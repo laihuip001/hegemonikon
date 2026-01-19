@@ -1,0 +1,176 @@
+{
+   "btn_checkout_plans": {
+      "message": "查看方案"
+   },
+   "export_settings_not_pdf_tagline": {
+      "message": "非 PDF 匯出類型的設定。"
+   },
+   "export_settings_tagline": {
+      "message": "通用設定。"
+   },
+   "export_settings_title": {
+      "message": "匯出設定"
+   },
+   "ext_description": {
+      "message": "將 Claude 對話匯出為 PDF、Markdown、文本、CSV 等格式。免費且完全可自訂。支援附件、推理與進階輸出。"
+   },
+   "ext_fulltitle": {
+      "message": "AI對話匯出器：將 Claude 保存為 PDF、MD 等格式"
+   },
+   "feedback": {
+      "message": "問題迴響"
+   },
+   "label_content_title": {
+      "message": "內容標題："
+   },
+   "label_convo_link": {
+      "message": "對話連結："
+   },
+   "label_copy_to_clipboard": {
+      "message": "複製到剪貼簿："
+   },
+   "label_dark_mode": {
+      "message": "深色模式："
+   },
+   "label_date_and_time": {
+      "message": "日期和時間："
+   },
+   "label_display_btns": {
+      "message": "顯示/隱藏匯出按鈕："
+   },
+   "label_download_location": {
+      "message": "下載位置："
+   },
+   "label_file_name": {
+      "message": "檔案名稱："
+   },
+   "label_file_name_prefix": {
+      "message": "檔案名稱前綴："
+   },
+   "label_font_family": {
+      "message": "字型："
+   },
+   "label_font_size": {
+      "message": "字型大小："
+   },
+   "label_include_artifacts": {
+      "message": "附件內容："
+   },
+   "label_include_per_msg_time": {
+      "message": "訊息時間戳："
+   },
+   "label_include_thought_process": {
+      "message": "思考過程："
+   },
+   "label_mute_export": {
+      "message": "靜音匯出："
+   },
+   "label_page_break_per_prompt": {
+      "message": "每個提示詞分頁："
+   },
+   "label_page_format": {
+      "message": "頁面格式："
+   },
+   "label_page_margin": {
+      "message": "頁面邊距："
+   },
+   "label_remove_branding": {
+      "message": "移除品牌標識："
+   },
+   "label_remove_icons": {
+      "message": "移除圖示："
+   },
+   "label_remove_page_number": {
+      "message": "移除頁碼："
+   },
+   "label_table_of_contents": {
+      "message": "目錄："
+   },
+   "label_user_info": {
+      "message": "使用者資訊："
+   },
+   "language": {
+      "message": "Chinese, Traditional"
+   },
+   "link_contact_support": {
+      "message": "聯絡支援"
+   },
+   "link_feature_request": {
+      "message": "功能請求"
+   },
+   "link_my_account": {
+      "message": "我的帳戶"
+   },
+   "link_open_claude": {
+      "message": "開啟 Claude 網站"
+   },
+   "link_settings_download": {
+      "message": "開啟設定"
+   },
+   "msg_bad": {
+      "message": "差"
+   },
+   "msg_export_success": {
+      "message": "匯出成功！"
+   },
+   "msg_export_success_copy_to_clipboard": {
+      "message": "複製到剪貼簿成功！"
+   },
+   "msg_good": {
+      "message": "好"
+   },
+   "msg_help_others_learn_about_us": {
+      "message": "這將幫助其他人了解更多關於此擴充功能的資訊。"
+   },
+   "msg_if_issue_or_idea": {
+      "message": "如果您有任何問題或想法，請隨時聯絡我們。"
+   },
+   "msg_rate_or_review": {
+      "message": "在 Chrome 網上應用店評分或評論"
+   },
+   "msg_related_extension": {
+      "message": "相關擴充功能："
+   },
+   "msg_thanks_for_support": {
+      "message": "感謝您的支持！"
+   },
+   "msg_usage": {
+      "message": "使用情況"
+   },
+   "msg_usage_reach_daily_quota": {
+      "message": "使用量已達每日配額"
+   },
+   "msg_what_you_think": {
+      "message": "您對這個擴充功能有何看法？"
+   },
+   "solo_dev_charge_fee": {
+      "message": "作為獨立開發者，我收取少量費用來幫助支付維護服務的成本。我真誠地感謝您的理解和支持。"
+   },
+   "thanks": {
+      "message": "用 ❤️ 製作。感謝您的使用。"
+   },
+   "tooltip_copy_to_clipboard": {
+      "message": "將內容複製到剪貼簿而不是下載檔案。"
+   },
+   "tooltip_download_location": {
+      "message": "更改檔案儲存位置或選擇在 Chrome 設定中每次詢問。"
+   },
+   "tooltip_main_checkbox": {
+      "message": "快速選擇或取消選擇所有訊息。"
+   },
+   "tooltip_mute_export": {
+      "message": "不顯示匯出成功對話框。"
+   },
+   "tooltip_page_break_per_prompt": {
+      "message": "啟用後，每個使用者提示詞將在新頁面開始。"
+   },
+   "tooltip_pro_plan_feature": {
+      "message": "專業版功能"
+   },
+   "tooltip_remove_branding": {
+      "message": "移除 Claude 匯出工具品牌標識，包括圖示和連結。"
+   },
+   "tooltip_remove_icons": {
+      "message": "在 PDF 中移除使用者和 Claude 圖示"
+   }
+}

@@ -1,0 +1,176 @@
+{
+   "btn_checkout_plans": {
+      "message": "Kolla in planerna"
+   },
+   "export_settings_not_pdf_tagline": {
+      "message": "Inställningar för icke-PDF exporttyper."
+   },
+   "export_settings_tagline": {
+      "message": "Allmänna inställningar."
+   },
+   "export_settings_title": {
+      "message": "Exportinställningar"
+   },
+   "ext_description": {
+      "message": "Exportera Claude-chatter till PDF, Markdown, Text, CSV... Gratis och helt anpassningsbar. Stöder artefakter, resonemang och avancerade utdata."
+   },
+   "ext_fulltitle": {
+      "message": "AI-chattexportör: Spara Claude som PDF, MD och mer"
+   },
+   "feedback": {
+      "message": "Feedback"
+   },
+   "label_content_title": {
+      "message": "Innehållstitel:"
+   },
+   "label_convo_link": {
+      "message": "Konversationslänk:"
+   },
+   "label_copy_to_clipboard": {
+      "message": "Kopiera till urklipp:"
+   },
+   "label_dark_mode": {
+      "message": "Mörkt läge:"
+   },
+   "label_date_and_time": {
+      "message": "Datum & Tid:"
+   },
+   "label_display_btns": {
+      "message": "Visa / Dölj Exportknappar:"
+   },
+   "label_download_location": {
+      "message": "Nedladdningsplats:"
+   },
+   "label_file_name": {
+      "message": "Filnamn:"
+   },
+   "label_file_name_prefix": {
+      "message": "Filnamnsprefix:"
+   },
+   "label_font_family": {
+      "message": "Teckensnitt:"
+   },
+   "label_font_size": {
+      "message": "Teckenstorlek:"
+   },
+   "label_include_artifacts": {
+      "message": "Artefaktinnehåll:"
+   },
+   "label_include_per_msg_time": {
+      "message": "Meddelande-tidsstämplar:"
+   },
+   "label_include_thought_process": {
+      "message": "Tankeprocess:"
+   },
+   "label_mute_export": {
+      "message": "Dämpa export:"
+   },
+   "label_page_break_per_prompt": {
+      "message": "Sidbrytning per prompt:"
+   },
+   "label_page_format": {
+      "message": "Sidformat:"
+   },
+   "label_page_margin": {
+      "message": "Sidmarginal:"
+   },
+   "label_remove_branding": {
+      "message": "Ta bort varumärke:"
+   },
+   "label_remove_icons": {
+      "message": "Ta bort ikoner:"
+   },
+   "label_remove_page_number": {
+      "message": "Ta bort sidnummer:"
+   },
+   "label_table_of_contents": {
+      "message": "Innehållsförteckning:"
+   },
+   "label_user_info": {
+      "message": "Användarinformation:"
+   },
+   "language": {
+      "message": "Swedish"
+   },
+   "link_contact_support": {
+      "message": "Kontakta support"
+   },
+   "link_feature_request": {
+      "message": "Funktionsförslag"
+   },
+   "link_my_account": {
+      "message": "Mitt konto"
+   },
+   "link_open_claude": {
+      "message": "Öppna Claude-webbplats"
+   },
+   "link_settings_download": {
+      "message": "Öppna inställningar"
+   },
+   "msg_bad": {
+      "message": "Dålig"
+   },
+   "msg_export_success": {
+      "message": "Export lyckades!"
+   },
+   "msg_export_success_copy_to_clipboard": {
+      "message": "Kopiering till urklipp lyckades!"
+   },
+   "msg_good": {
+      "message": "Bra"
+   },
+   "msg_help_others_learn_about_us": {
+      "message": "Detta skulle hjälpa andra att lära sig mer om tillägget."
+   },
+   "msg_if_issue_or_idea": {
+      "message": "Om du har problem eller idéer, tveka inte att kontakta oss."
+   },
+   "msg_rate_or_review": {
+      "message": "Betygsätt eller recensera på Chrome Web Store"
+   },
+   "msg_related_extension": {
+      "message": "Relaterat tillägg:"
+   },
+   "msg_thanks_for_support": {
+      "message": "Tack för ditt stöd!"
+   },
+   "msg_usage": {
+      "message": "Användning"
+   },
+   "msg_usage_reach_daily_quota": {
+      "message": "användning har nått daglig kvot"
+   },
+   "msg_what_you_think": {
+      "message": "Vad tycker du om detta tillägg?"
+   },
+   "solo_dev_charge_fee": {
+      "message": "Som ensam utvecklare tar jag ut en liten avgift för att hjälpa till att täcka kostnaderna för att underhålla tjänsten. Jag uppskattar verkligen din förståelse och stöd."
+   },
+   "thanks": {
+      "message": "Byggt med ❤️. Tack för användningen."
+   },
+   "tooltip_copy_to_clipboard": {
+      "message": "Kopiera innehåll till urklipp istället för att ladda ned som fil."
+   },
+   "tooltip_download_location": {
+      "message": "Ändra var filer sparas eller välj att bli tillfrågad varje gång i Chrome-inställningar."
+   },
+   "tooltip_main_checkbox": {
+      "message": "Välj eller avmarkera alla meddelanden på en gång."
+   },
+   "tooltip_mute_export": {
+      "message": "Visa inte dialogrutan för lyckad export."
+   },
+   "tooltip_page_break_per_prompt": {
+      "message": "När aktiverad kommer varje användaruppmaning att börja på en ny sida."
+   },
+   "tooltip_pro_plan_feature": {
+      "message": "Pro-planfunktion"
+   },
+   "tooltip_remove_branding": {
+      "message": "Ta bort Claude Exporter-varumärke, inklusive ikon och länk."
+   },
+   "tooltip_remove_icons": {
+      "message": "Ta bort användar- och Claude-ikoner i PDF"
+   }
+}

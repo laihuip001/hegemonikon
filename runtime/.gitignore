@@ -1,0 +1,13 @@
+# Antigravity Configuration
+# Secrets - NEVER COMMIT
+.env.local
+.env
+*.key
+
+# IDE
+.vscode/
+*.log
+
+# Temp
+*.tmp
+*.temp

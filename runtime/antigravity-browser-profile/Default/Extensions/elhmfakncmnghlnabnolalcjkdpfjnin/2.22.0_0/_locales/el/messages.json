@@ -1,0 +1,176 @@
+{
+   "btn_checkout_plans": {
+      "message": "Δείτε τα προγράμματα"
+   },
+   "export_settings_not_pdf_tagline": {
+      "message": "Ρυθμίσεις για τύπους εξαγωγής μη-PDF."
+   },
+   "export_settings_tagline": {
+      "message": "Κοινές ρυθμίσεις."
+   },
+   "export_settings_title": {
+      "message": "Ρυθμίσεις εξαγωγής"
+   },
+   "ext_description": {
+      "message": "Εξάγετε συνομιλίες Claude σε PDF, Markdown, Κείμενο, CSV... Δωρεάν και πλήρως προσαρμόσιμο. Υποστηρίζει αρτεφάκτα, συλλογισμό και προηγμένες εξόδους."
+   },
+   "ext_fulltitle": {
+      "message": "AI Chat Exporter: Αποθηκεύστε το Claude ως PDF, MD και περισσότερα"
+   },
+   "feedback": {
+      "message": "Ανατροφοδότηση"
+   },
+   "label_content_title": {
+      "message": "Τίτλος περιεχομένου:"
+   },
+   "label_convo_link": {
+      "message": "Σύνδεσμος Συνομιλίας:"
+   },
+   "label_copy_to_clipboard": {
+      "message": "Αντιγραφή στο πρόχειρο:"
+   },
+   "label_dark_mode": {
+      "message": "Σκοτεινός τρόπος:"
+   },
+   "label_date_and_time": {
+      "message": "Ημερομηνία & Ώρα:"
+   },
+   "label_display_btns": {
+      "message": "Εμφάνιση / Απόκρυψη Κουμπιών Εξαγωγής:"
+   },
+   "label_download_location": {
+      "message": "Τοποθεσία λήψης:"
+   },
+   "label_file_name": {
+      "message": "Όνομα αρχείου:"
+   },
+   "label_file_name_prefix": {
+      "message": "Πρόθεμα ονόματος αρχείου:"
+   },
+   "label_font_family": {
+      "message": "Γραμματοσειρά:"
+   },
+   "label_font_size": {
+      "message": "Μέγεθος γραμματοσειράς:"
+   },
+   "label_include_artifacts": {
+      "message": "Περιεχόμενο αρτεφάκτων:"
+   },
+   "label_include_per_msg_time": {
+      "message": "Χρονικές σφραγίδες μηνυμάτων:"
+   },
+   "label_include_thought_process": {
+      "message": "Διαδικασία σκέψης:"
+   },
+   "label_mute_export": {
+      "message": "Σίγαση εξαγωγής:"
+   },
+   "label_page_break_per_prompt": {
+      "message": "Αλλαγή σελίδας ανά prompt:"
+   },
+   "label_page_format": {
+      "message": "Μορφή σελίδας:"
+   },
+   "label_page_margin": {
+      "message": "Περιθώριο σελίδας:"
+   },
+   "label_remove_branding": {
+      "message": "Αφαίρεση επωνυμίας:"
+   },
+   "label_remove_icons": {
+      "message": "Αφαίρεση εικονιδίων:"
+   },
+   "label_remove_page_number": {
+      "message": "Αφαίρεση αριθμού σελίδας:"
+   },
+   "label_table_of_contents": {
+      "message": "Πίνακας περιεχομένων:"
+   },
+   "label_user_info": {
+      "message": "Πληροφορίες χρήστη:"
+   },
+   "language": {
+      "message": "Greek"
+   },
+   "link_contact_support": {
+      "message": "Επικοινωνία με την υποστήριξη"
+   },
+   "link_feature_request": {
+      "message": "Αίτηση χαρακτηριστικού"
+   },
+   "link_my_account": {
+      "message": "Ο λογαριασμός μου"
+   },
+   "link_open_claude": {
+      "message": "Άνοιγμα ιστοσελίδας Claude"
+   },
+   "link_settings_download": {
+      "message": "Άνοιγμα ρυθμίσεων"
+   },
+   "msg_bad": {
+      "message": "Κακό"
+   },
+   "msg_export_success": {
+      "message": "Επιτυχής εξαγωγή!"
+   },
+   "msg_export_success_copy_to_clipboard": {
+      "message": "Επιτυχής αντιγραφή στο πρόχειρο!"
+   },
+   "msg_good": {
+      "message": "Καλό"
+   },
+   "msg_help_others_learn_about_us": {
+      "message": "Αυτό θα βοηθήσει άλλους να μάθουν περισσότερα για την επέκταση."
+   },
+   "msg_if_issue_or_idea": {
+      "message": "Αν έχετε κάποιο πρόβλημα ή ιδέα, μη διστάσετε να επικοινωνήσετε μαζί μας."
+   },
+   "msg_rate_or_review": {
+      "message": "Αξιολογήστε ή γράψτε κριτική στο Chrome Web Store"
+   },
+   "msg_related_extension": {
+      "message": "Σχετική επέκταση:"
+   },
+   "msg_thanks_for_support": {
+      "message": "Ευχαριστούμε για την υποστήριξή σας!"
+   },
+   "msg_usage": {
+      "message": "Χρήση"
+   },
+   "msg_usage_reach_daily_quota": {
+      "message": "η χρήση έχει φτάσει το ημερήσιο όριο"
+   },
+   "msg_what_you_think": {
+      "message": "Τι πιστεύετε για αυτή την επέκταση;"
+   },
+   "solo_dev_charge_fee": {
+      "message": "Ως ανεξάρτητος προγραμματιστής, χρεώνω ένα μικρό τέλος για να βοηθήσω στην κάλυψη του κόστους συντήρησης της υπηρεσίας. Εκτιμώ πραγματικά την κατανόηση και την υποστήριξή σας."
+   },
+   "thanks": {
+      "message": "Χτισμένο με ❤️. Ευχαριστούμε για τη χρήση."
+   },
+   "tooltip_copy_to_clipboard": {
+      "message": "Αντιγραφή περιεχομένου στο πρόχειρο αντί για λήψη ως αρχείο."
+   },
+   "tooltip_download_location": {
+      "message": "Αλλάξτε πού αποθηκεύονται τα αρχεία ή επιλέξτε να ερωτάστε κάθε φορά στις ρυθμίσεις Chrome."
+   },
+   "tooltip_main_checkbox": {
+      "message": "Επιλέξτε ή αποεπιλέξτε όλα τα μηνύματα ταυτόχρονα."
+   },
+   "tooltip_mute_export": {
+      "message": "Μην εμφανίζετε το παράθυρο Επιτυχής εξαγωγή."
+   },
+   "tooltip_page_break_per_prompt": {
+      "message": "Όταν είναι ενεργοποιημένο, κάθε prompt χρήστη θα ξεκινά σε νέα σελίδα."
+   },
+   "tooltip_pro_plan_feature": {
+      "message": "Χαρακτηριστικό προγράμματος Pro"
+   },
+   "tooltip_remove_branding": {
+      "message": "Αφαιρέστε την επωνυμία Claude Exporter, συμπεριλαμβανομένου του εικονιδίου και του συνδέσμου."
+   },
+   "tooltip_remove_icons": {
+      "message": "Αφαιρέστε τα εικονίδια χρήστη και Claude στο PDF"
+   }
+}

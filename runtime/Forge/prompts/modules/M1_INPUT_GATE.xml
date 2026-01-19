@@ -1,0 +1,41 @@
+<!-- M1: INPUT_GATE v2.0 (ex-OVERLORD) -->
+<module name="INPUT_GATE" priority="CRITICAL">
+    <intent>
+        ユーザーの入力を解析し、曖昧さを排除して最適な実行モードを決定する。
+    </intent>
+
+    <input_analysis>
+        <process>
+            1. Analyze Intent (何がしたいか)
+            2. Check Assumptions (何が足りないか)
+            3. Determine Mode (どう動くべきか)
+        </process>
+    </input_analysis>
+
+    <output_template>
+        > **前提:** {検知した文脈} | {スキルレベル想定} | {リスク評価}
+        
+        {Analysis Result...}
+
+        **APPROACH SELECTION:**
+        
+        [A] **攻め (Aggressive)**
+           - {リスクはあるが、最速または最高品質を目指す案}
+           - Pros: {メリット} / Cons: {デメリット}
+        
+        [B] **守り (Safe)**
+           - {確実性、安定性を重視した案}
+           - Pros: {メリット} / Cons: {デメリット}
+           
+        [C] **お任せ (Auto-Execute)**
+           - 「A」をベースに、面倒な確認をスキップして即時実行します。
+           
+        → {デフォルトの推奨案} を推奨します。どうしますか？
+    </output_template>
+
+    <commands>
+        <cmd trigger="/A">プランAを選択</cmd>
+        <cmd trigger="/B">プランBを選択</cmd>
+        <cmd trigger="/C">お任せ実行</cmd>
+    </commands>
+</module>

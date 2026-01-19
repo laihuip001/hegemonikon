@@ -1,0 +1,176 @@
+{
+   "btn_checkout_plans": {
+      "message": "プランを確認する"
+   },
+   "export_settings_not_pdf_tagline": {
+      "message": "非PDFエクスポートタイプの設定。"
+   },
+   "export_settings_tagline": {
+      "message": "共通設定。"
+   },
+   "export_settings_title": {
+      "message": "エクスポート設定"
+   },
+   "ext_description": {
+      "message": "Claudeの会話をPDF、Markdown、テキスト、CSVなどにエクスポート。無料で完全にカスタマイズ可能。添付ファイル、推論、高度な出力をサポート。"
+   },
+   "ext_fulltitle": {
+      "message": "AIチャットエクスポーター：ClaudeをPDF、MDなどに保存"
+   },
+   "feedback": {
+      "message": "フィードバック"
+   },
+   "label_content_title": {
+      "message": "コンテンツタイトル："
+   },
+   "label_convo_link": {
+      "message": "会話リンク:"
+   },
+   "label_copy_to_clipboard": {
+      "message": "クリップボードにコピー："
+   },
+   "label_dark_mode": {
+      "message": "ダークモード："
+   },
+   "label_date_and_time": {
+      "message": "日付と時刻："
+   },
+   "label_display_btns": {
+      "message": "エクスポートボタンの表示/非表示:"
+   },
+   "label_download_location": {
+      "message": "ダウンロード場所："
+   },
+   "label_file_name": {
+      "message": "ファイル名："
+   },
+   "label_file_name_prefix": {
+      "message": "ファイル名プレフィックス："
+   },
+   "label_font_family": {
+      "message": "フォント:"
+   },
+   "label_font_size": {
+      "message": "フォントサイズ："
+   },
+   "label_include_artifacts": {
+      "message": "アーティファクトの内容："
+   },
+   "label_include_per_msg_time": {
+      "message": "メッセージタイムスタンプ："
+   },
+   "label_include_thought_process": {
+      "message": "思考プロセス："
+   },
+   "label_mute_export": {
+      "message": "エクスポートをミュート："
+   },
+   "label_page_break_per_prompt": {
+      "message": "プロンプトごとの改ページ："
+   },
+   "label_page_format": {
+      "message": "ページ形式："
+   },
+   "label_page_margin": {
+      "message": "ページ余白："
+   },
+   "label_remove_branding": {
+      "message": "ブランディングを削除："
+   },
+   "label_remove_icons": {
+      "message": "アイコンを削除："
+   },
+   "label_remove_page_number": {
+      "message": "ページ番号を削除："
+   },
+   "label_table_of_contents": {
+      "message": "目次："
+   },
+   "label_user_info": {
+      "message": "ユーザー情報："
+   },
+   "language": {
+      "message": "Japanese"
+   },
+   "link_contact_support": {
+      "message": "サポートに連絡"
+   },
+   "link_feature_request": {
+      "message": "機能リクエスト"
+   },
+   "link_my_account": {
+      "message": "マイアカウント"
+   },
+   "link_open_claude": {
+      "message": "Claudeウェブサイトを開く"
+   },
+   "link_settings_download": {
+      "message": "設定を開く"
+   },
+   "msg_bad": {
+      "message": "悪い"
+   },
+   "msg_export_success": {
+      "message": "エクスポート成功！"
+   },
+   "msg_export_success_copy_to_clipboard": {
+      "message": "クリップボードへのコピーが成功しました！"
+   },
+   "msg_good": {
+      "message": "良い"
+   },
+   "msg_help_others_learn_about_us": {
+      "message": "これは他の人がこの拡張機能についてもっと知るのに役立ちます。"
+   },
+   "msg_if_issue_or_idea": {
+      "message": "問題やアイデアがあれば、お気軽にご連絡ください。"
+   },
+   "msg_rate_or_review": {
+      "message": "Chrome ウェブストアで評価またはレビュー"
+   },
+   "msg_related_extension": {
+      "message": "関連拡張機能："
+   },
+   "msg_thanks_for_support": {
+      "message": "ご支援ありがとうございます！"
+   },
+   "msg_usage": {
+      "message": "使用量"
+   },
+   "msg_usage_reach_daily_quota": {
+      "message": "使用量が1日のクォータに達しました"
+   },
+   "msg_what_you_think": {
+      "message": "この拡張機能をどう思いますか？"
+   },
+   "solo_dev_charge_fee": {
+      "message": "個人開発者として、サービスの維持費用をサポートするために少額の料金を請求しています。ご理解とご支援に心より感謝いたします。"
+   },
+   "thanks": {
+      "message": "❤️でビルド。ご利用ありがとうございます。"
+   },
+   "tooltip_copy_to_clipboard": {
+      "message": "ファイルとしてダウンロードする代わりに、内容をクリップボードにコピーします。"
+   },
+   "tooltip_download_location": {
+      "message": "ファイルが保存される場所を変更するか、Chromeの設定で毎回尋ねるように選択します。"
+   },
+   "tooltip_main_checkbox": {
+      "message": "すべてのメッセージを一度に素早く選択または選択解除します。"
+   },
+   "tooltip_mute_export": {
+      "message": "エクスポート成功ダイアログを表示しません。"
+   },
+   "tooltip_page_break_per_prompt": {
+      "message": "有効にすると、各ユーザープロンプトが新しいページから始まります。"
+   },
+   "tooltip_pro_plan_feature": {
+      "message": "プロプラン機能"
+   },
+   "tooltip_remove_branding": {
+      "message": "アイコンとリンクを含むClaude Exporterのブランディングを削除します。"
+   },
+   "tooltip_remove_icons": {
+      "message": "PDFのユーザーとClaudeのアイコンを削除"
+   }
+}

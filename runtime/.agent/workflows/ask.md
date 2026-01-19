@@ -1,0 +1,163 @@
+---
+description: 不足情報をPerplexityに調査依頼する。M5 Peiraと連携。
+hegemonikon: Peira-H
+---
+
+# /ask ワークフロー
+
+M5 Peira (探求) と連携し、外部AIへの調査依頼を生成・実行する。
+
+## 設計原則
+
+> **ゼロコスト優先**: ブラウザURL方式をデフォルトとし、API呼び出しは明示的オプションのみ。
+
+---
+
+## 実行モード
+
+| モード | コマンド | 動作 | コスト |
+|--------|----------|------|--------|
+| **browser** | `/ask [質問]` | ブラウザで開く（デフォルト） | 無料 |
+| **generate** | `/ask generate` | コピペ用質問生成 | 無料 |
+| **api** | `/ask api [質問]` | API呼び出し（$5/月上限注意） | 有料 |
+
+---
+
+## モード1: browser（デフォルト）
+
+### 対応ツール
+
+| ツール | URL形式 | 追加料金 |
+|--------|---------|----------|
+| **Perplexity** | `https://www.perplexity.ai/?q=クエリ` | 無料 (Pro会員) |
+| **Gemini** | `https://gemini.google.com/app?text=クエリ` | 無料 |
+| **ChatGPT** | `https://chatgpt.com/?q=クエリ` | 無料 (Plus会員) |
+
+### 実行手順
+
+1. **ツール選択** (デフォルト: Perplexity)
+   ```
+   /ask [質問]              → Perplexity
+   /ask gemini [質問]       → Gemini
+   /ask gpt [質問]          → ChatGPT
+   ```
+
+2. **URL生成**
+   ```
+   質問: "Antigravityのセッション永続化方法"
+     ↓
+   URL: https://www.perplexity.ai/?q=Antigravity%E3%81%AE%E3%82%BB%E3%83%83%E3%82%B7%E3%83%A7%E3%83%B3%E6%B0%B8%E7%B6%9A%E5%8C%96%E6%96%B9%E6%B3%95
+   ```
+
+3. **ブラウザで開く**
+   - Antigravity Browser Agent 経由
+   - または手動でコピペ
+
+### Perplexity 特殊パラメータ
+
+| パラメータ | 効果 |
+|------------|------|
+| `?q=クエリ` | 検索実行 |
+| `&collection=memory` | メモリ機能有効化 |
+| `/search/new?q=クエリ` | 新規スレッド |
+
+---
+
+## モード2: generate（質問生成のみ）
+
+コピペ用の構造化質問を生成する。
+
+### 出力形式
+
+```markdown
+## 調査依頼
+
+### 質問: [タイトル]
+**背景:** [なぜこの情報が必要か]
+**知りたいこと:**
+1. [具体的な質問1]
+2. [具体的な質問2]
+3. [具体的な質問3]
+**制約:** [技術スタック等]
+
+### URL (コピペ用)
+- Perplexity: https://www.perplexity.ai/?q=...
+- Gemini: https://gemini.google.com/app?text=...
+- ChatGPT: https://chatgpt.com/?q=...
+```
+
+---
+
+## モード3: api（有料・明示的オプション）
+
+> ⚠️ **月$5上限**: 重要な調査のみ使用
+
+### 使用条件
+
+- 明示的に `/ask api` で呼び出した場合のみ
+- 自動実行では**絶対に使用しない**
+
+### API設定
+
+| 項目 | 値 |
+|------|-----|
+| API Key | `C:\Users\raikh\.gemini\.env.local` |
+| モデル | `sonar-pro` (デフォルト) |
+| 月間予算 | $5 |
+
+### コスト計算
+
+| モデル | 出力コスト | 500トークンあたり |
+|--------|-----------|------------------|
+| sonar | $0.002/1K | $0.001 |
+| sonar-pro | $0.005/1K | $0.0025 |
+
+月$5で約2000回のsonar-pro呼び出しが可能。
+
+---
+
+## M5 Peira 連携
+
+```
+M1 Aisthēsis → 不確実性検出 (U > 0.6)
+     ↓
+M5 Peira → 情報収集要求
+     ↓
+/ask (browser mode) → ブラウザでURL生成
+     ↓
+ユーザーがブラウザで確認
+     ↓
+M3 Theōria ← 新情報入力
+```
+
+---
+
+## ブラウザプロファイル
+
+Antigravity Browser のセッションは以下に保存:
+```
+~/.gemini/antigravity-browser-profile
+```
+
+Perplexity/Gemini/ChatGPTにログイン済みなら、セッションが維持される。
+
+---
+
+## ベストプラクティス
+
+| 状況 | 推奨モード |
+|------|-----------|
+| 日常的な調査 | browser (無料) |
+| 構造化質問が必要 | generate → 手動コピペ |
+| 精度重視・自動化 | api (予算内で) |
+| 複数ツール比較 | generate で全URL生成 |
+
+---
+
+## エラー対処
+
+| エラー | 原因 | 対処 |
+|--------|------|------|
+| ブラウザが開かない | 拡張機能未インストール | Cmd+L → "open browser" |
+| ログイン画面 | セッション切れ | 手動ログイン |
+| API 429 | レート制限 | browser モードに切り替え |

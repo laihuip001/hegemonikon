@@ -1,0 +1,26 @@
+{
+   "appName": {
+      "message": "Notebook LM"
+   },
+   "displayErrorDescription": {
+      "message": "Sorry, something went wrong while loading the page."
+   },
+   "displayErrorDetailsInfo": {
+      "message": "Error details:"
+   },
+   "displayErrorInfo": {
+      "message": "Error occur"
+   },
+   "displayErrorReset": {
+      "message": "Run Again"
+   },
+   "displayErrorUnknownErrorInfo": {
+      "message": "Unknown error"
+   },
+   "shortDesc": {
+      "message": "برای ایجاد یک دفترچه یادداشت جدید، وارد کردن آسان صفحات وب و افزودن لینک‌های یوتیوب به Notebook LM با یک کلیک از NotebookLM استفاده کنید!"
+   },
+   "storeDesc": {
+      "message": ""
+   }
+}

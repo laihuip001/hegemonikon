@@ -1,0 +1,176 @@
+{
+   "btn_checkout_plans": {
+      "message": "Podívejte se na plány"
+   },
+   "export_settings_not_pdf_tagline": {
+      "message": "Nastavení pro typy exportu bez PDF."
+   },
+   "export_settings_tagline": {
+      "message": "Obecná nastavení."
+   },
+   "export_settings_title": {
+      "message": "Nastavení exportu"
+   },
+   "ext_description": {
+      "message": "Exportujte Claude chaty do PDF, Markdown, Text, CSV... Zdarma a plně přizpůsobitelné. Podporuje artefakty, uvažování a pokročilé výstupy."
+   },
+   "ext_fulltitle": {
+      "message": "Exportér AI Chatů: Uložte Claude jako PDF, MD a další"
+   },
+   "feedback": {
+      "message": "Zpětná vazba"
+   },
+   "label_content_title": {
+      "message": "Název obsahu:"
+   },
+   "label_convo_link": {
+      "message": "Odkaz konverzace:"
+   },
+   "label_copy_to_clipboard": {
+      "message": "Kopírovat do schránky:"
+   },
+   "label_dark_mode": {
+      "message": "Tmavý režim:"
+   },
+   "label_date_and_time": {
+      "message": "Datum a čas:"
+   },
+   "label_display_btns": {
+      "message": "Zobrazit / Skrýt Tlačítka Exportu:"
+   },
+   "label_download_location": {
+      "message": "Místo stahování:"
+   },
+   "label_file_name": {
+      "message": "Název souboru:"
+   },
+   "label_file_name_prefix": {
+      "message": "Předpona názvu souboru:"
+   },
+   "label_font_family": {
+      "message": "Písmo:"
+   },
+   "label_font_size": {
+      "message": "Velikost písma:"
+   },
+   "label_include_artifacts": {
+      "message": "Obsah artefaktů:"
+   },
+   "label_include_per_msg_time": {
+      "message": "Časové značky zpráv:"
+   },
+   "label_include_thought_process": {
+      "message": "Myšlenkový proces:"
+   },
+   "label_mute_export": {
+      "message": "Ztlumit export:"
+   },
+   "label_page_break_per_prompt": {
+      "message": "Zalomení stránky na dotaz:"
+   },
+   "label_page_format": {
+      "message": "Formát stránky:"
+   },
+   "label_page_margin": {
+      "message": "Okraj stránky:"
+   },
+   "label_remove_branding": {
+      "message": "Odstranit značku:"
+   },
+   "label_remove_icons": {
+      "message": "Odstranit ikony:"
+   },
+   "label_remove_page_number": {
+      "message": "Odstranit číslo stránky:"
+   },
+   "label_table_of_contents": {
+      "message": "Obsah:"
+   },
+   "label_user_info": {
+      "message": "Informace o uživateli:"
+   },
+   "language": {
+      "message": "Czech"
+   },
+   "link_contact_support": {
+      "message": "Kontaktovat podporu"
+   },
+   "link_feature_request": {
+      "message": "Požadavek na funkci"
+   },
+   "link_my_account": {
+      "message": "Můj účet"
+   },
+   "link_open_claude": {
+      "message": "Otevřít web Claude"
+   },
+   "link_settings_download": {
+      "message": "Otevřít nastavení"
+   },
+   "msg_bad": {
+      "message": "Špatné"
+   },
+   "msg_export_success": {
+      "message": "Export úspěšný!"
+   },
+   "msg_export_success_copy_to_clipboard": {
+      "message": "Kopírování do schránky úspěšné!"
+   },
+   "msg_good": {
+      "message": "Dobré"
+   },
+   "msg_help_others_learn_about_us": {
+      "message": "Toto pomůže ostatním dozvědět se více o rozšíření."
+   },
+   "msg_if_issue_or_idea": {
+      "message": "Pokud máte nějaké problémy nebo nápady, neváhejte nás kontaktovat."
+   },
+   "msg_rate_or_review": {
+      "message": "Ohodnoťte nebo napište recenzi v Chrome Web Store"
+   },
+   "msg_related_extension": {
+      "message": "Související rozšíření:"
+   },
+   "msg_thanks_for_support": {
+      "message": "Děkujeme za vaši podporu!"
+   },
+   "msg_usage": {
+      "message": "Využití"
+   },
+   "msg_usage_reach_daily_quota": {
+      "message": "využití dosáhlo denního limitu"
+   },
+   "msg_what_you_think": {
+      "message": "Co si myslíte o tomto rozšíření?"
+   },
+   "solo_dev_charge_fee": {
+      "message": "Jako samostatný vývojář účtuji malý poplatek, který pomáhá pokrýt náklady na údržbu služby. Opravdu si vážím vašeho pochopení a podpory."
+   },
+   "thanks": {
+      "message": "Postaveno s ❤️. Děkujeme za použití."
+   },
+   "tooltip_copy_to_clipboard": {
+      "message": "Kopírovat obsah do schránky místo stahování jako soubor."
+   },
+   "tooltip_download_location": {
+      "message": "Změnit místo ukládání souborů nebo zvolit dotazování při každém stahování v nastavení Chrome."
+   },
+   "tooltip_main_checkbox": {
+      "message": "Rychle vyberte nebo zrušte výběr všech zpráv najednou."
+   },
+   "tooltip_mute_export": {
+      "message": "Nezobrazovat dialogové okno Úspěšný export."
+   },
+   "tooltip_page_break_per_prompt": {
+      "message": "Když je povoleno, každý uživatelský dotaz začne na nové stránce."
+   },
+   "tooltip_pro_plan_feature": {
+      "message": "Funkce Pro plánu"
+   },
+   "tooltip_remove_branding": {
+      "message": "Odstranit značku Claude Exporter, včetně ikony a odkazu."
+   },
+   "tooltip_remove_icons": {
+      "message": "Odstranit ikony uživatele a Claude v PDF"
+   }
+}

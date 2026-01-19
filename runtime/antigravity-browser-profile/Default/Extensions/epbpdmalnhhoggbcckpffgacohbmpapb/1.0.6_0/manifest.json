@@ -1,0 +1,59 @@
+{
+   "action": {
+      "default_icon": {
+         "19": "icons/dr_active_19.png",
+         "38": "icons/dr_active_38.png"
+      },
+      "default_popup": "popup.html",
+      "default_title": "__MSG_titleDefault__"
+   },
+   "background": {
+      "service_worker": "javascript/worker.js"
+   },
+   "commands": {
+      "darkModeToggle": {
+         "description": "Dark Mode On/Off",
+         "suggested_key": {
+            "default": "Alt+Shift+D",
+            "mac": "Alt+Shift+D",
+            "windows": "Alt+Shift+D"
+         }
+      },
+      "nightModeToggle": {
+         "description": "Night Shift On/Off",
+         "suggested_key": {
+            "default": "Alt+Shift+S",
+            "mac": "Alt+Shift+S",
+            "windows": "Alt+Shift+S"
+         }
+      },
+      "toggle": {
+         "description": "Extension On/Off",
+         "suggested_key": {
+            "default": "Alt+Shift+E",
+            "mac": "Alt+Shift+E",
+            "windows": "Alt+Shift+E"
+         }
+      }
+   },
+   "content_scripts": [ {
+      "all_frames": true,
+      "js": [ "javascript/content.js" ],
+      "matches": [ "*://*/*" ],
+      "run_at": "document_start"
+   } ],
+   "default_locale": "en",
+   "description": "__MSG_extDescription__",
+   "host_permissions": [ "*://*/*", "*://*/*/*" ],
+   "icons": {
+      "128": "icons/dr_128.png",
+      "16": "icons/dr_16.png",
+      "48": "icons/dr_48.png"
+   },
+   "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAmro8lIqN2wstnHYbhTh+ceabxjycvtBvbEE0gqlKval7cDfvYZggFIO6Rp7kug17YUhcnVr1Nc4Kjw2230/OavYStqr3YNgGNE8UBq8KO4MWdcl61o6nKdM/HZNEwns0Ban+ccwy05+3jl8v0GeAtJ6YZx5T0QSREH2abY4kAttl7qFufO8YAR2kN/qrWuvFV1d8brmPB+uFiL8QQvZFydHTFgWoZc6ec3SK3HxmUcIaHWvIzeK6gWewM9+81guCs0tX05noBgu5Nj3LQmTWpY1sAPT4Xz4NZLnhMjHjICI20v+y1AJNI5jPwkBnVM0RD5QFfRd5r0/lxpy8tF3BGwIDAQAB",
+   "manifest_version": 3,
+   "name": "__MSG_extName__",
+   "permissions": [ "fontSettings", "activeTab", "storage", "tabs", "alarms" ],
+   "update_url": "https://clients2.google.com/service/update2/crx",
+   "version": "1.0.6"
+}

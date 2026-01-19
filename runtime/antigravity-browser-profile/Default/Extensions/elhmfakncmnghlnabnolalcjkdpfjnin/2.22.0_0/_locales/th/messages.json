@@ -1,0 +1,176 @@
+{
+   "btn_checkout_plans": {
+      "message": "ดูแผน"
+   },
+   "export_settings_not_pdf_tagline": {
+      "message": "การตั้งค่าสำหรับประเภทการส่งออกที่ไม่ใช่ PDF"
+   },
+   "export_settings_tagline": {
+      "message": "การตั้งค่าทั่วไป"
+   },
+   "export_settings_title": {
+      "message": "การตั้งค่าการส่งออก"
+   },
+   "ext_description": {
+      "message": "ส่งออกการสนทนา Claude เป็น PDF, Markdown, ข้อความ, CSV... ฟรีและปรับแต่งได้อย่างเต็มที่ รองรับสิ่งประดิษฐ์ การให้เหตุผล และผลลัพธ์ขั้นสูง"
+   },
+   "ext_fulltitle": {
+      "message": "AI Chat Exporter: บันทึก Claude เป็น PDF, MD และอื่นๆ"
+   },
+   "feedback": {
+      "message": "ข้อเสนอแนะ"
+   },
+   "label_content_title": {
+      "message": "ชื่อเนื้อหา:"
+   },
+   "label_convo_link": {
+      "message": "ลิงก์การสนทนา:"
+   },
+   "label_copy_to_clipboard": {
+      "message": "คัดลอกไปยังคลิปบอร์ด:"
+   },
+   "label_dark_mode": {
+      "message": "โหมดมืด:"
+   },
+   "label_date_and_time": {
+      "message": "วันที่และเวลา:"
+   },
+   "label_display_btns": {
+      "message": "แสดง/ซ่อนปุ่มส่งออก:"
+   },
+   "label_download_location": {
+      "message": "ตำแหน่งดาวน์โหลด:"
+   },
+   "label_file_name": {
+      "message": "ชื่อไฟล์:"
+   },
+   "label_file_name_prefix": {
+      "message": "คำนำหน้าชื่อไฟล์:"
+   },
+   "label_font_family": {
+      "message": "ตัวอักษร:"
+   },
+   "label_font_size": {
+      "message": "ขนาดตัวอักษร:"
+   },
+   "label_include_artifacts": {
+      "message": "เนื้อหาสิ่งประดิษฐ์:"
+   },
+   "label_include_per_msg_time": {
+      "message": "ตราเวลาข้อความ:"
+   },
+   "label_include_thought_process": {
+      "message": "กระบวนการคิด:"
+   },
+   "label_mute_export": {
+      "message": "ปิดเสียงการส่งออก:"
+   },
+   "label_page_break_per_prompt": {
+      "message": "แบ่งหน้าต่อคำสั่ง:"
+   },
+   "label_page_format": {
+      "message": "รูปแบบหน้า:"
+   },
+   "label_page_margin": {
+      "message": "ขอบหน้า:"
+   },
+   "label_remove_branding": {
+      "message": "ลบแบรนด์:"
+   },
+   "label_remove_icons": {
+      "message": "ลบไอคอน:"
+   },
+   "label_remove_page_number": {
+      "message": "ลบเลขหน้า:"
+   },
+   "label_table_of_contents": {
+      "message": "สารบัญ:"
+   },
+   "label_user_info": {
+      "message": "ข้อมูลผู้ใช้:"
+   },
+   "language": {
+      "message": "Thai"
+   },
+   "link_contact_support": {
+      "message": "ติดต่อฝ่ายสนับสนุน"
+   },
+   "link_feature_request": {
+      "message": "ขอคุณสมบัติ"
+   },
+   "link_my_account": {
+      "message": "บัญชีของฉัน"
+   },
+   "link_open_claude": {
+      "message": "เปิดเว็บไซต์ Claude"
+   },
+   "link_settings_download": {
+      "message": "เปิดการตั้งค่า"
+   },
+   "msg_bad": {
+      "message": "ไม่ดี"
+   },
+   "msg_export_success": {
+      "message": "ส่งออกสำเร็จ!"
+   },
+   "msg_export_success_copy_to_clipboard": {
+      "message": "คัดลอกไปยังคลิปบอร์ดสำเร็จ!"
+   },
+   "msg_good": {
+      "message": "ดี"
+   },
+   "msg_help_others_learn_about_us": {
+      "message": "นี่จะช่วยให้ผู้อื่นได้เรียนรู้เพิ่มเติมเกี่ยวกับส่วนขยาย"
+   },
+   "msg_if_issue_or_idea": {
+      "message": "หากคุณมีปัญหาหรือความคิดเห็น อย่าลังเลที่จะติดต่อเรา"
+   },
+   "msg_rate_or_review": {
+      "message": "ให้คะแนนหรือรีวิวบน Chrome Web Store"
+   },
+   "msg_related_extension": {
+      "message": "ส่วนขยายที่เกี่ยวข้อง:"
+   },
+   "msg_thanks_for_support": {
+      "message": "ขอบคุณสำหรับการสนับสนุน!"
+   },
+   "msg_usage": {
+      "message": "การใช้งาน"
+   },
+   "msg_usage_reach_daily_quota": {
+      "message": "การใช้งานถึงโควตารายวันแล้ว"
+   },
+   "msg_what_you_think": {
+      "message": "คุณคิดอย่างไรกับส่วนขยายนี้?"
+   },
+   "solo_dev_charge_fee": {
+      "message": "ในฐานะนักพัฒนาคนเดียว ผมเรียกเก็บค่าธรรมเนียมเล็กน้อยเพื่อช่วยครอบคลุมค่าใช้จ่ายในการบำรุงรักษาบริการ ผมขอบคุณความเข้าใจและการสนับสนุนของคุณอย่างจริงใจ"
+   },
+   "thanks": {
+      "message": "สร้างด้วย ❤️ ขอบคุณที่ใช้งาน"
+   },
+   "tooltip_copy_to_clipboard": {
+      "message": "คัดลอกเนื้อหาไปยังคลิปบอร์ดแทนการดาวน์โหลดเป็นไฟล์"
+   },
+   "tooltip_download_location": {
+      "message": "เปลี่ยนที่บันทึกไฟล์ หรือเลือกให้ถามทุกครั้งในการตั้งค่า Chrome"
+   },
+   "tooltip_main_checkbox": {
+      "message": "เลือกหรือยกเลิกการเลือกข้อความทั้งหมดได้อย่างรวดเร็ว"
+   },
+   "tooltip_mute_export": {
+      "message": "ไม่แสดงกล่องโต้ตอบการส่งออกสำเร็จ"
+   },
+   "tooltip_page_break_per_prompt": {
+      "message": "เมื่อเปิดใช้งาน คำสั่งของผู้ใช้แต่ละคำสั่งจะเริ่มต้นในหน้าใหม่"
+   },
+   "tooltip_pro_plan_feature": {
+      "message": "คุณสมบัติแผน Pro"
+   },
+   "tooltip_remove_branding": {
+      "message": "ลบแบรนด์ Claude Exporter รวมถึงไอคอนและลิงก์"
+   },
+   "tooltip_remove_icons": {
+      "message": "ลบไอคอนผู้ใช้และ Claude ใน PDF"
+   }
+}

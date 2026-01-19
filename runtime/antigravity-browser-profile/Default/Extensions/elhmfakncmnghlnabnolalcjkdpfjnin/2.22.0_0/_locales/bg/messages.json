@@ -1,0 +1,176 @@
+{
+   "btn_checkout_plans": {
+      "message": "Разгледайте плановете"
+   },
+   "export_settings_not_pdf_tagline": {
+      "message": "Настройки за типове експорт различни от PDF."
+   },
+   "export_settings_tagline": {
+      "message": "Общи настройки."
+   },
+   "export_settings_title": {
+      "message": "Настройки за експорт"
+   },
+   "ext_description": {
+      "message": "Експортирайте Claude чатове към PDF, Markdown, Текст, CSV... Безплатно и напълно персонализируемо. Поддържа артефакти, разсъждения и разширени изходи."
+   },
+   "ext_fulltitle": {
+      "message": "AI Chat Exporter: Запазете Claude като PDF, MD и други"
+   },
+   "feedback": {
+      "message": "Обратна връзка"
+   },
+   "label_content_title": {
+      "message": "Заглавие на съдържанието:"
+   },
+   "label_convo_link": {
+      "message": "Връзка за разговор:"
+   },
+   "label_copy_to_clipboard": {
+      "message": "Копиране в клипборда:"
+   },
+   "label_dark_mode": {
+      "message": "Тъмен режим:"
+   },
+   "label_date_and_time": {
+      "message": "Дата и час:"
+   },
+   "label_display_btns": {
+      "message": "Показване / Скриване на Бутони за Експорт:"
+   },
+   "label_download_location": {
+      "message": "Местоположение за изтегляне:"
+   },
+   "label_file_name": {
+      "message": "Име на файл:"
+   },
+   "label_file_name_prefix": {
+      "message": "Представка на името на файла:"
+   },
+   "label_font_family": {
+      "message": "Шрифт:"
+   },
+   "label_font_size": {
+      "message": "Размер на шрифта:"
+   },
+   "label_include_artifacts": {
+      "message": "Съдържание на артефакти:"
+   },
+   "label_include_per_msg_time": {
+      "message": "Времеви печати на съобщения:"
+   },
+   "label_include_thought_process": {
+      "message": "Мисловен процес:"
+   },
+   "label_mute_export": {
+      "message": "Заглушаване на експорта:"
+   },
+   "label_page_break_per_prompt": {
+      "message": "Нова страница за всеки въпрос:"
+   },
+   "label_page_format": {
+      "message": "Формат на страницата:"
+   },
+   "label_page_margin": {
+      "message": "Марж на страницата:"
+   },
+   "label_remove_branding": {
+      "message": "Премахване на брандинга:"
+   },
+   "label_remove_icons": {
+      "message": "Премахване на иконите:"
+   },
+   "label_remove_page_number": {
+      "message": "Премахване на номера на страницата:"
+   },
+   "label_table_of_contents": {
+      "message": "Съдържание:"
+   },
+   "label_user_info": {
+      "message": "Информация за потребителя:"
+   },
+   "language": {
+      "message": "Bulgarian"
+   },
+   "link_contact_support": {
+      "message": "Свържете се с поддръжката"
+   },
+   "link_feature_request": {
+      "message": "Заявка за функция"
+   },
+   "link_my_account": {
+      "message": "Моят акаунт"
+   },
+   "link_open_claude": {
+      "message": "Отворете уебсайта на Claude"
+   },
+   "link_settings_download": {
+      "message": "Отворете настройките"
+   },
+   "msg_bad": {
+      "message": "Лошо"
+   },
+   "msg_export_success": {
+      "message": "Експортът е успешен!"
+   },
+   "msg_export_success_copy_to_clipboard": {
+      "message": "Копирането в клипборда е успешно!"
+   },
+   "msg_good": {
+      "message": "Добре"
+   },
+   "msg_help_others_learn_about_us": {
+      "message": "Това ще помогне на другите да научат повече за разширението."
+   },
+   "msg_if_issue_or_idea": {
+      "message": "Ако имате проблеми или идеи, не се колебайте да се свържете с нас."
+   },
+   "msg_rate_or_review": {
+      "message": "Оценете или напишете рецензия в Chrome Web Store"
+   },
+   "msg_related_extension": {
+      "message": "Свързано разширение:"
+   },
+   "msg_thanks_for_support": {
+      "message": "Благодарим за подкрепата ви!"
+   },
+   "msg_usage": {
+      "message": "Използване"
+   },
+   "msg_usage_reach_daily_quota": {
+      "message": "използването е достигнало дневния лимит"
+   },
+   "msg_what_you_think": {
+      "message": "Какво мислите за това разширение?"
+   },
+   "solo_dev_charge_fee": {
+      "message": "Като самостоятелен разработчик, таксувам малък такса, за да помогна покриването на разходите за поддръжка на услугата. Наистина оценявам разбирането и подкрепата ви."
+   },
+   "thanks": {
+      "message": "Създадено с ❤️. Благодарим за използването."
+   },
+   "tooltip_copy_to_clipboard": {
+      "message": "Копирайте съдържанието в клипборда вместо да изтегляте като файл."
+   },
+   "tooltip_download_location": {
+      "message": "Променете къде се запазват файловете или изберете да бъдете питани всеки път в настройките на Chrome."
+   },
+   "tooltip_main_checkbox": {
+      "message": "Бързо изберете или премахнете избора на всички съобщения наведнъж."
+   },
+   "tooltip_mute_export": {
+      "message": "Не показвайте диалоговия прозорец за успешен експорт."
+   },
+   "tooltip_page_break_per_prompt": {
+      "message": "Когато е активирано, всеки потребителски въпрос ще започне на нова страница."
+   },
+   "tooltip_pro_plan_feature": {
+      "message": "Функция на Pro плана"
+   },
+   "tooltip_remove_branding": {
+      "message": "Премахнете брандинга на Claude Exporter, включително иконата и връзката."
+   },
+   "tooltip_remove_icons": {
+      "message": "Премахнете иконите на потребителя и Claude в PDF"
+   }
+}

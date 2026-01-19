@@ -1,0 +1,176 @@
+{
+   "btn_checkout_plans": {
+      "message": "Consulter les plans"
+   },
+   "export_settings_not_pdf_tagline": {
+      "message": "Paramètres pour les types d'exportation non-PDF."
+   },
+   "export_settings_tagline": {
+      "message": "Paramètres courants."
+   },
+   "export_settings_title": {
+      "message": "Paramètres d'exportation"
+   },
+   "ext_description": {
+      "message": "Exportez les discussions Claude en PDF, Markdown, Texte, CSV... Gratuit et entièrement personnalisable. Prend en charge les artefacts, le raisonnement et les sorties avancées."
+   },
+   "ext_fulltitle": {
+      "message": "Exportateur de Chat IA : Enregistrez Claude en PDF, MD et plus"
+   },
+   "feedback": {
+      "message": "Retour"
+   },
+   "label_content_title": {
+      "message": "Titre du contenu :"
+   },
+   "label_convo_link": {
+      "message": "Lien de Conversation :"
+   },
+   "label_copy_to_clipboard": {
+      "message": "Copier dans le presse-papiers :"
+   },
+   "label_dark_mode": {
+      "message": "Mode sombre :"
+   },
+   "label_date_and_time": {
+      "message": "Date et heure :"
+   },
+   "label_display_btns": {
+      "message": "Afficher / Masquer les Boutons d'Exportation :"
+   },
+   "label_download_location": {
+      "message": "Emplacement de téléchargement :"
+   },
+   "label_file_name": {
+      "message": "Nom du fichier :"
+   },
+   "label_file_name_prefix": {
+      "message": "Préfixe du nom de fichier :"
+   },
+   "label_font_family": {
+      "message": "Police :"
+   },
+   "label_font_size": {
+      "message": "Taille de police :"
+   },
+   "label_include_artifacts": {
+      "message": "Contenu des artefacts :"
+   },
+   "label_include_per_msg_time": {
+      "message": "Horodatage des messages :"
+   },
+   "label_include_thought_process": {
+      "message": "Processus de réflexion :"
+   },
+   "label_mute_export": {
+      "message": "Exporter en silence :"
+   },
+   "label_page_break_per_prompt": {
+      "message": "Saut de page par prompt :"
+   },
+   "label_page_format": {
+      "message": "Format de page :"
+   },
+   "label_page_margin": {
+      "message": "Marge de page :"
+   },
+   "label_remove_branding": {
+      "message": "Supprimer la marque :"
+   },
+   "label_remove_icons": {
+      "message": "Supprimer les icônes :"
+   },
+   "label_remove_page_number": {
+      "message": "Supprimer le numéro de page :"
+   },
+   "label_table_of_contents": {
+      "message": "Table des matières :"
+   },
+   "label_user_info": {
+      "message": "Info utilisateur :"
+   },
+   "language": {
+      "message": "Français"
+   },
+   "link_contact_support": {
+      "message": "Contacter le support"
+   },
+   "link_feature_request": {
+      "message": "Demande de fonctionnalité"
+   },
+   "link_my_account": {
+      "message": "Mon compte"
+   },
+   "link_open_claude": {
+      "message": "Ouvrir le site Web Claude"
+   },
+   "link_settings_download": {
+      "message": "Ouvrir les paramètres"
+   },
+   "msg_bad": {
+      "message": "Mauvais"
+   },
+   "msg_export_success": {
+      "message": "Exportation réussie !"
+   },
+   "msg_export_success_copy_to_clipboard": {
+      "message": "Copie dans le presse-papiers réussie !"
+   },
+   "msg_good": {
+      "message": "Bon"
+   },
+   "msg_help_others_learn_about_us": {
+      "message": "Cela aiderait les autres à en savoir plus sur l'extension."
+   },
+   "msg_if_issue_or_idea": {
+      "message": "Si vous avez des problèmes ou des idées, n'hésitez pas à nous contacter."
+   },
+   "msg_rate_or_review": {
+      "message": "Noter ou commenter sur le Chrome Web Store"
+   },
+   "msg_related_extension": {
+      "message": "Extension connexe :"
+   },
+   "msg_thanks_for_support": {
+      "message": "Merci pour votre soutien !"
+   },
+   "msg_usage": {
+      "message": "Utilisation"
+   },
+   "msg_usage_reach_daily_quota": {
+      "message": "l'utilisation a atteint le quota journalier"
+   },
+   "msg_what_you_think": {
+      "message": "Que pensez-vous de cette extension ?"
+   },
+   "solo_dev_charge_fee": {
+      "message": "En tant que développeur indépendant, je facture des frais minimes pour aider à couvrir les coûts de maintenance du service. J'apprécie vraiment votre compréhension et votre soutien."
+   },
+   "thanks": {
+      "message": "Créé avec ❤️. Merci d'utiliser."
+   },
+   "tooltip_copy_to_clipboard": {
+      "message": "Copier le contenu dans le presse-papiers au lieu de télécharger un fichier."
+   },
+   "tooltip_download_location": {
+      "message": "Changer l'emplacement de sauvegarde des fichiers ou choisir d'être demandé à chaque fois dans les paramètres Chrome."
+   },
+   "tooltip_main_checkbox": {
+      "message": "Sélectionner ou désélectionner rapidement tous les messages à la fois."
+   },
+   "tooltip_mute_export": {
+      "message": "Ne pas afficher la boîte de dialogue Exportation réussie."
+   },
+   "tooltip_page_break_per_prompt": {
+      "message": "Lorsque activé, chaque prompt utilisateur commencera sur une nouvelle page."
+   },
+   "tooltip_pro_plan_feature": {
+      "message": "Fonctionnalité du plan Pro"
+   },
+   "tooltip_remove_branding": {
+      "message": "Supprimer la marque Claude Exporter, y compris l'icône et le lien."
+   },
+   "tooltip_remove_icons": {
+      "message": "Supprimer les icônes Utilisateur & Claude dans le PDF"
+   }
+}

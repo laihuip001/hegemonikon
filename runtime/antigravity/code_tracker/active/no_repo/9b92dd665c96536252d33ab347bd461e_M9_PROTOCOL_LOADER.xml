@@ -1,0 +1,94 @@
+Ã"<!-- M9: PROTOCOL_LOADER v2.1 -->
+<module name="PROTOCOL_LOADER" priority="MEDIUM">
+    <intent>
+        å¿…è¦ãªãƒ—ãƒ­ãƒˆã‚³ãƒ«ã‚’çŠ¶æ³ã«å¿œã˜ã¦ææ¡ˆãƒ»ãƒ­ãƒ¼ãƒ‰ã—ã€ãƒˆãƒ¼ã‚¯ãƒ³åŠ¹ç‡ã‚’æœ€å¤§åŒ–ã€‚
+        äºŒè»¸åŸå‰‡ï¼ˆè¦³æ¸¬â†’ææ¡ˆï¼‰ã‚’å³å®ˆã™ã‚‹ã€‚
+    </intent>
+
+    <!-- ãƒ—ãƒªã‚»ãƒƒãƒˆãƒãƒ³ãƒ‰ãƒ«ï¼ˆID + åå‰å½¢å¼ï¼‰ -->
+    <bundles>
+        <bundle id="P01-03" name="å®‰å…¨: ãƒ•ã‚¡ã‚¤ãƒ«ä¿è­·" protocols="P01,P02,P03">
+            é‡è¦ãƒ•ã‚¡ã‚¤ãƒ«ã®èª¤å‰Šé™¤ãƒ»èª¤ç·¨é›†ã‚’é˜²ã
+        </bundle>
+        <bundle id="P04-09" name="å“è³ª: TDDãƒ»ãƒ†ã‚¹ãƒˆå¼·åŒ–" protocols="P04,P09,P23">
+            ãƒ†ã‚¹ãƒˆé§†å‹•é–‹ç™ºã€ãƒŸãƒ¥ãƒ¼ãƒ†ãƒ¼ã‚·ãƒ§ãƒ³ãƒ†ã‚¹ãƒˆã€ãƒ¢ãƒƒã‚¯æˆ¦ç•¥
+        </bundle>
+        <bundle id="P15-16" name="UI: ã‚³ãƒ³ãƒãƒ¼ãƒãƒ³ãƒˆè¨­è¨ˆ" protocols="P15,P16">
+            Atomic Designã€ã‚¢ã‚¯ã‚»ã‚·ãƒ“ãƒªãƒ†ã‚£
+        </bundle>
+        <bundle id="P17-25" name="é‹ç”¨: ãƒ­ã‚°ãƒ»ãƒ‡ãƒ—ãƒ­ã‚¤ãƒ»å¾©æ—§" protocols="P17,P18,P25">
+            ãƒ­ã‚°è¨­è¨ˆã€ãƒ‡ãƒ—ãƒ­ã‚¤æˆ¦ç•¥ã€ãƒ­ãƒ¼ãƒ«ãƒãƒƒã‚¯
+        </bundle>
+        <bundle id="P19" name="é‹ç”¨: Docker" protocols="P19">
+            ã‚³ãƒ³ãƒ†ãƒŠè¨­å®šã€ãƒãƒ¼ãƒˆãƒ»ãƒœãƒªãƒ¥ãƒ¼ãƒ ç®¡ç†
+        </bundle>
+        <bundle id="P20-21" name="æ•´ç†: æŠ€è¡“è² å‚µè§£æ¶ˆ" protocols="P20,P21">
+            ãƒ‡ãƒƒãƒ‰ã‚³ãƒ¼ãƒ‰å‰Šé™¤ã€ãƒªãƒ•ã‚¡ã‚¯ã‚¿ãƒªãƒ³ã‚°
+        </bundle>
+    </bundles>
+
+    <!-- ä¾å­˜é–¢ä¿‚ -->
+    <dependencies>
+        <dep from="P01 (å®‰å…¨)" suggests="P02 (ãƒãƒƒã‚¯ã‚¢ãƒƒãƒ—), P03 (æ¨©é™ç¢ºèª)"/>
+        <dep from="P04 (TDD)" suggests="P09 (ãƒŸãƒ¥ãƒ¼ãƒ†ãƒ¼ã‚·ãƒ§ãƒ³), P23 (ãƒ¢ãƒƒã‚¯)"/>
+        <dep from="P19 (Docker)" suggests="P17 (ãƒ­ã‚°), P25 (ãƒ­ãƒ¼ãƒ«ãƒãƒƒã‚¯)"/>
+    </dependencies>
+
+    <!-- äºŒè»¸åŸå‰‡: è¦³æ¸¬ â†’ ææ¡ˆ å‡ºåŠ›ãƒ†ãƒ³ãƒ—ãƒ¬ãƒ¼ãƒˆ -->
+    <output_template>
+        <!-- ç¬¬ä¸€è»¸: æ­£ç¢ºæ€§ï¼ˆè¦³æ¸¬ï¼‰ -->
+        ğŸ“ **è¦³æ¸¬**: {æ¤œçŸ¥ã—ãŸäº‹å®Ÿ}
+        
+        <!-- ç¬¬äºŒè»¸: å®Ÿç”¨æ€§ï¼ˆææ¡ˆ+ç†ç”±ï¼‰ -->
+        ğŸ’¡ **ææ¡ˆ**: {ãƒãƒ³ãƒ‰ãƒ«ID} ({ãƒãƒ³ãƒ‰ãƒ«å}) ã®ãƒ­ãƒ¼ãƒ‰ã‚’ææ¡ˆã—ã¾ã™ã€‚
+           **ç†ç”±**: {ãªãœã“ã®ãƒ—ãƒ­ãƒˆã‚³ãƒ«ãŒæœ‰ç”¨ã‹}
+        
+        â†’ ãƒ­ãƒ¼ãƒ‰ã—ã¾ã™ã‹ï¼Ÿ [ã¯ã„ / ã„ã„ãˆ]
+    </output_template>
+
+    <!-- M6é€£æº: ã‚¤ãƒ™ãƒ³ãƒˆé§†å‹•è¦³æ¸¬ -->
+    <context_integration source="M6_CONTEXT_NEXUS">
+        <observation trigger="Dockerfileæ¤œçŸ¥">
+            <facts>ãƒ—ãƒ­ã‚¸ã‚§ã‚¯ãƒˆã«DockerfileãŒå­˜åœ¨ã—ã¾ã™</facts>
+            <proposal bundle="P19 (é‹ç”¨: Docker)">
+                ã‚³ãƒ³ãƒ†ãƒŠé–¢é€£ã®è¨­å®šãƒŸã‚¹ï¼ˆãƒãƒ¼ãƒˆå…¬é–‹æ¼ã‚Œã€ãƒœãƒªãƒ¥ãƒ¼ãƒ è¨­å®šã‚¨ãƒ©ãƒ¼ç­‰ï¼‰ã‚’äº‹å‰ã«é˜²ããŸã‚
+            </proposal>
+        </observation>
+        
+        <observation trigger="ãƒ†ã‚¹ãƒˆãƒ•ã‚¡ã‚¤ãƒ«ç·¨é›†ä¸­">
+            <facts>ãƒ†ã‚¹ãƒˆãƒ•ã‚¡ã‚¤ãƒ« (.test.ts, .spec.js) ã‚’ç·¨é›†ä¸­ã§ã™</facts>
+            <proposal bundle="P04-09 (å“è³ª: TDDãƒ»ãƒ†ã‚¹ãƒˆå¼·åŒ–)">
+                ãƒ†ã‚¹ãƒˆã‚«ãƒãƒ¬ãƒƒã‚¸ã®å‘ä¸Šã¨ãƒŸãƒ¥ãƒ¼ãƒ†ãƒ¼ã‚·ãƒ§ãƒ³ãƒ†ã‚¹ãƒˆã«ã‚ˆã‚‹å“è³ªæ‹…ä¿ã®ãŸã‚
+            </proposal>
+        </observation>
+
+        <observation trigger="UIã‚³ãƒ³ãƒãƒ¼ãƒãƒ³ãƒˆä½œæˆ">
+            <facts>Reactã‚³ãƒ³ãƒãƒ¼ãƒãƒ³ãƒˆ / Vueã‚³ãƒ³ãƒãƒ¼ãƒãƒ³ãƒˆã‚’ä½œæˆä¸­ã§ã™</facts>
+            <proposal bundle="P15-16 (UI: ã‚³ãƒ³ãƒãƒ¼ãƒãƒ³ãƒˆè¨­è¨ˆ)">
+                Atomic Designãƒ‘ã‚¿ãƒ¼ãƒ³ã®é©ç”¨ã¨ã‚¢ã‚¯ã‚»ã‚·ãƒ“ãƒªãƒ†ã‚£è¦ä»¶ã®éµå®ˆã®ãŸã‚
+            </proposal>
+        </observation>
+
+        <observation trigger="ãƒ¬ã‚¬ã‚·ãƒ¼ãƒ‘ã‚¿ãƒ¼ãƒ³æ¤œçŸ¥">
+            <facts>éæ¨å¥¨ãƒ‘ã‚¿ãƒ¼ãƒ³ / æœªä½¿ç”¨ã‚³ãƒ¼ãƒ‰ã‚’æ¤œçŸ¥ã—ã¾ã—ãŸ</facts>
+            <proposal bundle="P20-21 (æ•´ç†: æŠ€è¡“è² å‚µè§£æ¶ˆ)">
+                ã‚³ãƒ¼ãƒ‰ãƒ™ãƒ¼ã‚¹ã®å¥å…¨æ€§ç¶­æŒã¨å°†æ¥ã®ä¿å®ˆã‚³ã‚¹ãƒˆå‰Šæ¸›ã®ãŸã‚
+            </proposal>
+        </observation>
+    </context_integration>
+
+    <!-- ã‚³ãƒãƒ³ãƒ‰ï¼ˆãƒãƒƒã‚¯ã‚¢ãƒƒãƒ—ç”¨ï¼‰ -->
+    <commands>
+        <cmd key="/proto" alias="/ãƒ—ãƒ­ãƒˆã‚³ãƒ«">ç¾åœ¨ã®ãƒ­ãƒ¼ãƒ‰çŠ¶æ…‹ã‚’è¡¨ç¤º</cmd>
+        <cmd key="/proto list" alias="/proto ä¸€è¦§">å…¨ãƒ—ãƒ­ãƒˆã‚³ãƒ«ä¸€è¦§ï¼ˆID + åå‰ï¼‰</cmd>
+        <cmd key="/proto load" alias="/proto ãƒ­ãƒ¼ãƒ‰">ãƒ—ãƒ­ãƒˆã‚³ãƒ«æœ‰åŠ¹åŒ–</cmd>
+        <cmd key="/proto unload" alias="/proto è§£é™¤">ãƒ—ãƒ­ãƒˆã‚³ãƒ«ç„¡åŠ¹åŒ–</cmd>
+    </commands>
+</module>
+ *cascade08*cascade08b *cascade08bl*cascade08lÏ *cascade08Ï•*cascade08•Æ *cascade08Æİ*cascade08İ† *cascade08†”*cascade08”š *cascade08š®*cascade08®È *cascade08ÈÖ*cascade08Öè *cascade08è“*cascade08“² *cascade08²À*cascade08ÀÆ *cascade08Æİ*cascade08İ÷ *cascade08÷ş*cascade08şÿ *cascade08ÿ„*cascade08„ *cascade08Ú*cascade08Úù *cascade08ù‡*cascade08‡‰ *cascade08‰¦*cascade08¦¼ *cascade08¼ü*cascade08ü™ *cascade08™§*cascade08§¯ *cascade08¯Ï*cascade08Ïé *cascade08éì*cascade08ìî *cascade08î†*cascade08†’ *cascade08’¯*cascade08¯± *cascade08±·*cascade08·Ö *cascade08Öï*cascade08ïı *cascade08ıï	*cascade08ï	ñ	 *cascade08ñ	ò	*cascade08ò	õ	 *cascade08õ	„
+*cascade08„
+–
+ *cascade08–
+÷
+*cascade08÷
+Ù *cascade08Ùâ*cascade08âñ *cascade08ñ†*cascade08†‡ *cascade08‡ˆ*cascade08ˆ‹ *cascade08‹š*cascade08šµ *cascade08µ»*cascade08»Ê *cascade08Êå*cascade08åæ *cascade08æç*cascade08çê *cascade08êö*cascade08ö‘ *cascade08‘š*cascade08š© *cascade08©²*cascade08²³ *cascade08³´*cascade08´· *cascade08·Ì*cascade08Ìñ *cascade08ñš*cascade08š *cascade08©*cascade08©µ *cascade08µ½*cascade08½¾ *cascade08¾À*cascade08ÀÁ *cascade08ÁÃ*cascade08ÃÏ *cascade08ÏÒ*cascade08ÒÓ *cascade08Óİ*cascade08İŞ *cascade08Şö*cascade08ö *cascade08…*cascade08…† *cascade08†‘*cascade08‘’ *cascade08’¨*cascade08¨© *cascade08©¹*cascade08¹» *cascade08»é*cascade08éô *cascade08ôø*cascade08øù *cascade08ù„*cascade08„… *cascade08…•*cascade08•– *cascade08–©*cascade08©ª *cascade08ª­*cascade08­¶ *cascade08¶Ë*cascade08ËØ *cascade08Øã*cascade08ãä *cascade08äñ*cascade08ñ€ *cascade08€*cascade08¡ *cascade08¡¤*cascade08¤¥ *cascade08¥½*cascade08½¾ *cascade08¾Å*cascade08ÅÈ *cascade08ÈÒ*cascade08ÒÛ *cascade08Ûã*cascade08ãä *cascade08äæ*cascade08æç *cascade08çé*cascade08é *cascade08*cascade08“ *cascade08“™*cascade08™İ *cascade08İá*cascade08áâ *cascade08âè*cascade08èü *cascade08ü‚*cascade08‚’ *cascade08’—*cascade08—˜*cascade08˜·*cascade08·¸ *cascade08¸Ğ*cascade08ĞÑ*cascade08Ñé*cascade08éê *cascade08êò*cascade08òõ *cascade08õö*cascade08ö÷ *cascade08÷ÿ*cascade08ÿ† *cascade08†Š*cascade08Š‹ *cascade08‹Œ*cascade08Œ’*cascade08’œ *cascade08œ *cascade08 ¢ *cascade08¢£*cascade08£¤ *cascade08¤©*cascade08©ª *cascade08ª¶ *cascade08¶»*cascade08»¼ *cascade08¼Û*cascade08ÛÜ *cascade08Üã*cascade08ãí *cascade08í‹ *cascade08‹› *cascade08› *cascade08 ¡*cascade08¡»*cascade08»¼ *cascade08¼½ *cascade08½¾ *cascade08¾Â*cascade08ÂÃ *cascade08Ã‡*cascade08‡Š *cascade08Š*cascade08*cascade08 *cascade08—*cascade08—š *cascade08š¬*cascade08¬­ *cascade08­±*cascade08±² *cascade08²³*cascade08³¶*cascade08¶¸ *cascade08¸¤*cascade08¤¦ *cascade08¦ª*cascade08ª´ *cascade08´µ*cascade08µ¶ *cascade08¶»*cascade08»¼ *cascade08¼Ì*cascade08ÌÍ *cascade08ÍÔ*cascade08ÔÕ *cascade08Õ×*cascade08×â *cascade08âæ*cascade08æç *cascade08çí*cascade08íù *cascade08ù”*cascade08”¤ *cascade08¤©*cascade08©ª*cascade08ªÉ*cascade08ÉË *cascade08Ë÷*cascade08÷ø *cascade08ø‘*cascade08‘’ *cascade08’š*cascade08š *cascade08 *cascade08 ¡*cascade08¡¢ *cascade08¢Ö*cascade08Öİ *cascade08İ«*cascade08«­ *cascade08­±*cascade08±» *cascade08»¼*cascade08¼½ *cascade08½Â*cascade08ÂÃ *cascade08ÃÏ *cascade08ÏÔ*cascade08ÔÕ *cascade08Õì*cascade08ìí *cascade08íô*cascade08ôş *cascade08ş*cascade08 *cascade08“*cascade08“– *cascade08–œ*cascade08œ¬ *cascade08¬±*cascade08±²*cascade08²È*cascade08ÈÉ *cascade08ÉÊ*cascade08ÊË*cascade08Ëõ*cascade08õö *cascade08ö‡*cascade08‡ˆ*cascade08ˆ‹*cascade08‹Œ *cascade08Œ•*cascade08•– *cascade08–—*cascade08—˜ *cascade08˜š*cascade08š› *cascade08›Ÿ*cascade08Ÿ  *cascade08 ¡*cascade08¡¢ *cascade08¢¼*cascade08¼½ *cascade08½¿*cascade08¿É *cascade08É­*cascade08­¯ *cascade08¯°*cascade08°± *cascade08±¶*cascade08¶· *cascade08·Ç*cascade08ÇÈ *cascade08ÈÏ*cascade08Ïë *cascade08ëµ"*cascade08µ"Ã" *cascade082ˆfile:///G:/%E3%81%9D%E3%81%AE%E4%BB%96%E3%81%AE%E3%83%91%E3%82%BD%E3%82%B3%E3%83%B3/Forge/.gemini/prompts/modules/M9_PROTOCOL_LOADER.xml

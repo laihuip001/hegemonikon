@@ -1,0 +1,9 @@
+�# Hegemonikón Patterns
+
+patterns: []
+
+# 使用方法:
+# - M8 Anamnēsis がセッション中に検出したパターンを追記
+# - /sync-history で永続化
+# - /boot で読み込み → M3 Theōria へ送信
+�*cascade082@file:///C:/Users/raikh/Documents/mine/.hegemonikon/patterns.yaml

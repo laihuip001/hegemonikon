@@ -1,0 +1,176 @@
+{
+   "btn_checkout_plans": {
+      "message": "查看套餐"
+   },
+   "export_settings_not_pdf_tagline": {
+      "message": "非 PDF 导出类型的设置。"
+   },
+   "export_settings_tagline": {
+      "message": "通用设置。"
+   },
+   "export_settings_title": {
+      "message": "导出设置"
+   },
+   "ext_description": {
+      "message": "将 Claude 对话导出为 PDF、Markdown、文本、CSV 等格式。免费且完全可定制。支持附件、推理和高级输出。"
+   },
+   "ext_fulltitle": {
+      "message": "AI对话导出器：将 Claude 保存为 PDF、MD 等格式"
+   },
+   "feedback": {
+      "message": "问题反馈"
+   },
+   "label_content_title": {
+      "message": "内容标题："
+   },
+   "label_convo_link": {
+      "message": "对话链接："
+   },
+   "label_copy_to_clipboard": {
+      "message": "复制到剪贴板："
+   },
+   "label_dark_mode": {
+      "message": "暗黑模式："
+   },
+   "label_date_and_time": {
+      "message": "日期和时间："
+   },
+   "label_display_btns": {
+      "message": "显示/隐藏导出按钮："
+   },
+   "label_download_location": {
+      "message": "下载位置："
+   },
+   "label_file_name": {
+      "message": "文件名："
+   },
+   "label_file_name_prefix": {
+      "message": "文件名前缀："
+   },
+   "label_font_family": {
+      "message": "字体："
+   },
+   "label_font_size": {
+      "message": "字体大小："
+   },
+   "label_include_artifacts": {
+      "message": "附件内容："
+   },
+   "label_include_per_msg_time": {
+      "message": "消息时间戳："
+   },
+   "label_include_thought_process": {
+      "message": "思考过程："
+   },
+   "label_mute_export": {
+      "message": "静默导出："
+   },
+   "label_page_break_per_prompt": {
+      "message": "每个提示词分页："
+   },
+   "label_page_format": {
+      "message": "页面格式："
+   },
+   "label_page_margin": {
+      "message": "页面边距："
+   },
+   "label_remove_branding": {
+      "message": "移除品牌标识："
+   },
+   "label_remove_icons": {
+      "message": "移除图标："
+   },
+   "label_remove_page_number": {
+      "message": "移除页码："
+   },
+   "label_table_of_contents": {
+      "message": "目录："
+   },
+   "label_user_info": {
+      "message": "用户信息："
+   },
+   "language": {
+      "message": "Chinese, Simplified"
+   },
+   "link_contact_support": {
+      "message": "联系支持"
+   },
+   "link_feature_request": {
+      "message": "功能请求"
+   },
+   "link_my_account": {
+      "message": "我的账户"
+   },
+   "link_open_claude": {
+      "message": "打开 Claude 网站"
+   },
+   "link_settings_download": {
+      "message": "打开设置"
+   },
+   "msg_bad": {
+      "message": "差"
+   },
+   "msg_export_success": {
+      "message": "导出成功！"
+   },
+   "msg_export_success_copy_to_clipboard": {
+      "message": "复制到剪贴板成功！"
+   },
+   "msg_good": {
+      "message": "好"
+   },
+   "msg_help_others_learn_about_us": {
+      "message": "这将帮助其他人了解更多关于此扩展程序的信息。"
+   },
+   "msg_if_issue_or_idea": {
+      "message": "如果您有任何问题或想法，请随时联系我们。"
+   },
+   "msg_rate_or_review": {
+      "message": "在 Chrome 网上应用店评分或评论"
+   },
+   "msg_related_extension": {
+      "message": "相关扩展程序："
+   },
+   "msg_thanks_for_support": {
+      "message": "感谢您的支持！"
+   },
+   "msg_usage": {
+      "message": "使用情况"
+   },
+   "msg_usage_reach_daily_quota": {
+      "message": "使用量已达每日配额"
+   },
+   "msg_what_you_think": {
+      "message": "您对这个扩展程序有何看法？"
+   },
+   "solo_dev_charge_fee": {
+      "message": "作为独立开发者，我收取少量费用来帮助支付维护服务的成本。我真诚地感谢您的理解和支持。"
+   },
+   "thanks": {
+      "message": "用 ❤️ 构建。感谢使用。"
+   },
+   "tooltip_copy_to_clipboard": {
+      "message": "将内容复制到剪贴板而不是下载文件。"
+   },
+   "tooltip_download_location": {
+      "message": "更改文件保存位置或选择在 Chrome 设置中每次询问。"
+   },
+   "tooltip_main_checkbox": {
+      "message": "快速选择或取消选择所有消息。"
+   },
+   "tooltip_mute_export": {
+      "message": "不显示导出成功对话框。"
+   },
+   "tooltip_page_break_per_prompt": {
+      "message": "启用后，每个用户提示词将在新页面开始。"
+   },
+   "tooltip_pro_plan_feature": {
+      "message": "专业版功能"
+   },
+   "tooltip_remove_branding": {
+      "message": "移除 Claude Exporter 品牌标识，包括图标和链接。"
+   },
+   "tooltip_remove_icons": {
+      "message": "在 PDF 中移除用户和 Claude 图标"
+   }
+}

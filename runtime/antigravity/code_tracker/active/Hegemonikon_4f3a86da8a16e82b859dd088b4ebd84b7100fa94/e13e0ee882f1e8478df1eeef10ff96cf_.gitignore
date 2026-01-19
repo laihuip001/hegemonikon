@@ -1,0 +1,24 @@
+ú# Python virtual environments
+.venv*/
+__pycache__/
+*.pyc
+
+# Node
+node_modules/
+
+# IDE
+.idea/
+.vscode/
+
+# Temp files
+*.tmp
+temp_*.json
+temp_*.md
+
+# Large data files
+*.zip
+
+# ML Models (too large for GitHub)
+forge/models/
+*.onnx
+½½ú*cascade08"(4f3a86da8a16e82b859dd088b4ebd84b7100fa942-file:///C:/Users/raikh/Hegemonikon/.gitignore:"file:///C:/Users/raikh/Hegemonikon

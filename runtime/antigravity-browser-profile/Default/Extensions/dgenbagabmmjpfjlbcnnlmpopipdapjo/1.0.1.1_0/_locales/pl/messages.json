@@ -1,0 +1,26 @@
+{
+   "appName": {
+      "message": "Notebook LM"
+   },
+   "displayErrorDescription": {
+      "message": "Sorry, something went wrong while loading the page."
+   },
+   "displayErrorDetailsInfo": {
+      "message": "Error details:"
+   },
+   "displayErrorInfo": {
+      "message": "Error occur"
+   },
+   "displayErrorReset": {
+      "message": "Run Again"
+   },
+   "displayErrorUnknownErrorInfo": {
+      "message": "Unknown error"
+   },
+   "shortDesc": {
+      "message": "Użyj Notebook LM do łatwego importowania stron internetowych i dodawania YouTube do NotebookLM jednym kliknięciem!"
+   },
+   "storeDesc": {
+      "message": ""
+   }
+}

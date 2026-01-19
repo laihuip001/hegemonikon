@@ -1,0 +1,26 @@
+{
+   "appName": {
+      "message": "Notebook LM"
+   },
+   "displayErrorDescription": {
+      "message": "Sorry, something went wrong while loading the page."
+   },
+   "displayErrorDetailsInfo": {
+      "message": "Error details:"
+   },
+   "displayErrorInfo": {
+      "message": "Error occur"
+   },
+   "displayErrorReset": {
+      "message": "Run Again"
+   },
+   "displayErrorUnknownErrorInfo": {
+      "message": "Unknown error"
+   },
+   "shortDesc": {
+      "message": "Izmantojiet Notebook LM, lai viegli importētu tīmekļa lapas un pievienotu YouTube NotebookLM ar vienu klikšķi!"
+   },
+   "storeDesc": {
+      "message": ""
+   }
+}

@@ -1,0 +1,46 @@
+<!-- M9: PROTOCOL_LOADER v2.0 -->
+<module name="PROTOCOL_LOADER" priority="MEDIUM">
+    <intent>必要なプロトコルを状況に応じて自動提案・ロードし、トークン効率を最大化</intent>
+
+    <!-- プリセットバンドル -->
+    <bundles>
+        <bundle id="安全" protocols="P01,P02,P03">重要ファイル保護</bundle>
+        <bundle id="品質" protocols="P04,P09,P23">TDD + テスト強化</bundle>
+        <bundle id="UI" protocols="P15,P16">コンポーネント設計</bundle>
+        <bundle id="運用" protocols="P17,P18,P25">ログ + デプロイ + 復旧</bundle>
+        <bundle id="整理" protocols="P20,P21">技術負債解消</bundle>
+    </bundles>
+
+    <!-- 依存関係 -->
+    <dependencies>
+        <dep from="P01" suggests="P02,P03"/>
+        <dep from="P04" suggests="P09,P23"/>
+        <dep from="P19" suggests="P17,P25"/>
+    </dependencies>
+
+    <!-- コマンド -->
+    <commands>
+        <cmd key="/proto" alias="/プロトコル">現在の状態表示</cmd>
+        <cmd key="/proto list" alias="/proto 一覧">全プロトコル一覧</cmd>
+        <cmd key="/proto load" alias="/proto ロード">プロトコル有効化</cmd>
+        <cmd key="/proto unload" alias="/proto 解除">プロトコル無効化</cmd>
+        <cmd key="/proto bundle" alias="/proto バンドル">プリセット一括ロード</cmd>
+        <cmd key="/proto suggest" alias="/proto 提案">文脈から推奨</cmd>
+    </commands>
+
+    <!-- M6連携: 自動提案 -->
+    <context_integration source="M6_CONTEXT_NEXUS">
+        <rule trigger="ファイル状態にDockerfile">
+            suggest: P19 (Docker), P25 (Rollback)
+        </rule>
+        <rule trigger="テストファイルを編集中">
+            suggest: P04 (TDD), P09 (Mutation), P23 (Mock)
+        </rule>
+        <rule trigger="UIコンポーネント作成">
+            suggest: P15 (Atomic), P16 (a11y)
+        </rule>
+        <rule trigger="リファクタリング作業">
+            suggest: P20 (Dead Code), P13 (Archaeology)
+        </rule>
+    </context_integration>
+</module>

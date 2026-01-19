@@ -1,0 +1,176 @@
+{
+   "btn_checkout_plans": {
+      "message": "בדוק את התוכניות"
+   },
+   "export_settings_not_pdf_tagline": {
+      "message": "הגדרות לסוגי ייצוא שאינם PDF."
+   },
+   "export_settings_tagline": {
+      "message": "הגדרות נפוצות."
+   },
+   "export_settings_title": {
+      "message": "הגדרות ייצוא"
+   },
+   "ext_description": {
+      "message": "ייצא צ'אטים של Claude ל-PDF, Markdown, טקסט, CSV... חינמי וניתן להתאמה מלאה. תומך בחפצים, היגיון ופלטים מתקדמים."
+   },
+   "ext_fulltitle": {
+      "message": "מייצא צ'אט AI: שמור Claude כ-PDF, MD ועוד"
+   },
+   "feedback": {
+      "message": "משוב"
+   },
+   "label_content_title": {
+      "message": "כותרת תוכן:"
+   },
+   "label_convo_link": {
+      "message": "קישור שיחה:"
+   },
+   "label_copy_to_clipboard": {
+      "message": "העתק ללוח:"
+   },
+   "label_dark_mode": {
+      "message": "מצב כהה:"
+   },
+   "label_date_and_time": {
+      "message": "תאריך ושעה:"
+   },
+   "label_display_btns": {
+      "message": "הצג / הסתר כפתורי ייצוא:"
+   },
+   "label_download_location": {
+      "message": "מיקום הורדה:"
+   },
+   "label_file_name": {
+      "message": "שם קובץ:"
+   },
+   "label_file_name_prefix": {
+      "message": "קידומת שם קובץ:"
+   },
+   "label_font_family": {
+      "message": "גופן:"
+   },
+   "label_font_size": {
+      "message": "גודל גופן:"
+   },
+   "label_include_artifacts": {
+      "message": "תוכן חפצים:"
+   },
+   "label_include_per_msg_time": {
+      "message": "חותמות זמן להודעות:"
+   },
+   "label_include_thought_process": {
+      "message": "תהליך מחשבה:"
+   },
+   "label_mute_export": {
+      "message": "השתק ייצוא:"
+   },
+   "label_page_break_per_prompt": {
+      "message": "מעבר עמוד לכל הנחיה:"
+   },
+   "label_page_format": {
+      "message": "פורמט עמוד:"
+   },
+   "label_page_margin": {
+      "message": "שוליים עמוד:"
+   },
+   "label_remove_branding": {
+      "message": "הסר מיתוג:"
+   },
+   "label_remove_icons": {
+      "message": "הסר סמלים:"
+   },
+   "label_remove_page_number": {
+      "message": "הסר מספר עמוד:"
+   },
+   "label_table_of_contents": {
+      "message": "תוכן עניינים:"
+   },
+   "label_user_info": {
+      "message": "מידע משתמש:"
+   },
+   "language": {
+      "message": "Hebrew"
+   },
+   "link_contact_support": {
+      "message": "צור קשר עם התמיכה"
+   },
+   "link_feature_request": {
+      "message": "בקשת תכונה"
+   },
+   "link_my_account": {
+      "message": "החשבון שלי"
+   },
+   "link_open_claude": {
+      "message": "פתח את אתר Claude"
+   },
+   "link_settings_download": {
+      "message": "פתח הגדרות"
+   },
+   "msg_bad": {
+      "message": "רע"
+   },
+   "msg_export_success": {
+      "message": "הייצוא הצליח!"
+   },
+   "msg_export_success_copy_to_clipboard": {
+      "message": "העתקה ללוח הצליחה!"
+   },
+   "msg_good": {
+      "message": "טוב"
+   },
+   "msg_help_others_learn_about_us": {
+      "message": "זה יעזור לאחרים ללמוד יותר על התוספת."
+   },
+   "msg_if_issue_or_idea": {
+      "message": "אם יש לך בעיות או רעיונות, אל תהסס ליצור איתנו קשר."
+   },
+   "msg_rate_or_review": {
+      "message": "דרג או כתוב ביקורת ב-Chrome Web Store"
+   },
+   "msg_related_extension": {
+      "message": "תוספת קשורה:"
+   },
+   "msg_thanks_for_support": {
+      "message": "תודה על התמיכה שלך!"
+   },
+   "msg_usage": {
+      "message": "שימוש"
+   },
+   "msg_usage_reach_daily_quota": {
+      "message": "השימוש הגיע למכסה היומית"
+   },
+   "msg_what_you_think": {
+      "message": "מה דעתך על התוספת הזו?"
+   },
+   "solo_dev_charge_fee": {
+      "message": "כמפתח עצמאי, אני גובה עמלה קטנה כדי לעזור בכיסוי עלויות התחזוקה של השירות. אני באמת מעריך את ההבנה והתמיכה שלך."
+   },
+   "thanks": {
+      "message": "נבנה עם ❤️. תודה על השימוש."
+   },
+   "tooltip_copy_to_clipboard": {
+      "message": "העתק תוכן ללוח במקום להוריד כקובץ."
+   },
+   "tooltip_download_location": {
+      "message": "שנה היכן הקבצים נשמרים או בחר להישאל בכל פעם בהגדרות Chrome."
+   },
+   "tooltip_main_checkbox": {
+      "message": "בחר או בטל בחירה של כל ההודעות בבת אחת."
+   },
+   "tooltip_mute_export": {
+      "message": "אל תציג את חלון הייצוא המוצלח."
+   },
+   "tooltip_page_break_per_prompt": {
+      "message": "כאשר מופעל, כל הנחיה של משתמש תתחיל בעמוד חדש."
+   },
+   "tooltip_pro_plan_feature": {
+      "message": "תכונת תוכנית Pro"
+   },
+   "tooltip_remove_branding": {
+      "message": "הסר את מיתוג Claude Exporter, כולל סמל וקישור."
+   },
+   "tooltip_remove_icons": {
+      "message": "הסר סמלי משתמש ו-Claude ב-PDF"
+   }
+}

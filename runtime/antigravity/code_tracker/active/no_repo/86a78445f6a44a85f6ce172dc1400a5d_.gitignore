@@ -1,0 +1,14 @@
+ƒ# Antigravity Configuration
+# Secrets - NEVER COMMIT
+.env.local
+.env
+*.key
+
+# IDE
+.vscode/
+*.log
+
+# Temp
+*.tmp
+*.temp
+ƒ*cascade082)file:///C:/Users/raikh/.gemini/.gitignore

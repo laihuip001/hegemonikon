@@ -1,0 +1,176 @@
+{
+   "btn_checkout_plans": {
+      "message": "Katso suunnitelmat"
+   },
+   "export_settings_not_pdf_tagline": {
+      "message": "Asetukset ei-PDF vientityypeille."
+   },
+   "export_settings_tagline": {
+      "message": "Yleiset asetukset."
+   },
+   "export_settings_title": {
+      "message": "Viennin asetukset"
+   },
+   "ext_description": {
+      "message": "Vie Claude-keskustelut PDF:ään, Markdowniin, Tekstiin, CSV:ään... Ilmainen ja täysin muokattavissa. Tukee artefakteja, päättelyä ja edistyneitä tulosteita."
+   },
+   "ext_fulltitle": {
+      "message": "AI Chat -vientityökalu: Tallenna Claude PDF:nä, MD:nä ja enemmän"
+   },
+   "feedback": {
+      "message": "Palaute"
+   },
+   "label_content_title": {
+      "message": "Sisällön otsikko:"
+   },
+   "label_convo_link": {
+      "message": "Keskustelun linkki:"
+   },
+   "label_copy_to_clipboard": {
+      "message": "Kopioi leikepöydälle:"
+   },
+   "label_dark_mode": {
+      "message": "Tumma tila:"
+   },
+   "label_date_and_time": {
+      "message": "Päivämäärä ja aika:"
+   },
+   "label_display_btns": {
+      "message": "Näytä / Piilota Vienti-painikkeet:"
+   },
+   "label_download_location": {
+      "message": "Lataussijainti:"
+   },
+   "label_file_name": {
+      "message": "Tiedostonimi:"
+   },
+   "label_file_name_prefix": {
+      "message": "Tiedostonimen etuliite:"
+   },
+   "label_font_family": {
+      "message": "Fontti:"
+   },
+   "label_font_size": {
+      "message": "Fonttikoko:"
+   },
+   "label_include_artifacts": {
+      "message": "Artefaktien sisältö:"
+   },
+   "label_include_per_msg_time": {
+      "message": "Viestien aikaleimaukset:"
+   },
+   "label_include_thought_process": {
+      "message": "Ajatteluprosessi:"
+   },
+   "label_mute_export": {
+      "message": "Mykistä vienti:"
+   },
+   "label_page_break_per_prompt": {
+      "message": "Sivunvaihto per kehote:"
+   },
+   "label_page_format": {
+      "message": "Sivun muoto:"
+   },
+   "label_page_margin": {
+      "message": "Sivun marginaali:"
+   },
+   "label_remove_branding": {
+      "message": "Poista brändäys:"
+   },
+   "label_remove_icons": {
+      "message": "Poista kuvakkeet:"
+   },
+   "label_remove_page_number": {
+      "message": "Poista sivunumero:"
+   },
+   "label_table_of_contents": {
+      "message": "Sisällysluettelo:"
+   },
+   "label_user_info": {
+      "message": "Käyttäjätiedot:"
+   },
+   "language": {
+      "message": "Finnish"
+   },
+   "link_contact_support": {
+      "message": "Ota yhteyttä tukeen"
+   },
+   "link_feature_request": {
+      "message": "Ominaisuuspyyntö"
+   },
+   "link_my_account": {
+      "message": "Tilini"
+   },
+   "link_open_claude": {
+      "message": "Avaa Claude-sivusto"
+   },
+   "link_settings_download": {
+      "message": "Avaa asetukset"
+   },
+   "msg_bad": {
+      "message": "Huono"
+   },
+   "msg_export_success": {
+      "message": "Vienti onnistui!"
+   },
+   "msg_export_success_copy_to_clipboard": {
+      "message": "Kopioiminen leikepöydälle onnistui!"
+   },
+   "msg_good": {
+      "message": "Hyvä"
+   },
+   "msg_help_others_learn_about_us": {
+      "message": "Tämä auttaa muita oppimaan lisää laajennuksesta."
+   },
+   "msg_if_issue_or_idea": {
+      "message": "Jos sinulla on ongelmia tai ideoita, ota meihin yhteyttä."
+   },
+   "msg_rate_or_review": {
+      "message": "Arvioi tai kirjoita arvostelu Chrome Web Storeen"
+   },
+   "msg_related_extension": {
+      "message": "Liittyvä laajennus:"
+   },
+   "msg_thanks_for_support": {
+      "message": "Kiitos tuestasi!"
+   },
+   "msg_usage": {
+      "message": "Käyttö"
+   },
+   "msg_usage_reach_daily_quota": {
+      "message": "käyttö on saavuttanut päivittäisen kiintiön"
+   },
+   "msg_what_you_think": {
+      "message": "Mitä mieltä olet tästä laajennuksesta?"
+   },
+   "solo_dev_charge_fee": {
+      "message": "Yksin kehittäjänä veloitan pienen maksun palvelun ylläpitokustannusten kattamiseksi. Arvostan todella ymmärrystäsi ja tukeasi."
+   },
+   "thanks": {
+      "message": "Rakennettu ❤️:llä. Kiitos käytöstä."
+   },
+   "tooltip_copy_to_clipboard": {
+      "message": "Kopioi sisältö leikepöydälle tiedoston lataamisen sijaan."
+   },
+   "tooltip_download_location": {
+      "message": "Muuta missä tiedostot tallennetaan tai valitse kysyttäväksi joka kerta Chrome-asetuksissa."
+   },
+   "tooltip_main_checkbox": {
+      "message": "Valitse tai poista valinta kaikista viesteistä kerralla."
+   },
+   "tooltip_mute_export": {
+      "message": "Älä näytä onnistuneen viennin valintaikkunaa."
+   },
+   "tooltip_page_break_per_prompt": {
+      "message": "Kun käytössä, jokainen käyttäjän kehote aloittaa uudelta sivulta."
+   },
+   "tooltip_pro_plan_feature": {
+      "message": "Pro-suunnitelman ominaisuus"
+   },
+   "tooltip_remove_branding": {
+      "message": "Poista Claude Exporter -brändäys, mukaan lukien kuvake ja linkki."
+   },
+   "tooltip_remove_icons": {
+      "message": "Poista käyttäjän ja Clauden kuvakkeet PDF:stä"
+   }
+}

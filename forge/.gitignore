@@ -1,0 +1,26 @@
+# Forge System Security
+System/User_Context_*.md
+System/User_Manual_*.md
+
+# Prevent accidental commit of private keys or secrets if added later
+*.env
+secrets.json
+
+# Antigravity Browser Profile (contains session/cookies)
+.gemini/antigravity-browser-profile/
+
+# Test artifacts
+tests/test-results/
+
+# Antigravity IDE extensions (JRE, etc.)
+.antigravity/
+
+# Antigravity session data (embedded repos, browser recordings)
+.gemini/antigravity*/
+
+# Forge System Ignores
+node_modules/
+temp_*.json
+temp_*.md
+.obsidian/
+log.txt

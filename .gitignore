@@ -1,0 +1,29 @@
+# Python virtual environments
+.venv*/
+__pycache__/
+*.pyc
+
+# Node
+node_modules/
+
+# IDE
+.idea/
+.vscode/
+
+# Temp files
+*.tmp
+temp_*.json
+temp_*.md
+
+# Large data files
+*.zip
+
+# ML Models (too large for GitHub)
+forge/models/
+*.onnx
+
+# Antigravity data (too large for GitHub)
+runtime/antigravity/conversations/
+runtime/antigravity/brain/
+runtime/antigravity/browser_recordings/
+*.pb

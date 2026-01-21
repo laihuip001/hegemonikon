@@ -8,7 +8,8 @@ flags:
 
 # 🤖 GEMINI.md: Forge Edition (OMEGA)
 
-> **Architect**: Jules (The Creator)
+> **Architect**: Claude (Antigravity AI)
+> **Code Executor**: Jules (Gemini Code Assist)
 > **Architecture**: OMEGA v5.0.0 (Self-Evolved)
 > **Mission**: Build the ultimate Prompt Engineering Platform
 

@@ -92,6 +92,15 @@ tempo: Slow
 
 ---
 
+## Step 6: Memory Logging (Auto)
+
+プロセス完了を自己記録する:
+```bash
+python forge/gnosis/logger.py log "system" "/think Completed" --session "AutoLog"
+```
+
+---
+
 ## 出力形式
 
 ```

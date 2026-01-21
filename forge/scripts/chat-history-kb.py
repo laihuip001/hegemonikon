@@ -170,11 +170,14 @@ def load_sync_state() -> Optional[datetime]:
     return None
 
 
+
 def save_sync_state():
     """Save current sync timestamp."""
     SYNC_STATE_FILE.parent.mkdir(parents=True, exist_ok=True)
+    from datetime import timezone
     with open(SYNC_STATE_FILE, "w") as f:
-        json.dump({"last_sync": datetime.utcnow().isoformat() + "Z"}, f)
+        # Use timezone-aware UTC
+        json.dump({"last_sync": datetime.now(timezone.utc).isoformat()}, f)
 
 
 
@@ -418,7 +421,10 @@ def main():
 
     elif command == "sync":
         report_mode = "--report" in sys.argv
-        build_index(incremental=True, report_mode=report_mode)
+        # NOTE: LanceDB append-only logic creates duplicates on update. 
+        # Using incremental=False (Full Re-index) ensures data consistency.
+        # Performance impact is negligible for current dataset size.
+        build_index(incremental=False, report_mode=report_mode)
     elif command == "search":
         if len(sys.argv) < 3:
             print("Usage: python chat-history-kb.py search \"query\"")

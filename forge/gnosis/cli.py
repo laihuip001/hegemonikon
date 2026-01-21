@@ -11,9 +11,58 @@ import argparse
 import sys
 from pathlib import Path
 from typing import Optional
+import json
+from datetime import datetime, timedelta
 
-# Add parent to path for standalone execution
-sys.path.insert(0, str(Path(__file__).parent.parent))
+# Configuration
+DATA_DIR = Path(__file__).parent.parent / "gnosis_data"
+STATE_FILE = DATA_DIR / "state.json"
+
+
+def update_state():
+    """Update last collected timestamp."""
+    try:
+        DATA_DIR.mkdir(parents=True, exist_ok=True)
+        state = {}
+        if STATE_FILE.exists():
+            try:
+                state = json.loads(STATE_FILE.read_text(encoding="utf-8"))
+            except Exception:
+                pass
+        
+        state["last_collected_at"] = datetime.now().isoformat()
+        STATE_FILE.write_text(json.dumps(state, indent=2), encoding="utf-8")
+    except Exception as e:
+        print(f"[Warning] Failed to update state: {e}")
+
+
+def cmd_check_freshness(args):
+    """
+    Check if collection is needed based on threshold days.
+    Output JSON: {"status": "fresh"|"stale"|"missing", "days_elapsed": int|null}
+    """
+    threshold = timedelta(days=args.threshold)
+    result = {"status": "missing", "days_elapsed": None}
+    
+    if STATE_FILE.exists():
+        try:
+            state = json.loads(STATE_FILE.read_text(encoding="utf-8"))
+            last_str = state.get("last_collected_at")
+            if last_str:
+                last_time = datetime.fromisoformat(last_str)
+                elapsed = datetime.now() - last_time
+                days = elapsed.days
+                
+                if elapsed > threshold:
+                    result = {"status": "stale", "days_elapsed": days}
+                else:
+                    result = {"status": "fresh", "days_elapsed": days}
+        except Exception:
+            result = {"status": "error", "days_elapsed": None}
+            
+    print(json.dumps(result))
+    # Return 0 if fresh, 1 if stale/missing (to allow simple shell checks)
+    return 0 if result["status"] == "fresh" else 1
 
 
 def cmd_collect(args):
@@ -48,6 +97,7 @@ def cmd_collect(args):
             index = GnosisIndex()
             added = index.add_papers(papers)
             print(f"[Collect] Added {added} to index")
+            update_state()  # Update timestamp
         elif args.dry_run:
             print("[Collect] Dry run - not adding to index")
             for p in papers[:5]:
@@ -88,6 +138,7 @@ def cmd_collect_all(args):
         index = GnosisIndex()
         added = index.add_papers(all_papers, dedupe=True)
         print(f"[CollectAll] Added {added} unique papers to index")
+        update_state()  # Update timestamp
     
     return 0
 
@@ -135,6 +186,15 @@ def cmd_stats(args):
     print("\nBy Source:")
     for source, count in stats.get("sources", {}).items():
         print(f"  {source}: {count}")
+    
+    # Show freshness
+    if STATE_FILE.exists():
+        try:
+            state = json.loads(STATE_FILE.read_text(encoding="utf-8"))
+            print(f"Last Collected: {state.get('last_collected_at', 'Unknown')}")
+        except:
+            pass
+            
     print("=" * 40)
     
     return 0
@@ -171,6 +231,11 @@ def main():
     # stats
     p_stats = subparsers.add_parser("stats", help="Show index statistics")
     p_stats.set_defaults(func=cmd_stats)
+    
+    # check-freshness
+    p_check = subparsers.add_parser("check-freshness", help="Check collection freshness")
+    p_check.add_argument("--threshold", "-t", type=int, default=7, help="Threshold days (default: 7)")
+    p_check.set_defaults(func=cmd_check_freshness)
     
     args = parser.parse_args()
     

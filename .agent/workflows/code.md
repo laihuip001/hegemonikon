@@ -93,6 +93,15 @@ go test ./...
 
 ---
 
+## Step 4: Memory Logging (Auto)
+
+実装完了を自己記録する:
+```bash
+python forge/gnosis/logger.py log "system" "/code Completed" --session "AutoLog"
+```
+
+---
+
 ## 出力形式
 
 ```

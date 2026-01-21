@@ -33,9 +33,15 @@ Hegemonikón Phase 1 のブートシーケンス。
 4. **履歴同期判定**: 前回の同期から6時間以上経過している場合、`/hist` を実行
    - 同期状態は `.sync-state.json` で管理
 
-5. **今日のレビュー生成**: `/rev` を実行し、タスク/リマインドを抽出
+5. **Gnōsis 知識更新チェック**: ローカル知識基盤の鮮度を確認
+   - コマンド: `python m:/Hegemonikon/forge/gnosis/cli.py check-freshness`
+   - **分岐 (Interactive)**: 上記コマンドが `exit code 1` (Stale) を返した場合:
+     - ユーザーに更新するか尋ねる ("Gnōsisデータが古いです。更新しますか？")
+     - Yesの場合: `python m:/Hegemonikon/forge/gnosis/cli.py collect-all -q "LLM agent reasoning" -l 20` を実行
 
-6. **ブート完了報告**: 以下の形式で報告
+6. **今日のレビュー生成**: `/rev` を実行し、タスク/リマインドを抽出
+
+7. **ブート完了報告**: 以下の形式で報告
    ```
    [Hegemonikon] M1 Aisthesis
      入力: /boot 実行
@@ -54,7 +60,7 @@ Hegemonikón Phase 1 のブートシーケンス。
    ✅ Review: Generated
    ```
 
-7. **Today's Review を表示**: `/rev` の出力内容を表示
+8. **Today's Review を表示**: `/rev` の出力内容を表示
 
 ## 出力形式
 

@@ -108,11 +108,103 @@ def verify_all() -> bool:
         print("\n✅ PASSED: All checks passed.")
         return True
 
+# --- Structure Scan ---
+def generate_tree(dir_path: Path, prefix: str = "", is_last: bool = False, is_root: bool = False, current_depth: int = 0, max_depth: int = 4) -> str:
+    """Recursively generate directory tree string."""
+    output = ""
+    if not is_root:
+        connector = "└── " if is_last else "├── "
+        output += f"{prefix}{connector}{dir_path.name}"
+        if dir_path.is_file():
+             pass
+        elif current_depth >= max_depth:
+            output += "/ ...\n"
+            return output
+        output += "\n"
+        
+    if dir_path.is_file():
+        return output
+        
+    # Prepare prefix for children
+    if is_root:
+        new_prefix = prefix
+    else:
+        new_prefix = prefix + ("    " if is_last else "│   ")
+        
+    # Get children
+    try:
+        children = sorted(list(dir_path.iterdir()), key=lambda p: (p.is_file(), p.name))
+    except PermissionError:
+        return output
+        
+    # Filter ignored files
+    filtered = []
+    ignores = {".git", "__pycache__", ".DS_Store", "node_modules", ".logb", "wandb", ".github", "archive"}
+    for child in children:
+        if child.name in ignores or child.name.endswith(".pyc") or child.name.endswith(".txn"):
+            continue
+        filtered.append(child)
+        
+    count = len(filtered)
+    for i, child in enumerate(filtered):
+        is_last_child = (i == count - 1)
+        output += generate_tree(child, new_prefix, is_last_child, False, current_depth + 1, max_depth)
+        
+    return output
+
+def scan_structure() -> bool:
+    """Update docs/STRUCTURE.md with current directory tree."""
+    print("Scanning directory structure...")
+    
+    # Generate Tree with max_depth=3 for cleanliness
+    # .agent/rules etc will be shown but deeply nested files omitted
+    tree_content = "M:\\Hegemonikon\\\n" + generate_tree(ROOT_DIR, is_root=True, max_depth=3)
+    
+    # Wrap in code block
+    tree_block = "```text\n" + tree_content.strip() + "\n```"
+    
+    # 2. Update File
+    struct_file = DOCS_DIR / "STRUCTURE.md"
+    if not struct_file.exists():
+        print(f"❌ Error: {struct_file} not found.")
+        return False
+        
+    content = struct_file.read_text(encoding="utf-8")
+    
+    pattern = re.compile(
+        r"(<!-- STRUCTURE_START -->\n)(.*?)(<!-- STRUCTURE_END -->)", 
+        re.DOTALL
+    )
+    
+    if not pattern.search(content):
+        print("❌ Error: Structure markers not found in docs/STRUCTURE.md")
+        return False
+        
+    # Fix for Windows paths in regex substitution: escape backslashes
+    replacement = tree_block.replace("\\", "\\\\")
+    new_content = pattern.sub(f"\\1{replacement}\n\\3", content)
+    
+    if content != new_content:
+        struct_file.write_text(new_content, encoding="utf-8")
+        print("✅ Directory tree updated in docs/STRUCTURE.md")
+    else:
+        print("✅ Directory tree is up to date.")
+        
+    return True
+
 # --- Main ---
 if __name__ == "__main__":
-    if len(sys.argv) > 1 and sys.argv[1] == "verify":
-        success = verify_all()
-        sys.exit(0 if success else 1)
+    if len(sys.argv) > 1:
+        cmd = sys.argv[1]
+        if cmd == "verify":
+            success = verify_all()
+            sys.exit(0 if success else 1)
+        elif cmd == "scan-structure":
+            success = scan_structure()
+            sys.exit(0 if success else 1)
+        else:
+            print(f"Unknown command: {cmd}")
+            sys.exit(1)
     else:
-        print("Usage: python doc_maintenance.py verify")
+        print("Usage: python doc_maintenance.py [verify|scan-structure]")
         sys.exit(1)

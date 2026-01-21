@@ -22,8 +22,7 @@ temp_*.md
 forge/models/
 *.onnx
 
-# Antigravity data (too large for GitHub)
-runtime/antigravity/conversations/
-runtime/antigravity/brain/
-runtime/antigravity/browser_recordings/
+# Antigravity data (too large for GitHub & runtime managed by app)
+runtime/
+*.pb
 *.pb

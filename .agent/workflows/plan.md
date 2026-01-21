@@ -110,6 +110,15 @@ modules: [M4, M3]
 
 ---
 
+## Step 4: Memory Logging (Auto)
+
+計画策定完了を自己記録する:
+```bash
+python forge/gnosis/logger.py log "system" "/plan Completed" --session "AutoLog"
+```
+
+---
+
 ## 出力形式
 
 ```

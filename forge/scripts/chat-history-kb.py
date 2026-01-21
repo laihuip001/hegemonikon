@@ -272,7 +272,9 @@ def build_index(incremental: bool = False, report_mode: bool = False):
     
     # Create/update table
     try:
-        if "chat_history" in db.table_names():
+        existing_tables = db.list_tables()
+        table_names = existing_tables.tables if hasattr(existing_tables, 'tables') else list(existing_tables)
+        if "chat_history" in table_names:
             if incremental:
                 table = db.open_table("chat_history")
                 table.add(all_data)
@@ -352,7 +354,9 @@ def show_stats():
         try:
             import lancedb
             db = lancedb.connect(str(LANCE_DIR))
-            if "chat_history" in db.table_names():
+            existing_tables = db.list_tables()
+            table_names = existing_tables.tables if hasattr(existing_tables, 'tables') else list(existing_tables)
+            if "chat_history" in table_names:
                 table = db.open_table("chat_history")
                 print(f"\nIndex Status: [OK] Active")
                 print(f"Indexed: {len(table.to_pandas())}")

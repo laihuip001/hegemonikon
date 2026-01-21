@@ -1,14 +1,10 @@
 ﻿
-2026-01-21 14:52:35 START: Sync Process
-2026-01-21 14:52:35 DEBUG: Candidate M:\Hegemonikon\forge\.venv-kb\Scripts\python.exe failed check.
-2026-01-21 14:52:35 INFO: Verified interpreter: python (Python 3.13.9)
+2026-01-21 22:44:58 START: Sync Process
+2026-01-21 22:44:58 DEBUG: Candidate M:\Hegemonikon\forge\.venv-kb\Scripts\python.exe failed check.
+2026-01-21 22:44:58 INFO: Verified interpreter: python (Python 3.13.9)
 [Hegemonikon] M8 Anamnēsis
   Sync Phase: Complete
-  Processed: 14 sessions
-  New Index: 34 chunks
+  Processed: 18 sessions
+  New Index: 46 chunks
 
-2026-01-21 14:52:41 STDERR:
-M:\Hegemonikon\forge\scripts\chat-history-kb.py:275: DeprecationWarning: table_names() is deprecated, use list_tables() instead
-  if "chat_history" in db.table_names():
-
-2026-01-21 14:52:41 END: Exit Code 0
+2026-01-21 22:45:05 END: Exit Code 0

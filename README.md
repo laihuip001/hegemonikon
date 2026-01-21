@@ -33,6 +33,20 @@ Hegemonikón/
 
 ---
 
+## AI Documentation
+
+This repository is optimized for consumption by AI agents.
+
+| Document | Purpose | Audience |
+| :--- | :--- | :--- |
+| **[AGENTS.md](AGENTS.md)** | **Start Here**. Rules, boundaries, and commands. | Agents |
+| **[docs/STRUCTURE.md](docs/STRUCTURE.md)** | Detailed architecture map (English). | Agents |
+| **[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)** | Theoretical foundations and FEP analysis. | Deep Dive |
+| **[.ai/guidelines.md](.ai/guidelines.md)** | Coding standards and templates. | Coding Agents |
+| **[llms.txt](llms.txt)** | Context index. | Context Loaders |
+
+---
+
 ## 4軸構造
 
 | 軸 | 次元 | 説明 |

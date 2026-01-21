@@ -9,14 +9,26 @@ modules: [M8]
 > **Hegemonikón Module**: M8 Anamnēsis (Sync Phase)
 
 
-1. **Sync Execution**: `m:/Hegemonikon/forge/scripts/chat-history-kb.py` を実行。
-   - `sync` モード: 差分更新
-   - `--report` フラグ: Hegemonikón形式でログ出力
+## Step 1: AIDB Sync (Chat History KB)
 
-## 実行コマンド
+Antigravity ChatHistory DBをベクトルインデックスと同期する。
 
 ```powershell
 python m:/Hegemonikon/forge/scripts/chat-history-kb.py sync --report
+```
+
+## Step 2: Takeout Import (Optional)
+
+Google Takeoutデータが存在する場合、Vaultへインポートする。
+
+```powershell
+# Takeout JSONパス (例)
+$JSON_PATH = "M:\Google Drive\Takeout\Takeout\Gemini\Gemini.json"
+$VAULT_PATH = "M:\Hegemonikon\vault\chat-history"
+
+if (Test-Path $JSON_PATH) {
+    python m:/Hegemonikon/forge/scripts/import_takeout.py convert $JSON_PATH $VAULT_PATH
+}
 ```
 
 ## 出力形式
@@ -24,8 +36,8 @@ python m:/Hegemonikon/forge/scripts/chat-history-kb.py sync --report
 ```
 [Hegemonikon] M8 Anamnēsis
   Sync Phase: Complete
-  Processed: [N] sessions
-  New Index: [M] chunks
+  Index: Updated
+  Takeout: Skipped (Not found) / Imported [N] files
 ```
 
 ## エラーハンドリング

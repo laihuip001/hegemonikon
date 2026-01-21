@@ -1,7 +1,7 @@
 # 🔄 引き継ぎ書: 本セッション残タスク
 
-**作成日**: 2026-01-21T13:58
-**セッションID**: e19ddf03-fe8b-4e86-9451-3b109f1548a2
+**作成日**: 2026-01-21T14:10
+**セッションID**: b8c73595-c0d5-43a6-9a27-a8c7290d9010
 **ステータス**: 完了 → 次へ
 
 ---
@@ -15,7 +15,8 @@
 | 3 | **Perplexity API** | 自律クライアント `perplexity_api.py` 実装 & Peira統合 | ✅ |
 | 4 | **Workflows** | グローバルパス修正 (`~/.gemini/antigravity/global_workflows`) | ✅ |
 | 5 | **Memory** | `/rec` (Recollect) 実装 | ✅ |
-| 6 | **History** | `/hist` による長期記憶インデックス構築 (+4件) | ✅ |
+| 6 | **History** | **Chat History DB v2 (LanceDB Full Integration)** | ✅ |
+| 7 | **History** | **Auto-Sync** (Task Scheduler + Robust Scripts) | ✅ |
 
 ---
 
@@ -37,8 +38,9 @@
 
 ## 参照ファイル
 
+- **History DB**: `C:\Users\makar\.gemini\antigravity\brain\b8c73595-c0d5-43a6-9a27-a8c7290d9010\walkthrough.md`
+- **Auto-Sync Logs**: `m:\Hegemonikon\forge\scripts\logs\sync.log`
 - **prompt-lang**: `m:\Hegemonikon\docs\handover\prompt-lang-handover.md` (v1.0)
-- **Perplexity調査**: `m:\Hegemonikon\docs\research\antigravity_rules_skills_2026.md`
 - **設定一元化**: `M:\.gemini\.agent`
 
 ---
@@ -49,7 +51,6 @@
 
 ```
 /boot
-/rec
 引継ぎ確認: M:\Hegemonikon\docs\handover\session-handover.md
 ```
 
@@ -58,7 +59,7 @@
 ```
 ┌─[Hegemonikon]──────────────────────┐
 │ M8 Anamnēsis: Session Finalized    │
-│ Session: e19ddf03...               │
+│ Session: b8c73595...               │
 │ Status: SUCCESS / READY FOR NEXT   │
 └────────────────────────────────────┘
 ```

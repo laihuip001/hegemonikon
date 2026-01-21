@@ -24,7 +24,7 @@ Hegemonikón Phase 1 のブートシーケンス。
    これらのSkillの詳細仕様が必要な場合は `view_file` で `.agent/skills/m1-aisthesis/SKILL.md` または `.agent/skills/m2-krisis/SKILL.md` を参照。
 
 3. **M8 長期記憶読込 (Load Phase)**:
-   - `M:\Documents\mine\.hegemonikon\` から以下を読み込み:
+   - `M:\Brain\.hegemonikon\` から以下を読み込み:
      - `patterns.yaml` → M3 Theōria へ提供（過去のパターン）
      - `values.json` → M4 Phronēsis へ提供（価値関数）
      - `trust_history.json` → M6 Praxis へ提供（信頼履歴）

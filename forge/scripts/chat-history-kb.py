@@ -7,6 +7,7 @@ Antigravityチャット履歴をDB化し、M8 Anamnēsisの長期記憶として
 AIDB機構（aidb-kb.py）をベースに改修。
 
 Usage:
+    python chat-history-kb.py setup             # モデルダウンロード
     python chat-history-kb.py index             # 全件インデックス
     python chat-history-kb.py sync              # 差分同期
     python chat-history-kb.py search "query"    # 意味検索
@@ -24,10 +25,11 @@ from datetime import datetime
 from typing import Optional
 
 # Paths
-BRAIN_DIR = Path(r"M:\.gemini\antigravity\brain")
-LANCE_DIR = BRAIN_DIR / "_index" / "lancedb"
-SYNC_STATE_FILE = BRAIN_DIR / "_index" / ".sync-state.json"
-MODELS_DIR = Path(__file__).parent.parent / "models" / "bge-small"
+BRAIN_DIR = Path(r"C:\Users\makar\.gemini\antigravity\brain")
+KB_DIR = Path(r"M:\Hegemonikon\forge\knowledge_base")
+LANCE_DIR = KB_DIR / "_index" / "lancedb"
+SYNC_STATE_FILE = KB_DIR / "_index" / "sync_state.json"
+MODELS_DIR = Path(r"M:\Hegemonikon\forge\models\bge-small")
 
 # Embedding config
 EMBEDDING_DIM = 384  # BGE-small
@@ -175,24 +177,44 @@ def save_sync_state():
         json.dump({"last_sync": datetime.utcnow().isoformat() + "Z"}, f)
 
 
-def build_index(incremental: bool = False):
+
+def build_index(incremental: bool = False, report_mode: bool = False):
     """Build LanceDB index."""
     if not check_dependencies():
         return
     
     import lancedb
     
-    print("Initializing embedder...")
-    embedder = Embedder()
+    if not report_mode:
+        print("Initializing embedder...")
     
-    print("Connecting to LanceDB...")
-    LANCE_DIR.mkdir(parents=True, exist_ok=True)
-    db = lancedb.connect(str(LANCE_DIR))
+    try:
+        embedder = Embedder()
+    except Exception as e:
+        if report_mode:
+            print(f"[Hegemonikon] M8 Anamnēsis\n  Sync Phase: Error\n  Reason: Embedder init failed ({e})")
+        else:
+            print(f"Error initializing embedder: {e}")
+        return
+
+    if not report_mode:
+        print("Connecting to LanceDB...")
+    
+    try:
+        LANCE_DIR.mkdir(parents=True, exist_ok=True)
+        db = lancedb.connect(str(LANCE_DIR))
+    except Exception as e:
+        if report_mode:
+            print(f"[Hegemonikon] M8 Anamnēsis\n  Sync Phase: Error\n  Reason: DB connection failed ({e})")
+        else:
+            print(f"Error connecting to DB: {e}")
+        return
     
     last_sync = load_sync_state() if incremental else None
     sessions = get_sessions()
     
-    print(f"Found {len(sessions)} sessions.")
+    if not report_mode:
+        print(f"Found {len(sessions)} sessions.")
     
     all_data = []
     
@@ -210,46 +232,67 @@ def build_index(incremental: bool = False):
                         pass
             
             # Generate ID
-            art_type = artifact["artifact_type"].replace("ARTIFACT_TYPE_", "").lower()
+            art_type = artifact.get("artifact_type", "unknown").replace("ARTIFACT_TYPE_", "").lower()
             doc_id = f"{artifact['session_id']}_{art_type}"
             
-            # Generate embedding
-            embed_text = f"{artifact['summary']} {artifact['content'][:1000]}"
-            vector = embedder.embed(embed_text)
-            
-            all_data.append({
-                "id": doc_id,
-                "session_id": artifact["session_id"],
-                "artifact_type": art_type,
-                "summary": artifact["summary"][:500],
-                "content": artifact["content"][:3000],
-                "updated_at": artifact["updated_at"],
-                "vector": vector,
-            })
+            # Robust embedding
+            try:
+                summary = artifact.get("summary", "") or ""
+                content = artifact.get("content", "") or ""
+                embed_text = f"{summary} {content[:1000]}"
+                vector = embedder.embed(embed_text)
+                
+                all_data.append({
+                    "id": doc_id,
+                    "session_id": artifact["session_id"],
+                    "artifact_type": art_type,
+                    "summary": summary[:500],
+                    "content": content[:3000],
+                    "updated_at": artifact.get("updated_at", ""),
+                    "vector": vector,
+                })
+            except Exception as e:
+                if not report_mode:
+                    print(f"Skipping artifact {doc_id}: {e}")
+                continue
     
     if not all_data:
-        print("No new data to index.")
+        if report_mode:
+             print(f"[Hegemonikon] M8 Anamnēsis\n  Sync Phase: Skipped\n  Reason: No new data")
+        else:
+            print("No new data to index.")
         save_sync_state()
         return
     
-    print(f"Indexing {len(all_data)} artifacts...")
+    if not report_mode:
+        print(f"Indexing {len(all_data)} artifacts...")
     
     # Create/update table
-    if "chat_history" in db.table_names():
-        if incremental:
-            table = db.open_table("chat_history")
-            table.add(all_data)
+    try:
+        if "chat_history" in db.table_names():
+            if incremental:
+                table = db.open_table("chat_history")
+                table.add(all_data)
+            else:
+                db.drop_table("chat_history")
+                table = db.create_table("chat_history", data=all_data)
         else:
-            db.drop_table("chat_history")
             table = db.create_table("chat_history", data=all_data)
-    else:
-        table = db.create_table("chat_history", data=all_data)
-    
-    save_sync_state()
-    
-    print(f"\n[OK] Index built successfully!")
-    print(f"  Location: {LANCE_DIR}")
-    print(f"  Artifacts: {len(all_data)}")
+        
+        save_sync_state()
+        
+        if report_mode:
+            print(f"[Hegemonikon] M8 Anamnēsis\n  Sync Phase: Complete\n  Processed: {len(sessions)} sessions\n  New Index: {len(all_data)} chunks")
+        else:
+            print(f"\n[OK] Index built successfully!")
+            print(f"  Location: {LANCE_DIR}")
+            print(f"  Artifacts: {len(all_data)}")
+            
+    except Exception as e:
+        if report_mode:
+            print(f"[Hegemonikon] M8 Anamnēsis\n  Sync Phase: Error\n  Reason: DB write failed ({e})")
+        else:
+            print(f"Error writing to DB: {e}")
 
 
 def search(query: str, n_results: int = 5):
@@ -325,6 +368,39 @@ def show_stats():
     print("=" * 40)
 
 
+def setup_model():
+    """Download ONNX embedding model."""
+    import urllib.request
+    
+    MODELS_DIR.mkdir(parents=True, exist_ok=True)
+    
+    if (MODELS_DIR / "model.onnx").exists() and (MODELS_DIR / "tokenizer.json").exists():
+        print("Model already exists.")
+        return
+    
+    print("Downloading BGE-small ONNX model...")
+    
+    files = {
+        "model.onnx": "https://huggingface.co/Xenova/bge-small-en-v1.5/resolve/main/onnx/model.onnx",
+        "tokenizer.json": "https://huggingface.co/Xenova/bge-small-en-v1.5/resolve/main/tokenizer.json",
+    }
+    
+    for filename, url in files.items():
+        dest = MODELS_DIR / filename
+        if dest.exists():
+            print(f"  {filename} already exists, skipping.")
+            continue
+        print(f"  Downloading {filename}...")
+        try:
+            urllib.request.urlretrieve(url, dest)
+            print(f"  [OK] {filename} downloaded.")
+        except Exception as e:
+            print(f"  Error: {e}")
+            return
+    
+    print("[OK] Model downloaded successfully!")
+
+
 def main():
     if len(sys.argv) < 2:
         print(__doc__)
@@ -335,10 +411,14 @@ def main():
     if sys.platform == "win32":
         sys.stdout.reconfigure(encoding='utf-8')
     
-    if command == "index":
+    if command == "setup":
+        setup_model()
+    elif command == "index":
         build_index(incremental=False)
+
     elif command == "sync":
-        build_index(incremental=True)
+        report_mode = "--report" in sys.argv
+        build_index(incremental=True, report_mode=report_mode)
     elif command == "search":
         if len(sys.argv) < 3:
             print("Usage: python chat-history-kb.py search \"query\"")

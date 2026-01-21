@@ -1,0 +1,11 @@
+#prompt integration-test
+
+@role:
+  Integration test agent
+
+@goal:
+  test input -> test output
+
+@constraints:
+  - Test constraint 1
+  - Test constraint 2

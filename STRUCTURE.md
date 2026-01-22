@@ -28,7 +28,7 @@ Hegemonikon
 - パス: `kernel/`
 
 ### Agent（AI制御層）
-- **Workflows**: `/now`, `/plan`, `/code` 等のコマンド
+- **Workflows**: `/now`, `/plan`, `/do` 等のコマンド
 - **Skills**: M1-M8, P1-P4 スキル
 - **Rules**: 制約・プロトコル
 - パス: `.agent/`
@@ -100,7 +100,7 @@ M:\Hegemonikon\
 | `/plan` | 設計プロトコル | M4+M3 |
 | `/think` | 熟考・大域最適 | M4-S+M3-S |
 | `/pri` | 優先順位判定 | M2 |
-| `/code` | 実装プロトコル | M6+M2 |
+| `/do` | 実行開始プロトコル | M6+M2 |
 | `/chk` | 検証・批評 | M7 |
 | `/rev` | 日次レビュー | M7+M8 |
 | `/hist` | 履歴同期 | M8 |

@@ -137,5 +137,7 @@ python forge/gnosis/logger.py log "system" "/plan Completed" --session "AutoLog"
 ## Implementation Plan
 [上記フォーマットに従った計画]
 
-⏸️ 承認待ち: 計画を承認しますか？
+⏸️ 承認待ち: 計画を承認しますか？ (`y`)
+   承認後、`/do` で実装開始
 ```
+

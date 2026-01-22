@@ -75,18 +75,34 @@ Level 2a: P-series (4)          Level 1.5: 選択公理 (4)
 
 ---
 
+## 二重実装体系
+
+> **M-series は2つのスケールで具現化する**
+
+| レベル | 実装 | 役割 |
+|--------|------|------|
+| **ミクロ** | skills/, workflows/ | AI主体の行動 |
+| **マクロ** | mēkhanē/ | システム基盤 |
+
+---
+
 ## ディレクトリ構造
 
 ```
 Hegemonikón/
-├── kernel/              # 公理層 (IMMUTABLE)
-│   ├── axiom_hierarchy.md   # 公理階層 (Master)
-│   ├── SACRED_TRUTH.md      # 不変真理
-│   └── doctrine.md          # Kernel Doctrine
-├── skills/              # M-Series モジュール
-├── docs/                # 設計ドキュメント
-└── forge/               # ツール・プロンプト
+├── kernel/               # 公理層 (IMMUTABLE)
+│   ├── axiom_hierarchy.md
+│   ├── SACRED_TRUTH.md
+│   └── constitution/     # ルール群
+├── skills/               # ミクロ実装 (AI行動)
+├── mēkhanē/              # マクロ実装 (機構層)
+│   ├── peira/            # M5: 収集
+│   ├── ergastērion/      # M6: 製造
+│   ├── anamnēsis/        # M8: 記憶 (gnōsis)
+│   └── exagōgē/          # M6: 出力
+└── docs/                 # ドキュメント
 ```
+
 
 ---
 

@@ -1,0 +1,7 @@
+#prompt match_test
+
+@role:
+  Tester
+
+@goal:
+  Verify match logic

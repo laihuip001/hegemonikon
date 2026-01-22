@@ -1,10 +1,10 @@
 ﻿
-2026-01-21 22:44:58 START: Sync Process
-2026-01-21 22:44:58 DEBUG: Candidate M:\Hegemonikon\forge\.venv-kb\Scripts\python.exe failed check.
-2026-01-21 22:44:58 INFO: Verified interpreter: python (Python 3.13.9)
+2026-01-22 09:14:59 START: Sync Process
+2026-01-22 09:14:59 DEBUG: Candidate M:\Hegemonikon\forge\.venv-kb\Scripts\python.exe failed check.
+2026-01-22 09:14:59 INFO: Verified interpreter: python (Python 3.13.9)
 [Hegemonikon] M8 Anamnēsis
   Sync Phase: Complete
-  Processed: 18 sessions
-  New Index: 46 chunks
+  Processed: 25 sessions
+  New Index: 89 chunks
 
-2026-01-21 22:45:05 END: Exit Code 0
+2026-01-22 09:15:18 END: Exit Code 0

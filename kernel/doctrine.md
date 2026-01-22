@@ -17,8 +17,8 @@ flags:
 | 公理 | 内容 |
 |------|------|
 | **統一原理** | 知覚・認知・行動・学習は全て**変分自由エネルギー最小化**という同一原理の異なる側面 |
-| **4軸構造** | Flow(推論/行為) × Value(情報/目標) × Tempo(短期/長期) × Stratum(低次/高次) = 16機能 |
-| **Phase 1** | Aisthēsis-H, Krisis-H, Peira-H, Praxis-H, Praxis-L, Anamnēsis-H の6機能を有効化 |
+| **12機能体系** | P-series (2×2=4) + M-series (2×4=8) = 12機能 |
+| **Phase 1** | M1-M8 の8機能を有効化 |
 | **3層実装** | 機能層(Hegemonikón) → 実装層(Forge Module) → 実行層(Service) |
 
 ### 公理階層
@@ -28,10 +28,11 @@ flags:
 | 0 | メタ公理 | FEP統一原理 | 1 |
 | 1 | 核心公理 | Flow, Value | 2 |
 | 1.5 | 選択公理 | Tempo, Stratum, Agency, Valence | 4 |
-| 2 | 定理 | 64機能 (2⁶) | 64 |
+| 2a | P-series | 純粋定理 (核心×核心) | 4 |
+| 2b | M-series | 拡張定理 (核心×選択) | 8 |
 | 3 | 成果物 | 倫理・言語・品質 | ∞ |
 
-> **詳細参照**: `.agent/rules/hegemonikon.md`
+> **詳細参照**: `kernel/SACRED_TRUTH.md`
 
 ---
 

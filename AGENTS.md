@@ -103,7 +103,7 @@ Agents should recognize and utilize these standardized workflows:
 | `/boot` | Session initialization | M1 + M8 |
 | `/ask` | Research inquiry generation | M5 Peira |
 | `/plan` | Architectural design | M4 Phronēsis |
-| `/code` | Implementation protocol | M6 Praxis |
+| `/do` | Execution trigger | M6 Praxis |
 | `/rev` | Daily review | M7 Dokimē |
 | `/rec` | Memory refresh | M8 Anamnēsis |
 

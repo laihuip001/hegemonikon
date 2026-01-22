@@ -24,33 +24,46 @@ Applied to AI agents:
 
 ---
 
-## 2. The 4-Axis Architecture
+## 2. The 12-Function Architecture
 
-Hegemonikón derives cognitive functions from **4 binary axes** (2⁴ = 16 core functions):
+Hegemonikón derives cognitive functions from a **2-tier axiom structure**:
 
-| Axis | Dimension A | Dimension B |
+### Core Axioms (Level 1)
+
+| Axiom | Dimension A | Dimension B |
 | :--- | :--- | :--- |
 | **Flow** | Inference (perceive) | Action (execute) |
 | **Value** | Information (epistemic) | Goal (pragmatic) |
+
+### Choice Axioms (Level 1.5)
+
+| Axiom | Dimension A | Dimension B |
+| :--- | :--- | :--- |
 | **Tempo** | Fast (reactive) | Slow (deliberative) |
 | **Stratum** | Low (concrete) | High (abstract) |
+| **Agency** | Self | Environment |
+| **Valence** | Approach (+) | Avoid (-) |
 
-### 16 Core Functions (Theoretical Maximum)
+### 12 Core Functions
 
 ```
-Flow × Value × Tempo × Stratum = 2 × 2 × 2 × 2 = 16 functions
+P-series (Pure Theorems):  2 × 2 = 4 functions  ← Core × Core
+M-series (Extended Theorems): 2 × 4 = 8 functions  ← Core × Choice
+Total: 2² + 2³ = 12 functions
 ```
 
-**Phase 1 Active Functions** (6 of 16):
+**M-series (Active in Phase 1)**:
 
-| Function | Axis Values | Module |
+| Function | Module | Role |
 | :--- | :--- | :--- |
-| Perception-Fast | Inference × Info × Fast × Low | M1 Aisthēsis |
-| Judgment-Fast | Action × Goal × Fast × Low | M2 Krisis |
-| Research-Fast | Inference × Info × Fast × High | M5 Peira |
-| Execution-Fast | Action × Goal × Fast × Low | M6 Praxis |
-| Execution-Slow | Action × Goal × Slow × High | M6 Praxis (planning) |
-| Memory-Slow | Inference × Info × Slow × High | M8 Anamnēsis |
+| Perception | M1 Aisthēsis | Input processing |
+| Judgment | M2 Krisis | Priority decision |
+| Theory | M3 Theōria | Causal modeling |
+| Wisdom | M4 Phronēsis | Practical reasoning |
+| Research | M5 Peira | Exploration |
+| Execution | M6 Praxis | Action execution |
+| Verification | M7 Dokimē | Testing |
+| Memory | M8 Anamnēsis | Long-term storage |
 
 ---
 
@@ -125,16 +138,15 @@ Detect and eliminate:
 
 | Phase | Focus | Status |
 | :--- | :--- | :--- |
-| **Phase 1** | Core workflows, M1/M2/M5/M6/M7/M8 | ✅ Active |
-| **Phase 2** | M3/M4 (deep reasoning), P-series | 🔄 Planned |
-| **Phase 3** | Full 16-function deployment | 📋 Future |
+| **Phase 1** | M-series (M1-M8) | ✅ Active |
+| **Phase 2** | P-series (P1-P4) | 📄 Planned |
+| **Phase 3** | Full 12-function integration | 📋 Future |
 
 ### Phase 1 Scope
 
 ```
-Active: M1, M2, M5, M6, M7, M8
-Pending: M3 (Theōria), M4 (Phronēsis)
-P-series: Available but experimental (P1-P4)
+Active: M1, M2, M3, M4, M5, M6, M7, M8
+Planned: P1, P2, P3, P4
 ```
 
 ---

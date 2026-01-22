@@ -1,28 +1,44 @@
 ---
-description: 承認済み計画に基づく実装プロトコル。計画駆動開発の実行フェーズ。
+description: 承認済み計画を実行開始するトリガー。「今やれ」の明示的指示。
 hegemonikon: Praxis-H
 modules: [M6, M2]
 ---
 
-# /code: 実装プロトコル
+# /do: 実行開始プロトコル
 
 > **Hegemonikón Module**: M6 Praxis (実行) + M2 Krisis (判断)
 
-> **目的**: 承認済みの計画に基づいてコードを実装し、検証する
-> **前提条件**: `/plan` が完了し、ユーザー承認を得ていること
+> **目的**: 承認済みの計画を「今この瞬間から」実行開始する
+> **前提条件**: `/plan` が完了し、ユーザー承認 (`y`) を得ていること
+
+---
+
+## `/do` の位置づけ
+
+```
+/plan → 計画作成 → y (承認) → /do (実行開始)
+```
+
+| 操作 | 意味 | 状態遷移 |
+|------|------|----------|
+| `y` | 計画承認 — 設計に同意 | PLANNING → APPROVED |
+| `/do` | 実行開始 — 今すぐやれ | APPROVED → EXECUTION |
+
+> [!NOTE]
+> `y` と `/do` は分離されている。承認後、すぐに実行しなくても良い。
+> 別の作業を挟んでから `/do` で再開することも可能。
 
 ---
 
 ## 前提条件確認
 
-以下のいずれかが存在することを確認:
-
-- [ ] `implementation_plan.md` が作成済み
-- [ ] `/plan` でプランが承認済み
-- [ ] ユーザーからの明示的な実装開始指示
-
 > [!WARNING]
-> 承認なしでこのワークフローを開始してはならない。
+> 計画が APPROVED 状態でない場合、エラーを返す。
+
+確認事項:
+- [ ] `implementation_plan.md` が作成済み
+- [ ] ユーザーから `y`（承認）を得ている
+- [ ] APPROVED 状態である
 
 ---
 
@@ -51,19 +67,6 @@ modules: [M6, M2]
 2. テストを実行
 3. 失敗した場合は修正ループに入る
 
-### テスト実行コマンド例
-
-```bash
-# Python
-pytest tests/ -v
-
-# JavaScript/TypeScript
-npm test
-
-# Go
-go test ./...
-```
-
 ---
 
 ## Step 3: 納品
@@ -72,32 +75,13 @@ go test ./...
 2. コミットメッセージ案を提示（Conventional Commits形式）
 3. 必要に応じて `walkthrough.md` を更新
 
-### コミットメッセージ形式
-
-```
-<type>(<scope>): <description>
-
-[optional body]
-
-[optional footer]
-```
-
-| Type | 説明 |
-|------|------|
-| feat | 新機能 |
-| fix | バグ修正 |
-| docs | ドキュメント |
-| refactor | リファクタリング |
-| test | テスト追加 |
-| chore | その他 |
-
 ---
 
 ## Step 4: Memory Logging (Auto)
 
-実装完了を自己記録する:
+実行完了を自己記録する:
 ```bash
-python forge/gnosis/logger.py log "system" "/code Completed" --session "AutoLog"
+python forge/gnosis/logger.py log "system" "/do Completed" --session "AutoLog"
 ```
 
 ---
@@ -106,14 +90,14 @@ python forge/gnosis/logger.py log "system" "/code Completed" --session "AutoLog"
 
 ```
 ┌─[Hegemonikón]──────────────────────┐
-│ M6 Praxis: 実行判断完了           │
+│ M6 Praxis: 実行開始               │
 │ 計画: implementation_plan.md       │
 │ M2 Krisis: 優先度判断完了         │
-│ 実行: [N]ファイル変更                │
-│ リスク: [Low/Medium/High]           │
+│ 実行: [N]ファイル変更              │
+│ リスク: [Low/Medium/High]          │
 └────────────────────────────────────┘
 
-✅ /code 完了
+✅ /do 完了
 
 ## 変更サマリー
 - `path/to/file1.py`: [変更内容]
@@ -123,11 +107,7 @@ python forge/gnosis/logger.py log "system" "/code Completed" --session "AutoLog"
 [パス/失敗の状況]
 
 ## コミットメッセージ案
-feat(auth): implement OAuth2 authentication flow
-
-- Add OAuth2 provider abstraction
-- Implement Google OAuth2 handler
-- Add session management
+feat(scope): description
 
 ⏸️ 次のステップ: コミットしますか？
 ```

@@ -126,8 +126,7 @@ Value ───┬── Tempo   (目標の時間)
 | ドキュメント | 場所 | 役割 |
 |-------------|------|------|
 | GEMINI.md | `~/.gemini/GEMINI.md` | Kernel Doctrine |
-| hegemonikon.md | `runtime/.agent/rules/` | 公理体系詳細 |
-| phase2_design.md | `docs/design/` | 64機能完全マトリクス |
+| SACRED_TRUTH.md | `kernel/` | 公理階層・不変真理 |
 
 ---
 

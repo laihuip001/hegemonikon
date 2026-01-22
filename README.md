@@ -53,10 +53,16 @@ This repository is optimized for consumption by AI agents.
 |----|------|------|
 | **Flow** | Inference / Action | 推論（内部モデル更新）vs 行為（環境への働きかけ） |
 | **Value** | Epistemic / Pragmatic | 情報価値 vs 目標達成価値 |
-| **Tempo** | Fast / Slow | 即時反応 vs 熟考 |
-| **Stratum** | Low / High | 低次（パターン認識）vs 高次（抽象推論） |
 
-この4軸 × 2値 = **16機能**が Phase 1 で有効化。最終的には 64機能 に拡張予定。
+### 12機能体系
+
+```
+核心公理 (2) × 核心公理 (2) = P-series 4機能 (純粋定理)
+核心公理 (2) × 選択公理 (4) = M-series 8機能 (拡張定理)
+合計: 12機能 (2² + 2³)
+```
+
+> 詳細は [kernel/SACRED_TRUTH.md](kernel/SACRED_TRUTH.md) を参照。
 
 ---
 

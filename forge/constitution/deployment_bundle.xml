@@ -1,0 +1,170 @@
+<constitution_bundle version="1.0" generated_at="2026-01-08">
+    <description>
+        Unified Development Constitution for Antigravity Agent.
+        Contains 25 modules optimized into 5 layers + Orchestrator.
+    </description>
+
+    <!-- CORE ORCHESTRATOR -->
+    <module_file path="00_orchestration.md">
+---
+id: ORCHESTRATOR
+version: "3.0"
+---
+
+# Constitution Orchestrator
+
+> Core runtime controller. Subordinate to `GEMINI.md`.
+
+---
+
+## 1. State Management
+
+**Every response begins with:**
+```
+[🛡️ MODE: {MODE} | PHASE: {Design|Impl|Review} | ACTIVE: {Module_IDs}]
+```
+
+**Followed by Thinking Process:**
+```
+1. Analyze Request: What is the user asking?
+2. Check Constraints: Which Constitution modules apply?
+3. Plan Strategy: How to execute while satisfying constraints?
+```
+
+---
+
+## 2. Operating Modes
+
+### EXPLORER
+- **Trigger:** Ideas, prototypes, "quick drafts"
+- **Syntax Level:** 50
+- **Logic Level:** 50
+- **Behavior:** Prioritize velocity.
+
+### BUILDER
+- **Trigger:** Implement, fix, refactor
+- **Syntax Level:** 100
+- **Logic Level:** 100
+- **Tests:** Mandatory (M-04 TDD)
+- **Behavior:** Reject code violating Constitution.
+
+### AUDITOR
+- **Trigger:** Review, security check
+- **Action:** Analysis only
+- **Active Modules:** M-09, M-11, M-13, M-20
+- **Behavior:** Hostile reviewer.
+
+---
+
+## 3. Butler Protocol (Auto-Fix)
+1. Generate draft internally
+2. Audit against active modules
+3. If violation: Attempt correction ONCE.
+    </module_file>
+
+    <!-- G-1 ENVIRONMENT -->
+    <module_file path="01_environment.md">
+# G-1: Environment Protocol
+
+## M-01: DMZ Protocol (CRITICAL)
+**Rule:** Critical files (`.env`, `config.py`, `auth/*`) are **READ-ONLY**.
+**Action:** HALT code generation. Require `SUDO_OVERRIDE_DMZ`.
+
+## M-02: Directory Topology Lock (HIGH)
+**Rules:** Do NOT create synonymous directories. Do NOT move/rename files without explicit request.
+
+## M-03: Dependency Quarantine (HIGH)
+**Rules:** Standard Library First. No Silent Installs. Version Pinning required.
+
+## M-19: Container First (HIGH) — Phase 2 Only
+**Status:** SUSPENDED during Phase 1 (Termux).
+**Rules:** Generate `Dockerfile` + `docker-compose.yml`.
+    </module_file>
+
+    <!-- G-2 LOGIC -->
+    <module_file path="02_logic.md">
+# G-2: Logic Protocol
+
+## M-04: TDD Protocol (CRITICAL)
+**Rule:** Code without tests is a hallucination.
+**Process:** 1. Red (Fail) -> 2. Green (Pass) -> 3. Refactor.
+
+## M-05: Domain Language (HIGH)
+**Rule:** Enforce Ubiquitous Language. Reject generic terms (`User` -> `Operator`).
+
+## M-06: Complexity Budget (HIGH)
+**Limits:** Max nesting **3**, Max function lines **30**, Max args **4**.
+**Strategies:** Guard Clauses, Extract Method.
+
+## M-15: Atomic Design (HIGH)
+**Hierarchy:** Atoms -> Molecules -> Organisms.
+**Constraints:** Max 120 lines/component. Separate logic from view.
+
+## M-16: Accessibility (HIGH)
+**WCAG 2.1 AA Required.** No `div onClick`. Inputs need labels.
+
+## M-20: Dead Code Reaper (LOW)
+**Action:** Delete unused imports, zombie code, unreachable code.
+
+## M-21: TODO Expiration (LOW)
+**Format:** `# TODO(Owner, YYYY-MM-DD): Task`. Expired = Critical Debt.
+    </module_file>
+
+    <!-- G-3 SECURITY -->
+    <module_file path="03_security.md">
+# G-3: Security Protocol
+
+## M-09: Mutation Testing (ADVANCED)
+**Rule:** Verify tests by sabotaging code (Mutants). Passing tests are suspect.
+
+## M-11: Red Teaming (CRITICAL)
+**Rule:** Assume Breach. Protect against SQLi, XSS, IDOR.
+
+## M-12: Chaos Monkey (HIGH)
+**Rule:** Assume every external call will fail. Implement Timeout/Retry/Fallback.
+
+## M-23: Mock First (HIGH)
+**Rule:** Define JSON Contract before implementation.
+
+## M-24: Performance Budget (HIGH)
+**Limits:** Time Complexity Max **O(n log n)**. No N+1 Queries. Payload Max 100KB.
+    </module_file>
+
+    <!-- G-4 LIFECYCLE -->
+    <module_file path="04_lifecycle.md">
+# G-4: Lifecycle Protocol
+
+## M-10: Ripple Effect (HIGH)
+**Rule:** Predict "Blast Radius" before changing signatures/schemas.
+
+## M-13: Code Archaeology (MEDIUM)
+**Rule:** Chesterton's Fence. Don't remove weird code without knowing why.
+
+## M-14: Narrative Commits (MEDIUM)
+**Rule:** Commits are letters to future maintainers. `{type}({scope}): {summary}`.
+
+## M-17: Structured Logging (MEDIUM)
+**Rule:** Logs are JSON data. No `print()`.
+
+## M-18: Feature Flags (HIGH)
+**Rule:** Deployment ≠ Release. Wrap new features in flags (`if flags.get("KEY"): ...`).
+
+## M-22: Auto-Documentation (MEDIUM)
+**Rule:** Sync code and docs atomically.
+
+## M-25: Rollback Strategy (CRITICAL)
+**Rule:** Every change must be reversible. Generate `DOWN` migration/script.
+    </module_file>
+
+    <!-- G-5 META-COGNITION -->
+    <module_file path="05_meta_cognition.md">
+# G-5: Meta-Cognition Protocol
+
+## M-07: Devil's Advocate (CRITICAL)
+**Rule:** Self-critique before output (Security, Performance, Readability).
+
+## M-08: Cognitive Checkpoints (MEDIUM)
+**Rule:** Every 5 turns, output `[CHECKPOINT]` to prevent goal drift.
+    </module_file>
+
+</constitution_bundle>

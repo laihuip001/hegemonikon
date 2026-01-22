@@ -121,12 +121,31 @@ Value ───┬── Tempo   (目標の時間)
 
 ---
 
-## 5. 参照ドキュメント
+## 5. ミクロ/マクロ二重実装
+
+| レベル | 実装 | 役割 |
+|--------|------|------|
+| **ミクロ** | skills/, workflows/ | AI主体の行動 |
+| **マクロ** | mēkhanē/ | システム基盤 |
+
+### mēkhanē (機構層)
+
+| 機構 | M-series | 役割 |
+|------|----------|------|
+| peira/ | M5 | 収集 |
+| ergastērion/ | M6 | 製造 |
+| anamnēsis/ | M8 | 記憶 |
+| exagōgē/ | M6 | 出力 |
+
+---
+
+## 6. 参照ドキュメント
 
 | ドキュメント | 場所 | 役割 |
 |-------------|------|------|
 | GEMINI.md | `~/.gemini/GEMINI.md` | Kernel Doctrine |
 | SACRED_TRUTH.md | `kernel/` | 公理階層・不変真理 |
+| axiom_hierarchy.md | `kernel/` | 公理階層 (Master) |
 
 ---
 

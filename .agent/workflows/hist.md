@@ -14,7 +14,7 @@ modules: [M8]
 Antigravity ChatHistory DBをベクトルインデックスと同期する。
 
 ```powershell
-python m:/Hegemonikon/forge/scripts/chat-history-kb.py sync --report
+python m:/Hegemonikon/mekhane/peira/scripts/chat-history-kb.py sync --report
 ```
 
 ## Step 2: Takeout Import (Optional)

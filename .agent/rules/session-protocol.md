@@ -4,6 +4,7 @@ version: "1.1.0"
 tier: "RULES"
 parent: "KERNEL_DOCTRINE"
 status: "ENFORCED"
+activation: always_on
 ---
 
 # セッション管理プロトコル

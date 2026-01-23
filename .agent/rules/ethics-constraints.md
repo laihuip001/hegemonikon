@@ -4,6 +4,7 @@ version: "1.1.0"
 tier: "RULES"
 parent: "KERNEL_DOCTRINE"
 level: "3 (Artifact)"
+activation: always_on
 ---
 
 # 倫理的制約 (Ethics Constraints)

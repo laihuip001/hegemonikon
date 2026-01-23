@@ -159,7 +159,7 @@ Hegemonikon/
 
 ## ライセンス
 
-Private Repository
+MIT License
 
 ---
 

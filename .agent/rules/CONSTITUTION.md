@@ -2,6 +2,7 @@
 
 > **このドキュメントは不変（Immutable）である。**
 > 明示的なユーザー承諾なしに変更してはならない。
+> **Activation Mode**: `always_on`
 
 ---
 

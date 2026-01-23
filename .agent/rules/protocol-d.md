@@ -2,6 +2,7 @@
 
 > **ステータス**: 常時適用 (Invariant)
 > **分類**: G-2 Logic Gate (品質管理)
+> **Activation Mode**: `always_on`
 
 ---
 

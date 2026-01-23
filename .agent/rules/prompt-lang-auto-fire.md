@@ -4,6 +4,7 @@ version: "1.0.0"
 tier: "RULES"
 parent: "KERNEL_DOCTRINE"
 status: "ENFORCED"
+activation: model_decision
 ---
 
 # prompt-lang 自動発火プロトコル

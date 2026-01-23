@@ -3,6 +3,7 @@
 > **基盤原則**: P0 (Environment over Will) - GEMINI.md 第零原則参照
 > **ステータス**: 常時適用
 > **分類**: G-2 Logic Gate (品質管理)
+> **Activation Mode**: `always_on`
 
 ---
 

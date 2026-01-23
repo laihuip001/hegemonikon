@@ -4,6 +4,7 @@ version: "2.0.0"
 tier: "RULES"
 parent: "KERNEL_DOCTRINE"
 status: "CANONICAL_TRUTH"
+activation: always_on
 ---
 
 # Hegemonikón 公理体系

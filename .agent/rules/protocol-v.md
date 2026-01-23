@@ -3,6 +3,7 @@
 > **ステータス**: 常時適用 (Invariant)
 > **分類**: G-2 Logic Gate (品質管理)
 > **根拠**: GEMINI.md 第零原則 (意志より環境)
+> **Activation Mode**: `always_on`
 
 ---
 

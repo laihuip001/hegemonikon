@@ -3,6 +3,7 @@
 > **ステータス**: 常時適用 (絶対)
 > **分類**: G-1 Iron Cage (環境制御)
 > **根拠**: Latent Condition 対策 - スコープ曖昧性の排除
+> **Activation Mode**: `always_on`
 
 ---
 

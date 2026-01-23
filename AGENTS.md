@@ -26,9 +26,13 @@ This repository follows a 4-Layer Architecture:
 - **`kernel/`**: **IMMUTABLE**. Theoretical foundations and core axioms. Do NOT modify without explicit authorization.
 - **`.agent/`**: **The "Brain"**. Contains:
   - `workflows/`: Automated procedures (e.g., `/boot`, `/ask`, `/plan`).
-  - `skills/`: M-Series (M1-M8) and P-Series (P1-P4) cognitive modules.
+  - `skills/`: M-Series (M1-M8), P-Series (P1-P4), and K-Series (K1-K12) cognitive modules.
   - `rules/`: Operational constraints (including `GEMINI.md` rules).
-- **`forge/`**: **The "Hands"**. Tools, scripts, and product implementations (e.g., Gnōsis, Chat History DB).
+- **`mekhane/`**: **The "Mechanism Layer"**. Infrastructure implementations:
+  - `anamnesis/`: Knowledge engine (Gnōsis, LanceDB).
+  - `ergasterion/`: Manufacturing (helpers, protocols).
+  - `exagoge/`: Exports (Obsidian prompts, skills).
+  - `peira/`: Collection (data collectors).
 - **`docs/`**: Documentation and architectural maps.
 
 ## 4. Critical Boundaries (Traffic Light System)
@@ -49,8 +53,8 @@ This repository follows a 4-Layer Architecture:
 | :--- | :--- |
 | `.agent/workflows/*.md` | Test after changes. Affects all sessions. |
 | `.agent/skills/*/SKILL.md` | Verify M-series dependencies. |
-| `forge/gnosis/` | Run tests: `python -m pytest forge/gnosis/tests/` |
-| `vault/`, `gnosis_data/` | Backup before modification. |
+| `mekhane/anamnesis/` | Run tests: `python -m pytest mekhane/anamnesis/tests/` |
+| `vault/` | Backup before modification. |
 
 ### 🟢 GREEN: SAFE TO MODIFY
 
@@ -81,17 +85,17 @@ This repository follows a 4-Layer Architecture:
 
 ```powershell
 # Gnōsis CLI
-python m:/Hegemonikon/forge/gnosis/cli.py --help
-python m:/Hegemonikon/forge/gnosis/cli.py check-freshness
+python m:/Hegemonikon/mekhane/anamnesis/cli.py --help
+python m:/Hegemonikon/mekhane/anamnesis/cli.py check-freshness
 
 # Chat History Sync
-python m:/Hegemonikon/forge/scripts/sync_chat_history.py
+python m:/Hegemonikon/mekhane/anamnesis/scripts/sync_chat_history.py
 
 # Linting (if configured)
-ruff check forge/
+ruff check mekhane/
 
 # Tests
-python -m pytest forge/gnosis/tests/ -v
+python -m pytest mekhane/anamnesis/tests/ -v
 ```
 
 ## 7. Key Workflows (The "How-To")
@@ -121,7 +125,7 @@ Agents should recognize and utilize these standardized workflows:
 
 ### Updating Gnōsis Knowledge Base
 ```powershell
-python m:/Hegemonikon/forge/gnosis/cli.py collect -s arxiv -q "query" -l 10
+python m:/Hegemonikon/mekhane/anamnesis/cli.py collect -s arxiv -q "query" -l 10
 ```
 
 ## 9. Debugging Tips

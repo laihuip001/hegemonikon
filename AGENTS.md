@@ -61,7 +61,7 @@ This repository follows a 4-Layer Architecture:
 | Target | Notes |
 | :--- | :--- |
 | `docs/` | Documentation is always safe. |
-| `forge/scripts/` | Utility scripts. Test after changes. |
+| `mekhane/peira/scripts/` | Utility scripts. Test after changes. |
 | `runtime/antigravity/playground/` | Experimental area. |
 | `archive/` | Historical records. |
 
@@ -89,7 +89,7 @@ python m:/Hegemonikon/mekhane/anamnesis/cli.py --help
 python m:/Hegemonikon/mekhane/anamnesis/cli.py check-freshness
 
 # Chat History Sync
-python m:/Hegemonikon/mekhane/anamnesis/scripts/sync_chat_history.py
+python m:/Hegemonikon/mekhane/peira/scripts/chat-history-kb.py
 
 # Linting (if configured)
 ruff check mekhane/
@@ -134,7 +134,7 @@ python m:/Hegemonikon/mekhane/anamnesis/cli.py collect -s arxiv -q "query" -l 10
 | :--- | :--- | :--- |
 | Workflow not recognized | File not in `.agent/workflows/` | Check path and filename |
 | Gnōsis returns empty | DB not populated or stale | Run `collect-all` command |
-| Memory not loading | `.hegemonikon/` files missing | Check `M:\Documents\mine\.hegemonikon\` |
+| Memory not loading | `.hegemonikon/` files missing | Check `M:\Brain\.hegemonikon\` |
 | LanceDB errors | Version mismatch | `pip install --upgrade lancedb` |
 
 ## 10. Development Status (Phase 1)

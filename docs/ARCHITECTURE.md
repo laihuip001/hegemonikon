@@ -84,7 +84,7 @@ Total: 2² + 2³ = 12 functions
 │    └── .agent/workflows/                                │
 ├─────────────────────────────────────────────────────────┤
 │  LAYER 4: TOOLS (Execution)                             │
-│    └── forge/, runtime/                                 │
+│    └── mekhane/, runtime/                               │
 └─────────────────────────────────────────────────────────┘
 ```
 
@@ -159,7 +159,7 @@ Planned: P1, P2, P3, P4
 | :--- | :--- | :--- |
 | **Obsidian** | Long-term notes | `M:\Brain\` |
 | **Google Drive** | Multi-PC sync | `M:\` (synced) |
-| **LanceDB** | Vector storage | `gnosis_data/` |
+| **LanceDB** | Vector storage | `mekhane/anamnesis/data/` |
 
 ### AI Runtimes
 

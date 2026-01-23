@@ -1,0 +1,1 @@
+"""Hegemonikón Mechanism Layer (Mēkhanē)"""

@@ -6,7 +6,7 @@ from abc import ABC, abstractmethod
 from typing import Optional
 import time
 
-from gnosis.models.paper import Paper
+from mekhane.anamnesis.models.paper import Paper
 
 
 class BaseCollector(ABC):

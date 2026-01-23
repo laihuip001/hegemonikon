@@ -25,4 +25,13 @@ forge/models/
 # Antigravity data (too large for GitHub & runtime managed by app)
 runtime/
 *.pb
-*.pb
+
+# Security: Local secrets and state (NEVER commit)
+.env.local
+.env*.local
+.sync-state.json
+
+# Personal data: Knowledge bases
+forge/gnosis_data/
+gnosis_data/
+

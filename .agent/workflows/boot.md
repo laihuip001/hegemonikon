@@ -14,6 +14,12 @@ Hegemonikón Phase 1 のブートシーケンス。
 
 // turbo-all
 
+0. **設定ファイル同期**: M:\.gemini → C:\Users\{USER}\.gemini
+   ```powershell
+   & "m:\Hegemonikon\.agent\scripts\sync-config.ps1"
+   ```
+   > **目的**: Mドライブ（Git管理）を正本とし、Antigravityが読み込むCドライブに反映。
+
 1. **プロファイル読込**: `GEMINI.md` を確認し、Hegemonikón Doctrine が有効であることを確認
 
 2. **コアモジュール有効化**:

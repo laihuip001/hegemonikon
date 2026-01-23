@@ -16,13 +16,30 @@ created: "2026-01-23"
 
 ## 5分で読む要約
 
-### 公理階層（3行要約）
+### 公理階層（完全構造）
 
 ```
-Level 0: FEP（すべては予測誤差の最小化）
-Level 1: Flow（推論↔行為）× Value（情報↔目標）= 4象限
-Level 2: 上記 × 選択公理 → M1-M8 の 8機能
+Level 0: FEP統一原理（すべては予測誤差の最小化）
+    │
+Level 1: 核心公理 ── Flow (推論↔行為) × Value (情報↔目標)
+    │
+    ├── Level 2a: P-series (核心×核心) → P1-P4 の 4機能 [Phase 2]
+    │       純粋定理: Noēsis, Boulēsis, Zētēsis, Energeia
+    │
+    ├── Level 2b: M-series (核心×選択) → M1-M8 の 8機能 [Phase 1 ✓]
+    │       拡張定理: Aisthēsis, Krisis, Theōria, Phronēsis, Peira, Praxis, Dokimē, Anamnēsis
+    │
+    └── Level 2c: Kairos (選択×選択) → Κ1-Κ12 の 12修飾子 [Phase 3]
+            文脈定理: 状況に応じた行動様式を修飾
 ```
+
+**数学的構造**: 4 → 8 → 12 の等差数列 (+4) = **合計 24定理**
+
+| シリーズ | 数式 | 数 | 性質 | Phase |
+|---------|------|-----|------|-------|
+| P-series | 2×2 | **4** | 本質的（何であるか） | 2 |
+| M-series | 2×4 | **8** | 様態的（どう在るか） | 1 ✓ |
+| Kairos | 4P2 | **12** | 文脈的（どの状況で） | 3 |
 
 ### 核心公理の日常適用
 

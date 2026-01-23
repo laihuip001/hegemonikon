@@ -67,10 +67,10 @@ def cmd_check_freshness(args):
 
 def cmd_collect(args):
     """論文収集"""
-    from gnosis.collectors.arxiv import ArxivCollector
-    from gnosis.collectors.semantic_scholar import SemanticScholarCollector
-    from gnosis.collectors.openalex import OpenAlexCollector
-    from gnosis.index import GnosisIndex
+    from .collectors.arxiv import ArxivCollector
+    from .collectors.semantic_scholar import SemanticScholarCollector
+    from .collectors.openalex import OpenAlexCollector
+    from .index import GnosisIndex
     
     collectors = {
         "arxiv": ArxivCollector,
@@ -111,10 +111,10 @@ def cmd_collect(args):
 
 def cmd_collect_all(args):
     """全ソースから収集"""
-    from gnosis.collectors.arxiv import ArxivCollector
-    from gnosis.collectors.semantic_scholar import SemanticScholarCollector
-    from gnosis.collectors.openalex import OpenAlexCollector
-    from gnosis.index import GnosisIndex
+    from .collectors.arxiv import ArxivCollector
+    from .collectors.semantic_scholar import SemanticScholarCollector
+    from .collectors.openalex import OpenAlexCollector
+    from .index import GnosisIndex
     
     collectors = [
         ("arxiv", ArxivCollector()),
@@ -145,7 +145,7 @@ def cmd_collect_all(args):
 
 def cmd_search(args):
     """論文検索"""
-    from gnosis.index import GnosisIndex
+    from .index import GnosisIndex
     
     print(f"[Search] Query: {args.query}")
     
@@ -173,7 +173,7 @@ def cmd_search(args):
 
 def cmd_stats(args):
     """インデックス統計"""
-    from gnosis.index import GnosisIndex
+    from .index import GnosisIndex
     
     index = GnosisIndex()
     stats = index.stats()

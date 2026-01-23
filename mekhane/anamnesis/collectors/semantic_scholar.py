@@ -11,8 +11,8 @@ try:
 except ImportError:
     requests = None
 
-from gnosis.collectors.base import BaseCollector
-from gnosis.models.paper import Paper
+from mekhane.anamnesis.collectors.base import BaseCollector
+from mekhane.anamnesis.models.paper import Paper
 
 
 class SemanticScholarCollector(BaseCollector):

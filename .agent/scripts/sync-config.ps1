@@ -16,6 +16,15 @@ $SyncTargets = @(
     ".agent"
 )
 
+# Additional targets for Antigravity compatibility
+# Antigravity reads ~/.gemini/workflows/ directly, not .agent/workflows/
+$LegacySyncTargets = @(
+    @{
+        Source = "M:\Hegemonikon\.agent\workflows"
+        Dest   = "C:\Users\$env:USERNAME\.gemini\workflows"
+    }
+)
+
 Write-Host "[Hegemonikon] Config Sync: M: -> C:" -ForegroundColor Cyan
 
 foreach ($target in $SyncTargets) {
@@ -34,12 +43,33 @@ foreach ($target in $SyncTargets) {
     
     # Use robocopy for directories, Copy-Item for files
     if (Test-Path $srcPath -PathType Container) {
-        $result = robocopy $srcPath $dstPath /MIR /NFL /NDL /NJH /NJS /NC /NS 2>&1
+        $null = robocopy $srcPath $dstPath /MIR /NFL /NDL /NJH /NJS /NC /NS 2>&1
         Write-Host "  SYNCED: $target/ (directory)" -ForegroundColor Green
-    } else {
+    }
+    else {
         Copy-Item $srcPath $dstPath -Force
         Write-Host "  SYNCED: $target" -ForegroundColor Green
     }
+}
+
+# Sync legacy targets (Antigravity compatibility)
+foreach ($legacy in $LegacySyncTargets) {
+    $srcPath = $legacy.Source
+    $dstPath = $legacy.Dest
+    
+    if (-not (Test-Path $srcPath)) {
+        Write-Host "  SKIP: $srcPath (not found)" -ForegroundColor Yellow
+        continue
+    }
+    
+    if ($DryRun) {
+        Write-Host "  DRY-RUN: Would sync $srcPath -> $dstPath" -ForegroundColor Gray
+        continue
+    }
+    
+    # Always use robocopy for directories
+    $null = robocopy $srcPath $dstPath /MIR /NFL /NDL /NJH /NJS /NC /NS 2>&1
+    Write-Host "  SYNCED: workflows/ (Antigravity compat)" -ForegroundColor Green
 }
 
 Write-Host "[Hegemonikon] Config Sync: Complete" -ForegroundColor Cyan

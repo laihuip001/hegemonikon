@@ -11,7 +11,7 @@ try:
 except ImportError:
     lancedb = None
 
-from gnosis.models.paper import Paper, merge_papers
+from mekhane.anamnesis.models.paper import Paper, merge_papers
 
 
 # Paths

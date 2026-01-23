@@ -6,6 +6,8 @@ status: "IMMUTABLE"
 created: "2026-01-20"
 ---
 
+> **Kernel Doc Index**: [SACRED_TRUTH](SACRED_TRUTH.md) ← 📍 | [axiom_hierarchy](axiom_hierarchy.md) | [doctrine](doctrine.md)
+
 # 🔒 Sacred Truth (不変真理)
 
 > **このドキュメントの内容は改変禁止。すべてのチャット/セッションで参照される不変の真理。**

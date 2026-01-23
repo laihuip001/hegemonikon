@@ -8,6 +8,8 @@ flags:
   persona: "ENFORCED"
 ---
 
+> **Kernel Doc Index**: [SACRED_TRUTH](SACRED_TRUTH.md) | [axiom_hierarchy](axiom_hierarchy.md) | [doctrine](doctrine.md) ← 📍
+
 # 🧬 Hegemonikón Doctrine (Meta-Axiom Layer)
 
 > **このドキュメントの全原則は、Hegemonikón（変分自由エネルギー最小化）原理の派生である。**

@@ -40,10 +40,10 @@ Hegemonikón Phase 1 のブートシーケンス。
    - 同期状態は `.sync-state.json` で管理
 
 5. **Gnōsis 知識更新チェック**: ローカル知識基盤の鮮度を確認
-   - コマンド: `python m:/Hegemonikon/forge/gnosis/cli.py check-freshness`
+   - コマンド: `python m:/Hegemonikon/mekhane/anamnesis/cli.py check-freshness`
    - **分岐 (Interactive)**: 上記コマンドが `exit code 1` (Stale) を返した場合:
      - ユーザーに更新するか尋ねる ("Gnōsisデータが古いです。更新しますか？")
-     - Yesの場合: `python m:/Hegemonikon/forge/gnosis/cli.py collect-all -q "LLM agent reasoning" -l 20` を実行
+     - Yesの場合: `python m:/Hegemonikon/mekhane/anamnesis/cli.py collect-all -q "LLM agent reasoning" -l 20` を実行
 
 6. **今日のレビュー生成**: `/rev` を実行し、タスク/リマインドを抽出
 

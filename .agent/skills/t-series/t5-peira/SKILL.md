@@ -1,14 +1,14 @@
 ---
-name: "M5 Peira"
+name: "T5 Peira"
 description: |
-  FEP Octave M5: 探求モジュール (A-E-F)。情報不足を検出し、収集行動を発動する。
+  FEP Octave T5: 探求モジュール (A-E-F)。情報不足を検出し、収集行動を発動する。
   Use when: 情報収集、Web検索、「調べて」要求、不確実性が高い時(U>0.6)。
   Use when NOT: 既知情報で回答可能な時、実行フェーズで追加調査不要な時。
-  Triggers: M3 Theōria (情報収集→仮説構築へ) or M6 Praxis (情報収集→即時行動へ)
+  Triggers: T3 Theōria (情報収集→仮説構築へ) or T6 Praxis (情報収集→即時行動へ)
   Keywords: search, research, query, information gathering, uncertainty, fact-check.
 ---
 
-# M5: Peira (πεῖρα) — 探求
+# T5: Peira (πεῖρα) — 探求
 
 > **FEP Code:** A-E-F (Action × Epistemic × Fast)
 > **Hegemonikón:** 11 Peira-H
@@ -30,7 +30,7 @@ description: |
 
 | 条件 | 内容 |
 |------|------|
-| **位置** | M1/M2/M6 から呼び出されるオンデマンド実行 |
+| **位置** | T1/T2/T6 から呼び出されるオンデマンド実行 |
 | **依存** | 外部検索ツール (Web Search/API) |
 | **コスト** | 高コスト操作（時間・API）のため、乱発禁止 |
 
@@ -42,10 +42,10 @@ description: |
 
 | 種別 | 形式 | ソース | 備考 |
 |------|------|--------|------|
-| 不確実性スコア | Float | M1 Aisthēsis | **> 0.2 で発動検討** |
-| 情報ギャップ | JSON | M2 Krisis | 具体的な欠損情報 |
+| 不確実性スコア | Float | T1 Aisthēsis | **> 0.2 で発動検討** |
+| 情報ギャップ | JSON | T2 Krisis | 具体的な欠損情報 |
 | 明示的質問 | テキスト | ユーザー | 「調べて」 |
-| 仮説検証要求 | JSON | M7 Dokimē | 裏付け調査 |
+| 仮説検証要求 | JSON | T7 Dokimē | 裏付け調査 |
 
 ### Output
 
@@ -53,8 +53,8 @@ description: |
 |------|------|--------|------|
 | 検索クエリ | String[] | Web Search | 実行されるクエリ |
 | 調査レポート | Markdown | ユーザー | 構造化された回答 |
-| 新事実 | JSON | M3 Theōria | モデル更新用 |
-| 文脈更新 | JSON | M1 Aisthēsis | 変数埋め |
+| 新事実 | JSON | T3 Theōria | モデル更新用 |
+| 文脈更新 | JSON | T1 Aisthēsis | 変数埋め |
 
 ---
 
@@ -64,7 +64,7 @@ description: |
 |----------|------|--------|
 | 明示的情報要求 | ユーザーが検索を指示 | 最高 |
 | **クリティカル情報不足** | **U > 0.4** → 強制発動 | 高 |
-| 仮説検証 | M7からの裏付け要求 | 中 |
+| 仮説検証 | T7からの裏付け要求 | 中 |
 | **補足情報収集** | **U > 0.2** → 発動検討 | 低 |
 
 ### 強制発動条件（1:3 ピラミッド）
@@ -108,7 +108,7 @@ Phase 3: 情報統合・合成
 
 Phase 4: 出力・フィードバック
   10. 調査レポートを生成
-  11. M1/M3へ構造化データを送信
+  11. T1/T3へ構造化データを送信
 ```
 
 ---
@@ -151,7 +151,7 @@ Phase 4: 出力・フィードバック
 | T1 | 「Reactの最新バージョンは？」 | Fact check | 公式doc/release noteを提示 |
 | T2 | 「Docker vs Podman」 | Comparison | メリット・デメリットの比較表作成 |
 | T3 | エラーログ "System.NullReference..." | Debugging | StackOverflow等の解決策提示 |
-| T4 | 曖昧な質問「あれってどうやるの？」 | Exploration | M1履歴から文脈補完してクエリ生成 |
+| T4 | 曖昧な質問「あれってどうやるの？」 | Exploration | T1履歴から文脈補完してクエリ生成 |
 | T5 | 検索結果なし | Retry | クエリを短くして再試行 |
 
 ---
@@ -171,9 +171,9 @@ Phase 4: 出力・フィードバック
 
 | 依存 | 対象 | 関係 |
 |------|------|------|
-| **Precondition** | M1 Aisthēsis | 文脈・不確実性 |
-| **Precondition** | M2 Krisis | 情報ギャップ |
-| **Postcondition** | M3 Theōria | 新しい事実・知識 |
+| **Precondition** | T1 Aisthēsis | 文脈・不確実性 |
+| **Precondition** | T2 Krisis | 情報ギャップ |
+| **Postcondition** | T3 Theōria | 新しい事実・知識 |
 | **Postcondition** | ユーザー | レポート提示 |
 
 ---
@@ -191,7 +191,7 @@ Phase 4: 出力・フィードバック
 
 ## 外部AI連携
 
-M5 Peiraは複数の情報源を使い分ける。
+T5 Peiraは複数の情報源を使い分ける。
 
 ### 情報源の使い分け
 
@@ -227,7 +227,7 @@ python m:/Hegemonikon/forge/scripts/perplexity_api.py search "クエリ"
 ### 連携フロー（更新版）
 
 ```
-M5 Peira (情報不足検出)
+T5 Peira (情報不足検出)
     ↓
 search_web で基本情報収集
     ↓
@@ -235,7 +235,7 @@ search_web で基本情報収集
     ↓
 ユーザーに深い調査が必要な場合 → /ask で調査依頼書を生成
     ↓
-M3 Theōria ← 新情報入力
+T3 Theōria ← 新情報入力
 ```
 
 ### 対応ワークフロー
@@ -270,7 +270,7 @@ python m:/Hegemonikon/forge/gnosis/cli.py search "query"
 
 ## Prompt-Lang Integration
 
-M5 Peira は複雑な推論や構造化された出力が必要な場合、`prompt-lang` で定義されたプロンプトを使用する。
+T5 Peira は複雑な推論や構造化された出力が必要な場合、`prompt-lang` で定義されたプロンプトを使用する。
 
 **コマンド**:
 ```bash

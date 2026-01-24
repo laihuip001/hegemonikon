@@ -1,13 +1,13 @@
 ---
-name: "P2 Boulēsis"
+name: "O2 Boulēsis"
 description: |
-  純粋定理 P2: 純粋意志 (I-P)。Flow×Value のみの最も抽象的な意志機能。
+  純粋定理 O2: 純粋意志 (I-P)。Flow×Value のみの最も抽象的な意志機能。
   Use when: 目標設定、価値判断、「何を望むか」を問う時。
   Triggers: M2 Krisis（具体化）, M4 Phronēsis（戦略化）
   Keywords: pure-will, goal-setting, value-judgment, wanting.
 ---
 
-# P2: Boulēsis (βούλησις) — 純粋意志
+# O2: Boulēsis (βούλησις) — 純粋意志
 
 > **FEP Code:** I-P (Inference × Pragmatic)
 > **Hegemonikón Layer:** Level 2a 純粋定理
@@ -29,8 +29,8 @@ description: |
 
 | 純粋定理 | → 拡張定理 | 追加軸 |
 |----------|-----------|--------|
-| P2 Boulēsis | M2 Krisis | + Fast |
-| P2 Boulēsis | M4 Phronēsis | + Slow |
+| O2 Boulēsis | M2 Krisis | + Fast |
+| O2 Boulēsis | M4 Phronēsis | + Slow |
 
 ---
 
@@ -63,7 +63,7 @@ description: |
 
 ```
 ┌─[Hegemonikón]──────────────────────┐
-│ P2 Boulēsis: 純粋意志完了          │
+│ O2 Boulēsis: 純粋意志完了          │
 │ 理想: [制約なき理想状態]           │
 │ 対立: [価値の対立要素]             │
 │ 具体化: → M2/M4 に委譲             │

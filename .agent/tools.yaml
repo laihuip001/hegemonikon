@@ -55,37 +55,37 @@ scripts:
 workflows:
   boot:
     purpose: "セッション初期化、履歴同期、レビュー生成"
-    modules: [M1, M8]
+    modules: [T1, T8]
     
   hist:
     purpose: "チャット履歴を LanceDB に同期"
-    modules: [M8]
+    modules: [T8]
     depends: [chat-history-sync]
     
   plan:
     purpose: "設計計画策定（コード前に必須）"
-    modules: [M4, M3]
+    modules: [T4, T3]
     includes: "Step 0.1 モデル適性チェック"
     
   ask:
     purpose: "パプ君への調査依頼書作成"
-    modules: [M5]
+    modules: [T5]
     
   src:
     purpose: "Web検索実行（Perplexity API）"
-    modules: [M5]
+    modules: [T5]
     
   think:
     purpose: "深い熟考（壁にぶつかった時）"
-    modules: [M3, M7]
+    modules: [T3, T7]
     
   rev:
     purpose: "レビュー生成"
-    modules: [M7, M8]
+    modules: [T7, T8]
     
   chk:
     purpose: "検証・批評（Synedrion評議会）"
-    modules: [M7]
+    modules: [T7]
 
 # =============================================================================
 # Key Directories

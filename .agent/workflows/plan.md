@@ -24,6 +24,29 @@ modules: [M4, M3]
 
 ---
 
+## Step 0.1: モデル適性チェック（必須）
+
+> **🎯 [T2 Krisis: Active]** — model-selection-guide.md を参照
+
+1. タスクの特性キーワードを検出
+2. 推奨アルゴリズム（優先度P1→P5）を適用
+3. 結果を以下の形式で出力:
+
+```
+[Hegemonikon] T2 Krisis（モデル選択）
+  検出特性: {キーワード}
+  優先度: {P1-P5}
+  推奨: {Claude / Gemini / Gemini Flash}
+  理由: {1行}
+  → このまま継続 / Geminiに切り替え？
+```
+
+**チェックポイント**:
+- [ ] model-selection-guide.md の推奨アルゴリズムを適用したか？
+- [ ] 推奨を出力したか？
+
+---
+
 ## Step 0.5: 不足情報検出（M5 Peira + Gnōsis）
 
 > **不確実性が高い場合、戦略立案前に情報収集が必須**

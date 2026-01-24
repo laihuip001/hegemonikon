@@ -1,23 +1,29 @@
 #!/usr/bin/env python3
 """
-Gnōsis MCP Server
+Gnōsis MCP Server - Hegemonikón Knowledge Base
 
-Model Context Protocol server for Hegemonikón knowledge base.
-Exposes Gnōsis search and stats as MCP tools.
+Model Context Protocol server for academic paper search.
+Exposes search and stats tools via stdio transport.
 
-Usage:
-    python gnosis_mcp_server.py
-
-Register in Antigravity:
-    1. Open Antigravity IDE
-    2. Agent Panel → ... menu → MCP Servers → Manage
-    3. Add custom server with command:
-       python M:/Hegemonikon/mcp/gnosis_mcp_server.py
+CRITICAL: This file follows MCP stdio protocol rules:
+- stdout: JSON-RPC messages ONLY
+- stderr: All logging and debug output
 """
 
 import sys
-import json
-from pathlib import Path
+import os
+
+# ============ CRITICAL: Platform-specific asyncio setup ============
+# Must be done BEFORE any other imports that might use asyncio
+if sys.platform == 'win32':
+    import asyncio
+    asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
+
+# ============ CRITICAL: Redirect ALL stdout to stderr ============
+# This prevents any accidental stdout pollution from imported modules
+import io
+_original_stdout = sys.stdout
+_stderr_wrapper = sys.stderr
 
 # Debug logging to stderr (won't interfere with MCP stdio)
 def log(msg):
@@ -25,12 +31,32 @@ def log(msg):
 
 log("Starting Gnōsis MCP Server...")
 log(f"Python: {sys.executable}")
-log(f"CWD: {Path.cwd()}")
+log(f"Platform: {sys.platform}")
 
-# Add parent directory to path for imports
+# ============ Import path setup ============
+from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 log(f"Added to path: {Path(__file__).parent.parent}")
 
+# ============ Suppress stdout during imports ============
+# Some libraries (like lancedb) print to stdout during import
+class StdoutSuppressor:
+    def __init__(self):
+        self._null = io.StringIO()
+        self._old_stdout = None
+    
+    def __enter__(self):
+        self._old_stdout = sys.stdout
+        sys.stdout = self._null
+        return self
+    
+    def __exit__(self, *args):
+        sys.stdout = self._old_stdout
+        captured = self._null.getvalue()
+        if captured.strip():
+            log(f"Suppressed stdout during import: {captured[:100]}...")
+
+# Import MCP SDK
 try:
     from mcp.server import Server
     from mcp.server.stdio import stdio_server
@@ -40,7 +66,7 @@ except Exception as e:
     log(f"MCP import error: {e}")
     sys.exit(1)
 
-# Initialize MCP server with required parameters
+# Initialize MCP server
 server = Server(
     name="gnosis",
     version="1.0.0",
@@ -49,10 +75,10 @@ server = Server(
 log("Server initialized")
 
 
-
 @server.list_tools()
 async def list_tools():
     """List available tools."""
+    log("list_tools called")
     return [
         Tool(
             name="search",
@@ -101,9 +127,7 @@ async def list_tools():
 @server.call_tool(validate_input=True)
 async def call_tool(name: str, arguments: dict):
     """Handle tool calls."""
-    
-    # Lazy import to avoid startup delay
-    from mekhane.anamnesis.index import GnosisIndex
+    log(f"call_tool: {name} with {arguments}")
     
     if name == "search":
         query = arguments.get("query", "")
@@ -113,6 +137,11 @@ async def call_tool(name: str, arguments: dict):
             return [TextContent(type="text", text="Error: query is required")]
         
         try:
+            # Lazy import with stdout suppression
+            with StdoutSuppressor():
+                from mekhane.anamnesis.index import GnosisIndex
+            
+            log(f"Searching for: {query}")
             index = GnosisIndex()
             results = index.search(query, k=limit)
             
@@ -133,13 +162,19 @@ async def call_tool(name: str, arguments: dict):
                     output_lines.append(f"- **URL**: {r.get('url')}")
                 output_lines.append("")
             
+            log(f"Search completed: {len(results)} results")
             return [TextContent(type="text", text="\n".join(output_lines))]
             
         except Exception as e:
+            log(f"Search error: {e}")
             return [TextContent(type="text", text=f"Error searching: {str(e)}")]
     
     elif name == "stats":
         try:
+            with StdoutSuppressor():
+                from mekhane.anamnesis.index import GnosisIndex
+            
+            log("Getting stats...")
             index = GnosisIndex()
             stats = index.get_stats()
             
@@ -148,9 +183,11 @@ async def call_tool(name: str, arguments: dict):
             output_lines.append(f"- **Sources**: {', '.join(stats.get('sources', []))}")
             output_lines.append(f"- **Last Updated**: {stats.get('last_updated', 'Never')}")
             
+            log("Stats completed")
             return [TextContent(type="text", text="\n".join(output_lines))]
             
         except Exception as e:
+            log(f"Stats error: {e}")
             return [TextContent(type="text", text=f"Error getting stats: {str(e)}")]
     
     elif name == "recommend_model":
@@ -158,6 +195,8 @@ async def call_tool(name: str, arguments: dict):
         
         if not task_desc:
             return [TextContent(type="text", text="Error: task_description is required")]
+        
+        log(f"Recommending model for: {task_desc[:50]}...")
         
         # Priority rules based on model-selection-guide.md
         priority_rules = [
@@ -175,14 +214,13 @@ async def call_tool(name: str, arguments: dict):
             for kw in keywords:
                 if kw in task_desc:
                     detected_keywords.append(kw)
-                    if matched_priority is None:  # First match wins (higher priority)
+                    if matched_priority is None:
                         matched_priority = priority
                         recommended_model = model
         
         if matched_priority is None:
             matched_priority = "P5"
         
-        # Generate output in T2 Krisis format
         output_lines = [
             "# [Hegemonikon] T2 Krisis (Model Selection)\n",
             f"- **Task**: {arguments.get('task_description', '')}",
@@ -204,6 +242,7 @@ async def call_tool(name: str, arguments: dict):
         else:
             output_lines.append("No specific task type detected. Default to Claude for precision and consistency.")
         
+        log(f"Model recommendation: {recommended_model}")
         return [TextContent(type="text", text="\n".join(output_lines))]
     
     else:
@@ -212,14 +251,27 @@ async def call_tool(name: str, arguments: dict):
 
 async def main():
     """Run the MCP server."""
-    async with stdio_server() as streams:
-        await server.run(
-            streams[0],  # read_stream
-            streams[1],  # write_stream
-            server.create_initialization_options()
-        )
+    log("Starting stdio server...")
+    try:
+        async with stdio_server() as streams:
+            log("stdio_server connected")
+            await server.run(
+                streams[0],  # read_stream
+                streams[1],  # write_stream
+                server.create_initialization_options()
+            )
+    except Exception as e:
+        log(f"Server error: {e}")
+        raise
 
 
 if __name__ == "__main__":
     import asyncio
-    asyncio.run(main())
+    log("Running main...")
+    try:
+        asyncio.run(main())
+    except KeyboardInterrupt:
+        log("Server stopped by user")
+    except Exception as e:
+        log(f"Fatal error: {e}")
+        sys.exit(1)

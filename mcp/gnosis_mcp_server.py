@@ -64,6 +64,20 @@ async def list_tools():
                 "type": "object",
                 "properties": {}
             }
+        ),
+        Tool(
+            name="recommend_model",
+            description="Recommend the best AI model (Claude/Gemini) for a given task based on T2 Krisis priority rules (P1-P5). Returns model recommendation with detected keywords and reasoning.",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "task_description": {
+                        "type": "string",
+                        "description": "Description of the task to analyze (e.g., 'UI design for dashboard', 'security audit of API')"
+                    }
+                },
+                "required": ["task_description"]
+            }
         )
     ]
 
@@ -122,6 +136,59 @@ async def call_tool(name: str, arguments: dict):
             
         except Exception as e:
             return [TextContent(type="text", text=f"Error getting stats: {str(e)}")]
+    
+    elif name == "recommend_model":
+        task_desc = arguments.get("task_description", "").lower()
+        
+        if not task_desc:
+            return [TextContent(type="text", text="Error: task_description is required")]
+        
+        # Priority rules based on model-selection-guide.md
+        priority_rules = [
+            ("P1", ["セキュリティ", "security", "監査", "audit", "コンプライアンス", "compliance", "品質保証", "quality"], "Claude"),
+            ("P2", ["画像", "image", "ui", "ux", "図", "diagram", "可視化", "visualization", "デザイン", "design"], "Gemini"),
+            ("P3", ["探索", "explore", "ブレスト", "brainstorm", "プロトタイプ", "prototype", "mvp", "試作"], "Gemini"),
+            ("P4", ["高速", "fast", "バッチ", "batch", "初期調査", "triage", "トリアージ"], "Gemini Flash"),
+        ]
+        
+        detected_keywords = []
+        matched_priority = None
+        recommended_model = "Claude"  # Default P5
+        
+        for priority, keywords, model in priority_rules:
+            for kw in keywords:
+                if kw in task_desc:
+                    detected_keywords.append(kw)
+                    if matched_priority is None:  # First match wins (higher priority)
+                        matched_priority = priority
+                        recommended_model = model
+        
+        if matched_priority is None:
+            matched_priority = "P5"
+        
+        # Generate output in T2 Krisis format
+        output_lines = [
+            "# [Hegemonikon] T2 Krisis (Model Selection)\n",
+            f"- **Task**: {arguments.get('task_description', '')}",
+            f"- **Detected Keywords**: {', '.join(detected_keywords) if detected_keywords else '(none)'}",
+            f"- **Priority**: {matched_priority}",
+            f"- **Recommended Model**: {recommended_model}",
+            "",
+            "## Reasoning",
+        ]
+        
+        if matched_priority == "P1":
+            output_lines.append("Security/audit tasks require Claude's strict, deterministic reasoning.")
+        elif matched_priority == "P2":
+            output_lines.append("Multimodal/visual tasks benefit from Gemini's image capabilities.")
+        elif matched_priority == "P3":
+            output_lines.append("Exploratory tasks benefit from Gemini's creative, non-deterministic approach.")
+        elif matched_priority == "P4":
+            output_lines.append("High-speed/batch tasks are optimized for Gemini Flash.")
+        else:
+            output_lines.append("No specific task type detected. Default to Claude for precision and consistency.")
+        
+        return [TextContent(type="text", text="\n".join(output_lines))]
     
     else:
         return [TextContent(type="text", text=f"Unknown tool: {name}")]

@@ -41,6 +41,13 @@ scripts:
       - "stats            # 統計情報"
       - "collect -s arxiv # arXiv収集"
     description: "Gnōsis知識ベースCLI"
+    
+  gnosis-auto-collect:
+    path: .agent/scripts/gnosis-auto-collect.ps1
+    command: "& \"{path}\""
+    description: "Gnōsis自動収集（ローテーション）"
+    purpose: "10トピックを順番に収集"
+    workflow: "/boot Step 5"
 
 # =============================================================================
 # Workflows (quick reference)

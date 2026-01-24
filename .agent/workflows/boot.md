@@ -45,6 +45,20 @@ Hegemonikón Phase 1 のブートシーケンス。
      - ユーザーに更新するか尋ねる ("Gnōsisデータが古いです。更新しますか？")
      - Yesの場合: `python m:/Hegemonikon/mekhane/anamnesis/cli.py collect-all -q "LLM agent reasoning" -l 20` を実行
 
+5.5. **Perplexity Inbox 読み込み**: パプ君リサーチの新着確認
+   - 対象フォルダ: `M:\Hegemonikon\docs\research\perplexity\`
+   - 新規ファイル（前回bootから追加されたもの）がある場合:
+     ```
+     📥 Perplexity新着: [N]件
+     1. {filename} ({日時})
+     2. {filename} ({日時})
+     
+     → 読み込んでタスク提案しますか？ [y/n]
+     ```
+   - **[y]の場合**: 各ファイルを読み込み、サマリ + タスク提案を生成
+   - **[n]の場合**: スキップして次のステップへ
+   - 読み込み後、ファイルを `docs/research/` に移動するか確認
+
 6. **今日のレビュー生成**: `/rev` を実行し、タスク/リマインドを抽出
 
 7. **ブート完了報告**: 以下の形式で報告
@@ -63,6 +77,7 @@ Hegemonikón Phase 1 のブートシーケンス。
    ✅ Profile: Loaded
    ✅ Memory: [Loaded / Empty]
    ✅ History Sync: [実行/スキップ]
+   ✅ Perplexity Inbox: [N件処理 / 0件]
    ✅ Review: Generated
    ```
 
@@ -73,5 +88,6 @@ Hegemonikón Phase 1 のブートシーケンス。
 ブート完了後、以下を出力:
 - ブート完了バナー
 - 長期記憶ステータス（パターン数、価値関数状態）
+- Perplexity新着処理結果
 - Today's Review（優先タスク、フォローアップ、提案）
 

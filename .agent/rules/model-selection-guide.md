@@ -85,8 +85,9 @@ activation: always_on
 | `/plan` | Claude | 計画は一貫性と網羅性が重要 |
 | `/do` | Claude/Gemini | 複雑な実装→Claude、プロトタイプ→Gemini |
 | `/rev` | Claude | 検証は厳格さが重要 |
-| `/ask` | Gemini | 情報収集は速度と多様性が有効 |
+| `/ask` | Claude | 調査依頼書の作成は構造化が重要 |
 | `/think` | Claude | 深い思考は決定論的推論が有効 |
+| `/src` | ― | Perplexity API 使用（モデル選択対象外） |
 
 ---
 

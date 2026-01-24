@@ -2,10 +2,13 @@
 name: "M2 Krisis"
 description: |
   FEP Octave M2: 判断モジュール (I-P-F)。目標との整合性を即時判断し、優先順位を決定する。
-  Use when: M1完了後、複数タスク存在時、「どれを先に？」質問時、Eisenhower分類が必要な時。
+  **サブ機能**: モデル選択判断（model-selection-guide.md準拠）
+  Use when: 
+    - M1完了後、複数タスク存在時、「どれを先に？」質問時、Eisenhower分類が必要な時
+    - /plan 開始時（モデル適性チェック）
   Use when NOT: 単一タスクで優先判断不要な時、既に実行フェーズに入っている時。
   Triggers: M4 Phronēsis (優先判断→戦略立案へ) or M6 Praxis (優先判断→即時実行へ)
-  Keywords: priority, evaluation, ranking, importance, urgency, which-first, Eisenhower.
+  Keywords: priority, evaluation, ranking, importance, urgency, which-first, Eisenhower, model-selection.
 ---
 
 # M2: Krisis (κρίσις) — 判断
@@ -224,3 +227,51 @@ q2_protection:
 | `q2_protection_enabled` | true | Q2保護メカニズムの有効/無効 |
 | `min_q2_ratio` | 0.2 | 出力に含める最小Q2比率 |
 | `max_today_tasks` | 5 | "today"に分類するタスクの上限 |
+
+---
+
+## サブ機能: モデル選択判断
+
+> **派生元**: T2 Krisis（高次意思決定）
+> **参照**: `.agent/rules/model-selection-guide.md`
+> **発動フック**: `/plan` Step 0.1
+
+### 優先度ルール
+
+```
+1. [最優先] セキュリティ/監査/コンプライアンス → Claude
+2. [優先]   マルチモーダル（画像/UI/UX）→ Gemini
+3. [通常]   探索/ブレスト/プロトタイプ/MVP → Gemini
+4. [通常]   高速反復/大量処理/初期調査 → Gemini Flash
+5. [デフォルト] 上記に該当しない → Claude
+```
+
+### 検出キーワード
+
+| 優先度 | キーワード | 推奨 |
+|--------|-----------|------|
+| **P1** | セキュリティ, 監査, コンプライアンス, 品質保証 | Claude |
+| **P2** | 画像, UI, UX, 図, 可視化, デザイン | Gemini |
+| **P3** | 探索, ブレスト, プロトタイプ, MVP, 試作 | Gemini |
+| **P4** | 高速, バッチ, 初期調査, トリアージ | Gemini Flash |
+| **P5** | （デフォルト） | Claude |
+
+### 出力形式
+
+```
+[Hegemonikon] T2 Krisis（モデル選択）
+  検出特性: {キーワード}
+  優先度: {P1-P5}
+  推奨: {Claude / Gemini / Gemini Flash}
+  理由: {1行}
+  → このまま継続 / Geminiに切り替え？
+```
+
+### テストケース
+
+| ID | 入力 | 期待 |
+|----|------|------|
+| M1 | 「ドキュメント整理」 | P5 → Claude |
+| M2 | 「プロトタイプのセキュリティレビュー」 | P1 → Claude |
+| M3 | 「ダッシュボードのUI設計」 | P2 → Gemini |
+| M4 | 「新機能のブレスト」 | P3 → Gemini |

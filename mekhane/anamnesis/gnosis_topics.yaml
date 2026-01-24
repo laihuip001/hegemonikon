@@ -1,0 +1,80 @@
+# Gnōsis Auto-Collection Topics
+# 自動収集するトピック定義
+
+version: "1.0.0"
+updated: "2026-01-24"
+
+# 収集設定
+settings:
+  default_limit: 20           # 各クエリの取得件数
+  rotation_interval_days: 7   # ローテーション周期（日）
+  sources:
+    - arxiv
+    - openalex
+
+# トピック定義（Geminiが提案した10クエリ）
+topics:
+  # A. エージェント・アーキテクチャ (Core)
+  - id: agent-architecture
+    query: "LLM autonomous agent architecture"
+    layer: pattern
+    category: agent
+    description: 自律エージェントの構成要素、計画、記憶の最新トレンド
+
+  - id: memory-management
+    query: "Long-context memory management for LLM"
+    layer: pattern
+    category: agent
+    description: 長期記憶の効率的な管理手法
+
+  # B. FEP & 認知科学 (Theory)
+  - id: active-inference
+    query: "Active Inference in artificial intelligence"
+    layer: principle
+    category: theory
+    description: 能動的推論の工学的応用
+
+  - id: embodied-cognition
+    query: "Embodied cognition in Large Language Models"
+    layer: principle
+    category: theory
+    description: 身体性、環境との相互作用に関する研究
+
+  # C. プロンプトエンジニアリング & 言語 (Language)
+  - id: structured-prompting
+    query: "Structured prompting languages for LLM"
+    layer: pattern
+    category: language
+    description: DSPyやSGLangなど、プロンプトを構造化するアプローチ
+
+  - id: chain-of-thought
+    query: "Chain-of-Thought reasoning optimization"
+    layer: practice
+    category: language
+    description: 推論能力を最大化するためのプロンプト技法
+
+  # D. ツール利用 & 統合 (Tooling)
+  - id: tool-use
+    query: "Tool use and function calling in LLMs"
+    layer: practice
+    category: tooling
+    description: モデルが外部ツールをどう効果的に使うか
+
+  - id: ide-integration
+    query: "LLM integration in software development environment"
+    layer: practice
+    category: tooling
+    description: IDE統合、コーディング支援の新しい形
+
+  # E. 安全性 & 評価 (Safety)
+  - id: self-correction
+    query: "Self-correction and verification in LLM agents"
+    layer: pattern
+    category: safety
+    description: 自己修正メカニズム
+
+  - id: agent-evaluation
+    query: "Evaluating autonomous agent performance"
+    layer: practice
+    category: safety
+    description: エージェントのベンチマーク評価手法

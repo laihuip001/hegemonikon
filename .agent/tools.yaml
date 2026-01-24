@@ -1,0 +1,92 @@
+# Hegemonikón Tools Registry
+# 利用可能な機構の一元管理ファイル
+# /boot で自動読み込みされ、セッション開始時にリマインドされる
+
+version: "1.0.0"
+updated: "2026-01-24"
+
+# =============================================================================
+# MCP Servers
+# =============================================================================
+mcp:
+  gnosis:
+    path: mcp/gnosis_mcp_server.py
+    description: "Gnōsis知識ベース + モデル推奨"
+    tools:
+      - name: search
+        description: "論文検索（ベクトル類似度）"
+        usage: "@mcp:gnosis で「query」を検索して"
+      - name: stats
+        description: "知識ベース統計情報"
+        usage: "@mcp:gnosis で stats を実行"
+      - name: recommend_model
+        description: "タスクからモデル推奨（T2 Krisis）"
+        usage: "@mcp:gnosis で recommend_model「タスク説明」"
+
+# =============================================================================
+# CLI Scripts
+# =============================================================================
+scripts:
+  chat-history-sync:
+    path: mekhane/peira/scripts/chat-history-kb.py
+    command: "python {path} sync --report"
+    description: "チャット履歴を LanceDB に同期"
+    purpose: "セッション間の情報共有"
+    workflow: "/hist"
+    
+  gnosis-cli:
+    path: mekhane/anamnesis/cli.py
+    commands:
+      - "search \"query\"  # 論文検索"
+      - "stats            # 統計情報"
+      - "collect -s arxiv # arXiv収集"
+    description: "Gnōsis知識ベースCLI"
+
+# =============================================================================
+# Workflows (quick reference)
+# =============================================================================
+workflows:
+  boot:
+    purpose: "セッション初期化、履歴同期、レビュー生成"
+    modules: [M1, M8]
+    
+  hist:
+    purpose: "チャット履歴を LanceDB に同期"
+    modules: [M8]
+    depends: [chat-history-sync]
+    
+  plan:
+    purpose: "設計計画策定（コード前に必須）"
+    modules: [M4, M3]
+    includes: "Step 0.1 モデル適性チェック"
+    
+  ask:
+    purpose: "パプ君への調査依頼書作成"
+    modules: [M5]
+    
+  src:
+    purpose: "Web検索実行（Perplexity API）"
+    modules: [M5]
+    
+  think:
+    purpose: "深い熟考（壁にぶつかった時）"
+    modules: [M3, M7]
+    
+  rev:
+    purpose: "レビュー生成"
+    modules: [M7, M8]
+    
+  chk:
+    purpose: "検証・批評（Synedrion評議会）"
+    modules: [M7]
+
+# =============================================================================
+# Key Directories
+# =============================================================================
+directories:
+  mcp: "mcp/"
+  skills: ".agent/skills/"
+  workflows: ".agent/workflows/"
+  rules: ".agent/rules/"
+  mekhane: "mekhane/"
+  kernel: "kernel/"

@@ -1,76 +1,65 @@
 ---
-description: コード開発時の基本プロトコル（旧資産から蒸留）
-activation: manual
+description: コード開発時のプロトコル自動参照
+activation: glob
+pattern: "**/*.py"
 priority: 2
-hegemonikon: M6-Praxis, M7-Dokime
+hegemonikon: M6-Praxis
 ---
 
-# コード開発プロトコル
+# コード開発プロトコル（Glob Rule）
 
+> **発動条件**: `*.py` ファイル編集時に自動適用
 > **ソース**: Legacy Modules 01, 04, 14 から蒸留
-> **適用**: 実装フェーズ（`/code`）で参照
 
 ---
 
-## 1. DMZ Protocol（保護資産）
+## 自動チェックポイント
 
-以下のファイルは **Read-Only**。変更時は明示的な確認を要求。
+このルールが発動したら、以下を確認:
+
+### 1. DMZ チェック
+
+編集対象が以下に該当する場合、警告を発する:
+- `^\.env$` / `config*.py` / `secrets*` / `docker-compose.yml`
 
 ```
-# 保護対象パターン
-^\.env$
-^config\.py$
-^secrets\.json$
-^docker-compose\.yml$
-^requirements\.txt$
+⚠️ DMZ ALERT: 保護資産を編集中
+詳細: /dev dmz
 ```
 
-**違反時の対応**:
+### 2. TDD リマインダー
+
+新規関数を追加する場合:
 ```
-⚠️ DMZ ALERT: `{filename}` は保護資産です。
-変更を続行しますか？ (y/N)
+🧪 TDD Protocol: テストを先に書いていますか？
+詳細: /dev tdd
+```
+
+### 3. Commit 準備
+
+変更をコミットする前に:
+```
+📝 Narrative Commit: Context/Solution/Alternatives を含めてください
+詳細: /dev commit
 ```
 
 ---
 
-## 2. TDD Protocol（テスト駆動）
+## 詳細参照
 
-機能実装の順序:
+より詳しいプロトコルが必要な場合:
 
-1. **Red**: テストを先に書く（失敗することを確認）
-2. **Green**: テストを通す最小限のコードを書く
-3. **Refactor**: テストが通った後に最適化
-
-**禁止事項**:
-- テストなしの実装
-- テストより先の実装
-
----
-
-## 3. Commit Protocol（物語化）
-
-コミットメッセージの構造:
-
-```
-{type}({scope}): {summary}
-
-**Context:** なぜこの変更が必要か
-**Solution:** 何をしたか
-**Alternatives:** 検討したが採用しなかった案
-
-Refs: #{issue}
-```
-
-**禁止メッセージ**:
-- `fix bug`
-- `update`
-- `wip`
-- 日本語なし英語のみの曖昧な表現
+1. **Skill経由（自動）**: `/code` 実行時に M6 Praxis が参照
+2. **Workflow経由（手動）**: `/dev [protocol]` で原典を展開
+3. **原典直接参照**:
+   ```
+   view_file "M:\Brain\99_🗃️_保管庫｜Archive\プロンプト ライブラリー\モジュール（開発用）\個別のモジュール\Module XX ....md"
+   ```
 
 ---
 
-## 参照元
+## 関連
 
-詳細が必要な場合は旧資産を参照:
+- [Code Protocols Skill](file:///M:/Hegemonikon/.agent/skills/code-protocols/SKILL.md)
+- [/dev Workflow](file:///M:/Hegemonikon/.agent/workflows/dev.md)
 - [Legacy Modules Index](file:///M:/Hegemonikon/docs/archive/legacy-rules/legacy-modules-index.md)
-- [Module 01 DMZ](file:///M:/Brain/99_🗃️_保管庫｜Archive/プロンプト%20ライブラリー/モジュール（開発用）/個別のモジュール/)

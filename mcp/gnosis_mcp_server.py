@@ -19,12 +19,26 @@ import sys
 import json
 from pathlib import Path
 
+# Debug logging to stderr (won't interfere with MCP stdio)
+def log(msg):
+    print(f"[gnosis-mcp] {msg}", file=sys.stderr, flush=True)
+
+log("Starting Gnōsis MCP Server...")
+log(f"Python: {sys.executable}")
+log(f"CWD: {Path.cwd()}")
+
 # Add parent directory to path for imports
 sys.path.insert(0, str(Path(__file__).parent.parent))
+log(f"Added to path: {Path(__file__).parent.parent}")
 
-from mcp.server import Server
-from mcp.server.stdio import stdio_server
-from mcp.types import Tool, TextContent
+try:
+    from mcp.server import Server
+    from mcp.server.stdio import stdio_server
+    from mcp.types import Tool, TextContent
+    log("MCP imports successful")
+except Exception as e:
+    log(f"MCP import error: {e}")
+    sys.exit(1)
 
 # Initialize MCP server with required parameters
 server = Server(
@@ -32,6 +46,8 @@ server = Server(
     version="1.0.0",
     instructions="Gnōsis knowledge base for academic paper search"
 )
+log("Server initialized")
+
 
 
 @server.list_tools()

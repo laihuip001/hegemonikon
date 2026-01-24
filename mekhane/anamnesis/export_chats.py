@@ -39,7 +39,7 @@ CDP_PORT = 9222  # Chrome DevTools Protocol ポート
 # ============================================================================
 
 class AntigravityChatExporter:
-    """Antigravity IDE のチャット履歴をエクスポート"""
+    """簡潔版: Antigravity IDE のチャット履歴をエクスポート"""
     
     def __init__(self, output_dir: Path = DEFAULT_OUTPUT_DIR):
         self.output_dir = output_dir
@@ -47,6 +47,10 @@ class AntigravityChatExporter:
         self.chats: List[Dict] = []
         self.browser = None
         self.page = None
+        
+        # デバッグ: 出力ディレクトリ確認
+        print(f"[DEBUG] Output directory: {self.output_dir}")
+        print(f"[DEBUG] Exists: {self.output_dir.exists()}")
     
     async def connect(self) -> bool:
         """CDP 経由で Antigravity のブラウザに接続"""
@@ -61,19 +65,32 @@ class AntigravityChatExporter:
             
             self.browser = await self.playwright.chromium.connect_over_cdp(cdp_url)
             
-            # 既存のページを取得
+            # 既存のコンテキストからページを取得
             contexts = self.browser.contexts
             if not contexts:
                 print("[!] No browser context found")
                 return False
             
-            pages = contexts[0].pages
-            if not pages:
-                print("[!] No pages found")
-                return False
+            # jetski-agent.html (Agent Manager) を探す
+            self.page = None
+            for ctx in contexts:
+                for page in ctx.pages:
+                    if 'jetski-agent' in page.url:
+                        self.page = page
+                        print(f"[✓] Found Agent Manager: {page.url}")
+                        break
+                if self.page:
+                    break
             
-            self.page = pages[0]
-            print(f"[✓] Connected to: {self.page.url}")
+            if not self.page:
+                # fallback: 最初のページ
+                self.page = contexts[0].pages[0] if contexts[0].pages else None
+                if self.page:
+                    print(f"[!] Agent Manager not found, using: {self.page.url}")
+                else:
+                    print("[!] No pages found")
+                    return False
+            
             return True
             
         except Exception as e:
@@ -86,31 +103,29 @@ class AntigravityChatExporter:
         conversations = []
         
         try:
-            # Agent Manager の Inbox を待機
-            # ※ セレクタは実際の UI に合わせて調整が必要
+            # Agent Manager (jetski-agent.html) の会話ボタンを待機
+            # DOM調査結果: button.select-none.hover\:bg-list-hover
             await self.page.wait_for_selector(
-                '[data-testid="conversation-item"], [role="listitem"], .conversation-item',
+                'button.select-none',
                 timeout=5000
             )
             
-            # 会話アイテムを取得
+            # 会話ボタンを取得（タイトルを含む span[data-testid] を持つもの）
             items = await self.page.query_selector_all(
-                '[data-testid="conversation-item"], [role="listitem"], .conversation-item'
+                'button.select-none'
             )
             
-            for item in items:
+            for idx, item in enumerate(items):
                 try:
-                    # タイトルを取得
-                    title_el = await item.query_selector('h3, .title, [data-testid="title"]')
-                    title = await title_el.text_content() if title_el else "Untitled"
+                    # タイトルを取得 (span[data-testid] または span.text-sm.grow.truncate)
+                    title_el = await item.query_selector('span[data-testid], span.truncate')
+                    title = await title_el.text_content() if title_el else None
                     
-                    # ID を取得（data 属性から）
-                    conv_id = await item.get_attribute('data-conversation-id')
-                    if not conv_id:
-                        conv_id = await item.get_attribute('id')
+                    if not title:
+                        continue  # タイトルがないボタンはスキップ
                     
                     conversations.append({
-                        "id": conv_id or f"conv_{len(conversations)}",
+                        "id": f"conv_{idx}",
                         "title": title.strip(),
                         "element": item
                     })
@@ -184,8 +199,15 @@ class AntigravityChatExporter:
             try:
                 # 会話をクリック
                 await conv['element'].click()
-                await self.page.wait_for_load_state('networkidle')
-                await asyncio.sleep(0.5)  # UI 更新を待機
+                
+                # クリック後の安定化待機
+                # networkidle だと終わらないことがあるため、タイムアウト付きで待機
+                try:
+                    await self.page.wait_for_load_state('networkidle', timeout=2000)
+                except:
+                    pass
+                
+                await asyncio.sleep(1.0)  # UI 更新を確実に待機
                 
                 # メッセージを抽出
                 messages = await self.extract_messages()
@@ -199,6 +221,9 @@ class AntigravityChatExporter:
                     "messages": messages
                 }
                 self.chats.append(chat_record)
+                
+                # 逐次保存 (individualモードの場合)
+                self.save_single_chat(chat_record)
                 
                 print(f"    → {len(messages)} messages extracted")
                 
@@ -250,17 +275,29 @@ class AntigravityChatExporter:
         print(f"[✓] Saved: {filepath}")
         return filepath
     
-    def save_individual(self):
-        """各会話を個別ファイルとして保存"""
-        for chat in self.chats:
-            # ファイル名をサニタイズ
-            safe_title = re.sub(r'[<>:"/\\|?*]', '_', chat['title'])[:50]
-            date_prefix = datetime.now().strftime('%Y-%m-%d')
-            id_prefix = chat['id'][:8] if chat['id'] else 'noname'
-            
-            filename = f"{date_prefix}_{id_prefix}_{safe_title}.md"
-            filepath = self.output_dir / filename
-            
+    def save_single_chat(self, chat: Dict):
+        """1つの会話を保存"""
+        # ファイル名をサニタイズ（ASCII のみ許可）
+        title = chat['title']
+        # 危険な文字を削除
+        safe_title = re.sub(r'[<>:"/\\|?*\x00-\x1f]', '', title)
+        # ASCII 以外の文字をアンダースコアに置換
+        safe_title = ''.join(c if ord(c) < 128 else '_' for c in safe_title)
+        # 複数のアンダースコアを1つにまとめる
+        safe_title = re.sub(r'_+', '_', safe_title).strip('_')[:60]
+        
+        if not safe_title:
+            safe_title = "untitled"
+        
+        date_prefix = datetime.now().strftime('%Y-%m-%d')
+        id_prefix = chat['id'][:8] if chat['id'] else 'noname'
+        
+        filename = f"{date_prefix}_{id_prefix}_{safe_title}.md"
+        filepath = self.output_dir / filename
+        
+        print(f"[DEBUG] Saving to: {filepath}")
+        
+        try:
             with open(filepath, 'w', encoding='utf-8') as f:
                 f.write(f"# {chat['title']}\n\n")
                 f.write(f"- **ID**: `{chat['id']}`\n")
@@ -272,7 +309,17 @@ class AntigravityChatExporter:
                     f.write(f"{role_label}\n\n")
                     f.write(f"{msg['content']}\n\n")
             
-            print(f"  → {filepath.name}")
+            print(f"  [✓] Saved: {filename}")
+        except Exception as e:
+            print(f"  [!] Error saving file {filename}: {e}")
+            import traceback
+            traceback.print_exc()
+
+    def save_individual(self):
+        """（非推奨：逐次保存を使用）各会話を個別ファイルとして保存"""
+        print("[*] Re-saving all chats...")
+        for chat in self.chats:
+            self.save_single_chat(chat)
     
     async def close(self):
         """リソースを解放"""

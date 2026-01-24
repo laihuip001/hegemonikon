@@ -29,7 +29,7 @@ Hegemonikon
 
 ### Agent（AI制御層）
 - **Workflows**: `/now`, `/plan`, `/do` 等のコマンド
-- **Skills**: M1-M8, P1-P4 スキル
+- **Skills**: T1-T8, O1-O4, K1-K12 スキル
 - **Rules**: 制約・プロトコル
 - パス: `.agent/`
 
@@ -67,7 +67,7 @@ Hegemonikon
 M:\Hegemonikon\
 ├── .agent/                    # 🧬 Core: AI制御層
 │   ├── workflows/             #   ワークフロー定義
-│   ├── skills/                #   M1-M8, P1-P4 スキル
+│   ├── skills/                #   T-series, O-series, K-series
 │   └── rules/                 #   制約・プロトコル
 │
 ├── kernel/                    # 🧬 Core: 理論基盤
@@ -87,52 +87,52 @@ M:\Hegemonikon\
 
 ## 🔧 ワークフロー一覧
 
-| コマンド | 説明 | Module |
-|----------|------|--------|
-| `/boot` | セッション開始 | M1+M8 |
-| `/now` | 現在地確認 | M1+M8 |
-| `/nm` | 全体構造（この文書） | M8 |
-| `/nh` | セッション履歴 | M8 |
-| `/nc [project]` | プロジェクト文脈 | M8 |
-| `/nt` | 未解決タスク | M8 |
-| `/ask` | 調査依頼生成 | M5 |
-| `/src` | Web検索 | M5 |
-| `/plan` | 設計プロトコル | M4+M3 |
-| `/think` | 熟考・大域最適 | M4-S+M3-S |
-| `/pri` | 優先順位判定 | M2 |
-| `/do` | 実行開始プロトコル | M6+M2 |
-| `/chk` | 検証・批評 | M7 |
-| `/rev` | 日次レビュー | M7+M8 |
-| `/hist` | 履歴同期 | M8 |
-| `/rec` | 記憶リフレッシュ | M8 |
-| `/u` | 主体的見解 | M7+M4 |
-| `/p` | 純粋定理 | P1-P4 |
+| コマンド | 説明 | T-series |
+|----------|------|----------|
+| `/boot` | セッション開始 | T1+T8 |
+| `/now` | 現在地確認 | T1+T8 |
+| `/nm` | 全体構造（この文書） | T8 |
+| `/nh` | セッション履歴 | T8 |
+| `/nc [project]` | プロジェクト文脈 | T8 |
+| `/nt` | 未解決タスク | T8 |
+| `/ask` | 調査依頼生成 | T5 |
+| `/src` | Web検索 | T5 |
+| `/plan` | 設計プロトコル | T4+T3 |
+| `/think` | 熟考・大域最適 | T4-S+T3-S |
+| `/pri` | 優先順位判定 | T2 |
+| `/do` | 実行開始プロトコル | T6+T2 |
+| `/chk` | 検証・批評 | T7 |
+| `/rev` | 日次レビュー | T7+T8 |
+| `/hist` | 履歴同期 | T8 |
+| `/rec` | 記憶リフレッシュ | T8 |
+| `/u` | 主体的見解 | T7+T4 |
+| `/o` | 純粋定理 | O1-O4 |
 
 ---
 
 ## 🧠 スキル一覧
 
-### 拡張定理（M1-M8）
+### T-Series (Tropos): 拡張定理
 
 | スキル | 名称 | 役割 | Tempo |
 |--------|------|------|-------|
-| M1 | Aisthēsis | 知覚・入力処理 | Fast |
-| M2 | Krisis | 判断・優先順位 | Fast |
-| M3 | Theōria | 理論・因果モデル | Slow |
-| M4 | Phronēsis | 実践知・戦略 | Slow |
-| M5 | Peira | 探求・情報収集 | Fast |
-| M6 | Praxis | 実行・行動 | Fast |
-| M7 | Dokimē | 検証・批評 | Slow |
-| M8 | Anamnēsis | 記憶・長期保存 | Slow |
+| T1 | Aisthēsis | 知覚・入力処理 | Fast |
+| T2 | Krisis | 判断・優先順位 | Fast |
+| T3 | Theōria | 理論・因果モデル | Slow |
+| T4 | Phronēsis | 実践知・戦略 | Slow |
+| T5 | Peira | 探求・情報収集 | Fast |
+| T6 | Praxis | 実行・行動 | Fast |
+| T7 | Dokimē | 検証・批評 | Slow |
+| T8 | Anamnēsis | 記憶・長期保存 | Slow |
 
-### 純粋定理（P1-P4）
+### O-Series (Ousia): 純粋定理
 
 | スキル | 名称 | 本質的問い |
 |--------|------|-----------|
-| P1 | Noēsis | 何を知っているか（認識） |
-| P2 | Boulēsis | 何を望むか（意志） |
-| P3 | Zētēsis | 何を問うか（探求） |
-| P4 | Energeia | 何をするか（行為） |
+| O1 | Noēsis | 何を知っているか（認識） |
+| O2 | Boulēsis | 何を望むか（意志） |
+| O3 | Zētēsis | 何を問うか（探求） |
+| O4 | Energeia | 何をするか（行為） |
 
 ---
 
@@ -152,4 +152,4 @@ M:\Hegemonikon\
 
 ---
 
-*最終更新: 2026-01-21*
+*最終更新: 2026-01-25*

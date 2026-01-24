@@ -1,9 +1,0 @@
-﻿
-2026-01-22 21:14:57 START: Sync Process
-2026-01-22 21:14:57 INFO: Verified interpreter: python (Python 3.13.9)
-[Hegemonikon] M8 Anamnēsis
-  Sync Phase: Error
-  Reason: Embedder init failed (Model not found at M:\Hegemonikon\forge\models\bge-small\model.onnx
-Run: python aidb-kb.py setup)
-
-2026-01-22 21:15:00 END: Exit Code 0

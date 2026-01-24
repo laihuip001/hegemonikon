@@ -66,6 +66,18 @@ class Activation:
 
 
 @dataclass
+class ContextItem:
+    """A single context resource reference."""
+    ref_type: str  # "file", "dir", "conv", "mcp", "ki"
+    path: str
+    priority: str = "MEDIUM"  # "HIGH", "MEDIUM", "LOW"
+    section: Optional[str] = None
+    filter: Optional[str] = None
+    depth: Optional[int] = None
+    tool_chain: Optional[str] = None
+
+
+@dataclass
 class Prompt:
     """Parsed prompt-lang document."""
     name: str
@@ -80,6 +92,8 @@ class Prompt:
     rubric: Optional[Rubric] = None
     conditions: list[Condition] = field(default_factory=list)
     activation: Optional[Activation] = None
+    # v2.0.1 additions
+    context: list[ContextItem] = field(default_factory=list)
     
     def to_dict(self) -> dict:
         """Convert to dictionary."""
@@ -251,6 +265,9 @@ class PromptLangParser:
             condition = self._parse_condition_block()
             if condition:
                 self.prompt.conditions.append(condition)
+        # v2.0.1 additions
+        elif block_type == "@context":
+            self.prompt.context = self._parse_context_content()
     
     def _parse_text_content(self) -> str:
         """Parse indented text content."""
@@ -374,6 +391,73 @@ class PromptLangParser:
                 break
             else:
                 break
+        return items
+
+    def _parse_context_content(self) -> list[ContextItem]:
+        """Parse @context block content."""
+        items = []
+        
+        while self.pos < len(self.lines):
+            line = self._current_line()
+            
+            # Check for context item: "  - type:"path" [options]"
+            # Patterns: file:"path", dir:"path", conv:"title", mcp:server, ki:"name"
+            item_match = re.match(r'^  - (file|dir|conv|mcp|ki):(["\']?)([^"\']+)\2(.*)$', line)
+            if item_match:
+                ref_type = item_match.group(1)
+                path = item_match.group(3)
+                options_str = item_match.group(4).strip()
+                
+                # Parse options [priority=HIGH, section="..."]
+                priority = "MEDIUM"
+                section = None
+                filter_opt = None
+                depth = None
+                tool_chain = None
+                
+                if options_str:
+                    # Parse filter options (filter="*.ts", depth=2)
+                    filter_match = re.search(r'\(filter=["\']?([^"\']+)["\']?', options_str)
+                    if filter_match:
+                        filter_opt = filter_match.group(1)
+                    depth_match = re.search(r'depth=(\d+)', options_str)
+                    if depth_match:
+                        depth = int(depth_match.group(1))
+                    
+                    # Parse bracket options [priority=HIGH]
+                    if "[" in options_str:
+                        bracket_content = re.search(r'\[([^\]]+)\]', options_str)
+                        if bracket_content:
+                            opts = bracket_content.group(1)
+                            priority_match = re.search(r'priority=(HIGH|MEDIUM|LOW)', opts)
+                            if priority_match:
+                                priority = priority_match.group(1)
+                            section_match = re.search(r'section=["\']?([^"\']+)["\']?', opts)
+                            if section_match:
+                                section = section_match.group(1)
+                    
+                    # Parse MCP tool chain
+                    if ref_type == "mcp" and ".tool(" in path:
+                        tool_chain = path
+                        path = path.split(".")[0]
+                
+                items.append(ContextItem(
+                    ref_type=ref_type,
+                    path=path,
+                    priority=priority,
+                    section=section,
+                    filter=filter_opt,
+                    depth=depth,
+                    tool_chain=tool_chain
+                ))
+                self.pos += 1
+            elif line == "":
+                self.pos += 1
+            elif line.startswith('@') or line.startswith('#'):
+                break
+            else:
+                break
+        
         return items
 
     def _parse_rubric_content(self) -> Rubric:

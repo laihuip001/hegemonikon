@@ -180,18 +180,19 @@ class Prompt:
         if self.goal:
             sections.append(f"\n## Goal\n{self.goal.strip()}")
         
-        # Context (v2.0.1)
+        # Context (v2.0.1) - with actual file reading
         if self.context:
             context_parts = ["\n## Context"]
             for item in self.context:
-                # Placeholder: actual file reading would go here
                 context_parts.append(f"\n### [{item.ref_type}] {item.path}")
                 context_parts.append(f"*Priority: {item.priority}*")
-                if item.filter:
-                    context_parts.append(f"*Filter: {item.filter}*")
-                if item.depth:
-                    context_parts.append(f"*Depth: {item.depth}*")
-                context_parts.append(f"<!-- Resource content would be injected here -->")
+                
+                # Resolve context based on type
+                content = self._resolve_context_item(item)
+                if content:
+                    context_parts.append(f"```\n{content}\n```")
+                else:
+                    context_parts.append("<!-- Resource not available -->")
             sections.append("\n".join(context_parts))
         
         # Constraints
@@ -270,6 +271,64 @@ class Prompt:
             return float(var_value) <= float(cond.value)
         
         return False
+    
+    def _resolve_context_item(self, item: 'ContextItem') -> Optional[str]:
+        """Resolve a context item to its content string."""
+        import os
+        import glob as glob_module
+        
+        if item.ref_type == "file":
+            # Read actual file
+            path = Path(item.path)
+            if path.exists():
+                try:
+                    content = path.read_text(encoding='utf-8')
+                    # Truncate if too long (based on priority)
+                    max_lines = {"HIGH": 200, "MEDIUM": 100, "LOW": 50}.get(item.priority, 100)
+                    lines = content.split('\n')
+                    if len(lines) > max_lines:
+                        content = '\n'.join(lines[:max_lines]) + f"\n... ({len(lines) - max_lines} more lines)"
+                    return content
+                except Exception as e:
+                    return f"Error reading file: {e}"
+            else:
+                return f"File not found: {item.path}"
+        
+        elif item.ref_type == "dir":
+            # List files in directory
+            path = Path(item.path)
+            if path.exists() and path.is_dir():
+                try:
+                    pattern = item.filter or "*"
+                    max_depth = item.depth or 1
+                    
+                    # Use glob to find files
+                    if max_depth == 1:
+                        files = list(path.glob(pattern))
+                    else:
+                        files = list(path.glob(f"**/{pattern}"))
+                    
+                    # Limit results
+                    files = files[:20]
+                    return "\n".join(str(f.relative_to(path)) for f in files)
+                except Exception as e:
+                    return f"Error listing directory: {e}"
+            else:
+                return f"Directory not found: {item.path}"
+        
+        elif item.ref_type == "conv":
+            # Placeholder for conversation reference
+            return f"[Conversation: {item.path}]"
+        
+        elif item.ref_type == "mcp":
+            # Placeholder for MCP server reference
+            return f"[MCP Server: {item.path}]"
+        
+        elif item.ref_type == "ki":
+            # Placeholder for Knowledge Item
+            return f"[Knowledge Item: {item.path}]"
+        
+        return None
 
 
 class ParseError(Exception):

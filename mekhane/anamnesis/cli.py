@@ -2,9 +2,9 @@
 Gnōsis CLI - コマンドラインインタフェース
 
 Usage:
-    python -m gnosis.cli collect --source arxiv --query "transformer" --limit 10
-    python -m gnosis.cli search "attention mechanism"
-    python -m gnosis.cli stats
+    python -m mekhane.anamnesis.cli collect --source arxiv --query "transformer" --limit 10
+    python mekhane/anamnesis/cli.py search "attention mechanism"
+    python mekhane/anamnesis/cli.py stats
 """
 
 import argparse
@@ -14,8 +14,14 @@ from typing import Optional
 import json
 from datetime import datetime, timedelta
 
+# Add Hegemonikon root to path for imports (mekhane package)
+_THIS_DIR = Path(__file__).parent
+_HEGEMONIKON_ROOT = _THIS_DIR.parent.parent  # mekhane/anamnesis -> mekhane -> Hegemonikon
+if str(_HEGEMONIKON_ROOT) not in sys.path:
+    sys.path.insert(0, str(_HEGEMONIKON_ROOT))
+
 # Configuration
-DATA_DIR = Path(__file__).parent.parent / "gnosis_data"
+DATA_DIR = _HEGEMONIKON_ROOT / "gnosis_data"
 STATE_FILE = DATA_DIR / "state.json"
 
 
@@ -67,10 +73,10 @@ def cmd_check_freshness(args):
 
 def cmd_collect(args):
     """論文収集"""
-    from .collectors.arxiv import ArxivCollector
-    from .collectors.semantic_scholar import SemanticScholarCollector
-    from .collectors.openalex import OpenAlexCollector
-    from .index import GnosisIndex
+    from mekhane.anamnesis.collectors.arxiv import ArxivCollector
+    from mekhane.anamnesis.collectors.semantic_scholar import SemanticScholarCollector
+    from mekhane.anamnesis.collectors.openalex import OpenAlexCollector
+    from mekhane.anamnesis.index import GnosisIndex
     
     collectors = {
         "arxiv": ArxivCollector,
@@ -111,10 +117,10 @@ def cmd_collect(args):
 
 def cmd_collect_all(args):
     """全ソースから収集"""
-    from .collectors.arxiv import ArxivCollector
-    from .collectors.semantic_scholar import SemanticScholarCollector
-    from .collectors.openalex import OpenAlexCollector
-    from .index import GnosisIndex
+    from mekhane.anamnesis.collectors.arxiv import ArxivCollector
+    from mekhane.anamnesis.collectors.semantic_scholar import SemanticScholarCollector
+    from mekhane.anamnesis.collectors.openalex import OpenAlexCollector
+    from mekhane.anamnesis.index import GnosisIndex
     
     collectors = [
         ("arxiv", ArxivCollector()),
@@ -145,7 +151,7 @@ def cmd_collect_all(args):
 
 def cmd_search(args):
     """論文検索"""
-    from .index import GnosisIndex
+    from mekhane.anamnesis.index import GnosisIndex
     
     print(f"[Search] Query: {args.query}")
     
@@ -173,7 +179,7 @@ def cmd_search(args):
 
 def cmd_stats(args):
     """インデックス統計"""
-    from .index import GnosisIndex
+    from mekhane.anamnesis.index import GnosisIndex
     
     index = GnosisIndex()
     stats = index.stats()

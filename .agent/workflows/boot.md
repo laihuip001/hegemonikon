@@ -56,9 +56,13 @@ Hegemonikón Phase 1 のブートシーケンス。
 
 5. **Gnōsis 知識更新チェック**: ローカル知識基盤の鮮度を確認
    - コマンド: `python m:/Hegemonikon/mekhane/anamnesis/cli.py check-freshness`
-   - **分岐 (Interactive)**: 上記コマンドが `exit code 1` (Stale) を返した場合:
-     - ユーザーに更新するか尋ねる ("Gnōsisデータが古いです。更新しますか？")
-     - Yesの場合: `python m:/Hegemonikon/mekhane/anamnesis/cli.py collect-all -q "LLM agent reasoning" -l 20` を実行
+   - **自動収集**: Stale の場合、自動で収集実行:
+     ```powershell
+     & "m:/Hegemonikon/.agent/scripts/gnosis-auto-collect.ps1"
+     ```
+
+5.1. **未分類論文リマインド**: 未分類の論文があれば通知
+   - 出力: `📚 Gnōsis: [N]件の未分類論文 → /tag で分類`
 
 5.5. **Perplexity Inbox 読み込み**: パプ君リサーチの新着確認
    - 対象フォルダ: `M:\Hegemonikon\docs\research\perplexity\`
@@ -105,4 +109,3 @@ Hegemonikón Phase 1 のブートシーケンス。
 - 長期記憶ステータス（パターン数、価値関数状態）
 - Perplexity新着処理結果
 - Today's Review（優先タスク、フォローアップ、提案）
-

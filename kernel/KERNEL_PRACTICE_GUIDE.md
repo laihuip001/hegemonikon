@@ -116,7 +116,7 @@ Level 1: 核心公理 ── Flow (推論↔行為) × Value (情報↔目標)
 | `/boot` | T1, T8 | 文脈読込、記憶復元 |
 | `/ask` | T5 | 調査依頼書（Perplexity用） |
 | `/plan` | T4, T3 | implementation_plan.md |
-| `/code` | T6, T2 | コード実装 |
+| `/do` | T6, T2 | コード実装 |
 | `/rev` | T7, T8 | レビュー、学び抽出 |
 | `/hist` | T8 | 履歴同期 |
 

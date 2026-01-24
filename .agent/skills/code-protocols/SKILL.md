@@ -3,7 +3,7 @@ name: Code Protocols
 description: 開発プロトコル（旧資産Module 01-25）への自動参照
 activation: auto
 triggers:
-  - /code
+  - /do
   - /plan (implementation phase)
 hegemonikon: M6-Praxis
 ---
@@ -11,7 +11,7 @@ hegemonikon: M6-Praxis
 # Code Protocols Skill
 
 > **目的**: 実装フェーズで開発プロトコルを自動参照
-> **発動**: `/code` 実行時、または実装計画作成時
+> **発動**: `/do` 実行時、または実装計画作成時
 
 ---
 
@@ -60,7 +60,7 @@ M:\Brain\99_🗃️_保管庫｜Archive\プロンプト ライブラリー\モ�
 ## 使用方法
 
 ### 自動発動（Claude）
-`/code` 実行時に M6 Praxis が自動でこの Skill を参照し、該当プロトコルを提示。
+`/do` 実行時に M6 Praxis が自動でこの Skill を参照し、該当プロトコルを提示。
 
 ### 手動発動（Creator）
 `/dev` ワークフローで明示的にプロトコル一覧を表示。

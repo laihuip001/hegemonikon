@@ -60,5 +60,5 @@ hegemonikon: M6-Praxis
 ## 補足
 
 - このワークフローは **Creator が主体**
-- Claude は `/code` 実行時に **自動で** Code Protocols Skill を参照
+- Claude は `/do` 実行時に **自動で** Code Protocols Skill を参照
 - 両者が補完的に機能する

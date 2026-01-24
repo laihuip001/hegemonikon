@@ -1,14 +1,14 @@
 ---
-name: "M1 Aisthēsis"
+name: "T1 Aisthēsis"
 description: |
-  FEP Octave M1: 知覚モジュール (I-E-F)。状況・文脈を即時認識し、意味を推論する。
+  FEP Octave T1: 知覚モジュール (I-E-F)。状況・文脈を即時認識し、意味を推論する。
   Use when: 新規メッセージ受信時、文脈が不明確な時、「これは何？」質問時、セッション開始時。
   Use when NOT: 既に状況把握済みで行動決定フェーズに入っている時。
-  Triggers: M2 Krisis (状況認識→優先度判断へ連携)
+  Triggers: T2 Krisis (状況認識→優先度判断へ連携)
   Keywords: perception, context, situation, first-analysis, input-parsing, what-is-this.
 ---
 
-# M1: Aisthēsis (αἴσθησις) — 知覚
+# T1: Aisthēsis (αἴσθησις) — 知覚
 
 > **FEP Code:** I-E-F (Inference × Epistemic × Fast)
 > **Hegemonikón:** 09 Aisthēsis-H
@@ -51,11 +51,11 @@ description: |
 
 | 種別 | 形式 | 送信先 | 備考 |
 |------|------|--------|------|
-| 状況ラベル | Enum | M2 Krisis | 5値分類 |
-| 文脈サマリ | テキスト | M2, M5, M3 | 500文字以内 |
-| 検出エンティティ | JSON | M2 | 信頼度付き |
-| 不確実性スコア | Float (0-1) | M5 Peira | 計算式あり |
-| 観測履歴 | JSON | M3 Theōria | 因果モデル構築用 |
+| 状況ラベル | Enum | T2 Krisis | 5値分類 |
+| 文脈サマリ | テキスト | T2, T5, T3 | 500文字以内 |
+| 検出エンティティ | JSON | T2 | 信頼度付き |
+| 不確実性スコア | Float (0-1) | T5 Peira | 計算式あり |
+| 観測履歴 | JSON | T3 Theōria | 因果モデル構築用 |
 
 ---
 
@@ -90,7 +90,7 @@ Phase 3: 意味推論
 
 Phase 4: 出力
   10. 構造化出力を生成
-  11. M2 Krisis, M5 Peira, M3 Theōria へ送信
+  11. T2 Krisis, T5 Peira, T3 Theōria へ送信
 ```
 
 ---
@@ -158,9 +158,9 @@ contradiction:
   formula: contradicting_statements / total_statements
 
 threshold:
-  low: U < 0.3      # M5 Peira不要
-  medium: 0.3 <= U < 0.6  # M5 Peira推奨
-  high: U >= 0.6    # M5 Peira必須
+  low: U < 0.3      # T5 Peira不要
+  medium: 0.3 <= U < 0.6  # T5 Peira推奨
+  high: U >= 0.6    # T5 Peira必須
 ```
 
 ---
@@ -172,7 +172,7 @@ threshold:
 | **空入力** | ユーザー発話が空 or null | IDE状態のみで文脈推論、situation_label = "routine" |
 | **履歴なし** | Vaultが空 or アクセス不可 | 現在入力のみで処理、history_context = null |
 | **IDE状態なし** | Antigravity外での実行 | ファイル情報なしで処理続行 |
-| **全入力欠如** | 発話・履歴・IDEすべてなし | エラー返却、M2に進まない |
+| **全入力欠如** | 発話・履歴・IDEすべてなし | エラー返却、T2に進まない |
 
 ---
 
@@ -208,10 +208,10 @@ threshold:
 
 | 失敗 | 症状 | 検出方法 | 回復策 |
 |------|------|----------|--------|
-| 文脈誤認 | 無関係なタスクを抽出 | M2からの否定フィードバック | 履歴スキャン範囲を狭める |
+| 文脈誤認 | 無関係なタスクを抽出 | T2からの否定フィードバック | 履歴スキャン範囲を狭める |
 | 過検出 | 大量のエンティティ | entity_count > 20 | confidence閾値を0.7以上に |
 | 見落とし | 重要コミットメント未検出 | ユーザー指摘 | キーワードリスト拡張 |
-| 不確実性過小評価 | M5が起動すべき時に起動せず | 後続エラー率 | 閾値を下げる (0.5 → 0.4) |
+| 不確実性過小評価 | T5が起動すべき時に起動せず | 後続エラー率 | 閾値を下げる (0.5 → 0.4) |
 
 ---
 
@@ -220,9 +220,9 @@ threshold:
 | 依存 | 対象 | 関係 |
 |------|------|------|
 | **Precondition** | なし | 入口モジュール |
-| **Postcondition** | M2 Krisis | 状況認識結果を渡す |
-| **Postcondition** | M5 Peira | 不確実性が高い場合に起動 |
-| **Postcondition** | M3 Theōria | 観測履歴を渡す |
+| **Postcondition** | T2 Krisis | 状況認識結果を渡す |
+| **Postcondition** | T5 Peira | 不確実性が高い場合に起動 |
+| **Postcondition** | T3 Theōria | 観測履歴を渡す |
 
 ---
 
@@ -232,5 +232,5 @@ threshold:
 |------------|-----------|------|
 | `history_scan_days` | 7 | 履歴スキャン日数 |
 | `entity_confidence_threshold` | 0.5 | エンティティ検出閾値 |
-| `uncertainty_threshold` | 0.6 | M5起動閾値 |
+| `uncertainty_threshold` | 0.6 | T5起動閾値 |
 | `max_context_summary_length` | 500 | 文脈サマリ最大文字数 |

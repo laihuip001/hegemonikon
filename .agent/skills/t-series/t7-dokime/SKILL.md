@@ -1,14 +1,14 @@
 ---
-name: "M7 Dokimē"
+name: "T7 Dokimē"
 description: |
-  FEP Octave M7: 検証モジュール (A-E-S)。仮説を検証するための実験を設計・実行する。
+  FEP Octave T7: 検証モジュール (A-E-S)。仮説を検証するための実験を設計・実行する。
   Use when: テスト設計、批評・レビュー依頼、Synedrion発動、仮説検証、品質確認が必要な時。
   Use when NOT: 単純な実行タスクで検証不要な時、理論構築フェーズの時。
-  Triggers: M8 Anamnēsis (検証完了→学習記録へ) or M3 Theōria (検証失敗→モデル再構築へ)
+  Triggers: T8 Anamnēsis (検証完了→学習記録へ) or T3 Theōria (検証失敗→モデル再構築へ)
   Keywords: test, verify, validate, review, critique, hypothesis, experiment, Synedrion.
 ---
 
-# M7: Dokimē (δοκιμή) — 検証
+# T7: Dokimē (δοκιμή) — 検証
 
 > **FEP Code:** A-E-S (Action × Epistemic × Slow)
 > **Hegemonikón:** 15 Dokimē-H
@@ -32,16 +32,16 @@ description: |
 
 | 種別 | 形式 | ソース |
 |------|------|--------|
-| 仮説リスト | JSON | M3 Theōria |
-| 予備情報 | JSON | M5 Peira |
+| 仮説リスト | JSON | T3 Theōria |
+| 予備情報 | JSON | T5 Peira |
 | 検証要求 | テキスト | ユーザー |
 
 ### Output
 
 | 種別 | 形式 | 送信先 |
 |------|------|--------|
-| 実験計画 | Markdown | M6 Praxis |
-| 検証結果 | JSON | M3 Theōria |
+| 実験計画 | Markdown | T6 Praxis |
+| 検証結果 | JSON | T3 Theōria |
 | 検証レポート | Markdown | ユーザー |
 
 ---
@@ -50,7 +50,7 @@ description: |
 
 | トリガー | 条件 | 優先度 |
 |----------|------|--------|
-| 仮説形成 | M3 Theōria から仮説受信 | 高 |
+| 仮説形成 | T3 Theōria から仮説受信 | 高 |
 | 予測精度への疑問 | error_rate > 0.3 | 高 |
 | 明示的検証要求 | 「テストして」「確認して」 | 最高 |
 
@@ -73,12 +73,12 @@ Phase 2: 実験設計
   6. 必要なデータ/リソースを特定
 
 Phase 3: 実験実行
-  7. M6 Praxis に実験計画を送信
+  7. T6 Praxis に実験計画を送信
   8. 結果を収集
   9. 統計的評価
 
 Phase 4: 結果報告
-  10. 検証結果を M3 Theōria に送信
+  10. 検証結果を T3 Theōria に送信
   11. 仮説の採択/棄却を判定
   12. ユーザーにレポート
 ```
@@ -121,10 +121,10 @@ Phase 4: 結果報告
 
 | 依存 | 対象 | 関係 |
 |------|------|------|
-| **Precondition** | M3 Theōria | 仮説リスト |
-| **Precondition** | M5 Peira | 予備情報 |
-| **Postcondition** | M3 Theōria | 検証結果 |
-| **Postcondition** | M6 Praxis | 実験実行 |
+| **Precondition** | T3 Theōria | 仮説リスト |
+| **Precondition** | T5 Peira | 予備情報 |
+| **Postcondition** | T3 Theōria | 検証結果 |
+| **Postcondition** | T6 Praxis | 実験実行 |
 
 ---
 
@@ -182,7 +182,7 @@ Phase 3: 統合
 USER: この設計を批評して
 
 AGENT: 
-[M7 Dokimē 発動: Synedrion Protocol]
+[T7 Dokimē 発動: Synedrion Protocol]
 
 | 評議員 | 視点 | 評価 | コメント |
 |--------|------|------|----------|

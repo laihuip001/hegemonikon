@@ -1,14 +1,14 @@
 ---
-name: "M6 Praxis"
+name: "T6 Praxis"
 description: |
-  FEP Octave M6: 行為モジュール (A-P-F)。行動を決定し、実行を発動する。
+  FEP Octave T6: 行為モジュール (A-P-F)。行動を決定し、実行を発動する。
   Use when: コマンド実行、ファイル編集、コード生成、実行判断、承認処理が必要な時。
   Use when NOT: 計画未策定の時、ユーザー承認待ちの時、情報不足の時。
-  Triggers: M7 Dokimē (実行→検証へ) or M8 Anamnēsis (実行→記録保存へ)
+  Triggers: T7 Dokimē (実行→検証へ) or T8 Anamnēsis (実行→記録保存へ)
   Keywords: execute, action, command, edit, implement, approve, run.
 ---
 
-# M6: Praxis (πρᾶξις) — 行為
+# T6: Praxis (πρᾶξις) — 行為
 
 > **FEP Code:** A-P-F (Action × Pragmatic × Fast)
 > **Hegemonikón:** 12 Praxis-H
@@ -30,8 +30,8 @@ description: |
 
 | 条件 | 内容 |
 |------|------|
-| **位置** | Core Loopの出口。M1→M2→M6 |
-| **依存** | M2 Krisis からの優先順位付きタスク（必須） |
+| **位置** | Core Loopの出口。T1→T2→T6 |
+| **依存** | T2 Krisis からの優先順位付きタスク（必須） |
 | **注意** | **安全と実用性のバランス**を重視 |
 
 ---
@@ -42,11 +42,11 @@ description: |
 
 | 種別 | 形式 | ソース | 備考 |
 |------|------|--------|------|
-| 優先順位付きタスク | JSON | M2 Krisis | 必須 |
-| 緊急フラグ | Boolean | M2 Krisis | 即時実行の判断に使用 |
-| 方策 | テキスト | M4 Phronēsis | 任意（戦略がある場合） |
+| 優先順位付きタスク | JSON | T2 Krisis | 必須 |
+| 緊急フラグ | Boolean | T2 Krisis | 即時実行の判断に使用 |
+| 方策 | テキスト | T4 Phronēsis | 任意（戦略がある場合） |
 | ユーザー承認 | Boolean | ユーザー | 前回の提案への承認 |
-| 信頼履歴 | JSON | M8 Anamnēsis | 同種操作の承認回数 |
+| 信頼履歴 | JSON | T8 Anamnēsis | 同種操作の承認回数 |
 
 ### Output
 
@@ -54,7 +54,7 @@ description: |
 |------|------|--------|------|
 | 実行アクション | コマンド/編集 | Antigravity | 直接実行 |
 | 提案 | Markdown | ユーザー | 確認が必要な場合 |
-| 実行ログ | JSON | M8 Anamnēsis | 学習用 |
+| 実行ログ | JSON | T8 Anamnēsis | 学習用 |
 
 ---
 
@@ -62,7 +62,7 @@ description: |
 
 | トリガー | 条件 | 優先度 |
 |----------|------|--------|
-| M2完了 | 優先順位付きタスク受信 | 最高 |
+| T2完了 | 優先順位付きタスク受信 | 最高 |
 | ユーザー承認 | 提案への「y」「yes」受信 | 最高 |
 | 緊急フラグ | urgent_flag = true | 高 |
 
@@ -72,7 +72,7 @@ description: |
 
 ```
 Phase 1: 入力検証
-  1. M2からのタスクリストを受信
+  1. T2からのタスクリストを受信
   2. 各タスクのリスクレベルを評価（→ Risk Matrix参照）
 
 Phase 2: 決定ロジック
@@ -91,7 +91,7 @@ Phase 2: 決定ロジック
        OR 自信度 < 0.8
      
      Defer（延期）:
-       情報不足（M5 Peira発動を提案）
+       情報不足（T5 Peira発動を提案）
      
      Skip（スキップ）:
        既に完了 OR 目標外
@@ -105,7 +105,7 @@ Phase 4: 実行/出力
   5. Auto-Execute/Execute → コマンド発行
   6. Propose → ユーザーに提案
   7. Defer/Skip → ログ記録
-  8. 全決定を M8 Anamnēsis に送信
+  8. 全決定を T8 Anamnēsis に送信
 ```
 
 ---
@@ -199,10 +199,10 @@ trust_mechanism:
 
 | 依存 | 対象 | 関係 |
 |------|------|------|
-| **Precondition** | M2 Krisis | 優先順位付きタスク |
-| **Precondition** | M4 Phronēsis | 方策（任意） |
-| **Postcondition** | M8 Anamnēsis | 実行ログ、信頼履歴 |
-| **Conditional** | M5 Peira | 情報不足時に発動 |
+| **Precondition** | T2 Krisis | 優先順位付きタスク |
+| **Precondition** | T4 Phronēsis | 方策（任意） |
+| **Postcondition** | T8 Anamnēsis | 実行ログ、信頼履歴 |
+| **Conditional** | T5 Peira | 情報不足時に発動 |
 
 ---
 

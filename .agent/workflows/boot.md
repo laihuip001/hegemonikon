@@ -39,6 +39,11 @@ Hegemonikón Phase 1 のブートシーケンス。
      ```
    - **目的**: セッション中は tools.yaml に登録されたツールを積極的に活用する
 
+2.6. **tools.yaml 整合性リマインド**:
+   - 「最近追加したツール（MCP/スクリプト/ワークフロー）は tools.yaml に登録されていますか？」
+   - 未登録の可能性がある場合: `view_file .agent/tools.yaml` で確認を促す
+   - **目的**: 新ツール追加時の登録忘れを防止（習慣化）
+
 3. **M8 長期記憶読込 (Load Phase)**:
    - `M:\Brain\.hegemonikon\` から以下を読み込み:
      - `patterns.yaml` → M3 Theōria へ提供（過去のパターン）

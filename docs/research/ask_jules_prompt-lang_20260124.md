@@ -104,3 +104,30 @@
 - **前提条件**: Prompt-Lang MVP 完成済み、仕様書あり
 - **リポジトリ**: https://github.com/laihuip001/hegemonikon
 - **優先する評価軸**: 実装可能性 > 信頼性 > 簡便さ
+
+---
+
+## 6. パプ君（Perplexity）からの回答
+
+### 実装フェーズ提案
+
+| Phase | タスク | 検証方法 |
+|:---|:---|:---|
+| **Alpha** | Prompt-Lang 仕様の完全読み込み | パーサー翻訳 |
+| **Beta** | Antigravity + Claude で実装 | サンプル手動テスト |
+| **Gamma** | `.gemini/` に Prompt-Lang 統合 | 自動化スクリプト |
+| **Release** | MCP 対応ツール化 | E2E テスト |
+
+### 次のアクション
+
+1. GitHub Issues で「Jules + DSL」実装例を 5-10 件発掘
+2. `.gemini/` ファイル構造を実地調査
+3. テスト Prompt-Lang を手書きして動作確認
+
+### 検索キーワード
+
+```
+site:github.com Jules DSL custom language
+site:github.com Jules "domain-specific language"
+site:github.com Antigravity IDE prompt engineering
+```

@@ -123,6 +123,22 @@ class Prompt:
                 parts.append(f"- Input: {ex.get('input', '')}")
                 parts.append(f"  Output: {ex.get('output', '')}")
         
+        # v2 additions
+        if self.rubric and self.rubric.dimensions:
+            parts.append("\n\nEvaluation Rubric:")
+            for dim in self.rubric.dimensions:
+                parts.append(f"- {dim.name}: {dim.description} (scale: {dim.scale})")
+                if dim.criteria:
+                    for score, desc in dim.criteria.items():
+                        parts.append(f"    {score}: {desc}")
+        
+        if self.conditions:
+            parts.append("\n\nConditional Rules:")
+            for cond in self.conditions:
+                parts.append(f"- When {cond.variable} {cond.operator} {cond.value}:")
+                if cond.if_content.get("raw"):
+                    parts.append(f"    {cond.if_content['raw'][:100]}...")
+        
         return "\n".join(parts)
 
 
@@ -193,6 +209,14 @@ class PromptLangParser:
     def _parse_block(self):
         """Parse a block (@role, @goal, etc.)."""
         line = self._current_line()
+        
+        # Special handling for @if (doesn't match standard pattern)
+        if line.startswith("@if "):
+            condition = self._parse_condition_block()
+            if condition:
+                self.prompt.conditions.append(condition)
+            return
+        
         match = self.BLOCK_PATTERN.match(line)
         if not match:
             # Skip unknown lines

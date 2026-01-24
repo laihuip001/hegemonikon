@@ -198,9 +198,9 @@ mixin_name   ::= IDENTIFIER
 
 | ディレクティブ | メソッド | 実装状態 |
 |:---|:---|:---:|
-| `@rubric` | `_parse_rubric_content()` | 🔴 実装中 |
-| `@if/@else` | `_parse_condition_block()` | 🔴 実装中 |
-| `@activation` | `_parse_activation_content()` | 🔴 実装中 |
+| `@rubric` | `_parse_rubric_content()` | ✅ 完了 |
+| `@if/@else` | `_parse_condition_block()` | ✅ 完了 |
+| `@activation` | `_parse_activation_content()` | ✅ 完了 |
 | `@extends` | `_resolve_extends()` | ⚪ v2.1 |
 | `@mixin` | `_resolve_mixin()` | ⚪ v2.1 |
 

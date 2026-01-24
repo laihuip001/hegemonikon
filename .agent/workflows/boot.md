@@ -29,6 +29,16 @@ Hegemonikón Phase 1 のブートシーケンス。
    
    これらのSkillの詳細仕様が必要な場合は `view_file` で `.agent/skills/m1-aisthesis/SKILL.md` または `.agent/skills/m2-krisis/SKILL.md` を参照。
 
+2.5. **利用可能ツール読み込み**: `.agent/tools.yaml` を読み込み、利用可能な機構を把握
+   - 出力形式:
+     ```
+     [Hegemonikon] 利用可能ツール
+       MCP: gnosis (search, stats, recommend_model)
+       Scripts: chat-history-sync, gnosis-cli
+       Workflows: /boot, /hist, /plan, /ask, /src, /think, /rev, /chk
+     ```
+   - **目的**: セッション中は tools.yaml に登録されたツールを積極的に活用する
+
 3. **M8 長期記憶読込 (Load Phase)**:
    - `M:\Brain\.hegemonikon\` から以下を読み込み:
      - `patterns.yaml` → M3 Theōria へ提供（過去のパターン）

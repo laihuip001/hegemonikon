@@ -30,6 +30,42 @@ class PromptBlock:
 
 
 @dataclass
+class RubricDimension:
+    """A single rubric dimension for evaluation."""
+    name: str
+    description: str
+    scale: str  # "1-5", "1-10", "binary", "percent"
+    criteria: dict[str, str] = field(default_factory=dict)
+
+
+@dataclass
+class Rubric:
+    """Rubric block for self-evaluation."""
+    dimensions: list[RubricDimension] = field(default_factory=list)
+    output_format: Optional[str] = None
+    output_key: Optional[str] = None
+
+
+@dataclass
+class Condition:
+    """Conditional block (@if/@else)."""
+    variable: str
+    operator: str  # "==", "!=", ">", "<", ">=", "<="
+    value: str
+    if_content: dict = field(default_factory=dict)
+    else_content: dict = field(default_factory=dict)
+
+
+@dataclass
+class Activation:
+    """Activation metadata for glob/rule integration."""
+    mode: str = "manual"  # "always_on", "manual", "glob", "model_decision"
+    pattern: Optional[str] = None
+    priority: int = 1
+    rules: list[str] = field(default_factory=list)
+
+
+@dataclass
 class Prompt:
     """Parsed prompt-lang document."""
     name: str
@@ -40,6 +76,10 @@ class Prompt:
     examples: list[dict] = field(default_factory=list)
     tools: dict[str, str] = field(default_factory=dict)
     resources: dict[str, str] = field(default_factory=dict)
+    # v2 additions
+    rubric: Optional[Rubric] = None
+    conditions: list[Condition] = field(default_factory=list)
+    activation: Optional[Activation] = None
     
     def to_dict(self) -> dict:
         """Convert to dictionary."""
@@ -176,6 +216,17 @@ class PromptLangParser:
             self.prompt.tools = self._parse_tool_content()
         elif block_type == "@resources":
             self.prompt.resources = self._parse_tool_content()  # Same format
+        # v2 additions
+        elif block_type == "@rubric":
+            self.prompt.rubric = self._parse_rubric_content()
+        elif block_type == "@activation":
+            self.prompt.activation = self._parse_activation_content()
+        elif block_type == "@if":
+            # Re-parse with condition
+            self.pos -= 1  # Go back to @if line
+            condition = self._parse_condition_block()
+            if condition:
+                self.prompt.conditions.append(condition)
     
     def _parse_text_content(self) -> str:
         """Parse indented text content."""
@@ -300,6 +351,171 @@ class PromptLangParser:
             else:
                 break
         return items
+
+    def _parse_rubric_content(self) -> Rubric:
+        """Parse @rubric block content."""
+        rubric = Rubric()
+        current_dimension = None
+        
+        while self.pos < len(self.lines):
+            line = self._current_line()
+            
+            # Check for dimension header: "  - dimension_name:"
+            dim_match = re.match(r'^  - ([a-z_][a-z0-9_-]*):$', line)
+            if dim_match:
+                if current_dimension:
+                    rubric.dimensions.append(current_dimension)
+                current_dimension = RubricDimension(
+                    name=dim_match.group(1),
+                    description="",
+                    scale="1-5"
+                )
+                self.pos += 1
+                continue
+            
+            # Check for dimension properties (6-space indent)
+            if current_dimension and line.startswith("      "):
+                prop_line = line.strip()
+                if prop_line.startswith("description:"):
+                    current_dimension.description = prop_line[12:].strip().strip('"\'')
+                elif prop_line.startswith("scale:"):
+                    current_dimension.scale = prop_line[6:].strip()
+                elif prop_line.startswith("criteria:"):
+                    # Parse criteria block
+                    self.pos += 1
+                    while self.pos < len(self.lines):
+                        crit_line = self._current_line()
+                        crit_match = re.match(r'^        (\d+): (.+)$', crit_line)
+                        if crit_match:
+                            current_dimension.criteria[crit_match.group(1)] = crit_match.group(2).strip('"\'')
+                            self.pos += 1
+                        elif crit_line.startswith("        "):
+                            self.pos += 1
+                        else:
+                            break
+                    continue
+                self.pos += 1
+                continue
+            
+            # Check for output spec: "  output:"
+            if line == "  output:":
+                self.pos += 1
+                while self.pos < len(self.lines):
+                    out_line = self._current_line()
+                    if out_line.startswith("    format:"):
+                        rubric.output_format = out_line[11:].strip().strip('"\'')
+                    elif out_line.startswith("    key:"):
+                        rubric.output_key = out_line[8:].strip().strip('"\'')
+                    elif out_line.startswith("    "):
+                        pass
+                    else:
+                        break
+                    self.pos += 1
+                continue
+            
+            # End conditions
+            if line == "":
+                self.pos += 1
+            elif line.startswith('@') or line.startswith('#'):
+                break
+            else:
+                break
+        
+        if current_dimension:
+            rubric.dimensions.append(current_dimension)
+        
+        return rubric
+
+    def _parse_activation_content(self) -> Activation:
+        """Parse @activation block content."""
+        activation = Activation()
+        
+        while self.pos < len(self.lines):
+            line = self._current_line()
+            
+            # Parse key: value pairs with 2-space indent
+            if line.startswith("  ") and ":" in line:
+                stripped = line[2:].strip()
+                if stripped.startswith("mode:"):
+                    activation.mode = stripped[5:].strip().strip('"\'')
+                elif stripped.startswith("pattern:"):
+                    activation.pattern = stripped[8:].strip().strip('"\'')
+                elif stripped.startswith("priority:"):
+                    try:
+                        activation.priority = int(stripped[9:].strip())
+                    except ValueError:
+                        activation.priority = 1
+                elif stripped.startswith("rules:"):
+                    # Parse rules list: [rule1, rule2]
+                    rules_str = stripped[6:].strip()
+                    if rules_str.startswith("[") and rules_str.endswith("]"):
+                        rules_str = rules_str[1:-1]
+                        activation.rules = [r.strip().strip('"\'') for r in rules_str.split(",") if r.strip()]
+                self.pos += 1
+            elif line == "":
+                self.pos += 1
+            elif line.startswith('@') or line.startswith('#'):
+                break
+            else:
+                break
+        
+        return activation
+
+    def _parse_condition_block(self) -> Optional[Condition]:
+        """Parse @if/@else/@endif block."""
+        line = self._current_line()
+        
+        # Parse @if condition:
+        if_match = re.match(r'^@if\s+(\w+)\s*(==|!=|>|<|>=|<=)\s*["\']?([^"\']+)["\']?\s*:$', line)
+        if not if_match:
+            self.pos += 1
+            return None
+        
+        condition = Condition(
+            variable=if_match.group(1),
+            operator=if_match.group(2),
+            value=if_match.group(3)
+        )
+        self.pos += 1
+        
+        # Collect if_content until @else or @endif
+        if_lines = []
+        while self.pos < len(self.lines):
+            line = self._current_line()
+            if line == "@else:":
+                self.pos += 1
+                break
+            elif line == "@endif":
+                self.pos += 1
+                return condition
+            elif line.startswith("  "):
+                if_lines.append(line[2:])
+                self.pos += 1
+            elif line == "":
+                self.pos += 1
+            else:
+                break
+        
+        condition.if_content = {"raw": "\n".join(if_lines)}
+        
+        # Collect else_content until @endif
+        else_lines = []
+        while self.pos < len(self.lines):
+            line = self._current_line()
+            if line == "@endif":
+                self.pos += 1
+                break
+            elif line.startswith("  "):
+                else_lines.append(line[2:])
+                self.pos += 1
+            elif line == "":
+                self.pos += 1
+            else:
+                break
+        
+        condition.else_content = {"raw": "\n".join(else_lines)}
+        
+        return condition
 
 
 def parse_file(filepath: str) -> Prompt:

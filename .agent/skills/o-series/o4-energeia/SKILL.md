@@ -1,13 +1,13 @@
 ---
-name: "P4 Energeia"
+name: "O4 Energeia"
 description: |
-  純粋定理 P4: 純粋行為 (A-P)。Flow×Value のみの最も抽象的な行為機能。
+  純粋定理 O4: 純粋行為 (A-P)。Flow×Value のみの最も抽象的な行為機能。
   Use when: 実行、行動、「何をするか」を問う時。
   Triggers: M6 Praxis（具体化）, M8 Anamnēsis（記録化）
   Keywords: pure-action, doing, execution, actualization.
 ---
 
-# P4: Energeia (ἐνέργεια) — 純粋行為
+# O4: Energeia (ἐνέργεια) — 純粋行為
 
 > **FEP Code:** A-P (Action × Pragmatic)
 > **Hegemonikón Layer:** Level 2a 純粋定理
@@ -29,8 +29,8 @@ description: |
 
 | 純粋定理 | → 拡張定理 | 追加軸 |
 |----------|-----------|--------|
-| P4 Energeia | M6 Praxis | + Fast |
-| P4 Energeia | M8 Anamnēsis | + Slow |
+| O4 Energeia | M6 Praxis | + Fast |
+| O4 Energeia | M8 Anamnēsis | + Slow |
 
 ---
 
@@ -63,7 +63,7 @@ description: |
 
 ```
 ┌─[Hegemonikón]──────────────────────┐
-│ P4 Energeia: 純粋行為完了          │
+│ O4 Energeia: 純粋行為完了          │
 │ 意図: [行動の真の目的]             │
 │ 影響: [世界への影響]               │
 │ 具体化: → M6/M8 に委譲             │

@@ -15,6 +15,7 @@ Prompt-Lang v2 は、構造化プロンプト記述言語 v1 に以下の機能�
 | `@rubric` | 自己評価・品質指標の組み込み | 🔴 P1 |
 | `@if/@else` | 条件分岐によるプロンプト切替 | 🔴 P1 |
 | `@activation` | Glob/ルール連携のメタデータ | 🔴 P1 |
+| `@context` | リソース参照（ファイル/会話/MCP） | 🔴 P1 |
 | `@extends` | テンプレート継承 | 🟠 P2 |
 | `@mixin` | 共通モジュールの再利用 | 🟠 P2 |
 
@@ -131,7 +132,85 @@ key              ::= "mode" | "pattern" | "priority" | "rules"
 
 ---
 
-### 2.4 @extends — 継承（P2）
+### 2.4 @context — リソース参照（P1）
+
+**目的**: ファイル、会話履歴、MCP サーバなどのリソースをコンテキストに明示的にアタッチ
+
+> **設計原則**: `@context` は「リソース ID の宣言」であり、テキスト展開ではない。
+> どの部分を何トークン分プロンプトに注入するかは、エージェント側のコンテキスト戦略に委ねる。
+
+```bnf
+context_block   ::= "@context:" NEWLINE context_items
+context_items   ::= context_item+
+context_item    ::= "  - " resource_ref [options] NEWLINE
+resource_ref    ::= file_ref | dir_ref | conv_ref | mcp_ref | ki_ref
+file_ref        ::= "file:" STRING
+dir_ref         ::= "dir:" STRING [filter_options]
+conv_ref        ::= "conv:" STRING
+mcp_ref         ::= "mcp:" IDENTIFIER ["." tool_chain]
+ki_ref          ::= "ki:" STRING
+filter_options  ::= "(" filter_list ")"
+filter_list     ::= filter_item ("," filter_item)*
+filter_item     ::= "filter=" STRING | "depth=" NUMBER
+options         ::= "[" option_list "]"
+option_list     ::= option ("," option)*
+option          ::= "priority=" priority_level | "section=" STRING
+priority_level  ::= "HIGH" | "MEDIUM" | "LOW"
+tool_chain      ::= "tool(" STRING ")" ["." "with(" resource_ref ")"]
+```
+
+**リソース種別**:
+
+| 種別 | 構文 | 説明 |
+|:---|:---|:---|
+| `file:` | `file:"src/api/user.py"` | 単一ファイル参照 |
+| `dir:` | `dir:"src/"(filter="*.ts", depth=2)` | ディレクトリ参照（フィルタ付き） |
+| `conv:` | `conv:"Auth Flow Design"` | 会話履歴（タイトルまたはID） |
+| `mcp:` | `mcp:gnosis.tool("search")` | MCP サーバ/ツール参照 |
+| `ki:` | `ki:"API設計原則"` | Knowledge Item 参照 |
+
+**優先度のセマンティクス**:
+
+| 優先度 | 意味 |
+|:---|:---|
+| `HIGH` | 全文または詳細抜粋を維持。要約・圧縮を避ける |
+| `MEDIUM` | 通常のコンテキスト管理に従う（デフォルト） |
+| `LOW` | 必要時のみ参照。積極的に要約・省略可 |
+
+**例**:
+
+```prompt-lang
+#prompt api_refactoring
+
+@context:
+  - file:"src/api/user_controller.py" [priority=HIGH]
+  - file:"src/api/auth_controller.py" [priority=HIGH]
+  - dir:"src/models/"(filter="*.py", depth=1) [priority=MEDIUM]
+  - conv:"HLD: Authentication Flow" [priority=HIGH]
+  - mcp:gnosis.tool("search").with(file:"docs/query.txt")
+  - ki:"REST API 設計原則" [priority=LOW]
+
+@goal:
+  上記のコンテキストを参照し、API のリファクタリング計画を策定
+
+@constraints:
+  - 既存の公開 API エンドポイントを破壊しないこと
+  - 会話で決定した認証フローの設計に準拠すること
+```
+
+**Antigravity との対応**:
+
+| Prompt-Lang | Antigravity UI | 備考 |
+|:---|:---|:---|
+| `file:"path"` | `@path/to/file` | 同等 |
+| `dir:"path"` | `@dir/` | フィルタはPrompt-Lang固有 |
+| `conv:"title"` | `@Conversation Title` | 同等 |
+| `mcp:server` | `@mcp:server:` | 同等 |
+| `ki:"name"` | Knowledge自動参照 | Prompt-Langで明示化 |
+
+---
+
+### 2.5 @extends — 継承（P2）
 
 **目的**: ベーステンプレートを継承し、一部だけ上書き
 
@@ -152,7 +231,7 @@ base_name     ::= IDENTIFIER
 
 ---
 
-### 2.5 @mixin — 合成（P2）
+### 2.6 @mixin — 合成（P2）
 
 **目的**: 共通モジュールを複数promptから再利用
 
@@ -201,6 +280,7 @@ mixin_name   ::= IDENTIFIER
 | `@rubric` | `_parse_rubric_content()` | ✅ 完了 |
 | `@if/@else` | `_parse_condition_block()` | ✅ 完了 |
 | `@activation` | `_parse_activation_content()` | ✅ 完了 |
+| `@context` | `_parse_context_content()` | 🟡 v2.0.1 |
 | `@extends` | `_resolve_extends()` | ⚪ v2.1 |
 | `@mixin` | `_resolve_mixin()` | ⚪ v2.1 |
 
@@ -211,3 +291,4 @@ mixin_name   ::= IDENTIFIER
 - [Structured Prompting (arXiv)](https://arxiv.org/html/2511.20836v1)
 - [Multi-level Prompting (ScienceDirect)](https://www.sciencedirect.com/science/article/abs/pii/S095070512500591X)
 - [Prompt-Lang 統合研究レポート](file:///M:/Hegemonikon/docs/research/prompt-lang-complete-report.md)
+- [Antigravity メンション機能調査](file:///M:/Hegemonikon/docs/research/antigravity-mention-syntax-20260124.md)

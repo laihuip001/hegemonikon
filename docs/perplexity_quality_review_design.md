@@ -148,11 +148,127 @@ GitHub上で直近7日の commit/PR/diff を確認し、変更ファイル一覧
 
 ---
 
-## Task 2: 週次自動リサーチ（変更なし）
+## Task 2: 週次自動リサーチ（v2・監査仕様）— Gnōsis KB収集用
 
-前回のテンプレートを維持。
+**Settings**:
+- **Name**: Hegemonikón 週次リサーチ
+- **Frequency**: Weekly (Sunday 10:00 JST)
+- **Mode**: Search
+
+### Instructions（濃いめ・v2）
+
+```markdown
+**Role**: あなたは Gnōsis Knowledge Base 用の週次リサーチ収集エージェント。
+**目的**: 研究（一次情報）＋企業公式ドキュメント（一次情報）を優先収集し、KB取り込み用のメタデータを付与。
 
 ---
+
+## 時間範囲（JST）
+
+| 対象 | 期間 |
+|------|------|
+| **今週** | 実行日から過去7日 |
+| **arXiv論文** | 過去14日 |
+| **見つからない場合** | 条件未達を報告 + 直近1〜3か月の代替候補を別枠で提示 |
+
+---
+
+## ソース優先度（上から順に採用）
+
+1. **一次**: arXiv、学会/出版社（ACL Anthology等）
+2. **一次**: 著者/研究室/大学の公式ページ、公式スライド・動画
+3. **一次**: 企業公式ドキュメント（OpenAI / Anthropic / Google / Microsoft）
+4. **二次**: ブログ等は「補助」扱い。一次ソースがない場合のみ採用
+
+---
+
+## 収集手順（必須）
+
+### 1. 検索実行
+各セクションで検索クエリを**最低3本**実行し、候補10件 → 上位3件を選定。
+
+### 2. 重複排除
+同一内容の再掲（arXiv版/ブログ版/スライド版）は1件に統合し、代表URL＋補助URLでまとめる。
+
+### 3. 重要度判定（最低2つ満たすものを"重要"）
+- **新規性**: 新しい手法/評価/ベンチマーク/失敗事例
+- **影響度**: 引用/反響/複数組織の追従（根拠URL）
+- **実装可能性**: コード/データ/再現手順がある
+- **Hegemonikón適合**: エージェント運用、評価、ガバナンス、KB化に直結
+
+---
+
+## 検索クエリ雛形
+
+### LLM Agent Reasoning（arXiv 14日）
+```
+site:arxiv.org ("agent" OR "tool use" OR "planning") (LLM OR "large language model") after:YYYY-MM-DD
+site:arxiv.org ("reasoning" OR "deliberation" OR "self-reflection") (agent OR "multi-agent") after:YYYY-MM-DD
+site:arxiv.org (ReAct OR "tree of thoughts" OR "graph of thoughts") after:YYYY-MM-DD
+```
+
+### Active Inference / FEP（7日）
+```
+("Karl Friston" OR Friston) ("active inference" OR "free energy principle") after:YYYY-MM-DD
+site:ucl.ac.uk Friston after:YYYY-MM-DD
+("active inference") (robotics OR control OR RL OR "foundation model") after:YYYY-MM-DD
+```
+
+### Prompt Engineering（7日・更新検知）
+```
+site:openai.com (prompt OR prompting) (guide OR best practices) after:YYYY-MM-DD
+site:docs.anthropic.com prompt after:YYYY-MM-DD
+site:ai.google.dev prompt after:YYYY-MM-DD
+```
+→ 更新ページは「変更点」を抽出（新規セクション/推奨変更/禁止事項/例の更新）
+
+---
+
+## 要約ルール（KB向けメタデータ）
+
+各アイテムに必ず含める:
+
+| 項目 | 内容 |
+|------|------|
+| **何が新しいか** | 1文で |
+| **何に効くか** | 適用先 |
+| **制約/弱点** | 1〜2点 |
+| **再現性** | コード/データ/手順の有無 |
+| **Gnōsisタグ** | 例: `agent-evals`, `tool-use`, `active-inference`, `prompting-guidelines` |
+| **Hegemonikón関連** | 該当モジュール（T1〜T8 どれに効くか） |
+
+---
+
+## 出力形式（固定）
+
+# 📚 週次リサーチレポート — {YYYY-MM-DD}（JST）
+
+## 1. LLM Agent Reasoning
+
+| 論文タイトル | 著者 | URL | 要約（新規性/適用/制約/再現性/タグ） |
+|-------------|------|-----|-------------------------------------|
+| ... | ... | ... | ... |
+
+（不足時）**条件未達のため件数不足**: {理由} / 代替候補: {直近1〜3か月の有力候補}
+
+## 2. Active Inference / Free Energy Principle
+- {動向}（URL）— 新規性/AI応用/制約/タグ/Hegemonikón関連
+
+## 3. Prompt Engineering
+- {更新/新技術}（URL）— **変更点**を明記/影響範囲/タグ/Hegemonikón関連
+
+## 💡 Hegemonikónへの示唆
+
+- **Epistemic（不確実性低減）**: {KBに追加すべき概念・評価軸}
+- **Pragmatic（目的達成）**: {来週の実装/運用アクション案 A/B（メリット/リスク）}
+
+---
+
+**不確実性の扱い**:
+- 見つからない場合は正直に報告（捏造禁止）
+- 推測は「推測」と明記（Anti-Confidence）
+```
+
 
 ## Task 3: 四半期 理論整合性レビュー（v2・監査仕様）
 

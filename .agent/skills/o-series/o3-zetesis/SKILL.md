@@ -1,13 +1,13 @@
 ---
-name: "P3 Zētēsis"
+name: "O3 Zētēsis"
 description: |
-  純粋定理 P3: 純粋探求 (A-E)。Flow×Value のみの最も抽象的な探求機能。
+  純粋定理 O3: 純粋探求 (A-E)。Flow×Value のみの最も抽象的な探求機能。
   Use when: 問いかけ、探索、「何を調べるか」を問う時。
   Triggers: M5 Peira（具体化）, M7 Dokimē（検証化）
   Keywords: pure-inquiry, questioning, seeking, exploration.
 ---
 
-# P3: Zētēsis (ζήτησις) — 純粋探求
+# O3: Zētēsis (ζήτησις) — 純粋探求
 
 > **FEP Code:** A-E (Action × Epistemic)
 > **Hegemonikón Layer:** Level 2a 純粋定理
@@ -29,8 +29,8 @@ description: |
 
 | 純粋定理 | → 拡張定理 | 追加軸 |
 |----------|-----------|--------|
-| P3 Zētēsis | M5 Peira | + Fast |
-| P3 Zētēsis | M7 Dokimē | + Slow |
+| O3 Zētēsis | M5 Peira | + Fast |
+| O3 Zētēsis | M7 Dokimē | + Slow |
 
 ---
 
@@ -63,7 +63,7 @@ description: |
 
 ```
 ┌─[Hegemonikón]──────────────────────┐
-│ P3 Zētēsis: 純粋探求完了           │
+│ O3 Zētēsis: 純粋探求完了           │
 │ 根源的問い: [問いの内容]           │
 │ 探索空間: [範囲定義]               │
 │ 具体化: → M5/M7 に委譲             │

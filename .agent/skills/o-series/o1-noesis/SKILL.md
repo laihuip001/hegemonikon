@@ -1,13 +1,13 @@
 ---
-name: "P1 Noēsis"
+name: "O1 Noēsis"
 description: |
-  純粋定理 P1: 純粋認識 (I-E)。Flow×Value のみの最も抽象的な認識機能。
+  純粋定理 O1: 純粋認識 (I-E)。Flow×Value のみの最も抽象的な認識機能。
   Use when: メタ認知、自己認識、「何を知っているか」を問う時。
   Triggers: M1 Aisthēsis（具体化）, M3 Theōria（理論化）
   Keywords: meta-cognition, pure-recognition, knowing-that-we-know.
 ---
 
-# P1: Noēsis (νόησις) — 純粋認識
+# O1: Noēsis (νόησις) — 純粋認識
 
 > **FEP Code:** I-E (Inference × Epistemic)
 > **Hegemonikón Layer:** Level 2a 純粋定理
@@ -29,8 +29,8 @@ description: |
 
 | 純粋定理 | → 拡張定理 | 追加軸 |
 |----------|-----------|--------|
-| P1 Noēsis | M1 Aisthēsis | + Fast |
-| P1 Noēsis | M3 Theōria | + Slow |
+| O1 Noēsis | M1 Aisthēsis | + Fast |
+| O1 Noēsis | M3 Theōria | + Slow |
 
 ---
 
@@ -63,7 +63,7 @@ description: |
 
 ```
 ┌─[Hegemonikón]──────────────────────┐
-│ P1 Noēsis: メタ認知完了            │
+│ O1 Noēsis: メタ認知完了            │
 │ 既知: [既知の項目リスト]           │
 │ 未知: [未知の項目リスト]           │
 │ 具体化: → M1/M3 に委譲             │

@@ -1,0 +1,88 @@
+=== Current Agent Manager DOM ===
+
+Total HTML length: 202378
+
+
+=== .overflow-y-auto: 9 matches ===
+
+  [0] <DIV> class='transition-all duration-150 ease-in-out opacity-0 pointer-events-none flex-1 min-h-0 mt-4 overflow-y'
+      text_len=1497
+      preview: WorkspacesHegemonikonBoot and Prompt-Lang HandoffAntigravity Chat Export ImplementationO/K/X Series ImplementationPrompt-Lang Generation EnhancementAutomating Gnōsis Data CollectionHegemonikón Protoco
+
+  [1] <DIV> class='w-full flex h-full min-h-0 flex-col items-center overflow-y-auto'
+      text_len=4506
+      preview: 
+/* Copied from remark-github-blockquote-alert/alert.css */
+@media (prefers-color-scheme: dark) {
+.markdown-alert {
+	--color-border-default: #30363d;
+	--color-accent-fg: #58a6ff;
+	--color-accent-empha
+
+  [2] <DIV> class='h-full overflow-y-auto min-h-0 w-full scrollbar-hide'
+      text_len=4053
+      preview: 
+/* Copied from remark-github-blockquote-alert/alert.css */
+@media (prefers-color-scheme: dark) {
+.markdown-alert {
+	--color-border-default: #30363d;
+	--color-accent-fg: #58a6ff;
+	--color-accent-empha
+
+=== [class*="chat"]: 2 matches ===
+
+  [0] <DIV> class='border-gray-500/20 bg-ide-chat-background w-max bg-editor-background text-editor-foreground origin-b'
+      text_len=24
+      preview: Add contextMediaMentions
+
+  [1] <DIV> class='border-gray-500/20 bg-ide-chat-background w-max bg-editor-background text-editor-foreground origin-b'
+      text_len=211
+      preview: Conversation modePlanningAgent can plan before executing tasks. Use for deep research, complex tasks, or collaborative workFastAgent will execute tasks directly. Use for simple tasks that can be compl
+
+
+=== Large div analysis ===
+
+[Large 0] text_len=19185, children=2
+    class=''
+      child[0] <DIV> class='relative w-screen h-screen overflow-hidden' text_len=18342
+      child[1] <STYLE> class='' text_len=843
+
+[Large 1] text_len=18342, children=2
+    class='relative w-screen h-screen overflow-hidden'
+      child[0] <DIV> class='h-full w-full' text_len=11282
+      child[1] <STYLE> class='' text_len=7060
+
+[Large 2] text_len=11282, children=1
+    class='h-full w-full'
+      child[0] <DIV> class='flex w-full h-full outline-none flex-col' text_len=11282
+
+[Large 3] text_len=11282, children=2
+    class='flex w-full h-full outline-none flex-col'
+      child[0] <DIV> class='border-gray-500/20 flex border-b-[1px]' text_len=517
+      child[1] <DIV> class='' text_len=10765
+
+[Large 4] text_len=10765, children=1
+    class=''
+      child[0] <DIV> class='w-full h-full flex items-center' text_len=10765
+
+[Large 5] text_len=10765, children=1
+    class='w-full h-full flex items-center'
+      child[0] <DIV> class='flex w-full h-full outline-none' text_len=10765
+
+[Large 6] text_len=10765, children=2
+    class='flex w-full h-full outline-none'
+      child[0] <DIV> class='border-gray-500/20 flex border-r-[1px]' text_len=1561
+      child[1] <DIV> class='' text_len=9204
+
+[Large 7] text_len=9204, children=1
+    class=''
+      child[0] <DIV> class='w-full h-full' text_len=9204
+
+[Large 8] text_len=9204, children=1
+    class='w-full h-full'
+      child[0] <DIV> class='flex w-full h-full outline-none' text_len=9204
+
+[Large 9] text_len=9204, children=2
+    class='flex w-full h-full outline-none'
+      child[0] <DIV> class='border-gray-500/20 flex' text_len=9114
+      child[1] <DIV> class='' text_len=90

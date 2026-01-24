@@ -1,0 +1,338 @@
+#!/usr/bin/env python3
+"""
+Antigravity IDE チャット履歴エクスポートツール
+==============================================
+
+Playwright を使用して Antigravity の Agent Manager から
+チャット履歴を DOM 経由で抽出し、Markdown / JSON 形式で保存する。
+
+使用方法:
+    python export_chats.py                    # 全会話をエクスポート
+    python export_chats.py --output sessions/ # 出力先指定
+    python export_chats.py --format json      # JSON 形式で出力
+
+必要条件:
+    pip install playwright
+    playwright install chromium
+"""
+
+import asyncio
+import json
+import re
+import sys
+from datetime import datetime
+from pathlib import Path
+from typing import List, Dict, Optional
+import argparse
+
+
+# ============================================================================
+# 設定
+# ============================================================================
+
+DEFAULT_OUTPUT_DIR = Path(r"M:\Brain\.hegemonikon\sessions")
+CDP_PORT = 9222  # Chrome DevTools Protocol ポート
+
+
+# ============================================================================
+# エクスポータークラス
+# ============================================================================
+
+class AntigravityChatExporter:
+    """Antigravity IDE のチャット履歴をエクスポート"""
+    
+    def __init__(self, output_dir: Path = DEFAULT_OUTPUT_DIR):
+        self.output_dir = output_dir
+        self.output_dir.mkdir(parents=True, exist_ok=True)
+        self.chats: List[Dict] = []
+        self.browser = None
+        self.page = None
+    
+    async def connect(self) -> bool:
+        """CDP 経由で Antigravity のブラウザに接続"""
+        try:
+            from playwright.async_api import async_playwright
+            
+            self.playwright = await async_playwright().start()
+            
+            # CDP エンドポイントに接続
+            cdp_url = f"http://localhost:{CDP_PORT}"
+            print(f"[*] Connecting to CDP: {cdp_url}")
+            
+            self.browser = await self.playwright.chromium.connect_over_cdp(cdp_url)
+            
+            # 既存のページを取得
+            contexts = self.browser.contexts
+            if not contexts:
+                print("[!] No browser context found")
+                return False
+            
+            pages = contexts[0].pages
+            if not pages:
+                print("[!] No pages found")
+                return False
+            
+            self.page = pages[0]
+            print(f"[✓] Connected to: {self.page.url}")
+            return True
+            
+        except Exception as e:
+            print(f"[✗] Connection failed: {e}")
+            print("    → Antigravity IDE が起動していることを確認してください")
+            return False
+    
+    async def extract_conversation_list(self) -> List[Dict]:
+        """会話リストを抽出"""
+        conversations = []
+        
+        try:
+            # Agent Manager の Inbox を待機
+            # ※ セレクタは実際の UI に合わせて調整が必要
+            await self.page.wait_for_selector(
+                '[data-testid="conversation-item"], [role="listitem"], .conversation-item',
+                timeout=5000
+            )
+            
+            # 会話アイテムを取得
+            items = await self.page.query_selector_all(
+                '[data-testid="conversation-item"], [role="listitem"], .conversation-item'
+            )
+            
+            for item in items:
+                try:
+                    # タイトルを取得
+                    title_el = await item.query_selector('h3, .title, [data-testid="title"]')
+                    title = await title_el.text_content() if title_el else "Untitled"
+                    
+                    # ID を取得（data 属性から）
+                    conv_id = await item.get_attribute('data-conversation-id')
+                    if not conv_id:
+                        conv_id = await item.get_attribute('id')
+                    
+                    conversations.append({
+                        "id": conv_id or f"conv_{len(conversations)}",
+                        "title": title.strip(),
+                        "element": item
+                    })
+                except Exception as e:
+                    print(f"[!] Error extracting conversation item: {e}")
+                    continue
+            
+            print(f"[*] Found {len(conversations)} conversations")
+            return conversations
+            
+        except Exception as e:
+            print(f"[!] Error finding conversations: {e}")
+            return []
+    
+    async def extract_messages(self) -> List[Dict]:
+        """現在表示されている会話のメッセージを抽出"""
+        messages = []
+        
+        try:
+            # メッセージコンテナを待機
+            await self.page.wait_for_selector(
+                '[data-testid="message"], .message, [role="log"] > div',
+                timeout=3000
+            )
+            
+            # メッセージ要素を取得
+            msg_elements = await self.page.query_selector_all(
+                '[data-testid="message"], .message, [role="log"] > div'
+            )
+            
+            for msg_el in msg_elements:
+                try:
+                    # ロールを判定
+                    role = "assistant"
+                    role_attr = await msg_el.get_attribute('data-role')
+                    classes = await msg_el.get_attribute('class') or ""
+                    
+                    if role_attr:
+                        role = role_attr
+                    elif 'user' in classes.lower():
+                        role = "user"
+                    elif 'human' in classes.lower():
+                        role = "user"
+                    
+                    # コンテンツを取得
+                    content = await msg_el.text_content()
+                    if content and content.strip():
+                        messages.append({
+                            "role": role,
+                            "content": content.strip()
+                        })
+                except Exception as e:
+                    continue
+            
+            return messages
+            
+        except Exception as e:
+            print(f"[!] Error extracting messages: {e}")
+            return []
+    
+    async def export_all(self):
+        """全会話をエクスポート"""
+        if not await self.connect():
+            return
+        
+        conversations = await self.extract_conversation_list()
+        
+        for idx, conv in enumerate(conversations, 1):
+            print(f"[{idx}/{len(conversations)}] {conv['title']}")
+            
+            try:
+                # 会話をクリック
+                await conv['element'].click()
+                await self.page.wait_for_load_state('networkidle')
+                await asyncio.sleep(0.5)  # UI 更新を待機
+                
+                # メッセージを抽出
+                messages = await self.extract_messages()
+                
+                # 記録を保存
+                chat_record = {
+                    "id": conv['id'],
+                    "title": conv['title'],
+                    "exported_at": datetime.now().isoformat(),
+                    "message_count": len(messages),
+                    "messages": messages
+                }
+                self.chats.append(chat_record)
+                
+                print(f"    → {len(messages)} messages extracted")
+                
+            except Exception as e:
+                print(f"    → Error: {e}")
+                continue
+        
+        await self.close()
+    
+    def save_markdown(self, filename: Optional[str] = None):
+        """Markdown 形式で保存"""
+        if not filename:
+            filename = f"antigravity_export_{datetime.now().strftime('%Y%m%d_%H%M%S')}.md"
+        
+        filepath = self.output_dir / filename
+        
+        with open(filepath, 'w', encoding='utf-8') as f:
+            f.write("# Antigravity IDE チャット履歴\n\n")
+            f.write(f"- **エクスポート日時**: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
+            f.write(f"- **会話数**: {len(self.chats)}\n")
+            f.write(f"- **総メッセージ数**: {sum(c['message_count'] for c in self.chats)}\n\n")
+            f.write("---\n\n")
+            
+            for chat in self.chats:
+                f.write(f"## {chat['title']}\n\n")
+                f.write(f"- **ID**: `{chat['id']}`\n")
+                f.write(f"- **メッセージ数**: {chat['message_count']}\n\n")
+                
+                for msg in chat['messages']:
+                    role_label = "👤 **User**" if msg['role'] == 'user' else "🤖 **Claude**"
+                    f.write(f"### {role_label}\n\n")
+                    f.write(f"{msg['content']}\n\n")
+                
+                f.write("---\n\n")
+        
+        print(f"[✓] Saved: {filepath}")
+        return filepath
+    
+    def save_json(self, filename: Optional[str] = None):
+        """JSON 形式で保存"""
+        if not filename:
+            filename = f"antigravity_export_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
+        
+        filepath = self.output_dir / filename
+        
+        with open(filepath, 'w', encoding='utf-8') as f:
+            json.dump(self.chats, f, ensure_ascii=False, indent=2)
+        
+        print(f"[✓] Saved: {filepath}")
+        return filepath
+    
+    def save_individual(self):
+        """各会話を個別ファイルとして保存"""
+        for chat in self.chats:
+            # ファイル名をサニタイズ
+            safe_title = re.sub(r'[<>:"/\\|?*]', '_', chat['title'])[:50]
+            date_prefix = datetime.now().strftime('%Y-%m-%d')
+            id_prefix = chat['id'][:8] if chat['id'] else 'noname'
+            
+            filename = f"{date_prefix}_{id_prefix}_{safe_title}.md"
+            filepath = self.output_dir / filename
+            
+            with open(filepath, 'w', encoding='utf-8') as f:
+                f.write(f"# {chat['title']}\n\n")
+                f.write(f"- **ID**: `{chat['id']}`\n")
+                f.write(f"- **エクスポート日時**: {chat['exported_at']}\n\n")
+                f.write("---\n\n")
+                
+                for msg in chat['messages']:
+                    role_label = "## 👤 User" if msg['role'] == 'user' else "## 🤖 Claude"
+                    f.write(f"{role_label}\n\n")
+                    f.write(f"{msg['content']}\n\n")
+            
+            print(f"  → {filepath.name}")
+    
+    async def close(self):
+        """リソースを解放"""
+        if self.browser:
+            await self.browser.close()
+        if hasattr(self, 'playwright'):
+            await self.playwright.stop()
+
+
+# ============================================================================
+# メイン
+# ============================================================================
+
+async def main():
+    parser = argparse.ArgumentParser(
+        description="Antigravity IDE チャット履歴エクスポート"
+    )
+    parser.add_argument(
+        '--output', '-o',
+        type=Path,
+        default=DEFAULT_OUTPUT_DIR,
+        help=f"出力ディレクトリ (default: {DEFAULT_OUTPUT_DIR})"
+    )
+    parser.add_argument(
+        '--format', '-f',
+        choices=['md', 'json', 'both', 'individual'],
+        default='individual',
+        help="出力形式 (default: individual)"
+    )
+    
+    args = parser.parse_args()
+    
+    exporter = AntigravityChatExporter(output_dir=args.output)
+    
+    try:
+        await exporter.export_all()
+        
+        if not exporter.chats:
+            print("[!] No chats exported")
+            return 1
+        
+        if args.format == 'md':
+            exporter.save_markdown()
+        elif args.format == 'json':
+            exporter.save_json()
+        elif args.format == 'both':
+            exporter.save_markdown()
+            exporter.save_json()
+        elif args.format == 'individual':
+            exporter.save_individual()
+        
+        print(f"\n[✓] Export complete: {len(exporter.chats)} conversations")
+        return 0
+        
+    except Exception as e:
+        print(f"[✗] Error: {e}")
+        import traceback
+        traceback.print_exc()
+        return 1
+
+
+if __name__ == "__main__":
+    sys.exit(asyncio.run(main()))

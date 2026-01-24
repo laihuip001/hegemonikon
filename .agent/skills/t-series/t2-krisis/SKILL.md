@@ -1,17 +1,17 @@
 ---
-name: "M2 Krisis"
+name: "T2 Krisis"
 description: |
-  FEP Octave M2: 判断モジュール (I-P-F)。目標との整合性を即時判断し、優先順位を決定する。
+  FEP Octave T2: 判断モジュール (I-P-F)。目標との整合性を即時判断し、優先順位を決定する。
   **サブ機能**: モデル選択判断（model-selection-guide.md準拠）
   Use when: 
-    - M1完了後、複数タスク存在時、「どれを先に？」質問時、Eisenhower分類が必要な時
+    - T1完了後、複数タスク存在時、「どれを先に？」質問時、Eisenhower分類が必要な時
     - /plan 開始時（モデル適性チェック）
   Use when NOT: 単一タスクで優先判断不要な時、既に実行フェーズに入っている時。
-  Triggers: M4 Phronēsis (優先判断→戦略立案へ) or M6 Praxis (優先判断→即時実行へ)
+  Triggers: T4 Phronēsis (優先判断→戦略立案へ) or T6 Praxis (優先判断→即時実行へ)
   Keywords: priority, evaluation, ranking, importance, urgency, which-first, Eisenhower, model-selection.
 ---
 
-# M2: Krisis (κρίσις) — 判断
+# T2: Krisis (κρίσις) — 判断
 
 > **FEP Code:** I-P-F (Inference × Pragmatic × Fast)
 > **Hegemonikón:** 10 Krisis-H
@@ -33,8 +33,8 @@ description: |
 
 | 条件 | 内容 |
 |------|------|
-| **位置** | M1 Aisthēsis の直後に実行 |
-| **依存** | M1 からの状況認識結果が必須 |
+| **位置** | T1 Aisthēsis の直後に実行 |
+| **依存** | T1 からの状況認識結果が必須 |
 
 ---
 
@@ -44,7 +44,7 @@ description: |
 
 | 種別 | 形式 | ソース | 備考 |
 |------|------|--------|------|
-| 状況認識結果 | JSON | M1 Aisthēsis | 必須 |
+| 状況認識結果 | JSON | T1 Aisthēsis | 必須 |
 | ユーザー目標 | テキスト | セッション履歴 | 暗黙的に抽出 |
 | 制約条件 | テキスト | GEMINI.md | 自動読み込み |
 
@@ -52,10 +52,10 @@ description: |
 
 | 種別 | 形式 | 送信先 | 備考 |
 |------|------|--------|------|
-| 優先順位付きタスク | JSON | M6 Praxis | Eisenhower分類付き |
-| 緊急フラグ | Boolean | M6 Praxis | 即時対応が必要か |
-| 目標乖離度 | Float (0-1) | M8 Anamnēsis | 現状と目標の差分 |
-| 情報不足フラグ | JSON | M5 Peira | 追加情報が必要なタスク |
+| 優先順位付きタスク | JSON | T6 Praxis | Eisenhower分類付き |
+| 緊急フラグ | Boolean | T6 Praxis | 即時対応が必要か |
+| 目標乖離度 | Float (0-1) | T8 Anamnēsis | 現状と目標の差分 |
+| 情報不足フラグ | JSON | T5 Peira | 追加情報が必要なタスク |
 
 ---
 
@@ -63,7 +63,7 @@ description: |
 
 | トリガー | 条件 | 優先度 |
 |----------|------|--------|
-| M1完了 | 状況認識結果受信 | 最高 |
+| T1完了 | 状況認識結果受信 | 最高 |
 | 目標更新 | goals.yaml 変更 | 高 |
 | 手動要求 | `/review` コマンド | 中 |
 
@@ -73,7 +73,7 @@ description: |
 
 ```
 Phase 1: 入力統合
-  1. M1からの状況認識結果を受信
+  1. T1からの状況認識結果を受信
   2. 目標リストを読み込み（存在しない場合はデフォルト）
   3. 制約条件を読み込み（存在しない場合はスキップ）
 
@@ -95,7 +95,7 @@ Phase 3: 優先順位付け
 Phase 4: 出力
   9. 優先順位付きリスト生成
   10. 緊急フラグ判定
-  11. M6 Praxis, M5 Peira へ送信
+  11. T6 Praxis, T5 Peira へ送信
 ```
 
 ---
@@ -176,7 +176,7 @@ q2_protection:
 
 | ケース | 検出条件 | フォールバック動作 |
 |--------|----------|-------------------|
-| **タスクゼロ** | M1から検出タスクが0件 | "特になし" を返却、M6に進まない |
+| **タスクゼロ** | T1から検出タスクが0件 | "特になし" を返却、T6に進まない |
 | **目標推論失敗** | 履歴から目標を抽出できない | generic_goals を使用 |
 | **全タスクがQ4** | 全て緊急でも重要でもない | 最も goal_alignment が高いものを1つ提案 |
 | **期限過ぎ** | deadline < now | urgency = 1.0 (最高) + 警告フラグ |
@@ -190,7 +190,7 @@ q2_protection:
 | T1 | タスク: 「今日中にバグ修正」 | Q1, urgency=1.0, today |
 | T2 | タスク: 「来月の企画を考える」 | Q2, urgency=0.2, 2months |
 | T3 | タスク: 「メール返信」(期限なし) | Q3, urgency=0.3, week |
-| T4 | M1からタスク0件 | "特になし", M6不発動 |
+| T4 | T1からタスク0件 | "特になし", T6不発動 |
 | T5 | 目標推論失敗 | generic_goals適用、正常動作 |
 
 ---
@@ -210,10 +210,10 @@ q2_protection:
 
 | 依存 | 対象 | 関係 |
 |------|------|------|
-| **Precondition** | M1 Aisthēsis | 状況認識結果 |
-| **Postcondition** | M6 Praxis | 優先順位付きタスクを渡す |
-| **Postcondition** | M5 Peira | 情報不足タスクを渡す |
-| **Postcondition** | M8 Anamnēsis | 目標乖離度を渡す |
+| **Precondition** | T1 Aisthēsis | 状況認識結果 |
+| **Postcondition** | T6 Praxis | 優先順位付きタスクを渡す |
+| **Postcondition** | T5 Peira | 情報不足タスクを渡す |
+| **Postcondition** | T8 Anamnēsis | 目標乖離度を渡す |
 
 ---
 
@@ -271,7 +271,7 @@ q2_protection:
 
 | ID | 入力 | 期待 |
 |----|------|------|
-| M1 | 「ドキュメント整理」 | P5 → Claude |
-| M2 | 「プロトタイプのセキュリティレビュー」 | P1 → Claude |
-| M3 | 「ダッシュボードのUI設計」 | P2 → Gemini |
-| M4 | 「新機能のブレスト」 | P3 → Gemini |
+| T1 | 「ドキュメント整理」 | P5 → Claude |
+| T2 | 「プロトタイプのセキュリティレビュー」 | P1 → Claude |
+| T3 | 「ダッシュボードのUI設計」 | P2 → Gemini |
+| T4 | 「新機能のブレスト」 | P3 → Gemini |

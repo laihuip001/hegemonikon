@@ -1,14 +1,14 @@
 ---
-name: "M8 Anamnēsis"
+name: "T8 Anamnēsis"
 description: |
-  FEP Octave M8: 想起モジュール (A-P-S)。経験を保存し、価値を更新する。Vaultとの双方向連携で長期記憶を実現。
+  FEP Octave T8: 想起モジュール (A-P-S)。経験を保存し、価値を更新する。Vaultとの双方向連携で長期記憶を実現。
   Use when: /boot実行時、/sync-history実行時、セッション振り返り、パターン学習、価値更新が必要な時。
   Use when NOT: 短期タスク実行中で記録不要な時、一時的な情報のみ扱う時。
-  Triggers: M1 Aisthēsis (次セッション開始時→記憶読み込み)
+  Triggers: T1 Aisthēsis (次セッション開始時→記憶読み込み)
   Keywords: memory, learning, pattern, value, Vault, session summary, history sync.
 ---
 
-# M8: Anamnēsis (ἀνάμνησις) — 想起
+# T8: Anamnēsis (ἀνάμνησις) — 想起
 
 > **FEP Code:** A-P-S (Action × Pragmatic × Slow)
 > **Hegemonikón:** 08 Anamnēsis-L + 16 Anamnēsis-H
@@ -31,8 +31,8 @@ description: |
 
 | 条件 | 内容 |
 |------|------|
-| **位置** | Learning Loopの終端。M6→M8→M3→M4 |
-| **依存** | M6 Praxis からの実行ログ |
+| **位置** | Learning Loopの終端。T6→T8→T3→T4 |
+| **依存** | T6 Praxis からの実行ログ |
 | **外部依存** | Obsidian Vault（長期記憶ストレージ） |
 
 ---
@@ -41,7 +41,7 @@ description: |
 
 ```
 ┌─────────────────────────────────────────────────────────┐
-│                    M8 Anamnēsis                         │
+│                    T8 Anamnēsis                         │
 │  ┌─────────────────┐     ┌─────────────────┐           │
 │  │  Session Memory │ ←→ │  Vault Memory   │           │
 │  │  (Ephemeral)    │     │  (Persistent)   │           │
@@ -64,8 +64,8 @@ Session End:   Session → Vault (Sync)
 
 | 種別 | 形式 | ソース | 備考 |
 |------|------|--------|------|
-| 実行ログ | JSON | M6 Praxis | セッション内操作記録 |
-| 目標乖離度 | Float | M2 Krisis | 達成度評価 |
+| 実行ログ | JSON | T6 Praxis | セッション内操作記録 |
+| 目標乖離度 | Float | T2 Krisis | 達成度評価 |
 | フィードバック | テキスト | ユーザー | 明示的評価 |
 | 過去パターン | YAML | Vault | **セッション開始時に読み込み** |
 | 累積価値関数 | JSON | Vault | **過去の学習結果** |
@@ -75,9 +75,9 @@ Session End:   Session → Vault (Sync)
 | 種別 | 形式 | 送信先 | 備考 |
 |------|------|--------|------|
 | セッションサマリ | Markdown | Vault / ユーザー | 振り返りレポート |
-| 価値関数更新 | JSON | M4 Phronēsis / Vault | 学習結果 |
-| 新パターン | YAML | M3 Theōria / Vault | 検出した因果関係 |
-| 信頼履歴 | JSON | M6 Praxis | Trust Accumulation用 |
+| 価値関数更新 | JSON | T4 Phronēsis / Vault | 学習結果 |
+| 新パターン | YAML | T3 Theōria / Vault | 検出した因果関係 |
+| 信頼履歴 | JSON | T6 Praxis | Trust Accumulation用 |
 
 ---
 
@@ -87,7 +87,7 @@ Session End:   Session → Vault (Sync)
 |----------|------|--------|
 | セッション開始 | `/boot` 実行時 | 最高 (Load) |
 | セッション終了 | 明示的終了 or `/sync-history` | 最高 (Sync) |
-| M6 Praxis 完了 | 実行ログ受信 | 中 (Accumulate) |
+| T6 Praxis 完了 | 実行ログ受信 | 中 (Accumulate) |
 | 大きな成功/失敗 | 異常検出 | 高 (Flag) |
 
 ---
@@ -104,13 +104,13 @@ Phase 1: Vault接続
   2. 接続可能か確認
 
 Phase 2: 長期記憶読み込み
-  3. patterns.yaml を読み込み → M3 Theōria へ送信
-  4. values.json を読み込み → M4 Phronēsis へ送信
-  5. trust_history.json を読み込み → M6 Praxis へ送信
+  3. patterns.yaml を読み込み → T3 Theōria へ送信
+  4. values.json を読み込み → T4 Phronēsis へ送信
+  5. trust_history.json を読み込み → T6 Praxis へ送信
 
 Phase 3: コンテキスト復元
   6. 直近の session_summaries/ を読み込み（最新5件）
-  7. 「前回のあらすじ」として M1 Aisthēsis に提供
+  7. 「前回のあらすじ」として T1 Aisthēsis に提供
 
 Error Handling:
   - Vault アクセス不可 → 白紙状態で開始（警告表示）
@@ -120,7 +120,7 @@ Error Handling:
 ### B. During Session (Accumulate Phase)
 
 ```
-[M6 Praxis からログ受信ごと]
+[T6 Praxis からログ受信ごと]
 
 Phase 1: ログ蓄積
   1. 操作種別、成功/失敗、時刻を記録
@@ -164,10 +164,10 @@ Phase 4: Vault書き込み
 
 ```
 {Vault Root}/
-├── .hegemonikon/                    # M8 専用ディレクトリ
+├── .hegemonikon/                    # T8 専用ディレクトリ
 │   ├── patterns.yaml                # 検出パターン（累積）
 │   ├── values.json                  # 価値関数（累積）
-│   ├── trust_history.json           # 信頼履歴（M6連携）
+│   ├── trust_history.json           # 信頼履歴（T6連携）
 │   └── session_summaries/           # セッションサマリ
 │       ├── 20260119_1000.md
 │       ├── 20260118_1400.md
@@ -244,7 +244,7 @@ patterns:
 | ID | 入力 | 期待される挙動 |
 |----|------|----------------|
 | T1 | `/boot` 実行 | Vault から patterns/values 読み込み |
-| T2 | M6から成功ログ | session_delta に +0.1 加算 |
+| T2 | T6から成功ログ | session_delta に +0.1 加算 |
 | T3 | `/sync-history` 実行 | サマリ生成、Vault書き込み |
 | T4 | Vault未設定で `/boot` | 警告表示、白紙で開始 |
 | T5 | 同じ操作を3回成功 | 新パターンとして登録 |
@@ -266,11 +266,11 @@ patterns:
 
 | 依存 | 対象 | 関係 |
 |------|------|------|
-| **Precondition** | M6 Praxis | 実行ログ |
-| **Precondition** | M2 Krisis | 目標乖離度 |
-| **Postcondition** | M3 Theōria | パターン提供 |
-| **Postcondition** | M4 Phronēsis | 価値関数提供 |
-| **Postcondition** | M6 Praxis | 信頼履歴提供 |
+| **Precondition** | T6 Praxis | 実行ログ |
+| **Precondition** | T2 Krisis | 目標乖離度 |
+| **Postcondition** | T3 Theōria | パターン提供 |
+| **Postcondition** | T4 Phronēsis | 価値関数提供 |
+| **Postcondition** | T6 Praxis | 信頼履歴提供 |
 | **External** | Obsidian Vault | 永続ストレージ |
 | **Workflow** | `/boot` | Load Phase 発動 |
 | **Workflow** | `/sync-history` | Sync Phase 発動 |
@@ -282,7 +282,7 @@ patterns:
 | パラメータ | デフォルト | 説明 |
 |------------|-----------|------|
 | `vault_path` | `C:\Users\raikh\Documents\mine` | Vault ルートパス |
-| `hegemonikon_dir` | `.hegemonikon` | M8 専用ディレクトリ名 |
+| `hegemonikon_dir` | `.hegemonikon` | T8 専用ディレクトリ名 |
 | `max_patterns` | 100 | 保持する最大パターン数 |
 | `max_session_summaries` | 30 | 保持するサマリ数（約1ヶ月分） |
 | `learning_rate` | 0.2 | 価値更新の学習率 |

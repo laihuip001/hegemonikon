@@ -49,7 +49,7 @@ hegemonikon: M6-Praxis
 
 より詳しいプロトコルが必要な場合:
 
-1. **Skill経由（自動）**: `/code` 実行時に M6 Praxis が参照
+1. **Skill経由（自動）**: `/do` 実行時に M6 Praxis が参照
 2. **Workflow経由（手動）**: `/dev [protocol]` で原典を展開
 3. **原典直接参照**:
    ```

@@ -107,27 +107,39 @@
 
 ---
 
-## 6. パプ君（Perplexity）からの回答
+## 6. パプ君（Perplexity）最終レポート
 
-### 実装フェーズ提案
+### 主要発見
 
-| Phase | タスク | 検証方法 |
+**結論**: Jules での Prompt-Lang 単独統合は「技術的に困難」だが、**Claude + MCP ラッパー経由** で完全実装可能。信頼度 **95%**。
+
+### 調査結果
+
+| 層 | 調査対象 | 発見 |
 |:---|:---|:---|
-| **Alpha** | Prompt-Lang 仕様の完全読み込み | パーサー翻訳 |
-| **Beta** | Antigravity + Claude で実装 | サンプル手動テスト |
-| **Gamma** | `.gemini/` に Prompt-Lang 統合 | 自動化スクリプト |
-| **Release** | MCP 対応ツール化 | E2E テスト |
+| A層 | GitHub Issues: "Jules + DSL" | ❌ 0件 |
+| B層 | `.gemini/` の実装パターン | ✅ 508 stars テンプレート検出 |
+| C層 | Claude/Cursor での DSL 事例 | ✅✅ 20+ 実装例 |
 
-### 次のアクション
-
-1. GitHub Issues で「Jules + DSL」実装例を 5-10 件発掘
-2. `.gemini/` ファイル構造を実地調査
-3. テスト Prompt-Lang を手書きして動作確認
-
-### 検索キーワード
+### 最適アーキテクチャ
 
 ```
-site:github.com Jules DSL custom language
-site:github.com Jules "domain-specific language"
-site:github.com Antigravity IDE prompt engineering
+Antigravity IDE → Claude (Agent Mode) → MCP Communication → Prompt-Lang MCP Server
 ```
+
+### 推奨戦略
+
+1. **即座に実施**: `.mcp.json` 設定
+2. **Week 1-2**: MCP サーバー実装 (parse, validate, generate)
+3. **Week 3**: E2E テスト
+4. **Week 4**: ドキュメント・公開
+
+### 競合比較
+
+| 観点 | Jules 単独 | Claude + MCP |
+|:---|:---:|:---:|
+| 公開ドキュメント | ❌ | ✅ 充実 |
+| GitHub 実装例 | ❌ 0件 | ✅ 20+ |
+| スケーラビリティ | ⚠️ | ✅ |
+
+**結論**: Claude + MCP が圧倒的に有利。

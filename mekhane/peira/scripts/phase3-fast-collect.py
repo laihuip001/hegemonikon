@@ -127,7 +127,7 @@ def fetch_article(url, session):
         return {'url': url, 'status': 'error', 'error': str(e)}
 
 def save_article(article, batch_id):
-    """Save article to disk and update manifest."""
+    """Save article to disk."""
     post_id = article['url'].split('/')[-1]
     year = article.get('year', '0000')
     month = article.get('month', '00')
@@ -151,21 +151,6 @@ batch_id: {batch_id}
     
     with open(filepath, 'w', encoding='utf-8') as f:
         f.write(frontmatter + article.get('markdown', ''))
-    
-    # Update manifest
-    manifest_file = os.path.join(ROOT_DIR, '_index', f'manifest_fast_{batch_id}.jsonl')
-    manifest_entry = {
-        "id": post_id,
-        "url": article['url'],
-        "title": article['title'],
-        "file_path": filepath,
-        "captured_at": datetime.datetime.now().isoformat(),
-        "batch_id": batch_id,
-        "status": "success"
-    }
-    
-    with open(manifest_file, 'a', encoding='utf-8') as f:
-        f.write(json.dumps(manifest_entry, ensure_ascii=False) + '\n')
     
     return filepath
 
@@ -200,24 +185,42 @@ def main():
     success_count = 0
     error_count = 0
     
-    for i, url in enumerate(target_urls):
-        result = fetch_article(url, session)
+    manifest_file = os.path.join(ROOT_DIR, '_index', f'manifest_fast_{batch_id}.jsonl')
+    skip_file = os.path.join(ROOT_DIR, '_index', f'skipped_fast_{batch_id}.txt')
+
+    with open(manifest_file, 'a', encoding='utf-8') as manifest_f, \
+         open(skip_file, 'a', encoding='utf-8') as skip_f:
         
-        if result['status'] == 'success':
-            filepath = save_article(result, batch_id)
-            print(f"[{i+1}/{len(target_urls)}] OK: {result['title'][:40]}...")
-            success_count += 1
-        else:
-            print(f"[{i+1}/{len(target_urls)}] SKIP: {url} - {result.get('error', 'Unknown')}")
-            error_count += 1
+        for i, url in enumerate(target_urls):
+            result = fetch_article(url, session)
             
-            # Log skip
-            skip_file = os.path.join(ROOT_DIR, '_index', f'skipped_fast_{batch_id}.txt')
-            with open(skip_file, 'a', encoding='utf-8') as f:
-                f.write(f"{url}\t{result.get('error', 'Unknown')}\n")
-        
-        # Rate limiting (polite crawling)
-        time.sleep(0.5)
+            if result['status'] == 'success':
+                filepath = save_article(result, batch_id)
+
+                # Update manifest
+                post_id = result['url'].split('/')[-1]
+                manifest_entry = {
+                    "id": post_id,
+                    "url": result['url'],
+                    "title": result['title'],
+                    "file_path": filepath,
+                    "captured_at": datetime.datetime.now().isoformat(),
+                    "batch_id": batch_id,
+                    "status": "success"
+                }
+                manifest_f.write(json.dumps(manifest_entry, ensure_ascii=False) + '\n')
+
+                print(f"[{i+1}/{len(target_urls)}] OK: {result['title'][:40]}...")
+                success_count += 1
+            else:
+                print(f"[{i+1}/{len(target_urls)}] SKIP: {url} - {result.get('error', 'Unknown')}")
+                error_count += 1
+
+                # Log skip
+                skip_f.write(f"{url}\t{result.get('error', 'Unknown')}\n")
+
+            # Rate limiting (polite crawling)
+            time.sleep(0.5)
     
     print(f"\n[Fast Collect] Completed: {success_count} success, {error_count} errors")
 

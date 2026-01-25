@@ -22,6 +22,8 @@ from datetime import datetime, date, timedelta
 from typing import Optional, List, Dict, Any
 from dataclasses import dataclass, asdict
 
+from mekhane.anamnesis.vault import VaultManager
+
 # Load environment
 from dotenv import load_dotenv
 
@@ -305,13 +307,12 @@ def save_review(review: NightReview) -> Path:
 *Generated at: {review.generated_at}*
 """
     
-    with open(filepath, "w", encoding="utf-8") as f:
-        f.write(content)
+    VaultManager.write_safe(filepath, content)
     
     # Also save JSON for programmatic access
     json_path = OUTPUT_DIR / f"review_{review.date}.json"
-    with open(json_path, "w", encoding="utf-8") as f:
-        json.dump(asdict(review), f, ensure_ascii=False, indent=2)
+    json_content = json.dumps(asdict(review), ensure_ascii=False, indent=2)
+    VaultManager.write_safe(json_path, json_content)
     
     return filepath
 

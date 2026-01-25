@@ -154,7 +154,7 @@ class AntigravityChatExporter:
         DOM 構造:
         - .flex.flex-col.gap-y-3.px-4.relative がメッセージコンテナ
         - その子 div で text_len > 0 の要素がメッセージ
-        - プレースホルダー要素は text_len=0 で .bg-gray-500/10 クラスを持つ
+        - STYLE 要素の内容は TreeWalker で除外
         """
         messages = []
         
@@ -163,7 +163,6 @@ class AntigravityChatExporter:
             container = await self.page.query_selector('.flex.flex-col.gap-y-3.px-4.relative')
             
             if not container:
-                # 代替セレクタを試す
                 container = await self.page.query_selector('.flex.flex-col.gap-y-3')
             
             if not container:
@@ -173,62 +172,64 @@ class AntigravityChatExporter:
             # 直接の子要素を取得
             children = await container.query_selector_all(':scope > div')
             
-            message_index = 0
             for child in children:
                 try:
-                    # プレースホルダーをスキップ（bg-gray-500 クラスを持つ）
+                    # プレースホルダーをスキップ
                     classes = await child.get_attribute('class') or ""
                     if 'bg-gray-500' in classes:
                         continue
                     
-                    # テキスト内容を取得
-                    content = await child.text_content()
-                    if not content or len(content.strip()) < 10:
+                    # TreeWalker で STYLE 要素を除外してテキストを取得
+                    clean_text = await child.evaluate("""
+                        el => {
+                            const walker = document.createTreeWalker(
+                                el,
+                                NodeFilter.SHOW_TEXT,
+                                {
+                                    acceptNode: (node) => {
+                                        if (node.parentElement.tagName === 'STYLE') {
+                                            return NodeFilter.FILTER_REJECT;
+                                        }
+                                        return NodeFilter.FILTER_ACCEPT;
+                                    }
+                                }
+                            );
+                            let text = '';
+                            while (walker.nextNode()) {
+                                text += walker.currentNode.textContent;
+                            }
+                            return text.trim();
+                        }
+                    """)
+                    
+                    if not clean_text or len(clean_text) < 10:
                         continue
                     
-                    # CSS スタイル情報を除去（/*...*/）
-                    clean_content = content.strip()
-                    if clean_content.startswith('/*'):
-                        # CSS コメントをスキップ
-                        end_comment = clean_content.find('*/')
-                        if end_comment > 0:
-                            clean_content = clean_content[end_comment + 2:].strip()
+                    # "Thought for Xs" を除去
+                    import re
+                    clean_text = re.sub(r'^Thought for \d+s\s*', '', clean_text)
+                    clean_text = re.sub(r'^Thought for <\d+s\s*', '', clean_text)
                     
-                    # さらに CSS ルールを除去
-                    while clean_content.startswith('@media') or clean_content.startswith('.markdown'):
-                        # 次の } に続く部分を探す
-                        brace_count = 0
-                        for i, c in enumerate(clean_content):
-                            if c == '{':
-                                brace_count += 1
-                            elif c == '}':
-                                brace_count -= 1
-                                if brace_count == 0:
-                                    clean_content = clean_content[i+1:].strip()
-                                    break
-                        else:
-                            break
-                    
-                    if len(clean_content) < 10:
+                    if len(clean_text) < 10:
                         continue
                     
-                    # ロールを推測
-                    # 最初の要素は通常 Thought（Assistant）
-                    # 位置ベースの判定は難しいため、内容で判断
+                    # ロール判定
                     role = "assistant"
                     
-                    # User メッセージの特徴を探す
-                    if any(clean_content.startswith(prefix) for prefix in 
-                           ['@', '/', 'Continue', 'y', 'ok', '続けて', 'はい', 'いいえ']):
-                        # 短いコマンド的な内容は User
-                        if len(clean_content) < 500:
+                    user_patterns = ['@', '/', 'Continue', 'y', 'ok', '続けて', 'はい', 'いいえ', '実験', 'やってみ']
+                    
+                    if len(clean_text) < 300:
+                        if any(clean_text.startswith(p) for p in user_patterns):
+                            role = "user"
+                        # 日本語が多い短いメッセージは User の可能性が高い
+                        non_ascii = len([c for c in clean_text if ord(c) > 127])
+                        if non_ascii > len(clean_text) * 0.3:
                             role = "user"
                     
                     messages.append({
                         "role": role,
-                        "content": clean_content[:5000]  # 長すぎる場合は切り詰め
+                        "content": clean_text[:5000]
                     })
-                    message_index += 1
                     
                 except Exception as e:
                     continue

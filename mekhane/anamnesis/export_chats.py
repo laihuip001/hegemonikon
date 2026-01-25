@@ -223,7 +223,7 @@ class AntigravityChatExporter:
                 self.chats.append(chat_record)
                 
                 # 逐次保存 (individualモードの場合)
-                self.save_single_chat(chat_record)
+                await self.save_single_chat(chat_record)
                 
                 print(f"    → {len(messages)} messages extracted")
                 
@@ -275,8 +275,8 @@ class AntigravityChatExporter:
         print(f"[✓] Saved: {filepath}")
         return filepath
     
-    def save_single_chat(self, chat: Dict):
-        """1つの会話を保存"""
+    def _save_single_chat_sync(self, chat: Dict):
+        """Sync implementation of saving a single chat"""
         # ファイル名をサニタイズ（ASCII のみ許可）
         title = chat['title']
         # 危険な文字を削除
@@ -315,11 +315,16 @@ class AntigravityChatExporter:
             import traceback
             traceback.print_exc()
 
-    def save_individual(self):
+    async def save_single_chat(self, chat: Dict):
+        """1つの会話を保存 (非同期)"""
+        loop = asyncio.get_running_loop()
+        await loop.run_in_executor(None, self._save_single_chat_sync, chat)
+
+    async def save_individual(self):
         """（非推奨：逐次保存を使用）各会話を個別ファイルとして保存"""
         print("[*] Re-saving all chats...")
         for chat in self.chats:
-            self.save_single_chat(chat)
+            await self.save_single_chat(chat)
     
     async def close(self):
         """リソースを解放"""
@@ -369,7 +374,7 @@ async def main():
             exporter.save_markdown()
             exporter.save_json()
         elif args.format == 'individual':
-            exporter.save_individual()
+            await exporter.save_individual()
         
         print(f"\n[✓] Export complete: {len(exporter.chats)} conversations")
         return 0

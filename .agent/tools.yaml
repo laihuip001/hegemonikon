@@ -87,6 +87,27 @@ workflows:
     purpose: "検証・批評（Synedrion評議会）"
     modules: [T7]
 
+  axiom:
+    purpose: "O/T/K/X 定理群統合分析"
+    modules: [O1-O4, T1-T8, K1-K12, X-O, X-T, X-K]
+    description: "問題を本質→様態→文脈→関係の順で多層分析"
+
+  o:
+    purpose: "O-series（純粋定理）"
+    modules: [O1, O2, O3, O4]
+
+  t:
+    purpose: "T-series（拡張定理）"
+    modules: [T1-T8]
+
+  k:
+    purpose: "K-series（文脈定理）"
+    modules: [K1-K12]
+
+  x:
+    purpose: "X-series（関係層）"
+    modules: [X-O, X-T, X-K]
+
 # =============================================================================
 # Key Directories
 # =============================================================================

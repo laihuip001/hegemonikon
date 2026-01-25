@@ -29,14 +29,14 @@ O-series の純粋形式を、具体的な処理様式に展開する。
 
 | ID | 機能 | ギリシャ名 | Skill |
 |----|------|-----------|-------|
-| T1 | 知覚 | Aisthēsis | m1-aisthesis |
-| T2 | 判断 | Krisis | m2-krisis |
-| T3 | 内省 | Theōria | m3-theoria |
-| T4 | 戦略 | Phronēsis | m4-phronesis |
-| T5 | 探索 | Peira | m5-peira |
-| T6 | 実行 | Praxis | m6-praxis |
-| T7 | 検証 | Dokimē | m7-dokime |
-| T8 | 記憶 | Anamnēsis | m8-anamnesis |
+| T1 | 知覚 | Aisthēsis | t1-aisthesis |
+| T2 | 判断 | Krisis | t2-krisis |
+| T3 | 内省 | Theōria | t3-theoria |
+| T4 | 戦略 | Phronēsis | t4-phronesis |
+| T5 | 探索 | Peira | t5-peira |
+| T6 | 実行 | Praxis | t6-praxis |
+| T7 | 検証 | Dokimē | t7-dokime |
+| T8 | 記憶 | Anamnēsis | t8-anamnesis |
 
 ---
 

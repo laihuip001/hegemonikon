@@ -1,9 +1,6 @@
 #!/usr/bin/env python3
 """
-メッセージ要素詳細調査
-
-.overflow-y-auto コンテナの子要素を詳細調査し、
-個々のメッセージ要素のセレクタを特定する。
+会話を開いてからメッセージ要素を調査
 """
 
 import asyncio
@@ -33,82 +30,114 @@ async def main():
             print("[!] Agent Manager not found")
             return
         
-        print("[*] Inspecting message elements...")
-        
         lines = ["=== Message Elements Analysis ===\n"]
         
-        # 1. 会話コンテナを見つける
-        containers = await page.query_selector_all('.overflow-y-auto')
-        lines.append(f"Found {len(containers)} .overflow-y-auto containers\n")
+        # 1. まず会話ボタンを探す
+        print("[*] Looking for conversation buttons...")
+        conv_buttons = await page.query_selector_all('button.select-none')
+        lines.append(f"Found {len(conv_buttons)} buttons with class 'select-none'")
         
-        for i, container in enumerate(containers):
-            text = await container.text_content()
-            text_len = len(text) if text else 0
-            
-            # 一番大きなコンテナが会話ビュー
-            if text_len > 2000:
-                lines.append(f"\n=== Container {i}: text_len={text_len} ===")
-                classes = await container.get_attribute('class') or ""
-                lines.append(f"class='{classes}'")
-                
-                # 直接の子要素を調査
-                children = await container.query_selector_all(':scope > *')
-                lines.append(f"Direct children: {len(children)}")
-                
-                for j, child in enumerate(children):
-                    try:
-                        c_tag = await child.evaluate("el => el.tagName")
-                        c_class = await child.get_attribute('class') or ""
-                        c_text = await child.text_content()
-                        c_len = len(c_text) if c_text else 0
+        # 会話をクリックして開く
+        clicked = False
+        for btn in conv_buttons:
+            try:
+                title_el = await btn.query_selector('span[data-testid], span.truncate')
+                if title_el:
+                    title = await title_el.text_content()
+                    if title and 'Inbox' not in title and 'Start' not in title:
+                        print(f"[*] Clicking conversation: {title[:40]}")
                         
-                        # 子要素の子も確認
-                        grandchildren = await child.query_selector_all(':scope > *')
-                        
-                        lines.append(f"\n  [{j}] <{c_tag}> class='{c_class[:80]}' text_len={c_len} grandchildren={len(grandchildren)}")
-                        
-                        # テキストプレビュー
-                        if c_text:
-                            preview = c_text[:150].replace('\n', ' ')
-                            lines.append(f"      preview: {preview}")
-                        
-                        # 孫要素も調査
-                        for k, gc in enumerate(grandchildren[:5]):
-                            try:
-                                gc_tag = await gc.evaluate("el => el.tagName")
-                                gc_class = await gc.get_attribute('class') or ""
-                                gc_text = await gc.text_content()
-                                gc_len = len(gc_text) if gc_text else 0
-                                lines.append(f"        grandchild[{k}] <{gc_tag}> class='{gc_class[:50]}' text_len={gc_len}")
-                            except:
-                                pass
-                    except Exception as e:
-                        lines.append(f"  [{j}] Error: {e}")
-                
-                # このコンテナ内の特定パターンを探す
-                lines.append("\n--- Looking for message patterns ---")
-                
-                # role属性を持つ要素
-                role_elements = await container.query_selector_all('[role]')
-                lines.append(f"Elements with role attribute: {len(role_elements)}")
-                for el in role_elements[:10]:
-                    role = await el.get_attribute('role')
-                    tag = await el.evaluate("el => el.tagName")
-                    lines.append(f"  <{tag}> role='{role}'")
-                
-                # data-* 属性
-                data_elements = await container.query_selector_all('[data-testid], [data-message], [data-role]')
-                lines.append(f"\nElements with data attributes: {len(data_elements)}")
-                for el in data_elements[:10]:
-                    tag = await el.evaluate("el => el.tagName")
-                    testid = await el.get_attribute('data-testid') or ""
-                    msg = await el.get_attribute('data-message') or ""
-                    role = await el.get_attribute('data-role') or ""
-                    lines.append(f"  <{tag}> testid='{testid}' msg='{msg}' role='{role}'")
-                
-                break  # 最初の大きなコンテナのみ調査
+                        # force オプションでクリック
+                        await btn.click(force=True)
+                        await asyncio.sleep(2)  # ロード待機
+                        clicked = True
+                        lines.append(f"\nClicked: {title[:60]}")
+                        break
+            except Exception as e:
+                lines.append(f"Click error: {e}")
+                continue
         
-        # ファイルに書き込み
+        if not clicked:
+            lines.append("\n[!] Could not click any conversation")
+        
+        # 2. DOM を調査
+        print("[*] Inspecting DOM after click...")
+        
+        # 全体のHTML長さ
+        html = await page.content()
+        lines.append(f"\nTotal HTML length: {len(html)}")
+        
+        # 様々なセレクタを試す
+        selectors = [
+            '.overflow-y-auto',
+            '.overflow-auto', 
+            '.overflow-y-scroll',
+            '.prose',
+            '.markdown',
+            '[role="log"]',
+            '[role="feed"]',
+            '[class*="message"]',
+            '[class*="thread"]',
+            'main',
+            'article',
+        ]
+        
+        for sel in selectors:
+            try:
+                elements = await page.query_selector_all(sel)
+                if elements:
+                    lines.append(f"\n=== {sel}: {len(elements)} matches ===")
+                    for i, el in enumerate(elements[:3]):
+                        tag = await el.evaluate("el => el.tagName")
+                        classes = await el.get_attribute('class') or ""
+                        text = await el.text_content()
+                        lines.append(f"  [{i}] <{tag}> class='{classes[:80]}' text_len={len(text) if text else 0}")
+            except:
+                pass
+        
+        # 3. テキストが長いdivを探す（メッセージコンテナ候補）
+        lines.append("\n\n=== Large divs (text > 1000) ===")
+        all_divs = await page.query_selector_all('div')
+        large_divs = []
+        
+        for div in all_divs[:500]:
+            try:
+                text = await div.text_content()
+                if text and len(text) > 1000:
+                    classes = await div.get_attribute('class') or ""
+                    children = await div.evaluate("el => el.children.length")
+                    large_divs.append((classes, len(text), children))
+            except:
+                pass
+        
+        large_divs.sort(key=lambda x: x[1], reverse=True)
+        
+        for i, (classes, text_len, children) in enumerate(large_divs[:15]):
+            lines.append(f"[{i}] text_len={text_len}, children={children}")
+            lines.append(f"    class='{classes[:120]}'")
+        
+        # 4. data属性を持つ要素
+        lines.append("\n\n=== Elements with data-* attributes ===")
+        data_elements = await page.query_selector_all('[data-testid], [data-message-id], [data-role]')
+        lines.append(f"Found {len(data_elements)} elements")
+        
+        for i, el in enumerate(data_elements[:20]):
+            try:
+                tag = await el.evaluate("el => el.tagName")
+                testid = await el.get_attribute('data-testid') or ""
+                msg_id = await el.get_attribute('data-message-id') or ""
+                role = await el.get_attribute('data-role') or ""
+                classes = await el.get_attribute('class') or ""
+                text = await el.text_content()
+                text_preview = (text[:50] + "...") if text and len(text) > 50 else (text or "")
+                
+                lines.append(f"  [{i}] <{tag}> testid='{testid}' msg_id='{msg_id}' role='{role}'")
+                lines.append(f"       class='{classes[:60]}'")
+                lines.append(f"       text='{text_preview}'")
+            except:
+                pass
+        
+        # 書き込み
         with open(OUTPUT_FILE, 'w', encoding='utf-8') as f:
             f.write('\n'.join(lines))
         

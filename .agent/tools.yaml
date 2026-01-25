@@ -23,6 +23,14 @@ mcp:
         description: "タスクからモデル推奨（T2 Krisis）"
         usage: "@mcp:gnosis で recommend_model「タスク説明」"
 
+  prompt-lang:
+    path: mcp/prompt_lang_mcp_server.py
+    description: "Prompt-Lang v2.0 コード生成"
+    tools:
+      - name: generate
+        description: "自然言語要件からPrompt-Langコードを生成"
+        usage: "@mcp:prompt-lang で generate「要件」を実行"
+
 # =============================================================================
 # CLI Scripts
 # =============================================================================

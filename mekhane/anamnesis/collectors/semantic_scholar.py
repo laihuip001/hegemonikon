@@ -78,15 +78,34 @@ class SemanticScholarCollector(BaseCollector):
             "fields": self.PAPER_FIELDS,
         }
         
-        self._rate_limit_wait()
+        # 429 リトライ設定
+        max_retries = 3
+        retry_delay = 2.0  # 初回遅延（秒）
         
-        try:
-            response = self.session.get(url, params=params, timeout=30)
-            response.raise_for_status()
-            data = response.json()
-        except Exception as e:
-            print(f"[SemanticScholar] Search error: {e}")
-            return []
+        for attempt in range(max_retries + 1):
+            self._rate_limit_wait()
+            
+            try:
+                response = self.session.get(url, params=params, timeout=30)
+                
+                # 429 の場合はリトライ
+                if response.status_code == 429:
+                    if attempt < max_retries:
+                        wait_time = retry_delay * (2 ** attempt)  # 指数バックオフ
+                        print(f"[SemanticScholar] Rate limited, waiting {wait_time}s (attempt {attempt + 1}/{max_retries})")
+                        time.sleep(wait_time)
+                        continue
+                    else:
+                        print(f"[SemanticScholar] Rate limit exceeded after {max_retries} retries")
+                        return []
+                
+                response.raise_for_status()
+                data = response.json()
+                break
+                
+            except Exception as e:
+                print(f"[SemanticScholar] Search error: {e}")
+                return []
         
         papers = []
         for item in data.get("data", []):

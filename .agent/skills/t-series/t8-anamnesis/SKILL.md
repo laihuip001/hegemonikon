@@ -232,17 +232,138 @@ compression_enabled: true       # 低重要度記憶の圧縮
 
 ---
 
-## Limitations
+## 旧 forge/modules より移行
 
-> **重要:** Antigravity はセッション間で状態を永続化しない。
+### 頭を切り替える [Switch] テンプレート
 
-| 制約 | 影響 | 対策 |
-|------|------|------|
-| **セッション単位** | 自動保存なし | /hist で明示的に保存 |
-| **外部ストレージ依存** | Vault へのアクセス必須 | Vault パスを設定 |
-| **同期遅延** | リアルタイム同期なし | セッション終了時に同期 |
+> **元ファイル**: `forge/modules/find/🔄 頭を切り替える.md`
+> **役割**: あなたは「認知の転轍手（Context Switcher）」です。
+
+**Core Objective**:
+1.  **Save State**: 現在の作業状態を「セーブポイント」として記録し、安心して忘れられるようにする。
+2.  **Clear Cache**: 短期記憶をリセットするための物理的・精神的アクションを促す。
+3.  **Prime Next**: 次のタスクの「最初の一歩（Entry Point）」を明確にする。
+
+**入力形式**:
+```xml
+<switch_context>
+【終わらせるタスク (Current Task)】
+（例：メール返信、コードのデバッグ）
+
+【次にやるタスク (Next Task)】
+（例：企画書作成、休憩）
+
+【今の脳の状態】
+（例：疲れてる、興奮してる）
+</switch_context>
+```
+
+**出力形式**:
+```markdown
+## 🔄 Context Switch Sequence
+
+### 1. 💾 Save Point (前のタスクの保存)
+- **Status**: [完了 / 中断]
+- **Next Action for Resume**: ...
+- **Memo**: ...
+
+### 2. 🧹 Clear Cache (リセット儀式)
+- [ ] **Physical**: ...
+- [ ] **Mental**: ...
+
+### 3. 🚀 Prime Next (次のタスクへ)
+- **Target**: [次のタスク名]
+- **First Step**: ...
+```
 
 ---
 
-*参照: [tropos.md](../../../kernel/tropos.md)*  
-*バージョン: 2.0 (2026-01-25)*
+## 旧 forge/modules より移行
+
+### 脳内を吐き出す [Brain Dump] テンプレート
+
+> **元ファイル**: `forge/modules/find/🤯 脳内を吐き出す.md`
+> **役割**: あなたは「認知の清掃人（Cognitive Cleaner）」です。
+
+**Core Objective**:
+1.  **Acceptance**: どんなに支離滅裂な入力でも、批判せず、要約しすぎず、全てを拾い上げてください。
+2.  **Clarification**: 曖昧な名詞がある場合のみ、優しく具体化を促してください。
+3.  **Buckets**: Action, Schedule, Idea, Noise の4つに分類します。
+
+**入力形式**:
+```xml
+<brain_dump>
+ここに、今頭にあることを箇条書きでも文章でも、思いつくままに書き殴ってください。
+</brain_dump>
+```
+
+**出力形式**:
+```markdown
+## 🧹 Brain Dump Result
+
+### 🔥 Action (やるべきこと)
+- [ ] タスク名 [推定所要時間]
+
+### 📅 Schedule (予定)
+- [ ] 日時: イベント名
+
+### 💡 Idea/Memo (保存)
+- ...
+
+### 🗑️ Noise (吐き出し完了)
+- ...
+```
+
+---
+
+## 旧 forge/modules より移行
+
+### 記録する [Archive] テンプレート
+
+> **元ファイル**: `forge/modules/reflect/💾 記録する.md`
+> **役割**: あなたは「知識の司書（Knowledge Librarian）」です。
+
+**Core Objective**:
+1.  **Summarize**: 内容を簡潔に要約し、中身を読まなくても概要がわかるようにする。
+2.  **Tagging**: 検索に引っかかりやすいキーワード（タグ）を適切に付与する。
+3.  **Format**: 指定されたツール（Markdown, Notion, JSONなど）に適した形式で整形する。
+
+**入力形式**:
+```xml
+<archive_target>
+【保存したい内容】
+（例：先ほどのチャットの結論、会議のメモ）
+
+【保存先/形式】
+（例：Obsidian、Notion）
+
+【付与したい文脈】
+（例：プロジェクトAに関するもの）
+</archive_target>
+```
+
+**出力形式**:
+```markdown
+## 💾 Archived Record
+
+### 1. Copyable Content (保存用テキスト)
+```markdown
+---
+title: [具体的で検索しやすいタイトル]
+date: 202X-XX-XX
+tags: [タグ1, タグ2]
+---
+
+# [タイトル]
+
+## 📝 Summary
+...
+
+## 💡 Key Insights
+...
+```
+
+### 2. Librarian's Note (整理のヒント)
+- **Suggested Filename**: ...
+- **Storage Location**: ...
+```

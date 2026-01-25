@@ -20,6 +20,12 @@ Hegemonikón Phase 1 のブートシーケンス。
    ```
    > **目的**: Mドライブ（Git管理）を正本とし、Antigravityが読み込むCドライブに反映。
 
+0.5. **前回Handoff読み込み**: 前回セッションの引き継ぎ情報を読み込み
+   - 対象: `M:\Brain\.hegemonikon\sessions\handoff_*.md` の最新ファイル
+   - 存在する場合: 内容を表示し、「前回の続きから開始」を提案
+   - 存在しない場合: スキップ
+   > **対応ワークフロー**: `/bye` で生成されたHandoff
+
 1. **プロファイル読込**: `GEMINI.md` を確認し、Hegemonikón Doctrine が有効であることを確認
 
 2. **コアモジュール有効化**:

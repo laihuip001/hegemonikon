@@ -72,15 +72,23 @@ class AntigravityChatExporter:
                 return False
             
             # jetski-agent.html (Agent Manager) を探す
+            # 複数ある場合は button.select-none が最も多いページを選択
             self.page = None
+            agent_pages = []
+            
             for ctx in contexts:
                 for page in ctx.pages:
                     if 'jetski-agent' in page.url:
-                        self.page = page
-                        print(f"[✓] Found Agent Manager: {page.url}")
-                        break
-                if self.page:
-                    break
+                        # 会話ボタンの数をカウント
+                        buttons = await page.query_selector_all('button.select-none')
+                        agent_pages.append((page, len(buttons)))
+                        print(f"[*] Found jetski-agent page: {len(buttons)} buttons")
+            
+            if agent_pages:
+                # ボタン数が最も多いページを選択
+                agent_pages.sort(key=lambda x: x[1], reverse=True)
+                self.page = agent_pages[0][0]
+                print(f"[✓] Selected Agent Manager: {self.page.url} ({agent_pages[0][1]} buttons)")
             
             if not self.page:
                 # fallback: 最初のページ
@@ -141,49 +149,94 @@ class AntigravityChatExporter:
             return []
     
     async def extract_messages(self) -> List[Dict]:
-        """現在表示されている会話のメッセージを抽出"""
+        """現在表示されている会話のメッセージを抽出
+        
+        DOM 構造:
+        - .flex.flex-col.gap-y-3.px-4.relative がメッセージコンテナ
+        - その子 div で text_len > 0 の要素がメッセージ
+        - プレースホルダー要素は text_len=0 で .bg-gray-500/10 クラスを持つ
+        """
         messages = []
         
         try:
-            # メッセージコンテナを待機
-            await self.page.wait_for_selector(
-                '[data-testid="message"], .message, [role="log"] > div',
-                timeout=3000
-            )
+            # メッセージコンテナを探す
+            container = await self.page.query_selector('.flex.flex-col.gap-y-3.px-4.relative')
             
-            # メッセージ要素を取得
-            msg_elements = await self.page.query_selector_all(
-                '[data-testid="message"], .message, [role="log"] > div'
-            )
+            if not container:
+                # 代替セレクタを試す
+                container = await self.page.query_selector('.flex.flex-col.gap-y-3')
             
-            for msg_el in msg_elements:
+            if not container:
+                print("    [!] Message container not found")
+                return []
+            
+            # 直接の子要素を取得
+            children = await container.query_selector_all(':scope > div')
+            
+            message_index = 0
+            for child in children:
                 try:
-                    # ロールを判定
+                    # プレースホルダーをスキップ（bg-gray-500 クラスを持つ）
+                    classes = await child.get_attribute('class') or ""
+                    if 'bg-gray-500' in classes:
+                        continue
+                    
+                    # テキスト内容を取得
+                    content = await child.text_content()
+                    if not content or len(content.strip()) < 10:
+                        continue
+                    
+                    # CSS スタイル情報を除去（/*...*/）
+                    clean_content = content.strip()
+                    if clean_content.startswith('/*'):
+                        # CSS コメントをスキップ
+                        end_comment = clean_content.find('*/')
+                        if end_comment > 0:
+                            clean_content = clean_content[end_comment + 2:].strip()
+                    
+                    # さらに CSS ルールを除去
+                    while clean_content.startswith('@media') or clean_content.startswith('.markdown'):
+                        # 次の } に続く部分を探す
+                        brace_count = 0
+                        for i, c in enumerate(clean_content):
+                            if c == '{':
+                                brace_count += 1
+                            elif c == '}':
+                                brace_count -= 1
+                                if brace_count == 0:
+                                    clean_content = clean_content[i+1:].strip()
+                                    break
+                        else:
+                            break
+                    
+                    if len(clean_content) < 10:
+                        continue
+                    
+                    # ロールを推測
+                    # 最初の要素は通常 Thought（Assistant）
+                    # 位置ベースの判定は難しいため、内容で判断
                     role = "assistant"
-                    role_attr = await msg_el.get_attribute('data-role')
-                    classes = await msg_el.get_attribute('class') or ""
                     
-                    if role_attr:
-                        role = role_attr
-                    elif 'user' in classes.lower():
-                        role = "user"
-                    elif 'human' in classes.lower():
-                        role = "user"
+                    # User メッセージの特徴を探す
+                    if any(clean_content.startswith(prefix) for prefix in 
+                           ['@', '/', 'Continue', 'y', 'ok', '続けて', 'はい', 'いいえ']):
+                        # 短いコマンド的な内容は User
+                        if len(clean_content) < 500:
+                            role = "user"
                     
-                    # コンテンツを取得
-                    content = await msg_el.text_content()
-                    if content and content.strip():
-                        messages.append({
-                            "role": role,
-                            "content": content.strip()
-                        })
+                    messages.append({
+                        "role": role,
+                        "content": clean_content[:5000]  # 長すぎる場合は切り詰め
+                    })
+                    message_index += 1
+                    
                 except Exception as e:
                     continue
             
             return messages
             
         except Exception as e:
-            print(f"[!] Error extracting messages: {e}")
+            print(f"    [!] Error extracting messages: {e}")
             return []
     
     async def export_all(self):

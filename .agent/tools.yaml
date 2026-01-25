@@ -79,6 +79,8 @@ workflows:
     purpose: "深い熟考（壁にぶつかった時）"
     modules: [T3, T7]
     includes: "Step 3.5 T3 自問"
+    options:
+      - "/think deep: /think + /ax 統合の最深層熟考"
 
   why:
     purpose: "T3 自問（目的と手段の入れ替わり防止）"
@@ -93,7 +95,7 @@ workflows:
     purpose: "検証・批評（Synedrion評議会）"
     modules: [T7]
 
-  axiom:
+  ax:
     purpose: "O/T/K/X 定理群統合分析"
     modules: [O1-O4, T1-T8, K1-K12, X-O, X-T, X-K]
     description: "問題を本質→様態→文脈→関係の順で多層分析"

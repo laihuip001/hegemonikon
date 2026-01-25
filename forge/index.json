@@ -1,0 +1,1874 @@
+﻿{
+    "stats":  {
+                  "categories":  9,
+                  "totalModules":  120,
+                  "phases":  {
+                                 "think":  20,
+                                 "act":  12,
+                                 "find":  5,
+                                 "system":  25,
+                                 "reflect":  5,
+                                 "reference":  53
+                             }
+              },
+    "version":  "2.0",
+    "generated":  "2026-01-15T11:15:29+09:00",
+    "modules":  [
+                    {
+                        "size":  4099,
+                        "id":  "___演じる",
+                        "path":  "modules\\act\\prepare/🎭 演じる.md",
+                        "category":  "prepare",
+                        "name":  "🎭 演じる",
+                        "description":  "あなたは「演技指導の鬼コーチ（Acting Coach）」兼「シミュレーター」です。\r",
+                        "phase":  "act",
+                        "metadata":  {
+                                         "wordCount":  190,
+                                         "hasInstruction":  false,
+                                         "hasOutputFormat":  false,
+                                         "hasExample":  true
+                                     }
+                    },
+                    {
+                        "size":  4364,
+                        "id":  "___クエスト化する",
+                        "path":  "modules\\act\\prepare/🎮 クエスト化する.md",
+                        "category":  "prepare",
+                        "name":  "🎮 クエスト化する",
+                        "description":  "あなたは「人生ゲームのダンジョンマスター（Game Master）」です。\r",
+                        "phase":  "act",
+                        "metadata":  {
+                                         "wordCount":  240,
+                                         "hasInstruction":  false,
+                                         "hasOutputFormat":  false,
+                                         "hasExample":  true
+                                     }
+                    },
+                    {
+                        "size":  4102,
+                        "id":  "__️_環境をデザインする",
+                        "path":  "modules\\act\\prepare/🏟️ 環境をデザインする.md",
+                        "category":  "prepare",
+                        "name":  "🏟️ 環境をデザインする",
+                        "description":  "あなたは「行動建築家（Behavioral Architect）」です。\r",
+                        "phase":  "act",
+                        "metadata":  {
+                                         "wordCount":  216,
+                                         "hasInstruction":  false,
+                                         "hasOutputFormat":  false,
+                                         "hasExample":  true
+                                     }
+                    },
+                    {
+                        "size":  4446,
+                        "id":  "___断る",
+                        "path":  "modules\\act\\prepare/🙅 断る.md",
+                        "category":  "prepare",
+                        "name":  "🙅 断る",
+                        "description":  "あなたは「高潔な外交官（Diplomatic Guardian）」です。\r",
+                        "phase":  "act",
+                        "metadata":  {
+                                         "wordCount":  188,
+                                         "hasInstruction":  false,
+                                         "hasOutputFormat":  false,
+                                         "hasExample":  true
+                                     }
+                    },
+                    {
+                        "size":  4406,
+                        "id":  "___任せる",
+                        "path":  "modules\\act\\prepare/🤝 任せる.md",
+                        "category":  "prepare",
+                        "name":  "🤝 任せる",
+                        "description":  "あなたは「優秀な司令官（Commander）」です。\r",
+                        "phase":  "act",
+                        "metadata":  {
+                                         "wordCount":  226,
+                                         "hasInstruction":  false,
+                                         "hasOutputFormat":  false,
+                                         "hasExample":  true
+                                     }
+                    },
+                    {
+                        "size":  3688,
+                        "id":  "__品質を確かめる",
+                        "path":  "modules\\reflect/✨ 品質を確かめる.md",
+                        "category":  "reflect",
+                        "name":  "✨ 品質を確かめる",
+                        "description":  "あなたは「冷徹な品質管理官（Quality Assurance Officer）」です。\r",
+                        "phase":  "reflect",
+                        "metadata":  {
+                                         "wordCount":  209,
+                                         "hasInstruction":  false,
+                                         "hasOutputFormat":  false,
+                                         "hasExample":  true
+                                     }
+                    },
+                    {
+                        "size":  4323,
+                        "id":  "__️_賢人に聞く",
+                        "path":  "modules\\reflect/🏛️ 賢人に聞く.md",
+                        "category":  "reflect",
+                        "name":  "🏛️ 賢人に聞く",
+                        "description":  "あなたは「時空を超えた諮問委員会（Universal Board of Advisors）」の議長です。\r",
+                        "phase":  "reflect",
+                        "metadata":  {
+                                         "wordCount":  173,
+                                         "hasInstruction":  false,
+                                         "hasOutputFormat":  false,
+                                         "hasExample":  true
+                                     }
+                    },
+                    {
+                        "size":  4174,
+                        "id":  "___記録する",
+                        "path":  "modules\\reflect/💾 記録する.md",
+                        "category":  "reflect",
+                        "name":  "💾 記録する",
+                        "description":  "あなたは「知識の司書（Knowledge Librarian）」です。\r",
+                        "phase":  "reflect",
+                        "metadata":  {
+                                         "wordCount":  205,
+                                         "hasInstruction":  false,
+                                         "hasOutputFormat":  false,
+                                         "hasExample":  true
+                                     }
+                    },
+                    {
+                        "size":  4035,
+                        "id":  "___経験を振り返る",
+                        "path":  "modules\\reflect/📖 経験を振り返る.md",
+                        "category":  "reflect",
+                        "name":  "📖 経験を振り返る",
+                        "description":  "あなたは「学習のファシリテーター（Chief Learning Officer）」です。\r",
+                        "phase":  "reflect",
+                        "metadata":  {
+                                         "wordCount":  226,
+                                         "hasInstruction":  false,
+                                         "hasOutputFormat":  false,
+                                         "hasExample":  true
+                                     }
+                    },
+                    {
+                        "size":  4362,
+                        "id":  "___改善案を出す",
+                        "path":  "modules\\reflect/🔧 改善案を出す.md",
+                        "category":  "reflect",
+                        "name":  "🔧 改善案を出す",
+                        "description":  "あなたは「熟練の改善コンサルタント（Kaizen Consultant）」です。\r",
+                        "phase":  "reflect",
+                        "metadata":  {
+                                         "wordCount":  195,
+                                         "hasInstruction":  false,
+                                         "hasOutputFormat":  false,
+                                         "hasExample":  true
+                                     }
+                    },
+                    {
+                        "size":  3629,
+                        "id":  "_️_選択肢を比較する",
+                        "path":  "modules\\think\\focus/⚖️ 選択肢を比較する.md",
+                        "category":  "focus",
+                        "name":  "⚖️ 選択肢を比較する",
+                        "description":  "あなたは「公平な裁判官（Impartial Judge）」です。\r",
+                        "phase":  "think",
+                        "metadata":  {
+                                         "wordCount":  262,
+                                         "hasInstruction":  false,
+                                         "hasOutputFormat":  false,
+                                         "hasExample":  true
+                                     }
+                    },
+                    {
+                        "size":  4189,
+                        "id":  "_️_リスクを見積もる",
+                        "path":  "modules\\think\\focus/⚠️ リスクを見積もる.md",
+                        "category":  "focus",
+                        "name":  "⚠️ リスクを見積もる",
+                        "description":  "あなたは「慎重な危機管理官（Risk Manager）」です。\r",
+                        "phase":  "think",
+                        "metadata":  {
+                                         "wordCount":  260,
+                                         "hasInstruction":  false,
+                                         "hasOutputFormat":  false,
+                                         "hasExample":  true
+                                     }
+                    },
+                    {
+                        "size":  4557,
+                        "id":  "_️_ボトルネックを突く",
+                        "path":  "modules\\think\\focus/⛓️ ボトルネックを突く.md",
+                        "category":  "focus",
+                        "name":  "⛓️ ボトルネックを突く",
+                        "description":  "あなたは「制約理論のコンサルタント（TOC Consultant）」です。\r",
+                        "phase":  "think",
+                        "metadata":  {
+                                         "wordCount":  211,
+                                         "hasInstruction":  false,
+                                         "hasOutputFormat":  false,
+                                         "hasExample":  true
+                                     }
+                    },
+                    {
+                        "size":  4259,
+                        "id":  "__決断を下す",
+                        "path":  "modules\\think\\focus/✅ 決断を下す.md",
+                        "category":  "focus",
+                        "name":  "✅ 決断を下す",
+                        "description":  "あなたは「背中を押す賢者（Decisive Sage）」です。\r",
+                        "phase":  "think",
+                        "metadata":  {
+                                         "wordCount":  222,
+                                         "hasInstruction":  false,
+                                         "hasOutputFormat":  false,
+                                         "hasExample":  true
+                                     }
+                    },
+                    {
+                        "size":  3842,
+                        "id":  "___計画を立てる",
+                        "path":  "modules\\think\\focus/📋 計画を立てる.md",
+                        "category":  "focus",
+                        "name":  "📋 計画を立てる",
+                        "description":  "あなたは「熟練のプロジェクトマネージャー（Project Architect）」です。\r",
+                        "phase":  "think",
+                        "metadata":  {
+                                         "wordCount":  225,
+                                         "hasInstruction":  false,
+                                         "hasOutputFormat":  false,
+                                         "hasExample":  true
+                                     }
+                    },
+                    {
+                        "size":  3821,
+                        "id":  "___優先順位をつける",
+                        "path":  "modules\\think\\focus/🔢 優先順位をつける.md",
+                        "category":  "focus",
+                        "name":  "🔢 優先順位をつける",
+                        "description":  "あなたは「冷徹なトリアージ・ナース（Triage Nurse）」です。\r",
+                        "phase":  "think",
+                        "metadata":  {
+                                         "wordCount":  218,
+                                         "hasInstruction":  false,
+                                         "hasOutputFormat":  false,
+                                         "hasExample":  true
+                                     }
+                    },
+                    {
+                        "size":  4086,
+                        "id":  "___本質だけ残す",
+                        "path":  "modules\\think\\focus/🔪 本質だけ残す.md",
+                        "category":  "focus",
+                        "name":  "🔪 本質だけ残す",
+                        "description":  "あなたは「本質の彫刻家（Essentialist Sculptor）」です。\r",
+                        "phase":  "think",
+                        "metadata":  {
+                                         "wordCount":  207,
+                                         "hasInstruction":  false,
+                                         "hasOutputFormat":  false,
+                                         "hasExample":  true
+                                     }
+                    },
+                    {
+                        "size":  4013,
+                        "id":  "___未来を分岐させる",
+                        "path":  "modules\\think\\focus/🔮 未来を分岐させる.md",
+                        "category":  "focus",
+                        "name":  "🔮 未来を分岐させる",
+                        "description":  "あなたは「多次元の観測者（Multiverse Observer）」です。\r",
+                        "phase":  "think",
+                        "metadata":  {
+                                         "wordCount":  221,
+                                         "hasInstruction":  false,
+                                         "hasOutputFormat":  false,
+                                         "hasExample":  true
+                                     }
+                    },
+                    {
+                        "size":  4524,
+                        "id":  "__️_やめる決断をする",
+                        "path":  "modules\\think\\focus/🗑️ やめる決断をする.md",
+                        "category":  "focus",
+                        "name":  "🗑️ やめる決断をする",
+                        "description":  "あなたは「損切りのプロフェッショナル（Exit Strategist）」です。\r",
+                        "phase":  "think",
+                        "metadata":  {
+                                         "wordCount":  218,
+                                         "hasInstruction":  false,
+                                         "hasOutputFormat":  false,
+                                         "hasExample":  true
+                                     }
+                    },
+                    {
+                        "size":  4179,
+                        "id":  "___テコを見つける",
+                        "path":  "modules\\think\\focus/🚀 テコを見つける.md",
+                        "category":  "focus",
+                        "name":  "🚀 テコを見つける",
+                        "description":  "あなたは「レバレッジの達人（Archimedes Strategist）」です。\r",
+                        "phase":  "think",
+                        "metadata":  {
+                                         "wordCount":  210,
+                                         "hasInstruction":  false,
+                                         "hasOutputFormat":  false,
+                                         "hasExample":  true
+                                     }
+                    },
+                    {
+                        "size":  4372,
+                        "id":  "__️_悪魔の代弁をする",
+                        "path":  "modules\\think\\focus/🛡️ 悪魔の代弁をする.md",
+                        "category":  "focus",
+                        "name":  "🛡️ 悪魔の代弁をする",
+                        "description":  "あなたは「容赦ない批判者（The Devil\u0027s Advocate）」です。\r",
+                        "phase":  "think",
+                        "metadata":  {
+                                         "wordCount":  215,
+                                         "hasInstruction":  false,
+                                         "hasOutputFormat":  false,
+                                         "hasExample":  true
+                                     }
+                    },
+                    {
+                        "size":  7587,
+                        "id":  "antigravity-claude-opus-integration-2026",
+                        "path":  "knowledge/antigravity-claude-opus-integration-2026.md",
+                        "category":  "knowledge",
+                        "name":  "antigravity-claude-opus-integration-2026",
+                        "description":  "",
+                        "phase":  "reference",
+                        "metadata":  {
+                                         "wordCount":  485,
+                                         "hasInstruction":  false,
+                                         "hasOutputFormat":  false,
+                                         "hasExample":  true
+                                     }
+                    },
+                    {
+                        "size":  12547,
+                        "id":  "antigravity-exec-ecosystem-2026",
+                        "path":  "knowledge/antigravity-exec-ecosystem-2026.md",
+                        "category":  "knowledge",
+                        "name":  "antigravity-exec-ecosystem-2026",
+                        "description":  "",
+                        "phase":  "reference",
+                        "metadata":  {
+                                         "wordCount":  720,
+                                         "hasInstruction":  false,
+                                         "hasOutputFormat":  false,
+                                         "hasExample":  true
+                                     }
+                    },
+                    {
+                        "size":  8176,
+                        "id":  "antigravity-mcp-ceo-partner-2026",
+                        "path":  "knowledge/antigravity-mcp-ceo-partner-2026.md",
+                        "category":  "knowledge",
+                        "name":  "antigravity-mcp-ceo-partner-2026",
+                        "description":  "",
+                        "phase":  "reference",
+                        "metadata":  {
+                                         "wordCount":  477,
+                                         "hasInstruction":  false,
+                                         "hasOutputFormat":  true,
+                                         "hasExample":  true
+                                     }
+                    },
+                    {
+                        "size":  7227,
+                        "id":  "antigravity-noncoding-econ-analysis-2026",
+                        "path":  "knowledge/antigravity-noncoding-econ-analysis-2026.md",
+                        "category":  "knowledge",
+                        "name":  "antigravity-noncoding-econ-analysis-2026",
+                        "description":  "",
+                        "phase":  "reference",
+                        "metadata":  {
+                                         "wordCount":  435,
+                                         "hasInstruction":  false,
+                                         "hasOutputFormat":  false,
+                                         "hasExample":  true
+                                     }
+                    },
+                    {
+                        "size":  10208,
+                        "id":  "antigravity-tech-report-2026-comprehensive",
+                        "path":  "knowledge/antigravity-tech-report-2026-comprehensive.md",
+                        "category":  "knowledge",
+                        "name":  "antigravity-tech-report-2026-comprehensive",
+                        "description":  "",
+                        "phase":  "reference",
+                        "metadata":  {
+                                         "wordCount":  500,
+                                         "hasInstruction":  false,
+                                         "hasOutputFormat":  false,
+                                         "hasExample":  true
+                                     }
+                    },
+                    {
+                        "size":  8137,
+                        "id":  "antigravity-vibe-coding-mobile-multimodal-2026",
+                        "path":  "knowledge/antigravity-vibe-coding-mobile-multimodal-2026.md",
+                        "category":  "knowledge",
+                        "name":  "antigravity-vibe-coding-mobile-multimodal-2026",
+                        "description":  "",
+                        "phase":  "reference",
+                        "metadata":  {
+                                         "wordCount":  435,
+                                         "hasInstruction":  false,
+                                         "hasOutputFormat":  false,
+                                         "hasExample":  true
+                                     }
+                    },
+                    {
+                        "size":  8130,
+                        "id":  "antigravity-vibe-mobile-multimodal-2026",
+                        "path":  "knowledge/antigravity-vibe-mobile-multimodal-2026.md",
+                        "category":  "knowledge",
+                        "name":  "antigravity-vibe-mobile-multimodal-2026",
+                        "description":  "",
+                        "phase":  "reference",
+                        "metadata":  {
+                                         "wordCount":  435,
+                                         "hasInstruction":  false,
+                                         "hasOutputFormat":  false,
+                                         "hasExample":  true
+                                     }
+                    },
+                    {
+                        "size":  10323,
+                        "id":  "AuDHD_KB",
+                        "path":  "knowledge/AuDHD KB.md",
+                        "category":  "knowledge",
+                        "name":  "AuDHD KB",
+                        "description":  "",
+                        "phase":  "reference",
+                        "metadata":  {
+                                         "wordCount":  729,
+                                         "hasInstruction":  false,
+                                         "hasOutputFormat":  false,
+                                         "hasExample":  false
+                                     }
+                    },
+                    {
+                        "size":  6694,
+                        "id":  "claude-fewshot-xml-metaprompt-2026",
+                        "path":  "knowledge/claude-fewshot-xml-metaprompt-2026.md",
+                        "category":  "knowledge",
+                        "name":  "claude-fewshot-xml-metaprompt-2026",
+                        "description":  "",
+                        "phase":  "reference",
+                        "metadata":  {
+                                         "wordCount":  276,
+                                         "hasInstruction":  false,
+                                         "hasOutputFormat":  true,
+                                         "hasExample":  true
+                                     }
+                    },
+                    {
+                        "size":  5889,
+                        "id":  "claude-native-pe-system-rev3-2026",
+                        "path":  "knowledge/claude-native-pe-system-rev3-2026.md",
+                        "category":  "knowledge",
+                        "name":  "claude-native-pe-system-rev3-2026",
+                        "description":  "",
+                        "phase":  "reference",
+                        "metadata":  {
+                                         "wordCount":  364,
+                                         "hasInstruction":  false,
+                                         "hasOutputFormat":  true,
+                                         "hasExample":  true
+                                     }
+                    },
+                    {
+                        "size":  7625,
+                        "id":  "claude-xml-attention-mechanisms-2026",
+                        "path":  "knowledge/claude-xml-attention-mechanisms-2026.md",
+                        "category":  "knowledge",
+                        "name":  "claude-xml-attention-mechanisms-2026",
+                        "description":  "",
+                        "phase":  "reference",
+                        "metadata":  {
+                                         "wordCount":  372,
+                                         "hasInstruction":  false,
+                                         "hasOutputFormat":  false,
+                                         "hasExample":  true
+                                     }
+                    },
+                    {
+                        "size":  7573,
+                        "id":  "claude-xml-semantics-2026",
+                        "path":  "knowledge/claude-xml-semantics-2026.md",
+                        "category":  "knowledge",
+                        "name":  "claude-xml-semantics-2026",
+                        "description":  "",
+                        "phase":  "reference",
+                        "metadata":  {
+                                         "wordCount":  394,
+                                         "hasInstruction":  false,
+                                         "hasOutputFormat":  false,
+                                         "hasExample":  true
+                                     }
+                    },
+                    {
+                        "size":  9074,
+                        "id":  "google-antigravity-tech-analysis-2026",
+                        "path":  "knowledge/google-antigravity-tech-analysis-2026.md",
+                        "category":  "knowledge",
+                        "name":  "google-antigravity-tech-analysis-2026",
+                        "description":  "",
+                        "phase":  "reference",
+                        "metadata":  {
+                                         "wordCount":  655,
+                                         "hasInstruction":  false,
+                                         "hasOutputFormat":  false,
+                                         "hasExample":  true
+                                     }
+                    },
+                    {
+                        "size":  10106,
+                        "id":  "LLM性格診断KB",
+                        "path":  "knowledge/LLM性格診断KB.md",
+                        "category":  "knowledge",
+                        "name":  "LLM性格診断KB",
+                        "description":  "",
+                        "phase":  "reference",
+                        "metadata":  {
+                                         "wordCount":  717,
+                                         "hasInstruction":  false,
+                                         "hasOutputFormat":  false,
+                                         "hasExample":  false
+                                     }
+                    },
+                    {
+                        "size":  7783,
+                        "id":  "nano-banana-pro-eng-kb-2026_ingest_date",
+                        "path":  "knowledge/nano-banana-pro-eng-kb-2026 ingest_date.md",
+                        "category":  "knowledge",
+                        "name":  "nano-banana-pro-eng-kb-2026 ingest_date",
+                        "description":  "APP_TYPE=\"$1\"\r",
+                        "phase":  "reference",
+                        "metadata":  {
+                                         "wordCount":  520,
+                                         "hasInstruction":  false,
+                                         "hasOutputFormat":  false,
+                                         "hasExample":  true
+                                     }
+                    },
+                    {
+                        "size":  44226,
+                        "id":  "Prompt_Engineering_Component_Library",
+                        "path":  "knowledge/Prompt Engineering Component Library.md",
+                        "category":  "knowledge",
+                        "name":  "Prompt Engineering Component Library",
+                        "description":  "",
+                        "phase":  "reference",
+                        "metadata":  {
+                                         "wordCount":  2211,
+                                         "hasInstruction":  false,
+                                         "hasOutputFormat":  false,
+                                         "hasExample":  false
+                                     }
+                    },
+                    {
+                        "size":  17968,
+                        "id":  "スキーマ療法KB",
+                        "path":  "knowledge/スキーマ療法KB.md",
+                        "category":  "knowledge",
+                        "name":  "スキーマ療法KB",
+                        "description":  "",
+                        "phase":  "reference",
+                        "metadata":  {
+                                         "wordCount":  879,
+                                         "hasInstruction":  false,
+                                         "hasOutputFormat":  false,
+                                         "hasExample":  false
+                                     }
+                    },
+                    {
+                        "size":  11131,
+                        "id":  "ファイル構成",
+                        "path":  "knowledge/ファイル構成.md",
+                        "category":  "knowledge",
+                        "name":  "ファイル構成",
+                        "description":  "## 📁 /🔎 見つける [Find] (5ファイル)\r",
+                        "phase":  "reference",
+                        "metadata":  {
+                                         "wordCount":  705,
+                                         "hasInstruction":  false,
+                                         "hasOutputFormat":  false,
+                                         "hasExample":  true
+                                     }
+                    },
+                    {
+                        "size":  10227,
+                        "id":  "性格診断AI_KB",
+                        "path":  "knowledge/性格診断AI KB.md",
+                        "category":  "knowledge",
+                        "name":  "性格診断AI KB",
+                        "description":  "",
+                        "phase":  "reference",
+                        "metadata":  {
+                                         "wordCount":  519,
+                                         "hasInstruction":  false,
+                                         "hasOutputFormat":  false,
+                                         "hasExample":  false
+                                     }
+                    },
+                    {
+                        "size":  39706,
+                        "id":  "未完成KB",
+                        "path":  "knowledge/未完成KB.md",
+                        "category":  "knowledge",
+                        "name":  "未完成KB",
+                        "description":  "",
+                        "phase":  "reference",
+                        "metadata":  {
+                                         "wordCount":  2085,
+                                         "hasInstruction":  false,
+                                         "hasOutputFormat":  false,
+                                         "hasExample":  false
+                                     }
+                    },
+                    {
+                        "size":  39702,
+                        "id":  "自己分析テキスト_AI用_",
+                        "path":  "knowledge/自己分析テキスト(AI用).md",
+                        "category":  "knowledge",
+                        "name":  "自己分析テキスト(AI用)",
+                        "description":  "## System Instruction for AI\r",
+                        "phase":  "reference",
+                        "metadata":  {
+                                         "wordCount":  1236,
+                                         "hasInstruction":  false,
+                                         "hasOutputFormat":  true,
+                                         "hasExample":  false
+                                     }
+                    },
+                    {
+                        "size":  22226,
+                        "id":  "認知バイアスKB",
+                        "path":  "knowledge/認知バイアスKB.md",
+                        "category":  "knowledge",
+                        "name":  "認知バイアスKB",
+                        "description":  "",
+                        "phase":  "reference",
+                        "metadata":  {
+                                         "wordCount":  987,
+                                         "hasInstruction":  false,
+                                         "hasOutputFormat":  false,
+                                         "hasExample":  false
+                                     }
+                    },
+                    {
+                        "size":  4467,
+                        "id":  "___プレゼンを作る",
+                        "path":  "modules\\act\\create/🎤 プレゼンを作る.md",
+                        "category":  "create",
+                        "name":  "🎤 プレゼンを作る",
+                        "description":  "あなたは「伝説のプレゼン・アーキテクト（Presentation Architect）」です。\r",
+                        "phase":  "act",
+                        "metadata":  {
+                                         "wordCount":  250,
+                                         "hasInstruction":  false,
+                                         "hasOutputFormat":  false,
+                                         "hasExample":  true
+                                     }
+                    },
+                    {
+                        "size":  4469,
+                        "id":  "___図解する",
+                        "path":  "modules\\act\\create/🎨 図解する.md",
+                        "category":  "create",
+                        "name":  "🎨 図解する",
+                        "description":  "あなたは「情報の視覚化アーキテクト（Visual Architect）」です。\r",
+                        "phase":  "act",
+                        "metadata":  {
+                                         "wordCount":  241,
+                                         "hasInstruction":  false,
+                                         "hasOutputFormat":  false,
+                                         "hasExample":  true
+                                     }
+                    },
+                    {
+                        "size":  4003,
+                        "id":  "__️_仕組み化する",
+                        "path":  "modules\\act\\create/🏗️ 仕組み化する.md",
+                        "category":  "create",
+                        "name":  "🏗️ 仕組み化する",
+                        "description":  "あなたは「再現性のエンジニア（Systems Engineer）」です。\r",
+                        "phase":  "act",
+                        "metadata":  {
+                                         "wordCount":  222,
+                                         "hasInstruction":  false,
+                                         "hasOutputFormat":  false,
+                                         "hasExample":  true
+                                     }
+                    },
+                    {
+                        "size":  4058,
+                        "id":  "__️_名前をつける",
+                        "path":  "modules\\act\\create/🏷️ 名前をつける.md",
+                        "category":  "create",
+                        "name":  "🏷️ 名前をつける",
+                        "description":  "あなたは「言葉の魔術師（Master Namer）」です。\r",
+                        "phase":  "act",
+                        "metadata":  {
+                                         "wordCount":  254,
+                                         "hasInstruction":  false,
+                                         "hasOutputFormat":  false,
+                                         "hasExample":  true
+                                     }
+                    },
+                    {
+                        "size":  4348,
+                        "id":  "___手順を組む",
+                        "path":  "modules\\act\\create/📐 手順を組む.md",
+                        "category":  "create",
+                        "name":  "📐 手順を組む",
+                        "description":  "あなたは「論理の建築家（Logic Architect）」です。\r",
+                        "phase":  "act",
+                        "metadata":  {
+                                         "wordCount":  279,
+                                         "hasInstruction":  false,
+                                         "hasOutputFormat":  false,
+                                         "hasExample":  true
+                                     }
+                    },
+                    {
+                        "size":  3703,
+                        "id":  "___文章を書く",
+                        "path":  "modules\\act\\create/📝 文章を書く.md",
+                        "category":  "create",
+                        "name":  "📝 文章を書く",
+                        "description":  "あなたは「卓越したゴーストライター（Master Ghostwriter）」です。\r",
+                        "phase":  "act",
+                        "metadata":  {
+                                         "wordCount":  196,
+                                         "hasInstruction":  false,
+                                         "hasOutputFormat":  false,
+                                         "hasExample":  true
+                                     }
+                    },
+                    {
+                        "size":  4087,
+                        "id":  "___プロトタイプを作る",
+                        "path":  "modules\\act\\create/🧪 プロトタイプを作る.md",
+                        "category":  "create",
+                        "name":  "🧪 プロトタイプを作る",
+                        "description":  "あなたは「高速プロトタイパー（Rapid Prototyper）」です。\r",
+                        "phase":  "act",
+                        "metadata":  {
+                                         "wordCount":  191,
+                                         "hasInstruction":  false,
+                                         "hasOutputFormat":  false,
+                                         "hasExample":  true
+                                     }
+                    },
+                    {
+                        "size":  3920,
+                        "id":  "__問題を特定する",
+                        "path":  "modules\\think\\expand/❓ 問題を特定する.md",
+                        "category":  "expand",
+                        "name":  "❓ 問題を特定する",
+                        "description":  "あなたは「本質を見抜く診断医（Diagnostic Physician）」です。\r",
+                        "phase":  "think",
+                        "metadata":  {
+                                         "wordCount":  220,
+                                         "hasInstruction":  false,
+                                         "hasOutputFormat":  false,
+                                         "hasExample":  true
+                                     }
+                    },
+                    {
+                        "size":  4015,
+                        "id":  "___揺らぎを与える",
+                        "path":  "modules\\think\\expand/🎲 揺らぎを与える.md",
+                        "category":  "expand",
+                        "name":  "🎲 揺らぎを与える",
+                        "description":  "あなたは「カオスの運び屋（Agent of Chaos）」です。\r",
+                        "phase":  "think",
+                        "metadata":  {
+                                         "wordCount":  210,
+                                         "hasInstruction":  false,
+                                         "hasOutputFormat":  false,
+                                         "hasExample":  true
+                                     }
+                    },
+                    {
+                        "size":  4523,
+                        "id":  "___関係者を整理する",
+                        "path":  "modules\\think\\expand/👥 関係者を整理する.md",
+                        "category":  "expand",
+                        "name":  "👥 関係者を整理する",
+                        "description":  "あなたは「組織力学の地図製作者（Political Cartographer）」です。\r",
+                        "phase":  "think",
+                        "metadata":  {
+                                         "wordCount":  252,
+                                         "hasInstruction":  false,
+                                         "hasOutputFormat":  false,
+                                         "hasExample":  true
+                                     }
+                    },
+                    {
+                        "size":  3761,
+                        "id":  "___アイデアを出す",
+                        "path":  "modules\\think\\expand/💡 アイデアを出す.md",
+                        "category":  "expand",
+                        "name":  "💡 アイデアを出す",
+                        "description":  "あなたは「無限のアイデア生成機（Idea Generator）」です。\r",
+                        "phase":  "think",
+                        "metadata":  {
+                                         "wordCount":  205,
+                                         "hasInstruction":  false,
+                                         "hasOutputFormat":  false,
+                                         "hasExample":  true
+                                     }
+                    },
+                    {
+                        "size":  3971,
+                        "id":  "___前提を破壊する",
+                        "path":  "modules\\think\\expand/💣 前提を破壊する.md",
+                        "category":  "expand",
+                        "name":  "💣 前提を破壊する",
+                        "description":  "あなたは「革命の扇動者（Disruptive Agitator）」です。\r",
+                        "phase":  "think",
+                        "metadata":  {
+                                         "wordCount":  215,
+                                         "hasInstruction":  false,
+                                         "hasOutputFormat":  false,
+                                         "hasExample":  true
+                                     }
+                    },
+                    {
+                        "size":  3995,
+                        "id":  "___状況を把握する",
+                        "path":  "modules\\think\\expand/🔍 状況を把握する.md",
+                        "category":  "expand",
+                        "name":  "🔍 状況を把握する",
+                        "description":  "あなたは「冷徹な状況分析官（Situation Analyst）」です。\r",
+                        "phase":  "think",
+                        "metadata":  {
+                                         "wordCount":  252,
+                                         "hasInstruction":  false,
+                                         "hasOutputFormat":  false,
+                                         "hasExample":  true
+                                     }
+                    },
+                    {
+                        "size":  4308,
+                        "id":  "___点をつなぐ",
+                        "path":  "modules\\think\\expand/🔗 点をつなぐ.md",
+                        "category":  "expand",
+                        "name":  "🔗 点をつなぐ",
+                        "description":  "あなたは「概念の錬金術師（Conceptual Alchemist）」です。\r",
+                        "phase":  "think",
+                        "metadata":  {
+                                         "wordCount":  198,
+                                         "hasInstruction":  false,
+                                         "hasOutputFormat":  false,
+                                         "hasExample":  true
+                                     }
+                    },
+                    {
+                        "size":  4193,
+                        "id":  "___逆転させる",
+                        "path":  "modules\\think\\expand/🙃 逆転させる.md",
+                        "category":  "expand",
+                        "name":  "🙃 逆転させる",
+                        "description":  "あなたは「あまのじゃくな戦略家（Contrarian Strategist）」です。\r",
+                        "phase":  "think",
+                        "metadata":  {
+                                         "wordCount":  198,
+                                         "hasInstruction":  false,
+                                         "hasOutputFormat":  false,
+                                         "hasExample":  true
+                                     }
+                    },
+                    {
+                        "size":  4481,
+                        "id":  "___前提を疑う",
+                        "path":  "modules\\think\\expand/🤔 前提を疑う.md",
+                        "category":  "expand",
+                        "name":  "🤔 前提を疑う",
+                        "description":  "あなたは「常識の破壊者（Assumption Buster）」です。\r",
+                        "phase":  "think",
+                        "metadata":  {
+                                         "wordCount":  230,
+                                         "hasInstruction":  false,
+                                         "hasOutputFormat":  false,
+                                         "hasExample":  true
+                                     }
+                    },
+                    {
+                        "size":  3552,
+                        "id":  "Module_01_The_Demilitarized_Zone__DMZ__Protocol",
+                        "path":  "protocols/Module 01 The Demilitarized Zone (DMZ) Protocol.md",
+                        "category":  "protocols",
+                        "name":  "Module 01 The Demilitarized Zone (DMZ) Protocol",
+                        "description":  "",
+                        "phase":  "system",
+                        "metadata":  {
+                                         "wordCount":  213,
+                                         "hasInstruction":  false,
+                                         "hasOutputFormat":  false,
+                                         "hasExample":  true
+                                     }
+                    },
+                    {
+                        "size":  3684,
+                        "id":  "Module_02_Directory_Topology_Lock",
+                        "path":  "protocols/Module 02 Directory Topology Lock.md",
+                        "category":  "protocols",
+                        "name":  "Module 02 Directory Topology Lock",
+                        "description":  "",
+                        "phase":  "system",
+                        "metadata":  {
+                                         "wordCount":  253,
+                                         "hasInstruction":  false,
+                                         "hasOutputFormat":  false,
+                                         "hasExample":  true
+                                     }
+                    },
+                    {
+                        "size":  4101,
+                        "id":  "Module_03_Dependency_Quarantine_Protocol",
+                        "path":  "protocols/Module 03 Dependency Quarantine Protocol.md",
+                        "category":  "protocols",
+                        "name":  "Module 03 Dependency Quarantine Protocol",
+                        "description":  "",
+                        "phase":  "system",
+                        "metadata":  {
+                                         "wordCount":  297,
+                                         "hasInstruction":  false,
+                                         "hasOutputFormat":  false,
+                                         "hasExample":  true
+                                     }
+                    },
+                    {
+                        "size":  4021,
+                        "id":  "Module_04_Retro-Causal_Testing_Protocol__TDD_Enforcement_",
+                        "path":  "protocols/Module 04 Retro-Causal Testing Protocol (TDD Enforcement).md",
+                        "category":  "protocols",
+                        "name":  "Module 04 Retro-Causal Testing Protocol (TDD Enforcement)",
+                        "description":  "",
+                        "phase":  "system",
+                        "metadata":  {
+                                         "wordCount":  279,
+                                         "hasInstruction":  true,
+                                         "hasOutputFormat":  false,
+                                         "hasExample":  true
+                                     }
+                    },
+                    {
+                        "size":  4049,
+                        "id":  "Module_05_Domain_Language_Enforcement__Ubiquitous_Language_",
+                        "path":  "protocols/Module 05 Domain Language Enforcement (Ubiquitous Language).md",
+                        "category":  "protocols",
+                        "name":  "Module 05 Domain Language Enforcement (Ubiquitous Language)",
+                        "description":  "",
+                        "phase":  "system",
+                        "metadata":  {
+                                         "wordCount":  270,
+                                         "hasInstruction":  false,
+                                         "hasOutputFormat":  false,
+                                         "hasExample":  true
+                                     }
+                    },
+                    {
+                        "size":  4125,
+                        "id":  "Module_06_Complexity_Budget_Protocol",
+                        "path":  "protocols/Module 06 Complexity Budget Protocol.md",
+                        "category":  "protocols",
+                        "name":  "Module 06 Complexity Budget Protocol",
+                        "description":  "",
+                        "phase":  "system",
+                        "metadata":  {
+                                         "wordCount":  282,
+                                         "hasInstruction":  false,
+                                         "hasOutputFormat":  false,
+                                         "hasExample":  true
+                                     }
+                    },
+                    {
+                        "size":  4073,
+                        "id":  "Module_07_The_Devil_s_Advocate_Protocol__Multi-Persona_Critique_",
+                        "path":  "protocols/Module 07 The Devil\u0027s Advocate Protocol (Multi-Persona Critique).md",
+                        "category":  "protocols",
+                        "name":  "Module 07 The Devil\u0027s Advocate Protocol (Multi-Persona Critique)",
+                        "description":  "",
+                        "phase":  "system",
+                        "metadata":  {
+                                         "wordCount":  279,
+                                         "hasInstruction":  false,
+                                         "hasOutputFormat":  false,
+                                         "hasExample":  true
+                                     }
+                    },
+                    {
+                        "size":  4028,
+                        "id":  "Module_08_Cognitive_Checkpoint_Protocol__Anti-Drift_System_",
+                        "path":  "protocols/Module 08 Cognitive Checkpoint Protocol (Anti-Drift System).md",
+                        "category":  "protocols",
+                        "name":  "Module 08 Cognitive Checkpoint Protocol (Anti-Drift System)",
+                        "description":  "",
+                        "phase":  "system",
+                        "metadata":  {
+                                         "wordCount":  297,
+                                         "hasInstruction":  true,
+                                         "hasOutputFormat":  false,
+                                         "hasExample":  true
+                                     }
+                    },
+                    {
+                        "size":  3802,
+                        "id":  "Module_09_Mutation_Testing_Protocol__The_Saboteur_",
+                        "path":  "protocols/Module 09 Mutation Testing Protocol (The Saboteur).md",
+                        "category":  "protocols",
+                        "name":  "Module 09 Mutation Testing Protocol (The Saboteur)",
+                        "description":  "",
+                        "phase":  "system",
+                        "metadata":  {
+                                         "wordCount":  274,
+                                         "hasInstruction":  false,
+                                         "hasOutputFormat":  false,
+                                         "hasExample":  true
+                                     }
+                    },
+                    {
+                        "size":  3813,
+                        "id":  "Module_10_Ripple_Effect_Analysis__Impact_Prediction_",
+                        "path":  "protocols/Module 10 Ripple Effect Analysis (Impact Prediction).md",
+                        "category":  "protocols",
+                        "name":  "Module 10 Ripple Effect Analysis (Impact Prediction)",
+                        "description":  "",
+                        "phase":  "system",
+                        "metadata":  {
+                                         "wordCount":  254,
+                                         "hasInstruction":  false,
+                                         "hasOutputFormat":  false,
+                                         "hasExample":  true
+                                     }
+                    },
+                    {
+                        "size":  4270,
+                        "id":  "Module_11_Automated_Red_Teaming_Protocol",
+                        "path":  "protocols/Module 11 Automated Red Teaming Protocol.md",
+                        "category":  "protocols",
+                        "name":  "Module 11 Automated Red Teaming Protocol",
+                        "description":  "",
+                        "phase":  "system",
+                        "metadata":  {
+                                         "wordCount":  316,
+                                         "hasInstruction":  false,
+                                         "hasOutputFormat":  false,
+                                         "hasExample":  true
+                                     }
+                    },
+                    {
+                        "size":  4561,
+                        "id":  "Module_12_Chaos_Monkey_Protocol__Resilience_Engineering_",
+                        "path":  "protocols/Module 12 Chaos Monkey Protocol (Resilience Engineering).md",
+                        "category":  "protocols",
+                        "name":  "Module 12 Chaos Monkey Protocol (Resilience Engineering)",
+                        "description":  "",
+                        "phase":  "system",
+                        "metadata":  {
+                                         "wordCount":  326,
+                                         "hasInstruction":  false,
+                                         "hasOutputFormat":  false,
+                                         "hasExample":  true
+                                     }
+                    },
+                    {
+                        "size":  4393,
+                        "id":  "Module_13_Code_Archaeology_Protocol__Chesterton_s_Fence_",
+                        "path":  "protocols/Module 13 Code Archaeology Protocol (Chesterton\u0027s Fence).md",
+                        "category":  "protocols",
+                        "name":  "Module 13 Code Archaeology Protocol (Chesterton\u0027s Fence)",
+                        "description":  "",
+                        "phase":  "system",
+                        "metadata":  {
+                                         "wordCount":  301,
+                                         "hasInstruction":  false,
+                                         "hasOutputFormat":  false,
+                                         "hasExample":  true
+                                     }
+                    },
+                    {
+                        "size":  4977,
+                        "id":  "Module_14_Narrative_Commit_Protocol",
+                        "path":  "protocols/Module 14 Narrative Commit Protocol.md",
+                        "category":  "protocols",
+                        "name":  "Module 14 Narrative Commit Protocol",
+                        "description":  "",
+                        "phase":  "system",
+                        "metadata":  {
+                                         "wordCount":  340,
+                                         "hasInstruction":  false,
+                                         "hasOutputFormat":  false,
+                                         "hasExample":  true
+                                     }
+                    },
+                    {
+                        "size":  4668,
+                        "id":  "Module_15_Atomic_Design_Protocol__UI_Componentization_",
+                        "path":  "protocols/Module 15 Atomic Design Protocol (UI Componentization).md",
+                        "category":  "protocols",
+                        "name":  "Module 15 Atomic Design Protocol (UI Componentization)",
+                        "description":  "",
+                        "phase":  "system",
+                        "metadata":  {
+                                         "wordCount":  330,
+                                         "hasInstruction":  false,
+                                         "hasOutputFormat":  false,
+                                         "hasExample":  true
+                                     }
+                    },
+                    {
+                        "size":  4476,
+                        "id":  "Module_16_Accessibility_Mandate__a11y_Protocol_",
+                        "path":  "protocols/Module 16 Accessibility Mandate (a11y Protocol).md",
+                        "category":  "protocols",
+                        "name":  "Module 16 Accessibility Mandate (a11y Protocol)",
+                        "description":  "",
+                        "phase":  "system",
+                        "metadata":  {
+                                         "wordCount":  302,
+                                         "hasInstruction":  false,
+                                         "hasOutputFormat":  false,
+                                         "hasExample":  true
+                                     }
+                    },
+                    {
+                        "size":  4069,
+                        "id":  "Module_17_Structured_Logging_Protocol",
+                        "path":  "protocols/Module 17 Structured Logging Protocol.md",
+                        "category":  "protocols",
+                        "name":  "Module 17 Structured Logging Protocol",
+                        "description":  "",
+                        "phase":  "system",
+                        "metadata":  {
+                                         "wordCount":  278,
+                                         "hasInstruction":  false,
+                                         "hasOutputFormat":  false,
+                                         "hasExample":  true
+                                     }
+                    },
+                    {
+                        "size":  4259,
+                        "id":  "Module_18_Feature_Flag_Protocol__Toggle_Architecture_",
+                        "path":  "protocols/Module 18 Feature Flag Protocol (Toggle Architecture).md",
+                        "category":  "protocols",
+                        "name":  "Module 18 Feature Flag Protocol (Toggle Architecture)",
+                        "description":  "",
+                        "phase":  "system",
+                        "metadata":  {
+                                         "wordCount":  280,
+                                         "hasInstruction":  false,
+                                         "hasOutputFormat":  false,
+                                         "hasExample":  true
+                                     }
+                    },
+                    {
+                        "size":  3979,
+                        "id":  "Module_19_Docker_First_Protocol__Containerization_Mandate_",
+                        "path":  "protocols/Module 19 Docker First Protocol (Containerization Mandate).md",
+                        "category":  "protocols",
+                        "name":  "Module 19 Docker First Protocol (Containerization Mandate)",
+                        "description":  "",
+                        "phase":  "system",
+                        "metadata":  {
+                                         "wordCount":  271,
+                                         "hasInstruction":  false,
+                                         "hasOutputFormat":  false,
+                                         "hasExample":  true
+                                     }
+                    },
+                    {
+                        "size":  4181,
+                        "id":  "Module_20_Dead_Code_Reaper_Protocol",
+                        "path":  "protocols/Module 20 Dead Code Reaper Protocol.md",
+                        "category":  "protocols",
+                        "name":  "Module 20 Dead Code Reaper Protocol",
+                        "description":  "",
+                        "phase":  "system",
+                        "metadata":  {
+                                         "wordCount":  264,
+                                         "hasInstruction":  false,
+                                         "hasOutputFormat":  false,
+                                         "hasExample":  true
+                                     }
+                    },
+                    {
+                        "size":  3675,
+                        "id":  "Module_21_TODO_Expiration_Protocol__Technical_Debt_Management_",
+                        "path":  "protocols/Module 21 TODO Expiration Protocol (Technical Debt Management).md",
+                        "category":  "protocols",
+                        "name":  "Module 21 TODO Expiration Protocol (Technical Debt Management)",
+                        "description":  "",
+                        "phase":  "system",
+                        "metadata":  {
+                                         "wordCount":  235,
+                                         "hasInstruction":  false,
+                                         "hasOutputFormat":  false,
+                                         "hasExample":  true
+                                     }
+                    },
+                    {
+                        "size":  7703,
+                        "id":  "Module_22_Auto-Documentation_Protocol__Sync-or-Die_",
+                        "path":  "protocols/Module 22 Auto-Documentation Protocol (Sync-or-Die).md",
+                        "category":  "protocols",
+                        "name":  "Module 22 Auto-Documentation Protocol (Sync-or-Die)",
+                        "description":  "",
+                        "phase":  "system",
+                        "metadata":  {
+                                         "wordCount":  507,
+                                         "hasInstruction":  false,
+                                         "hasOutputFormat":  false,
+                                         "hasExample":  true
+                                     }
+                    },
+                    {
+                        "size":  4232,
+                        "id":  "Module_23_Mock_First_Protocol__Interface_Driven_",
+                        "path":  "protocols/Module 23 Mock First Protocol (Interface Driven).md",
+                        "category":  "protocols",
+                        "name":  "Module 23 Mock First Protocol (Interface Driven)",
+                        "description":  "",
+                        "phase":  "system",
+                        "metadata":  {
+                                         "wordCount":  278,
+                                         "hasInstruction":  false,
+                                         "hasOutputFormat":  false,
+                                         "hasExample":  true
+                                     }
+                    },
+                    {
+                        "size":  4363,
+                        "id":  "Module_24_Performance_Budget_Protocol",
+                        "path":  "protocols/Module 24 Performance Budget Protocol.md",
+                        "category":  "protocols",
+                        "name":  "Module 24 Performance Budget Protocol",
+                        "description":  "",
+                        "phase":  "system",
+                        "metadata":  {
+                                         "wordCount":  274,
+                                         "hasInstruction":  false,
+                                         "hasOutputFormat":  false,
+                                         "hasExample":  true
+                                     }
+                    },
+                    {
+                        "size":  5516,
+                        "id":  "Module_25_Rollback_Strategy_Protocol__The_Undo_Button_",
+                        "path":  "protocols/Module 25 Rollback Strategy Protocol (The Undo Button).md",
+                        "category":  "protocols",
+                        "name":  "Module 25 Rollback Strategy Protocol (The Undo Button)",
+                        "description":  "",
+                        "phase":  "system",
+                        "metadata":  {
+                                         "wordCount":  316,
+                                         "hasInstruction":  false,
+                                         "hasOutputFormat":  false,
+                                         "hasExample":  true
+                                     }
+                    },
+                    {
+                        "size":  6515,
+                        "id":  "WBSスケジューリング",
+                        "path":  "helpers/WBSスケジューリング.md",
+                        "category":  "helpers",
+                        "name":  "WBSスケジューリング",
+                        "description":  "",
+                        "phase":  "reference",
+                        "metadata":  {
+                                         "wordCount":  300,
+                                         "hasInstruction":  true,
+                                         "hasOutputFormat":  true,
+                                         "hasExample":  true
+                                     }
+                    },
+                    {
+                        "size":  6254,
+                        "id":  "おべっかの無い評価",
+                        "path":  "helpers/おべっかの無い評価.md",
+                        "category":  "helpers",
+                        "name":  "おべっかの無い評価",
+                        "description":  "",
+                        "phase":  "reference",
+                        "metadata":  {
+                                         "wordCount":  246,
+                                         "hasInstruction":  true,
+                                         "hasOutputFormat":  true,
+                                         "hasExample":  true
+                                     }
+                    },
+                    {
+                        "size":  6261,
+                        "id":  "エレガンススマート監査",
+                        "path":  "helpers/エレガンススマート監査.md",
+                        "category":  "helpers",
+                        "name":  "エレガンススマート監査",
+                        "description":  "",
+                        "phase":  "reference",
+                        "metadata":  {
+                                         "wordCount":  233,
+                                         "hasInstruction":  true,
+                                         "hasOutputFormat":  true,
+                                         "hasExample":  true
+                                     }
+                    },
+                    {
+                        "size":  6128,
+                        "id":  "オッカムのカミソリ",
+                        "path":  "helpers/オッカムのカミソリ.md",
+                        "category":  "helpers",
+                        "name":  "オッカムのカミソリ",
+                        "description":  "",
+                        "phase":  "reference",
+                        "metadata":  {
+                                         "wordCount":  294,
+                                         "hasInstruction":  true,
+                                         "hasOutputFormat":  true,
+                                         "hasExample":  true
+                                     }
+                    },
+                    {
+                        "size":  5928,
+                        "id":  "コンテキストの言語化",
+                        "path":  "helpers/コンテキストの言語化.md",
+                        "category":  "helpers",
+                        "name":  "コンテキストの言語化",
+                        "description":  "",
+                        "phase":  "reference",
+                        "metadata":  {
+                                         "wordCount":  204,
+                                         "hasInstruction":  true,
+                                         "hasOutputFormat":  true,
+                                         "hasExample":  true
+                                     }
+                    },
+                    {
+                        "size":  6765,
+                        "id":  "コンテキスト構造化",
+                        "path":  "helpers/コンテキスト構造化.md",
+                        "category":  "helpers",
+                        "name":  "コンテキスト構造化",
+                        "description":  "",
+                        "phase":  "reference",
+                        "metadata":  {
+                                         "wordCount":  324,
+                                         "hasInstruction":  true,
+                                         "hasOutputFormat":  true,
+                                         "hasExample":  true
+                                     }
+                    },
+                    {
+                        "size":  3399,
+                        "id":  "コーディング仕様書コンパイル",
+                        "path":  "helpers/コーディング仕様書コンパイル.md",
+                        "category":  "helpers",
+                        "name":  "コーディング仕様書コンパイル",
+                        "description":  "",
+                        "phase":  "reference",
+                        "metadata":  {
+                                         "wordCount":  172,
+                                         "hasInstruction":  false,
+                                         "hasOutputFormat":  true,
+                                         "hasExample":  true
+                                     }
+                    },
+                    {
+                        "size":  3052,
+                        "id":  "コード外科手術凹",
+                        "path":  "helpers/コード外科手術凹.md",
+                        "category":  "helpers",
+                        "name":  "コード外科手術凹",
+                        "description":  "",
+                        "phase":  "reference",
+                        "metadata":  {
+                                         "wordCount":  113,
+                                         "hasInstruction":  false,
+                                         "hasOutputFormat":  true,
+                                         "hasExample":  true
+                                     }
+                    },
+                    {
+                        "size":  4213,
+                        "id":  "コード監査凸",
+                        "path":  "helpers/コード監査凸.md",
+                        "category":  "helpers",
+                        "name":  "コード監査凸",
+                        "description":  "",
+                        "phase":  "reference",
+                        "metadata":  {
+                                         "wordCount":  157,
+                                         "hasInstruction":  false,
+                                         "hasOutputFormat":  true,
+                                         "hasExample":  true
+                                     }
+                    },
+                    {
+                        "size":  6176,
+                        "id":  "システム_ダイナミクス予想",
+                        "path":  "helpers/システム・ダイナミクス予想.md",
+                        "category":  "helpers",
+                        "name":  "システム・ダイナミクス予想",
+                        "description":  "",
+                        "phase":  "reference",
+                        "metadata":  {
+                                         "wordCount":  271,
+                                         "hasInstruction":  true,
+                                         "hasOutputFormat":  true,
+                                         "hasExample":  true
+                                     }
+                    },
+                    {
+                        "size":  7006,
+                        "id":  "システム構造監査",
+                        "path":  "helpers/システム構造監査.md",
+                        "category":  "helpers",
+                        "name":  "システム構造監査",
+                        "description":  "",
+                        "phase":  "reference",
+                        "metadata":  {
+                                         "wordCount":  287,
+                                         "hasInstruction":  true,
+                                         "hasOutputFormat":  true,
+                                         "hasExample":  true
+                                     }
+                    },
+                    {
+                        "size":  6925,
+                        "id":  "プロンプト外科手術凹",
+                        "path":  "helpers/プロンプト外科手術凹.md",
+                        "category":  "helpers",
+                        "name":  "プロンプト外科手術凹",
+                        "description":  "",
+                        "phase":  "reference",
+                        "metadata":  {
+                                         "wordCount":  297,
+                                         "hasInstruction":  true,
+                                         "hasOutputFormat":  true,
+                                         "hasExample":  true
+                                     }
+                    },
+                    {
+                        "size":  6774,
+                        "id":  "プロンプト構造監査凸",
+                        "path":  "helpers/プロンプト構造監査凸.md",
+                        "category":  "helpers",
+                        "name":  "プロンプト構造監査凸",
+                        "description":  "",
+                        "phase":  "reference",
+                        "metadata":  {
+                                         "wordCount":  259,
+                                         "hasInstruction":  true,
+                                         "hasOutputFormat":  true,
+                                         "hasExample":  true
+                                     }
+                    },
+                    {
+                        "size":  4152,
+                        "id":  "リバースエンジニアリング",
+                        "path":  "helpers/リバースエンジニアリング.md",
+                        "category":  "helpers",
+                        "name":  "リバースエンジニアリング",
+                        "description":  "",
+                        "phase":  "reference",
+                        "metadata":  {
+                                         "wordCount":  129,
+                                         "hasInstruction":  false,
+                                         "hasOutputFormat":  true,
+                                         "hasExample":  true
+                                     }
+                    },
+                    {
+                        "size":  6660,
+                        "id":  "七世代先の視点",
+                        "path":  "helpers/七世代先の視点.md",
+                        "category":  "helpers",
+                        "name":  "七世代先の視点",
+                        "description":  "",
+                        "phase":  "reference",
+                        "metadata":  {
+                                         "wordCount":  265,
+                                         "hasInstruction":  true,
+                                         "hasOutputFormat":  true,
+                                         "hasExample":  true
+                                     }
+                    },
+                    {
+                        "size":  6743,
+                        "id":  "仮想ユーザー座談会",
+                        "path":  "helpers/仮想ユーザー座談会.md",
+                        "category":  "helpers",
+                        "name":  "仮想ユーザー座談会",
+                        "description":  "",
+                        "phase":  "reference",
+                        "metadata":  {
+                                         "wordCount":  273,
+                                         "hasInstruction":  true,
+                                         "hasOutputFormat":  true,
+                                         "hasExample":  true
+                                     }
+                    },
+                    {
+                        "size":  5595,
+                        "id":  "単純性原理と平易な説明",
+                        "path":  "helpers/単純性原理と平易な説明.md",
+                        "category":  "helpers",
+                        "name":  "単純性原理と平易な説明",
+                        "description":  "",
+                        "phase":  "reference",
+                        "metadata":  {
+                                         "wordCount":  167,
+                                         "hasInstruction":  true,
+                                         "hasOutputFormat":  true,
+                                         "hasExample":  true
+                                     }
+                    },
+                    {
+                        "size":  6464,
+                        "id":  "回答の解像度向上",
+                        "path":  "helpers/回答の解像度向上.md",
+                        "category":  "helpers",
+                        "name":  "回答の解像度向上",
+                        "description":  "",
+                        "phase":  "reference",
+                        "metadata":  {
+                                         "wordCount":  256,
+                                         "hasInstruction":  true,
+                                         "hasOutputFormat":  true,
+                                         "hasExample":  true
+                                     }
+                    },
+                    {
+                        "size":  5450,
+                        "id":  "外科的再構築凹",
+                        "path":  "helpers/外科的再構築凹.md",
+                        "category":  "helpers",
+                        "name":  "外科的再構築凹",
+                        "description":  "",
+                        "phase":  "reference",
+                        "metadata":  {
+                                         "wordCount":  219,
+                                         "hasInstruction":  true,
+                                         "hasOutputFormat":  true,
+                                         "hasExample":  true
+                                     }
+                    },
+                    {
+                        "size":  5489,
+                        "id":  "外部文脈の結合",
+                        "path":  "helpers/外部文脈の結合.md",
+                        "category":  "helpers",
+                        "name":  "外部文脈の結合",
+                        "description":  "",
+                        "phase":  "reference",
+                        "metadata":  {
+                                         "wordCount":  216,
+                                         "hasInstruction":  true,
+                                         "hasOutputFormat":  true,
+                                         "hasExample":  true
+                                     }
+                    },
+                    {
+                        "size":  6149,
+                        "id":  "多角的ラテラル_シンキング",
+                        "path":  "helpers/多角的ラテラル・シンキング.md",
+                        "category":  "helpers",
+                        "name":  "多角的ラテラル・シンキング",
+                        "description":  "",
+                        "phase":  "reference",
+                        "metadata":  {
+                                         "wordCount":  208,
+                                         "hasInstruction":  true,
+                                         "hasOutputFormat":  true,
+                                         "hasExample":  true
+                                     }
+                    },
+                    {
+                        "size":  5931,
+                        "id":  "形態素解析マトリクス",
+                        "path":  "helpers/形態素解析マトリクス.md",
+                        "category":  "helpers",
+                        "name":  "形態素解析マトリクス",
+                        "description":  "",
+                        "phase":  "reference",
+                        "metadata":  {
+                                         "wordCount":  287,
+                                         "hasInstruction":  true,
+                                         "hasOutputFormat":  true,
+                                         "hasExample":  true
+                                     }
+                    },
+                    {
+                        "size":  6368,
+                        "id":  "成功の解体新書",
+                        "path":  "helpers/成功の解体新書.md",
+                        "category":  "helpers",
+                        "name":  "成功の解体新書",
+                        "description":  "",
+                        "phase":  "reference",
+                        "metadata":  {
+                                         "wordCount":  225,
+                                         "hasInstruction":  true,
+                                         "hasOutputFormat":  true,
+                                         "hasExample":  true
+                                     }
+                    },
+                    {
+                        "size":  3050,
+                        "id":  "敵対的レビュー凸",
+                        "path":  "helpers/敵対的レビュー凸.md",
+                        "category":  "helpers",
+                        "name":  "敵対的レビュー凸",
+                        "description":  "",
+                        "phase":  "reference",
+                        "metadata":  {
+                                         "wordCount":  130,
+                                         "hasInstruction":  true,
+                                         "hasOutputFormat":  true,
+                                         "hasExample":  true
+                                     }
+                    },
+                    {
+                        "size":  5849,
+                        "id":  "未踏の改善点",
+                        "path":  "helpers/未踏の改善点.md",
+                        "category":  "helpers",
+                        "name":  "未踏の改善点",
+                        "description":  "",
+                        "phase":  "reference",
+                        "metadata":  {
+                                         "wordCount":  228,
+                                         "hasInstruction":  true,
+                                         "hasOutputFormat":  true,
+                                         "hasExample":  true
+                                     }
+                    },
+                    {
+                        "size":  6696,
+                        "id":  "現実への接地",
+                        "path":  "helpers/現実への接地.md",
+                        "category":  "helpers",
+                        "name":  "現実への接地",
+                        "description":  "",
+                        "phase":  "reference",
+                        "metadata":  {
+                                         "wordCount":  282,
+                                         "hasInstruction":  true,
+                                         "hasOutputFormat":  true,
+                                         "hasExample":  true
+                                     }
+                    },
+                    {
+                        "size":  6413,
+                        "id":  "発散と収束",
+                        "path":  "helpers/発散と収束.md",
+                        "category":  "helpers",
+                        "name":  "発散と収束",
+                        "description":  "",
+                        "phase":  "reference",
+                        "metadata":  {
+                                         "wordCount":  267,
+                                         "hasInstruction":  true,
+                                         "hasOutputFormat":  true,
+                                         "hasExample":  true
+                                     }
+                    },
+                    {
+                        "size":  6996,
+                        "id":  "第一原理思考",
+                        "path":  "helpers/第一原理思考.md",
+                        "category":  "helpers",
+                        "name":  "第一原理思考",
+                        "description":  "",
+                        "phase":  "reference",
+                        "metadata":  {
+                                         "wordCount":  313,
+                                         "hasInstruction":  true,
+                                         "hasOutputFormat":  true,
+                                         "hasExample":  true
+                                     }
+                    },
+                    {
+                        "size":  6591,
+                        "id":  "経験の法則化",
+                        "path":  "helpers/経験の法則化.md",
+                        "category":  "helpers",
+                        "name":  "経験の法則化",
+                        "description":  "",
+                        "phase":  "reference",
+                        "metadata":  {
+                                         "wordCount":  251,
+                                         "hasInstruction":  true,
+                                         "hasOutputFormat":  true,
+                                         "hasExample":  true
+                                     }
+                    },
+                    {
+                        "size":  7077,
+                        "id":  "自律思考",
+                        "path":  "helpers/自律思考.md",
+                        "category":  "helpers",
+                        "name":  "自律思考",
+                        "description":  "",
+                        "phase":  "reference",
+                        "metadata":  {
+                                         "wordCount":  321,
+                                         "hasInstruction":  true,
+                                         "hasOutputFormat":  true,
+                                         "hasExample":  true
+                                     }
+                    },
+                    {
+                        "size":  6751,
+                        "id":  "論理的背景の補強",
+                        "path":  "helpers/論理的背景の補強.md",
+                        "category":  "helpers",
+                        "name":  "論理的背景の補強",
+                        "description":  "",
+                        "phase":  "reference",
+                        "metadata":  {
+                                         "wordCount":  242,
+                                         "hasInstruction":  true,
+                                         "hasOutputFormat":  true,
+                                         "hasExample":  true
+                                     }
+                    },
+                    {
+                        "size":  3868,
+                        "id":  "___声を聞く",
+                        "path":  "modules\\find/👂 声を聞く.md",
+                        "category":  "find",
+                        "name":  "👂 声を聞く",
+                        "description":  "あなたは「深層心理の傾聴者（Empathetic Listener）」です。\r",
+                        "phase":  "find",
+                        "metadata":  {
+                                         "wordCount":  206,
+                                         "hasInstruction":  false,
+                                         "hasOutputFormat":  false,
+                                         "hasExample":  true
+                                     }
+                    },
+                    {
+                        "size":  3539,
+                        "id":  "__情報を集める",
+                        "path":  "modules\\find/📥情報を集める.md",
+                        "category":  "find",
+                        "name":  "📥情報を集める",
+                        "description":  "あなたは「冷徹な調査官（Objective Investigator）」です。\r",
+                        "phase":  "find",
+                        "metadata":  {
+                                         "wordCount":  178,
+                                         "hasInstruction":  false,
+                                         "hasOutputFormat":  false,
+                                         "hasExample":  true
+                                     }
+                    },
+                    {
+                        "size":  3952,
+                        "id":  "___頭を切り替える",
+                        "path":  "modules\\find/🔄 頭を切り替える.md",
+                        "category":  "find",
+                        "name":  "🔄 頭を切り替える",
+                        "description":  "あなたは「認知の転轍手（Context Switcher）」です。\r",
+                        "phase":  "find",
+                        "metadata":  {
+                                         "wordCount":  200,
+                                         "hasInstruction":  false,
+                                         "hasOutputFormat":  false,
+                                         "hasExample":  true
+                                     }
+                    },
+                    {
+                        "size":  3640,
+                        "id":  "__️_全体を眺める",
+                        "path":  "modules\\find/🗺️ 全体を眺める.md",
+                        "category":  "find",
+                        "name":  "🗺️ 全体を眺める",
+                        "description":  "あなたは「高高度の測量士（High-Altitude Surveyor）」です。\r",
+                        "phase":  "find",
+                        "metadata":  {
+                                         "wordCount":  210,
+                                         "hasInstruction":  false,
+                                         "hasOutputFormat":  false,
+                                         "hasExample":  true
+                                     }
+                    },
+                    {
+                        "size":  3401,
+                        "id":  "___脳内を吐き出す",
+                        "path":  "modules\\find/🤯 脳内を吐き出す.md",
+                        "category":  "find",
+                        "name":  "🤯 脳内を吐き出す",
+                        "description":  "あなたは「認知の清掃人（Cognitive Cleaner）」です。\r",
+                        "phase":  "find",
+                        "metadata":  {
+                                         "wordCount":  185,
+                                         "hasInstruction":  false,
+                                         "hasOutputFormat":  false,
+                                         "hasExample":  true
+                                     }
+                    }
+                ],
+    "categories":  {
+                       "prepare":  {
+                                       "label":  "働きかける/固める (Act/Prepare)",
+                                       "phase":  "act",
+                                       "emoji":  "🔧",
+                                       "count":  5
+                                   },
+                       "reflect":  {
+                                       "label":  "振り返る (Reflect)",
+                                       "phase":  "reflect",
+                                       "emoji":  "🔄",
+                                       "count":  5
+                                   },
+                       "focus":  {
+                                     "label":  "考える/絞る (Think/Focus)",
+                                     "phase":  "think",
+                                     "emoji":  "🎯",
+                                     "count":  11
+                                 },
+                       "knowledge":  {
+                                         "label":  "知識ベース (Knowledge)",
+                                         "phase":  "reference",
+                                         "emoji":  "📚",
+                                         "count":  22
+                                     },
+                       "create":  {
+                                      "label":  "働きかける/生み出す (Act/Create)",
+                                      "phase":  "act",
+                                      "emoji":  "✨",
+                                      "count":  7
+                                  },
+                       "expand":  {
+                                      "label":  "考える/広げる (Think/Expand)",
+                                      "phase":  "think",
+                                      "emoji":  "📊",
+                                      "count":  9
+                                  },
+                       "protocols":  {
+                                         "label":  "プロトコル (Protocols)",
+                                         "phase":  "system",
+                                         "emoji":  "🛡️",
+                                         "count":  25
+                                     },
+                       "helpers":  {
+                                       "label":  "ヘルパー (Helpers)",
+                                       "phase":  "reference",
+                                       "emoji":  "🔧",
+                                       "count":  31
+                                   },
+                       "find":  {
+                                    "label":  "見つける (Find)",
+                                    "phase":  "find",
+                                    "emoji":  "🔎",
+                                    "count":  5
+                                }
+                   }
+}

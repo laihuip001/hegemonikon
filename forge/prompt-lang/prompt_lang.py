@@ -17,6 +17,7 @@ Requirements:
 import re
 import json
 import sys
+import itertools
 from pathlib import Path
 from dataclasses import dataclass, field, asdict
 from typing import Optional
@@ -304,12 +305,12 @@ class Prompt:
                     
                     # Use glob to find files
                     if max_depth == 1:
-                        files = list(path.glob(pattern))
+                        files_gen = path.glob(pattern)
                     else:
-                        files = list(path.glob(f"**/{pattern}"))
+                        files_gen = path.glob(f"**/{pattern}")
                     
                     # Limit results
-                    files = files[:20]
+                    files = list(itertools.islice(files_gen, 20))
                     return "\n".join(str(f.relative_to(path)) for f in files)
                 except Exception as e:
                     return f"Error listing directory: {e}"

@@ -321,8 +321,90 @@ class Prompt:
             return f"[Conversation: {item.path}]"
         
         elif item.ref_type == "mcp":
-            # Placeholder for MCP server reference
-            return f"[MCP Server: {item.path}]"
+            # Resolve MCP tool call
+            if not item.tool_chain:
+                return f"[MCP Error: No tool specified for {item.path}]"
+
+            # Parse tool chain: tool("args")
+            # item.path is server name (e.g. "gnosis")
+            # item.tool_chain is like 'gnosis.tool("search")'
+
+            import re
+            # Match .tool("name", args) or .tool("name")
+            match = re.search(r'\.tool\((["\'])(.*?)\1(?:,\s*(.*))?\)', item.tool_chain)
+            if not match:
+                return f"[MCP Error: Invalid tool syntax: {item.tool_chain}]"
+
+            tool_name = match.group(2)
+            args_str = match.group(3)
+
+            arguments = {}
+            if args_str:
+                try:
+                    arguments = json.loads(args_str)
+                except json.JSONDecodeError:
+                    # If not valid JSON, treat as error or ignore?
+                    # If args_str is a variable or complex string, we might fail here.
+                    return f"[MCP Error: Invalid JSON arguments for tool {tool_name}: {args_str}]"
+
+            # Heuristic: If no arguments provided for 'search', use prompt goal
+            if not arguments and tool_name == "search" and self.goal:
+                 arguments = {"query": self.goal}
+
+            # Resolve server script path
+            # Assume we are in forge/prompt-lang/
+            # Repo root is ../../
+            try:
+                # If running as script
+                root = Path(__file__).resolve().parent.parent.parent
+            except NameError:
+                # If __file__ is not defined (e.g. interactive)
+                root = Path.cwd()
+
+            server_script = None
+            if item.path == "gnosis":
+                 server_script = root / "mcp" / "gnosis_mcp_server.py"
+            elif item.path == "prompt-lang-generator":
+                 server_script = root / "mcp" / "prompt_lang_server.py"
+
+            if not server_script or not server_script.exists():
+                 return f"[MCP Error: Unknown or missing server {item.path} at {server_script}]"
+
+            # Call MCP
+            try:
+                 try:
+                     from .mcp_client import SimpleMCPClient
+                 except ImportError:
+                     from mcp_client import SimpleMCPClient
+
+                 # Run server from repo root to ensure imports work
+                 client = SimpleMCPClient(
+                     [sys.executable, str(server_script)],
+                     cwd=str(root),
+                     env={**os.environ, "PYTHONPATH": str(root)}
+                 )
+                 client.start()
+                 try:
+                     client.initialize()
+                     result = client.call_tool(tool_name, arguments)
+
+                     # Process result (list of content objects)
+                     text_output = []
+                     if isinstance(result, list):
+                         for content in result:
+                             if isinstance(content, dict) and content.get("type") == "text":
+                                  text_output.append(content.get("text", ""))
+                     elif isinstance(result, dict) and result.get("content"):
+                         # Handle {content: [...], isError: ...}
+                         for content in result["content"]:
+                             if isinstance(content, dict) and content.get("type") == "text":
+                                  text_output.append(content.get("text", ""))
+
+                     return "\n".join(text_output).strip()
+                 finally:
+                     client.stop()
+            except Exception as e:
+                return f"[MCP Error: {e}]"
         
         elif item.ref_type == "ki":
             # Placeholder for Knowledge Item
@@ -575,13 +657,37 @@ class PromptLangParser:
         while self.pos < len(self.lines):
             line = self._current_line()
             
-            # Check for context item: "  - type:"path" [options]"
-            # Patterns: file:"path", dir:"path", conv:"title", mcp:server, ki:"name"
-            item_match = re.match(r'^  - (file|dir|conv|mcp|ki):(["\']?)([^"\']+)\2(.*)$', line)
+            # Check for context item: "  - type:path [options]"
+            # We capture the whole remainder to handle complex paths (like MCP tool calls)
+            item_match = re.match(r'^  - (file|dir|conv|mcp|ki):(.*)$', line)
             if item_match:
                 ref_type = item_match.group(1)
-                path = item_match.group(3)
-                options_str = item_match.group(4).strip()
+                remainder = item_match.group(2).strip()
+
+                path = remainder
+                options_str = ""
+
+                # Handle quoted path
+                if remainder.startswith('"') or remainder.startswith("'"):
+                    quote = remainder[0]
+                    # Try to find closing quote
+                    # Naive match: ^"content" options$
+                    # We use non-greedy match for content
+                    quote_match = re.match(f'^{quote}(.+?){quote}(.*)$', remainder)
+                    if quote_match:
+                        path = quote_match.group(1)
+                        options_str = quote_match.group(2).strip()
+                else:
+                    # Unquoted path.
+                    # Identify options at the end: [priority=...] or (filter=...)
+                    # Be careful not to match MCP arguments inside tool(...)
+
+                    # Look for [priority=...] or similar at end of string
+                    # options usually start with space
+                    opt_match = re.search(r'(\s+\[.*?\]|\s+\(filter=.*?\))$', remainder)
+                    if opt_match:
+                        options_str = opt_match.group(1).strip()
+                        path = remainder[:opt_match.start()].strip()
                 
                 # Parse options [priority=HIGH, section="..."]
                 priority = "MEDIUM"
@@ -610,11 +716,12 @@ class PromptLangParser:
                             section_match = re.search(r'section=["\']?([^"\']+)["\']?', opts)
                             if section_match:
                                 section = section_match.group(1)
-                    
-                    # Parse MCP tool chain
-                    if ref_type == "mcp" and ".tool(" in path:
-                        tool_chain = path
-                        path = path.split(".")[0]
+
+                # Parse MCP tool chain
+                # Note: 'path' now holds the full string (e.g. server.tool("..."))
+                if ref_type == "mcp" and ".tool(" in path:
+                    tool_chain = path
+                    path = path.split(".")[0]
                 
                 items.append(ContextItem(
                     ref_type=ref_type,

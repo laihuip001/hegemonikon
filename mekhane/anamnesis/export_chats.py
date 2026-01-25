@@ -115,12 +115,18 @@ class AntigravityChatExporter:
                 'button.select-none'
             )
             
-            for idx, item in enumerate(items):
+            # タイトルを一括取得 (N+1 回避)
+            titles = await self.page.evaluate("""
+                (buttons) => {
+                    return buttons.map(button => {
+                        const titleEl = button.querySelector('span[data-testid], span.truncate');
+                        return titleEl ? titleEl.textContent : null;
+                    });
+                }
+            """, items)
+
+            for idx, (item, title) in enumerate(zip(items, titles)):
                 try:
-                    # タイトルを取得 (span[data-testid] または span.text-sm.grow.truncate)
-                    title_el = await item.query_selector('span[data-testid], span.truncate')
-                    title = await title_el.text_content() if title_el else None
-                    
                     if not title:
                         continue  # タイトルがないボタンはスキップ
                     

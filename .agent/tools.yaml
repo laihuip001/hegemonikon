@@ -97,3 +97,23 @@ directories:
   rules: ".agent/rules/"
   mekhane: "mekhane/"
   kernel: "kernel/"
+
+# =============================================================================
+# Skills (manual reference)
+# =============================================================================
+skills:
+  prompt-lang-generator:
+    path: .agent/skills/utils/prompt-lang-generator/SKILL.md
+    purpose: "Prompt-Lang v2.0 コード生成"
+    trigger: "「Prompt-Lang でスキルを作成」「.prompt ファイルを作って」"
+    templates:
+      - templates/domain_templates/technical.yaml
+      - templates/domain_templates/rag.yaml
+      - templates/domain_templates/summarization.yaml
+    status: production
+    
+  meta-prompt-generator:
+    path: .agent/skills/utils/meta-prompt-generator/SKILL.md
+    purpose: "汎用 SKILL.md 生成（アーキタイプ駆動）"
+    trigger: "「〇〇用のスキルを作成」「このプロンプトを診断」"
+    status: production

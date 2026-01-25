@@ -24,6 +24,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import List, Dict, Optional
 import argparse
+import aiofiles
 
 
 # ============================================================================
@@ -223,7 +224,7 @@ class AntigravityChatExporter:
                 self.chats.append(chat_record)
                 
                 # 逐次保存 (individualモードの場合)
-                self.save_single_chat(chat_record)
+                await self.save_single_chat(chat_record)
                 
                 print(f"    → {len(messages)} messages extracted")
                 
@@ -233,49 +234,56 @@ class AntigravityChatExporter:
         
         await self.close()
     
-    def save_markdown(self, filename: Optional[str] = None):
+    async def save_markdown(self, filename: Optional[str] = None):
         """Markdown 形式で保存"""
         if not filename:
             filename = f"antigravity_export_{datetime.now().strftime('%Y%m%d_%H%M%S')}.md"
         
         filepath = self.output_dir / filename
         
-        with open(filepath, 'w', encoding='utf-8') as f:
-            f.write("# Antigravity IDE チャット履歴\n\n")
-            f.write(f"- **エクスポート日時**: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
-            f.write(f"- **会話数**: {len(self.chats)}\n")
-            f.write(f"- **総メッセージ数**: {sum(c['message_count'] for c in self.chats)}\n\n")
-            f.write("---\n\n")
+        async with aiofiles.open(filepath, 'w', encoding='utf-8') as f:
+            header = []
+            header.append("# Antigravity IDE チャット履歴\n\n")
+            header.append(f"- **エクスポート日時**: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
+            header.append(f"- **会話数**: {len(self.chats)}\n")
+            header.append(f"- **総メッセージ数**: {sum(c['message_count'] for c in self.chats)}\n\n")
+            header.append("---\n\n")
+            await f.write("".join(header))
             
             for chat in self.chats:
-                f.write(f"## {chat['title']}\n\n")
-                f.write(f"- **ID**: `{chat['id']}`\n")
-                f.write(f"- **メッセージ数**: {chat['message_count']}\n\n")
+                lines = []
+                lines.append(f"## {chat['title']}\n\n")
+                lines.append(f"- **ID**: `{chat['id']}`\n")
+                lines.append(f"- **メッセージ数**: {chat['message_count']}\n\n")
                 
                 for msg in chat['messages']:
                     role_label = "👤 **User**" if msg['role'] == 'user' else "🤖 **Claude**"
-                    f.write(f"### {role_label}\n\n")
-                    f.write(f"{msg['content']}\n\n")
+                    lines.append(f"### {role_label}\n\n")
+                    lines.append(f"{msg['content']}\n\n")
                 
-                f.write("---\n\n")
+                lines.append("---\n\n")
+                await f.write("".join(lines))
         
         print(f"[✓] Saved: {filepath}")
         return filepath
     
-    def save_json(self, filename: Optional[str] = None):
+    async def save_json(self, filename: Optional[str] = None):
         """JSON 形式で保存"""
         if not filename:
             filename = f"antigravity_export_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
         
         filepath = self.output_dir / filename
         
-        with open(filepath, 'w', encoding='utf-8') as f:
-            json.dump(self.chats, f, ensure_ascii=False, indent=2)
+        # JSONダンプはCPUバウンドだが、aiofilesのために文字列化する
+        content = json.dumps(self.chats, ensure_ascii=False, indent=2)
+
+        async with aiofiles.open(filepath, 'w', encoding='utf-8') as f:
+            await f.write(content)
         
         print(f"[✓] Saved: {filepath}")
         return filepath
     
-    def save_single_chat(self, chat: Dict):
+    async def save_single_chat(self, chat: Dict):
         """1つの会話を保存"""
         # ファイル名をサニタイズ（ASCII のみ許可）
         title = chat['title']
@@ -298,16 +306,19 @@ class AntigravityChatExporter:
         print(f"[DEBUG] Saving to: {filepath}")
         
         try:
-            with open(filepath, 'w', encoding='utf-8') as f:
-                f.write(f"# {chat['title']}\n\n")
-                f.write(f"- **ID**: `{chat['id']}`\n")
-                f.write(f"- **エクスポート日時**: {chat['exported_at']}\n\n")
-                f.write("---\n\n")
+            async with aiofiles.open(filepath, 'w', encoding='utf-8') as f:
+                lines = []
+                lines.append(f"# {chat['title']}\n\n")
+                lines.append(f"- **ID**: `{chat['id']}`\n")
+                lines.append(f"- **エクスポート日時**: {chat['exported_at']}\n\n")
+                lines.append("---\n\n")
                 
                 for msg in chat['messages']:
                     role_label = "## 👤 User" if msg['role'] == 'user' else "## 🤖 Claude"
-                    f.write(f"{role_label}\n\n")
-                    f.write(f"{msg['content']}\n\n")
+                    lines.append(f"{role_label}\n\n")
+                    lines.append(f"{msg['content']}\n\n")
+
+                await f.write("".join(lines))
             
             print(f"  [✓] Saved: {filename}")
         except Exception as e:
@@ -315,11 +326,11 @@ class AntigravityChatExporter:
             import traceback
             traceback.print_exc()
 
-    def save_individual(self):
+    async def save_individual(self):
         """（非推奨：逐次保存を使用）各会話を個別ファイルとして保存"""
         print("[*] Re-saving all chats...")
         for chat in self.chats:
-            self.save_single_chat(chat)
+            await self.save_single_chat(chat)
     
     async def close(self):
         """リソースを解放"""
@@ -362,14 +373,14 @@ async def main():
             return 1
         
         if args.format == 'md':
-            exporter.save_markdown()
+            await exporter.save_markdown()
         elif args.format == 'json':
-            exporter.save_json()
+            await exporter.save_json()
         elif args.format == 'both':
-            exporter.save_markdown()
-            exporter.save_json()
+            await exporter.save_markdown()
+            await exporter.save_json()
         elif args.format == 'individual':
-            exporter.save_individual()
+            await exporter.save_individual()
         
         print(f"\n[✓] Export complete: {len(exporter.chats)} conversations")
         return 0

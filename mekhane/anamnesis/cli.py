@@ -42,6 +42,55 @@ def update_state():
         print(f"[Warning] Failed to update state: {e}")
 
 
+def cmd_vault(args):
+    """Vault operations (sync, status)"""
+    from mekhane.anamnesis.vault import VaultManager
+
+    vm = VaultManager()
+
+    if args.subcommand == "status":
+        print(f"[Vault Status]")
+        print(f"Vault Path: {vm.vault_path}")
+        print(f"Cache Path: {vm.cache_path}")
+
+        is_online = vm.is_online()
+        print(f"Online: {'✅ Yes' if is_online else '❌ No'}")
+
+        if is_online:
+            try:
+                # Check for differences if needed, or just report paths
+                pass
+            except Exception as e:
+                print(f"Error checking vault: {e}")
+
+    elif args.subcommand == "sync":
+        print(f"[Vault Sync] Starting...")
+
+        print("  Syncing Down (Vault -> Cache)...")
+        res_down = vm.sync_down()
+        if res_down["status"] == "success":
+            for f in res_down["synced"]:
+                print(f"    ↓ {f}")
+            if not res_down["synced"]:
+                print("    (Already up to date)")
+        else:
+            print(f"    Error: {res_down.get('message') or res_down['status']}")
+
+        print("  Syncing Up (Cache -> Vault)...")
+        res_up = vm.sync_up()
+        if res_up["status"] == "success":
+            for f in res_up["synced"]:
+                print(f"    ↑ {f}")
+            if not res_up["synced"]:
+                print("    (Already up to date)")
+        else:
+            print(f"    Error: {res_up.get('message') or res_up['status']}")
+
+        print("[Vault Sync] Complete.")
+
+    return 0
+
+
 def cmd_check_freshness(args):
     """
     Check if collection is needed based on threshold days.
@@ -242,6 +291,15 @@ def main():
     p_check = subparsers.add_parser("check-freshness", help="Check collection freshness")
     p_check.add_argument("--threshold", "-t", type=int, default=7, help="Threshold days (default: 7)")
     p_check.set_defaults(func=cmd_check_freshness)
+
+    # vault
+    p_vault = subparsers.add_parser("vault", help="Vault operations")
+    vault_subs = p_vault.add_subparsers(dest="subcommand", help="Vault subcommands")
+
+    p_vault_status = vault_subs.add_parser("status", help="Show vault connection status")
+    p_vault_sync = vault_subs.add_parser("sync", help="Sync cache with vault")
+
+    p_vault.set_defaults(func=cmd_vault)
     
     args = parser.parse_args()
     

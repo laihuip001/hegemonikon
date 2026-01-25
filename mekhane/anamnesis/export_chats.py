@@ -205,8 +205,7 @@ class AntigravityChatExporter:
                     if not clean_text or len(clean_text) < 10:
                         continue
                     
-                    # "Thought for Xs" を除去
-                    import re
+                    # "Thought for Xs" を除去（re は冒頭で import 済み）
                     clean_text = re.sub(r'^Thought for \d+s\s*', '', clean_text)
                     clean_text = re.sub(r'^Thought for <\d+s\s*', '', clean_text)
                     
@@ -245,47 +244,49 @@ class AntigravityChatExporter:
         if not await self.connect():
             return
         
-        conversations = await self.extract_conversation_list()
-        
-        for idx, conv in enumerate(conversations, 1):
-            print(f"[{idx}/{len(conversations)}] {conv['title']}")
+        try:
+            conversations = await self.extract_conversation_list()
             
-            try:
-                # 会話をクリック
-                await conv['element'].click()
+            for idx, conv in enumerate(conversations, 1):
+                print(f"[{idx}/{len(conversations)}] {conv['title']}")
                 
-                # クリック後の安定化待機
-                # networkidle だと終わらないことがあるため、タイムアウト付きで待機
                 try:
-                    await self.page.wait_for_load_state('networkidle', timeout=2000)
-                except:
-                    pass
-                
-                await asyncio.sleep(1.0)  # UI 更新を確実に待機
-                
-                # メッセージを抽出
-                messages = await self.extract_messages()
-                
-                # 記録を保存
-                chat_record = {
-                    "id": conv['id'],
-                    "title": conv['title'],
-                    "exported_at": datetime.now().isoformat(),
-                    "message_count": len(messages),
-                    "messages": messages
-                }
-                self.chats.append(chat_record)
-                
-                # 逐次保存 (individualモードの場合)
-                self.save_single_chat(chat_record)
-                
-                print(f"    → {len(messages)} messages extracted")
-                
-            except Exception as e:
-                print(f"    → Error: {e}")
-                continue
-        
-        await self.close()
+                    # 会話をクリック
+                    await conv['element'].click()
+                    
+                    # クリック後の安定化待機
+                    try:
+                        await self.page.wait_for_load_state('networkidle', timeout=2000)
+                    except:
+                        pass
+                    
+                    await asyncio.sleep(1.0)  # UI 更新を確実に待機
+                    
+                    # メッセージを抽出
+                    messages = await self.extract_messages()
+                    
+                    # 記録を保存
+                    chat_record = {
+                        "id": conv['id'],
+                        "title": conv['title'],
+                        "exported_at": datetime.now().isoformat(),
+                        "message_count": len(messages),
+                        "messages": messages
+                    }
+                    self.chats.append(chat_record)
+                    
+                    # 逐次保存 (individualモードの場合)
+                    self.save_single_chat(chat_record)
+                    
+                    print(f"    → {len(messages)} messages extracted")
+                    
+                except Exception as e:
+                    print(f"    → Error: {e}")
+                    import traceback
+                    traceback.print_exc()
+                    continue
+        finally:
+            await self.close()
     
     def save_markdown(self, filename: Optional[str] = None):
         """Markdown 形式で保存"""

@@ -321,8 +321,89 @@ class Prompt:
             return f"[Conversation: {item.path}]"
         
         elif item.ref_type == "mcp":
-            # Placeholder for MCP server reference
-            return f"[MCP Server: {item.path}]"
+            # MCP Server reference
+            try:
+                import asyncio
+                import ast
+                from mcp.client.stdio import stdio_client, StdioServerParameters
+                from mcp.client.session import ClientSession
+            except ImportError:
+                return "[Error: MCP library not installed]"
+
+            # Map server names to scripts
+            # Calculate repo root based on this file's location: forge/prompt-lang/prompt_lang.py
+            current_file = Path(__file__).resolve()
+            repo_root = current_file.parent.parent.parent
+
+            SERVERS = {
+                "gnosis": repo_root / "mcp/gnosis_mcp_server.py",
+                "prompt-lang-generator": repo_root / "mcp/prompt_lang_mcp_server.py"
+            }
+
+            # Parse path: "server.tool(args)"
+            path_str = item.path
+
+            if "." not in path_str:
+                return f"[Error: Invalid MCP path format. Expected 'server.tool', got '{path_str}']"
+
+            server_name, rest = path_str.split(".", 1)
+
+            if server_name not in SERVERS:
+                 return f"[Error: Unknown MCP server '{server_name}']"
+
+            script_path = SERVERS[server_name]
+            if not script_path.exists():
+                return f"[Error: Server script not found at {script_path}]"
+
+            # Parse tool and args
+            match = re.match(r"^([a-zA-Z0-9_]+)\((.*)\)$", rest)
+            if not match:
+                # Assuming just tool name
+                tool_name = rest
+                args = {}
+            else:
+                tool_name = match.group(1)
+                args_str = match.group(2)
+                args = {}
+                pos_args = []
+                if args_str:
+                    try:
+                        # Parse args using AST to handle kwargs safely
+                        # We simulate a function call parse: "call(arg1='val', ...)"
+                        tree = ast.parse(f"call({args_str})")
+                        call = tree.body[0].value
+                        for keyword in call.keywords:
+                            args[keyword.arg] = ast.literal_eval(keyword.value)
+                        pos_args = [ast.literal_eval(a) for a in call.args]
+                    except Exception as e:
+                        return f"[Error parsing arguments: {e}]"
+
+            # Handle .tool("name", ...) syntax
+            if tool_name == "tool":
+                if pos_args:
+                    tool_name = pos_args[0]
+                else:
+                    return "[Error: .tool() called without tool name argument]"
+
+            async def call_mcp_tool():
+                server_params = StdioServerParameters(
+                    command=sys.executable,
+                    args=[str(script_path)],
+                    env=os.environ.copy()
+                )
+
+                async with stdio_client(server_params) as (read, write):
+                    async with ClientSession(read, write) as session:
+                        await session.initialize()
+                        result = await session.call_tool(tool_name, arguments=args)
+                        texts = [c.text for c in result.content if c.type == "text"]
+                        return "\n".join(texts)
+
+            try:
+                # Run sync in the new loop
+                return asyncio.run(call_mcp_tool())
+            except Exception as e:
+                return f"[Error calling MCP tool: {e}]"
         
         elif item.ref_type == "ki":
             # Placeholder for Knowledge Item
@@ -577,11 +658,14 @@ class PromptLangParser:
             
             # Check for context item: "  - type:"path" [options]"
             # Patterns: file:"path", dir:"path", conv:"title", mcp:server, ki:"name"
-            item_match = re.match(r'^  - (file|dir|conv|mcp|ki):(["\']?)([^"\']+)\2(.*)$', line)
+            # Updated regex to handle quoted strings containing other quotes (e.g. mcp calls)
+            item_match = re.match(r'^  - (file|dir|conv|mcp|ki):(?:(["\'])(.*?)\2|([^"\']+))(.*)$', line)
             if item_match:
                 ref_type = item_match.group(1)
-                path = item_match.group(3)
-                options_str = item_match.group(4).strip()
+                # Group 3 is quoted content, Group 4 is unquoted content
+                path = item_match.group(3) if item_match.group(3) is not None else item_match.group(4)
+                path = path.strip() if path else ""
+                options_str = item_match.group(5).strip()
                 
                 # Parse options [priority=HIGH, section="..."]
                 priority = "MEDIUM"
@@ -610,12 +694,12 @@ class PromptLangParser:
                             section_match = re.search(r'section=["\']?([^"\']+)["\']?', opts)
                             if section_match:
                                 section = section_match.group(1)
-                    
-                    # Parse MCP tool chain
-                    if ref_type == "mcp" and ".tool(" in path:
-                        tool_chain = path
-                        path = path.split(".")[0]
                 
+                # For MCP, we do NOT split path here anymore. path contains "server.tool(args)"
+                # This allows _resolve_context_item to parse it fully.
+                if ref_type == "mcp" and ".tool(" in path:
+                     tool_chain = path
+
                 items.append(ContextItem(
                     ref_type=ref_type,
                     path=path,

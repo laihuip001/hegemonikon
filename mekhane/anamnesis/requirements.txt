@@ -3,6 +3,7 @@
 # Core
 arxiv>=2.1.0
 requests>=2.31.0
+PyYAML>=6.0
 
 # Vector DB
 lancedb>=0.4.0

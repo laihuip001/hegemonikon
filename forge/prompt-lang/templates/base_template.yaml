@@ -1,0 +1,29 @@
+# Base Prompt-Lang Template
+# Defines the standard structure for all generated prompts
+
+role: |
+  {{role}}
+
+goal: |
+  {{goal}}
+
+constraints:
+  - Output must be in {{output_format}} format.
+  - Follow the specified schema strictly.
+  {{extra_constraints}}
+
+format: |
+  ```{{output_format}}
+  {{format_schema}}
+  ```
+
+examples:
+  {{examples}}
+
+rubric:
+  - completeness:
+      description: Check if all required fields are present.
+      scale: 1-5
+  - accuracy:
+      description: Check if the output matches the requirements.
+      scale: 1-5

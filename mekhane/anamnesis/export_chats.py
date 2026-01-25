@@ -24,6 +24,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import List, Dict, Optional
 import argparse
+from concurrent.futures import ThreadPoolExecutor
 
 
 # ============================================================================
@@ -47,6 +48,7 @@ class AntigravityChatExporter:
         self.chats: List[Dict] = []
         self.browser = None
         self.page = None
+        self.executor = ThreadPoolExecutor(max_workers=2)
         
         # デバッグ: 出力ディレクトリ確認
         print(f"[DEBUG] Output directory: {self.output_dir}")
@@ -223,7 +225,10 @@ class AntigravityChatExporter:
                 self.chats.append(chat_record)
                 
                 # 逐次保存 (individualモードの場合)
-                self.save_single_chat(chat_record)
+                # ファイル書き込みはブロッキングIOなのでExecutorで実行
+                await asyncio.get_running_loop().run_in_executor(
+                    self.executor, self.save_single_chat, chat_record
+                )
                 
                 print(f"    → {len(messages)} messages extracted")
                 
@@ -327,6 +332,8 @@ class AntigravityChatExporter:
             await self.browser.close()
         if hasattr(self, 'playwright'):
             await self.playwright.stop()
+        if hasattr(self, 'executor'):
+            self.executor.shutdown(wait=False)
 
 
 # ============================================================================

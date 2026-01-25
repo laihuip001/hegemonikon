@@ -67,20 +67,28 @@ workflows:
     modules: [T4, T3]
     includes: "Step 0.1 モデル適性チェック"
     
-  ask:
-    purpose: "パプ君への調査依頼書作成"
-    modules: [T5]
+  zet:
+    purpose: "O3 Zētēsis（探求）パプ君への調査依頼書作成"
+    modules: [O3, T5]
     
   src:
     purpose: "Web検索実行（Perplexity API）"
     modules: [T5]
     
-  think:
-    purpose: "深い熟考（壁にぶつかった時）"
-    modules: [T3, T7]
-    includes: "Step 3.5 T3 自問"
-    options:
-      - "/think deep: /think + /ax 統合の最深層熟考"
+  noe:
+    purpose: "O1 Noēsis（認識）最深層思考、0からの再構築"
+    modules: [O1, T3, T4, T7]
+    description: "直観的認識、前提破壊、白紙再設計"
+
+  bou:
+    purpose: "O2 Boulēsis（意志）目的の明確化、何を望むか"
+    modules: [O2]
+    description: "次に何をしたいかを問う"
+
+  ene:
+    purpose: "O4 Energeia（行為）承認済み計画の実行"
+    modules: [O4, T6, T2]
+    description: "6段階実行フレームワーク"
 
   why:
     purpose: "T3 自問（目的と手段の入れ替わり防止）"

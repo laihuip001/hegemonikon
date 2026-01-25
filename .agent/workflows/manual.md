@@ -1,23 +1,32 @@
 ---
-description: 設計ドキュメントからGemini向け作業マニュアルを生成する。
+description: 設計ドキュメントからGemini/Jules向け作業マニュアルを生成する。
 hegemonikon: Praxis-H
 modules: [M6]
 ---
 
 # /manual ワークフロー
 
-> **目的**: 正本となる設計ドキュメントから、Gemini向けの作業マニュアルを自動生成する。
+> **目的**: 正本となる設計ドキュメントから、Gemini/Jules向けの作業マニュアルを自動生成する。
 
 ## 入力
 
 ```
-/manual <設計ドキュメントパス>
+/manual <設計ドキュメントパス> [--jules]
 ```
 
 **例**:
 ```
-/manual kernel/taxis_design.md
+/manual kernel/taxis_design.md          # Gemini 向け（デフォルト）
+/manual kernel/taxis_design.md --jules  # Jules 向け（GitHub Issue 形式）
 ```
+
+## 出力モード
+
+| モード | オプション | 出力形式 | 用途 |
+|:---|:---|:---|:---|
+| **Gemini** | (デフォルト) | Markdown マニュアル | 同期的な単純作業 |
+| **Jules** | `--jules` | GitHub Issue 形式 | 夜間バッチ、非同期作業 |
+
 
 ## 実行手順
 
@@ -201,12 +210,55 @@ docs/handoff_<YYYYMMDD>_<タスク名>.md
 ## 使用例
 
 ```
-/manual kernel/taxis_design.md
+/manual kernel/taxis_design.md          # Gemini 向け
+/manual kernel/taxis_design.md --jules  # Jules 向け
 ```
 
 生成されるファイル:
-- `docs/update_manual_taxis.md`
+- Gemini: `docs/update_manual_taxis.md`
+- Jules: `docs/jules_issue_taxis.md`
 
 ---
 
-*このワークフローはGeminiとClaudeの協働を効率化するために設計された。*
+## Jules Issue 形式テンプレート (--jules)
+
+`--jules` オプション使用時は、GitHub Issue としてそのまま使える形式で出力:
+
+```markdown
+# [Jules Task] <タスク名>
+
+## 概要
+<1行で何をするか>
+
+## 前提条件
+- [ ] リポジトリ: <repo URL>
+- [ ] ブランチ: `feature/<name>`
+
+## タスク詳細
+
+### 変更1: <ファイル名>
+**操作**: <追加/更新/削除>
+**位置**: <行番号>
+**内容**:
+```<lang>
+<完全なコード>
+```
+
+### 変更2: ...
+
+## 禁止事項
+- <具体的な禁止事項>
+
+## 完了条件
+- [ ] 全変更が適用された
+- [ ] テストが通る
+- [ ] PR が作成された
+
+## ラベル
+`jules`
+```
+
+---
+
+*このワークフローはGemini/JulesとClaudeの協働を効率化するために設計された。*
+

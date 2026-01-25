@@ -243,6 +243,17 @@ def main():
     p_check.add_argument("--threshold", "-t", type=int, default=7, help="Threshold days (default: 7)")
     p_check.set_defaults(func=cmd_check_freshness)
     
+    # logs (Antigravity Output Panel Logs)
+    from mekhane.anamnesis.antigravity_logs import cmd_logs
+    p_logs = subparsers.add_parser("logs", help="Antigravity Output Panel logs")
+    p_logs.add_argument("--session", "-s", help="Session ID (timestamp, e.g. 20260125T145530)")
+    p_logs.add_argument("--list", "-L", action="store_true", help="List available sessions")
+    p_logs.add_argument("--errors", "-e", action="store_true", help="Show errors only")
+    p_logs.add_argument("--models", "-m", action="store_true", help="Show detected models only")
+    p_logs.add_argument("--tokens", "-t", action="store_true", help="Show token usage only")
+    p_logs.add_argument("--limit", "-l", type=int, default=10, help="Max items to show")
+    p_logs.set_defaults(func=cmd_logs)
+    
     args = parser.parse_args()
     
     if not args.command:

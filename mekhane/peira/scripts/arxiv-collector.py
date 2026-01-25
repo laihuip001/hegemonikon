@@ -302,7 +302,7 @@ def show_stats():
             db = lancedb.connect(str(LANCE_DIR))
             if "arxiv_papers" in db.table_names():
                 table = db.open_table("arxiv_papers")
-                print(f"Indexed Papers: {len(table.to_pandas())}")
+                print(f"Indexed Papers: {table.count_rows()}")
             else:
                 print("Indexed Papers: (not yet indexed)")
         except Exception as e:

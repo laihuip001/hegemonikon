@@ -15,9 +15,7 @@ After all batches complete, run merge-manifests.py to combine them.
 
 import os
 import json
-import csv
 import datetime
-import re
 import sys
 
 def get_batch_id():
@@ -42,7 +40,7 @@ def parse_date(date_str):
     except:
         return datetime.date.today(), "0000", "00"
 
-def save_article(article):
+def save_article(article, manifest_file):
     url = article['url']
     post_id = url.split('/')[-1]
     title = article.get('title', '')
@@ -88,8 +86,7 @@ is_premium: unknown
         "status": "success"
     }
     
-    with open(MANIFEST_FILE, 'a', encoding='utf-8') as f:
-        f.write(json.dumps(manifest_entry, ensure_ascii=False) + '\n')
+    manifest_file.write(json.dumps(manifest_entry, ensure_ascii=False) + '\n')
         
     print(f"[Batch {BATCH_ID}] Saved: {filepath}")
     return True
@@ -105,14 +102,18 @@ def main():
     articles = json.loads(data)
     success_count = 0
     
-    for art in articles:
-        try:
-            if save_article(art):
-                success_count += 1
-        except Exception as e:
-            print(f"[Batch {BATCH_ID}] Error saving {art.get('url', 'unknown')}: {e}")
-            with open(SKIP_LOG_FILE, 'a', encoding='utf-8') as f:
-                f.write(f"{art.get('url', 'unknown')}\t{str(e)}\n")
+    # Ensure manifest directory exists
+    os.makedirs(os.path.dirname(MANIFEST_FILE), exist_ok=True)
+
+    with open(MANIFEST_FILE, 'a', encoding='utf-8') as manifest_file:
+        for art in articles:
+            try:
+                if save_article(art, manifest_file):
+                    success_count += 1
+            except Exception as e:
+                print(f"[Batch {BATCH_ID}] Error saving {art.get('url', 'unknown')}: {e}")
+                with open(SKIP_LOG_FILE, 'a', encoding='utf-8') as f:
+                    f.write(f"{art.get('url', 'unknown')}\t{str(e)}\n")
     
     print(f"[Batch {BATCH_ID}] Completed: {success_count}/{len(articles)} articles saved.")
 

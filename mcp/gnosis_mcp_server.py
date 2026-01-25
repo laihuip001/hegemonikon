@@ -75,6 +75,21 @@ server = Server(
 log("Server initialized")
 
 
+# Global cache for GnosisIndex to avoid reloading model on every request
+_gnosis_index_cache = None
+
+
+def get_gnosis_index():
+    """Get or initialize the global GnosisIndex instance."""
+    global _gnosis_index_cache
+    if _gnosis_index_cache is None:
+        # Lazy import with stdout suppression
+        with StdoutSuppressor():
+            from mekhane.anamnesis.index import GnosisIndex
+        _gnosis_index_cache = GnosisIndex()
+    return _gnosis_index_cache
+
+
 @server.list_tools()
 async def list_tools():
     """List available tools."""
@@ -137,12 +152,8 @@ async def call_tool(name: str, arguments: dict):
             return [TextContent(type="text", text="Error: query is required")]
         
         try:
-            # Lazy import with stdout suppression
-            with StdoutSuppressor():
-                from mekhane.anamnesis.index import GnosisIndex
-            
             log(f"Searching for: {query}")
-            index = GnosisIndex()
+            index = get_gnosis_index()
             results = index.search(query, k=limit)
             
             if not results:
@@ -171,11 +182,8 @@ async def call_tool(name: str, arguments: dict):
     
     elif name == "stats":
         try:
-            with StdoutSuppressor():
-                from mekhane.anamnesis.index import GnosisIndex
-            
             log("Getting stats...")
-            index = GnosisIndex()
+            index = get_gnosis_index()
             stats = index.get_stats()
             
             output_lines = ["# Gnōsis Knowledge Base Statistics\n"]

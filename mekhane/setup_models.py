@@ -6,7 +6,7 @@ from huggingface_hub import hf_hub_download
 
 # Configuration
 MODEL_ID = "Xenova/bge-small-en-v1.5"
-DEST_DIR = Path(__file__).parent / "anamnesis" / "models" / "bge-small"
+DEST_DIR = Path(__file__).parent / "models" / "bge-small"
 
 def setup_models():
     print(f"Setting up models in {DEST_DIR}...")

@@ -1,9 +1,10 @@
 ---
-description: 不足情報をPerplexityに調査依頼する。M5 Peiraと連携。深掘り版調査依頼書を生成。
-hegemonikon: Peira-H
+description: O3 Zētēsis（探求）を発動し、Perplexityに調査を依頼する。深掘り版調査依頼書を生成。
+hegemonikon: Zētēsis
+modules: [O3, T5]
 ---
 
-# /ask ワークフロー
+# /zet: 探求ワークフロー (Zētēsis)
 
 M5 Peira (探求) と連携し、**調査依頼書（深掘り版）** を生成する。
 

@@ -1,57 +1,97 @@
-# Hegemonikon Workspace Rules — 実験 B: Jules 最小化
+# AGENTS.md - Hegemonikon Project
 
-## エージェント選択ルール（Claude 優先）
+> **Purpose**: AI エージェント（Jules, Claude, Gemini）へのガイダンス
 
-### グローバルポリシー
+## Overview
 
-**IMPORTANT**: For ALL tasks including file operations:
-- **ALWAYS prefer Claude** as the primary agent
-- **NEVER delegate to Jules (Gemini)**
-- Claude should handle ALL write_to_file operations directly
-- Do NOT invoke any sub-agents or background agents
+Hegemonikon: A cognitive hypervisor framework integrating FEP-based AI modules.
+TypeScript + Python hybrid. Japanese documentation, English code.
 
-### プロンプト生成タスク
+---
 
-When the task involves generating prompts (*.prompt files):
-- **REQUIRED**: Claude must generate directly, no delegation
-- Do NOT use Gemini 3 Pro (Jules)
-- Claude handles everything: design, generation, and review
-- Follow the Prompt-Lang v2 specification at `docs/specs/prompt-lang-v2-spec.md`
+## Do
 
-### 実行の分離（なし）
+- Use TypeScript for frontend/tooling, Python for backend/ML
+- Follow ESLint/Pylint rules
+- Write tests for all business logic
+- Use Japanese for user-facing text and documentation
+- Keep code modular and well-documented
+- Run linting and tests before commit
 
+## Don't
+
+- Don't hardcode credentials or API keys
+- Don't skip tests
+- Don't modify `kernel/*.md` without approval
+- Don't use `any` type in TypeScript
+- Don't commit without passing CI checks
+
+---
+
+## Setup Commands
+
+```bash
+# Python environment
+python -m venv venv
+source venv/bin/activate  # Windows: venv\Scripts\activate
+pip install -r requirements.txt
+
+# Node.js dependencies (if applicable)
+npm install
 ```
-ALL Tasks → Claude ONLY
-NO delegation to Jules
-NO background agents
+
+## Test Commands
+
+```bash
+# Python tests
+pytest
+
+# Lint check
+pylint mekhane/
+
+# TypeScript tests (if applicable)
+npm run test
 ```
 
 ---
 
-## 実験フラグ
+## File Structure
 
-**EXPERIMENT_MODE**: jules_minimize
-**EXPERIMENT_ID**: B
+| Path | Purpose |
+|------|---------|
+| `kernel/*.md` | Core doctrine (immutable) |
+| `mekhane/` | Python implementation |
+| `.agent/workflows/*.md` | Workflows |
+| `.agent/skills/*/SKILL.md` | Skills |
+| `forge/` | Experimental tools |
+| `docs/` | Documentation |
 
 ---
 
-## プロジェクト固有のルール（維持）
+## Code Style
 
-### ファイル配置
+- **Python**: Black formatter, 88 char line length
+- **TypeScript**: Prettier, 100 char line length
+- **Naming**: snake_case (Python), camelCase (TypeScript)
+- **Comments**: English for code, Japanese for documentation
 
-- Prompt files: `forge/prompt-lang/prompts/*.prompt`
-- Skill files: `.agent/skills/*/SKILL.md`
-- Documentation: `docs/`
+---
 
-### 言語
+## Good Examples
 
-- All responses in **Japanese**
-- Code comments in **English**
-- Commit messages in **English**
+- Python module: `/mekhane/anamnesis/antigravity_logs.py`
+- Workflow: `/.agent/workflows/manual.md`
+- Skill: `/.agent/skills/*/SKILL.md`
+
+---
+
+## When Stuck
+
+Ask for clarification. Propose a plan before implementing.
 
 ---
 
 ## References
 
 - Prompt-Lang v2 Spec: `docs/specs/prompt-lang-v2-spec.md`
-- meta-prompt-generator Skill: `.agent/skills/utils/meta-prompt-generator/SKILL.md`
+- Jules Setup Guide: `docs/guides/jules_setup_guide.md`

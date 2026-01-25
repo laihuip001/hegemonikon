@@ -51,6 +51,31 @@ class Embedder:
         self.tokenizer.enable_truncation(max_length=512)
         self.tokenizer.enable_padding(length=512)
     
+    def embed_batch(self, texts: list[str]) -> list[list[float]]:
+        encoded_batch = self.tokenizer.encode_batch(texts)
+
+        # Prepare batch arrays
+        ids = [e.ids for e in encoded_batch]
+        masks = [e.attention_mask for e in encoded_batch]
+
+        input_ids = self.np.array(ids, dtype=self.np.int64)
+        attention_mask = self.np.array(masks, dtype=self.np.int64)
+        token_type_ids = self.np.zeros_like(input_ids)
+
+        outputs = self.session.run(None, {
+            "input_ids": input_ids,
+            "attention_mask": attention_mask,
+            "token_type_ids": token_type_ids,
+        })
+
+        embeddings = outputs[0]
+        mask = attention_mask[:, :, None]
+        pooled = (embeddings * mask).sum(axis=1) / mask.sum(axis=1)
+        norm = self.np.linalg.norm(pooled, axis=1, keepdims=True)
+        normalized = pooled / norm
+
+        return normalized.tolist()
+
     def embed(self, text: str) -> list:
         encoded = self.tokenizer.encode(text)
         input_ids = self.np.array([encoded.ids], dtype=self.np.int64)
@@ -137,14 +162,18 @@ class GnosisIndex:
         
         # 埋め込み生成
         data = []
-        for i, paper in enumerate(papers):
-            vector = embedder.embed(paper.embedding_text)
-            record = paper.to_dict()
-            record["vector"] = vector
-            data.append(record)
+        batch_size = 32
+        for i in range(0, len(papers), batch_size):
+            batch_papers = papers[i : i + batch_size]
+            texts = [p.embedding_text for p in batch_papers]
+            vectors = embedder.embed_batch(texts)
+
+            for paper, vector in zip(batch_papers, vectors):
+                record = paper.to_dict()
+                record["vector"] = vector
+                data.append(record)
             
-            if (i + 1) % 20 == 0:
-                print(f"  Processed {i + 1}/{len(papers)}...")
+            print(f"  Processed {min(i + batch_size, len(papers))}/{len(papers)}...")
         
         # LanceDBに追加
         if self.TABLE_NAME in self.db.table_names():

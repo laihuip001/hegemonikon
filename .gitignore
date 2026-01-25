@@ -35,3 +35,6 @@ runtime/
 forge/gnosis_data/
 gnosis_data/
 
+
+.env
+.env.local

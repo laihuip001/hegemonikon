@@ -17,6 +17,7 @@ Requirements:
 import re
 import json
 import sys
+import asyncio
 from pathlib import Path
 from dataclasses import dataclass, field, asdict
 from typing import Optional
@@ -250,6 +251,150 @@ class Prompt:
                 sections.append(f"| {dim.name} | {dim.description} | {dim.scale} |")
         
         return "\n".join(sections)
+
+    async def compile_async(self, context: dict = None, mcp_handler=None, format: str = "markdown") -> str:
+        """
+        Async compile AST to system prompt string.
+
+        Args:
+            context: Variables for @if evaluation
+            mcp_handler: Async callback for MCP resolution
+            format: Output format
+        """
+        context = context or {}
+        sections = []
+
+        # Header
+        sections.append(f"# {self.name}")
+
+        # Role
+        if self.role:
+            sections.append(f"\n## Role\n{self.role.strip()}")
+
+        # Goal
+        if self.goal:
+            sections.append(f"\n## Goal\n{self.goal.strip()}")
+
+        # Context (v2.0.1) - with async resolution
+        if self.context:
+            context_parts = ["\n## Context"]
+            for item in self.context:
+                context_parts.append(f"\n### [{item.ref_type}] {item.path}")
+                context_parts.append(f"*Priority: {item.priority}*")
+
+                # Resolve context based on type
+                if item.ref_type == "mcp":
+                    content = await self._resolve_context_item_async(item, mcp_handler)
+                else:
+                    content = self._resolve_context_item(item)
+
+                if content:
+                    context_parts.append(f"```\n{content}\n```")
+                else:
+                    context_parts.append("<!-- Resource not available -->")
+            sections.append("\n".join(context_parts))
+
+        # Constraints
+        if self.constraints:
+            sections.append("\n## Constraints")
+            for c in self.constraints:
+                sections.append(f"- {c}")
+
+        # Conditions (v2 - evaluated)
+        if self.conditions:
+            for cond in self.conditions:
+                if self._evaluate_condition(cond, context):
+                    # Use if_content
+                    if cond.if_content.get("raw"):
+                        sections.append(f"\n## Conditional (when {cond.variable}={cond.value})")
+                        sections.append(cond.if_content["raw"])
+                else:
+                    # Use else_content
+                    if cond.else_content.get("raw"):
+                        sections.append(f"\n## Conditional (else)")
+                        sections.append(cond.else_content["raw"])
+
+        # Tools
+        if self.tools:
+            sections.append("\n## Available Tools")
+            for name, desc in self.tools.items():
+                sections.append(f"- **{name}**: {desc}")
+
+        # Resources
+        if self.resources:
+            sections.append("\n## Resources")
+            for name, uri in self.resources.items():
+                sections.append(f"- **{name}**: {uri}")
+
+        # Format
+        if self.format:
+            sections.append(f"\n## Output Format\n```\n{self.format.strip()}\n```")
+
+        # Examples
+        if self.examples:
+            sections.append("\n## Examples")
+            for i, ex in enumerate(self.examples, 1):
+                sections.append(f"\n### Example {i}")
+                if ex.get("input"):
+                    sections.append(f"**Input**: {ex['input']}")
+                if ex.get("output"):
+                    sections.append(f"**Output**: {ex['output']}")
+
+        # Rubric (v2)
+        if self.rubric and self.rubric.dimensions:
+            sections.append("\n## Evaluation Rubric")
+            sections.append("| Dimension | Description | Scale |")
+            sections.append("|:---|:---|:---|")
+            for dim in self.rubric.dimensions:
+                sections.append(f"| {dim.name} | {dim.description} | {dim.scale} |")
+
+        return "\n".join(sections)
+
+    async def _resolve_context_item_async(self, item: 'ContextItem', mcp_handler) -> Optional[str]:
+        """Resolve a context item asynchronously."""
+        if item.ref_type == "mcp":
+            if not mcp_handler:
+                return f"Error: No MCP handler provided for {item.path}"
+
+            try:
+                # Parse path: "server.tool" or "server.tool(args)"
+                # But here path is already "gnosis" (server) if tool_chain is set?
+                # Parser sets tool_chain="mcp:gnosis.tool('search')"
+
+                target = item.tool_chain if item.tool_chain else item.path
+
+                # Extract server, tool, args from target string
+                # Expected format: "mcp:server.tool('args')" or "server.tool"
+
+                # Clean up prefix
+                if target.startswith("mcp:"):
+                    target = target[4:]
+
+                server_name = target.split(".")[0]
+
+                # Check for .tool("args") pattern
+                tool_match = re.search(r'\.tool\((["\']?)(.+?)\1\)', target)
+                if tool_match:
+                    tool_name = tool_match.group(2)
+                    # We might need to parse args more complexly later
+                    args = {} # Arguments usually passed via .with() or similar in Prompt-Lang v2 spec?
+                    # The spec says: mcp:gnosis.tool("search")
+                    # So tool name is passed as argument to .tool()?
+                    # Or is it mcp:gnosis.search?
+
+                    # Based on parser:
+                    # if ref_type == "mcp" and ".tool(" in path:
+                    #    tool_chain = path
+
+                    # So we have "gnosis.tool('search')"
+                    return await mcp_handler(server_name, tool_name, {})
+                else:
+                     return f"Error resolving MCP URI: {target}"
+
+            except Exception as e:
+                return f"MCP Error: {e}"
+
+        return self._resolve_context_item(item)
     
     def _evaluate_condition(self, cond: 'Condition', context: dict) -> bool:
         """Evaluate a condition against the context."""

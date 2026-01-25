@@ -2,7 +2,7 @@
 # ======================
 # Phase C: Prompt-Lang Generator を MCP ツールとして公開する設計
 
-> **Status**: STUB（設計メモのみ、実装は次回）
+> **Status**: ✅ IMPLEMENTED (2026-01-25)
 
 ---
 

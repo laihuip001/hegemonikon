@@ -2,7 +2,7 @@
 # 自動収集スクリプト（ローテーション実行）
 
 param(
-    [int]$Limit = 20,
+    [int]$Limit = 50,
     [switch]$All,
     [switch]$DryRun
 )
@@ -45,11 +45,13 @@ if ($All) {
         Write-Host "`n>> Collecting: $query" -ForegroundColor Yellow
         if (-not $DryRun) {
             python $CLI_PATH collect-all -q $query -l $Limit
-        } else {
+        }
+        else {
             Write-Host "   [DRY RUN] Would collect: $query"
         }
     }
-} else {
+}
+else {
     # Rotation: collect next topic
     $index = $state.last_index
     $query = $queries[$index]
@@ -70,7 +72,8 @@ if ($All) {
             New-Item -ItemType Directory -Path $stateDir -Force | Out-Null
         }
         $state | ConvertTo-Json | Set-Content $STATE_PATH
-    } else {
+    }
+    else {
         Write-Host "[DRY RUN] Would collect and update state"
     }
 }

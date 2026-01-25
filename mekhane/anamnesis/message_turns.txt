@@ -1,0 +1,555 @@
+=== Message Turns Analysis ===
+
+Clicked: Prompt-Lang Generation Enhancement
+
+
+=== .flex.flex-col.gap-y-3 containers: 1 ===
+
+[Container 0] text_len=12443
+  class='flex flex-col gap-y-3 px-4 relative'
+  Direct children: 178
+
+  --- Children details ---
+
+  [0] <DIV> (EVEN) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [1] <DIV> (ODD) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [2] <DIV> (EVEN) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [3] <DIV> (ODD) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [4] <DIV> (EVEN) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [5] <DIV> (ODD) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [6] <DIV> (EVEN) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [7] <DIV> (ODD) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [8] <DIV> (EVEN) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [9] <DIV> (ODD) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [10] <DIV> (EVEN) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [11] <DIV> (ODD) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [12] <DIV> (EVEN) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [13] <DIV> (ODD) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [14] <DIV> (EVEN) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [15] <DIV> (ODD) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [16] <DIV> (EVEN) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [17] <DIV> (ODD) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [18] <DIV> (EVEN) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [19] <DIV> (ODD) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [20] <DIV> (EVEN) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [21] <DIV> (ODD) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [22] <DIV> (EVEN) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [23] <DIV> (ODD) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [24] <DIV> (EVEN) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [25] <DIV> (ODD) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [26] <DIV> (EVEN) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [27] <DIV> (ODD) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [28] <DIV> (EVEN) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [29] <DIV> (ODD) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [30] <DIV> (EVEN) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [31] <DIV> (ODD) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [32] <DIV> (EVEN) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [33] <DIV> (ODD) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [34] <DIV> (EVEN) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [35] <DIV> (ODD) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [36] <DIV> (EVEN) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [37] <DIV> (ODD) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [38] <DIV> (EVEN) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [39] <DIV> (ODD) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [40] <DIV> (EVEN) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [41] <DIV> (ODD) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [42] <DIV> (EVEN) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [43] <DIV> (ODD) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [44] <DIV> (EVEN) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [45] <DIV> (ODD) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [46] <DIV> (EVEN) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [47] <DIV> (ODD) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [48] <DIV> (EVEN) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [49] <DIV> (ODD) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [50] <DIV> (EVEN) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [51] <DIV> (ODD) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [52] <DIV> (EVEN) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [53] <DIV> (ODD) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [54] <DIV> (EVEN) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [55] <DIV> (ODD) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [56] <DIV> (EVEN) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [57] <DIV> (ODD) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [58] <DIV> (EVEN) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [59] <DIV> (ODD) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [60] <DIV> (EVEN) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [61] <DIV> (ODD) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [62] <DIV> (EVEN) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [63] <DIV> (ODD) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [64] <DIV> (EVEN) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [65] <DIV> (ODD) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [66] <DIV> (EVEN) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [67] <DIV> (ODD) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [68] <DIV> (EVEN) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [69] <DIV> (ODD) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [70] <DIV> (EVEN) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [71] <DIV> (ODD) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [72] <DIV> (EVEN) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [73] <DIV> (ODD) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [74] <DIV> (EVEN) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [75] <DIV> (ODD) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [76] <DIV> (EVEN) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [77] <DIV> (ODD) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [78] <DIV> (EVEN) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [79] <DIV> (ODD) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [80] <DIV> (EVEN) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [81] <DIV> (ODD) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [82] <DIV> (EVEN) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [83] <DIV> (ODD) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [84] <DIV> (EVEN) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [85] <DIV> (ODD) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [86] <DIV> (EVEN) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [87] <DIV> (ODD) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [88] <DIV> (EVEN) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [89] <DIV> (ODD) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [90] <DIV> (EVEN) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [91] <DIV> (ODD) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [92] <DIV> (EVEN) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [93] <DIV> (ODD) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [94] <DIV> (EVEN) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [95] <DIV> (ODD) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [96] <DIV> (EVEN) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [97] <DIV> (ODD) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [98] <DIV> (EVEN) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [99] <DIV> (ODD) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [100] <DIV> (EVEN) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [101] <DIV> (ODD) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [102] <DIV> (EVEN) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [103] <DIV> (ODD) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [104] <DIV> (EVEN) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [105] <DIV> (ODD) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [106] <DIV> (EVEN) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [107] <DIV> (ODD) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [108] <DIV> (EVEN) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [109] <DIV> (ODD) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [110] <DIV> (EVEN) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [111] <DIV> (ODD) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [112] <DIV> (EVEN) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [113] <DIV> (ODD) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [114] <DIV> (EVEN) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [115] <DIV> (ODD) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [116] <DIV> (EVEN) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [117] <DIV> (ODD) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [118] <DIV> (EVEN) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [119] <DIV> (ODD) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [120] <DIV> (EVEN) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [121] <DIV> (ODD) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [122] <DIV> (EVEN) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [123] <DIV> (ODD) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [124] <DIV> (EVEN) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [125] <DIV> (ODD) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [126] <DIV> (EVEN) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [127] <DIV> (ODD) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [128] <DIV> (EVEN) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [129] <DIV> (ODD) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [130] <DIV> (EVEN) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [131] <DIV> (ODD) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [132] <DIV> (EVEN) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [133] <DIV> (ODD) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [134] <DIV> (EVEN) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [135] <DIV> (ODD) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [136] <DIV> (EVEN) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [137] <DIV> (ODD) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [138] <DIV> (EVEN) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [139] <DIV> (ODD) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [140] <DIV> (EVEN) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [141] <DIV> (ODD) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [142] <DIV> (EVEN) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [143] <DIV> (ODD) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [144] <DIV> (EVEN) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [145] <DIV> (ODD) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [146] <DIV> (EVEN) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [147] <DIV> (ODD) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [148] <DIV> (EVEN) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [149] <DIV> (ODD) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [150] <DIV> (EVEN) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [151] <DIV> (ODD) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [152] <DIV> (EVEN) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [153] <DIV> (ODD) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [154] <DIV> (EVEN) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [155] <DIV> (ODD) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [156] <DIV> (EVEN) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [157] <DIV> (ODD) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [158] <DIV> (EVEN) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [159] <DIV> (ODD) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [160] <DIV> (EVEN) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [161] <DIV> (ODD) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [162] <DIV> (EVEN) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [163] <DIV> (ODD) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [164] <DIV> (EVEN) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [165] <DIV> (ODD) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [166] <DIV> (EVEN) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [167] <DIV> (ODD) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [168] <DIV> (EVEN) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [169] <DIV> (ODD) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [170] <DIV> (EVEN) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [171] <DIV> (ODD) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [172] <DIV> (EVEN) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [173] <DIV> (ODD) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [174] <DIV> (EVEN) text_len=0
+      class='bg-gray-500/10 rounded-lg'
+
+  [175] <DIV> (ODD) text_len=8650
+      class=''
+      preview: 'Antigravity アーキテクチャ調査結果の統合 /* Copied from remark-github-blockquote-alert/alert.css */ @media (prefers-color-scheme: dark) { .markdown-alert { 	--color'
+      grandchildren: 1
+        [0] <DIV> class='isolate mb-2 overflow-hidden rounded-lg border bor' text_len=8650
+
+  [176] <DIV> (EVEN) text_len=3793
+      class=''
+      preview: '/* Copied from remark-github-blockquote-alert/alert.css */ @media (prefers-color-scheme: dark) { .markdown-alert { 	--color-border-default: #30363d;'
+      grandchildren: 2
+        [0] <DIV> class='flex flex-col space-y-2' text_len=3786
+        [1] <DIV> class='pt-3 text-sm' text_len=7
+
+  [177] <DIV> (ODD) text_len=0
+      class='absolute -bottom-8 right-4 left-4 whitespace-nowrap transition-opacity hidden opacity-0'
+      grandchildren: 1
+        [0] <SPAN> class='block max-w-full overflow-hidden text-ellipsis tex' text_len=0

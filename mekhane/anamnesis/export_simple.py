@@ -23,21 +23,28 @@ async def main():
     async with async_playwright() as p:
         browser = await p.chromium.connect_over_cdp(f"http://localhost:{CDP_PORT}")
         
-        # jetski-agent.html を探す
-        page = None
+        # jetski-agent.html を探す（複数ある場合はボタン数が最も多いページを選択）
+        agent_pages = []
         for ctx in browser.contexts:
             for pg in ctx.pages:
                 if 'jetski-agent' in pg.url:
-                    page = pg
-                    print(f"[*] Found Agent Manager: {pg.url}")
-                    break
+                    try:
+                        buttons = await pg.query_selector_all('button.select-none')
+                        agent_pages.append((pg, len(buttons)))
+                        print(f"[*] Found jetski-agent page: {len(buttons)} buttons")
+                    except:
+                        pass
         
-        if not page:
+        if not agent_pages:
             print("[!] Agent Manager not found")
             return
         
+        # ボタン数が最も多いページを選択
+        agent_pages.sort(key=lambda x: x[1], reverse=True)
+        page = agent_pages[0][0]
+        print(f"[✓] Selected Agent Manager: {agent_pages[0][1]} buttons")
+        
         # 会話ボタンを取得
-        await page.wait_for_selector('button.select-none', timeout=5000)
         items = await page.query_selector_all('button.select-none')
         
         conversations = []
@@ -52,9 +59,14 @@ async def main():
         # 各会話をファイルに保存
         for conv in conversations:
             title = conv['title']
-            safe_title = ''.join(c if ord(c) < 128 else '_' for c in title)
-            safe_title = re.sub(r'[<>:"/\\|?*]', '', safe_title)
-            safe_title = re.sub(r'_+', '_', safe_title).strip('_')[:60] or 'untitled'
+            # 改行、制御文字、バックスラッシュを除去
+            safe_title = title.replace('\n', ' ').replace('\r', ' ').replace('\\', '_')
+            # ASCII のみに変換
+            safe_title = ''.join(c if (ord(c) < 128 and ord(c) >= 32) else '_' for c in safe_title)
+            # 危険な文字を除去
+            safe_title = re.sub(r'[<>:"/|?*]', '', safe_title)
+            # 複数のスペース/アンダースコアを1つにまとめる
+            safe_title = re.sub(r'[\s_]+', '_', safe_title).strip('_')[:60] or 'untitled'
             
             filename = f"{datetime.now().strftime('%Y-%m-%d')}_{conv['id'][:8]}_{safe_title}.md"
             filepath = OUTPUT_DIR / filename

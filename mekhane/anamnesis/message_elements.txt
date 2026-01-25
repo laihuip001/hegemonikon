@@ -1,3 +1,20 @@
 === Message Elements Analysis ===
 
-Found 0 .overflow-y-auto containers
+Found 0 buttons with class 'select-none'
+
+[!] Could not click any conversation
+
+Total HTML length: 29917
+
+=== .overflow-auto: 1 matches ===
+  [0] <DIV> class='flex flex-col gap-1 overflow-auto overflow-y-scroll max-h-[50vh] px-1.5' text_len=80
+
+=== .overflow-y-scroll: 1 matches ===
+  [0] <DIV> class='flex flex-col gap-1 overflow-auto overflow-y-scroll max-h-[50vh] px-1.5' text_len=80
+
+
+=== Large divs (text > 1000) ===
+
+
+=== Elements with data-* attributes ===
+Found 0 elements

@@ -1,0 +1,16 @@
+#prompt context_real_test
+
+@role:
+  リアルファイルコンテキストテスト
+
+@goal:
+  実際のファイルを @context で読み込んで展開
+
+@context:
+  - file:"M:\Hegemonikon\README.md" [priority=HIGH]
+  - dir:"M:\Hegemonikon\.agent\workflows"(filter="*.md", depth=1) [priority=MEDIUM]
+  - mcp:gnosis
+  - ki:"REST API 設計原則"
+
+@constraints:
+  - テスト用のためシンプルに

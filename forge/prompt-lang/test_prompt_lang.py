@@ -13,11 +13,12 @@ import sys
 import unittest
 from pathlib import Path
 from io import StringIO
+from unittest.mock import MagicMock
 
 # Add parent directory to path
 sys.path.insert(0, str(Path(__file__).parent))
 
-from prompt_lang import Prompt, PromptLangParser, ParseError, parse_file, validate_file
+from prompt_lang import Prompt, PromptLangParser, ParseError, parse_file, validate_file, ContextItem
 
 
 class TestPromptLangParser(unittest.TestCase):
@@ -234,6 +235,77 @@ class TestIntegration(unittest.TestCase):
         prompts = list_prompts()
         # Should return a list (may be empty or have items)
         self.assertIsInstance(prompts, list)
+
+
+class TestMCPContext(unittest.TestCase):
+    """Test cases for MCP Context resolution."""
+
+    def test_parse_mcp_context(self):
+        content = """#prompt test-mcp
+
+@role:
+  Test role
+
+@goal:
+  Test goal
+
+@context:
+  - mcp:gnosis.tool("search").with(query="AI agents")
+  - mcp:other.tool("calc").with(a="1", b="2")
+"""
+        parser = PromptLangParser(content)
+        prompt = parser.parse()
+
+        self.assertEqual(len(prompt.context), 2)
+
+        item1 = prompt.context[0]
+        self.assertEqual(item1.ref_type, "mcp")
+        self.assertEqual(item1.path, "gnosis")
+        self.assertIn('.tool("search")', item1.tool_chain)
+        self.assertIn('.with(query="AI agents")', item1.tool_chain)
+
+    def test_compile_mcp_no_client(self):
+        prompt = Prompt(name="test", role="R", goal="G")
+        prompt.context.append(ContextItem(
+            ref_type="mcp",
+            path="gnosis",
+            tool_chain='gnosis.tool("search").with(query="foo")'
+        ))
+
+        compiled = prompt.compile()
+        self.assertIn("Runtime execution requires active MCP client", compiled)
+        self.assertIn("gnosis:search(query=foo)", compiled)
+
+    def test_compile_mcp_with_client_callable(self):
+        prompt = Prompt(name="test", role="R", goal="G")
+        prompt.context.append(ContextItem(
+            ref_type="mcp",
+            path="gnosis",
+            tool_chain='gnosis.tool("search").with(query="foo")'
+        ))
+
+        mock_client = MagicMock(return_value="Search Results")
+
+        compiled = prompt.compile(mcp_client=mock_client)
+
+        self.assertIn("Search Results", compiled)
+        mock_client.assert_called_with("gnosis", "search", {"query": "foo"})
+
+    def test_compile_mcp_with_client_object(self):
+        prompt = Prompt(name="test", role="R", goal="G")
+        prompt.context.append(ContextItem(
+            ref_type="mcp",
+            path="gnosis",
+            tool_chain='gnosis.tool("search").with(query="foo")'
+        ))
+
+        class MockClient:
+            def call_tool(self, server, tool, args):
+                return f"Called {server}:{tool} with {args}"
+
+        compiled = prompt.compile(mcp_client=MockClient())
+
+        self.assertIn("Called gnosis:search with {'query': 'foo'}", compiled)
 
 
 if __name__ == "__main__":

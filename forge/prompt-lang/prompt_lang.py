@@ -19,7 +19,7 @@ import json
 import sys
 from pathlib import Path
 from dataclasses import dataclass, field, asdict
-from typing import Optional
+from typing import Optional, Any
 
 
 @dataclass
@@ -155,13 +155,14 @@ class Prompt:
         
         return "\n".join(parts)
     
-    def compile(self, context: dict = None, format: str = "markdown") -> str:
+    def compile(self, context: dict = None, format: str = "markdown", mcp_client: Any = None) -> str:
         """
         Compile AST to system prompt string.
         
         Args:
             context: Variables for @if evaluation (e.g., {"env": "prod"})
             format: Output format ("markdown", "xml", "plain")
+            mcp_client: Optional client/callback to resolve MCP tools
         
         Returns:
             Compiled system prompt string
@@ -188,7 +189,7 @@ class Prompt:
                 context_parts.append(f"*Priority: {item.priority}*")
                 
                 # Resolve context based on type
-                content = self._resolve_context_item(item)
+                content = self._resolve_context_item(item, mcp_client)
                 if content:
                     context_parts.append(f"```\n{content}\n```")
                 else:
@@ -272,7 +273,7 @@ class Prompt:
         
         return False
     
-    def _resolve_context_item(self, item: 'ContextItem') -> Optional[str]:
+    def _resolve_context_item(self, item: 'ContextItem', mcp_client: Any = None) -> Optional[str]:
         """Resolve a context item to its content string."""
         import os
         import glob as glob_module
@@ -321,8 +322,46 @@ class Prompt:
             return f"[Conversation: {item.path}]"
         
         elif item.ref_type == "mcp":
-            # Placeholder for MCP server reference
-            return f"[MCP Server: {item.path}]"
+            # Parse server, tool, args from tool_chain or path
+            # Example: gnosis.tool("search").with(query="foo")
+
+            tool_str = item.tool_chain or item.path
+            server_name = item.path
+
+            # 1. Parse tool name
+            tool_match = re.search(r'\.tool\s*\(\s*["\']([^"\']+)["\']\s*\)', tool_str)
+            if not tool_match:
+                 return f"[MCP Server: {server_name} (No tool specified)]"
+
+            tool_name = tool_match.group(1)
+
+            # 2. Parse arguments
+            args = {}
+            with_match = re.search(r'\.with\s*\((.+)\)', tool_str)
+            if with_match:
+                args_str = with_match.group(1)
+                # Simple regex for key="value" or key='value'
+                # Note: This is fragile for complex values but sufficient for Phase C
+                arg_matches = re.finditer(r'(\w+)\s*=\s*(["\'])(.*?)\2', args_str)
+                for m in arg_matches:
+                    args[m.group(1)] = m.group(3)
+
+            # 3. Execute or Return Placeholder
+            if mcp_client:
+                try:
+                    # Assume mcp_client is a callable(server, tool, args) or object with call_tool
+                    if callable(mcp_client):
+                        return str(mcp_client(server_name, tool_name, args))
+                    elif hasattr(mcp_client, 'call_tool'):
+                        return str(mcp_client.call_tool(server_name, tool_name, args))
+                    else:
+                        return f"[MCP Error: Invalid mcp_client provided]"
+                except Exception as e:
+                    return f"[MCP Error: {e}]"
+            else:
+                # Return descriptive placeholder
+                args_desc = ", ".join(f"{k}={v}" for k,v in args.items())
+                return f"[MCP Tool Execution: {server_name}:{tool_name}({args_desc})]\n(Runtime execution requires active MCP client)"
         
         elif item.ref_type == "ki":
             # Placeholder for Knowledge Item
@@ -575,15 +614,36 @@ class PromptLangParser:
         while self.pos < len(self.lines):
             line = self._current_line()
             
-            # Check for context item: "  - type:"path" [options]"
-            # Patterns: file:"path", dir:"path", conv:"title", mcp:server, ki:"name"
-            item_match = re.match(r'^  - (file|dir|conv|mcp|ki):(["\']?)([^"\']+)\2(.*)$', line)
-            if item_match:
-                ref_type = item_match.group(1)
-                path = item_match.group(3)
-                options_str = item_match.group(4).strip()
+            # Check for context item
+            match = re.match(r'^  - (file|dir|conv|mcp|ki):(.*)$', line)
+            if match:
+                ref_type = match.group(1)
+                raw_content = match.group(2).strip()
+
+                path = raw_content
+                options_str = ""
                 
-                # Parse options [priority=HIGH, section="..."]
+                # Parse path and options
+                if raw_content.startswith(('"', "'")):
+                    q = raw_content[0]
+                    end = raw_content.find(q, 1)
+                    if end != -1:
+                        path = raw_content[1:end]
+                        options_str = raw_content[end+1:].strip()
+                    else:
+                        path = raw_content.strip(q)
+                else:
+                    # Unquoted content.
+                    # Look for start of options: [priority=...] or (filter=...) or (depth=...)
+                    # We look for the last occurrence of these patterns to split safely
+                    opt_start = re.search(r'(\s+\[.*\]|\s+\(filter=.*\)|\s+\(depth=.*\))$', raw_content)
+                    if opt_start:
+                        path = raw_content[:opt_start.start()].strip()
+                        options_str = raw_content[opt_start.start():].strip()
+                    else:
+                        path = raw_content
+
+                # Parse options
                 priority = "MEDIUM"
                 section = None
                 filter_opt = None
@@ -610,11 +670,11 @@ class PromptLangParser:
                             section_match = re.search(r'section=["\']?([^"\']+)["\']?', opts)
                             if section_match:
                                 section = section_match.group(1)
-                    
-                    # Parse MCP tool chain
-                    if ref_type == "mcp" and ".tool(" in path:
-                        tool_chain = path
-                        path = path.split(".")[0]
+
+                # Parse MCP tool chain (handled here because it's part of the path logic)
+                if ref_type == "mcp" and ".tool(" in path:
+                    tool_chain = path
+                    path = path.split(".")[0]
                 
                 items.append(ContextItem(
                     ref_type=ref_type,

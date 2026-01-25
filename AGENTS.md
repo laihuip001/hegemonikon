@@ -1,145 +1,49 @@
-# Hegemonikón: AI Agent Guidelines
+# Hegemonikon Workspace Rules
 
-> **Note**: This document is the "Instruction Manual" for AI agents (Claude, Gemini, Copilot, etc.) working on this repository.
-> **Read Also**: [docs/STRUCTURE.md](docs/STRUCTURE.md) for detailed architecture.
+## エージェント選択ルール
 
-## 1. Project Overview
+### プロンプト生成タスク
 
-**Hegemonikón** is an AI-Native Cognitive Architecture and Development Environment based on the **Free Energy Principle (FEP)**. It serves as the user's "Second Brain" and "Exocortex", integrating knowledge management, code execution, and agentic workflows.
+When the task involves generating prompts (*.prompt files):
+- **Prefer Gemini 3 Pro** for generation tasks
+- **Use Claude** for design and review tasks
+- **Follow** the Prompt-Lang v2 specification at `docs/specs/prompt-lang-v2-spec.md`
 
-### Core Philosophy
-- **Minimizing Free Energy**: The system aims to minimize surprise and uncertainty for the User (Creator).
-- **Environment over Will**: Reliability is achieved through environmental constraints and automated checks, not "willpower".
-- **Zero Entropy**: Ambiguity is the enemy. Structure is beauty.
+### プロンプト生成の具体的な指示
 
-## 2. Technical Stack
+If asked to generate a prompt file:
+1. Read the meta-prompt-generator Skill at `.agent/skills/utils/meta-prompt-generator/SKILL.md`
+2. Follow the Phase 0-6 workflow
+3. Use Prompt-Lang v2 format
+4. Validate with the parser before completion
 
-- **Core Languages**: Python (3.10+), PowerShell (Core 7.4+), Markdown (Obsidian flavored).
-- **Data Store**: LanceDB (Vector/Relational), JSON/YAML (Config).
-- **Environment**: Windows 11 (Termux/WSL compatible logic).
-- **Key Libraries**: `boto3`, `langchain`, `lancedb`, `pydantic`.
+### タスク委譲
 
-## 3. Repository Structure
+If a task is marked with `[DELEGATE:JULES]` or placed in `.ai/JULIUS_TASK.md`:
+- Treat this as a background task
+- Execute autonomously
+- Report results via artifacts
 
-This repository follows a 4-Layer Architecture:
+---
 
-- **`kernel/`**: **IMMUTABLE**. Theoretical foundations and core axioms. Do NOT modify without explicit authorization.
-- **`.agent/`**: **The "Brain"**. Contains:
-  - `workflows/`: Automated procedures (e.g., `/boot`, `/ask`, `/plan`).
-  - `skills/`: M-Series (M1-M8), P-Series (P1-P4), and K-Series (K1-K12) cognitive modules.
-  - `rules/`: Operational constraints (including `GEMINI.md` rules).
-- **`mekhane/`**: **The "Mechanism Layer"**. Infrastructure implementations:
-  - `anamnesis/`: Knowledge engine (Gnōsis, LanceDB).
-  - `ergasterion/`: Manufacturing (helpers, protocols).
-  - `exagoge/`: Exports (Obsidian prompts, skills).
-  - `peira/`: Collection (data collectors).
-- **`docs/`**: Documentation and architectural maps.
+## プロジェクト固有のルール
 
-## 4. Critical Boundaries (Traffic Light System)
+### ファイル配置
 
-### 🔴 RED: DO NOT TOUCH (Explicit Approval Required)
+- Prompt files: `forge/prompt-lang/prompts/*.prompt`
+- Skill files: `.agent/skills/*/SKILL.md`
+- Documentation: `docs/`
 
-| Target | Reason |
-| :--- | :--- |
-| `kernel/` | Theoretical core. Changes break axioms. |
-| `.gemini/GEMINI.md` | Identity definition. |
-| `.agent/rules/CONSTITUTION.md` | Immutable constraints. |
-| `config.json`, `.env*` | Secrets and environment. |
-| Any `rm -rf` or destructive commands | Data loss risk. |
+### 言語
 
-### 🟡 YELLOW: CAUTION (Verify Before Changing)
+- All responses in **Japanese**
+- Code comments in **English**
+- Commit messages in **English**
 
-| Target | Guidance |
-| :--- | :--- |
-| `.agent/workflows/*.md` | Test after changes. Affects all sessions. |
-| `.agent/skills/*/SKILL.md` | Verify M-series dependencies. |
-| `mekhane/anamnesis/` | Run tests: `python -m pytest mekhane/anamnesis/tests/` |
-| `vault/` | Backup before modification. |
+---
 
-### 🟢 GREEN: SAFE TO MODIFY
+## References
 
-| Target | Notes |
-| :--- | :--- |
-| `docs/` | Documentation is always safe. |
-| `mekhane/peira/scripts/` | Utility scripts. Test after changes. |
-| `runtime/antigravity/playground/` | Experimental area. |
-| `archive/` | Historical records. |
-
-## 5. Operational Rules for Agents
-
-### 5.1 Language & Communication
-- **User Communication**: MUST be in **Japanese** (unless explicitly requested otherwise).
-- **Code & Identifiers**: MUST be in **English**.
-- **Commit Messages**: English (Imperative mood, e.g., "Add feature X").
-
-### 5.2 File Operations
-- **Absolute Paths**: Always use absolute paths (e.g., `M:\Hegemonikon\...`).
-- **Safety First**: Use `list_dir` or `find_by_name` to verify paths before reading/writing.
-- **Backups**: Major changes should refer to `M6 Praxis` safety protocols (backup/restore).
-
-### 5.3 Kernel Protection
-- **`GEMINI.md`** and **`kernel/`** directory are **SACRED**.
-- Modification requires **Explicit User Approval**.
-
-## 6. Build, Test & Lint Commands
-
-```powershell
-# Gnōsis CLI
-python m:/Hegemonikon/mekhane/anamnesis/cli.py --help
-python m:/Hegemonikon/mekhane/anamnesis/cli.py check-freshness
-
-# Chat History Sync
-python m:/Hegemonikon/mekhane/peira/scripts/chat-history-kb.py
-
-# Linting (if configured)
-ruff check mekhane/
-
-# Tests
-python -m pytest mekhane/anamnesis/tests/ -v
-```
-
-## 7. Key Workflows (The "How-To")
-
-Agents should recognize and utilize these standardized workflows:
-
-| Command | Purpose | Module |
-| :--- | :--- | :--- |
-| `/boot` | Session initialization | M1 + M8 |
-| `/ask` | Research inquiry generation | M5 Peira |
-| `/plan` | Architectural design | M4 Phronēsis |
-| `/do` | Execution trigger | M6 Praxis |
-| `/rev` | Daily review | M7 Dokimē |
-| `/rec` | Memory refresh | M8 Anamnēsis |
-
-## 8. Common Tasks
-
-### Adding a New Workflow
-1. Create `new-workflow.md` in `.agent/workflows/`.
-2. Follow YAML frontmatter format (see existing workflows).
-3. Test manually before committing.
-
-### Adding a New Skill
-1. Create folder in `.agent/skills/m{N}-{name}/`.
-2. Add `SKILL.md` with standard format.
-3. Update `docs/STRUCTURE.md` module table.
-
-### Updating Gnōsis Knowledge Base
-```powershell
-python m:/Hegemonikon/mekhane/anamnesis/cli.py collect -s arxiv -q "query" -l 10
-```
-
-## 9. Debugging Tips
-
-| Symptom | Likely Cause | Solution |
-| :--- | :--- | :--- |
-| Workflow not recognized | File not in `.agent/workflows/` | Check path and filename |
-| Gnōsis returns empty | DB not populated or stale | Run `collect-all` command |
-| Memory not loading | `.hegemonikon/` files missing | Check `M:\Brain\.hegemonikon\` |
-| LanceDB errors | Version mismatch | `pip install --upgrade lancedb` |
-
-## 10. Development Status (Phase 1)
-
-- **Focus**: Stabilizing the Core Architecture and Workflows.
-- **Active Products**:
-  - **Gnōsis**: Knowledge Base (RAG).
-  - **Antigravity**: Agent Runtime.
+- Prompt-Lang v2 Spec: `docs/specs/prompt-lang-v2-spec.md`
+- meta-prompt-generator Skill: `.agent/skills/utils/meta-prompt-generator/SKILL.md`
+- jules-pe Skill: `.agent/skills/utils/jules-pe/SKILL.md`

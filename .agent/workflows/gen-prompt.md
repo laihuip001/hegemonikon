@@ -10,19 +10,45 @@ hegemonikon: Praxis-H
 
 ---
 
-## 概念
+## 方式選択
 
-```
-従来のコード生成:
-  Claude → [設計] → Jules → [コード生成] → ファイル
-
-プロンプト生成に転用:
-  Claude → [指示書作成] → Jules → [プロンプト生成] → .prompt ファイル
-```
+| 方式 | 操作 | 自動化度 | 推奨度 |
+|:---|:---|:---:|:---:|
+| **Agent Manager** | `Ctrl+E` で並列起動 | 高 | 🏆 最推奨 |
+| **Protocol First** | ファイルベース委譲 | 中 | ⭐ 代替 |
+| **手動切り替え** | 別タブでモデル選択 | 低 | △ 最終手段 |
 
 ---
 
-## 実行フロー
+## 方式 1: Agent Manager（推奨）
+
+### 操作手順
+
+1. **Agent Manager を開く**: `Ctrl+E`（Windows）/ `Cmd+E`（Mac）
+2. **Agent 1 作成**:
+   - 「+New」→ モデル: **Claude Sonnet 4.5**
+   - タスク: 「Prompt-Lang 形式でセキュリティレビュープロンプトを設計して」
+3. **Agent 2 作成**:
+   - 「+New」→ モデル: **Gemini 3 Pro**
+   - タスク: 「`.ai/JULIUS_TASK.md` を読んで `.prompt` ファイルを生成して」
+4. **実行**: 両エージェントが同時に動作
+5. **監視**: Agent Manager View で進捗確認
+
+### メリット
+
+- ✅ リアルタイム並列実行
+- ✅ 各エージェントの強みを活用
+- ✅ UI で進捗監視可能
+
+---
+
+## 方式 2: Protocol First（ファイルベース）
+
+### 実行フロー
+
+```
+Claude → write_to_file → .ai/JULIUS_TASK.md → Jules が読込 → 実行
+```
 
 ### Step 1: 指示書作成（Claude）
 
@@ -43,11 +69,7 @@ Claude が以下のフォーマットで **指示書** を作成し、ファイ�
 - **@role**: [役割の方向性]
 - **@goal**: [目標の方向性]
 - **@context**: [必要なリソース種類]
-- **@constraints**: [制約の方向性]
 - **@rubric**: [評価次元数と方向性]
-- **@if 条件**: [分岐が必要な状況]
-- **@examples**: [例の方向性]
-- **@fallback**: [エッジケースの方向性]
 
 ## 出力要件
 - ファイルパス: [保存先]
@@ -61,10 +83,10 @@ Claude が以下のフォーマットで **指示書** を作成し、ファイ�
 
 ### Step 2: Jules に生成依頼
 
-// turbo
-```powershell
-# 指示書を作成したら、Jules に以下のメッセージで依頼:
-# 「forge/prompt-lang/instructions/[name].md の指示に従って .prompt ファイルを生成してください」
+別のチャットで Gemini を選択し、以下を送信:
+```
+.ai/JULIUS_TASK.md を読んで、その指示に従って .prompt ファイルを生成してください。
+参考資料として meta-prompt-generator Skill と Prompt-Lang v2 仕様を読んでください。
 ```
 
 ### Step 3: 検証（Claude）
@@ -74,48 +96,30 @@ Claude が以下のフォーマットで **指示書** を作成し、ファイ�
 python M:\Hegemonikon\forge\prompt-lang\prompt_lang.py parse [生成されたファイル]
 ```
 
-### Step 4: 修正があれば反復
-
-- パースエラー → 修正依頼
-- 品質不足 → 追加指示
-
 ---
 
 ## ディレクトリ構造
 
 ```
+.ai/
+├── JULIUS_TASK.md          # タスク指示書
+└── SYSTEM_CONTEXT.md       # 制約定義
+
 forge/prompt-lang/
-├── instructions/          # 指示書ディレクトリ（新規）
-│   └── [task_name].md
-├── prompts/               # 生成されたプロンプト
-│   └── [prompt_name].prompt
-└── prompt_lang.py         # パーサー
+├── instructions/           # 指示書アーカイブ
+├── prompts/                # 生成されたプロンプト
+└── prompt_lang.py          # パーサー
 ```
 
 ---
 
-## 使用例
+## 制限事項
 
-```
-ユーザー: /gen-prompt セキュリティレビュー用プロンプト
-
-Claude: 
-1. 指示書を作成 → instructions/security_review.md
-2. Jules に依頼: 「この指示に従って .prompt を生成して」
-3. パーサーで検証
-4. 修正があれば反復
-5. 完了報告
-```
-
----
-
-## 仮説検証ポイント
-
-このワークフローが機能するかどうかは、以下に依存:
-
-1. **Jules がファイルを読める**: instructions/*.md を Jules が読み込めるか
-2. **Jules が指示に従える**: Prompt-Lang 形式を理解・生成できるか
-3. **Jules が自律的に生成**: 「内容を考えて書く」ができるか
+| 制限 | 回避策 |
+|:---|:---|
+| @mention 未実装 | Agent Manager で並列起動 |
+| 同セッション切替不可 | 別タブで異なるモデル使用 |
+| エージェント間同期通信不可 | ファイルベース非同期共有 |
 
 ---
 
@@ -123,4 +127,4 @@ Claude:
 
 | Module | Workflow | Status |
 |--------|----------|--------|
-| M6 Praxis | /gen-prompt | Experimental |
+| M6 Praxis | /gen-prompt | Ready |

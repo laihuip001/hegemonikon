@@ -12,11 +12,11 @@ CRITICAL: This file follows MCP stdio protocol rules:
 
 import sys
 import os
+import asyncio
 
 # ============ CRITICAL: Platform-specific asyncio setup ============
 # Must be done BEFORE any other imports that might use asyncio
 if sys.platform == 'win32':
-    import asyncio
     asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
 # ============ CRITICAL: Redirect ALL stdout to stderr ============
@@ -73,6 +73,24 @@ server = Server(
     instructions="Gnōsis knowledge base for academic paper search"
 )
 log("Server initialized")
+
+
+# ============ Global Cache ============
+_gnosis_index_cache = None
+
+def get_gnosis_index():
+    """Singleton accessor for GnosisIndex with stdout suppression."""
+    global _gnosis_index_cache
+    if _gnosis_index_cache is None:
+        try:
+            with StdoutSuppressor():
+                from mekhane.anamnesis.index import GnosisIndex
+                _gnosis_index_cache = GnosisIndex()
+            log("Initialized GnosisIndex singleton")
+        except Exception as e:
+            log(f"Failed to initialize GnosisIndex: {e}")
+            raise
+    return _gnosis_index_cache
 
 
 @server.list_tools()
@@ -137,13 +155,10 @@ async def call_tool(name: str, arguments: dict):
             return [TextContent(type="text", text="Error: query is required")]
         
         try:
-            # Lazy import with stdout suppression
-            with StdoutSuppressor():
-                from mekhane.anamnesis.index import GnosisIndex
-            
             log(f"Searching for: {query}")
-            index = GnosisIndex()
-            results = index.search(query, k=limit)
+            index = get_gnosis_index()
+            # Offload blocking search to thread pool
+            results = await asyncio.to_thread(index.search, query, k=limit)
             
             if not results:
                 return [TextContent(type="text", text=f"No results found for: {query}")]
@@ -171,12 +186,14 @@ async def call_tool(name: str, arguments: dict):
     
     elif name == "stats":
         try:
-            with StdoutSuppressor():
-                from mekhane.anamnesis.index import GnosisIndex
-            
             log("Getting stats...")
-            index = GnosisIndex()
-            stats = index.get_stats()
+            index = get_gnosis_index()
+            # Offload blocking stats to thread pool
+            # Check for stats method (fix for potential method name mismatch)
+            if hasattr(index, "get_stats"):
+                stats = await asyncio.to_thread(index.get_stats)
+            else:
+                stats = await asyncio.to_thread(index.stats)
             
             output_lines = ["# Gnōsis Knowledge Base Statistics\n"]
             output_lines.append(f"- **Total Papers**: {stats.get('total_papers', 0)}")

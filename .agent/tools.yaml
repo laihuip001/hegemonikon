@@ -78,6 +78,12 @@ workflows:
   think:
     purpose: "深い熟考（壁にぶつかった時）"
     modules: [T3, T7]
+    includes: "Step 3.5 T3 自問"
+
+  why:
+    purpose: "T3 自問（目的と手段の入れ替わり防止）"
+    modules: [T3]
+    description: "3層自問: 表層→深層→検証"
     
   rev:
     purpose: "レビュー生成"

@@ -71,6 +71,52 @@ def cmd_check_freshness(args):
     return 0 if result["status"] == "fresh" else 1
 
 
+def cmd_memory(args):
+    """Memory management (Vault/Cache)"""
+    from mekhane.anamnesis.memory import MemoryManager
+
+    manager = MemoryManager()
+
+    if args.subcommand == "load":
+        print(f"[Memory] Loading {args.filename}...")
+        data = manager.load(args.filename, force_reload=args.force)
+        if data is not None:
+            if isinstance(data, (dict, list)):
+                print(json.dumps(data, indent=2, ensure_ascii=False))
+            else:
+                print(data)
+        else:
+            print(f"[Error] Failed to load {args.filename}")
+            return 1
+
+    elif args.subcommand == "save":
+        print(f"[Memory] Saving to {args.filename}...")
+        # Try to parse input as JSON
+        try:
+            content = json.loads(args.content)
+        except json.JSONDecodeError:
+            content = args.content
+
+        success = manager.save(args.filename, content)
+        if success:
+            print("[Memory] Save successful")
+        else:
+            print("[Error] Save failed")
+            return 1
+
+    elif args.subcommand == "sync":
+        print("[Memory] Syncing core memory files...")
+        results = manager.sync_all()
+        for fname, status in results.items():
+            print(f"  {fname}: {status}")
+
+    else:
+        print("Unknown subcommand")
+        return 1
+
+    return 0
+
+
 def cmd_collect(args):
     """論文収集"""
     from mekhane.anamnesis.collectors.arxiv import ArxivCollector
@@ -243,6 +289,25 @@ def main():
     p_check.add_argument("--threshold", "-t", type=int, default=7, help="Threshold days (default: 7)")
     p_check.set_defaults(func=cmd_check_freshness)
     
+    # memory
+    p_memory = subparsers.add_parser("memory", help="Manage Vault memory and cache")
+    mem_subs = p_memory.add_subparsers(dest="subcommand", required=True)
+
+    # memory load
+    pm_load = mem_subs.add_parser("load", help="Load file from Vault/Cache")
+    pm_load.add_argument("filename", help="Filename (e.g. patterns.yaml)")
+    pm_load.add_argument("--force", "-f", action="store_true", help="Force reload from Vault")
+
+    # memory save
+    pm_save = mem_subs.add_parser("save", help="Save content to Vault/Cache")
+    pm_save.add_argument("filename", help="Filename")
+    pm_save.add_argument("content", help="Content (JSON string or text)")
+
+    # memory sync
+    pm_sync = mem_subs.add_parser("sync", help="Sync core files from Vault to Cache")
+
+    p_memory.set_defaults(func=cmd_memory)
+
     args = parser.parse_args()
     
     if not args.command:

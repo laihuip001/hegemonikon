@@ -49,7 +49,7 @@ class Embedder:
         self.session = ort.InferenceSession(str(model_path))
         self.tokenizer = Tokenizer.from_file(str(tokenizer_path))
         self.tokenizer.enable_truncation(max_length=512)
-        self.tokenizer.enable_padding(length=512)
+        self.tokenizer.enable_padding(pad_to_multiple_of=8)
     
     def embed(self, text: str) -> list:
         encoded = self.tokenizer.encode(text)
@@ -70,6 +70,36 @@ class Embedder:
         normalized = pooled / norm
         
         return normalized[0].tolist()
+
+    def embed_batch(self, texts: list[str]) -> list[list]:
+        if not texts:
+            return []
+
+        encoded_batch = self.tokenizer.encode_batch(texts)
+
+        # Stack arrays
+        input_ids = self.np.array([e.ids for e in encoded_batch], dtype=self.np.int64)
+        attention_mask = self.np.array([e.attention_mask for e in encoded_batch], dtype=self.np.int64)
+        token_type_ids = self.np.zeros_like(input_ids)
+
+        outputs = self.session.run(None, {
+            "input_ids": input_ids,
+            "attention_mask": attention_mask,
+            "token_type_ids": token_type_ids,
+        })
+
+        embeddings = outputs[0]
+        mask = attention_mask[:, :, None]
+
+        # Mean pooling with attention mask
+        mask_sum = mask.sum(axis=1)
+        # Avoid division by zero
+        pooled = (embeddings * mask).sum(axis=1) / self.np.maximum(mask_sum, 1e-9)
+
+        norm = self.np.linalg.norm(pooled, axis=1, keepdims=True)
+        normalized = pooled / self.np.maximum(norm, 1e-9)
+
+        return normalized.tolist()
 
 
 class GnosisIndex:
@@ -137,14 +167,23 @@ class GnosisIndex:
         
         # 埋め込み生成
         data = []
-        for i, paper in enumerate(papers):
-            vector = embedder.embed(paper.embedding_text)
-            record = paper.to_dict()
-            record["vector"] = vector
-            data.append(record)
+        batch_size = 32
+        total_papers = len(papers)
+
+        for i in range(0, total_papers, batch_size):
+            batch_papers = papers[i : i + batch_size]
+            batch_texts = [p.embedding_text for p in batch_papers]
+
+            vectors = embedder.embed_batch(batch_texts)
+
+            for paper, vector in zip(batch_papers, vectors):
+                record = paper.to_dict()
+                record["vector"] = vector
+                data.append(record)
             
-            if (i + 1) % 20 == 0:
-                print(f"  Processed {i + 1}/{len(papers)}...")
+            processed_count = min(i + batch_size, total_papers)
+            if processed_count % 32 == 0 or processed_count == total_papers:
+                 print(f"  Processed {processed_count}/{total_papers}...")
         
         # LanceDBに追加
         if self.TABLE_NAME in self.db.table_names():

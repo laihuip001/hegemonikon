@@ -22,13 +22,17 @@ from datetime import datetime, date, timedelta
 from typing import Optional, List, Dict, Any
 from dataclasses import dataclass, asdict
 
+from .vault_manager import VaultManager
+
 # Load environment
 from dotenv import load_dotenv
 
 # Paths
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 BRAIN_DIR = Path(r"C:\Users\makar\.gemini\antigravity\brain")
-OUTPUT_DIR = Path(r"M:\Brain\.hegemonikon\session_summaries")
+# OUTPUT_DIR replaced by VaultManager
+VAULT_ROOT = Path(r"M:\Brain")
+vault_manager = VaultManager(VAULT_ROOT)
 ENV_FILE = PROJECT_ROOT / ".env.local"
 
 # Load API key
@@ -280,10 +284,8 @@ def parse_review_response(response_text: str, target_date: date, session_count: 
 def save_review(review: NightReview) -> Path:
     """レビューをファイルに保存"""
     
-    OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
-    
+    relative_dir = Path(".hegemonikon/session_summaries")
     filename = f"review_{review.date}.md"
-    filepath = OUTPUT_DIR / filename
     
     content = f"""# 📋 Night Review ({review.date})
 
@@ -305,15 +307,13 @@ def save_review(review: NightReview) -> Path:
 *Generated at: {review.generated_at}*
 """
     
-    with open(filepath, "w", encoding="utf-8") as f:
-        f.write(content)
+    # Save Markdown via VaultManager
+    saved_path = vault_manager.save_text(relative_dir / filename, content)
     
-    # Also save JSON for programmatic access
-    json_path = OUTPUT_DIR / f"review_{review.date}.json"
-    with open(json_path, "w", encoding="utf-8") as f:
-        json.dump(asdict(review), f, ensure_ascii=False, indent=2)
+    # Also save JSON via VaultManager
+    vault_manager.save_json(relative_dir / f"review_{review.date}.json", asdict(review))
     
-    return filepath
+    return saved_path
 
 
 def generate_night_review(
@@ -397,6 +397,9 @@ def main():
     # list command
     subparsers.add_parser("list", help="List all sessions")
     
+    # sync command
+    subparsers.add_parser("sync", help="Sync cached files to Vault")
+
     args = parser.parse_args()
     
     if args.command == "generate":
@@ -419,6 +422,9 @@ def main():
         
     elif args.command == "list":
         list_sessions()
+
+    elif args.command == "sync":
+        vault_manager.sync()
 
 
 if __name__ == "__main__":

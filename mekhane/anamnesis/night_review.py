@@ -58,6 +58,88 @@ class NightReview:
     generated_at: str
 
 
+def _process_session_dir(session_dir: Path, target_date: Optional[date]) -> Optional[SessionInfo]:
+    """
+    単一のセッションディレクトリを処理するヘルパー関数。
+    並列処理のために分離。
+    """
+    if not session_dir.is_dir():
+        return None
+    if session_dir.name.startswith("_"):
+        return None
+
+    session_id = session_dir.name
+
+    # Find metadata files
+    artifacts = []
+    title = ""
+    objective = ""
+    created_at = None
+    modified_at = None
+
+    for md_file in session_dir.glob("*.md"):
+        meta_file = session_dir / f"{md_file.name}.metadata.json"
+
+        if not meta_file.exists():
+            continue
+
+        try:
+            with open(meta_file, "r", encoding="utf-8") as f:
+                meta = json.load(f)
+
+            with open(md_file, "r", encoding="utf-8") as f:
+                content = f.read()
+
+            artifact_updated = meta.get("updatedAt", "")
+
+            # Track latest modification
+            if artifact_updated:
+                if modified_at is None or artifact_updated > modified_at:
+                    modified_at = artifact_updated
+                if created_at is None or artifact_updated < created_at:
+                    created_at = artifact_updated
+
+            artifacts.append({
+                "type": meta.get("artifactType", "unknown"),
+                "summary": meta.get("summary", ""),
+                "content": content[:2000],
+                "updated_at": artifact_updated,
+            })
+
+            # Extract title from implementation_plan or task
+            if not title and "plan" in md_file.name.lower():
+                lines = content.split("\n")
+                for line in lines:
+                    if line.startswith("# "):
+                        title = line[2:].strip()
+                        break
+
+        except Exception as e:
+            print(f"Warning: Failed to read {meta_file}: {e}", file=sys.stderr)
+            continue
+
+    if not artifacts:
+        return None
+
+    # Filter by date if specified
+    if target_date and modified_at:
+        try:
+            mod_date = datetime.fromisoformat(modified_at.replace("Z", "+00:00")).date()
+            if mod_date != target_date:
+                return None
+        except:
+            pass
+
+    return SessionInfo(
+        session_id=session_id,
+        title=title or f"Session {session_id[:8]}",
+        objective=objective,
+        created_at=created_at,
+        modified_at=modified_at,
+        artifacts=artifacts,
+    )
+
+
 def get_sessions(target_date: Optional[date] = None) -> List[SessionInfo]:
     """
     Antigravity brain からセッション情報を取得。
@@ -67,82 +149,22 @@ def get_sessions(target_date: Optional[date] = None) -> List[SessionInfo]:
     """
     sessions = []
     
-    for session_dir in BRAIN_DIR.iterdir():
-        if not session_dir.is_dir():
-            continue
-        if session_dir.name.startswith("_"):
-            continue
+    # Use ProcessPoolExecutor to process sessions in parallel
+    import concurrent.futures
+
+    # Adjust max_workers based on the environment
+    max_workers = min(32, (os.cpu_count() or 1) + 4)
+
+    with concurrent.futures.ProcessPoolExecutor(max_workers=max_workers) as executor:
+        futures = {executor.submit(_process_session_dir, p, target_date): p for p in BRAIN_DIR.iterdir()}
         
-        session_id = session_dir.name
-        
-        # Find metadata files
-        artifacts = []
-        title = ""
-        objective = ""
-        created_at = None
-        modified_at = None
-        
-        for md_file in session_dir.glob("*.md"):
-            meta_file = session_dir / f"{md_file.name}.metadata.json"
-            
-            if not meta_file.exists():
-                continue
-            
+        for future in concurrent.futures.as_completed(futures):
             try:
-                with open(meta_file, "r", encoding="utf-8") as f:
-                    meta = json.load(f)
-                
-                with open(md_file, "r", encoding="utf-8") as f:
-                    content = f.read()
-                
-                artifact_updated = meta.get("updatedAt", "")
-                
-                # Track latest modification
-                if artifact_updated:
-                    if modified_at is None or artifact_updated > modified_at:
-                        modified_at = artifact_updated
-                    if created_at is None or artifact_updated < created_at:
-                        created_at = artifact_updated
-                
-                artifacts.append({
-                    "type": meta.get("artifactType", "unknown"),
-                    "summary": meta.get("summary", ""),
-                    "content": content[:2000],
-                    "updated_at": artifact_updated,
-                })
-                
-                # Extract title from implementation_plan or task
-                if not title and "plan" in md_file.name.lower():
-                    lines = content.split("\n")
-                    for line in lines:
-                        if line.startswith("# "):
-                            title = line[2:].strip()
-                            break
-                
+                result = future.result()
+                if result:
+                    sessions.append(result)
             except Exception as e:
-                print(f"Warning: Failed to read {meta_file}: {e}", file=sys.stderr)
-                continue
-        
-        if not artifacts:
-            continue
-        
-        # Filter by date if specified
-        if target_date and modified_at:
-            try:
-                mod_date = datetime.fromisoformat(modified_at.replace("Z", "+00:00")).date()
-                if mod_date != target_date:
-                    continue
-            except:
-                pass
-        
-        sessions.append(SessionInfo(
-            session_id=session_id,
-            title=title or f"Session {session_id[:8]}",
-            objective=objective,
-            created_at=created_at,
-            modified_at=modified_at,
-            artifacts=artifacts,
-        ))
+                print(f"Error processing session: {e}", file=sys.stderr)
     
     # Sort by modified_at descending
     sessions.sort(key=lambda s: s.modified_at or "", reverse=True)

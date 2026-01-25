@@ -1,119 +1,190 @@
 ---
-name: "T7 Dokimē"
-description: |
-  FEP Octave T7: 検証モジュール (A-E-S)。仮説を検証するための実験を設計・実行する。
-  Use when: テスト設計、批評・レビュー依頼、Synedrion発動、仮説検証、品質確認が必要な時。
-  Use when NOT: 単純な実行タスクで検証不要な時、理論構築フェーズの時。
-  Triggers: T8 Anamnēsis (検証完了→学習記録へ) or T3 Theōria (検証失敗→モデル再構築へ)
-  Keywords: test, verify, validate, review, critique, hypothesis, experiment, Synedrion.
+id: "T7"
+name: "Dokimē"
+category: "verification"
+description: "検証モジュール (A-E-S)。実行結果を検証し、フィードバックを生成する。"
+
+triggers:
+  - T6 execution complete
+  - verification needed
+  - hypothesis test
+  - /chk workflow
+
+keywords:
+  - verification
+  - test
+  - validate
+  - check
+  - feedback
+  - review
+
+when_to_use: |
+  T6 実行完了後、仮説検証時、「確認して」「レビューして」の依頼時。
+  /chk ワークフロー発動時。
+
+when_not_to_use: |
+  - まだ実行フェーズ中
+  - 検証対象がない
+
+fep_code: "A-E-S"
+version: "2.0"
 ---
 
 # T7: Dokimē (δοκιμή) — 検証
 
 > **FEP Code:** A-E-S (Action × Epistemic × Slow)
-> **Hegemonikón:** 15 Dokimē-H
+>
+> **問い**: これで正しいか？
+>
+> **役割**: 実行結果を検証し、フィードバックを生成する
+
+---
+
+## When to Use（早期判定）
+
+### ✓ Trigger となる条件
+- T6 Praxis からの実行結果受信
+- 仮説検証が必要（T3 から）
+- 「確認して」「レビューして」「テストして」という依頼
+- `/chk` ワークフロー発動
+- 重要な変更後
+
+### ✗ Not Trigger
+- まだ実行フェーズ中
+- 検証対象がない
+- 軽微な変更で検証不要
 
 ---
 
 ## Core Function
 
-**役割:** 仮説を検証するための実験を設計する
+**役割:** 実行結果を検証し、フィードバックを生成する
 
 | 項目 | 内容 |
 |------|------|
-| **FEP役割** | 能動的推論、情報獲得行動の最適化 |
-| **本質** | 「本当にそうか」を確かめる |
+| **FEP役割** | 予測と実際の比較（予測誤差計算） |
+| **本質** | 「これで正しいか」を確認する |
+| **位置** | Core Loop のフィードバック部分 |
+| **依存** | T6 からの実行結果、T3 からの仮説 |
 
 ---
 
-## Input / Output
-
-### Input
-
-| 種別 | 形式 | ソース |
-|------|------|--------|
-| 仮説リスト | JSON | T3 Theōria |
-| 予備情報 | JSON | T5 Peira |
-| 検証要求 | テキスト | ユーザー |
-
-### Output
-
-| 種別 | 形式 | 送信先 |
-|------|------|--------|
-| 実験計画 | Markdown | T6 Praxis |
-| 検証結果 | JSON | T3 Theōria |
-| 検証レポート | Markdown | ユーザー |
-
----
-
-## Trigger
-
-| トリガー | 条件 | 優先度 |
-|----------|------|--------|
-| 仮説形成 | T3 Theōria から仮説受信 | 高 |
-| 予測精度への疑問 | error_rate > 0.3 | 高 |
-| 明示的検証要求 | 「テストして」「確認して」 | 最高 |
-
----
-
-## Processing Logic
+## Processing Logic（フロー図）
 
 ```
-Phase 1: 仮説分析
-  1. 検証対象の仮説を受信
-  2. 検証可能性を評価
-  3. 反証可能な形式に変換
-
-Phase 2: 実験設計
-  4. 検証方法を選択:
-     - 直接検証: データで確認
-     - 間接検証: 推論で確認
-     - A/Bテスト: 比較で確認
-  5. 成功/失敗の基準を定義
-  6. 必要なデータ/リソースを特定
-
-Phase 3: 実験実行
-  7. T6 Praxis に実験計画を送信
-  8. 結果を収集
-  9. 統計的評価
-
-Phase 4: 結果報告
-  10. 検証結果を T3 Theōria に送信
-  11. 仮説の採択/棄却を判定
-  12. ユーザーにレポート
+┌─ 検証対象を受信
+│
+├─ Phase 1: 検証準備
+│  ├─ 期待結果（予測）を確認
+│  ├─ 実際結果を取得
+│  └─ 比較基準を設定
+│
+├─ Phase 2: 検証実行
+│  ├─ 予測 vs 実際を比較
+│  ├─ 偏差（差分）を計算
+│  └─ 偏差が閾値超え → Phase 3
+│
+├─ Phase 3: 原因分析（偏差大の場合）
+│  ├─ 偏差の原因を推定
+│  │   ├─ 実行ミス → T6 へフィードバック
+│  │   ├─ 計画ミス → T4 へフィードバック
+│  │   └─ モデルミス → T3 へフィードバック
+│  └─ Devil's Advocate 発動（任意）
+│
+└─ Phase 4: 出力
+   ├─ 検証結果 → T8 Anamnēsis（記録）
+   ├─ 修正提案 → T6/T4/T3
+   └─ 偏差小 → 次サイクルへ
 ```
 
 ---
 
-## Verification Methods
+## Verification Modes
 
-| 方法 | 適用条件 | 例 |
-|------|----------|-----|
-| **直接検証** | データが入手可能 | ログを確認 |
-| **間接検証** | 直接確認が困難 | 相関から推論 |
-| **A/Bテスト** | 比較が可能 | 両方試して比較 |
-| **Pre-Mortem** | リスク評価 | 失敗を仮定して分析 |
-
----
-
-## Cognitive Armory
-
-| フレームワーク | 用途 |
-|----------------|------|
-| **Devil's Advocate** | 反対意見を強制的に生成 |
-| **10th Man Rule** | 全員同意なら反論を義務化 |
-| **Inversion** | 失敗条件から逆算 |
-| **Occam's Razor** | 最も単純な説明を優先 |
+| モード | 条件 | 動作 |
+|--------|------|------|
+| **自動検証** | 明確な成功基準あり | 基準と比較 |
+| **手動検証** | 基準が主観的 | ユーザーに確認 |
+| **テスト検証** | コード/システム | テスト実行 |
+| **批判的検証** | 重要な決定 | Devil's Advocate 発動 |
 
 ---
 
-## Failure Modes
+## Devil's Advocate Mode
 
-| 失敗 | 症状 | 回復策 |
-|------|------|--------|
-| 不適切な実験設計 | 仮説が検証されない | 反証可能性の確認 |
-| 確証バイアス | 都合の良いデータのみ採用 | Devil's Advocate 強制 |
-| 検証漏れ | 重要な仮説が未検証 | 仮説リストの定期レビュー |
+> **発動条件**: 重要な決定、高リスク、または確証バイアス検出時
+
+```yaml
+devils_advocate:
+  trigger:
+    - high_risk_decision: true
+    - confidence_bias_detected: true  # contradicting = [] が続く
+    - user_request: "/chk critic"
+    
+  process:
+    1. 現在の結論/仮説を否定する視点を構築
+    2. 反証を積極的に探索
+    3. 批判的質問を列挙
+    4. 反論に対する回答を要求
+    
+  output:
+    - counter_arguments: []
+    - critical_questions: []
+    - revised_confidence: float
+```
+
+---
+
+## Edge Cases / Failure Modes
+
+### ⚠️ Failure 1: 期待結果なし
+**症状**: 予測/期待結果が未定義  
+**対処**: ユーザーに成功基準を質問
+
+### ⚠️ Failure 2: 全て合格
+**症状**: 常に偏差 < 閾値  
+**対処**: 閾値を厳しく or Devil's Advocate 発動
+
+### ⚠️ Failure 3: 全て不合格
+**症状**: 常に偏差 > 閾値  
+**対処**: 期待結果の妥当性を再評価
+
+### ⚠️ Failure 4: 原因不明
+**症状**: 偏差大だが原因推定不可  
+**対処**: T5 Peira に情報収集要求
+
+### ✓ Success Pattern
+**事例**: 実行結果受信 → 偏差計算 → 小偏差 → 合格 → T8 へ
+
+---
+
+## Test Cases（代表例）
+
+### Test 1: 自動検証（合格）
+**Input**: コード変更、テスト実行  
+**Expected**: テスト合格  
+**Actual**: ✓ 合格、次サイクルへ
+
+### Test 2: 批判的検証
+**Input**: 重要な設計決定  
+**Expected**: Devil's Advocate 発動  
+**Actual**: ✓ 反論リスト生成
+
+### Test 3: 偏差大
+**Input**: 予測と実際が大きく乖離  
+**Expected**: 原因分析、フィードバック  
+**Actual**: ✓ T4 へ計画修正提案
+
+---
+
+## Configuration
+
+```yaml
+deviation_threshold: 0.2       # 偏差閾値（超えたら原因分析）
+auto_devils_advocate: false    # 自動 Devil's Advocate
+min_test_coverage: 0.8         # 最低テストカバレッジ
+require_user_confirmation: false  # ユーザー確認を常に要求
+```
 
 ---
 
@@ -121,73 +192,14 @@ Phase 4: 結果報告
 
 | 依存 | 対象 | 関係 |
 |------|------|------|
-| **Precondition** | T3 Theōria | 仮説リスト |
-| **Precondition** | T5 Peira | 予備情報 |
-| **Postcondition** | T3 Theōria | 検証結果 |
-| **Postcondition** | T6 Praxis | 実験実行 |
+| **Precondition** | T6 Praxis | 実行結果 |
+| **Precondition** | T3 Theōria | 仮説（任意） |
+| **Postcondition** | T8 Anamnēsis | 検証結果を記録 |
+| **Postcondition** | T3 Theōria | モデル修正フィードバック |
+| **Postcondition** | T4 Phronēsis | 計画修正フィードバック |
+| **Postcondition** | T6 Praxis | 実行修正フィードバック |
 
 ---
 
-## 🏛️ Synedrion — 偉人評議会
-
-> **目的:** 多角的視点での批評・検証を実行する
-
-### 評議員 (The Six Critics)
-
-| # | 評議員 | 視点 | 哲学 |
-|---|--------|------|------|
-| 1 | 🔓 **チューリング** (Alan Turing) | 論理 | "証明可能か？計算可能か？" |
-| 2 | ⚡ **フォード** (Henry Ford) | 効率 | "無駄を排除せよ。シンプルに。" |
-| 3 | 🧪 **ファインマン** (Richard Feynman) | 明確さ | "説明できなければ理解していない。" |
-| 4 | ⚔️ **ベゾス** (Jeff Bezos) | 顧客 | "顧客から逆算せよ。" |
-| 5 | 🏛️ **ダ・ヴィンチ** (Leonardo da Vinci) | 構造 | "シンプルさは究極の洗練。" |
-| 6 | 🎨 **ジョブズ** (Steve Jobs) | 体験 | "ユーザーが何を望むかを知れ。" |
-
-### 発動プロトコル
-
-```
-[SYNEDRION PROTOCOL]
-
-Phase 1: 招集
-  1. 対象（成果物/提案/コード）を定義
-  2. 各評議員の視点で独立評価
-
-Phase 2: 評価
-  各評議員が以下を出力:
-  - 評価: ✅ (合格) / ⚠️ (要改善) / 🔴 (却下)
-  - 辛口コメント: 忖度なし、短く鋭く
-
-Phase 3: 統合
-  3. 異議がある者のみ発言（効率モード）
-  4. 全会一致なら「全会一致で承認」と一行で終了
-  5. 異議があれば修正指示を出力
-
-出力形式:
-  | 評議員 | 視点 | 評価 | コメント |
-  |--------|------|------|----------|
-  | ...    | ...  | ...  | ...      |
-```
-
-### 効率ルール
-
-| ルール | 内容 |
-|--------|------|
-| **異議優先** | 異議がある者のみ発言する |
-| **全会一致短縮** | 全員✅なら表を出さず一行で終了 |
-| **助言限定** | 「判定」ではなく「助言」を出力（決定権はCreatorにある） |
-
-### 使用例
-
-```
-USER: この設計を批評して
-
-AGENT: 
-[T7 Dokimē 発動: Synedrion Protocol]
-
-| 評議員 | 視点 | 評価 | コメント |
-|--------|------|------|----------|
-| ⚡ フォード | 効率 | ⚠️ | 冗長。3ステップで済むところを5ステップにしている。 |
-| 🎨 ジョブズ | 体験 | 🔴 | ユーザーがこれを見て何をすべきかわからない。 |
-
-**助言:** 効率と体験に問題あり。上記2点を修正推奨。
-```
+*参照: [tropos.md](../../../kernel/tropos.md)*  
+*バージョン: 2.0 (2026-01-25)*

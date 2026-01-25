@@ -1,0 +1,16 @@
+#prompt test_mcp_integration
+
+@role:
+  Tester
+
+@goal:
+  Verify MCP integration
+
+@context:
+  - mcp:"prompt-lang-generator.tool('generate', requirements='Analyze this text', domain='meta')"
+
+@constraints:
+  - None
+
+@format:
+  Text

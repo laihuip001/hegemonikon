@@ -1,0 +1,42 @@
+=== All Browser Pages ===
+
+
+=== Context 0 ===
+
+[Page 0.0]
+  URL: vscode-file://vscode-app/m:/Antigravity/resources/app/out/vs/code/electron-browser/workbench/workben
+  Title: Launchpad
+  HTML length: 29917
+  Is Agent Manager: True
+  Buttons: 0
+  button.select-none: 0
+  Divs: 25
+
+  --- Agent Manager Details ---
+  Conversation buttons: 0
+
+[Page 0.1]
+  URL: vscode-file://vscode-app/m:/Antigravity/resources/app/out/vs/code/electron-browser/workbench/workben
+  Title: Manager
+  HTML length: 162401
+  Is Agent Manager: True
+  Buttons: 58
+  button.select-none: 46
+  Divs: 644
+
+  --- Agent Manager Details ---
+  Conversation buttons: 46
+    [0] Antigravity
+    [1] File
+    [2] Edit
+    [3] View
+    [4] Prompt-Lang Generation Enhancement
+
+[Page 0.2]
+  URL: vscode-file://vscode-app/m:/Antigravity/resources/app/out/vs/code/electron-browser/workbench/workben
+  Title: Hegemonikon - Antigravity - Walkthrough [管理者]
+  HTML length: 626902
+  Is Agent Manager: False
+  Buttons: 3
+  button.select-none: 2
+  Divs: 1128

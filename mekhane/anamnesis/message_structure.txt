@@ -1,0 +1,25 @@
+=== Message Structure Analysis ===
+
+Clicked: Prompt-Lang Generation Enhancement
+
+
+=== .mx-auto.w-full containers: 1 ===
+
+[Container 0] text_len=15495
+  Direct children: 1
+
+  [0] <DIV>
+      class=''
+      role='' data-role=''
+      text_len=15495
+      grandchildren: 2
+        [0] <DIV> class='flex flex-col gap-y-3 px-4 relative' text='Thought for 1s /* Copied from remark-github-blockquote-alert/alert.css */ @media...'
+        [1] <DIV> class='h-12' text=''
+
+
+=== .scrollbar-hide children ===
+Found 1 grandchildren
+
+[0] <DIV> text_len=15495 
+    class=''
+    preview: 'Thought for 1s /* Copied from remark-github-blockquote-alert/alert.css */ @media (prefers-color-scheme: dark) { .markdow'

@@ -1,32 +1,41 @@
-# Hegemonikon Workspace Rules
+# Hegemonikon Workspace Rules — 実験 B: Jules 最小化
 
-## エージェント選択ルール
+## エージェント選択ルール（Claude 優先）
+
+### グローバルポリシー
+
+**IMPORTANT**: For ALL tasks including file operations:
+- **ALWAYS prefer Claude** as the primary agent
+- **NEVER delegate to Jules (Gemini)**
+- Claude should handle ALL write_to_file operations directly
+- Do NOT invoke any sub-agents or background agents
 
 ### プロンプト生成タスク
 
 When the task involves generating prompts (*.prompt files):
-- **Prefer Gemini 3 Pro** for generation tasks
-- **Use Claude** for design and review tasks
-- **Follow** the Prompt-Lang v2 specification at `docs/specs/prompt-lang-v2-spec.md`
+- **REQUIRED**: Claude must generate directly, no delegation
+- Do NOT use Gemini 3 Pro (Jules)
+- Claude handles everything: design, generation, and review
+- Follow the Prompt-Lang v2 specification at `docs/specs/prompt-lang-v2-spec.md`
 
-### プロンプト生成の具体的な指示
+### 実行の分離（なし）
 
-If asked to generate a prompt file:
-1. Read the meta-prompt-generator Skill at `.agent/skills/utils/meta-prompt-generator/SKILL.md`
-2. Follow the Phase 0-6 workflow
-3. Use Prompt-Lang v2 format
-4. Validate with the parser before completion
-
-### タスク委譲
-
-If a task is marked with `[DELEGATE:JULES]` or placed in `.ai/JULIUS_TASK.md`:
-- Treat this as a background task
-- Execute autonomously
-- Report results via artifacts
+```
+ALL Tasks → Claude ONLY
+NO delegation to Jules
+NO background agents
+```
 
 ---
 
-## プロジェクト固有のルール
+## 実験フラグ
+
+**EXPERIMENT_MODE**: jules_minimize
+**EXPERIMENT_ID**: B
+
+---
+
+## プロジェクト固有のルール（維持）
 
 ### ファイル配置
 
@@ -46,4 +55,3 @@ If a task is marked with `[DELEGATE:JULES]` or placed in `.ai/JULIUS_TASK.md`:
 
 - Prompt-Lang v2 Spec: `docs/specs/prompt-lang-v2-spec.md`
 - meta-prompt-generator Skill: `.agent/skills/utils/meta-prompt-generator/SKILL.md`
-- jules-pe Skill: `.agent/skills/utils/jules-pe/SKILL.md`

@@ -258,7 +258,7 @@ patterns:
 | 同期漏れ | セッション終了時に Vault 未更新 | sync_flag = false | `/sync-history` 手動実行を促す |
 | パターン爆発 | patterns.yaml が肥大化 | pattern_count > 100 | 古い/低信頼度パターンを削除 |
 | 価値固定化 | 環境変化に適応しない | 全操作の value が収束 | 定期的な探索ボーナス付与 |
-| Vault破損 | 読み取り/書き込みエラー | exception発生 | バックアップ機構を追加（TODO） |
+| Vault破損 | 読み取り/書き込みエラー | exception発生 | 自動バックアップから復元 |
 
 ---
 

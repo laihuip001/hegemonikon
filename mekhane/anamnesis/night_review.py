@@ -22,6 +22,8 @@ from datetime import datetime, date, timedelta
 from typing import Optional, List, Dict, Any
 from dataclasses import dataclass, asdict
 
+from mekhane.anamnesis.vault import VaultManager
+
 # Load environment
 from dotenv import load_dotenv
 
@@ -280,10 +282,14 @@ def parse_review_response(response_text: str, target_date: date, session_count: 
 def save_review(review: NightReview) -> Path:
     """レビューをファイルに保存"""
     
-    OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+    vault_root = OUTPUT_DIR.parent
+    vault = VaultManager(vault_root)
+
+    # Relative path from vault_root
+    rel_dir = Path(OUTPUT_DIR.name)
     
     filename = f"review_{review.date}.md"
-    filepath = OUTPUT_DIR / filename
+    rel_path = rel_dir / filename
     
     content = f"""# 📋 Night Review ({review.date})
 
@@ -305,15 +311,14 @@ def save_review(review: NightReview) -> Path:
 *Generated at: {review.generated_at}*
 """
     
-    with open(filepath, "w", encoding="utf-8") as f:
-        f.write(content)
+    # Use VaultManager to write file (handles backup and atomic write)
+    vault.write_file(rel_path, content)
     
     # Also save JSON for programmatic access
-    json_path = OUTPUT_DIR / f"review_{review.date}.json"
-    with open(json_path, "w", encoding="utf-8") as f:
-        json.dump(asdict(review), f, ensure_ascii=False, indent=2)
+    json_filename = f"review_{review.date}.json"
+    vault.write_json(rel_dir / json_filename, asdict(review))
     
-    return filepath
+    return vault_root / rel_path
 
 
 def generate_night_review(

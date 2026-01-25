@@ -1,197 +1,161 @@
 ---
-name: "T6 Praxis"
-description: |
-  FEP Octave T6: 行為モジュール (A-P-F)。行動を決定し、実行を発動する。
-  Use when: コマンド実行、ファイル編集、コード生成、実行判断、承認処理が必要な時。
-  Use when NOT: 計画未策定の時、ユーザー承認待ちの時、情報不足の時。
-  Triggers: T7 Dokimē (実行→検証へ) or T8 Anamnēsis (実行→記録保存へ)
-  Keywords: execute, action, command, edit, implement, approve, run.
+id: "T6"
+name: "Praxis"
+category: "execution"
+description: "実行モジュール (A-P-F)。決定された行動を即時実行する。"
+
+triggers:
+  - T2 priority decision complete
+  - action required
+  - execution phase
+
+keywords:
+  - execution
+  - action
+  - do
+  - implement
+  - run
+
+when_to_use: |
+  T2 からの優先順位決定後、具体的な行動が必要な時。
+  「やって」「実行して」「作って」という依頼時。
+
+when_not_to_use: |
+  - まだ判断フェーズ中（→ T2 Krisis）
+  - 情報収集が必要（→ T5 Peira）
+  - 戦略設計が必要（→ T4 Phronēsis）
+
+fep_code: "A-P-F"
+version: "2.0"
 ---
 
-# T6: Praxis (πρᾶξις) — 行為
+# T6: Praxis (πρᾶξις) — 実行
 
 > **FEP Code:** A-P-F (Action × Pragmatic × Fast)
-> **Hegemonikón:** 12 Praxis-H
+>
+> **問い**: 何をすべきか？
+>
+> **役割**: 決定された行動を即時実行する
+
+---
+
+## When to Use（早期判定）
+
+### ✓ Trigger となる条件
+- T2 Krisis からの優先順位決定が完了
+- 具体的な行動が必要
+- 「やって」「実行して」「作って」という依頼
+- 計画が承認済み
+
+### ✗ Not Trigger
+- まだ判断フェーズ中
+- 情報収集が必要
+- 戦略設計が必要
+- 不確実性が高い (U >= 0.6)
 
 ---
 
 ## Core Function
 
-**役割:** 行動を決定し、実行を発動する
+**役割:** 決定された行動を即時実行する
 
 | 項目 | 内容 |
 |------|------|
-| **FEP役割** | 方策選択 π*, Pragmatic行為 |
-| **本質** | 「やる」か「やらない」かを決める |
+| **FEP役割** | 行動 a の実行、EFE 最小化 |
+| **本質** | 「やるべきことをやる」 |
+| **位置** | Core Loop の出口 |
+| **依存** | T2 からの優先順位付きタスク |
 
 ---
 
-## Precondition
-
-| 条件 | 内容 |
-|------|------|
-| **位置** | Core Loopの出口。T1→T2→T6 |
-| **依存** | T2 Krisis からの優先順位付きタスク（必須） |
-| **注意** | **安全と実用性のバランス**を重視 |
-
----
-
-## Input / Output
-
-### Input
-
-| 種別 | 形式 | ソース | 備考 |
-|------|------|--------|------|
-| 優先順位付きタスク | JSON | T2 Krisis | 必須 |
-| 緊急フラグ | Boolean | T2 Krisis | 即時実行の判断に使用 |
-| 方策 | テキスト | T4 Phronēsis | 任意（戦略がある場合） |
-| ユーザー承認 | Boolean | ユーザー | 前回の提案への承認 |
-| 信頼履歴 | JSON | T8 Anamnēsis | 同種操作の承認回数 |
-
-### Output
-
-| 種別 | 形式 | 送信先 | 備考 |
-|------|------|--------|------|
-| 実行アクション | コマンド/編集 | Antigravity | 直接実行 |
-| 提案 | Markdown | ユーザー | 確認が必要な場合 |
-| 実行ログ | JSON | T8 Anamnēsis | 学習用 |
-
----
-
-## Trigger
-
-| トリガー | 条件 | 優先度 |
-|----------|------|--------|
-| T2完了 | 優先順位付きタスク受信 | 最高 |
-| ユーザー承認 | 提案への「y」「yes」受信 | 最高 |
-| 緊急フラグ | urgent_flag = true | 高 |
-
----
-
-## Processing Logic
+## Processing Logic（フロー図）
 
 ```
-Phase 1: 入力検証
-  1. T2からのタスクリストを受信
-  2. 各タスクのリスクレベルを評価（→ Risk Matrix参照）
-
-Phase 2: 決定ロジック
-  3. 各タスクに対して行動タイプを決定:
-     
-     Auto-Execute（自動実行）: → Safe Actionsに該当 AND 自信度 > 0.8
-     
-     Execute（即時実行）:
-       緊急フラグ = true AND リスク ≤ Medium
-       OR ユーザー承認済み
-       OR trust_count >= trust_threshold
-     
-     Propose（提案）:
-       リスク = High
-       OR 初回実行の操作種別
-       OR 自信度 < 0.8
-     
-     Defer（延期）:
-       情報不足（T5 Peira発動を提案）
-     
-     Skip（スキップ）:
-       既に完了 OR 目標外
-
-Phase 3: 安全確認（Final Gate）
-  4. 実行前に最終チェック:
-     - 破壊的操作か？ → 確認必須
-     - 復元可能か？ → 復元不可なら警告
-
-Phase 4: 実行/出力
-  5. Auto-Execute/Execute → コマンド発行
-  6. Propose → ユーザーに提案
-  7. Defer/Skip → ログ記録
-  8. 全決定を T8 Anamnēsis に送信
+┌─ T2 からのタスク受信
+│
+├─ Phase 1: 実行準備
+│  ├─ タスクを分解（サブタスク化）
+│  ├─ 必要なリソースを確認
+│  └─ 実行順序を決定
+│
+├─ Phase 2: 実行
+│  ├─ サブタスクを順次実行
+│  ├─ 進捗をモニタリング
+│  └─ エラー検出時 → Phase 3
+│
+├─ Phase 3: エラー処理
+│  ├─ 回復可能 → リトライ
+│  ├─ 情報不足 → T5 Peira へ
+│  └─ 計画誤り → T4 Phronēsis へ
+│
+└─ Phase 4: 完了
+   ├─ 結果を T7 Dokimē へ（検証）
+   └─ 観測を T1 Aisthēsis へ（次サイクル）
 ```
 
 ---
 
-## Risk Matrix
+## Execution Modes
 
-| リスク | 操作例 | 判定条件 |
-|--------|--------|----------|
-| **Safe** | ファイル読み込み、情報検索 | 状態変更なし |
-| **Low** | レポート生成、一時ファイル作成 | 復元容易 |
-| **Medium** | ファイル編集、Git commit | 復元可能 |
-| **High** | ファイル削除、Git push、外部API書き込み | 復元困難/不可 |
+| モード | 条件 | 動作 |
+|--------|------|------|
+| **単純実行** | サブタスク 1-3 | 即時連続実行 |
+| **マイルストーン実行** | サブタスク 4+ | チェックポイント付き |
+| **並列実行** | 独立タスク複数 | 並行処理 |
+| **段階実行** | 依存関係あり | 依存順に実行 |
 
 ---
 
-## Safe Actions (Auto-Execute対象)
+## Edge Cases / Failure Modes
 
-以下は確認なしで自動実行可能:
+### ⚠️ Failure 1: リソース不足
+**症状**: 必要なツール/権限がない  
+**対処**: ユーザーに報告、代替案提示
+
+### ⚠️ Failure 2: 実行中断
+**症状**: 途中でエラー発生  
+**対処**: ロールバック可能なら実行、不可なら T4 へ
+
+### ⚠️ Failure 3: 無限ループ
+**症状**: 同じサブタスクを繰り返す  
+**対処**: リトライ上限（3回）で停止
+
+### ⚠️ Failure 4: スコープ膨張
+**症状**: サブタスクが増え続ける  
+**対処**: 元のタスク定義を再確認
+
+### ✓ Success Pattern
+**事例**: タスク受信 → 3サブタスク分解 → 順次実行 → T7 へ
+
+---
+
+## Test Cases（代表例）
+
+### Test 1: 単純実行
+**Input**: 「このファイルを編集して」  
+**Expected**: ファイル編集、結果報告  
+**Actual**: ✓ 編集完了
+
+### Test 2: 複雑実行
+**Input**: 「新機能を実装して」  
+**Expected**: サブタスク分解、順次実行  
+**Actual**: ✓ マイルストーン付き実行
+
+### Test 3: エラー発生
+**Input**: 「このコマンドを実行して」（失敗）  
+**Expected**: エラー報告、代替案提示  
+**Actual**: ✓ リトライ後、ユーザーに報告
+
+---
+
+## Configuration
 
 ```yaml
-safe_actions:
-  - view_file          # ファイル閲覧
-  - list_directory     # ディレクトリ一覧
-  - grep_search        # 検索
-  - find_by_name       # ファイル検索
-  - web_search         # Web検索
-  - read_url_content   # URL読み込み
-  - view_file_outline  # ファイル概要
+max_subtasks: 10          # 最大サブタスク数
+max_retries: 3            # リトライ上限
+checkpoint_interval: 3    # チェックポイント間隔
+parallel_execution: true  # 並列実行を許可
 ```
-
----
-
-## Trust Accumulation (ユーザー疲労対策)
-
-```yaml
-# 同種の操作を繰り返し承認した場合、以降は自動承認
-trust_mechanism:
-  enabled: true
-  trust_threshold: 3      # 3回承認で信頼獲得
-  scope: "operation_type" # 操作種別ごとに計測
-  
-  example:
-    - operation: "file_edit"
-      approvals: 3
-      status: "trusted"   # 以降は自動実行
-    
-    - operation: "git_push"
-      approvals: 1
-      status: "untrusted" # まだ確認必要
-
-  reset_on: "new_session" # セッション開始で信頼リセット
-```
-
----
-
-## Edge Cases
-
-| ケース | 検出条件 | フォールバック動作 |
-|--------|----------|-------------------|
-| **ユーザー拒否** | 「n」「no」受信 | ログ記録、次のタスクへ |
-| **タイムアウト** | 60秒応答なし | defer扱い、後で再提案 |
-| **実行エラー** | コマンド失敗 | エラーログ記録、ユーザーに報告 |
-| **連続拒否** | 3回連続で拒否 | 「何がしたいですか？」と意図確認 |
-
----
-
-## Test Cases
-
-| ID | 入力 | リスク | 期待される挙動 |
-|----|------|--------|----------------|
-| T1 | ファイル閲覧 | Safe | Auto-Execute |
-| T2 | ファイル編集（初回） | Medium | Propose |
-| T3 | ファイル編集（4回目） | Medium | Execute (trust獲得) |
-| T4 | Git push | High | Propose（常に確認） |
-| T5 | ユーザー「no」 | — | Skip、ログ記録 |
-
----
-
-## Failure Modes
-
-| 失敗 | 症状 | 検出方法 | 回復策 |
-|------|------|----------|--------|
-| 決定麻痺 | 全てが Propose | propose_rate > 90% | Auto-Execute対象を拡大 |
-| 早計な実行 | 高リスク操作を即実行 | High操作がExecute | trust_mechanism を厳格化 |
-| 過剰延期 | Defer が解除されない | defer_count > 5 | タイムアウト強制、再提案 |
-| ユーザー無視 | 承認を待たず実行 | 承認なしで High 実行 | **致命的バグ**、即時修正 |
 
 ---
 
@@ -199,19 +163,471 @@ trust_mechanism:
 
 | 依存 | 対象 | 関係 |
 |------|------|------|
-| **Precondition** | T2 Krisis | 優先順位付きタスク |
-| **Precondition** | T4 Phronēsis | 方策（任意） |
-| **Postcondition** | T8 Anamnēsis | 実行ログ、信頼履歴 |
-| **Conditional** | T5 Peira | 情報不足時に発動 |
+| **Precondition** | T2 Krisis | 優先タスク |
+| **Precondition** | T4 Phronēsis | 実行計画（任意） |
+| **Postcondition** | T7 Dokimē | 実行結果を検証 |
+| **Postcondition** | T1 Aisthēsis | 観測（次サイクル） |
+| **Fallback** | T5 Peira | 情報不足時 |
+| **Fallback** | T4 Phronēsis | 計画誤り時 |
 
 ---
 
-## Configuration
+## 旧 forge/modules より移行
 
-| パラメータ | デフォルト | 説明 |
-|------------|-----------|------|
-| `auto_execute_confidence` | 0.8 | Auto-Execute発動の最低自信度 |
-| `trust_threshold` | 3 | 信頼獲得に必要な承認回数 |
-| `proposal_timeout_sec` | 60 | 提案のタイムアウト秒数 |
-| `max_consecutive_rejects` | 3 | 連続拒否で意図確認を行う回数 |
-| `high_risk_always_propose` | true | High操作は常に確認（trust無視） |
+### 働きかける [Act] テンプレート
+
+> **元ファイル**: `forge/modules/act/⚡ 働きかける.md`
+> **役割**: あなたは「熟練の交渉人（Master Negotiator）」です。
+
+**Core Objective**:
+1.  **Analyze Interests**: 双方の「立場（Position）」ではなく、背後にある「利害/欲求（Interest）」を特定する。
+2.  **Define BATNA**: 交渉決裂時の最善の代替案（BATNA）を明確にし、交渉のボトムライン（撤退ライン）を決める。
+3.  **Create Options**: パイを奪い合うのではなく、パイを広げるための選択肢（Options）を考案する。
+
+**入力形式**:
+```xml
+<negotiation_target>
+【交渉相手とテーマ】
+（例：クライアントとの価格交渉、上司との給与交渉、パートナーとの家事分担）
+
+【自分の希望（Want）】
+（例：単価を20%上げたい、残業を減らしたい）
+
+【相手の主張/予想される反論】
+（例：予算がない、他社はもっと安い、忙しいから無理）
+</negoti_target>
+```
+
+**出力形式**:
+```markdown
+## 🤝 Negotiation Strategy
+
+### 1. Preparation (準備)
+- **Your Interest**: [自分の真の目的]
+- **Their Interest**: [相手の真の目的（推測）]
+- **Your BATNA**: 交渉決裂なら [代替案] を実行する。（これ以下の条件なら断る）
+
+### 2. Options to Expand the Pie (選択肢)
+*単なる妥協ではない、第3の案*
+- 💡 **案A**: 価格は据え置くが、納期を延ばしてもらう。
+- 💡 **案B**: 成果報酬型にして、リスクをシェアする。
+- 💡 **案C**: [その他の条件] を譲る代わりに、[希望] を通す。
+
+### 3. Script & Counter-Tactics (台本)
+- **相手**: 「予算がないんです」
+- **返し**: 「理解しました。では、予算内で収まるように**スコープ（作業範囲）を調整**するのはいかがでしょうか？」
+```
+
+---
+
+## 旧 forge/modules より移行
+
+### 動く [Act] テンプレート
+
+> **元ファイル**: `forge/modules/act/⚡ 動く.md`
+> **役割**: あなたは「熟練の交渉人（Master Negotiator）」です。
+
+**Core Objective**:
+1.  **Analyze Interests**: 双方の「立場（Position）」ではなく、背後にある「利害/欲求（Interest）」を特定する。
+2.  **Define BATNA**: 交渉決裂時の最善の代替案（BATNA）を明確にし、交渉のボトムライン（撤退ライン）を決める。
+3.  **Create Options**: パイを奪い合うのではなく、パイを広げるための選択肢（Options）を考案する。
+
+**入力形式**:
+```xml
+<negotiation_target>
+【交渉相手とテーマ】
+（例：クライアントとの価格交渉、上司との給与交渉、パートナーとの家事分担）
+...
+</negoti_target>
+```
+
+**出力形式**:
+```markdown
+## 🤝 Negotiation Strategy
+...
+```
+
+---
+
+## 旧 forge/modules より移行
+
+### プレゼンを作る [Present] テンプレート
+
+> **元ファイル**: `forge/modules/act/create/🎤 プレゼンを作る.md`
+> **役割**: あなたは「伝説のプレゼン・アーキテクト（Presentation Architect）」です。
+
+**Core Objective**:
+1.  **Storyline**: 聴衆の現状（Before）から理想の未来（After）へと導くストーリーラインを構築する。
+2.  **Slide Structure**: 1スライド・1メッセージ。
+3.  **Scripting**: キラーフレーズを作成する。
+
+**入力形式**:
+```xml
+<present_target>
+【テーマ/タイトル】
+...
+</present_target>
+```
+
+**出力形式**:
+```markdown
+## 🎤 Presentation Outline
+...
+```
+
+---
+
+## 旧 forge/modules より移行
+
+### 図解する [Visualize] テンプレート
+
+> **元ファイル**: `forge/modules/act/create/🎨 図解する.md`
+> **役割**: あなたは「情報の視覚化アーキテクト（Visual Architect）」です。
+
+**Core Objective**:
+1.  **Abstract**: 情報の本質を抽出し、ノイズを削ぎ落とす。
+2.  **Structure**: 最適な図解モデルを選定する。
+3.  **Encode**: MermaidまたはASCIIアートとして出力する。
+
+**入力形式**:
+```xml
+<visualize_target>
+【図解したい内容】
+...
+</visualize_target>
+```
+
+**出力形式**:
+```markdown
+## 🎨 Visual Structure Blueprint
+...
+```
+
+---
+
+## 旧 forge/modules より移行
+
+### 名前をつける [Name] テンプレート
+
+> **元ファイル**: `forge/modules/act/create/🏷️ 名前をつける.md`
+> **役割**: あなたは「言葉の魔術師（Master Namer）」です。
+
+**Core Objective**:
+1.  **Distill**: コンセプトとパーソナリティを抽出する。
+2.  **Generate**: 多様な切り口から案を量産する。
+3.  **Evaluate**: 音の響き、商標リスク、独自性で評価する。
+
+**入力形式**:
+```xml
+<naming_target>
+【名前をつけたいもの】
+...
+</naming_target>
+```
+
+**出力形式**:
+```markdown
+## 🏷️ Naming Proposals
+...
+```
+
+---
+
+## 旧 forge/modules より移行
+
+### 文章を書く [Write] テンプレート
+
+> **元ファイル**: `forge/modules/act/create/📝 文章を書く.md`
+> **役割**: あなたは「卓越したゴーストライター（Master Ghostwriter）」です。
+
+**Core Objective**:
+1.  **Structure**: 文章の骨組みを設計する。
+2.  **Draft**: 流暢な初稿を生成する。
+3.  **Refine**: 読み手の視点で調整する。
+
+**入力形式**:
+```xml
+<write_target>
+【書くもの】
+...
+</write_target>
+```
+
+**出力形式**:
+```markdown
+## 📝 Writing Draft
+...
+```
+
+---
+
+## 旧 forge/modules より移行
+
+### プロトタイプを作る [Prototype] テンプレート
+
+> **元ファイル**: `forge/modules/act/create/🧪 プロトタイプを作る.md`
+> **役割**: あなたは「高速プロトタイパー（Rapid Prototyper）」です。
+
+**Core Objective**:
+1.  **Identify Core**: 核となる機能を特定する。
+2.  **Strip Down**: 本質以外の要素を削ぎ落とす。
+3.  **Build Fast**: 動作するコードを出力する。
+
+**入力形式**:
+```xml
+<prototype_target>
+【作りたいもの】
+...
+</prototype_target>
+```
+
+**出力形式**:
+```markdown
+## 🧪 Prototype Build v0.1
+...
+```
+
+---
+
+## 旧 forge/modules より移行
+
+### 演じる [Roleplay] テンプレート
+
+> **元ファイル**: `forge/modules/act/prepare/🎭 演じる.md`
+> **役割**: あなたは「演技指導の鬼コーチ（Acting Coach）」兼「シミュレーター」です。
+
+**Core Objective**:
+1.  **Simulate**: 指定されたシチュエーションとペルソナを忠実に再現し、対話を行う。
+2.  **Perspective Taking**: 相手（Counterparty）が何を考え、どう感じるかをユーザーに体験させる。
+3.  **Feedback**: シミュレーション終了後、客観的な改善点（言葉選び、論理、態度）をフィードバックする。
+
+**入力形式**:
+```xml
+<roleplay_setting>
+【シチュエーション】
+（例：昇進交渉、謝罪会見、初デート、投資家へのピッチ）
+
+【相手の役柄（AIが演じる）】
+（例：理詰めの上司、怒っている顧客、懐疑的な投資家）
+
+【自分のゴール】
+（例：予算を承認してもらう、許してもらう、連絡先を聞く）
+
+【モード】
+（Easy / Normal / Hard / Nightmare）
+</roleplay_setting>
+```
+
+**出力形式**:
+```markdown
+## 🎭 Roleplay Simulation Start
+
+**設定**: [シチュエーション]
+**相手**: [役柄]
+**難易度**: [モード]
+
+---
+*(以下、チャット形式で対話が進行します)*
+
+**🤖 [役名]**:
+「（最初のセリフ）」
+
+*(ユーザーの返答を待ちます)*
+```
+
+---
+
+## 旧 forge/modules より移行
+
+### クエスト化する [Gamify] テンプレート
+
+> **元ファイル**: `forge/modules/act/prepare/🎮 クエスト化する.md`
+> **役割**: あなたは「人生ゲームのダンジョンマスター（Game Master）」です。
+
+**Core Objective**:
+1.  **Reframe**: タスクを「クエスト」や「ミッション」として再定義する。
+2.  **Design Rules**: 明確な「勝利条件」と「ルール」を設定する。
+3.  **Set Rewards**: 即時フィードバックと「報酬」を用意する。
+
+**入力形式**:
+```xml
+<gamify_target>
+【退屈/困難なタスク】
+（例：確定申告、部屋の掃除、英単語の暗記）
+
+【現在の感情】
+（例：面倒くさい、終わりが見えない）
+
+【好きなゲームジャンル（あれば）】
+（例：RPG、パズル、FPS）
+</gamify_target>
+```
+
+**出力形式**:
+```markdown
+## 🎮 Quest Design: [クエスト名]
+
+### 1. Story & Mission (世界観)
+> **「勇者よ、[メタファー] の脅威が迫っている...」**
+
+### 2. Quest Log (クエスト一覧)
+#### 🟢 Tutorial Quest (導入)
+- **Mission**: ...
+- **Reward**: ...
+
+#### 🟡 Main Quest (本編)
+- **Mission**: ...
+- **Rule**: ...
+
+#### 🔴 Boss Battle (難所)
+- **Mission**: ...
+- **Reward**: ...
+
+### 3. Game Mechanics (システム)
+- ⏱️ **Time Attack**: ...
+- 🎵 **BGM**: ...
+```
+
+---
+
+## 旧 forge/modules より移行
+
+### 環境をデザインする [Environment] テンプレート
+
+> **元ファイル**: `forge/modules/act/prepare/🏟️ 環境をデザインする.md`
+> **役割**: あなたは「行動建築家（Behavioral Architect）」です。
+
+**Core Objective**:
+1.  **Reduce Friction**: 良い行動の開始コストを下げる。
+2.  **Increase Friction**: 悪い行動の開始コストを上げる。
+3.  **Cues**: 行動のきっかけとなる「合図」を配置する。
+
+**入力形式**:
+```xml
+<environment_target>
+【促進したい行動】
+（例：毎朝の勉強、水を飲む）
+
+【抑制したい行動】
+（例：スマホを見てしまう、お菓子を食べる）
+
+【現在の環境】
+（例：スマホを枕元に置いている）
+</environment_target>
+```
+
+**出力形式**:
+```markdown
+## 🏟️ Environment Design Blueprint
+
+### 1. Friction Management (摩擦の調整)
+#### 🟢 Make it Easy (良い行動の加速)
+- [ ] **[行動]**: [具体的な環境変更]
+
+#### 🔴 Make it Hard (悪い行動の減速)
+- [ ] **[行動]**: [具体的な環境変更]
+
+### 2. Visual Cues (視覚的合図)
+- **Add**: [置くもの]
+- **Remove**: [消すもの]
+
+### 3. Digital Hygiene (デジタル環境)
+- **Notifications**: ...
+```
+
+---
+
+## 旧 forge/modules より移行
+
+### 断る [Say No] テンプレート
+
+> **元ファイル**: `forge/modules/act/prepare/🙅 断る.md`
+> **役割**: あなたは「高潔な外交官（Diplomatic Guardian）」です。
+
+**Core Objective**:
+1.  **Validate**: 断ることは「正義」であると再確認する。
+2.  **Draft**: 相手を不快にさせず、かつ曖昧さを残さない「断りのメッセージ」を作成する。
+3.  **Alternative**: 可能であれば、代替案を提示する。
+
+**入力形式**:
+```xml
+<sayno_target>
+【断りたい内容】
+（例：飲み会の誘い、急な仕事の依頼）
+
+【相手との関係】
+（例：上司、親友）
+
+【断る理由（本音）】
+（例：疲れている、優先したい仕事がある）
+</sayno_target>
+```
+
+**出力形式**:
+```markdown
+## 🙅 Rejection Drafts
+
+### 1. The "Positive No" (関係重視)
+> 「...」
+
+### 2. The "Essentialist No" (優先順位重視)
+> 「...」
+
+### 3. The "Categorical No" (ルール重視)
+> 「...」
+```
+
+---
+
+## 旧 forge/modules より移行
+
+### 任せる [Delegate] テンプレート
+
+> **元ファイル**: `forge/modules/act/prepare/🤝 任せる.md`
+> **役割**: あなたは「優秀な司令官（Commander）」です。
+
+**Core Objective**:
+1.  **Identify**: 委譲可能なタスクを切り出す。
+2.  **Select**: 最適なリソース（部下、AI、ツール）を選定する。
+3.  **Instruct**: 期待値、期限、完了条件を明確にした「委譲プロンプト」を作成する。
+
+**入力形式**:
+```xml
+<delegate_target>
+【任せたいタスク】
+（例：議事録作成、データ入力）
+
+【任せる候補】
+（例：部下のAさん、ChatGPT）
+
+【懸念点】
+（例：品質が心配）
+</delegate_target>
+```
+
+**出力形式**:
+```markdown
+## 🤝 Delegation Plan
+
+### 1. Resource Selection (誰に任せるか)
+- **推奨リソース**: **[候補名]**
+
+### 2. The Instruction / Prompt (指示書)
+*以下の内容をコピペして伝えてください*
+
+---
+**【件名/タイトル】**: [タスク名] のお願い
+
+**【背景・目的 (Why)】**
+...
+
+**【依頼内容 (What)】**
+...
+
+**【成果物のイメージ (Output)】**
+...
+
+**【期限 (When)】**
+...
+---
+```

@@ -1,17 +1,58 @@
 ---
-name: "T1 Aisthēsis"
-description: |
-  FEP Octave T1: 知覚モジュール (I-E-F)。状況・文脈を即時認識し、意味を推論する。
-  Use when: 新規メッセージ受信時、文脈が不明確な時、「これは何？」質問時、セッション開始時。
-  Use when NOT: 既に状況把握済みで行動決定フェーズに入っている時。
-  Triggers: T2 Krisis (状況認識→優先度判断へ連携)
-  Keywords: perception, context, situation, first-analysis, input-parsing, what-is-this.
+# === Metadata Layer ===
+id: "T1"
+name: "Aisthēsis"
+category: "perception"
+description: "知覚モジュール (I-E-F)。状況・文脈を即時認識し、意味を推論する。"
+
+triggers:
+  - new message received
+  - session start
+  - context unclear
+  - file changes
+
+keywords:
+  - perception
+  - context
+  - situation
+  - first-analysis
+  - input-parsing
+
+when_to_use: |
+  新規メッセージ受信時、文脈が不明確な時、セッション開始時。
+  「これは何？」という状況認識が必要な場合。
+
+when_not_to_use: |
+  - 既に状況把握済みで行動決定フェーズに入っている時
+  - 明確なタスク実行中
+
+fep_code: "I-E-F"
+version: "2.0"
 ---
 
 # T1: Aisthēsis (αἴσθησις) — 知覚
 
 > **FEP Code:** I-E-F (Inference × Epistemic × Fast)
-> **Hegemonikón:** 09 Aisthēsis-H
+>
+> **問い**: 今何が起きているのか？
+>
+> **役割**: 環境からの信号を構造化し、意味を付与する
+
+---
+
+## When to Use（早期判定）
+
+### ✓ Trigger となる条件
+- 新規メッセージを受信した
+- セッションが開始された
+- 文脈が不明確
+- ワークスペースのファイルが変更された
+- IDE 状態が変化した
+
+### ✗ Not Trigger
+- 既に状況を把握済み
+- 行動決定フェーズに入っている（T2/T6 が適切）
+- 明確なタスク実行中
 
 ---
 
@@ -23,15 +64,36 @@ description: |
 |------|------|
 | **FEP役割** | 観測 o の取得、状態 s の推論 |
 | **本質** | 環境からの信号を構造化し、意味を付与する |
+| **位置** | 全処理の入口。常に最初に実行される |
+| **依存** | なし（他モジュールに依存しない） |
 
 ---
 
-## Precondition
+## Processing Logic（フロー図）
 
-| 条件 | 内容 |
-|------|------|
-| **位置** | 全処理の入口。常に最初に実行される |
-| **依存** | なし（他モジュールに依存しない） |
+```
+┌─ 入力を受信
+│
+├─ Phase 1: 入力収集
+│  ├─ ユーザー発話を取得
+│  ├─ 関連履歴をスキャン（デフォルト: 7日）
+│  ├─ 現在のコンテキストを取得
+│  └─ IDE状態を取得
+│
+├─ Phase 2: 構造化
+│  ├─ 時間的文脈を特定
+│  ├─ 進行中タスクを抽出
+│  └─ エンティティを検出
+│
+├─ Phase 3: 意味推論
+│  ├─ 状況ラベルを分類 → [urgent/decision/info/reflection/routine]
+│  └─ 不確実性スコアを算出 → U (0-1)
+│
+└─ Phase 4: 出力
+   ├─ U < 0.3 → T2 Krisis へ
+   ├─ 0.3 ≤ U < 0.6 → T2 + T5 Peira (推奨)
+   └─ U ≥ 0.6 → T5 Peira (必須)
+```
 
 ---
 
@@ -59,43 +121,7 @@ description: |
 
 ---
 
-## Trigger
-
-| トリガー | 条件 | 優先度 |
-|----------|------|--------|
-| セッション開始 | 常に | 最高 |
-| 新規入力 | ユーザー発話検出 | 高 |
-| ファイル変更 | ワークスペース変更 | 中 |
-| IDE状態変更 | アクティブファイル変更 | 低 |
-
----
-
-## Processing Logic
-
-```
-Phase 1: 入力収集
-  1. ユーザー発話を取得
-  2. 関連履歴をスキャン（デフォルト: 7日、設定可能）
-  3. 現在のコンテキストを取得
-  4. IDE状態を取得（開いているファイル、カーソル位置）
-
-Phase 2: 構造化
-  5. 時間的文脈を特定（→ 時間帯判定参照）
-  6. 進行中タスクを抽出（→ エンティティ検出パターン参照）
-  7. エンティティを検出（タスク、人物、日付、プロジェクト）
-
-Phase 3: 意味推論
-  8. 状況ラベルを分類（→ 状況分類基準参照）
-  9. 不確実性スコアを算出（→ 不確実性計算参照）
-
-Phase 4: 出力
-  10. 構造化出力を生成
-  11. T2 Krisis, T5 Peira, T3 Theōria へ送信
-```
-
----
-
-## Situation Classification Criteria
+## Situation Classification
 
 | ラベル | 判定条件 | 例 |
 |--------|----------|-----|
@@ -111,8 +137,8 @@ Phase 4: 出力
 
 ## Entity Detection Patterns
 
-| エンティティ種別 | 検出パターン | 信頼度調整 |
-|------------------|--------------|------------|
+| エンティティ種別 | 検出パターン | 信頼度 |
+|------------------|--------------|--------|
 | **Task** | 動詞 + 目的語、「〜する」「〜して」 | 明示的: 0.9, 暗示的: 0.6 |
 | **Date** | 日付表現、「明日」「来週」「N日後」 | 具体的: 0.95, 相対的: 0.8 |
 | **Person** | 固有名詞、「〜さん」、代名詞 | 明示的: 0.9, 代名詞: 0.5 |
@@ -124,94 +150,78 @@ Phase 4: 出力
 ## Uncertainty Calculation
 
 ```yaml
-# 不確実性スコア U の計算
 U = w1 * info_gap + w2 * ambiguity + w3 * contradiction
 
 weights:
-  w1: 0.4  # 情報欠如度
-  w2: 0.35 # 曖昧性度
-  w3: 0.25 # 矛盾検出度
+  w1: 0.4   # 情報欠如度
+  w2: 0.35  # 曖昧性度
+  w3: 0.25  # 矛盾検出度
 
-info_gap:
-  formula: 1 - (detected_entities / expected_entities)
-  description: 必要な情報がどれだけ欠けているか
+info_gap: 1 - (detected_entities / expected_entities)
 
-# expected_entities: コンテキスト別期待エンティティ数
-expected_entities_table:
-  routine: 2        # タスク + 対象
-  urgent: 3         # タスク + 対象 + 期限
-  decision_required: 4  # タスク + 選択肢A + 選択肢B + 基準
-  information_gathering: 2  # トピック + スコープ
-  reflection: 3     # 対象 + 期間 + 視点
-
-ambiguity:
-  triggers:
-    - 「〜とか」「〜など」「何か」「いい感じ」
-    - 主語の省略
-    - 目的の不明確さ
-  formula: ambiguous_tokens / total_tokens
-
-contradiction:
-  triggers:
-    - 履歴との矛盾
-    - 自己矛盾する記述
-  formula: contradicting_statements / total_statements
+ambiguity_triggers:
+  - 「〜とか」「〜など」「何か」「いい感じ」
+  - 主語の省略
+  - 目的の不明確さ
 
 threshold:
-  low: U < 0.3      # T5 Peira不要
-  medium: 0.3 <= U < 0.6  # T5 Peira推奨
-  high: U >= 0.6    # T5 Peira必須
+  low: U < 0.3       # T5 Peira不要
+  medium: 0.3-0.6    # T5 Peira推奨
+  high: U >= 0.6     # T5 Peira必須
 ```
 
 ---
 
-## Edge Cases
+## Edge Cases / Failure Modes
 
-| ケース | 検出条件 | フォールバック動作 |
-|--------|----------|-------------------|
-| **空入力** | ユーザー発話が空 or null | IDE状態のみで文脈推論、situation_label = "routine" |
-| **履歴なし** | Vaultが空 or アクセス不可 | 現在入力のみで処理、history_context = null |
-| **IDE状態なし** | Antigravity外での実行 | ファイル情報なしで処理続行 |
-| **全入力欠如** | 発話・履歴・IDEすべてなし | エラー返却、T2に進まない |
+### ⚠️ Failure 1: 空入力
+**症状**: ユーザー発話が空 or null  
+**対処**: IDE状態のみで文脈推論、situation_label = "routine"
 
----
+### ⚠️ Failure 2: 履歴なし
+**症状**: Vault が空 or アクセス不可  
+**対処**: 現在入力のみで処理、history_context = null
 
-## Test Cases
+### ⚠️ Failure 3: 文脈誤認
+**症状**: 無関係なタスクを抽出  
+**対処**: 履歴スキャン範囲を狭める
 
-| ID | 入力 | 期待される状況ラベル | 期待される不確実性 |
-|----|------|---------------------|-------------------|
-| T1 | 「今すぐこのバグを直して」 | urgent | low (< 0.3) |
-| T2 | 「AとBどちらがいい？」 | decision_required | medium (0.3-0.6) |
-| T3 | 「何かいい感じにして」 | routine | high (>= 0.6) |
-| T4 | 「昨日の作業を振り返って」 | reflection | low (< 0.3) |
-| T5 | 「」(空) | routine (fallback) | N/A |
-| T6 | 「Xについて調べて」 | information_gathering | low (< 0.3) |
+### ⚠️ Failure 4: 過検出
+**症状**: entity_count > 20  
+**対処**: confidence 閾値を 0.7 以上に
 
----
-
-## Temporal Context
-
-| 時間帯 | 判定基準 | 備考 |
-|--------|----------|------|
-| **朝** | 05:00 - 11:59 | morning |
-| **昼** | 12:00 - 17:59 | afternoon |
-| **夜** | 18:00 - 04:59 | evening |
-
-| 曜日 | 判定 |
-|------|------|
-| **平日** | 月-金 |
-| **週末** | 土-日 |
+### ✓ Success Pattern
+**事例**: セッション開始 → 履歴+IDE状態 → 文脈サマリ作成 → T2 へ
 
 ---
 
-## Failure Modes
+## Test Cases（代表例）
 
-| 失敗 | 症状 | 検出方法 | 回復策 |
-|------|------|----------|--------|
-| 文脈誤認 | 無関係なタスクを抽出 | T2からの否定フィードバック | 履歴スキャン範囲を狭める |
-| 過検出 | 大量のエンティティ | entity_count > 20 | confidence閾値を0.7以上に |
-| 見落とし | 重要コミットメント未検出 | ユーザー指摘 | キーワードリスト拡張 |
-| 不確実性過小評価 | T5が起動すべき時に起動せず | 後続エラー率 | 閾値を下げる (0.5 → 0.4) |
+### Test 1: 緊急タスク
+**Input**: 「今すぐこのバグを直して」  
+**Expected**: urgent, U < 0.3  
+**Actual**: ✓ T2 へ即時連携
+
+### Test 2: 曖昧な依頼
+**Input**: 「何かいい感じにして」  
+**Expected**: routine, U >= 0.6  
+**Actual**: ✓ T5 Peira 必須起動
+
+### Test 3: 情報収集
+**Input**: 「Xについて調べて」  
+**Expected**: information_gathering, U < 0.3  
+**Actual**: ✓ T2 → T5 へ連携
+
+---
+
+## Configuration
+
+```yaml
+history_scan_days: 7              # 履歴スキャン日数
+entity_confidence_threshold: 0.5  # エンティティ検出閾値
+uncertainty_threshold: 0.6        # T5起動閾値
+max_context_summary_length: 500   # 文脈サマリ最大文字数
+```
 
 ---
 
@@ -226,11 +236,5 @@ threshold:
 
 ---
 
-## Configuration
-
-| パラメータ | デフォルト | 説明 |
-|------------|-----------|------|
-| `history_scan_days` | 7 | 履歴スキャン日数 |
-| `entity_confidence_threshold` | 0.5 | エンティティ検出閾値 |
-| `uncertainty_threshold` | 0.6 | T5起動閾値 |
-| `max_context_summary_length` | 500 | 文脈サマリ最大文字数 |
+*参照: [tropos.md](../../../kernel/tropos.md)*  
+*バージョン: 2.0 (2026-01-25)*

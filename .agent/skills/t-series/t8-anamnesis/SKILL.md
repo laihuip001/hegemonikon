@@ -1,264 +1,222 @@
 ---
-name: "T8 Anamnēsis"
-description: |
-  FEP Octave T8: 想起モジュール (A-P-S)。経験を保存し、価値を更新する。Vaultとの双方向連携で長期記憶を実現。
-  Use when: /boot実行時、/sync-history実行時、セッション振り返り、パターン学習、価値更新が必要な時。
-  Use when NOT: 短期タスク実行中で記録不要な時、一時的な情報のみ扱う時。
-  Triggers: T1 Aisthēsis (次セッション開始時→記憶読み込み)
-  Keywords: memory, learning, pattern, value, Vault, session summary, history sync.
+id: "T8"
+name: "Anamnēsis"
+category: "memory"
+description: "記憶モジュール (A-P-S)。長期記憶への保存と取得を管理する。"
+
+triggers:
+  - session end
+  - important event detected
+  - /hist workflow
+  - memory retrieval needed
+
+keywords:
+  - memory
+  - recall
+  - save
+  - history
+  - vault
+  - long-term
+
+when_to_use: |
+  セッション終了時、重要イベント検出時、過去知見の取得が必要な時。
+  /hist, /boot ワークフロー発動時。
+
+when_not_to_use: |
+  - セッション内の一時的な情報のみ
+  - 記録価値がない情報
+
+fep_code: "A-P-S"
+version: "2.0"
 ---
 
-# T8: Anamnēsis (ἀνάμνησις) — 想起
+# T8: Anamnēsis (ἀνάμνησις) — 記憶
 
 > **FEP Code:** A-P-S (Action × Pragmatic × Slow)
-> **Hegemonikón:** 08 Anamnēsis-L + 16 Anamnēsis-H
+>
+> **問い**: 何を覚えておくべきか？何を思い出すべきか？
+>
+> **役割**: 長期記憶への保存と取得を管理する
+
+---
+
+## When to Use（早期判定）
+
+### ✓ Trigger となる条件
+- セッション終了時（/hist で同期）
+- 重要なイベント/決定が発生
+- ユーザーが「覚えておいて」と依頼
+- 過去の知見が必要（/boot で取得）
+- T3/T4 が過去パターンを要求
+
+### ✗ Not Trigger
+- セッション内の一時的な情報のみ
+- 記録価値がない情報
+- 既に Vault に保存済み
+
+**注意**: Antigravity はセッション間で状態を永続化しない。外部ストレージ（Vault）への明示的な保存が必要。
 
 ---
 
 ## Core Function
 
-**役割:** 経験を保存し、価値を更新する（長期記憶）
+**役割:** 長期記憶への保存と取得を管理する
 
 | 項目 | 内容 |
 |------|------|
-| **FEP役割** | 選好 p(o) の更新、価値学習 |
-| **本質** | 「次はこうしよう」を学ぶ |
-| **特性** | **Vaultとの双方向連携で疑似永続記憶を実現** |
+| **FEP役割** | 価値関数 E[P(o)] の長期最適化 |
+| **本質** | 「何を覚えておくべきか」を決定する |
+| **位置** | 長期学習ループの一部 |
+| **依存** | T7 からの検証結果、各モジュールからのイベント |
 
 ---
 
-## Precondition
-
-| 条件 | 内容 |
-|------|------|
-| **位置** | Learning Loopの終端。T6→T8→T3→T4 |
-| **依存** | T6 Praxis からの実行ログ |
-| **外部依存** | Obsidian Vault（長期記憶ストレージ） |
-
----
-
-## Dual Memory Architecture
+## Processing Logic（フロー図）
 
 ```
-┌─────────────────────────────────────────────────────────┐
-│                    T8 Anamnēsis                         │
-│  ┌─────────────────┐     ┌─────────────────┐           │
-│  │  Session Memory │ ←→ │  Vault Memory   │           │
-│  │  (Ephemeral)    │     │  (Persistent)   │           │
-│  └─────────────────┘     └─────────────────┘           │
-│         ↑                        ↑                      │
-│    セッション内ログ           長期パターン               │
-│    価値関数差分              累積価値関数                │
-│    一時的学習                永続的学習                  │
-└─────────────────────────────────────────────────────────┘
-
-Session Start: Vault → Session (Load)
-Session End:   Session → Vault (Sync)
-```
-
----
-
-## Input / Output
-
-### Input
-
-| 種別 | 形式 | ソース | 備考 |
-|------|------|--------|------|
-| 実行ログ | JSON | T6 Praxis | セッション内操作記録 |
-| 目標乖離度 | Float | T2 Krisis | 達成度評価 |
-| フィードバック | テキスト | ユーザー | 明示的評価 |
-| 過去パターン | YAML | Vault | **セッション開始時に読み込み** |
-| 累積価値関数 | JSON | Vault | **過去の学習結果** |
-
-### Output
-
-| 種別 | 形式 | 送信先 | 備考 |
-|------|------|--------|------|
-| セッションサマリ | Markdown | Vault / ユーザー | 振り返りレポート |
-| 価値関数更新 | JSON | T4 Phronēsis / Vault | 学習結果 |
-| 新パターン | YAML | T3 Theōria / Vault | 検出した因果関係 |
-| 信頼履歴 | JSON | T6 Praxis | Trust Accumulation用 |
-
----
-
-## Trigger
-
-| トリガー | 条件 | 優先度 |
-|----------|------|--------|
-| セッション開始 | `/boot` 実行時 | 最高 (Load) |
-| セッション終了 | 明示的終了 or `/sync-history` | 最高 (Sync) |
-| T6 Praxis 完了 | 実行ログ受信 | 中 (Accumulate) |
-| 大きな成功/失敗 | 異常検出 | 高 (Flag) |
-
----
-
-## Processing Logic
-
-### A. Session Start (Load Phase)
-
-```
-[/boot 発動時]
-
-Phase 1: Vault接続
-  1. Vault パスを確認 (Configuration参照)
-  2. 接続可能か確認
-
-Phase 2: 長期記憶読み込み
-  3. patterns.yaml を読み込み → T3 Theōria へ送信
-  4. values.json を読み込み → T4 Phronēsis へ送信
-  5. trust_history.json を読み込み → T6 Praxis へ送信
-
-Phase 3: コンテキスト復元
-  6. 直近の session_summaries/ を読み込み（最新5件）
-  7. 「前回のあらすじ」として T1 Aisthēsis に提供
-
-Error Handling:
-  - Vault アクセス不可 → 白紙状態で開始（警告表示）
-  - ファイル欠損 → その項目のみスキップ
-```
-
-### B. During Session (Accumulate Phase)
-
-```
-[T6 Praxis からログ受信ごと]
-
-Phase 1: ログ蓄積
-  1. 操作種別、成功/失敗、時刻を記録
-
-Phase 2: 差分学習
-  2. セッション内価値関数を更新（→ Value Update参照）
-
-Phase 3: パターン検出
-  3. 同じ操作が3回以上 → パターン候補としてフラグ
-  4. 失敗が2回連続 → 警告パターンとしてフラグ
-```
-
-### C. Session End (Sync Phase)
-
-```
-[/sync-history 発動時]
-
-Phase 1: サマリ生成
-  1. セッション内操作をカテゴリ別に集計
-  2. 成功/失敗比率を計算
-  3. 主要な成果をリスト化
-
-Phase 2: パターン統合
-  4. 新パターンを patterns.yaml にマージ
-  5. 既存パターンの信頼度を更新
-
-Phase 3: 価値関数永続化
-  6. セッション価値関数を累積価値関数にマージ
-  7. values.json を更新
-
-Phase 4: Vault書き込み
-  8. session_summaries/{date}_{time}.md を作成
-  9. patterns.yaml を更新
-  10. values.json を更新
-  11. trust_history.json を更新
+┌─ T8 発動トリガー検出
+│
+├─ 保存モード（Save）？
+│  ├─ Phase 1: 記録価値判定
+│  │   ├─ 重要度評価
+│  │   ├─ 新規性評価
+│  │   └─ 価値 > 閾値 → 保存
+│  ├─ Phase 2: 構造化
+│  │   ├─ Vault フォーマットに変換
+│  │   └─ メタデータ付与
+│  └─ Phase 3: 保存
+│      └─ Vault に書き込み
+│
+└─ 取得モード（Recall）？
+   ├─ Phase 1: クエリ解析
+   │   ├─ 検索対象を特定
+   │   └─ 時間範囲を設定
+   ├─ Phase 2: 検索
+   │   └─ Vault から取得
+   └─ Phase 3: 出力
+       └─ T1/T3/T4 へ提供
 ```
 
 ---
 
-## Vault Storage Structure
+## Memory Types
 
-```
-{Vault Root}/
-├── .hegemonikon/                    # T8 専用ディレクトリ
-│   ├── patterns.yaml                # 検出パターン（累積）
-│   ├── values.json                  # 価値関数（累積）
-│   ├── trust_history.json           # 信頼履歴（T6連携）
-│   └── session_summaries/           # セッションサマリ
-│       ├── 20260119_1000.md
-│       ├── 20260118_1400.md
-│       └── ...
-└── (その他のVaultコンテンツ)
-```
+| 記憶種別 | 保存先 | 内容 | 保持期間 |
+|----------|--------|------|----------|
+| **エピソード記憶** | Vault/daily | 日々のイベント | 恒久 |
+| **意味記憶** | Knowledge Items | 抽象化された知識 | 恒久 |
+| **手続き記憶** | Workflows/Skills | 手順・スキル | 恒久 |
+| **作業記憶** | セッション内 | 一時的な情報 | セッション終了まで |
 
 ---
 
-## Value Function Update
+## Importance Evaluation
 
 ```yaml
-# 価値更新式（TD学習ベース）
-delta = learning_rate × (reward - expected_value)
-new_value = old_value + delta
-
-# セッション内差分
-session_delta:
-  operation_type: "file_edit"
-  outcomes:
-    - success: +0.1
-    - success: +0.1
-    - failure: -0.3
-  net_delta: -0.1
-
-# 累積価値関数との統合
-merge_strategy:
-  method: "exponential_moving_average"
-  alpha: 0.2  # 新しいセッションの影響度
+importance_score:
+  formula: (novelty × 0.3) + (impact × 0.4) + (frequency × 0.3)
   
-  formula: cumulative = (1 - alpha) × cumulative + alpha × session
+  novelty:
+    - 初めてのイベント: 1.0
+    - 類似イベント過去3回未満: 0.7
+    - 類似イベント過去3回以上: 0.3
+    
+  impact:
+    - 目標達成に直結: 1.0
+    - 目標に間接的影響: 0.5
+    - 目標に無関係: 0.1
+    
+  frequency:
+    - 再利用される可能性高: 1.0
+    - 再利用される可能性低: 0.3
+    
+  threshold: 0.5  # これ以上なら保存
 ```
 
 ---
 
-## Pattern Format
+## Vault Format
+
+```markdown
+# YYYY-MM-DD (曜日) - Daily Log
+
+## Context (開始時の状況要約)
+- ...
+
+## Key Events
+- [HH:MM] Event 1
+- [HH:MM] Event 2
+
+## Decisions Made
+- Decision 1: 理由
+- Decision 2: 理由
+
+## Lessons Learned
+- Lesson 1
+- Lesson 2
+
+## Tomorrow / Next Actions
+- [ ] Action 1
+- [ ] Action 2
+
+## Metadata
+- session_id: ...
+- modules_activated: [T1, T2, ...]
+- importance_score: 0.X
+```
+
+---
+
+## Edge Cases / Failure Modes
+
+### ⚠️ Failure 1: Vault アクセス不可
+**症状**: ファイルシステムエラー  
+**対処**: セッション内に一時保存、後で再試行
+
+### ⚠️ Failure 2: 記憶過多
+**症状**: Vault が肥大化  
+**対処**: 低重要度の記憶を圧縮/削除
+
+### ⚠️ Failure 3: 検索失敗
+**症状**: 関連記憶が見つからない  
+**対処**: 検索範囲を拡大、曖昧検索
+
+### ⚠️ Failure 4: 矛盾する記憶
+**症状**: 過去の記憶と現在が矛盾  
+**対処**: 新しい記憶を優先、矛盾を記録
+
+### ✓ Success Pattern
+**事例**: セッション終了 → 重要イベント抽出 → Vault 保存 → 完了
+
+---
+
+## Test Cases（代表例）
+
+### Test 1: セッション終了時保存
+**Input**: /hist 発動  
+**Expected**: 重要イベントを Vault に保存  
+**Actual**: ✓ daily ノート作成
+
+### Test 2: 過去知見取得
+**Input**: /boot 発動  
+**Expected**: 過去 7 日の履歴を取得  
+**Actual**: ✓ 文脈サマリ生成
+
+### Test 3: 低重要度イベント
+**Input**: importance_score < 0.5  
+**Expected**: 保存スキップ  
+**Actual**: ✓ 作業記憶のみ
+
+---
+
+## Configuration
 
 ```yaml
-# patterns.yaml の構造
-patterns:
-  - id: "P001"
-    type: "success"
-    trigger: "ファイル編集前にバックアップ"
-    outcome: "エラー時に復元可能"
-    confidence: 0.85
-    occurrences: 12
-    last_seen: "2026-01-19"
-    
-  - id: "P002"
-    type: "warning"
-    trigger: "緊急タスクで複数ファイル同時編集"
-    outcome: "整合性エラー発生率 40%"
-    confidence: 0.7
-    occurrences: 5
-    last_seen: "2026-01-18"
+importance_threshold: 0.5       # 保存閾値
+history_scan_days: 7            # 取得時のスキャン日数
+max_vault_size_mb: 100          # Vault 最大サイズ
+compression_enabled: true       # 低重要度記憶の圧縮
 ```
-
----
-
-## Edge Cases
-
-| ケース | 検出条件 | フォールバック動作 |
-|--------|----------|-------------------|
-| **Vault未設定** | vault_path = null | 警告表示、セッション内学習のみ |
-| **Vault読み取り不可** | ファイル欠損/権限エラー | 白紙状態で開始 |
-| **Vault書き込み不可** | 権限エラー | セッション終了時に警告、手動同期を提案 |
-| **パターン衝突** | 新旧パターンが矛盾 | 新パターン優先、旧パターンの信頼度低下 |
-| **価値関数破損** | JSON パースエラー | バックアップから復元、なければリセット |
-
----
-
-## Test Cases
-
-| ID | 入力 | 期待される挙動 |
-|----|------|----------------|
-| T1 | `/boot` 実行 | Vault から patterns/values 読み込み |
-| T2 | T6から成功ログ | session_delta に +0.1 加算 |
-| T3 | `/sync-history` 実行 | サマリ生成、Vault書き込み |
-| T4 | Vault未設定で `/boot` | 警告表示、白紙で開始 |
-| T5 | 同じ操作を3回成功 | 新パターンとして登録 |
-
----
-
-## Failure Modes
-
-| 失敗 | 症状 | 検出方法 | 回復策 |
-|------|------|----------|--------|
-| 同期漏れ | セッション終了時に Vault 未更新 | sync_flag = false | `/sync-history` 手動実行を促す |
-| パターン爆発 | patterns.yaml が肥大化 | pattern_count > 100 | 古い/低信頼度パターンを削除 |
-| 価値固定化 | 環境変化に適応しない | 全操作の value が収束 | 定期的な探索ボーナス付与 |
-| Vault破損 | 読み取り/書き込みエラー | exception発生 | バックアップ機構を追加（TODO） |
 
 ---
 
@@ -266,34 +224,25 @@ patterns:
 
 | 依存 | 対象 | 関係 |
 |------|------|------|
-| **Precondition** | T6 Praxis | 実行ログ |
-| **Precondition** | T2 Krisis | 目標乖離度 |
-| **Postcondition** | T3 Theōria | パターン提供 |
+| **Precondition** | T7 Dokimē | 検証結果 |
+| **Precondition** | 各モジュール | イベント通知 |
+| **Postcondition** | T1 Aisthēsis | 過去知見提供（/boot） |
+| **Postcondition** | T3 Theōria | パターン情報提供 |
 | **Postcondition** | T4 Phronēsis | 価値関数提供 |
-| **Postcondition** | T6 Praxis | 信頼履歴提供 |
-| **External** | Obsidian Vault | 永続ストレージ |
-| **Workflow** | `/boot` | Load Phase 発動 |
-| **Workflow** | `/sync-history` | Sync Phase 発動 |
 
 ---
 
-## Configuration
+## Limitations
 
-| パラメータ | デフォルト | 説明 |
-|------------|-----------|------|
-| `vault_path` | `C:\Users\raikh\Documents\mine` | Vault ルートパス |
-| `hegemonikon_dir` | `.hegemonikon` | T8 専用ディレクトリ名 |
-| `max_patterns` | 100 | 保持する最大パターン数 |
-| `max_session_summaries` | 30 | 保持するサマリ数（約1ヶ月分） |
-| `learning_rate` | 0.2 | 価値更新の学習率 |
-| `pattern_threshold` | 3 | パターン登録に必要な出現回数 |
-
----
-
-## Limitations (制約)
+> **重要:** Antigravity はセッション間で状態を永続化しない。
 
 | 制約 | 影響 | 対策 |
 |------|------|------|
-| **ワークフロー依存** | `/boot` `/sync-history` を手動実行する必要がある | 習慣化、またはIDE起動時に自動実行（将来機能） |
-| **Vault構造固定** | `.hegemonikon/` ディレクトリが必須 | 初回実行時に自動作成 |
-| **オフライン時** | Vault がネットワークドライブの場合アクセス不可 | ローカルキャッシュ検討（TODO） |
+| **セッション単位** | 自動保存なし | /hist で明示的に保存 |
+| **外部ストレージ依存** | Vault へのアクセス必須 | Vault パスを設定 |
+| **同期遅延** | リアルタイム同期なし | セッション終了時に同期 |
+
+---
+
+*参照: [tropos.md](../../../kernel/tropos.md)*  
+*バージョン: 2.0 (2026-01-25)*

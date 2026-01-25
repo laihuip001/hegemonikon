@@ -17,9 +17,14 @@ Requirements:
 import re
 import json
 import sys
+import asyncio
 from pathlib import Path
 from dataclasses import dataclass, field, asdict
 from typing import Optional
+
+# Platform-specific asyncio setup
+if sys.platform == 'win32':
+    asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
 
 @dataclass
@@ -271,7 +276,49 @@ class Prompt:
             return float(var_value) <= float(cond.value)
         
         return False
-    
+
+    def _call_mcp_tool(self, server_path: str, tool_name: str, tool_args: dict) -> str:
+        """Execute an MCP tool synchronously via subprocess."""
+        from mcp import ClientSession, StdioServerParameters
+        from mcp.client.stdio import stdio_client
+
+        async def run_mcp():
+            server_params = StdioServerParameters(
+                command=sys.executable,
+                args=[server_path],
+                env=None
+            )
+
+            async with stdio_client(server_params) as (read, write):
+                async with ClientSession(read, write) as session:
+                    await session.initialize()
+
+                    # If tool_name is "tool", we treat it as "get definition of tool specified in args"
+                    if tool_name == "tool":
+                        # Fetch tool definitions
+                        result = await session.list_tools()
+                        target_tool_name = tool_args.get("name") # Assuming args is {"name": "search"}
+                        # If args was parsed from string "search", we might need to handle it.
+                        # For now, let's assume direct mapping if tool_name is standard.
+
+                        # Special handling for syntax `mcp:server.tool("name")`
+                        # We return the tool definition as text.
+                        target = next((t for t in result.tools if t.name == target_tool_name), None)
+                        if target:
+                            return json.dumps(target.model_dump(), indent=2)
+                        return f"Tool '{target_tool_name}' not found."
+
+                    # Execute tool
+                    result = await session.call_tool(tool_name, arguments=tool_args)
+                    if result.content:
+                        return "\n".join([c.text for c in result.content if c.type == "text"])
+                    return ""
+
+        try:
+            return asyncio.run(run_mcp())
+        except Exception as e:
+            return f"Error executing MCP tool: {e}"
+
     def _resolve_context_item(self, item: 'ContextItem') -> Optional[str]:
         """Resolve a context item to its content string."""
         import os
@@ -321,8 +368,60 @@ class Prompt:
             return f"[Conversation: {item.path}]"
         
         elif item.ref_type == "mcp":
-            # Placeholder for MCP server reference
-            return f"[MCP Server: {item.path}]"
+            # Syntax: server.tool("arg") or server.tool_name(arg="value")
+            # Example 1: gnosis.tool("search") -> List definition of "search" tool
+            # Example 2: gnosis.search("query") -> Execute search
+
+            # 1. Map server
+            parts = item.path.split(".", 1)
+            server_name = parts[0]
+            rest = parts[1] if len(parts) > 1 else ""
+
+            repo_root = Path(__file__).parent.parent.parent
+            server_map = {
+                "gnosis": repo_root / "mcp" / "gnosis_mcp_server.py",
+                "prompt-lang-generator": repo_root / "mcp" / "prompt_lang_mcp_server.py"
+            }
+            server_path = server_map.get(server_name)
+
+            if not server_path or not server_path.exists():
+                return f"[MCP Error: Server '{server_name}' not found]"
+
+            # 2. Parse method call
+            match = re.match(r'([a-z_][a-z0-9_]*)\((.*)\)', rest)
+            if match:
+                method_name = match.group(1)
+                args_str = match.group(2)
+
+                # Simple argument parsing
+                # Case A: "string literal" -> {"arg_name": "string literal"} (Need to guess arg name)
+                # Case B: key="value" -> {"key": "value"}
+
+                args = {}
+                # Strip quotes
+                if (args_str.startswith('"') and args_str.endswith('"')) or \
+                   (args_str.startswith("'") and args_str.endswith("'")):
+                    val = args_str[1:-1]
+
+                    if method_name == "tool":
+                        args = {"name": val}
+                    elif method_name == "search":
+                        args = {"query": val}
+                    elif method_name == "generate_prompt":
+                        args = {"requirements": val}
+                    else:
+                        # Fallback default arg name
+                        args = {"query": val}
+                else:
+                    # Try to parse key=value
+                    # ... simple implementation for now
+                    if "=" in args_str:
+                         k, v = args_str.split("=", 1)
+                         args = {k.strip(): v.strip().strip('"\'')}
+
+                return self._call_mcp_tool(str(server_path), method_name, args)
+
+            return f"[MCP Error: Invalid syntax '{item.path}']"
         
         elif item.ref_type == "ki":
             # Placeholder for Knowledge Item
@@ -575,13 +674,70 @@ class PromptLangParser:
         while self.pos < len(self.lines):
             line = self._current_line()
             
-            # Check for context item: "  - type:"path" [options]"
-            # Patterns: file:"path", dir:"path", conv:"title", mcp:server, ki:"name"
-            item_match = re.match(r'^  - (file|dir|conv|mcp|ki):(["\']?)([^"\']+)\2(.*)$', line)
-            if item_match:
-                ref_type = item_match.group(1)
-                path = item_match.group(3)
-                options_str = item_match.group(4).strip()
+            # Check for context item: "  - type:path [options]"
+            # We need to be careful with regex because path might contain quotes (e.g. mcp calls)
+            # Strategy: Match "  - type:", then take the rest, and try to split path from options.
+
+            match = re.match(r'^  - (file|dir|conv|mcp|ki):(.+)$', line)
+            if match:
+                ref_type = match.group(1)
+                remainder = match.group(2).strip()
+
+                # Check if wrapped in quotes
+                path = ""
+                options_str = ""
+
+                if remainder.startswith('"'):
+                    # Find closing quote
+                    end_quote = remainder.find('"', 1)
+                    if end_quote != -1:
+                        path = remainder[1:end_quote]
+                        options_str = remainder[end_quote+1:].strip()
+                    else:
+                        # Broken quote, take all
+                        path = remainder[1:]
+                elif remainder.startswith("'"):
+                    end_quote = remainder.find("'", 1)
+                    if end_quote != -1:
+                        path = remainder[1:end_quote]
+                        options_str = remainder[end_quote+1:].strip()
+                    else:
+                        path = remainder[1:]
+                else:
+                    # No outer quotes. Path ends at space before '[' (options) or end of line.
+                    # But path might contain spaces inside function call? e.g. .tool("a b")
+                    # Options start with [ or (
+                    # Let's assume options always start with [ or (
+                    # But mcp call might have ( in path.
+                    # Options usually are at the end.
+
+                    # Heuristic: split by " [" or " (" if present?
+                    # Or simpler: if it's mcp, we take everything until " [" (start of options) or end.
+
+                    # Regex for options at the end: (\s*[\(\[].*)?$
+                    # But this is tricky.
+
+                    # Let's check if there are options like [priority=...]
+                    opt_start = remainder.rfind('[')
+                    if opt_start != -1 and ']' in remainder[opt_start:]:
+                         # Check if it looks like options
+                         if "priority=" in remainder[opt_start:] or "section=" in remainder[opt_start:]:
+                             path = remainder[:opt_start].strip()
+                             options_str = remainder[opt_start:].strip()
+                         else:
+                             path = remainder
+                    else:
+                        path = remainder
+
+                    # Filter options like (filter="...") usually come after path for dir:
+                    if ref_type == "dir" and "(" in path:
+                         # Use existing logic for dir which might have used strict regex before
+                         # But let's rely on options_str parsing if possible.
+                         # Actually, previous regex captured options in group 4.
+                         pass
+
+                # Handle the case where path might still have options attached if not separated by space
+                # e.g. path(filter="...")
                 
                 # Parse options [priority=HIGH, section="..."]
                 priority = "MEDIUM"

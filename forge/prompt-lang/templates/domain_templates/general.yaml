@@ -1,0 +1,6 @@
+# General Domain Template
+# For general purpose tasks
+
+extra_constraints:
+  - Be concise and clear.
+  - Avoid ambiguity.

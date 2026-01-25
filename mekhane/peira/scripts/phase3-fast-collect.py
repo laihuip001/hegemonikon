@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 phase3-fast-collect.py
-High-speed AIDB article collection using requests + BeautifulSoup + html2text.
+High-speed AIDB article collection using aiohttp + BeautifulSoup + html2text.
 
 Usage:
   python scripts/phase3-fast-collect.py <start_index> <end_index> [batch_id]
@@ -10,14 +10,14 @@ Example:
   python scripts/phase3-fast-collect.py 31 150 1
 """
 
-import requests
+import aiohttp
+import asyncio
 import html2text
 from bs4 import BeautifulSoup
 import json
 import datetime
 import os
 import sys
-import time
 
 # Configuration
 ROOT_DIR = os.path.join('Raw', 'aidb')
@@ -64,63 +64,65 @@ def parse_date(date_str):
     
     return "0000.00.00", "0000", "00"
 
-def fetch_article(url, session):
+async def fetch_article(url, session):
     """Fetch and parse a single article."""
     try:
-        response = session.get(url, timeout=15)
-        response.encoding = 'utf-8'
-        response.raise_for_status()
+        async with session.get(url, timeout=15) as response:
+            response.raise_for_status()
+            text = await response.text(encoding='utf-8')
+
+            # Check for critical error
+            if '重大なエラー' in text or 'Critical Error' in text:
+                return {'url': url, 'status': 'error', 'error': 'WordPress Critical Error'}
+
+            # Parsing is CPU bound, technically blocking, but for simple HTML it's usually fast enough.
+            # If extremely strict, run in executor.
+            soup = BeautifulSoup(text, 'html.parser')
+
+            # Extract Metadata
+            og_title = soup.find('meta', property='og:title')
+            title = og_title['content'] if og_title else (soup.find('h1').get_text().strip() if soup.find('h1') else "No Title")
+            title = title.replace(' - AIDB', '').strip()
+
+            pub_time = soup.find('meta', property='article:published_time')
+            date_str = pub_time['content'] if pub_time else ""
+            formatted_date, year, month = parse_date(date_str)
+
+            # Tags
+            tag_els = soup.select('a[href*="/archives/type-tag/"], a[href*="/archives/tech-tag/"], a[href*="/archives/app-tag/"]')
+            tags = list(set([t.get_text().strip() for t in tag_els if t.get_text().strip()]))
+
+            # Content
+            content_el = soup.select_one('.p-entry__content, .c-entry__content, .p-entry-content')
+            if not content_el:
+                content_el = soup.select_one('article')
+
+            html_content = ""
+            if content_el:
+                for bad in content_el.select('script, style, .sharedaddy, .related-posts, nav, .wpp-list, .c-share'):
+                    bad.decompose()
+                html_content = str(content_el)
+
+            # Convert to Markdown
+            h = html2text.HTML2Text()
+            h.ignore_links = False
+            h.ignore_images = False
+            h.body_width = 0
+            markdown = h.handle(html_content)
+
+            return {
+                'url': url,
+                'title': title,
+                'date': formatted_date,
+                'year': year,
+                'month': month,
+                'tags': tags,
+                'markdown': markdown,
+                'status': 'success'
+            }
         
-        soup = BeautifulSoup(response.text, 'html.parser')
-        
-        # Check for critical error
-        if '重大なエラー' in response.text or 'Critical Error' in response.text:
-            return {'url': url, 'status': 'error', 'error': 'WordPress Critical Error'}
-        
-        # Extract Metadata
-        og_title = soup.find('meta', property='og:title')
-        title = og_title['content'] if og_title else (soup.find('h1').get_text().strip() if soup.find('h1') else "No Title")
-        title = title.replace(' - AIDB', '').strip()
-        
-        pub_time = soup.find('meta', property='article:published_time')
-        date_str = pub_time['content'] if pub_time else ""
-        formatted_date, year, month = parse_date(date_str)
-        
-        # Tags
-        tag_els = soup.select('a[href*="/archives/type-tag/"], a[href*="/archives/tech-tag/"], a[href*="/archives/app-tag/"]')
-        tags = list(set([t.get_text().strip() for t in tag_els if t.get_text().strip()]))
-        
-        # Content
-        content_el = soup.select_one('.p-entry__content, .c-entry__content, .p-entry-content')
-        if not content_el:
-            content_el = soup.select_one('article')
-        
-        html_content = ""
-        if content_el:
-            for bad in content_el.select('script, style, .sharedaddy, .related-posts, nav, .wpp-list, .c-share'):
-                bad.decompose()
-            html_content = str(content_el)
-        
-        # Convert to Markdown
-        h = html2text.HTML2Text()
-        h.ignore_links = False
-        h.ignore_images = False
-        h.body_width = 0
-        markdown = h.handle(html_content)
-        
-        return {
-            'url': url,
-            'title': title,
-            'date': formatted_date,
-            'year': year,
-            'month': month,
-            'tags': tags,
-            'markdown': markdown,
-            'status': 'success'
-        }
-        
-    except requests.exceptions.HTTPError as e:
-        if e.response.status_code == 404:
+    except aiohttp.ClientResponseError as e:
+        if e.status == 404:
             return {'url': url, 'status': 'error', 'error': '404 Not Found'}
         return {'url': url, 'status': 'error', 'error': str(e)}
     except Exception as e:
@@ -169,7 +171,24 @@ batch_id: {batch_id}
     
     return filepath
 
-def main():
+async def process_url(sem, url, session, batch_id, i, total):
+    async with sem:
+        result = await fetch_article(url, session)
+
+    if result['status'] == 'success':
+        # save_article is synchronous, so it runs sequentially in the event loop
+        filepath = save_article(result, batch_id)
+        print(f"[{i+1}/{total}] OK: {result['title'][:40]}...")
+        return True
+    else:
+        print(f"[{i+1}/{total}] SKIP: {url} - {result.get('error', 'Unknown')}")
+        # Log skip
+        skip_file = os.path.join(ROOT_DIR, '_index', f'skipped_fast_{batch_id}.txt')
+        with open(skip_file, 'a', encoding='utf-8') as f:
+            f.write(f"{url}\t{result.get('error', 'Unknown')}\n")
+        return False
+
+async def main_async():
     if len(sys.argv) < 3:
         print("Usage: python phase3-fast-collect.py <start_index> <end_index> [batch_id]")
         sys.exit(1)
@@ -179,47 +198,50 @@ def main():
     batch_id = sys.argv[3] if len(sys.argv) > 3 else "fast"
     
     # Load URLs
+    if not os.path.exists(URL_LIST_FILE):
+        print(f"Error: {URL_LIST_FILE} not found.")
+        sys.exit(1)
+
     with open(URL_LIST_FILE, 'r', encoding='utf-8') as f:
         urls = [line.strip() for line in f if line.strip()]
     
+    # Handle out of bounds
+    if start_idx >= len(urls):
+        print(f"Start index {start_idx} is out of range (max {len(urls)})")
+        return
+
     target_urls = urls[start_idx:end_idx]
     print(f"[Fast Collect] Processing {len(target_urls)} URLs (Index {start_idx}-{end_idx})")
     
-    # Setup session
-    session = requests.Session()
-    session.headers.update(HEADERS)
-    
+    # Setup session headers
+    headers = HEADERS.copy()
     cookie_headers = load_cookies()
     if cookie_headers:
-        session.headers.update(cookie_headers)
+        headers.update(cookie_headers)
         print("[Fast Collect] Session cookies loaded.")
     else:
         print("[Fast Collect] WARNING: No session cookies found. Premium content may not be accessible.")
     
-    # Process
-    success_count = 0
-    error_count = 0
-    
-    for i, url in enumerate(target_urls):
-        result = fetch_article(url, session)
+    # Limit concurrency
+    sem = asyncio.Semaphore(10)
+
+    async with aiohttp.ClientSession(headers=headers) as session:
+        tasks = []
+        for i, url in enumerate(target_urls):
+            # i here is 0-based relative to target_urls, but for logging we can use i+start_idx?
+            # The original code used enumerate(target_urls) starting from 0 for logging.
+            # I'll stick to 1-based progress relative to the batch.
+            tasks.append(process_url(sem, url, session, batch_id, i, len(target_urls)))
         
-        if result['status'] == 'success':
-            filepath = save_article(result, batch_id)
-            print(f"[{i+1}/{len(target_urls)}] OK: {result['title'][:40]}...")
-            success_count += 1
-        else:
-            print(f"[{i+1}/{len(target_urls)}] SKIP: {url} - {result.get('error', 'Unknown')}")
-            error_count += 1
-            
-            # Log skip
-            skip_file = os.path.join(ROOT_DIR, '_index', f'skipped_fast_{batch_id}.txt')
-            with open(skip_file, 'a', encoding='utf-8') as f:
-                f.write(f"{url}\t{result.get('error', 'Unknown')}\n")
-        
-        # Rate limiting (polite crawling)
-        time.sleep(0.5)
+        results = await asyncio.gather(*tasks)
+
+    success_count = sum(1 for r in results if r)
+    error_count = len(results) - success_count
     
     print(f"\n[Fast Collect] Completed: {success_count} success, {error_count} errors")
+
+def main():
+    asyncio.run(main_async())
 
 if __name__ == "__main__":
     main()

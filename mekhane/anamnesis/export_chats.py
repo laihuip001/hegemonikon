@@ -33,6 +33,22 @@ import argparse
 DEFAULT_OUTPUT_DIR = Path(r"M:\Brain\.hegemonikon\sessions")
 CDP_PORT = 9222  # Chrome DevTools Protocol ポート
 
+# メッセージ抽出の閾値
+MIN_MESSAGE_LENGTH = 10       # これより短いテキストは無視
+MIN_USER_MESSAGE_LENGTH = 100 # これより短い = User の可能性が高い
+MAX_USER_MESSAGE_LENGTH = 500 # これより長い = Assistant の可能性が高い
+MAX_MESSAGE_CONTENT = 10000   # 保存するメッセージの最大長
+
+# プリコンパイル正規表現（パフォーマンス向上）
+RE_THOUGHT_FOR = re.compile(r'^Thought for <?\d+s\s*')
+RE_FILES_EDITED = re.compile(r'Files Edited.*?(?=\n\n|\Z)', re.DOTALL)
+RE_PROGRESS_UPDATES = re.compile(r'Progress Updates.*?(?=\n\n|\Z)', re.DOTALL)
+RE_BACKGROUND_STEPS = re.compile(r'Background Steps.*?(?=\n\n|\Z)', re.DOTALL)
+RE_MULTI_NEWLINE = re.compile(r'\n{3,}')
+RE_MULTI_SPACE = re.compile(r' {2,}')
+RE_UNSAFE_FILENAME = re.compile(r'[<>:"/\\|?*\x00-\x1f]')
+RE_MULTI_UNDERSCORE = re.compile(r'_+')
+
 
 # ============================================================================
 # エクスポータークラス
@@ -179,55 +195,86 @@ class AntigravityChatExporter:
                     if 'bg-gray-500' in classes:
                         continue
                     
-                    # TreeWalker で STYLE 要素を除外してテキストを取得
+                    # 改良版テキスト抽出: STYLE, SCRIPT, CODE を再帰的に除外
                     clean_text = await child.evaluate("""
                         el => {
-                            const walker = document.createTreeWalker(
-                                el,
-                                NodeFilter.SHOW_TEXT,
-                                {
-                                    acceptNode: (node) => {
-                                        if (node.parentElement.tagName === 'STYLE') {
-                                            return NodeFilter.FILTER_REJECT;
+                            const excludeTags = new Set(['STYLE', 'SCRIPT', 'CODE', 'PRE']);
+                            
+                            function getTextContent(node) {
+                                let text = '';
+                                for (const child of node.childNodes) {
+                                    if (child.nodeType === Node.TEXT_NODE) {
+                                        // 除外すべき親があるか再帰的に確認
+                                        let parent = child.parentElement;
+                                        let shouldExclude = false;
+                                        while (parent && parent !== el) {
+                                            if (excludeTags.has(parent.tagName)) {
+                                                shouldExclude = true;
+                                                break;
+                                            }
+                                            parent = parent.parentElement;
                                         }
-                                        return NodeFilter.FILTER_ACCEPT;
+                                        if (!shouldExclude) {
+                                            text += child.textContent;
+                                        }
+                                    } else if (child.nodeType === Node.ELEMENT_NODE) {
+                                        if (!excludeTags.has(child.tagName)) {
+                                            text += getTextContent(child);
+                                        }
                                     }
                                 }
-                            );
-                            let text = '';
-                            while (walker.nextNode()) {
-                                text += walker.currentNode.textContent;
+                                return text;
                             }
-                            return text.trim();
+                            
+                            return getTextContent(el).trim();
                         }
                     """)
                     
-                    if not clean_text or len(clean_text) < 10:
+                    if not clean_text or len(clean_text) < MIN_MESSAGE_LENGTH:
                         continue
                     
-                    # "Thought for Xs" を除去（re は冒頭で import 済み）
-                    clean_text = re.sub(r'^Thought for \d+s\s*', '', clean_text)
-                    clean_text = re.sub(r'^Thought for <\d+s\s*', '', clean_text)
+                    # "Thought for Xs" を除去（先頭のみ）
+                    clean_text = RE_THOUGHT_FOR.sub('', clean_text)
                     
-                    if len(clean_text) < 10:
+                    # メタ情報を除去（Files Edited, Progress Updates 等）
+                    clean_text = RE_FILES_EDITED.sub('', clean_text)
+                    clean_text = RE_PROGRESS_UPDATES.sub('', clean_text)
+                    clean_text = RE_BACKGROUND_STEPS.sub('', clean_text)
+                    
+                    # 連続する空白/改行を正規化
+                    clean_text = RE_MULTI_NEWLINE.sub('\n\n', clean_text)
+                    clean_text = RE_MULTI_SPACE.sub(' ', clean_text)
+                    clean_text = clean_text.strip()
+                    
+                    if len(clean_text) < MIN_MESSAGE_LENGTH:
                         continue
                     
-                    # ロール判定
+                    # ロール判定（改善版）
+                    # Assistant は通常「Thought for」を含む、または長いメッセージ
+                    # User は短く、コマンド的な内容
                     role = "assistant"
                     
-                    user_patterns = ['@', '/', 'Continue', 'y', 'ok', '続けて', 'はい', 'いいえ', '実験', 'やってみ']
+                    # data-section-index を取得（デバッグ用）
+                    section_idx = await child.get_attribute('data-section-index')
                     
-                    if len(clean_text) < 300:
+                    # User メッセージの特徴を検出
+                    user_patterns = [
+                        '@', '/', 'Continue', 'y', 'Y', 'ok', 'OK', 
+                        '続けて', 'はい', 'いいえ', '実験', 'やってみ', 
+                        '"完全"', '完全', '的に', 'なぜ', 'もう', '確認'
+                    ]
+                    
+                    if len(clean_text) < MAX_USER_MESSAGE_LENGTH:
                         if any(clean_text.startswith(p) for p in user_patterns):
                             role = "user"
-                        # 日本語が多い短いメッセージは User の可能性が高い
-                        non_ascii = len([c for c in clean_text if ord(c) > 127])
-                        if non_ascii > len(clean_text) * 0.3:
+                        # 非常に短いメッセージは User の可能性が高い
+                        elif len(clean_text) < MIN_USER_MESSAGE_LENGTH:
                             role = "user"
                     
                     messages.append({
                         "role": role,
-                        "content": clean_text[:5000]
+                        "content": clean_text[:10000],  # 長いメッセージも保持
+                        "section_index": section_idx
                     })
                     
                 except Exception as e:
@@ -438,3 +485,6 @@ async def main():
 
 if __name__ == "__main__":
     sys.exit(asyncio.run(main()))
+
+
+

@@ -20,7 +20,7 @@ jobs:
     steps:
       - name: Trigger Jules Task
         run: |
-          RESPONSE=$(curl -s -X POST 'https://julius.googleapis.com/v1alpha/sessions' \
+          RESPONSE=$(curl -s -X POST 'https://jules.googleapis.com/v1alpha/sessions' \
             -H "X-Goog-Api-Key: ${{ secrets.JULIUS_API_KEY_1 }}" \
             -H "Content-Type: application/json" \
             -d '{
@@ -45,7 +45,7 @@ jobs:
         run: |
           sleep 30
 
-          STATUS=$(curl -s 'https://julius.googleapis.com/v1alpha/sessions/${{ env.SESSION_ID }}' \
+          STATUS=$(curl -s 'https://jules.googleapis.com/v1alpha/sessions/${{ env.SESSION_ID }}' \
             -H "X-Goog-Api-Key: ${{ secrets.JULIUS_API_KEY_1 }}" | jq -r '.status')
 
           echo "Status: $STATUS"

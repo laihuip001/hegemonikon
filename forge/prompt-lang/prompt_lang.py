@@ -17,9 +17,15 @@ Requirements:
 import re
 import json
 import sys
+import os
+import asyncio
 from pathlib import Path
 from dataclasses import dataclass, field, asdict
 from typing import Optional
+
+from mcp.client.stdio import stdio_client, StdioServerParameters
+from mcp.client.session import ClientSession
+from mcp.types import CallToolRequest, Tool, TextContent, ImageContent, EmbeddedResource
 
 
 @dataclass
@@ -94,7 +100,94 @@ class Prompt:
     activation: Optional[Activation] = None
     # v2.0.1 additions
     context: list[ContextItem] = field(default_factory=list)
-    
+
+    def _resolve_mcp(self, item: 'ContextItem') -> str:
+        # Map known servers
+        SERVERS = {
+            "gnosis": "mcp/gnosis_mcp_server.py",
+            "prompt-lang-generator": "mcp/prompt_lang_mcp_server.py"
+        }
+
+        server_script = SERVERS.get(item.path)
+        if not server_script:
+            return f"[MCP Error: Unknown server '{item.path}']"
+
+        if not item.tool_chain:
+            return f"[MCP Error: No tool specified for '{item.path}']"
+
+        # Parse tool chain: tool_name(args)
+        import re
+        match = re.match(r'^[\w-]+\.([a-zA-Z0-9_]+)\((.*)\)$', item.tool_chain)
+        if not match:
+             return f"[MCP Error: Malformed tool chain '{item.tool_chain}']"
+
+        tool_name = match.group(1)
+        args_str = match.group(2)
+
+        # Parse arguments (naive JSON or key=value parsing)
+        arguments = {}
+        if args_str:
+            try:
+                loaded = json.loads(args_str)
+                if isinstance(loaded, dict):
+                    arguments = loaded
+                # If parsed as string, fall through to string handling
+            except:
+                pass
+
+            if not arguments:
+                # Handle single string argument (quoted)
+                stripped = args_str.strip()
+                if (stripped.startswith('"') and stripped.endswith('"')) or \
+                   (stripped.startswith("'") and stripped.endswith("'")):
+                     val = stripped[1:-1]
+                     if "gnosis" in item.path and tool_name == "search":
+                         arguments = {"query": val}
+                     elif "prompt-lang-generator" in item.path and tool_name == "generate_prompt":
+                         arguments = {"requirements": val}
+
+        # Run async call
+        try:
+             result = asyncio.run(self._run_mcp_tool(server_script, tool_name, arguments))
+             return result
+        except Exception as e:
+             return f"[MCP Error: {e}]"
+
+    async def _run_mcp_tool(self, script_path, tool_name, arguments):
+        # Env setup
+        env = os.environ.copy()
+
+        server_params = StdioServerParameters(
+            command="python3",
+            args=[script_path],
+            env=env
+        )
+
+        async with stdio_client(server_params) as (read, write):
+            async with ClientSession(read, write) as session:
+                await session.initialize()
+
+                # Check tools
+                tools = await session.list_tools()
+                available_tools = [t.name for t in tools.tools]
+
+                if tool_name not in available_tools:
+                     return f"Tool '{tool_name}' not found. Available: {available_tools}"
+
+                result = await session.call_tool(tool_name, arguments)
+
+                # Format result
+                output = []
+                for content in result.content:
+                    if content.type == "text":
+                        output.append(content.text)
+                    elif content.type == "image":
+                        output.append("[Image]")
+                    elif content.type == "resource":
+                        output.append("[Resource]")
+
+                return "\n".join(output)
+
     def to_dict(self) -> dict:
         """Convert to dictionary."""
         return {k: v for k, v in asdict(self).items() if v}
@@ -321,8 +414,7 @@ class Prompt:
             return f"[Conversation: {item.path}]"
         
         elif item.ref_type == "mcp":
-            # Placeholder for MCP server reference
-            return f"[MCP Server: {item.path}]"
+            return self._resolve_mcp(item)
         
         elif item.ref_type == "ki":
             # Placeholder for Knowledge Item
@@ -577,11 +669,34 @@ class PromptLangParser:
             
             # Check for context item: "  - type:"path" [options]"
             # Patterns: file:"path", dir:"path", conv:"title", mcp:server, ki:"name"
-            item_match = re.match(r'^  - (file|dir|conv|mcp|ki):(["\']?)([^"\']+)\2(.*)$', line)
+            item_match = re.match(r'^  - (file|dir|conv|mcp|ki):\s*(.+)$', line)
             if item_match:
                 ref_type = item_match.group(1)
-                path = item_match.group(3)
-                options_str = item_match.group(4).strip()
+                rest = item_match.group(2).strip()
+
+                path = ""
+                options_str = ""
+
+                # Handle quotes
+                if rest.startswith('"'):
+                    # Naive quote matching (doesn't handle escaped quotes well)
+                    m = re.match(r'^"([^"]*)"(.*)$', rest)
+                    if m:
+                        path = m.group(1)
+                        options_str = m.group(2)
+                elif rest.startswith("'"):
+                    m = re.match(r"^'([^']*)'(.*)$", rest)
+                    if m:
+                        path = m.group(1)
+                        options_str = m.group(2)
+                else:
+                    # No quotes, take until space
+                    m = re.match(r'^([^ ]+)(.*)$', rest)
+                    if m:
+                        path = m.group(1)
+                        options_str = m.group(2)
+
+                options_str = options_str.strip() if options_str else ""
                 
                 # Parse options [priority=HIGH, section="..."]
                 priority = "MEDIUM"
@@ -610,11 +725,11 @@ class PromptLangParser:
                             section_match = re.search(r'section=["\']?([^"\']+)["\']?', opts)
                             if section_match:
                                 section = section_match.group(1)
-                    
-                    # Parse MCP tool chain
-                    if ref_type == "mcp" and ".tool(" in path:
-                        tool_chain = path
-                        path = path.split(".")[0]
+
+                # Parse MCP tool chain
+                if ref_type == "mcp" and "." in path and "(" in path and path.strip().endswith(")"):
+                    tool_chain = path
+                    path = path.split(".")[0]
                 
                 items.append(ContextItem(
                     ref_type=ref_type,

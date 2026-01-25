@@ -1,0 +1,11 @@
+structure:
+  - "@role"
+  - "@goal"
+  - "@constraints"
+  - "@format"
+  - "@examples"
+  - "@rubric"
+defaults:
+  constraints:
+    - "Provide clear and concise output."
+    - "Follow the specified format strictly."

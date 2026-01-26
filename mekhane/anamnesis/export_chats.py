@@ -195,52 +195,82 @@ class AntigravityChatExporter:
                 print("    [!] Message container not found")
                 return []
             
-            # 直接の子要素を取得
-            children = await container.query_selector_all(':scope > div')
-            print(f"    [DEBUG] Found {len(children)} child elements in container")
-            
-            for child in children:
-                try:
-                    # プレースホルダーをスキップ
-                    classes = await child.get_attribute('class') or ""
-                    if 'bg-gray-500' in classes:
-                        continue
+            # Batch extraction of all children data to avoid N+1 round trips
+            # Returns list of {clean_text, raw_text, section_idx}
+            raw_data = await container.evaluate("""
+                container => {
+                    const children = container.querySelectorAll(':scope > div');
+                    const result = [];
+                    const excludeTags = new Set(['STYLE', 'SCRIPT', 'CODE', 'PRE']);
                     
-                    # 改良版テキスト抽出: STYLE, SCRIPT, CODE を再帰的に除外
-                    clean_text = await child.evaluate("""
-                        el => {
-                            const excludeTags = new Set(['STYLE', 'SCRIPT', 'CODE', 'PRE']);
-                            
-                            function getTextContent(node) {
-                                let text = '';
-                                for (const child of node.childNodes) {
-                                    if (child.nodeType === Node.TEXT_NODE) {
-                                        // 除外すべき親があるか再帰的に確認
-                                        let parent = child.parentElement;
-                                        let shouldExclude = false;
-                                        while (parent && parent !== el) {
-                                            if (excludeTags.has(parent.tagName)) {
-                                                shouldExclude = true;
-                                                break;
-                                            }
-                                            parent = parent.parentElement;
-                                        }
-                                        if (!shouldExclude) {
-                                            text += child.textContent;
-                                        }
-                                    } else if (child.nodeType === Node.ELEMENT_NODE) {
-                                        if (!excludeTags.has(child.tagName)) {
-                                            text += getTextContent(child);
-                                        }
-                                    }
+                    function getTextContent(node, el) {
+                        let text = '';
+                        for (const child of node.childNodes) {
+                            if (child.nodeType === Node.TEXT_NODE) {
+                                // Optimization: Skip parent check as we control descent
+                                text += child.textContent;
+                            } else if (child.nodeType === Node.ELEMENT_NODE) {
+                                if (!excludeTags.has(child.tagName)) {
+                                    text += getTextContent(child, el);
                                 }
-                                return text;
                             }
-                            
-                            return getTextContent(el).trim();
                         }
-                    """)
-                    
+                        return text;
+                    }
+
+                    for (const child of children) {
+                        const classes = child.getAttribute('class') || "";
+                        if (classes.includes('bg-gray-500')) {
+                            continue;
+                        }
+
+                        const clean_text = getTextContent(child, child).trim();
+                        const raw_text = child.textContent || '';
+                        const section_idx = child.getAttribute('data-section-index');
+
+                        result.push({
+                            clean_text,
+                            raw_text,
+                            section_idx
+                        });
+                    }
+                    return result;
+                }
+            """)
+
+            print(f"    [DEBUG] Extracted {len(raw_data)} items from container")
+
+            # Claude 検出パターン
+            claude_patterns = [
+                'Thought for',
+                'Files Edited',
+                'Progress Updates',
+                'Background Steps',
+                'Ran terminal command',
+                'Open Terminal',
+                'Exit code',
+                'Always Proceed',
+                'RunningOpen',
+                'Analyzed',
+                'Edited',
+                'Generating',
+                'GoodBad',
+                'OpenProceed',
+            ]
+
+            # User 検出パターン（明示的な User 入力）
+            user_start_patterns = [
+                '@', '/', 'Continue', '続けて', 'はい', 'いいえ',
+                'y\n', 'Y\n', 'ok', 'OK', '実験', 'やってみ',
+                '改善', '修正', 'まずは', '1', '2', '3',
+            ]
+
+            for item in raw_data:
+                try:
+                    clean_text = item['clean_text']
+                    raw_text = item['raw_text']
+                    section_idx = item['section_idx']
+
                     if not clean_text or len(clean_text) < MIN_MESSAGE_LENGTH:
                         continue
                     
@@ -263,42 +293,6 @@ class AntigravityChatExporter:
                     if len(clean_text) < MIN_MESSAGE_LENGTH:
                         continue
                     
-                    # ロール判定（改善版 v2）
-                    # 1. 元テキストに「Thought for」があれば Claude
-                    # 2. UI 要素パターンがあれば Claude（ツール出力）
-                    # 3. フォールバック: index ベース（偶数=User, 奇数=Claude）
-                    
-                    # 元テキストを取得（Thought for 判定用）
-                    raw_text = await child.evaluate("el => el.textContent || ''")
-                    
-                    # data-section-index を取得（フォールバック用）
-                    section_idx = await child.get_attribute('data-section-index')
-                    
-                    # Claude 検出パターン
-                    claude_patterns = [
-                        'Thought for',
-                        'Files Edited',
-                        'Progress Updates',
-                        'Background Steps',
-                        'Ran terminal command',
-                        'Open Terminal',
-                        'Exit code',
-                        'Always Proceed',
-                        'RunningOpen',
-                        'Analyzed',
-                        'Edited',
-                        'Generating',
-                        'GoodBad',
-                        'OpenProceed',
-                    ]
-                    
-                    # User 検出パターン（明示的な User 入力）
-                    user_start_patterns = [
-                        '@', '/', 'Continue', '続けて', 'はい', 'いいえ',
-                        'y\n', 'Y\n', 'ok', 'OK', '実験', 'やってみ',
-                        '改善', '修正', 'まずは', '1', '2', '3',
-                    ]
-                    
                     role = "assistant"  # デフォルト
                     
                     # Claude 判定: Thought for または UI 要素
@@ -319,7 +313,7 @@ class AntigravityChatExporter:
                         try:
                             idx_num = int(section_idx)
                             role = "user" if idx_num % 2 == 0 else "assistant"
-                        except:
+                        except Exception:
                             pass
                     
                     messages.append({
@@ -328,7 +322,7 @@ class AntigravityChatExporter:
                         "section_index": section_idx
                     })
                     
-                except Exception as e:
+                except Exception:
                     continue
             
             return messages

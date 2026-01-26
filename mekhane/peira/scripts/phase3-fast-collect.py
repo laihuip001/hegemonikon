@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """
 phase3-fast-collect.py
-High-speed AIDB article collection using requests + BeautifulSoup + html2text.
+High-speed AIDB article collection using aiohttp + BeautifulSoup + html2text.
+Optimized for concurrency.
 
 Usage:
   python scripts/phase3-fast-collect.py <start_index> <end_index> [batch_id]
@@ -10,7 +11,8 @@ Example:
   python scripts/phase3-fast-collect.py 31 150 1
 """
 
-import requests
+import asyncio
+import aiohttp
 import html2text
 from bs4 import BeautifulSoup
 import json
@@ -29,6 +31,9 @@ HEADERS = {
     'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
     'Accept-Language': 'ja,en-US;q=0.7,en;q=0.3',
 }
+
+# Concurrency limit
+MAX_CONCURRENT_REQUESTS = 10
 
 def load_cookies():
     """Load session cookies from file."""
@@ -64,17 +69,26 @@ def parse_date(date_str):
     
     return "0000.00.00", "0000", "00"
 
-def fetch_article(url, session):
-    """Fetch and parse a single article."""
+async def fetch_html_async(url, session):
+    """Fetch HTML content asynchronously."""
     try:
-        response = session.get(url, timeout=15)
-        response.encoding = 'utf-8'
-        response.raise_for_status()
-        
-        soup = BeautifulSoup(response.text, 'html.parser')
+        timeout = aiohttp.ClientTimeout(total=15)
+        async with session.get(url, timeout=timeout) as response:
+            if response.status == 404:
+                return {'url': url, 'status': 'error', 'error': '404 Not Found'}
+            response.raise_for_status()
+            text = await response.text(encoding='utf-8')
+            return {'url': url, 'status': 'success', 'content': text}
+    except Exception as e:
+        return {'url': url, 'status': 'error', 'error': str(e)}
+
+def parse_article_content(html_content, url):
+    """Parse HTML content and extract metadata/markdown (CPU bound)."""
+    try:
+        soup = BeautifulSoup(html_content, 'html.parser')
         
         # Check for critical error
-        if '重大なエラー' in response.text or 'Critical Error' in response.text:
+        if '重大なエラー' in html_content or 'Critical Error' in html_content:
             return {'url': url, 'status': 'error', 'error': 'WordPress Critical Error'}
         
         # Extract Metadata
@@ -95,18 +109,18 @@ def fetch_article(url, session):
         if not content_el:
             content_el = soup.select_one('article')
         
-        html_content = ""
+        html_content_filtered = ""
         if content_el:
             for bad in content_el.select('script, style, .sharedaddy, .related-posts, nav, .wpp-list, .c-share'):
                 bad.decompose()
-            html_content = str(content_el)
+            html_content_filtered = str(content_el)
         
         # Convert to Markdown
         h = html2text.HTML2Text()
         h.ignore_links = False
         h.ignore_images = False
         h.body_width = 0
-        markdown = h.handle(html_content)
+        markdown = h.handle(html_content_filtered)
         
         return {
             'url': url,
@@ -118,16 +132,11 @@ def fetch_article(url, session):
             'markdown': markdown,
             'status': 'success'
         }
-        
-    except requests.exceptions.HTTPError as e:
-        if e.response.status_code == 404:
-            return {'url': url, 'status': 'error', 'error': '404 Not Found'}
-        return {'url': url, 'status': 'error', 'error': str(e)}
     except Exception as e:
-        return {'url': url, 'status': 'error', 'error': str(e)}
+         return {'url': url, 'status': 'error', 'error': str(e)}
 
-def save_article(article, batch_id):
-    """Save article to disk and update manifest."""
+def save_markdown_file(article, batch_id):
+    """Save article markdown to disk."""
     post_id = article['url'].split('/')[-1]
     year = article.get('year', '0000')
     month = article.get('month', '00')
@@ -151,8 +160,12 @@ batch_id: {batch_id}
     
     with open(filepath, 'w', encoding='utf-8') as f:
         f.write(frontmatter + article.get('markdown', ''))
-    
-    # Update manifest
+
+    return filepath
+
+def append_to_manifest(article, filepath, batch_id):
+    """Append article entry to manifest file."""
+    post_id = article['url'].split('/')[-1]
     manifest_file = os.path.join(ROOT_DIR, '_index', f'manifest_fast_{batch_id}.jsonl')
     manifest_entry = {
         "id": post_id,
@@ -166,8 +179,72 @@ batch_id: {batch_id}
     
     with open(manifest_file, 'a', encoding='utf-8') as f:
         f.write(json.dumps(manifest_entry, ensure_ascii=False) + '\n')
+
+async def process_single_url(url, session, semaphore, batch_id):
+    """Process a single URL: fetch, parse, save markdown."""
+    async with semaphore:
+        fetch_result = await fetch_html_async(url, session)
+
+    if fetch_result['status'] != 'success':
+        return fetch_result
     
-    return filepath
+    # Run CPU-bound parsing in executor
+    loop = asyncio.get_running_loop()
+    article = await loop.run_in_executor(None, parse_article_content, fetch_result['content'], url)
+
+    if article['status'] != 'success':
+        return article
+
+    # Save markdown in executor (File I/O)
+    filepath = await loop.run_in_executor(None, save_markdown_file, article, batch_id)
+    article['filepath'] = filepath
+
+    return article
+
+async def process_urls_async(target_urls, batch_id):
+    """Main async processing loop."""
+    semaphore = asyncio.Semaphore(MAX_CONCURRENT_REQUESTS)
+    cookie_headers = load_cookies()
+
+    print(f"[Fast Collect] Processing {len(target_urls)} URLs with concurrency {MAX_CONCURRENT_REQUESTS}")
+
+    # Prepare headers
+    final_headers = HEADERS.copy()
+    if cookie_headers:
+        final_headers.update(cookie_headers)
+        print("[Fast Collect] Session cookies loaded.")
+    else:
+        print("[Fast Collect] WARNING: No session cookies found. Premium content may not be accessible.")
+
+    success_count = 0
+    error_count = 0
+
+    async with aiohttp.ClientSession(headers=final_headers) as session:
+        tasks = []
+        for url in target_urls:
+            task = asyncio.create_task(process_single_url(url, session, semaphore, batch_id))
+            tasks.append(task)
+
+        # Use as_completed to process results as they come in
+        for i, future in enumerate(asyncio.as_completed(tasks)):
+            result = await future
+
+            if result['status'] == 'success':
+                # Append to manifest sequentially (safe in main loop)
+                append_to_manifest(result, result['filepath'], batch_id)
+                print(f"[{i+1}/{len(target_urls)}] OK: {result['title'][:40]}...")
+                success_count += 1
+            else:
+                print(f"[{i+1}/{len(target_urls)}] SKIP: {result['url']} - {result.get('error', 'Unknown')}")
+                error_count += 1
+
+                # Log skip
+                skip_file = os.path.join(ROOT_DIR, '_index', f'skipped_fast_{batch_id}.txt')
+                # Append to skip file sequentially
+                with open(skip_file, 'a', encoding='utf-8') as f:
+                    f.write(f"{result['url']}\t{result.get('error', 'Unknown')}\n")
+
+    print(f"\n[Fast Collect] Completed: {success_count} success, {error_count} errors")
 
 def main():
     if len(sys.argv) < 3:
@@ -179,47 +256,17 @@ def main():
     batch_id = sys.argv[3] if len(sys.argv) > 3 else "fast"
     
     # Load URLs
+    if not os.path.exists(URL_LIST_FILE):
+        print(f"Error: URL list file not found at {URL_LIST_FILE}")
+        sys.exit(1)
+
     with open(URL_LIST_FILE, 'r', encoding='utf-8') as f:
         urls = [line.strip() for line in f if line.strip()]
     
     target_urls = urls[start_idx:end_idx]
-    print(f"[Fast Collect] Processing {len(target_urls)} URLs (Index {start_idx}-{end_idx})")
     
-    # Setup session
-    session = requests.Session()
-    session.headers.update(HEADERS)
-    
-    cookie_headers = load_cookies()
-    if cookie_headers:
-        session.headers.update(cookie_headers)
-        print("[Fast Collect] Session cookies loaded.")
-    else:
-        print("[Fast Collect] WARNING: No session cookies found. Premium content may not be accessible.")
-    
-    # Process
-    success_count = 0
-    error_count = 0
-    
-    for i, url in enumerate(target_urls):
-        result = fetch_article(url, session)
-        
-        if result['status'] == 'success':
-            filepath = save_article(result, batch_id)
-            print(f"[{i+1}/{len(target_urls)}] OK: {result['title'][:40]}...")
-            success_count += 1
-        else:
-            print(f"[{i+1}/{len(target_urls)}] SKIP: {url} - {result.get('error', 'Unknown')}")
-            error_count += 1
-            
-            # Log skip
-            skip_file = os.path.join(ROOT_DIR, '_index', f'skipped_fast_{batch_id}.txt')
-            with open(skip_file, 'a', encoding='utf-8') as f:
-                f.write(f"{url}\t{result.get('error', 'Unknown')}\n")
-        
-        # Rate limiting (polite crawling)
-        time.sleep(0.5)
-    
-    print(f"\n[Fast Collect] Completed: {success_count} success, {error_count} errors")
+    # Run async loop
+    asyncio.run(process_urls_async(target_urls, batch_id))
 
 if __name__ == "__main__":
     main()

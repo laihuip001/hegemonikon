@@ -34,19 +34,20 @@ DEFAULT_OUTPUT_DIR = Path(r"M:\Brain\.hegemonikon\sessions")
 CDP_PORT = 9222  # Chrome DevTools Protocol ポート
 
 # メッセージ抽出の閾値
-MIN_MESSAGE_LENGTH = 10       # これより短いテキストは無視
+MIN_MESSAGE_LENGTH = 1        # 短い User 入力（y, /boot）も抽出
 MIN_USER_MESSAGE_LENGTH = 100 # これより短い = User の可能性が高い
 MAX_USER_MESSAGE_LENGTH = 500 # これより長い = Assistant の可能性が高い
 MAX_MESSAGE_CONTENT = 10000   # 保存するメッセージの最大長
 
 # プリコンパイル正規表現（パフォーマンス向上）
-RE_THOUGHT_FOR = re.compile(r'^Thought for <?\d+s\s*')
+RE_THOUGHT_FOR = re.compile(r'^Thought for \u003c?\d+s\s*')
 RE_FILES_EDITED = re.compile(r'Files Edited.*?(?=\n\n|\Z)', re.DOTALL)
 RE_PROGRESS_UPDATES = re.compile(r'Progress Updates.*?(?=\n\n|\Z)', re.DOTALL)
 RE_BACKGROUND_STEPS = re.compile(r'Background Steps.*?(?=\n\n|\Z)', re.DOTALL)
+RE_UI_STATUS = re.compile(r'\b(Running\.\.\.?|Generating\.?|GoodBad|OpenProceed|Cancel)\b')
 RE_MULTI_NEWLINE = re.compile(r'\n{3,}')
 RE_MULTI_SPACE = re.compile(r' {2,}')
-RE_UNSAFE_FILENAME = re.compile(r'[<>:"/\\|?*\x00-\x1f]')
+RE_UNSAFE_FILENAME = re.compile(r'[\u003c\u003e:\"/\\|?*\x00-\x1f]')
 RE_MULTI_UNDERSCORE = re.compile(r'_+')
 
 
@@ -57,16 +58,19 @@ RE_MULTI_UNDERSCORE = re.compile(r'_+')
 class AntigravityChatExporter:
     """簡潔版: Antigravity IDE のチャット履歴をエクスポート"""
     
-    def __init__(self, output_dir: Path = DEFAULT_OUTPUT_DIR):
+    def __init__(self, output_dir: Path = DEFAULT_OUTPUT_DIR, limit: int = None):
         self.output_dir = output_dir
         self.output_dir.mkdir(parents=True, exist_ok=True)
         self.chats: List[Dict] = []
         self.browser = None
         self.page = None
+        self.limit = limit  # エクスポート上限
         
         # デバッグ: 出力ディレクトリ確認
         print(f"[DEBUG] Output directory: {self.output_dir}")
         print(f"[DEBUG] Exists: {self.output_dir.exists()}")
+        if limit:
+            print(f"[DEBUG] Limit: {limit} conversations")
     
     async def connect(self) -> bool:
         """CDP 経由で Antigravity のブラウザに接続"""
@@ -148,9 +152,15 @@ class AntigravityChatExporter:
                     if not title:
                         continue  # タイトルがないボタンはスキップ
                     
+                    # タイトルを先頭行のみに限定（即度なサニタイズ）
+                    title = title.strip().split('\n')[0].strip()[:100]
+                    
+                    if not title or len(title) < 3:
+                        continue
+                    
                     conversations.append({
                         "id": f"conv_{idx}",
-                        "title": title.strip(),
+                        "title": title,
                         "element": item
                     })
                 except Exception as e:
@@ -187,6 +197,7 @@ class AntigravityChatExporter:
             
             # 直接の子要素を取得
             children = await container.query_selector_all(':scope > div')
+            print(f"    [DEBUG] Found {len(children)} child elements in container")
             
             for child in children:
                 try:
@@ -241,6 +252,9 @@ class AntigravityChatExporter:
                     clean_text = RE_PROGRESS_UPDATES.sub('', clean_text)
                     clean_text = RE_BACKGROUND_STEPS.sub('', clean_text)
                     
+                    # UI ステータステキストを除去
+                    clean_text = RE_UI_STATUS.sub('', clean_text)
+                    
                     # 連続する空白/改行を正規化
                     clean_text = RE_MULTI_NEWLINE.sub('\n\n', clean_text)
                     clean_text = RE_MULTI_SPACE.sub(' ', clean_text)
@@ -249,31 +263,68 @@ class AntigravityChatExporter:
                     if len(clean_text) < MIN_MESSAGE_LENGTH:
                         continue
                     
-                    # ロール判定（改善版）
-                    # Assistant は通常「Thought for」を含む、または長いメッセージ
-                    # User は短く、コマンド的な内容
-                    role = "assistant"
+                    # ロール判定（改善版 v2）
+                    # 1. 元テキストに「Thought for」があれば Claude
+                    # 2. UI 要素パターンがあれば Claude（ツール出力）
+                    # 3. フォールバック: index ベース（偶数=User, 奇数=Claude）
                     
-                    # data-section-index を取得（デバッグ用）
+                    # 元テキストを取得（Thought for 判定用）
+                    raw_text = await child.evaluate("el => el.textContent || ''")
+                    
+                    # data-section-index を取得（フォールバック用）
                     section_idx = await child.get_attribute('data-section-index')
                     
-                    # User メッセージの特徴を検出
-                    user_patterns = [
-                        '@', '/', 'Continue', 'y', 'Y', 'ok', 'OK', 
-                        '続けて', 'はい', 'いいえ', '実験', 'やってみ', 
-                        '"完全"', '完全', '的に', 'なぜ', 'もう', '確認'
+                    # Claude 検出パターン
+                    claude_patterns = [
+                        'Thought for',
+                        'Files Edited',
+                        'Progress Updates',
+                        'Background Steps',
+                        'Ran terminal command',
+                        'Open Terminal',
+                        'Exit code',
+                        'Always Proceed',
+                        'RunningOpen',
+                        'Analyzed',
+                        'Edited',
+                        'Generating',
+                        'GoodBad',
+                        'OpenProceed',
                     ]
                     
-                    if len(clean_text) < MAX_USER_MESSAGE_LENGTH:
-                        if any(clean_text.startswith(p) for p in user_patterns):
-                            role = "user"
-                        # 非常に短いメッセージは User の可能性が高い
-                        elif len(clean_text) < MIN_USER_MESSAGE_LENGTH:
-                            role = "user"
+                    # User 検出パターン（明示的な User 入力）
+                    user_start_patterns = [
+                        '@', '/', 'Continue', '続けて', 'はい', 'いいえ',
+                        'y\n', 'Y\n', 'ok', 'OK', '実験', 'やってみ',
+                        '改善', '修正', 'まずは', '1', '2', '3',
+                    ]
+                    
+                    role = "assistant"  # デフォルト
+                    
+                    # Claude 判定: Thought for または UI 要素
+                    is_claude = any(p in raw_text for p in claude_patterns)
+                    
+                    # User 判定: 短いメッセージ + User パターン
+                    is_user = (
+                        len(clean_text) < 200 and
+                        any(clean_text.strip().startswith(p) for p in user_start_patterns)
+                    )
+                    
+                    if is_claude:
+                        role = "assistant"
+                    elif is_user:
+                        role = "user"
+                    elif section_idx is not None:
+                        # index ベースフォールバック（偶数=User, 奇数=Claude）
+                        try:
+                            idx_num = int(section_idx)
+                            role = "user" if idx_num % 2 == 0 else "assistant"
+                        except:
+                            pass
                     
                     messages.append({
                         "role": role,
-                        "content": clean_text[:10000],  # 長いメッセージも保持
+                        "content": clean_text[:10000],
                         "section_index": section_idx
                     })
                     
@@ -294,23 +345,61 @@ class AntigravityChatExporter:
         try:
             conversations = await self.extract_conversation_list()
             
+            # limit がある場合、会話リストを制限
+            if self.limit:
+                conversations = conversations[:self.limit]
+                print(f"[*] Limiting to {self.limit} conversations")
+            
             for idx, conv in enumerate(conversations, 1):
                 print(f"[{idx}/{len(conversations)}] {conv['title']}")
                 
                 try:
-                    # 会話をクリック
-                    await conv['element'].click()
+                    # 前回のメッセージ内容を記録（重複検出用）
+                    prev_first_message = None
+                    if self.chats:
+                        prev_msgs = self.chats[-1].get('messages', [])
+                        if prev_msgs:
+                            prev_first_message = prev_msgs[0].get('content', '')[:100]
                     
-                    # クリック後の安定化待機
+                    # 会話をクリック（force=True で UI 干渉を回避）
+                    await conv['element'].click(force=True)
+                    
+                    # ネットワーク安定化を待機（最大15秒）
                     try:
-                        await self.page.wait_for_load_state('networkidle', timeout=2000)
+                        await self.page.wait_for_load_state('networkidle', timeout=15000)
                     except:
-                        pass
+                        print("    [!] Network idle timeout, proceeding...")
                     
-                    await asyncio.sleep(1.0)  # UI 更新を確実に待機
+                    # 初期待機
+                    await asyncio.sleep(2.0)
                     
-                    # メッセージを抽出
+                    # メッセージコンテナが出現するまで待機
+                    try:
+                        await self.page.wait_for_selector(
+                            '.flex.flex-col.gap-y-3.px-4.relative > div',
+                            timeout=10000
+                        )
+                    except:
+                        print("    [!] Message container selector timeout, proceeding...")
+                    
+                    # コンテンツ変化を待機（最大10秒、500ms間隔でチェック）
+                    for _ in range(20):
+                        messages = await self.extract_messages()
+                        if messages:
+                            first_msg = messages[0].get('content', '')[:100]
+                            if first_msg != prev_first_message:
+                                break  # コンテンツが変化した
+                        await asyncio.sleep(0.5)
+                    
+                    # 最終的なメッセージ抽出
                     messages = await self.extract_messages()
+                    
+                    # 重複チェック
+                    if messages and prev_first_message:
+                        first_msg = messages[0].get('content', '')[:100]
+                        if first_msg == prev_first_message:
+                            print("    [!] Duplicate content detected, skipping...")
+                            continue
                     
                     # 記録を保存
                     chat_record = {
@@ -429,6 +518,101 @@ class AntigravityChatExporter:
             await self.browser.close()
         if hasattr(self, 'playwright'):
             await self.playwright.stop()
+    
+    async def export_single(self, title: str = "current_chat"):
+        """現在表示されている会話のみをエクスポート（手動モード）"""
+        if not await self.connect():
+            return
+        
+        try:
+            print(f"[*] Exporting current conversation: {title}")
+            
+            # 現在表示されているメッセージを抽出
+            await asyncio.sleep(1.0)  # DOM 安定化待機
+            messages = await self.extract_messages()
+            
+            if not messages:
+                print("[!] No messages found in current view")
+                return
+            
+            # 記録を保存
+            chat_record = {
+                "id": f"manual_{datetime.now().strftime('%H%M%S')}",
+                "title": title,
+                "exported_at": datetime.now().isoformat(),
+                "message_count": len(messages),
+                "messages": messages
+            }
+            self.chats.append(chat_record)
+            self.save_single_chat(chat_record)
+            
+            print(f"    → {len(messages)} messages extracted")
+            
+        finally:
+            await self.close()
+    
+    async def export_watch(self):
+        """待機モード: コンテンツ変化を検出して自動エクスポート"""
+        if not await self.connect():
+            return
+        
+        print("[*] 待機モード開始！")
+        print("[*] Agent Manager で会話を切り替えると自動でエクスポートします")
+        print("[*] 終了するには Ctrl+C を押してください")
+        print()
+        
+        exported_hashes = set()  # エクスポート済みコンテンツのハッシュ
+        last_content_hash = None
+        export_count = 0
+        
+        try:
+            while True:
+                try:
+                    # 現在のメッセージを取得
+                    messages = await self.extract_messages()
+                    
+                    if messages:
+                        # コンテンツのハッシュを計算
+                        content = "".join(m.get('content', '')[:200] for m in messages[:3])
+                        content_hash = hash(content)
+                        
+                        # 新しいコンテンツを検出
+                        if content_hash != last_content_hash and content_hash not in exported_hashes:
+                            export_count += 1
+                            
+                            # タイトルを推測（最初のメッセージの先頭20文字）
+                            title = messages[0].get('content', 'unknown')[:50].replace('\n', ' ')
+                            
+                            print(f"[{export_count}] 新しい会話を検出: {title[:30]}...")
+                            
+                            # 記録を保存
+                            chat_record = {
+                                "id": f"watch_{datetime.now().strftime('%H%M%S')}",
+                                "title": title,
+                                "exported_at": datetime.now().isoformat(),
+                                "message_count": len(messages),
+                                "messages": messages
+                            }
+                            self.chats.append(chat_record)
+                            self.save_single_chat(chat_record)
+                            
+                            print(f"    → {len(messages)} messages extracted")
+                            
+                            last_content_hash = content_hash
+                            exported_hashes.add(content_hash)
+                    
+                    # 1秒間隔でチェック
+                    await asyncio.sleep(1.0)
+                    
+                except KeyboardInterrupt:
+                    break
+                except Exception as e:
+                    print(f"[!] Error: {e}")
+                    await asyncio.sleep(2.0)
+        
+        finally:
+            print(f"\n[*] 待機モード終了。{export_count} 件の会話をエクスポートしました")
+            await self.close()
 
 
 # ============================================================================
@@ -451,13 +635,40 @@ async def main():
         default='individual',
         help="出力形式 (default: individual)"
     )
+    parser.add_argument(
+        '--limit', '-l',
+        type=int,
+        default=None,
+        help="エクスポートする会話数の上限 (テスト用)"
+    )
+    
+    parser.add_argument(
+        '--single', '-s',
+        type=str,
+        default=None,
+        metavar='TITLE',
+        help="手動モード: 現在表示されている会話だけをエクスポート"
+    )
+    
+    parser.add_argument(
+        '--watch', '-w',
+        action='store_true',
+        help="待機モード: 会話の切り替えを検出して自動エクスポート（Ctrl+C で終了）"
+    )
     
     args = parser.parse_args()
     
-    exporter = AntigravityChatExporter(output_dir=args.output)
+    exporter = AntigravityChatExporter(output_dir=args.output, limit=args.limit)
     
     try:
-        await exporter.export_all()
+        if args.watch:
+            # 待機モード: 会話の切り替えを検出して自動エクスポート
+            await exporter.export_watch()
+        elif args.single:
+            # 手動モード: 現在表示されている会話だけをエクスポート
+            await exporter.export_single(title=args.single)
+        else:
+            await exporter.export_all()
         
         if not exporter.chats:
             print("[!] No chats exported")

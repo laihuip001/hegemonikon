@@ -65,6 +65,37 @@ python M:\Hegemonikon\mekhane\anamnesis\export_chats.py --single "Session_$(Get-
 
 > **注意**: Antigravity が `--remote-debugging-port=9222` で起動している必要あり
 
+### Step 3.6: Dispatch Log 自動集計
+
+セッション中のディスパッチを `dispatch_log.yaml` に自動記録。
+
+**収集対象**:
+
+- source_agent / target_agent が異なるタスク委譲
+- T-series / O-series の発動記録
+- 成功/失敗ステータス
+
+**実装**:
+
+1. セッション中の「Handoff形式のやり取り」を検出
+2. 各ディスパッチを dispatch_log.yaml に追記
+3. 統計サマリーを更新
+
+```yaml
+# 追記される形式
+- id: "HGK-{YYYYMMDD}-{NNN}"
+  timestamp: "{ISO8601}"
+  t_series: "{T1-T8}"
+  source_agent: "{agent}"
+  target_agent: "{agent}"
+  task: "{description}"
+  status: success | failure
+```
+
+**出力先**: `M:\Brain\.hegemonikon\logs\dispatch_log.yaml`
+
+> **Phase B移行判定**: dispatch_count >= 50, failure_rate < 10%, exception_patterns >= 3
+
 ### Step 4: 確認
 
 生成されたHandoffを表示し、ユーザーに確認を求める。

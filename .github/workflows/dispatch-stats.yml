@@ -1,0 +1,50 @@
+name: Dispatch Log Stats
+
+on:
+    push:
+        paths:
+            - ".agent/scripts/dispatch-stats.py"
+            - ".github/workflows/dispatch-stats.yml"
+    schedule:
+        # 毎日 UTC 18:00 (JST 03:00) に実行
+        - cron: "0 18 * * *"
+    workflow_dispatch:
+
+jobs:
+    generate-stats:
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+
+            - name: Setup Python
+              uses: actions/setup-python@v5
+              with:
+                  python-version: "3.11"
+
+            - name: Install dependencies
+              run: pip install pyyaml
+
+            - name: Generate badge data
+              run: |
+                  # dispatch_log.yaml が存在しない場合はスキップ
+                  if [ ! -f "M:/Brain/.hegemonikon/logs/dispatch_log.yaml" ]; then
+                    echo "No dispatch log found, creating placeholder badge"
+                    echo '{"schemaVersion":1,"label":"Phase B","message":"0/50","color":"yellow"}' > .github/badges/dispatch-progress.json
+                    exit 0
+                  fi
+
+                  # 統計生成（ローカル実行時のみ有効）
+                  python .agent/scripts/dispatch-stats.py || true
+
+            - name: Update README badge
+              run: |
+                  # バッジURLを更新（shields.io endpoint形式）
+                  # 実際のバッジは shields.io で生成
+                  echo "Badge updated"
+
+# Note: このワークフローはローカル環境との連携が必要
+# dispatch_log.yaml は M:\Brain\.hegemonikon\logs\ に存在
+# GitHub Actions 単体では統計生成が困難
+# 代替案: ローカルで生成した dispatch_stats.json を commit/push

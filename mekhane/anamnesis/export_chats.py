@@ -432,22 +432,32 @@ class AntigravityChatExporter:
         filepath = self.output_dir / filename
         
         with open(filepath, 'w', encoding='utf-8') as f:
+            f.write('<a id="top"></a>\n')
             f.write("# Antigravity IDE チャット履歴\n\n")
-            f.write(f"- **エクスポート日時**: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
-            f.write(f"- **会話数**: {len(self.chats)}\n")
-            f.write(f"- **総メッセージ数**: {sum(c['message_count'] for c in self.chats)}\n\n")
-            f.write("---\n\n")
+
+            f.write("> **エクスポート情報**\n")
+            f.write(f"> - **日時**: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
+            f.write(f"> - **会話数**: {len(self.chats)}\n")
+            f.write(f"> - **総メッセージ数**: {sum(c['message_count'] for c in self.chats)}\n\n")
+
+            f.write("## 目次\n\n")
+            for chat in self.chats:
+                f.write(f"- [{chat['title']}](#{chat['id']})\n")
+            f.write("\n---\n\n")
             
             for chat in self.chats:
+                f.write(f"<a id=\"{chat['id']}\"></a>\n")
                 f.write(f"## {chat['title']}\n\n")
-                f.write(f"- **ID**: `{chat['id']}`\n")
-                f.write(f"- **メッセージ数**: {chat['message_count']}\n\n")
+
+                f.write(f"> **ID**: `{chat['id']}` | **メッセージ数**: {chat['message_count']}\n\n")
                 
                 for msg in chat['messages']:
-                    role_label = "👤 **User**" if msg['role'] == 'user' else "🤖 **Claude**"
-                    f.write(f"### {role_label}\n\n")
+                    role_icon = "👤" if msg['role'] == 'user' else "🤖"
+                    role_name = "User" if msg['role'] == 'user' else "Claude"
+                    f.write(f"### {role_icon} {role_name}\n\n")
                     f.write(f"{msg['content']}\n\n")
                 
+                f.write("[↑ 目次へ戻る](#top)\n\n")
                 f.write("---\n\n")
         
         print(f"[✓] Saved: {filepath}")
@@ -491,13 +501,13 @@ class AntigravityChatExporter:
         try:
             with open(filepath, 'w', encoding='utf-8') as f:
                 f.write(f"# {chat['title']}\n\n")
-                f.write(f"- **ID**: `{chat['id']}`\n")
-                f.write(f"- **エクスポート日時**: {chat['exported_at']}\n\n")
+                f.write(f"> **ID**: `{chat['id']}` | **日時**: {chat['exported_at']}\n\n")
                 f.write("---\n\n")
                 
                 for msg in chat['messages']:
-                    role_label = "## 👤 User" if msg['role'] == 'user' else "## 🤖 Claude"
-                    f.write(f"{role_label}\n\n")
+                    role_icon = "👤" if msg['role'] == 'user' else "🤖"
+                    role_name = "User" if msg['role'] == 'user' else "Claude"
+                    f.write(f"## {role_icon} {role_name}\n\n")
                     f.write(f"{msg['content']}\n\n")
             
             print(f"  [✓] Saved: {filename}")

@@ -18,10 +18,15 @@ $SyncTargets = @(
 
 # Additional targets for Antigravity compatibility
 # Antigravity reads ~/.gemini/workflows/ directly, not .agent/workflows/
+# CRITICAL: Antigravity ALSO reads ~/.gemini/antigravity/global_workflows/
 $LegacySyncTargets = @(
     @{
         Source = "M:\Hegemonikon\.agent\workflows"
         Dest   = "C:\Users\$env:USERNAME\.gemini\workflows"
+    },
+    @{
+        Source = "M:\Hegemonikon\.agent\workflows"
+        Dest   = "C:\Users\$env:USERNAME\.gemini\antigravity\global_workflows"
     }
 )
 

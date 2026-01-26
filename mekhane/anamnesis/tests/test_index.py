@@ -24,6 +24,8 @@ class TestGnosisIndex(unittest.TestCase):
         self.mock_embedder_instance = self.mock_embedder_class.return_value
         # Mock embed method to return a dummy vector
         self.mock_embedder_instance.embed.return_value = [0.1] * 384
+        # Mock embed_batch to return list of dummy vectors
+        self.mock_embedder_instance.embed_batch.side_effect = lambda texts: [[0.1] * 384 for _ in texts]
 
         self.index = GnosisIndex(lance_dir=self.lance_dir)
         # Inject the mock embedder

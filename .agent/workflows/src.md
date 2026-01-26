@@ -82,7 +82,7 @@ Antigravityの `search_web` ツールを使用。
 | 日常的な調査 | `/src` (Google) |
 | Google検索で不足 | `/src pplx` |
 | 重要な意思決定 | `/src both` |
-| 深い調査が必要 | `/ask` で調査依頼書 → 手動Perplexity |
+| 深い調査が必要 | `/zet` で調査依頼書 → 手動Perplexity |
 
 ---
 

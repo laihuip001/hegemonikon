@@ -100,7 +100,7 @@ class GnosisIndex:
         
         table = self.db.open_table(self.TABLE_NAME)
         try:
-            df = table.to_pandas()
+            df = table.search().select(["primary_key"]).limit(None).to_pandas()
             self._primary_key_cache = set(df["primary_key"].tolist())
         except Exception:
             pass

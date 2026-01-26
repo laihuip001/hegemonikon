@@ -13,7 +13,7 @@ from pathlib import Path
 from typing import NamedTuple
 
 # --- Constants ---
-ROOT_DIR = Path(__file__).resolve().parents[2]
+ROOT_DIR = Path(__file__).resolve().parents[3]
 DOCS_DIR = ROOT_DIR / "docs"
 
 CRITICAL_FILES = [
@@ -31,6 +31,50 @@ class CheckResult(NamedTuple):
     message: str
 
 # --- Functions ---
+def is_safe_path(target_path: Path, base_dir: Path) -> bool:
+    """
+    Check if target_path is within base_dir, handling Windows drive/case issues.
+    """
+    # 1. Simple check (fast path)
+    if hasattr(target_path, "is_relative_to"):  # Python 3.9+
+        if target_path.is_relative_to(base_dir):
+            return True
+    else:
+        try:
+            target_path.relative_to(base_dir)
+            return True
+        except ValueError:
+            pass
+
+    # 2. Resolved check
+    t_res = target_path.resolve()
+    b_res = base_dir.resolve()
+
+    if hasattr(t_res, "is_relative_to"):
+        if t_res.is_relative_to(b_res):
+            return True
+    else:
+        try:
+            t_res.relative_to(b_res)
+            return True
+        except ValueError:
+            pass
+
+    # 3. Case-insensitive string check (Windows specific fallback)
+    t_str = str(t_res).lower().replace('\\', '/')
+    b_str = str(b_res).lower().replace('\\', '/')
+
+    if not b_str.endswith('/'):
+        b_str_slash = b_str + '/'
+    else:
+        b_str_slash = b_str
+
+    if t_str == b_str or t_str.startswith(b_str_slash):
+        return True
+
+    return False
+
+
 def check_critical_files() -> list[CheckResult]:
     """Verify existence of critical documentation files."""
     results = []
@@ -70,7 +114,14 @@ def check_link_validity(file_path: Path) -> list[CheckResult]:
         
         target_path = (file_path.parent / link_target).resolve()
         
-        # Note: Skipped strict relative_to(ROOT_DIR) check due to Windows drive mapping issues
+        # Check if path is safe (inside repo)
+        if not is_safe_path(target_path, ROOT_DIR):
+            results.append(CheckResult(
+                name=f"Link: {link_target}",
+                passed=False,
+                message=f"Unsafe link in {file_path.name}: {link_target} (points outside repo)"
+            ))
+            continue
         
         exists = target_path.exists()
         status = "✅" if exists else "❌"

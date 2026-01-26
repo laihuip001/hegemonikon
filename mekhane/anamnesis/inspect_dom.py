@@ -26,18 +26,27 @@ async def inspect_dom():
                 
                 try:
                     # 会話リストっぽい要素を探す
-                    elements = await page.query_selector_all('div, button, li, span, a')
-                    results.append(f'  Total elements: {len(elements)}')
+                    data = await page.evaluate('''() => {
+                        const selector = 'div, button, li, span, a';
+                        const elements = Array.from(document.querySelectorAll(selector));
+                        const total = elements.length;
+                        const items = elements.slice(0, 100).map((el, i) => {
+                             const tag = el.tagName;
+                             const cls = el.getAttribute('class') || '';
+                             const role = el.getAttribute('role') || '';
+                             const data_attrs = Object.keys(el.dataset).join(',');
+                             const text = (el.textContent || '').slice(0, 40).replace(/\\n/g, ' ').trim();
+                             return { index: i, tag, cls, role, data_attrs, text };
+                        });
+                        return { total, items };
+                    }''')
+
+                    results.append(f'  Total elements: {data["total"]}')
                     
                     # 最初の100要素を調査
-                    for i, el in enumerate(elements[:100]):
-                        tag = await el.evaluate('el => el.tagName')
-                        cls = await el.get_attribute('class') or ''
-                        role = await el.get_attribute('role') or ''
-                        data_attrs = await el.evaluate("el => Object.keys(el.dataset).join(',')")
-                        text = (await el.text_content() or '')[:40].replace('\n', ' ').strip()
-                        if cls or role or data_attrs:
-                            results.append(f'  [{i}] <{tag}> class="{cls[:50]}" role="{role}" data=[{data_attrs}] text="{text}"')
+                    for item in data['items']:
+                        if item['cls'] or item['role'] or item['data_attrs']:
+                            results.append(f'  [{item["index"]}] <{item["tag"]}> class="{item["cls"][:50]}" role="{item["role"]}" data=[{item["data_attrs"]}] text="{item["text"]}"')
                 except Exception as e:
                     results.append(f'  Error: {e}')
         

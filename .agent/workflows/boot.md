@@ -14,6 +14,12 @@ Hegemonikón Phase 1 のブートシーケンス。
 
 // turbo-all
 
+0. **🔄 正本読み直し（Anti-Stale Protocol）**:
+   - まず `view_file M:\Hegemonikon\.agent\workflows\boot.md` を実行
+   - このステップ自体が古いキャッシュから実行されている可能性があるため
+   - 正本を読み直すことで、以降のステップが最新版に基づくことを保証
+   > **設計原則**: 探索-活用トレードオフにおいて、ブート時は「探索」を優先する
+
 1. **設定ファイル同期**: M:\.gemini → C:\Users\{USER}\.gemini
 
    ```powershell

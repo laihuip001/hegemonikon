@@ -42,6 +42,7 @@ modules: [M4, M3]
 ```
 
 **チェックポイント**:
+
 - [ ] model-selection-guide.md の推奨アルゴリズムを適用したか？
 - [ ] 推奨を出力したか？
 
@@ -55,10 +56,11 @@ modules: [M4, M3]
 2. U > 0.6 の場合:
    - 不足情報をリストアップ
    - **Gnōsis検索**: `python gnosis/cli.py search "query"` で関連論文を取得
-   - Gnōsisで不足 → `/ask` で追加リサーチ、またはユーザーに質問
+   - Gnōsisで不足 → `/zet` で追加リサーチ、またはユーザーに質問
 3. U ≤ 0.6 の場合: Step 1 へ進む
 
 **チェックポイント**:
+
 - [ ] 不確実性スコアを算出したか？
 - [ ] U > 0.6 の場合、**Gnōsis検索**を実行したか？
 - [ ] Gnōsisで不足の場合、追加リサーチを実行したか？
@@ -67,13 +69,12 @@ modules: [M4, M3]
 
 ## Step 1: コンテキスト分析
 
-
-
 1. プロジェクトのファイル構造を読み込む
 2. 既存のアーキテクチャパターンを特定する
 3. ユーザー要求の不明点をリストアップし、質問する
 
-**チェックポイント**: 
+**チェックポイント**:
+
 - [ ] アーキテクチャパターンを特定・宣言したか？
 - [ ] 不明点がある場合、質問したか？
 
@@ -136,6 +137,7 @@ modules: [M4, M3]
 ## Step 4: Memory Logging (Auto)
 
 計画策定完了を自己記録する:
+
 ```bash
 python forge/gnosis/logger.py log "system" "/plan Completed" --session "AutoLog"
 ```
@@ -163,4 +165,3 @@ python forge/gnosis/logger.py log "system" "/plan Completed" --session "AutoLog"
 ⏸️ 承認待ち: 計画を承認しますか？ (`y`)
    承認後、`/do` で実装開始
 ```
-

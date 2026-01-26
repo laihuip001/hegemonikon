@@ -27,23 +27,31 @@ def cleanup():
     moved_count = 0
     kept_count = 0
 
+    threshold_size = 20 * 1024 * 1024  # 20MB
+
     for pb_file in CONV_DIR.glob("*.pb"):
         if pb_file.stem == CURRENT_SESSION_ID:
             print(f"[*] Keeping current session: {pb_file.name}")
             kept_count += 1
             continue
         
-        try:
-            shutil.move(str(pb_file), str(BACKUP_DIR / pb_file.name))
-            moved_count += 1
-        except Exception as e:
-            print(f"[!] Failed to move {pb_file.name}: {e}")
+        size = pb_file.stat().st_size
+        if size > threshold_size or size == 0:
+            print(f"⚠️  Moving problematic file ({size/1024/1024:.1f} MB): {pb_file.name}")
+            try:
+                shutil.move(str(pb_file), str(BACKUP_DIR / pb_file.name))
+                moved_count += 1
+            except Exception as e:
+                print(f"[!] Failed to move {pb_file.name}: {e}")
+        else:
+            # 正常ファイル
+            kept_count += 1
 
     print("-" * 30)
-    print(f"Moved {moved_count} sessions to backup.")
-    print(f"Kept {kept_count} session (current).")
+    print(f"Moved {moved_count} problematic sessions to backup.")
+    print(f"Kept {kept_count} healthy sessions.")
     
-    # Clean indices
+    # Clean indices (必須: 壊れたセッションの情報を消すため)
     index_dir = Path(r"M:\.gemini\antigravity\_index")
     if index_dir.exists():
         print("Removing LanceDB index...")

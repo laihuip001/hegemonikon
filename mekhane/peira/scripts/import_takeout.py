@@ -18,7 +18,12 @@ import os
 import hashlib
 from pathlib import Path
 from datetime import datetime
-from typing import Dict, List, Optional, Union
+from typing import Dict, List, Optional, Union, Iterable
+
+try:
+    import ijson
+except ImportError:
+    ijson = None
 
 def safe_filename(text: str, max_bytes: int = 100) -> str:
     """
@@ -63,26 +68,35 @@ def extract_text_recursive(node: Union[str, list, dict]) -> str:
         return "\n".join(parts)
     return ""
 
-def process_conversations(data: Union[List, Dict], output_dir: str):
+def process_conversations(data: Union[List, Dict, Iterable], output_dir: str):
     """メイン処理"""
     
     # Analyze structure
-    raw_list = []
+    conversations_iter = []
+    total_count_msg = ""
+
     if isinstance(data, list):
-        raw_list = data
+        conversations_iter = data
+        total_count_msg = f"Found {len(data)} conversation items."
     elif isinstance(data, dict):
         if 'conversations' in data:
-            raw_list = data['conversations']
+            conversations_iter = data['conversations']
+            total_count_msg = f"Found {len(conversations_iter)} conversation items."
         else:
             print("Warning: Unknown JSON structure. Trying to treat as list.")
-            raw_list = [data] # Fallback for single item
+            conversations_iter = [data] # Fallback for single item
+            total_count_msg = f"Found 1 conversation item."
+    else:
+        # Assume Iterable (streaming)
+        conversations_iter = data
+        total_count_msg = "Processing conversation stream..."
 
-    print(f"Found {len(raw_list)} conversation items.")
+    print(total_count_msg)
     
     success_count = 0
     error_count = 0
 
-    for item in raw_list:
+    for item in conversations_iter:
         try:
             # Title extraction
             title = item.get('title', 'Untitled')
@@ -195,6 +209,37 @@ def create_dummy_data() -> Dict:
         ]
     }
 
+def stream_conversations(f):
+    """
+    JSON構造を判別してストリーミングイテレータを返す。
+    ijsonが利用できない場合はjson.loadを使用する（フォールバック）。
+    """
+    if ijson is None:
+        print("Warning: ijson module not found. Falling back to loading entire JSON into memory.")
+        data = json.load(f)
+        if isinstance(data, dict) and 'conversations' in data:
+            return data['conversations']
+        elif isinstance(data, list):
+            return data
+        else:
+            return [data]
+
+    # ファイルの先頭文字を読んで構造を推定
+    start_pos = f.tell()
+    first_char = f.read(1)
+    while first_char and first_char.isspace():
+        first_char = f.read(1)
+
+    f.seek(start_pos)
+
+    if first_char == '[':
+        return ijson.items(f, 'item')
+    elif first_char == '{':
+        return ijson.items(f, 'conversations.item')
+    else:
+        # フォールバック
+        return ijson.items(f, 'item') # Assume list if unknown or let ijson handle error
+
 def main():
     if len(sys.argv) < 2:
         print("Usage: python import_takeout.py [json_file_path] [output_dir]")
@@ -216,9 +261,9 @@ def main():
             os.makedirs(output_dir)
             
         with open(input_file, 'r', encoding='utf-8') as f:
-            data = json.load(f)
-            
-        process_conversations(data, output_dir)
+            # Use streaming if possible
+            conversations = stream_conversations(f)
+            process_conversations(conversations, output_dir)
 
 if __name__ == "__main__":
     main()

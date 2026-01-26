@@ -277,6 +277,15 @@ def build_index(incremental: bool = False, report_mode: bool = False):
         if "chat_history" in table_names:
             if incremental:
                 table = db.open_table("chat_history")
+                # Delete existing records that match the new data IDs
+                new_ids = [item['id'] for item in all_data]
+                if new_ids:
+                    # Batch delete to avoid query length limits
+                    batch_size = 100
+                    for i in range(0, len(new_ids), batch_size):
+                        batch = new_ids[i:i+batch_size]
+                        ids_str = ", ".join([f"'{bid}'" for bid in batch])
+                        table.delete(f"id IN ({ids_str})")
                 table.add(all_data)
             else:
                 db.drop_table("chat_history")
@@ -426,9 +435,8 @@ def main():
     elif command == "sync":
         report_mode = "--report" in sys.argv
         # NOTE: LanceDB append-only logic creates duplicates on update. 
-        # Using incremental=False (Full Re-index) ensures data consistency.
-        # Performance impact is negligible for current dataset size.
-        build_index(incremental=False, report_mode=report_mode)
+        # Using incremental=True with delete-before-insert to ensure data consistency.
+        build_index(incremental=True, report_mode=report_mode)
     elif command == "search":
         if len(sys.argv) < 3:
             print("Usage: python chat-history-kb.py search \"query\"")

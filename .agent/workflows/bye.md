@@ -41,6 +41,7 @@ git -C "m:\Hegemonikon" status --short
 ### Step 2: セッション情報収集
 
 以下を自動収集:
+
 - 今日のAntigravityセッションのtask.md
 - 完了したタスク（[x]マーク）
 - 未完了タスク（[ ]マーク）
@@ -51,6 +52,18 @@ git -C "m:\Hegemonikon" status --short
 Prompt-Lang定義（`session-handoff.prompt`）に基づきHandoffドキュメントを生成。
 
 出力先: `M:\Brain\.hegemonikon\sessions\handoff_{YYYY-MM-DD}_{HHMM}.md`
+
+### Step 3.5: チャット履歴エクスポート
+
+現在のセッションのチャット履歴を Markdown にエクスポート。
+
+```powershell
+python M:\Hegemonikon\mekhane\anamnesis\export_chats.py --single "Session_$(Get-Date -Format 'yyyyMMdd_HHmm')"
+```
+
+出力先: `M:\Brain\.hegemonikon\sessions\{date}_conv_{title}.md`
+
+> **注意**: Antigravity が `--remote-debugging-port=9222` で起動している必要あり
 
 ### Step 4: 確認
 

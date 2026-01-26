@@ -7,11 +7,22 @@ LanceDB にインデックスし、全文検索・ベクトル検索を可能に
 """
 
 import re
+import os
+import multiprocessing
+from concurrent.futures import ProcessPoolExecutor
 from pathlib import Path
 from typing import List, Optional
 
 import lancedb
 from pydantic import BaseModel
+
+# Precompiled regexes for performance
+RE_CSS_COMMENT = re.compile(r'/\*.*?\*/', flags=re.DOTALL)
+RE_MEDIA_QUERY = re.compile(r'@media\s*\([^)]*\)\s*\{[^}]*\}')
+RE_CSS_RULE = re.compile(r'\.markdown[-\w]*\s*\{[^}]*\}')
+RE_THOUGHT = re.compile(r'Thought for \d+s\s*')
+RE_THOUGHT_OLD = re.compile(r'Thought for <\d+s\s*')
+RE_MULTI_NEWLINE = re.compile(r'\n{3,}')
 
 
 # 設定
@@ -82,20 +93,20 @@ def parse_session_file(filepath: Path) -> Optional[SessionDocument]:
         
         # CSS ノイズを除去
         # /* ... */ コメントを除去
-        full_content = re.sub(r'/\*.*?\*/', '', full_content, flags=re.DOTALL)
+        full_content = RE_CSS_COMMENT.sub('', full_content)
         
         # @media { ... } ブロックを除去
-        full_content = re.sub(r'@media\s*\([^)]*\)\s*\{[^}]*\}', '', full_content)
+        full_content = RE_MEDIA_QUERY.sub('', full_content)
         
         # .markdown-alert などの CSS ルールを除去
-        full_content = re.sub(r'\.markdown[-\w]*\s*\{[^}]*\}', '', full_content)
+        full_content = RE_CSS_RULE.sub('', full_content)
         
         # "Thought for Xs" を除去
-        full_content = re.sub(r'Thought for \d+s\s*', '', full_content)
-        full_content = re.sub(r'Thought for <\d+s\s*', '', full_content)
+        full_content = RE_THOUGHT.sub('', full_content)
+        full_content = RE_THOUGHT_OLD.sub('', full_content)
         
         # 連続する空行を除去
-        full_content = re.sub(r'\n{3,}', '\n\n', full_content).strip()
+        full_content = RE_MULTI_NEWLINE.sub('\n\n', full_content).strip()
         
         # プレビュー（最初の 500 文字）
         preview = full_content[:500].replace('\n', ' ')
@@ -131,10 +142,19 @@ def index_sessions():
     # ドキュメントを作成
     documents: List[SessionDocument] = []
     
-    for filepath in session_files:
-        doc = parse_session_file(filepath)
-        if doc and len(doc.content) > 50:
-            documents.append(doc)
+    # Parallel processing
+    # Using 'spawn' context to be safe with lancedb
+    ctx = multiprocessing.get_context("spawn")
+    max_workers = os.cpu_count() or 4
+
+    print(f"[*] Processing with {max_workers} workers...")
+
+    with ProcessPoolExecutor(max_workers=max_workers, mp_context=ctx) as executor:
+        results = executor.map(parse_session_file, session_files)
+
+        for doc in results:
+            if doc and len(doc.content) > 50:
+                documents.append(doc)
     
     print(f"[*] Parsed {len(documents)} valid documents")
     
@@ -157,7 +177,7 @@ def index_sessions():
     # Full-Text Search インデックスを作成
     try:
         table.create_fts_index("content", replace=True)
-        print(f"[✓] Created FTS index on 'content'")
+        print("[✓] Created FTS index on 'content'")
     except Exception as e:
         print(f"[!] FTS index creation failed: {e}")
     

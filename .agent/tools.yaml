@@ -33,18 +33,18 @@ scripts:
     description: "チャット履歴を LanceDB に同期"
     purpose: "セッション間の情報共有"
     workflow: "/hist"
-    
+
   gnosis-cli:
     path: mekhane/anamnesis/cli.py
     commands:
-      - "search \"query\"  # 論文検索"
+      - 'search "query"  # 論文検索'
       - "stats            # 統計情報"
       - "collect -s arxiv # arXiv収集"
     description: "Gnōsis知識ベースCLI"
-    
+
   gnosis-auto-collect:
     path: .agent/scripts/gnosis-auto-collect.ps1
-    command: "& \"{path}\""
+    command: '& "{path}"'
     description: "Gnōsis自動収集（ローテーション）"
     purpose: "10トピックを順番に収集"
     workflow: "/boot Step 5"
@@ -56,25 +56,25 @@ workflows:
   boot:
     purpose: "セッション初期化、履歴同期、レビュー生成"
     modules: [T1, T8]
-    
+
   hist:
     purpose: "チャット履歴を LanceDB に同期"
     modules: [T8]
     depends: [chat-history-sync]
-    
+
   plan:
     purpose: "設計計画策定（コード前に必須）"
     modules: [T4, T3]
     includes: "Step 0.1 モデル適性チェック"
-    
+
   zet:
     purpose: "O3 Zētēsis（探求）パプ君への調査依頼書作成"
     modules: [O3, T5]
-    
+
   src:
     purpose: "Web検索実行（Perplexity API）"
     modules: [T5]
-    
+
   noe:
     purpose: "O1 Noēsis（認識）最深層思考、0からの再構築"
     modules: [O1, T3, T4, T7]
@@ -94,11 +94,11 @@ workflows:
     purpose: "T3 自問（目的と手段の入れ替わり防止）"
     modules: [T3]
     description: "3層自問: 表層→深層→検証"
-    
+
   rev:
     purpose: "レビュー生成"
     modules: [T7, T8]
-    
+
   chk:
     purpose: "検証・批評（Synedrion評議会）"
     modules: [T7]
@@ -124,6 +124,45 @@ workflows:
     purpose: "X-series（関係層）"
     modules: [X-O, X-T, X-K]
 
+  bye:
+    purpose: "セッション終了、Handoff生成"
+    description: "次回セッションへの引き継ぎ書類を作成"
+
+  dev:
+    purpose: "開発プロトコル参照"
+    description: "Creator用開発マニュアル呼び出し"
+
+  exp:
+    purpose: "チャット履歴エクスポート"
+    modules: [T8]
+    description: "M8 Anamnēsis エピソード記憶保存"
+
+  manual:
+    purpose: "マニュアル生成"
+    description: "Gemini/Jules向け作業手順書を作成"
+
+  now:
+    purpose: "現在地確認"
+    description: "コンテキスト再構築とタスク確認"
+
+  pri:
+    purpose: "優先順位判定"
+    modules: [T2]
+    description: "Eisenhowerマトリクスによるタスク整理"
+
+  rec:
+    purpose: "記憶想起・ルール確認"
+    description: "必須ルールとスキルトリガーを再読み込み"
+
+  u:
+    purpose: "Claudeの主観意見"
+    description: "AIをパートナーとして扱い意見を求める"
+
+  v:
+    purpose: "Cross-Model 検証"
+    modules: [T7]
+    description: "Geminiの作業をClaudeが監査・検証"
+
 # =============================================================================
 # Key Directories
 # =============================================================================
@@ -148,7 +187,7 @@ skills:
       - templates/domain_templates/rag.yaml
       - templates/domain_templates/summarization.yaml
     status: production
-    
+
   meta-prompt-generator:
     path: .agent/skills/utils/meta-prompt-generator/SKILL.md
     purpose: "汎用 SKILL.md 生成（アーキタイプ駆動）"

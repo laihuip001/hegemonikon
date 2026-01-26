@@ -21,6 +21,8 @@ from datetime import datetime
 from dataclasses import dataclass, field
 from typing import Optional
 
+from mekhane.anamnesis.ux_utils import Colors, color_text
+
 
 @dataclass
 class LogEntry:
@@ -243,15 +245,22 @@ class AntigravityLogCollector:
     def format_summary(self, summary: dict) -> str:
         """要約を人間が読みやすい形式でフォーマット"""
         if "error" in summary:
-            return f"[Error] {summary['error']}"
+            return f"{color_text('[Error]', Colors.FAIL)} {summary['error']}"
         
         lines = [
-            f"[Antigravity] Session: {summary['session_id']}",
-            f"  Model: {summary['model']}",
+            f"{color_text('[Antigravity]', Colors.HEADER)} Session: {summary['session_id']}",
+            f"  Model: {color_text(summary['model'] or 'Unknown', Colors.CYAN)}",
             f"  Requests: {summary['total_requests']}",
-            f"  Errors: {summary['error_count']} (503: {summary['capacity_errors']})",
         ]
         
+        error_count = summary['error_count']
+        error_text = f"Errors: {error_count} (503: {summary['capacity_errors']})"
+
+        if error_count > 0:
+            lines.append(f"  {color_text(error_text, Colors.FAIL)}")
+        else:
+            lines.append(f"  {color_text(error_text, Colors.GREEN)}")
+
         if summary.get("token_usage"):
             tu = summary["token_usage"]
             lines.append(f"  Tokens: {tu['current']:,} / {tu['limit']:,} ({tu['percentage']}%)")

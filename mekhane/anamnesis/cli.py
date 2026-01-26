@@ -14,6 +14,8 @@ from typing import Optional
 import json
 from datetime import datetime, timedelta
 
+from mekhane.anamnesis.ux_utils import Colors, print_header, print_success, print_error, print_warning, color_text
+
 # Add Hegemonikon root to path for imports (mekhane package)
 _THIS_DIR = Path(__file__).parent
 _HEGEMONIKON_ROOT = _THIS_DIR.parent.parent  # mekhane/anamnesis -> mekhane -> Hegemonikon
@@ -88,11 +90,11 @@ def cmd_collect(args):
     
     source = args.source.lower()
     if source not in collectors:
-        print(f"Unknown source: {args.source}")
+        print_error(f"Unknown source: {args.source}")
         print(f"Available: {', '.join(collectors.keys())}")
         return 1
     
-    print(f"[Collect] Source: {source}, Query: {args.query}, Limit: {args.limit}")
+    print_header(f"[Collect] Source: {source}, Query: {args.query}, Limit: {args.limit}")
     
     try:
         collector = collectors[source]()
@@ -102,7 +104,7 @@ def cmd_collect(args):
         if papers and not args.dry_run:
             index = GnosisIndex()
             added = index.add_papers(papers)
-            print(f"[Collect] Added {added} to index")
+            print_success(f"[Collect] Added {added} to index")
             update_state()  # Update timestamp
         elif args.dry_run:
             print("[Collect] Dry run - not adding to index")
@@ -111,7 +113,7 @@ def cmd_collect(args):
         
         return 0
     except Exception as e:
-        print(f"[Error] {e}")
+        print_error(f"[Error] {e}")
         return 1
 
 
@@ -128,22 +130,22 @@ def cmd_collect_all(args):
         ("openalex", OpenAlexCollector()),
     ]
     
-    print(f"[CollectAll] Query: {args.query}, Limit per source: {args.limit}")
+    print_header(f"[CollectAll] Query: {args.query}, Limit per source: {args.limit}")
     
     all_papers = []
     for name, collector in collectors:
         try:
-            print(f"  Collecting from {name}...")
+            print(f"  Collecting from {color_text(name, Colors.CYAN)}...")
             papers = collector.search(args.query, max_results=args.limit)
             print(f"    Found {len(papers)} papers")
             all_papers.extend(papers)
         except Exception as e:
-            print(f"    Error: {e}")
+            print_error(f"    Error: {e}")
     
     if all_papers and not args.dry_run:
         index = GnosisIndex()
         added = index.add_papers(all_papers, dedupe=True)
-        print(f"[CollectAll] Added {added} unique papers to index")
+        print_success(f"[CollectAll] Added {added} unique papers to index")
         update_state()  # Update timestamp
     
     return 0
@@ -153,27 +155,32 @@ def cmd_search(args):
     """論文検索"""
     from mekhane.anamnesis.index import GnosisIndex
     
-    print(f"[Search] Query: {args.query}")
+    print_header(f"[Search] Query: {args.query}")
     
     index = GnosisIndex()
     results = index.search(args.query, k=args.limit)
     
     if not results:
-        print("No results found")
+        print_warning("No results found")
         return 0
     
     print(f"\nFound {len(results)} results:\n")
-    print("-" * 70)
+    print(color_text("-" * 70, Colors.DIM))
     
     for i, r in enumerate(results, 1):
-        print(f"\n[{i}] {r.get('title', 'Untitled')[:70]}")
-        print(f"    Source: {r.get('source')} | Citations: {r.get('citations', 'N/A')}")
-        print(f"    Authors: {r.get('authors', '')[:60]}...")
-        print(f"    Abstract: {r.get('abstract', '')[:150]}...")
+        title = color_text(r.get('title', 'Untitled')[:70], Colors.BOLD + Colors.CYAN)
+        source = color_text(f"Source: {r.get('source')} | Citations: {r.get('citations', 'N/A')}", Colors.WARNING)
+        authors = color_text(f"Authors: {r.get('authors', '')[:60]}...", Colors.GREEN)
+        abstract = color_text(f"Abstract: {r.get('abstract', '')[:150]}...", Colors.DIM)
+
+        print(f"\n{color_text(f'[{i}]', Colors.BOLD)} {title}")
+        print(f"    {source}")
+        print(f"    {authors}")
+        print(f"    {abstract}")
         if r.get('url'):
-            print(f"    URL: {r.get('url')}")
+            print(f"    {color_text('URL: ' + r.get('url'), Colors.BLUE)}")
     
-    print("\n" + "-" * 70)
+    print("\n" + color_text("-" * 70, Colors.DIM))
     return 0
 
 
@@ -184,14 +191,14 @@ def cmd_stats(args):
     index = GnosisIndex()
     stats = index.stats()
     
-    print("\n[Gnōsis Index Statistics]")
-    print("=" * 40)
-    print(f"Total Papers: {stats['total']}")
+    print_header("\n[Gnōsis Index Statistics]")
+    print(color_text("=" * 40, Colors.DIM))
+    print(f"Total Papers: {color_text(str(stats['total']), Colors.BOLD)}")
     print(f"With DOI: {stats.get('unique_dois', 0)}")
     print(f"With arXiv ID: {stats.get('unique_arxiv', 0)}")
-    print("\nBy Source:")
+    print(color_text("\nBy Source:", Colors.BOLD))
     for source, count in stats.get("sources", {}).items():
-        print(f"  {source}: {count}")
+        print(f"  {color_text(source, Colors.CYAN)}: {count}")
     
     # Show freshness
     if STATE_FILE.exists():
@@ -201,7 +208,7 @@ def cmd_stats(args):
         except:
             pass
             
-    print("=" * 40)
+    print(color_text("=" * 40, Colors.DIM))
     
     return 0
 

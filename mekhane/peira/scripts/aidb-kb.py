@@ -156,7 +156,43 @@ class Embedder:
     
     def embed_batch(self, texts: list[str]) -> list[list]:
         """Embed multiple texts."""
-        return [self.embed(t) for t in texts]
+        if not texts:
+            return []
+
+        # Tokenize batch
+        encoded_batch = self.tokenizer.encode_batch(texts)
+
+        # Prepare inputs
+        input_ids = self.np.array([e.ids for e in encoded_batch], dtype=self.np.int64)
+        attention_mask = self.np.array([e.attention_mask for e in encoded_batch], dtype=self.np.int64)
+        token_type_ids = self.np.zeros_like(input_ids)
+
+        # Run inference
+        outputs = self.session.run(
+            None,
+            {
+                "input_ids": input_ids,
+                "attention_mask": attention_mask,
+                "token_type_ids": token_type_ids,
+            }
+        )
+
+        # Mean pooling over tokens
+        embeddings = outputs[0]  # (batch_size, seq_len, hidden_dim)
+        mask = attention_mask[:, :, None]
+
+        # Avoid division by zero
+        sum_mask = mask.sum(axis=1)
+        sum_mask[sum_mask == 0] = 1e-9
+
+        pooled = (embeddings * mask).sum(axis=1) / sum_mask
+
+        # Normalize
+        norm = self.np.linalg.norm(pooled, axis=1, keepdims=True)
+        norm[norm == 0] = 1e-9
+        normalized = pooled / norm
+
+        return normalized.tolist()
 
 
 def parse_frontmatter(content: str) -> tuple[dict, str]:
@@ -246,11 +282,13 @@ def build_index():
         meta, _ = parse_frontmatter(content)
         chunks = chunk_article(article_id, content, meta)
         
-        for chunk in chunks:
-            # Generate embedding
-            embed_text = f"{chunk['title']} {chunk['section']} {chunk['text']}"
-            vector = embedder.embed(embed_text)
-            
+        # Prepare batch
+        embed_texts = [f"{c['title']} {c['section']} {c['text']}" for c in chunks]
+
+        # Generate embeddings
+        vectors = embedder.embed_batch(embed_texts)
+
+        for chunk, vector in zip(chunks, vectors):
             all_data.append({
                 "id": chunk["id"],
                 "article_id": chunk["article_id"],

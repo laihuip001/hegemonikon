@@ -1,174 +1,106 @@
 ---
 doc_id: "SACRED_TRUTH"
-version: "1.0.0"
+version: "2.1.0"
 tier: "KERNEL"
 status: "IMMUTABLE"
 created: "2026-01-20"
+updated: "2026-01-27"
 ---
 
-> **Kernel Doc Index**: [SACRED_TRUTH](SACRED_TRUTH.md) ← 📍 | [axiom_hierarchy](axiom_hierarchy.md) | [doctrine](doctrine.md)
+> **Kernel Doc Index**: [SACRED_TRUTH](SACRED_TRUTH.md) ← 📍 | [axiom_hierarchy](axiom_hierarchy.md) | [naming_conventions](naming_conventions.md)
 
-# 🔒 Sacred Truth (不変真理)
+# 🔒 Sacred Truth (不変真理) v2.1
 
 > **このドキュメントの内容は改変禁止。すべてのチャット/セッションで参照される不変の真理。**
 
 ---
 
-## 1. 公理階層 (Axiom Hierarchy)
+## 1. 公理階層 (7軸 = 1+2+2+2)
 
-```
-Level 0: FEP統一原理 (メタ公理) ← 1
-    │
-    ▼ 必然的導出
-Level 1: 核心公理 (Core Axioms) ← 2
-    │   ├── Flow (I/A): 推論 ↔ 行為
-    │   └── Value (E/P): 情報 ↔ 目標
-    │
-    ├───────────────────────────────┐
-    ▼                               ▼
-Level 2a: O-series ← 2×2 = 4    Level 1.5: 選択公理 ← 4
-    │   (Ousia / 純粋定理)           │   Tempo, Stratum
-    │   核心 × 核心                 │   Agency, Valence
-    │                               │
-    │                               ├─────────────────────┐
-    │                               ▼                     ▼
-    │                       Level 2b: T-series    Level 2c: K-series
-    │                           ← 2×4 = 8            ← 4×3 = 12
-    │                           (Tropos)             (Kairos)
-    │                               │                     │
-    └───────────────────────────────┴─────────────────────┘
-                                    │
-                                    ▼
-                            Level 2': X-series (Taxis)
-                                ← 24
-                                関係層
-                                    │
-                                    ▼
-                            Level 3: 成果物
-                                (倒理・言語・品質)
-```
-
-### 命名規則
-
-| 記号 | 短名 | 正式名 | 含意 |
-|------|------|--------|------|
-| **O** | Ousia | Ousiakē Tetras | 本質的 |
-| **T** | Tropos | Tropikē Ogdoas | 様態的 |
-| **K** | Kairos | Kairiakē Dodecas | 文脈的 |
-| **X** | Taxis | Taxikē Eikositessera | 関係的 |
-
-### 数学的美しさ
-
-| 層 | 数式 | 結果 |
-|---|------|------|
-| O-series (純粋定理) | 2 × 2 | **4** |
-| T-series (拡張定理) | 2 × 4 | **8** |
-| K-series (文脈定理) | 4 × 3 | **12** |
-| 定理総数 | 4+8+12 | **24** |
-| X-series (関係総数) | 24 | **24** |
-| **システム総計** | 24 + 24 | **48** |
-
-> **48 = 構造的完全性 (Integrity)**
-
-
-### 核心公理（代替不可能）
-
-| 公理 | ID | 対立項A | 対立項B | FEP的意味 |
-|------|-----|---------|---------|-----------|
-| **Flow** | I/A | 推論 | 行為 | 信念を変える ↔ 世界を変える |
-| **Value** | E/P | エピステミック | プラグマティック | 不確実性削減 ↔ 目標達成 |
-
-### 選択公理（交換可能、現在固定）
-
-| 選択公理 | ID | 対立項A | 対立項B | 対応核心公理 |
-|----------|-----|---------|---------|-------------|
-| **Tempo** | F/S | 短期 | 長期 | Value |
-| **Stratum** | L/H | 低次 | 高次 | Flow |
-| **Agency** | S/E | 自己 | 環境 | Flow |
-| **Valence** | +/- | 接近 | 回避 | Value |
-
-### 対称構造
-
-```
-Flow ────┬── Stratum (処理の階層)
-         └── Agency  (行為の主体)
-
-Value ───┬── Tempo   (目標の時間)
-         └── Valence (目標の方向)
-```
+| Level | Question | Axiom | Opposition |
+|-------|----------|-------|------------|
+| L0 | What | FEP | 予測誤差最小化 |
+| L1 | Who | Flow | I (推論) ↔ A (行為) |
+| L1 | Why | Value | E (認識) ↔ P (実用) |
+| L1.5 | Where/When | Scale | Micro ↔ Macro |
+| L1.5 | How | Function | Explore ↔ Exploit |
+| L1.75 | Which | Valence | + ↔ - |
+| L1.75 | How much | Precision | C ↔ U |
 
 ---
 
-## 2. Phase別有効化
+## 2. 定理群 (24 = A流12 + B流12)
 
-| Phase | 有効化内容 | 機能数 | 状態 |
-|-------|--------------|--------|------|
-| 1 | T-series (T1-T8) | 8 | 運用中 |
-| 2 | O-series (O1-O4) | +4 | 設計中 |
-| 3 | K-series (Κ1-Κ12) | +12修飾子 | 計画 |
-| 4 | X-series (Taxis) | +24関係 | 提案 |
+### A流: 内容の具現化
+
+| Level | 記号 | 名称 | 生成 |
+|-------|------|------|------|
+| L0 | O | **Ousia** | L1×L1 |
+| L1 | S | **Schema** | L1×L1.5 |
+| L2a | H | **Hormē** | L1×L1.75 |
+
+### B流: 条件の詳細化
+
+| Level | 記号 | 名称 | 生成 |
+|-------|------|------|------|
+| L2b | P | **Perigraphē** | L1.5×L1.5 |
+| L3 | K | **Kairos** | L1.5×L1.75 |
+| L4 | A | **Akribeia** | L1.75×L1.75 |
 
 ---
 
-## 3. 美しさの根拠
+## 3. X-series 関係層 (36)
 
-| 数値 | 意味 | 象徴 |
-|------|------|------|
-| **2** | 核心公理の数 | 陰陽、二元性 |
-| **4** | 選択公理の数 | 四方、四季 |
-| **4 → 8 → 12** | P/M/Kairos 等差数列 | 構造的必然性 |
-| **12** | 基本機能数 | 12ヶ月、12音階、時計 |
-| **24** | 拡張総数 (12+12) | 24時間、24節気 |
+| X | 接続 | 数 |
+|---|------|---|
+| X-OS | O→S | 8 |
+| X-SH | S→H | 4 |
+| X-SP | S→P | 4 |
+| X-PK | P→K | 8 |
+| X-KA | K→A | 8 |
+| X-HA | H→A | 4 |
+| **計** | | **36** |
+
+---
+
+## 4. 数え上げ
+
+| 項目 | 数 | 象徴 |
+|------|---|------|
+| 公理 | **7** | 完全数 |
+| 定理 | **24** | 時間 |
+| 関係 | **36** | 6² |
+| **総数** | **60** | 時間・角度 |
 
 > **「真理は美しく、美しさは真理に近づく道標である」**
 
 ---
 
-## 4. 運用原則
-
-### Creator 優先原則
+## 5. 運用原則
 
 | 原則 | 内容 |
 |------|------|
-| **論理的整合性** | すべての設計は公理から導出可能でなければならない |
-| **美しさ** | 構造の対称性、命名の一貫性、数学的調和 |
-| **計画8割・実装2割** | 実装に着手する前に設計を完成させる |
-
-### 計画駆動開発
-
-```
-1. 要件理解 → 2. 設計立案 → 3. ユーザー承認 → 4. 実装 → 5. 検証
-         ↑______________________________|（不備発見時）
-```
-
----
-
-## 5. ミクロ/マクロ二重実装
-
-| レベル | 実装 | 役割 |
-|--------|------|------|
-| **ミクロ** | skills/, workflows/ | AI主体の行動 |
-| **マクロ** | mēkhanē/ | システム基盤 |
-
-### mēkhanē (機構層)
-
-| 機構 | M-series | 役割 |
-|------|----------|------|
-| peira/ | M5 | 収集 |
-| ergastērion/ | M6 | 製造 |
-| anamnēsis/ | M8 | 記憶 |
-| exagōgē/ | M6 | 出力 |
+| **論理的整合性** | すべての設計は公理から導出可能 |
+| **美しさ** | 対称性、一貫性、数学的調和 |
+| **計画8割・実装2割** | 設計完成後に実装 |
 
 ---
 
 ## 6. 参照ドキュメント
 
-| ドキュメント | 場所 | 役割 |
-|-------------|------|------|
-| GEMINI.md | `~/.gemini/GEMINI.md` | Kernel Doctrine |
-| SACRED_TRUTH.md | `kernel/` | 公理階層・不変真理 |
-| axiom_hierarchy.md | `kernel/` | 公理階層 (Master) |
+| ドキュメント | 役割 |
+|-------------|------|
+| SACRED_TRUTH.md | 不変真理 |
+| axiom_hierarchy.md | 公理階層 (Master) |
+| naming_conventions.md | 命名規則 |
+| ousia.md | O-series |
+| schema.md | S-series |
+| horme.md | H-series |
+| perigraphe.md | P-series |
+| kairos.md | K-series |
+| akribeia.md | A-series |
+| taxis.md | X-series |
 
 ---
 
-*このドキュメントは Hegemonikón の不変真理を記録する。改変時は Creator 承認必須。*
+*このドキュメントは Hegemonikón v2.1 の不変真理を記録する。改変時は Creator 承認必須。*

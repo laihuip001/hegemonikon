@@ -1,7 +1,7 @@
 ---
 description: セッション終了時に引き継ぎドキュメントを生成する。次回セッションの/bootで読み込まれる。
 hegemonikon: Anamnēsis-H
-modules: [T8]
+modules: [T8, M8]
 ---
 
 # /bye ワークフロー
@@ -33,9 +33,9 @@ modules: [T8]
 
 ### Step 1: Git状態取得
 
-```powershell
-git -C "m:\Hegemonikon" log -1 --oneline
-git -C "m:\Hegemonikon" status --short
+```bash
+git -C "/home/laihuip001/oikos/hegemonikon" log -1 --oneline
+git -C "/home/laihuip001/oikos/hegemonikon" status --short
 ```
 
 ### Step 2: セッション情報収集
@@ -47,23 +47,70 @@ git -C "m:\Hegemonikon" status --short
 - 未完了タスク（[ ]マーク）
 - 決定事項（会話から抽出）
 
-### Step 3: Handoff生成
+### Step 3: Handoff生成 (T8 Anamnēsis)
 
-Prompt-Lang定義（`session-handoff.prompt`）に基づきHandoffドキュメントを生成。
+Handoff v2 形式（Layer 1 YAML + Layer 3 Markdown）でドキュメントを生成。
 
-出力先: `/home/laihuip001/oikos/mneme\.hegemonikon\sessions\handoff_{YYYY-MM-DD}_{HHMM}.md`
+出力先: `/home/laihuip001/oikos/mneme/.hegemonikon/sessions/handoff_{YYYY-MM-DD}_{HHMM}.md`
 
-### Step 3.5: チャット履歴エクスポート
+### Step 3.5: エピソード記憶エクスポート (M8 Anamnēsis Export Phase)
+
+> **旧 /exp の機能を統合**
 
 現在のセッションのチャット履歴を Markdown にエクスポート。
 
-```powershell
-python /home/laihuip001/oikos/hegemonikon\mekhane\anamnesis\export_chats.py --single "Session_$(Get-Date -Format 'yyyyMMdd_HHmm')"
+#### エクスポートモード
+
+| モード | 動作 | 備考 |
+|--------|------|------|
+| **auto** | /bye 実行時に自動生成 | デフォルト |
+| **manual** | Handoff とは別に即時エクスポート | ユーザー指定時のみ |
+| **batch** | Playwright で全会話を一括抽出 | 別途スクリプト実行 |
+| **past** | 過去会話を @conv 参照→記録 | 明示的指定時 |
+
+#### ファイル名規則
+
+```
+{YYYY-MM-DD}_{session_id_prefix}_{sanitized_title}.md
 ```
 
-出力先: `/home/laihuip001/oikos/mneme\.hegemonikon\sessions\{date}_conv_{title}.md`
+例: `2026-01-27_c13c1315_workflow-integration.md`
 
-> **注意**: Antigravity が `--remote-debugging-port=9222` で起動している必要あり
+#### 出力形式
+
+```markdown
+# {タイトル}
+
+- **日時**: {YYYY-MM-DD}
+- **ID**: {session_id}
+
+## サマリー
+{セッション要約}
+
+## 決定事項
+- 決定1
+- 決定2
+
+## 主要な対話
+
+### {トピック1}
+{要約された対話内容}
+```
+
+#### Batch モード（全会話一括）
+
+```bash
+# Playwright インストール（初回のみ）
+pip install playwright
+playwright install chromium
+
+# 全会話エクスポート
+python /home/laihuip001/oikos/hegemonikon/mekhane/anamnesis/export_chats.py --format individual
+```
+
+> **前提条件**: Antigravity IDE が CDP ポート 9222 でリッスンしている
+
+出力先: `/home/laihuip001/oikos/mneme/.hegemonikon/sessions/{date}_conv_{title}.md`
 
 ### Step 3.6: Dispatch Log 自動集計
 
@@ -92,7 +139,7 @@ python /home/laihuip001/oikos/hegemonikon\mekhane\anamnesis\export_chats.py --si
   status: success | failure
 ```
 
-**出力先**: `/home/laihuip001/oikos/mneme\.hegemonikon\logs\dispatch_log.yaml`
+**出力先**: `/home/laihuip001/oikos/mneme/.hegemonikon/logs/dispatch_log.yaml`
 
 > **Phase B移行判定**: dispatch_count >= 50, failure_rate < 10%, exception_patterns >= 3
 
@@ -138,9 +185,19 @@ python /home/laihuip001/oikos/hegemonikon\mekhane\anamnesis\export_chats.py --si
 
 ## /boot との連携
 
-1. `/bye` で生成されたHandoffは `/home/laihuip001/oikos/mneme\.hegemonikon\sessions\` に保存
+1. `/bye` で生成されたHandoffは `/home/laihuip001/oikos/mneme/.hegemonikon/sessions/` に保存
 2. 次回 `/boot` 実行時、最新のHandoffを自動読み込み
 3. 「前回の続きから」スムーズに開始可能
+
+---
+
+## エラーハンドリング
+
+| エラー | 原因 | 対処 |
+|--------|------|------|
+| CDP 接続失敗 | Antigravity IDE が起動していない | IDE 起動確認 |
+| セレクタ不一致 | UI 更新 | セレクタを調整 |
+| 空の会話 | 何も話していない | スキップしてログ記録 |
 
 ---
 
@@ -148,4 +205,5 @@ python /home/laihuip001/oikos/hegemonikon\mekhane\anamnesis\export_chats.py --si
 
 | Module | Workflow | Status |
 |--------|----------|--------|
-| T8 | /bye | Ready |
+| T8 | /bye (Handoff) | Ready |
+| M8 | /bye (Export) | Ready |

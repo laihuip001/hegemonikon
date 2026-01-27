@@ -63,11 +63,11 @@ except Exception as e:
 try:
     with StdoutSuppressor():
         from mekhane.symploke.search.engine import SearchEngine
-        from mekhane.symploke.adapters.mock_adapter import MockAdapter
+        from mekhane.symploke.adapters.embedding_adapter import EmbeddingAdapter
         from mekhane.symploke.indices import (
             GnosisIndex, ChronosIndex, SophiaIndex, KairosIndex, Document
         )
-    log("Symplokē imports successful")
+    log("Symplokē imports successful (EmbeddingAdapter mode)")
 except Exception as e:
     log(f"Symplokē import error: {e}")
     # Continue without Symplokē - stub mode
@@ -110,15 +110,19 @@ def get_engine():
             seed_data = {}
             log("No seed data available")
         
-        # Register all indices with MockAdapter (stub mode)
+        # Register all indices with EmbeddingAdapter (semantic search mode)
+        # Using MiniLM-L6-v2: 384 dimensions
+        embedding_adapter = EmbeddingAdapter(model_name="all-MiniLM-L6-v2")
+        log("EmbeddingAdapter initialized")
+        
         for IndexClass, name in [
             (GnosisIndex, "gnosis"),
             (ChronosIndex, "chronos"),
             (SophiaIndex, "sophia"),
             (KairosIndex, "kairos"),
         ]:
-            adapter = MockAdapter()
-            index = IndexClass(adapter, name, dimension=768)
+            adapter = EmbeddingAdapter(model_name="all-MiniLM-L6-v2")
+            index = IndexClass(adapter, name, dimension=384)
             index.initialize()
             
             # Ingest seed data if available

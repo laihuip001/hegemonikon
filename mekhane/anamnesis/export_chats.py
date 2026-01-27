@@ -195,51 +195,60 @@ class AntigravityChatExporter:
                 print("    [!] Message container not found")
                 return []
             
-            # 直接の子要素を取得
-            children = await container.query_selector_all(':scope > div')
-            print(f"    [DEBUG] Found {len(children)} child elements in container")
-            
-            for child in children:
+            # N+1問題を解決するため、全メッセージを一括で抽出
+            raw_data_list = await container.evaluate("""
+                container => {
+                    const results = [];
+                    const children = container.querySelectorAll(':scope > div');
+                    const excludeTags = new Set(['STYLE', 'SCRIPT', 'CODE', 'PRE']);
+                    
+                    function getTextContent(node, root) {
+                        let text = '';
+                        for (const child of node.childNodes) {
+                            if (child.nodeType === Node.TEXT_NODE) {
+                                // 除外すべき親があるか再帰的に確認
+                                let parent = child.parentElement;
+                                let shouldExclude = false;
+                                while (parent && parent !== root) {
+                                    if (excludeTags.has(parent.tagName)) {
+                                        shouldExclude = true;
+                                        break;
+                                    }
+                                    parent = parent.parentElement;
+                                }
+                                if (!shouldExclude) {
+                                    text += child.textContent;
+                                }
+                            } else if (child.nodeType === Node.ELEMENT_NODE) {
+                                if (!excludeTags.has(child.tagName)) {
+                                    text += getTextContent(child, root);
+                                }
+                            }
+                        }
+                        return text;
+                    }
+
+                    for (const child of children) {
+                        results.push({
+                            classes: child.className || "",
+                            clean_text: getTextContent(child, child).trim(),
+                            raw_text: child.textContent || "",
+                            section_idx: child.getAttribute('data-section-index')
+                        });
+                    }
+                    return results;
+                }
+            """)
+
+            print(f"    [DEBUG] Found {len(raw_data_list)} child elements in container")
+
+            for item in raw_data_list:
                 try:
                     # プレースホルダーをスキップ
-                    classes = await child.get_attribute('class') or ""
-                    if 'bg-gray-500' in classes:
+                    if 'bg-gray-500' in item['classes']:
                         continue
-                    
-                    # 改良版テキスト抽出: STYLE, SCRIPT, CODE を再帰的に除外
-                    clean_text = await child.evaluate("""
-                        el => {
-                            const excludeTags = new Set(['STYLE', 'SCRIPT', 'CODE', 'PRE']);
-                            
-                            function getTextContent(node) {
-                                let text = '';
-                                for (const child of node.childNodes) {
-                                    if (child.nodeType === Node.TEXT_NODE) {
-                                        // 除外すべき親があるか再帰的に確認
-                                        let parent = child.parentElement;
-                                        let shouldExclude = false;
-                                        while (parent && parent !== el) {
-                                            if (excludeTags.has(parent.tagName)) {
-                                                shouldExclude = true;
-                                                break;
-                                            }
-                                            parent = parent.parentElement;
-                                        }
-                                        if (!shouldExclude) {
-                                            text += child.textContent;
-                                        }
-                                    } else if (child.nodeType === Node.ELEMENT_NODE) {
-                                        if (!excludeTags.has(child.tagName)) {
-                                            text += getTextContent(child);
-                                        }
-                                    }
-                                }
-                                return text;
-                            }
-                            
-                            return getTextContent(el).trim();
-                        }
-                    """)
+
+                    clean_text = item['clean_text']
                     
                     if not clean_text or len(clean_text) < MIN_MESSAGE_LENGTH:
                         continue
@@ -269,10 +278,10 @@ class AntigravityChatExporter:
                     # 3. フォールバック: index ベース（偶数=User, 奇数=Claude）
                     
                     # 元テキストを取得（Thought for 判定用）
-                    raw_text = await child.evaluate("el => el.textContent || ''")
+                    raw_text = item['raw_text']
                     
                     # data-section-index を取得（フォールバック用）
-                    section_idx = await child.get_attribute('data-section-index')
+                    section_idx = item['section_idx']
                     
                     # Claude 検出パターン
                     claude_patterns = [

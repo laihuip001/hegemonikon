@@ -19,7 +19,7 @@ import json
 import datetime
 import os
 import sys
-import time
+from typing import Any, Dict, List
 
 # Configuration
 ROOT_DIR = os.path.join('Raw', 'aidb')
@@ -58,7 +58,7 @@ def parse_date(date_str):
         try:
             d = datetime.datetime.strptime(date_str[:19], fmt[:len(date_str)])
             return d.strftime("%Y.%m.%d"), d.strftime("%Y"), d.strftime("%m")
-        except:
+        except ValueError:
             continue
     
     # Fallback: try to extract YYYY-MM-DD pattern
@@ -163,7 +163,7 @@ batch_id: {batch_id}
 
     return filepath
 
-def append_to_manifest(article, filepath, batch_id):
+def append_to_manifest(article: Dict[str, Any], filepath: str, batch_id: str) -> None:
     """Append article entry to manifest file."""
     post_id = article['url'].split('/')[-1]
     manifest_file = os.path.join(ROOT_DIR, '_index', f'manifest_fast_{batch_id}.jsonl')
@@ -201,7 +201,7 @@ async def process_single_url(url, session, semaphore, batch_id):
 
     return article
 
-async def process_urls_async(target_urls, batch_id):
+async def process_urls_async(target_urls: List[str], batch_id: str) -> None:
     """Main async processing loop."""
     semaphore = asyncio.Semaphore(MAX_CONCURRENT_REQUESTS)
     cookie_headers = load_cookies()
@@ -226,12 +226,13 @@ async def process_urls_async(target_urls, batch_id):
             tasks.append(task)
 
         # Use as_completed to process results as they come in
+        loop = asyncio.get_running_loop()
         for i, future in enumerate(asyncio.as_completed(tasks)):
             result = await future
 
             if result['status'] == 'success':
-                # Append to manifest sequentially (safe in main loop)
-                append_to_manifest(result, result['filepath'], batch_id)
+                # Append to manifest sequentially (now in executor to avoid blocking)
+                await loop.run_in_executor(None, append_to_manifest, result, result['filepath'], batch_id)
                 print(f"[{i+1}/{len(target_urls)}] OK: {result['title'][:40]}...")
                 success_count += 1
             else:

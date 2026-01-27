@@ -1,4 +1,4 @@
-# Hegemonikón
+# Hegemonikón - 認知ハイパーバイザー (Cognitive Hypervisor)
 
 > **認知エージェントフレームワーク** — 変分自由エネルギー最小化原理に基づく AI 認知制御システム
 

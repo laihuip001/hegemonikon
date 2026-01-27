@@ -11,6 +11,8 @@ Usage:
 
 import sys
 import unittest
+import asyncio
+import tempfile
 from pathlib import Path
 from io import StringIO
 
@@ -160,6 +162,43 @@ class TestPromptLangParser(unittest.TestCase):
         
         self.assertIn("complex input with", prompt.goal)
         self.assertIn("multiple lines", prompt.goal)
+
+
+    def test_compile_async(self):
+        """Test compile_async method with context."""
+        # Create a temp file for context
+        with tempfile.NamedTemporaryFile(mode='w+', delete=False, encoding='utf-8') as tf:
+            tf.write("Context content")
+            temp_path = Path(tf.name)
+
+        try:
+            # Use forward slashes for path to avoid issues
+            path_str = str(temp_path).replace("\\", "/")
+            content = f"""#prompt test-async
+
+@role:
+  Async role
+
+@goal:
+  async -> success
+
+@context:
+  - file:"{path_str}"
+"""
+            parser = PromptLangParser(content)
+            prompt = parser.parse()
+
+            # Run async method
+            result = asyncio.run(prompt.compile_async())
+
+            self.assertIn("# test-async", result)
+            self.assertIn("## Role\nAsync role", result)
+            self.assertIn("## Context", result)
+            self.assertIn("Context content", result)
+
+        finally:
+            if temp_path.exists():
+                temp_path.unlink()
 
 
 class TestValidation(unittest.TestCase):

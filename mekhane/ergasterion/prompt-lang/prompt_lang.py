@@ -286,7 +286,7 @@ class Prompt:
                 if item.ref_type == "mcp":
                     content = await self._resolve_context_item_async(item, mcp_handler)
                 else:
-                    content = self._resolve_context_item(item)
+                    content = await asyncio.to_thread(self._resolve_context_item, item)
 
                 if content:
                     context_parts.append(f"```\n{content}\n```")

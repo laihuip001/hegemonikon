@@ -101,24 +101,55 @@ class GnosisIndex:
         
         self.db = lancedb.connect(str(self.lance_dir))
         self.embedder: Optional[Embedder] = None
-        self._primary_key_cache: set[str] = set()
     
     def _get_embedder(self) -> Embedder:
         if self.embedder is None:
             self.embedder = Embedder()
         return self.embedder
     
-    def _load_primary_keys(self):
-        """既存primary_keyをキャッシュ"""
-        if self.TABLE_NAME not in self.db.table_names():
-            return
+    def _filter_new_papers(self, papers: list[Paper]) -> list[Paper]:
+        """
+        データベースに存在しない論文のみを抽出
+        """
+        if not papers:
+            return []
+
+        # 1. 入力バッチ内の重複排除 (最初のものを残す)
+        unique_papers = []
+        seen_keys = set()
+        for p in papers:
+            if p.primary_key not in seen_keys:
+                unique_papers.append(p)
+                seen_keys.add(p.primary_key)
         
+        if self.TABLE_NAME not in self.db.table_names():
+            return unique_papers
+
         table = self.db.open_table(self.TABLE_NAME)
-        try:
-            df = table.search().select(["primary_key"]).limit(None).to_pandas()
-            self._primary_key_cache = set(df["primary_key"].tolist())
-        except Exception:
-            pass
+
+        # 2. データベース内の存在チェック
+        input_keys = list(seen_keys)
+        existing_keys = set()
+
+        BATCH_SIZE = 1000
+        for i in range(0, len(input_keys), BATCH_SIZE):
+            batch_keys = input_keys[i : i + BATCH_SIZE]
+            # エスケープ処理
+            keys_str = ", ".join(f"'{k.replace('\'', '\'\'')}'" for k in batch_keys)
+
+            try:
+                results = table.search().where(f"primary_key IN ({keys_str})").select(["primary_key"]).limit(None).to_arrow()
+                batch_existing = results["primary_key"].to_pylist()
+                existing_keys.update(batch_existing)
+            except Exception as e:
+                # クエリエラーの場合はログを出してスキップ (重複として扱わない、または安全側に倒して全部追加?
+                # ここではエラーが出ても続行するが、チェックできなかったものは新規扱いになる)
+                print(f"[GnosisIndex] Warning: Duplicate check failed for batch: {e}")
+                pass
+
+        # 3. 既存のキーを除外
+        final_papers = [p for p in unique_papers if p.primary_key not in existing_keys]
+        return final_papers
     
     def add_papers(self, papers: list[Paper], dedupe: bool = True) -> int:
         """
@@ -138,13 +169,7 @@ class GnosisIndex:
         
         # 重複排除
         if dedupe:
-            self._load_primary_keys()
-            new_papers = []
-            for p in papers:
-                if p.primary_key not in self._primary_key_cache:
-                    new_papers.append(p)
-                    self._primary_key_cache.add(p.primary_key)
-            papers = new_papers
+            papers = self._filter_new_papers(papers)
         
         if not papers:
             print("[GnosisIndex] No new papers to add (all duplicates)")

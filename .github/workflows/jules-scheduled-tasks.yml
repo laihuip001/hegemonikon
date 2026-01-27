@@ -16,13 +16,13 @@ on:
         required: true
         default: "all"
 
-# ===== シークレット名マッピング =====
+# ===== シークレット名マッピング（JULIUS_API_KEY_* で統一）=====
 # P1 数学者:    JULIUS_API_KEY_1, 2, 3
 # P2 FEP理論家: JULIUS_API_KEY_4, 5, 6
 # P3 ストア派:  JULIUS_API_KEY_7, 8, 9
 # P4 アーキ:    JULIUS_API_KEY_10, 11, 12
 # P5 LLM:       JULIUS_API_KEY_13, 14, 15
-# P6 統合者:    JULES_API_KEY_16, 17, 18
+# P6 統合者:    JULIUS_API_KEY_16, 17, 18
 
 jobs:
   p1-mathematician:
@@ -31,14 +31,10 @@ jobs:
     if: github.event.inputs.persona == 'p1' || github.event.inputs.persona == 'all' || github.event_name == 'schedule'
     steps:
       - uses: actions/checkout@v4
-      
       - name: Create Jules Task - P1
         env:
           JULES_API_KEY: ${{ secrets.JULIUS_API_KEY_1 }}
-        run: |
-          echo "Running P1 Mathematician weekly task..."
-          # Jules API呼び出し（APIエンドポイント確定後に更新）
-          # curl -X POST https://jules.google/api/v1/tasks ...
+        run: echo "Running P1 Mathematician weekly task..."
 
   p2-fep-theorist:
     name: P2 FEP理論家 - 週次FEP実装レビュー
@@ -47,12 +43,10 @@ jobs:
     if: github.event.inputs.persona == 'p2' || github.event.inputs.persona == 'all' || github.event_name == 'schedule'
     steps:
       - uses: actions/checkout@v4
-      
       - name: Create Jules Task - P2
         env:
           JULES_API_KEY: ${{ secrets.JULIUS_API_KEY_4 }}
-        run: |
-          echo "Running P2 FEP Theorist weekly task..."
+        run: echo "Running P2 FEP Theorist weekly task..."
 
   p3-stoic-philosopher:
     name: P3 ストア派 - 月次規範的監査
@@ -60,12 +54,10 @@ jobs:
     if: github.event.inputs.persona == 'p3' || (github.event_name == 'schedule' && github.event.schedule == '0 2 1 * *')
     steps:
       - uses: actions/checkout@v4
-      
       - name: Create Jules Task - P3
         env:
           JULES_API_KEY: ${{ secrets.JULIUS_API_KEY_7 }}
-        run: |
-          echo "Running P3 Stoic Philosopher monthly task..."
+        run: echo "Running P3 Stoic Philosopher monthly task..."
 
   p4-architect:
     name: P4 アーキテクト - 週次アーキテクチャ健全性
@@ -74,12 +66,10 @@ jobs:
     if: github.event.inputs.persona == 'p4' || github.event.inputs.persona == 'all' || github.event_name == 'schedule'
     steps:
       - uses: actions/checkout@v4
-      
       - name: Create Jules Task - P4
         env:
           JULES_API_KEY: ${{ secrets.JULIUS_API_KEY_10 }}
-        run: |
-          echo "Running P4 Architect weekly task..."
+        run: echo "Running P4 Architect weekly task..."
 
   p5-llm-specialist:
     name: P5 LLM専門家 - 週次プロンプト最適化
@@ -88,12 +78,10 @@ jobs:
     if: github.event.inputs.persona == 'p5' || github.event.inputs.persona == 'all' || github.event_name == 'schedule'
     steps:
       - uses: actions/checkout@v4
-      
       - name: Create Jules Task - P5
         env:
           JULES_API_KEY: ${{ secrets.JULIUS_API_KEY_13 }}
-        run: |
-          echo "Running P5 LLM Specialist weekly task..."
+        run: echo "Running P5 LLM Specialist weekly task..."
 
   p6-integrator:
     name: P6 統合者 - 週次統合レビュー
@@ -102,9 +90,7 @@ jobs:
     if: github.event.inputs.persona == 'p6' || github.event.inputs.persona == 'all' || github.event_name == 'schedule'
     steps:
       - uses: actions/checkout@v4
-      
       - name: Create Jules Task - P6
         env:
-          JULES_API_KEY: ${{ secrets.JULES_API_KEY_16 }}
-        run: |
-          echo "Running P6 Integrator weekly task..."
+          JULES_API_KEY: ${{ secrets.JULIUS_API_KEY_16 }}
+        run: echo "Running P6 Integrator weekly task..."

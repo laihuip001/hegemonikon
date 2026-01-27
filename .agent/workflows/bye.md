@@ -51,17 +51,17 @@ git -C "m:\Hegemonikon" status --short
 
 Prompt-Lang定義（`session-handoff.prompt`）に基づきHandoffドキュメントを生成。
 
-出力先: `M:\Brain\.hegemonikon\sessions\handoff_{YYYY-MM-DD}_{HHMM}.md`
+出力先: `/home/laihuip001/oikos/mneme\.hegemonikon\sessions\handoff_{YYYY-MM-DD}_{HHMM}.md`
 
 ### Step 3.5: チャット履歴エクスポート
 
 現在のセッションのチャット履歴を Markdown にエクスポート。
 
 ```powershell
-python M:\Hegemonikon\mekhane\anamnesis\export_chats.py --single "Session_$(Get-Date -Format 'yyyyMMdd_HHmm')"
+python /home/laihuip001/oikos/hegemonikon\mekhane\anamnesis\export_chats.py --single "Session_$(Get-Date -Format 'yyyyMMdd_HHmm')"
 ```
 
-出力先: `M:\Brain\.hegemonikon\sessions\{date}_conv_{title}.md`
+出力先: `/home/laihuip001/oikos/mneme\.hegemonikon\sessions\{date}_conv_{title}.md`
 
 > **注意**: Antigravity が `--remote-debugging-port=9222` で起動している必要あり
 
@@ -92,7 +92,7 @@ python M:\Hegemonikon\mekhane\anamnesis\export_chats.py --single "Session_$(Get-
   status: success | failure
 ```
 
-**出力先**: `M:\Brain\.hegemonikon\logs\dispatch_log.yaml`
+**出力先**: `/home/laihuip001/oikos/mneme\.hegemonikon\logs\dispatch_log.yaml`
 
 > **Phase B移行判定**: dispatch_count >= 50, failure_rate < 10%, exception_patterns >= 3
 
@@ -138,7 +138,7 @@ python M:\Hegemonikon\mekhane\anamnesis\export_chats.py --single "Session_$(Get-
 
 ## /boot との連携
 
-1. `/bye` で生成されたHandoffは `M:\Brain\.hegemonikon\sessions\` に保存
+1. `/bye` で生成されたHandoffは `/home/laihuip001/oikos/mneme\.hegemonikon\sessions\` に保存
 2. 次回 `/boot` 実行時、最新のHandoffを自動読み込み
 3. 「前回の続きから」スムーズに開始可能
 

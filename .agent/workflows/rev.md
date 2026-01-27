@@ -23,13 +23,13 @@ modules: [M7, M8]
 
 2. **結果表示**: 生成されたレビューを表示
    ```powershell
-   Get-Content "M:\Brain\.hegemonikon\session_summaries\review_$(Get-Date -Format 'yyyy-MM-dd').md"
+   Get-Content "/home/laihuip001/oikos/mneme\.hegemonikon\session_summaries\review_$(Get-Date -Format 'yyyy-MM-dd').md"
    ```
 
 ## 入力ソース
 
 1. Antigravity Brain (`C:\Users\makar\.gemini\antigravity\brain\`)
-2. LanceDB Index (`M:\Hegemonikon\forge\knowledge_base\_index\lancedb`)
+2. LanceDB Index (`/home/laihuip001/oikos/hegemonikon\forge\knowledge_base\_index\lancedb`)
 3. カレンダー情報（Phase 2で追加予定）
 
 ## タスク抽出ロジック（night_review.py内で処理）
@@ -70,8 +70,8 @@ modules: [M7, M8]
 
 ## 出力先
 
-- Markdown: `M:\Brain\.hegemonikon\session_summaries\review_YYYY-MM-DD.md`
-- JSON: `M:\Brain\.hegemonikon\session_summaries\review_YYYY-MM-DD.json`
+- Markdown: `/home/laihuip001/oikos/mneme\.hegemonikon\session_summaries\review_YYYY-MM-DD.md`
+- JSON: `/home/laihuip001/oikos/mneme\.hegemonikon\session_summaries\review_YYYY-MM-DD.json`
 
 ## 制約
 

@@ -1,11 +1,30 @@
-# AGENTS.md - Hegemonikon Project
+# AGENTS.md - Hegemonikon Project v2.1
 
-> **Purpose**: AI エージェント（Jules, Claude, Gemini）へのガイダンス
+> **Purpose**: AI エージェント（Claude, Gemini, Jules）へのガイダンス
 
 ## Overview
 
-Hegemonikon: A cognitive hypervisor framework integrating FEP-based AI modules.
-TypeScript + Python hybrid. Japanese documentation, English code.
+Hegemonikon: FEP (Free Energy Principle) に基づく認知ハイパーバイザーフレームワーク。
+
+### 構造
+
+| 項目 | 数 |
+|------|----|
+| 公理 | 7 |
+| 定理 | 24 (6×4) |
+| 関係 | 36 |
+| **総数** | **60** |
+
+### 定理群
+
+| 記号 | 名称 | 役割 |
+|------|------|------|
+| O | Ousia | 本質 |
+| S | Schema | 様態 |
+| H | Hormē | 傾向 |
+| P | Perigraphē | 条件 |
+| K | Kairos | 文脈 |
+| A | Akribeia | 精密 |
 
 ---
 
@@ -32,9 +51,9 @@ TypeScript + Python hybrid. Japanese documentation, English code.
 
 ```bash
 # Python environment
-python -m venv venv
-source venv/bin/activate  # Windows: venv\Scripts\activate
-pip install -r requirements.txt
+python -m venv .venv
+source .venv/bin/activate
+pip install -e .
 
 # Node.js dependencies (if applicable)
 npm install
@@ -44,13 +63,10 @@ npm install
 
 ```bash
 # Python tests
-pytest
+pytest tests/
 
 # Lint check
 pylint mekhane/
-
-# TypeScript tests (if applicable)
-npm run test
 ```
 
 ---
@@ -63,8 +79,15 @@ npm run test
 | `mekhane/` | Python implementation |
 | `.agent/workflows/*.md` | Workflows |
 | `.agent/skills/*/SKILL.md` | Skills |
-| `forge/` | Experimental tools |
 | `docs/` | Documentation |
+
+### Key kernel files
+
+| File | Content |
+|------|---------|
+| `SACRED_TRUTH.md` | Immutable truths |
+| `axiom_hierarchy.md` | 7 axioms, 24 theorems |
+| `naming_conventions.md` | Greek naming rules |
 
 ---
 
@@ -77,14 +100,6 @@ npm run test
 
 ---
 
-## Good Examples
-
-- Python module: `/mekhane/anamnesis/antigravity_logs.py`
-- Workflow: `/.agent/workflows/manual.md`
-- Skill: `/.agent/skills/*/SKILL.md`
-
----
-
 ## When Stuck
 
 Ask for clarification. Propose a plan before implementing.
@@ -93,5 +108,10 @@ Ask for clarification. Propose a plan before implementing.
 
 ## References
 
-- Prompt-Lang v2 Spec: `docs/specs/prompt-lang-v2-spec.md`
-- Jules Setup Guide: `docs/guides/jules_setup_guide.md`
+- [kernel/axiom_hierarchy.md](kernel/axiom_hierarchy.md)
+- [kernel/naming_conventions.md](kernel/naming_conventions.md)
+- [README.md](README.md)
+
+---
+
+*Hegemonikón v2.1*

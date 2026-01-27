@@ -1,4 +1,5 @@
 # Antigravity IDE × Jules × Claude Opus 4.5 協働ワークフロー設計レポート
+
 ## 2025年11月～2026年1月 最新情報ベース
 
 > **調査日**: 2026-01-25
@@ -37,6 +38,7 @@
 | **回復期限** | 7日間のローリング（元仕様: 5時間） |
 
 **対策**:
+
 - Google AI Ultra への移行（+$230/月）
 - Gemini 3.0 Pro へ切り替え（クォータ制限なし）
 
@@ -91,21 +93,15 @@ curl -X POST https://julius.googleapis.com/v1alpha/sessions \
 
 ## V. 料金表
 
-### Jules
+### Google AI プラン（2026年1月時点）
 
-| プラン | 日次上限 | 同時実行 | 月額 |
-|-------|--------|--------|------|
-| **Free** | 15 | 3 | $0 |
-| **Pro** | 100 | 15 | $19.99 |
-| **Ultra** | 300 | 60 | $249.99 |
+| プラン | 月額 | Jules上限 | Claude Opus制限 |
+|-------|------|-----------|----------------|
+| **Free** | $0 | 日次15 / 同時3 | N/A |
+| **Pro** | $19.99 | 日次100 / 同時15 | 7日待機 ⚠️ |
+| **Ultra** | $249.99 | **日次300 / 同時60** | なし |
 
-### Antigravity + Google AI
-
-| Plan | Claude Opus 制限 | 推奨 |
-|------|-----------------|------|
-| **Free** | N/A | Gemini のみ |
-| **Pro** | **7日待機** ⚠️ | 実用的でない |
-| **Ultra** | なし | 推奨 |
+> **重要**: Jules Ultra は Google AI Ultra に含まれる（追加料金不要）
 
 ---
 
@@ -114,15 +110,18 @@ curl -X POST https://julius.googleapis.com/v1alpha/sessions \
 ### 結論：**公式統合なし**
 
 #### パターン1：Antigravity ターミナル → Jules CLI
+
 ```bash
 julius remote new --repo owner/repo --session "Add tests"
 ```
 
 #### パターン2：GitHub Actions + REST API（推奨）
+
 - 完全自動化
 - スケジューラブル
 
 #### パターン3：MCP（制限あり）
+
 - Jules は MCP 非対応
 - curl で代替
 
@@ -141,23 +140,28 @@ julius remote new --repo owner/repo --session "Add tests"
 ## VIII. 推奨構成
 
 ### 最小コスト（$19.99/月）
-- Antigravity Free + Jules Pro
-- Gemini 3.0 Pro のみ使用
 
-### フル機能（$499.98/月）
-- Google AI Ultra + Jules Ultra
+- Google AI Pro
+- Gemini 3.0 Pro + Jules Pro（日次100タスク）
+
+### フル機能（$249.99/月）
+
+- **Google AI Ultra**
 - Claude Opus 4.5 制限なし
+- **Jules Ultra 込み**（日次300タスク、同時60）
 
 ---
 
 ## IX. 実装可否
 
 ### ✅ 可能
+
 - Antigravity ターミナル → Jules CLI
 - GitHub Actions + Jules REST API
 - Scheduled/Suggested Tasks
 
 ### ❌ 不可
+
 - Antigravity Agent → Jules 直接呼び出し
 - Claude Opus Pro 制限の回避
 
@@ -165,6 +169,6 @@ julius remote new --repo owner/repo --session "Add tests"
 
 ## 参考リンク
 
-- https://jules.google/docs/changelog/
-- https://blog.google/innovation-and-ai/technology/developers-tools/jules-proactive-updates/
-- https://developers.google.com/jules/api
+- <https://jules.google/docs/changelog/>
+- <https://blog.google/innovation-and-ai/technology/developers-tools/jules-proactive-updates/>
+- <https://developers.google.com/jules/api>

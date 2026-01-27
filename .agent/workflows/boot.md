@@ -15,12 +15,12 @@ Hegemonikón Phase 1 のブートシーケンス。
 // turbo-all
 
 0. **🔄 正本読み直し（Anti-Stale Protocol）**:
-   - まず `view_file M:\Hegemonikon\.agent\workflows\boot.md` を実行
+   - まず `view_file /home/laihuip001/oikos/hegemonikon\.agent\workflows\boot.md` を実行
    - このステップ自体が古いキャッシュから実行されている可能性があるため
    - 正本を読み直すことで、以降のステップが最新版に基づくことを保証
    > **設計原則**: 探索-活用トレードオフにおいて、ブート時は「探索」を優先する
 
-1. **設定ファイル同期**: M:\.gemini → C:\Users\{USER}\.gemini
+1. **設定ファイル同期**: /home/laihuip001/oikos/.gemini → /home/laihuip001/oikos/.gemini
 
    ```powershell
    & "m:\Hegemonikon\.agent\scripts\sync-config.ps1"
@@ -30,7 +30,7 @@ Hegemonikón Phase 1 のブートシーケンス。
 
 0.5. **前回Handoff読み込み**: 前回セッションの引き継ぎ情報を読み込み
 
-- 対象: `M:\Brain\.hegemonikon\sessions\handoff_*.md` の最新ファイル
+- 対象: `/home/laihuip001/oikos/mneme\.hegemonikon\sessions\handoff_*.md` の最新ファイル
 - 存在する場合: 内容を表示し、「前回の続きから開始」を提案
 - 存在しない場合: スキップ
 
@@ -65,7 +65,7 @@ Hegemonikón Phase 1 のブートシーケンス。
 - **目的**: 新ツール追加時の登録忘れを防止（習慣化）
 
 1. **T8 長期記憶読込 (Load Phase)**:
-   - `M:\Brain\.hegemonikon\` から以下を読み込み:
+   - `/home/laihuip001/oikos/mneme\.hegemonikon\` から以下を読み込み:
      - `patterns.yaml` → T3 Theōria へ提供（過去のパターン）
      - `values.json` → T4 Phronēsis へ提供（価値関数）
      - `trust_history.json` → T6 Praxis へ提供（信頼履歴）
@@ -86,9 +86,24 @@ Hegemonikón Phase 1 のブートシーケンス。
 
 - 出力: `📚 Gnōsis: [N]件の未分類論文 → /tag で分類`
 
-5.2. **Dispatch Log 進捗リマインド**: Phase B移行状況を表示
+5.2. **Mnēmē Synthesis インデックス更新**: セッション間記憶の更新
 
-- 対象: `M:\Brain\.hegemonikon\logs\dispatch_log.yaml`
+- コマンド: `python m:/Hegemonikon/mekhane/anamnesis/mneme_cli.py ingest --all`
+- **出力形式**:
+
+     ```
+     [Mnēmē Synthesis] インデックス更新
+       Chronos: [N] documents
+       Sophia: [N] documents
+       Kairos: [N] documents
+       Total: [N] documents
+     ```
+
+- **目的**: セッション開始時に最新の履歴・KI・Handoffを検索可能にする
+
+5.3. **Dispatch Log 進捗リマインド**: Phase B移行状況を表示
+
+- 対象: `/home/laihuip001/oikos/mneme\.hegemonikon\logs\dispatch_log.yaml`
 - 出力形式:
 
      ```
@@ -100,7 +115,7 @@ Hegemonikón Phase 1 のブートシーケンス。
 
 5.5. **Perplexity Inbox 読み込み**: パプ君リサーチの新着確認
 
-- 対象フォルダ: `M:\Hegemonikon\docs\research\perplexity\`
+- 対象フォルダ: `/home/laihuip001/oikos/hegemonikon\docs\research\perplexity\`
 - 新規ファイル（前回bootから追加されたもの）がある場合:
 
      ```

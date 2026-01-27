@@ -20,14 +20,20 @@ graph TD
     L0["Level 0: FEP統一原理<br/>(メタ公理)"]
     L1["Level 1: 核心公理<br/>Flow × Value"]
     L15["Level 1.5: 選択公理<br/>Tempo × Stratum × Agency × Valence"]
-    L2["Level 2: 64機能<br/>(定理)"]
+    L2["Level 2: 定理体系<br/>O(4) + T(8) + K(12) = 24"]
+    L2X["Level 2': 関係層<br/>X-series = 24"]
     L3["Level 3: 成果物<br/>(倫理・言語・品質)"]
     
     L0 -->|必然的導出| L1
     L1 -->|選択的拡張| L15
+    L1 -->|組み合わせ| L2
     L15 -->|組み合わせ| L2
+    L2 -->|従属関係| L2X
     L2 -->|運用| L3
+    L2X -->|運用| L3
 ```
+
+> **正本**: `kernel/axiom_hierarchy.md` (48定理体系)
 
 ---
 
@@ -77,42 +83,53 @@ Value ───┬── Tempo   (目標の時間)
 | Tempo (F/S) | Granularity (Fine/Coarse) | 時間より粒度が本質的と判明した場合 |
 | Stratum (L/H) | Scope (Local/Global) | 階層より範囲が本質的と判明した場合 |
 
----
+## 3. 定理体系 (Level 2: Theorem Series)
 
-## 3. 64機能 (Level 2: Theorems)
+> **正本**: `kernel/axiom_hierarchy.md`
 
-2^6 = 64 機能。6軸の全組み合わせ。
+### 数学的構造
 
-### 命名規則
+| シリーズ | 生成方法 | 積記法 | 数 |
+|---------|----------|--------|-----|
+| **O-series (Ousia)** | 核心 × 核心 | 2 × 2 | **4** |
+| **T-series (Tropos)** | 核心 × 選択 | 2 × 4 | **8** |
+| **K-series (Kairos)** | 選択 × 選択 | 4 × 3 | **12** |
+| **X-series (Taxis)** | 従属関係 | — | **24** |
+| **総計** | — | — | **48** |
 
-```
-[Flow]-[Value]-[Tempo]-[Stratum]-[Agency]-[Valence]
-  I/A  -  E/P  -  F/S  -   L/H   -  S/E   -   +/-
-```
+> **美しさ**: 4 + 8 + 12 = 24 (定理) + 24 (関係) = 48 (完全系)
 
-> **完全マトリクス参照**: `brain/.../phase2_design.md` (FULL_64_DESIGN)
+### O-series: 純粋定理 (Ousia)
 
-### Phase別有効化
+| ID | ギリシャ名 | FEP的役割 |
+|----|-----------|----------|
+| O1 | **Noēsis** | 世界モデル更新 |
+| O2 | **Boulēsis** | 選好モデル更新 |
+| O3 | **Zētēsis** | 能動的情報収集 |
+| O4 | **Energeia** | 目標達成行動 |
 
-| Phase | 有効軸 | 機能数 | 状態 |
-|-------|--------|--------|------|
-| **1** | Flow, Value, Tempo, Stratum | 6 | 現在運用中 |
-| **2** | + Agency | 12 | 設計完了 |
-| **3** | + Valence | 24 | 計画 |
-| **4** | 全6軸 | 64 | 完全運用 |
+### T-series: 拡張定理 (Tropos)
 
----
+| ID | ギリシャ名 | FEP的役割 |
+|----|-----------|----------|
+| T1 | **Aisthēsis** | 知覚・感覚入力 |
+| T2 | **Krisis** | 判断・意思決定 |
+| T3 | **Theōria** | 内省・自己モデル |
+| T4 | **Phronēsis** | 戦略・環境計画 |
+| T5 | **Peira** | 探索・即時収集 |
+| T6 | **Praxis** | 実行・行動遂行 |
+| T7 | **Dokimē** | 検証・仮説確認 |
+| T8 | **Anamnēsis** | 記憶・保存 |
 
-## 4. Phase 1 有効機能 (6/64)
+### K-series: 文脈定理 (Kairos)
 
-| # | Code | 機能名 | 役割 | Forge Module |
-|---|------|--------|------|--------------|
-| 07 | I-E-F-H-E-+ | **Aisthēsis-H+** | 環境認識 | `perceive/situation-analysis.md` |
-| 23 | I-P-F-H-E-+ | **Krisis-H+** | 環境評価 | `think/decision-matrix.md` |
-| 39 | A-E-F-H-E-+ | **Peira-H+** | 能動質問 | `perceive/active-questioning.md` |
-| 51 | A-P-F-L-E-+ | **Praxis-L+** | 反射実行 | (Antigravity native) |
-| 55 | A-P-F-H-E-+ | **Praxis-H+** | 意思決定 | `think/strategic-planning.md` |
-| 63 | A-P-S-H-E-+ | **Anamnēsis-H+** | 外部記録 | `verify/post-mortem-review.md` |
+選択公理間の有向従属関係（K1-K12）。
+> 詳細: `kernel/kairos.md`
+
+### X-series: 関係層 (Taxis)
+
+定理間の従属関係（X-O: 4, X-T: 8, X-K: 12）。
+> 詳細: `kernel/taxis.md`
 
 ---
 
@@ -131,17 +148,18 @@ Value ───┬── Tempo   (目標の時間)
 
 ---
 
-## 6. 美しさの根拠
+## 5. 美しさの根拠
 
 | 数値 | 意味 | 象徴 |
 |------|------|------|
 | **2** | 核心公理の数 | 陰陽、二元性、最小の素数 |
-| **4** | 選択公理の数 | 四方、四季、四元素 |
-| **6** | 総軸数 (2+4) | 完全数 (1+2+3=6) |
-| **64** | 機能数 (2⁶) | 易経の卦、チェス盤、DNA codon |
+| **4** | 選択公理/O-seriesの数 | 四方、四季、四元素 |
+| **12** | 基本機能 (4+8) | 12ヶ月、12音階 |
+| **24** | 定理/関係の数 | 24時間、24節気 |
+| **48** | 完全系 (24+24) | 完全な整合性 |
 
 > **真理は美しく、美しさは真理に近づく道標である。**
 
 ---
 
-*統合元: Claude-設計01.md, Claude-Hegemonikón01.md, FEP理論*
+*統合元: kernel/axiom_hierarchy.md, kernel/ousia.md, kernel/tropos.md*

@@ -180,6 +180,11 @@ def append_to_manifest(article, filepath, batch_id):
     with open(manifest_file, 'a', encoding='utf-8') as f:
         f.write(json.dumps(manifest_entry, ensure_ascii=False) + '\n')
 
+def append_to_skip_file(skip_file, url, error):
+    """Append skipped URL to skip file."""
+    with open(skip_file, 'a', encoding='utf-8') as f:
+        f.write(f"{url}\t{error}\n")
+
 async def process_single_url(url, session, semaphore, batch_id):
     """Process a single URL: fetch, parse, save markdown."""
     async with semaphore:
@@ -203,6 +208,7 @@ async def process_single_url(url, session, semaphore, batch_id):
 
 async def process_urls_async(target_urls, batch_id):
     """Main async processing loop."""
+    loop = asyncio.get_running_loop()
     semaphore = asyncio.Semaphore(MAX_CONCURRENT_REQUESTS)
     cookie_headers = load_cookies()
 
@@ -231,7 +237,7 @@ async def process_urls_async(target_urls, batch_id):
 
             if result['status'] == 'success':
                 # Append to manifest sequentially (safe in main loop)
-                append_to_manifest(result, result['filepath'], batch_id)
+                await loop.run_in_executor(None, append_to_manifest, result, result['filepath'], batch_id)
                 print(f"[{i+1}/{len(target_urls)}] OK: {result['title'][:40]}...")
                 success_count += 1
             else:
@@ -241,8 +247,7 @@ async def process_urls_async(target_urls, batch_id):
                 # Log skip
                 skip_file = os.path.join(ROOT_DIR, '_index', f'skipped_fast_{batch_id}.txt')
                 # Append to skip file sequentially
-                with open(skip_file, 'a', encoding='utf-8') as f:
-                    f.write(f"{result['url']}\t{result.get('error', 'Unknown')}\n")
+                await loop.run_in_executor(None, append_to_skip_file, skip_file, result['url'], result.get('error', 'Unknown'))
 
     print(f"\n[Fast Collect] Completed: {success_count} success, {error_count} errors")
 

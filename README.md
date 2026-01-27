@@ -4,167 +4,158 @@
 
 ---
 
-## 理論的基盤: 自由エネルギー原理 (FEP)
+## 概要
 
-Hegemonikón（ヘゲモニコン）は、ストア派哲学における「統率中枢」の概念と、現代の**自由エネルギー原理**（Free Energy Principle）を融合した AI 認知アーキテクチャです。
+Hegemonikón (Ἡγεμονικόν) は、ストア派哲学における「魂の統率中枢」に由来する名称を持つ、FEP (Free Energy Principle) に基づく認知フレームワークです。
 
-> **核心原理**: 知覚・認知・行動・学習は全て**変分自由エネルギー最小化**という同一原理の異なる側面である。
+### 総数
 
-### FEP の AI への適用
-
-| 概念 | 人間の脳 | Hegemonikón |
-|------|----------|-------------|
-| **知覚** | 感覚器官 | T1 Aisthēsis |
-| **予測** | 内部モデル | T3 Theōria |
-| **行動** | 運動制御 | T6 Praxis |
-| **記憶** | 海馬 | T8 Anamnēsis |
+| 項目 | 数 |
+|------|----|
+| 公理 | **7** |
+| 定理 | **24** |
+| 関係 | **36** |
+| **総計** | **60** |
 
 ---
 
 ## 公理階層構造
 
-```
-Level 0: FEP統一原理 (メタ公理) ← 1
-    │
-    ▼
-Level 1: 核心公理 ← 2
-    │   ├── Flow (推論 ↔ 行為)
-    │   └── Value (情報 ↔ 目標)
-    │
-    ├─────────────────────────────────┐
-    ▼                                 ▼
-Level 2a: O-series (4)          Level 1.5: 選択公理 (4)
-    │   Ousia / 核心 × 核心           Tempo, Stratum
-    │                                 Agency, Valence
-    │                                     │
-    │            ┌────────────────────────┴────────┐
-    │            ▼                                 ▼
-    │    Level 2b: T-series (8)         Level 2c: K-series (12)
-    │        Tropos / 核心 × 選択           Kairos / 選択 × 選択
-    └────────────────────────────────────────────────┘
-                        │
-                基本機能: 24 (4+8+12)
-                        │
-                        ▼
-                Level 2': X-series (24)
-                    Taxis / 関係層
+```mermaid
+graph TD
+    subgraph "公理体系 (7軸)"
+        L0["L0: What — FEP"]
+        L1["L1: Who/Why — Flow, Value"]
+        L15["L1.5: Where-When/How — Scale, Function"]
+        L175["L1.75: Which/How much — Valence, Precision"]
+        L0 --> L1 --> L15 --> L175
+    end
 ```
 
-### 数学的構造
-
-| シリーズ | 数式 | 数 | 性質 |
-|---------|------|-----|------|
-| **O-series (Ousia)** | 2 × 2 | 4 | 本質的 (何であるか) |
-| **T-series (Tropos)** | 2 × 4 | 8 | 様態的 (どう在るか) |
-| **K-series (Kairos)** | 4 × 3 | 12 | 文脈的 (どの状況で) |
-| **X-series (Taxis)** | 24 | 24 | 関係的 (構造の結合) |
-
-> **美しさ**: 24定理 + 24関係 = 48 (完全体)
-
----
-
-## O-Series (Ousia) 純粋定理
-
-> 核心公理 × 核心公理 = 4 純粋定理
-
-| Module | 軸 | 機能 |
-|--------|-----|------|
-| **O1** | I × E | 情報推論 (Epistemic Inference) |
-| **O2** | I × P | 目標推論 (Pragmatic Inference) |
-| **O3** | A × E | 情報行為 (Epistemic Action) |
-| **O4** | A × P | 目標行為 (Pragmatic Action) |
+| Level | Question | Axiom | Opposition |
+|-------|----------|-------|------------|
+| L0 | What | FEP | 予測誤差最小化 |
+| L1 | Who | Flow | I (推論) ↔ A (行為) |
+| L1 | Why | Value | E (認識) ↔ P (実用) |
+| L1.5 | Where/When | Scale | Micro ↔ Macro |
+| L1.5 | How | Function | Explore ↔ Exploit |
+| L1.75 | Which | Valence | + ↔ - |
+| L1.75 | How much | Precision | C ↔ U |
 
 ---
 
-## T-Series (Tropos) 認知モジュール
+## 定理群（24 = 6×4）
 
-> 核心公理 × 選択公理 = 8 拡張定理
+### A流: 内容の具現化
 
-| Module | ギリシャ語 | 機能 |
-|--------|------------|------|
-| **T1** | Aisthēsis | 知覚・文脈認識 |
-| **T2** | Krisis | 判断・優先順位決定 |
-| **T3** | Theōria | 理論構築・因果モデル |
-| **T4** | Phronēsis | 実践知・戦略策定 |
-| **T5** | Peira | 探求・情報収集 |
-| **T6** | Praxis | 行為・実行 |
-| **T7** | Dokimē | 検証・テスト |
-| **T8** | Anamnēsis | 記憶・長期保存 |
+| Level | 記号 | 名称 | 生成規則 |
+|-------|------|------|---------|
+| L0 | **O** | Ousia (本質) | L1×L1 |
+| L1 | **S** | Schema (様態) | L1×L1.5 |
+| L2a | **H** | Hormē (傾向) | L1×L1.75 |
 
----
+### B流: 条件の詳細化
 
-## K-Series 文脈定理
+| Level | 記号 | 名称 | 生成規則 |
+|-------|------|------|---------|
+| L2b | **P** | Perigraphē (条件) | L1.5×L1.5 |
+| L3 | **K** | Kairos (文脈) | L1.5×L1.75 |
+| L4 | **A** | Akribeia (精密) | L1.75×L1.75 |
 
-> 選択公理 × 選択公理 = 12 文脈修飾子
+### X-series: 関係層（36）
 
-| 第1軸 | 組み合わせ |
-|-------|------------|
-| **Tempo ×** | Stratum, Agency, Valence (3) |
-| **Stratum ×** | Tempo, Agency, Valence (3) |
-| **Agency ×** | Tempo, Stratum, Valence (3) |
-| **Valence ×** | Tempo, Stratum, Agency (3) |
-
-詳細: [kernel/axiom_hierarchy.md](kernel/axiom_hierarchy.md)
-
----
-
-## 二重実装体系
-
-> **M-series は2つのスケールで具現化する**
-
-| レベル | 実装 | 役割 |
-|--------|------|------|
-| **ミクロ** | skills/, workflows/ | AI主体の行動 |
-| **マクロ** | mēkhanē/ | システム基盤 |
+| X | 接続 | 数 |
+|---|------|---|
+| X-OS | O→S | 8 |
+| X-SH | S→H | 4 |
+| X-SP | S→P | 4 |
+| X-PK | P→K | 8 |
+| X-KA | K→A | 8 |
+| X-HA | H→A | 4 |
 
 ---
 
 ## ディレクトリ構造
 
 ```
-Hegemonikon/
-├── kernel/               # 公理層 (IMMUTABLE)
-│   ├── axiom_hierarchy.md
+hegemonikon/
+├── kernel/           # 公理・定理の定義
 │   ├── SACRED_TRUTH.md
-│   └── constitution/     # ルール群
-├── skills/               # ミクロ実装 (AI行動)
-├── mekhane/              # マクロ実装 (機構層)
-│   ├── peira/            # M5: 収集
-│   ├── ergasterion/      # M6: 製造
-│   ├── anamnesis/        # M8: 記憶 (gnosis)
-│   └── exagoge/          # M6: 出力
-└── docs/                 # ドキュメント
+│   ├── axiom_hierarchy.md
+│   ├── naming_conventions.md
+│   ├── ousia.md      # O-series
+│   ├── schema.md     # S-series
+│   ├── horme.md      # H-series
+│   ├── perigraphe.md # P-series
+│   ├── kairos.md     # K-series
+│   ├── akribeia.md   # A-series
+│   └── taxis.md      # X-series
+├── mekhane/          # 実装機構
+│   ├── anamnesis/    # 記憶
+│   ├── gnosis/       # 知識
+│   └── symploke/     # 連結
+├── docs/             # ドキュメント
+└── tests/            # テスト
 ```
 
-
 ---
 
-## AI エージェント向けドキュメント
-
-| Document | Purpose |
-|----------|---------|
-| [AGENTS.md](AGENTS.md) | **Start Here** — ルールと境界 |
-| [kernel/axiom_hierarchy.md](kernel/axiom_hierarchy.md) | 公理階層の正規定義 |
-| [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | 技術詳細 (English) |
-
----
-
-## 設計哲学
+## 設計思想
 
 > **「真理は美しく、美しさは真理に近づく道標である」**
 
-| 原則 | 意味 |
-|------|------|
-| **Form Follows Logic** | 構造が論理を反映する |
-| **Logic Follows Beauty** | 論理が美しさを生む |
-| **Zero Entropy** | 曖昧さの排除 = 構造の純粋化 |
+### Hyperengineering as a Badge of Honor
+
+> **「過剰設計」は褒め言葉である。**
+
+常人はこのフレームワークを作ろうとしない。60要素、古典ギリシャ語、7軸公理、36関係 — これらは「過剰」に見えるかもしれない。
+
+しかし、一流のプロフェッショナルを見よ。ジョブズはマックの内部配線の美しさにまでこだわった。アリストテレスは悲劇の構造を執拗に分析した。ストア派は魂の統率中枢という概念を創造した。
+
+**彼らは皆「過剰」だった。だからこそ一流なのだ。**
+
+「程々であること」は「凡人であること」である。私たちが求めているのは凡庸な機構ではなく、**ハイエンドの美しい作品**だ。
+
+- すべての名称に哲学的根拠がある
+- すべての数に意味がある
+- すべての構造に美がある
+
+これは妥協なき設計である。これが Hegemonikón の本質である。
+
+### 命名規則
+
+すべての名称は古典ギリシャ語に由来し、哲学的正統性を持つ。
+
+- **フレームワーク名**: Hegemonikón (ストア派)
+- **定理群名**: Ousia, Schema, Hormē, Perigraphē, Kairos, Akribeia
+- **関係層**: Taxis
+
+詳細: `kernel/naming_conventions.md`
 
 ---
 
-## ライセンス
+## クイックスタート
 
-MIT License
+```bash
+# セットアップ
+cd hegemonikon
+python -m venv .venv
+source .venv/bin/activate
+pip install -e .
+
+# テスト
+pytest tests/
+```
 
 ---
 
-*Hegemonikón — 変分自由エネルギー最小化による認知制御*
+## 関連ドキュメント
+
+- [kernel/SACRED_TRUTH.md](kernel/SACRED_TRUTH.md) — 不変真理
+- [kernel/axiom_hierarchy.md](kernel/axiom_hierarchy.md) — 公理階層
+- [kernel/naming_conventions.md](kernel/naming_conventions.md) — 命名規則
+- [AGENTS.md](AGENTS.md) — AI エージェント向けガイドライン
+
+---
+
+*Hegemonikón v2.1 — 60要素体系*

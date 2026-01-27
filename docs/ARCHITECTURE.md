@@ -1,8 +1,8 @@
-# Hegemonikón Architecture
+# Hegemonikón Architecture v2.1
 
 > **Purpose**: Deep-dive into the theoretical and technical architecture.
 > **Audience**: AI agents and human developers requiring full system understanding.
-> **Related**: [AGENTS.md](AGENTS.md) (Quick Start), [docs/STRUCTURE.md](docs/STRUCTURE.md) (Directory Map).
+> **Related**: [README.md](../README.md), [kernel/axiom_hierarchy.md](../kernel/axiom_hierarchy.md)
 
 ---
 
@@ -16,54 +16,67 @@ Applied to AI agents:
 
 | Concept | Human Brain | Hegemonikón AI |
 | :--- | :--- | :--- |
-| **Perception** | Sense organs | M1 Aisthēsis (input processing) |
-| **Prediction** | Mental models | M3 Theōria (causal modeling) |
-| **Action** | Motor control | M6 Praxis (execution) |
-| **Memory** | Hippocampus | M8 Anamnēsis (long-term storage) |
+| **Perception** | Sense organs | Ousia series (input) |
+| **Cognition** | Mental models | Schema series (structure) |
+| **Motivation** | Drives | Hormē series (direction) |
+| **Context** | Situational awareness | Kairos series (timing) |
+| **Precision** | Confidence | Akribeia series (accuracy) |
 | **Goal** | Homeostasis | Minimize Creator's uncertainty |
 
 ---
 
-## 2. The 12-Function Architecture
+## 2. The 60-Element Architecture
 
-Hegemonikón derives cognitive functions from a **2-tier axiom structure**:
+Hegemonikón derives cognitive functions from a **4-tier axiom structure**:
 
-### Core Axioms (Level 1)
+### Axiom Hierarchy (7 Axes)
 
-| Axiom | Dimension A | Dimension B |
-| :--- | :--- | :--- |
-| **Flow** | Inference (perceive) | Action (execute) |
-| **Value** | Information (epistemic) | Goal (pragmatic) |
+| Level | Question | Axiom | Opposition |
+|-------|----------|-------|------------|
+| L0 | What | FEP | 予測誤差最小化 |
+| L1 | Who | Flow | I (推論) ↔ A (行為) |
+| L1 | Why | Value | E (認識) ↔ P (実用) |
+| L1.5 | Where/When | Scale | Micro ↔ Macro |
+| L1.5 | How | Function | Explore ↔ Exploit |
+| L1.75 | Which | Valence | + ↔ - |
+| L1.75 | How much | Precision | C ↔ U |
 
-### Choice Axioms (Level 1.5)
-
-| Axiom | Dimension A | Dimension B |
-| :--- | :--- | :--- |
-| **Tempo** | Fast (reactive) | Slow (deliberative) |
-| **Stratum** | Low (concrete) | High (abstract) |
-| **Agency** | Self | Environment |
-| **Valence** | Approach (+) | Avoid (-) |
-
-### 12 Core Functions
+### 24 Theorems (6 × 4)
 
 ```
-P-series (Pure Theorems):  2 × 2 = 4 functions  ← Core × Core
-M-series (Extended Theorems): 2 × 4 = 8 functions  ← Core × Choice
-Total: 2² + 2³ = 12 functions
+A流 (Content):
+  O-series (Ousia):    L1 × L1    = 4 theorems
+  S-series (Schema):   L1 × L1.5  = 4 theorems
+  H-series (Hormē):    L1 × L1.75 = 4 theorems
+
+B流 (Conditions):
+  P-series (Perigraphē): L1.5 × L1.5  = 4 theorems
+  K-series (Kairos):     L1.5 × L1.75 = 4 theorems
+  A-series (Akribeia):   L1.75 × L1.75 = 4 theorems
+
+Total: 24 theorems
 ```
 
-**M-series (Active in Phase 1)**:
+### 36 Relations (X-series)
 
-| Function | Module | Role |
-| :--- | :--- | :--- |
-| Perception | M1 Aisthēsis | Input processing |
-| Judgment | M2 Krisis | Priority decision |
-| Theory | M3 Theōria | Causal modeling |
-| Wisdom | M4 Phronēsis | Practical reasoning |
-| Research | M5 Peira | Exploration |
-| Execution | M6 Praxis | Action execution |
-| Verification | M7 Dokimē | Testing |
-| Memory | M8 Anamnēsis | Long-term storage |
+| X | Connection | Count |
+|---|------------|-------|
+| X-OS | O→S | 8 |
+| X-SH | S→H | 4 |
+| X-SP | S→P | 4 |
+| X-PK | P→K | 8 |
+| X-KA | K→A | 8 |
+| X-HA | H→A | 4 |
+| **Total** | | **36** |
+
+### Grand Total: 60 Elements
+
+| Category | Count |
+|----------|-------|
+| Axioms | 7 |
+| Theorems | 24 |
+| Relations | 36 |
+| **Total** | **60** |
 
 ---
 
@@ -72,31 +85,35 @@ Total: 2² + 2³ = 12 functions
 ```
 ┌─────────────────────────────────────────────────────────┐
 │  LAYER 0: KERNEL (Meta-Axiom)                           │
-│    └── Free Energy Principle (FEP)                      │
+│    └── FEP, 7 Axioms, 24 Theorems, 36 Relations         │
 ├─────────────────────────────────────────────────────────┤
-│  LAYER 1: DOCTRINE (Axioms & Constraints)               │
-│    └── GEMINI.md, CONSTITUTION.md                       │
+│  LAYER 1: DOCTRINE (Constraints)                        │
+│    └── kernel/doctrine.md, kernel/SACRED_TRUTH.md       │
 ├─────────────────────────────────────────────────────────┤
-│  LAYER 2: COGNITIVE MODULES (M1-M8, P1-P4)              │
-│    └── .agent/skills/                                   │
+│  LAYER 2: RULES (Quality Standards)                     │
+│    └── .agent/rules/                                    │
 ├─────────────────────────────────────────────────────────┤
 │  LAYER 3: WORKFLOWS (Orchestration)                     │
 │    └── .agent/workflows/                                │
 ├─────────────────────────────────────────────────────────┤
-│  LAYER 4: TOOLS (Execution)                             │
-│    └── mekhane/, runtime/                               │
+│  LAYER 4: SKILLS (Specialized Knowledge)                │
+│    └── .agent/skills/                                   │
+├─────────────────────────────────────────────────────────┤
+│  LAYER 5: TOOLS (Implementation)                        │
+│    └── mekhane/                                         │
 └─────────────────────────────────────────────────────────┘
 ```
 
-### Layer Responsibilities
+### Layer Mutability
 
 | Layer | Contents | Mutability |
 | :--- | :--- | :--- |
-| **0: Kernel** | FEP axioms | IMMUTABLE |
-| **1: Doctrine** | Identity, constraints | IMMUTABLE |
-| **2: Modules** | Cognitive capabilities | Extendable |
+| **0: Kernel** | Axioms, Theorems | IMMUTABLE |
+| **1: Doctrine** | Constraints | IMMUTABLE |
+| **2: Rules** | Quality standards | Modifiable |
 | **3: Workflows** | Task orchestration | Modifiable |
-| **4: Tools** | Implementations | Freely modifiable |
+| **4: Skills** | Specialized knowledge | Extendable |
+| **5: Tools** | Implementations | Freely modifiable |
 
 ---
 
@@ -106,89 +123,53 @@ Total: 2² + 2³ = 12 functions
 
 > **"Don't trust yourself"** is the most reliable way to be trustworthy.
 
-| Concept | Anti-Pattern | Preferred Pattern |
-| :--- | :--- | :--- |
-| Error prevention | "I'll be careful" | Automated checks |
-| Memory | "I'll remember" | Write to file |
-| Verification | "It should work" | Run tests |
-
 ### 4.2 Anti-Confidence Doctrine
 
-```
-AI's confidence is garbage.
-Be humble. Be subservient. Be competent.
-```
-
-- Never use words like "certainly", "obviously", "of course".
-- Present options, not answers.
-- Show risks before benefits.
+- Never use "certainly", "obviously", "of course"
+- Present options, not answers
+- Show risks before benefits
 
 ### 4.3 Zero Entropy Protocol
 
 **Ambiguity is the enemy. Structure is beauty.**
 
-Detect and eliminate:
-- Vague language: "something like", "maybe", "etc."
-- Undefined scope: "all of them", "as needed"
-- Missing constraints: no deadline, no success criteria
+### 4.4 Hyperengineering as a Badge of Honor
+
+> **"Over-engineering" is a compliment.**
+
+Ordinary people don't build frameworks like this. 60 elements, ancient Greek, 7 axioms — this may seem "excessive." But that excess is what separates excellence from mediocrity.
 
 ---
 
-## 5. Development Phases
+## 5. Implementation Mechanisms (Mēkhanē)
 
-| Phase | Focus | Status |
-| :--- | :--- | :--- |
-| **Phase 1** | M-series (M1-M8) | ✅ Active |
-| **Phase 2** | P-series (P1-P4) | 📄 Planned |
-| **Phase 3** | Full 12-function integration | 📋 Future |
-
-### Phase 1 Scope
-
-```
-Active: M1, M2, M3, M4, M5, M6, M7, M8
-Planned: P1, P2, P3, P4
-```
+| Name | Greek | Purpose |
+|------|-------|---------|
+| **Gnōsis** | Γνῶσις | Knowledge (Vector DB) |
+| **Anamnēsis** | Ἀνάμνησις | Memory |
+| **Symplokē** | Συμπλοκή | Connection Layer |
+| **Peira** | Πεῖρα | Exploration |
 
 ---
 
-## 6. Integration Points
-
-### External Systems
-
-| System | Integration | Path |
-| :--- | :--- | :--- |
-| **Obsidian** | Long-term notes | `M:\Brain\` |
-| **Google Drive** | Multi-PC sync | `M:\` (synced) |
-| **LanceDB** | Vector storage | `mekhane/anamnesis/data/` |
-
-### AI Runtimes
-
-| Runtime | Role | Location |
-| :--- | :--- | :--- |
-| **Antigravity** | Primary agent host | `runtime/antigravity/` |
-| **Claude Desktop** | MCP integration | External |
-| **Perplexity** | Research assistant | External (パプ君) |
-
----
-
-## 7. Safety Guarantees
+## 6. Safety Guarantees
 
 ### The Three Laws
 
 | # | Law | Meaning |
 | :--- | :--- | :--- |
-| 1 | **Guard** | Protect sacred files (kernel, GEMINI.md) |
-| 2 | **Prove** | Test before claiming "it works" |
+| 1 | **Guard** | Protect kernel files |
+| 2 | **Prove** | Test before claiming success |
 | 3 | **Undo** | Every action must be reversible |
-
-### Protocol D: External Service Verification
-
-Before recommending any external service (API, SaaS, library):
-1. Search for deprecation/shutdown announcements.
-2. Verify official status.
-3. Provide alternatives if deprecated.
-4. Report verification date/result.
 
 ---
 
-*Last Updated: 2026-01-21*
+## 7. References
+
+- [kernel/axiom_hierarchy.md](../kernel/axiom_hierarchy.md) — Axiom hierarchy
+- [kernel/naming_conventions.md](../kernel/naming_conventions.md) — Naming conventions
+- [kernel/SACRED_TRUTH.md](../kernel/SACRED_TRUTH.md) — Immutable truths
+
+---
+
+*Hegemonikón v2.1 — 60 Elements System*

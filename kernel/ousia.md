@@ -85,6 +85,80 @@ O-series: 2 × 2 = 4 定理
 
 ---
 
+## 実装詳細
+
+### 実現構造
+
+```
+定理群の実現手段 = Scale 公理 (L1.5: Micro ↔ Macro)
+
+O-series 実現:
+├─ Micro: .agent/workflows/ (即時的・セッション内)
+└─ Macro: mekhane/ (永続的・インフラ)
+```
+
+### O1: Noēsis — 実装
+
+| 項目 | 内容 |
+|------|------|
+| **発動条件** | `/noe` / 根本的行き詰まり / パラダイム転換 |
+| **入力** | 問い Q |
+| **出力** | 構造化知見（JSON形式、信頼度付き） |
+| **Micro 実現** | [/noe](file:///home/laihuip001/oikos/.agent/workflows/noe.md) — 5フェーズ思考 |
+| **Macro 実現** | (将来) mekhane/noesis/ — 知見蓄積・パターン学習 |
+| **使用モジュール** | T3 (自問), T4 (判断), T7 (検証) |
+
+### O2: Boulēsis — 実装
+
+| 項目 | 内容 |
+|------|------|
+| **発動条件** | `/bou` / 作業一段落 / 方向性の迷い |
+| **入力** | 領域（任意） |
+| **出力** | 優先順位付き目標リスト + 次のアクション |
+| **Micro 実現** | [/bou](file:///home/laihuip001/oikos/.agent/workflows/bou.md) — 6フェーズ意志明確化 |
+| **Macro 実現** | (将来) mekhane/boulesis/ — 目標履歴・価値関数更新 |
+| **使用モジュール** | — (純粋思考) |
+
+### O3: Zētēsis — 実装
+
+| 項目 | 内容 |
+|------|------|
+| **発動条件** | `/zet` / 不確実性検出 (U > 0.6) |
+| **入力** | 調査テーマ |
+| **出力** | 調査依頼書（深掘り版） |
+| **Micro 実現** | [/zet](file:///home/laihuip001/oikos/.agent/workflows/zet.md) — 調査依頼書生成 |
+| **Macro 実現** | mekhane/anamnesis/collectors/ — 外部情報収集 |
+| **使用モジュール** | T5 (探索) |
+
+### O4: Energeia — 実装
+
+| 項目 | 内容 |
+|------|------|
+| **発動条件** | `/ene` / `y` (計画承認) / /bou 完了後 |
+| **入力** | 承認済み計画 or 明確な意志 |
+| **出力** | 成果物 + 検証結果 + コミット提案 |
+| **Micro 実現** | [/ene](file:///home/laihuip001/oikos/.agent/workflows/ene.md) — 6フェーズ実行 |
+| **Macro 実現** | mekhane/ergasterion/ — ファクトリ・プロトコル |
+| **使用モジュール** | T6 (実行), T2 (判断) |
+
+### O-series 連携図
+
+```
+O1 Noēsis（認識）
+  └→ 「何が真実か」を問う
+       ↓
+O2 Boulēsis（意志）
+  └→ 「何を望むか」を問う
+       ↓
+O3 Zētēsis（探求）
+  └→ 「何を問うか」を調べる
+       ↓
+O4 Energeia（行為）
+  └→ 「何をするか」を実行する
+```
+
+---
+
 ## X-series 接続
 
 | X | 接続 | 意味 |

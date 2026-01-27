@@ -78,6 +78,37 @@ class ContextItem:
     tool_chain: Optional[str] = None
 
 
+# v2.1 additions
+@dataclass
+class Mixin:
+    """Reusable template fragment for composition."""
+    name: str
+    role: Optional[str] = None
+    goal: Optional[str] = None
+    constraints: list[str] = field(default_factory=list)
+    format: Optional[str] = None
+    examples: list[dict] = field(default_factory=list)
+    tools: dict[str, str] = field(default_factory=dict)
+    resources: dict[str, str] = field(default_factory=dict)
+    rubric: Optional['Rubric'] = None
+    activation: Optional[Activation] = None
+    context: list[ContextItem] = field(default_factory=list)
+
+
+class CircularReferenceError(Exception):
+    """Error when circular reference is detected in extends/mixin chain."""
+    def __init__(self, chain: list[str]):
+        self.chain = chain
+        super().__init__(f"Circular reference: {' → '.join(chain)}")
+
+
+class ReferenceError(Exception):
+    """Error when referenced prompt/mixin is not found."""
+    def __init__(self, name: str):
+        self.name = name
+        super().__init__(f"Reference not found: {name}")
+
+
 @dataclass
 class Prompt:
     """Parsed prompt-lang document."""
@@ -95,6 +126,10 @@ class Prompt:
     activation: Optional[Activation] = None
     # v2.0.1 additions
     context: list[ContextItem] = field(default_factory=list)
+    # v2.1 additions (extends/mixin)
+    extends: Optional[str] = None
+    mixins: list[str] = field(default_factory=list)
+    _resolved: bool = field(default=False, repr=False)
     
     def to_dict(self) -> dict:
         """Convert to dictionary."""
@@ -476,6 +511,26 @@ class Prompt:
         return None
 
 
+# v2.1 additions
+@dataclass
+class ParseResult:
+    """Result of parsing a prompt-lang file with multiple definitions."""
+    prompts: dict[str, Prompt] = field(default_factory=dict)  # name -> Prompt
+    mixins: dict[str, Mixin] = field(default_factory=dict)    # name -> Mixin
+    
+    def get_prompt(self, name: str) -> Optional[Prompt]:
+        """Get a prompt by name."""
+        return self.prompts.get(name)
+    
+    def get_mixin(self, name: str) -> Optional[Mixin]:
+        """Get a mixin by name."""
+        return self.mixins.get(name)
+    
+    def get(self, name: str) -> Optional[Prompt | Mixin]:
+        """Get a prompt or mixin by name."""
+        return self.prompts.get(name) or self.mixins.get(name)
+
+
 class ParseError(Exception):
     """Error during parsing."""
     def __init__(self, message: str, line: int = 0):
@@ -488,6 +543,7 @@ class PromptLangParser:
     
     # Regex patterns
     HEADER_PATTERN = re.compile(r'^#prompt\s+([a-z_][a-z0-9_-]*)$')
+    MIXIN_HEADER_PATTERN = re.compile(r'^#mixin\s+([a-z_][a-z0-9_-]*)$')  # v2.1
     BLOCK_PATTERN = re.compile(r'^(@\w+):$')
     LIST_ITEM_PATTERN = re.compile(r'^  - (.+)$')
     TOOL_ITEM_PATTERN = re.compile(r'^  - ([a-z_][a-z0-9_-]*): (.+)$')
@@ -496,6 +552,9 @@ class PromptLangParser:
     FENCED_START_PATTERN = re.compile(r'^  ```(\w*)$')
     FENCED_END_PATTERN = re.compile(r'^  ```\s*$')  # Allow trailing whitespace
     INDENTED_LINE_PATTERN = re.compile(r'^  (.+)$')
+    # v2.1 patterns for extends/mixin
+    EXTENDS_INLINE_PATTERN = re.compile(r'^@extends:\s*(.+)$')
+    MIXIN_REF_PATTERN = re.compile(r'^@mixin:\s*\[([^\]]+)\]$')
     
     def __init__(self, content: str):
         self.content = content
@@ -551,6 +610,21 @@ class PromptLangParser:
                 self.prompt.conditions.append(condition)
             return
         
+        # v2.1: Check for inline @extends: name
+        extends_match = self.EXTENDS_INLINE_PATTERN.match(line)
+        if extends_match:
+            self.prompt.extends = extends_match.group(1).strip()
+            self.pos += 1
+            return
+        
+        # v2.1: Check for inline @mixin: [name1, name2]
+        mixin_match = self.MIXIN_REF_PATTERN.match(line)
+        if mixin_match:
+            mixins_str = mixin_match.group(1)
+            self.prompt.mixins = [m.strip() for m in mixins_str.split(',')]
+            self.pos += 1
+            return
+        
         match = self.BLOCK_PATTERN.match(line)
         if not match:
             # Skip unknown lines
@@ -588,6 +662,7 @@ class PromptLangParser:
         # v2.0.1 additions
         elif block_type == "@context":
             self.prompt.context = self._parse_context_content()
+
     
     def _parse_text_content(self) -> str:
         """Parse indented text content."""
@@ -955,6 +1030,187 @@ def parse_file(filepath: str) -> Prompt:
     content = path.read_text(encoding='utf-8')
     parser = PromptLangParser(content)
     return parser.parse()
+
+
+# v2.1 additions: parse_all and resolve functions
+def parse_all(content: str) -> ParseResult:
+    """
+    Parse content with multiple prompts and mixins.
+    
+    Supports:
+        #prompt name
+        #mixin name
+    
+    Returns:
+        ParseResult with all prompts and mixins
+    """
+    result = ParseResult()
+    lines = content.split('\n')
+    pos = 0
+    
+    while pos < len(lines):
+        line = lines[pos].rstrip()
+        
+        # Skip empty lines and comments
+        if not line or line.startswith('//'):
+            pos += 1
+            continue
+        
+        # Check for #mixin header
+        mixin_match = PromptLangParser.MIXIN_HEADER_PATTERN.match(line)
+        if mixin_match:
+            name = mixin_match.group(1)
+            # Extract mixin content until next # header
+            mixin_lines = [line]
+            pos += 1
+            while pos < len(lines):
+                next_line = lines[pos].rstrip()
+                if next_line.startswith('#prompt') or next_line.startswith('#mixin'):
+                    break
+                mixin_lines.append(next_line)
+                pos += 1
+            
+            # Parse as prompt and convert to Mixin
+            mixin_content = '\n'.join(mixin_lines).replace('#mixin', '#prompt', 1)
+            parser = PromptLangParser(mixin_content)
+            prompt = parser.parse()
+            mixin = Mixin(
+                name=name,
+                role=prompt.role,
+                goal=prompt.goal,
+                constraints=prompt.constraints,
+                format=prompt.format,
+                examples=prompt.examples,
+                tools=prompt.tools,
+                resources=prompt.resources,
+                rubric=prompt.rubric,
+                activation=prompt.activation,
+                context=prompt.context
+            )
+            result.mixins[name] = mixin
+            continue
+        
+        # Check for #prompt header
+        prompt_match = PromptLangParser.HEADER_PATTERN.match(line)
+        if prompt_match:
+            name = prompt_match.group(1)
+            # Extract prompt content until next # header
+            prompt_lines = [line]
+            pos += 1
+            while pos < len(lines):
+                next_line = lines[pos].rstrip()
+                if next_line.startswith('#prompt') or next_line.startswith('#mixin'):
+                    break
+                prompt_lines.append(next_line)
+                pos += 1
+            
+            prompt_content = '\n'.join(prompt_lines)
+            parser = PromptLangParser(prompt_content)
+            prompt = parser.parse()
+            result.prompts[name] = prompt
+            continue
+        
+        pos += 1
+    
+    return result
+
+
+def _merge(parent: Prompt | Mixin, child: Prompt) -> Prompt:
+    """
+    Merge parent into child. Child takes precedence for scalar fields.
+    
+    Rules:
+        - str fields (role, goal, format): child overrides
+        - list fields (constraints, examples, context): concatenate (parent + child)
+        - dict fields (tools, resources): merge (child overrides)
+        - complex fields (rubric, activation): child overrides
+    """
+    return Prompt(
+        name=child.name,
+        role=child.role or parent.role,
+        goal=child.goal or parent.goal,
+        constraints=parent.constraints + child.constraints,  # concatenate
+        format=child.format or parent.format,
+        examples=parent.examples + child.examples,  # concatenate
+        tools={**parent.tools, **child.tools},  # child overrides
+        resources={**parent.resources, **child.resources},
+        rubric=child.rubric or parent.rubric,
+        conditions=parent.conditions + child.conditions if hasattr(parent, 'conditions') and parent.conditions else child.conditions,
+        activation=child.activation or parent.activation,
+        context=parent.context + child.context,  # concatenate
+        extends=None,  # resolved
+        mixins=[],     # resolved
+        _resolved=True
+    )
+
+
+def resolve(prompt: Prompt, registry: ParseResult) -> Prompt:
+    """
+    Resolve extends and mixins for a prompt.
+    
+    Resolution order:
+        1. Mixins (left to right)
+        2. Extends (recursive, depth-first)
+        3. Self
+    
+    Args:
+        prompt: The prompt to resolve
+        registry: ParseResult containing all prompts and mixins
+    
+    Returns:
+        Resolved Prompt with _resolved=True
+    
+    Raises:
+        CircularReferenceError: If circular reference is detected
+        ReferenceError: If referenced prompt/mixin is not found
+    """
+    if prompt._resolved:
+        return prompt
+    
+    visited: set[str] = {prompt.name}
+    chain: list[str] = [prompt.name]
+    
+    return _resolve_with_chain(prompt, registry, visited, chain)
+
+
+def _resolve_with_chain(
+    prompt: Prompt,
+    registry: ParseResult,
+    visited: set[str],
+    chain: list[str]
+) -> Prompt:
+    """Internal resolver with cycle detection."""
+    result = prompt
+    
+    # 1. Apply mixins (left to right)
+    for mixin_name in prompt.mixins:
+        mixin = registry.get_mixin(mixin_name)
+        if not mixin:
+            raise ReferenceError(mixin_name)
+        result = _merge(mixin, result)
+    
+    # 2. Apply extends (recursive)
+    if prompt.extends:
+        parent_name = prompt.extends
+        
+        if parent_name in visited:
+            raise CircularReferenceError(chain + [parent_name])
+        
+        parent = registry.get_prompt(parent_name) or registry.get_mixin(parent_name)
+        if not parent:
+            raise ReferenceError(parent_name)
+        
+        visited.add(parent_name)
+        chain.append(parent_name)
+        
+        # Recursively resolve parent if it's a Prompt
+        if isinstance(parent, Prompt) and (parent.extends or parent.mixins):
+            parent = _resolve_with_chain(parent, registry, visited, chain)
+        
+        result = _merge(parent, result)
+    
+    result._resolved = True
+    return result
 
 
 def validate_file(filepath: str) -> tuple[bool, str]:

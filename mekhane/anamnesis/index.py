@@ -153,6 +153,8 @@ class GnosisIndex:
         # 埋め込み生成
         data = []
         BATCH_SIZE = 32
+        WRITE_BATCH_SIZE = 1024
+        total_added = 0
 
         for i in range(0, len(papers), BATCH_SIZE):
             batch_papers = papers[i : i + BATCH_SIZE]
@@ -164,17 +166,28 @@ class GnosisIndex:
                 record["vector"] = vector
                 data.append(record)
             
+            if len(data) >= WRITE_BATCH_SIZE:
+                if self.TABLE_NAME in self.db.table_names():
+                    table = self.db.open_table(self.TABLE_NAME)
+                    table.add(data)
+                else:
+                    self.db.create_table(self.TABLE_NAME, data=data)
+                total_added += len(data)
+                data = []
+
             print(f"  Processed {min(i + BATCH_SIZE, len(papers))}/{len(papers)}...")
         
-        # LanceDBに追加
-        if self.TABLE_NAME in self.db.table_names():
-            table = self.db.open_table(self.TABLE_NAME)
-            table.add(data)
-        else:
-            self.db.create_table(self.TABLE_NAME, data=data)
+        # LanceDBに残りを追加
+        if data:
+            if self.TABLE_NAME in self.db.table_names():
+                table = self.db.open_table(self.TABLE_NAME)
+                table.add(data)
+            else:
+                self.db.create_table(self.TABLE_NAME, data=data)
+            total_added += len(data)
         
-        print(f"[GnosisIndex] Added {len(data)} papers")
-        return len(data)
+        print(f"[GnosisIndex] Added {total_added} papers")
+        return total_added
     
     def search(self, query: str, k: int = 10) -> list[dict]:
         """

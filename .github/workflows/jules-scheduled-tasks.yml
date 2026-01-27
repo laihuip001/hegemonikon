@@ -1,0 +1,155 @@
+# Jules Scheduled Tasks for Hegemonikón
+#
+# 各ペルソナの週次/月次タスクを自動実行
+# 詳細: docs/guides/scheduled_tasks_prompts.md
+
+name: Jules Scheduled Tasks
+
+on:
+  schedule:
+    # P1 数学者 - 週次（月曜 09:00 JST = 00:00 UTC）
+    - cron: "0 0 * * 1"
+  workflow_dispatch:
+    inputs:
+      persona:
+        description: "実行するペルソナ (p1/p2/p3/p4/p5/p6/all)"
+        required: true
+        default: "all"
+
+jobs:
+  p1-mathematician:
+    name: P1 数学者 - 週次数学的一貫性チェック
+    runs-on: ubuntu-latest
+    if: github.event.inputs.persona == 'p1' || github.event.inputs.persona == 'all' || github.event_name == 'schedule'
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Create Jules Task - P1
+        env:
+          JULES_API_KEY: ${{ secrets.JULES_API_KEY_P1 }}
+        run: |
+          curl -X POST https://jules.google/api/v1/tasks \
+            -H "Authorization: Bearer $JULES_API_KEY" \
+            -H "Content-Type: application/json" \
+            -d '{
+              "name": "p1-weekly-math-consistency",
+              "repo": "hegemonikon",
+              "branch": "main",
+              "prompt_file": "docs/guides/scheduled_tasks_prompts.md",
+              "section": "P1 数学者"
+            }'
+
+  p2-fep-theorist:
+    name: P2 FEP理論家 - 週次FEP実装レビュー
+    runs-on: ubuntu-latest
+    needs: p1-mathematician
+    if: github.event.inputs.persona == 'p2' || github.event.inputs.persona == 'all' || github.event_name == 'schedule'
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Create Jules Task - P2
+        env:
+          JULES_API_KEY: ${{ secrets.JULES_API_KEY_P2 }}
+        run: |
+          curl -X POST https://jules.google/api/v1/tasks \
+            -H "Authorization: Bearer $JULES_API_KEY" \
+            -H "Content-Type: application/json" \
+            -d '{
+              "name": "p2-weekly-fep-review",
+              "repo": "hegemonikon",
+              "branch": "main",
+              "prompt_file": "docs/guides/scheduled_tasks_prompts.md",
+              "section": "P2 FEP理論家"
+            }'
+
+  p4-architect:
+    name: P4 アーキテクト - 週次アーキテクチャ健全性
+    runs-on: ubuntu-latest
+    needs: p2-fep-theorist
+    if: github.event.inputs.persona == 'p4' || github.event.inputs.persona == 'all' || github.event_name == 'schedule'
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Create Jules Task - P4
+        env:
+          JULES_API_KEY: ${{ secrets.JULES_API_KEY_P4 }}
+        run: |
+          curl -X POST https://jules.google/api/v1/tasks \
+            -H "Authorization: Bearer $JULES_API_KEY" \
+            -H "Content-Type: application/json" \
+            -d '{
+              "name": "p4-weekly-architecture-health",
+              "repo": "hegemonikon",
+              "branch": "main",
+              "prompt_file": "docs/guides/scheduled_tasks_prompts.md",
+              "section": "P4 アーキテクト"
+            }'
+
+  p5-llm-specialist:
+    name: P5 LLM専門家 - 週次プロンプト最適化
+    runs-on: ubuntu-latest
+    needs: p4-architect
+    if: github.event.inputs.persona == 'p5' || github.event.inputs.persona == 'all' || github.event_name == 'schedule'
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Create Jules Task - P5
+        env:
+          JULES_API_KEY: ${{ secrets.JULES_API_KEY_P5 }}
+        run: |
+          curl -X POST https://jules.google/api/v1/tasks \
+            -H "Authorization: Bearer $JULES_API_KEY" \
+            -H "Content-Type: application/json" \
+            -d '{
+              "name": "p5-weekly-prompt-optimization",
+              "repo": "hegemonikon",
+              "branch": "main",
+              "prompt_file": "docs/guides/scheduled_tasks_prompts.md",
+              "section": "P5 LLM専門家"
+            }'
+
+  p6-integrator:
+    name: P6 統合者 - 週次統合レビュー
+    runs-on: ubuntu-latest
+    needs: [p1-mathematician, p2-fep-theorist, p4-architect, p5-llm-specialist]
+    if: github.event.inputs.persona == 'p6' || github.event.inputs.persona == 'all' || github.event_name == 'schedule'
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Create Jules Task - P6
+        env:
+          JULES_API_KEY: ${{ secrets.JULES_API_KEY_P6 }}
+        run: |
+          curl -X POST https://jules.google/api/v1/tasks \
+            -H "Authorization: Bearer $JULES_API_KEY" \
+            -H "Content-Type: application/json" \
+            -d '{
+              "name": "p6-weekly-integration-review",
+              "repo": "hegemonikon",
+              "branch": "main",
+              "prompt_file": "docs/guides/scheduled_tasks_prompts.md",
+              "section": "P6 統合者"
+            }'
+
+  # P3 ストア派 - 月次（月初のみ）
+  p3-stoic-philosopher:
+    name: P3 ストア派 - 月次規範的監査
+    runs-on: ubuntu-latest
+    if: github.event.inputs.persona == 'p3' || (github.event_name == 'schedule' && github.event.schedule == '0 2 1 * *')
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Create Jules Task - P3
+        env:
+          JULES_API_KEY: ${{ secrets.JULES_API_KEY_P3 }}
+        run: |
+          curl -X POST https://jules.google/api/v1/tasks \
+            -H "Authorization: Bearer $JULES_API_KEY" \
+            -H "Content-Type: application/json" \
+            -d '{
+              "name": "p3-monthly-normative-audit",
+              "repo": "hegemonikon",
+              "branch": "main",
+              "prompt_file": "docs/guides/scheduled_tasks_prompts.md",
+              "section": "P3 ストア派哲学者"
+            }'

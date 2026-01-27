@@ -94,8 +94,23 @@ def get_engine():
         log("Initializing SearchEngine...")
         _engine = SearchEngine()
         
+        # Load seed data for MVP testing
+        try:
+            from mekhane.symploke.seed_data import (
+                GNOSIS_SEED, CHRONOS_SEED, SOPHIA_SEED, KAIROS_SEED
+            )
+            seed_data = {
+                "gnosis": GNOSIS_SEED,
+                "chronos": CHRONOS_SEED,
+                "sophia": SOPHIA_SEED,
+                "kairos": KAIROS_SEED,
+            }
+            log("Seed data loaded")
+        except ImportError:
+            seed_data = {}
+            log("No seed data available")
+        
         # Register all indices with MockAdapter (stub mode)
-        # TODO: Replace with real adapters when data is available
         for IndexClass, name in [
             (GnosisIndex, "gnosis"),
             (ChronosIndex, "chronos"),
@@ -105,8 +120,15 @@ def get_engine():
             adapter = MockAdapter()
             index = IndexClass(adapter, name, dimension=768)
             index.initialize()
+            
+            # Ingest seed data if available
+            if name in seed_data:
+                count = index.ingest(seed_data[name])
+                log(f"Registered {name} index ({count} docs)")
+            else:
+                log(f"Registered {name} index (empty)")
+            
             _engine.register(index)
-            log(f"Registered {name} index")
         
         log("SearchEngine ready")
     return _engine

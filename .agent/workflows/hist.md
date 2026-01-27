@@ -8,27 +8,26 @@ modules: [M8]
 
 > **Hegemonikón Module**: M8 Anamnēsis (Sync Phase)
 
-
 ## Step 1: AIDB Sync (Chat History KB)
 
 Antigravity ChatHistory DBをベクトルインデックスと同期する。
 
-```powershell
-python m:/Hegemonikon/mekhane/peira/scripts/chat-history-kb.py sync --report
+```bash
+python /home/laihuip001/oikos/hegemonikon/mekhane/peira/scripts/chat-history-kb.py sync --report
 ```
 
 ## Step 2: Takeout Import (Optional)
 
 Google Takeoutデータが存在する場合、Vaultへインポートする。
 
-```powershell
+```bash
 # Takeout JSONパス (例)
-$JSON_PATH = "M:\Google Drive\Takeout\Takeout\Gemini\Gemini.json"
-$VAULT_PATH = "M:\Hegemonikon\vault\chat-history"
+JSON_PATH="$HOME/ダウンロード/Takeout/Gemini/Gemini.json"
+VAULT_PATH="/home/laihuip001/oikos/hegemonikon/vault/chat-history"
 
-if (Test-Path $JSON_PATH) {
-    python m:/Hegemonikon/forge/scripts/import_takeout.py convert $JSON_PATH $VAULT_PATH
-}
+if [ -f "$JSON_PATH" ]; then
+    python /home/laihuip001/oikos/hegemonikon/forge/scripts/import_takeout.py convert "$JSON_PATH" "$VAULT_PATH"
+fi
 ```
 
 ## 出力形式

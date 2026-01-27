@@ -24,7 +24,7 @@ modules: [M8]
 
 ## 保存先
 
-`M:\Brain\.hegemonikon\sessions\`
+`/home/laihuip001/oikos/mneme\.hegemonikon\sessions\`
 
 ### ファイル名規則
 
@@ -80,7 +80,7 @@ pip install playwright
 playwright install chromium
 
 # 全会話エクスポート
-python M:\Hegemonikon\mekhane\anamnesis\export_chats.py --format individual
+python /home/laihuip001/oikos/hegemonikon\mekhane\anamnesis\export_chats.py --format individual
 ```
 
 ### 前提条件
@@ -95,7 +95,7 @@ python M:\Hegemonikon\mekhane\anamnesis\export_chats.py --format individual
 1. Creator が `/exp @[conversation:"重要な会話タイトル"]` を実行
 2. Antigravity が会話メタデータを注入
 3. Claude がサマリーと決定事項を md 化
-4. `M:\Brain\.hegemonikon\sessions\` に保存
+4. `/home/laihuip001/oikos/mneme\.hegemonikon\sessions\` に保存
 
 ---
 
@@ -104,7 +104,7 @@ python M:\Hegemonikon\mekhane\anamnesis\export_chats.py --format individual
 ```
 [Hegemonikon] M8 Anamnēsis
   Export Phase: Complete
-  Saved: M:\Brain\.hegemonikon\sessions\{filename}
+  Saved: /home/laihuip001/oikos/mneme\.hegemonikon\sessions\{filename}
   Messages: {count}
 ```
 

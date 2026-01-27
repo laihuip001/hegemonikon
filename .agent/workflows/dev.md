@@ -92,7 +92,7 @@ hegemonikon: M6-Praxis
 ## 原典ベースパス
 
 ```
-M:\Brain\99_🗃️_保管庫｜Archive\プロンプト ライブラリー\モジュール（開発用）\個別のモジュール\
+/home/laihuip001/oikos/mneme\99_🗃️_保管庫｜Archive\プロンプト ライブラリー\モジュール（開発用）\個別のモジュール\
 ```
 
 ---

@@ -12,7 +12,7 @@ M5 Peira (探求) と連携し、**調査依頼書（深掘り版）** を生成
 
 > **デフォルト動作**: 深掘り版調査依頼書を生成し、ユーザーがPerplexity等にコピペする。
 > **API呼び出しは `/src` に移管。**
-> **文脈共有**: Google Drive 経由でパプ君に M:\Brain の内容を参照させる。
+> **文脈共有**: Google Drive 経由でパプ君に /home/laihuip001/oikos/mneme の内容を参照させる。
 
 ---
 
@@ -226,8 +226,8 @@ M5 Peira (探求) と連携し、**調査依頼書（深掘り版）** を生成
 ### 文脈共有
 
 以下のGoogle Driveフォルダを参照してください:
-- **Obsidian Vault**: [Google Drive M:\Brain リンク]
-- **開発リポジトリ**: [Google Drive M:\Hegemonikon リンク]
+- **Obsidian Vault**: [Google Drive /home/laihuip001/oikos/mneme リンク]
+- **開発リポジトリ**: [Google Drive /home/laihuip001/oikos/hegemonikon リンク]
 
 上記の文脈（特に関連するファイル）を踏まえて調査してください。
 

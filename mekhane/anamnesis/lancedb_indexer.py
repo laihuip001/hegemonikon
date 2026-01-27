@@ -7,8 +7,9 @@ LanceDB にインデックスし、全文検索・ベクトル検索を可能に
 """
 
 import re
+from itertools import chain
 from pathlib import Path
-from typing import List, Optional
+from typing import Any, Dict, Iterator, List, Optional
 
 import lancedb
 from pydantic import BaseModel
@@ -114,6 +115,22 @@ def parse_session_file(filepath: Path) -> Optional[SessionDocument]:
         return None
 
 
+def generate_document_batches(
+    session_files: List[Path], batch_size: int = 1000
+) -> Iterator[List[Dict[str, Any]]]:
+    """セッションファイルをパースし、バッチごとにyieldするジェネレータ"""
+    batch: List[Dict[str, Any]] = []
+    for filepath in session_files:
+        doc = parse_session_file(filepath)
+        if doc and len(doc.content) > 50:
+            batch.append(doc.model_dump())
+            if len(batch) >= batch_size:
+                yield batch
+                batch = []
+    if batch:
+        yield batch
+
+
 def index_sessions():
     """全セッションファイルをインデックス"""
     print("[*] LanceDB Session Indexer")
@@ -128,36 +145,32 @@ def index_sessions():
     session_files = list(SESSIONS_DIR.glob("*.md"))
     print(f"[*] Found {len(session_files)} session files")
     
-    # ドキュメントを作成
-    documents: List[SessionDocument] = []
-    
-    for filepath in session_files:
-        doc = parse_session_file(filepath)
-        if doc and len(doc.content) > 50:
-            documents.append(doc)
-    
-    print(f"[*] Parsed {len(documents)} valid documents")
-    
-    if not documents:
+    # ドキュメントを作成 (Generator)
+    gen = generate_document_batches(session_files)
+
+    try:
+        first_batch = next(gen)
+    except StopIteration:
         print("[!] No documents to index")
         return
-    
+
     # テーブルが存在する場合は削除して再作成
     if TABLE_NAME in db.table_names():
         db.drop_table(TABLE_NAME)
         print(f"[*] Dropped existing table: {TABLE_NAME}")
-    
-    # ドキュメントを辞書に変換
-    data = [doc.model_dump() for doc in documents]
-    
+
     # テーブル作成
-    table = db.create_table(TABLE_NAME, data)
-    print(f"[✓] Created table: {TABLE_NAME} ({len(documents)} rows)")
+    data_iter = chain([first_batch], gen)
+    table = db.create_table(TABLE_NAME, data_iter)
+
+    row_count = table.count_rows()
+    print(f"[*] Parsed {row_count} valid documents")
+    print(f"[✓] Created table: {TABLE_NAME} ({row_count} rows)")
     
     # Full-Text Search インデックスを作成
     try:
         table.create_fts_index("content", replace=True)
-        print(f"[✓] Created FTS index on 'content'")
+        print("[✓] Created FTS index on 'content'")
     except Exception as e:
         print(f"[!] FTS index creation failed: {e}")
     

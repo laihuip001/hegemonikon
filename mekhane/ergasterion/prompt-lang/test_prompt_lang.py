@@ -236,6 +236,233 @@ class TestIntegration(unittest.TestCase):
         self.assertIsInstance(prompts, list)
 
 
+class TestExtendsAndMixin(unittest.TestCase):
+    """Test cases for v2.1 @extends and @mixin features."""
+    
+    def test_basic_extends(self):
+        """Test basic template inheritance."""
+        from prompt_lang import parse_all, resolve
+        
+        content = """#prompt base_spec
+@role:
+  Base role
+
+@goal:
+  Base goal
+
+@constraints:
+  - Base constraint
+
+#prompt child_spec
+@extends: base_spec
+@goal:
+  Child goal
+
+@constraints:
+  - Child constraint
+"""
+        result = parse_all(content)
+        child = result.get_prompt("child_spec")
+        resolved = resolve(child, result)
+        
+        self.assertEqual(resolved.role, "Base role")  # inherited
+        self.assertEqual(resolved.goal, "Child goal")  # overridden
+        self.assertEqual(len(resolved.constraints), 2)  # concatenated
+        self.assertIn("Base constraint", resolved.constraints)
+        self.assertIn("Child constraint", resolved.constraints)
+    
+    def test_mixin_composition(self):
+        """Test mixin composition."""
+        from prompt_lang import parse_all, resolve
+        
+        content = """#mixin json_output
+@format:
+  type: json
+
+@constraints:
+  - Output must be valid JSON
+
+#prompt my_prompt
+@mixin: [json_output]
+@role:
+  JSON generator
+@goal:
+  Generate JSON
+"""
+        result = parse_all(content)
+        prompt = result.get_prompt("my_prompt")
+        resolved = resolve(prompt, result)
+        
+        self.assertEqual(resolved.role, "JSON generator")
+        self.assertIn("type: json", resolved.format)
+        self.assertIn("Output must be valid JSON", resolved.constraints)
+    
+    def test_multiple_mixins(self):
+        """Test multiple mixin composition (left to right)."""
+        from prompt_lang import parse_all, resolve
+        
+        content = """#mixin mixin_a
+@constraints:
+  - Constraint A
+
+#mixin mixin_b
+@constraints:
+  - Constraint B
+
+#prompt multi_mixin
+@mixin: [mixin_a, mixin_b]
+@role:
+  Multi mixin role
+@goal:
+  Test
+@constraints:
+  - Constraint C
+"""
+        result = parse_all(content)
+        prompt = result.get_prompt("multi_mixin")
+        resolved = resolve(prompt, result)
+        
+        # Should have constraints from both mixins + self
+        self.assertEqual(len(resolved.constraints), 3)
+    
+    def test_extends_with_mixin(self):
+        """Test extends combined with mixin."""
+        from prompt_lang import parse_all, resolve
+        
+        content = """#mixin common_format
+@format:
+  markdown
+
+#prompt parent
+@role:
+  Parent role
+@goal:
+  Parent goal
+
+#prompt child
+@extends: parent
+@mixin: [common_format]
+@constraints:
+  - Child constraint
+"""
+        result = parse_all(content)
+        child = result.get_prompt("child")
+        resolved = resolve(child, result)
+        
+        self.assertEqual(resolved.role, "Parent role")
+        self.assertEqual(resolved.goal, "Parent goal")
+        self.assertIn("markdown", resolved.format)
+    
+    def test_circular_reference_detection(self):
+        """Test that circular references raise error."""
+        from prompt_lang import parse_all, resolve, CircularReferenceError
+        
+        content = """#prompt a
+@extends: b
+@role:
+  A
+@goal:
+  A
+
+#prompt b
+@extends: a
+@role:
+  B
+@goal:
+  B
+"""
+        result = parse_all(content)
+        prompt_a = result.get_prompt("a")
+        
+        with self.assertRaises(CircularReferenceError):
+            resolve(prompt_a, result)
+    
+    def test_undefined_reference(self):
+        """Test that undefined references raise error."""
+        from prompt_lang import parse_all, resolve, ReferenceError as PromptReferenceError
+        
+        content = """#prompt child
+@extends: nonexistent
+@role:
+  Child
+@goal:
+  Child
+"""
+        result = parse_all(content)
+        child = result.get_prompt("child")
+        
+        with self.assertRaises(PromptReferenceError):
+            resolve(child, result)
+    
+    def test_parse_all_multiple_prompts(self):
+        """Test parsing multiple prompts in one file."""
+        from prompt_lang import parse_all
+        
+        content = """#prompt first
+@role:
+  First role
+@goal:
+  First goal
+
+#prompt second
+@role:
+  Second role
+@goal:
+  Second goal
+"""
+        result = parse_all(content)
+        
+        self.assertEqual(len(result.prompts), 2)
+        self.assertIn("first", result.prompts)
+        self.assertIn("second", result.prompts)
+    
+    def test_dict_merge_child_priority(self):
+        """Test that dict fields use child priority."""
+        from prompt_lang import parse_all, resolve
+        
+        content = """#prompt parent
+@role:
+  Parent
+@goal:
+  Parent
+@tools:
+  - search: Parent search
+  - read: Parent read
+
+#prompt child
+@extends: parent
+@tools:
+  - search: Child search overrides
+"""
+        result = parse_all(content)
+        child = result.get_prompt("child")
+        resolved = resolve(child, result)
+        
+        # Child's search should override parent's
+        self.assertEqual(resolved.tools["search"], "Child search overrides")
+        # Parent's read should be inherited
+        self.assertEqual(resolved.tools["read"], "Parent read")
+    
+    def test_already_resolved_prompt(self):
+        """Test that already resolved prompts are returned as-is."""
+        from prompt_lang import parse_all, resolve
+        
+        content = """#prompt simple
+@role:
+  Simple
+@goal:
+  Simple
+"""
+        result = parse_all(content)
+        prompt = result.get_prompt("simple")
+        
+        resolved1 = resolve(prompt, result)
+        resolved2 = resolve(resolved1, result)  # Should return same object
+        
+        self.assertTrue(resolved2._resolved)
+
+
 if __name__ == "__main__":
     # Run tests with verbosity
     unittest.main(verbosity=2)
+

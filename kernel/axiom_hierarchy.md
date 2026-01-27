@@ -1,225 +1,175 @@
 ---
 doc_id: "AXIOM_HIERARCHY"
-version: "3.0.0"
+version: "5.0.0"
 tier: "KERNEL"
 status: "CANONICAL"
 created: "2026-01-22"
-updated: "2026-01-24"
+updated: "2026-01-27"
 ---
 
-> **Kernel Doc Index**: [SACRED_TRUTH](SACRED_TRUTH.md) | [axiom_hierarchy](axiom_hierarchy.md) ← 📍 | [doctrine](doctrine.md)
+> **Kernel Doc Index**: [SACRED_TRUTH](SACRED_TRUTH.md) | [axiom_hierarchy](axiom_hierarchy.md) ← 📍 | [naming_conventions](naming_conventions.md)
 
-# 📐 公理階層構造 (Axiom Hierarchy)
+# 📐 公理階層構造 (Axiom Hierarchy) v2.1
 
-> **Hegemonikón の設計思想をメタデータとして保存**
+> **「予測誤差最小化から導出される認知の全体系」**
 
 ---
 
-## Part 1: 全体俯瞰
+## 総数
 
-### 階層図
+| 項目 | 数 | 生成 |
+|------|---|------|
+| 公理 | **7** | 1+2+2+2 |
+| 定理 | **24** | 6×4 |
+| 関係 | **36** | 8+4+4+8+8+4 |
+| **総計** | **60** | — |
 
-```
-Level 0: FEP統一原理 (メタ公理) ← 1
-    │
-    ▼ 必然的導出
-Level 1: 核心公理 (Core Axioms) ← 2
-    │   ├── Flow (I/A): 推論 ↔ 行為
-    │   └── Value (E/P): 情報 ↔ 目標
-    │
-    ├───────────────────────────────┐
-    ▼                               ▼
-Level 2a: O-series ← 2×2 = 4    Level 1.5: 選択公理 ← 4
-    │   (Ousia / 純粋定理)           │   Tempo, Stratum
-    │   核心 × 核心                 │   Agency, Valence
-    │                               │
-    │                               ├─────────────────────┐
-    │                               ▼                     ▼
-    │                       Level 2b: T-series    Level 2c: K-series
-    │                           ← 2×4 = 8            ← 4×3 = 12
-    │                           (Tropos / 拡張定理)   (Kairos / 文脈定理)
-    │                           核心 × 選択          選択 × 選択
-    │                               │                     │
-    └───────────────────────────────┴─────────────────────┘
-                                    │
-                                    ▼
-                            Level 2': X-series
-                                ← 24
-                                (Taxis / 関係層)
-                                従属関係
-                                    │
-                                    ▼
-                            Level 3: 成果物
-                                (倫理・言語・品質)
-                                    │
-                                    ▼
-                            Level 4: 具体例
-                                ├── 4a: 代表例 (類型)
-                                │       → SKILL.md にインライン
-                                └── 4b: 事例 (個別)
-                                        → Gnōsis に蓄積
+---
+
+## 公理体系（7軸）
+
+```mermaid
+graph TD
+    subgraph "公理体系"
+        L0["L0: What — FEP"]
+        L1["L1: Who/Why — Flow, Value"]
+        L15["L1.5: Where-When/How — Scale, Function"]
+        L175["L1.75: Which/How much — Valence, Precision"]
+        L0 --> L1 --> L15 --> L175
+    end
 ```
 
-### 数学的構造
-
-| シリーズ | 生成方法 | 積記法 | 数 | 詳細 |
-|---------|----------|--------|-----|------|
-| **O-series (Ousia)** | 核心 × 核心 | 2 × 2 | **4** | [ousia.md](ousia.md) |
-| **T-series (Tropos)** | 核心 × 選択 | 2 × 4 | **8** | [tropos.md](tropos.md) |
-| **K-series (Kairos)** | 選択 × 選択 | 4 × 3 | **12** | [kairos.md](kairos.md) |
-| **X-series (Taxis)** | 従属関係 | 24 | **24** | [taxis.md](taxis.md) |
-| **総計** | — | — | **48** | 完全系 |
-
-> **美しさ**:
-> - 4 (O) + 8 (T) + 12 (K) = 24 (Theorems)
-> - 24 (Theorems) + 24 (Relations) = 48 (System)
+| Level | Question | Axiom | Opposition |
+|-------|----------|-------|------------|
+| L0 | What | FEP | 予測誤差最小化 |
+| L1 | Who | Flow | I (推論) ↔ A (行為) |
+| L1 | Why | Value | E (認識) ↔ P (実用) |
+| L1.5 | Where/When | Scale | Micro ↔ Macro |
+| L1.5 | How | Function | Explore ↔ Exploit |
+| L1.75 | Which | Valence | + ↔ - |
+| L1.75 | How much | Precision | C ↔ U |
 
 ---
 
-## Part 2: 設計原則
+## 定理群（24 = 6×4）
 
-### 命名規則
+### A流: 内容の具現化（12）
 
-> **すべてのシリーズ名はギリシャ語に由来する**
+| Level | 記号 | 名称 | 生成 | 定理 | ドキュメント |
+|-------|------|------|------|------|-------------|
+| L0 | O | **Ousia** | L1×L1 | O1-O4 | [ousia.md](ousia.md) |
+| L1 | S | **Schema** | L1×L1.5 | S1-S4 | [schema.md](schema.md) |
+| L2a | H | **Hormē** | L1×L1.75 | H1-H4 | [horme.md](horme.md) |
 
-| 記号 | 短名 | 正式名（複合形） | ギリシャ語表記 | 含意 |
-|------|------|-----------------|---------------|------|
-| **O** | Ousia | Ousiakē Tetras | Οὐσιακὴ Τετράς | 本質的（何であるか） |
-| **T** | Tropos | Tropikē Ogdoas | Τροπικὴ Ὀγδοάς | 様態的（どう在るか） |
-| **K** | Kairos | Kairiakē Dodecas | Καιριακὴ Δωδεκάς | 文脈的（どの状況で） |
-| **X** | Taxis | Taxikē Eikositessera | Ταξικὴ Εἰκοσιτέσσερα | 関係的（どう繋がるか） |
+### B流: 条件の詳細化（12）
 
-### 抽象-具体スペクトラム
+| Level | 記号 | 名称 | 生成 | 定理 | ドキュメント |
+|-------|------|------|------|------|-------------|
+| L2b | P | **Perigraphē** | L1.5×L1.5 | P1-P4 | [perigraphe.md](perigraphe.md) |
+| L3 | K | **Kairos** | L1.5×L1.75 | K1-K4 | [kairos.md](kairos.md) |
+| L4 | A | **Akribeia** | L1.75×L1.75 | A1-A4 | [akribeia.md](akribeia.md) |
 
-> 抽象と具体は二分ではなく連続体。各階層は下位階層の「代表例」を
-> インラインで参照可能だが、詳細な事例はKB（Gnōsis）に委譲する。
+---
 
-### 1:3 ピラミッド原則
+## 個別定理名（24）
 
-> **設計原則**: 1つの抽象（概念/規則）に対し、3つの具体（説明事例）を紐づける。
+### O-series (Ousia)
 
+| ID | 名称 | 意味 |
+|----|------|------|
+| O1 | Noēsis | 認識推論 |
+| O2 | Boulēsis | 意志推論 |
+| O3 | Zētēsis | 探索行動 |
+| O4 | Energeia | 実用行動 |
+
+### S-series (Schema)
+
+| ID | 名称 | 意味 |
+|----|------|------|
+| S1 | Metron | スケール流動 |
+| S2 | Mekhanē | 方法流動 |
+| S3 | Stathmos | スケール価値 |
+| S4 | Praxis | 方法価値 |
+
+### H-series (Hormē)
+
+| ID | 名称 | 意味 |
+|----|------|------|
+| H1 | Propatheia | 流動傾向 |
+| H2 | Pistis | 流動確信 |
+| H3 | Orexis | 価値傾向 |
+| H4 | Doxa | 価値確信 |
+
+### P-series (Perigraphē)
+
+| ID | 名称 | 意味 |
+|----|------|------|
+| P1 | Khōra | スケール場 |
+| P2 | Hodos | スケール方法 |
+| P3 | Trokhia | 方法スケール |
+| P4 | Tekhnē | 方法場 |
+
+### K-series (Kairos)
+
+| ID | 名称 | 意味 |
+|----|------|------|
+| K1 | Eukairia | スケール傾向 |
+| K2 | Chronos | スケール確信 |
+| K3 | Telos | 方法傾向 |
+| K4 | Sophia | 方法確信 |
+
+### A-series (Akribeia)
+
+| ID | 名称 | 意味 |
+|----|------|------|
+| A1 | Pathos | 二重傾向 |
+| A2 | Krisis | 傾向確信 |
+| A3 | Gnōmē | 確信傾向 |
+| A4 | Epistēmē | 二重確信 |
+
+---
+
+## X-series: 関係層（36）
+
+| X | 接続 | 数 | 意味 |
+|---|------|---|------|
+| X-OS | O→S | 8 | 本質→様態 |
+| X-SH | S→H | 4 | 様態→傾向 |
+| X-SP | S→P | 4 | 様態→条件 |
+| X-PK | P→K | 8 | 条件→文脈 |
+| X-KA | K→A | 8 | 文脈→精密 |
+| X-HA | H→A | 4 | 傾向→精密 |
+| **計** | | **36** | |
+
+詳細: [taxis.md](taxis.md)
+
+---
+
+## 階層構造図
+
+```mermaid
+graph TD
+    subgraph "A流: 内容"
+        O[O: Ousia] --> S[S: Schema]
+        S --> H[H: Hormē]
+    end
+    
+    subgraph "B流: 条件"
+        S --> P[P: Perigraphē]
+        P --> K[K: Kairos]
+        K --> A[A: Akribeia]
+    end
+    
+    H --> A
 ```
-        [抽象]
-       /  |  \
-    [具体1][具体2][具体3]
-```
-
-**根拠**:
-1. **三脚の安定性**: 3点で平面が確定し、構造が安定する
-2. **立体視（三角測量）**: 3つの視点で概念の「輪郭」が初めて見える
-3. **認知的最適**: 3つは覚えやすく、比較しやすく、飽きない
-
-**適用ルール**:
-- 代表例（類型）に対し、3つの事例をインライン埋め込み
-- 4つ目以降は Gnōsis に蓄積（SKILL.md の肥大化防止）
 
 ---
 
-## Part 3: 公理定義
+## 参照
 
-### 核心公理（代替不可能）
-
-| 公理 | ID | 対立項A | 対立項B | FEP的意味 |
-|------|-----|---------|---------|-----------| 
-| **Flow** | I/A | 推論 | 行為 | 信念を変える ↔ 世界を変える |
-| **Value** | E/P | エピステミック | プラグマティック | 不確実性削減 ↔ 目標達成 |
-
-### 選択公理（交換可能、現在固定）
-
-| 選択公理 | ID | 対立項A | 対立項B | 対応核心公理 |
-|----------|-----|---------|---------|-------------|
-| **Tempo** | F/S | 短期 | 長期 | Value |
-| **Stratum** | L/H | 低次 | 高次 | Flow |
-| **Agency** | S/E | 自己 | 環境 | Flow |
-| **Valence** | +/- | 接近 | 回避 | Value |
+- **命名規則**: [naming_conventions.md](naming_conventions.md)
+- **不変真理**: [SACRED_TRUTH.md](SACRED_TRUTH.md)
 
 ---
 
-## Part 4: 定理概要
-
-### O-Series (Ousia): 純粋定理
-
-> **詳細**: [ousia.md](ousia.md)
-
-| ID | 機能 | ギリシャ名 | FEP的役割 |
-|----|------|-----------|----------|
-| O1 | 情報推論 | Noēsis | 世界モデル更新 |
-| O2 | 目標推論 | Boulēsis | 選好モデル更新 |
-| O3 | 情報行為 | Zētēsis | 能動的情報収集 |
-| O4 | 目標行為 | Energeia | 目標達成行動 |
-
-### T-Series (Tropos): 拡張定理
-
-> **詳細**: [tropos.md](tropos.md)
-
-| ID | 機能 | ギリシャ名 | FEP的役割 |
-|----|------|-----------|----------|
-| T1 | 知覚 | Aisthēsis | 低次感覚入力処理 |
-| T2 | 判断 | Krisis | 高次意思決定 |
-| T3 | 内省 | Theōria | 自己モデル更新 |
-| T4 | 戦略 | Phronēsis | 環境モデル計画 |
-| T5 | 探索 | Peira | 即時情報収集 |
-| T6 | 実行 | Praxis | 長期行動遂行 |
-| T7 | 検証 | Dokimē | 仮説確認・接近 |
-| T8 | 記憶 | Anamnēsis | 損失回避・保存 |
-
-### K-Series (Kairos): 文脈定理
-
-> **詳細**: [kairos.md](kairos.md)
-
-| ID | 軸 A → 軸 B | 問い |
-|----|-------------|------|
-| Κ1 | Tempo → Stratum | 時間が処理レベルを決める |
-| Κ2 | Tempo → Agency | 時間が主体を決める |
-| Κ3 | Tempo → Valence | 時間が動機を決める |
-| Κ4-Κ12 | ... | （詳細は kairos.md） |
-
-### X-Series (Taxis): 関係層
-
-> **詳細**: [taxis.md](taxis.md)
-
-| サブシリーズ | 数 | 意味 |
-|-------------|-----|------|
-| X-O | 4 | 純粋定理間の従属 |
-| X-T | 8 | 拡張定理間の従属 |
-| X-K | 12 | 文脈定理間の従属 |
-
----
-
-## Part 5: 実装体系
-
-### ミクロ/マクロ二重実装
-
-| レベル | 名称 | 実装 | 役割 |
-|--------|------|------|------|
-| **ミクロ** | 主体レベル | skills/, workflows/ | AIの行動定義 |
-| **マクロ** | 基盤レベル | mēkhanē/ | システムインフラ |
-
-### mēkhanē (μηχανή): 機構層
-
-| 機構 | ギリシャ語 | T-series | 役割 |
-|------|------------|----------|------|
-| **peira/** | πεῖρα | T5 | 収集機構 |
-| **ergastērion/** | ἐργαστήριον | T6 | 製造機構 |
-| **anamnēsis/** | ἀνάμνησις | T8 | 記憶機構 (gnōsis) |
-| **exagōgē/** | ἐξαγωγή | T6 | 出力機構 |
-
----
-
-## Part 6: 美学
-
-### 数値の象徴
-
-| 数値 | 意味 | 象徴 |
-|------|------|------|
-| **2** | 核心公理の数 | 陰陽、二元性 |
-| **4** | 選択公理の数 | 四方、四季 |
-| **12** | 基本機能数 (4+8) | 12ヶ月、12音階 |
-| **24** | 拡張総数 (12+12) | 24時間、24節気 |
-| **48** | 完全系 | 完全な整合性 |
-
-> **「真理は美しく、美しさは真理に近づく道標である」**
-
----
-
-*このドキュメントは Hegemonikón の不変設計思想を記録する。*
+*Hegemonikón v2.1 — 60要素体系*

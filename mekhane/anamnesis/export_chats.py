@@ -421,7 +421,7 @@ class AntigravityChatExporter:
                     self.chats.append(chat_record)
                     
                     # 逐次保存 (individualモードの場合)
-                    self.save_single_chat(chat_record)
+                    await self.save_single_chat(chat_record)
                     
                     print(f"    → {len(messages)} messages extracted")
                     
@@ -475,8 +475,13 @@ class AntigravityChatExporter:
         print(f"[✓] Saved: {filepath}")
         return filepath
     
-    def save_single_chat(self, chat: Dict):
-        """1つの会話を保存"""
+    async def save_single_chat(self, chat: Dict):
+        """1つの会話を保存（非同期ラッパー）"""
+        loop = asyncio.get_running_loop()
+        await loop.run_in_executor(None, self._save_single_chat_sync, chat)
+
+    def _save_single_chat_sync(self, chat: Dict):
+        """1つの会話を保存（同期実装）"""
         # ファイル名をサニタイズ（ASCII のみ許可）
         title = chat['title']
         # 危険な文字を削除
@@ -519,7 +524,7 @@ class AntigravityChatExporter:
         """（非推奨：逐次保存を使用）各会話を個別ファイルとして保存"""
         print("[*] Re-saving all chats...")
         for chat in self.chats:
-            self.save_single_chat(chat)
+            self._save_single_chat_sync(chat)
     
     async def close(self):
         """リソースを解放"""
@@ -553,7 +558,7 @@ class AntigravityChatExporter:
                 "messages": messages
             }
             self.chats.append(chat_record)
-            self.save_single_chat(chat_record)
+            await self.save_single_chat(chat_record)
             
             print(f"    → {len(messages)} messages extracted")
             
@@ -603,7 +608,7 @@ class AntigravityChatExporter:
                                 "messages": messages
                             }
                             self.chats.append(chat_record)
-                            self.save_single_chat(chat_record)
+                            await self.save_single_chat(chat_record)
                             
                             print(f"    → {len(messages)} messages extracted")
                             

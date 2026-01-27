@@ -20,6 +20,11 @@ _HEGEMONIKON_ROOT = _THIS_DIR.parent.parent  # mekhane/anamnesis -> mekhane -> H
 if str(_HEGEMONIKON_ROOT) not in sys.path:
     sys.path.insert(0, str(_HEGEMONIKON_ROOT))
 
+from mekhane.anamnesis.ux_utils import (
+    print_header, print_success, print_error, print_warning, print_info,
+    print_table_row, Spinner, Colors
+)
+
 # Configuration
 DATA_DIR = _HEGEMONIKON_ROOT / "gnosis_data"
 STATE_FILE = DATA_DIR / "state.json"
@@ -39,7 +44,7 @@ def update_state():
         state["last_collected_at"] = datetime.now().isoformat()
         STATE_FILE.write_text(json.dumps(state, indent=2), encoding="utf-8")
     except Exception as e:
-        print(f"[Warning] Failed to update state: {e}")
+        print_warning(f"Failed to update state: {e}")
 
 
 def cmd_check_freshness(args):
@@ -88,30 +93,33 @@ def cmd_collect(args):
     
     source = args.source.lower()
     if source not in collectors:
-        print(f"Unknown source: {args.source}")
-        print(f"Available: {', '.join(collectors.keys())}")
+        print_error(f"Unknown source: {args.source}")
+        print_info(f"Available: {', '.join(collectors.keys())}")
         return 1
     
-    print(f"[Collect] Source: {source}, Query: {args.query}, Limit: {args.limit}")
+    print_header(f"Collect: {source} (Query: {args.query})")
     
     try:
         collector = collectors[source]()
-        papers = collector.search(args.query, max_results=args.limit)
-        print(f"[Collect] Found {len(papers)} papers")
+        with Spinner(f"Searching {source}"):
+            papers = collector.search(args.query, max_results=args.limit)
+
+        print_success(f"Found {len(papers)} papers")
         
         if papers and not args.dry_run:
-            index = GnosisIndex()
-            added = index.add_papers(papers)
-            print(f"[Collect] Added {added} to index")
+            with Spinner("Indexing papers"):
+                index = GnosisIndex()
+                added = index.add_papers(papers)
+            print_success(f"Added {added} to index")
             update_state()  # Update timestamp
         elif args.dry_run:
-            print("[Collect] Dry run - not adding to index")
+            print_info("Dry run - not adding to index")
             for p in papers[:5]:
                 print(f"  - {p.title[:60]}...")
         
         return 0
     except Exception as e:
-        print(f"[Error] {e}")
+        print_error(f"{e}")
         return 1
 
 
@@ -128,22 +136,23 @@ def cmd_collect_all(args):
         ("openalex", OpenAlexCollector()),
     ]
     
-    print(f"[CollectAll] Query: {args.query}, Limit per source: {args.limit}")
+    print_header(f"Collect All: {args.query}")
     
     all_papers = []
     for name, collector in collectors:
         try:
-            print(f"  Collecting from {name}...")
-            papers = collector.search(args.query, max_results=args.limit)
-            print(f"    Found {len(papers)} papers")
+            with Spinner(f"Collecting from {name}"):
+                papers = collector.search(args.query, max_results=args.limit)
+            print_info(f"{name}: Found {len(papers)} papers")
             all_papers.extend(papers)
         except Exception as e:
-            print(f"    Error: {e}")
+            print_error(f"{name}: {e}")
     
     if all_papers and not args.dry_run:
-        index = GnosisIndex()
-        added = index.add_papers(all_papers, dedupe=True)
-        print(f"[CollectAll] Added {added} unique papers to index")
+        with Spinner("Indexing all papers"):
+            index = GnosisIndex()
+            added = index.add_papers(all_papers, dedupe=True)
+        print_success(f"Added {added} unique papers to index")
         update_state()  # Update timestamp
     
     return 0
@@ -153,27 +162,28 @@ def cmd_search(args):
     """論文検索"""
     from mekhane.anamnesis.index import GnosisIndex
     
-    print(f"[Search] Query: {args.query}")
+    print_header(f"Search: {args.query}")
     
-    index = GnosisIndex()
-    results = index.search(args.query, k=args.limit)
+    with Spinner("Searching index"):
+        index = GnosisIndex()
+        results = index.search(args.query, k=args.limit)
     
     if not results:
-        print("No results found")
+        print_warning("No results found")
         return 0
     
-    print(f"\nFound {len(results)} results:\n")
-    print("-" * 70)
+    print_success(f"Found {len(results)} results")
+    print(Colors.DIM + "-" * 70 + Colors.ENDC)
     
     for i, r in enumerate(results, 1):
-        print(f"\n[{i}] {r.get('title', 'Untitled')[:70]}")
-        print(f"    Source: {r.get('source')} | Citations: {r.get('citations', 'N/A')}")
-        print(f"    Authors: {r.get('authors', '')[:60]}...")
-        print(f"    Abstract: {r.get('abstract', '')[:150]}...")
+        print(f"\n{Colors.BOLD}{Colors.CYAN}[{i}] {r.get('title', 'Untitled')[:70]}{Colors.ENDC}")
+        print(f"    {Colors.DIM}Source:{Colors.ENDC} {r.get('source')} | {Colors.DIM}Citations:{Colors.ENDC} {r.get('citations', 'N/A')}")
+        print(f"    {Colors.DIM}Authors:{Colors.ENDC} {r.get('authors', '')[:60]}...")
+        print(f"    {Colors.DIM}Abstract:{Colors.ENDC} {r.get('abstract', '')[:150]}...")
         if r.get('url'):
-            print(f"    URL: {r.get('url')}")
+            print(f"    {Colors.DIM}URL:{Colors.ENDC} {Colors.BLUE}{r.get('url')}{Colors.ENDC}")
     
-    print("\n" + "-" * 70)
+    print("\n" + Colors.DIM + "-" * 70 + Colors.ENDC)
     return 0
 
 
@@ -181,27 +191,29 @@ def cmd_stats(args):
     """インデックス統計"""
     from mekhane.anamnesis.index import GnosisIndex
     
-    index = GnosisIndex()
-    stats = index.stats()
+    with Spinner("Calculating stats"):
+        index = GnosisIndex()
+        stats = index.stats()
+
+    print_header("Gnōsis Index Statistics")
+
+    print_table_row("Total Papers", str(stats['total']))
+    print_table_row("With DOI", str(stats.get('unique_dois', 0)))
+    print_table_row("With arXiv ID", str(stats.get('unique_arxiv', 0)))
     
-    print("\n[Gnōsis Index Statistics]")
-    print("=" * 40)
-    print(f"Total Papers: {stats['total']}")
-    print(f"With DOI: {stats.get('unique_dois', 0)}")
-    print(f"With arXiv ID: {stats.get('unique_arxiv', 0)}")
-    print("\nBy Source:")
+    print(f"\n{Colors.BOLD}By Source:{Colors.ENDC}")
     for source, count in stats.get("sources", {}).items():
-        print(f"  {source}: {count}")
+        print_table_row(f"  {source}", str(count))
     
     # Show freshness
     if STATE_FILE.exists():
         try:
             state = json.loads(STATE_FILE.read_text(encoding="utf-8"))
-            print(f"Last Collected: {state.get('last_collected_at', 'Unknown')}")
+            print_table_row("Last Collected", state.get('last_collected_at', 'Unknown'))
         except:
             pass
             
-    print("=" * 40)
+    print(Colors.DIM + "=" * 40 + Colors.ENDC)
     
     return 0
 

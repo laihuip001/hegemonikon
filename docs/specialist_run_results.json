@@ -7,63 +7,63 @@
       "name": "変数スコープ認知負荷評価者",
       "session_id": "11494427069569170383",
       "status": "started",
-      "state": "IN_PROGRESS"
+      "state": "COMPLETED"
     },
     {
       "specialist_id": "CL-002",
       "name": "抽象度層状評価者",
       "session_id": "1027942050177161848",
       "status": "started",
-      "state": "IN_PROGRESS"
+      "state": "COMPLETED"
     },
     {
       "specialist_id": "CL-003",
       "name": "メンタルモデル穴検出者",
       "session_id": "15629065746210286520",
       "status": "started",
-      "state": "IN_PROGRESS"
+      "state": "COMPLETED"
     },
     {
       "specialist_id": "AI-001",
       "name": "命名ハルシネーション検出者",
       "session_id": "11750878530409046610",
       "status": "started",
-      "state": "IN_PROGRESS"
+      "state": "COMPLETED"
     },
     {
       "specialist_id": "AI-002",
       "name": "Mapping ハルシネーション検出者",
       "session_id": "1620332364549745168",
       "status": "started",
-      "state": "IN_PROGRESS"
+      "state": "COMPLETED"
     },
     {
       "specialist_id": "AI-003",
       "name": "Resource ハルシネーション検出者",
       "session_id": "2668125405615082614",
       "status": "started",
-      "state": "IN_PROGRESS"
+      "state": "COMPLETED"
     },
     {
       "specialist_id": "AS-001",
       "name": "イベントループブロッキング検出者",
       "session_id": "8562718573572284501",
       "status": "started",
-      "state": "IN_PROGRESS"
+      "state": "COMPLETED"
     },
     {
       "specialist_id": "TH-001",
       "name": "予測誤差バグ検出者",
       "session_id": "7612589282378191538",
       "status": "started",
-      "state": "IN_PROGRESS"
+      "state": "COMPLETED"
     },
     {
       "specialist_id": "TH-002",
       "name": "信念状態一貫性評価者",
       "session_id": "3011706980402212649",
       "status": "started",
-      "state": "IN_PROGRESS"
+      "state": "COMPLETED"
     }
   ]
 }

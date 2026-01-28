@@ -78,8 +78,13 @@ def get_ki_directories() -> list[Path]:
     return sorted(dirs)
 
 
-def ingest_to_sophia(docs: list[Document]) -> int:
-    """Ingest documents to Sophia index using real embeddings (returns count)."""
+def ingest_to_sophia(docs: list[Document], save_path: str = None) -> int:
+    """Ingest documents to Sophia index using real embeddings (returns count).
+    
+    Args:
+        docs: Documents to ingest
+        save_path: If provided, save the index to this path after ingestion
+    """
     from mekhane.symploke.adapters.embedding_adapter import EmbeddingAdapter
     
     adapter = EmbeddingAdapter(model_name="all-MiniLM-L6-v2")
@@ -88,14 +93,66 @@ def ingest_to_sophia(docs: list[Document]) -> int:
     
     count = index.ingest(docs)
     print(f"Ingested {count} documents to Sophia (real embeddings)")
+    
+    if save_path:
+        adapter.save(save_path)
+        print(f"💾 Saved index to: {save_path}")
+    
     return count
+
+
+def load_sophia_index(load_path: str):
+    """Load a previously saved Sophia index."""
+    from mekhane.symploke.adapters.embedding_adapter import EmbeddingAdapter
+    
+    adapter = EmbeddingAdapter(model_name="all-MiniLM-L6-v2")
+    adapter.load(load_path)
+    print(f"📂 Loaded index from: {load_path} ({adapter.count()} vectors)")
+    return adapter
+
+
+def search_loaded_index(adapter, query: str, top_k: int = 5):
+    """Search using a loaded adapter directly."""
+    # Encode query
+    query_vec = adapter.encode([query])[0]
+    results = adapter.search(query_vec, k=top_k)
+    return results
+
+
+# デフォルトの保存パス
+DEFAULT_INDEX_PATH = Path("/home/laihuip001/oikos/mneme/.hegemonikon/indices/sophia.pkl")
 
 
 def main():
     parser = argparse.ArgumentParser(description="Ingest KIs to Sophia index")
     parser.add_argument("--dry-run", action="store_true", help="Parse only, don't ingest")
+    parser.add_argument("--save", action="store_true", help="Save index after ingestion (default: True)")
+    parser.add_argument("--no-save", action="store_true", help="Don't save index after ingestion")
+    parser.add_argument("--load", action="store_true", help="Load existing index and show stats")
+    parser.add_argument("--search", type=str, help="Search query (requires --load)")
     args = parser.parse_args()
     
+    # Ensure index directory exists
+    DEFAULT_INDEX_PATH.parent.mkdir(parents=True, exist_ok=True)
+    
+    # Load mode
+    if args.load:
+        if not DEFAULT_INDEX_PATH.exists():
+            print(f"❌ Index not found: {DEFAULT_INDEX_PATH}")
+            return
+        adapter = load_sophia_index(str(DEFAULT_INDEX_PATH))
+        
+        if args.search:
+            results = search_loaded_index(adapter, args.search, top_k=5)
+            print(f"\n=== Search: {args.search} ===")
+            for r in results:
+                print(f"Score: {r.score:.3f} | {r.metadata.get('doc_id', 'N/A')}")
+                print(f"  KI: {r.metadata.get('ki_name', 'N/A')}")
+                print(f"  Summary: {r.metadata.get('summary', 'N/A')[:80]}...")
+                print()
+        return
+    
+    # Ingest mode
     ki_dirs = get_ki_directories()
     print(f"Found {len(ki_dirs)} KI directories")
     
@@ -113,9 +170,12 @@ def main():
         print("\n[Dry run] Would ingest documents")
         return
     
-    ingest_to_sophia(all_docs)
+    # Save by default unless --no-save
+    save_path = None if args.no_save else str(DEFAULT_INDEX_PATH)
+    ingest_to_sophia(all_docs, save_path=save_path)
     print("\n✅ Done!")
 
 
 if __name__ == "__main__":
     main()
+

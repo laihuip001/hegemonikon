@@ -42,10 +42,17 @@ class SearchEngine:
         )
     """
     
-    def __init__(self, config: Optional[SearchConfig] = None):
+    def __init__(self, config: Optional[SearchConfig] = None, backlinker=None):
+        """初期化
+        
+        Args:
+            config: 検索設定
+            backlinker: SophiaBacklinker インスタンス (HybridSearch 用)
+        """
         self._config = config or SearchConfig()
         self._indices: Dict[str, DomainIndex] = {}
         self._ranker = Ranker()
+        self._backlinker = backlinker
     
     @property
     def registered_sources(self) -> Set[str]:
@@ -78,16 +85,18 @@ class SearchEngine:
         query: str, 
         sources: Optional[List[str]] = None,
         k: int = 10,
-        weights: Optional[Dict[str, float]] = None
+        weights: Optional[Dict[str, float]] = None,
+        use_hybrid: bool = True,
     ) -> List[IndexedResult]:
         """
-        統合検索
+        統合検索 (HybridSearch 対応)
         
         Args:
             query: 検索クエリ
             sources: 検索対象ソース (None = 全ソース)
             k: 最終取得件数
             weights: ソース別重み (None = デフォルト)
+            use_hybrid: True の場合、バックリンクブーストを適用
         
         Returns:
             リランキング済み IndexedResult のリスト
@@ -107,11 +116,42 @@ class SearchEngine:
             results = index.search(query, k=k * 2)
             source_results[source_name] = results
         
+        # HybridSearch: バックリンクブースト計算
+        backlink_boost = None
+        if use_hybrid and self._backlinker:
+            backlink_boost = self._compute_backlink_boost(source_results)
+        
         # リランキング
         effective_weights = weights or self._config.default_weights
-        ranked = self._ranker.rank(source_results, effective_weights)
+        ranked = self._ranker.rank(source_results, effective_weights, backlink_boost)
         
         return ranked[:k]
+    
+    def _compute_backlink_boost(self, source_results: Dict[str, List[IndexedResult]]) -> Dict[str, float]:
+        """バックリンク数に基づくブースト係数を計算
+        
+        Args:
+            source_results: 検索結果
+            
+        Returns:
+            {doc_id: boost} の辞書
+        """
+        boost_map = {}
+        max_backlinks = 1  # ゼロ除算防止
+        
+        # 全 doc_id のバックリンク数を収集
+        for results in source_results.values():
+            for result in results:
+                backlinks = self._backlinker.get_backlinks(result.doc_id)
+                count = len(backlinks)
+                boost_map[result.doc_id] = count
+                max_backlinks = max(max_backlinks, count)
+        
+        # 正規化: 0.0 ~ 0.5 の範囲にスケーリング
+        for doc_id in boost_map:
+            boost_map[doc_id] = (boost_map[doc_id] / max_backlinks) * 0.5
+        
+        return boost_map
     
     def search_source(
         self, 

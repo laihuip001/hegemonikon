@@ -36,14 +36,17 @@ class Ranker:
     def rank(
         self,
         source_results: Dict[str, List[IndexedResult]],
-        weights: Dict[str, float]
+        weights: Dict[str, float],
+        backlink_boost: Optional[Dict[str, float]] = None,
     ) -> List[IndexedResult]:
         """
-        ソース別結果を統合ランキング
+        ソース別結果を統合ランキング (HybridSearch 対応)
         
         Args:
             source_results: {ソース名: 結果リスト} の辞書
             weights: {ソース名: 重み} の辞書
+            backlink_boost: {doc_id: ブースト係数} の辞書 (オプション)
+                           バックリンク数に応じたスコアブースト
         
         Returns:
             統合・ソート済み IndexedResult のリスト
@@ -77,6 +80,13 @@ class Ranker:
                     normalized_score = result.score
                 
                 weighted_score = normalized_score * weight
+                
+                # HybridSearch: バックリンクブースト適用
+                if backlink_boost and result.doc_id in backlink_boost:
+                    boost = backlink_boost[result.doc_id]
+                    # ブースト係数を 0.0-0.5 に制限して過剰ブースト防止
+                    boost = min(max(boost, 0.0), 0.5)
+                    weighted_score *= (1.0 + boost)
                 
                 # 最低スコアフィルタ
                 if weighted_score >= self._config.min_score:

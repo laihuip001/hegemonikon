@@ -1,10 +1,11 @@
 ---
 doc_id: "OUSIA_SERIES"
-version: "2.1.0"
+version: "2.2.0"
 tier: "KERNEL"
 status: "CANONICAL"
 created: "2026-01-24"
-updated: "2026-01-27"
+updated: "2026-01-28"
+lineage: "FEP 'A Beautiful Loop' (2026-01-28 調査) → O1 recursive self-evidencing 追加"
 ---
 
 > **Kernel Doc Index**: [axiom_hierarchy](axiom_hierarchy.md) | [ousia](ousia.md) ← 📍 | [schema](schema.md)
@@ -53,11 +54,14 @@ O-series: 2 × 2 = 4 定理
 
 ### O1: Noēsis (認識)
 
-> **「世界を理解するための推論」**
+> **「世界を理解するための推論 — Recursive Self-Evidencing」**
 
 - I (推論) × E (認識)
 - 知識獲得のための思考
-- 例: 分析、調査、理論構築
+- **Recursive Self-Evidencing**: 予測誤差を最小化しながら、自己のモデル（信念）を再帰的に更新・証明するループ
+- 例: 分析、調査、理論構築、前提破壊による再構築
+
+> **FEP 対応**: Prior belief P(s) の更新。Phantasia（表象）をVariational parameters として処理し、観測との整合性を最大化する。
 
 ### O2: Boulēsis (意志)
 

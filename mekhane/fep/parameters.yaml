@@ -2,9 +2,14 @@
 # Source: Active Inference Literature Review (2026-01-28)
 # Reference: docs/research/active_inference_parameter_research.md
 
-version: "1.0"
+version: "1.1"
 date: "2026-01-28"
-confidence: "medium-high"
+confidence: "high"  # Cross-validated with 3 independent sources
+
+# Cross-Validation Sources:
+# 1. pymdp Tutorial 2 (two-armed bandit): p_hint=0.7, p_reward=0.8, C=[-4,+2], D=[0.5,0.5]
+# 2. Gijsen et al. (2022) Scientific Reports: λ=preference precision, γ=inverse temperature
+# 3. Da Costa et al. (2020) N&BR: Dirichlet update rule (Eq. 21)
 
 # =============================================================================
 # A Matrix: Observation Likelihood P(o|s)

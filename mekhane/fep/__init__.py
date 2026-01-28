@@ -16,6 +16,12 @@ from .encoding import (
     encode_structured_input,
     decode_observation,
 )
+from .persistence import (
+    save_A,
+    load_A,
+    A_exists,
+    LEARNED_A_PATH,
+)
 
 __all__ = [
     "HegemonikónFEPAgent",
@@ -26,4 +32,8 @@ __all__ = [
     "encode_input",
     "encode_structured_input",
     "decode_observation",
+    "save_A",
+    "load_A",
+    "A_exists",
+    "LEARNED_A_PATH",
 ]

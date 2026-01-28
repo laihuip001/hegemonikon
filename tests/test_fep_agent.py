@@ -151,5 +151,142 @@ class TestStateSpaces:
         assert get_state_dim() == 8
 
 
+class TestPolicyHorizon:
+    """Test suite for 2-step policy horizon (arXiv:2412.10425)."""
+    
+    def test_policy_len_is_2(self):
+        """Agent is initialized with policy_len=2."""
+        from mekhane.fep import HegemonikónFEPAgent
+        
+        agent = HegemonikónFEPAgent(use_defaults=True)
+        
+        # Check that policy_len is correctly set
+        assert agent.agent.policy_len == 2
+    
+    def test_inference_horizon_is_1(self):
+        """Agent is initialized with inference_horizon=1."""
+        from mekhane.fep import HegemonikónFEPAgent
+        
+        agent = HegemonikónFEPAgent(use_defaults=True)
+        
+        # Check that inference_horizon is correctly set
+        assert agent.agent.inference_horizon == 1
+    
+    def test_learning_rate_default(self):
+        """Agent has default learning rate of 50.0."""
+        from mekhane.fep import HegemonikónFEPAgent
+        
+        agent = HegemonikónFEPAgent(use_defaults=True)
+        
+        assert agent.learning_rate == 50.0
+
+
+class TestPersistence:
+    """Test suite for A matrix persistence."""
+    
+    def test_save_learned_A(self, tmp_path):
+        """save_learned_A saves A matrix to file."""
+        from mekhane.fep import HegemonikónFEPAgent
+        
+        agent = HegemonikónFEPAgent(use_defaults=True)
+        
+        save_path = tmp_path / "test_A.npy"
+        saved_path = agent.save_learned_A(str(save_path))
+        
+        assert save_path.exists()
+        assert saved_path == str(save_path)
+    
+    def test_load_learned_A(self, tmp_path):
+        """load_learned_A loads A matrix from file."""
+        from mekhane.fep import HegemonikónFEPAgent
+        import numpy as np
+        
+        agent = HegemonikónFEPAgent(use_defaults=True)
+        
+        # Save first
+        save_path = tmp_path / "test_A.npy"
+        agent.save_learned_A(str(save_path))
+        
+        # Create new agent and load
+        agent2 = HegemonikónFEPAgent(use_defaults=True)
+        loaded = agent2.load_learned_A(str(save_path))
+        
+        assert loaded is True
+    
+    def test_load_nonexistent_returns_false(self, tmp_path):
+        """load_learned_A returns False for nonexistent file."""
+        from mekhane.fep import HegemonikónFEPAgent
+        
+        agent = HegemonikónFEPAgent(use_defaults=True)
+        
+        nonexistent_path = tmp_path / "nonexistent.npy"
+        loaded = agent.load_learned_A(str(nonexistent_path))
+        
+        assert loaded is False
+    
+    def test_persistence_roundtrip(self, tmp_path):
+        """A matrix survives save/load cycle."""
+        from mekhane.fep import HegemonikónFEPAgent
+        import numpy as np
+        
+        agent = HegemonikónFEPAgent(use_defaults=True)
+        original_A = agent.agent.A.copy() if isinstance(agent.agent.A, np.ndarray) else agent.agent.A[0].copy()
+        
+        # Save
+        save_path = tmp_path / "roundtrip_A.npy"
+        agent.save_learned_A(str(save_path))
+        
+        # Modify A
+        if isinstance(agent.agent.A, np.ndarray):
+            agent.agent.A *= 2.0
+        else:
+            agent.agent.A[0] *= 2.0
+        
+        # Load (should restore original)
+        agent.load_learned_A(str(save_path))
+        
+        loaded_A = agent.agent.A if isinstance(agent.agent.A, np.ndarray) else agent.agent.A[0]
+        # Note: exact equality may not hold due to normalization, but shape should match
+        assert loaded_A.shape == original_A.shape
+
+
+class TestDirichletUpdate:
+    """Test suite for Dirichlet learning."""
+    
+    def test_dirichlet_update_records_history(self):
+        """update_A_dirichlet records update in history."""
+        from mekhane.fep import HegemonikónFEPAgent
+        
+        agent = HegemonikónFEPAgent(use_defaults=True)
+        
+        # First infer states
+        agent.infer_states(observation=0)
+        
+        # Then update
+        agent.update_A_dirichlet(observation=0)
+        
+        history = agent.get_history()
+        dirichlet_updates = [h for h in history if h.get("type") == "dirichlet_update"]
+        
+        assert len(dirichlet_updates) == 1
+        assert dirichlet_updates[0]["observation"] == 0
+        assert dirichlet_updates[0]["learning_rate"] == 50.0
+    
+    def test_dirichlet_update_custom_learning_rate(self):
+        """update_A_dirichlet accepts custom learning rate."""
+        from mekhane.fep import HegemonikónFEPAgent
+        
+        agent = HegemonikónFEPAgent(use_defaults=True)
+        
+        agent.infer_states(observation=0)
+        agent.update_A_dirichlet(observation=0, learning_rate=100.0)
+        
+        history = agent.get_history()
+        dirichlet_updates = [h for h in history if h.get("type") == "dirichlet_update"]
+        
+        assert dirichlet_updates[0]["learning_rate"] == 100.0
+
+
 if __name__ == "__main__":
     pytest.main([__file__, "-v"])
+

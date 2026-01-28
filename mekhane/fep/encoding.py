@@ -420,3 +420,80 @@ def generate_fep_feedback_markdown(
 │ 推奨: {action_name} ({action_prob:.0f}%)
 │   {guidance}
 └────────────────────────────────────────────┘"""
+
+
+# =============================================================================
+# FEP with Learning & Persistence
+# =============================================================================
+
+def run_fep_with_learning(
+    obs_tuple: Tuple[int, int, int],
+    a_matrix_path: str = "/home/laihuip001/oikos/mneme/.hegemonikon/fep/learned_A.npy",
+    learning_rate: float = 50.0,
+) -> Dict:
+    """Execute FEP inference + Dirichlet learning + persistence in one flow.
+    
+    This function handles the complete FEP cycle:
+    1. Load learned A-matrix (if exists)
+    2. Run inference step
+    3. Update A-matrix with Dirichlet learning
+    4. Save updated A-matrix
+    
+    Args:
+        obs_tuple: Observation tuple (context_idx, urgency_idx, confidence_idx)
+        a_matrix_path: Path to save/load learned A-matrix
+        learning_rate: Dirichlet update learning rate (default: 50.0)
+    
+    Returns:
+        Dict with step() results + should_epoche flag
+    
+    Example:
+        >>> from mekhane.fep.encoding import encode_noesis_output, run_fep_with_learning
+        >>> obs = encode_noesis_output(0.85, [{"zone": "A"}])
+        >>> result = run_fep_with_learning(obs)
+        >>> print(result["action_name"], result["should_epoche"])
+    """
+    from mekhane.fep import HegemonikónFEPAgent
+    import os
+    
+    agent = HegemonikónFEPAgent(use_defaults=True)
+    
+    # 1. Load learned A-Matrix if exists
+    agent.load_learned_A(a_matrix_path)
+    
+    # 2. Run inference
+    flat_obs = obs_tuple[0] + 2 * obs_tuple[1] + obs_tuple[2]
+    result = agent.step(observation=flat_obs)
+    
+    # 3. Dirichlet update
+    agent.update_A_dirichlet(observation=flat_obs, learning_rate=learning_rate)
+    
+    # 4. Save
+    os.makedirs(os.path.dirname(a_matrix_path), exist_ok=True)
+    agent.save_learned_A(a_matrix_path)
+    
+    # 5. Add Auto-Epochē flag
+    result["should_epoche"] = result.get("entropy", 0) >= 2.0
+    
+    return result
+
+
+def should_trigger_epoche(agent_result: Dict, threshold: float = 2.0) -> bool:
+    """Check if Epochē should be triggered based on entropy.
+    
+    High entropy indicates high uncertainty in beliefs, suggesting
+    that judgment should be suspended (/epo).
+    
+    Args:
+        agent_result: Result dict from HegemonikónFEPAgent.step()
+        threshold: Entropy threshold (default: 2.0)
+    
+    Returns:
+        True if entropy >= threshold (Epochē recommended)
+    
+    Example:
+        >>> if should_trigger_epoche(result):
+        ...     print("⚠️ 高エントロピー → /epo 推奨")
+    """
+    return agent_result.get("entropy", 0.0) >= threshold
+

@@ -6,6 +6,9 @@ Async client for Google Jules API with:
 - Session creation and polling
 - Batch execution with semaphore control
 - Exponential backoff for rate limiting
+- Unified HTTP layer with retry support
+
+Refactored based on 58 Jules Synedrion reviews.
 
 Usage:
     client = JulesClient(api_key="YOUR_KEY")
@@ -14,12 +17,42 @@ Usage:
 
 import asyncio
 import aiohttp
+import functools
+import logging
 import os
 import time
-from dataclasses import dataclass
+import uuid
+from dataclasses import dataclass, field
 from enum import Enum
 from typing import Optional
 
+# Configure module logger
+logger = logging.getLogger(__name__)
+
+
+# ============ Exceptions ============
+
+class JulesError(Exception):
+    """Base exception for Jules client errors."""
+    pass
+
+
+class RateLimitError(JulesError):
+    """Raised when API rate limit is exceeded."""
+    def __init__(self, message: str = "Rate limit exceeded", retry_after: int | None = None):
+        super().__init__(message)
+        self.retry_after = retry_after
+
+
+class UnknownStateError(JulesError):
+    """Raised when API returns an unknown session state."""
+    def __init__(self, state: str, session_id: str):
+        super().__init__(f"Unknown session state '{state}' for session {session_id}")
+        self.state = state
+        self.session_id = session_id
+
+
+# ============ Enums ============
 
 class SessionState(Enum):
     """Jules session states."""
@@ -34,13 +67,21 @@ class SessionState(Enum):
 
 
 def parse_state(state_str: str) -> SessionState:
-    """Parse state string, returning UNKNOWN for unrecognized states."""
+    """Parse state string, returning UNKNOWN for unrecognized states.
+    
+    Warning: Unknown states may indicate new terminal states (e.g., CANCELLED)
+    that should stop polling. Check logs for unknown state occurrences.
+    """
     try:
         return SessionState(state_str)
     except ValueError:
-        # Map unknown states to IN_PROGRESS (likely active)
-        return SessionState.IN_PROGRESS
+        # Log unknown states for monitoring - may be new terminal states
+        logger.warning(f"Unknown Jules API state encountered: '{state_str}'. "
+                      f"This may indicate a new terminal state requiring code update.")
+        return SessionState.UNKNOWN
 
+
+# ============ Data Types ============
 
 @dataclass
 class JulesSession:
@@ -52,7 +93,82 @@ class JulesSession:
     source: str
     pull_request_url: Optional[str] = None
     error: Optional[str] = None
+    error_type: Optional[str] = None  # Preserves exception type for debugging
 
+
+@dataclass
+class JulesResult:
+    """
+    Result wrapper for batch operations.
+    
+    Provides explicit success/failure representation instead of
+    using empty IDs for failed sessions. See cl-003 review.
+    """
+    session: JulesSession | None = None
+    error: Exception | None = None
+    task: dict = field(default_factory=dict)
+    
+    @property
+    def is_success(self) -> bool:
+        return self.error is None and self.session is not None
+    
+    @property
+    def is_failed(self) -> bool:
+        return not self.is_success
+
+
+# ============ Retry Decorator ============
+
+def with_retry(
+    max_attempts: int = 3,
+    backoff_factor: float = 2.0,
+    initial_delay: float = 1.0,
+    max_delay: float = 60.0,
+    retryable_exceptions: tuple = (RateLimitError, aiohttp.ClientError),
+):
+    """
+    Decorator for async functions with exponential backoff retry.
+    
+    Args:
+        max_attempts: Maximum number of attempts
+        backoff_factor: Multiplier for delay between retries
+        initial_delay: Starting delay in seconds
+        max_delay: Maximum delay cap
+        retryable_exceptions: Tuple of exceptions to retry on
+    """
+    def decorator(func):
+        @functools.wraps(func)
+        async def wrapper(*args, **kwargs):
+            delay = initial_delay
+            last_exception = None
+            
+            for attempt in range(max_attempts):
+                try:
+                    return await func(*args, **kwargs)
+                except retryable_exceptions as e:
+                    last_exception = e
+                    if attempt == max_attempts - 1:
+                        raise
+                    
+                    # Use retry_after if available
+                    if isinstance(e, RateLimitError) and e.retry_after:
+                        wait_time = e.retry_after
+                    else:
+                        wait_time = min(delay, max_delay)
+                    
+                    logger.warning(
+                        f"Retry {attempt + 1}/{max_attempts} for {func.__name__}: "
+                        f"{e}. Waiting {wait_time:.1f}s"
+                    )
+                    await asyncio.sleep(wait_time)
+                    delay *= backoff_factor
+            
+            raise last_exception  # Should not reach here
+        return wrapper
+    return decorator
+
+
+# ============ Client ============
 
 class JulesClient:
     """
@@ -70,12 +186,20 @@ class JulesClient:
     POLL_INTERVAL = 5  # seconds
     MAX_CONCURRENT = 60  # Ultra plan limit
     
-    def __init__(self, api_key: Optional[str] = None):
+    # Terminal states that stop polling
+    TERMINAL_STATES = frozenset({SessionState.COMPLETED, SessionState.FAILED})
+    
+    def __init__(
+        self,
+        api_key: Optional[str] = None,
+        session: Optional[aiohttp.ClientSession] = None,
+    ):
         """
         Initialize Jules client.
         
         Args:
             api_key: Jules API key. If None, reads from JULES_API_KEY env var.
+            session: Optional shared aiohttp session for connection reuse.
         """
         self.api_key = api_key or os.environ.get("JULES_API_KEY")
         if not self.api_key:
@@ -85,13 +209,92 @@ class JulesClient:
             "X-Goog-Api-Key": self.api_key,
             "Content-Type": "application/json"
         }
+        self._shared_session = session
+        self._owned_session: Optional[aiohttp.ClientSession] = None
     
+    async def __aenter__(self):
+        """Context manager entry - creates shared session if needed."""
+        if self._shared_session is None:
+            self._owned_session = aiohttp.ClientSession()
+        return self
+    
+    async def __aexit__(self, exc_type, exc_val, exc_tb):
+        """Context manager exit - closes owned session."""
+        if self._owned_session:
+            await self._owned_session.close()
+            self._owned_session = None
+    
+    @property
+    def _session(self) -> aiohttp.ClientSession:
+        """Get the active session (shared or owned)."""
+        return self._shared_session or self._owned_session or aiohttp.ClientSession()
+    
+    async def _request(
+        self,
+        method: str,
+        endpoint: str,
+        *,
+        json: dict | None = None,
+    ) -> dict:
+        """
+        Unified HTTP request handler.
+        
+        Centralizes error handling and rate limit detection.
+        DRY fix per ai-006 review.
+        
+        Args:
+            method: HTTP method (GET, POST, etc.)
+            endpoint: API endpoint path
+            json: Optional JSON payload
+            
+        Returns:
+            Parsed JSON response
+            
+        Raises:
+            RateLimitError: If rate limited
+            aiohttp.ClientResponseError: For other HTTP errors
+        """
+        url = f"{self.BASE_URL}/{endpoint}"
+        
+        # Create session if not in context manager
+        session = self._shared_session or self._owned_session
+        close_after = False
+        if session is None:
+            session = aiohttp.ClientSession()
+            close_after = True
+        
+        try:
+            async with session.request(
+                method, url,
+                headers=self._headers,
+                json=json
+            ) as resp:
+                if resp.status == 429:
+                    retry_after = resp.headers.get("Retry-After")
+                    raise RateLimitError(
+                        f"Rate limit exceeded for {endpoint}",
+                        retry_after=int(retry_after) if retry_after else None
+                    )
+                
+                # Include response body in error for debugging
+                if not resp.ok:
+                    body = await resp.text()
+                    logger.error(f"API error {resp.status}: {body[:200]}")
+                
+                resp.raise_for_status()
+                return await resp.json()
+        finally:
+            if close_after:
+                await session.close()
+    
+    @with_retry(max_attempts=3, retryable_exceptions=(RateLimitError, aiohttp.ClientError))
     async def create_session(
         self,
         prompt: str,
         source: str,
         branch: str = "main",
-        auto_approve: bool = True
+        auto_approve: bool = True,
+        automation_mode: str = "AUTO_CREATE_PR",
     ) -> JulesSession:
         """
         Create a new Jules session.
@@ -101,6 +304,7 @@ class JulesClient:
             source: Repository source (e.g., "sources/github/owner/repo")
             branch: Starting branch (default: main)
             auto_approve: Skip plan approval step
+            automation_mode: Automation mode (default: AUTO_CREATE_PR)
             
         Returns:
             JulesSession with session ID and initial state
@@ -113,29 +317,21 @@ class JulesClient:
                     "startingBranch": branch
                 }
             },
-            "automationMode": "AUTO_CREATE_PR",
+            "automationMode": automation_mode,
             "requirePlanApproval": not auto_approve
         }
         
-        async with aiohttp.ClientSession() as session:
-            async with session.post(
-                f"{self.BASE_URL}/sessions",
-                headers=self._headers,
-                json=payload
-            ) as resp:
-                if resp.status == 429:
-                    raise RateLimitError("Rate limit exceeded")
-                resp.raise_for_status()
-                data = await resp.json()
-                
-                return JulesSession(
-                    id=data["id"],
-                    name=data["name"],
-                    state=parse_state(data.get("state", "PLANNING")),
-                    prompt=prompt,
-                    source=source
-                )
+        data = await self._request("POST", "sessions", json=payload)
+        
+        return JulesSession(
+            id=data["id"],
+            name=data["name"],
+            state=parse_state(data.get("state", "PLANNING")),
+            prompt=prompt,
+            source=source
+        )
     
+    @with_retry(max_attempts=3, retryable_exceptions=(RateLimitError, aiohttp.ClientError))
     async def get_session(self, session_id: str) -> JulesSession:
         """
         Get session status.
@@ -146,38 +342,31 @@ class JulesClient:
         Returns:
             Updated JulesSession
         """
-        async with aiohttp.ClientSession() as session:
-            async with session.get(
-                f"{self.BASE_URL}/sessions/{session_id}",
-                headers=self._headers
-            ) as resp:
-                if resp.status == 429:
-                    raise RateLimitError("Rate limit exceeded")
-                resp.raise_for_status()
-                data = await resp.json()
-                
-                # Extract PR URL if available
-                pr_url = None
-                outputs = data.get("outputs", [])
-                if outputs:
-                    pr = outputs[0].get("pullRequest", {})
-                    pr_url = pr.get("url")
-                
-                return JulesSession(
-                    id=data["id"],
-                    name=data["name"],
-                    state=parse_state(data.get("state", "PLANNING")),
-                    prompt=data.get("prompt", ""),
-                    source=data.get("sourceContext", {}).get("source", ""),
-                    pull_request_url=pr_url,
-                    error=data.get("error")
-                )
+        data = await self._request("GET", f"sessions/{session_id}")
+        
+        # Extract PR URL if available
+        pr_url = None
+        outputs = data.get("outputs", [])
+        if outputs:
+            pr = outputs[0].get("pullRequest", {})
+            pr_url = pr.get("url")
+        
+        return JulesSession(
+            id=data["id"],
+            name=data["name"],
+            state=parse_state(data.get("state", "PLANNING")),
+            prompt=data.get("prompt", ""),
+            source=data.get("sourceContext", {}).get("source", ""),
+            pull_request_url=pr_url,
+            error=data.get("error")
+        )
     
     async def poll_session(
         self,
         session_id: str,
         timeout: int = DEFAULT_TIMEOUT,
-        poll_interval: int = POLL_INTERVAL
+        poll_interval: int = POLL_INTERVAL,
+        fail_on_unknown: bool = True,
     ) -> JulesSession:
         """
         Poll session until completion or timeout.
@@ -186,30 +375,39 @@ class JulesClient:
             session_id: Session ID to poll
             timeout: Maximum wait time in seconds
             poll_interval: Seconds between polls
+            fail_on_unknown: If True, raise on UNKNOWN state (fail-fast)
             
         Returns:
             Final JulesSession state
             
         Raises:
             TimeoutError: If session doesn't complete within timeout
+            UnknownStateError: If API returns unknown state (when fail_on_unknown=True)
         """
         start_time = time.time()
-        backoff = poll_interval
+        consecutive_unknown = 0
         
         while time.time() - start_time < timeout:
-            try:
-                session = await self.get_session(session_id)
+            session = await self.get_session(session_id)
+            
+            # Terminal state - return immediately
+            if session.state in self.TERMINAL_STATES:
+                return session
+            
+            # Unknown state handling (th-001 fix)
+            if session.state == SessionState.UNKNOWN:
+                consecutive_unknown += 1
+                logger.warning(f"Session {session_id} in UNKNOWN state ({consecutive_unknown}x)")
                 
-                if session.state in (SessionState.COMPLETED, SessionState.FAILED):
-                    return session
-                
-                await asyncio.sleep(backoff)
-                backoff = min(backoff, poll_interval)  # Reset on success
-                
-            except RateLimitError:
-                # Exponential backoff on rate limit
-                backoff = min(backoff * 2, 60)
-                await asyncio.sleep(backoff)
+                if consecutive_unknown >= 3 and fail_on_unknown:
+                    raise UnknownStateError(
+                        state=session.state.value,
+                        session_id=session_id
+                    )
+            else:
+                consecutive_unknown = 0
+            
+            await asyncio.sleep(poll_interval)
         
         raise TimeoutError(f"Session {session_id} did not complete within {timeout}s")
     
@@ -241,36 +439,49 @@ class JulesClient:
         self,
         tasks: list[dict],
         max_concurrent: int = 30
-    ) -> list[JulesSession]:
+    ) -> list[JulesResult]:
         """
         Execute multiple tasks in parallel with concurrency control.
+        
+        Returns JulesResult objects with explicit success/failure representation
+        instead of using empty IDs (cl-003 fix).
         
         Args:
             tasks: List of dicts with 'prompt', 'source', optional 'branch'
             max_concurrent: Maximum concurrent sessions (default: 30)
             
         Returns:
-            List of JulesSession results (may include failed sessions)
+            List of JulesResult objects
         """
         semaphore = asyncio.Semaphore(max_concurrent)
         
-        async def bounded_execute(task: dict) -> JulesSession:
+        async def bounded_execute(task: dict) -> JulesResult:
             async with semaphore:
                 try:
-                    return await self.create_and_poll(
+                    session = await self.create_and_poll(
                         prompt=task["prompt"],
                         source=task["source"],
                         branch=task.get("branch", "main")
                     )
+                    return JulesResult(session=session, task=task)
                 except Exception as e:
-                    # Return failed session instead of raising
-                    return JulesSession(
-                        id="",
-                        name="",
-                        state=SessionState.FAILED,
-                        prompt=task["prompt"],
-                        source=task["source"],
-                        error=str(e)
+                    # Note: Python 3.8+ handles CancelledError as BaseException,
+                    # so it properly propagates and allows cancellation (as-003 review)
+                    # Return failed session with traceable ID and error type
+                    error_id = f"error-{uuid.uuid4().hex[:8]}"
+                    logger.error(f"Task failed [{error_id}]: {type(e).__name__}: {e}")
+                    return JulesResult(
+                        session=JulesSession(
+                            id=error_id,
+                            name="",
+                            state=SessionState.FAILED,
+                            prompt=task["prompt"],
+                            source=task["source"],
+                            error=str(e),
+                            error_type=type(e).__name__
+                        ),
+                        error=e,
+                        task=task
                     )
         
         results = await asyncio.gather(*[
@@ -280,13 +491,10 @@ class JulesClient:
         return list(results)
 
 
-class RateLimitError(Exception):
-    """Raised when API rate limit is exceeded."""
-    pass
-
-
 # ============ CLI for testing ============
-if __name__ == "__main__":
+
+def main():
+    """CLI entry point for testing."""
     import argparse
     
     parser = argparse.ArgumentParser(description="Jules API Client")
@@ -305,10 +513,14 @@ if __name__ == "__main__":
         
         try:
             client = JulesClient(api_key)
-            print(f"✅ Client initialized")
+            print("✅ Client initialized")
             print(f"   API Key: {api_key[:8]}...{api_key[-4:]}")
             print(f"   Base URL: {client.BASE_URL}")
             print(f"   Max Concurrent: {client.MAX_CONCURRENT}")
         except Exception as e:
             print(f"❌ Error: {e}")
             exit(1)
+
+
+if __name__ == "__main__":
+    main()

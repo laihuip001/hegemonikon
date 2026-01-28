@@ -112,6 +112,28 @@ async def list_tools():
                 "type": "object",
                 "properties": {}
             }
+        ),
+        Tool(
+            name="backlinks",
+            description="Get backlinks for a Knowledge Item. Shows which KIs reference the given one via [[wikilink]] syntax.",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "ki_name": {
+                        "type": "string",
+                        "description": "Name of the Knowledge Item to get backlinks for"
+                    }
+                },
+                "required": ["ki_name"]
+            }
+        ),
+        Tool(
+            name="graph_stats",
+            description="Get knowledge graph statistics (nodes, edges, most linked items)",
+            inputSchema={
+                "type": "object",
+                "properties": {}
+            }
         )
     ]
 
@@ -247,6 +269,71 @@ async def call_tool(name: str, arguments: dict):
         except Exception as e:
             log(f"Stats error: {e}")
             return [TextContent(type="text", text=f"Error getting stats: {str(e)}")]
+    
+    elif name == "backlinks":
+        ki_name = arguments.get("ki_name", "")
+        if not ki_name:
+            return [TextContent(type="text", text="Error: ki_name is required")]
+        
+        try:
+            with StdoutSuppressor():
+                from mekhane.symploke.sophia_backlinker import SophiaBacklinker
+            
+            log(f"Getting backlinks for: {ki_name}")
+            backlinker = SophiaBacklinker()
+            backlinker.build_graph()
+            
+            backlinks = backlinker.get_backlinks(ki_name)
+            outlinks = backlinker.get_outlinks(ki_name)
+            
+            output_lines = [f"# Backlinks: {ki_name}\n"]
+            
+            if backlinks:
+                output_lines.append(f"## ← Backlinks ({len(backlinks)})")
+                for link in sorted(backlinks):
+                    output_lines.append(f"- {link}")
+            else:
+                output_lines.append("No backlinks found.")
+            
+            output_lines.append("")
+            
+            if outlinks:
+                output_lines.append(f"## → Outlinks ({len(outlinks)})")
+                for link in sorted(outlinks):
+                    output_lines.append(f"- {link}")
+            
+            return [TextContent(type="text", text="\n".join(output_lines))]
+            
+        except Exception as e:
+            log(f"Backlinks error: {e}")
+            return [TextContent(type="text", text=f"Error: {str(e)}")]
+    
+    elif name == "graph_stats":
+        try:
+            with StdoutSuppressor():
+                from mekhane.symploke.sophia_backlinker import SophiaBacklinker
+            
+            log("Getting graph stats...")
+            backlinker = SophiaBacklinker()
+            backlinker.build_graph()
+            stats = backlinker.get_stats()
+            
+            output_lines = ["# Knowledge Graph Statistics\n"]
+            output_lines.append(f"- **Nodes**: {stats['nodes']}")
+            output_lines.append(f"- **Edges**: {stats['edges']}")
+            output_lines.append(f"- **Isolated**: {stats['isolated']}")
+            
+            if stats['most_linked']:
+                output_lines.append("\n## Most Linked")
+                for name, count in stats['most_linked']:
+                    if count > 0:
+                        output_lines.append(f"- **{name}**: {count} backlinks")
+            
+            return [TextContent(type="text", text="\n".join(output_lines))]
+            
+        except Exception as e:
+            log(f"Graph stats error: {e}")
+            return [TextContent(type="text", text=f"Error: {str(e)}")]
     
     else:
         return [TextContent(type="text", text=f"Unknown tool: {name}")]

@@ -59,6 +59,19 @@ updated: "2026-01-27"
 
 ---
 
+## Stoic-FEP Correspondence
+
+ストア派認知理論と自由エネルギー原理の対応関係:
+
+| ストア派概念 | FEP 対応 | Hegemonikón 実装 | 数学的表現 |
+|:-------------|:---------|:-----------------|:-----------|
+| **Phantasia** (表象) | Prior belief | O1 Noēsis | $P(s)$ |
+| **Synkatathesis** (同意) | Posterior update | O1 (Recursive Self-Evidencing) | $Q(s) \leftarrow P(o\|s)$ |
+| **Hormē** (衝動) | Action selection | O4 Energeia | $a^* \in A$ |
+| **Prohairesis** (選択) | Policy selection | O2 Boulēsis | $\pi^* = \arg\min G(\pi)$ |
+
+> **実装**: `mekhane/fep/fep_agent.py` — pymdp Active Inference 統合
+
 ## 4層アーキテクチャ
 
 | 層 | 位置 | 役割 |

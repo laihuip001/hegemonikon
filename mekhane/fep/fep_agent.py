@@ -93,62 +93,184 @@ class HegemonikónFEPAgent:
         self._history: List[Dict[str, Any]] = []
     
     def _default_A(self) -> np.ndarray:
-        """Generate default observation likelihood matrix.
+        """Generate Hegemonikón-optimized observation likelihood matrix.
         
-        Simple mapping: clear phantasia -> clear context observation
+        Maps hidden states to expected observations based on Stoic philosophy:
+        - Clear phantasia → clear context observation
+        - Granted assent → high confidence observation
+        - Active hormē → higher urgency observation
+        
+        Returns:
+            A matrix of shape (num_obs, num_states)
         """
-        num_obs = sum(self.obs_dims.values())
+        # Observation order: context(2) + urgency(3) + confidence(3) = 8
+        num_obs = sum(self.obs_dims.values())  # 8
         A = np.zeros((num_obs, self.state_dim))
         
-        # Simplified: identity-like mapping for demonstration
-        for i in range(self.state_dim):
-            # Distribute probability across observation space
-            obs_idx = i % num_obs
-            A[obs_idx, i] = 0.8
-            A[(obs_idx + 1) % num_obs, i] = 0.2
+        # Iterate through all 8 hidden states
+        for state_idx in range(self.state_dim):
+            phantasia, assent, horme = index_to_state(state_idx)
+            
+            obs_idx = 0  # Running observation index
+            
+            # Context observation (indices 0-1): depends on phantasia
+            if phantasia == "clear":
+                A[1, state_idx] = 0.9  # clear context
+                A[0, state_idx] = 0.1  # ambiguous
+            else:  # uncertain
+                A[0, state_idx] = 0.7  # ambiguous
+                A[1, state_idx] = 0.3  # clear
+            obs_idx += 2
+            
+            # Urgency observation (indices 2-4): depends on hormē
+            if horme == "active":
+                A[obs_idx + 0, state_idx] = 0.1  # low
+                A[obs_idx + 1, state_idx] = 0.3  # medium
+                A[obs_idx + 2, state_idx] = 0.6  # high
+            else:  # passive
+                A[obs_idx + 0, state_idx] = 0.6  # low
+                A[obs_idx + 1, state_idx] = 0.3  # medium
+                A[obs_idx + 2, state_idx] = 0.1  # high
+            obs_idx += 3
+            
+            # Confidence observation (indices 5-7): depends on assent
+            if assent == "granted":
+                A[obs_idx + 0, state_idx] = 0.1  # low
+                A[obs_idx + 1, state_idx] = 0.2  # medium
+                A[obs_idx + 2, state_idx] = 0.7  # high
+            else:  # withheld (Epochē)
+                A[obs_idx + 0, state_idx] = 0.5  # low
+                A[obs_idx + 1, state_idx] = 0.4  # medium
+                A[obs_idx + 2, state_idx] = 0.1  # high
         
         # Normalize columns
         A = A / A.sum(axis=0, keepdims=True)
         return A
     
     def _default_B(self) -> np.ndarray:
-        """Generate default state transition matrix.
+        """Generate Hegemonikón-optimized state transition matrix.
         
-        Actions: 0=observe, 1=act
+        Actions:
+        - 0: observe (O1 Noēsis) → clarifies phantasia, tends toward passive
+        - 1: act (O4 Energeia) → grants assent, activates hormē
+        
+        Returns:
+            B matrix of shape (num_states, num_states, num_actions)
         """
         num_actions = 2
         B = np.zeros((self.state_dim, self.state_dim, num_actions))
         
+        for from_idx in range(self.state_dim):
+            from_p, from_a, from_h = index_to_state(from_idx)
+            
+            for to_idx in range(self.state_dim):
+                to_p, to_a, to_h = index_to_state(to_idx)
+                
+                # Action 0: observe (clarify, suspend, calm)
+                p_observe = 1.0
+                if from_p == "uncertain" and to_p == "clear":
+                    p_observe *= 0.6  # Observation clarifies
+                elif from_p == "clear" and to_p == "clear":
+                    p_observe *= 0.8  # Clarity maintained
+                elif from_p == "uncertain" and to_p == "uncertain":
+                    p_observe *= 0.4
+                else:
+                    p_observe *= 0.1
+                
+                if from_a == "granted" and to_a == "withheld":
+                    p_observe *= 0.3  # Observation can induce Epochē
+                elif to_a == "withheld":
+                    p_observe *= 0.6  # Tends toward suspension
+                else:
+                    p_observe *= 0.4
+                
+                if to_h == "passive":
+                    p_observe *= 0.7  # Observation calms
+                else:
+                    p_observe *= 0.3
+                
+                B[to_idx, from_idx, 0] = p_observe
+                
+                # Action 1: act (commit, engage)
+                p_act = 1.0
+                if to_p == from_p:
+                    p_act *= 0.6  # Phantasia unchanged
+                elif to_p == "clear":
+                    p_act *= 0.3  # Action may clarify
+                else:
+                    p_act *= 0.1
+                
+                if to_a == "granted":
+                    p_act *= 0.7  # Acting implies assent
+                else:
+                    p_act *= 0.3
+                
+                if to_h == "active":
+                    p_act *= 0.8  # Action activates
+                else:
+                    p_act *= 0.2
+                
+                B[to_idx, from_idx, 1] = p_act
+        
+        # Normalize columns for each action
         for a in range(num_actions):
-            # Default: slight tendency to stay in same state
-            B[:, :, a] = np.eye(self.state_dim) * 0.7
-            # Add some transition probability
-            B[:, :, a] += 0.3 / self.state_dim
-            # Normalize columns
-            B[:, :, a] = B[:, :, a] / B[:, :, a].sum(axis=0, keepdims=True)
+            col_sums = B[:, :, a].sum(axis=0, keepdims=True)
+            col_sums[col_sums == 0] = 1  # Avoid division by zero
+            B[:, :, a] = B[:, :, a] / col_sums
         
         return B
     
     def _default_C(self) -> np.ndarray:
-        """Generate default preference vector.
+        """Generate Hegemonikón-optimized preference vector.
         
-        Prefers clear context, high confidence.
+        Based on PREFERENCES from state_spaces.py:
+        - Clear context: +2.0 (Zero Entropy principle)
+        - Ambiguous context: -2.0
+        - High confidence: +1.5
+        - Low confidence: -1.0 (Epochē trigger)
+        
+        Returns:
+            C vector of shape (num_obs,)
         """
-        num_obs = sum(self.obs_dims.values())
-        C = np.zeros(num_obs)
+        from .state_spaces import PREFERENCES
         
-        # Simple preference: prefer higher observation indices
-        for i in range(num_obs):
-            C[i] = i * 0.5
+        C = []
+        for modality, values in OBSERVATION_MODALITIES.items():
+            if modality in PREFERENCES:
+                for obs in values:
+                    C.append(PREFERENCES[modality].get(obs, 0.0))
+            else:
+                C.extend([0.0] * len(values))
         
-        return C
+        return np.array(C, dtype=np.float64)
     
     def _default_D(self) -> np.ndarray:
-        """Generate default initial state belief.
+        """Generate Hegemonikón-optimized initial state belief.
         
-        Uniform prior (maximum entropy).
+        Prior: Slightly prefers uncertain phantasia (epistemic humility),
+        withheld assent (Epochē default), and passive hormē (prudence).
+        
+        Returns:
+            D vector of shape (num_states,)
         """
-        return np.ones(self.state_dim) / self.state_dim
+        D = np.zeros(self.state_dim)
+        
+        for idx in range(self.state_dim):
+            phantasia, assent, horme = index_to_state(idx)
+            
+            prob = 1.0
+            # Epistemic humility: slightly prefer uncertain initially
+            prob *= 0.6 if phantasia == "uncertain" else 0.4
+            # Epochē default: prefer withheld assent
+            prob *= 0.6 if assent == "withheld" else 0.4
+            # Prudence: prefer passive initially
+            prob *= 0.6 if horme == "passive" else 0.4
+            
+            D[idx] = prob
+        
+        # Normalize
+        D = D / D.sum()
+        return D
     
     def infer_states(self, observation: int) -> Dict[str, Any]:
         """O1 Noēsis: Update beliefs based on new observation.

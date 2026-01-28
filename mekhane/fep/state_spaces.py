@@ -121,3 +121,83 @@ def index_to_state(idx: int) -> tuple:
     p_idx = idx // (h_size * a_size)
     
     return (PHANTASIA_STATES[p_idx], ASSENT_STATES[a_idx], HORME_STATES[h_idx])
+
+
+def encode_observation(
+    context_clarity: float,
+    urgency: float,
+    confidence: float,
+) -> int:
+    """Encode LLM-derived metrics into observation index.
+    
+    Following arXiv:2412.10425 pattern: LLM generates structured evaluation,
+    which is then discretized into observation space for Active Inference.
+    
+    Args:
+        context_clarity: 0.0-1.0 (0=ambiguous, 1=clear)
+        urgency: 0.0-1.0 (0=low, 1=high)
+        confidence: 0.0-1.0 (0=low, 1=high)
+        
+    Returns:
+        Flat observation index for pymdp
+        
+    Example:
+        >>> # From LLM self-evaluation JSON
+        >>> obs = encode_observation(context_clarity=0.8, urgency=0.6, confidence=0.9)
+        >>> agent.step(obs)
+    """
+    # Discretize context (2 levels)
+    context_idx = 1 if context_clarity >= 0.5 else 0
+    
+    # Discretize urgency (3 levels)
+    if urgency < 0.33:
+        urgency_idx = 0  # low
+    elif urgency < 0.66:
+        urgency_idx = 1  # medium
+    else:
+        urgency_idx = 2  # high
+    
+    # Discretize confidence (3 levels)
+    if confidence < 0.33:
+        confidence_idx = 0  # low
+    elif confidence < 0.66:
+        confidence_idx = 1  # medium
+    else:
+        confidence_idx = 2  # high
+    
+    # Compute flat observation index
+    # Order: context(2) + urgency(3) + confidence(3) = 8 total observations
+    # Index = context_idx * 9 + urgency_idx * 3 + confidence_idx
+    # But pymdp uses single modality, so we flatten differently:
+    # observation = context_offset + urgency_offset + confidence_offset
+    
+    # Return as tuple for multi-modality (context_idx, 2 + urgency_idx, 5 + confidence_idx)
+    # Or as flat index for single-modality: use weighted combination
+    return context_idx + (urgency_idx * 2) + (confidence_idx * 6)
+
+
+# Observation JSON schema for LLM evaluation (arXiv:2412.10425 pattern)
+OBSERVATION_SCHEMA = {
+    "type": "object",
+    "properties": {
+        "context_clarity": {
+            "type": "number",
+            "minimum": 0.0,
+            "maximum": 1.0,
+            "description": "How clear is the current context? (0=ambiguous, 1=clear)"
+        },
+        "urgency": {
+            "type": "number",
+            "minimum": 0.0,
+            "maximum": 1.0,
+            "description": "How urgent is action? (0=not urgent, 1=very urgent)"
+        },
+        "confidence": {
+            "type": "number",
+            "minimum": 0.0,
+            "maximum": 1.0,
+            "description": "Confidence in current understanding? (0=low, 1=high)"
+        }
+    },
+    "required": ["context_clarity", "urgency", "confidence"]
+}

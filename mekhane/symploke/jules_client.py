@@ -26,6 +26,14 @@ from dataclasses import dataclass, field
 from enum import Enum
 from typing import Optional
 
+# Optional OpenTelemetry support for distributed tracing
+try:
+    from opentelemetry import trace
+    from opentelemetry.propagate import inject
+    OTEL_AVAILABLE = True
+except ImportError:
+    OTEL_AVAILABLE = False
+
 # Configure module logger
 logger = logging.getLogger(__name__)
 
@@ -277,9 +285,15 @@ class JulesClient:
             close_after = True
         
         try:
+            # Prepare headers with optional trace context
+            request_headers = dict(self._headers)
+            if OTEL_AVAILABLE:
+                # Inject W3C trace context into headers
+                inject(request_headers)
+            
             async with session.request(
                 method, url,
-                headers=self._headers,
+                headers=request_headers,
                 json=json
             ) as resp:
                 if resp.status == 429:

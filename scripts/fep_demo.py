@@ -130,6 +130,17 @@ def demo_entropy_as_uncertainty():
 
 def main():
     """Run all demonstrations."""
+    import argparse
+    
+    parser = argparse.ArgumentParser(description="Hegemonikón FEP Demo")
+    parser.add_argument("-i", "--interactive", action="store_true",
+                        help="対話モードで起動")
+    args = parser.parse_args()
+    
+    if args.interactive:
+        return interactive_mode()
+    
+    # Non-interactive demos
     print_separator("Hegemonikón FEP Demo")
     print("\npymdp Active Inference を用いたストア派認知モデル")
     print("O1 Noēsis (認識) → O2 Boulēsis (意志) → O4 Energeia (行動)")
@@ -142,7 +153,7 @@ def main():
         
         print_separator("デモ完了")
         print("\n✅ pymdp 統合は正常に動作しています。")
-        print("   次のステップ: /noe, /bou ワークフローへの統合")
+        print("   対話モード: python scripts/fep_demo.py -i")
         
     except Exception as e:
         print(f"\n❌ エラー: {e}")
@@ -153,5 +164,156 @@ def main():
     return 0
 
 
+def interactive_mode():
+    """対話型 FEP デモ (REPL)"""
+    from mekhane.fep.encoding import encode_to_flat_index, decode_observation
+    
+    print_separator("FEP Interactive Mode")
+    print("\n🧠 Hegemonikón Active Inference Agent")
+    print("入力: 自然言語テキスト → FEP 推論 → 行動推奨")
+    print("ヘルプ: /help\n")
+    
+    agent = HegemonikónFEPAgent(use_defaults=True)
+    
+    # 初期A行列を保存 (diff 計算用)
+    initial_A = agent.agent.A[0].copy() if hasattr(agent.agent.A, '__getitem__') else agent.agent.A.copy()
+    
+    # 履歴
+    history = []
+    learning_count = 0
+    
+    def get_entropy():
+        """現在のエントロピーを計算"""
+        beliefs = agent.beliefs
+        # Handle nested structure from pymdp
+        if isinstance(beliefs, np.ndarray):
+            if beliefs.dtype == object:
+                qs = np.asarray(beliefs[0], dtype=np.float64).flatten()
+            else:
+                qs = np.asarray(beliefs, dtype=np.float64).flatten()
+        elif isinstance(beliefs, list):
+            qs = np.asarray(beliefs[0], dtype=np.float64).flatten()
+        else:
+            qs = np.asarray(beliefs, dtype=np.float64).flatten()
+        return float(-np.sum(qs * np.log(qs + 1e-10)))
+    
+    def show_help():
+        print("""
+╭─────────────────────────────────────────────────────────╮
+│ FEP Interactive Mode - コマンド一覧                      │
+├─────────────────────────────────────────────────────────┤
+│ [テキスト入力]  → FEP 推論を実行                         │
+│ /help          → このヘルプを表示                        │
+│ /entropy       → 現在のエントロピー (不確実性) を表示    │
+│ /diff          → A行列の累積学習量を表示                 │
+│ /history       → 直近の入力履歴を表示                    │
+│ /save          → 学習済みA行列を保存                     │
+│ /load          → 保存済みA行列を読込                     │
+│ /reset         → エージェントを初期化                    │
+│ /quit, /q      → 終了                                    │
+╰─────────────────────────────────────────────────────────╯
+        """)
+    
+    try:
+        while True:
+            try:
+                user_input = input("fep> ").strip()
+            except EOFError:
+                break
+            
+            # 空入力は無視
+            if not user_input:
+                continue
+            
+            # コマンド処理
+            if user_input.startswith("/"):
+                cmd = user_input.lower()
+                
+                if cmd in ("/quit", "/q"):
+                    print("👋 終了します")
+                    break
+                    
+                elif cmd == "/help":
+                    show_help()
+                    
+                elif cmd == "/reset":
+                    agent = HegemonikónFEPAgent(use_defaults=True)
+                    initial_A = agent.agent.A[0].copy() if hasattr(agent.agent.A, '__getitem__') else agent.agent.A.copy()
+                    history.clear()
+                    learning_count = 0
+                    print("✅ エージェントリセット")
+                    
+                elif cmd == "/entropy":
+                    print(f"📊 現在のエントロピー: {get_entropy():.3f}")
+                    
+                elif cmd == "/diff":
+                    current_A = agent.agent.A[0].copy() if hasattr(agent.agent.A, '__getitem__') else agent.agent.A.copy()
+                    diff = np.abs(current_A - initial_A).sum()
+                    print(f"📈 A行列変化量 (L1 norm): {diff:.4f}")
+                    print(f"   学習回数: {learning_count}")
+                    
+                elif cmd == "/history":
+                    if not history:
+                        print("📜 履歴なし")
+                    else:
+                        print("📜 直近の履歴:")
+                        for i, h in enumerate(history[-10:], 1):
+                            print(f"   {i}. \"{h['input'][:30]}...\" → {h['action']} (H={h['entropy']:.2f})")
+                            
+                elif cmd == "/save":
+                    path = agent.save_learned_A()
+                    print(f"💾 A行列保存: {path}")
+                    
+                elif cmd == "/load":
+                    if agent.load_learned_A():
+                        print("✅ A行列読込完了")
+                    else:
+                        print("⚠️ 学習済みA行列が見つかりません")
+                        
+                else:
+                    print(f"❓ 不明なコマンド: {cmd}")
+                    print("   /help でコマンド一覧を表示")
+                    
+                continue
+            
+            # テキスト → FEP 推論
+            try:
+                obs = encode_to_flat_index(user_input)
+                result = agent.infer_states(obs)
+                
+                # Dirichlet 学習
+                agent.update_A_dirichlet(obs)
+                learning_count += 1
+                
+                # ポリシー選択
+                q_pi, _ = agent.infer_policies()
+                action = agent.sample_action()
+                action_name = "observe (深く考える)" if action == 0 else "act (実行する)"
+                
+                # 出力
+                entropy = result['entropy']
+                print(f"  📥 obs={obs} → 状態: {result['map_state_names']}")
+                print(f"  📊 エントロピー: {entropy:.2f}")
+                print(f"  🎯 推奨行動: {action_name} ({q_pi[action]:.1%})")
+                
+                # 履歴に追加
+                history.append({
+                    "input": user_input,
+                    "obs": obs,
+                    "entropy": entropy,
+                    "action": action_name.split()[0],
+                })
+                
+            except Exception as e:
+                print(f"❌ エラー: {e}")
+                
+    except KeyboardInterrupt:
+        print("\n\n👋 Ctrl+C で終了")
+    
+    print(f"\n📊 セッション統計: {len(history)} 推論, {learning_count} 学習")
+    return 0
+
+
 if __name__ == "__main__":
     sys.exit(main())
+

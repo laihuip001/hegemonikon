@@ -1,0 +1,198 @@
+#!/usr/bin/env python3
+"""
+Sophia Backlinker - 知識アイテム間のリンクグラフ構築
+
+[[wikilink]] 構文を検出し、バックリンクを提供する。
+
+Usage:
+    python sophia_backlinker.py              # グラフ構築 + 統計表示
+    python sophia_backlinker.py --backlinks "ki_name"  # バックリンク取得
+"""
+
+import sys
+import re
+import json
+from pathlib import Path
+from typing import Set, Dict, List, Optional
+
+sys.path.insert(0, str(Path(__file__).parent.parent.parent))
+
+try:
+    import networkx as nx
+except ImportError:
+    print("❌ networkx not installed. Run: pip install networkx")
+    sys.exit(1)
+
+
+KNOWLEDGE_DIR = Path("/home/laihuip001/oikos/.gemini/antigravity/knowledge")
+
+
+class SophiaBacklinker:
+    """NetworkX ベースのバックリンク検出システム"""
+    
+    def __init__(self):
+        self.graph = nx.DiGraph()  # 方向性グラフ
+        self.cache: Dict[str, Dict] = {}  # ノードキャッシュ
+    
+    def extract_links(self, content: str) -> Set[str]:
+        """[[wikilink]] パターンを抽出
+        
+        対応形式:
+        - [[単純リンク]]
+        - [[パス/付きリンク]]
+        - [[リンク|別名]] (別名は無視)
+        """
+        # [[...]] 内のテキストを抽出 (| 以降は除外)
+        pattern = r'\[\[([^\]|]+?)(?:\|[^\]]+)?\]\]'
+        matches = re.findall(pattern, content)
+        return set(matches)
+    
+    def parse_ki_links(self, ki_path: Path) -> Set[str]:
+        """KI ディレクトリからリンクを抽出"""
+        links = set()
+        
+        # artifacts/*.md を走査
+        artifacts_dir = ki_path / "artifacts"
+        if artifacts_dir.exists():
+            for md_file in artifacts_dir.rglob("*.md"):
+                content = md_file.read_text(encoding="utf-8")
+                file_links = self.extract_links(content)
+                links.update(file_links)
+        
+        return links
+    
+    def build_graph(self, ki_dir: Path = None) -> int:
+        """全 KI からグラフを構築
+        
+        Returns:
+            追加されたエッジ数
+        """
+        ki_dir = ki_dir or KNOWLEDGE_DIR
+        edge_count = 0
+        
+        for ki_path in ki_dir.iterdir():
+            if not ki_path.is_dir():
+                continue
+            
+            ki_name = ki_path.name
+            links = self.parse_ki_links(ki_path)
+            
+            # ノード追加
+            if not self.graph.has_node(ki_name):
+                self.graph.add_node(ki_name, type="ki")
+            
+            # エッジ追加 (outlinks)
+            for link in links:
+                self.graph.add_edge(ki_name, link)
+                edge_count += 1
+                
+                # キャッシュ更新
+                if ki_name not in self.cache:
+                    self.cache[ki_name] = {"outlinks": set(), "backlinks": set()}
+                self.cache[ki_name]["outlinks"].add(link)
+        
+        # バックリンクキャッシュ構築
+        self._build_backlink_cache()
+        
+        return edge_count
+    
+    def _build_backlink_cache(self):
+        """逆方向リンク (バックリンク) のキャッシュを構築"""
+        for node in self.graph.nodes():
+            backlinks = set(self.graph.predecessors(node))
+            if node not in self.cache:
+                self.cache[node] = {"outlinks": set(), "backlinks": set()}
+            self.cache[node]["backlinks"] = backlinks
+    
+    def get_backlinks(self, note_name: str) -> Set[str]:
+        """O(1) バックリンク検索"""
+        if note_name in self.cache:
+            return self.cache[note_name].get("backlinks", set())
+        # キャッシュになければグラフから取得
+        if self.graph.has_node(note_name):
+            return set(self.graph.predecessors(note_name))
+        return set()
+    
+    def get_outlinks(self, note_name: str) -> Set[str]:
+        """O(1) アウトリンク検索"""
+        if note_name in self.cache:
+            return self.cache[note_name].get("outlinks", set())
+        if self.graph.has_node(note_name):
+            return set(self.graph.successors(note_name))
+        return set()
+    
+    def get_stats(self) -> Dict:
+        """グラフ統計を返す"""
+        return {
+            "nodes": self.graph.number_of_nodes(),
+            "edges": self.graph.number_of_edges(),
+            "isolated": len(list(nx.isolates(self.graph))),
+            "most_linked": self._get_most_linked(5),
+        }
+    
+    def _get_most_linked(self, n: int) -> List[tuple]:
+        """最も多くのバックリンクを持つノード"""
+        in_degrees = [(node, self.graph.in_degree(node)) 
+                      for node in self.graph.nodes()]
+        return sorted(in_degrees, key=lambda x: x[1], reverse=True)[:n]
+    
+    def to_dict(self) -> Dict:
+        """グラフを辞書形式でエクスポート"""
+        return {
+            "nodes": list(self.graph.nodes()),
+            "edges": list(self.graph.edges()),
+            "cache": {k: {"outlinks": list(v["outlinks"]), 
+                         "backlinks": list(v["backlinks"])} 
+                     for k, v in self.cache.items()}
+        }
+
+
+def main():
+    import argparse
+    
+    parser = argparse.ArgumentParser(description="Sophia Backlinker")
+    parser.add_argument("--backlinks", type=str, help="Get backlinks for a note")
+    parser.add_argument("--outlinks", type=str, help="Get outlinks for a note")
+    parser.add_argument("--stats", action="store_true", help="Show graph stats")
+    args = parser.parse_args()
+    
+    backlinker = SophiaBacklinker()
+    
+    print("📊 Building knowledge graph...")
+    edges = backlinker.build_graph()
+    stats = backlinker.get_stats()
+    
+    print(f"✅ Graph built: {stats['nodes']} nodes, {stats['edges']} edges")
+    
+    if args.backlinks:
+        backlinks = backlinker.get_backlinks(args.backlinks)
+        print(f"\n🔙 Backlinks for '{args.backlinks}':")
+        if backlinks:
+            for link in sorted(backlinks):
+                print(f"  ← {link}")
+        else:
+            print("  (no backlinks)")
+    
+    if args.outlinks:
+        outlinks = backlinker.get_outlinks(args.outlinks)
+        print(f"\n🔗 Outlinks from '{args.outlinks}':")
+        if outlinks:
+            for link in sorted(outlinks):
+                print(f"  → {link}")
+        else:
+            print("  (no outlinks)")
+    
+    if args.stats or (not args.backlinks and not args.outlinks):
+        print(f"\n📈 Stats:")
+        print(f"  Nodes: {stats['nodes']}")
+        print(f"  Edges: {stats['edges']}")
+        print(f"  Isolated: {stats['isolated']}")
+        if stats['most_linked']:
+            print(f"  Most linked:")
+            for name, count in stats['most_linked']:
+                if count > 0:
+                    print(f"    {name}: {count} backlinks")
+
+
+if __name__ == "__main__":
+    main()

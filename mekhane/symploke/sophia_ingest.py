@@ -137,6 +137,7 @@ def main():
     parser.add_argument("--no-save", action="store_true", help="Don't save index after ingestion")
     parser.add_argument("--load", action="store_true", help="Load existing index and show stats")
     parser.add_argument("--search", type=str, help="Search query (requires --load)")
+    parser.add_argument("--incremental", action="store_true", help="Only ingest new/modified KIs (diff mode)")
     args = parser.parse_args()
     
     # Ensure index directory exists
@@ -172,6 +173,31 @@ def main():
             all_docs.append(doc)
     
     print(f"\nTotal: {len(all_docs)} documents")
+    
+    # Incremental mode: filter out existing docs
+    if args.incremental and DEFAULT_INDEX_PATH.exists():
+        adapter = load_sophia_index(str(DEFAULT_INDEX_PATH))
+        existing_count = adapter.count()
+        
+        # Get existing doc IDs from adapter metadata
+        existing_ids = set()
+        if existing_count > 0:
+            # Use a broad search to get all existing docs
+            dummy_vec = adapter.encode([""])[0]
+            existing_results = adapter.search(dummy_vec, k=existing_count)
+            existing_ids = {r.metadata.get("doc_id", "") for r in existing_results}
+        
+        # Filter to only new docs
+        new_docs = [d for d in all_docs if d.id not in existing_ids]
+        skipped = len(all_docs) - len(new_docs)
+        
+        print(f"\n[Incremental] Existing: {len(existing_ids)}, New: {len(new_docs)}, Skipped: {skipped}")
+        
+        if not new_docs:
+            print("No new documents to ingest.")
+            return
+        
+        all_docs = new_docs
     
     if args.dry_run:
         print("\n[Dry run] Would ingest documents")

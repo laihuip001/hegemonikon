@@ -602,6 +602,98 @@ def detect_output_type(q1: str, q2: str) -> str:
 
 ---
 
+## M7: HEGEMONIKON_MODE (v6.4)
+
+> 定理体系に馴染む「聖」な生成物を作るモード
+
+### Activation
+
+```text
+/tek hege → Hegemonikón Mode 開始
+/tek → Interactive Mode → Q0 で「聖」選択
+```
+
+### 質問フロー
+
+```yaml
+Q0: 俗 or 聖?
+  options:
+    A: 俗 (汎用) → 従来動作 (M6)
+    B: 聖 (Hegemonikón) → Hegemonikón Mode
+
+Q1: カテゴリ選択
+  options:
+    A: Ousia (認識・理解・洞察) → O
+    B: Schema (計画・戦略・測定) → S
+    C: Akribeia (精度・判断・校正) → A
+    D: Hormē (衝動・信念・記憶) → H
+    E: Perigraphē (環境・境界・経路) → P
+    F: Kairos (時間・機会・文脈) → K
+
+Q2: 定理選択 (Q1 に応じた 4 定理を表示)
+  example (Ousia):
+    - O1 Noēsis (深い認識・直観)
+    - O2 Boulēsis (意志・目的)
+    - O3 Zētēsis (探求・調査)
+    - O4 Energeia (行為・実行)
+
+Q3: X-series 連携
+  options:
+    - 既存 X-series から選択
+    - 新規連携を定義
+    - なし
+
+Q4: 生成意図
+  prompt: なぜこの定理を選びましたか？
+  → lineage に記録
+```
+
+### 必須 Frontmatter (Hegemonikón Mode)
+
+| 項目 | 必須 | 説明 |
+|:-----|:----:|:-----|
+| `derived_from` | ✅ | 関連定理 ID (例: O1, S2) |
+| `series` | ✅ | O/S/A/H/P/K |
+| `related.x_series` | ✅ | 他定理との連携 (空でも明示) |
+| `lineage` | ✅ | 生成意図を含む |
+
+### Utils 使用条件
+
+Utils は「暫定カテゴリ」。以下の場合のみ許可:
+
+1. 6 カテゴリ (O/S/A/H/P/K) 全てに馴染まない
+2. 「Utils を選んだ理由」を lineage に必ず明記
+
+### Decision Logic
+
+```python
+def hegemonikon_mode(q0: str, q1: str, q2: str) -> dict:
+    """Hegemonikón Mode での生成パラメータ"""
+    if q0 == "俗":
+        return {"mode": "interactive"}  # M6 に委譲
+    
+    series_map = {
+        "A": ("Ousia", ["O1", "O2", "O3", "O4"]),
+        "B": ("Schema", ["S1", "S2", "S3", "S4"]),
+        "C": ("Akribeia", ["A1", "A2", "A3", "A4"]),
+        "D": ("Hormē", ["H1", "H2", "H3", "H4"]),
+        "E": ("Perigraphē", ["P1", "P2", "P3", "P4"]),
+        "F": ("Kairos", ["K1", "K2", "K3", "K4"]),
+    }
+    
+    series, theorems = series_map.get(q1, ("Utils", []))
+    
+    return {
+        "mode": "hegemonikon",
+        "series": series,
+        "derived_from": q2,  # 選択された定理
+        "x_series": [],      # Q3 で設定
+        "lineage": "",       # Q4 で設定
+    }
+```
+
+---
+
 ## Output: Workflow.md Structure (v6.3)
 
 > **Workflow は「手順書」— Skill を呼び出して実行する**

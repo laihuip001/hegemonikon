@@ -77,7 +77,7 @@ graph TD
 
 | ID | 名称 | 意味 |
 |----|------|------|
-| O1 | Noēsis | 認識推論 |
+| O1 | Noēsis | 認識推論 (Recursive Self-Evidencing) |
 | O2 | Boulēsis | 意志推論 |
 | O3 | Zētēsis | 探索行動 |
 | O4 | Energeia | 実用行動 |

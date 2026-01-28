@@ -32,6 +32,7 @@ from .state_spaces import (
     get_state_dim,
     index_to_state,
 )
+from .config import get_default_params
 
 
 class HegemonikónFEPAgent:

@@ -85,9 +85,18 @@ class HegemonikónFEPAgent:
             C = C if C is not None else self._default_C()
             D = D if D is not None else self._default_D()
         
-        # Initialize pymdp Agent
-        self.agent = Agent(A=A, B=B, C=C, D=D)
+        # Initialize pymdp Agent with 2-step policy horizon (arXiv:2412.10425 pattern)
+        # policy_len=2: Evaluate policies over 2 future timesteps
+        # inference_horizon=1: Single-step inference for belief updating
+        self.agent = Agent(
+            A=A, B=B, C=C, D=D,
+            policy_len=2,
+            inference_horizon=1,
+        )
         self.beliefs = D.copy() if D is not None else np.ones(self.state_dim) / self.state_dim
+        
+        # Learning parameters (from arXiv:2412.10425)
+        self.learning_rate = 50.0  # η for Dirichlet updates
         
         # Track history for analysis
         self._history: List[Dict[str, Any]] = []
@@ -420,3 +429,141 @@ class HegemonikónFEPAgent:
         """Reset agent state to initial beliefs."""
         self.beliefs = self._default_D()
         self._history = []
+    
+    # =========================================================================
+    # Persistence Methods (arXiv:2412.10425 pattern)
+    # =========================================================================
+    
+    def save_learned_A(self, path: Optional[str] = None) -> str:
+        """Save learned A matrix to file.
+        
+        Enables Dirichlet learning accumulation across sessions.
+        Called automatically by /bye workflow.
+        
+        Args:
+            path: Optional custom path (uses default if not specified)
+            
+        Returns:
+            Path where the A matrix was saved
+        """
+        from .persistence import save_A, LEARNED_A_PATH
+        from pathlib import Path
+        
+        target_path = Path(path) if path else None
+        saved_path = save_A(self, target_path)
+        
+        self._history.append({
+            "type": "save_A",
+            "path": str(saved_path),
+        })
+        
+        return str(saved_path)
+    
+    def load_learned_A(self, path: Optional[str] = None) -> bool:
+        """Load A matrix from file and update agent.
+        
+        Restores learned observation model from previous sessions.
+        Called automatically by /boot workflow.
+        
+        Args:
+            path: Optional custom path (uses default if not specified)
+            
+        Returns:
+            True if successfully loaded, False if file doesn't exist
+        """
+        from .persistence import load_A, A_exists, LEARNED_A_PATH
+        from pathlib import Path
+        
+        target_path = Path(path) if path else None
+        
+        if not A_exists(target_path):
+            return False
+        
+        loaded_A = load_A(target_path)
+        if loaded_A is not None:
+            self.agent.A = loaded_A
+            
+            self._history.append({
+                "type": "load_A",
+                "path": str(target_path or LEARNED_A_PATH),
+            })
+            return True
+        
+        return False
+    
+    # =========================================================================
+    # Dirichlet Learning (arXiv:2412.10425 pattern)
+    # =========================================================================
+    
+    def update_A_dirichlet(
+        self,
+        observation: int,
+        learning_rate: Optional[float] = None,
+    ) -> None:
+        """Update A matrix using Dirichlet concentration update.
+        
+        Implements the learning rule from arXiv:2412.10425:
+            pA += η * outer(observation, beliefs)
+        
+        This enables the agent to learn observation likelihoods from experience.
+        
+        Args:
+            observation: The observed outcome (index)
+            learning_rate: Learning rate η (defaults to self.learning_rate = 50.0)
+            
+        Example:
+            >>> agent.infer_states(observation=3)
+            >>> agent.update_A_dirichlet(observation=3)
+        """
+        eta = learning_rate if learning_rate is not None else self.learning_rate
+        
+        # Get current beliefs (flattened)
+        if isinstance(self.beliefs, np.ndarray):
+            if self.beliefs.dtype == object:
+                beliefs_array = np.asarray(self.beliefs[0], dtype=np.float64).flatten()
+            else:
+                beliefs_array = np.asarray(self.beliefs, dtype=np.float64).flatten()
+        elif isinstance(self.beliefs, list):
+            beliefs_array = np.asarray(self.beliefs[0], dtype=np.float64).flatten()
+        else:
+            beliefs_array = np.asarray(self.beliefs, dtype=np.float64).flatten()
+        
+        # Handle pymdp's A matrix format (may be object array containing arrays)
+        A = self.agent.A
+        if isinstance(A, np.ndarray) and A.dtype == object:
+            # Object array: A[0] is the actual matrix
+            A_matrix = np.asarray(A[0], dtype=np.float64)
+        elif isinstance(A, list):
+            A_matrix = np.asarray(A[0], dtype=np.float64)
+        else:
+            A_matrix = np.asarray(A, dtype=np.float64)
+        
+        # Create one-hot observation vector
+        num_obs = A_matrix.shape[0]
+        obs_vector = np.zeros(num_obs)
+        obs_vector[observation] = 1.0
+        
+        # Dirichlet update: pA += η * outer(o, beliefs)
+        # This increases concentration parameters for observed state-observation pairs
+        update = eta * np.outer(obs_vector, beliefs_array)
+        
+        # Apply update with numerical stability
+        eps = 1e-10
+        A_matrix = np.clip(A_matrix + update, eps, None)
+        # Renormalize columns
+        A_matrix = A_matrix / A_matrix.sum(axis=0, keepdims=True)
+        
+        # Write back to agent
+        if isinstance(self.agent.A, np.ndarray) and self.agent.A.dtype == object:
+            self.agent.A[0] = A_matrix
+        elif isinstance(self.agent.A, list):
+            self.agent.A[0] = A_matrix
+        else:
+            self.agent.A = A_matrix
+        
+        self._history.append({
+            "type": "dirichlet_update",
+            "observation": observation,
+            "learning_rate": eta,
+        })
+

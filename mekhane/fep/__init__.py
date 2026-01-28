@@ -29,6 +29,13 @@ from .fep_bridge import (
     NoesisResult,
     BoulesisResult,
 )
+from .llm_evaluator import (
+    encode_input_with_confidence,
+    hierarchical_evaluate,
+    evaluate_and_infer,
+    EvaluationResult,
+    GEMINI_AVAILABLE,
+)
 
 __all__ = [
     "HegemonikónFEPAgent",
@@ -48,4 +55,10 @@ __all__ = [
     "full_inference_cycle",
     "NoesisResult",
     "BoulesisResult",
+    "encode_input_with_confidence",
+    "hierarchical_evaluate",
+    "evaluate_and_infer",
+    "EvaluationResult",
+    "GEMINI_AVAILABLE",
 ]
+

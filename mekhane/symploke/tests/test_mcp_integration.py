@@ -9,10 +9,13 @@ import asyncio
 import os
 import sys
 import json
+import pytest
 
 sys.path.insert(0, "/home/laihuip001/oikos/hegemonikon")
 
 
+@pytest.mark.asyncio
+@pytest.mark.skipif(not os.environ.get("JULES_API_KEY"), reason="JULES_API_KEY not set")
 async def test_mcp_tools():
     """Test MCP server tools directly."""
     print("=" * 70)

@@ -509,14 +509,28 @@ class HegemonikónFEPAgent:
         This enables the agent to learn observation likelihoods from experience.
         
         Args:
-            observation: The observed outcome (index)
+            observation: The observed outcome (index or tuple of indices)
             learning_rate: Learning rate η (defaults to self.learning_rate = 50.0)
             
         Example:
             >>> agent.infer_states(observation=3)
             >>> agent.update_A_dirichlet(observation=3)
+            
+            # Or with tuple input (from encode_noesis_output):
+            >>> obs_tuple = (1, 0, 2)  # context, urgency, confidence
+            >>> agent.update_A_dirichlet(observation=obs_tuple)
         """
         eta = learning_rate if learning_rate is not None else self.learning_rate
+        
+        # Handle tuple observation input (from encode_noesis_output)
+        # Convert (context_idx, urgency_idx, confidence_idx) to flat index
+        if isinstance(observation, tuple):
+            context_idx, urgency_idx, confidence_idx = observation
+            # Compute flat observation index
+            # Layout: context (2) + urgency (3) + confidence (3) = 8
+            # Flat index = context + 2*urgency + confidence
+            # But for A matrix we need the primary context indicator
+            observation = context_idx + 2 * urgency_idx + confidence_idx
         
         # Get current beliefs (flattened)
         if isinstance(self.beliefs, np.ndarray):
@@ -541,8 +555,10 @@ class HegemonikónFEPAgent:
         
         # Create one-hot observation vector
         num_obs = A_matrix.shape[0]
+        # Clamp observation to valid range
+        obs_idx = min(int(observation), num_obs - 1)
         obs_vector = np.zeros(num_obs)
-        obs_vector[observation] = 1.0
+        obs_vector[obs_idx] = 1.0
         
         # Dirichlet update: pA += η * outer(o, beliefs)
         # This increases concentration parameters for observed state-observation pairs

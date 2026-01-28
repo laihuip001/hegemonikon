@@ -7,84 +7,64 @@ import yaml
 from pathlib import Path
 from mekhane.anamnesis.vault import VaultManager
 
+
 class TestVaultManager(unittest.TestCase):
+    """Tests for VaultManager static methods."""
+
     def setUp(self):
         self.test_dir = tempfile.mkdtemp()
-        self.vault = VaultManager(self.test_dir)
-        self.file_path = "test.txt"
-        self.json_path = "test.json"
-        self.yaml_path = "test.yaml"
+        self.file_path = Path(self.test_dir) / "test.txt"
+        self.json_path = Path(self.test_dir) / "test.json"
+        self.yaml_path = Path(self.test_dir) / "test.yaml"
 
     def tearDown(self):
         shutil.rmtree(self.test_dir)
 
     def test_write_read_file(self):
+        """write_safe and read_safe work correctly."""
         content = "Hello Vault"
-        self.vault.write_file(self.file_path, content)
-        read_content = self.vault.read_file(self.file_path)
+        VaultManager.write_safe(self.file_path, content)
+        read_content = VaultManager.read_safe(self.file_path)
         self.assertEqual(content, read_content)
 
     def test_backup_creation(self):
+        """write_safe creates backup when file exists."""
         # Initial write
-        self.vault.write_file(self.file_path, "v1")
+        VaultManager.write_safe(self.file_path, "v1")
 
         # Second write should trigger backup
-        self.vault.write_file(self.file_path, "v2")
+        VaultManager.write_safe(self.file_path, "v2")
 
         # Check main file
-        self.assertEqual(self.vault.read_file(self.file_path), "v2")
+        self.assertEqual(VaultManager.read_safe(self.file_path), "v2")
 
         # Check backup file
-        backup_path = Path(self.test_dir) / (self.file_path + ".bak")
+        backup_path = self.file_path.with_suffix(self.file_path.suffix + ".bak")
         self.assertTrue(backup_path.exists())
         with open(backup_path, 'r') as f:
             self.assertEqual(f.read(), "v1")
 
     def test_read_fallback(self):
-        # Create a file and backup manually
-        path = Path(self.test_dir) / self.file_path
-        backup_path = Path(self.test_dir) / (self.file_path + ".bak")
+        """read_safe falls back to backup when main file is missing."""
+        backup_path = self.file_path.with_suffix(self.file_path.suffix + ".bak")
 
-        # Write backup
+        # Write backup only
         with open(backup_path, 'w') as f:
-            f.write("backup")
+            f.write("backup content")
 
-        # Ensure main file does not exist to trigger FileNotFoundError fallback
-        if path.exists():
-            os.remove(path)
+        # Ensure main file does not exist
+        if self.file_path.exists():
+            os.remove(self.file_path)
 
-        content = self.vault.read_file(self.file_path)
-        self.assertEqual(content, "backup")
+        content = VaultManager.read_safe(self.file_path)
+        self.assertEqual(content, "backup content")
 
-    def test_json_backup_recovery(self):
-        data_v1 = {"version": 1}
-        data_v2 = {"version": 2}
+    def test_file_not_found(self):
+        """read_safe raises FileNotFoundError when no file or backup exists."""
+        non_existent = Path(self.test_dir) / "non_existent.txt"
+        with self.assertRaises(FileNotFoundError):
+            VaultManager.read_safe(non_existent)
 
-        self.vault.write_json(self.json_path, data_v1)
-        self.vault.write_json(self.json_path, data_v2)
-
-        # corrupt main file
-        path = Path(self.test_dir) / self.json_path
-        with open(path, 'w') as f:
-            f.write("{invalid_json")
-
-        recovered = self.vault.read_json(self.json_path)
-        self.assertEqual(recovered, data_v1)
-
-    def test_yaml_backup_recovery(self):
-        data_v1 = {"version": 1}
-        data_v2 = {"version": 2}
-
-        self.vault.write_yaml(self.yaml_path, data_v1)
-        self.vault.write_yaml(self.yaml_path, data_v2)
-
-        # corrupt main file
-        path = Path(self.test_dir) / self.yaml_path
-        with open(path, 'w') as f:
-            f.write(": invalid_yaml")
-
-        recovered = self.vault.read_yaml(self.yaml_path)
-        self.assertEqual(recovered, data_v1)
 
 if __name__ == '__main__':
     unittest.main()

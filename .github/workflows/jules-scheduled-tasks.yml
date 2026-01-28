@@ -1,96 +1,103 @@
 # Jules Scheduled Tasks for Hegemonikón
 #
-# 各ペルソナの週次/月次タスクを自動実行
-# 詳細: docs/guides/scheduled_tasks_prompts.md
+# tekhne-maker v5.0 アーキタイプ駆動設計に基づく
+# 専門家レビューの週次定時実行
+#
+# スケジュール:
+# - 毎週月曜 09:00 JST (00:00 UTC)
 
-name: Jules Scheduled Tasks
+name: Jules Specialist Reviews
 
 on:
   schedule:
-    # P1 数学者 - 週次（月曜 09:00 JST = 00:00 UTC）
+    # 毎週月曜 00:00 UTC (09:00 JST)
     - cron: "0 0 * * 1"
   workflow_dispatch:
     inputs:
-      persona:
-        description: "実行するペルソナ (p1/p2/p3/p4/p5/p6/all)"
+      category:
+        description: "実行するカテゴリ (all/cognitive_load/ai_risk/async/theory)"
         required: true
         default: "all"
+        type: choice
+        options:
+          - all
+          - cognitive_load
+          - ai_risk
+          - async
+          - theory
+      target_file:
+        description: "レビュー対象ファイル"
+        required: false
+        default: "mekhane/symploke/jules_client.py"
+      dry_run:
+        description: "ドライラン（実行せずプロンプト確認）"
+        type: boolean
+        default: false
 
-# ===== シークレット名マッピング（JULIUS_API_KEY_* で統一）=====
-# P1 数学者:    JULIUS_API_KEY_1, 2, 3
-# P2 FEP理論家: JULIUS_API_KEY_4, 5, 6
-# P3 ストア派:  JULIUS_API_KEY_7, 8, 9
-# P4 アーキ:    JULIUS_API_KEY_10, 11, 12
-# P5 LLM:       JULIUS_API_KEY_13, 14, 15
-# P6 統合者:    JULIUS_API_KEY_16, 17, 18
+env:
+  JULES_REPO_SOURCE: "sources/github/${{ github.repository }}"
+  JULES_BRANCH: "master"
 
 jobs:
-  p1-mathematician:
-    name: P1 数学者 - 週次数学的一貫性チェック
+  specialist-review:
+    name: "🔍 Specialist Review Batch"
     runs-on: ubuntu-latest
-    if: github.event.inputs.persona == 'p1' || github.event.inputs.persona == 'all' || github.event_name == 'schedule'
+    
     steps:
-      - uses: actions/checkout@v4
-      - name: Create Jules Task - P1
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+      
+      - name: Install dependencies
+        run: |
+          pip install aiohttp
+      
+      - name: Run Specialist Batch
         env:
-          JULES_API_KEY: ${{ secrets.JULIUS_API_KEY_1 }}
-        run: echo "Running P1 Mathematician weekly task..."
-
-  p2-fep-theorist:
-    name: P2 FEP理論家 - 週次FEP実装レビュー
-    runs-on: ubuntu-latest
-    needs: p1-mathematician
-    if: github.event.inputs.persona == 'p2' || github.event.inputs.persona == 'all' || github.event_name == 'schedule'
-    steps:
-      - uses: actions/checkout@v4
-      - name: Create Jules Task - P2
-        env:
-          JULES_API_KEY: ${{ secrets.JULIUS_API_KEY_4 }}
-        run: echo "Running P2 FEP Theorist weekly task..."
-
-  p3-stoic-philosopher:
-    name: P3 ストア派 - 月次規範的監査
-    runs-on: ubuntu-latest
-    if: github.event.inputs.persona == 'p3' || (github.event_name == 'schedule' && github.event.schedule == '0 2 1 * *')
-    steps:
-      - uses: actions/checkout@v4
-      - name: Create Jules Task - P3
-        env:
-          JULES_API_KEY: ${{ secrets.JULIUS_API_KEY_7 }}
-        run: echo "Running P3 Stoic Philosopher monthly task..."
-
-  p4-architect:
-    name: P4 アーキテクト - 週次アーキテクチャ健全性
-    runs-on: ubuntu-latest
-    needs: p2-fep-theorist
-    if: github.event.inputs.persona == 'p4' || github.event.inputs.persona == 'all' || github.event_name == 'schedule'
-    steps:
-      - uses: actions/checkout@v4
-      - name: Create Jules Task - P4
-        env:
-          JULES_API_KEY: ${{ secrets.JULIUS_API_KEY_10 }}
-        run: echo "Running P4 Architect weekly task..."
-
-  p5-llm-specialist:
-    name: P5 LLM専門家 - 週次プロンプト最適化
-    runs-on: ubuntu-latest
-    needs: p4-architect
-    if: github.event.inputs.persona == 'p5' || github.event.inputs.persona == 'all' || github.event_name == 'schedule'
-    steps:
-      - uses: actions/checkout@v4
-      - name: Create Jules Task - P5
-        env:
-          JULES_API_KEY: ${{ secrets.JULIUS_API_KEY_13 }}
-        run: echo "Running P5 LLM Specialist weekly task..."
-
-  p6-integrator:
-    name: P6 統合者 - 週次統合レビュー
-    runs-on: ubuntu-latest
-    needs: [p1-mathematician, p2-fep-theorist, p4-architect, p5-llm-specialist]
-    if: github.event.inputs.persona == 'p6' || github.event.inputs.persona == 'all' || github.event_name == 'schedule'
-    steps:
-      - uses: actions/checkout@v4
-      - name: Create Jules Task - P6
-        env:
-          JULES_API_KEY: ${{ secrets.JULIUS_API_KEY_16 }}
-        run: echo "Running P6 Integrator weekly task..."
+          JULIUS_API_KEY_7: ${{ secrets.JULIUS_API_KEY_7 }}
+          JULIUS_API_KEY_8: ${{ secrets.JULIUS_API_KEY_8 }}
+          JULIUS_API_KEY_9: ${{ secrets.JULIUS_API_KEY_9 }}
+        run: |
+          cd mekhane/symploke
+          
+          # パラメータ設定
+          CATEGORY="${{ github.event.inputs.category || 'all' }}"
+          TARGET="${{ github.event.inputs.target_file || 'mekhane/symploke/jules_client.py' }}"
+          DRY_RUN="${{ github.event.inputs.dry_run || 'false' }}"
+          
+          echo "=== Jules Specialist Review ==="
+          echo "Category: $CATEGORY"
+          echo "Target: $TARGET"
+          echo "Dry Run: $DRY_RUN"
+          echo ""
+          
+          if [ "$DRY_RUN" = "true" ]; then
+            python run_specialists.py --category "$CATEGORY" --target "$TARGET" --dry-run
+          else
+            python run_specialists.py --category "$CATEGORY" --target "$TARGET" --output "../../docs/specialist_run_results.json"
+          fi
+      
+      - name: Upload Results
+        if: ${{ github.event.inputs.dry_run != 'true' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: specialist-results-${{ github.run_number }}
+          path: docs/specialist_run_results.json
+          retention-days: 30
+      
+      - name: Summary
+        run: |
+          echo "## 🔍 Specialist Review Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          if [ -f docs/specialist_run_results.json ]; then
+            echo '```json' >> $GITHUB_STEP_SUMMARY
+            cat docs/specialist_run_results.json >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+          else
+            echo "結果ファイルが見つかりません（ドライランモード）" >> $GITHUB_STEP_SUMMARY
+          fi

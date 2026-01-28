@@ -1,17 +1,19 @@
-# Jules Scheduled Tasks for Hegemonikón
+# Jules Daily Specialist Reviews for Hegemonikón
 #
 # tekhne-maker v5.0 アーキタイプ駆動設計に基づく
-# 専門家レビューの週次定時実行
+# 専門家レビューの**毎日**定時実行
 #
 # スケジュール:
-# - 毎週月曜 09:00 JST (00:00 UTC)
+# - 毎日 08:00 JST (前日 23:00 UTC)
+# - 9 API キー × 80 タスク = 720 専門家/日
+# - /boot で結果を統合
 
-name: Jules Specialist Reviews
+name: Jules Daily Specialist Reviews
 
 on:
   schedule:
-    # 毎週月曜 00:00 UTC (09:00 JST)
-    - cron: "0 0 * * 1"
+    # 毎日 23:00 UTC (翌日 08:00 JST)
+    - cron: "0 23 * * *"
   workflow_dispatch:
     inputs:
       category:
@@ -29,6 +31,10 @@ on:
         description: "レビュー対象ファイル"
         required: false
         default: "mekhane/symploke/jules_client.py"
+      max_specialists:
+        description: "最大専門家数 (720/日まで)"
+        required: false
+        default: "100"
       dry_run:
         description: "ドライラン（実行せずプロンプト確認）"
         type: boolean
@@ -39,8 +45,8 @@ env:
   JULES_BRANCH: "master"
 
 jobs:
-  specialist-review:
-    name: "🔍 Specialist Review Batch"
+  daily-specialist-review:
+    name: "🔍 Daily Specialist Review (720/day capacity)"
     runs-on: ubuntu-latest
     
     steps:
@@ -59,6 +65,13 @@ jobs:
       
       - name: Run Specialist Batch
         env:
+          # 9 API キー = 720 タスク/日
+          JULIUS_API_KEY_1: ${{ secrets.JULIUS_API_KEY_1 }}
+          JULIUS_API_KEY_2: ${{ secrets.JULIUS_API_KEY_2 }}
+          JULIUS_API_KEY_3: ${{ secrets.JULIUS_API_KEY_3 }}
+          JULIUS_API_KEY_4: ${{ secrets.JULIUS_API_KEY_4 }}
+          JULIUS_API_KEY_5: ${{ secrets.JULIUS_API_KEY_5 }}
+          JULIUS_API_KEY_6: ${{ secrets.JULIUS_API_KEY_6 }}
           JULIUS_API_KEY_7: ${{ secrets.JULIUS_API_KEY_7 }}
           JULIUS_API_KEY_8: ${{ secrets.JULIUS_API_KEY_8 }}
           JULIUS_API_KEY_9: ${{ secrets.JULIUS_API_KEY_9 }}
@@ -70,7 +83,8 @@ jobs:
           TARGET="${{ github.event.inputs.target_file || 'mekhane/symploke/jules_client.py' }}"
           DRY_RUN="${{ github.event.inputs.dry_run || 'false' }}"
           
-          echo "=== Jules Specialist Review ==="
+          echo "=== Jules Daily Specialist Review (720/day) ==="
+          echo "Date: $(date -u +%Y-%m-%d)"
           echo "Category: $CATEGORY"
           echo "Target: $TARGET"
           echo "Dry Run: $DRY_RUN"
@@ -79,7 +93,10 @@ jobs:
           if [ "$DRY_RUN" = "true" ]; then
             python run_specialists.py --category "$CATEGORY" --target "$TARGET" --dry-run
           else
-            python run_specialists.py --category "$CATEGORY" --target "$TARGET" --output "../../docs/specialist_run_results.json"
+            python run_specialists.py \
+              --category "$CATEGORY" \
+              --target "$TARGET" \
+              --output "../../docs/specialist_run_$(date -u +%Y%m%d).json"
           fi
       
       - name: Upload Results
@@ -87,17 +104,20 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: specialist-results-${{ github.run_number }}
-          path: docs/specialist_run_results.json
+          path: docs/specialist_run_*.json
           retention-days: 30
       
       - name: Summary
         run: |
-          echo "## 🔍 Specialist Review Results" >> $GITHUB_STEP_SUMMARY
+          echo "## 🔍 Daily Specialist Review Results" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          if [ -f docs/specialist_run_results.json ]; then
+          echo "**Date:** $(date -u +%Y-%m-%d)" >> $GITHUB_STEP_SUMMARY
+          echo "**Capacity:** 9 keys × 80 tasks = 720 specialists/day" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          if ls docs/specialist_run_*.json 1> /dev/null 2>&1; then
             echo '```json' >> $GITHUB_STEP_SUMMARY
-            cat docs/specialist_run_results.json >> $GITHUB_STEP_SUMMARY
+            cat docs/specialist_run_*.json | head -100 >> $GITHUB_STEP_SUMMARY
             echo '```' >> $GITHUB_STEP_SUMMARY
           else
-            echo "結果ファイルが見つかりません（ドライランモード）" >> $GITHUB_STEP_SUMMARY
+            echo "結果ファイルが見つかりません" >> $GITHUB_STEP_SUMMARY
           fi

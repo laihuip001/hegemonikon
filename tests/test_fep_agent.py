@@ -287,6 +287,107 @@ class TestDirichletUpdate:
         assert dirichlet_updates[0]["learning_rate"] == 100.0
 
 
+class TestWorkflowEncoding:
+    """Test suite for workflow output encoding functions."""
+    
+    def test_encode_noesis_output_high_confidence(self):
+        """encode_noesis_output correctly maps high confidence."""
+        from mekhane.fep.encoding import encode_noesis_output
+        
+        # High confidence, one uncertainty zone
+        obs = encode_noesis_output(
+            confidence_score=0.87,
+            uncertainty_zones=[{"zone": "A", "doubt_score": 0.4}]
+        )
+        
+        assert len(obs) == 3
+        assert obs[0] == 1  # clear context (1 zone = 0.8 clarity >= 0.5)
+        assert obs[1] == 0  # low urgency (always for Noēsis)
+        assert obs[2] == 2  # high confidence (0.87 >= 0.7)
+    
+    def test_encode_noesis_output_many_uncertainty_zones(self):
+        """encode_noesis_output handles many uncertainty zones."""
+        from mekhane.fep.encoding import encode_noesis_output
+        
+        # Many uncertainty zones -> ambiguous context
+        zones = [{"zone": f"Z{i}"} for i in range(4)]  # 4 zones -> 0.2 clarity
+        obs = encode_noesis_output(confidence_score=0.5, uncertainty_zones=zones)
+        
+        assert obs[0] == 0  # ambiguous context
+        assert obs[2] == 1  # medium confidence
+    
+    def test_encode_boulesis_output_deliberate(self):
+        """encode_boulesis_output correctly maps deliberate (low impulse)."""
+        from mekhane.fep.encoding import encode_boulesis_output
+        
+        # Low impulse (deliberate), high feasibility
+        obs = encode_boulesis_output(impulse_score=25, feasibility_score=80)
+        
+        assert obs[0] == 1  # clear context (feasibility >= 50)
+        assert obs[1] == 0  # low urgency (impulse < 40)
+        assert obs[2] == 2  # high confidence (feasibility >= 70)
+    
+    def test_encode_boulesis_output_impulsive(self):
+        """encode_boulesis_output correctly maps impulsive (high impulse)."""
+        from mekhane.fep.encoding import encode_boulesis_output
+        
+        # High impulse, medium feasibility
+        obs = encode_boulesis_output(impulse_score=80, feasibility_score=55)
+        
+        assert obs[0] == 1  # clear context (feasibility >= 50)
+        assert obs[1] == 2  # high urgency (impulse >= 70)
+        assert obs[2] == 1  # medium confidence (40 <= feasibility < 70)
+    
+    def test_generate_fep_feedback_markdown_act(self):
+        """generate_fep_feedback_markdown generates correct output for 'act'."""
+        from mekhane.fep.encoding import generate_fep_feedback_markdown
+        
+        mock_result = {
+            "action_name": "act",
+            "action": 1,
+            "q_pi": [0.23, 0.77],
+            "entropy": 1.42,
+            "map_state_names": {
+                "phantasia": "clear",
+                "assent": "granted",
+                "horme": "passive"
+            }
+        }
+        
+        output = generate_fep_feedback_markdown(mock_result, "context=clear, urgency=low")
+        
+        assert "act (77%)" in output
+        assert "phantasia: clear" in output
+        assert "assent: granted" in output
+        assert "horme: passive" in output
+        assert "1.42" in output
+        assert "中程度の不確実性" in output
+        assert "行動に移行可能" in output
+    
+    def test_generate_fep_feedback_markdown_observe(self):
+        """generate_fep_feedback_markdown generates correct output for 'observe'."""
+        from mekhane.fep.encoding import generate_fep_feedback_markdown
+        
+        mock_result = {
+            "action_name": "observe",
+            "action": 0,
+            "q_pi": [0.65, 0.35],
+            "entropy": 2.5,
+            "map_state_names": {
+                "phantasia": "unclear",
+                "assent": "withheld",
+                "horme": "active"
+            }
+        }
+        
+        output = generate_fep_feedback_markdown(mock_result, "context=ambiguous")
+        
+        assert "observe (65%)" in output
+        assert "高い不確実性" in output
+        assert "Epochē 推奨" in output
+        assert "追加調査" in output
+
+
 if __name__ == "__main__":
     pytest.main([__file__, "-v"])
 

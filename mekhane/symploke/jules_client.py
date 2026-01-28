@@ -61,8 +61,10 @@ class SessionState(Enum):
     IN_PROGRESS = "IN_PROGRESS"
     IMPLEMENTING = "IMPLEMENTING"
     TESTING = "TESTING"
+    WAITING_FOR_APPROVAL = "WAITING_FOR_APPROVAL"  # Human approval required
     COMPLETED = "COMPLETED"
     FAILED = "FAILED"
+    CANCELLED = "CANCELLED"  # User or system cancelled
     UNKNOWN = "UNKNOWN"  # Fallback for new/unknown states
 
 
@@ -186,8 +188,11 @@ class JulesClient:
     POLL_INTERVAL = 5  # seconds
     MAX_CONCURRENT = 60  # Ultra plan limit
     
-    # Terminal states that stop polling
-    TERMINAL_STATES = frozenset({SessionState.COMPLETED, SessionState.FAILED})
+    # Terminal states that stop polling (task finished)
+    TERMINAL_STATES = frozenset({SessionState.COMPLETED, SessionState.FAILED, SessionState.CANCELLED})
+    
+    # Pause states that stop polling (awaiting external action)
+    PAUSE_STATES = frozenset({SessionState.WAITING_FOR_APPROVAL})
     
     def __init__(
         self,
@@ -392,6 +397,14 @@ class JulesClient:
             
             # Terminal state - return immediately
             if session.state in self.TERMINAL_STATES:
+                return session
+            
+            # Pause state - requires external action (e.g., human approval)
+            if session.state in self.PAUSE_STATES:
+                logger.info(
+                    f"Session {session_id} paused: {session.state.value}. "
+                    f"External action required."
+                )
                 return session
             
             # Unknown state handling (th-001 fix)

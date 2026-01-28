@@ -145,6 +145,46 @@ class SophiaBacklinker:
                          "backlinks": list(v["backlinks"])} 
                      for k, v in self.cache.items()}
         }
+    
+    def to_mermaid(self, direction: str = "LR", max_nodes: int = 50) -> str:
+        """Mermaid.js 形式でグラフをエクスポート
+        
+        Args:
+            direction: グラフの方向 (LR, TB, RL, BT)
+            max_nodes: 警告を表示するノード数閾値
+            
+        Returns:
+            Mermaid 記法の文字列
+        """
+        node_count = self.graph.number_of_nodes()
+        lines = [f"graph {direction}"]
+        
+        # 大規模グラフ警告
+        if node_count > max_nodes:
+            lines.insert(0, f"%% ⚠️ 警告: {node_count} ノード (> {max_nodes}) — 可視化が崩壊する可能性")
+        
+        def sanitize(name: str) -> str:
+            """ノード名をMermaid安全な形式に変換"""
+            # 特殊文字を置換、引用符で囲む
+            safe = name.replace('"', "'").replace("-", "_").replace(" ", "_")
+            return f'"{safe}"'
+        
+        for src, dst in self.graph.edges():
+            lines.append(f"    {sanitize(src)} --> {sanitize(dst)}")
+        
+        return "\n".join(lines)
+    
+    def to_json_for_d3(self) -> Dict:
+        """D3.js force-directed 用 JSON
+        
+        Returns:
+            D3.js 互換の nodes/links 構造
+        """
+        return {
+            "nodes": [{"id": n, "type": self.graph.nodes[n].get("type", "unknown")} 
+                     for n in self.graph.nodes()],
+            "links": [{"source": s, "target": t} for s, t in self.graph.edges()]
+        }
 
 
 def main():
@@ -154,6 +194,8 @@ def main():
     parser.add_argument("--backlinks", type=str, help="Get backlinks for a note")
     parser.add_argument("--outlinks", type=str, help="Get outlinks for a note")
     parser.add_argument("--stats", action="store_true", help="Show graph stats")
+    parser.add_argument("--mermaid", action="store_true", help="Output Mermaid diagram")
+    parser.add_argument("--json", action="store_true", help="Output D3.js JSON")
     args = parser.parse_args()
     
     backlinker = SophiaBacklinker()
@@ -163,6 +205,16 @@ def main():
     stats = backlinker.get_stats()
     
     print(f"✅ Graph built: {stats['nodes']} nodes, {stats['edges']} edges")
+    
+    if args.mermaid:
+        print(f"\n📈 Mermaid diagram:")
+        print(backlinker.to_mermaid())
+        return
+    
+    if args.json:
+        print(f"\n📈 D3.js JSON:")
+        print(json.dumps(backlinker.to_json_for_d3(), indent=2, ensure_ascii=False))
+        return
     
     if args.backlinks:
         backlinks = backlinker.get_backlinks(args.backlinks)

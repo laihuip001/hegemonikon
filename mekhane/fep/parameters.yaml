@@ -1,0 +1,259 @@
+# FEP Agent Parameter Database
+# Source: Active Inference Literature Review (2026-01-28)
+# Reference: docs/research/active_inference_parameter_research.md
+
+version: "1.0"
+date: "2026-01-28"
+confidence: "medium-high"
+
+# =============================================================================
+# A Matrix: Observation Likelihood P(o|s)
+# =============================================================================
+A_matrix:
+  description: "Probability of observing o given hidden state s"
+  
+  # High reliability observations (state clearly maps to observation)
+  high_reliability:
+    value: 0.85
+    range: [0.7, 0.9]
+    source: "pymdp tutorial"
+    verified: true
+    
+  # Low reliability / noise
+  low_reliability:
+    value: 0.15
+    range: [0.1, 0.3]
+    source: "pymdp multi-armed bandit"
+    verified: true
+    
+  # Dirichlet concentration (for learning)
+  dirichlet_alpha:
+    value: 1.0
+    range: [0.5, 2.0]
+    source: "Da Costa et al. (2020)"
+    verified: true
+    note: "1.0 = uninformative prior"
+
+# =============================================================================
+# B Matrix: State Transition P(s'|s,a)
+# =============================================================================
+B_matrix:
+  description: "Probability of transitioning to s' given current s and action a"
+  
+  # Deterministic transition (action has certain effect)
+  deterministic:
+    value: 1.0
+    range: [0.9, 1.0]
+    source: "pymdp grid-world"
+    verified: true
+    
+  # Probabilistic transition (noisy environment)
+  probabilistic:
+    value: 0.85
+    range: [0.8, 0.95]
+    source: "implementation examples"
+    verified: false
+    
+  # Observe action: clarification probability
+  observe_clarifies:
+    value: 0.8
+    range: [0.7, 0.9]
+    source: "task structure dependent"
+    verified: false
+    note: "Observation should make things clearer"
+    
+  # Observe action: induces Epochē probability  
+  observe_induces_epochē:
+    value: 0.3
+    range: [0.2, 0.4]
+    source: "Stoic philosophy"
+    verified: false
+    note: "Careful observation may reveal uncertainty"
+
+# =============================================================================
+# C Vector: Preferences (log-probabilities)
+# =============================================================================
+C_vector:
+  description: "Agent's preferences over observations (higher = more preferred)"
+  
+  # Strong positive preference
+  high_positive:
+    value: 2.5
+    range: [2.0, 3.0]
+    source: "Gijsen et al. (2022)"
+    verified: true
+    note: "Used for goal states"
+    
+  # Moderate positive preference
+  medium_positive:
+    value: 1.5
+    range: [1.0, 2.0]
+    source: "implementation examples"
+    verified: false
+    
+  # Neutral
+  neutral:
+    value: 0.0
+    range: [-0.5, 0.5]
+    source: "default"
+    verified: true
+    
+  # Moderate aversion
+  medium_negative:
+    value: -1.0
+    range: [-1.5, -0.5]
+    source: "implementation examples"
+    verified: false
+    
+  # Strong aversion
+  high_negative:
+    value: -2.0
+    range: [-3.0, -1.0]
+    source: "Gijsen et al. (2022)"
+    verified: true
+    note: "Used for error/uncertainty states"
+
+# =============================================================================
+# D Vector: Initial Beliefs (prior)
+# =============================================================================
+D_vector:
+  description: "Agent's initial belief distribution over hidden states"
+  
+  # Maximum epistemic humility (uniform)
+  uniform:
+    value: 0.5
+    range: [0.45, 0.55]
+    source: "default"
+    verified: true
+    note: "No prior knowledge"
+    
+  # Weak bias toward uncertainty (Stoic humility)
+  uncertain_bias:
+    value: 0.6
+    range: [0.55, 0.7]
+    source: "Stoic philosophy - epistemic humility"
+    verified: false
+    note: "Agent starts slightly uncertain"
+    
+  # Weak bias toward certainty (after learning)
+  certain_bias:
+    value: 0.4
+    range: [0.3, 0.45]
+    source: "post-learning tendency"
+    verified: false
+
+# =============================================================================
+# Hyperparameters
+# =============================================================================
+hyperparameters:
+  # Policy precision (gamma)
+  gamma:
+    value: 16.0
+    range: [4.0, 32.0]
+    source: "pymdp Agent default"
+    verified: true
+    note: "Higher = more deterministic policy selection"
+    
+  # EFE coefficient (alpha)
+  alpha:
+    value: 16.0
+    range: [1.0, 32.0]
+    source: "pymdp Agent default"
+    verified: true
+    
+  # Inverse temperature (beta)
+  beta:
+    value: 2.0
+    range: [1.0, 4.0]
+    source: "Gijsen et al. (2022)"
+    verified: true
+    note: "Individual difference parameter"
+    
+  # A matrix learning rate
+  lr_pA:
+    value: 1.0
+    range: [0.5, 2.0]
+    source: "pymdp default"
+    verified: true
+    
+  # D vector learning rate
+  lr_pD:
+    value: 0.5
+    range: [0.3, 1.0]
+    source: "recommendation for stability"
+    verified: false
+
+# =============================================================================
+# Hegemonikón-Specific Mappings
+# =============================================================================
+hegemonikon:
+  # Stoic philosophy to Active Inference mapping
+  state_factors:
+    phantasia:
+      levels: ["uncertain", "clear"]
+      preferred: "clear"
+      preference_value: 2.0
+      
+    synkatathesis:
+      levels: ["withheld", "granted"]
+      preferred: "granted"  # But only when phantasia is clear
+      preference_value: 1.5
+      
+    horme:
+      levels: ["passive", "active"]
+      preferred: "active"  # But only when synkatathesis is granted
+      preference_value: 1.0
+      
+  # Actions
+  actions:
+    observe:
+      index: 0
+      effect: "Clarifies phantasia, tends toward Epochē and calm"
+      hegemonikon_mapping: "O1 Noēsis"
+      
+    act:
+      index: 1
+      effect: "Grants assent, activates hormē"
+      hegemonikon_mapping: "O4 Energeia"
+      
+  # Epochē trigger
+  epochē_threshold:
+    entropy:
+      value: 1.0
+      range: [0.8, 1.5]
+      source: "empirical calibration needed"
+      verified: false
+      note: "Higher entropy = more uncertainty = trigger Epochē"
+
+# =============================================================================
+# Reference Sources
+# =============================================================================
+references:
+  - id: "smith2022"
+    title: "A step-by-step tutorial on active inference"
+    authors: "Smith, R., Friston, K., Whyte, C."
+    year: 2022
+    journal: "Journal of Mathematical Psychology"
+    
+  - id: "da_costa2020"
+    title: "Active inference on discrete state-spaces: A synthesis"
+    authors: "Da Costa, L., et al."
+    year: 2020
+    journal: "Neuroscience & Biobehavioral Reviews"
+    
+  - id: "gijsen2022"
+    title: "Active inference and the two-step task"
+    authors: "Gijsen, S., et al."
+    year: 2022
+    journal: "Scientific Reports"
+    
+  - id: "parr2022"
+    title: "Active Inference: The Free Energy Principle in Mind, Brain, and Behavior"
+    authors: "Parr, T., Pezzulo, G., Friston, K."
+    year: 2022
+    publisher: "MIT Press"
+    
+  - id: "pymdp2024"
+    title: "pymdp documentation"
+    url: "https://pymdp-rtd.readthedocs.io"
+    year: 2024

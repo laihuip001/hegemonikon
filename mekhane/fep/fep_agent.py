@@ -183,7 +183,10 @@ class HegemonikónFEPAgent:
         elif isinstance(self.beliefs, list):
             beliefs_array = np.asarray(self.beliefs[0], dtype=np.float64)
         else:
-        beliefs_array = np.asarray(beliefs_array, dtype=np.float64).flatten()
+            beliefs_array = np.asarray(self.beliefs, dtype=np.float64)
+        
+        # Flatten if needed
+        beliefs_array = beliefs_array.flatten()
         
         # Compute MAP state
         map_idx = int(np.argmax(beliefs_array))

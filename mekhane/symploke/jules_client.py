@@ -66,21 +66,29 @@ class SessionState(Enum):
     FAILED = "FAILED"
     CANCELLED = "CANCELLED"  # User or system cancelled
     UNKNOWN = "UNKNOWN"  # Fallback for new/unknown states
-
-
-def parse_state(state_str: str) -> SessionState:
-    """Parse state string, returning UNKNOWN for unrecognized states.
     
-    Warning: Unknown states may indicate new terminal states (e.g., CANCELLED)
-    that should stop polling. Check logs for unknown state occurrences.
-    """
-    try:
-        return SessionState(state_str)
-    except ValueError:
-        # Log unknown states for monitoring - may be new terminal states
-        logger.warning(f"Unknown Jules API state encountered: '{state_str}'. "
-                      f"This may indicate a new terminal state requiring code update.")
-        return SessionState.UNKNOWN
+    @classmethod
+    def from_string(cls, state_str: str) -> "SessionState":
+        """Parse state string, returning UNKNOWN for unrecognized states.
+        
+        Warning: Unknown states may indicate new terminal states (e.g., CANCELLED)
+        that should stop polling. Check logs for unknown state occurrences.
+        """
+        try:
+            return cls(state_str)
+        except ValueError:
+            # Log unknown states for monitoring - may be new terminal states
+            logger.warning(
+                f"Unknown Jules API state encountered: '{state_str}'. "
+                f"This may indicate a new terminal state requiring code update."
+            )
+            return cls.UNKNOWN
+
+
+# Legacy alias for backwards compatibility
+def parse_state(state_str: str) -> SessionState:
+    """Deprecated: Use SessionState.from_string() instead."""
+    return SessionState.from_string(state_str)
 
 
 # ============ Data Types ============

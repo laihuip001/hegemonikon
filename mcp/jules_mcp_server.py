@@ -19,7 +19,6 @@ if sys.platform == 'win32':
     asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
 # ============ Redirect stdout to stderr for logging ============
-import io
 
 def log(msg):
     print(f"[jules-mcp] {msg}", file=sys.stderr, flush=True)
@@ -148,24 +147,21 @@ async def call_tool(name: str, arguments: dict):
         return [TextContent(type="text", text="Error: JULES_API_KEY environment variable not set")]
     
     try:
-        client = JulesClient(api_key)
-    except Exception as e:
-        return [TextContent(type="text", text=f"Error initializing client: {e}")]
-    
-    # ============ jules_create_task ============
-    if name == "jules_create_task":
-        prompt = arguments.get("prompt", "")
-        repo = arguments.get("repo", "")
-        branch = arguments.get("branch", "main")
-        
-        if not prompt or not repo:
-            return [TextContent(type="text", text="Error: prompt and repo are required")]
-        
-        try:
-            source = f"sources/github/{repo}"
-            session = await client.create_session(prompt, source, branch)
-            
-            output = f"""# Jules Task Created
+        async with JulesClient(api_key) as client:
+            # ============ jules_create_task ============
+            if name == "jules_create_task":
+                prompt = arguments.get("prompt", "")
+                repo = arguments.get("repo", "")
+                branch = arguments.get("branch", "main")
+
+                if not prompt or not repo:
+                    return [TextContent(type="text", text="Error: prompt and repo are required")]
+
+                try:
+                    source = f"sources/github/{repo}"
+                    session = await client.create_session(prompt, source, branch)
+
+                    output = f"""# Jules Task Created
 
 - **Session ID**: `{session.id}`
 - **State**: {session.state.value}
@@ -174,105 +170,107 @@ async def call_tool(name: str, arguments: dict):
 
 Use `jules_get_status` with session_id to check progress.
 """
-            log(f"Created session: {session.id}")
-            return [TextContent(type="text", text=output)]
+                    log(f"Created session: {session.id}")
+                    return [TextContent(type="text", text=output)]
+
+                except Exception as e:
+                    log(f"Error creating session: {e}")
+                    return [TextContent(type="text", text=f"Error: {e}")]
             
-        except Exception as e:
-            log(f"Error creating session: {e}")
-            return [TextContent(type="text", text=f"Error: {e}")]
-    
-    # ============ jules_get_status ============
-    elif name == "jules_get_status":
-        session_id = arguments.get("session_id", "")
-        
-        if not session_id:
-            return [TextContent(type="text", text="Error: session_id is required")]
-        
-        try:
-            session = await client.get_session(session_id)
-            
-            status_emoji = {
-                SessionState.PLANNING: "📝",
-                SessionState.IMPLEMENTING: "🔨",
-                SessionState.TESTING: "🧪",
-                SessionState.COMPLETED: "✅",
-                SessionState.FAILED: "❌"
-            }
-            
-            output = f"""# Jules Session Status
+            # ============ jules_get_status ============
+            elif name == "jules_get_status":
+                session_id = arguments.get("session_id", "")
+
+                if not session_id:
+                    return [TextContent(type="text", text="Error: session_id is required")]
+
+                try:
+                    session = await client.get_session(session_id)
+
+                    status_emoji = {
+                        SessionState.PLANNING: "📝",
+                        SessionState.IMPLEMENTING: "🔨",
+                        SessionState.TESTING: "🧪",
+                        SessionState.COMPLETED: "✅",
+                        SessionState.FAILED: "❌"
+                    }
+
+                    output = f"""# Jules Session Status
 
 - **Session ID**: `{session.id}`
 - **State**: {status_emoji.get(session.state, "❓")} {session.state.value}
 """
-            if session.pull_request_url:
-                output += f"- **Pull Request**: {session.pull_request_url}\n"
-            if session.error:
-                output += f"- **Error**: {session.error}\n"
+                    if session.pull_request_url:
+                        output += f"- **Pull Request**: {session.pull_request_url}\n"
+                    if session.error:
+                        output += f"- **Error**: {session.error}\n"
+
+                    log(f"Session {session_id}: {session.state.value}")
+                    return [TextContent(type="text", text=output)]
+
+                except Exception as e:
+                    log(f"Error getting status: {e}")
+                    return [TextContent(type="text", text=f"Error: {e}")]
             
-            log(f"Session {session_id}: {session.state.value}")
-            return [TextContent(type="text", text=output)]
+            # ============ jules_batch_execute ============
+            elif name == "jules_batch_execute":
+                tasks = arguments.get("tasks", [])
+                max_concurrent = min(arguments.get("max_concurrent", 30), 60)
+
+                if not tasks:
+                    return [TextContent(type="text", text="Error: tasks list is required")]
+
+                try:
+                    # Convert repo format
+                    formatted_tasks = []
+                    for task in tasks:
+                        formatted_tasks.append({
+                            "prompt": task["prompt"],
+                            "source": f"sources/github/{task['repo']}",
+                            "branch": task.get("branch", "main")
+                        })
+
+                    log(f"Executing {len(tasks)} tasks with max_concurrent={max_concurrent}")
+                    results = await client.batch_execute(formatted_tasks, max_concurrent)
+
+                    # Format results
+                    output_lines = ["# Jules Batch Results\n"]
+                    output_lines.append(f"**Total**: {len(results)} tasks\n")
+
+                    completed = sum(1 for r in results if r.state == SessionState.COMPLETED)
+                    failed = sum(1 for r in results if r.state == SessionState.FAILED)
+                    output_lines.append(f"- ✅ Completed: {completed}")
+                    output_lines.append(f"- ❌ Failed: {failed}\n")
+
+                    for i, result in enumerate(results, 1):
+                        emoji = "✅" if result.state == SessionState.COMPLETED else "❌"
+                        output_lines.append(f"## [{i}] {emoji} {result.prompt[:50]}...")
+                        if result.pull_request_url:
+                            output_lines.append(f"- PR: {result.pull_request_url}")
+                        if result.error:
+                            output_lines.append(f"- Error: {result.error}")
+                        output_lines.append("")
+
+                    log(f"Batch complete: {completed}/{len(results)} succeeded")
+                    return [TextContent(type="text", text="\n".join(output_lines))]
+
+                except Exception as e:
+                    log(f"Batch execution error: {e}")
+                    return [TextContent(type="text", text=f"Error: {e}")]
             
-        except Exception as e:
-            log(f"Error getting status: {e}")
-            return [TextContent(type="text", text=f"Error: {e}")]
-    
-    # ============ jules_batch_execute ============
-    elif name == "jules_batch_execute":
-        tasks = arguments.get("tasks", [])
-        max_concurrent = min(arguments.get("max_concurrent", 30), 60)
-        
-        if not tasks:
-            return [TextContent(type="text", text="Error: tasks list is required")]
-        
-        try:
-            # Convert repo format
-            formatted_tasks = []
-            for task in tasks:
-                formatted_tasks.append({
-                    "prompt": task["prompt"],
-                    "source": f"sources/github/{task['repo']}",
-                    "branch": task.get("branch", "main")
-                })
-            
-            log(f"Executing {len(tasks)} tasks with max_concurrent={max_concurrent}")
-            results = await client.batch_execute(formatted_tasks, max_concurrent)
-            
-            # Format results
-            output_lines = [f"# Jules Batch Results\n"]
-            output_lines.append(f"**Total**: {len(results)} tasks\n")
-            
-            completed = sum(1 for r in results if r.state == SessionState.COMPLETED)
-            failed = sum(1 for r in results if r.state == SessionState.FAILED)
-            output_lines.append(f"- ✅ Completed: {completed}")
-            output_lines.append(f"- ❌ Failed: {failed}\n")
-            
-            for i, result in enumerate(results, 1):
-                emoji = "✅" if result.state == SessionState.COMPLETED else "❌"
-                output_lines.append(f"## [{i}] {emoji} {result.prompt[:50]}...")
-                if result.pull_request_url:
-                    output_lines.append(f"- PR: {result.pull_request_url}")
-                if result.error:
-                    output_lines.append(f"- Error: {result.error}")
-                output_lines.append("")
-            
-            log(f"Batch complete: {completed}/{len(results)} succeeded")
-            return [TextContent(type="text", text="\n".join(output_lines))]
-            
-        except Exception as e:
-            log(f"Batch execution error: {e}")
-            return [TextContent(type="text", text=f"Error: {e}")]
-    
-    # ============ jules_list_repos ============
-    elif name == "jules_list_repos":
-        # Note: This would require implementing the sources endpoint
-        return [TextContent(type="text", text="""# Jules Repositories
+            # ============ jules_list_repos ============
+            elif name == "jules_list_repos":
+                # Note: This would require implementing the sources endpoint
+                return [TextContent(type="text", text="""# Jules Repositories
 
 Repository listing not yet implemented.
 Use repository format: `owner/repo` (e.g., `laihuip001/hegemonikon`)
 """)]
-    
-    else:
-        return [TextContent(type="text", text=f"Unknown tool: {name}")]
+
+            else:
+                return [TextContent(type="text", text=f"Unknown tool: {name}")]
+    except Exception as e:
+        return [TextContent(type="text", text=f"Error initializing client: {e}")]
 
 
 async def main():

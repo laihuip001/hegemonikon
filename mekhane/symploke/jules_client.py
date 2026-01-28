@@ -85,7 +85,55 @@ class JulesClient:
             "X-Goog-Api-Key": self.api_key,
             "Content-Type": "application/json"
         }
+        self._session: Optional[aiohttp.ClientSession] = None
     
+    async def __aenter__(self):
+        """Enable use as context manager."""
+        self._session = aiohttp.ClientSession()
+        return self
+
+    async def __aexit__(self, exc_type, exc_val, exc_tb):
+        """Close session on exit."""
+        if self._session:
+            await self._session.close()
+            self._session = None
+
+    async def _make_request(self, method: str, endpoint: str, json: dict = None) -> dict:
+        """
+        Make API request using persistent session if available.
+
+        Args:
+            method: HTTP method (GET, POST)
+            endpoint: API endpoint path (e.g., "/sessions")
+            json: JSON payload
+
+        Returns:
+            Response JSON data
+
+        Raises:
+            RateLimitError: If API rate limit exceeded
+            aiohttp.ClientResponseError: For other HTTP errors
+        """
+        url = f"{self.BASE_URL}{endpoint}"
+
+        async def process_response(resp):
+            if resp.status == 429:
+                raise RateLimitError("Rate limit exceeded")
+            resp.raise_for_status()
+            return await resp.json()
+
+        if self._session and not self._session.closed:
+            async with self._session.request(
+                method, url, headers=self._headers, json=json
+            ) as resp:
+                return await process_response(resp)
+        else:
+            async with aiohttp.ClientSession() as session:
+                async with session.request(
+                    method, url, headers=self._headers, json=json
+                ) as resp:
+                    return await process_response(resp)
+
     async def create_session(
         self,
         prompt: str,
@@ -117,24 +165,15 @@ class JulesClient:
             "requirePlanApproval": not auto_approve
         }
         
-        async with aiohttp.ClientSession() as session:
-            async with session.post(
-                f"{self.BASE_URL}/sessions",
-                headers=self._headers,
-                json=payload
-            ) as resp:
-                if resp.status == 429:
-                    raise RateLimitError("Rate limit exceeded")
-                resp.raise_for_status()
-                data = await resp.json()
-                
-                return JulesSession(
-                    id=data["id"],
-                    name=data["name"],
-                    state=parse_state(data.get("state", "PLANNING")),
-                    prompt=prompt,
-                    source=source
-                )
+        data = await self._make_request("POST", "/sessions", json=payload)
+
+        return JulesSession(
+            id=data["id"],
+            name=data["name"],
+            state=parse_state(data.get("state", "PLANNING")),
+            prompt=prompt,
+            source=source
+        )
     
     async def get_session(self, session_id: str) -> JulesSession:
         """
@@ -146,32 +185,24 @@ class JulesClient:
         Returns:
             Updated JulesSession
         """
-        async with aiohttp.ClientSession() as session:
-            async with session.get(
-                f"{self.BASE_URL}/sessions/{session_id}",
-                headers=self._headers
-            ) as resp:
-                if resp.status == 429:
-                    raise RateLimitError("Rate limit exceeded")
-                resp.raise_for_status()
-                data = await resp.json()
-                
-                # Extract PR URL if available
-                pr_url = None
-                outputs = data.get("outputs", [])
-                if outputs:
-                    pr = outputs[0].get("pullRequest", {})
-                    pr_url = pr.get("url")
-                
-                return JulesSession(
-                    id=data["id"],
-                    name=data["name"],
-                    state=parse_state(data.get("state", "PLANNING")),
-                    prompt=data.get("prompt", ""),
-                    source=data.get("sourceContext", {}).get("source", ""),
-                    pull_request_url=pr_url,
-                    error=data.get("error")
-                )
+        data = await self._make_request("GET", f"/sessions/{session_id}")
+
+        # Extract PR URL if available
+        pr_url = None
+        outputs = data.get("outputs", [])
+        if outputs:
+            pr = outputs[0].get("pullRequest", {})
+            pr_url = pr.get("url")
+
+        return JulesSession(
+            id=data["id"],
+            name=data["name"],
+            state=parse_state(data.get("state", "PLANNING")),
+            prompt=data.get("prompt", ""),
+            source=data.get("sourceContext", {}).get("source", ""),
+            pull_request_url=pr_url,
+            error=data.get("error")
+        )
     
     async def poll_session(
         self,
@@ -305,7 +336,7 @@ if __name__ == "__main__":
         
         try:
             client = JulesClient(api_key)
-            print(f"✅ Client initialized")
+            print("✅ Client initialized")
             print(f"   API Key: {api_key[:8]}...{api_key[-4:]}")
             print(f"   Base URL: {client.BASE_URL}")
             print(f"   Max Concurrent: {client.MAX_CONCURRENT}")

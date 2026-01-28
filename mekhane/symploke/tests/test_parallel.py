@@ -10,12 +10,15 @@ import asyncio
 import os
 import sys
 import time
+import pytest
 
 sys.path.insert(0, "/home/laihuip001/oikos/hegemonikon")
 
 from mekhane.symploke.jules_client import JulesClient, SessionState
 
 
+@pytest.mark.asyncio
+@pytest.mark.skipif(not os.environ.get("JULES_API_KEY"), reason="JULES_API_KEY not set")
 async def test_parallel_execution():
     """Test 5 parallel task execution."""
     api_key = os.environ.get("JULES_API_KEY")

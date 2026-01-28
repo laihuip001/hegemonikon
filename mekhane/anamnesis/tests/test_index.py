@@ -22,12 +22,13 @@ class TestGnosisIndex(unittest.TestCase):
         self.embedder_patcher = patch('mekhane.anamnesis.index.Embedder')
         self.mock_embedder_class = self.embedder_patcher.start()
         self.mock_embedder_instance = self.mock_embedder_class.return_value
-        # Mock embed method to return a dummy vector
+        # Mock embed_batch to return one vector per input text
+        self.mock_embedder_instance.embed_batch.side_effect = lambda texts: [[0.1] * 384 for _ in texts]
         self.mock_embedder_instance.embed.return_value = [0.1] * 384
 
         self.index = GnosisIndex(lance_dir=self.lance_dir)
-        # Inject the mock embedder
-        self.index.embedder = self.mock_embedder_instance
+        # Override _get_embedder to always return our mock
+        self.index._get_embedder = lambda: self.mock_embedder_instance
 
     def tearDown(self):
         self.embedder_patcher.stop()

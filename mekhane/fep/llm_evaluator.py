@@ -21,8 +21,9 @@ import json
 
 # Check for available LLM clients
 GEMINI_AVAILABLE = False
+GEMINI_CLIENT = None
 try:
-    import google.generativeai as genai
+    from google import genai
     GEMINI_AVAILABLE = True
 except ImportError:
     pass
@@ -42,6 +43,9 @@ class EvaluationResult:
 # Evaluation thresholds
 L1_CONFIDENCE_THRESHOLD = 0.75  # Below this, escalate to L2
 L2_CONFIDENCE_THRESHOLD = 0.60  # Below this, escalate to L3
+
+# Gemini model to use (free tier: gemini-2.0-flash-lite)
+GEMINI_MODEL = "gemini-2.0-flash-lite"
 
 
 # =============================================================================
@@ -124,7 +128,7 @@ GEMINI_EVALUATION_PROMPT = """あなたはActive Inference認知エージェン�
 
 
 def evaluate_with_gemini(text: str) -> Optional[Dict[str, float]]:
-    """L2: Evaluate text using Gemini 1.5 Flash.
+    """L2: Evaluate text using Gemini Flash (free tier).
     
     Uses the free tier of Gemini API for observation generation.
     
@@ -143,11 +147,14 @@ def evaluate_with_gemini(text: str) -> Optional[Dict[str, float]]:
         return None
     
     try:
-        genai.configure(api_key=api_key)
-        model = genai.GenerativeModel("gemini-1.5-flash")
+        # Use new google-genai Client API
+        client = genai.Client(api_key=api_key)
         
         prompt = GEMINI_EVALUATION_PROMPT.format(text=text)
-        response = model.generate_content(prompt)
+        response = client.models.generate_content(
+            model=GEMINI_MODEL,
+            contents=prompt,
+        )
         
         # Parse JSON response
         response_text = response.text.strip()

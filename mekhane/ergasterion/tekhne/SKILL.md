@@ -14,6 +14,8 @@ description: |
   - 「要件を最適化」
   - 「プロンプト」
   - 「PE」
+  - 「生成」
+  - 「製作」
 ---
 
 # Tekhne-Maker v6.0 「OMEGA SINGULARITY BUILD」

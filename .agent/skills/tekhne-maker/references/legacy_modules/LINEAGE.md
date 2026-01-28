@@ -16,12 +16,12 @@
 
 | Original Module | ID | Digested To | Method | Status |
 |:----------------|:---|:------------|:-------|:------:|
-| 第一原理思考.md | A-9 | /noe | Phase 1 統合 | 🟡 Planned |
-| 発散と収束.md | X-1 | /noe | Phase 2 統合 | 🟡 Planned |
-| 敵対的レビュー凸.md | C-1 | /dia | Attack Vector拡張 | 🟡 Planned |
+| 第一原理思考.md | A-9 | /noe v2.5 | AXIOM/ASSUMPTION タグ | ✅ Verified |
+| 発散と収束.md | X-1/X-2 | /noe v2.5 | 4ベクトル + 弁証法的収束 | ✅ Verified |
+| 敵対的レビュー凸.md | C-1 | /dia v4.2 | Logic Guillotine 統合 | ✅ Verified |
 | システム構造監査.md | C-3 | /dia | --infra モード | 🟡 Planned |
-| 仮想ユーザー座談会.md | M-1 | /pan Layer 3 | User Perspective | ✅ Verified |
-| 経験の法則化.md | L-1 | /bye | Wisdom Phase 拡張 | 🟡 Planned |
+| 仮想ユーザー座談会.md | M-1 | /pan v2.0 Layer 3 | User Perspective 5ペルソナ | ✅ Verified |
+| 経験の法則化.md | L-1 | /bye v2.3 | Wisdom Phase | ✅ Verified |
 | 自律思考.md | Ω-1 | Tekhne-Maker | RECURSIVE_CORE | ✅ Absorbed |
 | リバースエンジニアリング.md | R-1 | Tekhne-Maker | Audit Mode | ✅ Absorbed |
 | プロンプト外科手術凹.md | — | Tekhne-Maker | — | ✅ Absorbed |

@@ -79,13 +79,15 @@ def get_ki_directories() -> list[Path]:
 
 
 def ingest_to_sophia(docs: list[Document]) -> int:
-    """Ingest documents to Sophia index (returns count)."""
-    adapter = MockAdapter()
-    index = SophiaIndex(adapter, "sophia", dimension=768)
+    """Ingest documents to Sophia index using real embeddings (returns count)."""
+    from mekhane.symploke.adapters.embedding_adapter import EmbeddingAdapter
+    
+    adapter = EmbeddingAdapter(model_name="all-MiniLM-L6-v2")
+    index = SophiaIndex(adapter, "sophia", dimension=384)  # MiniLM = 384 dims
     index.initialize()
     
     count = index.ingest(docs)
-    print(f"Ingested {count} documents to Sophia")
+    print(f"Ingested {count} documents to Sophia (real embeddings)")
     return count
 
 

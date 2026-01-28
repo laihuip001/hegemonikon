@@ -11,6 +11,11 @@ from .state_spaces import (
     HORME_STATES,
     OBSERVATION_MODALITIES,
 )
+from .encoding import (
+    encode_input,
+    encode_structured_input,
+    decode_observation,
+)
 
 __all__ = [
     "HegemonikónFEPAgent",
@@ -18,4 +23,7 @@ __all__ = [
     "ASSENT_STATES",
     "HORME_STATES",
     "OBSERVATION_MODALITIES",
+    "encode_input",
+    "encode_structured_input",
+    "decode_observation",
 ]

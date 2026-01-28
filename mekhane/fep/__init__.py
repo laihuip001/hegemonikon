@@ -22,6 +22,13 @@ from .persistence import (
     A_exists,
     LEARNED_A_PATH,
 )
+from .fep_bridge import (
+    noesis_analyze,
+    boulesis_analyze,
+    full_inference_cycle,
+    NoesisResult,
+    BoulesisResult,
+)
 
 __all__ = [
     "HegemonikónFEPAgent",
@@ -36,4 +43,9 @@ __all__ = [
     "load_A",
     "A_exists",
     "LEARNED_A_PATH",
+    "noesis_analyze",
+    "boulesis_analyze",
+    "full_inference_cycle",
+    "NoesisResult",
+    "BoulesisResult",
 ]

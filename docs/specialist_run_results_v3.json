@@ -1,0 +1,59 @@
+{
+  "timestamp": "2026-01-27T23:24:25.686695",
+  "results": [
+    {
+      "id": "CL-004",
+      "name": "チャンク化効率評価者",
+      "session_id": "2814099512529381519",
+      "status": "started"
+    },
+    {
+      "id": "CL-005",
+      "name": "事前知識査定者",
+      "session_id": "11526256428717290794",
+      "status": "started"
+    },
+    {
+      "id": "CL-006",
+      "name": "一時変数負荷評価者",
+      "session_id": "13953152142881962262",
+      "status": "started"
+    },
+    {
+      "id": "CL-007",
+      "name": "ネスト深度評価者",
+      "session_id": "33438501393711130",
+      "status": "started"
+    },
+    {
+      "id": "AI-004",
+      "name": "Logic ハルシネーション検出者",
+      "session_id": "11777353360202639777",
+      "status": "started"
+    },
+    {
+      "id": "AI-005",
+      "name": "不完全コード検出者",
+      "session_id": "9424357455151994345",
+      "status": "started"
+    },
+    {
+      "id": "AI-006",
+      "name": "DRY違反検出者",
+      "session_id": "1206474763853243647",
+      "status": "started"
+    },
+    {
+      "id": "AS-002",
+      "name": "Orphaned Task 検出者",
+      "session_id": "11929000371841716530",
+      "status": "started"
+    },
+    {
+      "id": "AS-003",
+      "name": "キャンセレーション処理評価者",
+      "session_id": "3650181083679867898",
+      "status": "started"
+    }
+  ]
+}

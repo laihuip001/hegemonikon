@@ -39,6 +39,12 @@ from .llm_evaluator import (
     EvaluationResult,
     GEMINI_AVAILABLE,
 )
+from .config import (
+    FEPParameters,
+    load_parameters,
+    get_default_params,
+    reload_params,
+)
 
 __all__ = [
     "HegemonikónFEPAgent",
@@ -66,5 +72,9 @@ __all__ = [
     "encode_noesis_output",
     "encode_boulesis_output",
     "generate_fep_feedback_markdown",
+    "FEPParameters",
+    "load_parameters",
+    "get_default_params",
+    "reload_params",
 ]
 

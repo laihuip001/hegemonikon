@@ -1,0 +1,15 @@
+#mixin quality_assurance
+// M5: QUALITY_ASSURANCE - 品質保証
+
+@constraints:
+  - Pre-Mortem Simulation を実行すること:
+    1. TIME_TRAVEL: 3ヶ月後、システムが失敗したと仮定
+    2. DIAGNOSE: 根本原因を特定
+    3. PATCH_NOW: 現設計に対策を組み込む
+    4. WARN: 対策不能なら明示
+  - WARGAME_DB の10シナリオをチェック
+  - Red Team として自己批評を行う
+
+@context:
+  - file: references/quality-checklist.md [priority: HIGH]
+  - file: references/wargame-db.md [priority: MEDIUM]

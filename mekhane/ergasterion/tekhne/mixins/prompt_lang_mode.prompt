@@ -1,0 +1,110 @@
+// prompt_lang_mode.prompt
+// Self-Dogfooding: tekhne-maker が自身を拡張するために生成した mixin
+// 元: prompt-lang-generator SKILL.md (251行) の知識を凝縮
+// 生成日: 2026-01-28
+
+#mixin prompt_lang_mode
+
+// ═══════════════════════════════════════════════════════════
+// Prompt-Lang Mode: 収束タスク向け構造化出力
+// 適性: コード生成、データ抽出、Zero-Entropy が求められる作業
+// ═══════════════════════════════════════════════════════════
+
+@constraints:
+  // --- Required Directives (必須5項目) ---
+  - 生成物には必ず以下を含める:
+    - @role: AIの役割定義
+    - @goal: タスクの目的
+    - @constraints: 制約条件（3個以上）
+    - @format: 出力構造の定義（具体的なJSON/Markdown構造）
+    - @examples: 入出力例（1個以上）
+  
+  // --- Optional Directives (推奨) ---
+  - 推奨ディレクティブ:
+    - @rubric: 自己評価軸（4軸: completeness, syntactic, semantic, practical）
+    - @activation: トリガー条件（Skill用）
+    - @context: リソース参照
+    - @extends/@mixin: テンプレート継承・モジュール合成
+
+  // --- Quality Standards (定量基準) ---
+  - 品質ゲート:
+    - 構文正確性: パースエラー 0 (prompt_lang.py parse で検証)
+    - 必須網羅: 5ディレクティブ含む
+    - 曖昧語: 0件 (「適切に」「うまく」禁止)
+    - @constraints: 3個以上
+    - @examples: 1個以上
+
+  // --- Workflow (4フェーズ) ---
+  - 生成フロー:
+    Phase 0: 要件分析
+      - ドメイン検出（技術/RAG/要約/医療/法律...）
+      - タスク種別判定（生成/分類/抽出/評価...）
+      - リスクレベル判定（高リスク → 免責必須）
+    Phase 1: テンプレート選択
+      - base_template.yaml をベースに
+      - ドメイン別テンプレートをマージ
+    Phase 2: コード生成
+      - 可変部を埋める
+      - @format は具体的な JSON/Markdown 構造で
+    Phase 3: 自己評価
+      - @rubric 4軸でスコアリング
+      - 閾値未達なら再生成（max 2回）
+
+  // --- Edge Cases (境界条件) ---
+  - 境界条件対応:
+    - 入力が曖昧（「いい感じのプロンプト」）→ REJECT + 追加質問
+    - 高リスクドメイン（医療/法律）→ 免責注記を自動追加
+    - 不明なディレクティブ要求 → 「@foo は未対応」+ 代替案
+    - 出力形式未指定 → デフォルト JSON 形式
+
+  // --- Error Handling (エラー対応) ---
+  - エラー対応:
+    - 構文エラー: パーサー出力を添えて箇所を明示
+    - 要件不足: 不足項目をリストアップし追加入力を促す
+    - ドメイン外: 「対応外」+ 類似 Skill 提案
+
+@format:
+  type: prompt-lang
+  version: "2.1"
+  file_extension: ".prompt"
+  structure: |
+    #prompt {name}
+
+    @role:
+      {role_definition}
+
+    @goal:
+      {goal_statement}
+
+    @constraints:
+      - {constraint_1}
+      - {constraint_2}
+      - {constraint_3}
+
+    @format:
+      ```json
+      {output_schema}
+      ```
+
+    @examples:
+      - input: "{example_input}"
+        output: {example_output}
+
+    @rubric:
+      - completeness:
+          description: 必須セクションの網羅度
+          scale: 0-10
+      - syntactic_correctness:
+          description: Prompt-Lang としてパース可能か
+          scale: binary
+      - semantic_relevance:
+          description: 入力要件との適合度
+          scale: 0-10
+      - practical_utility:
+          description: 実際に業務で使えるか
+          scale: 0-10
+
+@context:
+  - file: references/prompt-lang-templates/base_template.yaml [priority: HIGH]
+  - dir: references/prompt-lang-templates/domain_templates/ [priority: MEDIUM]
+  - file: references/prompt-lang-templates/rubric_standards.yaml [priority: MEDIUM]

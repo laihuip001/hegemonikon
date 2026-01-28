@@ -165,15 +165,18 @@ def encode_observation(
     else:
         confidence_idx = 2  # high
     
-    # Compute flat observation index
-    # Order: context(2) + urgency(3) + confidence(3) = 8 total observations
-    # Index = context_idx * 9 + urgency_idx * 3 + confidence_idx
-    # But pymdp uses single modality, so we flatten differently:
-    # observation = context_offset + urgency_offset + confidence_offset
-    
-    # Return as tuple for multi-modality (context_idx, 2 + urgency_idx, 5 + confidence_idx)
-    # Or as flat index for single-modality: use weighted combination
-    return context_idx + (urgency_idx * 2) + (confidence_idx * 6)
+    # Compute flat observation index within 0-7 range
+    # Observation space is 8 total: context(2) + urgency(3) + confidence(3)
+    # We map: (context, urgency, confidence) → single index 0-7
+    # Using: context dominates (0-3 vs 4-7), then urgency+confidence combo
+    # 
+    # Mapping:
+    #   context=0 (ambiguous): indices 0-3
+    #   context=1 (clear): indices 4-7
+    #   within each: urgency*1 + (confidence % 2) for variety
+    base = 4 if context_idx == 1 else 0
+    modifier = (urgency_idx + confidence_idx) % 4  # 0-3 range
+    return base + modifier
 
 
 # Observation JSON schema for LLM evaluation (arXiv:2412.10425 pattern)

@@ -17,14 +17,16 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 from mekhane.symploke.indices import Document, SophiaIndex
-from mekhane.symploke.adapters.mock_adapter import MockAdapter
 
 
 KNOWLEDGE_DIR = Path("/home/laihuip001/oikos/.gemini/antigravity/knowledge")
 
 
 def parse_ki_directory(ki_path: Path) -> list[Document]:
-    """Parse a KI directory into Documents."""
+    """Parse a KI directory into Documents.
+    
+    Note: Uses rglob to capture nested .md files in subdirectories.
+    """
     docs = []
     
     # Read metadata.json
@@ -38,14 +40,18 @@ def parse_ki_directory(ki_path: Path) -> list[Document]:
     ki_name = metadata.get("name", ki_path.name)
     summary = metadata.get("summary", "")
     
-    # Read artifact files
+    # Read artifact files (including nested directories)
     artifacts_dir = ki_path / "artifacts"
     if artifacts_dir.exists():
-        for artifact_file in artifacts_dir.glob("*.md"):
+        for artifact_file in artifacts_dir.rglob("*.md"):  # Changed: glob -> rglob
             content = artifact_file.read_text(encoding="utf-8")
             
+            # Use relative path from artifacts_dir as part of ID
+            rel_path = artifact_file.relative_to(artifacts_dir)
+            doc_id = f"ki-{ki_path.name}-{str(rel_path.with_suffix('')).replace('/', '-')}"
+            
             doc = Document(
-                id=f"ki-{ki_path.name}-{artifact_file.stem}",
+                id=doc_id,
                 content=f"{ki_name}\n\n{summary}\n\n{content[:1500]}",  # Combine for context
                 metadata={
                     "type": "knowledge_item",
@@ -53,6 +59,7 @@ def parse_ki_directory(ki_path: Path) -> list[Document]:
                     "summary": summary[:200],
                     "artifact": artifact_file.name,
                     "file_path": str(artifact_file),
+                    "subdir": str(rel_path.parent) if rel_path.parent != Path(".") else None,
                 }
             )
             docs.append(doc)

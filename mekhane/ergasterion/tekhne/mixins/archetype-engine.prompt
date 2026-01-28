@@ -1,0 +1,16 @@
+#mixin archetype_engine
+// M3: ARCHETYPE_ENGINE - アーキタイプ駆動設計
+
+@constraints:
+  - 5つのアーキタイプから1つを選択: Precision, Speed, Autonomy, Creative, Safety
+  - 勝利条件と犠牲を明示すること
+  - 5つの診断質問を実施すること:
+    1. 失敗の重大性 → Primary Archetype
+    2. 時間制約 → 速度制約
+    3. エラー許容度 → 拒否 vs 誤答
+    4. 監視体制 → Fallback要件
+    5. 出力一貫性 → Temperature設定
+
+@context:
+  - file: references/archetypes.md [priority: HIGH]
+    section: 5アーキタイプ詳細

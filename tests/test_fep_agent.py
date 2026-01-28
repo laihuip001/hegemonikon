@@ -388,6 +388,70 @@ class TestWorkflowEncoding:
         assert "追加調査" in output
 
 
+class TestFEPWithLearning:
+    """Test suite for run_fep_with_learning and should_trigger_epoche."""
+    
+    def test_run_fep_with_learning_returns_result(self, tmp_path):
+        """run_fep_with_learning returns valid result dict."""
+        from mekhane.fep.encoding import run_fep_with_learning
+        
+        a_path = tmp_path / "test_A.npy"
+        result = run_fep_with_learning(
+            obs_tuple=(1, 0, 2),  # clear, low, high
+            a_matrix_path=str(a_path),
+        )
+        
+        assert "action_name" in result
+        assert "entropy" in result
+        assert "should_epoche" in result
+        assert result["action_name"] in ["observe", "act"]
+    
+    def test_run_fep_with_learning_saves_a_matrix(self, tmp_path):
+        """run_fep_with_learning saves A-matrix to file."""
+        from mekhane.fep.encoding import run_fep_with_learning
+        
+        a_path = tmp_path / "learned_A.npy"
+        run_fep_with_learning(obs_tuple=(0, 1, 1), a_matrix_path=str(a_path))
+        
+        assert a_path.exists()
+    
+    def test_run_fep_with_learning_loads_existing(self, tmp_path):
+        """run_fep_with_learning loads existing A-matrix."""
+        from mekhane.fep.encoding import run_fep_with_learning
+        
+        a_path = tmp_path / "learned_A.npy"
+        
+        # First run - creates file
+        run_fep_with_learning(obs_tuple=(1, 0, 2), a_matrix_path=str(a_path))
+        
+        # Second run - loads existing file
+        result = run_fep_with_learning(obs_tuple=(0, 2, 0), a_matrix_path=str(a_path))
+        
+        assert result["action_name"] in ["observe", "act"]
+    
+    def test_should_trigger_epoche_high_entropy(self):
+        """should_trigger_epoche returns True for high entropy."""
+        from mekhane.fep.encoding import should_trigger_epoche
+        
+        result = {"entropy": 2.5}
+        assert should_trigger_epoche(result) is True
+    
+    def test_should_trigger_epoche_low_entropy(self):
+        """should_trigger_epoche returns False for low entropy."""
+        from mekhane.fep.encoding import should_trigger_epoche
+        
+        result = {"entropy": 1.5}
+        assert should_trigger_epoche(result) is False
+    
+    def test_should_trigger_epoche_custom_threshold(self):
+        """should_trigger_epoche respects custom threshold."""
+        from mekhane.fep.encoding import should_trigger_epoche
+        
+        result = {"entropy": 1.5}
+        assert should_trigger_epoche(result, threshold=1.0) is True
+        assert should_trigger_epoche(result, threshold=2.0) is False
+
+
 if __name__ == "__main__":
     pytest.main([__file__, "-v"])
 

@@ -558,30 +558,126 @@ enforcement:
 
 ---
 
-## Output: SKILL.md Structure
+## Output: SKILL.md Structure (v6.2 Structural Enforcement)
+
+> **1対3の法則**: 1つの抽象概念に対して、必ず3つの具体例を示す。
+
+### Minimum Output Requirements
+
+| セクション | 必須項目数 | 説明 |
+|:-----------|:-----------|:-----|
+| Overview | 200字以上 | 目的・スコープ・対象読者 |
+| Core Behavior | 10項目以上 | 必須動作を箇条書き |
+| Quality Standards | 5指標以上 | 各指標に数値基準を明記 |
+| Edge Cases | 5ケース以上 | 各ケースに Fallback を明記 |
+| Examples | 3ペア以上 | 各ペアに詳細解説 (3行以上) |
+| Pre-mortem | 3シナリオ以上 | 失敗予測と対策 |
+| References | 該当ファイル | 参照した reference/ を列挙 |
+| Version History | 必須 | 変更履歴 |
+
+### Template
+
+> **v6.2 強制項目**: 以下の frontmatter は省略禁止。不完全な出力は品質不合格。
 
 ```yaml
 ---
-name: [skill-name]
+# Skill Metadata (必須)
+id: "[series-initial][number]"          # 例: U1, O1, S2
+name: "[skill-name]"
+series: "[Ousia/Schema/Akribeia/Horme/Perigraphē/Kairos/Utils]"
+
 description: |
-  [1行説明]
-  **Trigger:** [起動条件]
+  [2-3行の説明]
+  
+  Triggers: [起動条件を具体的に列挙]
+
+# 発動条件 (必須)
+triggers:
+  - [トリガー1]
+  - [トリガー2]
+  - [トリガー3]
+
+# キーワード (必須)
+keywords:
+  - [keyword1]
+  - [keyword2]
+
+# 関連スキル (必須 - 空でも明示)
+related:
+  upstream: ["[関連するスキル名]"]
+  downstream: []
+  x_series: ["[X-XX: 説明]"]
+
+# メタデータ (必須)
+lineage: "[生成経緯を記述]"
+anti_skip: enabled
+version: "1.0.0"
 ---
 
 ## Overview
-[目的・スコープ 50字以内]
+[200字以上: 目的、スコープ、対象読者、使用シナリオ]
+```
+
+### Frontmatter Validation Checklist
+
+生成前に以下を確認:
+
+| 項目 | 確認内容 |
+|:-----|:---------|
+| id | series に対応した形式か (例: O1, S2, U1) |
+| series | Hegemonikón 体系に存在するか |
+| triggers | 3つ以上の具体的トリガーがあるか |
+| related.upstream | 空でも明示されているか |
+| related.x_series | 他定理との連携があれば記述されているか |
+| anti_skip | 必ず `enabled` を設定 |
+| lineage | 生成経緯が追跡可能か |
+| version | semantic versioning 形式か |
+
+### Body Structure
+
+```markdown
+## Overview
+[200字以上: 目的、スコープ、対象読者、使用シナリオ]
 
 ## Core Behavior
-[必須動作 箇条書き]
+[10項目以上の箇条書き]
+1. ...
+2. ...
+...
 
 ## Quality Standards
-[品質基準 定量的に]
+| 指標 | 基準値 | 測定方法 |
+|:-----|:-------|:---------|
+| ... | ... | ... |
+(5行以上)
 
 ## Edge Cases
-[境界条件 + Fallback]
+| ケース | 対応 | Fallback |
+|:-------|:-----|:---------|
+| ... | ... | ... |
+(5行以上)
 
 ## Examples
-[入出力例]
+### Example 1: [タイトル]
+**Input**: ...
+**Output**: ...
+**解説**: [3行以上の詳細解説]
+
+(3ペア以上)
+
+## Pre-mortem
+| 失敗シナリオ | 確率 | 対策 |
+|:-------------|:-----|:-----|
+| ... | ... | ... |
+(3行以上)
+
+## References
+- references/[file].md — [使用目的]
+
+## Version History
+| Version | Date | Changes |
+|:--------|:-----|:--------|
+| 1.0 | YYYY-MM-DD | Initial |
 ```
 
 ---
@@ -614,7 +710,8 @@ description: |
 | 4.0 | 2025-01-25 | 7フレームワーク統合 (OMEGA, Dual-Core等) |
 | 5.0 | 2025-01-27 | v3.0 + v4.0 統合、8 references体制 |
 | 5.1 | 2025-01-28 | prompt-lang-generator統合 |
-| **6.0** | **2025-01-28** | **OMEGA SINGULARITY BUILD: 完全吸収版** |
+| 6.0 | 2025-01-28 | OMEGA SINGULARITY BUILD: 完全吸収版 |
+| **6.2** | **2026-01-28** | **Structural Enforcement: 8必須frontmatter項目 + Validation Checklist** |
 
 ### v6.0 Changelog
 

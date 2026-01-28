@@ -285,6 +285,26 @@ class TestDirichletUpdate:
         dirichlet_updates = [h for h in history if h.get("type") == "dirichlet_update"]
         
         assert dirichlet_updates[0]["learning_rate"] == 100.0
+    
+    def test_dirichlet_update_with_tuple_input(self):
+        """update_A_dirichlet accepts tuple observation (from encode_noesis_output)."""
+        from mekhane.fep import HegemonikónFEPAgent
+        
+        agent = HegemonikónFEPAgent(use_defaults=True)
+        
+        # First infer states using tuple
+        obs_tuple = (1, 0, 2)  # context=clear, urgency=low, confidence=high
+        agent.infer_states(observation=obs_tuple)
+        
+        # Update with tuple - should not raise
+        agent.update_A_dirichlet(observation=obs_tuple)
+        
+        history = agent.get_history()
+        dirichlet_updates = [h for h in history if h.get("type") == "dirichlet_update"]
+        
+        assert len(dirichlet_updates) == 1
+        # Tuple should be converted to flat index: 1 + 2*0 + 2 = 3
+        assert dirichlet_updates[0]["observation"] == 3
 
 
 class TestWorkflowEncoding:

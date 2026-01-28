@@ -15,6 +15,9 @@ from .encoding import (
     encode_input,
     encode_structured_input,
     decode_observation,
+    encode_noesis_output,
+    encode_boulesis_output,
+    generate_fep_feedback_markdown,
 )
 from .persistence import (
     save_A,
@@ -60,5 +63,8 @@ __all__ = [
     "evaluate_and_infer",
     "EvaluationResult",
     "GEMINI_AVAILABLE",
+    "encode_noesis_output",
+    "encode_boulesis_output",
+    "generate_fep_feedback_markdown",
 ]
 

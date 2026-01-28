@@ -558,6 +558,140 @@ enforcement:
 
 ---
 
+---
+
+## M6: INTERACTIVE_MODE (v6.3 新規)
+
+> `/tek` 単体で質問フローを開始し、成果物種類を自動判定
+
+### Activation
+
+```text
+/tek → Interactive Mode 開始
+/tek [要件] → 直接 Skill 生成 (従来動作)
+/tek diagnose → 診断モード
+```
+
+### Output Type Detection Questions
+
+```yaml
+Q1: 何を作りたいですか？
+  options:
+    A: 知識・ルール・行動指針を定義したい → Skill
+    B: 手順・フロー・ステップを定義したい → Workflow
+  
+Q2: 他のスキルを呼び出しますか？
+  options:
+    A: はい → Workflow (skill_ref 必須)
+    B: いいえ → Skill
+    
+Q3: [要件の詳細を自由記述で聞く]
+```
+
+### Decision Logic
+
+```python
+def detect_output_type(q1: str, q2: str) -> str:
+    """成果物種類を判定"""
+    if "手順" in q1 or "フロー" in q1 or "ステップ" in q1:
+        return "Workflow"
+    if q2 == "はい":
+        return "Workflow"
+    return "Skill"
+```
+
+---
+
+## Output: Workflow.md Structure (v6.3)
+
+> **Workflow は「手順書」— Skill を呼び出して実行する**
+
+### Minimum Output Requirements (Workflow)
+
+| セクション | 必須項目数 | 説明 |
+|:-----------|:-----------|:-----|
+| Frontmatter | 8項目 | description, hegemonikon, modules, skill_ref, version, lineage, anti_skip |
+| 発動条件 | 2行以上 | トリガーテーブル |
+| 正本読み込み | 必須 | SKILL.md 読み込み手順 |
+| 処理フロー | 5ステップ以上 | 具体的な手順 |
+| エラー対処 | 3行以上 | エラーテーブル |
+| Hegemonikon Status | 必須 | モジュール/ワークフロー/スキル対応表 |
+
+### Workflow Template
+
+```yaml
+---
+description: [1行説明]
+hegemonikon: [Ousia/Schema/Akribeia/Horme/Perigraphē/Kairos/Mekhanē]
+modules: [モジュールリスト]
+skill_ref: "[参照するSKILL.mdパス]"
+version: "1.0"
+lineage: "[生成経緯]"
+anti_skip: enabled
+---
+
+# /[name]: [タイトル]
+
+> **正本参照**: [SKILL.md へのリンク]
+> **目的**: [1文]
+> **出力**: [成果物の説明]
+
+---
+
+## 発動条件
+
+| トリガー | 説明 |
+|:---------|:-----|
+| `/[name]` | デフォルト動作 |
+| `/[name] [variant]` | バリアント |
+
+---
+
+## ⚠️ 実行前必須: 正本読み込み
+
+> **このステップは省略禁止。必ず実行すること。**
+
+```text
+実行手順:
+1. view_file ツールで SKILL.md を読み込む
+   パス: [skill_ref の絶対パス]
+2. [確認事項1]
+3. [確認事項2]
+4. 確認後、処理を開始
+```
+
+---
+
+## 処理フロー
+
+[ステップ1-N の詳細]
+
+---
+
+## エラー対処
+
+| エラー | 原因 | 対処 |
+|:-------|:-----|:-----|
+| [エラー1] | [原因] | [対処] |
+| [エラー2] | [原因] | [対処] |
+| [エラー3] | [原因] | [対処] |
+
+---
+
+## Hegemonikon Status
+
+| Module | Workflow | Skill (正本) | Status |
+|:-------|:---------|:-------------|:-------|
+| [module] | /[name] | [SKILL.md] | v1.0 Ready |
+
+---
+
+*v1.0 — /tek generate (YYYY-MM-DD)*
+
+```
+
+---
+
 ## Output: SKILL.md Structure (v6.2 Structural Enforcement)
 
 > **1対3の法則**: 1つの抽象概念に対して、必ず3つの具体例を示す。

@@ -254,3 +254,169 @@ def encode_structured_input(
     confidence_idx = OBSERVATION_MODALITIES["confidence"].index(confidence)
     
     return (context_idx, urgency_idx, confidence_idx)
+
+
+# =============================================================================
+# Workflow Output Encoding
+# =============================================================================
+
+def encode_noesis_output(
+    confidence_score: float,
+    uncertainty_zones: List[Dict],
+) -> Tuple[int, int, int]:
+    """Encode O1 Noēsis PHASE 5 output to observation indices.
+    
+    Converts the structured output from Noēsis (deep thinking) workflow
+    into observation indices for the FEP agent.
+    
+    Args:
+        confidence_score: Confidence level from PHASE 5 (0.0-1.0)
+        uncertainty_zones: List of uncertainty zone dicts from PHASE 5
+    
+    Returns:
+        Tuple of (context_idx, urgency_idx, confidence_idx)
+    
+    Mapping Logic:
+        - context_clarity = 1.0 - (len(uncertainty_zones) * 0.2)
+          More uncertainty zones → more ambiguous context
+        - urgency = 'low' (Noēsis is a deliberative process)
+        - confidence = mapped from confidence_score
+    
+    Example:
+        >>> encode_noesis_output(0.87, [{"zone": "A", "doubt_score": 0.4}])
+        (1, 0, 2)  # clear context, low urgency, high confidence
+    """
+    # Context clarity: more uncertainty zones = more ambiguous
+    context_clarity = max(0.0, min(1.0, 1.0 - len(uncertainty_zones) * 0.2))
+    
+    # Map to categorical values
+    context = "clear" if context_clarity >= 0.5 else "ambiguous"
+    urgency = "low"  # Noēsis is always deliberative, low urgency
+    
+    if confidence_score >= 0.7:
+        confidence = "high"
+    elif confidence_score >= 0.4:
+        confidence = "medium"
+    else:
+        confidence = "low"
+    
+    return encode_structured_input(context=context, urgency=urgency, confidence=confidence)
+
+
+def encode_boulesis_output(
+    impulse_score: float,
+    feasibility_score: float,
+) -> Tuple[int, int, int]:
+    """Encode O2 Boulēsis PHASE 5 output to observation indices.
+    
+    Converts the structured output from Boulēsis (will clarification) workflow
+    into observation indices for the FEP agent.
+    
+    Args:
+        impulse_score: Impulse score (0-100), higher = more impulsive
+        feasibility_score: Feasibility score (0-100)
+    
+    Returns:
+        Tuple of (context_idx, urgency_idx, confidence_idx)
+    
+    Mapping Logic:
+        - context = based on feasibility (>=50 = clear)
+        - urgency = based on impulse score (high impulse = high urgency)
+        - confidence = based on feasibility score
+    
+    Example:
+        >>> encode_boulesis_output(impulse_score=25, feasibility_score=80)
+        (1, 0, 2)  # clear context, low urgency (deliberate), high confidence
+    """
+    # Urgency from impulse: high impulse → high urgency
+    if impulse_score >= 70:
+        urgency = "high"
+    elif impulse_score >= 40:
+        urgency = "medium"
+    else:
+        urgency = "low"
+    
+    # Confidence from feasibility
+    if feasibility_score >= 70:
+        confidence = "high"
+    elif feasibility_score >= 40:
+        confidence = "medium"
+    else:
+        confidence = "low"
+    
+    # Context clarity from feasibility
+    context = "clear" if feasibility_score >= 50 else "ambiguous"
+    
+    return encode_structured_input(context=context, urgency=urgency, confidence=confidence)
+
+
+def generate_fep_feedback_markdown(
+    agent_result: Dict,
+    observation_description: str,
+) -> str:
+    """Generate Markdown-formatted FEP cognitive feedback.
+    
+    Creates a human-readable summary of the FEP agent's analysis,
+    suitable for inclusion in workflow outputs.
+    
+    Args:
+        agent_result: Result dict from HegemonikónFEPAgent.step()
+        observation_description: Human-readable observation description
+            e.g., "context=clear, urgency=low, conf=high"
+    
+    Returns:
+        Markdown-formatted FEP feedback block
+    
+    Example:
+        >>> result = agent.step(observation=0)
+        >>> print(generate_fep_feedback_markdown(result, "context=clear"))
+        ━━━ FEP Cognitive Feedback ━━━
+        ┌─[Active Inference Layer]──────────────────┐
+        │ 観察値: context=clear                      │
+        ...
+    """
+    # Extract values with safe defaults
+    action_name = agent_result.get("action_name", "unknown")
+    action = agent_result.get("action", 0)
+    q_pi = agent_result.get("q_pi", [0.5, 0.5])
+    entropy = agent_result.get("entropy", 0.0)
+    map_state = agent_result.get("map_state_names", {})
+    
+    # Calculate action probability
+    if isinstance(q_pi, (list, tuple)) and len(q_pi) > action:
+        action_prob = q_pi[action] * 100
+    else:
+        action_prob = 50.0
+    
+    # Interpret entropy
+    if entropy < 1.0:
+        entropy_desc = "低い不確実性"
+    elif entropy < 2.0:
+        entropy_desc = "中程度の不確実性"
+    else:
+        entropy_desc = "高い不確実性 (Epochē 推奨)"
+    
+    # Extract belief states
+    phantasia = map_state.get("phantasia", "?")
+    assent = map_state.get("assent", "?")
+    horme = map_state.get("horme", "?")
+    
+    # Generate action guidance
+    if action_name == "act":
+        guidance = "→ 結論に確信あり、行動に移行可能"
+    elif action_name == "observe":
+        guidance = "→ 追加調査 (/zet) または判断停止 (/epo) を推奨"
+    else:
+        guidance = f"→ {action_name}"
+    
+    return f"""━━━ FEP Cognitive Feedback ━━━
+┌─[Active Inference Layer]──────────────────┐
+│ 観察値: {observation_description}
+│ 信念状態:
+│   phantasia: {phantasia}
+│   assent: {assent}
+│   horme: {horme}
+│ エントロピー: {entropy:.2f} ({entropy_desc})
+│ 推奨: {action_name} ({action_prob:.0f}%)
+│   {guidance}
+└────────────────────────────────────────────┘"""

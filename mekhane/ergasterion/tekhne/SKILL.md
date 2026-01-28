@@ -602,26 +602,21 @@ def detect_output_type(q1: str, q2: str) -> str:
 
 ---
 
-## M7: HEGEMONIKON_MODE (v6.4)
+## M7: HEGEMONIKON_MODE (v6.5)
 
-> 定理体系に馴染む「聖」な生成物を作るモード
+> 定理体系に馴染む「聖」な生成物を作るモード — **デフォルト動作**
 
 ### Activation
 
 ```text
-/tek hege → Hegemonikón Mode 開始
-/tek → Interactive Mode → Q0 で「聖」選択
+/tek → Hegemonikón Mode 開始 (デフォルト)
+/tek vulg → 俗 (汎用) モード — 例外的に体系外の生成が必要な場合のみ
 ```
 
 ### 質問フロー
 
 ```yaml
-Q0: 俗 or 聖?
-  options:
-    A: 俗 (汎用) → 従来動作 (M6)
-    B: 聖 (Hegemonikón) → Hegemonikón Mode
-
-Q1: カテゴリ選択
+Q1: カテゴリ選択 (デフォルトで聖モード)
   options:
     A: Ousia (認識・理解・洞察) → O
     B: Schema (計画・戦略・測定) → S

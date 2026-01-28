@@ -173,24 +173,26 @@ PHASE1_SPECIALISTS = (
     AESTHETICS_SPECIALISTS            # 8人
 )  # 合計 91人
 
-# Phase 2/3 は別モジュールで定義
+# Phase 2/3/0 は別モジュールで定義
 # インポート時の循環参照を避けるため、遅延インポートを使用
 _ALL_SPECIALISTS_CACHE = None
 
 def get_all_specialists():
-    """全専門家リストを取得 (Phase 1-3: 611人)"""
+    """全専門家リストを取得 (Phase 0-3: 866人)"""
     global _ALL_SPECIALISTS_CACHE
     if _ALL_SPECIALISTS_CACHE is None:
+        from .phase0_specialists import PHASE0_SPECIALISTS
         from .phase2_specialists import PHASE2_LAYER_7_10_SPECIALISTS
         from .phase2_remaining import PHASE2_LAYER_11_15_SPECIALISTS
         from .phase3_specialists import PHASE3_SPECIALISTS
         
         _ALL_SPECIALISTS_CACHE = (
-            PHASE1_SPECIALISTS +           # 91人
-            PHASE2_LAYER_7_10_SPECIALISTS +  # 170人
-            PHASE2_LAYER_11_15_SPECIALISTS + # 120人
-            PHASE3_SPECIALISTS              # 230人
-        )  # 合計 611人
+            PHASE0_SPECIALISTS +             # 255人 (Layer 1-6 + Buffer)
+            PHASE1_SPECIALISTS +             # 91人  (見落とし層)
+            PHASE2_LAYER_7_10_SPECIALISTS +  # 170人 (Layer 7-10)
+            PHASE2_LAYER_11_15_SPECIALISTS + # 120人 (Layer 11-15)
+            PHASE3_SPECIALISTS               # 230人 (Layer 16-20)
+        )  # 合計 866人
     return _ALL_SPECIALISTS_CACHE
 
 # 後方互換性のため

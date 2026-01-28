@@ -141,6 +141,46 @@ class TestSophiaIngest:
             
             # Should return empty list
             assert docs == []
+    
+    def test_parse_ki_nested_artifacts(self):
+        """Test parsing KI with nested artifact directories (rglob)"""
+        from mekhane.symploke.sophia_ingest import parse_ki_directory
+        
+        with tempfile.TemporaryDirectory() as tmpdir:
+            ki_path = Path(tmpdir)
+            
+            import json
+            metadata = {
+                "name": "Nested KI",
+                "summary": "KI with nested subdirectories"
+            }
+            (ki_path / "metadata.json").write_text(json.dumps(metadata))
+            
+            # Create nested artifact structure
+            artifacts_dir = ki_path / "artifacts"
+            artifacts_dir.mkdir()
+            (artifacts_dir / "overview.md").write_text("# Overview")
+            
+            # Create subdirectory with more artifacts
+            subdir = artifacts_dir / "implementation"
+            subdir.mkdir()
+            (subdir / "details.md").write_text("# Implementation Details")
+            (subdir / "guide.md").write_text("# Guide")
+            
+            # Deeper nesting
+            deep = subdir / "examples"
+            deep.mkdir()
+            (deep / "example1.md").write_text("# Example 1")
+            
+            docs = parse_ki_directory(ki_path)
+            
+            # Should find all 4 .md files via rglob
+            assert len(docs) == 4
+            
+            # Check doc IDs include subdirectory paths
+            doc_ids = [d.id for d in docs]
+            assert any("implementation-details" in id for id in doc_ids)
+            assert any("implementation-examples-example1" in id for id in doc_ids)
 
 
 if __name__ == "__main__":

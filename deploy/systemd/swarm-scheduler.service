@@ -1,0 +1,24 @@
+[Unit]
+Description=Swarm Scheduler Execution - Hegemonikon 720 Reviews
+Documentation=https://github.com/laihuip001/hegemonikon
+Requires=swarm-scheduler.timer
+After=network-online.target
+
+[Service]
+Type=oneshot
+User=laihuip001
+WorkingDirectory=/home/laihuip001/oikos/hegemonikon
+Environment=PATH=/home/laihuip001/oikos/hegemonikon/.venv/bin:/usr/bin
+ExecStart=/home/laihuip001/oikos/hegemonikon/.venv/bin/python swarm_scheduler.py --run
+StandardOutput=journal
+StandardError=journal
+
+# Failure notification (optional: configure webhook)
+# ExecStopPost=/bin/bash -c 'if [ "$EXIT_STATUS" != "0" ]; then curl -X POST https://hooks.slack.com/...; fi'
+
+# Restart policy
+Restart=on-failure
+RestartSec=60
+
+[Install]
+WantedBy=multi-user.target

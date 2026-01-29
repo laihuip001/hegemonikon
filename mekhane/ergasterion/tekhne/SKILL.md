@@ -18,7 +18,7 @@ description: |
   - 「製作」
 ---
 
-# Tekhne-Maker v6.0 「OMEGA SINGULARITY BUILD」
+# Tekhne-Maker v6.7 「OMEGA SINGULARITY BUILD + TARGET_AGENT」
 
 > τέχνη (Tekhne) = 技術・技芸・匠の技
 >
@@ -705,6 +705,136 @@ enhanced_flow:
 auto_trigger:
   condition: "確信度 < 90%"
   action: "Self-Critique 1回追加"
+```
+
+---
+
+## M10: TARGET_AGENT (v6.7 新規)
+
+> 既存5モード × 3ターゲット = 15の組み合わせをサポート
+> **Origin**: /bou 2026-01-29 — 「モード追加」ではなく「パラメータ追加」として消化
+
+### Activation
+
+```text
+/mek --target=claude   # デフォルト: Claude 用に生成
+/mek --target=gemini   # Gemini 3 Pro 用に最適化
+/mek --target=jules    # Jules API 用タスク記述として最適化
+```
+
+### Target-Specific Optimizations
+
+```yaml
+target_optimizations:
+  claude:
+    default: true
+    style: "ナラティブ + 構造化混合"
+    context_window: "200K"
+    strengths:
+      - 長文コンテキスト理解
+      - ニュアンスのある対話
+      - 複雑な推論チェーン
+    prompt_advice:
+      - "SKILL.md 形式がそのまま有効"
+      - "Markdown + YAML 混合を推奨"
+      - "Anti-Skip Protocol 等のメタルールを含めてよい"
+
+  gemini:
+    style: "簡潔 + 構造優先"
+    context_window: "128K (Gemini 3 Pro)"
+    strengths:
+      - マルチモーダル処理
+      - コード生成/レビュー
+      - 高速推論
+    prompt_advice:
+      - "冒頭1-2行で目的を明示"
+      - "制約条件は毎ターン再提示"
+      - "構造順序: Role → Goal → Constraints → Examples → Output"
+    template: |
+      ## Goal
+      [1-2文で目的]
+      
+      ## Constraints
+      - [制約1]
+      - [制約2]
+      
+      ## Steps
+      1. [ステップ1]
+      2. [ステップ2]
+      
+      ## Output Format
+      [期待する出力形式]
+
+  jules:
+    style: "タスク記述 + 完了条件明示"
+    context_window: "N/A (非対話型)"
+    strengths:
+      - 自律的コード変更
+      - PR 作成
+      - 大量並列実行
+    prompt_advice:
+      - "完了条件を明確に定義"
+      - "ファイルパス/関数名を具体的に指定"
+      - "「何をしない」も明記"
+      - "SILENCE ルールを活用 (発見なし→無言)"
+    template: |
+      ## Task
+      [1文でタスクを明記]
+      
+      ## Scope
+      - Target files: [ファイルパス]
+      - Focus: [確認観点]
+      
+      ## Instructions
+      1. [具体的な指示1]
+      2. [具体的な指示2]
+      
+      ## Completion Criteria
+      - [完了条件1]
+      - [完了条件2]
+      
+      ## Do NOT
+      - [やらないこと]
+```
+
+### Integration with Modes
+
+| Mode | Claude | Gemini | Jules |
+|:-----|:-------|:-------|:------|
+| Generate | SKILL.md | 簡潔版 SKILL.md | N/A |
+| Prompt-Lang | .prompt | .prompt (簡潔) | N/A |
+| SAGE | XML/MD | XML (簡潔) | N/A |
+| Diagnose | スコア表 | スコア表 | N/A |
+| Manual | 対話型手順書 | タスク委託書 | タスク委託書 |
+
+> **Note**: Jules は「コード変更タスク」専用のため、Generate/Prompt-Lang/SAGE/Diagnose は非対応。Manual モードのみ対応。
+
+### Usage Example
+
+```text
+USER: /mek --target=jules でコードレビュータスクを作成して
+
+OUTPUT:
+## Task
+prometheus_engine.py の observe_context メソッドをレビュー
+
+## Scope
+- Target files: mekhane/fep/prometheus_engine.py
+- Focus: 型ヒント + エラーハンドリング
+
+## Instructions
+1. observe_context メソッドの型ヒントが正しいか確認
+2. 例外処理の網羅性を評価
+3. 問題があれば修正 PR を作成
+
+## Completion Criteria
+- [ ] 型ヒントが PEP 484 準拠
+- [ ] 全例外がキャッチされている
+- 問題なければ SILENCE
+
+## Do NOT
+- 他のファイルを変更しない
+- スタイル変更のみの PR を作成しない
 ```
 
 ---

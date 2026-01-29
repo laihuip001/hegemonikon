@@ -78,6 +78,12 @@ BUILTIN_MACROS: Dict[str, Macro] = {
         description="κύκλος: 観察→推論→行動→判定の振動サイクル (O3~O1~O4~A2)",
         is_builtin=True
     ),
+    "wake": Macro(
+        name="wake",
+        ccl="/boot+_@dig_@plan",
+        description="目覚め: 詳細ブート→深掘り→計画のセッション開始シーケンス",
+        is_builtin=True
+    ),
 }
 
 

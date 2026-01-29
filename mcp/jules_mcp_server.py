@@ -300,7 +300,7 @@ if __name__ == "__main__":
         print("-" * 40)
         api_key = os.environ.get("JULES_API_KEY")
         if api_key:
-            print(f"✅ JULES_API_KEY: {api_key[:8]}...{api_key[-4:]}")
+            print(f"✅ JULES_API_KEY: ****{api_key[-4:] if len(api_key) > 4 else '****'}")
         else:
             print("⚠️  JULES_API_KEY not set")
         print("✅ Server module loaded successfully")

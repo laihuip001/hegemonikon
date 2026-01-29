@@ -21,24 +21,48 @@ class Macro:
     is_builtin: bool = False
 
 
-# Built-in macros (complex patterns only)
+# Built-in macros (complex patterns only, high expansion ratio)
 BUILTIN_MACROS: Dict[str, Macro] = {
     "dig": Macro(
         name="dig",
         ccl="/s+~(/p*/a)_/dia*/o+",
-        description="深掘り: 戦略↔環境×判断の振動→判定×認識融合",
+        description="深掘り・思考: 戦略↔環境×判断の振動→判定×認識融合",
         is_builtin=True
     ),
     "go": Macro(
         name="go",
         ccl="/s+_/ene+",
-        description="戦略→実行: 詳細戦略から詳細実行へ",
+        description="実行: 詳細戦略から詳細実行へ",
         is_builtin=True
     ),
     "osc": Macro(
         name="osc",
         ccl="/s~/dia~/noe",
-        description="3項振動: 戦略↔判定↔認識のHub内往復",
+        description="振動: 戦略↔判定↔認識のHub内往復",
+        is_builtin=True
+    ),
+    "fix": Macro(
+        name="fix",
+        ccl="/dia+_/ene+_/dia",
+        description="修正サイクル: 批判→実行→再批判",
+        is_builtin=True
+    ),
+    "plan": Macro(
+        name="plan",
+        ccl="/bou+_/s+_/dia",
+        description="計画策定: 意志→戦略→批判",
+        is_builtin=True
+    ),
+    "learn": Macro(
+        name="learn",
+        ccl="/dox+*^/u+_/bye+",
+        description="学習: 信念のメタ化→対話→永続化",
+        is_builtin=True
+    ),
+    "nous": Macro(
+        name="nous",
+        ccl="/u+*^/u^",
+        description="問いの深化: 対話×メタ→メタ対話 (νοῦς)",
         is_builtin=True
     ),
 }

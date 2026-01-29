@@ -43,6 +43,21 @@ class TestJulesClient:
             client = JulesClient()
             assert client.api_key == 'env-key-456'
 
+    @pytest.mark.asyncio
+    async def test_context_manager(self):
+        """Test usage as context manager."""
+        with patch('aiohttp.ClientSession') as mock_session_cls:
+            mock_session = AsyncMock()
+            mock_session_cls.return_value = mock_session
+            mock_session.close = AsyncMock()
+
+            async with JulesClient(api_key="test") as client:
+                assert client._session is not None
+                assert client._session == mock_session
+
+            # Verify close called
+            mock_session.close.assert_called_once()
+
 
 class TestSessionState:
     """Test session state enum."""
@@ -55,6 +70,13 @@ class TestSessionState:
         assert 'TESTING' in states
         assert 'COMPLETED' in states
         assert 'FAILED' in states
+        assert 'UNKNOWN' in states
+
+    def test_parse_state_unknown(self):
+        """Verify parse_state returns UNKNOWN for invalid input."""
+        from mekhane.symploke.jules_client import parse_state
+        assert parse_state("INVALID_STATE_XYZ") == SessionState.UNKNOWN
+        assert parse_state("random string") == SessionState.UNKNOWN
 
 
 class TestJulesSession:
@@ -109,6 +131,15 @@ class TestBatchExecute:
             results = await client.batch_execute([])
             assert results == []
             mock.assert_not_called()
+
+    @pytest.mark.asyncio
+    async def test_cancellation_propagation(self):
+        """Test that CancelledError is propagated."""
+        client = JulesClient(api_key="test-key")
+
+        with patch.object(client, 'create_and_poll', side_effect=asyncio.CancelledError):
+            with pytest.raises(asyncio.CancelledError):
+                await client.batch_execute([{"prompt": "p", "source": "s"}])
 
 
 if __name__ == "__main__":

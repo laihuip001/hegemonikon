@@ -1,0 +1,20 @@
+name = "swarm-scheduler"
+main = "src/index.ts"
+compatibility_date = "2026-01-29"
+
+# Production environment
+[env.production]
+name = "swarm-scheduler-prod"
+vars = { JULES_BASE_URL = "https://jules.googleapis.com/v1alpha" }
+
+# Cron trigger: 4:00 AM JST = 19:00 UTC
+[env.production.triggers]
+crons = ["0 19 * * *"]
+
+# Secrets (set via: wrangler secret put JULES_API_KEY --env production)
+# JULES_API_KEY_1, JULES_API_KEY_2, ... JULES_API_KEY_9
+
+# Development environment
+[env.development]
+name = "swarm-scheduler-dev"
+vars = { JULES_BASE_URL = "https://jules.googleapis.com/v1alpha" }

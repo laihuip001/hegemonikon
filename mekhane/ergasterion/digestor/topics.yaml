@@ -1,0 +1,61 @@
+# Digestor Topics - 消化対象トピック定義
+# Gnosis gnosis_topics.yaml と連携
+
+version: "1.0.0"
+updated: "2026-01-29"
+
+# 消化設定
+settings:
+  max_candidates: 10       # 1回の消化で処理する最大候補数
+  min_score: 0.3           # 最小スコア閾値
+  auto_digest: false       # 自動消化（将来用）
+
+# 消化対象トピック
+# gnosis_topics.yaml からインポート + Hegemonikón 固有トピック
+topics:
+  # ===== Gnosis からインポート =====
+  - id: agent-architecture
+    query: "LLM autonomous agent architecture"
+    digest_to: ["/noe", "/s"]
+    description: 自律エージェントアーキテクチャ → 設計パターン消化
+
+  - id: active-inference
+    query: "Active Inference in artificial intelligence"
+    digest_to: ["/noe", "/bou"]
+    description: 能動的推論 → FEP 理論消化
+
+  - id: structured-prompting
+    query: "Structured prompting languages for LLM"
+    digest_to: ["/mek", "/tek"]
+    description: 構造化プロンプト → tekhne-maker 強化
+
+  - id: chain-of-thought
+    query: "Chain-of-Thought reasoning optimization"
+    digest_to: ["/noe", "/dia"]
+    description: 推論最適化 → 認知プロトコル消化
+
+  - id: tool-use
+    query: "Tool use and function calling in LLMs"
+    digest_to: ["/ene", "/mek"]
+    description: ツール利用 → 実行パターン消化
+
+  - id: self-correction
+    query: "Self-correction and verification in LLM agents"
+    digest_to: ["/dia", "/epo"]
+    description: 自己修正 → 検証プロトコル消化
+
+  # ===== Hegemonikón 固有 =====
+  - id: stoic-philosophy
+    query: "Stoic philosophy cognitive science"
+    digest_to: ["/noe", "/bou"]
+    description: ストア哲学 × 認知科学
+
+  - id: free-energy-principle
+    query: "Free Energy Principle practical application"
+    digest_to: ["/bou", "/ore"]
+    description: 自由エネルギー原理の実用化
+
+  - id: metacognition
+    query: "Metacognition and self-awareness in AI"
+    digest_to: ["/dia", "/epo"]
+    description: メタ認知 → Akribeia 強化

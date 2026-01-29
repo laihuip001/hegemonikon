@@ -136,6 +136,60 @@ from .akribeia_evaluator import (
     format_episteme_markdown,
     encode_akribeia_observation,
 )
+from .zetesis_inquirer import (
+    ZetesisDerivative,
+    QuestionType,
+    ZetesisResult,
+    inquire,
+    format_zetesis_markdown,
+    encode_zetesis_observation,
+)
+from .schema_analyzer import (
+    MetronDerivative,
+    ScaleLevel,
+    MetronResult,
+    StathmosDerivative,
+    CriterionPriority,
+    StathmosResult,
+    PraxisDerivative,
+    PraxisResult,
+    analyze_scale,
+    define_criteria,
+    plan_praxis,
+    format_metron_markdown,
+    format_stathmos_markdown,
+    format_praxis_markdown,
+    encode_schema_observation,
+)
+from .doxa_persistence import (
+    DoxaDerivative,
+    BeliefStrength,
+    Belief,
+    DoxaResult,
+    DoxaStore,
+    get_store,
+    format_doxa_markdown,
+    encode_doxa_observation,
+)
+from .sophia_researcher import (
+    SophiaDerivative,
+    ResearchDepth,
+    ResearchQuery,
+    SophiaResult,
+    research,
+    format_sophia_markdown,
+    encode_sophia_observation,
+)
+from .krisis_judge import (
+    KrisisDerivative,
+    VerdictType,
+    Objection,
+    KrisisResult,
+    judge,
+    epochē,
+    format_krisis_markdown,
+    encode_krisis_observation,
+)
 
 __all__ = [
     "HegemonikónFEPAgent",
@@ -250,6 +304,55 @@ __all__ = [
     "format_gnome_markdown",
     "format_episteme_markdown",
     "encode_akribeia_observation",
+    # O3 Zētēsis
+    "ZetesisDerivative",
+    "QuestionType",
+    "ZetesisResult",
+    "inquire",
+    "format_zetesis_markdown",
+    "encode_zetesis_observation",
+    # S1 Metron, S3 Stathmos, S4 Praxis
+    "MetronDerivative",
+    "ScaleLevel",
+    "MetronResult",
+    "StathmosDerivative",
+    "CriterionPriority",
+    "StathmosResult",
+    "PraxisDerivative",
+    "PraxisResult",
+    "analyze_scale",
+    "define_criteria",
+    "plan_praxis",
+    "format_metron_markdown",
+    "format_stathmos_markdown",
+    "format_praxis_markdown",
+    "encode_schema_observation",
+    # H4 Doxa
+    "DoxaDerivative",
+    "BeliefStrength",
+    "Belief",
+    "DoxaResult",
+    "DoxaStore",
+    "get_store",
+    "format_doxa_markdown",
+    "encode_doxa_observation",
+    # K4 Sophia
+    "SophiaDerivative",
+    "ResearchDepth",
+    "ResearchQuery",
+    "SophiaResult",
+    "research",
+    "format_sophia_markdown",
+    "encode_sophia_observation",
+    # A2 Krisis
+    "KrisisDerivative",
+    "VerdictType",
+    "Objection",
+    "KrisisResult",
+    "judge",
+    "epochē",
+    "format_krisis_markdown",
+    "encode_krisis_observation",
 ]
 
 

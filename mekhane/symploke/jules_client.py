@@ -562,6 +562,117 @@ class JulesClient:
         ])
         
         return list(results)
+    
+    async def synedrion_review(
+        self,
+        source: str,
+        branch: str = "main",
+        domains: list[str] | None = None,
+        axes: list[str] | None = None,
+        progress_callback: Optional[callable] = None,
+    ) -> list["JulesResult"]:
+        """
+        Execute Synedrion v2.1 review with 480 orthogonal perspectives.
+        
+        Uses the Hegemonikón theorem grid (20 domains × 24 axes) to generate
+        structurally orthogonal review perspectives, eliminating redundancy.
+        
+        Args:
+            source: Repository source (e.g., "sources/github/owner/repo")
+            branch: Branch to review (default: "main")
+            domains: Optional list of domains to filter (e.g., ["Security", "Error"])
+            axes: Optional list of axes to filter (e.g., ["O1", "A2"])
+            progress_callback: Optional callback(batch_num, total_batches, completed)
+        
+        Returns:
+            List of JulesResult objects from all perspectives
+            
+        Example:
+            # Full 480-perspective review (8 batches)
+            results = await client.synedrion_review(
+                source="sources/github/owner/repo"
+            )
+            
+            # Filtered review (Security domain, O-series axes = 4 perspectives)
+            results = await client.synedrion_review(
+                source="sources/github/owner/repo",
+                domains=["Security"],
+                axes=["O1", "O2", "O3", "O4"]
+            )
+        """
+        # Import perspective matrix
+        try:
+            from mekhane.ergasterion.synedrion import PerspectiveMatrix
+        except ImportError:
+            raise ImportError(
+                "Synedrion module not found. Ensure mekhane.ergasterion.synedrion is installed."
+            )
+        
+        # Load perspective matrix
+        matrix = PerspectiveMatrix.load()
+        perspectives = matrix.all_perspectives()
+        
+        # Apply domain filter
+        if domains:
+            perspectives = [p for p in perspectives if p.domain_id in domains]
+            logger.info(f"Filtered to domains: {domains} ({len(perspectives)} perspectives)")
+        
+        # Apply axis filter
+        if axes:
+            perspectives = [p for p in perspectives if p.axis_id in axes]
+            logger.info(f"Filtered to axes: {axes} ({len(perspectives)} perspectives)")
+        
+        if not perspectives:
+            logger.warning("No perspectives match the filters. Returning empty results.")
+            return []
+        
+        # Generate tasks from perspectives
+        tasks = [
+            {
+                "prompt": matrix.generate_prompt(p),
+                "source": source,
+                "branch": branch,
+                "perspective_id": p.id,
+                "perspective_name": p.name,
+                "theorem": p.theorem,
+            }
+            for p in perspectives
+        ]
+        
+        # Calculate batches
+        batch_size = self.MAX_CONCURRENT
+        total_batches = (len(tasks) + batch_size - 1) // batch_size
+        
+        logger.info(
+            f"Starting Synedrion v2.1 review: "
+            f"{len(tasks)} perspectives, {total_batches} batches"
+        )
+        
+        # Execute and track progress
+        all_results = []
+        for batch_num, i in enumerate(range(0, len(tasks), batch_size), 1):
+            batch_tasks = tasks[i:i + batch_size]
+            
+            logger.info(f"Batch {batch_num}/{total_batches}: {len(batch_tasks)} perspectives")
+            
+            batch_results = await self.batch_execute(batch_tasks)
+            all_results.extend(batch_results)
+            
+            # Progress callback if provided
+            if progress_callback:
+                progress_callback(batch_num, total_batches, len(all_results))
+        
+        # Log summary
+        succeeded = sum(1 for r in all_results if r.success)
+        failed = len(all_results) - succeeded
+        silent = sum(1 for r in all_results if r.success and "SILENCE" in str(r.session))
+        
+        logger.info(
+            f"Synedrion review complete: "
+            f"{succeeded} succeeded, {failed} failed, {silent} silent (no issues)"
+        )
+        
+        return all_results
 
 
 # ============ Utilities ============

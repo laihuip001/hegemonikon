@@ -62,6 +62,15 @@ from .tekhne_registry import (
     search_techniques,
     format_registry_markdown,
 )
+from .energeia_executor import (
+    ExecutionPhase,
+    ExecutionStatus,
+    ExecutionContext,
+    ExecutionResult,
+    EnergеiaExecutor,
+    format_execution_markdown,
+    encode_execution_observation,
+)
 
 __all__ = [
     "HegemonikónFEPAgent",
@@ -108,6 +117,14 @@ __all__ = [
     "get_registry",
     "search_techniques",
     "format_registry_markdown",
+    # O4 Energeia
+    "ExecutionPhase",
+    "ExecutionStatus",
+    "ExecutionContext",
+    "ExecutionResult",
+    "EnergеiaExecutor",
+    "format_execution_markdown",
+    "encode_execution_observation",
 ]
 
 

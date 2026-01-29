@@ -23,6 +23,7 @@ class Macro:
 
 # Built-in macros (complex patterns only, high expansion ratio)
 BUILTIN_MACROS: Dict[str, Macro] = {
+    # === Original Macros ===
     "dig": Macro(
         name="dig",
         ccl="/s+~(/p*/a)_/dia*/o+",
@@ -65,7 +66,21 @@ BUILTIN_MACROS: Dict[str, Macro] = {
         description="問いの深化: 対話×メタ→メタ対話 (νοῦς)",
         is_builtin=True
     ),
+    
+    # === Prompt Library Digest (2026-01-29) ===
+    # 安直版を削除し、本質的マッピングのみ残す
+    # CoT/ToT/StepBack/Verifier → WF 派生として実装 (/noe --mode=cot 等)
+    # Reflection → 既存 /dia --mode=cold_mirror で表現可能
+    
+    "kyc": Macro(
+        name="kyc",
+        ccl="~(/sop_/noe_/ene_/dia-)",
+        description="κύκλος: 観察→推論→行動→判定の振動サイクル (O3~O1~O4~A2)",
+        is_builtin=True
+    ),
 }
+
+
 
 
 class MacroRegistry:

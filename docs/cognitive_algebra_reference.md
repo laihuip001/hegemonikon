@@ -109,7 +109,26 @@
 
 ---
 
-## 使用例
+## Hub = 全 Series 振動
+
+> **洞察**: Hub ワークフローは「全定理の振動」を意味する
+
+| Hub | 解釈 | 展開形 |
+|:----|:-----|:-------|
+| `/o` | O-series 4項振動 | `/noe~bou~zet~ene` |
+| `/s` | S-series 4項振動 | `/met~mek~sta~pra` |
+| `/h` | H-series 4項振動 | `/pro~pis~ore~dox` |
+| `/p` | P-series 4項振動 | `/kho~hod~tro~tek` |
+| `/k` | K-series 4項振動 | `/euk~chr~tel~sop` |
+| `/a` | A-series 4項振動 | `/pat~dia~gno~epi` |
+
+### 使い方
+
+```
+/o = 認識 ↔ 意志 ↔ 探求 ↔ 行為 ↔ 認識' ↔ ...
+```
+
+**いつ使う**: Series 全体を俯瞰したい時、複数の定理を順に巡回したい時
 
 ### 例1: 急ぎの判断
 

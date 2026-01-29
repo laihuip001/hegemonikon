@@ -10,7 +10,6 @@ Usage:
 import argparse
 import sys
 from pathlib import Path
-from typing import Optional
 import json
 from datetime import datetime, timedelta
 
@@ -19,6 +18,10 @@ _THIS_DIR = Path(__file__).parent
 _HEGEMONIKON_ROOT = _THIS_DIR.parent.parent  # mekhane/anamnesis -> mekhane -> Hegemonikon
 if str(_HEGEMONIKON_ROOT) not in sys.path:
     sys.path.insert(0, str(_HEGEMONIKON_ROOT))
+
+from mekhane.anamnesis.ux_utils import (  # noqa: E402
+    print_header, print_success, print_error, print_info, print_warning, Spinner
+)
 
 # Configuration
 DATA_DIR = _HEGEMONIKON_ROOT / "gnosis_data"
@@ -92,26 +95,30 @@ def cmd_collect(args):
         print(f"Available: {', '.join(collectors.keys())}")
         return 1
     
-    print(f"[Collect] Source: {source}, Query: {args.query}, Limit: {args.limit}")
+    print_header(f"Collect: {source}")
+    print_info(f"Query: {args.query}, Limit: {args.limit}")
     
     try:
-        collector = collectors[source]()
-        papers = collector.search(args.query, max_results=args.limit)
-        print(f"[Collect] Found {len(papers)} papers")
+        with Spinner(f"Searching {source}...", delay=0.1):
+            collector = collectors[source]()
+            papers = collector.search(args.query, max_results=args.limit)
+
+        print_success(f"Found {len(papers)} papers")
         
         if papers and not args.dry_run:
-            index = GnosisIndex()
-            added = index.add_papers(papers)
-            print(f"[Collect] Added {added} to index")
+            with Spinner("Indexing papers...", delay=0.1):
+                index = GnosisIndex()
+                added = index.add_papers(papers)
+            print_success(f"Added {added} to index")
             update_state()  # Update timestamp
         elif args.dry_run:
-            print("[Collect] Dry run - not adding to index")
+            print_warning("Dry run - not adding to index")
             for p in papers[:5]:
                 print(f"  - {p.title[:60]}...")
         
         return 0
     except Exception as e:
-        print(f"[Error] {e}")
+        print_error(f"{e}")
         return 1
 
 
@@ -128,22 +135,24 @@ def cmd_collect_all(args):
         ("openalex", OpenAlexCollector()),
     ]
     
-    print(f"[CollectAll] Query: {args.query}, Limit per source: {args.limit}")
+    print_header("Collect All Sources")
+    print_info(f"Query: {args.query}, Limit per source: {args.limit}")
     
     all_papers = []
     for name, collector in collectors:
         try:
-            print(f"  Collecting from {name}...")
-            papers = collector.search(args.query, max_results=args.limit)
-            print(f"    Found {len(papers)} papers")
+            with Spinner(f"Collecting from {name}...", delay=0.1):
+                papers = collector.search(args.query, max_results=args.limit)
+            print_success(f"{name}: Found {len(papers)} papers")
             all_papers.extend(papers)
         except Exception as e:
-            print(f"    Error: {e}")
+            print_error(f"{name}: {e}")
     
     if all_papers and not args.dry_run:
-        index = GnosisIndex()
-        added = index.add_papers(all_papers, dedupe=True)
-        print(f"[CollectAll] Added {added} unique papers to index")
+        with Spinner("Indexing all papers...", delay=0.1):
+            index = GnosisIndex()
+            added = index.add_papers(all_papers, dedupe=True)
+        print_success(f"Added {added} unique papers to index")
         update_state()  # Update timestamp
     
     return 0
@@ -153,16 +162,17 @@ def cmd_search(args):
     """論文検索"""
     from mekhane.anamnesis.index import GnosisIndex
     
-    print(f"[Search] Query: {args.query}")
+    print_header(f"Search: {args.query}")
     
-    index = GnosisIndex()
-    results = index.search(args.query, k=args.limit)
+    with Spinner("Searching index...", delay=0.1):
+        index = GnosisIndex()
+        results = index.search(args.query, k=args.limit)
     
     if not results:
-        print("No results found")
+        print_warning("No results found")
         return 0
     
-    print(f"\nFound {len(results)} results:\n")
+    print_success(f"Found {len(results)} results:\n")
     print("-" * 70)
     
     for i, r in enumerate(results, 1):
@@ -184,7 +194,7 @@ def cmd_stats(args):
     index = GnosisIndex()
     stats = index.stats()
     
-    print("\n[Gnōsis Index Statistics]")
+    print_header("Gnōsis Index Statistics")
     print("=" * 40)
     print(f"Total Papers: {stats['total']}")
     print(f"With DOI: {stats.get('unique_dois', 0)}")
@@ -198,7 +208,7 @@ def cmd_stats(args):
         try:
             state = json.loads(STATE_FILE.read_text(encoding="utf-8"))
             print(f"Last Collected: {state.get('last_collected_at', 'Unknown')}")
-        except:
+        except Exception:
             pass
             
     print("=" * 40)

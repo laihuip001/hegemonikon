@@ -9,9 +9,22 @@ updated: "2026-01-27"
 
 > **Kernel Doc Index**: [SACRED_TRUTH](SACRED_TRUTH.md) ← 📍 | [axiom_hierarchy](axiom_hierarchy.md) | [naming_conventions](naming_conventions.md)
 
-# 🔒 Sacred Truth (不変真理) v2.1
+# 🔒 Sacred Truth (不変真理) v2.2
 
 > **このドキュメントの内容は改変禁止。すべてのチャット/セッションで参照される不変の真理。**
+
+## 0. アイデンティティ
+
+> **Hegemonikón は「認知制御言語 (Cognitive Control Language, CCL)」である。**
+> **「思考言語 (Language of Thought, LoT)」ではない。**
+
+| LoT (Fodor) | CCL (Hegemonikón) |
+|:------------|:------------------|
+| 思考の表現 | 思考の制御 |
+| 完全性追求 | 開放的自己完備 |
+| 静的記号 | 動的行為 (Praxis) |
+
+> 意味を静的に定義せず、操作として実行する — Wittgenstein の批判を回避
 
 ---
 

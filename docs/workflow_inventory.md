@@ -1,9 +1,9 @@
 # Hegemonikón ワークフロー一覧
 
-> **自動生成**: 2026-01-29 12:43
-> **総ワークフロー数**: 46
-> **派生付きワークフロー**: 15
-> **総派生数**: 72
+> **自動生成**: 2026-01-29 15:17
+> **総ワークフロー数**: 37
+> **派生付きワークフロー**: 18
+> **総派生数**: 81
 
 ---
 
@@ -11,15 +11,11 @@
 
 | Workflow | Module | 派生 | Version |
 |:---------|:-------|:-----|:--------|
-| `/bou` | O2 | desir, voli, akra | 4.1 |
-| `/ene` | O4 | flow, prax, pois | 4.1 |
-| `/flag` | O4 | — | 1.0 |
-| `/noe` | O1 | nous, phro, meta | 4.1 |
+| `/bou` | O2 | desir, voli, akra | 4.3 |
+| `/ene` | O4 | flow, prax, pois | 4.2 |
+| `/noe` | O1 | nous, phro, meta | 4.3 |
 | `/o` | O1, O2, O3, O4 | — | 2.0 |
-| `/poc` | O3 | — | 1.0 |
-| `/pre` | O2 | — | 1.0 |
-| `/why` | O3 | — | 1.0 |
-| `/zet` | O3 | anom, hypo, eval | 5.1 |
+| `/zet` | O3 | anom, hypo, eval | 5.3 |
 
 ---
 
@@ -27,11 +23,11 @@
 
 | Workflow | Module | 派生 | Version |
 |:---------|:-------|:-----|:--------|
-| `/mek` | S2 | — | 6.0 |
-| `/met` | S1 | — | 1.0 |
-| `/pra` | S4 | — | 1.0 |
-| `/s` | S1, S2, S3, S4 | — | 4.1 |
-| `/sta` | S3 | — | 1.0 |
+| `/mek` | S2 | comp, inve, adap | 6.1 |
+| `/met` | S1 | — | 2.0 |
+| `/pra` | S4 | prax, pois, temp | 2.0 |
+| `/s` | S1, S2, S3, S4 | — | 4.2 |
+| `/sta` | S3 | norm, empi, rela | 2.0 |
 | `/u` | S2.dialogue | — | 2.1 |
 
 ---
@@ -79,15 +75,10 @@
 | Workflow | Module | 派生 | Version |
 |:---------|:-------|:-----|:--------|
 | `/a` | A1, A2, A3, A4 | prim, seco, regu, affi, nega, susp, conc, abst, univ, tent, just, cert | 3.0 |
-| `/dia` | A2 | — | 5.0 |
+| `/dia` | A2 | — | 6.0 |
 | `/epi` | A4 | — | 1.0 |
-| `/epo` | A2 | — | 2.0 |
-| `/fit` | A2 | — | 3.1 |
 | `/gno` | A3 | — | 1.0 |
-| `/pan` | A2 | — | 3.0 |
 | `/pat` | A1 | — | 1.0 |
-| `/syn` | A2 | — | 3.0 |
-| `/vet` | A2, A4 | — | 2.1 |
 
 ---
 
@@ -104,7 +95,7 @@
 
 | Workflow | Module | 派生 | Version |
 |:---------|:-------|:-----|:--------|
-| `/boot` | O1, H4 | — | 3.1 |
+| `/boot` | O1, H4 | — | 3.2 |
 | `/eat` | S2, A2 | — | 1.0 |
 
 ---
@@ -127,6 +118,9 @@
 | **P2** | line | bran | cycl |
 | **P3** | fixe | adap | emer |
 | **P4** | manu | mech | auto |
+| **S2** | comp | inve | adap |
+| **S3** | norm | empi | rela |
+| **S4** | prax | pois | temp |
 
 ---
 
@@ -134,15 +128,15 @@
 
 | カテゴリ | 数 |
 |:---------|:---|
-| O-series | 9 |
+| O-series | 5 |
 | S-series | 6 |
 | H-series | 6 |
 | P-series | 6 |
 | K-series | 5 |
-| A-series | 10 |
+| A-series | 5 |
 | X-series | 2 |
 | Utils | 2 |
-| **合計** | **46** |
+| **合計** | **37** |
 
 ---
 

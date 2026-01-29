@@ -1,9 +1,9 @@
 # Hegemonikón ワークフロー一覧
 
-> **自動生成**: 2026-01-29 11:07
+> **自動生成**: 2026-01-29 12:43
 > **総ワークフロー数**: 46
-> **派生付きワークフロー**: 13
-> **総派生数**: 48
+> **派生付きワークフロー**: 15
+> **総派生数**: 72
 
 ---
 
@@ -68,7 +68,7 @@
 |:---------|:-------|:-----|:--------|
 | `/chr` | K2 | — | 1.0 |
 | `/euk` | K1 | — | 1.0 |
-| `/k` | K1, K2, K3, K4 | — | 3.0 |
+| `/k` | K1, K2, K3, K4 | urge, opti, miss, shor, medi, long, intr, inst, ulti, taci, expl, meta | 4.0 |
 | `/sop` | K4 | — | 5.1 |
 | `/tel` | K3 | — | 3.0 |
 
@@ -78,7 +78,7 @@
 
 | Workflow | Module | 派生 | Version |
 |:---------|:-------|:-----|:--------|
-| `/a` | A1, A2, A3, A4 | — | 2.3 |
+| `/a` | A1, A2, A3, A4 | prim, seco, regu, affi, nega, susp, conc, abst, univ, tent, just, cert | 3.0 |
 | `/dia` | A2 | — | 5.0 |
 | `/epi` | A4 | — | 1.0 |
 | `/epo` | A2 | — | 2.0 |
@@ -104,7 +104,7 @@
 
 | Workflow | Module | 派生 | Version |
 |:---------|:-------|:-----|:--------|
-| `/boot` | O1, H4 | — | 3.0 |
+| `/boot` | O1, H4 | — | 3.1 |
 | `/eat` | S2, A2 | — | 1.0 |
 
 ---
@@ -113,10 +113,12 @@
 
 | 定理 | 派生1 | 派生2 | 派生3 |
 |:-----|:------|:------|:------|
+| **A1** | prim | seco | regu |
 | **H1** | appr | avoi | arre |
 | **H2** | subj | inte | obje |
 | **H3** | targ | acti | stat |
 | **H4** | sens | conc | form |
+| **K1** | urge | opti | miss |
 | **O1** | nous | phro | meta |
 | **O2** | desir | voli | akra |
 | **O3** | anom | hypo | eval |

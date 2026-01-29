@@ -45,6 +45,13 @@ from .config import (
     get_default_params,
     reload_params,
 )
+from .telos_checker import (
+    AlignmentStatus,
+    TelосResult,
+    check_alignment,
+    format_telos_markdown,
+    encode_telos_observation,
+)
 
 __all__ = [
     "HegemonikónFEPAgent",
@@ -76,5 +83,12 @@ __all__ = [
     "load_parameters",
     "get_default_params",
     "reload_params",
+    # K3 Telos
+    "AlignmentStatus",
+    "TelосResult",
+    "check_alignment",
+    "format_telos_markdown",
+    "encode_telos_observation",
 ]
+
 

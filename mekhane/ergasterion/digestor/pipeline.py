@@ -87,6 +87,17 @@ class DigestorPipeline:
                     results = collector.search(query, max_results=max_papers // len(queries))
                     papers.extend(results)
             
+            # 重複除去 (arXiv ID or URL ベース)
+            seen_ids = set()
+            unique_papers = []
+            for paper in papers:
+                paper_id = getattr(paper, 'arxiv_id', None) or getattr(paper, 'url', None) or paper.id
+                if paper_id not in seen_ids:
+                    seen_ids.add(paper_id)
+                    unique_papers.append(paper)
+            papers = unique_papers
+            print(f"[Digestor]   → Deduplicated: {len(papers)} unique papers")
+            
         except ImportError:
             print("[Digestor] Warning: Gnosis collectors not available")
         except Exception as e:

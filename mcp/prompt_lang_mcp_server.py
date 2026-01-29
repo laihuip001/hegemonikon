@@ -131,6 +131,9 @@ def generate_prompt_lang(requirements: str, domain: str, output_format: str) -> 
     domain_constraints = domain_template.get("domain_constraints", [])
     domain_rubric = domain_template.get("domain_rubric", [])
     
+    # Sanitize requirements to ensure indentation (prevent structure injection)
+    requirements_indented = "\n  ".join(requirements.splitlines())
+
     # Build Prompt-Lang code
     lines = [
         f"#prompt {skill_name}",
@@ -139,7 +142,7 @@ def generate_prompt_lang(requirements: str, domain: str, output_format: str) -> 
         f"  {domain} ドメインの専門家",
         "",
         "@goal:",
-        f"  {requirements}",
+        f"  {requirements_indented}",
         "",
         "@constraints:",
     ]

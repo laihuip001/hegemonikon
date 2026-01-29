@@ -75,7 +75,7 @@ BUILTIN_MACROS: Dict[str, Macro] = {
     "kyc": Macro(
         name="kyc",
         ccl="~(/sop_/noe_/ene_/dia-)",
-        description="κύκλος: 観察→推論→行動→判定の振動サイクル (O3~O1~O4~A2)",
+        description="κύκλος: 観察→推論→行動→判定の振動サイクル + Focused ReAct (焦点維持・早期終了)",
         is_builtin=True
     ),
     "wake": Macro(

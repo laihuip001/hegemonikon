@@ -426,36 +426,52 @@ class JulesClient:
         """
         start_time = time.time()
         consecutive_unknown = 0
+        current_interval = poll_interval  # Backoff reset: track current interval
         
         while time.time() - start_time < timeout:
-            session = await self.get_session(session_id)
-            
-            # Terminal state - return immediately
-            if session.state in self.TERMINAL_STATES:
-                return session
-            
-            # Pause state - requires external action (e.g., human approval)
-            if session.state in self.PAUSE_STATES:
-                logger.info(
-                    f"Session {session_id} paused: {session.state.value}. "
-                    f"External action required."
-                )
-                return session
-            
-            # Unknown state handling (th-001 fix)
-            if session.state == SessionState.UNKNOWN:
-                consecutive_unknown += 1
-                logger.warning(f"Session {session_id} in UNKNOWN state ({consecutive_unknown}x)")
+            try:
+                session = await self.get_session(session_id)
                 
-                if consecutive_unknown >= 3 and fail_on_unknown:
-                    raise UnknownStateError(
-                        state=session.state.value,
-                        session_id=session_id
+                # Reset interval on successful request (ai-004 backoff reset fix)
+                current_interval = poll_interval
+                
+                # Terminal state - return immediately
+                if session.state in self.TERMINAL_STATES:
+                    return session
+                
+                # Pause state - requires external action (e.g., human approval)
+                if session.state in self.PAUSE_STATES:
+                    logger.info(
+                        f"Session {session_id} paused: {session.state.value}. "
+                        f"External action required."
                     )
-            else:
-                consecutive_unknown = 0
+                    return session
+                
+                # Unknown state handling (th-001 fix)
+                if session.state == SessionState.UNKNOWN:
+                    consecutive_unknown += 1
+                    logger.warning(f"Session {session_id} in UNKNOWN state ({consecutive_unknown}x)")
+                    
+                    if consecutive_unknown >= 3 and fail_on_unknown:
+                        raise UnknownStateError(
+                            state=session.state.value,
+                            session_id=session_id
+                        )
+                else:
+                    consecutive_unknown = 0
+                    
+            except RateLimitError as e:
+                # Exponential backoff on rate limit (ai-004 fix)
+                if e.retry_after:
+                    current_interval = e.retry_after
+                else:
+                    current_interval = min(current_interval * 2, 60)
+                logger.warning(
+                    f"Rate limited during poll for {session_id}, "
+                    f"backing off to {current_interval}s"
+                )
             
-            await asyncio.sleep(poll_interval)
+            await asyncio.sleep(current_interval)
         
         raise TimeoutError(f"Session {session_id} did not complete within {timeout}s")
     

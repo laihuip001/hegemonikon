@@ -214,6 +214,7 @@ class JulesClient:
         self,
         api_key: Optional[str] = None,
         session: Optional[aiohttp.ClientSession] = None,
+        max_concurrent: Optional[int] = None,
     ):
         """
         Initialize Jules client.
@@ -221,6 +222,7 @@ class JulesClient:
         Args:
             api_key: Jules API key. If None, reads from JULES_API_KEY env var.
             session: Optional shared aiohttp session for connection reuse.
+            max_concurrent: Global concurrency limit. Defaults to MAX_CONCURRENT.
         """
         self.api_key = api_key or os.environ.get("JULES_API_KEY")
         if not self.api_key:
@@ -232,11 +234,22 @@ class JulesClient:
         }
         self._shared_session = session
         self._owned_session: Optional[aiohttp.ClientSession] = None
+        
+        # Global semaphore for cross-batch rate limiting (th-003 fix)
+        self._global_semaphore = asyncio.Semaphore(
+            max_concurrent if max_concurrent is not None else self.MAX_CONCURRENT
+        )
     
     async def __aenter__(self):
-        """Context manager entry - creates shared session if needed."""
+        """Context manager entry - creates pooled session for connection reuse."""
         if self._shared_session is None:
-            self._owned_session = aiohttp.ClientSession()
+            # Connection pooling: reuse TCP connections (cl-004, as-008 fix)
+            connector = aiohttp.TCPConnector(
+                limit=self.MAX_CONCURRENT,  # Max concurrent connections
+                keepalive_timeout=30,  # Keep connections alive for reuse
+                enable_cleanup_closed=True,  # Clean up closed connections
+            )
+            self._owned_session = aiohttp.ClientSession(connector=connector)
         return self
     
     async def __aexit__(self, exc_type, exc_val, exc_tb):
@@ -473,7 +486,8 @@ class JulesClient:
     async def batch_execute(
         self,
         tasks: list[dict],
-        max_concurrent: int = 30
+        max_concurrent: Optional[int] = None,
+        use_global_semaphore: bool = True,
     ) -> list[JulesResult]:
         """
         Execute multiple tasks in parallel with concurrency control.
@@ -483,12 +497,20 @@ class JulesClient:
         
         Args:
             tasks: List of dicts with 'prompt', 'source', optional 'branch'
-            max_concurrent: Maximum concurrent sessions (default: 30)
+            max_concurrent: Maximum concurrent sessions. If None, uses MAX_CONCURRENT.
+                           Ignored if use_global_semaphore=True.
+            use_global_semaphore: If True, uses instance-level semaphore for
+                                  cross-batch rate limiting (th-003 fix).
             
         Returns:
             List of JulesResult objects
         """
-        semaphore = asyncio.Semaphore(max_concurrent)
+        # Use global semaphore for consistent rate limiting across batches
+        if use_global_semaphore:
+            semaphore = self._global_semaphore
+        else:
+            limit = max_concurrent if max_concurrent is not None else self.MAX_CONCURRENT
+            semaphore = asyncio.Semaphore(limit)
         
         async def bounded_execute(task: dict) -> JulesResult:
             async with semaphore:
@@ -526,6 +548,27 @@ class JulesClient:
         return list(results)
 
 
+# ============ Utilities ============
+
+def mask_api_key(key: str, visible_chars: int = 4) -> str:
+    """
+    Safely mask API key for display.
+    
+    Prevents information leakage with short keys (ai-009, th-010 fix).
+    
+    Args:
+        key: API key to mask
+        visible_chars: Number of chars to show at start and end
+        
+    Returns:
+        Masked key string
+    """
+    min_length = visible_chars * 2 + 4  # Need enough chars to mask
+    if len(key) < min_length:
+        return "***"  # Fully mask short keys
+    return f"{key[:visible_chars]}...{key[-visible_chars:]}"
+
+
 # ============ CLI for testing ============
 
 def main():
@@ -549,9 +592,10 @@ def main():
         try:
             client = JulesClient(api_key)
             print("✅ Client initialized")
-            print(f"   API Key: {api_key[:8]}...{api_key[-4:]}")
+            print(f"   API Key: {mask_api_key(api_key)}")
             print(f"   Base URL: {client.BASE_URL}")
             print(f"   Max Concurrent: {client.MAX_CONCURRENT}")
+            print(f"   Connection Pooling: Enabled (TCPConnector)")
         except Exception as e:
             print(f"❌ Error: {e}")
             exit(1)

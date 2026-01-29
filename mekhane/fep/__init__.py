@@ -52,6 +52,16 @@ from .telos_checker import (
     format_telos_markdown,
     encode_telos_observation,
 )
+from .tekhne_registry import (
+    TechniqueQuadrant,
+    ActionCategory,
+    Technique,
+    TekhnēRegistry,
+    STANDARD_TECHNIQUES,
+    get_registry,
+    search_techniques,
+    format_registry_markdown,
+)
 
 __all__ = [
     "HegemonikónFEPAgent",
@@ -89,6 +99,15 @@ __all__ = [
     "check_alignment",
     "format_telos_markdown",
     "encode_telos_observation",
+    # P4 Tekhnē
+    "TechniqueQuadrant",
+    "ActionCategory",
+    "Technique",
+    "TekhnēRegistry",
+    "STANDARD_TECHNIQUES",
+    "get_registry",
+    "search_techniques",
+    "format_registry_markdown",
 ]
 
 

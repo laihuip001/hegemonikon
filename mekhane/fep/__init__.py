@@ -80,6 +80,16 @@ from .chronos_evaluator import (
     format_chronos_markdown,
     encode_chronos_observation,
 )
+from .eukairia_detector import (
+    OpportunityWindow,
+    OpportunityScale,
+    OpportunityDecision,
+    OpportunityContext,
+    EukairiaResult,
+    detect_opportunity,
+    format_eukairia_markdown,
+    encode_eukairia_observation,
+)
 
 __all__ = [
     "HegemonikónFEPAgent",
@@ -142,6 +152,15 @@ __all__ = [
     "evaluate_time",
     "format_chronos_markdown",
     "encode_chronos_observation",
+    # K1 Eukairia
+    "OpportunityWindow",
+    "OpportunityScale",
+    "OpportunityDecision",
+    "OpportunityContext",
+    "EukairiaResult",
+    "detect_opportunity",
+    "format_eukairia_markdown",
+    "encode_eukairia_observation",
 ]
 
 

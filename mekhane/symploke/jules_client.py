@@ -14,6 +14,7 @@ Usage:
 
 import asyncio
 import aiohttp
+import contextlib
 import os
 import time
 from dataclasses import dataclass
@@ -38,8 +39,7 @@ def parse_state(state_str: str) -> SessionState:
     try:
         return SessionState(state_str)
     except ValueError:
-        # Map unknown states to IN_PROGRESS (likely active)
-        return SessionState.IN_PROGRESS
+        return SessionState.UNKNOWN
 
 
 @dataclass
@@ -85,6 +85,17 @@ class JulesClient:
             "X-Goog-Api-Key": self.api_key,
             "Content-Type": "application/json"
         }
+        self._session: Optional[aiohttp.ClientSession] = None
+
+    async def __aenter__(self):
+        if self._session is None or self._session.closed:
+            self._session = aiohttp.ClientSession()
+        return self
+
+    async def __aexit__(self, exc_type, exc_val, exc_tb):
+        if self._session and not self._session.closed:
+            await self._session.close()
+            self._session = None
     
     async def create_session(
         self,
@@ -117,7 +128,9 @@ class JulesClient:
             "requirePlanApproval": not auto_approve
         }
         
-        async with aiohttp.ClientSession() as session:
+        session_ctx = contextlib.nullcontext(self._session) if (self._session and not self._session.closed) else aiohttp.ClientSession()
+
+        async with session_ctx as session:
             async with session.post(
                 f"{self.BASE_URL}/sessions",
                 headers=self._headers,
@@ -146,7 +159,9 @@ class JulesClient:
         Returns:
             Updated JulesSession
         """
-        async with aiohttp.ClientSession() as session:
+        session_ctx = contextlib.nullcontext(self._session) if (self._session and not self._session.closed) else aiohttp.ClientSession()
+
+        async with session_ctx as session:
             async with session.get(
                 f"{self.BASE_URL}/sessions/{session_id}",
                 headers=self._headers
@@ -200,14 +215,18 @@ class JulesClient:
             try:
                 session = await self.get_session(session_id)
                 
-                if session.state in (SessionState.COMPLETED, SessionState.FAILED):
+                if session.state == SessionState.UNKNOWN:
+                    print(f"Warning: Unknown session state encountered for {session_id}")
+
+                elif session.state in (SessionState.COMPLETED, SessionState.FAILED):
                     return session
                 
+                # Reset backoff on success before sleeping
+                backoff = poll_interval
                 await asyncio.sleep(backoff)
-                backoff = min(backoff, poll_interval)  # Reset on success
                 
-            except RateLimitError:
-                # Exponential backoff on rate limit
+            except (RateLimitError, aiohttp.ClientError, asyncio.TimeoutError):
+                # Exponential backoff on rate limit or network error
                 backoff = min(backoff * 2, 60)
                 await asyncio.sleep(backoff)
         
@@ -306,7 +325,8 @@ if __name__ == "__main__":
         try:
             client = JulesClient(api_key)
             print(f"✅ Client initialized")
-            print(f"   API Key: {api_key[:8]}...{api_key[-4:]}")
+            masked_key = f"{api_key[:4]}...{api_key[-4:]}" if len(api_key) > 8 else "***"
+            print(f"   API Key: {masked_key}")
             print(f"   Base URL: {client.BASE_URL}")
             print(f"   Max Concurrent: {client.MAX_CONCURRENT}")
         except Exception as e:

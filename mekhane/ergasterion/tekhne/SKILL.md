@@ -558,6 +558,157 @@ enforcement:
 
 ---
 
+## M8: CONTEXT_OPTIMIZATION (v6.6 新規)
+
+> 2026年1月プロンプト技法最前線から抽出
+
+### Context Window Efficiency Protocol
+
+```yaml
+principle: |
+  コンテキストウィンドウは有限資源。
+  初期ロード時の消費を20%以下に抑え、実作業に80%を確保する。
+
+strategies:
+  1_compression:
+    name: "CLAUDE.md 圧縮"
+    technique: |
+      - 人間向けナラティブを排除
+      - 構造化 Markdown/XML に変換
+      - 重複情報を参照インデックス化
+    benchmark: "12,541字 → 3,088字 (75%削減)"
+    
+  2_ai_format:
+    name: "AI向けフォーマット最適化"
+    technique: |
+      - 冗長な説明文を削除
+      - キー:値 形式を優先
+      - ネストは3階層まで
+    benchmark: "初期消費 27,993字 → 8,424字 (70%削減)"
+    
+  3_reference_index:
+    name: "参照インデックスシステム"
+    technique: |
+      - 詳細ドキュメントは外部ファイルに
+      - インデックスのみを初期ロード
+      - 必要時に view_file で取得
+    benchmark: "メモリファイル 6個 → 1個"
+
+guidelines:
+  - 初期コンテキスト使用率: ≤ 20%
+  - 構造化率: ≥ 80% (表・リスト・XMLタグ)
+  - 冗長率: ≤ 10% (説明文の割合)
+```
+
+### Model-Specific Optimizations
+
+```yaml
+claude_opus_4_5:
+  effort_parameter:
+    medium: "Sonnet同等品質で76%トークン削減"
+    high: "Sonnet+4.3pp向上、48%トークン削減"
+  context_awareness: |
+    System Prompt に追加:
+    "Your context window will be automatically compacted as it approaches 
+    its limit, allowing you to continue working indefinitely."
+  tool_calling: "強制言語不要 — 'Use when...' で十分"
+
+gemini_3_pro:
+  brevity_first: "1-2行の簡潔な指示が最適"
+  constraint_pinning: |
+    毎ターン制約を再提示:
+    "3 bullets ≤120 words each, US English"
+  structure_order:
+    - Role
+    - Goal  
+    - Constraints
+    - Examples
+    - Output Format
+```
+
+---
+
+## M9: SELF_CRITIQUE (v6.6 新規)
+
+> 平均20%の品質向上を実現する自己批評ループ
+
+### Self-Refine Protocol
+
+```yaml
+principle: |
+  モデル自身の出力を批評させ、改善版を生成する。
+  2-3回の反復で収束させる。
+
+process:
+  step_1_initial:
+    name: "初期出力生成"
+    action: "要件に対する最初の回答を生成"
+    
+  step_2_critique:
+    name: "自己批評"
+    prompt: |
+      Critique your answer:
+      - What's missing?
+      - What could be improved?
+      - What assumptions need verification?
+    output: "批評リスト"
+    
+  step_3_refine:
+    name: "改善版生成"
+    prompt: |
+      Based on your critique, generate an improved version.
+      Address each point identified.
+    output: "改善版"
+    
+  step_4_iterate:
+    name: "反復 (オプション)"
+    condition: "品質基準未達時"
+    max_iterations: 3
+    diminishing_returns: "3回以上は効果薄"
+
+benchmarks:
+  general: "平均20%パフォーマンス向上"
+  coding: "最も効果的 (30%+)"
+  scientific_qa: "高効果 (25%+)"
+```
+
+### Cross-Refine Variant
+
+```yaml
+principle: |
+  生成モデルと批評モデルを分離する。
+  弱いモデルでも批評者として有効。
+
+architecture:
+  generator: "メイン生成モデル (e.g., Claude Opus)"
+  critic: "批評専用モデル (e.g., Claude Sonnet)"
+  
+advantages:
+  - 自己バイアスの低減
+  - コスト効率の向上
+  - 客観性の強化
+```
+
+### Integration with RECURSIVE_CORE
+
+```yaml
+integration_point: "Layer 3: CONVERGENCE"
+
+enhanced_flow:
+  1. Layer 1 (EXPANSION): 拡散的生成
+  2. Layer 2 (CONFLICT): Internal Council 批評
+  3. Layer 3 (CONVERGENCE): 
+     - Self-Critique ループを自動発動
+     - 2回の反復で収束
+     - 最終成果物を形成
+
+auto_trigger:
+  condition: "確信度 < 90%"
+  action: "Self-Critique 1回追加"
+```
+
+---
+
 ---
 
 ## M6: INTERACTIVE_MODE (v6.3 新規)
@@ -932,7 +1083,8 @@ version: "1.0.0"
 | 5.0 | 2025-01-27 | v3.0 + v4.0 統合、8 references体制 |
 | 5.1 | 2025-01-28 | prompt-lang-generator統合 |
 | 6.0 | 2025-01-28 | OMEGA SINGULARITY BUILD: 完全吸収版 |
-| **6.2** | **2026-01-28** | **Structural Enforcement: 8必須frontmatter項目 + Validation Checklist** |
+| 6.2 | 2026-01-28 | Structural Enforcement: 8必須frontmatter項目 + Validation Checklist |
+| **6.6** | **2026-01-29** | **M8: CONTEXT_OPTIMIZATION + M9: SELF_CRITIQUE 追加 (2026-01 調査レポートから抽出)** |
 
 ### v6.0 Changelog
 

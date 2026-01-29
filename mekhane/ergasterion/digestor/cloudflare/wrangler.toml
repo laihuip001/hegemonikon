@@ -1,0 +1,17 @@
+name = "digestor-scheduler"
+main = "src/index.ts"
+compatibility_date = "2026-01-29"
+
+[env.production]
+name = "digestor-scheduler-prod"
+
+[env.production.vars]
+DIGESTOR_MAX_PAPERS = "30"
+DIGESTOR_MAX_CANDIDATES = "10"
+
+# 毎日 6:00 JST (= 21:00 UTC 前日)
+[env.production.triggers]
+crons = ["0 21 * * *"]
+
+# Secrets (set via: wrangler secret put SLACK_WEBHOOK_URL --env production)
+# - SLACK_WEBHOOK_URL

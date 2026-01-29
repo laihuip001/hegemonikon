@@ -11,9 +11,33 @@ updated: "2026-01-27"
 
 > **Kernel Doc Index**: [SACRED_TRUTH](SACRED_TRUTH.md) | [axiom_hierarchy](axiom_hierarchy.md) | [doctrine](doctrine.md) ← 📍
 
-# 🧬 Hegemonikón Doctrine v2.1 (Meta-Axiom Layer)
+# 🧬 Hegemonikón Doctrine v2.2 (Meta-Axiom Layer)
 
 > **すべては予測誤差最小化に帰着する**
+
+## アイデンティティ: 認知制御言語 (CCL)
+
+> **Hegemonikón は「認知制御言語 (Cognitive Control Language)」であり、「思考言語 (Language of Thought)」ではない。**
+
+| 観点 | Mentalese (Fodor) | Hegemonikón |
+|:-----|:------------------|:------------|
+| **目的** | 思考の表現 | 思考の制御 |
+| **性質** | 内部的・無意識 | 外部的・明示的 |
+| **野望** | 完全性 | 開放的自己完備 |
+| **体系** | 静的な記号 | 動的な行為 (Praxis) |
+
+**なぜ350年の失敗を回避できるか:**
+
+| 過去の失敗 | Hegemonikón の設計 |
+|:-----------|:-------------------|
+| 完全性の野望 | ハイブリッド: 骨格 + 肉付け + /u |
+| 文脈無視 | P/K/A で文脈を形式化 |
+| 自己参照の禁止 | X-series で自己参照を許容 |
+| 静的な体系 | FEP で動的に学習 |
+
+> **Wittgenstein の批判を回避**: 意味を静的に定義せず、操作として実行する。
+
+---
 
 | 項目 | 内容 |
 |------|------|

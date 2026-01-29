@@ -306,7 +306,7 @@ if __name__ == "__main__":
         try:
             client = JulesClient(api_key)
             print(f"✅ Client initialized")
-            print(f"   API Key: {api_key[:8]}...{api_key[-4:]}")
+            print(f"   API Key: ****")
             print(f"   Base URL: {client.BASE_URL}")
             print(f"   Max Concurrent: {client.MAX_CONCURRENT}")
         except Exception as e:

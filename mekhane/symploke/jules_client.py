@@ -13,12 +13,15 @@ Usage:
 """
 
 import asyncio
-import aiohttp
+import logging
 import os
 import time
+import aiohttp
 from dataclasses import dataclass
 from enum import Enum
 from typing import Optional
+
+logger = logging.getLogger(__name__)
 
 
 class SessionState(Enum):
@@ -38,8 +41,8 @@ def parse_state(state_str: str) -> SessionState:
     try:
         return SessionState(state_str)
     except ValueError:
-        # Map unknown states to IN_PROGRESS (likely active)
-        return SessionState.IN_PROGRESS
+        logger.warning(f"Unknown session state: '{state_str}'. Defaulting to UNKNOWN.")
+        return SessionState.UNKNOWN
 
 
 @dataclass
@@ -263,6 +266,11 @@ class JulesClient:
                         branch=task.get("branch", "main")
                     )
                 except Exception as e:
+                    logger.error(
+                        f"Error executing task '{task.get('prompt', 'unknown')}'",
+                        exc_info=True
+                    )
+
                     # Return failed session instead of raising
                     return JulesSession(
                         id="",

@@ -71,6 +71,15 @@ from .energeia_executor import (
     format_execution_markdown,
     encode_execution_observation,
 )
+from .chronos_evaluator import (
+    TimeScale,
+    CertaintyLevel,
+    SlackLevel,
+    ChronosResult,
+    evaluate_time,
+    format_chronos_markdown,
+    encode_chronos_observation,
+)
 
 __all__ = [
     "HegemonikónFEPAgent",
@@ -125,6 +134,15 @@ __all__ = [
     "EnergеiaExecutor",
     "format_execution_markdown",
     "encode_execution_observation",
+    # K2 Chronos
+    "TimeScale",
+    "CertaintyLevel",
+    "SlackLevel",
+    "ChronosResult",
+    "evaluate_time",
+    "format_chronos_markdown",
+    "encode_chronos_observation",
 ]
+
 
 

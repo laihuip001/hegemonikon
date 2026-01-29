@@ -120,51 +120,196 @@ domains:
 # ==============================================================================
 # AXES (How to look at it)
 # ==============================================================================
-# 6 Hegemonikón theorem series, one representative per series
-# Each axis provides a fundamentally different cognitive lens
+# All 24 Hegemonikón theorems as cognitive lenses
+# Each theorem provides a unique perspective for code review
+# Generated via /mek (tekhne-maker) Hegemonikón Mode
 
 axes:
-  - id: "O"
+  # ---------------------------------------------------------------------------
+  # O-series: Ousia (Pure Theorems) — 認識・理解・洞察
+  # ---------------------------------------------------------------------------
+  - id: "O1"
     series: "Ousia"
-    theorem: "O1 Noēsis"
-    name: "本質"
-    question: "What is the essential purpose?"
-    focus: "なぜこれが存在するか？根本的な意図は何か？"
+    theorem: "Noēsis"
+    name: "深い認識"
+    question: "What is the deep, non-discursive understanding?"
+    focus: "このコードの本質的な目的は何か？直観的に何を理解すべきか？"
     
-  - id: "S"
+  - id: "O2"
+    series: "Ousia"
+    theorem: "Boulēsis"
+    name: "意志・目的"
+    question: "What is the rational intention?"
+    focus: "このコードが達成しようとしている意図は明確か？"
+    
+  - id: "O3"
+    series: "Ousia"
+    theorem: "Zētēsis"
+    name: "探求"
+    question: "What questions remain unanswered?"
+    focus: "未解決の問い・不確実性・調査が必要な領域は何か？"
+    
+  - id: "O4"
+    series: "Ousia"
+    theorem: "Energeia"
+    name: "行為・活動"
+    question: "Is the action aligned with intention?"
+    focus: "実際の動作は意図と一致しているか？行動は完結しているか？"
+
+  # ---------------------------------------------------------------------------
+  # S-series: Schema (Strategy Theorems) — 計画・戦略・測定
+  # ---------------------------------------------------------------------------
+  - id: "S1"
     series: "Schema"
-    theorem: "S2 Mekhanē"
-    name: "手法"
-    question: "What methods are used?"
-    focus: "どのような手法・技術が使われているか？それは適切か？"
+    theorem: "Metron"
+    name: "尺度"
+    question: "Is the scale appropriate?"
+    focus: "このコードの粒度・スケールは適切か？過剰か不足か？"
     
-  - id: "H"
+  - id: "S2"
+    series: "Schema"
+    theorem: "Mekhanē"
+    name: "方法"
+    question: "Are the methods appropriate?"
+    focus: "使用されている手法・技術は適切か？より良い方法はあるか？"
+    
+  - id: "S3"
+    series: "Schema"
+    theorem: "Stathmos"
+    name: "基準"
+    question: "Are success criteria defined?"
+    focus: "成功・失敗の基準は明確か？評価可能か？"
+    
+  - id: "S4"
+    series: "Schema"
+    theorem: "Praxis"
+    name: "実践"
+    question: "Is theory applied correctly?"
+    focus: "設計と実装は一致しているか？理論が実践に落とし込まれているか？"
+
+  # ---------------------------------------------------------------------------
+  # H-series: Hormē (Impulse Theorems) — 衝動・信念・直感
+  # ---------------------------------------------------------------------------
+  - id: "H1"
     series: "Hormē"
-    theorem: "H1 Propatheia"
-    name: "直感"
-    question: "What does intuition say?"
-    focus: "直感的に違和感はないか？無意識のパターン認識は？"
+    theorem: "Propatheia"
+    name: "前感情"
+    question: "What is the gut feeling?"
+    focus: "直感的に違和感はないか？無意識のパターン認識は何を示すか？"
     
-  - id: "P"
+  - id: "H2"
+    series: "Hormē"
+    theorem: "Pistis"
+    name: "確信"
+    question: "How confident should we be?"
+    focus: "このコードの信頼性はどの程度か？どこに不確実性があるか？"
+    
+  - id: "H3"
+    series: "Hormē"
+    theorem: "Orexis"
+    name: "欲求"
+    question: "What is the underlying desire?"
+    focus: "このコードが満たそうとしている欲求・ニーズは何か？"
+    
+  - id: "H4"
+    series: "Hormē"
+    theorem: "Doxa"
+    name: "信念"
+    question: "What assumptions are made?"
+    focus: "暗黙の仮定・信念は何か？それは妥当か？"
+
+  # ---------------------------------------------------------------------------
+  # P-series: Perigraphē (Environment Theorems) — 環境・境界・経路
+  # ---------------------------------------------------------------------------
+  - id: "P1"
     series: "Perigraphē"
-    theorem: "P1 Khōra"
-    name: "境界"
-    question: "What are the boundaries?"
-    focus: "スコープ・境界は明確か？責務の切り分けは？"
+    theorem: "Khōra"
+    name: "場"
+    question: "What is the scope?"
+    focus: "このコードのスコープ・境界は明確か？責務の切り分けは？"
     
-  - id: "K"
+  - id: "P2"
+    series: "Perigraphē"
+    theorem: "Hodos"
+    name: "道"
+    question: "Is the path correct?"
+    focus: "実行パス・フローは適切か？分岐は妥当か？"
+    
+  - id: "P3"
+    series: "Perigraphē"
+    theorem: "Trokhia"
+    name: "軌道"
+    question: "What is the lifecycle?"
+    focus: "このコードのライフサイクル・軌道は？初期化から破棄まで正しいか？"
+    
+  - id: "P4"
+    series: "Perigraphē"
+    theorem: "Tekhnē"
+    name: "技法"
+    question: "Is the technique appropriate?"
+    focus: "使用されている技法・パターンは適切か？"
+
+  # ---------------------------------------------------------------------------
+  # K-series: Kairos (Context Theorems) — 時間・機会・文脈
+  # ---------------------------------------------------------------------------
+  - id: "K1"
     series: "Kairos"
-    theorem: "K3 Telos"
+    theorem: "Eukairia"
+    name: "好機"
+    question: "Is this the right time?"
+    focus: "このコードを書く・変更するタイミングは適切か？"
+    
+  - id: "K2"
+    series: "Kairos"
+    theorem: "Chronos"
+    name: "時間"
+    question: "Are time constraints considered?"
+    focus: "時間制約・期限は考慮されているか？タイムアウトは適切か？"
+    
+  - id: "K3"
+    series: "Kairos"
+    theorem: "Telos"
     name: "目的"
     question: "Is the purpose achieved?"
-    focus: "意図した目的は達成されるか？手段と目的は一致しているか？"
+    focus: "このコードの目的は達成されるか？手段と目的が入れ替わっていないか？"
     
-  - id: "A"
+  - id: "K4"
+    series: "Kairos"
+    theorem: "Sophia"
+    name: "知恵"
+    question: "Is past wisdom applied?"
+    focus: "過去の知恵・ベストプラクティスは活用されているか？"
+
+  # ---------------------------------------------------------------------------
+  # A-series: Akribeia (Precision Theorems) — 精度・判断・校正
+  # ---------------------------------------------------------------------------
+  - id: "A1"
     series: "Akribeia"
-    theorem: "A2 Krisis"
+    theorem: "Pathos"
+    name: "情念"
+    question: "Is there emotional bias?"
+    focus: "このコードに感情的なバイアス・過剰反応はないか？"
+    
+  - id: "A2"
+    series: "Akribeia"
+    theorem: "Krisis"
     name: "判定"
     question: "Is the judgment correct?"
-    focus: "判断は正しいか？条件分岐のロジックは妥当か？"
+    focus: "条件分岐・判断ロジックは正しいか？"
+    
+  - id: "A3"
+    series: "Akribeia"
+    theorem: "Gnōmē"
+    name: "格言"
+    question: "Are principles followed?"
+    focus: "原則・格言・ベストプラクティスに従っているか？"
+    
+  - id: "A4"
+    series: "Akribeia"
+    theorem: "Epistēmē"
+    name: "知識"
+    question: "Is it based on verified knowledge?"
+    focus: "確実な知識に基づいているか？推測ではないか？"
 
 # ==============================================================================
 # PROMPT TEMPLATE
@@ -216,8 +361,8 @@ prompt_template: |
 # ==============================================================================
 
 metadata:
-  total_perspectives: 120  # 20 domains × 6 axes
-  redundancy: "0 (structurally orthogonal)"
-  coverage: "Complete (domains × axes = direct product)"
+  total_perspectives: 480  # 20 domains × 24 axes (full theorem coverage)
+  redundancy: "0 (structurally orthogonal via direct product)"
+  coverage: "Complete (20 domains × 24 theorems = full Hegemonikón coverage)"
   batch_size: 60  # Jules API rate limit per batch
-  batches_required: 2
+  batches_required: 8  # 480 / 60 = 8 batches

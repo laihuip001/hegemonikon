@@ -26,7 +26,7 @@ class TestPerspectiveMatrix:
     def test_load_matrix(self, matrix: PerspectiveMatrix):
         """Verify matrix loads successfully."""
         assert matrix is not None
-        assert matrix.total_perspectives == 120
+        assert matrix.total_perspectives == 480
     
     def test_domain_count(self, matrix: PerspectiveMatrix):
         """Verify 20 domains are defined."""
@@ -34,14 +34,14 @@ class TestPerspectiveMatrix:
     
     def test_axis_count(self, matrix: PerspectiveMatrix):
         """Verify 6 axes are defined."""
-        assert len(matrix.axes) == 6
+        assert len(matrix.axes) == 24
     
     def test_get_perspective(self, matrix: PerspectiveMatrix):
         """Test getting a specific perspective."""
-        p = matrix.get("Resource", "O")
+        p = matrix.get("Resource", "O1")
         assert p.domain_id == "Resource"
-        assert p.axis_id == "O"
-        assert p.id == "Resource-O"
+        assert p.axis_id == "O1"
+        assert p.id == "Resource-O1"
     
     def test_get_invalid_domain(self, matrix: PerspectiveMatrix):
         """Test error on invalid domain."""
@@ -56,7 +56,7 @@ class TestPerspectiveMatrix:
     def test_all_perspectives_count(self, matrix: PerspectiveMatrix):
         """Verify all_perspectives returns 120 items."""
         perspectives = matrix.all_perspectives()
-        assert len(perspectives) == 120
+        assert len(perspectives) == 480
     
     def test_all_perspectives_unique(self, matrix: PerspectiveMatrix):
         """Verify all perspective IDs are unique."""
@@ -66,19 +66,19 @@ class TestPerspectiveMatrix:
     
     def test_generate_prompt(self, matrix: PerspectiveMatrix):
         """Test prompt generation."""
-        p = matrix.get("Security", "H")
+        p = matrix.get("Security", "H1")
         prompt = matrix.generate_prompt(p)
         
         # Check prompt contains key elements
         assert "Security" in prompt
-        assert "直感" in prompt
-        assert "H1 Propatheia" in prompt
+        assert "前感情" in prompt
+        assert "Propatheia" in prompt
         assert "SILENCE" in prompt
     
     def test_generate_all_prompts(self, matrix: PerspectiveMatrix):
         """Test generating all 120 prompts."""
         prompts = matrix.generate_all_prompts()
-        assert len(prompts) == 120
+        assert len(prompts) == 480
         
         # Check all prompts are non-empty
         for pid, prompt in prompts.items():
@@ -87,7 +87,7 @@ class TestPerspectiveMatrix:
     def test_batch_perspectives(self, matrix: PerspectiveMatrix):
         """Test batching for rate limiting."""
         batches = matrix.batch_perspectives(batch_size=60)
-        assert len(batches) == 2
+        assert len(batches) == 8
         assert len(batches[0]) == 60
         assert len(batches[1]) == 60
 

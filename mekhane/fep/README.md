@@ -140,5 +140,39 @@ python -m pytest mekhane/fep/tests/ -v
 
 ## Version
 
+- **v3.2** (2026-01-29): 派生選択学習基盤
+  - 選択ログ自動記録 (`derivative_selections.yaml`)
+  - /bye で Doxa 永続化、/boot で A-matrix 学習連携
+- **v3.1** (2026-01-29): LLM Hybrid 派生選択
+  - Gemini Flash free tier フォールバック
+  - 低信頼度 (<55%) で自動 LLM 選択
 - **v3.0** (2026-01-29): 100% theorem coverage
-- 13 modules, 24 theorems, 336 tests
+  - 13 modules, 24 theorems, 336 tests
+
+## LLM Hybrid 派生選択 (v3.1+)
+
+```python
+from mekhane.fep.derivative_selector import select_derivative
+
+# キーワード信頼度が低い場合、自動で Gemini Flash にフォールバック
+result = select_derivative("O1", "うーん")
+# → nous (85%) [LLM fallback]
+
+# 設定
+# LLM_FALLBACK_THRESHOLD = 0.55  # これ以下で LLM 発動
+# LLM_DERIVATIVE_MODEL = "gemini-2.0-flash-lite"  # Free tier
+```
+
+## 選択ログ (v3.2)
+
+派生選択は自動でログに記録され、将来の学習に使用されます：
+
+```yaml
+# mneme/.hegemonikon/derivative_selections.yaml
+selections:
+  - timestamp: '2026-01-29T13:24:36'
+    theorem: O1
+    derivative: nous
+    confidence: 0.85
+    method: llm
+```

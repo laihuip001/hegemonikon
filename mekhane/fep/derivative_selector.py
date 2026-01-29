@@ -24,7 +24,39 @@ References:
 
 from dataclasses import dataclass
 from typing import Literal, List, Dict, Tuple, Optional
+from datetime import datetime
+from pathlib import Path
 import re
+import os
+import json
+import logging
+import yaml
+
+# -----------------------------------------------------------------------------
+# LLM Fallback Configuration (v3.1 新規)
+# -----------------------------------------------------------------------------
+GEMINI_AVAILABLE = False
+GEMINI_CLIENT = None
+LLM_FALLBACK_ENABLED = True  # Set to False to disable LLM fallback
+LLM_FALLBACK_THRESHOLD = 0.55  # Keyword confidence below this triggers LLM
+LLM_DERIVATIVE_MODEL = "gemini-2.0-flash-lite"  # Free tier model
+
+# -----------------------------------------------------------------------------
+# Selection Logging Configuration (v3.2 新規 - 学習基盤)
+# -----------------------------------------------------------------------------
+SELECTION_LOG_ENABLED = True
+SELECTION_LOG_PATH = Path("/home/laihuip001/oikos/mneme/.hegemonikon/derivative_selections.yaml")
+
+logger = logging.getLogger(__name__)
+
+try:
+    from google import genai
+    api_key = os.environ.get("GEMINI_API_KEY") or os.environ.get("GOOGLE_API_KEY", "")
+    if api_key:
+        GEMINI_CLIENT = genai.Client(api_key=api_key)
+        GEMINI_AVAILABLE = True
+except ImportError:
+    pass
 
 
 # =============================================================================
@@ -1100,21 +1132,207 @@ def _calculate_pattern_score(text: str, patterns: List[str]) -> int:
 
 
 # =============================================================================
+# LLM Fallback Selection (v3.1 新規)
+# =============================================================================
+
+# Derivative mappings for each theorem
+THEOREM_DERIVATIVES: Dict[str, List[str]] = {
+    "O1": ["nous", "phro", "meta"],
+    "O2": ["desir", "voli", "akra"],
+    "O3": ["anom", "hypo", "eval"],
+    "O4": ["flow", "prax", "pois"],
+    "S1": ["cont", "disc", "abst"],
+    "S2": ["comp", "inve", "adap"],
+    "S3": ["norm", "empi", "rela"],
+    "S4": ["prax", "pois", "temp"],
+    "H1": ["appr", "avoi", "arre"],
+    "H2": ["subj", "inte", "obje"],
+    "H3": ["targ", "acti", "stat"],
+    "H4": ["sens", "conc", "form"],
+    "P1": ["phys", "conc", "rela"],
+    "P2": ["line", "bran", "cycl"],
+    "P3": ["fixe", "adap", "emer"],
+    "P4": ["manu", "mech", "auto"],
+    "K1": ["urge", "opti", "miss"],
+    "K2": ["shor", "medi", "long"],
+    "K3": ["intr", "inst", "ulti"],
+    "K4": ["taci", "expl", "meta"],
+    "A1": ["prim", "seco", "regu"],
+    "A2": ["affi", "nega", "susp"],
+    "A3": ["conc", "abst", "univ"],
+    "A4": ["tent", "just", "cert"],
+}
+
+DERIVATIVE_DESCRIPTIONS: Dict[str, Dict[str, str]] = {
+    "O1": {
+        "nous": "本質・原理の直観的把握 (Nous poietikos → theoretikos)",
+        "phro": "実践的判断・具体状況での適切な判断 (Phronēsis)",
+        "meta": "認知プロセスへの反省・信頼性評価 (Metanoēsis)",
+    },
+    "O2": {
+        "desir": "純粋な欲求の把握 (Epithymia)",
+        "voli": "複数欲動の意志統合 (Hekousios)",
+        "akra": "意志の弱さへの対処 (Akrasia)",
+    },
+    # ... 他の定理も同様
+}
+
+
+def _select_with_llm(theorem: str, problem: str) -> Optional[Tuple[str, float]]:
+    """
+    Select derivative using LLM (Gemini Flash free tier).
+    
+    Returns:
+        Tuple of (derivative, confidence) or None if LLM fails
+    """
+    if not LLM_FALLBACK_ENABLED or not GEMINI_AVAILABLE or not GEMINI_CLIENT:
+        return None
+    
+    derivatives = THEOREM_DERIVATIVES.get(theorem, [])
+    if not derivatives:
+        return None
+    
+    # Build concise prompt (Gemini 3 style: less is more)
+    prompt = f"""定理 {theorem} の派生を選べ。
+
+派生候補: {', '.join(derivatives)}
+
+入力: {problem}
+
+回答形式: 派生コードのみ (例: {derivatives[0]})"""
+
+    try:
+        response = GEMINI_CLIENT.models.generate_content(
+            model=LLM_DERIVATIVE_MODEL,
+            contents=prompt,
+        )
+        
+        if response and response.text:
+            result = response.text.strip().lower()
+            # Extract derivative code from response
+            for deriv in derivatives:
+                if deriv in result:
+                    return (deriv, 0.85)  # LLM confidence = 85%
+        
+        return None
+    except Exception as e:
+        logger.warning(f"LLM derivative selection failed: {e}")
+        return None
+
+
+def _hybrid_select(
+    theorem: str,
+    problem: str,
+    keyword_result: "DerivativeRecommendation"
+) -> "DerivativeRecommendation":
+    """
+    Hybrid selection: LLM fallback when keyword confidence is low.
+    
+    Returns original keyword result if:
+    - Keyword confidence >= threshold
+    - LLM fallback is disabled
+    - LLM call fails
+    
+    Otherwise returns LLM result with higher confidence.
+    """
+    # If keyword confidence is high enough, use it
+    if keyword_result.confidence >= LLM_FALLBACK_THRESHOLD:
+        return keyword_result
+    
+    # Try LLM fallback
+    llm_result = _select_with_llm(theorem, problem)
+    
+    if llm_result:
+        derivative, confidence = llm_result
+        
+        return DerivativeRecommendation(
+            theorem=theorem,
+            derivative=derivative,
+            confidence=confidence,
+            rationale=f"LLM fallback (keyword confidence {keyword_result.confidence:.0%} < {LLM_FALLBACK_THRESHOLD:.0%})",
+            alternatives=keyword_result.alternatives,
+        )
+
+    
+    # LLM failed, return keyword result
+    return keyword_result
+
+
+def _log_selection(
+    theorem: str,
+    problem: str,
+    result: "DerivativeRecommendation",
+    method: str = "keyword"
+) -> None:
+    """
+    派生選択をログに記録 (v3.2 学習基盤)
+    
+    Args:
+        theorem: 定理コード (O1, S2, etc.)
+        problem: 問題文 (最大100文字)
+        result: 選択結果
+        method: 選択方法 ("keyword" or "llm")
+    """
+    if not SELECTION_LOG_ENABLED:
+        return
+    
+    try:
+        # ログディレクトリ確保
+        SELECTION_LOG_PATH.parent.mkdir(parents=True, exist_ok=True)
+        
+        # エントリ作成
+        entry = {
+            "timestamp": datetime.now().isoformat(),
+            "theorem": theorem,
+            "problem": problem[:100] if len(problem) > 100 else problem,
+            "derivative": result.derivative,
+            "confidence": round(result.confidence, 2),
+            "method": method,
+        }
+        
+        # 既存ログを読み込み
+        existing = []
+        if SELECTION_LOG_PATH.exists():
+            with open(SELECTION_LOG_PATH, "r", encoding="utf-8") as f:
+                data = yaml.safe_load(f)
+                if data and isinstance(data.get("selections"), list):
+                    existing = data["selections"]
+        
+        # 追記
+        existing.append(entry)
+        
+        # 保存 (最新1000件のみ保持)
+        with open(SELECTION_LOG_PATH, "w", encoding="utf-8") as f:
+            yaml.dump(
+                {"selections": existing[-1000:]},
+                f,
+                allow_unicode=True,
+                default_flow_style=False,
+            )
+    except Exception as e:
+        logger.warning(f"Failed to log derivative selection: {e}")
+
+
+# =============================================================================
 # Selection Functions
 # =============================================================================
 
 def select_derivative(
     theorem: Literal["O1", "O2", "O3", "O4", "S1", "S2", "S3", "S4", "H1", "H2", "H3", "H4"],
     problem_context: str,
-    use_fep: bool = False
+    use_fep: bool = False,
+    use_llm_fallback: bool = True  # v3.1: Enable LLM hybrid selection
 ) -> DerivativeRecommendation:
     """
     Select the optimal derivative for the given theorem and problem context.
+    
+    v3.1: Hybrid selection - uses LLM fallback when keyword confidence < 50%
     
     Args:
         theorem: O-series (O1-O4), S-series (S1-S4), or H-series (H1-H4) theorem
         problem_context: Problem description (user input)
         use_fep: Use FEP agent for selection (future enhancement)
+        use_llm_fallback: Enable LLM hybrid selection (default: True)
     
     Returns:
         DerivativeRecommendation with selected derivative and confidence
@@ -1131,62 +1349,79 @@ def select_derivative(
         'appr'
     """
     
+    # Get keyword-based result first
+    keyword_result: Optional[DerivativeRecommendation] = None
+    
     # O-series
     if theorem == "O1":
-        return _select_o1_derivative(problem_context)
+        keyword_result = _select_o1_derivative(problem_context)
     elif theorem == "O2":
-        return _select_o2_derivative(problem_context)
+        keyword_result = _select_o2_derivative(problem_context)
     elif theorem == "O3":
-        return _select_o3_derivative(problem_context)
+        keyword_result = _select_o3_derivative(problem_context)
     elif theorem == "O4":
-        return _select_o4_derivative(problem_context)
+        keyword_result = _select_o4_derivative(problem_context)
     # S-series
     elif theorem == "S1":
-        return _select_s1_derivative(problem_context)
+        keyword_result = _select_s1_derivative(problem_context)
     elif theorem == "S2":
-        return _select_s2_derivative(problem_context)
+        keyword_result = _select_s2_derivative(problem_context)
     elif theorem == "S3":
-        return _select_s3_derivative(problem_context)
+        keyword_result = _select_s3_derivative(problem_context)
     elif theorem == "S4":
-        return _select_s4_derivative(problem_context)
+        keyword_result = _select_s4_derivative(problem_context)
     # H-series
     elif theorem == "H1":
-        return _select_h1_derivative(problem_context)
+        keyword_result = _select_h1_derivative(problem_context)
     elif theorem == "H2":
-        return _select_h2_derivative(problem_context)
+        keyword_result = _select_h2_derivative(problem_context)
     elif theorem == "H3":
-        return _select_h3_derivative(problem_context)
+        keyword_result = _select_h3_derivative(problem_context)
     elif theorem == "H4":
-        return _select_h4_derivative(problem_context)
+        keyword_result = _select_h4_derivative(problem_context)
     # P-series
     elif theorem == "P1":
-        return _select_p1_derivative(problem_context)
+        keyword_result = _select_p1_derivative(problem_context)
     elif theorem == "P2":
-        return _select_p2_derivative(problem_context)
+        keyword_result = _select_p2_derivative(problem_context)
     elif theorem == "P3":
-        return _select_p3_derivative(problem_context)
+        keyword_result = _select_p3_derivative(problem_context)
     elif theorem == "P4":
-        return _select_p4_derivative(problem_context)
+        keyword_result = _select_p4_derivative(problem_context)
     # K-series
     elif theorem == "K1":
-        return _select_k1_derivative(problem_context)
+        keyword_result = _select_k1_derivative(problem_context)
     elif theorem == "K2":
-        return _select_k2_derivative(problem_context)
+        keyword_result = _select_k2_derivative(problem_context)
     elif theorem == "K3":
-        return _select_k3_derivative(problem_context)
+        keyword_result = _select_k3_derivative(problem_context)
     elif theorem == "K4":
-        return _select_k4_derivative(problem_context)
+        keyword_result = _select_k4_derivative(problem_context)
     # A-series
     elif theorem == "A1":
-        return _select_a1_derivative(problem_context)
+        keyword_result = _select_a1_derivative(problem_context)
     elif theorem == "A2":
-        return _select_a2_derivative(problem_context)
+        keyword_result = _select_a2_derivative(problem_context)
     elif theorem == "A3":
-        return _select_a3_derivative(problem_context)
+        keyword_result = _select_a3_derivative(problem_context)
     elif theorem == "A4":
-        return _select_a4_derivative(problem_context)
+        keyword_result = _select_a4_derivative(problem_context)
     else:
         raise ValueError(f"Unknown theorem: {theorem}. Expected O1-O4, S1-S4, H1-H4, P1-P4, K1-K4, or A1-A4.")
+    
+    # v3.1: Apply Hybrid selection (LLM fallback for low confidence)
+    if use_llm_fallback and keyword_result is not None:
+        result = _hybrid_select(theorem, problem_context, keyword_result)
+        method = "llm" if "LLM" in result.rationale else "keyword"
+        _log_selection(theorem, problem_context, result, method)
+        return result
+    
+    # v3.2: Log keyword selection
+    if keyword_result is not None:
+        _log_selection(theorem, problem_context, keyword_result, "keyword")
+    
+    return keyword_result
+
 
 
 

@@ -740,43 +740,72 @@ target_optimizations:
       - "Anti-Skip Protocol 等のメタルールを含めてよい"
 
   gemini:
-    style: "簡潔 + 構造優先"
-    context_window: "128K (Gemini 3 Pro)"
+    # ⚠️ PARADIGM SHIFT (2025年11月): Less is More
+    # 詳細なプロンプトは逆効果 (output 2-3倍, latency +20-30%)
+    style: "簡潔 + 構造優先 (30-50%削減推奨)"
+    context_window: "2M tokens (Gemini 3 Pro)"
     strengths:
       - マルチモーダル処理
       - コード生成/レビュー
       - 高速推論
+      - 長文コンテキスト (99% retrieval accuracy)
+    
+    # ⚠️ 重要: Constraint Pinning は逆効果
+    anti_patterns:
+      - "制約の反復 (Constraint Pinning): -2-4% accuracy"
+      - "冗長な Role 定義: output 2-3倍"
+      - "System + User で同じ指示: 重複処理"
+    
     prompt_advice:
-      - "冒頭1-2行で目的を明示"
-      - "制約条件は毎ターン再提示"
-      - "構造順序: Role → Goal → Constraints → Examples → Output"
-    template: |
-      ## Goal
-      [1-2文で目的]
+      - "ROLE: 1-2文のみ ('Code reviewer' 程度)"
+      - "TASK: 直接指示 (1-2文)"
+      - "CONSTRAINTS: 1回のみ言及 (反復厳禁)"
+      - "System Prompt: 50-100トークン以下"
+      - "Context → Task → Format の順序"
+    
+    system_prompt_template: |
+      Code analysis agent. Direct responses.
+      Concise syntax. Output in requested format only.
+    
+    user_prompt_template: |
+      ## Context
+      [背景: 既存構造、目的]
       
-      ## Constraints
-      - [制約1]
-      - [制約2]
+      ## Task
+      [具体的指示: 1-2文]
       
-      ## Steps
-      1. [ステップ1]
-      2. [ステップ2]
+      ## Scope
+      [対象ファイル/モジュール]
       
-      ## Output Format
-      [期待する出力形式]
+      ## Format
+      Output: {issues: [{type: string, severity: 'high'|'low'}]}
 
   jules:
+    # Jules API: plan-based workflow + explicit completion criteria
     style: "タスク記述 + 完了条件明示"
     context_window: "N/A (非対話型)"
     strengths:
       - 自律的コード変更
       - PR 作成
-      - 大量並列実行
+      - plan-based workflow (複雑性自動管理)
+    
+    # ⚠️ 重要: 単一タスク推奨
+    best_practice:
+      - "Single comprehensive task > Multiple subtasks"
+      - "Jules の plan 機能が複雑さを自動管理"
+      - "Mid-task feedback で動的調整可能"
+    
     prompt_advice:
-      - "完了条件を明確に定義"
-      - "ファイルパス/関数名を具体的に指定"
-      - "「何をしない」も明記"
-      - "SILENCE ルールを活用 (発見なし→無言)"
+      - "Objective: 1-2文でゴール"
+      - "Scope: 対象ファイル/ディレクトリ明記"
+      - "Acceptance Criteria: 完了条件明示"
+      - "Do NOT: やらないことも明記"
+    
+    tool_chain: |
+      plan_step_complete() → request_code_review() 
+        → frontend_verification_complete(screenshot) 
+        → submit(branch_name, commit_msg)
+    
     template: |
       ## Task
       [1文でタスクを明記]
@@ -788,10 +817,12 @@ target_optimizations:
       ## Instructions
       1. [具体的な指示1]
       2. [具体的な指示2]
+      3. [具体的な指示3]
       
-      ## Completion Criteria
-      - [完了条件1]
-      - [完了条件2]
+      ## Acceptance Criteria
+      - [ ] Tests pass
+      - [ ] No type errors
+      - [ ] Code review approved
       
       ## Do NOT
       - [やらないこと]

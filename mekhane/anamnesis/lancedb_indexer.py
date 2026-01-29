@@ -8,7 +8,8 @@ LanceDB にインデックスし、全文検索・ベクトル検索を可能に
 
 import re
 from pathlib import Path
-from typing import List, Optional
+from typing import List, Optional, Iterator
+import itertools
 
 import lancedb
 from pydantic import BaseModel
@@ -29,6 +30,22 @@ class SessionDocument(BaseModel):
     content: str  # メッセージ全文
     content_preview: str  # 検索結果表示用
     
+
+def generate_session_batches(session_files: List[Path], batch_size: int = 100) -> Iterator[List[dict]]:
+    """Generate batches of session documents."""
+    batch = []
+    for filepath in session_files:
+        doc = parse_session_file(filepath)
+        if doc and len(doc.content) > 50:
+            batch.append(doc.model_dump())
+
+        if len(batch) >= batch_size:
+            yield batch
+            batch = []
+
+    if batch:
+        yield batch
+
 
 def parse_session_file(filepath: Path) -> Optional[SessionDocument]:
     """セッション md ファイルをパースしてドキュメントに変換"""
@@ -128,31 +145,27 @@ def index_sessions():
     session_files = list(SESSIONS_DIR.glob("*.md"))
     print(f"[*] Found {len(session_files)} session files")
     
-    # ドキュメントを作成
-    documents: List[SessionDocument] = []
+    # バッチジェネレータを作成
+    batches = generate_session_batches(session_files)
     
-    for filepath in session_files:
-        doc = parse_session_file(filepath)
-        if doc and len(doc.content) > 50:
-            documents.append(doc)
-    
-    print(f"[*] Parsed {len(documents)} valid documents")
-    
-    if not documents:
+    # 最初のバッチを確認（データが存在するか）
+    try:
+        first_batch = next(batches)
+    except StopIteration:
         print("[!] No documents to index")
         return
-    
+
     # テーブルが存在する場合は削除して再作成
     if TABLE_NAME in db.table_names():
         db.drop_table(TABLE_NAME)
         print(f"[*] Dropped existing table: {TABLE_NAME}")
     
-    # ドキュメントを辞書に変換
-    data = [doc.model_dump() for doc in documents]
+    # ジェネレータを再構成
+    data_gen = itertools.chain([first_batch], batches)
     
-    # テーブル作成
-    table = db.create_table(TABLE_NAME, data)
-    print(f"[✓] Created table: {TABLE_NAME} ({len(documents)} rows)")
+    # テーブル作成（ジェネレータを使用）
+    table = db.create_table(TABLE_NAME, data=data_gen)
+    print(f"[✓] Created table: {TABLE_NAME} (using batch processing)")
     
     # Full-Text Search インデックスを作成
     try:

@@ -103,6 +103,25 @@ def detect_domain(text: str) -> str:
     log("No domain detected, defaulting to 'technical'")
     return "technical"
 
+# ============ Security: Domain Validation (Defense-in-Depth) ============
+ALLOWED_DOMAINS = frozenset(["technical", "rag", "summarization"])
+
+def validate_domain(domain: str) -> str:
+    """
+    Validate domain against whitelist.
+    
+    Defense-in-depth: Even though MCP SDK enforces enum constraint,
+    we explicitly validate to prevent path traversal if validation is disabled.
+    
+    Security Note (from Synedrion v2 review):
+    - Line 130 uses domain directly in file path construction
+    - This validation prevents ../../ traversal attacks
+    """
+    if domain not in ALLOWED_DOMAINS:
+        log(f"SECURITY: Invalid domain '{domain}' rejected. Defaulting to 'technical'")
+        return "technical"
+    return domain
+
 # ============ Template Loading ============
 def load_yaml_file(path: Path) -> dict:
     """Load YAML file as dict."""
@@ -254,6 +273,9 @@ async def call_tool(name: str, arguments: dict):
             # Auto-detect domain if not specified
             if not domain:
                 domain = detect_domain(requirements)
+            
+            # Security: Validate domain (defense-in-depth)
+            domain = validate_domain(domain)
             
             log(f"Generating for domain: {domain}")
             

@@ -120,14 +120,14 @@ agent = HegemonikónFEPAgent()
 
 | Series | Theorems | Coverage |
 |:-------|:---------|:---------|
-| O (Ousia) | O1 Noēsis, O2 Boulēsis, O4 Energeia | ✅ 3/4 |
-| S (Schema) | S2 Mekhanē (derivative_selector) | ✅ 1/4 |
-| H (Hormē) | H1-H3 | ✅ 3/4 |
-| P (Perigraphē) | P1-P4 | ✅ 4/4 |
-| K (Kairos) | K1-K3 | ✅ 3/4 |
-| A (Akribeia) | A1, A3, A4 | ✅ 3/4 |
+| O (Ousia) | O1 Noēsis, O2 Boulēsis, O3 Zētēsis, O4 Energeia | ✅ 4/4 |
+| S (Schema) | S1 Metron, S2 Mekhanē, S3 Stathmos, S4 Praxis | ✅ 4/4 |
+| H (Hormē) | H1 Propatheia, H2 Pistis, H3 Orexis, H4 Doxa | ✅ 4/4 |
+| P (Perigraphē) | P1 Khōra, P2 Hodos, P3 Trokhia, P4 Tekhnē | ✅ 4/4 |
+| K (Kairos) | K1 Eukairia, K2 Chronos, K3 Telos, K4 Sophia | ✅ 4/4 |
+| A (Akribeia) | A1 Pathos, A2 Krisis, A3 Gnōmē, A4 Epistēmē | ✅ 4/4 |
 
-**Total: 17/24 theorems (71%)**
+**Total: 24/24 theorems (100%)**
 
 ## Testing
 
@@ -135,10 +135,10 @@ agent = HegemonikónFEPAgent()
 # Run all FEP tests
 python -m pytest mekhane/fep/tests/ -v
 
-# Current: 297 tests, 100% pass
+# Current: 336 tests, 100% pass
 ```
 
 ## Version
 
-- **v2.0** (2026-01-29): Phase A/B/C complete
-- 8 new modules, 17 theorems covered
+- **v3.0** (2026-01-29): 100% theorem coverage
+- 13 modules, 24 theorems, 336 tests

@@ -45,9 +45,13 @@ logger = logging.getLogger(__name__)
 class SwarmScheduler:
     """Orchestrate daily session execution."""
     
-    ACCOUNTS = 6
-    SESSIONS_PER_ACCOUNT = 300
-    DAILY_BUDGET = ACCOUNTS * SESSIONS_PER_ACCOUNT  # 1,800
+    # Realistic limits:
+    # - 3 accounts × 3 keys = 9 keys
+    # - 90 sessions/key/day limit
+    # - Total: 810/day, using 720 with safety margin
+    SESSIONS_PER_KEY = 90
+    KEYS_AVAILABLE = 9
+    DAILY_BUDGET = 720  # 80% of max to avoid hitting limits
     
     def __init__(self, repo_path: str = "."):
         self.repo_path = Path(repo_path)
@@ -133,12 +137,12 @@ class SwarmScheduler:
         all_tasks = plan.change_driven + plan.discovery + plan.weekly_focus
         logger.info(f"Total tasks: {len(all_tasks)}")
         
-        # Distribute across accounts
-        tasks_per_account = len(all_tasks) // len(keys) + 1
-        batches = [
-            all_tasks[i:i + tasks_per_account]
-            for i in range(0, len(all_tasks), tasks_per_account)
-        ]
+        # Distribute across keys (max 90 per key)
+        keys = self.load_api_keys()
+        sessions_per_key = min(len(all_tasks) // len(keys) + 1, self.SESSIONS_PER_KEY)
+        batches = []
+        for i in range(0, len(all_tasks), sessions_per_key):
+            batches.append(all_tasks[i:i + sessions_per_key])
         
         # Execute in parallel
         all_results = []

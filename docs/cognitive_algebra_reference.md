@@ -33,6 +33,7 @@
 | `~` | **Oscillation** (振動) | 定理間を時間軸で往復 | `/bou~zet` |
 | `*` | **Fusion** (融合) | 2定理が不可分に一体化 | `/noe*dia` |
 | `&` | **Simultaneous** (並列) | 2定理が同時に存在 | `/zet&sop` |
+| `_` | **Sequence** (順序) | Aの後にBを実行 | `/bou+_/s` |
 
 ---
 

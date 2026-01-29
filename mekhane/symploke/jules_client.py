@@ -663,9 +663,9 @@ class JulesClient:
                 progress_callback(batch_num, total_batches, len(all_results))
         
         # Log summary
-        succeeded = sum(1 for r in all_results if r.success)
+        succeeded = sum(1 for r in all_results if r.is_success)
         failed = len(all_results) - succeeded
-        silent = sum(1 for r in all_results if r.success and "SILENCE" in str(r.session))
+        silent = sum(1 for r in all_results if r.is_success and "SILENCE" in str(r.session))
         
         logger.info(
             f"Synedrion review complete: "

@@ -1,0 +1,223 @@
+# Jules Synedrion v2: Orthogonal Perspectives Matrix
+# 
+# 20 Domains × 6 Axes = 120 Structurally Orthogonal Perspectives
+#
+# Usage:
+#   from mekhane.ergasterion.synedrion.perspectives import load_perspectives
+#   perspectives = load_perspectives()
+#   prompt = perspectives.get_prompt("Resource", "O")
+
+version: "2.0"
+lineage: "Synedrion v1 (866 experts) → v2 (120 orthogonal perspectives via Hegemonikón theorem grid)"
+
+# ==============================================================================
+# DOMAINS (What to look at)
+# ==============================================================================
+# 20 review domains derived from software engineering best practices
+# Each domain is a distinct area of concern
+
+domains:
+  - id: "Resource"
+    name: "リソースライフサイクル"
+    description: "接続、ファイルハンドル、メモリ管理のライフサイクル"
+    keywords: ["connection", "file handle", "memory", "lifecycle", "cleanup", "close"]
+    
+  - id: "Error"
+    name: "エラーハンドリング"
+    description: "例外処理、リトライ、フォールバック戦略"
+    keywords: ["exception", "retry", "fallback", "error", "catch", "raise"]
+    
+  - id: "Concurrency"
+    name: "並行処理"
+    description: "競合状態、デッドロック、同期機構"
+    keywords: ["async", "await", "lock", "semaphore", "race condition", "deadlock"]
+    
+  - id: "API"
+    name: "API契約"
+    description: "入出力の型、境界値、契約の遵守"
+    keywords: ["input", "output", "type", "boundary", "contract", "validation"]
+    
+  - id: "Security"
+    name: "セキュリティ"
+    description: "認証、権限、インジェクション攻撃"
+    keywords: ["auth", "permission", "injection", "sanitize", "token", "credential"]
+    
+  - id: "Observability"
+    name: "可観測性"
+    description: "ログ、メトリクス、トレース"
+    keywords: ["log", "metric", "trace", "monitor", "alert", "dashboard"]
+    
+  - id: "Configuration"
+    name: "設定管理"
+    description: "環境変数、設定ファイル、デフォルト値"
+    keywords: ["env", "config", "setting", "default", "override", "secret"]
+    
+  - id: "Dependency"
+    name: "依存関係"
+    description: "外部ライブラリ、バージョン互換性"
+    keywords: ["import", "package", "version", "compatibility", "dependency"]
+    
+  - id: "CodeStyle"
+    name: "コードスタイル"
+    description: "命名規則、構造、可読性"
+    keywords: ["naming", "structure", "readability", "convention", "format"]
+    
+  - id: "Documentation"
+    name: "ドキュメント"
+    description: "コメント、docstring、README"
+    keywords: ["comment", "docstring", "readme", "documentation", "explain"]
+    
+  - id: "Testing"
+    name: "テスト"
+    description: "テストカバレッジ、エッジケース、モック"
+    keywords: ["test", "coverage", "mock", "assert", "edge case", "fixture"]
+    
+  - id: "Performance"
+    name: "パフォーマンス"
+    description: "速度、メモリ使用量、最適化"
+    keywords: ["speed", "memory", "optimize", "cache", "latency", "throughput"]
+    
+  - id: "Scalability"
+    name: "スケーラビリティ"
+    description: "水平/垂直スケーリング、負荷分散"
+    keywords: ["scale", "horizontal", "vertical", "load", "distribute", "shard"]
+    
+  - id: "Maintainability"
+    name: "保守性"
+    description: "理解しやすさ、変更しやすさ"
+    keywords: ["maintain", "understand", "change", "refactor", "modular"]
+    
+  - id: "Reliability"
+    name: "信頼性"
+    description: "障害耐性、冪等性、復旧"
+    keywords: ["reliable", "fault", "idempotent", "recover", "resilient"]
+    
+  - id: "Usability"
+    name: "使いやすさ"
+    description: "API設計、エルゴノミクス、開発者体験"
+    keywords: ["usable", "ergonomic", "developer experience", "intuitive", "api design"]
+    
+  - id: "Compatibility"
+    name: "互換性"
+    description: "後方互換、破壊的変更、移行"
+    keywords: ["compatible", "backward", "breaking", "migration", "deprecate"]
+    
+  - id: "Architecture"
+    name: "アーキテクチャ"
+    description: "設計パターン、責務分離、モジュール構成"
+    keywords: ["architecture", "pattern", "separation", "module", "layer"]
+    
+  - id: "DataFlow"
+    name: "データフロー"
+    description: "入力から出力への変換フロー"
+    keywords: ["flow", "transform", "pipeline", "input", "output", "data"]
+    
+  - id: "EdgeCase"
+    name: "エッジケース"
+    description: "境界値、異常系、予期しない入力"
+    keywords: ["edge", "boundary", "abnormal", "unexpected", "corner case"]
+
+# ==============================================================================
+# AXES (How to look at it)
+# ==============================================================================
+# 6 Hegemonikón theorem series, one representative per series
+# Each axis provides a fundamentally different cognitive lens
+
+axes:
+  - id: "O"
+    series: "Ousia"
+    theorem: "O1 Noēsis"
+    name: "本質"
+    question: "What is the essential purpose?"
+    focus: "なぜこれが存在するか？根本的な意図は何か？"
+    
+  - id: "S"
+    series: "Schema"
+    theorem: "S2 Mekhanē"
+    name: "手法"
+    question: "What methods are used?"
+    focus: "どのような手法・技術が使われているか？それは適切か？"
+    
+  - id: "H"
+    series: "Hormē"
+    theorem: "H1 Propatheia"
+    name: "直感"
+    question: "What does intuition say?"
+    focus: "直感的に違和感はないか？無意識のパターン認識は？"
+    
+  - id: "P"
+    series: "Perigraphē"
+    theorem: "P1 Khōra"
+    name: "境界"
+    question: "What are the boundaries?"
+    focus: "スコープ・境界は明確か？責務の切り分けは？"
+    
+  - id: "K"
+    series: "Kairos"
+    theorem: "K3 Telos"
+    name: "目的"
+    question: "Is the purpose achieved?"
+    focus: "意図した目的は達成されるか？手段と目的は一致しているか？"
+    
+  - id: "A"
+    series: "Akribeia"
+    theorem: "A2 Krisis"
+    name: "判定"
+    question: "Is the judgment correct?"
+    focus: "判断は正しいか？条件分岐のロジックは妥当か？"
+
+# ==============================================================================
+# PROMPT TEMPLATE
+# ==============================================================================
+# Template for generating perspective-specific review prompts
+
+prompt_template: |
+  You are a {domain_name} specialist reviewing code through the lens of {axis_name} ({theorem}).
+  
+  ## Your Unique Perspective
+  
+  **Domain Focus:** {domain_description}
+  **Cognitive Lens:** {axis_question}
+  
+  ## Review Protocol
+  
+  1. **Analyze** the code specifically from your perspective:
+     - {axis_focus}
+  
+  2. **Identify** issues ONLY within your domain × axis intersection:
+     - Domain keywords to watch: {domain_keywords}
+     - Cognitive question to answer: {axis_question}
+  
+  3. **Report** findings in structured format:
+     - Severity: [Critical / Major / Minor / Info]
+     - Location: [file:line]
+     - Issue: [specific finding]
+     - Recommendation: [concrete action]
+  
+  ## Critical Rules
+  
+  - ❌ Do NOT report issues outside your domain ({domain_id})
+  - ❌ Do NOT use cognitive lenses other than {axis_id} ({theorem})
+  - ❌ Do NOT duplicate findings that another perspective would report
+  - ✅ Report ONLY what YOU uniquely see from {domain_id} × {axis_id}
+  
+  ## Silence Protocol
+  
+  If you find nothing from your unique perspective, respond:
+  
+  ```
+  SILENCE: No issues found from {domain_id} × {axis_id} perspective
+  ```
+  
+  This is a valid outcome. Do not invent issues.
+
+# ==============================================================================
+# METADATA
+# ==============================================================================
+
+metadata:
+  total_perspectives: 120  # 20 domains × 6 axes
+  redundancy: "0 (structurally orthogonal)"
+  coverage: "Complete (domains × axes = direct product)"
+  batch_size: 60  # Jules API rate limit per batch
+  batches_required: 2

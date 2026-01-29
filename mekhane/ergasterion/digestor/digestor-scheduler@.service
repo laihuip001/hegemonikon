@@ -1,0 +1,20 @@
+[Unit]
+Description=Hegemonikón Digestor Scheduler
+Documentation=https://github.com/laihuip001/hegemonikon
+After=network.target
+
+[Service]
+Type=simple
+User=%i
+WorkingDirectory=/home/%i/oikos/hegemonikon
+Environment="PYTHONPATH=/home/%i/oikos/hegemonikon"
+ExecStart=/home/%i/oikos/hegemonikon/.venv/bin/python /home/%i/oikos/hegemonikon/mekhane/ergasterion/digestor/scheduler.py
+Restart=on-failure
+RestartSec=60
+
+# ログ
+StandardOutput=append:/home/%i/.hegemonikon/digestor/scheduler.log
+StandardError=append:/home/%i/.hegemonikon/digestor/scheduler.log
+
+[Install]
+WantedBy=multi-user.target

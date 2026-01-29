@@ -147,6 +147,57 @@ class CCLTracer:
         self.current_session = None
         self.session_dir = None
     
+    def load_session(self, session_id: str) -> bool:
+        """
+        Load an existing session for continued tracing.
+        
+        Args:
+            session_id: The session ID to load
+            
+        Returns:
+            True if loaded successfully
+        """
+        session_dir = self.base_path / session_id
+        state_file = session_dir / "state.json"
+        
+        if not state_file.exists():
+            return False
+        
+        try:
+            state = json.loads(state_file.read_text())
+            self.current_session = Session(
+                session_id=state["session_id"],
+                expression=state["expression"],
+                start_time=state["start_time"],
+                end_time=state.get("end_time"),
+                status=state["status"],
+                steps=state.get("steps", [])
+            )
+            self.session_dir = session_dir
+            return True
+        except (json.JSONDecodeError, KeyError):
+            return False
+    
+    @classmethod
+    def load_latest(cls, base_path: Optional[Path] = None) -> Optional["CCLTracer"]:
+        """
+        Load the most recent session.
+        
+        Returns:
+            CCLTracer with loaded session, or None
+        """
+        tracer = cls(base_path)
+        sessions = list(tracer.base_path.glob("*/state.json"))
+        if not sessions:
+            return None
+        
+        latest = max(sessions, key=lambda p: p.stat().st_mtime)
+        session_id = latest.parent.name
+        
+        if tracer.load_session(session_id):
+            return tracer
+        return None
+    
     def _save_state(self):
         """Save current session state to JSON."""
         if not self.session_dir or not self.current_session:

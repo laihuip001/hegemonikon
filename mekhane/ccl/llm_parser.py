@@ -7,6 +7,7 @@ Uses Gemini API (google.genai SDK) to convert natural language intent into CCL e
 Migration: google.generativeai -> google.genai (deprecated Nov 2025)
 """
 
+import os
 from typing import Optional
 from pathlib import Path
 
@@ -24,6 +25,15 @@ except ImportError:
     except ImportError:
         HAS_GENAI = False
         USE_NEW_SDK = False
+
+
+def _get_api_key() -> Optional[str]:
+    """Get API key from environment, trying multiple variable names."""
+    return (
+        os.environ.get("GOOGLE_API_KEY") or
+        os.environ.get("GEMINI_API_KEY") or
+        os.environ.get("GOOGLE_GENAI_API_KEY")
+    )
 
 
 class LLMParser:
@@ -45,7 +55,13 @@ class LLMParser:
             try:
                 if USE_NEW_SDK:
                     # New SDK: google.genai
-                    self.client = genai.Client()
+                    # Try multiple env var names for API key
+                    api_key = _get_api_key()
+                    if api_key:
+                        self.client = genai.Client(api_key=api_key)
+                    else:
+                        # Fallback: try default auth (ADC/Vertex)
+                        self.client = genai.Client()
                 else:
                     # Legacy SDK: google.generativeai
                     self.model = genai_legacy.GenerativeModel(model)

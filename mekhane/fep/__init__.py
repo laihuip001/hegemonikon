@@ -18,6 +18,12 @@ from .encoding import (
     encode_noesis_output,
     encode_boulesis_output,
     generate_fep_feedback_markdown,
+    # Feature 1, 2, 3 (2026-01-29)
+    auto_encode_noesis,
+    format_learning_progress,
+    get_x_series_recommendations,
+    X_SERIES_MATRIX,
+    X_SERIES_REPRESENTATIVE_PATHS,
 )
 from .persistence import (
     save_A,
@@ -353,6 +359,12 @@ __all__ = [
     "epochē",
     "format_krisis_markdown",
     "encode_krisis_observation",
+    # Feature 1, 2, 3 - FEP Integration (2026-01-29)
+    "auto_encode_noesis",
+    "format_learning_progress",
+    "get_x_series_recommendations",
+    "X_SERIES_MATRIX",
+    "X_SERIES_REPRESENTATIVE_PATHS",
 ]
 
 

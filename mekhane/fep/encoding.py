@@ -497,3 +497,171 @@ def should_trigger_epoche(agent_result: Dict, threshold: float = 2.0) -> bool:
     """
     return agent_result.get("entropy", 0.0) >= threshold
 
+
+# =============================================================================
+# Feature 3: Auto-Encode Noēsis (PHASE 5 自動変換)
+# =============================================================================
+
+def auto_encode_noesis(phase5_output: dict) -> Tuple[int, int, int]:
+    """PHASE 5 JSON 出力を FEP 観察に自動変換.
+    
+    /noe ワークフローの PHASE 5 出力を受け取り、
+    FEP Agent 用の観察値に自動変換する。
+    
+    Args:
+        phase5_output: PHASE 5 の構造化出力 (JSON)
+            必須キー: confidence_score, uncertainty_zones
+    
+    Returns:
+        Tuple of (context_idx, urgency_idx, confidence_idx)
+    
+    Example:
+        >>> phase5 = {"confidence_score": 0.78, "uncertainty_zones": [{"zone": "A"}]}
+        >>> auto_encode_noesis(phase5)
+        (1, 0, 2)  # clear, low, high
+    """
+    confidence = phase5_output.get("confidence_score", 0.5)
+    zones = phase5_output.get("uncertainty_zones", [])
+    return encode_noesis_output(confidence, zones)
+
+
+# =============================================================================
+# Feature 2: Learning Progress Visualization
+# =============================================================================
+
+def format_learning_progress(
+    before_A: Optional["np.ndarray"] = None,
+    after_A: Optional["np.ndarray"] = None,
+    observation: Optional[Tuple[int, int, int]] = None,
+    inference_count: int = 1,
+) -> str:
+    """A行列の学習進捗を Markdown で可視化.
+    
+    FEP Agent の観察モデル (A行列) がどのように更新されたかを
+    人間が読める形式で表示する。
+    
+    Args:
+        before_A: 更新前の A行列 (optional)
+        after_A: 更新後の A行列 (optional)
+        observation: 今回の観察値 (optional)
+        inference_count: 累計推論回数
+    
+    Returns:
+        Markdown formatted learning progress
+    
+    Example:
+        >>> print(format_learning_progress(inference_count=5))
+        ┌─[FEP Learning Progress]─────────────────────┐
+        │ 推論回数: 5                                  │
+        │ A行列更新: なし (before/after 未提供)        │
+        └──────────────────────────────────────────────┘
+    """
+    lines = [
+        "┌─[FEP Learning Progress]─────────────────────┐",
+        f"│ 推論回数: {inference_count}",
+    ]
+    
+    if observation:
+        obs_decoded = decode_observation(observation)
+        lines.append(
+            f"│ 観察値: context={obs_decoded['context']}, "
+            f"urgency={obs_decoded['urgency']}, conf={obs_decoded['confidence']}"
+        )
+    
+    if before_A is not None and after_A is not None:
+        try:
+            import numpy as np
+            delta = np.abs(after_A - before_A).sum()
+            lines.append(f"│ A行列変化量: {delta:.4f}")
+            if delta > 0.01:
+                lines.append("│ 📈 有意な学習が発生")
+            else:
+                lines.append("│ 📊 安定状態（微小変化）")
+        except ImportError:
+            lines.append("│ A行列変化: numpy 未インポート")
+    else:
+        lines.append("│ A行列更新: なし (before/after 未提供)")
+    
+    lines.append("└──────────────────────────────────────────────┘")
+    return "\n".join(lines)
+
+
+# =============================================================================
+# Feature 1: X-Series Navigation Constants
+# =============================================================================
+
+# X-series 36関係マトリクス定義
+X_SERIES_MATRIX = {
+    "O": {"O": "X-OO", "S": "X-OS", "H": "X-OH", "P": "X-OP", "K": "X-OK", "A": "X-OA"},
+    "S": {"O": "X-SO", "S": "X-SS", "H": "X-SH", "P": "X-SP", "K": "X-SK", "A": "X-SA"},
+    "H": {"O": "X-HO", "S": "X-HS", "H": "X-HH", "P": "X-HP", "K": "X-HK", "A": "X-HA"},
+    "P": {"O": "X-PO", "S": "X-PS", "H": "X-PH", "P": "X-PP", "K": "X-PK", "A": "X-PA"},
+    "K": {"O": "X-KO", "S": "X-KS", "H": "X-KH", "P": "X-KP", "K": "X-KK", "A": "X-KA"},
+    "A": {"O": "X-AO", "S": "X-AS", "H": "X-AH", "P": "X-AP", "K": "X-AK", "A": "X-AA"},
+}
+
+# 代表的な遷移経路
+X_SERIES_REPRESENTATIVE_PATHS = {
+    "X-OS": ("O1", "S1"),  # 認識→スケール
+    "X-OA": ("O1", "A2"),  # 認識→検証
+    "X-OH": ("O1", "H1"),  # 認識→傾向
+    "X-OP": ("O4", "P4"),  # 行為→技法
+    "X-SO": ("S4", "O4"),  # 実践→行為
+    "X-HO": ("H2", "O4"),  # 確信→行為
+    "X-KO": ("K4", "O1"),  # 知恵→認識
+    "X-AO": ("A4", "O1"),  # 知識→認識
+}
+
+
+def get_x_series_recommendations(
+    current_series: str,
+    confidence: float = 0.5,
+) -> List[Dict[str, str]]:
+    """現在のシリーズから X-series 推奨次ステップを取得.
+    
+    Args:
+        current_series: 現在のシリーズ (O, S, H, P, K, A)
+        confidence: 現在の確信度 (0.0-1.0)
+    
+    Returns:
+        List of recommendation dicts with keys: x_id, target, workflow, reason
+    
+    Example:
+        >>> get_x_series_recommendations("O", 0.78)
+        [{'x_id': 'X-OS', 'target': 'S', 'workflow': '/s', 'reason': '認識→設計へ'}, ...]
+    """
+    WORKFLOW_MAP = {
+        "O": "/noe", "S": "/s", "H": "/pro", 
+        "P": "/kho", "K": "/euk", "A": "/dia"
+    }
+    REASON_MAP = {
+        "O": "本質", "S": "設計", "H": "傾向",
+        "P": "環境", "K": "文脈", "A": "検証"
+    }
+    
+    if current_series not in X_SERIES_MATRIX:
+        return []
+    
+    recommendations = []
+    connections = X_SERIES_MATRIX[current_series]
+    
+    # 高確信 → 行動系 (S, P) を優先
+    # 低確信 → 検証系 (A, K) を優先
+    if confidence >= 0.7:
+        priority = ["S", "P", "O", "H", "K", "A"]
+    else:
+        priority = ["A", "K", "S", "O", "H", "P"]
+    
+    for target in priority[:3]:  # 上位3つ
+        if target == current_series:
+            continue
+        x_id = connections[target]
+        recommendations.append({
+            "x_id": x_id,
+            "target": target,
+            "workflow": WORKFLOW_MAP.get(target, f"/{target.lower()}"),
+            "reason": f"{REASON_MAP.get(current_series, current_series)}→{REASON_MAP.get(target, target)}へ",
+        })
+    
+    return recommendations
+

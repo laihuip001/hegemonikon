@@ -38,8 +38,7 @@ def parse_state(state_str: str) -> SessionState:
     try:
         return SessionState(state_str)
     except ValueError:
-        # Map unknown states to IN_PROGRESS (likely active)
-        return SessionState.IN_PROGRESS
+        return SessionState.UNKNOWN
 
 
 @dataclass
@@ -85,6 +84,18 @@ class JulesClient:
             "X-Goog-Api-Key": self.api_key,
             "Content-Type": "application/json"
         }
+        self._session: Optional[aiohttp.ClientSession] = None
+
+    async def __aenter__(self):
+        """Initialize persistent session."""
+        self._session = aiohttp.ClientSession()
+        return self
+
+    async def __aexit__(self, exc_type, exc_val, exc_tb):
+        """Close persistent session."""
+        if self._session:
+            await self._session.close()
+            self._session = None
     
     async def create_session(
         self,
@@ -117,7 +128,10 @@ class JulesClient:
             "requirePlanApproval": not auto_approve
         }
         
-        async with aiohttp.ClientSession() as session:
+        use_temp_session = self._session is None or self._session.closed
+        session = aiohttp.ClientSession() if use_temp_session else self._session
+
+        try:
             async with session.post(
                 f"{self.BASE_URL}/sessions",
                 headers=self._headers,
@@ -135,6 +149,9 @@ class JulesClient:
                     prompt=prompt,
                     source=source
                 )
+        finally:
+            if use_temp_session:
+                await session.close()
     
     async def get_session(self, session_id: str) -> JulesSession:
         """
@@ -146,7 +163,10 @@ class JulesClient:
         Returns:
             Updated JulesSession
         """
-        async with aiohttp.ClientSession() as session:
+        use_temp_session = self._session is None or self._session.closed
+        session = aiohttp.ClientSession() if use_temp_session else self._session
+
+        try:
             async with session.get(
                 f"{self.BASE_URL}/sessions/{session_id}",
                 headers=self._headers
@@ -172,6 +192,9 @@ class JulesClient:
                     pull_request_url=pr_url,
                     error=data.get("error")
                 )
+        finally:
+            if use_temp_session:
+                await session.close()
     
     async def poll_session(
         self,
@@ -262,6 +285,8 @@ class JulesClient:
                         source=task["source"],
                         branch=task.get("branch", "main")
                     )
+                except asyncio.CancelledError:
+                    raise
                 except Exception as e:
                     # Return failed session instead of raising
                     return JulesSession(
@@ -306,7 +331,9 @@ if __name__ == "__main__":
         try:
             client = JulesClient(api_key)
             print(f"✅ Client initialized")
-            print(f"   API Key: {api_key[:8]}...{api_key[-4:]}")
+            # Mask API key (show only last 4 chars)
+            masked_key = f"...{api_key[-4:]}" if len(api_key) > 4 else "***"
+            print(f"   API Key: {masked_key}")
             print(f"   Base URL: {client.BASE_URL}")
             print(f"   Max Concurrent: {client.MAX_CONCURRENT}")
         except Exception as e:

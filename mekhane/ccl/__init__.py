@@ -1,5 +1,5 @@
 """
-CCL (Cognitive Control Language) Module v2.2
+CCL (Cognitive Control Language) Module v2.3
 
 LLM-based intent-to-CCL conversion with 4-layer fallback:
   Layer 1: LLM (Primary)
@@ -9,6 +9,7 @@ LLM-based intent-to-CCL conversion with 4-layer fallback:
 
 v2.1: Macro system (@name), Level syntax (:N)
 v2.2: Semantic validation layer
+v2.3: Semantic matcher (Japanese→Macro), Workflow signatures
 """
 
 from .llm_parser import LLMParser
@@ -20,6 +21,8 @@ from .generator import CCLGenerator
 from .tracer import CCLTracer
 from .macro_registry import MacroRegistry, Macro, BUILTIN_MACROS
 from .macro_expander import MacroExpander
+from .semantic_matcher import SemanticMacroMatcher, MacroMatch, MACRO_DESCRIPTIONS_JP
+from .workflow_signature import SignatureRegistry, WorkflowSignature, WORKFLOW_SIGNATURES
 
 __all__ = [
     'LLMParser',
@@ -36,4 +39,11 @@ __all__ = [
     'MacroExpander',
     'Macro',
     'BUILTIN_MACROS',
+    'SemanticMacroMatcher',
+    'MacroMatch',
+    'MACRO_DESCRIPTIONS_JP',
+    'SignatureRegistry',
+    'WorkflowSignature',
+    'WORKFLOW_SIGNATURES',
 ]
+

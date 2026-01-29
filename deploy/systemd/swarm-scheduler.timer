@@ -1,0 +1,16 @@
+[Unit]
+Description=Swarm Scheduler Daily Trigger - Hegemonikon 720 Reviews
+Documentation=https://github.com/laihuip001/hegemonikon
+After=network-online.target
+Wants=network-online.target
+
+[Timer]
+# 4:00 AM JST (19:00 UTC previous day)
+OnCalendar=*-*-* 04:00:00
+# If missed (e.g., system was off), run immediately on boot
+Persistent=true
+# Randomize execution within 5 minutes to avoid exact-minute API spikes
+RandomizedDelaySec=300
+
+[Install]
+WantedBy=timers.target

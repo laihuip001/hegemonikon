@@ -2,17 +2,28 @@
 LLM Parser for CCL v2.0
 
 Layer 1 of the 4-layer fallback system.
-Uses Gemini API to convert natural language intent into CCL expressions.
+Uses Gemini API (google.genai SDK) to convert natural language intent into CCL expressions.
+
+Migration: google.generativeai -> google.genai (deprecated Nov 2025)
 """
 
 from typing import Optional
 from pathlib import Path
 
+# Try new SDK first, fall back to legacy
 try:
-    import google.generativeai as genai
+    from google import genai
+    from google.genai.types import GenerateContentConfig
     HAS_GENAI = True
+    USE_NEW_SDK = True
 except ImportError:
-    HAS_GENAI = False
+    try:
+        import google.generativeai as genai_legacy
+        HAS_GENAI = True
+        USE_NEW_SDK = False
+    except ImportError:
+        HAS_GENAI = False
+        USE_NEW_SDK = False
 
 
 class LLMParser:
@@ -26,12 +37,18 @@ class LLMParser:
             model: Gemini model name
         """
         self.model_name = model
+        self.client = None
         self.model = None
         self.system_prompt = self._load_system_prompt()
         
         if HAS_GENAI:
             try:
-                self.model = genai.GenerativeModel(model)
+                if USE_NEW_SDK:
+                    # New SDK: google.genai
+                    self.client = genai.Client()
+                else:
+                    # Legacy SDK: google.generativeai
+                    self.model = genai_legacy.GenerativeModel(model)
             except Exception:
                 pass
     
@@ -44,7 +61,7 @@ class LLMParser:
     
     def is_available(self) -> bool:
         """Check if LLM is available."""
-        return self.model is not None
+        return self.client is not None or self.model is not None
     
     def parse(self, intent: str) -> Optional[str]:
         """
@@ -61,11 +78,24 @@ class LLMParser:
             
         try:
             prompt = f"{self.system_prompt}\n\n## Intent\n{intent}\n\n## Output\nCCL expression only:"
-            response = self.model.generate_content(prompt)
             
-            if response and response.text:
+            if USE_NEW_SDK and self.client:
+                # New SDK: google.genai
+                response = self.client.models.generate_content(
+                    model=self.model_name,
+                    contents=prompt
+                )
+                text = response.text if response else None
+            elif self.model:
+                # Legacy SDK: google.generativeai
+                response = self.model.generate_content(prompt)
+                text = response.text if response else None
+            else:
+                return None
+            
+            if text:
                 # Clean up the response
-                ccl = response.text.strip()
+                ccl = text.strip()
                 # Remove markdown code blocks if present
                 if ccl.startswith("```"):
                     lines = ccl.split("\n")

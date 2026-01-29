@@ -1,6 +1,6 @@
 # Hegemonikón ワークフロー一覧
 
-> **自動生成**: 2026-01-29 15:17
+> **自動生成**: 2026-01-29 18:09
 > **総ワークフロー数**: 37
 > **派生付きワークフロー**: 18
 > **総派生数**: 81
@@ -11,11 +11,11 @@
 
 | Workflow | Module | 派生 | Version |
 |:---------|:-------|:-----|:--------|
-| `/bou` | O2 | desir, voli, akra | 4.3 |
-| `/ene` | O4 | flow, prax, pois | 4.2 |
-| `/noe` | O1 | nous, phro, meta | 4.3 |
-| `/o` | O1, O2, O3, O4 | — | 2.0 |
-| `/zet` | O3 | anom, hypo, eval | 5.3 |
+| `/bou` | O2 | desir, voli, akra | 4.4 |
+| `/ene` | O4 | flow, prax, pois | 4.4 |
+| `/noe` | O1 | nous, phro, meta | 4.4 |
+| `/o` | O1, O2, O3, O4 | — | 3.0 |
+| `/zet` | O3 | anom, hypo, eval | 5.4 |
 
 ---
 
@@ -23,12 +23,12 @@
 
 | Workflow | Module | 派生 | Version |
 |:---------|:-------|:-----|:--------|
-| `/mek` | S2 | comp, inve, adap | 6.1 |
-| `/met` | S1 | — | 2.0 |
-| `/pra` | S4 | prax, pois, temp | 2.0 |
-| `/s` | S1, S2, S3, S4 | — | 4.2 |
-| `/sta` | S3 | norm, empi, rela | 2.0 |
-| `/u` | S2.dialogue | — | 2.1 |
+| `/mek` | S2 | comp, inve, adap | 6.2 |
+| `/met` | S1 | — | 2.1 |
+| `/pra` | S4 | prax, pois, temp | 2.1 |
+| `/s` | S1, S2, S3, S4 | — | 5.1 |
+| `/sta` | S3 | norm, empi, rela | 2.1 |
+| `/u` | S2.dialogue | — | 2.2 |
 
 ---
 
@@ -36,12 +36,12 @@
 
 | Workflow | Module | 派生 | Version |
 |:---------|:-------|:-----|:--------|
-| `/bye` | H4 | — | 2.7 |
-| `/dox` | H4 | sens, conc, form | 2.0 |
-| `/h` | H1, H2, H3, H4 | — | 3.0 |
-| `/ore` | H3 | targ, acti, stat | 2.0 |
-| `/pis` | H2 | subj, inte, obje | 2.0 |
-| `/pro` | H1 | appr, avoi, arre | 2.0 |
+| `/bye` | H4 | — | 2.8 |
+| `/dox` | H4 | sens, conc, form | 2.1 |
+| `/h` | H1, H2, H3, H4 | — | 4.0 |
+| `/ore` | H3 | targ, acti, stat | 2.1 |
+| `/pis` | H2 | subj, inte, obje | 2.1 |
+| `/pro` | H1 | appr, avoi, arre | 2.1 |
 
 ---
 
@@ -49,12 +49,12 @@
 
 | Workflow | Module | 派生 | Version |
 |:---------|:-------|:-----|:--------|
-| `/dev` | P4 | — | 1.1 |
-| `/hod` | P2 | line, bran, cycl | 2.0 |
-| `/kho` | P1 | phys, conc, rela | 2.0 |
-| `/p` | P1, P2, P3, P4 | — | 3.0 |
-| `/tek` | P4 | manu, mech, auto | 2.0 |
-| `/tro` | P3 | fixe, adap, emer | 2.0 |
+| `/dev` | P4 | — | 1.2 |
+| `/hod` | P2 | line, bran, cycl | 2.1 |
+| `/kho` | P1 | phys, conc, rela | 2.1 |
+| `/p` | P1, P2, P3, P4 | — | 4.0 |
+| `/tek` | P4 | manu, mech, auto | 2.1 |
+| `/tro` | P3 | fixe, adap, emer | 2.1 |
 
 ---
 
@@ -62,11 +62,11 @@
 
 | Workflow | Module | 派生 | Version |
 |:---------|:-------|:-----|:--------|
-| `/chr` | K2 | — | 1.0 |
-| `/euk` | K1 | — | 1.0 |
-| `/k` | K1, K2, K3, K4 | urge, opti, miss, shor, medi, long, intr, inst, ulti, taci, expl, meta | 4.0 |
-| `/sop` | K4 | — | 5.1 |
-| `/tel` | K3 | — | 3.0 |
+| `/chr` | K2 | — | 1.1 |
+| `/euk` | K1 | — | 1.1 |
+| `/k` | K1, K2, K3, K4 | urge, opti, miss, shor, medi, long, intr, inst, ulti, taci, expl, meta | 5.0 |
+| `/sop` | K4 | — | 5.2 |
+| `/tel` | K3 | — | 3.1 |
 
 ---
 
@@ -74,11 +74,11 @@
 
 | Workflow | Module | 派生 | Version |
 |:---------|:-------|:-----|:--------|
-| `/a` | A1, A2, A3, A4 | prim, seco, regu, affi, nega, susp, conc, abst, univ, tent, just, cert | 3.0 |
-| `/dia` | A2 | — | 6.0 |
-| `/epi` | A4 | — | 1.0 |
-| `/gno` | A3 | — | 1.0 |
-| `/pat` | A1 | — | 1.0 |
+| `/a` | A1, A2, A3, A4 | prim, seco, regu, affi, nega, susp, conc, abst, univ, tent, just, cert | 4.0 |
+| `/dia` | A2 | — | 6.1 |
+| `/epi` | A4 | — | 1.1 |
+| `/gno` | A3 | — | 1.1 |
+| `/pat` | A1 | — | 1.1 |
 
 ---
 
@@ -86,8 +86,8 @@
 
 | Workflow | Module | 派生 | Version |
 |:---------|:-------|:-----|:--------|
-| `/ax` | X-series | — | 2.3 |
-| `/x` | X | — | 5.1 |
+| `/ax` | X-series | — | 3.0 |
+| `/x` | X | — | 5.2 |
 
 ---
 
@@ -95,8 +95,8 @@
 
 | Workflow | Module | 派生 | Version |
 |:---------|:-------|:-----|:--------|
-| `/boot` | O1, H4 | — | 3.2 |
-| `/eat` | S2, A2 | — | 1.0 |
+| `/boot` | O1, H4 | — | 3.3 |
+| `/eat` | S2, A2 | — | 1.1 |
 
 ---
 

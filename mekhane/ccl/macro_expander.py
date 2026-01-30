@@ -2,7 +2,7 @@
 CCL Macro Expander
 
 Expands @macro references in CCL expressions.
-Part of CCL v2.1 macro system.
+Part of CCL v2.4 macro system with let syntax support.
 """
 
 import re
@@ -19,6 +19,9 @@ class MacroExpander:
     # Pattern to match old @N level syntax (for migration)
     OLD_LEVEL_PATTERN = re.compile(r'(@)(\d+)(?!\w)')
     
+    # Pattern to match let @name = ccl syntax (v2.4)
+    LET_PATTERN = re.compile(r'^let\s+@(\w+)\s*=\s*(.+)$')
+    
     def __init__(self, registry: Optional[MacroRegistry] = None):
         """
         Initialize the expander.
@@ -27,6 +30,38 @@ class MacroExpander:
             registry: Macro registry to use
         """
         self.registry = registry or MacroRegistry()
+    
+    def parse_let(self, expr: str) -> Optional[Tuple[str, str]]:
+        """
+        Parse a let expression.
+        
+        Args:
+            expr: Expression like 'let @name = ccl'
+            
+        Returns:
+            Tuple of (name, ccl) if valid let expression, None otherwise
+        """
+        match = self.LET_PATTERN.match(expr.strip())
+        if match:
+            return match.group(1), match.group(2).strip()
+        return None
+    
+    def define_from_let(self, expr: str) -> Optional[str]:
+        """
+        Define a macro from a let expression.
+        
+        Args:
+            expr: Expression like 'let @name = ccl'
+            
+        Returns:
+            Macro name if successful, None otherwise
+        """
+        parsed = self.parse_let(expr)
+        if parsed:
+            name, ccl = parsed
+            self.registry.define(name, ccl, f"User-defined: {ccl}")
+            return name
+        return None
     
     def expand(self, ccl: str) -> Tuple[str, bool]:
         """

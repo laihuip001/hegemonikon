@@ -80,12 +80,89 @@ class DoxaResult:
 class DoxaStore:
     """H4 Doxa 信念ストア
     
-    信念の永続化を管理。
+    信念の永続化を管理。ファイルに自動保存。
     """
     
-    def __init__(self):
+    DEFAULT_PATH = "/home/laihuip001/oikos/mneme/.hegemonikon/doxa_beliefs.json"
+    
+    def __init__(self, path: Optional[str] = None):
+        self._path = path or self.DEFAULT_PATH
         self._beliefs: Dict[str, Belief] = {}
         self._archive: List[Belief] = []
+        self._load()
+    
+    def _load(self) -> None:
+        """ファイルから信念を読み込み"""
+        import json
+        from pathlib import Path
+        
+        path = Path(self._path)
+        if not path.exists():
+            return
+        
+        try:
+            with open(path, "r", encoding="utf-8") as f:
+                data = json.load(f)
+            
+            for item in data.get("beliefs", []):
+                belief = Belief(
+                    content=item["content"],
+                    strength=BeliefStrength(item["strength"]),
+                    confidence=item["confidence"],
+                    created_at=datetime.fromisoformat(item["created_at"]),
+                    updated_at=datetime.fromisoformat(item["updated_at"]),
+                    evidence=item.get("evidence", []),
+                )
+                self._beliefs[belief.content] = belief
+            
+            for item in data.get("archive", []):
+                belief = Belief(
+                    content=item["content"],
+                    strength=BeliefStrength(item["strength"]),
+                    confidence=item["confidence"],
+                    created_at=datetime.fromisoformat(item["created_at"]),
+                    updated_at=datetime.fromisoformat(item["updated_at"]),
+                    evidence=item.get("evidence", []),
+                )
+                self._archive.append(belief)
+        except Exception as e:
+            print(f"⚠️ Doxa 読み込みエラー: {e}")
+    
+    def _save(self) -> None:
+        """信念をファイルに保存"""
+        import json
+        from pathlib import Path
+        
+        path = Path(self._path)
+        path.parent.mkdir(parents=True, exist_ok=True)
+        
+        data = {
+            "beliefs": [
+                {
+                    "content": b.content,
+                    "strength": b.strength.value,
+                    "confidence": b.confidence,
+                    "created_at": b.created_at.isoformat(),
+                    "updated_at": b.updated_at.isoformat(),
+                    "evidence": b.evidence,
+                }
+                for b in self._beliefs.values()
+            ],
+            "archive": [
+                {
+                    "content": b.content,
+                    "strength": b.strength.value,
+                    "confidence": b.confidence,
+                    "created_at": b.created_at.isoformat(),
+                    "updated_at": b.updated_at.isoformat(),
+                    "evidence": b.evidence,
+                }
+                for b in self._archive
+            ],
+        }
+        
+        with open(path, "w", encoding="utf-8") as f:
+            json.dump(data, f, ensure_ascii=False, indent=2)
     
     def persist(self, content: str, strength: BeliefStrength = BeliefStrength.MODERATE,
                 confidence: float = 0.7, evidence: Optional[List[str]] = None) -> DoxaResult:
@@ -97,6 +174,7 @@ class DoxaStore:
             evidence=evidence or [],
         )
         self._beliefs[content] = belief
+        self._save()  # 自動保存
         
         return DoxaResult(
             belief=belief,
@@ -137,6 +215,7 @@ class DoxaStore:
             updated.strength = BeliefStrength.WEAK
         
         self._beliefs[content] = updated
+        self._save()  # 自動保存
         
         return DoxaResult(
             belief=updated,
@@ -159,6 +238,7 @@ class DoxaStore:
         
         belief = self._beliefs.pop(content)
         self._archive.append(belief)
+        self._save()  # 自動保存
         
         return DoxaResult(
             belief=belief,
@@ -181,13 +261,17 @@ class DoxaStore:
         return self._archive
 
 
-# グローバルストア
-_global_store = DoxaStore()
+# グローバルストア (遅延初期化)
+_global_store: Optional[DoxaStore] = None
 
 
 def get_store() -> DoxaStore:
     """グローバルストアを取得"""
+    global _global_store
+    if _global_store is None:
+        _global_store = DoxaStore()
     return _global_store
+
 
 
 def format_doxa_markdown(result: DoxaResult) -> str:

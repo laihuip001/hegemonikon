@@ -52,3 +52,6 @@ htmlcov/
 
 # Mypy
 .mypy_cache/
+mekhane/anamnesis/models/bge-small/model.onnx
+mekhane/models/bge-small/model.onnx
+*.onnx

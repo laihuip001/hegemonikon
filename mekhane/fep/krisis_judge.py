@@ -1,4 +1,14 @@
 """
+PROOF: このファイルは存在しなければならない
+
+A0 → 認知には判定 (Krisis) がある
+   → A2 で分析・統合・敵対的検証
+   → krisis_judge が担う
+
+Q.E.D.
+
+---
+
 A2 Krisis Judge — 判定・敵対的レビューモジュール
 
 Hegemonikón A-series (Akribeia) 定理: A2 Krisis

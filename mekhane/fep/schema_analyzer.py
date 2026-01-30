@@ -1,4 +1,14 @@
 """
+PROOF: このファイルは存在しなければならない
+
+A0 → 認知には戦略 (Schema) がある
+   → S1, S3, S4 で尺度・基準・実践を分析
+   → schema_analyzer が担う
+
+Q.E.D.
+
+---
+
 S-series Schema Analyzer — 戦略分析モジュール
 
 Hegemonikón S-series (Schema) 定理: S1 Metron, S3 Stathmos, S4 Praxis

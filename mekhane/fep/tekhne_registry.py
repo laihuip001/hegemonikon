@@ -1,4 +1,14 @@
 """
+PROOF: このファイルは存在しなければならない
+
+A0 → 認知には行為レパートリ (Tekhnē) がある
+   → P4 で「できること」の語彙を定義
+   → tekhne_registry が担う
+
+Q.E.D.
+
+---
+
 P4 Tekhnē Registry — 行為レパートリ定義モジュール
 
 Hegemonikón P-series (Perigraphē) 定理: P4 Tekhnē

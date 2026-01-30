@@ -1,4 +1,14 @@
 """
+PROOF: このファイルは存在しなければならない
+
+A0 → FEP には状態空間が必要
+   → Stoic 概念を FEP 状態因子にマップ
+   → state_spaces.py が担う
+
+Q.E.D.
+
+---
+
 State Spaces for Hegemonikón Active Inference
 
 Maps Stoic philosophy concepts to FEP state factors and observation modalities.

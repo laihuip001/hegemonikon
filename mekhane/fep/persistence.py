@@ -1,4 +1,14 @@
 """
+PROOF: このファイルは存在しなければならない
+
+A0 → FEP エージェントには学習がある
+   → 学習結果をセッション間で保持する必要
+   → persistence.py が担う
+
+Q.E.D.
+
+---
+
 FEP Agent Persistence Module
 
 Handles saving and loading of learned A matrices between sessions.

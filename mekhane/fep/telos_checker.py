@@ -1,4 +1,14 @@
 """
+PROOF: このファイルは存在しなければならない
+
+A0 → 認知には目的 (Telos) がある
+   → K3 で目的-行為整合を確認
+   → telos_checker が担う
+
+Q.E.D.
+
+---
+
 K3 Telos Checker — 目的-行為整合性評価モジュール
 
 Hegemonikón K-series (Kairos) 定理: K3 Telos

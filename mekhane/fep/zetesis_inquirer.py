@@ -1,4 +1,14 @@
 """
+PROOF: このファイルは存在しなければならない
+
+A0 → 認知には探求 (Zētēsis) がある
+   → O3 で「何を問うべきか」を発見
+   → zetesis_inquirer が担う
+
+Q.E.D.
+
+---
+
 O3 Zētēsis Inquirer — 探求・問い発見モジュール
 
 Hegemonikón O-series (Ousia) 定理: O3 Zētēsis

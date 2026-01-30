@@ -1,4 +1,14 @@
 """
+PROOF: このファイルは存在しなければならない
+
+A0 → FEP は観察を受け取る
+   → 自然言語を観察に変換する層が必要
+   → encoding.py が担う
+
+Q.E.D.
+
+---
+
 Text-to-Observation Encoding for Hegemonikón Active Inference
 
 Converts natural language input into observation indices for the FEP agent.

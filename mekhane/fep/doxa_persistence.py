@@ -1,4 +1,14 @@
 """
+PROOF: このファイルは存在しなければならない
+
+A0 → 認知には信念が存在する
+   → H4 Doxa で信念を永続化
+   → doxa_persistence が担う
+
+Q.E.D.
+
+---
+
 H4 Doxa Persistence — 信念永続化モジュール
 
 Hegemonikón H-series (Hormē) 定理: H4 Doxa

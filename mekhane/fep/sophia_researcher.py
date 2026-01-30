@@ -1,4 +1,14 @@
 """
+PROOF: このファイルは存在しなければならない
+
+A0 → 認知には知恵 (Sophia) がある
+   → K4 で深層調査と知恵収集
+   → sophia_researcher が担う
+
+Q.E.D.
+
+---
+
 K4 Sophia Researcher — 知恵・深層調査モジュール
 
 Hegemonikón K-series (Kairos) 定理: K4 Sophia

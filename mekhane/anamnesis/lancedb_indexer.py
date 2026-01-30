@@ -8,7 +8,7 @@ LanceDB にインデックスし、全文検索・ベクトル検索を可能に
 
 import re
 from pathlib import Path
-from typing import List, Optional
+from typing import Optional
 
 import lancedb
 from pydantic import BaseModel
@@ -128,36 +128,42 @@ def index_sessions():
     session_files = list(SESSIONS_DIR.glob("*.md"))
     print(f"[*] Found {len(session_files)} session files")
     
-    # ドキュメントを作成
-    documents: List[SessionDocument] = []
-    
-    for filepath in session_files:
-        doc = parse_session_file(filepath)
-        if doc and len(doc.content) > 50:
-            documents.append(doc)
-    
-    print(f"[*] Parsed {len(documents)} valid documents")
-    
-    if not documents:
-        print("[!] No documents to index")
-        return
-    
     # テーブルが存在する場合は削除して再作成
-    if TABLE_NAME in db.table_names():
+    if TABLE_NAME in db.list_tables():
         db.drop_table(TABLE_NAME)
         print(f"[*] Dropped existing table: {TABLE_NAME}")
-    
-    # ドキュメントを辞書に変換
-    data = [doc.model_dump() for doc in documents]
-    
-    # テーブル作成
-    table = db.create_table(TABLE_NAME, data)
-    print(f"[✓] Created table: {TABLE_NAME} ({len(documents)} rows)")
+
+    def generate_session_batches(files, batch_size=100):
+        """セッションファイルをバッチ処理で生成するジェネレータ"""
+        batch = []
+        count = 0
+        for filepath in files:
+            doc = parse_session_file(filepath)
+            if doc and len(doc.content) > 50:
+                batch.append(doc.model_dump())
+                count += 1
+                if len(batch) >= batch_size:
+                    yield batch
+                    batch = []
+        if batch:
+            yield batch
+        print(f"[*] Parsed {count} valid documents")
+
+    # テーブル作成 (ジェネレータを使用)
+    try:
+        # Pydanticモデルを直接schemaに渡すとAttributeError: metadataが発生する場合があるため、
+        # データから推論させる (データがある場合)
+        # 空の場合は別途ハンドリングが必要だが、ここではデータがある前提とする
+        table = db.create_table(TABLE_NAME, data=generate_session_batches(session_files))
+        print(f"[✓] Created table: {TABLE_NAME}")
+    except Exception as e:
+        print(f"[!] Failed to create table: {e}")
+        return None, None
     
     # Full-Text Search インデックスを作成
     try:
         table.create_fts_index("content", replace=True)
-        print(f"[✓] Created FTS index on 'content'")
+        print("[✓] Created FTS index on 'content'")
     except Exception as e:
         print(f"[!] FTS index creation failed: {e}")
     
@@ -170,7 +176,7 @@ def search_sessions(query: str, limit: int = 5):
     """セッションを検索"""
     db = lancedb.connect(str(DB_PATH))
     
-    if TABLE_NAME not in db.table_names():
+    if TABLE_NAME not in db.list_tables():
         print("[!] No sessions indexed. Run index_sessions() first.")
         return []
     

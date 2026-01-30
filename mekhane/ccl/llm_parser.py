@@ -1,3 +1,4 @@
+# PROOF: [L1/定理] CCL→CCLパーサーが必要→llm_parser が担う
 """
 LLM Parser for CCL v2.0
 

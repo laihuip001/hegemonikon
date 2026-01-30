@@ -1,3 +1,4 @@
+# PROOF: [L3/ユーティリティ] O4→運用スクリプトが必要→fep_experiment が担う
 #!/usr/bin/env python3
 """
 FEP Interactive Experiment: Explore pymdp behavior in real-time.

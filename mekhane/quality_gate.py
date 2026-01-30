@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] A0→品質管理が必要→quality_gate が担う
 """
 Quality Gate Module - Hegemonikón品質体系
 

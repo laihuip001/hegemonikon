@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] O4→創造機能が必要
 """
 Energeia Core — O4 Energeia Instantiation
 

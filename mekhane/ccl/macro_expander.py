@@ -1,3 +1,4 @@
+# PROOF: [L1/定理] CCL→CCLパーサーが必要→macro_expander が担う
 """
 CCL Macro Expander
 

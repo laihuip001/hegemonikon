@@ -1,3 +1,4 @@
+# PROOF: [L3/ユーティリティ] O4→運用スクリプトが必要→swarm_scheduler が担う
 #!/usr/bin/env python3
 """
 Swarm Scheduler - Daily 4AM Execution

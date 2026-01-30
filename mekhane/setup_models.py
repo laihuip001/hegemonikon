@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] A0→品質管理が必要→setup_models が担う
 
 import os
 from pathlib import Path

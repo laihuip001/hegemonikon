@@ -1,5 +1,15 @@
 #!/usr/bin/env python3
 """
+PROOF: [L3/ユーティリティ]
+
+P3 → 開発モジュールの検索が必要
+   → LanceDB での FTS 索引
+   → module_indexer が担う
+
+Q.E.D.
+
+---
+
 開発用モジュール インデクサー
 
 M:\Brain\99_保管庫\プロンプト ライブラリー\モジュール（開発用）内の

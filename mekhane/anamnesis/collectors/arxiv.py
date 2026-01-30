@@ -1,4 +1,14 @@
 """
+PROOF: [L2/インフラ]
+
+P3 → 知識収集が必要
+   → arXiv からの論文収集
+   → ArxivCollector が担う
+
+Q.E.D.
+
+---
+
 Gnōsis arXiv Collector - arXiv API経由で論文収集
 """
 

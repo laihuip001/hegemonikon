@@ -1,5 +1,15 @@
 #!/usr/bin/env python3
 """
+PROOF: [L3/ユーティリティ]
+
+P3 → チャット履歴の保存が必要
+   → Playwright による履歴抽出
+   → export_chats が担う
+
+Q.E.D.
+
+---
+
 Antigravity IDE チャット履歴エクスポートツール
 ==============================================
 

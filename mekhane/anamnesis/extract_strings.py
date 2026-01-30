@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L3/ユーティリティ] P3→データ処理が必要→extract_strings が担う
 """
 バイナリファイルから strings を抽出（protobuf パース不要）
 Python の strings 相当: ASCII/UTF-8 の連続文字列を抽出

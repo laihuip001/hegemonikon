@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L3/ユーティリティ] P3→DOM調査が必要→inspect_style が担う
 """
 STYLE 要素の完全調査
 

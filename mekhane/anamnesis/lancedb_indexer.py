@@ -1,5 +1,15 @@
 #!/usr/bin/env python3
 r"""
+PROOF: [L2/インフラ]
+
+P3 → セッションの検索が必要
+   → LanceDB によるセッション索引
+   → lancedb_indexer が担う
+
+Q.E.D.
+
+---
+
 LanceDB インデクサー for セッションファイル
 
 M:\Brain\.hegemonikon\sessions\ に保存されたセッションファイルを

@@ -1,5 +1,15 @@
 #!/usr/bin/env python3
 """
+PROOF: [L3/ユーティリティ]
+
+S2 → ワークフローの標準化が必要
+   → Artifact セクション一括追加
+   → workflow_artifact_batch が担う
+
+Q.E.D.
+
+---
+
 Batch add Artifact Auto-save section to all workflows.
 Hegemonikón Workflow Artifact Standardization
 """

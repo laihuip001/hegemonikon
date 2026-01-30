@@ -1,5 +1,15 @@
 #!/usr/bin/env python3
 """
+PROOF: [L3/ユーティリティ]
+
+S2 → ワークフロー一覧が必要
+   → frontmatter から自動生成
+   → workflow_inventory が担う
+
+Q.E.D.
+
+---
+
 Workflow Inventory Generator
 
 ワークフローの frontmatter から自動的に一覧表を生成する。

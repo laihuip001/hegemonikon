@@ -1,5 +1,15 @@
 #!/usr/bin/env python3
 """
+PROOF: [L2/インフラ]
+
+P3 → 記憶統合ツールが必要
+   → /boot から呼び出される Sophia/Kairos/Chronos 統合
+   → mneme_cli が担う
+
+Q.E.D.
+
+---
+
 Mnēmē Synthesis CLI - 統合セッション記憶インジェストツール
 
 /boot から呼び出される Sophia/Kairos/Chronos 統合 CLI.

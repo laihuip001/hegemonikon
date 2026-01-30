@@ -1,5 +1,15 @@
 #!/usr/bin/env python3
 """
+PROOF: [L2/インフラ]
+
+P3 → セッションの振り返りが必要
+   → 自動ナイトレビュー生成
+   → night_review が担う
+
+Q.E.D.
+
+---
+
 Night Review Generator - Hegemonikón M8 Anamnēsis
 ==================================================
 

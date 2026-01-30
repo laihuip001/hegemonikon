@@ -1,4 +1,14 @@
 """
+PROOF: [L2/インフラ]
+
+P3 → 知識収集が必要
+   → Semantic Scholar からの論文収集
+   → SemanticScholarCollector が担う
+
+Q.E.D.
+
+---
+
 Gnōsis Semantic Scholar Collector - S2 API経由で論文収集
 """
 

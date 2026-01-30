@@ -1,4 +1,14 @@
 """
+PROOF: [L2/インフラ]
+
+P3 → 知識収集が必要
+   → OpenAlex からの論文収集
+   → OpenAlexCollector が担う
+
+Q.E.D.
+
+---
+
 Gnōsis OpenAlex Collector - OpenAlex API経由で論文収集
 """
 

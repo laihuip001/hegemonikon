@@ -1,4 +1,14 @@
 """
+PROOF: [L2/インフラ]
+
+P3 → 記憶の索引が必要
+   → VectorStore アダプタ統合版
+   → GnosisIndexV2 が担う
+
+Q.E.D.
+
+---
+
 Gnōsis Index V2 - VectorStore Adapter統合
 
 lancedb依存からhnswlib/faiss/sqlite-vss切り替え可能な設計に移行。

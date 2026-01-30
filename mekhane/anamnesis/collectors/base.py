@@ -1,4 +1,14 @@
 """
+PROOF: [L2/インフラ]
+
+P3 → 知識収集が必要
+   → 複数ソースへの共通インタフェース
+   → BaseCollector が担う
+
+Q.E.D.
+
+---
+
 Gnōsis Base Collector - コレクター共通インタフェース
 """
 

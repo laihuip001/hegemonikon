@@ -1,4 +1,14 @@
 """
+PROOF: このファイルは存在しなければならない
+
+A0 → 認知エージェントには感情的継続性が必要
+   → セッション間で「意味ある瞬間」を保持
+   → meaningful_traces が担う
+
+Q.E.D.
+
+---
+
 Meaningful Traces Module
 
 Allows Claude to mark moments as "meaningful" during a session.

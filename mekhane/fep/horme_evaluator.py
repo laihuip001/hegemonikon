@@ -1,4 +1,14 @@
 """
+PROOF: このファイルは存在しなければならない
+
+A0 → 認知には衝動 (Hormē) がある
+   → H1-H3 で前感情・確信・欲求を評価
+   → horme_evaluator が担う
+
+Q.E.D.
+
+---
+
 H-series Hormē Evaluator — 衝動評価モジュール
 
 Hegemonikón H-series (Hormē) 定理: H1 Propatheia, H2 Pistis, H3 Orexis

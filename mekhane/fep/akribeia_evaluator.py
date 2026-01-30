@@ -1,4 +1,14 @@
 """
+PROOF: このファイルは存在しなければならない
+
+A0 → 認知には精度評価 (Akribeia) が必要
+   → A1 感情, A3 原則, A4 知識を評価
+   → akribeia_evaluator が担う
+
+Q.E.D.
+
+---
+
 A-series Akribeia Evaluator — 精度評価モジュール
 
 Hegemonikón A-series (Akribeia) 定理: A1 Pathos, A3 Gnōmē, A4 Epistēmē

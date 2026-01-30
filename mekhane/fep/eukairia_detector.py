@@ -1,4 +1,14 @@
 """
+PROOF: このファイルは存在しなければならない
+
+A0 → 認知には好機 (Eukairia) がある
+   → K1 で「今がチャンスか」を判定
+   → eukairia_detector が担う
+
+Q.E.D.
+
+---
+
 K1 Eukairia Detector — 好機判定モジュール
 
 Hegemonikón K-series (Kairos) 定理: K1 Eukairia

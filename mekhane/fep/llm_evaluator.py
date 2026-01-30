@@ -1,4 +1,14 @@
 """
+PROOF: このファイルは存在しなければならない
+
+A0 → FEP には観察生成が必要
+   → 正規表現だけでは不十分な場合がある
+   → LLM による階層的評価が担う
+
+Q.E.D.
+
+---
+
 LLM Evaluator - Hierarchical Hybrid Evaluation Layer
 
 Implements the 3-layer evaluation architecture from /noe analysis:

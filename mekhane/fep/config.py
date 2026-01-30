@@ -1,4 +1,14 @@
 """
+PROOF: このファイルは存在しなければならない
+
+A0 → FEP エージェントにはパラメータがある
+   → パラメータの読み込みと管理が必要
+   → config.py が担う
+
+Q.E.D.
+
+---
+
 FEP Agent Configuration
 
 Loads parameters from parameters.yaml with literature-backed defaults.

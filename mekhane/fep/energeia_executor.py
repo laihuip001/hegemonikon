@@ -1,4 +1,14 @@
 """
+PROOF: このファイルは存在しなければならない
+
+A0 → 認知には行為 (Energeia) がある
+   → O4 で行動選択と実行を制御
+   → energeia_executor が担う
+
+Q.E.D.
+
+---
+
 O4 Energeia Executor — 行為実行エンジン
 
 Hegemonikón O-series (Ousia) 定理: O4 Energeia

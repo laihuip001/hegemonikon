@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/インフラ] A0→知識管理が必要→seed_data が担う
 """
 MVP Seed Data for Mneme Server
 

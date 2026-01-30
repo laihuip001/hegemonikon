@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/インフラ] A0→知識管理が必要→sophia_ingest が担う
 """
 Sophia Ingest - Knowledge Items を Sophia インデックスに自動投入
 

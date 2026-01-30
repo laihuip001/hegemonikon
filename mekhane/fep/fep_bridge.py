@@ -1,4 +1,14 @@
 """
+PROOF: このファイルは存在しなければならない
+
+A0 → FEP エージェントが存在する (fep_agent.py)
+   → ワークフローとの統合が必要
+   → 高レベル API を提供する橋渡し層が担う
+
+Q.E.D.
+
+---
+
 FEP Bridge - Workflow Integration Layer
 
 Provides high-level functions for invoking FEP capabilities from

@@ -1,4 +1,14 @@
 """
+PROOF: このファイルは存在しなければならない
+
+A0 → 24定理から72派生が存在する
+   → 文脈に応じた派生選択が必要
+   → derivative_selector が担う
+
+Q.E.D.
+
+---
+
 O-Series & S-Series Derivative Selector for Hegemonikón Active Inference
 
 Selects the optimal derivative workflow based on problem context analysis.

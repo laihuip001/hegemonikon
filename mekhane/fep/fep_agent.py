@@ -1,4 +1,14 @@
 """
+PROOF: このファイルは存在しなければならない
+
+A0 → FEP (予測誤差最小化) が核である
+   → FEP を実装するエージェントが必要
+   → Active Inference エージェントが担う
+
+Q.E.D.
+
+---
+
 Hegemonikón FEP Agent
 
 Active Inference agent wrapping pymdp for cognitive processes.

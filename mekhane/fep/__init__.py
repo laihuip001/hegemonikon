@@ -1,4 +1,14 @@
 """
+PROOF: このファイルは存在しなければならない
+
+A0 → fep/ は FEP 実装を持つ
+   → モジュールには公開インターフェイスが必要
+   → __init__.py が担う
+
+Q.E.D.
+
+---
+
 Hegemonikón FEP Module
 
 Active Inference implementation based on pymdp for cognitive processes.

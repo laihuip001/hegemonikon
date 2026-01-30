@@ -1,0 +1,24 @@
+# Hegemonikón Pre-commit Configuration
+# 
+# Install: pip install pre-commit && pre-commit install
+# Run all: pre-commit run --all-files
+
+repos:
+  # PROOF Header Check
+  - repo: local
+    hooks:
+      - id: check-proof
+        name: Check PROOF headers
+        entry: python3 mekhane/scripts/check_proof.py
+        language: system
+        types: [python]
+        pass_filenames: false
+        always_run: true
+
+  # Python formatting (optional - uncomment if ruff is installed)
+  # - repo: https://github.com/astral-sh/ruff-pre-commit
+  #   rev: v0.1.6
+  #   hooks:
+  #     - id: ruff
+  #       args: [--fix]
+  #     - id: ruff-format

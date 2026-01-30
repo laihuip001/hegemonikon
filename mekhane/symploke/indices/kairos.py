@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] A0→索引管理が必要→kairos が担う
 """
 Kairos Index - Handoff (文脈)
 

@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L3/ユーティリティ] O4→実行スクリプトが必要→run_remaining が担う
 """残りの専門家26人を実行"""
 import asyncio
 import aiohttp

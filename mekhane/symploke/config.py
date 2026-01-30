@@ -1,4 +1,14 @@
 """
+PROOF: [L2/インフラ]
+
+A0 → 知識システムには設定が必要
+   → 環境変数/YAMLからの設定ロード
+   → config.py が担う
+
+Q.E.D.
+
+---
+
 Symplokē Configuration
 
 統合設定ファイル。環境変数またはYAMLからロード。

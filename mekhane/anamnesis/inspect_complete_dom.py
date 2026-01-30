@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L3/ユーティリティ] P3→DOM調査が必要→inspect_complete_dom が担う
 """
 DOM 構造詳細調査 v3 — User/Claude 区別とツール呼び出し
 

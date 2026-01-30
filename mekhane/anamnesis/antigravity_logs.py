@@ -1,4 +1,14 @@
 """
+PROOF: このファイルは存在しなければならない
+
+P3 → 記憶の永続化が必要
+   → Antigravity IDE のセッションログ収集が必要
+   → antigravity_logs.py が担う
+
+Q.E.D.
+
+---
+
 Antigravity Output Panel Log Collector
 
 Antigravity IDE の Output パネルに表示されるログを収集・分析するモジュール。

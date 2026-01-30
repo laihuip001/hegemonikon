@@ -1,3 +1,4 @@
+# PROOF: [L1/定理] CCL→CCLパーサーが必要→semantic_matcher が担う
 """
 Semantic Macro Matcher
 

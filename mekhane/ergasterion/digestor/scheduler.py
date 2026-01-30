@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] A0→消化処理が必要→scheduler が担う
 #!/usr/bin/env python3
 """
 Digestor Scheduler - OS 非依存の定時収集デーモン

@@ -1,3 +1,4 @@
+# PROOF: [L1/定理] CCL→CCLパーサーが必要→semantic_validator が担う
 """
 CCL Semantic Validator v1.0
 

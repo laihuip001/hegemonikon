@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] A0→MCP経由のアクセスが必要→jules_mcp_server が担う
 #!/usr/bin/env python3
 """
 Jules MCP Server - Hegemonikón H3 Symplokē Layer

@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] O4→工房機能が必要→fast_fetch が担う
 #!/usr/bin/env python3
 """
 Fast Fetch - HTML to Markdown converter

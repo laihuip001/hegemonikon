@@ -1,3 +1,4 @@
+# PROOF: [L3/ユーティリティ] O4→実験スクリプトが必要
 """
 Module: doc_maintenance.py
 Description: Automated maintenance for AI-optimized documentation (AGENTS.md, etc.)

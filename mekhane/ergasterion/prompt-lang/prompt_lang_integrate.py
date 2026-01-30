@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] S2→プロンプト言語が必要→prompt_lang_integrate が担う
 #!/usr/bin/env python3
 """
 prompt-lang Auto-Fire Integration

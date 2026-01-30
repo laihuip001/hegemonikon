@@ -1,3 +1,4 @@
+# PROOF: [L1/定理] CCL→実行基盤が必要
 #!/usr/bin/env python3
 """
 CCL Tracer (v1.0)

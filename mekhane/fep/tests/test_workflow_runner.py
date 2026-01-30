@@ -1,3 +1,4 @@
+# PROOF: [L3/テスト] 対象モジュールが存在→検証が必要
 """
 Tests for workflow_runner with X-series integration.
 

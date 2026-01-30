@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] A0→MCP経由のアクセスが必要→sophia_mcp_server が担う
 #!/usr/bin/env python3
 """
 Sophia MCP Server - Hegemonikón Knowledge Items Search

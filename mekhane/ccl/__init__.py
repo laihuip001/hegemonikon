@@ -1,3 +1,4 @@
+# PROOF: [L1/定理] CCL→CCLパーサーが必要→__init__ が担う
 """
 CCL (Cognitive Control Language) Module v2.3
 

@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] A0→消化処理が必要→test_selector が担う
 """
 Digestor Selector Tests
 """

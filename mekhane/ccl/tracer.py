@@ -1,3 +1,4 @@
+# PROOF: [L1/定理] CCL→CCLパーサーが必要→tracer が担う
 #!/usr/bin/env python3
 """
 CCL Tracer v2.0

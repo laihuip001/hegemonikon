@@ -1,3 +1,4 @@
+# PROOF: [L1/定理] CCL→CCLパーサーが必要→doxa_learner が担う
 """
 Doxa Learner for CCL v2.0
 

@@ -1,3 +1,4 @@
+# PROOF: [L3/ユーティリティ] O4→運用スクリプトが必要→restore_sessions が担う
 #!/usr/bin/env python3
 """
 restore_healthy_sessions.py

@@ -1,3 +1,4 @@
+# PROOF: [L1/定理] CCL→CCLパーサーが必要→pattern_cache が担う
 """
 Pattern Cache for CCL v2.0
 

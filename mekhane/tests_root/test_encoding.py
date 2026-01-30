@@ -1,3 +1,4 @@
+# PROOF: [L3/テスト] 対象モジュールが存在→検証が必要
 """Tests for encoding.py - Text-to-Observation encoding."""
 
 import pytest

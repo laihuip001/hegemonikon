@@ -1,3 +1,4 @@
+# PROOF: [L3/テスト] 対象モジュールが存在→検証が必要→test_engine が担う
 """
 Symplokē Tests - Search Engine
 

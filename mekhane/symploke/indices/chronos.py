@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] A0→索引管理が必要→chronos が担う
 """
 Chronos Index - チャット履歴 (時系列)
 

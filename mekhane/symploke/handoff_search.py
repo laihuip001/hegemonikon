@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/インフラ] A0→知識管理が必要→handoff_search が担う
 """
 Handoff Search - /boot 時に関連 Handoff を検索
 

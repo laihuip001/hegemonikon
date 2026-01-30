@@ -1,4 +1,14 @@
 """
+PROOF: このファイルは存在しなければならない
+
+A0 → 認知には時間的制約がある
+   → K2 Chronos で「いつまでに」を評価
+   → chronos_evaluator が担う
+
+Q.E.D.
+
+---
+
 K2 Chronos Evaluator — 時間制約評価モジュール
 
 Hegemonikón K-series (Kairos) 定理: K2 Chronos

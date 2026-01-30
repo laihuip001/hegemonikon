@@ -1,4 +1,14 @@
 """
+PROOF: このファイルは存在しなければならない
+
+A0 → 認知には環境定義 (Perigraphē) がある
+   → P1-P3 で場・経路・軌道を定義
+   → perigraphe_engine が担う
+
+Q.E.D.
+
+---
+
 P-series Perigraphē Engine — 環境定義モジュール
 
 Hegemonikón P-series (Perigraphē) 定理: P1 Khōra, P2 Hodos, P3 Trokhia

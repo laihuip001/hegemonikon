@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/インフラ]
 r"""
 PROOF: [L2/インフラ]
 

@@ -2,7 +2,8 @@ import os
 from pathlib import Path
 
 # Configuration
-SOURCE_ROOT = Path("M:/Hegemonikon")
+# Detect root directory relative to this script
+SOURCE_ROOT = Path(__file__).parent.parent.resolve()
 OUTPUT_FILE = SOURCE_ROOT / "hegemonikon_full_docs.txt"
 
 # Ignore these directories and patterns

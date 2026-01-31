@@ -21,6 +21,26 @@ from datetime import datetime
 from dataclasses import dataclass, field
 from typing import Optional
 
+try:
+    from mekhane.anamnesis.ux_utils import (
+        print_header, print_success, print_error, print_warning,
+        print_info, Colors, _colorize
+    )
+except ImportError:
+    # Fallback for standalone execution without package context
+    def print_header(t): print(f"\n=== {t} ===")
+    def print_success(t): print(f"✓ {t}")
+    def print_error(t): print(f"✖ {t}")
+    def print_warning(t): print(f"⚠ {t}")
+    def print_info(t): print(f"ℹ {t}")
+    class Colors:
+        HEADER = ""
+        FAIL = ""
+        WARNING = ""
+        OKGREEN = ""
+        ENDC = ""
+    def _colorize(t, c): return t
+
 
 @dataclass
 class LogEntry:
@@ -243,18 +263,35 @@ class AntigravityLogCollector:
     def format_summary(self, summary: dict) -> str:
         """要約を人間が読みやすい形式でフォーマット"""
         if "error" in summary:
-            return f"[Error] {summary['error']}"
+            return _colorize(f"[Error] {summary['error']}", Colors.FAIL)
         
         lines = [
-            f"[Antigravity] Session: {summary['session_id']}",
+            _colorize(f"[Antigravity] Session: {summary['session_id']}", Colors.HEADER),
             f"  Model: {summary['model']}",
             f"  Requests: {summary['total_requests']}",
-            f"  Errors: {summary['error_count']} (503: {summary['capacity_errors']})",
         ]
         
+        # Colorize errors
+        err_count = summary['error_count']
+        cap_err = summary['capacity_errors']
+        err_str = f"  Errors: {err_count} (503: {cap_err})"
+
+        if err_count > 0:
+            lines.append(_colorize(err_str, Colors.FAIL))
+        else:
+            lines.append(_colorize(err_str, Colors.OKGREEN))
+
         if summary.get("token_usage"):
             tu = summary["token_usage"]
-            lines.append(f"  Tokens: {tu['current']:,} / {tu['limit']:,} ({tu['percentage']}%)")
+            perc = tu['percentage']
+            usage_str = f"  Tokens: {tu['current']:,} / {tu['limit']:,} ({perc}%)"
+
+            if perc > 90:
+                lines.append(_colorize(usage_str, Colors.FAIL))
+            elif perc > 75:
+                lines.append(_colorize(usage_str, Colors.WARNING))
+            else:
+                lines.append(usage_str)
         
         return "\n".join(lines)
 
@@ -268,9 +305,9 @@ def cmd_logs(args) -> int:
     if args.list:
         sessions = collector.get_sessions(limit=args.limit)
         if not sessions:
-            print("No sessions found")
+            print_warning("No sessions found")
             return 1
-        print(f"[Antigravity Sessions] ({len(sessions)} shown)")
+        print_header(f"Antigravity Sessions ({len(sessions)} shown)")
         for s in sessions:
             print(f"  {s.name}")
         return 0
@@ -280,7 +317,7 @@ def cmd_logs(args) -> int:
     if args.session:
         session = collector._log_base / args.session
         if not session.exists():
-            print(f"Session not found: {args.session}")
+            print_error(f"Session not found: {args.session}")
             return 1
     
     # エラーのみ
@@ -288,7 +325,13 @@ def cmd_logs(args) -> int:
         lines = collector.read_log(session)
         errors = collector.extract_errors(lines)
         capacity = collector.extract_capacity_errors(lines)
-        print(f"[Errors] {len(errors)} total, {len(capacity)} capacity (503)")
+
+        header = f"Errors: {len(errors)} total, {len(capacity)} capacity (503)"
+        if errors:
+            print_error(header)
+        else:
+            print_success(header)
+
         for e in errors[:20]:  # 最大20件
             print(f"  {e['timestamp']} [{e['level']}] {e['message'][:80]}...")
         return 0
@@ -297,7 +340,10 @@ def cmd_logs(args) -> int:
     if args.models:
         lines = collector.read_log(session)
         models = collector.extract_model_info(lines)
-        print(f"[Models] Detected: {', '.join(models) if models else 'none'}")
+        if models:
+            print_info(f"Models Detected: {', '.join(models)}")
+        else:
+            print_warning("No models detected")
         return 0
     
     # トークン情報のみ
@@ -305,9 +351,15 @@ def cmd_logs(args) -> int:
         lines = collector.read_log(session)
         usage = collector.extract_token_usage(lines)
         if usage:
-            print(f"[Tokens] {usage['current']:,} / {usage['limit']:,} ({usage['percentage']}%)")
+            msg = f"Tokens: {usage['current']:,} / {usage['limit']:,} ({usage['percentage']}%)"
+            if usage['percentage'] > 90:
+                print_error(msg)
+            elif usage['percentage'] > 75:
+                print_warning(msg)
+            else:
+                print_info(msg)
         else:
-            print("[Tokens] Not found")
+            print_warning("Token usage not found")
         return 0
     
     # デフォルト: 要約

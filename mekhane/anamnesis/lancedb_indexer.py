@@ -114,6 +114,27 @@ def parse_session_file(filepath: Path) -> Optional[SessionDocument]:
         return None
 
 
+def generate_session_batches(files: List[Path], batch_size: int = 100):
+    """
+    セッションファイルを解析し、バッチ単位でデータを生成するジェネレータ。
+    """
+    batch = []
+    count = 0
+    for filepath in files:
+        doc = parse_session_file(filepath)
+        if doc and len(doc.content) > 50:
+            batch.append(doc.model_dump())
+            count += 1
+            if len(batch) >= batch_size:
+                yield batch
+                batch = []
+
+    if batch:
+        yield batch
+
+    print(f"[*] Processed {count} valid documents")
+
+
 def index_sessions():
     """全セッションファイルをインデックス"""
     print("[*] LanceDB Session Indexer")
@@ -128,31 +149,23 @@ def index_sessions():
     session_files = list(SESSIONS_DIR.glob("*.md"))
     print(f"[*] Found {len(session_files)} session files")
     
-    # ドキュメントを作成
-    documents: List[SessionDocument] = []
-    
-    for filepath in session_files:
-        doc = parse_session_file(filepath)
-        if doc and len(doc.content) > 50:
-            documents.append(doc)
-    
-    print(f"[*] Parsed {len(documents)} valid documents")
-    
-    if not documents:
-        print("[!] No documents to index")
-        return
+    if not session_files:
+        print("[!] No session files found")
+        return db, None
     
     # テーブルが存在する場合は削除して再作成
-    if TABLE_NAME in db.table_names():
+    if TABLE_NAME in db.list_tables():
         db.drop_table(TABLE_NAME)
         print(f"[*] Dropped existing table: {TABLE_NAME}")
     
-    # ドキュメントを辞書に変換
-    data = [doc.model_dump() for doc in documents]
-    
     # テーブル作成
-    table = db.create_table(TABLE_NAME, data)
-    print(f"[✓] Created table: {TABLE_NAME} ({len(documents)} rows)")
+    # ジェネレータを使用してバッチ処理を行うことで、メモリ使用量を抑制
+    try:
+        table = db.create_table(TABLE_NAME, generate_session_batches(session_files))
+        print(f"[✓] Created table: {TABLE_NAME} ({len(table)} rows)")
+    except Exception as e:
+        print(f"[!] Failed to create table (possibly no valid documents): {e}")
+        return db, None
     
     # Full-Text Search インデックスを作成
     try:
@@ -170,7 +183,7 @@ def search_sessions(query: str, limit: int = 5):
     """セッションを検索"""
     db = lancedb.connect(str(DB_PATH))
     
-    if TABLE_NAME not in db.table_names():
+    if TABLE_NAME not in db.list_tables():
         print("[!] No sessions indexed. Run index_sessions() first.")
         return []
     

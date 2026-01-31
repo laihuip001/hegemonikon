@@ -131,6 +131,74 @@ def search_loaded_index(adapter, query: str, top_k: int = 5):
 DEFAULT_INDEX_PATH = Path("/home/laihuip001/oikos/mneme/.hegemonikon/indices/sophia.pkl")
 
 
+def get_boot_ki(context: str = None, mode: str = "standard") -> dict:
+    """
+    /boot 統合 API: コンテキストに基づいて関連 KI を自動プッシュ
+    
+    Args:
+        context: 現在のセッションコンテキスト（Handoff の主題や目的など）
+        mode: "fast" (0件), "standard" (3件), "detailed" (5件)
+    
+    Returns:
+        dict: {
+            "ki_items": List[dict],  # 関連 KI リスト
+            "count": int
+        }
+    """
+    # モードによる件数
+    top_k = {
+        "fast": 0,
+        "standard": 3,
+        "detailed": 5
+    }.get(mode, 3)
+    
+    if top_k == 0 or not context:
+        return {"ki_items": [], "count": 0}
+    
+    # インデックス読み込み
+    if not DEFAULT_INDEX_PATH.exists():
+        return {"ki_items": [], "count": 0}
+    
+    adapter = load_sophia_index(str(DEFAULT_INDEX_PATH))
+    
+    # 検索
+    results = search_loaded_index(adapter, context, top_k=top_k)
+    
+    # 結果を整形
+    ki_items = []
+    for r in results:
+        ki_items.append({
+            "ki_name": r.metadata.get("ki_name", "Unknown"),
+            "summary": r.metadata.get("summary", ""),
+            "artifact": r.metadata.get("artifact", ""),
+            "score": r.score,
+            "file_path": r.metadata.get("file_path", "")
+        })
+    
+    return {
+        "ki_items": ki_items,
+        "count": len(ki_items)
+    }
+
+
+def format_ki_output(result: dict) -> str:
+    """
+    /boot 用の KI 出力フォーマット
+    """
+    if not result["ki_items"]:
+        return "📚 関連する知識: なし"
+    
+    lines = [f"📚 今日関連しそうな知識 ({result['count']}件):"]
+    
+    for item in result["ki_items"]:
+        ki_name = item["ki_name"]
+        summary = item["summary"][:60] + "..." if len(item["summary"]) > 60 else item["summary"]
+        lines.append(f"  • [{ki_name}] {summary}")
+    
+    return "\n".join(lines)
+
+
+
 def main():
     parser = argparse.ArgumentParser(description="Ingest KIs to Sophia index")
     parser.add_argument("--dry-run", action="store_true", help="Parse only, don't ingest")

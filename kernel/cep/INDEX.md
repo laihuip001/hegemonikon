@@ -10,7 +10,7 @@
 | CEP | Title | Status | Author | Date |
 |:----|:------|:-------|:-------|:-----|
 | [CEP-000](CEP-000.md) | CCL 初期仕様と言語進化ガバナンス | **Final** | Creator + AI | 2026-01-30 |
-| [CEP-001](CEP-001.md) | CCL FEP 記号拡張仕様 | **Proposed** | Creator + AI | 2026-01-31 |
+| [CEP-001](CEP-001.md) | CCL FEP 記号拡張仕様 | **Accepted** | Creator + AI | 2026-01-31 |
 
 ---
 

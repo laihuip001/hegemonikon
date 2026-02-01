@@ -53,10 +53,14 @@ class SELValidator:
     """SEL 遵守検証器"""
 
     def __init__(self, workflows_dir: Optional[Path] = None):
-        self.workflows_dir = workflows_dir or Path("/home/laihuip001/oikos/.agent/workflows")
+        self.workflows_dir = workflows_dir or Path(
+            "/home/laihuip001/oikos/.agent/workflows"
+        )
         self._cache: Dict[str, Dict] = {}
 
-    def load_sel_enforcement(self, workflow: str) -> Optional[Dict[str, SELRequirement]]:
+    def load_sel_enforcement(
+        self, workflow: str
+    ) -> Optional[Dict[str, SELRequirement]]:
         """ワークフローの sel_enforcement をロード"""
         if workflow in self._cache:
             return self._cache[workflow]
@@ -130,7 +134,9 @@ class SELValidator:
 
         return False
 
-    def validate(self, workflow: str, operator: str, output: str) -> SELValidationResult:
+    def validate(
+        self, workflow: str, operator: str, output: str
+    ) -> SELValidationResult:
         """ワークフロー出力の SEL 遵守を検証"""
         sel = self.load_sel_enforcement(workflow)
 
@@ -176,7 +182,9 @@ class SELValidator:
             details=requirement.description,
         )
 
-    def validate_batch(self, outputs: Dict[str, Dict[str, str]]) -> List[SELValidationResult]:
+    def validate_batch(
+        self, outputs: Dict[str, Dict[str, str]]
+    ) -> List[SELValidationResult]:
         """複数出力を一括検証
 
         Args:
@@ -208,7 +216,9 @@ class SELValidator:
             lines.append("⚠️ 非遵守項目:")
             for r in results:
                 if not r.is_compliant:
-                    lines.append(f"  - {r.workflow}{r.operator}: {r.missing_requirements}")
+                    lines.append(
+                        f"  - {r.workflow}{r.operator}: {r.missing_requirements}"
+                    )
 
         lines.append("═" * 60)
         return "\n".join(lines)

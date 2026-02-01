@@ -1,9 +1,13 @@
 ---
 doc_id: "SCHEMA_SERIES"
-version: "1.0.0"
+version: "1.1.0"
 tier: "KERNEL"
 status: "CANONICAL"
 created: "2026-01-27"
+updated: "2026-02-01"
+extends:
+  axioms: [L0.FEP, L1.Flow, L1.Value, L1.5.Scale, L1.5.Function]
+  generation: "L1 × L1.5"
 ---
 
 > **Kernel Doc Index**: [axiom_hierarchy](axiom_hierarchy.md) | [ousia](ousia.md) | [schema](schema.md) ← 📍 | [horme](horme.md)

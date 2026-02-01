@@ -35,7 +35,9 @@ class OperatorVerification(BaseModel):
     operator: str = Field(..., description="使用する演算子")
     official_name: str = Field(..., description="演算子の正式名称")
     official_action: str = Field(..., description="演算子の正式な作用")
-    my_understanding: str = Field(..., min_length=20, description="自分の言葉での説明（省略禁止）")
+    my_understanding: str = Field(
+        ..., min_length=20, description="自分の言葉での説明（省略禁止）"
+    )
 
     @validator("operator")
     def validate_operator(cls, v):
@@ -75,7 +77,9 @@ class MetaOutput(BaseModel):
 
     target: str = Field(..., description="メタ分析対象")
     meta_perspective: str = Field(..., min_length=100, description="メタ視点からの分析")
-    insights: List[str] = Field(..., min_items=1, description="メタ分析から得られた洞察")
+    insights: List[str] = Field(
+        ..., min_items=1, description="メタ分析から得られた洞察"
+    )
 
 
 class FactorialOutput(BaseModel):
@@ -83,7 +87,9 @@ class FactorialOutput(BaseModel):
 
     base_workflow: str = Field(..., description="基底ワークフロー")
     all_derivatives: List[str] = Field(..., min_items=1, description="全派生リスト")
-    simultaneous_execution: List[StepOutput] = Field(..., min_items=1, description="同時実行結果")
+    simultaneous_execution: List[StepOutput] = Field(
+        ..., min_items=1, description="同時実行結果"
+    )
 
 
 class SelfAudit(BaseModel):
@@ -91,7 +97,9 @@ class SelfAudit(BaseModel):
 
     completeness_check: str = Field(..., description="全ステップ完了の確認")
     operator_compliance: str = Field(..., description="演算子要件への準拠確認")
-    potential_issues: List[str] = Field(default_factory=list, description="潜在的問題点")
+    potential_issues: List[str] = Field(
+        default_factory=list, description="潜在的問題点"
+    )
 
 
 class CCLExecutionOutput(BaseModel):
@@ -109,9 +117,13 @@ class CCLExecutionOutput(BaseModel):
         None, description="振動演算子の出力（使用時のみ）"
     )
 
-    merges: Optional[List[MergeOutput]] = Field(None, description="融合演算子の出力（使用時のみ）")
+    merges: Optional[List[MergeOutput]] = Field(
+        None, description="融合演算子の出力（使用時のみ）"
+    )
 
-    metas: Optional[List[MetaOutput]] = Field(None, description="メタ演算子の出力（使用時のみ）")
+    metas: Optional[List[MetaOutput]] = Field(
+        None, description="メタ演算子の出力（使用時のみ）"
+    )
 
     factorials: Optional[List[FactorialOutput]] = Field(
         None, description="階乗演算子の出力（使用時のみ）"
@@ -175,7 +187,9 @@ if __name__ == "__main__":
             ],
             final_result="最終結果をここに記載します。" * 5,
             self_audit=SelfAudit(
-                completeness_check="完了", operator_compliance="準拠", potential_issues=[]
+                completeness_check="完了",
+                operator_compliance="準拠",
+                potential_issues=[],
             ),
         )
         print("✅ バリデーション成功")

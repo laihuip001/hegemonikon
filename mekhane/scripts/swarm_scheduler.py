@@ -93,7 +93,9 @@ class SwarmScheduler:
                     perspective = matrix.get(task["domain"], task["axis"])
 
                     if not perspective:
-                        logger.warning(f"Perspective not found: {task['domain']}-{task['axis']}")
+                        logger.warning(
+                            f"Perspective not found: {task['domain']}-{task['axis']}"
+                        )
                         continue
 
                     prompt = matrix.generate_prompt(perspective)
@@ -134,7 +136,9 @@ class SwarmScheduler:
         """Execute full allocation plan across all accounts."""
         keys = self.load_api_keys()
         if len(keys) < self.ACCOUNTS:
-            logger.warning(f"Only {len(keys)} keys available (expected {self.ACCOUNTS})")
+            logger.warning(
+                f"Only {len(keys)} keys available (expected {self.ACCOUNTS})"
+            )
 
         # Combine all tasks
         all_tasks = plan.change_driven + plan.discovery + plan.weekly_focus
@@ -155,7 +159,9 @@ class SwarmScheduler:
             all_results.extend(results)
 
         # Save results
-        output_file = self.results_dir / f"run_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
+        output_file = (
+            self.results_dir / f"run_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
+        )
         with open(output_file, "w", encoding="utf-8") as f:
             json.dump(
                 {
@@ -163,8 +169,12 @@ class SwarmScheduler:
                     "total_tasks": len(all_tasks),
                     "results": all_results,
                     "summary": {
-                        "started": sum(1 for r in all_results if r.get("status") == "started"),
-                        "failed": sum(1 for r in all_results if r.get("status") == "failed"),
+                        "started": sum(
+                            1 for r in all_results if r.get("status") == "started"
+                        ),
+                        "failed": sum(
+                            1 for r in all_results if r.get("status") == "failed"
+                        ),
                     },
                 },
                 f,
@@ -201,7 +211,9 @@ class SwarmScheduler:
             # Add new entry
             new_crontab = current.strip() + "\n" + entry + "\n"
 
-            process = subprocess.Popen(["crontab", "-"], stdin=subprocess.PIPE, text=True)
+            process = subprocess.Popen(
+                ["crontab", "-"], stdin=subprocess.PIPE, text=True
+            )
             process.communicate(input=new_crontab)
 
             logger.info(f"Cron installed: {entry}")
@@ -215,11 +227,15 @@ class SwarmScheduler:
         """Get scheduler status."""
         # Check cron
         result = subprocess.run(["crontab", "-l"], capture_output=True, text=True)
-        cron_installed = "swarm_scheduler.py" in result.stdout if result.returncode == 0 else False
+        cron_installed = (
+            "swarm_scheduler.py" in result.stdout if result.returncode == 0 else False
+        )
 
         # Check recent runs
         recent_runs = (
-            sorted(self.results_dir.glob("run_*.json"))[-5:] if self.results_dir.exists() else []
+            sorted(self.results_dir.glob("run_*.json"))[-5:]
+            if self.results_dir.exists()
+            else []
         )
 
         return {

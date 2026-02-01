@@ -74,7 +74,11 @@ async def main():
                         classes = await el.get_attribute("class") or ""
                         text = await el.text_content()
                         text_len = len(text) if text else 0
-                        preview = (text[:300] + "...") if text and len(text) > 300 else (text or "")
+                        preview = (
+                            (text[:300] + "...")
+                            if text and len(text) > 300
+                            else (text or "")
+                        )
                         lines.append(f"\n  [{i}] <{tag}> class='{classes[:100]}'")
                         lines.append(f"      text_len={text_len}")
                         lines.append(f"      preview: {preview[:200]}")
@@ -106,7 +110,9 @@ async def main():
         large_divs.sort(key=lambda x: x["text_len"], reverse=True)
 
         for i, item in enumerate(large_divs[:10]):
-            lines.append(f"\n[Large {i}] text_len={item['text_len']}, children={item['children']}")
+            lines.append(
+                f"\n[Large {i}] text_len={item['text_len']}, children={item['children']}"
+            )
             lines.append(f"    class='{item['classes'][:150]}'")
 
             # 子要素の構造を調査

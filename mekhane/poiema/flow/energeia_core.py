@@ -136,7 +136,9 @@ class EnergeiaCoreResolver:
             model_name = self._select_model(masked_text, resolved_level)
 
             # 4. O1 Noēsis: AI generation (placeholder for actual API call)
-            result = await self._generate_content(masked_text, system_prompt, model_name)
+            result = await self._generate_content(
+                masked_text, system_prompt, model_name
+            )
 
             if result.get("success"):
                 # 5. A2 Epochē (解除): Unmask PII
@@ -164,7 +166,9 @@ class EnergeiaCoreResolver:
                 "message": str(e),
             }
 
-    async def _generate_content(self, text: str, system_prompt: str, model: str) -> Dict:
+    async def _generate_content(
+        self, text: str, system_prompt: str, model: str
+    ) -> Dict:
         """
         O1 Noēsis への委譲: AI生成
 

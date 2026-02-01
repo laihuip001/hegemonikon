@@ -185,7 +185,11 @@ class SEPrincipleValidator:
                 continue
 
             if not re.search(config["pattern"], content, re.IGNORECASE):
-                severity = Severity.ERROR if detected_scale == Scale.MACRO else Severity.WARNING
+                severity = (
+                    Severity.ERROR
+                    if detected_scale == Scale.MACRO
+                    else Severity.WARNING
+                )
 
                 # Micro でも必須のものは ERROR
                 if config["min_scale"] == Scale.MICRO:

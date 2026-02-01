@@ -133,9 +133,13 @@ async def main():
                 role = await el.get_attribute("data-role") or ""
                 classes = await el.get_attribute("class") or ""
                 text = await el.text_content()
-                text_preview = (text[:50] + "...") if text and len(text) > 50 else (text or "")
+                text_preview = (
+                    (text[:50] + "...") if text and len(text) > 50 else (text or "")
+                )
 
-                lines.append(f"  [{i}] <{tag}> testid='{testid}' msg_id='{msg_id}' role='{role}'")
+                lines.append(
+                    f"  [{i}] <{tag}> testid='{testid}' msg_id='{msg_id}' role='{role}'"
+                )
                 lines.append(f"       class='{classes[:60]}'")
                 lines.append(f"       text='{text_preview}'")
             except Exception:

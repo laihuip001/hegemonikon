@@ -21,7 +21,9 @@ sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 
 PERSONA_PATH = Path("/home/laihuip001/oikos/mneme/.hegemonikon/persona.yaml")
-CREATOR_PROFILE_PATH = Path("/home/laihuip001/oikos/mneme/.hegemonikon/creator_profile.yaml")
+CREATOR_PROFILE_PATH = Path(
+    "/home/laihuip001/oikos/mneme/.hegemonikon/creator_profile.yaml"
+)
 
 # デフォルトの persona
 DEFAULT_PERSONA = {
@@ -324,7 +326,9 @@ def main():
     )
     parser.add_argument("--insight", type=str, help="Add new insight")
     parser.add_argument("--moment", type=str, help="Add meaningful moment")
-    parser.add_argument("--trust-delta", type=float, default=0.01, help="Trust change per session")
+    parser.add_argument(
+        "--trust-delta", type=float, default=0.01, help="Trust change per session"
+    )
     args = parser.parse_args()
 
     if args.update:

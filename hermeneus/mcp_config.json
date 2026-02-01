@@ -1,0 +1,15 @@
+{
+    "mcpServers": {
+        "hermeneus": {
+            "command": "python",
+            "args": [
+                "-m",
+                "hermeneus.src.mcp_server"
+            ],
+            "cwd": "/home/laihuip001/oikos/hegemonikon",
+            "env": {
+                "PYTHONPATH": "/home/laihuip001/oikos/hegemonikon"
+            }
+        }
+    }
+}

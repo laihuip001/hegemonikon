@@ -202,7 +202,9 @@ def format_krisis_markdown(result: KrisisResult) -> str:
         "│ 異議:",
     ]
     for o in result.objections[:3]:
-        severity_emoji = "🔴" if o.severity >= 0.7 else ("🟡" if o.severity >= 0.4 else "🟢")
+        severity_emoji = (
+            "🔴" if o.severity >= 0.7 else ("🟡" if o.severity >= 0.4 else "🟢")
+        )
         lines.append(f"│   {severity_emoji} [{o.category}] {o.content[:30]}")
     lines.extend(
         [

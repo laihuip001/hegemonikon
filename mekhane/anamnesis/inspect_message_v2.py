@@ -116,7 +116,9 @@ async def main():
                     }
                 """)
 
-                lines.append(f"  text without style: {len(inner_text_without_style)} chars")
+                lines.append(
+                    f"  text without style: {len(inner_text_without_style)} chars"
+                )
                 preview = inner_text_without_style[:200].replace("\n", " ")
                 lines.append(f"  preview: '{preview}'")
 

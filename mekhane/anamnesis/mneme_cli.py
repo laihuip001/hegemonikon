@@ -33,7 +33,9 @@ from datetime import datetime
 
 # Add Hegemonikon root to path for imports
 _THIS_DIR = Path(__file__).parent
-_HEGEMONIKON_ROOT = _THIS_DIR.parent.parent  # mekhane/anamnesis -> mekhane -> Hegemonikon
+_HEGEMONIKON_ROOT = (
+    _THIS_DIR.parent.parent
+)  # mekhane/anamnesis -> mekhane -> Hegemonikon
 if str(_HEGEMONIKON_ROOT) not in sys.path:
     sys.path.insert(0, str(_HEGEMONIKON_ROOT))
 
@@ -130,7 +132,9 @@ def cmd_stats(args):
         print("Sophia: Not indexed")
 
     # Kairos stats
-    handoff_count = len(list(HANDOFF_DIR.glob("handoff_*.md"))) if HANDOFF_DIR.exists() else 0
+    handoff_count = (
+        len(list(HANDOFF_DIR.glob("handoff_*.md"))) if HANDOFF_DIR.exists() else 0
+    )
     print(f"Kairos: {handoff_count} handoff files")
 
     # Chronos stats (placeholder)
@@ -149,10 +153,14 @@ def main():
 
     # ingest
     p_ingest = subparsers.add_parser("ingest", help="インデックス更新")
-    p_ingest.add_argument("--all", action="store_true", help="全インデックス更新 (default)")
+    p_ingest.add_argument(
+        "--all", action="store_true", help="全インデックス更新 (default)"
+    )
     p_ingest.add_argument("--sophia", action="store_true", help="Sophia (KI) のみ")
     p_ingest.add_argument("--kairos", action="store_true", help="Kairos (Handoff) のみ")
-    p_ingest.add_argument("--chronos", action="store_true", help="Chronos (会話履歴) のみ")
+    p_ingest.add_argument(
+        "--chronos", action="store_true", help="Chronos (会話履歴) のみ"
+    )
     p_ingest.set_defaults(func=cmd_ingest)
 
     # stats

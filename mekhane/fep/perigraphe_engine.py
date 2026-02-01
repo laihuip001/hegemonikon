@@ -102,9 +102,14 @@ def define_scope(
     # 派生自動推論 (キーワードベース)
     if derivative is None:
         target_lower = target.lower()
-        if any(w in target_lower for w in ["チーム", "ネットワーク", "関係", "コミュニティ"]):
+        if any(
+            w in target_lower
+            for w in ["チーム", "ネットワーク", "関係", "コミュニティ"]
+        ):
             derivative = KhoraDerivative.RELATIONAL
-        elif any(w in target_lower for w in ["設計", "モデル", "スキーマ", "アーキテクチャ"]):
+        elif any(
+            w in target_lower for w in ["設計", "モデル", "スキーマ", "アーキテクチャ"]
+        ):
             derivative = KhoraDerivative.CONCEPTUAL
         else:
             derivative = KhoraDerivative.PHYSICAL

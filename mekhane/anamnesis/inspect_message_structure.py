@@ -113,7 +113,9 @@ async def main():
         lines.append("\n\n=== .scrollbar-hide children ===")
         scrollbar_hide = await page.query_selector(".scrollbar-hide")
         if scrollbar_hide:
-            children = await scrollbar_hide.query_selector_all(":scope > * > *")  # 孫まで
+            children = await scrollbar_hide.query_selector_all(
+                ":scope > * > *"
+            )  # 孫まで
             lines.append(f"Found {len(children)} grandchildren")
 
             for i, child in enumerate(children[:15]):
@@ -132,7 +134,9 @@ async def main():
                     if "message" in c_class.lower():
                         features.append("MESSAGE")
 
-                    lines.append(f"\n[{i}] <{c_tag}> text_len={c_len} {' '.join(features)}")
+                    lines.append(
+                        f"\n[{i}] <{c_tag}> text_len={c_len} {' '.join(features)}"
+                    )
                     lines.append(f"    class='{c_class[:100]}'")
 
                     if c_text:

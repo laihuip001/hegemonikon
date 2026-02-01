@@ -53,7 +53,7 @@ graph TD
 
 ## 定理群（24 = 6×4）
 
-### A流: 内容の具現化（12）
+### Poiēsis: 内容の具現化（生成層12）
 
 | Level | 記号 | 名称 | 生成 | 定理 | ドキュメント |
 |-------|------|------|------|------|-------------|
@@ -61,7 +61,7 @@ graph TD
 | L1 | S | **Schema** | L1×L1.5 | S1-S4 | [schema.md](schema.md) |
 | L2a | H | **Hormē** | L1×L1.75 | H1-H4 | [horme.md](horme.md) |
 
-### B流: 条件の詳細化（12）
+### Dokimasia: 条件の詳細化（審査層12）
 
 | Level | 記号 | 名称 | 生成 | 定理 | ドキュメント |
 |-------|------|------|------|------|-------------|
@@ -149,12 +149,12 @@ graph TD
 
 ```mermaid
 graph TD
-    subgraph "A流: 内容"
+    subgraph "Poiēsis: 内容"
         O[O: Ousia] --> S[S: Schema]
         S --> H[H: Hormē]
     end
     
-    subgraph "B流: 条件"
+    subgraph "Dokimasia: 条件"
         S --> P[P: Perigraphē]
         P --> K[K: Kairos]
         K --> A[A: Akribeia]

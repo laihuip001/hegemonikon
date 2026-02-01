@@ -305,9 +305,13 @@ class TekhnēRegistry:
         Args:
             techniques: カスタム技法辞書 (None で標準技法を使用)
         """
-        self._techniques: Dict[str, Technique] = techniques or STANDARD_TECHNIQUES.copy()
+        self._techniques: Dict[str, Technique] = (
+            techniques or STANDARD_TECHNIQUES.copy()
+        )
         self._usage_counts: Dict[str, int] = {tid: 0 for tid in self._techniques}
-        self._success_history: Dict[str, List[bool]] = {tid: [] for tid in self._techniques}
+        self._success_history: Dict[str, List[bool]] = {
+            tid: [] for tid in self._techniques
+        }
 
     @property
     def techniques(self) -> Dict[str, Technique]:
@@ -432,9 +436,12 @@ class TekhnēRegistry:
         """レジストリ統計を取得"""
         return {
             "total_techniques": self.size,
-            "by_category": {cat.value: len(self.get_by_category(cat)) for cat in ActionCategory},
+            "by_category": {
+                cat.value: len(self.get_by_category(cat)) for cat in ActionCategory
+            },
             "by_quadrant": {
-                quad.value: len(self.get_by_quadrant(quad)) for quad in TechniqueQuadrant
+                quad.value: len(self.get_by_quadrant(quad))
+                for quad in TechniqueQuadrant
             },
             "total_usage": sum(self._usage_counts.values()),
         }
@@ -442,7 +449,9 @@ class TekhnēRegistry:
     def to_json(self) -> str:
         """JSON形式でエクスポート"""
         data = {
-            "techniques": {tid: tech.to_dict() for tid, tech in self._techniques.items()},
+            "techniques": {
+                tid: tech.to_dict() for tid, tech in self._techniques.items()
+            },
             "usage_counts": self._usage_counts,
             "success_history": self._success_history,
         }

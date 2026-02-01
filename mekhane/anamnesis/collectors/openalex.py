@@ -42,7 +42,9 @@ class OpenAlexCollector(BaseCollector):
             raise ImportError("requests package required: pip install requests")
 
         self.session = requests.Session()
-        self.session.headers["User-Agent"] = "Gnosis/0.1 (Hegemonikon Knowledge Foundation)"
+        self.session.headers["User-Agent"] = (
+            "Gnosis/0.1 (Hegemonikon Knowledge Foundation)"
+        )
 
         # メール指定でpolite poolに入る（レート制限緩和）
         self.email = email
@@ -53,7 +55,11 @@ class OpenAlexCollector(BaseCollector):
         """API応答 -> Paper 変換"""
         # IDs
         ids = data.get("ids", {}) or {}
-        doi = ids.get("doi", "").replace("https://doi.org/", "") if ids.get("doi") else None
+        doi = (
+            ids.get("doi", "").replace("https://doi.org/", "")
+            if ids.get("doi")
+            else None
+        )
 
         # arXiv ID抽出（openalex_idから）
         arxiv_id = None
@@ -90,7 +96,11 @@ class OpenAlexCollector(BaseCollector):
             title=data.get("title") or "",
             authors=authors,
             abstract=self._get_abstract(data),
-            published=str(data.get("publication_year")) if data.get("publication_year") else None,
+            published=(
+                str(data.get("publication_year"))
+                if data.get("publication_year")
+                else None
+            ),
             url=data.get("id") or "",
             pdf_url=pdf_url,
             citations=data.get("cited_by_count"),
@@ -139,7 +149,9 @@ class OpenAlexCollector(BaseCollector):
         # カテゴリフィルタ（OpenAlex concepts使用）
         if categories:
             # concepts.display_name でフィルタ
-            params["filter"] = ",".join([f"concepts.display_name:{cat}" for cat in categories])
+            params["filter"] = ",".join(
+                [f"concepts.display_name:{cat}" for cat in categories]
+            )
 
         self._rate_limit_wait()
 

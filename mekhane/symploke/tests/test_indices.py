@@ -11,7 +11,12 @@ from pathlib import Path
 
 # テスト対象
 from mekhane.symploke.adapters.mock_adapter import MockAdapter
-from mekhane.symploke.indices.base import DomainIndex, SourceType, Document, IndexedResult
+from mekhane.symploke.indices.base import (
+    DomainIndex,
+    SourceType,
+    Document,
+    IndexedResult,
+)
 from mekhane.symploke.indices.gnosis import GnosisIndex
 from mekhane.symploke.indices.chronos import ChronosIndex
 from mekhane.symploke.indices.sophia import SophiaIndex
@@ -152,7 +157,9 @@ class TestSophiaIndex:
         sophia = SophiaIndex(adapter, "sophia", dimension=128)
 
         docs = [
-            Document(id="ki1", content="Architecture patterns", metadata={"category": "arch"}),
+            Document(
+                id="ki1", content="Architecture patterns", metadata={"category": "arch"}
+            ),
         ]
         count = sophia.ingest(docs)
 
@@ -172,7 +179,9 @@ class TestKairosIndex:
         kairos = KairosIndex(adapter, "kairos", dimension=128)
 
         docs = [
-            Document(id="handoff1", content="Pending tasks", metadata={"status": "pending"}),
+            Document(
+                id="handoff1", content="Pending tasks", metadata={"status": "pending"}
+            ),
         ]
         count = kairos.ingest(docs)
 
@@ -184,7 +193,9 @@ class TestKairosIndex:
 
         docs = [
             Document(id="h1", content="Pending task 1", metadata={"status": "pending"}),
-            Document(id="h2", content="Completed task", metadata={"status": "completed"}),
+            Document(
+                id="h2", content="Completed task", metadata={"status": "completed"}
+            ),
         ]
         kairos.ingest(docs)
 

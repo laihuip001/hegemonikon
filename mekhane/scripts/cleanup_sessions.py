@@ -16,7 +16,8 @@ from datetime import datetime
 CURRENT_SESSION_ID = "2cf58e28-160a-4d1c-9078-1671acc546d2"
 CONV_DIR = Path(r"M:\.gemini\antigravity\conversations")
 BACKUP_DIR = Path(
-    r"M:\.gemini\antigravity\conversations_backup_" + datetime.now().strftime("%Y%m%d_%H%M%S")
+    r"M:\.gemini\antigravity\conversations_backup_"
+    + datetime.now().strftime("%Y%m%d_%H%M%S")
 )
 
 
@@ -41,7 +42,9 @@ def cleanup():
 
         size = pb_file.stat().st_size
         if size > threshold_size or size == 0:
-            print(f"⚠️  Moving problematic file ({size/1024/1024:.1f} MB): {pb_file.name}")
+            print(
+                f"⚠️  Moving problematic file ({size/1024/1024:.1f} MB): {pb_file.name}"
+            )
             try:
                 shutil.move(str(pb_file), str(BACKUP_DIR / pb_file.name))
                 moved_count += 1

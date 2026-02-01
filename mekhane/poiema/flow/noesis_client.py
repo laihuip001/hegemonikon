@@ -76,7 +76,9 @@ class NoesisClient:
         """外部認識源が利用可能か"""
         return self.client is not None
 
-    async def generate_content(self, text: str, config: Dict, model: Optional[str] = None) -> Dict:
+    async def generate_content(
+        self, text: str, config: Dict, model: Optional[str] = None
+    ) -> Dict:
         """
         O1 Noēsis 核心機能: 外部認識の取得
 
@@ -102,7 +104,9 @@ class NoesisClient:
         try:
             from google.genai import types
 
-            target_model = model or self.settings.get("MODEL_FAST", "gemini-2.0-flash-exp")
+            target_model = model or self.settings.get(
+                "MODEL_FAST", "gemini-2.0-flash-exp"
+            )
             prompt = f"{config.get('system', '')}\n\n[Input]\n{text}"
 
             response = await self.client.aio.models.generate_content(
@@ -131,7 +135,12 @@ class NoesisClient:
                         }
 
             result_text = response.text.strip() if response.text else ""
-            return {"success": True, "result": result_text, "error": None, "blocked_reason": None}
+            return {
+                "success": True,
+                "result": result_text,
+                "error": None,
+                "blocked_reason": None,
+            }
 
         except Exception as e:
             error_msg = str(e)
@@ -143,7 +152,9 @@ class NoesisClient:
                 "blocked_reason": error_msg,
             }
 
-    def generate_content_stream(self, text: str, config: Dict) -> Generator[str, None, None]:
+    def generate_content_stream(
+        self, text: str, config: Dict
+    ) -> Generator[str, None, None]:
         """
         ストリーミング生成
 

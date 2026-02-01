@@ -56,7 +56,9 @@ class TestSearchEngine:
         gnosis = GnosisIndex(adapter, "gnosis", dimension=128)
 
         # データ投入
-        docs = [Document(id=f"paper{i}", content=f"Paper {i} content") for i in range(10)]
+        docs = [
+            Document(id=f"paper{i}", content=f"Paper {i} content") for i in range(10)
+        ]
         gnosis.ingest(docs)
 
         engine.register(gnosis)
@@ -125,20 +127,28 @@ class TestSearchEngine:
         # 2つのソースに同量のデータ
         gnosis_adapter = MockAdapter()
         gnosis = GnosisIndex(gnosis_adapter, "gnosis", dimension=128)
-        gnosis.ingest([Document(id=f"g{i}", content=f"Gnosis doc {i}") for i in range(5)])
+        gnosis.ingest(
+            [Document(id=f"g{i}", content=f"Gnosis doc {i}") for i in range(5)]
+        )
 
         sophia_adapter = MockAdapter()
         sophia = SophiaIndex(sophia_adapter, "sophia", dimension=128)
-        sophia.ingest([Document(id=f"s{i}", content=f"Sophia doc {i}") for i in range(5)])
+        sophia.ingest(
+            [Document(id=f"s{i}", content=f"Sophia doc {i}") for i in range(5)]
+        )
 
         engine.register(gnosis)
         engine.register(sophia)
 
         # Gnōsis を強く重み付け
-        results_gnosis_heavy = engine.search("test", k=4, weights={"gnosis": 1.0, "sophia": 0.1})
+        results_gnosis_heavy = engine.search(
+            "test", k=4, weights={"gnosis": 1.0, "sophia": 0.1}
+        )
 
         # Sophia を強く重み付け
-        results_sophia_heavy = engine.search("test", k=4, weights={"gnosis": 0.1, "sophia": 1.0})
+        results_sophia_heavy = engine.search(
+            "test", k=4, weights={"gnosis": 0.1, "sophia": 1.0}
+        )
 
         # 結果が異なることを確認（少なくとも順序か内容が変わる）
         # MockAdapter は決定的なので、重み付けの効果を見る

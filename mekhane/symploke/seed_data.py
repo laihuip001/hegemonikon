@@ -13,7 +13,13 @@ from pathlib import Path
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
-from mekhane.symploke.indices import Document, GnosisIndex, ChronosIndex, SophiaIndex, KairosIndex
+from mekhane.symploke.indices import (
+    Document,
+    GnosisIndex,
+    ChronosIndex,
+    SophiaIndex,
+    KairosIndex,
+)
 from mekhane.symploke.adapters.mock_adapter import MockAdapter
 from mekhane.symploke.search.engine import SearchEngine
 
@@ -23,12 +29,20 @@ GNOSIS_SEED = [
     Document(
         id="fep-friston-2010",
         content="Free Energy Principle: A unified brain theory proposing that biological systems minimize variational free energy. Active inference and predictive processing.",
-        metadata={"title": "The Free-Energy Principle", "author": "Karl Friston", "year": 2010},
+        metadata={
+            "title": "The Free-Energy Principle",
+            "author": "Karl Friston",
+            "year": 2010,
+        },
     ),
     Document(
         id="transformer-attention-2017",
         content="Attention Is All You Need: Transformer architecture with self-attention mechanism. Foundation for modern LLMs like GPT and BERT.",
-        metadata={"title": "Attention Is All You Need", "author": "Vaswani et al.", "year": 2017},
+        metadata={
+            "title": "Attention Is All You Need",
+            "author": "Vaswani et al.",
+            "year": 2017,
+        },
     ),
 ]
 

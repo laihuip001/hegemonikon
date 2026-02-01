@@ -109,7 +109,11 @@ def state_to_index(phantasia: str, assent: str, horme: str) -> int:
     h_idx = HORME_STATES.index(horme)
 
     # Compute flat index (row-major order)
-    return p_idx * len(ASSENT_STATES) * len(HORME_STATES) + a_idx * len(HORME_STATES) + h_idx
+    return (
+        p_idx * len(ASSENT_STATES) * len(HORME_STATES)
+        + a_idx * len(HORME_STATES)
+        + h_idx
+    )
 
 
 def index_to_state(idx: int) -> tuple:

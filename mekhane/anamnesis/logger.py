@@ -32,7 +32,9 @@ from typing import Dict, Optional
 
 
 class SessionLogger:
-    def __init__(self, session_id: Optional[str] = None, base_dir: str = "vault/logs/raw"):
+    def __init__(
+        self, session_id: Optional[str] = None, base_dir: str = "vault/logs/raw"
+    ):
         self.session_id = session_id or datetime.now().strftime("%Y-%m-%d_Session")
 
         # M:\Hegemonikon root resolution

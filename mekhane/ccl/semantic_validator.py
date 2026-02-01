@@ -99,7 +99,9 @@ CCL は Hegemonikón システムの認知制御言語で、以下のワーク�
         """Check if LLM is available."""
         return self.client is not None
 
-    def validate(self, intent: str, ccl: str, context: Optional[str] = None) -> SemanticResult:
+    def validate(
+        self, intent: str, ccl: str, context: Optional[str] = None
+    ) -> SemanticResult:
         """
         Validate semantic alignment between intent and CCL.
 
@@ -123,18 +125,26 @@ CCL は Hegemonikón システムの認知制御言語で、以下のワーク�
         try:
             prompt = self._build_prompt(intent, ccl, context)
 
-            response = self.client.models.generate_content(model=self.model_name, contents=prompt)
+            response = self.client.models.generate_content(
+                model=self.model_name, contents=prompt
+            )
 
             if response and response.text:
                 return self._parse_response(response.text)
 
         except Exception as e:
             return SemanticResult(
-                aligned=True, confidence=0.0, reasoning=f"Validation error: {e}", suggestions=[]
+                aligned=True,
+                confidence=0.0,
+                reasoning=f"Validation error: {e}",
+                suggestions=[],
             )
 
         return SemanticResult(
-            aligned=True, confidence=0.0, reasoning="Empty response from LLM", suggestions=[]
+            aligned=True,
+            confidence=0.0,
+            reasoning="Empty response from LLM",
+            suggestions=[],
         )
 
     def _build_prompt(self, intent: str, ccl: str, context: Optional[str]) -> str:

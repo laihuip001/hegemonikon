@@ -73,7 +73,9 @@ class NightReview:
     generated_at: str
 
 
-def _process_session_dir(session_dir: Path, target_date: Optional[date]) -> Optional[SessionInfo]:
+def _process_session_dir(
+    session_dir: Path, target_date: Optional[date]
+) -> Optional[SessionInfo]:
     """
     単一のセッションディレクトリを処理するヘルパー関数。
     並列処理のために分離。
@@ -174,7 +176,8 @@ def get_sessions(target_date: Optional[date] = None) -> List[SessionInfo]:
 
     with concurrent.futures.ProcessPoolExecutor(max_workers=max_workers) as executor:
         futures = {
-            executor.submit(_process_session_dir, p, target_date): p for p in BRAIN_DIR.iterdir()
+            executor.submit(_process_session_dir, p, target_date): p
+            for p in BRAIN_DIR.iterdir()
         }
 
         for future in concurrent.futures.as_completed(futures):
@@ -241,13 +244,17 @@ def call_gemini_api(prompt: str) -> str:
     """Gemini API を呼び出してレビューを生成"""
 
     if not GEMINI_API_KEY:
-        raise ValueError("GEMINI_API_KEY not found. " "Set it in M:/Hegemonikon/.env.local")
+        raise ValueError(
+            "GEMINI_API_KEY not found. " "Set it in M:/Hegemonikon/.env.local"
+        )
 
     try:
         from google import genai
         from google.genai import types
     except ImportError:
-        raise ImportError("google-genai not installed. " "Run: pip install google-genai")
+        raise ImportError(
+            "google-genai not installed. " "Run: pip install google-genai"
+        )
 
     client = genai.Client(api_key=GEMINI_API_KEY)
 
@@ -263,7 +270,9 @@ def call_gemini_api(prompt: str) -> str:
     return response.text
 
 
-def parse_review_response(response_text: str, target_date: date, session_count: int) -> NightReview:
+def parse_review_response(
+    response_text: str, target_date: date, session_count: int
+) -> NightReview:
     """APIレスポンスを構造化"""
 
     lines = response_text.strip().split("\n")

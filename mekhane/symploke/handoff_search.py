@@ -28,9 +28,13 @@ from mekhane.symploke.adapters.embedding_adapter import EmbeddingAdapter
 from mekhane.symploke.indices import Document
 
 # Handoff インデックスの永続化パス
-HANDOFF_INDEX_PATH = Path("/home/laihuip001/oikos/mneme/.hegemonikon/indices/handoffs.pkl")
+HANDOFF_INDEX_PATH = Path(
+    "/home/laihuip001/oikos/mneme/.hegemonikon/indices/handoffs.pkl"
+)
 # 会話ログインデックスの永続化パス (Kairos と共有)
-CONVERSATION_INDEX_PATH = Path("/home/laihuip001/oikos/mneme/.hegemonikon/indices/kairos.pkl")
+CONVERSATION_INDEX_PATH = Path(
+    "/home/laihuip001/oikos/mneme/.hegemonikon/indices/kairos.pkl"
+)
 
 
 def load_handoffs() -> List[Document]:
@@ -228,10 +232,17 @@ def get_boot_handoffs(mode: str = "standard", context: str = None) -> dict:
                     file_path = r.metadata.get("file_path")
                     if file_path and Path(file_path).exists():
                         # 重複チェック
-                        if not any(c.metadata.get("file_path") == file_path for c in conversations):
+                        if not any(
+                            c.metadata.get("file_path") == file_path
+                            for c in conversations
+                        ):
                             doc = parse_conversation(Path(file_path))
-                            doc.metadata["score"] = adjust_score(r.score, "conversation")
-                            doc.metadata["proactive"] = True  # Proactive Recall でヒット
+                            doc.metadata["score"] = adjust_score(
+                                r.score, "conversation"
+                            )
+                            doc.metadata["proactive"] = (
+                                True  # Proactive Recall でヒット
+                            )
                             proactive_memories.append(doc)
             except Exception as e:
                 pass  # TODO: Add proper error handling

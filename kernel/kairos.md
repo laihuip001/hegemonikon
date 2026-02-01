@@ -1,10 +1,13 @@
 ---
 doc_id: "KAIROS_SERIES"
-version: "2.1.0"
+version: "2.2.0"
 tier: "KERNEL"
 status: "CANONICAL"
 created: "2026-01-24"
-updated: "2026-01-27"
+updated: "2026-02-01"
+extends:
+  axioms: [L0.FEP, L1.5.Scale, L1.5.Function, L1.75.Valence, L1.75.Precision]
+  generation: "L1.5 × L1.75"
 ---
 
 > **Kernel Doc Index**: [axiom_hierarchy](axiom_hierarchy.md) | [perigraphe](perigraphe.md) | [kairos](kairos.md) ← 📍 | [akribeia](akribeia.md)

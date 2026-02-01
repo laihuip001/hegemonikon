@@ -50,7 +50,9 @@ class EmbeddingAdapter(VectorStoreAdapter):
         model = self._get_model()
         return model.encode(texts, convert_to_numpy=True)
 
-    def create_index(self, dimension: int, index_name: str = "default", **kwargs) -> None:
+    def create_index(
+        self, dimension: int, index_name: str = "default", **kwargs
+    ) -> None:
         self._dimension = dimension
         self._vectors = []
         self._metadata = {}
@@ -116,7 +118,9 @@ class EmbeddingAdapter(VectorStoreAdapter):
         for idx, score in scores[:k]:
             if threshold is not None and score < threshold:
                 break
-            results.append(SearchResult(id=idx, score=score, metadata=self._metadata.get(idx, {})))
+            results.append(
+                SearchResult(id=idx, score=score, metadata=self._metadata.get(idx, {}))
+            )
 
         return results
 

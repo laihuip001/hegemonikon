@@ -235,7 +235,9 @@ def build_index(incremental: bool = False, report_mode: bool = False):
                 artifact_time = artifact.get("updated_at", "")
                 if artifact_time:
                     try:
-                        at = datetime.fromisoformat(artifact_time.replace("Z", "+00:00"))
+                        at = datetime.fromisoformat(
+                            artifact_time.replace("Z", "+00:00")
+                        )
                         if at <= last_sync:
                             continue
                     except Exception:
@@ -243,7 +245,9 @@ def build_index(incremental: bool = False, report_mode: bool = False):
 
             # Generate ID
             art_type = (
-                artifact.get("artifact_type", "unknown").replace("ARTIFACT_TYPE_", "").lower()
+                artifact.get("artifact_type", "unknown")
+                .replace("ARTIFACT_TYPE_", "")
+                .lower()
             )
             doc_id = f"{artifact['session_id']}_{art_type}"
 
@@ -272,7 +276,9 @@ def build_index(incremental: bool = False, report_mode: bool = False):
 
     if not all_data:
         if report_mode:
-            print(f"[Hegemonikon] M8 Anamnēsis\n  Sync Phase: Skipped\n  Reason: No new data")
+            print(
+                f"[Hegemonikon] M8 Anamnēsis\n  Sync Phase: Skipped\n  Reason: No new data"
+            )
         else:
             print("No new data to index.")
         save_sync_state()
@@ -285,7 +291,9 @@ def build_index(incremental: bool = False, report_mode: bool = False):
     try:
         existing_tables = db.list_tables()
         table_names = (
-            existing_tables.tables if hasattr(existing_tables, "tables") else list(existing_tables)
+            existing_tables.tables
+            if hasattr(existing_tables, "tables")
+            else list(existing_tables)
         )
         if "chat_history" in table_names:
             if incremental:
@@ -412,7 +420,9 @@ def setup_model():
 
     MODELS_DIR.mkdir(parents=True, exist_ok=True)
 
-    if (MODELS_DIR / "model.onnx").exists() and (MODELS_DIR / "tokenizer.json").exists():
+    if (MODELS_DIR / "model.onnx").exists() and (
+        MODELS_DIR / "tokenizer.json"
+    ).exists():
         print("Model already exists.")
         return
 

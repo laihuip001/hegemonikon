@@ -98,7 +98,10 @@ def print_boot_summary(mode: str = "standard", context: Optional[str] = None):
 def main():
     parser = argparse.ArgumentParser(description="Boot integration API")
     parser.add_argument(
-        "--mode", choices=["fast", "standard", "detailed"], default="standard", help="Boot mode"
+        "--mode",
+        choices=["fast", "standard", "detailed"],
+        default="standard",
+        help="Boot mode",
     )
     parser.add_argument("--context", type=str, help="Context for search")
     args = parser.parse_args()

@@ -172,7 +172,9 @@ class CCLParser:
         # V[] < 0.3 形式
         match = re.match(r"(V\[\]|E\[\])\s*([<>=]+)\s*([\d.]+)", expr)
         if match:
-            return Condition(var=match.group(1), op=match.group(2), value=float(match.group(3)))
+            return Condition(
+                var=match.group(1), op=match.group(2), value=float(match.group(3))
+            )
         return Condition(var="V[]", op="<", value=0.5)
 
 
@@ -273,7 +275,8 @@ def convergence_loop(context: str):
         """シーケンスを LMQL に変換"""
         steps = "\n".join(
             [
-                f'        "Step {i+1}: /{step.id} を実行"' f'\n        "[STEP_{i}_RESULT]"'
+                f'        "Step {i+1}: /{step.id} を実行"'
+                f'\n        "[STEP_{i}_RESULT]"'
                 for i, step in enumerate(node.steps)
             ]
         )

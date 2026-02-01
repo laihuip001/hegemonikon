@@ -63,7 +63,9 @@ def main():
                     try:
                         print(f"Deleted: {filepath}")
                     except UnicodeEncodeError:
-                        print(f"Deleted: {filepath.encode('ascii', 'replace').decode('ascii')}")
+                        print(
+                            f"Deleted: {filepath.encode('ascii', 'replace').decode('ascii')}"
+                        )
                 except OSError as e:
                     print(f"Error deleting {filepath}: {e}")
             print(f"\nDeleted {len(orphans)} orphan files.")

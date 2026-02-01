@@ -169,7 +169,9 @@ def _determine_status(score: float, drift_count: int) -> AlignmentStatus:
         return AlignmentStatus.MISALIGNED
 
 
-def _generate_suggestions(status: AlignmentStatus, drift_indicators: List[str]) -> List[str]:
+def _generate_suggestions(
+    status: AlignmentStatus, drift_indicators: List[str]
+) -> List[str]:
     """状態に応じた軌道修正提案を生成"""
     suggestions = []
 

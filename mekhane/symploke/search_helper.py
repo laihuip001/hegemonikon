@@ -72,7 +72,9 @@ def main():
     parser.add_argument("query", type=str, help="Search query")
     parser.add_argument("--sophia", action="store_true", help="Search Sophia only")
     parser.add_argument("--kairos", action="store_true", help="Search Kairos only")
-    parser.add_argument("--top-k", type=int, default=5, help="Number of results per source")
+    parser.add_argument(
+        "--top-k", type=int, default=5, help="Number of results per source"
+    )
     args = parser.parse_args()
 
     # Determine sources

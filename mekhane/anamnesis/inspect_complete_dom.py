@@ -106,7 +106,9 @@ async def main():
                                 return attrs;
                             }
                         """)
-                        lines.append(f"  first_child: <{fc_tag}> class='{fc_class[:50]}'")
+                        lines.append(
+                            f"  first_child: <{fc_tag}> class='{fc_class[:50]}'"
+                        )
                         lines.append(f"  first_child_attrs: {fc_attrs}")
 
                         # さらに孫要素
@@ -114,7 +116,9 @@ async def main():
                         if grandchild:
                             gc_tag = await grandchild.evaluate("el => el.tagName")
                             gc_class = await grandchild.get_attribute("class") or ""
-                            lines.append(f"  grandchild: <{gc_tag}> class='{gc_class[:50]}'")
+                            lines.append(
+                                f"  grandchild: <{gc_tag}> class='{gc_class[:50]}'"
+                            )
 
                     # テキストプレビュー
                     preview = text[:100].replace("\n", " ").strip()
@@ -151,7 +155,9 @@ async def main():
 
             for j, el in enumerate(elements[:2]):
                 try:
-                    parent = await el.evaluate("el => el.parentElement?.outerHTML?.slice(0, 200)")
+                    parent = await el.evaluate(
+                        "el => el.parentElement?.outerHTML?.slice(0, 200)"
+                    )
                     lines.append(f"  [{j}] parent: {parent}")
                 except Exception:
                     pass  # TODO: Add proper error handling

@@ -45,7 +45,11 @@ def parse_date(date_str):
 
     match = re.search(r"(\d{4})[.-](\d{2})[.-](\d{2})", str(date_str))
     if match:
-        return f"{match.group(1)}.{match.group(2)}.{match.group(3)}", match.group(1), match.group(2)
+        return (
+            f"{match.group(1)}.{match.group(2)}.{match.group(3)}",
+            match.group(1),
+            match.group(2),
+        )
     return datetime.date.today().strftime("%Y.%m.%d"), "2026", "01"
 
 
@@ -76,7 +80,9 @@ def restore_entry(entry):
     h = html2text.HTML2Text()
     h.ignore_links = False
     article_body = (
-        soup.select_one(".post_content") or soup.select_one("article") or soup.find("body")
+        soup.select_one(".post_content")
+        or soup.select_one("article")
+        or soup.find("body")
     )
     markdown = h.handle(str(article_body)) if article_body else ""
 

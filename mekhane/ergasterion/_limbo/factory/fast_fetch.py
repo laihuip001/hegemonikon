@@ -42,10 +42,14 @@ def main():
         date = date_el.get_text().strip() if date_el else "0000.00.00"
 
         # Extract Content
-        content_el = soup.select_one(".p-entry__content, .c-entry__content, article, .l-main")
+        content_el = soup.select_one(
+            ".p-entry__content, .c-entry__content, article, .l-main"
+        )
         if content_el:
             # Remove unwanted elements
-            for bad in content_el.select("script, style, .sharedaddy, .related-posts, nav"):
+            for bad in content_el.select(
+                "script, style, .sharedaddy, .related-posts, nav"
+            ):
                 bad.decompose()
             html_content = str(content_el)
         else:

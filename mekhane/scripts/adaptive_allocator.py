@@ -22,7 +22,9 @@ from dataclasses import dataclass, asdict, field
 from typing import Optional
 
 # Load perspectives configuration
-PERSPECTIVES_FILE = Path(__file__).parent / "mekhane/ergasterion/synedrion/perspectives.yaml"
+PERSPECTIVES_FILE = (
+    Path(__file__).parent / "mekhane/ergasterion/synedrion/perspectives.yaml"
+)
 
 
 @dataclass
@@ -135,7 +137,10 @@ class AdaptiveAllocator:
             f_lower = f.lower()
 
             # Security-related files
-            if any(k in f_lower for k in ["auth", "security", "token", "credential", "password"]):
+            if any(
+                k in f_lower
+                for k in ["auth", "security", "token", "credential", "password"]
+            ):
                 domains.add("Security")
                 domains.add("Auth")
 
@@ -162,7 +167,9 @@ class AdaptiveAllocator:
                 domains.add("Networking")
 
             # Config
-            if any(k in f_lower for k in ["config", "settings", "env", ".yaml", ".json"]):
+            if any(
+                k in f_lower for k in ["config", "settings", "env", ".yaml", ".json"]
+            ):
                 domains.add("Config")
 
         return list(domains) if domains else ["Architecture"]  # Default
@@ -180,7 +187,13 @@ class AdaptiveAllocator:
 
         # Select axes that complement the domains
         # For code changes, prioritize critical review axes
-        priority_axes = ["O1", "A2", "S2", "H2", "K3"]  # Noēsis, Krisis, Mekhanē, Pistis, Telos
+        priority_axes = [
+            "O1",
+            "A2",
+            "S2",
+            "H2",
+            "K3",
+        ]  # Noēsis, Krisis, Mekhanē, Pistis, Telos
 
         tasks = []
         for domain in domains:
@@ -194,7 +207,9 @@ class AdaptiveAllocator:
                         "perspective_id": f"{domain}-{axis}",
                         "allocation_type": "change_driven",
                         "reason": (
-                            f"変更ファイル: {changed_files[:3]}" if changed_files else "default"
+                            f"変更ファイル: {changed_files[:3]}"
+                            if changed_files
+                            else "default"
                         ),
                     }
                 )
@@ -203,7 +218,9 @@ class AdaptiveAllocator:
 
         return tasks[:budget]
 
-    def allocate_discovery(self, budget: int, excluded_domains: list[str] = None) -> list[dict]:
+    def allocate_discovery(
+        self, budget: int, excluded_domains: list[str] = None
+    ) -> list[dict]:
         """Random sampling for discovery."""
         excluded = set(excluded_domains or [])
         available_domains = [d for d in self.ALL_DOMAINS if d not in excluded]
@@ -292,7 +309,9 @@ class AdaptiveAllocator:
 
     def save_plan(self, plan: AllocationPlan, output_path: Path = None):
         """Save allocation plan to file."""
-        output_path = output_path or self.repo_path / f"allocation_plan_{plan.date[:10]}.json"
+        output_path = (
+            output_path or self.repo_path / f"allocation_plan_{plan.date[:10]}.json"
+        )
 
         with open(output_path, "w", encoding="utf-8") as f:
             json.dump(asdict(plan), f, indent=2, ensure_ascii=False)
@@ -306,9 +325,13 @@ def main():
 
     parser = argparse.ArgumentParser(description="Adaptive Swarm Allocator")
     parser.add_argument("--budget", type=int, default=1800, help="Daily session budget")
-    parser.add_argument("--mode", choices=["all", "change", "discovery", "focus"], default="all")
+    parser.add_argument(
+        "--mode", choices=["all", "change", "discovery", "focus"], default="all"
+    )
     parser.add_argument("--output", help="Output file path")
-    parser.add_argument("--dry-run", action="store_true", help="Show plan without executing")
+    parser.add_argument(
+        "--dry-run", action="store_true", help="Show plan without executing"
+    )
     args = parser.parse_args()
 
     allocator = AdaptiveAllocator()
@@ -318,7 +341,9 @@ def main():
     elif args.mode == "change":
         tasks = allocator.allocate_change_driven(args.budget)
         plan = AllocationPlan(
-            date=datetime.now().isoformat(), total_budget=args.budget, change_driven=tasks
+            date=datetime.now().isoformat(),
+            total_budget=args.budget,
+            change_driven=tasks,
         )
     elif args.mode == "discovery":
         tasks = allocator.allocate_discovery(args.budget)
@@ -328,7 +353,9 @@ def main():
     elif args.mode == "focus":
         tasks = allocator.allocate_weekly_focus(args.budget)
         plan = AllocationPlan(
-            date=datetime.now().isoformat(), total_budget=args.budget, weekly_focus=tasks
+            date=datetime.now().isoformat(),
+            total_budget=args.budget,
+            weekly_focus=tasks,
         )
 
     # Print summary

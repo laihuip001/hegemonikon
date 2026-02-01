@@ -212,7 +212,9 @@ def _make_decision(
     # PASS条件: 純価値がマイナス
     elif net < 0:
         decision = OpportunityDecision.PASS
-        rationale = f"リスク ({expected_risk:.0%}) がリターン ({expected_return:.0%}) を上回る"
+        rationale = (
+            f"リスク ({expected_risk:.0%}) がリターン ({expected_return:.0%}) を上回る"
+        )
     # GO条件: 窓が閉じかけで、純価値がゼロ以上
     elif window == OpportunityWindow.CLOSING and net >= 0:
         decision = OpportunityDecision.GO
@@ -224,7 +226,9 @@ def _make_decision(
     return decision, rationale
 
 
-def _generate_recommendation(decision: OpportunityDecision, window: OpportunityWindow) -> str:
+def _generate_recommendation(
+    decision: OpportunityDecision, window: OpportunityWindow
+) -> str:
     """推奨アクションを生成"""
     if decision == OpportunityDecision.GO:
         if window == OpportunityWindow.CLOSING:
@@ -288,7 +292,9 @@ def detect_opportunity(
     opportunity_cost = _calculate_opportunity_cost(window, action_value)
 
     # Step 4: 判定
-    decision, rationale = _make_decision(expected_return, expected_risk, readiness, window)
+    decision, rationale = _make_decision(
+        expected_return, expected_risk, readiness, window
+    )
 
     # 推奨生成
     recommendation = _generate_recommendation(decision, window)

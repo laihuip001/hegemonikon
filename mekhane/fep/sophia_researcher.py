@@ -102,7 +102,9 @@ def research(
 
     # 派生自動推論
     if derivative is None:
-        if any(w in topic_lower for w in ["論文", "研究", "paper", "research", "study"]):
+        if any(
+            w in topic_lower for w in ["論文", "研究", "paper", "research", "study"]
+        ):
             derivative = SophiaDerivative.ACADEMIC
         elif any(w in topic_lower for w in ["実装", "api", "ライブラリ", "framework"]):
             derivative = SophiaDerivative.TECHNICAL

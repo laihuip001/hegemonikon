@@ -215,7 +215,10 @@ class TestIntegration(unittest.TestCase):
         from prompt_lang_integrate import generate_prompt, STAGING_DIR
 
         filepath, prompt = generate_prompt(
-            slug="_test-gen", role="Test role", goal="test -> pass", constraints=["Test constraint"]
+            slug="_test-gen",
+            role="Test role",
+            goal="test -> pass",
+            constraints=["Test constraint"],
         )
 
         try:
@@ -377,7 +380,11 @@ class TestExtendsAndMixin(unittest.TestCase):
 
     def test_undefined_reference(self):
         """Test that undefined references raise error."""
-        from prompt_lang import parse_all, resolve, ReferenceError as PromptReferenceError
+        from prompt_lang import (
+            parse_all,
+            resolve,
+            ReferenceError as PromptReferenceError,
+        )
 
         content = """#prompt child
 @extends: nonexistent

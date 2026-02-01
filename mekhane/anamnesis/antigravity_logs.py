@@ -58,7 +58,9 @@ class LogSummary:
     def to_dict(self) -> dict:
         return {
             "session_id": self.session_id,
-            "session_start": self.session_start.isoformat() if self.session_start else None,
+            "session_start": (
+                self.session_start.isoformat() if self.session_start else None
+            ),
             "model": self.model,
             "total_requests": self.total_requests,
             "error_count": len(self.errors),
@@ -71,7 +73,9 @@ class AntigravityLogCollector:
     """Antigravity Output パネルログの収集・分析"""
 
     # ログ解析用の正規表現
-    RE_LOG_LINE = re.compile(r"^(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d+) \[(\w+)\] (.+)$")
+    RE_LOG_LINE = re.compile(
+        r"^(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d+) \[(\w+)\] (.+)$"
+    )
     RE_MODEL = re.compile(r"model[:\s]+([a-zA-Z0-9\-_.]+)")
     RE_TOKEN = re.compile(r"current tokens: (\d+),?\s*token limit: (\d+)")
     RE_PLANNER = re.compile(r"Requesting planner with (\d+) chat messages")
@@ -95,7 +99,9 @@ class AntigravityLogCollector:
             return []
 
         sessions = sorted(
-            [d for d in self._log_base.iterdir() if d.is_dir()], key=lambda x: x.name, reverse=True
+            [d for d in self._log_base.iterdir() if d.is_dir()],
+            key=lambda x: x.name,
+            reverse=True,
         )
         return sessions[:limit]
 
@@ -112,7 +118,9 @@ class AntigravityLogCollector:
         if session is None:
             return None
 
-        log_path = session / "window1" / "exthost" / "google.antigravity" / "Antigravity.log"
+        log_path = (
+            session / "window1" / "exthost" / "google.antigravity" / "Antigravity.log"
+        )
         return log_path if log_path.exists() else None
 
     def read_log(self, session: Optional[Path] = None, tail: int = 0) -> list[str]:
@@ -141,7 +149,9 @@ class AntigravityLogCollector:
                 except ValueError:
                     ts = datetime.now()
                 entries.append(
-                    LogEntry(timestamp=ts, level=level.lower(), message=message, raw=line)
+                    LogEntry(
+                        timestamp=ts, level=level.lower(), message=message, raw=line
+                    )
                 )
         return entries
 
@@ -155,7 +165,10 @@ class AntigravityLogCollector:
                 if match:
                     model = match.group(1)
                     # フィルタ: 明らかなモデル名のみ
-                    if any(m in model.lower() for m in ["claude", "gemini", "opus", "sonnet"]):
+                    if any(
+                        m in model.lower()
+                        for m in ["claude", "gemini", "opus", "sonnet"]
+                    ):
                         models.add(model)
         return sorted(models)
 
@@ -185,7 +198,9 @@ class AntigravityLogCollector:
                 model = match.group(1)
                 ts_match = self.RE_LOG_LINE.match(line)
                 ts_str = ts_match.group(1) if ts_match else "unknown"
-                errors.append({"timestamp": ts_str, "model": model, "type": "503_no_capacity"})
+                errors.append(
+                    {"timestamp": ts_str, "model": model, "type": "503_no_capacity"}
+                )
         return errors
 
     def extract_token_usage(self, lines: list[str]) -> Optional[dict]:
@@ -258,7 +273,9 @@ class AntigravityLogCollector:
 
         if summary.get("token_usage"):
             tu = summary["token_usage"]
-            lines.append(f"  Tokens: {tu['current']:,} / {tu['limit']:,} ({tu['percentage']}%)")
+            lines.append(
+                f"  Tokens: {tu['current']:,} / {tu['limit']:,} ({tu['percentage']}%)"
+            )
 
         return "\n".join(lines)
 
@@ -309,7 +326,9 @@ def cmd_logs(args) -> int:
         lines = collector.read_log(session)
         usage = collector.extract_token_usage(lines)
         if usage:
-            print(f"[Tokens] {usage['current']:,} / {usage['limit']:,} ({usage['percentage']}%)")
+            print(
+                f"[Tokens] {usage['current']:,} / {usage['limit']:,} ({usage['percentage']}%)"
+            )
         else:
             print("[Tokens] Not found")
         return 0

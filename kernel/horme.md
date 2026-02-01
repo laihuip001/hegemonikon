@@ -1,9 +1,13 @@
 ---
 doc_id: "HORME_SERIES"
-version: "1.0.0"
+version: "1.1.0"
 tier: "KERNEL"
 status: "CANONICAL"
 created: "2026-01-27"
+updated: "2026-02-01"
+extends:
+  axioms: [L0.FEP, L1.Flow, L1.Value, L1.75.Valence, L1.75.Precision]
+  generation: "L1 × L1.75"
 ---
 
 > **Kernel Doc Index**: [axiom_hierarchy](axiom_hierarchy.md) | [schema](schema.md) | [horme](horme.md) ← 📍 | [perigraphe](perigraphe.md)

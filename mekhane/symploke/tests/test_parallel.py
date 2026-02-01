@@ -63,7 +63,9 @@ async def test_parallel_execution():
         completed = sum(1 for r in results if r.state == SessionState.COMPLETED)
         failed = sum(1 for r in results if r.state == SessionState.FAILED)
         in_progress = sum(
-            1 for r in results if r.state not in (SessionState.COMPLETED, SessionState.FAILED)
+            1
+            for r in results
+            if r.state not in (SessionState.COMPLETED, SessionState.FAILED)
         )
 
         print(f"\n📊 Results:")

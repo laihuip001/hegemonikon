@@ -24,7 +24,9 @@ import lancedb
 from pydantic import BaseModel
 
 # 設定
-MODULES_DIR = Path(r"M:\Brain\99_🗃️_保管庫｜Archive\プロンプト ライブラリー\モジュール（開発用）")
+MODULES_DIR = Path(
+    r"M:\Brain\99_🗃️_保管庫｜Archive\プロンプト ライブラリー\モジュール（開発用）"
+)
 DB_PATH = Path(r"M:\Brain\.hegemonikon\lancedb")
 TABLE_NAME = "dev_modules"
 

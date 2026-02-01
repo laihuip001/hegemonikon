@@ -52,7 +52,9 @@ class JulesError(Exception):
 class RateLimitError(JulesError):
     """Raised when API rate limit is exceeded."""
 
-    def __init__(self, message: str = "Rate limit exceeded", retry_after: int | None = None):
+    def __init__(
+        self, message: str = "Rate limit exceeded", retry_after: int | None = None
+    ):
         super().__init__(message)
         self.retry_after = retry_after
 
@@ -246,7 +248,10 @@ class JulesClient:
         if not self.api_key:
             raise ValueError("API key required. Set JULES_API_KEY or pass api_key.")
 
-        self._headers = {"X-Goog-Api-Key": self.api_key, "Content-Type": "application/json"}
+        self._headers = {
+            "X-Goog-Api-Key": self.api_key,
+            "Content-Type": "application/json",
+        }
         self._shared_session = session
         self._owned_session: Optional[aiohttp.ClientSession] = None
 
@@ -343,7 +348,9 @@ class JulesClient:
             if close_after:
                 await session.close()
 
-    @with_retry(max_attempts=3, retryable_exceptions=(RateLimitError, aiohttp.ClientError))
+    @with_retry(
+        max_attempts=3, retryable_exceptions=(RateLimitError, aiohttp.ClientError)
+    )
     async def create_session(
         self,
         prompt: str,
@@ -367,7 +374,10 @@ class JulesClient:
         """
         payload = {
             "prompt": prompt,
-            "sourceContext": {"source": source, "githubRepoContext": {"startingBranch": branch}},
+            "sourceContext": {
+                "source": source,
+                "githubRepoContext": {"startingBranch": branch},
+            },
             "automationMode": automation_mode,
             "requirePlanApproval": not auto_approve,
         }
@@ -382,7 +392,9 @@ class JulesClient:
             # NOTE: Removed self-assignment: source = source
         )
 
-    @with_retry(max_attempts=3, retryable_exceptions=(RateLimitError, aiohttp.ClientError))
+    @with_retry(
+        max_attempts=3, retryable_exceptions=(RateLimitError, aiohttp.ClientError)
+    )
     async def get_session(self, session_id: str) -> JulesSession:
         """
         Get session status.
@@ -489,7 +501,11 @@ class JulesClient:
         raise TimeoutError(f"Session {session_id} did not complete within {timeout}s")
 
     async def create_and_poll(
-        self, prompt: str, source: str, branch: str = "main", timeout: int = DEFAULT_TIMEOUT
+        self,
+        prompt: str,
+        source: str,
+        branch: str = "main",
+        timeout: int = DEFAULT_TIMEOUT,
     ) -> JulesSession:
         """
         Create session and poll until completion.
@@ -534,7 +550,9 @@ class JulesClient:
         if use_global_semaphore:
             semaphore = self._global_semaphore
         else:
-            limit = max_concurrent if max_concurrent is not None else self.MAX_CONCURRENT
+            limit = (
+                max_concurrent if max_concurrent is not None else self.MAX_CONCURRENT
+            )
             semaphore = asyncio.Semaphore(limit)
 
         async def bounded_execute(task: dict) -> JulesResult:
@@ -622,7 +640,9 @@ class JulesClient:
         # Apply domain filter
         if domains:
             perspectives = [p for p in perspectives if p.domain_id in domains]
-            logger.info(f"Filtered to domains: {domains} ({len(perspectives)} perspectives)")
+            logger.info(
+                f"Filtered to domains: {domains} ({len(perspectives)} perspectives)"
+            )
 
         # Apply axis filter
         if axes:
@@ -630,7 +650,9 @@ class JulesClient:
             logger.info(f"Filtered to axes: {axes} ({len(perspectives)} perspectives)")
 
         if not perspectives:
-            logger.warning("No perspectives match the filters. Returning empty results.")
+            logger.warning(
+                "No perspectives match the filters. Returning empty results."
+            )
             return []
 
         # Generate tasks from perspectives
@@ -660,7 +682,9 @@ class JulesClient:
         for batch_num, i in enumerate(range(0, len(tasks), batch_size), 1):
             batch_tasks = tasks[i : i + batch_size]
 
-            logger.info(f"Batch {batch_num}/{total_batches}: {len(batch_tasks)} perspectives")
+            logger.info(
+                f"Batch {batch_num}/{total_batches}: {len(batch_tasks)} perspectives"
+            )
 
             batch_results = await self.batch_execute(batch_tasks)
             all_results.extend(batch_results)
@@ -672,7 +696,9 @@ class JulesClient:
         # Log summary
         succeeded = sum(1 for r in all_results if r.is_success)
         failed = len(all_results) - succeeded
-        silent = sum(1 for r in all_results if r.is_success and "SILENCE" in str(r.session))
+        silent = sum(
+            1 for r in all_results if r.is_success and "SILENCE" in str(r.session)
+        )
 
         logger.info(
             f"Synedrion review complete: "

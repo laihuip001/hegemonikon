@@ -33,7 +33,9 @@ class MetrikaResult:
 
     @property
     def passed(self) -> bool:
-        return all([self.dokime, self.syntomia, self.prosbasimotes, self.atomos, self.katharos])
+        return all(
+            [self.dokime, self.syntomia, self.prosbasimotes, self.atomos, self.katharos]
+        )
 
 
 @dataclass
@@ -105,18 +107,24 @@ class QualityGate:
         max_nesting = self._measure_nesting(lines)
         if max_nesting > self.MAX_NESTING:
             result.syntomia = False
-            result.violations.append(f"📉 Syntomia: ネスト深度 {max_nesting} > {self.MAX_NESTING}")
+            result.violations.append(
+                f"📉 Syntomia: ネスト深度 {max_nesting} > {self.MAX_NESTING}"
+            )
 
         # Atomos: 行数制限
         if len(lines) > self.MAX_COMPONENT_LINES:
             result.atomos = False
-            result.violations.append(f"⚛️ Atomos: {len(lines)}行 > {self.MAX_COMPONENT_LINES}行")
+            result.violations.append(
+                f"⚛️ Atomos: {len(lines)}行 > {self.MAX_COMPONENT_LINES}行"
+            )
 
         # Katharos: コメントアウトコード検出
         commented_code = self._detect_commented_code(lines)
         if commented_code:
             result.katharos = False
-            result.violations.append(f"💀 Katharos: コメントアウトコード {len(commented_code)}箇所")
+            result.violations.append(
+                f"💀 Katharos: コメントアウトコード {len(commented_code)}箇所"
+            )
 
         return result
 
@@ -251,7 +259,9 @@ class QualityGate:
         chreos = result["chreos"]
         rotten = [c for c in chreos if c.status == "rotten"]
         warning = [c for c in chreos if c.status == "warning"]
-        lines.append(f"⏰ Chreos: {len(chreos)}件 (腐敗: {len(rotten)}, 警告: {len(warning)})")
+        lines.append(
+            f"⏰ Chreos: {len(chreos)}件 (腐敗: {len(rotten)}, 警告: {len(warning)})"
+        )
         for c in rotten:
             lines.append(f"   🔴 L{c.line_number}: {c.description}")
         for c in warning:

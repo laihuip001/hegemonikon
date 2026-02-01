@@ -313,7 +313,9 @@ def encode_noesis_output(
     else:
         confidence = "low"
 
-    return encode_structured_input(context=context, urgency=urgency, confidence=confidence)
+    return encode_structured_input(
+        context=context, urgency=urgency, confidence=confidence
+    )
 
 
 def encode_boulesis_output(
@@ -360,7 +362,9 @@ def encode_boulesis_output(
     # Context clarity from feasibility
     context = "clear" if feasibility_score >= 50 else "ambiguous"
 
-    return encode_structured_input(context=context, urgency=urgency, confidence=confidence)
+    return encode_structured_input(
+        context=context, urgency=urgency, confidence=confidence
+    )
 
 
 def generate_fep_feedback_markdown(
@@ -647,8 +651,22 @@ def get_x_series_recommendations(
         >>> get_x_series_recommendations("O", 0.78)
         [{'x_id': 'X-OS', 'target': 'S', 'workflow': '/s', 'reason': '認識→設計へ'}, ...]
     """
-    WORKFLOW_MAP = {"O": "/noe", "S": "/s", "H": "/pro", "P": "/kho", "K": "/euk", "A": "/dia"}
-    REASON_MAP = {"O": "本質", "S": "設計", "H": "傾向", "P": "環境", "K": "文脈", "A": "検証"}
+    WORKFLOW_MAP = {
+        "O": "/noe",
+        "S": "/s",
+        "H": "/pro",
+        "P": "/kho",
+        "K": "/euk",
+        "A": "/dia",
+    }
+    REASON_MAP = {
+        "O": "本質",
+        "S": "設計",
+        "H": "傾向",
+        "P": "環境",
+        "K": "文脈",
+        "A": "検証",
+    }
 
     if current_series not in X_SERIES_MATRIX:
         return []

@@ -177,7 +177,9 @@ def extract_gnome(
     if any(w in combined for w in ["常に", "普遍", "never", "always", "必ず"]):
         derivative = GnomeDerivative.UNIVERSAL
         generalizability = 0.9
-    elif any(w in combined for w in ["この場合", "特定の", "specifically", "in this case"]):
+    elif any(
+        w in combined for w in ["この場合", "特定の", "specifically", "in this case"]
+    ):
         derivative = GnomeDerivative.DOMAIN
         generalizability = 0.5
     else:

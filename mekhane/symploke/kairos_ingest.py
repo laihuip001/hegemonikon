@@ -63,6 +63,122 @@ def get_handoff_files() -> list[Path]:
     return sorted(files, reverse=True)
 
 
+def parse_conversation(file_path: Path) -> Document:
+    """Parse a conversation log markdown file into a Document.
+    
+    Expected filename: 2026-01-31_conv_50_Implementing O-Series Derivatives.md
+    """
+    content = file_path.read_text(encoding="utf-8")
+    
+    # Extract metadata from filename: YYYY-MM-DD_conv_N_Title.md
+    match = re.match(r"(\d{4}-\d{2}-\d{2})_conv_(\d+)_(.+)\.md", file_path.name)
+    if match:
+        date_str, conv_num, title = match.groups()
+        title = title.replace("_", " ")
+        timestamp = f"{date_str}T00:00:00"
+    else:
+        date_str = datetime.now().strftime("%Y-%m-%d")
+        conv_num = "0"
+        title = file_path.stem
+        timestamp = datetime.now().isoformat()
+    
+    # Extract message count (count ## 🤖 Claude occurrences)
+    msg_count = len(re.findall(r"## 🤖 Claude", content))
+    
+    # Build embedding text: Title + first 2000 chars
+    # タイトルを重複して含めることで検索精度向上
+    embedding_text = f"{title}\n{title}\n{content[:2000]}"
+    
+    return Document(
+        id=f"conv-{date_str}-{conv_num}",
+        content=embedding_text,
+        metadata={
+            "timestamp": timestamp,
+            "type": "conversation",
+            "title": title,
+            "conv_num": int(conv_num),
+            "msg_count": msg_count,
+            "file_path": str(file_path),
+        }
+    )
+
+
+def parse_conversation_chunks(file_path: Path, chunk_size: int = 1500) -> list[Document]:
+    """Parse a conversation into multiple chunks for better search coverage.
+    
+    各ファイルを複数チャンクに分割し、より細かい粒度で検索可能にする。
+    """
+    content = file_path.read_text(encoding="utf-8")
+    
+    # Extract metadata from filename
+    match = re.match(r"(\d{4}-\d{2}-\d{2})_conv_(\d+)_(.+)\.md", file_path.name)
+    if match:
+        date_str, conv_num, title = match.groups()
+        title = title.replace("_", " ")
+        timestamp = f"{date_str}T00:00:00"
+    else:
+        date_str = datetime.now().strftime("%Y-%m-%d")
+        conv_num = "0"
+        title = file_path.stem
+        timestamp = datetime.now().isoformat()
+    
+    msg_count = len(re.findall(r"## 🤖 Claude", content))
+    
+    # Split by message markers (## 🤖 Claude)
+    messages = re.split(r"(?=## 🤖 Claude)", content)
+    messages = [m.strip() for m in messages if m.strip()]
+    
+    # Create chunks
+    chunks = []
+    current_chunk = f"# {title}\n\n"
+    chunk_idx = 0
+    
+    for msg in messages:
+        if len(current_chunk) + len(msg) > chunk_size and len(current_chunk) > 100:
+            chunks.append(Document(
+                id=f"conv-{date_str}-{conv_num}-c{chunk_idx}",
+                content=current_chunk,
+                metadata={
+                    "timestamp": timestamp,
+                    "type": "conversation_chunk",
+                    "title": title,
+                    "conv_num": int(conv_num),
+                    "chunk_idx": chunk_idx,
+                    "msg_count": msg_count,
+                    "file_path": str(file_path),
+                }
+            ))
+            chunk_idx += 1
+            current_chunk = f"# {title}\n\n"
+        current_chunk += msg + "\n\n"
+    
+    # Last chunk
+    if len(current_chunk) > 100:
+        chunks.append(Document(
+            id=f"conv-{date_str}-{conv_num}-c{chunk_idx}",
+            content=current_chunk,
+            metadata={
+                "timestamp": timestamp,
+                "type": "conversation_chunk",
+                "title": title,
+                "conv_num": int(conv_num),
+                "chunk_idx": chunk_idx,
+                "msg_count": msg_count,
+                "file_path": str(file_path),
+            }
+        ))
+    
+    return chunks if chunks else [parse_conversation(file_path)]  # Fallback
+
+
+def get_conversation_files() -> list[Path]:
+    """Get all conversation log files sorted by date (newest first)."""
+    files = list(HANDOFF_DIR.glob("*_conv_*.md"))
+    return sorted(files, reverse=True)
+
+
+
+
 def ingest_to_kairos(docs: list[Document], save_path: str = None) -> int:
     """Ingest documents to Kairos index using real embeddings."""
     from mekhane.symploke.adapters.embedding_adapter import EmbeddingAdapter
@@ -99,8 +215,11 @@ def search_loaded_index(adapter, query: str, top_k: int = 5):
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Ingest handoffs to Kairos index")
+    parser = argparse.ArgumentParser(description="Ingest handoffs and conversations to Kairos index")
     parser.add_argument("--all", action="store_true", help="Ingest all handoff files")
+    parser.add_argument("--conversations", action="store_true", help="Ingest conversation logs")
+    parser.add_argument("--unified", action="store_true", help="Ingest both handoffs and conversations into one index")
+    parser.add_argument("--chunked", action="store_true", help="Use chunked mode for better search coverage")
     parser.add_argument("--file", type=str, help="Ingest specific file")
     parser.add_argument("--dry-run", action="store_true", help="Parse only, don't ingest")
     parser.add_argument("--no-save", action="store_true", help="Don't save index after ingestion")
@@ -122,31 +241,90 @@ def main():
             results = search_loaded_index(adapter, args.search, top_k=5)
             print(f"\n=== Search: {args.search} ===")
             for r in results:
-                print(f"Score: {r.score:.3f} | {r.metadata.get('primary_task', 'N/A')}")
+                doc_type = r.metadata.get('type', 'unknown')
+                if doc_type in ('conversation', 'conversation_chunk'):
+                    label = r.metadata.get('title', 'N/A')
+                    if doc_type == 'conversation_chunk':
+                        label += f" [chunk {r.metadata.get('chunk_idx', '?')}]"
+                else:
+                    label = r.metadata.get('primary_task', 'N/A')
+                print(f"Score: {r.score:.3f} | [{doc_type}] {label}")
                 print(f"  ID: {r.metadata.get('doc_id', 'N/A')}")
                 print(f"  Timestamp: {r.metadata.get('timestamp', 'N/A')}")
                 print()
         return
     
     # Ingest mode
+    docs = []
+    
+    # Collect handoff files
     if args.file:
         files = [Path(args.file)]
+        for f in files:
+            print(f"Parsing: {f.name}")
+            doc = parse_handoff(f)
+            docs.append(doc)
+            print(f"  → {doc.id}: {doc.metadata.get('primary_task', 'N/A')}")
+    elif args.conversations:
+        # Conversation logs
+        files = get_conversation_files()
+        print(f"📝 Found {len(files)} conversation logs")
+        if args.chunked:
+            print("🔀 Using chunked mode for better coverage")
+            for f in files:
+                chunks = parse_conversation_chunks(f)
+                docs.extend(chunks)
+                print(f"  → {f.name}: {len(chunks)} chunks")
+        else:
+            for f in files:
+                print(f"Parsing: {f.name}")
+                doc = parse_conversation(f)
+                docs.append(doc)
+                print(f"  → {doc.id}: {doc.metadata.get('title', 'N/A')} ({doc.metadata.get('msg_count', 0)} msgs)")
     elif args.all:
+        # Handoffs only (use --conversations for conv logs)
         files = get_handoff_files()
+        for f in files:
+            print(f"Parsing: {f.name}")
+            doc = parse_handoff(f)
+            docs.append(doc)
+            print(f"  → {doc.id}: {doc.metadata.get('primary_task', 'N/A')}")
+    elif hasattr(args, 'unified') and args.unified:
+        # 統合モード: Handoff + 会話ログを一つのインデックスに
+        print("🔗 Unified mode: Handoffs + Conversations")
+        
+        # Handoffs
+        handoff_files = get_handoff_files()
+        print(f"📋 Found {len(handoff_files)} handoffs")
+        for f in handoff_files:
+            doc = parse_handoff(f)
+            docs.append(doc)
+        
+        # Conversations (chunked)
+        conv_files = get_conversation_files()
+        print(f"📝 Found {len(conv_files)} conversations")
+        if args.chunked:
+            for f in conv_files:
+                chunks = parse_conversation_chunks(f)
+                docs.extend(chunks)
+        else:
+            for f in conv_files:
+                doc = parse_conversation(f)
+                docs.append(doc)
+        
+        print(f"📊 Total: {len(docs)} documents")
     else:
-        # Default: latest only
+        # Default: latest handoff only
         files = get_handoff_files()[:1]
+        for f in files:
+            print(f"Parsing: {f.name}")
+            doc = parse_handoff(f)
+            docs.append(doc)
+            print(f"  → {doc.id}: {doc.metadata.get('primary_task', 'N/A')}")
     
-    if not files:
-        print("No handoff files found")
+    if not docs:
+        print("No files found")
         return
-    
-    docs = []
-    for f in files:
-        print(f"Parsing: {f.name}")
-        doc = parse_handoff(f)
-        docs.append(doc)
-        print(f"  → {doc.id}: {doc.metadata.get('primary_task', 'N/A')}")
     
     if args.dry_run:
         print(f"\n[Dry run] Would ingest {len(docs)} documents")

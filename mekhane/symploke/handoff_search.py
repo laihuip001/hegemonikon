@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 # PROOF: [L2/インフラ] A0→知識管理が必要→handoff_search が担う
 """
-Handoff Search - /boot 時に関連 Handoff を検索
+Handoff & Conversation Search - /boot 時に関連 Handoff と会話ログを検索
 
 Usage:
-    python handoff_search.py "query"                # Similar handoffs
+    python handoff_search.py "query"                # Similar handoffs + conversations
     python handoff_search.py --latest               # Show latest handoff
     python handoff_search.py --recent 3             # Show 3 most recent
 """
@@ -13,17 +13,23 @@ import sys
 import argparse
 from pathlib import Path
 from typing import List, Tuple
+from datetime import datetime, timedelta
 
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
-from mekhane.symploke.kairos_ingest import get_handoff_files, parse_handoff
+from mekhane.symploke.kairos_ingest import (
+    get_handoff_files, parse_handoff,
+    get_conversation_files, parse_conversation
+)
 from mekhane.symploke.adapters.embedding_adapter import EmbeddingAdapter
 from mekhane.symploke.indices import Document
 
 
 # Handoff インデックスの永続化パス
 HANDOFF_INDEX_PATH = Path("/home/laihuip001/oikos/mneme/.hegemonikon/indices/handoffs.pkl")
+# 会話ログインデックスの永続化パス (Kairos と共有)
+CONVERSATION_INDEX_PATH = Path("/home/laihuip001/oikos/mneme/.hegemonikon/indices/kairos.pkl")
 
 
 def load_handoffs() -> List[Document]:
@@ -73,6 +79,47 @@ def load_handoff_index() -> EmbeddingAdapter:
     return adapter
 
 
+# スコア調整設定
+SCORE_BOOST = {
+    "handoff": 0.08,           # 構造化された総括は価値が高い
+    "conversation": 0.0,       # 生の会話は基準値
+    "conversation_chunk": 0.0, # チャンクも基準値
+}
+
+
+def adjust_score(score: float, doc_type: str) -> float:
+    """タイプに基づいてスコアを調整する。
+    
+    Handoff は構造化された総括なので、生の会話より価値が高いとみなす。
+    時間減衰は実装しない（原則・洞察の価値は時間に依存しない）。
+    """
+    boost = SCORE_BOOST.get(doc_type, 0.0)
+    return min(1.0, score + boost)
+
+
+def extract_keywords(doc: Document, max_keywords: int = 5) -> List[str]:
+    """Handoff からキーワードを抽出（Proactive Recall 用）"""
+    content = doc.content
+    keywords = []
+    
+    # primary_task をキーワードとして抽出
+    primary_task = doc.metadata.get("primary_task", "")
+    if primary_task:
+        keywords.append(primary_task)
+    
+    # 日本語の重要そうなキーワードを抽出（簡易版）
+    import re
+    # カタカナ語を抽出
+    katakana = re.findall(r'[ァ-ヴー]{3,}', content)
+    keywords.extend(katakana[:3])
+    
+    # 英語の重要そうな語を抽出
+    english = re.findall(r'[A-Z][a-z]+(?:[A-Z][a-z]+)*', content)
+    keywords.extend(english[:3])
+    
+    return list(set(keywords))[:max_keywords]
+
+
 def search_handoffs(query: str, top_k: int = 5) -> List[Tuple[Document, float]]:
     """Search handoffs by semantic similarity using cached index."""
     docs = load_handoffs()
@@ -103,7 +150,7 @@ def search_handoffs(query: str, top_k: int = 5) -> List[Tuple[Document, float]]:
 
 def get_boot_handoffs(mode: str = "standard", context: str = None) -> dict:
     """
-    /boot 統合 API: モードに応じた Handoff を返す
+    /boot 統合 API: モードに応じた Handoff と会話ログを返す
     
     Args:
         mode: "fast" (/boot-), "standard" (/boot), "detailed" (/boot+)
@@ -113,7 +160,8 @@ def get_boot_handoffs(mode: str = "standard", context: str = None) -> dict:
         dict: {
             "latest": Document,           # 最新の Handoff
             "related": List[Document],    # 関連する Handoff
-            "count": int                  # 関連件数
+            "conversations": List[Document],  # 関連する会話ログ ← NEW
+            "count": int                  # 関連件数 (handoff + conversation)
         }
     """
     # モードによる関連件数
@@ -123,28 +171,79 @@ def get_boot_handoffs(mode: str = "standard", context: str = None) -> dict:
         "detailed": 10   # /boot+ : 最新 + 関連 10
     }.get(mode, 3)
     
+    conv_count = {
+        "fast": 0,       # /boot- : なし
+        "standard": 2,   # /boot  : 関連会話 2
+        "detailed": 5    # /boot+ : 関連会話 5
+    }.get(mode, 2)
+    
     docs = load_handoffs()
     if not docs:
-        return {"latest": None, "related": [], "count": 0}
+        return {"latest": None, "related": [], "conversations": [], "count": 0}
     
     latest = docs[0]
     
-    # 関連検索
+    # 検索クエリ
+    query = context or latest.metadata.get("primary_task", latest.content[:200])
+    
+    # 関連 Handoff 検索
     related = []
-    if related_count > 0 and context:
-        results = search_handoffs(context, top_k=related_count + 1)
-        # 最新を除外
-        related = [doc for doc, score in results if doc.id != latest.id][:related_count]
-    elif related_count > 0:
-        # コンテキストなしの場合は最新から抽出
-        query = latest.metadata.get("primary_task", latest.content[:200])
+    if related_count > 0:
         results = search_handoffs(query, top_k=related_count + 1)
         related = [doc for doc, score in results if doc.id != latest.id][:related_count]
+    
+    # 関連会話ログ検索 (Kairos Index を使用)
+    conversations = []
+    if conv_count > 0 and CONVERSATION_INDEX_PATH.exists():
+        try:
+            adapter = EmbeddingAdapter(model_name="all-MiniLM-L6-v2")
+            adapter.load(str(CONVERSATION_INDEX_PATH))
+            query_vec = adapter.encode([query])[0]
+            results = adapter.search(query_vec, k=conv_count)
+            
+            # ファイルパスからドキュメントを再構築
+            for r in results:
+                file_path = r.metadata.get("file_path")
+                if file_path and Path(file_path).exists():
+                    doc = parse_conversation(Path(file_path))
+                    # スコア調整を適用
+                    adjusted_score = adjust_score(r.score, "conversation")
+                    doc.metadata["score"] = adjusted_score
+                    doc.metadata["raw_score"] = r.score
+                    conversations.append(doc)
+        except Exception as e:
+            print(f"⚠️ Conversation search error: {e}")
+    
+    # Proactive Recall: 最新 Handoff からキーワードを抽出し、追加検索
+    proactive_memories = []
+    if mode == "detailed" and latest:
+        keywords = extract_keywords(latest)
+        if keywords and CONVERSATION_INDEX_PATH.exists():
+            try:
+                proactive_query = " ".join(keywords[:3])
+                adapter = EmbeddingAdapter(model_name="all-MiniLM-L6-v2")
+                adapter.load(str(CONVERSATION_INDEX_PATH))
+                query_vec = adapter.encode([proactive_query])[0]
+                results = adapter.search(query_vec, k=3)
+                
+                for r in results:
+                    file_path = r.metadata.get("file_path")
+                    if file_path and Path(file_path).exists():
+                        # 重複チェック
+                        if not any(c.metadata.get("file_path") == file_path for c in conversations):
+                            doc = parse_conversation(Path(file_path))
+                            doc.metadata["score"] = adjust_score(r.score, "conversation")
+                            doc.metadata["proactive"] = True  # Proactive Recall でヒット
+                            proactive_memories.append(doc)
+            except Exception as e:
+                pass  # Proactive は失敗しても問題なし
     
     return {
         "latest": latest,
         "related": related,
-        "count": len(related)
+        "conversations": conversations,
+        "proactive": proactive_memories,  # NEW: Proactive Recall 結果
+        "count": len(related) + len(conversations) + len(proactive_memories)
     }
 
 
@@ -164,11 +263,31 @@ def format_boot_output(result: dict, verbose: bool = False) -> str:
             lines.append(f"  内容: {doc.content[:300]}...")
         lines.append("")
     
-    if result["related"]:
-        lines.append(f"🔗 関連 Handoff ({result['count']}件):")
+    if result.get("related"):
+        lines.append(f"🔗 関連 Handoff ({len(result['related'])}件):")
         for doc in result["related"]:
             lines.append(f"  • {doc.metadata.get('primary_task', doc.id)}")
             lines.append(f"    時刻: {doc.metadata.get('timestamp', 'Unknown')}")
+        lines.append("")
+    
+    # NEW: 会話ログ表示
+    if result.get("conversations"):
+        lines.append(f"💬 関連する過去の会話 ({len(result['conversations'])}件):")
+        for doc in result["conversations"]:
+            score = doc.metadata.get("score", 0)
+            msg_count = doc.metadata.get("msg_count", 0)
+            title = doc.metadata.get("title", doc.id)
+            lines.append(f"  • {title} ({msg_count} msgs, score: {score:.2f})")
+            lines.append(f"    ID: {doc.id}")
+        lines.append("")
+    
+    # NEW: Proactive Recall 表示
+    if result.get("proactive"):
+        lines.append(f"🧠 自動浮上した記憶 ({len(result['proactive'])}件):")
+        for doc in result["proactive"]:
+            score = doc.metadata.get("score", 0)
+            title = doc.metadata.get("title", doc.id)
+            lines.append(f"  ✨ {title} (score: {score:.2f})")
     
     return "\n".join(lines)
 

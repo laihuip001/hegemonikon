@@ -1,0 +1,48 @@
+{
+  "ccl": "/sop+ |> /zet+",
+  "plan": {
+    "type": "pipeline",
+    "elements": [
+      "/sop+",
+      "/zet+"
+    ]
+  },
+  "results": [
+    {
+      "status": "success",
+      "ccl": "/sop+",
+      "thread": "perplexity",
+      "answer": "**A multi-agent AI framework is a system where multiple autonomous AI agents collaborate, communicate, and coordinate within a shared environment to solve complex tasks that single agents cannot handle efficiently.**[1][2][3]\n\nThese frameworks distribute workloads across specialized agents, each with autonomy for decision-making, local views of the environment, and abilities to interact via protocols or middleware, enabling scalability, adaptability, and robustness.[2][3][4] Core components include:\n- **Agents**: Independent entities handling specific roles, like query resolution or data analysis, equipped with reasoning, tools, and memory.[1][2][5]\n- **Environment**: Shared space where agents perceive, act, and adapt.[2][3]\n- **Interaction mechanisms**: Protocols for communication, collaboration, negotiation, or competition to achieve individual or collective goals.[1][2][3]\n\n### Key Features and Benefits\nMulti-agent systems excel over single-agent setups in handling dynamic, large-scale problems through:\n- **Collaboration and specialization**: Agents divide tasks (e.g., researcher + critic in workflows), improving accuracy and efficiency.[1][2][4][5]\n- **Scalability**: Add agents without performance loss, like modular LEGO builds.[2][4]\n- **Real-time adaptability**: Features like multi-modal interaction, error handling, and integration with external tools.[1]\n- **Advanced techniques**: Meta-learning for quick adaptation and multi-agent reinforcement learning (MARL) for coordinated learning.[4]\n\n| Aspect | Single-Agent AI | Multi-Agent AI |\n|--------|-----------------|---------------|\n| **Task Handling** | Simple, isolated tasks (e.g., basic chatbot).[2][4] | Complex, dynamic challenges (e.g., traffic optimization).[2][4] |\n| **Adaptability** | Static environments.[4] | Real-time role adjustments.[4] |\n| **Scalability** | Limited.[4] | High, via agent addition.[2][4] |\n| **Examples** | Fraud detection.[2] | Warehouse robots or autonomous fleets.[4] |\n\n### Popular Frameworks and Implementations\n- **LangChain, LangGraph, OpenAI API**: For building collaborative, data-driven agents.[1][6]\n- **Ema’s agentic framework**: Enterprise-focused for workflow automation.[1]\n- **Microsoft Agent Framework**: Open-source for .NET/Python multi-agent workflows.[7]\n- **Multi-agent LLMs**: Task decomposition into subtasks, agent execution with communication, and result synthesis (e.g., for 2025 workflows).[5]\n- Others like Anthropic's research systems handle tool failures gracefully.[8]\n\n### Challenges\nImplementation hurdles include designing robust communication, managing decentralization, and ensuring coordination without a central controller, especially in large-scale or competitive scenarios.[1][3] LLM-based systems add sophistication but require careful orchestration.[3][5]",
+      "citations": [
+        "https://www.ema.co/additional-blogs/addition-blogs/understanding-multi-agent-ai-frameworks",
+        "https://cloud.google.com/discover/what-is-a-multi-agent-system",
+        "https://en.wikipedia.org/wiki/Multi-agent_system",
+        "https://www.newhorizons.com/resources/blog/multi-agent-ai",
+        "https://www.superannotate.com/blog/multi-agent-llms",
+        "https://getstream.io/blog/multiagent-ai-frameworks/",
+        "https://learn.microsoft.com/en-us/agent-framework/overview/agent-framework-overview",
+        "https://www.anthropic.com/engineering/multi-agent-research-system"
+      ],
+      "cost": 0.00298
+    },
+    {
+      "status": "success",
+      "ccl": "/zet+",
+      "thread": "perplexity",
+      "answer": "A **multi-agent AI framework** is a system where multiple autonomous AI agents work together collaboratively to achieve common goals and solve complex tasks that exceed the capability of any single agent.[1][3]\n\n## Core Components\n\nEach agent in the framework is an **autonomous entity with a specific function or role**.[1] These agents are equipped with decision-making capabilities powered by Large Language Models (LLMs), enabling them to analyze data, set priorities, and take action based on their environment.[3][4] For example, in a customer service framework, one agent might handle queries, another manages tickets, and another handles escalation.[1]\n\nThe framework relies on several key elements working together:\n\n- **Communication protocols**: Agents communicate model-to-model in natural language for reasoning and coordination, and code-to-code for secure data exchange.[5]\n- **Coordination and planning mechanisms**: These ensure agents align their actions toward a common goal without duplicating efforts, either through centralized oversight or decentralized coordination following shared rules.[1][2]\n- **Orchestration layer**: A central coordinator or agent orchestrator manages workflows while specialized agents collaborate.[6]\n- **Tool and external system integration**: Agents connect with external tools and MCP servers to perform actions and gather data.[2]\n\n## Key Characteristics\n\nMulti-agent systems feature **autonomy, collaboration, and scalability**.[3] Each agent operates independently within its domain while maintaining constant communication and shared situational awareness with other agents.[6] As workflows become more complex, the system scales by adding more specialized agents rather than retraining a single model.[3]\n\nThese frameworks support **real-time decision-making, error handling, and composability**, allowing workflows to be nested or combined to create more complex processes.[1][2] The modular approach provides resilience—if one agent needs updating, others continue operating.[5]",
+      "citations": [
+        "https://www.ema.co/additional-blogs/addition-blogs/understanding-multi-agent-ai-frameworks",
+        "https://learn.microsoft.com/en-us/agent-framework/overview/agent-framework-overview",
+        "https://aisera.com/blog/multi-agent-ai-system/",
+        "https://indatalabs.com/blog/multi-agent-ai",
+        "https://www.cognizant.com/us/en/ai-lab/blog/demystifying-multi-agent-system",
+        "https://www.ml6.eu/en/blog/multi-agent-ai-systems-where-they-shine-and-how-they-work-together",
+        "https://smythos.com/developers/agent-development/multi-agent-systems-frameworks/",
+        "https://www.ibm.com/think/topics/multiagent-system",
+        "https://www.anthropic.com/engineering/multi-agent-research-system"
+      ],
+      "cost": 0.00207
+    }
+  ],
+  "timestamp": "2026-02-01T10:21:14.748529"
+}

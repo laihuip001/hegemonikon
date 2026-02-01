@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/インフラ] <- synergeia/ Interactive Coordinator
 """
 Synergeia Interactive Coordinator
 ==================================

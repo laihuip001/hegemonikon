@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# PROOF: [L2/インフラ]
+# PROOF: [L2/インフラ] <- synergeia/ Claude API Client
 """
 Claude API Client for Synergeia
 ================================

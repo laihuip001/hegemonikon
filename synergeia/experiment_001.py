@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L3/実験] <- synergeia/ Parallel CCL Experiment
 """
 Synergeia Experiment 001: 並列CCL実行
 ======================================

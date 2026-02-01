@@ -30,7 +30,7 @@ async def main():
                         buttons = await pg.query_selector_all('button.select-none')
                         agent_pages.append((pg, len(buttons)))
                         print(f"[*] Found jetski-agent page: {len(buttons)} buttons")
-                    except:
+                    except Exception:
                         pass
         
         if not agent_pages:
@@ -59,7 +59,7 @@ async def main():
                         clicked = True
                         lines.append(f"Clicked: {title[:60]}\n")
                         break
-            except:
+            except Exception:
                 continue
         
         if not clicked:
@@ -86,7 +86,7 @@ async def main():
                 if text and len(text) > 500:
                     classes = await el.get_attribute('class') or ""
                     large_scrolls.append((el, classes, len(text)))
-            except:
+            except Exception:
                 pass
         
         large_scrolls.sort(key=lambda x: x[2], reverse=True)
@@ -123,7 +123,7 @@ async def main():
                     if c_text and c_len > 0:
                         preview = c_text[:100].replace('\n', ' ').strip()
                         lines.append(f"        preview: '{preview}'")
-                except:
+                except Exception:
                     pass
         
         # 3. .prose/.markdown を探す
@@ -137,7 +137,7 @@ async def main():
                 lines.append(f"      parent_class='{parent_class[:60]}'")
                 if text:
                     lines.append(f"      preview: '{text[:100].replace(chr(10), ' ')}'")
-            except:
+            except Exception:
                 pass
         
         # 4. data-testid を持つ要素
@@ -150,7 +150,7 @@ async def main():
                 text = await el.text_content()
                 text_preview = (text[:50] + "...") if text and len(text) > 50 else (text or "")
                 lines.append(f"  [{i}] <{tag}> testid='{testid}' text='{text_preview.replace(chr(10), ' ')}'")
-            except:
+            except Exception:
                 pass
         
         # ファイルに書き込み

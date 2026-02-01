@@ -26,7 +26,7 @@ def extract_strings(filepath: Path, min_length: int = 20):
         try:
             text = match.group().decode('ascii')
             strings.append(('ascii', text))
-        except:
+        except Exception:
             pass
     
     # UTF-8 文字列 (日本語を含む)
@@ -45,7 +45,7 @@ def extract_strings(filepath: Path, min_length: int = 20):
                             strings.append(('utf8', text))
                             pos = end
                             break
-                except:
+                except Exception:
                     break
         pos += 1
     

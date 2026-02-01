@@ -31,7 +31,7 @@ async def main():
                     try:
                         buttons = await pg.query_selector_all('button.select-none')
                         agent_pages.append((pg, len(buttons)))
-                    except:
+                    except Exception:
                         pass
         
         if not agent_pages:
@@ -57,7 +57,7 @@ async def main():
                         await asyncio.sleep(3)
                         lines.append(f"Clicked: {title[:60]}\n")
                         break
-            except:
+            except Exception:
                 continue
         
         # 1. User/Claude 区別の調査
@@ -147,7 +147,7 @@ async def main():
                 try:
                     parent = await el.evaluate("el => el.parentElement?.outerHTML?.slice(0, 200)")
                     lines.append(f"  [{j}] parent: {parent}")
-                except:
+                except Exception:
                     pass
         
         # 3. data-testid を持つ要素の調査
@@ -160,7 +160,7 @@ async def main():
                 testid = await el.get_attribute('data-testid')
                 if testid:
                     testid_counts[testid] = testid_counts.get(testid, 0) + 1
-            except:
+            except Exception:
                 pass
         
         for testid, count in sorted(testid_counts.items(), key=lambda x: -x[1])[:20]:

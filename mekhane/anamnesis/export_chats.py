@@ -369,7 +369,7 @@ class AntigravityChatExporter:
                 try:
                     idx_num = int(section_idx)
                     role = "user" if idx_num % 2 == 0 else "assistant"
-                except:
+                except Exception:
                     pass
             
             messages.append({
@@ -542,7 +542,7 @@ class AntigravityChatExporter:
                         try:
                             idx_num = int(section_idx)
                             role = "user" if idx_num % 2 == 0 else "assistant"
-                        except:
+                        except Exception:
                             pass
                     
                     messages.append({
@@ -591,7 +591,7 @@ class AntigravityChatExporter:
                     # ネットワーク安定化を待機（最大15秒）
                     try:
                         await self.page.wait_for_load_state('networkidle', timeout=15000)
-                    except:
+                    except Exception:
                         print("    [!] Network idle timeout, proceeding...")
                     
                     # 初期待機（UI安定化）
@@ -603,7 +603,7 @@ class AntigravityChatExporter:
                             '.flex.flex-col.gap-y-3.px-4.relative > div',
                             timeout=10000
                         )
-                    except:
+                    except Exception:
                         print("    [!] Message container selector timeout, proceeding...")
                     
                     # コンテンツ変化を待機（最大15秒、500ms間隔でチェック）

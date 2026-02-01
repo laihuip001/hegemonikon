@@ -103,7 +103,7 @@ class JulesResultCollector:
                 t1 = dt_parser.parse(created)
                 t2 = dt_parser.parse(updated)
                 duration = int((t2 - t1).total_seconds())
-            except:
+            except Exception:
                 pass
         
         # Check if silent (no output = no issues found)

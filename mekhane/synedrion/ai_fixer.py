@@ -172,10 +172,10 @@ class AIFixer:
         fixes = []
         
         replacements = [
-            ('asyncio.get_event_loop()', 'asyncio.get_running_loop()'),
-            ('collections.Mapping', 'collections.abc.Mapping'),
-            ('collections.MutableMapping', 'collections.abc.MutableMapping'),
-            ('collections.Iterable', 'collections.abc.Iterable'),
+            ('asyncio.get_running_loop()', 'asyncio.get_running_loop()'),
+            ('collections.abc.Mapping', 'collections.abc.Mapping'),
+            ('collections.abc.MutableMapping', 'collections.abc.MutableMapping'),
+            ('collections.abc.Iterable', 'collections.abc.Iterable'),
         ]
         
         for i, line in enumerate(lines):

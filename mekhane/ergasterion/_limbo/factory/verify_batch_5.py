@@ -23,7 +23,7 @@ with open(r'C:\Users\raikh\Forge\Raw\aidb\_index\manifest_batch_5.jsonl', 'r', e
             try:
                 data = json.loads(line)
                 actual_urls.add(data['url'])
-            except:
+            except Exception:
                 pass
 
 print(f"Actual count: {len(actual_urls)}")

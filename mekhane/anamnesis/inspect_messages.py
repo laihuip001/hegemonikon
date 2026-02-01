@@ -93,7 +93,7 @@ async def main():
                         classes = await el.get_attribute('class') or ""
                         text = await el.text_content()
                         lines.append(f"  [{i}] <{tag}> class='{classes[:80]}' text_len={len(text) if text else 0}")
-            except:
+            except Exception:
                 pass
         
         # 3. テキストが長いdivを探す（メッセージコンテナ候補）
@@ -108,7 +108,7 @@ async def main():
                     classes = await div.get_attribute('class') or ""
                     children = await div.evaluate("el => el.children.length")
                     large_divs.append((classes, len(text), children))
-            except:
+            except Exception:
                 pass
         
         large_divs.sort(key=lambda x: x[1], reverse=True)
@@ -135,7 +135,7 @@ async def main():
                 lines.append(f"  [{i}] <{tag}> testid='{testid}' msg_id='{msg_id}' role='{role}'")
                 lines.append(f"       class='{classes[:60]}'")
                 lines.append(f"       text='{text_preview}'")
-            except:
+            except Exception:
                 pass
         
         # 書き込み

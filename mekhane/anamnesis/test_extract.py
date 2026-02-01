@@ -84,7 +84,7 @@ async def extract_messages(page):
                 messages.append({"role": role, "content": clean[:3000]})
                 print(f"    Extracted: {role} ({len(clean)} chars)")
                 
-            except:
+            except Exception:
                 continue
         
         return messages
@@ -110,7 +110,7 @@ async def main():
                     try:
                         buttons = await pg.query_selector_all('button.select-none')
                         agent_pages.append((pg, len(buttons)))
-                    except:
+                    except Exception:
                         pass
         
         if not agent_pages:
@@ -136,7 +136,7 @@ async def main():
                         await btn.click(force=True)
                         await asyncio.sleep(3)
                         break
-            except:
+            except Exception:
                 continue
         
         if not conv_title:

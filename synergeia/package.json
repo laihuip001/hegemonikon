@@ -1,0 +1,15 @@
+{
+  "name": "synergeia",
+  "version": "1.0.0",
+  "description": "> **協働による認知処理の最適化**",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@anthropic-ai/claude-code": "^2.1.29"
+  }
+}

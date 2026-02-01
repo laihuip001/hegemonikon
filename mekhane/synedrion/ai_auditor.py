@@ -52,7 +52,7 @@ class AIAuditor:
     
     # Known standard library modules (comprehensive)
     STDLIB_MODULES = {
-        'os', 'sys', 'io', 're', 'json', 'csv', 'math', 'random',
+        'ast', 'os', 'sys', 'io', 're', 'json', 'csv', 'math', 'random',
         'datetime', 'time', 'collections', 'itertools', 'functools',
         'pathlib', 'typing', 'enum', 'dataclasses', 'abc',
         'asyncio', 'aiohttp', 'logging', 'unittest', 'pytest',
@@ -107,18 +107,29 @@ class AIAuditor:
             ))
             return AuditResult(file_path=file_path, issues=self.issues)
         
-        # Run all checks
+        # Run all checks (22 axes)
         self._check_ai_001_naming_hallucination()
+        self._check_ai_002_api_misuse()
+        self._check_ai_003_type_confusion()
+        self._check_ai_004_logic_hallucination()
         self._check_ai_005_incomplete_code()
+        self._check_ai_006_context_drift()
+        self._check_ai_007_pattern_inconsistency()
         self._check_ai_008_self_contradiction()
         self._check_ai_009_security_vulnerabilities()
         self._check_ai_010_input_validation()
+        self._check_ai_011_boundary_condition()
+        self._check_ai_012_async_misuse()
+        self._check_ai_013_concurrency_issues()
         self._check_ai_014_excessive_comment()
+        self._check_ai_015_copy_paste_error()
         self._check_ai_016_dead_code()
         self._check_ai_017_magic_number()
         self._check_ai_018_hardcoded_path()
+        self._check_ai_019_deprecated_api()
         self._check_ai_020_exception_swallowing()
         self._check_ai_021_resource_leak()
+        self._check_ai_022_test_coverage_gap()
         
         return AuditResult(file_path=file_path, issues=self.issues)
     
@@ -152,6 +163,145 @@ class AIAuditor:
                             line=node.lineno,
                             message=f"Unknown module '{node.module}' - verify it exists",
                         ))
+    
+    # ─────────────────────────────────────────────────────────────
+    # AI-002: API Misuse
+    # ─────────────────────────────────────────────────────────────
+    def _check_ai_002_api_misuse(self):
+        """Check for common API misuse patterns."""
+        for node in ast.walk(self.tree):
+            if isinstance(node, ast.Call):
+                # json.loads() on already-parsed object
+                if isinstance(node.func, ast.Attribute) and node.func.attr == 'loads':
+                    if node.args and isinstance(node.args[0], ast.Dict):
+                        self.issues.append(Issue(
+                            code="AI-002",
+                            name="API Misuse",
+                            severity=Severity.MEDIUM,
+                            line=node.lineno,
+                            message="json.loads() called on dict literal",
+                            suggestion="Remove json.loads(), already a dict",
+                        ))
+                
+                # list() on already-list
+                if isinstance(node.func, ast.Name) and node.func.id == 'list':
+                    if node.args and isinstance(node.args[0], ast.List):
+                        self.issues.append(Issue(
+                            code="AI-002",
+                            name="API Misuse",
+                            severity=Severity.LOW,
+                            line=node.lineno,
+                            message="list() called on list literal",
+                        ))
+                
+                # str.split() followed by str.join()
+                if isinstance(node.func, ast.Attribute) and node.func.attr == 'join':
+                    if node.args and isinstance(node.args[0], ast.Call):
+                        inner = node.args[0]
+                        if isinstance(inner.func, ast.Attribute) and inner.func.attr == 'split':
+                            self.issues.append(Issue(
+                                code="AI-002",
+                                name="API Misuse",
+                                severity=Severity.LOW,
+                                line=node.lineno,
+                                message="Unnecessary split/join pattern",
+                                suggestion="Consider str.replace() instead",
+                            ))
+    
+    # ─────────────────────────────────────────────────────────────
+    # AI-003: Type Confusion
+    # ─────────────────────────────────────────────────────────────
+    def _check_ai_003_type_confusion(self):
+        """Check for type confusion patterns."""
+        for node in ast.walk(self.tree):
+            # Comparing different types
+            if isinstance(node, ast.Compare):
+                if node.comparators:
+                    left_type = type(node.left).__name__
+                    right_type = type(node.comparators[0]).__name__
+                    
+                    # String vs Number comparison
+                    if isinstance(node.left, ast.Constant) and isinstance(node.comparators[0], ast.Constant):
+                        left_val = node.left.value
+                        right_val = node.comparators[0].value
+                        if isinstance(left_val, str) and isinstance(right_val, (int, float)):
+                            self.issues.append(Issue(
+                                code="AI-003",
+                                name="Type Confusion",
+                                severity=Severity.HIGH,
+                                line=node.lineno,
+                                message="String compared with number",
+                            ))
+                        elif isinstance(left_val, (int, float)) and isinstance(right_val, str):
+                            self.issues.append(Issue(
+                                code="AI-003",
+                                name="Type Confusion",
+                                severity=Severity.HIGH,
+                                line=node.lineno,
+                                message="Number compared with string",
+                            ))
+            
+            # len() == True/False (should be > 0 or == 0)
+            if isinstance(node, ast.Compare):
+                if isinstance(node.left, ast.Call):
+                    if isinstance(node.left.func, ast.Name) and node.left.func.id == 'len':
+                        for comp in node.comparators:
+                            if isinstance(comp, ast.Constant) and comp.value in (True, False):
+                                self.issues.append(Issue(
+                                    code="AI-003",
+                                    name="Type Confusion",
+                                    severity=Severity.MEDIUM,
+                                    line=node.lineno,
+                                    message="len() compared with boolean",
+                                    suggestion="Use len() > 0 or len() == 0",
+                                ))
+    
+    # ─────────────────────────────────────────────────────────────
+    # AI-004: Logic Hallucination
+    # ─────────────────────────────────────────────────────────────
+    def _check_ai_004_logic_hallucination(self):
+        """Check for implausible logic patterns."""
+        for node in ast.walk(self.tree):
+            # Division by literal zero
+            if isinstance(node, ast.BinOp) and isinstance(node.op, (ast.Div, ast.FloorDiv, ast.Mod)):
+                if isinstance(node.right, ast.Constant) and node.right.value == 0:
+                    self.issues.append(Issue(
+                        code="AI-004",
+                        name="Logic Hallucination",
+                        severity=Severity.CRITICAL,
+                        line=node.lineno,
+                        message="Division by zero",
+                    ))
+            
+            # Infinite loop: while True without break
+            if isinstance(node, ast.While):
+                if isinstance(node.test, ast.Constant) and node.test.value is True:
+                    has_break = any(isinstance(n, ast.Break) for n in ast.walk(node))
+                    if not has_break:
+                        self.issues.append(Issue(
+                            code="AI-004",
+                            name="Logic Hallucination",
+                            severity=Severity.HIGH,
+                            line=node.lineno,
+                            message="Infinite loop without break statement",
+                        ))
+            
+            # Empty range
+            if isinstance(node, ast.Call):
+                if isinstance(node.func, ast.Name) and node.func.id == 'range':
+                    if len(node.args) >= 2:
+                        start = node.args[0]
+                        end = node.args[1]
+                        if (isinstance(start, ast.Constant) and isinstance(end, ast.Constant) and
+                            isinstance(start.value, int) and isinstance(end.value, int)):
+                            if start.value >= end.value:
+                                self.issues.append(Issue(
+                                    code="AI-004",
+                                    name="Logic Hallucination",
+                                    severity=Severity.MEDIUM,
+                                    line=node.lineno,
+                                    message=f"Empty range({start.value}, {end.value})",
+                                ))
     
     # ─────────────────────────────────────────────────────────────
     # AI-005: Incomplete Code
@@ -195,6 +345,85 @@ class AIAuditor:
                     line=i,
                     message="Found TODO/FIXME marker",
                 ))
+    
+    # ─────────────────────────────────────────────────────────────
+    # AI-006: Context Drift
+    # ─────────────────────────────────────────────────────────────
+    def _check_ai_006_context_drift(self):
+        """Check for context drift patterns (variable redefinition, scope confusion)."""
+        for node in ast.walk(self.tree):
+            if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                # Check for parameter shadowing
+                param_names = {arg.arg for arg in node.args.args}
+                
+                for stmt in ast.walk(node):
+                    if isinstance(stmt, ast.Assign):
+                        for target in stmt.targets:
+                            if isinstance(target, ast.Name) and target.id in param_names:
+                                self.issues.append(Issue(
+                                    code="AI-006",
+                                    name="Context Drift",
+                                    severity=Severity.MEDIUM,
+                                    line=stmt.lineno,
+                                    message=f"Parameter '{target.id}' is reassigned",
+                                    suggestion="Use different variable name to avoid confusion",
+                                ))
+                
+                # Check for global/nonlocal misuse
+                has_global = any(isinstance(s, ast.Global) for s in node.body)
+                has_return = any(isinstance(s, ast.Return) for s in ast.walk(node))
+                if has_global and has_return:
+                    self.issues.append(Issue(
+                        code="AI-006",
+                        name="Context Drift",
+                        severity=Severity.LOW,
+                        line=node.lineno,
+                        message="Function uses both global and return",
+                        suggestion="Consider avoiding global state",
+                    ))
+    
+    # ─────────────────────────────────────────────────────────────
+    # AI-007: Pattern Inconsistency
+    # ─────────────────────────────────────────────────────────────
+    def _check_ai_007_pattern_inconsistency(self):
+        """Check for inconsistent coding patterns."""
+        # Check for mixed string quotes in the same file
+        single_quote_count = self.source.count("'")
+        double_quote_count = self.source.count('"')
+        
+        # Significant imbalance suggests inconsistency (ignoring if one is dominant)
+        if single_quote_count > 10 and double_quote_count > 10:
+            ratio = min(single_quote_count, double_quote_count) / max(single_quote_count, double_quote_count)
+            if 0.3 < ratio < 0.7:  # Neither is clearly dominant
+                self.issues.append(Issue(
+                    code="AI-007",
+                    name="Pattern Inconsistency",
+                    severity=Severity.LOW,
+                    line=1,
+                    message="Mixed single and double quotes throughout file",
+                    suggestion="Standardize on one quote style",
+                ))
+        
+        # Check for inconsistent naming (mixedCase and snake_case in same scope)
+        for node in ast.walk(self.tree):
+            if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
+                names = []
+                for child in ast.walk(node):
+                    if isinstance(child, ast.Name):
+                        names.append(child.id)
+                
+                snake_case = [n for n in names if '_' in n and n.islower()]
+                camel_case = [n for n in names if not '_' in n and any(c.isupper() for c in n[1:])]
+                
+                if len(snake_case) > 3 and len(camel_case) > 3:
+                    self.issues.append(Issue(
+                        code="AI-007",
+                        name="Pattern Inconsistency",
+                        severity=Severity.LOW,
+                        line=node.lineno,
+                        message="Mixed naming conventions in same scope",
+                        suggestion="Use consistent snake_case or camelCase",
+                    ))
     
     # ─────────────────────────────────────────────────────────────
     # AI-008: Self-Contradiction
@@ -336,6 +565,137 @@ class AIAuditor:
                             ))
     
     # ─────────────────────────────────────────────────────────────
+    # AI-011: Boundary Condition Error
+    # ─────────────────────────────────────────────────────────────
+    def _check_ai_011_boundary_condition(self):
+        """Check for off-by-one and boundary errors."""
+        for node in ast.walk(self.tree):
+            # len(x) - 1 in index access (potential off-by-one)
+            if isinstance(node, ast.Subscript):
+                if isinstance(node.slice, ast.BinOp):
+                    if isinstance(node.slice.op, ast.Sub):
+                        if isinstance(node.slice.right, ast.Constant) and node.slice.right.value == 1:
+                            if isinstance(node.slice.left, ast.Call):
+                                if isinstance(node.slice.left.func, ast.Name) and node.slice.left.func.id == 'len':
+                                    # x[len(x) - 1] is actually valid for last element
+                                    # But check if it's in a range context
+                                    pass  # Skip for now, this is valid
+            
+            # range(len(x)) pattern
+            if isinstance(node, ast.Call):
+                if isinstance(node.func, ast.Name) and node.func.id == 'range':
+                    if node.args and isinstance(node.args[0], ast.Call):
+                        inner = node.args[0]
+                        if isinstance(inner.func, ast.Name) and inner.func.id == 'len':
+                            self.issues.append(Issue(
+                                code="AI-011",
+                                name="Boundary Condition",
+                                severity=Severity.LOW,
+                                line=node.lineno,
+                                message="range(len(x)) pattern - consider enumerate()",
+                                suggestion="Use 'for i, item in enumerate(x):'",
+                            ))
+            
+            # >= len() or > len() - 1
+            if isinstance(node, ast.Compare):
+                for i, (op, comp) in enumerate(zip(node.ops, node.comparators)):
+                    if isinstance(comp, ast.Call):
+                        if isinstance(comp.func, ast.Name) and comp.func.id == 'len':
+                            if isinstance(op, (ast.GtE, ast.Gt)):
+                                self.issues.append(Issue(
+                                    code="AI-011",
+                                    name="Boundary Condition",
+                                    severity=Severity.MEDIUM,
+                                    line=node.lineno,
+                                    message="Comparison with len() may cause index error",
+                                ))
+    
+    # ─────────────────────────────────────────────────────────────
+    # AI-012: Async Misuse
+    # ─────────────────────────────────────────────────────────────
+    def _check_ai_012_async_misuse(self):
+        """Check for async/await misuse patterns."""
+        for node in ast.walk(self.tree):
+            # Async function without await
+            if isinstance(node, ast.AsyncFunctionDef):
+                has_await = any(isinstance(n, ast.Await) for n in ast.walk(node))
+                if not has_await:
+                    self.issues.append(Issue(
+                        code="AI-012",
+                        name="Async Misuse",
+                        severity=Severity.MEDIUM,
+                        line=node.lineno,
+                        message=f"Async function '{node.name}' has no await",
+                        suggestion="Remove async or add await for I/O operations",
+                    ))
+            
+            # await in non-async function (will be caught by Python, but good to flag)
+            if isinstance(node, ast.FunctionDef):  # Not AsyncFunctionDef
+                for child in ast.walk(node):
+                    if isinstance(child, ast.Await):
+                        self.issues.append(Issue(
+                            code="AI-012",
+                            name="Async Misuse",
+                            severity=Severity.CRITICAL,
+                            line=child.lineno,
+                            message="await in non-async function",
+                        ))
+            
+            # time.sleep in async function
+            if isinstance(node, ast.AsyncFunctionDef):
+                for child in ast.walk(node):
+                    if isinstance(child, ast.Call):
+                        if isinstance(child.func, ast.Attribute):
+                            if child.func.attr == 'sleep':
+                                if isinstance(child.func.value, ast.Name) and child.func.value.id == 'time':
+                                    self.issues.append(Issue(
+                                        code="AI-012",
+                                        name="Async Misuse",
+                                        severity=Severity.HIGH,
+                                        line=child.lineno,
+                                        message="time.sleep() in async function blocks event loop",
+                                        suggestion="Use asyncio.sleep() instead",
+                                    ))
+    
+    # ─────────────────────────────────────────────────────────────
+    # AI-013: Concurrency Issues
+    # ─────────────────────────────────────────────────────────────
+    def _check_ai_013_concurrency_issues(self):
+        """Check for race conditions and thread safety issues."""
+        # Check for global variable modification without lock
+        global_vars = set()
+        for node in ast.walk(self.tree):
+            if isinstance(node, ast.Global):
+                global_vars.update(node.names)
+        
+        if global_vars:
+            # Check if there's any threading import
+            has_threading = any('threading' in line or 'multiprocessing' in line for line in self.lines)
+            if has_threading:
+                self.issues.append(Issue(
+                    code="AI-013",
+                    name="Concurrency Issue",
+                    severity=Severity.MEDIUM,
+                    line=1,
+                    message=f"Global variables {global_vars} with threading - potential race condition",
+                    suggestion="Use threading.Lock() to protect shared state",
+                ))
+        
+        # Check for mutable default arguments (common thread safety issue)
+        for node in ast.walk(self.tree):
+            if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                for default in node.args.defaults:
+                    if isinstance(default, (ast.List, ast.Dict, ast.Set)):
+                        self.issues.append(Issue(
+                            code="AI-013",
+                            name="Concurrency Issue",
+                            severity=Severity.HIGH,
+                            line=node.lineno,
+                            message="Mutable default argument - shared between calls",
+                            suggestion="Use None as default and create new object in function",
+                        ))
+    
+    # ─────────────────────────────────────────────────────────────
     # AI-014: Excessive Comment
     # ─────────────────────────────────────────────────────────────
     def _check_ai_014_excessive_comment(self):
@@ -360,6 +720,54 @@ class AIAuditor:
                         message=desc,
                         suggestion="Remove redundant comment or add non-obvious context",
                     ))
+    
+    # ─────────────────────────────────────────────────────────────
+    # AI-015: Copy-Paste Error
+    # ─────────────────────────────────────────────────────────────
+    def _check_ai_015_copy_paste_error(self):
+        """Check for copy-paste errors (duplicated code with minor changes)."""
+        # Check for consecutive similar lines
+        for i in range(len(self.lines) - 1):
+            line1 = self.lines[i].strip()
+            line2 = self.lines[i + 1].strip()
+            
+            # Skip empty lines, comments, and short lines
+            if not line1 or not line2 or line1.startswith('#') or len(line1) < 20:
+                continue
+            
+            # Check for very similar consecutive lines (potential copy-paste)
+            if line1 == line2:
+                self.issues.append(Issue(
+                    code="AI-015",
+                    name="Copy-Paste Error",
+                    severity=Severity.MEDIUM,
+                    line=i + 1,
+                    message="Consecutive duplicate lines detected",
+                    suggestion="Remove duplicate or extract to variable/function",
+                ))
+        
+        # Check for common copy-paste patterns
+        for i, line in enumerate(self.lines, 1):
+            # Same variable assigned to itself
+            match = re.match(r'\s*(\w+)\s*=\s*(\w+)\s*$', line)
+            if match and match.group(1) == match.group(2):
+                self.issues.append(Issue(
+                    code="AI-015",
+                    name="Copy-Paste Error",
+                    severity=Severity.HIGH,
+                    line=i,
+                    message=f"Variable '{match.group(1)}' assigned to itself",
+                ))
+            
+            # if x: x (condition same as body)
+            if re.match(r'\s*if\s+(\w+):\s*\1\s*$', line):
+                self.issues.append(Issue(
+                    code="AI-015",
+                    name="Copy-Paste Error",
+                    severity=Severity.MEDIUM,
+                    line=i,
+                    message="Condition same as body - likely copy-paste error",
+                ))
     
     # ─────────────────────────────────────────────────────────────
     # AI-016: Dead Code
@@ -439,6 +847,52 @@ class AIAuditor:
                     break
     
     # ─────────────────────────────────────────────────────────────
+    # AI-019: Deprecated API Usage
+    # ─────────────────────────────────────────────────────────────
+    def _check_ai_019_deprecated_api(self):
+        """Check for deprecated API usage."""
+        deprecated_patterns = [
+            # Python deprecations
+            (r'\basyncio\.get_event_loop\(\)', "asyncio.get_event_loop() - use asyncio.get_running_loop()"),
+            (r'\bcollections\.Mapping\b', "collections.Mapping - use collections.abc.Mapping"),
+            (r'\bcollections\.MutableMapping\b', "collections.MutableMapping - use collections.abc.MutableMapping"),
+            (r'\bcollections\.Iterable\b', "collections.Iterable - use collections.abc.Iterable"),
+            (r'\boptparse\b', "optparse - use argparse"),
+            (r'\bimp\b', "imp module - use importlib"),
+            (r'\bdistutils\b', "distutils - use setuptools"),
+            (r'\.format\s*\([^)]*%', "Mixed .format() and % formatting"),
+            # Common library deprecations
+            (r'requests\.packages\.urllib3', "requests.packages.urllib3 - import urllib3 directly"),
+            (r'from typing import Optional, Union', "Optional[X] is deprecated in 3.10+ - use X | None"),
+        ]
+        
+        for i, line in enumerate(self.lines, 1):
+            for pattern, desc in deprecated_patterns:
+                if re.search(pattern, line):
+                    self.issues.append(Issue(
+                        code="AI-019",
+                        name="Deprecated API",
+                        severity=Severity.LOW,
+                        line=i,
+                        message=desc,
+                    ))
+        
+        # Check for deprecated function decorators
+        for node in ast.walk(self.tree):
+            if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                for decorator in node.decorator_list:
+                    if isinstance(decorator, ast.Name):
+                        if decorator.id in ('abstractproperty', 'abstractstaticmethod', 'abstractclassmethod'):
+                            self.issues.append(Issue(
+                                code="AI-019",
+                                name="Deprecated API",
+                                severity=Severity.LOW,
+                                line=node.lineno,
+                                message=f"@{decorator.id} is deprecated",
+                                suggestion="Use @property/@staticmethod/@classmethod with @abstractmethod",
+                            ))
+    
+    # ─────────────────────────────────────────────────────────────
     # AI-020: Exception Swallowing
     # ─────────────────────────────────────────────────────────────
     def _check_ai_020_exception_swallowing(self):
@@ -494,6 +948,58 @@ class AIAuditor:
                             line=node.lineno,
                             message="open() without context manager may leak file handle",
                             suggestion="Use 'with open(...) as f:' pattern",
+                        ))
+    
+    # ─────────────────────────────────────────────────────────────
+    # AI-022: Test Coverage Gap
+    # ─────────────────────────────────────────────────────────────
+    def _check_ai_022_test_coverage_gap(self):
+        """Check for potential test coverage gaps."""
+        # Count public functions
+        public_functions = []
+        for node in ast.walk(self.tree):
+            if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                if not node.name.startswith('_'):
+                    public_functions.append(node.name)
+        
+        # Check if this is a test file
+        is_test_file = 'test_' in str(self.lines[0] if self.lines else '') or 'test' in str(self.source[:100])
+        
+        if not is_test_file and len(public_functions) > 5:
+            # Check for any test-related patterns
+            has_doctest = any('>>>' in line for line in self.lines)
+            has_assert = any('assert ' in line for line in self.lines)
+            
+            if not has_doctest and not has_assert:
+                self.issues.append(Issue(
+                    code="AI-022",
+                    name="Test Coverage Gap",
+                    severity=Severity.LOW,
+                    line=1,
+                    message=f"File has {len(public_functions)} public functions but no visible tests",
+                    suggestion="Add unit tests or doctests for public API",
+                ))
+        
+        # Check for complex functions without docstrings
+        for node in ast.walk(self.tree):
+            if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                # Check complexity (number of branches)
+                branches = sum(1 for n in ast.walk(node) if isinstance(n, (ast.If, ast.For, ast.While, ast.Try)))
+                
+                if branches >= 5:
+                    # Check for docstring
+                    has_docstring = (node.body and isinstance(node.body[0], ast.Expr) and 
+                                    isinstance(node.body[0].value, ast.Constant) and 
+                                    isinstance(node.body[0].value.value, str))
+                    
+                    if not has_docstring:
+                        self.issues.append(Issue(
+                            code="AI-022",
+                            name="Test Coverage Gap",
+                            severity=Severity.LOW,
+                            line=node.lineno,
+                            message=f"Complex function '{node.name}' ({branches} branches) lacks docstring",
+                            suggestion="Add docstring explaining edge cases",
                         ))
 
 

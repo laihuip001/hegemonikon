@@ -65,18 +65,53 @@ def save_usage(usage: dict):
     USAGE_FILE.write_text(json.dumps(usage, indent=2, ensure_ascii=False))
 
 
-def query(prompt: str, model: str = DEFAULT_MODEL) -> dict:
+def query(
+    prompt: str, 
+    model: str = DEFAULT_MODEL,
+    response_schema: dict = None,
+    timeout: int = 600,
+) -> dict:
     """
     Execute query via Gemini API.
+    
+    Args:
+        prompt: The prompt to send
+        model: Model name (default: gemini-2.0-flash-exp)
+        response_schema: Optional JSON schema for structured output
+        timeout: Request timeout in seconds (default: 600)
+    
+    Returns:
+        dict with answer, model, timestamp, and optionally structured_output
     """
     api_key = get_api_key()
     genai.configure(api_key=api_key)
     
-    model_instance = genai.GenerativeModel(model)
+    # Configure generation with optional schema
+    generation_config = {}
+    if response_schema:
+        generation_config["response_mime_type"] = "application/json"
+        generation_config["response_schema"] = response_schema
+    
+    model_instance = genai.GenerativeModel(
+        model,
+        generation_config=generation_config if generation_config else None
+    )
     
     try:
-        response = model_instance.generate_content(prompt)
+        response = model_instance.generate_content(
+            prompt,
+            request_options={"timeout": timeout}
+        )
         answer = response.text
+        
+        # Parse structured output if schema was provided
+        structured_output = None
+        if response_schema:
+            try:
+                structured_output = json.loads(answer)
+            except json.JSONDecodeError:
+                pass  # Fall back to raw text
+                
     except Exception as e:
         return {"error": str(e)}
     
@@ -87,14 +122,20 @@ def query(prompt: str, model: str = DEFAULT_MODEL) -> dict:
         "timestamp": datetime.now().isoformat(),
         "prompt": prompt[:100],
         "model": model,
+        "has_schema": response_schema is not None,
     })
     save_usage(usage)
     
-    return {
+    result = {
         "answer": answer,
         "model": model,
         "timestamp": datetime.now().isoformat(),
     }
+    
+    if structured_output:
+        result["structured_output"] = structured_output
+    
+    return result
 
 
 def main():

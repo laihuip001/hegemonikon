@@ -30,12 +30,12 @@ L1.75: Which/How much — Valence (+/-), Precision (C/U)
 
 | 流れ | 記号 | 名称 | 役割 |
 |------|------|------|------|
-| A流 | O | Ousia | 本質 |
-| A流 | S | Schema | 様態 |
-| A流 | H | Hormē | 傾向 |
-| B流 | P | Perigraphē | 条件 |
-| B流 | K | Kairos | 文脈 |
-| B流 | A | Akribeia | 精密 |
+| Poiēsis | O | Ousia | 本質 |
+| Poiēsis | S | Schema | 様態 |
+| Poiēsis | H | Hormē | 傾向 |
+| Dokimasia | P | Perigraphē | 条件 |
+| Dokimasia | K | Kairos | 文脈 |
+| Dokimasia | A | Akribeia | 精密 |
 
 **X-series**: 36関係（定理群間の従属）
 
@@ -45,7 +45,7 @@ L1.75: Which/How much — Valence (+/-), Precision (C/U)
 
 ## 日常適用早見表
 
-### A流: 内容の具現化
+### Poiēsis: 内容の具現化（生成層）
 
 | 定理群 | 問い | 発動タイミング |
 |--------|------|----------------|
@@ -53,7 +53,7 @@ L1.75: Which/How much — Valence (+/-), Precision (C/U)
 | **S: Schema** | どの配置で | 様態・アプローチを決める |
 | **H: Hormē** | どちらへ | 傾向と確信度を調整 |
 
-### B流: 条件の詳細化
+### Dokimasia: 条件の詳細化（審査層）
 
 | 定理群 | 問い | 発動タイミング |
 |--------|------|----------------|

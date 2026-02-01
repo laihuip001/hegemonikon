@@ -178,12 +178,16 @@ def main():
         json.dump(articles, f, ensure_ascii=False, indent=2)
 
     if skipped:
-        print(f"[Batch {batch_id}] Logging {len(skipped)} skipped URLs to {skip_log_file}...")
+        print(
+            f"[Batch {batch_id}] Logging {len(skipped)} skipped URLs to {skip_log_file}..."
+        )
         os.makedirs(os.path.dirname(skip_log_file), exist_ok=True)
         with open(skip_log_file, "w", encoding="utf-8") as f:
             f.write("\n".join(skipped))
 
-    print(f"\n[Batch {batch_id}] COMPLETE: {len(articles)} success, {len(skipped)} skipped.")
+    print(
+        f"\n[Batch {batch_id}] COMPLETE: {len(articles)} success, {len(skipped)} skipped."
+    )
     print(f"Next step: python scripts/phase3-save-batch-parallel.py {batch_id}")
 
 

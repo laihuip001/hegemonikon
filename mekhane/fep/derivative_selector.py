@@ -55,7 +55,9 @@ LLM_DERIVATIVE_MODEL = "gemini-2.0-flash-lite"  # Free tier model
 # Selection Logging Configuration (v3.2 新規 - 学習基盤)
 # -----------------------------------------------------------------------------
 SELECTION_LOG_ENABLED = True
-SELECTION_LOG_PATH = Path("/home/laihuip001/oikos/mneme/.hegemonikon/derivative_selections.yaml")
+SELECTION_LOG_PATH = Path(
+    "/home/laihuip001/oikos/mneme/.hegemonikon/derivative_selections.yaml"
+)
 
 logger = logging.getLogger(__name__)
 
@@ -1112,7 +1114,16 @@ def encode_for_derivative_selection(
 
     # Abstraction level (0=concrete, 1=mixed, 2=abstract)
     abstract_keywords = ["本質", "原理", "根本", "普遍", "概念", "定義", "抽象", "理論"]
-    practical_keywords = ["具体", "実際", "現場", "状況", "ケース", "事例", "この場合", "特定"]
+    practical_keywords = [
+        "具体",
+        "実際",
+        "現場",
+        "状況",
+        "ケース",
+        "事例",
+        "この場合",
+        "特定",
+    ]
 
     abstract_score = sum(1 for k in abstract_keywords if k in text_lower)
     practical_score = sum(1 for k in practical_keywords if k in text_lower)
@@ -1130,7 +1141,15 @@ def encode_for_derivative_selection(
     context_dependency = min(context_count, 2)
 
     # Reflection need (0=none, 1=some, 2=high)
-    reflection_keywords = ["確かか", "信頼", "再考", "見直し", "本当に", "疑問", "どう思う"]
+    reflection_keywords = [
+        "確かか",
+        "信頼",
+        "再考",
+        "見直し",
+        "本当に",
+        "疑問",
+        "どう思う",
+    ]
     reflection_count = sum(1 for k in reflection_keywords if k in text_lower)
     reflection_need = min(reflection_count, 2)
 
@@ -1271,7 +1290,10 @@ def _hybrid_select(
 
 
 def _log_selection(
-    theorem: str, problem: str, result: "DerivativeRecommendation", method: str = "keyword"
+    theorem: str,
+    problem: str,
+    result: "DerivativeRecommendation",
+    method: str = "keyword",
 ) -> None:
     """
     派生選択をログに記録 (v3.2 学習基盤)
@@ -1328,7 +1350,9 @@ def _log_selection(
 
 
 def select_derivative(
-    theorem: Literal["O1", "O2", "O3", "O4", "S1", "S2", "S3", "S4", "H1", "H2", "H3", "H4"],
+    theorem: Literal[
+        "O1", "O2", "O3", "O4", "S1", "S2", "S3", "S4", "H1", "H2", "H3", "H4"
+    ],
     problem_context: str,
     use_fep: bool = False,
     use_llm_fallback: bool = True,  # v3.1: Enable LLM hybrid selection
@@ -2618,7 +2642,9 @@ DERIVATIVE_DESCRIPTIONS: Dict[str, Dict[str, str]] = {
 
 def get_derivative_description(theorem: str, derivative: str) -> str:
     """Get human-readable description of a derivative."""
-    return DERIVATIVE_DESCRIPTIONS.get(theorem, {}).get(derivative, "Unknown derivative")
+    return DERIVATIVE_DESCRIPTIONS.get(theorem, {}).get(
+        derivative, "Unknown derivative"
+    )
 
 
 def list_derivatives(theorem: str) -> List[str]:

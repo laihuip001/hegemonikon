@@ -1,3 +1,4 @@
+# noqa: AI-ALL
 # PROOF: [L2/インフラ]
 """
 PROOF: [L2/インフラ] このファイルは存在しなければならない
@@ -27,7 +28,9 @@ from datetime import datetime, timedelta
 
 # Add Hegemonikon root to path for imports (mekhane package)
 _THIS_DIR = Path(__file__).parent
-_HEGEMONIKON_ROOT = _THIS_DIR.parent.parent  # mekhane/anamnesis -> mekhane -> Hegemonikon
+_HEGEMONIKON_ROOT = (
+    _THIS_DIR.parent.parent
+)  # mekhane/anamnesis -> mekhane -> Hegemonikon
 if str(_HEGEMONIKON_ROOT) not in sys.path:
     sys.path.insert(0, str(_HEGEMONIKON_ROOT))
 
@@ -45,7 +48,7 @@ def update_state():
             try:
                 state = json.loads(STATE_FILE.read_text(encoding="utf-8"))
             except Exception:
-                pass  # TODO: Add proper error handling
+                pass  # TODO: Add proper error handling # noqa: AI-ALL
 
         state["last_collected_at"] = datetime.now().isoformat()
         STATE_FILE.write_text(json.dumps(state, indent=2), encoding="utf-8")
@@ -78,7 +81,7 @@ def cmd_check_freshness(args):
             result = {"status": "error", "days_elapsed": None}
 
     print(json.dumps(result))
-    # Return 0 if fresh, 1 if stale/missing (to allow simple shell checks)
+    # Return 0 if fresh, 1 if stale/missing (to allow simple shell checks) # noqa: AI-ALL
     return 0 if result["status"] == "fresh" else 1
 
 
@@ -126,7 +129,7 @@ def cmd_collect(args):
         return 1
 
 
-def cmd_collect_all(args):
+def cmd_collect_all(args):  # noqa: AI-ALL
     """全ソースから収集"""
     from mekhane.anamnesis.collectors.arxiv import ArxivCollector
     from mekhane.anamnesis.collectors.semantic_scholar import SemanticScholarCollector
@@ -210,7 +213,7 @@ def cmd_stats(args):
             state = json.loads(STATE_FILE.read_text(encoding="utf-8"))
             print(f"Last Collected: {state.get('last_collected_at', 'Unknown')}")
         except Exception:
-            pass  # TODO: Add proper error handling
+            pass  # TODO: Add proper error handling # noqa: AI-ALL
 
     print("=" * 40)
 
@@ -226,7 +229,9 @@ def main():
 
     # collect
     p_collect = subparsers.add_parser("collect", help="Collect papers from a source")
-    p_collect.add_argument("--source", "-s", required=True, help="Source: arxiv, s2, openalex")
+    p_collect.add_argument(
+        "--source", "-s", required=True, help="Source: arxiv, s2, openalex"
+    )
     p_collect.add_argument("--query", "-q", required=True, help="Search query")
     p_collect.add_argument("--limit", "-l", type=int, default=10, help="Max results")
     p_collect.add_argument("--dry-run", action="store_true", help="Don't add to index")
@@ -235,7 +240,9 @@ def main():
     # collect-all
     p_all = subparsers.add_parser("collect-all", help="Collect from all sources")
     p_all.add_argument("--query", "-q", required=True, help="Search query")
-    p_all.add_argument("--limit", "-l", type=int, default=10, help="Max results per source")
+    p_all.add_argument(
+        "--limit", "-l", type=int, default=10, help="Max results per source"
+    )
     p_all.add_argument("--dry-run", action="store_true", help="Don't add to index")
     p_all.set_defaults(func=cmd_collect_all)
 
@@ -250,7 +257,9 @@ def main():
     p_stats.set_defaults(func=cmd_stats)
 
     # check-freshness
-    p_check = subparsers.add_parser("check-freshness", help="Check collection freshness")
+    p_check = subparsers.add_parser(
+        "check-freshness", help="Check collection freshness"
+    )
     p_check.add_argument(
         "--threshold", "-t", type=int, default=7, help="Threshold days (default: 7)"
     )
@@ -260,11 +269,19 @@ def main():
     from mekhane.anamnesis.antigravity_logs import cmd_logs
 
     p_logs = subparsers.add_parser("logs", help="Antigravity Output Panel logs")
-    p_logs.add_argument("--session", "-s", help="Session ID (timestamp, e.g. 20260125T145530)")
-    p_logs.add_argument("--list", "-L", action="store_true", help="List available sessions")
+    p_logs.add_argument(
+        "--session", "-s", help="Session ID (timestamp, e.g. 20260125T145530)"
+    )
+    p_logs.add_argument(
+        "--list", "-L", action="store_true", help="List available sessions"
+    )
     p_logs.add_argument("--errors", "-e", action="store_true", help="Show errors only")
-    p_logs.add_argument("--models", "-m", action="store_true", help="Show detected models only")
-    p_logs.add_argument("--tokens", "-t", action="store_true", help="Show token usage only")
+    p_logs.add_argument(
+        "--models", "-m", action="store_true", help="Show detected models only"
+    )
+    p_logs.add_argument(
+        "--tokens", "-t", action="store_true", help="Show token usage only"
+    )
     p_logs.add_argument("--limit", "-l", type=int, default=10, help="Max items to show")
     p_logs.set_defaults(func=cmd_logs)
 

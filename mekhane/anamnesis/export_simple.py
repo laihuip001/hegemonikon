@@ -72,11 +72,15 @@ async def main():
             # 改行、制御文字、バックスラッシュを除去
             safe_title = title.replace("\n", " ").replace("\r", " ").replace("\\", "_")
             # ASCII のみに変換
-            safe_title = "".join(c if (ord(c) < 128 and ord(c) >= 32) else "_" for c in safe_title)
+            safe_title = "".join(
+                c if (ord(c) < 128 and ord(c) >= 32) else "_" for c in safe_title
+            )
             # 危険な文字を除去
             safe_title = re.sub(r'[<>:"/|?*]', "", safe_title)
             # 複数のスペース/アンダースコアを1つにまとめる
-            safe_title = re.sub(r"[\s_]+", "_", safe_title).strip("_")[:60] or "untitled"
+            safe_title = (
+                re.sub(r"[\s_]+", "_", safe_title).strip("_")[:60] or "untitled"
+            )
 
             filename = f"{datetime.now().strftime('%Y-%m-%d')}_{conv['id'][:8]}_{safe_title}.md"
             filepath = OUTPUT_DIR / filename

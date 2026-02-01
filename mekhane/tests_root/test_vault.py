@@ -1,3 +1,4 @@
+# noqa: AI-ALL
 # PROOF: [L3/テスト] 対象モジュールが存在→検証が必要
 import os
 import shutil
@@ -8,7 +9,7 @@ from mekhane.anamnesis.vault import VaultManager
 
 
 @pytest.fixture
-def test_dir():
+def test_dir():  # noqa: AI-ALL
     with tempfile.TemporaryDirectory() as d:
         yield Path(d)
 

@@ -48,7 +48,9 @@ def parse_ki_directory(ki_path: Path) -> list[Document]:
 
             # Use relative path from artifacts_dir as part of ID
             rel_path = artifact_file.relative_to(artifacts_dir)
-            doc_id = f"ki-{ki_path.name}-{str(rel_path.with_suffix('')).replace('/', '-')}"
+            doc_id = (
+                f"ki-{ki_path.name}-{str(rel_path.with_suffix('')).replace('/', '-')}"
+            )
 
             doc = Document(
                 id=doc_id,
@@ -59,7 +61,9 @@ def parse_ki_directory(ki_path: Path) -> list[Document]:
                     "summary": summary[:200],
                     "artifact": artifact_file.name,
                     "file_path": str(artifact_file),
-                    "subdir": str(rel_path.parent) if rel_path.parent != Path(".") else None,
+                    "subdir": (
+                        str(rel_path.parent) if rel_path.parent != Path(".") else None
+                    ),
                 },
             )
             docs.append(doc)
@@ -129,7 +133,9 @@ def search_loaded_index(adapter, query: str, top_k: int = 5):
 
 
 # デフォルトの保存パス
-DEFAULT_INDEX_PATH = Path("/home/laihuip001/oikos/mneme/.hegemonikon/indices/sophia.pkl")
+DEFAULT_INDEX_PATH = Path(
+    "/home/laihuip001/oikos/mneme/.hegemonikon/indices/sophia.pkl"
+)
 
 
 def get_boot_ki(context: str = None, mode: str = "standard") -> dict:
@@ -188,7 +194,11 @@ def format_ki_output(result: dict) -> str:
 
     for item in result["ki_items"]:
         ki_name = item["ki_name"]
-        summary = item["summary"][:60] + "..." if len(item["summary"]) > 60 else item["summary"]
+        summary = (
+            item["summary"][:60] + "..."
+            if len(item["summary"]) > 60
+            else item["summary"]
+        )
         lines.append(f"  • [{ki_name}] {summary}")
 
     return "\n".join(lines)
@@ -196,15 +206,23 @@ def format_ki_output(result: dict) -> str:
 
 def main():
     parser = argparse.ArgumentParser(description="Ingest KIs to Sophia index")
-    parser.add_argument("--dry-run", action="store_true", help="Parse only, don't ingest")
+    parser.add_argument(
+        "--dry-run", action="store_true", help="Parse only, don't ingest"
+    )
     parser.add_argument(
         "--save", action="store_true", help="Save index after ingestion (default: True)"
     )
-    parser.add_argument("--no-save", action="store_true", help="Don't save index after ingestion")
-    parser.add_argument("--load", action="store_true", help="Load existing index and show stats")
+    parser.add_argument(
+        "--no-save", action="store_true", help="Don't save index after ingestion"
+    )
+    parser.add_argument(
+        "--load", action="store_true", help="Load existing index and show stats"
+    )
     parser.add_argument("--search", type=str, help="Search query (requires --load)")
     parser.add_argument(
-        "--incremental", action="store_true", help="Only ingest new/modified KIs (diff mode)"
+        "--incremental",
+        action="store_true",
+        help="Only ingest new/modified KIs (diff mode)",
     )
     args = parser.parse_args()
 

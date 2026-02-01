@@ -6,9 +6,14 @@ import re
 import sys
 from pathlib import Path
 
+DEFAULT_MIN_LENGTH = 10
 
-def extract_strings(filepath: Path, min_length: int = 10):
+
+def extract_strings(filepath: Path, min_length: int = DEFAULT_MIN_LENGTH):
     """バイナリファイルから ASCII/日本語文字列を抽出"""
+    if not filepath.exists():
+        raise FileNotFoundError(f"File not found: {filepath}")
+
     with open(filepath, "rb") as f:
         data = f.read()
 
@@ -20,7 +25,11 @@ def extract_strings(filepath: Path, min_length: int = 10):
 
 
 if __name__ == "__main__":
-    pb_dir = Path(r"M:\.gemini\antigravity\conversations")
+    # Use Path.home() for portability
+    pb_dir = Path.home() / ".gemini" / "antigravity" / "conversations"
+    if not pb_dir.exists():
+        # Fallback only for testing context, or suppress if intended
+        pb_dir = Path(r"M:\.gemini\antigravity\conversations")
 
     # 最初のファイルを解析
     pb_files = list(pb_dir.glob("*.pb"))

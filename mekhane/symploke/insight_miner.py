@@ -88,7 +88,9 @@ def score_insight_quality(text: str) -> float:
         score -= 0.2  # 短すぎ
     if text.count("\n") > 3:
         score -= 0.2  # 改行が多すぎ（複数文）
-    if any(noise in text for noise in ["Claude", "Thought for", "Progress", "Files Edited"]):
+    if any(
+        noise in text for noise in ["Claude", "Thought for", "Progress", "Files Edited"]
+    ):
         score -= 0.5  # UIノイズ
 
     return max(0.0, min(1.0, score))

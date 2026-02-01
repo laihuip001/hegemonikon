@@ -40,11 +40,15 @@ class TestEncodeForDerivativeSelection:
     """Test observation encoding."""
 
     def test_abstract_problem_encoding(self):
-        obs = encode_for_derivative_selection("この概念の本質は何か？原理を理解したい", "O1")
+        obs = encode_for_derivative_selection(
+            "この概念の本質は何か？原理を理解したい", "O1"
+        )
         assert obs[0] >= 1  # Abstraction level should be high
 
     def test_practical_situation_encoding(self):
-        obs = encode_for_derivative_selection("この具体的なケースで、今回どうすべきか？", "O1")
+        obs = encode_for_derivative_selection(
+            "この具体的なケースで、今回どうすべきか？", "O1"
+        )
         assert obs[1] >= 1  # Context dependency should be high
 
     def test_reflection_need_encoding(self):
@@ -64,17 +68,23 @@ class TestSelectDerivativeO1:
     """Test O1 Noēsis derivative selection."""
 
     def test_nous_selection_for_abstract(self):
-        result = select_derivative("O1", "この原理の本質を把握したい、普遍的な概念を理解")
+        result = select_derivative(
+            "O1", "この原理の本質を把握したい、普遍的な概念を理解"
+        )
         assert result.theorem == "O1"
         assert result.derivative == "nous"
         assert result.confidence > 0.5
 
     def test_phro_selection_for_practical(self):
-        result = select_derivative("O1", "この具体的な状況で、今回の場合どう判断すべき？")
+        result = select_derivative(
+            "O1", "この具体的な状況で、今回の場合どう判断すべき？"
+        )
         assert result.derivative == "phro"
 
     def test_meta_selection_for_reflection(self):
-        result = select_derivative("O1", "この判断は本当に正しいか？再考が必要、どう思う？")
+        result = select_derivative(
+            "O1", "この判断は本当に正しいか？再考が必要、どう思う？"
+        )
         assert result.derivative == "meta"
 
     def test_has_alternatives(self):
@@ -90,11 +100,15 @@ class TestSelectDerivativeO2:
         assert result.derivative == "desir"
 
     def test_voli_selection_for_conflict(self):
-        result = select_derivative("O2", "〜したいけど、迷っている、どちらを優先すべきか葛藤")
+        result = select_derivative(
+            "O2", "〜したいけど、迷っている、どちらを優先すべきか葛藤"
+        )
         assert result.derivative == "voli"
 
     def test_akra_selection_for_gap(self):
-        result = select_derivative("O2", "わかっているのにできない、意志が弱い、実行に移せない")
+        result = select_derivative(
+            "O2", "わかっているのにできない、意志が弱い、実行に移せない"
+        )
         assert result.derivative == "akra"
 
 
@@ -106,11 +120,15 @@ class TestSelectDerivativeO3:
         assert result.derivative == "anom"
 
     def test_hypo_selection(self):
-        result = select_derivative("O3", "もしかして〜かもしれない、仮説を立てたい、可能性")
+        result = select_derivative(
+            "O3", "もしかして〜かもしれない、仮説を立てたい、可能性"
+        )
         assert result.derivative == "hypo"
 
     def test_eval_selection(self):
-        result = select_derivative("O3", "どれがベストか比較したい、優先順位をつけて評価")
+        result = select_derivative(
+            "O3", "どれがベストか比較したい、優先順位をつけて評価"
+        )
         assert result.derivative == "eval"
 
 
@@ -118,11 +136,15 @@ class TestSelectDerivativeO4:
     """Test O4 Energeia derivative selection."""
 
     def test_flow_selection(self):
-        result = select_derivative("O4", "没入して集中したい、最適なパフォーマンスで楽しく")
+        result = select_derivative(
+            "O4", "没入して集中したい、最適なパフォーマンスで楽しく"
+        )
         assert result.derivative == "flow"
 
     def test_prax_selection(self):
-        result = select_derivative("O4", "それ自体に意味がある、目的ではなく過程、内発的")
+        result = select_derivative(
+            "O4", "それ自体に意味がある、目的ではなく過程、内発的"
+        )
         assert result.derivative == "prax"
 
     def test_pois_selection(self):
@@ -287,7 +309,9 @@ class TestSelectDerivativeS4:
         assert result.derivative == "pois"
 
     def test_temp_selection(self):
-        result = select_derivative("S4", "アジャイルかウォーターフォールか、繰り返し反復")
+        result = select_derivative(
+            "S4", "アジャイルかウォーターフォールか、繰り返し反復"
+        )
         assert result.derivative == "temp"
 
 
@@ -343,7 +367,9 @@ class TestSelectDerivativeH1:
     """Test H1 Propatheia derivative selection."""
 
     def test_appr_selection(self):
-        result = select_derivative("H1", "これには惹かれる、興味がある、ポジティブな感じ")
+        result = select_derivative(
+            "H1", "これには惹かれる、興味がある、ポジティブな感じ"
+        )
         assert result.theorem == "H1"
         assert result.derivative == "appr"
 

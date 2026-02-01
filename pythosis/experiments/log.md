@@ -14,11 +14,20 @@
 
 ---
 
+## 2026-02-01: Lambda 正式化
+
+`L:[x]{WF}` を CCL 正式仕様として採用 (operators.md v6.52)。
+
+**次の検証予定**:
+- `L:[x]{/noe+{x}}` — 引数付き Lambda 実行
+- `@retry(3, on_fail=L:{/dia^})` — 高階マクロへの渡し
+
+---
+
 ## 次の実験候補
 
 - [ ] `@reduce(*, /o, /s, /h, /p, /k, /a)` — 6 Hub 統合
 - [ ] `@cycle(/s+, /dia-, until=?h2>0.9)` — 収束テスト
-- [ ] `L:[x]{/noe+{x}}` — Lambda 構文テスト
 
 ---
 

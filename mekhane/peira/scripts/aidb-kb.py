@@ -71,7 +71,9 @@ def setup_model():
     MODELS_DIR.mkdir(parents=True, exist_ok=True)
 
     # Check if already downloaded
-    if (MODELS_DIR / "model.onnx").exists() and (MODELS_DIR / "tokenizer.json").exists():
+    if (MODELS_DIR / "model.onnx").exists() and (
+        MODELS_DIR / "tokenizer.json"
+    ).exists():
         print("Model already exists.")
         return
 
@@ -267,7 +269,9 @@ def build_index():
             )
 
         if (i + 1) % 50 == 0:
-            print(f"Processed {i + 1}/{len(md_files)} files ({len(all_data)} chunks)...")
+            print(
+                f"Processed {i + 1}/{len(md_files)} files ({len(all_data)} chunks)..."
+            )
 
     print(f"\nTotal chunks: {len(all_data)}")
     print("Writing to LanceDB...")

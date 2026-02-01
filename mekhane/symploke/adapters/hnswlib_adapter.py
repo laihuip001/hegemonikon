@@ -48,7 +48,9 @@ class HNSWlibAdapter(VectorStoreAdapter):
             max_elements: 最大ベクトル数
         """
         if hnswlib is None:
-            raise ImportError("hnswlib package required. Install with:\n" "  pip install hnswlib")
+            raise ImportError(
+                "hnswlib package required. Install with:\n" "  pip install hnswlib"
+            )
 
         self.space = space
         self.M = M
@@ -64,7 +66,9 @@ class HNSWlibAdapter(VectorStoreAdapter):
     def name(self) -> str:
         return "hnswlib"
 
-    def create_index(self, dimension: int, index_name: str = "default", **kwargs) -> None:
+    def create_index(
+        self, dimension: int, index_name: str = "default", **kwargs
+    ) -> None:
         """インデックスを作成"""
         self.dimension = dimension
         self.index = hnswlib.Index(space=self.space, dim=dimension)
@@ -121,7 +125,9 @@ class HNSWlibAdapter(VectorStoreAdapter):
             query = query.reshape(1, -1)
 
         # 検索
-        labels, distances = self.index.knn_query(query, k=min(k, self.index.get_current_count()))
+        labels, distances = self.index.knn_query(
+            query, k=min(k, self.index.get_current_count())
+        )
 
         results = []
         for idx, (label, dist) in enumerate(zip(labels[0], distances[0])):
@@ -129,7 +135,9 @@ class HNSWlibAdapter(VectorStoreAdapter):
                 continue
             results.append(
                 SearchResult(
-                    id=int(label), score=float(dist), metadata=self._metadata.get(int(label), {})
+                    id=int(label),
+                    score=float(dist),
+                    metadata=self._metadata.get(int(label), {}),
                 )
             )
 
@@ -138,7 +146,8 @@ class HNSWlibAdapter(VectorStoreAdapter):
     def delete(self, ids: List[int]) -> int:
         """削除（非対応 - 再構築が必要）"""
         raise NotImplementedError(
-            "hnswlib does not support deletion. " "Rebuild the index without the deleted vectors."
+            "hnswlib does not support deletion. "
+            "Rebuild the index without the deleted vectors."
         )
 
     def save(self, path: str) -> None:
@@ -176,7 +185,8 @@ class HNSWlibAdapter(VectorStoreAdapter):
         meta_path = Path(str(path) + ".meta.pkl")
         if not meta_path.exists():
             raise FileNotFoundError(
-                f"Metadata file not found: {meta_path}. " "Cannot load index without metadata."
+                f"Metadata file not found: {meta_path}. "
+                "Cannot load index without metadata."
             )
 
         with open(meta_path, "rb") as f:

@@ -63,7 +63,7 @@ graph TD
 
 ## 定理群 (24 = 6系列 × 4定理)
 
-### A流: 内容の具現化
+### Poiēsis: 内容の具現化（生成層）
 
 | Lv | 系列 | 生成規則 | 4定理 |
 |:---|:-----|:---------|:------|
@@ -71,7 +71,7 @@ graph TD
 | L1 | **S** Schema (様態) | L1×L1.5 | Metron, Mekhanē, Stathmos, Praxis |
 | L2a | **H** Hormē (傾向) | L1×L1.75 | Propatheia, Pistis, Orexis, Doxa |
 
-### B流: 条件の詳細化
+### Dokimasia: 条件の詳細化（審査層）
 
 | Lv | 系列 | 生成規則 | 4定理 |
 |:---|:-----|:---------|:------|
@@ -84,6 +84,15 @@ graph TD
 | 接続 | 数 | 意味 |
 |:-----|---:|:-----|
 | O→S, S→H, S→P, P→K, K→A, H→A | 36 | 定理間の情報フロー |
+
+### Synteleia: メタ認知層
+
+| 層 | 名称 | カテゴリ | 性質 |
+|----|------|---------|------|
+| **L1** | Poiēsis (生成) | O, S, H | 何を・どう・なぜ |
+| **L2** | Dokimasia (審査) | P, K, A | 範囲・時期・精度 |
+
+→ [Synteleia 設計](docs/architecture/synteleia.md) | [Synteleia 実装](mekhane/synteleia/)
 
 ---
 

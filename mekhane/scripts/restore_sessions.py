@@ -42,7 +42,9 @@ for pb_file in LATEST_BACKUP.glob("*.pb"):
     # サイズチェック（念のため）
     size = pb_file.stat().st_size
     if size > 20 * 1024 * 1024:  # 20MB
-        print(f"Skipping HUGE file found in backup: {pb_file.name} ({size/1024/1024:.1f} MB)")
+        print(
+            f"Skipping HUGE file found in backup: {pb_file.name} ({size/1024/1024:.1f} MB)"
+        )
         skipped_count += 1
         continue
 

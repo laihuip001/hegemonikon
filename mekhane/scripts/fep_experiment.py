@@ -87,7 +87,9 @@ def interactive_loop():
     # Show initial state
     initial_beliefs = agent.beliefs
     print(f"\n🔹 初期状態 (Epistemic Humility):")
-    print(f"   エントロピー: {-np.sum(initial_beliefs * np.log(initial_beliefs + 1e-10)):.3f}")
+    print(
+        f"   エントロピー: {-np.sum(initial_beliefs * np.log(initial_beliefs + 1e-10)):.3f}"
+    )
 
     while True:
         try:

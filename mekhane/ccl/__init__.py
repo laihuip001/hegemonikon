@@ -24,7 +24,11 @@ from .tracer import CCLTracer
 from .macro_registry import MacroRegistry, Macro, BUILTIN_MACROS
 from .macro_expander import MacroExpander
 from .semantic_matcher import SemanticMacroMatcher, MacroMatch, MACRO_DESCRIPTIONS_JP
-from .workflow_signature import SignatureRegistry, WorkflowSignature, WORKFLOW_SIGNATURES
+from .workflow_signature import (
+    SignatureRegistry,
+    WorkflowSignature,
+    WORKFLOW_SIGNATURES,
+)
 
 __all__ = [
     "LLMParser",

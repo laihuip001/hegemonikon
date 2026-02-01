@@ -71,7 +71,10 @@ async def list_tools():
                         "type": "string",
                         "description": "Task description (e.g., 'Fix bug in utils.py')",
                     },
-                    "repo": {"type": "string", "description": "Repository in format 'owner/repo'"},
+                    "repo": {
+                        "type": "string",
+                        "description": "Repository in format 'owner/repo'",
+                    },
                     "branch": {
                         "type": "string",
                         "description": "Starting branch (default: main)",
@@ -140,12 +143,18 @@ async def call_tool(name: str, arguments: dict):
     try:
         from mekhane.symploke.jules_client import JulesClient, SessionState
     except ImportError as e:
-        return [TextContent(type="text", text=f"Error: Jules client not available: {e}")]
+        return [
+            TextContent(type="text", text=f"Error: Jules client not available: {e}")
+        ]
 
     # Get API key from environment
     api_key = os.environ.get("JULES_API_KEY")
     if not api_key:
-        return [TextContent(type="text", text="Error: JULES_API_KEY environment variable not set")]
+        return [
+            TextContent(
+                type="text", text="Error: JULES_API_KEY environment variable not set"
+            )
+        ]
 
     try:
         client = JulesClient(api_key)
@@ -159,7 +168,9 @@ async def call_tool(name: str, arguments: dict):
         branch = arguments.get("branch", "main")
 
         if not prompt or not repo:
-            return [TextContent(type="text", text="Error: prompt and repo are required")]
+            return [
+                TextContent(type="text", text="Error: prompt and repo are required")
+            ]
 
         try:
             source = f"sources/github/{repo}"
@@ -288,7 +299,9 @@ async def main():
     try:
         async with stdio_server() as streams:
             log("stdio_server connected")
-            await server.run(streams[0], streams[1], server.create_initialization_options())
+            await server.run(
+                streams[0], streams[1], server.create_initialization_options()
+            )
     except Exception as e:
         log(f"Server error: {e}")
         raise

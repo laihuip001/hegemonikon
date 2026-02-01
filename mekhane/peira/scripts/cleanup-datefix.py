@@ -26,12 +26,20 @@ def parse_date(date_str):
     # Try ISO format
     match = re.search(r"(\d{4})-(\d{2})-(\d{2})", date_str)
     if match:
-        return f"{match.group(1)}.{match.group(2)}.{match.group(3)}", match.group(1), match.group(2)
+        return (
+            f"{match.group(1)}.{match.group(2)}.{match.group(3)}",
+            match.group(1),
+            match.group(2),
+        )
 
     # Try YYYY.MM.DD
     match = re.search(r"(\d{4})\.(\d{2})\.(\d{2})", date_str)
     if match:
-        return f"{match.group(1)}.{match.group(2)}.{match.group(3)}", match.group(1), match.group(2)
+        return (
+            f"{match.group(1)}.{match.group(2)}.{match.group(3)}",
+            match.group(1),
+            match.group(2),
+        )
 
     return None, None, None
 

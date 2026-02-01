@@ -31,7 +31,9 @@ class DigestorPipeline:
     """Gnosis → /eat 連携パイプライン"""
 
     def __init__(
-        self, output_dir: Optional[Path] = None, selector: Optional[DigestorSelector] = None
+        self,
+        output_dir: Optional[Path] = None,
+        selector: Optional[DigestorSelector] = None,
     ):
         """
         Args:
@@ -48,7 +50,9 @@ class DigestorPipeline:
         """デフォルトの出力ディレクトリ"""
         return Path.home() / ".hegemonikon" / "digestor"
 
-    def _fetch_from_gnosis(self, topics: Optional[list[str]] = None, max_papers: int = 50) -> list:
+    def _fetch_from_gnosis(
+        self, topics: Optional[list[str]] = None, max_papers: int = 50
+    ) -> list:
         """
         Gnosis から論文を取得
 
@@ -68,7 +72,9 @@ class DigestorPipeline:
 
             if topics:
                 # 指定トピックのクエリのみ
-                queries = [t.get("query", "") for t in topics_list if t.get("id") in topics]
+                queries = [
+                    t.get("query", "") for t in topics_list if t.get("id") in topics
+                ]
             else:
                 # 全トピックから上位3つ
                 queries = [t.get("query", "") for t in topics_list[:3]]
@@ -76,7 +82,9 @@ class DigestorPipeline:
             # 各クエリで検索
             for query in queries:
                 if query:
-                    results = collector.search(query, max_results=max_papers // len(queries))
+                    results = collector.search(
+                        query, max_results=max_papers // len(queries)
+                    )
                     papers.extend(results)
 
             # 重複除去 (arXiv ID or URL ベース)
@@ -84,7 +92,9 @@ class DigestorPipeline:
             unique_papers = []
             for paper in papers:
                 paper_id = (
-                    getattr(paper, "arxiv_id", None) or getattr(paper, "url", None) or paper.id
+                    getattr(paper, "arxiv_id", None)
+                    or getattr(paper, "url", None)
+                    or paper.id
                 )
                 if paper_id not in seen_ids:
                     seen_ids.add(paper_id)
@@ -240,7 +250,9 @@ def main():
     parser.add_argument("--topics", nargs="+", help="対象トピック")
     parser.add_argument("--max-papers", type=int, default=50, help="最大論文数")
     parser.add_argument("--max-candidates", type=int, default=10, help="最大候補数")
-    parser.add_argument("--dry-run", action="store_true", default=True, help="Dry run モード")
+    parser.add_argument(
+        "--dry-run", action="store_true", default=True, help="Dry run モード"
+    )
     parser.add_argument("--execute", action="store_true", help="実際に消化を実行")
 
     args = parser.parse_args()

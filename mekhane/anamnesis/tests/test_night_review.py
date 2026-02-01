@@ -53,7 +53,11 @@ class TestNightReview(unittest.TestCase):
             (
                 "plan.md",
                 "# Title 1\nContent",
-                {"artifactType": "test", "summary": "sum", "updatedAt": "2023-01-01T12:00:00Z"},
+                {
+                    "artifactType": "test",
+                    "summary": "sum",
+                    "updatedAt": "2023-01-01T12:00:00Z",
+                },
             ),
         ]
         self.create_session("session_1", files)

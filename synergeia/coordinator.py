@@ -29,6 +29,24 @@ sys.path.insert(0, str(PERPLEXITY_SCRIPT))
 
 from perplexity_api import search as perplexity_search
 
+# Import Hermeneus CCL Compiler
+try:
+    from hermeneus.src import compile_ccl, expand_ccl, parse_ccl as hermeneus_parse
+    from hermeneus.src.macros import get_all_macros
+    HERMENEUS_AVAILABLE = True
+    STANDARD_MACROS = get_all_macros()
+except ImportError:
+    HERMENEUS_AVAILABLE = False
+    STANDARD_MACROS = {}
+    print("[Warning] Hermeneus not available, falling back to manual execution")
+
+# Import FEP Selector
+try:
+    from synergeia.fep_selector import select_thread_by_fep, ThreadRecommendation
+    FEP_SELECTOR_AVAILABLE = True
+except ImportError:
+    FEP_SELECTOR_AVAILABLE = False
+
 EXPERIMENTS_DIR = Path(__file__).parent / "experiments"
 
 
@@ -37,37 +55,66 @@ EXPERIMENTS_DIR = Path(__file__).parent / "experiments"
 # =============================================================================
 
 THREAD_REGISTRY = {
+    "hermeneus": {
+        "name": "Hermeneus CCL Compiler",
+        "supported_ccl": ["*"],  # すべての CCL をコンパイル可能
+        "executor": "lmql",
+        "priority": 0,  # 最優先
+    },
     "antigravity": {
         "name": "Antigravity",
         "supported_ccl": ["/noe", "/dia", "/u", "/bou"],
         "executor": "manual",  # 手動実行
+        "priority": 10,
     },
     "perplexity": {
         "name": "Perplexity",
         "supported_ccl": ["/sop", "/zet"],
         "executor": "api",
+        "priority": 5,
     },
     "claude": {
         "name": "Claude CLI",
         "supported_ccl": ["/s", "/mek"],
         "executor": "cli",
+        "priority": 5,
     },
     "gemini": {
         "name": "Gemini CLI",
         "supported_ccl": ["/tek", "/sta"],
         "executor": "cli",
+        "priority": 5,
     },
     "codex": {
         "name": "OpenAI Codex",
         "supported_ccl": ["/ene", "/pra"],  # 実行系
         "executor": "cli",
+        "priority": 5,
     },
 }
 
 
-def select_thread(ccl: str) -> str:
-    """CCL要素から最適なスレッドを選択。"""
-    # 修飾子を除去してベースを取得
+def select_thread(ccl: str, use_fep: bool = True) -> str:
+    """
+    CCL要素から最適なスレッドを選択。
+    
+    Args:
+        ccl: CCL 式
+        use_fep: True の場合 FEP ベースの複雑度分析を使用
+    
+    Returns:
+        スレッド ID
+    """
+    # FEP ベース選択 (複雑度に基づく)
+    if use_fep and FEP_SELECTOR_AVAILABLE:
+        try:
+            recommendation = select_thread_by_fep(ccl)
+            print(f"[FEP] {ccl} -> {recommendation.thread} (complexity: {recommendation.complexity_score:.2f})")
+            return recommendation.thread
+        except Exception as e:
+            print(f"[FEP] Error: {e}, falling back to rule-based selection")
+    
+    # ルールベース選択 (フォールバック)
     base = re.match(r"(/\w+)", ccl)
     if not base:
         return "antigravity"
@@ -231,8 +278,79 @@ def execute_manual(ccl: str, context: str) -> Dict[str, Any]:
     }
 
 
-def execute_ccl(ccl: str, context: str) -> Dict[str, Any]:
-    """CCL要素を適切なスレッドで実行。"""
+def execute_hermeneus(ccl: str, context: str, compile_only: bool = False) -> Dict[str, Any]:
+    """
+    Hermeneus CCL Compiler で実行。
+    
+    Args:
+        ccl: CCL 式
+        context: 実行コンテキスト
+        compile_only: True の場合は LMQL コードを返すだけ（実行しない）
+    """
+    if not HERMENEUS_AVAILABLE:
+        return execute_manual(ccl, context)
+    
+    try:
+        # Step 1: CCL をコンパイル (標準マクロを使用)
+        lmql_code = compile_ccl(ccl, macros=STANDARD_MACROS)
+        
+        if compile_only:
+            return {
+                "status": "compiled",
+                "ccl": ccl,
+                "thread": "hermeneus",
+                "lmql": lmql_code,
+                "macros_available": list(STANDARD_MACROS.keys()),
+                "note": "LMQL code generated (not executed)",
+            }
+        
+        # Step 2: 展開情報を取得
+        expansion = expand_ccl(ccl, macros=STANDARD_MACROS)
+        
+        # Step 3: AST を取得
+        ast = hermeneus_parse(expansion.expanded)
+        
+        return {
+            "status": "success",
+            "ccl": ccl,
+            "thread": "hermeneus",
+            "expansion": {
+                "original": expansion.original,
+                "expanded": expansion.expanded,
+                "formal": expansion.formal,
+            },
+            "ast_type": type(ast).__name__,
+            "lmql": lmql_code,
+            "macros_used": len(STANDARD_MACROS),
+            "note": "Compiled by Hermeneus with standard macros.",
+        }
+        
+    except Exception as e:
+        return {
+            "status": "error",
+            "ccl": ccl,
+            "thread": "hermeneus",
+            "error": str(e),
+        }
+
+
+def execute_ccl(ccl: str, context: str, use_hermeneus: bool = True) -> Dict[str, Any]:
+    """
+    CCL要素を適切なスレッドで実行。
+    
+    Args:
+        ccl: CCL 式
+        context: 実行コンテキスト
+        use_hermeneus: True の場合は Hermeneus で構造化コンパイル
+    """
+    # Hermeneus モード: 構造化 LMQL コンパイル
+    if use_hermeneus and HERMENEUS_AVAILABLE:
+        hermeneus_result = execute_hermeneus(ccl, context)
+        if hermeneus_result["status"] != "error":
+            return hermeneus_result
+        # エラー時はフォールバック
+        print(f"[Coordinator] Hermeneus failed, falling back to thread selection")
+    
     thread = select_thread(ccl)
     
     print(f"[Coordinator] {ccl} -> {thread}")

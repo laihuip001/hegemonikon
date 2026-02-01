@@ -48,7 +48,8 @@ class SpecInjector:
 
     def __init__(self, operators_path: Path = None):
         self.operators_path = (
-            operators_path or Path(__file__).parent.parent.parent / "ccl" / "operators.md"
+            operators_path
+            or Path(__file__).parent.parent.parent / "ccl" / "operators.md"
         )
         self._operators_content: str = None
 
@@ -57,7 +58,9 @@ class SpecInjector:
         """operators.md の内容をキャッシュ付きで読み込み"""
         if self._operators_content is None:
             if self.operators_path.exists():
-                self._operators_content = self.operators_path.read_text(encoding="utf-8")
+                self._operators_content = self.operators_path.read_text(
+                    encoding="utf-8"
+                )
             else:
                 self._operators_content = ""
         return self._operators_content
@@ -99,7 +102,9 @@ class SpecInjector:
             if op in OPERATOR_DEFINITIONS:
                 defn = OPERATOR_DEFINITIONS[op]
                 lines.append(f"**Q{i}**: 演算子 `{op}` の名称と作用は？")
-                lines.append(f"**A{i}**: [ここに回答: 名称={defn['名称']}, 作用={defn['作用']}]\n")
+                lines.append(
+                    f"**A{i}**: [ここに回答: 名称={defn['名称']}, 作用={defn['作用']}]\n"
+                )
 
         return "\n".join(lines)
 
@@ -151,10 +156,14 @@ def get_warnings_for_expr(ccl_expr: str) -> List[str]:
 
     # ハードコードされた既知の失敗パターン
     if "!" in ccl_expr:
-        warnings.append("⚠️ 演算子 `!` は「階乗 = 全派生同時実行」です。「否定」ではありません。")
+        warnings.append(
+            "⚠️ 演算子 `!` は「階乗 = 全派生同時実行」です。「否定」ではありません。"
+        )
 
     if "*^" in ccl_expr:
-        warnings.append("⚠️ `*^` は「融合 + メタ分析」です。両方のセクションが必要です。")
+        warnings.append(
+            "⚠️ `*^` は「融合 + メタ分析」です。両方のセクションが必要です。"
+        )
 
     return warnings
 

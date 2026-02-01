@@ -36,8 +36,14 @@ async def inspect_dom():
                         tag = await el.evaluate("el => el.tagName")
                         cls = await el.get_attribute("class") or ""
                         role = await el.get_attribute("role") or ""
-                        data_attrs = await el.evaluate("el => Object.keys(el.dataset).join(',')")
-                        text = (await el.text_content() or "")[:40].replace("\n", " ").strip()
+                        data_attrs = await el.evaluate(
+                            "el => Object.keys(el.dataset).join(',')"
+                        )
+                        text = (
+                            (await el.text_content() or "")[:40]
+                            .replace("\n", " ")
+                            .strip()
+                        )
                         if cls or role or data_attrs:
                             results.append(
                                 f'  [{i}] <{tag}> class="{cls[:50]}" role="{role}" data=[{data_attrs}] text="{text}"'

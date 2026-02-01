@@ -14,7 +14,10 @@ import sys
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent.parent))
 
-from mekhane.ergasterion.synedrion.prompt_generator import PerspectiveMatrix, Perspective
+from mekhane.ergasterion.synedrion.prompt_generator import (
+    PerspectiveMatrix,
+    Perspective,
+)
 
 
 class TestPerspectiveMatrix:
@@ -154,7 +157,9 @@ class TestOrthogonality:
 
         # Every domain should cover all axes
         for d, axes in coverage.items():
-            assert axes == set(matrix.axes), f"Domain {d} missing axes: {set(matrix.axes) - axes}"
+            assert axes == set(
+                matrix.axes
+            ), f"Domain {d} missing axes: {set(matrix.axes) - axes}"
 
 
 if __name__ == "__main__":

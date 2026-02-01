@@ -251,7 +251,9 @@ class TestPersistence:
         # Load (should restore original)
         agent.load_learned_A(str(save_path))
 
-        loaded_A = agent.agent.A if isinstance(agent.agent.A, np.ndarray) else agent.agent.A[0]
+        loaded_A = (
+            agent.agent.A if isinstance(agent.agent.A, np.ndarray) else agent.agent.A[0]
+        )
         # Note: exact equality may not hold due to normalization, but shape should match
         assert loaded_A.shape == original_A.shape
 
@@ -372,10 +374,16 @@ class TestWorkflowEncoding:
             "action": 1,
             "q_pi": [0.23, 0.77],
             "entropy": 1.42,
-            "map_state_names": {"phantasia": "clear", "assent": "granted", "horme": "passive"},
+            "map_state_names": {
+                "phantasia": "clear",
+                "assent": "granted",
+                "horme": "passive",
+            },
         }
 
-        output = generate_fep_feedback_markdown(mock_result, "context=clear, urgency=low")
+        output = generate_fep_feedback_markdown(
+            mock_result, "context=clear, urgency=low"
+        )
 
         assert "act (77%)" in output
         assert "phantasia: clear" in output
@@ -394,7 +402,11 @@ class TestWorkflowEncoding:
             "action": 0,
             "q_pi": [0.65, 0.35],
             "entropy": 2.5,
-            "map_state_names": {"phantasia": "unclear", "assent": "withheld", "horme": "active"},
+            "map_state_names": {
+                "phantasia": "unclear",
+                "assent": "withheld",
+                "horme": "active",
+            },
         }
 
         output = generate_fep_feedback_markdown(mock_result, "context=ambiguous")

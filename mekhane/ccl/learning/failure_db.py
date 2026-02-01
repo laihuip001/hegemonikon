@@ -44,7 +44,11 @@ class FailureDB:
 
     def __init__(self, db_path: Path = None):
         self.db_path = (
-            db_path or Path(__file__).parent.parent.parent / "ccl" / "learning" / "failures.json"
+            db_path
+            or Path(__file__).parent.parent.parent
+            / "ccl"
+            / "learning"
+            / "failures.json"
         )
         self.db_path.parent.mkdir(parents=True, exist_ok=True)
         self._data: Dict = None
@@ -82,7 +86,12 @@ class FailureDB:
         )
 
     def record_failure(
-        self, ccl_expr: str, operator: str, failure_type: str, cause: str, resolution: str = None
+        self,
+        ccl_expr: str,
+        operator: str,
+        failure_type: str,
+        cause: str,
+        resolution: str = None,
     ) -> int:
         """失敗を記録"""
         record = FailureRecord(
@@ -147,7 +156,9 @@ class FailureDB:
         lines = ["## ⚠️ 注意事項 (過去の失敗から)\n"]
 
         for w in warnings:
-            severity_icon = {"critical": "🔴", "warning": "🟡", "info": "🔵"}.get(w.severity, "⚪")
+            severity_icon = {"critical": "🔴", "warning": "🟡", "info": "🔵"}.get(
+                w.severity, "⚪"
+            )
 
             lines.append(f"{severity_icon} **{w.operator}**: {w.message}")
 

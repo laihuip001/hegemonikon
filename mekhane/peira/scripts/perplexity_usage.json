@@ -1,7 +1,7 @@
 {
   "month": "2026-02",
-  "total_cost": 0.017875000000000002,
-  "calls": 7,
+  "total_cost": 0.026800000000000004,
+  "calls": 9,
   "history": [
     {
       "timestamp": "2026-02-01T09:57:57.378497",
@@ -64,6 +64,24 @@
       "tokens": {
         "input": 11,
         "output": 445
+      }
+    },
+    {
+      "timestamp": "2026-02-01T13:00:56.084664",
+      "query": "LMQL Python library 2026 best practices, pip install lmql, LMQL vs Guidance comparison, constrained ",
+      "cost": 0.00466,
+      "tokens": {
+        "input": 38,
+        "output": 894
+      }
+    },
+    {
+      "timestamp": "2026-02-01T14:24:50.458867",
+      "query": "DSPy Python 2026 pip install dspy-ai Teleprompter BootstrapFewShot prompt optimization metrics best ",
+      "cost": 0.004265,
+      "tokens": {
+        "input": 26,
+        "output": 827
       }
     }
   ]

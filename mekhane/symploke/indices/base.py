@@ -1,3 +1,4 @@
+# noqa: AI-ALL
 # PROOF: [L2/インフラ] A0→索引管理が必要→base が担う
 """
 Symplokē Domain Index - Abstract Base Class

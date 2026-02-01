@@ -120,7 +120,9 @@ def main():
             with open(SKIP_LOG_FILE, "a", encoding="utf-8") as f:
                 f.write(f"{art.get('url', 'unknown')}\t{str(e)}\n")
 
-    print(f"[Batch {BATCH_ID}] Completed: {success_count}/{len(articles)} articles saved.")
+    print(
+        f"[Batch {BATCH_ID}] Completed: {success_count}/{len(articles)} articles saved."
+    )
 
 
 if __name__ == "__main__":

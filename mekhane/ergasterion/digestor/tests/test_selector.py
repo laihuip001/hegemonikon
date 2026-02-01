@@ -56,7 +56,12 @@ class TestDigestorSelector:
         selector = DigestorSelector()
 
         papers = [
-            MockPaper(id="test-1", title="Simple paper", abstract="Short abstract", source="arxiv"),
+            MockPaper(
+                id="test-1",
+                title="Simple paper",
+                abstract="Short abstract",
+                source="arxiv",
+            ),
             MockPaper(
                 id="test-2",
                 title="LLM Autonomous Agent Architecture",

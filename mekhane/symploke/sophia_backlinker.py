@@ -163,7 +163,8 @@ class SophiaBacklinker:
         # 大規模グラフ警告
         if node_count > max_nodes:
             lines.insert(
-                0, f"%% ⚠️ 警告: {node_count} ノード (> {max_nodes}) — 可視化が崩壊する可能性"
+                0,
+                f"%% ⚠️ 警告: {node_count} ノード (> {max_nodes}) — 可視化が崩壊する可能性",
             )
 
         def sanitize(name: str) -> str:

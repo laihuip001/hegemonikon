@@ -31,7 +31,9 @@ import aiohttp
 
 # Configure logging
 logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s", datefmt="%H:%M:%S"
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(message)s",
+    datefmt="%H:%M:%S",
 )
 logger = logging.getLogger(__name__)
 
@@ -142,7 +144,9 @@ class JulesResultCollector:
 
     async def generate_report(self, session_ids: list[str]) -> dict:
         """Generate aggregate report from multiple sessions."""
-        summaries = await asyncio.gather(*[self.get_summary(sid) for sid in session_ids])
+        summaries = await asyncio.gather(
+            *[self.get_summary(sid) for sid in session_ids]
+        )
 
         total = len(summaries)
         completed = sum(1 for s in summaries if s.state == "COMPLETED")

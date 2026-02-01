@@ -235,7 +235,9 @@ def generate_prompt_lang(requirements: str, domain: str, output_format: str) -> 
             ]
         )
     else:
-        lines.extend(["  - quality:", "      description: 出力の品質", "      scale: 1-5"])
+        lines.extend(
+            ["  - quality:", "      description: 出力の品質", "      scale: 1-5"]
+        )
 
     lines.extend(
         [

@@ -31,6 +31,21 @@
 @partial(context="Heg") /zet+
 ```
 
+## Lambda 式 (Phase 2b)
+
+> **正式構文**: `L:[x]{WF}` (ccl/operators.md v6.52)
+
+```ccl
+# 高階マクロへの渡し
+@retry(3, on_fail=L:{/dia^})
+
+# マッピング
+F:[tasks]{L:[t]{/noe+{target=t}}}
+
+# アドホック操作
+L:{/bou*zet}
+```
+
 ---
 
-*stdlib Macros v1.0*
+*stdlib Macros v1.1 | Lambda 正式化*

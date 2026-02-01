@@ -59,7 +59,9 @@ async def main():
                     for i, btn in enumerate(conv_buttons[:5]):
                         try:
                             text = await btn.text_content()
-                            lines.append(f"    [{i}] {text[:50] if text else '(empty)'}")
+                            lines.append(
+                                f"    [{i}] {text[:50] if text else '(empty)'}"
+                            )
                         except Exception:
                             pass  # TODO: Add proper error handling
 

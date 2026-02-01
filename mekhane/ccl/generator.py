@@ -68,7 +68,10 @@ class CCLGenerator:
                     if self.enable_learning:
                         self.doxa.record(intent, ccl, confidence=0.9)
                     return GenerationResult(
-                        ccl=ccl, source="llm", confidence=0.9, warnings=validation.warnings
+                        ccl=ccl,
+                        source="llm",
+                        confidence=0.9,
+                        warnings=validation.warnings,
                     )
 
         # Layer 2: Doxa Patterns
@@ -77,7 +80,10 @@ class CCLGenerator:
             validation = self.validator.validate(cached)
             if validation.valid:
                 return GenerationResult(
-                    ccl=cached, source="doxa", confidence=0.8, warnings=validation.warnings
+                    ccl=cached,
+                    source="doxa",
+                    confidence=0.8,
+                    warnings=validation.warnings,
                 )
 
         # Layer 3: Heuristic

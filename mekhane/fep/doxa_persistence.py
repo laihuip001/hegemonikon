@@ -127,12 +127,17 @@ class DoxaStore:
         )
 
     def evolve(
-        self, content: str, new_confidence: float, new_evidence: Optional[List[str]] = None
+        self,
+        content: str,
+        new_confidence: float,
+        new_evidence: Optional[List[str]] = None,
     ) -> DoxaResult:
         """信念を進化（更新）"""
         if content not in self._beliefs:
             return DoxaResult(
-                belief=Belief(content=content, strength=BeliefStrength.WEAK, confidence=0.0),
+                belief=Belief(
+                    content=content, strength=BeliefStrength.WEAK, confidence=0.0
+                ),
                 derivative=DoxaDerivative.EVOLVE,
                 action_taken="進化失敗（信念が存在しない）",
                 previous_state=None,
@@ -171,7 +176,9 @@ class DoxaStore:
         """信念をアーカイブ（履歴化）"""
         if content not in self._beliefs:
             return DoxaResult(
-                belief=Belief(content=content, strength=BeliefStrength.WEAK, confidence=0.0),
+                belief=Belief(
+                    content=content, strength=BeliefStrength.WEAK, confidence=0.0
+                ),
                 derivative=DoxaDerivative.ARCHIVE,
                 action_taken="アーカイブ失敗",
                 previous_state=None,

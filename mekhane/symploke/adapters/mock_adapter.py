@@ -38,7 +38,9 @@ class MockAdapter(VectorStoreAdapter):
     def dimension(self) -> Optional[int]:
         return self._dimension
 
-    def create_index(self, dimension: int, index_name: str = "default", **kwargs) -> None:
+    def create_index(
+        self, dimension: int, index_name: str = "default", **kwargs
+    ) -> None:
         self._dimension = dimension
         self._vectors = []
         self._metadata = {}
@@ -54,7 +56,9 @@ class MockAdapter(VectorStoreAdapter):
             raise RuntimeError("Index not created. Call create_index first.")
 
         if vectors.ndim != 2 or vectors.shape[1] != self._dimension:
-            raise ValueError(f"Expected shape (N, {self._dimension}), got {vectors.shape}")
+            raise ValueError(
+                f"Expected shape (N, {self._dimension}), got {vectors.shape}"
+            )
 
         n = vectors.shape[0]
 
@@ -87,7 +91,9 @@ class MockAdapter(VectorStoreAdapter):
         for i in range(min(k, len(self._vectors))):
             results.append(
                 SearchResult(
-                    id=i, score=1.0 - (i * 0.1), metadata=self._metadata.get(i, {})  # 降順スコア
+                    id=i,
+                    score=1.0 - (i * 0.1),
+                    metadata=self._metadata.get(i, {}),  # 降順スコア
                 )
             )
 

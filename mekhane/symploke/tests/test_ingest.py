@@ -117,7 +117,10 @@ class TestSophiaIngest:
 
             import json
 
-            metadata = {"name": "Summary Only KI", "summary": "Just a summary, no artifacts"}
+            metadata = {
+                "name": "Summary Only KI",
+                "summary": "Just a summary, no artifacts",
+            }
             (ki_path / "metadata.json").write_text(json.dumps(metadata))
 
             docs = parse_ki_directory(ki_path)

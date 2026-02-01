@@ -96,9 +96,7 @@ class LLMParser:
             return None
 
         try:
-            prompt = (
-                f"{self.system_prompt}\n\n## Intent\n{intent}\n\n## Output\nCCL expression only:"
-            )
+            prompt = f"{self.system_prompt}\n\n## Intent\n{intent}\n\n## Output\nCCL expression only:"
 
             if USE_NEW_SDK and self.client:
                 # New SDK: google.genai

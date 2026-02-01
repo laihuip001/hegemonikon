@@ -53,7 +53,10 @@ def ensure_traces_dir() -> None:
 
 
 def mark_meaningful(
-    reason: str, intensity: int = 1, session_id: Optional[str] = None, context: Optional[str] = None
+    reason: str,
+    intensity: int = 1,
+    session_id: Optional[str] = None,
+    context: Optional[str] = None,
 ) -> MeaningfulTrace:
     """
     Mark a moment as meaningful.

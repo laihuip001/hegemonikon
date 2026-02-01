@@ -17,10 +17,18 @@ from pathlib import Path
 
 # ローカルモジュールインポート
 try:
-    from specialist_prompts import ALL_SPECIALISTS, generate_prompt, SpecialistDefinition
+    from specialist_prompts import (
+        ALL_SPECIALISTS,
+        generate_prompt,
+        SpecialistDefinition,
+    )
 except ImportError:
     sys.path.insert(0, str(Path(__file__).parent))
-    from specialist_prompts import ALL_SPECIALISTS, generate_prompt, SpecialistDefinition
+    from specialist_prompts import (
+        ALL_SPECIALISTS,
+        generate_prompt,
+        SpecialistDefinition,
+    )
 
 
 # === 設定 ===
@@ -30,7 +38,9 @@ TASKS_PER_KEY = int(os.getenv("JULES_TASKS_PER_KEY", "80"))
 
 # API キー（環境変数から取得）
 API_KEYS = [
-    os.getenv(f"JULIUS_API_KEY_{i}") for i in range(1, 19) if os.getenv(f"JULIUS_API_KEY_{i}")
+    os.getenv(f"JULIUS_API_KEY_{i}")
+    for i in range(1, 19)
+    if os.getenv(f"JULIUS_API_KEY_{i}")
 ]
 
 
@@ -46,7 +56,10 @@ async def create_session(
 
     payload = {
         "prompt": prompt,
-        "sourceContext": {"source": REPO_SOURCE, "githubRepoContext": {"startingBranch": BRANCH}},
+        "sourceContext": {
+            "source": REPO_SOURCE,
+            "githubRepoContext": {"startingBranch": BRANCH},
+        },
         "automationMode": "AUTO_CREATE_PR",
         "requirePlanApproval": False,
     }
@@ -132,7 +145,10 @@ async def main():
 
     parser = argparse.ArgumentParser(description="Jules Specialist Batch Runner")
     parser.add_argument(
-        "--target", "-t", default="mekhane/symploke/jules_client.py", help="Target file to review"
+        "--target",
+        "-t",
+        default="mekhane/symploke/jules_client.py",
+        help="Target file to review",
     )
     parser.add_argument(
         "--category",
@@ -145,9 +161,14 @@ async def main():
         "--max-concurrent", "-m", type=int, default=3, help="Max concurrent sessions"
     )
     parser.add_argument(
-        "--output", "-o", default="docs/specialist_run_results.json", help="Output file for results"
+        "--output",
+        "-o",
+        default="docs/specialist_run_results.json",
+        help="Output file for results",
     )
-    parser.add_argument("--dry-run", action="store_true", help="Print prompts without executing")
+    parser.add_argument(
+        "--dry-run", action="store_true", help="Print prompts without executing"
+    )
 
     args = parser.parse_args()
 

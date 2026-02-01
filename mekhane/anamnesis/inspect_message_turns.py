@@ -86,7 +86,9 @@ async def main():
                         # 位置で User/Assistant を推測（偶数=User, 奇数=Assistant など）
                         position_hint = "EVEN" if j % 2 == 0 else "ODD"
 
-                        lines.append(f"\n  [{j}] <{c_tag}> ({position_hint}) text_len={c_len}")
+                        lines.append(
+                            f"\n  [{j}] <{c_tag}> ({position_hint}) text_len={c_len}"
+                        )
                         lines.append(f"      class='{c_class[:100]}'")
 
                         # テキストプレビュー

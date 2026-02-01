@@ -128,7 +128,9 @@ def extract_arxiv_links():
     print(f"    Saved to: {ARXIV_LINKS_FILE}")
 
     # Show top sources
-    top_sources = sorted(links.values(), key=lambda x: len(x["source_articles"]), reverse=True)[:5]
+    top_sources = sorted(
+        links.values(), key=lambda x: len(x["source_articles"]), reverse=True
+    )[:5]
     print("\nTop referenced papers:")
     for p in top_sources:
         print(f"  {p['arxiv_id']}: {len(p['source_articles'])} articles")
@@ -163,7 +165,9 @@ def fetch_metadata():
                     "authors": [a.name for a in result.authors],
                     "summary": result.summary.replace("\n", " "),
                     "categories": list(result.categories),
-                    "published": result.published.isoformat() if result.published else None,
+                    "published": (
+                        result.published.isoformat() if result.published else None
+                    ),
                     "updated": result.updated.isoformat() if result.updated else None,
                     "pdf_url": result.pdf_url,
                     "source_articles": info["source_articles"],

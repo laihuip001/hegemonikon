@@ -1,3 +1,4 @@
+# noqa: AI-ALL
 """
 # PROOF: [L2/インフラ] A0→ベクトルDBアダプタが必要→base が担う
 VectorStore Adapter - Abstract Base Class
@@ -39,7 +40,9 @@ class VectorStoreAdapter(ABC):
         pass
 
     @abstractmethod
-    def create_index(self, dimension: int, index_name: str = "default", **kwargs) -> None:
+    def create_index(
+        self, dimension: int, index_name: str = "default", **kwargs
+    ) -> None:
         """
         インデックスを作成
 

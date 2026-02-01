@@ -23,7 +23,9 @@ sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 from mekhane.symploke.indices import Document, KairosIndex
 
 HANDOFF_DIR = Path("/home/laihuip001/oikos/mneme/.hegemonikon/sessions")
-DEFAULT_INDEX_PATH = Path("/home/laihuip001/oikos/mneme/.hegemonikon/indices/kairos.pkl")
+DEFAULT_INDEX_PATH = Path(
+    "/home/laihuip001/oikos/mneme/.hegemonikon/indices/kairos.pkl"
+)
 
 
 def parse_handoff(file_path: Path) -> Document:
@@ -102,7 +104,9 @@ def parse_conversation(file_path: Path) -> Document:
     )
 
 
-def parse_conversation_chunks(file_path: Path, chunk_size: int = 1500) -> list[Document]:
+def parse_conversation_chunks(
+    file_path: Path, chunk_size: int = 1500
+) -> list[Document]:
     """Parse a conversation into multiple chunks for better search coverage.
 
     各ファイルを複数チャンクに分割し、より細かい粒度で検索可能にする。
@@ -220,18 +224,26 @@ def main():
         description="Ingest handoffs and conversations to Kairos index"
     )
     parser.add_argument("--all", action="store_true", help="Ingest all handoff files")
-    parser.add_argument("--conversations", action="store_true", help="Ingest conversation logs")
+    parser.add_argument(
+        "--conversations", action="store_true", help="Ingest conversation logs"
+    )
     parser.add_argument(
         "--unified",
         action="store_true",
         help="Ingest both handoffs and conversations into one index",
     )
     parser.add_argument(
-        "--chunked", action="store_true", help="Use chunked mode for better search coverage"
+        "--chunked",
+        action="store_true",
+        help="Use chunked mode for better search coverage",
     )
     parser.add_argument("--file", type=str, help="Ingest specific file")
-    parser.add_argument("--dry-run", action="store_true", help="Parse only, don't ingest")
-    parser.add_argument("--no-save", action="store_true", help="Don't save index after ingestion")
+    parser.add_argument(
+        "--dry-run", action="store_true", help="Parse only, don't ingest"
+    )
+    parser.add_argument(
+        "--no-save", action="store_true", help="Don't save index after ingestion"
+    )
     parser.add_argument("--load", action="store_true", help="Load existing index")
     parser.add_argument("--search", type=str, help="Search query (requires --load)")
     args = parser.parse_args()

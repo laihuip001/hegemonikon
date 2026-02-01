@@ -16,7 +16,12 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent))
 
-from mekhane.symploke.jules_client import JulesClient, JulesSession, SessionState, RateLimitError
+from mekhane.symploke.jules_client import (
+    JulesClient,
+    JulesSession,
+    SessionState,
+    RateLimitError,
+)
 
 
 class TestJulesClient:

@@ -89,7 +89,9 @@ class ExecutionContext:
             "phase": self.phase.value,
             "status": self.status.value,
             "started_at": self.started_at.isoformat() if self.started_at else None,
-            "completed_at": self.completed_at.isoformat() if self.completed_at else None,
+            "completed_at": (
+                self.completed_at.isoformat() if self.completed_at else None
+            ),
             "artifacts": self.artifacts,
             "errors": self.errors,
         }
@@ -302,7 +304,10 @@ class EnergеiaExecutor:
                 deviations.append(f"追加成果物: {extra}")
 
         # 目的整合再確認
-        if context.telos_result and context.telos_result.status == AlignmentStatus.DRIFTING:
+        if (
+            context.telos_result
+            and context.telos_result.status == AlignmentStatus.DRIFTING
+        ):
             deviations.append(f"ドリフト検出: {context.telos_result.drift_indicators}")
 
         context.checkpoints["phase_3"] = {

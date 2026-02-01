@@ -159,7 +159,9 @@ class SearchEngine:
 
         return boost_map
 
-    def search_source(self, query: str, source: str, k: int = 10) -> List[IndexedResult]:
+    def search_source(
+        self, query: str, source: str, k: int = 10
+    ) -> List[IndexedResult]:
         """
         単一ソース検索 (リランキングなし)
 

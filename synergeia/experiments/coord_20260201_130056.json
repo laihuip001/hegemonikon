@@ -1,0 +1,28 @@
+{
+  "ccl": "/sop+",
+  "plan": {
+    "type": "single",
+    "elements": [
+      "/sop+"
+    ]
+  },
+  "results": [
+    {
+      "status": "success",
+      "ccl": "/sop+",
+      "thread": "perplexity",
+      "answer": "**LMQL is a Python library for constrained decoding in LLMs, installed via `pip install lmql`, with strong Python 3.10 support but unconfirmed compatibility for Python 3.11; no 2026-specific best practices are documented in available sources.[2][1]**\n\n### Installation\nInstall the latest LMQL version using:\n```\npip install lmql\n```\nFor local GPU support with Hugging Face Transformers, use Python 3.10 and install PyTorch >=1.11 first, then:\n```\npip install lmql[hf]\n```\n[2]\nOlder tutorials suggest specific versions like `pip install lmql==0.0.6.6 langchain==0.0.225`, but use the latest for current setups.[1]\n\n### 2026 Best Practices\nNo sources detail **2026 best practices** for LMQL. General recommendations from documentation emphasize:\n- Integrate as a Python library with `@lmql.query` decorators or `lmql.query()` for seamless function chaining and output processing (e.g., with Pandas).[1][2]\n- Leverage **constraints** via `where` clauses for token length, datatypes, regex, stopping phrases, and custom logic to reduce inference costs by up to 80% through logit masking and speculative execution.[1][2][3]\n- Use advanced decoding like `argmax`, `sample`, or beam search; support async APIs for parallel queries and multi-model compatibility (OpenAI, Azure, Transformers).[2]\n- Embed in pipelines for algorithmic prompting, JSON schema enforcement, or tool use, treating queries as guaranteed-format Python functions.[1][2]\n\nExample query as a Python function:\n```python\nimport lmql\n\nq = lmql.query('argmax \"Hello[WHO]\" from \"openai/text-ada-001\" where len(TOKENS(WHO)) < 10')\nawait q()\n```\n[1][2]\n\n### LMQL vs. Guidance Comparison\nNo direct head-to-head comparisons appear in results. **LMQL** excels in:\n- SQL-like declarative constraints (`where`) for precise output control during decoding, reducing re-queries.[1][3]\n- Python-superset syntax with full control flow, logit masking, and optimizations like tree caching.[2]\n**Guidance** (implied via LangChain example in [1]) focuses on chain-based prompting but lacks LMQL's native token-level constraints and efficiency gains. LMQL integrates with LangChain, positioning it as more constraint-focused for structured LLM outputs.[1]\n\n| Aspect              | LMQL [1][2][3]                          | Guidance (via LangChain) [1]          |\n|---------------------|-----------------------------------------|---------------------------------------|\n| **Core Strength**  | Constrained decoding, logit masks      | Prompt chaining, templates            |\n| **Constraints**    | Token/char length, regex, datatypes    | Post-generation validation            |\n| **Efficiency**     | Up to 80% cost reduction, speculative  | Relies on iterations/re-prompts       |\n| **Syntax**         | Python-superset, SQL-like              | Python chains/prompts                 |\n\n### Constrained Decoding for LLM Output Control\n**LMQL specializes in constrained decoding**, using `where` clauses to apply logical constraints (e.g., `len(TOKENS(WHO)) < 10`) that generate token masks automatically during inference. This steers generation in real-time, avoiding invalid outputs and minimizing API calls.[1][2][3]\n- **Supported constraints**: Stopping phrases, number types, choices from sets, regex (preview), combinations.[3]\n- Benefits: Guides reasoning, enforces formats (e.g., JSON), cuts latency/costs via short-circuiting.[1][2]\nExample:\n```\nargmax \"Answer: [ANS]\" from \"gpt-3.5-turbo\" where ANS in [\"Yes\", \"No\"]\n```\n[2][3]\n\n### Python 3.11 Compatibility\nExplicitly requires **Python 3.10** for installation; no confirmation for 3.11 in sources.[2] Test in a virtual environment, as superset syntax and dependencies (e.g., PyTorch) may work but lack official validation. Older installs used unspecified Python versions.[1]",
+      "citations": [
+        "https://www.packtpub.com/en-us/learning/how-to-tutorials/efficient-llm-querying-with-lmql",
+        "https://github.com/eth-sri/lmql",
+        "https://www.datacamp.com/pt/tutorial/introduction-to-lmql",
+        "https://www.logicmonitor.com/support/logicmonitor-query-language-reference",
+        "https://contabo.com/blog/open-source-llms/",
+        "https://boredhacking.com/coding-with-llms-2026/",
+        "https://softlandia.com/articles/best-way-to-build-an-ai-engine-in-2026"
+      ],
+      "cost": 0.00466
+    }
+  ],
+  "timestamp": "2026-02-01T13:00:56.084915"
+}

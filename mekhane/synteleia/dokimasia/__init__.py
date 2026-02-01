@@ -1,4 +1,4 @@
-# PROOF: [L2/インフラ] Dokimasia 審査層パッケージ
+# PROOF: [L2/インフラ] <- mekhane/synteleia/dokimasia/ Dokimasia 審査層パッケージ
 """
 Dokimasia (δοκιμασία) — 審査層
 

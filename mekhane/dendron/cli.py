@@ -1,5 +1,5 @@
 # noqa: AI-ALL
-# PROOF: [L2/インフラ]  # noqa: AI-022
+# PROOF: [L2/インフラ] <- mekhane/dendron/  # noqa: AI-022
 """
 Dendron CLI — コマンドラインインターフェース
 

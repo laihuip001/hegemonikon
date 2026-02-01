@@ -1,4 +1,4 @@
-# PROOF: [L2/インフラ]
+# PROOF: [L2/インフラ] <- mekhane/dendron/
 """
 Dendron — 存在証明検証ツール
 

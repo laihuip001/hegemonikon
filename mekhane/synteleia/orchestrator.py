@@ -1,4 +1,4 @@
-# PROOF: [L2/インフラ] Synteleia 2層オーケストレーター
+# PROOF: [L2/インフラ] <- mekhane/synteleia/ Synteleia 2層オーケストレーター
 """
 Synteleia Orchestrator
 

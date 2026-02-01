@@ -1,4 +1,4 @@
-# PROOF: [L2/インフラ] A0→索引管理が必要→gnosis が担う
+# PROOF: [L2/インフラ] <- mekhane/symploke/indices/ A0→索引管理が必要→gnosis が担う
 """
 Gnōsis Index - 論文データ (外部知識)
 

@@ -1,4 +1,4 @@
-# PROOF: [L1/定理] A2.ration 論理矛盾検出エージェント
+# PROOF: [L1/定理] <- mekhane/synteleia/dokimasia/ A2.ration 論理矛盾検出エージェント
 """
 Logic Consistency Agent
 

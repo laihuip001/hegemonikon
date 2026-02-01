@@ -1,4 +1,4 @@
-# PROOF: [L2/インフラ] A2→評議会システムが必要→test_prompt_generator が担う
+# PROOF: [L2/インフラ] <- mekhane/ergasterion/synedrion/tests/ A2→評議会システムが必要→test_prompt_generator が担う
 #!/usr/bin/env python3
 """
 Tests for Jules Synedrion v2 Prompt Generator.

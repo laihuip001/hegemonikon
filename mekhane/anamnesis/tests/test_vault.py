@@ -1,4 +1,4 @@
-# PROOF: [L3/テスト] vault.py が存在→その検証が必要→test_vault が担う
+# PROOF: [L3/テスト] <- mekhane/anamnesis/tests/ vault.py が存在→その検証が必要→test_vault が担う
 import unittest
 import shutil
 import tempfile

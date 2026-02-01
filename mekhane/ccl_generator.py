@@ -1,4 +1,4 @@
-# PROOF: [L1/定理] CCL→実行基盤が必要
+# PROOF: [L1/定理] <- mekhane/ CCL→実行基盤が必要
 """
 CCL Generator (v1.0)
 

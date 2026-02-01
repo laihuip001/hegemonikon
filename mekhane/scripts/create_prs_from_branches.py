@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# PROOF: [L2/インフラ] O4→ブランチからPRを作成する必要→create_prs_from_branches が担う
+# PROOF: [L2/インフラ] <- mekhane/scripts/ O4→ブランチからPRを作成する必要→create_prs_from_branches が担う
 """
 Jules Branch → Pull Request Creator
 

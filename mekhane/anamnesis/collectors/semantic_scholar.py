@@ -1,4 +1,4 @@
-# PROOF: [L2/インフラ]
+# PROOF: [L2/インフラ] <- mekhane/anamnesis/collectors/
 """
 PROOF: [L2/インフラ]
 

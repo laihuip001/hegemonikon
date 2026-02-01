@@ -1,4 +1,4 @@
-# PROOF: [L2/インフラ]
+# PROOF: [L2/インフラ] <- mekhane/ccl/
 # Phase 1: CCL 出力スキーマ定義
 
 """

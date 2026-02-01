@@ -1,9 +1,9 @@
 ---
 name: "Dendron"
 status: mvp_complete
-phase: "CI統合"
+phase: "運用準備完了"
 updated: 2026-02-01
-next_action: "git push でリモート反映"
+next_action: "git push で GitHub Actions 動作確認"
 ---
 
 # Dendron Project Status

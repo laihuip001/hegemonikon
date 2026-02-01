@@ -1,4 +1,4 @@
-# PROOF: [L2/インフラ]
+# PROOF: [L2/インフラ] <- mekhane/ccl/
 """
 SEL Validator — Semantic Enforcement Layer 遵守検証
 

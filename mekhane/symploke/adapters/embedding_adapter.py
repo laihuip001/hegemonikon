@@ -1,5 +1,5 @@
 """
-# PROOF: [L2/インフラ] A0→ベクトルDBアダプタが必要→embedding_adapter が担う
+# PROOF: [L2/インフラ] <- mekhane/symploke/adapters/ A0→ベクトルDBアダプタが必要→embedding_adapter が担う
 EmbeddingAdapter - sentence-transformers を使用した実ベクトル検索アダプタ
 
 MockAdapter とは異なり、実際の埋め込み計算と類似度検索を行う。

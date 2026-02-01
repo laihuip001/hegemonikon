@@ -1,4 +1,4 @@
-# PROOF: [L3/ユーティリティ] O4→運用スクリプトが必要→collect_results が担う
+# PROOF: [L3/ユーティリティ] <- mekhane/scripts/ O4→運用スクリプトが必要→collect_results が担う
 #!/usr/bin/env python3
 """
 Synedrion v2.1 Result Collector

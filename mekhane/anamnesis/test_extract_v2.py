@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# PROOF: [L3/テスト] export_chats が存在→その検証が必要→test_extract_v2 が担う
+# PROOF: [L3/テスト] <- mekhane/anamnesis/ export_chats が存在→その検証が必要→test_extract_v2 が担う
 """
 メッセージ抽出 v2（STYLE 除外版）
 

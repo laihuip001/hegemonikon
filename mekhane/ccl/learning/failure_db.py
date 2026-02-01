@@ -1,4 +1,4 @@
-# PROOF: [L2/インフラ]
+# PROOF: [L2/インフラ] <- mekhane/ccl/learning/
 # Phase 4: 失敗パターン学習
 
 """

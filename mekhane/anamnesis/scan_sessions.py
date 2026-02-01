@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# PROOF: [L3/ユーティリティ] P3→データ処理が必要→scan_sessions が担う
+# PROOF: [L3/ユーティリティ] <- mekhane/anamnesis/ P3→データ処理が必要→scan_sessions が担う
 """
 破損 .pb ファイルのスキャンとバックアップ
 Usage: python scan_sessions.py

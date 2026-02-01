@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# PROOF: [L3/ツール]
+# PROOF: [L3/ツール] <- mekhane/scripts/
 """
 PROOF Header Batch Injector
 

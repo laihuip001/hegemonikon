@@ -1,4 +1,4 @@
-# PROOF: [L3/テスト]
+# PROOF: [L3/テスト] <- mekhane/ccl/guardrails/
 """Guardrails sub-package"""
 
 from .validators import CCLOutputValidator, ValidationResult, ValidationError

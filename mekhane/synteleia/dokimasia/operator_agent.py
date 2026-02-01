@@ -1,4 +1,4 @@
-# PROOF: [L1/定理] A2.lex 演算子理解検証エージェント
+# PROOF: [L1/定理] <- mekhane/synteleia/dokimasia/ A2.lex 演算子理解検証エージェント
 """
 Operator Understanding Agent
 

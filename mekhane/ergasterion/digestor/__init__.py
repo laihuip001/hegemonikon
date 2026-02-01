@@ -1,4 +1,4 @@
-# PROOF: [L2/インフラ] A0→消化処理が必要→__init__ が担う
+# PROOF: [L2/インフラ] <- mekhane/ergasterion/digestor/ A0→消化処理が必要→__init__ が担う
 # Digestor Module
 # Gnosis → /eat 自動連携インフラ
 

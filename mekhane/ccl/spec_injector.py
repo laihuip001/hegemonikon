@@ -1,4 +1,4 @@
-# PROOF: [L2/インフラ]
+# PROOF: [L2/インフラ] <- mekhane/ccl/
 # Phase 0: CCL 実行前の仕様強制注入
 
 """

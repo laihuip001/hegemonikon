@@ -1,4 +1,4 @@
-# PROOF: [L1/定理] O1 Noēsis 本質洞察エージェント
+# PROOF: [L1/定理] <- mekhane/synteleia/poiesis/ O1 Noēsis 本質洞察エージェント
 """
 Ousia Agent - Essence Recognition
 

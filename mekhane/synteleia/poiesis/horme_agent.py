@@ -1,4 +1,4 @@
-# PROOF: [L1/定理] H3 Orexis 動機評価エージェント
+# PROOF: [L1/定理] <- mekhane/synteleia/poiesis/ H3 Orexis 動機評価エージェント
 """
 Hormē Agent - Motivation Evaluation
 

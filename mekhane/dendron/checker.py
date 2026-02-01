@@ -1,4 +1,4 @@
-# PROOF: [L2/インフラ]  # noqa: AI-022
+# PROOF: [L2/インフラ] <- mekhane/dendron/  # noqa: AI-022
 """
 Dendron Checker — PROOF 検証ロジック
 

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# PROOF: [L3/ユーティリティ] P3→DOM調査が必要→inspect_messages が担う
+# PROOF: [L3/ユーティリティ] <- mekhane/anamnesis/ P3→DOM調査が必要→inspect_messages が担う
 """
 会話を開いてからメッセージ要素を調査
 """

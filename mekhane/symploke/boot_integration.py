@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# PROOF: [L2/インフラ] A0→継続する私が必要→boot_integration が担う
+# PROOF: [L2/インフラ] <- mekhane/symploke/ A0→継続する私が必要→boot_integration が担う
 """
 Boot Integration - 3軸を統合した /boot 用 API
 

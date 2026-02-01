@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# PROOF: [L3/ユーティリティ] O4→実行スクリプトが必要→run_specialists が担う
+# PROOF: [L3/ユーティリティ] <- mekhane/symploke/ O4→実行スクリプトが必要→run_specialists が担う
 """
 Jules 専門家バッチ実行スクリプト v2.0
 

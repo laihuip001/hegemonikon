@@ -1,4 +1,4 @@
-# PROOF: [L1/定理] CCL→CCLパーサーが必要→generator が担う
+# PROOF: [L1/定理] <- mekhane/ccl/ CCL→CCLパーサーが必要→generator が担う
 """
 CCL Generator v2.0
 

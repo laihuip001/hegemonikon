@@ -4,12 +4,12 @@
 # Run all: pre-commit run --all-files
 
 repos:
-  # PROOF Header Check
+  # PROOF Header Check (Dendron)
   - repo: local
     hooks:
-      - id: check-proof
-        name: Check PROOF headers
-        entry: python3 mekhane/scripts/check_proof.py
+      - id: dendron-check
+        name: Dendron PROOF Check
+        entry: python3 -m mekhane.dendron check mekhane/ --ci
         language: system
         types: [python]
         pass_filenames: false

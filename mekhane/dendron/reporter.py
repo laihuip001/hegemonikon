@@ -22,7 +22,7 @@ class ReportFormat(Enum):
     CI = "ci"  # CI 向け最小出力
 
 
-class DendronReporter:
+class DendronReporter:  # noqa: AI-007
     """Dendron レポート生成器"""
 
     def __init__(self, output: TextIO = None):
@@ -39,7 +39,7 @@ class DendronReporter:
         elif format == ReportFormat.JSON:
             self._report_json(result)
 
-    def _report_text(self, result: CheckResult):
+    def _report_text(self, result: CheckResult):  # noqa: AI-007
         """テキスト形式"""
         self._print("=" * 60)
         self._print("Dendron PROOF Check Report")
@@ -53,6 +53,11 @@ class DendronReporter:
         self._print(f"Invalid:     {result.files_invalid_proof}")
         self._print(f"Exempt:      {result.files_exempt}")
         self._print(f"Coverage:    {result.coverage:.1f}%")
+
+        # レベル統計
+        if result.level_stats:
+            stats = result.level_stats
+            self._print(f"Levels:      L1:{stats.get('L1', 0)} | L2:{stats.get('L2', 0)} | L3:{stats.get('L3', 0)}")
         self._print()
 
         # ディレクトリ統計
@@ -90,6 +95,9 @@ class DendronReporter:
         self._print(f"| With proof | {result.files_with_proof} |")
         self._print(f"| Missing | {result.files_missing_proof} |")
         self._print(f"| Coverage | {result.coverage:.1f}% |")
+        if result.level_stats:
+            stats = result.level_stats
+            self._print(f"| Levels | L1:{stats.get('L1', 0)} / L2:{stats.get('L2', 0)} / L3:{stats.get('L3', 0)} |")
         self._print()
 
         # 問題のあるファイル
@@ -109,7 +117,9 @@ class DendronReporter:
     def _report_ci(self, result: CheckResult):
         """CI 向け最小出力"""
         if result.is_passing:
-            self._print(f"✅ Dendron: {result.coverage:.1f}% coverage")
+            stats = result.level_stats
+            level_str = f" (L1:{stats.get('L1', 0)}/L2:{stats.get('L2', 0)}/L3:{stats.get('L3', 0)})" if stats else ""
+            self._print(f"✅ Dendron: {result.coverage:.1f}% coverage{level_str}")
         else:
             self._print(f"❌ Dendron: {result.files_missing_proof} files missing PROOF")
             for f in result.file_proofs:
@@ -127,6 +137,7 @@ class DendronReporter:
             "files_invalid_proof": result.files_invalid_proof,
             "coverage": result.coverage,
             "is_passing": result.is_passing,
+            "level_stats": result.level_stats,
             "missing_files": [
                 str(f.path) for f in result.file_proofs if f.status == ProofStatus.MISSING
             ],

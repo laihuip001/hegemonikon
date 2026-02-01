@@ -52,3 +52,9 @@ htmlcov/
 
 # Mypy
 .mypy_cache/
+
+# Large model files
+*.onnx
+mekhane/anamnesis/models/
+
+mekhane/models/

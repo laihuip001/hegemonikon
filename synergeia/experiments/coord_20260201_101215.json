@@ -1,0 +1,40 @@
+{
+  "ccl": "/sop+ || /zet+",
+  "plan": {
+    "type": "parallel",
+    "elements": [
+      "/sop+",
+      "/zet+"
+    ]
+  },
+  "results": [
+    {
+      "status": "success",
+      "ccl": "/zet+",
+      "thread": "perplexity",
+      "answer": "**Hegemonikon** is the Ancient Greek philosophical term, particularly in Stoicism, for the *internal rational ruler* or **intellectual governing part of the soul**, acting as the central \"commanding faculty\" or \"control room\" that processes sensory impressions (*phantasiai*), exercises imagination, reason, impulse, and assent.[1]\n\n### Key Features in Stoic Philosophy\n- **Location and Structure**: Stoics view the soul as composed of eight parts as streams of *pneuma* (vital breath), with seven being the senses (sight, hearing, smell, taste, touch), reproductive faculty, and speech faculty; the **hegemonikon** is the central eighth part from which the others extend, located in the chest (not the head), akin to Aristotle's view.[1]\n- **Four Powers**:\n  - **Imagination**: Sensory inputs or mental reproductions of past impressions.[1]\n  - **Reason**: Faculty for logical analysis and making sense of impressions.[1]\n  - **Impulse**: Drive to act toward an imagined object.[1]\n  - **Assent**: Evaluative judgment confirming or rejecting an impulse after rational assessment.[1]\n- **Analogies**: Depicted as an octopus (tentacles from center), tree (branches from trunk), spring (streams from source), or spider's web, emphasizing soul unity with all faculties rooted in the **hegemonikon**.[1]\n\nNo direct connections appear in the sources between **hegemonikon** and \"CCL execution,\" \"zet,\" or \"deep.\" \"CCL\" likely references Epistle CCL (250) in St. Basil's works from the Christian Classics Ethereal Library (CCEL), discussing theological distinctions like \"engender alive\" vs. post-death revivification, amid Basil's biography (e.g., events around 370s AD), but without philosophical overlap to hegemonikon.[2] \"Zet\" and \"deep\" yield no relevant matches, possibly indicating a query misphrasing, acronym, or unrelated modern term (e.g., tech like \"ZET deep execution\" absent here). Stoic influence appears in later traditions, but not tied to these elements.[3]",
+      "citations": [
+        "https://www.sokratiko.com/words/hegemonikon/",
+        "https://ccel.org/s/schaff/npnf208/cache/npnf208.html3",
+        "https://www.scribd.com/document/330817551/Steven-K-Strange-Jack-Zupko-Stoicism-Traditions-and-Transformations-Cambridge-University-Press-2004-pdf",
+        "http://etheses.dur.ac.uk/15539/1/Corrected_PhD_Dissertation_Dean_Georcheski.pdf"
+      ],
+      "cost": 0.002345
+    },
+    {
+      "status": "success",
+      "ccl": "/sop+",
+      "thread": "perplexity",
+      "answer": "**No standard operating procedure (SOP) for \"Hegemonikon CCL execution\" exists in the provided search results or known historical/philosophical contexts.** \n\nThe term \"Hegemonikon\" refers to the Stoic concept of the **ruling faculty** or **commanding principle** (Greek: ἡγεμονικόν, hēgemonikon), the rational governing part of the soul responsible for judgment, impulse, and perception, as discussed in Stoic philosophy from thinkers like Epictetus and Marcus Aurelius[2]. It appears in modern scholarly analyses of Stoicism's evolution but lacks any \"CCL execution\" reference, which may be a misinterpretation of \"Ep. CCL\" (Letter 252) in St. Basil the Great's correspondence[1].\n\nSt. Basil's **Letter CCL (252)**, from the Nicene and Post-Nicene Fathers series (NPNF2-08), is a theological epistle addressing ecclesiastical matters amid 4th-century Arian controversies, with no mention of execution, SOPs, or Hegemonikon[1][4]. Basil's timeline (e.g., born ~329/330, died 379) involves councils like Ariminum (360) and disputes with Arians, but nothing procedural matches \"execution SOP deep\"[1].\n\nRelated contexts include:\n- **Arianism debates**: Pseudo-Hegemonius critiques early Arian views on the Trinity, unrelated to execution[4].\n- **No Gnostic or monastic links**: Results on Gnostic mythology or Orthodox monasticism show no procedural \"execution\" tied to Hegemonikon[3][5].\n\nIf \"CCL\" intends a modern acronym (e.g., Common Command Language) or code, or if this is a role-play scenario, clarify for deeper analysis—no credible SOP or execution details appear in sources.",
+      "citations": [
+        "https://ccel.org/s/schaff/npnf208/cache/npnf208.html3",
+        "https://www.scribd.com/document/330817551/Steven-K-Strange-Jack-Zupko-Stoicism-Traditions-and-Transformations-Cambridge-University-Press-2004-pdf",
+        "https://nnty.fun/downloads/books/TAEL/HUMANITIES/RELIGION/GNOSTICISM/The%20Tree%20of%20Gnosis_%20Gnostic%20Mythology%20from%20Early%20Christianity%20to%20Modern%20Nihilism%20-%20Harpercollins.%20Ioan%20P.%20Couliano%20(1992).pdf",
+        "https://ebin.pub/arianism-after-arius-essays-on-the-development-of-the-fourth-century-trinitarian-conflicts-0567096416-9780567096418.html",
+        "https://www.scribd.com/document/704545606/McGUCKIN-John-Orthodox-Monasticism-Past-and-Present-2015"
+      ],
+      "cost": 0.0019950000000000002
+    }
+  ],
+  "timestamp": "2026-02-01T10:12:15.805402"
+}

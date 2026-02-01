@@ -1,4 +1,4 @@
-# PROOF: [L2/インフラ] CCL → LMQL 翻訳器
+# PROOF: [L2/インフラ] <- hermeneus/src/ CCL → LMQL 翻訳器
 """
 Hermēneus Translator — AST を LMQL プログラムに変換
 

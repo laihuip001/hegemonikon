@@ -1,4 +1,4 @@
-# PROOF: [L2/インフラ] Hermēneus パッケージ
+# PROOF: [L2/インフラ] <- hermeneus/src/ Hermēneus パッケージ
 """
 Hermēneus — CCL 実行保証コンパイラ
 

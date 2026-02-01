@@ -1,4 +1,4 @@
-# PROOF: [L2/インフラ] 状態永続化 (Checkpointer)
+# PROOF: [L2/インフラ] <- hermeneus/src/ 状態永続化 (Checkpointer)
 """
 Hermēneus Checkpointer — 実行状態の永続化と復元
 

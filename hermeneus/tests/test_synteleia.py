@@ -1,4 +1,4 @@
-# PROOF: [L1/テスト] Synteleia 統合テスト
+# PROOF: [L1/テスト] <- hermeneus/tests/ Synteleia 統合テスト
 """
 Synteleia Phase 4 TDD テスト — @S マクロ統合
 

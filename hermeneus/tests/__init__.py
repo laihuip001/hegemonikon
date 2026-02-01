@@ -1,2 +1,2 @@
-# PROOF: [L2/インフラ] Hermēneus テストパッケージ
+# PROOF: [L2/インフラ] <- hermeneus/tests/ Hermēneus テストパッケージ
 """Hermēneus Tests"""

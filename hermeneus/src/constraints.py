@@ -1,4 +1,4 @@
-# PROOF: [L2/インフラ] Constrained Decoding
+# PROOF: [L2/インフラ] <- hermeneus/src/ Constrained Decoding
 """
 Hermēneus Constraints — 構造化出力の強制
 

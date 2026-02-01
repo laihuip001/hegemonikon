@@ -1,4 +1,4 @@
-# PROOF: [L2/テスト] Optimizer テスト
+# PROOF: [L2/テスト] <- hermeneus/tests/ Optimizer テスト
 """テスト: Hermeneus Phase 4 Optimizer"""
 
 import pytest

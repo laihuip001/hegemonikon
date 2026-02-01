@@ -1,4 +1,4 @@
-# PROOF: [L2/インフラ] Hermēneus CLI
+# PROOF: [L2/インフラ] <- hermeneus/src/ Hermēneus CLI
 """
 Hermēneus CLI — コマンドラインインターフェース
 

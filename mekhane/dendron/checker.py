@@ -16,10 +16,11 @@ import re
 class ProofStatus(Enum):
     """PROOF 状態"""
 
-    OK = "ok"  # 存在証明あり
+    OK = "ok"  # 存在証明あり (親参照付き)
     MISSING = "missing"  # 存在証明なし
     INVALID = "invalid"  # 形式不正
     EXEMPT = "exempt"  # 除外対象
+    ORPHAN = "orphan"  # 親参照なし (v2 警告)
 
 
 class ProofLevel(Enum):
@@ -38,6 +39,7 @@ class FileProof:
     path: Path
     status: ProofStatus
     level: Optional[ProofLevel] = None
+    parent: Optional[str] = None  # v2: 親参照
     reason: Optional[str] = None
     line_number: Optional[int] = None
 
@@ -61,21 +63,24 @@ class CheckResult:
     files_missing_proof: int
     files_invalid_proof: int
     files_exempt: int
+    files_orphan: int  # v2: 親参照なし
     file_proofs: List[FileProof]
     dir_proofs: List[DirProof]
     level_stats: Dict[str, int] = field(default_factory=dict)  # L1/L2/L3 統計
 
     @property
     def coverage(self) -> float:
-        """カバレッジ率"""
+        """カバレッジ率 (v2: ORPHAN も OK 扱い)"""
         checkable = self.total_files - self.files_exempt
         if checkable == 0:
             return 100.0
-        return (self.files_with_proof / checkable) * 100
+        # v2: ORPHAN は PROOF あり扱い
+        with_proof = self.files_with_proof + self.files_orphan
+        return (with_proof / checkable) * 100
 
     @property
     def is_passing(self) -> bool:
-        """CI で PASS するか"""
+        """CI で PASS するか (v2: ORPHAN は警告のみ)"""
         return self.files_missing_proof == 0 and self.files_invalid_proof == 0
 
 
@@ -88,8 +93,15 @@ EXEMPT_PATTERNS = [
     r"\.venv",  # 仮想環境を除外
 ]
 
-# PROOF ヘッダーパターン
+# PROOF ヘッダーパターン (v1)
 PROOF_PATTERN = re.compile(r"#\s*PROOF:\s*\[([^\]]+)\]")
+
+# PROOF ヘッダーパターン (v2: 親参照付き、任意の後続テキスト許容)
+# 形式: # PROOF: [レベル] または # PROOF: [レベル] <- 親
+PROOF_PATTERN_V2 = re.compile(r"#\s*PROOF:\s*\[([^\]]+)\](?:\s*<-\s*([^\s#]+))?")
+
+# 特殊親参照
+SPECIAL_PARENTS = {"FEP", "external", "legacy"}
 
 # PROOF.md パターン
 PROOF_MD_PATTERN = re.compile(r"^PROOF\.md$", re.IGNORECASE)
@@ -114,7 +126,7 @@ class DendronChecker:  # noqa: AI-007
         return any(p.search(path_str) for p in self.exempt_patterns)
 
     def check_file_proof(self, path: Path) -> FileProof:
-        """ファイルの PROOF ヘッダーをチェック"""
+        """ファイルの PROOF ヘッダーをチェック (v2: 親参照対応)"""
         if self.is_exempt(path):
             return FileProof(path=path, status=ProofStatus.EXEMPT)
 
@@ -126,11 +138,27 @@ class DendronChecker:  # noqa: AI-007
         # 最初の 10 行を検索
         lines = content.split("\n")[:10]
         for i, line in enumerate(lines, 1):
-            match = PROOF_PATTERN.search(line)
-            if match:
-                level_str = match.group(1)
+            # v2 パターン (親参照付き) を優先
+            match_v2 = PROOF_PATTERN_V2.search(line)
+            if match_v2:
+                level_str = match_v2.group(1)
+                parent = match_v2.group(2)
                 level = self._parse_level(level_str)
-                return FileProof(path=path, status=ProofStatus.OK, level=level, line_number=i)
+                
+                if parent:
+                    # 親参照あり → OK
+                    parent = parent.strip()
+                    return FileProof(
+                        path=path, status=ProofStatus.OK, 
+                        level=level, parent=parent, line_number=i
+                    )
+                else:
+                    # 親参照なし → ORPHAN (v2 警告)
+                    return FileProof(
+                        path=path, status=ProofStatus.ORPHAN, 
+                        level=level, line_number=i,
+                        reason="親参照なし (v2: <- parent 必須)"
+                    )
 
         return FileProof(path=path, status=ProofStatus.MISSING, reason="PROOF ヘッダーなし")
 
@@ -183,11 +211,12 @@ class DendronChecker:  # noqa: AI-007
         missing = sum(1 for f in file_proofs if f.status == ProofStatus.MISSING)
         invalid = sum(1 for f in file_proofs if f.status == ProofStatus.INVALID)
         exempt = sum(1 for f in file_proofs if f.status == ProofStatus.EXEMPT)
+        orphan = sum(1 for f in file_proofs if f.status == ProofStatus.ORPHAN)  # v2
 
-        # レベル統計 (check_proof.py から移植)
+        # レベル統計 (OK + ORPHAN を含む)
         level_counter: Counter = Counter()
         for fp in file_proofs:
-            if fp.status == ProofStatus.OK and fp.level:
+            if fp.status in (ProofStatus.OK, ProofStatus.ORPHAN) and fp.level:
                 level_counter[fp.level.value] += 1
         level_stats = dict(level_counter)
 
@@ -197,6 +226,7 @@ class DendronChecker:  # noqa: AI-007
             files_missing_proof=missing,
             files_invalid_proof=invalid,
             files_exempt=exempt,
+            files_orphan=orphan,
             file_proofs=file_proofs,
             dir_proofs=dir_proofs,
             level_stats=level_stats,

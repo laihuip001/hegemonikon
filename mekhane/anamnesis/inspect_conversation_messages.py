@@ -31,7 +31,7 @@ async def main():
                         agent_pages.append((pg, len(buttons)))
                         print(f"[*] Found jetski-agent page: {len(buttons)} buttons")
                     except Exception:
-                        pass
+                        pass  # TODO: Add proper error handling
         
         if not agent_pages:
             print("[!] Agent Manager not found")
@@ -87,7 +87,7 @@ async def main():
                     classes = await el.get_attribute('class') or ""
                     large_scrolls.append((el, classes, len(text)))
             except Exception:
-                pass
+                pass  # TODO: Add proper error handling
         
         large_scrolls.sort(key=lambda x: x[2], reverse=True)
         lines.append(f"\n=== Large scroll areas (top 5): ===")
@@ -124,7 +124,7 @@ async def main():
                         preview = c_text[:100].replace('\n', ' ').strip()
                         lines.append(f"        preview: '{preview}'")
                 except Exception:
-                    pass
+                    pass  # TODO: Add proper error handling
         
         # 3. .prose/.markdown を探す
         prose_elements = await page.query_selector_all('.prose, .markdown, .markdown-body')
@@ -138,7 +138,7 @@ async def main():
                 if text:
                     lines.append(f"      preview: '{text[:100].replace(chr(10), ' ')}'")
             except Exception:
-                pass
+                pass  # TODO: Add proper error handling
         
         # 4. data-testid を持つ要素
         testid_elements = await page.query_selector_all('[data-testid]')
@@ -151,7 +151,7 @@ async def main():
                 text_preview = (text[:50] + "...") if text and len(text) > 50 else (text or "")
                 lines.append(f"  [{i}] <{tag}> testid='{testid}' text='{text_preview.replace(chr(10), ' ')}'")
             except Exception:
-                pass
+                pass  # TODO: Add proper error handling
         
         # ファイルに書き込み
         with open(OUTPUT_FILE, 'w', encoding='utf-8') as f:

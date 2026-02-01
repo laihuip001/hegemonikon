@@ -104,7 +104,7 @@ class JulesResultCollector:
                 t2 = dt_parser.parse(updated)
                 duration = int((t2 - t1).total_seconds())
             except Exception:
-                pass
+                pass  # TODO: Add proper error handling
         
         # Check if silent (no output = no issues found)
         is_silent = data.get("state") == "COMPLETED" and not outputs

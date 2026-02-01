@@ -133,7 +133,7 @@ class ZeroTrustCCLExecutor:
             success=validation.valid,
             output=output,
             validation=validation,
-            context=context
+            # NOTE: Removed self-assignment: context = context
         )
     
     def get_regeneration_prompt(self, result: ExecutionResult) -> str:

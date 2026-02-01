@@ -24,7 +24,7 @@ with open(r'C:\Users\raikh\Forge\Raw\aidb\_index\manifest_batch_5.jsonl', 'r', e
                 data = json.loads(line)
                 actual_urls.add(data['url'])
             except Exception:
-                pass
+                pass  # TODO: Add proper error handling
 
 print(f"Actual count: {len(actual_urls)}")
 

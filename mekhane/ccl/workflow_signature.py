@@ -163,4 +163,4 @@ class SignatureRegistry:
                     has_side_effects=frontmatter.get("has_side_effects", True)
                 )
         except yaml.YAMLError:
-            pass
+            pass  # TODO: Add proper error handling

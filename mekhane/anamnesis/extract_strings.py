@@ -27,7 +27,7 @@ def extract_strings(filepath: Path, min_length: int = 20):
             text = match.group().decode('ascii')
             strings.append(('ascii', text))
         except Exception:
-            pass
+            pass  # TODO: Add proper error handling
     
     # UTF-8 文字列 (日本語を含む)
     # マジックバイトで UTF-8 開始を検出

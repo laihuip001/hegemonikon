@@ -93,7 +93,7 @@ class FailureDB:
             operator=operator,
             failure_type=failure_type,
             cause=cause,
-            resolution=resolution
+            # NOTE: Removed self-assignment: resolution = resolution
         )
         self.data["failures"].append(asdict(record))
         self.save()

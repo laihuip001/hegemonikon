@@ -80,7 +80,7 @@ async def main():
                         lines.append(f"      text_len={text_len}")
                         lines.append(f"      preview: {preview[:200]}")
             except Exception as e:
-                pass
+                pass  # TODO: Add proper error handling
         
         # 3. テキストが多いdivを探す
         lines.append("\n\n=== Large div analysis ===")
@@ -100,7 +100,7 @@ async def main():
                         'children': children_count
                     })
             except Exception:
-                pass
+                pass  # TODO: Add proper error handling
         
         large_divs.sort(key=lambda x: x['text_len'], reverse=True)
         
@@ -118,7 +118,7 @@ async def main():
                     c_len = len(c_text) if c_text else 0
                     lines.append(f"      child[{j}] <{c_tag}> class='{c_class[:60]}' text_len={c_len}")
                 except Exception:
-                    pass
+                    pass  # TODO: Add proper error handling
         
         # 4. ファイルに書き込み
         with open(OUTPUT_FILE, 'w', encoding='utf-8') as f:

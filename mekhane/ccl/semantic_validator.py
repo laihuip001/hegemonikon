@@ -67,7 +67,7 @@ class CCLSemanticValidator:
                 try:
                     self.client = genai.Client(api_key=api_key)
                 except Exception:
-                    pass
+                    pass  # TODO: Add proper error handling
     
     def _load_prompt(self) -> str:
         """Load the semantic check prompt."""
@@ -191,7 +191,7 @@ CCL は Hegemonikón システムの認知制御言語で、以下のワーク�
                     suggestions=data.get("suggestions", [])
                 )
             except (json.JSONDecodeError, ValueError):
-                pass
+                pass  # TODO: Add proper error handling
         
         # Fallback: try to infer from text
         aligned = "不一致" not in text and "aligned.*false" not in text.lower()

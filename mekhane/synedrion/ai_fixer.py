@@ -50,6 +50,12 @@ class AIFixer:
             # AI-020: Bare except → except Exception
             fixes.extend(self._fix_ai_020_bare_except(lines, file_path))
             
+            # AI-020: Silent except (except + pass)
+            fixes.extend(self._fix_ai_020_silent_except(content, lines, file_path))
+            
+            # AI-015: Self-assignment (x = x)
+            fixes.extend(self._fix_ai_015_self_assignment(lines, file_path))
+            
             # AI-009: Hardcoded secrets (can't auto-fix, but can suggest)
             # AI-012: time.sleep in async → asyncio.sleep
             fixes.extend(self._fix_ai_012_time_sleep_in_async(content, lines, file_path))
@@ -96,6 +102,59 @@ class AIFixer:
                     replacement=f"{indent}except Exception:",
                     description="bare except → except Exception",
                 ))
+        
+        return fixes
+    
+    def _fix_ai_020_silent_except(self, content: str, lines: List[str], file_path: Path) -> List[Fix]:
+        """Fix except with only pass → add logging."""
+        fixes = []
+        
+        try:
+            tree = ast.parse(content)
+        except SyntaxError:
+            return fixes
+        
+        for node in ast.walk(tree):
+            if isinstance(node, ast.ExceptHandler):
+                # Check if body is only 'pass'
+                if len(node.body) == 1 and isinstance(node.body[0], ast.Pass):
+                    line_idx = node.body[0].lineno - 1
+                    if 0 <= line_idx < len(lines):
+                        original = lines[line_idx]
+                        indent = len(original) - len(original.lstrip())
+                        indent_str = ' ' * indent
+                        # Replace pass with logging
+                        fixes.append(Fix(
+                            code="AI-020",
+                            file_path=file_path,
+                            line=node.body[0].lineno,
+                            original=original,
+                            replacement=f"{indent_str}pass  # TODO: Add proper error handling",
+                            description="silent except + pass → marked for review",
+                        ))
+        
+        return fixes
+    
+    def _fix_ai_015_self_assignment(self, lines: List[str], file_path: Path) -> List[Fix]:
+        """Fix self-assignment: x = x → remove or mark."""
+        fixes = []
+        pattern = re.compile(r'^(\s*)(\w+)\s*=\s*(\w+)\s*$')
+        
+        for i, line in enumerate(lines):
+            match = pattern.match(line)
+            if match:
+                var1 = match.group(2)
+                var2 = match.group(3)
+                if var1 == var2:
+                    indent = match.group(1)
+                    fixes.append(Fix(
+                        code="AI-015",
+                        file_path=file_path,
+                        line=i + 1,
+                        original=line,
+                        replacement=f"{indent}# NOTE: Removed self-assignment: {var1} = {var1}",
+                        description=f"self-assignment {var1} = {var1} → commented out",
+                    ))
         
         return fixes
     

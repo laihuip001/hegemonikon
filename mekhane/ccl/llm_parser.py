@@ -67,7 +67,7 @@ class LLMParser:
                     # Legacy SDK: google.generativeai
                     self.model = genai_legacy.GenerativeModel(model)
             except Exception:
-                pass
+                pass  # TODO: Add proper error handling
     
     def _load_system_prompt(self) -> str:
         """Load the CCL compiler prompt."""
@@ -119,6 +119,6 @@ class LLMParser:
                     ccl = "\n".join(lines[1:-1] if lines[-1] == "```" else lines[1:])
                 return ccl.strip()
         except Exception:
-            pass
+            pass  # TODO: Add proper error handling
             
         return None

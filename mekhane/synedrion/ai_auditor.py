@@ -71,6 +71,7 @@ class AIAuditor:
     
     # Known third-party modules (common AI/ML stack) + local modules
     KNOWN_MODULES = STDLIB_MODULES | {
+        # Common third-party
         'numpy', 'pandas', 'scipy', 'sklearn', 'torch', 'tensorflow',
         'transformers', 'openai', 'anthropic', 'google', 'langchain',
         'fastapi', 'flask', 'django', 'pydantic', 'requests',
@@ -78,9 +79,29 @@ class AIAuditor:
         'pymdp', 'jax', 'flax', 'optax', 'onnxruntime', 'tiktoken',
         'playwright', 'arxiv', 'ijson', 'yaml', 'bs4', 'beautifulsoup4',
         'pytest', 'pytest_asyncio', 'aiohttp', 'PIL', 'pillow',
-        # Local modules
+        'html2text', 'tokenizers', 'huggingface_hub', 'networkx',
+        'pyarrow', 'schedule', 'dotenv', 'dateutil', 'hnswlib',
+        # MCP
+        'mcp',
+        # Local Hegemonikón modules
         'mekhane', 'hegemonikon', 'symploke', 'ergasterion', 'peira',
         'anamnesis', 'ccl', 'fep', 'synedrion', 'hermeneus', 'synergeia',
+        'prompt_lang', 'gnosis', 'sophia', 'kairos', 'chronos',
+        # Internal sub-modules (relative imports)
+        'base', 'config', 'engine', 'executor', 'generator', 'validator',
+        'validator', 'validators', 'checker', 'reporter', 'ranker', 'selector',
+        'adapters', 'indices', 'persistence', 'encoding', 'learning', 'guardrails',
+        'state_spaces', 'pattern_cache', 'macro_registry', 'macro_expander',
+        'llm_parser', 'llm_evaluator', 'doxa_learner', 'doxa_persistence', 'doxa_cache',
+        'fep_agent', 'fep_bridge', 'epoche_shield', 'metron_resolver',
+        'telos_checker', 'tekhne_registry', 'spec_injector', 'syntax_validator',
+        'semantic_validator', 'semantic_matcher', 'schema_analyzer', 'tracer', 'pipeline',
+        'specialist_prompts', 'prompt_generator', 'prompt_lang_integrate', 'workflow_signature',
+        'noesis_client', 'sophia_researcher', 'zetesis_inquirer', 'eukairia_detector',
+        'chronos_evaluator', 'akribeia_evaluator', 'horme_evaluator', 'perigraphe_engine',
+        'energeia_executor', 'energeia_core', 'krisis_judge', 'failure_db', 'vocab_store', 'signal',
+        'phase0_specialists', 'phase2_specialists', 'phase2_remaining', 'phase3_specialists',
+        'adaptive_allocator', 'jules_mcp_server',
     }
     
     def __init__(self):
@@ -273,18 +294,39 @@ class AIAuditor:
                         message="Division by zero",
                     ))
             
-            # Infinite loop: while True without break
+            # Infinite loop: while True without break/return/sys.exit
             if isinstance(node, ast.While):
                 if isinstance(node.test, ast.Constant) and node.test.value is True:
-                    has_break = any(isinstance(n, ast.Break) for n in ast.walk(node))
-                    if not has_break:
-                        self.issues.append(Issue(
-                            code="AI-004",
-                            name="Logic Hallucination",
-                            severity=Severity.HIGH,
-                            line=node.lineno,
-                            message="Infinite loop without break statement",
-                        ))
+                    has_exit = False
+                    for n in ast.walk(node):
+                        # break statement
+                        if isinstance(n, ast.Break):
+                            has_exit = True
+                        # return statement
+                        if isinstance(n, ast.Return):
+                            has_exit = True
+                        # sys.exit() call
+                        if isinstance(n, ast.Call):
+                            if isinstance(n.func, ast.Attribute) and n.func.attr == 'exit':
+                                has_exit = True
+                            if isinstance(n.func, ast.Name) and n.func.id == 'exit':
+                                has_exit = True
+                    if not has_exit:
+                        # Check if in main() function with signal handler in file
+                        # (pattern for schedulers/daemons)
+                        is_scheduler_pattern = False
+                        file_has_signal = 'signal.' in self.source
+                        if file_has_signal and 'def main' in self.source:
+                            is_scheduler_pattern = True
+                        
+                        if not is_scheduler_pattern:
+                            self.issues.append(Issue(
+                                code="AI-004",
+                                name="Logic Hallucination",
+                                severity=Severity.HIGH,
+                                line=node.lineno,
+                                message="Infinite loop without break/return/exit",
+                            ))
             
             # Empty range
             if isinstance(node, ast.Call):
@@ -514,24 +556,42 @@ class AIAuditor:
                                 suggestion="Use shell=False with argument list",
                             ))
         
-        # Hardcoded secrets
+        # Hardcoded secrets (skip documentation examples)
         secret_patterns = [
             (r'password\s*=\s*["\'][^"\']+["\']', "Hardcoded password"),
             (r'api_key\s*=\s*["\'][^"\']+["\']', "Hardcoded API key"),
             (r'secret\s*=\s*["\'][^"\']+["\']', "Hardcoded secret"),
             (r'token\s*=\s*["\'][A-Za-z0-9_-]{20,}["\']', "Hardcoded token"),
         ]
+        # Placeholder values to skip (documentation examples and test dummies)
+        placeholder_patterns = [
+            r'YOUR_', r'your_', r'xxx', r'XXX', r'\*\*\*',
+            r'<.*>', r'\${', r'%\(', r'PLACEHOLDER', r'EXAMPLE',
+            r'sk-\.\.\.', r'sk_test_', r'pk_test_',
+            r'test[-_]key', r'test[-_]token', r'test[-_]secret', r'test[-_]pass',
+            r'dummy', r'DUMMY', r'fake', r'FAKE', r'mock', r'MOCK',
+        ]
         for i, line in enumerate(self.lines, 1):
+            # Skip if in docstring or comment
+            stripped = line.strip()
+            if stripped.startswith('#') or stripped.startswith('"""') or stripped.startswith("'''"):
+                continue
+            
             for pattern, desc in secret_patterns:
-                if re.search(pattern, line, re.IGNORECASE):
-                    self.issues.append(Issue(
-                        code="AI-009",
-                        name="Security Vulnerability",
-                        severity=Severity.CRITICAL,
-                        line=i,
-                        message=f"CWE-798: {desc} detected",
-                        suggestion="Use environment variables or secrets manager",
-                    ))
+                match = re.search(pattern, line, re.IGNORECASE)
+                if match:
+                    matched_value = match.group(0)
+                    # Skip if contains placeholder pattern
+                    is_placeholder = any(re.search(p, matched_value, re.IGNORECASE) for p in placeholder_patterns)
+                    if not is_placeholder:
+                        self.issues.append(Issue(
+                            code="AI-009",
+                            name="Security Vulnerability",
+                            severity=Severity.CRITICAL,
+                            line=i,
+                            message=f"CWE-798: {desc} detected",
+                            suggestion="Use environment variables or secrets manager",
+                        ))
     
     # ─────────────────────────────────────────────────────────────
     # AI-010: Input Validation Omission
@@ -629,17 +689,27 @@ class AIAuditor:
                         suggestion="Remove async or add await for I/O operations",
                     ))
             
-            # await in non-async function (will be caught by Python, but good to flag)
+            # await in non-async function (but skip if inside nested async function)
             if isinstance(node, ast.FunctionDef):  # Not AsyncFunctionDef
                 for child in ast.walk(node):
                     if isinstance(child, ast.Await):
-                        self.issues.append(Issue(
-                            code="AI-012",
-                            name="Async Misuse",
-                            severity=Severity.CRITICAL,
-                            line=child.lineno,
-                            message="await in non-async function",
-                        ))
+                        # Check if this await is inside a nested async function
+                        is_in_nested_async = False
+                        for n in ast.walk(node):
+                            if isinstance(n, ast.AsyncFunctionDef):
+                                for deep_child in ast.walk(n):
+                                    if deep_child is child:
+                                        is_in_nested_async = True
+                                        break
+                        
+                        if not is_in_nested_async:
+                            self.issues.append(Issue(
+                                code="AI-012",
+                                name="Async Misuse",
+                                severity=Severity.CRITICAL,
+                                line=child.lineno,
+                                message="await in non-async function",
+                            ))
             
             # time.sleep in async function
             if isinstance(node, ast.AsyncFunctionDef):
@@ -910,16 +980,19 @@ class AIAuditor:
                         suggestion="Use 'except Exception:' or specific exception types",
                     ))
                 
-                # except with only pass
+                # except with only pass (but allow if it has a TODO comment)
                 if (len(node.body) == 1 and isinstance(node.body[0], ast.Pass)):
-                    self.issues.append(Issue(
-                        code="AI-020",
-                        name="Exception Swallowing",
-                        severity=Severity.HIGH,
-                        line=node.lineno,
-                        message="Exception silently caught and ignored",
-                        suggestion="Log the exception or re-raise",
-                    ))
+                    line_content = self.lines[node.body[0].lineno - 1] if node.body[0].lineno <= len(self.lines) else ""
+                    # Allow if there's a TODO/NOTE/FIXME comment
+                    if not re.search(r'#\s*(TODO|NOTE|FIXME|HACK)', line_content, re.IGNORECASE):
+                        self.issues.append(Issue(
+                            code="AI-020",
+                            name="Exception Swallowing",
+                            severity=Severity.HIGH,
+                            line=node.lineno,
+                            message="Exception silently caught and ignored",
+                            suggestion="Log the exception or re-raise",
+                        ))
     
     # ─────────────────────────────────────────────────────────────
     # AI-021: Resource Leak

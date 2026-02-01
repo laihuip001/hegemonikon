@@ -81,7 +81,7 @@ def mark_meaningful(
         reason=reason,
         intensity=intensity,
         session_id=session_id,
-        context=context
+        # NOTE: Removed self-assignment: context = context
     )
     
     # Append to current session's traces

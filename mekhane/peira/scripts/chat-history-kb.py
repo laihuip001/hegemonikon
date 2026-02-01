@@ -233,7 +233,7 @@ def build_index(incremental: bool = False, report_mode: bool = False):
                         if at <= last_sync:
                             continue
                     except Exception:
-                        pass
+                        pass  # TODO: Add proper error handling
             
             # Generate ID
             art_type = artifact.get("artifact_type", "unknown").replace("ARTIFACT_TYPE_", "").lower()

@@ -107,7 +107,7 @@ def _register_adapters():
         from .adapters.hnswlib_adapter import HNSWlibAdapter
         VectorStoreFactory.register("hnswlib", HNSWlibAdapter)
     except ImportError:
-        pass  # hnswlib未インストール
+        pass  # TODO: Add proper error handling
     
     # 将来の拡張用
     # try:

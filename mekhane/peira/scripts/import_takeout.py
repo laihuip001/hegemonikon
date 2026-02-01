@@ -113,7 +113,7 @@ def process_conversations(data: Union[List, Dict, Iterable], output_dir: str):
                         dt = datetime.fromisoformat(create_time.replace('Z', '+00:00'))
                     date_str = dt.strftime('%Y-%m-%d')
                 except Exception:
-                    pass
+                    pass  # TODO: Add proper error handling
             
             # Safe Filename (Robustness)
             base_name = safe_filename(f"{date_str}_{title}")

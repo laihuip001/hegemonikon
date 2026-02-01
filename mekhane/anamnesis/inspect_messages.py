@@ -94,7 +94,7 @@ async def main():
                         text = await el.text_content()
                         lines.append(f"  [{i}] <{tag}> class='{classes[:80]}' text_len={len(text) if text else 0}")
             except Exception:
-                pass
+                pass  # TODO: Add proper error handling
         
         # 3. テキストが長いdivを探す（メッセージコンテナ候補）
         lines.append("\n\n=== Large divs (text > 1000) ===")
@@ -109,7 +109,7 @@ async def main():
                     children = await div.evaluate("el => el.children.length")
                     large_divs.append((classes, len(text), children))
             except Exception:
-                pass
+                pass  # TODO: Add proper error handling
         
         large_divs.sort(key=lambda x: x[1], reverse=True)
         
@@ -136,7 +136,7 @@ async def main():
                 lines.append(f"       class='{classes[:60]}'")
                 lines.append(f"       text='{text_preview}'")
             except Exception:
-                pass
+                pass  # TODO: Add proper error handling
         
         # 書き込み
         with open(OUTPUT_FILE, 'w', encoding='utf-8') as f:

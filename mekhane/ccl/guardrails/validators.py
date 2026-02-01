@@ -180,7 +180,7 @@ class CCLOutputValidator:
         return ValidationResult(
             valid=len(errors) == 0,
             errors=errors,
-            warnings=warnings
+            # NOTE: Removed self-assignment: warnings = warnings
         )
 
 

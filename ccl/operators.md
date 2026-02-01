@@ -321,6 +321,111 @@ L:  → ASCII で入力可能、λ の代替
 
 ---
 
+## 9.6 Mixin 合成 (Pythōsis B2) v6.53
+
+> **Origin**: Python 多重継承・デコレータの消化
+> **目的**: 複数の「能力」を認知操作に合成
+
+### 9.6.1 構文
+
+| 記法 | 説明 |
+|:-----|:-----|
+| `@with(Mixin)` | 単一 Mixin 適用 |
+| `@with(M1, M2)` | 複数 Mixin 合成 (左→右) |
+| `@with(M{param})` | パラメータ付き Mixin |
+
+### 9.6.2 合成ルール
+
+```
+@with(A, B) f ≡ A(B(f))
+# 前の Mixin が後の Mixin をラップ
+# 順序が重要: @with(A, B) ≠ @with(B, A)
+```
+
+### 9.6.3 標準 Mixin
+
+| Mixin | 機能 | Python 対応 |
+|:------|:-----|:------------|
+| `Tracing` | 実行ログ記録 | `logging` |
+| `Caching` | 結果キャッシュ | `@cache` |
+| `Retry` | 失敗時リトライ | `tenacity` |
+| `Validation` | 事前/事後検証 | `pydantic` |
+| `Timing` | 実行時間計測 | `time` |
+
+### 9.6.4 使用例
+
+```ccl
+# 基本
+@with(Tracing) /noe+
+
+# 複数合成
+@with(Tracing, Caching) /zet+
+
+# パラメータ付き
+@with(Retry{max_attempts=5}) /sop
+
+# Lambda との組み合わせ
+@with(Timing) L:[x]{/noe+{target=x}}
+```
+
+### 9.6.5 複雑度
+
+| 演算子 | pt |
+|:-------|:--:|
+| `@with(M)` | 3 |
+| `@with(M1, M2)` | 4 |
+| `@with(M{p})` | 4 |
+
+> **設計方針**: Mixin は「横断的関心事」(ログ、キャッシュ等) に限定。認知ロジックには使用しない。
+
+---
+
+## 9.7 デコレータマクロ (Pythōsis B3) v6.54
+
+> **Origin**: Python `@decorator` パターンの消化
+> **目的**: Mixin の簡潔な構文糖衣
+
+### 9.7.1 一覧
+
+| マクロ | 展開先 Mixin | 用途 |
+|:-------|:-------------|:-----|
+| `@memoize` | `Caching` | 結果キャッシュ |
+| `@retry` | `Retry` | 失敗時リトライ |
+| `@log` | `Tracing` | 実行ログ |
+| `@validate` | `Validation` | 事前/事後検証 |
+| `@timed` | `Timing` | 実行時間計測 |
+| `@scoped` | (特殊) | スコープ限定 |
+| `@async` | (特殊) | 非同期実行 |
+
+### 9.7.2 使用例
+
+```ccl
+# 基本形
+@memoize /sop{query="重い検索"}
+@retry /ene
+@log /noe+
+
+# パラメータ付き
+@memoize(ttl="1h") /zet+
+@retry(max=5) /sop
+@validate(pre=L:{$x != null}) /noe+
+
+# 非同期
+@async /sop{query="バックグラウンド"}
+```
+
+### 9.7.3 複雑度
+
+| マクロ | pt |
+|:-------|:--:|
+| 単純 (`@log`, `@timed`) | 2 |
+| パラメータ付き | 3 |
+| 特殊 (`@scoped`, `@async`) | 4 |
+
+> **詳細**: [ccl/macros/README.md](macros/README.md)
+
+---
+
 ## 10. 制御構文 (CPL v2.0)
 
 知的作業を「プログラム」として制御するための構文体系。
@@ -612,4 +717,4 @@ I:[V[/ctx] > 0.5]{
 
 ---
 
-*v6.52 | 2026-02-01 | Lambda 式 `L:[x]{WF}` 正式導入 (Pythōsis Phase 2b)。*
+*v6.54 | 2026-02-01 | デコレータマクロ `@memoize` 等 正式導入 (Pythōsis B3)。*

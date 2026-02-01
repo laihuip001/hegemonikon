@@ -22,7 +22,6 @@ Usage:
 import argparse
 import sys
 from pathlib import Path
-from typing import Optional
 import json
 from datetime import datetime, timedelta
 
@@ -37,6 +36,26 @@ if str(_HEGEMONIKON_ROOT) not in sys.path:
 # Configuration
 DATA_DIR = _HEGEMONIKON_ROOT / "gnosis_data"
 STATE_FILE = DATA_DIR / "state.json"
+
+try:
+    from mekhane.anamnesis.ux_utils import (
+        print_header,
+        print_success,
+        print_error,
+        print_warning,
+        print_info,
+        print_dim,
+        colored
+    )
+except ImportError:
+    # Fallback if import fails (e.g. termcolor missing)
+    def print_header(msg): print(f"=== {msg} ===")
+    def print_success(msg): print(f"[OK] {msg}")
+    def print_error(msg): print(f"[Error] {msg}")
+    def print_warning(msg): print(f"[Warning] {msg}")
+    def print_info(msg): print(f"[Info] {msg}")
+    def print_dim(msg): print(msg)
+    def colored(msg, *args, **kwargs): return msg
 
 
 def update_state():
@@ -53,7 +72,7 @@ def update_state():
         state["last_collected_at"] = datetime.now().isoformat()
         STATE_FILE.write_text(json.dumps(state, indent=2), encoding="utf-8")
     except Exception as e:
-        print(f"[Warning] Failed to update state: {e}")
+        print_warning(f"Failed to update state: {e}")
 
 
 def cmd_check_freshness(args):
@@ -102,30 +121,30 @@ def cmd_collect(args):
 
     source = args.source.lower()
     if source not in collectors:
-        print(f"Unknown source: {args.source}")
-        print(f"Available: {', '.join(collectors.keys())}")
+        print_error(f"Unknown source: {args.source}")
+        print_info(f"Available: {', '.join(collectors.keys())}")
         return 1
 
-    print(f"[Collect] Source: {source}, Query: {args.query}, Limit: {args.limit}")
+    print_header(f"Collect: {source} (Query: {args.query})")
 
     try:
         collector = collectors[source]()
         papers = collector.search(args.query, max_results=args.limit)
-        print(f"[Collect] Found {len(papers)} papers")
+        print_info(f"Found {len(papers)} papers")
 
         if papers and not args.dry_run:
             index = GnosisIndex()
             added = index.add_papers(papers)
-            print(f"[Collect] Added {added} to index")
+            print_success(f"Added {added} to index")
             update_state()  # Update timestamp
         elif args.dry_run:
-            print("[Collect] Dry run - not adding to index")
+            print_warning("Dry run - not adding to index")
             for p in papers[:5]:
                 print(f"  - {p.title[:60]}...")
 
         return 0
     except Exception as e:
-        print(f"[Error] {e}")
+        print_error(str(e))
         return 1
 
 
@@ -167,27 +186,39 @@ def cmd_search(args):
     """論文検索"""
     from mekhane.anamnesis.index import GnosisIndex
 
-    print(f"[Search] Query: {args.query}")
+    print_header(f"Search: {args.query}")
 
     index = GnosisIndex()
     results = index.search(args.query, k=args.limit)
 
     if not results:
-        print("No results found")
+        print_warning("No results found")
         return 0
 
-    print(f"\nFound {len(results)} results:\n")
-    print("-" * 70)
+    print_success(f"Found {len(results)} results")
+    print_dim("-" * 70)
 
     for i, r in enumerate(results, 1):
-        print(f"\n[{i}] {r.get('title', 'Untitled')[:70]}")
-        print(f"    Source: {r.get('source')} | Citations: {r.get('citations', 'N/A')}")
-        print(f"    Authors: {r.get('authors', '')[:60]}...")
-        print(f"    Abstract: {r.get('abstract', '')[:150]}...")
-        if r.get("url"):
-            print(f"    URL: {r.get('url')}")
+        title = r.get('title', 'Untitled')[:80]
+        print(f"\n{colored(f'[{i}]', 'cyan')} {colored(title, 'yellow', attrs=['bold'])}")
 
-    print("\n" + "-" * 70)
+        source = r.get('source', 'Unknown')
+        citations = r.get('citations', 'N/A')
+        print(f"    {colored('Source:', 'blue')} {source} | {colored('Citations:', 'blue')} {citations}")
+
+        authors = r.get('authors', '')[:60]
+        if authors:
+            print(f"    {colored('Authors:', 'blue')} {authors}...")
+
+        abstract = r.get('abstract', '')[:150]
+        if abstract:
+            print_dim(f"    {abstract}...")
+
+        url = r.get("url")
+        if url:
+            print(f"    {colored('URL:', 'blue')} {url}")
+
+    print("\n" + colored("-" * 70, "white", attrs=["dark"]))
     return 0
 
 
@@ -198,24 +229,26 @@ def cmd_stats(args):
     index = GnosisIndex()
     stats = index.stats()
 
-    print("\n[Gnōsis Index Statistics]")
-    print("=" * 40)
-    print(f"Total Papers: {stats['total']}")
-    print(f"With DOI: {stats.get('unique_dois', 0)}")
-    print(f"With arXiv ID: {stats.get('unique_arxiv', 0)}")
-    print("\nBy Source:")
+    print_header("Gnōsis Index Statistics")
+    print_dim("=" * 40)
+    print(f"Total Papers: {colored(str(stats['total']), 'green', attrs=['bold'])}")
+    print(f"With DOI:     {stats.get('unique_dois', 0)}")
+    print(f"With arXiv:   {stats.get('unique_arxiv', 0)}")
+
+    print("\n" + colored("By Source:", attrs=['underline']))
     for source, count in stats.get("sources", {}).items():
-        print(f"  {source}: {count}")
+        print(f"  {source.ljust(15)}: {colored(str(count), 'cyan')}")
 
     # Show freshness
     if STATE_FILE.exists():
         try:
             state = json.loads(STATE_FILE.read_text(encoding="utf-8"))
-            print(f"Last Collected: {state.get('last_collected_at', 'Unknown')}")
+            last = state.get('last_collected_at', 'Unknown')
+            print(f"\nLast Collected: {colored(last, 'yellow')}")
         except Exception:
             pass  # TODO: Add proper error handling # noqa: AI-ALL
 
-    print("=" * 40)
+    print_dim("=" * 40)
 
     return 0
 

@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/インフラ] <- synergeia/ Synergeia Coordinator
 """
 Synergeia Coordinator (簡易版)
 ==============================
@@ -23,6 +24,10 @@ from pathlib import Path
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from typing import List, Dict, Any
 
+# Add hegemonikon to path for Hermeneus import
+HEGEMONIKON_ROOT = Path(__file__).parent.parent
+sys.path.insert(0, str(HEGEMONIKON_ROOT))
+
 # Import Perplexity API
 PERPLEXITY_SCRIPT = Path("/home/laihuip001/oikos/hegemonikon/mekhane/peira/scripts")
 sys.path.insert(0, str(PERPLEXITY_SCRIPT))
@@ -31,13 +36,16 @@ from perplexity_api import search as perplexity_search
 
 # Import Hermeneus CCL Compiler
 try:
-    from hermeneus.src import compile_ccl, expand_ccl, parse_ccl as hermeneus_parse
+    from hermeneus.src import compile_ccl, expand_ccl
+    from hermeneus.src import execute_ccl as hermeneus_execute
+    from hermeneus.src import parse_ccl as hermeneus_parse
     from hermeneus.src.macros import get_all_macros
     HERMENEUS_AVAILABLE = True
     STANDARD_MACROS = get_all_macros()
 except ImportError:
     HERMENEUS_AVAILABLE = False
     STANDARD_MACROS = {}
+    hermeneus_execute = None
     print("[Warning] Hermeneus not available, falling back to manual execution")
 
 # Import FEP Selector
@@ -310,6 +318,48 @@ def execute_hermeneus(ccl: str, context: str, compile_only: bool = False) -> Dic
         # Step 3: AST を取得
         ast = hermeneus_parse(expansion.expanded)
         
+        # Step 4: Synteleia Monitor - コンテキストに監査情報を自動追加
+        enriched_context = context
+        synteleia_report = None
+        
+        try:
+            from synteleia import SynteleiaOrchestrator, AuditTarget, AuditTargetType
+            
+            # コンテキストに Synteleia 監査を実行
+            if context and len(context) > 100:
+                orch = SynteleiaOrchestrator()
+                target = AuditTarget(
+                    content=context,
+                    target_type=AuditTargetType.THOUGHT,
+                    source="user_context"
+                )
+                audit_result = orch.audit(target)
+                
+                if audit_result.all_issues:
+                    issue_lines = []
+                    for issue in audit_result.all_issues:
+                        issue_lines.append(f"- [{issue.severity.value.upper()}] {issue.code}: {issue.message}")
+                        if issue.suggestion:
+                            issue_lines.append(f"  - 提案: {issue.suggestion}")
+                    
+                    synteleia_report = f"""
+## Synteleia 監査結果 (自動追加)
+Issues: {len(audit_result.all_issues)}
+{chr(10).join(issue_lines)}
+"""
+                    enriched_context = f"{context}\n{synteleia_report}"
+        except ImportError:
+            pass  # Synteleia 未インストール
+        except Exception:
+            pass  # 監査エラーは無視 (LLM 実行を優先)
+        
+        # Step 5: LLM で実行 (hermeneus_execute が利用可能な場合)
+        llm_output = None
+        if hermeneus_execute is not None:
+            exec_result = hermeneus_execute(ccl, enriched_context)
+            if exec_result.status.value == "success":
+                llm_output = exec_result.output
+        
         return {
             "status": "success",
             "ccl": ccl,
@@ -321,8 +371,9 @@ def execute_hermeneus(ccl: str, context: str, compile_only: bool = False) -> Dic
             },
             "ast_type": type(ast).__name__,
             "lmql": lmql_code,
+            "llm_output": llm_output,
             "macros_used": len(STANDARD_MACROS),
-            "note": "Compiled by Hermeneus with standard macros.",
+            "note": "Compiled and executed by Hermeneus.",
         }
         
     except Exception as e:

@@ -1,4 +1,4 @@
-# PROOF: [L2/インフラ] FEP ベーススレッド選択
+# PROOF: [L2/インフラ] <- synergeia/ FEP ベーススレッド選択
 """
 Synergeia FEP Selector — 不確実性に基づく最適スレッド選択
 

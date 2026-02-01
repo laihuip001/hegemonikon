@@ -1,4 +1,4 @@
-# PROOF: [L3/テスト] Synergeia 統合テスト
+# PROOF: [L3/テスト] <- synergeia/tests/ Synergeia 統合テスト
 """
 Synergeia Integration Tests — プロジェクト間連携のテスト
 

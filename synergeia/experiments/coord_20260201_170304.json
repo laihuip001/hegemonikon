@@ -1,0 +1,18 @@
+{
+  "ccl": "/noe+",
+  "plan": {
+    "type": "single",
+    "elements": [
+      "/noe+"
+    ]
+  },
+  "results": [
+    {
+      "status": "manual",
+      "ccl": "/noe+",
+      "thread": "antigravity",
+      "note": "Antigravityが手動で実行。結果は統合時に入力してください。"
+    }
+  ],
+  "timestamp": "2026-02-01T17:03:04.932638"
+}

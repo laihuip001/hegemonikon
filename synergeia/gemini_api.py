@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/インフラ] <- synergeia/ Gemini API Client
 """
 Gemini API Client for Synergeia
 ================================

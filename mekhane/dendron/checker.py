@@ -93,14 +93,11 @@ EXEMPT_PATTERNS = [
     r"\.venv",  # 仮想環境を除外
 ]
 
-# PROOF ヘッダーパターン (v1)
-PROOF_PATTERN = re.compile(r"#\s*PROOF:\s*\[([^\]]+)\]")
-
 # PROOF ヘッダーパターン (v2: 親参照付き、任意の後続テキスト許容)
 # 形式: # PROOF: [レベル] または # PROOF: [レベル] <- 親
 PROOF_PATTERN_V2 = re.compile(r"#\s*PROOF:\s*\[([^\]]+)\](?:\s*<-\s*([^\s#]+))?")
 
-# 特殊親参照
+# 特殊親参照 (バリデーションをスキップ)
 SPECIAL_PARENTS = {"FEP", "external", "legacy"}
 
 # PROOF.md パターン
@@ -108,25 +105,55 @@ PROOF_MD_PATTERN = re.compile(r"^PROOF\.md$", re.IGNORECASE)
 
 
 class DendronChecker:  # noqa: AI-007
-    """Dendron PROOF チェッカー"""
+    """Dendron PROOF チェッカー v2.1 (親パス検証付き)"""
 
     def __init__(
         self,
         exempt_patterns: List[str] = None,
         check_dirs: bool = True,
         check_files: bool = True,
+        root: Path = None,  # v2.1: 親パス検証用ルート
+        validate_parents: bool = True,  # v2.1: 親パス存在検証
     ):
         self.exempt_patterns = [re.compile(p) for p in (exempt_patterns or EXEMPT_PATTERNS)]
         self.check_dirs = check_dirs
         self.check_files = check_files
+        self.root = root
+        self.validate_parents = validate_parents
 
     def is_exempt(self, path: Path) -> bool:
         """除外対象かどうか"""
         path_str = str(path)
         return any(p.search(path_str) for p in self.exempt_patterns)
 
+    def validate_parent(self, parent: str) -> tuple[bool, str]:
+        """親参照を検証 (v2.1: パストラバーサル防止 + 存在チェック)
+        
+        Returns:
+            (is_valid, reason)
+        """
+        # 特殊親参照はスキップ
+        if parent in SPECIAL_PARENTS:
+            return True, "特殊親参照"
+        
+        # パストラバーサル防止: .. を含むパスを拒否
+        if ".." in parent:
+            return False, f"パストラバーサル検出: {parent}"
+        
+        # 絶対パス拒否
+        if parent.startswith("/"):
+            return False, f"絶対パスは禁止: {parent}"
+        
+        # 存在チェック (root が設定されている場合のみ)
+        if self.root and self.validate_parents:
+            parent_path = self.root / parent.rstrip("/")
+            if not parent_path.exists():
+                return False, f"親パスが存在しない: {parent}"
+        
+        return True, "OK"
+
     def check_file_proof(self, path: Path) -> FileProof:
-        """ファイルの PROOF ヘッダーをチェック (v2: 親参照対応)"""
+        """ファイルの PROOF ヘッダーをチェック (v2.1: 親参照検証付き)"""
         if self.is_exempt(path):
             return FileProof(path=path, status=ProofStatus.EXEMPT)
 
@@ -146,8 +173,17 @@ class DendronChecker:  # noqa: AI-007
                 level = self._parse_level(level_str)
                 
                 if parent:
-                    # 親参照あり → OK
                     parent = parent.strip()
+                    
+                    # v2.1: 親参照を検証
+                    is_valid, reason = self.validate_parent(parent)
+                    if not is_valid:
+                        return FileProof(
+                            path=path, status=ProofStatus.INVALID, 
+                            level=level, parent=parent, line_number=i,
+                            reason=reason
+                        )
+                    
                     return FileProof(
                         path=path, status=ProofStatus.OK, 
                         level=level, parent=parent, line_number=i

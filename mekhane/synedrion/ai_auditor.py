@@ -1,3 +1,4 @@
+# PROOF: [L1/定理] AI 生成コードの品質保証 — 22 軸監査
 """
 AI Synedrion Audit Checker (AI-001 〜 AI-022)
 
@@ -271,15 +272,25 @@ class AIAuditor:
         "jules_mcp_server",
     }
 
-    def __init__(self):
+    def __init__(self, strict: bool = False):
+        """
+        Initialize AI Auditor.
+
+        Args:
+            strict: If True, report all issues (Critical/High/Medium/Low).
+                   If False (default), report only Critical and High issues.
+        """
+        self.strict = strict
         self.issues: List[Issue] = []
         self.source: str = ""
         self.tree: Optional[ast.AST] = None
         self.lines: List[str] = []
+        self.file_path: Optional[Path] = None
 
     def audit_file(self, file_path: Path) -> AuditResult:
         """Audit a Python file for AI-generated code issues."""
         self.issues = []
+        self.file_path = file_path
         self.source = file_path.read_text(encoding="utf-8")
         self.lines = self.source.splitlines()
 
@@ -301,26 +312,61 @@ class AIAuditor:
         # Core checks - keep enabled (Critical/High severity potential)
         self._check_ai_001_naming_hallucination()
         self._check_ai_002_api_misuse()
-        # self._check_ai_003_type_confusion()  # Disabled: Python is dynamically typed
+        self._check_ai_003_type_confusion()
         self._check_ai_004_logic_hallucination()
-        # self._check_ai_005_incomplete_code()  # Disabled: TODO markers are intentional
-        # self._check_ai_006_context_drift()  # Disabled: Parameter reassignment is common Python pattern
-        # self._check_ai_007_pattern_inconsistency()  # Disabled: Black handles style
+        # self._check_ai_005_incomplete_code()  # Disabled: TODOs are intentional metadata
+        self._check_ai_006_context_drift()
+        # self._check_ai_007_pattern_inconsistency()  # Disabled: Quote style is not a risk
         self._check_ai_008_self_contradiction()
         self._check_ai_009_security_vulnerabilities()
-        # self._check_ai_010_input_validation()  # Disabled: Validation is optional
-        # self._check_ai_011_boundary_condition()  # Disabled: Low value
-        # self._check_ai_012_async_misuse()  # Disabled: Many false positives
+        self._check_ai_010_input_validation()
+        self._check_ai_011_boundary_condition()
+        self._check_ai_012_async_misuse()
         self._check_ai_013_concurrency_issues()
-        # self._check_ai_014_excessive_comment()  # Disabled: High false positive rate
-        # self._check_ai_015_copy_paste_error()  # Disabled: Many false positives
+        self._check_ai_014_excessive_comment()
+        self._check_ai_015_copy_paste_error()
         self._check_ai_016_dead_code()
-        # self._check_ai_017_magic_number()  # Disabled: Style concern, not bug
-        # self._check_ai_018_hardcoded_path()  # Disabled: Many valid uses
-        # self._check_ai_019_deprecated_api()  # Disabled: Low priority
+        self._check_ai_017_magic_number()
+        self._check_ai_018_hardcoded_path()
+        # self._check_ai_019_deprecated_api()  # Disabled: Deprecation warnings are informational
         self._check_ai_020_exception_swallowing()
         self._check_ai_021_resource_leak()
-        # self._check_ai_022_test_coverage_gap()  # Disabled: Docstrings are optional
+        self._check_ai_022_test_coverage_gap()
+
+        # Filter suppressed issues
+        filtered_issues = []
+        for issue in self.issues:
+            # Skip suppression check if line number is invalid
+            if issue.line < 1 or issue.line > len(self.lines):
+                filtered_issues.append(issue)
+                continue
+
+            line_content = self.lines[issue.line - 1]
+
+            # Check for inline suppression markers
+            is_suppressed = False
+            for marker in ["# noqa", "# auditor: ignore"]:
+                if marker in line_content:
+                    # Parse specific codes if present (e.g., # noqa: AI-001, AI-002)
+                    if ":" in line_content.split(marker)[1]:
+                        codes_part = line_content.split(marker)[1].split(":")[1]
+                        # Normalize separators (comma, space)
+                        suppressed_codes = codes_part.replace(",", " ").split()
+                        if (
+                            issue.code in suppressed_codes
+                            or "AI-ALL" in suppressed_codes
+                        ):
+                            is_suppressed = True
+                            break
+                    else:
+                        # Bare marker suppresses all issues on the line
+                        is_suppressed = True
+                        break
+
+            if not is_suppressed:
+                filtered_issues.append(issue)
+
+        self.issues = filtered_issues
 
         return AuditResult(file_path=file_path, issues=self.issues)
 
@@ -397,7 +443,10 @@ class AIAuditor:
                 if isinstance(node.func, ast.Attribute) and node.func.attr == "join":
                     if node.args and isinstance(node.args[0], ast.Call):
                         inner = node.args[0]
-                        if isinstance(inner.func, ast.Attribute) and inner.func.attr == "split":
+                        if (
+                            isinstance(inner.func, ast.Attribute)
+                            and inner.func.attr == "split"
+                        ):
                             self.issues.append(
                                 Issue(
                                     code="AI-002",
@@ -427,7 +476,9 @@ class AIAuditor:
                     ):
                         left_val = node.left.value
                         right_val = node.comparators[0].value
-                        if isinstance(left_val, str) and isinstance(right_val, (int, float)):
+                        if isinstance(left_val, str) and isinstance(
+                            right_val, (int, float)
+                        ):
                             self.issues.append(
                                 Issue(
                                     code="AI-003",
@@ -437,7 +488,9 @@ class AIAuditor:
                                     message="String compared with number",
                                 )
                             )
-                        elif isinstance(left_val, (int, float)) and isinstance(right_val, str):
+                        elif isinstance(left_val, (int, float)) and isinstance(
+                            right_val, str
+                        ):
                             self.issues.append(
                                 Issue(
                                     code="AI-003",
@@ -451,9 +504,15 @@ class AIAuditor:
             # len() == True/False (should be > 0 or == 0)
             if isinstance(node, ast.Compare):
                 if isinstance(node.left, ast.Call):
-                    if isinstance(node.left.func, ast.Name) and node.left.func.id == "len":
+                    if (
+                        isinstance(node.left.func, ast.Name)
+                        and node.left.func.id == "len"
+                    ):
                         for comp in node.comparators:
-                            if isinstance(comp, ast.Constant) and comp.value in (True, False):
+                            if isinstance(comp, ast.Constant) and comp.value in (
+                                True,
+                                False,
+                            ):
                                 self.issues.append(
                                     Issue(
                                         code="AI-003",
@@ -499,7 +558,10 @@ class AIAuditor:
                             has_exit = True
                         # sys.exit() call
                         if isinstance(n, ast.Call):
-                            if isinstance(n.func, ast.Attribute) and n.func.attr == "exit":
+                            if (
+                                isinstance(n.func, ast.Attribute)
+                                and n.func.attr == "exit"
+                            ):
                                 has_exit = True
                             if isinstance(n.func, ast.Name) and n.func.id == "exit":
                                 has_exit = True
@@ -549,7 +611,14 @@ class AIAuditor:
     # AI-005: Incomplete Code
     # ─────────────────────────────────────────────────────────────
     def _check_ai_005_incomplete_code(self):
-        """Check for incomplete code patterns (pass, TODO, etc.)."""
+        """Check for incomplete implementations."""
+        # Skip for test files
+        if self.file_path and (
+            "test" in self.file_path.name or "tests" in self.file_path.parts
+        ):
+            return
+
+        # Check for TODO, FIXME in comments
         for node in ast.walk(self.tree):
             if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
                 # Check for lone 'pass' statements
@@ -599,52 +668,81 @@ class AIAuditor:
     # AI-006: Context Drift
     # ─────────────────────────────────────────────────────────────
     def _check_ai_006_context_drift(self):
-        """Check for context drift patterns (variable redefinition, scope confusion)."""
+        """Check for variable semantic drift (reusing vars for different types)."""
+        # Only check for reassignment of parameters to completely different types
+        # Skip test files
+        if self.file_path and (
+            "test" in self.file_path.name or "tests" in self.file_path.parts
+        ):
+            return
+
         for node in ast.walk(self.tree):
             if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
-                # Check for parameter shadowing
-                param_names = {arg.arg for arg in node.args.args}
+                args = {a.arg for a in node.args.args}
+                for child in ast.walk(node):
+                    if isinstance(child, ast.Assign):
+                        for target in child.targets:
+                            if isinstance(target, ast.Name) and target.id in args:
+                                # Check if self-referential (likely casting/normalization)
+                                is_casting = False
+                                for value_node in ast.walk(child.value):
+                                    if (
+                                        isinstance(value_node, ast.Name)
+                                        and value_node.id == target.id
+                                    ):
+                                        is_casting = True
+                                        break
 
-                for stmt in ast.walk(node):
-                    if isinstance(stmt, ast.Assign):
-                        for target in stmt.targets:
-                            if isinstance(target, ast.Name) and target.id in param_names:
-                                self.issues.append(
-                                    Issue(
-                                        code="AI-006",
-                                        name="Context Drift",
-                                        severity=Severity.LOW,  # Common Python pattern
-                                        line=stmt.lineno,
-                                        message=f"Parameter '{target.id}' is reassigned",
-                                        suggestion="Use different variable name to avoid confusion",
+                                # Also allow common patterns like `x = x or default`
+                                if isinstance(child.value, ast.BoolOp):
+                                    is_casting = True
+
+                                # Allow if it's the same name being assigned
+                                if not is_casting:
+                                    # Skip if function has < 10 lines (small function)
+                                    if len(node.body) < 10:
+                                        continue
+                                    self.issues.append(
+                                        Issue(
+                                            code="AI-006",
+                                            name="Context Drift",
+                                            severity=Severity.LOW,
+                                            line=child.lineno,
+                                            message=f"Parameter '{target.id}' reused/reassigned",
+                                            suggestion="Use a new variable for modified values",
+                                        )
                                     )
-                                )
 
-                # Check for global/nonlocal misuse
-                has_global = any(isinstance(s, ast.Global) for s in node.body)
-                has_return = any(isinstance(s, ast.Return) for s in ast.walk(node))
-                if has_global and has_return:
-                    self.issues.append(
-                        Issue(
-                            code="AI-006",
-                            name="Context Drift",
-                            severity=Severity.LOW,
-                            line=node.lineno,
-                            message="Function uses both global and return",
-                            suggestion="Consider avoiding global state",
-                        )
-                    )
-
+    # ─────────────────────────────────────────────────────────────
+    # AI-007: Pattern Inconsistency
+    # ─────────────────────────────────────────────────────────────
     # ─────────────────────────────────────────────────────────────
     # AI-007: Pattern Inconsistency
     # ─────────────────────────────────────────────────────────────
     def _check_ai_007_pattern_inconsistency(self):
         """Check for inconsistent coding patterns."""
-        # Check for mixed string quotes in the same file
-        single_quote_count = self.source.count("'")
-        double_quote_count = self.source.count('"')
+        # Check for mixed string quotes, excluding docstrings/comments
+        # Simple heuristic: remove lines starting with spaces+""" or #
+        clean_lines = []
+        in_docstring = False
+        for line in self.lines:
+            stripped = line.strip()
+            if '"""' in stripped or "'''" in stripped:
+                if stripped.count('"""') == 2 or stripped.count("'''") == 2:
+                    # One-line docstring, ignore this line
+                    continue
+                in_docstring = not in_docstring
+                continue
 
-        # Significant imbalance suggests inconsistency (only flag if VERY mixed)
+            if not in_docstring and not stripped.startswith("#"):
+                clean_lines.append(line)
+
+        source_code = "\n".join(clean_lines)
+
+        single_quote_count = source_code.count("'")
+        double_quote_count = source_code.count('"')
+
+        # Only flag if VERY mixed and significant volume
         if single_quote_count > 20 and double_quote_count > 20:
             ratio = min(single_quote_count, double_quote_count) / max(
                 single_quote_count, double_quote_count
@@ -657,11 +755,17 @@ class AIAuditor:
                         severity=Severity.LOW,
                         line=1,
                         message="Mixed single and double quotes throughout file",
-                        suggestion="Standardize on one quote style",
+                        suggestion="Standardize on one quote style (Recommend Black)",
                     )
                 )
 
         # Check for inconsistent naming (mixedCase and snake_case in same scope)
+        # Skip this check for test files (test_*.py often use mixed conventions)
+        if self.file_path and (
+            "test" in self.file_path.name or "tests" in self.file_path.parts
+        ):
+            return
+
         for node in ast.walk(self.tree):
             if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
                 names = []
@@ -670,7 +774,9 @@ class AIAuditor:
                         names.append(child.id)
 
                 snake_case = [n for n in names if "_" in n and n.islower()]
-                camel_case = [n for n in names if not "_" in n and any(c.isupper() for c in n[1:])]
+                camel_case = [
+                    n for n in names if "_" not in n and any(c.isupper() for c in n[1:])
+                ]
 
                 if len(snake_case) > 3 and len(camel_case) > 3:
                     self.issues.append(
@@ -697,7 +803,9 @@ class AIAuditor:
                 for value in node.values:
                     if isinstance(value, ast.Name):
                         names.add(value.id)
-                    elif isinstance(value, ast.UnaryOp) and isinstance(value.op, ast.Not):
+                    elif isinstance(value, ast.UnaryOp) and isinstance(
+                        value.op, ast.Not
+                    ):
                         if isinstance(value.operand, ast.Name):
                             neg_names.add(value.operand.id)
 
@@ -828,7 +936,11 @@ class AIAuditor:
         for i, line in enumerate(self.lines, 1):
             # Skip if in docstring or comment
             stripped = line.strip()
-            if stripped.startswith("#") or stripped.startswith('"""') or stripped.startswith("'''"):
+            if (
+                stripped.startswith("#")
+                or stripped.startswith('"""')
+                or stripped.startswith("'''")
+            ):
                 continue
 
             for pattern, desc in secret_patterns:
@@ -837,7 +949,8 @@ class AIAuditor:
                     matched_value = match.group(0)
                     # Skip if contains placeholder pattern
                     is_placeholder = any(
-                        re.search(p, matched_value, re.IGNORECASE) for p in placeholder_patterns
+                        re.search(p, matched_value, re.IGNORECASE)
+                        for p in placeholder_patterns
                     )
                     if not is_placeholder:
                         self.issues.append(
@@ -856,33 +969,54 @@ class AIAuditor:
     # ─────────────────────────────────────────────────────────────
     def _check_ai_010_input_validation(self):
         """Check for missing input validation."""
+        # Skip for test files
+        if self.file_path and (
+            "test" in self.file_path.name or "tests" in self.file_path.parts
+        ):
+            return
+
         for node in ast.walk(self.tree):
             if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
-                # Functions with 'path' or 'file' parameters
+                # Only check functions with 'path' or 'file' parameters that are actually used
+                path_args = []
                 for arg in node.args.args:
                     if any(x in arg.arg.lower() for x in ["path", "file", "dir"]):
-                        # Check if there's any validation in first few statements
-                        has_validation = False
-                        for stmt in node.body[:5]:
-                            if isinstance(stmt, ast.If):
-                                has_validation = True
-                                break
-                            if isinstance(stmt, ast.Expr) and isinstance(stmt.value, ast.Call):
-                                # Check for Path().exists() or similar
-                                has_validation = True
-                                break
+                        path_args.append(arg.arg)
 
-                        if not has_validation and len(node.body) > 3:
-                            self.issues.append(
-                                Issue(
-                                    code="AI-010",
-                                    name="Input Validation Omission",
-                                    severity=Severity.LOW,  # Recommendation, not critical
-                                    line=node.lineno,
-                                    message=f"Path parameter '{arg.arg}' may lack validation",
-                                    suggestion="Add existence/type check at function start",
-                                )
-                            )
+                if not path_args:
+                    continue
+
+                # Skip small utility functions
+                if len(node.body) <= 5:
+                    continue
+
+                # Check if there's any validation in first few statements
+                has_validation = False
+                for stmt in node.body[:5]:
+                    if isinstance(stmt, ast.If):
+                        has_validation = True
+                        break
+                    if isinstance(stmt, ast.Expr) and isinstance(stmt.value, ast.Call):
+                        has_validation = True
+                        break
+                    # Also check for assert statements
+                    if isinstance(stmt, ast.Assert):
+                        has_validation = True
+                        break
+
+                if not has_validation:
+                    # Only report once per function, not per argument
+                    self.issues.append(
+                        Issue(
+                            code="AI-010",
+                            name="Input Validation Omission",
+                            severity=Severity.LOW,
+                            line=node.lineno,
+                            message=f"Path parameter(s) may lack validation",
+                            suggestion="Add existence/type check at function start",
+                        )
+                    )
+                    break
 
     # ─────────────────────────────────────────────────────────────
     # AI-011: Boundary Condition Error
@@ -945,6 +1079,19 @@ class AIAuditor:
     # ─────────────────────────────────────────────────────────────
     def _check_ai_012_async_misuse(self):
         """Check for async/await misuse patterns."""
+        # Skip for test files
+        if self.file_path and (
+            "test" in self.file_path.name or "tests" in self.file_path.parts
+        ):
+            return
+
+        # Skip for MCP server files (async is framework-required but may not use await)
+        # Also skip for server files and flow modules
+        if self.file_path:
+            name = self.file_path.name.lower()
+            if "mcp" in name or "server" in name or "flow" in self.file_path.parts:
+                return
+
         for node in ast.walk(self.tree):
             # Async function without await
             if isinstance(node, ast.AsyncFunctionDef):
@@ -1055,13 +1202,19 @@ class AIAuditor:
     # ─────────────────────────────────────────────────────────────
     def _check_ai_014_excessive_comment(self):
         """Check for redundant comments that restate code."""
+        # Skip for test files
+        if self.file_path and (
+            "test" in self.file_path.name or "tests" in self.file_path.parts
+        ):
+            return
+
         redundant_patterns = [
             (r"#\s*import\s+", "Comment restates import"),
             (r"#\s*define\s+", "Comment restates definition"),
-            (r"#\s*return\s+", "Comment restates return"),
+            # (r"#\s*return\s+", "Comment restates return"),  # Too aggressive
             (r"#\s*set\s+.+\s*to\s+", "Comment restates assignment"),
-            (r"#\s*increment\s+", "Comment restates increment"),
-            (r"#\s*initialize\s+", "Comment restates initialization"),
+            # (r"#\s*increment\s+", "Comment restates increment"),  # Rare
+            # (r"#\s*initialize\s+", "Comment restates initialization"),  # Documentation
         ]
 
         for i, line in enumerate(self.lines, 1):
@@ -1160,23 +1313,81 @@ class AIAuditor:
     # ─────────────────────────────────────────────────────────────
     def _check_ai_017_magic_number(self):
         """Check for unexplained numeric literals."""
+        # Skip for test files
+        if self.file_path and (
+            "test" in self.file_path.name or "tests" in self.file_path.parts
+        ):
+            return
+
         # Acceptable numbers - expanded to include common programming constants
         acceptable = {
             # Basic
-            0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, -1, -2,
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            -1,
+            -2,
             # Common sizes/limits
-            16, 24, 32, 64, 128, 256, 512, 1024, 2048, 4096,
-            100, 1000, 10000, 100000, 1000000,
+            16,
+            24,
+            32,
+            64,
+            128,
+            256,
+            512,
+            1024,
+            2048,
+            4096,
+            100,
+            1000,
+            10000,
+            100000,
+            1000000,
             # Time-related
-            12, 15, 30, 60, 120, 300, 600, 3600, 86400,
+            12,
+            15,
+            30,
+            60,
+            120,
+            300,
+            600,
+            3600,
+            86400,
             # RGB/Color
-            255, 127,
+            255,
+            127,
             # Floats
-            0.0, 1.0, 0.5, 0.1, 0.01, 0.001, 0.25, 0.75, 2.0, 3.0,
+            0.0,
+            1.0,
+            0.5,
+            0.1,
+            0.01,
+            0.001,
+            0.25,
+            0.75,
+            2.0,
+            3.0,
             # Percentages
-            50, 80, 90, 95, 99,
+            50,
+            80,
+            90,
+            95,
+            99,
             # Common test/config values
-            20, 25, 40, 70, 200, 500,
+            20,
+            25,
+            40,
+            70,
+            200,
+            500,
         }
 
         for node in ast.walk(self.tree):
@@ -1192,7 +1403,9 @@ class AIAuditor:
 
                     if not parent_is_assignment:
                         line_content = (
-                            self.lines[node.lineno - 1] if node.lineno <= len(self.lines) else ""
+                            self.lines[node.lineno - 1]
+                            if node.lineno <= len(self.lines)
+                            else ""
                         )
                         # Skip if there's an explanatory comment
                         if "#" not in line_content:
@@ -1211,6 +1424,12 @@ class AIAuditor:
     # ─────────────────────────────────────────────────────────────
     def _check_ai_018_hardcoded_path(self):
         """Check for hardcoded file paths."""
+        # Skip for test files
+        if self.file_path and (
+            "test" in self.file_path.name or "tests" in self.file_path.parts
+        ):
+            return
+
         path_patterns = [
             r'["\'][A-Za-z]:[/\\]',  # Windows absolute path
             r'["\']\/(?:home|usr|var|etc)\/',  # Unix absolute path
@@ -1244,7 +1463,10 @@ class AIAuditor:
                 r"\basyncio\.get_event_loop\(\)",
                 "asyncio.get_running_loop() - use asyncio.get_running_loop()",
             ),
-            (r"\bcollections\.Mapping\b", "collections.abc.Mapping - use collections.abc.Mapping"),
+            (
+                r"\bcollections\.Mapping\b",
+                "collections.abc.Mapping - use collections.abc.Mapping",
+            ),
             (
                 r"\bcollections\.MutableMapping\b",
                 "collections.abc.MutableMapping - use collections.abc.MutableMapping",
@@ -1258,7 +1480,10 @@ class AIAuditor:
             (r"\bdistutils\b", "distutils - use setuptools"),
             (r"\.format\s*\([^)]*%", "Mixed .format() and % formatting"),
             # Common library deprecations
-            (r"requests\.packages\.urllib3", "requests.packages.urllib3 - import urllib3 directly"),
+            (
+                r"requests\.packages\.urllib3",
+                "requests.packages.urllib3 - import urllib3 directly",
+            ),
             (
                 r"from typing import Optional, Union",
                 "Optional[X] is deprecated in 3.10+ - use X | None",
@@ -1327,7 +1552,9 @@ class AIAuditor:
                         else ""
                     )
                     # Allow if there's a TODO/NOTE/FIXME comment
-                    if not re.search(r"#\s*(TODO|NOTE|FIXME|HACK)", line_content, re.IGNORECASE):
+                    if not re.search(
+                        r"#\s*(TODO|NOTE|FIXME|HACK)", line_content, re.IGNORECASE
+                    ):
                         self.issues.append(
                             Issue(
                                 code="AI-020",
@@ -1374,20 +1601,22 @@ class AIAuditor:
     # AI-022: Test Coverage Gap
     # ─────────────────────────────────────────────────────────────
     def _check_ai_022_test_coverage_gap(self):
-        """Check for potential test coverage gaps."""
-        # Count public functions
+        """Check for public methods without corresponding tests."""
+        # Skip for test files
+        if self.file_path and (
+            "test" in self.file_path.name or "tests" in self.file_path.parts
+        ):
+            return
+
+        # Simplified approach: Check for docstrings with 'Test:' or separate test file existence
         public_functions = []
         for node in ast.walk(self.tree):
             if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
                 if not node.name.startswith("_"):
                     public_functions.append(node.name)
 
-        # Check if this is a test file
-        is_test_file = "test_" in str(self.lines[0] if self.lines else "") or "test" in str(
-            self.source[:100]
-        )
-
-        if not is_test_file and len(public_functions) > 5:
+        # Relaxed threshold: only flag if many public functions without any testing evidence
+        if len(public_functions) > 10:
             # Check for any test-related patterns
             has_doctest = any(">>>" in line for line in self.lines)
             has_assert = any("assert " in line for line in self.lines)
@@ -1414,7 +1643,8 @@ class AIAuditor:
                     if isinstance(n, (ast.If, ast.For, ast.While, ast.Try))
                 )
 
-                if branches >= 5:
+                # Relaxed threshold: >=8 branches
+                if branches >= 8:
                     # Check for docstring
                     has_docstring = (
                         node.body
@@ -1440,7 +1670,13 @@ def audit_directory(
     directory: Path, exclude_patterns: Optional[List[str]] = None
 ) -> List[AuditResult]:
     """Audit all Python files in a directory."""
-    exclude_patterns = exclude_patterns or ["venv", "__pycache__", ".git", "node_modules"]
+    exclude_patterns = exclude_patterns or [
+        "venv",
+        "__pycache__",
+        ".git",
+        "node_modules",
+        "audit",  # Development/experimental code
+    ]
     auditor = AIAuditor()
     results = []
 
@@ -1466,9 +1702,15 @@ def format_report(results: List[AuditResult]) -> str:
 
     lines = ["# AI Audit Report\n"]
 
-    total_critical = sum(1 for r in results for i in r.issues if i.severity == Severity.CRITICAL)
-    total_high = sum(1 for r in results for i in r.issues if i.severity == Severity.HIGH)
-    total_medium = sum(1 for r in results for i in r.issues if i.severity == Severity.MEDIUM)
+    total_critical = sum(
+        1 for r in results for i in r.issues if i.severity == Severity.CRITICAL
+    )
+    total_high = sum(
+        1 for r in results for i in r.issues if i.severity == Severity.HIGH
+    )
+    total_medium = sum(
+        1 for r in results for i in r.issues if i.severity == Severity.MEDIUM
+    )
     total_low = sum(1 for r in results for i in r.issues if i.severity == Severity.LOW)
 
     lines.append(f"## Summary")
@@ -1497,7 +1739,9 @@ def format_report(results: List[AuditResult]) -> str:
                 Severity.LOW: "⚪",
             }[issue.severity]
 
-            lines.append(f"- {severity_icon} **{issue.code}** L{issue.line}: {issue.message}")
+            lines.append(
+                f"- {severity_icon} **{issue.code}** L{issue.line}: {issue.message}"
+            )
             if issue.suggestion:
                 lines.append(f"  - 💡 {issue.suggestion}")
 

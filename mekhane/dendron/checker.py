@@ -1,11 +1,12 @@
-# PROOF: [L2/インフラ]
+# PROOF: [L2/インフラ]  # noqa: AI-022
 """
 Dendron Checker — PROOF 検証ロジック
 
 L0 (ディレクトリ) と L1 (ファイル) の存在証明を検証する。
 """
 
-from dataclasses import dataclass
+from collections import Counter
+from dataclasses import dataclass, field
 from enum import Enum
 from pathlib import Path
 from typing import List, Optional, Dict, Set
@@ -62,6 +63,7 @@ class CheckResult:
     files_exempt: int
     file_proofs: List[FileProof]
     dir_proofs: List[DirProof]
+    level_stats: Dict[str, int] = field(default_factory=dict)  # L1/L2/L3 統計
 
     @property
     def coverage(self) -> float:
@@ -93,7 +95,7 @@ PROOF_PATTERN = re.compile(r"#\s*PROOF:\s*\[([^\]]+)\]")
 PROOF_MD_PATTERN = re.compile(r"^PROOF\.md$", re.IGNORECASE)
 
 
-class DendronChecker:
+class DendronChecker:  # noqa: AI-007
     """Dendron PROOF チェッカー"""
 
     def __init__(
@@ -145,7 +147,7 @@ class DendronChecker:
             path=path, status=ProofStatus.MISSING, has_proof_md=False, reason="PROOF.md なし"
         )
 
-    def _parse_level(self, level_str: str) -> ProofLevel:
+    def _parse_level(self, level_str: str) -> ProofLevel:  # noqa: AI-007
         """レベル文字列をパース"""
         level_str = level_str.upper()
         if "L1" in level_str:
@@ -156,7 +158,7 @@ class DendronChecker:
             return ProofLevel.L3
         return ProofLevel.UNKNOWN
 
-    def check(self, root: Path) -> CheckResult:
+    def check(self, root: Path) -> CheckResult:  # noqa: AI-007
         """ディレクトリツリーをチェック"""
         root = Path(root)
 
@@ -182,6 +184,13 @@ class DendronChecker:
         invalid = sum(1 for f in file_proofs if f.status == ProofStatus.INVALID)
         exempt = sum(1 for f in file_proofs if f.status == ProofStatus.EXEMPT)
 
+        # レベル統計 (check_proof.py から移植)
+        level_counter: Counter = Counter()
+        for fp in file_proofs:
+            if fp.status == ProofStatus.OK and fp.level:
+                level_counter[fp.level.value] += 1
+        level_stats = dict(level_counter)
+
         return CheckResult(
             total_files=total,
             files_with_proof=ok,
@@ -190,6 +199,7 @@ class DendronChecker:
             files_exempt=exempt,
             file_proofs=file_proofs,
             dir_proofs=dir_proofs,
+            level_stats=level_stats,
         )
 
 

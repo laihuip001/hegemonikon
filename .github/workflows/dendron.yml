@@ -1,0 +1,45 @@
+# Dendron — Existence Proof Check
+# Validates that all Python files have PROOF headers
+name: Dendron
+
+on:
+  push:
+    branches: [master, main]
+    paths:
+      - 'mekhane/**/*.py'
+      - 'hermeneus/**/*.py'
+      - 'synergeia/**/*.py'
+      - 'ccl/**/*.py'
+  pull_request:
+    branches: [master, main]
+    paths:
+      - 'mekhane/**/*.py'
+      - 'hermeneus/**/*.py'
+      - 'synergeia/**/*.py'
+      - 'ccl/**/*.py'
+
+jobs:
+  proof-check:
+    runs-on: ubuntu-latest
+    name: PROOF Header Validation
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      
+      - name: Run Dendron PROOF Check
+        run: |
+          export PYTHONPATH=${{ github.workspace }}
+          python -m mekhane.dendron check mekhane/ --ci --format ci
+      
+      - name: Upload Coverage Report
+        if: always()
+        run: |
+          export PYTHONPATH=${{ github.workspace }}
+          python -m mekhane.dendron check mekhane/ --format markdown > proof-coverage.md
+          cat proof-coverage.md >> $GITHUB_STEP_SUMMARY

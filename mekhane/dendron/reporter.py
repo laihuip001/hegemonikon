@@ -1,8 +1,9 @@
-# PROOF: [L2/インフラ]
+# PROOF: [L2/インフラ] <- mekhane/dendron/
 """
-Dendron Reporter — レポート生成
+Dendron Reporter — レポート生成 v2
 
 チェック結果をさまざまな形式で出力する。
+v2: ORPHAN (親参照なし) の警告表示をサポート。
 """
 
 from enum import Enum
@@ -49,6 +50,7 @@ class DendronReporter:  # noqa: AI-007
         # サマリー
         self._print(f"Total files: {result.total_files}")
         self._print(f"With proof:  {result.files_with_proof}")
+        self._print(f"Orphan:      {result.files_orphan}")  # v2
         self._print(f"Missing:     {result.files_missing_proof}")
         self._print(f"Invalid:     {result.files_invalid_proof}")
         self._print(f"Exempt:      {result.files_exempt}")
@@ -115,11 +117,12 @@ class DendronReporter:  # noqa: AI-007
             self._print("**Result**: ❌ FAIL")
 
     def _report_ci(self, result: CheckResult):
-        """CI 向け最小出力"""
+        """CI 向け最小出力 (v2: ORPHAN 警告対応)"""
         if result.is_passing:
             stats = result.level_stats
             level_str = f" (L1:{stats.get('L1', 0)}/L2:{stats.get('L2', 0)}/L3:{stats.get('L3', 0)})" if stats else ""
-            self._print(f"✅ Dendron: {result.coverage:.1f}% coverage{level_str}")
+            orphan_str = f" ⚠️{result.files_orphan} orphan" if result.files_orphan > 0 else ""
+            self._print(f"✅ Dendron: {result.coverage:.1f}% coverage{level_str}{orphan_str}")
         else:
             self._print(f"❌ Dendron: {result.files_missing_proof} files missing PROOF")
             for f in result.file_proofs:

@@ -22,6 +22,7 @@ from .syntax_validator import CCLSyntaxValidator
 @dataclass
 class GenerationResult:
     """Result of CCL generation."""
+
     ccl: str
     source: str  # "llm", "doxa", "heuristic", "user"
     confidence: float
@@ -31,14 +32,14 @@ class GenerationResult:
 class CCLGenerator:
     """
     CCL Generator with 4-layer fallback.
-    
+
     Converts natural language intent into CCL v2.0 expressions.
     """
-    
+
     def __init__(self, enable_learning: bool = True):
         """
         Initialize the generator.
-        
+
         Args:
             enable_learning: Whether to record successful conversions to Doxa
         """
@@ -47,14 +48,14 @@ class CCLGenerator:
         self.heuristic = PatternCache()
         self.validator = CCLSyntaxValidator()
         self.enable_learning = enable_learning
-    
+
     def generate(self, intent: str) -> GenerationResult:
         """
         Generate CCL from natural language intent.
-        
+
         Args:
             intent: Natural language description of desired action
-            
+
         Returns:
             GenerationResult with CCL expression and metadata
         """
@@ -67,24 +68,18 @@ class CCLGenerator:
                     if self.enable_learning:
                         self.doxa.record(intent, ccl, confidence=0.9)
                     return GenerationResult(
-                        ccl=ccl,
-                        source="llm",
-                        confidence=0.9,
-                        warnings=validation.warnings
+                        ccl=ccl, source="llm", confidence=0.9, warnings=validation.warnings
                     )
-        
+
         # Layer 2: Doxa Patterns
         cached = self.doxa.lookup(intent)
         if cached:
             validation = self.validator.validate(cached)
             if validation.valid:
                 return GenerationResult(
-                    ccl=cached,
-                    source="doxa",
-                    confidence=0.8,
-                    warnings=validation.warnings
+                    ccl=cached, source="doxa", confidence=0.8, warnings=validation.warnings
                 )
-        
+
         # Layer 3: Heuristic
         heuristic_ccl = self.heuristic.generate(intent)
         if heuristic_ccl:
@@ -96,15 +91,15 @@ class CCLGenerator:
                     ccl=heuristic_ccl,
                     source="heuristic",
                     confidence=0.6,
-                    warnings=validation.warnings
+                    warnings=validation.warnings,
                 )
-        
+
         # Layer 4: User Inquiry
         return GenerationResult(
             ccl="/u",
             source="user",
             confidence=0.0,
-            warnings=["Could not generate CCL - asking user"]
+            warnings=["Could not generate CCL - asking user"],
         )
 
 
@@ -112,10 +107,10 @@ class CCLGenerator:
 def generate_ccl(intent: str) -> str:
     """
     Generate CCL from intent (simple interface).
-    
+
     Args:
         intent: Natural language intent
-        
+
     Returns:
         CCL expression string
     """

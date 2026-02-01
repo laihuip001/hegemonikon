@@ -27,9 +27,11 @@ LOG_DIR = Path("/home/laihuip001/oikos/.gemini/antigravity/logs")
 LOG_FILE = LOG_DIR / "ccl.log"
 STATE_FILE = LOG_DIR / "ccl_state.json"
 
+
 def ensure_dirs():
     if not LOG_DIR.exists():
         LOG_DIR.mkdir(parents=True, exist_ok=True)
+
 
 def load_state() -> dict:
     if STATE_FILE.exists():
@@ -39,19 +41,24 @@ def load_state() -> dict:
             return {}
     return {}
 
+
 def save_state(state: dict):
     STATE_FILE.write_text(json.dumps(state, indent=2))
+
 
 def log_entry(entry: dict):
     ensure_dirs()
     timestamp = datetime.datetime.now().isoformat()
-    log_line = f"[{timestamp}] [{entry.get('type', 'INFO')}] {json.dumps(entry, ensure_ascii=False)}"
-    
+    log_line = (
+        f"[{timestamp}] [{entry.get('type', 'INFO')}] {json.dumps(entry, ensure_ascii=False)}"
+    )
+
     with open(LOG_FILE, "a") as f:
         f.write(log_line + "\n")
-        
+
     # Also print to stdout for immediate feedback
     print(f"CCL_TRACE: {entry.get('message', '')}")
+
 
 def start_session(expression: str):
     session_id = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
@@ -59,16 +66,19 @@ def start_session(expression: str):
         "session_id": session_id,
         "expression": expression,
         "start_time": datetime.datetime.now().isoformat(),
-        "steps": []
+        "steps": [],
     }
     save_state(state)
-    
-    log_entry({
-        "type": "SESSION_START",
-        "session_id": session_id,
-        "expression": expression,
-        "message": f"Started CCL Session: {expression}"
-    })
+
+    log_entry(
+        {
+            "type": "SESSION_START",
+            "session_id": session_id,
+            "expression": expression,
+            "message": f"Started CCL Session: {expression}",
+        }
+    )
+
 
 def log_step(op: str, status: str = "running", note: str = ""):
     state = load_state()
@@ -80,19 +90,22 @@ def log_step(op: str, status: str = "running", note: str = ""):
         "timestamp": datetime.datetime.now().isoformat(),
         "op": op,
         "status": status,
-        "note": note
+        "note": note,
     }
     state["steps"].append(step_record)
     save_state(state)
-    
-    log_entry({
-        "type": "STEP",
-        "session_id": state.get("session_id"),
-        "op": op,
-        "status": status,
-        "note": note,
-        "message": f"Step: {op} [{status}] {note}"
-    })
+
+    log_entry(
+        {
+            "type": "STEP",
+            "session_id": state.get("session_id"),
+            "op": op,
+            "status": status,
+            "note": note,
+            "message": f"Step: {op} [{status}] {note}",
+        }
+    )
+
 
 def end_session(status: str = "completed"):
     state = load_state()
@@ -106,18 +119,21 @@ def end_session(status: str = "completed"):
         end_dt = datetime.datetime.now()
         duration = str(end_dt - start_dt)
 
-    log_entry({
-        "type": "SESSION_END",
-        "session_id": state.get("session_id"),
-        "status": status,
-        "duration": duration,
-        "step_count": len(state.get("steps", [])),
-        "message": f"Ended CCL Session: {status} (Duration: {duration})"
-    })
-    
+    log_entry(
+        {
+            "type": "SESSION_END",
+            "session_id": state.get("session_id"),
+            "status": status,
+            "duration": duration,
+            "step_count": len(state.get("steps", [])),
+            "message": f"Ended CCL Session: {status} (Duration: {duration})",
+        }
+    )
+
     # Archive state
     # In a real implementation, we might move state file to history
     # For now, just leave it for inspection or next overwrite
+
 
 def main():
     parser = argparse.ArgumentParser(description="CCL Tracer")
@@ -130,7 +146,9 @@ def main():
     # Step
     step_parser = subparsers.add_parser("step")
     step_parser.add_argument("op", help="Current operator/operation")
-    step_parser.add_argument("--status", default="running", help="Status (running, success, failed, skipped)")
+    step_parser.add_argument(
+        "--status", default="running", help="Status (running, success, failed, skipped)"
+    )
     step_parser.add_argument("--note", default="", help="Optional note")
 
     # End
@@ -146,6 +164,7 @@ def main():
         log_step(args.op, args.status, args.note)
     elif args.command == "end":
         end_session(args.status)
+
 
 if __name__ == "__main__":
     main()

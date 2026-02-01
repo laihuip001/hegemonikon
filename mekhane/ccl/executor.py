@@ -24,6 +24,7 @@ from .learning.failure_db import get_failure_db, FailureDB
 @dataclass
 class ExecutionContext:
     """CCL 実行コンテキスト"""
+
     ccl_expr: str
     injected_prompt: str
     warnings: List[str]
@@ -32,6 +33,7 @@ class ExecutionContext:
 @dataclass
 class ExecutionResult:
     """CCL 実行結果"""
+
     success: bool
     output: str
     validation: ValidationResult
@@ -40,107 +42,96 @@ class ExecutionResult:
 
 class ZeroTrustCCLExecutor:
     """Zero-Trust CCL 実行エンジン
-    
+
     LLM を信用せず、構造的に正しい実行を強制する。
     """
-    
+
     def __init__(self):
         self.injector = SpecInjector()
         self.validator = CCLOutputValidator()
         self.failure_db = get_failure_db()
-    
+
     def prepare(self, ccl_expr: str) -> ExecutionContext:
         """
         Phase 0: 実行準備
-        
+
         1. 演算子仕様を注入
         2. 過去の失敗から警告を生成
         """
         # 仕様注入
         injected_prompt = self.injector.inject(ccl_expr)
-        
+
         # 警告を取得
         warnings_records = self.failure_db.get_warnings(ccl_expr)
         warnings_text = self.failure_db.format_warnings(warnings_records)
-        
+
         # 警告をプロンプトに追加
         if warnings_text:
             injected_prompt = warnings_text + "\n" + injected_prompt
-        
+
         return ExecutionContext(
             ccl_expr=ccl_expr,
             injected_prompt=injected_prompt,
-            warnings=[w.message for w in warnings_records]
+            warnings=[w.message for w in warnings_records],
         )
-    
+
     def validate(self, output: str, context: ExecutionContext) -> ValidationResult:
         """
         Phase 2: 出力検証
         """
         return self.validator.validate(output, context.ccl_expr)
-    
+
     def record_result(
-        self,
-        context: ExecutionContext,
-        validation: ValidationResult,
-        output: str
+        self, context: ExecutionContext, validation: ValidationResult, output: str
     ) -> None:
         """
         Phase 4: 結果を記録
         """
         if validation.valid:
-            self.failure_db.record_success(
-                ccl_expr=context.ccl_expr,
-                output_summary=output[:200]
-            )
+            self.failure_db.record_success(ccl_expr=context.ccl_expr, output_summary=output[:200])
         else:
             for error in validation.errors:
                 self.failure_db.record_failure(
                     ccl_expr=context.ccl_expr,
                     operator=error.operator,
                     failure_type=error.error_type,
-                    cause=error.message
+                    cause=error.message,
                 )
-    
-    def execute(
-        self,
-        ccl_expr: str,
-        output: str,
-        record: bool = True
-    ) -> ExecutionResult:
+
+    def execute(self, ccl_expr: str, output: str, record: bool = True) -> ExecutionResult:
         """
         CCL 実行フロー全体
-        
+
         Args:
             ccl_expr: CCL 式
             output: LLM が生成した出力
             record: 結果を記録するか
-        
+
         Returns:
             ExecutionResult
         """
         # Phase 0: 準備
         context = self.prepare(ccl_expr)
-        
+
         # Phase 2: 検証
         validation = self.validate(output, context)
-        
+
         # Phase 4: 記録
         if record:
             self.record_result(context, validation, output)
-        
+
         return ExecutionResult(
             success=validation.valid,
             output=output,
             validation=validation,
             # NOTE: Removed self-assignment: context = context
         )
-    
+
     def get_regeneration_prompt(self, result: ExecutionResult) -> str:
         """再生成用のプロンプトを取得"""
         if result.success:
             return ""
-        
+
         return f"""
 {result.validation.regeneration_instruction}
 
@@ -176,14 +167,14 @@ def validate_ccl_output(ccl_expr: str, output: str) -> ValidationResult:
 # テスト用
 if __name__ == "__main__":
     executor = ZeroTrustCCLExecutor()
-    
+
     # プロンプト生成テスト
     print("=" * 60)
     print("Phase 0: プロンプト生成")
     print("=" * 60)
     context = executor.prepare("/noe!~/u+")
     print(context.injected_prompt)
-    
+
     # 検証テスト
     print("\n" + "=" * 60)
     print("Phase 2: 出力検証 (不完全な出力)")

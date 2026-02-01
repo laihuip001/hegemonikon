@@ -41,7 +41,7 @@ def search_vector(query: str, limit: int = 3) -> str:
             capture_output=True,
             text=True,
             encoding="utf-8",
-            timeout=60
+            timeout=60,
         )
         return result.stdout
     except Exception as e:
@@ -56,7 +56,7 @@ def search_fts(query: str, limit: int = 3) -> str:
             capture_output=True,
             text=True,
             encoding="utf-8",
-            timeout=30
+            timeout=30,
         )
         return result.stdout
     except Exception as e:
@@ -71,7 +71,7 @@ def search_modules(query: str, limit: int = 3) -> str:
             capture_output=True,
             text=True,
             encoding="utf-8",
-            timeout=30
+            timeout=30,
         )
         return result.stdout
     except Exception as e:
@@ -81,26 +81,26 @@ def search_modules(query: str, limit: int = 3) -> str:
 def hybrid_search(query: str) -> str:
     """ハイブリッド検索（全ソースを実行）"""
     output = []
-    
+
     output.append("[Hegemonikon] M8 Anamnēsis — 統合長期記憶検索")
     output.append(f"  クエリ: {query}")
     output.append("")
-    
+
     # ベクトル検索（意味記憶）
     output.append("=== 意味記憶（ベクトル検索）===")
     vector_result = search_vector(query)
     output.append(vector_result)
-    
+
     # FTS 検索（エピソード記憶）
     output.append("\n=== エピソード記憶（FTS）===")
     fts_result = search_fts(query)
     output.append(fts_result)
-    
+
     # モジュール検索（開発用モジュール）
     output.append("\n=== 開発用モジュール ===")
     module_result = search_modules(query)
     output.append(module_result)
-    
+
     return "\n".join(output)
 
 
@@ -108,27 +108,27 @@ def main():
     if len(sys.argv) < 2:
         print(__doc__)
         return
-    
+
     # Windows UTF-8 対応
     if sys.platform == "win32":
-        sys.stdout.reconfigure(encoding='utf-8')
-    
+        sys.stdout.reconfigure(encoding="utf-8")
+
     mode = "hybrid"
     query_start = 1
-    
+
     if sys.argv[1] == "--vector":
         mode = "vector"
         query_start = 2
     elif sys.argv[1] == "--fts":
         mode = "fts"
         query_start = 2
-    
+
     query = " ".join(sys.argv[query_start:])
-    
+
     if not query:
         print("Error: No query provided")
         sys.exit(1)
-    
+
     if mode == "vector":
         print(search_vector(query))
     elif mode == "fts":

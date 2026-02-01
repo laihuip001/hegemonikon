@@ -32,7 +32,6 @@ References:
 - Stoic-FEP Correspondence
 """
 
-
 from dataclasses import dataclass
 from typing import Literal, List, Dict, Tuple, Optional
 from datetime import datetime
@@ -62,6 +61,7 @@ logger = logging.getLogger(__name__)
 
 try:
     from google import genai
+
     api_key = os.environ.get("GEMINI_API_KEY") or os.environ.get("GOOGLE_API_KEY", "")
     if api_key:
         GEMINI_CLIENT = genai.Client(api_key=api_key)
@@ -74,364 +74,366 @@ except ImportError:
 # Derivative State Spaces
 # =============================================================================
 
+
 class DerivativeStateSpace:
     """State spaces for derivative selection across O-series theorems."""
-    
+
     # O1 Noēsis: Recognition/Understanding derivatives
     O1_STATES: List[str] = [
-        "abstract_problem",     # 抽象的問題 → nous
-        "practical_situation",  # 実践的状況 → phro  
-        "need_reflection",      # 反省が必要 → meta
+        "abstract_problem",  # 抽象的問題 → nous
+        "practical_situation",  # 実践的状況 → phro
+        "need_reflection",  # 反省が必要 → meta
     ]
-    
+
     O1_DERIVATIVES: List[str] = ["nous", "phro", "meta"]
     O1_STATE_TO_DERIVATIVE: Dict[str, str] = {
         "abstract_problem": "nous",
         "practical_situation": "phro",
         "need_reflection": "meta",
     }
-    
+
     # O2 Boulēsis: Will/Desire derivatives
     O2_STATES: List[str] = [
-        "raw_desire",           # 生の欲動 → desir
+        "raw_desire",  # 生の欲動 → desir
         "conflict_resolution",  # 葛藤解決 → voli
-        "will_action_gap",      # 意志-行為乖離 → akra
+        "will_action_gap",  # 意志-行為乖離 → akra
     ]
-    
+
     O2_DERIVATIVES: List[str] = ["desir", "voli", "akra"]
     O2_STATE_TO_DERIVATIVE: Dict[str, str] = {
         "raw_desire": "desir",
         "conflict_resolution": "voli",
         "will_action_gap": "akra",
     }
-    
+
     # O3 Zētēsis: Inquiry/Search derivatives
     O3_STATES: List[str] = [
-        "anomaly_detected",     # 異常検出 → anom
-        "hypothesis_needed",    # 仮説が必要 → hypo
-        "evaluation_phase",     # 評価段階 → eval
+        "anomaly_detected",  # 異常検出 → anom
+        "hypothesis_needed",  # 仮説が必要 → hypo
+        "evaluation_phase",  # 評価段階 → eval
     ]
-    
+
     O3_DERIVATIVES: List[str] = ["anom", "hypo", "eval"]
     O3_STATE_TO_DERIVATIVE: Dict[str, str] = {
         "anomaly_detected": "anom",
         "hypothesis_needed": "hypo",
         "evaluation_phase": "eval",
     }
-    
+
     # O4 Energeia: Activity/Actualization derivatives
     O4_STATES: List[str] = [
-        "optimal_engagement",   # 最適没入 → flow
+        "optimal_engagement",  # 最適没入 → flow
         "self_sufficient_act",  # 自己目的的行為 → prax
-        "production_goal",      # 産出目標 → pois
+        "production_goal",  # 産出目標 → pois
     ]
-    
+
     O4_DERIVATIVES: List[str] = ["flow", "prax", "pois"]
     O4_STATE_TO_DERIVATIVE: Dict[str, str] = {
         "optimal_engagement": "flow",
         "self_sufficient_act": "prax",
         "production_goal": "pois",
     }
-    
+
     # =========================================================================
     # S-Series State Spaces (Schema / Strategic Theorems)
     # =========================================================================
-    
+
     # S1 Metron: Scale/Measure derivatives
     S1_STATES: List[str] = [
-        "continuous_measure",    # 連続量 → cont
-        "discrete_measure",      # 離散量 → disc
-        "abstraction_level",     # 抽象度 → abst
+        "continuous_measure",  # 連続量 → cont
+        "discrete_measure",  # 離散量 → disc
+        "abstraction_level",  # 抽象度 → abst
     ]
-    
+
     S1_DERIVATIVES: List[str] = ["cont", "disc", "abst"]
     S1_STATE_TO_DERIVATIVE: Dict[str, str] = {
         "continuous_measure": "cont",
         "discrete_measure": "disc",
         "abstraction_level": "abst",
     }
-    
+
     # S2 Mekhanē: Method/Tool derivatives
     S2_STATES: List[str] = [
-        "assemble_existing",     # 既存組立 → comp
-        "create_new",            # 新規創出 → inve
-        "adapt_existing",        # 既存適応 → adap
+        "assemble_existing",  # 既存組立 → comp
+        "create_new",  # 新規創出 → inve
+        "adapt_existing",  # 既存適応 → adap
     ]
-    
+
     S2_DERIVATIVES: List[str] = ["comp", "inve", "adap"]
     S2_STATE_TO_DERIVATIVE: Dict[str, str] = {
         "assemble_existing": "comp",
         "create_new": "inve",
         "adapt_existing": "adap",
     }
-    
+
     # S3 Stathmos: Criteria/Standard derivatives
     S3_STATES: List[str] = [
-        "ideal_based",           # 理想基準 → norm
-        "data_based",            # 経験基準 → empi
-        "comparison_based",      # 相対基準 → rela
+        "ideal_based",  # 理想基準 → norm
+        "data_based",  # 経験基準 → empi
+        "comparison_based",  # 相対基準 → rela
     ]
-    
+
     S3_DERIVATIVES: List[str] = ["norm", "empi", "rela"]
     S3_STATE_TO_DERIVATIVE: Dict[str, str] = {
         "ideal_based": "norm",
         "data_based": "empi",
         "comparison_based": "rela",
     }
-    
+
     # S4 Praxis: Practice/Execution derivatives
     S4_STATES: List[str] = [
-        "self_purpose_action",   # 内在目的 → prax
-        "external_production",   # 外的産出 → pois
-        "temporal_execution",    # 時間構造 → temp
+        "self_purpose_action",  # 内在目的 → prax
+        "external_production",  # 外的産出 → pois
+        "temporal_execution",  # 時間構造 → temp
     ]
-    
+
     S4_DERIVATIVES: List[str] = ["prax", "pois", "temp"]
     S4_STATE_TO_DERIVATIVE: Dict[str, str] = {
         "self_purpose_action": "prax",
         "external_production": "pois",
         "temporal_execution": "temp",
     }
-    
+
     # =========================================================================
     # H-Series State Spaces (Hormē / Impulse Theorems)
     # =========================================================================
-    
+
     # H1 Propatheia: Pre-affective response derivatives
     H1_STATES: List[str] = [
-        "approach_response",     # 接近反応 → appr
-        "avoidance_response",    # 回避反応 → avoi
-        "arrest_response",       # 保留反応 → arre
+        "approach_response",  # 接近反応 → appr
+        "avoidance_response",  # 回避反応 → avoi
+        "arrest_response",  # 保留反応 → arre
     ]
-    
+
     H1_DERIVATIVES: List[str] = ["appr", "avoi", "arre"]
     H1_STATE_TO_DERIVATIVE: Dict[str, str] = {
         "approach_response": "appr",
         "avoidance_response": "avoi",
         "arrest_response": "arre",
     }
-    
+
     # H2 Pistis: Confidence level derivatives
     H2_STATES: List[str] = [
-        "subjective_confidence",    # 主観的確信 → subj
-        "intersubjective_conf",     # 間主観的確信 → inte
-        "objective_evidence",       # 客観的証拠 → obje
+        "subjective_confidence",  # 主観的確信 → subj
+        "intersubjective_conf",  # 間主観的確信 → inte
+        "objective_evidence",  # 客観的証拠 → obje
     ]
-    
+
     H2_DERIVATIVES: List[str] = ["subj", "inte", "obje"]
     H2_STATE_TO_DERIVATIVE: Dict[str, str] = {
         "subjective_confidence": "subj",
         "intersubjective_conf": "inte",
         "objective_evidence": "obje",
     }
-    
+
     # H3 Orexis: Desire orientation derivatives
     H3_STATES: List[str] = [
-        "target_oriented",       # 対象志向 → targ
-        "activity_oriented",     # 活動志向 → acti
-        "state_oriented",        # 状態志向 → stat
+        "target_oriented",  # 対象志向 → targ
+        "activity_oriented",  # 活動志向 → acti
+        "state_oriented",  # 状態志向 → stat
     ]
-    
+
     H3_DERIVATIVES: List[str] = ["targ", "acti", "stat"]
     H3_STATE_TO_DERIVATIVE: Dict[str, str] = {
         "target_oriented": "targ",
         "activity_oriented": "acti",
         "state_oriented": "stat",
     }
-    
+
     # H4 Doxa: Belief representation derivatives
     H4_STATES: List[str] = [
-        "sensory_belief",        # 感覚的信念 → sens
-        "conceptual_belief",     # 概念的信念 → conc
-        "formal_belief",         # 形式的信念 → form
+        "sensory_belief",  # 感覚的信念 → sens
+        "conceptual_belief",  # 概念的信念 → conc
+        "formal_belief",  # 形式的信念 → form
     ]
-    
+
     H4_DERIVATIVES: List[str] = ["sens", "conc", "form"]
     H4_STATE_TO_DERIVATIVE: Dict[str, str] = {
         "sensory_belief": "sens",
         "conceptual_belief": "conc",
         "formal_belief": "form",
     }
-    
+
     # =========================================================================
     # P-Series State Spaces (Perigraphē / Environment Theorems)
     # =========================================================================
-    
+
     # P1 Khōra: Spatial structure derivatives
     P1_STATES: List[str] = [
-        "physical_space",        # 物理的空間 → phys
-        "conceptual_space",      # 概念的空間 → conc
-        "relational_space",      # 関係的空間 → rela
+        "physical_space",  # 物理的空間 → phys
+        "conceptual_space",  # 概念的空間 → conc
+        "relational_space",  # 関係的空間 → rela
     ]
-    
+
     P1_DERIVATIVES: List[str] = ["phys", "conc", "rela"]
     P1_STATE_TO_DERIVATIVE: Dict[str, str] = {
         "physical_space": "phys",
         "conceptual_space": "conc",
         "relational_space": "rela",
     }
-    
+
     # P2 Hodos: Path topology derivatives
     P2_STATES: List[str] = [
-        "linear_path",           # 線形経路 → line
-        "branching_path",        # 分岐経路 → bran
-        "cyclical_path",         # 循環経路 → cycl
+        "linear_path",  # 線形経路 → line
+        "branching_path",  # 分岐経路 → bran
+        "cyclical_path",  # 循環経路 → cycl
     ]
-    
+
     P2_DERIVATIVES: List[str] = ["line", "bran", "cycl"]
     P2_STATE_TO_DERIVATIVE: Dict[str, str] = {
         "linear_path": "line",
         "branching_path": "bran",
         "cyclical_path": "cycl",
     }
-    
+
     # P3 Trokhia: Attractor stability derivatives
     P3_STATES: List[str] = [
-        "fixed_attractor",       # 固定パターン → fixe
-        "adaptive_attractor",    # 適応パターン → adap
-        "emergent_attractor",    # 創発パターン → emer
+        "fixed_attractor",  # 固定パターン → fixe
+        "adaptive_attractor",  # 適応パターン → adap
+        "emergent_attractor",  # 創発パターン → emer
     ]
-    
+
     P3_DERIVATIVES: List[str] = ["fixe", "adap", "emer"]
     P3_STATE_TO_DERIVATIVE: Dict[str, str] = {
         "fixed_attractor": "fixe",
         "adaptive_attractor": "adap",
         "emergent_attractor": "emer",
     }
-    
+
     # P4 Tekhnē: Technical operation derivatives
     P4_STATES: List[str] = [
-        "manual_operation",      # 手動操作 → manu
+        "manual_operation",  # 手動操作 → manu
         "mechanical_operation",  # 機械操作 → mech
-        "automated_operation",   # 自動操作 → auto
+        "automated_operation",  # 自動操作 → auto
     ]
-    
+
     P4_DERIVATIVES: List[str] = ["manu", "mech", "auto"]
     P4_STATE_TO_DERIVATIVE: Dict[str, str] = {
         "manual_operation": "manu",
         "mechanical_operation": "mech",
         "automated_operation": "auto",
     }
-    
+
     # =========================================================================
     # K-Series State Spaces (Kairos / Context Theorems)
     # =========================================================================
-    
+
     # K1 Eukairia: Temporal opportunity derivatives
     K1_STATES: List[str] = [
-        "urgent_opportunity",    # 緊急機会 → urge
-        "optimal_opportunity",   # 最適機会 → opti
-        "missed_opportunity",    # 逸失機会 → miss
+        "urgent_opportunity",  # 緊急機会 → urge
+        "optimal_opportunity",  # 最適機会 → opti
+        "missed_opportunity",  # 逸失機会 → miss
     ]
-    
+
     K1_DERIVATIVES: List[str] = ["urge", "opti", "miss"]
     K1_STATE_TO_DERIVATIVE: Dict[str, str] = {
         "urgent_opportunity": "urge",
         "optimal_opportunity": "opti",
         "missed_opportunity": "miss",
     }
-    
+
     # K2 Chronos: Temporal horizon derivatives
     K2_STATES: List[str] = [
-        "short_term",            # 短期 → shor
-        "medium_term",           # 中期 → medi
-        "long_term",             # 長期 → long
+        "short_term",  # 短期 → shor
+        "medium_term",  # 中期 → medi
+        "long_term",  # 長期 → long
     ]
-    
+
     K2_DERIVATIVES: List[str] = ["shor", "medi", "long"]
     K2_STATE_TO_DERIVATIVE: Dict[str, str] = {
         "short_term": "shor",
         "medium_term": "medi",
         "long_term": "long",
     }
-    
+
     # K3 Telos: Goal hierarchy derivatives
     K3_STATES: List[str] = [
-        "intrinsic_goal",        # 内在目的 → intr
-        "instrumental_goal",     # 手段目的 → inst
-        "ultimate_goal",         # 究極目的 → ulti
+        "intrinsic_goal",  # 内在目的 → intr
+        "instrumental_goal",  # 手段目的 → inst
+        "ultimate_goal",  # 究極目的 → ulti
     ]
-    
+
     K3_DERIVATIVES: List[str] = ["intr", "inst", "ulti"]
     K3_STATE_TO_DERIVATIVE: Dict[str, str] = {
         "intrinsic_goal": "intr",
         "instrumental_goal": "inst",
         "ultimate_goal": "ulti",
     }
-    
+
     # K4 Sophia: Knowledge representation derivatives
     K4_STATES: List[str] = [
-        "tacit_knowledge",       # 暗黙知 → taci
-        "explicit_knowledge",    # 明示知 → expl
-        "meta_knowledge",        # メタ知 → meta
+        "tacit_knowledge",  # 暗黙知 → taci
+        "explicit_knowledge",  # 明示知 → expl
+        "meta_knowledge",  # メタ知 → meta
     ]
-    
+
     K4_DERIVATIVES: List[str] = ["taci", "expl", "meta"]
     K4_STATE_TO_DERIVATIVE: Dict[str, str] = {
         "tacit_knowledge": "taci",
         "explicit_knowledge": "expl",
         "meta_knowledge": "meta",
     }
-    
+
     # =========================================================================
     # A-Series State Spaces (Akribeia / Precision Theorems)
     # =========================================================================
-    
+
     # A1 Pathos: Emotion appraisal derivatives
     A1_STATES: List[str] = [
-        "primary_emotion",       # 一次感情 → prim
-        "secondary_emotion",     # 二次感情 → seco
-        "regulated_emotion",     # 調整感情 → regu
+        "primary_emotion",  # 一次感情 → prim
+        "secondary_emotion",  # 二次感情 → seco
+        "regulated_emotion",  # 調整感情 → regu
     ]
-    
+
     A1_DERIVATIVES: List[str] = ["prim", "seco", "regu"]
     A1_STATE_TO_DERIVATIVE: Dict[str, str] = {
         "primary_emotion": "prim",
         "secondary_emotion": "seco",
         "regulated_emotion": "regu",
     }
-    
+
     # A2 Krisis: Judgment criteria derivatives
     A2_STATES: List[str] = [
-        "affirm_judgment",       # 肯定判定 → affi
-        "negate_judgment",       # 否定判定 → nega
-        "suspend_judgment",      # 保留判定 → susp
+        "affirm_judgment",  # 肯定判定 → affi
+        "negate_judgment",  # 否定判定 → nega
+        "suspend_judgment",  # 保留判定 → susp
     ]
-    
+
     A2_DERIVATIVES: List[str] = ["affi", "nega", "susp"]
     A2_STATE_TO_DERIVATIVE: Dict[str, str] = {
         "affirm_judgment": "affi",
         "negate_judgment": "nega",
         "suspend_judgment": "susp",
     }
-    
+
     # A3 Gnōmē: Wisdom level derivatives
     A3_STATES: List[str] = [
-        "concrete_wisdom",       # 具体的知恵 → conc
-        "abstract_wisdom",       # 抽象的知恵 → abst
-        "universal_wisdom",      # 普遍的知恵 → univ
+        "concrete_wisdom",  # 具体的知恵 → conc
+        "abstract_wisdom",  # 抽象的知恵 → abst
+        "universal_wisdom",  # 普遍的知恵 → univ
     ]
-    
+
     A3_DERIVATIVES: List[str] = ["conc", "abst", "univ"]
     A3_STATE_TO_DERIVATIVE: Dict[str, str] = {
         "concrete_wisdom": "conc",
         "abstract_wisdom": "abst",
         "universal_wisdom": "univ",
     }
-    
+
     # A4 Epistēmē: Knowledge confidence derivatives
     A4_STATES: List[str] = [
-        "tentative_knowledge",   # 暫定知識 → tent
-        "justified_knowledge",   # 正当化知識 → just
-        "certain_knowledge",     # 確実知識 → cert
+        "tentative_knowledge",  # 暫定知識 → tent
+        "justified_knowledge",  # 正当化知識 → just
+        "certain_knowledge",  # 確実知識 → cert
     ]
-    
+
     A4_DERIVATIVES: List[str] = ["tent", "just", "cert"]
     A4_STATE_TO_DERIVATIVE: Dict[str, str] = {
         "tentative_knowledge": "tent",
         "justified_knowledge": "just",
         "certain_knowledge": "cert",
     }
+
 
 # =============================================================================
 # Keyword Patterns for Derivative Selection
@@ -1075,61 +1077,63 @@ A4_PATTERNS: Dict[str, List[str]] = {
 # Data Classes
 # =============================================================================
 
+
 @dataclass
 class DerivativeRecommendation:
     """Result of derivative selection."""
-    theorem: str              # O1, O2, O3, O4
-    derivative: str           # nous, phro, meta, etc.
-    confidence: float         # 0.0-1.0
-    rationale: str            # Reason for recommendation
-    alternatives: List[str]   # Alternative derivatives
+
+    theorem: str  # O1, O2, O3, O4
+    derivative: str  # nous, phro, meta, etc.
+    confidence: float  # 0.0-1.0
+    rationale: str  # Reason for recommendation
+    alternatives: List[str]  # Alternative derivatives
 
 
 # =============================================================================
 # Encoding Functions
 # =============================================================================
 
+
 def encode_for_derivative_selection(
-    problem_text: str,
-    theorem: Literal["O1", "O2", "O3", "O4"]
+    problem_text: str, theorem: Literal["O1", "O2", "O3", "O4"]
 ) -> Tuple[int, int, int]:
     """
     Encode problem text for derivative selection.
-    
+
     Returns:
         Tuple of (abstraction_level, context_dependency, reflection_need)
         Each value is 0, 1, or 2.
-    
+
     Example:
         >>> encode_for_derivative_selection("この概念の本質は？", "O1")
         (2, 0, 0)  # High abstraction, low context, low reflection
     """
     text_lower = problem_text.lower()
-    
+
     # Abstraction level (0=concrete, 1=mixed, 2=abstract)
     abstract_keywords = ["本質", "原理", "根本", "普遍", "概念", "定義", "抽象", "理論"]
     practical_keywords = ["具体", "実際", "現場", "状況", "ケース", "事例", "この場合", "特定"]
-    
+
     abstract_score = sum(1 for k in abstract_keywords if k in text_lower)
     practical_score = sum(1 for k in practical_keywords if k in text_lower)
-    
+
     if abstract_score > practical_score:
         abstraction_level = 2
     elif practical_score > abstract_score:
         abstraction_level = 0
     else:
         abstraction_level = 1
-    
+
     # Context dependency (0=universal, 1=some context, 2=highly contextual)
     context_keywords = ["この場合", "今回", "特定の", "において", "状況", "ここで"]
     context_count = sum(1 for k in context_keywords if k in text_lower)
     context_dependency = min(context_count, 2)
-    
+
     # Reflection need (0=none, 1=some, 2=high)
     reflection_keywords = ["確かか", "信頼", "再考", "見直し", "本当に", "疑問", "どう思う"]
     reflection_count = sum(1 for k in reflection_keywords if k in text_lower)
     reflection_need = min(reflection_count, 2)
-    
+
     return (abstraction_level, context_dependency, reflection_need)
 
 
@@ -1192,17 +1196,17 @@ DERIVATIVE_DESCRIPTIONS: Dict[str, Dict[str, str]] = {
 def _select_with_llm(theorem: str, problem: str) -> Optional[Tuple[str, float]]:
     """
     Select derivative using LLM (Gemini Flash free tier).
-    
+
     Returns:
         Tuple of (derivative, confidence) or None if LLM fails
     """
     if not LLM_FALLBACK_ENABLED or not GEMINI_AVAILABLE or not GEMINI_CLIENT:
         return None
-    
+
     derivatives = THEOREM_DERIVATIVES.get(theorem, [])
     if not derivatives:
         return None
-    
+
     # Build concise prompt (Gemini 3 style: less is more)
     prompt = f"""定理 {theorem} の派生を選べ。
 
@@ -1217,14 +1221,14 @@ def _select_with_llm(theorem: str, problem: str) -> Optional[Tuple[str, float]]:
             model=LLM_DERIVATIVE_MODEL,
             contents=prompt,
         )
-        
+
         if response and response.text:
             result = response.text.strip().lower()
             # Extract derivative code from response
             for deriv in derivatives:
                 if deriv in result:
                     return (deriv, 0.85)  # LLM confidence = 85%
-        
+
         return None
     except Exception as e:
         logger.warning(f"LLM derivative selection failed: {e}")
@@ -1232,30 +1236,28 @@ def _select_with_llm(theorem: str, problem: str) -> Optional[Tuple[str, float]]:
 
 
 def _hybrid_select(
-    theorem: str,
-    problem: str,
-    keyword_result: "DerivativeRecommendation"
+    theorem: str, problem: str, keyword_result: "DerivativeRecommendation"
 ) -> "DerivativeRecommendation":
     """
     Hybrid selection: LLM fallback when keyword confidence is low.
-    
+
     Returns original keyword result if:
     - Keyword confidence >= threshold
     - LLM fallback is disabled
     - LLM call fails
-    
+
     Otherwise returns LLM result with higher confidence.
     """
     # If keyword confidence is high enough, use it
     if keyword_result.confidence >= LLM_FALLBACK_THRESHOLD:
         return keyword_result
-    
+
     # Try LLM fallback
     llm_result = _select_with_llm(theorem, problem)
-    
+
     if llm_result:
         derivative, confidence = llm_result
-        
+
         return DerivativeRecommendation(
             theorem=theorem,
             derivative=derivative,
@@ -1264,20 +1266,16 @@ def _hybrid_select(
             alternatives=keyword_result.alternatives,
         )
 
-    
     # LLM failed, return keyword result
     return keyword_result
 
 
 def _log_selection(
-    theorem: str,
-    problem: str,
-    result: "DerivativeRecommendation",
-    method: str = "keyword"
+    theorem: str, problem: str, result: "DerivativeRecommendation", method: str = "keyword"
 ) -> None:
     """
     派生選択をログに記録 (v3.2 学習基盤)
-    
+
     Args:
         theorem: 定理コード (O1, S2, etc.)
         problem: 問題文 (最大100文字)
@@ -1286,11 +1284,11 @@ def _log_selection(
     """
     if not SELECTION_LOG_ENABLED:
         return
-    
+
     try:
         # ログディレクトリ確保
         SELECTION_LOG_PATH.parent.mkdir(parents=True, exist_ok=True)
-        
+
         # エントリ作成
         entry = {
             "timestamp": datetime.now().isoformat(),
@@ -1300,7 +1298,7 @@ def _log_selection(
             "confidence": round(result.confidence, 2),
             "method": method,
         }
-        
+
         # 既存ログを読み込み
         existing = []
         if SELECTION_LOG_PATH.exists():
@@ -1308,10 +1306,10 @@ def _log_selection(
                 data = yaml.safe_load(f)
                 if data and isinstance(data.get("selections"), list):
                     existing = data["selections"]
-        
+
         # 追記
         existing.append(entry)
-        
+
         # 保存 (最新1000件のみ保持)
         with open(SELECTION_LOG_PATH, "w", encoding="utf-8") as f:
             yaml.dump(
@@ -1328,26 +1326,27 @@ def _log_selection(
 # Selection Functions
 # =============================================================================
 
+
 def select_derivative(
     theorem: Literal["O1", "O2", "O3", "O4", "S1", "S2", "S3", "S4", "H1", "H2", "H3", "H4"],
     problem_context: str,
     use_fep: bool = False,
-    use_llm_fallback: bool = True  # v3.1: Enable LLM hybrid selection
+    use_llm_fallback: bool = True,  # v3.1: Enable LLM hybrid selection
 ) -> DerivativeRecommendation:
     """
     Select the optimal derivative for the given theorem and problem context.
-    
+
     v3.1: Hybrid selection - uses LLM fallback when keyword confidence < 50%
-    
+
     Args:
         theorem: O-series (O1-O4), S-series (S1-S4), or H-series (H1-H4) theorem
         problem_context: Problem description (user input)
         use_fep: Use FEP agent for selection (future enhancement)
         use_llm_fallback: Enable LLM hybrid selection (default: True)
-    
+
     Returns:
         DerivativeRecommendation with selected derivative and confidence
-    
+
     Example:
         >>> result = select_derivative("O1", "この原理の本質を把握したい")
         >>> result.derivative
@@ -1359,10 +1358,10 @@ def select_derivative(
         >>> result.derivative
         'appr'
     """
-    
+
     # Get keyword-based result first
     keyword_result: Optional[DerivativeRecommendation] = None
-    
+
     # O-series
     if theorem == "O1":
         keyword_result = _select_o1_derivative(problem_context)
@@ -1418,24 +1417,22 @@ def select_derivative(
     elif theorem == "A4":
         keyword_result = _select_a4_derivative(problem_context)
     else:
-        raise ValueError(f"Unknown theorem: {theorem}. Expected O1-O4, S1-S4, H1-H4, P1-P4, K1-K4, or A1-A4.")
-    
+        raise ValueError(
+            f"Unknown theorem: {theorem}. Expected O1-O4, S1-S4, H1-H4, P1-P4, K1-K4, or A1-A4."
+        )
+
     # v3.1: Apply Hybrid selection (LLM fallback for low confidence)
     if use_llm_fallback and keyword_result is not None:
         result = _hybrid_select(theorem, problem_context, keyword_result)
         method = "llm" if "LLM" in result.rationale else "keyword"
         _log_selection(theorem, problem_context, result, method)
         return result
-    
+
     # v3.2: Log keyword selection
     if keyword_result is not None:
         _log_selection(theorem, problem_context, keyword_result, "keyword")
-    
+
     return keyword_result
-
-
-
-
 
 
 def _select_o1_derivative(text: str) -> DerivativeRecommendation:
@@ -1445,7 +1442,7 @@ def _select_o1_derivative(text: str) -> DerivativeRecommendation:
         "phro": _calculate_pattern_score(text, O1_PATTERNS["phro"]),
         "meta": _calculate_pattern_score(text, O1_PATTERNS["meta"]),
     }
-    
+
     # Encoding-based boost
     obs = encode_for_derivative_selection(text, "O1")
     if obs[2] >= 2:  # High reflection need
@@ -1454,24 +1451,24 @@ def _select_o1_derivative(text: str) -> DerivativeRecommendation:
         scores["nous"] += 2
     elif obs[1] >= 1:  # Context dependency
         scores["phro"] += 1
-    
+
     # Select highest score
     selected = max(scores, key=scores.get)
     max_score = scores[selected]
-    
+
     # Confidence based on score dominance
     total = sum(scores.values()) or 1
     confidence = 0.5 + 0.1 * max_score
     confidence = min(confidence, 0.95)
-    
+
     # Default if no patterns matched
     if total == 0:
         selected = "nous"
         confidence = 0.5
-    
+
     alternatives = [d for d in ["nous", "phro", "meta"] if d != selected]
     rationale = _generate_o1_rationale(selected, obs)
-    
+
     return DerivativeRecommendation(
         theorem="O1",
         derivative=selected,
@@ -1488,14 +1485,14 @@ def _select_o2_derivative(text: str) -> DerivativeRecommendation:
         "voli": _calculate_pattern_score(text, O2_PATTERNS["voli"]),
         "akra": _calculate_pattern_score(text, O2_PATTERNS["akra"]),
     }
-    
+
     # Priority boost for akra (意志-行為乖離 is often the core problem)
     if scores["akra"] >= 2:
         scores["akra"] += 1
-    
+
     selected = max(scores, key=scores.get)
     max_score = scores[selected]
-    
+
     # Default to desir if no patterns matched
     if sum(scores.values()) == 0:
         selected = "desir"
@@ -1503,10 +1500,10 @@ def _select_o2_derivative(text: str) -> DerivativeRecommendation:
     else:
         confidence = 0.5 + 0.1 * max_score
         confidence = min(confidence, 0.95)
-    
+
     alternatives = [d for d in ["desir", "voli", "akra"] if d != selected]
     rationale = _generate_o2_rationale(selected, scores)
-    
+
     return DerivativeRecommendation(
         theorem="O2",
         derivative=selected,
@@ -1523,10 +1520,10 @@ def _select_o3_derivative(text: str) -> DerivativeRecommendation:
         "hypo": _calculate_pattern_score(text, O3_PATTERNS["hypo"]),
         "eval": _calculate_pattern_score(text, O3_PATTERNS["eval"]),
     }
-    
+
     selected = max(scores, key=scores.get)
     max_score = scores[selected]
-    
+
     # Default to anom (inquiry starts with anomaly detection)
     if sum(scores.values()) == 0:
         selected = "anom"
@@ -1534,10 +1531,10 @@ def _select_o3_derivative(text: str) -> DerivativeRecommendation:
     else:
         confidence = 0.55 + 0.1 * max_score
         confidence = min(confidence, 0.95)
-    
+
     alternatives = [d for d in ["anom", "hypo", "eval"] if d != selected]
     rationale = _generate_o3_rationale(selected, scores)
-    
+
     return DerivativeRecommendation(
         theorem="O3",
         derivative=selected,
@@ -1554,10 +1551,10 @@ def _select_o4_derivative(text: str) -> DerivativeRecommendation:
         "prax": _calculate_pattern_score(text, O4_PATTERNS["prax"]),
         "pois": _calculate_pattern_score(text, O4_PATTERNS["pois"]),
     }
-    
+
     selected = max(scores, key=scores.get)
     max_score = scores[selected]
-    
+
     # Default to pois (production is common in development context)
     if sum(scores.values()) == 0:
         selected = "pois"
@@ -1565,10 +1562,10 @@ def _select_o4_derivative(text: str) -> DerivativeRecommendation:
     else:
         confidence = 0.55 + 0.1 * max_score
         confidence = min(confidence, 0.95)
-    
+
     alternatives = [d for d in ["flow", "prax", "pois"] if d != selected]
     rationale = _generate_o4_rationale(selected, scores)
-    
+
     return DerivativeRecommendation(
         theorem="O4",
         derivative=selected,
@@ -1582,6 +1579,7 @@ def _select_o4_derivative(text: str) -> DerivativeRecommendation:
 # S-series Selection Functions
 # =============================================================================
 
+
 def _select_s1_derivative(text: str) -> DerivativeRecommendation:
     """Select S1 Metron derivative: cont, disc, or abst."""
     scores = {
@@ -1589,10 +1587,10 @@ def _select_s1_derivative(text: str) -> DerivativeRecommendation:
         "disc": _calculate_pattern_score(text, S1_PATTERNS["disc"]),
         "abst": _calculate_pattern_score(text, S1_PATTERNS["abst"]),
     }
-    
+
     selected = max(scores, key=scores.get)
     max_score = scores[selected]
-    
+
     # Default to abst (abstraction level is most common)
     if sum(scores.values()) == 0:
         selected = "abst"
@@ -1600,10 +1598,10 @@ def _select_s1_derivative(text: str) -> DerivativeRecommendation:
     else:
         confidence = 0.55 + 0.1 * max_score
         confidence = min(confidence, 0.95)
-    
+
     alternatives = [d for d in ["cont", "disc", "abst"] if d != selected]
     rationale = _generate_s1_rationale(selected, scores)
-    
+
     return DerivativeRecommendation(
         theorem="S1",
         derivative=selected,
@@ -1620,10 +1618,10 @@ def _select_s2_derivative(text: str) -> DerivativeRecommendation:
         "inve": _calculate_pattern_score(text, S2_PATTERNS["inve"]),
         "adap": _calculate_pattern_score(text, S2_PATTERNS["adap"]),
     }
-    
+
     selected = max(scores, key=scores.get)
     max_score = scores[selected]
-    
+
     # Default to comp (composition is most common)
     if sum(scores.values()) == 0:
         selected = "comp"
@@ -1631,10 +1629,10 @@ def _select_s2_derivative(text: str) -> DerivativeRecommendation:
     else:
         confidence = 0.55 + 0.1 * max_score
         confidence = min(confidence, 0.95)
-    
+
     alternatives = [d for d in ["comp", "inve", "adap"] if d != selected]
     rationale = _generate_s2_rationale(selected, scores)
-    
+
     return DerivativeRecommendation(
         theorem="S2",
         derivative=selected,
@@ -1651,10 +1649,10 @@ def _select_s3_derivative(text: str) -> DerivativeRecommendation:
         "empi": _calculate_pattern_score(text, S3_PATTERNS["empi"]),
         "rela": _calculate_pattern_score(text, S3_PATTERNS["rela"]),
     }
-    
+
     selected = max(scores, key=scores.get)
     max_score = scores[selected]
-    
+
     # Default to empi (empirical criteria is most common)
     if sum(scores.values()) == 0:
         selected = "empi"
@@ -1662,10 +1660,10 @@ def _select_s3_derivative(text: str) -> DerivativeRecommendation:
     else:
         confidence = 0.55 + 0.1 * max_score
         confidence = min(confidence, 0.95)
-    
+
     alternatives = [d for d in ["norm", "empi", "rela"] if d != selected]
     rationale = _generate_s3_rationale(selected, scores)
-    
+
     return DerivativeRecommendation(
         theorem="S3",
         derivative=selected,
@@ -1682,10 +1680,10 @@ def _select_s4_derivative(text: str) -> DerivativeRecommendation:
         "pois": _calculate_pattern_score(text, S4_PATTERNS["pois"]),
         "temp": _calculate_pattern_score(text, S4_PATTERNS["temp"]),
     }
-    
+
     selected = max(scores, key=scores.get)
     max_score = scores[selected]
-    
+
     # Default to pois (production is most common in development context)
     if sum(scores.values()) == 0:
         selected = "pois"
@@ -1693,10 +1691,10 @@ def _select_s4_derivative(text: str) -> DerivativeRecommendation:
     else:
         confidence = 0.55 + 0.1 * max_score
         confidence = min(confidence, 0.95)
-    
+
     alternatives = [d for d in ["prax", "pois", "temp"] if d != selected]
     rationale = _generate_s4_rationale(selected, scores)
-    
+
     return DerivativeRecommendation(
         theorem="S4",
         derivative=selected,
@@ -1710,6 +1708,7 @@ def _select_s4_derivative(text: str) -> DerivativeRecommendation:
 # H-series Selection Functions (Hormē / Impulse)
 # =============================================================================
 
+
 def _select_h1_derivative(text: str) -> DerivativeRecommendation:
     """Select H1 Propatheia derivative: appr, avoi, or arre."""
     scores = {
@@ -1717,10 +1716,10 @@ def _select_h1_derivative(text: str) -> DerivativeRecommendation:
         "avoi": _calculate_pattern_score(text, H1_PATTERNS["avoi"]),
         "arre": _calculate_pattern_score(text, H1_PATTERNS["arre"]),
     }
-    
+
     selected = max(scores, key=scores.get)
     max_score = scores[selected]
-    
+
     # Default to arre (suspension is safest default)
     if sum(scores.values()) == 0:
         selected = "arre"
@@ -1728,10 +1727,10 @@ def _select_h1_derivative(text: str) -> DerivativeRecommendation:
     else:
         confidence = 0.55 + 0.1 * max_score
         confidence = min(confidence, 0.95)
-    
+
     alternatives = [d for d in ["appr", "avoi", "arre"] if d != selected]
     rationale = _generate_h1_rationale(selected, scores)
-    
+
     return DerivativeRecommendation(
         theorem="H1",
         derivative=selected,
@@ -1748,10 +1747,10 @@ def _select_h2_derivative(text: str) -> DerivativeRecommendation:
         "inte": _calculate_pattern_score(text, H2_PATTERNS["inte"]),
         "obje": _calculate_pattern_score(text, H2_PATTERNS["obje"]),
     }
-    
+
     selected = max(scores, key=scores.get)
     max_score = scores[selected]
-    
+
     # Default to subj (subjective is most common starting point)
     if sum(scores.values()) == 0:
         selected = "subj"
@@ -1759,10 +1758,10 @@ def _select_h2_derivative(text: str) -> DerivativeRecommendation:
     else:
         confidence = 0.55 + 0.1 * max_score
         confidence = min(confidence, 0.95)
-    
+
     alternatives = [d for d in ["subj", "inte", "obje"] if d != selected]
     rationale = _generate_h2_rationale(selected, scores)
-    
+
     return DerivativeRecommendation(
         theorem="H2",
         derivative=selected,
@@ -1779,10 +1778,10 @@ def _select_h3_derivative(text: str) -> DerivativeRecommendation:
         "acti": _calculate_pattern_score(text, H3_PATTERNS["acti"]),
         "stat": _calculate_pattern_score(text, H3_PATTERNS["stat"]),
     }
-    
+
     selected = max(scores, key=scores.get)
     max_score = scores[selected]
-    
+
     # Default to targ (target-oriented is most explicit)
     if sum(scores.values()) == 0:
         selected = "targ"
@@ -1790,10 +1789,10 @@ def _select_h3_derivative(text: str) -> DerivativeRecommendation:
     else:
         confidence = 0.55 + 0.1 * max_score
         confidence = min(confidence, 0.95)
-    
+
     alternatives = [d for d in ["targ", "acti", "stat"] if d != selected]
     rationale = _generate_h3_rationale(selected, scores)
-    
+
     return DerivativeRecommendation(
         theorem="H3",
         derivative=selected,
@@ -1810,10 +1809,10 @@ def _select_h4_derivative(text: str) -> DerivativeRecommendation:
         "conc": _calculate_pattern_score(text, H4_PATTERNS["conc"]),
         "form": _calculate_pattern_score(text, H4_PATTERNS["form"]),
     }
-    
+
     selected = max(scores, key=scores.get)
     max_score = scores[selected]
-    
+
     # Default to sens (sensory is most basic)
     if sum(scores.values()) == 0:
         selected = "sens"
@@ -1821,10 +1820,10 @@ def _select_h4_derivative(text: str) -> DerivativeRecommendation:
     else:
         confidence = 0.55 + 0.1 * max_score
         confidence = min(confidence, 0.95)
-    
+
     alternatives = [d for d in ["sens", "conc", "form"] if d != selected]
     rationale = _generate_h4_rationale(selected, scores)
-    
+
     return DerivativeRecommendation(
         theorem="H4",
         derivative=selected,
@@ -1838,6 +1837,7 @@ def _select_h4_derivative(text: str) -> DerivativeRecommendation:
 # P-series Selection Functions (Perigraphē / Environment)
 # =============================================================================
 
+
 def _select_p1_derivative(text: str) -> DerivativeRecommendation:
     """Select P1 Khōra derivative: phys, conc, or rela."""
     scores = {
@@ -1845,10 +1845,10 @@ def _select_p1_derivative(text: str) -> DerivativeRecommendation:
         "conc": _calculate_pattern_score(text, P1_PATTERNS["conc"]),
         "rela": _calculate_pattern_score(text, P1_PATTERNS["rela"]),
     }
-    
+
     selected = max(scores, key=scores.get)
     max_score = scores[selected]
-    
+
     # Default to phys (physical is most concrete)
     if sum(scores.values()) == 0:
         selected = "phys"
@@ -1856,10 +1856,10 @@ def _select_p1_derivative(text: str) -> DerivativeRecommendation:
     else:
         confidence = 0.55 + 0.1 * max_score
         confidence = min(confidence, 0.95)
-    
+
     alternatives = [d for d in ["phys", "conc", "rela"] if d != selected]
     rationale = _generate_p1_rationale(selected, scores)
-    
+
     return DerivativeRecommendation(
         theorem="P1",
         derivative=selected,
@@ -1876,10 +1876,10 @@ def _select_p2_derivative(text: str) -> DerivativeRecommendation:
         "bran": _calculate_pattern_score(text, P2_PATTERNS["bran"]),
         "cycl": _calculate_pattern_score(text, P2_PATTERNS["cycl"]),
     }
-    
+
     selected = max(scores, key=scores.get)
     max_score = scores[selected]
-    
+
     # Default to line (linear is most common)
     if sum(scores.values()) == 0:
         selected = "line"
@@ -1887,10 +1887,10 @@ def _select_p2_derivative(text: str) -> DerivativeRecommendation:
     else:
         confidence = 0.55 + 0.1 * max_score
         confidence = min(confidence, 0.95)
-    
+
     alternatives = [d for d in ["line", "bran", "cycl"] if d != selected]
     rationale = _generate_p2_rationale(selected, scores)
-    
+
     return DerivativeRecommendation(
         theorem="P2",
         derivative=selected,
@@ -1907,10 +1907,10 @@ def _select_p3_derivative(text: str) -> DerivativeRecommendation:
         "adap": _calculate_pattern_score(text, P3_PATTERNS["adap"]),
         "emer": _calculate_pattern_score(text, P3_PATTERNS["emer"]),
     }
-    
+
     selected = max(scores, key=scores.get)
     max_score = scores[selected]
-    
+
     # Default to adap (adaptive is most common)
     if sum(scores.values()) == 0:
         selected = "adap"
@@ -1918,10 +1918,10 @@ def _select_p3_derivative(text: str) -> DerivativeRecommendation:
     else:
         confidence = 0.55 + 0.1 * max_score
         confidence = min(confidence, 0.95)
-    
+
     alternatives = [d for d in ["fixe", "adap", "emer"] if d != selected]
     rationale = _generate_p3_rationale(selected, scores)
-    
+
     return DerivativeRecommendation(
         theorem="P3",
         derivative=selected,
@@ -1938,10 +1938,10 @@ def _select_p4_derivative(text: str) -> DerivativeRecommendation:
         "mech": _calculate_pattern_score(text, P4_PATTERNS["mech"]),
         "auto": _calculate_pattern_score(text, P4_PATTERNS["auto"]),
     }
-    
+
     selected = max(scores, key=scores.get)
     max_score = scores[selected]
-    
+
     # Default to mech (tool-assisted is most common)
     if sum(scores.values()) == 0:
         selected = "mech"
@@ -1949,10 +1949,10 @@ def _select_p4_derivative(text: str) -> DerivativeRecommendation:
     else:
         confidence = 0.55 + 0.1 * max_score
         confidence = min(confidence, 0.95)
-    
+
     alternatives = [d for d in ["manu", "mech", "auto"] if d != selected]
     rationale = _generate_p4_rationale(selected, scores)
-    
+
     return DerivativeRecommendation(
         theorem="P4",
         derivative=selected,
@@ -1966,6 +1966,7 @@ def _select_p4_derivative(text: str) -> DerivativeRecommendation:
 # K-series Selection Functions
 # =============================================================================
 
+
 def _select_k1_derivative(text: str) -> DerivativeRecommendation:
     """Select K1 Eukairia derivative: urge, opti, or miss."""
     scores = {
@@ -1973,10 +1974,10 @@ def _select_k1_derivative(text: str) -> DerivativeRecommendation:
         "opti": _calculate_pattern_score(text, K1_PATTERNS["opti"]),
         "miss": _calculate_pattern_score(text, K1_PATTERNS["miss"]),
     }
-    
+
     selected = max(scores, key=scores.get)
     max_score = scores[selected]
-    
+
     # Default to opti (optimal timing is most common)
     if sum(scores.values()) == 0:
         selected = "opti"
@@ -1984,10 +1985,10 @@ def _select_k1_derivative(text: str) -> DerivativeRecommendation:
     else:
         confidence = 0.55 + 0.1 * max_score
         confidence = min(confidence, 0.95)
-    
+
     alternatives = [d for d in ["urge", "opti", "miss"] if d != selected]
     rationale = _generate_k1_rationale(selected, scores)
-    
+
     return DerivativeRecommendation(
         theorem="K1",
         derivative=selected,
@@ -2004,10 +2005,10 @@ def _select_k2_derivative(text: str) -> DerivativeRecommendation:
         "medi": _calculate_pattern_score(text, K2_PATTERNS["medi"]),
         "long": _calculate_pattern_score(text, K2_PATTERNS["long"]),
     }
-    
+
     selected = max(scores, key=scores.get)
     max_score = scores[selected]
-    
+
     # Default to medi (medium-term is most common)
     if sum(scores.values()) == 0:
         selected = "medi"
@@ -2015,10 +2016,10 @@ def _select_k2_derivative(text: str) -> DerivativeRecommendation:
     else:
         confidence = 0.55 + 0.1 * max_score
         confidence = min(confidence, 0.95)
-    
+
     alternatives = [d for d in ["shor", "medi", "long"] if d != selected]
     rationale = _generate_k2_rationale(selected, scores)
-    
+
     return DerivativeRecommendation(
         theorem="K2",
         derivative=selected,
@@ -2035,10 +2036,10 @@ def _select_k3_derivative(text: str) -> DerivativeRecommendation:
         "inst": _calculate_pattern_score(text, K3_PATTERNS["inst"]),
         "ulti": _calculate_pattern_score(text, K3_PATTERNS["ulti"]),
     }
-    
+
     selected = max(scores, key=scores.get)
     max_score = scores[selected]
-    
+
     # Default to inst (instrumental is most common)
     if sum(scores.values()) == 0:
         selected = "inst"
@@ -2046,10 +2047,10 @@ def _select_k3_derivative(text: str) -> DerivativeRecommendation:
     else:
         confidence = 0.55 + 0.1 * max_score
         confidence = min(confidence, 0.95)
-    
+
     alternatives = [d for d in ["intr", "inst", "ulti"] if d != selected]
     rationale = _generate_k3_rationale(selected, scores)
-    
+
     return DerivativeRecommendation(
         theorem="K3",
         derivative=selected,
@@ -2066,10 +2067,10 @@ def _select_k4_derivative(text: str) -> DerivativeRecommendation:
         "expl": _calculate_pattern_score(text, K4_PATTERNS["expl"]),
         "meta": _calculate_pattern_score(text, K4_PATTERNS["meta"]),
     }
-    
+
     selected = max(scores, key=scores.get)
     max_score = scores[selected]
-    
+
     # Default to expl (explicit knowledge is most common)
     if sum(scores.values()) == 0:
         selected = "expl"
@@ -2077,10 +2078,10 @@ def _select_k4_derivative(text: str) -> DerivativeRecommendation:
     else:
         confidence = 0.55 + 0.1 * max_score
         confidence = min(confidence, 0.95)
-    
+
     alternatives = [d for d in ["taci", "expl", "meta"] if d != selected]
     rationale = _generate_k4_rationale(selected, scores)
-    
+
     return DerivativeRecommendation(
         theorem="K4",
         derivative=selected,
@@ -2094,6 +2095,7 @@ def _select_k4_derivative(text: str) -> DerivativeRecommendation:
 # A-series Selection Functions
 # =============================================================================
 
+
 def _select_a1_derivative(text: str) -> DerivativeRecommendation:
     """Select A1 Pathos derivative: prim, seco, or regu."""
     scores = {
@@ -2101,10 +2103,10 @@ def _select_a1_derivative(text: str) -> DerivativeRecommendation:
         "seco": _calculate_pattern_score(text, A1_PATTERNS["seco"]),
         "regu": _calculate_pattern_score(text, A1_PATTERNS["regu"]),
     }
-    
+
     selected = max(scores, key=scores.get)
     max_score = scores[selected]
-    
+
     # Default to prim (primary emotion is most common)
     if sum(scores.values()) == 0:
         selected = "prim"
@@ -2112,10 +2114,10 @@ def _select_a1_derivative(text: str) -> DerivativeRecommendation:
     else:
         confidence = 0.55 + 0.1 * max_score
         confidence = min(confidence, 0.95)
-    
+
     alternatives = [d for d in ["prim", "seco", "regu"] if d != selected]
     rationale = _generate_a1_rationale(selected, scores)
-    
+
     return DerivativeRecommendation(
         theorem="A1",
         derivative=selected,
@@ -2132,10 +2134,10 @@ def _select_a2_derivative(text: str) -> DerivativeRecommendation:
         "nega": _calculate_pattern_score(text, A2_PATTERNS["nega"]),
         "susp": _calculate_pattern_score(text, A2_PATTERNS["susp"]),
     }
-    
+
     selected = max(scores, key=scores.get)
     max_score = scores[selected]
-    
+
     # Default to susp (suspend is safest)
     if sum(scores.values()) == 0:
         selected = "susp"
@@ -2143,10 +2145,10 @@ def _select_a2_derivative(text: str) -> DerivativeRecommendation:
     else:
         confidence = 0.55 + 0.1 * max_score
         confidence = min(confidence, 0.95)
-    
+
     alternatives = [d for d in ["affi", "nega", "susp"] if d != selected]
     rationale = _generate_a2_rationale(selected, scores)
-    
+
     return DerivativeRecommendation(
         theorem="A2",
         derivative=selected,
@@ -2163,10 +2165,10 @@ def _select_a3_derivative(text: str) -> DerivativeRecommendation:
         "abst": _calculate_pattern_score(text, A3_PATTERNS["abst"]),
         "univ": _calculate_pattern_score(text, A3_PATTERNS["univ"]),
     }
-    
+
     selected = max(scores, key=scores.get)
     max_score = scores[selected]
-    
+
     # Default to conc (concrete is most actionable)
     if sum(scores.values()) == 0:
         selected = "conc"
@@ -2174,10 +2176,10 @@ def _select_a3_derivative(text: str) -> DerivativeRecommendation:
     else:
         confidence = 0.55 + 0.1 * max_score
         confidence = min(confidence, 0.95)
-    
+
     alternatives = [d for d in ["conc", "abst", "univ"] if d != selected]
     rationale = _generate_a3_rationale(selected, scores)
-    
+
     return DerivativeRecommendation(
         theorem="A3",
         derivative=selected,
@@ -2194,10 +2196,10 @@ def _select_a4_derivative(text: str) -> DerivativeRecommendation:
         "just": _calculate_pattern_score(text, A4_PATTERNS["just"]),
         "cert": _calculate_pattern_score(text, A4_PATTERNS["cert"]),
     }
-    
+
     selected = max(scores, key=scores.get)
     max_score = scores[selected]
-    
+
     # Default to just (justified is most common)
     if sum(scores.values()) == 0:
         selected = "just"
@@ -2205,10 +2207,10 @@ def _select_a4_derivative(text: str) -> DerivativeRecommendation:
     else:
         confidence = 0.55 + 0.1 * max_score
         confidence = min(confidence, 0.95)
-    
+
     alternatives = [d for d in ["tent", "just", "cert"] if d != selected]
     rationale = _generate_a4_rationale(selected, scores)
-    
+
     return DerivativeRecommendation(
         theorem="A4",
         derivative=selected,
@@ -2219,6 +2221,7 @@ def _select_a4_derivative(text: str) -> DerivativeRecommendation:
 
 
 # =============================================================================
+
 
 def _generate_o1_rationale(derivative: str, obs: Tuple[int, int, int]) -> str:
     """Generate rationale for O1 derivative selection."""
@@ -2262,6 +2265,7 @@ def _generate_o4_rationale(derivative: str, scores: Dict[str, int]) -> str:
 
 # S-series Rationale Generation
 
+
 def _generate_s1_rationale(derivative: str, scores: Dict[str, int]) -> str:
     """Generate rationale for S1 derivative selection."""
     rationales = {
@@ -2304,6 +2308,7 @@ def _generate_s4_rationale(derivative: str, scores: Dict[str, int]) -> str:
 
 # H-series Rationale Generation
 
+
 def _generate_h1_rationale(derivative: str, scores: Dict[str, int]) -> str:
     """Generate rationale for H1 derivative selection."""
     rationales = {
@@ -2345,6 +2350,7 @@ def _generate_h4_rationale(derivative: str, scores: Dict[str, int]) -> str:
 
 
 # P-series Rationale Generation
+
 
 def _generate_p1_rationale(derivative: str, scores: Dict[str, int]) -> str:
     """Generate rationale for P1 derivative selection."""
@@ -2390,6 +2396,7 @@ def _generate_p4_rationale(derivative: str, scores: Dict[str, int]) -> str:
 # K-series Rationale Functions
 # =============================================================================
 
+
 def _generate_k1_rationale(derivative: str, scores: Dict[str, int]) -> str:
     """Generate rationale for K1 derivative selection."""
     rationales = {
@@ -2433,6 +2440,7 @@ def _generate_k4_rationale(derivative: str, scores: Dict[str, int]) -> str:
 # =============================================================================
 # A-series Rationale Functions
 # =============================================================================
+
 
 def _generate_a1_rationale(derivative: str, scores: Dict[str, int]) -> str:
     """Generate rationale for A1 derivative selection."""
@@ -2483,7 +2491,6 @@ DERIVATIVE_DESCRIPTIONS: Dict[str, Dict[str, str]] = {
     "O1": {
         "nous": "本質・原理の直観的把握（Nous poietikos → theoretikos）",
         "phro": "文脈的実践的判断（Phronēsis：経験 + 文脈感受性）",
-
         "meta": "メタ認識的反省（認識の認識、信頼度評価）",
     },
     "O2": {
@@ -2609,7 +2616,6 @@ DERIVATIVE_DESCRIPTIONS: Dict[str, Dict[str, str]] = {
 }
 
 
-
 def get_derivative_description(theorem: str, derivative: str) -> str:
     """Get human-readable description of a derivative."""
     return DERIVATIVE_DESCRIPTIONS.get(theorem, {}).get(derivative, "Unknown derivative")
@@ -2624,18 +2630,16 @@ def list_derivatives(theorem: str) -> List[str]:
 # FEP Integration (Future Enhancement)
 # =============================================================================
 
+
 def update_derivative_selector(
-    theorem: str,
-    derivative: str,
-    problem_context: str,
-    success: bool
+    theorem: str, derivative: str, problem_context: str, success: bool
 ) -> None:
     """
     Record feedback for derivative selection learning.
-    
+
     Future enhancement: integrate with Dirichlet learning in FEP agent
     to improve derivative selection based on outcomes.
-    
+
     Args:
         theorem: O-series theorem
         derivative: Selected derivative

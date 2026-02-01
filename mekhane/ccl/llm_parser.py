@@ -16,11 +16,13 @@ from pathlib import Path
 try:
     from google import genai
     from google.genai.types import GenerateContentConfig
+
     HAS_GENAI = True
     USE_NEW_SDK = True
 except ImportError:
     try:
         import google.generativeai as genai_legacy
+
         HAS_GENAI = True
         USE_NEW_SDK = False
     except ImportError:
@@ -31,19 +33,19 @@ except ImportError:
 def _get_api_key() -> Optional[str]:
     """Get API key from environment, trying multiple variable names."""
     return (
-        os.environ.get("GOOGLE_API_KEY") or
-        os.environ.get("GEMINI_API_KEY") or
-        os.environ.get("GOOGLE_GENAI_API_KEY")
+        os.environ.get("GOOGLE_API_KEY")
+        or os.environ.get("GEMINI_API_KEY")
+        or os.environ.get("GOOGLE_GENAI_API_KEY")
     )
 
 
 class LLMParser:
     """LLM-based CCL intent parser (Layer 1)."""
-    
+
     def __init__(self, model: str = "gemini-2.0-flash"):
         """
         Initialize the LLM parser.
-        
+
         Args:
             model: Gemini model name
         """
@@ -51,7 +53,7 @@ class LLMParser:
         self.client = None
         self.model = None
         self.system_prompt = self._load_system_prompt()
-        
+
         if HAS_GENAI:
             try:
                 if USE_NEW_SDK:
@@ -68,39 +70,40 @@ class LLMParser:
                     self.model = genai_legacy.GenerativeModel(model)
             except Exception:
                 pass  # TODO: Add proper error handling
-    
+
     def _load_system_prompt(self) -> str:
         """Load the CCL compiler prompt."""
         prompt_path = Path(__file__).parent / "prompts" / "ccl_compiler.md"
         if prompt_path.exists():
             return prompt_path.read_text()
         return ""
-    
+
     def is_available(self) -> bool:
         """Check if LLM is available."""
         return self.client is not None or self.model is not None
-    
+
     def parse(self, intent: str) -> Optional[str]:
         """
         Convert natural language intent to CCL expression.
-        
+
         Args:
             intent: Natural language description of desired action
-            
+
         Returns:
             CCL expression or None if parsing fails
         """
         if not self.is_available():
             return None
-            
+
         try:
-            prompt = f"{self.system_prompt}\n\n## Intent\n{intent}\n\n## Output\nCCL expression only:"
-            
+            prompt = (
+                f"{self.system_prompt}\n\n## Intent\n{intent}\n\n## Output\nCCL expression only:"
+            )
+
             if USE_NEW_SDK and self.client:
                 # New SDK: google.genai
                 response = self.client.models.generate_content(
-                    model=self.model_name,
-                    contents=prompt
+                    model=self.model_name, contents=prompt
                 )
                 text = response.text if response else None
             elif self.model:
@@ -109,7 +112,7 @@ class LLMParser:
                 text = response.text if response else None
             else:
                 return None
-            
+
             if text:
                 # Clean up the response
                 ccl = text.strip()
@@ -120,5 +123,5 @@ class LLMParser:
                 return ccl.strip()
         except Exception:
             pass  # TODO: Add proper error handling
-            
+
         return None

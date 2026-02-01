@@ -27,7 +27,7 @@ from mekhane.fep.chronos_evaluator import (
 
 class TestTimeScale:
     """TimeScale enum tests"""
-    
+
     def test_all_scales_exist(self):
         assert TimeScale.IMMEDIATE.value == "immediate"
         assert TimeScale.SHORT.value == "short"
@@ -37,7 +37,7 @@ class TestTimeScale:
 
 class TestCertaintyLevel:
     """CertaintyLevel enum tests"""
-    
+
     def test_certainty_levels(self):
         assert CertaintyLevel.CERTAIN.value == "C"
         assert CertaintyLevel.UNCERTAIN.value == "U"
@@ -45,7 +45,7 @@ class TestCertaintyLevel:
 
 class TestSlackLevel:
     """SlackLevel enum tests"""
-    
+
     def test_slack_levels(self):
         assert SlackLevel.AMPLE.value == "ample"
         assert SlackLevel.ADEQUATE.value == "adequate"
@@ -55,7 +55,7 @@ class TestSlackLevel:
 
 class TestChronosResult:
     """ChronosResult dataclass tests"""
-    
+
     def test_is_overdue(self):
         result = ChronosResult(
             task="test",
@@ -71,7 +71,7 @@ class TestChronosResult:
         )
         assert result.is_overdue is True
         assert result.needs_acceleration is True
-    
+
     def test_not_overdue(self):
         result = ChronosResult(
             task="test",
@@ -91,40 +91,40 @@ class TestChronosResult:
 
 class TestParseDeadline:
     """_parse_deadline tests"""
-    
+
     def test_parse_iso_date(self):
         # Future date
-        future = (datetime.now() + timedelta(days=10)).strftime('%Y-%m-%d')
+        future = (datetime.now() + timedelta(days=10)).strftime("%Y-%m-%d")
         deadline, scale, certainty = _parse_deadline(future)
         assert deadline is not None
         assert certainty == CertaintyLevel.CERTAIN
-    
+
     def test_parse_japanese_today(self):
         deadline, scale, certainty = _parse_deadline("今日")
         assert deadline is not None
         assert scale == TimeScale.IMMEDIATE
         assert certainty == CertaintyLevel.CERTAIN
-    
+
     def test_parse_japanese_tomorrow(self):
         deadline, scale, certainty = _parse_deadline("明日")
         assert deadline is not None
         assert scale == TimeScale.IMMEDIATE
-    
+
     def test_parse_japanese_days(self):
         deadline, scale, certainty = _parse_deadline("3日")
         assert deadline is not None
         assert scale == TimeScale.SHORT
-    
+
     def test_parse_english_tomorrow(self):
         deadline, scale, certainty = _parse_deadline("tomorrow")
         assert deadline is not None
         assert scale == TimeScale.IMMEDIATE
-    
+
     def test_parse_english_days(self):
         deadline, scale, certainty = _parse_deadline("5 days")
         assert deadline is not None
         assert scale == TimeScale.SHORT
-    
+
     def test_parse_unknown(self):
         deadline, scale, certainty = _parse_deadline("something unknown")
         assert deadline is None
@@ -133,50 +133,50 @@ class TestParseDeadline:
 
 class TestCalculateUrgency:
     """_calculate_urgency tests"""
-    
+
     def test_urgency_immediate(self):
         assert _calculate_urgency(12) == 1.0  # < 24h
-    
+
     def test_urgency_3days(self):
         assert _calculate_urgency(48) == 0.8  # < 72h
-    
+
     def test_urgency_week(self):
         assert _calculate_urgency(120) == 0.6  # < 168h
-    
+
     def test_urgency_3weeks(self):
         assert _calculate_urgency(336) == 0.4  # < 504h
-    
+
     def test_urgency_none(self):
         assert _calculate_urgency(None) == 0.3
 
 
 class TestCalculateSlack:
     """_calculate_slack tests"""
-    
+
     def test_slack_ample(self):
         assert _calculate_slack(100, 40) == SlackLevel.AMPLE  # ratio = 2.5
-    
+
     def test_slack_adequate(self):
         assert _calculate_slack(60, 40) == SlackLevel.ADEQUATE  # ratio = 1.5
-    
+
     def test_slack_tight(self):
         assert _calculate_slack(30, 40) == SlackLevel.TIGHT  # ratio = 0.75
-    
+
     def test_slack_overdue(self):
         assert _calculate_slack(10, 40) == SlackLevel.OVERDUE  # ratio = 0.25
-    
+
     def test_slack_zero_remaining(self):
         assert _calculate_slack(0, 40) == SlackLevel.OVERDUE
-    
+
     def test_slack_none_remaining(self):
         assert _calculate_slack(None, 40) == SlackLevel.ADEQUATE
 
 
 class TestEvaluateTime:
     """evaluate_time integration tests"""
-    
+
     def test_evaluate_with_iso_date(self):
-        future = (datetime.now() + timedelta(days=7)).strftime('%Y-%m-%d')
+        future = (datetime.now() + timedelta(days=7)).strftime("%Y-%m-%d")
         result = evaluate_time(
             task="テスト実装",
             deadline_str=future,
@@ -185,7 +185,7 @@ class TestEvaluateTime:
         assert result.task == "テスト実装"
         assert result.deadline is not None
         assert result.certainty == CertaintyLevel.CERTAIN
-    
+
     def test_evaluate_with_japanese(self):
         result = evaluate_time(
             task="ドキュメント作成",
@@ -194,7 +194,7 @@ class TestEvaluateTime:
         )
         assert result.deadline is not None
         assert result.time_scale == TimeScale.SHORT
-    
+
     def test_evaluate_includes_critical_path(self):
         result = evaluate_time(
             task="最終レビュー",
@@ -203,7 +203,7 @@ class TestEvaluateTime:
             critical_path=["設計完了", "実装完了"],
         )
         assert len(result.critical_path) == 2
-    
+
     def test_evaluate_generates_recommendation(self):
         result = evaluate_time(
             task="緊急対応",
@@ -215,7 +215,7 @@ class TestEvaluateTime:
 
 class TestFormatChronosMarkdown:
     """format_chronos_markdown tests"""
-    
+
     def test_format_includes_key_fields(self):
         result = evaluate_time(
             task="テストタスク",
@@ -230,7 +230,7 @@ class TestFormatChronosMarkdown:
 
 class TestEncodeChronosObservation:
     """encode_chronos_observation tests"""
-    
+
     def test_encode_certain_deadline(self):
         result = ChronosResult(
             task="test",
@@ -248,7 +248,7 @@ class TestEncodeChronosObservation:
         assert obs["context_clarity"] == 0.9  # Certain
         assert obs["urgency"] == 0.8
         assert obs["confidence"] == 0.7  # Adequate
-    
+
     def test_encode_uncertain_deadline(self):
         result = ChronosResult(
             task="test",

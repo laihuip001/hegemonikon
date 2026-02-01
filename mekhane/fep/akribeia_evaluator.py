@@ -30,22 +30,23 @@ from dataclasses import dataclass, field
 from typing import Optional, List, Dict, Any
 from enum import Enum
 
-
 # =============================================================================
 # A1 Pathos (メタ感情)
 # =============================================================================
 
+
 class PathosDerivative(Enum):
     """A1 Pathos の派生モード"""
-    EMOTIONAL = "emot"    # 情動的 (感情そのもの)
-    COGNITIVE = "cogn"    # 認知的 (感情についての思考)
-    SOMATIC = "soma"      # 身体的 (感情の身体反応)
+
+    EMOTIONAL = "emot"  # 情動的 (感情そのもの)
+    COGNITIVE = "cogn"  # 認知的 (感情についての思考)
+    SOMATIC = "soma"  # 身体的 (感情の身体反応)
 
 
 @dataclass
 class PathosResult:
     """A1 Pathos 評価結果
-    
+
     Attributes:
         experience: 経験・状況
         derivative: 派生モード
@@ -54,13 +55,14 @@ class PathosResult:
         intensity: 強度 (0.0-1.0)
         regulation_need: 調整必要度 (0.0-1.0)
     """
+
     experience: str
     derivative: PathosDerivative
     primary_emotion: str
     meta_emotion: str
     intensity: float
     regulation_need: float
-    
+
     @property
     def needs_regulation(self) -> bool:
         """調整が必要か"""
@@ -73,38 +75,38 @@ def evaluate_pathos(
     meta_emotion: Optional[str] = None,
 ) -> PathosResult:
     """A1 Pathos: メタ感情を評価
-    
+
     Args:
         experience: 経験・状況
         primary_emotion: 一次感情
         meta_emotion: 二次感情
-        
+
     Returns:
         PathosResult
     """
     exp_lower = experience.lower()
-    
+
     # キーワードベースの派生推論
-    if any(w in exp_lower for w in ['体', '身体', '緊張', '心拍', 'body', 'tension']):
+    if any(w in exp_lower for w in ["体", "身体", "緊張", "心拍", "body", "tension"]):
         derivative = PathosDerivative.SOMATIC
-    elif any(w in exp_lower for w in ['考え', '思考', '分析', 'think', 'analyze']):
+    elif any(w in exp_lower for w in ["考え", "思考", "分析", "think", "analyze"]):
         derivative = PathosDerivative.COGNITIVE
     else:
         derivative = PathosDerivative.EMOTIONAL
-    
+
     # 感情推論
     primary = primary_emotion or "不明"
     meta = meta_emotion or f"{primary}に対する自覚"
-    
+
     # 強度と調整必要度
-    negative_keywords = ['不安', '怒り', '悲しみ', '恐れ', 'anxiety', 'anger', 'fear']
+    negative_keywords = ["不安", "怒り", "悲しみ", "恐れ", "anxiety", "anger", "fear"]
     if any(w in exp_lower for w in negative_keywords):
         intensity = 0.7
         regulation_need = 0.6
     else:
         intensity = 0.4
         regulation_need = 0.2
-    
+
     return PathosResult(
         experience=experience,
         derivative=derivative,
@@ -119,17 +121,19 @@ def evaluate_pathos(
 # A3 Gnōmē (格言・原則)
 # =============================================================================
 
+
 class GnomeDerivative(Enum):
     """A3 Gnōmē の派生モード"""
-    UNIVERSAL = "univ"    # 普遍的原則
-    DOMAIN = "doma"       # 領域固有原則
-    PRAGMATIC = "prag"    # 実用的原則
+
+    UNIVERSAL = "univ"  # 普遍的原則
+    DOMAIN = "doma"  # 領域固有原則
+    PRAGMATIC = "prag"  # 実用的原則
 
 
 @dataclass
 class GnomeResult:
     """A3 Gnōmē 評価結果
-    
+
     Attributes:
         source: 原則の出所・文脈
         derivative: 派生モード
@@ -138,13 +142,14 @@ class GnomeResult:
         generalizability: 一般化可能性 (0.0-1.0)
         examples: 適用例
     """
+
     source: str
     derivative: GnomeDerivative
     principle: str
     applicability: float
     generalizability: float
     examples: List[str] = field(default_factory=list)
-    
+
     @property
     def is_actionable(self) -> bool:
         """行動可能な原則か"""
@@ -156,32 +161,32 @@ def extract_gnome(
     context: Optional[str] = None,
 ) -> GnomeResult:
     """A3 Gnōmē: 原則を抽出
-    
+
     Args:
         source: 原則の出所・経験
         context: 文脈
-        
+
     Returns:
         GnomeResult
     """
     src_lower = source.lower()
     ctx_lower = (context or "").lower()
     combined = src_lower + " " + ctx_lower
-    
+
     # 派生推論
-    if any(w in combined for w in ['常に', '普遍', 'never', 'always', '必ず']):
+    if any(w in combined for w in ["常に", "普遍", "never", "always", "必ず"]):
         derivative = GnomeDerivative.UNIVERSAL
         generalizability = 0.9
-    elif any(w in combined for w in ['この場合', '特定の', 'specifically', 'in this case']):
+    elif any(w in combined for w in ["この場合", "特定の", "specifically", "in this case"]):
         derivative = GnomeDerivative.DOMAIN
         generalizability = 0.5
     else:
         derivative = GnomeDerivative.PRAGMATIC
         generalizability = 0.7
-    
+
     # 原則生成 (簡略版)
     principle = f"{source[:50]}から導かれる教訓"
-    
+
     return GnomeResult(
         source=source,
         derivative=derivative,
@@ -196,17 +201,19 @@ def extract_gnome(
 # A4 Epistēmē (知識確立)
 # =============================================================================
 
+
 class EpistemeDerivative(Enum):
     """A4 Epistēmē の派生モード (JTB条件)"""
-    JUSTIFIED = "just"    # 正当化された
-    TRUE = "true"         # 真である
-    BELIEVED = "beli"     # 信じられている
+
+    JUSTIFIED = "just"  # 正当化された
+    TRUE = "true"  # 真である
+    BELIEVED = "beli"  # 信じられている
 
 
 @dataclass
 class EpistemeResult:
     """A4 Epistēmē 評価結果
-    
+
     Attributes:
         proposition: 命題
         derivative: 評価の焦点
@@ -216,6 +223,7 @@ class EpistemeResult:
         jtb_score: JTB総合スコア (0.0-1.0)
         status: 知識ステータス
     """
+
     proposition: str
     derivative: EpistemeDerivative
     is_justified: bool
@@ -223,7 +231,7 @@ class EpistemeResult:
     is_believed: bool
     jtb_score: float
     status: str
-    
+
     @property
     def is_knowledge(self) -> bool:
         """知識として成立するか (JTB条件)"""
@@ -237,21 +245,21 @@ def evaluate_episteme(
     believed: bool = True,
 ) -> EpistemeResult:
     """A4 Epistēmē: 知識を評価
-    
+
     Args:
         proposition: 命題
         justification: 正当化根拠
         evidence: 証拠リスト
         believed: 信じられているか
-        
+
     Returns:
         EpistemeResult
     """
     ev = evidence or []
-    
+
     # 正当化評価
     is_justified = justification is not None or len(ev) > 0
-    
+
     # 真理評価 (証拠ベース)
     if len(ev) >= 3:
         is_true = True
@@ -262,13 +270,13 @@ def evaluate_episteme(
     else:
         is_true = None
         derivative = EpistemeDerivative.BELIEVED
-    
+
     # JTBスコア計算
     j_score = 1.0 if is_justified else 0.0
     t_score = 1.0 if is_true else (0.5 if is_true is None else 0.0)
     b_score = 1.0 if believed else 0.0
     jtb_score = (j_score + t_score + b_score) / 3
-    
+
     # ステータス
     if is_justified and is_true and believed:
         status = "✅ 知識として確立"
@@ -278,7 +286,7 @@ def evaluate_episteme(
         status = "⚠️ 単なる信念（正当化不足）"
     else:
         status = "❌ 疑念あり"
-    
+
     return EpistemeResult(
         proposition=proposition,
         derivative=derivative,
@@ -293,6 +301,7 @@ def evaluate_episteme(
 # =============================================================================
 # Formatting
 # =============================================================================
+
 
 def format_pathos_markdown(result: PathosResult) -> str:
     """A1 Pathos 結果をMarkdown形式でフォーマット"""
@@ -329,7 +338,7 @@ def format_episteme_markdown(result: EpistemeResult) -> str:
     j_emoji = "✅" if result.is_justified else "❌"
     t_emoji = "✅" if result.is_true else ("🔄" if result.is_true is None else "❌")
     b_emoji = "✅" if result.is_believed else "❌"
-    
+
     lines = [
         "┌─[A4 Epistēmē 知識評価]───────────────────────────────┐",
         f"│ 派生: {result.derivative.value}",
@@ -346,34 +355,35 @@ def format_episteme_markdown(result: EpistemeResult) -> str:
 # FEP Integration
 # =============================================================================
 
+
 def encode_akribeia_observation(
     pathos: Optional[PathosResult] = None,
     gnome: Optional[GnomeResult] = None,
     episteme: Optional[EpistemeResult] = None,
 ) -> dict:
     """FEP観察空間へのエンコード
-    
+
     A-series の精度評価を FEP agent の観察形式に変換。
-    
+
     Returns:
         dict with context_clarity, urgency, confidence
     """
     context_clarity = 0.5
     urgency = 0.3
     confidence = 0.5
-    
+
     # Pathos: メタ感情 → urgency (調整必要度と連動)
     if pathos:
         urgency = pathos.regulation_need
-    
+
     # Gnōmē: 原則 → context_clarity (一般化可能性)
     if gnome:
         context_clarity = gnome.generalizability
-    
+
     # Epistēmē: 知識 → confidence (JTBスコア)
     if episteme:
         confidence = episteme.jtb_score
-    
+
     return {
         "context_clarity": context_clarity,
         "urgency": urgency,

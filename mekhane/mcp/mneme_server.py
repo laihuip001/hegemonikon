@@ -30,6 +30,7 @@ log(f"Platform: {sys.platform}")
 
 # ============ Import path setup ============
 from pathlib import Path
+
 sys.path.insert(0, str(Path(__file__).parent.parent))
 log(f"Added to path: {Path(__file__).parent.parent}")
 
@@ -54,6 +55,7 @@ try:
     from mcp.server import Server
     from mcp.server.stdio import stdio_server
     from mcp.types import Tool, TextContent
+
     log("MCP imports successful")
 except Exception as e:
     log(f"MCP import error: {e}")
@@ -66,7 +68,11 @@ try:
         from mekhane.symploke.search.engine import SearchEngine
         from mekhane.symploke.adapters.embedding_adapter import EmbeddingAdapter
         from mekhane.symploke.indices import (
-            GnosisIndex, ChronosIndex, SophiaIndex, KairosIndex, Document
+            GnosisIndex,
+            ChronosIndex,
+            SophiaIndex,
+            KairosIndex,
+            Document,
         )
     log("Symplokē imports successful (EmbeddingAdapter mode)")
 except Exception as e:
@@ -79,7 +85,7 @@ except Exception as e:
 server = Server(
     name="mneme",
     version="1.0.0",
-    instructions="Mneme: Hegemonikón integrated knowledge search across 4 sources"
+    instructions="Mneme: Hegemonikón integrated knowledge search across 4 sources",
 )
 log("Server initialized")
 
@@ -94,12 +100,16 @@ def get_engine():
     if _engine is None and SearchEngine is not None:
         log("Initializing SearchEngine...")
         _engine = SearchEngine()
-        
+
         # Load seed data for MVP testing
         try:
             from mekhane.symploke.seed_data import (
-                GNOSIS_SEED, CHRONOS_SEED, SOPHIA_SEED, KAIROS_SEED
+                GNOSIS_SEED,
+                CHRONOS_SEED,
+                SOPHIA_SEED,
+                KAIROS_SEED,
             )
+
             seed_data = {
                 "gnosis": GNOSIS_SEED,
                 "chronos": CHRONOS_SEED,
@@ -110,12 +120,12 @@ def get_engine():
         except ImportError:
             seed_data = {}
             log("No seed data available")
-        
+
         # Register all indices with EmbeddingAdapter (semantic search mode)
         # Using MiniLM-L6-v2: 384 dimensions
         embedding_adapter = EmbeddingAdapter(model_name="all-MiniLM-L6-v2")
         log("EmbeddingAdapter initialized")
-        
+
         for IndexClass, name in [
             (GnosisIndex, "gnosis"),
             (ChronosIndex, "chronos"),
@@ -125,16 +135,16 @@ def get_engine():
             adapter = EmbeddingAdapter(model_name="all-MiniLM-L6-v2")
             index = IndexClass(adapter, name, dimension=384)
             index.initialize()
-            
+
             # Ingest seed data if available
             if name in seed_data:
                 count = index.ingest(seed_data[name])
                 log(f"Registered {name} index ({count} docs)")
             else:
                 log(f"Registered {name} index (empty)")
-            
+
             _engine.register(index)
-        
+
         log("SearchEngine ready")
     return _engine
 
@@ -150,42 +160,31 @@ async def list_tools() -> list[Tool]:
             inputSchema={
                 "type": "object",
                 "properties": {
-                    "query": {
-                        "type": "string",
-                        "description": "Search query"
-                    },
+                    "query": {"type": "string", "description": "Search query"},
                     "sources": {
                         "type": "array",
                         "items": {"type": "string"},
-                        "description": "Optional: limit to specific sources (gnosis, chronos, sophia, kairos)"
+                        "description": "Optional: limit to specific sources (gnosis, chronos, sophia, kairos)",
                     },
                     "k": {
                         "type": "integer",
                         "description": "Number of results (default: 10)",
-                        "default": 10
-                    }
+                        "default": 10,
+                    },
                 },
-                "required": ["query"]
-            }
+                "required": ["query"],
+            },
         ),
         Tool(
             name="stats",
             description="Get statistics about indexed documents",
-            inputSchema={
-                "type": "object",
-                "properties": {},
-                "required": []
-            }
+            inputSchema={"type": "object", "properties": {}, "required": []},
         ),
         Tool(
             name="sources",
             description="List available knowledge sources",
-            inputSchema={
-                "type": "object",
-                "properties": {},
-                "required": []
-            }
-        )
+            inputSchema={"type": "object", "properties": {}, "required": []},
+        ),
     ]
 
 
@@ -193,7 +192,7 @@ async def list_tools() -> list[Tool]:
 async def call_tool(name: str, arguments: dict) -> list[TextContent]:
     """Handle tool calls."""
     log(f"Tool call: {name} with args: {arguments}")
-    
+
     try:
         if name == "search":
             return await _handle_search(arguments)
@@ -213,16 +212,16 @@ async def _handle_search(arguments: dict) -> list[TextContent]:
     query = arguments.get("query", "")
     sources = arguments.get("sources")
     k = arguments.get("k", 10)
-    
+
     engine = get_engine()
     if engine is None:
         return [TextContent(type="text", text="SearchEngine not available (stub mode)")]
-    
+
     results = engine.search(query, sources=sources, k=k)
-    
+
     if not results:
         return [TextContent(type="text", text=f"No results for: {query}")]
-    
+
     # Format results
     lines = [f"## Search Results for: {query}", f"Found {len(results)} results\n"]
     for i, r in enumerate(results, 1):
@@ -231,7 +230,7 @@ async def _handle_search(arguments: dict) -> list[TextContent]:
         if r.content:
             lines.append(f"Content: {r.content[:200]}...")
         lines.append("")
-    
+
     return [TextContent(type="text", text="\n".join(lines))]
 
 
@@ -240,16 +239,16 @@ async def _handle_stats(arguments: dict) -> list[TextContent]:
     engine = get_engine()
     if engine is None:
         return [TextContent(type="text", text="SearchEngine not available (stub mode)")]
-    
+
     stats = engine.stats()
-    
+
     lines = ["## Mneme Statistics\n"]
     total = 0
     for source, count in stats.items():
         lines.append(f"- **{source}**: {count} documents")
         total += count
     lines.append(f"\n**Total**: {total} documents")
-    
+
     return [TextContent(type="text", text="\n".join(lines))]
 
 
@@ -260,19 +259,19 @@ async def _handle_sources(arguments: dict) -> list[TextContent]:
         sources = ["gnosis", "chronos", "sophia", "kairos"]
     else:
         sources = list(engine.registered_sources)
-    
+
     lines = ["## Available Knowledge Sources\n"]
     descriptions = {
         "gnosis": "External knowledge (research papers, documentation)",
         "chronos": "Chat history (time-ordered conversations)",
         "sophia": "Knowledge items (distilled insights)",
-        "kairos": "Session handoffs (context continuity)"
+        "kairos": "Session handoffs (context continuity)",
     }
-    
+
     for source in sources:
         desc = descriptions.get(source, "Unknown source")
         lines.append(f"- **{source}**: {desc}")
-    
+
     return [TextContent(type="text", text="\n".join(lines))]
 
 
@@ -280,19 +279,20 @@ async def _handle_sources(arguments: dict) -> list[TextContent]:
 async def main():
     """Run the MCP server."""
     log("Starting stdio server...")
-    
+
     # Initialize engine
     get_engine()
-    
+
     async with stdio_server() as (read, write):
         log("Stdio streams ready")
         await server.run(read, write, server.create_initialization_options())
-    
+
     log("Server shutdown")
 
 
 if __name__ == "__main__":
     import asyncio
+
     log("Running main...")
     try:
         asyncio.run(main())

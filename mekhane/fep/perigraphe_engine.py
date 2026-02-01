@@ -30,28 +30,30 @@ from dataclasses import dataclass, field
 from typing import Optional, List, Dict, Any
 from enum import Enum
 
-
 # =============================================================================
 # P1 Khōra (場・スコープ)
 # =============================================================================
 
+
 class KhoraDerivative(Enum):
     """P1 Khōra の派生モード (Lefebvre の空間三分法)"""
-    PHYSICAL = "phys"       # 物理的空間 (Perceived space)
-    CONCEPTUAL = "conc"     # 概念的空間 (Conceived space)
-    RELATIONAL = "rela"     # 関係的空間 (Lived space)
+
+    PHYSICAL = "phys"  # 物理的空間 (Perceived space)
+    CONCEPTUAL = "conc"  # 概念的空間 (Conceived space)
+    RELATIONAL = "rela"  # 関係的空間 (Lived space)
 
 
 class ScopeScale(Enum):
     """スコープのスケール"""
-    MICRO = "micro"   # 局所的
-    MACRO = "macro"   # 広域的
+
+    MICRO = "micro"  # 局所的
+    MACRO = "macro"  # 広域的
 
 
 @dataclass
 class KhoraResult:
     """P1 Khōra 評価結果
-    
+
     Attributes:
         target: 対象
         derivative: 派生モード
@@ -61,6 +63,7 @@ class KhoraResult:
         included: スコープ内に含まれるもの
         excluded: スコープ外に除外されるもの
     """
+
     target: str
     derivative: KhoraDerivative
     x_scale: ScopeScale
@@ -68,7 +71,7 @@ class KhoraResult:
     boundaries: List[str]
     included: List[str] = field(default_factory=list)
     excluded: List[str] = field(default_factory=list)
-    
+
     @property
     def scope_label(self) -> str:
         """スコープラベル (Micro×Micro 等)"""
@@ -84,7 +87,7 @@ def define_scope(
     excluded: Optional[List[str]] = None,
 ) -> KhoraResult:
     """P1 Khōra: スコープを定義
-    
+
     Args:
         target: 対象
         derivative: 派生モード (None で自動推論)
@@ -92,20 +95,20 @@ def define_scope(
         y_scale: Y軸スケール
         included: 含めるもの
         excluded: 除外するもの
-        
+
     Returns:
         KhoraResult
     """
     # 派生自動推論 (キーワードベース)
     if derivative is None:
         target_lower = target.lower()
-        if any(w in target_lower for w in ['チーム', 'ネットワーク', '関係', 'コミュニティ']):
+        if any(w in target_lower for w in ["チーム", "ネットワーク", "関係", "コミュニティ"]):
             derivative = KhoraDerivative.RELATIONAL
-        elif any(w in target_lower for w in ['設計', 'モデル', 'スキーマ', 'アーキテクチャ']):
+        elif any(w in target_lower for w in ["設計", "モデル", "スキーマ", "アーキテクチャ"]):
             derivative = KhoraDerivative.CONCEPTUAL
         else:
             derivative = KhoraDerivative.PHYSICAL
-    
+
     # 境界生成
     boundaries = []
     if x_scale == ScopeScale.MICRO and y_scale == ScopeScale.MICRO:
@@ -114,7 +117,7 @@ def define_scope(
         boundaries.append("広域的・全体レベル")
     else:
         boundaries.append("混合スケール")
-    
+
     return KhoraResult(
         target=target,
         derivative=derivative,
@@ -130,17 +133,19 @@ def define_scope(
 # P2 Hodos (道・経路)
 # =============================================================================
 
+
 class HodosDerivative(Enum):
     """P2 Hodos の派生モード"""
-    DIRECT = "direct"       # 直接経路 (A→B)
-    ITERATE = "iterate"     # 反復経路 (A→B→A→B)
-    PARALLEL = "parallel"   # 並列経路 (A→B, A→C)
+
+    DIRECT = "direct"  # 直接経路 (A→B)
+    ITERATE = "iterate"  # 反復経路 (A→B→A→B)
+    PARALLEL = "parallel"  # 並列経路 (A→B, A→C)
 
 
 @dataclass
 class HodosResult:
     """P2 Hodos 評価結果
-    
+
     Attributes:
         path_name: 経路名
         derivative: 派生モード
@@ -149,13 +154,14 @@ class HodosResult:
         waypoints: 経由点
         estimated_steps: 予想ステップ数
     """
+
     path_name: str
     derivative: HodosDerivative
     start: str
     end: str
     waypoints: List[str] = field(default_factory=list)
     estimated_steps: int = 1
-    
+
     @property
     def total_nodes(self) -> int:
         """総ノード数"""
@@ -170,19 +176,19 @@ def define_path(
     waypoints: Optional[List[str]] = None,
 ) -> HodosResult:
     """P2 Hodos: 経路を定義
-    
+
     Args:
         path_name: 経路名
         start: 開始点
         end: 終了点
         derivative: 派生モード (None で自動推論)
         waypoints: 経由点
-        
+
     Returns:
         HodosResult
     """
     wp = waypoints or []
-    
+
     # 派生自動推論
     if derivative is None:
         if start == end:
@@ -191,7 +197,7 @@ def define_path(
             derivative = HodosDerivative.ITERATE
         else:
             derivative = HodosDerivative.DIRECT
-    
+
     # ステップ数計算
     if derivative == HodosDerivative.ITERATE:
         estimated_steps = (len(wp) + 1) * 2  # 往復
@@ -199,7 +205,7 @@ def define_path(
         estimated_steps = len(wp) + 1  # 同時
     else:
         estimated_steps = len(wp) + 1
-    
+
     return HodosResult(
         path_name=path_name,
         derivative=derivative,
@@ -214,17 +220,19 @@ def define_path(
 # P3 Trokhia (軌道・サイクル)
 # =============================================================================
 
+
 class TrokhiaDerivative(Enum):
     """P3 Trokhia の派生モード"""
-    CYCLE = "cycle"       # 循環 (A→B→C→A)
-    SPIRAL = "spiral"     # 螺旋 (A→B→C→A' elevated)
-    BRANCH = "branch"     # 分岐 (A→B or A→C)
+
+    CYCLE = "cycle"  # 循環 (A→B→C→A)
+    SPIRAL = "spiral"  # 螺旋 (A→B→C→A' elevated)
+    BRANCH = "branch"  # 分岐 (A→B or A→C)
 
 
 @dataclass
 class TrokhiaResult:
     """P3 Trokhia 評価結果
-    
+
     Attributes:
         trajectory_name: 軌道名
         derivative: 派生モード
@@ -233,20 +241,21 @@ class TrokhiaResult:
         iteration: 現在イテレーション
         max_iterations: 最大イテレーション (None で無限)
     """
+
     trajectory_name: str
     derivative: TrokhiaDerivative
     phases: List[str]
     current_phase: int = 0
     iteration: int = 1
     max_iterations: Optional[int] = None
-    
+
     @property
     def current_phase_name(self) -> str:
         """現在フェーズ名"""
         if 0 <= self.current_phase < len(self.phases):
             return self.phases[self.current_phase]
         return "unknown"
-    
+
     @property
     def is_complete(self) -> bool:
         """軌道完了か"""
@@ -262,13 +271,13 @@ def define_trajectory(
     max_iterations: Optional[int] = None,
 ) -> TrokhiaResult:
     """P3 Trokhia: 軌道を定義
-    
+
     Args:
         trajectory_name: 軌道名
         phases: フェーズリスト
         derivative: 派生モード
         max_iterations: 最大イテレーション
-        
+
     Returns:
         TrokhiaResult
     """
@@ -277,7 +286,7 @@ def define_trajectory(
             derivative = TrokhiaDerivative.CYCLE
         else:
             derivative = TrokhiaDerivative.SPIRAL
-    
+
     return TrokhiaResult(
         trajectory_name=trajectory_name,
         derivative=derivative,
@@ -289,6 +298,7 @@ def define_trajectory(
 # =============================================================================
 # Formatting
 # =============================================================================
+
 
 def format_khora_markdown(result: KhoraResult) -> str:
     """P1 Khōra 結果をMarkdown形式でフォーマット"""
@@ -313,7 +323,7 @@ def format_hodos_markdown(result: HodosResult) -> str:
     for wp in result.waypoints:
         path_str += f" → {wp}"
     path_str += f" → {result.end}"
-    
+
     lines = [
         "┌─[P2 Hodos 経路定義]───────────────────────────────┐",
         f"│ 派生: {result.derivative.value}",
@@ -328,8 +338,12 @@ def format_hodos_markdown(result: HodosResult) -> str:
 def format_trokhia_markdown(result: TrokhiaResult) -> str:
     """P3 Trokhia 結果をMarkdown形式でフォーマット"""
     phase_str = " → ".join(result.phases)
-    iter_str = f"{result.iteration}" if result.max_iterations is None else f"{result.iteration}/{result.max_iterations}"
-    
+    iter_str = (
+        f"{result.iteration}"
+        if result.max_iterations is None
+        else f"{result.iteration}/{result.max_iterations}"
+    )
+
     lines = [
         "┌─[P3 Trokhia 軌道定義]──────────────────────────────┐",
         f"│ 派生: {result.derivative.value}",
@@ -345,22 +359,23 @@ def format_trokhia_markdown(result: TrokhiaResult) -> str:
 # FEP Integration
 # =============================================================================
 
+
 def encode_perigraphe_observation(
     khora: Optional[KhoraResult] = None,
     hodos: Optional[HodosResult] = None,
     trokhia: Optional[TrokhiaResult] = None,
 ) -> dict:
     """FEP観察空間へのエンコード
-    
+
     P-series の環境定義を FEP agent の観察形式に変換。
-    
+
     Returns:
         dict with context_clarity, urgency, confidence
     """
     context_clarity = 0.5
     urgency = 0.3
     confidence = 0.5
-    
+
     # Khōra: スコープ定義 → context_clarity
     if khora:
         scale_factor = {
@@ -370,12 +385,12 @@ def encode_perigraphe_observation(
             (ScopeScale.MACRO, ScopeScale.MACRO): 0.5,
         }
         context_clarity = scale_factor.get((khora.x_scale, khora.y_scale), 0.6)
-    
+
     # Hodos: 経路定義 → urgency
     if hodos:
         # 長い経路 → 低urgency (余裕がある)
         urgency = max(0.1, 1.0 - (hodos.estimated_steps * 0.1))
-    
+
     # Trokhia: 軌道定義 → confidence
     if trokhia:
         if trokhia.is_complete:
@@ -385,7 +400,7 @@ def encode_perigraphe_observation(
             confidence = 0.4 + (progress * 0.5)
         else:
             confidence = 0.5
-    
+
     return {
         "context_clarity": context_clarity,
         "urgency": urgency,

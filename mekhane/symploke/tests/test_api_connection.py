@@ -24,18 +24,15 @@ async def test_connection():
     if not api_key:
         print("❌ JULES_API_KEY not set")
         return False
-    
+
     print(f"Testing API Key: {api_key[:10]}...{api_key[-4:]}")
     print("-" * 50)
-    
+
     try:
         import aiohttp
-        
-        headers = {
-            "X-Goog-Api-Key": api_key,
-            "Content-Type": "application/json"
-        }
-        
+
+        headers = {"X-Goog-Api-Key": api_key, "Content-Type": "application/json"}
+
         async with aiohttp.ClientSession() as session:
             # Test 1: Get sources (repos)
             print("\n[Test 1] Getting sources...")
@@ -53,7 +50,7 @@ async def test_connection():
                 else:
                     text = await resp.text()
                     print(f"  ⚠️  Response: {text[:200]}")
-            
+
             # Test 2: Get sessions (should work even if empty)
             print("\n[Test 2] Getting sessions...")
             async with session.get(
@@ -68,9 +65,9 @@ async def test_connection():
                 else:
                     text = await resp.text()
                     print(f"  ⚠️  Response: {text[:200]}")
-        
+
         return True
-        
+
     except Exception as e:
         print(f"❌ Error: {e}")
         return False

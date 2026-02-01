@@ -32,23 +32,25 @@ from datetime import datetime
 
 class DoxaDerivative(Enum):
     """H4 Doxa の派生モード"""
-    PERSIST = "pers"    # 永続化 (保存)
-    EVOLVE = "evol"     # 進化 (更新)
-    ARCHIVE = "arch"    # アーカイブ (履歴化)
+
+    PERSIST = "pers"  # 永続化 (保存)
+    EVOLVE = "evol"  # 進化 (更新)
+    ARCHIVE = "arch"  # アーカイブ (履歴化)
 
 
 class BeliefStrength(Enum):
     """信念の強さ"""
-    WEAK = "weak"         # 弱い (容易に変わる)
+
+    WEAK = "weak"  # 弱い (容易に変わる)
     MODERATE = "moderate"  # 中程度
-    STRONG = "strong"     # 強い (変わりにくい)
-    CORE = "core"         # 核心 (アイデンティティ)
+    STRONG = "strong"  # 強い (変わりにくい)
+    CORE = "core"  # 核心 (アイデンティティ)
 
 
 @dataclass
 class Belief:
     """信念オブジェクト
-    
+
     Attributes:
         content: 信念の内容
         strength: 信念の強さ
@@ -57,13 +59,14 @@ class Belief:
         updated_at: 更新日時
         evidence: 根拠
     """
+
     content: str
     strength: BeliefStrength
     confidence: float
     created_at: datetime = field(default_factory=datetime.now)
     updated_at: datetime = field(default_factory=datetime.now)
     evidence: List[str] = field(default_factory=list)
-    
+
     @property
     def age_days(self) -> float:
         """信念の年齢（日数）"""
@@ -73,7 +76,7 @@ class Belief:
 @dataclass
 class DoxaResult:
     """H4 Doxa 操作結果
-    
+
     Attributes:
         belief: 対象の信念
         derivative: 派生モード
@@ -81,6 +84,7 @@ class DoxaResult:
         previous_state: 前の状態 (進化時)
         success: 成功したか
     """
+
     belief: Belief
     derivative: DoxaDerivative
     action_taken: str
@@ -90,16 +94,21 @@ class DoxaResult:
 
 class DoxaStore:
     """H4 Doxa 信念ストア
-    
+
     信念の永続化を管理。
     """
-    
+
     def __init__(self):
         self._beliefs: Dict[str, Belief] = {}
         self._archive: List[Belief] = []
-    
-    def persist(self, content: str, strength: BeliefStrength = BeliefStrength.MODERATE,
-                confidence: float = 0.7, evidence: Optional[List[str]] = None) -> DoxaResult:
+
+    def persist(
+        self,
+        content: str,
+        strength: BeliefStrength = BeliefStrength.MODERATE,
+        confidence: float = 0.7,
+        evidence: Optional[List[str]] = None,
+    ) -> DoxaResult:
         """信念を永続化"""
         belief = Belief(
             content=content,
@@ -108,7 +117,7 @@ class DoxaStore:
             evidence=evidence or [],
         )
         self._beliefs[content] = belief
-        
+
         return DoxaResult(
             belief=belief,
             derivative=DoxaDerivative.PERSIST,
@@ -116,9 +125,10 @@ class DoxaStore:
             previous_state=None,
             success=True,
         )
-    
-    def evolve(self, content: str, new_confidence: float,
-               new_evidence: Optional[List[str]] = None) -> DoxaResult:
+
+    def evolve(
+        self, content: str, new_confidence: float, new_evidence: Optional[List[str]] = None
+    ) -> DoxaResult:
         """信念を進化（更新）"""
         if content not in self._beliefs:
             return DoxaResult(
@@ -128,7 +138,7 @@ class DoxaStore:
                 previous_state=None,
                 success=False,
             )
-        
+
         previous = self._beliefs[content]
         updated = Belief(
             content=content,
@@ -138,7 +148,7 @@ class DoxaStore:
             updated_at=datetime.now(),
             evidence=previous.evidence + (new_evidence or []),
         )
-        
+
         # 確信度に基づいて強さを調整
         if new_confidence >= 0.9:
             updated.strength = BeliefStrength.STRONG
@@ -146,9 +156,9 @@ class DoxaStore:
             updated.strength = BeliefStrength.MODERATE
         else:
             updated.strength = BeliefStrength.WEAK
-        
+
         self._beliefs[content] = updated
-        
+
         return DoxaResult(
             belief=updated,
             derivative=DoxaDerivative.EVOLVE,
@@ -156,7 +166,7 @@ class DoxaStore:
             previous_state=previous,
             success=True,
         )
-    
+
     def archive(self, content: str) -> DoxaResult:
         """信念をアーカイブ（履歴化）"""
         if content not in self._beliefs:
@@ -167,10 +177,10 @@ class DoxaStore:
                 previous_state=None,
                 success=False,
             )
-        
+
         belief = self._beliefs.pop(content)
         self._archive.append(belief)
-        
+
         return DoxaResult(
             belief=belief,
             derivative=DoxaDerivative.ARCHIVE,
@@ -178,15 +188,15 @@ class DoxaStore:
             previous_state=None,
             success=True,
         )
-    
+
     def get(self, content: str) -> Optional[Belief]:
         """信念を取得"""
         return self._beliefs.get(content)
-    
+
     def list_all(self) -> List[Belief]:
         """全信念をリスト"""
         return list(self._beliefs.values())
-    
+
     def list_archived(self) -> List[Belief]:
         """アーカイブ済みをリスト"""
         return self._archive
@@ -226,10 +236,10 @@ def encode_doxa_observation(result: DoxaResult) -> dict:
         BeliefStrength.CORE: 0.9,
     }
     confidence = strength_map[result.belief.strength]
-    
+
     # 信念の年齢 → context_clarity (古い信念は高clarity)
     context_clarity = min(1.0, 0.5 + result.belief.age_days * 0.01)
-    
+
     # 派生 → urgency
     urgency_map = {
         DoxaDerivative.PERSIST: 0.3,
@@ -237,7 +247,7 @@ def encode_doxa_observation(result: DoxaResult) -> dict:
         DoxaDerivative.ARCHIVE: 0.2,
     }
     urgency = urgency_map[result.derivative]
-    
+
     return {
         "context_clarity": context_clarity,
         "urgency": urgency,

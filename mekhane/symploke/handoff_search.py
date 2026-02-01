@@ -19,12 +19,13 @@ from datetime import datetime, timedelta
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 from mekhane.symploke.kairos_ingest import (
-    get_handoff_files, parse_handoff,
-    get_conversation_files, parse_conversation
+    get_handoff_files,
+    parse_handoff,
+    get_conversation_files,
+    parse_conversation,
 )
 from mekhane.symploke.adapters.embedding_adapter import EmbeddingAdapter
 from mekhane.symploke.indices import Document
-
 
 # Handoff インデックスの永続化パス
 HANDOFF_INDEX_PATH = Path("/home/laihuip001/oikos/mneme/.hegemonikon/indices/handoffs.pkl")
@@ -42,33 +43,29 @@ def build_handoff_index(docs: List[Document] = None) -> EmbeddingAdapter:
     """Build and save handoff index."""
     if docs is None:
         docs = load_handoffs()
-    
+
     if not docs:
         return None
-    
+
     adapter = EmbeddingAdapter(model_name="all-MiniLM-L6-v2")
-    
+
     # Encode all docs
     texts = [d.content for d in docs]
     doc_vectors = adapter.encode(texts)
-    
+
     # Create index
     adapter.create_index(dimension=doc_vectors.shape[1])
     metadata = [
-        {
-            "doc_id": d.id,
-            "idx": i,
-            "primary_task": d.metadata.get("primary_task", "")
-        }
+        {"doc_id": d.id, "idx": i, "primary_task": d.metadata.get("primary_task", "")}
         for i, d in enumerate(docs)
     ]
     adapter.add_vectors(doc_vectors, metadata=metadata)
-    
+
     # Save
     HANDOFF_INDEX_PATH.parent.mkdir(parents=True, exist_ok=True)
     adapter.save(str(HANDOFF_INDEX_PATH))
     print(f"💾 Handoff index saved: {len(docs)} docs")
-    
+
     return adapter
 
 
@@ -81,15 +78,15 @@ def load_handoff_index() -> EmbeddingAdapter:
 
 # スコア調整設定
 SCORE_BOOST = {
-    "handoff": 0.08,           # 構造化された総括は価値が高い
-    "conversation": 0.0,       # 生の会話は基準値
-    "conversation_chunk": 0.0, # チャンクも基準値
+    "handoff": 0.08,  # 構造化された総括は価値が高い
+    "conversation": 0.0,  # 生の会話は基準値
+    "conversation_chunk": 0.0,  # チャンクも基準値
 }
 
 
 def adjust_score(score: float, doc_type: str) -> float:
     """タイプに基づいてスコアを調整する。
-    
+
     Handoff は構造化された総括なので、生の会話より価値が高いとみなす。
     時間減衰は実装しない（原則・洞察の価値は時間に依存しない）。
     """
@@ -101,22 +98,23 @@ def extract_keywords(doc: Document, max_keywords: int = 5) -> List[str]:
     """Handoff からキーワードを抽出（Proactive Recall 用）"""
     content = doc.content
     keywords = []
-    
+
     # primary_task をキーワードとして抽出
     primary_task = doc.metadata.get("primary_task", "")
     if primary_task:
         keywords.append(primary_task)
-    
+
     # 日本語の重要そうなキーワードを抽出（簡易版）
     import re
+
     # カタカナ語を抽出
-    katakana = re.findall(r'[ァ-ヴー]{3,}', content)
+    katakana = re.findall(r"[ァ-ヴー]{3,}", content)
     keywords.extend(katakana[:3])
-    
+
     # 英語の重要そうな語を抽出
-    english = re.findall(r'[A-Z][a-z]+(?:[A-Z][a-z]+)*', content)
+    english = re.findall(r"[A-Z][a-z]+(?:[A-Z][a-z]+)*", content)
     keywords.extend(english[:3])
-    
+
     return list(set(keywords))[:max_keywords]
 
 
@@ -125,7 +123,7 @@ def search_handoffs(query: str, top_k: int = 5) -> List[Tuple[Document, float]]:
     docs = load_handoffs()
     if not docs:
         return []
-    
+
     # 永続化インデックスを使用（なければビルド）
     if HANDOFF_INDEX_PATH.exists():
         adapter = load_handoff_index()
@@ -133,29 +131,29 @@ def search_handoffs(query: str, top_k: int = 5) -> List[Tuple[Document, float]]:
         adapter = build_handoff_index(docs)
         if adapter is None:
             return []
-    
+
     # Search
     query_vector = adapter.encode([query])[0]
     results = adapter.search(query_vector, k=top_k)
-    
+
     # Match results to docs (using idx from metadata)
     matched = []
     for r in results:
         idx = r.metadata.get("idx", r.id)
         if idx < len(docs):
             matched.append((docs[idx], r.score))
-    
+
     return matched
 
 
 def get_boot_handoffs(mode: str = "standard", context: str = None) -> dict:
     """
     /boot 統合 API: モードに応じた Handoff と会話ログを返す
-    
+
     Args:
         mode: "fast" (/boot-), "standard" (/boot), "detailed" (/boot+)
         context: 現在のコンテキスト（検索クエリに使用）
-    
+
     Returns:
         dict: {
             "latest": Document,           # 最新の Handoff
@@ -166,32 +164,32 @@ def get_boot_handoffs(mode: str = "standard", context: str = None) -> dict:
     """
     # モードによる関連件数
     related_count = {
-        "fast": 0,       # /boot- : 最新のみ
-        "standard": 3,   # /boot  : 最新 + 関連 3
-        "detailed": 10   # /boot+ : 最新 + 関連 10
+        "fast": 0,  # /boot- : 最新のみ
+        "standard": 3,  # /boot  : 最新 + 関連 3
+        "detailed": 10,  # /boot+ : 最新 + 関連 10
     }.get(mode, 3)
-    
+
     conv_count = {
-        "fast": 0,       # /boot- : なし
-        "standard": 2,   # /boot  : 関連会話 2
-        "detailed": 5    # /boot+ : 関連会話 5
+        "fast": 0,  # /boot- : なし
+        "standard": 2,  # /boot  : 関連会話 2
+        "detailed": 5,  # /boot+ : 関連会話 5
     }.get(mode, 2)
-    
+
     docs = load_handoffs()
     if not docs:
         return {"latest": None, "related": [], "conversations": [], "count": 0}
-    
+
     latest = docs[0]
-    
+
     # 検索クエリ
     query = context or latest.metadata.get("primary_task", latest.content[:200])
-    
+
     # 関連 Handoff 検索
     related = []
     if related_count > 0:
         results = search_handoffs(query, top_k=related_count + 1)
         related = [doc for doc, score in results if doc.id != latest.id][:related_count]
-    
+
     # 関連会話ログ検索 (Kairos Index を使用)
     conversations = []
     if conv_count > 0 and CONVERSATION_INDEX_PATH.exists():
@@ -200,7 +198,7 @@ def get_boot_handoffs(mode: str = "standard", context: str = None) -> dict:
             adapter.load(str(CONVERSATION_INDEX_PATH))
             query_vec = adapter.encode([query])[0]
             results = adapter.search(query_vec, k=conv_count)
-            
+
             # ファイルパスからドキュメントを再構築
             for r in results:
                 file_path = r.metadata.get("file_path")
@@ -213,7 +211,7 @@ def get_boot_handoffs(mode: str = "standard", context: str = None) -> dict:
                     conversations.append(doc)
         except Exception as e:
             print(f"⚠️ Conversation search error: {e}")
-    
+
     # Proactive Recall: 最新 Handoff からキーワードを抽出し、追加検索
     proactive_memories = []
     if mode == "detailed" and latest:
@@ -225,7 +223,7 @@ def get_boot_handoffs(mode: str = "standard", context: str = None) -> dict:
                 adapter.load(str(CONVERSATION_INDEX_PATH))
                 query_vec = adapter.encode([proactive_query])[0]
                 results = adapter.search(query_vec, k=3)
-                
+
                 for r in results:
                     file_path = r.metadata.get("file_path")
                     if file_path and Path(file_path).exists():
@@ -237,13 +235,13 @@ def get_boot_handoffs(mode: str = "standard", context: str = None) -> dict:
                             proactive_memories.append(doc)
             except Exception as e:
                 pass  # TODO: Add proper error handling
-    
+
     return {
         "latest": latest,
         "related": related,
         "conversations": conversations,
         "proactive": proactive_memories,  # NEW: Proactive Recall 結果
-        "count": len(related) + len(conversations) + len(proactive_memories)
+        "count": len(related) + len(conversations) + len(proactive_memories),
     }
 
 
@@ -252,7 +250,7 @@ def format_boot_output(result: dict, verbose: bool = False) -> str:
     /boot 用の出力フォーマット
     """
     lines = []
-    
+
     if result["latest"]:
         doc = result["latest"]
         lines.append("📋 最新 Handoff:")
@@ -262,14 +260,14 @@ def format_boot_output(result: dict, verbose: bool = False) -> str:
         if verbose:
             lines.append(f"  内容: {doc.content[:300]}...")
         lines.append("")
-    
+
     if result.get("related"):
         lines.append(f"🔗 関連 Handoff ({len(result['related'])}件):")
         for doc in result["related"]:
             lines.append(f"  • {doc.metadata.get('primary_task', doc.id)}")
             lines.append(f"    時刻: {doc.metadata.get('timestamp', 'Unknown')}")
         lines.append("")
-    
+
     # NEW: 会話ログ表示
     if result.get("conversations"):
         lines.append(f"💬 関連する過去の会話 ({len(result['conversations'])}件):")
@@ -280,7 +278,7 @@ def format_boot_output(result: dict, verbose: bool = False) -> str:
             lines.append(f"  • {title} ({msg_count} msgs, score: {score:.2f})")
             lines.append(f"    ID: {doc.id}")
         lines.append("")
-    
+
     # NEW: Proactive Recall 表示
     if result.get("proactive"):
         lines.append(f"🧠 自動浮上した記憶 ({len(result['proactive'])}件):")
@@ -288,7 +286,7 @@ def format_boot_output(result: dict, verbose: bool = False) -> str:
             score = doc.metadata.get("score", 0)
             title = doc.metadata.get("title", doc.id)
             lines.append(f"  ✨ {title} (score: {score:.2f})")
-    
+
     return "\n".join(lines)
 
 
@@ -300,7 +298,7 @@ def show_latest(n: int = 1):
         print(f"📄 {doc.id}")
         print(f"主題: {doc.metadata.get('primary_task', 'Unknown')}")
         print(f"時刻: {doc.metadata.get('timestamp', 'Unknown')}")
-        print("-"*60)
+        print("-" * 60)
         print(doc.content[:500] + "..." if len(doc.content) > 500 else doc.content)
 
 
@@ -310,30 +308,33 @@ def main():
     parser.add_argument("--latest", action="store_true", help="Show latest handoff")
     parser.add_argument("--recent", type=int, help="Show N most recent handoffs")
     parser.add_argument("-k", type=int, default=3, help="Number of results")
-    parser.add_argument("--boot", choices=["fast", "standard", "detailed"], 
-                       help="/boot mode: fast (-), standard, detailed (+)")
+    parser.add_argument(
+        "--boot",
+        choices=["fast", "standard", "detailed"],
+        help="/boot mode: fast (-), standard, detailed (+)",
+    )
     parser.add_argument("--context", type=str, help="Context for /boot search")
     parser.add_argument("-v", "--verbose", action="store_true", help="Verbose output")
     args = parser.parse_args()
-    
+
     # /boot mode
     if args.boot:
         result = get_boot_handoffs(mode=args.boot, context=args.context)
         print(format_boot_output(result, verbose=args.verbose))
         return
-    
+
     if args.latest:
         show_latest(1)
     elif args.recent:
         show_latest(args.recent)
     elif args.query:
-        print(f"🔍 Searching: \"{args.query}\"\n")
+        print(f'🔍 Searching: "{args.query}"\n')
         results = search_handoffs(args.query, top_k=args.k)
-        
+
         if not results:
             print("No matching handoffs found.")
             return
-        
+
         for doc, score in results:
             print(f"━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
             print(f"📊 Score: {score:.3f}")

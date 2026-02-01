@@ -13,7 +13,7 @@ from .kairos import KairosIndex
 
 __all__ = [
     "DomainIndex",
-    "SourceType", 
+    "SourceType",
     "Document",
     "IndexedResult",
     "GnosisIndex",
@@ -21,4 +21,3 @@ __all__ = [
     "SophiaIndex",
     "KairosIndex",
 ]
-

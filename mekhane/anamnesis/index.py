@@ -27,7 +27,9 @@ from mekhane.anamnesis.models.paper import Paper, merge_papers
 # Paths
 GNOSIS_DIR = Path(__file__).parent.parent.parent / "gnosis_data"
 LANCE_DIR = GNOSIS_DIR / "lancedb"
-MODELS_DIR = Path(__file__).parent.parent / "models" / "bge-small"  # forge/models/bge-small
+MODELS_DIR = (
+    Path(__file__).parent.parent / "models" / "bge-small"
+)  # forge/models/bge-small
 
 # Windows UTF-8
 if sys.platform == "win32":
@@ -236,7 +238,12 @@ class GnosisIndex:
         table = self.db.open_table(self.TABLE_NAME)
 
         try:
-            results = table.search().where(f"primary_key = '{primary_key}'").limit(1).to_list()
+            results = (
+                table.search()
+                .where(f"primary_key = '{primary_key}'")
+                .limit(1)
+                .to_list()
+            )
             return results[0] if results else None
         except Exception:
             return None

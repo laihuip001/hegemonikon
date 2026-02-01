@@ -107,7 +107,9 @@ class HegemonikónFEPAgent:
             policy_len=2,
             inference_horizon=1,
         )
-        self.beliefs = D.copy() if D is not None else np.ones(self.state_dim) / self.state_dim
+        self.beliefs = (
+            D.copy() if D is not None else np.ones(self.state_dim) / self.state_dim
+        )
 
         # Learning parameters (from arXiv:2412.10425)
         self.learning_rate = 50.0  # η for Dirichlet updates
@@ -312,7 +314,9 @@ class HegemonikónFEPAgent:
                 - entropy: Entropy of belief distribution
         """
         # pymdp expects observation as tuple/list for multi-modality
-        obs_tuple = (observation,) if isinstance(observation, int) else tuple(observation)
+        obs_tuple = (
+            (observation,) if isinstance(observation, int) else tuple(observation)
+        )
 
         # Use pymdp agent to infer states
         self.beliefs = self.agent.infer_states(obs_tuple)
@@ -425,7 +429,9 @@ class HegemonikónFEPAgent:
 
         # Action interpretation
         action_names = ["observe", "act"]
-        action_name = action_names[action] if action < len(action_names) else f"action_{action}"
+        action_name = (
+            action_names[action] if action < len(action_names) else f"action_{action}"
+        )
 
         return {
             "beliefs": state_result["beliefs"],

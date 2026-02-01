@@ -282,7 +282,8 @@ def hierarchical_evaluate(
             l2_obs = scores_to_observation(gemini_scores)
             # L2 confidence is average of Gemini's reported confidence
             l2_confidence = (
-                gemini_scores["context_clarity"] * 0.3 + gemini_scores["confidence"] * 0.7
+                gemini_scores["context_clarity"] * 0.3
+                + gemini_scores["confidence"] * 0.7
             )
 
             if l2_confidence >= L2_CONFIDENCE_THRESHOLD or force_layer == "L2":

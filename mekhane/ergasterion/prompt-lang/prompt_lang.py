@@ -254,7 +254,9 @@ class Prompt:
                 if self._evaluate_condition(cond, context):
                     # Use if_content
                     if cond.if_content.get("raw"):
-                        sections.append(f"\n## Conditional (when {cond.variable}={cond.value})")
+                        sections.append(
+                            f"\n## Conditional (when {cond.variable}={cond.value})"
+                        )
                         sections.append(cond.if_content["raw"])
                 else:
                     # Use else_content
@@ -354,7 +356,9 @@ class Prompt:
                 if self._evaluate_condition(cond, context):
                     # Use if_content
                     if cond.if_content.get("raw"):
-                        sections.append(f"\n## Conditional (when {cond.variable}={cond.value})")
+                        sections.append(
+                            f"\n## Conditional (when {cond.variable}={cond.value})"
+                        )
                         sections.append(cond.if_content["raw"])
                 else:
                     # Use else_content
@@ -398,7 +402,9 @@ class Prompt:
 
         return "\n".join(sections)
 
-    async def _resolve_context_item_async(self, item: "ContextItem", mcp_handler) -> Optional[str]:
+    async def _resolve_context_item_async(
+        self, item: "ContextItem", mcp_handler
+    ) -> Optional[str]:
         """Resolve a context item asynchronously."""
         if item.ref_type == "mcp":
             if not mcp_handler:
@@ -479,7 +485,9 @@ class Prompt:
                 try:
                     content = path.read_text(encoding="utf-8")
                     # Truncate if too long (based on priority)
-                    max_lines = {"HIGH": 200, "MEDIUM": 100, "LOW": 50}.get(item.priority, 100)
+                    max_lines = {"HIGH": 200, "MEDIUM": 100, "LOW": 50}.get(
+                        item.priority, 100
+                    )
                     lines = content.split("\n")
                     if len(lines) > max_lines:
                         content = (
@@ -816,7 +824,9 @@ class PromptLangParser:
 
             # Check for context item: "  - type:"path" [options]"
             # Patterns: file:"path", dir:"path", conv:"title", mcp:server, ki:"name"
-            item_match = re.match(r'^  - (file|dir|conv|mcp|ki):(["\']?)([^"\']+)\2(.*)$', line)
+            item_match = re.match(
+                r'^  - (file|dir|conv|mcp|ki):(["\']?)([^"\']+)\2(.*)$', line
+            )
             if item_match:
                 ref_type = item_match.group(1)
                 path = item_match.group(3)
@@ -831,7 +841,9 @@ class PromptLangParser:
 
                 if options_str:
                     # Parse filter options (filter="*.ts", depth=2)
-                    filter_match = re.search(r'\(filter=["\']?([^"\']+)["\']?', options_str)
+                    filter_match = re.search(
+                        r'\(filter=["\']?([^"\']+)["\']?', options_str
+                    )
                     if filter_match:
                         filter_opt = filter_match.group(1)
                     depth_match = re.search(r"depth=(\d+)", options_str)
@@ -843,10 +855,14 @@ class PromptLangParser:
                         bracket_content = re.search(r"\[([^\]]+)\]", options_str)
                         if bracket_content:
                             opts = bracket_content.group(1)
-                            priority_match = re.search(r"priority=(HIGH|MEDIUM|LOW)", opts)
+                            priority_match = re.search(
+                                r"priority=(HIGH|MEDIUM|LOW)", opts
+                            )
                             if priority_match:
                                 priority = priority_match.group(1)
-                            section_match = re.search(r'section=["\']?([^"\']+)["\']?', opts)
+                            section_match = re.search(
+                                r'section=["\']?([^"\']+)["\']?', opts
+                            )
                             if section_match:
                                 section = section_match.group(1)
 
@@ -909,9 +925,9 @@ class PromptLangParser:
                         crit_line = self._current_line()
                         crit_match = re.match(r"^        (\d+): (.+)$", crit_line)
                         if crit_match:
-                            current_dimension.criteria[crit_match.group(1)] = crit_match.group(
-                                2
-                            ).strip("\"'")
+                            current_dimension.criteria[crit_match.group(1)] = (
+                                crit_match.group(2).strip("\"'")
+                            )
                             self.pos += 1
                         elif crit_line.startswith("        "):
                             self.pos += 1
@@ -975,7 +991,9 @@ class PromptLangParser:
                     if rules_str.startswith("[") and rules_str.endswith("]"):
                         rules_str = rules_str[1:-1]
                         activation.rules = [
-                            r.strip().strip("\"'") for r in rules_str.split(",") if r.strip()
+                            r.strip().strip("\"'")
+                            for r in rules_str.split(",")
+                            if r.strip()
                         ]
                 self.pos += 1
             elif line == "":
@@ -992,13 +1010,17 @@ class PromptLangParser:
         line = self._current_line()
 
         # Parse @if condition:
-        if_match = re.match(r'^@if\s+(\w+)\s*(==|!=|>|<|>=|<=)\s*["\']?([^"\']+)["\']?\s*:$', line)
+        if_match = re.match(
+            r'^@if\s+(\w+)\s*(==|!=|>|<|>=|<=)\s*["\']?([^"\']+)["\']?\s*:$', line
+        )
         if not if_match:
             self.pos += 1
             return None
 
         condition = Condition(
-            variable=if_match.group(1), operator=if_match.group(2), value=if_match.group(3)
+            variable=if_match.group(1),
+            operator=if_match.group(2),
+            value=if_match.group(3),
         )
         self.pos += 1
 

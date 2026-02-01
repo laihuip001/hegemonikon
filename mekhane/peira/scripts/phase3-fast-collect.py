@@ -69,7 +69,11 @@ def parse_date(date_str):
 
     match = re.search(r"(\d{4})[.-](\d{2})[.-](\d{2})", date_str)
     if match:
-        return f"{match.group(1)}.{match.group(2)}.{match.group(3)}", match.group(1), match.group(2)
+        return (
+            f"{match.group(1)}.{match.group(2)}.{match.group(3)}",
+            match.group(1),
+            match.group(2),
+        )
 
     return "0000.00.00", "0000", "00"
 
@@ -114,10 +118,14 @@ def parse_article_content(html_content, url):
         tag_els = soup.select(
             'a[href*="/archives/type-tag/"], a[href*="/archives/tech-tag/"], a[href*="/archives/app-tag/"]'
         )
-        tags = list(set([t.get_text().strip() for t in tag_els if t.get_text().strip()]))
+        tags = list(
+            set([t.get_text().strip() for t in tag_els if t.get_text().strip()])
+        )
 
         # Content
-        content_el = soup.select_one(".p-entry__content, .c-entry__content, .p-entry-content")
+        content_el = soup.select_one(
+            ".p-entry__content, .c-entry__content, .p-entry-content"
+        )
         if not content_el:
             content_el = soup.select_one("article")
 
@@ -207,7 +215,9 @@ async def process_single_url(url, session, semaphore, batch_id):
 
     # Run CPU-bound parsing in executor
     loop = asyncio.get_running_loop()
-    article = await loop.run_in_executor(None, parse_article_content, fetch_result["content"], url)
+    article = await loop.run_in_executor(
+        None, parse_article_content, fetch_result["content"], url
+    )
 
     if article["status"] != "success":
         return article
@@ -244,7 +254,9 @@ async def process_urls_async(target_urls, batch_id):
     async with aiohttp.ClientSession(headers=final_headers) as session:
         tasks = []
         for url in target_urls:
-            task = asyncio.create_task(process_single_url(url, session, semaphore, batch_id))
+            task = asyncio.create_task(
+                process_single_url(url, session, semaphore, batch_id)
+            )
             tasks.append(task)
 
         # Use as_completed to process results as they come in
@@ -263,7 +275,9 @@ async def process_urls_async(target_urls, batch_id):
                 error_count += 1
 
                 # Log skip
-                skip_file = os.path.join(ROOT_DIR, "_index", f"skipped_fast_{batch_id}.txt")
+                skip_file = os.path.join(
+                    ROOT_DIR, "_index", f"skipped_fast_{batch_id}.txt"
+                )
                 # Append to skip file sequentially
                 with open(skip_file, "a", encoding="utf-8") as f:
                     f.write(f"{result['url']}\t{result.get('error', 'Unknown')}\n")
@@ -273,7 +287,9 @@ async def process_urls_async(target_urls, batch_id):
 
 def main():
     if len(sys.argv) < 3:
-        print("Usage: python phase3-fast-collect.py <start_index> <end_index> [batch_id]")
+        print(
+            "Usage: python phase3-fast-collect.py <start_index> <end_index> [batch_id]"
+        )
         sys.exit(1)
 
     start_idx = int(sys.argv[1])

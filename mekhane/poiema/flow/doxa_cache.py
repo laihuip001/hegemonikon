@@ -112,14 +112,18 @@ class DoxaCache:
             # Sort by last_accessed_at and remove oldest
             sorted_keys = sorted(
                 self._memory_cache.keys(),
-                key=lambda k: self._memory_cache[k].get("last_accessed_at", datetime.min),
+                key=lambda k: self._memory_cache[k].get(
+                    "last_accessed_at", datetime.min
+                ),
             )
             over = len(self._memory_cache) - max_entries
             for key in sorted_keys[:over]:
                 del self._memory_cache[key]
             logger.info(f"🧹 Doxa Limit Enforced: removed {over} entries")
 
-    def check_cache(self, text: str, metron_level: int, db_session: Any = None) -> Optional[Dict]:
+    def check_cache(
+        self, text: str, metron_level: int, db_session: Any = None
+    ) -> Optional[Dict]:
         """
         キャッシュ検索: 信念の想起
 
@@ -151,7 +155,9 @@ class DoxaCache:
                 cached_result = results[cache_key]
 
                 # Don't trust error results
-                if isinstance(cached_result, str) and cached_result.startswith("Error:"):
+                if isinstance(cached_result, str) and cached_result.startswith(
+                    "Error:"
+                ):
                     return None
 
                 # Update access time (LRU)
@@ -243,7 +249,11 @@ class DoxaCache:
 
                 for level in levels:
                     cache_key = f"metron_{level}"
-                    if cache_entry and cache_key in cache_entry.get("results", {}) and not force:
+                    if (
+                        cache_entry
+                        and cache_key in cache_entry.get("results", {})
+                        and not force
+                    ):
                         continue
 
                     # Generate via API

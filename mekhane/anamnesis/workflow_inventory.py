@@ -93,7 +93,9 @@ def categorize_workflows(workflows: list[dict]) -> dict[str, list]:
             # Remove from other categories
             for cat in list(categories.keys()):
                 if cat != "X-series":
-                    categories[cat] = [w for w in categories[cat] if w["name"] != wf["name"]]
+                    categories[cat] = [
+                        w for w in categories[cat] if w["name"] != wf["name"]
+                    ]
 
     return dict(categories)
 
@@ -121,7 +123,9 @@ def count_derivatives(workflows: list[dict]) -> tuple[int, dict]:
     return total, by_theorem
 
 
-def generate_markdown(workflows: list[dict], categories: dict, derivatives_info: tuple) -> str:
+def generate_markdown(
+    workflows: list[dict], categories: dict, derivatives_info: tuple
+) -> str:
     """Generate markdown inventory."""
     total_derivs, by_theorem = derivatives_info
     now = datetime.now().strftime("%Y-%m-%d %H:%M")

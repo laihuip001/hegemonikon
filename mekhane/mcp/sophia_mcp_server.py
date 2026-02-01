@@ -68,7 +68,9 @@ except Exception as e:
 
 # Initialize MCP server
 server = Server(
-    name="sophia", version="1.0.0", instructions="Sophia knowledge search for KIs and Handoffs"
+    name="sophia",
+    version="1.0.0",
+    instructions="Sophia knowledge search for KIs and Handoffs",
 )
 log("Server initialized")
 
@@ -265,7 +267,9 @@ async def call_tool(name: str, arguments: dict):
             output_lines.append(
                 f"- **Sophia (Knowledge Items)**: {stats['sophia_count']} documents"
             )
-            output_lines.append(f"- **Kairos (Handoffs)**: {stats['kairos_count']} documents")
+            output_lines.append(
+                f"- **Kairos (Handoffs)**: {stats['kairos_count']} documents"
+            )
             output_lines.append(
                 f"- **Total**: {stats['sophia_count'] + stats['kairos_count']} documents"
             )
@@ -352,7 +356,9 @@ async def main():
     try:
         async with stdio_server() as streams:
             log("stdio_server connected")
-            await server.run(streams[0], streams[1], server.create_initialization_options())
+            await server.run(
+                streams[0], streams[1], server.create_initialization_options()
+            )
     except Exception as e:
         log(f"Server error: {e}")
         raise

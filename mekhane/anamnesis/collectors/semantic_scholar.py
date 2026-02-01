@@ -33,9 +33,7 @@ class SemanticScholarCollector(BaseCollector):
     rate_limit = 1.0  # 1 request per second (認証なしの制限)
 
     BASE_URL = "https://api.semanticscholar.org/graph/v1"
-    PAPER_FIELDS = (
-        "paperId,externalIds,title,authors,abstract,year,citationCount,venue,url,openAccessPdf"
-    )
+    PAPER_FIELDS = "paperId,externalIds,title,authors,abstract,year,citationCount,venue,url,openAccessPdf"
 
     def __init__(self, api_key: Optional[str] = None):
         super().__init__()
@@ -70,7 +68,8 @@ class SemanticScholarCollector(BaseCollector):
             authors=[a.get("name", "") for a in data.get("authors", [])],
             abstract=data.get("abstract") or "",
             published=str(data.get("year")) if data.get("year") else None,
-            url=data.get("url") or f"https://www.semanticscholar.org/paper/{data['paperId']}",
+            url=data.get("url")
+            or f"https://www.semanticscholar.org/paper/{data['paperId']}",
             pdf_url=pdf_url,
             citations=data.get("citationCount"),
             venue=data.get("venue"),
@@ -111,7 +110,9 @@ class SemanticScholarCollector(BaseCollector):
                         time.sleep(wait_time)
                         continue
                     else:
-                        print(f"[SemanticScholar] Rate limit exceeded after {max_retries} retries")
+                        print(
+                            f"[SemanticScholar] Rate limit exceeded after {max_retries} retries"
+                        )
                         return []
 
                 response.raise_for_status()

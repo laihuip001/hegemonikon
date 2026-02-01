@@ -78,7 +78,9 @@ class EpocheScanner:
 
         # キーワードマッチ
         text_upper = text.upper()
-        keyword_hits = [kw for kw in self.sensitive_keywords if kw.upper() in text_upper]
+        keyword_hits = [
+            kw for kw in self.sensitive_keywords if kw.upper() in text_upper
+        ]
         if keyword_hits:
             findings["SENSITIVE_KEYWORD"] = keyword_hits
 
@@ -120,7 +122,9 @@ class EpocheShield:
     def __init__(self):
         self.scanner = EpocheScanner()
 
-    def mask(self, text: str, use_custom_vocab: bool = True) -> Tuple[str, Dict[str, str]]:
+    def mask(
+        self, text: str, use_custom_vocab: bool = True
+    ) -> Tuple[str, Dict[str, str]]:
         """
         Epochē 発動: PIIをプレースホルダに置換
 

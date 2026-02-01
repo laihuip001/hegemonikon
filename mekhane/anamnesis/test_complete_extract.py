@@ -123,7 +123,9 @@ async def extract_messages(page):
                     elif len(clean_text) < 100:
                         role = "user"
 
-                messages.append({"role": role, "content": clean_text, "section_index": section_idx})
+                messages.append(
+                    {"role": role, "content": clean_text, "section_index": section_idx}
+                )
                 print(f"    [{section_idx}] {role}: {len(clean_text)} chars")
 
             except Exception as e:
@@ -211,9 +213,13 @@ async def main():
 
         # ファイルに保存
         if messages:
-            safe_title = "".join(c if (ord(c) < 128 and ord(c) >= 32) else "_" for c in conv_title)
+            safe_title = "".join(
+                c if (ord(c) < 128 and ord(c) >= 32) else "_" for c in conv_title
+            )
             safe_title = re.sub(r'[<>:"/|?*\n\r]', "", safe_title)
-            safe_title = re.sub(r"[\s_]+", "_", safe_title).strip("_")[:50] or "untitled"
+            safe_title = (
+                re.sub(r"[\s_]+", "_", safe_title).strip("_")[:50] or "untitled"
+            )
 
             filename = f"complete_{datetime.now().strftime('%H%M%S')}_{safe_title}.md"
             filepath = OUTPUT_DIR / filename
@@ -226,7 +232,9 @@ async def main():
                 f.write("---\n\n")
 
                 for msg in messages:
-                    role_label = "## 👤 User" if msg["role"] == "user" else "## 🤖 Claude"
+                    role_label = (
+                        "## 👤 User" if msg["role"] == "user" else "## 🤖 Claude"
+                    )
                     f.write(f"{role_label}\n\n")
                     f.write(f"{msg['content']}\n\n")
                     f.write("---\n\n")

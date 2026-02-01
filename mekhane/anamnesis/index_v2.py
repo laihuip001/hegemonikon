@@ -52,7 +52,9 @@ class Embedder:
 
     def __init__(self, model_dir: Optional[Path] = None):
         if not EMBEDDER_AVAILABLE:
-            raise ImportError("Embedder dependencies required: pip install onnxruntime tokenizers")
+            raise ImportError(
+                "Embedder dependencies required: pip install onnxruntime tokenizers"
+            )
 
         model_dir = model_dir or MODELS_DIR
         model_path = model_dir / "model.onnx"
@@ -131,7 +133,9 @@ class GnosisIndexV2:
         self.adapter_name = adapter
 
         # アダプタ生成
-        self.store: VectorStoreAdapter = VectorStoreFactory.create(adapter, config=config)
+        self.store: VectorStoreAdapter = VectorStoreFactory.create(
+            adapter, config=config
+        )
 
         # Embedder (遅延初期化)
         self._embedder: Optional[Embedder] = None
@@ -155,14 +159,18 @@ class GnosisIndexV2:
     def _load(self) -> None:
         try:
             self.store.load(str(self.index_path))
-            print(f"[GnosisIndexV2] Loaded {self.store.count()} vectors from {self.index_path}")
+            print(
+                f"[GnosisIndexV2] Loaded {self.store.count()} vectors from {self.index_path}"
+            )
         except Exception as e:
             print(f"[GnosisIndexV2] Failed to load index: {e}")
             self.store.create_index(dimension=self._dimension)
 
     def _save(self) -> None:
         self.store.save(str(self.index_path))
-        print(f"[GnosisIndexV2] Saved {self.store.count()} vectors to {self.index_path}")
+        print(
+            f"[GnosisIndexV2] Saved {self.store.count()} vectors to {self.index_path}"
+        )
 
     def add_papers(self, papers: list, dedupe: bool = True) -> int:
         if not papers:
@@ -192,7 +200,9 @@ class GnosisIndexV2:
 
             for paper, vector in zip(batch, vectors):
                 all_vectors.append(vector)
-                all_metadata.append(getattr(paper, "to_dict", lambda: {"text": str(paper)})())
+                all_metadata.append(
+                    getattr(paper, "to_dict", lambda: {"text": str(paper)})()
+                )
 
             print(f"  Processed {min(i + BATCH_SIZE, len(papers))}/{len(papers)}...")
 

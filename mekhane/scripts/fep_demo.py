@@ -112,7 +112,9 @@ def demo_entropy_as_uncertainty():
     agent = HegemonikónFEPAgent(use_defaults=True)
 
     print("\n観測によるエントロピー変化:")
-    print(f"   初期エントロピー: {-np.sum(agent.beliefs * np.log(agent.beliefs + 1e-10)):.3f}")
+    print(
+        f"   初期エントロピー: {-np.sum(agent.beliefs * np.log(agent.beliefs + 1e-10)):.3f}"
+    )
 
     # Different observations
     observations = [
@@ -135,7 +137,9 @@ def main():
     import argparse
 
     parser = argparse.ArgumentParser(description="Hegemonikón FEP Demo")
-    parser.add_argument("-i", "--interactive", action="store_true", help="対話モードで起動")
+    parser.add_argument(
+        "-i", "--interactive", action="store_true", help="対話モードで起動"
+    )
     args = parser.parse_args()
 
     if args.interactive:
@@ -179,7 +183,9 @@ def interactive_mode():
 
     # 初期A行列を保存 (diff 計算用)
     initial_A = (
-        agent.agent.A[0].copy() if hasattr(agent.agent.A, "__getitem__") else agent.agent.A.copy()
+        agent.agent.A[0].copy()
+        if hasattr(agent.agent.A, "__getitem__")
+        else agent.agent.A.copy()
     )
 
     # 履歴
@@ -302,7 +308,9 @@ def interactive_mode():
                 # ポリシー選択
                 q_pi, _ = agent.infer_policies()
                 action = agent.sample_action()
-                action_name = "observe (深く考える)" if action == 0 else "act (実行する)"
+                action_name = (
+                    "observe (深く考える)" if action == 0 else "act (実行する)"
+                )
 
                 # 出力
                 entropy = result["entropy"]

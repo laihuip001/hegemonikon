@@ -100,7 +100,10 @@ async def extract_messages(page):
                     if any(clean_text.startswith(p) for p in user_patterns):
                         role = "user"
                     # または ASCII 以外の文字が多くて短い場合（日本語コマンド）
-                    if len([c for c in clean_text if ord(c) > 127]) > len(clean_text) * 0.3:
+                    if (
+                        len([c for c in clean_text if ord(c) > 127])
+                        > len(clean_text) * 0.3
+                    ):
                         role = "user"
 
                 messages.append({"role": role, "content": clean_text[:5000]})
@@ -175,9 +178,13 @@ async def main():
 
         # ファイルに保存
         if messages:
-            safe_title = "".join(c if (ord(c) < 128 and ord(c) >= 32) else "_" for c in conv_title)
+            safe_title = "".join(
+                c if (ord(c) < 128 and ord(c) >= 32) else "_" for c in conv_title
+            )
             safe_title = re.sub(r'[<>:"/|?*\n\r]', "", safe_title)
-            safe_title = re.sub(r"[\s_]+", "_", safe_title).strip("_")[:50] or "untitled"
+            safe_title = (
+                re.sub(r"[\s_]+", "_", safe_title).strip("_")[:50] or "untitled"
+            )
 
             filename = f"test_v2_{datetime.now().strftime('%H%M%S')}_{safe_title}.md"
             filepath = OUTPUT_DIR / filename
@@ -189,7 +196,9 @@ async def main():
                 f.write("---\n\n")
 
                 for i, msg in enumerate(messages):
-                    role_label = "## 👤 User" if msg["role"] == "user" else "## 🤖 Claude"
+                    role_label = (
+                        "## 👤 User" if msg["role"] == "user" else "## 🤖 Claude"
+                    )
                     f.write(f"{role_label}\n\n")
                     f.write(f"{msg['content']}\n\n")
                     if i < len(messages) - 1:

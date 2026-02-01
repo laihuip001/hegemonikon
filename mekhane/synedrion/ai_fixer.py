@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] AI Auditor 検出問題の自動修正
 """
 AI Synedrion Issue Fixer (AI-001 〜 AI-022)
 
@@ -34,7 +35,9 @@ class Fix:
 class AIFixer:
     """Auto-fixer for AI Audit issues."""
 
-    def __init__(self, dry_run: bool = False, target_severities: Optional[List[str]] = None):
+    def __init__(
+        self, dry_run: bool = False, target_severities: Optional[List[str]] = None
+    ):
         self.dry_run = dry_run
         self.target_severities = target_severities or ["critical", "high"]
         self.fixes_applied: List[Fix] = []
@@ -59,7 +62,9 @@ class AIFixer:
 
             # AI-009: Hardcoded secrets (can't auto-fix, but can suggest)
             # AI-012: time.sleep in async → asyncio.sleep
-            fixes.extend(self._fix_ai_012_time_sleep_in_async(content, lines, file_path))
+            fixes.extend(
+                self._fix_ai_012_time_sleep_in_async(content, lines, file_path)
+            )
 
             # AI-013: Mutable default arguments
             fixes.extend(self._fix_ai_013_mutable_defaults(content, file_path))
@@ -142,7 +147,9 @@ class AIFixer:
 
         return fixes
 
-    def _fix_ai_015_self_assignment(self, lines: List[str], file_path: Path) -> List[Fix]:
+    def _fix_ai_015_self_assignment(
+        self, lines: List[str], file_path: Path
+    ) -> List[Fix]:
         """Fix self-assignment: x = x → remove or mark."""
         fixes = []
         pattern = re.compile(r"^(\s*)(\w+)\s*=\s*(\w+)\s*$")
@@ -222,7 +229,9 @@ class AIFixer:
 
         return fixes
 
-    def _fix_ai_018_hardcoded_paths(self, lines: List[str], file_path: Path) -> List[Fix]:
+    def _fix_ai_018_hardcoded_paths(
+        self, lines: List[str], file_path: Path
+    ) -> List[Fix]:
         """Suggest fixes for hardcoded paths (cannot fully auto-fix)."""
         fixes = []
         pattern = re.compile(r'["\']\/home\/[^"\']+["\']')
@@ -244,7 +253,9 @@ class AIFixer:
         # Skip auto-fix, just note
         return fixes
 
-    def _fix_ai_019_deprecated_api(self, lines: List[str], file_path: Path) -> List[Fix]:
+    def _fix_ai_019_deprecated_api(
+        self, lines: List[str], file_path: Path
+    ) -> List[Fix]:
         """Fix deprecated API usage."""
         fixes = []
 

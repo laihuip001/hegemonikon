@@ -29,7 +29,9 @@ if TYPE_CHECKING:
 
 # Default persistence paths
 LEARNED_A_PATH = Path("/home/laihuip001/oikos/mneme/.hegemonikon/learned_A.npy")
-LEARNED_A_METADATA_PATH = Path("/home/laihuip001/oikos/mneme/.hegemonikon/learned_A_meta.json")
+LEARNED_A_METADATA_PATH = Path(
+    "/home/laihuip001/oikos/mneme/.hegemonikon/learned_A_meta.json"
+)
 
 
 def ensure_persistence_dir() -> None:

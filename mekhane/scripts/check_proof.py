@@ -1,119 +1,57 @@
 #!/usr/bin/env python3
-# PROOF: [L3/ユーティリティ] A2→品質検証が必要→check_proof が担う
+# PROOF: [L3/ユーティリティ] 後方互換ラッパー（非推奨）
+# lineage: 旧 check_proof.py → dendron/checker.py へ昇華 (2026-02-01)
 """
-PROOF Header Checker - CI Integration
+DEPRECATED: Use `python -m dendron.cli check mekhane/` instead.
 
-mekhane/ 以下の全 Python ファイルに PROOF ヘッダーがあることを検証。
+このスクリプトは後方互換性のために維持されています。
+新規利用は dendron CLI を推奨します。
 
-Usage:
-    python check_proof.py              # 検証のみ
-    python check_proof.py --verbose    # 詳細表示
-    python check_proof.py --stats      # 統計表示
-
-Exit codes:
-    0 = All files have PROOF headers
-    1 = Missing PROOF headers
+History:
+  - 2026-01-XX: 初版 (mekhane 固定スコープ)
+  - 2026-02-01: 非推奨化、dendron CLI への委譲
 """
 
-import argparse
-import re
+import subprocess
 import sys
-from collections import Counter
+import warnings
 from pathlib import Path
-
-# パス設定
-SCRIPT_DIR = Path(__file__).resolve().parent
-MEKHANE = SCRIPT_DIR.parent if SCRIPT_DIR.name == "scripts" else SCRIPT_DIR / "mekhane"
-
-# 検証パターン
-REQUIRED_PATTERN = re.compile(r"# PROOF:|PROOF:")
-LEVEL_PATTERN = re.compile(r"\[(L[123])/([^\]]+)\]")
-
-
-def check_proofs(verbose: bool = False) -> tuple[int, list[Path], Counter]:
-    """Check all Python files for PROOF headers.
-
-    Returns:
-        (total_files, missing_files, level_counter)
-    """
-    total = 0
-    missing = []
-    levels = Counter()
-
-    search_dir = MEKHANE
-    if not search_dir.exists():
-        # フォールバック: hegemonikon/mekhane を探す
-        alt = Path(__file__).resolve().parent.parent / "mekhane"
-        if alt.exists():
-            search_dir = alt
-        else:
-            print(f"❌ Cannot find mekhane directory")
-            print(f"   Tried: {MEKHANE}")
-            print(f"   Tried: {alt}")
-            sys.exit(2)
-
-    for f in search_dir.rglob("*.py"):
-        if "__pycache__" in str(f):
-            continue
-
-        total += 1
-        try:
-            content = f.read_text(encoding="utf-8", errors="ignore")
-        except Exception as e:
-            if verbose:
-                print(f"  ⚠️  Cannot read {f}: {e}")
-            continue
-
-        if not REQUIRED_PATTERN.search(content):
-            missing.append(f)
-            if verbose:
-                print(f"  ❌ Missing: {f.relative_to(search_dir.parent)}")
-        else:
-            # レベルを抽出
-            match = LEVEL_PATTERN.search(content)
-            if match:
-                levels[match.group(1)] += 1
-            else:
-                levels["(no level)"] += 1
-
-    return total, missing, levels
 
 
 def main():
-    parser = argparse.ArgumentParser(description="PROOF Header Checker")
-    parser.add_argument("--verbose", "-v", action="store_true", help="詳細表示")
-    parser.add_argument("--stats", "-s", action="store_true", help="統計表示")
-    args = parser.parse_args()
+    # 非推奨警告
+    warnings.warn(
+        "check_proof.py is deprecated. Use 'python -m dendron.cli check mekhane/' instead.",
+        DeprecationWarning,
+        stacklevel=2,
+    )
 
-    print("🔍 PROOF Header Checker")
-    print()
+    # hegemonikon ルートを特定
+    script_dir = Path(__file__).resolve().parent
+    hegemonikon_root = script_dir.parent.parent  # mekhane/scripts/ → hegemonikon/
 
-    total, missing, levels = check_proofs(verbose=args.verbose)
+    # dendron CLI を呼び出し
+    cmd = [
+        sys.executable,
+        "-m",
+        "dendron.cli",
+        "check",
+        "mekhane/",
+        "--format",
+        "ci" if "--ci" in sys.argv else "text",
+    ]
 
-    # 統計表示
-    if args.stats:
-        print("📊 Level Distribution:")
-        for level, count in sorted(levels.items()):
-            print(f"   {level}: {count}")
-        print()
+    # verbose/stats オプションの対応
+    # dendron は --stats を持たないが、text 形式でレベル統計を出力する
+    if "--stats" in sys.argv or "-s" in sys.argv:
+        cmd[5] = "text"  # 統計は text 形式で表示
 
-    # 結果
-    if missing:
-        print(f"❌ PROOF missing in {len(missing)}/{total} files:")
-        display_count = 10 if not args.verbose else len(missing)
-        for f in missing[:display_count]:
-            rel = f.relative_to(f.parent.parent.parent) if len(f.parts) > 3 else f
-            print(f"   - {rel}")
-        if len(missing) > display_count:
-            print(f"   ... and {len(missing) - display_count} more")
-        sys.exit(1)
-
-    print(f"✅ All {total} files have PROOF headers")
-    if levels:
-        print(
-            f"   L1: {levels.get('L1', 0)} | L2: {levels.get('L2', 0)} | L3: {levels.get('L3', 0)}"
-        )
-    sys.exit(0)
+    result = subprocess.run(
+        cmd,
+        cwd=hegemonikon_root,
+        env={**__import__("os").environ, "PYTHONPATH": str(hegemonikon_root)},
+    )
+    sys.exit(result.returncode)
 
 
 if __name__ == "__main__":

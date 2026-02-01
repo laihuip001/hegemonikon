@@ -19,7 +19,9 @@ import os
 from pathlib import Path
 
 WORKFLOWS_DIR = Path("/home/laihuip001/oikos/.agent/workflows")
-STANDARD_REF = "file:///home/laihuip001/oikos/.agent/standards/workflow_artifact_standard.md"
+STANDARD_REF = (
+    "file:///home/laihuip001/oikos/.agent/standards/workflow_artifact_standard.md"
+)
 MNEME_PATH = "/home/laihuip001/oikos/mneme/.hegemonikon/workflows"
 
 # Workflows to update (exclude already done: noe, bou, zet, ene)
@@ -93,7 +95,9 @@ ARTIFACT_TEMPLATE = """
 """
 
 
-def generate_section(workflow: str, module: str, summary: str, date: str = "20260129") -> str:
+def generate_section(
+    workflow: str, module: str, summary: str, date: str = "20260129"
+) -> str:
     """Generate artifact section for a workflow."""
     example_topic = summary.replace("・", "_").replace(" ", "_")[:20]
     return ARTIFACT_TEMPLATE.format(

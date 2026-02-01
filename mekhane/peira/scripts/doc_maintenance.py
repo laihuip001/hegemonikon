@@ -220,7 +220,11 @@ def generate_tree(
         "archive",
     }
     for child in children:
-        if child.name in ignores or child.name.endswith(".pyc") or child.name.endswith(".txn"):
+        if (
+            child.name in ignores
+            or child.name.endswith(".pyc")
+            or child.name.endswith(".txn")
+        ):
             continue
         filtered.append(child)
 
@@ -240,7 +244,9 @@ def scan_structure() -> bool:
 
     # Generate Tree with max_depth=3 for cleanliness
     # .agent/rules etc will be shown but deeply nested files omitted
-    tree_content = "M:\\Hegemonikon\\\n" + generate_tree(ROOT_DIR, is_root=True, max_depth=3)
+    tree_content = "M:\\Hegemonikon\\\n" + generate_tree(
+        ROOT_DIR, is_root=True, max_depth=3
+    )
 
     # Wrap in code block
     tree_block = "```text\n" + tree_content.strip() + "\n```"
@@ -253,7 +259,9 @@ def scan_structure() -> bool:
 
     content = struct_file.read_text(encoding="utf-8")
 
-    pattern = re.compile(r"(<!-- STRUCTURE_START -->\n)(.*?)(<!-- STRUCTURE_END -->)", re.DOTALL)
+    pattern = re.compile(
+        r"(<!-- STRUCTURE_START -->\n)(.*?)(<!-- STRUCTURE_END -->)", re.DOTALL
+    )
 
     if not pattern.search(content):
         print("❌ Error: Structure markers not found in docs/STRUCTURE.md")

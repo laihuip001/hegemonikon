@@ -82,7 +82,9 @@ async def main():
             lines.append(f"  [{i}] src='{src[:80]}' name='{name}' title='{title_attr}'")
 
         # 2. スクロール可能領域を探す
-        scroll_areas = await page.query_selector_all('[class*="overflow-y"], [class*="scroll"]')
+        scroll_areas = await page.query_selector_all(
+            '[class*="overflow-y"], [class*="scroll"]'
+        )
         large_scrolls = []
         for el in scroll_areas[:100]:
             try:
@@ -137,12 +139,16 @@ async def main():
                     pass  # TODO: Add proper error handling
 
         # 3. .prose/.markdown を探す
-        prose_elements = await page.query_selector_all(".prose, .markdown, .markdown-body")
+        prose_elements = await page.query_selector_all(
+            ".prose, .markdown, .markdown-body"
+        )
         lines.append(f"\n\n=== .prose/.markdown elements: {len(prose_elements)} ===")
         for i, el in enumerate(prose_elements[:10]):
             try:
                 text = await el.text_content()
-                parent_class = await el.evaluate("el => el.parentElement?.className || ''")
+                parent_class = await el.evaluate(
+                    "el => el.parentElement?.className || ''"
+                )
                 lines.append(f"  [{i}] text_len={len(text) if text else 0}")
                 lines.append(f"      parent_class='{parent_class[:60]}'")
                 if text:
@@ -158,7 +164,9 @@ async def main():
                 testid = await el.get_attribute("data-testid")
                 tag = await el.evaluate("el => el.tagName")
                 text = await el.text_content()
-                text_preview = (text[:50] + "...") if text and len(text) > 50 else (text or "")
+                text_preview = (
+                    (text[:50] + "...") if text and len(text) > 50 else (text or "")
+                )
                 lines.append(
                     f"  [{i}] <{tag}> testid='{testid}' text='{text_preview.replace(chr(10), ' ')}'"
                 )

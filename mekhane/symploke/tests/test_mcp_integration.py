@@ -39,7 +39,9 @@ async def test_mcp_tools():
 
     print("\n[3] Testing jules_get_status with existing session...")
     # Use a session ID from earlier tests
-    result = await server.call_tool("jules_get_status", {"session_id": "10287138985978924050"})
+    result = await server.call_tool(
+        "jules_get_status", {"session_id": "10287138985978924050"}
+    )
     print(f"  Result:\n{result[0].text}")
 
     print("\n[4] Testing jules_create_task...")

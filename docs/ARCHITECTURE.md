@@ -44,12 +44,12 @@ Hegemonikón derives cognitive functions from a **4-tier axiom structure**:
 ### 24 Theorems (6 × 4)
 
 ```
-A流 (Content):
+Poiēsis (生成層 — Content):
   O-series (Ousia):    L1 × L1    = 4 theorems
   S-series (Schema):   L1 × L1.5  = 4 theorems
   H-series (Hormē):    L1 × L1.75 = 4 theorems
 
-B流 (Conditions):
+Dokimasia (審査層 — Conditions):
   P-series (Perigraphē): L1.5 × L1.5  = 4 theorems
   K-series (Kairos):     L1.5 × L1.75 = 4 theorems
   A-series (Akribeia):   L1.75 × L1.75 = 4 theorems

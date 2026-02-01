@@ -63,7 +63,8 @@ def export_walkthrough(conversation_id: str | None = None) -> Path | None:
         related_path = walkthrough_path.parent / related
         if related_path.exists():
             related_output = (
-                MNEME_DIR / f"{related.replace('.md', '')}_{date_str}_{conversation_id[:8]}.md"
+                MNEME_DIR
+                / f"{related.replace('.md', '')}_{date_str}_{conversation_id[:8]}.md"
             )
             shutil.copy2(related_path, related_output)
             print(f"[✓] Related: {related_output.name}")

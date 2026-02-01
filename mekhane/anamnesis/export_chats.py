@@ -55,7 +55,9 @@ RE_THOUGHT_FOR = re.compile(r"^Thought for \u003c?\d+s\s*")
 RE_FILES_EDITED = re.compile(r"Files Edited.*?(?=\n\n|\Z)", re.DOTALL)
 RE_PROGRESS_UPDATES = re.compile(r"Progress Updates.*?(?=\n\n|\Z)", re.DOTALL)
 RE_BACKGROUND_STEPS = re.compile(r"Background Steps.*?(?=\n\n|\Z)", re.DOTALL)
-RE_UI_STATUS = re.compile(r"\b(Running\.\.\.?|Generating\.?|GoodBad|OpenProceed|Cancel)\b")
+RE_UI_STATUS = re.compile(
+    r"\b(Running\.\.\.?|Generating\.?|GoodBad|OpenProceed|Cancel)\b"
+)
 RE_MULTI_NEWLINE = re.compile(r"\n{3,}")
 RE_MULTI_SPACE = re.compile(r" {2,}")
 RE_UNSAFE_FILENAME = re.compile(r"[\u003c\u003e:\"/\\|?*\x00-\x1f]")
@@ -77,6 +79,7 @@ class AntigravityChatExporter:
         self.browser = None
         self.page = None
         self.limit = limit  # エクスポート上限
+        self.filter_keyword = None
 
         # デバッグ: 出力ディレクトリ確認
         print(f"[DEBUG] Output directory: {self.output_dir}")
@@ -120,7 +123,9 @@ class AntigravityChatExporter:
                 # ボタン数が最も多いページを選択
                 agent_pages.sort(key=lambda x: x[1], reverse=True)
                 self.page = agent_pages[0][0]
-                print(f"[✓] Selected Agent Manager: {self.page.url} ({agent_pages[0][1]} buttons)")
+                print(
+                    f"[✓] Selected Agent Manager: {self.page.url} ({agent_pages[0][1]} buttons)"
+                )
 
             if not self.page:
                 # fallback: 最初のページ
@@ -153,7 +158,9 @@ class AntigravityChatExporter:
             for idx, item in enumerate(items):
                 try:
                     # タイトルを取得 (span[data-testid] または span.text-sm.grow.truncate)
-                    title_el = await item.query_selector("span[data-testid], span.truncate")
+                    title_el = await item.query_selector(
+                        "span[data-testid], span.truncate"
+                    )
                     title = await title_el.text_content() if title_el else None
 
                     if not title:
@@ -165,7 +172,9 @@ class AntigravityChatExporter:
                     if not title or len(title) < 3:
                         continue
 
-                    conversations.append({"id": f"conv_{idx}", "title": title, "element": item})
+                    conversations.append(
+                        {"id": f"conv_{idx}", "title": title, "element": item}
+                    )
                 except Exception as e:
                     print(f"[!] Error extracting conversation item: {e}")
                     continue
@@ -187,7 +196,9 @@ class AntigravityChatExporter:
         seen_content_hashes = set()
 
         try:
-            container = await self.page.query_selector(".flex.flex-col.gap-y-3.px-4.relative")
+            container = await self.page.query_selector(
+                ".flex.flex-col.gap-y-3.px-4.relative"
+            )
             if not container:
                 container = await self.page.query_selector(".flex.flex-col.gap-y-3")
 
@@ -409,7 +420,9 @@ class AntigravityChatExporter:
 
         try:
             # メッセージコンテナを探す
-            container = await self.page.query_selector(".flex.flex-col.gap-y-3.px-4.relative")
+            container = await self.page.query_selector(
+                ".flex.flex-col.gap-y-3.px-4.relative"
+            )
 
             if not container:
                 container = await self.page.query_selector(".flex.flex-col.gap-y-3")
@@ -577,7 +590,11 @@ class AntigravityChatExporter:
                             pass  # TODO: Add proper error handling
 
                     messages.append(
-                        {"role": role, "content": clean_text[:10000], "section_index": section_idx}
+                        {
+                            "role": role,
+                            "content": clean_text[:10000],
+                            "section_index": section_idx,
+                        }
                     )
 
                 except Exception as e:
@@ -603,6 +620,19 @@ class AntigravityChatExporter:
                 conversations = conversations[: self.limit]
                 print(f"[*] Limiting to {self.limit} conversations")
 
+            # フィルタリング
+            if self.filter_keyword:
+                print(f"[*] Filtering by keyword: '{self.filter_keyword}'")
+                original_count = len(conversations)
+                conversations = [
+                    c
+                    for c in conversations
+                    if self.filter_keyword.lower() in c["title"].lower()
+                ]
+                print(
+                    f"[*] Filtered: {original_count} -> {len(conversations)} conversations"
+                )
+
             for idx, conv in enumerate(conversations, 1):
                 print(f"[{idx}/{len(conversations)}] {conv['title']}")
 
@@ -619,7 +649,9 @@ class AntigravityChatExporter:
 
                     # ネットワーク安定化を待機（最大15秒）
                     try:
-                        await self.page.wait_for_load_state("networkidle", timeout=15000)
+                        await self.page.wait_for_load_state(
+                            "networkidle", timeout=15000
+                        )
                     except Exception:
                         print("    [!] Network idle timeout, proceeding...")
 
@@ -632,7 +664,9 @@ class AntigravityChatExporter:
                             ".flex.flex-col.gap-y-3.px-4.relative > div", timeout=10000
                         )
                     except Exception:
-                        print("    [!] Message container selector timeout, proceeding...")
+                        print(
+                            "    [!] Message container selector timeout, proceeding..."
+                        )
 
                     # コンテンツ変化を待機（最大15秒、500ms間隔でチェック）
                     content_changed = False
@@ -688,15 +722,21 @@ class AntigravityChatExporter:
     def save_markdown(self, filename: Optional[str] = None):
         """Markdown 形式で保存"""
         if not filename:
-            filename = f"antigravity_export_{datetime.now().strftime('%Y%m%d_%H%M%S')}.md"
+            filename = (
+                f"antigravity_export_{datetime.now().strftime('%Y%m%d_%H%M%S')}.md"
+            )
 
         filepath = self.output_dir / filename
 
         with open(filepath, "w", encoding="utf-8") as f:
             f.write("# Antigravity IDE チャット履歴\n\n")
-            f.write(f"- **エクスポート日時**: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
+            f.write(
+                f"- **エクスポート日時**: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n"
+            )
             f.write(f"- **会話数**: {len(self.chats)}\n")
-            f.write(f"- **総メッセージ数**: {sum(c['message_count'] for c in self.chats)}\n\n")
+            f.write(
+                f"- **総メッセージ数**: {sum(c['message_count'] for c in self.chats)}\n\n"
+            )
             f.write("---\n\n")
 
             for chat in self.chats:
@@ -705,7 +745,9 @@ class AntigravityChatExporter:
                 f.write(f"- **メッセージ数**: {chat['message_count']}\n\n")
 
                 for msg in chat["messages"]:
-                    role_label = "👤 **User**" if msg["role"] == "user" else "🤖 **Claude**"
+                    role_label = (
+                        "👤 **User**" if msg["role"] == "user" else "🤖 **Claude**"
+                    )
                     f.write(f"### {role_label}\n\n")
                     f.write(f"{msg['content']}\n\n")
 
@@ -717,7 +759,9 @@ class AntigravityChatExporter:
     def save_json(self, filename: Optional[str] = None):
         """JSON 形式で保存"""
         if not filename:
-            filename = f"antigravity_export_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
+            filename = (
+                f"antigravity_export_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
+            )
 
         filepath = self.output_dir / filename
 
@@ -757,7 +801,9 @@ class AntigravityChatExporter:
                 f.write("---\n\n")
 
                 for msg in chat["messages"]:
-                    role_label = "## 👤 User" if msg["role"] == "user" else "## 🤖 Claude"
+                    role_label = (
+                        "## 👤 User" if msg["role"] == "user" else "## 🤖 Claude"
+                    )
                     f.write(f"{role_label}\n\n")
                     # 連続3行以上の空行を1行に正規化
                     content = re.sub(r"\n{3,}", "\n\n", msg["content"])
@@ -791,13 +837,17 @@ class AntigravityChatExporter:
         try:
             print(f"[*] Exporting current conversation: {title}")
 
-            # 現在表示されているメッセージを抽出
-            await asyncio.sleep(1.0)  # DOM 安定化待機
-            messages = await self.extract_messages()
+            print(f"[*] Exporting current conversation: {title}")
 
-            if not messages:
+            # スクロールしながら全メッセージを収集
+            raw_messages = await self.scroll_and_collect_messages()
+
+            if not raw_messages:
                 print("[!] No messages found in current view")
                 return
+
+            # ロール判定とフォーマット
+            messages = self._process_raw_messages(raw_messages)
 
             # 記録を保存
             chat_record = {
@@ -837,7 +887,9 @@ class AntigravityChatExporter:
 
                     if messages:
                         # コンテンツのハッシュを計算
-                        content = "".join(m.get("content", "")[:200] for m in messages[:3])
+                        content = "".join(
+                            m.get("content", "")[:200] for m in messages[:3]
+                        )
                         content_hash = hash(content)
 
                         # 新しいコンテンツを検出
@@ -848,7 +900,11 @@ class AntigravityChatExporter:
                             export_count += 1
 
                             # タイトルを推測（最初のメッセージの先頭20文字）
-                            title = messages[0].get("content", "unknown")[:50].replace("\n", " ")
+                            title = (
+                                messages[0]
+                                .get("content", "unknown")[:50]
+                                .replace("\n", " ")
+                            )
 
                             print(f"[{export_count}] 新しい会話を検出: {title[:30]}...")
 
@@ -878,7 +934,9 @@ class AntigravityChatExporter:
                     await asyncio.sleep(2.0)
 
         finally:
-            print(f"\n[*] 待機モード終了。{export_count} 件の会話をエクスポートしました")
+            print(
+                f"\n[*] 待機モード終了。{export_count} 件の会話をエクスポートしました"
+            )
             await self.close()
 
 
@@ -888,7 +946,9 @@ class AntigravityChatExporter:
 
 
 async def main():
-    parser = argparse.ArgumentParser(description="Antigravity IDE チャット履歴エクスポート")
+    parser = argparse.ArgumentParser(
+        description="Antigravity IDE チャット履歴エクスポート"
+    )
     parser.add_argument(
         "--output",
         "-o",
@@ -904,7 +964,11 @@ async def main():
         help="出力形式 (default: individual)",
     )
     parser.add_argument(
-        "--limit", "-l", type=int, default=None, help="エクスポートする会話数の上限 (テスト用)"
+        "--limit",
+        "-l",
+        type=int,
+        default=None,
+        help="エクスポートする会話数の上限 (テスト用)",
     )
 
     parser.add_argument(
@@ -922,10 +986,17 @@ async def main():
         action="store_true",
         help="待機モード: 会話の切り替えを検出して自動エクスポート（Ctrl+C で終了）",
     )
+    parser.add_argument(
+        "--filter",
+        type=str,
+        default=None,
+        help="指定した文字列をタイトルに含む会話のみエクスポート",
+    )
 
     args = parser.parse_args()
 
     exporter = AntigravityChatExporter(output_dir=args.output, limit=args.limit)
+    exporter.filter_keyword = args.filter
 
     try:
         if args.watch:

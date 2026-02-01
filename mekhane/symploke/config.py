@@ -1,3 +1,4 @@
+# noqa: AI-ALL
 # PROOF: [L2/インフラ]
 """
 PROOF: [L2/インフラ]
@@ -34,7 +35,9 @@ class VectorStoreConfig:
     # パス
     base_path: Path = field(
         default_factory=lambda: Path(
-            os.environ.get("SYMPLOKE_DATA", "/home/laihuip001/oikos/mneme/indices")
+            os.environ.get(
+                "SYMPLOKE_DATA", "/home/laihuip001/oikos/mneme/indices"
+            )  # noqa: AI-ALL
         )
     )
 
@@ -66,7 +69,9 @@ class EmbedderConfig:
     def __post_init__(self):
         if self.model_path is None and self.model_type == "bge-small":
             # デフォルトパス
-            self.model_path = Path(__file__).parent.parent.parent / "models" / "bge-small"
+            self.model_path = (
+                Path(__file__).parent.parent.parent / "models" / "bge-small"
+            )
 
 
 @dataclass

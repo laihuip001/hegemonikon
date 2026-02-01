@@ -324,11 +324,19 @@ if __name__ == "__main__":
     import json
 
     parser = argparse.ArgumentParser(description="Hegemonikón Workflow Runner")
-    parser.add_argument("theorem", help="Theorem code (e.g., O1, A2) or workflow name (e.g., noe)")
+    parser.add_argument(
+        "theorem", help="Theorem code (e.g., O1, A2) or workflow name (e.g., noe)"
+    )
     parser.add_argument("problem", nargs="?", default="", help="Problem context")
-    parser.add_argument("-v", "--verbose", action="store_true", help="Show detailed diagnostics")
-    parser.add_argument("--show-path", action="store_true", help="Show workflow file path only")
-    parser.add_argument("--execute", action="store_true", help="Output JSON for agent execution")
+    parser.add_argument(
+        "-v", "--verbose", action="store_true", help="Show detailed diagnostics"
+    )
+    parser.add_argument(
+        "--show-path", action="store_true", help="Show workflow file path only"
+    )
+    parser.add_argument(
+        "--execute", action="store_true", help="Output JSON for agent execution"
+    )
 
     args = parser.parse_args()
 
@@ -344,7 +352,10 @@ if __name__ == "__main__":
 
     # For derivative selection, we need a problem context
     if not args.problem and not args.show_path:
-        print("Error: problem context is required unless --show-path is used", file=sys.stderr)
+        print(
+            "Error: problem context is required unless --show-path is used",
+            file=sys.stderr,
+        )
         sys.exit(1)
 
     result = run_workflow(args.theorem, args.problem)
@@ -363,7 +374,12 @@ if __name__ == "__main__":
             "description": result.description,
             "processing_hints": result.processing_hints,
             "x_series_next": [
-                {"id": r.x_id, "target": r.target, "workflow": r.workflow, "reason": r.reason}
+                {
+                    "id": r.x_id,
+                    "target": r.target,
+                    "workflow": r.workflow,
+                    "reason": r.reason,
+                }
                 for r in result.x_series_recommendations
             ],
         }

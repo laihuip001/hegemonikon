@@ -105,13 +105,16 @@ class TestCheckAlignment:
 
     def test_detects_perfectionism_keywords(self):
         result = check_alignment(
-            goal="基本的なCRUDを実装", action="完璧なエラーハンドリングを全てのケースで実装"
+            goal="基本的なCRUDを実装",
+            action="完璧なエラーハンドリングを全てのケースで実装",
         )
         # Should detect perfectionism patterns
         assert len(result.drift_indicators) >= 1
 
     def test_returns_suggestions(self):
-        result = check_alignment(goal="シンプルな機能を追加", action="完璧に最適化された実装を作る")
+        result = check_alignment(
+            goal="シンプルな機能を追加", action="完璧に最適化された実装を作る"
+        )
         assert len(result.suggestions) > 0
 
 

@@ -22,7 +22,12 @@ from mekhane.fep.energeia_executor import (
     encode_execution_observation,
 )
 from mekhane.fep.telos_checker import AlignmentStatus
-from mekhane.fep.tekhne_registry import TekhnēRegistry, Technique, ActionCategory, TechniqueQuadrant
+from mekhane.fep.tekhne_registry import (
+    TekhnēRegistry,
+    Technique,
+    ActionCategory,
+    TechniqueQuadrant,
+)
 
 
 class TestExecutionPhase:
@@ -82,7 +87,9 @@ class TestEnergеiaExecutor:
 
     def test_initiate_creates_context(self):
         executor = EnergеiaExecutor()
-        ctx = executor.initiate(goal="テスト機能を実装する", plan="test_feature.py を作成する")
+        ctx = executor.initiate(
+            goal="テスト機能を実装する", plan="test_feature.py を作成する"
+        )
         assert ctx.goal == "テスト機能を実装する"
         assert ctx.phase == ExecutionPhase.INIT
         assert ctx.status == ExecutionStatus.PENDING

@@ -286,7 +286,11 @@ class TestKrisis:
 
     def test_judge_reject(self):
         result = judge("問題", evidence_against=["X", "Y", "Z", "W"])
-        assert result.verdict in (VerdictType.REJECT, VerdictType.REVISE, VerdictType.SUSPEND)
+        assert result.verdict in (
+            VerdictType.REJECT,
+            VerdictType.REVISE,
+            VerdictType.SUSPEND,
+        )
 
     def test_judge_devil_advocate(self):
         result = judge("計画", devil_advocate=True)

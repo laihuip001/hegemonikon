@@ -91,9 +91,26 @@ def evaluate_propatheia(
     combined = stimulus_lower + " " + feeling_lower
 
     # 警告キーワード
-    warn_keywords = ["危険", "リスク", "不安", "懸念", "danger", "risk", "concern", "worry"]
+    warn_keywords = [
+        "危険",
+        "リスク",
+        "不安",
+        "懸念",
+        "danger",
+        "risk",
+        "concern",
+        "worry",
+    ]
     # 吸引キーワード
-    draw_keywords = ["興味", "魅力", "可能性", "チャンス", "interest", "opportunity", "exciting"]
+    draw_keywords = [
+        "興味",
+        "魅力",
+        "可能性",
+        "チャンス",
+        "interest",
+        "opportunity",
+        "exciting",
+    ]
 
     if any(w in combined for w in warn_keywords):
         derivative = PropatheiaDerivative.WARN
@@ -305,7 +322,9 @@ def evaluate_orexis(
 
 def format_propatheia_markdown(result: PropatheiaResult) -> str:
     """H1 Propatheia 結果をMarkdown形式でフォーマット"""
-    valence_emoji = "🟢" if result.valence > 0 else ("🔴" if result.valence < 0 else "⚪")
+    valence_emoji = (
+        "🟢" if result.valence > 0 else ("🔴" if result.valence < 0 else "⚪")
+    )
     lines = [
         "┌─[H1 Propatheia 前感情評価]─────────────────────────┐",
         f"│ 派生: {result.derivative.value}",
@@ -320,7 +339,11 @@ def format_propatheia_markdown(result: PropatheiaResult) -> str:
 
 def format_pistis_markdown(result: PistisResult) -> str:
     """H2 Pistis 結果をMarkdown形式でフォーマット"""
-    conf_emoji = "🟢" if result.confidence >= 0.7 else ("🟡" if result.confidence >= 0.4 else "🔴")
+    conf_emoji = (
+        "🟢"
+        if result.confidence >= 0.7
+        else ("🟡" if result.confidence >= 0.4 else "🔴")
+    )
     lines = [
         "┌─[H2 Pistis 確信度評価]──────────────────────────────┐",
         f"│ 派生: {result.derivative.value}",
@@ -335,7 +358,11 @@ def format_pistis_markdown(result: PistisResult) -> str:
 
 def format_orexis_markdown(result: OrexisResult) -> str:
     """H3 Orexis 結果をMarkdown形式でフォーマット"""
-    tend_emoji = "→" if result.net_tendency > 0.2 else ("←" if result.net_tendency < -0.2 else "○")
+    tend_emoji = (
+        "→"
+        if result.net_tendency > 0.2
+        else ("←" if result.net_tendency < -0.2 else "○")
+    )
     lines = [
         "┌─[H3 Orexis 欲求傾向評価]────────────────────────────┐",
         f"│ 派生: {result.derivative.value}",

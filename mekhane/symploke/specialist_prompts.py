@@ -830,7 +830,14 @@ if __name__ == "__main__":
     # Phase 1 only
     print(f"\n[Phase 1: 見落とし層]")
     print(f"Total specialists: {len(PHASE1_SPECIALISTS)}")
-    for cat in ["cognitive_load", "emotional_social", "ai_risk", "async", "theory", "aesthetics"]:
+    for cat in [
+        "cognitive_load",
+        "emotional_social",
+        "ai_risk",
+        "async",
+        "theory",
+        "aesthetics",
+    ]:
         count = len(get_specialists_by_category(cat))
         print(f"  {cat}: {count}")
 

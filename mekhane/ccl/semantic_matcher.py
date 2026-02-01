@@ -42,13 +42,41 @@ MACRO_DESCRIPTIONS_JP = {
     ],
     "go": ["実行する", "やる", "進める", "行動する", "走らせる", "動かす", "開始する"],
     "osc": ["往復する", "振動する", "行き来する", "揺れる", "交互に考える", "反復する"],
-    "fix": ["直す", "修正する", "改善する", "治す", "手直しする", "修復する", "フィックスする"],
-    "plan": ["計画する", "企画する", "立案する", "設計する", "プランを立てる", "構想する"],
+    "fix": [
+        "直す",
+        "修正する",
+        "改善する",
+        "治す",
+        "手直しする",
+        "修復する",
+        "フィックスする",
+    ],
+    "plan": [
+        "計画する",
+        "企画する",
+        "立案する",
+        "設計する",
+        "プランを立てる",
+        "構想する",
+    ],
     "learn": ["学ぶ", "学習する", "覚える", "習得する", "理解する", "勉強する"],
     "nous": ["問う", "尋ねる", "自問する", "探求する", "問いかける", "深く問う"],
     # === H-Series (Hormē) ===
-    "h": ["動機を確認", "衝動を感じる", "やる気", "モチベーション", "傾向と欲求", "なぜやりたいか"],
-    "pro": ["直感", "第一印象", "初期傾向", "ファーストインプレッション", "最初に感じたこと"],
+    "h": [
+        "動機を確認",
+        "衝動を感じる",
+        "やる気",
+        "モチベーション",
+        "傾向と欲求",
+        "なぜやりたいか",
+    ],
+    "pro": [
+        "直感",
+        "第一印象",
+        "初期傾向",
+        "ファーストインプレッション",
+        "最初に感じたこと",
+    ],
     "pis": ["確信度", "信頼度", "どれくらい確か", "自信", "信じる度合い"],
     "ore": ["欲求", "何が欲しいか", "願望", "望み", "本当に欲しいもの"],
     "dox": ["信念", "信じていること", "価値観", "持論", "記録しておきたい"],
@@ -143,7 +171,9 @@ class SemanticMacroMatcher:
             macro_name = self.term_to_macro[term]
             macro = self.registry.get(macro_name) or BUILTIN_MACROS.get(macro_name)
             if macro:
-                scores.append(MacroMatch(macro=macro, score=float(similarity), matched_term=term))
+                scores.append(
+                    MacroMatch(macro=macro, score=float(similarity), matched_term=term)
+                )
 
         # Sort by score, deduplicate by macro name
         scores.sort(key=lambda x: x.score, reverse=True)

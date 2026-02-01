@@ -74,7 +74,9 @@ class TestKhora:
         assert result.derivative == KhoraDerivative.CONCEPTUAL
 
     def test_scope_label(self):
-        result = define_scope("test", x_scale=ScopeScale.MACRO, y_scale=ScopeScale.MICRO)
+        result = define_scope(
+            "test", x_scale=ScopeScale.MACRO, y_scale=ScopeScale.MICRO
+        )
         assert result.scope_label == "Macro×Micro"
 
     def test_format_khora_markdown(self):
@@ -115,7 +117,9 @@ class TestTrokhia:
         assert len(result.phases) == 4
 
     def test_define_trajectory_spiral(self):
-        result = define_trajectory("スプリント", ["設計", "実装", "レビュー"], max_iterations=5)
+        result = define_trajectory(
+            "スプリント", ["設計", "実装", "レビュー"], max_iterations=5
+        )
         assert result.derivative == TrokhiaDerivative.SPIRAL
         assert result.max_iterations == 5
 
@@ -195,7 +199,9 @@ class TestOrexis:
     """H3 Orexis tests"""
 
     def test_evaluate_orexis_approach(self):
-        result = evaluate_orexis("新技術", benefits=["効率向上", "品質向上", "学習機会"])
+        result = evaluate_orexis(
+            "新技術", benefits=["効率向上", "品質向上", "学習機会"]
+        )
         assert result.derivative == OrexisDerivative.APPROACH
         assert result.should_pursue is True
 

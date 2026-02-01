@@ -110,7 +110,9 @@ URGENCY_MAP = {
 }
 
 
-def _parse_deadline(deadline_str: str) -> tuple[Optional[datetime], TimeScale, CertaintyLevel]:
+def _parse_deadline(
+    deadline_str: str,
+) -> tuple[Optional[datetime], TimeScale, CertaintyLevel]:
     """期限文字列をパース
 
     対応形式:
@@ -144,7 +146,12 @@ def _parse_deadline(deadline_str: str) -> tuple[Optional[datetime], TimeScale, C
 
     # 相対表現 (Japanese)
     jp_patterns = [
-        (r"今日|本日", timedelta(hours=24), TimeScale.IMMEDIATE, CertaintyLevel.CERTAIN),
+        (
+            r"今日|本日",
+            timedelta(hours=24),
+            TimeScale.IMMEDIATE,
+            CertaintyLevel.CERTAIN,
+        ),
         (
             r"明日",
             timedelta(days=1, hours=23, minutes=59),
@@ -153,7 +160,12 @@ def _parse_deadline(deadline_str: str) -> tuple[Optional[datetime], TimeScale, C
         ),
         (r"今週|今週中", timedelta(days=7), TimeScale.SHORT, CertaintyLevel.UNCERTAIN),
         (r"来週", timedelta(days=14), TimeScale.SHORT, CertaintyLevel.UNCERTAIN),
-        (r"月末|今月中", timedelta(days=30), TimeScale.MEDIUM, CertaintyLevel.UNCERTAIN),
+        (
+            r"月末|今月中",
+            timedelta(days=30),
+            TimeScale.MEDIUM,
+            CertaintyLevel.UNCERTAIN,
+        ),
         (r"(\d+)日", None, TimeScale.SHORT, CertaintyLevel.UNCERTAIN),
         (r"(\d+)週間", None, TimeScale.MEDIUM, CertaintyLevel.UNCERTAIN),
         (r"(\d+)ヶ月|(\d+)か月", None, TimeScale.LONG, CertaintyLevel.UNCERTAIN),
@@ -374,9 +386,13 @@ def format_chronos_markdown(result: ChronosResult) -> str:
     }
 
     deadline_display = (
-        result.deadline.strftime("%Y-%m-%d %H:%M") if result.deadline else result.deadline_str
+        result.deadline.strftime("%Y-%m-%d %H:%M")
+        if result.deadline
+        else result.deadline_str
     )
-    remaining_display = f"{result.remaining_hours:.1f}h" if result.remaining_hours else "不明"
+    remaining_display = (
+        f"{result.remaining_hours:.1f}h" if result.remaining_hours else "不明"
+    )
 
     lines = [
         "┌─[K2 Chronos 時間評価]────────────────────────────┐",

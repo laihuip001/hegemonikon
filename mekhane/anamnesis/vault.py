@@ -31,7 +31,10 @@ class VaultManager:
 
     @staticmethod
     def write_safe(
-        filepath: Union[str, Path], content: str, encoding: str = "utf-8", backup: bool = True
+        filepath: Union[str, Path],
+        content: str,
+        encoding: str = "utf-8",
+        backup: bool = True,
     ) -> Path:
         """
         Writes content to a file safely with backup and atomic constraints.
@@ -115,7 +118,9 @@ class VaultManager:
             except Exception as e:
                 logger.error(f"Failed to read {target_path}: {e}")
                 if not backup_path.exists():
-                    raise IOError(f"Failed to read {target_path} and no backup found: {e}")
+                    raise IOError(
+                        f"Failed to read {target_path} and no backup found: {e}"
+                    )
                 # Fallthrough to backup
         elif not backup_path.exists():
             raise FileNotFoundError(f"File not found: {target_path}")

@@ -157,7 +157,9 @@ def process_conversations(data: Union[List, Dict, Iterable], output_dir: str):
                     for line in msg["content"].split("\n"):
                         if "TODO" in line or "Task" in line:
                             clean_line = line.strip()
-                            if clean_line and clean_line not in [t.strip() for t in tasks]:
+                            if clean_line and clean_line not in [
+                                t.strip() for t in tasks
+                            ]:
                                 tasks.append(f"- [ ] {clean_line}")
 
             # Generate Markdown
@@ -207,7 +209,10 @@ def create_dummy_data() -> Dict:
                 "title": "Complex Nested Data",
                 "createTime": "2026-01-20T15:30:00Z",
                 "messages": [
-                    {"role": "user", "content": {"parts": ["Nested content part 1", " part 2"]}},
+                    {
+                        "role": "user",
+                        "content": {"parts": ["Nested content part 1", " part 2"]},
+                    },
                     {"role": "model", "content": "Parsed successfully."},
                 ],
             },
@@ -221,7 +226,9 @@ def stream_conversations(f):
     ijsonが利用できない場合はjson.loadを使用する（フォールバック）。
     """
     if ijson is None:
-        print("Warning: ijson module not found. Falling back to loading entire JSON into memory.")
+        print(
+            "Warning: ijson module not found. Falling back to loading entire JSON into memory."
+        )
         data = json.load(f)
         if isinstance(data, dict) and "conversations" in data:
             return data["conversations"]
@@ -244,7 +251,9 @@ def stream_conversations(f):
         return ijson.items(f, "conversations.item")
     else:
         # フォールバック
-        return ijson.items(f, "item")  # Assume list if unknown or let ijson handle error
+        return ijson.items(
+            f, "item"
+        )  # Assume list if unknown or let ijson handle error
 
 
 def main():

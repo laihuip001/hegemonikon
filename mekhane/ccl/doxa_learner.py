@@ -83,7 +83,9 @@ class DoxaLearner:
         else:
             # Add new pattern
             self.patterns.append(
-                LearnedPattern(intent=intent, ccl=ccl, confidence=confidence, usage_count=1)
+                LearnedPattern(
+                    intent=intent, ccl=ccl, confidence=confidence, usage_count=1
+                )
             )
 
         self._save()
@@ -117,6 +119,7 @@ class DoxaLearner:
 
         return {
             "count": len(self.patterns),
-            "avg_confidence": sum(p.confidence for p in self.patterns) / len(self.patterns),
+            "avg_confidence": sum(p.confidence for p in self.patterns)
+            / len(self.patterns),
             "total_usage": sum(p.usage_count for p in self.patterns),
         }

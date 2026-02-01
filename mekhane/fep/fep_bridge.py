@@ -99,7 +99,9 @@ def noesis_analyze(
 
     # Calculate normalized entropy (0-1 scale)
     max_entropy = np.log(agent.state_dim)  # Maximum entropy for uniform distribution
-    normalized_entropy = inference_result["entropy"] / max_entropy if max_entropy > 0 else 0
+    normalized_entropy = (
+        inference_result["entropy"] / max_entropy if max_entropy > 0 else 0
+    )
 
     # Confidence is inverse of normalized entropy
     confidence = 1.0 - normalized_entropy
@@ -158,7 +160,9 @@ def boulesis_analyze(
 
     # Action names
     action_names = ["observe", "act"]
-    action_name = action_names[action] if action < len(action_names) else f"action_{action}"
+    action_name = (
+        action_names[action] if action < len(action_names) else f"action_{action}"
+    )
 
     # Generate interpretation
     interpretation = _interpret_boulesis_policy(q_pi, action_name)

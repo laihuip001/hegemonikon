@@ -80,7 +80,9 @@ async def main():
                     for j, style in enumerate(style_elements):
                         style_text = await style.text_content()
                         lines.append(f"  STYLE[{j}] length: {len(style_text or '')}")
-                        lines.append(f"  STYLE[{j}] preview: {(style_text or '')[:100]}...")
+                        lines.append(
+                            f"  STYLE[{j}] preview: {(style_text or '')[:100]}..."
+                        )
 
                     # 改良版 TreeWalker で STYLE, SCRIPT, CODE を除外
                     clean_text = await child.evaluate("""
@@ -120,7 +122,9 @@ async def main():
 
                     # CSS が含まれているか確認
                     has_css = (
-                        "/*" in clean_text or "@media" in clean_text or ".markdown" in clean_text
+                        "/*" in clean_text
+                        or "@media" in clean_text
+                        or ".markdown" in clean_text
                     )
                     lines.append(f"Contains CSS: {has_css}")
 
@@ -131,7 +135,9 @@ async def main():
                             idx = clean_text.find("@media")
                         if idx >= 0:
                             lines.append(f"CSS starts at position {idx}")
-                            lines.append(f"Context: ...{clean_text[max(0,idx-30):idx+50]}...")
+                            lines.append(
+                                f"Context: ...{clean_text[max(0,idx-30):idx+50]}..."
+                            )
 
                     # プレビュー
                     preview = clean_text[:200].replace("\n", " ")

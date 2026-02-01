@@ -19,7 +19,9 @@ from mekhane.symploke.jules_client import JulesClient
 
 # Configure logging
 logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s", datefmt="%H:%M:%S"
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(message)s",
+    datefmt="%H:%M:%S",
 )
 logger = logging.getLogger(__name__)
 
@@ -84,13 +86,17 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description="Synedrion v2.1 Review Runner")
     parser.add_argument(
-        "--source", default="sources/github/laihuip001/hegemonikon", help="Repository source"
+        "--source",
+        default="sources/github/laihuip001/hegemonikon",
+        help="Repository source",
     )
     parser.add_argument("--branch", default="master", help="Branch to review")
     parser.add_argument("--domains", nargs="+", help="Filter domains")
     parser.add_argument("--axes", nargs="+", help="Filter axes")
     parser.add_argument(
-        "--test", action="store_true", help="Test mode: single perspective (Security × O1)"
+        "--test",
+        action="store_true",
+        help="Test mode: single perspective (Security × O1)",
     )
     args = parser.parse_args()
 
@@ -98,12 +104,18 @@ if __name__ == "__main__":
         # Single perspective test
         asyncio.run(
             run_synedrion_review(
-                source=args.source, branch=args.branch, domains=["Security"], axes=["O1"]
+                source=args.source,
+                branch=args.branch,
+                domains=["Security"],
+                axes=["O1"],
             )
         )
     else:
         asyncio.run(
             run_synedrion_review(
-                source=args.source, branch=args.branch, domains=args.domains, axes=args.axes
+                source=args.source,
+                branch=args.branch,
+                domains=args.domains,
+                axes=args.axes,
             )
         )

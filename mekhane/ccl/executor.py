@@ -88,7 +88,9 @@ class ZeroTrustCCLExecutor:
         Phase 4: 結果を記録
         """
         if validation.valid:
-            self.failure_db.record_success(ccl_expr=context.ccl_expr, output_summary=output[:200])
+            self.failure_db.record_success(
+                ccl_expr=context.ccl_expr, output_summary=output[:200]
+            )
         else:
             for error in validation.errors:
                 self.failure_db.record_failure(
@@ -98,7 +100,9 @@ class ZeroTrustCCLExecutor:
                     cause=error.message,
                 )
 
-    def execute(self, ccl_expr: str, output: str, record: bool = True) -> ExecutionResult:
+    def execute(
+        self, ccl_expr: str, output: str, record: bool = True
+    ) -> ExecutionResult:
         """
         CCL 実行フロー全体
 

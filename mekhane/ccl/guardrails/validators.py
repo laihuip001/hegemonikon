@@ -81,7 +81,9 @@ class CCLOutputValidator:
                 operators.add(char)
         return operators
 
-    def check_required_sections(self, output: str, operators: Set[str]) -> List[ValidationError]:
+    def check_required_sections(
+        self, output: str, operators: Set[str]
+    ) -> List[ValidationError]:
         """必須セクションの存在確認"""
         errors = []
 
@@ -129,7 +131,9 @@ class CCLOutputValidator:
 
         return errors
 
-    def check_minimum_length(self, output: str, operators: Set[str]) -> List[ValidationError]:
+    def check_minimum_length(
+        self, output: str, operators: Set[str]
+    ) -> List[ValidationError]:
         """最小長の確認"""
         errors = []
         lines = output.strip().split("\n")
@@ -178,7 +182,9 @@ class CCLOutputValidator:
 
         # 各種チェック
         errors.extend(self.check_required_sections(output, operators))
-        errors.extend(self.check_oscillation_bidirectional(output) if "~" in operators else [])
+        errors.extend(
+            self.check_oscillation_bidirectional(output) if "~" in operators else []
+        )
         errors.extend(self.check_minimum_length(output, operators))
         errors.extend(self.check_operator_understanding(output, operators))
 

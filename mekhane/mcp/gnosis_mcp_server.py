@@ -77,7 +77,9 @@ except Exception as e:
 
 # Initialize MCP server
 server = Server(
-    name="gnosis", version="1.0.0", instructions="Gnōsis knowledge base for academic paper search"
+    name="gnosis",
+    version="1.0.0",
+    instructions="Gnōsis knowledge base for academic paper search",
 )
 log("Server initialized")
 
@@ -160,7 +162,9 @@ async def call_tool(name: str, arguments: dict):
                 output_lines.append(f"## [{i}] {r.get('title', 'Untitled')}")
                 output_lines.append(f"- **Source**: {r.get('source', 'Unknown')}")
                 output_lines.append(f"- **Citations**: {r.get('citations', 'N/A')}")
-                output_lines.append(f"- **Authors**: {r.get('authors', 'Unknown')[:100]}...")
+                output_lines.append(
+                    f"- **Authors**: {r.get('authors', 'Unknown')[:100]}..."
+                )
                 output_lines.append(f"- **Abstract**: {r.get('abstract', '')[:300]}...")
                 if r.get("url"):
                     output_lines.append(f"- **URL**: {r.get('url')}")
@@ -185,7 +189,9 @@ async def call_tool(name: str, arguments: dict):
             output_lines = ["# Gnōsis Knowledge Base Statistics\n"]
             output_lines.append(f"- **Total Papers**: {stats.get('total_papers', 0)}")
             output_lines.append(f"- **Sources**: {', '.join(stats.get('sources', []))}")
-            output_lines.append(f"- **Last Updated**: {stats.get('last_updated', 'Never')}")
+            output_lines.append(
+                f"- **Last Updated**: {stats.get('last_updated', 'Never')}"
+            )
 
             log("Stats completed")
             return [TextContent(type="text", text="\n".join(output_lines))]
@@ -198,7 +204,9 @@ async def call_tool(name: str, arguments: dict):
         task_desc = arguments.get("task_description", "").lower()
 
         if not task_desc:
-            return [TextContent(type="text", text="Error: task_description is required")]
+            return [
+                TextContent(type="text", text="Error: task_description is required")
+            ]
 
         log(f"Recommending model for: {task_desc[:50]}...")
 
@@ -285,13 +293,17 @@ async def call_tool(name: str, arguments: dict):
                 "Security/audit tasks require Claude's strict, deterministic reasoning."
             )
         elif matched_priority == "P2":
-            output_lines.append("Multimodal/visual tasks benefit from Gemini's image capabilities.")
+            output_lines.append(
+                "Multimodal/visual tasks benefit from Gemini's image capabilities."
+            )
         elif matched_priority == "P3":
             output_lines.append(
                 "Exploratory tasks benefit from Gemini's creative, non-deterministic approach."
             )
         elif matched_priority == "P4":
-            output_lines.append("High-speed/batch tasks are optimized for Gemini Flash.")
+            output_lines.append(
+                "High-speed/batch tasks are optimized for Gemini Flash."
+            )
         else:
             output_lines.append(
                 "No specific task type detected. Default to Claude for precision and consistency."

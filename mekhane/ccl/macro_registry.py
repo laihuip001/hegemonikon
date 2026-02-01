@@ -33,7 +33,10 @@ BUILTIN_MACROS: Dict[str, Macro] = {
         is_builtin=True,
     ),
     "go": Macro(
-        name="go", ccl="/s+_/ene+", description="実行: 詳細戦略から詳細実行へ", is_builtin=True
+        name="go",
+        ccl="/s+_/ene+",
+        description="実行: 詳細戦略から詳細実行へ",
+        is_builtin=True,
     ),
     "osc": Macro(
         name="osc",
@@ -48,7 +51,10 @@ BUILTIN_MACROS: Dict[str, Macro] = {
         is_builtin=True,
     ),
     "plan": Macro(
-        name="plan", ccl="/bou+_/s+_/dia", description="計画策定: 意志→戦略→批判", is_builtin=True
+        name="plan",
+        ccl="/bou+_/s+_/dia",
+        description="計画策定: 意志→戦略→批判",
+        is_builtin=True,
     ),
     "learn": Macro(
         name="learn",

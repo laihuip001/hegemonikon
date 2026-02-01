@@ -49,9 +49,7 @@ def save_state(state: dict):
 def log_entry(entry: dict):
     ensure_dirs()
     timestamp = datetime.datetime.now().isoformat()
-    log_line = (
-        f"[{timestamp}] [{entry.get('type', 'INFO')}] {json.dumps(entry, ensure_ascii=False)}"
-    )
+    log_line = f"[{timestamp}] [{entry.get('type', 'INFO')}] {json.dumps(entry, ensure_ascii=False)}"
 
     with open(LOG_FILE, "a") as f:
         f.write(log_line + "\n")

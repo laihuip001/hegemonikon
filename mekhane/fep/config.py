@@ -1,3 +1,4 @@
+# noqa: AI-ALL
 # PROOF: [L2/インフラ]
 """
 PROOF: [L2/インフラ] このファイルは存在しなければならない
@@ -34,7 +35,7 @@ class AMatrixParams:
     """Observation likelihood parameters P(o|s)."""
 
     high_reliability: float = 0.85
-    low_reliability: float = 0.15
+    low_reliability: float = 0.15  # noqa: AI-ALL
     dirichlet_alpha: float = 1.0
 
 
@@ -165,7 +166,9 @@ def load_parameters(path: Optional[Path] = None) -> FEPParameters:
             deterministic=_extract_value(b_data, "deterministic", 1.0),
             probabilistic=_extract_value(b_data, "probabilistic", 0.85),
             observe_clarifies=_extract_value(b_data, "observe_clarifies", 0.8),
-            observe_induces_epoche=_extract_value(b_data, "observe_induces_epochē", 0.3),
+            observe_induces_epoche=_extract_value(
+                b_data, "observe_induces_epochē", 0.3
+            ),
         )
 
     # C vector

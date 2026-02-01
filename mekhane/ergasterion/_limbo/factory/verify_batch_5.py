@@ -4,7 +4,9 @@ import json
 
 # 1. Read URL list to get expected URLs
 expected_urls = []
-with open(r"C:\Users\raikh\Forge\Raw\aidb\_index\url_list.txt", "r", encoding="utf-8") as f:
+with open(
+    r"C:\Users\raikh\Forge\Raw\aidb\_index\url_list.txt", "r", encoding="utf-8"
+) as f:
     lines = f.readlines()
     # Indices 510 to 594 (0-indexed) correspond to lines 511 to 595 (1-indexed)
     # Line 595 was empty, so up to 594.
@@ -18,7 +20,9 @@ print(f"Expected count: {len(expected_urls)}")
 # 2. Read Manifest to get actual URLs
 actual_urls = set()
 with open(
-    r"C:\Users\raikh\Forge\Raw\aidb\_index\manifest_batch_5.jsonl", "r", encoding="utf-8"
+    r"C:\Users\raikh\Forge\Raw\aidb\_index\manifest_batch_5.jsonl",
+    "r",
+    encoding="utf-8",
 ) as f:
     for line in f:
         if line.strip():

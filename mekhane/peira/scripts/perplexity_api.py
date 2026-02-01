@@ -66,7 +66,12 @@ def load_usage() -> dict:
     """Load usage data."""
     if USAGE_FILE.exists():
         return json.loads(USAGE_FILE.read_text())
-    return {"month": date.today().strftime("%Y-%m"), "total_cost": 0.0, "calls": 0, "history": []}
+    return {
+        "month": date.today().strftime("%Y-%m"),
+        "total_cost": 0.0,
+        "calls": 0,
+        "history": [],
+    }
 
 
 def save_usage(usage: dict):

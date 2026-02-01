@@ -104,7 +104,15 @@ class AIAuditor:
         'adaptive_allocator', 'jules_mcp_server',
     }
     
-    def __init__(self):
+    def __init__(self, strict: bool = False):
+        """
+        Initialize AI Auditor.
+        
+        Args:
+            strict: If True, report all issues (Critical/High/Medium/Low).
+                   If False (default), report only Critical and High issues.
+        """
+        self.strict = strict
         self.issues: List[Issue] = []
         self.source: str = ""
         self.tree: Optional[ast.AST] = None
@@ -151,6 +159,11 @@ class AIAuditor:
         self._check_ai_020_exception_swallowing()
         self._check_ai_021_resource_leak()
         self._check_ai_022_test_coverage_gap()
+        
+        # Filter issues based on strict mode
+        if not self.strict:
+            # In lenient mode, only report Critical and High
+            self.issues = [i for i in self.issues if i.severity in (Severity.CRITICAL, Severity.HIGH)]
         
         return AuditResult(file_path=file_path, issues=self.issues)
     
@@ -1076,10 +1089,10 @@ class AIAuditor:
                         ))
 
 
-def audit_directory(directory: Path, exclude_patterns: Optional[List[str]] = None) -> List[AuditResult]:
+def audit_directory(directory: Path, exclude_patterns: Optional[List[str]] = None, strict: bool = False) -> List[AuditResult]:
     """Audit all Python files in a directory."""
     exclude_patterns = exclude_patterns or ['venv', '__pycache__', '.git', 'node_modules']
-    auditor = AIAuditor()
+    auditor = AIAuditor(strict=strict)
     results = []
     
     for py_file in directory.rglob('*.py'):
@@ -1145,14 +1158,16 @@ if __name__ == "__main__":
     parser.add_argument("path", type=Path, help="File or directory to audit")
     parser.add_argument("--output", "-o", type=Path, help="Output report file")
     parser.add_argument("--verbose", "-v", action="store_true", help="Verbose output")
+    parser.add_argument("--strict", "-s", action="store_true", 
+                       help="Strict mode: report all issues including Low severity")
     args = parser.parse_args()
     
     if args.path.is_file():
-        auditor = AIAuditor()
+        auditor = AIAuditor(strict=args.strict)
         result = auditor.audit_file(args.path)
         results = [result] if result.issues else []
     else:
-        results = audit_directory(args.path)
+        results = audit_directory(args.path, strict=args.strict)
     
     report = format_report(results)
     print(report)

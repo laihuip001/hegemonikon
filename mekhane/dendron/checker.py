@@ -100,6 +100,12 @@ PROOF_PATTERN_V2 = re.compile(r"#\s*PROOF:\s*\[([^\]]+)\](?:\s*<-\s*([^\s#]+))?"
 # 特殊親参照 (バリデーションをスキップ)
 SPECIAL_PARENTS = {"FEP", "external", "legacy"}
 
+# 有効なレベルプレフィックス (v2.2: 厳密検証)
+VALID_LEVEL_PREFIXES = {"L1", "L2", "L3"}
+
+# 最大ファイルサイズ (v2.2: リソース枯渇防止)
+MAX_FILE_SIZE = 10 * 1024 * 1024  # 10MB
+
 # PROOF.md パターン
 PROOF_MD_PATTERN = re.compile(r"^PROOF\.md$", re.IGNORECASE)
 
@@ -153,9 +159,20 @@ class DendronChecker:  # noqa: AI-007
         return True, "OK"
 
     def check_file_proof(self, path: Path) -> FileProof:
-        """ファイルの PROOF ヘッダーをチェック (v2.1: 親参照検証付き)"""
+        """ファイルの PROOF ヘッダーをチェック (v2.2: 強化版)"""
         if self.is_exempt(path):
             return FileProof(path=path, status=ProofStatus.EXEMPT)
+
+        # v2.2: ファイルサイズチェック (リソース枯渇防止)
+        try:
+            file_size = path.stat().st_size
+            if file_size > MAX_FILE_SIZE:
+                return FileProof(
+                    path=path, status=ProofStatus.INVALID,
+                    reason=f"ファイルサイズ超過: {file_size // (1024*1024)}MB > 10MB"
+                )
+        except OSError as e:
+            return FileProof(path=path, status=ProofStatus.INVALID, reason=f"ファイルアクセスエラー: {e}")
 
         try:
             content = path.read_text(encoding="utf-8")
@@ -165,12 +182,25 @@ class DendronChecker:  # noqa: AI-007
         # 最初の 10 行を検索
         lines = content.split("\n")[:10]
         for i, line in enumerate(lines, 1):
+            # v2.2: コードコメント行のみをチェック (docstring内を除外)
+            if not self._is_code_comment(line):
+                continue
+            
             # v2 パターン (親参照付き) を優先
             match_v2 = PROOF_PATTERN_V2.search(line)
             if match_v2:
                 level_str = match_v2.group(1)
                 parent = match_v2.group(2)
                 level = self._parse_level(level_str)
+                
+                # v2.2: レベル検証 (UNKNOWN を拒否)
+                is_valid_level, level_reason = self._validate_level(level)
+                if not is_valid_level:
+                    return FileProof(
+                        path=path, status=ProofStatus.INVALID,
+                        level=level, line_number=i,
+                        reason=f"{level_reason} (入力: {level_str})"
+                    )
                 
                 if parent:
                     parent = parent.strip()
@@ -212,15 +242,32 @@ class DendronChecker:  # noqa: AI-007
         )
 
     def _parse_level(self, level_str: str) -> ProofLevel:  # noqa: AI-007
-        """レベル文字列をパース"""
-        level_str = level_str.upper()
-        if "L1" in level_str:
+        """レベル文字列をパース (v2.2: 厳密検証)"""
+        level_str_upper = level_str.upper()
+        
+        # 厳密検証: L1/L2/L3 で始まる必要がある
+        if level_str_upper.startswith("L1"):
             return ProofLevel.L1
-        elif "L2" in level_str:
+        elif level_str_upper.startswith("L2"):
             return ProofLevel.L2
-        elif "L3" in level_str:
+        elif level_str_upper.startswith("L3"):
             return ProofLevel.L3
         return ProofLevel.UNKNOWN
+    
+    def _is_code_comment(self, line: str) -> bool:
+        """行がコードコメントかどうか (docstring内を除外)
+        
+        v2.2: docstring 内の PROOF を無視するため、
+        行が # で始まるかチェック (前後の空白は許容)
+        """
+        stripped = line.strip()
+        return stripped.startswith("#")
+    
+    def _validate_level(self, level: ProofLevel) -> tuple[bool, str]:
+        """レベルを検証 (v2.2: UNKNOWN を拒否)"""
+        if level == ProofLevel.UNKNOWN:
+            return False, "無効なレベル: L1/L2/L3 のいずれかで始まる必要があります"
+        return True, "OK"
 
     def check(self, root: Path) -> CheckResult:  # noqa: AI-007
         """ディレクトリツリーをチェック"""

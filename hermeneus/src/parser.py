@@ -1,4 +1,4 @@
-# PROOF: [L2/インフラ] CCL パーサー
+# PROOF: [L2/インフラ] <- hermeneus/src/ CCL パーサー
 """
 Hermēneus Parser — CCL 式を AST に変換
 

@@ -1,4 +1,4 @@
-# PROOF: [L2/インフラ] CCL マクロローダー
+# PROOF: [L2/インフラ] <- hermeneus/src/ CCL マクロローダー
 """
 Hermēneus Macro Loader — ccl/macros/ から標準マクロを読み込む
 

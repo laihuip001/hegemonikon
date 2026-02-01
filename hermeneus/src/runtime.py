@@ -1,4 +1,4 @@
-# PROOF: [L2/インフラ] LMQL 実行ランタイム
+# PROOF: [L2/インフラ] <- hermeneus/src/ LMQL 実行ランタイム
 """
 Hermēneus Runtime — LMQL プログラムを実行
 
@@ -196,8 +196,18 @@ class LMQLExecutor:
                 error="Could not extract prompt from LMQL code"
             )
         
-        # コンテキストを挿入
-        full_prompt = prompt.replace("{context}", context)
+        # コンテキストを明示的にプロンプトに追加
+        # (LMQL の {context} プレースホルダーが抽出されない場合があるため)
+        if context and context.strip():
+            full_prompt = f"""## コンテキスト
+{context}
+
+## タスク
+{prompt}
+
+上記のコンテキストに基づいて、タスクを実行してください。"""
+        else:
+            full_prompt = prompt
         
         # プロバイダー検出と実行
         anthropic_key = os.environ.get("ANTHROPIC_API_KEY")
@@ -275,7 +285,7 @@ class LMQLExecutor:
             )
         
         genai.configure(api_key=api_key)
-        model = genai.GenerativeModel("gemini-2.5-pro")
+        model = genai.GenerativeModel("gemini-3-pro-preview")
         
         for attempt in range(self.config.max_retries):
             try:
@@ -290,7 +300,7 @@ class LMQLExecutor:
                     output=output,
                     metadata={
                         "provider": "google",
-                        "model": "gemini-2.5-pro",
+                        "model": "gemini-3-pro-preview",
                         "attempt": attempt + 1,
                         "fallback": True
                     }

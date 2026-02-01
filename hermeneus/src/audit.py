@@ -1,4 +1,4 @@
-# PROOF: [L2/インフラ] 検証履歴永続化 (Audit Trail)
+# PROOF: [L2/インフラ] <- hermeneus/src/ 検証履歴永続化 (Audit Trail)
 """
 Hermēneus Audit — 検証履歴の記録と追跡
 

@@ -1,4 +1,4 @@
-# PROOF: [L2/インフラ] Workflow Registry
+# PROOF: [L2/インフラ] <- hermeneus/src/ Workflow Registry
 """
 Hermēneus Registry — ワークフロー定義管理
 

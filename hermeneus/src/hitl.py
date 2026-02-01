@@ -1,4 +1,4 @@
-# PROOF: [L2/インフラ] HITL コントローラー
+# PROOF: [L2/インフラ] <- hermeneus/src/ HITL コントローラー
 """
 Hermēneus HITL — Human-in-the-Loop 制御
 

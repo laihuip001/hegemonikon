@@ -1,4 +1,4 @@
-# PROOF: [L2/インフラ] Hermēneus エントリーポイント
+# PROOF: [L2/インフラ] <- hermeneus/src/ Hermēneus エントリーポイント
 """
 Hermēneus __main__.py
 

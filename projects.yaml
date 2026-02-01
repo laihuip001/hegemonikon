@@ -1,0 +1,63 @@
+# Hegemonikón Named Projects Registry
+# 名前付きプロジェクトの一元管理
+#
+# フィールド説明:
+#   name: 表示名
+#   description: 一行説明
+#   path: ディレクトリパス (hegemonikon/ からの相対)
+#   status: planning | active | mvp_complete | stable
+#   phase: 現在フェーズ（自由記述）
+#   priority: high (毎回表示) | medium (週1) | low (月1)
+#   updated: 最終更新日 (YYYY-MM-DD)
+#   next_action: 次のアクション (stable は null)
+
+projects:
+  dendron:
+    name: "Dendron"
+    description: "存在証明検証ツール"
+    path: "mekhane/dendron/"
+    status: "mvp_complete"
+    phase: "CI統合"
+    priority: high
+    updated: "2026-02-01"
+    next_action: "git push でリモート反映"
+
+  hermeneus:
+    name: "Hermēneus"
+    description: "CCL→LMQL コンパイラ"
+    path: "hermeneus/"
+    status: "active"
+    phase: "Phase 3: LangGraph"
+    priority: high
+    updated: "2026-02-01"
+    next_action: "Phase 3 実装継続"
+
+  synteleia:
+    name: "Synteleia"
+    description: "6視点認知アンサンブル"
+    path: "mekhane/synteleia/"
+    status: "planning"
+    phase: "設計中"
+    priority: medium
+    updated: "2026-02-01"
+    next_action: "Poiēsis/Dokimasia 実装"
+
+  pythosis:
+    name: "Pythōsis"
+    description: "Python哲学消化"
+    path: "pythosis/"
+    status: "active"
+    phase: "Phase 2"
+    priority: low
+    updated: "2026-01-30"
+    next_action: "ライブラリマッピング継続"
+
+  synergeia:
+    name: "Synergeia"
+    description: "分散AI実行基盤"
+    path: "synergeia/"
+    status: "stable"
+    phase: "運用中"
+    priority: medium
+    updated: "2026-02-01"
+    next_action: null

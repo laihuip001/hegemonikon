@@ -179,6 +179,13 @@ class DendronChecker:  # noqa: AI-007
         except Exception as e:
             return FileProof(path=path, status=ProofStatus.INVALID, reason=f"読み込みエラー: {e}")
 
+        # v2.3: バイナリファイル検出 (NULL バイトチェック)
+        if "\x00" in content:
+            return FileProof(
+                path=path, status=ProofStatus.INVALID,
+                reason="バイナリファイル検出 (NULL バイト含む)"
+            )
+
         # 最初の 10 行を検索
         lines = content.split("\n")[:10]
         for i, line in enumerate(lines, 1):

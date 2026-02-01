@@ -4,7 +4,7 @@ Noēsis Client — O1 Noēsis Instantiation (API Layer)
 
 Philosophical Reference:
     O1 Noēsis (認識): 深い理解、本質把握
-    
+
 Design Principle:
     外部AI (Gemini) との接続層
     = Hegemonikón の認識能力を外部AIに委譲
@@ -23,20 +23,20 @@ logger = logging.getLogger("noesis_client")
 class NoesisClient:
     """
     O1 Noēsis の外部接続層: AI認識の委譲
-    
+
     Philosophical Reference:
         Noēsis (νόησις) = 「純粋思考」「直観的認識」
         外部AIの認識能力を借りて処理を行う
-        
+
     Design Principle:
         Hegemonikón 自身は認識を持たず、
         外部AI（Gemini等）に認識を委譲する
     """
-    
+
     def __init__(self, settings: Dict = None):
         """
         Initialize NoesisClient
-        
+
         Args:
             settings: Configuration with GEMINI_API_KEY, MODEL_FAST, MODEL_SMART
         """
@@ -51,7 +51,7 @@ class NoesisClient:
     def _configure(self):
         """
         API設定
-        
+
         Philosophical Reference:
             外部認識源との接続を確立
         """
@@ -59,10 +59,11 @@ class NoesisClient:
         conf_key = self.settings.get("GEMINI_API_KEY", "").strip()
 
         api_key = env_key or conf_key
-        
+
         if api_key:
             try:
                 from google import genai
+
                 self.client = genai.Client(api_key=api_key)
                 logger.info("O1 Noēsis: External cognition source configured")
             except ImportError:
@@ -75,23 +76,18 @@ class NoesisClient:
         """外部認識源が利用可能か"""
         return self.client is not None
 
-    async def generate_content(
-        self, 
-        text: str, 
-        config: Dict, 
-        model: Optional[str] = None
-    ) -> Dict:
+    async def generate_content(self, text: str, config: Dict, model: Optional[str] = None) -> Dict:
         """
         O1 Noēsis 核心機能: 外部認識の取得
-        
+
         Philosophical Reference:
             外部AIに「認識」を委譲し、結果を受け取る
-            
+
         Args:
             text: 入力テキスト
             config: システムプロンプト等の設定
             model: 使用するモデル
-            
+
         Returns:
             Dict with success, result, error, blocked_reason
         """
@@ -105,7 +101,7 @@ class NoesisClient:
 
         try:
             from google.genai import types
-            
+
             target_model = model or self.settings.get("MODEL_FAST", "gemini-2.0-flash-exp")
             prompt = f"{config.get('system', '')}\n\n[Input]\n{text}"
 
@@ -135,12 +131,7 @@ class NoesisClient:
                         }
 
             result_text = response.text.strip() if response.text else ""
-            return {
-                "success": True, 
-                "result": result_text, 
-                "error": None, 
-                "blocked_reason": None
-            }
+            return {"success": True, "result": result_text, "error": None, "blocked_reason": None}
 
         except Exception as e:
             error_msg = str(e)
@@ -152,14 +143,10 @@ class NoesisClient:
                 "blocked_reason": error_msg,
             }
 
-    def generate_content_stream(
-        self, 
-        text: str, 
-        config: Dict
-    ) -> Generator[str, None, None]:
+    def generate_content_stream(self, text: str, config: Dict) -> Generator[str, None, None]:
         """
         ストリーミング生成
-        
+
         Philosophical Reference:
             認識の段階的な顕現
         """
@@ -169,7 +156,7 @@ class NoesisClient:
 
         try:
             from google.genai import types
-            
+
             model = self.settings.get("MODEL_FAST", "gemini-2.0-flash-exp")
             prompt = f"{config.get('system', '')}\n\n[Input]\n{text}"
 

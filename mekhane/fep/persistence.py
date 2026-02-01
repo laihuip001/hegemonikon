@@ -39,14 +39,14 @@ def ensure_persistence_dir() -> None:
 
 def save_A(agent: "HegemonikónFEPAgent", path: Optional[Path] = None) -> Path:
     """Save learned A matrix to file.
-    
+
     Args:
         agent: The FEP agent whose A matrix to save
         path: Optional custom path (defaults to LEARNED_A_PATH)
-        
+
     Returns:
         Path where the A matrix was saved
-        
+
     Example:
         >>> from mekhane.fep import HegemonikónFEPAgent
         >>> from mekhane.fep.persistence import save_A
@@ -56,44 +56,44 @@ def save_A(agent: "HegemonikónFEPAgent", path: Optional[Path] = None) -> Path:
     """
     target_path = path or LEARNED_A_PATH
     ensure_persistence_dir()
-    
+
     # Get A matrix from pymdp agent
     A = agent.agent.A
-    
+
     # Save as numpy array
     np.save(str(target_path), A)
-    
+
     return target_path
 
 
 def load_A(path: Optional[Path] = None) -> Optional[np.ndarray]:
     """Load A matrix from file.
-    
+
     Args:
         path: Optional custom path (defaults to LEARNED_A_PATH)
-        
+
     Returns:
         Loaded A matrix, or None if file doesn't exist
-        
+
     Example:
         >>> from mekhane.fep.persistence import load_A, A_exists
         >>> if A_exists():
         ...     A = load_A()
     """
     target_path = path or LEARNED_A_PATH
-    
+
     if not target_path.exists():
         return None
-    
+
     return np.load(str(target_path), allow_pickle=True)
 
 
 def A_exists(path: Optional[Path] = None) -> bool:
     """Check if a saved A matrix exists.
-    
+
     Args:
         path: Optional custom path (defaults to LEARNED_A_PATH)
-        
+
     Returns:
         True if the file exists
     """
@@ -103,15 +103,15 @@ def A_exists(path: Optional[Path] = None) -> bool:
 
 def delete_A(path: Optional[Path] = None) -> bool:
     """Delete saved A matrix.
-    
+
     Args:
         path: Optional custom path (defaults to LEARNED_A_PATH)
-        
+
     Returns:
         True if deletion was successful
     """
     target_path = path or LEARNED_A_PATH
-    
+
     if target_path.exists():
         target_path.unlink()
         return True

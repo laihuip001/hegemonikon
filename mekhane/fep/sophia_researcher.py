@@ -31,28 +31,31 @@ from enum import Enum
 
 class SophiaDerivative(Enum):
     """K4 Sophia の派生モード"""
-    ACADEMIC = "acad"   # 学術的調査
+
+    ACADEMIC = "acad"  # 学術的調査
     TECHNICAL = "tech"  # 技術的調査
-    SOCIAL = "soci"     # 社会的調査
+    SOCIAL = "soci"  # 社会的調査
 
 
 class ResearchDepth(Enum):
     """調査深度"""
-    SURFACE = "surface"     # 表層 (概要のみ)
-    STANDARD = "standard"   # 標準 (詳細)
-    DEEP = "deep"           # 深層 (専門家レベル)
+
+    SURFACE = "surface"  # 表層 (概要のみ)
+    STANDARD = "standard"  # 標準 (詳細)
+    DEEP = "deep"  # 深層 (専門家レベル)
 
 
 @dataclass
 class ResearchQuery:
     """調査クエリ
-    
+
     Attributes:
         topic: 調査トピック
         questions: 具体的な問い
         sources: 推奨ソース
         constraints: 制約 (期間、言語など)
     """
+
     topic: str
     questions: List[str]
     sources: List[str] = field(default_factory=list)
@@ -62,7 +65,7 @@ class ResearchQuery:
 @dataclass
 class SophiaResult:
     """K4 Sophia 調査結果
-    
+
     Attributes:
         topic: 調査トピック
         derivative: 派生モード
@@ -70,6 +73,7 @@ class SophiaResult:
         query: 生成された調査クエリ
         estimated_time_minutes: 推定調査時間
     """
+
     topic: str
     derivative: SophiaDerivative
     depth: ResearchDepth
@@ -84,34 +88,34 @@ def research(
     specific_questions: Optional[List[str]] = None,
 ) -> SophiaResult:
     """K4 Sophia: 調査クエリを生成
-    
+
     Args:
         topic: 調査トピック
         derivative: 派生モード
         depth: 調査深度
         specific_questions: 具体的な問い
-        
+
     Returns:
         SophiaResult
     """
     topic_lower = topic.lower()
-    
+
     # 派生自動推論
     if derivative is None:
-        if any(w in topic_lower for w in ['論文', '研究', 'paper', 'research', 'study']):
+        if any(w in topic_lower for w in ["論文", "研究", "paper", "research", "study"]):
             derivative = SophiaDerivative.ACADEMIC
-        elif any(w in topic_lower for w in ['実装', 'api', 'ライブラリ', 'framework']):
+        elif any(w in topic_lower for w in ["実装", "api", "ライブラリ", "framework"]):
             derivative = SophiaDerivative.TECHNICAL
         else:
             derivative = SophiaDerivative.SOCIAL
-    
+
     # ソース推奨
     sources_map = {
         SophiaDerivative.ACADEMIC: ["arXiv", "Google Scholar", "Semantic Scholar"],
         SophiaDerivative.TECHNICAL: ["GitHub", "Stack Overflow", "Official Docs"],
         SophiaDerivative.SOCIAL: ["X/Twitter", "Reddit", "HackerNews"],
     }
-    
+
     # 問い生成
     if specific_questions:
         questions = specific_questions
@@ -121,21 +125,21 @@ def research(
             f"{topic}の最新動向は？",
             f"{topic}のベストプラクティスは？",
         ]
-    
+
     # 推定時間
     time_map = {
         ResearchDepth.SURFACE: 15,
         ResearchDepth.STANDARD: 30,
         ResearchDepth.DEEP: 60,
     }
-    
+
     query = ResearchQuery(
         topic=topic,
         questions=questions,
         sources=sources_map[derivative],
         constraints={"depth": depth.value},
     )
-    
+
     return SophiaResult(
         topic=topic,
         derivative=derivative,
@@ -156,11 +160,13 @@ def format_sophia_markdown(result: SophiaResult) -> str:
     ]
     for q in result.query.questions[:3]:
         lines.append(f"│   • {q[:40]}")
-    lines.extend([
-        f"│ ソース: {', '.join(result.query.sources[:3])}",
-        f"│ 推定時間: {result.estimated_time_minutes}分",
-        "└──────────────────────────────────────────────────┘",
-    ])
+    lines.extend(
+        [
+            f"│ ソース: {', '.join(result.query.sources[:3])}",
+            f"│ 推定時間: {result.estimated_time_minutes}分",
+            "└──────────────────────────────────────────────────┘",
+        ]
+    )
     return "\n".join(lines)
 
 
@@ -173,13 +179,13 @@ def encode_sophia_observation(result: SophiaResult) -> dict:
         ResearchDepth.DEEP: 0.8,
     }
     confidence = depth_map[result.depth]
-    
+
     # 問いの数 → context_clarity
     context_clarity = min(1.0, len(result.query.questions) * 0.2)
-    
+
     # 調査時間 → urgency (長い調査は低urgency)
     urgency = max(0.1, 1.0 - result.estimated_time_minutes * 0.01)
-    
+
     return {
         "context_clarity": context_clarity,
         "urgency": urgency,

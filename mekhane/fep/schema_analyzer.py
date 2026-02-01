@@ -30,29 +30,31 @@ from dataclasses import dataclass, field
 from typing import Optional, List, Dict, Any
 from enum import Enum
 
-
 # =============================================================================
 # S1 Metron (尺度・スケール)
 # =============================================================================
 
+
 class MetronDerivative(Enum):
     """S1 Metron の派生モード"""
-    CONTINUOUS = "cont"   # 連続量
-    DISCRETE = "disc"     # 離散量
-    ABSTRACT = "abst"     # 抽象度
+
+    CONTINUOUS = "cont"  # 連続量
+    DISCRETE = "disc"  # 離散量
+    ABSTRACT = "abst"  # 抽象度
 
 
 class ScaleLevel(Enum):
     """スケールレベル"""
-    MICRO = "micro"   # 極小
-    MESO = "meso"     # 中間
-    MACRO = "macro"   # 広域
+
+    MICRO = "micro"  # 極小
+    MESO = "meso"  # 中間
+    MACRO = "macro"  # 広域
 
 
 @dataclass
 class MetronResult:
     """S1 Metron 評価結果
-    
+
     Attributes:
         subject: 評価対象
         derivative: 派生モード
@@ -60,6 +62,7 @@ class MetronResult:
         granularity: 粒度 (0.0 粗い - 1.0 細かい)
         recommendation: 推奨スケール
     """
+
     subject: str
     derivative: MetronDerivative
     scale: ScaleLevel
@@ -72,38 +75,38 @@ def analyze_scale(
     derivative: Optional[MetronDerivative] = None,
 ) -> MetronResult:
     """S1 Metron: スケールを分析
-    
+
     Args:
         subject: 評価対象
         derivative: 派生モード
-        
+
     Returns:
         MetronResult
     """
     subj_lower = subject.lower()
-    
+
     # 派生自動推論
     if derivative is None:
-        if any(w in subj_lower for w in ['連続', '流れ', 'continuous', 'flow']):
+        if any(w in subj_lower for w in ["連続", "流れ", "continuous", "flow"]):
             derivative = MetronDerivative.CONTINUOUS
-        elif any(w in subj_lower for w in ['個数', 'カウント', 'discrete', 'count']):
+        elif any(w in subj_lower for w in ["個数", "カウント", "discrete", "count"]):
             derivative = MetronDerivative.DISCRETE
         else:
             derivative = MetronDerivative.ABSTRACT
-    
+
     # スケール推論
-    if any(w in subj_lower for w in ['全体', 'システム', 'macro', 'global']):
+    if any(w in subj_lower for w in ["全体", "システム", "macro", "global"]):
         scale = ScaleLevel.MACRO
         granularity = 0.3
-    elif any(w in subj_lower for w in ['部分', 'モジュール', 'meso', 'module']):
+    elif any(w in subj_lower for w in ["部分", "モジュール", "meso", "module"]):
         scale = ScaleLevel.MESO
         granularity = 0.5
     else:
         scale = ScaleLevel.MICRO
         granularity = 0.8
-    
+
     recommendation = f"{scale.value}スケールで{derivative.value}的に評価"
-    
+
     return MetronResult(
         subject=subject,
         derivative=derivative,
@@ -117,30 +120,34 @@ def analyze_scale(
 # S3 Stathmos (基準・評価基準)
 # =============================================================================
 
+
 class StathmosDerivative(Enum):
     """S3 Stathmos の派生モード"""
-    NORMATIVE = "norm"    # 規範的基準
-    EMPIRICAL = "empi"    # 経験的基準
-    RELATIVE = "rela"     # 相対的基準
+
+    NORMATIVE = "norm"  # 規範的基準
+    EMPIRICAL = "empi"  # 経験的基準
+    RELATIVE = "rela"  # 相対的基準
 
 
 class CriterionPriority(Enum):
     """基準の優先度"""
-    MUST = "must"       # 必須
-    SHOULD = "should"   # 期待
-    COULD = "could"     # 理想
+
+    MUST = "must"  # 必須
+    SHOULD = "should"  # 期待
+    COULD = "could"  # 理想
 
 
 @dataclass
 class StathmosResult:
     """S3 Stathmos 評価結果
-    
+
     Attributes:
         subject: 評価対象
         derivative: 派生モード
         criteria: 基準リスト (優先度付き)
         benchmark: ベンチマーク
     """
+
     subject: str
     derivative: StathmosDerivative
     criteria: Dict[CriterionPriority, List[str]]
@@ -155,38 +162,38 @@ def define_criteria(
     derivative: Optional[StathmosDerivative] = None,
 ) -> StathmosResult:
     """S3 Stathmos: 評価基準を定義
-    
+
     Args:
         subject: 評価対象
         must: 必須基準
         should: 期待基準
         could: 理想基準
         derivative: 派生モード
-        
+
     Returns:
         StathmosResult
     """
     subj_lower = subject.lower()
-    
+
     # 派生自動推論
     if derivative is None:
-        if any(w in subj_lower for w in ['規則', 'ルール', 'rule', 'standard']):
+        if any(w in subj_lower for w in ["規則", "ルール", "rule", "standard"]):
             derivative = StathmosDerivative.NORMATIVE
-        elif any(w in subj_lower for w in ['実験', 'データ', 'empirical', 'test']):
+        elif any(w in subj_lower for w in ["実験", "データ", "empirical", "test"]):
             derivative = StathmosDerivative.EMPIRICAL
         else:
             derivative = StathmosDerivative.RELATIVE
-    
+
     criteria = {
         CriterionPriority.MUST: must or [],
         CriterionPriority.SHOULD: should or [],
         CriterionPriority.COULD: could or [],
     }
-    
+
     # ベンチマーク生成
     total = sum(len(v) for v in criteria.values())
     benchmark = f"{total}基準 ({len(must or [])} must)"
-    
+
     return StathmosResult(
         subject=subject,
         derivative=derivative,
@@ -199,9 +206,11 @@ def define_criteria(
 # S4 Praxis (実践・価値実現)
 # =============================================================================
 
+
 class PraxisDerivative(Enum):
     """S4 Praxis の派生モード (Aristotle)"""
-    PRAXIS = "prax"   # 内在目的 (行為自体が目的)
+
+    PRAXIS = "prax"  # 内在目的 (行為自体が目的)
     POIESIS = "pois"  # 外的産出 (成果物を作る)
     TEMPORAL = "temp"  # 時間構造 (いつ実行するか)
 
@@ -209,7 +218,7 @@ class PraxisDerivative(Enum):
 @dataclass
 class PraxisResult:
     """S4 Praxis 評価結果
-    
+
     Attributes:
         action: 行動
         derivative: 派生モード
@@ -217,6 +226,7 @@ class PraxisResult:
         realization_path: 実現経路
         intrinsic_value: 内在価値があるか
     """
+
     action: str
     derivative: PraxisDerivative
     value_type: str
@@ -230,23 +240,23 @@ def plan_praxis(
     steps: Optional[List[str]] = None,
 ) -> PraxisResult:
     """S4 Praxis: 実践を計画
-    
+
     Args:
         action: 行動
         derivative: 派生モード
         steps: 実現ステップ
-        
+
     Returns:
         PraxisResult
     """
     action_lower = action.lower()
-    
+
     # 派生自動推論
     if derivative is None:
-        if any(w in action_lower for w in ['学習', '成長', 'learn', 'practice']):
+        if any(w in action_lower for w in ["学習", "成長", "learn", "practice"]):
             derivative = PraxisDerivative.PRAXIS
             intrinsic = True
-        elif any(w in action_lower for w in ['作成', '構築', 'build', 'create']):
+        elif any(w in action_lower for w in ["作成", "構築", "build", "create"]):
             derivative = PraxisDerivative.POIESIS
             intrinsic = False
         else:
@@ -254,14 +264,14 @@ def plan_praxis(
             intrinsic = False
     else:
         intrinsic = derivative == PraxisDerivative.PRAXIS
-    
+
     # 価値タイプ
     value_type = {
         PraxisDerivative.PRAXIS: "内在的価値",
         PraxisDerivative.POIESIS: "外在的価値",
         PraxisDerivative.TEMPORAL: "時間的価値",
     }[derivative]
-    
+
     return PraxisResult(
         action=action,
         derivative=derivative,
@@ -274,6 +284,7 @@ def plan_praxis(
 # =============================================================================
 # Formatting
 # =============================================================================
+
 
 def format_metron_markdown(result: MetronResult) -> str:
     """S1 Metron 結果をMarkdown形式でフォーマット"""
@@ -299,10 +310,12 @@ def format_stathmos_markdown(result: StathmosResult) -> str:
     for priority, items in result.criteria.items():
         if items:
             lines.append(f"│ {priority.value.upper()}: {', '.join(items[:3])}")
-    lines.extend([
-        f"│ ベンチマーク: {result.benchmark}",
-        "└──────────────────────────────────────────────────┘",
-    ])
+    lines.extend(
+        [
+            f"│ ベンチマーク: {result.benchmark}",
+            "└──────────────────────────────────────────────────┘",
+        ]
+    )
     return "\n".join(lines)
 
 
@@ -324,6 +337,7 @@ def format_praxis_markdown(result: PraxisResult) -> str:
 # FEP Integration
 # =============================================================================
 
+
 def encode_schema_observation(
     metron: Optional[MetronResult] = None,
     stathmos: Optional[StathmosResult] = None,
@@ -333,20 +347,20 @@ def encode_schema_observation(
     context_clarity = 0.5
     urgency = 0.3
     confidence = 0.5
-    
+
     # Metron: 粒度 → context_clarity
     if metron:
         context_clarity = metron.granularity
-    
+
     # Stathmos: 基準数 → confidence
     if stathmos:
         total = sum(len(v) for v in stathmos.criteria.values())
         confidence = min(1.0, total * 0.15)
-    
+
     # Praxis: 内在価値 → urgency (低urgency = 急がなくてよい)
     if praxis:
         urgency = 0.3 if praxis.intrinsic_value else 0.6
-    
+
     return {
         "context_clarity": context_clarity,
         "urgency": urgency,

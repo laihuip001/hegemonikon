@@ -25,15 +25,13 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+
 class VaultManager:
     """Manages secure file operations for the Vault."""
 
     @staticmethod
     def write_safe(
-        filepath: Union[str, Path],
-        content: str,
-        encoding: str = "utf-8",
-        backup: bool = True
+        filepath: Union[str, Path], content: str, encoding: str = "utf-8", backup: bool = True
     ) -> Path:
         """
         Writes content to a file safely with backup and atomic constraints.
@@ -67,7 +65,7 @@ class VaultManager:
         tmp_path = None
         try:
             with tempfile.NamedTemporaryFile(
-                mode='w',
+                mode="w",
                 dir=target_path.parent,
                 delete=False,
                 # NOTE: Removed self-assignment: encoding = encoding
@@ -90,10 +88,7 @@ class VaultManager:
             raise IOError(f"Failed to write file safely: {e}")
 
     @staticmethod
-    def read_safe(
-        filepath: Union[str, Path],
-        encoding: str = "utf-8"
-    ) -> str:
+    def read_safe(filepath: Union[str, Path], encoding: str = "utf-8") -> str:
         """
         Reads content from a file safely.
         If reading the primary file fails, attempts to read from the backup (.bak).
@@ -115,7 +110,7 @@ class VaultManager:
         # Attempt 1: Read original
         if target_path.exists():
             try:
-                with open(target_path, 'r', encoding=encoding) as f:
+                with open(target_path, "r", encoding=encoding) as f:
                     return f.read()
             except Exception as e:
                 logger.error(f"Failed to read {target_path}: {e}")
@@ -123,13 +118,13 @@ class VaultManager:
                     raise IOError(f"Failed to read {target_path} and no backup found: {e}")
                 # Fallthrough to backup
         elif not backup_path.exists():
-             raise FileNotFoundError(f"File not found: {target_path}")
+            raise FileNotFoundError(f"File not found: {target_path}")
 
         # Attempt 2: Read backup
         if backup_path.exists():
             logger.warning(f"Attempting to read from backup: {backup_path}")
             try:
-                with open(backup_path, 'r', encoding=encoding) as f:
+                with open(backup_path, "r", encoding=encoding) as f:
                     return f.read()
             except Exception as e:
                 raise IOError(f"Failed to read backup {backup_path}: {e}")

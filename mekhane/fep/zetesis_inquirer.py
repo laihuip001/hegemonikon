@@ -31,27 +31,29 @@ from enum import Enum
 
 class ZetesisDerivative(Enum):
     """O3 Zētēsis の派生モード"""
-    DEEP = "deep"     # 深層探求 (Five Whys)
-    WIDE = "wide"     # 広域探索 (横展開)
-    PIVOT = "pivot"   # 転換 (前提破壊)
+
+    DEEP = "deep"  # 深層探求 (Five Whys)
+    WIDE = "wide"  # 広域探索 (横展開)
+    PIVOT = "pivot"  # 転換 (前提破壊)
 
 
 class QuestionType(Enum):
     """問いの種類"""
-    WHAT = "what"       # 何？
-    WHY = "why"         # なぜ？
-    HOW = "how"         # どうやって？
-    WHEN = "when"       # いつ？
-    WHO = "who"         # 誰？
-    WHERE = "where"     # どこ？
-    WHICH = "which"     # どれ？
-    IF = "if"           # もし〜なら？
+
+    WHAT = "what"  # 何？
+    WHY = "why"  # なぜ？
+    HOW = "how"  # どうやって？
+    WHEN = "when"  # いつ？
+    WHO = "who"  # 誰？
+    WHERE = "where"  # どこ？
+    WHICH = "which"  # どれ？
+    IF = "if"  # もし〜なら？
 
 
 @dataclass
 class ZetesisResult:
     """O3 Zētēsis 探求結果
-    
+
     Attributes:
         topic: 探求対象
         derivative: 派生モード
@@ -60,18 +62,19 @@ class ZetesisResult:
         depth: 探求深度
         insights: 発見した洞察
     """
+
     topic: str
     derivative: ZetesisDerivative
     seed_question: str
     generated_questions: List[str]
     depth: int
     insights: List[str] = field(default_factory=list)
-    
+
     @property
     def question_count(self) -> int:
         """生成した問いの数"""
         return len(self.generated_questions)
-    
+
     @property
     def has_insight(self) -> bool:
         """洞察があるか"""
@@ -118,30 +121,30 @@ def inquire(
     depth: int = 3,
 ) -> ZetesisResult:
     """O3 Zētēsis: 探求を実行
-    
+
     Args:
         topic: 探求対象
         seed_question: 種となる問い (None で自動生成)
         derivative: 派生モード (None で自動推論)
         depth: 探求深度
-        
+
     Returns:
         ZetesisResult
     """
     seed = seed_question or f"{topic}とは何か？"
-    
+
     # 派生自動推論
     if derivative is None:
         topic_lower = topic.lower()
-        if any(w in topic_lower for w in ['なぜ', '原因', 'why', 'root']):
+        if any(w in topic_lower for w in ["なぜ", "原因", "why", "root"]):
             derivative = ZetesisDerivative.DEEP
-        elif any(w in topic_lower for w in ['他', '代替', 'alternative', 'other']):
+        elif any(w in topic_lower for w in ["他", "代替", "alternative", "other"]):
             derivative = ZetesisDerivative.WIDE
-        elif any(w in topic_lower for w in ['前提', '仮定', 'assumption', 'if']):
+        elif any(w in topic_lower for w in ["前提", "仮定", "assumption", "if"]):
             derivative = ZetesisDerivative.PIVOT
         else:
             derivative = ZetesisDerivative.DEEP
-    
+
     # 問い生成
     if derivative == ZetesisDerivative.DEEP:
         questions = _generate_five_whys(topic, seed)[:depth]
@@ -149,12 +152,12 @@ def inquire(
         questions = _generate_wide_questions(topic, seed)[:depth]
     else:
         questions = _generate_pivot_questions(topic, seed)[:depth]
-    
+
     # 洞察抽出 (簡略版)
     insights = []
     if len(questions) >= 3:
         insights.append(f"{topic}について{len(questions)}つの問いを発見")
-    
+
     return ZetesisResult(
         topic=topic,
         derivative=derivative,
@@ -188,10 +191,10 @@ def encode_zetesis_observation(result: ZetesisResult) -> dict:
     """FEP観察空間へのエンコード"""
     # 深度 → confidence
     confidence = min(1.0, result.depth * 0.2)
-    
+
     # 問いの数 → context_clarity
     context_clarity = min(1.0, result.question_count * 0.15)
-    
+
     # 派生 → urgency
     urgency_map = {
         ZetesisDerivative.DEEP: 0.5,
@@ -199,7 +202,7 @@ def encode_zetesis_observation(result: ZetesisResult) -> dict:
         ZetesisDerivative.PIVOT: 0.7,
     }
     urgency = urgency_map[result.derivative]
-    
+
     return {
         "context_clarity": context_clarity,
         "urgency": urgency,

@@ -3,4 +3,4 @@
 
 from .validators import CCLOutputValidator, ValidationResult, ValidationError
 
-__all__ = ['CCLOutputValidator', 'ValidationResult', 'ValidationError']
+__all__ = ["CCLOutputValidator", "ValidationResult", "ValidationError"]

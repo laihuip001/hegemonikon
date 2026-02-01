@@ -5,7 +5,7 @@ Epochē Shield — A2 Krisis (Epochē) Instantiation
 Philosophical Reference:
     A2 Krisis (判定力): 判断を下す能力
     Epochē (判断停止): 判断を一時保留し、安全側に倒す
-    
+
 Design Principle:
     外部API送信前にPIIをマスク → 判断を「保留」した状態で通信
     レスポンス後にアンマスク → 判断を「再開」
@@ -22,7 +22,7 @@ from typing import Dict, List, Tuple, Optional
 class EpocheScanner:
     """
     A2 Krisis の偵察機能: リスク検知
-    
+
     Philosophical Reference:
         判断を下す前に「何を判断すべきか」を明確にする
         = リスクの可視化
@@ -47,7 +47,7 @@ class EpocheScanner:
             # 日本住所
             "JP_ADDRESS": r"(?:東京都|北海道|(?:京都|大阪)府|[^\s]{2,3}県)[^\s]{2,}[市区町村]",
         }
-        
+
         # 機密キーワード（H3 Orexis: 保護すべき欲求）
         self.sensitive_keywords = [
             "CONFIDENTIAL",
@@ -64,12 +64,12 @@ class EpocheScanner:
     def scan(self, text: str) -> Dict:
         """
         リスクスキャン: PIIとセンシティブキーワードを検出
-        
+
         Philosophical Reference:
             O3 Zētēsis (探求): 何が問題かを探し出す
         """
         findings = {}
-        
+
         # Regex パターンマッチ
         for p_type, pattern in self.patterns.items():
             matches = re.findall(pattern, text)
@@ -88,7 +88,7 @@ class EpocheScanner:
     def check_deny_list(self, text: str) -> Tuple[bool, Optional[str]]:
         """
         厳格な拒否リストチェック
-        
+
         Philosophical Reference:
             A2 Krisis の最終防衛ライン
             これに引っかかったら即座にEpochē発動
@@ -103,34 +103,34 @@ class EpocheScanner:
 class EpocheShield:
     """
     A2 Krisis (Epochē) の防御機能: PIIマスキング
-    
+
     Philosophical Reference:
         Epochē = 判断停止
         外部に送信する前に、判断を「保留」した状態にする
         = PIIをプレースホルダに置換
-        
+
         レスポンス後、判断を「再開」
         = プレースホルダを元の値に復元
-    
+
     Design Principle:
         「判断を保留した状態で外部と通信する」
         これにより、外部が判断材料（PII）を得ることを防ぐ
     """
-    
+
     def __init__(self):
         self.scanner = EpocheScanner()
 
     def mask(self, text: str, use_custom_vocab: bool = True) -> Tuple[str, Dict[str, str]]:
         """
         Epochē 発動: PIIをプレースホルダに置換
-        
+
         Philosophical Reference:
             判断を保留 → 外部に送信可能な状態にする
-        
+
         Args:
             text: 入力テキスト
             use_custom_vocab: カスタム語彙も使用するか
-            
+
         Returns:
             (masked_text, mapping): マスク済みテキストと復元用マッピング
         """
@@ -154,6 +154,7 @@ class EpocheShield:
         if use_custom_vocab:
             try:
                 from .vocab_store import get_vocab_store
+
                 store = get_vocab_store()
                 custom_terms = store.find_in_text(masked_text)
                 for term in custom_terms:
@@ -170,7 +171,7 @@ class EpocheShield:
     def unmask(self, text: str, mapping: Dict[str, str]) -> str:
         """
         Epochē 解除: プレースホルダを元のPIIに復元
-        
+
         Philosophical Reference:
             判断を再開 → 外部からのレスポンスを元の文脈に戻す
         """

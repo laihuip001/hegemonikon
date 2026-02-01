@@ -24,28 +24,30 @@ import os
 @dataclass
 class VectorStoreConfig:
     """ベクトルストア設定"""
-    
+
     # アダプタ選択
     adapter: Literal["hnswlib", "faiss", "sqlite-vss", "lancedb"] = "hnswlib"
-    
+
     # 共通
     dimension: int = 384  # BGE-small default
-    
+
     # パス
-    base_path: Path = field(default_factory=lambda: Path(
-        os.environ.get("SYMPLOKE_DATA", "/home/laihuip001/oikos/mneme/indices")
-    ))
-    
+    base_path: Path = field(
+        default_factory=lambda: Path(
+            os.environ.get("SYMPLOKE_DATA", "/home/laihuip001/oikos/mneme/indices")
+        )
+    )
+
     # hnswlib固有
     hnsw_M: int = 16
     hnsw_ef_construction: int = 200
     hnsw_ef: int = 256
     hnsw_max_elements: int = 1_000_000
-    
+
     # faiss固有
     faiss_nlist: int = 4096
     faiss_nprobe: int = 256
-    
+
     def __post_init__(self):
         if isinstance(self.base_path, str):
             self.base_path = Path(self.base_path)
@@ -55,12 +57,12 @@ class VectorStoreConfig:
 @dataclass
 class EmbedderConfig:
     """埋め込みモデル設定"""
-    
+
     model_type: Literal["bge-small", "openai", "sentence-transformers"] = "bge-small"
     model_path: Optional[Path] = None
     dimension: int = 384  # BGE-small default
     batch_size: int = 32
-    
+
     def __post_init__(self):
         if self.model_path is None and self.model_type == "bge-small":
             # デフォルトパス
@@ -70,14 +72,14 @@ class EmbedderConfig:
 @dataclass
 class SymplokeConfig:
     """統合設定"""
-    
+
     vector_store: VectorStoreConfig = field(default_factory=VectorStoreConfig)
     embedder: EmbedderConfig = field(default_factory=EmbedderConfig)
-    
+
     # 検索設定
     default_k: int = 10
     rerank: bool = False
-    
+
     @classmethod
     def from_env(cls) -> "SymplokeConfig":
         """環境変数から設定を読み込み"""
@@ -88,5 +90,5 @@ class SymplokeConfig:
             ),
             embedder=EmbedderConfig(
                 model_type=os.environ.get("SYMPLOKE_EMBEDDER", "bge-small"),
-            )
+            ),
         )

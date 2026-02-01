@@ -6,10 +6,12 @@ from pathlib import Path
 import pytest
 from mekhane.anamnesis.vault import VaultManager
 
+
 @pytest.fixture
 def test_dir():
     with tempfile.TemporaryDirectory() as d:
         yield Path(d)
+
 
 def test_write_new_file(test_dir):
     """Test writing a new file."""
@@ -20,6 +22,7 @@ def test_write_new_file(test_dir):
 
     assert file_path.exists()
     assert file_path.read_text(encoding="utf-8") == content
+
 
 def test_write_overwrite_backup(test_dir):
     """Test overwriting an existing file creates a backup."""
@@ -37,6 +40,7 @@ def test_write_overwrite_backup(test_dir):
     assert backup_path.exists()
     assert backup_path.read_text(encoding="utf-8") == content1
 
+
 def test_read_safe(test_dir):
     """Test reading a file safely."""
     file_path = test_dir / "read_test.txt"
@@ -46,6 +50,7 @@ def test_read_safe(test_dir):
     read_content = VaultManager.read_safe(file_path)
 
     assert read_content == content
+
 
 def test_read_backup_when_main_missing(test_dir):
     """Test reading from backup when main file is missing."""
@@ -68,6 +73,7 @@ def test_read_backup_when_main_missing(test_dir):
     # Should read from backup
     read_content = VaultManager.read_safe(file_path)
     assert read_content == content
+
 
 def test_read_fail_no_file(test_dir):
     """Test reading a non-existent file fails."""

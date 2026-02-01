@@ -17,7 +17,7 @@ if not backups:
     print("No backups found!")
     exit(1)
 
-LATEST_BACKUP = backups[-1] # 一番新しいバックアップ (さっき全退避したもの)
+LATEST_BACKUP = backups[-1]  # 一番新しいバックアップ (さっき全退避したもの)
 CONV_DIR = Path(r"M:\.gemini\antigravity\conversations")
 ARCHIVE_DIR = Path(r"M:\.gemini\antigravity\archive")
 
@@ -38,10 +38,10 @@ for pb_file in LATEST_BACKUP.glob("*.pb"):
         print(f"Skipping archived file: {pb_file.name}")
         skipped_count += 1
         continue
-    
+
     # サイズチェック（念のため）
     size = pb_file.stat().st_size
-    if size > 20 * 1024 * 1024: # 20MB
+    if size > 20 * 1024 * 1024:  # 20MB
         print(f"Skipping HUGE file found in backup: {pb_file.name} ({size/1024/1024:.1f} MB)")
         skipped_count += 1
         continue

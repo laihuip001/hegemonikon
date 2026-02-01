@@ -4,7 +4,7 @@ Energeia Core — O4 Energeia Instantiation
 
 Philosophical Reference:
     O4 Energeia (行為): 意志を現実に具現化する
-    
+
 Design Principle:
     統一された行動層として、全ての処理パイプラインを統括
     = 認識 (O1) → 意志 (O2) → 探求 (O3) → 行為 (O4) の最終段階
@@ -35,33 +35,33 @@ logger = logging.getLogger("energeia_core")
 class EnergeiaCoreResolver:
     """
     O4 Energeia の中枢: 意志を現実化する統一行動層
-    
+
     Philosophical Reference:
         Energeia (ἐνέργεια) = 「活動中の状態」「現実態」
         Aristotle: 可能態 (dynamis) → 現実態 (energeia)
-        
+
     Design Principle:
         全ての処理パイプラインを統括し、入力を出力に変換する
         = 意志の具現化
-    
+
     Component Mapping:
         - MetronResolver: S1 Metron (スケール決定)
         - EpocheShield: A2 Krisis (PII保護)
         - EukairiaRouter: K1 Eukairia (モデル選択)
         - DoxaCache: H4 Doxa (キャッシュ)
     """
-    
+
     def __init__(self, settings: Any = None):
         """
         Initialize EnergeiaCoreResolver
-        
+
         Args:
             settings: Configuration object (optional, uses defaults if None)
         """
         self.metron_resolver = MetronResolver()
         self.epoche_shield = EpocheShield()
         self.settings = settings or self._default_settings()
-        
+
         # Lazy imports for optional components
         self._cache_manager = None
         self._gemini_client = None
@@ -79,11 +79,11 @@ class EnergeiaCoreResolver:
     def _select_model(self, text: str, metron_level: int) -> str:
         """
         K1 Eukairia: Model selection based on timing/context
-        
+
         Philosophical Reference:
             Eukairia (εὐκαιρία) = 「好機」「適切な時」
             「今がスマートモデルを使う好機か」を判定
-        
+
         Decision Logic:
             - Deep level (100) → Always Smart (深い認識が必要)
             - Long text → Smart (複雑な処理が必要)
@@ -98,32 +98,31 @@ class EnergeiaCoreResolver:
     async def process(self, text: str, metron_level: int = 60) -> Dict:
         """
         O4 Energeia 核心機能: 処理パイプラインの実行
-        
+
         Philosophical Reference:
             入力 (dynamis) → 出力 (energeia)
             可能態から現実態への変換
-        
+
         Pipeline:
             1. S1 Metron: レベル解決
             2. A2 Epochē: PII マスキング
             3. K1 Eukairia: モデル選択
             4. O1 Noēsis: AI生成 (外部API)
             5. A2 Epochē (解除): PII アンマスキング
-        
+
         Args:
             text: 入力テキスト
             metron_level: 処理レベル (0-100)
-            
+
         Returns:
             Dict with result or error
         """
         # 1. S1 Metron: Resolve level
         resolved_level = MetronResolver.resolve_level(metron_level)
         system_prompt = MetronResolver.get_system_prompt(
-            resolved_level,
-            user_prompt=self.settings.get("USER_SYSTEM_PROMPT", "")
+            resolved_level, user_prompt=self.settings.get("USER_SYSTEM_PROMPT", "")
         )
-        
+
         try:
             # 2. A2 Epochē: Mask PII
             if self.settings.get("PRIVACY_MODE", True):
@@ -132,19 +131,19 @@ class EnergeiaCoreResolver:
                 masked_text = text
                 pii_mapping = {}
                 logger.warning("⚠️ PRIVACY_MODE=False: A2 Epochē disabled")
-            
+
             # 3. K1 Eukairia: Select model
             model_name = self._select_model(masked_text, resolved_level)
-            
+
             # 4. O1 Noēsis: AI generation (placeholder for actual API call)
             result = await self._generate_content(masked_text, system_prompt, model_name)
-            
+
             if result.get("success"):
                 # 5. A2 Epochē (解除): Unmask PII
                 final_result = result["result"]
                 if self.settings.get("PRIVACY_MODE", True) and pii_mapping:
                     final_result = self.epoche_shield.unmask(final_result, pii_mapping)
-                
+
                 logger.info(f"✅ Energeia complete: model={model_name}")
                 return {
                     "result": final_result,
@@ -157,7 +156,7 @@ class EnergeiaCoreResolver:
                     "error": result.get("error", "unknown_error"),
                     "message": result.get("message", "Processing failed"),
                 }
-                
+
         except Exception as e:
             logger.error(f"❌ Energeia failed: {e}", exc_info=True)
             return {
@@ -165,15 +164,10 @@ class EnergeiaCoreResolver:
                 "message": str(e),
             }
 
-    async def _generate_content(
-        self, 
-        text: str, 
-        system_prompt: str, 
-        model: str
-    ) -> Dict:
+    async def _generate_content(self, text: str, system_prompt: str, model: str) -> Dict:
         """
         O1 Noēsis への委譲: AI生成
-        
+
         Note: This is a placeholder. In production, this would call
         the actual Gemini API via a dedicated client.
         """
@@ -187,7 +181,7 @@ class EnergeiaCoreResolver:
     def process_sync(self, text: str, metron_level: int = 60) -> Dict:
         """
         同期版の process メソッド
-        
+
         K2 Chronos Reference:
             時間制約に対応するための同期ラッパー
         """

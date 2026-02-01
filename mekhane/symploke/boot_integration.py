@@ -21,11 +21,11 @@ sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 def get_boot_context(mode: str = "standard", context: Optional[str] = None) -> dict:
     """
     /boot 統合 API: 3軸（Handoff, Sophia, Persona）を統合して返す
-    
+
     Args:
         mode: "fast" (/boot-), "standard" (/boot), "detailed" (/boot+)
         context: 現在のコンテキスト（Handoff の主題など）
-    
+
     Returns:
         dict: {
             "handoffs": {...},    # 軸 A
@@ -36,8 +36,9 @@ def get_boot_context(mode: str = "standard", context: Optional[str] = None) -> d
     """
     # 軸 A: Handoff 活用
     from mekhane.symploke.handoff_search import get_boot_handoffs, format_boot_output
+
     handoffs_result = get_boot_handoffs(mode=mode, context=context)
-    
+
     # 軸 B: Sophia アクティベーション
     # コンテキストを Handoff から取得
     ki_context = context
@@ -45,36 +46,38 @@ def get_boot_context(mode: str = "standard", context: Optional[str] = None) -> d
         ki_context = handoffs_result["latest"].metadata.get("primary_task", "")
         if not ki_context:
             ki_context = handoffs_result["latest"].content[:200]
-    
+
     from mekhane.symploke.sophia_ingest import get_boot_ki, format_ki_output
+
     ki_result = get_boot_ki(context=ki_context, mode=mode)
-    
+
     # 軸 C: 人格永続化
     from mekhane.symploke.persona import get_boot_persona
+
     persona_result = get_boot_persona(mode=mode)
-    
+
     # 統合フォーマット
     lines = []
-    
+
     # Persona (最初に)
     if persona_result.get("formatted"):
         lines.append(persona_result["formatted"])
         lines.append("")
-    
+
     # Handoff
     if handoffs_result["latest"]:
         lines.append(format_boot_output(handoffs_result, verbose=(mode == "detailed")))
         lines.append("")
-    
+
     # KI
     if ki_result["ki_items"]:
         lines.append(format_ki_output(ki_result))
-    
+
     return {
         "handoffs": handoffs_result,
         "ki": ki_result,
         "persona": persona_result,
-        "formatted": "\n".join(lines)
+        "formatted": "\n".join(lines),
     }
 
 
@@ -82,7 +85,7 @@ def print_boot_summary(mode: str = "standard", context: Optional[str] = None):
     """Print formatted boot summary."""
     result = get_boot_context(mode=mode, context=context)
     print(result["formatted"])
-    
+
     # Summary line
     print()
     print("─" * 50)
@@ -94,14 +97,16 @@ def print_boot_summary(mode: str = "standard", context: Optional[str] = None):
 
 def main():
     parser = argparse.ArgumentParser(description="Boot integration API")
-    parser.add_argument("--mode", choices=["fast", "standard", "detailed"],
-                       default="standard", help="Boot mode")
+    parser.add_argument(
+        "--mode", choices=["fast", "standard", "detailed"], default="standard", help="Boot mode"
+    )
     parser.add_argument("--context", type=str, help="Context for search")
     args = parser.parse_args()
-    
+
     import warnings
+
     warnings.filterwarnings("ignore")
-    
+
     print_boot_summary(mode=args.mode, context=args.context)
 
 

@@ -40,6 +40,7 @@ class TestMetronResolver:
     def test_backward_compatibility_alias(self):
         """SeasoningManager alias should work"""
         from ..metron_resolver import SeasoningManager
+
         assert SeasoningManager is MetronResolver
 
 
@@ -51,7 +52,7 @@ class TestEpocheShield:
         shield = EpocheShield()
         text = "Contact me at test@example.com"
         masked, mapping = shield.mask(text, use_custom_vocab=False)
-        
+
         assert "test@example.com" not in masked
         assert "[EPOCHE_" in masked
         assert len(mapping) == 1
@@ -62,7 +63,7 @@ class TestEpocheShield:
         original = "My email is test@example.com and phone is 03-1234-5678"
         masked, mapping = shield.mask(original, use_custom_vocab=False)
         restored = shield.unmask(masked, mapping)
-        
+
         assert restored == original
 
     def test_mask_phone(self):
@@ -70,12 +71,13 @@ class TestEpocheShield:
         shield = EpocheShield()
         text = "Call 03-1234-5678"
         masked, mapping = shield.mask(text, use_custom_vocab=False)
-        
+
         assert "03-1234-5678" not in masked
 
     def test_backward_compatibility_aliases(self):
         """PrivacyHandler/PrivacyScanner aliases should work"""
         from ..epoche_shield import PrivacyHandler, PrivacyScanner
+
         assert PrivacyHandler is EpocheShield
         assert PrivacyScanner is EpocheScanner
 
@@ -87,7 +89,7 @@ class TestEpocheScanner:
         """Scanner should detect email patterns"""
         scanner = EpocheScanner()
         result = scanner.scan("Email: admin@example.org")
-        
+
         assert result["has_risks"] is True
         assert "EMAIL" in result["risks"]
 
@@ -95,7 +97,7 @@ class TestEpocheScanner:
         """Scanner should detect sensitive keywords"""
         scanner = EpocheScanner()
         result = scanner.scan("This is CONFIDENTIAL information")
-        
+
         assert result["has_risks"] is True
         assert "SENSITIVE_KEYWORD" in result["risks"]
 
@@ -103,6 +105,6 @@ class TestEpocheScanner:
         """Deny list should block sensitive keywords"""
         scanner = EpocheScanner()
         blocked, keyword = scanner.check_deny_list("This is 社外秘")
-        
+
         assert blocked is True
         assert keyword == "社外秘"

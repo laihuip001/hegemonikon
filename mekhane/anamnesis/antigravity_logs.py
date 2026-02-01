@@ -19,7 +19,7 @@ Antigravity IDE の Output パネルに表示されるログを収集・分析�
 
 Usage:
     from mekhane.anamnesis.antigravity_logs import AntigravityLogCollector
-    
+
     collector = AntigravityLogCollector()
     summary = collector.summary()
     print(summary)
@@ -36,6 +36,7 @@ from typing import Optional
 @dataclass
 class LogEntry:
     """ログエントリ"""
+
     timestamp: datetime
     level: str  # info, warning, error
     message: str
@@ -45,6 +46,7 @@ class LogEntry:
 @dataclass
 class LogSummary:
     """ログの要約"""
+
     session_id: str
     session_start: Optional[datetime] = None
     model: Optional[str] = None
@@ -52,7 +54,7 @@ class LogSummary:
     errors: list = field(default_factory=list)
     warnings: list = field(default_factory=list)
     token_usage: Optional[dict] = None
-    
+
     def to_dict(self) -> dict:
         return {
             "session_id": self.session_id,
@@ -67,19 +69,17 @@ class LogSummary:
 
 class AntigravityLogCollector:
     """Antigravity Output パネルログの収集・分析"""
-    
+
     # ログ解析用の正規表現
-    RE_LOG_LINE = re.compile(
-        r"^(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d+) \[(\w+)\] (.+)$"
-    )
+    RE_LOG_LINE = re.compile(r"^(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d+) \[(\w+)\] (.+)$")
     RE_MODEL = re.compile(r"model[:\s]+([a-zA-Z0-9\-_.]+)")
     RE_TOKEN = re.compile(r"current tokens: (\d+),?\s*token limit: (\d+)")
     RE_PLANNER = re.compile(r"Requesting planner with (\d+) chat messages")
     RE_UNAVAILABLE = re.compile(r"UNAVAILABLE.*No capacity available for model (\S+)")
-    
+
     def __init__(self):
         self._log_base = self._get_log_directory()
-    
+
     @staticmethod
     def _get_log_directory() -> Path:
         """Antigravity ログディレクトリのパスを取得"""
@@ -88,38 +88,36 @@ class AntigravityLogCollector:
             # Fallback for non-Windows
             appdata = Path.home() / "AppData" / "Roaming"
         return Path(appdata) / "Antigravity" / "logs"
-    
+
     def get_sessions(self, limit: int = 10) -> list[Path]:
         """利用可能なセッションディレクトリを取得（新しい順）"""
         if not self._log_base.exists():
             return []
-        
+
         sessions = sorted(
-            [d for d in self._log_base.iterdir() if d.is_dir()],
-            key=lambda x: x.name,
-            reverse=True
+            [d for d in self._log_base.iterdir() if d.is_dir()], key=lambda x: x.name, reverse=True
         )
         return sessions[:limit]
-    
+
     def get_latest_session(self) -> Optional[Path]:
         """最新セッションのログディレクトリを取得"""
         sessions = self.get_sessions(limit=1)
         return sessions[0] if sessions else None
-    
+
     def get_antigravity_log(self, session: Optional[Path] = None) -> Optional[Path]:
         """Antigravity.log ファイルのパスを取得"""
         if session is None:
             session = self.get_latest_session()
-        
+
         if session is None:
             return None
-        
+
         log_path = session / "window1" / "exthost" / "google.antigravity" / "Antigravity.log"
         return log_path if log_path.exists() else None
-    
+
     def read_log(self, session: Optional[Path] = None, tail: int = 0) -> list[str]:
         """ログファイルを読み込む
-        
+
         Args:
             session: セッションディレクトリ（None で最新）
             tail: 末尾から取得する行数（0 で全行）
@@ -127,10 +125,10 @@ class AntigravityLogCollector:
         log_path = self.get_antigravity_log(session)
         if log_path is None:
             return []
-        
+
         lines = log_path.read_text(encoding="utf-8", errors="ignore").splitlines()
         return lines[-tail:] if tail > 0 else lines
-    
+
     def parse_log(self, lines: list[str]) -> list[LogEntry]:
         """ログ行をパースして LogEntry のリストを返す"""
         entries = []
@@ -142,14 +140,11 @@ class AntigravityLogCollector:
                     ts = datetime.strptime(ts_str, "%Y-%m-%d %H:%M:%S.%f")
                 except ValueError:
                     ts = datetime.now()
-                entries.append(LogEntry(
-                    timestamp=ts,
-                    level=level.lower(),
-                    message=message,
-                    raw=line
-                ))
+                entries.append(
+                    LogEntry(timestamp=ts, level=level.lower(), message=message, raw=line)
+                )
         return entries
-    
+
     def extract_model_info(self, lines: list[str]) -> list[str]:
         """モデル選択情報を抽出"""
         models = set()
@@ -163,7 +158,7 @@ class AntigravityLogCollector:
                     if any(m in model.lower() for m in ["claude", "gemini", "opus", "sonnet"]):
                         models.add(model)
         return sorted(models)
-    
+
     def extract_errors(self, lines: list[str]) -> list[dict]:
         """エラー・警告を抽出"""
         errors = []
@@ -172,13 +167,15 @@ class AntigravityLogCollector:
                 match = self.RE_LOG_LINE.match(line)
                 if match:
                     ts_str, level, message = match.groups()
-                    errors.append({
-                        "timestamp": ts_str,
-                        "level": level,
-                        "message": message[:200]  # 長すぎるメッセージを切り詰め
-                    })
+                    errors.append(
+                        {
+                            "timestamp": ts_str,
+                            "level": level,
+                            "message": message[:200],  # 長すぎるメッセージを切り詰め
+                        }
+                    )
         return errors
-    
+
     def extract_capacity_errors(self, lines: list[str]) -> list[dict]:
         """503 No capacity エラーを抽出"""
         errors = []
@@ -188,13 +185,9 @@ class AntigravityLogCollector:
                 model = match.group(1)
                 ts_match = self.RE_LOG_LINE.match(line)
                 ts_str = ts_match.group(1) if ts_match else "unknown"
-                errors.append({
-                    "timestamp": ts_str,
-                    "model": model,
-                    "type": "503_no_capacity"
-                })
+                errors.append({"timestamp": ts_str, "model": model, "type": "503_no_capacity"})
         return errors
-    
+
     def extract_token_usage(self, lines: list[str]) -> Optional[dict]:
         """最新のトークン使用量を抽出"""
         for line in reversed(lines):
@@ -204,17 +197,17 @@ class AntigravityLogCollector:
                 return {
                     "current": int(current),
                     "limit": int(limit),
-                    "percentage": round(int(current) / int(limit) * 100, 1)
+                    "percentage": round(int(current) / int(limit) * 100, 1),
                 }
         return None
-    
+
     def extract_request_count(self, lines: list[str]) -> int:
         """プランナーリクエスト数をカウント"""
         return sum(1 for line in lines if self.RE_PLANNER.search(line))
-    
+
     def summary(self, session: Optional[Path] = None) -> dict:
         """ログの要約を生成
-        
+
         Returns:
             dict: 要約情報
                 - session_id: セッションID（タイムスタンプ）
@@ -226,20 +219,20 @@ class AntigravityLogCollector:
         """
         if session is None:
             session = self.get_latest_session()
-        
+
         if session is None:
             return {"error": "No session found"}
-        
+
         lines = self.read_log(session)
         if not lines:
             return {"error": "Empty log file"}
-        
+
         models = self.extract_model_info(lines)
         errors = self.extract_errors(lines)
         capacity_errors = self.extract_capacity_errors(lines)
         token_usage = self.extract_token_usage(lines)
         request_count = self.extract_request_count(lines)
-        
+
         return {
             "session_id": session.name,
             "model": models[0] if models else "unknown",
@@ -250,23 +243,23 @@ class AntigravityLogCollector:
             "token_usage": token_usage,
             "log_lines": len(lines),
         }
-    
+
     def format_summary(self, summary: dict) -> str:
         """要約を人間が読みやすい形式でフォーマット"""
         if "error" in summary:
             return f"[Error] {summary['error']}"
-        
+
         lines = [
             f"[Antigravity] Session: {summary['session_id']}",
             f"  Model: {summary['model']}",
             f"  Requests: {summary['total_requests']}",
             f"  Errors: {summary['error_count']} (503: {summary['capacity_errors']})",
         ]
-        
+
         if summary.get("token_usage"):
             tu = summary["token_usage"]
             lines.append(f"  Tokens: {tu['current']:,} / {tu['limit']:,} ({tu['percentage']}%)")
-        
+
         return "\n".join(lines)
 
 
@@ -274,7 +267,7 @@ class AntigravityLogCollector:
 def cmd_logs(args) -> int:
     """logs サブコマンドのハンドラ"""
     collector = AntigravityLogCollector()
-    
+
     # セッション一覧
     if args.list:
         sessions = collector.get_sessions(limit=args.limit)
@@ -285,7 +278,7 @@ def cmd_logs(args) -> int:
         for s in sessions:
             print(f"  {s.name}")
         return 0
-    
+
     # 特定セッションまたは最新
     session = None
     if args.session:
@@ -293,7 +286,7 @@ def cmd_logs(args) -> int:
         if not session.exists():
             print(f"Session not found: {args.session}")
             return 1
-    
+
     # エラーのみ
     if args.errors:
         lines = collector.read_log(session)
@@ -303,14 +296,14 @@ def cmd_logs(args) -> int:
         for e in errors[:20]:  # 最大20件
             print(f"  {e['timestamp']} [{e['level']}] {e['message'][:80]}...")
         return 0
-    
+
     # モデル情報のみ
     if args.models:
         lines = collector.read_log(session)
         models = collector.extract_model_info(lines)
         print(f"[Models] Detected: {', '.join(models) if models else 'none'}")
         return 0
-    
+
     # トークン情報のみ
     if args.tokens:
         lines = collector.read_log(session)
@@ -320,7 +313,7 @@ def cmd_logs(args) -> int:
         else:
             print("[Tokens] Not found")
         return 0
-    
+
     # デフォルト: 要約
     summary = collector.summary(session)
     print(collector.format_summary(summary))

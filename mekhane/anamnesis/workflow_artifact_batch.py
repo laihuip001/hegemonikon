@@ -58,7 +58,7 @@ WORKFLOWS_TO_UPDATE = {
     "eat": ("Digestion", "消化結果"),
 }
 
-ARTIFACT_TEMPLATE = '''
+ARTIFACT_TEMPLATE = """
 ---
 
 ## Artifact 自動保存
@@ -90,7 +90,8 @@ ARTIFACT_TEMPLATE = '''
 2. **参照可能**: {purpose}を後から確認できる
 3. **蓄積可能**: パターン分析に活用
 
-'''
+"""
+
 
 def generate_section(workflow: str, module: str, summary: str, date: str = "20260129") -> str:
     """Generate artifact section for a workflow."""
@@ -105,80 +106,84 @@ def generate_section(workflow: str, module: str, summary: str, date: str = "2026
         purpose=summary,
     )
 
+
 def find_insertion_point(content: str) -> int:
     """Find the line number to insert artifact section."""
-    lines = content.split('\n')
-    
+    lines = content.split("\n")
+
     # Look for "## Hegemonikon Status" or "---" before it
     for i, line in enumerate(lines):
         if "## Hegemonikon Status" in line or "## Hegemonikón Status" in line:
             # Insert before the "---" that precedes this section
-            if i > 0 and lines[i-1].strip() == "---":
+            if i > 0 and lines[i - 1].strip() == "---":
                 return i - 1
             return i
-    
+
     # If not found, look for last "---" before EOF
     for i in range(len(lines) - 1, -1, -1):
         if lines[i].strip() == "---":
             return i
-    
+
     return len(lines)
+
 
 def update_workflow(workflow: str, module: str, summary: str) -> bool:
     """Update a single workflow file with artifact section."""
     filepath = WORKFLOWS_DIR / f"{workflow}.md"
-    
+
     if not filepath.exists():
         print(f"  ⚠️ {workflow}.md not found")
         return False
-    
+
     content = filepath.read_text()
-    
+
     # Skip if already has artifact section
     if "## Artifact 自動保存" in content or "Artifact 自動保存" in content:
         print(f"  ⏭️ {workflow}.md already has artifact section")
         return True
-    
+
     # Skip if has old artifact section that needs manual update
     if "Artifact 出力保存規則" in content or "出力保存規則" in content:
         print(f"  ⚠️ {workflow}.md has old section - needs manual update")
         return False
-    
+
     # Generate new section
     section = generate_section(workflow, module, summary)
-    
+
     # Find insertion point
-    lines = content.split('\n')
+    lines = content.split("\n")
     insert_idx = find_insertion_point(content)
-    
+
     # Insert section
-    new_lines = lines[:insert_idx] + section.split('\n') + lines[insert_idx:]
-    new_content = '\n'.join(new_lines)
-    
+    new_lines = lines[:insert_idx] + section.split("\n") + lines[insert_idx:]
+    new_content = "\n".join(new_lines)
+
     # Write back
     filepath.write_text(new_content)
     print(f"  ✅ {workflow}.md updated")
     return True
+
 
 def main():
     print("🚀 Hegemonikón Workflow Artifact Standardization")
     print(f"📁 Target: {WORKFLOWS_DIR}")
     print(f"📦 Workflows to update: {len(WORKFLOWS_TO_UPDATE)}")
     print()
-    
+
     success = 0
     skipped = 0
     failed = 0
-    
+
     for workflow, (module, summary) in WORKFLOWS_TO_UPDATE.items():
         result = update_workflow(workflow, module, summary)
         if result:
             success += 1
         else:
             failed += 1
-    
+
     print()
     print(f"📊 Results: {success} updated, {failed} failed/needs manual")
+
 
 if __name__ == "__main__":
     main()

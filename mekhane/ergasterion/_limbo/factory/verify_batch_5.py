@@ -4,11 +4,11 @@ import json
 
 # 1. Read URL list to get expected URLs
 expected_urls = []
-with open(r'C:\Users\raikh\Forge\Raw\aidb\_index\url_list.txt', 'r', encoding='utf-8') as f:
+with open(r"C:\Users\raikh\Forge\Raw\aidb\_index\url_list.txt", "r", encoding="utf-8") as f:
     lines = f.readlines()
     # Indices 510 to 594 (0-indexed) correspond to lines 511 to 595 (1-indexed)
     # Line 595 was empty, so up to 594.
-    target_lines = lines[510:594] 
+    target_lines = lines[510:594]
     for line in target_lines:
         if line.strip():
             expected_urls.append(line.strip())
@@ -17,12 +17,14 @@ print(f"Expected count: {len(expected_urls)}")
 
 # 2. Read Manifest to get actual URLs
 actual_urls = set()
-with open(r'C:\Users\raikh\Forge\Raw\aidb\_index\manifest_batch_5.jsonl', 'r', encoding='utf-8') as f:
+with open(
+    r"C:\Users\raikh\Forge\Raw\aidb\_index\manifest_batch_5.jsonl", "r", encoding="utf-8"
+) as f:
     for line in f:
         if line.strip():
             try:
                 data = json.loads(line)
-                actual_urls.add(data['url'])
+                actual_urls.add(data["url"])
             except Exception:
                 pass  # TODO: Add proper error handling
 

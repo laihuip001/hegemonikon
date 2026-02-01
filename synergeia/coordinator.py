@@ -49,12 +49,17 @@ THREAD_REGISTRY = {
     },
     "claude": {
         "name": "Claude CLI",
-        "supported_ccl": ["/s", "/ene", "/mek"],
+        "supported_ccl": ["/s", "/mek"],
         "executor": "cli",
     },
     "gemini": {
         "name": "Gemini CLI",
         "supported_ccl": ["/tek", "/sta"],
+        "executor": "cli",
+    },
+    "codex": {
+        "name": "OpenAI Codex",
+        "supported_ccl": ["/ene", "/pra"],  # 実行系
         "executor": "cli",
     },
 }
@@ -82,6 +87,7 @@ def select_thread(ccl: str) -> str:
 
 CLAUDE_CLI = "/home/laihuip001/oikos/.local/bin/claude"
 GEMINI_CLI = "node /home/laihuip001/oikos/.npm/_npx/38c708f8d73fe4c9/node_modules/@google/gemini-cli/bundle/gemini.js"
+CODEX_CLI = "/home/laihuip001/oikos/hegemonikon/synergeia/node_modules/.bin/codex"
 
 
 # =============================================================================
@@ -119,7 +125,7 @@ def execute_claude(ccl: str, context: str) -> Dict[str, Any]:
             [CLAUDE_CLI, "-p", prompt],
             capture_output=True,
             text=True,
-            timeout=120,
+            timeout=600,  # 最大10分
             cwd="/home/laihuip001/oikos/hegemonikon"
         )
         answer = result.stdout.strip()
@@ -142,14 +148,26 @@ def execute_gemini(ccl: str, context: str) -> Dict[str, Any]:
     """Gemini CLI でCCLを実行。"""
     import subprocess
     
-    prompt = f"{context}\n\nExecute CCL: {ccl}\n\nProvide a detailed response."
+    # ツール操作を避けるプロンプト
+    prompt = f"""You are a Hegemonikon CCL interpreter.
+Do NOT use any file system tools. Just analyze and respond in text.
+
+{context}
+
+Analyze and explain the CCL command: {ccl}
+
+Provide a detailed conceptual response without executing any tools."""
     
     try:
         result = subprocess.run(
-            ["node", "/home/laihuip001/oikos/.npm/_npx/38c708f8d73fe4c9/node_modules/@google/gemini-cli/bundle/gemini.js", "-p", prompt],
+            [
+                "node", 
+                "/home/laihuip001/oikos/.npm/_npx/38c708f8d73fe4c9/node_modules/@google/gemini-cli/bundle/gemini.js", 
+                "-p", prompt
+            ],
             capture_output=True,
             text=True,
-            timeout=120,
+            timeout=600,  # 最大10分
             cwd="/home/laihuip001/oikos/hegemonikon"
         )
         # Geminiは最初の2行がログなので除去
@@ -167,6 +185,39 @@ def execute_gemini(ccl: str, context: str) -> Dict[str, Any]:
         "ccl": ccl,
         "thread": "gemini",
         "answer": answer,
+    }
+
+
+def execute_codex(ccl: str, context: str) -> Dict[str, Any]:
+    """OpenAI Codex CLI でCCLを実行。"""
+    import subprocess
+    
+    prompt = f"{context}\n\nExecute CCL: {ccl}\n\nProvide a detailed response."
+    
+    try:
+        result = subprocess.run(
+            [CODEX_CLI, "exec", prompt],
+            capture_output=True,
+            text=True,
+            timeout=600,  # 最大10分
+            cwd="/home/laihuip001/oikos/hegemonikon"
+        )
+        # Codex は最初と最後にメタデータがあるので整理
+        lines = result.stdout.strip().split("\n")
+        # "Hello from Codex" のような実際の出力を抽出
+        answer = "\n".join([l for l in lines if not l.startswith("OpenAI Codex") and not l.startswith("---") and not l.startswith("workdir:") and not l.startswith("model:") and not l.startswith("provider:") and not l.startswith("approval:") and not l.startswith("sandbox:") and not l.startswith("reasoning") and not l.startswith("session id:") and not l.startswith("user") and not l.startswith("mcp startup:") and not l.startswith("codex") and not l.startswith("tokens used")])
+        if result.returncode != 0:
+            return {"status": "error", "error": result.stderr, "ccl": ccl}
+    except subprocess.TimeoutExpired:
+        return {"status": "error", "error": "Timeout (600s)", "ccl": ccl}
+    except Exception as e:
+        return {"status": "error", "error": str(e), "ccl": ccl}
+    
+    return {
+        "status": "success",
+        "ccl": ccl,
+        "thread": "codex",
+        "answer": answer.strip(),
     }
 
 
@@ -192,6 +243,8 @@ def execute_ccl(ccl: str, context: str) -> Dict[str, Any]:
         return execute_claude(ccl, context)
     elif thread == "gemini":
         return execute_gemini(ccl, context)
+    elif thread == "codex":
+        return execute_codex(ccl, context)
     else:
         return execute_manual(ccl, context)
 

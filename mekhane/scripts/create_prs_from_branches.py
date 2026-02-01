@@ -59,7 +59,7 @@ def get_github_token() -> str:
             )
             token = result.stdout.strip()
         except subprocess.CalledProcessError:
-            pass
+            pass  # TODO: Add proper error handling
     
     if not token:
         raise ValueError(

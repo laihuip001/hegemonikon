@@ -35,7 +35,7 @@ if sys.platform == "win32":
     try:
         sys.stdout.reconfigure(encoding='utf-8')
     except Exception:
-        pass
+        pass  # TODO: Add proper error handling
 
 
 class Embedder:
@@ -129,7 +129,7 @@ class GnosisIndex:
             df = table.search().select(["primary_key"]).limit(None).to_pandas()
             self._primary_key_cache = set(df["primary_key"].tolist())
         except Exception:
-            pass
+            pass  # TODO: Add proper error handling
     
     def add_papers(self, papers: list[Paper], dedupe: bool = True) -> int:
         """

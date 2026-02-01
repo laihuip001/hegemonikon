@@ -141,7 +141,7 @@ def _process_session_dir(session_dir: Path, target_date: Optional[date]) -> Opti
             if mod_date != target_date:
                 return None
         except Exception:
-            pass
+            pass  # TODO: Add proper error handling
 
     return SessionInfo(
         session_id=session_id,

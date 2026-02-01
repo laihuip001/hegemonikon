@@ -844,7 +844,7 @@ class PromptLangParser:
                     section=section,
                     filter=filter_opt,
                     depth=depth,
-                    tool_chain=tool_chain
+                    # NOTE: Removed self-assignment: tool_chain = tool_chain
                 ))
                 self.pos += 1
             elif line == "":

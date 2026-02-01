@@ -41,7 +41,7 @@ async def test_connection():
             print("\n[Test 1] Getting sources...")
             async with session.get(
                 "https://jules.googleapis.com/v1alpha/sources",
-                headers=headers
+                # NOTE: Removed self-assignment: headers = headers
             ) as resp:
                 print(f"  Status: {resp.status}")
                 if resp.status == 200:
@@ -58,7 +58,7 @@ async def test_connection():
             print("\n[Test 2] Getting sessions...")
             async with session.get(
                 "https://jules.googleapis.com/v1alpha/sessions",
-                headers=headers
+                # NOTE: Removed self-assignment: headers = headers
             ) as resp:
                 print(f"  Status: {resp.status}")
                 if resp.status == 200:

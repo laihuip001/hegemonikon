@@ -236,7 +236,7 @@ def get_boot_handoffs(mode: str = "standard", context: str = None) -> dict:
                             doc.metadata["proactive"] = True  # Proactive Recall でヒット
                             proactive_memories.append(doc)
             except Exception as e:
-                pass  # Proactive は失敗しても問題なし
+                pass  # TODO: Add proper error handling
     
     return {
         "latest": latest,

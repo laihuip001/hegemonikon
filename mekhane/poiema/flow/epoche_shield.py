@@ -163,7 +163,7 @@ class EpocheShield:
                         mapping[placeholder] = term
                         counter += 1
             except Exception:
-                pass  # vocab_storeが利用不可でもフォールバック
+                pass  # TODO: Add proper error handling
 
         return masked_text, mapping
 

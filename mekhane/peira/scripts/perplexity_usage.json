@@ -1,7 +1,7 @@
 {
   "month": "2026-02",
-  "total_cost": 0.011925000000000002,
-  "calls": 5,
+  "total_cost": 0.017875000000000002,
+  "calls": 7,
   "history": [
     {
       "timestamp": "2026-02-01T09:57:57.378497",
@@ -46,6 +46,24 @@
       "tokens": {
         "input": 44,
         "output": 370
+      }
+    },
+    {
+      "timestamp": "2026-02-01T11:17:09.671245",
+      "query": "Hegemonikon CCL distributed execution test  sop deep",
+      "cost": 0.00367,
+      "tokens": {
+        "input": 12,
+        "output": 722
+      }
+    },
+    {
+      "timestamp": "2026-02-01T11:34:59.392565",
+      "query": "Synergeia 5-thread test  sop deep",
+      "cost": 0.0022800000000000003,
+      "tokens": {
+        "input": 11,
+        "output": 445
       }
     }
   ]

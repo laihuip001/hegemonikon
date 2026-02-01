@@ -144,7 +144,7 @@ class QualityGate:
                     deadline=deadline,
                     description=desc,
                     line_number=i,
-                    status=status
+                    # NOTE: Removed self-assignment: status = status
                 ))
             
             # 不正形式のTODO (期限・担当者なし)

@@ -30,7 +30,7 @@ async def main():
                         buttons = await pg.query_selector_all('button.select-none')
                         agent_pages.append((pg, len(buttons)))
                     except Exception:
-                        pass
+                        pass  # TODO: Add proper error handling
         
         if not agent_pages:
             print("[!] Agent Manager not found")
@@ -100,9 +100,9 @@ async def main():
                                 gc_preview = (gc_text[:80] + "...") if gc_text and len(gc_text) > 80 else (gc_text or "")
                                 lines.append(f"        [{k}] <{gc_tag}> class='{gc_class[:50]}' text='{gc_preview.replace(chr(10), ' ')}'")
                             except Exception:
-                                pass
+                                pass  # TODO: Add proper error handling
                     except Exception:
-                        pass
+                        pass  # TODO: Add proper error handling
         
         # scrollbar-hide 内を調査
         lines.append("\n\n=== .scrollbar-hide children ===")
@@ -134,7 +134,7 @@ async def main():
                         preview = c_text[:120].replace('\n', ' ')
                         lines.append(f"    preview: '{preview}'")
                 except Exception:
-                    pass
+                    pass  # TODO: Add proper error handling
         
         with open(OUTPUT_FILE, 'w', encoding='utf-8') as f:
             f.write('\n'.join(lines))

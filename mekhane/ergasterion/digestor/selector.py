@@ -160,7 +160,7 @@ class DigestorSelector:
                 paper=paper,
                 score=score,
                 matched_topics=matched_topics,
-                rationale=rationale
+                # NOTE: Removed self-assignment: rationale = rationale
             ))
         
         # スコア降順でソート

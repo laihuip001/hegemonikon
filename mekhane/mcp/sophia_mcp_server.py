@@ -197,7 +197,7 @@ async def call_tool(name: str, arguments: dict):
                                 if (now - doc_date).days > recent_days:
                                     continue
                             except Exception:
-                                pass
+                                pass  # TODO: Add proper error handling
                     
                     results.append({
                         "source": "kairos",

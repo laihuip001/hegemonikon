@@ -133,7 +133,7 @@ class DendronChecker:  # noqa: AI-007
         return any(p.search(path_str) for p in self.exempt_patterns)
 
     def validate_parent(self, parent: str) -> tuple[bool, str]:
-        """親参照を検証 (v2.1: パストラバーサル防止 + 存在チェック)
+        """親参照を検証 (v2.4: パス長制限追加)
         
         Returns:
             (is_valid, reason)
@@ -141,6 +141,10 @@ class DendronChecker:  # noqa: AI-007
         # 特殊親参照はスキップ
         if parent in SPECIAL_PARENTS:
             return True, "特殊親参照"
+        
+        # v2.4: パス長制限 (255 bytes = Linux ファイル名上限)
+        if len(parent.encode('utf-8')) > 255:
+            return False, f"親パスが長すぎる: {len(parent)} chars"
         
         # パストラバーサル防止: .. を含むパスを拒否
         if ".." in parent:
@@ -152,9 +156,12 @@ class DendronChecker:  # noqa: AI-007
         
         # 存在チェック (root が設定されている場合のみ)
         if self.root and self.validate_parents:
-            parent_path = self.root / parent.rstrip("/")
-            if not parent_path.exists():
-                return False, f"親パスが存在しない: {parent}"
+            try:
+                parent_path = self.root / parent.rstrip("/")
+                if not parent_path.exists():
+                    return False, f"親パスが存在しない: {parent}"
+            except OSError as e:
+                return False, f"パス検証エラー: {e}"
         
         return True, "OK"
 

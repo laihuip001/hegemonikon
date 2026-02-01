@@ -114,7 +114,7 @@ class CCLTracer:
             timestamp=datetime.datetime.now().isoformat(),
             op=op,
             status=status,
-            note=note
+            # NOTE: Removed self-assignment: note = note
         )
         
         self.current_session.steps.append(asdict(step))

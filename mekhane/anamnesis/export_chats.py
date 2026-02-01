@@ -370,7 +370,7 @@ class AntigravityChatExporter:
                     idx_num = int(section_idx)
                     role = "user" if idx_num % 2 == 0 else "assistant"
                 except Exception:
-                    pass
+                    pass  # TODO: Add proper error handling
             
             messages.append({
                 "role": role,
@@ -543,7 +543,7 @@ class AntigravityChatExporter:
                             idx_num = int(section_idx)
                             role = "user" if idx_num % 2 == 0 else "assistant"
                         except Exception:
-                            pass
+                            pass  # TODO: Add proper error handling
                     
                     messages.append({
                         "role": role,

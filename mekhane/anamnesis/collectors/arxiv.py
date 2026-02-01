@@ -108,7 +108,7 @@ class ArxivCollector(BaseCollector):
             if result:
                 return self._to_paper(result)
         except Exception:
-            pass
+            pass  # TODO: Add proper error handling
         
         return None
     

@@ -115,7 +115,7 @@ def main():
         os.rmdir(os.path.join(ROOT_DIR, '0000'))
         print("Removed empty 0000/00 directory.")
     except Exception:
-        pass
+        pass  # TODO: Add proper error handling
 
 if __name__ == "__main__":
     main()

@@ -115,7 +115,7 @@ class MacroRegistry:
                     macro = Macro(**item)
                     self.user_macros[macro.name] = macro
             except (json.JSONDecodeError, TypeError):
-                pass
+                pass  # TODO: Add proper error handling
     
     def _save(self):
         """Save user macros to file."""

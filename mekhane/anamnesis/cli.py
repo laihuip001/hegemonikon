@@ -45,7 +45,7 @@ def update_state():
             try:
                 state = json.loads(STATE_FILE.read_text(encoding="utf-8"))
             except Exception:
-                pass
+                pass  # TODO: Add proper error handling
         
         state["last_collected_at"] = datetime.now().isoformat()
         STATE_FILE.write_text(json.dumps(state, indent=2), encoding="utf-8")
@@ -210,7 +210,7 @@ def cmd_stats(args):
             state = json.loads(STATE_FILE.read_text(encoding="utf-8"))
             print(f"Last Collected: {state.get('last_collected_at', 'Unknown')}")
         except Exception:
-            pass
+            pass  # TODO: Add proper error handling
             
     print("=" * 40)
     

@@ -134,10 +134,14 @@ def search(query: str, model: str = DEFAULT_MODEL) -> dict:
     }
     
     try:
-        with httpx.Client(timeout=60.0) as client:
+        # タイムアウト設定: 全体5分、読み取り3分
+        timeout = httpx.Timeout(300.0, read=180.0, connect=30.0)
+        with httpx.Client(timeout=timeout) as client:
             response = client.post(API_URL, headers=headers, json=payload)
             response.raise_for_status()
             data = response.json()
+    except httpx.TimeoutException as e:
+        return {"error": f"Timeout: {e}"}
     except httpx.HTTPError as e:
         return {"error": f"API error: {e}"}
     

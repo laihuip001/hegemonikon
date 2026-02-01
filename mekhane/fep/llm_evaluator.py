@@ -37,7 +37,7 @@ try:
     from google import genai
     GEMINI_AVAILABLE = True
 except ImportError:
-    pass
+    pass  # TODO: Add proper error handling
 
 
 @dataclass

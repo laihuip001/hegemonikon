@@ -64,7 +64,7 @@ def extract_text_from_pb(filepath: Path):
                     if len(text) >= 10 and re.search(r'[\u3040-\u9fff\w]{3,}', text):
                         texts.append(text)
                 except Exception:
-                    pass
+                    pass  # TODO: Add proper error handling
             
             elif wire_type == 5:  # 32-bit
                 pos += 4

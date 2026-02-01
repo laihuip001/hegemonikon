@@ -30,7 +30,7 @@ async def main():
                         buttons = await pg.query_selector_all('button.select-none')
                         agent_pages.append((pg, len(buttons)))
                     except Exception:
-                        pass
+                        pass  # TODO: Add proper error handling
         
         if not agent_pages:
             print("[!] Agent Manager not found")
@@ -107,9 +107,9 @@ async def main():
                                     gc_len = len(gc_text) if gc_text else 0
                                     lines.append(f"        [{k}] <{gc_tag}> class='{gc_class[:50]}' text_len={gc_len}")
                                 except Exception:
-                                    pass
+                                    pass  # TODO: Add proper error handling
                     except Exception:
-                        pass
+                        pass  # TODO: Add proper error handling
                 
                 break  # 最初の大きなコンテナのみ
         

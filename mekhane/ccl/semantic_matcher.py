@@ -171,7 +171,7 @@ class SemanticMacroMatcher:
                 self.model = SentenceTransformer(self.MODEL_NAME)
                 self._build_index()
             except Exception:
-                pass
+                pass  # TODO: Add proper error handling
     
     def _build_index(self):
         """Build embedding index for all macro descriptions."""

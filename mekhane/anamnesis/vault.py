@@ -70,7 +70,7 @@ class VaultManager:
                 mode='w',
                 dir=target_path.parent,
                 delete=False,
-                encoding=encoding
+                # NOTE: Removed self-assignment: encoding = encoding
             ) as tmp_file:
                 tmp_file.write(content)
                 tmp_path = Path(tmp_file.name)
@@ -86,7 +86,7 @@ class VaultManager:
                 try:
                     tmp_path.unlink()
                 except Exception:
-                    pass
+                    pass  # TODO: Add proper error handling
             raise IOError(f"Failed to write file safely: {e}")
 
     @staticmethod

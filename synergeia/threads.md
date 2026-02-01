@@ -91,6 +91,15 @@
 | 複雑なワークフロー | OpenManus |
 | IDE内作業 | Gemini Code Assist |
 
+## 4. タイムアウト設定
+
+| スレッド | 最大タイムアウト | 設定方法 |
+|:---------|:----------------|:---------|
+| Claude CLI | **10分 (600秒)** | `BASH_MAX_TIMEOUT_MS=600000` |
+| Gemini CLI | **10分 (600秒)** | 同上 |
+| Perplexity API | 60秒 | API側制限 |
+| MCP ツール | 2-3分 | `MCP_TIMEOUT` |
+
 ---
 
-*Created: 2026-02-01 | Synergeia Threads v0.1*
+*Created: 2026-02-01 | Synergeia Threads v0.2 | タイムアウト10分対応*

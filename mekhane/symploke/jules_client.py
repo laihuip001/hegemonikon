@@ -308,7 +308,7 @@ class JulesClient:
             async with session.request(
                 method, url,
                 headers=request_headers,
-                json=json
+                # NOTE: Removed self-assignment: json = json
             ) as resp:
                 if resp.status == 429:
                     retry_after = resp.headers.get("Retry-After")
@@ -369,7 +369,7 @@ class JulesClient:
             name=data["name"],
             state=parse_state(data.get("state", "PLANNING")),
             prompt=prompt,
-            source=source
+            # NOTE: Removed self-assignment: source = source
         )
     
     @with_retry(max_attempts=3, retryable_exceptions=(RateLimitError, aiohttp.ClientError))
@@ -456,7 +456,7 @@ class JulesClient:
                     if consecutive_unknown >= 3 and fail_on_unknown:
                         raise UnknownStateError(
                             state=session.state.value,
-                            session_id=session_id
+                            # NOTE: Removed self-assignment: session_id = session_id
                         )
                 else:
                     consecutive_unknown = 0
@@ -555,7 +555,7 @@ class JulesClient:
                             error_type=type(e).__name__
                         ),
                         error=e,
-                        task=task
+                        # NOTE: Removed self-assignment: task = task
                     )
         
         results = await asyncio.gather(*[

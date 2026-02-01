@@ -30,7 +30,7 @@ async def main():
                         buttons = await pg.query_selector_all('button.select-none')
                         agent_pages.append((pg, len(buttons)))
                     except Exception:
-                        pass
+                        pass  # TODO: Add proper error handling
         
         if not agent_pages:
             print("[!] Agent Manager not found")
@@ -79,7 +79,7 @@ async def main():
                     if text and len(text.strip()) > 50:
                         text_children.append((i, child, classes, len(text.strip())))
                 except Exception:
-                    pass
+                    pass  # TODO: Add proper error handling
             
             lines.append(f"\nChildren with text > 50 chars: {len(text_children)}")
             
@@ -131,7 +131,7 @@ async def main():
                         gc_len = len(gc_text.strip()) if gc_text else 0
                         lines.append(f"    [{j}] <{gc_tag}> class='{gc_class[:40]}' text_len={gc_len}")
                     except Exception:
-                        pass
+                        pass  # TODO: Add proper error handling
         
         with open(OUTPUT_FILE, 'w', encoding='utf-8') as f:
             f.write('\n'.join(lines))

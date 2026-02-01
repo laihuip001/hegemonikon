@@ -1,4 +1,4 @@
-# PROOF: [L2/インフラ] AI Auditor 検出問題の自動修正
+# PROOF: [L2/インフラ] <- mekhane/synedrion/ AI Auditor 検出問題の自動修正
 """
 AI Synedrion Issue Fixer (AI-001 〜 AI-022)
 

@@ -1,4 +1,4 @@
-# PROOF: [L2/インフラ] CCL実行基盤
+# PROOF: [L2/インフラ] <- mekhane/ccl/ CCL実行基盤
 """
 CCL (Cognitive Control Language) Module v2.4
 

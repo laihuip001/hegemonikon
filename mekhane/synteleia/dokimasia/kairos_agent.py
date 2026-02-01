@@ -1,4 +1,4 @@
-# PROOF: [L1/定理] K1 Eukairia 時宜判断エージェント
+# PROOF: [L1/定理] <- mekhane/synteleia/dokimasia/ K1 Eukairia 時宜判断エージェント
 """
 Kairos Agent - Timing Evaluation
 

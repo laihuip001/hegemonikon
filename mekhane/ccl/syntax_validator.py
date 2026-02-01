@@ -1,4 +1,4 @@
-# PROOF: [L1/定理] CCL→CCLパーサーが必要→syntax_validator が担う
+# PROOF: [L1/定理] <- mekhane/ccl/ CCL→CCLパーサーが必要→syntax_validator が担う
 """
 CCL Syntax Validator v2.0
 

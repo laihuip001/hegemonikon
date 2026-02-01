@@ -1,4 +1,4 @@
-# PROOF: [L2/インフラ] O4→創造機能が必要
+# PROOF: [L2/インフラ] <- mekhane/poiema/flow/ O4→創造機能が必要
 # Flow AI — Hegemonikón Recast
 # Text preprocessing tool built with Hegemonikón principles
 #

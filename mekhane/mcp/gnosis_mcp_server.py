@@ -1,4 +1,4 @@
-# PROOF: [L2/インフラ] A0→MCP経由のアクセスが必要→gnosis_mcp_server が担う
+# PROOF: [L2/インフラ] <- mekhane/mcp/ A0→MCP経由のアクセスが必要→gnosis_mcp_server が担う
 #!/usr/bin/env python3
 """
 Gnōsis MCP Server - Hegemonikón Knowledge Base

@@ -1,5 +1,5 @@
 # noqa: AI-ALL
-# PROOF: [L2/インフラ]
+# PROOF: [L2/インフラ] <- mekhane/symploke/
 """
 PROOF: [L2/インフラ]
 

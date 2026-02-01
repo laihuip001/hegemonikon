@@ -1,4 +1,4 @@
-# PROOF: [L2/インフラ] Poiēsis 生成層パッケージ
+# PROOF: [L2/インフラ] <- mekhane/synteleia/poiesis/ Poiēsis 生成層パッケージ
 """
 Poiēsis (ποίησις) — 生成層
 

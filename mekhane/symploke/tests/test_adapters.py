@@ -1,4 +1,4 @@
-# PROOF: [L3/テスト] 対象モジュールが存在→検証が必要→test_adapters が担う
+# PROOF: [L3/テスト] <- mekhane/symploke/tests/ 対象モジュールが存在→検証が必要→test_adapters が担う
 """
 Symplokē Tests - VectorStore Adapters
 

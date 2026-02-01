@@ -1,4 +1,4 @@
-# PROOF: [L1/定理] A2 Krisis 監査基底クラス — 普遍的監査の抽象
+# PROOF: [L1/定理] <- mekhane/synteleia/ A2 Krisis 監査基底クラス — 普遍的監査の抽象
 """
 Audit Base Classes
 

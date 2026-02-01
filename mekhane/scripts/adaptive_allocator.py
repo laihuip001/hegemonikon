@@ -1,4 +1,4 @@
-# PROOF: [L3/ユーティリティ] O4→運用スクリプトが必要→adaptive_allocator が担う
+# PROOF: [L3/ユーティリティ] <- mekhane/scripts/ O4→運用スクリプトが必要→adaptive_allocator が担う
 #!/usr/bin/env python3
 """
 Adaptive Swarm Allocator

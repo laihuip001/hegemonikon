@@ -1,4 +1,4 @@
-# PROOF: [L1/定理] A2.epo 完全性検証エージェント
+# PROOF: [L1/定理] <- mekhane/synteleia/dokimasia/ A2.epo 完全性検証エージェント
 """
 Completeness Agent
 

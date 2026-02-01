@@ -1,4 +1,4 @@
-# PROOF: [L3/ユーティリティ] O4→運用スクリプトが必要→convert_webp が担う
+# PROOF: [L3/ユーティリティ] <- mekhane/scripts/ O4→運用スクリプトが必要→convert_webp が担う
 from PIL import Image
 import sys
 import os

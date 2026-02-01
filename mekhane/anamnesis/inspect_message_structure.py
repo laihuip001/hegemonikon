@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# PROOF: [L3/ユーティリティ] P3→DOM調査が必要→inspect_message_structure が担う
+# PROOF: [L3/ユーティリティ] <- mekhane/anamnesis/ P3→DOM調査が必要→inspect_message_structure が担う
 """
 メッセージ単位の DOM 構造調査
 

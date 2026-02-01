@@ -1,4 +1,4 @@
-# PROOF: [L3/テスト] 対象モジュールが存在→その検証が必要→test_night_review が担う
+# PROOF: [L3/テスト] <- mekhane/anamnesis/tests/ 対象モジュールが存在→その検証が必要→test_night_review が担う
 
 import unittest
 import tempfile

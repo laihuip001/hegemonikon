@@ -1,4 +1,4 @@
-# PROOF: [L2/インフラ]
+# PROOF: [L2/インフラ] <- mekhane/ccl/guardrails/
 # Phase 2: CCL 出力検証
 
 """

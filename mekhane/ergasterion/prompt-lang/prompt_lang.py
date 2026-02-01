@@ -1,4 +1,4 @@
-# PROOF: [L2/インフラ] S2→プロンプト言語が必要→prompt_lang が担う
+# PROOF: [L2/インフラ] <- mekhane/ergasterion/prompt-lang/ S2→プロンプト言語が必要→prompt_lang が担う
 #!/usr/bin/env python3
 """
 prompt-lang Parser

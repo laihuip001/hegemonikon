@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# PROOF: [L2/インフラ] AI Auditor 抑制コメント自動挿入
+# PROOF: [L2/インフラ] <- mekhane/synedrion/ AI Auditor 抑制コメント自動挿入
 """Auto-insert # noqa suppression comments for AI Auditor findings."""
 
 import re

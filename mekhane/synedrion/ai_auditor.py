@@ -1,4 +1,4 @@
-# PROOF: [L1/定理] AI 生成コードの品質保証 — 22 軸監査
+# PROOF: [L1/定理] <- mekhane/synedrion/ AI 生成コードの品質保証 — 22 軸監査
 """
 AI Synedrion Audit Checker (AI-001 〜 AI-022)
 

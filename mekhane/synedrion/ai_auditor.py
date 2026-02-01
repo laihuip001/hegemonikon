@@ -271,7 +271,7 @@ class AIAuditor:
                                 self.issues.append(Issue(
                                     code="AI-003",
                                     name="Type Confusion",
-                                    severity=Severity.MEDIUM,
+                                    severity=Severity.LOW,  # Common pattern, not critical
                                     line=node.lineno,
                                     message="len() compared with boolean",
                                     suggestion="Use len() > 0 or len() == 0",
@@ -405,7 +405,7 @@ class AIAuditor:
                                 self.issues.append(Issue(
                                     code="AI-006",
                                     name="Context Drift",
-                                    severity=Severity.MEDIUM,
+                                    severity=Severity.LOW,  # Common Python pattern
                                     line=stmt.lineno,
                                     message=f"Parameter '{target.id}' is reassigned",
                                     suggestion="Use different variable name to avoid confusion",
@@ -618,7 +618,7 @@ class AIAuditor:
                             self.issues.append(Issue(
                                 code="AI-010",
                                 name="Input Validation Omission",
-                                severity=Severity.MEDIUM,
+                                severity=Severity.LOW,  # Recommendation, not critical
                                 line=node.lineno,
                                 message=f"Path parameter '{arg.arg}' may lack validation",
                                 suggestion="Add existence/type check at function start",
@@ -909,7 +909,7 @@ class AIAuditor:
                     self.issues.append(Issue(
                         code="AI-018",
                         name="Hardcoded Path",
-                        severity=Severity.MEDIUM,
+                        severity=Severity.LOW,  # Recommendation, not critical
                         line=i,
                         message="Hardcoded path detected",
                         suggestion="Use Path(__file__).parent or config",

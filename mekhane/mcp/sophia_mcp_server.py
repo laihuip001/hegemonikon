@@ -15,44 +15,52 @@ import sys
 import os
 
 # Platform-specific asyncio setup
-if sys.platform == 'win32':
+if sys.platform == "win32":
     import asyncio
+
     asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
 import io
+
 _original_stdout = sys.stdout
 _stderr_wrapper = sys.stderr
 
+
 def log(msg):
     print(f"[sophia-mcp] {msg}", file=sys.stderr, flush=True)
+
 
 log("Starting Sophia MCP Server...")
 log(f"Python: {sys.executable}")
 
 # Import path setup
 from pathlib import Path
+
 sys.path.insert(0, str(Path(__file__).parent.parent))
 log(f"Added to path: {Path(__file__).parent.parent}")
+
 
 # Suppress stdout during imports
 class StdoutSuppressor:
     def __init__(self):
         self._null = io.StringIO()
         self._old_stdout = None
-    
+
     def __enter__(self):
         self._old_stdout = sys.stdout
         sys.stdout = self._null
         return self
-    
+
     def __exit__(self, *args):
         sys.stdout = self._old_stdout
+
 
 # Import MCP SDK
 try:
     from mcp.server import Server
     from mcp.server.stdio import stdio_server
     from mcp.types import Tool, TextContent
+
     log("MCP imports successful")
 except Exception as e:
     log(f"MCP import error: {e}")
@@ -60,9 +68,7 @@ except Exception as e:
 
 # Initialize MCP server
 server = Server(
-    name="sophia",
-    version="1.0.0",
-    instructions="Sophia knowledge search for KIs and Handoffs"
+    name="sophia", version="1.0.0", instructions="Sophia knowledge search for KIs and Handoffs"
 )
 log("Server initialized")
 
@@ -83,36 +89,30 @@ async def list_tools():
             inputSchema={
                 "type": "object",
                 "properties": {
-                    "query": {
-                        "type": "string",
-                        "description": "Search query"
-                    },
+                    "query": {"type": "string", "description": "Search query"},
                     "source": {
                         "type": "string",
                         "description": "Source to search: 'sophia', 'kairos', or 'both' (default)",
                         "enum": ["sophia", "kairos", "both"],
-                        "default": "both"
+                        "default": "both",
                     },
                     "limit": {
                         "type": "integer",
                         "description": "Maximum results per source (default: 5)",
-                        "default": 5
+                        "default": 5,
                     },
                     "recent_days": {
                         "type": "integer",
-                        "description": "Filter Kairos results to recent N days (optional)"
-                    }
+                        "description": "Filter Kairos results to recent N days (optional)",
+                    },
                 },
-                "required": ["query"]
-            }
+                "required": ["query"],
+            },
         ),
         Tool(
             name="stats",
             description="Get statistics about Sophia and Kairos indices",
-            inputSchema={
-                "type": "object",
-                "properties": {}
-            }
+            inputSchema={"type": "object", "properties": {}},
         ),
         Tool(
             name="backlinks",
@@ -122,20 +122,17 @@ async def list_tools():
                 "properties": {
                     "ki_name": {
                         "type": "string",
-                        "description": "Name of the Knowledge Item to get backlinks for"
+                        "description": "Name of the Knowledge Item to get backlinks for",
                     }
                 },
-                "required": ["ki_name"]
-            }
+                "required": ["ki_name"],
+            },
         ),
         Tool(
             name="graph_stats",
             description="Get knowledge graph statistics (nodes, edges, most linked items)",
-            inputSchema={
-                "type": "object",
-                "properties": {}
-            }
-        )
+            inputSchema={"type": "object", "properties": {}},
+        ),
     ]
 
 
@@ -143,50 +140,53 @@ async def list_tools():
 async def call_tool(name: str, arguments: dict):
     """Handle tool calls."""
     log(f"call_tool: {name} with {arguments}")
-    
+
     if name == "search":
         query = arguments.get("query", "")
         source = arguments.get("source", "both")
         limit = arguments.get("limit", 5)
         recent_days = arguments.get("recent_days")
-        
+
         if not query:
             return [TextContent(type="text", text="Error: query is required")]
-        
+
         try:
             with StdoutSuppressor():
                 from mekhane.symploke.adapters.embedding_adapter import EmbeddingAdapter
-            
+
             log(f"Searching for: {query}")
             results = []
-            
+
             # Search Sophia
             if source in ("sophia", "both") and SOPHIA_INDEX.exists():
                 adapter = EmbeddingAdapter(model_name="all-MiniLM-L6-v2")
                 adapter.load(str(SOPHIA_INDEX))
                 query_vec = adapter.encode([query])[0]
                 sophia_results = adapter.search(query_vec, k=limit)
-                
+
                 for r in sophia_results:
-                    results.append({
-                        "source": "sophia",
-                        "score": r.score,
-                        "ki_name": r.metadata.get("ki_name", "N/A"),
-                        "artifact": r.metadata.get("artifact", ""),
-                        "summary": r.metadata.get("summary", "")[:150],
-                        "file_path": r.metadata.get("file_path", "")
-                    })
-            
+                    results.append(
+                        {
+                            "source": "sophia",
+                            "score": r.score,
+                            "ki_name": r.metadata.get("ki_name", "N/A"),
+                            "artifact": r.metadata.get("artifact", ""),
+                            "summary": r.metadata.get("summary", "")[:150],
+                            "file_path": r.metadata.get("file_path", ""),
+                        }
+                    )
+
             # Search Kairos
             if source in ("kairos", "both") and KAIROS_INDEX.exists():
                 adapter = EmbeddingAdapter(model_name="all-MiniLM-L6-v2")
                 adapter.load(str(KAIROS_INDEX))
                 query_vec = adapter.encode([query])[0]
                 kairos_results = adapter.search(query_vec, k=limit)
-                
+
                 from datetime import datetime, timedelta
+
                 now = datetime.now()
-                
+
                 for r in kairos_results:
                     # Time filter
                     if recent_days:
@@ -198,26 +198,28 @@ async def call_tool(name: str, arguments: dict):
                                     continue
                             except Exception:
                                 pass  # TODO: Add proper error handling
-                    
-                    results.append({
-                        "source": "kairos",
-                        "score": r.score,
-                        "task": r.metadata.get("primary_task", "N/A"),
-                        "timestamp": r.metadata.get("timestamp", ""),
-                        "file_path": r.metadata.get("file_path", "")
-                    })
-            
+
+                    results.append(
+                        {
+                            "source": "kairos",
+                            "score": r.score,
+                            "task": r.metadata.get("primary_task", "N/A"),
+                            "timestamp": r.metadata.get("timestamp", ""),
+                            "file_path": r.metadata.get("file_path", ""),
+                        }
+                    )
+
             # Sort by score
             results.sort(key=lambda x: x["score"], reverse=True)
-            results = results[:limit * 2]
-            
+            results = results[: limit * 2]
+
             if not results:
                 return [TextContent(type="text", text=f"No results found for: {query}")]
-            
+
             # Format output
-            output_lines = [f"# Sophia Search: \"{query}\"\n"]
+            output_lines = [f'# Sophia Search: "{query}"\n']
             output_lines.append(f"Found {len(results)} results:\n")
-            
+
             for i, r in enumerate(results, 1):
                 if r["source"] == "sophia":
                     output_lines.append(f"## [{i}] [Sophia] {r['ki_name']}")
@@ -229,113 +231,117 @@ async def call_tool(name: str, arguments: dict):
                     output_lines.append(f"- **Timestamp**: {r['timestamp']}")
                     output_lines.append(f"- **Score**: {r['score']:.3f}")
                 output_lines.append("")
-            
+
             log(f"Search completed: {len(results)} results")
             return [TextContent(type="text", text="\n".join(output_lines))]
-            
+
         except Exception as e:
             log(f"Search error: {e}")
             return [TextContent(type="text", text=f"Error searching: {str(e)}")]
-    
+
     elif name == "stats":
         try:
             with StdoutSuppressor():
                 from mekhane.symploke.adapters.embedding_adapter import EmbeddingAdapter
-            
+
             log("Getting stats...")
             stats = {}
-            
+
             if SOPHIA_INDEX.exists():
                 adapter = EmbeddingAdapter(model_name="all-MiniLM-L6-v2")
                 adapter.load(str(SOPHIA_INDEX))
                 stats["sophia_count"] = adapter.count()
             else:
                 stats["sophia_count"] = 0
-            
+
             if KAIROS_INDEX.exists():
                 adapter = EmbeddingAdapter(model_name="all-MiniLM-L6-v2")
                 adapter.load(str(KAIROS_INDEX))
                 stats["kairos_count"] = adapter.count()
             else:
                 stats["kairos_count"] = 0
-            
+
             output_lines = ["# Sophia/Kairos Statistics\n"]
-            output_lines.append(f"- **Sophia (Knowledge Items)**: {stats['sophia_count']} documents")
+            output_lines.append(
+                f"- **Sophia (Knowledge Items)**: {stats['sophia_count']} documents"
+            )
             output_lines.append(f"- **Kairos (Handoffs)**: {stats['kairos_count']} documents")
-            output_lines.append(f"- **Total**: {stats['sophia_count'] + stats['kairos_count']} documents")
-            
+            output_lines.append(
+                f"- **Total**: {stats['sophia_count'] + stats['kairos_count']} documents"
+            )
+
             log("Stats completed")
             return [TextContent(type="text", text="\n".join(output_lines))]
-            
+
         except Exception as e:
             log(f"Stats error: {e}")
             return [TextContent(type="text", text=f"Error getting stats: {str(e)}")]
-    
+
     elif name == "backlinks":
         ki_name = arguments.get("ki_name", "")
         if not ki_name:
             return [TextContent(type="text", text="Error: ki_name is required")]
-        
+
         try:
             with StdoutSuppressor():
                 from mekhane.symploke.sophia_backlinker import SophiaBacklinker
-            
+
             log(f"Getting backlinks for: {ki_name}")
             backlinker = SophiaBacklinker()
             backlinker.build_graph()
-            
+
             backlinks = backlinker.get_backlinks(ki_name)
             outlinks = backlinker.get_outlinks(ki_name)
-            
+
             output_lines = [f"# Backlinks: {ki_name}\n"]
-            
+
             if backlinks:
                 output_lines.append(f"## ← Backlinks ({len(backlinks)})")
                 for link in sorted(backlinks):
                     output_lines.append(f"- {link}")
             else:
                 output_lines.append("No backlinks found.")
-            
+
             output_lines.append("")
-            
+
             if outlinks:
                 output_lines.append(f"## → Outlinks ({len(outlinks)})")
                 for link in sorted(outlinks):
                     output_lines.append(f"- {link}")
-            
+
             return [TextContent(type="text", text="\n".join(output_lines))]
-            
+
         except Exception as e:
             log(f"Backlinks error: {e}")
             return [TextContent(type="text", text=f"Error: {str(e)}")]
-    
+
     elif name == "graph_stats":
         try:
             with StdoutSuppressor():
                 from mekhane.symploke.sophia_backlinker import SophiaBacklinker
-            
+
             log("Getting graph stats...")
             backlinker = SophiaBacklinker()
             backlinker.build_graph()
             stats = backlinker.get_stats()
-            
+
             output_lines = ["# Knowledge Graph Statistics\n"]
             output_lines.append(f"- **Nodes**: {stats['nodes']}")
             output_lines.append(f"- **Edges**: {stats['edges']}")
             output_lines.append(f"- **Isolated**: {stats['isolated']}")
-            
-            if stats['most_linked']:
+
+            if stats["most_linked"]:
                 output_lines.append("\n## Most Linked")
-                for name, count in stats['most_linked']:
+                for name, count in stats["most_linked"]:
                     if count > 0:
                         output_lines.append(f"- **{name}**: {count} backlinks")
-            
+
             return [TextContent(type="text", text="\n".join(output_lines))]
-            
+
         except Exception as e:
             log(f"Graph stats error: {e}")
             return [TextContent(type="text", text=f"Error: {str(e)}")]
-    
+
     else:
         return [TextContent(type="text", text=f"Unknown tool: {name}")]
 
@@ -346,11 +352,7 @@ async def main():
     try:
         async with stdio_server() as streams:
             log("stdio_server connected")
-            await server.run(
-                streams[0],
-                streams[1],
-                server.create_initialization_options()
-            )
+            await server.run(streams[0], streams[1], server.create_initialization_options())
     except Exception as e:
         log(f"Server error: {e}")
         raise
@@ -358,6 +360,7 @@ async def main():
 
 if __name__ == "__main__":
     import asyncio
+
     log("Running main...")
     try:
         asyncio.run(main())

@@ -15,6 +15,7 @@ import json
 @dataclass
 class LearnedPattern:
     """A learned intent-to-CCL mapping."""
+
     intent: str
     ccl: str
     confidence: float
@@ -24,17 +25,17 @@ class LearnedPattern:
 class DoxaLearner:
     """
     H4 Doxa connected pattern learner (Layer 2).
-    
+
     Persists successful intent-to-CCL conversions and retrieves them
     for future similar intents. Learning improves over time.
     """
-    
+
     STORE_PATH = Path("/home/laihuip001/oikos/mneme/.hegemonikon/ccl_patterns.json")
-    
+
     def __init__(self, store_path: Optional[Path] = None):
         """
         Initialize the learner.
-        
+
         Args:
             store_path: Override default storage path
         """
@@ -43,7 +44,7 @@ class DoxaLearner:
         else:
             self.store_path = self.STORE_PATH
         self.patterns: List[LearnedPattern] = self._load()
-    
+
     def _load(self) -> List[LearnedPattern]:
         """Load patterns from disk."""
         if self.store_path.exists():
@@ -53,17 +54,17 @@ class DoxaLearner:
             except (json.JSONDecodeError, TypeError):
                 return []
         return []
-    
+
     def _save(self):
         """Persist patterns to disk."""
         self.store_path.parent.mkdir(parents=True, exist_ok=True)
         data = [asdict(p) for p in self.patterns]
         self.store_path.write_text(json.dumps(data, indent=2, ensure_ascii=False))
-    
+
     def record(self, intent: str, ccl: str, confidence: float = 0.8):
         """
         Record a successful intent-to-CCL conversion.
-        
+
         Args:
             intent: The natural language intent
             ccl: The CCL expression that was generated
@@ -71,7 +72,7 @@ class DoxaLearner:
         """
         # Check for existing pattern
         existing = next((p for p in self.patterns if p.intent == intent), None)
-        
+
         if existing:
             # Reinforce existing pattern
             existing.usage_count += 1
@@ -81,22 +82,19 @@ class DoxaLearner:
                 existing.ccl = ccl
         else:
             # Add new pattern
-            self.patterns.append(LearnedPattern(
-                intent=intent,
-                ccl=ccl,
-                confidence=confidence,
-                usage_count=1
-            ))
-        
+            self.patterns.append(
+                LearnedPattern(intent=intent, ccl=ccl, confidence=confidence, usage_count=1)
+            )
+
         self._save()
-    
+
     def lookup(self, intent: str) -> Optional[str]:
         """
         Look up a similar pattern.
-        
+
         Args:
             intent: The natural language intent to match
-            
+
         Returns:
             CCL expression if found, None otherwise
         """
@@ -109,14 +107,14 @@ class DoxaLearner:
             if len(p.intent) > 5 and len(intent) > 5:
                 if p.intent in intent or intent in p.intent:
                     return p.ccl
-        
+
         return None
-    
+
     def get_stats(self) -> dict:
         """Get statistics about learned patterns."""
         if not self.patterns:
             return {"count": 0, "avg_confidence": 0.0, "total_usage": 0}
-        
+
         return {
             "count": len(self.patterns),
             "avg_confidence": sum(p.confidence for p in self.patterns) / len(self.patterns),

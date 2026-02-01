@@ -9,7 +9,7 @@ SEL Validator — Semantic Enforcement Layer 遵守検証
 
 Usage:
     from mekhane.ccl.sel_validator import SELValidator
-    
+
     validator = SELValidator()
     result = validator.validate(workflow="boot", operator="+", output=response)
     if not result.is_compliant:
@@ -26,6 +26,7 @@ import re
 @dataclass
 class SELRequirement:
     """SEL 要件"""
+
     description: str
     minimum_requirements: List[str]
 
@@ -33,6 +34,7 @@ class SELRequirement:
 @dataclass
 class SELValidationResult:
     """SEL 検証結果"""
+
     workflow: str
     operator: str
     is_compliant: bool
@@ -40,7 +42,7 @@ class SELValidationResult:
     missing_requirements: List[str] = field(default_factory=list)
     score: float = 0.0  # 遵守率 0.0-1.0
     details: str = ""
-    
+
     @property
     def summary(self) -> str:
         status = "✅ 遵守" if self.is_compliant else "⚠️ 非遵守"
@@ -49,66 +51,63 @@ class SELValidationResult:
 
 class SELValidator:
     """SEL 遵守検証器"""
-    
+
     def __init__(self, workflows_dir: Optional[Path] = None):
         self.workflows_dir = workflows_dir or Path("/home/laihuip001/oikos/.agent/workflows")
         self._cache: Dict[str, Dict] = {}
-    
+
     def load_sel_enforcement(self, workflow: str) -> Optional[Dict[str, SELRequirement]]:
         """ワークフローの sel_enforcement をロード"""
         if workflow in self._cache:
             return self._cache[workflow]
-        
+
         wf_path = self.workflows_dir / f"{workflow}.md"
         if not wf_path.exists():
             return None
-        
+
         content = wf_path.read_text(encoding="utf-8")
-        
+
         # YAML frontmatter を抽出
         if not content.startswith("---"):
             return None
-        
+
         parts = content.split("---", 2)
         if len(parts) < 3:
             return None
-        
+
         try:
             frontmatter = yaml.safe_load(parts[1])
         except yaml.YAMLError:
             return None
-        
+
         sel = frontmatter.get("sel_enforcement")
         if not sel:
             return None
-        
+
         result = {}
         for op, data in sel.items():
             if isinstance(data, dict):
                 result[op] = SELRequirement(
                     description=data.get("description", ""),
-                    minimum_requirements=data.get("minimum_requirements", [])
+                    minimum_requirements=data.get("minimum_requirements", []),
                 )
-        
+
         self._cache[workflow] = result
         return result
-    
+
     def check_requirement(self, requirement: str, output: str) -> bool:
         """要件が出力に満たされているか確認"""
         # 日本語の要件を正規化してマッチング
         req_normalized = requirement.lower().replace(" ", "").replace("必須", "")
-        
+
         # キーワードベースのチェック
-        keywords = [
-            k.strip() for k in req_normalized.split("/") 
-            if k.strip()
-        ]
-        
+        keywords = [k.strip() for k in req_normalized.split("/") if k.strip()]
+
         if not keywords:
             keywords = [req_normalized]
-        
+
         output_lower = output.lower()
-        
+
         for kw in keywords:
             # 直接マッチ
             if kw in output_lower:
@@ -128,27 +127,22 @@ class SELValidator:
                 if kw in key or key in kw:
                     if any(s in output_lower for s in synonyms):
                         return True
-        
+
         return False
-    
-    def validate(
-        self, 
-        workflow: str, 
-        operator: str, 
-        output: str
-    ) -> SELValidationResult:
+
+    def validate(self, workflow: str, operator: str, output: str) -> SELValidationResult:
         """ワークフロー出力の SEL 遵守を検証"""
         sel = self.load_sel_enforcement(workflow)
-        
+
         if not sel:
             return SELValidationResult(
                 workflow=workflow,
                 operator=operator,
                 is_compliant=True,
                 score=1.0,
-                details="sel_enforcement なし（検証スキップ）"
+                details="sel_enforcement なし（検証スキップ）",
             )
-        
+
         requirement = sel.get(operator)
         if not requirement:
             return SELValidationResult(
@@ -156,22 +150,22 @@ class SELValidator:
                 operator=operator,
                 is_compliant=True,
                 score=1.0,
-                details=f"演算子 {operator} の要件なし（検証スキップ）"
+                details=f"演算子 {operator} の要件なし（検証スキップ）",
             )
-        
+
         met = []
         missing = []
-        
+
         for req in requirement.minimum_requirements:
             if self.check_requirement(req, output):
                 met.append(req)
             else:
                 missing.append(req)
-        
+
         total = len(requirement.minimum_requirements)
         score = len(met) / total if total > 0 else 1.0
         is_compliant = len(missing) == 0
-        
+
         return SELValidationResult(
             workflow=workflow,
             operator=operator,
@@ -179,15 +173,12 @@ class SELValidator:
             met_requirements=met,
             missing_requirements=missing,
             score=score,
-            details=requirement.description
+            details=requirement.description,
         )
-    
-    def validate_batch(
-        self, 
-        outputs: Dict[str, Dict[str, str]]
-    ) -> List[SELValidationResult]:
+
+    def validate_batch(self, outputs: Dict[str, Dict[str, str]]) -> List[SELValidationResult]:
         """複数出力を一括検証
-        
+
         Args:
             outputs: {workflow: {operator: output}}
         """
@@ -196,13 +187,13 @@ class SELValidator:
             for operator, output in ops.items():
                 results.append(self.validate(workflow, operator, output))
         return results
-    
+
     def generate_report(self, results: List[SELValidationResult]) -> str:
         """検証レポートを生成"""
         total = len(results)
         compliant = sum(1 for r in results if r.is_compliant)
         avg_score = sum(r.score for r in results) / total if total > 0 else 0.0
-        
+
         lines = [
             "═" * 60,
             "[Hegemonikón] SEL 遵守レポート",
@@ -212,13 +203,13 @@ class SELValidator:
             f"📊 平均スコア: {avg_score:.0%}",
             f"",
         ]
-        
+
         if any(not r.is_compliant for r in results):
             lines.append("⚠️ 非遵守項目:")
             for r in results:
                 if not r.is_compliant:
                     lines.append(f"  - {r.workflow}{r.operator}: {r.missing_requirements}")
-        
+
         lines.append("═" * 60)
         return "\n".join(lines)
 
@@ -226,7 +217,7 @@ class SELValidator:
 # テスト用
 if __name__ == "__main__":
     validator = SELValidator()
-    
+
     # boot+ のテスト
     test_output = """
     ## Handoff 読込
@@ -238,7 +229,7 @@ if __name__ == "__main__":
     ## Identity Stack
     Persona プロファイルを読み込みました。
     """
-    
+
     result = validator.validate("boot", "+", test_output)
     print(result.summary)
     print(f"満たした要件: {result.met_requirements}")

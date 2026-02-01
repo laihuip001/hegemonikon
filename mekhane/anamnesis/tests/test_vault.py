@@ -42,7 +42,7 @@ class TestVaultManager(unittest.TestCase):
         # Check backup file
         backup_path = self.file_path.with_suffix(self.file_path.suffix + ".bak")
         self.assertTrue(backup_path.exists())
-        with open(backup_path, 'r') as f:
+        with open(backup_path, "r") as f:
             self.assertEqual(f.read(), "v1")
 
     def test_read_fallback(self):
@@ -50,7 +50,7 @@ class TestVaultManager(unittest.TestCase):
         backup_path = self.file_path.with_suffix(self.file_path.suffix + ".bak")
 
         # Write backup only
-        with open(backup_path, 'w') as f:
+        with open(backup_path, "w") as f:
             f.write("backup content")
 
         # Ensure main file does not exist
@@ -67,5 +67,5 @@ class TestVaultManager(unittest.TestCase):
             VaultManager.read_safe(non_existent)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

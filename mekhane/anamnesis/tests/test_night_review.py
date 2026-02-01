@@ -15,6 +15,7 @@ sys.path.insert(0, os.path.abspath("."))
 
 from mekhane.anamnesis import night_review
 
+
 class TestNightReview(unittest.TestCase):
 
     def setUp(self):
@@ -49,7 +50,11 @@ class TestNightReview(unittest.TestCase):
 
     def test_get_sessions_basic(self):
         files = [
-            ("plan.md", "# Title 1\nContent", {"artifactType": "test", "summary": "sum", "updatedAt": "2023-01-01T12:00:00Z"}),
+            (
+                "plan.md",
+                "# Title 1\nContent",
+                {"artifactType": "test", "summary": "sum", "updatedAt": "2023-01-01T12:00:00Z"},
+            ),
         ]
         self.create_session("session_1", files)
 
@@ -75,7 +80,7 @@ class TestNightReview(unittest.TestCase):
         # The code says: "if not meta_file.exists(): continue" inside the loop.
         # If no artifacts, "if not artifacts: continue" -> session skipped.
 
-        files = [("Content", None)] # None means no metadata file created
+        files = [("Content", None)]  # None means no metadata file created
         self.create_session("session_no_meta", files)
 
         with patch("mekhane.anamnesis.night_review.BRAIN_DIR", self.brain_dir):
@@ -116,6 +121,7 @@ class TestNightReview(unittest.TestCase):
         # Should be sorted by modified_at descending (newest first)
         self.assertEqual(sessions[0].session_id, "s2")
         self.assertEqual(sessions[1].session_id, "s1")
+
 
 if __name__ == "__main__":
     unittest.main()

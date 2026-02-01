@@ -13,65 +13,65 @@ from .macro_registry import MacroRegistry
 
 class MacroExpander:
     """Expands @macro references in CCL expressions."""
-    
+
     # Pattern to match @macro_name
-    MACRO_PATTERN = re.compile(r'@(\w+)')
-    
+    MACRO_PATTERN = re.compile(r"@(\w+)")
+
     # Pattern to match old @N level syntax (for migration)
-    OLD_LEVEL_PATTERN = re.compile(r'(@)(\d+)(?!\w)')
-    
+    OLD_LEVEL_PATTERN = re.compile(r"(@)(\d+)(?!\w)")
+
     def __init__(self, registry: Optional[MacroRegistry] = None):
         """
         Initialize the expander.
-        
+
         Args:
             registry: Macro registry to use
         """
         self.registry = registry or MacroRegistry()
-    
+
     def expand(self, ccl: str) -> Tuple[str, bool]:
         """
         Expand all @macro references in a CCL expression.
-        
+
         Args:
             ccl: CCL expression possibly containing @macros
-            
+
         Returns:
             Tuple of (expanded CCL, whether any expansion occurred)
         """
         expanded = False
         result = ccl
-        
+
         # Find all @name patterns
         for match in self.MACRO_PATTERN.finditer(ccl):
             name = match.group(1)
-            
+
             # Skip if it's a number (that's a level, not a macro)
             if name.isdigit():
                 continue
-            
+
             macro = self.registry.get(name)
             if macro:
                 result = result.replace(f"@{name}", macro.ccl)
                 self.registry.record_usage(name)
                 expanded = True
-        
+
         return result, expanded
-    
+
     def migrate_level_syntax(self, ccl: str) -> str:
         """
         Migrate old @N level syntax to new :N syntax.
-        
+
         Args:
             ccl: CCL expression with old @N syntax
-            
+
         Returns:
             CCL with :N syntax
         """
         # Replace @N with :N where N is a digit
         # But only when @ is followed by just digits (not a macro name)
-        return self.OLD_LEVEL_PATTERN.sub(r':\2', ccl)
-    
+        return self.OLD_LEVEL_PATTERN.sub(r":\2", ccl)
+
     def has_macros(self, ccl: str) -> bool:
         """Check if expression contains macro references."""
         for match in self.MACRO_PATTERN.finditer(ccl):
@@ -79,7 +79,7 @@ class MacroExpander:
             if not name.isdigit() and self.registry.get(name):
                 return True
         return False
-    
+
     def list_macros_in_expr(self, ccl: str) -> list:
         """List all macros used in an expression."""
         macros = []

@@ -10,6 +10,7 @@ Usage:
 """
 
 import sys
+
 sys.path.insert(0, ".")
 
 from mekhane.fep import HegemonikónFEPAgent
@@ -40,15 +41,15 @@ def print_state(result: dict):
     print(f"\n🧠 現在の信念状態:")
     print(f"   MAP: {result['map_state_names']}")
     print(f"   エントロピー: {result['entropy']:.3f}")
-    
+
     # Visual entropy bar
     max_entropy = np.log(8)  # 8 states
-    normalized = result['entropy'] / max_entropy
+    normalized = result["entropy"] / max_entropy
     bar_len = 20
     filled = int(normalized * bar_len)
     bar = "█" * filled + "░" * (bar_len - filled)
     print(f"   不確実性: [{bar}] {normalized:.1%}")
-    
+
     # Epochē check
     if normalized > 0.7:
         print(f"   ⚠️  Epochē 推奨: 判断を保留すべき")
@@ -65,7 +66,7 @@ def print_policy(q_pi, neg_efe):
         efe_indicator = "⬆" if -efe > 2.1 else "⬇"
         print(f"   {actions[i]:20s}: {prob:.1%} {bar}")
         print(f"      EFE: {-efe:.3f} {efe_indicator}")
-    
+
     recommended = "observe" if q_pi[0] > q_pi[1] else "act"
     print(f"\n   ➤ 推奨行動: {recommended}")
 
@@ -74,41 +75,41 @@ def interactive_loop():
     """Main interactive loop."""
     agent = HegemonikónFEPAgent(use_defaults=True)
     step_count = 0
-    
+
     print("=" * 60)
     print("  Hegemonikón FEP Interactive Experiment")
     print("=" * 60)
     print("\nストア派認知モデルをリアルタイムで探索します。")
     print("観測を入力すると、信念が更新されます。")
-    
+
     print_observation_menu()
-    
+
     # Show initial state
     initial_beliefs = agent.beliefs
     print(f"\n🔹 初期状態 (Epistemic Humility):")
     print(f"   エントロピー: {-np.sum(initial_beliefs * np.log(initial_beliefs + 1e-10)):.3f}")
-    
+
     while True:
         try:
             user_input = input("\n観測を入力 (0-7, r, h, q): ").strip().lower()
-            
+
             if user_input == "q":
                 print("\n👋 実験終了")
                 break
-            
+
             if user_input == "r":
                 agent = HegemonikónFEPAgent(use_defaults=True)
                 step_count = 0
                 print("\n🔄 リセット完了")
                 continue
-            
+
             if user_input == "h":
                 history = agent.get_history()
                 print(f"\n📜 履歴 ({len(history)} 件):")
                 for i, entry in enumerate(history[-5:]):  # Last 5
                     print(f"   {i+1}. {entry['type']}")
                 continue
-            
+
             try:
                 obs_idx = int(user_input)
                 if obs_idx < 0 or obs_idx > 7:
@@ -117,26 +118,27 @@ def interactive_loop():
             except ValueError:
                 print("❌ 数値または r/h/q を入力してください")
                 continue
-            
+
             # Process observation
             step_count += 1
             print(f"\n{'─' * 60}")
             print(f"ステップ {step_count}: 観測 {obs_idx}")
-            
+
             # O1 Noēsis
             result = agent.infer_states(observation=obs_idx)
             print_state(result)
-            
+
             # O2 Boulēsis
             q_pi, neg_efe = agent.infer_policies()
             print_policy(q_pi, neg_efe)
-            
+
         except KeyboardInterrupt:
             print("\n\n👋 中断されました")
             break
         except Exception as e:
             print(f"\n❌ エラー: {e}")
             import traceback
+
             traceback.print_exc()
 
 

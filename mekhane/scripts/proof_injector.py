@@ -28,7 +28,6 @@ FILE_LEVELS = {
     "derivative_selector.py": "L1/定理",
     "meaningful_traces.py": "L1/定理",
     "perigraphe_engine.py": "L1/定理",
-    
     # mekhane/fep - インフラ
     "fep_bridge.py": "L2/インフラ",
     "encoding.py": "L2/インフラ",
@@ -40,7 +39,6 @@ FILE_LEVELS = {
     "tekhne_registry.py": "L2/インフラ",
     "se_principle_validator.py": "L2/インフラ",
     "__init__.py": "L2/インフラ",
-    
     # mekhane/anamnesis
     "module_indexer.py": "L2/インフラ",
     "mneme_cli.py": "L2/インフラ",
@@ -58,16 +56,13 @@ FILE_LEVELS = {
     "lancedb_indexer.py": "L2/インフラ",
     "cli.py": "L2/インフラ",
     "workflow_artifact_batch.py": "L2/インフラ",
-    
     # collectors
     "arxiv.py": "L2/インフラ",
     "semantic_scholar.py": "L2/インフラ",
     "base.py": "L2/インフラ",
     "openalex.py": "L2/インフラ",
-    
     # models
     "paper.py": "L2/インフラ",
-    
     # symploke
     "factory.py": "L2/インフラ",
 }
@@ -75,9 +70,11 @@ FILE_LEVELS = {
 # デフォルトレベル
 DEFAULT_LEVEL = "L2/インフラ"
 
+
 def get_proof_level(filename: str) -> str:
     """ファイル名からPROOFレベルを取得"""
     return FILE_LEVELS.get(filename, DEFAULT_LEVEL)
+
 
 def add_proof_header(filepath: Path, dry_run: bool = False) -> bool:
     """ファイルにPROOFヘッダーを追加"""
@@ -86,37 +83,38 @@ def add_proof_header(filepath: Path, dry_run: bool = False) -> bool:
     except Exception as e:
         print(f"  ❌ 読み込みエラー: {e}")
         return False
-    
+
     # 既存のPROOFヘッダーをチェック
     if re.search(r"#\s*PROOF:", content[:500]):
         print(f"  ⏭️ 既存: {filepath}")
         return True
-    
+
     level = get_proof_level(filepath.name)
     header = f"# PROOF: [{level}]\n"
-    
+
     # shebangがある場合はその後に挿入
     if content.startswith("#!"):
         lines = content.split("\n", 1)
         new_content = lines[0] + "\n" + header + (lines[1] if len(lines) > 1 else "")
     else:
         new_content = header + content
-    
+
     if dry_run:
         print(f"  🔍 [DRY-RUN] {filepath} → [{level}]")
     else:
         filepath.write_text(new_content, encoding="utf-8")
         print(f"  ✅ 追加: {filepath} → [{level}]")
-    
+
     return True
+
 
 def main():
     parser = argparse.ArgumentParser(description="PROOF Header Batch Injector")
     parser.add_argument("--dry-run", action="store_true", help="実際には変更しない")
     args = parser.parse_args()
-    
+
     root = Path(__file__).parent.parent  # mekhane ディレクトリ
-    
+
     # 対象ファイルリスト
     targets = [
         # fep
@@ -144,7 +142,6 @@ def main():
         root / "fep/akribeia_evaluator.py",
         root / "fep/tekhne_registry.py",
         root / "fep/se_principle_validator.py",
-        
         # anamnesis
         root / "anamnesis/module_indexer.py",
         root / "anamnesis/mneme_cli.py",
@@ -167,17 +164,16 @@ def main():
         root / "anamnesis/collectors/semantic_scholar.py",
         root / "anamnesis/collectors/base.py",
         root / "anamnesis/collectors/openalex.py",
-        
         # symploke
         root / "symploke/factory.py",
         root / "symploke/config.py",
     ]
-    
+
     print(f"📋 PROOF Header Injector")
     print(f"   対象: {len(targets)} ファイル")
     print(f"   モード: {'DRY-RUN' if args.dry_run else '実行'}")
     print()
-    
+
     success = 0
     for target in targets:
         if target.exists():
@@ -185,9 +181,10 @@ def main():
                 success += 1
         else:
             print(f"  ⚠️ 見つからない: {target}")
-    
+
     print()
     print(f"✅ 完了: {success}/{len(targets)} ファイル")
+
 
 if __name__ == "__main__":
     main()

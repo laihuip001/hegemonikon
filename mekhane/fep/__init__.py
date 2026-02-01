@@ -377,6 +377,3 @@ __all__ = [
     "X_SERIES_MATRIX",
     "X_SERIES_REPRESENTATIVE_PATHS",
 ]
-
-
-

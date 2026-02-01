@@ -14,17 +14,20 @@ sys.path.insert(0, str(repo_root))
 from mekhane.anamnesis.index import GnosisIndex
 from mekhane.anamnesis.models.paper import Paper
 
+
 class TestGnosisIndex(unittest.TestCase):
     def setUp(self):
         self.test_dir = tempfile.mkdtemp()
         self.lance_dir = Path(self.test_dir) / "lancedb"
 
         # Mock Embedder to avoid loading models
-        self.embedder_patcher = patch('mekhane.anamnesis.index.Embedder')
+        self.embedder_patcher = patch("mekhane.anamnesis.index.Embedder")
         self.mock_embedder_class = self.embedder_patcher.start()
         self.mock_embedder_instance = self.mock_embedder_class.return_value
         # Mock embed_batch to return one vector per input text
-        self.mock_embedder_instance.embed_batch.side_effect = lambda texts: [[0.1] * 384 for _ in texts]
+        self.mock_embedder_instance.embed_batch.side_effect = lambda texts: [
+            [0.1] * 384 for _ in texts
+        ]
         self.mock_embedder_instance.embed.return_value = [0.1] * 384
 
         self.index = GnosisIndex(lance_dir=self.lance_dir)
@@ -44,7 +47,7 @@ class TestGnosisIndex(unittest.TestCase):
                 source="test",
                 source_id=str(i),
                 title=f"Title {i}",
-                abstract="Abstract"
+                abstract="Abstract",
             )
             papers.append(p)
 
@@ -66,5 +69,6 @@ class TestGnosisIndex(unittest.TestCase):
         self.assertEqual(self.index._primary_key_cache, expected_keys)
         self.assertEqual(len(self.index._primary_key_cache), 15)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()

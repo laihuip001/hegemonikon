@@ -26,7 +26,7 @@ from mekhane.fep.eukairia_detector import (
 
 class TestOpportunityWindow:
     """OpportunityWindow enum tests"""
-    
+
     def test_all_windows_exist(self):
         assert OpportunityWindow.WIDE.value == "wide"
         assert OpportunityWindow.NARROW.value == "narrow"
@@ -35,7 +35,7 @@ class TestOpportunityWindow:
 
 class TestOpportunityScale:
     """OpportunityScale enum tests"""
-    
+
     def test_all_scales_exist(self):
         assert OpportunityScale.MICRO.value == "micro"
         assert OpportunityScale.MACRO.value == "macro"
@@ -43,7 +43,7 @@ class TestOpportunityScale:
 
 class TestOpportunityDecision:
     """OpportunityDecision enum tests"""
-    
+
     def test_all_decisions_exist(self):
         assert OpportunityDecision.GO.value == "go"
         assert OpportunityDecision.WAIT.value == "wait"
@@ -52,7 +52,7 @@ class TestOpportunityDecision:
 
 class TestEukairiaResult:
     """EukairiaResult dataclass tests"""
-    
+
     def test_should_act(self):
         result = EukairiaResult(
             action="test",
@@ -70,7 +70,7 @@ class TestEukairiaResult:
         assert result.should_act is True
         assert result.should_wait is False
         assert result.net_value == pytest.approx(0.5)
-    
+
     def test_should_wait(self):
         result = EukairiaResult(
             action="test",
@@ -91,7 +91,7 @@ class TestEukairiaResult:
 
 class TestOpportunityContext:
     """OpportunityContext tests"""
-    
+
     def test_default_values(self):
         ctx = OpportunityContext()
         assert ctx.environment_ready == 0.5
@@ -101,7 +101,7 @@ class TestOpportunityContext:
 
 class TestCalculateReadiness:
     """_calculate_readiness tests"""
-    
+
     def test_high_readiness(self):
         ctx = OpportunityContext(
             environment_ready=0.9,
@@ -111,7 +111,7 @@ class TestCalculateReadiness:
         )
         readiness = _calculate_readiness(ctx)
         assert readiness > 0.8
-    
+
     def test_low_readiness(self):
         ctx = OpportunityContext(
             environment_ready=0.2,
@@ -121,7 +121,7 @@ class TestCalculateReadiness:
         )
         readiness = _calculate_readiness(ctx)
         assert readiness < 0.3
-    
+
     def test_competition_reduces_readiness(self):
         ctx_no_comp = OpportunityContext(
             environment_ready=0.8,
@@ -142,15 +142,15 @@ class TestCalculateReadiness:
 
 class TestCalculateWindow:
     """_calculate_window tests"""
-    
+
     def test_closing_window_high_pressure(self):
         ctx = OpportunityContext(deadline_pressure=0.9)
         assert _calculate_window(ctx) == OpportunityWindow.CLOSING
-    
+
     def test_wide_window(self):
         ctx = OpportunityContext(timing_favorable=0.8, deadline_pressure=0.2)
         assert _calculate_window(ctx) == OpportunityWindow.WIDE
-    
+
     def test_narrow_window(self):
         ctx = OpportunityContext(timing_favorable=0.4, deadline_pressure=0.5)
         assert _calculate_window(ctx) == OpportunityWindow.NARROW
@@ -158,7 +158,7 @@ class TestCalculateWindow:
 
 class TestDetectOpportunity:
     """detect_opportunity integration tests"""
-    
+
     def test_go_decision_high_readiness(self):
         ctx = OpportunityContext(
             environment_ready=0.9,
@@ -173,12 +173,12 @@ class TestDetectOpportunity:
         )
         assert result.decision == OpportunityDecision.GO
         assert result.should_act is True
-    
+
     def test_wait_decision_low_readiness(self):
         ctx = OpportunityContext(
             environment_ready=0.8,
             resources_available=0.3,  # Low resources
-            skills_prepared=0.4,      # Low skills
+            skills_prepared=0.4,  # Low skills
             timing_favorable=0.7,
         )
         result = detect_opportunity(
@@ -188,7 +188,7 @@ class TestDetectOpportunity:
         )
         # Low readiness should lead to WAIT
         assert result.decision in (OpportunityDecision.WAIT, OpportunityDecision.PASS)
-    
+
     def test_pass_decision_high_risk(self):
         ctx = OpportunityContext(
             environment_ready=0.2,
@@ -205,7 +205,7 @@ class TestDetectOpportunity:
         )
         # High risk, low readiness → PASS
         assert result.decision == OpportunityDecision.PASS
-    
+
     def test_go_on_closing_window(self):
         ctx = OpportunityContext(
             environment_ready=0.6,
@@ -221,7 +221,7 @@ class TestDetectOpportunity:
         )
         # Closing window should push toward GO if net >= 0
         assert result.window == OpportunityWindow.CLOSING
-    
+
     def test_factors_are_populated(self):
         ctx = OpportunityContext(
             environment_ready=0.9,
@@ -231,7 +231,7 @@ class TestDetectOpportunity:
         )
         result = detect_opportunity("テスト", ctx)
         assert len(result.factors) > 0
-    
+
     def test_default_context(self):
         result = detect_opportunity("デフォルト行動")
         assert result.action == "デフォルト行動"
@@ -240,7 +240,7 @@ class TestDetectOpportunity:
 
 class TestFormatEukairiaMarkdown:
     """format_eukairia_markdown tests"""
-    
+
     def test_format_includes_key_fields(self):
         ctx = OpportunityContext(
             environment_ready=0.8,
@@ -257,7 +257,7 @@ class TestFormatEukairiaMarkdown:
 
 class TestEncodeEukairiaObservation:
     """encode_eukairia_observation tests"""
-    
+
     def test_encode_go_decision(self):
         result = EukairiaResult(
             action="test",
@@ -276,7 +276,7 @@ class TestEncodeEukairiaObservation:
         assert obs["context_clarity"] == 0.85  # readiness
         assert obs["urgency"] == 0.3  # WIDE window
         assert obs["confidence"] == 0.8
-    
+
     def test_encode_closing_window(self):
         result = EukairiaResult(
             action="test",

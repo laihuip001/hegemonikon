@@ -52,6 +52,7 @@ GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 @dataclass
 class SessionInfo:
     """セッション情報"""
+
     session_id: str
     title: str
     objective: str
@@ -63,6 +64,7 @@ class SessionInfo:
 @dataclass
 class NightReview:
     """ナイトレビュー構造体"""
+
     date: str
     summary: str  # 3-7行の変更サマリ
     learnings: List[str]  # 学び・気づき
@@ -112,12 +114,14 @@ def _process_session_dir(session_dir: Path, target_date: Optional[date]) -> Opti
                 if created_at is None or artifact_updated < created_at:
                     created_at = artifact_updated
 
-            artifacts.append({
-                "type": meta.get("artifactType", "unknown"),
-                "summary": meta.get("summary", ""),
-                "content": content[:2000],
-                "updated_at": artifact_updated,
-            })
+            artifacts.append(
+                {
+                    "type": meta.get("artifactType", "unknown"),
+                    "summary": meta.get("summary", ""),
+                    "content": content[:2000],
+                    "updated_at": artifact_updated,
+                }
+            )
 
             # Extract title from implementation_plan or task
             if not title and "plan" in md_file.name.lower():
@@ -156,12 +160,12 @@ def _process_session_dir(session_dir: Path, target_date: Optional[date]) -> Opti
 def get_sessions(target_date: Optional[date] = None) -> List[SessionInfo]:
     """
     Antigravity brain からセッション情報を取得。
-    
+
     Args:
         target_date: 指定日のみ取得。Noneの場合は全件。
     """
     sessions = []
-    
+
     # Use ProcessPoolExecutor to process sessions in parallel
     import concurrent.futures
 
@@ -169,8 +173,10 @@ def get_sessions(target_date: Optional[date] = None) -> List[SessionInfo]:
     max_workers = min(32, (os.cpu_count() or 1) + 4)
 
     with concurrent.futures.ProcessPoolExecutor(max_workers=max_workers) as executor:
-        futures = {executor.submit(_process_session_dir, p, target_date): p for p in BRAIN_DIR.iterdir()}
-        
+        futures = {
+            executor.submit(_process_session_dir, p, target_date): p for p in BRAIN_DIR.iterdir()
+        }
+
         for future in concurrent.futures.as_completed(futures):
             try:
                 result = future.result()
@@ -178,22 +184,21 @@ def get_sessions(target_date: Optional[date] = None) -> List[SessionInfo]:
                     sessions.append(result)
             except Exception as e:
                 print(f"Error processing session: {e}", file=sys.stderr)
-    
+
     # Sort by modified_at descending
     sessions.sort(key=lambda s: s.modified_at or "", reverse=True)
-    
+
     return sessions
 
 
 def generate_review_prompt(sessions: List[SessionInfo], target_date: date) -> str:
     """Gemini API用のプロンプトを生成"""
-    
+
     session_summaries = []
     for s in sessions:
-        artifact_list = "\n".join([
-            f"  - [{a['type']}] {a['summary'][:100]}..." 
-            for a in s.artifacts
-        ])
+        artifact_list = "\n".join(
+            [f"  - [{a['type']}] {a['summary'][:100]}..." for a in s.artifacts]
+        )
         session_summaries.append(f"""
 ### {s.title}
 - Session ID: {s.session_id[:8]}
@@ -201,9 +206,9 @@ def generate_review_prompt(sessions: List[SessionInfo], target_date: date) -> st
 - アーティファクト:
 {artifact_list}
 """)
-    
+
     sessions_text = "\n".join(session_summaries)
-    
+
     return f"""あなたは Hegemonikón スペースの振り返りアシスタントです。
 以下のセッション情報に基づいて、{target_date.isoformat()} のナイトレビューを生成してください。
 
@@ -234,50 +239,44 @@ def generate_review_prompt(sessions: List[SessionInfo], target_date: date) -> st
 
 def call_gemini_api(prompt: str) -> str:
     """Gemini API を呼び出してレビューを生成"""
-    
+
     if not GEMINI_API_KEY:
-        raise ValueError(
-            "GEMINI_API_KEY not found. "
-            "Set it in M:/Hegemonikon/.env.local"
-        )
-    
+        raise ValueError("GEMINI_API_KEY not found. " "Set it in M:/Hegemonikon/.env.local")
+
     try:
         from google import genai
         from google.genai import types
     except ImportError:
-        raise ImportError(
-            "google-genai not installed. "
-            "Run: pip install google-genai"
-        )
-    
+        raise ImportError("google-genai not installed. " "Run: pip install google-genai")
+
     client = genai.Client(api_key=GEMINI_API_KEY)
-    
+
     response = client.models.generate_content(
         model="gemini-2.0-flash",
         contents=prompt,
         config=types.GenerateContentConfig(
             temperature=0.3,
             max_output_tokens=1500,
-        )
+        ),
     )
-    
+
     return response.text
 
 
 def parse_review_response(response_text: str, target_date: date, session_count: int) -> NightReview:
     """APIレスポンスを構造化"""
-    
+
     lines = response_text.strip().split("\n")
-    
+
     summary_lines = []
     learnings = []
     tasks = []
-    
+
     current_section = None
-    
+
     for line in lines:
         line_stripped = line.strip()
-        
+
         if "今日の変更サマリ" in line or "変更サマリ" in line:
             current_section = "summary"
             continue
@@ -287,10 +286,10 @@ def parse_review_response(response_text: str, target_date: date, session_count: 
         elif "タスク" in line or "引き継ぐ" in line:
             current_section = "tasks"
             continue
-        
+
         if not line_stripped or line_stripped.startswith("#"):
             continue
-        
+
         if current_section == "summary":
             summary_lines.append(line_stripped)
         elif current_section == "learnings":
@@ -301,7 +300,7 @@ def parse_review_response(response_text: str, target_date: date, session_count: 
                 tasks.append(line_stripped[6:])
             elif line_stripped.startswith("- "):
                 tasks.append(line_stripped[2:])
-    
+
     return NightReview(
         date=target_date.isoformat(),
         summary="\n".join(summary_lines[:7]),
@@ -314,16 +313,16 @@ def parse_review_response(response_text: str, target_date: date, session_count: 
 
 def save_review(review: NightReview) -> Path:
     """レビューをファイルに保存"""
-    
+
     vault_root = OUTPUT_DIR.parent
     vault = VaultManager(vault_root)
 
     # Relative path from vault_root
     rel_dir = Path(OUTPUT_DIR.name)
-    
+
     filename = f"review_{review.date}.md"
     rel_path = rel_dir / filename
-    
+
     content = f"""# 📋 Night Review ({review.date})
 
 ## 今日の変更サマリ
@@ -343,14 +342,14 @@ def save_review(review: NightReview) -> Path:
 *Sessions processed: {review.sessions_processed}*
 *Generated at: {review.generated_at}*
 """
-    
+
     # Use VaultManager to write file (handles backup and atomic write)
     vault.write_file(rel_path, content)
-    
+
     # Also save JSON for programmatic access
     json_filename = f"review_{review.date}.json"
     vault.write_json(rel_dir / json_filename, asdict(review))
-    
+
     return vault_root / rel_path
 
 
@@ -360,22 +359,22 @@ def generate_night_review(
 ) -> NightReview:
     """
     ナイトレビューを生成。
-    
+
     Args:
         target_date: レビュー対象日（デフォルト: 今日）
         process_all: 全履歴を遡及処理
     """
-    
+
     if target_date is None:
         target_date = date.today()
-    
+
     print(f"[Hegemonikon] M8 Anamnēsis - Night Review Generator")
     print(f"  Target: {target_date.isoformat()}")
     print(f"  Mode: {'All history' if process_all else 'Single day'}")
-    
+
     # Get sessions
     sessions = get_sessions(None if process_all else target_date)
-    
+
     if not sessions:
         print(f"  Warning: No sessions found for {target_date}")
         return NightReview(
@@ -386,34 +385,34 @@ def generate_night_review(
             sessions_processed=0,
             generated_at=datetime.now().isoformat(),
         )
-    
+
     print(f"  Sessions found: {len(sessions)}")
-    
+
     # Generate prompt
     prompt = generate_review_prompt(sessions, target_date)
-    
+
     # Call API
     print("  Calling Gemini API...")
     response = call_gemini_api(prompt)
-    
+
     # Parse response
     review = parse_review_response(response, target_date, len(sessions))
-    
+
     # Save
     filepath = save_review(review)
     print(f"  Saved: {filepath}")
-    
+
     return review
 
 
 def list_sessions():
     """全セッション一覧を表示"""
     sessions = get_sessions()
-    
+
     print(f"\n[Hegemonikon] Session List")
     print("=" * 60)
     print(f"Total: {len(sessions)} sessions\n")
-    
+
     for s in sessions[:20]:  # Show first 20
         print(f"[{s.session_id[:8]}] {s.title}")
         print(f"    Modified: {s.modified_at}")
@@ -423,27 +422,27 @@ def list_sessions():
 
 def main():
     import argparse
-    
+
     parser = argparse.ArgumentParser(description="Night Review Generator")
     subparsers = parser.add_subparsers(dest="command", required=True)
-    
+
     # generate command
     gen_parser = subparsers.add_parser("generate", help="Generate night review")
     gen_parser.add_argument("--date", type=str, help="Target date (YYYY-MM-DD)")
     gen_parser.add_argument("--all", action="store_true", help="Process all history")
-    
+
     # list command
     subparsers.add_parser("list", help="List all sessions")
-    
+
     args = parser.parse_args()
-    
+
     if args.command == "generate":
         target = None
         if args.date:
             target = date.fromisoformat(args.date)
-        
+
         review = generate_night_review(target, args.all)
-        
+
         print("\n" + "=" * 60)
         print(f"# Night Review ({review.date})")
         print("=" * 60)
@@ -454,7 +453,7 @@ def main():
         print("\n## タスク候補")
         for t in review.tasks:
             print(f"- [ ] {t}")
-        
+
     elif args.command == "list":
         list_sessions()
 

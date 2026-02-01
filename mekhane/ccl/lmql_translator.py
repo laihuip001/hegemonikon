@@ -17,48 +17,52 @@ from enum import Enum, auto
 from typing import Optional, List, Dict, Any
 import re
 
-
 # =============================================================================
 # AST Nodes
 # =============================================================================
 
+
 class OpType(Enum):
     """CCL 演算子タイプ"""
-    DEEPEN = auto()      # +
-    CONDENSE = auto()    # -
-    ASCEND = auto()      # ^
-    DESCEND = auto()     # /
-    QUERY = auto()       # ?
-    INVERT = auto()      # \
-    DIFF = auto()        # '
-    ROOT = auto()        # √
-    FUSE = auto()        # *
-    OSC = auto()         # ~
-    SEQ = auto()         # _
-    CONVERGE = auto()    # >> or →
-    EXPAND = auto()      # !
+
+    DEEPEN = auto()  # +
+    CONDENSE = auto()  # -
+    ASCEND = auto()  # ^
+    DESCEND = auto()  # /
+    QUERY = auto()  # ?
+    INVERT = auto()  # \
+    DIFF = auto()  # '
+    ROOT = auto()  # √
+    FUSE = auto()  # *
+    OSC = auto()  # ~
+    SEQ = auto()  # _
+    CONVERGE = auto()  # >> or →
+    EXPAND = auto()  # !
 
 
 @dataclass
 class Workflow:
     """ワークフローノード"""
+
     id: str
     operators: List[OpType]
     modifiers: Dict[str, Any]  # e.g., {"s1": 2, "k2": 1}
     selector: Optional[str] = None
 
 
-@dataclass 
+@dataclass
 class Condition:
     """条件ノード"""
-    var: str      # e.g., "V[]"
-    op: str       # e.g., "<", ">", "="
+
+    var: str  # e.g., "V[]"
+    op: str  # e.g., "<", ">", "="
     value: float
 
 
 @dataclass
 class ConvergenceLoop:
     """収束ループ: A >> cond"""
+
     body: Any  # Workflow or Expression
     condition: Condition
 
@@ -66,6 +70,7 @@ class ConvergenceLoop:
 @dataclass
 class Sequence:
     """シーケンス: A _ B"""
+
     steps: List[Any]
 
 
@@ -73,70 +78,101 @@ class Sequence:
 # Simple Parser (PoC)
 # =============================================================================
 
+
 class CCLParser:
     """CCL 簡易パーサー（PoC）"""
-    
+
     WORKFLOWS = {
-        "noe", "bou", "zet", "ene", "s", "mek", "met", "sta", "pra",
-        "h", "pro", "pis", "ore", "dox", "p", "kho", "hod", "tro", "tek",
-        "k", "euk", "chr", "tel", "sop", "a", "pat", "dia", "gno", "epi",
-        "boot", "bye", "ax", "u", "syn", "pan", "pre", "poc", "why"
+        "noe",
+        "bou",
+        "zet",
+        "ene",
+        "s",
+        "mek",
+        "met",
+        "sta",
+        "pra",
+        "h",
+        "pro",
+        "pis",
+        "ore",
+        "dox",
+        "p",
+        "kho",
+        "hod",
+        "tro",
+        "tek",
+        "k",
+        "euk",
+        "chr",
+        "tel",
+        "sop",
+        "a",
+        "pat",
+        "dia",
+        "gno",
+        "epi",
+        "boot",
+        "bye",
+        "ax",
+        "u",
+        "syn",
+        "pan",
+        "pre",
+        "poc",
+        "why",
     }
-    
+
     UNARY_OPS = {
-        '+': OpType.DEEPEN,
-        '-': OpType.CONDENSE,
-        '^': OpType.ASCEND,
-        '/': OpType.DESCEND,
-        '?': OpType.QUERY,
-        '\\': OpType.INVERT,
+        "+": OpType.DEEPEN,
+        "-": OpType.CONDENSE,
+        "^": OpType.ASCEND,
+        "/": OpType.DESCEND,
+        "?": OpType.QUERY,
+        "\\": OpType.INVERT,
         "'": OpType.DIFF,
-        '!': OpType.EXPAND,
+        "!": OpType.EXPAND,
     }
-    
+
     def parse(self, ccl: str) -> Any:
         """CCL 式をパース"""
         ccl = ccl.strip()
-        
+
         # 収束ループ: A >> cond
         if ">>" in ccl:
             parts = ccl.split(">>", 1)
             body = self._parse_workflow(parts[0].strip())
             condition = self._parse_condition(parts[1].strip())
             return ConvergenceLoop(body=body, condition=condition)
-        
+
         # シーケンス: A _ B
         if "_" in ccl:
             parts = ccl.split("_")
             steps = [self._parse_workflow(p.strip()) for p in parts]
             return Sequence(steps=steps)
-        
+
         return self._parse_workflow(ccl)
-    
+
     def _parse_workflow(self, expr: str) -> Workflow:
         """ワークフロー式をパース"""
         # /wf+- 形式
-        match = re.match(r'^/?([a-z]+)([\+\-\^\?\!\'\\]*)', expr)
+        match = re.match(r"^/?([a-z]+)([\+\-\^\?\!\'\\]*)", expr)
         if not match:
             raise ValueError(f"Invalid workflow: {expr}")
-        
+
         wf_id = match.group(1)
         ops_str = match.group(2)
-        
+
         operators = [self.UNARY_OPS[op] for op in ops_str if op in self.UNARY_OPS]
-        
+
         return Workflow(id=wf_id, operators=operators, modifiers={})
-    
+
     def _parse_condition(self, expr: str) -> Condition:
         """条件式をパース"""
         # V[] < 0.3 形式
-        match = re.match(r'(V\[\]|E\[\])\s*([<>=]+)\s*([\d.]+)', expr)
+        match = re.match(r"(V\[\]|E\[\])\s*([<>=]+)\s*([\d.]+)", expr)
         if match:
-            return Condition(
-                var=match.group(1),
-                op=match.group(2),
-                value=float(match.group(3))
-            )
+            return Condition(var=match.group(1), op=match.group(2), value=float(match.group(3)))
         return Condition(var="V[]", op="<", value=0.5)
 
 
@@ -144,9 +180,10 @@ class CCLParser:
 # LMQL Translator
 # =============================================================================
 
+
 class LMQLTranslator:
     """CCL AST → LMQL プログラム変換"""
-    
+
     # ワークフロー → プロンプトテンプレート
     WORKFLOW_PROMPTS = {
         "noe": "深い認識: 以下について多角的に分析してください。",
@@ -157,7 +194,7 @@ class LMQLTranslator:
         "ene": "実行: 以下を具体的なステップで実行してください。",
         "sop": "調査: 以下について調査してください。",
     }
-    
+
     def translate(self, ast: Any) -> str:
         """AST を LMQL プログラムに変換"""
         if isinstance(ast, ConvergenceLoop):
@@ -168,18 +205,18 @@ class LMQLTranslator:
             return self._translate_workflow(ast)
         else:
             raise ValueError(f"Unknown AST node: {type(ast)}")
-    
+
     def _translate_workflow(self, wf: Workflow) -> str:
         """ワークフローを LMQL に変換"""
         prompt = self.WORKFLOW_PROMPTS.get(wf.id, f"/{wf.id} を実行:")
-        
+
         # 演算子による修飾
         depth_instruction = ""
         if OpType.DEEPEN in wf.operators:
             depth_instruction = "詳細に、3つ以上の視点で、根拠を明示して"
         elif OpType.CONDENSE in wf.operators:
             depth_instruction = "簡潔に、要点のみ"
-        
+
         return f'''
 @lmql.query
 def ccl_{wf.id}(context: str):
@@ -194,12 +231,12 @@ def ccl_{wf.id}(context: str):
     from
         "openai/gpt-4o"
 '''
-    
+
     def _translate_convergence(self, node: ConvergenceLoop) -> str:
         """収束ループを LMQL に変換"""
         body = self._translate_workflow(node.body)
         cond = node.condition
-        
+
         return f'''
 # CCL 収束ループ: {node.body.id} >> {cond.var} {cond.op} {cond.value}
 
@@ -231,15 +268,16 @@ def convergence_loop(context: str):
     from
         "openai/gpt-4o"
 '''
-    
+
     def _translate_sequence(self, node: Sequence) -> str:
         """シーケンスを LMQL に変換"""
-        steps = "\n".join([
-            f'        "Step {i+1}: /{step.id} を実行"'
-            f'\n        "[STEP_{i}_RESULT]"'
-            for i, step in enumerate(node.steps)
-        ])
-        
+        steps = "\n".join(
+            [
+                f'        "Step {i+1}: /{step.id} を実行"' f'\n        "[STEP_{i}_RESULT]"'
+                for i, step in enumerate(node.steps)
+            ]
+        )
+
         return f'''
 @lmql.query
 def sequence_execution(context: str):
@@ -257,14 +295,15 @@ def sequence_execution(context: str):
 # Main: CCL → LMQL Pipeline
 # =============================================================================
 
+
 def ccl_to_lmql(ccl_expr: str) -> str:
     """CCL 式を LMQL プログラムに変換"""
     parser = CCLParser()
     translator = LMQLTranslator()
-    
+
     ast = parser.parse(ccl_expr)
     lmql_code = translator.translate(ast)
-    
+
     return lmql_code
 
 
@@ -279,7 +318,7 @@ if __name__ == "__main__":
         "/s+_/ene",
         "/noe+ >> V[] < 0.3",
     ]
-    
+
     for ccl in test_cases:
         print(f"\n{'='*60}")
         print(f"CCL: {ccl}")

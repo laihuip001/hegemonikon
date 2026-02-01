@@ -38,7 +38,7 @@ class Scale(Enum):
 
 
 class Severity(Enum):
-    ERROR = "error"      # ブロック
+    ERROR = "error"  # ブロック
     WARNING = "warning"  # 警告のみ
 
 
@@ -55,11 +55,11 @@ class ValidationResult:
     valid: bool
     violations: list[Violation]
     scale: Scale
-    
+
     def __str__(self) -> str:
         if self.valid:
             return f"✅ PASS (Scale: {self.scale.value})"
-        
+
         lines = [f"❌ FAIL (Scale: {self.scale.value})"]
         for v in self.violations:
             icon = "⛔" if v.severity == Severity.ERROR else "⚠️"
@@ -69,7 +69,7 @@ class ValidationResult:
 
 class SEPrincipleValidator:
     """SE 5原則の構造的強制を検証"""
-    
+
     # 必須パターン定義
     MEK_PATTERNS = {
         "fail_fast": {
@@ -88,7 +88,7 @@ class SEPrincipleValidator:
             "min_scale": Scale.MESO,
         },
     }
-    
+
     S_PATTERNS = {
         "stage_0": {
             "pattern": r"STAGE\s*0:",
@@ -141,9 +141,9 @@ class SEPrincipleValidator:
             "min_scale": Scale.MESO,
         },
     }
-    
+
     SCALE_ORDER = {Scale.MICRO: 0, Scale.MESO: 1, Scale.MACRO: 2}
-    
+
     def detect_scale(self, content: str) -> Scale:
         """コンテンツからスケールを自動検出"""
         scale_patterns = [
@@ -154,56 +154,55 @@ class SEPrincipleValidator:
             (r"Meso", Scale.MESO),
             (r"Macro", Scale.MACRO),
         ]
-        
+
         for pattern, scale in scale_patterns:
             if re.search(pattern, content, re.IGNORECASE):
                 return scale
-        
+
         # デフォルトは Meso
         return Scale.MESO
-    
+
     def should_check(self, field_min_scale: Scale, current_scale: Scale) -> bool:
         """現在のスケールでこのフィールドをチェックすべきか"""
         return self.SCALE_ORDER[current_scale] >= self.SCALE_ORDER[field_min_scale]
-    
+
     def validate(
-        self, 
-        filepath: Path, 
-        workflow: str,
-        scale: Optional[Scale] = None
+        self, filepath: Path, workflow: str, scale: Optional[Scale] = None
     ) -> ValidationResult:
         """ファイルを検証"""
         content = filepath.read_text(encoding="utf-8")
-        
+
         # スケール検出または指定
         detected_scale = scale or self.detect_scale(content)
-        
+
         # パターン選択
         patterns = self.MEK_PATTERNS if workflow == "mek" else self.S_PATTERNS
-        
+
         violations = []
-        
+
         for field, config in patterns.items():
             if not self.should_check(config["min_scale"], detected_scale):
                 continue
-            
+
             if not re.search(config["pattern"], content, re.IGNORECASE):
                 severity = Severity.ERROR if detected_scale == Scale.MACRO else Severity.WARNING
-                
+
                 # Micro でも必須のものは ERROR
                 if config["min_scale"] == Scale.MICRO:
                     severity = Severity.ERROR
-                
-                violations.append(Violation(
-                    field=field,
-                    principle=config["principle"],
-                    severity=severity,
-                    message=f"パターン '{config['pattern']}' が見つかりません",
-                ))
-        
+
+                violations.append(
+                    Violation(
+                        field=field,
+                        principle=config["principle"],
+                        severity=severity,
+                        message=f"パターン '{config['pattern']}' が見つかりません",
+                    )
+                )
+
         # ERROR があれば invalid
         has_errors = any(v.severity == Severity.ERROR for v in violations)
-        
+
         return ValidationResult(
             valid=not has_errors,
             violations=violations,
@@ -213,13 +212,15 @@ class SEPrincipleValidator:
 
 def main():
     if len(sys.argv) < 4:
-        print("Usage: python se_principle_validator.py <filepath> --workflow <mek|s> [--scale <micro|meso|macro>]")
+        print(
+            "Usage: python se_principle_validator.py <filepath> --workflow <mek|s> [--scale <micro|meso|macro>]"
+        )
         sys.exit(1)
-    
+
     filepath = Path(sys.argv[1])
     workflow = None
     scale = None
-    
+
     i = 2
     while i < len(sys.argv):
         if sys.argv[i] == "--workflow":
@@ -230,20 +231,20 @@ def main():
             i += 2
         else:
             i += 1
-    
+
     if not filepath.exists():
         print(f"❌ ファイルが見つかりません: {filepath}")
         sys.exit(1)
-    
+
     if workflow not in ("mek", "s"):
         print(f"❌ workflow は 'mek' または 's' を指定してください")
         sys.exit(1)
-    
+
     validator = SEPrincipleValidator()
     result = validator.validate(filepath, workflow, scale)
-    
+
     print(result)
-    
+
     if not result.valid:
         print("\n⛔ SE原則違反: ブロック")
         print("   修正後に再実行してください")

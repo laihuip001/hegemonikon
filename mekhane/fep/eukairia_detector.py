@@ -31,28 +31,31 @@ from enum import Enum
 
 class OpportunityWindow(Enum):
     """機会窓の状態"""
-    WIDE = "wide"           # 広い: 時間的/条件的余裕あり
-    NARROW = "narrow"       # 狭い: 限られた窓
-    CLOSING = "closing"     # 閉じかけ: 急いで判断必要
+
+    WIDE = "wide"  # 広い: 時間的/条件的余裕あり
+    NARROW = "narrow"  # 狭い: 限られた窓
+    CLOSING = "closing"  # 閉じかけ: 急いで判断必要
 
 
 class OpportunityScale(Enum):
     """機会のスケール"""
-    MICRO = "micro"   # 局所的機会 (短期・小規模)
-    MACRO = "macro"   # 大局的機会 (長期・大規模)
+
+    MICRO = "micro"  # 局所的機会 (短期・小規模)
+    MACRO = "macro"  # 大局的機会 (長期・大規模)
 
 
 class OpportunityDecision(Enum):
     """好機判定結果"""
-    GO = "go"       # 好機 — 行動せよ
-    WAIT = "wait"   # 待機 — 条件改善を待て
-    PASS = "pass"   # 見送り — この機会は取らない
+
+    GO = "go"  # 好機 — 行動せよ
+    WAIT = "wait"  # 待機 — 条件改善を待て
+    PASS = "pass"  # 見送り — この機会は取らない
 
 
 @dataclass
 class EukairiaResult:
     """好機判定結果
-    
+
     Attributes:
         action: 判断対象の行動
         window: 機会窓の状態
@@ -67,6 +70,7 @@ class EukairiaResult:
         recommendation: 推奨アクション
         factors: 判定に影響した要因
     """
+
     action: str
     window: OpportunityWindow
     scale: OpportunityScale
@@ -79,17 +83,17 @@ class EukairiaResult:
     readiness_score: float
     recommendation: str
     factors: List[str] = field(default_factory=list)
-    
+
     @property
     def should_act(self) -> bool:
         """今行動すべきか"""
         return self.decision == OpportunityDecision.GO
-    
+
     @property
     def should_wait(self) -> bool:
         """待機すべきか"""
         return self.decision == OpportunityDecision.WAIT
-    
+
     @property
     def net_value(self) -> float:
         """純価値 (リターン - リスク)"""
@@ -100,10 +104,11 @@ class EukairiaResult:
 # 好機評価パラメータ
 # =============================================================================
 
+
 @dataclass
 class OpportunityContext:
     """機会評価のコンテキスト
-    
+
     Attributes:
         environment_ready: 環境が整っているか (0.0-1.0)
         resources_available: リソースが利用可能か (0.0-1.0)
@@ -112,6 +117,7 @@ class OpportunityContext:
         competition_high: 競争が激しいか (True で不利)
         deadline_pressure: 期限からの圧力 (0.0-1.0)
     """
+
     environment_ready: float = 0.5
     resources_available: float = 0.5
     skills_prepared: float = 0.5
@@ -123,10 +129,10 @@ class OpportunityContext:
 def _calculate_readiness(ctx: OpportunityContext) -> float:
     """準備度を計算"""
     base = (
-        ctx.environment_ready * 0.3 +
-        ctx.resources_available * 0.3 +
-        ctx.skills_prepared * 0.25 +
-        ctx.timing_favorable * 0.15
+        ctx.environment_ready * 0.3
+        + ctx.resources_available * 0.3
+        + ctx.skills_prepared * 0.25
+        + ctx.timing_favorable * 0.15
     )
     # 競争が激しい場合は減点
     if ctx.competition_high:
@@ -165,7 +171,7 @@ def _calculate_risk(
     pressure_risk = ctx.deadline_pressure * 0.3
     # 競争 → 中リスク
     competition_risk = 0.2 if ctx.competition_high else 0.0
-    
+
     return min(1.0, unpreparedness * 0.5 + pressure_risk + competition_risk)
 
 
@@ -175,9 +181,9 @@ def _calculate_opportunity_cost(
 ) -> float:
     """見送った場合の機会損失を計算"""
     window_factor = {
-        OpportunityWindow.WIDE: 0.3,      # 後でも再挑戦可能
-        OpportunityWindow.NARROW: 0.6,    # 逃すと痛い
-        OpportunityWindow.CLOSING: 0.9,   # ほぼ最後のチャンス
+        OpportunityWindow.WIDE: 0.3,  # 後でも再挑戦可能
+        OpportunityWindow.NARROW: 0.6,  # 逃すと痛い
+        OpportunityWindow.CLOSING: 0.9,  # ほぼ最後のチャンス
     }
     return window_factor[window] * action_value
 
@@ -190,7 +196,7 @@ def _make_decision(
 ) -> tuple[OpportunityDecision, str]:
     """判定と理由を生成"""
     net = expected_return - expected_risk
-    
+
     # GO条件: 純価値が正で、準備度が十分
     if net > 0.1 and readiness >= 0.6:
         decision = OpportunityDecision.GO
@@ -214,7 +220,7 @@ def _make_decision(
     else:
         decision = OpportunityDecision.WAIT
         rationale = "条件が不十分 — 待機推奨"
-    
+
     return decision, rationale
 
 
@@ -235,6 +241,7 @@ def _generate_recommendation(decision: OpportunityDecision, window: OpportunityW
 # Public API
 # =============================================================================
 
+
 def detect_opportunity(
     action: str,
     context: Optional[OpportunityContext] = None,
@@ -242,19 +249,19 @@ def detect_opportunity(
     scale: OpportunityScale = OpportunityScale.MICRO,
 ) -> EukairiaResult:
     """好機を判定
-    
+
     K1 Eukairia の中核関数。O4 Energeia から呼ばれ、
     行動開始前に好機かどうかを確認する。
-    
+
     Args:
         action: 判断対象の行動
         context: 機会評価コンテキスト (None でデフォルト値)
         action_value: 行動の潜在価値 (0.0-1.0)
         scale: 機会のスケール
-        
+
     Returns:
         EukairiaResult
-        
+
     Example:
         >>> from mekhane.fep.eukairia_detector import detect_opportunity, OpportunityContext
         >>> ctx = OpportunityContext(
@@ -268,30 +275,28 @@ def detect_opportunity(
         OpportunityDecision.GO
     """
     ctx = context or OpportunityContext()
-    
+
     # Step 1: 準備度計算
     readiness = _calculate_readiness(ctx)
-    
+
     # Step 2: 機会窓評価
     window = _calculate_window(ctx)
-    
+
     # Step 3: リスク/リターン分析
     expected_return = _calculate_return(readiness, ctx, action_value)
     expected_risk = _calculate_risk(readiness, ctx)
     opportunity_cost = _calculate_opportunity_cost(window, action_value)
-    
+
     # Step 4: 判定
-    decision, rationale = _make_decision(
-        expected_return, expected_risk, readiness, window
-    )
-    
+    decision, rationale = _make_decision(expected_return, expected_risk, readiness, window)
+
     # 推奨生成
     recommendation = _generate_recommendation(decision, window)
-    
+
     # 判定確信度 (純価値の絶対値に基づく)
     net = abs(expected_return - expected_risk)
     confidence = min(1.0, 0.5 + net)
-    
+
     # 影響要因リスト
     factors = []
     if ctx.environment_ready >= 0.7:
@@ -308,7 +313,7 @@ def detect_opportunity(
         factors.append("⚠️ 競争が激しい")
     if ctx.deadline_pressure >= 0.7:
         factors.append("⏰ 期限プレッシャーあり")
-    
+
     return EukairiaResult(
         action=action,
         window=window,
@@ -337,7 +342,7 @@ def format_eukairia_markdown(result: EukairiaResult) -> str:
         OpportunityWindow.NARROW: "狭い",
         OpportunityWindow.CLOSING: "閉じかけ",
     }
-    
+
     lines = [
         "┌─[K1 Eukairia 好機判定]────────────────────────────┐",
         f"│ 対象: {result.action[:40]}",
@@ -352,32 +357,34 @@ def format_eukairia_markdown(result: EukairiaResult) -> str:
         "│",
         f"│ 理由: {result.rationale}",
     ]
-    
+
     if result.factors:
         lines.append("│")
         lines.append("│ 要因:")
         for factor in result.factors[:4]:
             lines.append(f"│   {factor}")
-    
-    lines.extend([
-        "│",
-        f"│ 推奨: {result.recommendation}",
-        "└──────────────────────────────────────────────────┘",
-    ])
-    
+
+    lines.extend(
+        [
+            "│",
+            f"│ 推奨: {result.recommendation}",
+            "└──────────────────────────────────────────────────┘",
+        ]
+    )
+
     return "\n".join(lines)
 
 
 # FEP Integration
 def encode_eukairia_observation(result: EukairiaResult) -> dict:
     """FEP観察空間へのエンコード
-    
+
     Returns:
         dict with context_clarity, urgency, confidence
     """
     # readiness を context_clarity にマップ
     context_clarity = result.readiness_score
-    
+
     # 機会窓を urgency にマップ
     urgency_map = {
         OpportunityWindow.WIDE: 0.3,
@@ -385,10 +392,10 @@ def encode_eukairia_observation(result: EukairiaResult) -> dict:
         OpportunityWindow.CLOSING: 0.9,
     }
     urgency = urgency_map[result.window]
-    
+
     # 判定を confidence にマップ
     confidence = result.confidence
-    
+
     return {
         "context_clarity": context_clarity,
         "urgency": urgency,

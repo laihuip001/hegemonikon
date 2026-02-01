@@ -27,44 +27,50 @@ from .semantic_matcher import SemanticMacroMatcher, MacroMatch, MACRO_DESCRIPTIO
 from .workflow_signature import SignatureRegistry, WorkflowSignature, WORKFLOW_SIGNATURES
 
 __all__ = [
-    'LLMParser',
-    'DoxaLearner',
-    'PatternCache',
-    'CCLSyntaxValidator',
-    'ValidationResult',
-    'CCLSemanticValidator',
-    'SemanticResult',
-    'validate_semantic',
-    'CCLGenerator',
-    'CCLTracer',
-    'MacroRegistry',
-    'MacroExpander',
-    'Macro',
-    'BUILTIN_MACROS',
-    'SemanticMacroMatcher',
-    'MacroMatch',
-    'MACRO_DESCRIPTIONS_JP',
-    'SignatureRegistry',
-    'WorkflowSignature',
-    'WORKFLOW_SIGNATURES',
+    "LLMParser",
+    "DoxaLearner",
+    "PatternCache",
+    "CCLSyntaxValidator",
+    "ValidationResult",
+    "CCLSemanticValidator",
+    "SemanticResult",
+    "validate_semantic",
+    "CCLGenerator",
+    "CCLTracer",
+    "MacroRegistry",
+    "MacroExpander",
+    "Macro",
+    "BUILTIN_MACROS",
+    "SemanticMacroMatcher",
+    "MacroMatch",
+    "MACRO_DESCRIPTIONS_JP",
+    "SignatureRegistry",
+    "WorkflowSignature",
+    "WORKFLOW_SIGNATURES",
     # Zero-Trust CCL Executor (v2.4)
-    'ZeroTrustCCLExecutor',
-    'create_ccl_prompt',
-    'validate_ccl_output',
+    "ZeroTrustCCLExecutor",
+    "create_ccl_prompt",
+    "validate_ccl_output",
 ]
+
 
 # Zero-Trust imports (lazy to avoid circular imports)
 def get_zero_trust_executor():
     """Get ZeroTrustCCLExecutor instance"""
     from .executor import ZeroTrustCCLExecutor
+
     return ZeroTrustCCLExecutor()
+
 
 def create_ccl_prompt(ccl_expr: str) -> str:
     """Create prompt with injected specs and warnings"""
     from .executor import create_ccl_prompt as _create
+
     return _create(ccl_expr)
+
 
 def validate_ccl_output(ccl_expr: str, output: str):
     """Validate CCL output"""
     from .executor import validate_ccl_output as _validate
+
     return _validate(ccl_expr, output)

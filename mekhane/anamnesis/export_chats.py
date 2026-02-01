@@ -41,7 +41,8 @@ import argparse
 # 設定
 # ============================================================================
 
-DEFAULT_OUTPUT_DIR = Path(r"M:\Brain\.hegemonikon\sessions")
+# GCP/Linux 環境に対応
+DEFAULT_OUTPUT_DIR = Path("/home/laihuip001/oikos/mneme/.hegemonikon/sessions")
 CDP_PORT = 9222  # Chrome DevTools Protocol ポート
 
 # メッセージ抽出の閾値
@@ -185,6 +186,200 @@ class AntigravityChatExporter:
             print(f"[!] Error finding conversations: {e}")
             return []
     
+    async def scroll_and_collect_messages(self) -> List[Dict]:
+        """スクロールしながらメッセージを収集する
+        
+        仮想スクロールにより DOM からメッセージが消えるため、
+        スクロールしながら逐次メッセージを収集し蓄積する。
+        """
+        all_messages = []
+        seen_content_hashes = set()
+        
+        try:
+            container = await self.page.query_selector('.flex.flex-col.gap-y-3.px-4.relative')
+            if not container:
+                container = await self.page.query_selector('.flex.flex-col.gap-y-3')
+            
+            if not container:
+                print("    [!] Container not found")
+                return []
+            
+            max_iterations = 500
+            same_scroll_count = 0
+            prev_scroll_pos = -1
+            
+            print("    [*] Scrolling and collecting messages...")
+            
+            # まず最上部にスクロール
+            await self.page.evaluate("""
+                () => {
+                    const c = document.querySelector('.flex.flex-col.gap-y-3.px-4.relative')
+                        || document.querySelector('.flex.flex-col.gap-y-3');
+                    if (!c) return;
+                    let el = c.parentElement;
+                    while (el) {
+                        const s = window.getComputedStyle(el);
+                        if (s.overflowY === 'auto' || s.overflowY === 'scroll') {
+                            el.scrollTop = 0;
+                            return;
+                        }
+                        el = el.parentElement;
+                    }
+                }
+            """)
+            await asyncio.sleep(1.0)
+            
+            for i in range(max_iterations):
+                # 現在表示されているメッセージを収集
+                raw_data = await container.evaluate("""
+                    container => {
+                        const results = [];
+                        const children = container.querySelectorAll(':scope > div');
+                        const excludeTags = new Set(['STYLE', 'SCRIPT', 'CODE', 'PRE']);
+                        
+                        function getTextContent(node, root) {
+                            let text = '';
+                            for (const child of node.childNodes) {
+                                if (child.nodeType === Node.TEXT_NODE) {
+                                    let parent = child.parentElement;
+                                    let shouldExclude = false;
+                                    while (parent && parent !== root) {
+                                        if (excludeTags.has(parent.tagName)) {
+                                            shouldExclude = true;
+                                            break;
+                                        }
+                                        parent = parent.parentElement;
+                                    }
+                                    if (!shouldExclude) {
+                                        text += child.textContent;
+                                    }
+                                } else if (child.nodeType === Node.ELEMENT_NODE) {
+                                    if (!excludeTags.has(child.tagName)) {
+                                        text += getTextContent(child, root);
+                                    }
+                                }
+                            }
+                            return text;
+                        }
+                        
+                        for (const child of children) {
+                            const text = getTextContent(child, child).trim();
+                            if (text && text.length > 0) {
+                                results.push({
+                                    clean_text: text,
+                                    raw_text: child.textContent || "",
+                                    section_idx: child.getAttribute('data-section-index')
+                                });
+                            }
+                        }
+                        return results;
+                    }
+                """)
+                
+                # 新しいメッセージを蓄積（重複除去）
+                new_count = 0
+                for item in raw_data:
+                    content = item['clean_text']
+                    # ハッシュで重複チェック
+                    content_hash = hash(content[:200])  # 先頭200文字でハッシュ
+                    if content_hash not in seen_content_hashes:
+                        seen_content_hashes.add(content_hash)
+                        all_messages.append(item)
+                        new_count += 1
+                
+                if i % 20 == 0:
+                    print(f"    [*] Scroll {i}: collected {len(all_messages)} messages (+{new_count})")
+                
+                # 下方向にスクロール
+                scroll_pos = await self.page.evaluate("""
+                    () => {
+                        const c = document.querySelector('.flex.flex-col.gap-y-3.px-4.relative')
+                            || document.querySelector('.flex.flex-col.gap-y-3');
+                        if (!c) return -1;
+                        let el = c.parentElement;
+                        while (el) {
+                            const s = window.getComputedStyle(el);
+                            if (s.overflowY === 'auto' || s.overflowY === 'scroll') {
+                                el.scrollTop += 500;
+                                return el.scrollTop;
+                            }
+                            el = el.parentElement;
+                        }
+                        return -1;
+                    }
+                """)
+                
+                # スクロール位置が変わらなければ終了
+                if scroll_pos == prev_scroll_pos:
+                    same_scroll_count += 1
+                    if same_scroll_count >= 3:
+                        break
+                else:
+                    same_scroll_count = 0
+                    prev_scroll_pos = scroll_pos
+                
+                await asyncio.sleep(0.15)
+            
+            print(f"    [✓] Collected {len(all_messages)} total messages")
+            return all_messages
+            
+        except Exception as e:
+            print(f"    [!] Scroll/collect error: {e}")
+            import traceback
+            traceback.print_exc()
+            return all_messages
+    
+    def _process_raw_messages(self, raw_messages: List[Dict]) -> List[Dict]:
+        """収集したメッセージをロール判定してフォーマット"""
+        messages = []
+        
+        # Claude 判定パターン
+        claude_patterns = [
+            'Thought for', 'Files Edited', 'Progress Updates', 'Background Steps',
+            'Ran terminal command', 'Open Terminal', 'Exit code', 'Always Proceed',
+            'RunningOpen', 'Analyzed', 'Edited', 'Generating', 'GoodBad', 'OpenProceed',
+        ]
+        
+        # User 判定パターン
+        user_start_patterns = [
+            '@', '/', 'Continue', '続けて', 'はい', 'いいえ',
+            'y\n', 'Y\n', 'ok', 'OK', '実験', 'やってみ',
+            '改善', '修正', 'まずは', '1', '2', '3',
+        ]
+        
+        for i, item in enumerate(raw_messages):
+            content = item['clean_text']
+            raw_text = item.get('raw_text', '')
+            section_idx = item.get('section_idx')
+            
+            # ロール判定
+            role = "assistant"  # デフォルト
+            
+            is_claude = any(p in raw_text for p in claude_patterns)
+            is_user = (
+                len(content) < 200 and
+                any(content.strip().startswith(p) for p in user_start_patterns)
+            )
+            
+            if is_claude:
+                role = "assistant"
+            elif is_user:
+                role = "user"
+            elif section_idx is not None:
+                try:
+                    idx_num = int(section_idx)
+                    role = "user" if idx_num % 2 == 0 else "assistant"
+                except:
+                    pass
+            
+            messages.append({
+                "role": role,
+                "content": content[:10000],
+                "section_index": section_idx
+            })
+        
+        return messages
+    
     async def extract_messages(self) -> List[Dict]:
         """現在表示されている会話のメッセージを抽出
         
@@ -252,28 +447,36 @@ class AntigravityChatExporter:
             """)
 
             print(f"    [DEBUG] Found {len(raw_data_list)} child elements in container")
+            
+            skipped_placeholder = 0
+            skipped_empty = 0
+            skipped_short = 0
 
             for item in raw_data_list:
                 try:
-                    # プレースホルダーをスキップ
-                    if 'bg-gray-500' in item['classes']:
-                        continue
+                    # プレースホルダーをスキップ（無効化して検証）
+                    # if 'bg-gray-500' in item['classes']:
+                    #     skipped_placeholder += 1
+                    #     continue
 
                     clean_text = item['clean_text']
                     
-                    if not clean_text or len(clean_text) < MIN_MESSAGE_LENGTH:
+                    if not clean_text:
+                        skipped_empty += 1
                         continue
                     
-                    # "Thought for Xs" を除去（先頭のみ）
+                    if len(clean_text) < MIN_MESSAGE_LENGTH:
+                        skipped_short += 1
+                        continue
+                    
+                    # 「Thought for Xs」のみ除去（思考過程は不要）
                     clean_text = RE_THOUGHT_FOR.sub('', clean_text)
                     
-                    # メタ情報を除去（Files Edited, Progress Updates 等）
-                    clean_text = RE_FILES_EDITED.sub('', clean_text)
-                    clean_text = RE_PROGRESS_UPDATES.sub('', clean_text)
-                    clean_text = RE_BACKGROUND_STEPS.sub('', clean_text)
-                    
-                    # UI ステータステキストを除去
-                    clean_text = RE_UI_STATUS.sub('', clean_text)
+                    # 全文を保持: メタ情報フィルタを無効化
+                    # clean_text = RE_FILES_EDITED.sub('', clean_text)
+                    # clean_text = RE_PROGRESS_UPDATES.sub('', clean_text)
+                    # clean_text = RE_BACKGROUND_STEPS.sub('', clean_text)
+                    # clean_text = RE_UI_STATUS.sub('', clean_text)
                     
                     # 連続する空白/改行を正規化
                     clean_text = RE_MULTI_NEWLINE.sub('\n\n', clean_text)
@@ -351,6 +554,7 @@ class AntigravityChatExporter:
                 except Exception as e:
                     continue
             
+            print(f"    [DEBUG] Skipped: empty={skipped_empty}, short={skipped_short}")
             return messages
             
         except Exception as e:
@@ -390,8 +594,8 @@ class AntigravityChatExporter:
                     except:
                         print("    [!] Network idle timeout, proceeding...")
                     
-                    # 初期待機
-                    await asyncio.sleep(2.0)
+                    # 初期待機（UI安定化）
+                    await asyncio.sleep(3.0)
                     
                     # メッセージコンテナが出現するまで待機
                     try:
@@ -402,17 +606,25 @@ class AntigravityChatExporter:
                     except:
                         print("    [!] Message container selector timeout, proceeding...")
                     
-                    # コンテンツ変化を待機（最大10秒、500ms間隔でチェック）
-                    for _ in range(20):
+                    # コンテンツ変化を待機（最大15秒、500ms間隔でチェック）
+                    content_changed = False
+                    for _ in range(30):
                         messages = await self.extract_messages()
                         if messages:
                             first_msg = messages[0].get('content', '')[:100]
                             if first_msg != prev_first_message:
+                                content_changed = True
                                 break  # コンテンツが変化した
                         await asyncio.sleep(0.5)
                     
-                    # 最終的なメッセージ抽出
-                    messages = await self.extract_messages()
+                    if not content_changed:
+                        print("    [!] Content did not change, may be duplicate")
+                    
+                    # スクロールしながら全メッセージを収集
+                    raw_messages = await self.scroll_and_collect_messages()
+                    
+                    # ロール判定とフォーマット
+                    messages = self._process_raw_messages(raw_messages)
                     
                     # 重複チェック
                     if messages and prev_first_message:
@@ -518,7 +730,9 @@ class AntigravityChatExporter:
                 for msg in chat['messages']:
                     role_label = "## 👤 User" if msg['role'] == 'user' else "## 🤖 Claude"
                     f.write(f"{role_label}\n\n")
-                    f.write(f"{msg['content']}\n\n")
+                    # 連続3行以上の空行を1行に正規化
+                    content = re.sub(r'\n{3,}', '\n\n', msg['content'])
+                    f.write(f"{content}\n\n")
             
             print(f"  [✓] Saved: {filename}")
         except Exception as e:

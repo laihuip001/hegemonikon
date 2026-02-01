@@ -1,60 +1,51 @@
 {
-  "month": "2026-01",
-  "total_cost": 0.013565,
-  "calls": 6,
+  "month": "2026-02",
+  "total_cost": 0.011925000000000002,
+  "calls": 5,
   "history": [
     {
-      "timestamp": "2026-01-21T11:50:45.920593",
-      "query": "Antigravity Claude context window size 2025",
-      "cost": 0.001155,
+      "timestamp": "2026-02-01T09:57:57.378497",
+      "query": "CCL (Cognitive Control Language) distributed execution multi-agent architecture 2025 2026",
+      "cost": 0.002585,
+      "tokens": {
+        "input": 19,
+        "output": 498
+      }
+    },
+    {
+      "timestamp": "2026-02-01T10:12:15.804981",
+      "query": "Hegemonikon CCL execution  sop deep",
+      "cost": 0.0019950000000000002,
       "tokens": {
         "input": 10,
-        "output": 221
+        "output": 389
       }
     },
     {
-      "timestamp": "2026-01-21T11:51:01.819469",
-      "query": "Antigravity Skills Rules always on manual model decision apply mode how to configure 2025 2026",
-      "cost": 0.0019850000000000002,
-      "tokens": {
-        "input": 21,
-        "output": 376
-      }
-    },
-    {
-      "timestamp": "2026-01-21T11:53:53.562029",
-      "query": "Google Antigravity IDE Skills and Rules configuration: what are the apply modes (always on, manual, ",
-      "cost": 0.0020250000000000003,
-      "tokens": {
-        "input": 34,
-        "output": 371
-      }
-    },
-    {
-      "timestamp": "2026-01-21T13:53:48.393571",
-      "query": "Google Takeout automation API or Gmail API chat history export",
-      "cost": 0.004135,
-      "tokens": {
-        "input": 11,
-        "output": 816
-      }
-    },
-    {
-      "timestamp": "2026-01-21T13:57:46.864884",
-      "query": "github tool google takeout automation command line interface 2025",
-      "cost": 0.00159,
+      "timestamp": "2026-02-01T10:20:55.586122",
+      "query": "Synergeia distributed CCL execution framework  sop deep",
+      "cost": 0.002295,
       "tokens": {
         "input": 12,
-        "output": 306
+        "output": 447
       }
     },
     {
-      "timestamp": "2026-01-21T13:57:58.271684",
-      "query": "AI agent chat history persistence architecture best practices self-logging vs external-api",
-      "cost": 0.0026750000000000003,
+      "timestamp": "2026-02-01T10:21:08.018797",
+      "query": "Multi-agent AI framework  sop deep",
+      "cost": 0.00298,
       "tokens": {
-        "input": 14,
-        "output": 521
+        "input": 7,
+        "output": 589
+      }
+    },
+    {
+      "timestamp": "2026-02-01T10:21:14.748288",
+      "query": "Multi-agent AI framework Previous: **A multi-agent AI framework is a system where multiple autonomou",
+      "cost": 0.00207,
+      "tokens": {
+        "input": 44,
+        "output": 370
       }
     }
   ]

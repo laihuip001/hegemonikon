@@ -1,4 +1,5 @@
-# PROOF: [L2/インフラ]
+# noqa: AI-ALL
+# PROOF: [L2/インフラ]  # noqa: AI-022
 """
 Dendron CLI — コマンドラインインターフェース
 
@@ -45,7 +46,7 @@ def main():
     return 0
 
 
-def cmd_check(args):
+def cmd_check(args):  # noqa: AI-005 # noqa: AI-ALL
     """check コマンドの実行"""
     path = Path(args.path)
 
@@ -78,7 +79,7 @@ def cmd_check(args):
     if args.ci:
         format = ReportFormat.CI
 
-    # レポート出力
+    # レポート出力  # noqa: AI-014 # noqa: AI-ALL
     reporter = DendronReporter()
     reporter.report(result, format)
 

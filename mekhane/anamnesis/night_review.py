@@ -140,7 +140,7 @@ def _process_session_dir(session_dir: Path, target_date: Optional[date]) -> Opti
             mod_date = datetime.fromisoformat(modified_at.replace("Z", "+00:00")).date()
             if mod_date != target_date:
                 return None
-        except:
+        except Exception:
             pass
 
     return SessionInfo(

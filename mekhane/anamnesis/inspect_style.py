@@ -28,7 +28,7 @@ async def main():
                     try:
                         buttons = await pg.query_selector_all('button.select-none')
                         agent_pages.append((pg, len(buttons)))
-                    except:
+                    except Exception:
                         pass
         
         if not agent_pages:
@@ -54,7 +54,7 @@ async def main():
                         await asyncio.sleep(3)
                         lines.append(f"Clicked: {title[:60]}\n")
                         break
-            except:
+            except Exception:
                 continue
         
         # メッセージ要素を探す

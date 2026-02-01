@@ -63,7 +63,7 @@ def extract_text_from_pb(filepath: Path):
                     # (最低10文字、ASCII/日本語を含む)
                     if len(text) >= 10 and re.search(r'[\u3040-\u9fff\w]{3,}', text):
                         texts.append(text)
-                except:
+                except Exception:
                     pass
             
             elif wire_type == 5:  # 32-bit

@@ -43,7 +43,7 @@ async def main():
                         buttons = await pg.query_selector_all('button.select-none')
                         agent_pages.append((pg, len(buttons)))
                         print(f"[*] Found jetski-agent page: {len(buttons)} buttons")
-                    except:
+                    except Exception:
                         pass
         
         if not agent_pages:

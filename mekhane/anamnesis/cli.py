@@ -209,7 +209,7 @@ def cmd_stats(args):
         try:
             state = json.loads(STATE_FILE.read_text(encoding="utf-8"))
             print(f"Last Collected: {state.get('last_collected_at', 'Unknown')}")
-        except:
+        except Exception:
             pass
             
     print("=" * 40)

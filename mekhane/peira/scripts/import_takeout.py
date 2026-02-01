@@ -112,7 +112,7 @@ def process_conversations(data: Union[List, Dict, Iterable], output_dir: str):
                     else:
                         dt = datetime.fromisoformat(create_time.replace('Z', '+00:00'))
                     date_str = dt.strftime('%Y-%m-%d')
-                except:
+                except Exception:
                     pass
             
             # Safe Filename (Robustness)

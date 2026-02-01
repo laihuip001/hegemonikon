@@ -61,7 +61,7 @@ async def main():
                         try:
                             text = await btn.text_content()
                             lines.append(f"    [{i}] {text[:50] if text else '(empty)'}")
-                        except:
+                        except Exception:
                             pass
         
         with open(OUTPUT_FILE, 'w', encoding='utf-8') as f:

@@ -32,7 +32,7 @@ def fetch_article(url):
             return None
         resp.encoding = 'utf-8'
         return resp.text
-    except:
+    except Exception:
         return None
 
 def parse_date(date_str):

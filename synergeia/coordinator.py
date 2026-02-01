@@ -39,7 +39,7 @@ EXPERIMENTS_DIR = Path(__file__).parent / "experiments"
 THREAD_REGISTRY = {
     "antigravity": {
         "name": "Antigravity",
-        "supported_ccl": ["/noe", "/dia", "/u", "/bou", "/s"],
+        "supported_ccl": ["/noe", "/dia", "/u", "/bou"],
         "executor": "manual",  # 手動実行
     },
     "perplexity": {
@@ -47,10 +47,15 @@ THREAD_REGISTRY = {
         "supported_ccl": ["/sop", "/zet"],
         "executor": "api",
     },
+    "claude": {
+        "name": "Claude CLI",
+        "supported_ccl": ["/s", "/ene", "/mek"],
+        "executor": "cli",
+    },
     "gemini": {
         "name": "Gemini CLI",
-        "supported_ccl": ["/ene", "/tek"],
-        "executor": "cli",  # 将来実装
+        "supported_ccl": ["/tek", "/sta"],
+        "executor": "cli",
     },
 }
 
@@ -67,8 +72,16 @@ def select_thread(ccl: str) -> str:
     for thread_id, config in THREAD_REGISTRY.items():
         if base_ccl in config["supported_ccl"]:
             return thread_id
-    
+
     return "antigravity"  # デフォルト
+
+
+# =============================================================================
+# CLI Paths
+# =============================================================================
+
+CLAUDE_CLI = "/home/laihuip001/oikos/.local/bin/claude"
+GEMINI_CLI = "node /home/laihuip001/oikos/.npm/_npx/38c708f8d73fe4c9/node_modules/@google/gemini-cli/bundle/gemini.js"
 
 
 # =============================================================================
@@ -95,6 +108,68 @@ def execute_perplexity(ccl: str, context: str) -> Dict[str, Any]:
     }
 
 
+def execute_claude(ccl: str, context: str) -> Dict[str, Any]:
+    """Claude CLI でCCLを実行。"""
+    import subprocess
+    
+    prompt = f"{context}\n\nExecute CCL: {ccl}\n\nProvide a detailed response."
+    
+    try:
+        result = subprocess.run(
+            [CLAUDE_CLI, "-p", prompt],
+            capture_output=True,
+            text=True,
+            timeout=120,
+            cwd="/home/laihuip001/oikos/hegemonikon"
+        )
+        answer = result.stdout.strip()
+        if result.returncode != 0:
+            return {"status": "error", "error": result.stderr, "ccl": ccl}
+    except subprocess.TimeoutExpired:
+        return {"status": "error", "error": "Timeout (120s)", "ccl": ccl}
+    except Exception as e:
+        return {"status": "error", "error": str(e), "ccl": ccl}
+    
+    return {
+        "status": "success",
+        "ccl": ccl,
+        "thread": "claude",
+        "answer": answer,
+    }
+
+
+def execute_gemini(ccl: str, context: str) -> Dict[str, Any]:
+    """Gemini CLI でCCLを実行。"""
+    import subprocess
+    
+    prompt = f"{context}\n\nExecute CCL: {ccl}\n\nProvide a detailed response."
+    
+    try:
+        result = subprocess.run(
+            ["node", "/home/laihuip001/oikos/.npm/_npx/38c708f8d73fe4c9/node_modules/@google/gemini-cli/bundle/gemini.js", "-p", prompt],
+            capture_output=True,
+            text=True,
+            timeout=120,
+            cwd="/home/laihuip001/oikos/hegemonikon"
+        )
+        # Geminiは最初の2行がログなので除去
+        lines = result.stdout.strip().split("\n")
+        answer = "\n".join(lines[2:]) if len(lines) > 2 else result.stdout.strip()
+        if result.returncode != 0:
+            return {"status": "error", "error": result.stderr, "ccl": ccl}
+    except subprocess.TimeoutExpired:
+        return {"status": "error", "error": "Timeout (120s)", "ccl": ccl}
+    except Exception as e:
+        return {"status": "error", "error": str(e), "ccl": ccl}
+    
+    return {
+        "status": "success",
+        "ccl": ccl,
+        "thread": "gemini",
+        "answer": answer,
+    }
+
+
 def execute_manual(ccl: str, context: str) -> Dict[str, Any]:
     """手動実行 (Antigravity)。"""
     return {
@@ -113,6 +188,10 @@ def execute_ccl(ccl: str, context: str) -> Dict[str, Any]:
     
     if thread == "perplexity":
         return execute_perplexity(ccl, context)
+    elif thread == "claude":
+        return execute_claude(ccl, context)
+    elif thread == "gemini":
+        return execute_gemini(ccl, context)
     else:
         return execute_manual(ccl, context)
 

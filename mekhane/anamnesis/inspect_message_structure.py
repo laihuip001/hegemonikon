@@ -29,7 +29,7 @@ async def main():
                     try:
                         buttons = await pg.query_selector_all('button.select-none')
                         agent_pages.append((pg, len(buttons)))
-                    except:
+                    except Exception:
                         pass
         
         if not agent_pages:
@@ -55,7 +55,7 @@ async def main():
                         await asyncio.sleep(3)
                         lines.append(f"Clicked: {title[:60]}\n")
                         break
-            except:
+            except Exception:
                 continue
         
         # メッセージコンテナを探す
@@ -99,9 +99,9 @@ async def main():
                                 gc_text = await gc.text_content()
                                 gc_preview = (gc_text[:80] + "...") if gc_text and len(gc_text) > 80 else (gc_text or "")
                                 lines.append(f"        [{k}] <{gc_tag}> class='{gc_class[:50]}' text='{gc_preview.replace(chr(10), ' ')}'")
-                            except:
+                            except Exception:
                                 pass
-                    except:
+                    except Exception:
                         pass
         
         # scrollbar-hide 内を調査
@@ -133,7 +133,7 @@ async def main():
                     if c_text:
                         preview = c_text[:120].replace('\n', ' ')
                         lines.append(f"    preview: '{preview}'")
-                except:
+                except Exception:
                     pass
         
         with open(OUTPUT_FILE, 'w', encoding='utf-8') as f:

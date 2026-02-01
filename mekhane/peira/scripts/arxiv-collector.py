@@ -96,7 +96,7 @@ def extract_arxiv_links():
         try:
             with open(md_file, 'r', encoding='utf-8') as f:
                 content = f.read()
-        except:
+        except Exception:
             continue
         
         matches = ARXIV_PATTERN.findall(content)

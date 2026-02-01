@@ -40,7 +40,7 @@ def parse_date(date_str):
     try:
         d = datetime.datetime.strptime(date_str, "%Y.%m.%d")
         return d, d.strftime("%Y"), d.strftime("%m")
-    except:
+    except Exception:
         return datetime.date.today(), "0000", "00"
 
 def save_article(article):

@@ -853,10 +853,10 @@ class AIAuditor:
         """Check for deprecated API usage."""
         deprecated_patterns = [
             # Python deprecations
-            (r'\basyncio\.get_event_loop\(\)', "asyncio.get_event_loop() - use asyncio.get_running_loop()"),
-            (r'\bcollections\.Mapping\b', "collections.Mapping - use collections.abc.Mapping"),
-            (r'\bcollections\.MutableMapping\b', "collections.MutableMapping - use collections.abc.MutableMapping"),
-            (r'\bcollections\.Iterable\b', "collections.Iterable - use collections.abc.Iterable"),
+            (r'\basyncio\.get_event_loop\(\)', "asyncio.get_running_loop() - use asyncio.get_running_loop()"),
+            (r'\bcollections\.Mapping\b', "collections.abc.Mapping - use collections.abc.Mapping"),
+            (r'\bcollections\.MutableMapping\b', "collections.abc.MutableMapping - use collections.abc.MutableMapping"),
+            (r'\bcollections\.Iterable\b', "collections.abc.Iterable - use collections.abc.Iterable"),
             (r'\boptparse\b', "optparse - use argparse"),
             (r'\bimp\b', "imp module - use importlib"),
             (r'\bdistutils\b', "distutils - use setuptools"),

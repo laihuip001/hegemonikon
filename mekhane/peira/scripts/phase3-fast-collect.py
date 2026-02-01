@@ -59,7 +59,7 @@ def parse_date(date_str):
         try:
             d = datetime.datetime.strptime(date_str[:19], fmt[:len(date_str)])
             return d.strftime("%Y.%m.%d"), d.strftime("%Y"), d.strftime("%m")
-        except:
+        except Exception:
             continue
     
     # Fallback: try to extract YYYY-MM-DD pattern

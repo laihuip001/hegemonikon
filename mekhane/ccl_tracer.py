@@ -35,7 +35,7 @@ def load_state() -> dict:
     if STATE_FILE.exists():
         try:
             return json.loads(STATE_FILE.read_text())
-        except:
+        except Exception:
             return {}
     return {}
 

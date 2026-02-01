@@ -29,7 +29,7 @@ async def main():
                     try:
                         buttons = await pg.query_selector_all('button.select-none')
                         agent_pages.append((pg, len(buttons)))
-                    except:
+                    except Exception:
                         pass
         
         if not agent_pages:
@@ -55,7 +55,7 @@ async def main():
                         await asyncio.sleep(3)
                         lines.append(f"Clicked: {title[:60]}\n")
                         break
-            except:
+            except Exception:
                 continue
         
         # メッセージコンテナを探す
@@ -106,9 +106,9 @@ async def main():
                                     gc_text = await gc.text_content()
                                     gc_len = len(gc_text) if gc_text else 0
                                     lines.append(f"        [{k}] <{gc_tag}> class='{gc_class[:50]}' text_len={gc_len}")
-                                except:
+                                except Exception:
                                     pass
-                    except:
+                    except Exception:
                         pass
                 
                 break  # 最初の大きなコンテナのみ

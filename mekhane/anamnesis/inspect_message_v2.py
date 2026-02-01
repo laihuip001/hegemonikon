@@ -29,7 +29,7 @@ async def main():
                     try:
                         buttons = await pg.query_selector_all('button.select-none')
                         agent_pages.append((pg, len(buttons)))
-                    except:
+                    except Exception:
                         pass
         
         if not agent_pages:
@@ -55,7 +55,7 @@ async def main():
                         await asyncio.sleep(3)
                         lines.append(f"Clicked: {title[:60]}\n")
                         break
-            except:
+            except Exception:
                 continue
         
         # 1. .flex.flex-col.gap-y-3 内の構造を詳細調査
@@ -78,7 +78,7 @@ async def main():
                     text = await child.text_content()
                     if text and len(text.strip()) > 50:
                         text_children.append((i, child, classes, len(text.strip())))
-                except:
+                except Exception:
                     pass
             
             lines.append(f"\nChildren with text > 50 chars: {len(text_children)}")
@@ -130,7 +130,7 @@ async def main():
                         gc_text = await gc.text_content()
                         gc_len = len(gc_text.strip()) if gc_text else 0
                         lines.append(f"    [{j}] <{gc_tag}> class='{gc_class[:40]}' text_len={gc_len}")
-                    except:
+                    except Exception:
                         pass
         
         with open(OUTPUT_FILE, 'w', encoding='utf-8') as f:

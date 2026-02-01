@@ -99,7 +99,7 @@ async def main():
                         'text_len': len(text),
                         'children': children_count
                     })
-            except:
+            except Exception:
                 pass
         
         large_divs.sort(key=lambda x: x['text_len'], reverse=True)
@@ -117,7 +117,7 @@ async def main():
                     c_text = await child.text_content()
                     c_len = len(c_text) if c_text else 0
                     lines.append(f"      child[{j}] <{c_tag}> class='{c_class[:60]}' text_len={c_len}")
-                except:
+                except Exception:
                     pass
         
         # 4. ファイルに書き込み

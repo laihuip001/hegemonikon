@@ -232,7 +232,7 @@ def build_index(incremental: bool = False, report_mode: bool = False):
                         at = datetime.fromisoformat(artifact_time.replace("Z", "+00:00"))
                         if at <= last_sync:
                             continue
-                    except:
+                    except Exception:
                         pass
             
             # Generate ID

@@ -1,4 +1,4 @@
-# PROOF: [L2/インフラ] CCL → LangGraph グラフ変換
+# PROOF: [L2/インフラ] <- hermeneus/src/ CCL → LangGraph グラフ変換
 """
 Hermēneus Graph — CCL AST を LangGraph StateGraph に変換
 

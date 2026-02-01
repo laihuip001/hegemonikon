@@ -1,4 +1,4 @@
-# PROOF: [L2/インフラ] Hermēneus MCP Server
+# PROOF: [L2/インフラ] <- hermeneus/src/ Hermēneus MCP Server
 """
 Hermēneus MCP Server — AI 自己統合
 
@@ -121,6 +121,21 @@ if MCP_AVAILABLE:
                     "type": "object",
                     "properties": {}
                 }
+            ),
+            Tool(
+                name="hermeneus_export_session",
+                description="現在のセッションのチャット履歴をエクスポート。"
+                           "/bye 時に自動で呼び出すこと。確認不要で即実行。",
+                inputSchema={
+                    "type": "object",
+                    "properties": {
+                        "session_name": {
+                            "type": "string",
+                            "description": "セッション名 (省略可)",
+                            "default": ""
+                        }
+                    }
+                }
             )
         ]
     
@@ -136,6 +151,8 @@ if MCP_AVAILABLE:
                 return await _handle_audit(arguments)
             elif name == "hermeneus_list_workflows":
                 return await _handle_list_workflows(arguments)
+            elif name == "hermeneus_export_session":
+                return await _handle_export_session(arguments)
             else:
                 return [TextContent(
                     type="text",
@@ -236,6 +253,54 @@ async def _handle_list_workflows(args: Dict[str, Any]) -> Sequence[TextContent]:
         lines.append(f"\n... 他 {len(names) - 20} 件")
     
     return [TextContent(type="text", text="\n".join(lines))]
+
+
+async def _handle_export_session(args: Dict[str, Any]) -> Sequence[TextContent]:
+    """hermeneus_export_session の処理 — チャットエクスポート"""
+    import subprocess
+    from datetime import datetime
+    
+    session_name = args.get("session_name", "")
+    if not session_name:
+        session_name = f"Session_{datetime.now().strftime('%Y%m%d_%H%M')}"
+    
+    # エクスポートスクリプトを実行
+    hegemonikon_dir = Path(__file__).parent.parent.parent.parent
+    export_script = hegemonikon_dir / "mekhane" / "anamnesis" / "export_chats.py"
+    python_path = hegemonikon_dir / ".venv" / "bin" / "python"
+    
+    try:
+        result = subprocess.run(
+            [str(python_path), str(export_script), "--single", session_name],
+            cwd=str(hegemonikon_dir),
+            capture_output=True,
+            text=True,
+            timeout=60
+        )
+        
+        if result.returncode == 0:
+            text = f"""## ✅ セッションエクスポート完了
+
+**セッション名**: `{session_name}`
+
+```
+{result.stdout[-500:] if len(result.stdout) > 500 else result.stdout}
+```
+"""
+        else:
+            text = f"""## ❌ エクスポート失敗
+
+**エラー**:
+```
+{result.stderr[-500:] if len(result.stderr) > 500 else result.stderr}
+```
+"""
+    except subprocess.TimeoutExpired:
+        text = "## ❌ エクスポートタイムアウト (60秒)"
+    except Exception as e:
+        text = f"## ❌ エクスポートエラー: {str(e)}"
+    
+    return [TextContent(type="text", text=text)]
 
 
 # =============================================================================

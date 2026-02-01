@@ -1,4 +1,4 @@
-# PROOF: [L2/インフラ] Hermēneus DSPy Optimizer
+# PROOF: [L2/インフラ] <- hermeneus/src/ Hermēneus DSPy Optimizer
 """
 Hermēneus Optimizer — 自動プロンプト最適化
 

@@ -1,4 +1,4 @@
-# PROOF: [L2/インフラ] Workflow Executor
+# PROOF: [L2/インフラ] <- hermeneus/src/ Workflow Executor
 """
 Hermēneus Executor — ワークフロー実行エンジン
 

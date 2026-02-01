@@ -1,4 +1,4 @@
-# PROOF: [L2/インフラ] CCL 省略形展開器
+# PROOF: [L2/インフラ] <- hermeneus/src/ CCL 省略形展開器
 """
 Hermēneus Expander — CCL 省略形を正式形に展開
 

@@ -1,4 +1,4 @@
-# PROOF: [L2/インフラ] Hermēneus 検証テスト
+# PROOF: [L3/テスト] <- hermeneus/tests/ Hermēneus 検証テスト
 """
 Hermēneus Verifier Unit Tests
 

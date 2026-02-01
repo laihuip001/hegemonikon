@@ -1,4 +1,4 @@
-# PROOF: [L2/インフラ] Multi-Agent Debate 検証器
+# PROOF: [L2/インフラ] <- hermeneus/src/ Multi-Agent Debate 検証器
 """
 Hermēneus Verifier — Multi-Agent Debate による検証
 

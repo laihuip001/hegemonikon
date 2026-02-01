@@ -1,4 +1,4 @@
-# PROOF: [L2/インフラ] CCL AST 定義
+# PROOF: [L2/インフラ] <- hermeneus/src/ CCL AST 定義
 """
 Hermēneus AST (Abstract Syntax Tree) Nodes
 

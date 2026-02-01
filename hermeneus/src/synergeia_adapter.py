@@ -1,4 +1,4 @@
-# PROOF: [L2/インフラ] Synergeia Adapter
+# PROOF: [L2/インフラ] <- hermeneus/src/ Synergeia Adapter
 """
 Hermēneus Synergeia Adapter — Synergeia 統合
 

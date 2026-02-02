@@ -12,6 +12,8 @@ import os
 import re
 import json
 import asyncio
+import concurrent.futures
+import threading
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional, Union
 from enum import Enum
@@ -85,8 +87,20 @@ class LMQLExecutor:
     """
     
     def __init__(self, config: Optional[ExecutionConfig] = None):
+        self._runner: Optional[asyncio.Runner] = None
+        self._runner_lock = threading.Lock()
         self.config = config or ExecutionConfig()
         self._lmql_available = self._check_lmql()
+
+    def __del__(self):
+        self.close()
+
+    def close(self):
+        """Executor をクローズ"""
+        with self._runner_lock:
+            if self._runner is not None:
+                self._runner.close()
+                self._runner = None
     
     def _check_lmql(self) -> bool:
         """LMQL がインストールされているか確認"""
@@ -134,7 +148,31 @@ class LMQLExecutor:
         variables: Optional[Dict[str, Any]] = None
     ) -> ExecutionResult:
         """LMQL プログラムを同期実行"""
-        return asyncio.run(self.execute_async(lmql_code, context, variables))
+        try:
+            loop = asyncio.get_running_loop()
+        except RuntimeError:
+            loop = None
+
+        if loop and loop.is_running():
+            # 既にイベントループが実行中の場合は、別スレッドで実行してクラッシュを回避
+            with concurrent.futures.ThreadPoolExecutor() as pool:
+                return pool.submit(
+                    asyncio.run,
+                    self.execute_async(lmql_code, context, variables)
+                ).result()
+
+        # イベントループがない場合は、Runner を再利用してオーバーヘッドを削減
+        # スレッドセーフ性を確保するため、ロックを取得できた場合のみ Runner を使用
+        if self._runner_lock.acquire(blocking=False):
+            try:
+                if self._runner is None:
+                    self._runner = asyncio.Runner()
+                return self._runner.run(self.execute_async(lmql_code, context, variables))
+            finally:
+                self._runner_lock.release()
+        else:
+            # ロックが取得できない（他スレッドで使用中）場合は、通常の asyncio.run を使用
+            return asyncio.run(self.execute_async(lmql_code, context, variables))
     
     async def _execute_with_lmql(
         self,
@@ -522,14 +560,26 @@ def execute_ccl(
         ast = parse_ccl(ccl)
         if isinstance(ast, ConvergenceLoop):
             conv_executor = ConvergenceExecutor(executor)
-            return asyncio.run(conv_executor.execute_convergence(
+            coro = conv_executor.execute_convergence(
                 lmql_code,
                 context,
                 condition_var=ast.condition.var,
                 condition_op=ast.condition.op,
                 condition_value=ast.condition.value,
                 max_iterations=config.max_iterations
-            ))
+            )
+
+            try:
+                loop = asyncio.get_running_loop()
+            except RuntimeError:
+                loop = None
+
+            if loop and loop.is_running():
+                # 既にイベントループが実行中の場合は、別スレッドで実行
+                with concurrent.futures.ThreadPoolExecutor() as pool:
+                    return pool.submit(asyncio.run, coro).result()
+            else:
+                return asyncio.run(coro)
     except Exception:
         pass  # パース失敗時は通常実行
     

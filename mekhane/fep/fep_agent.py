@@ -610,3 +610,170 @@ class HegemonikónFEPAgent:
                 "learning_rate": eta,
             }
         )
+
+
+class DerivativeFEPAgent:
+    """Active Inference agent for Derivative Selection.
+
+    Specialized for learning optimal derivatives (states) from problem contexts (observations).
+    Uses a simplified B matrix (Identity) as we are modeling static inference (Bandit-like).
+    """
+
+    def __init__(
+        self,
+        state_dim: int,
+        obs_dim: int,
+        learning_rate: float = 20.0,
+    ):
+        if not PYMDP_AVAILABLE:
+            raise ImportError("pymdp is not installed. Install with: pip install pymdp")
+
+        self.state_dim = state_dim
+        self.obs_dim = obs_dim
+        self.learning_rate = learning_rate
+
+        # Initialize matrices
+        # A: (obs_dim, state_dim)
+        # Initialize A as uniform.
+        A = np.ones((obs_dim, state_dim)) / obs_dim
+
+        # B: (state_dim, state_dim, 1) - Identity (no transition dynamics needed for static selection)
+        # Explicitly ensure float type and 3D shape
+        B = np.eye(state_dim, dtype=np.float64)
+        B = np.expand_dims(B, axis=2)  # Shape: (state_dim, state_dim, 1)
+
+        # C: Not used for pure state inference, but required by Agent.
+        C = np.zeros(obs_dim)
+
+        # D: Prior beliefs. Uniform.
+        D = np.ones(state_dim) / state_dim
+
+        # Explicitly pass num_controls to avoid inference ambiguity
+        self.agent = Agent(
+            A=A, B=B, C=C, D=D, inference_horizon=1, num_controls=[1]
+        )
+        self.beliefs = D.copy()
+
+        # Track history
+        self._history: List[Dict[str, Any]] = []
+
+    def infer_states(self, observation: int) -> np.ndarray:
+        """Update beliefs based on observation.
+
+        Returns:
+            Flat numpy array of posterior beliefs.
+        """
+        obs_tuple = (observation,)
+        self.beliefs = self.agent.infer_states(obs_tuple)
+
+        # Handle pymdp output format
+        if isinstance(self.beliefs, np.ndarray):
+            if self.beliefs.dtype == object:
+                beliefs_array = np.asarray(self.beliefs[0], dtype=np.float64)
+            else:
+                beliefs_array = np.asarray(self.beliefs, dtype=np.float64)
+        elif isinstance(self.beliefs, list):
+            beliefs_array = np.asarray(self.beliefs[0], dtype=np.float64)
+        else:
+            beliefs_array = np.asarray(self.beliefs, dtype=np.float64)
+
+        return beliefs_array.flatten()
+
+    def update_A_dirichlet(
+        self,
+        observation: int,
+        target_state_idx: Optional[int] = None,
+        learning_rate: Optional[float] = None,
+    ) -> None:
+        """Update A matrix.
+
+        Args:
+            observation: The observed context.
+            target_state_idx: If provided, forces learning as if this was the true state.
+                             (Supervised learning from feedback).
+        """
+        eta = learning_rate if learning_rate is not None else self.learning_rate
+
+        if target_state_idx is not None:
+            # Force beliefs to one-hot vector
+            beliefs_array = np.zeros(self.state_dim)
+            if 0 <= target_state_idx < self.state_dim:
+                beliefs_array[target_state_idx] = 1.0
+            else:
+                return  # Invalid state index
+        else:
+            # Use current beliefs (unsupervised/self-supervised)
+            if isinstance(self.beliefs, np.ndarray):
+                if self.beliefs.dtype == object:
+                    beliefs_array = np.asarray(self.beliefs[0], dtype=np.float64).flatten()
+                else:
+                    beliefs_array = np.asarray(self.beliefs, dtype=np.float64).flatten()
+            elif isinstance(self.beliefs, list):
+                beliefs_array = np.asarray(self.beliefs[0], dtype=np.float64).flatten()
+            else:
+                beliefs_array = np.asarray(self.beliefs, dtype=np.float64).flatten()
+
+        # Update logic
+        A = self.agent.A
+        if isinstance(A, np.ndarray) and A.dtype == object:
+            A_matrix = np.asarray(A[0], dtype=np.float64)
+        elif isinstance(A, list):
+            A_matrix = np.asarray(A[0], dtype=np.float64)
+        else:
+            A_matrix = np.asarray(A, dtype=np.float64)
+
+        num_obs = A_matrix.shape[0]
+        obs_idx = min(int(observation), num_obs - 1)
+        obs_vector = np.zeros(num_obs)
+        obs_vector[obs_idx] = 1.0
+
+        update = eta * np.outer(obs_vector, beliefs_array)
+        eps = 1e-10
+        A_matrix = np.clip(A_matrix + update, eps, None)
+        A_matrix = A_matrix / A_matrix.sum(axis=0, keepdims=True)
+
+        if isinstance(self.agent.A, np.ndarray) and self.agent.A.dtype == object:
+            self.agent.A[0] = A_matrix
+        elif isinstance(self.agent.A, list):
+            self.agent.A[0] = A_matrix
+        else:
+            self.agent.A = A_matrix
+
+        self._history.append(
+            {
+                "type": "dirichlet_update",
+                "observation": observation,
+                "target_state": target_state_idx,
+            }
+        )
+
+    # =========================================================================
+    # Persistence Methods
+    # =========================================================================
+
+    def save_learned_A(self, path: Optional[str] = None) -> str:
+        """Save learned A matrix to file."""
+        from .persistence import save_A
+        from pathlib import Path
+
+        target_path = Path(path) if path else None
+        saved_path = save_A(self, target_path)
+
+        return str(saved_path)
+
+    def load_learned_A(self, path: Optional[str] = None) -> bool:
+        """Load A matrix from file."""
+        from .persistence import load_A, A_exists
+        from pathlib import Path
+
+        target_path = Path(path) if path else None
+
+        if not A_exists(target_path):
+            return False
+
+        loaded_A = load_A(target_path)
+        if loaded_A is not None:
+            self.agent.A = loaded_A
+            return True
+
+        return False

@@ -1,0 +1,196 @@
+# FEP ワークフロー統合計画
+
+> **目的**: pymdp FEP Agent を /noe, /bou, /boot, /bye に完全統合
+> **前提**: Phase 1-3 (fep_agent + persistence + Dirichlet) は実装済み・全テスト通過
+
+---
+
+## Phase 4: ワークフロー統合
+
+### STAGE 0: 現状分析
+
+| コンポーネント | 現状 | 必要な変更 |
+|:--------------|:-----|:-----------|
+| O1 SKILL.md | FEPセクションあり ✅ | なし |
+| O2 SKILL.md | FEPセクションあり ✅ | なし |
+| /noe.md | FEP言及なし | オプションステップ追加 |
+| /bou.md | FEP言及なし | オプションステップ追加 |
+| /bye.md | A行列保存なし | Step追加 |
+| /boot.md | A行列読込なし | Step追加 |
+
+---
+
+## Proposed Changes
+
+### Component: /bye (セッション終了)
+
+---
+
+#### [MODIFY] [bye.md](file:///home/laihuip001/oikos/.agent/workflows/bye.md)
+
+**Step 3.9: FEP A行列永続化** を追加:
+
+```markdown
+### Step 3.9: FEP A行列永続化
+
+セッション中の観察学習（Dirichlet更新）を永続化。
+
+```python
+from mekhane.fep import HegemonikónFEPAgent
+
+agent = HegemonikónFEPAgent(use_defaults=True)
+# セッション中に学習があった場合
+saved_path = agent.save_learned_A()
+print(f"✅ FEP A行列保存: {saved_path}")
+```
+
+**出力先**: `/home/laihuip001/oikos/mneme/.hegemonikon/learned_A.npy`
+```
+
+---
+
+### Component: /boot (セッション開始)
+
+---
+
+#### [MODIFY] [boot.md](file:///home/laihuip001/oikos/.agent/workflows/boot.md)
+
+**Step 8.5: FEP A行列読込** を Phase 3 知識読込 に追加:
+
+```markdown
+#### 8.5 🧠 FEP A行列読込 (Cognitive Layer)
+
+前回セッションで学習した観察モデルを読み込む。
+
+```python
+from mekhane.fep import HegemonikónFEPAgent
+
+agent = HegemonikónFEPAgent(use_defaults=True)
+if agent.load_learned_A():
+    print("✅ FEP A行列: 学習済みモデル読込")
+else:
+    print("📝 FEP A行列: デフォルト使用（未学習）")
+```
+```
+
+---
+
+### Component: /noe (Noēsis)
+
+---
+
+#### [MODIFY] [noe.md](file:///home/laihuip001/oikos/.agent/workflows/noe.md)
+
+**オプショナル: FEP 拡張** セクションを追加:
+
+```markdown
+## オプショナル: FEP 拡張 (Cognitive Layer)
+
+> **発動条件**: 信念の不確実性を定量化したい場合
+
+/noe の思考結果を pymdp の信念分布として表現する。
+
+### 使用例
+
+```python
+from mekhane.fep import HegemonikónFEPAgent
+from mekhane.fep.state_spaces import encode_observation
+
+agent = HegemonikónFEPAgent(use_defaults=True)
+
+# PHASE 0.5 の結論を観察として入力
+obs = encode_observation(
+    context_clarity=0.7,  # 盲点リスクから算出
+    urgency=0.3,          # 時間的制約
+    confidence=0.6        # 信頼度
+)
+
+# O1 Noēsis: 信念更新
+result = agent.infer_states(obs)
+print(f"信念エントロピー: {result['entropy']:.2f}")
+print(f"MAP状態: {result['map_state_names']}")
+
+# エントロピー > 2.02 → Epochē (判断停止) を示唆
+if result['entropy'] > 2.02:
+    print("⚠️ Epochē 推奨: 信念の不確実性が高い")
+```
+```
+
+---
+
+### Component: /bou (Boulēsis)
+
+---
+
+#### [MODIFY] [bou.md](file:///home/laihuip001/oikos/.agent/workflows/bou.md)
+
+**オプショナル: FEP 拡張** セクションを追加:
+
+```markdown
+## オプショナル: FEP 拡張 (Cognitive Layer)
+
+> **発動条件**: ポリシー選択の数学的根拠が必要な場合
+
+/bou の優先順位決定を Expected Free Energy で定量化する。
+
+### 使用例
+
+```python
+from mekhane.fep import HegemonikónFEPAgent
+from mekhane.fep.state_spaces import encode_observation
+
+agent = HegemonikónFEPAgent(use_defaults=True)
+
+# 現在の状況を観察として入力
+obs = encode_observation(
+    context_clarity=0.8,  # 望みの明確さ
+    urgency=0.5,          # 時間的プレッシャー
+    confidence=0.7        # 達成への確信
+)
+
+# O1 → O2 の順で実行
+agent.infer_states(obs)
+q_pi, neg_efe = agent.infer_policies()
+
+# ポリシー解釈
+if q_pi[1] > q_pi[0]:
+    print(f"🎯 Boulēsis 推奨: ACT (行動) — 確率 {q_pi[1]:.1%}")
+    print("→ 明確な意志が形成された。/ene で実行へ")
+else:
+    print(f"🔍 Boulēsis 推奨: OBSERVE (観察) — 確率 {q_pi[0]:.1%}")
+    print("→ さらなる情報収集が必要")
+```
+```
+
+---
+
+## 実装順序
+
+1. **Phase 4.1**: [/bye.md](file:///home/laihuip001/oikos/.agent/workflows/bye.md) に Step 3.9 追加
+2. **Phase 4.2**: [/boot.md](file:///home/laihuip001/oikos/.agent/workflows/boot.md) に Step 8.5 追加
+3. **Phase 4.3**: [/noe.md](file:///home/laihuip001/oikos/.agent/workflows/noe.md) に FEP オプション追加
+4. **Phase 4.4**: [/bou.md](file:///home/laihuip001/oikos/.agent/workflows/bou.md) に FEP オプション追加
+5. **Phase 4.5**: テスト実行 + Handoff テスト
+
+---
+
+## Verification Plan
+
+### Automated Tests
+
+```bash
+# 既存テスト維持
+cd /home/laihuip001/oikos/hegemonikon
+source .venv/bin/activate
+PYTHONPATH=. pytest tests/test_fep_agent.py -v
+```
+
+### Manual Verification
+
+1. `/bye` 実行時に A行列が保存されることを確認
+2. `/boot` 実行時に A行列が読込されることを確認
+3. `/noe` + FEP オプションが動作することを確認
+
+---
+
+*Generated by Hegemonikón /plan v3.0*

@@ -1,0 +1,37 @@
+# A-Series派生レポート v1.0
+
+> **Session**: a1c02be0-25df-4097-a2b1-ccefbae68962  
+> **Created**: 2026-01-29 11:21  
+> **Scope**: A1-A4 精度定理の12派生体系化
+
+## 派生マトリックス
+
+| 定理 | 派生1 | 派生2 | 派生3 | FEP対応 |
+|:----:|:----:|:----:|:----:|:-----:|
+| **A1 Pathos** | prim (一次) | seco (二次) | regu (調整) | Affective appraisal |
+| **A2 Krisis** | affi (肯定) | nega (否定) | susp (保留) | Judgment criteria |
+| **A3 Gnōmē** | conc (具体) | abst (抽象) | univ (普遍) | Wisdom levels |
+| **A4 Epistēmē** | tent (暫定) | just (正当化) | cert (確実) | Confidence calibration |
+
+## 哲学的根拠
+
+- **A1**: Stoic passion theory (propatheia vs pathos)
+- **A2**: Pyrrhonian epochē (judgment suspension)
+- **A3**: Aristotle phronesis (practical wisdom)
+- **A4**: Plato/Aristotle epistēmē vs doxa
+
+## 科学的根拠
+
+- **A1**: Cognitive appraisal theory, emotion regulation (Gross)
+- **A2**: Fallibilism, confidence calibration
+- **A3**: Practical wisdom empirical models
+- **A4**: Gettier problem, JTB conditions
+
+## FEP統合
+
+A-Series = **Precision Weighting** phase
+
+- 信念形成の精度重み付けを規定
+- O/S/H/P/K 全シリーズと相互作用
+
+*Source: Perplexity research 2026-01-29*

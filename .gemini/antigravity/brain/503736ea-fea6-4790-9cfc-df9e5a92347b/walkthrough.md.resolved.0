@@ -1,0 +1,52 @@
+# H/P Series Footprint Testing Results
+
+**Date**: 2026-01-27 23:18
+**Session**: 503736ea-fea6-4790-9cfc-df9e5a92347b
+
+---
+
+## Summary
+
+| Series | Skills Tested | Invocation Rate | Result |
+|--------|---------------|-----------------|--------|
+| H (Hormē) | H1, H2, H3, H4 | **4/4 (100%)** | ✅ Pass |
+| P (Perigraphē) | P1, P2, P3, P4 | **4/4 (100%)** | ✅ Pass |
+| **Total** | 8 | **8/8 (100%)** | ✅ Pass |
+
+---
+
+## H-series Results
+
+| ID | Name | Test Prompt (概要) | Invoked | Format |
+|----|------|-------------------|---------|--------|
+| H1 | Propatheia | 直感的印象 | ✅ | 傾向ベクトル |
+| H2 | Pistis | 確信度評価 | ✅ | スコア(0-1) |
+| H3 | Orexis | 内発的動機 | ✅ | 欲求リスト |
+| H4 | Doxa | 長期記憶記録 | ✅ | 永続化判断 |
+
+---
+
+## P-series Results
+
+| ID | Name | Test Prompt (概要) | Invoked | Format |
+|----|------|-------------------|---------|--------|
+| P1 | Khōra | 分析領域定義 | ✅ | スコープ表 |
+| P2 | Hodos | 経路・道筋 | ✅ | Mermaid図 |
+| P3 | Trokhia | 適用範囲・軌道 | ✅ | パターン表 |
+| P4 | Tekhnē | 技術・技法選定 | ✅ | 技法リスト |
+
+---
+
+## Observations
+
+1. **高い発動率**: 同一会話内テストのため、スキルがコンテキストに存在していた可能性あり
+2. **出力形式の一貫性**: 全スキルが期待されるフォーマットに従った
+3. **次ステップ**: 新規チャットでのクロス検証を推奨
+
+---
+
+## Next Steps
+
+- [ ] O/S/K/A series の Footprint Testing (別セッション)
+- [ ] 新規チャットでの H/P 再検証 (純粋性確認)
+- [ ] [skill_reconstruction_status.md](file:///home/laihuip001/oikos/.gemini/antigravity/knowledge/hegemonikon_system/artifacts/implementation/skill_reconstruction_status.md) の更新

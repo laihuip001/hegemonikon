@@ -1,0 +1,102 @@
+# Hermeneus Phase 2: LMQL ランタイム統合 (via Synergeia)
+
+## 目的
+
+Hermeneus が生成する LMQL コードを**実際に実行**できるランタイムを構築する。
+
+---
+
+## 背景
+
+| Phase | ステータス |
+|:------|:----------|
+| Phase 1: Expander + Parser + Translator | ✅ 完了 (19 tests pass) |
+| Phase 2: LMQL ランタイム統合 | ⏳ **今回** |
+| Phase 3: Constrained Decoding | 未着手 |
+| Phase 4: LangGraph 統合 | 未着手 |
+
+---
+
+## 提案変更
+
+### Hermeneus
+
+#### [NEW] [runtime.py](file:///home/laihuip001/oikos/hegemonikon/hermeneus/src/runtime.py)
+
+LMQL プログラムを実行するランタイム:
+- [lmql](file:///home/laihuip001/oikos/hegemonikon/hermeneus/src/translator.py#325-329) パッケージとの統合
+- `execute_lmql(code: str, context: str) -> str` API
+- 異常処理とフォールバック
+
+#### [MODIFY] [__init__.py](file:///home/laihuip001/oikos/hegemonikon/hermeneus/src/__init__.py)
+
+- [execute_ccl()](file:///home/laihuip001/oikos/hegemonikon/synergeia/coordinator.py#234-250) 関数を追加 (compile → execute のパイプライン)
+
+---
+
+## Synergeia 分散実行計画
+
+### Step 1: 調査 (Perplexity)
+
+```bash
+python3 /home/laihuip001/oikos/hegemonikon/synergeia/coordinator.py \
+  "/sop+" \
+  "LMQL library Python 2026 best practices, Guidance, constrained decoding"
+```
+
+### Step 2: 設計認識 (Antigravity)
+
+```
+/noe+ "runtime.py design based on Perplexity research"
+```
+
+### Step 3: 実装 (Claude CLI)
+
+```bash
+python3 /home/laihuip001/oikos/hegemonikon/synergeia/coordinator.py \
+  "/s+" \
+  "Implement hermeneus/src/runtime.py based on LMQL documentation"
+```
+
+### Step 4: レビュー (Antigravity)
+
+```
+/dia+ "review runtime.py implementation"
+```
+
+---
+
+## 検証計画
+
+### 自動テスト
+
+```bash
+cd /home/laihuip001/oikos/hegemonikon && \
+.venv/bin/pytest hermeneus/tests/ -v
+```
+
+### 手動テスト
+
+1. LMQL パッケージインストール確認:
+   ```bash
+   .venv/bin/pip show lmql
+   ```
+
+2. 簡単な CCL 実行:
+   ```bash
+   cd /home/laihuip001/oikos/hegemonikon && \
+   .venv/bin/python -c "from hermeneus.src import execute_ccl; print(execute_ccl('/noe+', 'test'))"
+   ```
+
+---
+
+## リスク
+
+| リスク | 軽減策 |
+|:-------|:-------|
+| LMQL が Python 3.11 非対応 | 代替ライブラリ (Guidance) 検討 |
+| API キー不足 | `.env` 設定確認 |
+
+---
+
+*Generated: 2026-02-01 12:55 | Synergeia Distributed Execution*

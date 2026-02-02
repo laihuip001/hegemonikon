@@ -1,0 +1,40 @@
+# ゼロトラスト・リポジトリ刷新 v2 タスク
+
+## Phase 1: 即時削除
+- [ ] [llms.txt](file:///home/laihuip001/oikos/hegemonikon/llms.txt) 削除
+- [ ] `docs/archive/` (70件) 削除
+- [ ] `docs/research/archived/` (49件) 削除
+- [ ] [docs/perplexity_specialist_research.md](file:///home/laihuip001/oikos/hegemonikon/docs/perplexity_specialist_research.md) (105KB) 削除
+
+## Phase 2: 構造変更
+- [ ] [INDEX.md](file:///home/laihuip001/oikos/hegemonikon/INDEX.md) → `docs/reference/INDEX.md` 移動
+- [ ] [.env.jules](file:///home/laihuip001/oikos/hegemonikon/.env.jules) の .gitignore 確認
+
+## Phase 3: README 書き換え
+- [ ] 81行 → 25行に圧縮 (69%削減)
+- [ ] 「30秒で理解」→「概要」に改名
+- [ ] 自己満足セクション削除
+
+## Phase 4: AGENTS.md 書き換え
+- [ ] 6ペルソナ定義を表に圧縮 (77行→15行)
+- [ ] ビルドコマンド削除 (README参照)
+- [ ] コーディング規約を別ファイルへ
+- [ ] Scheduled Tasks 削除
+
+## Phase 5: derivative_selector.py 分割
+- [ ] `derivative_selector/` パッケージ化
+- [ ] O/S/H/P/K/A 各 series 別ファイル
+- [ ] 共通ロジックを base.py へ
+
+## Phase 6: docs/ トリアージ
+- [ ] 最終更新 > 30日のファイル特定
+- [ ] 参照なしファイル特定
+- [ ] 削除/統合実行
+
+---
+
+**期待効果**:
+- ルートファイル: 9 → 6 (-33%)
+- docs/: 227 → 100以下 (-56%)
+- README: 81 → 25行 (-69%)
+- AGENTS: 183 → 80行 (-56%)

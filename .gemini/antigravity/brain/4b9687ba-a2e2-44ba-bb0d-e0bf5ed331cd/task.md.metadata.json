@@ -1,0 +1,6 @@
+{
+  "artifactType": "ARTIFACT_TYPE_TASK",
+  "summary": "Flow AI Hegemonikón Recast タスク全完了。コアロジック5モジュール変換、pytest 12/12 passed、api/appは別層のため対象外。",
+  "updatedAt": "2026-01-29T04:31:00.284526211Z",
+  "version": "4"
+}

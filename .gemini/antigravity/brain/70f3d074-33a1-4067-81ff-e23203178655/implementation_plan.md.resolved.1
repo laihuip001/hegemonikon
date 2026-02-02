@@ -1,0 +1,161 @@
+# fep_demo.py 拡張計画
+
+## 目的
+
+既存の非対話的デモスクリプトを**対話型 CLI ツール**に拡張し、リアルタイムで FEP エージェントの動作を確認・学習できるようにする。
+
+---
+
+## STAGE 0: Blindspot + Scale
+
+### 盲点チェック
+
+| カテゴリ | 盲点 | 対策 |
+|:---------|:-----|:-----|
+| 🎯 Framing | ✅ 問題明確: 対話機能追加 | N/A |
+| 📐 Scope | ⚠️ 機能拡大リスク | 最小限の対話機能に限定 |
+| 🔗 Dependencies | ✅ encoding.py が既に text→obs 変換対応 | 既存機能を活用 |
+| 👤 Stakeholders | Creator のみ | 自己使用ツール |
+| ⏱️ Temporal | 短期的ツール | 永続的設計は不要 |
+
+### スケール判定
+
+**📏 Scale: 🔬 Micro** — 単一ファイル変更
+
+---
+
+## STAGE 1: Strategy Selection
+
+### Read-Resolve 完了
+
+- [x] [fep_demo.py](file:///home/laihuip001/oikos/hegemonikon/scripts/fep_demo.py) 読込 (158行)
+- [x] [encoding.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/fep/encoding.py) 読込 (encode_to_flat_index 確認)
+- [x] Dirichlet 学習機能確認 (update_A_dirichlet)
+
+### Explore/Exploit 判定
+
+| 軸 | 判定 |
+|:---|:-----|
+| 失敗コスト | 低 (開発ツール) |
+| 環境確実性 | 高 (既存機能活用) |
+| 時間制約 | 余裕あり |
+
+**判定: Exploit** — 既存パターンを活用
+
+### 3プラン
+
+| Plan | 概要 | リスク |
+|:-----|:-----|:-------|
+| A: Conservative | `-i` オプションで対話モード追加 | 最小限 |
+| B: Robust | 対話モード + 学習可視化 + 保存機能 ← **推奨** |工数中 |
+| C: Aggressive | Rich/Textual TUI | 依存増 |
+
+**選択: Plan B**
+
+---
+
+## STAGE 2: Success Criteria
+
+| 軸 | Must | Should | Could |
+|:---|:-----|:-------|:------|
+| 機能性 | 対話入力 → FEP 推論 | 学習効果表示 | 履歴保存 |
+| 品質 | エラーハンドリング | ヘルプ表示 | Tab 補完 |
+| 性能 | レスポンス < 1秒 | N/A | N/A |
+
+---
+
+## STAGE 3: Blueprint
+
+### Goal Decomposition
+
+```text
+最終目標: 対話型 FEP デモツール
+  ← サブ1: CLI 引数 `-i` 追加 (argparse)
+  ← サブ2: REPL ループ実装
+  ← サブ3: テキスト → 観察 → 推論 → 行動 パイプライン
+  ← サブ4: Dirichlet 学習表示
+  ← 現在地: 非対話的デモのみ
+```
+
+### 変更対象
+
+| ファイル | 変更概要 |
+|:---------|:---------|
+| [scripts/fep_demo.py](file:///home/laihuip001/oikos/hegemonikon/scripts/fep_demo.py) | 対話モード追加、REPL ループ、学習表示 |
+
+### 設計詳細
+
+```python
+def interactive_mode():
+    """対話型 FEP デモ"""
+    agent = HegemonikónFEPAgent(use_defaults=True)
+    print("FEP Interactive Mode")
+    print("入力: 自然言語テキスト → FEP 推論")
+    print("コマンド: /quit, /reset, /save, /load, /entropy")
+    
+    while True:
+        user_input = input("\n> ").strip()
+        
+        if user_input == "/quit":
+            break
+        elif user_input == "/reset":
+            agent = HegemonikónFEPAgent(use_defaults=True)
+            print("✅ エージェントリセット")
+            continue
+        elif user_input == "/save":
+            path = agent.save_learned_A()
+            print(f"✅ A行列保存: {path}")
+            continue
+        elif user_input == "/load":
+            if agent.load_learned_A():
+                print("✅ A行列読込")
+            else:
+                print("⚠️ 学習済みA行列が見つかりません")
+            continue
+        elif user_input == "/entropy":
+            print(f"現在のエントロピー: {agent.get_entropy():.3f}")
+            continue
+        
+        # テキスト → 観察 → 推論
+        obs = encode_to_flat_index(user_input)
+        result = agent.infer_states(obs)
+        
+        # Dirichlet 学習
+        agent.update_A_dirichlet(obs)
+        
+        # ポリシー選択
+        q_pi, _ = agent.infer_policies()
+        action = agent.sample_action()
+        action_name = "observe" if action == 0 else "act"
+        
+        # 出力
+        print(f"  obs={obs}, entropy={result['entropy']:.2f}")
+        print(f"  状態: {result['map_state_names']}")
+        print(f"  推奨行動: {action_name} ({q_pi[action]:.1%})")
+```
+
+---
+
+## STAGE 4: Devil's Advocate
+
+| 視点 | 結果 | 理由 |
+|:-----|:-----|:-----|
+| Feasibility | ✅ PASS | 既存関数の組み合わせ |
+| Necessity | ✅ PASS | 先ほどの実験で手動コマンド実行が煩雑だった |
+| Alternatives | ✅ PASS | Jupyter でも可能だが CLI の方が軽量 |
+| Risks | ✅ PASS | 既存機能への影響なし (追加のみ) |
+| Dependencies | ✅ PASS | 新規依存なし |
+
+### Pre-mortem
+
+1. **入力パースエラー** — 対策: try/except + エラーメッセージ
+2. **無限ループ** — 対策: /quit コマンド、Ctrl+C ハンドラ
+
+---
+
+## 検証計画
+
+1. `python scripts/fep_demo.py -i` で対話モード起動確認
+2. テキスト入力 → FEP 出力確認
+3. `/save`, `/load` コマンド動作確認
+4. Ctrl+C で正常終了確認

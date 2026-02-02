@@ -1,0 +1,104 @@
+# 抽象コマンド (Δ-layer) ドキュメント精緻化
+
+## 問題分析
+
+### 現状の重複構造
+
+| 情報 | workflow (`.agent/workflows/`) | KI (`hegemonikon_system`) |
+|:-----|:-------------------------------|:--------------------------|
+| 定理定義 | 各 `{o,s,h,p,k,a,x}.md` に詳細 | `canonical_framework_v2_2.md` にも |
+| Process | 各ワークフローに完全記載 | `comprehensive_workflow_guide_v3_1.md` は K-series のみ |
+| X-series接続 | 各ファイルに mermaid 図 | 分散 |
+
+### 問題点
+
+1. **同一情報の二重管理** — workflow と KI で同じ定理定義を維持
+2. **不完全なΔ-layer KI** — K-series のみ記載、O/S/H/P/A/X が欠落
+3. **使い分けガイドなし** — 「どれを使うべきか」の判断基準が不在
+
+---
+
+## Proposed Changes
+
+> [!IMPORTANT]
+> **Single Source of Truth (SSOT) 原則**
+> - **正本**: `.agent/workflows/*.md` — 実行時に参照される
+> - **索引+選択ガイド**: KI — ナビゲーション用
+
+### 1. KI更新: Δ-layer統合ガイド追加
+
+#### [NEW] [delta_layer_guide.md](file:///home/laihuip001/oikos/.gemini/antigravity/knowledge/hegemonikon_system/artifacts/workflows/delta_layer_guide.md)
+
+新規ファイル、以下を含む:
+- **選択フローチャート**: 問い → 適切なΔコマンド
+- **使い分け表**: 各コマンドの適用場面
+- **具体ユースケース**: 各コマンド 2-3 例
+- **workflow への参照リンク**: 詳細は正本を見よ
+
+### 2. comprehensive_workflow_guide 更新
+
+#### [MODIFY] [comprehensive_workflow_guide_v3_1.md](file:///home/laihuip001/oikos/.gemini/antigravity/knowledge/hegemonikon_system/artifacts/workflows/comprehensive_workflow_guide_v3_1.md)
+
+- §3 Δ-Layer を削除 (→ 新ガイドへ移行)
+- 代わりに新ガイドへの参照リンクを追加
+
+### 3. workflow ファイルは変更なし
+
+既に完全な情報を持つため、正本として維持。
+
+---
+
+## 具体的な delta_layer_guide.md 構成案
+
+```markdown
+# Δ-layer 抽象コマンドガイド
+
+## 1. 選択フローチャート
+(問いの種類 → 適切なコマンド)
+
+## 2. 使い分け早見表
+| 問い | コマンド | 例 |
+|------|----------|-----|
+| 本質は何か | /o | ... |
+| 戦略は何か | /s | ... |
+| etc.
+
+## 3. 各コマンド詳解 (リンク集)
+- /o: [o.md](file:///.agent/workflows/o.md)
+- /s: [s.md](file:///.agent/workflows/s.md)
+- ...
+
+## 4. 具体ユースケース集
+### /o 使用例
+### /s 使用例
+### ...
+
+## 5. よくある誤用パターン
+```
+
+---
+
+## Verification Plan
+
+### 手動確認
+
+1. **SSOT 検証**: 
+   - 各 workflow ファイルの情報が正本として十分かチェック
+   - KI からの参照リンクが正しく機能するか確認
+
+2. **フローチャート検証**:
+   - 3-5 の典型的な問いに対し、フローチャートを辿って正しいコマンドに到達するか
+
+3. **ユースケース検証**:
+   - 各ユースケースが実際の使用パターンを反映しているか
+
+---
+
+## User Review Required
+
+> [!NOTE]
+> 以下についてご意見をいただきたいです:
+
+1. **SSOT の方針**: workflow を正本、KI を索引とする方針で良いか？
+2. **KI の役割**: 選択ガイドに特化する方向で良いか？
+3. **ユースケースの粒度**: どの程度詳細にすべきか？

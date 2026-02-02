@@ -1,0 +1,104 @@
+# Workflow Refactoring Implementation Plan
+
+## 整合性監査結果
+
+### 現状の構造
+
+```
+         現状                              理想 (3層)
+┌───────────────┐                  ┌───────────────┐
+│ Skill         │                  │ Skill (正本)  │
+│ → implementation.micro           │ ← Workflow が参照
+│    → Workflow │                  │               │
+└───────────────┘                  └───────────────┘
+     逆方向!                            正方向
+```
+
+### 監査データ
+
+| カテゴリ | ファイル数 | SKILL.md参照あり | 行数 (avg) |
+|:---------|:-----------|:-----------------|:-----------|
+| Δ-layer (a,h,k,o,p,s,x) | 7 | 7 (100%) | ~110 |
+| τ-layer 主要 (noe,bou,ene,plan,fit) | 5 | 0 (0%) | ~380 |
+| τ-layer 中規模 (dia,vet,syn,pan,pri) | 5 | 4 (80%) | ~200 |
+| τ-layer 小規模 (その他) | 9 | 0 (0%) | ~180 |
+
+### 発見した課題
+
+| # | 課題 | 詳細 |
+|:--|:-----|:-----|
+| 1 | **参照方向が逆** | Skill.implementation.micro → Workflow (逆向き) |
+| 2 | **τ-workflow にロジック重複** | `/noe` (420行) に O1 Noēsis のロジックがフル記載 |
+| 3 | **Skill と Workflow の役割曖昧** | どちらが正本か定義されていなかった |
+
+---
+
+## 提案: 段階的リファクタリング
+
+> [!IMPORTANT]
+> **破壊的変更を避け、段階的に整合性を高める**
+
+### Option A: 軽量リファクタ (推奨)
+- Workflow 冒頭に Skill 参照リンクを追加
+- Skill.implementation.micro は現状維持（双方向参照）
+- ロジック移動は行わない
+
+### Option B: 完全リファクタ (非推奨)
+- Workflow からロジックを抜き、Skill に移動
+- 大規模変更、リスク高
+
+---
+
+## Proposed Changes (Option A)
+
+### 1. τ-Workflow に Skill 参照を追加
+
+各 τ-workflow の frontmatter に `skill_ref:` を追加:
+
+```yaml
+---
+skill_ref: ".agent/skills/ousia/o1-noesis/SKILL.md"
+---
+```
+
+本文に参照セクションを追加:
+
+```markdown
+> **正本参照**: [O1 Noēsis SKILL.md](file:///.agent/skills/ousia/o1-noesis/SKILL.md)
+```
+
+### 対象ファイル (15件)
+
+| Workflow | 追加する Skill 参照 |
+|:---------|:-------------------|
+| noe.md | ousia/o1-noesis |
+| bou.md | ousia/o2-boulesis |
+| zet.md | ousia/o3-zetesis |
+| ene.md | ousia/o4-energeia |
+| plan.md | schema/s2-mekhane |
+| pri.md | kairos/k1-k3 |
+| why.md | kairos/k3-telos |
+| boot.md | horme/h4-doxa, ousia/o1-noesis |
+| bye.md | horme/h4-doxa |
+| dia.md | akribeia/a2-krisis |
+| fit.md | akribeia/a2-krisis |
+| vet.md | akribeia/a2-krisis |
+| syn.md | akribeia/a2-krisis |
+| pan.md | akribeia/a2-krisis |
+| dev.md | perigraphe/p4-tekhne |
+
+---
+
+## Verification Plan
+
+1. 変更後、grep で `skill_ref:` が全対象に存在するか確認
+2. リンクが有効か検証
+
+---
+
+## User Review Required
+
+> [!NOTE]
+> **Option A (軽量) で進めますか？**
+> 
+> この方針なら既存ロジックは維持しつつ、3層構造の参照関係を明示できます。

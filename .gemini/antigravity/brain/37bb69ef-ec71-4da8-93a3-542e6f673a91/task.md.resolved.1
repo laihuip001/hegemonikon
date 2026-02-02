@@ -1,0 +1,32 @@
+# FEP Agent 拡張タスク
+
+## 概要
+
+arXiv:2412.10425 論文から吸収したパターンを Hegemonikón FEP に実装
+
+## タスク
+
+- [/] **Phase 1**: 2-step政策horizon導入
+  - [ ] [fep_agent.py](file:///home/laihuip001/oikos/hegemonikon/tests/test_fep_agent.py) に `policy_len=2` 追加
+  - [ ] `inference_horizon=1` 明示設定
+  - [ ] テスト `test_policy_len_is_2` 追加
+
+- [ ] **Phase 2**: A行列永続化
+  - [ ] `persistence.py` 作成
+  - [ ] `save_learned_A()` メソッド実装
+  - [ ] `load_learned_A()` メソッド実装
+  - [ ] ラウンドトリップテスト追加
+
+- [ ] **Phase 3**: Dirichlet更新
+  - [ ] `update_A_dirichlet()` メソッド実装
+  - [ ] 学習率パラメータ (η=50.0)
+  - [ ] テスト追加
+
+- [ ] **Phase 4**: ワークフロー統合
+  - [ ] `/bye` で A行列保存
+  - [ ] `/boot` で A行列読込
+
+## 完了条件
+
+- [ ] 既存10テスト維持
+- [ ] 新規5テスト追加・全通過

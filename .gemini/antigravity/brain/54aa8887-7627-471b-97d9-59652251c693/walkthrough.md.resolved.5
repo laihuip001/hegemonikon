@@ -1,0 +1,41 @@
+# Walkthrough: ワークフローモード Naturalization
+
+> **期間**: Batch 9-14
+> **成果**: 63 セクション追加 (16.7% → 42.4%)
+
+---
+
+## Batch 14 (7件)
+
+| WF | モード | CCL |
+|:---|:-------|:----|
+| [chr.md](file:///home/laihuip001/oikos/.agent/workflows/chr.md) | regu | `/chr+{type=recurring}` |
+| | esti | `/chr+{type=estimate}` |
+| [hod.md](file:///home/laihuip001/oikos/.agent/workflows/hod.md) | line | `/hod+{shape=linear}` |
+| | bran | `/hod+{shape=branch}` |
+| | cycl | `/hod+{shape=cycle}` |
+| | bisect | `/hod+{strategy=binary}` |
+| | backcast | `/hod+{direction=future→present}` |
+
+---
+
+## 累積進捗
+
+| Batch | WF数 | セクション数 |
+|:------|:-----|:-------------|
+| 9-13 | 17 | 56 |
+| 14 | 2 | 7 |
+| **計** | **19** | **63** |
+
+```diff
+- 前回: 41/245 = 16.7%
++ 今回: 104/245 = 42.4%
+```
+
+---
+
+## 次のステップ
+
+1. `/tro` に派生を追加
+2. `/tek` に派生を追加
+3. 残り ~130 モードを順次追加

@@ -1,0 +1,6 @@
+{
+  "artifactType": "ARTIFACT_TYPE_WALKTHROUGH",
+  "summary": "Hermēneus Phase 1-7 完了の walkthrough。コンパイラ + ランタイム + オーケストレーション + Verification + Prover + CLI + Executor + Synergeia + MCP Server を実装。全125テストパス。AI が自身で CCL を実行可能に。",
+  "updatedAt": "2026-02-01T07:45:59.721920007Z",
+  "version": "7"
+}

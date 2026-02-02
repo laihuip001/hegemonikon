@@ -1,0 +1,81 @@
+# CCL 実行保証: 実装計画 v2.0
+
+> **Date**: 2026-01-31
+> **Status**: /sop+ 調査完了、設計確定
+
+---
+
+## 1. 問題と解決策
+
+| 問題 | 解決策 |
+|:-----|:-------|
+| LLM は予測エンジン（非決定的） | ハイブリッドアーキテクチャ |
+| プロンプトだけでは不十分 | DSL + 外部検証層 |
+| 100% 保証は原理的に不可能 | **>96% 信頼度**を目標とする |
+
+---
+
+## 2. 4層アーキテクチャ
+
+```
+[最適化] DSPy Teleprompter
+    ↓
+[制御]   LMQL / Guidance / Outlines
+    ↓
+[実行]   LangGraph + CodeAct
+    ↓
+[検証]   Constrained Decoding + Multi-Agent Debate + Verus
+```
+
+---
+
+## 3. 実装ロードマップ
+
+### Phase 1: 翻訳層（2週間）
+- [ ] [expander.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/ccl/macro_expander.py) — 省略形展開（`>>` → `lim[]{}` 等）
+- [ ] [parser.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/ccl/llm_parser.py) — CCL 正式形パーサー
+- [ ] `ast.py` — AST ノード定義
+
+### Phase 2: DSL 変換（2週間）
+- [ ] `translator.py` — AST → LMQL/Guidance DSL
+- [ ] LMQL テンプレート設計
+- [ ] Guidance 連携調査
+
+### Phase 3: 検証層（2週間）
+- [ ] Constrained Decoding 統合（vLLM + xgrammar）
+- [ ] Multi-Agent Debate プロトタイプ（3エージェント投票）
+
+### Phase 4: オーケストレーション（2週間）
+- [ ] LangGraph 統合
+- [ ] 状態永続化（Checkpointer）
+- [ ] HITL（Human-in-the-Loop）ゲート
+
+### Phase 5: 最適化（1週間）
+- [ ] DSPy Signatures 定義
+- [ ] Teleprompter 最適化ループ
+
+### Phase 6: 形式検証（オプション）
+- [ ] Verus/Lean 連携（クリティカルパスのみ）
+
+---
+
+## 4. 技術選択
+
+| 層 | 技術 | 理由 |
+|:---|:-----|:-----|
+| 制御 | **LMQL** | CCL と親和性高、宣言的 |
+| 実行 | **LangGraph** | 状態管理、チェックポイント |
+| 検証 | **Constrained Decoding** | 軽量、92% エラー削減 |
+| 最適化 | **DSPy** | 自動プロンプト改善 |
+
+---
+
+## 5. 次のアクション
+
+1. [ ] LMQL 調査・PoC
+2. [ ] [expander.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/ccl/macro_expander.py) 実装開始
+3. [ ] LangGraph 評価
+
+---
+
+*Revised after /sop+ research (2026-01-31)*

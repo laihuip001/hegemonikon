@@ -1,0 +1,272 @@
+# LLM-Based CCL Generator 実装計画
+
+> **日時**: 2026-01-29T20:50:00+09:00
+> **CCL式**: `/s+_/mek+`
+> **目標**: [ccl_generator.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/ccl_generator.py) v1.0 → v2.0 (LLM ベース生成)
+
+---
+
+## 1. 現状分析
+
+### 1.1 現在の [ccl_generator.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/ccl_generator.py) v1.0
+
+| 項目 | 内容 |
+|:-----|:-----|
+| **方式** | ルールベース（KEYWORD_MAP正規表現） |
+| **対応構文** | 単純なワークフロー連結、`F:×N{}` ループ |
+| **限界** | 複雑な意図の解釈不可、制御構文 (if/for) 非対応 |
+
+```python
+# 現在のフロー
+intent → 正規表現マッチ → ハードコード出力
+```
+
+### 1.2 目標とする v2.0
+
+```python
+# 新フロー
+intent → LLM 解釈 → CCL v2.0 構文生成 → 検証 → 出力
+```
+
+---
+
+## 2. アーキテクチャ設計
+
+### 2.1 コンポーネント構成
+
+```
+ccl_generator.py v2.0
+├── LLMParser          # LLM による意図解析
+├── SyntaxValidator    # CCL v2.0 構文検証
+├── DerivativeResolver # 派生選択 (既存 derivative_selector.py 連携)
+└── FallbackHeuristic  # LLM 失敗時のルールベースフォールバック
+```
+
+### 2.2 処理フロー
+
+```mermaid
+graph LR
+    A[自然言語意図] --> B{LLM解釈}
+    B -->|成功| C[CCL v2.0 式]
+    B -->|失敗/低確信度| D[ルールベース]
+    C --> E{構文検証}
+    E -->|OK| F[出力]
+    E -->|NG| D
+    D --> F
+```
+
+---
+
+## 3. LLM プロンプト設計
+
+### 3.1 System Prompt
+
+```
+You are a CCL (Cognitive Control Language) v2.0 compiler.
+Convert natural language intent into CCL expressions.
+
+## CCL Syntax Reference
+
+### Workflows
+- /noe (認識), /bou (意志), /zet (探求), /ene (実行)
+- /s (設計), /mek (方法), /sta (基準), /pra (実践)
+- /dia (判定), /syn (評議会)
+
+### Operators (Unary)
+- + (詳細), - (縮約), ^ (メタ), / (具体)
+
+### Operators (Binary)
+- _ (順序: A then B)
+- * (融合: A merged with B)
+- ~ (振動: A ↔ B oscillation)
+
+### Control Syntax (v2.0)
+- F:N{ ... } — 反復 (for N times)
+- I:condition{ ... } else { ... } — 条件分岐
+- [審査:人間] — HITL constraint
+
+### Examples
+| Intent | CCL |
+|--------|-----|
+| 分析して実行 | /s_/ene |
+| 3回詳細分析 | F:×3{ /s+ } |
+| 確信度高ければ実行 | I:confidence>0.7{ /ene } else { /dia^ } |
+```
+
+### 3.2 User Prompt Template
+
+```
+## Intent
+{user_intent}
+
+## Constraints
+- Output CCL expression only (no explanation)
+- Use v2.0 control syntax if applicable
+- Add [審査:人間] for irreversible actions
+```
+
+---
+
+## 4. 実装計画
+
+### Phase A: LLM 統合 (P1)
+
+#### A1. `llm_parser.py` 作成
+
+```python
+# mekhane/ccl/llm_parser.py
+from typing import Optional
+import json
+
+class LLMParser:
+    """LLM-based CCL intent parser."""
+    
+    def __init__(self, model: str = "gemini-3-pro"):
+        self.model = model
+        self.system_prompt = self._load_system_prompt()
+    
+    def parse(self, intent: str) -> Optional[str]:
+        """Convert natural language intent to CCL."""
+        # API call to LLM
+        # Returns CCL expression or None
+        pass
+```
+
+#### A2. `syntax_validator.py` 作成
+
+```python
+# mekhane/ccl/syntax_validator.py
+import re
+from dataclasses import dataclass
+from typing import List, Tuple
+
+@dataclass
+class ValidationResult:
+    valid: bool
+    errors: List[str]
+    warnings: List[str]
+
+class CCLSyntaxValidator:
+    """Validate CCL v2.0 expressions."""
+    
+    WORKFLOW_PATTERN = r'/[a-z]+'
+    UNARY_OPS = r'[+\-^/]'
+    BINARY_OPS = r'[_*~]'
+    CONTROL_PATTERN = r'[FI]:[^{]+\{[^}]+\}'
+    
+    def validate(self, ccl: str) -> ValidationResult:
+        """Validate CCL expression syntax."""
+        errors, warnings = [], []
+        
+        # Check balanced braces
+        if ccl.count('{') != ccl.count('}'):
+            errors.append("Unbalanced braces")
+        
+        # Check workflow references
+        workflows = re.findall(self.WORKFLOW_PATTERN, ccl)
+        for wf in workflows:
+            if wf[1:] not in VALID_WORKFLOWS:
+                warnings.append(f"Unknown workflow: {wf}")
+        
+        return ValidationResult(
+            valid=len(errors) == 0,
+            errors=errors,
+            warnings=warnings
+        )
+```
+
+### Phase B: tekhne-maker 連携 (P2)
+
+#### B1. `/mek --mode=ccl` 追加
+
+tekhne-maker に CCL 生成モードを追加:
+
+```yaml
+# /mek workflow update
+modes:
+  ccl:
+    description: "CCL v2.0 式を生成"
+    trigger: "CCLを生成", "CCL式で"
+    output: "CCL expression"
+```
+
+#### B2. [ccl_generator.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/ccl_generator.py) をモジュール化
+
+```python
+# mekhane/ccl/__init__.py
+from .llm_parser import LLMParser
+from .syntax_validator import CCLSyntaxValidator
+from .generator import CCLGenerator
+
+__all__ = ['LLMParser', 'CCLSyntaxValidator', 'CCLGenerator']
+```
+
+### Phase C: Dogfooding 準備 (P3)
+
+#### C1. `ccl_tracer.py` との連携
+
+```python
+# 生成した CCL を自動トレース
+ccl = generate_ccl("ブログを分析して改善案を出す")
+tracer.start(ccl)
+# 手動実行...
+tracer.step("/s", status="success")
+tracer.end()
+```
+
+#### C2. 実行ログ収集
+
+```yaml
+# /home/laihuip001/oikos/mneme/.hegemonikon/ccl_traces/
+trace_2026-01-29_2100.yaml:
+  intent: "ブログを分析して改善案を出す"
+  generated: "/s_/dia"
+  executed: true
+  success: true
+  feedback: null
+```
+
+---
+
+## 5. ファイル配置
+
+```
+hegemonikon/mekhane/
+├── ccl/                          # [NEW] CCL モジュール
+│   ├── __init__.py
+│   ├── llm_parser.py            # LLM 解釈器
+│   ├── syntax_validator.py      # 構文検証器
+│   ├── generator.py             # メイン生成器 (v1.0 → v2.0)
+│   └── prompts/
+│       └── ccl_compiler.md      # System Prompt
+├── ccl_generator.py              # [DEPRECATE] → ccl/generator.py
+└── ccl_tracer.py                 # (既存)
+```
+
+---
+
+## 6. 成功基準
+
+| 基準 | 目標 |
+|:-----|:-----|
+| **意図解釈精度** | 80% の日本語意図から有効な CCL 生成 |
+| **構文妥当性** | 100% の出力が CCL v2.0 準拠 |
+| **フォールバック** | LLM 失敗時に 100% ルールベースで対応 |
+| **Dogfooding** | 1週間の実運用で 50+ トレース収集 |
+
+---
+
+## 7. 次のステップ
+
+1. **承認後**: Phase A (LLM 統合) の実装開始
+2. **実装順序**:
+   - [ ] `mekhane/ccl/` ディレクトリ作成
+   - [ ] `llm_parser.py` 実装
+   - [ ] `syntax_validator.py` 実装
+   - [ ] [generator.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/ccl_generator.py) (v2.0) 実装
+   - [ ] テスト作成
+   - [ ] `/mek --mode=ccl` 統合
+
+---
+
+*CCL: 知的作業のプログラム言語化*

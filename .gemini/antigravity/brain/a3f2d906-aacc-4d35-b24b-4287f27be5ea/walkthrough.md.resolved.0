@@ -1,0 +1,94 @@
+# /tak (Task Orchestration) Walkthrough
+
+> **Date**: 2026-01-30
+> **CCL Signature**: `/tak+`
+
+---
+
+## 実装完了
+
+バイブコーディングを具体 (6W3H) に着地させる機構として `/tak` を実装した。
+
+---
+
+## 作成ファイル
+
+| Path | 説明 |
+|:-----|:-----|
+| [tak.md](file:///home/laihuip001/oikos/.agent/workflows/tak.md) | ワークフロー定義 |
+| [models.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/orchestration/models.py) | データモデル |
+| [task_intake.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/orchestration/task_intake.py) | PHASE 1: 入力パーサー |
+| [task_processor.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/orchestration/task_processor.py) | PHASES 2-7: 処理パイプライン |
+| [task_output.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/orchestration/task_output.py) | PHASE 8: 出力フォーマッター |
+
+---
+
+## テスト結果
+
+### 入力
+
+```text
+- API認証がバグってるのでなおす（急ぎ）
+- 来週のv1.2リリースの準備
+- 新機能のプロトタイプ作りたい
+- Rustの勉強
+- チーム振り返りの準備
+- クライアントへの報告メール（今日中）
+- コードレビューの対応
+- ドキュメント更新
+```
+
+### 出力
+
+```text
+┌─[/tak: タスク整理完了]──────────────────────────────────────────┐
+│ 📊 サマリー
+│   投入: 8タスク | Must: 2, Should: 6 | 不足情報: 2件 | 総工数: 18.0h
+├────────────────────────────────────────────────────────────────────┤
+│ 🔴 TODAY (今日中) — Must: 2, Should: 0
+│   ├ [Must] API認証がバグってるのでなおす (2.0h)
+│   ├ [Must] クライアントへの報告メール (2.0h)
+│
+│ 🟡 WEEK (今週中) — Must: 0, Should: 6
+│   └ [Should] 来週のv1.2リリースの準備 (2.0h)
+│   └ [Should] 新機能のプロトタイプ作りたい (4.0h)
+│   └ [Should] Rustの勉強 (2.0h)
+│   └ [Should] チーム振り返りの準備 (2.0h)
+│   └ [Should] コードレビューの対応 (2.0h)
+│   └ [Should] ドキュメント更新 (2.0h)
+│
+├────────────────────────────────────────────────────────────────────┤
+│ ⚠️ 不足情報
+│   1. [SCOPE] 「Rustの勉強」のゴールは何ですか？ → Creator確認待ち
+│   2. [SCOPE] 「ドキュメント更新」のゴールは何ですか？ → Creator確認待ち
+└────────────────────────────────────────────────────────────────────┘
+
+→ 今日は「API認証がバグってるのでなおす」から始めますか？ [y/n]
+```
+
+---
+
+## 検証完了
+
+| 項目 | 結果 |
+|:-----|:-----|
+| パース | ✅ 8タスク正常抽出 |
+| 分類 | ✅ Must: 2, Should: 6 |
+| 期限検出 | ✅ 「急ぎ」「今日中」→ TODAY |
+| 工数見積 | ✅ 18.0h 総計 |
+| 不足情報 | ✅ 2件検出 |
+| 次アクション提案 | ✅ 正常 |
+
+---
+
+## 育てる設計 — 今後の拡張ポイント
+
+1. **STRUCTURE フェーズ**: キーワードクラスタリングで自動階層化
+2. **DEPEND フェーズ**: 技術的依存の推論 (DB → API → UI)
+3. **GAP フェーズ**: `/sop` 自動連携で技術調査を自動実行
+4. **ESTIMATE フェーズ**: 過去タスク実績からの学習
+5. **/bou 連携**: 目的との整合性評価
+
+---
+
+*v1.0 — Task Orchestration Workflow 完成*

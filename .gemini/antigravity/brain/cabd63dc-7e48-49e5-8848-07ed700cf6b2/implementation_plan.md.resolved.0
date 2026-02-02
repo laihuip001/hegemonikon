@@ -1,0 +1,221 @@
+# CCL/mek リポジトリ刷新計画
+
+> **S2 Mekhanē** (方法配置) + **A2 Krisis** (容赦ない批評)
+> **視点**: Steve Jobs — "Simplicity is the ultimate sophistication."
+> **原則**: ゼロトラスト — 存在理由が証明できないものは削除
+
+---
+
+## 🔥 Steve Jobs 批評モード発動
+
+> "People think focus means saying yes to the thing you've got to focus on.
+> But that's not what it means at all. It means saying no to the hundred
+> other good ideas that there are."
+
+**批評の姿勢**:
+- 「これは必要か？」ではなく「これがないと死ぬか？」
+- 美しくないものは正しくない
+- 1つの真実が、10のドキュメントより価値がある
+
+---
+
+## 📊 現状診断サマリー
+
+| 領域 | 発見 | 深刻度 |
+|:-----|:-----|:------:|
+| ルートレベル | 19ファイル散在（.py, .ps1, .log, .txt 混在） | 🔴 Critical |
+| docs/ | 229ファイル、4.8MB — 情報の墓場化 | 🔴 Critical |
+| README系 | 6つの重複ドキュメント（README, INDEX, STRUCTURE, AGENTS, CONTRIBUTING, CHANGELOG） | 🟠 High |
+| hegemonikon_full_docs.txt | 2.1MB の巨大テキスト — 用途不明 | 🔴 Critical |
+| derivative_selector.py | 97KB 単一ファイル — 肥大化 | 🟠 High |
+| kernel/constitution | 11ファイル — 本当に constitution か？ | 🟡 Medium |
+
+---
+
+## 🎯 Phase 1: 即時削除・移動（ゼロトラスト適用）
+
+### 1.1 ルートからの追放
+
+| ファイル | 判定 | アクション | 理由 |
+|:---------|:----:|:-----------|:-----|
+| [hegemonikon_full_docs.txt](file:///home/laihuip001/oikos/hegemonikon/hegemonikon_full_docs.txt) (2.1MB) | ❌ | **削除** | 用途不明の巨大ファイル。生成物なら再生成可能 |
+| [swarm_scheduler.log](file:///home/laihuip001/oikos/hegemonikon/swarm_scheduler.log) | ❌ | **削除** | ログはリポジトリに含めない |
+| [llms.txt](file:///home/laihuip001/oikos/hegemonikon/llms.txt) | ❓ | **検証 → 削除/移動** | 内容次第で docs/ または削除 |
+| [migrate_to_m.ps1](file:///home/laihuip001/oikos/hegemonikon/migrate_to_m.ps1) | ❌ | **削除** | レガシーマイグレーションスクリプト。完了済みなら不要 |
+| [sync-gemini-settings.ps1](file:///home/laihuip001/oikos/hegemonikon/sync-gemini-settings.ps1) | ❓ | **移動** → `scripts/` | ルート汚染。スクリプトはスクリプトフォルダへ |
+| [adaptive_allocator.py](file:///home/laihuip001/oikos/hegemonikon/adaptive_allocator.py) | ❓ | **移動** → `mekhane/ergasterion/` | ルートに .py を置くな |
+| [collect_results.py](file:///home/laihuip001/oikos/hegemonikon/collect_results.py) | ❓ | **移動** → `mekhane/ergasterion/` | 同上 |
+| [run_synedrion_review.py](file:///home/laihuip001/oikos/hegemonikon/run_synedrion_review.py) | ❓ | **移動** → `mekhane/ergasterion/synedrion/` | 同上 |
+| [swarm_scheduler.py](file:///home/laihuip001/oikos/hegemonikon/swarm_scheduler.py) | ❓ | **移動** → `mekhane/ergasterion/` | 同上 |
+
+**Jobs曰く**: "ルートディレクトリはリポジトリの顔だ。顔に吹き出物があってはならない。"
+
+---
+
+### 1.2 docs/ の大粛清
+
+| 対象 | 現状 | アクション |
+|:-----|:-----|:-----------|
+| `docs/archive/` (70件, 468KB) | 死んだドキュメント | **丸ごと .archive/ へ移動** or git履歴に委ねて削除 |
+| `docs/research/` (103件, 4.3MB) | 研究メモの墓場 | **トリアージ**: アクティブ(10件以下)を残し、残りは削除 |
+| `docs/research/archived/` (49件) | アーカイブの二重構造 | **削除** — アーカイブにアーカイブは病的 |
+| `docs/specialist_run_results*.json` (3件) | 一時的な結果ファイル | **削除** — リポジトリは結果の保管庫ではない |
+
+**Jobs曰く**: "ドキュメントが多いということは、何も伝えていないということだ。"
+
+---
+
+## 🎯 Phase 2: README の単一真実化
+
+### 現状: 6つの重複ドキュメント
+
+| ファイル | 内容 | 問題 |
+|:---------|:-----|:-----|
+| [README.md](file:///home/laihuip001/oikos/hegemonikon/README.md) | 概要 + 構造 + 設計思想 | ✅ 残す（ただし刷新） |
+| [INDEX.md](file:///home/laihuip001/oikos/hegemonikon/INDEX.md) | 定理索引 + 用語辞典 | 🟠 README に統合 or docs/へ |
+| [STRUCTURE.md](file:///home/laihuip001/oikos/hegemonikon/STRUCTURE.md) | ディレクトリ構造 | ❌ README と重複。削除 |
+| [AGENTS.md](file:///home/laihuip001/oikos/hegemonikon/AGENTS.md) | AI向けガイド | 🟡 残すが簡潔化 |
+| [CONTRIBUTING.md](file:///home/laihuip001/oikos/hegemonikon/CONTRIBUTING.md) | 貢献ガイド | ❌ プライベートリポジトリに不要 |
+| [CHANGELOG.md](file:///home/laihuip001/oikos/hegemonikon/CHANGELOG.md) | 変更履歴 | 🟡 残す（最小限） |
+
+### 提案: ルートは3ファイルのみ
+
+```
+hegemonikon/
+├── README.md        # 唯一の入口。全てはここから始まる
+├── AGENTS.md        # AI向け（Jules/Gemini用）
+└── CHANGELOG.md     # 変更履歴（簡潔に）
+```
+
+**Jobs曰く**: "3つ以上のドキュメントを読ませる時点で、設計が失敗している。"
+
+---
+
+## 🎯 Phase 3: README.md 完全刷新
+
+### 現状の問題（文レベル批評）
+
+| 行 | 内容 | 判定 | 理由 |
+|:---|:-----|:----:|:-----|
+| 3 | "変分自由エネルギー最小化原理に基づく" | 🟠 | 専門用語の羅列。初見では意味不明 |
+| 9 | "Hegemonikón (Ἡγεμονικόν) は..." | 🟡 | ギリシャ語は美しいが説明が冗長 |
+| 13-18 | 総数テーブル | ✅ | 簡潔で良い |
+| 22-33 | Mermaid図 | 🟠 | L0/L1/L1.5/L1.75 は暗号。説明なしでは無意味 |
+| 80-99 | ディレクトリ構造 | ❌ | 古い。現実と乖離 |
+| 103-126 | Hyperengineering哲学 | 🟡 | 美しいが長い。1/3に圧縮可能 |
+| 152-163 | クイックスタート | ❌ | `pip install -e .` は動かない（setup.py がない） |
+
+### 新README構造案
+
+```markdown
+# Hegemonikón
+
+> 認知の統率中枢 — FEP + Stoic Philosophy
+
+## 何ができるか（30秒で理解）
+
+[3文で本質を説明]
+
+## 構造
+
+| 要素 | 数 |
+|------|---:|
+| 公理 | 7 |
+| 定理 | 24 |
+| 関係 | 36 |
+
+## 始め方
+
+[実際に動くコマンドのみ]
+
+## 詳細
+
+→ [docs/](docs/) または [AGENTS.md](AGENTS.md)
+```
+
+**Jobs曰く**: "READMEは30秒で読者を魅了するか、永遠に失うか、どちらかだ。"
+
+---
+
+## 🎯 Phase 4: mekhane/ の肥大化対処
+
+### 問題: derivative_selector.py = 97KB
+
+**これは異常である。**
+
+単一ファイルが 97KB = 約 3000行以上。
+
+| 対策 | 説明 |
+|:-----|:-----|
+| **分割** | 派生ごとにファイルを分ける |
+| **抽象化** | 共通ロジックを base クラスに |
+| **検証** | 本当にすべて必要か？ |
+
+---
+
+## 🎯 Phase 5: kernel/ の整理
+
+### kernel/constitution/ の検証
+
+11ファイルは多すぎないか？
+
+| ファイル | サイズ | 必要性 |
+|:---------|:-------|:------:|
+| [00_orchestration.md](file:///home/laihuip001/oikos/hegemonikon/kernel/constitution/00_orchestration.md) | 5.4KB | ✅ |
+| [01_environment.md](file:///home/laihuip001/oikos/hegemonikon/kernel/constitution/01_environment.md) | 2.0KB | 🟡 統合候補 |
+| [02_logic.md](file:///home/laihuip001/oikos/hegemonikon/kernel/constitution/02_logic.md) | 2.3KB | 🟡 統合候補 |
+| [03_security.md](file:///home/laihuip001/oikos/hegemonikon/kernel/constitution/03_security.md) | 2.0KB | 🟡 統合候補 |
+| [04_lifecycle.md](file:///home/laihuip001/oikos/hegemonikon/kernel/constitution/04_lifecycle.md) | 3.4KB | ✅ |
+| [05_meta_cognition.md](file:///home/laihuip001/oikos/hegemonikon/kernel/constitution/05_meta_cognition.md) | 1.9KB | 🟡 統合候補 |
+| [06_style.md](file:///home/laihuip001/oikos/hegemonikon/kernel/constitution/06_style.md) | 3.1KB | 🟡 |
+| [07_implementation.md](file:///home/laihuip001/oikos/hegemonikon/kernel/constitution/07_implementation.md) | 3.8KB | ✅ |
+| [INTRODUCTION.md](file:///home/laihuip001/oikos/hegemonikon/kernel/constitution/INTRODUCTION.md) | 3.1KB | 🟠 _index.md と重複 |
+| [_index.md](file:///home/laihuip001/oikos/hegemonikon/kernel/constitution/_index.md) | 2.0KB | 🟠 |
+| [deployment_bundle.xml](file:///home/laihuip001/oikos/hegemonikon/kernel/constitution/deployment_bundle.xml) | 5.0KB | ✅ |
+
+**提案**: 6ファイル以下に統合
+
+---
+
+## 📋 実行順序
+
+### 即時（今日中）
+
+1. [ ] [hegemonikon_full_docs.txt](file:///home/laihuip001/oikos/hegemonikon/hegemonikon_full_docs.txt) 削除
+2. [ ] [swarm_scheduler.log](file:///home/laihuip001/oikos/hegemonikon/swarm_scheduler.log) 削除
+3. [ ] [migrate_to_m.ps1](file:///home/laihuip001/oikos/hegemonikon/migrate_to_m.ps1) 削除
+4. [ ] ルート .py ファイルを `mekhane/` へ移動
+5. [ ] `docs/archive/` を `.archive/` へ移動
+6. [ ] [STRUCTURE.md](file:///home/laihuip001/oikos/hegemonikon/STRUCTURE.md), [CONTRIBUTING.md](file:///home/laihuip001/oikos/hegemonikon/CONTRIBUTING.md) 削除
+
+### 短期（今週中）
+
+7. [ ] [README.md](file:///home/laihuip001/oikos/hegemonikon/README.md) 完全刷新
+8. [ ] [INDEX.md](file:///home/laihuip001/oikos/hegemonikon/INDEX.md) を `docs/reference/` へ移動
+9. [ ] `docs/research/` トリアージ
+10. [ ] [AGENTS.md](file:///home/laihuip001/oikos/hegemonikon/AGENTS.md) 簡潔化
+
+### 中期（来週）
+
+11. [ ] [derivative_selector.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/fep/derivative_selector.py) 分割
+12. [ ] `kernel/constitution/` 統合
+13. [ ] 全体リント・テスト
+
+---
+
+## ⚠️ User Review Required
+
+> [!WARNING]
+> 以下は **破壊的変更** を含みます:
+> - 大量削除（docs/archive 70件、docs/research 100件以上）
+> - README完全刷新
+> - ディレクトリ構造変更
+
+**承認が必要な項目**:
+1. [hegemonikon_full_docs.txt](file:///home/laihuip001/oikos/hegemonikon/hegemonikon_full_docs.txt) の削除（復元不可の場合）
+2. `docs/research/` の大量削除
+3. [STRUCTURE.md](file:///home/laihuip001/oikos/hegemonikon/STRUCTURE.md), [CONTRIBUTING.md](file:///home/laihuip001/oikos/hegemonikon/CONTRIBUTING.md) の削除
+
+---
+
+*Generated by CCL/mek+ with A2 Krisis (Steve Jobs Mode)*

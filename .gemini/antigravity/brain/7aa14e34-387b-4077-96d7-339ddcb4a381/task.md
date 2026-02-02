@@ -1,0 +1,17 @@
+# Episodic Memory Recovery and Automation
+
+## Phase 1: 今すぐできること
+
+- [x] Antigravity 内部ログ構造を調査 → .pb は暗号化済み、読み取り不可
+- [x] 既存の会話データを復旧可能か確認 → brain/ と knowledge/ から 492 ファイル回収
+- [x] バックアップスクリプト作成 (`episodic_backup.sh`)
+- [x] cron ジョブ設定 (1時間ごと)
+
+## Phase 2: /bye 拡張
+
+- [x] Walkthrough を mneme にコピーする機能追加 (`walkthrough_export.py`)
+- [ ] セッション終了時の Git diff 記録 → 今後の課題
+
+## Phase 3: 代替機構の検討
+
+- [x] 3層エピソード記憶アーキテクチャを設計 (implementation_plan.md)

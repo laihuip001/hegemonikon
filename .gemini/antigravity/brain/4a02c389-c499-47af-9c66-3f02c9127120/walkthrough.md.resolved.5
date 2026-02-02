@@ -1,0 +1,79 @@
+# Hermēneus Phase 1-5 完了 Walkthrough
+
+## 概要
+
+CCL (Cognitive Control Language) の **コンパイル→実行→オーケストレーション→検証→CLI** を実装した **Hermēneus** コンパイラが Production Ready に到達。
+
+## テスト結果
+
+```
+================== 106 passed, 2 skipped, 2 warnings in 1.77s ==================
+```
+
+## アーキテクチャ
+
+```
+CCL Input → [Phase 1: Compiler] → LMQL
+                ↓
+         [Phase 2: Runtime] → LLM Execution
+                ↓
+         [Phase 3: Orchestration] → Stateful Graph
+                ↓
+         [Phase 4: Verification] → Multi-Agent Debate → Audit Trail
+                ↓
+         [Phase 4b: Prover] → Type Check / Schema / Formal
+                ↓
+         [Phase 5: CLI] → Production Ready
+```
+
+## 作成ファイル
+
+| Phase | ファイル | 役割 |
+|:------|:---------|:-----|
+| 1 | [ast.py](file:///home/laihuip001/oikos/hegemonikon/hermeneus/src/ast.py) | AST ノード |
+| 1 | [expander.py](file:///home/laihuip001/oikos/hegemonikon/hermeneus/src/expander.py) | 省略形展開 |
+| 1 | [parser.py](file:///home/laihuip001/oikos/hegemonikon/hermeneus/src/parser.py) | CCL パーサー |
+| 1 | [translator.py](file:///home/laihuip001/oikos/hegemonikon/hermeneus/src/translator.py) | LMQL 変換 |
+| 2 | [runtime.py](file:///home/laihuip001/oikos/hegemonikon/hermeneus/src/runtime.py) | 実行エンジン |
+| 2 | [constraints.py](file:///home/laihuip001/oikos/hegemonikon/hermeneus/src/constraints.py) | 制約デコード |
+| 3 | [graph.py](file:///home/laihuip001/oikos/hegemonikon/hermeneus/src/graph.py) | StateGraph変換 |
+| 3 | [checkpointer.py](file:///home/laihuip001/oikos/hegemonikon/hermeneus/src/checkpointer.py) | 状態永続化 |
+| 3 | [hitl.py](file:///home/laihuip001/oikos/hegemonikon/hermeneus/src/hitl.py) | HITL制御 |
+| 4 | [verifier.py](file:///home/laihuip001/oikos/hegemonikon/hermeneus/src/verifier.py) | Multi-Agent Debate |
+| 4 | [audit.py](file:///home/laihuip001/oikos/hegemonikon/hermeneus/src/audit.py) | Audit Trail |
+| 4b | [prover.py](file:///home/laihuip001/oikos/hegemonikon/hermeneus/src/prover.py) | Formal Prover |
+| 5 | [cli.py](file:///home/laihuip001/oikos/hegemonikon/hermeneus/src/cli.py) | CLI エントリー |
+
+**合計: ~4,500行 | 14 モジュール**
+
+## CLI 使用例
+
+```bash
+# コンパイル
+python -c "from hermeneus.src.cli import main; main(['compile', '/noe+'])"
+
+# 検証
+hermeneus verify "/ene+" --rounds 3 --min-conf 0.7
+
+# 監査
+hermeneus audit --period last_7_days
+```
+
+## 公開 API (v0.5.0)
+
+```python
+from hermeneus.src import (
+    # コンパイル & 実行
+    compile_ccl, execute_ccl,
+    
+    # 検証
+    verify_execution,       # Multi-Agent Debate
+    verify_code,            # 型チェック (mypy)
+    verify_schema,          # スキーマ検証
+    record_verification,    # 監査記録
+)
+```
+
+---
+
+*Completed: 2026-02-01 | v0.5.0 Production Ready*

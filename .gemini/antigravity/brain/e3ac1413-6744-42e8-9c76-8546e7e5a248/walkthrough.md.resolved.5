@@ -1,0 +1,56 @@
+# Dendron v2.2 最終レポート
+
+> **反復強化**: 2 iterations → HIGH 0, MED 1 (deferred)
+
+---
+
+## バージョン履歴
+
+| Ver | 内容 |
+|-----|------|
+| v2.0 | 親参照構文 |
+| v2.1 | パストラバーサル防止、親パス検証 |
+| v2.2 | docstring除外、レベル検証、サイズ制限 |
+
+---
+
+## R2 攻撃ベクトル結果
+
+| 優先度 | Before | After |
+|--------|--------|-------|
+| HIGH | 2 | **0** ✅ |
+| MED | 3 | **1** (deferred) |
+| LOW | 5 | 5 (accepted) |
+
+---
+
+## 修正した脆弱性
+
+| 攻撃 | 対策 |
+|------|------|
+| A4: Docstring内PROOF | [_is_code_comment()](file:///home/laihuip001/oikos/hegemonikon/mekhane/dendron/checker.py#257-265) フィルター |
+| C4: レベル偽装 | [_validate_level()](file:///home/laihuip001/oikos/hegemonikon/mekhane/dendron/checker.py#266-271) 厳密検証 |
+| D1: 巨大ファイル | `MAX_FILE_SIZE` (10MB) |
+
+---
+
+## 受容したリスク (LOW)
+
+- B2: シンボリックリンク (将来検討)
+- C1/C2: 循環/自己参照 (グラフ検証は将来)
+- D2/D3: ディレクトリ/ファイル数制限
+
+---
+
+## Git コミット
+
+- `f1ea513f`: v2.1 hardening
+- `6b78c933`: v2.2 R2 hardening
+
+---
+
+## 最終検証
+
+```
+✅ Dendron: 100.0% coverage (L1:38/L2:117/L3:86)
+```

@@ -1,0 +1,13 @@
+{
+  "session_id": "20260129-204340",
+  "expression": "F:test{ /s }",
+  "start_time": "2026-01-29T20:43:40.111840",
+  "steps": [
+    {
+      "timestamp": "2026-01-29T20:43:40.135318",
+      "op": "/s",
+      "status": "success",
+      "note": "Self-test"
+    }
+  ]
+}

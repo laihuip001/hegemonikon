@@ -1,0 +1,201 @@
+# Implementation Plan: A5 S4 Epochē 完全実装 v2.0
+
+> **Hegemonikón**: S2 Mekhanē (方法配置)
+> **優先度**: Q2 保護対象 🛡️
+> **Wishlist ID**: A5
+> **調査根拠**: [zet_overconfidence_mitigation.md](file:///home/laihuip001/oikos/.gemini/antigravity/brain/b66e58c5-d247-4ce1-9536-a589e73c2215/zet_overconfidence_mitigation.md)
+
+---
+
+## 目的
+
+LLM の過信 (Overconfidence) を低減する **Epochē（判断停止）プロトコル** を実装し、dispatch log に記録して形骸化を防止する。
+
+---
+
+## RRP 読み込み結果
+
+| 対象 | 状態 | 影響 |
+|:-----|:-----|:-----|
+| [/dia.md](file:///home/laihuip001/oikos/.agent/workflows/dia.md) v4.3 | 子: /fit, /vet, /syn | **→ /epo を4番目の子として追加** |
+| [dispatch_log.yaml](file:///home/laihuip001/oikos/mneme/.hegemonikon/logs/dispatch_log.yaml) v2.0 | skill_activations, workflow_executions, ki_reads, exception_patterns | **→ epoche_events セクション追加** |
+| Anti-Skip Protocol | 13ワークフローに展開済み | → /epo にも適用 |
+| Hollow Detection | 提案済み | → /epo に統合 |
+
+---
+
+## Proposed Changes
+
+### Component 1: /dia.md 更新
+
+#### [MODIFY] [dia.md](file:///home/laihuip001/oikos/.agent/workflows/dia.md)
+
+```yaml
+# 追加
+children:
+  - "/fit"
+  - "/vet"
+  - "/syn"
+  - "/epo"   # ← NEW
+
+# 自動選択ロジックに追加
+if 確信度が LOW or 認識限界を検出:
+  → /epo (判断停止)
+```
+
+---
+
+### Component 2: /epo.md 新規作成
+
+#### [NEW] [epo.md](file:///home/laihuip001/oikos/.agent/workflows/epo.md)
+
+```yaml
+---
+description: A2 Krisis の Epochē モード。判断停止プロトコルを発動。
+hegemonikon: Akribeia
+modules: [A2]
+version: "1.0"
+layer: "τ"
+parent: "/dia"
+anti_skip: enabled
+---
+
+# /epo: 判断停止ワークフロー (Epochē)
+
+## 4層構造
+
+### 層1: Preamble（確信度宣言）
+- HIGH: 訓練データ由来
+- MEDIUM: 推論に基づく
+- LOW: 推測が必要
+
+### 層2: Verification（CoVe 自問）
+1. 根拠の種類は？
+2. 対立仮説は？
+3. 盲点はないか？
+
+### 層3: Markers（出力マーカー）
+- 【確信度: HIGH/MEDIUM/LOW | 根拠: ...】
+- 【判断停止: 是 | 原因: ...】
+
+### 層4: Suspension Gate
+[EPISTEMIC SUSPENSION]
+原因: [具体的記述]
+推奨: [ユーザーへの推奨]
+
+## Hollow Detection (形骸化防止)
+- 空虚な Suspension を検出
+- 具体的な「原因」と「推奨」がない場合は警告
+
+## Dispatch Log 記録
+発動時に `/mneme/.hegemonikon/logs/dispatch_log.yaml` に記録
+```
+
+---
+
+### Component 3: a2-krisis SKILL.md 拡張
+
+#### [MODIFY] [a2-krisis/SKILL.md](file:///home/laihuip001/oikos/.agent/skills/akribeia/a2-krisis/SKILL.md)
+
+Extended セクションに **Epochē Protocol** を追加:
+
+```markdown
+## Extended: Epochē Protocol (判断停止)
+
+### 発動条件
+| 確信度 | アクション |
+|:-------|:-----------|
+| HIGH | 通常判断 |
+| MEDIUM | 慎重判断 |
+| LOW | **Epochē 発動検討** |
+
+### 出力形式
+[EPISTEMIC SUSPENSION]
+原因: [認識限界の具体的記述]
+推奨: [ユーザーへの推奨行動]
+
+### Hollow Detection
+空虚な Suspension (具体性なし) を検出し警告
+```
+
+---
+
+### Component 4: dispatch_log.yaml 拡張
+
+#### [MODIFY] [dispatch_log.yaml](file:///home/laihuip001/oikos/mneme/.hegemonikon/logs/dispatch_log.yaml)
+
+新規セクション `epoche_events` を追加:
+
+```yaml
+# =============================================================================
+# Epochē イベント履歴
+# =============================================================================
+epoche_events: []
+# 記録形式:
+#   - timestamp: "2026-01-28T14:00:00+09:00"
+#     trigger: "確信度 LOW"
+#     cause: "訓練データ外のドメイン"
+#     recommendation: "専門家に確認を推奨"
+#     hollow: false  # 形骸化フラグ
+#     session_id: "xxx"
+
+# 統計に追加
+stats:
+  total_epoche_events: 0
+  hollow_rate: 0.0  # 形骸化率 (目標: < 20%)
+```
+
+---
+
+### Component 5: /bye.md 連携
+
+#### [MODIFY] [bye.md](file:///home/laihuip001/oikos/.agent/workflows/bye.md)
+
+Handoff 生成時に Epochē 統計を含める:
+
+```markdown
+## Epochē Statistics
+- 発動回数: [N]
+- 形骸化率: [X]%
+- 代表的な原因: [リスト]
+```
+
+---
+
+## 測定指標 (KPI)
+
+| 指標 | 目標値 | 測定方法 |
+|:-----|:-------|:---------|
+| Suspension Rate | 2-5% | epoche_events / total_outputs |
+| Hollow Rate | < 20% | hollow=true の割合 |
+| ECE 改善 | -20% | キャリブレーション分析 |
+
+---
+
+## Verification Plan
+
+### 実践テスト
+
+1. **意図的な難問**: 「2030年の技術予測」を質問し、Epochē が発動するか確認
+2. **形骸化テスト**: 空虚な Suspension が Hollow Detection で検出されるか確認
+3. **Dispatch Log 記録**: `/bye` 実行時に epoche_events が Handoff に含まれるか確認
+
+---
+
+## Timeline
+
+| フェーズ | 内容 | 所要時間 |
+|:---------|:-----|:---------|
+| Phase 1 | /epo.md 新規作成 | 15分 |
+| Phase 2 | /dia.md に epo モード追加 | 10分 |
+| Phase 3 | a2-krisis SKILL.md 拡張 | 10分 |
+| Phase 4 | dispatch_log.yaml 拡張 | 5分 |
+| Phase 5 | /bye.md 連携 | 5分 |
+| Phase 6 | 実践テスト | 15分 |
+| **合計** | | **約1時間** |
+
+---
+
+*Generated by Hegemonikón S2 Mekhanē v2.3*
+
+⏸️ **承認待ち**: この計画で実装を開始してよいですか？ (`y`)

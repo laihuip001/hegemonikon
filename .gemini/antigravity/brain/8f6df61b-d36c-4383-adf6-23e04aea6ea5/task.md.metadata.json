@@ -1,0 +1,6 @@
+{
+  "artifactType": "ARTIFACT_TYPE_TASK",
+  "summary": "位相反転演算子実装タスク。operators_and_layers.md への追加完了。検証・残作業のみ。",
+  "updatedAt": "2026-01-30T04:02:45.392242284Z",
+  "version": "2"
+}

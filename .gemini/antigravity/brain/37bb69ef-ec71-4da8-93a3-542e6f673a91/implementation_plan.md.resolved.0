@@ -1,0 +1,179 @@
+# FEP Agent 拡張計画: A行列動的学習 + 2-step政策Horizon
+
+> **Origin**: arXiv:2412.10425 論文精読からの吸収パターン
+> **Plan**: B (Robust)
+
+## 目的
+
+pymdp Agent を拡張し、セッション間で学習した観察モデル (A行列) を永続化し、2-step の政策評価 horizon を導入する。
+
+---
+
+## STAGE 0: Blindspot + Scale
+
+| カテゴリ | リスク | 解決策 |
+|:---------|:-------|:-------|
+| 🔗 Dependencies | 中 | pymdp API確認: `policy_len`, `inference_horizon` パラメータで対応可能 |
+| ⏱️ Temporal | 低 | 既存テスト10件、変更後も互換性維持 |
+| 📐 Scope | 確認済 | Meso (モジュールレベル変更) |
+
+**📏 Scale**: Meso
+
+---
+
+## STAGE 1: Strategy Selection
+
+**⚖️ Explore/Exploit**: Exploit
+- 失敗コスト: 低 (PoC段階)
+- 環境確実性: 高 (論文パターン活用)
+- 時間制約: 通常
+
+**選択**: Plan B (Robust)
+
+---
+
+## STAGE 2: Success Criteria
+
+| 軸 | Must | Should | Could |
+|:---|:-----|:-------|:------|
+| 機能性 | A行列保存・読込 | Dirichlet更新 | 自動劣化検出 |
+| 機能性 | `policy_len=2` 設定 | inference_horizon設定 | 動的horizon |
+| 品質 | 既存10テスト維持 | 新規5テスト追加 | Coverage 80%+ |
+| 性能 | 既存と同等 | 50ms以内 | 10ms以内 |
+
+**✅ 完了条件**: Must が全て満たされた時点
+
+---
+
+## STAGE 3: Goal Decomposition
+
+```
+最終目標: 論文パターンを吸収した拡張FEP Agent
+  ↑
+サブゴール 2: 2-step政策horizon導入
+  ↑ 前提: pymdp Agent パラメータ理解
+サブゴール 1: A行列永続化
+  ↑ 前提: 保存パス・フォーマット決定
+現在地: fep_agent.py 423行、テスト10件
+```
+
+---
+
+## Proposed Changes
+
+### Component: mekhane/fep
+
+---
+
+#### [MODIFY] [fep_agent.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/fep/fep_agent.py)
+
+1. **2-step政策horizon導入**
+   - [Agent()](file:///home/laihuip001/oikos/hegemonikon/mekhane/fep/fep_agent.py#37-423) 初期化時に `policy_len=2` を追加
+   - `inference_horizon=1` を明示的に設定 (論文と同一)
+
+2. **A行列永続化メソッド追加**
+   ```python
+   def save_learned_A(self, path: str) -> None:
+       """Save learned A matrix to file."""
+       np.save(path, self.agent.A)
+   
+   def load_learned_A(self, path: str) -> None:
+       """Load A matrix from file and update agent."""
+       self.agent.A = np.load(path)
+   ```
+
+3. **Dirichlet更新ロジック追加**
+   ```python
+   def update_A_dirichlet(self, observation: int, learning_rate: float = 50.0) -> None:
+       """Update A matrix using Dirichlet concentration update."""
+       # pA += η * outer(o, beliefs)
+   ```
+
+---
+
+#### [NEW] [persistence.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/fep/persistence.py)
+
+A行列永続化のためのヘルパーモジュール:
+
+```python
+LEARNED_A_PATH = "/home/laihuip001/oikos/mneme/.hegemonikon/learned_A.npy"
+
+def save_A(agent: HegemonikónFEPAgent) -> Path
+def load_A(path: Path) -> np.ndarray
+def A_exists() -> bool
+```
+
+---
+
+### Component: tests
+
+---
+
+#### [MODIFY] [test_fep_agent.py](file:///home/laihuip001/oikos/hegemonikon/tests/test_fep_agent.py)
+
+5件のテスト追加:
+- `test_policy_len_is_2`: policy_len が 2 であることを確認
+- `test_save_learned_A`: A行列保存テスト
+- `test_load_learned_A`: A行列読込テスト
+- `test_dirichlet_update`: Dirichlet更新テスト
+- `test_persistence_roundtrip`: 保存→読込のラウンドトリップ
+
+---
+
+## Verification Plan
+
+### Automated Tests
+
+```bash
+# 既存テスト維持確認
+pytest tests/test_fep_agent.py -v
+
+# 新規テスト実行
+pytest tests/test_fep_agent.py -v -k "policy_len or save or load or dirichlet"
+```
+
+### Manual Verification
+
+1. [scripts/fep_demo.py](file:///home/laihuip001/oikos/hegemonikon/scripts/fep_demo.py) で動作確認
+2. `/bye` 実行時に A行列が保存されることを確認
+3. `/boot` 実行時に A行列が読込されることを確認
+
+---
+
+## 依存関係
+
+- **pymdp**: `policy_len`, `inference_horizon` パラメータ (確認済み)
+- **numpy**: A行列保存 (既存)
+
+---
+
+## STAGE 4: Devil's Advocate
+
+| 視点 | 判定 | 理由 |
+|:-----|:-----|:-----|
+| 🔴 Feasibility | ✅ PASS | pymdp APIで対応可能 |
+| 🔴 Necessity | ✅ PASS | 論文で効果実証済み |
+| 🔴 Alternatives | ✅ PASS | pymdp変更が最小限 |
+| 🔴 Risks | ✅ PASS | 既存テスト維持で検出可能 |
+| 🔴 Dependencies | ✅ PASS | pymdp互換性確認済み |
+
+### Pre-mortem
+
+| 失敗シナリオ | 対策 |
+|:-------------|:-----|
+| pymdp API変更でpolicy_len非対応 | バージョン固定 (0.8.1) |
+| A行列サイズ不一致で読込失敗 | バージョン番号付きファイル名 |
+| Dirichlet更新で数値不安定 | クリッピング (1e-10) |
+
+---
+
+## 実装順序
+
+1. **Phase 1**: `fep_agent.py` に `policy_len=2` 追加 + テスト
+2. **Phase 2**: `persistence.py` 作成 + 保存/読込テスト
+3. **Phase 3**: Dirichlet更新ロジック + テスト
+4. **Phase 4**: `/bye`, `/boot` ワークフロー統合
+
+---
+
+*Generated by Hegemonikón /plan v3.0*

@@ -1,0 +1,117 @@
+# Scale Analyzer 精緻実装計画
+
+> **基盤調査**: Perplexity Deep Research (2026-01-28)
+> **採用フレームワーク**: Interacting Timescales + AoT + SEAR
+
+---
+
+## 設計原則
+
+```
+S1 Metron (定理) ← 参照 → Scale Analyzer (SAGE Module)
+                         ↓
+                   /scale ワークフロー
+                         ↓
+                   /plan or 直接実行
+```
+
+---
+
+## 7段階アルゴリズム (簡略化版)
+
+| Stage | 処理 | 出力 |
+|:------|:-----|:-----|
+| 1 | Feature Extraction | deadline, impact_scope, novelty |
+| 2 | Timescale Analysis | fast/slow/hybrid |
+| 3 | Hierarchy Depth | Apex/Meso/Micro |
+| 4 | Conflict Check | 衝突検出 |
+| 5 | Prompt Strategy | Direct/CoT/AoT |
+| 6 | Reasoner Config | DT/LLM/Hybrid |
+| 7 | Output Format | Macro/Micro/Mixed |
+
+---
+
+## SAGE Module 設計
+
+```xml
+<module_config>
+  <name>Scale Analyzer</name>
+  <base_theorem>S1 Metron</base_theorem>
+  <objective>タスクの最適スケールを7段階で診断</objective>
+</module_config>
+
+<protocol>
+  <step_1_extract>
+    **Feature Extraction:**
+    - deadline: 即座 (<10min) / 短期 (<1week) / 長期
+    - impact_scope: ファイル / モジュール / システム
+    - novelty: 既知 / 部分的新規 / 完全新規
+  </step_1_extract>
+
+  <step_2_timescale>
+    **Timescale Analysis:**
+    IF deadline=即座 AND scope=ファイル → fast (Micro)
+    ELSE IF deadline=長期 OR scope=システム → slow (Macro)
+    ELSE → hybrid
+  </step_2_timescale>
+
+  <step_3_conflict>
+    **Conflict Detection:**
+    IF (Micro要求 AND Macro要求) simultaneously:
+      → temporal_decomposition 提案
+  </step_3_conflict>
+
+  <step_4_strategy>
+    **Prompt Strategy:**
+    fast → Direct / CoT
+    slow → AoT / Decomposed
+    hybrid → Mixed
+  </step_4_strategy>
+</protocol>
+
+<output_template>
+  ## 📐 Scale Analysis
+
+  | Dimension | Value | Reason |
+  |-----------|-------|--------|
+  | Timescale | [fast/slow/hybrid] | ... |
+  | Depth | [Apex/Meso/Micro] | ... |
+  | Strategy | [Direct/CoT/AoT] | ... |
+
+  **推奨スケール**: [Micro/Macro/Hybrid]
+  **次のアクション**: [/plan or 直接実行]
+  
+  ### スケール衝突
+  [検出された場合のみ表示]
+</output_template>
+</module_config>
+```
+
+---
+
+## 配置場所
+
+`tekhne-maker/references/sage-scale-analyzer.md`
+
+---
+
+## ワークフロー連携
+
+| 新規 | 既存連携 |
+|:-----|:---------|
+| `/scale` | → Scale Analyzer 実行 |
+| | → 結果に応じて `/plan` or 直接実行を提案 |
+
+---
+
+## 実装フェーズ
+
+| # | Task | Est. |
+|:--|:-----|-----:|
+| 1 | SAGE Module 作成 | 10min |
+| 2 | `/scale` ワークフロー作成 | 5min |
+| 3 | 検証 | 5min |
+
+---
+
+**推奨**: `y` で実装開始

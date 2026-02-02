@@ -1,0 +1,6 @@
+{
+  "artifactType": "ARTIFACT_TYPE_IMPLEMENTATION_PLAN",
+  "summary": "1,800セッション/日の Adaptive Swarm Allocation システム設計。変更駆動型(40%)、発見型(40%)、週次深掘り(20%)の3層構造。6アカウント並列実行でJulesの無料枠を最大活用。",
+  "updatedAt": "2026-01-29T02:20:35.345153146Z",
+  "version": "2"
+}

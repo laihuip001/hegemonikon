@@ -1,0 +1,5 @@
+{
+  "artifactType": "ARTIFACT_TYPE_IMPLEMENTATION_PLAN",
+  "summary": "存在証明の走査 (@proof*) プロジェクト実行計画。ディレクトリ→ファイル→コード→字句の4レイヤー走査。CCL式 /mek+ で設計。",
+  "updatedAt": "2026-01-30T14:09:35.509647909Z"
+}

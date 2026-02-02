@@ -1,0 +1,5 @@
+{
+  "artifactType": "ARTIFACT_TYPE_IMPLEMENTATION_PLAN",
+  "summary": "Design specification for the '!' augmentation system. Defines a 3-level hierarchy: Level 0 (universal effects like output increase, structured format, questions, rationale), Level 1 (series-specific patterns for O/S/H/P/K/A), and Level 2 (individual workflow definitions). Includes implementation strategy with tiered rollout.",
+  "updatedAt": "2026-01-29T05:06:35.623266975Z"
+}

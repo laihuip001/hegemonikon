@@ -1,0 +1,6 @@
+{
+  "artifactType": "ARTIFACT_TYPE_WALKTHROUGH",
+  "summary": "SE原則強制の完全実装。(1) 出力テンプレート作成、(2) STAGE 0 スケール宣言必須化、(3) se_principle_validator.py 実装とテスト成功。/mek v6.7、/s v5.6。",
+  "updatedAt": "2026-01-30T23:53:56.092896338Z",
+  "version": "3"
+}

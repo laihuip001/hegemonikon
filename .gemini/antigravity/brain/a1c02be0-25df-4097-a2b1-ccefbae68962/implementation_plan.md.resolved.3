@@ -1,0 +1,116 @@
+# /s 戦略設計: 3つの改善候補
+
+> **日時**: 2026-01-29 13:42
+> **形式**: /s v4.1 (5-STAGE)
+
+---
+
+## 改善候補 1: /bye + /boot 学習サイクル完成
+
+### STAGE 0: Blindspot Check
+
+| 確認事項 | 結果 |
+|:---------|:-----|
+| 既存実装 | v3.2 で選択ログ記録完了 |
+| 欠けているもの | /bye で Doxa 永続化、/boot で A-matrix 読み込み |
+
+### STAGE 1: Scale (S1 Metron)
+
+| 粒度 | 工数 |
+|:-----|:-----|
+| Micro | /bye.md に 5 行追加 |
+| Meso | /boot.md に 5 行追加 |
+| 合計 | **20分** |
+
+### 変更内容
+
+```yaml
+# /bye.md に追加
+PHASE 3: 派生選択学習
+  1. derivative_selections.yaml を読み込み
+  2. 高信頼度選択 (>80%) を Doxa に永続化
+  3. 低信頼度選択をレビュー候補に
+
+# /boot.md に追加
+PHASE 2: 学習状態復元
+  1. Doxa から高信頼度選択を読み込み
+  2. A-matrix にプライア更新
+```
+
+---
+
+## 改善候補 2: X-series 連携強化
+
+### STAGE 0: Blindspot Check
+
+| 確認事項 | 結果 |
+|:---------|:-----|
+| 現状 | 36 relations 定義済み、/x.md で可視化 |
+| 欠けているもの | 単一ワークフローからの自動推奨 |
+
+### STAGE 1: Scale (S1 Metron)
+
+| 粒度 | 工数 |
+|:-----|:-----|
+| Micro | 各 SKILL.md に X-series 推奨セクション |
+| Meso | workflow_runner に next_theorem 出力 |
+| 合計 | **45分** |
+
+### 変更内容
+
+```python
+# workflow_runner.py に追加
+def suggest_next_theorem(current: str) -> List[str]:
+    """X-series から次の定理を推奨"""
+    from mekhane.fep.x_series import get_relations
+    return get_relations(current)
+```
+
+---
+
+## 改善候補 3: workflow_runner 診断機能
+
+### STAGE 0: Blindspot Check
+
+| 確認事項 | 結果 |
+|:---------|:-----|
+| 現状 | 派生選択結果のみ出力 |
+| 欠けているもの | 選択理由の詳細、デバッグ情報 |
+
+### STAGE 1: Scale (S1 Metron)
+
+| 粒度 | 工数 |
+|:-----|:-----|
+| Micro | --verbose フラグ追加 |
+| Meso | 選択スコア可視化 |
+| 合計 | **30分** |
+
+### 変更内容
+
+```bash
+# 診断モード
+python -m mekhane.workflow_runner O1 "問題" --verbose
+
+# 出力例
+[派生選択詳細]
+  nous: 2.5 (pattern: 3, encoding: 2)
+  phro: 1.0 (pattern: 1, encoding: 0)
+  meta: 0.5 (pattern: 0, encoding: 1)
+  → 選択: nous (80%)
+```
+
+---
+
+## 優先順位決定
+
+| # | 候補 | 工数 | 価値 | 推奨 |
+|:-:|:-----|:----:|:----:|:----:|
+| 1 | 学習サイクル | 20分 | 高 | **即実行** |
+| 2 | X-series 連携 | 45分 | 中 | 次回 |
+| 3 | 診断機能 | 30分 | 中 | 次回 |
+
+---
+
+## 承認をお願いします
+
+「学習サイクル」を今日実装しますか？ 残り2つは次回セッションへ。

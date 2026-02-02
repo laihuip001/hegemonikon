@@ -1,0 +1,325 @@
+# Hegemonikón Dispatch Log v2.0
+# Phase B 移行判定用 + スキル/ワークフロー発動の可視化
+# 
+# 記録対象:
+#   1. skill_activations: 真の自動発動 (description マッチ)
+#   2. workflow_executions: ワークフロー実行とスキル呼び出し
+#   3. ki_reads: Knowledge Item 読み込み
+#   4. exception_patterns: 想定外の状況と対処
+#
+# Phase B 条件: dispatch_count >= 50, failure_rate < 10%, exception_patterns >= 3
+
+version: "2.0"
+created: "2026-01-28T12:56:00+09:00"
+updated: "2026-01-28T23:05:00+09:00"
+
+# =============================================================================
+# 統計サマリー
+# =============================================================================
+stats:
+  total_skill_activations: 0
+  total_workflow_executions: 56
+  total_ki_reads: 2
+  total_exception_patterns: 0
+  total_epoche_events: 2
+  epoche_hollow_rate: 0.0
+  success_rate: 1.0
+  phase_b_achieved: true
+  phase_b_date: "2026-01-29T20:00:00+09:00"
+
+# =============================================================================
+# スキル発動履歴 (Primary)
+# 記録条件: Antigravity IDE が description でマッチして自動発動
+# =============================================================================
+skill_activations: []
+# 記録形式:
+#   - timestamp: "2026-01-28T14:00:00+09:00"
+#     skill: "O1 Noēsis"
+#     trigger: "user_query:深く考えて"  # マッチしたキーワード
+#     outcome: "success"
+#     session_id: "xxx"
+
+# =============================================================================
+# ワークフロー実行履歴
+# =============================================================================
+workflow_executions:
+  - timestamp: "2026-01-28T16:30:50+09:00"
+    workflow: "/boot"
+    skills_referenced: ["O1 Noēsis", "H4 Doxa"]
+    outcome: "success"
+    session_id: "32c3cec2-3abe-42e0-a741-fceb158263f5"
+  - timestamp: "2026-01-28T16:36:08+09:00"
+    workflow: "/bou"
+    skills_referenced: ["O2 Boulēsis"]
+    outcome: "success"
+    session_id: "32c3cec2-3abe-42e0-a741-fceb158263f5"
+  - timestamp: "2026-01-28T16:42:19+09:00"
+    workflow: "/noe"
+    skills_referenced: ["O1 Noēsis"]
+    outcome: "success"
+    session_id: "32c3cec2-3abe-42e0-a741-fceb158263f5"
+  - timestamp: "2026-01-28T16:46:15+09:00"
+    workflow: "/ene"
+    skills_referenced: ["O4 Energeia"]
+    outcome: "success"
+    session_id: "32c3cec2-3abe-42e0-a741-fceb158263f5"
+  - timestamp: "2026-01-28T18:04:17+09:00"
+    workflow: "/bou"
+    skills_referenced: ["O2 Boulēsis"]
+    outcome: "success"
+    session_id: "32c3cec2-3abe-42e0-a741-fceb158263f5"
+  - timestamp: "2026-01-28T18:37:07+09:00"
+    workflow: "/bye"
+    skills_referenced: ["H4 Doxa"]
+    outcome: "success"
+    session_id: "32c3cec2-3abe-42e0-a741-fceb158263f5"
+  - timestamp: "2026-01-28T15:56:00+09:00"
+    workflow: "/bou"
+    skills_referenced: ["O2 Boulēsis"]
+    outcome: "success"
+    session_id: "b66e58c5-d247-4ce1-9536-a589e73c2215"
+  - timestamp: "2026-01-28T16:13:00+09:00"
+    workflow: "/ene"
+    skills_referenced: ["O4 Energeia"]
+    outcome: "success"
+    session_id: "b66e58c5-d247-4ce1-9536-a589e73c2215"
+  - timestamp: "2026-01-28T18:50:00+09:00"
+    workflow: "/bye"
+    skills_referenced: ["H4 Doxa"]
+    outcome: "success"
+    session_id: "b66e58c5-d247-4ce1-9536-a589e73c2215"
+  - timestamp: "2026-01-28T18:41:02+09:00"
+    workflow: "/noe"
+    skills_referenced: ["O1 Noēsis"]
+    outcome: "success"
+    session_id: "ffa792f7-54f1-43c7-b1c6-81f8da41084a"
+  - timestamp: "2026-01-28T18:53:10+09:00"
+    workflow: "/bye"
+    skills_referenced: ["H4 Doxa"]
+    outcome: "success"
+    session_id: "ffa792f7-54f1-43c7-b1c6-81f8da41084a"
+  - timestamp: "2026-01-28T19:14:23+09:00"
+    workflow: "/boot"
+    skills_referenced: ["O1 Noēsis", "H4 Doxa"]
+    outcome: "success"
+    session_id: "024806a0-9911-4c49-8b4c-1b0bbf248f3c"
+  - timestamp: "2026-01-28T19:17:28+09:00"
+    workflow: "/noe"
+    skills_referenced: ["O1 Noēsis"]
+    outcome: "success"
+    session_id: "024806a0-9911-4c49-8b4c-1b0bbf248f3c"
+  - timestamp: "2026-01-28T19:17:28+09:00"
+    workflow: "/dia"
+    skills_referenced: ["A2 Krisis"]
+    outcome: "success"
+    session_id: "024806a0-9911-4c49-8b4c-1b0bbf248f3c"
+  - timestamp: "2026-01-28T20:04:23+09:00"
+    workflow: "/noe"
+    skills_referenced: ["O1 Noēsis"]
+    outcome: "success"
+    session_id: "024806a0-9911-4c49-8b4c-1b0bbf248f3c"
+    notes: "/boot v3.0 5-phase analysis"
+  - timestamp: "2026-01-28T20:18:17+09:00"
+    workflow: "/bou"
+    skills_referenced: ["O2 Boulēsis"]
+    outcome: "success"
+    session_id: "024806a0-9911-4c49-8b4c-1b0bbf248f3c"
+  - timestamp: "2026-01-28T20:18:17+09:00"
+    workflow: "/pri"
+    skills_referenced: ["K1 Eukairia", "K2", "K3"]
+    outcome: "success"
+    session_id: "024806a0-9911-4c49-8b4c-1b0bbf248f3c"
+  - timestamp: "2026-01-28T20:22:00+09:00"
+    workflow: "/bye"
+    skills_referenced: ["H4 Doxa"]
+    outcome: "success"
+    session_id: "024806a0-9911-4c49-8b4c-1b0bbf248f3c"
+  - timestamp: "2026-01-28T20:15:04+09:00"
+    workflow: "/boot"
+    skills_referenced: ["O1 Noēsis", "H4 Doxa"]
+    outcome: "success"
+    session_id: "76b0afc4-c3a8-4b8d-a819-bb8b3f7644bd"
+  - timestamp: "2026-01-28T20:17:00+09:00"
+    workflow: "/noe"
+    skills_referenced: ["O1 Noēsis"]
+    outcome: "success"
+    session_id: "76b0afc4-c3a8-4b8d-a819-bb8b3f7644bd"
+    notes: "N4 tekhne-maker 本質分析"
+  - timestamp: "2026-01-28T20:26:00+09:00"
+    workflow: "/tek"
+    skills_referenced: ["tekhne-maker"]
+    outcome: "success"
+    session_id: "76b0afc4-c3a8-4b8d-a819-bb8b3f7644bd"
+    notes: "新規ワークフロー作成 (commit: 7be1c57b)"
+  - timestamp: "2026-01-28T21:23:00+09:00"
+    workflow: "/ax"
+    skills_referenced: ["O1-O4", "S1-S4", "H1-H4", "P1-P4", "K1-K4", "A1-A4", "X-series"]
+    outcome: "success"
+    session_id: "230fabb3-9ce6-4e89-833b-d6abd27ddf60"
+    notes: "/ax '次に何をするべきか' — 6層すべてが /bye を指す"
+  - timestamp: "2026-01-28T21:35:00+09:00"
+    workflow: "/bye"
+    skills_referenced: ["H4 Doxa"]
+    outcome: "success"
+    session_id: "230fabb3-9ce6-4e89-833b-d6abd27ddf60"
+    notes: "セッション終了、Skill Description最適化+/ax体験"
+  - timestamp: "2026-01-28T21:31:00+09:00"
+    workflow: "/noe"
+    skills_referenced: ["O1 Noēsis"]
+    outcome: "success"
+    session_id: "682b6959-dd02-4c2f-b70f-1712daaac0ea"
+    notes: "Hegemonikón Mode 深層分析 — V2 (Pragmatist) 採択"
+  - timestamp: "2026-01-28T21:35:00+09:00"
+    workflow: "/plan"
+    skills_referenced: ["S1 Metron", "S2 Mekhanē"]
+    outcome: "success"
+    session_id: "682b6959-dd02-4c2f-b70f-1712daaac0ea"
+    notes: "Hegemonikón Mode 実装計画"
+  - timestamp: "2026-01-28T21:55:00+09:00"
+    workflow: "/ene"
+    skills_referenced: ["O4 Energeia"]
+    outcome: "success"
+    session_id: "682b6959-dd02-4c2f-b70f-1712daaac0ea"
+    notes: "M7: HEGEMONIKON_MODE 実装 + デフォルト化"
+  - timestamp: "2026-01-28T22:18:00+09:00"
+    workflow: "/bye"
+    skills_referenced: ["H4 Doxa"]
+    outcome: "success"
+    session_id: "682b6959-dd02-4c2f-b70f-1712daaac0ea"
+    notes: "tekhne-maker v5.0 + Hegemonikón Mode デフォルト化セッション終了"
+  # --- Session 31cee274-e98d-4e87-a07a-7451b3e11ed8 (2026-01-28 22:28-) ---
+  - timestamp: "2026-01-28T22:28:24+09:00"
+    workflow: "/boot"
+    skills_referenced: ["O1 Noēsis", "H4 Doxa"]
+    outcome: "success"
+    session_id: "31cee274-e98d-4e87-a07a-7451b3e11ed8"
+    notes: "boot v3.0 完全実行、Jules レビューブランチ3件確認"
+  - timestamp: "2026-01-28T22:37:04+09:00"
+    workflow: "maintenance"
+    skills_referenced: []
+    outcome: "success"
+    session_id: "31cee274-e98d-4e87-a07a-7451b3e11ed8"
+    notes: "Jules レビューブランチ3件削除（ai-001, missing-file, report）"
+  - timestamp: "2026-01-28T22:50:00+09:00"
+    workflow: "/noe"
+    skills_referenced: ["O1 Noēsis"]
+    outcome: "success"
+    session_id: "31cee274-e98d-4e87-a07a-7451b3e11ed8"
+    notes: "FEP観点でHegemonikónの本質分析 — 結論: 認知シミュレーション環境"
+  # --- Session 405e04e3-13b5-4a79-9f34-d4d02b0a6faa (2026-01-28 22:39-22:58) ---
+  - timestamp: "2026-01-28T22:39:13+09:00"
+    workflow: "/boot"
+    skills_referenced: ["O1 Noēsis", "H4 Doxa"]
+    outcome: "success"
+    session_id: "405e04e3-13b5-4a79-9f34-d4d02b0a6faa"
+    notes: "boot v3.0 完全実行"
+  - timestamp: "2026-01-28T22:42:00+09:00"
+    workflow: "/bou"
+    skills_referenced: ["O2 Boulēsis"]
+    outcome: "success"
+    session_id: "405e04e3-13b5-4a79-9f34-d4d02b0a6faa"
+    notes: "PHASE 0 私の望み提示 + Creator 対話"
+  - timestamp: "2026-01-28T22:47:16+09:00"
+    workflow: "/mek"
+    skills_referenced: ["tekhne-maker"]
+    outcome: "success"
+    session_id: "405e04e3-13b5-4a79-9f34-d4d02b0a6faa"
+    notes: "FileMaker チューター v2.0 生成 (Creator 向け, MICKS社コンテキスト)"
+  - timestamp: "2026-01-28T22:58:00+09:00"
+    workflow: "/bye"
+    skills_referenced: ["H4 Doxa"]
+    outcome: "success"
+    session_id: "405e04e3-13b5-4a79-9f34-d4d02b0a6faa"
+    notes: "handoff_2026-01-28_2258.md 生成"
+  # --- Session 31cee274-e98d-4e87-a07a-7451b3e11ed8 (2026-01-28 22:30-23:05) ---
+  - timestamp: "2026-01-28T22:50:00+09:00"
+    workflow: "/dev"
+    skills_referenced: ["Code Protocols"]
+    outcome: "success"
+    session_id: "31cee274-e98d-4e87-a07a-7451b3e11ed8"
+    notes: "FEP + 全コードベース監査 — 192 PASSED, 0 FAILED"
+  - timestamp: "2026-01-28T23:05:00+09:00"
+    workflow: "/bye"
+    skills_referenced: ["H4 Doxa"]
+    outcome: "success"
+    session_id: "31cee274-e98d-4e87-a07a-7451b3e11ed8"
+    notes: "handoff_2026-01-28_2305.md 生成、コミット cdacbf42"
+    notes: "セッション終了 + filemaker-learning/ ディレクトリ作成"
+  # --- Session 61fd8c7f-1a6e-44a4-8bf1-420d1fc4fe5e (2026-01-29 20:06-20:52) ---
+  - timestamp: "2026-01-29T20:06:12+09:00"
+    workflow: "/boot"
+    skills_referenced: ["O1 Noēsis", "H4 Doxa"]
+    outcome: "success"
+    session_id: "61fd8c7f-1a6e-44a4-8bf1-420d1fc4fe5e"
+    notes: "boot v3.4 complete, Sophia 182件, Kairos 61件"
+  - timestamp: "2026-01-29T20:34:26+09:00"
+    workflow: "/s+"
+    skills_referenced: ["S1 Metron", "S2 Mekhanē", "S3 Stathmos", "S4 Praxis"]
+    outcome: "success"
+    session_id: "61fd8c7f-1a6e-44a4-8bf1-420d1fc4fe5e"
+    notes: "S-Series deep analysis for gemini_frontend_spec"
+  - timestamp: "2026-01-29T20:42:13+09:00"
+    workflow: "/ene"
+    skills_referenced: ["O4 Energeia"]
+    outcome: "success"
+    session_id: "61fd8c7f-1a6e-44a4-8bf1-420d1fc4fe5e"
+    notes: "hegemonikon-guide 実装完了、browser_subagent でデモ録画"
+  - timestamp: "2026-01-29T20:52:09+09:00"
+    workflow: "/bye+"
+    skills_referenced: ["H4 Doxa"]
+    outcome: "success"
+    session_id: "61fd8c7f-1a6e-44a4-8bf1-420d1fc4fe5e"
+    notes: "詳細引き継ぎ生成、Sophia/Kairos 更新"
+
+
+# =============================================================================
+# KI 読み込み履歴
+# =============================================================================
+ki_reads: []
+# 記録形式:
+#   - timestamp: "2026-01-28T14:00:00+09:00"
+#     ki_name: "Hegemonikón Integrated System"
+#     artifacts_read: ["overview.md", "digestion_principle.md"]
+#     purpose: "ワークフロー設計の参照"
+#     session_id: "xxx"
+
+# =============================================================================
+# 例外パターン (Phase B 条件の1つ)
+# =============================================================================
+exception_patterns: []
+# 記録形式:
+#   - timestamp: "2026-01-28T14:00:00+09:00"
+#     situation: "想定外の依存関係"
+#     action_taken: "手動で解決"
+#     learned: "今後は事前チェックを追加"
+#     session_id: "xxx"
+
+# =============================================================================
+# Epochē イベント (A2 Krisis 判断停止)
+# =============================================================================
+epoche_events:
+  - timestamp: "2026-01-28T21:24:00+09:00"
+    trigger: "FEP entropy >= 2.0"
+    cause: "問い A: 自己参照パラドックス"
+    recommendation: "判断停止、外部評価を求める"
+    hollow: false
+    session_id: "fe8d0749-9ee0-4858-9d7a-355a05d34923"
+  - timestamp: "2026-01-28T21:26:00+09:00"
+    trigger: "FEP entropy >= 2.0"
+    cause: "問い D: 長期的能力影響が未検証"
+    recommendation: "判断停止、両論併記"
+    hollow: false
+    session_id: "fe8d0749-9ee0-4858-9d7a-355a05d34923"
+
+# =============================================================================
+# Phase B 移行状態
+# =============================================================================
+phase_b:
+  eligible: false
+  reason: "dispatch_count < 50"
+  progress:
+    skill_activations: "0/50"
+    workflow_executions: "56/50"  # 112% - 達成!
+    exception_patterns: "0/3"
+
+

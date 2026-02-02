@@ -1,0 +1,5 @@
+{
+  "artifactType": "ARTIFACT_TYPE_IMPLEMENTATION_PLAN",
+  "summary": "P2-1: let 構文の実装設計 (CCL v2.4)。P2-2: ccl_signature のワークフロー YAML 追加設計。実装対象ファイルとコード例を提供。",
+  "updatedAt": "2026-01-29T13:52:54.311591288Z"
+}

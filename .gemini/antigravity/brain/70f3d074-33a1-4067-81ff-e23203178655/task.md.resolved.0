@@ -1,0 +1,30 @@
+# FEP ワークフロー統合タスク
+
+## 目標
+
+pymdp FEP Agent を Hegemonikón ワークフローに完全統合する。
+
+---
+
+## タスクリスト
+
+- [x] Phase 1-3: FEP Agent コア実装 (fep_agent.py, persistence.py, Dirichlet)
+- [x] 19テスト全通過確認
+- [ ] Phase 4.1: [/bye.md](file:///home/laihuip001/oikos/.agent/workflows/bye.md) に Step 3.9 (A行列保存) 追加
+- [ ] Phase 4.2: [/boot.md](file:///home/laihuip001/oikos/.agent/workflows/boot.md) に Step 8.5 (A行列読込) 追加
+- [ ] Phase 4.3: [/noe.md](file:///home/laihuip001/oikos/.agent/workflows/noe.md) に FEP オプションセクション追加
+- [ ] Phase 4.4: [/bou.md](file:///home/laihuip001/oikos/.agent/workflows/bou.md) に FEP オプションセクション追加
+- [ ] Phase 4.5: 手動検証 (保存/読込サイクル)
+
+---
+
+## 進捗
+
+| Phase | Status | Notes |
+|:------|:-------|:------|
+| 1-3 | ✅ 完了 | 19テスト通過 |
+| 4.1 | ⏳ | 待機中 |
+| 4.2 | ⏳ | 待機中 |
+| 4.3 | ⏳ | 待機中 |
+| 4.4 | ⏳ | 待機中 |
+| 4.5 | ⏳ | 待機中 |

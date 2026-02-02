@@ -1,0 +1,157 @@
+# Jules /vet Integration Plan
+
+> **Goal**: Synedrion 866 を `/vet` ワークフローの並列監査エンジンとして統合し、Cross-Model Verification の精度と速度を向上
+
+---
+
+## 1. 現状分析
+
+### /vet ワークフロー (v2.1)
+
+- **目的**: Gemini の作業を Claude が監査
+- **4層フレームワーク**: L1 成果物正確性、L2 プロセス遵守、L3 計画一致、L4 品質基準
+- **課題**: 監査は Claude 単体で実行（トークン消費大、視点単一）
+
+### Jules API (Synedrion 866)
+
+- **Status**: Phase 5 完了、866 専門家カタログ確立
+- **能力**: 720 タスク/日並列実行、MCP 統合済み
+- **課題**: 現在は手動呼び出しのみ、/vet との連携なし
+
+---
+
+## 2. 統合アーキテクチャ
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                     /vet 発動                                │
+└─────────────────────────────────────────────────────────────┘
+                              ↓
+       ┌──────────────────────┼──────────────────────┐
+       ↓                      ↓                      ↓
+┌─────────────┐      ┌─────────────┐      ┌─────────────┐
+│ Claude L1-L3│      │ Jules L4    │      │ Jules 専門家│
+│ 構造検証     │      │ Code Smell  │      │ 並列レビュー  │
+└─────────────┘      └─────────────┘      └─────────────┘
+       │                      │                      │
+       └──────────────────────┼──────────────────────┘
+                              ↓
+       ┌─────────────────────────────────────────────┐
+       │        Claude 統合判定 (Synthesis)          │
+       │   - Jules 結果のマージ                       │
+       │   - 重大度分類の統一                         │
+       │   - 最終レポート生成                         │
+       └─────────────────────────────────────────────┘
+```
+
+---
+
+## 3. 提案する変更
+
+### 3.1 新モード追加: `/vet jules`
+
+既存の `/vet` を拡張し、Jules 並列監査モードを追加:
+
+| モード | 説明 |
+|:-------|:-----|
+| `/vet` | 従来通り Claude 単体監査 |
+| `/vet jules` | Jules 866 を召喚し、コード品質 (L4) を並列レビュー |
+| `/vet full` | Claude (L1-L3) + Jules (L4) の完全監査 |
+
+### 3.2 Jules 呼び出しパターン
+
+#### [MODIFY] [vet.md](file:///home/laihuip001/oikos/.agent/workflows/vet.md)
+
+**追加セクション**:
+
+```markdown
+## Jules 並列監査モード (v2.2)
+
+### 発動
+
+`/vet jules [ファイルパス]`
+
+### 実行フロー
+
+1. **タスク生成**: 変更ファイルごとに Jules タスクを生成
+2. **専門家選択**: Security, Performance, Style など L4 専門家を自動選択
+3. **並列実行**: Jules API で 5-10 タスクを同時実行
+4. **結果収集**: Git ベース結果取得（polling or PR）
+5. **統合判定**: Claude が結果をマージし、最終レポート作成
+
+### 専門家マッピング (L4)
+
+| チェック項目 | 担当専門家 |
+|:------------|:----------|
+| Code Smells | Code Quality Reviewer |
+| Type Safety | Static Analysis Specialist |
+| Security | Security Auditor |
+| Performance | Performance Engineer |
+```
+
+### 3.3 結果取得自動化
+
+現在、Jules の結果は手動で Git からプル必要。自動取得スクリプトを追加:
+
+#### [NEW] [jules_result_fetcher.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/synedrion/jules_result_fetcher.py)
+
+```python
+"""Jules API 結果取得ユーティリティ"""
+
+async def fetch_task_result(task_id: str) -> dict:
+    """Git からタスク結果をプル"""
+    # 1. タスクステータス確認
+    # 2. COMPLETED なら結果ブランチをフェッチ
+    # 3. diff を抽出して返却
+    pass
+```
+
+---
+
+## 4. 検証計画
+
+### 4.1 ユニットテスト
+
+既存の Jules テストを確認:
+
+```bash
+# 既存テスト確認
+ls hegemonikon/tests/test_jules_*.py
+```
+
+### 4.2 統合テスト
+
+1. **Claude → Jules 呼び出し**: `/vet jules sample.py` を実行
+2. **結果マージ**: Jules 5 並列の結果を Claude が統合できるか
+3. **レポート品質**: 最終レポートが従来フォーマットに準拠するか
+
+### 4.3 手動検証
+
+1. Antigravity で `/vet jules hegemonikon/mekhane/synedrion/jules_client.py` を実行
+2. Jules API が呼び出され、タスクが IN_PROGRESS になることを確認
+3. 結果が Claude で統合され、監査レポートが出力されることを確認
+
+---
+
+## 5. リスクと軽減策
+
+| リスク | 軽減策 |
+|:-------|:-------|
+| Jules 結果取得遅延 (5分+) | タイムアウト設定、非同期待機 |
+| 重複発見事項 | Claude による重複排除フィルタ |
+| API キー枯渇 | Rate Limit 監視、フォールバック |
+
+---
+
+## 6. マイルストーン
+
+| Phase | 内容 | 見積もり |
+|:------|:-----|:---------|
+| A | vet.md に Jules モード追加、ドキュメント更新 | 30min |
+| B | 結果取得スクリプト作成 | 1h |
+| C | 統合テスト & 手動検証 | 1h |
+| D | 本番運用 & 改善 | 継続 |
+
+---
+
+*Created: 2026-01-28 14:30 JST*

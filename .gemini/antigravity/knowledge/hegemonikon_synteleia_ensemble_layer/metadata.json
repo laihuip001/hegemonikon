@@ -1,0 +1,45 @@
+{
+    "title": "Hegemonikón Synteleia Ensemble Layer",
+    "summary": "Cognitive ensemble layer (8th component) for parallel 6-perspective (O/H/A/S/P/K) processing. It implements an 18-cell cognitive matrix structured into a Dual-Layer Orchestration model: Poiēsis (Generative: O,S,H) and Dokimasia (Evaluative: P,K,A). As of 2026-02-01, Phase 4 (Refinement & Macro Integration) is 100% complete with full Hermēneus integration and TDD verification (17/17 cases).",
+    "dependencies": [
+        "hegemonikon_system"
+    ],
+    "references": [
+        {
+            "type": "file",
+            "value": "mekhane/synteleia/orchestrator.py"
+        },
+        {
+            "type": "file",
+            "value": "docs/architecture/synteleia.md"
+        },
+        {
+            "type": "file",
+            "value": "hegemonikon_synteleia_ensemble_layer/artifacts/implementation/phase_4_refinement_plan.md"
+        },
+        {
+            "type": "file",
+            "value": "hegemonikon_synteleia_ensemble_layer/artifacts/implementation/tdd_verification_registry.md"
+        },
+        {
+            "type": "file",
+            "value": "hermeneus/tests/test_synteleia.py"
+        },
+        {
+            "type": "conversation_id",
+            "value": "13a52a4d-b927-43e2-88f2-2289d8ccac45"
+        },
+        {
+            "type": "related_ki",
+            "value": "project_hermeneus"
+        },
+        {
+            "type": "conversation_id",
+            "value": "e3ac1413-6744-42e8-9c76-8546e7e5a248"
+        },
+        {
+            "type": "related_ki",
+            "value": "project_dendron"
+        }
+    ]
+}

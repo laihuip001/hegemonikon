@@ -1,0 +1,33 @@
+# セッションタスク (2026-01-28 18:27)
+
+## Phase 1: Perplexity 調査結果の法則化
+
+- [x] axiom_hierarchy.md 更新: O1 に "recursive self-evidencing" 追加
+- [x] STOIC-Hegemonikón 差異ドキュメント作成
+- [x] Perplexity 結果アーカイブ
+
+## Phase 2: 短期タスク
+
+- [x] pymdp 統合 PoC 設計 (/plan) → ✅ 10/10 テスト通過
+- [x] Stoic-FEP 対応表を doctrine.md に追加
+
+## Phase 3: ワークフロー統合
+
+- [x] pymdp を /noe, /bou ワークフローに統合
+  - [x] SKILL.md に FEP Implementation セクション追加済み
+  - [x] A/B/C/D 行列を Stoic 哲学対応に改良
+  - [x] デモスクリプト [scripts/fep_demo.py](file:///home/laihuip001/oikos/hegemonikon/scripts/fep_demo.py) 作成・実行成功
+
+## Phase 4: 実用性明確化
+
+- [x] pymdp と Hegemonikón の連動・実用価値を文書化
+  - [x] pymdp_integration_guide.md 作成
+  - [x] encoding.py (テキスト→観測変換)
+  - [x] pymdp_exploration_findings.md (4つの法則発見)
+
+## Phase 5: 深掘り探索 (次セッション引継ぎ)
+
+- [x] 追加実験で知見を最大化 (7実験)
+- [x] 連続観測での信念累積テスト
+- [x] エッジケースの発見 (対立観測など)
+- [x] 包括的引き継ぎドキュメント作成 (v2.0)

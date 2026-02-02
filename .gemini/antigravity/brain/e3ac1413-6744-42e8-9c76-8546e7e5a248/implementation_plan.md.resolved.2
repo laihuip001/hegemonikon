@@ -1,0 +1,137 @@
+# Dendron v2: 親参照義務化 実装計画
+
+> **目的**: PROOF ヘッダーに親参照を義務化し、演繹チェーンを構築可能にする
+> **CCL**: `/kho+_/mek.model`
+
+---
+
+## 背景
+
+Dendron は単なる「ラベル付け」ではなく、FEP からの**演繹による必然性証明**である。
+親参照を義務化することで、ファイル間の演繹グラフを構築可能にする。
+
+---
+
+## Proposed Changes
+
+### 1. PROOF ヘッダー構文拡張
+
+#### 現行構文
+
+```python
+# PROOF: [L1/定理]
+# PROOF: [L2/インフラ]
+```
+
+#### 新構文 v2
+
+```python
+# PROOF: [L2/インフラ] <- mekhane/dendron/
+# PROOF: [L1/定理] <- kernel/ousia
+# PROOF: [L3/テスト] <- mekhane/dendron/checker
+```
+
+**構文規則**:
+- `<-` の後に親パス（モジュール/ディレクトリ/ファイル）
+- 親パスは相対パス（hegemonikon/ からの相対）
+- 特殊親: `FEP`, `external`, `legacy`
+
+---
+
+### 2. 特殊親参照
+
+| 親参照 | 意味 | 使用例 |
+|--------|------|--------|
+| `FEP` | 公理から直接導出 | kernel/ トップレベル |
+| `external` | 外部要件から導出 | LICENSE, .gitignore |
+| `legacy` | 移行中のレガシーコード | 一時的許容 |
+
+```python
+# PROOF: [L1/定理] <- FEP
+# PROOF: [L2/インフラ] <- external:Python
+# PROOF: [L2/インフラ] <- legacy  # 要移行
+```
+
+---
+
+### 3. Checker 更新
+
+#### [MODIFY] [checker.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/dendron/checker.py)
+
+```python
+# 新パターン
+PROOF_PATTERN_V2 = re.compile(
+    r"#\s*PROOF:\s*\[([^\]]+)\]\s*(?:<-\s*(.+))?"
+)
+
+@dataclass
+class FileProof:
+    path: Path
+    status: ProofStatus
+    level: Optional[ProofLevel] = None
+    parent: Optional[str] = None  # 🆕 親参照
+    reason: Optional[str] = None
+    line_number: Optional[int] = None
+```
+
+#### 検証ロジック
+
+```python
+def validate_parent(self, parent: str, file_path: Path) -> bool:
+    """親参照が有効かどうか"""
+    if parent in ["FEP", "external", "legacy"]:
+        return True
+    
+    # 相対パスとして存在チェック
+    parent_path = self.root / parent
+    return parent_path.exists()
+```
+
+---
+
+### 4. 新しい ProofStatus
+
+```python
+class ProofStatus(Enum):
+    OK = "ok"
+    MISSING = "missing"
+    INVALID = "invalid"
+    EXEMPT = "exempt"
+    ORPHAN = "orphan"  # 🆕 親参照なし (v2 警告)
+```
+
+---
+
+### 5. 移行戦略
+
+| フェーズ | 動作 | 期間 |
+|---------|------|------|
+| **Phase 1** | 親参照なしは WARNING | 即時 |
+| **Phase 2** | 親参照なしは ERROR | 1週間後 |
+
+**移行コマンド**:
+```bash
+python -m mekhane.dendron migrate mekhane/
+# → 親参照なしファイルを検出し、推奨親を提案
+```
+
+---
+
+## Verification Plan
+
+### テスト
+
+```bash
+# 親参照あり
+echo '# PROOF: [L2/インフラ] <- mekhane/dendron/' | python -c "..."
+
+# 親参照なし (WARNING)
+echo '# PROOF: [L2/インフラ]' | python -c "..."
+```
+
+### 段階的ロールアウト
+
+1. checker.py に v2 パターン追加
+2. WARNING モードで運用
+3. 全ファイルに親参照追加
+4. ERROR モードに移行

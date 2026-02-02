@@ -1,0 +1,68 @@
+[
+  {
+    "intent": "詳細に分析して実行",
+    "ccl": "/s+_/ene+",
+    "confidence": 0.6,
+    "usage_count": 1
+  },
+  {
+    "intent": "何をしたいか考えて",
+    "ccl": "/bou",
+    "confidence": 0.9500000000000001,
+    "usage_count": 2
+  },
+  {
+    "intent": "深く分析してほしい",
+    "ccl": "/noe+",
+    "confidence": 0.9500000000000001,
+    "usage_count": 2
+  },
+  {
+    "intent": "問いを発見したい",
+    "ccl": "/zet",
+    "confidence": 0.9500000000000001,
+    "usage_count": 2
+  },
+  {
+    "intent": "計画を立てて実行",
+    "ccl": "/s_/ene",
+    "confidence": 0.9500000000000001,
+    "usage_count": 2
+  },
+  {
+    "intent": "批評的にレビュー",
+    "ccl": "/dia",
+    "confidence": 0.9500000000000001,
+    "usage_count": 2
+  },
+  {
+    "intent": "全体を俯瞰して",
+    "ccl": "/s^",
+    "confidence": 0.9500000000000001,
+    "usage_count": 2
+  },
+  {
+    "intent": "今このタイミングで",
+    "ccl": "/euk",
+    "confidence": 0.8,
+    "usage_count": 1
+  },
+  {
+    "intent": "時間制約を考慮して",
+    "ccl": "/chr",
+    "confidence": 0.85,
+    "usage_count": 1
+  },
+  {
+    "intent": "目的を確認したい",
+    "ccl": "/bou~/tel",
+    "confidence": 0.9,
+    "usage_count": 1
+  },
+  {
+    "intent": "問題を多層分析",
+    "ccl": "/ax",
+    "confidence": 0.9,
+    "usage_count": 1
+  }
+]

@@ -1,0 +1,5 @@
+{
+  "artifactType": "ARTIFACT_TYPE_IMPLEMENTATION_PLAN",
+  "summary": "プロンプトエンジニアリング教養を教えるSkillの実装計画。S2 Mekhanē派生として位置づけ、didact/feed/mechの3モードを定義。指示語タクソノミー（「教えて」vs「考えて」等）の作用機序解説フォーマット、チャット履歴からの改善提案機構を含む。",
+  "updatedAt": "2026-01-30T02:40:00.846477834Z"
+}

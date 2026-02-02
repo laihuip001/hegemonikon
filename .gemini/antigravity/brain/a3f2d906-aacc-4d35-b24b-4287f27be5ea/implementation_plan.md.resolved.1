@@ -1,0 +1,125 @@
+# /mek+ CCL 生成能力向上 — 実装計画
+
+> **目標**: より精緻で美しい CCL マクロコードを自動生成
+> **CCL**: `[/mek+]/mek+ _ @tak`
+
+---
+
+## 現状分析
+
+### ccl_generator.py (v1.0)
+
+| 機能 | 実装 | 問題点 |
+|:-----|:-----|:-------|
+| ワークフロー検出 | ✅ キーワードマップ | 静的、限定的 |
+| 演算子検出 | ✅ +/-/^/ | 基本のみ |
+| ループ `F:N{}` | ⚠️ 正規表現 [(\d+)回](file:///home/laihuip001/oikos/hegemonikon/mekhane/axioms/__init__.py#32-38) | 暗黙的ループは検出不可 |
+| 振動 `~` | ⚠️ キーワード「往復」のみ | 関係性からの推論なし |
+| 条件 `?cond{}` | ❌ 未実装 | 完全欠落 |
+| マクロ参照 | ❌ 未実装 | @tak 等を展開できない |
+
+---
+
+## 改善項目
+
+### P1: ループ推論の強化
+
+```python
+# 現在: "3回分析" → F:×3{/s}
+# 目標: "収束するまで分析と評価を繰り返す" 
+#       → F:{/s~/dia}  (暗黙的ループ)
+
+LOOP_PATTERNS = {
+    r"収束(する)?まで": "F:{}",        # 回数なし = 収束まで
+    r"安定するまで": "F:{}",
+    r"(\d+)回": "F:×{N}{}",
+    r"繰り返し(て|し|ながら)": "F:{}",
+}
+```
+
+### P2: 振動パターン検出
+
+```python
+# 現在: "往復" → ~
+# 目標: "分類と見積を調整しながら" → /sta~/chr
+
+OSCILLATION_SIGNALS = [
+    r"(.+?)と(.+?)を(調整|往復|対話|やりとり)",
+    r"(.+?)↔(.+?)",
+    r"(.+?)しながら(.+?)", 
+]
+```
+
+### P3: 条件分岐の自然言語→CCL変換
+
+```python
+# 目標: "Gapがあれば調査する" → ?gap{/sop}
+
+CONDITION_PATTERNS = {
+    r"(.+?)があれば(.+?)": "?{cond}{{action}}",
+    r"もし(.+?)なら(.+?)": "?{cond}{{action}}",
+    r"(.+?)の場合(.+?)": "?{cond}{{action}}",
+}
+```
+
+### P4: マクロ展開・参照
+
+```python
+# 目標: "@tak" を認識してDoxa から定義を取得
+
+from mekhane.doxa_persistence import DoxaStore
+
+def resolve_macro(name: str) -> str:
+    doxa = DoxaStore.load()
+    pattern = doxa.find(f"ccl_{name}_pattern")
+    return pattern.content if pattern else f"@{name}"
+```
+
+---
+
+## ファイル変更
+
+### [MODIFY] /home/laihuip001/oikos/hegemonikon/mekhane/ccl_generator.py
+
+```diff
++ LOOP_PATTERNS = {...}
++ OSCILLATION_SIGNALS = [...]
++ CONDITION_PATTERNS = {...}
+
++ def detect_implicit_loop(intent: str) -> tuple[bool, str]:
++     ...
+
++ def detect_oscillation(intent: str) -> list[tuple[str, str]]:
++     ...
+
++ def synthesize_condition(intent: str) -> str:
++     ...
+
++ def resolve_macro(name: str) -> str:
++     ...
+
+  def generate_ccl(intent: str) -> str:
+-     # Simple keyword matching
++     # 1. Macro resolution
++     # 2. Loop detection (explicit + implicit)
++     # 3. Oscillation detection
++     # 4. Condition synthesis
++     # 5. Workflow/operator composition
+```
+
+---
+
+## 検証計画
+
+| テストケース | 入力 | 期待出力 |
+|:------------|:-----|:---------|
+| 明示ループ | "3回分析" | `F:×3{/s}` |
+| 暗黙ループ | "収束まで評価" | `F:{/dia}` |
+| 振動 | "分類と見積を調整" | `/sta~/chr` |
+| 条件 | "Gapあれば調査" | `?gap{/sop}` |
+| マクロ | "@tak を実行" | [(展開式)](file:///home/laihuip001/oikos/hegemonikon/mekhane/axioms/__init__.py#32-38) |
+| 複合 | "@tak を詳細に" | `@tak+` |
+
+---
+
+*v1.0 → v2.0 升级计划 (2026-01-30)*

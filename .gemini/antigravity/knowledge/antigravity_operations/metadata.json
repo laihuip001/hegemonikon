@@ -1,0 +1,37 @@
+{
+    "title": "Antigravity IDE Operations",
+    "summary": "Practical operational knowledge for the Antigravity IDE within the Hegemonikón ecosystem. Covers session persistence, rule activation, and intent-driven maintenance. v4.9 (2026-02-01) implements the 18-step /boot sequence (v3.9). v5.0 (2026-02-02) introduces Full-Sync Configuration via Git tracking of the .gemini directory for seamless environment portability.",
+    "dependencies": [
+        "hegemonikon_system"
+    ],
+    "references": [
+        {
+            "type": "conversation_id",
+            "value": "7aa14e34-387b-4077-96d7-339ddcb4a381"
+        },
+        {
+            "type": "conversation_id",
+            "value": "796b9acc-d965-4ab8-ac5a-eb26d470ff73"
+        },
+        {
+            "type": "conversation_id",
+            "value": "e3ac1413-6744-42e8-9c76-8546e7e5a248"
+        },
+        {
+            "type": "conversation_id",
+            "value": "93e1f457-c2db-48aa-ad20-9fb5a45dc587"
+        },
+        {
+            "type": "file",
+            "value": "antigravity_operations/artifacts/boot_sequence_v3_9_specification.md"
+        },
+        {
+            "type": "file",
+            "value": "antigravity_operations/artifacts/case_studies/git_sync_migration_20260202.md"
+        },
+        {
+            "type": "url",
+            "value": "https://github.com/laihuip001/OIKOS"
+        }
+    ]
+}

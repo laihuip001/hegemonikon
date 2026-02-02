@@ -1,0 +1,6 @@
+{
+  "artifactType": "ARTIFACT_TYPE_IMPLEMENTATION_PLAN",
+  "summary": "N7: /sop に「先人の知恵」検索モード (`/sop prior`) を追加する計画。問題解決時にまず外部の既存解決策（Stack Overflow, GitHub, ブログ等）を調査し、車輪の再発明を防止する。",
+  "updatedAt": "2026-01-28T13:12:10.552251705Z",
+  "version": "3"
+}

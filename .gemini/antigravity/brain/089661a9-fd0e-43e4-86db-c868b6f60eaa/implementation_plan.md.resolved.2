@@ -1,0 +1,102 @@
+# Perplexity タスク機能設定計画 v2
+
+> **目的**: Perplexity の**検索AI**としての強みを活かし、**外部情報収集**を自動化
+
+---
+
+## 役割分担（修正版）
+
+| エンティティ | 役割 | 担当 |
+|:------------|:-----|:-----|
+| **Perplexity** | 検索AI | **外部情報収集**（Web、論文、トレンド） |
+| Claude/Gemini | 技術者 | 内部タスク管理、コード生成、監査 |
+| Jules 866 | 審査団 | コードレビュー、品質監査 |
+
+---
+
+## 提案タスク（外部情報特化）
+
+### Task 1: AI/LLM 技術トレンド監視（週次）
+
+```
+Instructions:
+今週の AI/LLM 業界の重要ニュースを調査し、以下を出力:
+
+1. 新モデル/API リリース（GPT, Claude, Gemini 等）
+2. プロンプトエンジニアリングの新技術・論文
+3. AI エージェント/MCP 関連の動向
+4. 注目すべき GitHub リポジトリ
+
+各項目: タイトル / 要約 / URL / Hegemonikon への影響度
+
+Language: 日本語
+```
+
+- **Frequency**: Weekly (日曜 20:00)
+- **Mode**: Research
+
+---
+
+### Task 2: 競合ツール監視（隔週）
+
+```
+Instructions:
+AI コーディングアシスタント・エージェントツールの最新動向:
+
+1. GitHub Copilot / Cursor / Windsurf の新機能
+2. 新興 AI IDE / エージェントフレームワーク
+3. MCP (Model Context Protocol) エコシステムの拡大
+
+各項目: ツール名 / 新機能 / Hegemonikon への示唆
+
+Language: 日本語
+```
+
+- **Frequency**: Bi-weekly (隔週日曜 20:00)
+- **Mode**: Research
+
+---
+
+### Task 3: FEP/認知科学 最新研究（月次）
+
+```
+Instructions:
+Free Energy Principle (FEP) と認知科学の最新論文・記事:
+
+1. Active Inference の新応用（robotics, AI）
+2. Predictive Processing の実装研究
+3. LLM と FEP の接続に関する議論
+
+各項目: タイトル / 著者 / 要約 / Hegemonikon 公理への関連性
+
+Language: 日本語
+```
+
+- **Frequency**: Monthly (毎月1日 10:00)
+- **Mode**: Research
+
+---
+
+## 情報フロー
+
+```
+Perplexity (外部収集)
+    ↓ メール/通知
+Creator (レビュー)
+    ↓ 有用な情報を抽出
+/boot 時に Claude へ共有
+    ↓
+Hegemonikon 進化に反映
+```
+
+---
+
+## 検証計画
+
+1. Task 1 のみ設定し 2週間運用
+2. 情報の有用性を `/boot` 時に評価
+3. 有用なら Task 2, 3 を追加
+
+---
+
+⏸️ **承認待ち**: この方向性で進めますか？ (`y`)

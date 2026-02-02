@@ -1,0 +1,54 @@
+# Hermēneus 開発タスク
+
+> **CCL**: `[hermeneus]@plan_review+ >> /ene+`
+> **検証日**: 2026-02-01T16:35
+
+---
+
+## ✅ Phase 1-6: 全完了
+
+### pytest 結果
+
+```
+125 passed, 2 skipped, 2 warnings in 1.72s
+```
+
+### DoD チェック
+
+- [x] Phase 1: コンパイラ (ast, parser, expander, translator)
+- [x] Phase 2: ランタイム (runtime, constraints)
+- [x] Phase 3: オーケストレーション (graph, checkpointer, hitl)
+- [x] Phase 4: Formal Verification (verifier, audit, optimizer)
+- [x] Phase 4b: Prover (mypy, schema, lean4, cache)
+- [x] Phase 5: Production (cli, README)
+- [x] Phase 6: Workflow Executor + Synergeia 統合
+
+---
+
+## 🗺️ 実装済みファイル一覧
+
+| ファイル | 内容 | 行数 |
+|:---------|:-----|-----:|
+| [ast.py](file:///home/laihuip001/oikos/hegemonikon/hermeneus/src/ast.py) | AST ノード | 192 |
+| [parser.py](file:///home/laihuip001/oikos/hegemonikon/hermeneus/src/parser.py) | CCL パーサー | 334 |
+| [expander.py](file:///home/laihuip001/oikos/hegemonikon/hermeneus/src/expander.py) | 省略形展開 | 226 |
+| [translator.py](file:///home/laihuip001/oikos/hegemonikon/hermeneus/src/translator.py) | LMQL 変換 | 280 |
+| [runtime.py](file:///home/laihuip001/oikos/hegemonikon/hermeneus/src/runtime.py) | LMQL 実行 | 350 |
+| [constraints.py](file:///home/laihuip001/oikos/hegemonikon/hermeneus/src/constraints.py) | Constrained Decoding | 320 |
+| [graph.py](file:///home/laihuip001/oikos/hegemonikon/hermeneus/src/graph.py) | LangGraph 統合 | 450 |
+| [checkpointer.py](file:///home/laihuip001/oikos/hegemonikon/hermeneus/src/checkpointer.py) | 状態永続化 | 340 |
+| [hitl.py](file:///home/laihuip001/oikos/hegemonikon/hermeneus/src/hitl.py) | Human-in-the-Loop | 280 |
+| `optimizer.py` | DSPy 最適化 | - |
+| [verifier.py](file:///home/laihuip001/oikos/hegemonikon/hermeneus/src/verifier.py) | Multi-Agent Debate | 420 |
+| [audit.py](file:///home/laihuip001/oikos/hegemonikon/hermeneus/src/audit.py) | Audit Trail | 360 |
+
+**合計**: ~3,500行 | **テスト**: 74 passed
+
+---
+
+## 🔜 次のステップ
+
+- [ ] prover.py (Lean4/Dafny 連携) — オプション
+- [ ] 実運用テスト (Synergeia 経由で CCL 実行)
+- [ ] KI 更新 (CCL Cognitive Algebra System)
+

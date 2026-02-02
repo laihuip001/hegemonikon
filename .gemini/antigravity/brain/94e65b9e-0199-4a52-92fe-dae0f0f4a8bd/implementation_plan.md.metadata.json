@@ -1,0 +1,6 @@
+{
+  "artifactType": "ARTIFACT_TYPE_IMPLEMENTATION_PLAN",
+  "summary": "/plan 対応スキル（T4, T3, T2, S2）に軽量版 Precondition Check を追加する実装計画。フル版 Protocol はワークフロー層に留める。",
+  "updatedAt": "2026-01-27T13:04:52.843168546Z",
+  "version": "2"
+}

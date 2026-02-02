@@ -1,0 +1,6 @@
+{
+  "artifactType": "ARTIFACT_TYPE_IMPLEMENTATION_PLAN",
+  "summary": "SE原則の信頼性を担保するための構造的強制と自動テストの設計。スケール別強制マトリックス（Micro/Meso/Macro）、必須フィールド定義、自動検証スクリプトの設計を含む。",
+  "updatedAt": "2026-01-30T23:27:23.994809980Z",
+  "version": "2"
+}

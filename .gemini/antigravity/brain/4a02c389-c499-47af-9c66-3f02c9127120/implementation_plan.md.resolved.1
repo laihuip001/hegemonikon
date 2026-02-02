@@ -1,0 +1,128 @@
+# Hermēneus 開発計画 — Phase 1: Expander + Parser 正式版
+
+> **Hermēneus (Ἑρμηνεύς)** = 翻訳者、解釈者
+> CCL を LMQL/LangGraph に翻訳し、実行保証（>96%）を提供するコンパイラ
+
+---
+
+## 📜 文脈復元 (2026-01-31 会話より)
+
+### 設計経緯
+
+| ワークフロー | 成果 |
+|:-------------|:-----|
+| `/zet+` | CCL 実行保証の欠落を5層で分析 |
+| `/noe!*~/u+` | LLM = 予測エンジン、100% 保証は原理的に不可能と認識 |
+| `/sop+` | ハイブリッドアーキテクチャ調査 (Perplexity) |
+| `/tak+` | 9タスク、27-37h ロードマップ |
+
+### 到達した洞察
+
+> **LLM 単体では原理的に実行保証は不可能。**
+> ハイブリッドアーキテクチャ（DSL + 検証器 + Multi-Agent）で **>96% 信頼度** は達成可能。
+
+### 推奨 4層アーキテクチャ
+
+```
+┌─────────────────────────────────────────┐
+│      最適化層 (Optimization)            │
+│  DSPy Optimizer / Teleprompter         │
+└────────────────┬────────────────────────┘
+                 ↓
+┌─────────────────────────────────────────┐
+│      制御層 (Control / DSL)              │
+│  LMQL / Guidance / Outlines              │
+└────────────────┬────────────────────────┘
+                 ↓
+┌─────────────────────────────────────────┐
+│      実行層 (Execution)                  │
+│  CodeAct / LangGraph / AutoGen          │
+└────────────────┬────────────────────────┘
+                 ↓
+┌─────────────────────────────────────────┐
+│      検証層 (Verification)               │
+│  Constrained Decoding + Multi-Agent     │
+└─────────────────────────────────────────┘
+```
+
+---
+
+## 現状分析
+
+| コンポーネント | 状態 | ファイル |
+|:---------------|:-----|:---------|
+| **AST 定義** | ✅ PoC完了 | [mekhane/ccl/lmql_translator.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/ccl/lmql_translator.py) |
+| **CCLParser** | ✅ PoC完了 | 同上 |
+| **LMQLTranslator** | ✅ PoC完了 | 同上 |
+| **MacroExpander** | ✅ 存在 | [mekhane/ccl/macro_expander.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/ccl/macro_expander.py) |
+| **正式版モジュール** | ❌ 未 | `hermeneus/src/` (空) |
+| **テスト** | ❌ 未 | `hermeneus/tests/` (空) |
+
+---
+
+## Proposed Changes
+
+### [NEW] `hermeneus/src/ast.py` — AST ノード分離
+
+[lmql_translator.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/ccl/lmql_translator.py) から抽出:
+- [OpType](file:///home/laihuip001/oikos/hegemonikon/mekhane/ccl/lmql_translator.py#25-41), [Workflow](file:///home/laihuip001/oikos/hegemonikon/mekhane/ccl/lmql_translator.py#43-51), [Condition](file:///home/laihuip001/oikos/hegemonikon/mekhane/ccl/lmql_translator.py#53-60), [ConvergenceLoop](file:///home/laihuip001/oikos/hegemonikon/mekhane/ccl/lmql_translator.py#62-68), [Sequence](file:///home/laihuip001/oikos/hegemonikon/mekhane/ccl/lmql_translator.py#70-75)
+- **追加**: CPL v2.0 構文 (`ForLoop`, `IfCondition`, `WhileLoop`)
+
+---
+
+### [NEW] `hermeneus/src/expander.py` — 省略形展開
+
+- `/noe+` → `lim[V[]<0.3]{/o1++ --mode=nous}`
+- `>>` → `lim[cond]{...}`
+- `@macro` → 展開済み CCL
+
+---
+
+### [NEW] `hermeneus/src/parser.py` — CCL パーサー
+
+- Lark ベースの正式実装
+- CPL 構文 ([F:](file:///home/laihuip001/oikos/hegemonikon/LICENSE), [I:](file:///home/laihuip001/oikos/hegemonikon/LICENSE), [W:](file:///home/laihuip001/oikos/hegemonikon/LICENSE), [L:](file:///home/laihuip001/oikos/hegemonikon/LICENSE)) 対応
+- エラーハンドリング強化
+
+---
+
+### [NEW] `hermeneus/src/translator.py` — LMQL 変換
+
+PoC [LMQLTranslator](file:///home/laihuip001/oikos/hegemonikon/mekhane/ccl/lmql_translator.py#184-292) からリファクタ
+
+---
+
+### [NEW] `hermeneus/tests/test_parser.py` — 単体テスト
+
+```python
+test_cases = ['/noe+', '/bou-', '/s+_/ene', '/noe+ >> V[] < 0.3']
+```
+
+---
+
+## Verification Plan
+
+```bash
+cd /home/laihuip001/oikos/hegemonikon
+source .venv/bin/activate
+pytest hermeneus/tests/test_parser.py -v
+```
+
+---
+
+## /tak+ ロードマップ (2026-01-31)
+
+| 期限 | 優先度 | タスク | 工数 |
+|:-----|:-------|:-------|:-----|
+| **WEEK** | Must | Expander 実装 | 4-6h |
+| **WEEK** | Must | Parser (Lark) 実装 | 6-8h |
+| **WEEK** | Must | AST 分離 | 2-3h |
+| **3WEEKS** | Should | LMQL ランタイム統合 | 6-8h |
+| **3WEEKS** | Should | Constrained Decoding | 4-6h |
+| **2MONTHS** | Could | LangGraph 統合 | 6-8h |
+
+**合計**: 27-37h
+
+---
+
+*Created: 2026-02-01 | Origin: 2026-01-31 CCL Execution Guarantee Architecture 会話*

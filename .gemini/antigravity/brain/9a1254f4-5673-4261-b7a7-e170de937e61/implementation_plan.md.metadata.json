@@ -1,0 +1,5 @@
+{
+  "artifactType": "ARTIFACT_TYPE_IMPLEMENTATION_PLAN",
+  "summary": "タスク自動分類機構（I2）の設計計画。旧 T2 Krisis のロジック（Eisenhower + priority_score）を再活用し、`/classify` 新規ワークフローとして実装する方針。検証は wishlist_organized.md で Dogfooding。",
+  "updatedAt": "2026-01-27T23:35:28.263409830Z"
+}

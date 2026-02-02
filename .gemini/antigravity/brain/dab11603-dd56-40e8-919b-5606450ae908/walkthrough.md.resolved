@@ -1,0 +1,79 @@
+# FEP Integration Features Walkthrough
+
+> **Date**: 2026-01-29
+> **Session**: `/noe` → 実装 → 検証
+
+---
+
+## 実装した機能
+
+### Feature 1: X-series 36関係 Navigator
+
+```python
+from mekhane.fep import get_x_series_recommendations, X_SERIES_MATRIX
+
+# 78%確信で O シリーズから次ステップを推奨
+recs = get_x_series_recommendations("O", 0.78)
+# → X-OS: /s (本質→設計へ)
+# → X-OP: /kho (本質→環境へ)
+```
+
+**設計判断**: 高確信 (≥70%) → 行動系優先、低確信 → 検証系優先
+
+---
+
+### Feature 2: Learning Progress Visualization
+
+```python
+from mekhane.fep import format_learning_progress
+
+print(format_learning_progress(inference_count=5, observation=(1, 0, 2)))
+```
+
+出力:
+```
+┌─[FEP Learning Progress]─────────────────────┐
+│ 推論回数: 5
+│ 観察値: context=clear, urgency=low, conf=high
+│ A行列更新: なし (before/after 未提供)
+└──────────────────────────────────────────────┘
+```
+
+---
+
+### Feature 3: Auto-Encode Noēsis
+
+```python
+from mekhane.fep import auto_encode_noesis
+
+phase5 = {"confidence_score": 0.78, "uncertainty_zones": [{"zone": "A"}]}
+obs = auto_encode_noesis(phase5)
+# → (1, 0, 2)  # clear, low urgency, high confidence
+```
+
+**用途**: `/noe` PHASE 5 出力を自動で FEP 観察値に変換
+
+---
+
+## 検証結果
+
+| 項目 | 結果 |
+|:-----|:-----|
+| pytest | 328 passed ✓ |
+| Feature 1 動作 | ✓ |
+| Feature 2 動作 | ✓ |
+| Feature 3 動作 | ✓ |
+| `/noe` 統合 | 実行・FEP Feedback 取得成功 |
+
+---
+
+## 変更ファイル
+
+| ファイル | 変更内容 |
+|:---------|:---------|
+| [encoding.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/fep/encoding.py) | +168行 (3関数 + 2定数) |
+| [__init__.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/fep/__init__.py) | +6行 (エクスポート追加) |
+
+---
+
+*Generated: 2026-01-29T13:45+09:00*

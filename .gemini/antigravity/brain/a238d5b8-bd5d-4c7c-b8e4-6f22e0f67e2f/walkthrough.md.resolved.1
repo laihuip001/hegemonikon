@@ -1,0 +1,50 @@
+# Jules Client 実装 Walkthrough
+
+## Phase 1 完了 ✅
+
+### 作成ファイル
+
+| ファイル | 説明 |
+|---------|------|
+| [jules_client.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/symploke/jules_client.py) | API クライアント（60並列対応）|
+| [jules_mcp_server.py](file:///home/laihuip001/oikos/hegemonikon/mcp/jules_mcp_server.py) | MCP Server（4ツール）|
+| [test_jules_client.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/symploke/tests/test_jules_client.py) | ユニットテスト |
+| [requirements.txt](file:///home/laihuip001/oikos/hegemonikon/requirements.txt) | 依存関係 |
+
+### 更新ファイル
+
+| ファイル | 変更内容 |
+|---------|---------|
+| [tools.yaml](file:///home/laihuip001/oikos/.agent/tools.yaml) | Jules MCP 追加 |
+
+---
+
+## テスト結果
+
+```
+7 passed, 1 skipped in 0.12s ✅
+```
+
+---
+
+## 環境構築
+
+```bash
+# venv 作成済み
+/home/laihuip001/oikos/hegemonikon/.venv/
+
+# 依存関係インストール済み
+aiohttp, mcp, pytest, pytest-asyncio
+```
+
+---
+
+## 次のステップ（Phase 2）
+
+1. Jules API キー取得・設定
+2. 単一タスクテスト（実 API）
+3. 並列実行テスト
+
+---
+
+*Generated 2026-01-27*

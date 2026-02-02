@@ -1,0 +1,94 @@
+# /noe: FEP 統合計画の深層分析
+
+> **対象**: FEP Workflow Integration Plan
+> **実行日**: 2026-01-28 20:22
+
+---
+
+## PHASE 0.5: Read + 盲点チェック
+
+### 読み込み済み
+
+1. `o1-noesis/SKILL.md`
+2. `fep_agent.py`
+3. `state_spaces.py`
+4. `noe.md`, `bou.md`, `epo.md`
+5. `implementation_plan.md`
+6. `exploration_insights_2026_01_28.md`
+
+### 盲点リスク
+
+| カテゴリ | リスク | 理由 |
+|:---------|:-------|:-----|
+| ドメイン知識 | **高** | pymdp/Active Inference の理論的正確性 |
+| 問いの前提 | 中 | 「FEP 統合が有益」という暗黙前提 |
+| フレーミング | 中 | Entropy → Epochē の線形マッピングは単純すぎるか |
+
+---
+
+## PHASE 1: 前提掘出
+
+### 致命的弱点発見
+
+| # | 前提 | 種別 | 危険度 |
+|:--|:-----|:-----|:-------|
+| **3** | **LLM の自己評価は信頼できる** | [ASSUMPTION] | **⚠️ 40** |
+
+> LLM は自己の確信度を過大評価しがち（過信バイアス）。
+> encode_observation() に渡すデータが歪んでいれば、Entropy 計算は無意味。
+
+---
+
+## PHASE 2: 4ベクトル
+
+| 仮説 | 内容 | 信頼度 |
+|:-----|:-----|:-------|
+| V1 Idealist | 完全統合、全判断に Entropy | 55 |
+| **V2 Minimalist** | **Optional として追加** | **75** |
+| V3 Heretic | LLM 評価廃止、外部観測のみ | 40 |
+| V4 Analyst | ハイブリッド検証 | 70 |
+
+**Synthesis**: V2 + V4 = Optional だがハイブリッド観測を使用
+
+---
+
+## PHASE 3: GoT 収斂
+
+| 収斂ノード |
+|:-----------|
+| C1: Optional として追加 |
+| C2: 閾値は configurable |
+| C3: User override 必須 |
+
+---
+
+## PHASE 4: 最強反論
+
+> **「LLM 自己評価は根本的に信頼できない」**
+
+- 妥当性スコア: **65**
+- 対策: ハイブリッド観測で緩和
+
+---
+
+## PHASE 5: 結論
+
+```json
+{
+  "final_answer": "FEP 統合は Optional + ハイブリッド観測 + configurable 閾値 + User override",
+  "confidence_score": 0.72
+}
+```
+
+### 計画修正案
+
+| 項目 | 現計画 | 修正案 |
+|:-----|:-------|:-------|
+| 観測入力 | LLM のみ | **ハイブリッド** |
+| 閾値 | 1.0 固定 | **configurable** |
+| Epochē | 自動 | **自動 + override** |
+| 範囲 | /noe + /bou | **/noe のみ** (段階的) |
+
+---
+
+*O1 Noēsis v3.0 Complete*

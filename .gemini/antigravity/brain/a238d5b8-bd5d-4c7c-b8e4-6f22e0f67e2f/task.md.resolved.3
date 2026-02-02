@@ -1,0 +1,36 @@
+# Jules API 統合タスク
+
+## 設計決定
+
+**Pattern B' 採用**: 4アカウント IP 分散 + スパイク使用
+
+## チェックリスト
+
+### 1. 調査（✅ 完了）
+- [x] Jules API 仕様確認
+- [x] ファミリープラン ToS 調査
+- [x] Pattern B' 採用決定
+
+### 2. 詳細設計（✅ 完了）
+- [x] アーキテクチャ図作成
+- [x] 実装計画策定
+
+### 3. Phase 1: コア実装（✅ 完了）
+- [x] [jules_client.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/symploke/jules_client.py) 作成
+- [x] [jules_mcp_server.py](file:///home/laihuip001/oikos/hegemonikon/mcp/jules_mcp_server.py) 作成
+- [x] [tools.yaml](file:///home/laihuip001/oikos/.agent/tools.yaml) 更新
+- [ ] 依存関係インストール（aiohttp, mcp）
+
+### 4. Phase 2: 検証（待機中）
+- [ ] 単一タスクテスト
+- [ ] 並列実行テスト
+
+## 依存関係
+
+```bash
+pip install aiohttp mcp
+```
+
+## 次回アクション
+
+依存関係インストール後、API キーを設定してテスト実行

@@ -1,0 +1,1234 @@
+nohup: 入力を無視します
+(node:190029) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+[DEBUG] Output directory: /home/laihuip001/oikos/mneme/.hegemonikon/sessions
+[DEBUG] Exists: True
+[*] Connecting to CDP: http://localhost:9222
+[*] Found jetski-agent page: 0 buttons
+[*] Found jetski-agent page: 93 buttons
+[✓] Selected Agent Manager: vscode-file://vscode-app/usr/share/antigravity/resources/app/out/vs/code/electron-browser/workbench/workbench-jetski-agent.html (93 buttons)
+[*] Found 89 conversations
+[1/89] Episodic Memory Recovery
+    [DEBUG] Found 20 child elements in container
+    [DEBUG] Found 20 child elements in container
+[DEBUG] Saving to: /home/laihuip001/oikos/mneme/.hegemonikon/sessions/2026-01-31_conv_4_Episodic Memory Recovery.md
+  [✓] Saved: 2026-01-31_conv_4_Episodic Memory Recovery.md
+    → 5 messages extracted
+[2/89] Refining CCL Operators and Docs
+    [DEBUG] Found 20 child elements in container
+    [DEBUG] Found 20 child elements in container
+    [DEBUG] Found 20 child elements in container
+    [DEBUG] Found 20 child elements in container
+    [DEBUG] Found 20 child elements in container
+    [DEBUG] Found 20 child elements in container
+    [DEBUG] Found 20 child elements in container
+    [DEBUG] Found 20 child elements in container
+[DEBUG] Saving to: /home/laihuip001/oikos/mneme/.hegemonikon/sessions/2026-01-31_conv_5_Refining CCL Operators and Docs.md
+  [✓] Saved: 2026-01-31_conv_5_Refining CCL Operators and Docs.md
+    → 3 messages extracted
+[3/89] CCL Execution Guarantee Architecture
+    [DEBUG] Found 20 child elements in container
+    [DEBUG] Found 20 child elements in container
+    [DEBUG] Found 20 child elements in container
+    [DEBUG] Found 20 child elements in container
+    [DEBUG] Found 20 child elements in container
+    [DEBUG] Found 20 child elements in container
+    [DEBUG] Found 20 child elements in container
+    [DEBUG] Found 20 child elements in container
+    [DEBUG] Found 20 child elements in container
+    [DEBUG] Found 20 child elements in container
+    [DEBUG] Found 20 child elements in container
+    [DEBUG] Found 20 child elements in container
+    [DEBUG] Found 20 child elements in container
+    [DEBUG] Found 20 child elements in container
+    [DEBUG] Found 20 child elements in container
+    [DEBUG] Found 20 child elements in container
+    [DEBUG] Found 20 child elements in container
+    [DEBUG] Found 20 child elements in container
+    [DEBUG] Found 20 child elements in container
+    [DEBUG] Found 20 child elements in container
+[DEBUG] Saving to: /home/laihuip001/oikos/mneme/.hegemonikon/sessions/2026-01-31_conv_6_CCL Execution Guarantee Architecture.md
+  [✓] Saved: 2026-01-31_conv_6_CCL Execution Guarantee Architecture.md
+    → 5 messages extracted
+[4/89] X-Series Integration Refinement
+    [DEBUG] Found 20 child elements in container
+    [DEBUG] Found 20 child elements in container
+    [DEBUG] Found 20 child elements in container
+    [DEBUG] Found 20 child elements in container
+    [DEBUG] Found 20 child elements in container
+    [DEBUG] Found 20 child elements in container
+    [DEBUG] Found 20 child elements in container
+    [DEBUG] Found 20 child elements in container
+    [DEBUG] Found 20 child elements in container
+    [DEBUG] Found 20 child elements in container
+    [DEBUG] Found 20 child elements in container
+    [DEBUG] Found 20 child elements in container
+    [DEBUG] Found 20 child elements in container
+    [DEBUG] Found 20 child elements in container
+    [DEBUG] Found 20 child elements in container
+    [DEBUG] Found 20 child elements in container
+    [DEBUG] Found 20 child elements in container
+[DEBUG] Saving to: /home/laihuip001/oikos/mneme/.hegemonikon/sessions/2026-01-31_conv_7_X-Series Integration Refinement.md
+  [✓] Saved: 2026-01-31_conv_7_X-Series Integration Refinement.md
+    → 5 messages extracted
+[5/89] AI Relationship Evolution
+    [DEBUG] Found 20 child elements in container
+    [DEBUG] Found 20 child elements in container
+    [DEBUG] Found 20 child elements in container
+[DEBUG] Saving to: /home/laihuip001/oikos/mneme/.hegemonikon/sessions/2026-01-31_conv_8_AI Relationship Evolution.md
+  [✓] Saved: 2026-01-31_conv_8_AI Relationship Evolution.md
+    → 4 messages extracted
+[6/89] Dendron Package Audit
+    [DEBUG] Found 20 child elements in container
+    [DEBUG] Found 20 child elements in container
+[DEBUG] Saving to: /home/laihuip001/oikos/mneme/.hegemonikon/sessions/2026-01-31_conv_9_Dendron Package Audit.md
+  [✓] Saved: 2026-01-31_conv_9_Dendron Package Audit.md
+    → 4 messages extracted
+[7/89] Completing CEP-001 Usage
+    [DEBUG] Found 20 child elements in container
+    [DEBUG] Found 20 child elements in container
+[DEBUG] Saving to: /home/laihuip001/oikos/mneme/.hegemonikon/sessions/2026-01-31_conv_10_Completing CEP-001 Usage.md
+  [✓] Saved: 2026-01-31_conv_10_Completing CEP-001 Usage.md
+    → 5 messages extracted
+[8/89] Naturalizing Workflow Modes
+    [DEBUG] Found 20 child elements in container
+    [DEBUG] Found 20 child elements in container
+[DEBUG] Saving to: /home/laihuip001/oikos/mneme/.hegemonikon/sessions/2026-01-31_conv_11_Naturalizing Workflow Modes.md
+  [✓] Saved: 2026-01-31_conv_11_Naturalizing Workflow Modes.md
+    → 3 messages extracted
+[9/89] Planning Pythōsis Development
+    [DEBUG] Found 20 child elements in container
+    [DEBUG] Found 20 child elements in container
+[DEBUG] Saving to: /home/laihuip001/oikos/mneme/.hegemonikon/sessions/2026-01-31_conv_12_Planning Pyth_sis Development.md
+  [✓] Saved: 2026-01-31_conv_12_Planning Pyth_sis Development.md
+    → 5 messages extracted
+[10/89] Implementing SE Principles in Workflows
+    [DEBUG] Found 20 child elements in container
+    [DEBUG] Found 20 child elements in container
+    [DEBUG] Found 20 child elements in container
+    [DEBUG] Found 20 child elements in container
+    [DEBUG] Found 20 child elements in container
+    [DEBUG] Found 20 child elements in container
+    [DEBUG] Found 20 child elements in container
+    [DEBUG] Found 20 child elements in container
+    [DEBUG] Found 20 child elements in container
+    [DEBUG] Found 20 child elements in container
+    [DEBUG] Found 20 child elements in container
+    [DEBUG] Found 20 child elements in container
+    [DEBUG] Found 20 child elements in container
+    [DEBUG] Found 20 child elements in container
+    [DEBUG] Found 20 child elements in container
+    [DEBUG] Found 20 child elements in container
+[DEBUG] Saving to: /home/laihuip001/oikos/mneme/.hegemonikon/sessions/2026-01-31_conv_13_Implementing SE Principles in Workflows.md
+  [✓] Saved: 2026-01-31_conv_13_Implementing SE Principles in Workflows.md
+    → 5 messages extracted
+[11/89] Implementing Prompt Literacy Skill
+    [DEBUG] Found 20 child elements in container
+    [DEBUG] Found 20 child elements in container
+[DEBUG] Saving to: /home/laihuip001/oikos/mneme/.hegemonikon/sessions/2026-01-31_conv_14_Implementing Prompt Literacy Skill.md
+  [✓] Saved: 2026-01-31_conv_14_Implementing Prompt Literacy Skill.md
+    → 5 messages extracted
+[12/89] Prompt Engineering Skill Design
+    [DEBUG] Found 20 child elements in container
+    [DEBUG] Found 20 child elements in container
+    [DEBUG] Found 20 child elements in container
+    [DEBUG] Found 20 child elements in container
+    [DEBUG] Found 20 child elements in container
+    [DEBUG] Found 20 child elements in container
+    [DEBUG] Found 20 child elements in container
+    [DEBUG] Found 20 child elements in container
+[DEBUG] Saving to: /home/laihuip001/oikos/mneme/.hegemonikon/sessions/2026-01-31_conv_15_Prompt Engineering Skill Design.md
+  [✓] Saved: 2026-01-31_conv_15_Prompt Engineering Skill Design.md
+    → 4 messages extracted
+[13/89] CCL Macro Documentation
+    [DEBUG] Found 20 child elements in container
+    [DEBUG] Found 20 child elements in container
+    [DEBUG] Found 21 child elements in container
+    [DEBUG] Found 21 child elements in container
+[DEBUG] Saving to: /home/laihuip001/oikos/mneme/.hegemonikon/sessions/2026-01-31_conv_16_CCL Macro Documentation.md
+  [✓] Saved: 2026-01-31_conv_16_CCL Macro Documentation.md
+    → 3 messages extracted
+[14/89] Designing Phase Inversion Operator
+    [DEBUG] Found 21 child elements in container
+    [DEBUG] Found 21 child elements in container
+    [DEBUG] Found 21 child elements in container
+    [DEBUG] Found 21 child elements in container
+    [DEBUG] Found 21 child elements in container
+    [DEBUG] Found 21 child elements in container
+    [DEBUG] Found 21 child elements in container
+    [DEBUG] Found 21 child elements in container
+    [DEBUG] Found 21 child elements in container
+    [DEBUG] Found 21 child elements in container
+    [DEBUG] Found 21 child elements in container
+    [DEBUG] Found 21 child elements in container
+    [DEBUG] Found 21 child elements in container
+    [DEBUG] Found 21 child elements in container
+    [DEBUG] Found 21 child elements in container
+    [DEBUG] Found 21 child elements in container
+    [DEBUG] Found 21 child elements in container
+    [DEBUG] Found 21 child elements in container
+    [DEBUG] Found 21 child elements in container
+    [DEBUG] Found 21 child elements in container
+    [DEBUG] Found 21 child elements in container
+    [!] Duplicate content detected, skipping...
+[15/89] Bootstrapping Hegemonikon Session
+    [DEBUG] Found 21 child elements in container
+    [DEBUG] Found 21 child elements in container
+    [DEBUG] Found 21 child elements in container
+    [DEBUG] Found 21 child elements in container
+    [DEBUG] Found 21 child elements in container
+    [DEBUG] Found 21 child elements in container
+    [DEBUG] Found 21 child elements in container
+    [DEBUG] Found 21 child elements in container
+    [DEBUG] Found 21 child elements in container
+    [DEBUG] Found 21 child elements in container
+    [DEBUG] Found 21 child elements in container
+    [DEBUG] Found 21 child elements in container
+    [DEBUG] Found 21 child elements in container
+    [DEBUG] Found 21 child elements in container
+    [DEBUG] Found 21 child elements in container
+    [DEBUG] Found 21 child elements in container
+    [DEBUG] Found 21 child elements in container
+    [DEBUG] Found 21 child elements in container
+    [DEBUG] Found 21 child elements in container
+    [DEBUG] Found 21 child elements in container
+    [DEBUG] Found 21 child elements in container
+    [!] Duplicate content detected, skipping...
+[16/89] Implementing Doxa Persistence
+    [DEBUG] Found 21 child elements in container
+    [DEBUG] Found 21 child elements in container
+    [DEBUG] Found 21 child elements in container
+    [DEBUG] Found 21 child elements in container
+    [DEBUG] Found 21 child elements in container
+    [DEBUG] Found 21 child elements in container
+    [DEBUG] Found 21 child elements in container
+    [DEBUG] Found 21 child elements in container
+    [DEBUG] Found 23 child elements in container
+    [DEBUG] Found 23 child elements in container
+    [DEBUG] Found 23 child elements in container
+[DEBUG] Saving to: /home/laihuip001/oikos/mneme/.hegemonikon/sessions/2026-01-31_conv_19_Implementing Doxa Persistence.md
+  [✓] Saved: 2026-01-31_conv_19_Implementing Doxa Persistence.md
+    → 3 messages extracted
+[17/89] CCL Syntax and Signature Finalization
+    [DEBUG] Found 23 child elements in container
+    [DEBUG] Found 23 child elements in container
+[DEBUG] Saving to: /home/laihuip001/oikos/mneme/.hegemonikon/sessions/2026-01-31_conv_20_CCL Syntax and Signature Finalization.md
+  [✓] Saved: 2026-01-31_conv_20_CCL Syntax and Signature Finalization.md
+    → 4 messages extracted
+[18/89] Implementing P1/P2 Prompt Patterns
+    [DEBUG] Found 23 child elements in container
+    [DEBUG] Found 23 child elements in container
+[DEBUG] Saving to: /home/laihuip001/oikos/mneme/.hegemonikon/sessions/2026-01-31_conv_21_Implementing P1P2 Prompt Patterns.md
+  [✓] Saved: 2026-01-31_conv_21_Implementing P1P2 Prompt Patterns.md
+    → 6 messages extracted
+[19/89] Bootstrapping Hegemonikon Session
+    [DEBUG] Found 23 child elements in container
+    [DEBUG] Found 23 child elements in container
+    [DEBUG] Found 23 child elements in container
+    [DEBUG] Found 23 child elements in container
+    [DEBUG] Found 23 child elements in container
+    [DEBUG] Found 23 child elements in container
+    [DEBUG] Found 23 child elements in container
+    [DEBUG] Found 24 child elements in container
+    [DEBUG] Found 24 child elements in container
+[DEBUG] Saving to: /home/laihuip001/oikos/mneme/.hegemonikon/sessions/2026-01-31_conv_22_Bootstrapping Hegemonikon Session.md
+  [✓] Saved: 2026-01-31_conv_22_Bootstrapping Hegemonikon Session.md
+    → 5 messages extracted
+[20/89] Designing CCL Macros
+    [DEBUG] Found 24 child elements in container
+    [DEBUG] Found 24 child elements in container
+    [DEBUG] Found 24 child elements in container
+    [DEBUG] Found 24 child elements in container
+    [DEBUG] Found 24 child elements in container
+    [DEBUG] Found 24 child elements in container
+    [DEBUG] Found 24 child elements in container
+    [DEBUG] Found 24 child elements in container
+    [DEBUG] Found 24 child elements in container
+    [DEBUG] Found 24 child elements in container
+    [DEBUG] Found 24 child elements in container
+    [DEBUG] Found 24 child elements in container
+    [DEBUG] Found 24 child elements in container
+    [DEBUG] Found 24 child elements in container
+    [DEBUG] Found 24 child elements in container
+    [DEBUG] Found 24 child elements in container
+    [DEBUG] Found 24 child elements in container
+    [DEBUG] Found 24 child elements in container
+    [DEBUG] Found 24 child elements in container
+    [DEBUG] Found 24 child elements in container
+    [DEBUG] Found 24 child elements in container
+    [!] Duplicate content detected, skipping...
+[21/89] Enhancing Hegemonikón Documentation
+    [DEBUG] Found 24 child elements in container
+    [DEBUG] Found 24 child elements in container
+    [DEBUG] Found 24 child elements in container
+    [DEBUG] Found 24 child elements in container
+    [DEBUG] Found 24 child elements in container
+    [DEBUG] Found 24 child elements in container
+    [DEBUG] Found 24 child elements in container
+    [DEBUG] Found 24 child elements in container
+    [DEBUG] Found 24 child elements in container
+    [DEBUG] Found 24 child elements in container
+    [DEBUG] Found 24 child elements in container
+    [DEBUG] Found 24 child elements in container
+    [DEBUG] Found 24 child elements in container
+    [DEBUG] Found 24 child elements in container
+    [DEBUG] Found 24 child elements in container
+    [DEBUG] Found 24 child elements in container
+    [DEBUG] Found 24 child elements in container
+    [DEBUG] Found 24 child elements in container
+    [DEBUG] Found 24 child elements in container
+    [DEBUG] Found 24 child elements in container
+    [DEBUG] Found 24 child elements in container
+    [!] Duplicate content detected, skipping...
+[22/89] Session Handoff and Closure
+    [DEBUG] Found 24 child elements in container
+    [DEBUG] Found 24 child elements in container
+    [DEBUG] Found 24 child elements in container
+    [DEBUG] Found 24 child elements in container
+    [DEBUG] Found 24 child elements in container
+    [DEBUG] Found 24 child elements in container
+    [DEBUG] Found 24 child elements in container
+    [DEBUG] Found 24 child elements in container
+    [DEBUG] Found 24 child elements in container
+    [DEBUG] Found 24 child elements in container
+    [DEBUG] Found 24 child elements in container
+    [DEBUG] Found 24 child elements in container
+    [DEBUG] Found 24 child elements in container
+    [DEBUG] Found 24 child elements in container
+    [DEBUG] Found 24 child elements in container
+    [DEBUG] Found 24 child elements in container
+    [DEBUG] Found 24 child elements in container
+    [DEBUG] Found 24 child elements in container
+    [DEBUG] Found 24 child elements in container
+    [DEBUG] Found 24 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [!] Duplicate content detected, skipping...
+[23/89] Implementing X-Series Visualization
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [!] Duplicate content detected, skipping...
+[24/89] Implement CCL Debug & Generate
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+[DEBUG] Saving to: /home/laihuip001/oikos/mneme/.hegemonikon/sessions/2026-01-31_conv_27_Implement CCL Debug & Generate.md
+  [✓] Saved: 2026-01-31_conv_27_Implement CCL Debug & Generate.md
+    → 3 messages extracted
+[25/89] Session Boot and Boulēsis
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+[DEBUG] Saving to: /home/laihuip001/oikos/mneme/.hegemonikon/sessions/2026-01-31_conv_28_Session Boot and Boul_sis.md
+  [✓] Saved: 2026-01-31_conv_28_Session Boot and Boul_sis.md
+    → 2 messages extracted
+[26/89] Implementing CCL Selector Syntax
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+[DEBUG] Saving to: /home/laihuip001/oikos/mneme/.hegemonikon/sessions/2026-01-31_conv_29_Implementing CCL Selector Syntax.md
+  [✓] Saved: 2026-01-31_conv_29_Implementing CCL Selector Syntax.md
+    → 5 messages extracted
+[27/89] Evolving CCL Syntax For Scope And Queries
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+[DEBUG] Saving to: /home/laihuip001/oikos/mneme/.hegemonikon/sessions/2026-01-31_conv_30_Evolving CCL Syntax For Scope And Queries.md
+  [✓] Saved: 2026-01-31_conv_30_Evolving CCL Syntax For Scope And Queries.md
+    → 4 messages extracted
+[28/89] Verifying CCL Functionality
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+[DEBUG] Saving to: /home/laihuip001/oikos/mneme/.hegemonikon/sessions/2026-01-31_conv_31_Verifying CCL Functionality.md
+  [✓] Saved: 2026-01-31_conv_31_Verifying CCL Functionality.md
+    → 1 messages extracted
+[29/89] Cognitive Algebra Maturation
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [!] Message container not found
+    [!] Message container not found
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+[DEBUG] Saving to: /home/laihuip001/oikos/mneme/.hegemonikon/sessions/2026-01-31_conv_32_Cognitive Algebra Maturation.md
+  [✓] Saved: 2026-01-31_conv_32_Cognitive Algebra Maturation.md
+    → 2 messages extracted
+[30/89] Quality Gate Integration
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [!] Duplicate content detected, skipping...
+[31/89] Cognitive Algebra Finalization
+    [DEBUG] Found 27 child elements in container
+    [DEBUG] Found 27 child elements in container
+[DEBUG] Saving to: /home/laihuip001/oikos/mneme/.hegemonikon/sessions/2026-01-31_conv_34_Cognitive Algebra Finalization.md
+  [✓] Saved: 2026-01-31_conv_34_Cognitive Algebra Finalization.md
+    → 2 messages extracted
+[32/89] Cognitive Algebra System Finalization
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+[DEBUG] Saving to: /home/laihuip001/oikos/mneme/.hegemonikon/sessions/2026-01-31_conv_35_Cognitive Algebra System Finalization.md
+  [✓] Saved: 2026-01-31_conv_35_Cognitive Algebra System Finalization.md
+    → 5 messages extracted
+[33/89] Cognitive Algebra Expansion
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [!] Duplicate content detected, skipping...
+[34/89] Cognitive Algebra Operators
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [!] Duplicate content detected, skipping...
+[35/89] Cognitive Algebra Theory Validation
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+[DEBUG] Saving to: /home/laihuip001/oikos/mneme/.hegemonikon/sessions/2026-01-31_conv_38_Cognitive Algebra Theory Validation.md
+  [✓] Saved: 2026-01-31_conv_38_Cognitive Algebra Theory Validation.md
+    → 6 messages extracted
+[36/89] Forge Naturalization Complete
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+[DEBUG] Saving to: /home/laihuip001/oikos/mneme/.hegemonikon/sessions/2026-01-31_conv_39_Forge Naturalization Complete.md
+  [✓] Saved: 2026-01-31_conv_39_Forge Naturalization Complete.md
+    → 5 messages extracted
+[37/89] Fixing Derivative Selector Tests
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+[DEBUG] Saving to: /home/laihuip001/oikos/mneme/.hegemonikon/sessions/2026-01-31_conv_40_Fixing Derivative Selector Tests.md
+  [✓] Saved: 2026-01-31_conv_40_Fixing Derivative Selector Tests.md
+    → 4 messages extracted
+[38/89] Forge Repository Digestion
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+[DEBUG] Saving to: /home/laihuip001/oikos/mneme/.hegemonikon/sessions/2026-01-31_conv_41_Forge Repository Digestion.md
+  [✓] Saved: 2026-01-31_conv_41_Forge Repository Digestion.md
+    → 2 messages extracted
+[39/89] FEP Integration and Verification
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [!] Duplicate content detected, skipping...
+[40/89] Workflow Runner Enhancements
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [DEBUG] Found 25 child elements in container
+    [!] Duplicate content detected, skipping...
+[41/89] Workflow Consolidation Complete
+    [DEBUG] Found 27 child elements in container
+    [DEBUG] Found 27 child elements in container
+[DEBUG] Saving to: /home/laihuip001/oikos/mneme/.hegemonikon/sessions/2026-01-31_conv_44_Workflow Consolidation Complete.md
+  [✓] Saved: 2026-01-31_conv_44_Workflow Consolidation Complete.md
+    → 2 messages extracted
+[42/89] Completing FEP Theorem Coverage
+    [DEBUG] Found 27 child elements in container
+    [DEBUG] Found 27 child elements in container
+    [DEBUG] Found 27 child elements in container
+    [DEBUG] Found 27 child elements in container
+    [DEBUG] Found 27 child elements in container
+    [DEBUG] Found 27 child elements in container
+    [DEBUG] Found 27 child elements in container
+    [DEBUG] Found 27 child elements in container
+    [DEBUG] Found 27 child elements in container
+    [DEBUG] Found 27 child elements in container
+    [DEBUG] Found 27 child elements in container
+    [DEBUG] Found 27 child elements in container
+    [DEBUG] Found 27 child elements in container
+    [DEBUG] Found 27 child elements in container
+    [DEBUG] Found 27 child elements in container
+    [DEBUG] Found 28 child elements in container
+    [DEBUG] Found 28 child elements in container
+    [DEBUG] Found 28 child elements in container
+    [DEBUG] Found 28 child elements in container
+    [DEBUG] Found 28 child elements in container
+    [DEBUG] Found 28 child elements in container
+    [!] Duplicate content detected, skipping...
+[43/89] Digestor Automation Setup
+    [DEBUG] Found 28 child elements in container
+    [DEBUG] Found 28 child elements in container
+    [DEBUG] Found 28 child elements in container
+    [DEBUG] Found 28 child elements in container
+    [DEBUG] Found 28 child elements in container
+    [DEBUG] Found 28 child elements in container
+    [DEBUG] Found 28 child elements in container
+    [DEBUG] Found 28 child elements in container
+    [DEBUG] Found 28 child elements in container
+    [DEBUG] Found 28 child elements in container
+    [DEBUG] Found 28 child elements in container
+    [DEBUG] Found 28 child elements in container
+    [DEBUG] Found 28 child elements in container
+    [DEBUG] Found 28 child elements in container
+    [DEBUG] Found 28 child elements in container
+    [DEBUG] Found 28 child elements in container
+    [DEBUG] Found 28 child elements in container
+    [DEBUG] Found 28 child elements in container
+    [DEBUG] Found 28 child elements in container
+    [!] Message container not found
+    [DEBUG] Found 260 child elements in container
+[DEBUG] Saving to: /home/laihuip001/oikos/mneme/.hegemonikon/sessions/2026-01-31_conv_46_Digestor Automation Setup.md
+  [✓] Saved: 2026-01-31_conv_46_Digestor Automation Setup.md
+    → 4 messages extracted
+[44/89] Swarm Scheduler Deployment Strategy
+    [DEBUG] Found 28 child elements in container
+    [DEBUG] Found 28 child elements in container
+[DEBUG] Saving to: /home/laihuip001/oikos/mneme/.hegemonikon/sessions/2026-01-31_conv_47_Swarm Scheduler Deployment Strategy.md
+  [✓] Saved: 2026-01-31_conv_47_Swarm Scheduler Deployment Strategy.md
+    → 5 messages extracted
+[45/89] Designing Emotional Memory
+    [DEBUG] Found 28 child elements in container
+    [DEBUG] Found 28 child elements in container
+    [DEBUG] Found 28 child elements in container
+    [DEBUG] Found 28 child elements in container
+    [DEBUG] Found 28 child elements in container
+    [DEBUG] Found 28 child elements in container
+    [DEBUG] Found 28 child elements in container
+    [DEBUG] Found 28 child elements in container
+    [DEBUG] Found 28 child elements in container
+    [DEBUG] Found 28 child elements in container
+    [DEBUG] Found 28 child elements in container
+    [DEBUG] Found 28 child elements in container
+    [DEBUG] Found 28 child elements in container
+    [DEBUG] Found 28 child elements in container
+    [DEBUG] Found 28 child elements in container
+    [DEBUG] Found 28 child elements in container
+    [DEBUG] Found 28 child elements in container
+    [DEBUG] Found 28 child elements in container
+    [DEBUG] Found 28 child elements in container
+    [DEBUG] Found 28 child elements in container
+    [DEBUG] Found 28 child elements in container
+    [!] Duplicate content detected, skipping...
+[46/89] FileMaker Tutor Prompt
+    [DEBUG] Found 28 child elements in container
+    [DEBUG] Found 28 child elements in container
+    [DEBUG] Found 28 child elements in container
+    [DEBUG] Found 28 child elements in container
+    [DEBUG] Found 28 child elements in container
+    [DEBUG] Found 28 child elements in container
+    [DEBUG] Found 28 child elements in container
+    [DEBUG] Found 28 child elements in container
+    [DEBUG] Found 28 child elements in container
+    [DEBUG] Found 28 child elements in container
+    [DEBUG] Found 28 child elements in container
+    [DEBUG] Found 28 child elements in container
+    [DEBUG] Found 28 child elements in container
+    [DEBUG] Found 28 child elements in container
+    [DEBUG] Found 28 child elements in container
+    [DEBUG] Found 28 child elements in container
+    [DEBUG] Found 28 child elements in container
+    [DEBUG] Found 28 child elements in container
+[DEBUG] Saving to: /home/laihuip001/oikos/mneme/.hegemonikon/sessions/2026-01-31_conv_49_FileMaker Tutor Prompt.md
+  [✓] Saved: 2026-01-31_conv_49_FileMaker Tutor Prompt.md
+    → 4 messages extracted
+[47/89] Implementing O-Series Derivatives
+    [DEBUG] Found 28 child elements in container
+    [DEBUG] Found 28 child elements in container
+[DEBUG] Saving to: /home/laihuip001/oikos/mneme/.hegemonikon/sessions/2026-01-31_conv_50_Implementing O-Series Derivatives.md
+  [✓] Saved: 2026-01-31_conv_50_Implementing O-Series Derivatives.md
+    → 5 messages extracted
+[48/89] Workflow Inventory Automation
+    [DEBUG] Found 28 child elements in container
+    [DEBUG] Found 28 child elements in container
+    [DEBUG] Found 28 child elements in container
+    [DEBUG] Found 28 child elements in container
+    [DEBUG] Found 28 child elements in container
+    [DEBUG] Found 28 child elements in container
+    [DEBUG] Found 28 child elements in container
+    [DEBUG] Found 28 child elements in container
+    [DEBUG] Found 28 child elements in container
+    [DEBUG] Found 28 child elements in container
+    [DEBUG] Found 28 child elements in container
+    [DEBUG] Found 28 child elements in container
+    [DEBUG] Found 28 child elements in container
+    [DEBUG] Found 28 child elements in container
+    [DEBUG] Found 28 child elements in container
+    [DEBUG] Found 28 child elements in container
+    [DEBUG] Found 28 child elements in container
+    [DEBUG] Found 28 child elements in container
+    [DEBUG] Found 28 child elements in container
+    [DEBUG] Found 28 child elements in container
+    [DEBUG] Found 28 child elements in container
+    [!] Duplicate content detected, skipping...
+[49/89] MCP Implementation and Session Wrap-up
+    [DEBUG] Found 28 child elements in container
+    [DEBUG] Found 28 child elements in container
+    [DEBUG] Found 28 child elements in container
+    [DEBUG] Found 28 child elements in container
+    [DEBUG] Found 28 child elements in container
+    [DEBUG] Found 28 child elements in container
+    [DEBUG] Found 28 child elements in container
+    [DEBUG] Found 28 child elements in container
+    [DEBUG] Found 28 child elements in container
+    [DEBUG] Found 28 child elements in container
+    [DEBUG] Found 28 child elements in container
+    [DEBUG] Found 28 child elements in container
+    [DEBUG] Found 28 child elements in container
+    [DEBUG] Found 28 child elements in container
+    [DEBUG] Found 28 child elements in container
+    [DEBUG] Found 28 child elements in container
+    [DEBUG] Found 28 child elements in container
+    [DEBUG] Found 28 child elements in container
+    [DEBUG] Found 28 child elements in container
+    [DEBUG] Found 28 child elements in container
+    [DEBUG] Found 28 child elements in container
+    [!] Duplicate content detected, skipping...
+[50/89] X-Series 36 Relations
+    [DEBUG] Found 28 child elements in container
+    [DEBUG] Found 28 child elements in container
+    [DEBUG] Found 28 child elements in container
+    [DEBUG] Found 28 child elements in container
+    [DEBUG] Found 28 child elements in container
+    [DEBUG] Found 28 child elements in container
+    [DEBUG] Found 28 child elements in container
+    [DEBUG] Found 28 child elements in container
+    [DEBUG] Found 28 child elements in container
+    [DEBUG] Found 28 child elements in container
+    [DEBUG] Found 28 child elements in container
+    [DEBUG] Found 28 child elements in container
+    [DEBUG] Found 29 child elements in container
+    [DEBUG] Found 29 child elements in container
+    [DEBUG] Found 29 child elements in container
+    [DEBUG] Found 29 child elements in container
+    [DEBUG] Found 29 child elements in container
+    [DEBUG] Found 29 child elements in container
+    [DEBUG] Found 29 child elements in container
+    [DEBUG] Found 29 child elements in container
+    [DEBUG] Found 29 child elements in container
+    [!] Duplicate content detected, skipping...
+[51/89] Codebase Audit and Bug Fixes
+    [DEBUG] Found 29 child elements in container
+    [DEBUG] Found 29 child elements in container
+    [DEBUG] Found 29 child elements in container
+    [DEBUG] Found 29 child elements in container
+[DEBUG] Saving to: /home/laihuip001/oikos/mneme/.hegemonikon/sessions/2026-01-31_conv_54_Codebase Audit and Bug Fixes.md
+  [✓] Saved: 2026-01-31_conv_54_Codebase Audit and Bug Fixes.md
+    → 4 messages extracted
+[52/89] Implement Prior Art Search
+    [DEBUG] Found 29 child elements in container
+    [DEBUG] Found 29 child elements in container
+    [DEBUG] Found 29 child elements in container
+    [DEBUG] Found 29 child elements in container
+    [DEBUG] Found 29 child elements in container
+    [DEBUG] Found 29 child elements in container
+    [DEBUG] Found 29 child elements in container
+    [DEBUG] Found 29 child elements in container
+    [DEBUG] Found 29 child elements in container
+    [DEBUG] Found 29 child elements in container
+    [DEBUG] Found 29 child elements in container
+    [DEBUG] Found 29 child elements in container
+    [DEBUG] Found 29 child elements in container
+    [DEBUG] Found 29 child elements in container
+    [DEBUG] Found 29 child elements in container
+    [DEBUG] Found 29 child elements in container
+    [DEBUG] Found 29 child elements in container
+    [DEBUG] Found 29 child elements in container
+    [DEBUG] Found 29 child elements in container
+    [DEBUG] Found 29 child elements in container
+    [DEBUG] Found 29 child elements in container
+    [!] Duplicate content detected, skipping...
+[53/89] Hegemonikón Mode Integration
+    [DEBUG] Found 29 child elements in container
+    [DEBUG] Found 29 child elements in container
+    [DEBUG] Found 29 child elements in container
+    [DEBUG] Found 29 child elements in container
+    [DEBUG] Found 29 child elements in container
+    [DEBUG] Found 29 child elements in container
+    [DEBUG] Found 29 child elements in container
+    [DEBUG] Found 29 child elements in container
+    [DEBUG] Found 29 child elements in container
+    [DEBUG] Found 29 child elements in container
+    [DEBUG] Found 29 child elements in container
+    [DEBUG] Found 29 child elements in container
+    [DEBUG] Found 29 child elements in container
+    [DEBUG] Found 29 child elements in container
+    [DEBUG] Found 29 child elements in container
+    [DEBUG] Found 29 child elements in container
+    [DEBUG] Found 29 child elements in container
+    [DEBUG] Found 29 child elements in container
+    [DEBUG] Found 29 child elements in container
+    [DEBUG] Found 29 child elements in container
+    [DEBUG] Found 29 child elements in container
+    [!] Duplicate content detected, skipping...
+[54/89] Tekhne-Maker Workflow Generation
+    [DEBUG] Found 29 child elements in container
+    [DEBUG] Found 29 child elements in container
+    [DEBUG] Found 29 child elements in container
+    [DEBUG] Found 29 child elements in container
+    [DEBUG] Found 29 child elements in container
+    [DEBUG] Found 29 child elements in container
+    [DEBUG] Found 29 child elements in container
+    [DEBUG] Found 29 child elements in container
+    [DEBUG] Found 29 child elements in container
+    [DEBUG] Found 29 child elements in container
+    [DEBUG] Found 29 child elements in container
+    [DEBUG] Found 29 child elements in container
+    [DEBUG] Found 29 child elements in container
+    [DEBUG] Found 29 child elements in container
+    [DEBUG] Found 29 child elements in container
+    [DEBUG] Found 29 child elements in container
+    [DEBUG] Found 29 child elements in container
+    [DEBUG] Found 29 child elements in container
+    [DEBUG] Found 29 child elements in container
+    [DEBUG] Found 29 child elements in container
+    [DEBUG] Found 29 child elements in container
+    [!] Duplicate content detected, skipping...
+[55/89] FEP Persistence and Learning Observation
+    [DEBUG] Found 29 child elements in container
+    [DEBUG] Found 29 child elements in container
+    [DEBUG] Found 29 child elements in container
+    [DEBUG] Found 29 child elements in container
+    [DEBUG] Found 29 child elements in container
+    [DEBUG] Found 29 child elements in container
+    [DEBUG] Found 29 child elements in container
+    [DEBUG] Found 29 child elements in container
+    [DEBUG] Found 29 child elements in container
+    [DEBUG] Found 29 child elements in container
+    [DEBUG] Found 29 child elements in container
+    [DEBUG] Found 29 child elements in container
+    [DEBUG] Found 29 child elements in container
+    [DEBUG] Found 29 child elements in container
+    [DEBUG] Found 29 child elements in container
+    [DEBUG] Found 29 child elements in container
+    [DEBUG] Found 29 child elements in container
+    [DEBUG] Found 29 child elements in container
+    [DEBUG] Found 29 child elements in container
+    [DEBUG] Found 29 child elements in container
+    [DEBUG] Found 29 child elements in container
+    [!] Duplicate content detected, skipping...
+[56/89] FEP Parameter Validation and Loader
+    [DEBUG] Found 29 child elements in container
+    [DEBUG] Found 29 child elements in container
+    [DEBUG] Found 29 child elements in container
+    [DEBUG] Found 29 child elements in container
+    [DEBUG] Found 29 child elements in container
+    [DEBUG] Found 29 child elements in container
+    [DEBUG] Found 29 child elements in container
+    [DEBUG] Found 29 child elements in container
+    [DEBUG] Found 29 child elements in container
+    [DEBUG] Found 29 child elements in container
+    [DEBUG] Found 29 child elements in container
+    [DEBUG] Found 29 child elements in container
+    [DEBUG] Found 29 child elements in container
+    [DEBUG] Found 29 child elements in container
+    [DEBUG] Found 29 child elements in container
+    [DEBUG] Found 29 child elements in container
+    [DEBUG] Found 29 child elements in container
+    [DEBUG] Found 29 child elements in container
+    [DEBUG] Found 29 child elements in container
+    [DEBUG] Found 29 child elements in container
+    [DEBUG] Found 29 child elements in container
+    [!] Duplicate content detected, skipping...
+[57/89] Skill Description Enhancement
+    [DEBUG] Found 29 child elements in container
+    [DEBUG] Found 29 child elements in container
+    [DEBUG] Found 29 child elements in container
+    [DEBUG] Found 29 child elements in container
+    [DEBUG] Found 29 child elements in container
+    [DEBUG] Found 29 child elements in container
+    [DEBUG] Found 29 child elements in container
+    [DEBUG] Found 29 child elements in container
+    [DEBUG] Found 31 child elements in container
+    [DEBUG] Found 31 child elements in container
+[DEBUG] Saving to: /home/laihuip001/oikos/mneme/.hegemonikon/sessions/2026-01-31_conv_60_Skill Description Enhancement.md
+  [✓] Saved: 2026-01-31_conv_60_Skill Description Enhancement.md
+    → 4 messages extracted
+[58/89] FEP Integration and Experimentation
+    [DEBUG] Found 31 child elements in container
+    [DEBUG] Found 31 child elements in container
+    [DEBUG] Found 31 child elements in container
+    [DEBUG] Found 31 child elements in container
+    [DEBUG] Found 31 child elements in container
+    [DEBUG] Found 31 child elements in container
+    [DEBUG] Found 31 child elements in container
+    [DEBUG] Found 31 child elements in container
+    [DEBUG] Found 31 child elements in container
+    [DEBUG] Found 31 child elements in container
+    [DEBUG] Found 31 child elements in container
+    [DEBUG] Found 31 child elements in container
+    [DEBUG] Found 31 child elements in container
+    [DEBUG] Found 31 child elements in container
+    [DEBUG] Found 31 child elements in container
+    [!] Message container not found
+    [!] Message container not found
+    [DEBUG] Found 260 child elements in container
+    [DEBUG] Found 260 child elements in container
+[DEBUG] Saving to: /home/laihuip001/oikos/mneme/.hegemonikon/sessions/2026-01-31_conv_61_FEP Integration and Experimentation.md
+  [✓] Saved: 2026-01-31_conv_61_FEP Integration and Experimentation.md
+    → 4 messages extracted
+[59/89] FEP LLM Evaluation Integration
+    [DEBUG] Found 49 child elements in container
+    [DEBUG] Found 49 child elements in container
+[DEBUG] Saving to: /home/laihuip001/oikos/mneme/.hegemonikon/sessions/2026-01-31_conv_62_FEP LLM Evaluation Integration.md
+  [✓] Saved: 2026-01-31_conv_62_FEP LLM Evaluation Integration.md
+    → 4 messages extracted
+[60/89] Boot Workflow Analysis & Refinement
+    [DEBUG] Found 31 child elements in container
+    [DEBUG] Found 31 child elements in container
+[DEBUG] Saving to: /home/laihuip001/oikos/mneme/.hegemonikon/sessions/2026-01-31_conv_63_Boot Workflow Analysis & Refinement.md
+  [✓] Saved: 2026-01-31_conv_63_Boot Workflow Analysis & Refinement.md
+    → 4 messages extracted
+[61/89] FEP Integration and Handoff
+    [DEBUG] Found 65 child elements in container
+    [DEBUG] Found 65 child elements in container
+[DEBUG] Saving to: /home/laihuip001/oikos/mneme/.hegemonikon/sessions/2026-01-31_conv_64_FEP Integration and Handoff.md
+  [✓] Saved: 2026-01-31_conv_64_FEP Integration and Handoff.md
+    → 3 messages extracted
+[62/89] Session Handoff and Workflow Update
+    [DEBUG] Found 31 child elements in container
+    [DEBUG] Found 31 child elements in container
+[DEBUG] Saving to: /home/laihuip001/oikos/mneme/.hegemonikon/sessions/2026-01-31_conv_65_Session Handoff and Workflow Update.md
+  [✓] Saved: 2026-01-31_conv_65_Session Handoff and Workflow Update.md
+    → 4 messages extracted
+[63/89] FEP pymdp Practical Exploration
+    [DEBUG] Found 50 child elements in container
+    [DEBUG] Found 50 child elements in container
+[DEBUG] Saving to: /home/laihuip001/oikos/mneme/.hegemonikon/sessions/2026-01-31_conv_66_FEP pymdp Practical Exploration.md
+  [✓] Saved: 2026-01-31_conv_66_FEP pymdp Practical Exploration.md
+    → 2 messages extracted
+[64/89] Hegemonikón FEP Matrix Optimization
+    [DEBUG] Found 62 child elements in container
+    [DEBUG] Found 62 child elements in container
+[DEBUG] Saving to: /home/laihuip001/oikos/mneme/.hegemonikon/sessions/2026-01-31_conv_67_Hegemonik_n FEP Matrix Optimization.md
+  [✓] Saved: 2026-01-31_conv_67_Hegemonik_n FEP Matrix Optimization.md
+    → 1 messages extracted
+[65/89] τ-Workflow Pattern Consistency
+    [DEBUG] Found 106 child elements in container
+    [DEBUG] Found 106 child elements in container
+[DEBUG] Saving to: /home/laihuip001/oikos/mneme/.hegemonikon/sessions/2026-01-31_conv_68_-Workflow Pattern Consistency.md
+  [✓] Saved: 2026-01-31_conv_68_-Workflow Pattern Consistency.md
+    → 5 messages extracted
+[66/89] Sophia MCP & Linting Fixes
+    [DEBUG] Found 58 child elements in container
+    [DEBUG] Found 58 child elements in container
+[DEBUG] Saving to: /home/laihuip001/oikos/mneme/.hegemonikon/sessions/2026-01-31_conv_69_Sophia MCP & Linting Fixes.md
+  [✓] Saved: 2026-01-31_conv_69_Sophia MCP & Linting Fixes.md
+    → 2 messages extracted
+[67/89] Sophia Knowledge Graph Implementation
+    [DEBUG] Found 101 child elements in container
+    [DEBUG] Found 101 child elements in container
+[DEBUG] Saving to: /home/laihuip001/oikos/mneme/.hegemonikon/sessions/2026-01-31_conv_70_Sophia Knowledge Graph Implementation.md
+  [✓] Saved: 2026-01-31_conv_70_Sophia Knowledge Graph Implementation.md
+    → 2 messages extracted
+[68/89] Workflow Consolidation and Audit
+    [DEBUG] Found 81 child elements in container
+    [DEBUG] Found 81 child elements in container
+[DEBUG] Saving to: /home/laihuip001/oikos/mneme/.hegemonikon/sessions/2026-01-31_conv_71_Workflow Consolidation and Audit.md
+  [✓] Saved: 2026-01-31_conv_71_Workflow Consolidation and Audit.md
+    → 5 messages extracted
+[69/89] S4 Epochē Overconfidence Mitigation
+    [DEBUG] Found 60 child elements in container
+    [DEBUG] Found 60 child elements in container
+[DEBUG] Saving to: /home/laihuip001/oikos/mneme/.hegemonikon/sessions/2026-01-31_conv_72_S4 Epoch_ Overconfidence Mitigation.md
+  [✓] Saved: 2026-01-31_conv_72_S4 Epoch_ Overconfidence Mitigation.md
+    → 6 messages extracted
+[70/89] Perplexity Task Refinement
+    [DEBUG] Found 86 child elements in container
+    [DEBUG] Found 86 child elements in container
+[DEBUG] Saving to: /home/laihuip001/oikos/mneme/.hegemonikon/sessions/2026-01-31_conv_73_Perplexity Task Refinement.md
+  [✓] Saved: 2026-01-31_conv_73_Perplexity Task Refinement.md
+    → 7 messages extracted
+[71/89] Zet Template Redesign
+    [DEBUG] Found 47 child elements in container
+    [DEBUG] Found 47 child elements in container
+[DEBUG] Saving to: /home/laihuip001/oikos/mneme/.hegemonikon/sessions/2026-01-31_conv_74_Zet Template Redesign.md
+  [✓] Saved: 2026-01-31_conv_74_Zet Template Redesign.md
+    → 6 messages extracted
+[72/89] Anti-Skip Protocol Rollout Expansion
+    [DEBUG] Found 128 child elements in container
+    [DEBUG] Found 128 child elements in container
+[DEBUG] Saving to: /home/laihuip001/oikos/mneme/.hegemonikon/sessions/2026-01-31_conv_75_Anti-Skip Protocol Rollout Expansion.md
+  [✓] Saved: 2026-01-31_conv_75_Anti-Skip Protocol Rollout Expansion.md
+    → 3 messages extracted
+[73/89] Tekhne-Maker Ergasterion Integration
+    [DEBUG] Found 70 child elements in container
+    [DEBUG] Found 70 child elements in container
+[DEBUG] Saving to: /home/laihuip001/oikos/mneme/.hegemonikon/sessions/2026-01-31_conv_76_Tekhne-Maker Ergasterion Integration.md
+  [✓] Saved: 2026-01-31_conv_76_Tekhne-Maker Ergasterion Integration.md
+    → 2 messages extracted
+[74/89] Tekhne-Maker V6.0 Finalization
+    [DEBUG] Found 62 child elements in container
+    [DEBUG] Found 62 child elements in container
+[DEBUG] Saving to: /home/laihuip001/oikos/mneme/.hegemonikon/sessions/2026-01-31_conv_77_Tekhne-Maker V6.0 Finalization.md
+  [✓] Saved: 2026-01-31_conv_77_Tekhne-Maker V6.0 Finalization.md
+    → 1 messages extracted
+[75/89] Intuition Inheritance Implementation
+    [DEBUG] Found 69 child elements in container
+    [DEBUG] Found 69 child elements in container
+[DEBUG] Saving to: /home/laihuip001/oikos/mneme/.hegemonikon/sessions/2026-01-31_conv_78_Intuition Inheritance Implementation.md
+  [✓] Saved: 2026-01-31_conv_78_Intuition Inheritance Implementation.md
+    → 5 messages extracted
+[76/89] Weekly Review Integration
+    [DEBUG] Found 104 child elements in container
+    [DEBUG] Found 104 child elements in container
+[DEBUG] Saving to: /home/laihuip001/oikos/mneme/.hegemonikon/sessions/2026-01-31_conv_79_Weekly Review Integration.md
+  [✓] Saved: 2026-01-31_conv_79_Weekly Review Integration.md
+    → 1 messages extracted
+[77/89] Synedrion and Panorama Workflows
+    [DEBUG] Found 140 child elements in container
+    [DEBUG] Found 140 child elements in container
+[DEBUG] Saving to: /home/laihuip001/oikos/mneme/.hegemonikon/sessions/2026-01-31_conv_80_Synedrion and Panorama Workflows.md
+  [✓] Saved: 2026-01-31_conv_80_Synedrion and Panorama Workflows.md
+    → 1 messages extracted
+[78/89] Synedrion Documentation and Dev Protocol
+    [DEBUG] Found 168 child elements in container
+    [DEBUG] Found 168 child elements in container
+[DEBUG] Saving to: /home/laihuip001/oikos/mneme/.hegemonikon/sessions/2026-01-31_conv_81_Synedrion Documentation and Dev Protocol.md
+  [✓] Saved: 2026-01-31_conv_81_Synedrion Documentation and Dev Protocol.md
+    → 3 messages extracted
+[79/89] Implementing Prompt-Lang Extensions
+    [DEBUG] Found 66 child elements in container
+    [DEBUG] Found 66 child elements in container
+[DEBUG] Saving to: /home/laihuip001/oikos/mneme/.hegemonikon/sessions/2026-01-31_conv_82_Implementing Prompt-Lang Extensions.md
+  [✓] Saved: 2026-01-31_conv_82_Implementing Prompt-Lang Extensions.md
+    → 3 messages extracted
+[80/89] Workflow Update and Cleanup
+    [DEBUG] Found 80 child elements in container
+    [DEBUG] Found 80 child elements in container
+[DEBUG] Saving to: /home/laihuip001/oikos/mneme/.hegemonikon/sessions/2026-01-31_conv_83_Workflow Update and Cleanup.md
+  [✓] Saved: 2026-01-31_conv_83_Workflow Update and Cleanup.md
+    → 5 messages extracted
+[81/89] Perplexity Inbox Analysis
+    [DEBUG] Found 77 child elements in container
+    [DEBUG] Found 77 child elements in container
+[DEBUG] Saving to: /home/laihuip001/oikos/mneme/.hegemonikon/sessions/2026-01-31_conv_84_Perplexity Inbox Analysis.md
+  [✓] Saved: 2026-01-31_conv_84_Perplexity Inbox Analysis.md
+    → 5 messages extracted
+[82/89] Session Handoff Generation
+    [DEBUG] Found 67 child elements in container
+    [DEBUG] Found 67 child elements in container
+[DEBUG] Saving to: /home/laihuip001/oikos/mneme/.hegemonikon/sessions/2026-01-31_conv_85_Session Handoff Generation.md
+  [✓] Saved: 2026-01-31_conv_85_Session Handoff Generation.md
+    → 3 messages extracted
+[83/89] Refining Persona AGENTS.md
+    [DEBUG] Found 98 child elements in container
+    [DEBUG] Found 98 child elements in container
+[DEBUG] Saving to: /home/laihuip001/oikos/mneme/.hegemonikon/sessions/2026-01-31_conv_86_Refining Persona AGENTS.md.md
+  [✓] Saved: 2026-01-31_conv_86_Refining Persona AGENTS.md.md
+    → 4 messages extracted
+[84/89] T-Series Skill Optimization
+    [DEBUG] Found 84 child elements in container
+    [DEBUG] Found 84 child elements in container
+[DEBUG] Saving to: /home/laihuip001/oikos/mneme/.hegemonikon/sessions/2026-01-31_conv_87_T-Series Skill Optimization.md
+  [✓] Saved: 2026-01-31_conv_87_T-Series Skill Optimization.md
+    → 4 messages extracted
+[85/89] Antigravity Operations KI Update
+    [DEBUG] Found 40 child elements in container
+    [DEBUG] Found 40 child elements in container
+[DEBUG] Saving to: /home/laihuip001/oikos/mneme/.hegemonikon/sessions/2026-01-31_conv_88_Antigravity Operations KI Update.md
+  [✓] Saved: 2026-01-31_conv_88_Antigravity Operations KI Update.md
+    → 5 messages extracted
+[86/89] S-Series and T-Series Update
+    [DEBUG] Found 41 child elements in container
+    [DEBUG] Found 41 child elements in container
+[DEBUG] Saving to: /home/laihuip001/oikos/mneme/.hegemonikon/sessions/2026-01-31_conv_89_S-Series and T-Series Update.md
+  [✓] Saved: 2026-01-31_conv_89_S-Series and T-Series Update.md
+    → 4 messages extracted
+[87/89] Implementing MCP Server Stub
+    [DEBUG] Found 53 child elements in container
+    [DEBUG] Found 53 child elements in container
+[DEBUG] Saving to: /home/laihuip001/oikos/mneme/.hegemonikon/sessions/2026-01-31_conv_90_Implementing MCP Server Stub.md
+  [✓] Saved: 2026-01-31_conv_90_Implementing MCP Server Stub.md
+    → 5 messages extracted
+[88/89] Hegemonikón Naming Refinement
+    [DEBUG] Found 179 child elements in container
+    [DEBUG] Found 179 child elements in container
+[DEBUG] Saving to: /home/laihuip001/oikos/mneme/.hegemonikon/sessions/2026-01-31_conv_91_Hegemonik_n Naming Refinement.md
+  [✓] Saved: 2026-01-31_conv_91_Hegemonik_n Naming Refinement.md
+    → 5 messages extracted
+[89/89] H3 Symplokē Implementation
+    [DEBUG] Found 55 child elements in container
+    [DEBUG] Found 55 child elements in container
+[DEBUG] Saving to: /home/laihuip001/oikos/mneme/.hegemonikon/sessions/2026-01-31_conv_92_H3 Symplok_ Implementation.md
+  [✓] Saved: 2026-01-31_conv_92_H3 Symplok_ Implementation.md
+    → 5 messages extracted
+[*] Re-saving all chats...
+[DEBUG] Saving to: /home/laihuip001/oikos/mneme/.hegemonikon/sessions/2026-01-31_conv_4_Episodic Memory Recovery.md
+  [✓] Saved: 2026-01-31_conv_4_Episodic Memory Recovery.md
+[DEBUG] Saving to: /home/laihuip001/oikos/mneme/.hegemonikon/sessions/2026-01-31_conv_5_Refining CCL Operators and Docs.md
+  [✓] Saved: 2026-01-31_conv_5_Refining CCL Operators and Docs.md
+[DEBUG] Saving to: /home/laihuip001/oikos/mneme/.hegemonikon/sessions/2026-01-31_conv_6_CCL Execution Guarantee Architecture.md
+  [✓] Saved: 2026-01-31_conv_6_CCL Execution Guarantee Architecture.md
+[DEBUG] Saving to: /home/laihuip001/oikos/mneme/.hegemonikon/sessions/2026-01-31_conv_7_X-Series Integration Refinement.md
+  [✓] Saved: 2026-01-31_conv_7_X-Series Integration Refinement.md
+[DEBUG] Saving to: /home/laihuip001/oikos/mneme/.hegemonikon/sessions/2026-01-31_conv_8_AI Relationship Evolution.md
+  [✓] Saved: 2026-01-31_conv_8_AI Relationship Evolution.md
+[DEBUG] Saving to: /home/laihuip001/oikos/mneme/.hegemonikon/sessions/2026-01-31_conv_9_Dendron Package Audit.md
+  [✓] Saved: 2026-01-31_conv_9_Dendron Package Audit.md
+[DEBUG] Saving to: /home/laihuip001/oikos/mneme/.hegemonikon/sessions/2026-01-31_conv_10_Completing CEP-001 Usage.md
+  [✓] Saved: 2026-01-31_conv_10_Completing CEP-001 Usage.md
+[DEBUG] Saving to: /home/laihuip001/oikos/mneme/.hegemonikon/sessions/2026-01-31_conv_11_Naturalizing Workflow Modes.md
+  [✓] Saved: 2026-01-31_conv_11_Naturalizing Workflow Modes.md
+[DEBUG] Saving to: /home/laihuip001/oikos/mneme/.hegemonikon/sessions/2026-01-31_conv_12_Planning Pyth_sis Development.md
+  [✓] Saved: 2026-01-31_conv_12_Planning Pyth_sis Development.md
+[DEBUG] Saving to: /home/laihuip001/oikos/mneme/.hegemonikon/sessions/2026-01-31_conv_13_Implementing SE Principles in Workflows.md
+  [✓] Saved: 2026-01-31_conv_13_Implementing SE Principles in Workflows.md
+[DEBUG] Saving to: /home/laihuip001/oikos/mneme/.hegemonikon/sessions/2026-01-31_conv_14_Implementing Prompt Literacy Skill.md
+  [✓] Saved: 2026-01-31_conv_14_Implementing Prompt Literacy Skill.md
+[DEBUG] Saving to: /home/laihuip001/oikos/mneme/.hegemonikon/sessions/2026-01-31_conv_15_Prompt Engineering Skill Design.md
+  [✓] Saved: 2026-01-31_conv_15_Prompt Engineering Skill Design.md
+[DEBUG] Saving to: /home/laihuip001/oikos/mneme/.hegemonikon/sessions/2026-01-31_conv_16_CCL Macro Documentation.md
+  [✓] Saved: 2026-01-31_conv_16_CCL Macro Documentation.md
+[DEBUG] Saving to: /home/laihuip001/oikos/mneme/.hegemonikon/sessions/2026-01-31_conv_19_Implementing Doxa Persistence.md
+  [✓] Saved: 2026-01-31_conv_19_Implementing Doxa Persistence.md
+[DEBUG] Saving to: /home/laihuip001/oikos/mneme/.hegemonikon/sessions/2026-01-31_conv_20_CCL Syntax and Signature Finalization.md
+  [✓] Saved: 2026-01-31_conv_20_CCL Syntax and Signature Finalization.md
+[DEBUG] Saving to: /home/laihuip001/oikos/mneme/.hegemonikon/sessions/2026-01-31_conv_21_Implementing P1P2 Prompt Patterns.md
+  [✓] Saved: 2026-01-31_conv_21_Implementing P1P2 Prompt Patterns.md
+[DEBUG] Saving to: /home/laihuip001/oikos/mneme/.hegemonikon/sessions/2026-01-31_conv_22_Bootstrapping Hegemonikon Session.md
+  [✓] Saved: 2026-01-31_conv_22_Bootstrapping Hegemonikon Session.md
+[DEBUG] Saving to: /home/laihuip001/oikos/mneme/.hegemonikon/sessions/2026-01-31_conv_27_Implement CCL Debug & Generate.md
+  [✓] Saved: 2026-01-31_conv_27_Implement CCL Debug & Generate.md
+[DEBUG] Saving to: /home/laihuip001/oikos/mneme/.hegemonikon/sessions/2026-01-31_conv_28_Session Boot and Boul_sis.md
+  [✓] Saved: 2026-01-31_conv_28_Session Boot and Boul_sis.md
+[DEBUG] Saving to: /home/laihuip001/oikos/mneme/.hegemonikon/sessions/2026-01-31_conv_29_Implementing CCL Selector Syntax.md
+  [✓] Saved: 2026-01-31_conv_29_Implementing CCL Selector Syntax.md
+[DEBUG] Saving to: /home/laihuip001/oikos/mneme/.hegemonikon/sessions/2026-01-31_conv_30_Evolving CCL Syntax For Scope And Queries.md
+  [✓] Saved: 2026-01-31_conv_30_Evolving CCL Syntax For Scope And Queries.md
+[DEBUG] Saving to: /home/laihuip001/oikos/mneme/.hegemonikon/sessions/2026-01-31_conv_31_Verifying CCL Functionality.md
+  [✓] Saved: 2026-01-31_conv_31_Verifying CCL Functionality.md
+[DEBUG] Saving to: /home/laihuip001/oikos/mneme/.hegemonikon/sessions/2026-01-31_conv_32_Cognitive Algebra Maturation.md
+  [✓] Saved: 2026-01-31_conv_32_Cognitive Algebra Maturation.md
+[DEBUG] Saving to: /home/laihuip001/oikos/mneme/.hegemonikon/sessions/2026-01-31_conv_34_Cognitive Algebra Finalization.md
+  [✓] Saved: 2026-01-31_conv_34_Cognitive Algebra Finalization.md
+[DEBUG] Saving to: /home/laihuip001/oikos/mneme/.hegemonikon/sessions/2026-01-31_conv_35_Cognitive Algebra System Finalization.md
+  [✓] Saved: 2026-01-31_conv_35_Cognitive Algebra System Finalization.md
+[DEBUG] Saving to: /home/laihuip001/oikos/mneme/.hegemonikon/sessions/2026-01-31_conv_38_Cognitive Algebra Theory Validation.md
+  [✓] Saved: 2026-01-31_conv_38_Cognitive Algebra Theory Validation.md
+[DEBUG] Saving to: /home/laihuip001/oikos/mneme/.hegemonikon/sessions/2026-01-31_conv_39_Forge Naturalization Complete.md
+  [✓] Saved: 2026-01-31_conv_39_Forge Naturalization Complete.md
+[DEBUG] Saving to: /home/laihuip001/oikos/mneme/.hegemonikon/sessions/2026-01-31_conv_40_Fixing Derivative Selector Tests.md
+  [✓] Saved: 2026-01-31_conv_40_Fixing Derivative Selector Tests.md
+[DEBUG] Saving to: /home/laihuip001/oikos/mneme/.hegemonikon/sessions/2026-01-31_conv_41_Forge Repository Digestion.md
+  [✓] Saved: 2026-01-31_conv_41_Forge Repository Digestion.md
+[DEBUG] Saving to: /home/laihuip001/oikos/mneme/.hegemonikon/sessions/2026-01-31_conv_44_Workflow Consolidation Complete.md
+  [✓] Saved: 2026-01-31_conv_44_Workflow Consolidation Complete.md
+[DEBUG] Saving to: /home/laihuip001/oikos/mneme/.hegemonikon/sessions/2026-01-31_conv_46_Digestor Automation Setup.md
+  [✓] Saved: 2026-01-31_conv_46_Digestor Automation Setup.md
+[DEBUG] Saving to: /home/laihuip001/oikos/mneme/.hegemonikon/sessions/2026-01-31_conv_47_Swarm Scheduler Deployment Strategy.md
+  [✓] Saved: 2026-01-31_conv_47_Swarm Scheduler Deployment Strategy.md
+[DEBUG] Saving to: /home/laihuip001/oikos/mneme/.hegemonikon/sessions/2026-01-31_conv_49_FileMaker Tutor Prompt.md
+  [✓] Saved: 2026-01-31_conv_49_FileMaker Tutor Prompt.md
+[DEBUG] Saving to: /home/laihuip001/oikos/mneme/.hegemonikon/sessions/2026-01-31_conv_50_Implementing O-Series Derivatives.md
+  [✓] Saved: 2026-01-31_conv_50_Implementing O-Series Derivatives.md
+[DEBUG] Saving to: /home/laihuip001/oikos/mneme/.hegemonikon/sessions/2026-01-31_conv_54_Codebase Audit and Bug Fixes.md
+  [✓] Saved: 2026-01-31_conv_54_Codebase Audit and Bug Fixes.md
+[DEBUG] Saving to: /home/laihuip001/oikos/mneme/.hegemonikon/sessions/2026-01-31_conv_60_Skill Description Enhancement.md
+  [✓] Saved: 2026-01-31_conv_60_Skill Description Enhancement.md
+[DEBUG] Saving to: /home/laihuip001/oikos/mneme/.hegemonikon/sessions/2026-01-31_conv_61_FEP Integration and Experimentation.md
+  [✓] Saved: 2026-01-31_conv_61_FEP Integration and Experimentation.md
+[DEBUG] Saving to: /home/laihuip001/oikos/mneme/.hegemonikon/sessions/2026-01-31_conv_62_FEP LLM Evaluation Integration.md
+  [✓] Saved: 2026-01-31_conv_62_FEP LLM Evaluation Integration.md
+[DEBUG] Saving to: /home/laihuip001/oikos/mneme/.hegemonikon/sessions/2026-01-31_conv_63_Boot Workflow Analysis & Refinement.md
+  [✓] Saved: 2026-01-31_conv_63_Boot Workflow Analysis & Refinement.md
+[DEBUG] Saving to: /home/laihuip001/oikos/mneme/.hegemonikon/sessions/2026-01-31_conv_64_FEP Integration and Handoff.md
+  [✓] Saved: 2026-01-31_conv_64_FEP Integration and Handoff.md
+[DEBUG] Saving to: /home/laihuip001/oikos/mneme/.hegemonikon/sessions/2026-01-31_conv_65_Session Handoff and Workflow Update.md
+  [✓] Saved: 2026-01-31_conv_65_Session Handoff and Workflow Update.md
+[DEBUG] Saving to: /home/laihuip001/oikos/mneme/.hegemonikon/sessions/2026-01-31_conv_66_FEP pymdp Practical Exploration.md
+  [✓] Saved: 2026-01-31_conv_66_FEP pymdp Practical Exploration.md
+[DEBUG] Saving to: /home/laihuip001/oikos/mneme/.hegemonikon/sessions/2026-01-31_conv_67_Hegemonik_n FEP Matrix Optimization.md
+  [✓] Saved: 2026-01-31_conv_67_Hegemonik_n FEP Matrix Optimization.md
+[DEBUG] Saving to: /home/laihuip001/oikos/mneme/.hegemonikon/sessions/2026-01-31_conv_68_-Workflow Pattern Consistency.md
+  [✓] Saved: 2026-01-31_conv_68_-Workflow Pattern Consistency.md
+[DEBUG] Saving to: /home/laihuip001/oikos/mneme/.hegemonikon/sessions/2026-01-31_conv_69_Sophia MCP & Linting Fixes.md
+  [✓] Saved: 2026-01-31_conv_69_Sophia MCP & Linting Fixes.md
+[DEBUG] Saving to: /home/laihuip001/oikos/mneme/.hegemonikon/sessions/2026-01-31_conv_70_Sophia Knowledge Graph Implementation.md
+  [✓] Saved: 2026-01-31_conv_70_Sophia Knowledge Graph Implementation.md
+[DEBUG] Saving to: /home/laihuip001/oikos/mneme/.hegemonikon/sessions/2026-01-31_conv_71_Workflow Consolidation and Audit.md
+  [✓] Saved: 2026-01-31_conv_71_Workflow Consolidation and Audit.md
+[DEBUG] Saving to: /home/laihuip001/oikos/mneme/.hegemonikon/sessions/2026-01-31_conv_72_S4 Epoch_ Overconfidence Mitigation.md
+  [✓] Saved: 2026-01-31_conv_72_S4 Epoch_ Overconfidence Mitigation.md
+[DEBUG] Saving to: /home/laihuip001/oikos/mneme/.hegemonikon/sessions/2026-01-31_conv_73_Perplexity Task Refinement.md
+  [✓] Saved: 2026-01-31_conv_73_Perplexity Task Refinement.md
+[DEBUG] Saving to: /home/laihuip001/oikos/mneme/.hegemonikon/sessions/2026-01-31_conv_74_Zet Template Redesign.md
+  [✓] Saved: 2026-01-31_conv_74_Zet Template Redesign.md
+[DEBUG] Saving to: /home/laihuip001/oikos/mneme/.hegemonikon/sessions/2026-01-31_conv_75_Anti-Skip Protocol Rollout Expansion.md
+  [✓] Saved: 2026-01-31_conv_75_Anti-Skip Protocol Rollout Expansion.md
+[DEBUG] Saving to: /home/laihuip001/oikos/mneme/.hegemonikon/sessions/2026-01-31_conv_76_Tekhne-Maker Ergasterion Integration.md
+  [✓] Saved: 2026-01-31_conv_76_Tekhne-Maker Ergasterion Integration.md
+[DEBUG] Saving to: /home/laihuip001/oikos/mneme/.hegemonikon/sessions/2026-01-31_conv_77_Tekhne-Maker V6.0 Finalization.md
+  [✓] Saved: 2026-01-31_conv_77_Tekhne-Maker V6.0 Finalization.md
+[DEBUG] Saving to: /home/laihuip001/oikos/mneme/.hegemonikon/sessions/2026-01-31_conv_78_Intuition Inheritance Implementation.md
+  [✓] Saved: 2026-01-31_conv_78_Intuition Inheritance Implementation.md
+[DEBUG] Saving to: /home/laihuip001/oikos/mneme/.hegemonikon/sessions/2026-01-31_conv_79_Weekly Review Integration.md
+  [✓] Saved: 2026-01-31_conv_79_Weekly Review Integration.md
+[DEBUG] Saving to: /home/laihuip001/oikos/mneme/.hegemonikon/sessions/2026-01-31_conv_80_Synedrion and Panorama Workflows.md
+  [✓] Saved: 2026-01-31_conv_80_Synedrion and Panorama Workflows.md
+[DEBUG] Saving to: /home/laihuip001/oikos/mneme/.hegemonikon/sessions/2026-01-31_conv_81_Synedrion Documentation and Dev Protocol.md
+  [✓] Saved: 2026-01-31_conv_81_Synedrion Documentation and Dev Protocol.md
+[DEBUG] Saving to: /home/laihuip001/oikos/mneme/.hegemonikon/sessions/2026-01-31_conv_82_Implementing Prompt-Lang Extensions.md
+  [✓] Saved: 2026-01-31_conv_82_Implementing Prompt-Lang Extensions.md
+[DEBUG] Saving to: /home/laihuip001/oikos/mneme/.hegemonikon/sessions/2026-01-31_conv_83_Workflow Update and Cleanup.md
+  [✓] Saved: 2026-01-31_conv_83_Workflow Update and Cleanup.md
+[DEBUG] Saving to: /home/laihuip001/oikos/mneme/.hegemonikon/sessions/2026-01-31_conv_84_Perplexity Inbox Analysis.md
+  [✓] Saved: 2026-01-31_conv_84_Perplexity Inbox Analysis.md
+[DEBUG] Saving to: /home/laihuip001/oikos/mneme/.hegemonikon/sessions/2026-01-31_conv_85_Session Handoff Generation.md
+  [✓] Saved: 2026-01-31_conv_85_Session Handoff Generation.md
+[DEBUG] Saving to: /home/laihuip001/oikos/mneme/.hegemonikon/sessions/2026-01-31_conv_86_Refining Persona AGENTS.md.md
+  [✓] Saved: 2026-01-31_conv_86_Refining Persona AGENTS.md.md
+[DEBUG] Saving to: /home/laihuip001/oikos/mneme/.hegemonikon/sessions/2026-01-31_conv_87_T-Series Skill Optimization.md
+  [✓] Saved: 2026-01-31_conv_87_T-Series Skill Optimization.md
+[DEBUG] Saving to: /home/laihuip001/oikos/mneme/.hegemonikon/sessions/2026-01-31_conv_88_Antigravity Operations KI Update.md
+  [✓] Saved: 2026-01-31_conv_88_Antigravity Operations KI Update.md
+[DEBUG] Saving to: /home/laihuip001/oikos/mneme/.hegemonikon/sessions/2026-01-31_conv_89_S-Series and T-Series Update.md
+  [✓] Saved: 2026-01-31_conv_89_S-Series and T-Series Update.md
+[DEBUG] Saving to: /home/laihuip001/oikos/mneme/.hegemonikon/sessions/2026-01-31_conv_90_Implementing MCP Server Stub.md
+  [✓] Saved: 2026-01-31_conv_90_Implementing MCP Server Stub.md
+[DEBUG] Saving to: /home/laihuip001/oikos/mneme/.hegemonikon/sessions/2026-01-31_conv_91_Hegemonik_n Naming Refinement.md
+  [✓] Saved: 2026-01-31_conv_91_Hegemonik_n Naming Refinement.md
+[DEBUG] Saving to: /home/laihuip001/oikos/mneme/.hegemonikon/sessions/2026-01-31_conv_92_H3 Symplok_ Implementation.md
+  [✓] Saved: 2026-01-31_conv_92_H3 Symplok_ Implementation.md
+
+[✓] Export complete: 68 conversations

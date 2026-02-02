@@ -1,0 +1,41 @@
+# Task: プロンプト生成スキル統合 & Prompt-Lang連携
+
+## 概要
+
+1. ダウンロードした Meta-Prompt Generator v4.0 を現行 v3.0 に統合
+2. リネーム実施 (`meta-prompt-generator` → `tekhne-maker`)
+3. Prompt-Lang との連携設計
+
+## チェックリスト
+
+### 1. 分析・計画
+
+- [x] ZIPファイル展開・読み込み
+- [x] 現行スキル (v3.0) と v4.0 の比較分析
+- [x] 統合計画文書作成
+- [x] リネーム案策定
+- [x] メタ認知的検証（/noe, /why, /chk×2）
+
+### 2. ファイル統合
+
+- [x] `meta-prompt-generator` → `tekhne-maker` ディレクトリ名変更
+- [x] SKILL.md を v5.0 へマージ更新
+- [x] 4つの新参照ファイル追加
+- [x] README.md に格言追加
+
+### 3. 設定更新
+
+- [x] tools.yaml のスキル参照更新（不要と判断）
+
+### 4. Prompt-Lang 連携
+
+- [x] `@extends`/`@mixin` 実装
+- [x] `Mixin`, `ParseResult` dataclass
+- [x] `parse_all()`, `resolve()` 関数
+- [x] 循環参照検出
+- [x] テスト9件追加
+
+### 5. 検証
+
+- [x] ファイル構成確認（9ファイル体制）
+- [x] 全20テスト PASSED

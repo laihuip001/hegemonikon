@@ -1,0 +1,75 @@
+# Task: Perplexity レポート完全消化
+
+## 消化チェックリスト
+
+### ✅ Task 5: AI ツール/ワークフロー発見（完了）
+
+- [x] 動的リプランニング → `/ene` PHASE 3.5 追加 (v4.8)
+
+---
+
+### ✅ Task 1: デイリーブリーフ（完了）
+
+- [x] **Context Engineering** → `/mek` STEP 1.5 に既存統合確認
+- [x] **Deliberative Refinement** → `/dia` に `--mode=deliberative` 追加
+- [x] **MCP List_Changed Notifications** → 設計記録 (`task1_daily_brief_insights.md`)
+- [x] **Execution Trace Auto-improvement** → 設計記録 (`task1_daily_brief_insights.md`)
+
+---
+
+### ✅ Task 2: MCP エコシステム監視（完了）
+
+- [x] **MCP Apps UI** → `mcp/extensions_2026-02-01.md` に設計
+- [x] **OpenCV MCP** → `mcp/extensions_2026-02-01.md` に設計
+- [x] **Plotting MCP** → `mcp/extensions_2026-02-01.md` に設計
+- [x] **MATLAB MCP** → `mcp/extensions_2026-02-01.md` に設計
+
+---
+
+### ✅ Task 3: LLM API 変更監視（完了）
+
+- [x] **Gemini 2.5 Flash 廃止確認** → 不使用確認 ✅
+- [x] **Gemini 2.0 Flash 移行計画** → `docs/alerts/llm_api_deprecation.md` に記録
+
+---
+
+### ✅ Task 4: プロンプト技法 最前線（完了）
+
+- [x] **Reverse Prompting** → `/mek` に `--mode=reverse` 追加
+- [x] **Constitutional AI 2.0** → `/mek` に `--mode=constitutional` 追加
+- [x] **YAML 構造化プロンプト** → `/mek` に `--mode=yaml` 追加
+- [x] **Multi-expert Prompting** → `/mek` に `--mode=multi` 追加
+
+---
+
+## 進捗
+
+| カテゴリ | 完了 | 合計 |
+|:---------|:----:|:----:|
+| Task 5 | 1 | 1 |
+| Task 1 | 4 | 4 |
+| Task 2 | 4 | 4 |
+| Task 3 | 2 | 2 |
+| Task 4 | 4 | 4 |
+| **合計** | **15** | **15** |
+
+---
+
+## 生成された成果物
+
+| ファイル | 内容 |
+|:---------|:-----|
+| `/ene.md` | PHASE 3.5 動的リプランニング追加 (v4.8) |
+| `/dia.md` | `--mode=deliberative` 追加 |
+| `/mek.md` | 4つの新モード追加 (reverse, constitutional, yaml, multi) |
+| `mcp/extensions_2026-02-01.md` | MCP 拡張設計 |
+| `docs/alerts/llm_api_deprecation_2026-02-01.md` | API 廃止アラート |
+| `docs/digestion/task1_daily_brief_insights_2026-02-01.md` | Task 1 技術示唆 |
+| `docs/digestion/perplexity_daily_digest_2026-02-01.md` | 統合消化レポート |
+| `docs/digestion/perplexity_n8n_automation_design.md` | n8n 自動化設計 |
+
+---
+
+## 消化完了 🎉
+
+**全15アクションアイテムを消化完了。**

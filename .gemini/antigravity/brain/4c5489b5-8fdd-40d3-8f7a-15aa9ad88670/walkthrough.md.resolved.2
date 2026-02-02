@@ -1,0 +1,50 @@
+# Walkthrough: tekhne-maker v6.1 + j2p 廃止
+
+**実施日時**: 2026-01-28 13:04
+**セッション**: 4c5489b5-8fdd-40d3-8f7a-15aa9ad88670
+
+---
+
+## 📋 結果サマリ
+
+```
+tekhne-maker v6.0 → v6.1
+japanese-to-prompt-converter → 完全廃止
+```
+
+---
+
+## /noe 分析による意思決定
+
+| 問い | 結論 |
+|:-----|:-----|
+| j2p の「8秒制約」は必要か？ | ❌ 不要（API直接呼出し前提） |
+| j2p の「YAML出力」は必要か？ | ❌ 不要（.prompt形式で十分） |
+| j2p の本質は？ | Speed Archetype × Claude最適化 |
+
+**決定**: 完全 mixin 化ではなく、トリガー追加のみで吸収
+
+---
+
+## 変更ファイル
+
+| ファイル | 変更内容 |
+|:---------|:---------|
+| [tekhne-maker/SKILL.md](file:///home/laihuip001/oikos/.agent/skills/utils/tekhne-maker/SKILL.md) | v6.1、トリガー4つ追加 |
+| [tools.yaml](file:///home/laihuip001/oikos/.agent/tools.yaml) | トリガー・modes・history 更新 |
+| [japanese-to-prompt-converter/](file:///home/laihuip001/oikos/.agent/skills/utils/japanese-to-prompt-converter) | **削除** |
+
+---
+
+## 追加トリガー
+
+- 「日本語で〇〇がしたい」
+- 「要件を最適化」
+- 「プロンプト」
+- 「PE」
+
+---
+
+## 残タスク
+
+- [ ] Phase 2: mekhane 接続強化（後日）

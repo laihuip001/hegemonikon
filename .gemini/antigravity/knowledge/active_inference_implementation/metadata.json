@@ -1,0 +1,109 @@
+{
+    "title": "Active Inference & FEP Technical Implementation",
+    "summary": "自由エネルギー原理 (FEP) と pymdp を用いた Hegemonikón 認知レイヤーの実装。Stoic-FEP マッピング、定理実装マトリックス、X-series ナビゲーショを統合。Orexis (希望) に対する Pistis (確信度) による行動制約の数学的定式化、および Zero-Trust Doctrine の FEP 的解釈（精密化制約）を提供する。",
+    "dependencies": [
+        "hegemonikon_system"
+    ],
+    "references": [
+        {
+            "type": "file",
+            "value": "/home/laihuip001/oikos/hegemonikon/mekhane/fep/fep_agent.py"
+        },
+        {
+            "type": "file",
+            "value": "/home/laihuip001/oikos/hegemonikon/mekhane/fep/config.py"
+        },
+        {
+            "type": "file",
+            "value": "/home/laihuip001/oikos/hegemonikon/mekhane/fep/persistence.py"
+        },
+        {
+            "type": "file",
+            "value": "/home/laihuip001/oikos/hegemonikon/mekhane/fep/fep_bridge.py"
+        },
+        {
+            "type": "file",
+            "value": "/home/laihuip001/oikos/hegemonikon/mekhane/fep/llm_evaluator.py"
+        },
+        {
+            "type": "conversation_id",
+            "value": "fe8d0749-9ee0-4858-9d7a-355a05d34923"
+        },
+        {
+            "type": "conversation_id",
+            "value": "76b0afc4-c3a8-4b8d-a819-bb8b3f7644bd"
+        },
+        {
+            "type": "conversation_id",
+            "value": "31cee274-e98d-4e87-a07a-7451b3e11ed8"
+        },
+        {
+            "type": "conversation_id",
+            "value": "788732d4-6e29-46d4-8aad-94ec8b8764c1"
+        },
+        {
+            "type": "file",
+            "value": "/home/laihuip001/oikos/.gemini/antigravity/knowledge/active_inference_implementation/artifacts/implementation/dirichlet_update_remediation.md"
+        },
+        {
+            "type": "file",
+            "value": "/home/laihuip001/oikos/.gemini/antigravity/knowledge/workflow_dynamic_orchestration/artifacts/implementation/derivative_selection_engine.md"
+        },
+        {
+            "type": "file",
+            "value": "/home/laihuip001/oikos/hegemonikon/mekhane/fep/derivative_selector.py"
+        },
+        {
+            "type": "conversation_id",
+            "value": "a1c02be0-25df-4097-a2b1-ccefbae68962"
+        },
+        {
+            "type": "file",
+            "value": "/home/laihuip001/oikos/.gemini/antigravity/knowledge/active_inference_implementation/artifacts/implementation/fep_persistence_verification_2026_01.md"
+        },
+        {
+            "type": "conversation_id",
+            "value": "7e74a0f0-9a63-4dfd-bb5d-c706750ba38d"
+        },
+        {
+            "type": "file",
+            "value": "/home/laihuip001/oikos/.gemini/antigravity/knowledge/active_inference_implementation/artifacts/implementation/k3_telos_checker_specification.md"
+        },
+        {
+            "type": "file",
+            "value": "/home/laihuip001/oikos/.gemini/antigravity/knowledge/active_inference_implementation/artifacts/implementation/fep_theorem_coverage_100_report.md"
+        },
+        {
+            "type": "file",
+            "value": "/home/laihuip001/oikos/.gemini/antigravity/knowledge/active_inference_implementation/artifacts/implementation/fep_integration_design_principles.md"
+        },
+        {
+            "type": "conversation_id",
+            "value": "89359020-c5e4-4636-b9ee-28c1d6e0047a"
+        },
+        {
+            "type": "conversation_id",
+            "value": "dab11603-dd56-40e8-919b-5606450ae908"
+        },
+        {
+            "type": "conversation_id",
+            "value": "8a6ce380-bc6a-4c6b-bc2a-e0fcc3fa7868"
+        },
+        {
+            "type": "file",
+            "value": "cognitive_algebra_system/artifacts/architecture/ccl_v2_control_syntax_spec.md"
+        },
+        {
+            "type": "conversation_id",
+            "value": "c791f7fa-7cce-4724-8436-f0a137fd7999"
+        },
+        {
+            "type": "conversation_id",
+            "value": "eac9ce4b-59ee-4d83-89f7-f104fc54c144"
+        },
+        {
+            "type": "conversation_id",
+            "value": "4a02c389-c499-47af-9c66-3f02c9127120"
+        }
+    ]
+}

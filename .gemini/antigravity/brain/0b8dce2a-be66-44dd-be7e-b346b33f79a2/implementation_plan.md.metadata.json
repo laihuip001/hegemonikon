@@ -1,0 +1,6 @@
+{
+  "artifactType": "ARTIFACT_TYPE_IMPLEMENTATION_PLAN",
+  "summary": "LLM-based CCL Generator (v2.0) の実装計画。4層フォールバック（LLM→Doxa→Heuristic→User）、Tracer セッション分離、doxa_learner.py によるパターン学習、/noe+ 分析で発見した「文脈知識」層を含む包括的設計。",
+  "updatedAt": "2026-01-29T11:53:22.238522137Z",
+  "version": "2"
+}

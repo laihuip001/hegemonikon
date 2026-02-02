@@ -1,0 +1,6 @@
+{
+  "artifactType": "ARTIFACT_TYPE_WALKTHROUGH",
+  "summary": "tekhne-maker v5.1 Self-Dogfooding統合の完了証跡。prompt_lang_mode.prompt生成、251行の知識をmixinに凝縮、情報ロスなし。",
+  "updatedAt": "2026-01-27T23:58:56.799394546Z",
+  "version": "1"
+}

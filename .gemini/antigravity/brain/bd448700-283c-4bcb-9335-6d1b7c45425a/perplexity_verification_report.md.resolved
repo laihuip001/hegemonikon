@@ -1,0 +1,167 @@
+# Perplexity レポート検証レポート
+
+> **Hegemonikón リポジトリ解析の「推測」を実データで検証**
+> Generated: 2026-01-28T16:59+09:00
+
+---
+
+## Executive Summary
+
+Perplexity の外部分析は**構造・設計思想の理解において80%以上正確**だった。ただし、リポジトリアクセス制限により技術実装の詳細が推測にとどまっていた部分を本検証で補完した。
+
+---
+
+## 1️⃣ 内部ドキュメント突合
+
+### README.md 検証
+
+| Perplexity 推測 | 実態 | 判定 |
+|:---------------|:-----|:----:|
+| FEP + ストア哲学融合 | ✅ 「変分自由エネルギー最小化原理に基づく AI 認知制御システム」 | ✅ |
+| 60要素体系 | ✅ 公理7、定理24、関係36 = 60 | ✅ |
+| 公理階層 L0-L1.75 | ✅ FEP / Flow,Value / Scale,Function / Valence,Precision | ✅ |
+| Hyperengineering 哲学 | ✅ 「過剰設計は褒め言葉」明記 | ✅ |
+
+### ワークフロー体系 (.agent/workflows/)
+
+| コマンド | Perplexity 推測 | 実態 | 判定 |
+|:---------|:---------------|:-----|:----:|
+| /boot | 初期化 | ✅ O1 Noēsis + H4 Doxa | ✅ |
+| /bye | クリーンアップ | ✅ Handoff 生成 + 知識投入 | ✅ |
+| /plan | 計画立案 | ✅ 7433bytes の詳細ワークフロー | ✅ |
+| /zet | Zētēsis (探求) | ✅ Perplexity 依頼書生成 | ✅ |
+| /noe | Noēsis | ✅ O1 Noēsis Skill 発動 | ✅ |
+| /bou | Boulēsis | ✅ O2 Boulēsis 意志確認 | ✅ |
+| /dia | Dialogue | ✅ A2 Krisis 判定 | ✅ |
+| /syn | Synthesis | ✅ Synedrion 召喚 | ✅ |
+| /pan | Panorama | ✅ Ω層メタ認知レーダー | ✅ |
+
+**追加発見**: Perplexity が言及していない重要ワークフロー
+- `/ene` (O4 Energeia) - 行為実行フレームワーク
+- `/epo` (Epochē) - 判断停止プロトコル
+- `/vet` - 品質監査
+- `/ax` - O/S/H/P/K/A/X 統合分析
+
+---
+
+## Mēkhanē 層の実態
+
+### Perplexity 推測 vs 実際の構成
+
+| Perplexity 推測 | 実態 | 補足 |
+|:---------------|:-----|:-----|
+| **anamnesis** (記憶想起) | ✅ [cli.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/anamnesis/cli.py), [mneme_cli.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/anamnesis/mneme_cli.py) | Gnōsis CLI + Mnēmē Synthesis |
+| **ergasterion** (工房) | ✅ 5 subdirs: factory, helpers, prompt-lang, protocols, tekhne | Perplexity 予想より大規模 |
+| **symploke** (連結) | ✅ 20 files: VectorDB adapters, Jules client, 866 specialists | 最も実装が進んでいる |
+| **exagoge** (抽出) | ⚠️ 未言及 | 43 children - 新発見 |
+| **peira** (実験) | ⚠️ 未言及 | 30 children - テスト/検証層 |
+
+### Symploke 詳細（Perplexity 未把握）
+
+| ファイル | 機能 |
+|:---------|:-----|
+| [sophia_ingest.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/symploke/sophia_ingest.py) | KI → ベクトル化 |
+| [kairos_ingest.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/symploke/kairos_ingest.py) | Handoff → 検索可能化 |
+| [jules_client.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/symploke/jules_client.py) | Jules API 連携 |
+| [phase0_specialists.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/symploke/phase0_specialists.py) | 866 専門家の定義 (45KB) |
+| [phase2_specialists.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/symploke/phase2_specialists.py) | 追加専門家 (32KB) |
+| [phase3_specialists.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/symploke/phase3_specialists.py) | 最終拡張 (39KB) |
+
+**Perplexity 評価**: 「マイクロエージェント」という推測は正しいが、規模 (866人) は予想を超える。
+
+---
+
+## 2️⃣ FEP 数学対応マッピング
+
+### 現時点での対応関係
+
+| FEP 概念 | Perplexity 推測 | 実装状況 |
+|:---------|:---------------|:---------|
+| **Variational FE** F[q(s)] | Noēsis Module | `/noe` ワークフローとして実装 |
+| **Expected FE** G(π) | Boulēsis Gate | `/bou` ワークフローとして実装 |
+| **Markov Blanket** | Pneuma Network | MCP + Symploke 層 |
+| **Prediction Error ε** | Assent Mechanism | 未明示（KI品質として暗黙的） |
+| **Active Inference** | Hormē Actuator | `/ene` (Energeia) で行動生成 |
+
+### 追加調査が必要な項目
+
+> **/zet 依頼書作成対象**
+
+1. **FEP 実装パターン**: Active Inference の Python 実装ベストプラクティス
+2. **Variational FE 近似**: Mean-Field Approximation の AI Agent 応用例
+3. **Expected FE 計算**: 複数ステップ計画における G(π) 最小化手法
+
+---
+
+## 3️⃣ STOIC Architecture 比較
+
+### PhilArchive 参照 [web:138] からの差異分析
+
+| 観点 | STOIC Architecture | Hegemonikón |
+|:-----|:-------------------|:------------|
+| **Governed Cognition** | Dual-engine orchestration | /bou + /dia による判断階層 |
+| **Micro-agencies** | 一般的なマルチエージェント | **866 専門家** の具体実装 |
+| **Reflective Containment** | Meta-cognition as control | /pan (Panorama) + /epo (Epochē) |
+| **命名規則** | 英語ベース | **古典ギリシャ語完全準拠** |
+| **ワークフロー統合** | 不明 | 26 ワークフロー + Anti-Skip Protocol |
+
+### Hegemonikón 独自設計
+
+1. **60要素体系**: 公理7 + 定理24 + 関係36 の数学的構造
+2. **3層アーキテクチャ**: Skill (SSOT) → Workflow (Orchestrator) → KI (Index)
+3. **Epochē Protocol**: 判断停止による過信防止
+4. **Sophia/Kairos/Chronos**: 多層記憶アーキテクチャ
+
+---
+
+## 4️⃣ 運用実績パターン抽出
+
+### Dispatch Log 分析
+
+```
+📊 Dispatch Log: 4/50 (8%)
+   - skill_activations: 0 (自動発動なし)
+   - workflow_executions: 4 (/boot, /bou, /noe, /ene)
+   - ki_reads: 0
+   - exception_patterns: 0/3
+   
+🎯 Phase B移行: 未達成
+   理由: dispatch_count < 50
+```
+
+### Handoff 19件の傾向
+
+| 日付 | セッション数 |
+|:-----|:----------:|
+| 2026-01-27 | 10 |
+| 2026-01-28 | 9+ |
+
+**主要トピック** (最新 Handoff から):
+- /zet v2.3 ハイブリッド版再設計
+- Claude 4.5 最適化統合
+- パイプライン思考 (Perplexity → Claude)
+
+### 発見されたパターン
+
+1. **ki-as-letter**: KI は「次の私への手紙」
+2. **boot-handoff-cycle**: /boot → 作業 → /bye の確立
+3. **symploke-adapter-design**: Factory + ABC パターン
+
+---
+
+## 推奨アクション
+
+### 即時
+
+1. ✅ 本レポートを KI に統合
+2. [ ] /zet FEP 深掘り依頼書を生成
+3. [ ] /zet STOIC 比較依頼書を生成
+
+### 中期
+
+- Dispatch Log の運用促進 (Phase B 達成を目指す)
+- exagoge, peira モジュールのドキュメント整備
+
+---
+
+*Generated by Hegemonikón O3 Zētēsis + O1 Noēsis*

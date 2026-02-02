@@ -1,0 +1,70 @@
+# Claude Dialogue Skill Review & Integration Plan
+
+## 品質レビュー: claude-dialogue SKILL.md
+
+### ✅ 良い点
+
+| 観点 | 評価 | 詳細 |
+|:-----|:----:|:-----|
+| 構造 | A | v6.2 Structural Enforcement 準拠、全必須セクション完備 |
+| 5モード設計 | A | Opinion/Critique/Preference/Concern/Vision の明確な区分 |
+| 例の充実度 | A | 3例（Opinion, Critique, Vision）全て実用的 |
+| Do/Don't | A | 行動指針が具体的で実行可能 |
+| 品質基準 | B+ | 測定方法あり、ただし自動検証は困難 |
+| Pre-mortem | A | 3失敗シナリオと対策 |
+
+**総合評価**: **A-** (高品質、実運用可能)
+
+### ⚠️ 改善点
+
+1. **series の設定ミス**: `Utils` ではなく `Schema` (S2 連携のため)
+2. **id の不整合**: "U1" は不適切 → Schema 系なら "S2.dialogue" が妥当
+3. **related.upstream の A2 参照**: 双方向連携だが記述が曖昧
+
+---
+
+## 統合方針: /u ワークフローへの Fit
+
+**現状**:
+- [/u.md](file:///home/laihuip001/oikos/.agent/workflows/u.md) は SKILL.md を参照する軽量ワークフロー (79行)
+- `claude-dialogue` SKILL.md は独立スキル (302行)
+
+**問題**:
+- Antigravity の Skill Activation Gap により、SKILL.md は自動発動しにくい
+- `/u` コマンド経由で呼ばれても、SKILL.md の読み込みは手動
+
+**提案**: **Fit (消化) パターン**
+
+[/u.md](file:///home/laihuip001/oikos/.agent/workflows/u.md) に最低限必要なロジック（5モード選択、Core Behavior）を直接埋め込み、`claude-dialogue` SKILL.md は正本として残すが、ワークフローで自己完結できるようにする。
+
+---
+
+## Proposed Changes
+
+### [MODIFY] [u.md](file:///home/laihuip001/oikos/.agent/workflows/u.md)
+
+1. **モード選択ロジックを埋め込み** (SKILL.md から抽出)
+2. **Core Behavior チェックリストを追加**
+3. **出力形式を各モード別に拡張**
+4. **正本参照を維持** (詳細は SKILL.md へ)
+
+### [MODIFY] [claude-dialogue SKILL.md](file:///home/laihuip001/oikos/.agent/skills/schema/claude-dialogue/SKILL.md)
+
+1. `series: Utils` → `series: Schema`
+2. `id: U1` → `id: S2.dialogue`
+
+### [DELETE] (推奨せず)
+
+SKILL.md は削除しない。正本として残し、/u.md から参照する。
+
+---
+
+## Verification
+
+1. `/u 何か問題点ある？` → Critique モードが選択されるか
+2. `/u 理想を教えて` → Vision モードが選択されるか
+3. 出力が Core Behavior (結論先行、理由2-3点) を満たすか
+
+---
+
+*Estimated changes: u.md +50行, SKILL.md 2行修正*

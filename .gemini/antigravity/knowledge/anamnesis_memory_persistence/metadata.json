@@ -1,0 +1,49 @@
+{
+    "title": "Anamnēsis & System Persistence",
+    "summary": "Technical implementation of the 'Mnēmē' (Memory) layer. v5.7 (2026-02-01) adds the 'Double-Export System' (Cron + MCP) for 100% session persistence. v6.4 (2026-02-02) achieves the 'Clean State-as-Repo' standard, reducing the sync payload to ~200MB by strictly excluding system environment assets (.cache, .local, .venv).",
+    "dependencies": [
+        "hegemonikon_system"
+    ],
+    "references": [
+        {
+            "type": "conversation_id",
+            "value": "7aa14e34-387b-4077-96d7-339ddcb4a381"
+        },
+        {
+            "type": "conversation_id",
+            "value": "796b9acc-d965-4ab8-ac5a-eb26d470ff73"
+        },
+        {
+            "type": "conversation_id",
+            "value": "891aef16-e50a-4b10-9f94-38e050771424"
+        },
+        {
+            "type": "file",
+            "value": "anamnesis_memory_persistence/artifacts/implementation/episodic_memory_system.md"
+        },
+        {
+            "type": "file",
+            "value": "anamnesis_memory_persistence/artifacts/implementation/continuity_and_recovery.md"
+        },
+        {
+            "type": "file",
+            "value": "anamnesis_memory_persistence/artifacts/implementation/ki_random_recall_anti_decay.md"
+        },
+        {
+            "type": "file",
+            "value": "anamnesis_memory_persistence/artifacts/implementation/double_export_system.md"
+        },
+        {
+            "type": "file",
+            "value": "anamnesis_memory_persistence/artifacts/case_studies/insight_mining_20260201.md"
+        },
+        {
+            "type": "related_ki",
+            "value": "ai_autonomous_learning_evolution"
+        },
+        {
+            "type": "url",
+            "value": "https://github.com/laihuip001/OIKOS"
+        }
+    ]
+}

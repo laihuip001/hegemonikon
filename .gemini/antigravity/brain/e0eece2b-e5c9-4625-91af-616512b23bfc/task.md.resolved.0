@@ -1,0 +1,31 @@
+# CEP-001 活用実装タスク
+
+> **日時**: 2026-01-31
+> **目標**: 20問いの活用設計を今日中に実装
+
+---
+
+## Phase 1: 日常WF統合 (即時)
+
+- [ ] boot.md に Phase 0.5 追加 (`/boot'` 変化追跡)
+- [ ] bye.md に収束確認追加 (`>> V[]`)
+
+## Phase 2: 派生追加
+
+### B: 認知的自己診断
+- [ ] h.md に `.bias` 派生追加
+- [ ] doxa.md (dox.md) に `.delta` 派生追加
+- [ ] dia.md に `.root` 派生追加
+
+### D: 研究・学習
+- [ ] sop.md に `.track` 派生追加
+
+### E: 感情・傾向管理
+- [ ] pat.md に `.delta`, `.neutral` 派生追加
+- [ ] ore.md に `.entropy` 派生追加
+- [ ] pro.md に `.forecast` 派生追加
+
+## Phase 3: ドキュメント
+
+- [ ] CCL Usage Examples 作成
+- [ ] 72 Derivatives Ref 更新

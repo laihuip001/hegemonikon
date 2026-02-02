@@ -1,0 +1,56 @@
+# Dendron v2 — Walkthrough
+
+## 完了した作業
+
+### 1. 親参照機能実装
+
+| 変更 | 説明 |
+|------|------|
+| `PROOF_PATTERN_V2` | `<- parent` 構文をサポート |
+| `ProofStatus.ORPHAN` | 親参照なしの警告状態 |
+| `FileProof.parent` | 親参照フィールド追加 |
+| `files_orphan` | 集計カウント追加 |
+
+### 2. 新構文
+
+```python
+# v1 (ORPHAN 扱い)
+# PROOF: [L2/インフラ]
+
+# v2 (OK)
+# PROOF: [L2/インフラ] <- mekhane/dendron/
+
+# 特殊親
+# PROOF: [L1/定理] <- FEP
+```
+
+### 3. `/dendron` ワークフロー
+
+[dendron.md](file:///home/laihuip001/oikos/.agent/workflows/dendron.md) を作成:
+
+- CCL 演算子: `/dendron+/-/*/~`
+- スコープ・フォーマット指定可能
+
+---
+
+## 検証結果
+
+```
+✅ Dendron: 100.0% coverage (L1:38/L2:116/L3:86) ⚠️239 orphan
+```
+
+→ **全ファイルに PROOF あり、239 件に親参照が必要**
+
+---
+
+## Git コミット
+
+- `8e8e4400`: Dendron v2 親参照実装
+- `d3925ccf`: /dendron ワークフロー追加
+
+---
+
+## 次のステップ
+
+1. 既存ファイルに親参照を順次追加
+2. 親参照なし (ORPHAN) を ERROR に移行 (1週間後)

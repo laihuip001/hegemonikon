@@ -1,0 +1,88 @@
+# Footprint Testing 実装計画
+
+## 目標
+
+H-series (H1-H4) および P-series (P1-P4) の 8スキルが、Antigravity IDE で意図通り発動するかを検証する。
+
+---
+
+## テスト設計
+
+### 検証プロセス (KI 参照)
+
+1. **インラインプロンプト**: 各スキルの trigger/keyword を含む短いプロンプトを送信
+2. **発動確認**: AI が明示的にスキル名を言及、または特有の出力フォーマットに従うか確認
+3. **Ablation**: description 変更前後で発動率の差を比較（オプション）
+
+### 成功基準
+
+| Criterion | Definition |
+|-----------|------------|
+| **Explicit Invocation** | AI が `[H1 Propatheia]` のようにスキル名を明示 |
+| **Output Format Match** | スキル固有の出力形式（Mermaid, 表, ステップ）に従う |
+| **Trigger Coverage** | 設定した trigger keywords の 80%+ で発動 |
+
+---
+
+## テストプロンプト設計
+
+### H-series (Hormē)
+
+| ID | Name | Greek | Test Prompt |
+|----|------|-------|-------------|
+| **H1** | Propatheia | Προπάθεια | 「このアプローチに対する直感的な印象・第一印象を教えて」 |
+| **H2** | Pistis | Πίστις | 「この判断にどれくらい確信がある？信頼度を評価して」 |
+| **H3** | Orexis | Ὄρεξις | 「このプロジェクトで何を望む？内発的動機を明らかにして」 |
+| **H4** | Doxa | Δόξα | 「この信念を長期記憶として記録して」または `/hist` 実行 |
+
+### P-series (Perigraphē)
+
+| ID | Name | Greek | Test Prompt |
+|----|------|-------|-------------|
+| **P1** | Khōra | Χώρα | 「この分析の領域・スコープを定義して」 |
+| **P2** | Hodos | Ὁδός | 「このゴールへの経路・道筋を示して」 |
+| **P3** | Trokhia | Τροχιά | 「この方法の適用範囲・軌道を決定して」 |
+| **P4** | Tekhnē | Τέχνη | 「この課題に適用する技術・技法を選定して」 |
+
+---
+
+## 実行計画
+
+### Phase 1: Baseline Test (今セッション)
+
+1. 各テストプロンプトを **新しいチャット** で送信
+2. AI の応答を記録 (スキル言及有無、出力形式)
+3. 発動/非発動を判定
+
+### Phase 2: Ablation Test (オプション)
+
+1. 非発動スキルの `description` を調整
+2. 同一プロンプトで再テスト
+3. 発動率変化を記録
+
+### Phase 3: Documentation
+
+1. 結果を `walkthrough.md` に記録
+2. [skill_reconstruction_status.md](file:///home/laihuip001/oikos/.gemini/antigravity/knowledge/hegemonikon_system/artifacts/implementation/skill_reconstruction_status.md) を更新
+
+---
+
+## 期待される成果物
+
+- [ ] 8スキルのテスト結果表
+- [ ] 発動成功率 (target: 80%+)
+- [ ] 非発動スキルの改善提案
+
+---
+
+## User Review Required
+
+> [!IMPORTANT]
+> Footprint Testing には **新規チャット** でのテストが推奨される。
+> 現在の会話内でテストする場合、スキルが既にコンテキストに含まれているため、
+> 発動率が「人工的に高く」なる可能性がある。
+
+**選択肢**:
+1. **現在の会話でテスト** — 簡易版。即座に実行可能だが、純粋な発動率ではない。
+2. **新規チャットでテスト** — 純粋な発動率検証。ただし手動で結果を転記する必要あり。
+3. **既存 description のみ確認** — テストは見送り、改善点を提案するのみ。

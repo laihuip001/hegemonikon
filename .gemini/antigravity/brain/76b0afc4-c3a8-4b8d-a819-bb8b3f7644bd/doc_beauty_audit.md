@@ -1,0 +1,97 @@
+# Documentation Beauty Audit
+
+> **目的**: ドキュメントの「美しさ」を精査 — 本体、関係、配置
+> **日時**: 2026-01-28 22:02 JST
+
+---
+
+## 現状分析
+
+### Root Level (hegemonikon/)
+
+| ファイル | 問題点 |
+|:---------|:-------|
+| `AGENTS.md` vs `agents.md` | ⚠️ **重複** — 大文字小文字が異なる2ファイル |
+| `temp_preview*.png` (7個) | ⚠️ **ゴミファイル** — root に散乱 |
+| `*.py` スクリプト (4個) | ⚠️ **配置不適切** — scripts/ に移動すべき |
+| `hegemonikon_full_docs.txt` | ⚠️ **生成物** — docs/ か .gitignore すべき |
+| `llms.txt` | ⚠️ **不明** — 用途不明 |
+
+### docs/ (217 子要素)
+
+| ディレクトリ | 問題点 |
+|:-------------|:-------|
+| `archive/` (70個) | ⚠️ **巨大** — 整理が必要 |
+| `research/` (94個) | ⚠️ **巨大** — テーマ別サブフォルダが必要 |
+| `handoff/` vs `handover/` | ⚠️ **重複概念** — 統一すべき |
+| `jules-personas/` | 📍 配置検討 — mekhane/ の方が適切? |
+| ルートに直置きの md (14個) | ⚠️ **分類不足** — サブフォルダへ |
+
+### kernel/ (構造良好)
+
+| ファイル | 評価 |
+|:---------|:-----|
+| SACRED_TRUTH.md | ✅ |
+| axiom_hierarchy.md | ✅ |
+| KERNEL_PRACTICE_GUIDE.md | ✅ |
+| ousia/schema/horme/perigraphe/kairos/akribeia.md | ✅ |
+| taxis.md | ✅ |
+| naming_conventions.md | ✅ |
+| doctrine.md | ✅ |
+
+---
+
+## 問題一覧
+
+| # | 問題 | 重大度 | 改善案 |
+|:--|:-----|:------:|:-------|
+| 1 | `AGENTS.md` vs `agents.md` 重複 | H | 1つに統合 |
+| 2 | Root に temp_preview*.png 散乱 | M | 削除 or .gitignore |
+| 3 | Root に *.py スクリプト散乱 | M | scripts/ へ移動 |
+| 4 | `handoff/` vs `handover/` 重複 | M | `handoff/` に統一 |
+| 5 | `research/` が 94 ファイル | L | テーマ別サブフォルダ |
+| 6 | `archive/` が 70 ファイル | L | 年度別整理 |
+| 7 | docs/ ルートに直置き md | L | サブフォルダ作成 |
+
+---
+
+## 即時実行可能なクリーンアップ
+
+### 1. 重複ファイル削除 (agents.md)
+
+```bash
+# 小文字版を削除 (AGENTS.md を正本とする)
+rm hegemonikon/agents.md
+```
+
+### 2. temp_preview*.png 削除
+
+```bash
+rm hegemonikon/temp_preview*.png
+```
+
+### 3. handover/ → handoff/ 統合
+
+```bash
+mv hegemonikon/docs/handover/* hegemonikon/docs/handoff/
+rmdir hegemonikon/docs/handover
+```
+
+### 4. Root スクリプトを scripts/ へ
+
+```bash
+mv hegemonikon/*.py hegemonikon/scripts/
+```
+
+---
+
+## 実行しますか？
+
+- [ ] 1. agents.md 削除
+- [ ] 2. temp_preview*.png 削除
+- [ ] 3. handover/ → handoff/ 統合
+- [ ] 4. Root スクリプト移動
+
+---
+
+*Documentation Beauty Audit — 2026-01-28*

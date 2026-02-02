@@ -1,0 +1,39 @@
+{
+    "title": "Project Hermeneus: CCL Execution Guarantee Compiler",
+    "summary": "Hermēneus (Ἑρμηνεύς) is a high-performance compiler designed to translate Cognitive Control Language (CCL/CPL) into executable LMQL and LangGraph programs. As of 2026-02-01, v0.8.0 introduces a DSPy-based Optimizer and Grounded Cognitive Loops. Integration with Synteleia enables high-fidelity code-base audits, identifying the translation layer as the primary stability bottleneck and establishing the 'Anti-Airp' protocol for grounded analysis.",
+    "dependencies": [
+        "cognitive_algebra_system",
+        "hegemonikon_synteleia_ensemble_layer",
+        "synergeia_distributed_execution"
+    ],
+    "references": [
+        {
+            "type": "conversation_id",
+            "value": "63b8d195-043e-4a17-99d9-720fb135bfca"
+        },
+        {
+            "type": "conversation_id",
+            "value": "bot-b09b1b4d-2f86-49dc-a3b9-48da45ba1a7c"
+        },
+        {
+            "type": "conversation_id",
+            "value": "4a02c389-c499-47af-9c66-3f02c9127120"
+        },
+        {
+            "type": "file",
+            "value": "project_hermeneus/artifacts/status/milestones.md"
+        },
+        {
+            "type": "file",
+            "value": "project_hermeneus/artifacts/methodology/differential_validation_strategy.md"
+        },
+        {
+            "type": "related_ki",
+            "value": "anamnesis_memory_persistence"
+        },
+        {
+            "type": "related_ki",
+            "value": "project_dendron"
+        }
+    ]
+}

@@ -1,0 +1,113 @@
+# /pre 実装計画 (O2 Boulēsis 派生)
+
+## 目標
+
+O2 Boulēsis の派生ワークフロー `/pre` を作成する。
+
+> **用途**: Premortem — 失敗を事前に想定し、目標の堅牢性を検証
+
+---
+
+## SE手法: Premortem
+
+**概要**: プロジェクト開始前に「既に失敗した」と仮定し、その原因を洗い出す
+
+- **McKinsey研究**: 「prospective hindsight」により判定精度30%向上
+- **心理的効果**: チームメンバーが懸念を表明しやすくなる
+- **タイミング**: 目標設定後、実行前
+
+---
+
+## 提案する変更
+
+### [NEW] [pre.md](file:///home/laihuip001/oikos/.agent/workflows/pre.md)
+
+O2 Boulēsis の派生ワークフロー。
+
+**Frontmatter**:
+```yaml
+---
+description: O2 Boulēsis 派生。Premortem で失敗を事前想定し、目標を強化する。
+hegemonikon: Ousia
+modules: [O2]
+parent: "/bou"
+skill_ref: ".agent/skills/ousia/o2-boulesis/SKILL.md"
+triggers:
+  - "失敗想定"
+  - "Premortem"
+  - "何が失敗する"
+  - "リスク"
+  - "弱点"
+version: "1.0"
+lineage: "O2 Boulēsis 派生 + SE Premortem 手法統合 → v1.0 (2026-01-29)"
+anti_skip: enabled
+---
+```
+
+**構造** (SE Premortem 手法に基づく):
+
+1. **PHASE 0**: 対象の明確化
+   - 何の失敗を想定するか？（計画/目標/プロジェクト）
+   - 時間軸は？（1週間後/1ヶ月後/1年後）
+
+2. **PHASE 1**: 失敗宣言
+   - 「この計画は完全に失敗した」と仮定
+   - 具体的な失敗の状況を描写
+
+3. **PHASE 2**: 原因列挙
+   - 失敗の原因を網羅的に洗い出す
+   - カテゴリ: 技術/人/プロセス/外部環境
+
+4. **PHASE 3**: 対策立案
+   - 各原因に対する予防策
+   - 優先順位付け
+
+5. **PHASE 4**: 目標強化
+   - 元の目標/計画を修正
+   - 対策を組み込んだ強化版を作成
+
+---
+
+### [MODIFY] [bou.md](file:///home/laihuip001/oikos/.agent/workflows/bou.md)
+
+**変更内容**: children に `/pre` を追加
+
+```yaml
+children:
+  - "/pre"  # Premortem (失敗事前想定)
+```
+
+---
+
+### [MODIFY] tools.yaml
+
+**変更内容**: `/pre` エントリを追加
+
+```yaml
+pre:
+  description: "O2 Boulēsis 派生。Premortem で失敗を事前想定"
+  purpose: "失敗事前想定 — 目標の堅牢性を検証"
+  modules: [O2]
+  parent: "/bou"
+```
+
+---
+
+## 検証計画
+
+1. `/pre` を実行し、失敗想定フローが動作することを確認
+2. 生成された対策リストが artifact として保存されることを確認
+
+---
+
+## 実装手順
+
+1. **poc.md と同様の構造で生成**
+2. **frontmatter 追加**: 上記定義を適用
+3. **親ワークフロー更新**: `/bou` に children 追加
+4. **tools.yaml 更新**: エントリ追加
+5. **git commit**
+
+---
+
+*計画完了: 2026-01-29*

@@ -1,0 +1,89 @@
+# Synteleia Phase 5 — 外積モード (×) 実装計画
+
+## 目標
+
+3×3 交差検証マトリックスによる**外積モード (×)** を実装し、エージェント間の相互検証を実現する。
+
+---
+
+## 外積マトリックス設計
+
+### 構造: Poiēsis × Dokimasia (3×3)
+
+|           | **P** (境界) | **K** (時宜) | **A** (精度) |
+|:----------|:-------------|:-------------|:-------------|
+| **O** (認識) | O×P: 認識の境界は妥当か | O×K: 認識のタイミングは適切か | O×A: 認識の精度は十分か |
+| **S** (設計) | S×P: 設計のスコープは適切か | S×K: 設計の時間軸は現実的か | S×A: 設計の厳密性は十分か |
+| **H** (動機) | H×P: 動機の範囲は明確か | H×K: 動機の緊急性は妥当か | H×A: 動機の根拠は精緻か |
+
+### 各セルの評価
+
+```python
+@dataclass
+class CrossVerification:
+    poiesis_agent: str   # O, S, H
+    dokimasia_agent: str # P, K, A
+    question: str        # 交差検証の問い
+    score: float         # 0.0-1.0
+    issues: List[str]
+```
+
+---
+
+## 提案する変更
+
+### [MODIFY] orchestrator.py
+
+`_run_outer_product()` メソッドを実装:
+
+```python
+def _run_outer_product(self, target: AuditTarget) -> AuditResult:
+    """3×3 交差検証"""
+    matrix = []
+    for p_agent in self.poiesis_agents:
+        for d_agent in self.dokimasia_agents[:3]:  # P, K, A
+            cross = self._cross_verify(p_agent, d_agent, target)
+            matrix.append(cross)
+    return self._synthesize_matrix(matrix)
+```
+
+### [NEW] synthesis.py
+
+Synthesis Engine — 9セルの結果を統合:
+
+```python
+class SynthesisEngine:
+    def synthesize(self, matrix: List[CrossVerification]) -> SynthesisResult:
+        # 重み付き投票
+        weights = self._compute_weights(matrix)
+        consensus = self._weighted_vote(matrix, weights)
+        return SynthesisResult(consensus=consensus, confidence=...)
+```
+
+### [NEW] test_outer_product.py
+
+TDD テストケース:
+
+1. `test_matrix_structure`: 3×3 = 9 セル生成
+2. `test_cross_verification`: 各セルの評価ロジック
+3. `test_synthesis_consensus`: 重み付き投票
+4. `test_outer_product_mode`: @syn× 呼び出し
+
+---
+
+## 検証計画
+
+```bash
+cd /home/laihuip001/oikos/hegemonikon
+PYTHONPATH=. .venv/bin/python -m pytest hermeneus/tests/test_outer_product.py -v
+```
+
+---
+
+## TDD サイクル
+
+| Cycle | Red | Green | Refactor |
+|:------|:----|:------|:---------|
+| 1 | `test_matrix_structure` | `_run_outer_product` 骨格 | - |
+| 2 | `test_cross_verification` | `_cross_verify` 実装 | 共通化 |
+| 3 | `test_synthesis_consensus` | `SynthesisEngine` | 最適化 |

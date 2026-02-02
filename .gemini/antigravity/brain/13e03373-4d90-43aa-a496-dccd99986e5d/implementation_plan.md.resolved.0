@@ -1,0 +1,54 @@
+# Implementation Plan: /v Workflow Enhancement
+
+## 背景
+
+`/v` workflow を Executor-Auditor パターンの最新研究に基づいて強化する。
+
+**現状**: 
+- 4層監査フレームワーク (L1-L4) 実装済み
+- 基本的な CMV プロセスあり
+
+**強化ポイント**:
+1. RRP (Read-Resolve-Proceed) ゲート統合
+2. Confidence Scoring 機構追加
+3. v2.1 module 参照更新
+4. Evaluation Paranoia 対策
+
+---
+
+## Proposed Changes
+
+### `/v` Workflow Enhancement
+
+#### [MODIFY] [v.md](file:///home/laihuip001/oikos/hegemonikon/.agent/workflows/v.md)
+
+1. **RRP Gate 追加** (Step 0.5)
+   - 監査前に環境状態を明示的に検証
+   - Working set とターゲット要件の差分を特定
+
+2. **Confidence Scoring セクション追加**
+   - 各層の信頼度スコア (0.0-1.0)
+   - < 0.8 の場合は詳細検証をトリガー
+
+3. **Hegemonikon 連携セクション更新**
+   - M-series → v2.1 ID に変更
+   - A2 Dokimē, S1 Metron, O3 Zētēsis, H4 Anamnēsis
+
+4. **Evaluation Paranoia 注意書き追加**
+   - Gemini 向けに「評価されている」印象を与えない記述
+
+---
+
+## Verification Plan
+
+### Manual Verification
+
+1. **構文検証**: 変更後の v.md が正しい Markdown フォーマット
+2. **参照整合性**: v2.1 module ID がスキルと一致
+3. **ユーザーレビュー**: 強化内容が意図通りか確認
+
+> このワークフローは定義ドキュメントのため、自動テスト対象外。
+
+---
+
+*Plan created: 2026-01-28*

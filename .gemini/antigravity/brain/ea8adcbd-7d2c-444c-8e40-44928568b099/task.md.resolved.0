@@ -1,0 +1,18 @@
+# CANON-ΔELΤΑ 監査実行
+
+## CCL プログラム
+```
+/noe+s1@4?s3[philosophy] _/noe+p1[implementation] _/dia+--mode=cold-mirror*X _/why!~/zet+ _/bou+*sta?h2 _/s+_/ene?k1
+```
+
+## フェーズ
+
+- [/] Phase 1: 正典抽出 (`/noe+s1@4?s3[philosophy]`)
+- [ ] Phase 2: 実装スキャン (`/noe+p1[implementation]`)
+- [ ] Phase 3: 差分検出 (`/dia+--mode=cold-mirror*X`)
+- [ ] Phase 4: 根本原因分析 (`/why!~/zet+`)
+- [ ] Phase 5: 優先順位決定 (`/bou+*sta?h2`)
+- [ ] Phase 6: 修正計画 (`/s+_/ene?k1`)
+
+## 出力
+- [ ] `audit_canon_delta_20260129.md` 生成

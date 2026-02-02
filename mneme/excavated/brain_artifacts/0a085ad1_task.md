@@ -1,0 +1,23 @@
+# AIDB Batch 5 Collection Task
+
+- [x] **Initialization**
+    - [x] Create `implementation_plan.md` with custom extraction logic <!-- id: 0 -->
+    - [x] Get user approval for the plan <!-- id: 1 -->
+- [x] **Preparation**
+    - [x] Create `scripts/extract_content.js` (or inline JS) for browser execution <!-- id: 2 -->
+    - [x] Verify extraction on one sample URL <!-- id: 3 -->
+- [ ] **Execution (Batch 5: Index 511-595)**
+    - [x] Collect 511-520 <!-- id: 4 -->
+    - [x] Collect 521-530 <!-- id: 5 -->
+    - [x] Collect 531-540 <!-- id: 6 -->
+    - [x] Collect 541-550 <!-- id: 7 -->
+    - [x] Collect 551-560 <!-- id: 8 -->
+    - [x] Collect 561-570 <!-- id: 9 -->
+    - [x] Collect 571-580 <!-- id: 10 -->
+    - [x] Collect 581-590 <!-- id: 11 -->
+    - [x] Collect 591-595 <!-- id: 12 -->
+    - [x] Run `phase3-save-batch-parallel.py 5` after each sub-batch or at the end <!-- id: 13 -->
+- [x] **Verification**
+    - [x] Verify `manifest_5.jsonl` count <!-- id: 14 -->
+    - [x] Check for missing articles <!-- id: 15 -->
+    - [ ] Run `merge-manifests.py` (if this is the last batch) <!-- id: 16 -->

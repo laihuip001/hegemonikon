@@ -1,0 +1,22 @@
+# タスク: X-series 連携強化 + workflow_runner 診断
+
+## 完了
+
+- [x] Boot環境修復 (Gnōsis/FEP)
+- [x] 現状調査 (X-series, workflow_runner)
+- [x] implementation_plan.md 作成
+
+## 進行中
+
+- [ ] workflow_runner.py に X-series 統合
+  - [ ] [WorkflowResult](file:///home/laihuip001/oikos/hegemonikon/mekhane/workflow_runner.py#30-40) に [x_series_recommendations](file:///home/laihuip001/oikos/hegemonikon/mekhane/fep/encoding.py#616-667) 追加
+  - [ ] [format_derivative_selection()](file:///home/laihuip001/oikos/hegemonikon/mekhane/workflow_runner.py#144-166) に推奨表示追加
+
+- [ ] test_workflow_runner.py 作成
+  - [ ] 全24定理テスト
+  - [ ] X-series 推奨テスト
+
+## 未着手
+
+- [ ] テスト実行・検証
+- [ ] 動作確認 (CLI)

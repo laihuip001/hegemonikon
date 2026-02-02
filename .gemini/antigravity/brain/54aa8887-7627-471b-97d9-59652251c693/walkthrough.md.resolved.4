@@ -1,0 +1,55 @@
+# Walkthrough: ワークフローモード Naturalization
+
+> **期間**: Batch 9-13
+> **成果**: 56 セクション追加 (16.7% → 39.6%)
+
+---
+
+## 追加セクション一覧
+
+### Batch 9-12 (42件) — 詳細省略
+
+| WF | セクション数 |
+|:---|:-------------|
+| pra, pat, epi, gno, kho, sta | 14 |
+| ore, mek | 6 |
+| noe, sop, bou, zet | 13 |
+| ene, dia | 9 |
+
+### Batch 13 (14件)
+
+| WF | モード | CCL |
+|:---|:-------|:----|
+| [pro.md](file:///home/laihuip001/oikos/.agent/workflows/pro.md) | appr | `/pro+{向=接近}` |
+| | avoi | `/pro+{向=回避}` |
+| | arre | `/pro{停=判断}` |
+| | random | `/pro+{入力=乱数}` |
+| [pis.md](file:///home/laihuip001/oikos/.agent/workflows/pis.md) | subj | `/pis+{source=self}` |
+| | inte | `/pis+{source=consensus}` |
+| | obje | `/pis+{source=evidence}` |
+| | calibrate | `/pis*{adjust=meta}` |
+| [dox.md](file:///home/laihuip001/oikos/.agent/workflows/dox.md) | sens | `/dox+{源=感覚}` |
+| | conc | `/dox+{源=概念}` |
+| | form | `/dox+{源=形式}` |
+| [euk.md](file:///home/laihuip001/oikos/.agent/workflows/euk.md) | dete | `/euk+{type=decisive}` |
+| | crea | `/euk+{type=creative}` |
+| | main | `/euk+{type=sustain}` |
+
+---
+
+## 進捗サマリー
+
+```diff
+- 前回: 41/245 = 16.7%
++ Batch 9-12: +42 モード
++ Batch 13:   +14 モード
++ 今回: 97/245 = 39.6%
+```
+
+---
+
+## 次のステップ
+
+1. `/chr` に allo/budi/debt を追加
+2. `/hod` に派生を追加
+3. 残り ~140 モードを順次追加

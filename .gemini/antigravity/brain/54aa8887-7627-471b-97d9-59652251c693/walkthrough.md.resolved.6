@@ -1,0 +1,58 @@
+# Walkthrough: ワークフローモード Naturalization
+
+> **期間**: Batch 9-15 + リファクタリング
+> **成果**: 81 セクション追加/修正 (16.7% → 49.8%)
+
+---
+
+## リファクタリング (7件)
+
+| WF | モード | 修正内容 |
+|:---|:-------|:---------|
+| [dia.md](file:///home/laihuip001/oikos/.agent/workflows/dia.md) | epochē | CCL/Scale/発動/出力形式追加 |
+| | audit | CCL/Scale/発動/出力形式追加 |
+| | panorama | CCL/Scale/発動/出力形式追加 |
+| | cross-model | CCL/Scale/発動/出力形式追加 |
+| | cold_mirror | CCL/Scale/発動/出力形式追加 |
+| [met.md](file:///home/laihuip001/oikos/.agent/workflows/met.md) | toc | 発動トリガー追加 |
+| | fermi | 発動トリガー追加 |
+
+---
+
+## Batch 15 (11件)
+
+| WF | モード | CCL |
+|:---|:-------|:----|
+| [tro.md](file:///home/laihuip001/oikos/.agent/workflows/tro.md) | fixe | `/tro+{pattern=fixed}` |
+| | adap | `/tro+{pattern=adaptive}` |
+| | emer | `/tro+{urgency=high}` |
+| | learning | `/tro+{model=learning}` |
+| [tek.md](file:///home/laihuip001/oikos/.agent/workflows/tek.md) | manu | `/tek+{automation=manual}` |
+| | mech | `/tek+{automation=semi}` |
+| | auto | `/tek+{automation=full}` |
+| | template | `/tek+{method=template}` |
+| | formal | `/tek+{rigor=formal}` |
+| | arch | `/tek+{scope=architecture}` |
+| | interface | `/tek+{focus=contract}` |
+
+---
+
+## 累積進捗
+
+```diff
+  Batch 9-14: 63 セクション
++ Refactor:   7 セクション
++ Batch 15:   11 セクション
+= 合計:       81 セクション
+```
+
+```
+進捗: 41 → 122 モード (16.7% → 49.8%)
+```
+
+---
+
+## 次のステップ
+
+1. `/ore`, `/gno` に派生を追加
+2. 50% 達成を目指す

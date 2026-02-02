@@ -1,0 +1,193 @@
+# Implementation Plan: pymdp Integration PoC
+
+> **目的**: Active Inference (pymdp) を Hegemonikón に統合し、O1 Noēsis と O2 Boulēsis の認知プロセスを数学的にモデル化する
+
+---
+
+## User Review Required
+
+> [!IMPORTANT]
+> この PoC は Hegemonikón の認知基盤を FEP に基づいて再実装する第一歩です。
+> 実運用への統合前に、概念実証として `/noe` や `/bou` の判定ロジックと並行評価を行う予定です。
+
+---
+
+## /plan v3.0 結果サマリ
+
+### STAGE 0: Blindspot + Scale
+
+| カテゴリ | 盲点 | 解決策 |
+|:---------|:-----|:-------|
+| 🎯 Framing | pymdp は離散状態空間専用 | 最初は離散モデルに限定、連続空間は将来課題 |
+| 📐 Scope | 全 O-series 同時実装は過大 | O1 + O2 に限定した PoC |
+| 🔗 Dependencies | pymdp の venv 互換性 | 既存 .venv に pip install |
+| 👤 Stakeholders | Creator のみ | N/A |
+| ⏱️ Temporal | 長期的には /ene, /noe に統合必要 | まず PoC、統合は Phase 2 |
+
+**Scale**: 🔭 Meso（新モジュール追加、既存アーキテクチャへの軽微な影響）
+
+### STAGE 1: Strategy Selection
+
+**Explore/Exploit**: **Explore 寄り**
+
+- 失敗コスト: 低い（実験的コード）
+- 環境確実性: 中（pymdp は成熟しているが、Hegemonikón 統合は未知）
+- 時間制約: 通常
+
+**選択プラン**: **B (Robust)** — 抽象化層を設けて将来の拡張に備える
+
+### STAGE 2: Success Criteria
+
+| 軸 | Must | Should | Could |
+|:---|:-----|:-------|:------|
+| 機能性 | pymdp Agent が状態推論を実行できる | O1/O2 概念との対応が明確 | ワークフローから呼び出し可能 |
+| 品質 | 単体テスト3件以上 | 例外処理が整備されている | ドキュメント整備 |
+| 性能 | 推論が1秒以内に完了 | N/A | N/A |
+
+### STAGE 3: Blueprint
+
+```
+最終目標: /noe, /bou で FEP ベースの判定を実行
+  ↑
+サブゴール 1: fep_agent.py が pymdp Agent をラップして動作
+  ↑
+サブゴール 2: Stoic-FEP 対応表に基づく状態空間設計
+  ↑
+現在地: pymdp 概念調査完了
+```
+
+### STAGE 4: Devil's Advocate
+
+| 視点 | 結果 | 理由 |
+|:-----|:-----|:-----|
+| Feasibility | ✅ PASS | pymdp は成熟ライブラリ、Python 3.11 互換 |
+| Necessity | ✅ PASS | FEP は Hegemonikón の理論的基盤、実装が遅れている |
+| Alternatives | ✅ PASS | 自前実装はコスト高、pymdp が標準 |
+| Risks | ⚠️ CONDITIONAL | Hegemonikón 既存コードとの統合が将来課題 |
+| Dependencies | ✅ PASS | pymdp のみ、他依存なし |
+
+**Pre-mortem**:
+
+1. pymdp の状態空間設計が Hegemonikón 概念と合わない → 対策: 抽象化層で吸収
+2. 性能がワークフロー統合に不十分 → 対策: 非同期処理で分離
+
+---
+
+## Proposed Changes
+
+### mekhane
+
+#### [NEW] [fep/](file:///home/laihuip001/oikos/hegemonikon/mekhane/fep/)
+
+新規ディレクトリ: FEP/Active Inference 実装
+
+#### [NEW] [fep/**init**.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/fep/__init__.py)
+
+モジュール初期化
+
+#### [NEW] [fep/fep_agent.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/fep/fep_agent.py)
+
+pymdp Agent のラッパークラス。以下を実装:
+
+```python
+class HegemonikónFEPAgent:
+    """Active Inference agent for Hegemonikón cognitive processes."""
+    
+    def __init__(self, A, B, C, D=None):
+        """Initialize with POMDP matrices."""
+        
+    def infer_states(self, observation) -> dict:
+        """O1 Noēsis: Update beliefs based on observation."""
+        
+    def infer_policies(self) -> tuple:
+        """O2 Boulēsis: Select policy minimizing expected free energy."""
+        
+    def step(self, observation) -> dict:
+        """Complete inference-action cycle."""
+```
+
+#### [NEW] [fep/state_spaces.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/fep/state_spaces.py)
+
+Stoic-FEP 対応に基づく状態空間定義:
+
+```python
+# State factors
+PHANTASIA_STATES = ["uncertain", "clear"]  # Impression clarity
+ASSENT_STATES = ["withheld", "granted"]    # Belief commitment
+HORME_STATES = ["passive", "active"]       # Action disposition
+
+# Observation modalities
+OBSERVATION_MODALITIES = {
+    "context": ["ambiguous", "clear"],
+    "urgency": ["low", "medium", "high"],
+}
+```
+
+---
+
+### tests
+
+#### [NEW] [tests/test_fep_agent.py](file:///home/laihuip001/oikos/hegemonikon/tests/test_fep_agent.py)
+
+```python
+class TestHegemonikónFEPAgent:
+    def test_init_with_valid_matrices(self):
+        """Agent initializes with valid A, B, C matrices."""
+        
+    def test_infer_states_returns_beliefs(self):
+        """infer_states returns updated belief distribution."""
+        
+    def test_infer_policies_returns_efe(self):
+        """infer_policies returns policy probabilities and EFE values."""
+        
+    def test_step_completes_cycle(self):
+        """step() performs full inference-action cycle."""
+```
+
+---
+
+### Dependencies
+
+#### [MODIFY] [requirements.txt](file:///home/laihuip001/oikos/hegemonikon/requirements.txt)
+
+```diff
++ pymdp>=0.0.7
+```
+
+---
+
+## Verification Plan
+
+### Automated Tests
+
+```bash
+# 1. pymdp インストール確認
+cd /home/laihuip001/oikos/hegemonikon
+source .venv/bin/activate
+pip install pymdp>=0.0.7
+python -c "import pymdp; print(f'pymdp version: {pymdp.__version__}')"
+
+# 2. 単体テスト実行
+pytest tests/test_fep_agent.py -v
+
+# 3. 統合確認（import テスト）
+python -c "from mekhane.fep.fep_agent import HegemonikónFEPAgent; print('Import OK')"
+```
+
+### Manual Verification
+
+なし（自動テストで十分カバー）
+
+---
+
+## リスクと対策
+
+| リスク | 対策 |
+|:-------|:-----|
+| pymdp 互換性問題 | Python 3.11 で確認済み、問題発生時は pinned version |
+| 状態空間設計の見直し | 抽象化層で変更を吸収可能 |
+| ワークフロー統合の複雑化 | Phase 2 で段階的に対応 |
+
+---
+
+*Generated by /plan v3.0 — S-Series 完全統合版*

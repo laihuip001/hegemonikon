@@ -1,0 +1,32 @@
+# Walkthrough: モード Naturalization + Skill連携
+
+## 達成事項
+
+### 1. WF Mode Naturalization ✅
+- **209セクション実装** → frontmatter完全一致 = **100%達成！**
+- 本セッション: +89 派生
+
+### 2. Skill-WF Mode Mapping Phase 1 ✅
+- Top 5 Skills に `## Related Modes` セクション追加完了
+
+| Skill | WF | Modes |
+|:------|:---|------:|
+| a3-gnome | /gno | 23 |
+| p1-khora | /kho | 19 |
+| s3-stathmos | /sta | 17 |
+| a2-krisis | /dia | 17 |
+| s1-metron | /met | 15 |
+
+### 3. 発動テスト ✅
+- `/gno.analogy_cs` — 成功
+- `/kho.a3` — 成功
+- `/sta.rela` — 成功 (問題発見に活用)
+
+---
+
+## 発見した問題と解決
+
+| 問題 | 解決 |
+|:-----|:-----|
+| Skill内にmode CCL言及=0 | Related Modesセクション追加 |
+| WF-Skill断絶 | 双方向リンク確立 |

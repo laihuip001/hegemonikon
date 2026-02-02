@@ -1,0 +1,21 @@
+# Workflow Refactoring (3-Layer Architecture)
+
+## 目標
+3層アーキテクチャ (Skill=正本, Workflow=組み合わせ, KI=索引) に基づきワークフロー群をリファクタリング
+
+## タスク
+
+### Phase 1: 整合性監査
+- [/] Workflow ↔ Skill 参照の一貫性チェック
+- [ ] 重複情報の特定
+- [ ] 欠落参照の特定
+
+### Phase 2: リファクタリング計画
+- [ ] 削除対象の特定 (Workflow 内の重複定義)
+- [ ] 追加対象の特定 (Skill への参照リンク)
+- [ ] 変更方針の決定
+
+### Phase 3: 実装
+- [ ] Workflow ファイルの更新
+- [ ] Skill ファイルの更新 (必要に応じて)
+- [ ] 検証

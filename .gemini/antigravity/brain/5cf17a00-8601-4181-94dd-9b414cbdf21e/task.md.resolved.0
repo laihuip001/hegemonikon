@@ -1,0 +1,39 @@
+# Hermeneus Phase 2 via Synergeia
+
+## 概要
+
+Synergeia 分散実行システムを使って Hermeneus Phase 2 (LMQL ランタイム統合) を実装する。
+
+---
+
+## タスク
+
+### 準備
+- [x] Hermeneus 現状確認（Phase 1 完了、19 tests pass）
+- [x] Synergeia coordinator.py 確認（5スレッド対応済）
+- [ ] LMQL 現状調査 (Perplexity `/sop+`)
+
+### Phase 2: LMQL ランタイム統合
+- [ ] LMQL/Guidance ライブラリ調査
+- [ ] lmql パッケージインストール検証
+- [ ] `runtime.py` 設計・実装
+- [ ] 実行テスト作成
+
+### Synergeia 分散実行
+- [ ] `/noe+ |> /sop+ |> /s+ |> /dia+` パイプライン実行
+- [ ] 結果統合
+
+### 検証
+- [ ] pytest 確認
+- [ ] LMQL 実行確認
+
+---
+
+## 分散実行計画
+
+```ccl
+@thread[antigravity]{ /noe+ "LMQL Runtime Integration" }
+|> @thread[perplexity]{ /sop+ "LMQL 2026 best practices" }
+|> @thread[claude]{ /s+ "implement runtime.py" }
+|> @thread[antigravity]{ /dia+ "review" }
+```

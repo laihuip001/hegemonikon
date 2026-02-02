@@ -1,0 +1,76 @@
+# Tier 5/6 Complete Digestion Plan
+
+## 目的
+
+Tier 5（凹ペア）と Tier 6（残りの特化系）の全モジュールを既存ワークフローに完全消化し、「参照のみ」ステータスを解消する。
+
+## 消化計画
+
+### Tier 5: 凹ペア（外科手術系）
+
+| Module | 消化先 | 消化方法 |
+|:-------|:-------|:---------|
+| C-5 コード外科手術 | /vet v2.1 | 「修正提案」フェーズを追加 |
+| C-7 プロンプト外科手術 | Tekhne-Maker | 既に吸収済み → スキップ |
+
+### Tier 6: 特化系
+
+| Module | 消化先 | 消化方法 |
+|:-------|:-------|:---------|
+| Q-3 オッカムのカミソリ | /a v2.0 | Kill List プロトコルを追加 |
+| E-1 WBSスケジューリング | /plan v2.4 | Step 3 にタスク分解テンプレート追加 |
+| F-1 形態素解析マトリクス | /a に統合 | 用語分解ステップを追加 |
+
+### 既に吸収済み（追加作業不要）
+
+- C-7 プロンプト外科手術 → Tekhne-Maker
+- オッカムのカミソリ → A1 Akribeia（部分吸収）
+- 単純性原理 → A1 Akribeia
+- 多角的ラテラル・シンキング → /syn
+- 成功の解体新書 → L-1 派生（/bye に吸収済み）
+- 未踏の改善点 → C-3 派生（/pan に吸収済み）
+- 外部文脈の結合 → P4 Tekhne
+- コーディング仕様書コンパイル → /manual
+
+## Proposed Changes
+
+### [MODIFY] /vet.md
+
+1. Step 4 後に「C-5 外科的修正提案」フェーズを追加
+2. Anti-Truncation Protocol を明記
+3. lineage 更新: `C-4 + C-5 → /vet v2.1`
+
+---
+
+### [MODIFY] /a.md
+
+1. Q-3 オッカムのカミソリを消化
+   - "The Singularity" 特定
+   - Kill List プロトコル
+   - Complexity Budgeting
+2. F-1 形態素解析を消化
+   - 用語分解ステップ
+3. lineage 更新: `Q-3 + F-1 → /a v2.0`
+
+---
+
+### [MODIFY] /plan.md
+
+1. Step 3 に E-1 WBSスケジューリングを消化
+   - クリティカルパス特定
+   - 依存関係マッピング
+2. lineage 更新: `Y-1 + D-1 + E-1 → /plan v2.4`
+
+## Verification Plan
+
+### Automated Tests
+
+なし（ワークフローファイルの編集のため）
+
+### Manual Verification
+
+1. `/fit` ワークフローで各消化が Naturalized であることを確認
+
+## 新コマンド追加
+
+**0**（全て既存ワークフローに消化）

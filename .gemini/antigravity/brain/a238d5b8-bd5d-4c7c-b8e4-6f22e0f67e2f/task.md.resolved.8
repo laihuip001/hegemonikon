@@ -1,0 +1,27 @@
+# Jules API 統合タスク ✅ 完了
+
+## 設計決定
+
+**Pattern B' 採用**: 4アカウント IP 分散 + スパイク使用
+
+## チェックリスト
+
+- [x] Phase 1: コア実装 - [jules_client.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/symploke/jules_client.py), [jules_mcp_server.py](file:///home/laihuip001/oikos/hegemonikon/mcp/jules_mcp_server.py)
+- [x] Phase 2: 実 API テスト - 接続、セッション作成
+- [x] Phase 3: 並列実行テスト - 5タスク並列 (3/5 完了)
+- [x] Phase 4: MCP Server 統合 - 4ツール動作確認
+- [x] Phase 5: mcp_config.json 登録 - Claude から呼び出し可能
+
+## 利用方法
+
+```bash
+# 環境変数設定
+export JULES_API_KEY="your-key"
+
+# Claude から MCP 呼び出し
+@mcp:jules で create_task「タスク」「repo」
+```
+
+## 残タスク（任意）
+
+- hegemonikon リポジトリを Jules App に追加

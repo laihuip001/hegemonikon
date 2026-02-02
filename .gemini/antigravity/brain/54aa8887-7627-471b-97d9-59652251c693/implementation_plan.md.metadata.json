@@ -1,0 +1,6 @@
+{
+  "artifactType": "ARTIFACT_TYPE_IMPLEMENTATION_PLAN",
+  "summary": "Series構造再設計: 振動(~)から外積(/)/内積(\\)への移行。位相と演算の対応確定。",
+  "updatedAt": "2026-01-31T07:27:13.073360486Z",
+  "version": "2"
+}

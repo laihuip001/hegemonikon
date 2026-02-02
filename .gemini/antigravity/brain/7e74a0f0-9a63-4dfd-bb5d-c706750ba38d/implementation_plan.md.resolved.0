@@ -1,0 +1,217 @@
+# Mekhane 機構群と定理体系の対応関係分析・拡張計画
+
+> **O1 Noēsis 出力**: 定理のマクロ実装であるMekhane層の精査
+
+---
+
+## 1. 現状分析：定理 → Mekhane 対応マトリクス
+
+### 1.1 定理体系サマリー (7公理・24定理・36派生)
+
+| 系列 | 定理数 | 派生数 | 定理 |
+|:-----|:------:|:------:|:-----|
+| **O-series** (本質) | 4 | 12 | Noēsis, Boulēsis, Zētēsis, Energeia |
+| **S-series** (様態) | 4 | 12 | Metron, Mekhanē, Stathmos, Praxis |
+| **H-series** (衝動) | 4 | 12 | Propatheia, Pistis, Orexis, Doxa |
+| **P-series** (環境) | 4 | - | Khōra, Hodos, Trokhia, Tekhnē |
+| **K-series** (文脈) | 4 | - | Eukairia, Chronos, Telos, Sophia |
+| **A-series** (精度) | 4 | - | Pathos, Krisis, Gnōmē, Epistēmē |
+
+### 1.2 Mekhane ディレクトリ構造
+
+```
+hegemonikon/mekhane/
+├── fep/           # 認知推論エンジン (FEP Active Inference)
+├── anamnesis/     # 記憶・永続化層
+├── symploke/      # 意味検索・外部API連携
+├── ergasterion/   # 生成・プロトコル・評議会
+├── exagoge/       # エクスポートライブラリ
+├── peira/         # 実験・スクリプト群
+└── models/        # データモデル
+```
+
+---
+
+## 2. 実装済み機構と定理の対応
+
+### 2.1 ✅ 高密度実装領域
+
+| Mekhane Module | 対応定理 | 実装物 | 成熟度 |
+|:---------------|:---------|:-------|:------:|
+| [fep/fep_agent.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/fep/fep_agent.py) | **O1 Noēsis** (状態推論), **O2 Boulēsis** (政策選択) | HegemonikónFEPAgent 587L | ⭐⭐⭐⭐ |
+| [fep/derivative_selector.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/fep/derivative_selector.py) | **O/S/H 36派生** | 48KB/1307L キーワードパターン+状態空間 | ⭐⭐⭐⭐⭐ |
+| [ergasterion/tekhne/SKILL.md](file:///home/laihuip001/oikos/hegemonikon/mekhane/ergasterion/tekhne/SKILL.md) | **S2 Mekhanē** (方法配置) | tekhne-maker v7.0 34KB | ⭐⭐⭐⭐⭐ |
+| [symploke/jules_client.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/symploke/jules_client.py) | **H3 Symplokē** (連携) | Jules API async client 733L | ⭐⭐⭐⭐ |
+| `ergasterion/synedrion/` | **A2 Krisis** (判定) | 480-perspective matrix | ⭐⭐⭐⭐ |
+| [anamnesis/vault.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/anamnesis/vault.py) | **H4 Doxa** (信念保存) | Atomic persistence | ⭐⭐⭐ |
+| [symploke/sophia_ingest.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/symploke/sophia_ingest.py) | **K4 Sophia** (知恵) | KI埋め込み・検索 | ⭐⭐⭐⭐ |
+
+### 2.2 ⚠️ 中程度実装領域
+
+| Mekhane Module | 対応定理 | 現状 | ギャップ |
+|:---------------|:---------|:-----|:---------|
+| [anamnesis/cli.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/anamnesis/cli.py) | **O3 Zētēsis** | Gnōsis検索/収集 | 仮説生成なし |
+| [symploke/kairos_ingest.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/symploke/kairos_ingest.py) | **K1 Eukairia** | Handoff時系列 | 好機判定ロジックなし |
+| [symploke/handoff_search.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/symploke/handoff_search.py) | **K2 Chronos** | 時系列検索 | 時間制約評価なし |
+| `ergasterion/protocols/` | **P2 Hodos** | 25 Modules | 連携ワークフロー化未完 |
+
+### 2.3 ❌ 未実装/希薄領域
+
+| 定理 | 期待される機能 | 現状 |
+|:-----|:---------------|:-----|
+| **O4 Energeia** (活動) | 6段階実行フレームワーク | ワークフローのみ、Python実装なし |
+| **P1 Khōra** (場) | スコープ定義エンジン | なし |
+| **P3 Trokhia** (軌道) | サイクル/反復管理 | なし |
+| **P4 Tekhnē** (技法) | 技法選択エンジン | 決定ロジックなし |
+| **K1 Eukairia** (好機) | タイミング評価 | なし |
+| **K2 Chronos** (時間) | 時間制約管理 | 部分的 |
+| **K3 Telos** (目的) | 目的整合チェック | なし |
+| **A1 Pathos** | メタ感情評価 | なし |
+| **A3 Gnōmē** | 格言・原則抽出 | なし |
+| **A4 Epistēmē** | 知識確立評価 | なし |
+| **H1 Propatheia** | 前感情フィードバック | derivative_selectorに定義あり、専用モジュールなし |
+| **H2 Pistis** | 確信度評価 | derivative_selectorに定義あり、専用モジュールなし |
+| **H3 Orexis** | 欲求傾向評価 | derivative_selectorに定義あり、専用モジュールなし |
+
+---
+
+## 3. ギャップ分析サマリー
+
+### 3.1 実装密度スコア
+
+| 系列 | Python実装 | 専用モジュール | スコア |
+|:-----|:----------:|:--------------:|:------:|
+| O-series | ⭐⭐⭐⭐ | O1,O2 完成 | 75% |
+| S-series | ⭐⭐⭐⭐⭐ | S2 完成 | 85% |
+| H-series | ⭐⭐⭐ | 派生定義あり | 60% |
+| P-series | ⭐ | なし | 15% |
+| K-series | ⭐⭐⭐ | K4 完成 | 50% |
+| A-series | ⭐⭐ | A2 完成 | 35% |
+
+### 3.2 主要ギャップ
+
+1. **P-series 機構層の欠落**: スコープ・経路・軌道・技法の Python 実装がない
+2. **Energeia (O4) 実行エンジン**: 6段階実行を制御する Python モジュールがない
+3. **時間文脈層 (K1-K3)**: タイミング・時間・目的を評価するロジックがない
+4. **精度層 (A1, A3, A4)**: メタ感情・格言・知識確立の自動化がない
+
+---
+
+## 4. 提案：不足 Mekhane 機構の実装計画
+
+> [!IMPORTANT]
+> 優先度は「使用頻度 × 認知的影響度 × 実装難易度の逆数」で決定
+
+### Phase A: 高優先度 (使用頻度高)
+
+| 新規モジュール | 対応定理 | 内容 | 工数目安 |
+|:---------------|:---------|:-----|:--------:|
+| `fep/energeia_executor.py` | **O4 Energeia** | 6段階 (Initiate→Plan→Execute→Monitor→Adjust→Complete) 実行エンジン | 2時間 |
+| `fep/telos_checker.py` | **K3 Telos** | 目的-手段入れ替わり検出、軌道修正提案 | 1時間 |
+
+### Phase B: 中優先度 (認知的影響大)
+
+| 新規モジュール | 対応定理 | 内容 | 工数目安 |
+|:---------------|:---------|:-----|:--------:|
+| `fep/chronos_evaluator.py` | **K2 Chronos** | 時間制約評価、デッドライン接近アラート | 1.5時間 |
+| `fep/eukairia_detector.py` | **K1 Eukairia** | 好機判定（環境条件 × 準備度 × 緊急度） | 1.5時間 |
+| `fep/horme_evaluator.py` | **H1-H3** 統合 | Propatheia/Pistis/Orexis を1モジュールで | 2時間 |
+
+### Phase C: 低優先度 (将来拡張)
+
+| 新規モジュール | 対応定理 | 内容 | 工数目安 |
+|:---------------|:---------|:-----|:--------:|
+| `fep/perigraphe_engine.py` | **P1-P4** | Khōra/Hodos/Trokhia/Tekhnē 統合環境定義 | 3時間 |
+| `fep/akribeia_evaluator.py` | **A1, A3, A4** | Pathos/Gnōmē/Epistēmē 精度評価 | 2時間 |
+
+---
+
+## 5. 実装アーキテクチャ
+
+### 5.1 推奨ディレクトリ
+
+```
+hegemonikon/mekhane/fep/
+├── fep_agent.py              # 既存 (O1, O2)
+├── derivative_selector.py    # 既存 (36派生)
+├── energeia_executor.py      # 新規: O4 実行エンジン
+├── telos_checker.py          # 新規: K3 目的整合
+├── chronos_evaluator.py      # 新規: K2 時間制約
+├── eukairia_detector.py      # 新規: K1 好機判定
+├── horme_evaluator.py        # 新規: H1-H3 衝動評価
+├── perigraphe_engine.py      # 新規: P1-P4 環境定義
+└── akribeia_evaluator.py     # 新規: A1,A3,A4 精度評価
+```
+
+### 5.2 設計原則
+
+1. **FEP 統合**: 各新規モジュールは [HegemonikónFEPAgent](file:///home/laihuip001/oikos/hegemonikon/mekhane/fep/fep_agent.py#38-586) と連携可能
+2. **スタンドアロン可能**: FEP なしでも単体利用可能
+3. **派生対応**: [derivative_selector.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/fep/derivative_selector.py) の状態空間と連携
+4. **永続化対応**: [anamnesis/vault.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/anamnesis/vault.py) 経由でセッション間記憶
+
+---
+
+## 6. 検証計画
+
+### 6.1 既存テスト
+
+```bash
+# FEP モジュールテスト
+pytest hegemonikon/mekhane/fep/tests/ -v
+
+# Symploke テスト
+pytest hegemonikon/mekhane/symploke/tests/ -v
+
+# Anamnesis テスト
+pytest hegemonikon/mekhane/anamnesis/tests/ -v
+```
+
+### 6.2 新規実装の検証
+
+各モジュール実装後:
+1. **ユニットテスト**: `tests/test_{module}.py` 追加
+2. **統合テスト**: 既存ワークフローとの連携確認
+3. **REPL検証**: Python インタラクティブで動作確認
+
+---
+
+## 7. 決定事項 (Creator Review Required)
+
+> [!WARNING]
+> 以下は私の提案です。実装前に確認をお願いします。
+
+1. **Phase A から開始してよいか？** (O4 Energeia → K3 Telos)
+2. **P-series は Phase C で遅延でよいか？** (使用頻度が低いと判断)
+3. **H1-H3 を1モジュールに統合するか、分離するか？**
+4. **既存の [derivative_selector.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/fep/derivative_selector.py) に機能を追加するか、独立モジュールを作るか？**
+
+---
+
+## 8. System Status (Boot Complete)
+
+```
+🚀 HEGEMONIKON BOOT COMPLETE v3.0
+
+┌─ Phase サマリー ─────────────────────────────────────┐
+│ 1. 正本読込     ✅ boot.md v3.0 読込完了             │
+│ 2. セッション状態 ✅ Handoff 2026-01-29_0901 読込     │
+│ 3. 知識読込     ✅ Sophia 77件 / KI参照済            │
+│ 4. システム更新  ✅ 55 SKILLs / 46 workflows         │
+│ 5. 外部入力     📥 Perplexity 0件 / 🔍 Jules N/A    │
+│ 6. 完了        🚀 Ready                              │
+└───────────────────────────────────────────────────────┘
+
+📋 前回 Handoff: X-series リファクタ完了
+  • 連結WF全廃止 → 単体WF統合方式
+  • 36関係完全マトリクス実装済み
+  • `/noe.md` v3.1 に X-series 参照追加
+
+🎯 本セッション目的:
+  • Mekhane 機構と定理の対応精査
+  • 不足機構の実装計画策定
+```
+
+---
+
+*Generated by Hegemonikón O1 Noēsis — 2026-01-29*

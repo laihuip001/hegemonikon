@@ -1,0 +1,184 @@
+# Active Projects System 実装計画
+
+> **目的**: 名前付きプロジェクトの可視化と進捗管理
+> **CCL**: `/boot` 拡張 + プロジェクト登録制度
+
+---
+
+## 背景
+
+「埋もれる」問題 — プロジェクトが `mekhane/` 深層に配置されると認知的に忘れられる。
+解決策: 物理配置に依存せず、`/boot` で全プロジェクトを可視化する。
+
+---
+
+## Proposed Changes
+
+### 1. プロジェクト登録ファイル
+
+#### [NEW] [projects.yaml](file:///home/laihuip001/oikos/hegemonikon/projects.yaml)
+
+```yaml
+# Hegemonikón Named Projects Registry
+# 名前付きプロジェクトの一元管理
+
+projects:
+  dendron:
+    name: "Dendron"
+    description: "存在証明検証ツール"
+    path: "mekhane/dendron/"
+    status: "mvp_complete"  # planning | active | mvp_complete | stable
+    phase: "CI統合"
+    priority: high
+    
+  hermeneus:
+    name: "Hermēneus"
+    description: "CCL→LMQL コンパイラ"
+    path: "hermeneus/"
+    status: "active"
+    phase: "Phase 3: LangGraph"
+    priority: high
+    
+  synteleia:
+    name: "Synteleia"
+    description: "6視点認知アンサンブル"
+    path: "mekhane/synteleia/"
+    status: "planning"
+    phase: "設計中"
+    priority: medium
+    
+  pythosis:
+    name: "Pythōsis"
+    description: "Python哲学消化"
+    path: "pythosis/"
+    status: "active"
+    phase: "Phase 2"
+    priority: low
+    
+  synergeia:
+    name: "Synergeia"
+    description: "分散AI実行基盤"
+    path: "synergeia/"
+    status: "stable"
+    phase: "運用中"
+    priority: medium
+```
+
+---
+
+### 2. プロジェクト標準構造
+
+#### 各プロジェクトに必須のファイル
+
+```
+<project>/
+├── README.md           # 概要
+├── PROOF.md            # 存在証明
+├── PROJECT.md          # ← 🆕 プロジェクト状態 (machine-readable)
+└── ...
+```
+
+#### [NEW] PROJECT.md テンプレート
+
+```markdown
+---
+name: "Dendron"
+status: mvp_complete
+phase: "CI統合"
+updated: 2026-02-01
+next_action: "GitHub Actions 動作確認"
+---
+
+# Dendron Project Status
+
+## Current Phase
+CI統合 — pre-commit と GitHub Actions に統合済み
+
+## Next Steps
+1. `git push` でリモート反映
+2. PR での動作確認
+
+## Milestones
+- [x] MVP 実装
+- [x] CLI パッケージ化
+- [x] CI 統合
+- [ ] 外部リポジトリ対応
+```
+
+---
+
+### 3. /boot への統合
+
+#### [MODIFY] [boot.md](file:///home/laihuip001/oikos/.agent/workflows/boot.md)
+
+Step 17.5 を追加:
+
+```markdown
+#### 17.5 🚧 Active Projects
+
+`projects.yaml` を読み込み、開発中プロジェクトを表示:
+
+```bash
+python3 -c "
+import yaml
+from pathlib import Path
+
+pf = Path('/home/laihuip001/oikos/hegemonikon/projects.yaml')
+if pf.exists():
+    projects = yaml.safe_load(pf.read_text())['projects']
+    active = [(k,v) for k,v in projects.items() if v['status'] != 'stable']
+    print('🚧 開発中プロジェクト:')
+    for k, p in sorted(active, key=lambda x: {'high':0,'medium':1,'low':2}[x[1]['priority']]):
+        status_icon = {'planning':'📋','active':'🔨','mvp_complete':'✅'}[p['status']]
+        print(f\"  {status_icon} {p['name']} [{p['phase']}] — {p['description']}\")
+"
+```
+
+**出力例**:
+
+```text
+🚧 開発中プロジェクト:
+  ✅ Dendron [CI統合] — 存在証明検証ツール
+  🔨 Hermēneus [Phase 3: LangGraph] — CCL→LMQL コンパイラ
+  📋 Synteleia [設計中] — 6視点認知アンサンブル
+  🔨 Pythōsis [Phase 2] — Python哲学消化
+
+→ 続きを行うプロジェクトを選択してください
+```
+
+---
+
+## Verification Plan
+
+### 自動テスト
+
+```bash
+# projects.yaml の構文チェック
+python3 -c "import yaml; yaml.safe_load(open('projects.yaml'))"
+```
+
+### 手動検証
+
+1. `/boot+` を実行して Active Projects が表示されることを確認
+2. 各プロジェクトのパスが実在することを確認
+
+---
+
+## Implementation Order
+
+| 順序 | 作業 | ファイル |
+|------|------|----------|
+| 1 | projects.yaml 作成 | `hegemonikon/projects.yaml` |
+| 2 | /boot に Step 17.5 追加 | `.agent/workflows/boot.md` |
+| 3 | 各プロジェクトに PROJECT.md 追加 | 5ファイル |
+
+---
+
+## User Review Required
+
+> [!IMPORTANT]
+> **ディレクトリ移動について**
+> 
+> この計画では物理的なディレクトリ移動は行いません。
+> `projects.yaml` による登録制で「認知的可視性」を確保します。
+> 将来的に `projects/` ディレクトリへの統合が必要な場合は別途計画します。

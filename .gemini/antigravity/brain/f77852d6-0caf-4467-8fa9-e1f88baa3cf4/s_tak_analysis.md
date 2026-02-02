@@ -1,0 +1,175 @@
+# /s+*/tak+ 統合分析: SEL 強化残タスク
+
+> **Origin**: 2026-02-01 SEL 完了後
+> **Scale**: Macro → 全体システム設計レベル
+
+---
+
+## /s+ Schema 分析 (様態 × 詳細)
+
+### S1 Metron — スケール
+
+| 領域 | スケール | 備考 |
+|:-----|:---------|:-----|
+| SEL v1.0 | Micro | WF frontmatter level |
+| Grammar-Constrained | Meso | API response level |
+| Activation Steering | Macro | Model inference level |
+| 動機設計 (H3) | Micro | Prompt/context level |
+
+### S2 Mekhanē — 方法配置
+
+```mermaid
+graph TD
+    subgraph "Phase 1: 記号→言語 (完了)"
+        A[SEL v1.0] -->|85-90%| B[WF frontmatter]
+    end
+    
+    subgraph "Phase 2: 構造強制"
+        C[Pydantic Schema] -->|+5%| D[API response_schema]
+        E[/vet SEL Check] -->|+1%| F[事後検証]
+    end
+    
+    subgraph "Phase 3: 推論操作"
+        G[Activation Steering] -.->|研究のみ| H[OSS LLM]
+    end
+    
+    subgraph "Phase 4: 動機設計"
+        I[H3 Orexis] -->|価値傾向| J[Reasoning Protocol]
+    end
+```
+
+### S3 Stathmos — 評価基準
+
+| 基準 | Must | Should | Could |
+|:-----|:-----|:-------|:------|
+| **遵守率** | 90%+ | 95%+ | 98%+ |
+| **実装可能性** | API 対応 | OSS 可 | 研究段階 |
+| **メンテナンス性** | 低コスト | 中コスト | 高コスト |
+
+### S4 Praxis — 実践配置
+
+**推奨実行順序**:
+
+1. Grammar-Constrained Decoding (Phase 2a)
+2. /vet SEL Check (Phase 2b)
+3. 動機設計 H3 (Phase 4)
+4. Activation Steering (調査のみ)
+
+---
+
+## /* メタ分析 — なぜこの配置か
+
+### 根拠
+
+1. **費用対効果**: API 対応技術を優先 (Grammar-Constrained)
+2. **既存資産活用**: /vet ワークフロー拡張で低コスト
+3. **リスク管理**: Activation Steering は研究フェーズで保留
+4. **哲学的整合**: H3 Orexis による「なぜ従うか」の動機設計
+
+---
+
+## /tak+ タスク整理 (詳細)
+
+### PHASE 1: INTAKE
+
+**入力タスク**:
+
+1. Activation Steering 実験
+2. Grammar-Constrained Decoding (CCL Parser Phase 4)
+3. 動機設計 (H3) — /boot 理由付けプロトコル
+4. Multi-Agent Verification (/vet 強化)
+
+### PHASE 2: CLASSIFY (Eisenhower Matrix)
+
+| タスク | 緊急度 | 重要度 | 分類 |
+|:-------|:-------|:-------|:-----|
+| Grammar-Constrained | 🔴 高 | 🔴 高 | **Must/今週** |
+| /vet SEL Check | 🟠 中 | 🔴 高 | **Should/3日** |
+| H3 動機設計 | 🟡 低 | 🟠 中 | **Could/3週間** |
+| Activation Steering | 🟢 低 | 🟡 低 | **調査/2ヶ月** |
+
+### PHASE 3: STRUCTURE
+
+```
+📁 SEL Enhancement Project
+├── 📂 Phase 2: 構造強制
+│   ├── 2a. schema_validator.py (Pydantic)
+│   ├── 2b. Synergeia response_schema 統合
+│   └── 2c. /vet SEL Check 統合
+├── 📂 Phase 3: 推論操作 (調査)
+│   └── 3a. llm_steer 調査 (OSS)
+└── 📂 Phase 4: 動機設計
+    └── 4a. H3 Orexis reasoning protocol
+```
+
+### PHASE 4: DEPEND
+
+```mermaid
+graph LR
+    A[2a. schema_validator] --> B[2b. response_schema]
+    B --> C[2c. /vet SEL Check]
+    C --> D[4a. H3 Reasoning]
+    E[3a. llm_steer] -.-> F[将来統合]
+```
+
+### PHASE 5: GAP — 不足情報
+
+| Gap | 種類 | 解決方法 |
+|:----|:-----|:---------|
+| Gemini response_schema 仕様 | TECHNICAL | API ドキュメント確認 |
+| Claude tool_use 形式 | TECHNICAL | Anthropic ドキュメント確認 |
+| H3 reasoning prompt 設計 | SCOPE | /ore+ で価値傾向分析 |
+
+### PHASE 6: ESTIMATE
+
+| タスク | 工数 | 見積根拠 |
+|:-------|:-----|:---------|
+| 2a. schema_validator | **S** | Pydantic 既知、1h |
+| 2b. response_schema | **M** | API 調査込み、3h |
+| 2c. /vet SEL Check | **S** | WF 編集のみ、1h |
+| 3a. llm_steer 調査 | **L** | OSS 環境構築込み、8h |
+| 4a. H3 Reasoning | **M** | 設計＋実装、4h |
+
+### PHASE 7: SCHEDULE
+
+| 期限バケット | タスク |
+|:-------------|:-------|
+| 🔴 TODAY | - |
+| 🟠 3DAYS | 2a, 2b, 2c |
+| 🟡 WEEK | - |
+| 🟢 3WEEKS | 4a. H3 Reasoning |
+| 🔵 2MONTHS | 3a. llm_steer 調査 |
+
+### PHASE 8: OUTPUT — Must/Should 提示
+
+#### 🔴 Must (3日以内)
+
+| # | タスク | 工数 | 依存 |
+|:--|:-------|:-----|:-----|
+| 1 | `schema_validator.py` 作成 | S | - |
+| 2 | Synergeia `response_schema` 統合 | M | #1 |
+| 3 | `/vet` に SEL Check 統合 | S | #2 |
+
+#### 🟠 Should (3週間以内)
+
+| # | タスク | 工数 | 依存 |
+|:--|:-------|:-----|:-----|
+| 4 | H3 Orexis reasoning protocol | M | #3 |
+
+#### 🟡 Could (2ヶ月以内)
+
+| # | タスク | 工数 | 依存 |
+|:--|:-------|:-----|:-----|
+| 5 | `llm_steer` 調査 (OSS LLM) | L | - |
+
+---
+
+## 結論
+
+**SEL v1.0 は Phase 1 完了。Phase 2 (構造強制) が次の最優先。**
+
+推奨次ステップ: `/ene` で Phase 2a (schema_validator.py) 着手。
+
+---
+
+*Created: 2026-02-01T11:50*

@@ -1,0 +1,41 @@
+# Jules API 統合タスク
+
+## 設計決定
+
+**Pattern B' 採用**: 4アカウント IP 分散 + スパイク使用
+
+## チェックリスト
+
+### 1. 調査（✅ 完了）
+- [x] Jules API 仕様確認
+- [x] ファミリープラン ToS 調査
+- [x] Pattern B' 採用決定
+
+### 2. 詳細設計（✅ 完了）
+- [x] アーキテクチャ図作成
+- [x] 実装計画策定
+
+### 3. Phase 1: コア実装（✅ 完了）
+- [x] [jules_client.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/symploke/jules_client.py) 作成
+- [x] [jules_mcp_server.py](file:///home/laihuip001/oikos/hegemonikon/mcp/jules_mcp_server.py) 作成
+- [x] [tools.yaml](file:///home/laihuip001/oikos/.agent/tools.yaml) 更新
+- [x] venv 環境構築
+- [x] ユニットテスト（7/7 passing + 1 skipped）
+
+### 4. Phase 2: 統合テスト（次のステップ）
+- [ ] API キー設定
+- [ ] 単一タスクテスト（実 API）
+- [ ] MCP Server 動作確認
+
+## 環境情報
+
+```bash
+# venv 有効化
+source /home/laihuip001/oikos/hegemonikon/.venv/bin/activate
+
+# API キー設定
+export JULES_API_KEY="your-key-here"
+
+# テスト実行
+python -m pytest mekhane/symploke/tests/test_jules_client.py -v
+```

@@ -1,0 +1,6 @@
+{
+  "artifactType": "ARTIFACT_TYPE_IMPLEMENTATION_PLAN",
+  "summary": "FEP Persistence & Auto-Epochē 実装計画 v2。/noe で発見した Dirichlet 更新タイミング問題を解決。run_fep_with_learning() ヘルパー関数を追加し、load → step → update → save の一連のフローを実現。",
+  "updatedAt": "2026-01-28T11:46:09.079615166Z",
+  "version": "3"
+}

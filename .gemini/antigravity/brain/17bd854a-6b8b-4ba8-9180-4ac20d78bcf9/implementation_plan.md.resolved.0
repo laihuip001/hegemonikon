@@ -1,0 +1,89 @@
+# CCL 意味的検証モジュール設計案
+
+> **懸念3 対応**: 形式的正しさ → 意味的妥当性への拡張
+
+---
+
+## 現状 (v2.0)
+
+| レイヤー | 検証内容 |
+|:---------|:---------|
+| [syntax_validator.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/ccl/syntax_validator.py) | ブレースバランス、WF 存在、演算子規則 |
+
+## 提案 (v2.1)
+
+| レイヤー | 検証内容 | 手法 |
+|:---------|:---------|:-----|
+| Layer 1: 構文 | 上記 | Regex |
+| **Layer 2: 意味** | 意図-CCL 整合性 | **LLM** |
+
+---
+
+## 実装案: `semantic_validator.py`
+
+```python
+class CCLSemanticValidator:
+    """LLM-based semantic validation for CCL expressions."""
+    
+    def validate(self, intent: str, ccl: str) -> SemanticResult:
+        """
+        Validate semantic alignment between intent and CCL.
+        
+        Returns:
+            SemanticResult with:
+                - aligned: bool (意味的に一致しているか)
+                - confidence: float (確信度 0.0-1.0)
+                - reasoning: str (判断理由)
+                - suggestions: List[str] (改善案)
+        """
+```
+
+---
+
+## LLM プロンプト設計
+
+```markdown
+## Task
+あなたは CCL (Cognitive Control Language) の意味的検証器です。
+
+## Input
+- **Intent**: {intent}
+- **CCL Expression**: {ccl}
+
+## Output (JSON)
+{
+  "aligned": true/false,
+  "confidence": 0.0-1.0,
+  "reasoning": "判断理由",
+  "suggestions": ["改善案1", "改善案2"]
+}
+
+## CCL 知識
+- `/bou`: 意志・目的の明確化
+- `/noe+`: 深い認識・分析
+- `/s_/ene`: 設計→実行のシーケンス
+...
+```
+
+---
+
+## 統合計画
+
+1. ✅ [llm_parser.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/ccl/llm_parser.py) の API キー問題を解決（懸念1で完了）
+2. 🔨 `semantic_validator.py` を新規作成
+3. 🔗 [generator.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/ccl/generator.py) の後処理として統合
+4. 📊 検証結果を Doxa に記録し、学習データ化
+
+---
+
+## 実装コスト
+
+| 項目 | 見積もり |
+|:-----|:---------|
+| 開発時間 | 2-3 時間 |
+| API コスト | 低（検証時のみ呼び出し） |
+| 依存関係 | [llm_parser.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/ccl/llm_parser.py) と共通 |
+
+---
+
+*Decision required: この設計案で進めますか？*

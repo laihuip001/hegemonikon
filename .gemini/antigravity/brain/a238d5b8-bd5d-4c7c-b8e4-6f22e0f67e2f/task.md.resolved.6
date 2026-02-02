@@ -1,0 +1,48 @@
+# Jules API 統合タスク
+
+## 設計決定
+
+**Pattern B' 採用**: 4アカウント IP 分散 + スパイク使用
+
+## チェックリスト
+
+### 1. 調査（✅ 完了）
+- [x] Jules API 仕様確認
+- [x] ファミリープラン ToS 調査
+- [x] Pattern B' 採用決定
+
+### 2. 詳細設計（✅ 完了）
+- [x] アーキテクチャ図作成
+- [x] 実装計画策定
+
+### 3. Phase 1: コア実装（✅ 完了）
+- [x] [jules_client.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/symploke/jules_client.py) 作成
+- [x] [jules_mcp_server.py](file:///home/laihuip001/oikos/hegemonikon/mcp/jules_mcp_server.py) 作成
+- [x] [tools.yaml](file:///home/laihuip001/oikos/.agent/tools.yaml) 更新
+- [x] venv 環境構築
+- [x] ユニットテスト（7/7 passing）
+
+### 4. Phase 2: 実 API テスト（✅ 完了）
+- [x] API キー設定
+- [x] 接続テスト（7リポジトリ発見）
+- [x] セッション作成テスト
+
+### 5. Phase 3: 並列実行テスト（✅ 完了）
+- [x] 5タスク並列実行
+  - 完了: 3/5
+  - タイムアウト: 2/5
+  - 時間: 311.9秒
+
+### 6. Phase 4: MCP Server 統合（進行中）
+- [/] MCP Server テスト
+- [ ] Claude からの呼び出し確認
+
+## 並列実行結果
+
+| Task | Status | ID |
+|------|--------|-------|
+| 1 | ✅ COMPLETED | 10287138985978924050 |
+| 2 | ✅ COMPLETED | 15713842654106551954 |
+| 3 | ❌ TIMEOUT | 11710873359711859617 |
+| 4 | ❌ TIMEOUT | 8890922861574998123 |
+| 5 | ✅ COMPLETED | 447030549268343015 |

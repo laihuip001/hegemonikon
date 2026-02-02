@@ -1,0 +1,52 @@
+# Walkthrough: tekhne-maker 統合 + 定時実行ワークフロー
+
+## 実装完了
+
+### Phase 1: プロンプトテンプレート
+
+#### [specialist_prompts.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/symploke/specialist_prompts.py)
+
+tekhne-maker v5.0 アーキタイプ駆動設計に基づくプロンプト生成:
+
+| アーキタイプ | 用途 |
+|-------------|------|
+| 🎯 Precision | 認知負荷、AI固有リスク、非同期 |
+| 🎨 Creative | 理論整合性 |
+
+---
+
+### Phase 2: バッチ実行スクリプト
+
+#### [run_specialists.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/symploke/run_specialists.py)
+
+```bash
+# ドライラン
+python run_specialists.py --dry-run --category cognitive_load
+
+# 実行
+python run_specialists.py --category all --target mekhane/symploke/jules_client.py
+```
+
+---
+
+### Phase 3: GitHub Actions
+
+#### [jules-scheduled-tasks.yml](file:///home/laihuip001/oikos/hegemonikon/.github/workflows/jules-scheduled-tasks.yml)
+
+| トリガー | スケジュール |
+|----------|------------|
+| 自動実行 | 毎週月曜 09:00 JST |
+| 手動実行 | workflow_dispatch |
+
+---
+
+## ユーザーアクション
+
+GitHub Secrets に以下を追加:
+- `JULIUS_API_KEY_7`
+- `JULIUS_API_KEY_8`
+- `JULIUS_API_KEY_9`
+
+---
+
+*完了日: 2026-01-28*

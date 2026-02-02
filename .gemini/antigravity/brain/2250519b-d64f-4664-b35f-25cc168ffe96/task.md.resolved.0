@@ -1,0 +1,29 @@
+# Task: Digestor Module Design
+
+## 目標
+Gnosis (論文収集) → `/eat` (消化) の自動連携インフラを Mekhanē 機構として設計する
+
+## チェックリスト
+
+### STAGE 0: Prior Art + Blindspot + Scale
+- [ ] 既存の類似実装を確認 (Gnosis, Synedrion)
+- [ ] 盲点チェック (Framing, Scope, Dependencies)
+- [ ] スケール決定 (Micro/Meso/Macro)
+
+### STAGE 1: Strategy Selection
+- [ ] Explore vs Exploit 判定
+- [ ] 3プラン提示 (A/B/C)
+- [ ] Y-1 / D-1 時間軸評価
+
+### STAGE 2: Success Criteria
+- [ ] Must / Should / Could 定義
+
+### STAGE 3: Blueprint
+- [ ] 目標分解
+- [ ] 実装計画作成
+
+### STAGE 4: Devil's Advocate
+- [ ] 敵対的レビュー
+
+## 現在の状態
+- [/] STAGE 0 開始

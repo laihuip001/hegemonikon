@@ -1,0 +1,204 @@
+# CCL/mek+ ゼロトラスト・リポジトリ刷新計画 v2
+
+> **S2 Mekhanē** × **A2 Krisis** (容赦ない批評モード)
+> **姿勢**: まず否定から入る。存在理由を証明せよ。
+> **粒度**: 文/単語レベルまで分解
+
+---
+
+## 🔴 現状診断（ゼロトラスト査定）
+
+### ルートレベル（9ファイル）
+
+| ファイル | サイズ | 判定 | 理由 |
+|:---------|:-------|:----:|:-----|
+| [README.md](file:///home/laihuip001/oikos/hegemonikon/README.md) | 81行 | ⚠️ 要刷新 | 「30秒で理解」を謳うが冗長 |
+| [AGENTS.md](file:///home/laihuip001/oikos/hegemonikon/AGENTS.md) | 183行 | ⚠️ 要圧縮 | 6ペルソナ情報が肥大化 |
+| [INDEX.md](file:///home/laihuip001/oikos/hegemonikon/INDEX.md) | 298行 | 🔴 要移動 | ルートに置く必要なし |
+| [CHANGELOG.md](file:///home/laihuip001/oikos/hegemonikon/CHANGELOG.md) | 64行 | 🟡 要判断 | Keep Changelog形式だが過少 |
+| [LICENSE](file:///home/laihuip001/oikos/hegemonikon/LICENSE) | 22行 | ✅ 維持 | 法的必須 |
+| [requirements.txt](file:///home/laihuip001/oikos/hegemonikon/requirements.txt) | 15行 | ✅ 維持 | 技術的必須 |
+| [.gitignore](file:///home/laihuip001/oikos/hegemonikon/.gitignore) | 12行 | ✅ 維持 | 技術的必須 |
+| [.env.jules](file:///home/laihuip001/oikos/hegemonikon/.env.jules) | 30行 | ⚠️ 要確認 | 環境変数。.gitignoreに入れるべき |
+| [llms.txt](file:///home/laihuip001/oikos/hegemonikon/llms.txt) | 1.1KB | 🔴 削除候補 | 用途不明 |
+
+### docs/（227件）— 情報の墓場
+
+| サブディレクトリ | 件数 | 判定 | 理由 |
+|:-----------------|:-----|:----:|:-----|
+| `archive/` | 70件 | 🔴 削除 | アーカイブは git 履歴の仕事 |
+| `research/` | 104件 | ⚠️ トリアージ | 半数以上は死んでいる |
+| `research/archived/` | 49件 | 🔴 削除 | アーカイブの二重構造 |
+| `handoff/` | 12件 | 🟡 維持 | セッション継続に必要 |
+| `jules-personas/` | 6件 | 🟡 維持 | AGENTS.mdの詳細 |
+
+### mekhane/（466件）— 肥大化
+
+| ファイル | 行数 | 判定 | 理由 |
+|:---------|:-----|:----:|:-----|
+| [fep/derivative_selector.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/fep/derivative_selector.py) | 2639行 | 🔴 分割必須 | 単一責任違反。上限は300行 |
+| `ergasterion/prompt-lang/prompt_lang.py` | 1290行 | ⚠️ 要検討 | DSL実装なので許容範囲か |
+| `symploke/jules_client.py` | 732行 | ⚠️ 要検討 | APIクライアント |
+| `__pycache__` | 2396ディレクトリ | 🔴 gitignore確認 | .gitignoreに入っているか確認 |
+
+### kernel/（14ファイル）— 神聖領域
+
+| ファイル | 行数 | 判定 | 理由 |
+|:---------|:-----|:----:|:-----|
+| [naming_conventions.md](file:///home/laihuip001/oikos/hegemonikon/kernel/naming_conventions.md) | 266行 | 🟡 要確認 | 長いが reference なら許容 |
+| [SACRED_TRUTH.md](file:///home/laihuip001/oikos/hegemonikon/kernel/SACRED_TRUTH.md) | 119行 | ✅ 不可侵 | 絶対に変更しない |
+| `constitution/` | 12件 | ⚠️ 要統合 | 8件の小ファイルは統合可能 |
+
+---
+
+## 📝 文/単語レベル批評
+
+### README.md 批評
+
+| 行 | 内容 | 判定 | 批評 |
+|:---|:-----|:----:|:-----|
+| 3 | `> **認知の統率中枢** — FEP + Stoic Philosophy に基づく認知フレームワーク` | ⚠️ | 「FEP」「Stoic Philosophy」は初見で意味不明。削除または脚注 |
+| 7 | `## 30秒で理解する` | ⚠️ | 嘘。30秒では理解できない。「概要」に改名 |
+| 9 | `**Hegemonikón は「考える」を構造化したシステムです。**` | ⚠️ | 曖昧。「AIの認知プロセスを制御するフレームワーク」に修正 |
+| 11-13 | 箇条書き3項目 | ✅ | 簡潔で良い |
+| 15 | `合計 **60要素** が、認知プロセスを体系化します。` | ⚠️ | 「体系化」は動詞として弱い。「定義する」に |
+| 21-27 | ディレクトリ構造 | 🔴 | `.agent/` の説明が「制御層」→ 意味不明。削除 |
+| 29-33 | 層の表 | ⚠️ | 「Agent」の説明が冗長。`/boot, /bye, /noe, /bou 等` は不要 |
+| 39-46 | 定理群表 | 🔴 | 「本質的問い」列は不要。役割だけで十分 |
+| 52-58 | 始め方 | 🔴 | `python -m venv .venv` は常識。書く必要なし |
+| 62-67 | 詳細リンク | ⚠️ | 4項目は多い。2項目に |
+| 71-76 | 設計思想 | 🔴 | 自己満足。削除候補 |
+| 80 | バージョン | ✅ | 必要 |
+
+### AGENTS.md 批評
+
+| 行 | 判定 | 批評 |
+|:---|:----:|:-----|
+| 1 | ⚠️ | `v3.0 (6ペルソナ対応)` — バージョン情報は CHANGELOG へ |
+| 34-77 | ⚠️ | 6ペルソナ定義が冗長。表1つにまとめられる |
+| 103-118 | 🔴 | ビルドコマンドは README と重複 |
+| 122-135 | 🔴 | コーディング規約は別ファイルへ |
+| 138-148 | 🔴 | Scheduled Tasks は実行されていない。削除 |
+| 151-157 | ⚠️ | 禁止事項は重要だが、多すぎる。3項目に |
+
+### INDEX.md 批評
+
+| 判定 | 批評 |
+|:----:|:-----|
+| 🔴 | 298行はルートに置くべきではない |
+| 🔴 | README/AGENTS と情報が重複 |
+| 🟡 | `docs/reference/` に移動すべき |
+
+---
+
+## 🎯 具体的変更提案
+
+### Phase 1: 即時削除
+
+| 対象 | アクション | 推定削減 |
+|:-----|:-----------|:---------|
+| [llms.txt](file:///home/laihuip001/oikos/hegemonikon/llms.txt) | **削除** | 1.1KB |
+| `docs/archive/` (70件) | **削除** | 468KB |
+| `docs/research/archived/` (49件) | **削除** | 不明 |
+| [docs/perplexity_specialist_research.md](file:///home/laihuip001/oikos/hegemonikon/docs/perplexity_specialist_research.md) (105KB) | **移動 → archive → 削除** | 105KB |
+
+### Phase 2: 構造変更
+
+| 対象 | アクション | 理由 |
+|:-----|:-----------|:-----|
+| [INDEX.md](file:///home/laihuip001/oikos/hegemonikon/INDEX.md) | **移動** → `docs/reference/INDEX.md` | ルート清浄化 |
+| [CHANGELOG.md](file:///home/laihuip001/oikos/hegemonikon/CHANGELOG.md) | **維持** | 標準 |
+| [.env.jules](file:///home/laihuip001/oikos/hegemonikon/.env.jules) | **.gitignore追加確認** | セキュリティ |
+
+### Phase 3: README 書き換え
+
+```markdown
+# Hegemonikón
+
+> AIの認知プロセスを制御するフレームワーク
+
+## 構造
+
+| 要素 | 数 |
+|------|---:|
+| 公理 | 7 |
+| 定理 | 24 |
+| 関係 | 36 |
+
+## ディレクトリ
+
+| パス | 内容 |
+|------|------|
+| `kernel/` | 公理・定理 |
+| `mekhane/` | Python実装 |
+| `docs/` | ドキュメント |
+
+## 詳細
+
+- [AGENTS.md](AGENTS.md) — AI向け
+- [docs/](docs/) — 詳細
+
+*v3.2*
+```
+
+**削減**: 81行 → 25行 (69%削減)
+
+### Phase 4: AGENTS.md 書き換え
+
+| 変更 | 内容 |
+|:-----|:-----|
+| 6ペルソナ | 表に圧縮（77行 → 15行） |
+| ビルドコマンド | 削除（README参照） |
+| コーディング規約 | `docs/coding_standards.md` へ移動 |
+| Scheduled Tasks | 削除（未使用） |
+
+**削減**: 183行 → 80行 (56%削減)
+
+### Phase 5: derivative_selector.py 分割
+
+| 新ファイル | 責務 | 推定行数 |
+|:-----------|:-----|:---------|
+| `derivative_selector/base.py` | 共通ロジック | 200行 |
+| `derivative_selector/o_series.py` | O派生選択 | 300行 |
+| `derivative_selector/s_series.py` | S派生選択 | 300行 |
+| `derivative_selector/h_series.py` | H派生選択 | 300行 |
+| `derivative_selector/p_series.py` | P派生選択 | 300行 |
+| `derivative_selector/k_series.py` | K派生選択 | 300行 |
+| `derivative_selector/a_series.py` | A派生選択 | 300行 |
+| `derivative_selector/__init__.py` | エクスポート | 30行 |
+
+**効果**: 2639行 → 8ファイル × 平均250行 = 責務分離
+
+### Phase 6: docs/ トリアージ
+
+| 対象 | 判定基準 | アクション |
+|:-----|:---------|:-----------|
+| 最終更新 > 30日 | 死んでいる | アーカイブ検討 |
+| 参照なし | 孤立 | 削除候補 |
+| 重複内容 | 冗長 | 統合 |
+
+---
+
+## 📊 期待効果
+
+| 指標 | Before | After | 変化 |
+|:-----|:-------|:------|:-----|
+| ルートファイル数 | 9 | 6 | -33% |
+| docs/ ファイル数 | 227 | 100以下 | -56% |
+| README行数 | 81 | 25 | -69% |
+| AGENTS.md行数 | 183 | 80 | -56% |
+| derivative_selector.py | 2639行 | 分割 | 責務分離 |
+
+---
+
+## ⚠️ 承認必要事項
+
+1. **docs/archive/** 70件の削除
+2. **docs/research/archived/** 49件の削除
+3. **README.md** 完全書き換え
+4. **AGENTS.md** 大幅圧縮
+5. **derivative_selector.py** パッケージ化
+
+---
+
+*CCL/mek+ × A2 Krisis — 存在理由なきものは消える*

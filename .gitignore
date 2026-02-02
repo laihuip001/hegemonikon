@@ -1,60 +1,32 @@
-# Python
-__pycache__/
-*.py[cod]
-*$py.class
-*.so
-.Python
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
-
 # Virtual environments
 venv/
 .venv/
-ENV/
 
-# IDE
-.idea/
-.vscode/
-*.swp
-*.swo
+# Cache directories
+.cache/
+.npm/
+.mozilla/
+.local/
+.dspy_cache/
+.config/
+.antigravity/
 
-# Environment variables / Secrets
-.env
-.env.*
-*.env
-.env.jules
+# Browser profile (large)
+.gemini/antigravity-browser-profile/
+.gemini/antigravity/browser_recordings/
+.gemini/antigravity/code_tracker/
+.gemini/tmp/
 
-# Logs
-*.log
-logs/
+# Conversations (large binary protobuf files)
+.gemini/antigravity/conversations/
 
-# OS
-.DS_Store
-Thumbs.db
-
-# Test
-.pytest_cache/
-.coverage
-htmlcov/
-
-# Mypy
-.mypy_cache/
-
-# Large model files
-*.onnx
-mekhane/anamnesis/models/
-
-mekhane/models/
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+# Session logs with secrets
+mneme/.hegemonikon/sessions/*
+**/sessions/*
+**/.hegemonikon/sessions/*
+.gemini/oauth_creds.json
+.gemini/google_accounts.json

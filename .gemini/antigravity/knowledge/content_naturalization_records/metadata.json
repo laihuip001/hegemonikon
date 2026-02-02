@@ -1,0 +1,53 @@
+{
+    "title": "Content Naturalization Records",
+    "summary": "Master registry and history of external frameworks, concepts, and tools ingested into Hegemonikón. It codifies the 'Naturalization' process—merging external 'nutrients' like legacy libraries, AI Zen, and SE Frameworks (Agile/Scrum) into the native theorem system. Features 'The Recast Strategy' for meaningful integration. As of 2026-02-01, the system successfully naturalized the legacy check_proof.py prototype into the unified Dendron CLI, demonstrating the internal application of the /eat framework.",
+    "dependencies": [
+        "hegemonikon_system"
+    ],
+    "references": [
+        {
+            "type": "conversation_id",
+            "value": "08485a94-1a93-4c0d-aa1f-71a5e28b8e9d"
+        },
+        {
+            "type": "conversation_id",
+            "value": "2250519b-d64f-4664-b35f-25cc168ffe96"
+        },
+        {
+            "type": "conversation_id",
+            "value": "a3f2d906-aacc-4d35-b24b-4287f27be5ea"
+        },
+        {
+            "type": "conversation_id",
+            "value": "eac9ce4b-59ee-4d83-89f7-f104fc54c144"
+        },
+        {
+            "type": "conversation_id",
+            "value": "ede816f7-5bfe-444c-b063-841238271aea"
+        },
+        {
+            "type": "file",
+            "value": "/home/laihuip001/oikos/.gemini/antigravity/knowledge/content_naturalization_records/artifacts/digestion/orthodox_thinking_methods_mapping.md"
+        },
+        {
+            "type": "file",
+            "value": "/home/laihuip001/oikos/.gemini/antigravity/knowledge/content_naturalization_records/artifacts/digestion/ai_zen_naturalization_master.md"
+        },
+        {
+            "type": "file",
+            "value": "/home/laihuip001/oikos/.gemini/antigravity/knowledge/content_naturalization_records/artifacts/digestion/se_framework_agile_recast.md"
+        },
+        {
+            "type": "file",
+            "value": "/home/laihuip001/oikos/.gemini/antigravity/knowledge/ccl_standard_library/metadata.json"
+        },
+        {
+            "type": "file",
+            "value": "/home/laihuip001/oikos/.gemini/antigravity/knowledge/content_naturalization_records/artifacts/digestion/tier_1_review_report.md"
+        },
+        {
+            "type": "conversation_id",
+            "value": "891aef16-e50a-4b10-9f94-38e050771424"
+        }
+    ]
+}

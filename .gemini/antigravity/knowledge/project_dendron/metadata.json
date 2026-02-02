@@ -1,0 +1,97 @@
+{
+    "title": "Project Dendron (Existence Proof System)",
+    "summary": "Hegemonikón の「存在証明 (Existence Proof)」検証システム。v2.3/v2.4 にかけて品質テスト（R3-R5）を完遂し、全プロジェクトでの 100.0% 収束を達成。さらに、粒度 (L0-L3) と検証深度 (Surface, Structural, Functional, Empirical) を掛け合わせた「4x4 検証マトリクス（16セル）」を定義し、トークンレベルの必然性を検証する次世代の実装フェーズに移行した。",
+    "dependencies": [
+        "hegemonikon_system"
+    ],
+    "references": [
+        {
+            "type": "conversation_id",
+            "value": "cabd63dc-7e48-49e5-8848-07ed700cf6b2"
+        },
+        {
+            "type": "conversation_id",
+            "value": "796b9acc-d965-4ab8-ac5a-eb26d470ff73"
+        },
+        {
+            "type": "conversation_id",
+            "value": "e3ac1413-6744-42e8-9c76-8546e7e5a248"
+        },
+        {
+            "type": "file",
+            "value": "project_dendron/artifacts/status/red_team_audit_20260201.md"
+        },
+        {
+            "type": "file",
+            "value": "project_dendron/artifacts/status/red_team_audit_round_2_20260201.md"
+        },
+        {
+            "type": "file",
+            "value": "project_dendron/artifacts/status/current_status_20260201.md"
+        },
+        {
+            "type": "file",
+            "value": "project_dendron/artifacts/status/quality_testing_report_r3_20260201.md"
+        },
+        {
+            "type": "file",
+            "value": "project_dendron/artifacts/status/quality_testing_report_r4_20260201.md"
+        },
+        {
+            "type": "file",
+            "value": "project_dendron/artifacts/status/quality_testing_report_r5_20260201.md"
+        },
+        {
+            "type": "file",
+            "value": "project_dendron/artifacts/status/cross_directory_audit_report_20260201.md"
+        },
+        {
+            "type": "file",
+            "value": "project_dendron/artifacts/theory/deductive_necessity.md"
+        },
+        {
+            "type": "file",
+            "value": "project_dendron/artifacts/theory/existence_proof.md"
+        },
+        {
+            "type": "file",
+            "value": "project_dendron/artifacts/implementation/v2_specification_and_migration.md"
+        },
+        {
+            "type": "file",
+            "value": "project_dendron/artifacts/implementation/usage_and_workflows.md"
+        },
+        {
+            "type": "file",
+            "value": "project_dendron/artifacts/implementation/integration_and_automation.md"
+        },
+        {
+            "type": "file",
+            "value": "project_dendron/artifacts/implementation/checker_logic.md"
+        },
+        {
+            "type": "file",
+            "value": "project_dendron/artifacts/implementation/obsessive_audit_protocol.md"
+        },
+        {
+            "type": "file",
+            "value": "project_dendron/artifacts/status/case_study_hermeneus_100_percent.md"
+        },
+        {
+            "type": "file",
+            "value": "project_dendron/artifacts/status/case_study_synergeia_100_percent.md"
+        },
+        {
+            "type": "file",
+            "value": "project_dendron/artifacts/theory/matrix_4x4_specification.md"
+        },
+        {
+            "type": "file",
+            "value": "project_dendron/artifacts/implementation/matrix_implementation_plan.md"
+        },
+        {
+            "type": "file",
+            "value": "hegemonikon/projects.yaml"
+        }
+    ]
+}

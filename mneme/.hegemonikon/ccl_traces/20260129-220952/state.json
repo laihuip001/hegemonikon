@@ -1,0 +1,8 @@
+{
+  "session_id": "20260129-220952",
+  "expression": "/mek+{ vector_search + ccl_signature }",
+  "start_time": "2026-01-29T22:09:52.248894",
+  "end_time": null,
+  "status": "running",
+  "steps": []
+}

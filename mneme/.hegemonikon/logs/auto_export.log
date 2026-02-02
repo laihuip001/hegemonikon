@@ -1,0 +1,36 @@
+[2026-02-01 18:00:01] === Auto Export Started ===
+[2026-02-01 18:00:01] Antigravity not running (CDP port 9222 not available). Skipping.
+[2026-02-01 19:00:01] === Auto Export Started ===
+[2026-02-01 19:00:01] Antigravity not running (CDP port 9222 not available). Skipping.
+[2026-02-01 20:00:01] === Auto Export Started ===
+[2026-02-01 20:00:01] Antigravity not running (CDP port 9222 not available). Skipping.
+[2026-02-01 21:00:01] === Auto Export Started ===
+[2026-02-01 21:00:01] Antigravity not running (CDP port 9222 not available). Skipping.
+[2026-02-01 22:00:01] === Auto Export Started ===
+[2026-02-01 22:00:01] Antigravity not running (CDP port 9222 not available). Skipping.
+[2026-02-01 23:00:01] === Auto Export Started ===
+[2026-02-01 23:00:01] Antigravity not running (CDP port 9222 not available). Skipping.
+[2026-02-02 00:00:01] === Auto Export Started ===
+[2026-02-02 00:00:01] Antigravity not running (CDP port 9222 not available). Skipping.
+[2026-02-02 01:00:01] === Auto Export Started ===
+[2026-02-02 01:00:01] Antigravity not running (CDP port 9222 not available). Skipping.
+[2026-02-02 02:00:01] === Auto Export Started ===
+[2026-02-02 02:00:01] Antigravity not running (CDP port 9222 not available). Skipping.
+[2026-02-02 03:00:01] === Auto Export Started ===
+[2026-02-02 03:00:01] Antigravity not running (CDP port 9222 not available). Skipping.
+[2026-02-02 04:00:01] === Auto Export Started ===
+[2026-02-02 04:00:01] Antigravity not running (CDP port 9222 not available). Skipping.
+[2026-02-02 05:00:01] === Auto Export Started ===
+[2026-02-02 05:00:01] Antigravity not running (CDP port 9222 not available). Skipping.
+[2026-02-02 06:00:01] === Auto Export Started ===
+[2026-02-02 06:00:01] Antigravity not running (CDP port 9222 not available). Skipping.
+[2026-02-02 07:00:01] === Auto Export Started ===
+[2026-02-02 07:00:01] Antigravity not running (CDP port 9222 not available). Skipping.
+[2026-02-02 22:00:01] === Auto Export Started ===
+[2026-02-02 22:00:01] Antigravity detected. Running export...
+usage: export_chats.py [-h] [--output OUTPUT]
+                       [--format {md,json,both,individual}] [--limit LIMIT]
+                       [--single TITLE] [--watch] [--filter FILTER]
+export_chats.py: error: unrecognized arguments: --all
+[2026-02-02 22:00:01] Export failed with exit code 2
+[2026-02-02 22:00:01] === Auto Export Finished ===

@@ -1,0 +1,61 @@
+{
+    "title": "Autonomous Knowledge & Research Infrastructure (Gnōsis + Zētēsis)",
+    "summary": "The unified knowledge domain for Hegemonikón's intelligence acquisition system. It merges the academic Gnōsis infrastructure (arXiv/S2 collectors, Digestor orchestration) with Zētēsis exploratory research protocols (Perplexity Sonar 'Hybrid Model' prompts, chronotopic precision, adversarial hallucination prevention). Detailed implementation of the 'Beautiful Handoff' pattern for environment portability is also included. (Consolidated from gnosis_knowledge_infrastructure and search_exploration_optimization).",
+    "dependencies": [
+        "hegemonikon_system"
+    ],
+    "references": [
+        {
+            "type": "conversation_id",
+            "value": "812dc2e4-2d5e-4cb7-8e01-1d3dc515755b"
+        },
+        {
+            "type": "conversation_id",
+            "value": "2250519b-d64f-4664-b35f-25cc168ffe96"
+        },
+        {
+            "type": "conversation_id",
+            "value": "9cb3717d-7407-4d8e-a8d7-aefc3b31f3e0"
+        },
+        {
+            "type": "conversation_id",
+            "value": "f6ad2307-5115-4fd3-8ed9-b91a96eaa34b"
+        },
+        {
+            "type": "conversation_id",
+            "value": "30aa8d81-3a86-4491-85dc-978e562f9f98"
+        },
+        {
+            "type": "conversation_id",
+            "value": "089661a9-fd0e-43e4-86db-c868b6f60eaa"
+        },
+        {
+            "type": "conversation_id",
+            "value": "788732d4-6e29-46d4-8aad-94ec8b8764c1"
+        },
+        {
+            "type": "conversation_id",
+            "value": "e2385bf5-d55a-4581-9e1a-93c219d59051"
+        },
+        {
+            "type": "conversation_id",
+            "value": "eac9ce4b-59ee-4d83-89f7-f104fc54c144"
+        },
+        {
+            "type": "file",
+            "value": "/home/laihuip001/oikos/.agent/workflows/sop.md"
+        },
+        {
+            "type": "file",
+            "value": "/home/laihuip001/oikos/.agent/workflows/gno.md"
+        },
+        {
+            "type": "file",
+            "value": "/home/laihuip001/oikos/.agent/workflows/zet.md"
+        },
+        {
+            "type": "conversation_id",
+            "value": "891aef16-e50a-4b10-9f94-38e050771424"
+        }
+    ]
+}

@@ -1,0 +1,42 @@
+{
+  "version": 1,
+  "entries": [
+    {
+      "sessionId": "a220d612-e992-4008-8097-ef2b48763a52",
+      "fullPath": "/home/laihuip001/oikos/.claude/projects/-home-laihuip001-oikos-hegemonikon-synergeia/a220d612-e992-4008-8097-ef2b48763a52.jsonl",
+      "fileMtime": 1769910834110,
+      "firstPrompt": "What is 2+2?",
+      "messageCount": 2,
+      "created": "2026-02-01T01:53:51.914Z",
+      "modified": "2026-02-01T01:53:54.108Z",
+      "gitBranch": "master",
+      "projectPath": "/home/laihuip001/oikos/hegemonikon/synergeia",
+      "isSidechain": false
+    },
+    {
+      "sessionId": "bc6a76a1-914c-41ea-b294-a2a5cb540a88",
+      "fullPath": "/home/laihuip001/oikos/.claude/projects/-home-laihuip001-oikos-hegemonikon-synergeia/bc6a76a1-914c-41ea-b294-a2a5cb540a88.jsonl",
+      "fileMtime": 1769910858853,
+      "firstPrompt": "What is 2+2? Reply with just the number.",
+      "messageCount": 2,
+      "created": "2026-02-01T01:54:17.002Z",
+      "modified": "2026-02-01T01:54:18.851Z",
+      "gitBranch": "master",
+      "projectPath": "/home/laihuip001/oikos/hegemonikon/synergeia",
+      "isSidechain": false
+    },
+    {
+      "sessionId": "c5244a56-d02e-441b-8143-6ceb6c23c7eb",
+      "fullPath": "/home/laihuip001/oikos/.claude/projects/-home-laihuip001-oikos-hegemonikon-synergeia/c5244a56-d02e-441b-8143-6ceb6c23c7eb.jsonl",
+      "fileMtime": 1769910871729,
+      "firstPrompt": "What is 2+2? Reply with just the number.",
+      "messageCount": 2,
+      "created": "2026-02-01T01:54:29.663Z",
+      "modified": "2026-02-01T01:54:31.728Z",
+      "gitBranch": "master",
+      "projectPath": "/home/laihuip001/oikos/hegemonikon/synergeia",
+      "isSidechain": false
+    }
+  ],
+  "originalPath": "/home/laihuip001/oikos/hegemonikon/synergeia"
+}

@@ -1,0 +1,29 @@
+{
+    "version": "1.0.0",
+    "description": "T6 Praxis 信頼履歴 - 実行結果の記録",
+    "created": "2026-01-27T14:52:00+09:00",
+    "trust_records": [
+        {
+            "action": "h3_symploke_implementation",
+            "timestamp": "2026-01-27T13:00:00+09:00",
+            "outcome": "success",
+            "details": "VectorDB Adapter実装完了、15テスト全成功",
+            "confidence_delta": 0.1
+        },
+        {
+            "action": "kernel_naming_refinement",
+            "timestamp": "2026-01-27T05:30:00+09:00",
+            "outcome": "success",
+            "details": "v2.1命名規則確定、全ファイル整合性確認済み",
+            "confidence_delta": 0.05
+        }
+    ],
+    "aggregate": {
+        "total_actions": 2,
+        "success_rate": 1.0,
+        "current_confidence": 0.85
+    },
+    "meta": {
+        "last_updated": "2026-01-27T14:52:00+09:00"
+    }
+}

@@ -1,0 +1,25 @@
+nohup: 入力を無視します
+(node:209580) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+[DEBUG] Output directory: /home/laihuip001/oikos/mneme/.hegemonikon/sessions
+[DEBUG] Exists: True
+[DEBUG] Limit: 1 conversations
+[*] Connecting to CDP: http://localhost:9222
+[*] Found jetski-agent page: 0 buttons
+[*] Found jetski-agent page: 93 buttons
+[✓] Selected Agent Manager: vscode-file://vscode-app/usr/share/antigravity/resources/app/out/vs/code/electron-browser/workbench/workbench-jetski-agent.html (93 buttons)
+[*] Found 89 conversations
+[*] Limiting to 1 conversations
+[1/1] Export Chat History
+    [DEBUG] Found 65 child elements in container
+    [*] Scrolling to load all messages...
+    [✓] Loaded 65 message elements
+    [DEBUG] Found 65 child elements in container
+[DEBUG] Saving to: /home/laihuip001/oikos/mneme/.hegemonikon/sessions/2026-01-31_conv_4_Export Chat History.md
+  [✓] Saved: 2026-01-31_conv_4_Export Chat History.md
+    → 5 messages extracted
+[*] Re-saving all chats...
+[DEBUG] Saving to: /home/laihuip001/oikos/mneme/.hegemonikon/sessions/2026-01-31_conv_4_Export Chat History.md
+  [✓] Saved: 2026-01-31_conv_4_Export Chat History.md
+
+[✓] Export complete: 1 conversations

@@ -1,0 +1,62 @@
+{
+  "timestamp": "2026-01-29T11:09:24.966006",
+  "source": "gnosis",
+  "total_papers": 12,
+  "candidates_selected": 5,
+  "dry_run": true,
+  "candidates": [
+    {
+      "title": "REASON: Accelerating Probabilistic Logical Reasoning for Scalable Neuro-Symbolic Intelligence",
+      "source": "arxiv",
+      "url": "http://arxiv.org/abs/2601.20784v1",
+      "score": 0.43333333333333335,
+      "matched_topics": [
+        "active-inference",
+        "metacognition"
+      ],
+      "rationale": "Topics: active-inference, metacognition | Score: 0.43"
+    },
+    {
+      "title": "Agentic Fog: A Policy-driven Framework for Distributed Intelligence in Fog Computing",
+      "source": "arxiv",
+      "url": "http://arxiv.org/abs/2601.20764v1",
+      "score": 0.43333333333333335,
+      "matched_topics": [
+        "agent-architecture",
+        "metacognition"
+      ],
+      "rationale": "Topics: agent-architecture, metacognition | Score: 0.43"
+    },
+    {
+      "title": "Persona Prompting as a Lens on LLM Social Reasoning",
+      "source": "arxiv",
+      "url": "http://arxiv.org/abs/2601.20757v1",
+      "score": 0.43333333333333335,
+      "matched_topics": [
+        "structured-prompting",
+        "metacognition"
+      ],
+      "rationale": "Topics: structured-prompting, metacognition | Score: 0.43"
+    },
+    {
+      "title": "Learning From a Steady Hand: A Weakly Supervised Agent for Robot Assistance under Microscopy",
+      "source": "arxiv",
+      "url": "http://arxiv.org/abs/2601.20776v1",
+      "score": 0.3666666666666667,
+      "matched_topics": [
+        "metacognition"
+      ],
+      "rationale": "Topics: metacognition | Score: 0.37"
+    },
+    {
+      "title": "Smoothing the Black-Box: Signed-Distance Supervision for Black-Box Model Copying",
+      "source": "arxiv",
+      "url": "http://arxiv.org/abs/2601.20773v1",
+      "score": 0.3666666666666667,
+      "matched_topics": [
+        "metacognition"
+      ],
+      "rationale": "Topics: metacognition | Score: 0.37"
+    }
+  ]
+}

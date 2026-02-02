@@ -1,0 +1,30 @@
+{
+  "version": 1,
+  "entries": [
+    {
+      "sessionId": "dcf75018-165e-424c-a384-859794814de0",
+      "fullPath": "/home/laihuip001/oikos/.claude/projects/-home-laihuip001-oikos-hegemonikon/dcf75018-165e-424c-a384-859794814de0.jsonl",
+      "fileMtime": 1769912340105,
+      "firstPrompt": "Hegemonikon CCL distributed execution test  Execute CCL: /s+  Provide a detailed response.",
+      "messageCount": 5,
+      "created": "2026-02-01T02:17:02.603Z",
+      "modified": "2026-02-01T02:19:00.107Z",
+      "gitBranch": "master",
+      "projectPath": "/home/laihuip001/oikos/hegemonikon",
+      "isSidechain": false
+    },
+    {
+      "sessionId": "bc4467a6-3c2d-424a-8bce-ce84d5aa194e",
+      "fullPath": "/home/laihuip001/oikos/.claude/projects/-home-laihuip001-oikos-hegemonikon/bc4467a6-3c2d-424a-8bce-ce84d5aa194e.jsonl",
+      "fileMtime": 1769912772673,
+      "firstPrompt": "Design a simple greeting function  Execute CCL: /s+  Provide a detailed response.",
+      "messageCount": 4,
+      "created": "2026-02-01T02:25:32.192Z",
+      "modified": "2026-02-01T02:26:12.672Z",
+      "gitBranch": "master",
+      "projectPath": "/home/laihuip001/oikos/hegemonikon",
+      "isSidechain": false
+    }
+  ],
+  "originalPath": "/home/laihuip001/oikos/hegemonikon"
+}

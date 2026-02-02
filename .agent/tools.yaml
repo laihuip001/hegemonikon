@@ -1,0 +1,521 @@
+# Hegemonikón Tools Registry
+# 利用可能な機構の一元管理ファイル
+# /boot で自動読み込みされ、セッション開始時にリマインドされる
+
+version: "1.0.0"
+updated: "2026-01-24"
+
+# =============================================================================
+# MCP Servers
+# =============================================================================
+mcp:
+  gnosis:
+    path: mcp/gnosis_mcp_server.py
+    description: "Gnōsis知識ベース + モデル推奨"
+    tools:
+      - name: search
+        description: "論文検索（ベクトル類似度）"
+        usage: "@mcp:gnosis で「query」を検索して"
+      - name: stats
+        description: "知識ベース統計情報"
+        usage: "@mcp:gnosis で stats を実行"
+      - name: recommend_model
+        description: "タスクからモデル推奨（T2 Krisis）"
+        usage: "@mcp:gnosis で recommend_model「タスク説明」"
+
+  sophia:
+    path: mcp/sophia_mcp_server.py
+    description: "Sophia (KI) + Kairos (Handoff) 統合検索"
+    tools:
+      - name: search
+        description: "知識検索（時間軸フィルタ対応）"
+        usage: "@mcp:sophia で「query」を検索して (--source sophia/kairos/both, --recent_days N)"
+      - name: stats
+        description: "Sophia/Kairos 統計情報"
+        usage: "@mcp:sophia で stats を実行"
+
+  jules:
+    path: mcp/jules_mcp_server.py
+    description: "Jules API 並列コード生成"
+    tools:
+      - name: jules_create_task
+        description: "単一タスク作成"
+        usage: "@mcp:jules で create_task「タスク説明」「repo」"
+      - name: jules_batch_execute
+        description: "並列実行（max 60）"
+        usage: "@mcp:jules で batch_execute [タスクリスト]"
+      - name: jules_get_status
+        description: "セッション状態確認"
+        usage: "@mcp:jules で get_status「session_id」"
+      - name: jules_list_repos
+        description: "利用可能リポジトリ一覧"
+        usage: "@mcp:jules で list_repos"
+
+  # ─────────────────────────────────────────────────────────────────────────
+  # MCP Servers - Active (2026-01-29)
+  # ─────────────────────────────────────────────────────────────────────────
+  sequential-thinking:
+    status: "active"
+    installed: "2026-01-29"
+    package: "@modelcontextprotocol/server-sequential-thinking"
+    command: "npx -y @modelcontextprotocol/server-sequential-thinking"
+    description: "構造化・反省的思考プロセス（5,550+ uses）"
+    integration_target: "synedrion/"
+    tools:
+      - name: sequentialthinking
+        description: "動的・反復的な思考プロセスを構造化"
+        usage: "複雑な問題解決、仮説検証、再帰的分析"
+    hegemonikon_mapping:
+      primary: "O1 Noēsis"
+      secondary: ["O3 Zētēsis", "A2 Krisis"]
+    config_location: "~/.config/Antigravity/User/globalStorage/rooveterinaryinc.roo-cline/settings/mcp_settings.json"
+  # ─────────────────────────────────────────────────────────────────────────
+  # Scheduled Task - Windows Migration
+  # ─────────────────────────────────────────────────────────────────────────
+  redis:
+    status: "scheduled"
+    scheduled_for: "2026-01-30 夕方 (Windows環境)"
+    platform: "Windows"
+    note: "GCP Linux環境ではRedisインストールに問題あり。Windows環境で実装予定。"
+    package: "@modelcontextprotocol/server-redis"
+    command: "npx -y @modelcontextprotocol/server-redis"
+    description: "Redis キャッシングおよびセッション状態管理"
+    integration_target: "anamnesis/"
+    tools:
+      - name: set
+        description: "キー値ペアを保存"
+      - name: get
+        description: "キー値を取得"
+      - name: del
+        description: "キー値を削除"
+    hegemonikon_mapping:
+      primary: "H4 Doxa"
+      secondary: ["H3 Orexis"]
+    windows_install_steps: |
+      1. Redis for Windows をインストール (Memurai または WSL2)
+      2. redis-cli ping で動作確認
+      3. mcp_settings.json に追加
+      4. tools.yaml status を active に更新
+
+# =============================================================================
+# CLI Scripts
+# =============================================================================
+scripts:
+  chat-history-sync:
+    path: mekhane/peira/scripts/chat-history-kb.py
+    command: "python {path} sync --report"
+    description: "チャット履歴を LanceDB に同期"
+    purpose: "セッション間の情報共有"
+    workflow: "/hist"
+
+  gnosis-cli:
+    path: mekhane/anamnesis/cli.py
+    commands:
+      - 'search "query"  # 論文検索'
+      - "stats            # 統計情報"
+      - "collect -s arxiv # arXiv収集"
+    description: "Gnōsis知識ベースCLI"
+
+  gnosis-auto-collect:
+    path: .agent/scripts/gnosis-auto-collect.ps1
+    command: '& "{path}"'
+    description: "Gnōsis自動収集（ローテーション）"
+    purpose: "10トピックを順番に収集"
+    workflow: "/boot Step 5"
+
+# =============================================================================
+# Workflows (quick reference)
+# =============================================================================
+workflows:
+  boot:
+    purpose: "セッション初期化、履歴同期、レビュー生成"
+    modules: [T1, T8]
+
+  hist:
+    purpose: "チャット履歴を LanceDB に同期"
+    modules: [T8]
+    depends: [chat-history-sync]
+
+  plan:
+    purpose: "[DEPRECATED] → /s に統合済み (2026-01-28)"
+    modules: [S1, S2, S3, S4]
+    description: "→ /s (戦略定理ワークフロー) を使用"
+
+  # ───────────────────────────────────────────────────────────────────────────
+  # O-series (Pure Theorems) - v4.0+ with Derivatives
+  # ───────────────────────────────────────────────────────────────────────────
+  o:
+    purpose: "O-series Hub。O1-O4 定理と12派生への入口"
+    modules: [O1, O2, O3, O4]
+    description: "純粋定理ハブ — 認識・意志・探求・活動の派生選択"
+    version: "2.0"
+
+  noe:
+    purpose: "O1 Noēsis（認識）最深層思考、0からの再構築"
+    modules: [O1, T3, T4, T7]
+    description: "直観的認識、前提破壊、白紙再設計"
+    derivatives: [nous, phro, meta]
+    version: "4.0"
+
+  bou:
+    purpose: "O2 Boulēsis（意志）目的の明確化、何を望むか"
+    modules: [O2]
+    description: "次に何をしたいかを問う"
+    derivatives: [desir, voli, akra]
+    version: "4.0"
+
+  pre:
+    purpose: "O2 Boulēsis 派生。Premortem で失敗を事前想定"
+    modules: [O2]
+    parent: "/bou"
+    description: "失敗事前想定 — 目標の堅牢性を検証"
+
+  zet:
+    purpose: "O3 Zētēsis（探求）問いを発見する"
+    modules: [O3]
+    description: "何を問うべきかを発見し、/noe 用候補を生成"
+    derivatives: [anom, hypo, eval]
+    version: "5.0"
+
+  poc:
+    purpose: "O3 Zētēsis 派生。Timeboxed 探索で不確実性を下げる"
+    modules: [O3]
+    parent: "/zet"
+    description: "Spike/PoC — 不確実性を実験で下げる"
+
+  why:
+    purpose: "O3 Zētēsis 派生。Five Whys で根本原因を問い続ける"
+    modules: [O3]
+    parent: "/zet"
+    description: "根本原因分析 — なぜ？を繰り返す"
+
+  ene:
+    purpose: "O4 Energeia（行為）意志を現実に具現化する"
+    modules: [O4]
+    description: "6段階実行フレームワーク"
+    derivatives: [flow, prax, pois]
+    version: "4.1"
+
+  flag:
+    purpose: "O4 Energeia 派生。Feature Flags で段階的リリース"
+    modules: [O4]
+    parent: "/ene"
+    description: "段階的ロールアウト — リスクを制御した実行"
+    derivatives: [flow, prax, pois]
+    version: "4.0"
+
+  sop:
+    purpose: "K4 Sophia（知恵）Perplexityへの調査依頼書作成"
+    modules: [K4]
+    description: "情報収集 = observe 行動、外部ソースからの知識取得"
+
+  src:
+    purpose: "Web検索実行（Perplexity API）"
+    modules: [T5]
+
+
+
+  euk:
+    purpose: "K1 Eukairia（好機）タイミング評価"
+    modules: [K1]
+    description: "今がチャンスかを判定する"
+
+  chr:
+    purpose: "K2 Chronos（時間）時間配置"
+    modules: [K2]
+    description: "時間制約と期限を評価する"
+
+  tel:
+    purpose: "K3 Telos（目的）目的整合確認"
+    modules: [K3]
+    description: "手段と目的の入れ替わりを防ぐ"
+
+
+  # S-series 1:1 with Derivatives (v4.0)
+  s:
+    purpose: "Schema（戦略定理 S1-S4）認知的設計プロトコル"
+    modules: [S1, S2, S3, S4]
+    description: "12派生統合Hub — スケール・方法・基準・実践"
+    derivatives: [cont, disc, abst, comp, inve, adap, norm, empi, rela, prax, pois, temp]
+    version: "4.0"
+
+  met:
+    purpose: "S1 Metron（尺度）スケール配置"
+    modules: [S1]
+    description: "どのスケールで？粒度を決定"
+    derivatives: [cont, disc, abst]
+    version: "2.0"
+
+  mek:
+    purpose: "S2 Mekhanē（方法配置）スキル/ワークフロー生成"
+    modules: [S2]
+    description: "tekhne-maker 統合、生成・診断"
+    derivatives: [comp, inve, adap]
+    version: "7.0"
+
+  sta:
+    purpose: "S3 Stathmos（基準）基準配置"
+    modules: [S3]
+    description: "評価基準・ベンチマークを設定"
+    derivatives: [norm, empi, rela]
+    version: "2.0"
+
+  pra:
+    purpose: "S4 Praxis（実践）実践配置"
+    modules: [S4]
+    description: "価値実現の方法を選択"
+    derivatives: [prax, pois, temp]
+    version: "2.0"
+
+  # H-series 1:1 with Derivatives (v3.0)
+  h:
+    purpose: "Hormē（衝動定理 H1-H4）動機処理"
+    modules: [H1, H2, H3, H4]
+    description: "12派生統合Hub — 傾向・確信・欲求・信念"
+    derivatives: [appr, avoi, arre, subj, inte, obje, targ, acti, stat, sens, conc, form]
+    version: "3.0"
+
+  pro:
+    purpose: "H1 Propatheia（前感情）初期傾向評価"
+    modules: [H1]
+    description: "直感的にどう感じる？接近/回避を判定"
+    derivatives: [appr, avoi, arre]
+    version: "2.0"
+
+  pis:
+    purpose: "H2 Pistis（確信）確信度評価"
+    modules: [H2]
+    description: "どのくらい確か？信頼性を評価"
+    derivatives: [subj, inte, obje]
+    version: "2.0"
+
+  ore:
+    purpose: "H3 Orexis（欲求）価値傾向評価"
+    modules: [H3]
+    description: "何を望む？価値判断を評価"
+    derivatives: [targ, acti, stat]
+    version: "2.0"
+
+
+  dox:
+    purpose: "H4 Doxa（信念）信念定着"
+    modules: [H4]
+    description: "記録して・覚えておいて"
+    derivatives: [sens, conc, form]
+    version: "2.0"
+
+  # P-series 1:1 with Derivatives (v3.0)
+  p:
+    purpose: "Perigraphē（環境定理 P1-P4）環境配置"
+    modules: [P1, P2, P3, P4]
+    description: "12派生統合Hub — 空間・経路・軌道・技術"
+    derivatives: [phys, conc, rela, line, bran, cycl, fixe, adap, emer, manu, mech, auto]
+    version: "3.0"
+
+  kho:
+    purpose: "P1 Khōra（場）条件空間定義"
+    modules: [P1]
+    description: "どの範囲で考える？スコープを定義"
+    derivatives: [phys, conc, rela]
+    version: "2.0"
+
+  hod:
+    purpose: "P2 Hodos（道）経路定義"
+    modules: [P2]
+    description: "どう進める？道筋を定義"
+    derivatives: [line, bran, cycl]
+    version: "2.0"
+
+  tro:
+    purpose: "P3 Trokhia（軌道）軌道定義"
+    modules: [P3]
+    description: "どこまで適用する？サイクルを定義"
+    derivatives: [fixe, adap, emer]
+    version: "2.0"
+
+  tek:
+    purpose: "P4 Tekhnē（技法）技法選択"
+    modules: [P4]
+    description: "どの技法で？技術選択"
+    derivatives: [manu, mech, auto]
+    version: "2.0"
+
+  # A-series 1:1
+  pat:
+    purpose: "A1 Pathos（情念）メタ感情評価"
+    modules: [A1]
+    description: "この判断にどう感じる？二重傾向"
+
+  gno:
+    purpose: "A3 Gnōmē（格言）原則抽出"
+    modules: [A3]
+    description: "教訓は？格言を抽出"
+
+  epi:
+    purpose: "A4 Epistēmē（知識）知識確立"
+    modules: [A4]
+    description: "これは確実な知識か？Doxa→Epistēmē"
+
+  rev:
+    purpose: "レビュー生成"
+    modules: [T7, T8]
+
+  chk:
+    purpose: "検証・批評（Synedrion評議会）"
+    modules: [T7]
+
+  ax:
+    purpose: "O/T/K/X 定理群統合分析"
+    modules: [O1-O4, T1-T8, K1-K12, X-O, X-T, X-K]
+    description: "問題を本質→様態→文脈→関係の順で多層分析"
+
+  t:
+    purpose: "T-series（拡張定理）"
+    modules: [T1-T8]
+
+  k:
+    purpose: "K-series（文脈定理）"
+    modules: [K1-K12]
+
+  x:
+    purpose: "X-series（関係層）"
+    modules: [X-O, X-T, X-K]
+
+  bye:
+    purpose: "セッション終了、Handoff生成"
+    description: "次回セッションへの引き継ぎ書類を作成"
+
+  dev:
+    purpose: "開発プロトコル参照"
+    description: "Creator用開発マニュアル呼び出し"
+
+  exp:
+    purpose: "チャット履歴エクスポート"
+    modules: [T8]
+    description: "H4 Doxa エピソード記憶保存"
+
+  manual:
+    purpose: "マニュアル生成"
+    description: "Gemini/Jules向け作業手順書を作成"
+
+  now:
+    purpose: "現在地確認"
+    description: "コンテキスト再構築とタスク確認"
+
+  pri:
+    purpose: "[DEPRECATED] 統合ワークフロー廃止、/k を使用"
+    modules: [K1, K2, K3]
+    description: "→ /k, /euk, /chr, /tel で代替"
+    modes: [Standard, Auto, Matrix, Timeline]
+
+  rec:
+    purpose: "記憶想起・ルール確認"
+    description: "必須ルールとスキルトリガーを再読み込み"
+
+  u:
+    purpose: "Claudeの主観意見"
+    description: "AIをパートナーとして扱い意見を求める"
+
+  v:
+    purpose: "Cross-Model 検証"
+    modules: [T7]
+    description: "Geminiの作業をClaudeが監査・検証"
+
+  audit:
+    purpose: "統合品質診断（馴染み度評価）"
+    modules: [O1, A2, P4]
+    description: "情報ロス・重複・不整合を検出し統合度を3段階で評価"
+
+  # tek: 旧エントリは削除済み → 205行目の P4 Tekhnē /tek を使用
+
+# =============================================================================
+# Key Directories
+# =============================================================================
+directories:
+  mcp: "mcp/"
+  skills: ".agent/skills/"
+  workflows: ".agent/workflows/"
+  rules: ".agent/rules/"
+  mekhane: "mekhane/"
+  kernel: "kernel/"
+
+# =============================================================================
+# Skills (manual reference)
+# =============================================================================
+skills:
+  tekhne-maker:
+    path: hegemonikon/mekhane/ergasterion/tekhne/SKILL.md  # 実体パス (symlink: .agent/skills/utils/tekhne-maker)
+    purpose: "汎用 SKILL.md / .prompt 生成（アーキタイプ駆動、7モジュール構成）"
+    trigger:
+      - "「〇〇用のスキル/プロンプトを作成」"
+      - "「Prompt-Lang でスキルを作成」"
+      - "「.prompt ファイルを作って」"
+      - "「このプロンプトを診断/改善」"
+      - "「〇〇AIエージェントを構築」"
+      - "「日本語で〇〇がしたい」"
+      - "「要件を最適化」"
+      - "「プロンプト」"
+      - "「PE」"
+      - "「生成」"
+      - "「製作」"
+    modes:
+      generate: "SKILL.md 生成（デフォルト）"
+      prompt-lang: ".prompt 生成（収束タスク向け）"
+      sage: "XML/MD ハイブリッド"
+      diagnose: "既存プロンプト診断"
+      improve: "既存プロンプト改善"
+    references:
+      - references/archetypes.md
+      - references/quality-checklist.md
+      - references/logic-gates.md
+      - references/wargame-db.md
+      - references/prompt-lang-templates/
+    status: production
+    workflow: "/tek"
+    history: "meta-prompt-generator v1.0-2.1 → HEPHAESTUS → v3.0-4.0 → tekhne-maker v5.0 → v6.0 → v6.1 (j2p absorbed)"
+
+  # DEPRECATED: 以下はtekhne-makerに統合済み
+  # prompt-lang-generator:
+  #   status: deprecated
+  #   migrated_to: tekhne-maker (prompt-lang mode)
+  # meta-prompt-generator:
+  #   status: deprecated
+  #   migrated_to: tekhne-maker
+
+  integration-audit:
+    path: .agent/skills/utils/integration-audit/SKILL.md
+    purpose: "統合品質診断エージェント（馴染み度評価）"
+    trigger:
+      - "「統合/マージ/吸収の品質を確認」"
+      - "「馴染んでる？」「吸収できてる？」"
+      - "「情報ロスを検出」"
+    modules: [O1, A2, P4]
+    status: production
+
+# =============================================================================
+# Skill-Workflow Linkage Patterns (v2.2)
+# =============================================================================
+skill_patterns:
+  paradigm: "workflow-as-caller"
+  version: "2.2"
+  
+  linkage_types:
+    direct_reference:
+      description: "Workflow explicitly calls SKILL.md"
+      example: "/noe → O1 Noēsis"
+      token_cost: "frontmatter(100-150t) + body(700-1000t)"
+      
+    metadata_reference:
+      description: "Runtime matching via frontmatter triggers"
+      example: "user intent → skill matching"
+      token_cost: "frontmatter only until activation"
+      
+    inline_injection:
+      description: "Lightweight skill embedded in workflow"
+      example: "single-step validation"
+      token_cost: "<300t total"
+  
+  optimization:
+    heavy_skills: ["O1", "O2", "O3", "O4", "A2"]  # Use file reference
+    light_skills: ["S1", "S3", "P2"]               # Can use inline
+

@@ -1,0 +1,23 @@
+# AIDB Article Collection - Batch 1
+
+- [x] Article 31: https://ai-data-base.com/archives/100064
+- [x] Article 32: https://ai-data-base.com/archives/58765
+- [x] Article 33: https://ai-data-base.com/archives/82195
+- [x] Article 34: https://ai-data-base.com/archives/99509
+- [x] Article 35: https://ai-data-base.com/archives/99953
+- [x] Article 36: https://ai-data-base.com/archives/99678
+- [x] Article 37: https://ai-data-base.com/archives/63536
+- [x] Article 38: https://ai-data-base.com/archives/58540
+- [x] Article 39: https://ai-data-base.com/archives/99226
+- [x] Article 40: https://ai-data-base.com/archives/98812
+- [x] Article 41: https://ai-data-base.com/archives/98974
+- [x] Article 42: https://ai-data-base.com/archives/99179
+- [x] Article 43: https://ai-data-base.com/archives/99016
+- [x] Article 44: https://ai-data-base.com/archives/96206
+- [x] Article 45: https://ai-data-base.com/archives/97098
+- [x] Article 46: https://ai-data-base.com/archives/97382
+- [x] Article 47: https://ai-data-base.com/archives/99286
+- [x] Article 48: https://ai-data-base.com/archives/99328
+- [ ] Article 49: https://ai-data-base.com/archives/99467
+- [ ] Article 50: https://ai-data-base.com/archives/99557
+- [ ] Article 51-150: (Remaining articles)

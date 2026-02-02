@@ -12,6 +12,7 @@ import os
 import re
 import json
 import asyncio
+import threading
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional, Union
 from enum import Enum
@@ -35,6 +36,46 @@ def _load_env():
                             os.environ[key] = value.strip()
 
 _load_env()
+
+
+# =============================================================================
+# Async Runner (Background Thread)
+# =============================================================================
+
+class _AsyncRunner:
+    """Singleton background thread runner for asyncio tasks.
+
+    This allows synchronous code (like execute()) to dispatch async tasks
+    without creating a new event loop every time, and avoids crashes
+    when called from an existing event loop.
+    """
+    _instance = None
+    _lock = threading.Lock()
+
+    def __init__(self):
+        self._loop = asyncio.new_event_loop()
+        self._thread = threading.Thread(
+            target=self._run_loop,
+            daemon=True,
+            name="HermeneusRuntimeLoop"
+        )
+        self._thread.start()
+
+    def _run_loop(self):
+        asyncio.set_event_loop(self._loop)
+        self._loop.run_forever()
+
+    @classmethod
+    def get_instance(cls):
+        if cls._instance is None:
+            with cls._lock:
+                if cls._instance is None:
+                    cls._instance = cls()
+        return cls._instance
+
+    @property
+    def loop(self):
+        return self._loop
 
 
 # =============================================================================
@@ -134,7 +175,26 @@ class LMQLExecutor:
         variables: Optional[Dict[str, Any]] = None
     ) -> ExecutionResult:
         """LMQL プログラムを同期実行"""
-        return asyncio.run(self.execute_async(lmql_code, context, variables))
+        runner = _AsyncRunner.get_instance()
+
+        # Deadlock prevention:
+        # If we are running inside the runner's loop, we cannot block waiting for the result.
+        try:
+            current_loop = asyncio.get_running_loop()
+        except RuntimeError:
+            current_loop = None
+
+        if current_loop and current_loop == runner.loop:
+            raise RuntimeError(
+                "Cannot call execute() synchronously from within the runtime event loop. "
+                "Use await execute_async() instead."
+            )
+
+        future = asyncio.run_coroutine_threadsafe(
+            self.execute_async(lmql_code, context, variables),
+            runner.loop
+        )
+        return future.result()
     
     async def _execute_with_lmql(
         self,

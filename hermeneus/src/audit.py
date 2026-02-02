@@ -99,23 +99,50 @@ class AuditStore:
         finally:
             conn.close()
     
+    @contextmanager
+    def transaction(self):
+        """トランザクションを取得 (コミット付き)"""
+        with self._connect() as conn:
+            try:
+                yield conn
+                conn.commit()
+            except Exception:
+                conn.rollback()
+                raise
+
     def _generate_id(self) -> str:
         """一意の ID を生成"""
         import uuid
         return f"audit_{uuid.uuid4().hex[:12]}"
     
-    def record(self, audit: AuditRecord) -> str:
-        """監査レコードを記録"""
-        if not audit.record_id:
-            audit.record_id = self._generate_id()
+    def record(self, audit: AuditRecord, conn: Optional[sqlite3.Connection] = None) -> str:
+        """監査レコードを記録
         
-        with self._connect() as conn:
-            conn.execute("""
-                INSERT OR REPLACE INTO audits 
-                (record_id, ccl_expression, execution_result, debate_summary,
-                 consensus_accepted, confidence, dissent_reasons, metadata, timestamp)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-            """, (
+        Args:
+            audit: 監査レコード
+            conn: 既存のデータベース接続 (オプション)。指定された場合、コミットは行わない。
+        """
+        return self.record_batch([audit], conn=conn)[0]
+
+    def record_batch(self, audits: List[AuditRecord], conn: Optional[sqlite3.Connection] = None) -> List[str]:
+        """監査レコードをバッチ記録
+
+        Args:
+            audits: 監査レコードのリスト
+            conn: 既存のデータベース接続 (オプション)。指定された場合、コミットは行わない。
+        """
+        if not audits:
+            return []
+
+        ids = []
+        data = []
+
+        for audit in audits:
+            if not audit.record_id:
+                audit.record_id = self._generate_id()
+            ids.append(audit.record_id)
+
+            data.append((
                 audit.record_id,
                 audit.ccl_expression,
                 audit.execution_result,
@@ -126,9 +153,21 @@ class AuditStore:
                 json.dumps(audit.metadata, ensure_ascii=False) if audit.metadata else None,
                 audit.timestamp.isoformat()
             ))
-            conn.commit()
         
-        return audit.record_id
+        sql = """
+            INSERT OR REPLACE INTO audits
+            (record_id, ccl_expression, execution_result, debate_summary,
+             consensus_accepted, confidence, dissent_reasons, metadata, timestamp)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """
+
+        if conn:
+            conn.executemany(sql, data)
+        else:
+            with self.transaction() as conn:
+                conn.executemany(sql, data)
+
+        return ids
     
     def get(self, record_id: str) -> Optional[AuditRecord]:
         """レコードを取得"""

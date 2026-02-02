@@ -194,14 +194,23 @@ def get_boot_handoffs(mode: str = "standard", context: str = None) -> dict:
         results = search_handoffs(query, top_k=related_count + 1)
         related = [doc for doc, score in results if doc.id != latest.id][:related_count]
 
+    # 会話ログアダプタの遅延読み込み (一度だけ)
+    conv_adapter = None
+    if CONVERSATION_INDEX_PATH.exists() and (
+        conv_count > 0 or (mode == "detailed" and latest)
+    ):
+        try:
+            conv_adapter = EmbeddingAdapter(model_name="all-MiniLM-L6-v2")
+            conv_adapter.load(str(CONVERSATION_INDEX_PATH))
+        except Exception as e:
+            print(f"⚠️ Conversation adapter load error: {e}")
+
     # 関連会話ログ検索 (Kairos Index を使用)
     conversations = []
-    if conv_count > 0 and CONVERSATION_INDEX_PATH.exists():
+    if conv_count > 0 and conv_adapter:
         try:
-            adapter = EmbeddingAdapter(model_name="all-MiniLM-L6-v2")
-            adapter.load(str(CONVERSATION_INDEX_PATH))
-            query_vec = adapter.encode([query])[0]
-            results = adapter.search(query_vec, k=conv_count)
+            query_vec = conv_adapter.encode([query])[0]
+            results = conv_adapter.search(query_vec, k=conv_count)
 
             # ファイルパスからドキュメントを再構築
             for r in results:
@@ -220,13 +229,11 @@ def get_boot_handoffs(mode: str = "standard", context: str = None) -> dict:
     proactive_memories = []
     if mode == "detailed" and latest:
         keywords = extract_keywords(latest)
-        if keywords and CONVERSATION_INDEX_PATH.exists():
+        if keywords and conv_adapter:
             try:
                 proactive_query = " ".join(keywords[:3])
-                adapter = EmbeddingAdapter(model_name="all-MiniLM-L6-v2")
-                adapter.load(str(CONVERSATION_INDEX_PATH))
-                query_vec = adapter.encode([proactive_query])[0]
-                results = adapter.search(query_vec, k=3)
+                query_vec = conv_adapter.encode([proactive_query])[0]
+                results = conv_adapter.search(query_vec, k=3)
 
                 for r in results:
                     file_path = r.metadata.get("file_path")

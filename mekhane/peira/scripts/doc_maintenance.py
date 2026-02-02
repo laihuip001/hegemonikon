@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import sys
 import re
+import logging
 from pathlib import Path
 from typing import NamedTuple
 
@@ -46,8 +47,10 @@ def is_safe_path(target_path: Path, base_dir: Path) -> bool:
         try:
             target_path.relative_to(base_dir)
             return True
-        except ValueError:
-            pass  # TODO: Add proper error handling
+        except ValueError as e:
+            # Not relative to base_dir, continue to next check
+            logging.debug("Fast path check failed: %s is not relative to %s (%s)", target_path, base_dir, e)
+            pass
 
     # 2. Resolved check
     t_res = target_path.resolve()
@@ -60,8 +63,10 @@ def is_safe_path(target_path: Path, base_dir: Path) -> bool:
         try:
             t_res.relative_to(b_res)
             return True
-        except ValueError:
-            pass  # TODO: Add proper error handling
+        except ValueError as e:
+            # Not relative to base_dir, continue to next check
+            logging.debug("Resolved check failed: %s is not relative to %s (%s)", t_res, b_res, e)
+            pass
 
     # 3. Case-insensitive string check (Windows specific fallback)
     t_str = str(t_res).lower().replace("\\", "/")
@@ -282,6 +287,9 @@ def scan_structure() -> bool:
 
 # --- Main ---
 if __name__ == "__main__":
+    # Configure logging (default to WARNING to avoid polluting stdout with INFO/DEBUG)
+    logging.basicConfig(level=logging.WARNING, format="%(levelname)s: %(message)s")
+
     if len(sys.argv) > 1:
         cmd = sys.argv[1]
         if cmd == "verify":

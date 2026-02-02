@@ -8,7 +8,10 @@ Integrates with Symplokē for semantic search.
 
 from typing import List, Tuple, Optional
 from dataclasses import dataclass
+import logging
 from .macro_registry import MacroRegistry, Macro, BUILTIN_MACROS
+
+logger = logging.getLogger(__name__)
 
 try:
     from sentence_transformers import SentenceTransformer
@@ -122,8 +125,9 @@ class SemanticMacroMatcher:
             try:
                 self.model = SentenceTransformer(self.MODEL_NAME)
                 self._build_index()
-            except Exception:
-                pass  # TODO: Add proper error handling
+            except Exception as e:
+                logger.error(f"Failed to initialize semantic matcher: {e}", exc_info=True)
+                self.model = None
 
     def _build_index(self):
         """Build embedding index for all macro descriptions."""

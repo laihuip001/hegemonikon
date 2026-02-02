@@ -92,6 +92,7 @@ class DebateAgent:
         self.model = model
         self.temperature = temperature
         self._llm_available = self._check_llm()
+        self.client = None
     
     def _check_llm(self) -> bool:
         """LLM が利用可能か確認"""
@@ -220,17 +221,18 @@ class DebateAgent:
         if not self._llm_available:
             return self._fallback_generate(prompt)
         
-        import os
-        from openai import AsyncOpenAI
-        
-        api_key = os.environ.get("OPENAI_API_KEY")
-        if not api_key:
-            return self._fallback_generate(prompt)
-        
-        client = AsyncOpenAI(api_key=api_key)
+        if self.client is None:
+            import os
+            from openai import AsyncOpenAI
+
+            api_key = os.environ.get("OPENAI_API_KEY")
+            if not api_key:
+                return self._fallback_generate(prompt)
+
+            self.client = AsyncOpenAI(api_key=api_key)
         
         try:
-            response = await client.chat.completions.create(
+            response = await self.client.chat.completions.create(
                 model=self.model.replace("openai/", ""),
                 messages=[{"role": "user", "content": prompt}],
                 temperature=self.temperature

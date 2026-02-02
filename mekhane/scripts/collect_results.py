@@ -102,8 +102,8 @@ class JulesResultCollector:
                 t1 = dt_parser.parse(created)
                 t2 = dt_parser.parse(updated)
                 duration = int((t2 - t1).total_seconds())
-            except Exception:
-                pass  # TODO: Add proper error handling
+            except Exception as e:
+                logger.warning(f"Date parsing failed for session {data.get('id', 'unknown')}: {e}")
 
         # Check if silent (no output = no issues found)
         is_silent = data.get("state") == "COMPLETED" and not outputs

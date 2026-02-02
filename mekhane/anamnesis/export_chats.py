@@ -334,9 +334,8 @@ class AntigravityChatExporter:
             traceback.print_exc()
             return all_messages
 
-    def _process_raw_messages(self, raw_messages: List[Dict]) -> List[Dict]:
-        """収集したメッセージをロール判定してフォーマット"""
-        messages = []
+    def _determine_role(self, content: str, raw_text: str, section_idx: Optional[str]) -> str:
+        """メッセージのロールを判定する"""
 
         # Claude 判定パターン
         claude_patterns = [
@@ -378,29 +377,41 @@ class AntigravityChatExporter:
             "3",
         ]
 
+        # デフォルトは assistant
+        role = "assistant"
+
+        is_claude = any(p in raw_text for p in claude_patterns)
+        is_user = len(content) < 200 and any(
+            content.strip().startswith(p) for p in user_start_patterns
+        )
+
+        if is_claude:
+            role = "assistant"
+        elif is_user:
+            role = "user"
+        elif section_idx is not None:
+            try:
+                idx_num = int(section_idx)
+                role = "user" if idx_num % 2 == 0 else "assistant"
+            except ValueError:
+                print(f"    [!] Warning: Invalid section_idx '{section_idx}', defaulting to assistant role")
+                role = "assistant"
+            except Exception as e:
+                print(f"    [!] Error parsing section_idx '{section_idx}': {e}")
+                role = "assistant"
+
+        return role
+
+    def _process_raw_messages(self, raw_messages: List[Dict]) -> List[Dict]:
+        """収集したメッセージをロール判定してフォーマット"""
+        messages = []
+
         for i, item in enumerate(raw_messages):
             content = item["clean_text"]
             raw_text = item.get("raw_text", "")
             section_idx = item.get("section_idx")
 
-            # ロール判定
-            role = "assistant"  # デフォルト
-
-            is_claude = any(p in raw_text for p in claude_patterns)
-            is_user = len(content) < 200 and any(
-                content.strip().startswith(p) for p in user_start_patterns
-            )
-
-            if is_claude:
-                role = "assistant"
-            elif is_user:
-                role = "user"
-            elif section_idx is not None:
-                try:
-                    idx_num = int(section_idx)
-                    role = "user" if idx_num % 2 == 0 else "assistant"
-                except Exception:
-                    pass  # TODO: Add proper error handling
+            role = self._determine_role(content, raw_text, section_idx)
 
             messages.append(
                 {"role": role, "content": content[:10000], "section_index": section_idx}
@@ -516,78 +527,14 @@ class AntigravityChatExporter:
                     if len(clean_text) < MIN_MESSAGE_LENGTH:
                         continue
 
-                    # ロール判定（改善版 v2）
-                    # 1. 元テキストに「Thought for」があれば Claude
-                    # 2. UI 要素パターンがあれば Claude（ツール出力）
-                    # 3. フォールバック: index ベース（偶数=User, 奇数=Claude）
-
                     # 元テキストを取得（Thought for 判定用）
                     raw_text = item["raw_text"]
 
                     # data-section-index を取得（フォールバック用）
                     section_idx = item["section_idx"]
 
-                    # Claude 検出パターン
-                    claude_patterns = [
-                        "Thought for",
-                        "Files Edited",
-                        "Progress Updates",
-                        "Background Steps",
-                        "Ran terminal command",
-                        "Open Terminal",
-                        "Exit code",
-                        "Always Proceed",
-                        "RunningOpen",
-                        "Analyzed",
-                        "Edited",
-                        "Generating",
-                        "GoodBad",
-                        "OpenProceed",
-                    ]
-
-                    # User 検出パターン（明示的な User 入力）
-                    user_start_patterns = [
-                        "@",
-                        "/",
-                        "Continue",
-                        "続けて",
-                        "はい",
-                        "いいえ",
-                        "y\n",
-                        "Y\n",
-                        "ok",
-                        "OK",
-                        "実験",
-                        "やってみ",
-                        "改善",
-                        "修正",
-                        "まずは",
-                        "1",
-                        "2",
-                        "3",
-                    ]
-
-                    role = "assistant"  # デフォルト
-
-                    # Claude 判定: Thought for または UI 要素
-                    is_claude = any(p in raw_text for p in claude_patterns)
-
-                    # User 判定: 短いメッセージ + User パターン
-                    is_user = len(clean_text) < 200 and any(
-                        clean_text.strip().startswith(p) for p in user_start_patterns
-                    )
-
-                    if is_claude:
-                        role = "assistant"
-                    elif is_user:
-                        role = "user"
-                    elif section_idx is not None:
-                        # index ベースフォールバック（偶数=User, 奇数=Claude）
-                        try:
-                            idx_num = int(section_idx)
-                            role = "user" if idx_num % 2 == 0 else "assistant"
-                        except Exception:
-                            pass  # TODO: Add proper error handling
+                    # ロール判定（改善版 v2）
+                    role = self._determine_role(clean_text, raw_text, section_idx)
 
                     messages.append(
                         {

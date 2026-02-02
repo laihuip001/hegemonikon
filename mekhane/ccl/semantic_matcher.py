@@ -6,9 +6,12 @@ Uses vector embeddings to match Japanese natural language to CCL macros.
 Integrates with Symplokē for semantic search.
 """
 
+import logging
 from typing import List, Tuple, Optional
 from dataclasses import dataclass
 from .macro_registry import MacroRegistry, Macro, BUILTIN_MACROS
+
+logger = logging.getLogger(__name__)
 
 try:
     from sentence_transformers import SentenceTransformer
@@ -122,8 +125,9 @@ class SemanticMacroMatcher:
             try:
                 self.model = SentenceTransformer(self.MODEL_NAME)
                 self._build_index()
-            except Exception:
-                pass  # TODO: Add proper error handling
+            except Exception as e:
+                logger.error(f"Failed to initialize SemanticMacroMatcher: {e}")
+                self.model = None
 
     def _build_index(self):
         """Build embedding index for all macro descriptions."""
@@ -159,34 +163,38 @@ class SemanticMacroMatcher:
         if not self.is_available():
             return []
 
-        # Encode query
-        query_embedding = self.model.encode([query])[0]
+        try:
+            # Encode query
+            query_embedding = self.model.encode([query])[0]
 
-        # Calculate similarities
-        scores = []
-        for term, embedding in self.embeddings.items():
-            similarity = np.dot(query_embedding, embedding) / (
-                np.linalg.norm(query_embedding) * np.linalg.norm(embedding)
-            )
-            macro_name = self.term_to_macro[term]
-            macro = self.registry.get(macro_name) or BUILTIN_MACROS.get(macro_name)
-            if macro:
-                scores.append(
-                    MacroMatch(macro=macro, score=float(similarity), matched_term=term)
+            # Calculate similarities
+            scores = []
+            for term, embedding in self.embeddings.items():
+                similarity = np.dot(query_embedding, embedding) / (
+                    np.linalg.norm(query_embedding) * np.linalg.norm(embedding)
                 )
+                macro_name = self.term_to_macro[term]
+                macro = self.registry.get(macro_name) or BUILTIN_MACROS.get(macro_name)
+                if macro:
+                    scores.append(
+                        MacroMatch(macro=macro, score=float(similarity), matched_term=term)
+                    )
 
-        # Sort by score, deduplicate by macro name
-        scores.sort(key=lambda x: x.score, reverse=True)
-        seen = set()
-        results = []
-        for match in scores:
-            if match.macro.name not in seen:
-                seen.add(match.macro.name)
-                results.append(match)
-                if len(results) >= top_k:
-                    break
+            # Sort by score, deduplicate by macro name
+            scores.sort(key=lambda x: x.score, reverse=True)
+            seen = set()
+            results = []
+            for match in scores:
+                if match.macro.name not in seen:
+                    seen.add(match.macro.name)
+                    results.append(match)
+                    if len(results) >= top_k:
+                        break
 
-        return results
+            return results
+        except Exception as e:
+            logger.error(f"Error during semantic matching: {e}")
+            return []
 
     def suggest(self, query: str, threshold: float = 0.6) -> Optional[Macro]:
         """

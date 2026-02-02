@@ -245,7 +245,7 @@ def get_boot_handoffs(mode: str = "standard", context: str = None) -> dict:
                             )
                             proactive_memories.append(doc)
             except Exception as e:
-                pass  # TODO: Add proper error handling
+                print(f"⚠️ Proactive recall error: {e}")
 
     return {
         "latest": latest,

@@ -15,8 +15,11 @@ Original: Flow AI v4.1 PrivacyHandler, PrivacyScanner
 Recast: Hegemonikón A2 Krisis (Epochē) vocabulary
 """
 
+import logging
 import re
 from typing import Dict, List, Tuple, Optional
+
+logger = logging.getLogger("epoche_shield")
 
 
 class EpocheScanner:
@@ -167,8 +170,8 @@ class EpocheShield:
                         masked_text = masked_text.replace(term, placeholder)
                         mapping[placeholder] = term
                         counter += 1
-            except Exception:
-                pass  # TODO: Add proper error handling
+            except Exception as e:
+                logger.warning(f"Failed to use custom vocab masking: {e}")
 
         return masked_text, mapping
 

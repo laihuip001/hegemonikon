@@ -5,6 +5,7 @@
 """
 
 import asyncio
+import logging
 from pathlib import Path
 
 CDP_PORT = 9222
@@ -12,6 +13,7 @@ OUTPUT_FILE = Path(r"M:\Hegemonikon\mekhane\anamnesis\all_pages.txt")
 
 
 async def main():
+    logging.basicConfig(level=logging.INFO)
     from playwright.async_api import async_playwright
 
     async with async_playwright() as p:
@@ -62,8 +64,9 @@ async def main():
                             lines.append(
                                 f"    [{i}] {text[:50] if text else '(empty)'}"
                             )
-                        except Exception:
-                            pass  # TODO: Add proper error handling
+                        except Exception as e:
+                            logging.warning(f"Failed to get text content for button {i}: {e}")
+                            continue
 
         with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
             f.write("\n".join(lines))

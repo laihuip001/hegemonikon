@@ -9,7 +9,7 @@
   "results": [
     {
       "status": "error",
-      "error": "An unexpected critical error occurred:Error: Approval mode \"plan\" is only available when experimental.plan is enabled.\n    at loadCliConfig (file:///home/laihuip001/oikos/.npm/_npx/38c708f8d73fe4c9/node_modules/@google/gemini-cli/bundle/gemini.js:522433:17)\n    at async main (file:///home/laihuip001/oikos/.npm/_npx/38c708f8d73fe4c9/node_modules/@google/gemini-cli/bundle/gemini.js:526756:25)\n",
+      "error": "An unexpected critical error occurred:Error: Approval mode \"plan\" is only available when experimental.plan is enabled.\n    at loadCliConfig (file:///home/makaron8426/oikos/.npm/_npx/38c708f8d73fe4c9/node_modules/@google/gemini-cli/bundle/gemini.js:522433:17)\n    at async main (file:///home/makaron8426/oikos/.npm/_npx/38c708f8d73fe4c9/node_modules/@google/gemini-cli/bundle/gemini.js:526756:25)\n",
       "ccl": "/tek+"
     }
   ],

@@ -36,7 +36,7 @@ ccl_signature: "/epi+"
 
 # /epi: 知識確立ワークフロー (Epistēmē) v1.1
 
-> **正本参照**: [A4 Epistēmē SKILL.md](file:///home/laihuip001/oikos/.agent/skills/akribeia/a4-episteme/SKILL.md)
+> **正本参照**: [A4 Epistēmē SKILL.md](file:///home/makaron8426/oikos/.agent/skills/akribeia/a4-episteme/SKILL.md)
 > **目的**: 信念を知識に昇格させる — Doxa から Epistēmē へ
 > **役割**: 知識の確実性の検証
 
@@ -678,12 +678,12 @@ ccl_signature: "/epi+"
 
 ## Artifact 自動保存
 
-> **標準参照**: [workflow_artifact_standard.md](file:///home/laihuip001/oikos/.agent/standards/workflow_artifact_standard.md)
+> **標準参照**: [workflow_artifact_standard.md](file:///home/makaron8426/oikos/.agent/standards/workflow_artifact_standard.md)
 
 ### 保存先
 
 ```
-/home/laihuip001/oikos/mneme/.hegemonikon/workflows/epi_<topic>_<date>.md
+/home/makaron8426/oikos/mneme/.hegemonikon/workflows/epi_<topic>_<date>.md
 ```
 
 例: `epi_知識確立_20260129.md`
@@ -709,7 +709,7 @@ ccl_signature: "/epi+"
 
 | Module | Workflow | Skill (正本) | Status |
 |:-------|:---------|:-------------|:-------|
-| A4 Epistēmē | /epi | [SKILL.md](file:///home/laihuip001/oikos/.agent/skills/akribeia/a4-episteme/SKILL.md) | v1.0 Ready |
+| A4 Epistēmē | /epi | [SKILL.md](file:///home/makaron8426/oikos/.agent/skills/akribeia/a4-episteme/SKILL.md) | v1.0 Ready |
 
 ---
 

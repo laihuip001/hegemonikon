@@ -315,7 +315,7 @@ def main():
     print("=" * 50)
 
     # Git リポジトリに移動
-    repo_path = Path("/home/laihuip001/oikos/hegemonikon")
+    repo_path = Path("/home/makaron8426/oikos/hegemonikon")
     os.chdir(repo_path)
 
     # 最新を取得

@@ -36,7 +36,7 @@ ccl_signature: "/hod+_/ene"
 
 # /hod: 経路定義ワークフロー (Hodos) v2.1
 
-> **正本参照**: [P2 Hodos SKILL.md](file:///home/laihuip001/oikos/.agent/skills/perigraphe/p2-hodos/SKILL.md)
+> **正本参照**: [P2 Hodos SKILL.md](file:///home/makaron8426/oikos/.agent/skills/perigraphe/p2-hodos/SKILL.md)
 > **目的**: 「どう進めるか」を決定する — 条件空間における経路
 > **役割**: 方法論・道筋の選択
 
@@ -385,12 +385,12 @@ ccl_signature: "/hod+_/ene"
 
 ## Artifact 自動保存
 
-> **標準参照**: [workflow_artifact_standard.md](file:///home/laihuip001/oikos/.agent/standards/workflow_artifact_standard.md)
+> **標準参照**: [workflow_artifact_standard.md](file:///home/makaron8426/oikos/.agent/standards/workflow_artifact_standard.md)
 
 ### 保存先
 
 ```
-/home/laihuip001/oikos/mneme/.hegemonikon/workflows/hod_<topic>_<date>.md
+/home/makaron8426/oikos/mneme/.hegemonikon/workflows/hod_<topic>_<date>.md
 ```
 
 例: `hod_経路定義_20260129.md`
@@ -416,7 +416,7 @@ ccl_signature: "/hod+_/ene"
 
 | Module | Workflow | Skill (正本) | Status |
 |:-------|:---------|:-------------|:-------|
-| P2 Hodos | /hod | [SKILL.md](file:///home/laihuip001/oikos/.agent/skills/perigraphe/p2-hodos/SKILL.md) | v1.0 Ready |
+| P2 Hodos | /hod | [SKILL.md](file:///home/makaron8426/oikos/.agent/skills/perigraphe/p2-hodos/SKILL.md) | v1.0 Ready |
 
 ---
 

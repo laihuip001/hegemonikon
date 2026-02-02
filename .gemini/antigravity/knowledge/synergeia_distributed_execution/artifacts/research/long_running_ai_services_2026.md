@@ -23,7 +23,7 @@
 
 - **Coordinator & Specialists**: Coordinator がタスクをパースし、Research, Coder, Reporter などの専門家に分散。
 - **Durable Docker Environment**: Docker コンテナ内での隔離実行と、長時間タスクの並行処理。
-- **MVP (Colab)**: [OpenManus Colab MVP](/home/laihuip001/oikos/hegemonikon/experiments/openmanus_mvp.ipynb) にて動作確認。GPT-4o-mini ベースで Web 調査やコーディングを自律代行。
+- **MVP (Colab)**: [OpenManus Colab MVP](/home/makaron8426/oikos/hegemonikon/experiments/openmanus_mvp.ipynb) にて動作確認。GPT-4o-mini ベースで Web 調査やコーディングを自律代行。
 - **Hegemonikón 親和性**: `/bou` から `/ene` へのワークフローをエージェント群へマッピング（ Translator 開発により自動化可能）。
 
 ## 2. ワークフロー・プラットフォーム

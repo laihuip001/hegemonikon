@@ -37,7 +37,7 @@ ccl_signature: "/dox+_/bye"
 
 # /dox: 信念定着ワークフロー (Doxa) v2.1
 
-> **正本参照**: [H4 Doxa SKILL.md](file:///home/laihuip001/oikos/.agent/skills/horme/h4-doxa/SKILL.md)
+> **正本参照**: [H4 Doxa SKILL.md](file:///home/makaron8426/oikos/.agent/skills/horme/h4-doxa/SKILL.md)
 > **目的**: 信念を記録・永続化する — 長期記憶への格納
 > **役割**: 価値判断の確信度評価と記録
 
@@ -429,12 +429,12 @@ result = select_derivative("H4", "この経験から学んだことを記録し�
 
 ## Artifact 自動保存
 
-> **標準参照**: [workflow_artifact_standard.md](file:///home/laihuip001/oikos/.agent/standards/workflow_artifact_standard.md)
+> **標準参照**: [workflow_artifact_standard.md](file:///home/makaron8426/oikos/.agent/standards/workflow_artifact_standard.md)
 
 ### 保存先
 
 ```
-/home/laihuip001/oikos/mneme/.hegemonikon/workflows/dox_<topic>_<date>.md
+/home/makaron8426/oikos/mneme/.hegemonikon/workflows/dox_<topic>_<date>.md
 ```
 
 例: `dox_信念記録_20260129.md`
@@ -460,7 +460,7 @@ result = select_derivative("H4", "この経験から学んだことを記録し�
 
 | Module | Workflow | Skill (正本) | Status |
 |:-------|:---------|:-------------|:-------|
-| H4 Doxa | /dox | [SKILL.md](file:///home/laihuip001/oikos/.agent/skills/horme/h4-doxa/SKILL.md) | v1.0 Ready |
+| H4 Doxa | /dox | [SKILL.md](file:///home/makaron8426/oikos/.agent/skills/horme/h4-doxa/SKILL.md) | v1.0 Ready |
 
 ---
 

@@ -35,7 +35,7 @@ ccl_signature: "/pat+"
 
 # /pat: メタ感情評価ワークフロー (Pathos) v1.1
 
-> **正本参照**: [A1 Pathos SKILL.md](file:///home/laihuip001/oikos/.agent/skills/akribeia/a1-pathos/SKILL.md)
+> **正本参照**: [A1 Pathos SKILL.md](file:///home/makaron8426/oikos/.agent/skills/akribeia/a1-pathos/SKILL.md)
 > **目的**: 「この判断に対してどう感じるか」を評価する — 傾向の傾向
 > **役割**: 二次的傾向・メタ感情の検出
 
@@ -325,12 +325,12 @@ ccl_signature: "/pat+"
 
 ## Artifact 自動保存
 
-> **標準参照**: [workflow_artifact_standard.md](file:///home/laihuip001/oikos/.agent/standards/workflow_artifact_standard.md)
+> **標準参照**: [workflow_artifact_standard.md](file:///home/makaron8426/oikos/.agent/standards/workflow_artifact_standard.md)
 
 ### 保存先
 
 ```
-/home/laihuip001/oikos/mneme/.hegemonikon/workflows/pat_<topic>_<date>.md
+/home/makaron8426/oikos/mneme/.hegemonikon/workflows/pat_<topic>_<date>.md
 ```
 
 例: `pat_メタ感情_20260129.md`
@@ -356,7 +356,7 @@ ccl_signature: "/pat+"
 
 | Module | Workflow | Skill (正本) | Status |
 |:-------|:---------|:-------------|:-------|
-| A1 Pathos | /pat | [SKILL.md](file:///home/laihuip001/oikos/.agent/skills/akribeia/a1-pathos/SKILL.md) | v1.0 Ready |
+| A1 Pathos | /pat | [SKILL.md](file:///home/makaron8426/oikos/.agent/skills/akribeia/a1-pathos/SKILL.md) | v1.0 Ready |
 
 ---
 

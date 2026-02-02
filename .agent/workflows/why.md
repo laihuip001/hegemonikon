@@ -38,7 +38,7 @@ ccl_signature: "F:5{/zet}"
 
 # /why: 根本原因分析ワークフロー (Five Whys)
 
-> **親定理**: [O3 Zētēsis /zet](file:///home/laihuip001/oikos/.agent/workflows/zet.md)
+> **親定理**: [O3 Zētēsis /zet](file:///home/makaron8426/oikos/.agent/workflows/zet.md)
 > **目的**: 根本原因を問い続けて表層を超える
 > **SE手法**: Five Whys (トヨタ生産方式)
 

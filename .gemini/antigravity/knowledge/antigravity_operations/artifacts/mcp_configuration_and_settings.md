@@ -6,12 +6,12 @@ Hegemonikón leverages the Model Context Protocol (MCP) to extend the capabiliti
 
 ### 2.1 Extension Level (Roo-Cline)
 
-Location: `/home/laihuip001/.config/Antigravity/User/globalStorage/rooveterinaryinc.roo-cline/settings/mcp_settings.json`
+Location: `/home/makaron8426/.config/Antigravity/User/globalStorage/rooveterinaryinc.roo-cline/settings/mcp_settings.json`
 *Used by:* The Roo-Cline / Cline extension agents.
 
 ### 2.2 IDE Level (Antigravity Internal Agent)
 
-Location: `/home/laihuip001/oikos/.gemini/antigravity/mcp_config.json`
+Location: `/home/makaron8426/oikos/.gemini/antigravity/mcp_config.json`
 *Used by:* The core Antigravity Gemini agent (the primary system assistant).
 
 ## 3. Active Server Configuration (2026-01-29)
@@ -55,9 +55,9 @@ The Hermēneus MCP server allows the AI to autonomously execute and verify CCL w
     "hermeneus": {
       "command": "python",
       "args": ["-m", "hermeneus.src.mcp_server"],
-      "cwd": "/home/laihuip001/oikos/hegemonikon",
+      "cwd": "/home/makaron8426/oikos/hegemonikon",
       "env": {
-        "PYTHONPATH": "/home/laihuip001/oikos/hegemonikon"
+        "PYTHONPATH": "/home/makaron8426/oikos/hegemonikon"
       }
     }
   }

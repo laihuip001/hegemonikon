@@ -12,7 +12,7 @@ anti_skip: enabled
 
 # /fit: 消化品質診断 (Digestion Audit)
 
-> **親クラス (抽象)**: [A2 Krisis SKILL.md § 消化原則](file:///home/laihuip001/oikos/.agent/skills/akribeia/a2-krisis/SKILL.md)
+> **親クラス (抽象)**: [A2 Krisis SKILL.md § 消化原則](file:///home/makaron8426/oikos/.agent/skills/akribeia/a2-krisis/SKILL.md)
 > **目的**: モジュール統合が Naturalized 状態に達しているか検証する
 > **親コマンド**: /dia
 
@@ -25,7 +25,7 @@ anti_skip: enabled
 ```text
 実行手順:
 1. view_file ツールで A2 SKILL.md を読み込む
-   パス: /home/laihuip001/oikos/.agent/skills/akribeia/a2-krisis/SKILL.md
+   パス: /home/makaron8426/oikos/.agent/skills/akribeia/a2-krisis/SKILL.md
 2. 「消化原則 (Digestion Principle)」セクションを確認
 3. 3段階消化レベルと4つのチェックリストを理解
 4. 確認後、以下の具体的手順を実行
@@ -464,7 +464,7 @@ empowerment_score = capability + coherence + cognitive
 
 | Module | Workflow | Skill (親クラス) | Status |
 | :------- |:---------|------------------| :------- |
-| A2 Krisis | /fit | [消化原則](file:///home/laihuip001/oikos/.agent/skills/akribeia/a2-krisis/SKILL.md) | v3.1 Ready |
+| A2 Krisis | /fit | [消化原則](file:///home/makaron8426/oikos/.agent/skills/akribeia/a2-krisis/SKILL.md) | v3.1 Ready |
 
 ---
 

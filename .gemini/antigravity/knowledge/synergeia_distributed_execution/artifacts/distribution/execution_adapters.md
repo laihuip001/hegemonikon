@@ -18,7 +18,7 @@ def execute_claude(ccl: str, context: str) -> Dict[str, Any]:
         result = subprocess.run(
             ["claude", "-p", prompt],
             capture_output=True, text=True, timeout=600,
-            cwd="/home/laihuip001/oikos/hegemonikon"
+            cwd="/home/makaron8426/oikos/hegemonikon"
         )
         answer = result.stdout.strip()
         # handle error...
@@ -63,7 +63,7 @@ Provide a detailed conceptual response without executing any tools."""
             capture_output=True,
             text=True,
             timeout=600,  # 最大10分
-            cwd="/home/laihuip001/oikos/hegemonikon"
+            cwd="/home/makaron8426/oikos/hegemonikon"
         )
         # 応答のパース処理...
 ```
@@ -91,7 +91,7 @@ def execute_codex(ccl: str, context: str) -> Dict[str, Any]:
             capture_output=True,
             text=True,
             timeout=600,  # 最大10分
-            cwd="/home/laihuip001/oikos/hegemonikon"
+            cwd="/home/makaron8426/oikos/hegemonikon"
         )
         # Codex は最初と最後にメタデータがあるので整理
         lines = result.stdout.strip().split("\n")

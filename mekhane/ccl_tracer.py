@@ -12,7 +12,7 @@ Usage:
   python3 ccl_tracer.py step "<op>" --status=<status> --note="<note>"
   python3 ccl_tracer.py end --status=<status>
 
-Log Path: /home/laihuip001/oikos/.gemini/antigravity/logs/ccl.log
+Log Path: /home/makaron8426/oikos/.gemini/antigravity/logs/ccl.log
 """
 
 import sys
@@ -23,7 +23,7 @@ import argparse
 from pathlib import Path
 from typing import Optional
 
-LOG_DIR = Path("/home/laihuip001/oikos/.gemini/antigravity/logs")
+LOG_DIR = Path("/home/makaron8426/oikos/.gemini/antigravity/logs")
 LOG_FILE = LOG_DIR / "ccl.log"
 STATE_FILE = LOG_DIR / "ccl_state.json"
 

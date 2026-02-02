@@ -130,7 +130,7 @@ version: "2.1.0"
 
 | 層 | 実現手段 | 参照 |
 |----|----------|------|
-| **Micro** | /noe workflow | [noe.md](file:///home/laihuip001/oikos/.agent/workflows/noe.md) |
+| **Micro** | /noe workflow | [noe.md](file:///home/makaron8426/oikos/.agent/workflows/noe.md) |
 | **Macro** | mekhane/noesis/ | (将来実装) 知見蓄積・パターン学習 |
 
 ### Micro 実現 (/noe) の詳細
@@ -212,5 +212,5 @@ version: "2.1.0"
 
 ---
 
-*参照: [ousia.md](file:///home/laihuip001/oikos/hegemonikon/kernel/ousia.md)*  
+*参照: [ousia.md](file:///home/makaron8426/oikos/hegemonikon/kernel/ousia.md)*  
 *バージョン: 2.1.0 (2026-01-27)*

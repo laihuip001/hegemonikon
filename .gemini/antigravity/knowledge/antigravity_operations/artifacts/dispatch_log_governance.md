@@ -1,6 +1,6 @@
 # Dispatch Log Governance (v2.0)
 
-> **File**: `/home/laihuip001/oikos/mneme/.hegemonikon/logs/dispatch_log.yaml`
+> **File**: `/home/makaron8426/oikos/mneme/.hegemonikon/logs/dispatch_log.yaml`
 > **Role**: Source of truth for Hegemonikón's autonomous operation and Phase B eligibility.
 
 ## 1. Schema v2.0 Overview

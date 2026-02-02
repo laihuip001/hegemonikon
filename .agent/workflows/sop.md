@@ -49,10 +49,10 @@ ccl_signature: "/sop+_/noe"
 
 # /sop: 情報収集ワークフロー (Sophia) v5.2
 
-> **正本参照**: [K4 Sophia SKILL.md](file:///home/laihuip001/oikos/.agent/skills/kairos/k4-sophia/SKILL.md)
+> **正本参照**: [K4 Sophia SKILL.md](file:///home/makaron8426/oikos/.agent/skills/kairos/k4-sophia/SKILL.md)
 > **目的**: 外部ソースから情報を収集する — Perplexity調査依頼を生成
 > **役割**: observe 行動 — 環境からの知識取得
-> **KI 参照**: [hegemonikon_research_standard.md](file:///home/laihuip001/oikos/.gemini/antigravity/knowledge/search_exploration_optimization/artifacts/protocols/hegemonikon_research_standard.md)
+> **KI 参照**: [hegemonikon_research_standard.md](file:///home/makaron8426/oikos/.gemini/antigravity/knowledge/search_exploration_optimization/artifacts/protocols/hegemonikon_research_standard.md)
 
 ---
 
@@ -434,12 +434,12 @@ Perplexity は**冒頭500-2000トークン**を優先処理する。以下の順
 
 ## Artifact 自動保存
 
-> **標準参照**: [workflow_artifact_standard.md](file:///home/laihuip001/oikos/.agent/standards/workflow_artifact_standard.md)
+> **標準参照**: [workflow_artifact_standard.md](file:///home/makaron8426/oikos/.agent/standards/workflow_artifact_standard.md)
 
 ### 保存先
 
 ```
-/home/laihuip001/oikos/mneme/.hegemonikon/workflows/sop_<topic>_<date>.md
+/home/makaron8426/oikos/mneme/.hegemonikon/workflows/sop_<topic>_<date>.md
 ```
 
 例: `sop_perplexity_optimization_20260129.md`
@@ -650,7 +650,7 @@ python -m mekhane.ergasterion.digestor.pipeline --execute --topics agent-archite
 
 | Module | Workflow | Skill (正本) | Status |
 |:-------|:---------|:-------------|:-------|
-| K4 Sophia | /sop | [SKILL.md](file:///home/laihuip001/oikos/.agent/skills/kairos/k4-sophia/SKILL.md) | v5.1 Ready |
+| K4 Sophia | /sop | [SKILL.md](file:///home/makaron8426/oikos/.agent/skills/kairos/k4-sophia/SKILL.md) | v5.1 Ready |
 
 ---
 

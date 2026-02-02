@@ -1,7 +1,7 @@
 # CEP Index — CCL Enhancement Proposals
 
 > **Last Updated**: 2026-01-30
-> **Governance**: [CEP-000](file:///home/laihuip001/oikos/hegemonikon/kernel/cep/CEP-000.md)
+> **Governance**: [CEP-000](file:///home/makaron8426/oikos/hegemonikon/kernel/cep/CEP-000.md)
 
 ---
 

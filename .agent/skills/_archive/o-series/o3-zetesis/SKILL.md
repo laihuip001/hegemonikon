@@ -140,7 +140,7 @@ version: "2.1.0"
 
 | 層 | 実現手段 | 参照 |
 |----|----------|------|
-| **Micro** | /zet workflow | [zet.md](file:///home/laihuip001/oikos/.agent/workflows/zet.md) |
+| **Micro** | /zet workflow | [zet.md](file:///home/makaron8426/oikos/.agent/workflows/zet.md) |
 | **Macro** | mekhane/anamnesis/collectors/ | 外部情報収集インフラ |
 
 ### Micro 実現 (/zet) の詳細
@@ -234,5 +234,5 @@ version: "2.1.0"
 
 ---
 
-*参照: [ousia.md](file:///home/laihuip001/oikos/hegemonikon/kernel/ousia.md)*  
+*参照: [ousia.md](file:///home/makaron8426/oikos/hegemonikon/kernel/ousia.md)*  
 *バージョン: 2.1.0 (2026-01-27)*

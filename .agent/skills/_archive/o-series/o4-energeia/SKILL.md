@@ -145,7 +145,7 @@ version: "2.1.0"
 
 | 層 | 実現手段 | 参照 |
 |----|----------|------|
-| **Micro** | /ene workflow | [ene.md](file:///home/laihuip001/oikos/.agent/workflows/ene.md) |
+| **Micro** | /ene workflow | [ene.md](file:///home/makaron8426/oikos/.agent/workflows/ene.md) |
 | **Macro** | mekhane/ergasterion/ | ファクトリ・プロトコル |
 
 ### Micro 実現 (/ene) の詳細
@@ -263,5 +263,5 @@ version: "2.1.0"
 
 ---
 
-*参照: [ousia.md](file:///home/laihuip001/oikos/hegemonikon/kernel/ousia.md)*  
+*参照: [ousia.md](file:///home/makaron8426/oikos/hegemonikon/kernel/ousia.md)*  
 *バージョン: 2.1.0 (2026-01-27)*

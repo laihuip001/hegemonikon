@@ -6,7 +6,7 @@
 
 ## Origin
 
-- **Source**: `/home/laihuip001/ダウンロード/Brain/99_🗃️_保管庫｜Archive/プロンプト ライブラリー/モジュール/`
+- **Source**: `/home/makaron8426/ダウンロード/Brain/99_🗃️_保管庫｜Archive/プロンプト ライブラリー/モジュール/`
 - **Archive Date**: 2026-01-28
 - **File Count**: 31
 

@@ -39,5 +39,5 @@ Hegemonikón and the **STOIC Architecture** (Jeff Borneman, RELCOG Labs) are con
 
 ## 5. References
 
-- [Formal Differentiation Document (2026-01-28)](/home/laihuip001/oikos/hegemonikon/docs/research/stoic_hegemonikon_comparison.md)
-- [Archived Perplexity Research (Mneme)](/home/laihuip001/oikos/mneme/perplexity_reports/)
+- [Formal Differentiation Document (2026-01-28)](/home/makaron8426/oikos/hegemonikon/docs/research/stoic_hegemonikon_comparison.md)
+- [Archived Perplexity Research (Mneme)](/home/makaron8426/oikos/mneme/perplexity_reports/)

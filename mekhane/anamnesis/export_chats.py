@@ -41,7 +41,7 @@ import argparse
 # ============================================================================
 
 # GCP/Linux 環境に対応
-DEFAULT_OUTPUT_DIR = Path("/home/laihuip001/oikos/mneme/.hegemonikon/sessions")
+DEFAULT_OUTPUT_DIR = Path("/home/makaron8426/oikos/mneme/.hegemonikon/sessions")
 CDP_PORT = 9222  # Chrome DevTools Protocol ポート
 
 # メッセージ抽出の閾値

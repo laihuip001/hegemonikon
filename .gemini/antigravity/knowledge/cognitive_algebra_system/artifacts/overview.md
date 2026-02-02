@@ -243,7 +243,7 @@ Python の設計思想（Zen of Python）を CCL として「消化」するプ�
 - **委譲の原則 (Labor vs Cognition)**: 30分以上の「労働」を伴う CCL は、持続力を持つ外部エージェント（手足）に委譲する。
 - **スレッドキャパシティ**: 各スレッドが **60 CP** 以下であれば、全体のプログラム長には制限がない。
 - **分散演算子**: `|>` (パイプライン), `||` (並列), `@thread` (スレッド指定), `@delegate` (委譲).
-- **実装プロジェクト**: [Project Synergeia (Distributed Execution)](/home/laihuip001/oikos/.gemini/antigravity/knowledge/synergeia_distributed_execution) ⚡NEW
+- **実装プロジェクト**: [Project Synergeia (Distributed Execution)](/home/makaron8426/oikos/.gemini/antigravity/knowledge/synergeia_distributed_execution) ⚡NEW
 - **研究プロジェクト**: [Activation Steering Research](research/activation_steering_2026.md) ⚡NEW
 
 **即時利用可能なスレッド**:

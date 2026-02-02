@@ -151,8 +151,8 @@ The first real-world learning of the A-matrix was executed via `/noe "FEP観点�
 
 ## 6. References
 
-- [Perplexity FEP Implementation Report (2026-01-28)](/home/laihuip001/oikos/hegemonikon/docs/research/perplexity/fep_implementation_patterns_2026-01-28.md)
-- [Implementation Plan v2.0 (2026-01-28)](/home/laihuip001/oikos/.gemini/antigravity/brain/bd448700-283c-4bcb-9335-6d1b7c45425a/implementation_plan.md)
+- [Perplexity FEP Implementation Report (2026-01-28)](/home/makaron8426/oikos/hegemonikon/docs/research/perplexity/fep_implementation_patterns_2026-01-28.md)
+- [Implementation Plan v2.0 (2026-01-28)](/home/makaron8426/oikos/.gemini/antigravity/brain/bd448700-283c-4bcb-9335-6d1b7c45425a/implementation_plan.md)
 - Borneman, J. (2026). *The STOIC Architecture*. PhilArchive BORAHI.
 - Prakki, R. (2024). *Active Inference for Self-Organizing Multi-LLM Systems*. arXiv:2412.10425.
 - Wakayama et al. (2022). *VBIS and Laplace approximation for Active Inference*.

@@ -21,33 +21,37 @@ class PatternCache:
     # Keyword to workflow mapping
     KEYWORD_MAP = {
         # O-Series
-        r"(分析|調査|理解|把握)": "/s",
-        r"(認識|本質|意味|深く考)": "/noe",
-        r"(意志|目標|ゴール|望み|したい)": "/bou",
-        r"(問い|疑問|探求|リサーチ|調べ)": "/zet",
-        r"(実行|作成|実装|やる|する)": "/ene",
+        re.compile(r"(分析|調査|理解|把握)"): "/s",
+        re.compile(r"(認識|本質|意味|深く考)"): "/noe",
+        re.compile(r"(意志|目標|ゴール|望み|したい)"): "/bou",
+        re.compile(r"(問い|疑問|探求|リサーチ|調べ)"): "/zet",
+        re.compile(r"(実行|作成|実装|やる|する)"): "/ene",
         # S-Series
-        r"(設計|計画|戦略|構成|プラン)": "/s",
-        r"(方法|ツール|手段|生成)": "/mek",
-        r"(基準|評価|テスト|チェック)": "/sta",
+        re.compile(r"(設計|計画|戦略|構成|プラン)"): "/s",
+        re.compile(r"(方法|ツール|手段|生成)"): "/mek",
+        re.compile(r"(基準|評価|テスト|チェック)"): "/sta",
         # A-Series
-        r"(判定|判断|審査|批評|レビュー)": "/dia",
+        re.compile(r"(判定|判断|審査|批評|レビュー)"): "/dia",
     }
 
     # Modifier keywords
     MODIFIER_MAP = {
-        r"(詳細|詳しく|具体的|深堀り|もっと)": "+",
-        r"(要約|シンプル|簡単|概要|短く)": "-",
-        r"(メタ|俯瞰|全体|なぜ|理由)": "^",
-        r"(具体化|実践的|落とし込む)": "/",
+        re.compile(r"(詳細|詳しく|具体的|深堀り|もっと)"): "+",
+        re.compile(r"(要約|シンプル|簡単|概要|短く)"): "-",
+        re.compile(r"(メタ|俯瞰|全体|なぜ|理由)"): "^",
+        re.compile(r"(具体化|実践的|落とし込む)"): "/",
     }
 
     # Structure keywords
     STRUCTURE_MAP = {
-        r"(と|and|そして|してから|して)": "_",
-        r"(同時|並行|融合|統合)": "*",
-        r"(往復|対話|交互|行き来)": "~",
+        re.compile(r"(と|and|そして|してから|して)"): "_",
+        re.compile(r"(同時|並行|融合|統合)"): "*",
+        re.compile(r"(往復|対話|交互|行き来)"): "~",
     }
+
+    # Loop patterns
+    LOOP_PATTERN = re.compile(r"(\d+)回")
+    LOOP_CLEAN_PATTERN = re.compile(r"\d+回(繰り返す|ループ)?")
 
     def generate(self, intent: str) -> Optional[str]:
         """
@@ -62,10 +66,10 @@ class PatternCache:
         intent_lower = intent.lower()
 
         # Check for loop pattern
-        loop_match = re.search(r"(\d+)回", intent)
+        loop_match = self.LOOP_PATTERN.search(intent)
         if loop_match:
             count = loop_match.group(1)
-            inner_intent = re.sub(r"\d+回(繰り返す|ループ)?", "", intent).strip()
+            inner_intent = self.LOOP_CLEAN_PATTERN.sub("", intent).strip()
             inner_ccl = self._generate_inner(inner_intent)
             if inner_ccl:
                 return f"F:×{count}{{ {inner_ccl} }}"
@@ -79,13 +83,13 @@ class PatternCache:
 
         # Find workflows
         for pattern, workflow in self.KEYWORD_MAP.items():
-            if re.search(pattern, intent):
+            if pattern.search(intent):
                 if workflow not in workflows:
                     workflows.append(workflow)
 
         # Find modifiers
         for pattern, modifier in self.MODIFIER_MAP.items():
-            if re.search(pattern, intent):
+            if pattern.search(intent):
                 modifiers.append(modifier)
 
         # No workflows found
@@ -98,7 +102,7 @@ class PatternCache:
         # Determine structure
         structure = "_"  # Default to sequence
         for pattern, struct in self.STRUCTURE_MAP.items():
-            if re.search(pattern, intent):
+            if pattern.search(intent):
                 structure = struct
                 break
 

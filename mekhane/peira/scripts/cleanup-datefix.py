@@ -11,6 +11,7 @@ import datetime
 import os
 import re
 import shutil
+import errno
 from bs4 import BeautifulSoup
 
 ROOT_DIR = os.path.join("Raw", "aidb")
@@ -103,6 +104,20 @@ def fix_file(filepath):
     return True
 
 
+def safe_rmdir(path: str) -> None:
+    """Safely remove a directory if it is empty."""
+    try:
+        os.rmdir(path)
+        print(f"Removed empty directory: {path}")
+    except OSError as e:
+        if e.errno == errno.ENOTEMPTY:
+            print(f"Directory not empty, skipping removal: {path}")
+        elif e.errno == errno.ENOENT:
+            print(f"Directory not found, skipping removal: {path}")
+        else:
+            print(f"Error removing {path}: {e}")
+
+
 def main():
     if not os.path.exists(PROBLEM_DIR):
         print("No 0000/00 directory found.")
@@ -120,12 +135,8 @@ def main():
     print(f"\nFixed: {fixed}/{len(files)}")
 
     # Remove empty 0000/00 if possible
-    try:
-        os.rmdir(PROBLEM_DIR)
-        os.rmdir(os.path.join(ROOT_DIR, "0000"))
-        print("Removed empty 0000/00 directory.")
-    except Exception:
-        pass  # TODO: Add proper error handling
+    safe_rmdir(PROBLEM_DIR)
+    safe_rmdir(os.path.join(ROOT_DIR, "0000"))
 
 
 if __name__ == "__main__":

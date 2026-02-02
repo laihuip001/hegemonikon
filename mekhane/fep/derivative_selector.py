@@ -68,8 +68,8 @@ try:
     if api_key:
         GEMINI_CLIENT = genai.Client(api_key=api_key)
         GEMINI_AVAILABLE = True
-except ImportError:
-    pass  # TODO: Add proper error handling
+except ImportError as e:
+    logger.warning("Google GenAI not available: %s", e)
 
 
 # =============================================================================

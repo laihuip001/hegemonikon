@@ -23,7 +23,7 @@ from .parser import CCLParser, parse_ccl
 from .translator import LMQLTranslator, translate_to_lmql
 from .runtime import (
     ExecutionStatus, ExecutionResult, ExecutionConfig,
-    LMQLExecutor, ConvergenceExecutor, execute_ccl
+    LMQLExecutor, ConvergenceExecutor, execute_ccl, execute_ccl_async
 )
 from .constraints import (
     CCLOutputSchema, ConvergenceOutputSchema, SequenceOutputSchema,
@@ -102,7 +102,7 @@ __all__ = [
     "LMQLTranslator", "translate_to_lmql",
     # Runtime (Phase 2)
     "ExecutionStatus", "ExecutionResult", "ExecutionConfig",
-    "LMQLExecutor", "ConvergenceExecutor", "execute_ccl",
+    "LMQLExecutor", "ConvergenceExecutor", "execute_ccl", "execute_ccl_async",
     # Constraints (Phase 2)
     "CCLOutputSchema", "ConvergenceOutputSchema", "SequenceOutputSchema",
     "SchemaGenerator", "ConstrainedDecoder",

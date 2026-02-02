@@ -389,7 +389,7 @@ class JulesClient:
             name=data["name"],
             state=parse_state(data.get("state", "PLANNING")),
             prompt=prompt,
-            # NOTE: Removed self-assignment: source = source
+            source=source,
         )
 
     @with_retry(

@@ -60,6 +60,12 @@ class SwarmScheduler:
         self.results_dir = self.repo_path / "swarm_results"
         self.results_dir.mkdir(exist_ok=True)
 
+    @staticmethod
+    def _save_results_to_file(output_file: Path, data: dict):
+        """Save results to file synchronously (to be run in thread)."""
+        with open(output_file, "w", encoding="utf-8") as f:
+            json.dump(data, f, indent=2, ensure_ascii=False)
+
     def load_api_keys(self) -> list[str]:
         """Load API keys from .env.jules."""
         keys = []
@@ -162,25 +168,18 @@ class SwarmScheduler:
         output_file = (
             self.results_dir / f"run_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
         )
-        with open(output_file, "w", encoding="utf-8") as f:
-            json.dump(
-                {
-                    "plan_date": plan.date,
-                    "total_tasks": len(all_tasks),
-                    "results": all_results,
-                    "summary": {
-                        "started": sum(
-                            1 for r in all_results if r.get("status") == "started"
-                        ),
-                        "failed": sum(
-                            1 for r in all_results if r.get("status") == "failed"
-                        ),
-                    },
-                },
-                f,
-                indent=2,
-                ensure_ascii=False,
-            )
+
+        data = {
+            "plan_date": plan.date,
+            "total_tasks": len(all_tasks),
+            "results": all_results,
+            "summary": {
+                "started": sum(1 for r in all_results if r.get("status") == "started"),
+                "failed": sum(1 for r in all_results if r.get("status") == "failed"),
+            },
+        }
+
+        await asyncio.to_thread(self._save_results_to_file, output_file, data)
 
         logger.info(f"Results saved to: {output_file}")
         return {"output_file": str(output_file), "results": all_results}

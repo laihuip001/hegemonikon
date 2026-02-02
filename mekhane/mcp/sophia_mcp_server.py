@@ -198,8 +198,8 @@ async def call_tool(name: str, arguments: dict):
                                 doc_date = datetime.fromisoformat(ts.split("T")[0])
                                 if (now - doc_date).days > recent_days:
                                     continue
-                            except Exception:
-                                pass  # TODO: Add proper error handling
+                            except Exception as e:
+                                log(f"Error parsing date '{ts}' for file '{r.metadata.get('file_path', 'unknown')}': {e}")
 
                     results.append(
                         {

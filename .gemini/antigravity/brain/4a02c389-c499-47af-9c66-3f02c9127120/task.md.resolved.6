@@ -1,0 +1,32 @@
+# Hermēneus 開発タスク
+
+## Phase 1: Expander + Parser 正式版 (Must — WEEK)
+
+- [x] [hermeneus/src/ast.py](file:///home/laihuip001/oikos/hegemonikon/hermeneus/src/ast.py) — AST ノード分離 (2-3h)
+- [x] [hermeneus/src/expander.py](file:///home/laihuip001/oikos/hegemonikon/hermeneus/src/expander.py) — 省略形展開 (4-6h)
+- [x] [hermeneus/src/parser.py](file:///home/laihuip001/oikos/hegemonikon/hermeneus/src/parser.py) — Lark CCL パーサー (6-8h)
+- [x] [hermeneus/src/translator.py](file:///home/laihuip001/oikos/hegemonikon/hermeneus/src/translator.py) — LMQL 変換
+- [x] [hermeneus/src/__init__.py](file:///home/laihuip001/oikos/hegemonikon/hermeneus/src/__init__.py) — パッケージ初期化
+- [x] [hermeneus/tests/test_parser.py](file:///home/laihuip001/oikos/hegemonikon/hermeneus/tests/test_parser.py) — 単体テスト (19 passed)
+- [ ] [hermeneus/PROOF.md](file:///home/laihuip001/oikos/hegemonikon/hermeneus/PROOF.md) 更新
+
+
+## Phase 2: LMQL ランタイム統合 (Should — 3WEEKS)
+
+- [x] [hermeneus/src/runtime.py](file:///home/laihuip001/oikos/hegemonikon/hermeneus/src/runtime.py) — LMQL 実行エンジン (350行)
+- [x] [hermeneus/src/constraints.py](file:///home/laihuip001/oikos/hegemonikon/hermeneus/src/constraints.py) — Constrained Decoding (320行)
+- [x] [hermeneus/tests/test_runtime.py](file:///home/laihuip001/oikos/hegemonikon/hermeneus/tests/test_runtime.py) — ランタイムテスト (16 passed)
+- [x] [hermeneus/src/__init__.py](file:///home/laihuip001/oikos/hegemonikon/hermeneus/src/__init__.py) — v0.2.0 API 更新
+
+
+## Phase 3: LangGraph 統合 (Could — 2MONTHS)
+
+- [x] [hermeneus/src/graph.py](file:///home/laihuip001/oikos/hegemonikon/hermeneus/src/graph.py) — CCL → StateGraph 変換 (450行)
+- [x] [hermeneus/src/checkpointer.py](file:///home/laihuip001/oikos/hegemonikon/hermeneus/src/checkpointer.py) — 状態永続化 (340行)
+- [x] [hermeneus/src/hitl.py](file:///home/laihuip001/oikos/hegemonikon/hermeneus/src/hitl.py) — HITL コントローラー (280行)
+- [x] [hermeneus/tests/test_graph.py](file:///home/laihuip001/oikos/hegemonikon/hermeneus/tests/test_graph.py) — グラフテスト (15 passed)
+
+---
+
+**PoC 完了**: [mekhane/ccl/lmql_translator.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/ccl/lmql_translator.py) (292行)
+**合計工数**: 27-37h

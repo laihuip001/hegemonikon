@@ -1,0 +1,5 @@
+{
+  "artifactType": "ARTIFACT_TYPE_OTHER",
+  "summary": "Claude から Jules API を呼び出す方法の調査依頼書。エンドポイント仕様、MCP/HTTP/Actions 比較、18並列オーケストレーション設計を調査項目として定義。",
+  "updatedAt": "2026-01-27T07:55:30.676897216Z"
+}

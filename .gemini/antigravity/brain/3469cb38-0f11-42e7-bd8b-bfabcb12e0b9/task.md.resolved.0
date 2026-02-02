@@ -1,0 +1,18 @@
+# 🎯 タスク管理
+
+## 進行中
+
+- [x] mekhane/ と定理群のマッピング方針を設計
+  - 定理群が mekhane を使う上下関係
+  - workflow/skill = Micro 実現、mekhane = Macro 実現
+  - Scale 公理（L1.5）がそのまま実装構造に反映
+- [/] O-series の実装詳細化
+  - [x] /noe (O1 Noēsis) 確認 — 5フェーズ構造、詳細定義済み
+  - [x] /bou (O2 Boulēsis) 確認 — 6フェーズ構造、詳細定義済み
+  - [x] /zet (O3 Zētēsis) 確認 — 調査依頼書生成、詳細定義済み
+  - [x] /ene (O4 Energeia) 確認 — 6フェーズ実行、詳細定義済み
+  - [ ] kernel/ousia.md に実装詳細セクション追加
+
+## 次回
+
+- [ ] S/H/P/K/A 系の実装詳細化（必要に応じて）

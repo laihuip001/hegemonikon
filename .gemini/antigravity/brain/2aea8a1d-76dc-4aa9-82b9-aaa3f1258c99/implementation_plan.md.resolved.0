@@ -1,0 +1,80 @@
+# B1 定理継承 (extends) 実装計画
+
+> **CCL**: `/s+*^/noe`
+> **Date**: 2026-02-01
+
+---
+
+## 目的
+
+各定理シリーズに `extends` フィールドを追加し、公理からの演繹パスを明示化する。
+
+## 設計
+
+### 現状
+
+既存フィールド:
+- `lineage`: 変更履歴（例: "FEP 'A Beautiful Loop' → O1 追加"）
+- `生成規則`: L1×L1 等のテキスト説明
+
+### 追加フィールド
+
+```yaml
+# frontmatter に追加
+extends:
+  axioms: [L0, L1.Flow, L1.Value]  # 公理依存
+  generation: "L1 × L1"            # 生成式
+  level: 0                         # 階層レベル (O=0, S=1, H=2a, P=2b, K=3, A=4)
+```
+
+---
+
+## Proposed Changes
+
+### [MODIFY] [ousia.md](file:///home/laihuip001/oikos/hegemonikon/kernel/ousia.md)
+- frontmatter に `extends` フィールド追加
+- O-series: `axioms: [L0, L1.Flow, L1.Value]`, `level: 0`
+
+### [MODIFY] [schema.md](file:///home/laihuip001/oikos/hegemonikon/kernel/schema.md)
+- S-series: `axioms: [L0, L1.Flow, L1.Value, L1.5.Scale, L1.5.Function]`, `level: 1`
+
+### [MODIFY] [horme.md](file:///home/laihuip001/oikos/hegemonikon/kernel/horme.md)
+- H-series: `axioms: [L0, L1.Flow, L1.Value, L1.75.Valence, L1.75.Precision]`, `level: 2a`
+
+### [MODIFY] [perigraphe.md](file:///home/laihuip001/oikos/hegemonikon/kernel/perigraphe.md)
+- P-series: `axioms: [L0, L1.5.Scale, L1.5.Function]`, `level: 2b`
+
+### [MODIFY] [kairos.md](file:///home/laihuip001/oikos/hegemonikon/kernel/kairos.md)
+- K-series: `axioms: [L0, L1.5.Scale, L1.5.Function, L1.75.Valence, L1.75.Precision]`, `level: 3`
+
+### [MODIFY] [akribeia.md](file:///home/laihuip001/oikos/hegemonikon/kernel/akribeia.md)
+- A-series: `axioms: [L0, L1.75.Valence, L1.75.Precision]`, `level: 4`
+
+---
+
+## Verification Plan
+
+### Manual Verification
+
+1. **YAML 構文検証**: 各ファイルの frontmatter が有効な YAML か確認
+   ```bash
+   cd /home/laihuip001/oikos/hegemonikon/kernel
+   for f in ousia.md schema.md horme.md perigraphe.md kairos.md akribeia.md; do
+     head -20 "$f"
+   done
+   ```
+
+2. **axiom_hierarchy.md との整合性確認**: 追加した `extends` が公理階層図と一致するか目視確認
+
+3. **PROOF.md 更新**: kernel/PROOF.md に B1 実装を記録
+
+---
+
+## スコープ外
+
+- workflow frontmatter への extends 追加（将来課題）
+- 自動検証ツールの実装（将来課題）
+
+---
+
+*B1 Implementation Plan | Pythōsis*

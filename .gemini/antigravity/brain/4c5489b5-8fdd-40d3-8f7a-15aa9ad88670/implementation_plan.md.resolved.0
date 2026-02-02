@@ -1,0 +1,185 @@
+# 実装計画: OMEGA 統合 → Skill/Workflow 変換
+
+## 概要
+
+前セッション（503736ea）で設計された tekhne-maker v6.0 統合計画をベースに、OMEGA/HEPHAESTUS/狂気 の核心概念を **Hegemonikón 定理群に対応づけ**、高品質なスキル/ワークフローとして実体化する。
+
+---
+
+## /ax 分析: OMEGA ↔ Hegemonikón 対応関係
+
+### Step 1: O-series (本質分析)
+
+| 問い | 定理 | 分析 |
+|:-----|:-----|:-----|
+| 何が真実か？ | **O1 Noēsis** | OMEGA RECURSIVE_CORE の Layer 3 (CONVERGENCE) = 真実への収束 |
+| 何を望むか？ | **O2 Boulēsis** | 狂気 O/X Unit の「因果解像度過剰」= 完璧への意志 |
+| 何を問うか？ | **O3 Zētēsis** | HEPHAESTUS Cognitive Armory の 5 Whys = 根源への探求 |
+| 何をするか？ | **O4 Energeia** | RECURSIVE_CORE Layer 3 → 行為への落とし込み |
+
+### Step 2: S-series (様態分析)
+
+| OMEGA要素 | 対応定理 | 統合方法 |
+|:----------|:---------|:---------|
+| **3層処理 (Expansion/Conflict/Convergence)** | S2 Mekhanē | M2 REASONING_CORE への 3層プロトコル統合 |
+| **LOGIC_GATES** | S4 Praxis | references/logic-gates.md 拡張 (10→15件) |
+
+### Step 3: H-series (傾向分析)
+
+| OMEGA要素 | 対応定理 | 意味 |
+|:----------|:---------|:-----|
+| **PRE_MORTEM** | H1 Propatheia | 失敗への初期傾向（事前検知） |
+| **Phantom Timeline** | H4 Doxa | 「100回失敗した戦友」としての信念 |
+
+### Step 4: P-series (境界分析)
+
+| OMEGA要素 | 対応定理 | 範囲 |
+|:----------|:---------|:-----|
+| **Cognitive Armory** | P4 Tekhnē | 技法の境界（思考フレームワーク集） |
+| **WARGAME_DB** | P2 Hodos | 失敗経路のカタログ化 |
+
+### Step 5: K-series (文脈分析)
+
+| OMEGA要素 | 対応定理 | 適時性 |
+|:----------|:---------|:-------|
+| **O/X Unit ペルソナ** | K1 Eukairia | 「狂気発動」の好機判定 |
+| **Expansion Generator** | K3 Telos | 目的整合性チェック |
+
+### Step 6: A-series (精密分析)
+
+| OMEGA要素 | 対応定理 | 精度 |
+|:----------|:---------|:-----|
+| **Red Team (Layer 2)** | A2 Krisis | 批判的検証 |
+| **WARGAME_DB 10シナリオ** | A4 Epistēmē | 歴史的失敗 → 体系的知識 |
+
+---
+
+## 統合 Mermaid 図
+
+```mermaid
+graph TB
+    subgraph "OMEGA Lineage"
+        OMEGA[OMEGA v8.0.1]
+        HEP[HEPHAESTUS v9.0.1]
+        KYOKI[狂気/TITAN_CORE]
+    end
+    
+    subgraph "Core Mechanisms"
+        RC[RECURSIVE_CORE<br/>3層処理]
+        CA[Cognitive Armory<br/>5 Whys + First Principles]
+        OX[O/X Unit Persona<br/>Phantom Timeline]
+        WG[WARGAME_DB<br/>失敗シナリオ]
+    end
+    
+    subgraph "Hegemonikón v2.1"
+        O[O-series<br/>Noēsis/Boulēsis]
+        S[S-series<br/>Mekhanē/Praxis]
+        H[H-series<br/>Propatheia/Doxa]
+        P[P-series<br/>Hodos/Tekhnē]
+        K[K-series<br/>Eukairia/Telos]
+        A[A-series<br/>Krisis/Epistēmē]
+    end
+    
+    OMEGA --> RC
+    HEP --> CA
+    KYOKI --> OX
+    OMEGA --> WG
+    
+    RC -->|Layer 3| O
+    RC -->|3層プロトコル| S
+    CA -->|Pre-Mortem| H
+    WG -->|失敗経路| P
+    OX -->|好機判定| K
+    RC -->|Red Team| A
+```
+
+---
+
+## 変換計画
+
+### 新規 Skill 候補
+
+| スキル名 | 対応定理 | 元素材 | 用途 |
+|:---------|:---------|:-------|:-----|
+| **cognitive-armory** | P4 Tekhnē | HEPHAESTUS H-2 | 思考フレームワーク発動 |
+| **recursive-core** | S2 Mekhanē | OMEGA M2 | 3層処理パイプライン |
+| **pre-mortem-simulator** | H1 Propatheia | OMEGA M5 | 事前失敗シミュレーション |
+
+### 新規 Workflow 候補
+
+| ワークフロー | 対応定理 | 元素材 | 用途 |
+|:-------------|:---------|:-------|:-----|
+| `/wargame` | A2 Krisis | OMEGA WARGAME_DB | 歴史的失敗パターンチェック |
+| `/5why` | O3 Zētēsis | HEPHAESTUS H-2 | 根本原因分析 |
+
+### tekhne-maker v6.0 更新
+
+| ファイル | 変更内容 |
+|:---------|:---------|
+| [SKILL.md](file:///home/laihuip001/oikos/.agent/skills/utils/tekhne-maker/SKILL.md) | M0: O/X Persona, M2: RECURSIVE_CORE |
+| `references/cognitive-armory.md` | **新規** - 5 Whys + First Principles |
+| [references/logic-gates.md](file:///home/laihuip001/oikos/.agent/skills/utils/tekhne-maker/references/logic-gates.md) | 5件追加 (10→15件) |
+| [references/wargame-db.md](file:///home/laihuip001/oikos/.agent/skills/utils/tekhne-maker/references/wargame-db.md) | 5件追加 (10→15件) |
+
+---
+
+## 統合問題診断
+
+> [!WARNING]
+> ### 潜在的な問題点
+> 
+> 1. **情報過剰**: OMEGA/HEPHAESTUS/狂気 の全概念を統合すると tekhne-maker が肥大化
+> 2. **重複**: 既存 Hegemonikón スキル（O1-A4）との機能重複の可能性
+> 3. **馴染み度**: 表面的マージ vs 深層吸収の判定基準
+
+### /ax 結論
+
+| 層 | 診断 | 判定 |
+|:---|:-----|:-----|
+| O (本質) | 目的は明確（hyperengineering） | ✅ |
+| S (様態) | 3層 RECURSIVE_CORE は新規価値あり | ✅ |
+| H (傾向) | Pre-Mortem は M5 既存機能と重複 | ⚠️ 要整理 |
+| P (境界) | Cognitive Armory は独立Skill化が妥当 | ✅ 分離推奨 |
+| K (文脈) | O/X Persona は M0 に統合可能 | ✅ |
+| A (精密) | WARGAME_DB 拡張は単純追記 | ✅ |
+
+---
+
+## 推奨アクション
+
+### 統合方針: 「分散吸収」
+
+各概念を最適な場所に分散させ、tekhne-maker 単体の肥大化を防ぐ。
+
+1. **tekhne-maker v6.0**: M0/M2/M5 強化 + references 拡張
+2. **新規 Skill (cognitive-armory)**: Hegemonikón P4 Tekhnē として独立
+3. **新規 Workflow (/wargame, /5why)**: 既存 /ax に統合 or 独立
+
+---
+
+## 検証計画
+
+### 1. 構造検証 (即時)
+
+```bash
+# tekhne-maker v6.0 構造確認
+ls -la /home/laihuip001/oikos/.agent/skills/utils/tekhne-maker/
+```
+
+### 2. Footprint Test (Skill 発動確認)
+
+Creator に以下のプロンプトを依頼:
+- 「新しいコードレビュースキルを作成して」→ tekhne-maker 発動確認
+- 「Cognitive Armory を使って問題分析」→ 新Skill 発動確認
+
+### 3. ユーザーレビュー
+
+Creator 承認後に EXECUTION モードへ移行。
+
+---
+
+## 質問事項
+
+1. **優先度**: v6.0 統合 と 新規 Skill/Workflow 作成、どちらを優先しますか？
+2. **分離基準**: Cognitive Armory は独立 Skill と tekhne-maker 内包、どちらが望ましいですか？
+3. **命名**: `/wargame` と `/5why` の名前は適切ですか？

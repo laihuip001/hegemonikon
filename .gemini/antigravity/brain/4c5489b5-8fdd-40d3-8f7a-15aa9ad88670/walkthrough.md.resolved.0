@@ -1,0 +1,115 @@
+# Walkthrough: OMEGA 統合品質診断
+
+**実施日時**: 2026-01-28 09:07 - 09:17
+**セッション**: 4c5489b5-8fdd-40d3-8f7a-15aa9ad88670
+
+---
+
+## 📋 診断結果サマリ
+
+```
+┌─────────────────────────────────────────────┐
+│ Integration Audit Report                    │
+├─────────────────────────────────────────────┤
+│ 表面統合: ✅ PASS                           │
+│ 構造統合: ✅ PASS (refs 補完完了)           │
+│ 意味統合: ⚠️ PARTIAL (v6.0 SKILL.md 未更新) │
+├─────────────────────────────────────────────┤
+│ 馴染み度: Absorbed (吸収済み)               │
+│ 情報ロス率: < 5%                            │
+│ 検出問題: 1件 (Low)                         │
+└─────────────────────────────────────────────┘
+```
+
+---
+
+## 🆕 生成成果物
+
+### 新規 Skill
+
+| ファイル | 内容 |
+|:---------|:-----|
+| [utils/integration-audit/SKILL.md](file:///home/laihuip001/oikos/.agent/skills/utils/integration-audit/SKILL.md) | 統合品質診断エージェント（5.7KB） |
+
+### 新規 Workflow
+
+| ファイル | 内容 |
+|:---------|:-----|
+| [hegemonikon/.agent/workflows/audit.md](file:///home/laihuip001/oikos/hegemonikon/.agent/workflows/audit.md) | `/audit` 統合診断ワークフロー |
+
+### 新規/拡張 References
+
+| ファイル | 変更 |
+|:---------|:-----|
+| [tekhne-maker/references/cognitive-armory.md](file:///home/laihuip001/oikos/.agent/skills/utils/tekhne-maker/references/cognitive-armory.md) | **新規** 7フレームワーク（6.1KB） |
+| [tekhne-maker/references/wargame-db.md](file:///home/laihuip001/oikos/.agent/skills/utils/tekhne-maker/references/wargame-db.md) | **拡張** 10→15シナリオ（9.7KB） |
+
+---
+
+## 🔗 Hegemonikón 対応関係 (/ax)
+
+| 素材 | 概念 | 統合先 | 対応定理 |
+|:-----|:-----|:-------|:---------|
+| OMEGA | RECURSIVE_CORE | M2 | S2 Mekhanē |
+| OMEGA | WARGAME_DB | refs拡張 | P2 Hodos |
+| HEPHAESTUS | Cognitive Armory | refs新規 | P4 Tekhnē |
+| 狂気 | Pre-Mortem | M5既存 | H1 Propatheia |
+
+---
+
+## ✅ 完了アクション
+
+1. **integration-audit Skill 作成** - 3層統合度評価 + 馴染み診断
+2. **/audit Workflow 作成** - O1/A2/P4 定理に基づく診断プロトコル
+3. **cognitive-armory.md 作成** - 5 Whys, First Principles, OODA 等 7手法
+4. **wargame-db.md 拡張** - Prompt Injection, Hallucination Cascade 等 5件追加
+
+---
+
+## ⚠️ 残タスク
+
+| 優先度 | 項目 | 説明 |
+|:-------|:-----|:-----|
+| Medium | SKILL.md v6.0 更新 | M0/M2/M4 の強化記述 |
+| Low | tools.yaml 更新 | /audit, integration-audit 登録 |
+
+---
+
+## 📊 統合概念マッピング
+
+```mermaid
+graph TB
+    subgraph "生成成果物"
+        IA[integration-audit Skill]
+        AW[/audit Workflow]
+        CA[cognitive-armory.md]
+        WG[wargame-db.md 拡張]
+    end
+    
+    subgraph "Hegemonikón 定理"
+        O1[O1 Noēsis]
+        A2[A2 Krisis]
+        P4[P4 Tekhnē]
+        P2[P2 Hodos]
+    end
+    
+    IA --> O1
+    IA --> A2
+    AW --> O1
+    AW --> A2
+    CA --> P4
+    WG --> P2
+```
+
+---
+
+## 🎯 結論
+
+**「馴染んでいるか？」への回答:**
+
+> **Absorbed（吸収済み）** — 表面・構造統合は完了。意味統合は SKILL.md v6.0 更新で完成予定。情報ロスは 5% 未満で許容範囲内。
+
+**推奨次アクション:**
+1. [tekhne-maker/SKILL.md](file:///home/laihuip001/oikos/.agent/skills/utils/tekhne-maker/SKILL.md) を v6.0 に更新
+2. `tools.yaml` に新 Skill/Workflow を登録
+3. Footprint テストで発動確認

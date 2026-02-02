@@ -1,0 +1,6 @@
+{
+  "artifactType": "ARTIFACT_TYPE_IMPLEMENTATION_PLAN",
+  "summary": "3層アーキテクチャに基づくワークフローリファクタリング計画。整合性監査結果と3つの課題（参照方向、重複ロジック、メタデータ不一致）を特定。",
+  "updatedAt": "2026-01-28T06:45:53.023919397Z",
+  "version": "1"
+}

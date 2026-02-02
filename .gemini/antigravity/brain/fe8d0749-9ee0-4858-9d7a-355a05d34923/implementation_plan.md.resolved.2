@@ -1,0 +1,118 @@
+# FEP Persistence & Auto-Epochē 実装計画
+
+> **Goal 1**: A行列 Dirichlet 学習を `/bye` で保存、`/boot` で読込
+> **Goal 2**: 高エントロピー時に自動 `/epo` 発動
+
+---
+
+## Proposed Changes
+
+### Component 1: FEP Persistence Layer
+
+#### [MODIFY] [bye.md](file:///home/laihuip001/oikos/.agent/workflows/bye.md)
+
+**追加位置**: Step 3.6 (Dispatch Log) の後
+
+```markdown
+### Step 3.7: FEP A-Matrix 保存
+
+セッション中の FEP 学習結果を永続化:
+
+```python
+from mekhane.fep import HegemonikónFEPAgent
+
+agent = HegemonikónFEPAgent(use_defaults=True)
+# セッション中の学習を反映（既存インスタンスがあれば）
+agent.save_learned_A("/home/laihuip001/oikos/mneme/.hegemonikon/fep/learned_A.npy")
+```
+
+出力: `mneme/.hegemonikon/fep/learned_A.npy`
+```
+
+---
+
+#### [MODIFY] [boot.md](file:///home/laihuip001/oikos/.agent/workflows/boot.md)
+
+**追加位置**: Phase 3 (知識読込) に Step 8.5 として追加
+
+```markdown
+### Step 8.5: FEP A-Matrix 読込
+
+```python
+from mekhane.fep import HegemonikónFEPAgent
+
+agent = HegemonikónFEPAgent(use_defaults=True)
+loaded = agent.load_learned_A("/home/laihuip001/oikos/mneme/.hegemonikon/fep/learned_A.npy")
+if loaded:
+    print("✅ FEP: 学習済み A-Matrix 読込完了")
+else:
+    print("ℹ️ FEP: デフォルト A-Matrix を使用")
+```
+```
+
+---
+
+### Component 2: Auto-Epochē Trigger
+
+#### [MODIFY] [encoding.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/fep/encoding.py)
+
+新規関数追加:
+
+```python
+def should_trigger_epoche(agent_result: Dict, threshold: float = 2.0) -> bool:
+    """高エントロピー時に Epochē を推奨するか判定。
+    
+    Args:
+        agent_result: HegemonikónFEPAgent.step() の戻り値
+        threshold: エントロピー閾値 (default: 2.0)
+    
+    Returns:
+        True if Epochē should be triggered
+    """
+    entropy = agent_result.get("entropy", 0.0)
+    return entropy >= threshold
+```
+
+---
+
+#### [MODIFY] [o1-noesis/SKILL.md](file:///home/laihuip001/oikos/.agent/skills/ousia/o1-noesis/SKILL.md)
+
+FEP Cognitive Layer セクションに Auto-Epochē ロジックを追加:
+
+```markdown
+### Auto-Epochē Trigger
+
+エントロピー ≥ 2.0 の場合、自動的に `/epo` を推奨:
+
+```python
+from mekhane.fep.encoding import should_trigger_epoche
+
+if should_trigger_epoche(fep_result, threshold=2.0):
+    print("⚠️ 高エントロピー検出 → /epo を発動")
+    # /epo ワークフローを自動発動
+```
+```
+
+---
+
+## Verification Plan
+
+```bash
+# テスト追加
+PYTHONPATH=. pytest tests/test_fep_agent.py -v -k "epoche"
+```
+
+### Manual Verification
+
+1. `/noe` 実行 → 高エントロピーなら Epochē 推奨が出力されること
+2. `/bye` 実行 → `learned_A.npy` が保存されること
+3. `/boot` 実行 → 保存された A-Matrix が読み込まれること
+
+---
+
+## 実装順序
+
+1. **Phase 1**: `encoding.py` に `should_trigger_epoche()` 追加 + テスト
+2. **Phase 2**: `/bye.md` に Step 3.7 追加
+3. **Phase 3**: `/boot.md` に Step 8.5 追加
+4. **Phase 4**: O1 SKILL.md に Auto-Epochē ロジック追加

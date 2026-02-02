@@ -1,0 +1,170 @@
+# S-Series派生概念体系化レポート v1.0
+
+## 戦略定理の哲学的・認知科学的根拠づけ
+
+**作成日**: 2026年01月29日  
+**調査範囲**: 古典哲学（全時代）+ 現代認知科学・AI研究（2020年以降）  
+**対象**: S1-S4 定理の派生概念分類と採用判定  
+**調査源**: Perplexity Research (540+ scholarly sources)
+
+---
+
+## 【結論サマリー】
+
+### 推奨派生数と分類軸（要約）
+
+| 定理 | 派生数 | 推奨分類軸 | 確信度 | 根拠 |
+|:----:|:----:|:---------|:------:|:---:|
+| **S1 Metron** | **3** | Continuity / Discreteness / Abstraction Level | 非常に高 | Aristotle『カテゴリー論』4b20-23 |
+| **S2 Mekhanē** | **3** | Composition / Invention / Adaptation | 非常に高 | Method Engineering + AI Tool Selection |
+| **S3 Stathmos** | **3** | Normative / Empirical / Relative | 高 | Rubric theory + Kant imperatives |
+| **S4 Praxis** | **3-5** | Praxis/Poiesis分化 + Temporal Structure modes | 中 | Aristotle + Agile patterns |
+
+---
+
+## 【採用判定】
+
+### S1 Metron（尺度）— 3派生採用
+
+| 派生 | 略称 | 定義 | 採用 |
+|:-----|:-----|:-----|:----:|
+| **Continuous Quantity** | `cont` | 直線、面、体、時間、場所（連続的測定） | ✅ |
+| **Discrete Quantity** | `disc` | 数、言語単位（離散的測定） | ✅ |
+| **Abstraction Level** | `abst` | モデル粒度、LoD（詳細↔概略） | ✅ |
+
+### S2 Mekhanē（方法配置）— 3派生採用
+
+| 派生 | 略称 | 定義 | 採用 |
+|:-----|:-----|:-----|:----:|
+| **Composition** | `comp` | 既存method fragmentsの組み立て | ✅ |
+| **Invention** | `inve` | 新規方法論の創出 | ✅ |
+| **Adaptation** | `adap` | Base methodの状況的カスタマイズ | ✅ |
+
+### S3 Stathmos（基準）— 3派生採用
+
+| 派生 | 略称 | 定義 | 採用 |
+|:-----|:-----|:-----|:----:|
+| **Normative Criteria** | `norm` | 理想状態・原則に基づく基準 | ✅ |
+| **Empirical Criteria** | `empi` | 観測可能データに基づく基準 | ✅ |
+| **Relative Criteria** | `rela` | 競争的・相対的ランキング基準 | ✅ |
+
+### S4 Praxis（実践）— 3派生採用（古典的）+ 実装拡張検討
+
+| 派生 | 略称 | 定義 | 採用 |
+|:-----|:-----|:-----|:----:|
+| **Praxis (Action)** | `prax` | 活動自体が目的（内在的目的） | ✅ |
+| **Poiesis (Production)** | `pois` | 外部産出物が目的（外的目的） | ✅ |
+| **Temporal Mode** | `temp` | 実行の時間構造（Sequential/Iterative/Parallel） | ✅ |
+
+> **Note**: S4 の `pois` は O4 Energeia の派生 `pois` と同じ語源。S4は「実践戦略」、O4は「実践行為」として区別。
+
+---
+
+## 【O-series との対比】
+
+| Series | 定理数 | 派生数/定理 | 合計派生 | 確信度 |
+|:-------|:------:|:----------:|:--------:|:------:|
+| **O-series** | 4 | 3 | 12 | 高 |
+| **S-series** | 4 | 3 | 12 | 高〜中 |
+
+### 派生命名パターン
+
+| O-series | S-series |
+|:---------|:---------|
+| nous, phro, meta | cont, disc, abst |
+| desir, voli, akra | comp, inve, adap |
+| anom, hypo, eval | norm, empi, rela |
+| flow, prax, pois | prax, pois, temp |
+
+---
+
+## 【詳細分析】
+
+### A. S1 Metron 派生
+
+| 派生 | 古典根拠 | 現代対応 | 確信度 |
+|:-----|:---------|:---------|:------:|
+| **cont** | Aristotle『カテゴリー論』4b20-23 | Spatial/Temporal abstraction | 100% |
+| **disc** | Aristotle『カテゴリー論』4b20-23 | Countable metrics | 100% |
+| **abst** | Kant『判断力批判』 | Cognitive multiscale | 95% |
+
+**結論**: Aristotle のカテゴリー論における「量」の二分（連続/離散）が確立。Kant の粒度概念を経由して現代認知科学の multiscale enaction model と連続。
+
+### B. S2 Mekhanē 派生
+
+| 派生 | 古典根拠 | 現代対応 | 確信度 |
+|:-----|:---------|:---------|:------:|
+| **comp** | Aristotle『カテゴリー論』predicate structure | Method assembly framework | 100% |
+| **inve** | Aristotle『ニコマコス倫理学』technē creation | Design Thinking innovation | 95% |
+| **adap** | Method configuration tailoring | Situational method engineering | 100% |
+
+**結論**: Method engineering の理論的枠組みにより3派生が確立。相互補完的。
+
+### C. S3 Stathmos 派生
+
+| 派生 | 古典根拠 | 現代対応 | 確信度 |
+|:-----|:---------|:---------|:------:|
+| **norm** | Kant『道徳形而上学の基礎づけ』定言命法 | Core values, ethical guidelines | 100% |
+| **empi** | Aristotle『分析論』証拠主義 | Measurable KPIs, rubric assessments | 100% |
+| **rela** | Competitive framing | Benchmarking, market positioning | 95% |
+
+**結論**: Kant の命法区別が哲学的基礎。競争的相対比較を加えた3派生は学術的に確立。
+
+### D. S4 Praxis 派生
+
+| 派生 | 古典根拠 | 現代対応 | 確信度 |
+|:-----|:---------|:---------|:------:|
+| **prax** | Aristotle『ニコマコス倫理学』VI巻 | Self-determining action | 100% |
+| **pois** | Aristotle『ニコマコス倫理学』VI巻 | Project delivery, production | 100% |
+| **temp** | — | Sequential/Iterative/Parallel patterns | 80% |
+
+**結論**: 古典的には Praxis/Poiesis の2分が確立。現代実装では時間構造パターンを含めた3派生が実用的。
+
+---
+
+## 【反証検証結果】
+
+### 派生数「3」の妥当性
+
+- **S1**: 2派生では abstraction level を説明不可。4派生は過度。→ 3が最適
+- **S2**: 2派生では Adaptation の独立性を失う。→ 3が最適
+- **S3**: 2派生では競争要素を捨象。→ 3が最適
+- **S4**: 古典的には2、実装的には3-5。→ 3採用（階層化アプローチ）
+
+### 古典解釈の確認
+
+- Aristotle のカテゴリー論: 中世以降の主流派（Al-Fārābī, Thomas Aquinas）が擁護
+- Kant の命法区別: 各学派が基本区別に同意
+- Praxis/Poiesis: すべての学派が基本区別を認める
+
+---
+
+## 【根拠リンク】
+
+### S1 Metron
+
+- [Stanford Encyclopedia: Aristotle's Categories](https://plato.stanford.edu/entries/aristotle-categories/)
+- [Frontiers: Multiscale Enaction Model](https://www.frontiersin.org/journals/psychology/articles/10.3389/fpsyg.2014.01425/full)
+
+### S2 Mekhanē
+
+- [Wikipedia: Method Engineering](https://en.wikipedia.org/wiki/Method_engineering)
+- [OpenReview: STRIDE Framework](https://openreview.net/pdf?id=rD4lzOhqLp)
+
+### S3 Stathmos
+
+- [Frontiers: Rubric Development](https://www.frontiersin.org/journals/education/articles/10.3389/feduc.2024.1496242/full)
+- [Wikipedia: Categorical Imperative](https://en.wikipedia.org/wiki/Categorical_imperative)
+
+### S4 Praxis
+
+- [Scielo: Aristotle Praxis/Poiesis](http://www.scielo.br/pdf/man/v41n4/2317-630X-man-41-04-195.pdf)
+- [AOM: Temporal Intentionality](https://journals.aom.org/doi/10.5465/amd.2024.0217)
+
+---
+
+**次のステップ**: O-series と同様の A+B+F 戦略で S-series 派生を実装可能
+
+---
+
+*v1.0 — Perplexity Research 結果整理 (2026-01-29)*

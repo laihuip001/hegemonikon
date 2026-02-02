@@ -1,0 +1,34 @@
+# /noe-plan Self-Analysis Task
+
+## 目的
+作成した `/noe-plan` ワークフローを、そのワークフロー自体で分析するメタ検証
+
+---
+
+## PART A: O1 Noēsis
+
+- [/] STEP 0: SKILL.md 読み込み
+- [ ] PHASE 0.5: 盲点カテゴリチェック
+- [ ] PHASE 1: 前提掘出
+- [ ] PHASE 2: ゼロ設計
+- [ ] PHASE 3: 分析深化 [GoT]
+- [ ] PHASE 4: 自己検証
+- [ ] PHASE 5: メタ認知出力
+- [ ] 出力ファイル保存
+
+---
+
+## HANDOFF
+
+- [ ] 継承データ抽出
+- [ ] 中間確認
+
+---
+
+## PART B: /plan
+
+- [ ] STAGE 0: Blindspot + Scale (継承モード)
+- [ ] STAGE 1: Strategy Selection
+- [ ] STAGE 2: Success Criteria
+- [ ] STAGE 3: Blueprint
+- [ ] STAGE 4: Devil's Advocate

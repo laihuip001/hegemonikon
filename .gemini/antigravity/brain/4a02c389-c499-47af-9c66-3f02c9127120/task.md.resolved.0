@@ -1,0 +1,25 @@
+# Hermēneus 開発タスク
+
+## Phase 1: Expander + Parser 正式版
+
+- [ ] `hermeneus/src/ast.py` — AST ノード定義
+- [ ] `hermeneus/src/expander.py` — 省略形展開
+- [ ] `hermeneus/src/parser.py` — CCL パーサー
+- [ ] `hermeneus/src/translator.py` — LMQL 変換
+- [ ] `hermeneus/src/__init__.py` — パッケージ初期化
+- [ ] `hermeneus/tests/test_parser.py` — 単体テスト
+- [ ] [hermeneus/PROOF.md](file:///home/laihuip001/oikos/hegemonikon/hermeneus/PROOF.md) 更新
+
+## Phase 2: LMQL ランタイム統合 (Future)
+
+- [ ] LMQL ライブラリ統合
+- [ ] 実行環境構築
+
+## Phase 3: Constrained Decoding (Future)
+
+- [ ] GCD (Grammar-Constrained Decoding) 実装
+- [ ] JSON Schema 検証
+
+## Phase 4: LangGraph 統合 (Future)
+
+- [ ] オーケストレーション層

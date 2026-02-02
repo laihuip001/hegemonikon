@@ -1,0 +1,30 @@
+# /zet ワークフロー最適化
+
+## フェーズ
+
+- [x] **Phase 1: KI復元内容の実装** — 2025後半優先、世代フィルタ、Cut-off Awareness を反映 ✅
+- [x] **Phase 2: /noe によるテンプレート再設計** — パプ君調査結果を反映 ✅
+- [x] **Phase 3: ハイブリッド版復元 + Claude特化** ✅
+
+---
+
+## Phase 3 完了 ✅
+
+1. `/zet` テンプレートをハイブリッド版に修正
+   - 調査対象の定義（用語揺れ防止）
+   - 調査すべき論点（網羅性担保）
+   - 成果物構成（出力フォーマット固定）
+   - 調査ルール（Chronotopic Precision）
+2. Claude向け後処理ガイドを追加
+   - Lost in the Middle 対策
+   - XML + Markdown 推奨構造
+   - 段落形式の推奨
+3. KI更新完了
+   - `search_exploration_optimization` に Claude 4.5 最適化セクション追加
+
+---
+
+## 成果物
+
+- `/zet` v2.3（ハイブリッド + Claude特化）
+- KI更新: `zet_redesign_summary.md`

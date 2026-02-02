@@ -1,0 +1,6 @@
+{
+  "artifactType": "ARTIFACT_TYPE_IMPLEMENTATION_PLAN",
+  "summary": "Implementation plan for W9: Integrating Jules review results directly into /vet workflow. Adds a 'Jules Prior Art' retrieval step to the audit process.",
+  "updatedAt": "2026-01-28T10:02:52.455413619Z",
+  "version": "1"
+}

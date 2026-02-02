@@ -1,0 +1,52 @@
+# Dendron + LLM 強制機構 タスクリスト
+
+## Phase A: @dendron_prep v1.0 実行
+
+- [ ] Step 1: /bou+ (意志明確化)
+- [ ] Step 2: /kho+ (スコープ定義)
+- [ ] Step 3: /sta+ (成功基準)
+- [ ] Step 4: /pre+ (Premortem)
+- [ ] Step 5: /sop+ (外部調査)
+- [ ] Step 6: /syn+ (偉人評議会)
+- [ ] Step 7: /pan (盲点発見)
+- [ ] Step 8: /chr (期限設定)
+- [ ] Step 9: /euk (今やるべきか)
+
+---
+
+## Phase B: LLM 論外処理解消 (3段階実装)
+
+### Phase B1: 基盤構築（1-2週間）
+
+- [ ] JSON Schema + Pydantic で CCL 出力モデル化
+- [ ] System Prompt に operators.md 仕様埋め込み
+- [ ] CoT 強制 (reason→verify→result)
+
+### Phase B2: 検証自動化（2-4週間）
+
+- [ ] NeMo Guardrails Output Rails 設定
+- [ ] Multi-Agent Validator Layer 設計
+
+### Phase B3: 高度な最適化（1-2ヶ月）
+
+- [ ] Dynamic Paired Generation ループ
+- [ ] Cost Optimization (Caching)
+
+---
+
+## Phase C: Dendron MVP
+
+- [ ] `mekhane/dendron/` ディレクトリ作成
+- [ ] CLI (`dendron check`) 実装
+- [ ] check_proof.py 拡張
+- [ ] テスト作成
+- [ ] README.md 作成
+
+---
+
+## 完了済み
+
+- [x] PROOF traversal (203 ファイル)
+- [x] FEP 演繹 (L1/L2/L3)
+- [x] CI 統合 (check_proof.py, pre-commit)
+- [x] /sop 調査 (LLM 論外処理解消)

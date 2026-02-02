@@ -1,0 +1,50 @@
+# Task: Cognitive Algebra 理論的基盤の確立
+
+## 目標
+
+/sop 調査結果を基に、Cognitive Algebra の設計思想を理論的に裏付ける。
+
+---
+
+## チェックリスト
+
+### Phase 1: 理論調査 ✅
+
+- [x] /sop で学術的根拠を調査
+- [x] 調査結果を Artifact に保存
+
+### Phase 2: 設計更新 ✅
+
+- [x] KI `overview.md` に理論的基盤セクションを追加
+- [x] KI `truth_as_constraint.md` を CLT 根拠で更新
+- [x] 「ハイブリッド設計」を公式方針として明記
+
+### Phase 3: 自己完備性の発見 ✅
+
+- [x] Layer 2 (Flesh) を P/K/A/X で補完できる洞察を発見
+- [x] Hegemonikón が自己完備な認知 DSL であることを文書化
+- [x] KI overview.md に CCL 定義を追加
+
+### Phase 4: 禁術設計 ✅
+
+- [x] CCL (Cognitive Control Language) を公式定義
+- [x] `!` (階乗) の詳細設計を完了
+- [x] 4層限界の理論的根拠を文書化
+- [x] セーフガード: 確認必須、3派生上限、再帰禁止
+
+### Phase 5: 全シリーズ展開 ✅
+
+- [x] H-series (4件): /pro, /pis, /ore, /dox
+- [x] P-series (3件): /kho, /hod, /tro
+- [x] K-series (1件): /sop
+- [x] A-series (3件): /pat, /gno, /epi
+- [x] 合計14ワークフローに Cognitive Algebra 適用完了
+
+---
+
+*Created: 2026-01-29*
+*Completed: 2026-01-29*
+
+---
+
+*Created: 2026-01-29*

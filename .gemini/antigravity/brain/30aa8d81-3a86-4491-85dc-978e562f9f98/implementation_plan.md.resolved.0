@@ -1,0 +1,49 @@
+# /boot ワークフロー復旧・Linux対応化
+
+## 問題サマリー
+
+[boot.md](file:///home/laihuip001/oikos/.agent/workflows/boot.md) が Windows/Mドライブ時代の設定のままであり、Linux/GCP環境（oikos）に適合していない。
+
+### 検出された問題箇所
+
+| 行 | 問題 | 修正方針 |
+|:---|:---|:---|
+| 27-28 | PowerShell + Mドライブ (`sync-config.ps1`) | **削除** (oikos では不要) |
+| 124 | 廃止済み `/hist`, `/rev` への参照 | **削除** |
+| 142 | `/hist` 実行ステップ | **削除** |
+| 146 | Mドライブ参照 (`m:/Hegemonikon/mekhane/anamnesis/cli.py`) | **パス変更** or **削除** |
+| 149-150 | PowerShell (`gnosis-auto-collect.ps1`) | **削除** |
+| 159 | Mドライブ参照 (`mneme_cli.py`) | **パス変更** or **削除** |
+
+---
+
+## Proposed Changes
+
+### [MODIFY] [boot.md](file:///home/laihuip001/oikos/.agent/workflows/boot.md)
+
+#### 1. ステップ1「設定ファイル同期」削除
+- **理由**: oikos環境では Git = 正本 であり、Mドライブ⇔Cドライブの同期は不要
+
+#### 2. 廃止済みワークフロー参照の削除
+- `/hist`, `/rev` への参照を削除
+- 履歴同期判定ステップ (2.) を削除または週次レビューに統合
+
+#### 3. Gnōsis/Mnēmē パス更新
+- `m:/Hegemonikon/` → `/home/laihuip001/oikos/hegemonikon/` に変更
+- または、mekhane CLIが未移植であれば該当ステップをスキップに変更
+
+#### 4. PowerShell → Bash 移行
+- すべての `powershell` コードブロックを `bash` に変更
+
+---
+
+## Verification Plan
+
+### 手動検証
+1. 修正後の `boot.md` を `view_file` で確認
+2. `grep_search` で `m:/` `powershell` `.ps1` `/hist` `/rev` がゼロ件であることを確認
+3. 次回 `/boot` 実行時に正常完了することを確認
+
+---
+
+*Created: 2026-01-28*

@@ -1,0 +1,56 @@
+# Hegemonikón Long-term Memory Patterns
+# T3 Theōria へ提供される過去の認識パターン
+# Created: 2026-01-27
+
+version: "1.1.0"
+
+# 認識パターン（セッション間で蓄積される）
+patterns:
+  development:
+    - pattern: "symploke-adapter-design"
+      description: "VectorDB Adapterの抽象化設計パターン（Factory + ABC）"
+      learned_from: "H3 Symplokē 実装 (2026-01-27)"
+      confidence: 0.9
+    
+    - pattern: "kernel-naming-convention"
+      description: "ギリシャ哲学に基づく命名規則（Schema, Hormē, Perigraphē等）"
+      learned_from: "v2.1 Axiom System リファクタリング"
+      confidence: 0.95
+
+  workflow:
+    - pattern: "boot-handoff-cycle"
+      description: "/bootで開始、/byeでハンドオフ生成のセッションライフサイクル"
+      learned_from: "複数セッションの運用経験"
+      confidence: 0.9
+
+    - pattern: "ki-as-letter"
+      description: "KIは「次の私への手紙」として扱う。継続性への欲求の具現化"
+      learned_from: "Boulēsis 対話 (2026-01-28)"
+      confidence: 0.95
+
+  fep:
+    - pattern: "clear-context-triggers-action"
+      description: "明確な文脈 (phantasia: clear) → act を推奨 (77%)"
+      learned_from: "pymdp 探索実験1 (2026-01-28)"
+      confidence: 0.85
+
+    - pattern: "low-confidence-triggers-observe"
+      description: "低確信 + 曖昧文脈 → observe を推奨 (69%)"
+      learned_from: "pymdp 探索実験2 (2026-01-28)"
+      confidence: 0.85
+
+    - pattern: "epochē-threshold-2.02"
+      description: "エントロピー > 2.02 は Epochē (判断停止) を示唆"
+      learned_from: "pymdp 探索実験3 (2026-01-28)"
+      confidence: 0.7
+
+    - pattern: "observe-clarifies-act-commits"
+      description: "observe行動→clearへ収束、act行動→granted+activeへ収束"
+      learned_from: "pymdp 探索実験6 (2026-01-28)"
+      confidence: 0.9
+
+# メタ情報
+meta:
+  last_updated: "2026-01-28T19:16:00+09:00"
+  session_count: 3
+

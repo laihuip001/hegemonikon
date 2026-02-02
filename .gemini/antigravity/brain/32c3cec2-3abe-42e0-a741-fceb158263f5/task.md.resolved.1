@@ -1,0 +1,35 @@
+# Boulēsis 優先タスク (2026-01-28)
+
+> **Origin**: `/bou` PHASE 0 → Creator 確認済み
+
+## 現在のセッション目標
+
+1. [/] **Mnēmē Synthesis CLI 実装** ← 現在進行中
+2. [ ] Dispatch Log 運用開始
+3. [ ] 3-Layer Architecture リファクタリング継続
+
+---
+
+## タスク 1: Mnēmē Synthesis CLI 実装
+
+- [x] 既存インフラ調査 ([sophia_ingest.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/symploke/sophia_ingest.py), [kairos_ingest.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/symploke/kairos_ingest.py))
+- [x] テスト構造確認 ([test_ingest.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/symploke/tests/test_ingest.py))
+- [x] 実装計画作成 + /noe 分析
+- [x] `/boot` 対応パスに `mneme_cli.py` 作成
+- [x] `ingest --all` コマンド実装 (Sophia + Kairos + Chronos 統合)
+- [x] 動作確認テスト (Sophia: 65件, Kairos: 19件)
+
+---
+
+## タスク 2: Dispatch Log 運用開始
+
+- [ ] `/boot` でワークフロー実行を記録するロジック追加
+- [ ] `/bye` でスキル発動を記録するロジック追加
+- [ ] 記録フォーマット確認
+
+---
+
+## タスク 3: 3-Layer Architecture リファクタリング
+
+- [ ] `/noe` パイロット: O1 Noesis SKILL.md へ詳細ロジック移動
+- [ ] 他 τ-workflow への展開計画

@@ -1,0 +1,29 @@
+# Task: Cognitive Algebra 理論的基盤の確立
+
+## 目標
+
+/sop 調査結果を基に、Cognitive Algebra の設計思想を理論的に裏付ける。
+
+---
+
+## チェックリスト
+
+### Phase 1: 理論調査 ✅
+
+- [x] /sop で学術的根拠を調査
+- [x] 調査結果を Artifact に保存
+
+### Phase 2: 設計更新
+
+- [ ] [cognitive_algebra.md](file:///home/laihuip001/oikos/.gemini/antigravity/brain/e2385bf5-d55a-4581-9e1a-93c219d59051/cognitive_algebra.md) に理論的基盤セクションを追加
+- [ ] KI `cognitive_algebra_system` を更新
+- [ ] 「ハイブリッド設計」を公式方針として明記
+
+### Phase 3: 禁術設計
+
+- [ ] `!` (階乗) の使用制限を理論的に根拠付け
+- [ ] 「3-4層限界」をCLTで説明
+
+---
+
+*Created: 2026-01-29*

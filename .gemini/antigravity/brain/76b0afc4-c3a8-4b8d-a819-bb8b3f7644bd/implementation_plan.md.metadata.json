@@ -1,0 +1,6 @@
+{
+  "artifactType": "ARTIFACT_TYPE_IMPLEMENTATION_PLAN",
+  "summary": "/tek にワークフロー生成機能を追加する実装計画。Interactive Mode で質問を通じてスキル/ワークフローを判定。",
+  "updatedAt": "2026-01-28T12:12:44.427143880Z",
+  "version": "1"
+}

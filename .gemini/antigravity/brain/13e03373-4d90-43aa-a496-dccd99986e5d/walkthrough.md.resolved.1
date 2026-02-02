@@ -1,0 +1,43 @@
+# Walkthrough: Workflow Modules v2.1 Update
+
+## 完了した作業
+
+15ワークフローの `modules:` フィールドを v2.1 スキル ID に更新。
+
+### マッピング一覧
+
+| Workflow | Before | After |
+|----------|--------|-------|
+| `/noe` | O1,T3,T4,T7 | O1,O3,S2,A2 |
+| `/zet` | O3,T5 | O3 |
+| `/plan` | M4,M3 | S2,O3 |
+| `/boot` | T1,T8 | S1,H4 |
+| `/bye` | T8,M8 | H4 |
+| `/ene` | O4,T6,T2 | O4,O2 |
+| `/why` | T3 | O3 |
+| `/u` | M7,M4 | A2,S2 |
+| `/chk` | M7 | A2 |
+| `/v` | M7 | A2 |
+| `/rev` | M7,M8 | A2,H4 |
+| `/hist` | M8 | H4 |
+| `/now` | M1,M8 | S1,H4 |
+| `/pri` | M2 | S2 |
+| `/manual` | M6 | H2 |
+
+### 意図的維持
+
+以下は T-series を直接呼び出す interface ワークフロー:
+- `ax.md`, `t.md`, `k.md`, `o.md`, `x.md`
+
+## v2.1 スキル ID 対応表
+
+| Legacy | v2.1 | 名称 |
+|--------|------|------|
+| M1 | S1 | Metron (測定) |
+| M2 | S2 | Mekhanē (機構) |
+| M3 | O3 | Zētēsis (探求) |
+| M4 | S2 | Mekhanē → 判断 |
+| M6 | H2 | Epitaxis (計画) |
+| M7 | A2 | Dokimē (検証) |
+| M8 | H4 | Anamnēsis (記憶) |
+| T1-T8 | → | S/H/O series |

@@ -1,0 +1,321 @@
+# FEP ワークフロー統合計画 v2
+
+> **Goal**: `/noe`, `/bou` ワークフロー内で FEP Agent を使った認知的フィードバックを実装
+> **Plan**: B (Robust)
+> **Revision**: /syn レビューの4件の不備を反映
+
+---
+
+## STAGE 0: Blindspot + Scale
+
+| カテゴリ | リスク | 解決策 |
+|:---------|:-------|:-------|
+| 🎯 Framing | 低 | FEP 統合 = 認知的フィードバック |
+| 📐 Scope | 中 → **解決** | SKILL.md のみ変更、workflow.md は参照のみ |
+| 🔗 Dependencies | 中 → **解決** | 新規ファイル不要、[encoding.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/fep/encoding.py) 拡張 |
+| 👤 Stakeholders | 低 | Creator のみ |
+| ⏱️ Temporal | 低 | 将来的に全 O-series に拡張可能な設計 |
+
+📏 **Scale**: Meso
+
+---
+
+## STAGE 1: Strategy Selection
+
+⚖️ **Explore/Exploit**: Exploit
+- 失敗コスト: 低 (PoC 段階)
+- 環境確実性: 高 (FEP Agent 既にテスト済み)
+- 時間制約: 通常
+
+**選択**: Plan B (Robust)
+
+---
+
+## STAGE 2: Success Criteria
+
+| 軸 | Must | Should | Could |
+|:---|:-----|:-------|:------|
+| 機能性 | `/noe` 完了後に FEP 判定が出力される | `/bou` でも動作 | 全 O-series 拡張 |
+| 品質 | 既存 19 テスト維持 | 新規 3 テスト追加 | Coverage 85%+ |
+| 性能 | +100ms 以内 | +50ms 以内 | +10ms 以内 |
+
+✅ **完了条件**: Must が全て満たされた時点
+
+---
+
+## STAGE 3: Blueprint
+
+### Goal Decomposition
+
+```
+最終目標: /noe, /bou で FEP 認知フィードバックが出力される
+  ↑
+サブゴール 2: SKILL.md に FEP PHASE を追加
+  ↑ 前提: 変換関数が存在する
+サブゴール 1: encoding.py に変換関数を追加
+  ↑ 前提: 変換ロジックが明確
+現在地: 変換ロジック明確化済み
+```
+
+---
+
+## Proposed Changes
+
+### Component: FEP Layer
+
+---
+
+#### [MODIFY] [encoding.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/fep/encoding.py)
+
+2つの変換関数を追加:
+
+```python
+def encode_noesis_output(
+    confidence_score: float,
+    uncertainty_zones: List[Dict],
+) -> Tuple[int, int, int]:
+    """O1 Noēsis の PHASE 5 出力から観察値を生成。
+    
+    Args:
+        confidence_score: 信頼度 (0.0-1.0)
+        uncertainty_zones: 不確実領域リスト
+    
+    Returns:
+        (context_idx, urgency_idx, confidence_idx)
+    
+    Mapping Logic:
+        - context_clarity = 1.0 - (len(uncertainty_zones) * 0.2)
+        - urgency = 0.3 (Noēsis は思考プロセス、低緊急度)
+        - confidence = confidence_score をそのまま使用
+    """
+    context_clarity = max(0.0, min(1.0, 1.0 - len(uncertainty_zones) * 0.2))
+    return encode_structured_input(
+        context="clear" if context_clarity >= 0.5 else "ambiguous",
+        urgency="low",
+        confidence="high" if confidence_score >= 0.7 else "medium" if confidence_score >= 0.4 else "low",
+    )
+
+
+def encode_boulesis_output(
+    impulse_score: float,
+    feasibility_score: float,
+) -> Tuple[int, int, int]:
+    """O2 Boulēsis の PHASE 5 出力から観察値を生成。
+    
+    Args:
+        impulse_score: 衝動スコア (0-100) — 高いほど衝動的
+        feasibility_score: 実現可能性 (0-100)
+    
+    Returns:
+        (context_idx, urgency_idx, confidence_idx)
+    
+    Mapping Logic:
+        - context = 実現可能性で判定 (>70 = clear)
+        - urgency = 衝動スコアで判定 (衝動的 = 高緊急度)
+        - confidence = 実現可能性で判定
+    """
+    urgency = "high" if impulse_score >= 70 else "medium" if impulse_score >= 40 else "low"
+    confidence = "high" if feasibility_score >= 70 else "medium" if feasibility_score >= 40 else "low"
+    context = "clear" if feasibility_score >= 50 else "ambiguous"
+    
+    return encode_structured_input(context=context, urgency=urgency, confidence=confidence)
+
+
+def generate_fep_feedback_markdown(
+    agent_result: Dict[str, Any],
+    observation_description: str,
+) -> str:
+    """FEP Agent の結果を Markdown 形式で出力。
+    
+    Args:
+        agent_result: HegemonikónFEPAgent.step() の戻り値
+        observation_description: 観察値の説明 (例: "context=clear, urgency=low, conf=high")
+    
+    Returns:
+        Markdown 形式の FEP フィードバック
+    """
+    action_name = agent_result.get("action_name", "unknown")
+    q_pi = agent_result.get("q_pi", [0.5, 0.5])
+    action_prob = q_pi[agent_result.get("action", 0)] * 100
+    entropy = agent_result.get("entropy", 0.0)
+    map_state = agent_result.get("map_state_names", {})
+    
+    # エントロピーの解釈
+    if entropy < 1.0:
+        entropy_desc = "低い不確実性"
+    elif entropy < 2.0:
+        entropy_desc = "中程度の不確実性"
+    else:
+        entropy_desc = "高い不確実性 (Epochē 推奨)"
+    
+    return f"""━━━ FEP Cognitive Feedback ━━━
+┌─[Active Inference Layer]──────────────────┐
+│ 観察値: {observation_description}         │
+│ 信念状態:                                  │
+│   phantasia: {map_state.get('phantasia', '?')}  │
+│   assent: {map_state.get('assent', '?')}        │
+│   horme: {map_state.get('horme', '?')}          │
+│ エントロピー: {entropy:.2f} ({entropy_desc})    │
+│ 推奨: {action_name} ({action_prob:.0f}%)        │
+└────────────────────────────────────────────┘"""
+```
+
+---
+
+### Component: Skill Layer
+
+---
+
+#### [MODIFY] [o1-noesis/SKILL.md](file:///home/laihuip001/oikos/.agent/skills/ousia/o1-noesis/SKILL.md)
+
+**追加位置**: PHASE 5 の後、「統合出力形式」セクションの前
+
+```markdown
+## PHASE 6: FEP Cognitive Feedback (Optional)
+
+> **Status**: 自動発動（PHASE 5 完了後）
+> **依存**: `mekhane/fep/` モジュール
+
+### 処理フロー
+
+1. PHASE 5 の `confidence_score` と `uncertainty_zones` を取得
+2. `encode_noesis_output()` で観察値に変換
+3. `HegemonikónFEPAgent.step()` で信念更新 + 政策推論
+4. `generate_fep_feedback_markdown()` で出力生成
+
+### 使用コード
+
+\`\`\`python
+from mekhane.fep import HegemonikónFEPAgent
+from mekhane.fep.encoding import encode_noesis_output, generate_fep_feedback_markdown
+
+# PHASE 5 の結果から
+obs = encode_noesis_output(
+    confidence_score=phase5_result["confidence_score"],
+    uncertainty_zones=phase5_result["uncertainty_zones"],
+)
+
+agent = HegemonikónFEPAgent()
+result = agent.step(encode_to_flat_index_from_tuple(obs))
+
+print(generate_fep_feedback_markdown(result, f"context={obs[0]}, urgency={obs[1]}, conf={obs[2]}"))
+\`\`\`
+
+### 出力形式
+
+\`\`\`
+━━━ FEP Cognitive Feedback ━━━
+┌─[Active Inference Layer]──────────────────┐
+│ 観察値: context=clear, urgency=low, conf=high │
+│ 信念状態:                                  │
+│   phantasia: clear                         │
+│   assent: granted                          │
+│   horme: passive                           │
+│ エントロピー: 1.42 (中程度の不確実性)      │
+│ 推奨: act (77%)                            │
+└────────────────────────────────────────────┘
+\`\`\`
+
+### 推奨アクションの解釈
+
+| 推奨 | 意味 | 次のステップ |
+|:-----|:-----|:-------------|
+| **act** | 確信あり、行動可能 | 結論を採用し、/ene で実行 |
+| **observe** | 不確実性が高い | 追加調査 (/zet) または /epo で判断停止 |
+```
+
+---
+
+#### [MODIFY] [o2-boulesis/SKILL.md](file:///home/laihuip001/oikos/.agent/skills/ousia/o2-boulesis/SKILL.md)
+
+**追加位置**: PHASE 5 の後（O1 Noēsis と同様の構造）
+
+同様の FEP PHASE を追加。変換関数は `encode_boulesis_output()` を使用。
+
+---
+
+### Component: Tests
+
+---
+
+#### [MODIFY] [test_fep_agent.py](file:///home/laihuip001/oikos/hegemonikon/tests/test_fep_agent.py)
+
+3件のテスト追加:
+
+```python
+class TestWorkflowEncoding:
+    def test_encode_noesis_output(self):
+        from mekhane.fep.encoding import encode_noesis_output
+        obs = encode_noesis_output(confidence_score=0.87, uncertainty_zones=[{"zone": "A"}])
+        assert len(obs) == 3
+        assert obs[2] == 2  # high confidence
+    
+    def test_encode_boulesis_output(self):
+        from mekhane.fep.encoding import encode_boulesis_output
+        obs = encode_boulesis_output(impulse_score=25, feasibility_score=80)
+        assert obs[1] == 0  # low urgency (熟慮)
+        assert obs[2] == 2  # high confidence
+    
+    def test_generate_fep_feedback_markdown(self):
+        from mekhane.fep.encoding import generate_fep_feedback_markdown
+        mock_result = {
+            "action_name": "act", "action": 1, "q_pi": [0.23, 0.77],
+            "entropy": 1.42, "map_state_names": {"phantasia": "clear", "assent": "granted", "horme": "passive"}
+        }
+        output = generate_fep_feedback_markdown(mock_result, "test")
+        assert "act (77%)" in output
+        assert "phantasia: clear" in output
+```
+
+---
+
+## Verification Plan
+
+### Automated Tests
+
+```bash
+# 既存テスト維持確認
+PYTHONPATH=. pytest tests/test_fep_agent.py -v
+
+# 新規テスト実行
+PYTHONPATH=. pytest tests/test_fep_agent.py -v -k "workflow"
+```
+
+### Manual Verification
+
+1. `/noe [テスト問題]` を実行
+2. PHASE 5 完了後に FEP フィードバックが出力されることを確認
+3. 推奨アクション (act/observe) が結論と整合していることを確認
+
+---
+
+## STAGE 4: Devil's Advocate
+
+| 視点 | 判定 | 理由 |
+|:-----|:-----|:-----|
+| 🔴 Feasibility | ✅ PASS | encoding.py 拡張のみ、低リスク |
+| 🔴 Necessity | ✅ PASS | FEP 判定は認知的意思決定支援に有用 |
+| 🔴 Alternatives | ✅ PASS | 新規ファイルは不要と判断済み |
+| 🔴 Risks | ✅ PASS | 既存テスト維持で検出可能 |
+| 🔴 Dependencies | ✅ PASS | pymdp のみ、既存 |
+
+### Pre-mortem
+
+| 失敗シナリオ | 対策 |
+|:-------------|:-----|
+| PHASE 5 出力形式が変わった | 変換関数でデフォルト値を設定 |
+| FEP 判定が常に同じ結果 | テストで多様な入力をカバー |
+| 出力が長すぎて邪魔 | Optional 扱い、スキップ可能に |
+
+---
+
+## 実装順序
+
+1. **Phase 1**: [encoding.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/fep/encoding.py) に3つの関数追加 + テスト
+2. **Phase 2**: O1 Noēsis SKILL.md に FEP PHASE 追加
+3. **Phase 3**: O2 Boulēsis SKILL.md に FEP PHASE 追加
+4. **Phase 4**: `/noe` を実際に実行して動作確認
+
+---
+
+*Generated by Hegemonikón /plan v3.0*

@@ -1,0 +1,90 @@
+# W6: S-Series SAGE Refactor 実装計画
+
+> **対象**: S1-S4 (Schema Series) スキル
+> **手法**: Tekhne-Maker SAGE Mode テンプレート適用
+> **目的**: XML/MD ハイブリッド形式による構造強化
+
+---
+
+## 現状分析
+
+| Skill | Name | Format | Lines | Implementation |
+|:------|:-----|:-------|------:|:---------------|
+| S1 | Metron | v2.1 YAML+MD | 99 | implicit |
+| S2 | Mekhanē | v2.1 YAML+MD | 102 | /plan 連携 |
+| S3 | Stathmos | v2.1 YAML+MD | 97 | implicit |
+| S4 | Praxis | v2.1 YAML+MD | 97 | implicit |
+
+**現状の問題点**:
+- Processing Logic が簡素 (3ステップのみ)
+- 認知的深さ (Cognitive Depth) が不十分
+- 出力形式が未定義
+
+---
+
+## 提案変更
+
+### SAGE 形式への変換
+
+各 S-series スキルに以下を追加:
+
+1. **`<protocol>` セクション**: 詳細な認知ステップ (SAGE 標準)
+2. **`<constraints>` セクション**: 制約ルール明示
+3. **`<output_template>` セクション**: 出力形式定義
+
+### 変換例 (S1 Metron)
+
+```xml
+<protocol>
+  <step_1_scale_detection>
+    **スケール検出:**
+    対象を以下の軸で評価:
+    - 時間軸: 短期 (日-週) / 長期 (月-年)
+    - 空間軸: 局所 (ファイル) / 大局 (システム)
+    - 抽象軸: 詳細 (実装) / 概念 (設計)
+  </step_1_scale_detection>
+
+  <step_2_context_matching>
+    **コンテキストマッチング:**
+    タスクの性質から最適スケールを選択
+  </step_2_context_matching>
+</protocol>
+
+<output_template>
+  ## 📐 Scale Analysis
+  | Axis | Selected | Reason |
+  |------|----------|--------|
+</output_template>
+```
+
+---
+
+## 実装フェーズ
+
+| Phase | Task | Est. |
+|:------|:-----|-----:|
+| 1 | S1 Metron SAGE 化 | 5min |
+| 2 | S2 Mekhanē SAGE 化 | 5min |
+| 3 | S3 Stathmos SAGE 化 | 5min |
+| 4 | S4 Praxis SAGE 化 | 5min |
+| 5 | 統合テスト | 5min |
+
+---
+
+## 検証計画
+
+1. `/plan` 実行時に S2 Mekhanē が適切に発動するか確認
+2. 各スキルの `<output_template>` が正しく出力されるか検証
+
+---
+
+## リスク
+
+| Risk | Mitigation |
+|:-----|:-----------|
+| 既存ワークフロー連携への影響 | S2→/plan 連携のみ変更。他は implicit |
+| SAGE 形式の冗長化 | 簡潔性を維持、Essential セクションのみ |
+
+---
+
+**推奨**: `y` で実装開始

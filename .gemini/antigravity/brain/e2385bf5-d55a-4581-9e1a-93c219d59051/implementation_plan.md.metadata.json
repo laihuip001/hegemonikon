@@ -1,0 +1,5 @@
+{
+  "artifactType": "ARTIFACT_TYPE_IMPLEMENTATION_PLAN",
+  "summary": "Implementation plan for Cognitive Algebra Phase 1-2. Defines + (augment), - (reduce), * (expand) operators. Includes proposed changes to Tier 1 workflows (/noe, /s, /zet, /bou) with frontmatter additions and output format specifications.",
+  "updatedAt": "2026-01-29T05:44:13.224989928Z"
+}

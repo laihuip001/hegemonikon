@@ -1,0 +1,65 @@
+# Walkthrough: pymdp × Hegemonikón 統合
+
+> **Status**: ✅ PoC 完了
+> **Date**: 2026-01-28
+
+---
+
+## 成果
+
+| 項目 | 結果 |
+|:-----|:-----|
+| pymdp インストール | ✅ v0.0.7.1 |
+| HegemonikónFEPAgent | ✅ 291 lines |
+| テスト | ✅ 10/10 passed (1.07s) |
+
+---
+
+## 核心洞察
+
+```
+pymdp Agent API          →  Hegemonikón O-series
+─────────────────────────────────────────────────
+infer_states(obs)        →  O1 Noēsis (認識)
+infer_policies()         →  O2 Boulēsis (意志)
+sample_action()          →  O4 Energeia (行為)
+```
+
+**両者は独立に開発され、同じ認知構造に到達した。**
+
+---
+
+## アーキテクチャ
+
+```
+┌─ Cognitive Layer (pymdp) ─┐
+│ HegemonikónFEPAgent       │
+│ - Phantasia → Prior       │
+│ - Assent → Belief update  │
+│ - Hormē → Action          │
+├─ Neural Renderer (LLM) ───┤
+│ テキスト生成               │
+└───────────────────────────┘
+```
+
+---
+
+## 変更ファイル
+
+| File | Change |
+|:-----|:-------|
+| [fep_agent.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/fep/fep_agent.py) | New: FEP Agent class |
+| [state_spaces.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/fep/state_spaces.py) | New: Stoic state definitions |
+| [test_fep_agent.py](file:///home/laihuip001/oikos/hegemonikon/tests/test_fep_agent.py) | New: 10 test cases |
+
+---
+
+## 次のステップ
+
+1. `/noe` SKILL.md に FEP 実装セクション追加
+2. 認知層 ↔ LLM 連携の設計
+3. STOIC 効率性パターン (Priority 2) の調査
+
+---
+
+*Commit: 50c20665 — fix(fep): numpy object array handling*

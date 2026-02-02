@@ -1,0 +1,5 @@
+{
+  "artifactType": "ARTIFACT_TYPE_IMPLEMENTATION_PLAN",
+  "summary": "存在証明の多層探索プロジェクト「Dendron」の実行計画。4層構造 (ディレクトリ→ファイル→コード→字句) で全リポジトリに存在証明を注入。FEP構造をコードレベルにまで展開。",
+  "updatedAt": "2026-01-31T00:29:23.970102892Z"
+}

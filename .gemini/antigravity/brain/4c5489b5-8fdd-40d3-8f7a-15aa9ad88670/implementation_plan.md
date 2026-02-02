@@ -1,0 +1,115 @@
+# tekhne-maker → ergasterion 統合計画
+
+> **目的**: tekhne-maker を ergasterion（工房）の生産ラインとして配置
+> **根拠**: ergasterion = 工房 = 生産施設、tekhne = 技芸 → 後者は前者の一部
+
+---
+
+## 現状分析
+
+### ergasterion 構造（既存）
+
+```
+mekhane/ergasterion/
+├── factory/        # 生産スクリプト (forge.ps1 等)
+├── prompt-lang/    # DSL 実装 (prompt_lang.py 等)
+├── helpers/        # ユーティリティ
+└── protocols/      # プロトコル定義
+```
+
+### tekhne-maker 位置（現在）
+
+```
+.agent/skills/utils/tekhne-maker/   # ← スキル層に独立
+```
+
+### 問題
+
+1. **概念的不整合**: ergasterion は「工房」だが tekhne は外部
+2. **分散参照**: tools.yaml、SKILL.md、workflows で個別参照
+3. **貯蔵 vs 生産**: ergasterion/prompt-lang は DSL、tekhne-maker はスキル定義 → 役割分担
+
+---
+
+## 統合方針
+
+### 結論: **物理移動 + シンボリックリンク**
+
+```
+[移動後]
+mekhane/ergasterion/
+├── factory/
+├── prompt-lang/
+├── helpers/
+├── protocols/
+└── tekhne/           # ← tekhne-maker をここに配置
+    ├── SKILL.md
+    ├── tekhne-maker.prompt
+    ├── mixins/
+    ├── references/
+    └── docs/
+
+[互換性維持]
+.agent/skills/utils/tekhne-maker → ../../../hegemonikon/mekhane/ergasterion/tekhne (symlink)
+```
+
+---
+
+## 実装手順
+
+### Step 1: ディレクトリ移動
+
+```bash
+mv .agent/skills/utils/tekhne-maker hegemonikon/mekhane/ergasterion/tekhne
+```
+
+### Step 2: シンボリックリンク作成（Antigravity 互換）
+
+```bash
+cd .agent/skills/utils
+ln -s ../../../hegemonikon/mekhane/ergasterion/tekhne tekhne-maker
+```
+
+### Step 3: tools.yaml 更新
+
+```yaml
+skills:
+  tekhne-maker:
+    path: hegemonikon/mekhane/ergasterion/tekhne/SKILL.md  # 実体パス
+    # symlink があるため .agent/skills/utils/tekhne-maker でも動作
+```
+
+### Step 4: 検証
+
+1. Antigravity が tekhne-maker を検出できることを確認
+2. トリガー「PE」「プロンプト」で発動することを確認
+3. 既存参照（workflows, expansions）が機能することを確認
+
+---
+
+## 変更ファイル一覧
+
+| 操作 | パス |
+|:-----|:-----|
+| MOVE | `.agent/skills/utils/tekhne-maker` → `mekhane/ergasterion/tekhne` |
+| NEW (symlink) | `.agent/skills/utils/tekhne-maker` |
+| MODIFY | `tools.yaml` (path 更新) |
+
+---
+
+## リスク評価
+
+| リスク | 確率 | 対策 |
+|:-------|:-----|:-----|
+| Antigravity が symlink を辿れない | 低 | 事前テスト、失敗時は revert |
+| 既存参照が壊れる | 低 | symlink により後方互換維持 |
+| IDE ファイル監視の問題 | 低 | symlink は透過的に動作 |
+
+---
+
+## 実行タスク
+
+- [ ] Step 1: tekhne-maker を ergasterion/tekhne に移動
+- [ ] Step 2: シンボリックリンク作成
+- [ ] Step 3: tools.yaml 更新
+- [ ] Step 4: 動作確認

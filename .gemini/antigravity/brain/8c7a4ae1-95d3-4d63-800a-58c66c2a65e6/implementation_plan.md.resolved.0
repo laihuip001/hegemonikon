@@ -1,0 +1,48 @@
+# FEP Integration into /bou Workflow
+
+**Status**: FEP Cognitive Layer を `/bou` ワークフローに反映
+
+---
+
+## 背景
+
+- **FEP 実装済み**: [encode_boulesis_output()](file:///home/laihuip001/oikos/hegemonikon/mekhane/fep/encoding.py#306-351), [run_fep_with_learning()](file:///home/laihuip001/oikos/hegemonikon/mekhane/fep/encoding.py#429-479) in [encoding.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/fep/encoding.py)
+- **SKILL.md 文書化済み**: O2 Boulēsis SKILL.md PHASE 6 セクション (lines 403-482)
+- **テスト合格済み**: `test_fep_bridge.py` に `TestBoulesisAnalyze` クラス
+- **未反映**: [/bou.md](file:///home/laihuip001/oikos/.agent/workflows/bou.md) ワークフローに PHASE 6 呼び出し手順なし
+
+---
+
+## Proposed Changes
+
+### [MODIFY] [bou.md](file:///home/laihuip001/oikos/.agent/workflows/bou.md)
+
+1. マクロフローに PHASE 6 追加 (line 87 付近)
+2. コマンド一覧を更新
+3. PHASE 6 セクションを [/noe.md](file:///home/laihuip001/oikos/.agent/workflows/noe.md) と同様に追加
+
+**変更内容**:
+- マクロフロー最終行を `PHASE 6` へ繋ぐ
+- PHASE 6 セクションを追加（SKILL.md を正本参照として）
+
+---
+
+## Verification Plan
+
+### Automated Tests
+
+```bash
+cd /home/laihuip001/oikos/hegemonikon
+PYTHONPATH=. pytest tests/test_fep_bridge.py -v
+```
+
+**期待**: 22件 Passed (既存テストが全てパス)
+
+### Manual Verification
+
+1. `/bou` ワークフローを実行して PHASE 6 FEP Cognitive Feedback が表示されることを確認
+2. 出力に「FEP Cognitive Feedback」セクションが含まれることを視認
+
+---
+
+*Estimated changes: ~30 lines*

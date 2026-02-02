@@ -1,0 +1,5 @@
+{
+  "artifactType": "ARTIFACT_TYPE_IMPLEMENTATION_PLAN",
+  "summary": "Implementation plan for integrating pymdp Active Inference library into Hegemonikón's /noe, /bou, /ene workflows. Includes conceptual mapping, PoC design, and verification steps.",
+  "updatedAt": "2026-01-28T09:13:58.033177854Z"
+}

@@ -1,0 +1,5 @@
+{
+  "artifactType": "ARTIFACT_TYPE_TASK",
+  "summary": "タスク自動分類機構（I2）の設計と実装のためのチェックリスト。Phase 1（設計）、Phase 2（実装）、Phase 3（検証）の3フェーズで構成。",
+  "updatedAt": "2026-01-27T23:33:54.159520427Z"
+}

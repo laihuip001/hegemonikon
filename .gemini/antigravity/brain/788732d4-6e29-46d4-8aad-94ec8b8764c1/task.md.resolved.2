@@ -1,0 +1,33 @@
+# Task: O3/K4 統一リマッピング
+
+## 目標
+
+O3 Zētēsis と K4 Sophia のワークフローリネーム、SKILL.md 更新
+
+## 最終マッピング
+
+| 定理 | ワークフロー | 機能 |
+|:-----|:-------------|:-----|
+| O3 Zētēsis | **/zet** | 問いを発見 |
+| K4 Sophia | **/sop** | 情報を収集 |
+
+## タスク
+
+- [x] /ax 分析でリマッピング決定
+- [x] /tou.md → /zet.md にリネーム・内容更新 (O3)
+- [x] 旧 /zet.md → /sop.md にリネーム・内容更新 (K4)
+- [x] O3 Zētēsis SKILL.md を「問いを立てる」に純化
+- [x] K4 Sophia SKILL.md に「情報収集」機能を追加
+- [x] tools.yaml 更新
+
+## 変更ファイル
+
+```
+.agent/workflows/
+  tou.md  → zet.md (O3 Zētēsis)
+  zet.md  → sop.md (K4 Sophia)
+
+.agent/skills/
+  ousia/o3-zetesis/SKILL.md   → 純化
+  kairos/k4-sophia/SKILL.md   → 情報収集追加
+```

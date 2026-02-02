@@ -1,0 +1,108 @@
+# /poc 実装計画 (O3 Zētēsis 派生)
+
+## 目標
+
+O3 Zētēsis の派生ワークフロー `/poc` を作成する。
+
+> **用途**: Timeboxed 探索 — 不確実性を下げるための実験的調査
+
+---
+
+## 提案する変更
+
+### [NEW] [poc.md](file:///home/laihuip001/oikos/.agent/workflows/poc.md)
+
+O3 Zētēsis の派生ワークフロー。
+
+**Frontmatter**:
+```yaml
+---
+description: O3 Zētēsis 派生。Timeboxed 探索で不確実性を下げる。Spike/PoC 手法。
+hegemonikon: Ousia
+modules: [O3]
+parent: "/zet"
+skill_ref: ".agent/skills/ousia/o3-zetesis/SKILL.md"
+triggers:
+  - "試してみる"
+  - "実験"
+  - "PoC"
+  - "Spike"
+  - "探索"
+  - "不確実"
+version: "1.0"
+lineage: "O3 Zētēsis 派生 + SE Spike/PoC 手法統合 → v1.0 (2026-01-29)"
+anti_skip: enabled
+---
+```
+
+**構造** (SE Spike/PoC 手法に基づく):
+
+1. **PHASE 0**: 探索目的の明確化
+   - 何を検証するか？
+   - 成功の定義は？
+   - Timebox (制限時間) は？
+
+2. **PHASE 1**: 仮説設定
+   - 「〇〇すれば△△になるはず」形式
+   - 検証可能な形に言語化
+
+3. **PHASE 2**: 最小実装
+   - 検証に必要な最小限のコード/手順
+   - 品質は問わない (捨てる前提)
+
+4. **PHASE 3**: 結果評価
+   - 仮説は正しかったか？
+   - 学んだことは？
+   - 次のアクションは？
+
+---
+
+### [MODIFY] [zet.md](file:///home/laihuip001/oikos/.agent/workflows/zet.md)
+
+**変更内容**: children に `/poc` を追加
+
+```yaml
+children:
+  - "/poc"  # Timeboxed 探索
+```
+
+---
+
+### [MODIFY] [o.md](file:///home/laihuip001/oikos/.agent/workflows/o.md)
+
+**変更内容**: O-series 派生一覧に `/poc` を追加
+
+---
+
+### [MODIFY] tools.yaml
+
+**変更内容**: `/poc` エントリを追加
+
+```yaml
+poc:
+  description: "O3 Zētēsis 派生。Timeboxed 探索で不確実性を下げる"
+  purpose: "Spike/PoC — 不確実性を実験で下げる"
+  modules: [O3]
+  parent: "/zet"
+```
+
+---
+
+## 検証計画
+
+1. `/poc` を実行し、質問フローが動作することを確認
+2. 生成された探索結果が artifact として保存されることを確認
+
+---
+
+## 実装手順
+
+1. **tekhne-maker で生成**: `/mek` Hegemonikón Mode を使用
+2. **frontmatter 追加**: 上記定義を適用
+3. **親ワークフロー更新**: `/zet` に children 追加
+4. **tools.yaml 更新**: エントリ追加
+5. **git commit**
+
+---
+
+*計画完了: 2026-01-29*

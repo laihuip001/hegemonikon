@@ -1,0 +1,203 @@
+# Dendron 4×4 検証マトリクス 実装計画
+
+## 概要
+
+16セル完全実装: **4 粒度 × 4 深度**
+
+```
+           │ Surface   │ Structural │ Functional │ Empirical │
+───────────┼───────────┼────────────┼────────────┼───────────┤
+L0 Dir     │ Cell 1    │ Cell 2     │ Cell 3     │ Cell 4    │
+L1 File    │ Cell 5    │ Cell 6     │ Cell 7     │ Cell 8    │
+L2 Block   │ Cell 9    │ Cell 10    │ Cell 11    │ Cell 12   │
+L3 Token   │ Cell 13   │ Cell 14    │ Cell 15    │ Cell 16   │
+```
+
+---
+
+## Phase 1: Surface Layer (完成度: 50%)
+
+### [MODIFY] [checker.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/dendron/checker.py)
+
+| Cell | 実装 | 説明 |
+|------|------|------|
+| 1 | ✅ | `check_dir_proof()` - PROOF.md チェック |
+| 5 | ✅ | `check_file_proof()` - # PROOF: ヘッダー |
+| 9 | ❌ | `check_block_proof()` - docstring PROOF: |
+| 13 | ❌ | `check_token_proof()` - 命名規約検証 |
+
+```python
+# Cell 9: L2/Surface - ブロック PROOF
+def check_block_proof(self, path: Path) -> list[BlockProof]:
+    """関数/クラスの docstring 内 PROOF をチェック"""
+    import ast
+    tree = ast.parse(path.read_text())
+    results = []
+    for node in ast.walk(tree):
+        if isinstance(node, (ast.FunctionDef, ast.ClassDef)):
+            docstring = ast.get_docstring(node)
+            if docstring and 'PROOF:' in docstring:
+                # Parse PROOF in docstring
+                ...
+    return results
+
+# Cell 13: L3/Surface - トークン命名
+def check_token_proof(self, path: Path) -> list[TokenProof]:
+    """変数/関数名の命名規約チェック"""
+    import ast
+    # 規約: _internal, _deprecated, _legacy 等のプレフィックス
+    ...
+```
+
+---
+
+## Phase 2: Structural Layer (依存解析)
+
+### [NEW] [structural.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/dendron/structural.py)
+
+| Cell | 実装 | 説明 |
+|------|------|------|
+| 2 | ❌ | ディレクトリ依存グラフ |
+| 6 | ❌ | import 解析 |
+| 10 | ❌ | 関数呼び出し解析 |
+| 14 | ❌ | 変数参照解析 |
+
+```python
+class StructuralAnalyzer:
+    """依存関係解析器"""
+    
+    # Cell 2: L0/Structural
+    def analyze_dir_deps(self, path: Path) -> DirDeps:
+        """ディレクトリ間の依存関係"""
+        ...
+    
+    # Cell 6: L1/Structural
+    def analyze_imports(self, path: Path) -> list[Import]:
+        """ファイルの import 解析"""
+        import ast
+        tree = ast.parse(path.read_text())
+        imports = []
+        for node in ast.walk(tree):
+            if isinstance(node, ast.Import):
+                ...
+            elif isinstance(node, ast.ImportFrom):
+                ...
+        return imports
+    
+    # Cell 10: L2/Structural
+    def analyze_calls(self, path: Path) -> list[Call]:
+        """関数呼び出しグラフ"""
+        ...
+    
+    # Cell 14: L3/Structural
+    def analyze_refs(self, path: Path) -> list[Ref]:
+        """変数参照解析"""
+        ...
+```
+
+---
+
+## Phase 3: Functional Layer (冗長性検出)
+
+### [NEW] [functional.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/dendron/functional.py)
+
+| Cell | 実装 | 説明 |
+|------|------|------|
+| 3 | ❌ | 冗長ディレクトリ検出 |
+| 7 | ❌ | 冗長ファイル検出 |
+| 11 | ❌ | 冗長関数検出 (Dead Code) |
+| 15 | ❌ | 未使用変数検出 |
+
+```python
+class FunctionalAnalyzer:
+    """冗長性検出器"""
+    
+    # Cell 3: L0/Functional
+    def find_redundant_dirs(self, root: Path) -> list[Path]:
+        """空または未参照ディレクトリ"""
+        ...
+    
+    # Cell 7: L1/Functional
+    def find_redundant_files(self, root: Path) -> list[Path]:
+        """未 import ファイル"""
+        ...
+    
+    # Cell 11: L2/Functional
+    def find_dead_functions(self, path: Path) -> list[str]:
+        """未呼び出し関数"""
+        ...
+    
+    # Cell 15: L3/Functional
+    def find_unused_vars(self, path: Path) -> list[str]:
+        """未使用変数 (write-only)"""
+        ...
+```
+
+---
+
+## Phase 4: Empirical Layer (削除実験)
+
+### [NEW] [empirical.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/dendron/empirical.py)
+
+| Cell | 実装 | 説明 |
+|------|------|------|
+| 4 | ❌ | Dir 削除 → テスト実行 |
+| 8 | ❌ | File 削除 → テスト実行 |
+| 12 | ❌ | Function 削除 → テスト実行 |
+| 16 | ❌ | Variable 削除 → テスト実行 |
+
+```python
+class EmpiricalAnalyzer:
+    """削除実験器 (Sandbox)"""
+    
+    def run_deletion_experiment(
+        self, 
+        target: Path | str,
+        level: Literal['dir', 'file', 'function', 'variable']
+    ) -> ExperimentResult:
+        """
+        1. Git stash で現状保存
+        2. 対象を削除
+        3. pytest 実行
+        4. 結果記録
+        5. Git stash pop で復元
+        """
+        ...
+```
+
+---
+
+## Phase 5: CLI 統合
+
+### [MODIFY] [cli.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/dendron/cli.py)
+
+```bash
+# 新コマンド
+python -m mekhane.dendron matrix .                  # 16セル全実行
+python -m mekhane.dendron matrix . --layer surface  # Surface のみ
+python -m mekhane.dendron matrix . --depth L2       # L2 のみ
+python -m mekhane.dendron matrix . --cell 6         # Cell 6 のみ
+```
+
+---
+
+## 実装順序
+
+| Order | Phase | Cells | 優先度 |
+|-------|-------|-------|--------|
+| 1 | Surface L2/L3 | 9, 13 | HIGH |
+| 2 | Structural L1 | 6 | HIGH |
+| 3 | Functional L2 | 11 | MED |
+| 4 | 残り Structural | 2, 10, 14 | MED |
+| 5 | 残り Functional | 3, 7, 15 | MED |
+| 6 | Empirical 全部 | 4, 8, 12, 16 | LOW |
+
+---
+
+## 検証計画
+
+各セル実装後:
+
+1. 単体テスト
+2. mekhane/ で統合テスト
+3. hegemonikon 全体で回帰テスト

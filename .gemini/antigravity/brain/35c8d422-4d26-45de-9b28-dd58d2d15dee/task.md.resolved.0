@@ -1,0 +1,38 @@
+# B-List: Mneme Server 強化タスク
+
+> **Session**: 2026-01-27 17:42~
+> **前提**: mneme_server.py MVP 完了、7 seed docs
+
+---
+
+## タスク一覧
+
+- [ ] **1. 本物のデータ投入**
+  - [ ] 既存 Gnosis 論文データの確認・少量追加
+  - [ ] 最近のチャット履歴を Chronos に追加
+  - [ ] KI (Knowledge Items) を Sophia に追加
+  - [ ] Handoff ファイルを Kairos に追加
+
+- [ ] **2. Embedding 実装**
+  - [ ] sentence-transformers インストール
+  - [ ] EmbeddingAdapter 作成
+  - [ ] MockAdapter → EmbeddingAdapter 切り替え
+
+- [ ] **3. Handoff v2 ワークフロー統合**
+  - [ ] /bye 時に kairos へ自動投入
+  - [ ] /boot 時に kairos から読み込み
+
+- [ ] **4. 残り /bou タスク確認**
+  - [ ] 他セッション (1, 2, 4) の進捗確認
+  - [ ] 統合ポイントの特定
+
+---
+
+## 優先順位
+
+| # | タスク | 理由 | 時間目安 |
+|:---:|:---|:---|:---:|
+| 1 | Handoff v2 統合 | ワークフロー直結、即効果 | 15min |
+| 2 | 本物のデータ投入 | 検索精度向上 | 20min |
+| 3 | Embedding 実装 | 本格的なベクトル検索 | 30min |
+| 4 | /bou 残りタスク | 他セッション依存 | TBD |

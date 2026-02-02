@@ -1,0 +1,36 @@
+# Task: Skill Architecture Enhancement + Workflow連携パターン実装
+
+## 目標
+
+KIレポートに基づき、Hegemonikón スキル/ワークフローを v2.2 標準へ更新
+
+---
+
+## タスク一覧
+
+### Phase 1: スキル構造改善
+
+- [ ] O1 Noēsis に `when_not_to_use` フィールド追加
+- [ ] O1 に LLM固有最適化層（claude/gemini/gpt）追加
+- [ ] A2 Krisis に同様の改善適用
+- [ ] S1 Metron に同様の改善適用
+- [ ] 残り21スキルにパターン適用（優先度低、今回はパイロット3つ）
+
+### Phase 2: ワークフロー連携パターン
+
+- [ ] ハイブリッド連携パターンを文書化
+- [ ] tools.yaml にスキル連携パターン定義を追加
+- [ ] /noe ワークフローをスキル呼び出し形式に更新
+
+### Phase 3: 検証
+
+- [ ] 更新したスキルのfrontmatterトークン数確認（100-150t目標）
+- [ ] LLM別最適化セクションの整合性確認
+
+---
+
+## 進捗
+
+- [x] KI確認（skill_workflow_best_practices.md）
+- [x] 現状スキル分析（O1, A2, S1 確認）
+- [ ] 実装計画作成

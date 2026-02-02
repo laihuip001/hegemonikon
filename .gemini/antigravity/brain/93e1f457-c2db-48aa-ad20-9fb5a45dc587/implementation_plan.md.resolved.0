@@ -1,0 +1,95 @@
+# Synteleia Layer Refinement — Phase 4 実装計画
+
+## 目標
+
+Synteleia の **Phase 4: @S マクロ統合** を実装し、CCL 式から直接 Synteleia エージェントを呼び出せるようにする。
+
+---
+
+## 現状把握 ✅
+
+| 項目 | 状態 |
+|:-----|:-----|
+| `mekhane/synteleia/` | 実装済み (Phase 3 完了) |
+| Poiēsis 層 (O,S,H) | 3エージェント実装済み |
+| Dokimasia 層 (P,K,A) | 5エージェント実装済み |
+| [SynteleiaOrchestrator](file:///home/laihuip001/oikos/hegemonikon/mekhane/synteleia/orchestrator.py#36-224) | 内積/外積モード対応済み |
+| テストファイル | **未作成** |
+| @S マクロ定義 | **未実装** |
+
+---
+
+## 提案する変更
+
+### Phase 4A: @S マクロ定義 (CCL stdlib 統合)
+
+#### [MODIFY] [standard_macros_stdlib.md](file:///home/laihuip001/oikos/hegemonikon/kernel/ccl/standard_macros_stdlib.md)
+
+以下のマクロを追加:
+
+```markdown
+| **Synteleia** | `@syn·` | 内積モード (両層統合) |
+| | `@syn×` | 外積モード (3×3 交差検証) |
+| | `@poiesis` | 生成層のみ (O,S,H) |
+| | `@dokimasia` | 審査層のみ (P,K,A) |
+| | `@S{O,A,K}` | 指定Agent のみ |
+| | `@S-` | 最小Agent（自動選択）|
+```
+
+---
+
+### Phase 4B: 統合CLI/インターフェース
+
+#### [MODIFY] [hermeneus/parser.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/hermeneus/parser.py)
+
+`@syn` マクロを認識するパーサー拡張:
+- `@syn·` → `SynteleiaOrchestrator.audit()` (内積)
+- `@syn×` → 外積モード (未実装 → Phase 5)
+
+---
+
+### Phase 4C: ユニットテスト作成
+
+#### [NEW] tests/test_synteleia.py
+
+```python
+# テスト内容:
+# 1. SynteleiaOrchestrator の基本動作
+# 2. 並列/逐次実行モードの切替
+# 3. Poiēsis/Dokimasia 各エージェントの検出精度
+```
+
+---
+
+## 検証計画
+
+### 自動テスト
+
+```bash
+# テストディレクトリ作成後:
+cd /home/laihuip001/oikos/hegemonikon
+PYTHONPATH=. .venv/bin/python -m pytest tests/test_synteleia.py -v
+```
+
+### 手動検証
+
+1. Python REPL で [SynteleiaOrchestrator](file:///home/laihuip001/oikos/hegemonikon/mekhane/synteleia/orchestrator.py#36-224) を直接呼び出し
+2. サンプルコード/ドキュメントを監査対象とし、結果を確認
+
+```python
+from mekhane.synteleia.orchestrator import SynteleiaOrchestrator
+from mekhane.synteleia.base import AuditTarget, TargetType
+
+orch = SynteleiaOrchestrator()
+target = AuditTarget(content="# Sample\n...", target_type=TargetType.PLAN)
+result = orch.audit(target)
+print(orch.format_report(result))
+```
+
+---
+
+## 質問
+
+1. **Phase 4 のスコープ**: @S マクロ定義のみか、Hermeneus パーサー統合まで含めるか？
+2. **テスト優先度**: テスト作成を先行するか、マクロ定義を先行するか？
+3. **外積モード (×)**: Phase 5 に残すか、今回実装するか？

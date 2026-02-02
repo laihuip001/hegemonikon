@@ -1,0 +1,219 @@
+# tekhne-maker 改善計画 v2
+
+> **Origin**: /noe 分析 (N4) → Creator フィードバック → 自己批評 → /plan v3.0
+
+---
+
+## ┌─[Hegemonikón] STAGE 0: Blindspot + Scale─┐
+
+### 盲点チェック
+
+| カテゴリ | 盲点 | 対策 |
+|:---------|:-----|:-----|
+| 🎯 Framing | 「トークン数」で制約しても LLM は守れない | **構造的強制**に変更 |
+| 📐 Scope | .prompt ファイルが v5.0 で放置 | **廃止または同期** |
+| 🔗 Dependencies | references/ が読み込まれていない可能性 | **読み込み必須化** |
+| 👤 Stakeholders | Creator のみ | ✅ 問題なし |
+| ⏱️ Temporal | 短期効果重視 | ✅ 適切 |
+
+### スケール判定
+
+📏 **Scale: Meso** (モジュール改善)
+- 3ファイル変更 + 1ファイル廃止
+- アーキテクチャ変更なし
+
+---
+
+## ┌─[Hegemonikón] STAGE 1: Strategy Selection─┐
+
+### Explore / Exploit 判定
+
+| 軸 | 評価 |
+|:---|:-----|
+| 失敗コスト | **低** (実験可能) |
+| 環境確実性 | **高** (既知の問題) |
+| 時間制約 | **通常** |
+
+→ **Exploit** (確実な改善を優先)
+
+### Plan 選択
+
+| Plan | 概要 | リスク |
+|:-----|:-----|:-------|
+| A Conservative | tools.yaml 登録のみ | 効果薄 |
+| **B Robust** ← 推奨 | 構造的強制 + references 読み込み必須化 | 工数増 |
+| C Aggressive | .prompt 廃止 + SKILL.md 大規模リファクタ | 破壊的 |
+
+---
+
+## ┌─[Hegemonikón] STAGE 2: Success Criteria─┐
+
+| 評価軸 | Must (必須) | Should (期待) | Could (理想) |
+|:-------|:------------|:--------------|:-------------|
+| 発見可能性 | tools.yaml に登録 | Quick Start 追加 | /boot で自動表示 |
+| 出力密度 | 8セクション以上 | 各セクション3例以上 | 1000行以上 |
+| 品質 | Edge Cases 5+ | Pre-mortem 含む | WARGAME_DB 参照 |
+
+**完了条件**: Must が全て満たされた時点
+
+---
+
+## ┌─[Hegemonikón] STAGE 3: Blueprint─┐
+
+### Goal Decomposition
+
+```text
+最終目標: tekhne-maker が「密度の高い」プロンプトを生成する
+  ↑
+サブゴール 1: references/ が実際に読み込まれる
+  ↑ 前提: /tek.md に読み込みステップを追加
+サブゴール 2: 出力構造が明示的に定義されている
+  ↑ 前提: SKILL.md に構造的制約を追加
+サブゴール 3: /tek が発見される
+  ↑ 前提: tools.yaml に登録
+現在地
+```
+
+### 変更対象ファイル
+
+---
+
+#### [MODIFY] [tools.yaml](file:///home/laihuip001/oikos/.agent/tools.yaml)
+
+`workflows:` セクションに追加:
+
+```yaml
+  tek:
+    purpose: "プロンプト/スキル生成 (tekhne-maker)"
+    modules: [S2]
+    modes: [Generate, Diagnose, Improve, SAGE, Prompt-Lang]
+```
+
+---
+
+#### [MODIFY] [SKILL.md](file:///home/laihuip001/oikos/hegemonikon/mekhane/ergasterion/tekhne/SKILL.md)
+
+**変更点**:
+
+1. `## Output: SKILL.md Structure` セクションを**構造的強制**に変更:
+
+```yaml
+## Output: SKILL.md Structure (v6.2 Structural Enforcement)
+
+@output_requirements:
+  minimum_sections: 8
+  sections:
+    - Overview: 200字以上
+    - Core Behavior: 10項目以上
+    - Quality Standards: 5指標以上、各指標に数値基準
+    - Edge Cases: 5ケース以上、各ケースに Fallback 明記
+    - Examples: 3入出力ペア以上、各ペアに詳細解説
+    - Pre-mortem: 3失敗シナリオ以上
+    - References: 該当する reference/ ファイルを明示
+    - Version History: 必須
+```
+
+2. `## M6: INTERFACE` に **1対3の法則** を追加:
+
+```markdown
+### 1対3の法則 (One-to-Three Rule)
+
+> 1つの抽象概念に対して、必ず3つの具体例を示す。
+
+- 良い例 ✅: 「Edge Cases: 1) 空入力 2) 長文入力 3) 特殊文字」
+- 悪い例 ❌: 「Edge Cases: 異常系を考慮」
+```
+
+---
+
+#### [MODIFY] [tek.md](file:///home/laihuip001/oikos/.agent/workflows/tek.md)
+
+**変更点**:
+
+1. **STEP 0.5: 参照ファイル読み込み (必須)** を追加:
+
+```markdown
+## ⚠️ STEP 0.5: 参照ファイル読み込み (必須)
+
+> **このステップは省略禁止。**
+
+以下を `view_file` で読み込んでから生成を開始:
+
+| ファイル | 目的 |
+|:---------|:-----|
+| `references/archetypes.md` | Archetype 選択根拠 |
+| `references/quality-checklist.md` | 品質基準 |
+| `references/wargame-db.md` | 失敗シナリオ |
+
+読み込まずに生成を開始した場合: **出力が薄くなる。やり直し。**
+```
+
+2. **出力品質基準** セクションを追加:
+
+```markdown
+## 出力品質基準 (Structural Enforcement)
+
+| 指標 | 必須値 |
+|:-----|:-------|
+| セクション数 | 8+ |
+| Core Behavior 項目数 | 10+ |
+| Edge Cases 数 | 5+ |
+| Examples ペア数 | 3+ |
+| 各例の解説行数 | 3+ |
+
+**検証**: 出力後に上記を満たしているか確認。不足時は追記。
+```
+
+---
+
+#### [DELETE] [tekhne-maker.prompt](file:///home/laihuip001/oikos/hegemonikon/mekhane/ergasterion/tekhne/tekhne-maker.prompt)
+
+**理由**: v5.0 で放置されており SKILL.md v6.1 と不整合。混乱の原因。
+
+**代替**: SKILL.md が正本。.prompt 形式が必要な場合は `/tek pl` モードで動的生成。
+
+---
+
+## ┌─[Hegemonikón] STAGE 4: Devil's Advocate─┐
+
+### 敵対的チェック
+
+| 視点 | 判定 | 理由 |
+|:-----|:----:|:-----|
+| Feasibility | ✅ PASS | 3ファイル編集 + 1削除、1時間以内 |
+| Necessity | ✅ PASS | Creator が明示的に要望 |
+| Alternatives | ✅ PASS | AI Studio 移行は /noe で否定済み |
+| Risks | ✅ PASS | .prompt 削除は破壊的だが代替あり |
+| Dependencies | ✅ PASS | 外部依存なし |
+
+### Pre-mortem
+
+| 失敗シナリオ | 対策 |
+|:-------------|:-----|
+| 構造的強制を無視される | /tek.md に検証ステップを追加 |
+| references/ を読まない | Anti-Skip Protocol で強制 |
+| .prompt 削除で既存依存が壊れる | 削除前に grep で参照確認 |
+
+---
+
+## Verification Plan
+
+1. tools.yaml に `/tek` が登録されていることを確認
+2. `/tek 「テストスキル」` を実行し、8セクション以上か確認
+3. [.prompt](file:///home/laihuip001/oikos/hegemonikon/mekhane/ergasterion/tekhne/tekhne-maker.prompt) が参照されていないことを grep で確認後、削除
+
+---
+
+## 作業順序
+
+| Step | タスク | 見積もり |
+|:----:|:-------|:---------|
+| 1 | tools.yaml に /tek 登録 | 1分 |
+| 2 | SKILL.md 構造的強制追加 | 5分 |
+| 3 | /tek.md STEP 0.5 + 品質基準追加 | 5分 |
+| 4 | .prompt の参照確認 → 削除 | 2分 |
+| 5 | 手動検証 | 5分 |
+
+---
+
+*v2 — /plan v3.0 準拠 + 自己批評反映 (2026-01-28 20:44 JST)*

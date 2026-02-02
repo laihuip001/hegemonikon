@@ -1,0 +1,5 @@
+{
+  "artifactType": "ARTIFACT_TYPE_OTHER",
+  "summary": "/noe 実行結果。主要ワークフロー品質分析。結論: 軽微な不整合あり（noe/zet は参照型、bou/ene は重複型）。推奨: noe/zet に PHASE サマリー追加。",
+  "updatedAt": "2026-01-28T09:44:29.646780256Z"
+}

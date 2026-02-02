@@ -1,0 +1,45 @@
+# Hegemonikón Mode 設計タスク
+
+## 目的
+
+tekhne-maker に「Hegemonikón Mode」を追加し、哲学的に正当化された生成物を作成できるようにする。
+
+---
+
+## タスクリスト
+
+### Phase 1: /noe 分析
+
+- [/] 盲点チェック — 見落としている観点はないか
+- [ ] 前提掘出 — 暗黙の前提を明らかにする
+- [ ] ゼロ設計 — 複数の仮説を検討
+- [ ] GoT 分析 — 収斂ノードを特定
+- [ ] 自己検証 — 誤謬検出と最強反論
+
+### Phase 2: /plan 設計
+
+- [ ] STAGE 0: 盲点 + スケール判定
+- [ ] STAGE 1: 戦略選択 (Explore/Exploit)
+- [ ] STAGE 2: 成功基準定義
+- [ ] STAGE 3: Blueprint 作成
+- [ ] STAGE 4: Devil's Advocate
+
+### Phase 3: 実装
+
+- [ ] M7: HEGEMONIKON_MODE を SKILL.md に追加
+- [ ] /tek.md に Hegemonikón Mode トリガーを追加
+- [ ] 定理導出ロジックの実装
+- [ ] テスト生成
+
+---
+
+## 成果物
+
+- [ ] /noe 分析結果
+- [ ] implementation_plan.md
+- [ ] SKILL.md v6.4 (M7 追加)
+- [ ] /tek.md v4.0
+
+---
+
+*Created: 2026-01-28 21:31 JST*

@@ -1,0 +1,15 @@
+# Task: jules_client.py 脆弱性修正
+
+## 完了
+- [x] Jules レビューブランチのGit直接確認 (59件発見)
+- [x] ai-003 Hallucination レビュー検証 → **False Positive** (401≠404)
+- [x] th-004 支配二分法レビュー検証 → **4/4 True**
+
+## 進行中
+- [/] Finding 1 + 2 修正実装
+  - [ ] parse_state: UNKNOWN返却 + ログ追加
+  - [ ] batch_execute: エラー型情報保持 + トレース可能ID
+
+## 未着手
+- [ ] テスト実行確認
+- [ ] コミット

@@ -1,0 +1,5 @@
+{
+  "artifactType": "ARTIFACT_TYPE_IMPLEMENTATION_PLAN",
+  "summary": "CCL v2.1 の意味的検証モジュール `semantic_validator.py` の設計案。LLM を使用して、自然言語の意図と CCL 式の意味的整合性を検証する。",
+  "updatedAt": "2026-01-29T12:48:20.737087291Z"
+}

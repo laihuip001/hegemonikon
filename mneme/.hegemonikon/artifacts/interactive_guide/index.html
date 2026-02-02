@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hegemonikón Interactive Guide</title>
+    <!-- Google Fonts: Inter & Fira Code -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300..700&family=Inter:wght@300..800&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="./src/style/main.css" />
+    <link rel="stylesheet" href="./src/style/components.css" />
+  </head>
+  <body>
+    <div id="app" class="container">
+      <!-- Header -->
+      <header class="flex-center" style="padding: var(--space-xl) 0;">
+        <h1 class="text-gradient font-xl">HEGEMONIKÓN GUIDE</h1>
+      </header>
+
+      <!-- Main Navigation (Home) -->
+      <main id="home-view" class="fade-in">
+        <!-- Hub Grid -->
+        <section class="glass-panel" style="padding: var(--space-lg); margin-bottom: var(--space-xl);">
+          <h2 class="font-lg" style="margin-bottom: var(--space-md);">6 HUBS</h2>
+          <div id="hub-grid" class="grid" style="grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));">
+            <!-- Hub Cards injected by JS -->
+          </div>
+        </section>
+
+        <!-- Command Palette -->
+        <section class="glass-panel" style="padding: var(--space-xl); text-align: center;">
+          <h2 class="font-lg">今日何をする？</h2>
+          <p class="font-sm" style="margin-top: var(--space-sm);">AIとの対話を開始するコマンドを入力してください</p>
+          
+          <div class="command-input-wrapper">
+            <input type="text" id="cmd-input" class="command-input" placeholder="/" autocomplete="off" />
+            <div id="suggestion-box" class="suggestion-box">
+              <!-- Suggestions injected by JS -->
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <!-- Detailed Views (Hidden by default) -->
+      <section id="detail-view" class="hidden fade-in">
+        <button id="back-btn" class="glass-card" style="margin-bottom: var(--space-md);">← Back</button>
+        <div id="detail-content">
+          <!-- Detail content injected by JS -->
+        </div>
+      </section>
+
+    </div>
+    <script type="module" src="./src/main.js"></script>
+  </body>
+</html>

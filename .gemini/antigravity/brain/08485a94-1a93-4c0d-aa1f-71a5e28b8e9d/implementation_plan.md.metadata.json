@@ -1,0 +1,5 @@
+{
+  "artifactType": "ARTIFACT_TYPE_IMPLEMENTATION_PLAN",
+  "summary": "/eat ワークフローを用いて旧資産 Module 01-25 + Hypervisor を Hegemonikón に消化するための戦略的計画書。/s v4.1 の 5-STAGE 認知プロセスに従い、STAGE 0-4 を完了。優先度に基づく 3+1 バッチ戦略を提案: Batch 1 (認知+検証 8件)、Batch 2 (環境+堅牢 8件)、Batch 3 (運用+保守 9件)、Final (Hypervisor → /boot 統合)。",
+  "updatedAt": "2026-01-29T04:52:00.766774981Z"
+}

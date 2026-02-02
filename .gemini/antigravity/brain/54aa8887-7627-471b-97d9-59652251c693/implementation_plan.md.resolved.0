@@ -1,0 +1,85 @@
+# Skill-WF Mode Mapping 設計
+
+> **目的**: SKILL.md に `related_modes` セクションを追加し、WF modeとの連携を明示化
+
+---
+
+## 背景
+
+- WF側: 209 mode実装済み (100%達成)
+- Skill側: mode CCL言及 = **0** (断絶)
+
+---
+
+## 対応マトリックス
+
+| Skill | WF | 主要 modes (例) |
+|:------|:---|:----------------|
+| a1-pathos | /pat | pat, meta_emotion |
+| a2-krisis | /dia | auto, adv, lex, epo |
+| a3-gnome | /gno | disc, extr, analogy_* |
+| a4-episteme | /epi | prac, theo, case, triz40 |
+| h1-propatheia | /pro | initial, bias, risk |
+| h2-pistis | /pis | degree, bayes, calib |
+| h3-orexis | /ore | value, prior, akra |
+| h4-doxa | /dox | persist, evolve, archive |
+| k1-eukairia | /euk | window, timing, now |
+| k2-chronos | /chr | deadline, duration, sequence |
+| k3-telos | /tel | purpose, why, means |
+| k4-sophia | /sop | deep, fact, lit |
+| o1-noesis | /noe | nous, phro, meta |
+| o2-boulesis | /bou | desir, voli, akra |
+| o3-zetesis | /zet | anom, hypo, abduction |
+| o4-energeia | /ene | act, exec, flag |
+| p1-khora | /kho | scope, boundary, a3 |
+| p2-hodos | /hod | path, search, backward |
+| p3-trokhia | /tro | cycle, expand, contract |
+| p4-tekhne | /tek | method, tool, dsl |
+| s1-metron | /met | fermi, kiss, units |
+| s2-mekhane | /mek | comp, inve, observability |
+| s3-stathmos | /sta | robust, done, security |
+| s4-praxis | /pra | exec, deploy, rollback |
+
+---
+
+## Proposed Changes
+
+### 各 SKILL.md に追加するセクション
+
+```markdown
+## Related Modes
+
+このスキルに関連するWFモード:
+
+| Mode | CCL | 用途 |
+|:-----|:----|:-----|
+| `{mode1}` | `/{wf}.{mode1}` | {説明} |
+| `{mode2}` | `/{wf}.{mode2}` | {説明} |
+```
+
+---
+
+## 優先実装 (Top 5)
+
+1. **a3-gnome** → /gno (23 modes) — 最多
+2. **p1-khora** → /kho (19 modes)
+3. **s3-stathmos** → /sta (17 modes)
+4. **a2-krisis** → /dia (17 modes)
+5. **s1-metron** → /met (15 modes)
+
+---
+
+## Verification Plan
+
+### 自動検証
+
+```bash
+# 追加後に実行
+grep -c "## Related Modes" .agent/skills/*/SKILL.md
+# 期待: 5 (Phase 1)
+```
+
+### 手動検証
+
+1. SKILL.md を開き Related Modes セクションが存在することを確認
+2. 記載されている mode CCL が対応 WF に実在することを確認

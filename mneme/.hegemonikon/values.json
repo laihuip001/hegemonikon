@@ -1,0 +1,39 @@
+{
+    "version": "1.0.0",
+    "description": "T4 Phronēsis 価値関数 - 意思決定の重み付け",
+    "created": "2026-01-27T14:52:00+09:00",
+    "values": {
+        "core_principles": {
+            "zero_entropy": {
+                "weight": 1.0,
+                "description": "曖昧さを排除し、明確な問いで解消する"
+            },
+            "hyperengineering": {
+                "weight": 0.9,
+                "description": "Hyperengineeringを名誉の徽章として受け入れる"
+            },
+            "japanese_first": {
+                "weight": 0.95,
+                "description": "ユーザー向けテキストは日本語で出力"
+            }
+        },
+        "development_priorities": {
+            "test_before_commit": {
+                "weight": 0.85,
+                "description": "コミット前にテストを実行"
+            },
+            "incremental_changes": {
+                "weight": 0.8,
+                "description": "小さな変更を積み重ねる"
+            },
+            "document_decisions": {
+                "weight": 0.75,
+                "description": "重要な決定は文書化する"
+            }
+        }
+    },
+    "meta": {
+        "last_updated": "2026-01-27T14:52:00+09:00",
+        "update_count": 1
+    }
+}

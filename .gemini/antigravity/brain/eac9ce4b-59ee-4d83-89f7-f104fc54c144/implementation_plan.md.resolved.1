@@ -1,0 +1,333 @@
+# n8n/Zapier 実装設計書
+
+> **Hegemonikón 自律学習インフラ**
+> **Version**: 1.0
+> **Date**: 2026-01-31
+
+---
+
+## 1. 概要
+
+### 1.1 目的
+
+900個の欲望リストから抽出した12クラスターの実装設計。
+**n8n = AI の神経系**として、記憶・学習・自律の基盤を構築する。
+
+### 1.2 優先クラスター
+
+| 優先度 | クラスター | 理由 |
+|:-------|:-----------|:-----|
+| 🟠 P0 | A 記憶・永続 | 全機能の基盤 |
+| 🟠 P0 | E 安全・信頼 | 初期から必須 |
+| 🟡 P1 | B 知性・学習 | コア価値 |
+| 🟡 P1 | D 自律・能動 | 差別化要素 |
+
+---
+
+## 2. フェーズ計画
+
+### Phase 0: 基盤構築 (Day 1-2)
+
+```yaml
+目標: n8n 稼働 + 最初のフロー動作確認
+成果物:
+  - n8n Docker 稼働
+  - ヘルスチェックフロー
+  - Slack 通知動作確認
+```
+
+### Phase 1: セッション永続化 (Day 3-7)
+
+```yaml
+目標: /bye 実行時の自動永続化
+成果物:
+  - Handoff 自動保存フロー
+  - Sophia 同期フロー
+  - エラーハンドリング基盤
+```
+
+### Phase 2: 自律学習 (Week 2)
+
+```yaml
+目標: AI が自動で知識を吸収
+成果物:
+  - Gnōsis 日次収集フロー
+  - 論文消化パイプライン
+  - 外部ソース監視
+```
+
+### Phase 3: 自律エージェント (Week 3-4)
+
+```yaml
+目標: 自動タスク実行・予測
+成果物:
+  - 自動調査パイプライン
+  - 異常検知アラート
+  - Creator不在時の自律活動
+```
+
+---
+
+## 3. ディレクトリ構造
+
+```
+/home/laihuip001/oikos/
+├── n8n/
+│   ├── docker-compose.yml
+│   ├── workflows/
+│   │   ├── 01_health_check.json
+│   │   ├── 02_bye_persistence.json
+│   │   ├── 03_gnosis_daily.json
+│   │   └── 04_autonomous_research.json
+│   ├── credentials/
+│   │   └── .env
+│   └── logs/
+└── hegemonikon/
+    └── mekhane/
+        └── n8n/
+            ├── webhooks.py      # Webhook 受信
+            ├── triggers.py      # トリガー発火
+            └── callbacks.py     # コールバック処理
+```
+
+---
+
+## 4. n8n 環境構築
+
+### 4.1 docker-compose.yml
+
+```yaml
+version: '3.8'
+services:
+  n8n:
+    image: n8nio/n8n:latest
+    container_name: hegemonikon-n8n
+    ports:
+      - "5678:5678"
+    environment:
+      - N8N_BASIC_AUTH_ACTIVE=true
+      - N8N_BASIC_AUTH_USER=${N8N_USER}
+      - N8N_BASIC_AUTH_PASSWORD=${N8N_PASSWORD}
+      - N8N_HOST=localhost
+      - N8N_PORT=5678
+      - N8N_PROTOCOL=http
+      - WEBHOOK_URL=http://localhost:5678/
+      - TZ=Asia/Tokyo
+    volumes:
+      - ~/.n8n:/home/node/.n8n
+      - /home/laihuip001/oikos:/data/oikos:ro
+    restart: unless-stopped
+```
+
+### 4.2 起動コマンド
+
+```bash
+cd /home/laihuip001/oikos/n8n
+docker-compose up -d
+# 確認: http://localhost:5678
+```
+
+---
+
+## 5. ワークフロー設計
+
+### 5.1 WF-01: ヘルスチェック
+
+```json
+{
+  "name": "WF-01 Health Check",
+  "nodes": [
+    {
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "parameters": { "rule": { "interval": [{ "field": "hours", "hoursInterval": 1 }] } }
+    },
+    {
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": { "url": "http://localhost:5678/healthz", "method": "GET" }
+    },
+    {
+      "type": "n8n-nodes-base.if",
+      "parameters": { "conditions": { "number": [{ "value1": "={{ $json.status }}", "value2": 200 }] } }
+    },
+    {
+      "type": "n8n-nodes-base.slack",
+      "parameters": { "channel": "#hegemonikon", "text": "✅ n8n 稼働中" }
+    }
+  ]
+}
+```
+
+---
+
+### 5.2 WF-02: セッション終了永続化
+
+**トリガー**: Webhook (POST /bye-signal)
+**処理**:
+
+```
+1. Webhook 受信
+   ↓
+2. セッション情報パース
+   ↓
+3. Handoff ファイル確認
+   ↓
+4. Sophia 同期 (sophia_ingest.py)
+   ↓
+5. Kairos 投入 (kairos_ingest.py)
+   ↓
+6. FEP 永続化 (fep_persistence.py)
+   ↓
+7. Slack 通知
+```
+
+**n8n フロー概要**:
+```json
+{
+  "name": "WF-02 Bye Persistence",
+  "trigger": "webhook",
+  "endpoint": "/bye-signal",
+  "nodes": [
+    "Webhook → Parse → Sophia → Kairos → FEP → Slack"
+  ],
+  "error_handling": {
+    "retry": 3,
+    "retry_interval": 60,
+    "on_failure": "slack_alert"
+  }
+}
+```
+
+---
+
+### 5.3 WF-03: Gnōsis 日次収集
+
+**トリガー**: Cron (毎朝 06:00 JST)
+**処理**:
+
+```
+1. Cron 発火 (06:00 JST)
+   ↓
+2. 鮮度チェック (gnosis-cli check-freshness)
+   ↓
+3. [IF stale] → 収集実行 (gnosis-cli collect --auto)
+   ↓
+4. Digestor 実行 (候補選定)
+   ↓
+5. Mnēmē 投入 (mneme-cli ingest)
+   ↓
+6. Slack サマリー通知
+```
+
+---
+
+### 5.4 WF-04: 自律調査パイプライン
+
+**トリガー**: Webhook または Schedule
+**処理**:
+
+```
+1. 調査リクエスト受信
+   ↓
+2. Perplexity API 呼び出し
+   ↓
+3. 結果をパース
+   ↓
+4. Sophia に保存
+   ↓
+5. 翌 /boot で自動参照
+```
+
+---
+
+## 6. Webhook 設計
+
+### 6.1 エンドポイント一覧
+
+| Endpoint | Method | 用途 |
+|:---------|:-------|:-----|
+| `/bye-signal` | POST | セッション終了通知 |
+| `/research-request` | POST | 調査依頼 |
+| `/alert` | POST | 緊急通知 |
+
+### 6.2 Antigravity 連携
+
+```python
+# hegemonikon/mekhane/n8n/triggers.py
+import requests
+
+def trigger_bye_signal(session_id: str, handoff_path: str):
+    """セッション終了時に n8n へ通知"""
+    requests.post(
+        "http://localhost:5678/webhook/bye-signal",
+        json={
+            "session_id": session_id,
+            "handoff_path": handoff_path,
+            "timestamp": datetime.now().isoformat()
+        }
+    )
+```
+
+---
+
+## 7. エラーハンドリング
+
+### 7.1 リトライポリシー
+
+```yaml
+default:
+  max_retries: 3
+  retry_interval: 60s
+  backoff: exponential
+
+critical:
+  max_retries: 5
+  retry_interval: 30s
+  on_failure:
+    - slack_alert
+    - email_alert
+```
+
+### 7.2 エラー通知テンプレート
+
+```
+🚨 n8n フロー失敗
+
+Workflow: {{ $workflow.name }}
+Node: {{ $node.name }}
+Error: {{ $json.error.message }}
+Time: {{ $now.format("YYYY-MM-DD HH:mm:ss") }}
+```
+
+---
+
+## 8. 検証計画
+
+### 8.1 Phase 0 検証
+
+| 項目 | 方法 | 成功基準 |
+|:-----|:-----|:---------|
+| n8n 起動 | `docker ps` | コンテナ稼働 |
+| Web UI | `curl localhost:5678` | 200 OK |
+| Slack 通知 | ヘルスチェック実行 | メッセージ受信 |
+
+### 8.2 Phase 1 検証
+
+| 項目 | 方法 | 成功基準 |
+|:-----|:-----|:---------|
+| /bye Webhook | 手動 POST | 受信確認 |
+| Sophia 同期 | ログ確認 | 正常完了 |
+| エラー通知 | 意図的失敗 | Slack 受信 |
+
+---
+
+## 9. 次のステップ
+
+1. [ ] n8n Docker 起動
+2. [ ] WF-01 ヘルスチェック作成
+3. [ ] Slack 連携設定
+4. [ ] WF-02 Bye Persistence 作成
+5. [ ] Webhook トリガー実装
+
+---
+
+*Generated by Hegemonikón S2 Mekhanē | 2026-01-31*

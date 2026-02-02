@@ -1,0 +1,292 @@
+{
+    "relations": [
+        {
+            "id": "X-OO",
+            "from": "o",
+            "to": "o",
+            "meaning": "本質内循環",
+            "path": "O3→O1 (問い→認識)",
+            "priority": 2
+        },
+        {
+            "id": "X-OS",
+            "from": "o",
+            "to": "s",
+            "meaning": "認識→設計",
+            "path": "O1→S1 (スケール決定)",
+            "priority": 1
+        },
+        {
+            "id": "X-OH",
+            "from": "o",
+            "to": "h",
+            "meaning": "本質→衝動",
+            "path": "O1→H1 (初期反応)",
+            "priority": 2
+        },
+        {
+            "id": "X-OP",
+            "from": "o",
+            "to": "p",
+            "meaning": "本質→環境",
+            "path": "O4→P4 (技法選択)",
+            "priority": 2
+        },
+        {
+            "id": "X-OK",
+            "from": "o",
+            "to": "k",
+            "meaning": "本質→文脈",
+            "path": "O2→K3 (目的確認)",
+            "priority": 2
+        },
+        {
+            "id": "X-OA",
+            "from": "o",
+            "to": "a",
+            "meaning": "本質→精密",
+            "path": "O1→A2 (判定)",
+            "priority": 2
+        },
+        {
+            "id": "X-SO",
+            "from": "s",
+            "to": "o",
+            "meaning": "設計→本質",
+            "path": "S4→O4 (実行)",
+            "priority": 1
+        },
+        {
+            "id": "X-SS",
+            "from": "s",
+            "to": "s",
+            "meaning": "設計内循環",
+            "path": "S1→S4",
+            "priority": 2
+        },
+        {
+            "id": "X-SH",
+            "from": "s",
+            "to": "h",
+            "meaning": "設計→衝動",
+            "path": "S4→H4 (信念記録)",
+            "priority": 2
+        },
+        {
+            "id": "X-SP",
+            "from": "s",
+            "to": "p",
+            "meaning": "設計→環境",
+            "path": "S1→P1 (場決定)",
+            "priority": 2
+        },
+        {
+            "id": "X-SK",
+            "from": "s",
+            "to": "k",
+            "meaning": "設計→文脈",
+            "path": "S3→K3 (目的照合)",
+            "priority": 1
+        },
+        {
+            "id": "X-SA",
+            "from": "s",
+            "to": "a",
+            "meaning": "設計→精密",
+            "path": "S3→A2 (基準検証)",
+            "priority": 2
+        },
+        {
+            "id": "X-HO",
+            "from": "h",
+            "to": "o",
+            "meaning": "衝動→本質",
+            "path": "H2→O4",
+            "priority": 2
+        },
+        {
+            "id": "X-HS",
+            "from": "h",
+            "to": "s",
+            "meaning": "衝動→設計",
+            "path": "H4→S4",
+            "priority": 2
+        },
+        {
+            "id": "X-HH",
+            "from": "h",
+            "to": "h",
+            "meaning": "衝動内循環",
+            "path": "H1→H2",
+            "priority": 2
+        },
+        {
+            "id": "X-HP",
+            "from": "h",
+            "to": "p",
+            "meaning": "衝動→環境",
+            "path": "H3→P1",
+            "priority": 2
+        },
+        {
+            "id": "X-HK",
+            "from": "h",
+            "to": "k",
+            "meaning": "衝動→文脈",
+            "path": "H4→K4",
+            "priority": 2
+        },
+        {
+            "id": "X-HA",
+            "from": "h",
+            "to": "a",
+            "meaning": "衝動→精密",
+            "path": "H4→A3",
+            "priority": 1
+        },
+        {
+            "id": "X-PO",
+            "from": "p",
+            "to": "o",
+            "meaning": "環境→本質",
+            "path": "P4→O4",
+            "priority": 2
+        },
+        {
+            "id": "X-PS",
+            "from": "p",
+            "to": "s",
+            "meaning": "環境→設計",
+            "path": "P4→S2",
+            "priority": 2
+        },
+        {
+            "id": "X-PH",
+            "from": "p",
+            "to": "h",
+            "meaning": "環境→衝動",
+            "path": "P1→H3",
+            "priority": 2
+        },
+        {
+            "id": "X-PP",
+            "from": "p",
+            "to": "p",
+            "meaning": "環境内循環",
+            "path": "P1→P2",
+            "priority": 2
+        },
+        {
+            "id": "X-PK",
+            "from": "p",
+            "to": "k",
+            "meaning": "環境→文脈",
+            "path": "P3→K2",
+            "priority": 2
+        },
+        {
+            "id": "X-PA",
+            "from": "p",
+            "to": "a",
+            "meaning": "環境→精密",
+            "path": "P4→A4",
+            "priority": 2
+        },
+        {
+            "id": "X-KO",
+            "from": "k",
+            "to": "o",
+            "meaning": "文脈→本質",
+            "path": "K4→O1 (哲学者の道)",
+            "priority": 1
+        },
+        {
+            "id": "X-KS",
+            "from": "k",
+            "to": "s",
+            "meaning": "文脈→設計",
+            "path": "K2→S1",
+            "priority": 2
+        },
+        {
+            "id": "X-KH",
+            "from": "k",
+            "to": "h",
+            "meaning": "文脈→衝動",
+            "path": "K1→H1",
+            "priority": 2
+        },
+        {
+            "id": "X-KP",
+            "from": "k",
+            "to": "p",
+            "meaning": "文脈→環境",
+            "path": "K3→P3",
+            "priority": 2
+        },
+        {
+            "id": "X-KK",
+            "from": "k",
+            "to": "k",
+            "meaning": "文脈内循環",
+            "path": "K1→K3",
+            "priority": 2
+        },
+        {
+            "id": "X-KA",
+            "from": "k",
+            "to": "a",
+            "meaning": "文脈→精密",
+            "path": "K4→A4",
+            "priority": 2
+        },
+        {
+            "id": "X-AO",
+            "from": "a",
+            "to": "o",
+            "meaning": "精密→本質",
+            "path": "A4→O1 (知識→認識)",
+            "priority": 1
+        },
+        {
+            "id": "X-AS",
+            "from": "a",
+            "to": "s",
+            "meaning": "精密→設計",
+            "path": "A3→S3",
+            "priority": 2
+        },
+        {
+            "id": "X-AH",
+            "from": "a",
+            "to": "h",
+            "meaning": "精密→衝動",
+            "path": "A1→H1",
+            "priority": 2
+        },
+        {
+            "id": "X-AP",
+            "from": "a",
+            "to": "p",
+            "meaning": "精密→環境",
+            "path": "A4→P4",
+            "priority": 2
+        },
+        {
+            "id": "X-AK",
+            "from": "a",
+            "to": "k",
+            "meaning": "精密→文脈",
+            "path": "A2→K1",
+            "priority": 2
+        },
+        {
+            "id": "X-AA",
+            "from": "a",
+            "to": "a",
+            "meaning": "精密内循環",
+            "path": "A2→A4",
+            "priority": 2
+        }
+    ]
+}

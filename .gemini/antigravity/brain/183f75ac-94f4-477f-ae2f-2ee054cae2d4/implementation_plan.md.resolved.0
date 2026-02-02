@@ -1,0 +1,200 @@
+# FEP Workflow Integration Plan: Entropy → Epochē Auto-Trigger
+
+> **目的**: `/noe` と `/bou` に FEP ベースの Epochē 自動トリガーを統合
+> **日付**: 2026-01-28
+
+---
+
+## 1. 現状
+
+### 1.1 既存コンポーネント
+
+| コンポーネント | パス | 状態 |
+|:---------------|:-----|:-----|
+| [HegemonikónFEPAgent](file:///home/laihuip001/oikos/hegemonikon/mekhane/fep/fep_agent.py#37-569) | [mekhane/fep/fep_agent.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/fep/fep_agent.py) | ✅ 10/10 テスト合格 |
+| [encode_observation()](file:///home/laihuip001/oikos/hegemonikon/mekhane/fep/state_spaces.py#126-180) | [mekhane/fep/state_spaces.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/fep/state_spaces.py) | ✅ 実装済み |
+| `/noe` ワークフロー | [.agent/workflows/noe.md](file:///home/laihuip001/oikos/.agent/workflows/noe.md) | v3.0 |
+| `/bou` ワークフロー | [.agent/workflows/bou.md](file:///home/laihuip001/oikos/.agent/workflows/bou.md) | v3.0 |
+| `/epo` ワークフロー | [.agent/workflows/epo.md](file:///home/laihuip001/oikos/.agent/workflows/epo.md) | v2.0 |
+
+### 1.2 FEP Agent の機能
+
+```python
+# O1 Noēsis: 観測から信念更新
+result = agent.infer_states(observation=obs_idx)
+# result['entropy'] が判断の不確実性を定量化
+
+# O2 Boulēsis: ポリシー選択
+q_pi, neg_efe = agent.infer_policies()
+# q_pi[0] = observe 確率, q_pi[1] = act 確率
+```
+
+---
+
+## 2. 設計
+
+### 2.1 統合パターン
+
+```
+┌─ /noe または /bou ワークフロー開始 ─┐
+│                                    │
+│ [STEP 0] SKILL.md 読み込み         │
+│ [STEP 0.5] FEP 状況評価 ← NEW      │
+│   ↓                                 │
+│ LLM が context_clarity, urgency,   │
+│ confidence を自己評価 (0.0-1.0)      │
+│   ↓                                 │
+│ encode_observation() で量子化       │
+│   ↓                                 │
+│ agent.infer_states() で信念更新     │
+│   ↓                                 │
+│ entropy > THRESHOLD ?              │
+│   ├─ YES → /epo 自動発動            │
+│   └─ NO  → 通常処理続行             │
+│                                    │
+└────────────────────────────────────┘
+```
+
+### 2.2 Epochē トリガー閾値
+
+| Entropy 値 | 判定 | アクション |
+|:-----------|:-----|:-----------|
+| H < 0.5 | **LOW** | 通常処理（確信あり） |
+| 0.5 ≤ H < 1.0 | **MEDIUM** | 慎重判断、警告表示 |
+| H ≥ 1.0 | **HIGH** | **Epochē 自動発動** |
+
+### 2.3 Policy 推薦の活用
+
+| q_pi 分布 | 推薦 |
+|:----------|:-----|
+| q_pi[0] > 0.6 | 「さらに調査が必要」→ `/zet` 提案 |
+| q_pi[1] > 0.6 | 「行動可能」→ `/ene` 提案 |
+| 両方 ≈ 0.5 | 「判断困難」→ ユーザー確認 |
+
+---
+
+## 3. 実装
+
+### 3.1 O1 Noēsis SKILL.md への追加
+
+ファイル: [.agent/skills/ousia/o1-noesis/SKILL.md](file:///home/laihuip001/oikos/.agent/skills/ousia/o1-noesis/SKILL.md)
+
+追加セクション:
+
+```markdown
+## FEP Integration (Optional)
+
+### 自動 Epochē トリガー
+
+O1 Noēsis の PHASE 0.5 (盲点チェック) で、FEP Agent を使用して
+判断の不確実性を定量化できます。
+
+### 使用方法
+
+\```python
+from mekhane.fep import HegemonikónFEPAgent
+from mekhane.fep.state_spaces import encode_observation
+
+# 自己評価
+context_clarity = 0.7  # 文脈の明確さ
+urgency = 0.3          # 緊急性
+confidence = 0.5       # 確信度
+
+# FEP 変換
+obs = encode_observation(context_clarity, urgency, confidence)
+agent = HegemonikónFEPAgent(use_defaults=True)
+result = agent.infer_states(observation=obs)
+
+# Epochē 判定
+if result['entropy'] > 1.0:
+    print("[EPOCHĒ] 判断停止を推奨")
+    # → /epo 発動
+\```
+
+### Entropy 閾値
+
+| 値 | 判定 | 推奨 |
+|:---|:-----|:-----|
+| < 0.5 | 確信あり | 通常処理 |
+| 0.5-1.0 | 慎重判断 | 警告表示 |
+| > 1.0 | **Epochē** | 判断停止 |
+```
+
+### 3.2 /noe ワークフローへの追加
+
+ファイル: [.agent/workflows/noe.md](file:///home/laihuip001/oikos/.agent/workflows/noe.md)
+
+処理フロー更新:
+
+```markdown
+## 処理フロー
+
+\```
+入力: 問い Q
+  ↓
+[STEP 0] SKILL.md を view_file で読み込む ← 必須
+  ↓
+[STEP 0.5] FEP 状況評価 (Optional)  ← NEW
+  - context_clarity, urgency, confidence を自己評価
+  - entropy > 1.0 なら /epo 発動を検討
+  ↓
+[PHASE 0.5] 盲点カテゴリチェック
+  ...
+\```
+```
+
+### 3.3 /bou ワークフローへの追加
+
+ファイル: [.agent/workflows/bou.md](file:///home/laihuip001/oikos/.agent/workflows/bou.md)
+
+PHASE 4 (実現可能性) に統合:
+
+```markdown
+## PHASE 4: 実現可能性の検証 + FEP 確信度
+
+### FEP 確信度 (Optional)
+
+各望みについて FEP Agent で確信度を定量化:
+
+\```python
+obs = encode_observation(
+    context_clarity=0.8,  # この望みの文脈は明確か
+    urgency=0.5,          # 緊急性
+    confidence=0.7        # 達成への確信
+)
+result = agent.infer_states(obs)
+print(f"FEP Entropy: {result['entropy']:.3f}")
+\```
+
+- entropy < 0.5: 確信あり → 即実行候補
+- entropy > 1.0: 不確実 → 長期目標か再検討
+```
+
+---
+
+## 4. 検証計画
+
+### 4.1 ユニットテスト
+
+- [ ] Epochē トリガー閾値テスト (entropy > 1.0 で発動)
+- [ ] encode_observation の境界値テスト
+
+### 4.2 統合テスト
+
+- [ ] /noe 実行時に FEP 評価が動作
+- [ ] /bou PHASE 4 で entropy 表示
+- [ ] 高 entropy 時に /epo 発動提案
+
+---
+
+## 5. 変更ファイル
+
+| ファイル | 変更内容 |
+|:---------|:---------|
+| [.agent/skills/ousia/o1-noesis/SKILL.md](file:///home/laihuip001/oikos/.agent/skills/ousia/o1-noesis/SKILL.md) | FEP Integration セクション追加 |
+| [.agent/workflows/noe.md](file:///home/laihuip001/oikos/.agent/workflows/noe.md) | STEP 0.5 追加 |
+| [.agent/workflows/bou.md](file:///home/laihuip001/oikos/.agent/workflows/bou.md) | PHASE 4 に FEP 確信度追加 |
+
+---
+
+*FEP Workflow Integration Plan v1.0*

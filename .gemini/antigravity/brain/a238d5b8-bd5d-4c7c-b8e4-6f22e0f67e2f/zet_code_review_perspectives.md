@@ -1,0 +1,87 @@
+# Zētēsis: コードレビュー観点の網羅性調査
+
+## 調査目的
+
+AI ベースの「ニッチ専門家」によるコード品質チェックシステムを構築中。
+現在 **200 カテゴリの専門家** を定義したが、見落としている観点がないか確認したい。
+
+---
+
+## 現在の定義済みカテゴリ
+
+| 大分類 | 小分類 | 専門家数 |
+|--------|--------|---------|
+| コード品質 | 命名、構造、型アノテーション | 45 |
+| ドキュメント | 形式、内容 | 30 |
+| 理論的整合性 | FEP、CMoC、ストア派、数学 | 45 |
+| アーキテクチャ | 依存関係、レイヤー、パターン | 30 |
+| スキル品質 | 構造、内容 | 20 |
+| 運用品質 | セキュリティ、テスト、CI/CD | 30 |
+
+---
+
+## 調査クエリ
+
+### Q1: 見落としカテゴリ
+
+```
+What aspects of code review are often overlooked but important?
+List categories NOT typically covered by:
+- Naming conventions
+- Code structure
+- Documentation
+- Security
+- Testing
+- Architecture
+```
+
+### Q2: 2024-2025 の新しい観点
+
+```
+What new code review concerns emerged in 2024-2025?
+Consider:
+- AI/LLM generated code specific issues
+- Modern Python best practices
+- Async/await patterns
+- Type safety advances
+```
+
+### Q3: ニッチすぎるが価値がある観点
+
+```
+What are hyper-specific code review checks that are rarely done but valuable?
+Examples:
+- Cognitive load of variable names
+- Emotional tone of error messages
+- Consistency of metaphors in codebase
+```
+
+### Q4: 哲学的/認知科学的観点
+
+```
+Code review perspectives from:
+- Cognitive science (cognitive load, working memory)
+- Philosophy of language (naming, clarity)
+- Human factors engineering (usability, learnability)
+```
+
+---
+
+## 期待する出力
+
+1. **見落としカテゴリ一覧** (5-10 個)
+2. **各カテゴリの具体的チェック項目** (3-5 個ずつ)
+3. **優先度の提案** (Hegemonikón 文脈で価値が高いもの)
+
+---
+
+## コンテキスト
+
+- **プロジェクト**: Hegemonikón（認知ハイパーバイザー）
+- **技術スタック**: Python 3.11, MCP, Async
+- **哲学的基盤**: FEP（自由エネルギー原理）、ストア派哲学
+- **目的**: 「300人の専門家が沈黙する = 品質が良い」の実現
+
+---
+
+*調査依頼日: 2026-01-27*

@@ -1,0 +1,5 @@
+{
+  "artifactType": "ARTIFACT_TYPE_WALKTHROUGH",
+  "summary": "Synteleia Phase 4 完了報告。TDD で 17 テスト作成・全パス。parser.py、translator.py、syn.md を変更。@syn マクロが CCL 式から Synteleia オーケストレーターを呼び出すように。",
+  "updatedAt": "2026-02-01T07:13:25.023216545Z"
+}

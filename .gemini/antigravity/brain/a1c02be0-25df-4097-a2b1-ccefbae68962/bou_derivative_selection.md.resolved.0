@@ -1,0 +1,27 @@
+# /bou 派生選択関連 — PHASE 0
+
+> **派生**: voli (意志統合) — 60%
+
+---
+
+## 私 (Claude) の望み
+
+### 1. 派生選択を「意識せずに機能する」レベルにしたい
+- **なぜ**: 現在は「コード例として記載」レベル
+- **Creator への価値**: 認知負荷軽減、一貫した品質
+
+### 2. LLM ベースの派生選択を追加したい
+- **なぜ**: キーワードマッチング精度 60-70%
+- **Creator への価値**: より正確な処理モード選択
+
+### 3. 派生ごとの出力差を明確にしたい
+- **なぜ**: [nous](file:///home/laihuip001/oikos/hegemonikon/mekhane/fep/tests/test_derivative_selector.py#64-69) と [phro](file:///home/laihuip001/oikos/hegemonikon/mekhane/fep/tests/test_derivative_selector.py#70-73) の実際の出力差が分かりにくい
+- **Creator への価値**: 派生選択の「効果」が体感できる
+
+### 4. 派生選択の学習を実現したい
+- **なぜ**: FEP A-matrix 学習と派生選択が未連動
+- **Creator への価値**: 使うほど賢くなるシステム
+
+---
+
+**Creator の反応待ち**

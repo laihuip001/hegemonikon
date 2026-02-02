@@ -1,0 +1,155 @@
+# Hermēneus 開発計画 — Phase 1: Expander + Parser 正式版
+
+> **目的**: `mekhane/ccl/` の PoC コードを `hermeneus/src/` へリファクタし、正式版として確立する。
+
+---
+
+## 概要
+
+| 項目 | 内容 |
+|:-----|:-----|
+| **対象** | CCL 実行保証コンパイラ Hermēneus |
+| **現状** | PoC が [mekhane/ccl/lmql_translator.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/ccl/lmql_translator.py) に存在 |
+| **目標** | `hermeneus/src/` に正式なモジュール構造を構築 |
+| **工数** | M (中規模) |
+
+---
+
+## 現状分析
+
+### 既存コード
+
+| ファイル | 行数 | 内容 |
+|:---------|:-----|:-----|
+| [mekhane/ccl/lmql_translator.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/ccl/lmql_translator.py) | 292 | AST定義 + CCLParser + LMQLTranslator |
+| [mekhane/ccl/macro_expander.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/ccl/macro_expander.py) | 93 | @macro 展開 |
+| [mekhane/ccl/macro_registry.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/ccl/macro_registry.py) | - | マクロ登録 |
+
+### 欠落している機能
+
+1. **正式な AST 分離**: AST 定義が [lmql_translator.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/ccl/lmql_translator.py) に混在
+2. **SEL 統合**: CCL v6.50 の Semantic Enforcement Layer 未対応
+3. **CPL 構文**: `F:[]{}`, `I:[]{}`, `W:[]{}` 等の制御構文未実装
+4. **テスト**: CCLParser の単体テストなし
+5. **X-series 融合**: `* X` の暗黙融合未実装
+
+---
+
+## Proposed Changes
+
+### Component 1: Core AST Module
+
+#### [NEW] [ast.py](file:///home/laihuip001/oikos/hegemonikon/hermeneus/src/ast.py)
+
+[lmql_translator.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/ccl/lmql_translator.py) から AST ノード定義を抽出:
+- [OpType](file:///home/laihuip001/oikos/hegemonikon/mekhane/ccl/lmql_translator.py#25-40) (Enum)
+- [Workflow](file:///home/laihuip001/oikos/hegemonikon/mekhane/ccl/lmql_translator.py#42-49), [Condition](file:///home/laihuip001/oikos/hegemonikon/mekhane/ccl/lmql_translator.py#51-57), [ConvergenceLoop](file:///home/laihuip001/oikos/hegemonikon/mekhane/ccl/lmql_translator.py#59-64), [Sequence](file:///home/laihuip001/oikos/hegemonikon/mekhane/ccl/lmql_translator.py#66-70)
+- **追加**: `ForLoop`, `IfCondition`, `WhileLoop` (CPL v2.0)
+
+---
+
+#### [NEW] [expander.py](file:///home/laihuip001/oikos/hegemonikon/hermeneus/src/expander.py)
+
+省略形→正式形変換:
+- `/noe+` → `/o1++ --mode=nous`
+- `@macro` → 展開済み CCL
+- SEL frontmatter 注入
+
+---
+
+#### [NEW] [parser.py](file:///home/laihuip001/oikos/hegemonikon/hermeneus/src/parser.py)
+
+正式版 CCL パーサー:
+- [CCLParser](file:///home/laihuip001/oikos/hegemonikon/mekhane/ccl/lmql_translator.py#76-141) クラス (PoC からリファクタ)
+- CPL 構文 ([F:](file:///home/laihuip001/oikos/hegemonikon/LICENSE), [I:](file:///home/laihuip001/oikos/hegemonikon/LICENSE), [W:](file:///home/laihuip001/oikos/hegemonikon/LICENSE), [L:](file:///home/laihuip001/oikos/hegemonikon/LICENSE)) 対応
+- エラーハンドリング強化
+
+---
+
+#### [NEW] [translator.py](file:///home/laihuip001/oikos/hegemonikon/hermeneus/src/translator.py)
+
+LMQL 変換 (PoC [LMQLTranslator](file:///home/laihuip001/oikos/hegemonikon/mekhane/ccl/lmql_translator.py#147-254) からリファクタ):
+- ワークフロー → LMQL テンプレート
+- 収束ループ変換
+- シーケンス変換
+
+---
+
+#### [NEW] [__init__.py](file:///home/laihuip001/oikos/hegemonikon/hermeneus/src/__init__.py)
+
+パッケージ初期化とパブリック API:
+```python
+from .ast import *
+from .expander import Expander
+from .parser import CCLParser
+from .translator import LMQLTranslator
+
+def compile(ccl: str) -> str:
+    """CCL → LMQL コンパイル"""
+    ...
+```
+
+---
+
+### Component 2: Tests
+
+#### [NEW] [test_parser.py](file:///home/laihuip001/oikos/hegemonikon/hermeneus/tests/test_parser.py)
+
+CCLParser 単体テスト:
+- 基本ワークフロー: `/noe+`, `/bou-`
+- シーケンス: `/s+_/ene`
+- 収束ループ: `/noe+ >> V[] < 0.3`
+- CPL 構文: `F:[×3]{/dia}`
+
+---
+
+## Verification Plan
+
+### Automated Tests
+
+```bash
+# 1. 単体テスト実行
+cd /home/laihuip001/oikos/hegemonikon
+source .venv/bin/activate
+pytest hermeneus/tests/test_parser.py -v
+
+# 2. PoC との互換性確認 (既存テストケース)
+python -c "
+from hermeneus.src import compile
+test_cases = ['/noe+', '/bou-', '/s+_/ene', '/noe+ >> V[] < 0.3']
+for ccl in test_cases:
+    result = compile(ccl)
+    print(f'{ccl} → {len(result)} chars')
+"
+```
+
+### Manual Verification
+
+- Creator 確認: 生成された LMQL コードが意図通りか目視確認
+
+---
+
+## Implementation Order
+
+| # | タスク | 依存 |
+|:--|:-------|:-----|
+| 1 | `ast.py` 作成 | なし |
+| 2 | [expander.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/ccl/macro_expander.py) 作成 | [macro_expander.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/ccl/macro_expander.py) 参照 |
+| 3 | [parser.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/ccl/llm_parser.py) 作成 | `ast.py` |
+| 4 | [translator.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/ccl/lmql_translator.py) 作成 | `ast.py` |
+| 5 | [__init__.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/ccl/__init__.py) 作成 | 全モジュール |
+| 6 | `test_parser.py` 作成・実行 | [parser.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/ccl/llm_parser.py) |
+| 7 | PROOF.md 更新 | 全完了後 |
+
+---
+
+## User Review Required
+
+> [!IMPORTANT]
+> **Phase 1 スコープ確認**:
+> - LMQL ランタイム統合 (Phase 2) は今回のスコープ外
+> - 今回は「コンパイラ」部分のみ、実行は別途
+
+---
+
+*Created: 2026-02-01*

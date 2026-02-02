@@ -1,0 +1,264 @@
+# SE開発フレームワーク転用: /mek・/s への統合設計
+
+> **CCL Program**: `CLL/mek+`
+> **目的**: アジャイル開発等の SE フレームワークを /mek・/s のコマンド体系として成立させる
+
+---
+
+## 1. 設計思想
+
+### 1.1 転用の原則
+
+SE開発フレームワークを「そのまま移植」するのではなく、Hegemonikón の定理体系に**消化（Naturalization）**する。
+
+| 原則 | 説明 |
+|:-----|:-----|
+| **定理への対応付け** | Scrum の役割・イベントを既存の定理派生にマッピング |
+| **CCL 記号化** | イテレーション、スプリントを CCL 演算子で表現 |
+| **既存構造の拡張** | /mek・/s の既存ステージを活かし、SE要素を注入 |
+
+### 1.2 対象フレームワーク
+
+| フレームワーク | 転用対象 |
+|:---------------|:---------|
+| **Scrum** | スプリント、ロール、セレモニー |
+| **Kanban** | フロー管理、WIP制限 |
+| **XP** | TDD、ペアプロ、継続的統合 |
+| **SAFe** | PI Planning（大規模向け） |
+
+---
+
+## 2. SE開発フレームワーク ↔ Hegemonikón 対応マトリックス
+
+### 2.1 アジャイル役割 ↔ 定理
+
+| Scrum Role | Hegemonikón 対応 | 説明 |
+|:-----------|:-----------------|:-----|
+| **Product Owner** | O2 Boulēsis (`/bou`) | 意志・目的の決定者 |
+| **Scrum Master** | S2 Mekhanē (`/mek`) | 方法・プロセスの管理者 |
+| **Dev Team** | O4 Energeia (`/ene`) | 行為・実装の担い手 |
+
+### 2.2 アジャイルイベント ↔ ワークフロー
+
+| Scrum Event | CCL 対応 | 説明 |
+|:------------|:---------|:-----|
+| **Sprint Planning** | `/s+` | 戦略定理の詳細実行 |
+| **Daily Standup** | `/boot-` | 高速起動（状態確認） |
+| **Sprint Review** | `/dia --mode=review` | 成果物レビュー |
+| **Retrospective** | `/gno+_/dox` | 原則抽出 + 信念記録 |
+| **Backlog Refinement** | `/bou+_/s-` | 意志確認 + 簡易計画 |
+
+### 2.3 アジャイル成果物 ↔ Artifact Standard
+
+| Scrum Artifact | 保存先 | 形式 |
+|:---------------|:-------|:-----|
+| **Product Backlog** | `/mneme/.hegemonikon/backlog/` | `backlog_YYYYMMDD.md` |
+| **Sprint Backlog** | `/mneme/.hegemonikon/sprints/` | `sprint_N.md` |
+| **Increment** | Git Tag | `v*.*.*` |
+| **Burndown** | `/mneme/.hegemonikon/metrics/` | `burndown_YYYYMMDD.json` |
+
+---
+
+## 3. 提案: 新規 CCL 構文（イテレーション制御）
+
+### 3.1 スプリント記法
+
+```ccl
+# スプリント定義
+SPRINT:N{ /s+_/ene_/dia }
+
+# 展開
+SPRINT:2{ /s+_/ene_/dia }
+  → 2週間スプリント
+  → 計画(/s+) → 実行(/ene) → レビュー(/dia) を繰り返し
+```
+
+### 3.2 カンバン記法（WIP制限）
+
+```ccl
+# WIP 制限付きフロー
+WIP:3{ /ene }
+
+# 意味
+→ 同時進行タスク最大3件
+→ 完了まで新規タスク開始禁止
+```
+
+### 3.3 TDD サイクル
+
+```ccl
+# Red-Green-Refactor サイクル
+@tdd = F:×3{ /dia-_/ene_/dia+ }
+
+# 展開
+→ Red: 失敗テスト作成 (/dia-)
+→ Green: 実装 (/ene)
+→ Refactor: 品質向上 (/dia+)
+```
+
+---
+
+## 4. 提案: /mek への転用実装
+
+### 4.1 新規モード追加
+
+| モード | トリガー | 機能 |
+|:-------|:---------|:-----|
+| **agile** | `/mek --mode=agile` | アジャイルプロセス生成 |
+| **sprint** | `/mek --mode=sprint` | スプリント計画生成 |
+| **retro** | `/mek --mode=retro` | レトロスペクティブ実行 |
+
+### 4.2 /mek frontmatter 追加
+
+```yaml
+modes:
+  agile: "Agile Process: スプリント計画・実行・振り返りの統合サイクル"
+  sprint: "Sprint Planning: タイムボックス付き目標設定"
+  retro: "Retrospective: 原則抽出と継続的改善"
+```
+
+### 4.3 /mek 処理フロー拡張
+
+```text
+[AGILE MODE]
+入力: プロジェクト要件
+  ↓
+[STEP A1] Backlog 生成 (O2 Boulēsis)
+  - Product Backlog Items 抽出
+  - 優先順位付け
+  ↓
+[STEP A2] Sprint 設計 (S1 Metron)
+  - タイムボックス決定 (1週 / 2週)
+  - Velocity 推定
+  ↓
+[STEP A3] Task 分解 (S4 Praxis)
+  - User Story → Task
+  - 見積もり (Story Points)
+  ↓
+[STEP A4] Definition of Done (S3 Stathmos)
+  - 完了基準定義
+  - Quality Gate 連携
+  ↓
+最終出力: Sprint Backlog → ファイル保存
+```
+
+---
+
+## 5. 提案: /s への転用実装
+
+### 5.1 STAGE 拡張
+
+現行の5-STAGE に「イテレーション制御」を追加:
+
+| STAGE | 現行 | 追加 |
+|:------|:-----|:-----|
+| 0 | Blindspot + Scale | + **Sprint Scope** |
+| 1 | Strategy Selection | + **Iteration Type** |
+| 2 | Success Criteria | + **Definition of Done** |
+| 3 | Blueprint | + **Sprint Backlog** |
+| 3.5 | Quality Gate | = 維持 |
+| 4 | Devil's Advocate | + **Sprint Review** |
+| **NEW 5** | - | **Retrospective** |
+
+### 5.2 新規 STAGE 5: Retrospective
+
+```text
+STAGE 5: Retrospective [/gno派生]
+  ↓
+[5.1] Keep: 継続すべきこと
+[5.2] Problem: 問題点
+[5.3] Try: 次のスプリントで試すこと
+  ↓
+出力: 原則 → Doxa に永続化
+```
+
+### 5.3 /s frontmatter 追加
+
+```yaml
+modes:
+  sprint: "Sprint Mode: 2週間タイムボックスでの STAGE 実行"
+  kanban: "Kanban Mode: フロー最適化、WIP 制限付き"
+ccl_signature: "/s+_/dia --mode=sprint"  # 更新
+```
+
+---
+
+## 6. フィードバックループの定義
+
+### 6.1 スプリントサイクル
+
+```mermaid
+graph LR
+    A[Sprint Planning<br>/s+] --> B[Daily<br>/boot-]
+    B --> C[Execution<br>/ene]
+    C --> D[Review<br>/dia]
+    D --> E[Retro<br>/gno+_/dox]
+    E --> A
+```
+
+### 6.2 CCL プログラム化
+
+```ccl
+# スプリントサイクル（2週間 = 10日）
+let @sprint = SPRINT:2{
+  /s+ _                     # Sprint Planning
+  F:×10{ /boot-_/ene } _    # 10 Daily Standups + Execution
+  /dia --mode=review _      # Sprint Review
+  /gno+_/dox                # Retrospective + Record
+}
+```
+
+---
+
+## 7. 変更対象ファイル
+
+### 7.1 修正ファイル
+
+| ファイル | 変更内容 |
+|:---------|:---------|
+| [/mek.md](file:///home/laihuip001/oikos/.agent/workflows/mek.md) | modes セクションに `agile`, `sprint`, `retro` 追加 |
+| [/s.md](file:///home/laihuip001/oikos/.agent/workflows/s.md) | modes セクション追加、STAGE 5 (Retrospective) 追加 |
+
+### 7.2 新規ファイル
+
+| ファイル | 内容 |
+|:---------|:-----|
+| `/mneme/.hegemonikon/backlog/README.md` | Backlog 構造説明 |
+| `/mneme/.hegemonikon/sprints/README.md` | Sprint 構造説明 |
+
+---
+
+## 8. 検証計画
+
+### 8.1 自動テスト
+
+現時点で `/mek` と `/s` に対する自動テストは存在しない（ワークフローは手動実行）。
+
+### 8.2 手動検証
+
+1. **`/mek --mode=agile` 実行テスト**
+   - 入力: 「簡単なタスク管理アプリを作る」
+   - 期待: Backlog 生成、Sprint 設計出力
+
+2. **`/s --mode=sprint` 実行テスト**
+   - 入力: 既存の開発タスク
+   - 期待: STAGE 0-5 が順次実行、STAGE 5 で Retrospective 出力
+
+3. **CCL `@sprint` マクロ実行**
+   - 入力: `@sprint` 
+   - 期待: スプリントサイクル全体が展開
+
+---
+
+## User Review Required
+
+> [!IMPORTANT]
+> 以下の設計判断について確認が必要です:
+
+1. **スプリント記法 `SPRINT:N{}`** — CCL 演算子体系に追加して良いか？
+2. **STAGE 5 (Retrospective)** — /s に新規 STAGE を追加する方針で良いか？
+3. **モード命名** — `agile`, `sprint`, `retro` で良いか、ギリシャ語名への変換が必要か？
+
+---
+
+*Generated by /s+ (Schema Planning) | 2026-01-30*

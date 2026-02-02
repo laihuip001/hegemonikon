@@ -1,0 +1,149 @@
+# v2.1 スキル体系統合計画
+
+> **目的**: T/K-series を新定理体系に吸収統合 + H/P/A-series 新規作成
+
+---
+
+## 発見: T-series の v2.1 生成規則
+
+T-series は既に v2.1 公理体系への接続を持っています:
+
+| T-skill | 生成規則 | 結果 | Tempo |
+|---------|---------|------|-------|
+| T1 Aisthēsis | S1 Metron × Fast | 即時知覚 | Fast |
+| T2 Krisis | S2 Mekhanē × Fast | 即時判断 | Fast |
+| T3 Theōria | S3 Stathmos × Slow | 深層理論 | Slow |
+| T4 Phronēsis | S2 Mekhanē × Slow | 深層戦略 | Slow |
+| T5 Peira | S1 Metron × Fast | 即時探索 | Fast |
+| T6 Praxis | S4 Praxis × Fast | 即時実行 | Fast |
+| T7 Dokimē | S3 Stathmos × Slow | 深層検証 | Slow |
+| T8 Anamnēsis | S4 Praxis × Slow | 深層記憶 | Slow |
+
+**結論**: T-series は「運用レイヤー」として独立維持可能。S-series の**Tempo拡張**として位置づけ。
+
+---
+
+## 現状分析（Gap Analysis）
+
+### v2.1 定理体系
+
+| Series | 定理数 | 定理名 |
+|--------|--------|--------|
+| **O-series (Ousia)** | 4 | O1 Noēsis, O2 Boulēsis, O3 Zētēsis, O4 Energeia |
+| **S-series (Schema)** | 4 | S1 Metron, S2 Mekhanē, S3 Stathmos, S4 Praxis |
+| **H-series (Hormē)** | 4 | H1 Propatheia, H2 Pistis, H3 Orexis, H4 Doxa |
+| **P-series (Perigraphē)** | 4 | P1 Khōra, P2 Hodos, P3 Trokhia, P4 Tekhnē |
+| **K-series (Kairos)** | 4 | K1 Eukairia, K2 Chronos, K3 Telos, K4 Sophia |
+| **A-series (Akribeia)** | 4 | A1 Pathos, A2 Krisis, A3 Gnōmē, A4 Epistēmē |
+| **計** | **24** | |
+
+### 現在のスキル実装
+
+| Series | 実装数 | 状態 |
+|--------|--------|------|
+| O-series | 4 | ✅ 整合 |
+| S-series | 4 | ✅ 整合 |
+| T-series | 8 | ✅ **S-series × Tempo** として定義済み（維持） |
+| K-series (旧) | 12 | ⚠️ Context Filters として維持（並行運用） |
+| K-series (新) | 0 | ❌ v2.1 Kairos (K1-K4) **未実装** |
+| X-series | 3 | ⚠️ 33不足（36 - 3）（Phase 4）|
+| H-series | 0 | ❌ **未実装** |
+| P-series | 0 | ❌ **未実装** |
+| A-series | 0 | ❌ **未実装** |
+
+---
+
+## User Review Required
+
+> [!IMPORTANT]
+> **重大な体系不整合を発見しました。**
+
+### 課題1: T-series のアイデンティティ
+
+現在のT-series（T1 Aisthēsis〜T8 Anamnēsis）は v2.1 axiom_hierarchy に**存在しません**。
+
+**選択肢:**
+
+1. **維持**: T-series を「運用スキル」として独立維持（kernel定理とは別レイヤー）
+2. **マッピング**: T-series を H/P/K/A-series にマッピング
+3. **廃止**: T-series を段階的に置き換え
+
+### 課題2: K-series の 12→4 縮約
+
+現在のK-series（K1-K12: tempo-stratum等）は旧体系。v2.1では K1-K4（Eukairia, Chronos, Telos, Sophia）の4定理のみ。
+
+**選択肢:**
+
+1. **リファクタ**: K1-K12 を K1-K4 に統合
+2. **並行運用**: 旧K-series を「Context Filters」として維持、新K-series を追加
+3. **廃止して再設計**: 完全にv2.1準拠で再設計
+
+---
+
+## Proposed Changes
+
+### Phase 1: 旧K-series リネーム
+
+- [MOVE] `.agent/skills/k-series/` → `.agent/skills/cf-series/` (Context Filters)
+- 12スキルを「CF1-CF12」に改名
+
+### Phase 2: 新シリーズ追加
+
+#### [NEW] `.agent/skills/k-series/` — Kairos スキル群
+
+| Skill | 生成 | 役割 |
+|-------|------|------|
+| K1 Eukairia | Scale × Valence | 好機判定（接近/回避） |
+| K2 Chronos | Scale × Precision | 時間確信（見通し） |
+| K3 Telos | Function × Valence | 目的志向（探索/活用） |
+| K4 Sophia | Function × Precision | 知恵（戦略確信） |
+
+#### [NEW] `.agent/skills/h-series/` — Hormē スキル群
+
+| Skill | 生成 | 役割 |
+|-------|------|------|
+| H1 Propatheia | Flow × Valence | 前感情的反応 |
+| H2 Pistis | Flow × Precision | 信念レベル |
+| H3 Orexis | Value × Valence | 価値的志向 |
+| H4 Doxa | Value × Precision | 見解・判断 |
+
+#### [NEW] `.agent/skills/p-series/` — Perigraphē スキル群
+
+| Skill | 生成 | 役割 |
+|-------|------|------|
+| P1 Khōra | Scale × Scale | 問題空間定義 |
+| P2 Hodos | Scale × Function | 経路設計 |
+| P3 Trokhia | Function × Scale | パターン追跡 |
+| P4 Tekhnē | Function × Function | 技術的可能性 |
+
+#### [NEW] `.agent/skills/a-series/` — Akribeia スキル群
+
+| Skill | 生成 | 役割 |
+|-------|------|------|
+| A1 Pathos | Valence × Valence | 二重傾向 |
+| A2 Krisis | Valence × Precision | 傾向確信 |
+| A3 Gnōmē | Precision × Valence | 確信傾向 |
+| A4 Epistēmē | Precision × Precision | 確実な知識 |
+
+### Phase 3: X-series 関係層（将来）
+
+- 36個の接続定理（現在3個）
+- Phase 2完了後に着手
+
+---
+
+## Verification Plan
+
+1. 各スキル作成後、Antigravity IDE で Footprint テスト
+2. description の英語キーワードがルーターにマッチするか確認
+
+---
+
+## 確認事項
+
+1. **CF-series リネーム**: 旧K-series → CF-series (Context Filters) で問題ないか？
+2. **実行順序**: Phase 1 (CF移行) → Phase 2 (新シリーズ追加) でよいか？
+
+---
+
+*Generated: 2026-01-27T16:53*

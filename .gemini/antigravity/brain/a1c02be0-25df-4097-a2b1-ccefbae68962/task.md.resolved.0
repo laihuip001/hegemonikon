@@ -1,0 +1,115 @@
+# O-Series 派生ワークフロー消化統合 タスクリスト
+
+> **Session ID**: a1c02be0-25df-4097-a2b1-ccefbae68962  
+> **Created**: 2026-01-29 08:50  
+> **Strategy**: A + B + F ハイブリッド  
+> **Estimated Time**: 5時間
+
+---
+
+## Phase 1: 派生マッピング確認
+
+- [x] 報告書 v1.0 の派生リスト抽出
+- [x] 報告書 v2.0 の採用/却下判定確認
+- [x] 12派生の最終リスト確定
+
+---
+
+## Phase 2: Strategy A - `/o` Hub作成
+
+- [ ] [.agent/workflows/o.md](file:///home/laihuip001/oikos/.agent/workflows/o.md) 新規作成
+- [ ] 派生マトリックス記載
+- [ ] FEP派生選択の統合記載
+- [ ] X-series連携記載
+- [ ] [tools.yaml](file:///home/laihuip001/oikos/.agent/tools.yaml) の `/o` エントリ更新
+
+---
+
+## Phase 3: Strategy B - 既存ワークフローPhase追加
+
+### O1 Noēsis (`/noe.md`)
+
+- [ ] Phase 0: 派生選択（FEP駆動）追加
+- [ ] Phase 1: nous（本質直観）既存維持
+- [ ] Phase 2: phro（実践的判断）新規追加
+- [ ] Phase 3: meta（メタ認識）新規追加
+- [ ] frontmatter version更新 → v2.0
+
+### O2 Boulēsis (`/bou.md`)
+
+- [ ] Phase 0: 派生選択（FEP駆動）追加
+- [ ] desir（第一次欲動）Phase追加
+- [ ] voli（第二次意志）Phase追加
+- [ ] akra（意志-行為乖離）Phase追加
+
+### O3 Zētēsis (`/zet.md`)
+
+- [ ] Phase 0: 派生選択（FEP駆動）追加
+- [ ] anom（異常認識）Phase追加
+- [ ] hypo（仮説生成）Phase追加
+- [ ] eval（仮説評価）Phase追加
+
+### O4 Energeia (`/ene.md`)
+
+- [ ] Phase 0: 派生選択（FEP駆動）追加
+- [ ] flow（Flow状態）Phase追加
+- [ ] prax（自己目的行為）Phase追加
+- [ ] pois（産出活動）Phase追加
+
+---
+
+## Phase 4: Strategy F - FEP派生選択
+
+### コア実装
+
+- [ ] `mekhane/fep/derivative_selector.py` 作成
+- [ ] `DerivativeStateSpace` クラス定義
+- [ ] `encode_for_derivative_selection()` 実装
+- [ ] `select_derivative()` 実装（O1-O4対応）
+- [ ] `_generate_rationale()` 実装
+
+### テスト
+
+- [ ] `mekhane/fep/tests/test_derivative_selector.py` 作成
+- [ ] `TestEncodeForDerivativeSelection` クラス
+- [ ] `TestSelectDerivative` クラス
+- [ ] pytest 実行・PASS確認
+
+### 統合
+
+- [ ] `/noe.md` の Phase 0 で `select_derivative()` 呼び出し追記
+- [ ] `/bou.md` の Phase 0 で統合
+- [ ] `/zet.md` の Phase 0 で統合
+- [ ] `/ene.md` の Phase 0 で統合
+
+---
+
+## Phase 5: 検証
+
+- [ ] 単体テスト全PASS
+- [ ] E2Eテスト作成・PASS
+- [ ] 手動テスト: `/noe` で派生自動選択確認
+- [ ] 手動テスト: `/noe --derivative=phro` オーバーライド確認
+
+---
+
+## コミット
+
+- [ ] git add -A
+- [ ] git commit -m "feat(ousia): O-Series 12派生をA+B+F戦略で消化統合"
+- [ ] dispatch_log.yaml 更新
+
+---
+
+## 参照ファイル
+
+| ファイル | 用途 |
+|:---------|:-----|
+| [implementation_plan.md](file:///home/laihuip001/oikos/.gemini/antigravity/brain/a1c02be0-25df-4097-a2b1-ccefbae68962/implementation_plan.md) | 詳細実装計画 |
+| [.agent/workflows/noe.md](file:///home/laihuip001/oikos/.agent/workflows/noe.md) | 既存構造参照 |
+| `mekhane/fep/fep_agent.py` | FEPパターン参照 |
+| `mekhane/fep/state_spaces.py` | 状態空間パターン |
+
+---
+
+*Last Updated: 2026-01-29 08:50*

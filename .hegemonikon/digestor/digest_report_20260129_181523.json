@@ -1,0 +1,42 @@
+{
+  "timestamp": "2026-01-29T18:15:23.727729",
+  "source": "gnosis",
+  "total_papers": 8,
+  "candidates_selected": 3,
+  "dry_run": true,
+  "candidates": [
+    {
+      "title": "Deep Researcher with Sequential Plan Reflection and Candidates Crossover (Deep Researcher Reflect Evolve)",
+      "source": "arxiv",
+      "url": "http://arxiv.org/abs/2601.20843v1",
+      "score": 0.5,
+      "matched_topics": [
+        "agent-architecture",
+        "self-correction",
+        "metacognition"
+      ],
+      "rationale": "Topics: agent-architecture, self-correction, metacognition | Score: 0.50"
+    },
+    {
+      "title": "When Flores Bloomz Wrong: Cross-Direction Contamination in Machine Translation Evaluation",
+      "source": "arxiv",
+      "url": "http://arxiv.org/abs/2601.20858v1",
+      "score": 0.43333333333333335,
+      "matched_topics": [
+        "structured-prompting",
+        "metacognition"
+      ],
+      "rationale": "Topics: structured-prompting, metacognition | Score: 0.43"
+    },
+    {
+      "title": "Evolutionary Strategies lead to Catastrophic Forgetting in LLMs",
+      "source": "arxiv",
+      "url": "http://arxiv.org/abs/2601.20861v1",
+      "score": 0.3666666666666667,
+      "matched_topics": [
+        "metacognition"
+      ],
+      "rationale": "Topics: metacognition | Score: 0.37"
+    }
+  ]
+}

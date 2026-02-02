@@ -1,0 +1,60 @@
+# CCL 式実行: 3懸念分析
+
+> **CCL**: `f:[懸念点all]{f:3x{/s+~(/p*/a)_/dia*/o+}}/s+_/ene+`
+> **解釈**: 3懸念に対し S↔(P×A)↔dia↔O を往復させ、最終的に S+→ene+ へ流す
+
+---
+
+## 懸念一覧
+
+| # | 懸念 | 重大度 |
+|:--|:-----|:-------|
+| 1 | LLM Layer 未稼働 (`google-genai` 未インストール) | 🟡 中 |
+| 2 | Doxa 学習が浅い (1パターンのみ) | 🟢 低 |
+| 3 | 構文検証のみ（意味的妥当性は未検証） | 🟡 中 |
+
+---
+
+## Phase 1: 懸念1 (LLM Layer 未稼働) ✅
+
+- [x] `/s+` — Schema 深化: `google-genai` v1.60.0 インストール済み確認
+- [x] `~(/p*/a)` — P×A 往復: `GEMINI_API_KEY` は設定済み、`GOOGLE_API_KEY` が不一致
+- [x] `_/dia` — Krisis 判定: 環境変数フォールバックが最適解
+- [x] `*/o+` — O-series 融合深化: [llm_parser.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/ccl/llm_parser.py) に [_get_api_key()](file:///home/laihuip001/oikos/hegemonikon/mekhane/ccl/llm_parser.py#30-37) 追加
+
+## Phase 2: 懸念2 (Doxa 学習が浅い) ✅
+
+- [x] `/s+` — Schema 深化: [DoxaLearner](file:///home/laihuip001/oikos/hegemonikon/mekhane/ccl/doxa_learner.py#23-124) の構造を確認、substring match で lookup
+- [x] `~(/p*/a)` — P×A 往復: インフラは動作中、運用データが不足
+- [x] `_/dia` — Krisis 判定: 初期パターンの Seeding が最適解
+- [x] `*/o+` — O-series 融合深化: 10件のコアパターンを Doxa に追加、統計 11件
+
+## Phase 3: 懸念3 (意味的検証の限界) ✅
+
+- [x] `/s+` — Schema 深化: [syntax_validator.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/ccl/syntax_validator.py) は形式的正しさのみ
+- [x] `~(/p*/a)` — P×A 往復: WF存在、ブレースバランス、演算子規則のみ
+- [x] `_/dia` — Krisis 判定: LLM 統合による `semantic_validator.py` が必要
+- [x] `*/o+` — O-series 融合深化: 設計案を [implementation_plan.md](file:///home/laihuip001/oikos/.gemini/antigravity/brain/17bd854a-6b8b-4ba8-9180-4ac20d78bcf9/implementation_plan.md) に策定
+
+## Final Phase: 統合実行 ✅
+
+- [x] `/s+` — 全体設計の深化: 3懸念の構造化完了
+- [x] `_/ene+` — Energeia へ流す: 次フェーズへ継続
+
+---
+
+## Semantic Validator 実装 (`/dia!_/s+_/ene+`)
+
+### `/dia!` 批評的レビュー
+- [ ] 設計案の弱点を特定
+- [ ] エッジケースを洗い出す
+
+### `/s+` 設計深化
+- [ ] `semantic_validator.py` のインターフェース設計
+- [ ] LLM プロンプト設計
+
+### `/ene+` 実行深化
+- [ ] `semantic_validator.py` 実装
+- [ ] `prompts/semantic_check.md` 作成
+- [ ] テスト実行
+- [ ] 統合テスト

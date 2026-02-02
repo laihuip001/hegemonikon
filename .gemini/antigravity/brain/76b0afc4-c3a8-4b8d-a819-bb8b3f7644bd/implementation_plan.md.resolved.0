@@ -1,0 +1,159 @@
+# Implementation Plan: tekhne-maker v7.0 再定義
+
+> **目的**: tekhne-maker を「プロンプト生成」から「プロンプト診断」へ軸足移動
+> **根拠**: [/noe 分析結果](file:///home/laihuip001/oikos/.gemini/antigravity/brain/76b0afc4-c3a8-4b8d-a819-bb8b3f7644bd/noe_tekhne_maker_analysis.md)
+
+---
+
+## User Review Required
+
+> [!IMPORTANT]
+> これは破壊的変更です。現在の tekhne-maker SKILL.md (662行) を大幅に縮小します。
+> 既存の references/ ディレクトリ構造は維持しますが、SKILL.md 本体を再設計します。
+
+---
+
+## 変更の本質
+
+| Before (v6.1) | After (v7.0) |
+|:--------------|:-------------|
+| 662行の巨大 SKILL.md | 100行以下のチェックリスト |
+| Generate モードがデフォルト | Diagnose モードがデフォルト |
+| 新規プロンプト作成に特化 | 既存スキル品質診断に特化 |
+| 「プロンプト生成機構」 | 「Prompt Quality Checklist」 |
+
+---
+
+## Proposed Changes
+
+### tekhne-maker
+
+#### [MODIFY] [SKILL.md](file:///home/laihuip001/oikos/.agent/skills/utils/tekhne-maker/SKILL.md)
+
+現在の 662行を以下の構造に圧縮:
+
+```yaml
+---
+name: prompt-quality-checklist
+description: |
+  既存スキル・プロンプトの品質診断と改善提案。
+  
+  **Primary Mode**: Diagnose (既存資産の検証)
+  **Secondary Mode**: Improve (差分のみ提示)
+  **Legacy Mode**: Generate (非推奨 - /noe + Claude で代替推奨)
+  
+  Trigger:
+  - 「このプロンプトを診断」
+  - 「スキルの品質を確認」
+  - 「改善点を教えて」
+---
+
+# Prompt Quality Checklist v7.0
+
+> 「プロンプトを作る」から「プロンプトを検証する」へ
+
+## Quick Diagnosis (5項目)
+
+| # | チェック項目 | 合格基準 |
+|:--|:------------|:---------|
+| 1 | **Trigger明確性** | 発動条件が具体的か |
+| 2 | **出力形式定義** | 期待される出力が明示されているか |
+| 3 | **エッジケース** | 境界条件が考慮されているか |
+| 4 | **Fallback** | 失敗時の対処が定義されているか |
+| 5 | **計測可能性** | 品質を測定できる基準があるか |
+
+## Diagnose Mode (Default)
+
+入力: 既存の SKILL.md または .prompt ファイル
+出力: 5項目スコア表 + 改善提案
+
+## Improve Mode
+
+入力: Diagnose 結果 + 改善承認
+出力: 差分のみ提示
+
+## Legacy Mode (Generate) ⚠️
+
+> **非推奨**: 新規プロンプト生成は /noe + Claude との会話で行う
+
+詳細が必要な場合は references/ を参照:
+- references/archetypes.md
+- references/quality-checklist.md
+- ...
+
+---
+
+*v7.0 — Mission Redefine (2026-01-28)*
+```
+
+**変更理由**:
+
+1. 662行 → ~80行 (88%削減)
+2. Diagnose がデフォルト、Generate は Legacy
+3. references/ は維持（詳細が必要な場合に参照）
+
+---
+
+#### [MODIFY] tools.yaml への反映
+
+```yaml
+skills:
+  prompt-quality-checklist:  # renamed from tekhne-maker
+    path: .agent/skills/utils/tekhne-maker/SKILL.md
+    purpose: "既存スキル・プロンプトの品質診断"
+    trigger:
+      - "「このプロンプトを診断」"
+      - "「スキルの品質を確認」"
+    modes:
+      diagnose: "品質診断（デフォルト）"
+      improve: "改善提案"
+      generate: "新規生成（非推奨）"
+    status: production
+    history: "tekhne-maker v1.0-6.1 → prompt-quality-checklist v7.0"
+```
+
+---
+
+## Verification Plan
+
+### Automated Tests
+
+```bash
+# 1. SKILL.md が 100行以下であることを確認
+wc -l .agent/skills/utils/tekhne-maker/SKILL.md
+
+# 2. symlink が正しく動作することを確認
+ls -la .agent/skills/utils/tekhne-maker/
+
+# 3. references/ が維持されていることを確認
+ls .agent/skills/utils/tekhne-maker/references/
+```
+
+### Manual Verification
+
+1. Antigravity で「このプロンプトを診断」とトリガーし、Diagnose モードが発動するか
+2. 既存の O1 Noēsis SKILL.md を入力し、5項目スコア表が出力されるか
+3. Improve 提案を承認し、差分が適切に生成されるか
+
+---
+
+## リスク評価
+
+| リスク | 重大度 | 対策 |
+|:-------|:------:|:-----|
+| 既存知識の喪失 | 中 | references/ を完全維持 |
+| Generate 機能の需要 | 低 | Legacy Mode として残す |
+| 名称変更の混乱 | 低 | lineage を明記 |
+
+---
+
+## 次のステップ
+
+1. [ ] この計画を承認
+2. [ ] SKILL.md を v7.0 に書き換え
+3. [ ] tools.yaml を更新
+4. [ ] Dispatch Log に反映
+
+---
+
+*Implementation Plan created: 2026-01-28*

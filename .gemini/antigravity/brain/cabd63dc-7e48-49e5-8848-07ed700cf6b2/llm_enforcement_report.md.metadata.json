@@ -1,0 +1,5 @@
+{
+  "artifactType": "ARTIFACT_TYPE_OTHER",
+  "summary": "LLM エージェントの論外処理解消のための包括的調査報告書。Perplexity 結果。3段階実装戦略: (1) JSON Schema + Pydantic, (2) NeMo Guardrails, (3) Multi-Agent Validator。仕様遵守度 95% → 99%+ の見込み。",
+  "updatedAt": "2026-01-31T02:24:32.423332316Z"
+}

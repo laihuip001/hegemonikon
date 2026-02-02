@@ -1,0 +1,162 @@
+# v2.1 定理体系 Full Rebuild 計画
+
+> **方針**: 24定理すべてを新公理から一気に再設計
+
+---
+
+## 決定事項
+
+| 項目 | 決定 |
+|------|------|
+| **アプローチ** | H1 Full Rebuild |
+| **旧スキル** | アーカイブ（参照のみ） |
+| **新スキル** | 24定理を新規作成 |
+| **X-series** | 36関係を定義 |
+
+---
+
+## Phase 1: 旧スキルのアーカイブ
+
+```
+.agent/skills/
+├── _archive/         ← 新規作成
+│   ├── t-series/     ← 移動
+│   ├── k-series/     ← 移動
+│   ├── o-series/     ← 移動
+│   └── s-series/     ← 移動
+├── ousia/            ← 新規（O1-O4）
+├── schema/           ← 新規（S1-S4）
+├── horme/            ← 新規（H1-H4）
+├── perigraphe/       ← 新規（P1-P4）
+├── kairos/           ← 新規（K1-K4）
+├── akribeia/         ← 新規（A1-A4）
+└── taxis/            ← 新規（X-series 36）
+```
+
+---
+
+## Phase 2: 24定理スキル作成
+
+### スキル構造テンプレート
+
+```yaml
+---
+# Theorem Metadata (v2.1)
+id: "{SERIES}{N}"
+name: "{Greek Name}"
+greek: "{Greek Characters}"
+series: "{Series Name}"
+generation:
+  formula: "{L-level} × {L-level}"
+  result: "{Meaning}"
+
+# Antigravity Activation
+description: >
+  Use this skill when {trigger conditions}.
+  Triggers: {keywords}.
+
+# Implementation (旧T等から継承)
+implementation:
+  micro: "{workflow path}"
+  macro: "{mekhane path}"
+  templates: []
+
+version: "2.1.0"
+---
+
+# {SERIES}{N}: {Name} ({Greek})
+
+> **生成**: {formula}
+> **役割**: {role}
+
+## When to Use
+...
+
+## Processing Logic
+...
+
+## Integration
+| X | 接続 |
+|---|------|
+| → | {downstream} |
+| ← | {upstream} |
+```
+
+---
+
+## Phase 3: 24定理一覧
+
+### O-series (Ousia)
+
+| ID | Name | 旧T継承 | 実装 |
+|----|------|--------|------|
+| O1 | Noēsis | T1 Aisthēsis, T3 Theōria | /noe |
+| O2 | Boulēsis | T2 Krisis | /bou |
+| O3 | Zētēsis | T5 Peira | /zet |
+| O4 | Energeia | T6 Praxis | /ene |
+
+### S-series (Schema)
+
+| ID | Name | 旧T継承 | 実装 |
+|----|------|--------|------|
+| S1 | Metron | — | — |
+| S2 | Mekhanē | T4 Phronēsis | /plan |
+| S3 | Stathmos | — | — |
+| S4 | Praxis | — | — |
+
+### H-series (Hormē)
+
+| ID | Name | 旧T継承 | 実装 |
+|----|------|--------|------|
+| H1 | Propatheia | — | 新規 |
+| H2 | Pistis | — | 新規 |
+| H3 | Orexis | — | 新規 |
+| H4 | Doxa | T8 Anamnēsis | /hist |
+
+### P-series (Perigraphē)
+
+| ID | Name | 実装 |
+|----|------|------|
+| P1 | Khōra | 新規 |
+| P2 | Hodos | 新規 |
+| P3 | Trokhia | 新規 |
+| P4 | Tekhnē | 新規 |
+
+### K-series (Kairos)
+
+| ID | Name | 旧K継承 | 実装 |
+|----|------|--------|------|
+| K1 | Eukairia | K1-K4 ルール | 新規 |
+| K2 | Chronos | K1-K4 ルール | 新規 |
+| K3 | Telos | — | 新規 |
+| K4 | Sophia | — | 新規 |
+
+### A-series (Akribeia)
+
+| ID | Name | 旧継承 | 実装 |
+|----|------|--------|------|
+| A1 | Pathos | 旧K5-8 | 新規 |
+| A2 | Krisis | T7 Dokimē | /chk |
+| A3 | Gnōmē | 旧K9-12 | 新規 |
+| A4 | Epistēmē | — | 新規 |
+
+---
+
+## Phase 4: X-series (36関係)
+
+taxis.md に従い、36関係を skills/taxis/ に実装。
+
+---
+
+## 実行順序
+
+1. [ ] `_archive/` 作成、旧スキル移動
+2. [ ] 6フォルダ作成 (ousia/, schema/, ...)
+3. [ ] O-series 4スキル作成
+4. [ ] S-series 4スキル作成
+5. [ ] H-series 4スキル作成
+6. [ ] P-series 4スキル作成
+7. [ ] K-series 4スキル作成
+8. [ ] A-series 4スキル作成
+9. [ ] X-series (taxis/) 作成
+10. [ ] Footprint テスト

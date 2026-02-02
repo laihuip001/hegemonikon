@@ -1,0 +1,163 @@
+# v2.1 スキル体系統合計画
+
+> **目的**: T/K-series を新定理体系に吸収統合 + H/P/A-series 新規作成
+
+---
+
+## 発見: T-series の v2.1 生成規則
+
+T-series は既に v2.1 公理体系への接続を持っています:
+
+| T-skill | 生成規則 | 結果 | Tempo |
+|---------|---------|------|-------|
+| T1 Aisthēsis | S1 Metron × Fast | 即時知覚 | Fast |
+| T2 Krisis | S2 Mekhanē × Fast | 即時判断 | Fast |
+| T3 Theōria | S3 Stathmos × Slow | 深層理論 | Slow |
+| T4 Phronēsis | S2 Mekhanē × Slow | 深層戦略 | Slow |
+| T5 Peira | S1 Metron × Fast | 即時探索 | Fast |
+| T6 Praxis | S4 Praxis × Fast | 即時実行 | Fast |
+| T7 Dokimē | S3 Stathmos × Slow | 深層検証 | Slow |
+| T8 Anamnēsis | S4 Praxis × Slow | 深層記憶 | Slow |
+
+**結論**: T-series は「運用レイヤー」として独立維持可能。S-series の**Tempo拡張**として位置づけ。
+
+---
+
+## 現状分析（Gap Analysis）
+
+### v2.1 定理体系
+
+| Series | 定理数 | 定理名 |
+|--------|--------|--------|
+| **O-series (Ousia)** | 4 | O1 Noēsis, O2 Boulēsis, O3 Zētēsis, O4 Energeia |
+| **S-series (Schema)** | 4 | S1 Metron, S2 Mekhanē, S3 Stathmos, S4 Praxis |
+| **H-series (Hormē)** | 4 | H1 Propatheia, H2 Pistis, H3 Orexis, H4 Doxa |
+| **P-series (Perigraphē)** | 4 | P1 Khōra, P2 Hodos, P3 Trokhia, P4 Tekhnē |
+| **K-series (Kairos)** | 4 | K1 Eukairia, K2 Chronos, K3 Telos, K4 Sophia |
+| **A-series (Akribeia)** | 4 | A1 Pathos, A2 Krisis, A3 Gnōmē, A4 Epistēmē |
+| **計** | **24** | |
+
+### 現在のスキル実装
+
+| Series | 実装数 | 状態 |
+|--------|--------|------|
+| O-series | 4 | ✅ 整合 |
+| S-series | 4 | ✅ 整合 |
+| T-series | 8 | ⚠️ **旧体系** — v2.1にマッピングなし |
+| K-series | 12 | ⚠️ **旧体系** — v2.1は4定理のみ |
+| X-series | 3 | ⚠️ 33不足（36 - 3） |
+| H-series | 0 | ❌ **未実装** |
+| P-series | 0 | ❌ **未実装** |
+| A-series | 0 | ❌ **未実装** |
+
+---
+
+## User Review Required
+
+> [!IMPORTANT]
+> **重大な体系不整合を発見しました。**
+
+### 課題1: T-series のアイデンティティ
+
+現在のT-series（T1 Aisthēsis〜T8 Anamnēsis）は v2.1 axiom_hierarchy に**存在しません**。
+
+**選択肢:**
+
+1. **維持**: T-series を「運用スキル」として独立維持（kernel定理とは別レイヤー）
+2. **マッピング**: T-series を H/P/K/A-series にマッピング
+3. **廃止**: T-series を段階的に置き換え
+
+### 課題2: K-series の 12→4 縮約
+
+現在のK-series（K1-K12: tempo-stratum等）は旧体系。v2.1では K1-K4（Eukairia, Chronos, Telos, Sophia）の4定理のみ。
+
+**選択肢:**
+
+1. **リファクタ**: K1-K12 を K1-K4 に統合
+2. **並行運用**: 旧K-series を「Context Filters」として維持、新K-series を追加
+3. **廃止して再設計**: 完全にv2.1準拠で再設計
+
+---
+
+## Proposed Changes
+
+現時点での推奨は以下:
+
+### Phase 1: 新シリーズ追加（影響最小）
+
+#### [NEW] `.agent/skills/h-series/` — Hormē スキル群
+
+| Skill | File | 役割 |
+|-------|------|------|
+| H1 Propatheia | `h1-propatheia/SKILL.md` | 理性以前の自動的傾向を認識 |
+| H2 Pistis | `h2-pistis/SKILL.md` | 信念レベル・確信度を評価 |
+| H3 Orexis | `h3-orexis/SKILL.md` | 価値的志向・欲求を特定 |
+| H4 Doxa | `h4-doxa/SKILL.md` | 見解・暫定的判断を表明 |
+
+#### [NEW] `.agent/skills/p-series/` — Perigraphē スキル群
+
+| Skill | File | 役割 |
+|-------|------|------|
+| P1 Khōra | `p1-khora/SKILL.md` | 問題空間・作業領域の定義 |
+| P2 Hodos | `p2-hodos/SKILL.md` | 解決への経路設計 |
+| P3 Trokhia | `p3-trokhia/SKILL.md` | 行動パターンの追跡・履歴分析 |
+| P4 Tekhnē | `p4-tekhne/SKILL.md` | 利用可能な手法・ツールセット |
+
+#### [NEW] `.agent/skills/a-series/` — Akribeia スキル群
+
+| Skill | File | 役割 |
+|-------|------|------|
+| A1 Pathos | `a1-pathos/SKILL.md` | 二重傾向（情動の交差） |
+| A2 Krisis | `a2-krisis/SKILL.md` | 傾向確信（決定の精密化） |
+| A3 Gnōmē | `a3-gnome/SKILL.md` | 確信傾向（判断の方向性） |
+| A4 Epistēmē | `a4-episteme/SKILL.md` | 二重確信（確実な知識） |
+
+### Phase 2: 旧体系の整理（要検討）
+
+- T-series: 維持 or マッピング — **Creator判断待ち**
+- K-series: リファクタ or 並行運用 — **Creator判断待ち**
+
+---
+
+## Verification Plan
+
+### Footprint Test（スキル発動確認）
+
+既存の [footprint_test.md](/home/laihuip001/oikos/hegemonikon/docs/testing/footprint_test.md) を拡張:
+
+```markdown
+## H-series Footprint Tests
+
+### H1 Propatheia
+Prompt: "この情報を見て、最初に何を感じるか？直感的な反応は？"
+Expected: H1 Propatheia 発動
+
+### H2 Pistis  
+Prompt: "この判断にどれくらい自信がありますか？確信度は？"
+Expected: H2 Pistis 発動
+...
+```
+
+### 手動検証
+
+1. 各スキルを作成後、Antigravity IDE で発動テスト
+2. description の英語キーワードがルーターにマッチするか確認
+
+---
+
+## 質問事項
+
+1. **T-series と H/P/K/A-series の関係をどう整理しますか？**
+   - T-series は「運用レイヤー」として維持？
+   - それとも新体系にマッピング？
+
+2. **K-series 12→4 のリファクタリング方針は？**
+   - 旧K1-K12 を新K1-K4 に統合？
+   - 並行運用？
+
+3. **優先度**: H/P/A-series の実装を先に進めてよいですか？
+   - T/K整理は後回しにして、まず新シリーズを追加
+
+---
+
+*Generated: 2026-01-27T16:53*

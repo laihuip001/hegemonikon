@@ -1,0 +1,41 @@
+{
+  "timestamp": "2026-01-30T11:27:54.261180",
+  "source": "gnosis",
+  "total_papers": 9,
+  "candidates_selected": 3,
+  "dry_run": true,
+  "candidates": [
+    {
+      "title": "EWSJF: An Adaptive Scheduler with Hybrid Partitioning for Mixed-Workload LLM Inference",
+      "source": "arxiv",
+      "url": "http://arxiv.org/abs/2601.21758v1",
+      "score": 0.43333333333333335,
+      "matched_topics": [
+        "active-inference",
+        "metacognition"
+      ],
+      "rationale": "Topics: active-inference, metacognition | Score: 0.43"
+    },
+    {
+      "title": "Fast and user-friendly econometrics estimations: The R package fixest",
+      "source": "arxiv",
+      "url": "http://arxiv.org/abs/2601.21749v1",
+      "score": 0.43333333333333335,
+      "matched_topics": [
+        "tool-use",
+        "metacognition"
+      ],
+      "rationale": "Topics: tool-use, metacognition | Score: 0.43"
+    },
+    {
+      "title": "Language-based Trial and Error Falls Behind in the Era of Experience",
+      "source": "arxiv",
+      "url": "http://arxiv.org/abs/2601.21754v1",
+      "score": 0.3666666666666667,
+      "matched_topics": [
+        "metacognition"
+      ],
+      "rationale": "Topics: metacognition | Score: 0.37"
+    }
+  ]
+}

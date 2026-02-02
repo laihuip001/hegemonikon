@@ -1,0 +1,142 @@
+# Sophia Backlinker Phase 1 — Implementation Plan
+
+> **/plan v3.0 出力**
+
+---
+
+## STAGE 0: Blindspot + Scale
+
+```
+[Hegemonikon] STAGE 0: Blindspot + Scale
+  🔍 Blindspots Identified: 2
+    - [x] Scope: 既存 KI に [[wikilink]] なし → 新パターン導入
+    - [x] Dependencies: NetworkX 未インストール → 確認必要
+  📏 Scale: Meso (新モジュール追加)
+  理由: Symploke 内に新ファイル追加、既存機能への影響なし
+```
+
+---
+
+## STAGE 1: Strategy Selection
+
+```
+[Hegemonikon] STAGE 1: Strategy Selection
+  📂 Files Read: sophia_ingest.py, search_helper.py, sophia_mcp_server
+  📚 KI Referenced: knowledge_curation_and_activation
+  🔍 Concerns: 全解決
+
+  ⚖️ Explore/Exploit: Exploit (既存パターン踏襲)
+    失敗コスト: 低
+    環境確実性: 高 (Perplexity 調査済み)
+    時間制約: 今日中
+
+  📋 Plans:
+    A: Conservative — 検出のみ、表示なし
+    B: Robust — 検出 + MCP統合 ← 推奨
+    C: Aggressive — + Web UI グラフビュー
+```
+
+**選択**: Plan B (Robust)
+
+---
+
+## STAGE 2: Success Criteria
+
+| 軸 | Must | Should | Could |
+|:---|:-----|:-------|:------|
+| 機能性 | バックリンク検出動作 | MCP から検索可能 | グラフ可視化 |
+| 品質 | 10 KI でテスト通過 | 100% リンク検出 | 暗黙的リンク |
+| 性能 | < 1秒 初期構築 | O(1) 検索 | 差分更新 |
+
+**完了条件**: Must が全て満たされた時点
+
+---
+
+## STAGE 3: Blueprint
+
+```
+🎯 Goal Decomposition:
+  最終目標: MCP から「この KI を参照している他の KI」を検索可能
+    ← バックリンクを MCP stats/search に追加
+    ← NetworkX グラフ構築 + キャッシュ
+    ← [[wikilink]] パターン抽出
+    ← 現在地
+```
+
+### 変更対象ファイル
+
+| File | Action | 概要 |
+|:-----|:-------|:-----|
+| `sophia_backlinker.py` | [NEW] | NetworkX グラフ + バックリンク検出 |
+| [sophia_mcp_server.py](file:///home/laihuip001/oikos/hegemonikon/mcp/sophia_mcp_server.py) | [MODIFY] | backlinks ツール追加 |
+| `test_backlinker.py` | [NEW] | ユニットテスト |
+
+### 依存関係
+
+- `networkx` (pip install networkx)
+
+---
+
+## STAGE 4: Devil's Advocate
+
+```
+[Hegemonikon] STAGE 4: Devil's Advocate
+  😈 Adversarial Check:
+    - Feasibility: PASS — NetworkX は軽量、実装単純
+    - Necessity: PASS — グラフ機能はユーザー要望
+    - Alternatives: PASS — igraph も可能だが NetworkX で十分
+    - Risks: PASS — 既存機能に影響なし
+    - Dependencies: PASS — networkx のみ
+
+  ☠️ Pre-mortem:
+    1. [[wikilink]] 構文が既存 KI にない → 今後の KI で使用開始
+    2. 大量ファイル時の性能 → 10k 以下なら問題なし
+
+  ✅ All Checks Passed
+```
+
+---
+
+## 実装計画
+
+### Step 1: `sophia_backlinker.py` 作成
+
+```python
+class SophiaBacklinker:
+    def __init__(self):
+        self.graph = nx.DiGraph()
+    
+    def extract_links(self, content: str) -> Set[str]
+    def build_graph(self, ki_dir: Path) -> None
+    def get_backlinks(self, note_name: str) -> Set[str]
+```
+
+### Step 2: MCP 統合
+
+```python
+# sophia_mcp_server.py に追加
+Tool(name="backlinks", ...)
+```
+
+### Step 3: テスト
+
+```bash
+python -m pytest mekhane/symploke/tests/test_backlinker.py
+```
+
+---
+
+```
+┌─[Hegemonikón]──────────────────────────────────────────┐
+│ /plan v3.0 完了                                        │
+│                                                        │
+│ STAGE 0: ✅ Blindspots [2] resolved, Scale: Meso       │
+│ STAGE 1: ✅ Strategy: Exploit, Plan: B (Robust)        │
+│ STAGE 2: ✅ Rubric: Must 3 / Should 2 / Could 2        │
+│ STAGE 3: ✅ Blueprint: 3 files                         │
+│ STAGE 4: ✅ Devil's Advocate: All PASS                 │
+│                                                        │
+└────────────────────────────────────────────────────────┘
+
+⏸️ 承認待ち: 計画を承認しますか？ (y)
+```

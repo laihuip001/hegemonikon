@@ -1,0 +1,160 @@
+# LLM ベース派生選択 実装計画
+
+> **/s v4.1** — 5-STAGE 認知プロセス
+
+---
+
+## STAGE 0: Blindspot + Scale [S1 Metron]
+
+### Phase 0.0: Prior Art Check
+
+| 確認事項 | 結果 |
+|:---------|:-----|
+| 同様の問題解決 | ✅ Hegemonikón 内に FEP LLM Evaluator (llm_evaluator.py) が存在 |
+| 推奨手法 | ✅ Gemini/GPT の structured output 機能が利用可能 |
+| 社内類似解決策 | ✅ [encoding.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/fep/encoding.py) に LLM fallback の設計パターンあり |
+
+### Phase 0.1: Blindspot Check
+
+| カテゴリ | リスク | 対策 |
+|:---------|:-------|:-----|
+| Framing | 低 | 「精度向上」が本当に必要か → /bou で確認済み |
+| Scope | 中 | 24定理すべてに適用 → 段階的展開 |
+| Dependencies | 低 | API キーは既存 |
+
+### Phase 0.2: Scale
+
+**判定: Meso** — 単一モジュール (derivative_selector.py) の拡張
+
+---
+
+## STAGE 1: Strategy Selection [S2 Mekhanē]
+
+### Explore vs Exploit
+
+| 軸 | 現状 | 判定 |
+|:---|:-----|:-----|
+| 失敗コスト | 低 — fallback にキーワードマッチングを残せる | **Explore** |
+| 環境確実性 | 中 — LLM 精度は未検証 | |
+| 時間制約 | 余裕あり | |
+
+### 3プラン
+
+| Plan | 説明 | 工数 | リスク |
+|:-----|:-----|:----:|:------:|
+| A Conservative | キーワード精度チューニング | 低 | 低 |
+| **B Robust** | LLM + キーワード Hybrid | 中 | 中 |
+| C Aggressive | LLM のみ (キーワード廃止) | 中 | 高 |
+
+**選択: Plan B Robust**
+
+### Y-1 評価
+
+| 層 | 評価 |
+|:---|:-----|
+| Fast | ✅ 即座に精度向上が体感できる |
+| Slow | ✅ 学習基盤との連携で6ヶ月後に自動改善 |
+| Eternal | ⚠️ LLM API 依存リスク (10年スケール) |
+
+### D-1 評価
+
+| フェーズ | 影響 |
+|:---------|:-----|
+| T+0 | derivative_selector.py に 1関数追加 |
+| T+1 | SKILL.md の呼び出し例を更新 |
+| T+2 | 影響なし (後方互換維持) |
+
+---
+
+## STAGE 2: Success Criteria [S3 Stathmos]
+
+| 軸 | Must | Should | Could |
+|:---|:-----|:-------|:------|
+| 精度 | 70%+ | 85%+ | 95%+ |
+| レスポンス | <2秒 | <1秒 | <500ms |
+| Fallback | キーワードに安全に戻れる | - | - |
+| コスト | 無料枠内 (Gemini 1.5 Flash) | - | - |
+
+---
+
+## STAGE 3: Blueprint [S4 Praxis]
+
+### Goal Decomposition
+
+```
+精度 85%+ 派生選択
+  ↑
+LLM フォールバック実装
+  ↑
+プロンプト設計
+  ↑
+現在地
+```
+
+### 変更対象ファイル
+
+| ファイル | 変更内容 |
+|:---------|:---------|
+| [mekhane/fep/derivative_selector.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/fep/derivative_selector.py) | `_select_with_llm()` 関数追加 |
+| [mekhane/fep/llm_evaluator.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/fep/llm_evaluator.py) | 既存再利用 (Gemini 1.5 Flash) |
+| [.agent/rules/derivative-selection.md](file:///home/laihuip001/oikos/.agent/rules/derivative-selection.md) | LLM fallback 説明追加 |
+
+### 設計詳細
+
+```python
+def _select_with_llm(theorem: str, problem: str) -> Optional[str]:
+    """
+    LLM を使って派生を選択。
+    失敗時は None を返し、キーワードマッチングにフォールバック。
+    """
+    prompt = f"""
+    定理 {theorem} の3つの派生から最適なものを選べ:
+    {DerivativeStateSpace.get(theorem)}
+    
+    問題文: {problem}
+    
+    回答形式: 派生コード (例: nous, phro, meta)
+    """
+    # Gemini 1.5 Flash 呼び出し
+    response = call_gemini_flash(prompt)
+    return parse_derivative(response)
+```
+
+### Hybrid フロー
+
+```
+入力
+  ↓
+[LLM 選択を試行]
+  ↓ 成功 → 採用 (confidence 0.85)
+  ↓ 失敗 → [キーワードマッチング] (confidence 0.65)
+  ↓
+出力
+```
+
+---
+
+## STAGE 4: Devil's Advocate [/dia]
+
+| 視点 | 質問 | 回答 |
+|:-----|:-----|:-----|
+| Feasibility | LLM 呼び出しは遅くないか？ | Gemini Flash <500ms |
+| Necessity | 60% で十分では？ | 派生分岐が間違うと処理全体が歪む |
+| Alternatives | キーワード辞書拡充では？ | 限界あり、曖昧入力に弱い |
+| Risks | API障害時は？ | キーワードに自動フォールバック |
+
+---
+
+## まとめ
+
+```
+┌─[Hegemonikón /s v4.1]────────────────────────────────┐
+│ STAGE 0: ✅ Scale: Meso                             │
+│ STAGE 1: ✅ Strategy: Explore, Plan: B (Hybrid)     │
+│ STAGE 2: ✅ Rubric: 精度 85%+, <1秒, Fallback必須    │
+│ STAGE 3: ✅ Blueprint: derivative_selector.py 拡張  │
+│ STAGE 4: ✅ Devil's Advocate: All PASS              │
+└──────────────────────────────────────────────────────┘
+```
+
+**承認をお願いします。**

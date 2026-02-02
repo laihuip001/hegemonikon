@@ -1,0 +1,56 @@
+# Adaptive Swarm Allocation System
+
+## 目標
+
+1,800 セッション/日を動的に配分し、hegemonikon を「認知ハイパーバイザー」として常時監視。
+
+## アーキテクチャ
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│ Daily Budget: 1,800 sessions (6 accounts × 300)            │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│  Phase 1: Change-Driven (40% = 720 sessions)               │
+│  ├─ git diff で変更ファイルを検出                          │
+│  ├─ 変更ファイルに適した視点を動的選択                      │
+│  └─ 例: mcp/*.py 変更 → Security, Async, Error 優先        │
+│                                                             │
+│  Phase 2: Discovery (40% = 720 sessions)                    │
+│  ├─ 未レビューファイルをランダムサンプリング                │
+│  ├─ 毎日違う視点で「発見型レビュー」                        │
+│  └─ 長期間変更がないコードの劣化を検出                      │
+│                                                             │
+│  Phase 3: Weekly Deep Dive (20% = 360 sessions)            │
+│  ├─ 今週のフォーカスエリアを集中レビュー                    │
+│  ├─ 例: 月=Security, 火=Performance, 水=Error...            │
+│  └─ ドメイン専門家として深掘り                              │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+```
+
+## 実装計画
+
+### [MODIFY] run_synedrion_review.py
+- 適応型配分ロジックを追加
+- `--mode change|discovery|deep` オプション
+
+### [NEW] adaptive_allocator.py
+- `AllocateChangeDriven()`: git diff ベース
+- `AllocateDiscovery()`: ランダムサンプリング
+- `AllocateWeeklyFocus()`: 曜日別フォーカス
+
+### [NEW] swarm_scheduler.py
+- cron 連携スクリプト
+- 毎日 04:00 JST に実行
+- 6アカウント並列実行
+
+### [NEW] session_tracker.json
+- 実行済みセッションを記録
+- 重複防止 + 進捗追跡
+
+## Verification
+
+1. 20視点テスト実行（即時）
+2. 1時間分のシミュレーション
+3. cron 設定 + 翌朝確認

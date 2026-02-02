@@ -1,0 +1,5 @@
+{
+  "artifactType": "ARTIFACT_TYPE_IMPLEMENTATION_PLAN",
+  "summary": "CCL への Lambda 式導入の設計計画。Python lambda との対応、3つの構文候補（λ/fn/{}）、導入の是非判定、実装方針を含む。導入判定は「条件付き採用」で、@partial を先行実装として活用しつつ、将来的な完全 Lambda 構文を検討。",
+  "updatedAt": "2026-01-31T00:35:39.843003865Z"
+}

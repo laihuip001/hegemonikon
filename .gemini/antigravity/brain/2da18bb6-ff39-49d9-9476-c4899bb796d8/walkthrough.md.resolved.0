@@ -1,0 +1,65 @@
+# Walkthrough: Strategy B スキル最適化
+
+> /zet 調査結果に基づくスキル構造の最適化
+
+---
+
+## 完了した作業
+
+### 背景
+
+Perplexity リサーチにより、Antigravity IDE は `llm_optimization` フィールドを **読み取らない** ことが判明。セマンティックマッチングには `description` のみが使用される。
+
+### 変更内容
+
+| スキル | 変更 |
+|:-------|:-----|
+| O1 Noēsis | description に NOT for句統合、llm_optimization 削除 |
+| O2 Boulēsis | 同上 |
+| O3 Zētēsis | 同上 |
+| O4 Energeia | 同上 |
+| A2 Krisis | 同上 |
+| S1 Metron | 同上 |
+
+### バージョン
+
+- **2.2.0** → **2.1.1** (documented fields only)
+
+---
+
+## 変更例 (O1 Noēsis)
+
+```diff
+description: >
+  Use this skill when the user needs deep understanding...
++ NOT for simple information retrieval (use /src) or known solutions (use S2).
+  Triggers: 本質, essence, understand deeply...
+
+- when_not_to_use: >
+-   単純な情報検索、既知の解決策がある場合...
+-
+- llm_optimization:
+-   claude: |
+-     <instructions>...</instructions>
+-   gemini: |
+-     ...
+-   gpt: |
+-     ...
+
+- version: "2.2.0"
++ version: "2.1.1"
+```
+
+---
+
+## 効果
+
+| 項目 | Before | After |
+|:-----|:-------|:------|
+| Token overhead | ~50t/skill | 0t |
+| Semantic matching | ✅ | ✅ (enhanced) |
+| IDE compatibility | Unknown | ✅ Guaranteed |
+
+---
+
+*Completed: 2026-01-28*

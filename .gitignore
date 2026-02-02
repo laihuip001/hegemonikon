@@ -1,0 +1,32 @@
+# Virtual environments
+venv/
+.venv/
+
+# Cache directories
+.cache/
+.npm/
+.mozilla/
+.local/
+.dspy_cache/
+.config/
+.antigravity/
+
+# Browser profile (large)
+.gemini/antigravity-browser-profile/
+.gemini/antigravity/browser_recordings/
+.gemini/antigravity/code_tracker/
+.gemini/tmp/
+
+# Conversations (large binary protobuf files)
+.gemini/antigravity/conversations/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+# Session logs with secrets
+mneme/.hegemonikon/sessions/*
+**/sessions/*
+**/.hegemonikon/sessions/*
+.gemini/oauth_creds.json
+.gemini/google_accounts.json

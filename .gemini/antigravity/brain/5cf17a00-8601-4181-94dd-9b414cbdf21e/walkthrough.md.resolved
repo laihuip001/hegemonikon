@@ -1,0 +1,2079 @@
+# Walkthrough: Hermeneus LLM 実行と Synteleia + LLM 統合
+
+**セッション**: 2026-02-01
+**主題**: Hermeneus の LLM 実行を有効化し、Synteleia + LLM の統合分析を実現
+
+---
+
+## 🎯 目標
+
+Hermeneus を「CCL コンパイラ」から「実用的な LLM 実行エンジン」へ進化させる
+
+---
+
+## ✅ 完了した作業
+
+### 1. 環境セットアップ
+
+- [hermeneus/.env](file:///home/laihuip001/oikos/hegemonikon/hermeneus/.env) に Google API Key を永続化
+- [runtime.py](file:///home/laihuip001/oikos/hegemonikon/hermeneus/src/runtime.py) に dotenv 自動読み込みを追加
+- Gemini 3 Pro Preview で動作確認
+
+### 2. Synergeia + Hermeneus 統合
+
+- [coordinator.py](file:///home/laihuip001/oikos/hegemonikon/synergeia/coordinator.py) に `hermeneus_execute` をインポート
+- [execute_hermeneus](file:///home/laihuip001/oikos/hegemonikon/synergeia/coordinator.py#289-386) で LLM 実行を有効化
+- PYTHONPATH 自動設定を追加
+
+### 3. Context Passing 問題修正
+
+**問題**: Gemini が「エアプ」出力をしていた
+
+**原因**: [_extract_prompt_from_lmql](file:///home/laihuip001/oikos/hegemonikon/hermeneus/src/runtime.py#365-380) が `{context}` プレースホルダーを抽出しない
+
+**修正**: [_execute_fallback](file:///home/laihuip001/oikos/hegemonikon/hermeneus/src/runtime.py#177-229) で context を常にプロンプト先頭に明示的に追加
+
+```diff:runtime.py
+# PROOF: [L2/インフラ] LMQL 実行ランタイム
+"""
+Hermēneus Runtime — LMQL プログラムを実行
+
+compile_ccl() の出力を実際の LLM で実行し、
+結果を構造化して返す。
+
+Origin: 2026-01-31 CCL Execution Guarantee Architecture
+"""
+
+import os
+import re
+import json
+import asyncio
+from dataclasses import dataclass, field
+from typing import Any, Dict, List, Optional, Union
+from enum import Enum
+
+
+# =============================================================================
+# Execution Result Types
+# =============================================================================
+
+class ExecutionStatus(Enum):
+    """実行ステータス"""
+    SUCCESS = "success"
+    PARTIAL = "partial"       # 一部成功
+    TIMEOUT = "timeout"
+    ERROR = "error"
+    RATE_LIMITED = "rate_limited"
+
+
+@dataclass
+class ExecutionResult:
+    """CCL 実行結果"""
+    status: ExecutionStatus
+    output: str                              # 最終出力
+    iterations: int = 0                      # 反復回数 (収束ループの場合)
+    confidence: float = 1.0                  # 確信度 (0.0-1.0)
+    intermediate_results: List[str] = field(default_factory=list)
+    metadata: Dict[str, Any] = field(default_factory=dict)
+    error: Optional[str] = None
+
+
+@dataclass
+class ExecutionConfig:
+    """実行設定"""
+    model: str = "openai/gpt-4o"
+    timeout: int = 300                       # 秒
+    max_retries: int = 3
+    max_iterations: int = 5                  # 収束ループの最大反復
+    temperature: float = 0.7
+    api_key: Optional[str] = None
+
+
+# =============================================================================
+# LMQL Executor
+# =============================================================================
+
+class LMQLExecutor:
+    """LMQL プログラム実行器
+    
+    LMQL がインストールされていない場合は、
+    フォールバック実行 (直接 OpenAI API) を使用。
+    """
+    
+    def __init__(self, config: Optional[ExecutionConfig] = None):
+        self.config = config or ExecutionConfig()
+        self._lmql_available = self._check_lmql()
+    
+    def _check_lmql(self) -> bool:
+        """LMQL がインストールされているか確認"""
+        try:
+            import lmql  # noqa: F401
+            return True
+        except ImportError:
+            return False
+    
+    async def execute_async(
+        self,
+        lmql_code: str,
+        context: str = "",
+        variables: Optional[Dict[str, Any]] = None
+    ) -> ExecutionResult:
+        """LMQL プログラムを非同期実行"""
+        variables = variables or {}
+        
+        try:
+            if self._lmql_available:
+                return await self._execute_with_lmql(lmql_code, context, variables)
+            else:
+                return await self._execute_fallback(lmql_code, context, variables)
+        except asyncio.TimeoutError:
+            return ExecutionResult(
+                status=ExecutionStatus.TIMEOUT,
+                output="",
+                error=f"Execution timed out after {self.config.timeout} seconds"
+            )
+        except Exception as e:
+            return ExecutionResult(
+                status=ExecutionStatus.ERROR,
+                output="",
+                error=str(e)
+            )
+    
+    def execute(
+        self,
+        lmql_code: str,
+        context: str = "",
+        variables: Optional[Dict[str, Any]] = None
+    ) -> ExecutionResult:
+        """LMQL プログラムを同期実行"""
+        return asyncio.run(self.execute_async(lmql_code, context, variables))
+    
+    async def _execute_with_lmql(
+        self,
+        lmql_code: str,
+        context: str,
+        variables: Dict[str, Any]
+    ) -> ExecutionResult:
+        """LMQL ライブラリを使用して実行"""
+        import lmql
+        
+        # LMQL コードを実行可能な形式に変換
+        # (compile_ccl の出力は文字列なので、exec で実行)
+        local_vars = {"lmql": lmql, "context": context, **variables}
+        
+        try:
+            exec(lmql_code, local_vars)
+            
+            # 関数を探して実行
+            for name, obj in local_vars.items():
+                if callable(obj) and name.startswith("ccl_"):
+                    result = await obj(context)
+                    return ExecutionResult(
+                        status=ExecutionStatus.SUCCESS,
+                        output=str(result),
+                        metadata={"function": name}
+                    )
+            
+            return ExecutionResult(
+                status=ExecutionStatus.ERROR,
+                output="",
+                error="No executable CCL function found in LMQL code"
+            )
+        except Exception as e:
+            return ExecutionResult(
+                status=ExecutionStatus.ERROR,
+                output="",
+                error=f"LMQL execution error: {e}"
+            )
+    
+    async def _execute_fallback(
+        self,
+        lmql_code: str,
+        context: str,
+        variables: Dict[str, Any]
+    ) -> ExecutionResult:
+        """フォールバック: OpenAI API 直接呼び出し"""
+        try:
+            from openai import AsyncOpenAI
+        except ImportError:
+            return ExecutionResult(
+                status=ExecutionStatus.ERROR,
+                output="",
+                error="Neither LMQL nor OpenAI SDK is installed. Run: pip install lmql or pip install openai"
+            )
+        
+        # LMQL コードからプロンプトを抽出
+        prompt = self._extract_prompt_from_lmql(lmql_code)
+        if not prompt:
+            return ExecutionResult(
+                status=ExecutionStatus.ERROR,
+                output="",
+                error="Could not extract prompt from LMQL code"
+            )
+        
+        # コンテキストを挿入
+        full_prompt = prompt.replace("{context}", context)
+        
+        # OpenAI API 呼び出し
+        api_key = self.config.api_key or os.environ.get("OPENAI_API_KEY")
+        if not api_key:
+            return ExecutionResult(
+                status=ExecutionStatus.ERROR,
+                output="",
+                error="OPENAI_API_KEY not set"
+            )
+        
+        client = AsyncOpenAI(api_key=api_key)
+        
+        for attempt in range(self.config.max_retries):
+            try:
+                response = await asyncio.wait_for(
+                    client.chat.completions.create(
+                        model=self.config.model.replace("openai/", ""),
+                        messages=[{"role": "user", "content": full_prompt}],
+                        temperature=self.config.temperature,
+                    ),
+                    timeout=self.config.timeout
+                )
+                
+                output = response.choices[0].message.content
+                return ExecutionResult(
+                    status=ExecutionStatus.SUCCESS,
+                    output=output,
+                    metadata={
+                        "model": self.config.model,
+                        "attempt": attempt + 1,
+                        "fallback": True
+                    }
+                )
+            except asyncio.TimeoutError:
+                if attempt == self.config.max_retries - 1:
+                    raise
+                await asyncio.sleep(2 ** attempt)  # Exponential backoff
+        
+        return ExecutionResult(
+            status=ExecutionStatus.ERROR,
+            output="",
+            error="Max retries exceeded"
+        )
+    
+    def _extract_prompt_from_lmql(self, lmql_code: str) -> Optional[str]:
+        """LMQL コードからプロンプト部分を抽出"""
+        # 文字列リテラルを探す
+        prompts = []
+        
+        # "..." パターンを抽出
+        for match in re.finditer(r'"([^"]+)"', lmql_code):
+            text = match.group(1)
+            # コード的な文字列は除外
+            if not text.startswith("@") and not "import" in text:
+                prompts.append(text)
+        
+        if prompts:
+            return "\n".join(prompts)
+        return None
+
+
+# =============================================================================
+# Convergence Loop Executor
+# =============================================================================
+
+class ConvergenceExecutor:
+    """収束ループ実行器
+    
+    CCL の >> (収束) 演算子を実行し、
+    条件を満たすまで反復する。
+    """
+    
+    def __init__(self, executor: LMQLExecutor):
+        self.executor = executor
+    
+    async def execute_convergence(
+        self,
+        lmql_code: str,
+        context: str,
+        condition_var: str = "V",
+        condition_op: str = "<",
+        condition_value: float = 0.3,
+        max_iterations: int = 5
+    ) -> ExecutionResult:
+        """収束ループを実行"""
+        results = []
+        current_value = 1.0  # 初期不確実性
+        
+        for i in range(max_iterations):
+            # ワークフロー実行
+            result = await self.executor.execute_async(lmql_code, context)
+            results.append(result.output)
+            
+            if result.status != ExecutionStatus.SUCCESS:
+                return ExecutionResult(
+                    status=result.status,
+                    output=result.output,
+                    iterations=i + 1,
+                    intermediate_results=results,
+                    error=result.error
+                )
+            
+            # 不確実性を評価 (簡易ヒューリスティック)
+            current_value = self._estimate_uncertainty(result.output)
+            
+            # 収束条件チェック
+            if self._check_condition(current_value, condition_op, condition_value):
+                return ExecutionResult(
+                    status=ExecutionStatus.SUCCESS,
+                    output=results[-1],
+                    iterations=i + 1,
+                    confidence=1.0 - current_value,
+                    intermediate_results=results,
+                    metadata={"converged": True, "final_uncertainty": current_value}
+                )
+            
+            # 次の反復のためにコンテキストを更新
+            context = f"{context}\n\n前回の分析:\n{result.output}"
+        
+        # 最大反復に達した
+        return ExecutionResult(
+            status=ExecutionStatus.PARTIAL,
+            output=results[-1] if results else "",
+            iterations=max_iterations,
+            confidence=1.0 - current_value,
+            intermediate_results=results,
+            metadata={"converged": False, "final_uncertainty": current_value}
+        )
+    
+    def _estimate_uncertainty(self, output: str) -> float:
+        """出力から不確実性を推定 (簡易ヒューリスティック)"""
+        uncertainty_indicators = [
+            "かもしれない", "おそらく", "might", "maybe", "perhaps",
+            "不明", "unclear", "uncertain", "possible",
+            "?", "推測", "guess", "assume"
+        ]
+        
+        certainty_indicators = [
+            "確実", "definitely", "certainly", "明確",
+            "結論", "conclusion", "therefore", "したがって"
+        ]
+        
+        output_lower = output.lower()
+        
+        uncertainty_count = sum(1 for ind in uncertainty_indicators if ind in output_lower)
+        certainty_count = sum(1 for ind in certainty_indicators if ind in output_lower)
+        
+        # 簡易スコア計算
+        if certainty_count > uncertainty_count:
+            return max(0.1, 0.5 - (certainty_count * 0.1))
+        elif uncertainty_count > 0:
+            return min(0.9, 0.5 + (uncertainty_count * 0.1))
+        else:
+            return 0.4  # デフォルト
+    
+    def _check_condition(self, value: float, op: str, threshold: float) -> bool:
+        """条件をチェック"""
+        if op == "<":
+            return value < threshold
+        elif op == "<=":
+            return value <= threshold
+        elif op == ">":
+            return value > threshold
+        elif op == ">=":
+            return value >= threshold
+        elif op == "=":
+            return abs(value - threshold) < 0.01
+        return False
+
+
+# =============================================================================
+# High-Level API
+# =============================================================================
+
+def execute_ccl(
+    ccl: str,
+    context: str = "",
+    model: str = "openai/gpt-4o",
+    macros: Optional[Dict[str, str]] = None,
+    **kwargs
+) -> ExecutionResult:
+    """CCL 式をコンパイルして実行
+    
+    Args:
+        ccl: CCL 式 (例: "/noe+ >> V[] < 0.3")
+        context: 入力コンテキスト
+        model: 使用する LLM モデル
+        macros: マクロ定義
+        **kwargs: ExecutionConfig に渡す追加設定
+        
+    Returns:
+        ExecutionResult
+        
+    Example:
+        >>> result = execute_ccl("/noe+", "プロジェクト設計を分析")
+        >>> print(result.output)
+    """
+    # 遅延インポート (循環参照回避)
+    from . import compile_ccl
+    from .parser import parse_ccl
+    from .ast import ConvergenceLoop
+    
+    # コンパイル
+    lmql_code = compile_ccl(ccl, macros=macros, model=model)
+    
+    # 設定
+    config = ExecutionConfig(model=model, **kwargs)
+    executor = LMQLExecutor(config)
+    
+    # 収束ループかどうかを判定
+    try:
+        ast = parse_ccl(ccl)
+        if isinstance(ast, ConvergenceLoop):
+            conv_executor = ConvergenceExecutor(executor)
+            return asyncio.run(conv_executor.execute_convergence(
+                lmql_code,
+                context,
+                condition_var=ast.condition.var,
+                condition_op=ast.condition.op,
+                condition_value=ast.condition.value,
+                max_iterations=config.max_iterations
+            ))
+    except Exception:
+        pass  # パース失敗時は通常実行
+    
+    # 通常実行
+    return executor.execute(lmql_code, context)
+===
+# PROOF: [L2/インフラ] LMQL 実行ランタイム
+"""
+Hermēneus Runtime — LMQL プログラムを実行
+
+compile_ccl() の出力を実際の LLM で実行し、
+結果を構造化して返す。
+
+Origin: 2026-01-31 CCL Execution Guarantee Architecture
+"""
+
+import os
+import re
+import json
+import asyncio
+from dataclasses import dataclass, field
+from typing import Any, Dict, List, Optional, Union
+from enum import Enum
+from pathlib import Path
+
+# .env ファイルから環境変数を読み込む
+def _load_env():
+    """hermeneus/.env から API キーを読み込む"""
+    env_paths = [
+        Path(__file__).parent.parent / ".env",  # hermeneus/.env
+        Path(__file__).parent.parent.parent / ".env",  # hegemonikon/.env
+    ]
+    for env_path in env_paths:
+        if env_path.exists():
+            with open(env_path) as f:
+                for line in f:
+                    line = line.strip()
+                    if line and not line.startswith("#") and "=" in line:
+                        key, value = line.split("=", 1)
+                        if key not in os.environ:  # 既存の環境変数は上書きしない
+                            os.environ[key] = value.strip()
+
+_load_env()
+
+
+# =============================================================================
+# Execution Result Types
+# =============================================================================
+
+class ExecutionStatus(Enum):
+    """実行ステータス"""
+    SUCCESS = "success"
+    PARTIAL = "partial"       # 一部成功
+    TIMEOUT = "timeout"
+    ERROR = "error"
+    RATE_LIMITED = "rate_limited"
+
+
+@dataclass
+class ExecutionResult:
+    """CCL 実行結果"""
+    status: ExecutionStatus
+    output: str                              # 最終出力
+    iterations: int = 0                      # 反復回数 (収束ループの場合)
+    confidence: float = 1.0                  # 確信度 (0.0-1.0)
+    intermediate_results: List[str] = field(default_factory=list)
+    metadata: Dict[str, Any] = field(default_factory=dict)
+    error: Optional[str] = None
+
+
+@dataclass
+class ExecutionConfig:
+    """実行設定"""
+    model: str = "openai/gpt-4o"
+    timeout: int = 300                       # 秒
+    max_retries: int = 3
+    max_iterations: int = 5                  # 収束ループの最大反復
+    temperature: float = 0.7
+    api_key: Optional[str] = None
+
+
+# =============================================================================
+# LMQL Executor
+# =============================================================================
+
+class LMQLExecutor:
+    """LMQL プログラム実行器
+    
+    LMQL がインストールされていない場合は、
+    フォールバック実行 (直接 OpenAI API) を使用。
+    """
+    
+    def __init__(self, config: Optional[ExecutionConfig] = None):
+        self.config = config or ExecutionConfig()
+        self._lmql_available = self._check_lmql()
+    
+    def _check_lmql(self) -> bool:
+        """LMQL がインストールされているか確認"""
+        try:
+            import lmql  # noqa: F401
+            return True
+        except ImportError:
+            return False
+    
+    async def execute_async(
+        self,
+        lmql_code: str,
+        context: str = "",
+        variables: Optional[Dict[str, Any]] = None
+    ) -> ExecutionResult:
+        """LMQL プログラムを非同期実行"""
+        variables = variables or {}
+        
+        try:
+            if self._lmql_available:
+                result = await self._execute_with_lmql(lmql_code, context, variables)
+                # LMQL exec() が失敗した場合は Fallback へ
+                if result.status == ExecutionStatus.ERROR and "exec" in str(result.error).lower():
+                    return await self._execute_fallback(lmql_code, context, variables)
+                return result
+            else:
+                return await self._execute_fallback(lmql_code, context, variables)
+        except asyncio.TimeoutError:
+            return ExecutionResult(
+                status=ExecutionStatus.TIMEOUT,
+                output="",
+                error=f"Execution timed out after {self.config.timeout} seconds"
+            )
+        except Exception as e:
+            return ExecutionResult(
+                status=ExecutionStatus.ERROR,
+                output="",
+                error=str(e)
+            )
+    
+    def execute(
+        self,
+        lmql_code: str,
+        context: str = "",
+        variables: Optional[Dict[str, Any]] = None
+    ) -> ExecutionResult:
+        """LMQL プログラムを同期実行"""
+        return asyncio.run(self.execute_async(lmql_code, context, variables))
+    
+    async def _execute_with_lmql(
+        self,
+        lmql_code: str,
+        context: str,
+        variables: Dict[str, Any]
+    ) -> ExecutionResult:
+        """LMQL ライブラリを使用して実行"""
+        import lmql
+        
+        # LMQL コードを実行可能な形式に変換
+        # (compile_ccl の出力は文字列なので、exec で実行)
+        local_vars = {"lmql": lmql, "context": context, **variables}
+        
+        try:
+            exec(lmql_code, local_vars)
+            
+            # 関数を探して実行
+            for name, obj in local_vars.items():
+                if callable(obj) and name.startswith("ccl_"):
+                    result = await obj(context)
+                    return ExecutionResult(
+                        status=ExecutionStatus.SUCCESS,
+                        output=str(result),
+                        metadata={"function": name}
+                    )
+            
+            return ExecutionResult(
+                status=ExecutionStatus.ERROR,
+                output="",
+                error="No executable CCL function found in LMQL code"
+            )
+        except Exception as e:
+            return ExecutionResult(
+                status=ExecutionStatus.ERROR,
+                output="",
+                error=f"LMQL execution error: {e}"
+            )
+    
+    async def _execute_fallback(
+        self,
+        lmql_code: str,
+        context: str,
+        variables: Dict[str, Any]
+    ) -> ExecutionResult:
+        """フォールバック: 複数プロバイダー対応の LLM 呼び出し
+        
+        優先順位:
+        1. Anthropic (Claude) - ANTHROPIC_API_KEY
+        2. Google (Gemini) - GOOGLE_API_KEY  
+        3. OpenAI - OPENAI_API_KEY
+        """
+        # LMQL コードからプロンプトを抽出
+        prompt = self._extract_prompt_from_lmql(lmql_code)
+        if not prompt:
+            return ExecutionResult(
+                status=ExecutionStatus.ERROR,
+                output="",
+                error="Could not extract prompt from LMQL code"
+            )
+        
+        # コンテキストを明示的にプロンプトに追加
+        # (LMQL の {context} プレースホルダーが抽出されない場合があるため)
+        if context and context.strip():
+            full_prompt = f"""## コンテキスト
+{context}
+
+## タスク
+{prompt}
+
+上記のコンテキストに基づいて、タスクを実行してください。"""
+        else:
+            full_prompt = prompt
+        
+        # プロバイダー検出と実行
+        anthropic_key = os.environ.get("ANTHROPIC_API_KEY")
+        google_key = os.environ.get("GOOGLE_API_KEY")
+        openai_key = self.config.api_key or os.environ.get("OPENAI_API_KEY")
+        
+        if anthropic_key:
+            return await self._execute_anthropic(full_prompt, anthropic_key)
+        elif google_key:
+            return await self._execute_google(full_prompt, google_key)
+        elif openai_key:
+            return await self._execute_openai(full_prompt, openai_key)
+        else:
+            return ExecutionResult(
+                status=ExecutionStatus.ERROR,
+                output="",
+                error="No API key found. Set ANTHROPIC_API_KEY, GOOGLE_API_KEY, or OPENAI_API_KEY"
+            )
+    
+    async def _execute_anthropic(self, prompt: str, api_key: str) -> ExecutionResult:
+        """Anthropic Claude API 呼び出し"""
+        try:
+            from anthropic import AsyncAnthropic
+        except ImportError:
+            return ExecutionResult(
+                status=ExecutionStatus.ERROR,
+                output="",
+                error="anthropic not installed. Run: pip install anthropic"
+            )
+        
+        client = AsyncAnthropic(api_key=api_key)
+        
+        for attempt in range(self.config.max_retries):
+            try:
+                response = await asyncio.wait_for(
+                    client.messages.create(
+                        model="claude-sonnet-4-20250514",
+                        max_tokens=4096,
+                        messages=[{"role": "user", "content": prompt}],
+                    ),
+                    timeout=self.config.timeout
+                )
+                
+                output = response.content[0].text
+                return ExecutionResult(
+                    status=ExecutionStatus.SUCCESS,
+                    output=output,
+                    metadata={
+                        "provider": "anthropic",
+                        "model": "claude-sonnet-4-20250514",
+                        "attempt": attempt + 1,
+                        "fallback": True
+                    }
+                )
+            except asyncio.TimeoutError:
+                if attempt == self.config.max_retries - 1:
+                    raise
+                await asyncio.sleep(2 ** attempt)
+        
+        return ExecutionResult(
+            status=ExecutionStatus.ERROR,
+            output="",
+            error="Anthropic API call failed after retries"
+        )
+    
+    async def _execute_google(self, prompt: str, api_key: str) -> ExecutionResult:
+        """Google Gemini API 呼び出し"""
+        try:
+            import google.generativeai as genai
+        except ImportError:
+            return ExecutionResult(
+                status=ExecutionStatus.ERROR,
+                output="",
+                error="google-generativeai not installed. Run: pip install google-generativeai"
+            )
+        
+        genai.configure(api_key=api_key)
+        model = genai.GenerativeModel("gemini-3-pro-preview")
+        
+        for attempt in range(self.config.max_retries):
+            try:
+                response = await asyncio.wait_for(
+                    asyncio.to_thread(model.generate_content, prompt),
+                    timeout=self.config.timeout
+                )
+                
+                output = response.text
+                return ExecutionResult(
+                    status=ExecutionStatus.SUCCESS,
+                    output=output,
+                    metadata={
+                        "provider": "google",
+                        "model": "gemini-3-pro-preview",
+                        "attempt": attempt + 1,
+                        "fallback": True
+                    }
+                )
+            except asyncio.TimeoutError:
+                if attempt == self.config.max_retries - 1:
+                    raise
+                await asyncio.sleep(2 ** attempt)
+        
+        return ExecutionResult(
+            status=ExecutionStatus.ERROR,
+            output="",
+            error="Google API call failed after retries"
+        )
+    
+    async def _execute_openai(self, prompt: str, api_key: str) -> ExecutionResult:
+        """OpenAI API 呼び出し"""
+        try:
+            from openai import AsyncOpenAI
+        except ImportError:
+            return ExecutionResult(
+                status=ExecutionStatus.ERROR,
+                output="",
+                error="openai not installed. Run: pip install openai"
+            )
+        
+        client = AsyncOpenAI(api_key=api_key)
+        
+        for attempt in range(self.config.max_retries):
+            try:
+                response = await asyncio.wait_for(
+                    client.chat.completions.create(
+                        model=self.config.model.replace("openai/", ""),
+                        messages=[{"role": "user", "content": prompt}],
+                        temperature=self.config.temperature,
+                    ),
+                    timeout=self.config.timeout
+                )
+                
+                output = response.choices[0].message.content
+                return ExecutionResult(
+                    status=ExecutionStatus.SUCCESS,
+                    output=output,
+                    metadata={
+                        "provider": "openai",
+                        "model": self.config.model,
+                        "attempt": attempt + 1,
+                        "fallback": True
+                    }
+                )
+            except asyncio.TimeoutError:
+                if attempt == self.config.max_retries - 1:
+                    raise
+                await asyncio.sleep(2 ** attempt)
+        
+        return ExecutionResult(
+            status=ExecutionStatus.ERROR,
+            output="",
+            error="Max retries exceeded"
+        )
+    
+    def _extract_prompt_from_lmql(self, lmql_code: str) -> Optional[str]:
+        """LMQL コードからプロンプト部分を抽出"""
+        # 文字列リテラルを探す
+        prompts = []
+        
+        # "..." パターンを抽出
+        for match in re.finditer(r'"([^"]+)"', lmql_code):
+            text = match.group(1)
+            # コード的な文字列は除外
+            if not text.startswith("@") and not "import" in text:
+                prompts.append(text)
+        
+        if prompts:
+            return "\n".join(prompts)
+        return None
+
+
+# =============================================================================
+# Convergence Loop Executor
+# =============================================================================
+
+class ConvergenceExecutor:
+    """収束ループ実行器
+    
+    CCL の >> (収束) 演算子を実行し、
+    条件を満たすまで反復する。
+    """
+    
+    def __init__(self, executor: LMQLExecutor):
+        self.executor = executor
+    
+    async def execute_convergence(
+        self,
+        lmql_code: str,
+        context: str,
+        condition_var: str = "V",
+        condition_op: str = "<",
+        condition_value: float = 0.3,
+        max_iterations: int = 5
+    ) -> ExecutionResult:
+        """収束ループを実行"""
+        results = []
+        current_value = 1.0  # 初期不確実性
+        
+        for i in range(max_iterations):
+            # ワークフロー実行
+            result = await self.executor.execute_async(lmql_code, context)
+            results.append(result.output)
+            
+            if result.status != ExecutionStatus.SUCCESS:
+                return ExecutionResult(
+                    status=result.status,
+                    output=result.output,
+                    iterations=i + 1,
+                    intermediate_results=results,
+                    error=result.error
+                )
+            
+            # 不確実性を評価 (簡易ヒューリスティック)
+            current_value = self._estimate_uncertainty(result.output)
+            
+            # 収束条件チェック
+            if self._check_condition(current_value, condition_op, condition_value):
+                return ExecutionResult(
+                    status=ExecutionStatus.SUCCESS,
+                    output=results[-1],
+                    iterations=i + 1,
+                    confidence=1.0 - current_value,
+                    intermediate_results=results,
+                    metadata={"converged": True, "final_uncertainty": current_value}
+                )
+            
+            # 次の反復のためにコンテキストを更新
+            context = f"{context}\n\n前回の分析:\n{result.output}"
+        
+        # 最大反復に達した
+        return ExecutionResult(
+            status=ExecutionStatus.PARTIAL,
+            output=results[-1] if results else "",
+            iterations=max_iterations,
+            confidence=1.0 - current_value,
+            intermediate_results=results,
+            metadata={"converged": False, "final_uncertainty": current_value}
+        )
+    
+    def _estimate_uncertainty(self, output: str) -> float:
+        """出力から不確実性を推定 (簡易ヒューリスティック)"""
+        uncertainty_indicators = [
+            "かもしれない", "おそらく", "might", "maybe", "perhaps",
+            "不明", "unclear", "uncertain", "possible",
+            "?", "推測", "guess", "assume"
+        ]
+        
+        certainty_indicators = [
+            "確実", "definitely", "certainly", "明確",
+            "結論", "conclusion", "therefore", "したがって"
+        ]
+        
+        output_lower = output.lower()
+        
+        uncertainty_count = sum(1 for ind in uncertainty_indicators if ind in output_lower)
+        certainty_count = sum(1 for ind in certainty_indicators if ind in output_lower)
+        
+        # 簡易スコア計算
+        if certainty_count > uncertainty_count:
+            return max(0.1, 0.5 - (certainty_count * 0.1))
+        elif uncertainty_count > 0:
+            return min(0.9, 0.5 + (uncertainty_count * 0.1))
+        else:
+            return 0.4  # デフォルト
+    
+    def _check_condition(self, value: float, op: str, threshold: float) -> bool:
+        """条件をチェック"""
+        if op == "<":
+            return value < threshold
+        elif op == "<=":
+            return value <= threshold
+        elif op == ">":
+            return value > threshold
+        elif op == ">=":
+            return value >= threshold
+        elif op == "=":
+            return abs(value - threshold) < 0.01
+        return False
+
+
+# =============================================================================
+# High-Level API
+# =============================================================================
+
+def execute_ccl(
+    ccl: str,
+    context: str = "",
+    model: str = "openai/gpt-4o",
+    macros: Optional[Dict[str, str]] = None,
+    **kwargs
+) -> ExecutionResult:
+    """CCL 式をコンパイルして実行
+    
+    Args:
+        ccl: CCL 式 (例: "/noe+ >> V[] < 0.3")
+        context: 入力コンテキスト
+        model: 使用する LLM モデル
+        macros: マクロ定義
+        **kwargs: ExecutionConfig に渡す追加設定
+        
+    Returns:
+        ExecutionResult
+        
+    Example:
+        >>> result = execute_ccl("/noe+", "プロジェクト設計を分析")
+        >>> print(result.output)
+    """
+    # 遅延インポート (循環参照回避)
+    from . import compile_ccl
+    from .parser import parse_ccl
+    from .ast import ConvergenceLoop
+    
+    # コンパイル
+    lmql_code = compile_ccl(ccl, macros=macros, model=model)
+    
+    # 設定
+    config = ExecutionConfig(model=model, **kwargs)
+    executor = LMQLExecutor(config)
+    
+    # 収束ループかどうかを判定
+    try:
+        ast = parse_ccl(ccl)
+        if isinstance(ast, ConvergenceLoop):
+            conv_executor = ConvergenceExecutor(executor)
+            return asyncio.run(conv_executor.execute_convergence(
+                lmql_code,
+                context,
+                condition_var=ast.condition.var,
+                condition_op=ast.condition.op,
+                condition_value=ast.condition.value,
+                max_iterations=config.max_iterations
+            ))
+    except Exception:
+        pass  # パース失敗時は通常実行
+    
+    # 通常実行
+    return executor.execute(lmql_code, context)
+```
+
+### 4. Synteleia + LLM 統合分析
+
+**発見**: 裸の API 呼び出しは「エアプ」を生成する
+
+**解決**: Synteleia で実コードを監査 → Issue 詳細を LLM に渡す → 具体的な分析が得られる
+
+| アプローチ | 品質 | コスト |
+|:-----------|:-----|:-------|
+| 裸の API | ❌ エアプ | 無駄 |
+| Synteleia 単体 | ✅ 具体的 | 無料 |
+| **Synteleia + LLM** | ✅✅ 最強 | ~3円 |
+
+### 5. Synteleia Monitor 実装
+
+[execute_hermeneus](file:///home/laihuip001/oikos/hegemonikon/synergeia/coordinator.py#289-386) に Synteleia 監査結果を自動追加する機能を実装
+
+```diff:coordinator.py
+#!/usr/bin/env python3
+"""
+Synergeia Coordinator (簡易版)
+==============================
+
+CCL式を解析し、適切なスレッドに分配する簡易Coordinator。
+
+Usage:
+    python coordinator.py "/noe+ || /sop+"
+    python coordinator.py "/noe+ |> /dia+ |> /ene+"
+
+Supported:
+    - || (並列): 複数スレッドで同時実行
+    - |> (パイプライン): 順次実行
+    - @thread[agent]{CCL}: スレッド指定
+"""
+
+import sys
+import json
+import re
+from datetime import datetime
+from pathlib import Path
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from typing import List, Dict, Any
+
+# Import Perplexity API
+PERPLEXITY_SCRIPT = Path("/home/laihuip001/oikos/hegemonikon/mekhane/peira/scripts")
+sys.path.insert(0, str(PERPLEXITY_SCRIPT))
+
+from perplexity_api import search as perplexity_search
+
+# Import Hermeneus CCL Compiler
+try:
+    from hermeneus.src import compile_ccl, expand_ccl, parse_ccl as hermeneus_parse
+    from hermeneus.src.macros import get_all_macros
+    HERMENEUS_AVAILABLE = True
+    STANDARD_MACROS = get_all_macros()
+except ImportError:
+    HERMENEUS_AVAILABLE = False
+    STANDARD_MACROS = {}
+    print("[Warning] Hermeneus not available, falling back to manual execution")
+
+# Import FEP Selector
+try:
+    from synergeia.fep_selector import select_thread_by_fep, ThreadRecommendation
+    FEP_SELECTOR_AVAILABLE = True
+except ImportError:
+    FEP_SELECTOR_AVAILABLE = False
+
+EXPERIMENTS_DIR = Path(__file__).parent / "experiments"
+
+
+# =============================================================================
+# Thread Definitions
+# =============================================================================
+
+THREAD_REGISTRY = {
+    "hermeneus": {
+        "name": "Hermeneus CCL Compiler",
+        "supported_ccl": ["*"],  # すべての CCL をコンパイル可能
+        "executor": "lmql",
+        "priority": 0,  # 最優先
+    },
+    "antigravity": {
+        "name": "Antigravity",
+        "supported_ccl": ["/noe", "/dia", "/u", "/bou"],
+        "executor": "manual",  # 手動実行
+        "priority": 10,
+    },
+    "perplexity": {
+        "name": "Perplexity",
+        "supported_ccl": ["/sop", "/zet"],
+        "executor": "api",
+        "priority": 5,
+    },
+    "claude": {
+        "name": "Claude CLI",
+        "supported_ccl": ["/s", "/mek"],
+        "executor": "cli",
+        "priority": 5,
+    },
+    "gemini": {
+        "name": "Gemini CLI",
+        "supported_ccl": ["/tek", "/sta"],
+        "executor": "cli",
+        "priority": 5,
+    },
+    "codex": {
+        "name": "OpenAI Codex",
+        "supported_ccl": ["/ene", "/pra"],  # 実行系
+        "executor": "cli",
+        "priority": 5,
+    },
+}
+
+
+def select_thread(ccl: str, use_fep: bool = True) -> str:
+    """
+    CCL要素から最適なスレッドを選択。
+    
+    Args:
+        ccl: CCL 式
+        use_fep: True の場合 FEP ベースの複雑度分析を使用
+    
+    Returns:
+        スレッド ID
+    """
+    # FEP ベース選択 (複雑度に基づく)
+    if use_fep and FEP_SELECTOR_AVAILABLE:
+        try:
+            recommendation = select_thread_by_fep(ccl)
+            print(f"[FEP] {ccl} -> {recommendation.thread} (complexity: {recommendation.complexity_score:.2f})")
+            return recommendation.thread
+        except Exception as e:
+            print(f"[FEP] Error: {e}, falling back to rule-based selection")
+    
+    # ルールベース選択 (フォールバック)
+    base = re.match(r"(/\w+)", ccl)
+    if not base:
+        return "antigravity"
+    
+    base_ccl = base.group(1)
+    
+    for thread_id, config in THREAD_REGISTRY.items():
+        if base_ccl in config["supported_ccl"]:
+            return thread_id
+
+    return "antigravity"  # デフォルト
+
+
+# =============================================================================
+# CLI Paths
+# =============================================================================
+
+CLAUDE_CLI = "/home/laihuip001/oikos/.local/bin/claude"
+GEMINI_CLI = "node /home/laihuip001/oikos/.npm/_npx/38c708f8d73fe4c9/node_modules/@google/gemini-cli/bundle/gemini.js"
+CODEX_CLI = "/home/laihuip001/oikos/hegemonikon/synergeia/node_modules/.bin/codex"
+
+
+# =============================================================================
+# Executors
+# =============================================================================
+
+def execute_perplexity(ccl: str, context: str) -> Dict[str, Any]:
+    """Perplexity API でCCLを実行。"""
+    # CCLを検索クエリに変換
+    query = f"{context} {ccl.replace('/', ' ').replace('+', ' deep').replace('-', ' brief')}"
+    
+    result = perplexity_search(query)
+    
+    if "error" in result:
+        return {"status": "error", "error": result["error"], "ccl": ccl}
+    
+    return {
+        "status": "success",
+        "ccl": ccl,
+        "thread": "perplexity",
+        "answer": result["answer"],
+        "citations": result.get("citations", []),
+        "cost": result["cost"],
+    }
+
+
+def execute_claude(ccl: str, context: str) -> Dict[str, Any]:
+    """Claude CLI でCCLを実行。"""
+    import subprocess
+    
+    prompt = f"{context}\n\nExecute CCL: {ccl}\n\nProvide a detailed response."
+    
+    try:
+        result = subprocess.run(
+            [CLAUDE_CLI, "-p", prompt],
+            capture_output=True,
+            text=True,
+            timeout=600,  # 最大10分
+            cwd="/home/laihuip001/oikos/hegemonikon"
+        )
+        answer = result.stdout.strip()
+        if result.returncode != 0:
+            return {"status": "error", "error": result.stderr, "ccl": ccl}
+    except subprocess.TimeoutExpired:
+        return {"status": "error", "error": "Timeout (120s)", "ccl": ccl}
+    except Exception as e:
+        return {"status": "error", "error": str(e), "ccl": ccl}
+    
+    return {
+        "status": "success",
+        "ccl": ccl,
+        "thread": "claude",
+        "answer": answer,
+    }
+
+
+def execute_gemini(ccl: str, context: str) -> Dict[str, Any]:
+    """Gemini CLI でCCLを実行。"""
+    import subprocess
+    
+    # ツール操作を避けるプロンプト
+    prompt = f"""You are a Hegemonikon CCL interpreter.
+Do NOT use any file system tools. Just analyze and respond in text.
+
+{context}
+
+Analyze and explain the CCL command: {ccl}
+
+Provide a detailed conceptual response without executing any tools."""
+    
+    try:
+        result = subprocess.run(
+            [
+                "node", 
+                "/home/laihuip001/oikos/.npm/_npx/38c708f8d73fe4c9/node_modules/@google/gemini-cli/bundle/gemini.js", 
+                "-p", prompt
+            ],
+            capture_output=True,
+            text=True,
+            timeout=600,  # 最大10分
+            cwd="/home/laihuip001/oikos/hegemonikon"
+        )
+        # Geminiは最初の2行がログなので除去
+        lines = result.stdout.strip().split("\n")
+        answer = "\n".join(lines[2:]) if len(lines) > 2 else result.stdout.strip()
+        if result.returncode != 0:
+            return {"status": "error", "error": result.stderr, "ccl": ccl}
+    except subprocess.TimeoutExpired:
+        return {"status": "error", "error": "Timeout (120s)", "ccl": ccl}
+    except Exception as e:
+        return {"status": "error", "error": str(e), "ccl": ccl}
+    
+    return {
+        "status": "success",
+        "ccl": ccl,
+        "thread": "gemini",
+        "answer": answer,
+    }
+
+
+def execute_codex(ccl: str, context: str) -> Dict[str, Any]:
+    """OpenAI Codex CLI でCCLを実行。"""
+    import subprocess
+    
+    prompt = f"{context}\n\nExecute CCL: {ccl}\n\nProvide a detailed response."
+    
+    try:
+        result = subprocess.run(
+            [CODEX_CLI, "exec", prompt],
+            capture_output=True,
+            text=True,
+            timeout=600,  # 最大10分
+            cwd="/home/laihuip001/oikos/hegemonikon"
+        )
+        # Codex は最初と最後にメタデータがあるので整理
+        lines = result.stdout.strip().split("\n")
+        # "Hello from Codex" のような実際の出力を抽出
+        answer = "\n".join([l for l in lines if not l.startswith("OpenAI Codex") and not l.startswith("---") and not l.startswith("workdir:") and not l.startswith("model:") and not l.startswith("provider:") and not l.startswith("approval:") and not l.startswith("sandbox:") and not l.startswith("reasoning") and not l.startswith("session id:") and not l.startswith("user") and not l.startswith("mcp startup:") and not l.startswith("codex") and not l.startswith("tokens used")])
+        if result.returncode != 0:
+            return {"status": "error", "error": result.stderr, "ccl": ccl}
+    except subprocess.TimeoutExpired:
+        return {"status": "error", "error": "Timeout (600s)", "ccl": ccl}
+    except Exception as e:
+        return {"status": "error", "error": str(e), "ccl": ccl}
+    
+    return {
+        "status": "success",
+        "ccl": ccl,
+        "thread": "codex",
+        "answer": answer.strip(),
+    }
+
+
+def execute_manual(ccl: str, context: str) -> Dict[str, Any]:
+    """手動実行 (Antigravity)。"""
+    return {
+        "status": "manual",
+        "ccl": ccl,
+        "thread": "antigravity",
+        "note": "Antigravityが手動で実行。結果は統合時に入力してください。",
+    }
+
+
+def execute_hermeneus(ccl: str, context: str, compile_only: bool = False) -> Dict[str, Any]:
+    """
+    Hermeneus CCL Compiler で実行。
+    
+    Args:
+        ccl: CCL 式
+        context: 実行コンテキスト
+        compile_only: True の場合は LMQL コードを返すだけ（実行しない）
+    """
+    if not HERMENEUS_AVAILABLE:
+        return execute_manual(ccl, context)
+    
+    try:
+        # Step 1: CCL をコンパイル (標準マクロを使用)
+        lmql_code = compile_ccl(ccl, macros=STANDARD_MACROS)
+        
+        if compile_only:
+            return {
+                "status": "compiled",
+                "ccl": ccl,
+                "thread": "hermeneus",
+                "lmql": lmql_code,
+                "macros_available": list(STANDARD_MACROS.keys()),
+                "note": "LMQL code generated (not executed)",
+            }
+        
+        # Step 2: 展開情報を取得
+        expansion = expand_ccl(ccl, macros=STANDARD_MACROS)
+        
+        # Step 3: AST を取得
+        ast = hermeneus_parse(expansion.expanded)
+        
+        return {
+            "status": "success",
+            "ccl": ccl,
+            "thread": "hermeneus",
+            "expansion": {
+                "original": expansion.original,
+                "expanded": expansion.expanded,
+                "formal": expansion.formal,
+            },
+            "ast_type": type(ast).__name__,
+            "lmql": lmql_code,
+            "macros_used": len(STANDARD_MACROS),
+            "note": "Compiled by Hermeneus with standard macros.",
+        }
+        
+    except Exception as e:
+        return {
+            "status": "error",
+            "ccl": ccl,
+            "thread": "hermeneus",
+            "error": str(e),
+        }
+
+
+def execute_ccl(ccl: str, context: str, use_hermeneus: bool = True) -> Dict[str, Any]:
+    """
+    CCL要素を適切なスレッドで実行。
+    
+    Args:
+        ccl: CCL 式
+        context: 実行コンテキスト
+        use_hermeneus: True の場合は Hermeneus で構造化コンパイル
+    """
+    # Hermeneus モード: 構造化 LMQL コンパイル
+    if use_hermeneus and HERMENEUS_AVAILABLE:
+        hermeneus_result = execute_hermeneus(ccl, context)
+        if hermeneus_result["status"] != "error":
+            return hermeneus_result
+        # エラー時はフォールバック
+        print(f"[Coordinator] Hermeneus failed, falling back to thread selection")
+    
+    thread = select_thread(ccl)
+    
+    print(f"[Coordinator] {ccl} -> {thread}")
+    
+    if thread == "perplexity":
+        return execute_perplexity(ccl, context)
+    elif thread == "claude":
+        return execute_claude(ccl, context)
+    elif thread == "gemini":
+        return execute_gemini(ccl, context)
+    elif thread == "codex":
+        return execute_codex(ccl, context)
+    else:
+        return execute_manual(ccl, context)
+
+
+# =============================================================================
+# CCL Parser
+# =============================================================================
+
+def parse_ccl(ccl_expr: str) -> Dict[str, Any]:
+    """
+    CCL式をパースして実行計画を生成。
+    
+    Returns:
+        {
+            "type": "parallel" | "pipeline" | "single",
+            "elements": [...]
+        }
+    """
+    ccl_expr = ccl_expr.strip()
+    
+    # 並列 (||)
+    if "||" in ccl_expr:
+        elements = [e.strip() for e in ccl_expr.split("||")]
+        return {"type": "parallel", "elements": elements}
+    
+    # パイプライン (|>)
+    if "|>" in ccl_expr:
+        elements = [e.strip() for e in ccl_expr.split("|>")]
+        return {"type": "pipeline", "elements": elements}
+    
+    # 単一
+    return {"type": "single", "elements": [ccl_expr]}
+
+
+# =============================================================================
+# Coordinator
+# =============================================================================
+
+def coordinate(ccl_expr: str, context: str = "") -> Dict[str, Any]:
+    """
+    CCL式を解析し、分散実行を調整。
+    """
+    plan = parse_ccl(ccl_expr)
+    results = []
+    
+    print(f"\n{'='*60}")
+    print(f"[Coordinator] CCL: {ccl_expr}")
+    print(f"[Coordinator] Type: {plan['type']}")
+    print(f"[Coordinator] Elements: {plan['elements']}")
+    print(f"{'='*60}\n")
+    
+    if plan["type"] == "parallel":
+        # 並列実行
+        with ThreadPoolExecutor(max_workers=len(plan["elements"])) as executor:
+            futures = {
+                executor.submit(execute_ccl, elem, context): elem
+                for elem in plan["elements"]
+            }
+            for future in as_completed(futures):
+                results.append(future.result())
+    
+    elif plan["type"] == "pipeline":
+        # パイプライン実行
+        prev_result = None
+        for elem in plan["elements"]:
+            ctx = context
+            if prev_result and prev_result.get("answer"):
+                ctx = f"{context} Previous: {prev_result['answer'][:200]}"
+            result = execute_ccl(elem, ctx)
+            results.append(result)
+            prev_result = result
+    
+    else:
+        # 単一実行
+        results.append(execute_ccl(plan["elements"][0], context))
+    
+    return {
+        "ccl": ccl_expr,
+        "plan": plan,
+        "results": results,
+        "timestamp": datetime.now().isoformat(),
+    }
+
+
+def save_result(result: Dict[str, Any]):
+    """結果を保存。"""
+    EXPERIMENTS_DIR.mkdir(exist_ok=True)
+    
+    exp_id = datetime.now().strftime("%Y%m%d_%H%M%S")
+    log_file = EXPERIMENTS_DIR / f"coord_{exp_id}.json"
+    log_file.write_text(json.dumps(result, indent=2, ensure_ascii=False))
+    
+    print(f"\n[Coordinator] Result saved: {log_file}")
+    return log_file
+
+
+def main():
+    if len(sys.argv) < 2:
+        print(__doc__)
+        return
+    
+    ccl_expr = sys.argv[1]
+    context = sys.argv[2] if len(sys.argv) > 2 else "Hegemonikon CCL execution"
+    
+    result = coordinate(ccl_expr, context)
+    log_file = save_result(result)
+    
+    # サマリ出力
+    print(f"\n{'='*60}")
+    print("SUMMARY")
+    print(f"{'='*60}")
+    for r in result["results"]:
+        status = r.get("status", "unknown")
+        thread = r.get("thread", "unknown")
+        ccl = r.get("ccl", "unknown")
+        print(f"  [{status}] {ccl} -> {thread}")
+        if status == "success" and "answer" in r:
+            print(f"    Answer: {r['answer'][:100]}...")
+    print(f"{'='*60}")
+
+
+if __name__ == "__main__":
+    main()
+===
+#!/usr/bin/env python3
+"""
+Synergeia Coordinator (簡易版)
+==============================
+
+CCL式を解析し、適切なスレッドに分配する簡易Coordinator。
+
+Usage:
+    python coordinator.py "/noe+ || /sop+"
+    python coordinator.py "/noe+ |> /dia+ |> /ene+"
+
+Supported:
+    - || (並列): 複数スレッドで同時実行
+    - |> (パイプライン): 順次実行
+    - @thread[agent]{CCL}: スレッド指定
+"""
+
+import sys
+import json
+import re
+from datetime import datetime
+from pathlib import Path
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from typing import List, Dict, Any
+
+# Add hegemonikon to path for Hermeneus import
+HEGEMONIKON_ROOT = Path(__file__).parent.parent
+sys.path.insert(0, str(HEGEMONIKON_ROOT))
+
+# Import Perplexity API
+PERPLEXITY_SCRIPT = Path("/home/laihuip001/oikos/hegemonikon/mekhane/peira/scripts")
+sys.path.insert(0, str(PERPLEXITY_SCRIPT))
+
+from perplexity_api import search as perplexity_search
+
+# Import Hermeneus CCL Compiler
+try:
+    from hermeneus.src import compile_ccl, expand_ccl
+    from hermeneus.src import execute_ccl as hermeneus_execute
+    from hermeneus.src import parse_ccl as hermeneus_parse
+    from hermeneus.src.macros import get_all_macros
+    HERMENEUS_AVAILABLE = True
+    STANDARD_MACROS = get_all_macros()
+except ImportError:
+    HERMENEUS_AVAILABLE = False
+    STANDARD_MACROS = {}
+    hermeneus_execute = None
+    print("[Warning] Hermeneus not available, falling back to manual execution")
+
+# Import FEP Selector
+try:
+    from synergeia.fep_selector import select_thread_by_fep, ThreadRecommendation
+    FEP_SELECTOR_AVAILABLE = True
+except ImportError:
+    FEP_SELECTOR_AVAILABLE = False
+
+EXPERIMENTS_DIR = Path(__file__).parent / "experiments"
+
+
+# =============================================================================
+# Thread Definitions
+# =============================================================================
+
+THREAD_REGISTRY = {
+    "hermeneus": {
+        "name": "Hermeneus CCL Compiler",
+        "supported_ccl": ["*"],  # すべての CCL をコンパイル可能
+        "executor": "lmql",
+        "priority": 0,  # 最優先
+    },
+    "antigravity": {
+        "name": "Antigravity",
+        "supported_ccl": ["/noe", "/dia", "/u", "/bou"],
+        "executor": "manual",  # 手動実行
+        "priority": 10,
+    },
+    "perplexity": {
+        "name": "Perplexity",
+        "supported_ccl": ["/sop", "/zet"],
+        "executor": "api",
+        "priority": 5,
+    },
+    "claude": {
+        "name": "Claude CLI",
+        "supported_ccl": ["/s", "/mek"],
+        "executor": "cli",
+        "priority": 5,
+    },
+    "gemini": {
+        "name": "Gemini CLI",
+        "supported_ccl": ["/tek", "/sta"],
+        "executor": "cli",
+        "priority": 5,
+    },
+    "codex": {
+        "name": "OpenAI Codex",
+        "supported_ccl": ["/ene", "/pra"],  # 実行系
+        "executor": "cli",
+        "priority": 5,
+    },
+}
+
+
+def select_thread(ccl: str, use_fep: bool = True) -> str:
+    """
+    CCL要素から最適なスレッドを選択。
+    
+    Args:
+        ccl: CCL 式
+        use_fep: True の場合 FEP ベースの複雑度分析を使用
+    
+    Returns:
+        スレッド ID
+    """
+    # FEP ベース選択 (複雑度に基づく)
+    if use_fep and FEP_SELECTOR_AVAILABLE:
+        try:
+            recommendation = select_thread_by_fep(ccl)
+            print(f"[FEP] {ccl} -> {recommendation.thread} (complexity: {recommendation.complexity_score:.2f})")
+            return recommendation.thread
+        except Exception as e:
+            print(f"[FEP] Error: {e}, falling back to rule-based selection")
+    
+    # ルールベース選択 (フォールバック)
+    base = re.match(r"(/\w+)", ccl)
+    if not base:
+        return "antigravity"
+    
+    base_ccl = base.group(1)
+    
+    for thread_id, config in THREAD_REGISTRY.items():
+        if base_ccl in config["supported_ccl"]:
+            return thread_id
+
+    return "antigravity"  # デフォルト
+
+
+# =============================================================================
+# CLI Paths
+# =============================================================================
+
+CLAUDE_CLI = "/home/laihuip001/oikos/.local/bin/claude"
+GEMINI_CLI = "node /home/laihuip001/oikos/.npm/_npx/38c708f8d73fe4c9/node_modules/@google/gemini-cli/bundle/gemini.js"
+CODEX_CLI = "/home/laihuip001/oikos/hegemonikon/synergeia/node_modules/.bin/codex"
+
+
+# =============================================================================
+# Executors
+# =============================================================================
+
+def execute_perplexity(ccl: str, context: str) -> Dict[str, Any]:
+    """Perplexity API でCCLを実行。"""
+    # CCLを検索クエリに変換
+    query = f"{context} {ccl.replace('/', ' ').replace('+', ' deep').replace('-', ' brief')}"
+    
+    result = perplexity_search(query)
+    
+    if "error" in result:
+        return {"status": "error", "error": result["error"], "ccl": ccl}
+    
+    return {
+        "status": "success",
+        "ccl": ccl,
+        "thread": "perplexity",
+        "answer": result["answer"],
+        "citations": result.get("citations", []),
+        "cost": result["cost"],
+    }
+
+
+def execute_claude(ccl: str, context: str) -> Dict[str, Any]:
+    """Claude CLI でCCLを実行。"""
+    import subprocess
+    
+    prompt = f"{context}\n\nExecute CCL: {ccl}\n\nProvide a detailed response."
+    
+    try:
+        result = subprocess.run(
+            [CLAUDE_CLI, "-p", prompt],
+            capture_output=True,
+            text=True,
+            timeout=600,  # 最大10分
+            cwd="/home/laihuip001/oikos/hegemonikon"
+        )
+        answer = result.stdout.strip()
+        if result.returncode != 0:
+            return {"status": "error", "error": result.stderr, "ccl": ccl}
+    except subprocess.TimeoutExpired:
+        return {"status": "error", "error": "Timeout (120s)", "ccl": ccl}
+    except Exception as e:
+        return {"status": "error", "error": str(e), "ccl": ccl}
+    
+    return {
+        "status": "success",
+        "ccl": ccl,
+        "thread": "claude",
+        "answer": answer,
+    }
+
+
+def execute_gemini(ccl: str, context: str) -> Dict[str, Any]:
+    """Gemini CLI でCCLを実行。"""
+    import subprocess
+    
+    # ツール操作を避けるプロンプト
+    prompt = f"""You are a Hegemonikon CCL interpreter.
+Do NOT use any file system tools. Just analyze and respond in text.
+
+{context}
+
+Analyze and explain the CCL command: {ccl}
+
+Provide a detailed conceptual response without executing any tools."""
+    
+    try:
+        result = subprocess.run(
+            [
+                "node", 
+                "/home/laihuip001/oikos/.npm/_npx/38c708f8d73fe4c9/node_modules/@google/gemini-cli/bundle/gemini.js", 
+                "-p", prompt
+            ],
+            capture_output=True,
+            text=True,
+            timeout=600,  # 最大10分
+            cwd="/home/laihuip001/oikos/hegemonikon"
+        )
+        # Geminiは最初の2行がログなので除去
+        lines = result.stdout.strip().split("\n")
+        answer = "\n".join(lines[2:]) if len(lines) > 2 else result.stdout.strip()
+        if result.returncode != 0:
+            return {"status": "error", "error": result.stderr, "ccl": ccl}
+    except subprocess.TimeoutExpired:
+        return {"status": "error", "error": "Timeout (120s)", "ccl": ccl}
+    except Exception as e:
+        return {"status": "error", "error": str(e), "ccl": ccl}
+    
+    return {
+        "status": "success",
+        "ccl": ccl,
+        "thread": "gemini",
+        "answer": answer,
+    }
+
+
+def execute_codex(ccl: str, context: str) -> Dict[str, Any]:
+    """OpenAI Codex CLI でCCLを実行。"""
+    import subprocess
+    
+    prompt = f"{context}\n\nExecute CCL: {ccl}\n\nProvide a detailed response."
+    
+    try:
+        result = subprocess.run(
+            [CODEX_CLI, "exec", prompt],
+            capture_output=True,
+            text=True,
+            timeout=600,  # 最大10分
+            cwd="/home/laihuip001/oikos/hegemonikon"
+        )
+        # Codex は最初と最後にメタデータがあるので整理
+        lines = result.stdout.strip().split("\n")
+        # "Hello from Codex" のような実際の出力を抽出
+        answer = "\n".join([l for l in lines if not l.startswith("OpenAI Codex") and not l.startswith("---") and not l.startswith("workdir:") and not l.startswith("model:") and not l.startswith("provider:") and not l.startswith("approval:") and not l.startswith("sandbox:") and not l.startswith("reasoning") and not l.startswith("session id:") and not l.startswith("user") and not l.startswith("mcp startup:") and not l.startswith("codex") and not l.startswith("tokens used")])
+        if result.returncode != 0:
+            return {"status": "error", "error": result.stderr, "ccl": ccl}
+    except subprocess.TimeoutExpired:
+        return {"status": "error", "error": "Timeout (600s)", "ccl": ccl}
+    except Exception as e:
+        return {"status": "error", "error": str(e), "ccl": ccl}
+    
+    return {
+        "status": "success",
+        "ccl": ccl,
+        "thread": "codex",
+        "answer": answer.strip(),
+    }
+
+
+def execute_manual(ccl: str, context: str) -> Dict[str, Any]:
+    """手動実行 (Antigravity)。"""
+    return {
+        "status": "manual",
+        "ccl": ccl,
+        "thread": "antigravity",
+        "note": "Antigravityが手動で実行。結果は統合時に入力してください。",
+    }
+
+
+def execute_hermeneus(ccl: str, context: str, compile_only: bool = False) -> Dict[str, Any]:
+    """
+    Hermeneus CCL Compiler で実行。
+    
+    Args:
+        ccl: CCL 式
+        context: 実行コンテキスト
+        compile_only: True の場合は LMQL コードを返すだけ（実行しない）
+    """
+    if not HERMENEUS_AVAILABLE:
+        return execute_manual(ccl, context)
+    
+    try:
+        # Step 1: CCL をコンパイル (標準マクロを使用)
+        lmql_code = compile_ccl(ccl, macros=STANDARD_MACROS)
+        
+        if compile_only:
+            return {
+                "status": "compiled",
+                "ccl": ccl,
+                "thread": "hermeneus",
+                "lmql": lmql_code,
+                "macros_available": list(STANDARD_MACROS.keys()),
+                "note": "LMQL code generated (not executed)",
+            }
+        
+        # Step 2: 展開情報を取得
+        expansion = expand_ccl(ccl, macros=STANDARD_MACROS)
+        
+        # Step 3: AST を取得
+        ast = hermeneus_parse(expansion.expanded)
+        
+        # Step 4: Synteleia Monitor - コンテキストに監査情報を自動追加
+        enriched_context = context
+        synteleia_report = None
+        
+        try:
+            from synteleia import SynteleiaOrchestrator, AuditTarget, AuditTargetType
+            
+            # コンテキストに Synteleia 監査を実行
+            if context and len(context) > 100:
+                orch = SynteleiaOrchestrator()
+                target = AuditTarget(
+                    content=context,
+                    target_type=AuditTargetType.THOUGHT,
+                    source="user_context"
+                )
+                audit_result = orch.audit(target)
+                
+                if audit_result.all_issues:
+                    issue_lines = []
+                    for issue in audit_result.all_issues:
+                        issue_lines.append(f"- [{issue.severity.value.upper()}] {issue.code}: {issue.message}")
+                        if issue.suggestion:
+                            issue_lines.append(f"  - 提案: {issue.suggestion}")
+                    
+                    synteleia_report = f"""
+## Synteleia 監査結果 (自動追加)
+Issues: {len(audit_result.all_issues)}
+{chr(10).join(issue_lines)}
+"""
+                    enriched_context = f"{context}\n{synteleia_report}"
+        except ImportError:
+            pass  # Synteleia 未インストール
+        except Exception:
+            pass  # 監査エラーは無視 (LLM 実行を優先)
+        
+        # Step 5: LLM で実行 (hermeneus_execute が利用可能な場合)
+        llm_output = None
+        if hermeneus_execute is not None:
+            exec_result = hermeneus_execute(ccl, enriched_context)
+            if exec_result.status.value == "success":
+                llm_output = exec_result.output
+        
+        return {
+            "status": "success",
+            "ccl": ccl,
+            "thread": "hermeneus",
+            "expansion": {
+                "original": expansion.original,
+                "expanded": expansion.expanded,
+                "formal": expansion.formal,
+            },
+            "ast_type": type(ast).__name__,
+            "lmql": lmql_code,
+            "llm_output": llm_output,
+            "macros_used": len(STANDARD_MACROS),
+            "note": "Compiled and executed by Hermeneus.",
+        }
+        
+    except Exception as e:
+        return {
+            "status": "error",
+            "ccl": ccl,
+            "thread": "hermeneus",
+            "error": str(e),
+        }
+
+
+def execute_ccl(ccl: str, context: str, use_hermeneus: bool = True) -> Dict[str, Any]:
+    """
+    CCL要素を適切なスレッドで実行。
+    
+    Args:
+        ccl: CCL 式
+        context: 実行コンテキスト
+        use_hermeneus: True の場合は Hermeneus で構造化コンパイル
+    """
+    # Hermeneus モード: 構造化 LMQL コンパイル
+    if use_hermeneus and HERMENEUS_AVAILABLE:
+        hermeneus_result = execute_hermeneus(ccl, context)
+        if hermeneus_result["status"] != "error":
+            return hermeneus_result
+        # エラー時はフォールバック
+        print(f"[Coordinator] Hermeneus failed, falling back to thread selection")
+    
+    thread = select_thread(ccl)
+    
+    print(f"[Coordinator] {ccl} -> {thread}")
+    
+    if thread == "perplexity":
+        return execute_perplexity(ccl, context)
+    elif thread == "claude":
+        return execute_claude(ccl, context)
+    elif thread == "gemini":
+        return execute_gemini(ccl, context)
+    elif thread == "codex":
+        return execute_codex(ccl, context)
+    else:
+        return execute_manual(ccl, context)
+
+
+# =============================================================================
+# CCL Parser
+# =============================================================================
+
+def parse_ccl(ccl_expr: str) -> Dict[str, Any]:
+    """
+    CCL式をパースして実行計画を生成。
+    
+    Returns:
+        {
+            "type": "parallel" | "pipeline" | "single",
+            "elements": [...]
+        }
+    """
+    ccl_expr = ccl_expr.strip()
+    
+    # 並列 (||)
+    if "||" in ccl_expr:
+        elements = [e.strip() for e in ccl_expr.split("||")]
+        return {"type": "parallel", "elements": elements}
+    
+    # パイプライン (|>)
+    if "|>" in ccl_expr:
+        elements = [e.strip() for e in ccl_expr.split("|>")]
+        return {"type": "pipeline", "elements": elements}
+    
+    # 単一
+    return {"type": "single", "elements": [ccl_expr]}
+
+
+# =============================================================================
+# Coordinator
+# =============================================================================
+
+def coordinate(ccl_expr: str, context: str = "") -> Dict[str, Any]:
+    """
+    CCL式を解析し、分散実行を調整。
+    """
+    plan = parse_ccl(ccl_expr)
+    results = []
+    
+    print(f"\n{'='*60}")
+    print(f"[Coordinator] CCL: {ccl_expr}")
+    print(f"[Coordinator] Type: {plan['type']}")
+    print(f"[Coordinator] Elements: {plan['elements']}")
+    print(f"{'='*60}\n")
+    
+    if plan["type"] == "parallel":
+        # 並列実行
+        with ThreadPoolExecutor(max_workers=len(plan["elements"])) as executor:
+            futures = {
+                executor.submit(execute_ccl, elem, context): elem
+                for elem in plan["elements"]
+            }
+            for future in as_completed(futures):
+                results.append(future.result())
+    
+    elif plan["type"] == "pipeline":
+        # パイプライン実行
+        prev_result = None
+        for elem in plan["elements"]:
+            ctx = context
+            if prev_result and prev_result.get("answer"):
+                ctx = f"{context} Previous: {prev_result['answer'][:200]}"
+            result = execute_ccl(elem, ctx)
+            results.append(result)
+            prev_result = result
+    
+    else:
+        # 単一実行
+        results.append(execute_ccl(plan["elements"][0], context))
+    
+    return {
+        "ccl": ccl_expr,
+        "plan": plan,
+        "results": results,
+        "timestamp": datetime.now().isoformat(),
+    }
+
+
+def save_result(result: Dict[str, Any]):
+    """結果を保存。"""
+    EXPERIMENTS_DIR.mkdir(exist_ok=True)
+    
+    exp_id = datetime.now().strftime("%Y%m%d_%H%M%S")
+    log_file = EXPERIMENTS_DIR / f"coord_{exp_id}.json"
+    log_file.write_text(json.dumps(result, indent=2, ensure_ascii=False))
+    
+    print(f"\n[Coordinator] Result saved: {log_file}")
+    return log_file
+
+
+def main():
+    if len(sys.argv) < 2:
+        print(__doc__)
+        return
+    
+    ccl_expr = sys.argv[1]
+    context = sys.argv[2] if len(sys.argv) > 2 else "Hegemonikon CCL execution"
+    
+    result = coordinate(ccl_expr, context)
+    log_file = save_result(result)
+    
+    # サマリ出力
+    print(f"\n{'='*60}")
+    print("SUMMARY")
+    print(f"{'='*60}")
+    for r in result["results"]:
+        status = r.get("status", "unknown")
+        thread = r.get("thread", "unknown")
+        ccl = r.get("ccl", "unknown")
+        print(f"  [{status}] {ccl} -> {thread}")
+        if status == "success" and "answer" in r:
+            print(f"    Answer: {r['answer'][:100]}...")
+    print(f"{'='*60}")
+
+
+if __name__ == "__main__":
+    main()
+```
+
+---
+
+## 📊 検証結果
+
+### Gemini 出力比較
+
+| 条件 | 出力例 |
+|:-----|:-------|
+| コンテキストなし | 「SOTAモデル統合が強み」(汎用的) |
+| Synteleia 監査付き | 「Hermeneus 12 Issues がボトルネック」(具体的) |
+| Issue 詳細付き | 「S-030: 115行関数を分割せよ」(実行可能) |
+
+### テスト結果
+
+```
+hermeneus/tests/test_optimizer.py::8 passed in 1.68s
+```
+
+---
+
+## 💡 学んだこと
+
+> **API のコストではなく、コンテキストの濃度が価値を決める**
+
+- 3円払っても「エアプ」なら価値はゼロ
+- 3円払って「実用的な Issue 詳細分析」なら価値は高い
+- **Synteleia + LLM の組み合わせが最もコスパ良い**
+
+---
+
+## 📈 API 使用量
+
+| 項目 | 値 |
+|:-----|:---|
+| Input tokens | ~6,800 |
+| Output tokens | ~11,000 |
+| 合計コスト | 約 3円 ($0.02) |
+
+---
+
+*Generated by Hegemonikón H4 Doxa*

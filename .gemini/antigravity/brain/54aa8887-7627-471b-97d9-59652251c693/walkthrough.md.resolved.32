@@ -1,0 +1,48 @@
+# Walkthrough: Skill-WF 統合完了
+
+## 成果サマリ
+
+| 項目 | 値 |
+|:-----|:---|
+| 定理 | 24 |
+| 双方向リンク | 48 |
+| CI/CD | ✅ GitHub Actions |
+| 懸念点 | 0 |
+
+---
+
+## 成果物
+
+| ファイル | 役割 |
+|:---------|:-----|
+| [.agent/data/theorem_map.yaml](file:///home/laihuip001/oikos/.agent/data/theorem_map.yaml) | 唯一の情報源 |
+| [.agent/scripts/bidirectional_linker.py](file:///home/laihuip001/oikos/.agent/scripts/bidirectional_linker.py) | リンク生成 |
+| [.agent/scripts/wf_skill_sync_check.sh](file:///home/laihuip001/oikos/.agent/scripts/wf_skill_sync_check.sh) | 同期検証 |
+| [.github/workflows/skill_wf_sync.yaml](file:///home/laihuip001/oikos/.github/workflows/skill_wf_sync.yaml) | CI/CD |
+| [.agent/standards/se_principles.md](file:///home/laihuip001/oikos/.agent/standards/se_principles.md) | SE-6 定義 |
+| [.agent/docs/skill_wf_integration.md](file:///home/laihuip001/oikos/.agent/docs/skill_wf_integration.md) | 使い方 |
+
+---
+
+## SE-6 達成
+
+```
+土台: theorem_map.yaml (1ファイル)
+展開: 48リンク + CI/CD + 3スクリプト
+追加コスト: O(1)
+```
+
+---
+
+## 振動WF 派生 (Q1 参照用)
+
+| WF | 派生 | 性質 |
+|:---|:-----|:-----|
+| /p | kho, hod, tro, tek | 子WF名 |
+| /s | met, mek, sta, pra | 子WF名 |
+| /h | pro, pis, ore, dox, bias | 子WF名+bias |
+| /a | 12件 | 独自派生 |
+| /k | 12件 | 独自派生 |
+| /o | (空) | なし |
+
+後続判断: /a, /k の派生をどう扱うか

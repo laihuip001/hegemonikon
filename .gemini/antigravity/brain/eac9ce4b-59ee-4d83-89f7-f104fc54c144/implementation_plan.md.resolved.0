@@ -1,0 +1,354 @@
+# n8n/Zapier 活用提案書 for Hegemonikón
+
+> **基盤**: CLL/mek+ (CCL v6.34)
+> **対象**: 現況 Hegemonikón ワークフロー体系
+> **日付**: 2026-01-30
+
+---
+
+## Executive Summary
+
+Hegemonikón の 37 ワークフロー体系に対し、n8n (セルフホスト) と Zapier (クラウド) を戦略的に組み合わせることで、**手作業ボトルネック解消**と**認知負荷軽減**を実現する。
+
+---
+
+## 1. n8n vs Zapier 役割分担
+
+| 軸 | n8n (推奨: 内部処理) | Zapier (推奨: 外部連携) |
+|:---|:---------------------|:------------------------|
+| **ホスティング** | セルフホスト (GCP VM) | クラウド SaaS |
+| **データ管理** | 完全制御（GDPR/HIPAA 準拠可能） | Zapier サーバー経由 |
+| **複雑さ** | JavaScript/Python カスタム可 | ノーコード、簡単 |
+| **コスト** | 実行回数無制限（セルフホスト） | タスク数課金 |
+| **統合数** | 400-1000+ | 6000-8000+ |
+| **AI 統合** | LangChain/OpenAI/Anthropic 直結 | 限定的 |
+
+### 採用方針
+
+```mermaid
+graph TD
+    A[自動化要件] --> B{データ機密性?}
+    B -->|高| C[n8n セルフホスト]
+    B -->|低| D{複雑なロジック?}
+    D -->|Yes| C
+    D -->|No| E{外部SaaS連携?}
+    E -->|Yes| F[Zapier]
+    E -->|No| C
+```
+
+---
+
+## 2. Hegemonikón ワークフローへの挿入ポイント
+
+### 2.1 /boot — セッション開始自動化
+
+| ステップ | 現状 | n8n/Zapier 自動化案 |
+|:---------|:-----|:--------------------|
+| Gnōsis 鮮度チェック | 手動 CLI | **n8n**: スケジュールトリガー (毎朝 6:00) |
+| Perplexity Inbox | 手動確認 | **n8n**: Webhook 受信 → Inbox 保存 |
+| Jules レビュー結果 | Git fetch | **n8n**: Git Hook → 通知 |
+| Sophia 同期 | 手動実行 | **n8n**: 日次バッチ (02:00 JST) |
+
+**具体フロー (n8n)**:
+
+```text
+Trigger: Cron (06:00 JST)
+  ↓
+Node 1: Execute Command (gnosis-cli check-freshness)
+  ↓
+Node 2: IF stale → Execute Command (gnosis-cli collect --auto)
+  ↓
+Node 3: Execute Command (mneme-cli ingest --all)
+  ↓
+Node 4: Slack/Discord 通知 "Boot 準備完了"
+```
+
+---
+
+### 2.2 /bye — セッション終了自動化
+
+| ステップ | 現状 | n8n/Zapier 自動化案 |
+|:---------|:-----|:--------------------|
+| Kairos 投入 | 手動 Python | **n8n**: Handoff 保存検知 → 自動投入 |
+| Sophia 同期 | 手動実行 | **n8n**: /bye 実行検知 → 同期 |
+| FEP A行列保存 | 手動 Python | **n8n**: セッション終了 Hook |
+| Dispatch Log | 手動 YAML | **n8n**: 活動ログ自動集計 |
+
+**具体フロー (n8n)**:
+
+```text
+Trigger: Webhook (Antigravity /bye 発火)
+  ↓
+Node 1: Execute Script (handoff 生成)
+  ↓
+Node 2: Execute Script (kairos_ingest.py)
+  ↓
+Node 3: Execute Script (sophia_ingest.py)
+  ↓
+Node 4: Execute Script (FEP 永続化)
+  ↓
+Node 5: Append to YAML (dispatch_log.yaml)
+```
+
+---
+
+### 2.3 /sop — 外部調査連携
+
+| ステップ | 現状 | Zapier 自動化案 |
+|:---------|:-----|:-----------------|
+| Perplexity 調査依頼 | 手動コピペ | **Zapier**: Slack/Notion → Perplexity API |
+| 結果保存 | 手動ファイル作成 | **Zapier**: API結果 → Mnēmē 保存 |
+
+**具体フロー (Zapier)**:
+
+```text
+Trigger: Slack メッセージ (#research) に "💡" リアクション
+  ↓
+Action 1: Send to Perplexity API (sonar-3.1)
+  ↓
+Action 2: Create File in GitHub (perplexity/ ディレクトリ)
+  ↓
+Action 3: Reply in Slack Thread (結果サマリー)
+```
+
+---
+
+### 2.4 /eat — 論文消化パイプライン
+
+| ステップ | 現状 | n8n 自動化案 |
+|:---------|:-----|:-------------|
+| Digestor 実行 | 手動 Python | **n8n**: 日次バッチ |
+| 消化候補選定 | 手動確認 | **n8n**: スコア計算 → 上位3件抽出 |
+| 消化実行 | 手動 | **n8n**: 承認待ちキュー |
+
+---
+
+## 3. 自動化の実行単位設計
+
+### 3.1 トリガー体系
+
+| トリガー種別 | 実装先 | 例 |
+|:-------------|:-------|:---|
+| **時間ベース (Cron)** | n8n | 毎朝 06:00 Gnōsis 収集 |
+| **ファイル監視** | n8n | Handoff ファイル作成検知 |
+| **Webhook** | n8n | Antigravity → n8n 通知 |
+| **SaaS イベント** | Zapier | Slack リアクション |
+| **API ポーリング** | Zapier | arXiv RSS 新着 |
+
+### 3.2 条件分岐パターン
+
+```yaml
+# n8n IF Node 設定例
+condition: "{{ $json.stale === true }}"
+true_branch:
+  - execute: gnosis-cli collect
+false_branch:
+  - log: "Fresh, skipping collection"
+```
+
+### 3.3 エラーハンドリング
+
+| エラー種別 | 対応 | 実装 |
+|:-----------|:-----|:-----|
+| API タイムアウト | リトライ 3回 | n8n Retry 設定 |
+| スクリプト失敗 | Slack 通知 + ログ | n8n Error Trigger |
+| 外部 SaaS 障害 | 代替フロー | Zapier Paths |
+
+### 3.4 再実行ポリシー
+
+```yaml
+retry_policy:
+  max_attempts: 3
+  wait_between: 300s  # 5分
+  on_failure: 
+    - notify:slack
+    - log:mneme/errors
+```
+
+---
+
+## 4. 段階導入アプローチ
+
+### Phase 0: 最小導入 (1週間)
+
+**目標**: n8n インストール + 単一フロー稼働
+
+| 項目 | 内容 |
+|:-----|:-----|
+| インストール | `docker run -d n8n` on GCP VM |
+| 初回フロー | Gnōsis 日次収集 (Cron → CLI) |
+| 検証 | 7日間の安定稼働確認 |
+
+**CCL 表現**: `[BOOT]/mek+ → n8n:gnosis_daily`
+
+---
+
+### Phase 1: コア自動化 (2週間)
+
+**目標**: /boot + /bye の主要ステップ自動化
+
+| ワークフロー | 自動化対象 |
+|:-------------|:-----------|
+| /boot | Gnōsis + Digestor + Mnēmē |
+| /bye | Kairos + Sophia + Dispatch Log |
+
+---
+
+### Phase 2: 外部連携 (3週間)
+
+**目標**: Zapier 導入 + 外部 SaaS 連携
+
+| 連携先 | 用途 |
+|:-------|:-----|
+| Slack | 通知 + 調査依頼 |
+| Notion | タスク管理 |
+| Perplexity | 調査 API |
+
+---
+
+### Phase 3: 高度自動化 (1ヶ月+)
+
+**目標**: AI エージェント統合
+
+| 機能 | 実装 |
+|:-----|:-----|
+| LLM 判断挿入 | n8n → Claude API → 派生選択 |
+| 自動 Handoff 要約 | セッション終了 → LLM 要約 |
+| 異常検知 | Dispatch Log 分析 → アラート |
+
+---
+
+## 5. 具体的な自動化フロー例
+
+### 5.1 日次知識更新フロー (n8n)
+
+```text
+┌─[Trigger: Cron 06:00 JST]────────────────────────────────┐
+│                                                          │
+│  Execute: gnosis-cli check-freshness                     │
+│    │                                                     │
+│    ├─[IF stale]──→ Execute: gnosis-cli collect --auto   │
+│    │                                                     │
+│  Execute: digestor-cli run --max-candidates=3            │
+│    │                                                     │
+│  Execute: mneme-cli ingest --all                         │
+│    │                                                     │
+│  Slack: "#hegemonikon 📚 日次更新完了"                    │
+│                                                          │
+└──────────────────────────────────────────────────────────┘
+```
+
+---
+
+### 5.2 セッション終了自動化フロー (n8n)
+
+```text
+┌─[Trigger: Webhook POST /bye-signal]──────────────────────┐
+│                                                          │
+│  Parse: session_id, handoff_path                         │
+│    │                                                     │
+│  Execute: python kairos_ingest.py                        │
+│    │                                                     │
+│  Execute: python sophia_ingest.py                        │
+│    │                                                     │
+│  Execute: python fep_persistence.py --save               │
+│    │                                                     │
+│  Append: dispatch_log.yaml                               │
+│    │                                                     │
+│  Slack: "#hegemonikon 👋 セッション終了"                  │
+│                                                          │
+└──────────────────────────────────────────────────────────┘
+```
+
+---
+
+### 5.3 調査依頼自動化フロー (Zapier)
+
+```text
+┌─[Trigger: Slack #research に /sop コマンド]──────────────┐
+│                                                          │
+│  Parse: クエリ抽出                                        │
+│    │                                                     │
+│  API Call: Perplexity sonar-3.1                          │
+│    │                                                     │
+│  Create: GitHub perplexity/{date}_{topic}.md             │
+│    │                                                     │
+│  Reply: Slack スレッドに結果サマリー                       │
+│                                                          │
+└──────────────────────────────────────────────────────────┘
+```
+
+---
+
+## 6. ボトルネック解消マップ
+
+| ボトルネック | 現状の痛み | 解消策 |
+|:-------------|:-----------|:-------|
+| **手作業**: Gnōsis 収集 | 忘れる、面倒 | n8n Cron 自動化 |
+| **重複**: Sophia/Kairos 同期 | 毎回手動実行 | n8n Webhook 自動化 |
+| **転記**: Dispatch Log 更新 | 手動 YAML 編集 | n8n 自動追記 |
+| **分散**: 調査結果保存 | ファイル散在 | Zapier → GitHub 一元化 |
+| **遅延**: Jules レビュー確認 | 手動 git fetch | n8n Git Hook 通知 |
+
+---
+
+## 7. 技術要件
+
+### n8n 環境
+
+```yaml
+# docker-compose.yml
+version: '3'
+services:
+  n8n:
+    image: n8nio/n8n
+    ports:
+      - "5678:5678"
+    volumes:
+      - ~/.n8n:/home/node/.n8n
+      - /home/laihuip001/oikos:/data/oikos
+    environment:
+      - N8N_BASIC_AUTH_ACTIVE=true
+      - N8N_BASIC_AUTH_USER=admin
+      - N8N_BASIC_AUTH_PASSWORD=${N8N_PASSWORD}
+```
+
+### Zapier 連携アカウント
+
+| サービス | 必要権限 |
+|:---------|:---------|
+| Slack | メッセージ読み書き |
+| GitHub | リポジトリ読み書き |
+| Perplexity | API キー |
+
+---
+
+## 8. 検証計画
+
+### 8.1 Phase 0 検証
+
+| 項目 | 方法 |
+|:-----|:-----|
+| n8n 稼働 | `curl http://localhost:5678/healthz` |
+| Gnōsis 自動収集 | Cron 実行ログ確認 |
+| エラー通知 | テスト失敗 → Slack 受信確認 |
+
+### 8.2 全体検証
+
+| 項目 | 成功基準 |
+|:-----|:---------|
+| /boot 準備時間 | 手動 5分 → 自動 0分 |
+| /bye 完了時間 | 手動 10分 → 自動 2分 |
+| 調査依頼応答 | 手動 15分 → 自動 3分 |
+
+---
+
+## 9. 今後の提案
+
+1. **n8n インストール**: 即座に実行可能
+2. **初回フロー作成**: Gnōsis 日次収集
+3. **Webhook 設計**: Antigravity → n8n 連携仕様
+
+---
+
+*Generated by Hegemonikón S2 Mekhanē + CCL/mek+ | 2026-01-30*

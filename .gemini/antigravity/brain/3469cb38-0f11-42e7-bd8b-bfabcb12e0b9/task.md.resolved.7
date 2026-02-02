@@ -1,0 +1,26 @@
+# Skill System Optimization
+
+## Phase 1: T-series v2.1 Frontmatter Update
+
+- [x] T1 Aisthēsis frontmatter 更新
+- [x] T2 Krisis frontmatter 更新
+- [x] T3 Theōria frontmatter 更新
+- [x] T4 Phronēsis frontmatter 更新
+- [x] T5 Peira frontmatter 更新
+- [x] T6 Praxis frontmatter 更新
+- [x] T7 Dokimē frontmatter 更新
+- [x] T8 Anamnēsis frontmatter 更新
+
+## Phase 2: Description Optimization (/zet 調査結果反映)
+
+- [x] O-series description 最適化 (O1-O4)
+- [x] S-series description 最適化 (S1-S4)
+- [x] T-series description 最適化 (T1-T8)
+- [x] Footprint テスト実装
+- [ ] Ablation テスト実施 (次回セッションへ)
+
+## Key Findings from /zet Research
+
+- ルーターは `description` **のみ** を見る
+- `triggers`, `keywords`, `generation`, `related` はルーティングに使われない
+- 発動確認: Walkthrough + Footprint + Ablation

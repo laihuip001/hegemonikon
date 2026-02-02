@@ -1,0 +1,50 @@
+# Hermēneus 開発タスク
+
+> **CCL**: `[hermeneus]@plan_review+ >> /ene+`
+> **検証日**: 2026-02-01T13:25
+
+---
+
+## ✅ Phase 1-3: 全完了
+
+### pytest 結果
+
+```
+50 passed, 2 warnings in 0.13s
+```
+
+### DoD チェック
+
+- [x] [hermeneus/src/ast.py](file:///home/laihuip001/oikos/hegemonikon/hermeneus/src/ast.py) — 192行、11 ノード型
+- [x] [hermeneus/src/parser.py](file:///home/laihuip001/oikos/hegemonikon/hermeneus/src/parser.py) — 334行、CCLParser (F:/I:/W:/L: 対応)
+- [x] [hermeneus/src/expander.py](file:///home/laihuip001/oikos/hegemonikon/hermeneus/src/expander.py) — 226行、Expander
+- [x] `hermeneus/tests/` — 50 テスト全パス
+- [x] LMQL ランタイム統合 ([runtime.py](file:///home/laihuip001/oikos/hegemonikon/hermeneus/src/runtime.py))
+- [x] LangGraph 統合 ([graph.py](file:///home/laihuip001/oikos/hegemonikon/hermeneus/src/graph.py))
+- [x] Constrained Decoding ([constraints.py](file:///home/laihuip001/oikos/hegemonikon/hermeneus/src/constraints.py))
+- [x] HITL Controller ([hitl.py](file:///home/laihuip001/oikos/hegemonikon/hermeneus/src/hitl.py))
+
+---
+
+## 🗺️ 実装済みファイル一覧
+
+| ファイル | サイズ | 内容 |
+|:---------|:-------|:-----|
+| [ast.py](file:///home/laihuip001/oikos/hegemonikon/hermeneus/src/ast.py) | 5KB | AST ノード定義 |
+| [parser.py](file:///home/laihuip001/oikos/hegemonikon/hermeneus/src/parser.py) | 11KB | CCL パーサー |
+| [expander.py](file:///home/laihuip001/oikos/hegemonikon/hermeneus/src/expander.py) | 7KB | 省略形展開 |
+| [translator.py](file:///home/laihuip001/oikos/hegemonikon/hermeneus/src/translator.py) | 12KB | LMQL 変換 |
+| [runtime.py](file:///home/laihuip001/oikos/hegemonikon/hermeneus/src/runtime.py) | 14KB | LMQL 実行 |
+| [graph.py](file:///home/laihuip001/oikos/hegemonikon/hermeneus/src/graph.py) | 18KB | LangGraph 統合 |
+| [constraints.py](file:///home/laihuip001/oikos/hegemonikon/hermeneus/src/constraints.py) | 11KB | Constrained Decoding |
+| [hitl.py](file:///home/laihuip001/oikos/hegemonikon/hermeneus/src/hitl.py) | 9KB | Human-in-the-Loop |
+| [checkpointer.py](file:///home/laihuip001/oikos/hegemonikon/hermeneus/src/checkpointer.py) | 13KB | 状態永続化 |
+| [__init__.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/ccl/__init__.py) | 4KB | パッケージ API |
+
+---
+
+## 🔜 次のステップ
+
+- [ ] 実運用テスト (Synergeia 経由で CCL 実行)
+- [ ] KI 更新 (CCL Cognitive Algebra System)
+- [ ] ドキュメント更新 (hermeneus/README.md)

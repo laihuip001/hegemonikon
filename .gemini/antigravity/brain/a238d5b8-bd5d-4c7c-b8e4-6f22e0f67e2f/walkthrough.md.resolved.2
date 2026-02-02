@@ -1,0 +1,45 @@
+# Jules API 統合 Walkthrough
+
+## 完了項目
+
+### Phase 1: コア実装 ✅
+
+| ファイル | 説明 |
+|---------|------|
+| [jules_client.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/symploke/jules_client.py) | API クライアント（60並列対応）|
+| [jules_mcp_server.py](file:///home/laihuip001/oikos/hegemonikon/mcp/jules_mcp_server.py) | MCP Server（4ツール）|
+| [.env.jules](file:///home/laihuip001/oikos/hegemonikon/.env.jules) | API キー保存 |
+
+### Phase 2: 実 API テスト ✅
+
+```
+[Test 1] API 接続
+  Status: 200
+  ✅ Found 7 リポジトリ
+
+[Test 2] セッション作成
+  ✅ 3セッション作成
+  - 2137541038960795309: IN_PROGRESS
+  - 13839237181315664836: IN_PROGRESS
+  - 17087464420336099823: IN_PROGRESS
+```
+
+---
+
+## 発見事項
+
+1. **SessionState 拡張が必要**: API は `QUEUED`, `IN_PROGRESS` など追加ステートを返す
+2. **Jules タスク完了には時間がかかる**: ポーリング 5秒間隔でも 120秒以内に完了しないケースあり
+3. **hegemonikon リポジトリ未接続**: Jules App への追加が必要
+
+---
+
+## 次のステップ
+
+1. **並列実行テスト** - 5タスク同時実行
+2. **MCP Server 統合テスト** - Claude からの呼び出し
+3. **hegemonikon を Jules に接続** - 実際の開発ワークフロー
+
+---
+
+*Generated 2026-01-27*

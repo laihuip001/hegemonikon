@@ -1,0 +1,51 @@
+# Dendron v2.1 最終レポート
+
+> **CCL**: `/syn+.lex[Dendron] × /dia+.adv × /pre+ × /pan.grave × /epo+`
+> **反復強化**: 1 iteration → 0 criticisms
+
+---
+
+## 結果サマリー
+
+| 項目 | Before | After |
+|------|--------|-------|
+| 批評点 | 4 | **0** ✅ |
+| 脆弱性 | 2 | 0 |
+| 死コード | 2 | 0 |
+
+---
+
+## 修正内容
+
+| 問題 | 対策 |
+|------|------|
+| 親パス存在チェックなし | [validate_parent()](file:///home/laihuip001/oikos/hegemonikon/mekhane/dendron/checker.py#129-154) メソッド追加 |
+| パストラバーサル | `".." in parent` 検出 |
+| 絶対パス | `startswith("/")` 拒否 |
+| PROOF_PATTERN v1 | 削除 |
+
+---
+
+## 攻撃ベクトル再テスト
+
+```
+✅ valid path: OK
+❌ nonexistent: 親パスが存在しない: nonexistent/path/
+❌ path traversal: パストラバーサル検出: ../../../etc/passwd
+❌ absolute path: 絶対パスは禁止: /etc/passwd
+✅ special parent: 特殊親参照
+```
+
+---
+
+## Git コミット
+
+- `f1ea513f`: security: Dendron v2.1 hardening
+
+---
+
+## 最終検証
+
+```
+✅ Dendron: 100.0% coverage (L1:38/L2:117/L3:86)
+```

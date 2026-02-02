@@ -1,0 +1,135 @@
+# Theorem Map — Single Source of Truth for Skill-WF Links
+# SE-6: Scalable Foundation — 1テーブルから全リンク生成
+
+theorems:
+  # Akribeia (A) Series
+  A1:
+    wf: pat
+    skill: akribeia/a1-pathos
+    series: Akribeia
+    name: Pathos
+  A2:
+    wf: dia
+    skill: akribeia/a2-krisis
+    series: Akribeia
+    name: Krisis
+  A3:
+    wf: gno
+    skill: akribeia/a3-gnome
+    series: Akribeia
+    name: Gnōmē
+  A4:
+    wf: epi
+    skill: akribeia/a4-episteme
+    series: Akribeia
+    name: Epistēmē
+
+  # Horme (H) Series
+  H1:
+    wf: pro
+    skill: horme/h1-propatheia
+    series: Horme
+    name: Propatheia
+  H2:
+    wf: pis
+    skill: horme/h2-pistis
+    series: Horme
+    name: Pistis
+  H3:
+    wf: ore
+    skill: horme/h3-orexis
+    series: Horme
+    name: Orexis
+  H4:
+    wf: dox
+    skill: horme/h4-doxa
+    series: Horme
+    name: Doxa
+
+  # Kairos (K) Series
+  K1:
+    wf: euk
+    skill: kairos/k1-eukairia
+    series: Kairos
+    name: Eukairia
+  K2:
+    wf: chr
+    skill: kairos/k2-chronos
+    series: Kairos
+    name: Chronos
+  K3:
+    wf: tel
+    skill: kairos/k3-telos
+    series: Kairos
+    name: Telos
+  K4:
+    wf: sop
+    skill: kairos/k4-sophia
+    series: Kairos
+    name: Sophia
+
+  # Ousia (O) Series
+  O1:
+    wf: noe
+    skill: ousia/o1-noesis
+    series: Ousia
+    name: Noēsis
+  O2:
+    wf: bou
+    skill: ousia/o2-boulesis
+    series: Ousia
+    name: Boulēsis
+  O3:
+    wf: zet
+    skill: ousia/o3-zetesis
+    series: Ousia
+    name: Zētēsis
+  O4:
+    wf: ene
+    skill: ousia/o4-energeia
+    series: Ousia
+    name: Energeia
+
+  # Perigraphe (P) Series
+  P1:
+    wf: kho
+    skill: perigraphe/p1-khora
+    series: Perigraphe
+    name: Khōra
+  P2:
+    wf: hod
+    skill: perigraphe/p2-hodos
+    series: Perigraphe
+    name: Hodos
+  P3:
+    wf: tro
+    skill: perigraphe/p3-trokhia
+    series: Perigraphe
+    name: Trokhia
+  P4:
+    wf: tek
+    skill: perigraphe/p4-tekhne
+    series: Perigraphe
+    name: Tekhnē
+
+  # Schema (S) Series
+  S1:
+    wf: met
+    skill: schema/s1-metron
+    series: Schema
+    name: Metron
+  S2:
+    wf: mek
+    skill: schema/s2-mekhane
+    series: Schema
+    name: Mekhanē
+  S3:
+    wf: sta
+    skill: schema/s3-stathmos
+    series: Schema
+    name: Stathmos
+  S4:
+    wf: pra
+    skill: schema/s4-praxis
+    series: Schema
+    name: Praxis

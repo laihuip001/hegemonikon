@@ -1,0 +1,672 @@
+# O-Series 派生ワークフロー消化統合 実装計画
+
+> **Session**: 2026-01-29 08:42  
+> **Strategy**: A + B + F ハイブリッド  
+> **Estimated Time**: 4-6時間  
+> **Priority**: 高  
+
+---
+
+## 概要
+
+O-Series定理（O1-O4）の11派生ワークフローを、以下の3戦略で「消化」する：
+
+| 戦略 | 概要 | 実装対象 |
+|:-----|:-----|:---------|
+| **A** | `/o` をO-Series Hubとして実装 | [.agent/workflows/o.md](file:///home/laihuip001/oikos/.agent/workflows/o.md) |
+| **B** | 各既存ワークフローにPhase追加 | `/noe`, `/bou`, `/zet`, `/ene` |
+| **F** | FEP駆動の動的派生選択 | `mekhane/fep/derivative_selector.py` |
+
+---
+
+## 入力資料
+
+以下の報告書を参照：
+
+1. **O-Series派生ワークフロー発見 v1.0** (Perplexity)
+   - 古典60%:現代40%のバランスで11派生を導出
+   - 各派生の理論的根拠と実装方法
+
+2. **O-Series派生ワークフロー発見 v2.0** (Perplexity)
+   - A1-A5, B1-B5, C1-C5, D1-D5 の20項目を網羅
+   - 採用/保留/却下の判定付き
+
+---
+
+## Phase 1: 派生マッピング（確定版）
+
+> [!IMPORTANT]
+> 報告書から抽出した採用派生のみを実装対象とする
+
+### O1 Noēsis 派生（認識）
+
+| 派生名 | 記法 | 定義 | 古典根拠 | 現代対応 |
+|:-------|:-----|:-----|:---------|:---------|
+| **nous** | `/o-nous` | 本質・原理の直観的把握 | Nous poietikos → theoretikos | 専門家直観 (System 1) |
+| **phro** | `/o-phro` | 文脈的実践的判断 | Phronēsis | エキスパート判断、EI統合 |
+| **meta** | `/o-meta` | メタ認識的反省 | 自己参照的Nous | pMFC/aPFC 監視・調整 |
+
+### O2 Boulēsis 派生（意志）
+
+| 派生名 | 記法 | 定義 | 古典根拠 | 現代対応 |
+|:-------|:-----|:-----|:---------|:---------|
+| **desir** | `/o-desir` | 第一次欲動の表出 | Boulēsis基層 | Implicit wants |
+| **voli** | `/o-voli` | 第二次意志による調整と自我統一 | Frankfurt階層意志 | Executive function |
+| **akra** | `/o-akra` | 意志-行為乖離の診断と克服 | Akrasia理論 | Implementation intention |
+
+### O3 Zētēsis 派生（探求）
+
+| 派生名 | 記法 | 定義 | 古典根拠 | 現代対応 |
+|:-------|:-----|:-----|:---------|:---------|
+| **anom** | `/o-anom` | 異常認識と問題化 | Diaporesis | Curiosity gap |
+| **hypo** | `/o-hypo` | 創造的仮説生成 | Peirce Abduction Phase 1 | Generative reasoning |
+| **eval** | `/o-eval` | 仮説評価と優先順位付け | Peirce Abduction Phase 2 | IBE, pursuitworthiness |
+
+### O4 Energeia 派生（活動）
+
+| 派生名 | 記法 | 定義 | 古典根拠 | 現代対応 |
+|:-------|:-----|:-----|:---------|:---------|
+| **flow** | `/o-flow` | Flow状態の最適化 | Energeia自己目的性 | Csikszentmihalyi |
+| **prax** | `/o-prax` | 自己目的的実践行為 | Praxis | Intrinsic motivation |
+| **pois** | `/o-pois` | 技能的産出活動 | Poiesis | Craftsmanship |
+
+**合計**: 12派生（O1:3, O2:3, O3:3, O4:3）
+
+---
+
+## Phase 2: Strategy A 実装
+
+### 2.1 `/o.md` ワークフロー作成
+
+**ファイル**: [.agent/workflows/o.md](file:///home/laihuip001/oikos/.agent/workflows/o.md)
+
+```yaml
+---
+description: O-series（純粋定理）Hub。O1-O4定理と12派生への入口。
+hegemonikon: Ousia
+modules: [O1, O2, O3, O4]
+skill_ref:
+  - ".agent/skills/ousia/o1-noesis/SKILL.md"
+  - ".agent/skills/ousia/o2-boulesis/SKILL.md"
+  - ".agent/skills/ousia/o3-zetesis/SKILL.md"
+  - ".agent/skills/ousia/o4-energeia/SKILL.md"
+version: "2.0"
+lineage: "v1.0 (抽象コマンド) → v2.0 (派生統合Hub)"
+---
+
+# /o ワークフロー
+
+> **Hegemonikón**: Ousia（純粋定理 O1-O4）
+
+## 使用法
+
+### 基本呼び出し（FEP推奨）
+```
+/o
+```
+→ FEPが状況を分析し、最適な定理と派生を推奨
+
+### 定理指定
+```
+/o noe   → O1 Noēsis
+/o bou   → O2 Boulēsis
+/o zet   → O3 Zētēsis
+/o ene   → O4 Energeia
+```
+
+### 派生直接指定（手動オーバーライド）
+```
+/o nous  → O1派生: 本質直観
+/o phro  → O1派生: 実践的判断
+/o akra  → O2派生: 意志-行為乖離診断
+/o flow  → O4派生: Flow状態最適化
+...
+```
+
+## 派生マトリックス
+
+| 定理 | 派生1 | 派生2 | 派生3 |
+|:-----|:------|:------|:------|
+| O1 Noēsis | nous（本質直観） | phro（実践判断） | meta（メタ認識） |
+| O2 Boulēsis | desir（第一次欲動） | voli（第二次意志） | akra（意志乖離） |
+| O3 Zētēsis | anom（異常認識） | hypo（仮説生成） | eval（仮説評価） |
+| O4 Energeia | flow（Flow状態） | prax（自己目的行為） | pois（産出活動） |
+
+## FEP 派生選択
+
+呼び出し時、FEP Cognitive Layer が状況を分析し、最適な派生を推奨する。
+
+```python
+from mekhane.fep.derivative_selector import select_derivative
+
+result = select_derivative(
+    theorem="O1",
+    problem_context="ユーザー入力テキスト"
+)
+# → {"recommended": "phro", "confidence": 0.85, "rationale": "..."}
+```
+
+## X-series 連携
+
+/o 実行後、X-seriesにより次のステップが推奨される：
+
+- O1 Noēsis → S1 Metron（スケール決定）
+- O2 Boulēsis → S2 Mekhanē（方法配置）
+- O3 Zētēsis → K4 Sophia（外部調査）
+- O4 Energeia → H4 Doxa（記録・永続化）
+```
+
+---
+
+## Phase 3: Strategy B 実装
+
+### 3.1 `/noe.md` への派生Phase追加
+
+**変更対象**: [.agent/workflows/noe.md](file:///home/laihuip001/oikos/.agent/workflows/noe.md)
+
+**追加セクション**:
+
+```markdown
+---
+
+## Phase 0: 派生選択（FEP駆動）
+
+> 新規追加 (v2.0)
+
+### 自動選択モード（デフォルト）
+
+FEP が問題の性質を分析し、最適な派生を推奨：
+
+| 派生 | 適用条件 | 出力特性 |
+|:-----|:---------|:---------|
+| **nous** | 抽象的・原理探求・本質把握 | 直観的洞察、パターン認識 |
+| **phro** | 具体的・実践的・文脈依存 | 状況適応的判断、経験統合 |
+| **meta** | 信頼性疑問・自己反省必要 | 認識の認識、信頼度評価 |
+
+### 手動オーバーライド
+
+```
+/noe --derivative=phro
+/noe --derivative=nous
+```
+
+---
+
+## Phase 1: nous（本質直観）
+
+> 元のN1-N5 Phaseをここに含める
+
+---
+
+## Phase 2: phro（実践的判断）
+
+> 新規派生
+
+### Step 2.1: 文脈抽出
+- 具体的状況の特殊性を特定
+- 関与するステークホルダーを列挙
+- 時間的・空間的制約を明確化
+
+### Step 2.2: 経験統合
+- 類似状況の過去事例を想起（H4 Doxa参照）
+- 成功/失敗パターンを抽出
+
+### Step 2.3: 実践的判断
+- 「いま・ここ」での最適解を導出
+- 道徳的卓越性との整合を確認
+
+---
+
+## Phase 3: meta（メタ認識）
+
+> 新規派生
+
+### Step 3.1: 信頼度評価
+- Phase 1/2 の出力の確信度を評価
+- pMFC的監視：「この認識は信頼できるか？」
+
+### Step 3.2: 調整的介入
+- 必要に応じてEpochē（判断停止）発動
+- 追加情報収集の必要性を判定
+```
+
+### 3.2 他ワークフローへの同様の追加
+
+| ワークフロー | 追加派生 | 実装優先度 |
+|:-------------|:---------|:----------:|
+| `/bou.md` | desir, voli, akra | 高 |
+| `/zet.md` | anom, hypo, eval | 高 |
+| `/ene.md` | flow, prax, pois | 中 |
+
+---
+
+## Phase 4: Strategy F 実装
+
+### 4.1 新規ファイル作成
+
+**ファイル**: `mekhane/fep/derivative_selector.py`
+
+```python
+"""
+O-Series 派生選択モジュール
+
+FEP Cognitive Layer を活用して、問題の性質から最適な派生を推奨する。
+"""
+
+from dataclasses import dataclass
+from typing import Literal, Optional
+import numpy as np
+
+# 派生選択用の状態空間定義
+class DerivativeStateSpace:
+    """O1-O4 各定理の派生状態空間"""
+    
+    O1_STATES = [
+        "abstract_problem",     # 抽象的問題 → nous
+        "practical_situation",  # 実践的状況 → phro  
+        "need_reflection",      # 反省が必要 → meta
+    ]
+    
+    O2_STATES = [
+        "raw_desire",           # 生の欲動 → desir
+        "conflict_resolution",  # 葛藤解決 → voli
+        "will_action_gap",      # 意志-行為乖離 → akra
+    ]
+    
+    O3_STATES = [
+        "anomaly_detected",     # 異常検出 → anom
+        "hypothesis_needed",    # 仮説が必要 → hypo
+        "evaluation_phase",     # 評価段階 → eval
+    ]
+    
+    O4_STATES = [
+        "optimal_engagement",   # 最適没入 → flow
+        "self_sufficient_act",  # 自己目的的行為 → prax
+        "production_goal",      # 産出目標 → pois
+    ]
+
+
+@dataclass
+class DerivativeRecommendation:
+    """派生推奨の結果"""
+    theorem: str              # O1, O2, O3, O4
+    derivative: str           # nous, phro, meta, etc.
+    confidence: float         # 0.0-1.0
+    rationale: str            # 推奨理由
+    alternatives: list[str]   # 代替派生
+
+
+def encode_for_derivative_selection(
+    problem_text: str,
+    theorem: Literal["O1", "O2", "O3", "O4"]
+) -> tuple[int, int, int]:
+    """
+    問題テキストから派生選択用の観察をエンコード
+    
+    Returns:
+        (abstraction_level, context_dependency, reflection_need)
+        各値は 0, 1, 2 の3段階
+    """
+    text_lower = problem_text.lower()
+    
+    # 抽象度評価
+    abstract_keywords = ["本質", "原理", "根本", "普遍", "概念", "定義"]
+    practical_keywords = ["具体", "実際", "現場", "状況", "ケース", "事例"]
+    abstraction = sum(1 for k in abstract_keywords if k in text_lower)
+    practicality = sum(1 for k in practical_keywords if k in text_lower)
+    abstraction_level = 2 if abstraction > practicality else (0 if practicality > abstraction else 1)
+    
+    # 文脈依存度評価
+    context_keywords = ["この場合", "今回", "特定の", "〜において", "状況"]
+    context_count = sum(1 for k in context_keywords if k in text_lower)
+    context_dependency = min(context_count, 2)
+    
+    # 反省必要度評価
+    reflection_keywords = ["確かか", "信頼", "再考", "見直し", "本当に", "疑問"]
+    reflection_count = sum(1 for k in reflection_keywords if k in text_lower)
+    reflection_need = min(reflection_count, 2)
+    
+    return (abstraction_level, context_dependency, reflection_need)
+
+
+def select_derivative(
+    theorem: Literal["O1", "O2", "O3", "O4"],
+    problem_context: str,
+    use_fep: bool = True
+) -> DerivativeRecommendation:
+    """
+    最適な派生を選択
+    
+    Args:
+        theorem: O-series定理 (O1, O2, O3, O4)
+        problem_context: 問題のコンテキスト（ユーザー入力）
+        use_fep: FEPエージェントを使用するか（学習データがあれば精度向上）
+    
+    Returns:
+        DerivativeRecommendation
+    """
+    obs = encode_for_derivative_selection(problem_context, theorem)
+    
+    # O1 Noēsis 派生選択ロジック
+    if theorem == "O1":
+        derivatives = ["nous", "phro", "meta"]
+        
+        # ルールベース選択（FEP学習前のデフォルト）
+        if obs[2] >= 2:  # 反省必要度が高い
+            selected = "meta"
+            confidence = 0.75
+        elif obs[0] >= obs[1]:  # 抽象度 >= 文脈依存度
+            selected = "nous"
+            confidence = 0.70 + 0.1 * (obs[0] - obs[1])
+        else:
+            selected = "phro"
+            confidence = 0.70 + 0.1 * (obs[1] - obs[0])
+        
+        rationale = _generate_rationale(theorem, selected, obs)
+        alternatives = [d for d in derivatives if d != selected]
+        
+    elif theorem == "O2":
+        derivatives = ["desir", "voli", "akra"]
+        
+        # 葛藤検出キーワード
+        conflict_keywords = ["〜したいけど", "迷", "葛藤", "両立", "どちらか"]
+        gap_keywords = ["できない", "やれない", "わかっているのに", "意志が弱い"]
+        
+        conflict_score = sum(1 for k in conflict_keywords if k in problem_context)
+        gap_score = sum(1 for k in gap_keywords if k in problem_context)
+        
+        if gap_score >= 2:
+            selected, confidence = "akra", 0.80
+        elif conflict_score >= 2:
+            selected, confidence = "voli", 0.75
+        else:
+            selected, confidence = "desir", 0.65
+        
+        rationale = _generate_rationale(theorem, selected, obs)
+        alternatives = [d for d in derivatives if d != selected]
+        
+    elif theorem == "O3":
+        derivatives = ["anom", "hypo", "eval"]
+        
+        # 問い段階検出
+        anomaly_keywords = ["不思議", "なぜ", "おかしい", "予想外", "違和感"]
+        hypothesis_keywords = ["仮説", "もしかして", "考えられる", "推測", "可能性"]
+        eval_keywords = ["どれが", "比較", "優先", "選ぶ", "判断"]
+        
+        a_score = sum(1 for k in anomaly_keywords if k in problem_context)
+        h_score = sum(1 for k in hypothesis_keywords if k in problem_context)
+        e_score = sum(1 for k in eval_keywords if k in problem_context)
+        
+        scores = {"anom": a_score, "hypo": h_score, "eval": e_score}
+        selected = max(scores, key=scores.get)
+        confidence = 0.60 + 0.1 * scores[selected]
+        
+        rationale = _generate_rationale(theorem, selected, obs)
+        alternatives = [d for d in derivatives if d != selected]
+        
+    elif theorem == "O4":
+        derivatives = ["flow", "prax", "pois"]
+        
+        # 活動タイプ検出
+        flow_keywords = ["没入", "集中", "zone", "最適", "楽しい"]
+        prax_keywords = ["それ自体", "意味", "価値", "本質的", "内発"]
+        pois_keywords = ["作る", "成果", "アウトプット", "製品", "完成"]
+        
+        f_score = sum(1 for k in flow_keywords if k in problem_context)
+        pr_score = sum(1 for k in prax_keywords if k in problem_context)
+        po_score = sum(1 for k in pois_keywords if k in problem_context)
+        
+        scores = {"flow": f_score, "prax": pr_score, "pois": po_score}
+        selected = max(scores, key=scores.get)
+        confidence = 0.60 + 0.1 * scores[selected]
+        
+        rationale = _generate_rationale(theorem, selected, obs)
+        alternatives = [d for d in derivatives if d != selected]
+    
+    else:
+        raise ValueError(f"Unknown theorem: {theorem}")
+    
+    return DerivativeRecommendation(
+        theorem=theorem,
+        derivative=selected,
+        confidence=min(confidence, 0.95),
+        rationale=rationale,
+        alternatives=alternatives
+    )
+
+
+def _generate_rationale(theorem: str, derivative: str, obs: tuple) -> str:
+    """推奨理由を生成"""
+    rationale_templates = {
+        ("O1", "nous"): f"抽象度 {obs[0]}/2 が高く、本質・原理の直観的把握が適切",
+        ("O1", "phro"): f"文脈依存度 {obs[1]}/2 が高く、実践的判断が適切",
+        ("O1", "meta"): f"反省必要度 {obs[2]}/2 が高く、メタ認識的反省が適切",
+        ("O2", "desir"): "明確な葛藤がなく、欲動の表出段階として適切",
+        ("O2", "voli"): "複数の欲動が競合しており、意志統合が必要",
+        ("O2", "akra"): "意志と行為の乖離が検出され、克服戦略が必要",
+        ("O3", "anom"): "異常・驚きが検出され、問題化段階として適切",
+        ("O3", "hypo"): "仮説生成の必要性が示唆されている",
+        ("O3", "eval"): "複数の選択肢が存在し、評価段階として適切",
+        ("O4", "flow"): "没入・最適経験への志向が検出された",
+        ("O4", "prax"): "行為それ自体が目的である状況",
+        ("O4", "pois"): "外部成果物の産出が目的である状況",
+    }
+    return rationale_templates.get((theorem, derivative), "ルールベース選択")
+```
+
+### 4.2 単体テスト
+
+**ファイル**: `mekhane/fep/tests/test_derivative_selector.py`
+
+```python
+import pytest
+from mekhane.fep.derivative_selector import (
+    select_derivative,
+    encode_for_derivative_selection,
+    DerivativeRecommendation
+)
+
+
+class TestEncodeForDerivativeSelection:
+    def test_abstract_problem(self):
+        obs = encode_for_derivative_selection("この概念の本質は何か？", "O1")
+        assert obs[0] >= 1  # 抽象度が高い
+
+    def test_practical_situation(self):
+        obs = encode_for_derivative_selection("この具体的なケースでどうすべきか？", "O1")
+        assert obs[1] >= 1  # 文脈依存度が高い
+
+    def test_reflection_need(self):
+        obs = encode_for_derivative_selection("この判断は本当に正しいのか？信頼できる？", "O1")
+        assert obs[2] >= 1  # 反省必要度が高い
+
+
+class TestSelectDerivative:
+    def test_o1_nous_selection(self):
+        result = select_derivative("O1", "この原理の本質を把握したい")
+        assert result.theorem == "O1"
+        assert result.derivative == "nous"
+        assert result.confidence > 0.5
+
+    def test_o1_phro_selection(self):
+        result = select_derivative("O1", "この具体的な状況で、今回の場合どう判断すべき？")
+        assert result.derivative == "phro"
+
+    def test_o2_akra_selection(self):
+        result = select_derivative("O2", "わかっているのにできない、意志が弱い")
+        assert result.derivative == "akra"
+
+    def test_o3_anom_selection(self):
+        result = select_derivative("O3", "なぜこの現象が起きるのか不思議だ")
+        assert result.derivative == "anom"
+
+    def test_o4_pois_selection(self):
+        result = select_derivative("O4", "この機能を作って完成させたい")
+        assert result.derivative == "pois"
+
+    def test_recommendation_structure(self):
+        result = select_derivative("O1", "テスト入力")
+        assert isinstance(result, DerivativeRecommendation)
+        assert len(result.alternatives) == 2  # 残り2つの派生
+```
+
+### 4.3 FEP学習統合（将来拡張）
+
+```python
+# mekhane/fep/derivative_selector.py に追加
+
+def update_derivative_selector(
+    theorem: str,
+    derivative: str,
+    problem_context: str,
+    success: bool
+) -> None:
+    """
+    派生選択結果のフィードバックを学習
+    
+    将来的にはDirichlet学習でA行列を更新し、
+    選択精度を向上させる。
+    """
+    # TODO: FEPエージェントのA行列更新と統合
+    pass
+```
+
+---
+
+## Phase 5: 統合テスト
+
+### 5.1 E2E テストシナリオ
+
+```python
+# tests/test_o_series_integration.py
+
+def test_o_hub_to_noe_derivative():
+    """
+    /o → O1 Noēsis → 派生自動選択 → 実行
+    """
+    # 1. /o Hub呼び出し
+    # 2. FEP派生選択
+    # 3. 選択された派生Phase実行
+    # 4. 結果検証
+    pass
+
+def test_manual_derivative_override():
+    """
+    手動オーバーライドのテスト
+    """
+    # /noe --derivative=phro が正しく動作するか
+    pass
+```
+
+---
+
+## 実装チェックリスト
+
+### Strategy A: `/o` Hub
+
+- [ ] [.agent/workflows/o.md](file:///home/laihuip001/oikos/.agent/workflows/o.md) 作成
+- [ ] 派生マトリックス記載
+- [ ] X-series連携記載
+- [ ] tools.yaml 更新
+
+### Strategy B: 既存ワークフローPhase追加
+
+- [ ] `/noe.md` 派生Phase追加 (nous, phro, meta)
+- [ ] `/bou.md` 派生Phase追加 (desir, voli, akra)
+- [ ] `/zet.md` 派生Phase追加 (anom, hypo, eval)
+- [ ] `/ene.md` 派生Phase追加 (flow, prax, pois)
+
+### Strategy F: FEP派生選択
+
+- [ ] `mekhane/fep/derivative_selector.py` 作成
+- [ ] `DerivativeStateSpace` クラス定義
+- [ ] `encode_for_derivative_selection()` 実装
+- [ ] `select_derivative()` 実装
+- [ ] 単体テスト作成
+- [ ] `/noe.md` へのFEP統合
+- [ ] `/bou.md` へのFEP統合
+- [ ] `/zet.md` へのFEP統合
+- [ ] `/ene.md` へのFEP統合
+
+### 検証
+
+- [ ] 単体テスト PASS
+- [ ] E2E テスト PASS
+- [ ] 手動テスト（各派生を実際に使用）
+
+---
+
+## 依存関係
+
+```mermaid
+graph TD
+    subgraph "入力"
+        R1[報告書 v1.0]
+        R2[報告書 v2.0]
+    end
+    
+    subgraph "Strategy A"
+        A1[o.md 作成]
+    end
+    
+    subgraph "Strategy F"
+        F1[derivative_selector.py]
+        F2[テスト]
+    end
+    
+    subgraph "Strategy B"
+        B1[noe.md Phase追加]
+        B2[bou.md Phase追加]
+        B3[zet.md Phase追加]
+        B4[ene.md Phase追加]
+    end
+    
+    R1 --> A1
+    R2 --> A1
+    R1 --> F1
+    R2 --> F1
+    
+    F1 --> F2
+    F1 --> B1
+    F1 --> B2
+    F1 --> B3
+    F1 --> B4
+    
+    A1 --> B1
+```
+
+---
+
+## 次のセッションへの引き継ぎ
+
+### 開始手順
+
+1. `view_file` でこの実装計画を確認
+2. Phase 4 (Strategy F) から開始（コアロジック）
+3. `derivative_selector.py` を作成・テスト
+4. Phase 3 (Strategy B) でワークフローにPhase追加
+5. Phase 2 (Strategy A) で `/o.md` Hub作成
+6. 統合テスト
+
+### 参照すべきファイル
+
+| ファイル | 理由 |
+|:---------|:-----|
+| [.agent/workflows/noe.md](file:///home/laihuip001/oikos/.agent/workflows/noe.md) | 既存構造の確認 |
+| `mekhane/fep/fep_agent.py` | FEP実装パターン参照 |
+| `mekhane/fep/state_spaces.py` | 状態空間定義パターン |
+
+### 推定所要時間
+
+| Phase | 時間 |
+|:------|:----:|
+| Phase 4 (F) | 2時間 |
+| Phase 3 (B) | 2時間 |
+| Phase 2 (A) | 30分 |
+| Phase 5 (統合テスト) | 30分 |
+| **合計** | **5時間** |
+
+---
+
+*Created: 2026-01-29 08:50*  
+*Status: Ready for Implementation*

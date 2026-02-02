@@ -1,0 +1,130 @@
+# Hegemonikón レポジトリ評価
+
+> **CCL**: `/dia*/noe~\dia*\noe`
+> **目的**: レポジトリとドキュメント類の包括的評価
+
+---
+
+## 統計
+
+| 指標 | 値 |
+|:-----|:---|
+| .md ファイル | 479 |
+| .py ファイル (実質) | 201 |
+| ルートファイル | 19 |
+| サイズ | 270MB |
+
+---
+
+## /dia* 批評: ルートディレクトリ
+
+| ファイル | 判定 | 理由 |
+|:---------|:----:|:-----|
+| README.md | ✅ | 洗練済み |
+| AGENTS.md | ✅ | 洗練済み |
+| CHANGELOG.md | 🟡 | 維持（履歴） |
+| CONTRIBUTING.md | 🟡 | 維持（OSS標準） |
+| INDEX.md | 🔴 | **10KB — 巨大** |
+| STRUCTURE.md | 🟡 | 維持 |
+| LICENSE | ✅ | 維持 |
+| requirements.txt | ✅ | 維持 |
+| .gitignore | ✅ | 維持 |
+| llms.txt | 🔴 | **不要** |
+| hegemonikon_full_docs.txt | 🔴 | **2.1MB — 異常** |
+| *.py (ルート直下) | 🔴 | **6件 — 場所不適切** |
+| *.ps1 (ルート直下) | 🔴 | **2件 — レガシー** |
+
+---
+
+## /noe 認識: 問題の本質
+
+### 問題1: ルート汚染
+
+ルートに6つの.pyファイル + 2つの.ps1ファイルが存在。
+
+| ファイル | サイズ | 判定 |
+|:---------|:-------|:-----|
+| adaptive_allocator.py | 11KB | scripts/ へ |
+| collect_results.py | 9KB | scripts/ へ |
+| run_synedrion_review.py | 3KB | scripts/ へ |
+| swarm_scheduler.py | 10KB | scripts/ へ |
+| migrate_to_m.ps1 | 2KB | _limbo/ へ |
+| sync-gemini-settings.ps1 | 1KB | _limbo/ へ |
+
+### 問題2: 巨大ファイル
+
+| ファイル | サイズ | 判定 |
+|:---------|:-------|:-----|
+| hegemonikon_full_docs.txt | 2.1MB | **削除** |
+| INDEX.md | 10KB | **圧縮必要** |
+
+### 問題3: llms.txt
+
+- 目的不明
+- 削除候補
+
+---
+
+## /dia*\noe 振動: 判断
+
+### hegemonikon_full_docs.txt
+
+**/noe**: なぜ存在するか？
+
+- 全ドキュメントを1ファイルに集約？
+- LLM向けのコンテキスト？
+
+**/dia***: 2.1MB は異常
+
+- git履歴を汚染
+- README/AGENTS で十分
+
+**判断**: 🔴 削除
+
+### INDEX.md
+
+**/noe**: なぜ10KBか？
+
+- 全ファイルのインデックス？
+- 自動生成？
+
+**/dia***: READMEと重複する可能性
+
+- 手動メンテナンスは困難
+
+**判断**: 🟡 要調査
+
+### ルート.pyファイル
+
+**/noe**: なぜルートに？
+
+- 利便性？
+- 歴史的経緯？
+
+**/dia***: ルートは「聖なる入口」
+
+- スクリプトは scripts/ または mekhane/ へ
+
+**判断**: 🔴 移動
+
+---
+
+## 推奨アクション
+
+| 優先度 | アクション | 対象 |
+|:------:|:-----------|:-----|
+| 1 | 削除 | hegemonikon_full_docs.txt, llms.txt |
+| 2 | 移動 | *.py → scripts/,*.ps1 → _limbo/ |
+| 3 | 調査 | INDEX.md の構造と必要性 |
+
+---
+
+## 次ステップ
+
+1. 上記アクションを実行？
+2. docs/ の詳細評価？
+3. mekhane/ の詳細評価？
+
+---
+
+*CCL: `/dia*/noe~\dia*\noe` — 批評と認識の振動*

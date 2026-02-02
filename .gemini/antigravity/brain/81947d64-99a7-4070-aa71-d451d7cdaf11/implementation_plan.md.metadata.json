@@ -1,0 +1,6 @@
+{
+  "artifactType": "ARTIFACT_TYPE_IMPLEMENTATION_PLAN",
+  "summary": "Sophia Backlinker Phase 1 実装計画。/plan v3.0 の5ステージ完了。NetworkX + wikilink パーサ、MCP 統合、テスト計画。",
+  "updatedAt": "2026-01-28T09:24:36.575424341Z",
+  "version": "3"
+}

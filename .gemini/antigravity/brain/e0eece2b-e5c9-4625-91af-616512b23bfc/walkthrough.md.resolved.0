@@ -1,0 +1,68 @@
+# B/C/D 実装完了 Walkthrough
+
+> **Commit**: `f89e124e` (3 files, +448 lines)
+> **日時**: 2026-01-31 12:00
+
+---
+
+## B. ドキュメント ✅
+
+### [ccl_usage_examples.md](file:///home/laihuip001/oikos/hegemonikon/docs/ccl_usage_examples.md)
+
+CEP-001 新記号の使用例を6セクションで文書化:
+
+| セクション | 内容 |
+|:-----------|:-----|
+| 変化追跡 | `/boot'`, `/doxa'` |
+| 不確実性 | `V[/bou]`, `V[/ore]` |
+| 期待値 | `E[/pro]`, `E[/ene]` |
+| 収束 | `/bye >> V[]`, `/sop.track` |
+| 根源探索 | `√/dia` |
+| 複合パターン | `lim[V[]<0.2]{...}` |
+
+---
+
+## D. コード品質 ✅
+
+### PROOF Coverage: 76.3%
+
+**変更**: [checker.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/dendron/checker.py) に `.venv` を除外パターン追加
+
+```python
+EXEMPT_PATTERNS = [
+    ...
+    r"\.venv",  # 仮想環境を除外
+]
+```
+
+**CI コマンド**:
+```bash
+python3 -m mekhane.dendron.cli check . --ci --format ci
+```
+
+---
+
+## C. AI 自律化 ✅
+
+### [boot_automation_poc.md](file:///home/laihuip001/oikos/hegemonikon/mekhane/ergasterion/n8n/boot_automation_poc.md)
+
+n8n Boot 自動化の PoC 設計:
+
+```mermaid
+graph TD
+    A[Cron 08:00] --> B[Git Status]
+    B --> C[Handoff 検索]
+    C --> D[Slack 通知]
+```
+
+**次のステップ**: n8n Docker 起動 → フロー Import
+
+---
+
+## 統計
+
+| 項目 | 成果 |
+|:-----|:-----|
+| 新規ファイル | 3 |
+| 追加行数 | +448 |
+| PROOF Coverage | 76.3% |

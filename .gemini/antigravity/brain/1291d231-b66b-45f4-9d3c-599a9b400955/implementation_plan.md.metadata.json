@@ -1,0 +1,5 @@
+{
+  "artifactType": "ARTIFACT_TYPE_IMPLEMENTATION_PLAN",
+  "summary": "ワークフロー劣化監査の結果と修復計画。劣化を3件特定: (1) /sop.md (v5.0で修復済), (2) /pri.md削除によるEisenhower Matrix・Q2保護の完全喪失, (3) /plan.md→/s.mdでY-1/D-1評価が喪失。修復方針として/k.mdへのEisenhower Matrix統合、/s.mdへのY-1/D-1復元を提案。",
+  "updatedAt": "2026-01-28T23:28:52.926127535Z"
+}

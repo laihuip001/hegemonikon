@@ -1,0 +1,5 @@
+{
+  "artifactType": "ARTIFACT_TYPE_OTHER",
+  "summary": "CCL (認知制御言語) の Hegemonikón における位置付けを Python アナロジーで分析したレポート。7つの仮説（CCLは中枢か、README配置、Hegemonikón≒CCL、WF分類、パラダイム論等）を検証し、各仮説の妥当性・成立条件・破綻点を明示。完全対応表（FEP↔言語仕様、定理↔builtins、CCL↔構文等）と具体的なREADME改訂案・ディレクトリ構造提案を含む。結論は「CCLを準主役として前面に出すべき」だが「≒Hegemonikón」は不成立。",
+  "updatedAt": "2026-01-30T14:11:10.133381550Z"
+}

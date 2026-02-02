@@ -1,0 +1,5 @@
+{
+  "artifactType": "ARTIFACT_TYPE_IMPLEMENTATION_PLAN",
+  "summary": "P3 中長期 SEL 強化対策の実装計画。Phase 1: Grammar-Constrained Decoding (CCL Parser + Pydantic)、Phase 2: Multi-Agent Verification (/vet 強化)、Phase 3: Activation Steering (調査のみ) の 3 フェーズ構成。",
+  "updatedAt": "2026-02-01T02:42:42.163281872Z"
+}

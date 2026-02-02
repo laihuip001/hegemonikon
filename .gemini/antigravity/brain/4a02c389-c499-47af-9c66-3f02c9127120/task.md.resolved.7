@@ -1,0 +1,35 @@
+# Hermēneus 開発タスク
+
+> **CCL**: `[hermeneus]@plan_review+`
+> **期限**: 2026-02-08
+> **工数**: 18-26h (参照クラス補正済み)
+
+---
+
+## Phase 1: Expander + Parser 正式版 (Must — WEEK)
+
+### DoD (Definition of Done)
+
+- [ ] `hermeneus/src/ast.py` — 5+ ノード定義
+- [ ] `hermeneus/src/parser.py` — 基本構文パース可能
+- [ ] `hermeneus/src/expander.py` — `>>` → `lim[]{}` 変換
+- [ ] `hermeneus/src/translator.py` — LMQL テンプレート生成
+- [ ] `pytest hermeneus/tests/` — 全パス
+- [ ] [hermeneus/PROOF.md](file:///home/laihuip001/oikos/hegemonikon/hermeneus/PROOF.md) — 更新済み
+
+### マイルストーン
+
+| 日付 | 目標 |
+|:-----|:-----|
+| 02-03 | AST 分離 |
+| 02-05 | Parser + Expander |
+| 02-07 | テスト |
+| 02-08 | **Phase 1 完了** |
+
+---
+
+## Phase 2+ (Future)
+
+- [ ] LMQL ランタイム統合
+- [ ] Constrained Decoding
+- [ ] LangGraph 統合

@@ -1,0 +1,6 @@
+{
+  "artifactType": "ARTIFACT_TYPE_OTHER",
+  "summary": "A5 S4 Epochē (LLM過信低減) の Perplexity Deep Research 結果。10手法の構造化テーブル、4層実装構造 (Preamble/Verification/Markers/Diagnostic)、Claude Constitutional AI 統合パターン、エンタープライズ KPI (ECE ≤ 0.10, Brier ≤ 0.20) を含む包括的調査レポート。",
+  "updatedAt": "2026-01-28T05:51:46.132539009Z",
+  "version": "1"
+}

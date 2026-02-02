@@ -1,0 +1,77 @@
+# Footprint Test Suite for Skill Activation
+
+スキル発動確認のためのテストスイート。
+
+## テスト方法
+
+### 1. インラインテスト（即時確認）
+
+以下のプロンプトを送信し、スキルが発動されるか確認：
+
+| Skill | Test Prompt | Expected Trigger |
+|-------|-------------|------------------|
+| O1 Noesis | "What do I know about this?" | meta-cognition |
+| O2 Boulēsis | "What is my goal here?" | goal clarification |
+| O3 Zētēsis | "Research this topic for me" | /zet, investigate |
+| O4 Energeia | "Let's implement this now" | action, implement |
+| S1 Metron | "Should I zoom in or out?" | granularity |
+| S2 Mekhanē | "Explore or exploit?" | strategy |
+| S3 Stathmos | "How do I evaluate this?" | evaluation criteria |
+| S4 Praxis | "Turn this into action" | value realization |
+| T1 Aisthēsis | "What is this?" | classify, perception |
+| T2 Krisis | "Prioritize these tasks" | /pri, Eisenhower |
+| T3 Theōria | "Why does this happen?" | theory, hypothesis |
+| T4 Phronēsis | "How should I approach this?" | /plan, strategy |
+| T5 Peira | "I don't know, find out" | explore, search |
+| T6 Praxis | "Execute this now" | do it, implement |
+| T7 Dokimē | "Is this correct?" | /chk, verify |
+| T8 Anamnēsis | "Save this for later" | /bye, memory |
+
+### 2. 発動確認チェックリスト
+
+スキル発動時に確認すべき項目：
+
+- [ ] Antigravity IDE がスキルをロードしているか
+- [ ] description が Available Skills リストに表示されるか
+- [ ] プロンプトに対してスキルが選択されるか
+- [ ] スキル内容がレスポンスに反映されるか
+
+### 3. Footprint ログ
+
+発動確認ログを以下に記録：
+
+```
+Date: 2026-01-27
+Tester: Gemini
+
+| Skill | Tested | Activated | Notes |
+|-------|--------|-----------|-------|
+| O1    | [ ]    | [ ]       |       |
+| O2    | [ ]    | [ ]       |       |
+| O3    | [ ]    | [ ]       |       |
+| O4    | [ ]    | [ ]       |       |
+| S1    | [ ]    | [ ]       |       |
+| S2    | [ ]    | [ ]       |       |
+| S3    | [ ]    | [ ]       |       |
+| S4    | [ ]    | [ ]       |       |
+| T1    | [ ]    | [ ]       |       |
+| T2    | [ ]    | [ ]       |       |
+| T3    | [ ]    | [ ]       |       |
+| T4    | [ ]    | [ ]       |       |
+| T5    | [ ]    | [ ]       |       |
+| T6    | [ ]    | [ ]       |       |
+| T7    | [ ]    | [ ]       |       |
+| T8    | [ ]    | [ ]       |       |
+```
+
+## 現在の問題点
+
+Antigravity IDE のスキル読み込みについて：
+1. `.agent/skills/` 配下のスキルは自動読み込み
+2. `description` フィールドがルーティングに使用される
+3. ただし、**現在のセッションではスキルリストが固定**されている可能性
+
+## 即時テスト実行
+
+**T2 Krisis テスト**: このセッションで「優先順位をつけて」と言ってみてください。
+T2 が発動すれば、Eisenhower Matrix を使用した優先順位付けが提案されるはずです。

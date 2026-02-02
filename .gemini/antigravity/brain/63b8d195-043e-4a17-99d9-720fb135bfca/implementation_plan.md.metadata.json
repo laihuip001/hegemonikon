@@ -1,0 +1,6 @@
+{
+  "artifactType": "ARTIFACT_TYPE_IMPLEMENTATION_PLAN",
+  "summary": "CCL 実行保証の実装計画。/sop+ 調査結果を統合。4層アーキテクチャ（最適化/制御/実行/検証）、7フェーズの実装ロードマップ。",
+  "updatedAt": "2026-01-31T04:43:40.355468274Z",
+  "version": "3"
+}

@@ -1,0 +1,215 @@
+# /mek+ Hermeneus Phase 2: LMQL ランタイム統合
+
+---
+sel:
+  workflow: /mek+
+  scope: P1=hermeneus-phase2
+  output_format: Synergeia 分散実行計画
+  quality_gate:
+    - CCL 式で全ステップを記述
+    - 収束条件を明示
+    - スレッド割り当て定義
+    - 検証手順
+---
+
+## CCL シグネチャ
+
+```ccl
+/mek+ "Hermeneus Phase 2"
+  [target: runtime.py]
+  {compile_and_execute()}
+  >> V[] < 0.2
+```
+
+---
+
+## 背景状態
+
+```ccl
+let @hermeneus_status = (
+  phase1: [✓] "Expander, Parser, Translator 完了"
+  phase2: [ ] "LMQL ランタイム統合"  # ← 今回
+  phase3: [ ] "Constrained Decoding"
+  phase4: [ ] "LangGraph 統合"
+)
+
+@hermeneus_status >> /noe "現在位置確認"
+```
+
+---
+
+## メイン CCL プログラム
+
+```ccl
+# Hermeneus Phase 2 分散実行
+# Total: ~60 CP (分散後: 各スレッド 15 CP)
+
+let @research = @thread[perplexity]{
+  /sop+ "LMQL Python 2026, Guidance, constrained decoding"
+  >> "実用例3つ以上"
+}
+
+let @design = @thread[antigravity]{
+  /noe+^h4 "runtime.py 設計"
+  [input: @research]
+  >> "アーキテクチャ図"
+}
+
+let @implement = @thread[claude]{
+  /s+_/ene "runtime.py 実装"
+  [input: @design]
+  [scope: hermeneus/src/]
+  >> "pytest pass"
+}
+
+let @review = @thread[antigravity]{
+  /dia+\a2 "コードレビュー"
+  [input: @implement]
+  >> "blocker 0件"
+}
+
+# パイプライン実行
+@research |> @design |> @implement |> @review
+>> lim[V[] < 0.2]{
+  I:[blocker > 0]{
+    @fix _@implement _@review  # 修正サイクル
+  }
+}
+```
+
+---
+
+## ステップ CCL 詳細
+
+### Step 1: 調査 (@research)
+
+```ccl
+@thread[perplexity]{
+  /sop+ "LMQL library Python 2026"
+  {
+    query: [
+      "LMQL latest version pip install",
+      "LMQL vs Guidance comparison 2026",
+      "constrained decoding best practices",
+      "LMQL OpenAI integration example"
+    ]
+  }
+  >> Σ[citations] > 5
+}
+```
+
+**CLI 実行**:
+
+```bash
+python3 /home/laihuip001/oikos/hegemonikon/synergeia/coordinator.py \
+  "/sop+" \
+  "LMQL Python 2026, Guidance, constrained decoding for LLM output control"
+```
+
+### Step 2: 設計 (@design)
+
+```ccl
+@thread[antigravity]{
+  /noe+^
+  [input: Step1.result]
+  {
+    analyze: "LMQL パターン抽出"
+    design: "runtime.py API 設計"
+    output: [
+      "execute_lmql(code, context) -> str",
+      "LMQLRuntime class",
+      "エラーハンドリング戦略"
+    ]
+  }
+  >> "設計ドキュメント完成"
+}
+```
+
+### Step 3: 実装 (@implement)
+
+```ccl
+@thread[claude]{
+  /s+ "runtime.py"
+  [cwd: /home/laihuip001/oikos/hegemonikon]
+  {
+    create: "hermeneus/src/runtime.py"
+    modify: "hermeneus/src/__init__.py"
+    test: "hermeneus/tests/test_runtime.py"
+  }
+  _/ene+ "実行確認"
+  >> "pytest pass && no blocker"
+}
+```
+
+**CLI 実行**:
+
+```bash
+python3 /home/laihuip001/oikos/hegemonikon/synergeia/coordinator.py \
+  "/s+" \
+  "Implement hermeneus/src/runtime.py: LMQL execution runtime"
+```
+
+### Step 4: レビュー (@review)
+
+```ccl
+@thread[antigravity]{
+  /dia+\
+  [scope: hermeneus/src/runtime.py]
+  {
+    F:[axes]{
+      check: "AI-022 (magic numbers)"
+      check: "AI-003 (security)"
+      check: "AI-006 (hardcoded)"
+    }
+  }
+  >> "blocker = 0"
+}
+```
+
+---
+
+## 収束条件
+
+```ccl
+# 成功条件
+lim[V[] < 0.2]{
+  pytest: "19/19 + new tests pass"
+  execute_ccl("/noe+"): "returns valid output"
+  blocker: 0
+}
+
+# 失敗時フォールバック
+I:[lmql_install_fail]{
+  @fallback = "Guidance ライブラリ使用"
+  /sop+ "Guidance Python 2026"
+  |> @implement
+}
+```
+
+---
+
+## 成果物マトリクス
+
+| ファイル | アクション | CCL |
+|:---------|:-----------|:----|
+| [runtime.py](file:///home/laihuip001/oikos/hegemonikon/hermeneus/src/runtime.py) | **NEW** | `/s+` |
+| [__init__.py](file:///home/laihuip001/oikos/hegemonikon/hermeneus/src/__init__.py) | **MODIFY** | `/ene` |
+| [test_runtime.py](file:///home/laihuip001/oikos/hegemonikon/hermeneus/tests/test_runtime.py) | **NEW** | `/dia` |
+
+---
+
+## 検証 CCL
+
+```ccl
+/vet "Hermeneus Phase 2"
+  [scope: hermeneus/]
+  {
+    pytest: "-v"
+    manual: "execute_ccl('/noe+', 'test')"
+  }
+  >> "all green"
+```
+
+---
+
+*Generated: 2026-02-01 13:00 | /mek+ Synergeia Distributed Execution*

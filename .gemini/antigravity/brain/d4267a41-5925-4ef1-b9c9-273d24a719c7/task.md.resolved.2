@@ -1,0 +1,22 @@
+# Task: jules_client.py 脆弱性修正
+
+## 完了
+- [x] Jules レビューブランチ確認 (59件発見)
+- [x] ai-003, ai-002: **False Positive** (API存在疑義 - 401確認)
+- [x] th-004: parse_state→UNKNOWN, error_type保持 (**Fixed**: 233af095)
+- [x] ai-004-1: docstring矛盾 (**Fixed** by th-004)
+- [x] ai-004-2: WAITING_FOR_APPROVAL追加 (**Fixed**: d88f4e9e)
+- [x] ai-004-3: aiohttp再利用 (**Already done**: context manager)
+- [x] es-001: docstring矛盾 (**Fixed** by th-004)
+- [x] th-002-1,2: parse_state, aiohttp (**Fixed**)
+
+## 新規発見 (要対応)
+| Review | Severity | Finding |
+|--------|----------|---------|
+| th-001 | Medium | 500系エラーのリトライ未実装 |
+| th-001 | Medium | エラー伝播の非対称性 |
+| as-003 | Low | CancelledError意図コメント推奨 |
+| th-002-3 | Medium | Result型の統一 |
+
+## 確認済みブランチ
+ai-003, ai-002, ai-004, es-001, th-001, th-002, th-004, as-003 (8/59)

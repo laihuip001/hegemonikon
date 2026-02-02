@@ -1,0 +1,5 @@
+{
+  "artifactType": "ARTIFACT_TYPE_IMPLEMENTATION_PLAN",
+  "summary": "Dendron 次フェーズの実装計画。Phase A は check_proof.py の非推奨化と Dendron への機能統合（1.5時間）。Phase B は CCL 実行の Multi-Agent 監査基盤構築（9時間）。Phase A を先行実行することを推奨。",
+  "updatedAt": "2026-02-01T03:53:52.583917711Z"
+}

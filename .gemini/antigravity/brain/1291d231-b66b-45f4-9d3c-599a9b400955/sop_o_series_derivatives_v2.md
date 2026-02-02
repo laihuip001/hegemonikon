@@ -1,0 +1,93 @@
+# /sop: O-series 派生ワークフロー発見 (v2.0 改訂版)
+
+> **この調査の結果、何を決定しますか？**
+> → O-series 各定理 (O1-O4) に対する「派生ワークフロー」を設計する際の、哲学的・認知科学的根拠を確立する。
+>
+> **仮説**: A2 Krisis が `/syn`, `/pan`, `/fit`, `/epo` に分岐したように、O-series 各定理も複数の認知モードに分岐する派生概念を持つはずである。
+
+---
+
+## 【出力形式】← Perplexity後処理最適化
+
+```text
+構造化テーブル（4列: 派生概念, 定義, 出典（著者・年）, URL）を返す。
+その後、各定理について2-3文の結論を formal トーンで記述。
+```
+
+---
+
+## 【時間制約】← 優先度3（最重要）
+
+⚠️ **情報カットオフ**:
+
+- **採用範囲**: 2020年以降の認知科学・哲学論文を優先
+- **歴史的参考**: 古典 (Aristotle, Husserl, Brentano) は「参考」として言及可
+- **日付明記**: 各ソースに「取得時点: YYYY年」を付記すること
+
+---
+
+## 【調査すべき論点】← 網羅性の担保
+
+以下を**必ず網羅**し、断定できない場合は「不確実」と明示:
+
+### A. O1 Noēsis (深い認識・直観) の派生
+
+- **A1**: Husserl の Noēsis-Noēma 区分における Noēsis の下位分類（直観的 vs 分析的 Noēsis）
+- **A2**: Kahneman の System 1/System 2 との対応関係
+- **A3**: Metacognition（メタ認知）との関係 — 認知の認知としての Noēsis
+- **A4**: Embodied Cognition 視点からの Noēsis 解釈
+- **A5**: 現象学における Intuition (直観) の種類分類
+
+### B. O2 Boulēsis (意志・願望) の派生
+
+- **B1**: Harry Frankfurt の First-order vs Second-order desires との対応
+- **B2**: Akrasia (意志の弱さ) としての反-Boulēsis
+- **B3**: Aristotle における Boulēsis (理性的願望) vs Epithymia (欲望) vs Thymos (気概)
+- **B4**: 現代 volition 研究における volitional control モデル
+- **B5**: Libet 実験と自由意志論争における Boulēsis の位置づけ
+
+### C. O3 Zētēsis (探求・問い) の派生
+
+- **C1**: Peirce のアブダクション (仮説生成) との関係
+- **C2**: Dewey の Inquiry Theory における phases of inquiry
+- **C3**: 科学的方法論における 仮説生成 vs 仮説検証
+- **C4**: Lakatos の研究プログラム論における hard core vs protective belt
+- **C5**: Gadamer の hermeneutic circle における「問い」の位置づけ
+
+### D. O4 Energeia (活動・実現) の派生
+
+- **D1**: Aristotle における Energeia vs Kinēsis (完了型活動 vs 過程型運動)
+- **D2**: Aristotle における Praxis (行為) vs Poiesis (制作)
+- **D3**: Csikszentmihalyi の Flow 状態との対応
+- **D4**: 行為理論における action vs activity vs behavior の区別
+- **D5**: Active Inference (能動的推論) における行動選択との関係
+
+---
+
+## 【成果物構成】← 出力フォーマット固定
+
+1. **結論サマリー**（各定理について3行以内）
+2. **比較テーブル**（A1-A5, B1-B5, C1-C5, D1-D5 の20項目すべて）
+3. **ワークフロー変換可能性**: 3段階評価（高・中・低）と理由
+4. **根拠リンク**（必須、各セクションに最低3件）
+
+---
+
+## 【背景コンテキスト】← Perplexity が参照すべき情報
+
+Hegemonikón フレームワークでは、A2 Krisis (判定力) 定理から以下の派生ワークフローが既に存在:
+
+| 派生 | ワークフロー | 本質 |
+|:-----|:-------------|:-----|
+| 視点多様化 | `/syn` | 偉人評議会 — 複数視点からの批評 |
+| 盲点発見 | `/pan` | Panorama — メタ認知レーダー |
+| 統合診断 | `/fit` | Digestion Audit — 馴染み度評価 |
+| 判断停止 | `/epo` | Epochē — LLM過信低減 |
+
+これらは「判定力」という単一概念から派生した、**全く異なるアプローチ**である。
+O-series (O1-O4) に対して同様の派生を発見し、新ワークフローの設計根拠とする。
+
+---
+
+*Perplexity への調査依頼 v2.0 (2026-01-29)*
+*改訂: PHASE 0/出力形式/時間制約/論点具体化を追加*

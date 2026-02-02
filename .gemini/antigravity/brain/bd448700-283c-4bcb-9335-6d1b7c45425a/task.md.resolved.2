@@ -1,0 +1,49 @@
+# Task: pymdp × Hegemonikón 統合
+
+## Status: /plan 完了、承認待ち
+
+---
+
+## Goal Decomposition
+
+```
+最終目標: pymdpを認知層として動作させる
+  ← [3] noesis/boulesis/energeia APIテスト
+  ← [2] HegemonikónAgentクラス作成
+  ← [1] pymdpインストール確認
+  ← 現在地
+```
+
+---
+
+## Checklist
+
+### Subgoal 1: pymdpインストール確認
+- [ ] `pip install inferactively-pymdp`
+- [ ] `from pymdp.agent import Agent` 成功確認
+
+### Subgoal 2: HegemonikónAgentクラス作成
+- [ ] `mekhane/fep/` ディレクトリ作成
+- [ ] `active_inference_agent.py` 作成
+- [ ] noesis/boulesis/energeia メソッド実装
+
+### Subgoal 3: APIテスト
+- [ ] ランダム観察で noesis() 呼び出し
+- [ ] boulesis() でポリシー推論
+- [ ] energeia() で行動選択
+- [ ] 全ステップエラーなし確認
+
+---
+
+## Success Criteria
+
+| 軸 | Must | Status |
+|:---|:-----|:-------|
+| 機能性 | pymdpインポート成功 | [ ] |
+| 機能性 | API呼び出し成功 | [ ] |
+| 品質 | エラーなく動作 | [ ] |
+| 性能 | 1秒以内で推論完了 | [ ] |
+
+---
+
+*Created: 2026-01-28 / /plan v3.0 完了*

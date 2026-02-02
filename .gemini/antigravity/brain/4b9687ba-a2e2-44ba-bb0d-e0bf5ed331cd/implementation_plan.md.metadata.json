@@ -1,0 +1,5 @@
+{
+  "artifactType": "ARTIFACT_TYPE_IMPLEMENTATION_PLAN",
+  "summary": "Flow AI を Hegemonikón の語彙で0から再構築する計画。コンポーネントマッピング（SeasoningManager→MetronResolver、PrivacyHandler→EpocheShield、CoreProcessor→EnergeiaCoreResolverShield、、etc）、ディレクトリ構造、段階的実装計画、検証計画を含む。",
+  "updatedAt": "2026-01-29T04:08:24.947067652Z"
+}

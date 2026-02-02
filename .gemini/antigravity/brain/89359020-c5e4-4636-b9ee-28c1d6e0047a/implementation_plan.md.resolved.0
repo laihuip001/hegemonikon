@@ -1,0 +1,104 @@
+# Workflow Consolidation Plan
+
+> **Goal**: 子を親が吸収し、コマンド数を削減
+> **Model**: `/mek --target=` パターン
+
+---
+
+## 現状分析
+
+| 親 | 子 | 子の数 |
+|:---|:---|:------:|
+| `/dia` | epo, fit, pan, syn, **vet** | **5** |
+| `/zet` | poc, why | 2 |
+| `/bou` | pre | 1 |
+| `/ene` | flag | 1 |
+| `/x` | ax | 1 |
+
+**Total**: 46 ワークフロー中 10 個が子
+
+---
+
+## 統合案
+
+### Phase 1: `/dia` 統合 (5子 → 0子)
+
+```yaml
+# 現状
+/dia   # A2 Krisis 親
+/epo   # 判断停止
+/fit   # 消化品質診断
+/pan   # メタ認知レーダー
+/syn   # 偉人評議会
+/vet   # Cross-Model 検証
+
+# 統合後
+/dia                      # デフォルト
+/dia --mode=epochē        # 判断停止
+/dia --mode=audit         # 消化品質診断
+/dia --mode=panorama      # メタ認知レーダー
+/dia --mode=synedrion     # 偉人評議会
+/dia --mode=cross-model   # Cross-Model 検証
+```
+
+**削減**: 5 ワークフロー
+
+---
+
+### Phase 2: `/zet` 統合 (2子 → 0子)
+
+```yaml
+# 現状
+/zet   # O3 Zētēsis 親
+/poc   # Spike/PoC
+/why   # Five Whys
+
+# 統合後
+/zet                   # デフォルト
+/zet --mode=poc        # Spike/PoC
+/zet --mode=five-whys  # Five Whys
+```
+
+**削減**: 2 ワークフロー
+
+---
+
+### Phase 3: 残り (3子 → 0子)
+
+```yaml
+/bou --mode=premortem  # /pre
+/ene --mode=feature-flag  # /flag
+/x --mode=all  # /ax
+```
+
+**削減**: 3 ワークフロー
+
+---
+
+## 効果
+
+| 項目 | Before | After | 削減 |
+|:-----|:------:|:-----:|:----:|
+| ワークフロー数 | 46 | 36 | **-10** |
+| 認知負荷 | 高 | 低 | 大幅改善 |
+
+---
+
+## 実装方法
+
+1. 親ワークフローに `--mode=` パラメータを追加
+2. 子の内容を親のセクションに統合
+3. 子ファイルを `deprecated/` に移動
+4. tools.yaml を更新
+
+---
+
+## Verification
+
+- [ ] `/dia --mode=cross-model` が `/vet` と同等に動作
+- [ ] 既存の親子関係が壊れていない
+
+---
+
+> [!IMPORTANT]
+> これは大きな変更です。Phase 1 (/dia) のみ先行実装しますか？

@@ -1,0 +1,5 @@
+{
+  "artifactType": "ARTIFACT_TYPE_OTHER",
+  "summary": "スキル発動確認のための Footprint テストスイート。16スキル全てのテストプロンプト、発動確認チェックリスト、ログテンプレートを含む。",
+  "updatedAt": "2026-01-27T07:29:44.008759237Z"
+}

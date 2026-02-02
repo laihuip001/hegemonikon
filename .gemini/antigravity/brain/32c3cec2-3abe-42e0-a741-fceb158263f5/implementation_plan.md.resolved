@@ -1,0 +1,100 @@
+# Mnēmē Synthesis CLI 実装計画
+
+> **Boulēsis 優先順位**: 1/3
+> **目的**: `/boot` で `mneme_cli.py ingest --all` が動作するようにする
+
+---
+
+## 1. 現状分析
+
+### 既存インフラ
+| ファイル | 機能 | 状態 |
+|:---|:---|:---|
+| [sophia_ingest.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/symploke/sophia_ingest.py) | KI → Sophia インデックス | ✅ 動作確認済み |
+| [kairos_ingest.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/symploke/kairos_ingest.py) | Handoff → Kairos | ✅ 動作確認済み |
+| [test_ingest.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/symploke/tests/test_ingest.py) | 両 ingest のテスト | ✅ 存在 |
+
+### 問題点
+`/boot` は `python mekhane/anamnesis/mneme_cli.py ingest --all` を呼ぼうとするが、そのファイルが存在しない。
+
+---
+
+## 2. 提案
+
+### Option A: シンプルなラッパー CLI 作成 (推奨)
+- `mekhane/anamnesis/mneme_cli.py` を新規作成
+- 既存の `sophia_ingest.py` と `kairos_ingest.py` を import して統合
+- `/boot` との互換性を維持
+
+### Option B: boot.md のパスを修正
+- 既存スクリプトのパスに合わせて `/boot` を更新
+- 既存コードを変更せず
+
+**→ Option A を推奨**: 統一されたエントリポイントがあることで、将来の拡張 (Chronos 追加など) が容易になる。
+
+---
+
+## 3. 実装変更
+
+### [NEW] mneme_cli.py
+
+**パス**: `mekhane/anamnesis/mneme_cli.py`
+
+```python
+# 統合インジェストCLI
+# - ingest --all: Sophia + Kairos を同時実行
+# - ingest --sophia: KI のみ
+# - ingest --kairos: Handoff のみ
+# - stats: 各インデックスの統計
+```
+
+**主要機能**:
+1. `ingest` サブコマンド (argparse)
+2. Sophia/Kairos の既存ロジックを再利用
+3. 統計出力 (`/boot` の期待するフォーマット)
+
+---
+
+## 4. Verification Plan
+
+### 4.1 既存テスト実行
+```bash
+cd /home/laihuip001/oikos/hegemonikon
+python3 -m pytest mekhane/symploke/tests/test_ingest.py -v
+```
+
+### 4.2 新規 CLI 動作確認
+```bash
+python3 /home/laihuip001/oikos/hegemonikon/mekhane/anamnesis/mneme_cli.py ingest --all
+```
+
+期待出力:
+```
+[Mnēmē Synthesis] インデックス更新
+  Chronos: [N] documents
+  Sophia: [M] documents
+  Kairos: [K] documents
+  Total: [N+M+K] documents
+```
+
+### 4.3 /boot 統合テスト
+`/boot` を実行し、Mnēmē Synthesis ステップがエラーなく完了することを確認。
+
+---
+
+## 5. 懸念点・注意事項
+
+> [!NOTE]
+> `sophia_ingest.py` は `all-MiniLM-L6-v2` (384次元) を使用。
+> 初回実行時にモデルダウンロードが発生する可能性あり。
+
+> [!IMPORTANT]
+> Chronos (会話履歴) は現時点で未実装。
+> `/boot` の出力テンプレートでは `Chronos: [N] documents` を期待しているが、
+> 今回は `0` または `N/A` を返す。
+
+---
+
+## 承認待ち
+
+→ この計画で進めてよろしいですか？

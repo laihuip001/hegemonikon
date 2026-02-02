@@ -1,0 +1,6 @@
+{
+  "artifactType": "ARTIFACT_TYPE_IMPLEMENTATION_PLAN",
+  "summary": "tekhne-maker SKILL.md を Prompt-Lang 形式に変換する計画。mixin を活用したモジュール分離設計。",
+  "updatedAt": "2026-01-27T14:12:17.266105848Z",
+  "version": "4"
+}

@@ -1,0 +1,138 @@
+# 実装計画: @extends/@mixin for Prompt-Lang v2.1
+
+## 概要
+
+Prompt-Lang にテンプレート継承 (`@extends`) とコンポジション (`@mixin`) を追加する。
+
+---
+
+## 設計仕様（complete-report.md より）
+
+### @extends: テンプレート継承
+
+```prompt-lang
+#prompt base_spec
+@role: "システム設計レビューア"
+@goal: "与えられた設計のリスクと改善提案を出す"
+@constraints:
+  - "数値的な根拠を添えること"
+
+#prompt security_review
+@extends: base_spec
+@goal: "セキュリティ観点に特化してレビュー"  # 上書き
+@constraints:
+  - "OWASP Top 10に照らして指摘"             # 追加
+```
+
+**動作**: 子が親を継承し、同名ブロックは子が優先。リスト型は追加。
+
+### @mixin: テンプレート合成
+
+```prompt-lang
+#mixin json_output
+@format:
+  type: "json"
+  required_keys: ["summary", "risks"]
+
+#prompt design_review
+@mixin: [json_output, security_constraints]
+@role: "設計レビューア"
+```
+
+**動作**: 複数 mixin を順次マージ。後に指定したものが優先。
+
+---
+
+## 変更箇所
+
+### 1. データ構造追加 (prompt_lang.py)
+
+```python
+@dataclass
+class Mixin:
+    """Reusable mixin template."""
+    name: str
+    blocks: dict[str, any] = field(default_factory=dict)
+
+@dataclass
+class Prompt:
+    # 既存フィールド...
+    
+    # v2.1 additions
+    extends: Optional[str] = None           # 継承元プロンプト名
+    mixins: list[str] = field(default_factory=list)  # 適用するmixin名リスト
+```
+
+### 2. パーサー拡張 (PromptLangParser)
+
+| 変更 | 内容 |
+|:-----|:-----|
+| `#mixin` ヘッダー | `#mixin <name>` をパース |
+| `@extends:` ブロック | 継承元を記録 |
+| `@mixin:` ブロック | mixin リストを記録 |
+
+### 3. 解決ロジック (resolve_inheritance)
+
+```python
+def resolve_inheritance(
+    prompt: Prompt,
+    registry: dict[str, Prompt | Mixin]
+) -> Prompt:
+    """
+    1. mixin を順次マージ（左から右）
+    2. extends があれば親を再帰的に解決
+    3. 親 + mixin + 自身を合成
+    """
+```
+
+### 4. マージルール
+
+| ブロック型 | マージ動作 |
+|:-----------|:-----------|
+| [str](file:///home/laihuip001/oikos/hegemonikon/mekhane/ergasterion/prompt-lang/test_prompt_lang.py#132-146) (role, goal, format) | 子で上書き |
+| [list](file:///home/laihuip001/oikos/hegemonikon/mcp/prompt_lang_mcp_server.py#208-238) (constraints, examples) | 追加（子が末尾） |
+| [dict](file:///home/laihuip001/oikos/hegemonikon/mekhane/ergasterion/prompt-lang/prompt_lang.py#99-102) (tools, resources) | マージ（子が優先） |
+| [Rubric](file:///home/laihuip001/oikos/hegemonikon/mekhane/ergasterion/prompt-lang/prompt_lang.py#42-48) | 子で置き換え |
+| [Activation](file:///home/laihuip001/oikos/hegemonikon/mekhane/ergasterion/prompt-lang/prompt_lang.py#60-67) | 子で置き換え |
+| `list[ContextItem]` | 追加 |
+
+---
+
+## 実装手順
+
+### Phase 1: データ構造
+
+- [ ] `Mixin` dataclass 定義
+- [ ] [Prompt](file:///home/laihuip001/oikos/hegemonikon/mekhane/ergasterion/prompt-lang/prompt_lang.py#81-477) に `extends`, `mixins` 追加
+
+### Phase 2: パーサー
+
+- [ ] `#mixin` ヘッダーパターン追加
+- [ ] [_parse_header()](file:///home/laihuip001/oikos/hegemonikon/mekhane/ergasterion/prompt-lang/prompt_lang.py#533-542) で mixin 判別
+- [ ] `@extends:` ブロック解析
+- [ ] `@mixin:` ブロック解析
+
+### Phase 3: 解決ロジック
+
+- [ ] `resolve_inheritance()` 関数実装
+- [ ] 循環参照検出
+- [ ] [compile()](file:///home/laihuip001/oikos/hegemonikon/mekhane/ergasterion/prompt-lang/prompt_lang.py#159-254) に統合
+
+### Phase 4: テスト
+
+- [ ] 基本継承テスト
+- [ ] 複数mixin合成テスト
+- [ ] 循環参照エラーテスト
+- [ ] 上書き・追加マージテスト
+
+---
+
+## 工数見積もり
+
+| フェーズ | 時間 |
+|:---------|:-----|
+| Phase 1 | 5分 |
+| Phase 2 | 15分 |
+| Phase 3 | 20分 |
+| Phase 4 | 15分 |
+| **合計** | **~55分** |

@@ -1,0 +1,38 @@
+# Workflow Modules v2.1 Update
+
+> **目的**: ワークフローの modules フィールドをレガシーT/M-series から v2.1 ID に更新
+
+## タスク
+
+- [x] **ワークフローmodules更新**
+  - [x] `/noe` → T3,T4,T7 → O1,O3,S2,A2
+  - [x] `/zet` → T5 → O3
+  - [x] `/plan` → M3,M4 → S2,O3
+  - [x] `/boot` → T1,T8 → S1,H4
+  - [x] `/bye` → T8,M8 → H4
+  - [x] `/ene` → T6,T2 → O4,O2
+  - [x] `/why` → T3 → O3
+  - [x] `/u` → M7,M4 → A2,S2
+  - [x] `/chk` → M7 → A2
+  - [x] `/v` → M7 → A2
+  - [x] `/rev` → M7,M8 → A2,H4
+  - [x] `/hist` → M8 → H4
+  - [x] `/now` → M1,M8 → S1,H4
+  - [x] `/pri` → M2 → S2
+  - [x] `/manual` → M6 → H2
+
+- [x] **意図的T-series参照（維持）**
+  - `ax.md` - 全定理統合（O/T/K/X全層を呼び出す）
+  - `t.md` - T-series interface（T1-T8を直接呼ぶ）
+  - `k.md` - K-series interface（K1-K12を呼ぶ）
+  - `o.md` - O-series interface（O1-O4を呼ぶ）
+  - `x.md` - X-series interface
+
+## 成功基準
+
+- [x] 全ワークフローでレガシーM-series参照を排除
+- [x] T-series参照はT-series interfaceワークフローのみに維持
+
+---
+
+*Updated: 2026-01-28*

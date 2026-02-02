@@ -1,0 +1,6 @@
+{
+  "artifactType": "ARTIFACT_TYPE_IMPLEMENTATION_PLAN",
+  "summary": "Hermēneus CCL コンパイラ Phase 1 実装計画。@plan_review+ で精査し、完了条件・Premortem・参照クラス見積もりを追加。",
+  "updatedAt": "2026-02-01T04:24:22.370254374Z",
+  "version": "2"
+}

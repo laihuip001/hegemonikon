@@ -1,0 +1,5 @@
+{
+  "artifactType": "ARTIFACT_TYPE_OTHER",
+  "summary": "ワークフロー劣化の再発防止ルール。1:1統一時の機能喞失パターン、Git pre-commitフックによる自動検証、品質指標チェックリストを定義。",
+  "updatedAt": "2026-01-29T00:11:27.300874717Z"
+}

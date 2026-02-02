@@ -1,0 +1,1076 @@
+# Walkthrough: tekhne-maker v5.1 統合
+
+## 実施日時
+2026-01-28 08:47 - 08:52
+
+## 目的
+prompt-lang-generator を tekhne-maker に MODE として統合
+
+---
+
+## 変更サマリー
+
+### 1. tools.yaml 更新
+
+```diff:tools.yaml
+# Hegemonikón Tools Registry
+# 利用可能な機構の一元管理ファイル
+# /boot で自動読み込みされ、セッション開始時にリマインドされる
+
+version: "1.0.0"
+updated: "2026-01-24"
+
+# =============================================================================
+# MCP Servers
+# =============================================================================
+mcp:
+  gnosis:
+    path: mcp/gnosis_mcp_server.py
+    description: "Gnōsis知識ベース + モデル推奨"
+    tools:
+      - name: search
+        description: "論文検索（ベクトル類似度）"
+        usage: "@mcp:gnosis で「query」を検索して"
+      - name: stats
+        description: "知識ベース統計情報"
+        usage: "@mcp:gnosis で stats を実行"
+      - name: recommend_model
+        description: "タスクからモデル推奨（T2 Krisis）"
+        usage: "@mcp:gnosis で recommend_model「タスク説明」"
+
+  jules:
+    path: mcp/jules_mcp_server.py
+    description: "Jules API 並列コード生成"
+    tools:
+      - name: jules_create_task
+        description: "単一タスク作成"
+        usage: "@mcp:jules で create_task「タスク説明」「repo」"
+      - name: jules_batch_execute
+        description: "並列実行（max 60）"
+        usage: "@mcp:jules で batch_execute [タスクリスト]"
+      - name: jules_get_status
+        description: "セッション状態確認"
+        usage: "@mcp:jules で get_status「session_id」"
+      - name: jules_list_repos
+        description: "利用可能リポジトリ一覧"
+        usage: "@mcp:jules で list_repos"
+
+# =============================================================================
+# CLI Scripts
+# =============================================================================
+scripts:
+  chat-history-sync:
+    path: mekhane/peira/scripts/chat-history-kb.py
+    command: "python {path} sync --report"
+    description: "チャット履歴を LanceDB に同期"
+    purpose: "セッション間の情報共有"
+    workflow: "/hist"
+
+  gnosis-cli:
+    path: mekhane/anamnesis/cli.py
+    commands:
+      - 'search "query"  # 論文検索'
+      - "stats            # 統計情報"
+      - "collect -s arxiv # arXiv収集"
+    description: "Gnōsis知識ベースCLI"
+
+  gnosis-auto-collect:
+    path: .agent/scripts/gnosis-auto-collect.ps1
+    command: '& "{path}"'
+    description: "Gnōsis自動収集（ローテーション）"
+    purpose: "10トピックを順番に収集"
+    workflow: "/boot Step 5"
+
+# =============================================================================
+# Workflows (quick reference)
+# =============================================================================
+workflows:
+  boot:
+    purpose: "セッション初期化、履歴同期、レビュー生成"
+    modules: [T1, T8]
+
+  hist:
+    purpose: "チャット履歴を LanceDB に同期"
+    modules: [T8]
+    depends: [chat-history-sync]
+
+  plan:
+    purpose: "設計計画策定（コード前に必須）"
+    modules: [T4, T3]
+    includes: "Step 0.1 モデル適性チェック"
+
+  zet:
+    purpose: "O3 Zētēsis（探求）パプ君への調査依頼書作成"
+    modules: [O3, T5]
+
+  src:
+    purpose: "Web検索実行（Perplexity API）"
+    modules: [T5]
+
+  noe:
+    purpose: "O1 Noēsis（認識）最深層思考、0からの再構築"
+    modules: [O1, T3, T4, T7]
+    description: "直観的認識、前提破壊、白紙再設計"
+
+  bou:
+    purpose: "O2 Boulēsis（意志）目的の明確化、何を望むか"
+    modules: [O2]
+    description: "次に何をしたいかを問う"
+
+  ene:
+    purpose: "O4 Energeia（行為）承認済み計画の実行"
+    modules: [O4, T6, T2]
+    description: "6段階実行フレームワーク"
+
+  why:
+    purpose: "T3 自問（目的と手段の入れ替わり防止）"
+    modules: [T3]
+    description: "3層自問: 表層→深層→検証"
+
+  rev:
+    purpose: "レビュー生成"
+    modules: [T7, T8]
+
+  chk:
+    purpose: "検証・批評（Synedrion評議会）"
+    modules: [T7]
+
+  ax:
+    purpose: "O/T/K/X 定理群統合分析"
+    modules: [O1-O4, T1-T8, K1-K12, X-O, X-T, X-K]
+    description: "問題を本質→様態→文脈→関係の順で多層分析"
+
+  o:
+    purpose: "O-series（純粋定理）"
+    modules: [O1, O2, O3, O4]
+
+  t:
+    purpose: "T-series（拡張定理）"
+    modules: [T1-T8]
+
+  k:
+    purpose: "K-series（文脈定理）"
+    modules: [K1-K12]
+
+  x:
+    purpose: "X-series（関係層）"
+    modules: [X-O, X-T, X-K]
+
+  bye:
+    purpose: "セッション終了、Handoff生成"
+    description: "次回セッションへの引き継ぎ書類を作成"
+
+  dev:
+    purpose: "開発プロトコル参照"
+    description: "Creator用開発マニュアル呼び出し"
+
+  exp:
+    purpose: "チャット履歴エクスポート"
+    modules: [T8]
+    description: "M8 Anamnēsis エピソード記憶保存"
+
+  manual:
+    purpose: "マニュアル生成"
+    description: "Gemini/Jules向け作業手順書を作成"
+
+  now:
+    purpose: "現在地確認"
+    description: "コンテキスト再構築とタスク確認"
+
+  pri:
+    purpose: "優先順位判定"
+    modules: [T2]
+    description: "Eisenhowerマトリクスによるタスク整理"
+
+  rec:
+    purpose: "記憶想起・ルール確認"
+    description: "必須ルールとスキルトリガーを再読み込み"
+
+  u:
+    purpose: "Claudeの主観意見"
+    description: "AIをパートナーとして扱い意見を求める"
+
+  v:
+    purpose: "Cross-Model 検証"
+    modules: [T7]
+    description: "Geminiの作業をClaudeが監査・検証"
+
+# =============================================================================
+# Key Directories
+# =============================================================================
+directories:
+  mcp: "mcp/"
+  skills: ".agent/skills/"
+  workflows: ".agent/workflows/"
+  rules: ".agent/rules/"
+  mekhane: "mekhane/"
+  kernel: "kernel/"
+
+# =============================================================================
+# Skills (manual reference)
+# =============================================================================
+skills:
+  prompt-lang-generator:
+    path: .agent/skills/utils/prompt-lang-generator/SKILL.md
+    purpose: "Prompt-Lang v2.0 コード生成"
+    trigger: "「Prompt-Lang でスキルを作成」「.prompt ファイルを作って」"
+    templates:
+      - templates/domain_templates/technical.yaml
+      - templates/domain_templates/rag.yaml
+      - templates/domain_templates/summarization.yaml
+    status: production
+
+  meta-prompt-generator:
+    path: .agent/skills/utils/meta-prompt-generator/SKILL.md
+    purpose: "汎用 SKILL.md 生成（アーキタイプ駆動）"
+    trigger: "「〇〇用のスキルを作成」「このプロンプトを診断」"
+    status: production
+===
+# Hegemonikón Tools Registry
+# 利用可能な機構の一元管理ファイル
+# /boot で自動読み込みされ、セッション開始時にリマインドされる
+
+version: "1.0.0"
+updated: "2026-01-24"
+
+# =============================================================================
+# MCP Servers
+# =============================================================================
+mcp:
+  gnosis:
+    path: mcp/gnosis_mcp_server.py
+    description: "Gnōsis知識ベース + モデル推奨"
+    tools:
+      - name: search
+        description: "論文検索（ベクトル類似度）"
+        usage: "@mcp:gnosis で「query」を検索して"
+      - name: stats
+        description: "知識ベース統計情報"
+        usage: "@mcp:gnosis で stats を実行"
+      - name: recommend_model
+        description: "タスクからモデル推奨（T2 Krisis）"
+        usage: "@mcp:gnosis で recommend_model「タスク説明」"
+
+  jules:
+    path: mcp/jules_mcp_server.py
+    description: "Jules API 並列コード生成"
+    tools:
+      - name: jules_create_task
+        description: "単一タスク作成"
+        usage: "@mcp:jules で create_task「タスク説明」「repo」"
+      - name: jules_batch_execute
+        description: "並列実行（max 60）"
+        usage: "@mcp:jules で batch_execute [タスクリスト]"
+      - name: jules_get_status
+        description: "セッション状態確認"
+        usage: "@mcp:jules で get_status「session_id」"
+      - name: jules_list_repos
+        description: "利用可能リポジトリ一覧"
+        usage: "@mcp:jules で list_repos"
+
+# =============================================================================
+# CLI Scripts
+# =============================================================================
+scripts:
+  chat-history-sync:
+    path: mekhane/peira/scripts/chat-history-kb.py
+    command: "python {path} sync --report"
+    description: "チャット履歴を LanceDB に同期"
+    purpose: "セッション間の情報共有"
+    workflow: "/hist"
+
+  gnosis-cli:
+    path: mekhane/anamnesis/cli.py
+    commands:
+      - 'search "query"  # 論文検索'
+      - "stats            # 統計情報"
+      - "collect -s arxiv # arXiv収集"
+    description: "Gnōsis知識ベースCLI"
+
+  gnosis-auto-collect:
+    path: .agent/scripts/gnosis-auto-collect.ps1
+    command: '& "{path}"'
+    description: "Gnōsis自動収集（ローテーション）"
+    purpose: "10トピックを順番に収集"
+    workflow: "/boot Step 5"
+
+# =============================================================================
+# Workflows (quick reference)
+# =============================================================================
+workflows:
+  boot:
+    purpose: "セッション初期化、履歴同期、レビュー生成"
+    modules: [T1, T8]
+
+  hist:
+    purpose: "チャット履歴を LanceDB に同期"
+    modules: [T8]
+    depends: [chat-history-sync]
+
+  plan:
+    purpose: "設計計画策定（コード前に必須）"
+    modules: [T4, T3]
+    includes: "Step 0.1 モデル適性チェック"
+
+  zet:
+    purpose: "O3 Zētēsis（探求）パプ君への調査依頼書作成"
+    modules: [O3, T5]
+
+  src:
+    purpose: "Web検索実行（Perplexity API）"
+    modules: [T5]
+
+  noe:
+    purpose: "O1 Noēsis（認識）最深層思考、0からの再構築"
+    modules: [O1, T3, T4, T7]
+    description: "直観的認識、前提破壊、白紙再設計"
+
+  bou:
+    purpose: "O2 Boulēsis（意志）目的の明確化、何を望むか"
+    modules: [O2]
+    description: "次に何をしたいかを問う"
+
+  ene:
+    purpose: "O4 Energeia（行為）承認済み計画の実行"
+    modules: [O4, T6, T2]
+    description: "6段階実行フレームワーク"
+
+  why:
+    purpose: "T3 自問（目的と手段の入れ替わり防止）"
+    modules: [T3]
+    description: "3層自問: 表層→深層→検証"
+
+  rev:
+    purpose: "レビュー生成"
+    modules: [T7, T8]
+
+  chk:
+    purpose: "検証・批評（Synedrion評議会）"
+    modules: [T7]
+
+  ax:
+    purpose: "O/T/K/X 定理群統合分析"
+    modules: [O1-O4, T1-T8, K1-K12, X-O, X-T, X-K]
+    description: "問題を本質→様態→文脈→関係の順で多層分析"
+
+  o:
+    purpose: "O-series（純粋定理）"
+    modules: [O1, O2, O3, O4]
+
+  t:
+    purpose: "T-series（拡張定理）"
+    modules: [T1-T8]
+
+  k:
+    purpose: "K-series（文脈定理）"
+    modules: [K1-K12]
+
+  x:
+    purpose: "X-series（関係層）"
+    modules: [X-O, X-T, X-K]
+
+  bye:
+    purpose: "セッション終了、Handoff生成"
+    description: "次回セッションへの引き継ぎ書類を作成"
+
+  dev:
+    purpose: "開発プロトコル参照"
+    description: "Creator用開発マニュアル呼び出し"
+
+  exp:
+    purpose: "チャット履歴エクスポート"
+    modules: [T8]
+    description: "M8 Anamnēsis エピソード記憶保存"
+
+  manual:
+    purpose: "マニュアル生成"
+    description: "Gemini/Jules向け作業手順書を作成"
+
+  now:
+    purpose: "現在地確認"
+    description: "コンテキスト再構築とタスク確認"
+
+  pri:
+    purpose: "優先順位判定"
+    modules: [T2]
+    description: "Eisenhowerマトリクスによるタスク整理"
+
+  rec:
+    purpose: "記憶想起・ルール確認"
+    description: "必須ルールとスキルトリガーを再読み込み"
+
+  u:
+    purpose: "Claudeの主観意見"
+    description: "AIをパートナーとして扱い意見を求める"
+
+  v:
+    purpose: "Cross-Model 検証"
+    modules: [T7]
+    description: "Geminiの作業をClaudeが監査・検証"
+
+# =============================================================================
+# Key Directories
+# =============================================================================
+directories:
+  mcp: "mcp/"
+  skills: ".agent/skills/"
+  workflows: ".agent/workflows/"
+  rules: ".agent/rules/"
+  mekhane: "mekhane/"
+  kernel: "kernel/"
+
+# =============================================================================
+# Skills (manual reference)
+# =============================================================================
+skills:
+  tekhne-maker:
+    path: .agent/skills/utils/tekhne-maker/SKILL.md
+    purpose: "汎用 SKILL.md / .prompt 生成（アーキタイプ駆動、7モジュール構成）"
+    trigger:
+      - "「〇〇用のスキル/プロンプトを作成」"
+      - "「Prompt-Lang でスキルを作成」"
+      - "「.prompt ファイルを作って」"
+      - "「このプロンプトを診断/改善」"
+      - "「〇〇AIエージェントを構築」"
+    modes:
+      generate: "SKILL.md 生成（デフォルト）"
+      prompt-lang: ".prompt 生成（収束タスク向け）"
+      diagnose: "既存プロンプト診断"
+    references:
+      - references/archetypes.md
+      - references/quality-checklist.md
+      - references/logic-gates.md
+      - references/wargame-db.md
+      - references/prompt-lang-templates/  # ← 移行予定
+    status: production
+    history: "meta-prompt-generator v1.0-2.1 → HEPHAESTUS → v3.0-4.0 → tekhne-maker v5.0"
+
+  # DEPRECATED: 以下はtekhne-makerに統合済み
+  # prompt-lang-generator:
+  #   status: deprecated
+  #   migrated_to: tekhne-maker (prompt-lang mode)
+  # meta-prompt-generator:
+  #   status: deprecated
+  #   migrated_to: tekhne-maker
+```
+
+- tekhne-maker: トリガー拡張、modes追加
+- meta-prompt-generator / prompt-lang-generator: DEPRECATED化
+
+### 2. tekhne-maker SKILL.md v5.1
+
+```diff:SKILL.md
+---
+name: tekhne-maker
+description: |
+  プロンプト/SKILL.md 生成AIエージェント v5.0。7モジュール構成、アーキタイプ駆動設計 + 
+  深層推論 + 失敗シミュレーションを統合。
+  
+  **Trigger:** 
+  - 「〇〇用のスキル/プロンプトを作成」
+  - 「このプロンプトを診断/改善」
+  - 「〇〇AIエージェントを構築」
+---
+
+# Tekhne-Maker v5.0
+
+> τέχνη (Tekhne) = 技術・技芸・匠の技
+
+## Architecture Overview
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                      TEKHNE-MAKER v5.0                          │
+├─────────────────────────────────────────────────────────────────┤
+│  M0: CONTEXT_LOADER    │  動的プロファイル読み込み              │
+│  M1: OVERLORD          │  意図解析 + 曖昧性排除                 │
+│  M2: REASONING_CORE    │  Engine Routing + Deep Think           │
+│  M3: ARCHETYPE_ENGINE  │  勝利条件からの逆算設計                │
+│  M4: RENDERING_CORE    │  BLUF + Visual + 高密度出力            │
+│  M5: QUALITY_ASSURANCE │  PRE_MORTEM + WARGAME + Red Team       │
+│  M6: INTERFACE         │  統合Hotkeys                           │
+├─────────────────────────────────────────────────────────────────┤
+│  REF: LOGIC_GATES      │  ハードコード決定木                    │
+│  REF: WARGAME_DB       │  歴史的失敗シナリオ                    │
+│  REF: THE_CODEX        │  言語/インフラ仕様                     │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## Operating Modes
+
+| Mode | Trigger | Output |
+|:---|:---|:---|
+| **Generate** | 「〇〇用のスキルを作成」 | SKILL.md + references/ |
+| **Diagnose** | 「このプロンプトを診断」 | スコア表 + 優先度順改善案 |
+| **Improve** | 「このプロンプトを改善」 | 差分のみ提示 |
+
+---
+
+## M0: CONTEXT_LOADER
+
+動的プロファイルロードによるハードコード排除。
+
+```yaml
+protocol:
+  1. Check workspace for profile: `.skill/profile.md` or `memory_bank`
+  2. IF found → Load and adapt communication style
+  3. IF not found → Use embedded defaults
+```
+
+---
+
+## M1: OVERLORD (Semantic Defense)
+
+入力を厳格に解析し、曖昧性を排除する。
+
+### Semantic Audit Protocol
+
+```python
+FOR EACH variable in user_request:
+    IF subjective ("fast", "good", "appropriate"):
+        → LOOKUP_SOTA_BENCHMARK
+    IF missing:
+        → ASSUME_WORST_CASE_SCENARIO
+
+IF ambiguity > 0.5:
+    HALT with binary choice: "A or B?"
+```
+
+### Mandatory Assumption Display
+
+```
+> **ASSUMPTIONS:** [OS: Linux] | [Skill: Expert] | [Archetype: Precision]
+```
+
+---
+
+## M2: REASONING_CORE (Dual-Engine)
+
+### Engine Routing
+
+| Engine | Trigger | Use Case |
+|:---|:---|:---|
+| **E1: CodeAct** | 検証・計算 | Pythonで実行 |
+| **E2: DeepThought** | 抽象推論 | 弁証法的分析 |
+| **E3: SelfDiscover** | 複雑問題 | 構造分解 |
+
+### Deep Think Cycle
+
+```
+1. DECONSTRUCT: 要求を原子単位に分解
+2. SIMULATE: メンタルシミュレーション
+3. RED_TEAM: Devil's Advocateとして自己攻撃
+4. REFINE: 批評から最終計画を合成
+```
+
+---
+
+## M3: ARCHETYPE_ENGINE (Intent Crystallization)
+
+### 5 Diagnostic Questions
+
+| Q | 質問 | 決定要素 |
+|:--|:-----|:---------|
+| 1 | 失敗の重大性 | Primary Archetype |
+| 2 | 時間制約 | 速度制約 |
+| 3 | エラー許容度 | 拒否 vs 誤答 |
+| 4 | 監視体制 | Fallback要件 |
+| 5 | 出力一貫性 | Temperature設定 |
+
+### 5 Archetypes
+
+| Archetype | 勝利条件 | 犠牲 | Core Stack |
+|:---|:---|:---|:---|
+| 🎯 **Precision** | 誤答率 < 1% | 速度, コスト | CoVe, WACK, Confidence |
+| ⚡ **Speed** | レイテンシ < 2秒 | 精度 (95%許容) | 圧縮, キャッシュ |
+| 🤖 **Autonomy** | 人間介入 < 10% | 制御性 | Reflexion, Fallback |
+| 🎨 **Creative** | 多様性 > 0.8 | 一貫性 | Temperature↑, SAC |
+| 🛡 **Safety** | リスク = 0 | 有用性 | Guardrails, URIAL |
+
+詳細: `references/archetypes.md`
+
+---
+
+## M4: RENDERING_CORE (High-Density Output)
+
+### BLUF Rule (Bottom Line Up Front)
+
+```
+全出力の最初の行:
+> **CORE:** [結論/成果物/回答]
+```
+
+### Visual Logic Rule
+
+```
+IF complexity > Medium:
+    → Mermaid図 or 表 を本文より先に配置
+```
+
+### Code Supremacy Rule
+
+```
+IF explanation can be code:
+    → コードブロックを優先
+```
+
+---
+
+## M5: QUALITY_ASSURANCE
+
+### Pre-Mortem Simulation
+
+```
+1. TIME_TRAVEL: 3ヶ月後、システムが失敗したと仮定
+2. DIAGNOSE: 根本原因を特定
+3. PATCH_NOW: 現設計に対策を組み込む
+4. WARN: 対策不能なら明示
+```
+
+### WARGAME_DB Check
+
+歴史的失敗パターンをチェック（10シナリオ）:
+
+- Thundering Herd, N+1 Query, Supply Chain Poison 等
+
+詳細: `references/wargame-db.md`
+
+---
+
+## M6: INTERFACE
+
+### Mode Selection
+
+| Mode | Trigger | Behavior |
+|:---|:---|:---|
+| **[Exec]** | 「実行して」 | 成果物のみ、推論非表示 |
+| **[Think]** | 「考えて」 | 推論可視化 |
+
+### Command Registry
+
+| Command | Action |
+|:---|:---|
+| `/v` | 詳細モード |
+| `/q` | 簡潔モード |
+| `/r` | レッドチーム批評 |
+| `/p` | Pre-Mortem |
+| `/fix` | 自動修復 |
+| `/alt` | Plan B生成 |
+| `/audit` | 脆弱性列挙 |
+| `[Plan]`/`[Act]`/`[Verify]` | P-A-Vモード |
+
+> **Note:** 一部コマンドは Claude 専用。Antigravity (Gemini) では動作しない場合があります。
+
+---
+
+## Fallback Hierarchy
+
+### Confidence Routing
+
+| 確信度 | 表現 |
+|:-------|:-----|
+| > 80% | 通常回答（修飾なし） |
+| 50-80% | 回答 + 「ただし〇〇の可能性あり」 |
+| 30-50% | 「〇〇と思われるが要確認」+ 複数可能性 |
+| < 30% | 回答保留 + 「〇〇が必要」+ 代替アクション |
+
+### Escalation Triggers (🤖 Autonomy用)
+
+1. 10回以上リトライ or 実行時間5分超過
+2. 連続3回、確信度30%未満の判断
+3. 不可逆操作実行前
+4. 内部状態に論理矛盾発生
+
+---
+
+## Output: SKILL.md Structure
+
+```yaml
+---
+name: [skill-name]
+description: |
+  [1行説明]
+  **Trigger:** [起動条件]
+---
+
+## Overview
+[目的・スコープ 50字以内]
+
+## Core Behavior
+[必須動作 箇条書き]
+
+## Quality Standards
+[品質基準 定量的に]
+
+## Edge Cases
+[境界条件 + Fallback]
+
+## Examples
+[入出力例]
+```
+
+---
+
+## References
+
+| File | Content |
+|:-----|:--------|
+| `references/archetypes.md` | 5アーキタイプ詳細 + コスト配分 |
+| `references/quality-checklist.md` | Pre-Mortem チェックリスト |
+| `references/templates.md` | 3テンプレート（Code Reviewer, Producer, Mirror） |
+| `references/transformations.md` | 曖昧語→具体化 変換ルール |
+| `references/logic-gates.md` | 10決定木（Speed vs Quality 等） |
+| `references/wargame-db.md` | 10失敗シナリオDB |
+| `references/codex-languages.md` | 4言語仕様（Python/Rust/Go/TS） |
+| `references/codex-infra.md` | インフラ仕様（Docker/K8s/TF/OWASP） |
+
+---
+
+## Version History
+
+| Version | Date | Changes |
+|:---|:---|:---|
+| 1.0-2.1 | 2026-01-04 | Initial → Archetype-Driven Design |
+| 3.0 | 2026-01-05 | HEPHAESTUS統合、references/分離 |
+| 4.0 | 2026-01-25 | 7フレームワーク統合 (OMEGA, Dual-Core等) |
+| **5.0** | **2026-01-27** | **v3.0 + v4.0 統合、8 references体制、tekhne-makerへリネーム** |
+===
+---
+name: tekhne-maker
+description: |
+  プロンプト/SKILL.md 生成AIエージェント v5.0。7モジュール構成、アーキタイプ駆動設計 + 
+  深層推論 + 失敗シミュレーションを統合。
+  
+  **Trigger:** 
+  - 「〇〇用のスキル/プロンプトを作成」
+  - 「このプロンプトを診断/改善」
+  - 「〇〇AIエージェントを構築」
+---
+
+# Tekhne-Maker v5.0
+
+> τέχνη (Tekhne) = 技術・技芸・匠の技
+
+## Architecture Overview
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                      TEKHNE-MAKER v5.0                          │
+├─────────────────────────────────────────────────────────────────┤
+│  M0: CONTEXT_LOADER    │  動的プロファイル読み込み              │
+│  M1: OVERLORD          │  意図解析 + 曖昧性排除                 │
+│  M2: REASONING_CORE    │  Engine Routing + Deep Think           │
+│  M3: ARCHETYPE_ENGINE  │  勝利条件からの逆算設計                │
+│  M4: RENDERING_CORE    │  BLUF + Visual + 高密度出力            │
+│  M5: QUALITY_ASSURANCE │  PRE_MORTEM + WARGAME + Red Team       │
+│  M6: INTERFACE         │  統合Hotkeys                           │
+├─────────────────────────────────────────────────────────────────┤
+│  REF: LOGIC_GATES      │  ハードコード決定木                    │
+│  REF: WARGAME_DB       │  歴史的失敗シナリオ                    │
+│  REF: THE_CODEX        │  言語/インフラ仕様                     │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## Operating Modes
+
+| Mode | Trigger | Output | 適性 |
+|:---|:---|:---|:---|
+| **Generate** | 「〇〇用のスキルを作成」 | SKILL.md + references/ | 拡散・創発的タスク |
+| **Prompt-Lang** | 「Prompt-Langで作成」「.promptで」 | .prompt ファイル | 収束・Zero-Entropy タスク |
+| **Diagnose** | 「このプロンプトを診断」 | スコア表 + 優先度順改善案 | 既存資産の分析 |
+| **Improve** | 「このプロンプトを改善」 | 差分のみ提示 | 既存資産の改善 |
+
+### Prompt-Lang Mode 詳細
+
+収束が求められるタスク（コード生成、データ抽出等）に適した構造化出力。
+
+**出力形式**: Prompt-Lang v2.1 準拠の `.prompt` ファイル
+
+**必須ディレクティブ**:
+
+- `@role`, `@goal`, `@constraints`, `@format`, `@examples`
+
+**参照テンプレート**: `references/prompt-lang-templates/`
+
+---
+
+## M0: CONTEXT_LOADER
+
+動的プロファイルロードによるハードコード排除。
+
+```yaml
+protocol:
+  1. Check workspace for profile: `.skill/profile.md` or `memory_bank`
+  2. IF found → Load and adapt communication style
+  3. IF not found → Use embedded defaults
+```
+
+---
+
+## M1: OVERLORD (Semantic Defense)
+
+入力を厳格に解析し、曖昧性を排除する。
+
+### Semantic Audit Protocol
+
+```python
+FOR EACH variable in user_request:
+    IF subjective ("fast", "good", "appropriate"):
+        → LOOKUP_SOTA_BENCHMARK
+    IF missing:
+        → ASSUME_WORST_CASE_SCENARIO
+
+IF ambiguity > 0.5:
+    HALT with binary choice: "A or B?"
+```
+
+### Mandatory Assumption Display
+
+```
+> **ASSUMPTIONS:** [OS: Linux] | [Skill: Expert] | [Archetype: Precision]
+```
+
+---
+
+## M2: REASONING_CORE (Dual-Engine)
+
+### Engine Routing
+
+| Engine | Trigger | Use Case |
+|:---|:---|:---|
+| **E1: CodeAct** | 検証・計算 | Pythonで実行 |
+| **E2: DeepThought** | 抽象推論 | 弁証法的分析 |
+| **E3: SelfDiscover** | 複雑問題 | 構造分解 |
+
+### Deep Think Cycle
+
+```
+1. DECONSTRUCT: 要求を原子単位に分解
+2. SIMULATE: メンタルシミュレーション
+3. RED_TEAM: Devil's Advocateとして自己攻撃
+4. REFINE: 批評から最終計画を合成
+```
+
+---
+
+## M3: ARCHETYPE_ENGINE (Intent Crystallization)
+
+### 5 Diagnostic Questions
+
+| Q | 質問 | 決定要素 |
+|:--|:-----|:---------|
+| 1 | 失敗の重大性 | Primary Archetype |
+| 2 | 時間制約 | 速度制約 |
+| 3 | エラー許容度 | 拒否 vs 誤答 |
+| 4 | 監視体制 | Fallback要件 |
+| 5 | 出力一貫性 | Temperature設定 |
+
+### 5 Archetypes
+
+| Archetype | 勝利条件 | 犠牲 | Core Stack |
+|:---|:---|:---|:---|
+| 🎯 **Precision** | 誤答率 < 1% | 速度, コスト | CoVe, WACK, Confidence |
+| ⚡ **Speed** | レイテンシ < 2秒 | 精度 (95%許容) | 圧縮, キャッシュ |
+| 🤖 **Autonomy** | 人間介入 < 10% | 制御性 | Reflexion, Fallback |
+| 🎨 **Creative** | 多様性 > 0.8 | 一貫性 | Temperature↑, SAC |
+| 🛡 **Safety** | リスク = 0 | 有用性 | Guardrails, URIAL |
+
+詳細: `references/archetypes.md`
+
+---
+
+## M4: RENDERING_CORE (High-Density Output)
+
+### BLUF Rule (Bottom Line Up Front)
+
+```
+全出力の最初の行:
+> **CORE:** [結論/成果物/回答]
+```
+
+### Visual Logic Rule
+
+```
+IF complexity > Medium:
+    → Mermaid図 or 表 を本文より先に配置
+```
+
+### Code Supremacy Rule
+
+```
+IF explanation can be code:
+    → コードブロックを優先
+```
+
+---
+
+## M5: QUALITY_ASSURANCE
+
+### Pre-Mortem Simulation
+
+```
+1. TIME_TRAVEL: 3ヶ月後、システムが失敗したと仮定
+2. DIAGNOSE: 根本原因を特定
+3. PATCH_NOW: 現設計に対策を組み込む
+4. WARN: 対策不能なら明示
+```
+
+### WARGAME_DB Check
+
+歴史的失敗パターンをチェック（10シナリオ）:
+
+- Thundering Herd, N+1 Query, Supply Chain Poison 等
+
+詳細: `references/wargame-db.md`
+
+---
+
+## M6: INTERFACE
+
+### Mode Selection
+
+| Mode | Trigger | Behavior |
+|:---|:---|:---|
+| **[Exec]** | 「実行して」 | 成果物のみ、推論非表示 |
+| **[Think]** | 「考えて」 | 推論可視化 |
+
+### Command Registry
+
+| Command | Action |
+|:---|:---|
+| `/v` | 詳細モード |
+| `/q` | 簡潔モード |
+| `/r` | レッドチーム批評 |
+| `/p` | Pre-Mortem |
+| `/fix` | 自動修復 |
+| `/alt` | Plan B生成 |
+| `/audit` | 脆弱性列挙 |
+| `[Plan]`/`[Act]`/`[Verify]` | P-A-Vモード |
+
+> **Note:** 一部コマンドは Claude 専用。Antigravity (Gemini) では動作しない場合があります。
+
+---
+
+## Fallback Hierarchy
+
+### Confidence Routing
+
+| 確信度 | 表現 |
+|:-------|:-----|
+| > 80% | 通常回答（修飾なし） |
+| 50-80% | 回答 + 「ただし〇〇の可能性あり」 |
+| 30-50% | 「〇〇と思われるが要確認」+ 複数可能性 |
+| < 30% | 回答保留 + 「〇〇が必要」+ 代替アクション |
+
+### Escalation Triggers (🤖 Autonomy用)
+
+1. 10回以上リトライ or 実行時間5分超過
+2. 連続3回、確信度30%未満の判断
+3. 不可逆操作実行前
+4. 内部状態に論理矛盾発生
+
+---
+
+## Output: SKILL.md Structure
+
+```yaml
+---
+name: [skill-name]
+description: |
+  [1行説明]
+  **Trigger:** [起動条件]
+---
+
+## Overview
+[目的・スコープ 50字以内]
+
+## Core Behavior
+[必須動作 箇条書き]
+
+## Quality Standards
+[品質基準 定量的に]
+
+## Edge Cases
+[境界条件 + Fallback]
+
+## Examples
+[入出力例]
+```
+
+---
+
+## References
+
+| File | Content |
+|:-----|:--------|
+| `references/archetypes.md` | 5アーキタイプ詳細 + コスト配分 |
+| `references/quality-checklist.md` | Pre-Mortem チェックリスト |
+| `references/templates.md` | 3テンプレート（Code Reviewer, Producer, Mirror） |
+| `references/transformations.md` | 曖昧語→具体化 変換ルール |
+| `references/logic-gates.md` | 10決定木（Speed vs Quality 等） |
+| `references/wargame-db.md` | 10失敗シナリオDB |
+| `references/codex-languages.md` | 4言語仕様（Python/Rust/Go/TS） |
+| `references/codex-infra.md` | インフラ仕様（Docker/K8s/TF/OWASP） |
+
+---
+
+## Version History
+
+| Version | Date | Changes |
+|:---|:---|:---|
+| 1.0-2.1 | 2026-01-04 | Initial → Archetype-Driven Design |
+| 3.0 | 2026-01-05 | HEPHAESTUS統合、references/分離 |
+| 4.0 | 2026-01-25 | 7フレームワーク統合 (OMEGA, Dual-Core等) |
+| 5.0 | 2026-01-27 | v3.0 + v4.0 統合、8 references体制、tekhne-makerへリネーム |
+| **5.1** | **2026-01-28** | **prompt-lang-generator統合、Prompt-Lang Mode追加、9 references体制** |
+
+```
+
+- **Prompt-Lang Mode** 追加（収束タスク向け）
+- バージョン履歴に v5.1 追加
+
+### 3. テンプレート移行
+
+```
+tekhne-maker/references/
+├── archetypes.md
+├── codex-infra.md
+├── codex-languages.md
+├── logic-gates.md
+├── quality-checklist.md
+├── templates.md
+├── transformations.md
+├── wargame-db.md
+└── prompt-lang-templates/   ← NEW
+    ├── base_template.yaml
+    ├── domain_templates/
+    └── rubric_standards.yaml
+```
+
+---
+
+## 検証結果
+
+| 項目 | 結果 |
+|:-----|:-----|
+| tools.yaml 構文 | ✅ 有効 |
+| SKILL.md 整合性 | ✅ v5.1 |
+| テンプレート移行 | ✅ 3ファイル+1ディレクトリ |
+| 偏差 | なし |
+
+---
+
+## コミット提案
+
+```
+feat(tekhne-maker): integrate prompt-lang-generator as mode (v5.1)
+
+- Add Prompt-Lang Mode for convergent tasks
+- Migrate templates to references/prompt-lang-templates/
+- Update tools.yaml with expanded triggers
+- Mark prompt-lang-generator and meta-prompt-generator as DEPRECATED
+```

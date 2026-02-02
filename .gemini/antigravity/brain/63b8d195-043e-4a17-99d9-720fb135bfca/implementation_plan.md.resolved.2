@@ -1,0 +1,72 @@
+# CCL 実行保証: LLM 翻訳層の設計
+
+> **CCL**: `/noe A` + `/u+` × 3
+> **Date**: 2026-01-31
+> **焦点修正**: ユーザー構文は変えない → LLM が正しく実行するための翻訳
+
+---
+
+## 1. 問題の再定義
+
+| ❌ 誤った問題 | ✅ 正しい問題 |
+|:-------------|:-------------|
+| CCL 構文を変える | CCL 構文はそのまま |
+| 新しい演算子を追加 | 既存演算子で十分 |
+| ユーザー向け構文改善 | **LLM が CCL を正しく実行する翻訳層** |
+
+---
+
+## 2. 既存構文の確認
+
+### 2.1 省略形と正式形
+
+| 省略形 | 正式形 | 意味 |
+|:-------|:-------|:-----|
+| `>>` | `→` | 収束・極限 |
+| `/s~dia >> V[] < 0.2` | `~: V[] > 0.2 { /s~dia }` | 条件付きループ |
+| `cond ? /wf` | `I: cond { /wf }` | 条件分岐 |
+
+**原則**: 省略形は正式形に展開可能。LLM 翻訳とは正式形への展開 + 実行可能形式への変換。
+
+---
+
+## 3. 翻訳層アーキテクチャ
+
+```
+CCL (Human)  →  Expander  →  CCL (正式形)  →  Translator  →  LLM Prompt
+                    ↑                              ↓
+               省略形展開                    構造化指示
+```
+
+### 3.1 コンポーネント
+
+| コンポーネント | 役割 |
+|:---------------|:-----|
+| **Expander** | 省略形 (`>>`, `?`) → 正式形 (`lim[]{}`, `I:{}`) |
+| **Parser** | 正式形 → AST |
+| **Translator** | AST → LLM 向けプロンプト |
+| **Validator** | LLM 出力の検証 |
+
+---
+
+## 4. 実装ファイル
+
+| ファイル | 目的 |
+|:---------|:-----|
+| `mekhane/ccl/expander.py` | 省略形展開 |
+| `mekhane/ccl/parser.py` | 正式形パーサー |
+| `mekhane/ccl/translator.py` | AST → LLM プロンプト |
+| [mekhane/ccl/executor.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/ccl/executor.py) | 既存（強化） |
+
+---
+
+## 5. 次のステップ
+
+1. [ ] 省略形 → 正式形のマッピング表を完成
+2. [ ] Expander 実装
+3. [ ] Translator 実装
+4. [ ] 既存 [executor.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/ccl/executor.py) との統合
+
+---
+
+*Revised after /u+ feedback (2026-01-31)*

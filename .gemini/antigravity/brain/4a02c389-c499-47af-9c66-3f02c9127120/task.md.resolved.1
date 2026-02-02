@@ -1,0 +1,27 @@
+# Hermēneus 開発タスク
+
+## Phase 1: Expander + Parser 正式版 (Must — WEEK)
+
+- [ ] `hermeneus/src/ast.py` — AST ノード分離 (2-3h)
+- [ ] `hermeneus/src/expander.py` — 省略形展開 (4-6h)
+- [ ] `hermeneus/src/parser.py` — Lark CCL パーサー (6-8h)
+- [ ] `hermeneus/src/translator.py` — LMQL 変換
+- [ ] `hermeneus/src/__init__.py` — パッケージ初期化
+- [ ] `hermeneus/tests/test_parser.py` — 単体テスト
+- [ ] [hermeneus/PROOF.md](file:///home/laihuip001/oikos/hegemonikon/hermeneus/PROOF.md) 更新
+
+## Phase 2: LMQL ランタイム統合 (Should — 3WEEKS)
+
+- [ ] `pip install lmql` 環境構築
+- [ ] 実行ランタイム統合
+- [ ] Constrained Decoding 追加
+
+## Phase 3: LangGraph 統合 (Could — 2MONTHS)
+
+- [ ] オーケストレーション層
+- [ ] Multi-Agent Debate 統合
+
+---
+
+**PoC 完了**: [mekhane/ccl/lmql_translator.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/ccl/lmql_translator.py) (292行)
+**合計工数**: 27-37h

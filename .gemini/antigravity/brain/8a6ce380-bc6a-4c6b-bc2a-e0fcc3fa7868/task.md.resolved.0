@@ -1,0 +1,39 @@
+# Task: /eat System Instructions
+
+## Overview
+System Instructions ディレクトリ (12ファイル, 173KB) を Hegemonikón に消化する
+
+## Checklist
+
+### Phase 0: Boot & Analysis
+- [x] /boot 実行
+- [x] 対象ディレクトリ分析
+- [x] 素材 Tier 分類
+
+### Phase 1: Planning (/s)
+- [x] STAGE 0: Prior Art + Blindspot + Scale
+- [x] STAGE 1: Strategy Selection (Plan B Robust)
+- [x] STAGE 2: Success Criteria
+- [x] STAGE 3: Blueprint
+- [x] STAGE 4: Devil's Advocate
+- [ ] ユーザー承認待ち
+
+### Phase 2: Tier 1 消化
+- [ ] Dual-Core Strategy → `references/dual-core-architecture.md`
+- [ ] メタプロンプト → `references/gemini-meta-prompt.md`
+- [ ] 品質審問官 → `/dia --mode=audit`
+
+### Phase 3: Tier 2 消化
+- [ ] 事実でぶん殴る → `/dia --mode=cold_mirror`
+- [ ] GDR KB化 → `references/gdr-converter.md`
+- [ ] 無題のファイル → `references/repo-to-context.md`
+
+### Phase 4: 統合
+- [ ] tekhne/SKILL.md 更新
+- [ ] /dia.md 拡張
+- [ ] /fit 消化診断
+
+### Phase 5: 検証
+- [ ] 参照資料認識確認
+- [ ] /dia 新モード動作確認
+- [ ] Git commit

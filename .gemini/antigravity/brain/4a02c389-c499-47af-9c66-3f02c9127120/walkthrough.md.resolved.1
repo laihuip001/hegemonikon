@@ -1,0 +1,65 @@
+# Hermēneus Phase 1 + Phase 2 完了 Walkthrough
+
+## 概要
+
+CCL (Cognitive Control Language) を LMQL に翻訳・実行する **Hermēneus** コンパイラの Phase 1 + 2 を完了。
+
+## 作成ファイル
+
+### Phase 1: コンパイラ
+
+| ファイル | 役割 | 行数 |
+|:---------|:-----|-----:|
+| [ast.py](file:///home/laihuip001/oikos/hegemonikon/hermeneus/src/ast.py) | AST ノード定義 | 163 |
+| [expander.py](file:///home/laihuip001/oikos/hegemonikon/hermeneus/src/expander.py) | 省略形展開 | 180 |
+| [parser.py](file:///home/laihuip001/oikos/hegemonikon/hermeneus/src/parser.py) | CCL パーサー | 335 |
+| [translator.py](file:///home/laihuip001/oikos/hegemonikon/hermeneus/src/translator.py) | LMQL 変換 | 280 |
+
+### Phase 2: ランタイム
+
+| ファイル | 役割 | 行数 |
+|:---------|:-----|-----:|
+| [runtime.py](file:///home/laihuip001/oikos/hegemonikon/hermeneus/src/runtime.py) | LMQL 実行エンジン | 350 |
+| [constraints.py](file:///home/laihuip001/oikos/hegemonikon/hermeneus/src/constraints.py) | Constrained Decoding | 320 |
+
+## テスト結果
+
+```
+============================== 35 passed in 0.04s ==============================
+```
+
+- Phase 1 テスト: 19 passed
+- Phase 2 テスト: 16 passed
+
+## 公開 API (v0.2.0)
+
+```python
+from hermeneus.src import (
+    # Phase 1
+    compile_ccl, parse_ccl,
+    
+    # Phase 2
+    execute_ccl, generate_constrained
+)
+
+# コンパイル
+lmql_code = compile_ccl("/noe+ >> V[] < 0.3")
+
+# 実行 (OPENAI_API_KEY 必要)
+result = execute_ccl(
+    "/noe+",
+    context="プロジェクトを分析",
+    model="openai/gpt-4o"
+)
+print(result.output)
+```
+
+## 次のステップ (Phase 3)
+
+1. LangGraph 統合
+2. Checkpointer (状態永続化)
+3. Human-in-the-Loop
+
+---
+
+*Completed: 2026-02-01*

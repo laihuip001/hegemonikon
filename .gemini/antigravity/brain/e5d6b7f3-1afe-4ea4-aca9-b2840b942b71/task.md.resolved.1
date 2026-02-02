@@ -1,0 +1,21 @@
+# タスク: Cognitive Algebra 出力先問題の調査
+
+## 問題
+
+`/bou+*zet+` の出力がチャットに生成され、artifact に保存されない
+
+## 分析ステータス
+
+- [x] `/boot` 正本読込
+- [x] `/bou`, `/zet` ワークフローの artifact 保存規則を確認
+- [x] Cognitive Algebra 演算子仕様 (`operators_and_layers.md`) を確認
+- [x] Universal Artifact Generation Standard を確認
+- [x] 根本原因特定
+- [x] 修正案策定
+- [ ] 実装計画レビュー待ち
+
+## 発見事項
+
+1. `/bou` と `/zet` の両方に「チャットには最小限の出力のみ」規則あり
+2. Cognitive Algebra 演算子は **動作** のみ定義、**出力先** は未定義
+3. 複合演算 (`*`, `~`) 時の artifact 継承ルールが欠如

@@ -1,0 +1,82 @@
+# sophia_backlinker グラフエクスポート機能追加
+
+## 目的
+
+sophia_backlinker.py に Mermaid/JSON エクスポート機能を追加し、知識グラフを可視化可能にする。
+
+---
+
+## STAGE 0: Blindspot + Scale
+
+| カテゴリ | 盲点 | 解決 |
+|:---------|:-----|:-----|
+| Framing | ✅ 明確 | グラフ可視化の第一歩 |
+| Scope | ✅ 適切 | 2メソッド追加のみ |
+| Dependencies | ✅ なし | 既存 NetworkX のみ使用 |
+
+**📏 Scale: 🔬 Micro** — 単一ファイル、2メソッド追加
+
+---
+
+## STAGE 1: Strategy
+
+- **Explore/Exploit**: Exploit (既存パターン活用)
+- **選択**: Plan A (Conservative) — 最小限の変更
+
+---
+
+## STAGE 2: Success Criteria
+
+| 軸 | Must | Should |
+|:---|:-----|:-------|
+| 機能 | `to_mermaid()` が Mermaid 構文を返す | `--mermaid` CLI オプション |
+| 品質 | 空グラフでエラーなし | ノード名のエスケープ |
+
+---
+
+## STAGE 3: Blueprint
+
+### 追加メソッド
+
+```python
+def to_mermaid(self, direction: str = "LR") -> str:
+    """Mermaid.js 形式でグラフをエクスポート"""
+    lines = [f"graph {direction}"]
+    for src, dst in self.graph.edges():
+        # ノード名のサニタイズ (特殊文字対応)
+        safe_src = src.replace("-", "_").replace(" ", "_")
+        safe_dst = dst.replace("-", "_").replace(" ", "_")
+        lines.append(f"    {safe_src} --> {safe_dst}")
+    return "\n".join(lines)
+
+def to_json_for_d3(self) -> dict:
+    """D3.js force-directed 用 JSON"""
+    return {
+        "nodes": [{"id": n} for n in self.graph.nodes()],
+        "links": [{"source": s, "target": t} for s, t in self.graph.edges()]
+    }
+```
+
+### CLI オプション追加
+
+```python
+parser.add_argument("--mermaid", action="store_true", help="Output Mermaid diagram")
+parser.add_argument("--json", action="store_true", help="Output D3.js JSON")
+```
+
+---
+
+## STAGE 4: Devil's Advocate
+
+| 視点 | 結果 |
+|:-----|:-----|
+| Feasibility | ✅ PASS |
+| Necessity | ✅ PASS — Perplexity調査で Priority 2 |
+| Risks | ✅ PASS — 追加のみ、既存機能に影響なし |
+
+---
+
+## 検証計画
+
+1. `python sophia_backlinker.py --mermaid` で Mermaid 出力確認
+2. Mermaid Live Editor で可視化確認

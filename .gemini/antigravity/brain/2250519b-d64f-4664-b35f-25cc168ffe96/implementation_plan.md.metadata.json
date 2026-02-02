@@ -1,0 +1,6 @@
+{
+  "artifactType": "ARTIFACT_TYPE_IMPLEMENTATION_PLAN",
+  "summary": "digestor/ モジュールの実装計画。Gnosis → /eat 自動連携インフラを ergasterion/digestor/ に Python モジュールとして実装。Plan B (Robust) を採用: CLI + MCP + トピックベース自動消化。",
+  "updatedAt": "2026-01-29T01:37:16.061167613Z",
+  "version": "1"
+}

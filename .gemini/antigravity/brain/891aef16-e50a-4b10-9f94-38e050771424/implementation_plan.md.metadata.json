@@ -1,0 +1,5 @@
+{
+  "artifactType": "ARTIFACT_TYPE_IMPLEMENTATION_PLAN",
+  "summary": "会話ログを Kairos Index に統合するための実装計画。kairos_ingest.py の拡張と /boot 連携を定義。",
+  "updatedAt": "2026-01-31T15:32:18.254864972Z"
+}

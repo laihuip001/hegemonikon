@@ -1,0 +1,125 @@
+# /think: Documents と Brain の統合検討
+
+> **問い**: `M:\Documents\` は不要か？`M:\Brain\` に統合すべきか？
+> **日時**: 2026-01-21T21:24
+> **複雑度**: Medium（設計判断 + 移行リスク評価）
+
+---
+
+## Step 0: 壁の認識
+
+**現状の問題**:
+- `M:\Documents\mine\.hegemonikon\` と `M:\Brain\.hegemonikon\` に**同名ファイルが重複**
+- どちらが「正」か不明確
+- `/boot` は `M:\Documents\mine\.hegemonikon\` を参照
+
+---
+
+## Step 1: 暗黙の前提洗い出し
+
+| 前提 | 確信度 | 根拠 |
+|------|--------|------|
+| Documentsは「個人データ領域」 | 0.3 | Windows慣習だが、実質 `.hegemonikon` のみ |
+| BrainはObsidian専用 | 0.7 | Obsidian Vaultとして設計 |
+| 2箇所に分散は必要 | 0.2 | 現状の理由が不明 |
+| 統合すれば管理が楽になる | 0.8 | 単一ソースの原則 |
+
+---
+
+## Step 2: 多視点分析
+
+### 🔴 Pessimist（最悪ケース）
+
+1. **移行時のデータ破損リスク**
+   - `M:\Documents\mine\.hegemonikon\` のファイルが「正」だが、`M:\Brain\.hegemonikon\` は空に近い
+   - 誤って空の方を正として採用するとデータ消失
+
+2. **Obsidianとの干渉**
+   - `.hegemonikon/` はObsidianのインデックスに含まれる
+   - JSONファイルがObsidian検索に混入
+
+3. **パス変更の影響範囲**
+   - `/boot` ワークフローのパス変更
+   - 他のスクリプト・設定の修正漏れ
+
+### 🟢 Optimist（最善ケース）
+
+1. **単一ソースの原則**
+   - `M:\Brain\.hegemonikon\` に統合 → 参照先が明確に
+   - 「第二の脳」に全てが集約される美しさ
+
+2. **Obsidian連携強化**
+   - Hegemonikónデータを Obsidian でも可視化可能
+   - 将来的にObsidianプラグインで連携
+
+3. **Documents削除でドライブ構造がシンプルに**
+
+### 🟡 Realist（現実制約）
+
+1. **現状のデータ量**
+   - `Documents\mine\.hegemonikon`: 4ファイル, **実データあり**
+   - `Brain\.hegemonikon`: 4ファイル, **ほぼ空（テンプレート）**
+
+2. **移行コスト**
+   - `/boot` ワークフロー修正: 1ファイル
+   - `README.md` 更新: 完了したばかり
+   - 実作業: 5分程度
+
+3. **リスク軽減策**
+   - 移行前にバックアップ
+   - Git履歴で復元可能
+
+---
+
+## Step 3: 統合と批判
+
+### 統合結論
+
+**推奨: `M:\Brain\.hegemonikon\` に統合**
+
+| 項目 | 判断 |
+|------|------|
+| 統合先 | `M:\Brain\.hegemonikon\` |
+| 移行元 | `M:\Documents\mine\.hegemonikon\` |
+| Documents削除 | **可**（統合後に削除） |
+
+### 自己批判
+
+**弱点1**: Obsidianの `.obsidian/` 設定と干渉する可能性
+- **反論**: `.hegemonikon/` は別ディレクトリ。Obsidian設定に影響なし
+
+**弱点2**: 「個人データ」と「知識ベース」の区別が曖昧に
+- **反論**: Hegemonikónにおいて、長期記憶は「第二の脳」の一部。区別不要
+
+**弱点3**: 移行後のパス変更漏れ
+- **反論**: `grep` で全パターンを検索し、漏れを防止
+
+---
+
+## Step 4: 結論
+
+```
+┌─[Hegemonikón]──────────────────────┐
+│ M4 Phronēsis-S: 深層戦略完了       │
+│ M3 Theōria-S: パラダイム分析完了   │
+│ M5 Peira: 外部探索スキップ         │
+│ 複雑度: Medium                     │
+│ 局所解: 現状維持（2箇所分散）      │
+│ 大域解: Brain統合（単一ソース）    │
+│ 結論: 採用 — Brain統合推奨         │
+└────────────────────────────────────┘
+```
+
+---
+
+## 実行プラン（承認待ち）
+
+1. `M:\Documents\mine\.hegemonikon\*` → `M:\Brain\.hegemonikon\` にコピー（上書き）
+2. `/boot` ワークフローのパス変更
+3. `M:\README.md` 更新
+4. `M:\Documents\` 削除
+5. 動作確認
+
+---
+
+📝 /think 完了

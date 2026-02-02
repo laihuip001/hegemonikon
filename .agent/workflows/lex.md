@@ -30,7 +30,7 @@ ccl_signature: "/lex mech"
 
 # /lex: 表現教養ワークフロー
 
-> **正本**: [A2 Krisis SKILL.md](file:///home/laihuip001/oikos/.agent/skills/akribeia/a2-krisis/SKILL.md)
+> **正本**: [A2 Krisis SKILL.md](file:///home/makaron8426/oikos/.agent/skills/akribeia/a2-krisis/SKILL.md)
 > **本質**: `/dia lex` の短縮形。UX 改善のため独立コマンド化。
 
 ---

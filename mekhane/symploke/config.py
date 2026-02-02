@@ -36,7 +36,7 @@ class VectorStoreConfig:
     base_path: Path = field(
         default_factory=lambda: Path(
             os.environ.get(
-                "SYMPLOKE_DATA", "/home/laihuip001/oikos/mneme/indices"
+                "SYMPLOKE_DATA", "/home/makaron8426/oikos/mneme/indices"
             )  # noqa: AI-ALL
         )
     )

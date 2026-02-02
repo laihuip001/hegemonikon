@@ -72,8 +72,8 @@ Hegemonikón に新しいレイヤー「Synteleia（認知アンサンブル）�
 
 ## 参照ドキュメント
 
-- `/home/laihuip001/oikos/hegemonikon/docs/architecture/synteleia.md`
-- `/home/laihuip001/oikos/hegemonikon/mekhane/audit/` (Phase 1 実装済み)
+- `/home/makaron8426/oikos/hegemonikon/docs/architecture/synteleia.md`
+- `/home/makaron8426/oikos/hegemonikon/mekhane/audit/` (Phase 1 実装済み)
 
 ---
 

@@ -23,8 +23,8 @@
 
 ## 関連ファイル
 
-- [boot_automation_poc.md](file:///home/laihuip001/oikos/hegemonikon/mekhane/ergasterion/n8n/boot_automation_poc.md)
-- [boot_morning_flow.json](file:///home/laihuip001/oikos/hegemonikon/mekhane/ergasterion/n8n/boot_morning_flow.json)
+- [boot_automation_poc.md](file:///home/makaron8426/oikos/hegemonikon/mekhane/ergasterion/n8n/boot_automation_poc.md)
+- [boot_morning_flow.json](file:///home/makaron8426/oikos/hegemonikon/mekhane/ergasterion/n8n/boot_morning_flow.json)
 
 ---
 

@@ -19,7 +19,7 @@ from datetime import datetime
 from pathlib import Path
 
 # Add parent path for perplexity_api import
-PERPLEXITY_SCRIPT = Path("/home/laihuip001/oikos/hegemonikon/mekhane/peira/scripts")
+PERPLEXITY_SCRIPT = Path("/home/makaron8426/oikos/hegemonikon/mekhane/peira/scripts")
 sys.path.insert(0, str(PERPLEXITY_SCRIPT))
 
 from perplexity_api import search

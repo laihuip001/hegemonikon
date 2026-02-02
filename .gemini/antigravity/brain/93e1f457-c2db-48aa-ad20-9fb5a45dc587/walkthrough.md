@@ -15,10 +15,10 @@
 
 | ファイル | 変更内容 |
 |:---------|:---------|
-| [parser.py](file:///home/laihuip001/oikos/hegemonikon/hermeneus/src/parser.py#L212-238) | @syn·, @syn×, @S{} セレクタ認識 |
-| [translator.py](file:///home/laihuip001/oikos/hegemonikon/hermeneus/src/translator.py#L103-195) | MacroRef → Synteleia 統合 |
-| [test_synteleia.py](file:///home/laihuip001/oikos/hegemonikon/hermeneus/tests/test_synteleia.py) | TDD テスト 17 件 |
-| [syn.md](file:///home/laihuip001/oikos/hegemonikon/ccl/macros/syn.md) | @syn マクロ定義 |
+| [parser.py](file:///home/makaron8426/oikos/hegemonikon/hermeneus/src/parser.py#L212-238) | @syn·, @syn×, @S{} セレクタ認識 |
+| [translator.py](file:///home/makaron8426/oikos/hegemonikon/hermeneus/src/translator.py#L103-195) | MacroRef → Synteleia 統合 |
+| [test_synteleia.py](file:///home/makaron8426/oikos/hegemonikon/hermeneus/tests/test_synteleia.py) | TDD テスト 17 件 |
+| [syn.md](file:///home/makaron8426/oikos/hegemonikon/ccl/macros/syn.md) | @syn マクロ定義 |
 
 ---
 

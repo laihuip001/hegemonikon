@@ -132,7 +132,7 @@
 
 `data/x-series.json` に 36 関係を定義。
 
-既存データ参照: `/home/laihuip001/oikos/mneme/.hegemonikon/workflows/x_series_36_relations_guide_20260129.md`
+既存データ参照: `/home/makaron8426/oikos/mneme/.hegemonikon/workflows/x_series_36_relations_guide_20260129.md`
 
 ### Step 2: X-series ページ作成
 
@@ -179,8 +179,8 @@ function renderXSeries() {
 
 ## 6. 参考資料
 
-- [X-series 36関係ガイド](/home/laihuip001/oikos/mneme/.hegemonikon/workflows/x_series_36_relations_guide_20260129.md)
-- [既存の Interactive Guide 実装](/home/laihuip001/oikos/hegemonikon-guide/)
+- [X-series 36関係ガイド](/home/makaron8426/oikos/mneme/.hegemonikon/workflows/x_series_36_relations_guide_20260129.md)
+- [既存の Interactive Guide 実装](/home/makaron8426/oikos/hegemonikon-guide/)
 
 ---
 

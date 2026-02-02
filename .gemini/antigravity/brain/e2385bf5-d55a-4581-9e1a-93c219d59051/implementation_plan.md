@@ -109,28 +109,28 @@ operators:
 ### Step 1: /noe.md 更新
 
 ```bash
-view_file /home/laihuip001/oikos/.agent/workflows/noe.md
+view_file /home/makaron8426/oikos/.agent/workflows/noe.md
 # frontmatter に operators セクションを追加
 ```
 
 ### Step 2: /s.md 更新
 
 ```bash
-view_file /home/laihuip001/oikos/.agent/workflows/s.md
+view_file /home/makaron8426/oikos/.agent/workflows/s.md
 # frontmatter に operators セクションを追加
 ```
 
 ### Step 3: /zet.md 更新
 
 ```bash
-view_file /home/laihuip001/oikos/.agent/workflows/zet.md
+view_file /home/makaron8426/oikos/.agent/workflows/zet.md
 # frontmatter に operators セクションを追加
 ```
 
 ### Step 4: /bou.md 更新
 
 ```bash
-view_file /home/laihuip001/oikos/.agent/workflows/bou.md
+view_file /home/makaron8426/oikos/.agent/workflows/bou.md
 # frontmatter に operators セクションを追加
 ```
 

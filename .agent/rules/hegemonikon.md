@@ -170,10 +170,10 @@ graph TD
 
 ## 7. 参照
 
-- [kernel/axiom_hierarchy.md](file:///home/laihuip001/oikos/hegemonikon/kernel/axiom_hierarchy.md)
-- [kernel/ousia.md](file:///home/laihuip001/oikos/hegemonikon/kernel/ousia.md) — O-series
-- [kernel/schema.md](file:///home/laihuip001/oikos/hegemonikon/kernel/schema.md) — S-series
-- [kernel/horme.md](file:///home/laihuip001/oikos/hegemonikon/kernel/horme.md) — H-series
+- [kernel/axiom_hierarchy.md](file:///home/makaron8426/oikos/hegemonikon/kernel/axiom_hierarchy.md)
+- [kernel/ousia.md](file:///home/makaron8426/oikos/hegemonikon/kernel/ousia.md) — O-series
+- [kernel/schema.md](file:///home/makaron8426/oikos/hegemonikon/kernel/schema.md) — S-series
+- [kernel/horme.md](file:///home/makaron8426/oikos/hegemonikon/kernel/horme.md) — H-series
 
 ---
 

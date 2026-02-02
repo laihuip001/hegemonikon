@@ -43,10 +43,10 @@
 
 ## 変更ファイル
 
-- [MODIFY] [T4 Phronēsis SKILL.md](file:///home/laihuip001/oikos/.agent/skills/t-series/t4-phronesis/SKILL.md)
-- [MODIFY] [T3 Theōria SKILL.md](file:///home/laihuip001/oikos/.agent/skills/t-series/t3-theoria/SKILL.md)
-- [MODIFY] [T2 Krisis SKILL.md](file:///home/laihuip001/oikos/.agent/skills/t-series/t2-krisis/SKILL.md)
-- [MODIFY] [S2 Mekhanē SKILL.md](file:///home/laihuip001/oikos/.agent/skills/s-series/s2-mekhane/SKILL.md)
+- [MODIFY] [T4 Phronēsis SKILL.md](file:///home/makaron8426/oikos/.agent/skills/t-series/t4-phronesis/SKILL.md)
+- [MODIFY] [T3 Theōria SKILL.md](file:///home/makaron8426/oikos/.agent/skills/t-series/t3-theoria/SKILL.md)
+- [MODIFY] [T2 Krisis SKILL.md](file:///home/makaron8426/oikos/.agent/skills/t-series/t2-krisis/SKILL.md)
+- [MODIFY] [S2 Mekhanē SKILL.md](file:///home/makaron8426/oikos/.agent/skills/s-series/s2-mekhane/SKILL.md)
 
 ---
 

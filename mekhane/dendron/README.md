@@ -57,4 +57,4 @@ mekhane/dendron/
 ## 関連ドキュメント
 
 - [PROOF.md](./PROOF.md) — このディレクトリの存在証明
-- [kernel/proof_levels.md](/home/laihuip001/oikos/hegemonikon/kernel/proof_levels.md) — PROOF レベル定義
+- [kernel/proof_levels.md](/home/makaron8426/oikos/hegemonikon/kernel/proof_levels.md) — PROOF レベル定義

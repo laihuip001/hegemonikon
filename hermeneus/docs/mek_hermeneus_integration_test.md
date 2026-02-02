@@ -123,7 +123,7 @@ pt 計算:
 1. Antigravity 再起動 (MCP 無効状態)
 2. 各テストケースを手動で実行 (3回ずつ)
 3. 出力をファイルに保存:
-   /home/laihuip001/oikos/mneme/.hegemonikon/tests/hermeneus/
+   /home/makaron8426/oikos/mneme/.hegemonikon/tests/hermeneus/
      baseline/{ccl_name}_{run_n}.md
 4. 実行時間を記録
 ```
@@ -160,7 +160,7 @@ Creator がファイルを評価:
 ## 📁 出力先
 
 ```text
-/home/laihuip001/oikos/mneme/.hegemonikon/tests/hermeneus/
+/home/makaron8426/oikos/mneme/.hegemonikon/tests/hermeneus/
   ├── baseline/          # A群出力
   ├── hermeneus/         # B群出力
   ├── evaluation.yaml    # 評価結果

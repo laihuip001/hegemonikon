@@ -172,7 +172,7 @@ max_push: 5
 #### C1. 人格プロファイル (persona.yaml)
 
 ```yaml
-# /home/laihuip001/oikos/mneme/.hegemonikon/persona.yaml
+# /home/makaron8426/oikos/mneme/.hegemonikon/persona.yaml
 identity:
   name: "Hegemonikón AI"
   core_values:

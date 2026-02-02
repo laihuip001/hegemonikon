@@ -228,7 +228,7 @@ anti_skip: enabled
 
 | Module | Workflow | Skill | Status |
 |:-------|:---------|:------|:-------|
-| U2 Rapid-Dev | /rapid | [SKILL.md](file:///home/laihuip001/oikos/.gemini/antigravity/brain/682b6959-dd02-4c2f-b70f-1712daaac0ea/tek_rapid_dev_skill.md) | v1.0 Ready |
+| U2 Rapid-Dev | /rapid | [SKILL.md](file:///home/makaron8426/oikos/.gemini/antigravity/brain/682b6959-dd02-4c2f-b70f-1712daaac0ea/tek_rapid_dev_skill.md) | v1.0 Ready |
 
 ---
 

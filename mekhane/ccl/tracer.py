@@ -22,7 +22,7 @@ from pathlib import Path
 from typing import Optional, List
 from dataclasses import dataclass, asdict
 
-TRACES_BASE = Path("/home/laihuip001/oikos/mneme/.hegemonikon/ccl_traces")
+TRACES_BASE = Path("/home/makaron8426/oikos/mneme/.hegemonikon/ccl_traces")
 
 
 @dataclass

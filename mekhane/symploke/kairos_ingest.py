@@ -22,9 +22,9 @@ sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 from mekhane.symploke.indices import Document, KairosIndex
 
-HANDOFF_DIR = Path("/home/laihuip001/oikos/mneme/.hegemonikon/sessions")
+HANDOFF_DIR = Path("/home/makaron8426/oikos/mneme/.hegemonikon/sessions")
 DEFAULT_INDEX_PATH = Path(
-    "/home/laihuip001/oikos/mneme/.hegemonikon/indices/kairos.pkl"
+    "/home/makaron8426/oikos/mneme/.hegemonikon/indices/kairos.pkl"
 )
 
 

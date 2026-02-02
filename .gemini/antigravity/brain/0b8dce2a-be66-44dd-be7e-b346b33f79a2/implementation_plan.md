@@ -191,7 +191,7 @@ class LearnedPattern:
 class DoxaLearner:
     """H4 Doxa 連携パターン学習器。Creator の意図パターンを永続化。"""
     
-    STORE_PATH = Path("/home/laihuip001/oikos/mneme/.hegemonikon/ccl_patterns.json")
+    STORE_PATH = Path("/home/makaron8426/oikos/mneme/.hegemonikon/ccl_patterns.json")
     
     def __init__(self):
         self.patterns: List[LearnedPattern] = self._load()
@@ -311,7 +311,7 @@ tracer.end()
 #### C2. 実行ログ収集
 
 ```yaml
-# /home/laihuip001/oikos/mneme/.hegemonikon/ccl_traces/
+# /home/makaron8426/oikos/mneme/.hegemonikon/ccl_traces/
 trace_2026-01-29_2100.yaml:
   intent: "ブログを分析して改善案を出す"
   generated: "/s_/dia"

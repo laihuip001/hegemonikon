@@ -44,7 +44,7 @@ ccl_signature: "[WF]/mek+"
 
 # /mek: 方法配置ワークフロー (Mekhanē) v6.2
 
-> **正本参照**: [tekhne-maker SKILL.md](file:///home/laihuip001/oikos/hegemonikon/mekhane/ergasterion/tekhne/SKILL.md)
+> **正本参照**: [tekhne-maker SKILL.md](file:///home/makaron8426/oikos/hegemonikon/mekhane/ergasterion/tekhne/SKILL.md)
 > **目的**: スキル・ワークフローの生成、診断、改善
 > **発動条件**: 新規プロンプト作成、既存プロンプト診断
 
@@ -62,7 +62,7 @@ ccl_signature: "[WF]/mek+"
 
 ## CCL 複雑度ポイント制 (v6.45)
 
-> **参照**: [operators.md Section 12](file:///home/laihuip001/oikos/hegemonikon/ccl/operators.md)
+> **参照**: [operators.md Section 12](file:///home/makaron8426/oikos/hegemonikon/ccl/operators.md)
 
 生成した CCL のポイントを計算し、帯域内に収めよ:
 
@@ -380,7 +380,7 @@ Q2: 要件を教えてください
 ```text
 実行手順:
 1. view_file ツールで SKILL.md を読み込む
-   パス: /home/laihuip001/oikos/hegemonikon/mekhane/ergasterion/tekhne/SKILL.md
+   パス: /home/makaron8426/oikos/hegemonikon/mekhane/ergasterion/tekhne/SKILL.md
 2. Operating Modes セクションを確認
 3. 要件に応じたモードを選択
 4. 処理を開始
@@ -400,7 +400,7 @@ Q2: 要件を教えてください
 | `references/quality-checklist.md` | 品質基準 |
 | `references/wargame-db.md` | 失敗シナリオ |
 
-**パス**: `/home/laihuip001/oikos/hegemonikon/mekhane/ergasterion/tekhne/references/`
+**パス**: `/home/makaron8426/oikos/hegemonikon/mekhane/ergasterion/tekhne/references/`
 
 ---
 
@@ -1041,7 +1041,7 @@ items:
 
 ## Artifact 自動保存
 
-> **標準参照**: [workflow_artifact_standard.md](file:///home/laihuip001/oikos/.agent/standards/workflow_artifact_standard.md)
+> **標準参照**: [workflow_artifact_standard.md](file:///home/makaron8426/oikos/.agent/standards/workflow_artifact_standard.md)
 > **SE原則強制**: 必須フィールドがないとブロック（Standard 参照）
 
 ### 必須フィールド（SE原則）
@@ -1054,7 +1054,7 @@ items:
 
 ### 出力テンプレート [必須]
 
-> **参照**: [mek_output.md](file:///home/laihuip001/oikos/.agent/templates/mek_output.md)
+> **参照**: [mek_output.md](file:///home/makaron8426/oikos/.agent/templates/mek_output.md)
 
 出力は上記テンプレートに従うこと。フィールドが欠けているとブロック。
 
@@ -1067,7 +1067,7 @@ python hegemonikon/mekhane/fep/se_principle_validator.py <output.md> --workflow 
 ### 保存先
 
 ```
-/home/laihuip001/oikos/mneme/.hegemonikon/workflows/mek_<purpose>_<date>.md
+/home/makaron8426/oikos/mneme/.hegemonikon/workflows/mek_<purpose>_<date>.md
 ```
 
 例: `mek_code_review_skill_20260129.md`
@@ -1119,7 +1119,7 @@ python hegemonikon/mekhane/fep/se_principle_validator.py <output.md> --workflow 
 ### 例2: 既存スキル診断
 
 ```text
-/tek diagnose /home/laihuip001/oikos/.agent/skills/ousia/o1-noesis/SKILL.md
+/tek diagnose /home/makaron8426/oikos/.agent/skills/ousia/o1-noesis/SKILL.md
 
 → tekhne-maker が:
   1. Quality Checklist で5項目スコア算出
@@ -1129,7 +1129,7 @@ python hegemonikon/mekhane/fep/se_principle_validator.py <output.md> --workflow 
 ### 例3: 既存スキル改善
 
 ```text
-/tek improve /home/laihuip001/oikos/.agent/skills/ousia/o1-noesis/SKILL.md
+/tek improve /home/makaron8426/oikos/.agent/skills/ousia/o1-noesis/SKILL.md
 
 → tekhne-maker が:
   1. Diagnose 実行
@@ -1142,7 +1142,7 @@ python hegemonikon/mekhane/fep/se_principle_validator.py <output.md> --workflow 
 
 | Module | Workflow | Skill (正本) | Status |
 |:-------|:---------|:-------------|:-------|
-| tekhne-maker | /tek | [SKILL.md](file:///home/laihuip001/oikos/hegemonikon/mekhane/ergasterion/tekhne/SKILL.md) | v5.0 Ready |
+| tekhne-maker | /tek | [SKILL.md](file:///home/makaron8426/oikos/hegemonikon/mekhane/ergasterion/tekhne/SKILL.md) | v5.0 Ready |
 
 ---
 

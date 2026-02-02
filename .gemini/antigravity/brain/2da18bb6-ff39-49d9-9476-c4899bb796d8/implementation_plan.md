@@ -10,7 +10,7 @@
 
 ### Phase 1: `/boot` 拡張
 
-#### [MODIFY] [boot.md](file:///home/laihuip001/oikos/.agent/workflows/boot.md)
+#### [MODIFY] [boot.md](file:///home/makaron8426/oikos/.agent/workflows/boot.md)
 
 **追加する機能**:
 

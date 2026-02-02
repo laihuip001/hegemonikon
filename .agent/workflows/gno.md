@@ -39,7 +39,7 @@ ccl_signature: "/gno+_/dox"
 
 # /gno: 原則抽出ワークフロー (Gnōmē) v1.1
 
-> **正本参照**: [A3 Gnōmē SKILL.md](file:///home/laihuip001/oikos/.agent/skills/akribeia/a3-gnome/SKILL.md)
+> **正本参照**: [A3 Gnōmē SKILL.md](file:///home/makaron8426/oikos/.agent/skills/akribeia/a3-gnome/SKILL.md)
 > **目的**: 「教訓は何か」を抽出する — 格言・原則の形成
 > **役割**: 経験から一般化可能な原則を導く
 
@@ -308,7 +308,7 @@ ccl_signature: "/gno+_/dox"
 
 ### 参照
 
-- [instruction_taxonomy.md](file:///home/laihuip001/oikos/.agent/skills/akribeia/a3-gnome/references/instruction_taxonomy.md)
+- [instruction_taxonomy.md](file:///home/makaron8426/oikos/.agent/skills/akribeia/a3-gnome/references/instruction_taxonomy.md)
 
 ---
 
@@ -993,12 +993,12 @@ ccl_signature: "/gno+_/dox"
 
 ---
 
-> **標準参照**: [workflow_artifact_standard.md](file:///home/laihuip001/oikos/.agent/standards/workflow_artifact_standard.md)
+> **標準参照**: [workflow_artifact_standard.md](file:///home/makaron8426/oikos/.agent/standards/workflow_artifact_standard.md)
 
 ### 保存先
 
 ```
-/home/laihuip001/oikos/mneme/.hegemonikon/workflows/gno_<topic>_<date>.md
+/home/makaron8426/oikos/mneme/.hegemonikon/workflows/gno_<topic>_<date>.md
 ```
 
 例: `gno_格言抽出_20260129.md`
@@ -1024,7 +1024,7 @@ ccl_signature: "/gno+_/dox"
 
 | Module | Workflow | Skill (正本) | Status |
 |:-------|:---------|:-------------|:-------|
-| A3 Gnōmē | /gno | [SKILL.md](file:///home/laihuip001/oikos/.agent/skills/akribeia/a3-gnome/SKILL.md) | v1.0 Ready |
+| A3 Gnōmē | /gno | [SKILL.md](file:///home/makaron8426/oikos/.agent/skills/akribeia/a3-gnome/SKILL.md) | v1.0 Ready |
 
 ---
 

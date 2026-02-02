@@ -36,7 +36,7 @@ ccl_signature: "/chr+"
 
 # /chr: 時間配置ワークフロー (Chronos)
 
-> **正本参照**: [K2 Chronos SKILL.md](file:///home/laihuip001/oikos/.agent/skills/kairos/k2-chronos/SKILL.md)
+> **正本参照**: [K2 Chronos SKILL.md](file:///home/makaron8426/oikos/.agent/skills/kairos/k2-chronos/SKILL.md)
 > **目的**: 時間制約と期限を評価する — 時間軸上の配置
 > **役割**: 時間的確実性の評価
 
@@ -259,12 +259,12 @@ ccl_signature: "/chr+"
 
 ## Artifact 自動保存
 
-> **標準参照**: [workflow_artifact_standard.md](file:///home/laihuip001/oikos/.agent/standards/workflow_artifact_standard.md)
+> **標準参照**: [workflow_artifact_standard.md](file:///home/makaron8426/oikos/.agent/standards/workflow_artifact_standard.md)
 
 ### 保存先
 
 ```
-/home/laihuip001/oikos/mneme/.hegemonikon/workflows/chr_<topic>_<date>.md
+/home/makaron8426/oikos/mneme/.hegemonikon/workflows/chr_<topic>_<date>.md
 ```
 
 例: `chr_時間評価_20260129.md`
@@ -290,7 +290,7 @@ ccl_signature: "/chr+"
 
 | Module | Workflow | Skill (正本) | Status |
 |:-------|:---------|:-------------|:-------|
-| K2 Chronos | /chr | [SKILL.md](file:///home/laihuip001/oikos/.agent/skills/kairos/k2-chronos/SKILL.md) | v1.0 Ready |
+| K2 Chronos | /chr | [SKILL.md](file:///home/makaron8426/oikos/.agent/skills/kairos/k2-chronos/SKILL.md) | v1.0 Ready |
 
 ---
 

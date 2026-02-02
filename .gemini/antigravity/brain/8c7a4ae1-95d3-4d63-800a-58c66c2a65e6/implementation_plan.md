@@ -10,7 +10,7 @@
 
 ## Proposed Changes
 
-### [MODIFY] [sop.md](file:///home/laihuip001/oikos/.agent/workflows/sop.md)
+### [MODIFY] [sop.md](file:///home/makaron8426/oikos/.agent/workflows/sop.md)
 
 **追加コマンド**:
 

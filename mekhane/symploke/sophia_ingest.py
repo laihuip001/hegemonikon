@@ -19,7 +19,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 from mekhane.symploke.indices import Document, SophiaIndex
 
-KNOWLEDGE_DIR = Path("/home/laihuip001/oikos/.gemini/antigravity/knowledge")
+KNOWLEDGE_DIR = Path("/home/makaron8426/oikos/.gemini/antigravity/knowledge")
 
 
 def parse_ki_directory(ki_path: Path) -> list[Document]:
@@ -134,7 +134,7 @@ def search_loaded_index(adapter, query: str, top_k: int = 5):
 
 # デフォルトの保存パス
 DEFAULT_INDEX_PATH = Path(
-    "/home/laihuip001/oikos/mneme/.hegemonikon/indices/sophia.pkl"
+    "/home/makaron8426/oikos/mneme/.hegemonikon/indices/sophia.pkl"
 )
 
 

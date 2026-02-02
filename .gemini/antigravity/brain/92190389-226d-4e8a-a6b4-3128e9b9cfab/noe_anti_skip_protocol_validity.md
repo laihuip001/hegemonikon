@@ -26,11 +26,11 @@
 
 ### 読み込んだファイル
 
-1. `/home/laihuip001/oikos/.agent/skills/akribeia/anti-skip/SKILL.md`
+1. `/home/makaron8426/oikos/.agent/skills/akribeia/anti-skip/SKILL.md`
    - 内容: Constitutional AI + Checkpoint Markers の設計
    - 読み込み理由: 評価対象の正本
 
-2. `/home/laihuip001/oikos/.agent/workflows/noe.md` (v2.4)
+2. `/home/makaron8426/oikos/.agent/workflows/noe.md` (v2.4)
    - 内容: Anti-Skip Protocol が埋め込まれたワークフロー
    - 読み込み理由: 実装例として確認
 

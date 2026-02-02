@@ -86,7 +86,7 @@
 **経路**:
 
 ```
-Source: /home/laihuip001/ダウンロード/Brain/.../System instructions/
+Source: /home/makaron8426/ダウンロード/Brain/.../System instructions/
 Target: hegemonikon/mekhane/ergasterion/tekhne/references/
 ```
 

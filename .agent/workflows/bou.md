@@ -47,7 +47,7 @@ absorbed:
 
 # /bou: 意志明確化ワークフロー (Boulēsis)
 
-> **正本参照**: [O2 Boulēsis SKILL.md](file:///home/laihuip001/oikos/.agent/skills/ousia/o2-boulesis/SKILL.md)
+> **正本参照**: [O2 Boulēsis SKILL.md](file:///home/makaron8426/oikos/.agent/skills/ousia/o2-boulesis/SKILL.md)
 > **目的**: 「何を望むか」を問い、純粋な理想を実用的な目標に変換する
 > **発動条件**: 作業が一段落した時、方向性に迷った時
 
@@ -248,7 +248,7 @@ result = select_derivative("O2", problem_context)
 ```
 実行手順:
 1. view_file ツールで SKILL.md を読み込む
-   パス: /home/laihuip001/oikos/.agent/skills/ousia/o2-boulesis/SKILL.md
+   パス: /home/makaron8426/oikos/.agent/skills/ousia/o2-boulesis/SKILL.md
 2. Anti-Skip Protocol セクションを確認
 3. 各 PHASE の出力形式を確認
 4. 確認後、処理を開始
@@ -512,7 +512,7 @@ result = select_derivative("O2", problem_context)
 **目的**: PHASE 5 の結果を FEP Agent に入力し、認知的フィードバックを取得
 
 > **詳細**: SKILL.md の PHASE 6 セクションを参照
-> [O2 Boulēsis SKILL.md#PHASE-6](file:///home/laihuip001/oikos/.agent/skills/ousia/o2-boulesis/SKILL.md)
+> [O2 Boulēsis SKILL.md#PHASE-6](file:///home/makaron8426/oikos/.agent/skills/ousia/o2-boulesis/SKILL.md)
 
 ### プロセス（サマリー）
 
@@ -587,12 +587,12 @@ result = select_derivative("O2", problem_context)
 
 ## Artifact 自動保存
 
-> **標準参照**: [workflow_artifact_standard.md](file:///home/laihuip001/oikos/.agent/standards/workflow_artifact_standard.md)
+> **標準参照**: [workflow_artifact_standard.md](file:///home/makaron8426/oikos/.agent/standards/workflow_artifact_standard.md)
 
 ### 保存先
 
 ```
-/home/laihuip001/oikos/mneme/.hegemonikon/workflows/bou_<topic>_<date>.md
+/home/makaron8426/oikos/mneme/.hegemonikon/workflows/bou_<topic>_<date>.md
 ```
 
 例: `bou_next_priorities_20260129.md`
@@ -620,7 +620,7 @@ result = select_derivative("O2", problem_context)
 
 | Module | Workflow | Skill (正本) | Status |
 | :------ | :-------- |--------------| :------ |
-| O2 Boulēsis | /bou | [SKILL.md](file:///home/laihuip001/oikos/.agent/skills/ousia/o2-boulesis/SKILL.md) | v3.0 Ready |
+| O2 Boulēsis | /bou | [SKILL.md](file:///home/makaron8426/oikos/.agent/skills/ousia/o2-boulesis/SKILL.md) | v3.0 Ready |
 
 ---
 

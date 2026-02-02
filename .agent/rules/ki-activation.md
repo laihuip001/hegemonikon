@@ -25,5 +25,5 @@
 ## パターン集の場所
 
 ```
-/home/laihuip001/oikos/.gemini/antigravity/knowledge/ki_activation_patterns.md
+/home/makaron8426/oikos/.gemini/antigravity/knowledge/ki_activation_patterns.md
 ```

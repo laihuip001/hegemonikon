@@ -25,8 +25,8 @@
 
 | ファイル | 追加 |
 |:---------|:-----|
-| [prompt_lang.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/ergasterion/prompt-lang/prompt_lang.py) | `Mixin`, `ParseResult`, `CircularReferenceError`, `parse_all()`, `resolve()`, `_merge()` |
-| [test_prompt_lang.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/ergasterion/prompt-lang/test_prompt_lang.py) | `TestExtendsAndMixin` クラス（9テスト） |
+| [prompt_lang.py](file:///home/makaron8426/oikos/hegemonikon/mekhane/ergasterion/prompt-lang/prompt_lang.py) | `Mixin`, `ParseResult`, `CircularReferenceError`, `parse_all()`, `resolve()`, `_merge()` |
+| [test_prompt_lang.py](file:///home/makaron8426/oikos/hegemonikon/mekhane/ergasterion/prompt-lang/test_prompt_lang.py) | `TestExtendsAndMixin` クラス（9テスト） |
 
 ### 機能
 

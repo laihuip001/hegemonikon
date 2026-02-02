@@ -30,7 +30,7 @@ if any(has_artifact_rule(t) for t in theorems_in_expression):
 
 ## 提案変更
 
-### [MODIFY] [operators_and_layers.md](file:///home/laihuip001/oikos/.gemini/antigravity/knowledge/cognitive_algebra_system/artifacts/architecture/operators_and_layers.md)
+### [MODIFY] [operators_and_layers.md](file:///home/makaron8426/oikos/.gemini/antigravity/knowledge/cognitive_algebra_system/artifacts/architecture/operators_and_layers.md)
 
 新セクション「5. 出力形式継承」を追加:
 
@@ -70,7 +70,7 @@ if any(has_artifact_rule(t) for t in theorems_in_expression):
 
 ---
 
-### [MODIFY] [overview.md](file:///home/laihuip001/oikos/.gemini/antigravity/knowledge/cognitive_algebra_system/artifacts/overview.md)
+### [MODIFY] [overview.md](file:///home/makaron8426/oikos/.gemini/antigravity/knowledge/cognitive_algebra_system/artifacts/overview.md)
 
 `## 演算子一覧` の後に「Artifact 継承」を追記。
 

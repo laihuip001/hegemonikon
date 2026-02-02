@@ -11,9 +11,9 @@
 
 | ファイル | 機能 | 状態 |
 |:---|:---|:---|
-| [sophia_ingest.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/symploke/sophia_ingest.py) | KI → Sophia インデックス | ✅ 動作確認済み |
-| [kairos_ingest.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/symploke/kairos_ingest.py) | Handoff → Kairos | ✅ 動作確認済み |
-| [test_ingest.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/symploke/tests/test_ingest.py) | 両 ingest のテスト | ✅ 存在 |
+| [sophia_ingest.py](file:///home/makaron8426/oikos/hegemonikon/mekhane/symploke/sophia_ingest.py) | KI → Sophia インデックス | ✅ 動作確認済み |
+| [kairos_ingest.py](file:///home/makaron8426/oikos/hegemonikon/mekhane/symploke/kairos_ingest.py) | Handoff → Kairos | ✅ 動作確認済み |
+| [test_ingest.py](file:///home/makaron8426/oikos/hegemonikon/mekhane/symploke/tests/test_ingest.py) | 両 ingest のテスト | ✅ 存在 |
 
 ### 問題点
 
@@ -65,14 +65,14 @@
 ### 4.1 既存テスト実行
 
 ```bash
-cd /home/laihuip001/oikos/hegemonikon
+cd /home/makaron8426/oikos/hegemonikon
 python3 -m pytest mekhane/symploke/tests/test_ingest.py -v
 ```
 
 ### 4.2 新規 CLI 動作確認
 
 ```bash
-python3 /home/laihuip001/oikos/hegemonikon/mekhane/anamnesis/mneme_cli.py ingest --all
+python3 /home/makaron8426/oikos/hegemonikon/mekhane/anamnesis/mneme_cli.py ingest --all
 ```
 
 期待出力:

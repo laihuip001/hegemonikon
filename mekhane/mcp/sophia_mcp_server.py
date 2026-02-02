@@ -76,8 +76,8 @@ log("Server initialized")
 
 
 # Index paths
-SOPHIA_INDEX = Path("/home/laihuip001/oikos/mneme/.hegemonikon/indices/sophia.pkl")
-KAIROS_INDEX = Path("/home/laihuip001/oikos/mneme/.hegemonikon/indices/kairos.pkl")
+SOPHIA_INDEX = Path("/home/makaron8426/oikos/mneme/.hegemonikon/indices/sophia.pkl")
+KAIROS_INDEX = Path("/home/makaron8426/oikos/mneme/.hegemonikon/indices/kairos.pkl")
 
 
 @server.list_tools()

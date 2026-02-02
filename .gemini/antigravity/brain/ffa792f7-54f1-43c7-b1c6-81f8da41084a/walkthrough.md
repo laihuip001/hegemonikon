@@ -63,8 +63,8 @@ plan.md (307行) は既に良い具体例を含んでおり、親子パターン
 
 ## 変更ファイル
 
-- [A2 Krisis SKILL.md](file:///home/laihuip001/oikos/.agent/skills/akribeia/a2-krisis/SKILL.md) — 消化原則追加
-- [fit.md](file:///home/laihuip001/oikos/.agent/workflows/fit.md) — 具体手順復元
+- [A2 Krisis SKILL.md](file:///home/makaron8426/oikos/.agent/skills/akribeia/a2-krisis/SKILL.md) — 消化原則追加
+- [fit.md](file:///home/makaron8426/oikos/.agent/workflows/fit.md) — 具体手順復元
 
 ---
 

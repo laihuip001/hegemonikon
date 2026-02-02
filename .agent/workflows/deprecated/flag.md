@@ -18,7 +18,7 @@ anti_skip: enabled
 
 # /flag: Feature Flags ワークフロー
 
-> **親定理**: [O4 Energeia /ene](file:///home/laihuip001/oikos/.agent/workflows/ene.md)
+> **親定理**: [O4 Energeia /ene](file:///home/makaron8426/oikos/.agent/workflows/ene.md)
 > **目的**: 段階的リリースでリスクを制御しながら実行する
 > **SE手法**: Feature Flags / Feature Toggles
 

@@ -10,11 +10,11 @@
 
 | ファイル | バージョン | 変更 |
 |:---------|:-----------|:-----|
-| [mek_output.md](file:///home/laihuip001/oikos/.agent/templates/mek_output.md) | **NEW** | 出力テンプレート |
-| [s_output.md](file:///home/laihuip001/oikos/.agent/templates/s_output.md) | **NEW** | 出力テンプレート |
-| [se_principle_validator.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/fep/se_principle_validator.py) | **NEW** | 検証スクリプト |
-| [mek.md](file:///home/laihuip001/oikos/.agent/workflows/mek.md) | 6.6 → **6.7** | テンプレート参照 + validator |
-| [s.md](file:///home/laihuip001/oikos/.agent/workflows/s.md) | 5.5 → **5.6** | スケール宣言必須 + テンプレート + validator |
+| [mek_output.md](file:///home/makaron8426/oikos/.agent/templates/mek_output.md) | **NEW** | 出力テンプレート |
+| [s_output.md](file:///home/makaron8426/oikos/.agent/templates/s_output.md) | **NEW** | 出力テンプレート |
+| [se_principle_validator.py](file:///home/makaron8426/oikos/hegemonikon/mekhane/fep/se_principle_validator.py) | **NEW** | 検証スクリプト |
+| [mek.md](file:///home/makaron8426/oikos/.agent/workflows/mek.md) | 6.6 → **6.7** | テンプレート参照 + validator |
+| [s.md](file:///home/makaron8426/oikos/.agent/workflows/s.md) | 5.5 → **5.6** | スケール宣言必須 + テンプレート + validator |
 
 ---
 

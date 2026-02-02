@@ -18,11 +18,11 @@ Hegemonikón Workflow Artifact Standardization
 import os
 from pathlib import Path
 
-WORKFLOWS_DIR = Path("/home/laihuip001/oikos/.agent/workflows")
+WORKFLOWS_DIR = Path("/home/makaron8426/oikos/.agent/workflows")
 STANDARD_REF = (
-    "file:///home/laihuip001/oikos/.agent/standards/workflow_artifact_standard.md"
+    "file:///home/makaron8426/oikos/.agent/standards/workflow_artifact_standard.md"
 )
-MNEME_PATH = "/home/laihuip001/oikos/mneme/.hegemonikon/workflows"
+MNEME_PATH = "/home/makaron8426/oikos/mneme/.hegemonikon/workflows"
 
 # Workflows to update (exclude already done: noe, bou, zet, ene)
 # Also exclude hub workflows: o, h, s, p, k, a, x

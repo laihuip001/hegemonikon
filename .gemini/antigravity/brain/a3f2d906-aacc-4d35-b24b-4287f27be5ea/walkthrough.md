@@ -25,7 +25,7 @@
 ### /mek+ (実装分析)
 
 ```yaml
-場所: /home/laihuip001/oikos/.agent/workflows/pis.md
+場所: /home/makaron8426/oikos/.agent/workflows/pis.md
 変更:
   - derivatives: [subj, inte, obje] → [subj, inte, obje, bayes]
   - cognitive_algebra に bayes 追加
@@ -66,7 +66,7 @@ S1 Metron の「スケール選択」機能の特殊形態。
 ### /mek+ (実装分析)
 
 ```yaml
-場所: /home/laihuip001/oikos/.agent/workflows/met.md
+場所: /home/makaron8426/oikos/.agent/workflows/met.md
 変更:
   - derivatives に fermi 追加
   - cognitive_algebra に fermi 追加
@@ -107,7 +107,7 @@ S1 Metron の「スケール選択」機能の特殊形態。
 ### /mek+ (実装分析)
 
 ```yaml
-場所: /home/laihuip001/oikos/.agent/workflows/gno.md
+場所: /home/makaron8426/oikos/.agent/workflows/gno.md
 変更:
   - derivatives に analogy 追加
   - cognitive_algebra に analogy 追加
@@ -148,7 +148,7 @@ A2 Krisis の批評機能の特殊形態。
 ### /mek+ (実装分析)
 
 ```yaml
-場所: /home/laihuip001/oikos/.agent/workflows/dia.md
+場所: /home/makaron8426/oikos/.agent/workflows/dia.md
 変更:
   - derivatives に reductio 追加
   - cognitive_algebra に reductio 追加
@@ -189,7 +189,7 @@ P1 (場) と S3 (基準) の自然な合成。
 ### /mek+ (実装分析)
 
 ```yaml
-場所: /home/laihuip001/oikos/.agent/macros/REGISTRY.md
+場所: /home/makaron8426/oikos/.agent/macros/REGISTRY.md
 定義: @mece = /kho_/sta
 行数: +1 行
 ```

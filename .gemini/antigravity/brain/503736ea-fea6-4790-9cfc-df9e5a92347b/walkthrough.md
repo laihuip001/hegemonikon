@@ -39,7 +39,7 @@ skill_ref:
 
 ### 4. 文書化
 
-命名規則を [hegemonikon.md](file:///home/laihuip001/oikos/.agent/rules/hegemonikon.md) のセクション6に追加。
+命名規則を [hegemonikon.md](file:///home/makaron8426/oikos/.agent/rules/hegemonikon.md) のセクション6に追加。
 
 ## 設計決定
 

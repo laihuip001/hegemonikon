@@ -19,7 +19,7 @@ anti_skip: enabled
 
 # /poc: Timeboxed 探索ワークフロー
 
-> **親定理**: [O3 Zētēsis /zet](file:///home/laihuip001/oikos/.agent/workflows/zet.md)
+> **親定理**: [O3 Zētēsis /zet](file:///home/makaron8426/oikos/.agent/workflows/zet.md)
 > **目的**: 不確実性を実験で下げる — 仮説検証型探索
 > **SE手法**: Spike / Proof of Concept
 

@@ -37,11 +37,11 @@ The Hegemonikón Interactive Guide has been successfully implemented as a standa
 
 ### Core Guide Demo
 
-![Hegemonikón Interactive Guide Demo](/home/laihuip001/oikos/.gemini/antigravity/brain/61fd8c7f-1a6e-44a4-8bf1-420d1fc4fe5e/hegemonikon_interactive_guide_demo.webp)
+![Hegemonikón Interactive Guide Demo](/home/makaron8426/oikos/.gemini/antigravity/brain/61fd8c7f-1a6e-44a4-8bf1-420d1fc4fe5e/hegemonikon_interactive_guide_demo.webp)
 
 ### X-Series Visualization Demo
 
-![X-Series Demo](/home/laihuip001/oikos/.gemini/antigravity/brain/61fd8c7f-1a6e-44a4-8bf1-420d1fc4fe5e/hegemonikon_x_series_demo.webp)
+![X-Series Demo](/home/makaron8426/oikos/.gemini/antigravity/brain/61fd8c7f-1a6e-44a4-8bf1-420d1fc4fe5e/hegemonikon_x_series_demo.webp)
 
 ## Technical Architecture
 

@@ -84,8 +84,8 @@ obs_vector[obs_idx] = 1.0
 
 ## 📁 変更ファイル
 
-- [fep_agent.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/fep/fep_agent.py) — tuple サポート追加
-- [test_fep_agent.py](file:///home/laihuip001/oikos/hegemonikon/tests/test_fep_agent.py) — 新規テストケース追加
+- [fep_agent.py](file:///home/makaron8426/oikos/hegemonikon/mekhane/fep/fep_agent.py) — tuple サポート追加
+- [test_fep_agent.py](file:///home/makaron8426/oikos/hegemonikon/tests/test_fep_agent.py) — 新規テストケース追加
 
 ---
 

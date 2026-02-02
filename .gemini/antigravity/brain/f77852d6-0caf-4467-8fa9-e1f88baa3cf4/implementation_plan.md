@@ -111,13 +111,13 @@ class CCLOutput(BaseModel):
 1. **Unit Test**: `schema_validator.py` の Pydantic モデル検証
 
    ```bash
-   cd /home/laihuip001/oikos/hegemonikon && python -m pytest mekhane/ccl/test_schema_validator.py -v
+   cd /home/makaron8426/oikos/hegemonikon && python -m pytest mekhane/ccl/test_schema_validator.py -v
    ```
 
 2. **Integration Test**: Synergeia API での structured output
 
    ```bash
-   cd /home/laihuip001/oikos/hegemonikon && python synergeia/test_structured_output.py
+   cd /home/makaron8426/oikos/hegemonikon && python synergeia/test_structured_output.py
    ```
 
 ### Phase 2 Verification

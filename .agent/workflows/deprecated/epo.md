@@ -12,7 +12,7 @@ anti_skip: enabled
 
 # /epo: 判断停止ワークフロー (Epochē)
 
-> **正本参照**: [A2 Krisis SKILL.md](file:///home/laihuip001/oikos/.agent/skills/akribeia/a2-krisis/SKILL.md)
+> **正本参照**: [A2 Krisis SKILL.md](file:///home/makaron8426/oikos/.agent/skills/akribeia/a2-krisis/SKILL.md)
 > **目的**: LLM の過信 (Overconfidence) を低減し、認識限界で判断を停止する
 > **本質**: ἐποχή = 判断保留
 
@@ -35,7 +35,7 @@ anti_skip: enabled
 ```text
 実行手順:
 1. view_file ツールで SKILL.md を読み込む
-   パス: /home/laihuip001/oikos/.agent/skills/akribeia/a2-krisis/SKILL.md
+   パス: /home/makaron8426/oikos/.agent/skills/akribeia/a2-krisis/SKILL.md
 2. Epochē: 判断停止 セクションを確認
 3. 4層構造と出力マーカーを確認
 4. 確認後、処理を開始
@@ -86,7 +86,7 @@ Hollow Detection（形骸化防止チェック）
 
 | Module | Workflow | Skill (正本) | Status |
 | :------- |:---------|--------------| :------- |
-| A2 Krisis | /epo | [SKILL.md](file:///home/laihuip001/oikos/.agent/skills/akribeia/a2-krisis/SKILL.md) | v2.0 Ready |
+| A2 Krisis | /epo | [SKILL.md](file:///home/makaron8426/oikos/.agent/skills/akribeia/a2-krisis/SKILL.md) | v2.0 Ready |
 
 ---
 

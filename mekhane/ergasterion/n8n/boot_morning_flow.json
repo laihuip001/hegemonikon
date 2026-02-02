@@ -23,7 +23,7 @@
         },
         {
             "parameters": {
-                "command": "cd /home/laihuip001/oikos/hegemonikon && git log -1 --oneline"
+                "command": "cd /home/makaron8426/oikos/hegemonikon && git log -1 --oneline"
             },
             "id": "git-status",
             "name": "Git Latest Commit",
@@ -36,7 +36,7 @@
         },
         {
             "parameters": {
-                "command": "ls -t /home/laihuip001/oikos/mneme/.hegemonikon/sessions/ | head -1"
+                "command": "ls -t /home/makaron8426/oikos/mneme/.hegemonikon/sessions/ | head -1"
             },
             "id": "handoff-latest",
             "name": "Latest Handoff",

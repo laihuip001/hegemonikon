@@ -10,7 +10,7 @@
 
 ### mekhane/symploke
 
-#### [MODIFY] [kairos_ingest.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/symploke/kairos_ingest.py)
+#### [MODIFY] [kairos_ingest.py](file:///home/makaron8426/oikos/hegemonikon/mekhane/symploke/kairos_ingest.py)
 
 1. `parse_conversation(file_path)` 関数を追加
    - `2026-01-31_conv_50_*.md` 形式をパース
@@ -23,7 +23,7 @@
 3. `--conversations` フラグを追加
    - Handoff に加え会話ログも投入可能に
 
-#### [MODIFY] [handoff_search.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/symploke/handoff_search.py)
+#### [MODIFY] [handoff_search.py](file:///home/makaron8426/oikos/hegemonikon/mekhane/symploke/handoff_search.py)
 
 1. `get_boot_handoffs()` を拡張
    - 会話ログも検索対象に含める
@@ -36,21 +36,21 @@
 ### 既存テスト実行
 
 ```bash
-cd /home/laihuip001/oikos/hegemonikon && \
+cd /home/makaron8426/oikos/hegemonikon && \
 .venv/bin/python -m pytest mekhane/symploke/tests/test_ingest.py -v
 ```
 
 ### 新規投入テスト
 
 ```bash
-cd /home/laihuip001/oikos/hegemonikon && \
+cd /home/makaron8426/oikos/hegemonikon && \
 PYTHONPATH=. .venv/bin/python mekhane/symploke/kairos_ingest.py --conversations --dry-run
 ```
 
 ### 検索テスト
 
 ```bash
-cd /home/laihuip001/oikos/hegemonikon && \
+cd /home/makaron8426/oikos/hegemonikon && \
 PYTHONPATH=. .venv/bin/python mekhane/symploke/kairos_ingest.py --load --search "FEP"
 ```
 

@@ -164,7 +164,7 @@ version: "2.1.0"
 
 | 層 | 実現手段 | 参照 |
 |----|----------|------|
-| **Micro** | /plan workflow | [plan.md](file:///home/laihuip001/oikos/.agent/workflows/plan.md) |
+| **Micro** | /plan workflow | [plan.md](file:///home/makaron8426/oikos/.agent/workflows/plan.md) |
 
 /plan は「戦略設計」であり、S2 Mekhanē の Micro 実現と見なせる。
 
@@ -218,5 +218,5 @@ version: "2.1.0"
 
 ---
 
-*参照: [schema.md](file:///home/laihuip001/oikos/hegemonikon/kernel/schema.md)*  
+*参照: [schema.md](file:///home/makaron8426/oikos/hegemonikon/kernel/schema.md)*  
 *バージョン: 2.1.0 (2026-01-27)*

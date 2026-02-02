@@ -48,4 +48,4 @@ The system limits policies to `act` (Energeia) and `observe` (Noēsis/Zētēsis)
 ## 4. References
 
 - Smith et al. (2025). *Stoic Free Will and Predictor-Error Frameworks*. Frontiers in Psychology.
-- [Perplexity FEP Implementation Report (2026-01-28)](/home/laihuip001/oikos/hegemonikon/docs/research/perplexity/fep_implementation_patterns_2026-01-28.md)
+- [Perplexity FEP Implementation Report (2026-01-28)](/home/makaron8426/oikos/hegemonikon/docs/research/perplexity/fep_implementation_patterns_2026-01-28.md)

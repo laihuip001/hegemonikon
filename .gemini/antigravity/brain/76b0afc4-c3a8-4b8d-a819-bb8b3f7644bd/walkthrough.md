@@ -36,7 +36,7 @@ Creator の反応:
 ### /tek ワークフロー
 
 ```
-/home/laihuip001/oikos/.agent/workflows/tek.md
+/home/makaron8426/oikos/.agent/workflows/tek.md
 ```
 
 | モード | 動作 |
@@ -50,7 +50,7 @@ Creator の反応:
 ### claude-dialogue スキル
 
 ```
-/home/laihuip001/oikos/.agent/skills/schema/claude-dialogue/SKILL.md
+/home/makaron8426/oikos/.agent/skills/schema/claude-dialogue/SKILL.md
 ```
 
 | モード | 説明 |

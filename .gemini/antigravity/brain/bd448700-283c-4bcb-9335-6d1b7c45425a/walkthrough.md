@@ -48,10 +48,10 @@ LLM は「Neural Renderer」として機能
 
 | File | Change | Commit |
 |:-----|:-------|:-------|
-| [fep_agent.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/fep/fep_agent.py) | numpy fix + A/B/C/D | 50c20665, 942e675e |
-| [o1-noesis/SKILL.md](file:///home/laihuip001/oikos/.agent/skills/ousia/o1-noesis/SKILL.md) | FEP section | eda73362 |
-| [o2-boulesis/SKILL.md](file:///home/laihuip001/oikos/.agent/skills/ousia/o2-boulesis/SKILL.md) | FEP section | edf92a3e |
-| [o4-energeia/SKILL.md](file:///home/laihuip001/oikos/.agent/skills/ousia/o4-energeia/SKILL.md) | FEP section | edf92a3e |
+| [fep_agent.py](file:///home/makaron8426/oikos/hegemonikon/mekhane/fep/fep_agent.py) | numpy fix + A/B/C/D | 50c20665, 942e675e |
+| [o1-noesis/SKILL.md](file:///home/makaron8426/oikos/.agent/skills/ousia/o1-noesis/SKILL.md) | FEP section | eda73362 |
+| [o2-boulesis/SKILL.md](file:///home/makaron8426/oikos/.agent/skills/ousia/o2-boulesis/SKILL.md) | FEP section | edf92a3e |
+| [o4-energeia/SKILL.md](file:///home/makaron8426/oikos/.agent/skills/ousia/o4-energeia/SKILL.md) | FEP section | edf92a3e |
 
 ---
 
@@ -89,8 +89,8 @@ LLM は「Neural Renderer」として機能
 
 | File | 内容 |
 |:-----|:-----|
-| [implementation_plan.md](file:///home/laihuip001/oikos/.gemini/antigravity/brain/bd448700-283c-4bcb-9335-6d1b7c45425a/implementation_plan.md) | pymdp 統合計画 v2.0 |
-| [stoic_efficiency_pattern.md](file:///home/laihuip001/oikos/.gemini/antigravity/brain/bd448700-283c-4bcb-9335-6d1b7c45425a/stoic_efficiency_pattern.md) | STOIC パターン適用ガイド |
+| [implementation_plan.md](file:///home/makaron8426/oikos/.gemini/antigravity/brain/bd448700-283c-4bcb-9335-6d1b7c45425a/implementation_plan.md) | pymdp 統合計画 v2.0 |
+| [stoic_efficiency_pattern.md](file:///home/makaron8426/oikos/.gemini/antigravity/brain/bd448700-283c-4bcb-9335-6d1b7c45425a/stoic_efficiency_pattern.md) | STOIC パターン適用ガイド |
 
 ---
 

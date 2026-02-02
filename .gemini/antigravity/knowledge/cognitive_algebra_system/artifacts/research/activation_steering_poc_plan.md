@@ -63,11 +63,11 @@ CCL 遵守率を推論レベルで向上させる Steering Vector の有効性�
 
 ## 実装済み MVP
 
-- [Colab MVP (Mistral 7B)](/home/laihuip001/oikos/hegemonikon/experiments/activation_steering_mvp.ipynb) — T4 GPU で動作確認可能。
+- [Colab MVP (Mistral 7B)](/home/makaron8426/oikos/hegemonikon/experiments/activation_steering_mvp.ipynb) — T4 GPU で動作確認可能。
 
 ## 管理
 
-- [GPU 必須タスク管理](/home/laihuip001/oikos/hegemonikon/docs/gpu_required_tasks.md) — 自宅 PC 移行後に実行するタスク一覧。
+- [GPU 必須タスク管理](/home/makaron8426/oikos/hegemonikon/docs/gpu_required_tasks.md) — 自宅 PC 移行後に実行するタスク一覧。
 
 ---
 

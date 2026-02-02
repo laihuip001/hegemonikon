@@ -19,12 +19,12 @@
 
 ### Phase A+B: ワークフロー更新
 
-#### [MODIFY] [s.md](file:///home/laihuip001/oikos/.agent/workflows/s.md)
+#### [MODIFY] [s.md](file:///home/makaron8426/oikos/.agent/workflows/s.md)
 
 - STAGE 2 に Metrika 5門チェックリスト (通過必須ゲート)
 - Chreos 警告ロジック
 
-#### [MODIFY] [ene.md](file:///home/laihuip001/oikos/.agent/workflows/ene.md)  
+#### [MODIFY] [ene.md](file:///home/makaron8426/oikos/.agent/workflows/ene.md)  
 
 - PHASE 1 に Graphē 同期チェック
 - PHASE 4 に /dia 自動推奨
@@ -34,7 +34,7 @@
 
 ### Phase C: Python 実装
 
-#### [NEW] [quality_gate.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/quality_gate.py)
+#### [NEW] [quality_gate.py](file:///home/makaron8426/oikos/hegemonikon/mekhane/quality_gate.py)
 
 ```python
 # Metrika 5門 + Chreos + Palimpsest 自動検証

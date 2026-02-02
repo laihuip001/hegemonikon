@@ -21,7 +21,7 @@ The agent utilizes **Dirichlet accumulation** to update its observation model ov
 
 ## 3. Metrics
 
-- **File Path**: `/home/laihuip001/oikos/mneme/.hegemonikon/learned_A.npy`
+- **File Path**: `/home/makaron8426/oikos/mneme/.hegemonikon/learned_A.npy`
 - **Verification Method**: Manual check during `/boot` sequence revealed successful loading and state space mapping.
 - **Entropy Trend**: Learning persists across handoffs, leading to lower cognitive entropy in familiar problem contexts (Assent stability).
 

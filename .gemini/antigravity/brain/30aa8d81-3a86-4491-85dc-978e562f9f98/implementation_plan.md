@@ -46,7 +46,7 @@
 
 ## Proposed Changes
 
-### [MODIFY] [zet.md](file:///home/laihuip001/oikos/.agent/workflows/zet.md)
+### [MODIFY] [zet.md](file:///home/makaron8426/oikos/.agent/workflows/zet.md)
 
 1. **深掘り版テンプレート再構成**: 冒頭凝縮型に変更
 2. **セクション順序変更**: 時間制約を最初に移動

@@ -479,7 +479,7 @@ graph LR
 > [!CAUTION]
 > **全 STAGE の実行が必須**。各 STAGE のゲート条件をクリアしない限り次に進めない。
 
-**標準参照**: [workflow_artifact_standard.md](file:///home/laihuip001/oikos/.agent/standards/workflow_artifact_standard.md)
+**標準参照**: [workflow_artifact_standard.md](file:///home/makaron8426/oikos/.agent/standards/workflow_artifact_standard.md)
 **SE原則強制**: 必須フィールドがないとブロック
 
 ### 必須フィールド（SE原則）
@@ -492,7 +492,7 @@ graph LR
 
 ### 出力テンプレート [必須]
 
-> **参照**: [s_output.md](file:///home/laihuip001/oikos/.agent/templates/s_output.md)
+> **参照**: [s_output.md](file:///home/makaron8426/oikos/.agent/templates/s_output.md)
 
 出力は上記テンプレートに従うこと。フィールドが欠けているとブロック。
 

@@ -66,7 +66,7 @@ pymdp Agent を拡張し、セッション間で学習した観察モデル (A�
 
 ---
 
-#### [MODIFY] [fep_agent.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/fep/fep_agent.py)
+#### [MODIFY] [fep_agent.py](file:///home/makaron8426/oikos/hegemonikon/mekhane/fep/fep_agent.py)
 
 1. **2-step政策horizon導入**
    - `Agent()` 初期化時に `policy_len=2` を追加
@@ -94,12 +94,12 @@ pymdp Agent を拡張し、セッション間で学習した観察モデル (A�
 
 ---
 
-#### [NEW] [persistence.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/fep/persistence.py)
+#### [NEW] [persistence.py](file:///home/makaron8426/oikos/hegemonikon/mekhane/fep/persistence.py)
 
 A行列永続化のためのヘルパーモジュール:
 
 ```python
-LEARNED_A_PATH = "/home/laihuip001/oikos/mneme/.hegemonikon/learned_A.npy"
+LEARNED_A_PATH = "/home/makaron8426/oikos/mneme/.hegemonikon/learned_A.npy"
 
 def save_A(agent: HegemonikónFEPAgent) -> Path
 def load_A(path: Path) -> np.ndarray
@@ -112,7 +112,7 @@ def A_exists() -> bool
 
 ---
 
-#### [MODIFY] [test_fep_agent.py](file:///home/laihuip001/oikos/hegemonikon/tests/test_fep_agent.py)
+#### [MODIFY] [test_fep_agent.py](file:///home/makaron8426/oikos/hegemonikon/tests/test_fep_agent.py)
 
 5件のテスト追加:
 

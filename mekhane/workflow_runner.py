@@ -82,7 +82,7 @@ THEOREM_TO_WORKFLOW: Dict[str, str] = {
 }
 
 # Workflow directory (absolute path)
-WORKFLOWS_DIR = "/home/laihuip001/oikos/.agent/workflows"
+WORKFLOWS_DIR = "/home/makaron8426/oikos/.agent/workflows"
 
 
 def get_workflow_path(theorem_or_workflow: str) -> Optional[str]:
@@ -97,11 +97,11 @@ def get_workflow_path(theorem_or_workflow: str) -> Optional[str]:
 
     Example:
         >>> get_workflow_path("O1")
-        '/home/laihuip001/oikos/.agent/workflows/noe.md'
+        '/home/makaron8426/oikos/.agent/workflows/noe.md'
         >>> get_workflow_path("/noe")
-        '/home/laihuip001/oikos/.agent/workflows/noe.md'
+        '/home/makaron8426/oikos/.agent/workflows/noe.md'
         >>> get_workflow_path("noe")
-        '/home/laihuip001/oikos/.agent/workflows/noe.md'
+        '/home/makaron8426/oikos/.agent/workflows/noe.md'
     """
     # Normalize input
     input_str = theorem_or_workflow.upper()

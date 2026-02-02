@@ -92,9 +92,9 @@ mekhane/synteleia/
 
 ## 📁 関連ファイル
 
-- [synteleia.md](file:///home/laihuip001/oikos/hegemonikon/docs/architecture/synteleia.md)
-- [synteleia/](file:///home/laihuip001/oikos/hegemonikon/mekhane/synteleia/)
-- [README.md](file:///home/laihuip001/oikos/hegemonikon/README.md)
+- [synteleia.md](file:///home/makaron8426/oikos/hegemonikon/docs/architecture/synteleia.md)
+- [synteleia/](file:///home/makaron8426/oikos/hegemonikon/mekhane/synteleia/)
+- [README.md](file:///home/makaron8426/oikos/hegemonikon/README.md)
 
 ---
 

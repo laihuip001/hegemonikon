@@ -36,7 +36,7 @@ ccl_signature: "/pro+"
 
 # /pro: 初期傾向評価ワークフロー (Propatheia) v2.1
 
-> **正本参照**: [H1 Propatheia SKILL.md](file:///home/laihuip001/oikos/.agent/skills/horme/h1-propatheia/SKILL.md)
+> **正本参照**: [H1 Propatheia SKILL.md](file:///home/makaron8426/oikos/.agent/skills/horme/h1-propatheia/SKILL.md)
 > **目的**: 「直感的にどう感じるか」を評価する — 初期傾向の検出
 > **役割**: 接近 (+) vs 回避 (-) の直感的判断
 
@@ -353,12 +353,12 @@ E[/pro] >> {
 
 ## Artifact 自動保存
 
-> **標準参照**: [workflow_artifact_standard.md](file:///home/laihuip001/oikos/.agent/standards/workflow_artifact_standard.md)
+> **標準参照**: [workflow_artifact_standard.md](file:///home/makaron8426/oikos/.agent/standards/workflow_artifact_standard.md)
 
 ### 保存先
 
 ```
-/home/laihuip001/oikos/mneme/.hegemonikon/workflows/pro_<topic>_<date>.md
+/home/makaron8426/oikos/mneme/.hegemonikon/workflows/pro_<topic>_<date>.md
 ```
 
 例: `pro_直感評価_20260129.md`
@@ -384,7 +384,7 @@ E[/pro] >> {
 
 | Module | Workflow | Skill (正本) | Status |
 |:-------|:---------|:-------------|:-------|
-| H1 Propatheia | /pro | [SKILL.md](file:///home/laihuip001/oikos/.agent/skills/horme/h1-propatheia/SKILL.md) | v2.0 Ready |
+| H1 Propatheia | /pro | [SKILL.md](file:///home/makaron8426/oikos/.agent/skills/horme/h1-propatheia/SKILL.md) | v2.0 Ready |
 
 ---
 

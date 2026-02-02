@@ -202,7 +202,7 @@ graph TD
 
 ### 1. tekhne-maker SKILL.md 更新
 
-#### [MODIFY] [SKILL.md](file:///home/laihuip001/oikos/.agent/skills/utils/tekhne-maker/SKILL.md)
+#### [MODIFY] [SKILL.md](file:///home/makaron8426/oikos/.agent/skills/utils/tekhne-maker/SKILL.md)
 
 **変更内容**:
 
@@ -214,7 +214,7 @@ graph TD
 
 ### 2. prompt-lang-generator の統合
 
-#### [DELETE] [prompt-lang-generator/](file:///home/laihuip001/oikos/.agent/skills/utils/prompt-lang-generator/)
+#### [DELETE] [prompt-lang-generator/](file:///home/makaron8426/oikos/.agent/skills/utils/prompt-lang-generator/)
 
 **移行内容**:
 
@@ -225,7 +225,7 @@ graph TD
 
 ### 3. tools.yaml 更新
 
-#### [MODIFY] [tools.yaml](file:///home/laihuip001/oikos/.agent/tools.yaml)
+#### [MODIFY] [tools.yaml](file:///home/makaron8426/oikos/.agent/tools.yaml)
 
 ```yaml
 skills:
@@ -256,7 +256,7 @@ skills:
 1. **Prompt-Lang パーサーテスト** (既存):
 
    ```bash
-   cd /home/laihuip001/oikos/hegemonikon
+   cd /home/makaron8426/oikos/hegemonikon
    source .venv/bin/activate
    pytest test_prompt_lang.py -v
    ```

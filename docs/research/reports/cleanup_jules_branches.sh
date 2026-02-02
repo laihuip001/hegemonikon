@@ -9,7 +9,7 @@
 #
 # SAFETY: All branches are prefixed with 'origin/' for remote deletion
 
-cd /home/laihuip001/oikos/hegemonikon || exit 1
+cd /home/makaron8426/oikos/hegemonikon || exit 1
 
 echo "🧹 Jules Review Branches Cleanup"
 echo "================================="

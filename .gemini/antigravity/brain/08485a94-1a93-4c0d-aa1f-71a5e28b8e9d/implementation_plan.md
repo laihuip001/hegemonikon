@@ -136,23 +136,23 @@ Batch 5: G-5 Meta (07,08) → /pan, /boot Phase 2
 
 ### Component: Workflows (Batch 1)
 
-#### [MODIFY] [dia.md](file:///home/laihuip001/oikos/.agent/workflows/dia.md)
+#### [MODIFY] [dia.md](file:///home/makaron8426/oikos/.agent/workflows/dia.md)
 
 - Devil's Advocate (Module 07) を形式化
 - Red Teaming (Module 11) を `--mode=redteam` として追加
 - Mutation Testing (Module 09) を `--mode=mutation` として追加
 
-#### [MODIFY] [s.md](file:///home/laihuip001/oikos/.agent/workflows/s.md)
+#### [MODIFY] [s.md](file:///home/makaron8426/oikos/.agent/workflows/s.md)
 
 - TDD Protocol (Module 04) を STAGE 4 with verification 強化
 - Complexity Budget (Module 06) を STAGE 0 に追加
 
-#### [MODIFY] [noe.md](file:///home/laihuip001/oikos/.agent/workflows/noe.md)
+#### [MODIFY] [noe.md](file:///home/makaron8426/oikos/.agent/workflows/noe.md)
 
 - Domain Language (Module 05) を Ubiquitous Language Check として追加
 - Code Archaeology (Module 13) を Chesterton's Fence 原則として追加
 
-#### [MODIFY] [boot.md](file:///home/laihuip001/oikos/.agent/workflows/boot.md)
+#### [MODIFY] [boot.md](file:///home/makaron8426/oikos/.agent/workflows/boot.md)
 
 - Cognitive Checkpoint (Module 08) を Phase 2 Drift検出に統合
 
@@ -166,7 +166,7 @@ Batch 5: G-5 Meta (07,08) → /pan, /boot Phase 2
 
 ```bash
 # 境界残存チェック
-grep -r "Module 0" /home/laihuip001/oikos/.agent/workflows/*.md
+grep -r "Module 0" /home/makaron8426/oikos/.agent/workflows/*.md
 
 # 期待結果: 0件（モジュール名が消えている）
 ```

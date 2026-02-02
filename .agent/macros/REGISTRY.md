@@ -32,7 +32,7 @@ description: CCL マクロの定義と演算子ルール
 
 ### Tier 2: ユーザーライブラリ
 
-> **完全版**: [TIER2_LIBRARY.md](file:///home/laihuip001/oikos/.agent/macros/TIER2_LIBRARY.md)
+> **完全版**: [TIER2_LIBRARY.md](file:///home/makaron8426/oikos/.agent/macros/TIER2_LIBRARY.md)
 >
 > **166モード派生 + 71マクロ** — 全ての王道思考法を包括
 

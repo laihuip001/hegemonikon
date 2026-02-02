@@ -30,7 +30,7 @@ class DoxaLearner:
     for future similar intents. Learning improves over time.
     """
 
-    STORE_PATH = Path("/home/laihuip001/oikos/mneme/.hegemonikon/ccl_patterns.json")
+    STORE_PATH = Path("/home/makaron8426/oikos/mneme/.hegemonikon/ccl_patterns.json")
 
     def __init__(self, store_path: Optional[Path] = None):
         """

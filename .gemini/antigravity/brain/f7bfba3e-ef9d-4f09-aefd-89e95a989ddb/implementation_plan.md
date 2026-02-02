@@ -77,15 +77,15 @@
 
 ### mekhane
 
-#### [NEW] [fep/](file:///home/laihuip001/oikos/hegemonikon/mekhane/fep/)
+#### [NEW] [fep/](file:///home/makaron8426/oikos/hegemonikon/mekhane/fep/)
 
 新規ディレクトリ: FEP/Active Inference 実装
 
-#### [NEW] [fep/**init**.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/fep/__init__.py)
+#### [NEW] [fep/**init**.py](file:///home/makaron8426/oikos/hegemonikon/mekhane/fep/__init__.py)
 
 モジュール初期化
 
-#### [NEW] [fep/fep_agent.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/fep/fep_agent.py)
+#### [NEW] [fep/fep_agent.py](file:///home/makaron8426/oikos/hegemonikon/mekhane/fep/fep_agent.py)
 
 pymdp Agent のラッパークラス。以下を実装:
 
@@ -106,7 +106,7 @@ class HegemonikónFEPAgent:
         """Complete inference-action cycle."""
 ```
 
-#### [NEW] [fep/state_spaces.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/fep/state_spaces.py)
+#### [NEW] [fep/state_spaces.py](file:///home/makaron8426/oikos/hegemonikon/mekhane/fep/state_spaces.py)
 
 Stoic-FEP 対応に基づく状態空間定義:
 
@@ -127,7 +127,7 @@ OBSERVATION_MODALITIES = {
 
 ### tests
 
-#### [NEW] [tests/test_fep_agent.py](file:///home/laihuip001/oikos/hegemonikon/tests/test_fep_agent.py)
+#### [NEW] [tests/test_fep_agent.py](file:///home/makaron8426/oikos/hegemonikon/tests/test_fep_agent.py)
 
 ```python
 class TestHegemonikónFEPAgent:
@@ -148,7 +148,7 @@ class TestHegemonikónFEPAgent:
 
 ### Dependencies
 
-#### [MODIFY] [requirements.txt](file:///home/laihuip001/oikos/hegemonikon/requirements.txt)
+#### [MODIFY] [requirements.txt](file:///home/makaron8426/oikos/hegemonikon/requirements.txt)
 
 ```diff
 + pymdp>=0.0.7
@@ -162,7 +162,7 @@ class TestHegemonikónFEPAgent:
 
 ```bash
 # 1. pymdp インストール確認
-cd /home/laihuip001/oikos/hegemonikon
+cd /home/makaron8426/oikos/hegemonikon
 source .venv/bin/activate
 pip install pymdp>=0.0.7
 python -c "import pymdp; print(f'pymdp version: {pymdp.__version__}')"

@@ -56,7 +56,7 @@ LLM_DERIVATIVE_MODEL = "gemini-2.0-flash-lite"  # Free tier model
 # -----------------------------------------------------------------------------
 SELECTION_LOG_ENABLED = True
 SELECTION_LOG_PATH = Path(
-    "/home/laihuip001/oikos/mneme/.hegemonikon/derivative_selections.yaml"
+    "/home/makaron8426/oikos/mneme/.hegemonikon/derivative_selections.yaml"
 )
 
 logger = logging.getLogger(__name__)

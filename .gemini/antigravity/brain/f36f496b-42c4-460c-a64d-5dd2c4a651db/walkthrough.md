@@ -19,10 +19,10 @@
 
 ## 主要成果物
 
-- [ccl/README.md](file:///home/laihuip001/oikos/hegemonikon/ccl/README.md)
-- [ccl/wf_classification.md](file:///home/laihuip001/oikos/hegemonikon/ccl/wf_classification.md)
-- [pythosis/README.md](file:///home/laihuip001/oikos/hegemonikon/pythosis/README.md)
-- [pythosis/roadmap.md](file:///home/laihuip001/oikos/hegemonikon/pythosis/roadmap.md)
+- [ccl/README.md](file:///home/makaron8426/oikos/hegemonikon/ccl/README.md)
+- [ccl/wf_classification.md](file:///home/makaron8426/oikos/hegemonikon/ccl/wf_classification.md)
+- [pythosis/README.md](file:///home/makaron8426/oikos/hegemonikon/pythosis/README.md)
+- [pythosis/roadmap.md](file:///home/makaron8426/oikos/hegemonikon/pythosis/roadmap.md)
 
 ---
 

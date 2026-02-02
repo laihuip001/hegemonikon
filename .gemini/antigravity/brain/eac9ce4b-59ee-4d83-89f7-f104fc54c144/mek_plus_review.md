@@ -113,7 +113,7 @@ def search_handoffs(query: str, top_k: int = 5) -> List[Tuple[Document, float]]:
 
 ```python
 # 永続化インデックスを使用
-HANDOFF_INDEX_PATH = Path("/home/laihuip001/oikos/mneme/.hegemonikon/indices/handoffs.pkl")
+HANDOFF_INDEX_PATH = Path("/home/makaron8426/oikos/mneme/.hegemonikon/indices/handoffs.pkl")
 
 def search_handoffs(query: str, top_k: int = 5) -> List[Tuple[Document, float]]:
     """Search handoffs by semantic similarity using cached index."""

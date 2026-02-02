@@ -7,11 +7,11 @@
 
 ## B. ドキュメント ✅
 
-### [ccl_usage_examples.md](file:///home/laihuip001/oikos/hegemonikon/docs/ccl_usage_examples.md)
+### [ccl_usage_examples.md](file:///home/makaron8426/oikos/hegemonikon/docs/ccl_usage_examples.md)
 
 CEP-001 新記号の使用例を6セクションで文書化。
 
-### [derivatives_reference.md](file:///home/laihuip001/oikos/hegemonikon/docs/derivatives_reference.md)
+### [derivatives_reference.md](file:///home/makaron8426/oikos/hegemonikon/docs/derivatives_reference.md)
 
 **200+ 派生** を39ワークフローから統合。CEP-001 新規8派生を✨マーク付きで記載。
 
@@ -41,11 +41,11 @@ python3 -m mekhane.dendron.cli check . --coverage
 
 ## C. AI 自律化 ⭕
 
-### [boot_automation_poc.md](file:///home/laihuip001/oikos/hegemonikon/mekhane/ergasterion/n8n/boot_automation_poc.md)
+### [boot_automation_poc.md](file:///home/makaron8426/oikos/hegemonikon/mekhane/ergasterion/n8n/boot_automation_poc.md)
 
 n8n Boot 自動化の設計ドキュメント。
 
-### [boot_morning_flow.json](file:///home/laihuip001/oikos/hegemonikon/mekhane/ergasterion/n8n/boot_morning_flow.json)
+### [boot_morning_flow.json](file:///home/makaron8426/oikos/hegemonikon/mekhane/ergasterion/n8n/boot_morning_flow.json)
 
 n8n にインポート可能なワークフロー JSON:
 

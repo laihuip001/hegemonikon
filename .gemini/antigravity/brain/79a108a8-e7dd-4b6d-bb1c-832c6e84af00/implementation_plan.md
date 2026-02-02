@@ -76,7 +76,7 @@
 
 ## 📁 変更ファイル
 
-### [MODIFY] [operators_and_layers.md](file:///home/laihuip001/oikos/.gemini/antigravity/knowledge/cognitive_algebra_system/artifacts/architecture/operators_and_layers.md)
+### [MODIFY] [operators_and_layers.md](file:///home/makaron8426/oikos/.gemini/antigravity/knowledge/cognitive_algebra_system/artifacts/architecture/operators_and_layers.md)
 
 - **変更内容**: 新規演算子 (`&`, `/`, `%`, `|`, `@`, `?`) の定義追加
 - **セクション追加**:
@@ -85,12 +85,12 @@
   - §1.3 Modifier Operators (修飾)
 - **Advanced/Future Operators セクション削除**: 正式定義に昇格
 
-### [MODIFY] [overview.md](file:///home/laihuip001/oikos/.gemini/antigravity/knowledge/cognitive_algebra_system/artifacts/overview.md)
+### [MODIFY] [overview.md](file:///home/makaron8426/oikos/.gemini/antigravity/knowledge/cognitive_algebra_system/artifacts/overview.md)
 
 - **変更内容**: Operations at a Glance テーブルを更新
 - **新セクション**: Tier 分類表を追加
 
-### [MODIFY] [roadmap.md](file:///home/laihuip001/oikos/.gemini/antigravity/knowledge/cognitive_algebra_system/artifacts/implementation/roadmap.md)
+### [MODIFY] [roadmap.md](file:///home/makaron8426/oikos/.gemini/antigravity/knowledge/cognitive_algebra_system/artifacts/implementation/roadmap.md)
 
 - **変更内容**: Phase 4 完了をマーク、Phase 5 (Full Integration) を追加
 
@@ -104,7 +104,7 @@
 
 ```bash
 # hegemonikon ディレクトリで実行
-cd /home/laihuip001/oikos/hegemonikon
+cd /home/makaron8426/oikos/hegemonikon
 pytest tests/ mekhane/fep/tests/ -v --ignore=mekhane/symploke/tests/test_jules_client.py
 ```
 

@@ -180,9 +180,9 @@ lim[V[] < 0.15]{
 
 | ファイル | アクション | CCL | サイズ目安 |
 |:---------|:-----------|:----|:-----------|
-| [optimizer.py](file:///home/laihuip001/oikos/hegemonikon/hermeneus/src/optimizer.py) | **NEW** | `/s+` | ~300 行 |
-| [__init__.py](file:///home/laihuip001/oikos/hegemonikon/hermeneus/src/__init__.py) | **MODIFY** | `/ene` | +5 行 |
-| [test_optimizer.py](file:///home/laihuip001/oikos/hegemonikon/hermeneus/tests/test_optimizer.py) | **NEW** | `/dia` | ~100 行 |
+| [optimizer.py](file:///home/makaron8426/oikos/hegemonikon/hermeneus/src/optimizer.py) | **NEW** | `/s+` | ~300 行 |
+| [__init__.py](file:///home/makaron8426/oikos/hegemonikon/hermeneus/src/__init__.py) | **MODIFY** | `/ene` | +5 行 |
+| [test_optimizer.py](file:///home/makaron8426/oikos/hegemonikon/hermeneus/tests/test_optimizer.py) | **NEW** | `/dia` | ~100 行 |
 
 ---
 

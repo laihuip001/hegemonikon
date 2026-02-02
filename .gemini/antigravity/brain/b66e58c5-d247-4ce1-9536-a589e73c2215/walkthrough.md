@@ -22,11 +22,11 @@
 
 | Artifact | 内容 |
 |:---------|:-----|
-| [/plan v3.0](file:///home/laihuip001/oikos/.agent/workflows/plan.md) | S-series 完全統合版 |
-| [noe_scale_analyzer.md](file:///home/laihuip001/oikos/.gemini/antigravity/brain/b66e58c5-d247-4ce1-9536-a589e73c2215/noe_scale_analyzer.md) | Scale Analyzer 深掘り分析 |
-| [zet_s2_mekhane.md](file:///home/laihuip001/oikos/.gemini/antigravity/brain/b66e58c5-d247-4ce1-9536-a589e73c2215/zet_s2_mekhane.md) | S2 調査依頼書 |
-| [zet_s3_stathmos.md](file:///home/laihuip001/oikos/.gemini/antigravity/brain/b66e58c5-d247-4ce1-9536-a589e73c2215/zet_s3_stathmos.md) | S3 調査依頼書 |
-| [zet_s4_praxis.md](file:///home/laihuip001/oikos/.gemini/antigravity/brain/b66e58c5-d247-4ce1-9536-a589e73c2215/zet_s4_praxis.md) | S4 調査依頼書 |
+| [/plan v3.0](file:///home/makaron8426/oikos/.agent/workflows/plan.md) | S-series 完全統合版 |
+| [noe_scale_analyzer.md](file:///home/makaron8426/oikos/.gemini/antigravity/brain/b66e58c5-d247-4ce1-9536-a589e73c2215/noe_scale_analyzer.md) | Scale Analyzer 深掘り分析 |
+| [zet_s2_mekhane.md](file:///home/makaron8426/oikos/.gemini/antigravity/brain/b66e58c5-d247-4ce1-9536-a589e73c2215/zet_s2_mekhane.md) | S2 調査依頼書 |
+| [zet_s3_stathmos.md](file:///home/makaron8426/oikos/.gemini/antigravity/brain/b66e58c5-d247-4ce1-9536-a589e73c2215/zet_s3_stathmos.md) | S3 調査依頼書 |
+| [zet_s4_praxis.md](file:///home/makaron8426/oikos/.gemini/antigravity/brain/b66e58c5-d247-4ce1-9536-a589e73c2215/zet_s4_praxis.md) | S4 調査依頼書 |
 
 ---
 

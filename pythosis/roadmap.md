@@ -26,11 +26,13 @@
 | 3 | `contextlib` | `@scoped` v2 | ✅ |
 | 4 | `asyncio` | Synergeia 統合 (`||`,`|>`) | ✅ |
 
-## Phase 4: Zen 抽出
+## Phase 4: Zen 抽出 ✅
 
-- [ ] Python Zen → Hegemonikón 原則
-- [ ] 明示性原則の体系化
-- [ ] 縮約優先原則の適用
+> **設計文書**: [zen_extraction.md](designs/zen_extraction.md)
+
+- [x] Python Zen → Hegemonikón 原則 (17 格言マッピング)
+- [x] 明示性原則の体系化 (原則 2)
+- [x] 縮約優先原則の適用 (原則 3)
 
 ## Phase 5: 高度な統合
 

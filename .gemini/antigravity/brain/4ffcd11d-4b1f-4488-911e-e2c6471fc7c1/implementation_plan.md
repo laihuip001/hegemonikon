@@ -26,7 +26,7 @@
 
 ### 1. workflow_runner に X-series 統合
 
-#### [MODIFY] [workflow_runner.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/workflow_runner.py)
+#### [MODIFY] [workflow_runner.py](file:///home/makaron8426/oikos/hegemonikon/mekhane/workflow_runner.py)
 
 - `WorkflowResult` に `x_series_recommendations` フィールドを追加
 - `run_workflow()` 完了時に `get_x_series_recommendations()` を呼び出し
@@ -36,7 +36,7 @@
 
 ### 2. workflow_runner 診断テスト追加
 
-#### [NEW] [test_workflow_runner.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/fep/tests/test_workflow_runner.py)
+#### [NEW] [test_workflow_runner.py](file:///home/makaron8426/oikos/hegemonikon/mekhane/fep/tests/test_workflow_runner.py)
 
 ```python
 # テスト内容:
@@ -53,7 +53,7 @@
 
 ```bash
 # 既存FEPテスト確認
-cd /home/laihuip001/oikos/hegemonikon
+cd /home/makaron8426/oikos/hegemonikon
 PYTHONPATH=. .venv/bin/python -m pytest mekhane/fep/tests/ -v -k "workflow" --tb=short
 
 # 新規テスト実行
@@ -67,7 +67,7 @@ PYTHONPATH=. .venv/bin/python -m pytest mekhane/fep/tests/ -v
 
 ```bash
 # CLI 動作確認
-cd /home/laihuip001/oikos/hegemonikon
+cd /home/makaron8426/oikos/hegemonikon
 PYTHONPATH=. .venv/bin/python mekhane/workflow_runner.py O1 "この問題の本質は何か"
 # 期待出力: 派生選択 + X-series 推奨次ステップ表示
 ```

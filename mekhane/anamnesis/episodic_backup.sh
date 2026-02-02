@@ -8,13 +8,13 @@
 #
 # episodic_backup.sh - Antigravity データを mneme にバックアップ
 # 使用方法: ./episodic_backup.sh
-# cron: 0 * * * * /home/laihuip001/oikos/hegemonikon/mekhane/anamnesis/episodic_backup.sh
+# cron: 0 * * * * /home/makaron8426/oikos/hegemonikon/mekhane/anamnesis/episodic_backup.sh
 
 set -euo pipefail
 
 # 設定
-# NOTE: Antigravity 環境では HOME=/home/laihuip001/oikos
-OIKOS_ROOT="/home/laihuip001/oikos"
+# NOTE: Antigravity 環境では HOME=/home/makaron8426/oikos
+OIKOS_ROOT="/home/makaron8426/oikos"
 GEMINI_DIR="${OIKOS_ROOT}/.gemini/antigravity"
 MNEME_DIR="${OIKOS_ROOT}/mneme/.antigravity"
 LOG_FILE="${OIKOS_ROOT}/mneme/.hegemonikon/logs/episodic_backup.log"

@@ -6,7 +6,7 @@
 
 ## 決定事項
 
-- [x] 保存先: mneme ディレクトリ (`/home/laihuip001/oikos/mneme/.hegemonikon/workflows/`)
+- [x] 保存先: mneme ディレクトリ (`/home/makaron8426/oikos/mneme/.hegemonikon/workflows/`)
 - [x] 対象: 全30+ ワークフロー
 - [x] トリガー: 自動保存
 - [x] チャット出力: 最小限（ファイルパスと要約のみ）

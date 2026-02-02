@@ -124,11 +124,11 @@ STOIC の「Cognitive Substrate」パターンを参考に、LLM の推論を py
 
 ## Proposed Changes
 
-### [NEW] [active_inference_agent.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/fep/active_inference_agent.py)
+### [NEW] [active_inference_agent.py](file:///home/makaron8426/oikos/hegemonikon/mekhane/fep/active_inference_agent.py)
 
 最小限の pymdp ラッパークラスを実装。
 
-### [MODIFY] [requirements.txt](file:///home/laihuip001/oikos/hegemonikon/requirements.txt)
+### [MODIFY] [requirements.txt](file:///home/makaron8426/oikos/hegemonikon/requirements.txt)
 
 `inferactively-pymdp` 依存関係を追加。
 
@@ -144,7 +144,7 @@ pip install inferactively-pymdp
 python -c "from pymdp.agent import Agent; print('OK')"
 
 # PoC 動作確認
-cd /home/laihuip001/oikos/hegemonikon
+cd /home/makaron8426/oikos/hegemonikon
 python -m pytest mekhane/fep/test_active_inference.py -v
 ```
 

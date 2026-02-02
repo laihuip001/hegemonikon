@@ -100,7 +100,7 @@
 
 #### 変更対象ファイル
 
-1. `/home/laihuip001/oikos/.gemini/antigravity/knowledge/cognitive_algebra_system/artifacts/architecture/operators_and_layers.md`
+1. `/home/makaron8426/oikos/.gemini/antigravity/knowledge/cognitive_algebra_system/artifacts/architecture/operators_and_layers.md`
    - **追加**: 演算子優先順位セクションの強化
    - **追加**: 複合パターン使用例
 

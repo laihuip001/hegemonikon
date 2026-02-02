@@ -46,7 +46,7 @@ CCL (Cognitive Control Language) の **コンパイル→実行→検証→MCP �
 | 4 | verifier, audit, prover | 形式検証 |
 | 5 | cli | CLI エントリー |
 | 6 | registry, executor, synergeia_adapter | Workflow 実行 |
-| 7 | [mcp_server.py](file:///home/laihuip001/oikos/hegemonikon/hermeneus/src/mcp_server.py) | MCP Server |
+| 7 | [mcp_server.py](file:///home/makaron8426/oikos/hegemonikon/hermeneus/src/mcp_server.py) | MCP Server |
 
 **合計: ~6,000行 | 18 モジュール**
 

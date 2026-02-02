@@ -20,7 +20,7 @@ O4 Energeia の派生ワークフロー `/flag` を作成する。
 
 ## 提案する変更
 
-### [NEW] [flag.md](file:///home/laihuip001/oikos/.agent/workflows/flag.md)
+### [NEW] [flag.md](file:///home/makaron8426/oikos/.agent/workflows/flag.md)
 
 O4 Energeia の派生ワークフロー。
 
@@ -68,7 +68,7 @@ anti_skip: enabled
 
 ---
 
-### [MODIFY] [ene.md](file:///home/laihuip001/oikos/.agent/workflows/ene.md)
+### [MODIFY] [ene.md](file:///home/makaron8426/oikos/.agent/workflows/ene.md)
 
 **変更内容**: children に `/flag` を追加
 

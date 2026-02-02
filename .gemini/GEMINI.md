@@ -6,7 +6,7 @@
 
 ## Project Reference
 
-**Primary Workspace**: `/home/laihuip001/oikos/hegemonikon`
+**Primary Workspace**: `/home/makaron8426/oikos/hegemonikon`
 
 このプロジェクトで作業する場合、以下を自動参照してください：
 

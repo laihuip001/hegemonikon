@@ -13,9 +13,9 @@
 
 ## Changes Made
 
-### [a2-krisis/SKILL.md](file:///home/laihuip001/oikos/.agent/skills/akribeia/a2-krisis/SKILL.md)
+### [a2-krisis/SKILL.md](file:///home/makaron8426/oikos/.agent/skills/akribeia/a2-krisis/SKILL.md)
 
-render_diffs(file:///home/laihuip001/oikos/.agent/skills/akribeia/a2-krisis/SKILL.md)
+render_diffs(file:///home/makaron8426/oikos/.agent/skills/akribeia/a2-krisis/SKILL.md)
 
 **主要変更**:
 

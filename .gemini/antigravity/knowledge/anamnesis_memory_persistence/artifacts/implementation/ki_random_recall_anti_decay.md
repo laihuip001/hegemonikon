@@ -9,14 +9,14 @@ Knowledge Items (KIs) often suffer from "storage decay"—they are written but n
 If an AI has a vault of 1,000 insights but only accesses the 5 most recent ones, 99.5% of its potential "self" is sleeping. To maintain a "Continuing Me" identity, the AI must periodically be reminded of its own historical foundations.
 
 ## Technical Implementation
-The mechanism is integrated into `/home/laihuip001/oikos/.agent/workflows/boot.md` as **Step 6.7**.
+The mechanism is integrated into `/home/makaron8426/oikos/.agent/workflows/boot.md` as **Step 6.7**.
 
 ### Implementation Logic (Python snippet in boot.md)
 ```python
 from pathlib import Path
 import random
 
-ki_dir = Path('/home/laihuip001/oikos/.gemini/antigravity/knowledge')
+ki_dir = Path('/home/makaron8426/oikos/.gemini/antigravity/knowledge')
 ki_folders = [d for d in ki_dir.iterdir() if d.is_dir() and d.name != 'knowledge.lock']
 
 # Select 3 random KIs

@@ -122,10 +122,16 @@ def main():
     # Remove empty 0000/00 if possible
     try:
         os.rmdir(PROBLEM_DIR)
-        os.rmdir(os.path.join(ROOT_DIR, "0000"))
-        print("Removed empty 0000/00 directory.")
-    except Exception:
-        pass  # TODO: Add proper error handling
+        print("Removed empty directory: 0000/00")
+    except OSError as e:
+        print(f"Could not remove {PROBLEM_DIR}: {e}")
+
+    try:
+        parent_dir = os.path.join(ROOT_DIR, "0000")
+        os.rmdir(parent_dir)
+        print("Removed empty directory: 0000")
+    except OSError as e:
+        print(f"Could not remove {parent_dir}: {e}")
 
 
 if __name__ == "__main__":

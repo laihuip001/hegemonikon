@@ -181,5 +181,32 @@ class TestSophiaIngest:
             assert any("implementation-examples-example1" in id for id in doc_ids)
 
 
+class TestChronosIngest:
+    """Tests for chronos_ingest.py"""
+
+    def test_parse_conversation_chunks(self):
+        """Test parsing of conversation log into chunks"""
+        from mekhane.symploke.chronos_ingest import parse_conversation_chunks
+
+        # Create temp directory
+        with tempfile.TemporaryDirectory() as tmpdir:
+            # Create file with expected naming convention
+            file_path = Path(tmpdir) / "2026-01-01_conv_1_Test Conversation.md"
+
+            with open(file_path, "w", encoding="utf-8") as f:
+                f.write("# Test Conversation\n\n")
+                f.write("## 👤 User\nHello\n\n")
+                f.write("## 🤖 Claude\nHi there!\n\n")
+                f.write("## 👤 User\nHow are you?\n\n")
+                f.write("## 🤖 Claude\nI am fine.\n\n")
+
+            # Set small chunk size to force chunking
+            chunks = parse_conversation_chunks(file_path, chunk_size=50)
+
+            assert len(chunks) > 0
+            assert chunks[0].metadata.get("type") == "conversation_chunk"
+            assert "Test Conversation" in chunks[0].metadata.get("title")
+
+
 if __name__ == "__main__":
     pytest.main([__file__, "-v"])

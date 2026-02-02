@@ -241,7 +241,10 @@ def build_index(incremental: bool = False, report_mode: bool = False):
                         if at <= last_sync:
                             continue
                     except Exception:
-                        pass  # TODO: Add proper error handling
+                        print(
+                            f"Skipping artifact {artifact.get('session_id', '?')}_{artifact.get('artifact_type', 'unknown')} due to invalid date: {artifact_time}"
+                        )
+                        continue
 
             # Generate ID
             art_type = (

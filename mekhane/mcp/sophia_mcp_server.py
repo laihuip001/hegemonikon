@@ -199,7 +199,8 @@ async def call_tool(name: str, arguments: dict):
                                 if (now - doc_date).days > recent_days:
                                     continue
                             except Exception:
-                                pass  # TODO: Add proper error handling
+                                log(f"Invalid timestamp in Kairos result: {r.metadata.get('file_path', 'unknown')} - {ts}")
+                                continue
 
                     results.append(
                         {

@@ -6,6 +6,7 @@ import os
 import json
 import yaml
 from pathlib import Path
+from unittest.mock import patch, MagicMock
 from mekhane.anamnesis.vault import VaultManager
 
 
@@ -65,6 +66,44 @@ class TestVaultManager(unittest.TestCase):
         non_existent = Path(self.test_dir) / "non_existent.txt"
         with self.assertRaises(FileNotFoundError):
             VaultManager.read_safe(non_existent)
+
+    @patch("mekhane.anamnesis.vault.tempfile.NamedTemporaryFile")
+    @patch("mekhane.anamnesis.vault.logger")
+    @patch("mekhane.anamnesis.vault.Path")
+    def test_cleanup_failure_logging(self, MockPath, mock_logger, MockTempFile):
+        """write_safe logs warning when temp file cleanup fails."""
+        # Setup mock instance for Path
+        mock_path_instance = MockPath.return_value
+
+        # Configure mocks to fail at replace and unlink
+        mock_path_instance.replace.side_effect = IOError("Simulated Write Failure")
+        mock_path_instance.exists.return_value = True
+        mock_path_instance.unlink.side_effect = OSError("Simulated Unlink Failure")
+
+        # Configure parent.mkdir to do nothing
+        mock_path_instance.parent.mkdir.return_value = None
+
+        # Configure TempFile
+        mock_temp = MagicMock()
+        mock_temp.name = "/tmp/mock_file"
+        MockTempFile.return_value.__enter__.return_value = mock_temp
+
+        # Execute
+        with self.assertRaises(IOError) as cm:
+            VaultManager.write_safe("dummy_path", "content", backup=False)
+
+        # Verify
+        self.assertIn("Failed to write file safely", str(cm.exception))
+
+        # Check that warning was called with the expected message pattern
+        found = False
+        for call in mock_logger.warning.call_args_list:
+            args, _ = call
+            if "Failed to delete temporary file" in args[0]:
+                found = True
+                break
+
+        self.assertTrue(found, "Warning log for cleanup failure was not found")
 
 
 if __name__ == "__main__":

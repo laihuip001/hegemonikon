@@ -16,7 +16,10 @@ Recast: Hegemonikón A2 Krisis (Epochē) vocabulary
 """
 
 import re
+import logging
 from typing import Dict, List, Tuple, Optional
+
+logger = logging.getLogger("epoche_shield")
 
 
 class EpocheScanner:
@@ -167,8 +170,14 @@ class EpocheShield:
                         masked_text = masked_text.replace(term, placeholder)
                         mapping[placeholder] = term
                         counter += 1
-            except Exception:
-                pass  # TODO: Add proper error handling
+            except (ImportError, ModuleNotFoundError):
+                logger.info(
+                    "Optional component 'vocab_store' not found. Skipping custom vocabulary masking."
+                )
+            except Exception as e:
+                logger.error(
+                    f"Failed to apply custom vocabulary masking: {e}", exc_info=True
+                )
 
         return masked_text, mapping
 

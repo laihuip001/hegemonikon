@@ -41,6 +41,7 @@ import os
 import json
 import logging
 import yaml
+import numpy as np
 
 # -----------------------------------------------------------------------------
 # LLM Fallback Configuration (v3.1 新規)
@@ -60,6 +61,13 @@ SELECTION_LOG_PATH = Path(
 )
 
 logger = logging.getLogger(__name__)
+
+try:
+    from .fep_agent import HegemonikónFEPAgent
+    from .persistence import LEARNED_A_PATH
+    FEP_AVAILABLE = True
+except ImportError:
+    FEP_AVAILABLE = False
 
 try:
     from google import genai
@@ -1345,6 +1353,89 @@ def _log_selection(
 
 
 # =============================================================================
+# FEP Integration Helpers
+# =============================================================================
+
+DERIVATIVE_OBSERVATION_DIM = 27  # 3 x 3 x 3 encoding factors
+
+
+def _flatten_derivative_observation(obs_tuple: Tuple[int, int, int]) -> int:
+    """Convert (abstraction, context, reflection) to flat index 0-26."""
+    abstraction, context, reflection = obs_tuple
+    # abstraction (0-2) * 9 + context (0-2) * 3 + reflection (0-2)
+    return abstraction * 9 + context * 3 + reflection
+
+
+def _get_derivative_state_index(theorem: str, derivative: str) -> int:
+    """Get state index for a derivative within its theorem."""
+    derivatives = THEOREM_DERIVATIVES.get(theorem, [])
+    try:
+        return derivatives.index(derivative)
+    except ValueError:
+        return 0  # Fallback
+
+
+def _get_derivative_agent(theorem: str) -> Optional["HegemonikónFEPAgent"]:
+    """Get or create FEP agent for derivative selection learning."""
+    if not FEP_AVAILABLE:
+        return None
+
+    derivatives = THEOREM_DERIVATIVES.get(theorem, [])
+    if not derivatives:
+        return None
+
+    state_dim = len(derivatives)
+    obs_dim = DERIVATIVE_OBSERVATION_DIM
+
+    # Try to load existing A matrix
+    # Path: ~/.hegemonikon/derivatives/{theorem}_A.npy
+    # Reuse LEARNED_A_PATH base directory
+    base_dir = LEARNED_A_PATH.parent / "derivatives"
+    base_dir.mkdir(parents=True, exist_ok=True)
+    a_path = base_dir / f"{theorem}_A.npy"
+
+    A = None
+    if a_path.exists():
+        try:
+            A = np.load(str(a_path), allow_pickle=True)
+        except Exception:
+            pass
+
+    # Default matrices if not loaded
+    if A is None:
+        # Uniform A matrix initially (obs_dim x state_dim)
+        A = np.ones((obs_dim, state_dim)) / obs_dim
+
+    # Simple Identity B (states don't change spontaneously)
+    # Shape: (state_dim, state_dim, 1 action) - assuming static selection task
+    B = np.zeros((state_dim, state_dim, 1))
+    np.fill_diagonal(B[:, :, 0], 1.0)
+
+    # C (preferences) - uniform, we don't use policy inference for learning A
+    C = np.zeros(obs_dim)
+
+    # D (prior) - uniform
+    D = np.ones(state_dim) / state_dim
+
+    try:
+        agent = HegemonikónFEPAgent(
+            A=A,
+            B=B,
+            C=C,
+            D=D,
+            use_defaults=False,
+            state_dim=state_dim,
+            obs_dims={"derivative_context": obs_dim},
+        )
+        # Attach the path to the agent for easier saving
+        agent._derivative_a_path = a_path
+        return agent
+    except Exception as e:
+        logger.error(f"Failed to create derivative FEP agent: {e}")
+        return None
+
+
+# =============================================================================
 # Selection Functions
 # =============================================================================
 
@@ -1445,6 +1536,48 @@ def select_derivative(
             f"Unknown theorem: {theorem}. Expected O1-O4, S1-S4, H1-H4, P1-P4, K1-K4, or A1-A4."
         )
 
+    # v3.3: Apply FEP Agent selection (Learned outcome optimization)
+    # If FEP agent has high confidence (learned behavior), it may override
+    if use_fep and FEP_AVAILABLE and keyword_result is not None:
+        try:
+            agent = _get_derivative_agent(theorem)
+            if agent:
+                # Encode observation
+                obs_tuple = encode_for_derivative_selection(problem_context, theorem)
+                obs_idx = _flatten_derivative_observation(obs_tuple)
+
+                # Infer state
+                inference = agent.infer_states(obs_idx)
+                beliefs = inference["beliefs"]
+                map_idx = inference["map_state"]
+                fep_confidence = beliefs[map_idx]
+
+                # Get derivative name
+                derivatives = THEOREM_DERIVATIVES.get(theorem, [])
+                if map_idx < len(derivatives):
+                    fep_derivative = derivatives[map_idx]
+
+                    # If FEP is more confident than keyword result
+                    # And significantly confident (> 0.6)
+                    if (
+                        fep_confidence > keyword_result.confidence
+                        and fep_confidence > 0.6
+                    ):
+                        # Construct FEP recommendation
+                        fep_result = DerivativeRecommendation(
+                            theorem=theorem,
+                            derivative=fep_derivative,
+                            confidence=fep_confidence,
+                            rationale=f"FEP Agent learned preference (confidence {fep_confidence:.2f})",
+                            alternatives=keyword_result.alternatives,
+                        )
+                        _log_selection(
+                            theorem, problem_context, fep_result, "fep_agent"
+                        )
+                        return fep_result
+        except Exception as e:
+            logger.warning(f"FEP selection failed: {e}")
+
     # v3.1: Apply Hybrid selection (LLM fallback for low confidence)
     if use_llm_fallback and keyword_result is not None:
         result = _hybrid_select(theorem, problem_context, keyword_result)
@@ -1498,7 +1631,7 @@ def _select_o1_derivative(text: str) -> DerivativeRecommendation:
         derivative=selected,
         confidence=confidence,
         rationale=rationale,
-        # NOTE: Removed self-assignment: alternatives = alternatives
+        alternatives=alternatives
     )
 
 
@@ -1533,7 +1666,7 @@ def _select_o2_derivative(text: str) -> DerivativeRecommendation:
         derivative=selected,
         confidence=confidence,
         rationale=rationale,
-        # NOTE: Removed self-assignment: alternatives = alternatives
+        alternatives=alternatives
     )
 
 
@@ -1564,7 +1697,7 @@ def _select_o3_derivative(text: str) -> DerivativeRecommendation:
         derivative=selected,
         confidence=confidence,
         rationale=rationale,
-        # NOTE: Removed self-assignment: alternatives = alternatives
+        alternatives=alternatives
     )
 
 
@@ -1595,7 +1728,7 @@ def _select_o4_derivative(text: str) -> DerivativeRecommendation:
         derivative=selected,
         confidence=confidence,
         rationale=rationale,
-        # NOTE: Removed self-assignment: alternatives = alternatives
+        alternatives=alternatives
     )
 
 
@@ -1631,7 +1764,7 @@ def _select_s1_derivative(text: str) -> DerivativeRecommendation:
         derivative=selected,
         confidence=confidence,
         rationale=rationale,
-        # NOTE: Removed self-assignment: alternatives = alternatives
+        alternatives=alternatives
     )
 
 
@@ -1662,7 +1795,7 @@ def _select_s2_derivative(text: str) -> DerivativeRecommendation:
         derivative=selected,
         confidence=confidence,
         rationale=rationale,
-        # NOTE: Removed self-assignment: alternatives = alternatives
+        alternatives=alternatives
     )
 
 
@@ -1693,7 +1826,7 @@ def _select_s3_derivative(text: str) -> DerivativeRecommendation:
         derivative=selected,
         confidence=confidence,
         rationale=rationale,
-        # NOTE: Removed self-assignment: alternatives = alternatives
+        alternatives=alternatives
     )
 
 
@@ -1724,7 +1857,7 @@ def _select_s4_derivative(text: str) -> DerivativeRecommendation:
         derivative=selected,
         confidence=confidence,
         rationale=rationale,
-        # NOTE: Removed self-assignment: alternatives = alternatives
+        alternatives=alternatives
     )
 
 
@@ -1760,7 +1893,7 @@ def _select_h1_derivative(text: str) -> DerivativeRecommendation:
         derivative=selected,
         confidence=confidence,
         rationale=rationale,
-        # NOTE: Removed self-assignment: alternatives = alternatives
+        alternatives=alternatives
     )
 
 
@@ -1791,7 +1924,7 @@ def _select_h2_derivative(text: str) -> DerivativeRecommendation:
         derivative=selected,
         confidence=confidence,
         rationale=rationale,
-        # NOTE: Removed self-assignment: alternatives = alternatives
+        alternatives=alternatives
     )
 
 
@@ -1822,7 +1955,7 @@ def _select_h3_derivative(text: str) -> DerivativeRecommendation:
         derivative=selected,
         confidence=confidence,
         rationale=rationale,
-        # NOTE: Removed self-assignment: alternatives = alternatives
+        alternatives=alternatives
     )
 
 
@@ -1853,7 +1986,7 @@ def _select_h4_derivative(text: str) -> DerivativeRecommendation:
         derivative=selected,
         confidence=confidence,
         rationale=rationale,
-        # NOTE: Removed self-assignment: alternatives = alternatives
+        alternatives=alternatives
     )
 
 
@@ -1889,7 +2022,7 @@ def _select_p1_derivative(text: str) -> DerivativeRecommendation:
         derivative=selected,
         confidence=confidence,
         rationale=rationale,
-        # NOTE: Removed self-assignment: alternatives = alternatives
+        alternatives=alternatives
     )
 
 
@@ -1920,7 +2053,7 @@ def _select_p2_derivative(text: str) -> DerivativeRecommendation:
         derivative=selected,
         confidence=confidence,
         rationale=rationale,
-        # NOTE: Removed self-assignment: alternatives = alternatives
+        alternatives=alternatives
     )
 
 
@@ -1951,7 +2084,7 @@ def _select_p3_derivative(text: str) -> DerivativeRecommendation:
         derivative=selected,
         confidence=confidence,
         rationale=rationale,
-        # NOTE: Removed self-assignment: alternatives = alternatives
+        alternatives=alternatives
     )
 
 
@@ -1982,7 +2115,7 @@ def _select_p4_derivative(text: str) -> DerivativeRecommendation:
         derivative=selected,
         confidence=confidence,
         rationale=rationale,
-        # NOTE: Removed self-assignment: alternatives = alternatives
+        alternatives=alternatives
     )
 
 
@@ -2018,7 +2151,7 @@ def _select_k1_derivative(text: str) -> DerivativeRecommendation:
         derivative=selected,
         confidence=confidence,
         rationale=rationale,
-        # NOTE: Removed self-assignment: alternatives = alternatives
+        alternatives=alternatives
     )
 
 
@@ -2049,7 +2182,7 @@ def _select_k2_derivative(text: str) -> DerivativeRecommendation:
         derivative=selected,
         confidence=confidence,
         rationale=rationale,
-        # NOTE: Removed self-assignment: alternatives = alternatives
+        alternatives=alternatives
     )
 
 
@@ -2080,7 +2213,7 @@ def _select_k3_derivative(text: str) -> DerivativeRecommendation:
         derivative=selected,
         confidence=confidence,
         rationale=rationale,
-        # NOTE: Removed self-assignment: alternatives = alternatives
+        alternatives=alternatives
     )
 
 
@@ -2111,7 +2244,7 @@ def _select_k4_derivative(text: str) -> DerivativeRecommendation:
         derivative=selected,
         confidence=confidence,
         rationale=rationale,
-        # NOTE: Removed self-assignment: alternatives = alternatives
+        alternatives=alternatives
     )
 
 
@@ -2147,7 +2280,7 @@ def _select_a1_derivative(text: str) -> DerivativeRecommendation:
         derivative=selected,
         confidence=confidence,
         rationale=rationale,
-        # NOTE: Removed self-assignment: alternatives = alternatives
+        alternatives=alternatives
     )
 
 
@@ -2178,7 +2311,7 @@ def _select_a2_derivative(text: str) -> DerivativeRecommendation:
         derivative=selected,
         confidence=confidence,
         rationale=rationale,
-        # NOTE: Removed self-assignment: alternatives = alternatives
+        alternatives=alternatives
     )
 
 
@@ -2209,7 +2342,7 @@ def _select_a3_derivative(text: str) -> DerivativeRecommendation:
         derivative=selected,
         confidence=confidence,
         rationale=rationale,
-        # NOTE: Removed self-assignment: alternatives = alternatives
+        alternatives=alternatives
     )
 
 
@@ -2240,7 +2373,7 @@ def _select_a4_derivative(text: str) -> DerivativeRecommendation:
         derivative=selected,
         confidence=confidence,
         rationale=rationale,
-        # NOTE: Removed self-assignment: alternatives = alternatives
+        alternatives=alternatives
     )
 
 
@@ -2657,14 +2790,18 @@ def list_derivatives(theorem: str) -> List[str]:
 # =============================================================================
 
 
+# =============================================================================
+# FEP Integration (Update)
+# =============================================================================
+
 def update_derivative_selector(
     theorem: str, derivative: str, problem_context: str, success: bool
 ) -> None:
     """
     Record feedback for derivative selection learning.
 
-    Future enhancement: integrate with Dirichlet learning in FEP agent
-    to improve derivative selection based on outcomes.
+    Updates the FEP agent's observation model (A matrix) using Dirichlet learning
+    if the selection was successful.
 
     Args:
         theorem: O-series theorem
@@ -2672,9 +2809,36 @@ def update_derivative_selector(
         problem_context: Problem description
         success: Whether the derivative was effective
     """
-    # TODO: Integrate with HegemonikónFEPAgent.update_A_dirichlet()
-    # This will require:
-    # 1. Derivative-specific state space in FEP
-    # 2. Observation encoding for derivative context
-    # 3. Persistence of learned derivative preferences
-    pass
+    if not success or not FEP_AVAILABLE:
+        # Currently only learning from success (reinforcement)
+        return
+
+    try:
+        agent = _get_derivative_agent(theorem)
+        if not agent:
+            return
+
+        # 1. Encode observation
+        obs_tuple = encode_for_derivative_selection(problem_context, theorem)
+        obs_idx = _flatten_derivative_observation(obs_tuple)
+
+        # 2. Identify state (derivative)
+        state_idx = _get_derivative_state_index(theorem, derivative)
+
+        # 3. Set beliefs (Supervised learning)
+        # We know the "true" state was this derivative (since it was successful)
+        # So we set beliefs to be certain about this state
+        beliefs = np.zeros(agent.state_dim)
+        beliefs[state_idx] = 1.0
+        agent.beliefs = beliefs
+
+        # 4. Update A matrix
+        # This increases the likelihood P(obs | state) for the observed pair
+        agent.update_A_dirichlet(obs_idx)
+
+        # 5. Persist
+        if hasattr(agent, "_derivative_a_path"):
+            agent.save_learned_A(str(agent._derivative_a_path))
+
+    except Exception as e:
+        logger.warning(f"Failed to update derivative selector FEP: {e}")

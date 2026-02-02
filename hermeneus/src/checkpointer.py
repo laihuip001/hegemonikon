@@ -8,6 +8,7 @@ SQLite ベースの状態保存により、
 Origin: 2026-01-31 CCL Execution Guarantee Architecture
 """
 
+import asyncio
 import json
 import sqlite3
 from datetime import datetime
@@ -109,11 +110,10 @@ class CCLCheckpointer:
         """JSON から状態をデシリアライズ"""
         return json.loads(state_json)
     
-    def put(self, write: CheckpointWrite) -> Checkpoint:
-        """チェックポイントを保存"""
-        checkpoint_id = self._generate_id()
-        created_at = datetime.now()
-        
+    # --- Internal Implementations (Sync, safe to run in thread) ---
+
+    def _put_impl(self, write: CheckpointWrite, checkpoint_id: str, created_at: datetime) -> None:
+        """put の内部実装"""
         with self._connect() as conn:
             conn.execute("""
                 INSERT INTO checkpoints 
@@ -128,18 +128,9 @@ class CCLCheckpointer:
                 created_at.isoformat()
             ))
             conn.commit()
-        
-        return Checkpoint(
-            checkpoint_id=checkpoint_id,
-            thread_id=write.thread_id,
-            state=write.state,
-            created_at=created_at,
-            parent_id=write.parent_id,
-            metadata=write.metadata
-        )
-    
-    def get(self, thread_id: str, checkpoint_id: Optional[str] = None) -> Optional[Checkpoint]:
-        """チェックポイントを取得"""
+
+    def _get_impl(self, thread_id: str, checkpoint_id: Optional[str]) -> Optional[Checkpoint]:
+        """get の内部実装"""
         with self._connect() as conn:
             if checkpoint_id:
                 row = conn.execute("""
@@ -165,14 +156,9 @@ class CCLCheckpointer:
                     metadata=json.loads(row["metadata"]) if row["metadata"] else None
                 )
             return None
-    
-    def list(
-        self,
-        thread_id: str,
-        limit: int = 10,
-        before: Optional[str] = None
-    ) -> List[Checkpoint]:
-        """チェックポイント履歴を取得"""
+
+    def _list_impl(self, thread_id: str, limit: int, before: Optional[str]) -> List[Checkpoint]:
+        """list の内部実装"""
         with self._connect() as conn:
             if before:
                 rows = conn.execute("""
@@ -202,9 +188,9 @@ class CCLCheckpointer:
                 )
                 for row in rows
             ]
-    
-    def delete(self, thread_id: str, checkpoint_id: Optional[str] = None):
-        """チェックポイントを削除"""
+
+    def _delete_impl(self, thread_id: str, checkpoint_id: Optional[str]) -> None:
+        """delete の内部実装"""
         with self._connect() as conn:
             if checkpoint_id:
                 conn.execute("""
@@ -217,7 +203,79 @@ class CCLCheckpointer:
                     DELETE FROM checkpoints WHERE thread_id = ?
                 """, (thread_id,))
             conn.commit()
+
+    # --- Synchronous Methods ---
+
+    def put(self, write: CheckpointWrite) -> Checkpoint:
+        """チェックポイントを保存"""
+        checkpoint_id = self._generate_id()
+        created_at = datetime.now()
+
+        self._put_impl(write, checkpoint_id, created_at)
+
+        return Checkpoint(
+            checkpoint_id=checkpoint_id,
+            thread_id=write.thread_id,
+            state=write.state,
+            created_at=created_at,
+            parent_id=write.parent_id,
+            metadata=write.metadata
+        )
     
+    def get(self, thread_id: str, checkpoint_id: Optional[str] = None) -> Optional[Checkpoint]:
+        """チェックポイントを取得"""
+        return self._get_impl(thread_id, checkpoint_id)
+
+    def list(
+        self,
+        thread_id: str,
+        limit: int = 10,
+        before: Optional[str] = None
+    ) -> List[Checkpoint]:
+        """チェックポイント履歴を取得"""
+        return self._list_impl(thread_id, limit, before)
+
+    def delete(self, thread_id: str, checkpoint_id: Optional[str] = None):
+        """チェックポイントを削除"""
+        self._delete_impl(thread_id, checkpoint_id)
+
+    # --- Asynchronous Methods ---
+
+    async def aput(self, write: CheckpointWrite) -> Checkpoint:
+        """チェックポイントを非同期に保存"""
+        checkpoint_id = self._generate_id()
+        created_at = datetime.now()
+
+        await asyncio.to_thread(self._put_impl, write, checkpoint_id, created_at)
+
+        return Checkpoint(
+            checkpoint_id=checkpoint_id,
+            thread_id=write.thread_id,
+            state=write.state,
+            created_at=created_at,
+            parent_id=write.parent_id,
+            metadata=write.metadata
+        )
+
+    async def aget(self, thread_id: str, checkpoint_id: Optional[str] = None) -> Optional[Checkpoint]:
+        """チェックポイントを非同期に取得"""
+        return await asyncio.to_thread(self._get_impl, thread_id, checkpoint_id)
+
+    async def alist(
+        self,
+        thread_id: str,
+        limit: int = 10,
+        before: Optional[str] = None
+    ) -> List[Checkpoint]:
+        """チェックポイント履歴を非同期に取得"""
+        return await asyncio.to_thread(self._list_impl, thread_id, limit, before)
+
+    async def adelete(self, thread_id: str, checkpoint_id: Optional[str] = None):
+        """チェックポイントを非同期に削除"""
+        await asyncio.to_thread(self._delete_impl, thread_id, checkpoint_id)
+
+    # --- LangGraph Compatibility ---
+
     def get_tuple(self, config: Dict[str, Any]) -> Optional[Tuple]:
         """LangGraph 互換: チェックポイントをタプルで取得"""
         thread_id = config.get("configurable", {}).get("thread_id")

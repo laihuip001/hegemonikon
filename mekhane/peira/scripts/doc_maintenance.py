@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import sys
 import re
+import logging
 from pathlib import Path
 from typing import NamedTuple
 
@@ -46,8 +47,8 @@ def is_safe_path(target_path: Path, base_dir: Path) -> bool:
         try:
             target_path.relative_to(base_dir)
             return True
-        except ValueError:
-            pass  # TODO: Add proper error handling
+        except ValueError as e:
+            logging.debug(f"Path '{target_path}' is not relative to '{base_dir}': {e}")
 
     # 2. Resolved check
     t_res = target_path.resolve()
@@ -60,8 +61,8 @@ def is_safe_path(target_path: Path, base_dir: Path) -> bool:
         try:
             t_res.relative_to(b_res)
             return True
-        except ValueError:
-            pass  # TODO: Add proper error handling
+        except ValueError as e:
+            logging.debug(f"Resolved path '{t_res}' is not relative to '{b_res}': {e}")
 
     # 3. Case-insensitive string check (Windows specific fallback)
     t_str = str(t_res).lower().replace("\\", "/")

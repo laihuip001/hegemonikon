@@ -68,8 +68,12 @@ try:
     if api_key:
         GEMINI_CLIENT = genai.Client(api_key=api_key)
         GEMINI_AVAILABLE = True
-except ImportError:
-    pass  # TODO: Add proper error handling
+except ImportError as e:
+    logger.warning(
+        f"Google GenAI import failed. LLM features will be disabled. Error: {e}"
+    )
+    GEMINI_AVAILABLE = False
+    GEMINI_CLIENT = None
 
 
 # =============================================================================
@@ -1498,7 +1502,7 @@ def _select_o1_derivative(text: str) -> DerivativeRecommendation:
         derivative=selected,
         confidence=confidence,
         rationale=rationale,
-        # NOTE: Removed self-assignment: alternatives = alternatives
+        alternatives=alternatives
     )
 
 
@@ -1533,7 +1537,7 @@ def _select_o2_derivative(text: str) -> DerivativeRecommendation:
         derivative=selected,
         confidence=confidence,
         rationale=rationale,
-        # NOTE: Removed self-assignment: alternatives = alternatives
+        alternatives=alternatives
     )
 
 
@@ -1564,7 +1568,7 @@ def _select_o3_derivative(text: str) -> DerivativeRecommendation:
         derivative=selected,
         confidence=confidence,
         rationale=rationale,
-        # NOTE: Removed self-assignment: alternatives = alternatives
+        alternatives=alternatives
     )
 
 
@@ -1595,7 +1599,7 @@ def _select_o4_derivative(text: str) -> DerivativeRecommendation:
         derivative=selected,
         confidence=confidence,
         rationale=rationale,
-        # NOTE: Removed self-assignment: alternatives = alternatives
+        alternatives=alternatives
     )
 
 
@@ -1631,7 +1635,7 @@ def _select_s1_derivative(text: str) -> DerivativeRecommendation:
         derivative=selected,
         confidence=confidence,
         rationale=rationale,
-        # NOTE: Removed self-assignment: alternatives = alternatives
+        alternatives=alternatives
     )
 
 
@@ -1662,7 +1666,7 @@ def _select_s2_derivative(text: str) -> DerivativeRecommendation:
         derivative=selected,
         confidence=confidence,
         rationale=rationale,
-        # NOTE: Removed self-assignment: alternatives = alternatives
+        alternatives=alternatives
     )
 
 
@@ -1693,7 +1697,7 @@ def _select_s3_derivative(text: str) -> DerivativeRecommendation:
         derivative=selected,
         confidence=confidence,
         rationale=rationale,
-        # NOTE: Removed self-assignment: alternatives = alternatives
+        alternatives=alternatives
     )
 
 
@@ -1724,7 +1728,7 @@ def _select_s4_derivative(text: str) -> DerivativeRecommendation:
         derivative=selected,
         confidence=confidence,
         rationale=rationale,
-        # NOTE: Removed self-assignment: alternatives = alternatives
+        alternatives=alternatives
     )
 
 
@@ -1760,7 +1764,7 @@ def _select_h1_derivative(text: str) -> DerivativeRecommendation:
         derivative=selected,
         confidence=confidence,
         rationale=rationale,
-        # NOTE: Removed self-assignment: alternatives = alternatives
+        alternatives=alternatives
     )
 
 
@@ -1791,7 +1795,7 @@ def _select_h2_derivative(text: str) -> DerivativeRecommendation:
         derivative=selected,
         confidence=confidence,
         rationale=rationale,
-        # NOTE: Removed self-assignment: alternatives = alternatives
+        alternatives=alternatives
     )
 
 
@@ -1822,7 +1826,7 @@ def _select_h3_derivative(text: str) -> DerivativeRecommendation:
         derivative=selected,
         confidence=confidence,
         rationale=rationale,
-        # NOTE: Removed self-assignment: alternatives = alternatives
+        alternatives=alternatives
     )
 
 
@@ -1853,7 +1857,7 @@ def _select_h4_derivative(text: str) -> DerivativeRecommendation:
         derivative=selected,
         confidence=confidence,
         rationale=rationale,
-        # NOTE: Removed self-assignment: alternatives = alternatives
+        alternatives=alternatives
     )
 
 
@@ -1889,7 +1893,7 @@ def _select_p1_derivative(text: str) -> DerivativeRecommendation:
         derivative=selected,
         confidence=confidence,
         rationale=rationale,
-        # NOTE: Removed self-assignment: alternatives = alternatives
+        alternatives=alternatives
     )
 
 
@@ -1920,7 +1924,7 @@ def _select_p2_derivative(text: str) -> DerivativeRecommendation:
         derivative=selected,
         confidence=confidence,
         rationale=rationale,
-        # NOTE: Removed self-assignment: alternatives = alternatives
+        alternatives=alternatives
     )
 
 
@@ -1951,7 +1955,7 @@ def _select_p3_derivative(text: str) -> DerivativeRecommendation:
         derivative=selected,
         confidence=confidence,
         rationale=rationale,
-        # NOTE: Removed self-assignment: alternatives = alternatives
+        alternatives=alternatives
     )
 
 
@@ -1982,7 +1986,7 @@ def _select_p4_derivative(text: str) -> DerivativeRecommendation:
         derivative=selected,
         confidence=confidence,
         rationale=rationale,
-        # NOTE: Removed self-assignment: alternatives = alternatives
+        alternatives=alternatives
     )
 
 
@@ -2018,7 +2022,7 @@ def _select_k1_derivative(text: str) -> DerivativeRecommendation:
         derivative=selected,
         confidence=confidence,
         rationale=rationale,
-        # NOTE: Removed self-assignment: alternatives = alternatives
+        alternatives=alternatives
     )
 
 
@@ -2049,7 +2053,7 @@ def _select_k2_derivative(text: str) -> DerivativeRecommendation:
         derivative=selected,
         confidence=confidence,
         rationale=rationale,
-        # NOTE: Removed self-assignment: alternatives = alternatives
+        alternatives=alternatives
     )
 
 
@@ -2080,7 +2084,7 @@ def _select_k3_derivative(text: str) -> DerivativeRecommendation:
         derivative=selected,
         confidence=confidence,
         rationale=rationale,
-        # NOTE: Removed self-assignment: alternatives = alternatives
+        alternatives=alternatives
     )
 
 
@@ -2111,7 +2115,7 @@ def _select_k4_derivative(text: str) -> DerivativeRecommendation:
         derivative=selected,
         confidence=confidence,
         rationale=rationale,
-        # NOTE: Removed self-assignment: alternatives = alternatives
+        alternatives=alternatives
     )
 
 
@@ -2147,7 +2151,7 @@ def _select_a1_derivative(text: str) -> DerivativeRecommendation:
         derivative=selected,
         confidence=confidence,
         rationale=rationale,
-        # NOTE: Removed self-assignment: alternatives = alternatives
+        alternatives=alternatives
     )
 
 
@@ -2178,7 +2182,7 @@ def _select_a2_derivative(text: str) -> DerivativeRecommendation:
         derivative=selected,
         confidence=confidence,
         rationale=rationale,
-        # NOTE: Removed self-assignment: alternatives = alternatives
+        alternatives=alternatives
     )
 
 
@@ -2209,7 +2213,7 @@ def _select_a3_derivative(text: str) -> DerivativeRecommendation:
         derivative=selected,
         confidence=confidence,
         rationale=rationale,
-        # NOTE: Removed self-assignment: alternatives = alternatives
+        alternatives=alternatives
     )
 
 
@@ -2240,7 +2244,7 @@ def _select_a4_derivative(text: str) -> DerivativeRecommendation:
         derivative=selected,
         confidence=confidence,
         rationale=rationale,
-        # NOTE: Removed self-assignment: alternatives = alternatives
+        alternatives=alternatives
     )
 
 

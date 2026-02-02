@@ -86,8 +86,8 @@ class VaultManager:
             if tmp_path and tmp_path.exists():
                 try:
                     tmp_path.unlink()
-                except Exception:
-                    pass  # TODO: Add proper error handling
+                except Exception as cleanup_error:
+                    logger.warning(f"Failed to cleanup temp file {tmp_path}: {cleanup_error}")
             raise IOError(f"Failed to write file safely: {e}")
 
     @staticmethod

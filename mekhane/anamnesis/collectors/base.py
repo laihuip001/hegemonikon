@@ -17,6 +17,7 @@ Gnōsis Base Collector - コレクター共通インタフェース
 from abc import ABC, abstractmethod
 from typing import Optional
 import time
+import asyncio
 
 from mekhane.anamnesis.models.paper import Paper
 
@@ -37,6 +38,19 @@ class BaseCollector(ABC):
             elapsed = time.time() - self._last_request_time
             if elapsed < min_interval:
                 time.sleep(min_interval - elapsed)
+        self._last_request_time = time.time()
+
+    async def wait_async(self):
+        """
+        レート制限準拠のための待機 (非同期版)
+
+        asyncio.sleepを使用し、イベントループをブロックしない。
+        """
+        if self.rate_limit > 0:
+            min_interval = 1.0 / self.rate_limit
+            elapsed = time.time() - self._last_request_time
+            if elapsed < min_interval:
+                await asyncio.sleep(min_interval - elapsed)
         self._last_request_time = time.time()
 
     @abstractmethod
@@ -85,3 +99,33 @@ class BaseCollector(ABC):
         """
         self._rate_limit_wait()
         return self.search(query, max_results, **kwargs)
+
+    async def search_async(
+        self,
+        query: str,
+        max_results: int = 10,
+        categories: Optional[list[str]] = None,
+    ) -> list[Paper]:
+        """
+        クエリで論文検索 (非同期版)
+
+        デフォルト実装では同期searchメソッドをexecutorで実行する。
+        これにより、同期メソッド内のtime.sleepがイベントループをブロックするのを防ぐ。
+        """
+        return await asyncio.to_thread(
+            self.search, query, max_results=max_results, categories=categories
+        )
+
+    async def collect_async(
+        self,
+        query: str,
+        max_results: int = 10,
+        **kwargs,
+    ) -> list[Paper]:
+        """
+        論文収集 (非同期版)
+
+        collectの非同期ラッパー。wait_asyncを呼び出した後、search_asyncに委譲する。
+        """
+        await self.wait_async()
+        return await self.search_async(query, max_results, **kwargs)

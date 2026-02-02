@@ -14,8 +14,11 @@ Gnōsis Index - LanceDB統合 + 重複排除
 """
 
 import sys
+import logging
 from pathlib import Path
 from typing import Optional
+
+logger = logging.getLogger(__name__)
 
 try:
     import lancedb
@@ -35,8 +38,8 @@ MODELS_DIR = (
 if sys.platform == "win32":
     try:
         sys.stdout.reconfigure(encoding="utf-8")
-    except Exception:
-        pass  # TODO: Add proper error handling
+    except Exception as e:
+        logger.warning(f"Failed to reconfigure stdout encoding to utf-8: {e}")
 
 
 class Embedder:

@@ -9,6 +9,7 @@ Origin: 2026-01-31 CCL Execution Guarantee Architecture
 """
 
 import json
+import asyncio
 import sqlite3
 from datetime import datetime
 from pathlib import Path
@@ -109,8 +110,12 @@ class CCLCheckpointer:
         """JSON から状態をデシリアライズ"""
         return json.loads(state_json)
     
-    def put(self, write: CheckpointWrite) -> Checkpoint:
-        """チェックポイントを保存"""
+    async def put(self, write: CheckpointWrite) -> Checkpoint:
+        """チェックポイントを保存 (非同期)"""
+        return await asyncio.to_thread(self._put_sync, write)
+
+    def _put_sync(self, write: CheckpointWrite) -> Checkpoint:
+        """チェックポイントを保存 (同期)"""
         checkpoint_id = self._generate_id()
         created_at = datetime.now()
         
@@ -138,8 +143,12 @@ class CCLCheckpointer:
             metadata=write.metadata
         )
     
-    def get(self, thread_id: str, checkpoint_id: Optional[str] = None) -> Optional[Checkpoint]:
-        """チェックポイントを取得"""
+    async def get(self, thread_id: str, checkpoint_id: Optional[str] = None) -> Optional[Checkpoint]:
+        """チェックポイントを取得 (非同期)"""
+        return await asyncio.to_thread(self._get_sync, thread_id, checkpoint_id)
+
+    def _get_sync(self, thread_id: str, checkpoint_id: Optional[str] = None) -> Optional[Checkpoint]:
+        """チェックポイントを取得 (同期)"""
         with self._connect() as conn:
             if checkpoint_id:
                 row = conn.execute("""
@@ -166,13 +175,22 @@ class CCLCheckpointer:
                 )
             return None
     
-    def list(
+    async def list(
         self,
         thread_id: str,
         limit: int = 10,
         before: Optional[str] = None
     ) -> List[Checkpoint]:
-        """チェックポイント履歴を取得"""
+        """チェックポイント履歴を取得 (非同期)"""
+        return await asyncio.to_thread(self._list_sync, thread_id, limit, before)
+
+    def _list_sync(
+        self,
+        thread_id: str,
+        limit: int = 10,
+        before: Optional[str] = None
+    ) -> List[Checkpoint]:
+        """チェックポイント履歴を取得 (同期)"""
         with self._connect() as conn:
             if before:
                 rows = conn.execute("""
@@ -203,8 +221,12 @@ class CCLCheckpointer:
                 for row in rows
             ]
     
-    def delete(self, thread_id: str, checkpoint_id: Optional[str] = None):
-        """チェックポイントを削除"""
+    async def delete(self, thread_id: str, checkpoint_id: Optional[str] = None):
+        """チェックポイントを削除 (非同期)"""
+        await asyncio.to_thread(self._delete_sync, thread_id, checkpoint_id)
+
+    def _delete_sync(self, thread_id: str, checkpoint_id: Optional[str] = None):
+        """チェックポイントを削除 (同期)"""
         with self._connect() as conn:
             if checkpoint_id:
                 conn.execute("""
@@ -218,18 +240,18 @@ class CCLCheckpointer:
                 """, (thread_id,))
             conn.commit()
     
-    def get_tuple(self, config: Dict[str, Any]) -> Optional[Tuple]:
+    async def get_tuple(self, config: Dict[str, Any]) -> Optional[Tuple]:
         """LangGraph 互換: チェックポイントをタプルで取得"""
         thread_id = config.get("configurable", {}).get("thread_id")
         if not thread_id:
             return None
         
-        checkpoint = self.get(thread_id)
+        checkpoint = await self.get(thread_id)
         if checkpoint:
             return (checkpoint.state, {"checkpoint_id": checkpoint.checkpoint_id})
         return None
     
-    def put_tuple(self, config: Dict[str, Any], state: Dict[str, Any]) -> Dict[str, Any]:
+    async def put_tuple(self, config: Dict[str, Any], state: Dict[str, Any]) -> Dict[str, Any]:
         """LangGraph 互換: チェックポイントを保存"""
         thread_id = config.get("configurable", {}).get("thread_id")
         if not thread_id:
@@ -237,7 +259,7 @@ class CCLCheckpointer:
         
         parent_id = config.get("configurable", {}).get("checkpoint_id")
         
-        checkpoint = self.put(CheckpointWrite(
+        checkpoint = await self.put(CheckpointWrite(
             thread_id=thread_id,
             state=state,
             parent_id=parent_id
@@ -261,7 +283,7 @@ class MemoryCheckpointer:
         self._counter += 1
         return f"mem_{self._counter:04d}"
     
-    def put(self, write: CheckpointWrite) -> Checkpoint:
+    async def put(self, write: CheckpointWrite) -> Checkpoint:
         checkpoint_id = self._generate_id()
         checkpoint = Checkpoint(
             checkpoint_id=checkpoint_id,
@@ -278,7 +300,7 @@ class MemoryCheckpointer:
         
         return checkpoint
     
-    def get(self, thread_id: str, checkpoint_id: Optional[str] = None) -> Optional[Checkpoint]:
+    async def get(self, thread_id: str, checkpoint_id: Optional[str] = None) -> Optional[Checkpoint]:
         if thread_id not in self._storage:
             return None
         
@@ -294,7 +316,7 @@ class MemoryCheckpointer:
         
         return checkpoints[-1]  # 最新
     
-    def list(self, thread_id: str, limit: int = 10, before: Optional[str] = None) -> List[Checkpoint]:
+    async def list(self, thread_id: str, limit: int = 10, before: Optional[str] = None) -> List[Checkpoint]:
         if thread_id not in self._storage:
             return []
         
@@ -307,7 +329,7 @@ class MemoryCheckpointer:
         
         return checkpoints[:limit]
     
-    def delete(self, thread_id: str, checkpoint_id: Optional[str] = None):
+    async def delete(self, thread_id: str, checkpoint_id: Optional[str] = None):
         if thread_id not in self._storage:
             return
         
@@ -324,7 +346,7 @@ class MemoryCheckpointer:
 # Convenience Functions
 # =============================================================================
 
-def save_state(
+async def save_state(
     thread_id: str,
     state: Dict[str, Any],
     db_path: Optional[Path] = None
@@ -332,13 +354,13 @@ def save_state(
     """状態を保存 (便利関数)
     
     Example:
-        >>> save_state("session-001", {"context": "分析中", "results": []})
+        >>> await save_state("session-001", {"context": "分析中", "results": []})
     """
     checkpointer = CCLCheckpointer(db_path)
-    return checkpointer.put(CheckpointWrite(thread_id=thread_id, state=state))
+    return await checkpointer.put(CheckpointWrite(thread_id=thread_id, state=state))
 
 
-def load_state(
+async def load_state(
     thread_id: str,
     checkpoint_id: Optional[str] = None,
     db_path: Optional[Path] = None
@@ -346,18 +368,18 @@ def load_state(
     """状態を読み込み (便利関数)
     
     Example:
-        >>> state = load_state("session-001")
+        >>> state = await load_state("session-001")
     """
     checkpointer = CCLCheckpointer(db_path)
-    checkpoint = checkpointer.get(thread_id, checkpoint_id)
+    checkpoint = await checkpointer.get(thread_id, checkpoint_id)
     return checkpoint.state if checkpoint else None
 
 
-def list_checkpoints(
+async def list_checkpoints(
     thread_id: str,
     limit: int = 10,
     db_path: Optional[Path] = None
 ) -> List[Checkpoint]:
     """チェックポイント履歴を取得 (便利関数)"""
     checkpointer = CCLCheckpointer(db_path)
-    return checkpointer.list(thread_id, limit)
+    return await checkpointer.list(thread_id, limit)

@@ -103,7 +103,8 @@ class TestCCLGraphBuilder:
 class TestMemoryCheckpointer:
     """MemoryCheckpointer のテスト"""
     
-    def test_put_and_get(self):
+    @pytest.mark.asyncio
+    async def test_put_and_get(self):
         """保存と取得"""
         cp = MemoryCheckpointer()
         
@@ -112,39 +113,41 @@ class TestMemoryCheckpointer:
             state={"context": "test", "results": []}
         )
         
-        checkpoint = cp.put(write)
+        checkpoint = await cp.put(write)
         assert checkpoint.thread_id == "test-001"
         assert checkpoint.checkpoint_id is not None
         
-        retrieved = cp.get("test-001")
+        retrieved = await cp.get("test-001")
         assert retrieved is not None
         assert retrieved.state["context"] == "test"
     
-    def test_list_checkpoints(self):
+    @pytest.mark.asyncio
+    async def test_list_checkpoints(self):
         """履歴取得"""
         cp = MemoryCheckpointer()
         
         for i in range(3):
-            cp.put(CheckpointWrite(
+            await cp.put(CheckpointWrite(
                 thread_id="test-002",
                 state={"step": i}
             ))
         
-        history = cp.list("test-002")
+        history = await cp.list("test-002")
         assert len(history) == 3
     
-    def test_delete(self):
+    @pytest.mark.asyncio
+    async def test_delete(self):
         """削除"""
         cp = MemoryCheckpointer()
         
-        cp.put(CheckpointWrite(
+        await cp.put(CheckpointWrite(
             thread_id="test-003",
             state={"test": True}
         ))
         
-        cp.delete("test-003")
+        await cp.delete("test-003")
         
-        retrieved = cp.get("test-003")
+        retrieved = await cp.get("test-003")
         assert retrieved is None
 
 

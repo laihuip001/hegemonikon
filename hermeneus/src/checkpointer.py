@@ -10,6 +10,7 @@ Origin: 2026-01-31 CCL Execution Guarantee Architecture
 
 import json
 import sqlite3
+import asyncio
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, Iterator, List, Optional, Tuple
@@ -245,6 +246,35 @@ class CCLCheckpointer:
         
         return {"checkpoint_id": checkpoint.checkpoint_id}
 
+    async def aput(self, write: CheckpointWrite) -> Checkpoint:
+        """非同期: チェックポイントを保存"""
+        return await asyncio.to_thread(self.put, write)
+
+    async def aget(self, thread_id: str, checkpoint_id: Optional[str] = None) -> Optional[Checkpoint]:
+        """非同期: チェックポイントを取得"""
+        return await asyncio.to_thread(self.get, thread_id, checkpoint_id)
+
+    async def alist(
+        self,
+        thread_id: str,
+        limit: int = 10,
+        before: Optional[str] = None
+    ) -> List[Checkpoint]:
+        """非同期: チェックポイント履歴を取得"""
+        return await asyncio.to_thread(self.list, thread_id, limit, before)
+
+    async def adelete(self, thread_id: str, checkpoint_id: Optional[str] = None):
+        """非同期: チェックポイントを削除"""
+        return await asyncio.to_thread(self.delete, thread_id, checkpoint_id)
+
+    async def aget_tuple(self, config: Dict[str, Any]) -> Optional[Tuple]:
+        """LangGraph 互換 (非同期): チェックポイントをタプルで取得"""
+        return await asyncio.to_thread(self.get_tuple, config)
+
+    async def aput_tuple(self, config: Dict[str, Any], state: Dict[str, Any]) -> Dict[str, Any]:
+        """LangGraph 互換 (非同期): チェックポイントを保存"""
+        return await asyncio.to_thread(self.put_tuple, config, state)
+
 
 # =============================================================================
 # Memory Checkpointer (テスト用)
@@ -318,6 +348,45 @@ class MemoryCheckpointer:
             ]
         else:
             del self._storage[thread_id]
+
+    def get_tuple(self, config: Dict[str, Any]) -> Optional[Tuple]:
+        thread_id = config.get("configurable", {}).get("thread_id")
+        if not thread_id:
+            return None
+        checkpoint = self.get(thread_id)
+        if checkpoint:
+            return (checkpoint.state, {"checkpoint_id": checkpoint.checkpoint_id})
+        return None
+
+    def put_tuple(self, config: Dict[str, Any], state: Dict[str, Any]) -> Dict[str, Any]:
+        thread_id = config.get("configurable", {}).get("thread_id")
+        if not thread_id:
+            raise ValueError("thread_id is required in config")
+        parent_id = config.get("configurable", {}).get("checkpoint_id")
+        checkpoint = self.put(CheckpointWrite(
+            thread_id=thread_id,
+            state=state,
+            parent_id=parent_id
+        ))
+        return {"checkpoint_id": checkpoint.checkpoint_id}
+
+    async def aput(self, write: CheckpointWrite) -> Checkpoint:
+        return self.put(write)
+
+    async def aget(self, thread_id: str, checkpoint_id: Optional[str] = None) -> Optional[Checkpoint]:
+        return self.get(thread_id, checkpoint_id)
+
+    async def alist(self, thread_id: str, limit: int = 10, before: Optional[str] = None) -> List[Checkpoint]:
+        return self.list(thread_id, limit, before)
+
+    async def adelete(self, thread_id: str, checkpoint_id: Optional[str] = None):
+        return self.delete(thread_id, checkpoint_id)
+
+    async def aget_tuple(self, config: Dict[str, Any]) -> Optional[Tuple]:
+        return self.get_tuple(config)
+
+    async def aput_tuple(self, config: Dict[str, Any], state: Dict[str, Any]) -> Dict[str, Any]:
+        return self.put_tuple(config, state)
 
 
 # =============================================================================

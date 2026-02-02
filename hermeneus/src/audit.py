@@ -61,6 +61,7 @@ class AuditStore:
     def __init__(self, db_path: Optional[Path] = None):
         self.db_path = db_path or self.DEFAULT_PATH
         self.db_path.parent.mkdir(parents=True, exist_ok=True)
+        self._active_conn: Optional[sqlite3.Connection] = None
         self._init_db()
     
     def _init_db(self):
@@ -87,11 +88,36 @@ class AuditStore:
                 CREATE INDEX IF NOT EXISTS idx_ccl 
                 ON audits(ccl_expression)
             """)
-            conn.commit()
+            if self._active_conn is None:
+                conn.commit()
     
+    @contextmanager
+    def transaction(self):
+        """トランザクション管理"""
+        if self._active_conn:
+            yield self._active_conn
+            return
+
+        conn = sqlite3.connect(str(self.db_path))
+        conn.row_factory = sqlite3.Row
+        self._active_conn = conn
+        try:
+            yield conn
+            conn.commit()
+        except Exception:
+            conn.rollback()
+            raise
+        finally:
+            conn.close()
+            self._active_conn = None
+
     @contextmanager
     def _connect(self):
         """データベース接続を取得"""
+        if self._active_conn:
+            yield self._active_conn
+            return
+
         conn = sqlite3.connect(str(self.db_path))
         conn.row_factory = sqlite3.Row
         try:
@@ -126,9 +152,45 @@ class AuditStore:
                 json.dumps(audit.metadata, ensure_ascii=False) if audit.metadata else None,
                 audit.timestamp.isoformat()
             ))
-            conn.commit()
+            if self._active_conn is None:
+                conn.commit()
         
         return audit.record_id
+
+    def record_batch(self, audits: List[AuditRecord]) -> List[str]:
+        """監査レコードを一括記録"""
+        ids = []
+        params = []
+        for audit in audits:
+            if not audit.record_id:
+                audit.record_id = self._generate_id()
+            ids.append(audit.record_id)
+            params.append((
+                audit.record_id,
+                audit.ccl_expression,
+                audit.execution_result,
+                audit.debate_summary,
+                1 if audit.consensus_accepted else 0,
+                audit.confidence,
+                json.dumps(audit.dissent_reasons, ensure_ascii=False),
+                json.dumps(audit.metadata, ensure_ascii=False) if audit.metadata else None,
+                audit.timestamp.isoformat()
+            ))
+
+        if not params:
+            return ids
+
+        with self._connect() as conn:
+            conn.executemany("""
+                INSERT OR REPLACE INTO audits
+                (record_id, ccl_expression, execution_result, debate_summary,
+                 consensus_accepted, confidence, dissent_reasons, metadata, timestamp)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """, params)
+            if self._active_conn is None:
+                conn.commit()
+
+        return ids
     
     def get(self, record_id: str) -> Optional[AuditRecord]:
         """レコードを取得"""

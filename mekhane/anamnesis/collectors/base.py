@@ -17,6 +17,7 @@ Gnōsis Base Collector - コレクター共通インタフェース
 from abc import ABC, abstractmethod
 from typing import Optional
 import time
+import asyncio
 
 from mekhane.anamnesis.models.paper import Paper
 
@@ -30,13 +31,27 @@ class BaseCollector(ABC):
     def __init__(self):
         self._last_request_time: float = 0
 
-    def _rate_limit_wait(self):
-        """レート制限準拠のための待機"""
+    def _calculate_wait_time(self) -> float:
+        """待機時間を計算"""
         if self.rate_limit > 0:
             min_interval = 1.0 / self.rate_limit
             elapsed = time.time() - self._last_request_time
             if elapsed < min_interval:
-                time.sleep(min_interval - elapsed)
+                return min_interval - elapsed
+        return 0.0
+
+    def _rate_limit_wait(self):
+        """レート制限準拠のための待機"""
+        wait_time = self._calculate_wait_time()
+        if wait_time > 0:
+            time.sleep(wait_time)
+        self._last_request_time = time.time()
+
+    async def _rate_limit_wait_async(self):
+        """レート制限準拠のための待機 (非同期)"""
+        wait_time = self._calculate_wait_time()
+        if wait_time > 0:
+            await asyncio.sleep(wait_time)
         self._last_request_time = time.time()
 
     @abstractmethod

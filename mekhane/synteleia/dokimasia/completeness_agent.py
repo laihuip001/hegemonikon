@@ -53,23 +53,23 @@ class CompletenessAgent(AuditAgent):
 
     # 未完了マーカー
     INCOMPLETE_MARKERS = [
-        (r"\bTODO\b", "COMP-001", "TODO マーカーが残っています"),
-        (r"\bFIXME\b", "COMP-002", "FIXME マーカーが残っています"),
-        (r"\bXXX\b", "COMP-003", "XXX マーカーが残っています"),
-        (r"\bHACK\b", "COMP-004", "HACK マーカーが残っています"),
-        (r"\.\.\.(?!\s*\]|\s*\))", "COMP-005", "省略記号 ... が残っています"),
-        (r"\bpass\s*$", "COMP-006", "空の pass 文があります"),
-        (r'raise\s+NotImplementedError', "COMP-007", "NotImplementedError が残っています"),
-        (r"\?\?\?", "COMP-008", "??? プレースホルダーが残っています"),
+        (re.compile(r"\bTODO\b", re.MULTILINE), "COMP-001", "TODO マーカーが残っています"),
+        (re.compile(r"\bFIXME\b", re.MULTILINE), "COMP-002", "FIXME マーカーが残っています"),
+        (re.compile(r"\bXXX\b", re.MULTILINE), "COMP-003", "XXX マーカーが残っています"),
+        (re.compile(r"\bHACK\b", re.MULTILINE), "COMP-004", "HACK マーカーが残っています"),
+        (re.compile(r"\.\.\.(?!\s*\]|\s*\))", re.MULTILINE), "COMP-005", "省略記号 ... が残っています"),
+        (re.compile(r"\bpass\s*$", re.MULTILINE), "COMP-006", "空の pass 文があります"),
+        (re.compile(r'raise\s+NotImplementedError', re.MULTILINE), "COMP-007", "NotImplementedError が残っています"),
+        (re.compile(r"\?\?\?", re.MULTILINE), "COMP-008", "??? プレースホルダーが残っています"),
     ]
 
     # 空のブロックパターン
     EMPTY_PATTERNS = [
-        (r"def\s+\w+\([^)]*\):\s*\n\s*pass\s*$", "COMP-010", "空の関数定義"),
-        (r"class\s+\w+[^:]*:\s*\n\s*pass\s*$", "COMP-011", "空のクラス定義"),
-        (r"if\s+[^:]+:\s*\n\s*pass\s*$", "COMP-012", "空の if ブロック"),
-        (r"try:\s*\n\s*pass\s*$", "COMP-013", "空の try ブロック"),
-        (r"except[^:]*:\s*\n\s*pass\s*$", "COMP-014", "空の except ブロック"),
+        (re.compile(r"def\s+\w+\([^)]*\):\s*\n\s*pass\s*$", re.MULTILINE), "COMP-010", "空の関数定義"),
+        (re.compile(r"class\s+\w+[^:]*:\s*\n\s*pass\s*$", re.MULTILINE), "COMP-011", "空のクラス定義"),
+        (re.compile(r"if\s+[^:]+:\s*\n\s*pass\s*$", re.MULTILINE), "COMP-012", "空の if ブロック"),
+        (re.compile(r"try:\s*\n\s*pass\s*$", re.MULTILINE), "COMP-013", "空の try ブロック"),
+        (re.compile(r"except[^:]*:\s*\n\s*pass\s*$", re.MULTILINE), "COMP-014", "空の except ブロック"),
     ]
 
     def audit(self, target: AuditTarget) -> AgentResult:
@@ -106,7 +106,7 @@ class CompletenessAgent(AuditAgent):
         issues = []
 
         for pattern, code, message in self.INCOMPLETE_MARKERS:
-            for match in re.finditer(pattern, content, re.MULTILINE):
+            for match in pattern.finditer(content):
                 # コメント内の TODO/FIXME の重大度を調整
                 line_start = content.rfind("\n", 0, match.start()) + 1
                 line = content[line_start : content.find("\n", match.start())]
@@ -133,7 +133,7 @@ class CompletenessAgent(AuditAgent):
         issues = []
 
         for pattern, code, message in self.EMPTY_PATTERNS:
-            for match in re.finditer(pattern, content, re.MULTILINE):
+            for match in pattern.finditer(content):
                 issues.append(
                     AuditIssue(
                         agent=self.name,

@@ -1,0 +1,43 @@
+{
+    "title": "Cognitive Control Language (CCL/CPL) System v6.54",
+    "summary": "認知制御言語 (CCL/CPL) v6.54 の体系。Project Pythōsis の成果（Lambda, Mixin, Decorator, Typing）を統合し、Pythonic な設計哲学を認知代数へと昇華。SEL v2.0 による 96%+ の実行保証、/vet v3.1 による自律的再実行フローを実装。B1 Paradigm による定理階層の演繹的明示化をサポート。",
+    "dependencies": [
+        "hegemonikon_system",
+        "project_pythosis"
+    ],
+    "references": [
+        {
+            "type": "conversation_id",
+            "value": "f36f496b-42c4-460c-a64d-5dd2c4a651db"
+        },
+        {
+            "type": "conversation_id",
+            "value": "4a02c389-c499-47af-9c66-3f02c9127120"
+        },
+        {
+            "type": "conversation_id",
+            "value": "54aa8887-7627-471b-97d9-59652251c693"
+        },
+        {
+            "type": "conversation_id",
+            "value": "c1c2dca8-2d67-44f6-b4ae-f1402f795059"
+        },
+        {
+            "type": "file",
+            "value": "/home/laihuip001/oikos/.gemini/antigravity/knowledge/cognitive_algebra_system/artifacts/overview.md"
+        },
+        {
+            "type": "file",
+            "value": "/home/laihuip001/oikos/.gemini/antigravity/knowledge/cognitive_algebra_system/artifacts/projects/pythosis/project_summary.md"
+        },
+        {
+            "type": "file",
+            "value": "/home/laihuip001/oikos/.gemini/antigravity/knowledge/cognitive_algebra_system/artifacts/research/activation_steering_2026.md"
+        },
+        {
+            "type": "file",
+            "value": "/home/laihuip001/oikos/hegemonikon/ccl/operators.md"
+        }
+    ]
+}
+```

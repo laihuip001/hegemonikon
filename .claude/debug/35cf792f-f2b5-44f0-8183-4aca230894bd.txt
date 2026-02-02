@@ -1,0 +1,46 @@
+2026-02-01T02:13:10.305Z [DEBUG] [init] configureGlobalMTLS starting
+2026-02-01T02:13:10.306Z [DEBUG] [init] configureGlobalMTLS complete
+2026-02-01T02:13:10.306Z [DEBUG] [init] configureGlobalAgents starting
+2026-02-01T02:13:10.306Z [DEBUG] [init] configureGlobalAgents complete
+2026-02-01T02:13:10.313Z [DEBUG] Loading skills from: managed=/etc/claude-code/.claude/skills, user=/home/laihuip001/oikos/.claude/skills, project=[]
+2026-02-01T02:13:10.314Z [DEBUG] Error log sink initialized
+2026-02-01T02:13:10.321Z [DEBUG] Found 0 plugins (0 enabled, 0 disabled)
+2026-02-01T02:13:10.321Z [DEBUG] getPluginSkills: Processing 0 enabled plugins
+2026-02-01T02:13:10.321Z [DEBUG] Total plugin skills loaded: 0
+2026-02-01T02:13:10.321Z [DEBUG] Total plugin commands loaded: 0
+2026-02-01T02:13:10.321Z [DEBUG] Registered 0 hooks from 0 plugins
+2026-02-01T02:13:10.321Z [DEBUG] Loaded 0 unique skills (managed: 0, user: 0, project: 0, legacy commands: 0)
+2026-02-01T02:13:10.322Z [DEBUG] getSkills returning: 0 skill dir commands, 0 plugin skills, 1 bundled skills
+2026-02-01T02:13:10.324Z [DEBUG] [render] initLayout starting
+2026-02-01T02:13:10.324Z [DEBUG] Layout engine: yoga
+2026-02-01T02:13:10.340Z [DEBUG] [render] initLayout complete
+2026-02-01T02:13:10.342Z [DEBUG] [render] first ink render: 325ms since process start
+2026-02-01T02:13:10.346Z [DEBUG] [Claude in Chrome] Extension not found in any browser
+2026-02-01T02:13:10.353Z [DEBUG] Install: Starting installation process (force=false, target=undefined)
+2026-02-01T02:13:10.353Z [DEBUG] Install: Calling installLatest(channelOrVersion=latest, forceReinstall=false)
+2026-02-01T02:13:10.358Z [DEBUG] Writing to temp file: /home/laihuip001/oikos/.claude.json.tmp.98616.1769911990358
+2026-02-01T02:13:10.358Z [DEBUG] Preserving file permissions: 100600
+2026-02-01T02:13:10.360Z [DEBUG] Temp file written successfully, size: 2701 bytes
+2026-02-01T02:13:10.360Z [DEBUG] Applied original permissions to temp file
+2026-02-01T02:13:10.360Z [DEBUG] Renaming /home/laihuip001/oikos/.claude.json.tmp.98616.1769911990358 to /home/laihuip001/oikos/.claude.json
+2026-02-01T02:13:10.360Z [DEBUG] File /home/laihuip001/oikos/.claude.json written atomically
+2026-02-01T02:13:10.933Z [DEBUG] Checking for native installer update to version 2.1.29
+2026-02-01T02:13:10.933Z [DEBUG] Downloading native installer version 2.1.29
+2026-02-01T02:13:18.442Z [DEBUG] Atomically installed binary to /home/laihuip001/oikos/.local/share/claude/versions/2.1.29
+2026-02-01T02:13:18.461Z [DEBUG] Could not remove empty directory at /home/laihuip001/oikos/.local/bin/claude: Error: ENOENT: no such file or directory, statx '/home/laihuip001/oikos/.local/bin/claude'
+2026-02-01T02:13:18.461Z [DEBUG] Created directory /home/laihuip001/oikos/.local/bin for symlink
+2026-02-01T02:13:18.462Z [DEBUG] Atomically updated symlink /home/laihuip001/oikos/.local/bin/claude -> /home/laihuip001/oikos/.local/share/claude/versions/2.1.29
+2026-02-01T02:13:18.462Z [DEBUG] Successfully updated to version 2.1.29
+2026-02-01T02:13:18.463Z [DEBUG] Writing to temp file: /home/laihuip001/oikos/.claude.json.tmp.98616.1769911998463
+2026-02-01T02:13:18.463Z [DEBUG] Preserving file permissions: 100600
+2026-02-01T02:13:18.741Z [DEBUG] Temp file written successfully, size: 2795 bytes
+2026-02-01T02:13:18.741Z [DEBUG] Applied original permissions to temp file
+2026-02-01T02:13:18.741Z [DEBUG] Renaming /home/laihuip001/oikos/.claude.json.tmp.98616.1769911998463 to /home/laihuip001/oikos/.claude.json
+2026-02-01T02:13:18.742Z [DEBUG] File /home/laihuip001/oikos/.claude.json written atomically
+2026-02-01T02:13:18.742Z [DEBUG] Native installer: Set installMethod to "native" and disabled legacy auto-updater for protection
+2026-02-01T02:13:18.742Z [DEBUG] Install: installLatest returned version=2.1.29, wasUpdated=true, lockFailed=false
+2026-02-01T02:13:19.890Z [DEBUG] Install: Setup launcher completed with 0 messages
+2026-02-01T02:13:19.890Z [DEBUG] Install: Cleaning up npm installations after successful install
+2026-02-01T02:13:20.062Z [DEBUG] Removed global npm installation of @anthropic-ai/claude-code
+2026-02-01T02:13:20.062Z [DEBUG] Cleaned up 1 npm installation(s)
+2026-02-01T02:13:20.062Z [DEBUG] Install: Shell PATH already configured

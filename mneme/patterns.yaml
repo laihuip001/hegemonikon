@@ -1,0 +1,33 @@
+# M3 Theōria - Patterns Database
+# ================================
+# 過去のセッションから抽出されたパターン・因果モデル
+# Format: YAML
+
+version: "1.0.0"
+created: "2026-01-21T19:24:00+09:00"
+updated: "2026-01-21T19:24:00+09:00"
+
+# === パターンスキーマ ===
+# patterns:
+#   - id: string
+#     name: string
+#     description: string
+#     trigger: string        # 発動条件
+#     action: string         # 推奨アクション
+#     confidence: float      # 0.0-1.0
+#     source_sessions: []    # 抽出元セッションID
+#     created: datetime
+#     last_used: datetime
+
+patterns: []
+
+# === 因果モデルスキーマ ===
+# causal_models:
+#   - id: string
+#     domain: string         # 適用ドメイン
+#     cause: string
+#     effect: string
+#     strength: float        # 因果強度 0.0-1.0
+#     evidence_count: int
+
+causal_models: []

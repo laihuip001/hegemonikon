@@ -1,0 +1,43 @@
+{
+    "title": "Model Context Protocol (MCP) Ecosystem (2026)",
+    "summary": "Comprehensive knowledge base tracking the evolution of the Model Context Protocol (MCP). Covers the transition to the Agentic AI Foundation, the release of MCP Apps, enterprise governance standards (Zero Trust, RBAC), and popular cloud-native hosting patterns (Azure Functions). Documents server populations and high-priority integration targets for agentic workflows.",
+    "dependencies": [],
+    "references": [
+        {
+            "type": "url",
+            "value": "https://blog.modelcontextprotocol.io/posts/2026-01-22-core-maintainer-update/"
+        },
+        {
+            "type": "conversation_id",
+            "value": "1291d231-b66b-45f4-9d3c-599a9b400955"
+        },
+        {
+            "type": "conversation_id",
+            "value": "bot-11dbd940-5335-442d-a9d4-7e568bfa990a"
+        },
+        {
+            "type": "file",
+            "value": "/home/laihuip001/oikos/hegemonikon/docs/research/reports/2026-01-29_mcp_ecosystem_monitoring.md"
+        },
+        {
+            "type": "conversation_id",
+            "value": "f6ad2307-5115-4fd3-8ed9-b91a96eaa34b"
+        },
+        {
+            "type": "conversation_id",
+            "value": "f6ad2307-5115-4fd3-8ed9-b91a96eaa34b"
+        },
+        {
+            "type": "conversation_id",
+            "value": "eac9ce4b-59ee-4d83-89f7-f104fc54c144"
+        },
+        {
+            "type": "conversation_id",
+            "value": "891aef16-e50a-4b10-9f94-38e050771424"
+        },
+        {
+            "type": "conversation_id",
+            "value": "93e1f457-c2db-48aa-ad20-9fb5a45dc587"
+        }
+    ]
+}

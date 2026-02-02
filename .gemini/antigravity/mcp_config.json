@@ -1,0 +1,47 @@
+{
+    "servers": {
+        "gnosis": {
+            "command": "python",
+            "args": [
+                "/home/laihuip001/oikos/hegemonikon/mcp/gnosis_mcp_server.py"
+            ]
+        },
+        "prompt-lang": {
+            "command": "python",
+            "args": [
+                "/home/laihuip001/oikos/hegemonikon/mcp/prompt_lang_mcp_server.py"
+            ]
+        },
+        "mneme": {
+            "command": "python",
+            "args": [
+                "/home/laihuip001/oikos/hegemonikon/mcp/mneme_server.py"
+            ]
+        },
+        "jules": {
+            "command": "/home/laihuip001/oikos/hegemonikon/.venv/bin/python",
+            "args": [
+                "/home/laihuip001/oikos/hegemonikon/mcp/jules_mcp_server.py"
+            ],
+            "env": {
+                "JULES_API_KEY": "${JULES_API_KEY}"
+            }
+        },
+        "digestor": {
+            "command": "/home/laihuip001/oikos/hegemonikon/.venv/bin/python",
+            "args": [
+                "/home/laihuip001/oikos/hegemonikon/mcp/digestor_mcp_server.py"
+            ]
+        },
+        "hermeneus": {
+            "command": "/home/laihuip001/oikos/hegemonikon/.venv/bin/python",
+            "args": [
+                "-m",
+                "hermeneus.src.mcp_server"
+            ],
+            "env": {
+                "PYTHONPATH": "/home/laihuip001/oikos/hegemonikon"
+            }
+        }
+    }
+}

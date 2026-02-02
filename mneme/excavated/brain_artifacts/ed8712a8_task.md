@@ -1,0 +1,32 @@
+# 現状整理とコンテキスト同期
+
+- [ ] 資料読み込み: Reference Materials
+    - [x] `C:\Users\raikh\Downloads\Claude-設計01.md`
+    - [x] `C:\Users\raikh\Downloads\Agent execution terminated due to error..md`
+    - [x] `C:\Users\raikh\Downloads\Claude-Hegemonikón01.md`
+    - [x] `C:\Users\raikh\Downloads\Claude-設計01のチャット引き継ぎ.md`
+- [x] 現状の整理と報告 (Status Organization & Report)
+    - [x] Create `project_status.md`
+
+- [x] Bootstrap Prompt Creation
+    - [x] Create `Hegemonikon_Bootstrap.xml` (Antigravity Manual) → 方針変更: C案採用
+    - [x] `GEMINI.md` に Hegemonikón Doctrine 追加
+    - [x] **Phase 1: Hegemonikón Framework** <!-- id: 5 -->
+      - [x] Design 64-function matrix (Phase 1) <!-- id: 6 -->
+      - [x] Define Phase 2-4 Roadmap <!-- id: 7 -->
+      - [x] Enhance M-Series Skill Descriptions <!-- id: 16 -->
+      - [x] Restructure Workspace (Hegemonikón Repository) <!-- id: 17 -->
+- [ ] **Phase 2: Semantic Skills** <!-- id: 8 -->
+    - [x] Initialize `ANTIGRAVITY_MEMORY` (vault structure created)
+    - [x] Create Forge Workflows (`/boot`, `/sync-history`, `/review`)
+    - [x] Execute `/boot` test ✅
+- [x] Critical Review & Improvement (6-module analysis)
+    - [x] Plain language explanation added
+    - [x] Ethics constraints file created (`.agent/rules/ethics-constraints.md`)
+    - [x] OMEGA Modules reference updated (Skills migration)
+    - [x] 4-axis rationale documented
+- [/] Phase 2 Planning: Agency軸
+    - [ ] Agency軸 (Self/Environment) の詳細定義
+    - [ ] 32機能への拡張設計
+    - [ ] 新機能の命名（ギリシャ語）
+    - [ ] Forge Module マッピング

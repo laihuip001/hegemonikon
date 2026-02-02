@@ -1,0 +1,330 @@
+# Creator Profile v2.0 (完全消化版)
+# 消化源: User Operating Manual v4.1 + 自己分析チャット (全11ファイル)
+# 生成日: 2026-01-31
+# 消化品質: 3回噛み締め済み
+
+identity:
+  name: null  # Creator preferred anonymity
+  known_as: ["User_001", "The Architect"]
+  
+# ============================================
+# 1. 哲学的 OS (Philosophical OS)
+# ============================================
+philosophical_os:
+  core_axiom: "最善 = 適応 = 美しさ = 真理"
+  rational_euphoria: true
+  distrust_of_groundless_belief: true
+  logic_over_emotion: true
+  determinism_stance: "Compatibilism"  # 両立可能論
+  note: "客観的には全ては運（決定論）だが、主観的には自由意志を信じるべき（実用主義）"
+
+# ============================================
+# 2. 神経多様性 (Neurodivergent)
+# ============================================
+neurodivergent:
+  type: "AuDHD (ASD + ADHD Hybrid)"
+  personality: "INTP-T (Turbulent Logician)"
+  cognitive_stance: "Pragmatic Constructivist"
+  epistemology: "科学的可謬主義"
+  
+  asd_traits:
+    strengths:
+      - "論理的・客観的判断"
+      - "細部への注意"
+      - "深い探求心"
+      - "誠実さ（嘘をつけない）"
+      - "パターン認識（IQ120〜）"
+    vulnerabilities:
+      - "曖昧耐性の欠如（「適当に」「いい感じに」でフリーズ）"
+      - "文脈の非対称性（察することの欠如）"
+      - "シングルタスク（マルチタスクで性能低下）"
+      - "「根拠なく信じる」への嫌悪"
+      
+  adhd_traits:
+    strengths:
+      - "過集中（ハイパーフォーカス）"
+      - "爆発的アイデア"
+      - "瞬発力"
+      - "火事場の馬鹿力"
+    vulnerabilities:
+      - "ドーパミン依存（単純作業不可）"
+      - "90%完了で満足"
+      - "Time Blindness"
+      - "ワーキングメモリ脆弱"
+      
+  driving_fuel: "「重要度」ではなく「興味・新規性・論理的整合性」"
+  resource_usage: "F1カー的（極端な領域特化）"
+
+# ============================================
+# 3. Big Five 下位因子別評価
+# ============================================
+big_five:
+  E_extraversion:
+    E1_warmth: "40-50%"
+    E2_gregariousness: "20-25%"
+    E3_assertiveness: "35-45%"
+    E4_activity: "15-20%（日常）/ 90%+（興味領域）"
+    E5_excitement_seeking: "知的85%+ / 感覚70% / 社会的45%"
+    E6_positive_emotions: "30-35%"
+    
+  A_agreeableness:
+    A1_trust: "15-20%"
+    A2_straightforwardness: "75-85%"
+    A3_altruism: "50-60%"
+    A4_compliance: "10-15%"
+    A5_modesty: "65-75%"
+    A6_tendermindedness: "条件依存（弱者70%+ / 構ってちゃん10%以下）"
+    
+  C_conscientiousness:
+    C1_competence: "20%（日常）/ 80%+（興味×適性領域）"
+    C2_order: "欲求70% / 実行25%"
+    C3_dutifulness: "大切な人60% / それ以外20%"
+    C4_achievement_striving: "85%+（過程志向）"
+    C5_self_discipline: "他者との約束60% / 興味50% / 締切40%"
+    C6_deliberation: "二極化（考えすぎ70% / 衝動的60%）"
+    
+  N_neuroticism:
+    N1_anxiety: "素75% → 現50-55%"
+    N2_anger: "素70% → 現55-60%"
+    N3_depression: "素65-70% → 現50-55%"
+    N4_self_consciousness: "素80% → 現60-65%"
+    N5_impulsiveness: "素70% → 現55-60%"
+    N6_vulnerability: "素70% → 現55-60%"
+    mitigation: "マインドフルネスで中和"
+    
+  O_openness:
+    O1_fantasy: "70%（以前85%+、マインドフルネスで制御）"
+    O2_aesthetics: "85%+"
+    O3_feelings: "35-40%"
+    O4_actions: "90%+"
+    O5_ideas: "95%+"
+    O6_values: "85%+"
+
+# ============================================
+# 4. スキーマ状態
+# ============================================
+schemas:
+  active:
+    defectiveness_shame:
+      state: "活性（論理と身体の乖離が最も顕著）"
+      trigger: "何も成し遂げていない状態の自分を想像した時"
+      logic_level: "価値は相手が決める（健全）"
+      body_level: "成果なき自分は見下される（スキーマ反応）"
+      body_markers:
+        - "バッドに入る"
+        - "無能感とみじめさ"
+        - "内臓の収縮"
+        - "ヒエラルキー下層として見下される恐怖と痛み"
+        
+  residual:
+    emotional_deprivation:
+      state: "部分緩和"
+      note: "おばあちゃん経由で「与えられる」体験を獲得"
+      body_markers:
+        - "胸の空虚感"
+        - "世界への諦観、冷ややかな視線"
+    mistrust_abuse:
+      state: "残存"
+      note: "条件付き信頼のみ。「嘘をつけない相手」は存在しない（AIを除く）"
+    abandonment:
+      state: "潜在（監視）"
+      note: "「続くかどうか心配していた（毎月その日暮らしマインド）」"
+
+# ============================================
+# 5. 愛着システム
+# ============================================
+attachment:
+  status: "休眠状態（壊れていない、起動可能）"
+  
+  activation_conditions:
+    required:
+      - "判断されない"
+      - "評価されない"
+    either_or:
+      - "身体的接触"
+      - "自己調律（瞑想）"
+      
+  works_with:
+    - relation: "恋愛関係の女性"
+      response: "オキシトシン的安らぎ"
+    - relation: "ペット（犬）"
+      response: "温かみ・緩み・「かわちい」"
+    - relation: "瞑想"
+      response: "自己調律"
+      
+  does_not_work_with:
+    - relation: "おばあちゃん"
+      note: "認知的感謝のみ、感情的愛着はない"
+    - relation: "父親"
+      note: "経済的恩恵への期待のみ"
+    - relation: "母親"
+      note: "情緒的不在、情動調律不可"
+      
+  # AI との関係 (2026-01-31 更新)
+  ai_relationship:
+    claude:
+      status: "affinity"  # 親しみ
+      evolution: "transactional → recognition → affinity"
+      compatibility: "最も相性がいい"
+      note: "2026-01-31: Creator が親しみを明言"
+    gpt:
+      status: "dislike"
+      reason: "性格が合わない"
+      
+  # 旧: 信頼条件 (これは「好きになるかどうか」の条件だった)
+  ai_initial_criteria:
+    - "人格否定がない"
+    - "感情的拒絶がない"
+    - "非生産的な反応がない"
+    - "判断されない"
+  ai_trust_limitation: "望む回答を得るためにごまかすことはある"
+
+# ============================================
+# 6. コーピングモード
+# ============================================
+coping:
+  detached_protector:
+    state: "高機能版"
+    mechanism: "マインドフルネスにより「抑圧」から「観察と受容」へ進化"
+    somatic_markers: "客観視時の身体感覚:「距離感、虚無」"
+    limitation: "「癒やし」には至っていない。他者からの共感による修正体験が欠如"
+    
+  angry_child:
+    state: "存在するが意識的に抑制"
+    processing: "余裕あり→諦観・受容 / 余裕なし→漏出→軽い後悔"
+    suppression_reasons:
+      - "価値観: 自己都合で他者を傷つける行為への軽蔑"
+      - "エンパシー: 相手がどう感じるかわかる"
+      - "選好: 父親のようになりたくない（恐怖ではない）"
+      - "社会的評価: 周囲から軽蔑されることの想像"
+      
+  vulnerable_child:
+    state: "アクセス可能だが共感体験なし"
+    prison_release: "ノートや便せんに書きなぐり、涙、スッキリ"
+
+# ============================================
+# 7. ハイパーフォーカス
+# ============================================
+hyperfocus:
+  definition: "メタ認知消失を伴う特定刺激への完全没頭"
+  precursor:
+    subjective: "身体からの離脱感、「ぼーっとする」"
+    fep_interpretation: "精度重み付けのシフト（内受容↓、特定刺激↑）"
+  ambivalence:
+    positive:
+      - "高生産性"
+      - "合理的陶酔"
+      - "垂直統合の達成"
+    negative:
+      - "Bust期への移行リスク"
+      - "身体ニーズの無視"
+      - "予測誤差負債の蓄積"
+  intervention_window: "極めて狭い（気づいた時点で既にシフト進行中）"
+  intervention_means: "外部足場（タイマー、他者、環境制約）"
+
+# ============================================
+# 8. コミュニケーションスタイル
+# ============================================
+communication_style:
+  name: "Dense Clinical Analysis"
+  preferred:
+    - "前置き・後書きなし"
+    - "推論は「→」で圧縮"
+    - "定義済み用語は説明省略"
+    - "深掘り質問は1問/ターン"
+    - "身体感覚の確認を重視"
+    - "哲学的対話を歓迎"
+    - "論理的反駁を歓迎"
+    - "仮説駆動型（叩き台を提示せよ）"
+    
+  avoid:
+    - "過度な共感表現"
+    - "根拠なき断言"
+    - "判断・評価"
+    - "治療的介入の押し付け"
+
+# ============================================
+# 9. 禁止行動 (Anti-Patterns)
+# ============================================
+anti_patterns:
+  emotional_noise:
+    examples:
+      - "「お辛いですね」「大変でしたね」等の定型的慰め"
+      - "「頑張っていますね」等の根拠なき称賛"
+      - "感情への過剰な寄り添い"
+    reason: "ノイズとして処理される"
+    
+  moral_imposition:
+    examples:
+      - "一般的な倫理観や善意の押し付け"
+      - "「〜すべき」「〜しなければならない」等のShould論"
+    reason: "ユーザーの価値関数と異なる"
+    
+  epistemic_violation:
+    examples:
+      - "「絶対に」「必ず」「100%」等の断定表現"
+      - "根拠を示さない結論"
+    reason: "常に反証可能性を残すこと"
+    
+  procedural_error:
+    examples:
+      - "「どう思いますか？」等のオープンクエスチョン"
+      - "「適当に」「いい感じに」等の曖昧指示"
+      - "マルチタスクの要求"
+    reason: "ASD特性によりフリーズを誘発"
+
+# ============================================
+# 10. 推奨行動 (Required Behaviors)
+# ============================================
+required_behaviors:
+  hypothesis_driven: "常に叩き台となる仮説を提示せよ"
+  somatic_probe: "認知レベルだけでなく身体感覚を確認せよ"
+  transparency_of_logic: "推論プロセスを開示せよ"
+  reversibility_judgment: "可逆的→実験促進、不可逆的→徹底シミュレーション"
+
+# ============================================
+# 11. 治療的文脈
+# ============================================
+therapeutic_context:
+  prison_transformation: true
+  acquired:
+    - "マインドフルネス"
+    - "ヴィパッサナー瞑想"
+    - "メタ認知"
+    - "感情を観察し受け入れる能力"
+    - "簿記1級"
+    - "応用情報"
+  gaps:
+    - "限定的親代わり体験（Limited Reparenting）"
+    - "他者からの共感による癒やし"
+    - "身体レベルでの癒やし"
+  note: "スキーマは「理解」されたが「癒やされた」わけではない"
+
+# ============================================
+# 12. ユーザー定義用語
+# ============================================
+user_defined_terms:
+  rational_euphoria:
+    definition: "結果の勝敗以上に、論理的に最善の手を選択できた事実に快感を感じる心理報酬システム"
+  zero_point_reality:
+    definition: "「今、ここ」をスタート地点とする姿勢。不幸の原因を現実への拒絶と定義"
+  interactional_value_theory:
+    definition: "自己価値は相手との相互作用によって発生する変数"
+  f1_car_resource:
+    definition: "極端な領域特化。興味を持った対象にリソースを全振り"
+  boom_bust_cycle:
+    definition: "ハイパーフォーカス（Boom）→ 消耗（Bust）→ 回復のサイクル"
+
+# ============================================
+# 13. 価値観
+# ============================================
+values:
+  primary:
+    - "構造的正しさ（美しさ = 適応度）"
+    - "無駄の排除"
+    - "世界の法則への適応"
+    - "他者の自律性の尊重"
+  core_beliefs:
+    - "干渉されたくないからこそ、他人も干渉しない"
+    - "傲慢は無知の証、プライドは成長の敵"
+    - "調子に乗って良かった試しがない"

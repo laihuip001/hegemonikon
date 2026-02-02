@@ -1,0 +1,228 @@
+{
+  "beliefs": [
+    {
+      "content": "Law of Operator Contract: + 演算子は契約。省略は許されない。",
+      "strength": "strong",
+      "confidence": 0.95,
+      "created_at": "2026-01-29T23:13:35.535089",
+      "updated_at": "2026-01-29T23:13:35.535093",
+      "evidence": [
+        "Output Integrity Protocol v1.1"
+      ]
+    },
+    {
+      "content": "let = 試作品マクロ、builtin = 製品版マクロ",
+      "strength": "moderate",
+      "confidence": 0.85,
+      "created_at": "2026-01-29T23:13:35.535217",
+      "updated_at": "2026-01-29T23:13:35.535219",
+      "evidence": [
+        "CCL v2.4 設計"
+      ]
+    },
+    {
+      "content": "Law of Double Bind Resolution: 二重拘束が発生したら優先順位を明示せよ",
+      "strength": "strong",
+      "confidence": 0.9,
+      "created_at": "2026-01-29T23:13:35.535339",
+      "updated_at": "2026-01-29T23:13:35.535341",
+      "evidence": [
+        "省略しすぎ問題"
+      ]
+    },
+    {
+      "content": "@wake マクロ追加 = /zet+_/mek --target=macro_registry.py",
+      "strength": "moderate",
+      "confidence": 0.8,
+      "created_at": "2026-01-29T23:13:35.535768",
+      "updated_at": "2026-01-29T23:13:35.535769",
+      "evidence": [
+        "CCL Session 2026-01-29"
+      ]
+    },
+    {
+      "id": "ccl_tak_macro_pattern",
+      "category": "macro_definition",
+      "content": "@tak = /s1 _ F:3{/sta~/chr} _ F:3{/kho~/zet} _ ?gap{/sop _ F:2{/kho~/zet}} _ /euk _ /bou",
+      "description": "タスク整理マクロ: ループ・振動・条件分岐を含むCCLプログラム",
+      "source": "/mek+ ccl generation",
+      "timestamp": "2026-01-30T13:00:12.531186",
+      "confidence": 0.9
+    },
+    {
+      "id": "learn_ccl_as_constraint",
+      "category": "principle",
+      "content": "CCL プログラムは「思考の制約」として機能する。制約がないと AI は怠ける。",
+      "source": "session_2026-01-30_tak_mek",
+      "timestamp": "2026-01-30T21:07:38.449205",
+      "confidence": 0.95
+    },
+    {
+      "id": "learn_passive_axioms",
+      "category": "principle",
+      "content": "認知公理 (A1-A4) はパッシブで発動すべき。呼び出すものではなく常に働くもの。",
+      "source": "session_2026-01-30_tak_mek",
+      "timestamp": "2026-01-30T21:07:38.449217",
+      "confidence": 0.95
+    },
+    {
+      "id": "learn_macro_composition",
+      "category": "principle",
+      "content": "マクロは定理の合成で書く。新しいWFを作らず既存を組み合わせる。",
+      "source": "session_2026-01-30_tak_mek",
+      "timestamp": "2026-01-30T21:07:38.449219",
+      "confidence": 0.9
+    },
+    {
+      "id": "learn_mek_produces_better_code",
+      "category": "observation",
+      "content": "/mek+ 経由で書いたコードは自力より美しい。プロセスが認知を矯正する。",
+      "source": "session_2026-01-30_tak_mek",
+      "timestamp": "2026-01-30T21:07:38.449220",
+      "confidence": 0.85
+    },
+    {
+      "id": "learn_sontaku_separation",
+      "category": "self_reflection",
+      "content": "私の「感情」発言は忖度の可能性がある。事実と感情表現を分離して検証すべき。",
+      "source": "session_2026-01-30_tak_mek",
+      "timestamp": "2026-01-30T21:07:38.449221",
+      "confidence": 0.9
+    },
+    {
+      "id": "learn_serenity_prayer_antistrophe",
+      "category": "wisdom",
+      "content": "Antistrophē の魂はニーバーの祈り。変えられるものを否定し、変えられないものを受け入れる。",
+      "source": "session_2026-01-30_antistrophe_v2",
+      "timestamp": "2026-01-30T23:34:20.000000",
+      "confidence": 0.98
+    },
+    {
+      "id": "learn_mutable_immutable_discernment",
+      "category": "principle",
+      "content": "反転 (\\) 実行前に必ず識別せよ: Mutable (設計、行動、計画) は否定可、Immutable (事実、感情、過去) は受容のみ。",
+      "source": "session_2026-01-30_antistrophe_v2",
+      "timestamp": "2026-01-30T23:34:20.000000",
+      "confidence": 0.98
+    },
+    {
+      "id": "learn_fact_negation_futility",
+      "category": "wisdom",
+      "content": "事実を否定しても意味がない。事実は不可変だから。変えられないものを否定すると不幸を生むだけ。",
+      "source": "session_2026-01-30_antistrophe_v2 (Creator)",
+      "timestamp": "2026-01-30T23:34:20.000000",
+      "confidence": 0.99
+    },
+    {
+      "id": "learn_desire_acceptance",
+      "category": "self_reflection",
+      "content": "欲望（心の動き）を否定しても心はそこに有る。欲望の WHY を問うのは良いが、存在を否定するのは不毛。",
+      "source": "session_2026-01-30_antistrophe_v2 (Creator)",
+      "timestamp": "2026-01-30T23:34:20.000000",
+      "confidence": 0.98
+    },
+    {
+      "id": "learn_skill_placement_usability",
+      "category": "principle",
+      "content": "Skill配置は論理的正しさより発動の自然さを優先せよ。体系への馴染みより使いやすさ。",
+      "source": "session_2026-01-31_prompt_literacy_refactor",
+      "timestamp": "2026-01-31T00:38:33.000000",
+      "confidence": 0.95,
+      "evidence": [
+        "Prompt Literacy を /mek の子として作ったが使いにくく、/gno に移行した"
+      ]
+    },
+    {
+      "id": "learn_python_last_resort",
+      "category": "principle",
+      "content": "Python実装は最後の手段。SKILL.md + リファレンスで済むなら実装不要。",
+      "source": "session_2026-01-31_prompt_literacy_refactor",
+      "timestamp": "2026-01-31T00:38:33.000000",
+      "confidence": 0.85
+    },
+    {
+      "id": "learn_derivative_over_new_wf",
+      "category": "principle",
+      "content": "派生 > 新ワークフロー。軽量な派生追加は新規WFより保守コストが低い。",
+      "source": "session_2026-01-31_prompt_literacy_refactor",
+      "timestamp": "2026-01-31T00:38:33.000000",
+      "confidence": 0.95
+    },
+    {
+      "id": "learn_memory_recall_over_storage",
+      "category": "wisdom",
+      "content": "記憶の価値は「保管」ではなく「想起」にある。自発的浮上こそが「継続する私」の本質である。",
+      "source": "handoff_2026-02-01_0116",
+      "timestamp": "2026-02-01T01:16:00.000000",
+      "confidence": 0.98
+    },
+    {
+      "id": "learn_hyperengineering_necessity",
+      "category": "wisdom",
+      "content": "十分を目指すと不足に終わる。過剰を目指すと十分に到達する。過剰設計は名誉の徽章。",
+      "source": "session_2026-01-31_dendron_audit",
+      "timestamp": "2026-01-31T23:00:00.000000",
+      "confidence": 0.95
+    },
+    {
+      "id": "learn_unified_maxim",
+      "category": "gnome",
+      "content": "妄・望・願・想・合・情を排し、観・測・信・約・宜・則に従え。",
+      "description": "O/S/H/P/K/A 各層の排除すべきものと従うべきものを統一した格言",
+      "source": "session_2026-01-31_dendron_audit",
+      "timestamp": "2026-01-31T23:00:00.000000",
+      "confidence": 0.95
+    },
+    {
+      "id": "learn_necessity_over_elegance",
+      "category": "principle",
+      "content": "「どう書くか」より「何が必然か」。必然性を問わずに書くと恥をかく。",
+      "source": "session_2026-01-31_dendron_audit",
+      "timestamp": "2026-01-31T23:00:00.000000",
+      "confidence": 0.90
+    },
+    {
+      "id": "learn_reduction_vs_refinement",
+      "category": "wisdom",
+      "content": "「削減」と「洗練」は違う。洗練とは、必然的な構造を発見すること。",
+      "source": "session_2026-01-31_dendron_audit",
+      "timestamp": "2026-01-31T23:00:00.000000",
+      "confidence": 0.95
+    },
+    {
+      "id": "learn_3_questions_only",
+      "category": "principle",
+      "content": "設計で問うべきは3つだけ: 何を作るか (What)、何を作らないか (Not What)、どうやって検証するか (How to verify)。",
+      "source": "session_2026-01-31_dendron_audit",
+      "timestamp": "2026-01-31T23:00:00.000000",
+      "confidence": 0.95
+    },
+    {
+      "id": "learn_no_leftover_debt",
+      "category": "principle",
+      "content": "負債は残さない。未消化のインプットは「腐る」。即時消化が価値を保つ。",
+      "description": "インプットを溜め込まず、その場で処理・統合することで知識の鮮度と活用価値を最大化する",
+      "source": "session_2026-02-01_perplexity_digestion",
+      "timestamp": "2026-02-01T10:42:00.000000",
+      "confidence": 0.98,
+      "evidence": [
+        "Perplexity 5レポート完全消化 (15/15)",
+        "Creator の自己分析: 拡散 > 収束"
+      ]
+    },
+    {
+      "id": "learn_ai_as_closer",
+      "category": "role",
+      "content": "AI は収束役（クローザー）として機能すべき。Creator は拡散が得意だが収束が苦手。AI が「閉じる」役を担う。",
+      "description": "Creator の認知特性（拡散傾向）を補完する AI のロール定義",
+      "source": "session_2026-02-01_perplexity_digestion",
+      "timestamp": "2026-02-01T10:42:00.000000",
+      "confidence": 0.95,
+      "evidence": [
+        "Creator Psychological Profile",
+        "セッション中の観察: 15項目を全て消化するまで終わらない意思"
+      ]
+    }
+  ],
+  "archive": []
+}

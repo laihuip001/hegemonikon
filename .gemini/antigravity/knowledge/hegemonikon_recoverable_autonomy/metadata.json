@@ -1,0 +1,17 @@
+{
+    "title": "Hegemonikón Recoverable Autonomy",
+    "summary": "This Knowledge Item defines the Recoverable Autonomy paradigm, which prioritizes the ability to recover from failure over absolute autonomy. It includes specifications for the Risk Tag System, Graduated Supervision (Agent Supervisor Model), Graduated Enforcement (Zero-Trust), and the Auto-rollback mechanism.",
+    "dependencies": [
+        "hegemonikon_system"
+    ],
+    "references": [
+        {
+            "type": "conversation_id",
+            "value": "812dc2e4-2d5e-4cb7-8e01-1d3dc515755b"
+        },
+        {
+            "type": "conversation_id",
+            "value": "dfe77c41-cb9a-4cce-9d5f-33f7ccda8c43"
+        }
+    ]
+}

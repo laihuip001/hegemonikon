@@ -1,0 +1,45 @@
+{
+    "title": "Synergeia Distributed Execution & Autonomous AI Infrastructure",
+    "summary": "Synergeia 分散実行システム。2026-02-01 に Hermēneus CCL コンパイラを統合し、あらゆる CCL 式を構造化 LMQL へ変換・実行する能力を獲得。さらに Kernel/FEP ベースのスレッド選択器 (fep_selector) を導入し、CCL の認知的複雑度に応じた動的なリソース配分を実現。これにより、深い思考が必要なタスク (Antigravity) と、高速な検索・処理 (Perplexity/Claude) の自動的な使い分けが可能となった。",
+    "dependencies": [
+        "hegemonikon_system"
+    ],
+    "references": [
+        {
+            "type": "related_ki",
+            "value": "project_dendron"
+        },
+        {
+            "type": "conversation_id",
+            "value": "54aa8887-7627-471b-97d9-59652251c693"
+        },
+        {
+            "type": "conversation_id",
+            "value": "891aef16-e50a-4b10-9f94-38e050771424"
+        },
+        {
+            "type": "file",
+            "value": "/home/laihuip001/oikos/hegemonikon/synergeia/coordinator.py"
+        },
+        {
+            "type": "file",
+            "value": "/home/laihuip001/oikos/.gemini/antigravity/knowledge/synergeia_distributed_execution/artifacts/distribution/fep_thread_selection.md"
+        },
+        {
+            "type": "file",
+            "value": "/home/laihuip001/oikos/.gemini/antigravity/knowledge/synergeia_distributed_execution/artifacts/experiments/experiment_log_archive.md"
+        },
+        {
+            "type": "conversation_id",
+            "value": "e3ac1413-6744-42e8-9c76-8546e7e5a248"
+        },
+        {
+            "type": "conversation_id",
+            "value": "93e1f457-c2db-48aa-ad20-9fb5a45dc587"
+        },
+        {
+            "type": "file",
+            "value": "/home/laihuip001/oikos/.gemini/antigravity/knowledge/synergeia_distributed_execution/artifacts/testing/integration_tests.md"
+        }
+    ]
+}

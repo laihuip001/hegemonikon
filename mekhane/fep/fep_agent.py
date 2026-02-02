@@ -70,6 +70,8 @@ class HegemonikónFEPAgent:
         C: Optional[np.ndarray] = None,
         D: Optional[np.ndarray] = None,
         use_defaults: bool = True,
+        state_dim: Optional[int] = None,
+        obs_dims: Optional[Dict[str, int]] = None,
     ):
         """Initialize the FEP agent.
 
@@ -79,6 +81,8 @@ class HegemonikónFEPAgent:
             C: Preference vector over observations. Shape: (num_obs,)
             D: Initial state belief (prior). Shape: (num_states,)
             use_defaults: If True and matrices not provided, use default Hegemonikón matrices
+            state_dim: Optional override for state dimension
+            obs_dims: Optional override for observation dimensions
 
         Raises:
             ImportError: If pymdp is not available
@@ -86,8 +90,15 @@ class HegemonikónFEPAgent:
         if not PYMDP_AVAILABLE:
             raise ImportError("pymdp is not installed. Install with: pip install pymdp")
 
-        self.state_dim = get_state_dim()
-        self.obs_dims = {k: len(v) for k, v in OBSERVATION_MODALITIES.items()}
+        if state_dim is not None:
+            self.state_dim = state_dim
+        else:
+            self.state_dim = get_state_dim()
+
+        if obs_dims is not None:
+            self.obs_dims = obs_dims
+        else:
+            self.obs_dims = {k: len(v) for k, v in OBSERVATION_MODALITIES.items()}
 
         # Use provided matrices or generate defaults
         if use_defaults:
@@ -339,7 +350,19 @@ class HegemonikónFEPAgent:
 
         # Compute MAP state
         map_idx = int(np.argmax(beliefs_array))
-        map_names = index_to_state(map_idx)
+
+        # Handle state naming (only if using default Hegemonikón state space)
+        default_dim = get_state_dim()
+        if self.state_dim == default_dim:
+            map_names = index_to_state(map_idx)
+            state_names_dict = {
+                "phantasia": map_names[0],
+                "assent": map_names[1],
+                "horme": map_names[2],
+            }
+        else:
+            # Generic naming for custom state spaces
+            state_names_dict = {"state": f"state_{map_idx}"}
 
         # Compute entropy
         # Avoid log(0) by adding small epsilon
@@ -349,11 +372,7 @@ class HegemonikónFEPAgent:
         result = {
             "beliefs": beliefs_array,
             "map_state": map_idx,
-            "map_state_names": {
-                "phantasia": map_names[0],
-                "assent": map_names[1],
-                "horme": map_names[2],
-            },
+            "map_state_names": state_names_dict,
             "entropy": float(entropy),
         }
 

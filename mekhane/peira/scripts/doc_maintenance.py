@@ -47,7 +47,8 @@ def is_safe_path(target_path: Path, base_dir: Path) -> bool:
             target_path.relative_to(base_dir)
             return True
         except ValueError:
-            pass  # TODO: Add proper error handling
+            # Path is not relative; continue to next check
+            pass
 
     # 2. Resolved check
     t_res = target_path.resolve()
@@ -61,7 +62,8 @@ def is_safe_path(target_path: Path, base_dir: Path) -> bool:
             t_res.relative_to(b_res)
             return True
         except ValueError:
-            pass  # TODO: Add proper error handling
+            # Path is not relative; continue to next check
+            pass
 
     # 3. Case-insensitive string check (Windows specific fallback)
     t_str = str(t_res).lower().replace("\\", "/")

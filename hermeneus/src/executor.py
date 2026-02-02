@@ -320,15 +320,14 @@ class WorkflowExecutor:
         start = time.time()
         
         try:
-            from . import record_verification
+            from .audit import record_verification_async, AuditStore, AuditRecord
             
             consensus = verify_result.output if verify_result else None
             
             if consensus:
-                audit_id = record_verification(ccl, output, consensus)
+                audit_id = await record_verification_async(ccl, output, consensus)
             else:
                 # 検証なしの場合はダミー記録
-                from .audit import AuditStore, AuditRecord
                 store = AuditStore()
                 record = AuditRecord(
                     record_id="",
@@ -339,7 +338,7 @@ class WorkflowExecutor:
                     confidence=0.5,
                     dissent_reasons=[]
                 )
-                audit_id = store.record(record)
+                audit_id = await store.record_async(record)
             
             return PhaseResult(
                 phase=ExecutionPhase.AUDIT,

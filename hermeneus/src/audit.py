@@ -8,6 +8,7 @@ Hermēneus Audit — 検証履歴の記録と追跡
 Origin: 2026-01-31 CCL Execution Guarantee Architecture
 """
 
+import asyncio
 import json
 import sqlite3
 from datetime import datetime, timedelta
@@ -130,6 +131,10 @@ class AuditStore:
         
         return audit.record_id
     
+    async def record_async(self, audit: AuditRecord) -> str:
+        """監査レコードを非同期で記録"""
+        return await asyncio.to_thread(self.record, audit)
+
     def get(self, record_id: str) -> Optional[AuditRecord]:
         """レコードを取得"""
         with self._connect() as conn:
@@ -392,6 +397,22 @@ def record_verification(
     )
     
     return store.record(record)
+
+
+async def record_verification_async(
+    ccl: str,
+    execution_result: str,
+    consensus_result: Any,  # ConsensusResult from verifier
+    db_path: Optional[Path] = None
+) -> str:
+    """検証結果を非同期で記録 (便利関数)"""
+    return await asyncio.to_thread(
+        record_verification,
+        ccl,
+        execution_result,
+        consensus_result,
+        db_path
+    )
 
 
 def query_audits(

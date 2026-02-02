@@ -57,7 +57,7 @@ from .verifier import (
 )
 from .audit import (
     AuditRecord, AuditStats, AuditStore, AuditReporter,
-    record_verification, query_audits, get_audit_report
+    record_verification, record_verification_async, query_audits, get_audit_report
 )
 from .prover import (
     ProofType, ProofStatus, ProofResult,
@@ -129,7 +129,7 @@ __all__ = [
     "verify_execution", "verify_execution_async", "quick_verify",
     # Audit (Phase 4)
     "AuditRecord", "AuditStats", "AuditStore", "AuditReporter",
-    "record_verification", "query_audits", "get_audit_report",
+    "record_verification", "record_verification_async", "query_audits", "get_audit_report",
     # Prover (Phase 4b)
     "ProofType", "ProofStatus", "ProofResult",
     "ProverInterface", "MypyProver", "SchemaProver", "Lean4Prover",

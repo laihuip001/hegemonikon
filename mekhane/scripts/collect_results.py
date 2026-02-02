@@ -200,6 +200,12 @@ class JulesResultCollector:
         print(f"{'━' * 60}")
 
 
+def load_json_file(filepath: str) -> list[str]:
+    """Load JSON file safely."""
+    with open(filepath) as f:
+        return json.load(f)
+
+
 async def main():
     import argparse
 
@@ -245,8 +251,7 @@ async def main():
                 collector.print_summary(summary)
 
     elif args.report:
-        with open(args.report) as f:
-            session_ids = json.load(f)
+        session_ids = await asyncio.to_thread(load_json_file, args.report)
         report = await collector.generate_report(session_ids)
         if args.json:
             print(json.dumps(report, indent=2, ensure_ascii=False))

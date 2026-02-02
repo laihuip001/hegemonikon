@@ -14,13 +14,13 @@
 projects:
   dendron:
     name: "Dendron"
-    description: "存在証明検証ツール"
+    description: "存在証明検証ツール (L0-L3 × 4 Meta Layer マトリクス)"
     path: "mekhane/dendron/"
-    status: "mvp_complete"
-    phase: "CI統合"
+    status: "active"
+    phase: "Phase 1: 表層 L2/L3"
     priority: high
-    updated: "2026-02-01"
-    next_action: "git push でリモート反映"
+    updated: "2026-02-03"
+    next_action: "L2 関数 docstring PROOF 実装"
 
   hermeneus:
     name: "Hermēneus"
@@ -41,6 +41,16 @@ projects:
     priority: medium
     updated: "2026-02-01"
     next_action: "Poiēsis/Dokimasia 実装"
+
+  synedrion:
+    name: "Synedrion"
+    description: "AI監査・偉人評議会"
+    path: "mekhane/synedrion/"
+    status: "active"
+    phase: "MVP実装中"
+    priority: medium
+    updated: "2026-02-01"
+    next_action: "ai_auditor.py 統合テスト"
 
   pythosis:
     name: "Pythōsis"

@@ -306,12 +306,12 @@ success_criteria:
 
 ## Artifact 自動保存
 
-> **標準参照**: [workflow_artifact_standard.md](file:///home/laihuip001/oikos/.agent/standards/workflow_artifact_standard.md)
+> **標準参照**: [workflow_artifact_standard.md](file:///home/makaron8426/oikos/.agent/standards/workflow_artifact_standard.md)
 
 ### 保存先
 
 ```
-/home/laihuip001/oikos/mneme/.hegemonikon/workflows/eat_<素材名>_<date>.md
+/home/makaron8426/oikos/mneme/.hegemonikon/workflows/eat_<素材名>_<date>.md
 ```
 
 例: `eat_ai_zen_techniques_20260129.md`

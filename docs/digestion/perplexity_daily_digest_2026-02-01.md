@@ -2,7 +2,7 @@
 
 > **消化日**: 2026-02-01 10:37 JST
 > **対象期間**: 2026-01-30 ～ 2026-02-01
-> **Sources**: `/home/laihuip001/ダウンロード/新しいフォルダ/` (5件)
+> **Sources**: `/home/makaron8426/ダウンロード/新しいフォルダ/` (5件)
 > **Origin**: /bou+*^/u+ → Option C (Digest + 即時適用)
 > **Status**: ✅ **完全消化完了** (15/15 アクションアイテム)
 
@@ -43,7 +43,7 @@
 
 | アクション | 成果物 |
 |:-----------|:-------|
-| MCP Apps UI | [mcp/extensions.md](file:///home/laihuip001/oikos/hegemonikon/mekhane/mcp/extensions_2026-02-01.md) |
+| MCP Apps UI | [mcp/extensions.md](file:///home/makaron8426/oikos/hegemonikon/mekhane/mcp/extensions_2026-02-01.md) |
 | OpenCV MCP | 同上 |
 | Plotting MCP | 同上 |
 | MATLAB MCP | 同上 |
@@ -53,7 +53,7 @@
 | アクション | 成果物 |
 |:-----------|:-------|
 | Gemini 2.5 Flash 廃止確認 | 不使用確認 ✅ |
-| Gemini 2.0 Flash 移行計画 | [deprecation alert](file:///home/laihuip001/oikos/hegemonikon/docs/alerts/llm_api_deprecation_2026-02-01.md) |
+| Gemini 2.0 Flash 移行計画 | [deprecation alert](file:///home/makaron8426/oikos/hegemonikon/docs/alerts/llm_api_deprecation_2026-02-01.md) |
 
 ### Task 4: プロンプト技法 最前線 (4/4)
 
@@ -79,7 +79,7 @@
 
 ## 📌 n8n 自動化設計
 
-**詳細**: [perplexity_n8n_automation_design.md](file:///home/laihuip001/oikos/hegemonikon/docs/digestion/perplexity_n8n_automation_design.md)
+**詳細**: [perplexity_n8n_automation_design.md](file:///home/makaron8426/oikos/hegemonikon/docs/digestion/perplexity_n8n_automation_design.md)
 
 **リサーチ実行時刻**: 04:00 JST (毎日)
 

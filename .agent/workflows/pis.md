@@ -37,7 +37,7 @@ ccl_signature: "/pis+?h2"
 
 # /pis: 確信度評価ワークフロー (Pistis) v2.1
 
-> **正本参照**: [H2 Pistis SKILL.md](file:///home/laihuip001/oikos/.agent/skills/horme/h2-pistis/SKILL.md)
+> **正本参照**: [H2 Pistis SKILL.md](file:///home/makaron8426/oikos/.agent/skills/horme/h2-pistis/SKILL.md)
 > **目的**: 「どのくらい確かか」を評価する — 確信度と信頼性
 > **役割**: Certain (C) vs Uncertain (U) の判断
 
@@ -396,12 +396,12 @@ ccl_signature: "/pis+?h2"
 
 ## Artifact 自動保存
 
-> **標準参照**: [workflow_artifact_standard.md](file:///home/laihuip001/oikos/.agent/standards/workflow_artifact_standard.md)
+> **標準参照**: [workflow_artifact_standard.md](file:///home/makaron8426/oikos/.agent/standards/workflow_artifact_standard.md)
 
 ### 保存先
 
 ```
-/home/laihuip001/oikos/mneme/.hegemonikon/workflows/pis_<topic>_<date>.md
+/home/makaron8426/oikos/mneme/.hegemonikon/workflows/pis_<topic>_<date>.md
 ```
 
 例: `pis_確信度評価_20260129.md`
@@ -427,7 +427,7 @@ ccl_signature: "/pis+?h2"
 
 | Module | Workflow | Skill (正本) | Status |
 |:-------|:---------|:-------------|:-------|
-| H2 Pistis | /pis | [SKILL.md](file:///home/laihuip001/oikos/.agent/skills/horme/h2-pistis/SKILL.md) | v1.0 Ready |
+| H2 Pistis | /pis | [SKILL.md](file:///home/makaron8426/oikos/.agent/skills/horme/h2-pistis/SKILL.md) | v1.0 Ready |
 
 ---
 

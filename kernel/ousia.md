@@ -111,7 +111,7 @@ O-series 実現:
 | **発動条件** | `/noe` / 根本的行き詰まり / パラダイム転換 |
 | **入力** | 問い Q |
 | **出力** | 構造化知見（JSON形式、信頼度付き） |
-| **Micro 実現** | [/noe](file:///home/laihuip001/oikos/.agent/workflows/noe.md) — 5フェーズ思考 |
+| **Micro 実現** | [/noe](file:///home/makaron8426/oikos/.agent/workflows/noe.md) — 5フェーズ思考 |
 | **Macro 実現** | (将来) mekhane/noesis/ — 知見蓄積・パターン学習 |
 | **使用モジュール** | T3 (自問), T4 (判断), T7 (検証) |
 
@@ -122,7 +122,7 @@ O-series 実現:
 | **発動条件** | `/bou` / 作業一段落 / 方向性の迷い |
 | **入力** | 領域（任意） |
 | **出力** | 優先順位付き目標リスト + 次のアクション |
-| **Micro 実現** | [/bou](file:///home/laihuip001/oikos/.agent/workflows/bou.md) — 6フェーズ意志明確化 |
+| **Micro 実現** | [/bou](file:///home/makaron8426/oikos/.agent/workflows/bou.md) — 6フェーズ意志明確化 |
 | **Macro 実現** | (将来) mekhane/boulesis/ — 目標履歴・価値関数更新 |
 | **使用モジュール** | — (純粋思考) |
 
@@ -133,7 +133,7 @@ O-series 実現:
 | **発動条件** | `/zet` / 不確実性検出 (U > 0.6) |
 | **入力** | 調査テーマ |
 | **出力** | 調査依頼書（深掘り版） |
-| **Micro 実現** | [/zet](file:///home/laihuip001/oikos/.agent/workflows/zet.md) — 調査依頼書生成 |
+| **Micro 実現** | [/zet](file:///home/makaron8426/oikos/.agent/workflows/zet.md) — 調査依頼書生成 |
 | **Macro 実現** | mekhane/anamnesis/collectors/ — 外部情報収集 |
 | **使用モジュール** | T5 (探索) |
 
@@ -144,7 +144,7 @@ O-series 実現:
 | **発動条件** | `/ene` / `y` (計画承認) / /bou 完了後 |
 | **入力** | 承認済み計画 or 明確な意志 |
 | **出力** | 成果物 + 検証結果 + コミット提案 |
-| **Micro 実現** | [/ene](file:///home/laihuip001/oikos/.agent/workflows/ene.md) — 6フェーズ実行 |
+| **Micro 実現** | [/ene](file:///home/makaron8426/oikos/.agent/workflows/ene.md) — 6フェーズ実行 |
 | **Macro 実現** | mekhane/ergasterion/ — ファクトリ・プロトコル |
 | **使用モジュール** | T6 (実行), T2 (判断) |
 

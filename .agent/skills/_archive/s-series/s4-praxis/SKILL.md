@@ -149,7 +149,7 @@ version: "2.1.0"
 
 | 層 | 実現手段 | 参照 |
 |----|----------|------|
-| **Micro** | /ene workflow | [ene.md](file:///home/laihuip001/oikos/.agent/workflows/ene.md) |
+| **Micro** | /ene workflow | [ene.md](file:///home/makaron8426/oikos/.agent/workflows/ene.md) |
 | **Macro** | mekhane/ergasterion/ | ファクトリ・プロトコル |
 
 S4 Praxis は O4 Energeia の様態化であり、/ene を通じて実現される。
@@ -204,5 +204,5 @@ S4 Praxis は O4 Energeia の様態化であり、/ene を通じて実現され�
 
 ---
 
-*参照: [schema.md](file:///home/laihuip001/oikos/hegemonikon/kernel/schema.md)*  
+*参照: [schema.md](file:///home/makaron8426/oikos/hegemonikon/kernel/schema.md)*  
 *バージョン: 2.1.0 (2026-01-27)*

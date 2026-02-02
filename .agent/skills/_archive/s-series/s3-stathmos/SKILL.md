@@ -188,5 +188,5 @@ version: "2.1.0"
 
 ---
 
-*参照: [schema.md](file:///home/laihuip001/oikos/hegemonikon/kernel/schema.md)*  
+*参照: [schema.md](file:///home/makaron8426/oikos/hegemonikon/kernel/schema.md)*  
 *バージョン: 2.1.0 (2026-01-27)*

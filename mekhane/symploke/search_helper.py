@@ -18,8 +18,8 @@ sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 from mekhane.symploke.adapters.embedding_adapter import EmbeddingAdapter
 
-SOPHIA_INDEX_PATH = Path("/home/laihuip001/oikos/mneme/.hegemonikon/indices/sophia.pkl")
-KAIROS_INDEX_PATH = Path("/home/laihuip001/oikos/mneme/.hegemonikon/indices/kairos.pkl")
+SOPHIA_INDEX_PATH = Path("/home/makaron8426/oikos/mneme/.hegemonikon/indices/sophia.pkl")
+KAIROS_INDEX_PATH = Path("/home/makaron8426/oikos/mneme/.hegemonikon/indices/kairos.pkl")
 
 
 def load_adapter(path: Path) -> EmbeddingAdapter:

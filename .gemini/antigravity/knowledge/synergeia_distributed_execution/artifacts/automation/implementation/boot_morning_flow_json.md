@@ -25,7 +25,7 @@ The following JSON can be imported directly into n8n to setup the Boot Morning N
     },
     {
       "parameters": {
-        "command": "cd /home/laihuip001/oikos/hegemonikon && git log -1 --oneline"
+        "command": "cd /home/makaron8426/oikos/hegemonikon && git log -1 --oneline"
       },
       "id": "git-status",
       "name": "Git Latest Commit",
@@ -35,7 +35,7 @@ The following JSON can be imported directly into n8n to setup the Boot Morning N
     },
     {
       "parameters": {
-        "command": "ls -t /home/laihuip001/oikos/mneme/.hegemonikon/sessions/ | head -1"
+        "command": "ls -t /home/makaron8426/oikos/mneme/.hegemonikon/sessions/ | head -1"
       },
       "id": "handoff-latest",
       "name": "Latest Handoff",

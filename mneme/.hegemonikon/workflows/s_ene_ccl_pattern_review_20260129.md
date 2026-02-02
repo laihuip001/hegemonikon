@@ -130,7 +130,7 @@
 
 **⚠️ 頻出誤解**:
 - `*^` は「`*` と `^` の独立」ではなく「融合のメタ表示」
-- 詳細: [operators_and_layers.md Section 5](file:///home/laihuip001/oikos/.gemini/antigravity/knowledge/cognitive_algebra_system/artifacts/architecture/operators_and_layers.md#L168)
+- 詳細: [operators_and_layers.md Section 5](file:///home/makaron8426/oikos/.gemini/antigravity/knowledge/cognitive_algebra_system/artifacts/architecture/operators_and_layers.md#L168)
 ```
 
 ---
@@ -164,7 +164,7 @@
 
 ### 変更箇所
 
-**ファイル**: `/home/laihuip001/oikos/.agent/workflows/boot.md`
+**ファイル**: `/home/makaron8426/oikos/.agent/workflows/boot.md`
 **位置**: Phase 4 (システム更新) の 10.5 の後
 **行番号**: 約 370-400 行の間
 

@@ -41,7 +41,7 @@ ccl_signature: "/met+"
 
 # /met: スケール配置ワークフロー (Metron)
 
-> **正本参照**: [S1 Metron SKILL.md](file:///home/laihuip001/oikos/.agent/skills/schema/s1-metron/SKILL.md)
+> **正本参照**: [S1 Metron SKILL.md](file:///home/makaron8426/oikos/.agent/skills/schema/s1-metron/SKILL.md)
 > **目的**: 「どのスケールで」を決定する — 粒度と視点の選択
 > **役割**: マイクロ vs マクロの判断
 
@@ -115,7 +115,7 @@ ccl_signature: "/met+"
 > **CCL**: `/met.toc` = `/met_/x.toc`
 > **目的**: ボトルネックを特定し全体最適を図る
 > **Scale**: 🌍 Macro
-> **参照**: [forge-techniques.md](file:///home/laihuip001/oikos/hegemonikon/mekhane/ergasterion/tekhne/references/forge-techniques.md)
+> **参照**: [forge-techniques.md](file:///home/makaron8426/oikos/hegemonikon/mekhane/ergasterion/tekhne/references/forge-techniques.md)
 
 **発動**: `/met toc` または「ボトルネック」「制約」「全体最適」
 
@@ -675,12 +675,12 @@ ccl_signature: "/met+"
 
 ## Artifact 自動保存
 
-> **標準参照**: [workflow_artifact_standard.md](file:///home/laihuip001/oikos/.agent/standards/workflow_artifact_standard.md)
+> **標準参照**: [workflow_artifact_standard.md](file:///home/makaron8426/oikos/.agent/standards/workflow_artifact_standard.md)
 
 ### 保存先
 
 ```
-/home/laihuip001/oikos/mneme/.hegemonikon/workflows/met_<topic>_<date>.md
+/home/makaron8426/oikos/mneme/.hegemonikon/workflows/met_<topic>_<date>.md
 ```
 
 例: `met_スケール分析_20260129.md`
@@ -706,7 +706,7 @@ ccl_signature: "/met+"
 
 | Module | Workflow | Skill (正本) | Status |
 |:-------|:---------|:-------------|:-------|
-| S1 Metron | /met | [SKILL.md](file:///home/laihuip001/oikos/.agent/skills/schema/s1-metron/SKILL.md) | v1.0 Ready |
+| S1 Metron | /met | [SKILL.md](file:///home/makaron8426/oikos/.agent/skills/schema/s1-metron/SKILL.md) | v1.0 Ready |
 
 ---
 

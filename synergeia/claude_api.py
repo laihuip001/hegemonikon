@@ -48,7 +48,7 @@ def get_api_key() -> str:
         for path in [
             Path(__file__).parent / ".env.local",
             Path.home() / ".anthropic" / ".env.local",
-            Path("/home/laihuip001/oikos/.claude") / ".env.local",
+            Path("/home/makaron8426/oikos/.claude") / ".env.local",
         ]:
             if path.exists():
                 content = path.read_text().strip()

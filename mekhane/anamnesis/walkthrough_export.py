@@ -16,7 +16,7 @@ from datetime import datetime
 from pathlib import Path
 
 # 設定
-OIKOS_ROOT = Path("/home/laihuip001/oikos")
+OIKOS_ROOT = Path("/home/makaron8426/oikos")
 BRAIN_DIR = OIKOS_ROOT / ".gemini/antigravity/brain"
 MNEME_DIR = OIKOS_ROOT / "mneme/.hegemonikon/sessions"
 

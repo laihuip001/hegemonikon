@@ -12,7 +12,7 @@ As of 2026-02-01, a two-tiered reliability system ensures 100% session capture.
 
 An autonomous shell script runs at the system level via Cron.
 
-- **Location**: `/home/laihuip001/oikos/hegemonikon/mekhane/anamnesis/auto_export.sh`
+- **Location**: `/home/makaron8426/oikos/hegemonikon/mekhane/anamnesis/auto_export.sh`
 - **Schedule**: `0 * * * *` (Hourly)
 - **Logic**:
     1. Checks for an active Antigravity session via the CDP port (9222).

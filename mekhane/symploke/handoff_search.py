@@ -29,11 +29,11 @@ from mekhane.symploke.indices import Document
 
 # Handoff インデックスの永続化パス
 HANDOFF_INDEX_PATH = Path(
-    "/home/laihuip001/oikos/mneme/.hegemonikon/indices/handoffs.pkl"
+    "/home/makaron8426/oikos/mneme/.hegemonikon/indices/handoffs.pkl"
 )
 # 会話ログインデックスの永続化パス (Kairos と共有)
 CONVERSATION_INDEX_PATH = Path(
-    "/home/laihuip001/oikos/mneme/.hegemonikon/indices/kairos.pkl"
+    "/home/makaron8426/oikos/mneme/.hegemonikon/indices/kairos.pkl"
 )
 
 

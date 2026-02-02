@@ -24,7 +24,7 @@
 ### 検索対象
 
 ```
-/home/laihuip001/oikos/hegemonikon/
+/home/makaron8426/oikos/hegemonikon/
 ├── mekhane/anamnesis/    → BGE-small ONNX
 ├── mekhane/symploke/     → all-MiniLM-L6-v2
 ├── mekhane/peira/        → BGE-small ONNX

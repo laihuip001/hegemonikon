@@ -74,9 +74,9 @@ SEL変換:  "Execute /boot. MUST execute ALL steps, skip NOTHING." → 85-90% �
 
 ## 📎 参照
 
-- [Perplexity 調査結果](file:///home/laihuip001/oikos/hegemonikon/docs/digestion/sop_operator_enforcement_20260201.md)
-- [operators.md v6.50](file:///home/laihuip001/oikos/hegemonikon/ccl/operators.md)
-- [boot.md v3.9](file:///home/laihuip001/oikos/.agent/workflows/boot.md)
+- [Perplexity 調査結果](file:///home/makaron8426/oikos/hegemonikon/docs/digestion/sop_operator_enforcement_20260201.md)
+- [operators.md v6.50](file:///home/makaron8426/oikos/hegemonikon/ccl/operators.md)
+- [boot.md v3.9](file:///home/makaron8426/oikos/.agent/workflows/boot.md)
 
 ---
 

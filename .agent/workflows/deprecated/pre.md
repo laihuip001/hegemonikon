@@ -18,7 +18,7 @@ anti_skip: enabled
 
 # /pre: Premortem ワークフロー
 
-> **親定理**: [O2 Boulēsis /bou](file:///home/laihuip001/oikos/.agent/workflows/bou.md)
+> **親定理**: [O2 Boulēsis /bou](file:///home/makaron8426/oikos/.agent/workflows/bou.md)
 > **目的**: 失敗を事前に想定し、目標の堅牢性を検証する
 > **SE手法**: Premortem (McKinsey prospective hindsight)
 

@@ -49,6 +49,14 @@ class PatternCache:
         r"(往復|対話|交互|行き来)": "~",
     }
 
+    # Pre-compiled patterns for performance
+    _COMPILED_KEYWORD_MAP = {re.compile(k): v for k, v in KEYWORD_MAP.items()}
+    _COMPILED_MODIFIER_MAP = {re.compile(k): v for k, v in MODIFIER_MAP.items()}
+    _COMPILED_STRUCTURE_MAP = {re.compile(k): v for k, v in STRUCTURE_MAP.items()}
+
+    _LOOP_PATTERN = re.compile(r"(\d+)回")
+    _LOOP_SUB_PATTERN = re.compile(r"\d+回(繰り返す|ループ)?")
+
     def generate(self, intent: str) -> Optional[str]:
         """
         Generate CCL from intent using heuristics.
@@ -62,10 +70,10 @@ class PatternCache:
         intent_lower = intent.lower()
 
         # Check for loop pattern
-        loop_match = re.search(r"(\d+)回", intent)
+        loop_match = self._LOOP_PATTERN.search(intent)
         if loop_match:
             count = loop_match.group(1)
-            inner_intent = re.sub(r"\d+回(繰り返す|ループ)?", "", intent).strip()
+            inner_intent = self._LOOP_SUB_PATTERN.sub("", intent).strip()
             inner_ccl = self._generate_inner(inner_intent)
             if inner_ccl:
                 return f"F:×{count}{{ {inner_ccl} }}"
@@ -78,14 +86,14 @@ class PatternCache:
         modifiers = []
 
         # Find workflows
-        for pattern, workflow in self.KEYWORD_MAP.items():
-            if re.search(pattern, intent):
+        for pattern, workflow in self._COMPILED_KEYWORD_MAP.items():
+            if pattern.search(intent):
                 if workflow not in workflows:
                     workflows.append(workflow)
 
         # Find modifiers
-        for pattern, modifier in self.MODIFIER_MAP.items():
-            if re.search(pattern, intent):
+        for pattern, modifier in self._COMPILED_MODIFIER_MAP.items():
+            if pattern.search(intent):
                 modifiers.append(modifier)
 
         # No workflows found
@@ -97,8 +105,8 @@ class PatternCache:
 
         # Determine structure
         structure = "_"  # Default to sequence
-        for pattern, struct in self.STRUCTURE_MAP.items():
-            if re.search(pattern, intent):
+        for pattern, struct in self._COMPILED_STRUCTURE_MAP.items():
+            if pattern.search(intent):
                 structure = struct
                 break
 

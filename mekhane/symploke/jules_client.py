@@ -312,41 +312,42 @@ class JulesClient:
 
         # Create session if not in context manager
         session = self._shared_session or self._owned_session
-        close_after = False
         if session is None:
-            session = aiohttp.ClientSession()
-            close_after = True
+            # Lazy initialization of owned session (performance fix)
+            connector = aiohttp.TCPConnector(
+                limit=self.MAX_CONCURRENT,  # Max concurrent connections
+                keepalive_timeout=30,  # Keep connections alive for reuse
+                enable_cleanup_closed=True,  # Clean up closed connections
+            )
+            self._owned_session = aiohttp.ClientSession(connector=connector)
+            session = self._owned_session
 
-        try:
-            # Prepare headers with optional trace context
-            request_headers = dict(self._headers)
-            if OTEL_AVAILABLE:
-                # Inject W3C trace context into headers
-                inject(request_headers)
+        # Prepare headers with optional trace context
+        request_headers = dict(self._headers)
+        if OTEL_AVAILABLE:
+            # Inject W3C trace context into headers
+            inject(request_headers)
 
-            async with session.request(
-                method,
-                url,
-                headers=request_headers,
-                # NOTE: Removed self-assignment: json = json
-            ) as resp:
-                if resp.status == 429:
-                    retry_after = resp.headers.get("Retry-After")
-                    raise RateLimitError(
-                        f"Rate limit exceeded for {endpoint}",
-                        retry_after=int(retry_after) if retry_after else None,
-                    )
+        async with session.request(
+            method,
+            url,
+            headers=request_headers,
+            json=json,
+        ) as resp:
+            if resp.status == 429:
+                retry_after = resp.headers.get("Retry-After")
+                raise RateLimitError(
+                    f"Rate limit exceeded for {endpoint}",
+                    retry_after=int(retry_after) if retry_after else None,
+                )
 
-                # Include response body in error for debugging
-                if not resp.ok:
-                    body = await resp.text()
-                    logger.error(f"API error {resp.status}: {body[:200]}")
+            # Include response body in error for debugging
+            if not resp.ok:
+                body = await resp.text()
+                logger.error(f"API error {resp.status}: {body[:200]}")
 
-                resp.raise_for_status()
-                return await resp.json()
-        finally:
-            if close_after:
-                await session.close()
+            resp.raise_for_status()
+            return await resp.json()
 
     @with_retry(
         max_attempts=3, retryable_exceptions=(RateLimitError, aiohttp.ClientError)
@@ -389,7 +390,7 @@ class JulesClient:
             name=data["name"],
             state=parse_state(data.get("state", "PLANNING")),
             prompt=prompt,
-            # NOTE: Removed self-assignment: source = source
+            source=source,
         )
 
     @with_retry(

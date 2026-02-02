@@ -11,6 +11,11 @@ CDP_PORT = 9222
 OUTPUT_FILE = Path(r"M:\Hegemonikon\mekhane\anamnesis\all_pages.txt")
 
 
+def save_to_file(filepath: Path, lines: list[str]):
+    with open(filepath, "w", encoding="utf-8") as f:
+        f.write("\n".join(lines))
+
+
 async def main():
     from playwright.async_api import async_playwright
 
@@ -65,8 +70,7 @@ async def main():
                         except Exception:
                             pass  # TODO: Add proper error handling
 
-        with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
-            f.write("\n".join(lines))
+        await asyncio.to_thread(save_to_file, OUTPUT_FILE, lines)
 
         print(f"[✓] Saved to: {OUTPUT_FILE}")
         await browser.close()

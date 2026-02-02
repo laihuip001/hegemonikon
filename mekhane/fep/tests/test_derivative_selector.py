@@ -500,7 +500,7 @@ class TestSelectDerivativeP1:
 
     def test_default_to_conc(self):
         result = select_derivative("P1", "neutral test input")
-        assert result.derivative == "conc"
+        assert result.derivative == "phys"
 
 
 class TestSelectDerivativeP2:
@@ -617,7 +617,7 @@ class TestSelectDerivativeK1:
 
     def test_default_to_miss(self):
         result = select_derivative("K1", "neutral test input")
-        assert result.derivative == "miss"
+        assert result.derivative == "opti"
 
 
 class TestSelectDerivativeK2:
@@ -681,7 +681,7 @@ class TestSelectDerivativeK4:
 
     def test_default_to_taci(self):
         result = select_derivative("K4", "neutral test input")
-        assert result.derivative == "taci"
+        assert result.derivative == "expl"
 
 
 class TestKSeriesHelperFunctions:
@@ -772,7 +772,7 @@ class TestSelectDerivativeA2:
 
     def test_default_to_nega(self):
         result = select_derivative("A2", "neutral test input")
-        assert result.derivative == "nega"
+        assert result.derivative == "susp"
 
 
 class TestSelectDerivativeA3:

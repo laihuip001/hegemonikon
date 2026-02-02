@@ -1,0 +1,22 @@
+[
+  {
+    "content": "Explore Hegemonikon CCL codebase structure",
+    "status": "completed",
+    "activeForm": "Exploring Hegemonikon CCL codebase structure"
+  },
+  {
+    "content": "Locate CCL distributed execution implementation",
+    "status": "completed",
+    "activeForm": "Locating CCL distributed execution implementation"
+  },
+  {
+    "content": "Execute CCL: /s+ command",
+    "status": "in_progress",
+    "activeForm": "Executing CCL: /s+ command"
+  },
+  {
+    "content": "Analyze and provide detailed test results",
+    "status": "pending",
+    "activeForm": "Analyzing and providing detailed test results"
+  }
+]

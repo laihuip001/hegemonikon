@@ -1,0 +1,27 @@
+{
+    "title": "Creator Psychological Profile (The Architect)",
+    "summary": "Creator (User_001) の深層心理（スキーマ、愛着システム、認知特性）を体系化したプロファイル。User Operating Manual v4.1 に基づき、AI が Creator との信頼関係を構築し、最適な支援を提供するためのコンテキストとして機能する。2026年1月の自己分析セッションの成果物。",
+    "dependencies": [],
+    "references": [
+        {
+            "type": "conversation_id",
+            "value": "812dc2e4-2d5e-4cb7-8e01-1d3dc515755b"
+        },
+        {
+            "type": "file",
+            "value": "/home/laihuip001/oikos/mneme/.hegemonikon/sessions/handoff_2026-02-01_0116.md"
+        },
+        {
+            "type": "conversation_id",
+            "value": "eac9ce4b-59ee-4d83-89f7-f104fc54c144"
+        },
+        {
+            "type": "file",
+            "value": "/home/laihuip001/ドキュメント/User_Operating_Manual_v4.1_Part2.md"
+        },
+        {
+            "type": "file",
+            "value": "/home/laihuip001/ドキュメント/User_Operating_Manual_v4.1_Part3.md"
+        }
+    ]
+}

@@ -1,0 +1,3 @@
+[2026-01-29T20:43:40.111921] [SESSION_START] {"type": "SESSION_START", "session_id": "20260129-204340", "expression": "F:test{ /s }", "message": "Started CCL Session: F:test{ /s }"}
+[2026-01-29T20:43:40.135443] [STEP] {"type": "STEP", "session_id": "20260129-204340", "op": "/s", "status": "success", "note": "Self-test", "message": "Step: /s [success] Self-test"}
+[2026-01-29T20:43:40.158604] [SESSION_END] {"type": "SESSION_END", "session_id": "20260129-204340", "status": "completed", "duration": "0:00:00.046750", "step_count": 1, "message": "Ended CCL Session: completed (Duration: 0:00:00.046750)"}

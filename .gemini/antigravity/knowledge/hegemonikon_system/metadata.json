@@ -1,0 +1,35 @@
+{
+  "title": "Hegemonikón Integrated System (v7.6)",
+  "summary": "Hegemonikón マスターアーキテクチャ v7.6。2026-02-01 に「B1: Theorem Inheritance (extends)」導入により推論の演繹的復元を可能にし、自由エネルギー原理 (FEP) からリポジトリ構造（kernel/, mekhane/, docs/ 等）を必然的構成要素として導出した。新たに「Recoverability over Autonomy」の原則を強化し、公理に基づく定理導出チェーンを明示化している。",
+  "dependencies": [],
+  "references": [
+    {
+      "type": "conversation_id",
+      "value": "7aa14e34-387b-4077-96d7-339ddcb4a381"
+    },
+    {
+      "type": "conversation_id",
+      "value": "4a02c389-c499-47af-9c66-3f02c9127120"
+    },
+    {
+      "type": "conversation_id",
+      "value": "891aef16-e50a-4b10-9f94-38e050771424"
+    },
+    {
+      "type": "conversation_id",
+      "value": "54aa8887-7627-471b-97d9-59652251c693"
+    },
+    {
+      "type": "conversation_id",
+      "value": "e3ac1413-6744-42e8-9c76-8546e7e5a248"
+    },
+    {
+      "type": "file",
+      "value": "/home/laihuip001/oikos/.gemini/antigravity/knowledge/hegemonikon_system/artifacts/architecture/fep_repository_deduction.md"
+    },
+    {
+      "type": "file",
+      "value": "/home/laihuip001/oikos/.gemini/antigravity/knowledge/hegemonikon_system/artifacts/architecture/synedrion_theorem_alignment.md"
+    }
+  ]
+}

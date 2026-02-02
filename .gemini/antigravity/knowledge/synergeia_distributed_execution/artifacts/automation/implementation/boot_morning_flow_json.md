@@ -1,0 +1,104 @@
+# n8n Boot Morning Flow JSON (Artifact)
+
+The following JSON can be imported directly into n8n to setup the Boot Morning Notification flow.
+
+```json
+{
+  "name": "Hegemonikón Boot Morning Notification",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 8 * * *"
+            }
+          ]
+        }
+      },
+      "id": "cron-trigger",
+      "name": "Every Morning 08:00",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "command": "cd /home/laihuip001/oikos/hegemonikon && git log -1 --oneline"
+      },
+      "id": "git-status",
+      "name": "Git Latest Commit",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "command": "ls -t /home/laihuip001/oikos/mneme/.hegemonikon/sessions/ | head -1"
+      },
+      "id": "handoff-latest",
+      "name": "Latest Handoff",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [650, 300]
+    },
+    {
+      "parameters": {
+        "channel": "#hegemonikon",
+        "text": "=🌅 おはようございます！\\n\\n📋 **Git**: {{ $node[\"Git Latest Commit\"].data.stdout }}\\n📄 **Handoff**: {{ $node[\"Latest Handoff\"].data.stdout }}\\n\\n→ `/boot` を推奨します",
+        "otherOptions": {}
+      },
+      "id": "slack-notify",
+      "name": "Slack Notification",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.1,
+      "position": [850, 300],
+      "credentials": {
+        "slackApi": {
+          "id": "SLACK_CREDENTIAL_ID",
+          "name": "Slack Account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Every Morning 08:00": {
+      "main": [
+        [
+          {
+            "node": "Git Latest Commit",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Git Latest Commit": {
+      "main": [
+        [
+          {
+            "node": "Latest Handoff",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Latest Handoff": {
+      "main": [
+        [
+          {
+            "node": "Slack Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}
+```
+
+---
+*n8n Automation Strategy | Project Hegemonikón*

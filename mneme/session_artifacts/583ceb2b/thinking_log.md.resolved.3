@@ -1,0 +1,103 @@
+# /think + /p: runtime 残存要素の処遇
+
+> **問い**: `runtime/antigravity/` (残存) と `runtime/Forge/` (削除済) の本質は？
+> **日時**: 2026-01-21T22:11
+> **プロトコル**: P3 Zētēsis (探求) + M3 Theōria (因果)
+
+---
+
+## P3 Zētēsis: 純粋な問い
+
+```
+┌─[Hegemonikón]──────────────────────┐
+│ P3 Zētēsis: 純粋推論完了           │
+│ Q: 「それは制御すべき対象か？」    │
+│ A: 「ForgeはYes、antigravityはNo」 │
+└────────────────────────────────────┘
+```
+
+### 対象の性質
+
+| 対象 | 性質 | 主権者 | 結論 |
+|------|------|--------|------|
+| **6. runtime/antigravity/** | Output / Cache | Antigravity (App) | **不可侵領域**（手出し無用） |
+| **7. runtime/Forge/** | Configuration | Hegemonikon (User) | **統合領域**（一元管理すべき） |
+
+---
+
+## Step 1: Deep Dive (Analysis)
+
+### 6. runtime/antigravity/ の処遇
+
+**現象**:
+- 削除を試みたが `Process cannot access file` で失敗。
+- 中身は `browser_recordings/` などの一時ファイル。
+
+**M3 Theōria (因果モデル)**:
+1. **Antigravityの仕様**: 自身の実行カレントディレクトリに `runtime/` を掘り、そこにアーティファクトを吐く。
+2. **Hegemonikonの立場**: これは「Hegemonikonの構成要素」ではなく、「Antigravityが住み着いた痕跡（足跡）」。
+3. **対立**: これをGit管理しようとしたり、制御しようとすると衝突する。
+
+**結論**:
+- **「影（Shadow）」として扱う**。
+- 存在は認めるが、Hegemonikónの構成図（STRUCTURE.md）には載せない。
+- `.gitignore` で無視する。
+
+---
+
+### 7. runtime/Forge/ の処遇（再確認）
+
+**現象**:
+- 既に削除済み。
+- `M:\.gemini\Forge` が本来の正本。
+
+**比較検証**:
+- `runtime/Forge` にあったのは `GEMINI_OMEGA_v5.md` と `prompts/`。
+- `M:\.gemini\Forge` にも同ファイルが存在。
+- **リスク**: `runtime/Forge` にだけ独自の設定があった可能性は？
+  - → ユーザーは「runtimeの存在意義が不明」と言っていたため、意図的な独自設定はなかったと推測。
+  - → 即使ったとしても `M:\.gemini` 側で再設定すれば良い。
+
+**結論**:
+- **「統合完了」とみなす**。
+- 物理的にも削除済みであり、不可逆。未来志向で `M:\.gemini\Forge` を正とする。
+
+---
+
+## Step 2: B案（構造再設計）の修正
+
+前回の提案を、現実（Antigravityの挙動）に合わせて修正する。
+
+```
+M:\Hegemonikon\
+├── .agent/
+├── forge/
+├── gnosis_data/
+├── ...
+└── runtime/          # [Shadow]
+    └── antigravity/  # Antigravity管理領域（Hegemonikonは関知しない）
+```
+
+**決定事項**:
+1. `runtime/` ディレクトリ自体は残る（Antigravityが作成するため）。
+2. しかし Hegemonikon の管理対象からは外す（STRUCTURE.md から削除済み）。
+3. `.gitignore` に `/runtime/` を追加し、Git管理からも除外する。
+
+---
+
+## Step 3: 結論
+
+```
+┌─[Hegemonikón]──────────────────────┐
+│ M4 Phronēsis-S: 戦略策定完了       │
+│ 6. antigravity: [IGNORE]           │
+│    理由: アプリケーションの排他領域 │
+│ 7. Forge: [MERGED]                 │
+│    理由: .gemini/Forge が正本      │
+│ アクション: .gitignore 更新        │
+└────────────────────────────────────┘
+```
+
+---
+
+📝 /think + /p 完了

@@ -1,0 +1,65 @@
+{
+    "title": "Hegemonikón Governance & Integrity",
+    "summary": "Hegemonikón のマスターガバナンス枠組み。品質・完全性標準、構造的強制、および『双柱 (Twin Pillars)』に基づく設計思想を統合する。Kairema 10 標準、SEL フロントマター、5層監査フレームワーク、Zero-Trust Doctrine v2.6、プロジェクト監視システム、および『State-as-Repo』原則（.gemini 全体の Git 管理と厳格な除外パス管理）を定義する。",
+    "dependencies": [
+        "hegemonikon_system"
+    ],
+    "references": [
+        {
+            "type": "conversation_id",
+            "value": "4a02c389-c499-47af-9c66-3f02c9127120"
+        },
+        {
+            "type": "conversation_id",
+            "value": "c1c2dca8-2d67-44f6-b4ae-f1402f795059"
+        },
+        {
+            "type": "conversation_id",
+            "value": "812dc2e4-2d5e-4cb7-8e01-1d3dc515755b"
+        },
+        {
+            "type": "conversation_id",
+            "value": "a3f2d906-aacc-4d35-b24b-4287f27be5ea"
+        },
+        {
+            "type": "conversation_id",
+            "value": "14366a7e-26ad-4b86-9f67-7881b5f5dfd2"
+        },
+        {
+            "type": "conversation_id",
+            "value": "eac9ce4b-59ee-4d83-89f7-f104fc54c144"
+        },
+        {
+            "type": "conversation_id",
+            "value": "54aa8887-7627-471b-97d9-59652251c693"
+        },
+        {
+            "type": "conversation_id",
+            "value": "891aef16-e50a-4b10-9f94-38e050771424"
+        },
+        {
+            "type": "conversation_id",
+            "value": "cabd63dc-7e48-49e5-8848-07ed700cf6b2"
+        },
+        {
+            "type": "conversation_id",
+            "value": "e3ac1413-6744-42e8-9c76-8546e7e5a248"
+        },
+        {
+            "type": "file",
+            "value": "hegemonikon_governance_integrity/artifacts/standards/promoted_insights_2026-02-01.md"
+        },
+        {
+            "type": "file",
+            "value": "hegemonikon_governance_integrity/artifacts/standards/active_projects_system.md"
+        },
+        {
+            "type": "file",
+            "value": "hegemonikon_governance_integrity/artifacts/standards/active_projects_monitoring.md"
+        },
+        {
+            "type": "url",
+            "value": "https://github.com/laihuip001/OIKOS"
+        }
+    ]
+}

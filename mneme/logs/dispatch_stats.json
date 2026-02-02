@@ -1,0 +1,33 @@
+{
+  "dispatch_count": 12,
+  "success_count": 12,
+  "failure_count": 0,
+  "failure_rate": 0.0,
+  "exception_patterns": [],
+  "exception_count": 0,
+  "phase_b_ready": false,
+  "phase_b_progress": {
+    "dispatch": "12/50",
+    "dispatch_pct": 24.0,
+    "failure_rate": "0.0% (< 10%)",
+    "exceptions": "0/3"
+  },
+  "t_series_distribution": {
+    "T5": 1,
+    "T4": 1,
+    "T6": 9,
+    "T7": 1
+  },
+  "agent_distribution": {
+    "source": {
+      "claude_antigravity": 9,
+      "claude_ai": 3
+    },
+    "target": {
+      "claude_ai": 1,
+      "claude_antigravity": 3,
+      "local_filesystem": 8
+    }
+  },
+  "last_updated": "2026-01-26T13:40:34.289606"
+}

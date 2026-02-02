@@ -1,0 +1,24 @@
+#!/bin/bash
+# Git pre-commit hook: ワークフロー命名規則ドキュメントの自動更新
+#
+# Purpose:
+#   .agent/workflows/ に変更がある場合、命名規則ドキュメントを自動更新
+#
+# Installation:
+#   このフックは .agent/hooks/pre-commit に配置され、
+#   git config core.hooksPath .agent/hooks で有効化される
+
+# .agent/workflows に変更があるかチェック
+if git diff --cached --name-only | grep -q "^\.agent/workflows/"; then
+    echo "📝 Updating workflow naming convention..."
+    
+    # スクリプト実行
+    python3 .agent/scripts/update-workflow-registry.py
+    
+    # 更新されたファイルをステージング
+    git add .agent/docs/workflow-naming-convention.md
+    
+    echo "✅ Workflow registry updated"
+fi
+
+exit 0

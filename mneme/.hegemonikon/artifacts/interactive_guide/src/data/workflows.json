@@ -1,0 +1,44 @@
+{
+    "workflows": [
+        {
+            "command": "/boot",
+            "description": "セッション開始 (System Boot)",
+            "category": "System"
+        },
+        {
+            "command": "/bye",
+            "description": "セッション終了 (Handoff生成)",
+            "category": "System"
+        },
+        {
+            "command": "/noe",
+            "description": "深い認識 (O1: Noēsis)",
+            "category": "Cognitive"
+        },
+        {
+            "command": "/bou",
+            "description": "意志確認 (O2: Boulēsis)",
+            "category": "Cognitive"
+        },
+        {
+            "command": "/s",
+            "description": "計画策定 (S-Series Analysis)",
+            "category": "Planning"
+        },
+        {
+            "command": "/ene",
+            "description": "実行 (O4: Energeia)",
+            "category": "Action"
+        },
+        {
+            "command": "/dia",
+            "description": "敵対的レビュー (Devil's Advocate)",
+            "category": "QA"
+        },
+        {
+            "command": "/mek",
+            "description": "方法配置 (S2: Mekhanē)",
+            "category": "Planning"
+        }
+    ]
+}

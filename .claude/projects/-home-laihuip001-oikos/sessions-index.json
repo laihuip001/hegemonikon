@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "entries": [
+    {
+      "sessionId": "28ae40cb-773f-4bf5-a506-a64be057ffb7",
+      "fullPath": "/home/laihuip001/oikos/.claude/projects/-home-laihuip001-oikos/28ae40cb-773f-4bf5-a506-a64be057ffb7.jsonl",
+      "fileMtime": 1769911716720,
+      "firstPrompt": "npx claude",
+      "messageCount": 4,
+      "created": "2026-02-01T02:08:09.136Z",
+      "modified": "2026-02-01T02:08:36.722Z",
+      "gitBranch": "master",
+      "projectPath": "/home/laihuip001/oikos",
+      "isSidechain": false
+    }
+  ],
+  "originalPath": "/home/laihuip001/oikos"
+}

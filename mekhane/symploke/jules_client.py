@@ -260,9 +260,9 @@ class JulesClient:
             max_concurrent if max_concurrent is not None else self.MAX_CONCURRENT
         )
 
-    async def __aenter__(self):
-        """Context manager entry - creates pooled session for connection reuse."""
-        if self._shared_session is None:
+    async def _ensure_session(self):
+        """Ensure an owned session exists if no shared session is available."""
+        if self._shared_session is None and self._owned_session is None:
             # Connection pooling: reuse TCP connections (cl-004, as-008 fix)
             connector = aiohttp.TCPConnector(
                 limit=self.MAX_CONCURRENT,  # Max concurrent connections
@@ -270,10 +270,18 @@ class JulesClient:
                 enable_cleanup_closed=True,  # Clean up closed connections
             )
             self._owned_session = aiohttp.ClientSession(connector=connector)
+
+    async def __aenter__(self):
+        """Context manager entry - creates pooled session for connection reuse."""
+        await self._ensure_session()
         return self
 
     async def __aexit__(self, exc_type, exc_val, exc_tb):
         """Context manager exit - closes owned session."""
+        await self.close()
+
+    async def close(self):
+        """Close the underlying session."""
         if self._owned_session:
             await self._owned_session.close()
             self._owned_session = None
@@ -311,42 +319,35 @@ class JulesClient:
         url = f"{self.BASE_URL}/{endpoint}"
 
         # Create session if not in context manager
+        await self._ensure_session()
         session = self._shared_session or self._owned_session
-        close_after = False
-        if session is None:
-            session = aiohttp.ClientSession()
-            close_after = True
 
-        try:
-            # Prepare headers with optional trace context
-            request_headers = dict(self._headers)
-            if OTEL_AVAILABLE:
-                # Inject W3C trace context into headers
-                inject(request_headers)
+        # Prepare headers with optional trace context
+        request_headers = dict(self._headers)
+        if OTEL_AVAILABLE:
+            # Inject W3C trace context into headers
+            inject(request_headers)
 
-            async with session.request(
-                method,
-                url,
-                headers=request_headers,
-                # NOTE: Removed self-assignment: json = json
-            ) as resp:
-                if resp.status == 429:
-                    retry_after = resp.headers.get("Retry-After")
-                    raise RateLimitError(
-                        f"Rate limit exceeded for {endpoint}",
-                        retry_after=int(retry_after) if retry_after else None,
-                    )
+        async with session.request(
+            method,
+            url,
+            headers=request_headers,
+            # NOTE: Removed self-assignment: json = json
+        ) as resp:
+            if resp.status == 429:
+                retry_after = resp.headers.get("Retry-After")
+                raise RateLimitError(
+                    f"Rate limit exceeded for {endpoint}",
+                    retry_after=int(retry_after) if retry_after else None,
+                )
 
-                # Include response body in error for debugging
-                if not resp.ok:
-                    body = await resp.text()
-                    logger.error(f"API error {resp.status}: {body[:200]}")
+            # Include response body in error for debugging
+            if not resp.ok:
+                body = await resp.text()
+                logger.error(f"API error {resp.status}: {body[:200]}")
 
-                resp.raise_for_status()
-                return await resp.json()
-        finally:
-            if close_after:
-                await session.close()
+            resp.raise_for_status()
+            return await resp.json()
 
     @with_retry(
         max_attempts=3, retryable_exceptions=(RateLimitError, aiohttp.ClientError)

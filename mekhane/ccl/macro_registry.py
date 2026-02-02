@@ -10,6 +10,9 @@ from typing import Dict, Optional, List
 from dataclasses import dataclass, asdict
 from pathlib import Path
 import json
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -111,14 +114,17 @@ class MacroRegistry:
                 for item in data:
                     macro = Macro(**item)
                     self.user_macros[macro.name] = macro
-            except (json.JSONDecodeError, TypeError):
-                pass  # TODO: Add proper error handling
+            except (json.JSONDecodeError, TypeError, OSError) as e:
+                logger.error(f"Failed to load macros from {self.path}: {e}")
 
     def _save(self):
         """Save user macros to file."""
-        self.path.parent.mkdir(parents=True, exist_ok=True)
-        data = [asdict(m) for m in self.user_macros.values()]
-        self.path.write_text(json.dumps(data, indent=2, ensure_ascii=False))
+        try:
+            self.path.parent.mkdir(parents=True, exist_ok=True)
+            data = [asdict(m) for m in self.user_macros.values()]
+            self.path.write_text(json.dumps(data, indent=2, ensure_ascii=False))
+        except (OSError, TypeError) as e:
+            logger.error(f"Failed to save macros to {self.path}: {e}")
 
     def get(self, name: str) -> Optional[Macro]:
         """

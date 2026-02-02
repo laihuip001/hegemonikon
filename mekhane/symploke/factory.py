@@ -16,8 +16,11 @@ VectorStore Factory
 """
 
 from typing import Dict, Type, Optional
+import logging
 from .adapters.base import VectorStoreAdapter
 from .config import VectorStoreConfig
+
+logger = logging.getLogger(__name__)
 
 
 class VectorStoreFactory:
@@ -101,8 +104,8 @@ def _register_adapters():
         from .adapters.hnswlib_adapter import HNSWlibAdapter
 
         VectorStoreFactory.register("hnswlib", HNSWlibAdapter)
-    except ImportError:
-        pass  # TODO: Add proper error handling
+    except ImportError as e:
+        logger.warning("Failed to auto-register adapter 'hnswlib': %s", e)
 
     # 将来の拡張用
     # try:

@@ -12,9 +12,13 @@ Design decisions:
 """
 
 import os
+import logging
 from dataclasses import dataclass
 from typing import Optional, List
 from pathlib import Path
+
+# Configure logger
+logger = logging.getLogger(__name__)
 
 # Try to import LLM client
 try:
@@ -193,8 +197,14 @@ CCL は Hegemonikón システムの認知制御言語で、以下のワーク�
                     reasoning=data.get("reasoning", ""),
                     suggestions=data.get("suggestions", []),
                 )
-            except (json.JSONDecodeError, ValueError):
-                pass  # TODO: Add proper error handling
+            except (json.JSONDecodeError, ValueError) as e:
+                logger.error(f"Failed to parse JSON response: {e}. Text: {text[:200]}")
+                return SemanticResult(
+                    aligned=False,
+                    confidence=0.0,
+                    reasoning=f"JSON parsing error: {e}",
+                    suggestions=[],
+                )
 
         # Fallback: try to infer from text
         aligned = "不一致" not in text and "aligned.*false" not in text.lower()

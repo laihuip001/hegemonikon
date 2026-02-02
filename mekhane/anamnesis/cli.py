@@ -34,6 +34,24 @@ _HEGEMONIKON_ROOT = (
 if str(_HEGEMONIKON_ROOT) not in sys.path:
     sys.path.insert(0, str(_HEGEMONIKON_ROOT))
 
+try:
+    from mekhane.anamnesis.ux_utils import (
+        print_header,
+        print_success,
+        print_error,
+        print_warning,
+        print_info,
+        print_dim,
+    )
+except ImportError:
+    # Fallback if ux_utils is missing/broken
+    def print_header(t): print(f"\n=== {t} ===")
+    def print_success(t): print(f"✓ {t}")
+    def print_error(t): print(f"✗ {t}")
+    def print_warning(t): print(f"! {t}")
+    def print_info(t): print(f"ℹ {t}")
+    def print_dim(t): print(t)
+
 # Configuration
 DATA_DIR = _HEGEMONIKON_ROOT / "gnosis_data"
 STATE_FILE = DATA_DIR / "state.json"
@@ -53,7 +71,7 @@ def update_state():
         state["last_collected_at"] = datetime.now().isoformat()
         STATE_FILE.write_text(json.dumps(state, indent=2), encoding="utf-8")
     except Exception as e:
-        print(f"[Warning] Failed to update state: {e}")
+        print_warning(f"Failed to update state: {e}")
 
 
 def cmd_check_freshness(args):
@@ -102,30 +120,31 @@ def cmd_collect(args):
 
     source = args.source.lower()
     if source not in collectors:
-        print(f"Unknown source: {args.source}")
-        print(f"Available: {', '.join(collectors.keys())}")
+        print_error(f"Unknown source: {args.source}")
+        print_info(f"Available: {', '.join(collectors.keys())}")
         return 1
 
-    print(f"[Collect] Source: {source}, Query: {args.query}, Limit: {args.limit}")
+    print_header("Collect Papers")
+    print_dim(f"Source: {source} | Query: {args.query} | Limit: {args.limit}")
 
     try:
         collector = collectors[source]()
         papers = collector.search(args.query, max_results=args.limit)
-        print(f"[Collect] Found {len(papers)} papers")
+        print_success(f"Found {len(papers)} papers")
 
         if papers and not args.dry_run:
             index = GnosisIndex()
             added = index.add_papers(papers)
-            print(f"[Collect] Added {added} to index")
+            print_success(f"Added {added} to index")
             update_state()  # Update timestamp
         elif args.dry_run:
-            print("[Collect] Dry run - not adding to index")
+            print_warning("Dry run - not adding to index")
             for p in papers[:5]:
-                print(f"  - {p.title[:60]}...")
+                print_dim(f"  - {p.title[:60]}...")
 
         return 0
     except Exception as e:
-        print(f"[Error] {e}")
+        print_error(f"{e}")
         return 1
 
 
@@ -142,22 +161,23 @@ def cmd_collect_all(args):  # noqa: AI-ALL
         ("openalex", OpenAlexCollector()),
     ]
 
-    print(f"[CollectAll] Query: {args.query}, Limit per source: {args.limit}")
+    print_header("Collect All")
+    print_dim(f"Query: {args.query} | Limit per source: {args.limit}")
 
     all_papers = []
     for name, collector in collectors:
         try:
-            print(f"  Collecting from {name}...")
+            print_info(f"Collecting from {name}...")
             papers = collector.search(args.query, max_results=args.limit)
-            print(f"    Found {len(papers)} papers")
+            print_dim(f"    Found {len(papers)} papers")
             all_papers.extend(papers)
         except Exception as e:
-            print(f"    Error: {e}")
+            print_error(f"    Error: {e}")
 
     if all_papers and not args.dry_run:
         index = GnosisIndex()
         added = index.add_papers(all_papers, dedupe=True)
-        print(f"[CollectAll] Added {added} unique papers to index")
+        print_success(f"Added {added} unique papers to index")
         update_state()  # Update timestamp
 
     return 0
@@ -167,27 +187,25 @@ def cmd_search(args):
     """論文検索"""
     from mekhane.anamnesis.index import GnosisIndex
 
-    print(f"[Search] Query: {args.query}")
+    print_header("Search Papers")
+    print_dim(f"Query: {args.query}")
 
     index = GnosisIndex()
     results = index.search(args.query, k=args.limit)
 
     if not results:
-        print("No results found")
+        print_warning("No results found")
         return 0
 
-    print(f"\nFound {len(results)} results:\n")
-    print("-" * 70)
+    print_success(f"Found {len(results)} results:")
 
     for i, r in enumerate(results, 1):
         print(f"\n[{i}] {r.get('title', 'Untitled')[:70]}")
-        print(f"    Source: {r.get('source')} | Citations: {r.get('citations', 'N/A')}")
-        print(f"    Authors: {r.get('authors', '')[:60]}...")
-        print(f"    Abstract: {r.get('abstract', '')[:150]}...")
+        print_dim(f"    Source: {r.get('source')} | Citations: {r.get('citations', 'N/A')}")
+        print_dim(f"    Authors: {r.get('authors', '')[:60]}...")
+        print_dim(f"    Abstract: {r.get('abstract', '')[:150]}...")
         if r.get("url"):
-            print(f"    URL: {r.get('url')}")
-
-    print("\n" + "-" * 70)
+            print_dim(f"    URL: {r.get('url')}")
     return 0
 
 
@@ -198,12 +216,11 @@ def cmd_stats(args):
     index = GnosisIndex()
     stats = index.stats()
 
-    print("\n[Gnōsis Index Statistics]")
-    print("=" * 40)
+    print_header("Gnōsis Index Statistics")
     print(f"Total Papers: {stats['total']}")
     print(f"With DOI: {stats.get('unique_dois', 0)}")
     print(f"With arXiv ID: {stats.get('unique_arxiv', 0)}")
-    print("\nBy Source:")
+    print_info("By Source:")
     for source, count in stats.get("sources", {}).items():
         print(f"  {source}: {count}")
 
@@ -211,11 +228,9 @@ def cmd_stats(args):
     if STATE_FILE.exists():
         try:
             state = json.loads(STATE_FILE.read_text(encoding="utf-8"))
-            print(f"Last Collected: {state.get('last_collected_at', 'Unknown')}")
+            print_dim(f"Last Collected: {state.get('last_collected_at', 'Unknown')}")
         except Exception:
             pass  # TODO: Add proper error handling # noqa: AI-ALL
-
-    print("=" * 40)
 
     return 0
 

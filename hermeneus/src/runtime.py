@@ -87,6 +87,8 @@ class LMQLExecutor:
     def __init__(self, config: Optional[ExecutionConfig] = None):
         self.config = config or ExecutionConfig()
         self._lmql_available = self._check_lmql()
+        self._openai_client = None
+        self._openai_client_key = None
     
     def _check_lmql(self) -> bool:
         """LMQL がインストールされているか確認"""
@@ -317,7 +319,12 @@ class LMQLExecutor:
                 error="openai not installed. Run: pip install openai"
             )
         
-        client = AsyncOpenAI(api_key=api_key)
+        if self._openai_client and self._openai_client_key == api_key:
+            client = self._openai_client
+        else:
+            client = AsyncOpenAI(api_key=api_key)
+            self._openai_client = client
+            self._openai_client_key = api_key
         
         for attempt in range(self.config.max_retries):
             try:

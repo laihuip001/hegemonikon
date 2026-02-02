@@ -11,9 +11,13 @@ Usage:
 
 import sys
 import argparse
+import logging
 from pathlib import Path
 from typing import List, Tuple
 from datetime import datetime, timedelta
+
+# Configure module logger
+logger = logging.getLogger(__name__)
 
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
@@ -245,7 +249,7 @@ def get_boot_handoffs(mode: str = "standard", context: str = None) -> dict:
                             )
                             proactive_memories.append(doc)
             except Exception as e:
-                pass  # TODO: Add proper error handling
+                logger.error(f"⚠️ Proactive recall error: {e}", exc_info=True)
 
     return {
         "latest": latest,

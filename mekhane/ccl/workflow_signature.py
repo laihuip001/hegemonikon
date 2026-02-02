@@ -9,7 +9,10 @@ Enables macro-style reference to workflows without full procedural execution.
 from typing import Dict, Optional
 from dataclasses import dataclass
 from pathlib import Path
+import logging
 import yaml
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -163,5 +166,5 @@ class SignatureRegistry:
                     description=frontmatter.get("description", ""),
                     has_side_effects=frontmatter.get("has_side_effects", True),
                 )
-        except yaml.YAMLError:
-            pass  # TODO: Add proper error handling
+        except yaml.YAMLError as e:
+            logger.error(f"Failed to parse YAML frontmatter in {workflow_path}: {e}")

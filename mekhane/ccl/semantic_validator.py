@@ -12,6 +12,7 @@ Design decisions:
 """
 
 import os
+import logging
 from dataclasses import dataclass
 from typing import Optional, List
 from pathlib import Path
@@ -23,6 +24,9 @@ try:
     HAS_LLM = True
 except ImportError:
     HAS_LLM = False
+
+
+logger = logging.getLogger(__name__)
 
 
 def _get_api_key() -> Optional[str]:
@@ -69,7 +73,8 @@ class CCLSemanticValidator:
                 try:
                     self.client = genai.Client(api_key=api_key)
                 except Exception:
-                    pass  # TODO: Add proper error handling
+                    # Log initialization failure but don't crash
+                    logger.warning("Failed to initialize GenAI client, semantic validation will be disabled.")
 
     def _load_prompt(self) -> str:
         """Load the semantic check prompt."""
@@ -193,8 +198,9 @@ CCL は Hegemonikón システムの認知制御言語で、以下のワーク�
                     reasoning=data.get("reasoning", ""),
                     suggestions=data.get("suggestions", []),
                 )
-            except (json.JSONDecodeError, ValueError):
-                pass  # TODO: Add proper error handling
+            except (json.JSONDecodeError, ValueError) as e:
+                # Log the error and fall back to text inference
+                logger.warning(f"Failed to parse JSON from LLM response: {e}. Text snippet: {text[:100]}...")
 
         # Fallback: try to infer from text
         aligned = "不一致" not in text and "aligned.*false" not in text.lower()

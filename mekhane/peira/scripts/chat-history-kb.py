@@ -240,8 +240,17 @@ def build_index(incremental: bool = False, report_mode: bool = False):
                         )
                         if at <= last_sync:
                             continue
-                    except Exception:
-                        pass  # TODO: Add proper error handling
+                    except Exception as e:
+                        s_id = artifact.get("session_id", "unknown")
+                        a_type = artifact.get("artifact_type", "unknown")
+                        msg = f"Failed to parse timestamp for artifact {s_id}/{a_type}: {e}"
+                        if report_mode:
+                            print(
+                                f"[Hegemonikon] M8 Anamnēsis\n  Sync Phase: Warning\n  Reason: {msg}"
+                            )
+                        else:
+                            print(f"Warning: {msg}. Skipping.")
+                        continue
 
             # Generate ID
             art_type = (

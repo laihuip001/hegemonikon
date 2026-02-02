@@ -48,6 +48,30 @@ class TestMetrika:
         result = gate.check_metrika(lines)
         assert result.atomos is False
 
+    def test_katharos_detection(self):
+        """コメントアウトコード検出"""
+        gate = QualityGate()
+        lines = [
+            "def foo():",
+            "    # obj.method('debug')",  # commented code
+            "    # x = 1",           # commented assignment
+            "    pass"
+        ]
+        result = gate.check_metrika(lines)
+        assert result.katharos is False
+        assert "コメントアウトコード 2箇所" in result.violations[0]
+
+    def test_katharos_pass(self):
+        """コメントアウトコードなしはPass"""
+        gate = QualityGate()
+        lines = [
+            "def foo():",
+            "    # This is a normal comment",
+            "    pass"
+        ]
+        result = gate.check_metrika(lines)
+        assert result.katharos is True
+
 
 class TestChreos:
     """Chreos 技術負債テスト"""

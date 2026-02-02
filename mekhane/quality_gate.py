@@ -83,6 +83,13 @@ class QualityGate:
     }
     MAGIC_NUMBER = re.compile(r"(?<![a-zA-Z_])\d{3,}(?![a-zA-Z_])")
 
+    # Katharos パターン
+    COMMENTED_CODE_PATTERNS = [
+        re.compile(r"#\s*(def |class |import |from |return |if |for |while )"),
+        re.compile(r"#\s*\w+\s*=\s*"),
+        re.compile(r"#\s*\w+\.\w+\("),
+    ]
+
     def check_file(self, file_path: str) -> dict:
         """ファイルの品質を検証"""
         path = Path(file_path)
@@ -215,16 +222,10 @@ class QualityGate:
 
     def _detect_commented_code(self, lines: list[str]) -> list[int]:
         """コメントアウトされたコード行を検出"""
-        code_patterns = [
-            r"#\s*(def |class |import |from |return |if |for |while )",
-            r"#\s*\w+\s*=\s*",
-            r"#\s*\w+\.\w+\(",
-        ]
-
         commented = []
         for i, line in enumerate(lines, 1):
-            for pattern in code_patterns:
-                if re.search(pattern, line):
+            for pattern in self.COMMENTED_CODE_PATTERNS:
+                if pattern.search(line):
                     commented.append(i)
                     break
         return commented

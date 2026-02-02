@@ -14,6 +14,7 @@ import json
 import sys
 from datetime import datetime
 from pathlib import Path
+from typing import Optional
 
 # ローカルモジュールインポート
 try:
@@ -48,6 +49,7 @@ async def create_session(
     key: str,
     spec: SpecialistDefinition,
     target_file: str,
+    session: Optional[aiohttp.ClientSession] = None,
 ) -> dict:
     """Jules セッションを作成"""
     headers = {"X-Goog-Api-Key": key, "Content-Type": "application/json"}
@@ -64,32 +66,37 @@ async def create_session(
         "requirePlanApproval": False,
     }
 
+    async def _perform_request(sess):
+        async with sess.post(
+            "https://jules.googleapis.com/v1alpha/sessions",
+            headers=headers,
+            json=payload,
+            timeout=aiohttp.ClientTimeout(total=30),
+        ) as resp:
+            if resp.status == 200:
+                data = await resp.json()
+                return {
+                    "id": spec.id,
+                    "name": spec.name,
+                    "archetype": spec.archetype.value,
+                    "session_id": data.get("id"),
+                    "url": data.get("url"),
+                    "status": "started",
+                }
+            else:
+                error_text = await resp.text()
+                return {
+                    "id": spec.id,
+                    "name": spec.name,
+                    "error": resp.status,
+                    "error_text": error_text[:200],
+                }
+
     try:
-        async with aiohttp.ClientSession() as session:
-            async with session.post(
-                "https://jules.googleapis.com/v1alpha/sessions",
-                headers=headers,
-                json=payload,
-                timeout=aiohttp.ClientTimeout(total=30),
-            ) as resp:
-                if resp.status == 200:
-                    data = await resp.json()
-                    return {
-                        "id": spec.id,
-                        "name": spec.name,
-                        "archetype": spec.archetype.value,
-                        "session_id": data.get("id"),
-                        "url": data.get("url"),
-                        "status": "started",
-                    }
-                else:
-                    error_text = await resp.text()
-                    return {
-                        "id": spec.id,
-                        "name": spec.name,
-                        "error": resp.status,
-                        "error_text": error_text[:200],
-                    }
+        if session:
+            return await _perform_request(session)
+        async with aiohttp.ClientSession() as new_session:
+            return await _perform_request(new_session)
     except Exception as e:
         return {"id": spec.id, "name": spec.name, "error": str(e)}
 
@@ -107,20 +114,21 @@ async def run_batch(
     results = []
     semaphore = asyncio.Semaphore(max_concurrent)
 
-    async def bounded_create(i: int, spec: SpecialistDefinition):
-        async with semaphore:
-            key_idx = i % len(API_KEYS)
-            key = API_KEYS[key_idx]
-            print(f"[{i+1}/{len(specialists)}] {spec.id} {spec.name[:20]}...")
-            result = await create_session(key, spec, target_file)
-            if "session_id" in result:
-                print(f"  ✓ Started")
-            else:
-                print(f"  ✗ Error: {result.get('error')}")
-            return result
+    async with aiohttp.ClientSession() as session:
+        async def bounded_create(i: int, spec: SpecialistDefinition):
+            async with semaphore:
+                key_idx = i % len(API_KEYS)
+                key = API_KEYS[key_idx]
+                print(f"[{i+1}/{len(specialists)}] {spec.id} {spec.name[:20]}...")
+                result = await create_session(key, spec, target_file, session=session)
+                if "session_id" in result:
+                    print(f"  ✓ Started")
+                else:
+                    print(f"  ✗ Error: {result.get('error')}")
+                return result
 
-    tasks = [bounded_create(i, spec) for i, spec in enumerate(specialists)]
-    results = await asyncio.gather(*tasks)
+        tasks = [bounded_create(i, spec) for i, spec in enumerate(specialists)]
+        results = await asyncio.gather(*tasks)
     return list(results)
 
 

@@ -130,6 +130,39 @@ class AuditStore:
         
         return audit.record_id
     
+    def record_batch(self, audits: List[AuditRecord]) -> List[str]:
+        """監査レコードを一括記録"""
+        record_ids = []
+        data_to_insert = []
+
+        for audit in audits:
+            if not audit.record_id:
+                audit.record_id = self._generate_id()
+            record_ids.append(audit.record_id)
+
+            data_to_insert.append((
+                audit.record_id,
+                audit.ccl_expression,
+                audit.execution_result,
+                audit.debate_summary,
+                1 if audit.consensus_accepted else 0,
+                audit.confidence,
+                json.dumps(audit.dissent_reasons, ensure_ascii=False),
+                json.dumps(audit.metadata, ensure_ascii=False) if audit.metadata else None,
+                audit.timestamp.isoformat()
+            ))
+
+        with self._connect() as conn:
+            conn.executemany("""
+                INSERT OR REPLACE INTO audits
+                (record_id, ccl_expression, execution_result, debate_summary,
+                 consensus_accepted, confidence, dissent_reasons, metadata, timestamp)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """, data_to_insert)
+            conn.commit()
+
+        return record_ids
+
     def get(self, record_id: str) -> Optional[AuditRecord]:
         """レコードを取得"""
         with self._connect() as conn:

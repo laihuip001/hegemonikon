@@ -97,10 +97,37 @@ def cmd_ingest(args):
         except Exception as e:
             print(f"[Kairos] Error: {e}")
 
-    # Chronos (Conversation History) - Not yet implemented
+    # Chronos (Conversation History)
     if args.all or args.chronos:
-        # TODO: Implement when conversation history indexing is ready
-        results["chronos"] = 0
+        try:
+            from mekhane.symploke.chronos_ingest import (
+                get_conversation_files,
+                parse_conversation_messages,
+                ingest_to_chronos,
+                DEFAULT_INDEX_PATH as CHRONOS_INDEX_PATH,
+            )
+
+            files = get_conversation_files()
+            if files:
+                all_docs = []
+                for f in files:
+                    docs = parse_conversation_messages(f)
+                    all_docs.extend(docs)
+
+                if all_docs:
+                    CHRONOS_INDEX_PATH.parent.mkdir(parents=True, exist_ok=True)
+                    count = ingest_to_chronos(
+                        all_docs, save_path=str(CHRONOS_INDEX_PATH)
+                    )
+                    results["chronos"] = count
+                else:
+                    print("[Chronos] No messages found")
+            else:
+                print("[Chronos] No conversation files found")
+        except ImportError as e:
+            print(f"[Chronos] Import error: {e}")
+        except Exception as e:
+            print(f"[Chronos] Error: {e}")
 
     # Output in /boot expected format
     total = sum(results.values())
@@ -137,8 +164,21 @@ def cmd_stats(args):
     )
     print(f"Kairos: {handoff_count} handoff files")
 
-    # Chronos stats (placeholder)
-    print("Chronos: Not implemented")
+    # Chronos stats
+    from mekhane.symploke.chronos_ingest import (
+        DEFAULT_INDEX_PATH as CHRONOS_INDEX_PATH,
+        load_chronos_index,
+    )
+
+    if CHRONOS_INDEX_PATH.exists():
+        try:
+            # We use the underlying adapter count since ChronosIndex wraps it
+            adapter = load_chronos_index(str(CHRONOS_INDEX_PATH)).adapter
+            print(f"Chronos: {adapter.count()} messages")
+        except Exception as e:
+            print(f"Chronos: Error - {e}")
+    else:
+        print("Chronos: Not indexed")
 
     print("=" * 40)
     return 0

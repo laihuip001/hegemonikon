@@ -8,9 +8,12 @@ Uses Gemini API (google.genai SDK) to convert natural language intent into CCL e
 Migration: google.generativeai -> google.genai (deprecated Nov 2025)
 """
 
+import logging
 import os
 from typing import Optional
 from pathlib import Path
+
+logger = logging.getLogger(__name__)
 
 # Try new SDK first, fall back to legacy
 try:
@@ -69,7 +72,7 @@ class LLMParser:
                     # Legacy SDK: google.generativeai
                     self.model = genai_legacy.GenerativeModel(model)
             except Exception:
-                pass  # TODO: Add proper error handling
+                logger.error("Failed to initialize LLM client", exc_info=True)
 
     def _load_system_prompt(self) -> str:
         """Load the CCL compiler prompt."""
@@ -120,6 +123,6 @@ class LLMParser:
                     ccl = "\n".join(lines[1:-1] if lines[-1] == "```" else lines[1:])
                 return ccl.strip()
         except Exception:
-            pass  # TODO: Add proper error handling
+            logger.error("LLM generation failed", exc_info=True)
 
         return None

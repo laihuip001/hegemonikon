@@ -16,6 +16,7 @@ Gnōsis Base Collector - コレクター共通インタフェース
 
 from abc import ABC, abstractmethod
 from typing import Optional
+import asyncio
 import time
 
 from mekhane.anamnesis.models.paper import Paper
@@ -39,6 +40,15 @@ class BaseCollector(ABC):
                 time.sleep(min_interval - elapsed)
         self._last_request_time = time.time()
 
+    async def _rate_limit_wait_async(self):
+        """非同期レート制限準拠のための待機"""
+        if self.rate_limit > 0:
+            min_interval = 1.0 / self.rate_limit
+            elapsed = time.time() - self._last_request_time
+            if elapsed < min_interval:
+                await asyncio.sleep(min_interval - elapsed)
+        self._last_request_time = time.time()
+
     @abstractmethod
     def search(
         self,
@@ -58,6 +68,26 @@ class BaseCollector(ABC):
             Paper オブジェクトのリスト
         """
         pass
+
+    async def search_async(
+        self,
+        query: str,
+        max_results: int = 10,
+        categories: Optional[list[str]] = None,
+        **kwargs,
+    ) -> list[Paper]:
+        """
+        非同期で論文検索
+
+        デフォルト実装: sync search を executor で実行
+        """
+        loop = asyncio.get_running_loop()
+        return await loop.run_in_executor(
+            None,
+            lambda: self.search(
+                query, max_results=max_results, categories=categories, **kwargs
+            ),
+        )
 
     @abstractmethod
     def fetch_by_id(self, paper_id: str) -> Optional[Paper]:
@@ -85,3 +115,13 @@ class BaseCollector(ABC):
         """
         self._rate_limit_wait()
         return self.search(query, max_results, **kwargs)
+
+    async def collect_async(
+        self,
+        query: str,
+        max_results: int = 10,
+        **kwargs,
+    ) -> list[Paper]:
+        """非同期論文収集"""
+        await self._rate_limit_wait_async()
+        return await self.search_async(query, max_results, **kwargs)

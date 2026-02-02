@@ -134,6 +134,17 @@ class LMQLExecutor:
         variables: Optional[Dict[str, Any]] = None
     ) -> ExecutionResult:
         """LMQL プログラムを同期実行"""
+        try:
+            loop = asyncio.get_running_loop()
+        except RuntimeError:
+            loop = None
+
+        if loop and loop.is_running():
+            raise RuntimeError(
+                "Cannot call sync execute() from within a running event loop. "
+                "Use await execute_async() instead."
+            )
+
         return asyncio.run(self.execute_async(lmql_code, context, variables))
     
     async def _execute_with_lmql(
@@ -482,14 +493,14 @@ class ConvergenceExecutor:
 # High-Level API
 # =============================================================================
 
-def execute_ccl(
+async def execute_ccl_async(
     ccl: str,
     context: str = "",
     model: str = "openai/gpt-4o",
     macros: Optional[Dict[str, str]] = None,
     **kwargs
 ) -> ExecutionResult:
-    """CCL 式をコンパイルして実行
+    """CCL 式をコンパイルして非同期実行
     
     Args:
         ccl: CCL 式 (例: "/noe+ >> V[] < 0.3")
@@ -500,10 +511,6 @@ def execute_ccl(
         
     Returns:
         ExecutionResult
-        
-    Example:
-        >>> result = execute_ccl("/noe+", "プロジェクト設計を分析")
-        >>> print(result.output)
     """
     # 遅延インポート (循環参照回避)
     from . import compile_ccl
@@ -522,16 +529,59 @@ def execute_ccl(
         ast = parse_ccl(ccl)
         if isinstance(ast, ConvergenceLoop):
             conv_executor = ConvergenceExecutor(executor)
-            return asyncio.run(conv_executor.execute_convergence(
+            return await conv_executor.execute_convergence(
                 lmql_code,
                 context,
                 condition_var=ast.condition.var,
                 condition_op=ast.condition.op,
                 condition_value=ast.condition.value,
                 max_iterations=config.max_iterations
-            ))
+            )
     except Exception:
         pass  # パース失敗時は通常実行
     
     # 通常実行
-    return executor.execute(lmql_code, context)
+    return await executor.execute_async(lmql_code, context)
+
+
+def execute_ccl(
+    ccl: str,
+    context: str = "",
+    model: str = "openai/gpt-4o",
+    macros: Optional[Dict[str, str]] = None,
+    **kwargs
+) -> ExecutionResult:
+    """CCL 式をコンパイルして実行 (同期ラッパー)
+
+    Args:
+        ccl: CCL 式 (例: "/noe+ >> V[] < 0.3")
+        context: 入力コンテキスト
+        model: 使用する LLM モデル
+        macros: マクロ定義
+        **kwargs: ExecutionConfig に渡す追加設定
+
+    Returns:
+        ExecutionResult
+
+    Example:
+        >>> result = execute_ccl("/noe+", "プロジェクト設計を分析")
+        >>> print(result.output)
+    """
+    try:
+        loop = asyncio.get_running_loop()
+    except RuntimeError:
+        loop = None
+
+    if loop and loop.is_running():
+        raise RuntimeError(
+            "Cannot call sync execute_ccl() from within a running event loop. "
+            "Use await execute_ccl_async() instead."
+        )
+
+    return asyncio.run(execute_ccl_async(
+        ccl=ccl,
+        context=context,
+        model=model,
+        macros=macros,
+        **kwargs
+    ))

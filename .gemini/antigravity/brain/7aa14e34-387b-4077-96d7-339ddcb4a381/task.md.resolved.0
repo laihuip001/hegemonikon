@@ -1,0 +1,14 @@
+# Episodic Memory Recovery and Automation
+
+## Phase 1: 今すぐできること
+- [/] Antigravity 内部ログ構造を調査
+- [ ] 既存の会話データを復旧可能か確認
+- [ ] GCP 対応の export_chats.py を作成
+
+## Phase 2: 自動化
+- [ ] n8n/cron による定期エクスポート設計
+- [ ] 実装とテスト
+
+## Phase 3: 代替機構の検討
+- [ ] Antigravity API/ログからの直接抽出
+- [ ] 新しいエピソード記憶アーキテクチャ設計

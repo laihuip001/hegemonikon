@@ -1,0 +1,68 @@
+# PROOF Header Traversal — 完了レポート
+
+## 達成状況
+
+**mekhane/ 全 201 Python ファイル → 100% PROOF カバレッジ**
+
+## コミット履歴
+
+| Commit | 内容 | ファイル数 |
+|--------|------|-----------|
+| `41b56b8d` | Phase 2: fep/ core (4 files) | 4 |
+| `c65240c4` | Phase 2: fep/ remaining (19 files) | 19 |
+| `067f1efc` | Phase 3 batch 1: anamnesis/ core | 6 |
+| `65f6fc88` | Phase 3 batch 2: anamnesis/ collectors, models, utilities | 17 |
+| `b2cc3249` | Phase 3 batch 3: anamnesis/ complete | 21 |
+| `bcaecd0e` | Phase 3 batch 4: symploke/ complete | 41 |
+| `dd415aed` | Phase 3 complete: all remaining | 93 |
+
+## ディレクトリ別集計
+
+| Directory | Files | Level |
+|-----------|-------|-------|
+| [fep/](file:///home/laihuip001/oikos/hegemonikon/mekhane/fep/encoding.py#439-489) | 32 | L1/L3 (定理+テスト) |
+| `anamnesis/` | 44 | L2/L3 (インフラ+ユーティリティ) |
+| `symploke/` | 41 | L2/L3 (インフラ+テスト) |
+| `ccl/` | 13 | L1 (定理) |
+| `ergasterion/` | 16 | L2 (インフラ) |
+| `peira/` | 17 | L3 (ユーティリティ) |
+| `poiema/` | 9 | L2 (インフラ) |
+| `mcp/` | 6 | L2 (インフラ) |
+| `scripts/` | 10 | L3 (ユーティリティ) |
+| `tests_root/` | 7 | L3 (テスト) |
+| その他 | 6 | 混合 |
+| **合計** | **201** | — |
+
+## PROOF 粒度標準
+
+実装した3段階の粒度:
+
+- **[L1/定理]**: CCL、FEP コア定理実装ファイル
+- **[L2/インフラ]**: アダプタ、ファクトリ、インデクサ、MCPサーバー等
+- **[L3/テスト/ユーティリティ]**: テストコード、ヘルパースクリプト
+
+## PROOF フォーマット例
+
+```python
+# PROOF: [L2/インフラ] A0→知識結合が必要→Symplokē (統合知識層) が担う
+```
+
+```python
+"""
+PROOF: [L1/定理]
+
+E7 → 能動的推論が必要
+   → pymdp との統合
+   → fep_agent.py が担う
+
+Q.E.D.
+
+---
+
+(元のdocstring)
+"""
+```
+
+---
+
+*Generated: 2026-01-31 / mekhane/ PROOF traversal complete*

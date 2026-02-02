@@ -1,0 +1,42 @@
+# Task: タスク管理機構 (/tak) の設計・実装
+
+> **CCL Signature**: `/tak+` (Task Orchestration Workflow)
+> **Date**: 2026-01-30
+
+## 目標
+
+タスク/TODO/アイデアを投入すると、自動で整理・分類・見積もり・不足情報提案・期限別Must/Should提示までを行う機構を CCL/mek+ で製作する。
+
+---
+
+## タスク一覧
+
+### Phase 1: 設計 (PLANNING)
+
+- [x] 実装計画書の作成
+- [x] Creator レビュー完了 → A (完全版) 採択
+
+### Phase 2: 実装 (EXECUTION)
+
+- [x] /tak ワークフロー作成
+- [x] Pythonモジュール実装
+  - [x] Task Intake Parser
+  - [x] Priority/Urgency Classifier
+  - [x] Hierarchy Builder
+  - [x] Dependency Resolver
+  - [x] Gap Analyzer
+  - [x] Effort Estimator
+  - [x] Schedule Matcher
+- [x] データスキーマ定義
+
+### Phase 3: 検証 (VERIFICATION)
+
+- [x] 入出力例のテスト
+- [x] 既存ワークフローとの統合確認
+
+---
+
+## Notes
+
+- Hegemonikón 体系との整合 (K2 Chronos, O2 Boulēsis, S3 Stathmos 連携)
+- 期限区分: 今日中 / 三日以内 / 今週中 / 3週間以内 / 2ヶ月以内

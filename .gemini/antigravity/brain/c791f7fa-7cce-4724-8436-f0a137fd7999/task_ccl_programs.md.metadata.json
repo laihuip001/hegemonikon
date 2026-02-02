@@ -1,0 +1,5 @@
+{
+  "artifactType": "ARTIFACT_TYPE_OTHER",
+  "summary": "タスク提案 (P0:依存関係確認、P1:Dogfooding、P2:let構文/ccl_signature) を CCL 式に変換。各タスクの CCL 表現とその構造分析を提供。統合プログラムも生成。",
+  "updatedAt": "2026-01-29T13:46:21.885915528Z"
+}

@@ -1,0 +1,68 @@
+# Walkthrough: tekhne-maker v5.1 Self-Dogfooding Integration
+
+## 実施日時
+2026-01-28 08:47 - 08:57
+
+## 目的
+prompt-lang-generator を tekhne-maker に Self-Dogfooding で吸収
+
+---
+
+## Self-Dogfooding (D案)
+
+```
+┌─────────────────────────────────────────┐
+│ 道具が自らを拡張する                    │
+│ tekhne-maker → prompt_lang_mode.prompt  │
+└─────────────────────────────────────────┘
+```
+
+**生成物**: [mixins/prompt_lang_mode.prompt](file:///home/laihuip001/oikos/.agent/skills/utils/tekhne-maker/mixins/prompt_lang_mode.prompt) (4120バイト)
+
+**吸収した知識**:
+- Required Directives (11項目)
+- Quality Standards (5項目の定量基準)
+- 4フェーズ Workflow
+- @rubric 4軸評価
+- Edge Cases (4パターン)
+- Error Handling (3パターン)
+
+---
+
+## 最終構造
+
+```
+tekhne-maker/
+├── SKILL.md                    # インターフェース (v5.1)
+├── tekhne-maker.prompt         # 魂 (7 mixins)
+├── mixins/
+│   ├── archetype-engine.prompt
+│   ├── fallback-hierarchy.prompt
+│   ├── quality-assurance.prompt
+│   └── prompt_lang_mode.prompt ← Self-Dogfooding生成
+└── references/
+    ├── (8既存ファイル)
+    └── prompt-lang-templates/
+```
+
+---
+
+## 検証結果
+
+| 項目 | 結果 |
+|:-----|:-----|
+| 情報ロス | **なし** ✅ |
+| mixins | 3 → **4** |
+| 美学 | Self-Dogfooding ✅ |
+
+---
+
+## コミット提案
+
+```
+feat(tekhne-maker): self-dogfooding integration (v5.1)
+
+- Generate prompt_lang_mode.prompt via tekhne-maker philosophy
+- Absorb prompt-lang-generator knowledge into mixin
+- Zero information loss, recursive elegance achieved
+```

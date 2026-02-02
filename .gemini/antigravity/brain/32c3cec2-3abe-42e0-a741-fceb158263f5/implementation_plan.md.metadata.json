@@ -1,0 +1,5 @@
+{
+  "artifactType": "ARTIFACT_TYPE_IMPLEMENTATION_PLAN",
+  "summary": "Mnēmē Synthesis CLI (mneme_cli.py) の実装計画。既存の sophia_ingest.py と kairos_ingest.py を統合し、/boot から呼び出し可能な unified CLI を作成する。Option A (新規ラッパーCLI) を推奨。Verification は既存テスト + 新規CLI動作確認 + /boot統合テストの3段階。",
+  "updatedAt": "2026-01-28T07:41:04.112973048Z"
+}

@@ -1,0 +1,137 @@
+# STOIC 効率性パターン: Hegemonikón への適用
+
+> **調査日**: 2026-01-28
+> **出典**: PhilArchive STOIC Architecture + Perplexity 調査
+
+---
+
+## 核心洞察
+
+> **「20M モデル ≈ 50B 出力品質」**
+> — STOIC Architecture の中心的主張
+
+これは「認知処理を LLM の外部に押し出す」ことで実現される。
+
+---
+
+## Cognitive Substrate パターン
+
+### 概念
+
+```
+┌─ Traditional LLM ─────────────────────┐
+│ [Input] → [LLM 推論 + 決定] → [Output] │
+│          (全てが LLM 内部)             │
+└───────────────────────────────────────┘
+
+┌─ Cognitive Substrate ─────────────────┐
+│ [Input]                               │
+│    ↓                                  │
+│ [外部認知層] ← 決定・推論はここで     │
+│    ↓                                  │
+│ [LLM] ← テキスト生成のみ              │
+│    ↓                                  │
+│ [Output]                              │
+└───────────────────────────────────────┘
+```
+
+### STOIC での実装
+
+1. **Belief State Machine**: 信念の明示的管理
+2. **Deterministic Reasoning**: 再現可能な推論
+3. **Structured Output**: LLM は「書く」だけ
+
+---
+
+## Hegemonikón への適用
+
+### 現在の構造 (v5.1)
+
+```
+User Input
+  ↓
+Claude (LLM) — 全ての判断を実行
+  ↓
+Output
+```
+
+### 提案: Cognitive Layer 統合
+
+```
+User Input
+  ↓
+[O1 Noēsis] pymdp.infer_states() — 信念推論
+  ↓
+[O2 Boulēsis] pymdp.infer_policies() — ポリシー選択
+  ↓
+[O4 Energeia] pymdp.sample_action() — 行動決定
+  ↓
+Claude (LLM) — テキスト生成 (Neural Renderer)
+  ↓
+Output
+```
+
+### 期待される効果
+
+| 指標 | 現在 | 予測 |
+|:-----|:-----|:-----|
+| 推論品質 | Claude 依存 | pymdp + Claude |
+| 再現可能性 | 確率的 | 決定論的 (pymdp) |
+| 計算効率 | 高コスト | 認知層で削減可能 |
+
+---
+
+## 実装アプローチ (Phase 3)
+
+### Step 1: 状態空間設計
+
+`state_spaces.py` で定義済み:
+- Phantasia (印象): clear/unclear
+- Assent (同意): given/withheld
+- Hormē (衝動): controlled/reactive
+
+### Step 2: A/B/C 行列カスタマイズ
+
+デフォルト行列を Hegemonikón の文脈に最適化:
+- A: 観察→状態 マッピング
+- B: 状態遷移 (ワークフロー間の遷移)
+- C: 選好ベクトル (品質優先)
+
+### Step 3: 統合テスト
+
+```python
+# 統合フロー
+from mekhane.fep import HegemonikónFEPAgent
+
+def cognitive_layer_demo(user_input: str):
+    agent = HegemonikónFEPAgent()
+    
+    # 観察をエンコード
+    obs = encode_input(user_input)
+    
+    # O1 Noēsis
+    beliefs = agent.infer_states(obs)
+    
+    # O2 Boulēsis
+    q_pi, efe = agent.infer_policies()
+    
+    # O4 Energeia
+    action = agent.sample_action()
+    
+    # LLM に委譲
+    prompt = f"Action: {action}, Beliefs: {beliefs}"
+    return llm_generate(prompt)
+```
+
+---
+
+## 次のステップ
+
+1. [ ] `encode_input()` 関数設計 — テキスト→観察変換
+2. [ ] A/B/C 行列の Hegemonikón 最適化
+3. [ ] 統合デモ実装
+4. [ ] 品質比較テスト (with/without Cognitive Layer)
+
+---
+
+*Generated as part of /bou Priority 2 research*

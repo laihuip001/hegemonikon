@@ -1,0 +1,5 @@
+{
+  "artifactType": "ARTIFACT_TYPE_IMPLEMENTATION_PLAN",
+  "summary": "エピソード記憶機構の再設計計画。.pb が読めないため、代替データソースからエピソード記憶を構築する。",
+  "updatedAt": "2026-01-31T07:56:20.423861652Z"
+}

@@ -1,0 +1,19 @@
+# Mekhane 実装状況精査と定理マッピング
+
+## Phase 1: Boot & Data Collection ✅
+- [x] /boot 実行 (Anti-Stale, Handoff読込)
+- [x] mekhane ディレクトリ構造探索
+- [x] 既存 KI (36_derivative_taxonomy) 参照
+
+## Phase 2: Analysis & Mapping ▶️
+- [/] テオリア層 → メカーネ層の対応関係分析
+- [ ] 実装済み機構の特定
+- [ ] 不足領域の特定
+
+## Phase 3: Implementation Planning
+- [ ] 不足メカーネ機構の設計
+- [ ] 実装優先順位決定
+- [ ] implementation_plan.md 作成
+
+## Phase 4: Review
+- [ ] Creator レビュー依頼

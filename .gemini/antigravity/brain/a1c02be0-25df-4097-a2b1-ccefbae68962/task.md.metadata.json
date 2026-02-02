@@ -1,0 +1,6 @@
+{
+  "artifactType": "ARTIFACT_TYPE_TASK",
+  "summary": "ワークフロー統合タスク。O/S/H/P/K/A 全ワークフローに select_derivative を統合する。",
+  "updatedAt": "2026-01-29T02:38:31.200160844Z",
+  "version": "4"
+}

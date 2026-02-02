@@ -1,0 +1,57 @@
+# Walkthrough: Jules API 統合 + 専門家カタログ拡張
+
+## 実施内容
+
+### 1. Jules API 統合 ✅
+
+| 成果物 | 説明 |
+|--------|------|
+| [jules_client.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/symploke/jules_client.py) | API クライアント |
+| [jules_mcp_server.py](file:///home/laihuip001/oikos/hegemonikon/mcp/jules_mcp_server.py) | MCP Server (4ツール) |
+
+**テスト結果**:
+- 7リポジトリ発見
+- 5タスク並列実行（3/5完了、311秒）
+- MCP 4ツール動作確認
+
+---
+
+### 2. 専門家カタログ拡張 ✅
+
+**初期 → 最終**:
+```
+60人 → 200人 → 866人（20層構造）
+```
+
+| ファイル | 内容 |
+|----------|------|
+| [jules-specialists-catalog.md](file:///home/laihuip001/oikos/hegemonikon/docs/jules-specialists-catalog.md) | カタログ v3 |
+| [perplexity_specialist_research.md](file:///home/laihuip001/oikos/hegemonikon/docs/perplexity_specialist_research.md) | Perplexity 調査結果（105KB） |
+
+**20層構造**:
+- Phase 0: 従来的品質 (200)
+- Phase 1: 見落とし層 (76) - 認知負荷、AI固有
+- Phase 2: 運用層 (290) - 可観測性、債務、分散
+- Phase 3: 高度分析 (230) - DSL、ML、統計
+
+---
+
+### 3. Jules 設定 ✅
+
+| ファイル | 内容 |
+|----------|------|
+| [.env.jules](file:///home/laihuip001/oikos/hegemonikon/.env.jules) | 9 API キー |
+| [agents.md](file:///home/laihuip001/oikos/hegemonikon/agents.md) | 環境ヒント |
+| [jules-repository-setup.md](file:///home/laihuip001/oikos/hegemonikon/docs/jules-repository-setup.md) | 設定ガイド |
+
+---
+
+## 次のアクション
+
+1. Jules Web UI で Setup Script 設定 → スナップショット保存
+2. 専門家実装の優先度決定
+3. Phase 1 (見落とし層) の実装開始
+
+---
+
+*完了日: 2026-01-27*

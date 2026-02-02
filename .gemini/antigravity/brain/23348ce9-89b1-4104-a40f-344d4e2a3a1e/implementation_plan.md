@@ -1,0 +1,52 @@
+# 品質体系統合 実装計画 (A+B+C 全統合)
+
+> **目的**: Metrika/Chreos/Palimpsest/Graphē を 3層で完全統合
+> **判断**: Creator — 今日中に全部終わらせる
+
+---
+
+## 実装スコープ
+
+| Phase | 内容 | ファイル |
+|:------|:-----|:---------|
+| **A** | チェックリスト追加 | /s.md, /ene.md |
+| **B** | 発動ロジック追加 | /s.md, /ene.md |
+| **C** | Python バリデータ | mekhane/quality_gate.py |
+
+---
+
+## Proposed Changes
+
+### Phase A+B: ワークフロー更新
+
+#### [MODIFY] [s.md](file:///home/laihuip001/oikos/.agent/workflows/s.md)
+
+- STAGE 2 に Metrika 5門チェックリスト (通過必須ゲート)
+- Chreos 警告ロジック
+
+#### [MODIFY] [ene.md](file:///home/laihuip001/oikos/.agent/workflows/ene.md)  
+
+- PHASE 1 に Graphē 同期チェック
+- PHASE 4 に /dia 自動推奨
+- Palimpsest 柵警告
+
+---
+
+### Phase C: Python 実装
+
+#### [NEW] [quality_gate.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/quality_gate.py)
+
+```python
+# Metrika 5門 + Chreos + Palimpsest 自動検証
+def check_metrika(file_path: str) -> dict
+def check_chreos(file_path: str) -> list[dict]
+def check_palimpsest(file_path: str) -> list[dict]
+```
+
+---
+
+## Verification
+
+1. `/s` 発動 → Metrika チェックリスト表示
+2. `/ene` 発動 → Graphē チェック + /dia 推奨表示
+3. `quality_gate.py` テスト実行 → 全 Pass

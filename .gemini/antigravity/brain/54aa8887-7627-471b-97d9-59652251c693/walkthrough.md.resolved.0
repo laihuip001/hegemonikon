@@ -1,0 +1,51 @@
+# Batch 9: Workflow Mode Naturalization
+
+> **CCL**: `/mek+{ccl, process, output}`
+> **Date**: 2026-01-31
+
+---
+
+## セッション成果
+
+### 追加したセクション (14件)
+
+| WF | モード | CCL |
+|:---|:-------|:----|
+| [pra.md](file:///home/laihuip001/oikos/.agent/workflows/pra.md) | prax | `/pra+{value=intrinsic}` |
+| | pois | `/pra+{value=extrinsic}_/sta` |
+| | temp | `/pra+{axis=time}_/chr` |
+| [pat.md](file:///home/laihuip001/oikos/.agent/workflows/pat.md) | rece | `/pat+{mode=accept}` |
+| | tran | `/pat{+→-}_/gno` |
+| | regu | `/pat~{target=balance}` |
+| [epi.md](file:///home/laihuip001/oikos/.agent/workflows/epi.md) | statistical | `/epi+{method=stat}` |
+| | base_rate | `/kho.reference_class_/epi` |
+| [gno.md](file:///home/laihuip001/oikos/.agent/workflows/gno.md) | invariant | `/gno+{target=constant}` |
+| | rule | `/gno+{form=if-then}` |
+| [kho.md](file:///home/laihuip001/oikos/.agent/workflows/kho.md) | constraint | `/kho+{type=limit}` |
+| | boundary | `/kho+{focus=edge}` |
+| [sta.md](file:///home/laihuip001/oikos/.agent/workflows/sta.md) | sensitivity | `/sta+{analysis=delta}` |
+| | robust | `/sta+{test=perturbation}` |
+
+---
+
+## 進捗サマリー
+
+```diff
+- 前回: 41/245 = 16.7%
++ 今回: 55/245 = 22.4%
++ 増分: +14 モード (+5.7%)
+```
+
+---
+
+## 次のバッチ候補
+
+| WF | 未実装派生 | 優先度 |
+|:---|:-----------|:-------|
+| o.md, h.md, p.md, s.md | Hub WF の派生 | 🔴 High |
+| met.md | approximation, cognitive_load | 🟠 Med |
+| mek.md | 多数 | 🟠 Med |
+
+---
+
+*Batch 9 完了 (2026-01-31 12:00)*

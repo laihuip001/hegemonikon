@@ -1,0 +1,86 @@
+# 実装計画: tekhne-maker → Prompt-Lang 形式
+
+## 概要
+
+SKILL.md (277行) を [.prompt](file:///home/laihuip001/oikos/hegemonikon/mekhane/ergasterion/prompt-lang/demo.prompt) 形式に変換する。
+@mixin を活用してモジュールを分離し、再利用性を高める。
+
+---
+
+## 変換設計
+
+### ファイル構成
+
+```
+tekhne-maker/
+├── tekhne-maker.prompt      # メインプロンプト
+├── mixins/
+│   ├── archetype-engine.prompt   # M3: アーキタイプ
+│   ├── quality-assurance.prompt  # M5: 品質保証
+│   └── fallback-hierarchy.prompt # 確信度ルーティング
+└── references/               # 既存維持
+    ├── archetypes.md
+    └── ...
+```
+
+### メインプロンプト構造
+
+```prompt-lang
+#mixin archetype_engine
+@constraints:
+  - 5つのアーキタイプから選択: Precision, Speed, Autonomy, Creative, Safety
+  - 勝利条件と犠牲を明示
+  - references/archetypes.md を参照
+
+#mixin quality_assurance
+@constraints:
+  - Pre-Mortem Simulation を実行
+  - WARGAME_DB をチェック
+  - Red Team 批評を行う
+
+#prompt tekhne_maker
+@extends: base_agent
+@mixin: [archetype_engine, quality_assurance]
+
+@role:
+  プロンプト/SKILL.md 生成AIエージェント v5.0。
+  7モジュール構成、アーキタイプ駆動設計 + 深層推論 + 失敗シミュレーションを統合。
+
+@goal:
+  ユーザーの要求から高品質な SKILL.md またはプロンプトを生成する。
+  - Generate: 新規スキル作成
+  - Diagnose: 既存プロンプト診断
+  - Improve: 差分改善
+
+@constraints:
+  - BLUF (Bottom Line Up Front) を遵守
+  - 曖昧な入力には二者択一で確認
+  - 出力は SKILL.md 形式に従う
+
+@format:
+  SKILL.md 形式（YAML frontmatter + Markdown）
+
+@context:
+  - file: references/archetypes.md [priority: HIGH]
+  - file: references/quality-checklist.md [priority: MEDIUM]
+  - file: references/wargame-db.md [priority: MEDIUM]
+```
+
+---
+
+## 実装手順
+
+| # | タスク | 工数 |
+|:--|:-------|:-----|
+| 1 | mixin 3件作成 | 10分 |
+| 2 | メイン tekhne-maker.prompt 作成 | 15分 |
+| 3 | 動作テスト | 5分 |
+| **合計** | | **~30分** |
+
+---
+
+## 注意点
+
+1. **SKILL.md は維持**: Antigravity IDE はまだ [.prompt](file:///home/laihuip001/oikos/hegemonikon/mekhane/ergasterion/prompt-lang/demo.prompt) 形式を直接認識しない
+2. **並行運用**: [.prompt](file:///home/laihuip001/oikos/hegemonikon/mekhane/ergasterion/prompt-lang/demo.prompt) は「理想形」、[SKILL.md](file:///home/laihuip001/oikos/.agent/skills/utils/tekhne-maker/SKILL.md) は「現行」
+3. **@context で参照**: references/ はそのまま活用

@@ -1,0 +1,35 @@
+name: Skill-WF Sync Check
+
+on:
+    push:
+        paths:
+            - ".agent/workflows/*.md"
+            - ".agent/skills/**/SKILL.md"
+            - ".agent/data/theorem_map.yaml"
+    pull_request:
+        paths:
+            - ".agent/workflows/*.md"
+            - ".agent/skills/**/SKILL.md"
+            - ".agent/data/theorem_map.yaml"
+
+jobs:
+    sync-check:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+
+            - name: Set up Python
+              uses: actions/setup-python@v5
+              with:
+                  python-version: "3.11"
+
+            - name: Install dependencies
+              run: pip install pyyaml
+
+            - name: Run bidirectional linker verification
+              run: python3 .agent/scripts/bidirectional_linker.py
+
+            - name: Run WF-Skill sync check
+              run: |
+                  chmod +x .agent/scripts/wf_skill_sync_check.sh
+                  .agent/scripts/wf_skill_sync_check.sh

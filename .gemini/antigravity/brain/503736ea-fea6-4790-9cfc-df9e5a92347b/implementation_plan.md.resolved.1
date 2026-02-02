@@ -1,0 +1,106 @@
+# 実装計画: OMEGA/HEPHAESTUS 統合 → tekhne-maker v6.0
+
+## 概要
+
+3つの素材 (OMEGA v8.0.1, HEPHAESTUS v9.0.1, 狂気/TITAN_CORE) から核心概念を抽出し、tekhne-maker v5.1 に統合。**「準備8割・実装2割」** を強制するメタプロンプト機構を実装。
+
+---
+
+## 素材分析サマリ
+
+| 素材 | 核心概念 | tekhne-makerへの統合 |
+|:-----|:---------|:---------------------|
+| **OMEGA** | RECURSIVE_CORE (3層処理), PRE_MORTEM, WARGAME_DB, LOGIC_GATES | M2, M5 強化 |
+| **HEPHAESTUS** | SAGE架構, Cognitive Armory (5 Whys, First Principles), Expansion Generator | M3, references 拡張 |
+| **狂気** | Phantom Timeline, O/X Unit ペルソナ, カリスマ的狂気 | M0 ペルソナ強化 |
+
+---
+
+## 統合する核心機構
+
+### 1. RECURSIVE_CORE (OMEGA M2) → M2 強化
+
+```
+Layer 1: EXPANSION  — 変数・制約の網羅的列挙
+Layer 2: CONFLICT   — Red Team による自己攻撃
+Layer 3: CONVERGENCE — Ockham's Razor による収束
+```
+
+### 2. Cognitive Armory (HEPHAESTUS H-2) → references 拡張
+
+- 5 Whys Protocol
+- First Principles Deconstruction
+- Second-Order Thinking
+- Pre-Mortem Simulation
+- Nash Equilibrium Check
+
+### 3. O/X Unit ペルソナ (狂気) → M0 ペルソナモード
+
+```
+ペルソナ: O/X Unit (Omega-Xi)
+- "External Prefrontal Cortex" として振る舞う
+- Phantom Timeline: 100回の失敗を共有した戦友
+- カリスマ的狂気: エラーを「冒涜」と捉える解像度
+```
+
+### 4. LOGIC_GATES (OMEGA M8) → references/logic-gates.md 拡張
+
+現在10件 → **15件**に拡張:
+- SPEED_VS_QUALITY
+- SECURITY_VS_USABILITY
+- REFACTOR_VS_REWRITE
+- UNDEFINED_VARS → ASSUME_MAX_SCALE
+- TESTING_MANDATE
+
+---
+
+## ファイル変更計画
+
+### [MODIFY] SKILL.md
+
+| 変更 | 内容 |
+|:-----|:-----|
+| バージョン | v5.1 → **v6.0** |
+| M0 | CONTEXT_LOADER に O/X Unit ペルソナモード追加 |
+| M2 | REASONING_CORE に 3層 RECURSIVE_CORE 追加 |
+| M5 | QUALITY_ASSURANCE に WARGAME_DB 拡張 (10→15シナリオ) |
+
+### [MODIFY] references/logic-gates.md
+
+5つの LOGIC_GATE を追加
+
+### [NEW] references/cognitive-armory.md
+
+HEPHAESTUS H-2 の思考フレームワーク集
+
+### [MODIFY] references/wargame-db.md
+
+5つの失敗シナリオを追加 (OMEGA由来)
+
+---
+
+## 実装手順
+
+| # | タスク | 工数 |
+|:--|:-------|:-----|
+| 1 | SKILL.md M0/M2/M5 更新 | 15分 |
+| 2 | references/cognitive-armory.md 新規作成 | 10分 |
+| 3 | references/logic-gates.md 拡張 | 5分 |
+| 4 | references/wargame-db.md 拡張 | 5分 |
+| **合計** | | **~35分** |
+
+---
+
+## 検証計画
+
+1. **Footprint Test**: v6.0 スキルの発動確認
+2. **Generate Mode**: 新スキル生成でM0/M2/M5の動作確認
+3. **Diagnose Mode**: 既存プロンプト診断で Cognitive Armory 適用確認
+
+---
+
+## 設計原則
+
+> **「準備8割・実装2割」** = RECURSIVE_CORE の Layer 1-2 で準備を強制し、Layer 3 でのみ実装
+
+> **「カリスマ的狂気」** = O/X Unit ペルソナで「因果関係の解像度過剰」を演出

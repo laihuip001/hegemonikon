@@ -1,0 +1,5 @@
+{
+  "artifactType": "ARTIFACT_TYPE_IMPLEMENTATION_PLAN",
+  "summary": "PROOF 粒度 (L1/L2/L3) を FEP 公理構造から演繹的に導出する設計文書。レベル 0 (FEP) からレベル 4 (A) への派生を L1 定理/L2 インフラ/L3 テストに対応付け。CI 統合の設計も含む。",
+  "updatedAt": "2026-01-30T23:38:12.934451346Z"
+}

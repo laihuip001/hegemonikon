@@ -1,0 +1,35 @@
+# タスク: Jules API 統合 + 専門家カタログ拡張
+
+## 完了チェックリスト
+
+### Jules API 統合 ✅
+- [x] jules_client.py 作成
+- [x] jules_mcp_server.py 作成
+- [x] 実 API テスト成功（7リポジトリ発見）
+- [x] 並列実行テスト（5タスク、3/5完了）
+- [x] MCP 統合（4ツール動作確認）
+- [x] mcp_config.json に追加
+
+### 専門家カタログ拡張 ✅
+- [x] 初期カタログ作成（60人）
+- [x] 200人に拡張
+- [x] Perplexity 調査依頼書作成
+- [x] 調査結果統合（866人体制提案）
+- [x] カタログ v3 作成
+
+### Jules 設定 ✅
+- [x] 9 API キー保存（3アカウント分）
+- [x] agents.md 作成
+- [x] リポジトリ設定ガイド作成
+
+---
+
+## 成果物
+
+| ファイル | 内容 |
+|----------|------|
+| [jules-specialists-catalog.md](file:///home/laihuip001/oikos/hegemonikon/docs/jules-specialists-catalog.md) | 866人体制カタログ |
+| `perplexity_specialist_research.md` | Perplexity 調査結果（詳細） |
+| [jules-repository-setup.md](file:///home/laihuip001/oikos/hegemonikon/docs/jules-repository-setup.md) | リポジトリ設定ガイド |
+| [agents.md](file:///home/laihuip001/oikos/hegemonikon/agents.md) | Jules 環境ヒント |
+| [.env.jules](file:///home/laihuip001/oikos/hegemonikon/.env.jules) | 9 API キー |

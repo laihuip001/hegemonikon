@@ -1,0 +1,44 @@
+# FEP Integration Features Implementation
+
+## 目的
+前回セッションで挙がった3つのアイデアの種を実装し、`/noe` ワークフローで体験する。
+
+---
+
+## タスク一覧
+
+### Phase 1: 計画策定
+- [x] `/noe` ワークフロー構造の確認
+- [x] `/x` X-series 36関係マトリクスの確認
+- [x] FEP モジュール群の確認
+- [ ] 実装計画書作成 → ユーザー承認
+
+### Phase 2: 実装
+
+#### Feature 1: X-series 36関係の FEP 統合
+- [ ] `x_series_navigator.py` モジュール作成
+- [ ] 36関係を FEP 観察としてエンコード
+- [ ] `/noe` 完了時の推奨次ステップを FEP で選択
+
+#### Feature 2: FEP Agent のリアルタイム学習デモ
+- [ ] 学習状況の可視化関数追加
+- [ ] A行列の変化を表示する `format_learning_progress()` 実装
+- [ ] `/noe` 実行時に学習進捗を表示
+
+#### Feature 3: /noe 実行時の自動 encoder 呼び出し
+- [ ] `noesis_fep_integration.py` モジュール作成
+- [ ] PHASE 5 出力 → FEP 観察への自動変換
+- [ ] `/noe` ワークフローに統合指示追加
+
+### Phase 3: 検証
+- [ ] 既存テスト通過確認 (`pytest mekhane/fep/tests/`)
+- [ ] 新機能の単体テスト作成
+- [ ] `/noe` 実行で統合動作確認
+
+### Phase 4: 文書化
+- [ ] `walkthrough.md` 作成
+- [ ] `/bye` 実行
+
+---
+
+*Last updated: 2026-01-29T13:40+09:00*

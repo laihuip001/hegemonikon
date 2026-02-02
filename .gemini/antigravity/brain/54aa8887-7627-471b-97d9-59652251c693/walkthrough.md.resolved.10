@@ -1,0 +1,36 @@
+# Walkthrough: モード Naturalization
+
+> **成果**: 160/245 = 65.3% 🎉
+
+---
+
+## 本セッション: +56セクション
+
+| Batch | WF | 件数 |
+|:------|:---|:-----|
+| リファクタ | dia, met | 7 |
+| 15 | tro, tek | 11 |
+| 16 | ore, gno | 8 |
+| 17 | pis, epi | 6 |
+| 18 | kho, sta | 5 |
+| 19 | tel | 3 |
+| **計** | | **40** |
+
+---
+
+## Batch 19 詳細
+
+| WF | モード | CCL |
+|:---|:-------|:----|
+| [tel.md](file:///home/laihuip001/oikos/.agent/workflows/tel.md) | intr | `/tel+{source=intrinsic}` |
+| | extr | `/tel+{source=extrinsic}` |
+| | tran | `/tel+{scope=transcendent}` |
+
+---
+
+## 進捗
+
+```
+104 → 149 → 160 / 245 = 65.3%
+              ↑ 65%突破!
+```

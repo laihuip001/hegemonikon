@@ -1,0 +1,45 @@
+# Task: ワークフローモード Naturalization 継続
+
+> **CCL**: `/mek+{ccl, process, output}`
+> **前回セッション**: 41/245 = 16.7%
+
+---
+
+## 進捗
+
+### 完了 WF (前回セッション)
+- [x] hod.md: search, backward
+- [x] bou.md: desir, voli, akra (CCL追加)
+- [x] noe.md: anom, hypo, eval, cot, tot, cod (CCL追加)
+- [x] zet.md: anom, hypo, eval, abduction (CCL追加)
+- [x] pis.md: bayes (新規セクション)
+- [x] ene.md: flow, prax, pois, constructive (CCL追加)
+- [x] pro.md: appr, avoi, arre, random (CCL追加)
+- [x] dox.md: sens, conc, form (CCL追加)
+- [x] tel.md: objective (新規セクション)
+- [x] euk.md: stage (新規セクション)
+- [x] chr.md: deadline (新規セクション)
+- [x] tro.md: state, scurve (新規セクション)
+- [x] tek.md: api (新規セクション)
+
+### 既存 --mode セクション確認
+- [x] dia.md: epochē, audit, panorama, cross-model, cold_mirror, verify, steelman, devil, counterfactual, root
+- [x] kho.md: mece, problem
+- [x] sta.md: pareto, optimize, safety
+
+### Batch 9: 今セッション
+- [/] gno.md: analogy (詳細手順追加)
+- [ ] epi.md: モード確認
+- [ ] pat.md: モード確認
+- [ ] met.md: fermi (詳細手順追加)
+- [ ] pra.md: モード確認
+
+---
+
+## 残り WF 優先順位
+
+| Priority | WF | 派生数 | 理由 |
+|:---------|:---|:-------|:-----|
+| 🔴 High | gno, epi, pat, met, pra | ~15 | A/S Hub 未完成 |
+| 🟠 Med | o, h, p, k, s, x | ~20 | Hub WF |
+| 🟢 Low | その他 | ~170 | 使用頻度低 |

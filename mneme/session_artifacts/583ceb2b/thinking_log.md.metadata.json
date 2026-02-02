@@ -1,0 +1,6 @@
+{
+  "artifactType": "ARTIFACT_TYPE_OTHER",
+  "summary": "runtime仕様に関する技術的裏付け（ユーザー提供情報）を追記し、Shadow（影）としての扱いを確定。シンボリックリンクによる退避策も記録。",
+  "updatedAt": "2026-01-21T13:24:48.962051300Z",
+  "version": "5"
+}

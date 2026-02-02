@@ -1,0 +1,65 @@
+# Task: 全シリーズ 1:1 ワークフロー統一
+
+## 完了 (24/24 定理)
+
+### O シリーズ ✅
+
+- [x] /noe (O1 Noēsis)
+- [x] /bou (O2 Boulēsis)
+- [x] /zet (O3 Zētēsis)
+- [x] /ene (O4 Energeia)
+
+### K シリーズ ✅
+
+- [x] /euk (K1 Eukairia)
+- [x] /chr (K2 Chronos)
+- [x] /tel (K3 Telos)
+- [x] /sop (K4 Sophia)
+
+### S シリーズ ✅
+
+- [x] /met (S1 Metron) — 新設
+- [x] /mek (S2 Mekhanē) — /tek リネーム
+- [x] /sta (S3 Stathmos) — 新設
+- [x] /pra (S4 Praxis) — 新設
+
+### H シリーズ ✅
+
+- [x] /pro (H1 Propatheia) — 新設
+- [x] /pis (H2 Pistis) — 新設
+- [x] /ore (H3 Orexis) — 新設
+- [x] /dox (H4 Doxa) — 新設
+
+### P シリーズ ✅
+
+- [x] /kho (P1 Khōra) — 新設
+- [x] /hod (P2 Hodos) — 新設
+- [x] /tro (P3 Trokhia) — 新設
+- [x] /tek (P4 Tekhnē) — 新設
+
+### A シリーズ ✅
+
+- [x] /pat (A1 Pathos) — 新設
+- [x] /dia (A2 Krisis) — 既存
+- [x] /gno (A3 Gnōmē) — 新設
+- [x] /epi (A4 Epistēmē) — 新設
+
+---
+
+## 更新ファイル
+
+- [x] s.md children 更新
+- [x] h.md children 更新
+- [x] p.md children 更新
+- [x] a.md children 更新
+- [x] tools.yaml 更新
+
+---
+
+## 追加変更 (2026-01-28 23:07)
+
+- [x] /plan → /s 統合 (例外排除)
+- [x] /plan.md 削除
+- [x] tools.yaml /plan → deprecated
+
+**ステータス**: ✅ 完了 — 例外なし、1:1 原則完全達成

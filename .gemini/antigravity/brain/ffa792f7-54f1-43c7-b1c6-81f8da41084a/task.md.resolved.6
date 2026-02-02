@@ -1,0 +1,44 @@
+# Phase 3: Parent-Child Architecture Refinement
+
+## 設計パターン (継承モデル)
+
+```yaml
+SKILL.md (親クラス):
+  role: 抽象基底
+  contains:
+    - ドメイン概念の定義
+    - 汎用ロジック
+    - Anti-Skip Protocol
+  example: "消化とは A + B → A' である"
+
+Workflow (子クラス):
+  role: 具象実装
+  contains:
+    - 具体的な実行手順
+    - コード例・テンプレート
+    - 個別事案の例
+  example: "Step 1: 境界残存チェック (Python例)"
+```
+
+## 修正対象
+
+### fit.md 修正 (最初)
+- [ ] A2 SKILL.md に消化原則（抽象概念）を追加
+- [ ] fit.md に具体的手順を復元
+  - [ ] 階層的消化プロトコル (Level 0-3)
+  - [ ] 境界残存チェック (Python例)
+  - [ ] 機能重複検出 (Jaccard類似度)
+  - [ ] 強化度評価 (3軸スコア)
+  - [ ] 消化マッピング表 (例)
+  - [ ] 消化失敗時フローチャート
+
+### plan.md 確認
+- [x] 既に良い具体例を含む (307行)
+- [ ] S-series SKILL.md との整合性確認
+
+### 他のワークフロー検証
+- [ ] /noe, /bou, /ene, /zet の具体手順確認
+- [ ] 必要に応じて復元
+
+## 進捗
+- [/] fit.md 修正中

@@ -1,0 +1,5 @@
+{
+  "artifactType": "ARTIFACT_TYPE_OTHER",
+  "summary": "全42ワークフローの深層監査結果。8つの品質指標で評価し、11件は完全OK、31件に何らかの欠落を検出。欠落の深刻度をCritical/High/Medium/Lowに分類し、修復推奨を記載。",
+  "updatedAt": "2026-01-28T23:54:01.517312689Z"
+}

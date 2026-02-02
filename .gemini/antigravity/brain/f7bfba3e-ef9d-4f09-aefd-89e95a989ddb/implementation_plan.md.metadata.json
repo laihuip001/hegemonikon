@@ -1,0 +1,5 @@
+{
+  "artifactType": "ARTIFACT_TYPE_IMPLEMENTATION_PLAN",
+  "summary": "pymdp (Active Inference) を Hegemonikon に統合する PoC 設計。mekhane/fep/ 新モジュールとして fep_agent.py を実装。O1/O2 概念の数学的実装。",
+  "updatedAt": "2026-01-28T09:34:59.290584071Z"
+}

@@ -1,0 +1,24 @@
+# Task: Implement X-Series Visualization
+
+> **Source**: [gemini_x_series_spec_20260129.md](file:///home/laihuip001/oikos/mneme/.hegemonikon/workflows/gemini_x_series_spec_20260129.md)
+> **CCL**: `/s+ _/dia* /noe _/noe* /dia _/s!+ _/ene+`
+
+- [ ] **Phase 1: Deep Analysis (/s+)**
+    - [ ] Read and internalize [gemini_x_series_spec_20260129.md](file:///home/laihuip001/oikos/mneme/.hegemonikon/workflows/gemini_x_series_spec_20260129.md) <!-- id: 0 -->
+    - [ ] Perform S1 (Scale), S2 (Method), S3 (Criteria), S4 (Praxis) analysis <!-- id: 1 -->
+
+- [ ] **Phase 2: Critique & Understanding Loops (/dia* /noe ...)**
+    - [ ] critical review of the initial concept <!-- id: 2 -->
+    - [ ] Deep philosophical understanding of X-series mapping <!-- id: 3 -->
+    - [ ] Re-evaluation and refinement <!-- id: 4 -->
+
+- [ ] **Phase 3: Exhaustive Planning (/s!+)**
+    - [ ] Create detailed Implementation Plan expanding on all derivatives <!-- id: 5 -->
+    - [ ] Define data structure for 36 relations <!-- id: 6 -->
+    - [ ] Design SVG/Canvas visualization logic <!-- id: 7 -->
+
+- [ ] **Phase 4: Deep Execution (/ene+)**
+    - [ ] Generate `src/data/x-series.json` <!-- id: 8 -->
+    - [ ] Implement `XSeriesVis` component <!-- id: 9 -->
+    - [ ] Integrate into `hegemonikon-guide` <!-- id: 10 -->
+    - [ ] Verify interactivity <!-- id: 11 -->

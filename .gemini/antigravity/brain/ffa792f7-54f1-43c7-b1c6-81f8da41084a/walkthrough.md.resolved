@@ -1,0 +1,69 @@
+# Walkthrough: Parent-Child Architecture Refinement
+
+## 概要
+
+/noe 分析で fit.md v3.0 の「劣化」を検出し、親子アーキテクチャパターンを確立・適用。
+
+---
+
+## 問題発見
+
+| 項目 | 状態 |
+|:-----|:-----|
+| fit.md v3.0 | 133行（詳細手順削除）|
+| A2 SKILL.md | 消化原則なし |
+| 結論 | **両方とも欠落 = 劣化** |
+
+---
+
+## 解決策: 親子アーキテクチャ
+
+```yaml
+SKILL.md (親クラス):
+  role: 抽象基底
+  contains: ドメイン概念、汎用ロジック
+  example: "消化とは A + B → A' である"
+
+Workflow (子クラス):
+  role: 具象実装
+  contains: 具体的手順、コード例、テンプレート
+  example: "Step 1: 境界残存チェック (Python例)"
+```
+
+---
+
+## 適用結果
+
+### A2 Krisis SKILL.md
+- **追加**: 消化原則セクション (+40行)
+- **内容**: 定義、3段階レベル、チェックリスト
+- **合計**: 419行
+
+### fit.md v3.1
+- **復元**: 具体的手順 (+241行)
+- **内容**:
+  - 階層的消化プロトコル (Level 0-3)
+  - 境界残存チェック (Python例)
+  - 機能重複検出 (Jaccard類似度)
+  - 強化度評価 (3軸スコア)
+  - 消化マッピング表 (例)
+  - 消化失敗時フローチャート
+  - 使用例 2件
+- **合計**: 374行
+
+---
+
+## plan.md 確認
+
+plan.md (307行) は既に良い具体例を含んでおり、親子パターンに適合。
+
+---
+
+## 変更ファイル
+
+- [A2 Krisis SKILL.md](file:///home/laihuip001/oikos/.agent/skills/akribeia/a2-krisis/SKILL.md) — 消化原則追加
+- [fit.md](file:///home/laihuip001/oikos/.agent/workflows/fit.md) — 具体手順復元
+
+---
+
+*Generated: 2026-01-28*

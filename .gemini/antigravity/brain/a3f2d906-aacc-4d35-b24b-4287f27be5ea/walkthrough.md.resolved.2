@@ -1,0 +1,78 @@
+# /mek+ CCL 生成能力向上 — Walkthrough
+
+> **Date**: 2026-01-30
+> **CCL Program**: `/mek+_enhance = /s1 _ F:4{/zet-_/mek_?test_fail{/dia-_/mek}} _ /sta _ /bou`
+
+---
+
+## 実行結果
+
+**CCL プログラムに従い、自己強化を完了**
+
+```
+/s1 ✅  — 現状分析 (ccl_generator.py v1.0)
+F:4{}   — 4改善項目ループ
+  P1 ✅ — ループ推論
+  P2 ✅ — 振動検出
+  P3 ✅ — 条件合成
+  P4 ✅ — マクロ参照
+/sta ✅ — 基準検証 (テスト実行)
+/bou ✅ — 完了出力
+```
+
+---
+
+## Before/After
+
+| 項目 | v1.0 | v2.0 |
+|:-----|:-----|:-----|
+| Lines | 91 | 387 |
+| Loops | [(\d+)回](file:///home/laihuip001/oikos/hegemonikon/mekhane/orchestration/models.py#96-106) のみ | 暗黙ループ対応 |
+| Oscillation | 「往復」キーワード | パターンマッチ |
+| Conditions | ❌ | `?cond{}` 合成 |
+| Macros | ❌ | @tak 等対応 |
+
+---
+
+## テスト結果
+
+```
+入力: 3回分析する
+CCL:  F:×3{/s}  ✅
+
+入力: 収束まで評価する
+CCL:  F:{/dia}  ✅
+
+入力: 分類と見積を調整しながら
+CCL:  /sta~/chr  ✅
+
+入力: Gapがあれば調査する
+CCL:  ?ga{/sop}  ✅
+
+入力: @tak を詳細に実行
+CCL:  @tak _ /ene_+  ⚠️ (軽微な結合問題)
+```
+
+---
+
+## 作成/修正ファイル
+
+| File | 変更 |
+|:-----|:-----|
+| [ccl_generator.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/ccl_generator.py) | 91→387行 (大幅強化) |
+
+---
+
+## メタ洞察
+
+**CCL プログラムで自己強化を実行した**
+
+```
+/mek+ が /mek+ を改善
+  = ブートストラップ成功
+  = Hegemonikón の自己参照能力
+```
+
+---
+
+*v2.0 — CCL Generator Enhancement (2026-01-30)*

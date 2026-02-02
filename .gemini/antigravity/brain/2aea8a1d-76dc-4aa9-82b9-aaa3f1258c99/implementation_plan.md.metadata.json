@@ -1,0 +1,6 @@
+{
+  "artifactType": "ARTIFACT_TYPE_IMPLEMENTATION_PLAN",
+  "summary": "B4 KI 依存関係の実装計画。6つの主要 KI に dependencies フィールドを追加する。スコープを限定し、シンプルな実装で始める。",
+  "updatedAt": "2026-02-01T06:51:40.889228358Z",
+  "version": "2"
+}

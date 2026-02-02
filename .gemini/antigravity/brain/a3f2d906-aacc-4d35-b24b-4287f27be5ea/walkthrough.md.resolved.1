@@ -1,0 +1,82 @@
+# 認知公理 + @tak マクロ Walkthrough
+
+> **Date**: 2026-01-30
+> **進化**: `/tak` ワークフロー → 認知公理 + CCL マクロ
+
+---
+
+## 設計の進化
+
+```
+元の設計:
+  /tak = 独立したワークフロー (8フェーズ)
+
+新しい設計:
+  Layer 1: 認知公理 (パッシブ・常時発動)
+  Layer 2: @tak = 定理の合成 (CCLマクロ)
+```
+
+**美しさの理由**: 「当たり前」は呼び出すものではなく、常に働いているもの
+
+---
+
+## 作成ファイル
+
+| Path | 内容 |
+|:-----|:-----|
+| [cognitive_axioms.md](file:///home/laihuip001/oikos/.agent/rules/always/cognitive_axioms.md) | A1-A4 パッシブ公理 |
+| [tak.md](file:///home/laihuip001/oikos/.agent/macros/tak.md) | @tak マクロ定義 |
+| [REGISTRY.md](file:///home/laihuip001/oikos/.agent/macros/REGISTRY.md) | マクロレジストリ |
+| [axioms/__init__.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/axioms/__init__.py) | Python実装 |
+
+---
+
+## 認知公理 (A1-A4)
+
+| 公理 | 名前 | 効果 |
+|:-----|:-----|:-----|
+| A1 | 接地原則 | 曖昧→6W3H具体化 |
+| A2 | 分解原則 | 大→小に分割 |
+| A3 | 不足検出 | Gap明示 |
+| A4 | 行動可能性 | 次アクション明確化 |
+
+---
+
+## @tak マクロ
+
+```ccl
+@tak = /s1 _ /sta _ /kho _ /zet _ /chr _ /euk _ /bou
+```
+
+**演算子**:
+- `@tak+` — 詳細版 (内部全WFに + 伝播)
+- `@tak^` — メタ (分類ロジック自体を問う)
+- `@tak~/s` — 戦略との振動
+- `@tak*/ene` — 即実行への融合
+
+---
+
+## テスト結果
+
+```
+=== A1: 接地原則 ===
+What: 来週までにAPIを修正したい
+When: 来週
+Completeness: 22%
+
+=== A2: 分解原則 ===
+Input: 25 items → 3 batches
+
+=== A3: 不足検出 ===
+Detected: [TECHNICAL] どのような手段で実現しますか？
+
+=== A4: 行動可能化 ===
+Next action: APIを修正する
+Priority: SHOULD
+
+✅ 認知公理テスト完了
+```
+
+---
+
+*v1.0 — 「美しい」設計の実装完了*

@@ -1,0 +1,49 @@
+# Walkthrough: 専門家レビューシステム完成
+
+## 解決した問題
+
+**問題**: Jules セッション完了後も PR URL が返らず、レビュー結果にアクセスできない
+
+**解決策**: **Git ブランチからレビュー結果を取得**
+
+```bash
+# ブランチ名にセッションIDが含まれる
+git fetch origin
+git branch -r | grep "review"
+git show origin/branch-name:docs/reviews/xxx.md
+```
+
+---
+
+## レビュー結果（v2 実行）
+
+### ✅ CL-001 認知負荷レビュー
+
+> **結論**: 非常に高品質なコード。リファクタリング不要。
+
+| 観点 | 評価 | 詳細 |
+|------|------|------|
+| 変数スコープ | 低（良好） | 適切に局所化 |
+| ネスト深度 | 低（良好） | 最大3レベル |
+| 一時変数 | 適切 | 説明的変数として機能 |
+| 命名 | 高（良好） | 直感的な名前 |
+
+---
+
+## 成果物
+
+| ファイル | 内容 |
+|----------|------|
+| [jules_client.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/symploke/jules_client.py) | API クライアント |
+| [run_specialists.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/symploke/run_specialists.py) | バッチ実行 |
+| [specialist_run_results_v2.json](file:///home/laihuip001/oikos/hegemonikon/docs/specialist_run_results_v2.json) | 実行結果 |
+
+---
+
+## 次のアクション
+
+1. 残り 8/9 セッション完了待ち
+2. 他のブランチからレビュー結果を収集
+3. 残り 857 人の専門家を段階的に実行
+
+*完了日: 2026-01-27*

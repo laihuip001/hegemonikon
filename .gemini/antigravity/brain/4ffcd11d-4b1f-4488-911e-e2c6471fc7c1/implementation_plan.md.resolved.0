@@ -1,0 +1,88 @@
+# X-series 連携強化 + workflow_runner 診断
+
+## 現状分析
+
+### ✅ 既存実装
+
+| コンポーネント | 状態 | 場所 |
+|--------------|------|------|
+| X-series 36関係マトリクス | ✅ 完了 | [/x.md](file:///home/laihuip001/oikos/.agent/workflows/x.md) + [encoding.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/fep/encoding.py) |
+| `X_SERIES_MATRIX` 定数 | ✅ 完了 | [mekhane/fep/encoding.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/fep/encoding.py) L594-601 |
+| [get_x_series_recommendations()](file:///home/laihuip001/oikos/hegemonikon/mekhane/fep/encoding.py#616-667) | ✅ 完了 | [mekhane/fep/encoding.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/fep/encoding.py) L616-666 |
+| [workflow_runner.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/workflow_runner.py) 派生選択 | ✅ 動作 | [mekhane/workflow_runner.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/workflow_runner.py) |
+| FEP [__init__.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/fep/__init__.py) エクスポート | ✅ 完了 | X-series関数がエクスポート済み |
+
+### ⚠️ 統合が欠落している箇所
+
+1. **workflow_runner ↔ X-series 連携なし**
+   - WF完了時に X-series 推奨次ステップを表示する機能がない
+   
+2. **workflow_runner テストなし**
+   - `mekhane/fep/tests/` に `test_workflow_runner.py` が存在しない
+
+---
+
+## Proposed Changes
+
+### 1. workflow_runner に X-series 統合
+
+#### [MODIFY] [workflow_runner.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/workflow_runner.py)
+
+- [WorkflowResult](file:///home/laihuip001/oikos/hegemonikon/mekhane/workflow_runner.py#30-40) に [x_series_recommendations](file:///home/laihuip001/oikos/hegemonikon/mekhane/fep/encoding.py#616-667) フィールドを追加
+- [run_workflow()](file:///home/laihuip001/oikos/hegemonikon/mekhane/workflow_runner.py#105-142) 完了時に [get_x_series_recommendations()](file:///home/laihuip001/oikos/hegemonikon/mekhane/fep/encoding.py#616-667) を呼び出し
+- [format_derivative_selection()](file:///home/laihuip001/oikos/hegemonikon/mekhane/workflow_runner.py#144-166) に推奨次ステップ表示を追加
+
+---
+
+### 2. workflow_runner 診断テスト追加
+
+#### [NEW] [test_workflow_runner.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/fep/tests/test_workflow_runner.py)
+
+```python
+# テスト内容:
+# - 全24定理の派生選択が動作すること
+# - X-series 推奨が正しく生成されること
+# - format_derivative_selection() 出力形式
+```
+
+---
+
+## Verification Plan
+
+### Automated Tests
+
+```bash
+# 既存FEPテスト確認
+cd /home/laihuip001/oikos/hegemonikon
+PYTHONPATH=. .venv/bin/python -m pytest mekhane/fep/tests/ -v -k "workflow" --tb=short
+
+# 新規テスト実行
+PYTHONPATH=. .venv/bin/python -m pytest mekhane/fep/tests/test_workflow_runner.py -v
+
+# 全FEPテスト（既存336テストが壊れていないことを確認）
+PYTHONPATH=. .venv/bin/python -m pytest mekhane/fep/tests/ -v
+```
+
+### Manual Verification
+
+```bash
+# CLI 動作確認
+cd /home/laihuip001/oikos/hegemonikon
+PYTHONPATH=. .venv/bin/python mekhane/workflow_runner.py O1 "この問題の本質は何か"
+# 期待出力: 派生選択 + X-series 推奨次ステップ表示
+```
+
+---
+
+## 実装工数見積
+
+| タスク | 工数 |
+|--------|------|
+| workflow_runner.py 修正 | 15分 |
+| test_workflow_runner.py 作成 | 15分 |
+| テスト実行・検証 | 5分 |
+| **合計** | **35分** |
+
+---
+
+*Generated: 2026-01-29 13:49*

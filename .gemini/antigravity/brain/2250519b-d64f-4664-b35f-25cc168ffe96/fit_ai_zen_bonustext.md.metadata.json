@@ -1,0 +1,6 @@
+{
+  "artifactType": "ARTIFACT_TYPE_WALKTHROUGH",
+  "summary": "AI Zen ボーナステキストの Hegemonikón への消化完了レポート。/ingest ワークフロー新設により、/mek で調理し /fit で消化診断するパターンを確立。3つの調理品: (1) 6W3H → /bou v4.1, (2) リーンキャンバス → /s v4.1, (3) 発散技法 → /noe v4.1。消化レベル: 🟢 Naturalized。情報ロス: 0%。新規コマンド: /ingest のみ（メタワークフロー）。",
+  "updatedAt": "2026-01-29T01:07:25.383847784Z",
+  "version": "1"
+}

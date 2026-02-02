@@ -1,0 +1,76 @@
+# Walkthrough: ワークフローモード Naturalization
+
+> **期間**: Batch 9-11
+> **成果**: 33 セクション追加 (16.7% → 30.2%)
+
+---
+
+## 追加セクション一覧
+
+### Batch 9 (14件)
+
+| WF | モード | CCL |
+|:---|:-------|:----|
+| [pra.md](file:///home/laihuip001/oikos/.agent/workflows/pra.md) | prax | `/pra+{value=intrinsic}` |
+| | pois | `/pra+{value=extrinsic}_/sta` |
+| | temp | `/pra+{axis=time}_/chr` |
+| [pat.md](file:///home/laihuip001/oikos/.agent/workflows/pat.md) | rece | `/pat+{mode=accept}` |
+| | tran | `/pat{+→-}_/gno` |
+| | regu | `/pat~{target=balance}` |
+| [epi.md](file:///home/laihuip001/oikos/.agent/workflows/epi.md) | statistical | `/epi+{method=stat}` |
+| | base_rate | `/kho.reference_class_/epi` |
+| [gno.md](file:///home/laihuip001/oikos/.agent/workflows/gno.md) | invariant | `/gno+{target=constant}` |
+| | rule | `/gno+{form=if-then}` |
+| [kho.md](file:///home/laihuip001/oikos/.agent/workflows/kho.md) | constraint | `/kho+{type=limit}` |
+| | boundary | `/kho+{focus=edge}` |
+| [sta.md](file:///home/laihuip001/oikos/.agent/workflows/sta.md) | sensitivity | `/sta+{analysis=delta}` |
+| | robust | `/sta+{test=perturbation}` |
+
+### Batch 10 (6件)
+
+| WF | モード | CCL |
+|:---|:-------|:----|
+| [ore.md](file:///home/laihuip001/oikos/.agent/workflows/ore.md) | targ | `/ore+{focus=object}` |
+| | acti | `/ore+{focus=process}` |
+| | stat | `/ore+{focus=state}` |
+| [mek.md](file:///home/laihuip001/oikos/.agent/workflows/mek.md) | comp | `/mek+{method=compose}` |
+| | inve | `/mek+{method=invent}` |
+| | adap | `/mek+{method=adapt}` |
+
+### Batch 11 (13件)
+
+| WF | モード | CCL |
+|:---|:-------|:----|
+| [noe.md](file:///home/laihuip001/oikos/.agent/workflows/noe.md) | separate | `/noe+{focus=decompose}_/kho` |
+| | align | `/noe+{focus=coherence}_/sta` |
+| | metalearning | `/noe*{scope=process}_/gno` |
+| [sop.md](file:///home/laihuip001/oikos/.agent/workflows/sop.md) | surf | `/sop-{depth=surface}` |
+| | deep | `/sop+{depth=exhaustive}` |
+| | prag | `/sop+{focus=actionable}_/ene` |
+| [bou.md](file:///home/laihuip001/oikos/.agent/workflows/bou.md) | desir | `/bou+{filter=pure}` |
+| | voli | `/bou+{resolve=conflict}` |
+| | akra | `/bou+{bridge=will→action}` |
+| [zet.md](file:///home/laihuip001/oikos/.agent/workflows/zet.md) | anom | `/zet+{trigger=friction}` |
+| | hypo | `/zet+{mode=generate}` |
+| | eval | `/zet+{mode=prioritize}` |
+| | abduction | `/zet+{logic=inference}` |
+
+---
+
+## 進捗サマリー
+
+```diff
+- 前回: 41/245 = 16.7%
++ Batch 9:  +14 モード
++ Batch 10: +6 モード
++ Batch 11: +13 モード
++ 今回: 74/245 = 30.2%
+```
+
+---
+
+## 次のステップ
+
+1. `/ene` に flow/prax/pois を追加
+2. `/dia` に root/sys/devil を追加
+3. 残り ~160 モードを順次追加

@@ -1,0 +1,5 @@
+{
+  "artifactType": "ARTIFACT_TYPE_IMPLEMENTATION_PLAN",
+  "summary": "Cognitive Algebra 複合実行時の artifact 出力規則追加。operators_and_layers.md と overview.md を修正し、継承原則を明文化する計画。",
+  "updatedAt": "2026-01-29T08:08:00.508712095Z"
+}

@@ -1,0 +1,86 @@
+# Hermēneus Phase 1-4 完了 Walkthrough
+
+## 概要
+
+CCL (Cognitive Control Language) の **コンパイル→実行→オーケストレーション→検証** を行う **Hermēneus** コンパイラの Phase 1-4 を完了。
+
+## アーキテクチャ
+
+```
+CCL Input → [Phase 1: Compiler] → LMQL
+                ↓
+         [Phase 2: Runtime] → LLM Execution
+                ↓
+         [Phase 3: Orchestration] → Stateful Graph
+                ↓
+         [Phase 4: Verification] → Multi-Agent Debate → Audit Trail
+```
+
+## 作成ファイル
+
+| Phase | ファイル | 役割 | 行数 |
+|:------|:---------|:-----|-----:|
+| 1 | [ast.py](file:///home/laihuip001/oikos/hegemonikon/hermeneus/src/ast.py) | AST ノード | 192 |
+| 1 | [expander.py](file:///home/laihuip001/oikos/hegemonikon/hermeneus/src/expander.py) | 省略形展開 | 226 |
+| 1 | [parser.py](file:///home/laihuip001/oikos/hegemonikon/hermeneus/src/parser.py) | CCL パーサー | 334 |
+| 1 | [translator.py](file:///home/laihuip001/oikos/hegemonikon/hermeneus/src/translator.py) | LMQL 変換 | 280 |
+| 2 | [runtime.py](file:///home/laihuip001/oikos/hegemonikon/hermeneus/src/runtime.py) | 実行エンジン | 350 |
+| 2 | [constraints.py](file:///home/laihuip001/oikos/hegemonikon/hermeneus/src/constraints.py) | 制約デコード | 320 |
+| 3 | [graph.py](file:///home/laihuip001/oikos/hegemonikon/hermeneus/src/graph.py) | StateGraph変換 | 450 |
+| 3 | [checkpointer.py](file:///home/laihuip001/oikos/hegemonikon/hermeneus/src/checkpointer.py) | 状態永続化 | 340 |
+| 3 | [hitl.py](file:///home/laihuip001/oikos/hegemonikon/hermeneus/src/hitl.py) | HITL制御 | 280 |
+| 4 | [verifier.py](file:///home/laihuip001/oikos/hegemonikon/hermeneus/src/verifier.py) | Multi-Agent Debate | 420 |
+| 4 | [audit.py](file:///home/laihuip001/oikos/hegemonikon/hermeneus/src/audit.py) | Audit Trail | 360 |
+
+**合計: ~3,500行**
+
+## テスト結果
+
+```
+======================== 74 passed, 2 warnings in 1.63s ========================
+```
+
+| Phase | テスト数 |
+|:------|--------:|
+| Phase 1 | 19 |
+| Phase 2 | 16 |
+| Phase 3 | 15 |
+| Phase 4 | 24 |
+
+## 公開 API (v0.4.0)
+
+```python
+from hermeneus.src import (
+    # Phase 1: コンパイル
+    compile_ccl, parse_ccl,
+    
+    # Phase 2: 実行
+    execute_ccl, generate_constrained,
+    
+    # Phase 3: オーケストレーション
+    build_graph, execute_graph,
+    save_state, load_state, HITLController,
+    
+    # Phase 4: 検証
+    verify_execution, DebateEngine,
+    record_verification, query_audits
+)
+
+# 1. CCL 実行
+result = execute_ccl("/noe+", context="分析対象")
+
+# 2. Multi-Agent Debate で検証
+consensus = verify_execution(
+    ccl="/noe+ >> V[] < 0.3",
+    execution_output=result.output,
+    debate_rounds=3
+)
+print(f"Confidence: {consensus.confidence:.2%}")
+
+# 3. 監査レコードを記録
+audit_id = record_verification("/noe+", result.output, consensus)
+```
+
+---
+
+*Completed: 2026-02-01 | v0.4.0*

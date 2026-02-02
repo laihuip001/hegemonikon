@@ -1,0 +1,80 @@
+# /zet ワークフロー完全再設計 — ウォークスルー
+
+> **日時**: 2026-01-28
+> **成果**: `/zet` テンプレートを2025年実証研究に基づき最適化
+
+---
+
+## 成果サマリー
+
+| 項目 | Before | After |
+|------|--------|-------|
+| 行数 | 279行 | 207行 (−26%) |
+| 冒頭優先順位 | 未定義 | フォーマット→タスク→時間制約 |
+| 時間制約 | セクション4 | **冒頭** |
+| 出力形式 | チャット内 | **ファイル出力** |
+
+---
+
+## Phase 1: KI復元内容の実装 ✅
+
+[workflow_governance.md](file:///home/laihuip001/oikos/.gemini/antigravity/knowledge/hegemonikon_system/artifacts/implementation/workflow_governance.md) から復元した原則を [zet.md](file:///home/laihuip001/oikos/.agent/workflows/zet.md) に統合:
+
+1. **2025後半優先**: 2025年7月〜2026年1月を最優先
+2. **世代フィルタ**: 2024年以前は「参考」扱い
+3. **Cut-off明示**: 各情報源に日付を明記させる
+
+### 反映箇所
+- 行36: 2025年実証研究による優先順位
+- 行58: 過去6ヶ月以内（相対日付）
+- 行116: 品質チェックリスト Chronotopic Precision
+- 行140: 簡易版テンプレート
+
+---
+
+## Phase 2: /noe によるテンプレート再設計 ✅
+
+### /noe 分析結果
+- **最高リスク領域**: フレーミング（一律テンプレートへの仮定）
+- **洞察**: パプ君は冒頭を最重視 → 時間制約がセクション4は遅すぎる
+- **Synthesis**: 「冒頭3行に核心 + 詳細はアコーディオン」
+
+### パプ君調査結果 ([zet_research_result.md](file:///home/laihuip001/oikos/.gemini/antigravity/brain/30aa8d81-3a86-4491-85dc-978e562f9f98/zet_research_result.md))
+- **最適プロンプト長**: 500-2,000トークン（日本語: 1,500-6,000文字）
+- **冒頭優先順位**: フォーマット指定 → タスク定義 → 時間制約 → スタイル
+- **時間制約表現**: 「過去X日」（相対日付）が最効果的
+- **引用強化**: "Cite-or-fail"指示で幻覚 −20-30%
+
+---
+
+## 変更内容
+
+### 設計原則に追加
+```markdown
+> **出力形式**: 調査依頼書は brain/<id>/zet_<topic>.md としてファイル出力
+```
+
+### テンプレート構造変更
+```markdown
+## 【出力形式】← 最優先（冒頭最初）
+## 【調査目的】← 優先度2（1-2文）
+## 【時間制約】← 優先度3（最重要）
+## 【質問】← 3-5項目
+## 【オプション詳細】← 必要時のみ
+## 【末尾指示】← 引用強化
+```
+
+### Perplexity特有機能追加
+- 時間予算指定: `"Spend 3 minutes on multi-source synthesis"`
+- Sub-Query自動生成: `Consider these dimensions: [A] [B] [C]`
+- 引用強化: 「わかりません」指示
+
+---
+
+## 関連ファイル
+
+| ファイル | 状態 |
+|----------|------|
+| [zet.md](file:///home/laihuip001/oikos/.agent/workflows/zet.md) | ✅ 更新済み |
+| [boot.md](file:///home/laihuip001/oikos/.agent/workflows/boot.md) | ✅ 更新済み (Linux対応) |
+| [zet_research_result.md](file:///home/laihuip001/oikos/.gemini/antigravity/brain/30aa8d81-3a86-4491-85dc-978e562f9f98/zet_research_result.md) | 調査結果 |

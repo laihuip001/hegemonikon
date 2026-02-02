@@ -1,0 +1,84 @@
+# MCP Server (mneme_server.py) 完了ウォークスルー
+
+> **Hegemonikón Module**: H3 Symplokē
+> **Session**: 2026-01-27 16:55-17:05
+
+---
+
+## ✅ 完了した作業
+
+### 1. 現状確認
+- [mneme_server.py](file:///home/laihuip001/oikos/hegemonikon/mcp/mneme_server.py) は既に実装済み（277行）
+- 3つのツールを提供: [search](file:///home/laihuip001/oikos/hegemonikon/mcp/mneme_server.py#184-209), [stats](file:///home/laihuip001/oikos/hegemonikon/mcp/mneme_server.py#211-227), [sources](file:///home/laihuip001/oikos/hegemonikon/mcp/mneme_server.py#229-250)
+- SearchEngine + 4インデックス (gnosis/chronos/sophia/kairos) を統合
+
+### 2. Symplokē コンポーネント検証
+```
+Registered: gnosis
+Registered: chronos
+Registered: sophia
+Registered: kairos
+Search results: 0 (MockAdapter - データなし)
+Stats: {'gnosis': 0, 'chronos': 0, 'sophia': 0, 'kairos': 0}
+Sources: {'kairos', 'sophia', 'gnosis', 'chronos'}
+```
+
+### 3. MCP SDK インストール
+```bash
+pip install mcp
+# → mcp 1.26.0 + 27 dependencies installed
+```
+
+### 4. 統合テスト結果
+```
+✅ MCP Server created
+✅ SearchEngine initialized with 4 indices
+   Sources: {'sophia', 'chronos', 'gnosis', 'kairos'}
+
+✅ mneme_server.py is FULLY FUNCTIONAL!
+```
+
+---
+
+## 📊 アーキテクチャ
+
+```
+┌─────────────────────────────────────────────┐
+│           mneme_server.py (MCP)             │
+│  Tools: search | stats | sources            │
+└──────────────────┬──────────────────────────┘
+                   │
+┌──────────────────▼──────────────────────────┐
+│            SearchEngine                      │
+└──────────────────┬──────────────────────────┘
+                   │
+     ┌─────────────┼─────────────┐
+     │             │             │
+┌────▼────┐ ┌─────▼─────┐ ┌─────▼─────┐ ┌─────▼─────┐
+│ Gnosis  │ │ Chronos   │ │ Sophia    │ │ Kairos    │
+│ Index   │ │ Index     │ │ Index     │ │ Index     │
+└────┬────┘ └─────┬─────┘ └─────┬─────┘ └─────┬─────┘
+     │            │             │             │
+┌────▼────────────▼─────────────▼─────────────▼────┐
+│              MockAdapter (stub mode)              │
+│         (将来: HNSWlib / LanceDB Adapter)        │
+└─────────────────────────────────────────────────┘
+```
+
+---
+
+## 🚀 次のステップ
+
+| フェーズ | タスク | 状態 |
+|:---|:---|:---|
+| A | データ投入（論文/履歴/KI/Handoff） | ⏳ |
+| B | Antigravity MCP 設定 | ⏳ |
+| C | 本番 Adapter（HNSWlib/LanceDB）接続 | ⏳ |
+
+---
+
+## 📎 関連ファイル
+
+- [mneme_server.py](file:///home/laihuip001/oikos/hegemonikon/mcp/mneme_server.py)
+- [search/engine.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/symploke/search/engine.py)
+- [indices/__init__.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/symploke/indices/__init__.py)

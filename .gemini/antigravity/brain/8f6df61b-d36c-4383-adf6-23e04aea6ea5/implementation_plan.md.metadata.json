@@ -1,0 +1,6 @@
+{
+  "artifactType": "ARTIFACT_TYPE_IMPLEMENTATION_PLAN",
+  "summary": "位相反転演算子 `\\` (Antistrophē) の設計仕様。旧 Antitheton ワークフロー案を破棄し、全 37 ワークフローに適用可能な単項演算子として再設計。CCL v6.35 への更新、構文定義、強制ルール、使用パターン、検証計画を含む。",
+  "updatedAt": "2026-01-30T04:00:40.169106070Z",
+  "version": "1"
+}

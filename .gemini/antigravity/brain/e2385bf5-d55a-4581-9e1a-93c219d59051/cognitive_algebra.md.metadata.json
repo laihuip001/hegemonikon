@@ -1,0 +1,5 @@
+{
+  "artifactType": "ARTIFACT_TYPE_OTHER",
+  "summary": "Foundational discovery document for the Cognitive Algebra system. Defines arithmetic symbols (+, -, *, /, %, &, !) as operators on cognitive workflows. Emerged from the /ax!! experiment. Includes theoretical basis, implementation phases, and aesthetic principles.",
+  "updatedAt": "2026-01-29T05:38:42.338256865Z"
+}

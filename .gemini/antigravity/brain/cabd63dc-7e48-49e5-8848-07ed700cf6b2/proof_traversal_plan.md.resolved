@@ -1,0 +1,199 @@
+# 存在証明の走査 — 実行計画
+
+> **CCL**: `/mek+{target=@proof*}`
+> **目的**: リポジトリ全体を FEP から演繹的に洗練
+
+---
+
+## 概要
+
+```
+木の探索:
+  Layer 0: ディレクトリ → PROOF.md
+  Layer 1: ファイル → ファイル冒頭コメント
+  Layer 2: コード/文 → 関数/クラスの docstring
+  Layer 3: 単語/字句 → 命名規則への統合
+```
+
+---
+
+## CCL プログラム
+
+```ccl
+@proof* = {
+    # Layer 0: ディレクトリ
+    F:directories {
+        @proof{layer:dir}
+        
+        # Layer 1: ファイル
+        F:files {
+            @proof{layer:file}
+            
+            # Layer 2: コード
+            F:code_items {
+                @proof{layer:code}
+            }
+        }
+    }
+    
+    # Layer 3: 字句 (別途)
+    /gno{output:naming_conventions.md}
+}
+```
+
+---
+
+## Phase 1: ディレクトリ走査
+
+### 対象
+
+```
+hegemonikon/
+├── kernel/          ← PROOF.md 済み ✅
+├── mekhane/         ← PROOF.md 済み ✅
+│   ├── fep/         ← 未
+│   ├── anamnesis/   ← 未
+│   ├── gnosis/      ← 未
+│   ├── symploke/    ← 未
+│   ├── ergasterion/ ← 未
+│   ├── deploy/      ← 未 (移動済み)
+│   ├── mcp/         ← 未 (移動済み)
+│   ├── scripts/     ← 未 (移動済み)
+│   ├── tests/       ← 未 (移動済み)
+│   └── experiments/ ← 未 (移動済み)
+└── docs/            ← PROOF.md 済み ✅
+    └── governance/  ← 未
+```
+
+### 実行順序
+
+1. `mekhane/fep/`
+2. `mekhane/anamnesis/`
+3. `mekhane/gnosis/`
+4. `mekhane/symploke/`
+5. `mekhane/ergasterion/`
+6. `docs/governance/`
+7. (移動したディレクトリは帰属が明確なのでスキップ可)
+
+### 工数見積もり
+
+| ディレクトリ | PROOF.md | 時間 |
+|:-------------|:--------:|:----:|
+| mekhane/fep/ | 1 | 5分 |
+| mekhane/anamnesis/ | 1 | 5分 |
+| mekhane/gnosis/ | 1 | 5分 |
+| mekhane/symploke/ | 1 | 5分 |
+| mekhane/ergasterion/ | 1 | 5分 |
+| docs/governance/ | 1 | 5分 |
+| **計** | **6** | **30分** |
+
+---
+
+## Phase 2: ファイル走査 (今日はスキップ)
+
+### 方針
+
+各ファイルの冒頭に存在証明コメントを追加:
+
+```python
+"""
+PROOF: このファイルは存在しなければならない
+
+Axiom: FEP (予測誤差最小化)
+Derivation:
+  A0 → システムは内部モデルを持つ
+     → 内部モデルには FEP 実装が必要
+     → derivative_selector.py は派生選択を担う
+     
+Q.E.D.
+"""
+```
+
+### 工数
+
+- 対象: 201 .py ファイル
+- 1ファイル 2分 → **約 7時間**
+- **別日に実施**
+
+---
+
+## Phase 3: コード走査 (将来)
+
+### 方針
+
+関数/クラスの docstring に存在証明を追加:
+
+```python
+def select_derivative(theorem_id: str, context: str) -> DerivativeResult:
+    """
+    PROOF: この関数は存在しなければならない
+    
+    A0 → 複数の派生が存在
+       → 文脈に応じた選択が必要
+       → select_derivative() が担う
+    
+    Q.E.D.
+    """
+```
+
+### 工数
+
+- 対象: 数百関数
+- **Phase 2 完了後**
+
+---
+
+## Phase 4: 字句走査 (将来)
+
+### 方針
+
+命名規則を [kernel/naming_conventions.md](file:///home/laihuip001/oikos/hegemonikon/kernel/naming_conventions.md) に統合:
+
+```markdown
+# 命名規則
+
+## 変数名
+
+| パターン | 演繹 |
+|:---------|:-----|
+| `*_state` | FEP 状態空間 |
+| `*_action` | FEP 行為 |
+| `*_belief` | FEP 信念 |
+```
+
+### 工数
+
+- **Phase 3 完了後**
+
+---
+
+## 今日の実行提案
+
+```ccl
+# Phase 1 のみ実行
+F:[fep, anamnesis, gnosis, symploke, ergasterion] {
+    @proof{layer:dir}
+}
+```
+
+| ステップ | 内容 | 時間 |
+|:---------|:-----|:----:|
+| 1 | mekhane/fep/PROOF.md | 5分 |
+| 2 | mekhane/anamnesis/PROOF.md | 5分 |
+| 3 | mekhane/gnosis/PROOF.md | 5分 |
+| 4 | mekhane/symploke/PROOF.md | 5分 |
+| 5 | mekhane/ergasterion/PROOF.md | 5分 |
+| 6 | docs/governance/PROOF.md | 5分 |
+| **計** | **6 PROOF.md** | **30分** |
+
+---
+
+## 承認待ち
+
+- [ ] Phase 1 (ディレクトリ PROOF.md) を今日実行？
+- [ ] Phase 2-4 は別日？
+- [ ] 対象ディレクトリの追加/削除？
+
+---
+
+*CCL: `/mek+{target=@proof*}` — 計画完了、実行待ち*

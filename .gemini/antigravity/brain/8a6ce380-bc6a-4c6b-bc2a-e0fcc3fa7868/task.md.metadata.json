@@ -1,0 +1,6 @@
+{
+  "artifactType": "ARTIFACT_TYPE_TASK",
+  "summary": "Forge Prompt Structure 消化タスク。System Instructions 消化完了後、Forge 44 モジュールから randomize と toc の 2 派生を抽出して追加。",
+  "updatedAt": "2026-01-29T05:48:26.154714201Z",
+  "version": "4"
+}

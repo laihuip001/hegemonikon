@@ -1,0 +1,6 @@
+{
+  "artifactType": "ARTIFACT_TYPE_IMPLEMENTATION_PLAN",
+  "summary": "Tier 5/6 の各モジュールを第一原理で再評価。「消化 AND/OR 新コマンド」を個別判定。Q-3 オッカムは /cut 新設、C-5 は /fix 新設 + /vet 連携、E-1 は /plan 深化。",
+  "updatedAt": "2026-01-28T04:26:53.597019925Z",
+  "version": "1"
+}

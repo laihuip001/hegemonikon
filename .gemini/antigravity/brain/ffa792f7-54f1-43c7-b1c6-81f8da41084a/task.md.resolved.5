@@ -1,0 +1,46 @@
+# Phase 2: τ-Workflow Refactoring Rollout
+
+## 目標
+/noe で確立したパターンを全 τ-workflow に適用:
+1. SKILL.md を正本として拡張（Anti-Skip Protocol 追加）
+2. Workflow に Step 0 (view_file 強制) 追加
+3. Artifact 出力保存規則を追加
+
+## τ-Workflow 一覧
+
+### 優先度 High (詳細ロジックあり)
+- [x] /noe (O1 Noēsis) — パイロット完了
+- [x] /bou (O2 Boulēsis) — v3.0
+- [x] /ene (O4 Energeia) — v3.0
+- [x] /pan (Panorama) — v3.0
+- [x] /syn (Synedrion) — v3.0
+- [x] /dia (A2 Krisis) — v5.0
+- [x] /epo (S4 Epochē) — v2.0
+
+### 優先度 Medium (中程度のロジック)
+- [x] /pri (Priority) — v3.0
+- [x] /fit (Digestion Audit) — v3.0
+- [x] /zet (O3 Zētēsis) — v3.0
+
+### 優先度 Low (抽象コマンド、薄い) — 未処理
+- [ ] /o, /s, /h, /p, /k, /a (Δ-layer)
+- [ ] /ax (統合)
+
+## 進捗
+- Phase 1 完了: /noe v3.0
+- Phase 2 完了: High + Medium 優先度全て
+
+## 統計
+
+| Workflow | Before (lines) | After (lines) | 削減率 |
+|:---------|---------------:|---------------:|-------:|
+| /noe | 421 | 109 | 74% |
+| /bou | 280 | 100 | 64% |
+| /ene | 358 | 100 | 72% |
+| /pan | 293 | 90 | 69% |
+| /syn | 191 | 95 | 50% |
+| /dia | 157 | 85 | 46% |
+| /epo | 152 | 85 | 44% |
+| /fit | 490 | 120 | 76% |
+| /pri | 215 | 130 | 40% |
+| /zet | 331 | 90 | 73% |

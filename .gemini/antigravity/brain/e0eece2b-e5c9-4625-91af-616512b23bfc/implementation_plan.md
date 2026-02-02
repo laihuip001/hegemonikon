@@ -1,0 +1,103 @@
+# B/C/D 実装計画
+
+> **目的**: Documentation, AI 自律化, コード品質の3軸を進める
+> **V[/bou]**: 0.18 (収束済み)
+
+---
+
+## 現状分析
+
+| 項目 | 現状 |
+|:-----|:-----|
+| **B. ドキュメント** | `ccl_macro_reference.md` 存在、CEP-001 派生は未反映 |
+| **C. AI 自律化** | KI `n8n_refined_implementation_plan.md` 存在、未着手 |
+| **D. コード品質** | 17 PROOF.md 存在、CI 統合なし |
+
+---
+
+## Proposed Changes
+
+### B. CCL Usage Examples 作成
+
+#### [NEW] ccl_usage_examples.md
+
+`/home/laihuip001/oikos/hegemonikon/docs/ccl_usage_examples.md`
+
+CEP-001 新記号の使用例を文書化:
+
+- `/boot'` 変化追跡
+- `V[/bou]` 意志の不確実性
+- `/sop.track` 調査進捗
+
+---
+
+### C. AI 自律化 PoC
+
+#### [NEW] n8n_boot_automation.json
+
+`/home/laihuip001/oikos/hegemonikon/mekhane/ergasterion/n8n/boot_automation.json`
+
+/boot の一部を n8n で自動化:
+
+- Git status 取得
+- Handoff 検索
+- 通知送信
+
+> **スコープ制限**: PoC として最小限の1フロー
+
+---
+
+### D. PROOF CI 統合
+
+#### [MODIFY] dendron_ci.py
+
+`/home/laihuip001/oikos/hegemonikon/mekhane/dendron/dendron_ci.py`
+
+既存の Dendron CI に PROOF チェックを追加:
+
+- PROOF.md 存在確認
+- 必須セクション検証
+
+---
+
+## Verification Plan
+
+### B. ドキュメント
+
+**手動検証**:
+
+1. `ccl_usage_examples.md` を作成
+2. 内容が CEP-001 派生を網羅しているか確認
+3. CCL 式が有効な構文か確認
+
+### C. AI 自律化
+
+**手動検証**:
+
+1. n8n フロー JSON を作成
+2. n8n UI にインポート可能か確認 (User: 実環境で検証)
+
+### D. コード品質
+
+**自動テスト**:
+
+```bash
+pytest hegemonikon/mekhane/dendron/tests/ -v
+```
+
+> **注意**: 既存テストがあれば活用、なければ新規作成
+
+---
+
+## 優先順位
+
+1. **B** (即時) — ドキュメントは依存なし
+2. **D** (次) — CI 改善は B と並行可能
+3. **C** (最後) — PoC 設計のみ今日
+
+---
+
+## User Review Required
+
+> [!IMPORTANT]
+> C (AI 自律化) は n8n 環境が必要です。本日は設計のみにしますか？

@@ -1,0 +1,6 @@
+{
+  "artifactType": "ARTIFACT_TYPE_IMPLEMENTATION_PLAN",
+  "summary": "parameters.yaml を fep_agent.py から読み込む loader モジュールの実装計画。/plan v3.0 形式。",
+  "updatedAt": "2026-01-28T12:36:19.379115259Z",
+  "version": "1"
+}

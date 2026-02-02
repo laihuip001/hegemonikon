@@ -1,0 +1,5 @@
+{
+  "artifactType": "ARTIFACT_TYPE_IMPLEMENTATION_PLAN",
+  "summary": "arXiv:2412.10425論文からの吸収パターンを実装する計画。(1) 2-step政策horizon導入 (policy_len=2) (2) A行列永続化 (save/load) (3) Dirichlet更新ロジック。対象: fep_agent.py, persistence.py(新規), test_fep_agent.py。",
+  "updatedAt": "2026-01-28T10:20:40.680706219Z"
+}

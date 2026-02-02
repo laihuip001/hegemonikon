@@ -1,0 +1,63 @@
+# Walkthrough: tekhne-maker v5.0 統合
+
+## 概要
+
+`meta-prompt-generator` v3.0 と v4.0 を統合し、`tekhne-maker` v5.0 を作成しました。
+
+---
+
+## 実施内容
+
+### 1. README 更新
+
+[README.md](file:///home/laihuip001/oikos/hegemonikon/README.md) に格言を追加:
+
+> **「十分」を目指すと「不足」に終わる。「過剰」を目指すと「十分」に到達する。**
+
+---
+
+### 2. ディレクトリリネーム
+
+```
+meta-prompt-generator → tekhne-maker
+```
+
+τέχνη (テクネー) = 技術・技芸・匠の技
+
+---
+
+### 3. ファイル構成
+
+| ファイル | 行数 | 備考 |
+|:---------|-----:|:-----|
+| [SKILL.md](file:///home/laihuip001/oikos/.agent/skills/utils/tekhne-maker/SKILL.md) | 276 | v5.0 統合版 |
+| references/archetypes.md | 236 | v3.0維持 |
+| references/quality-checklist.md | 172 | v3.0維持 |
+| references/templates.md | 295 | v3.0維持 |
+| references/transformations.md | 180 | v3.0維持 |
+| references/logic-gates.md | 462 | ✨ v4.0新規 |
+| references/wargame-db.md | 308 | ✨ v4.0新規 |
+| references/codex-languages.md | 214 | ✨ v4.0新規 |
+| references/codex-infra.md | 305 | ✨ v4.0新規 |
+| **合計** | **2,448** | |
+
+---
+
+### 4. 主要な変更点
+
+| 項目 | 内容 |
+|:-----|:-----|
+| **バージョン** | v4.1 → **v5.0** (Synedrion助言による) |
+| **アーキテクチャ** | 7モジュール構成 (M0-M6) |
+| **新規機能** | Dual-Core推論エンジン、Deep Think Cycle |
+| **品質保証** | WARGAME_DB + Pre-Mortem統合 |
+| **環境注記** | Claude専用機能にNote追加 |
+
+---
+
+## 次のステップ
+
+| 優先度 | タスク | 状態 |
+|:------:|:-------|:----:|
+| 1 | `@extends`/`@mixin` 実装 | Phase 2 へ後送 |
+| 2 | tekhne-maker → Prompt-Lang化 | 検討中 |

@@ -1,0 +1,81 @@
+# 派生選択学習 実装計画
+
+> 今日できる範囲で「学習実現」を進める
+
+---
+
+## 学習サイクル設計
+
+```text
+1. 派生選択実行
+   ↓
+2. 選択ログ記録 (YAML)
+   ↓
+3. /bye 時に成功記録を Doxa に永続化
+   ↓
+4. /boot 時に Doxa から A-matrix を更新
+   ↓
+5. 次回の派生選択でより精度向上
+```
+
+---
+
+## 今日実装する範囲
+
+| 機能 | 説明 | ファイル |
+|:-----|:-----|:---------|
+| **選択ログ記録** | 派生選択を YAML に記録 | [derivative_selector.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/fep/derivative_selector.py) |
+| **ログ永続化** | /bye で Doxa に保存 | [/bye.md](file:///home/laihuip001/oikos/.agent/workflows/bye.md) + [doxa_persistence.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/fep/doxa_persistence.py) |
+| **A-matrix 更新** | /boot で学習 A を反映 | [/boot.md](file:///home/laihuip001/oikos/.agent/workflows/boot.md) |
+
+---
+
+## 変更対象
+
+### [MODIFY] derivative_selector.py
+
+```python
+# v3.2: 選択ログ記録
+SELECTION_LOG_PATH = "/home/laihuip001/oikos/mneme/.hegemonikon/derivative_selections.yaml"
+
+def _log_selection(theorem: str, problem: str, result: DerivativeRecommendation):
+    """派生選択をログに記録"""
+    entry = {
+        "timestamp": datetime.now().isoformat(),
+        "theorem": theorem,
+        "problem": problem[:100],
+        "derivative": result.derivative,
+        "confidence": result.confidence,
+        "method": "llm" if "LLM" in result.rationale else "keyword",
+    }
+    # YAML に追記
+    ...
+```
+
+### [MODIFY] /bye.md
+
+派生選択ログを Doxa に永続化するステップを追加:
+
+```markdown
+## PHASE 3: 派生選択学習 (v3.2 新規)
+
+1. `derivative_selections.yaml` を読み込み
+2. 高信頼度 (>80%) の選択を Doxa に永続化
+3. 次回 /boot 時に A-matrix 学習に使用
+```
+
+---
+
+## 簡易実装 (今日のゴール)
+
+最小限の学習基盤:
+
+1. ✅ **選択ログ記録**: 派生選択のたびに YAML に記録
+2. ✅ **ログ解析ユーティリティ**: どの派生がどの問題で選ばれたかを分析
+3. ✅ **/bye 連携**: 高信頼度選択を Doxa に永続化
+
+これで「学習の種」が植えられ、後日 FEP A-matrix 統合が可能になる。
+
+---
+
+## 承認をお願いします

@@ -1,0 +1,114 @@
+# /why 実装計画 (O3 Zētēsis 派生)
+
+## 目標
+
+O3 Zētēsis の派生ワークフロー `/why` を作成する。
+
+> **用途**: Five Whys — 根本原因を問い続ける
+
+---
+
+## SE手法: Five Whys
+
+**概要**: 「なぜ？」を5回繰り返して根本原因に到達する
+
+- **起源**: トヨタ生産方式 (Sakichi Toyoda)
+- **2023年産業調査**: 47組織で有効性確認
+- **特徴**: シンプルだが強力、表層的原因から根本原因へ
+
+---
+
+## 提案する変更
+
+### [NEW] [why.md](file:///home/laihuip001/oikos/.agent/workflows/why.md)
+
+O3 Zētēsis の派生ワークフロー。
+
+**Frontmatter**:
+```yaml
+---
+description: O3 Zētēsis 派生。Five Whys で根本原因を問い続ける。
+hegemonikon: Ousia
+modules: [O3]
+parent: "/zet"
+skill_ref: ".agent/skills/ousia/o3-zetesis/SKILL.md"
+triggers:
+  - "なぜ"
+  - "根本原因"
+  - "Five Whys"
+  - "原因分析"
+  - "RCA"
+version: "1.0"
+lineage: "O3 Zētēsis 派生 + SE Five Whys 手法統合 → v1.0 (2026-01-29)"
+anti_skip: enabled
+---
+```
+
+**構造** (SE Five Whys 手法に基づく):
+
+1. **PHASE 0**: 問題の明確化
+   - 何が問題か？
+   - いつ発生したか？
+   - 影響範囲は？
+
+2. **PHASE 1**: Why 1-5
+   - Why 1: 直接原因
+   - Why 2: 間接原因
+   - Why 3: プロセス原因
+   - Why 4: システム原因
+   - Why 5: 根本原因
+
+3. **PHASE 2**: 根本原因の検証
+   - 「この原因を解決すれば問題は再発しないか？」
+   - 検証可能な形に言語化
+
+4. **PHASE 3**: 対策立案
+   - 根本原因に対する対策
+   - 表層原因への緩和策
+
+---
+
+### [MODIFY] [zet.md](file:///home/laihuip001/oikos/.agent/workflows/zet.md)
+
+**変更内容**: children に `/why` を追加
+
+```yaml
+children:
+  - "/poc"  # Timeboxed 探索 (Spike/PoC)
+  - "/why"  # Five Whys (根本原因分析)
+```
+
+---
+
+### [MODIFY] tools.yaml
+
+**変更内容**: `/why` エントリを更新 (DEPRECATED → 復活)
+
+```yaml
+why:
+  purpose: "O3 Zētēsis 派生。Five Whys で根本原因を問い続ける"
+  modules: [O3]
+  parent: "/zet"
+  description: "根本原因分析 — なぜ？を5回繰り返す"
+```
+
+---
+
+## 検証計画
+
+1. `/why` を実行し、Five Whys フローが動作することを確認
+2. 生成された根本原因分析が artifact として保存されることを確認
+
+---
+
+## 実装手順
+
+1. **tekhne-maker (M2-M4) を使用して生成**
+2. **frontmatter 追加**: 上記定義を適用
+3. **親ワークフロー更新**: `/zet` に children 追加
+4. **tools.yaml 更新**: エントリ更新
+5. **git commit**
+
+---
+
+*計画完了: 2026-01-29*

@@ -1,0 +1,25 @@
+# Active Projects System タスクリスト
+
+## Phase A: CCL 精緻化実行
+
+- [/] Step 1: /kho+ (スコープ詳細定義)
+- [ ] Step 2: /sta+ (成功基準設定)
+- [ ] Step 3: /pre~\pre (Premortem 振動)
+- [ ] Step 4: /mek.model (モデル構築)
+- [ ] Step 5: /mek.observability (可観測性設計)
+
+---
+
+## Phase B: 実装
+
+- [ ] `projects.yaml` 作成
+- [ ] `/boot` Step 17.5 追加
+- [ ] 各プロジェクトに `PROJECT.md` 追加
+- [ ] `/bye` に更新 prompt 追加
+
+---
+
+## Phase C: 検証
+
+- [ ] `/boot+` でプロジェクト一覧表示確認
+- [ ] 全プロジェクトパスの実在確認

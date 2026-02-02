@@ -1,0 +1,113 @@
+# /flag 実装計画 (O4 Energeia 派生)
+
+## 目標
+
+O4 Energeia の派生ワークフロー `/flag` を作成する。
+
+> **用途**: Feature Flags — 段階的リリースとリスク制御
+
+---
+
+## SE手法: Feature Flags
+
+**概要**: コードをデプロイしても機能をオフにしておき、段階的に有効化する
+
+- **別名**: Feature Toggles, Feature Switches
+- **起源**: Martin Fowler, 2010年代の CI/CD 実践
+- **利点**: リリースリスク低減、A/Bテスト、段階的ロールアウト
+
+---
+
+## 提案する変更
+
+### [NEW] [flag.md](file:///home/laihuip001/oikos/.agent/workflows/flag.md)
+
+O4 Energeia の派生ワークフロー。
+
+**Frontmatter**:
+
+```yaml
+---
+description: O4 Energeia 派生。Feature Flags で段階的リリースとリスク制御。
+hegemonikon: Ousia
+modules: [O4]
+parent: "/ene"
+skill_ref: ".agent/skills/ousia/o4-energeia/SKILL.md"
+triggers:
+  - "Feature Flag"
+  - "段階的リリース"
+  - "トグル"
+  - "ロールアウト"
+  - "フラグ"
+version: "1.0"
+lineage: "O4 Energeia 派生 + SE Feature Flags 手法統合 → v1.0 (2026-01-29)"
+anti_skip: enabled
+---
+```
+
+**構造** (SE Feature Flags 手法に基づく):
+
+1. **PHASE 0**: フラグ設計
+   - 何をフラグ化するか？
+   - フラグの種類は？(Release / Experiment / Ops / Permission)
+   - フラグの寿命は？(短期 / 長期 / 永続)
+
+2. **PHASE 1**: 実装パターン
+   - 条件分岐の挿入点
+   - デフォルト値の設定
+   - フォールバック動作
+
+3. **PHASE 2**: ロールアウト計画
+   - 段階的有効化 (0% → 10% → 50% → 100%)
+   - 対象ユーザーグループ
+   - 監視指標
+
+4. **PHASE 3**: クリーンアップ計画
+   - フラグ削除のタイミング
+   - 技術的負債の管理
+
+---
+
+### [MODIFY] [ene.md](file:///home/laihuip001/oikos/.agent/workflows/ene.md)
+
+**変更内容**: children に `/flag` を追加
+
+```yaml
+children:
+  - "/flag"  # Feature Flags (段階的リリース)
+```
+
+---
+
+### [MODIFY] tools.yaml
+
+**変更内容**: `/flag` エントリを追加
+
+```yaml
+flag:
+  purpose: "O4 Energeia 派生。Feature Flags で段階的リリース"
+  modules: [O4]
+  parent: "/ene"
+  description: "段階的ロールアウト — リスクを制御した実行"
+```
+
+---
+
+## 検証計画
+
+1. `/flag` を実行し、フラグ設計フローが動作することを確認
+2. 生成されたロールアウト計画が artifact として保存されることを確認
+
+---
+
+## 実装手順 (/mek)
+
+1. **tekhne-maker (M2-M4) を使用して生成**
+2. **frontmatter 追加**: 上記定義を適用
+3. **親ワークフロー更新**: `/ene` に children 追加
+4. **tools.yaml 更新**: エントリ追加
+5. **git commit**
+
+---
+
+*計画完了: 2026-01-29*

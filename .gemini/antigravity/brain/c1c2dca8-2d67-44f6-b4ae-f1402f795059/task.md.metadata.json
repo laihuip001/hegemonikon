@@ -1,0 +1,6 @@
+{
+  "artifactType": "ARTIFACT_TYPE_TASK",
+  "summary": "Task checklist for eliminating 948 AI audit issues by fixing logic, code, and adding suppression support.",
+  "updatedAt": "2026-02-01T03:24:55.678903865Z",
+  "version": "1"
+}

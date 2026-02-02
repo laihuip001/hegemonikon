@@ -1,0 +1,46 @@
+# Implementation Plan - Fix All 948 Audit Issues
+
+## Goal
+Eliminate all 948 reported AI audit issues by fixing the codebase and refining the auditor, without effectively disabling the auditor.
+
+## Current State
+- **Issues:** 948 (Medium/Low) confirmed.
+- **Auditor Status:** Some checks appear commented out in [ai_auditor.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/synedrion/ai_auditor.py) (need restoration).
+- **Improvements:** AI-017 (Magic Number) expansion and AI-007 (Quote) threshold changes are present.
+
+## Proposed Changes
+
+### 1. Restore & Enhance Auditor ([mekhane/synedrion/ai_auditor.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/synedrion/ai_auditor.py))
+- **[Restore]** Uncomment all checks in [audit_file](file:///home/laihuip001/oikos/hegemonikon/mekhane/synedrion/ai_auditor.py#280-326) (L300-325) to ensure "Zero Issues" is genuine.
+- **[Enhance]** Add Inline Suppression Support:
+    - Parse `# noqa: AI-XXX` or `# auditor: ignore` comments.
+    - Filter suppressed issues.
+- **[Refine]** Improve [check_ai_006](file:///home/laihuip001/oikos/hegemonikon/mekhane/synedrion/ai_auditor.py#601-637) (Context Drift):
+    - Allow safe reassignments (same name, type narrowing).
+- **[Refine]** Improve [check_ai_003](file:///home/laihuip001/oikos/hegemonikon/mekhane/synedrion/ai_auditor.py#415-467) (Type Confusion):
+    - Allow `if len(x):`.
+- **[Refine]** Improve [check_ai_007](file:///home/laihuip001/oikos/hegemonikon/mekhane/synedrion/ai_auditor.py#641-686) (Quote Inconsistency):
+    - Ensure it respects files reformatted by `black`.
+
+### 2. Code Fixes
+- **[mekhane/anamnesis/analyze_pb.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/anamnesis/analyze_pb.py)**:
+    - Extract magic numbers (`MIN_LENGTH`).
+    - Fix hardcoded path (use `Path.home()` or env var).
+- **[mekhane/symploke/jules_client.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/symploke/jules_client.py)** (and others):
+    - Fix/Suppress AI-009 (Secrets) false positives if any.
+    - Suppress acceptable AI-006 (Context Drift) / AI-018 (Hardcoded Path) if valid.
+- **Bulk Fix**:
+    - Use [ai_fixer.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/synedrion/ai_fixer.py) if possible, otherwise use `sed` or manual edits for specific patterns.
+
+## Verification Plan
+1. **Restore Checks**:
+    - Run `python mekhane/synedrion/ai_auditor.py mekhane/`.
+    - Verify issue count is ~948 (or lower with refinements).
+2. **Apply Fixes**:
+    - Fix code / Add suppressions.
+    - Run auditor again.
+3. **Verify Zero**:
+    - Confirm `✅ No issues found!` (in strict mode equivalent).
+
+## Automated Tests
+- `python mekhane/synedrion/ai_auditor.py mekhane/` - Primary verification.

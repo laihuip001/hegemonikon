@@ -1,0 +1,5 @@
+{
+  "artifactType": "ARTIFACT_TYPE_WALKTHROUGH",
+  "summary": "/boot v2.7 ワークフローの深層分析レポート。O1 Noēsis の5フェーズ（盲点チェック、前提掘出、ゼロ設計、GoT分析、自己検証）と A2 Krisis（Synedrion 6評議員、Inversion、10th Man、Graveyard Walk、User Perspective Panel）を適用。主要発見: ステップ番号のカオス、認知負荷未測定、turbo-all安全性、トークンコスト不明の4盲点。推奨: ステップ番号正規化、認知負荷測定、Progressive Boot検討。信頼度72%。",
+  "updatedAt": "2026-01-28T10:20:29.960833646Z"
+}

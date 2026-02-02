@@ -1,0 +1,26 @@
+# Wishlist 残タスク (W6→W8→W9→W11)
+
+## Current: W6 T-series SAGE リファクタ
+
+- [/] S-series スキル (s1-s4) を SAGE Mode 形式にリファクタ
+  - [ ] s1-metron → SAGE Mode
+  - [ ] s2-mekhane → SAGE Mode
+  - [ ] s3-stathmos → SAGE Mode
+  - [ ] s4-praxis → SAGE Mode
+  - [ ] コミット & バージョン更新
+
+## Next: W8 Perplexity Task Automation
+
+- [ ] タスク機能自動化設定
+
+## Next: W9 Jules /vet Direct Integration
+
+- [ ] /vet への直接統合
+
+## Next: W11 Markdown Lint 残修正
+
+- [ ] MD036/MD060 残 230件修正
+
+---
+
+*Updated: 2026-01-28 18:55 JST*

@@ -1,0 +1,5 @@
+{
+  "artifactType": "ARTIFACT_TYPE_OTHER",
+  "summary": "@dendron_prep v1.0 復元 + LLM 認知的負荷問題の解決策調査結果。3つの問題への構造的対策: Guardrails, Context Engineering, Mandatory Checkpoints。",
+  "updatedAt": "2026-01-31T02:13:20.716806940Z"
+}

@@ -1,0 +1,29 @@
+# タスク: 週次レビュー + Cognitive Algebra 演算子拡張
+
+## Phase 1: 週次レビュー ✅
+
+- [x] セッション履歴の収集 (56件 Handoff)
+- [x] 主要成果のサマリー作成
+- [x] 意思決定履歴の整理
+- [x] 軌道修正提案の生成
+- [x] [weekly_review_2026-01-29.md](file:///home/laihuip001/oikos/mneme/.hegemonikon/sessions/weekly_review_2026-01-29.md) の保存
+
+## Phase 2: Cognitive Algebra 演算子拡張 ✅
+
+- [x] 既存演算子の整理 (`+`, `-`, `^`, `×`, `~`, `!`)
+- [x] 新規演算子 Phase 4 実装計画作成
+  - [x] `&` (Parallel): 並列実行
+  - [x] `/` (Factor): 要素分解
+  - [x] `%` (Residual): 残余・例外
+  - [x] `|` (Pipe): 順次連鎖
+  - [x] `@` (Focus): 派生選択糖衣
+  - [x] `?` (Conditional): 条件分岐
+- [x] Tier 分類体系 (Unary/Binary/Modifier)
+- [x] [operators_and_layers.md](file:///home/laihuip001/oikos/.gemini/antigravity/knowledge/cognitive_algebra_system/artifacts/architecture/operators_and_layers.md) 更新
+- [x] [overview.md](file:///home/laihuip001/oikos/.gemini/antigravity/knowledge/cognitive_algebra_system/artifacts/overview.md) 更新
+
+## Phase 3: 検証 ✅
+
+- [x] pytest リグレッションテスト (390 PASSED, 4 pre-existing failures)
+- [x] KI の更新 (operators_and_layers.md, overview.md, roadmap.md)
+- [x] コミット (597f98e8)

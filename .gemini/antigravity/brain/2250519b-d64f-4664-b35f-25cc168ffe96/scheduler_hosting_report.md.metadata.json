@@ -1,0 +1,5 @@
+{
+  "artifactType": "ARTIFACT_TYPE_OTHER",
+  "summary": "Swarm/Digestor スケジューラのホスティング最適化レポート。Cloudflare Workers Cron Triggers が第1選択、systemd timer が第2選択。GitHub Actions は cron 信頼性が低く非推奨。",
+  "updatedAt": "2026-01-29T03:29:08.460979995Z"
+}

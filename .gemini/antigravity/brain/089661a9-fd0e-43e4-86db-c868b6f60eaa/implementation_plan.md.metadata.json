@@ -1,0 +1,6 @@
+{
+  "artifactType": "ARTIFACT_TYPE_IMPLEMENTATION_PLAN",
+  "summary": "Perplexity タスク機能設定計画 v4 — tekhne-maker + /zet 統合版。\n\n各タスクの Instructions に:\n- Step 0: 目的確認 (決定事項 + 仮説)\n- Chronotopic Precision (2025後半優先)\n- 操作的定義 (検証可能な基準)\n- Claude 後処理最適化 (XML + Markdown)\n- Pre-Mortem (失敗シナリオ事前評価)\nを組み込んだ深い設計。",
+  "updatedAt": "2026-01-28T06:44:14.633224224Z",
+  "version": "4"
+}

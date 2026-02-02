@@ -1,0 +1,11 @@
+# Browser profile (cache, cookies, etc.)
+antigravity-browser-profile/
+
+# Browser recordings (large video files)
+antigravity/browser_recordings/
+
+# Temporary files
+tmp/
+
+# Code tracker (session-specific)
+antigravity/code_tracker/

@@ -1,0 +1,94 @@
+# Hermēneus Phase 1-6 完了 Walkthrough
+
+## 概要
+
+CCL (Cognitive Control Language) の **コンパイル→実行→オーケストレーション→検証→Workflow Executor→Synergeia 統合** を実装した **Hermēneus** コンパイラが完成。
+
+## テスト結果
+
+```
+================== 125 passed, 2 skipped, 2 warnings in 1.72s ==================
+```
+
+## アーキテクチャ
+
+```
+                    ┌─────────────────────────────────────────┐
+                    │          Synergeia Coordinator          │
+                    └────────────────┬────────────────────────┘
+                                     │
+                    ┌────────────────▼────────────────────────┐
+                    │         Hermēneus Executor              │
+                    │  ┌─────────────────────────────────┐    │
+CCL Input ─────────▶│  │     Workflow Registry           │    │
+                    │  │  (/noe+, /bou+, /ene+ 定義)     │    │
+                    │  └───────────────┬─────────────────┘    │
+                    │                  │                      │
+                    │  ┌───────────────▼─────────────────┐    │
+                    │  │  Pipeline: compile→execute→     │    │
+                    │  │  verify→audit                   │    │
+                    │  └───────────────┬─────────────────┘    │
+                    │                  │                      │
+                    │  ┌───────────────▼─────────────────┐    │
+                    │  │       LLM Backends              │    │
+                    │  │  (Claude, GPT-4, Gemini)        │    │
+                    │  └─────────────────────────────────┘    │
+                    └─────────────────────────────────────────┘
+```
+
+## 作成ファイル
+
+| Phase | ファイル | 役割 |
+|:------|:---------|:-----|
+| 1 | [ast.py](file:///home/laihuip001/oikos/hegemonikon/hermeneus/src/ast.py) | AST ノード |
+| 1 | [expander.py](file:///home/laihuip001/oikos/hegemonikon/hermeneus/src/expander.py) | 省略形展開 |
+| 1 | [parser.py](file:///home/laihuip001/oikos/hegemonikon/hermeneus/src/parser.py) | CCL パーサー |
+| 1 | [translator.py](file:///home/laihuip001/oikos/hegemonikon/hermeneus/src/translator.py) | LMQL 変換 |
+| 2 | [runtime.py](file:///home/laihuip001/oikos/hegemonikon/hermeneus/src/runtime.py) | 実行エンジン |
+| 2 | [constraints.py](file:///home/laihuip001/oikos/hegemonikon/hermeneus/src/constraints.py) | 制約デコード |
+| 3 | [graph.py](file:///home/laihuip001/oikos/hegemonikon/hermeneus/src/graph.py) | StateGraph変換 |
+| 3 | [checkpointer.py](file:///home/laihuip001/oikos/hegemonikon/hermeneus/src/checkpointer.py) | 状態永続化 |
+| 3 | [hitl.py](file:///home/laihuip001/oikos/hegemonikon/hermeneus/src/hitl.py) | HITL制御 |
+| 4 | [verifier.py](file:///home/laihuip001/oikos/hegemonikon/hermeneus/src/verifier.py) | Multi-Agent Debate |
+| 4 | [audit.py](file:///home/laihuip001/oikos/hegemonikon/hermeneus/src/audit.py) | Audit Trail |
+| 4b | [prover.py](file:///home/laihuip001/oikos/hegemonikon/hermeneus/src/prover.py) | Formal Prover |
+| 5 | [cli.py](file:///home/laihuip001/oikos/hegemonikon/hermeneus/src/cli.py) | CLI エントリー |
+| 6 | [registry.py](file:///home/laihuip001/oikos/hegemonikon/hermeneus/src/registry.py) | Workflow Registry |
+| 6 | [executor.py](file:///home/laihuip001/oikos/hegemonikon/hermeneus/src/executor.py) | Workflow Executor |
+| 6 | [synergeia_adapter.py](file:///home/laihuip001/oikos/hegemonikon/hermeneus/src/synergeia_adapter.py) | Synergeia 統合 |
+
+**合計: ~5,500行 | 17 モジュール**
+
+## 使用例
+
+```python
+from hermeneus.src import (
+    WorkflowExecutor,
+    run_workflow,
+    SynergeiaAdapter,
+    create_plan
+)
+
+# 1. シンプル実行
+result = await run_workflow("/noe+", context="分析対象")
+print(f"Output: {result.output}")
+print(f"Verified: {result.verified}")
+print(f"Audit ID: {result.audit_id}")
+
+# 2. Synergeia 連携
+plan = (
+    create_plan()
+    .add_thread("analysis", "/noe+", "分析対象")
+    .add_thread("critique", "/dia+", "レビュー対象")
+    .set_parallel(True)
+    .set_concurrency(3)
+    .build()
+)
+
+adapter = SynergeiaAdapter()
+results = await adapter.execute_plan(plan)
+```
+
+---
+
+*Completed: 2026-02-01 | v0.6.0 Workflow Executor + Synergeia*

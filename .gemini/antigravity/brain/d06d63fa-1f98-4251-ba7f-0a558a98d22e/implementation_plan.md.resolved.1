@@ -1,0 +1,169 @@
+# X-Series 連結ワークフロー設計
+
+## 目的
+
+X-series（関係層）で定義された定理間関係を、連結ワークフローとして実装する。
+
+---
+
+## 1. 既存 X-series 関係（/x.md より）
+
+```mermaid
+graph LR
+  O1[O1 Noēsis] --> S1[S1 Metron]
+  O1 --> H1[H1 Propatheia]
+  O2[O2 Boulēsis] --> K3[K3 Telos]
+  O3[O3 Zētēsis] --> A4[A4 Epistēmē]
+  O4[O4 Energeia] --> S4[S4 Praxis]
+```
+
+---
+
+## 2. 連結ワークフロー候補マトリクス
+
+### ユーザー確認済み
+
+| X-series ID | 関係 | ワークフロー連結 | 優先度 |
+|:------------|:-----|:-----------------|:-------|
+| X-OK23 | O2→K3 | `/bou` → `/pri` | 🔴 高 |
+| X-OA34 | O3→A4 | `/sop` → `/noe` | 🔴 高 |
+| X-OA12 | O1→A2 | `/noe` → `/dia` | 🔴 高 |
+
+### 追加候補（X-series から導出）
+
+| X-series ID | 関係 | ワークフロー連結 | 優先度 | 理由 |
+|:------------|:-----|:-----------------|:-------|:-----|
+| X-OS14 | O1→S1 | `/noe` → `/plan` STAGE 0 | ✅ 実装済 (`/noe-plan`) |
+| X-OS44 | O4→S4 | `/ene` → (実践記録) | 🟡 中 | 行為→実践の記録 |
+| X-OH11 | O1→H1 | `/noe` → `/h` (傾向分析) | 🟡 中 | 認識→感情傾向 |
+| X-OK12 | O1→K2 | `/noe` → `/why` | 🟢 低 | 認識→目的確認 |
+| X-SA24 | S2→A4 | `/plan` → (知識確立) | 🟢 低 | 設計→知識化 |
+
+### 新規提案
+
+| X-series ID | 関係 | ワークフロー連結 | 優先度 | 理由 |
+|:------------|:-----|:-----------------|:-------|:-----|
+| X-循環 | O2→O4 | `/bou` → `/ene` | 🔴 高 | 意志→行為（自然な流れ） |
+| X-検証 | O4→A2 | `/ene` → `/dia` | 🟡 中 | 行為→検証のサイクル |
+| X-探求 | O3→O1 | `/zet` → `/noe` | 🔴 高 | 調査結果の深い分析 |
+
+---
+
+## 3. 命名規則: 2つのアプローチ
+
+### 案A: ワークフロー名連結（現行）
+
+**パターン**: `/{source}-{target}`
+
+| 例 | 命名 |
+|:---|:-----|
+| /noe → /plan | `/noe-plan` |
+| /bou → /pri | `/bou-pri` |
+| /sop → /noe | `/sop-noe` |
+| /noe → /dia | `/noe-dia` |
+
+**メリット**:
+
+- 直感的に構成がわかる
+- 既存の命名パターンと整合
+
+**デメリット**:
+
+- 名前が長くなる
+- X-series との関連が不明瞭
+
+---
+
+### 案B: X-series ID から命名
+
+**パターン**: `/x{source}{target}` または `/x-{id}`
+
+| X-series ID | 命名案1 | 命名案2 |
+|:------------|:--------|:--------|
+| X-OS14 | `/xos1` | `/x-os1` |
+| X-OK23 | `/xok2` | `/x-ok2` |
+| X-OA34 | `/xoa3` | `/x-oa3` |
+| X-OA12 | `/xoa1` | `/x-oa1` |
+
+**メリット**:
+
+- X-series アーキテクチャとの整合性
+- コンパクト
+- 体系的
+
+**デメリット**:
+
+- 意味が直感的でない（学習コスト）
+- タイプミスしやすい
+
+---
+
+### 案C: ハイブリッド（推奨）
+
+**パターン**: 案A を基本とし、X-series ID をメタデータに記録
+
+```yaml
+# /noe-plan.md frontmatter
+x_series_id: "X-OS14"  # O1 → S1 (Metron)
+```
+
+**メリット**:
+
+- 直感的な命名（案A）
+- X-series との関連を保持（メタデータ）
+- 既存の `/noe-plan` と整合
+
+---
+
+## 4. 推奨実装順序
+
+| 順序 | 連結 | X-series ID | 理由 |
+|:-----|:-----|:------------|:-----|
+| 1 | `/bou` → `/pri` | X-OK23 | 意志→優先順位は日常的 |
+| 2 | `/noe` → `/dia` | X-OA12 | 認識→検証は品質向上 |
+| 3 | `/sop` → `/noe` | X-OA34 | 調査→分析は研究フロー |
+| 4 | `/bou` → `/ene` | X-O24 | 意志→行為は完結性 |
+
+---
+
+## 5. /plan STAGE 0-4 結果 (Deep Design)
+
+### STAGE 0: Blindspot ✅
+
+| 盲点 | 解決 |
+|:-----|:-----|
+| X-series 定義との整合性 | ✅ 補完関係（定義↔実装） |
+| /ax との関係 | ✅ 粒度が異なる（全層 vs 2者間） |
+
+📏 **Scale: Meso** — 複数WF + メタデータ体系
+
+### STAGE 1: Strategy ✅
+
+**選択: Plan B (Robust)** — 4つ全て + x_series_id 規格化
+
+### STAGE 2: Criteria ✅
+
+| Must | Should | Could |
+|:-----|:-------|:------|
+| 4つの連結WF | x_series_id 追加 | /x.md 更新 |
+| 整合性維持 | Anti-Skip 準拠 | dispatch_log |
+
+### STAGE 3: Blueprint ✅
+
+| ファイル | X-series ID |
+|:---------|:------------|
+| **[MODIFY]** [/noe-plan.md](file:///home/laihuip001/oikos/.agent/workflows/noe-plan.md) | X-OS14 |
+| **[NEW]** `/bou-pri.md` | X-OK23 |
+| **[NEW]** `/noe-dia.md` | X-OA12 |
+| **[NEW]** `/sop-noe.md` | X-OA34 |
+| **[MODIFY]** [/x.md](file:///home/laihuip001/oikos/.agent/workflows/x.md) | — |
+
+### STAGE 4: Devil's Advocate ✅
+
+All Checks Passed
+
+---
+
+## 承認待ち
+
+⏸️ **計画を承認しますか？** (`y` で実装開始)

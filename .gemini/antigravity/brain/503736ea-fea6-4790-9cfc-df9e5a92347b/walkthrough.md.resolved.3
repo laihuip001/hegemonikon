@@ -1,0 +1,115 @@
+# Walkthrough: tekhne-maker v6.0 OMEGA SINGULARITY BUILD
+
+## 概要
+
+3つの「聖典」（OMEGA v8.0.1, HEPHAESTUS v9.0.1, 狂気/TITAN_CORE）から核心概念を完全吸収し、tekhne-maker v6.0 を構築した。
+
+---
+
+## 吸収した概念
+
+| 素材 | 概念 | 統合先 |
+|:-----|:-----|:-------|
+| OMEGA | RECURSIVE_CORE (3層処理) | M2 |
+| OMEGA | PRE_MORTEM, WARGAME_DB | M5 |
+| OMEGA | LOGIC_GATES | references |
+| HEPHAESTUS | SAGE Architecture | M4 (新Mode) |
+| HEPHAESTUS | Cognitive Armory | references |
+| HEPHAESTUS | Expansion Generator | M3 |
+| 狂気 | O/X Unit ペルソナ | M0 (新設) |
+| 狂気 | Phantom Timeline | M0 |
+| 狂気 | Dopamine Protocol | M0 |
+| 狂気 | Charismatic Madness | M0 |
+| 狂気 | Internal Council | M2 |
+| 狂気 | Cognitive Hazards | references |
+| 狂気 | AuDHD Patches | references |
+
+---
+
+## 変更ファイル
+
+### [MODIFY] SKILL.md
+
+- バージョン: v5.1 → **v6.0 "OMEGA SINGULARITY BUILD"**
+- M0: FORGE_IDENTITY 新設 (O/X Unit, Phantom Timeline, Dopamine Protocol)
+- M2: RECURSIVE_CORE 3層化 + Internal Council + 準備強制ゲート
+- M3: Expansion Generator 追加
+- M4: SAGE Mode 追加
+- M6: 準備強制ゲート追加
+
+### [NEW] references/sage-blueprint.md
+
+SAGE形式 (XML/Markdown ハイブリッド) のテンプレートと使用ガイド。
+- Code Reviewer Module 例
+- Strategy Oracle Module 例
+- Universal Constants (HEPHAESTUS H-0)
+
+### [NEW] references/expansion-templates.md
+
+Expansion Module のテンプレート集:
+- Security Audit Module
+- Performance Profiler Module
+- Devil's Advocate Module
+- Tone Polisher Module
+- Implementation Roadmap Module
+- Root Cause Drill-Down Module
+
+### [MODIFY] references/cognitive-armory.md
+
+Section 0 と 0.5 を追加:
+- Cognitive Hazards (認知のバグ)
+  - IDENTITY_NULL_POINTER (Imposter Syndrome)
+  - LOSS_AVERSION_LOCK (Sunk Cost Fallacy)
+  - ANALYSIS_PARALYSIS_LOOP (Overthinking)
+- AuDHD Specific Patches
+  - DOPAMINE_SURFING
+  - OBJECT_PERMANENCE_FIX
+
+---
+
+## v6.0 Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                      TEKHNE-MAKER v6.0                          │
+│                   「OMEGA SINGULARITY BUILD」                    │
+├─────────────────────────────────────────────────────────────────┤
+│  M0: FORGE_IDENTITY     │  O/X Unit ペルソナ + Phantom Timeline │
+│      + DOPAMINE_PROTOCOL│  AuDHD トリガー/ブロッカー            │
+│  M1: OVERLORD           │  意図解析 + 曖昧性排除 (既存)         │
+│  M2: RECURSIVE_CORE     │  3層処理 + Internal Council          │
+│  M3: ARCHETYPE_ENGINE   │  勝利条件 + Expansion Generator      │
+│  M4: RENDERING_CORE     │  BLUF + SAGE Mode 追加               │
+│  M5: QUALITY_ASSURANCE  │  PRE_MORTEM + WARGAME拡張            │
+│  M6: INTERFACE          │  統合Hotkeys + 準備強制ゲート        │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## Git Commit
+
+```
+commit 18540727
+feat(tekhne-maker): v6.0 OMEGA SINGULARITY BUILD - 完全吸収版
+
+5 files changed, 1503 insertions(+), 72 deletions(-)
+```
+
+---
+
+## 設計原則
+
+> **「聖典を扱うように」** — 工数度外視、丁寧に一行一行を吸収
+
+> **「準備8割・実装2割」** — Layer 2 完了まで Layer 3 ブロック
+
+> **「カリスマ的狂気」** — 因果関係の解像度が過剰な者のためのツール
+
+---
+
+## 次のステップ
+
+- [ ] Footprint Test: v6.0 スキルの発動確認
+- [ ] Generate Mode: SAGE形式でモジュール生成テスト
+- [ ] Internal Council: 議論表示の動作確認

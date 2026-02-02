@@ -1,0 +1,99 @@
+# W6: S-Series 活用 SAGE モジュール作成計画
+
+> **方針転換**: S-series 自体を SAGE 化するのではなく、
+> S-series 定理を「活用する」SAGE モジュールを新規作成
+
+---
+
+## 設計原則
+
+```
+Δ層 (抽象)          τ層 (具象)
+┌─────────┐        ┌─────────────────┐
+│ S1-S4   │ ───→   │ SAGE Modules    │
+│ 定理定義 │  参照   │ 実行可能モジュール │
+└─────────┘        └─────────────────┘
+```
+
+**役割分離**: 定理は「何」を定義し、SAGE モジュールは「どうやるか」を実行する
+
+---
+
+## 提案モジュール
+
+| # | Module Name | Base | 機能 |
+|:--|:------------|:-----|:-----|
+| 1 | **Scale Analyzer** | S1 Metron | タスクの最適スケール診断 |
+| 2 | **Strategy Selector** | S2 Mekhanē | Explore/Exploit 判断エンジン |
+| 3 | **Baseline Calibrator** | S3 Stathmos | 評価基準・ベンチマーク設定 |
+| 4 | **Value Realizer** | S4 Praxis | 価値実現方法選択 |
+
+---
+
+## Module 1: Scale Analyzer (S1 Metron 活用)
+
+```xml
+<module_config>
+  <name>Scale Analyzer</name>
+  <model_target>Claude / Gemini</model_target>
+  <objective>タスクの最適スケール (Micro/Macro) を診断</objective>
+</module_config>
+
+<instruction>
+  <protocol>
+    <step_1_detect>
+      **3軸スケール評価:**
+      - 時間軸: 短期 (日-週) / 長期 (月-年)
+      - 空間軸: 局所 (ファイル) / 大局 (システム)
+      - 抽象軸: 詳細 (実装) / 概念 (設計)
+    </step_1_detect>
+    <step_2_match>
+      **コンテキストマッチング:**
+      タスクの性質から最適スケールを選択
+    </step_2_match>
+  </protocol>
+
+  <output_template>
+    ## 📐 Scale Analysis
+    | Axis | Micro ← → Macro | Selected |
+    |------|-----------------|----------|
+    | 時間 | 日 ←───→ 年 | [X] |
+    | 空間 | ファイル ←───→ システム | [X] |
+    | 抽象 | 実装 ←───→ 設計 | [X] |
+    
+    **推奨スケール**: [Micro/Macro/Hybrid]
+  </output_template>
+</instruction>
+```
+
+---
+
+## 配置場所
+
+| Option | Path | Pros/Cons |
+|:-------|:-----|:----------|
+| A | `.agent/skills/schema/sage-modules/` | 定理と同じ場所 |
+| B | `.agent/skills/utils/sage-modules/` | 汎用ツールとして配置 |
+| **C** | Tekhne-Maker の Expansion | 既存 SAGE 体系と統合 ✓ |
+
+**推奨: C** — Tekhne-Maker の `references/` に追加
+
+---
+
+## 実装フェーズ
+
+| Phase | Task | Est. |
+|:------|:-----|-----:|
+| 1 | Scale Analyzer 作成 | 5min |
+| 2 | 他 3 モジュールは必要に応じて追加 | - |
+
+---
+
+## 検証計画
+
+1. Scale Analyzer を `/plan` 前に実行してスケール診断テスト
+2. 出力が S1 Metron の定義と整合しているか確認
+
+---
+
+**判断**: 4 モジュール全部作るか、まず 1 つだけ試すか？

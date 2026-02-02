@@ -1,0 +1,5 @@
+{
+  "artifactType": "ARTIFACT_TYPE_OTHER",
+  "summary": "Perplexity Sonar Deep Researchによる/sopテンプレート最適化調査結果。3つの改善領域（APIパラメータ活用、位置バイアス対策、多段階クエリ）を特定。v5.1へのアップグレード提案を含む。",
+  "updatedAt": "2026-01-29T00:37:27.837963664Z"
+}

@@ -1,0 +1,26 @@
+# Task: Antitheton 敵対アーティファクト機構
+
+## 計画フェーズ
+
+- [x] 既存批評機構の分析 (`/dia`, `/syn`, `/mek`)
+- [x] CCL v6.34 演算子仕様の確認
+- [x] Antitheton 仕様設計
+- [x] Implementation Plan 作成
+- [ ] **Creator レビュー待ち**
+
+## 実装フェーズ
+
+- [ ] `/ant.md` ワークフロー作成
+- [ ] [/dia.md](file:///home/laihuip001/oikos/.agent/workflows/dia.md) への `--mode=antitheton` 追加
+- [ ] [operators_and_layers.md](file:///home/laihuip001/oikos/.gemini/antigravity/knowledge/cognitive_algebra_system/artifacts/architecture/operators_and_layers.md) への Antitheton Pattern 追記
+- [ ] CCL Signature 登録
+
+## 検証フェーズ
+
+- [ ] 手動テスト: `/s+` → `/ant` シーケンス
+- [ ] CCL シーケンステスト: `/bou+_/ant`
+- [ ] 出力品質検証（6セクション完遂、肯定語ゼロ）
+
+---
+
+*Created: 2026-01-30*

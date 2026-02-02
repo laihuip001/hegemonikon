@@ -1,0 +1,25 @@
+# リポジトリ刷新タスク
+
+## Phase 1: 即削除（4件）
+- [ ] [hegemonikon_full_docs.txt](file:///home/laihuip001/oikos/hegemonikon/hegemonikon_full_docs.txt) (2.1MB生成物)
+- [ ] [swarm_scheduler.log](file:///home/laihuip001/oikos/hegemonikon/swarm_scheduler.log) (ログ)
+- [ ] [migrate_to_m.ps1](file:///home/laihuip001/oikos/hegemonikon/migrate_to_m.ps1) (レガシースクリプト)
+- [ ] `docs/specialist_run_results*.json` (3件の一時ファイル)
+
+## Phase 2: 即移動（4件）
+- [ ] [adaptive_allocator.py](file:///home/laihuip001/oikos/hegemonikon/adaptive_allocator.py) → `mekhane/ergasterion/`
+- [ ] [collect_results.py](file:///home/laihuip001/oikos/hegemonikon/collect_results.py) → `mekhane/ergasterion/`
+- [ ] [run_synedrion_review.py](file:///home/laihuip001/oikos/hegemonikon/run_synedrion_review.py) → `mekhane/ergasterion/synedrion/`
+- [ ] [swarm_scheduler.py](file:///home/laihuip001/oikos/hegemonikon/swarm_scheduler.py) → `mekhane/ergasterion/`
+
+## Phase 3: README刷新
+- [ ] README.md 完全書き直し（30秒で理解できる構造）
+- [ ] STRUCTURE.md → README.md に吸収
+- [ ] INDEX.md → docs/reference/ へ移動
+
+## Phase 4: 発見可能性向上
+- [ ] docs/research/INDEX.md 作成（思考の化石への索引）
+
+## Phase 5: 検証
+- [ ] pytest 実行
+- [ ] import チェック

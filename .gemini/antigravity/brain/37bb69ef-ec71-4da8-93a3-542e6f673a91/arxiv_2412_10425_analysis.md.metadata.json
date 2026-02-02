@@ -1,0 +1,5 @@
+{
+  "artifactType": "ARTIFACT_TYPE_WALKTHROUGH",
+  "summary": "arXiv:2412.10425 (Active Inference for Self-Organizing Multi-LLM Systems) の精読レポート。論文の核心パターン（3状態因子×7観察様式、LLM観察生成、Dirichlet学習）とHegemonikón FEP実装との比較分析。Phase 1-3の実装提案を含む。",
+  "updatedAt": "2026-01-28T10:10:35.669431142Z"
+}

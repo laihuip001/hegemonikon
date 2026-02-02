@@ -1,0 +1,5 @@
+{
+  "artifactType": "ARTIFACT_TYPE_IMPLEMENTATION_PLAN",
+  "summary": "Refactoring plan for jules_client.py synthesized from 58 Jules Synedrion reviews. Identifies 7 key issues: DRY violation, parse_state bug, missing retry, backoff coupling, empty ID failures, doc/impl mismatch. Proposes 4 phases: HTTP layer unification, parse_state fix, retry strategy, failure representation. Priority order: Phase 2 (parse_state) > Phase 1 (HTTP DRY) > Phase 3 (retry) > Phase 4 (failure type).",
+  "updatedAt": "2026-01-28T09:45:09.641643315Z"
+}

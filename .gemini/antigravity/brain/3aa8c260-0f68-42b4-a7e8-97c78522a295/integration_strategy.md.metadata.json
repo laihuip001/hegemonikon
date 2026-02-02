@@ -1,0 +1,5 @@
+{
+  "artifactType": "ARTIFACT_TYPE_IMPLEMENTATION_PLAN",
+  "summary": "Integration strategy for 31 legacy prompt modules from Archive. Proposes 4 options: KI integration, Tekhne-Maker references, τ-layer workflows, or hybrid approach. Includes module classification, pros/cons analysis, and questions for Creator decision.",
+  "updatedAt": "2026-01-28T02:45:44.225713494Z"
+}

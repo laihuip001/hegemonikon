@@ -1,0 +1,48 @@
+# Active Projects System — Walkthrough
+
+## 完了した作業
+
+### 1. CCL 精緻化 `/kho+_/sta+_/pre~\pre_/mek.model_/mek.observability`
+
+| ステップ | 成果 |
+|----------|------|
+| `/kho+` | スコープ：5プロジェクト、4必須ファイル/project |
+| `/sta+` | 成功基準：100% PROJECT.md保有、<7日更新間隔 |
+| `/pre~\pre` | 失敗防止：/bye prompt、priority filter |
+| `/mek.model` | 8フィールド、4状態遷移 |
+| `/mek.observability` | 鮮度アラート（7日⚠️、21日🔴） |
+
+---
+
+### 2. 作成ファイル
+
+| ファイル | 目的 |
+|----------|------|
+| [projects.yaml](file:///home/laihuip001/oikos/hegemonikon/projects.yaml) | プロジェクト登録レジストリ |
+| [mekhane/dendron/PROJECT.md](file:///home/laihuip001/oikos/hegemonikon/mekhane/dendron/PROJECT.md) | Dendron 状態 |
+| [hermeneus/PROJECT.md](file:///home/laihuip001/oikos/hegemonikon/hermeneus/PROJECT.md) | Hermēneus 状態 |
+| [mekhane/synteleia/PROJECT.md](file:///home/laihuip001/oikos/hegemonikon/mekhane/synteleia/PROJECT.md) | Synteleia 状態 |
+| [pythosis/PROJECT.md](file:///home/laihuip001/oikos/hegemonikon/pythosis/PROJECT.md) | Pythōsis 状態 |
+| [synergeia/PROJECT.md](file:///home/laihuip001/oikos/hegemonikon/synergeia/PROJECT.md) | Synergeia 状態 |
+| [.agent/workflows/boot.md](file:///home/laihuip001/oikos/.agent/workflows/boot.md) (Step 17.5) | /boot 表示ロジック |
+
+---
+
+### 3. 検証結果
+
+```
+🚧 開発中プロジェクト:
+  ✅ Dendron [CI統合] (今日) → git push でリモート反映
+  🔨 Hermēneus [Phase 3: LangGraph] (今日) → Phase 3 実装継続
+  📋 Synteleia [設計中] (今日) → Poiēsis/Dokimasia 実装
+  🔨 Pythōsis [Phase 2] (2日前) → ライブラリマッピング継続
+
+→ 続きを行うプロジェクトを選択してください
+```
+
+---
+
+### 4. Git コミット
+
+- `74b90985`: feat: Add Active Projects System (6 files)
+- `0ed0f9ea`: feat: Add /boot Step 17.5 Active Projects display

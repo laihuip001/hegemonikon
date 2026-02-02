@@ -1,0 +1,196 @@
+# 差分分析レポート: v4.0 vs v3.0 詳細比較
+
+## 📊 ファイル構成比較
+
+| ソース | ファイル名 | 行数 | バイト |
+|:---|:---|:---|:---|
+| **ZIPファイル (v4.0)** ||||
+| ZIP | SKILL_v4.0-1.md | 417行 | 12,774B |
+| ZIP | logic-gates.md | 463行 | 15,786B |
+| ZIP | wargame-db.md | 309行 | 6,211B |
+| ZIP | codex-languages.md | 215行 | 5,815B |
+| ZIP | codex-infra.md | 306行 | 7,387B |
+| **合計** | | **1,710行** | **47,973B** |
+| **現行スキル (v3.0)** ||||
+| 現行 | SKILL.md | 324行 | 9,542B |
+| 現行 | archetypes.md | 237行 | 6,352B |
+| 現行 | quality-checklist.md | 173行 | 6,673B |
+| 現行 | templates.md | 296行 | 9,176B |
+| 現行 | transformations.md | 181行 | 5,936B |
+| **合計** | | **1,211行** | **37,679B** |
+
+---
+
+## 🔴 v4.0 新規追加要素（v3.0に存在しない）
+
+### 1. アーキテクチャ構造
+
+| 新規モジュール | 説明 | v3.0相当 |
+|:---|:---|:---|
+| **M0: CONTEXT_LOADER** | 動的プロファイルロード | なし（新規） |
+| **M2: REASONING_CORE** | 3種エンジンルーティング | なし（新規） |
+| **BOOT_LOADER Protocol** | システム起動シーケンス | なし（新規） |
+
+### 2. 推論エンジン（全て新規）
+
+| エンジン | トリガー | 用途 |
+|:---|:---|:---|
+| **E1: CodeAct** | 検証・計算 | Pythonで実行 |
+| **E2: DeepThought** | 抽象推論 | 弁証法的分析 |
+| **E3: SelfDiscover** | 複雑問題 | 構造分解 |
+
+### 3. Deep Think Cycle（新規）
+
+```
+1. DECONSTRUCT: 要求を原子単位に分解
+2. SIMULATE: メンタルシミュレーション
+3. RED_TEAM: Devil's Advocateとして自己攻撃
+4. REFINE: 批評から最終計画を合成
+```
+
+### 4. 新規参照ファイル（全て新規）
+
+| ファイル | 内容 |
+|:---|:---|
+| `logic-gates.md` | 10個の決定木（Speed vs Quality等） |
+| `wargame-db.md` | 10個の失敗シナリオDB |
+| `codex-languages.md` | 4言語ベストプラクティス（Python/Rust/Go/TS） |
+| `codex-infra.md` | インフラ仕様（Docker/K8s/TF/OWASP/DB） |
+
+### 5. 拡張Hotkeys（新規）
+
+| コマンド | アクション |
+|:---|:---|
+| `/fix` | 自動修復：エラー分析→根本原因→パッチ |
+| `/alt` | ピボット：現仮説を破棄しPlan Bを生成 |
+| `/audit` | レッドチーム：5つの脆弱性を列挙 |
+| `/fork` | スナップショット：コンテキストをエクスポート |
+| `[Plan]`/`[Act]`/`[Verify]` | 計画/実行/検証モード |
+| `[Deep]` | 2次・3次影響まで推論拡張 |
+
+---
+
+## 🟢 v3.0 既存要素（v4.0で維持/改良）
+
+### 1. 5アーキタイプ定義
+
+| 要素 | v3.0 | v4.0 | 差分 |
+|:---|:---|:---|:---|
+| 5種定義 | ✅ | ✅ | 同一 |
+| 必須技術 | 詳細表あり | 概要表のみ | **v3.0の方が詳細** |
+| コスト配分 | ✅ | なし | **v3.0固有** |
+| 禁忌マトリクス | ✅ | ✅ | 同等 |
+
+### 2. Phase 0 診断質問
+
+| 要素 | v3.0 | v4.0 | 差分 |
+|:---|:---|:---|:---|
+| 5診断質問 | 表形式で明確 | 同等だが散文 | **v3.0の方が読みやすい** |
+| Hypothesis提示 | ✅ | ASSUMPTION表示 | 表現異なるが同目的 |
+
+### 3. Pre-Mortem
+
+| 要素 | v3.0 (quality-checklist.md) | v4.0 (SKILL.md) | 差分 |
+|:---|:---|:---|:---|
+| Universal Checks | 11項目詳細 | 概要のみ | **v3.0固有詳細** |
+| Archetype別 | 5種×各6項目 | 概要のみ | **v3.0固有詳細** |
+| Severity Matrix | 4レベル詳細 | 簡略版 | **v3.0の方が詳細** |
+
+### 4. Fallback Hierarchy
+
+| 要素 | v3.0 | v4.0 | 差分 |
+|:---|:---|:---|:---|
+| Confidence Routing | ✅ 詳細 | なし | **v3.0固有** |
+| Phase別Fallback | ✅ 5Phase表 | なし | **v3.0固有** |
+| Escalation Triggers | ✅ | ✅ | 同等 |
+
+### 5. Transformation Tables
+
+| 要素 | v3.0 (transformations.md) | v4.0 | 差分 |
+|:---|:---|:---|:---|
+| 曖昧語→具体化 | 10項目 | なし | **v3.0固有** |
+| 冗長表現→簡潔 | 11項目 | ✅（一部） | v3.0の方が網羅的 |
+| 確信度マッピング | 5レベル | なし | **v3.0固有** |
+| 条件分岐標準形式 | ✅ | なし | **v3.0固有** |
+
+### 6. Templates
+
+| テンプレート | v3.0 (templates.md) | v4.0 | 差分 |
+|:---|:---|:---|:---|
+| Python Code Reviewer | ✅ 完全版 | なし | **v3.0固有** |
+| Project Producer | ✅ 完全版 | なし | **v3.0固有** |
+| Ruthless Mirror | ✅ 完全版 | なし | **v3.0固有** |
+
+---
+
+## 🟡 齟齬・矛盾点
+
+| # | 項目 | v3.0 | v4.0 | 解決策 |
+|:---|:---|:---|:---|:---|
+| 1 | バージョン番号 | v3.0 | v4.0 | 統合後 **v4.1** とする |
+| 2 | 日付 | 2026-01-05 | 2026-01-25 | v4.0を採用 |
+| 3 | Workflow | 6 Phase | 7 Module (M0-M6) | M0-M6を採用、PhaseをModule内に包含 |
+| 4 | 出力形式 | 簡略YAML | より詳細 | v3.0のコンパクト版を維持 |
+
+---
+
+## ⚠️ 情報ロスリスク
+
+### 🔴 統合時に失われるリスクがある情報
+
+| 項目 | 出典 | 対策 |
+|:---|:---|:---|
+| **アーキタイプ別コスト配分** | v3.0 archetypes.md | references/archetypes.md に維持 |
+| **5Phase別Fallback表** | v3.0 SKILL.md | references/quality-checklist.md に統合 |
+| **Confidence Routing詳細** | v3.0 SKILL.md | 新SKILL.mdに維持 |
+| **3テンプレート完全版** | v3.0 templates.md | references/templates.md に維持 |
+| **10変換ルール** | v3.0 transformations.md | references/transformations.md に維持 |
+| **Severity検証スクリプト** | v3.0 quality-checklist.md | references/quality-checklist.md に維持 |
+
+---
+
+## ✅ 統合方針（情報ロスゼロ保証）
+
+### SKILL.md 構成案
+
+```markdown
+# Meta-Prompt Generator v4.1
+
+## Architecture (v4.0から採用)
+M0-M6モジュール構造 + BOOT_LOADER
+
+## Phase 0: Intent Crystallization (v3.0から採用)
+5診断質問（表形式を維持）
+
+## M2: REASONING_CORE (v4.0から追加)
+3エンジンルーティング
+
+## Rendering & Output (v3.0構造を維持)
+
+## Quality Assurance (v3.0詳細を維持 + v4.0 WARGAME統合)
+
+## Interface (v4.0拡張Hotkeysを採用)
+```
+
+### references/ 構成案
+
+| ファイル | 出典 | 内容 |
+|:---|:---|:---|
+| archetypes.md | v3.0維持 | コスト配分等の詳細を保持 |
+| quality-checklist.md | v3.0維持 | 全チェック項目を保持 |
+| templates.md | v3.0維持 | 3テンプレート完全版 |
+| transformations.md | v3.0維持 | 10変換ルール |
+| logic-gates.md | v4.0新規 | 10決定木 |
+| wargame-db.md | v4.0新規 | 10失敗シナリオ |
+| codex-languages.md | v4.0新規 | 4言語仕様 |
+| codex-infra.md | v4.0新規 | インフラ仕様 |
+
+**合計: 9ファイル → 情報ロスゼロ**
+
+---
+
+## 📋 結論
+
+**齟齬:** 4件（全て解決策あり）
+**情報ロスリスク:** 6件（全て references/ に維持で解消）
+**統合後ファイル数:** 1 SKILL.md + 8 references = 9ファイル

@@ -1,0 +1,104 @@
+# O-Series 派生ワークフロー消化統合 タスクリスト
+
+> **Session ID**: a1c02be0-25df-4097-a2b1-ccefbae68962  
+> **Created**: 2026-01-29 08:50  
+> **Strategy**: A + B + F ハイブリッド  
+> **Status**: ✅ 完了
+
+---
+
+## Phase 1: 派生マッピング確認
+
+- [x] 報告書 v1.0 の派生リスト抽出
+- [x] 報告書 v2.0 の採用/却下判定確認
+- [x] 12派生の最終リスト確定
+
+---
+
+## Phase 2: Strategy A - `/o` Hub作成
+
+- [x] [.agent/workflows/o.md](file:///home/laihuip001/oikos/.agent/workflows/o.md) 新規作成
+- [x] 派生マトリックス記載
+- [x] FEP派生選択の統合記載
+- [x] X-series連携記載
+- [x] [tools.yaml](file:///home/laihuip001/oikos/.agent/tools.yaml) の `/o` エントリ更新
+
+---
+
+## Phase 3: Strategy B - 既存ワークフローPhase追加
+
+### O1 Noēsis ([/noe.md](file:///home/laihuip001/oikos/.agent/workflows/noe.md))
+
+- [x] Phase 0: 派生選択（FEP駆動）追加
+- [x] 派生モードセクション追加 (nous, phro, meta)
+- [x] frontmatter version更新 → v4.0
+
+### O2 Boulēsis ([/bou.md](file:///home/laihuip001/oikos/.agent/workflows/bou.md))
+
+- [x] Phase 0: 派生選択（FEP駆動）追加
+- [x] 派生モードセクション追加 (desir, voli, akra)
+- [x] frontmatter version更新 → v4.0
+
+### O3 Zētēsis ([/zet.md](file:///home/laihuip001/oikos/.agent/workflows/zet.md))
+
+- [x] Phase 0: 派生選択（FEP駆動）追加
+- [x] 派生モードセクション追加 (anom, hypo, eval)
+- [x] frontmatter version更新 → v5.0
+
+### O4 Energeia ([/ene.md](file:///home/laihuip001/oikos/.agent/workflows/ene.md))
+
+- [x] Phase 0: 派生選択（FEP駆動）追加
+- [x] 派生モードセクション追加 (flow, prax, pois)
+- [x] frontmatter version更新 → v4.0
+
+---
+
+## Phase 4: Strategy F - FEP派生選択
+
+### コア実装
+
+- [x] [mekhane/fep/derivative_selector.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/fep/derivative_selector.py) 作成
+- [x] [DerivativeStateSpace](file:///home/laihuip001/oikos/hegemonikon/mekhane/fep/derivative_selector.py#27-85) クラス定義
+- [x] [encode_for_derivative_selection()](file:///home/laihuip001/oikos/hegemonikon/mekhane/fep/derivative_selector.py#218-260) 実装
+- [x] [select_derivative()](file:///home/laihuip001/oikos/hegemonikon/mekhane/fep/derivative_selector.py#275-309) 実装（O1-O4対応）
+- [x] `_generate_rationale()` 実装
+
+### テスト
+
+- [x] [mekhane/fep/tests/test_derivative_selector.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/fep/tests/test_derivative_selector.py) 作成
+- [x] [TestEncodeForDerivativeSelection](file:///home/laihuip001/oikos/hegemonikon/mekhane/fep/tests/test_derivative_selector.py#38-58) クラス
+- [x] [TestSelectDerivative](file:///home/laihuip001/oikos/hegemonikon/mekhane/fep/tests/test_derivative_selector.py#60-80) クラス
+- [x] pytest 実行・PASS確認 (32 tests)
+
+### 統合
+
+- [x] [/noe.md](file:///home/laihuip001/oikos/.agent/workflows/noe.md) に派生選択コード例追記
+- [x] [/bou.md](file:///home/laihuip001/oikos/.agent/workflows/bou.md) に派生選択コード例追記
+- [x] [/zet.md](file:///home/laihuip001/oikos/.agent/workflows/zet.md) に派生選択コード例追記
+- [x] [/ene.md](file:///home/laihuip001/oikos/.agent/workflows/ene.md) に派生選択コード例追記
+
+---
+
+## Phase 5: 検証
+
+- [x] 単体テスト全PASS (32/32)
+- [x] tools.yaml 重複キー解消
+
+---
+
+## 成果物
+
+| ファイル | 説明 |
+|:---------|:-----|
+| [mekhane/fep/derivative_selector.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/fep/derivative_selector.py) | FEP派生選択コアモジュール |
+| [mekhane/fep/tests/test_derivative_selector.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/fep/tests/test_derivative_selector.py) | 32件のテスト |
+| [.agent/workflows/o.md](file:///home/laihuip001/oikos/.agent/workflows/o.md) | O-Series Hub v2.0 |
+| [.agent/workflows/noe.md](file:///home/laihuip001/oikos/.agent/workflows/noe.md) | v4.0 (3派生統合) |
+| [.agent/workflows/bou.md](file:///home/laihuip001/oikos/.agent/workflows/bou.md) | v4.0 (3派生統合) |
+| [.agent/workflows/zet.md](file:///home/laihuip001/oikos/.agent/workflows/zet.md) | v5.0 (3派生統合) |
+| [.agent/workflows/ene.md](file:///home/laihuip001/oikos/.agent/workflows/ene.md) | v4.0 (3派生統合) |
+| [.agent/tools.yaml](file:///home/laihuip001/oikos/.agent/tools.yaml) | O-series派生情報追加 |
+
+---
+
+*Completed: 2026-01-29 09:10*

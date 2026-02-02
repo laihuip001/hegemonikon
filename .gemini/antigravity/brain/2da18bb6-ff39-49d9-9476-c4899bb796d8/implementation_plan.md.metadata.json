@@ -1,0 +1,6 @@
+{
+  "artifactType": "ARTIFACT_TYPE_IMPLEMENTATION_PLAN",
+  "summary": "Plan to integrate weekly review into /boot, delete obsolete workflows (/now, /exp, /hist, /rev), and update documentation.",
+  "updatedAt": "2026-01-28T02:59:29.590957415Z",
+  "version": "3"
+}

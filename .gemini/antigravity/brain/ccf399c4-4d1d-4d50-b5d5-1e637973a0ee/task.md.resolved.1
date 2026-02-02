@@ -1,0 +1,35 @@
+# Task: プロンプト生成スキル統合 & Prompt-Lang連携
+
+## 概要
+1. ダウンロードした Meta-Prompt Generator v4.0 を現行 v3.0 に統合
+2. リネーム実施 (`meta-prompt-generator` → `tekhne-maker`)
+3. Prompt-Lang との連携設計
+
+## チェックリスト
+
+### 1. 分析・計画
+- [x] ZIPファイル展開・読み込み
+- [x] 現行スキル (v3.0) と v4.0 の比較分析
+- [x] 統合計画文書作成
+- [x] リネーム案策定
+
+### 2. ファイル統合
+- [ ] `meta-prompt-generator` → `tekhne-maker` ディレクトリ名変更
+- [ ] SKILL.md を v4.1 へマージ更新
+- [ ] 4つの新参照ファイル追加:
+  - [ ] logic-gates.md
+  - [ ] wargame-db.md
+  - [ ] codex-languages.md
+  - [ ] codex-infra.md
+
+### 3. 設定更新
+- [ ] tools.yaml のスキル参照更新
+- [ ] 関連ワークフローの参照更新（必要時）
+
+### 4. Prompt-Lang 連携
+- [ ] `@extends`/`@mixin` 実装（prompt_lang.py）
+- [ ] mixin として参照ファイルを公開
+
+### 5. 検証
+- [ ] スキル動作確認
+- [ ] 既存テスト通過確認

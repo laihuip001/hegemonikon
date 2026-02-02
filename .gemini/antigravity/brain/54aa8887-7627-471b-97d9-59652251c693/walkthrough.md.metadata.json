@@ -1,0 +1,6 @@
+{
+  "artifactType": "ARTIFACT_TYPE_WALKTHROUGH",
+  "summary": "Synergeia 5スレッド分散CCL実行システムの完成記録。operators.md v6.38→v6.50、SEL追加、Coordinator実装、Perplexity/Claude/Gemini/Codex CLI統合。",
+  "updatedAt": "2026-02-01T02:46:16.641183036Z",
+  "version": "33"
+}

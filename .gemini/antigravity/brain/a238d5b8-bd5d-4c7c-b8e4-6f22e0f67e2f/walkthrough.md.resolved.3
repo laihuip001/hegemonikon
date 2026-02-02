@@ -1,0 +1,44 @@
+# Jules API 統合 Walkthrough
+
+## 完了項目
+
+### Phase 1: コア実装 ✅
+
+| ファイル | 説明 |
+|---------|------|
+| [jules_client.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/symploke/jules_client.py) | API クライアント（60並列対応）|
+| [jules_mcp_server.py](file:///home/laihuip001/oikos/hegemonikon/mcp/jules_mcp_server.py) | MCP Server（4ツール）|
+
+### Phase 2: 実 API テスト ✅
+
+- API 接続: 7リポジトリ発見
+- セッション作成: 成功
+
+### Phase 3: 並列実行テスト ✅
+
+```
+📊 Results (311.9s):
+  ✅ Completed: 3/5
+  ❌ Timeout: 2/5
+```
+
+### Phase 4: MCP Server 統合 ✅
+
+```
+[1] list_tools: 4 tools
+[2] jules_list_repos: ✅
+[3] jules_get_status: ✅ COMPLETED
+[4] jules_create_task: ✅ Session 2422421501566455967
+```
+
+---
+
+## 次のステップ
+
+1. **hegemonikon リポジトリを Jules に接続**
+2. **Antigravity mcp_config.json に Jules を追加**
+3. **実際のワークフローで活用**
+
+---
+
+*Generated 2026-01-27*

@@ -1,0 +1,6 @@
+{
+  "artifactType": "ARTIFACT_TYPE_TASK",
+  "summary": "ワークフロー統合完了。全9子WFを親に吸収し、46→37に削減。",
+  "updatedAt": "2026-01-29T04:47:36.660180600Z",
+  "version": "3"
+}

@@ -1,0 +1,73 @@
+# 派生定理実装計画
+
+> **CCL**: `@impl_derive = /s1_F:2{/sta~/dia}_?solid{/mek_/ene}_?weak{/u}_/bou`
+
+---
+
+## Phase 1: 妥当なマッピング → 派生定理化
+
+### 高優先 (普遍度: 高)
+
+| 王道 | 親定理 | 派生名 | CCL |
+|:-----|:-------|:-------|:----|
+| MECE | P1 Khōra | `kho.mece` | `/kho+sta` |
+| 5 Whys | O3 Zētēsis | `zet.5why` | `/zet×5` |
+| 反証志向 | A2 Krisis | `dia.fals` | `/dia^` |
+| プレモーテム | A2 Krisis | `dia.pre` | `/dia+chr` |
+| 背理法 | A2 Krisis | `dia.redu` | `/dia^~` |
+| フェルミ推定 | S1 Metron | `met.ferm` | `/met-` |
+| 抽象化/具体化 | S1 Metron | `met.zoom` | `/met+/-` |
+| アナロジー | A3 Gnōmē | `gno.anal` | `/gno+mek` |
+| 因果推論 | X-series | `x.caus` | `/x` |
+| トレードオフ | S3 Stathmos | `sta.trad` | `/sta~` |
+
+### 中優先 (普遍度: 中)
+
+| 王道 | 親定理 | 派生名 | CCL |
+|:-----|:-------|:-------|:----|
+| デシジョンツリー | P2 Hodos | `hod.tree` | `/hod+` |
+| シナリオプランニング | P3 Trokhia | `tro.scen` | `/tro×3` |
+| PDCA/OODA | P3 Trokhia | `tro.loop` | `/tro~` |
+| ベイズ更新 | H2 Pistis | `pis.bayes` | `/pis~` |
+| システム思考 | X + P3 | `x.sys` | `/x_tro` |
+| レッドチーミング | A2 Krisis | `dia.red` | `/dia^+` |
+| 仮説駆動 | O3 Zētēsis | `zet.hypo` | `/zet+dia` |
+| 期待値思考 | H2 + S3 | `pis.ev` | `/pis+sta` |
+| パレート | S3 Stathmos | `sta.pare` | `/sta80` |
+| 境界条件 | P1 Khōra | `kho.edge` | `/kho^` |
+
+---
+
+## Phase 2: 精査が必要なマッピング
+
+| 王道 | 割当定理 | 懸念 |
+|:-----|:---------|:-----|
+| ランダム刺激 | H1 Propatheia | 「前感情」は入力か？ |
+| 擬人化 | A3 Gnōmē | 「原則」より「モデル」では？ |
+| コンセプトブレンディング | X-series | 「関係」だけで不十分 |
+| ラテラルシンキング | A2 Krisis (逆) | 「批評」ではなく「破壊」 |
+| TRIZ | A4 Epistēmē | 「知識」より「技法」P4? |
+| カノモデル | H3 Orexis | 「欲求分類」でいいか？ |
+| シネクティクス | A3 Gnōmē | より複雑な合成 |
+| 効用 | H3 Orexis | 「欲求」ではなく「価値」 |
+| メタ認知 | O1 Noēsis | 「認識」でいいか？ |
+| デザイン思考 | H3 + O4 | 複合すぎ？ |
+| KJ法 | A4 Epistēmē | 「親和性」は独自概念 |
+| ダブルダイヤモンド | P3 Trokhia | 1サイクルではない |
+| A3思考 | P1 Khōra | 「スコープ」というより「圧縮」 |
+| リアルオプション | K1 Eukairia | 金融概念との混同 |
+| ジョブ分解 (JTBD) | H3 Orexis | 「欲求」より「目的」K3? |
+
+---
+
+## 実装順序
+
+```
+1. Phase 1 (20項目) → 派生定理として登録
+2. Phase 2 (15項目) → Creator と精査
+3. 確定後 → 全て統合
+```
+
+---
+
+*CCL/mek+ 実装計画 v1.0*

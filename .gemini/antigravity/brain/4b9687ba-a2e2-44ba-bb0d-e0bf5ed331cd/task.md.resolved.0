@@ -1,0 +1,39 @@
+# Flow AI Hegemonikón Recast
+
+> **目標**: Flow AI を Hegemonikón の語彙で 0 から再構築する
+
+---
+
+## Phase 1: 設計計画
+
+- [/] 1.1 Flow AI ソースコード構造を分析
+- [ ] 1.2 全コンポーネント → Hegemonikón 定理マッピング
+- [ ] 1.3 新しい名前体系を定義
+- [ ] 1.4 implementation_plan.md を作成
+- [ ] 1.5 ユーザーレビュー
+
+## Phase 2: アーキテクチャ再構築
+
+- [ ] 2.1 ARCHITECTURE_HEGEMONIKON.md を作成
+- [ ] 2.2 ディレクトリ構造の再設計
+- [ ] 2.3 モジュール名の変換表を作成
+
+## Phase 3: コード変換（Jules API 連携）
+
+- [ ] 3.1 core/ モジュールの変換
+  - [ ] 3.1.1 processor.py → energeia_core.py
+  - [ ] 3.1.2 seasoning.py → metron_resolver.py
+  - [ ] 3.1.3 privacy.py → epoche_shield.py
+  - [ ] 3.1.4 その他
+- [ ] 3.2 infra/ モジュールの変換
+- [ ] 3.3 api/ / app/ の変換
+
+## Phase 4: 検証 (/vet)
+
+- [ ] 4.1 既存テストの実行
+- [ ] 4.2 新アーキテクチャでのテスト追加
+- [ ] 4.3 Jules API を使った自動レビュー
+
+---
+
+*Created: 2026-01-29 13:06*

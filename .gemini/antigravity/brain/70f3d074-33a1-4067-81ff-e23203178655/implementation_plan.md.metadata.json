@@ -1,0 +1,6 @@
+{
+  "artifactType": "ARTIFACT_TYPE_IMPLEMENTATION_PLAN",
+  "summary": "HybridSearch プロトタイプの計画。Sophia ベクトル検索 + バックリンクグラフを統合し、関連 KI をブーストするランカー。Plan A (Conservative) を採用。",
+  "updatedAt": "2026-01-28T12:40:15.203464500Z",
+  "version": "4"
+}

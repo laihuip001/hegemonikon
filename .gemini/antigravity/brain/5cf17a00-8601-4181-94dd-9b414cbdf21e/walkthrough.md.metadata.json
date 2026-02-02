@@ -1,0 +1,6 @@
+{
+  "artifactType": "ARTIFACT_TYPE_WALKTHROUGH",
+  "summary": "Hermeneus LLM 実行テストと Synteleia + LLM 統合分析の Walkthrough。Context Passing 問題の修正、Synteleia Monitor の実装、API コスト分析を含む。",
+  "updatedAt": "2026-02-01T10:34:05.160730591Z",
+  "version": "3"
+}

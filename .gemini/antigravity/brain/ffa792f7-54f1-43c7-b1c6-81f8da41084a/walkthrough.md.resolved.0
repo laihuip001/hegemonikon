@@ -1,0 +1,78 @@
+# Walkthrough: τ-Workflow Refactoring Phase 2
+
+## 概要
+
+/noe で確立した 3層アーキテクチャパターンを全 τ-workflow に適用。
+
+## 適用パターン
+
+1. **SKILL.md 正本化**: 詳細ロジックを Skill に集約
+2. **Workflow Step 0 強制**: view_file で SKILL.md を読み込み
+3. **Artifact 出力規則**: 結果をファイルに保存
+
+---
+
+## 処理結果
+
+### SKILL.md 拡張
+
+| Skill | 内容 | 新規行数 |
+|:------|:-----|:---------|
+| O1 Noēsis | 5フェーズ + Anti-Skip | ~456行 |
+| O2 Boulēsis | 6フェーズ + 対話ロジック | ~340行 |
+| O3 Zētēsis | 深掘りテンプレート + 品質チェック | ~280行 |
+| O4 Energeia | 6フェーズ + Read-Resolve-Proceed | ~430行 |
+| A2 Krisis | Panorama + Synedrion + Epochē + Fortress | ~400行 |
+
+### Workflow スリム化
+
+| Workflow | Before | After | 削減率 |
+|:---------|-------:|------:|-------:|
+| /noe | 421行 | 128行 | 70% |
+| /bou | 280行 | 108行 | 61% |
+| /ene | 358行 | 109行 | 70% |
+| /pan | 293行 | 106行 | 64% |
+| /syn | 191行 | 104行 | 46% |
+| /dia | 157行 | 99行 | 37% |
+| /epo | 152行 | 93行 | 39% |
+| /fit | 490行 | 132行 | 73% |
+| /pri | 215行 | 143行 | 33% |
+| /zet | 331行 | 101行 | 69% |
+
+**平均削減率**: 56%
+
+---
+
+## 変更ファイル一覧
+
+### SKILL.md (5ファイル)
+- [O1 Noēsis](file:///home/laihuip001/oikos/.agent/skills/ousia/o1-noesis/SKILL.md)
+- [O2 Boulēsis](file:///home/laihuip001/oikos/.agent/skills/ousia/o2-boulesis/SKILL.md)
+- [O3 Zētēsis](file:///home/laihuip001/oikos/.agent/skills/ousia/o3-zetesis/SKILL.md)
+- [O4 Energeia](file:///home/laihuip001/oikos/.agent/skills/ousia/o4-energeia/SKILL.md)
+- [A2 Krisis](file:///home/laihuip001/oikos/.agent/skills/akribeia/a2-krisis/SKILL.md)
+
+### Workflow (10ファイル)
+- [/noe](file:///home/laihuip001/oikos/.agent/workflows/noe.md)
+- [/bou](file:///home/laihuip001/oikos/.agent/workflows/bou.md)
+- [/ene](file:///home/laihuip001/oikos/.agent/workflows/ene.md)
+- [/pan](file:///home/laihuip001/oikos/.agent/workflows/pan.md)
+- [/syn](file:///home/laihuip001/oikos/.agent/workflows/syn.md)
+- [/dia](file:///home/laihuip001/oikos/.agent/workflows/dia.md)
+- [/epo](file:///home/laihuip001/oikos/.agent/workflows/epo.md)
+- [/fit](file:///home/laihuip001/oikos/.agent/workflows/fit.md)
+- [/pri](file:///home/laihuip001/oikos/.agent/workflows/pri.md)
+- [/zet](file:///home/laihuip001/oikos/.agent/workflows/zet.md)
+
+---
+
+## 未処理 (Low 優先度)
+
+| Workflow | 理由 |
+|:---------|:-----|
+| /o, /s, /h, /p, /k, /a | Δ層抽象コマンド（既にスリム） |
+| /ax | 統合コマンド（既にスリム） |
+
+---
+
+*Generated: 2026-01-28*

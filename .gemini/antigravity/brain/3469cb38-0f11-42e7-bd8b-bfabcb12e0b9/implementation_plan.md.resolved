@@ -1,0 +1,323 @@
+# 🏗️ v2.1 スキルシステム完全再構築 設計規約書
+
+> **目標**: v2.1 体系（O/S/H/P/K/A）に完全準拠したスキル・ワークフローシステム
+> **方針**: 「過剰」なまでに作り込む。懸念を「完全に」潰す。
+
+---
+
+## 📊 懸念潰しマトリクス
+
+### 懸念1: 工数 → 解決策: 段階的実装
+
+| フェーズ | 内容 | 推定工数 | 依存 |
+|----------|------|----------|------|
+| 1 | O-series 精査・完全化 | 1セッション | なし |
+| 2 | T-series 分析・マッピング | 1セッション | フェーズ1 |
+| 3 | T-series リファクタリング | 2-3セッション | フェーズ2 |
+| 4 | S/H/P/K/A 補完 | 2-3セッション | フェーズ3 |
+| 5 | 命名・表記統一 | 1セッション | フェーズ4 |
+| 6 | 未実装 workflow 設計 | 1-2セッション | フェーズ5 |
+
+**合計推定: 8-11セッション**
+
+### 懸念2: スキル使用実態 → 解決: 調査完了
+
+| スキル | 参照元 | 実使用? |
+|--------|--------|---------|
+| o-series (O1-O4) | /o.md, /noe.md, /bou.md, /zet.md, /ene.md, /ax.md | ✅ 使用中 |
+| t-series (T1-T8) | /o.md, /t.md, /boot.md, /k.md, /ax.md 他多数 | ✅ 広く使用 |
+| k-series (K1-K12) | /k.md, /x.md, /ax.md, /manual.md | ✅ 使用中 |
+| x-series | /x.md | ✅ 使用中 |
+
+**結論**: 全スキルが使用されている。削除は不可、リファクタリングのみ。
+
+### 懸念3: 破壊的変更 → 解決: 影響範囲マッピング
+
+#### 影響を受けるワークフロー
+
+| 変更対象 | 影響を受けるファイル |
+|----------|---------------------|
+| T-series 名変更 | /o.md, /t.md, /boot.md, /k.md, /ax.md, /noe.md, /bou.md, /zet.md, /ene.md, /plan.md, /chk.md, /rev.md, /why.md, /pri.md |
+| K-series K1-K12 → K1-K4 | /k.md, /x.md, /ax.md |
+| M表記 → 新表記 | /chk.md, /rev.md, /u.md, /v.md, /manual.md, /dev.md |
+
+#### 旧表記残存箇所
+
+| 旧表記 | 新表記 | 残存ファイル |
+|--------|--------|-------------|
+| M1-M8 | T1-T8 or S1-A4 | /chk.md, /rev.md, /u.md, /v.md |
+| tropos.md | schema.md | 一部リンク |
+| rhope.md | horme.md | 一部リンク |
+| topos.md | perigraphe.md | スキル内参照 |
+
+---
+
+## 🔄 T-series → v2.1 マッピング
+
+### 現行 T-series と v2.1 の対応
+
+| 旧 T | 名称 | v2.1 対応 | 根拠 |
+|------|------|-----------|------|
+| T1 | Aisthēsis (知覚) | **S1 Metron** | Scale × Flow = 尺度流動 |
+| T2 | Krisis (判断) | **H2 Pistis** | Flow × Precision = 確信 |
+| T3 | Theōria (内省) | **S3 Stathmos** | Scale × Value = 基点 |
+| T4 | Phronēsis (戦略) | **S4 Praxis** | Function × Value = 実践 |
+| T5 | Peira (探索) | **S2 Mekhanē** | Function × Flow = 方法 |
+| T6 | Praxis (実行) | **O4 Energeia** のMicro実現 | 既に対応済み |
+| T7 | Dokimē (検証) | **A2 Krisis** | Valence × Precision = 判断 |
+| T8 | Anamnēsis (記憶) | **K4 Sophia** | Function × Precision = 知恵 |
+
+### 対応困難な T-series
+
+| T | 問題 | 解決策 |
+|---|------|--------|
+| T1 Aisthēsis | S1 Metron と機能が異なる | T→S マッピングは「対応」であり「同一」ではない |
+| T7 Dokimē | A2 Krisis と重複 | v2.1 では Krisis が2箇所に存在（M2 Krisis, A2 Krisis） |
+
+### 結論
+
+**T-series は S-series の「拡張実装」として維持する。**
+
+- T-series を廃止せず、S-series の「Micro実現」として再定義
+- T1-T8 スキルは内容を保持しつつ、frontmatter を v2.1 準拠に更新
+
+---
+
+## 📐 スキル設計規約
+
+### 1. ディレクトリ構造（v2.1 準拠）
+
+```
+.agent/skills/
+├── o-series/           # Ousia (本質)
+│   ├── o1-noesis/
+│   ├── o2-boulesis/
+│   ├── o3-zetesis/
+│   └── o4-energeia/
+├── s-series/           # Schema (様態) ← 新規
+│   ├── s1-metron/
+│   ├── s2-mekhane/
+│   ├── s3-stathmos/
+│   └── s4-praxis/
+├── h-series/           # Hormē (傾向) ← 新規
+│   ├── h1-propatheia/
+│   ├── h2-pistis/
+│   ├── h3-orexis/
+│   └── h4-doxa/
+├── p-series/           # Perigraphē (条件) ← 新規
+│   ├── p1-khora/
+│   ├── p2-hodos/
+│   ├── p3-trokhia/
+│   └── p4-tekhne/
+├── k-series/           # Kairos (文脈) ← 要リファクタ
+│   ├── k1-eukairia/
+│   ├── k2-chronos/
+│   ├── k3-telos/
+│   └── k4-sophia/
+├── a-series/           # Akribeia (精密) ← 新規
+│   ├── a1-pathos/
+│   ├── a2-krisis/
+│   ├── a3-gnome/
+│   └── a4-episteme/
+├── x-series/           # Taxis (関係)
+│   ├── x-os/
+│   ├── x-sh/
+│   ├── x-sp/
+│   ├── x-pk/
+│   ├── x-ka/
+│   └── x-ha/
+├── t-series/           # 旧 Extended（S の Micro 実現として維持）
+│   └── (現行 T1-T8 を保持)
+└── utils/              # ユーティリティ
+```
+
+### 2. SKILL.md テンプレート（O-series をロールモデル）
+
+```yaml
+---
+id: "{シリーズ}{番号}"
+name: "{ギリシャ語名}"
+greek: "{Ελληνικά}"
+category: "{pure-theorem|modal-theorem|context-theorem|precision-theorem}"
+description: "{1行説明}"
+
+# v2.1 生成規則
+generation:
+  formula: "{公理1} × {公理2}"
+  result: "{意味}"
+
+# 発動条件
+triggers:
+  - "{トリガー1}"
+  - "{トリガー2}"
+
+# キーワード
+keywords:
+  - "{keyword1}"
+  - "{keyword2}"
+
+# 使用条件
+when_to_use: |
+  {使用すべき状況}
+
+when_not_to_use: |
+  {使用すべきでない状況}
+
+# 関連
+related:
+  upstream: ["{上流定理}"]
+  downstream: ["{下流定理}"]
+  x_series: ["{X接続}"]
+
+version: "2.1.0"
+---
+
+# {ID}: {名称} ({ギリシャ語}) — {日本語名}
+
+> **生成規則:** {公理1} × {公理2} = {意味}
+>
+> **問い**: {この定理が答える問い}
+>
+> **役割**: {この定理の機能}
+
+---
+
+## When to Use（早期判定）
+
+### ✓ Trigger となる条件
+- {条件1}
+- {条件2}
+
+### ✗ Not Trigger
+- {非条件1}
+- {非条件2}
+
+---
+
+## Core Function
+
+**役割:** {機能説明}
+
+| 項目 | 内容 |
+|------|------|
+| **生成規則** | {公理1} × {公理2} |
+| **本質** | {本質説明} |
+| **位置** | {階層位置} |
+
+---
+
+## Processing Logic
+
+```
+{フローチャート}
+```
+
+---
+
+## Micro/Macro 実現
+
+| 層 | 実現手段 | 参照 |
+|----|----------|------|
+| Micro | {workflow} | {リンク} |
+| Macro | {mekhane module} | {リンク} |
+
+---
+
+## Edge Cases / Failure Modes
+
+### ⚠️ Failure 1: {失敗名}
+**症状**: {症状}
+**対処**: {対処}
+
+### ✓ Success Pattern
+**事例**: {成功事例}
+
+---
+
+## Output Format
+
+```
+{出力形式}
+```
+
+---
+
+## Integration
+
+| 依存 | 対象 | 関係 |
+|------|------|------|
+| **上流** | {上流定理} | {関係説明} |
+| **下流** | {下流定理} | {関係説明} |
+| **X接続** | {X-series} | {接続説明} |
+
+---
+
+*参照: [kernel/{シリーズ名}.md](../../../kernel/{シリーズ名}.md)*
+*バージョン: 2.1.0*
+```
+
+---
+
+## ✅ 作業順序（確定版）
+
+### Phase 1: O-series 精査・完全化
+
+1. [ ] O1-O4 スキルの使用実態確認 ✅ 完了
+2. [ ] O-series スキルを v2.1 テンプレートに更新
+3. [ ] kernel/ousia.md との整合性確認
+
+### Phase 2: T-series 分析・マッピング
+
+1. [ ] T1-T8 → v2.1 対応表作成 ✅ 完了
+2. [ ] 各 T スキルの内容確認
+3. [ ] S-series との重複・差分分析
+
+### Phase 3: T-series リファクタリング
+
+1. [ ] T-series frontmatter を v2.1 準拠に更新
+2. [ ] 「O→T」参照を「O→S→T」に変更
+3. [ ] T-series を「S の Micro 実現」として再定義
+
+### Phase 4: S/H/P/K/A 補完
+
+1. [ ] S-series スキル作成（O-series をロールモデル）
+2. [ ] H-series スキル作成
+3. [ ] P-series スキル作成
+4. [ ] K-series リファクタリング（K1-K12 → K1-K4）
+5. [ ] A-series スキル作成
+
+### Phase 5: 命名・表記統一
+
+1. [ ] 全ワークフローの M表記 → 新表記
+2. [ ] 旧ファイル名参照の修正
+3. [ ] frontmatter の hegemonikon フィールド統一
+
+### Phase 6: 未実装 workflow 設計
+
+1. [ ] S-series 用 workflow 設計
+2. [ ] H-series 用 workflow 設計（必要性検討）
+3. [ ] P/K/A 用 workflow 設計（必要性検討）
+4. [ ] X-series 用 workflow 更新
+
+---
+
+## 🔒 安全策
+
+### 破壊的変更の防止
+
+1. **バックアップ**: リファクタリング前に `.agent/skills.bak/` を作成
+2. **段階的変更**: 1シリーズずつ変更し、動作確認
+3. **互換性維持**: 旧参照が壊れないようエイリアス維持（当面）
+
+### ロールバック手順
+
+```bash
+# バックアップから復元
+rm -rf .agent/skills
+mv .agent/skills.bak .agent/skills
+```
+
+---
+
+*作成日時: 2026-01-27 15:25 JST*
+*v2.1 Skill System Restructuring Plan v1.0*

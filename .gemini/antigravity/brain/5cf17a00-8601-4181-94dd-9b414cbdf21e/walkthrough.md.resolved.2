@@ -1,0 +1,75 @@
+# Walkthrough: Hermeneus 実戦投入
+
+**Date**: 2026-02-01 16:18-16:45
+**Session**: CCL → LLM 実行の実証
+
+---
+
+## 🎉 結果: **SUCCESS**
+
+```python
+execute_ccl('/zet+*/bou+', context)
+# Status: ExecutionStatus.SUCCESS
+# Provider: google (Gemini 2.0 Flash)
+```
+
+---
+
+## 修正内容
+
+### 1. マルチプロバイダーサポート (runtime.py)
+
+```python
+# 優先順位で API キーを自動検出
+if anthropic_key:     # Claude
+    return await self._execute_anthropic(...)
+elif google_key:      # Gemini ← 今回使用
+    return await self._execute_google(...)
+elif openai_key:      # OpenAI
+    return await self._execute_openai(...)
+```
+
+### 2. LMQL Fallback 自動切り替え
+
+```python
+# LMQL DSL が exec() 失敗 → 自動フォールバック
+if result.status == ExecutionStatus.ERROR and "exec" in str(result.error):
+    return await self._execute_fallback(...)
+```
+
+---
+
+## テスト結果
+
+| 項目 | 結果 |
+|:-----|:-----|
+| pytest | **106 passed** ✅ |
+| execute_ccl | **SUCCESS** ✅ |
+| Provider | google (Gemini 2.0 Flash) |
+
+---
+
+## 実行フロー
+
+```
+CCL: /zet+*/bou+
+  ↓ compile_ccl()
+LMQL (fusion_execution)
+  ↓ execute_ccl() → _execute_with_lmql() → exec() 失敗
+  ↓ フォールバック
+_execute_google() → Gemini API
+  ↓
+ExecutionResult(SUCCESS, output=...)
+```
+
+---
+
+## API Key
+
+```bash
+export GOOGLE_API_KEY="AIzaSy..."
+```
+
+---
+
+*Generated: 2026-02-01 16:45*

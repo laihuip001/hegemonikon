@@ -1,0 +1,6 @@
+{
+  "artifactType": "ARTIFACT_TYPE_OTHER",
+  "summary": "ワークフロー具体層の監査結果。Deprecated 継承マップを追加し、WF 使用率分析を反映。",
+  "updatedAt": "2026-01-29T13:14:16.883840457Z",
+  "version": "1"
+}

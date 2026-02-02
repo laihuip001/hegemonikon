@@ -1,0 +1,93 @@
+# Prompt Skill Consolidation Plan
+
+> **目的**: プロンプト生成スキル群の強化と整備
+> **優先順位**: 1) j2p → tekhne 統合 → 2) tools.yaml 一元管理 → 3) mekhane 接続
+
+---
+
+## Phase 1: japanese-to-prompt-converter → tekhne-maker 統合
+
+### 現状分析
+
+| スキル | バージョン | サイズ | 問題点 |
+|:-------|:-----------|:-------|:-------|
+| [tekhne-maker](file:///home/laihuip001/oikos/.agent/skills/utils/tekhne-maker) | v6.0 | 21KB | 完成度高い、5モード |
+| [japanese-to-prompt-converter](file:///home/laihuip001/oikos/.agent/skills/utils/japanese-to-prompt-converter) | v1.0 | 15KB | frontmatter二重定義、固有名詞残存 |
+
+### 統合方針: Mixin 化 (Self-Dogfooding)
+
+```
+tekhne-maker v6.0
+  ├── mixins/
+  │   ├── prompt_lang_mode.prompt (既存)
+  │   └── j2p_mode.prompt ← 新規作成
+  │
+  └── Operating Modes:
+      ├── Generate
+      ├── Prompt-Lang
+      ├── SAGE
+      ├── Diagnose
+      ├── Improve
+      └── **J2P** ← 新規追加
+```
+
+### 変更ファイル
+
+#### [NEW] `mixins/j2p_mode.prompt`
+
+japanese-to-prompt-converter のロジックを mixin として抽出:
+- 7ステップ処理フロー
+- 8秒以内目標
+- YAML出力形式
+
+#### [MODIFY] [tekhne-maker.prompt](file:///home/laihuip001/oikos/.agent/skills/utils/tekhne-maker/tekhne-maker.prompt)
+
+```diff
+ @mixin prompt_lang_mode
++@mixin j2p_mode
+```
+
+#### [MODIFY] [SKILL.md](file:///home/laihuip001/oikos/.agent/skills/utils/tekhne-maker/SKILL.md) → v6.1
+
+1. Operating Modes に `J2P` 追加
+2. トリガー追加: 「日本語で」「要件を最適化」
+
+#### [DELETE] [japanese-to-prompt-converter/](file:///home/laihuip001/oikos/.agent/skills/utils/japanese-to-prompt-converter)
+
+統合後に deprecate
+
+---
+
+## Phase 2: tools.yaml 一元管理
+
+```yaml
+skills:
+  tekhne-maker:
+    purpose: "メタプロンプト生成（6モード）"
+    modules: [S2, P4]
+    triggers:
+      - "スキルを作成"
+      - "日本語で〇〇がしたい"
+      - "このプロンプトを診断"
+    modes: [Generate, Prompt-Lang, SAGE, Diagnose, Improve, J2P]
+```
+
+---
+
+## Phase 3: mekhane 接続強化
+
+| スキル層 | Python 層 | 接続 |
+|:---------|:----------|:-----|
+| tekhne-maker | ergasterion/ | 生成→実行 |
+| references/ | anamnesis/ | 参照→索引 |
+
+---
+
+## タスク
+
+- [ ] Phase 1-1: j2p_mode.prompt 作成
+- [ ] Phase 1-2: tekhne-maker.prompt 更新
+- [ ] Phase 1-3: SKILL.md → v6.1
+- [ ] Phase 1-4: j2p 削除
+- [ ] Phase 2: tools.yaml 更新
+- [ ] Phase 3: 接続ドキュメント作成

@@ -1,0 +1,44 @@
+{
+    "$schema": "hegemonikon/values/v1",
+    "version": "1.0.0",
+    "created": "2026-01-21T19:24:00+09:00",
+    "updated": "2026-01-21T19:24:00+09:00",
+    "description": "M4 Phronēsis - 価値関数ストレージ",
+    "value_functions": {
+        "priorities": {
+            "description": "目標優先度の重み付け",
+            "weights": {
+                "correctness": 0.9,
+                "efficiency": 0.7,
+                "maintainability": 0.8,
+                "user_satisfaction": 0.85
+            }
+        },
+        "risk_tolerance": {
+            "description": "リスク許容度",
+            "level": "moderate",
+            "thresholds": {
+                "auto_approve": 0.3,
+                "warn": 0.6,
+                "block": 0.9
+            }
+        },
+        "time_preferences": {
+            "description": "時間選好",
+            "discount_rate": 0.1,
+            "urgency_multiplier": 1.5
+        }
+    },
+    "constraints": {
+        "forbidden_actions": [
+            "delete without backup",
+            "commit without test",
+            "deploy to prod without approval"
+        ],
+        "required_checks": [
+            "lint",
+            "type_check"
+        ]
+    },
+    "learning_rate": 0.05
+}

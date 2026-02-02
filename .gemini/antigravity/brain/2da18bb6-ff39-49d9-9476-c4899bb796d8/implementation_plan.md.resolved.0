@@ -1,0 +1,185 @@
+# Skill Architecture Enhancement + Workflow連携パターン実装
+
+> Hegemonikón v2.2 へのスキル構造改善
+
+---
+
+## 背景
+
+2026-01-28 Perplexity Research レポートに基づき、以下のギャップを解消：
+
+| 項目 | 推奨 | 現状 |
+|:-----|:-----|:-----|
+| `when_not_to_use` | 必須 | なし |
+| LLM固有セクション | 必須 | なし |
+| frontmatter トークン | 100-150t | 約80t |
+
+---
+
+## Proposed Changes
+
+### Phase 1: スキル構造改善（パイロット3スキル）
+
+---
+
+#### [MODIFY] [SKILL.md](file:///home/laihuip001/oikos/.agent/skills/ousia/o1-noesis/SKILL.md)
+
+**追加フィールド（frontmatter）**:
+
+```yaml
+when_not_to_use: >
+  単純な情報検索、既知の解決策がある場合、時間が逼迫している場合。
+  代替: 情報検索 → Web検索、既知解決 → S2 Mekhanē
+
+llm_optimization:
+  claude: |
+    <instructions>
+    直観的認識による根本理解を求める。前提を疑い、パラダイム転換を促進。
+    </instructions>
+  gemini: |
+    This skill requires deep multi-perspective analysis utilizing the full 
+    context window. Apply the 5-phase Noēsis process systematically.
+  gpt: |
+    function: noesis_analysis
+    output_schema: {insight: string, confidence: float, paradigm_shift: boolean}
+```
+
+---
+
+#### [MODIFY] [SKILL.md](file:///home/laihuip001/oikos/.agent/skills/akribeia/a2-krisis/SKILL.md)
+
+**追加フィールド（frontmatter）**:
+
+```yaml
+when_not_to_use: >
+  検証不要な確定事項、単純な yes/no 判断。
+  代替: 単純判断 → 直接回答
+
+llm_optimization:
+  claude: |
+    <instructions>
+    判断の妥当性を三段階（仮説検証/テスト設計/Synedrion）で評価。
+    </instructions>
+  gemini: |
+    Apply the Absorption Matrix methodology. Evaluate harmony level and 
+    calculate loss rate with explicit reasoning for each mapping decision.
+  gpt: |
+    function: krisis_validation
+    output_schema: {verdict: enum[PASS/WARN/FAIL], confidence: float, issues: array}
+```
+
+---
+
+#### [MODIFY] [SKILL.md](file:///home/laihuip001/oikos/.agent/skills/schema/s1-metron/SKILL.md)
+
+**追加フィールド（frontmatter）**:
+
+```yaml
+when_not_to_use: >
+  スケールが既に決定されている場合。
+  代替: 既定スケール → 直接処理
+
+llm_optimization:
+  claude: |
+    <instructions>スケール判断をMicro/Macroの二項から選択</instructions>
+  gemini: |
+    Consider the full spectrum of scale options and their contextual fit.
+  gpt: |
+    function: scale_determination
+    output_schema: {scale: enum[micro/macro], rationale: string}
+```
+
+---
+
+### Phase 2: ワークフロー連携パターン
+
+---
+
+#### [MODIFY] [tools.yaml](file:///home/laihuip001/oikos/.agent/tools.yaml)
+
+**追加セクション**:
+
+```yaml
+# =============================================================================
+# Skill-Workflow Linkage Patterns (v2.2)
+# =============================================================================
+skill_patterns:
+  paradigm: "workflow-as-caller"
+  
+  linkage_types:
+    direct_reference:
+      description: "Workflow explicitly calls SKILL.md"
+      example: "/noe → O1 Noēsis"
+      token_cost: "frontmatter(100-150t) + body(700-1000t)"
+      
+    metadata_reference:
+      description: "Runtime matching via frontmatter triggers"
+      example: "user intent → skill matching"
+      token_cost: "frontmatter only until activation"
+      
+    inline_injection:
+      description: "Lightweight skill embedded in workflow"
+      example: "single-step validation"
+      token_cost: "<300t total"
+  
+  optimization:
+    heavy_skills: ["O1", "O2", "O3", "O4", "A2"]  # Use file reference
+    light_skills: ["S1", "S3", "P2"]               # Can use inline
+```
+
+---
+
+#### [MODIFY] [noe.md](file:///home/laihuip001/oikos/.agent/workflows/noe.md)
+
+**スキル呼び出し形式への更新**:
+
+```markdown
+## スキル発動
+
+このワークフローは以下のスキルを呼び出す:
+
+| スキル | 役割 | 発動方式 |
+|:-------|:-----|:---------|
+| **O1 Noēsis** | 主処理 | direct_reference |
+| S1 Metron | スケール判断（オプション）| metadata_reference |
+```
+
+---
+
+## Verification Plan
+
+### 自動テスト
+
+なし（スキルファイルは静的定義のため）
+
+### 手動検証
+
+1. **Frontmatter トークン数確認**
+   - 各SKILLのfrontmatter部分をコピー
+   - トークンカウンター（概算: 1行 ≈ 10-15 tokens）で100-150t範囲を確認
+
+2. **IDE認識テスト**
+   - Antigravity で `/noe` を入力
+   - O1 Noēsis スキルが発動することを確認
+   - 「判断を検証して」と入力 → A2 Krisis が発動するか確認
+
+3. **LLM固有セクション整合性**
+   - claude/gemini/gpt 各セクションが構文エラーなく記述されているか目視確認
+
+---
+
+## リスク
+
+> [!NOTE]
+> パイロット3スキルで検証後、残り21スキルに展開。一括変更は避ける。
+
+---
+
+## 見積り
+
+| Phase | 工数 |
+|:------|-----:|
+| Phase 1 (3スキル) | 15min |
+| Phase 2 (tools.yaml, noe.md) | 10min |
+| Phase 3 (検証) | 5min |
+| **合計** | **30min** |

@@ -1,0 +1,56 @@
+# Walkthrough: Skill-WF 双方向リンク
+
+## 成果
+
+| 項目 | 値 |
+|:-----|:---|
+| 定理数 | 24 |
+| 双方向リンク | 48 (24×2) |
+| 不変式検証 | ✅ Pass |
+
+---
+
+## SE-6 Scalable Foundation 準拠設計
+
+```text
+土台: theorem_map.yaml (1ファイル)
+展開: 全双方向リンク自動生成
+追加コスト: O(1) — YAMLに1行追加 + スクリプト実行
+```
+
+---
+
+## 成果物
+
+| ファイル | 役割 |
+|:---------|:-----|
+| [.agent/data/theorem_map.yaml](file:///home/laihuip001/oikos/.agent/data/theorem_map.yaml) | 唯一の情報源 |
+| [.agent/scripts/bidirectional_linker.py](file:///home/laihuip001/oikos/.agent/scripts/bidirectional_linker.py) | リンク生成 |
+| [.agent/scripts/wf_skill_sync_check.sh](file:///home/laihuip001/oikos/.agent/scripts/wf_skill_sync_check.sh) | 同期検証 |
+| [.agent/standards/se_principles.md](file:///home/laihuip001/oikos/.agent/standards/se_principles.md) | SE-6 定義 |
+| [.agent/docs/skill_wf_integration.md](file:///home/laihuip001/oikos/.agent/docs/skill_wf_integration.md) | 使い方 |
+
+---
+
+## 双方向リンク構造
+
+```
+WF.md
+└── skill_ref: .agent/skills/{skill}/SKILL.md
+
+SKILL.md
+├── workflow_ref: .agent/workflows/{wf}.md
+└── ## Related Modes (mode一覧)
+```
+
+---
+
+## 新定理追加手順
+
+```bash
+# 1. YAMLに追加
+echo "X5: {wf: xxx, skill: x-series/x5-xxx}" >> theorem_map.yaml
+
+# 2. 実行
+python3 .agent/scripts/bidirectional_linker.py
+```

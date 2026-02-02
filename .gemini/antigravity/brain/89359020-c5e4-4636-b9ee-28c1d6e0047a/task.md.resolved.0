@@ -1,0 +1,10 @@
+# Boot Issues Resolution
+
+## Issues to Resolve
+- [ ] 1. pymdp 未インストール → FEP A行列読込失敗
+- [ ] 2. Sophia pkl 未存在 → /bye で蓄積開始が必要
+- [ ] 3. Digestor の python コマンド → python3 に修正
+- [ ] 4. Git origin 未設定 → Jules結果取得不可
+
+## Progress
+- Started: 2026-01-29T12:46

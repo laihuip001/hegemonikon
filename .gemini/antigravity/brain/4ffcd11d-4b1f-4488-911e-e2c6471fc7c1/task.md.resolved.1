@@ -1,0 +1,27 @@
+# タスク: X-series 連携強化 + workflow_runner 診断
+
+## 完了
+
+- [x] Boot環境修復 (Gnōsis/FEP)
+- [x] 現状調査 (X-series, workflow_runner)
+- [x] implementation_plan.md 作成
+- [x] workflow_runner.py に X-series 統合
+  - [x] [XSeriesRecommendation](file:///home/laihuip001/oikos/hegemonikon/mekhane/workflow_runner.py#31-38) dataclass 追加
+  - [x] [WorkflowResult](file:///home/laihuip001/oikos/hegemonikon/mekhane/workflow_runner.py#40-51) に [x_series_recommendations](file:///home/laihuip001/oikos/hegemonikon/mekhane/fep/encoding.py#616-667) 追加
+  - [x] [run_workflow()](file:///home/laihuip001/oikos/hegemonikon/mekhane/workflow_runner.py#192-243) で X-series 推奨取得
+  - [x] [format_derivative_selection()](file:///home/laihuip001/oikos/hegemonikon/mekhane/workflow_runner.py#245-273) に推奨表示追加
+- [x] test_workflow_runner.py 作成
+  - [x] 全24定理テスト (48件)
+  - [x] X-series 推奨テスト (3件)
+  - [x] 出力形式テスト (3件)
+  - [x] エッジケーステスト (4件)
+- [x] テスト実行・検証 (58件全通過)
+- [x] CLI動作確認
+
+## 結果
+
+| 項目 | 結果 |
+|------|------|
+| 新規テスト | 58件 全通過 ✅ |
+| 既存テスト | 387件 通過 |
+| 回帰失敗 | 0件 (7件はderivative_selector既存問題) |

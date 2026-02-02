@@ -1,0 +1,183 @@
+# Implementation Plan: Hegemonikón Mode
+
+> **Goal**: tekhne-maker に「Hegemonikón Mode」を追加し、哲学的に正当化された生成物を作る
+
+---
+
+## STAGE 0: 盲点 + スケール
+
+### 盲点チェック
+
+| 盲点 | 対策 |
+|:-----|:-----|
+| 24 定理の完全理解が前提 | 質問フローで段階的に絞り込み |
+| Utils を完全排除する完璧主義 | Utils を「暫定」として残す |
+| Creator の選択能力に依存 | 選択理由の記録を必須化 |
+
+### スケール判定
+
+| 観点 | 判定 |
+|:-----|:-----|
+| 影響範囲 | tekhne-maker のみ |
+| 変更量 | M7 追加 + /tek.md 更新 |
+| リスク | 低〜中 (既存機能は維持) |
+| **スケール** | **Meso** (モジュール改良) |
+
+---
+
+## STAGE 1: 戦略選択
+
+**選択**: **Exploit** (既存資産の活用)
+
+理由:
+- 既存の定理メタデータ形式を活用
+- Interactive Mode (v3.0) の質問フローを拡張
+- 新規アーキテクチャは不要
+
+---
+
+## STAGE 2: 成功基準
+
+| レベル | 基準 |
+|:-------|:-----|
+| **Must** | 定理マッピングが必須化される |
+| **Must** | X-series 連携が frontmatter に含まれる |
+| **Should** | 生成意図が lineage に記録される |
+| **Should** | Utils 選択時に理由が必須 |
+| **Could** | 定理選択ガイドが提供される |
+
+---
+
+## STAGE 3: Blueprint
+
+### Goal Decomposition
+
+```
+Goal: Hegemonikón Mode 実装
+├─ G1: M7 HEGEMONIKON_MODE を SKILL.md に追加
+├─ G2: 定理選択質問フローを実装
+├─ G3: /tek.md に Hegemonikón Mode トリガーを追加
+└─ G4: テスト実行
+```
+
+### Proposed Changes
+
+---
+
+#### [MODIFY] SKILL.md
+
+**Path**: [/home/laihuip001/oikos/hegemonikon/mekhane/ergasterion/tekhne/SKILL.md](file:///home/laihuip001/oikos/hegemonikon/mekhane/ergasterion/tekhne/SKILL.md)
+
+追加内容:
+
+```markdown
+## M7: HEGEMONIKON_MODE (v6.4)
+
+> 定理体系に馴染む生成物を作るモード
+
+### Activation
+
+- `/tek hege` → Hegemonikón Mode 開始
+- Interactive Mode で「聖 (Hegemonikón)」を選択
+
+### 質問フロー
+
+Q1: カテゴリ選択
+  A: Ousia (認識・理解)
+  B: Schema (計画・戦略)
+  C: Akribeia (精度・判断)
+  D: Hormē (衝動・信念)
+  E: Perigraphē (環境・境界)
+  F: Kairos (時間・文脈)
+
+Q2: 定理選択 (Q1 に応じた 4 定理を表示)
+
+Q3: X-series 連携
+
+Q4: 生成意図 (なぜこの定理か)
+
+### 必須 Frontmatter (Hegemonikón Mode)
+
+- `derived_from: [定理ID]`
+- `series: [O/S/A/H/P/K]`
+- `related.x_series: [連携定義]`
+- `lineage: [生成意図を含む]`
+
+### Utils 使用条件
+
+Utils は「暫定カテゴリ」。以下の場合のみ許可:
+1. 6 カテゴリ全てに馴染まない
+2. 「Utils を選んだ理由」を lineage に明記
+```
+
+---
+
+#### [MODIFY] /tek.md
+
+**Path**: [/home/laihuip001/oikos/.agent/workflows/tek.md](file:///home/laihuip001/oikos/.agent/workflows/tek.md)
+
+追加内容:
+
+1. 発動条件テーブルに `/tek hege` を追加
+2. モード選択テーブルに `Hegemonikón` を追加
+3. Interactive Mode の質問フローに「俗/聖」選択を追加
+
+```markdown
+## Interactive Mode (v4.0)
+
+### 質問フロー
+
+Q0: どちらのモードで生成しますか？
+  A: 俗 (汎用) — 従来動作
+  B: 聖 (Hegemonikón) → Hegemonikón Mode
+
+[以降は M7 の質問フローに続く]
+```
+
+---
+
+## STAGE 4: Devil's Advocate
+
+### 反論
+
+> 「定理マッピングを強制しても、形骸化して結局 Utils に落ちるのでは？」
+
+### 反駁
+
+| 対策 | 有効性 |
+|:-----|:------:|
+| Utils 選択時に理由必須 | 高 (心理的障壁) |
+| 生成後の診断で「馴染み度」を評価 | 高 |
+| lineage で選択理由を追跡可能 | 中 |
+
+### Pre-mortem
+
+| 失敗シナリオ | 確率 | 対策 |
+|:-------------|:-----|:-----|
+| Hegemonikón Mode が使われない | 中 | Interactive Mode のデフォルトを「聖」に |
+| Utils に全て落ちる | 低 | 診断モードで警告 |
+| 質問フローが長すぎ | 中 | 最小 3 問に抑える |
+
+---
+
+## Verification Plan
+
+1. `/tek hege` で Ousia 系スキルを生成
+2. frontmatter に `derived_from`, `series`, `x_series` が含まれることを確認
+3. Utils 選択時に理由を求められることを確認
+
+---
+
+## Summary
+
+| 項目 | 内容 |
+|:-----|:-----|
+| スケール | Meso |
+| 戦略 | Exploit |
+| 変更ファイル | SKILL.md, /tek.md |
+| 新規モジュール | M7: HEGEMONIKON_MODE |
+| バージョン | SKILL.md v6.4, /tek.md v4.0 |
+
+---
+
+*Created: 2026-01-28 21:35 JST | /plan v3.0*

@@ -1,0 +1,74 @@
+# W6: S-Series SAGE Mode リファクタリング
+
+S-series (Schema) の 4スキルを Tekhne-Maker v6 SAGE Mode 形式に更新する。
+
+## 背景
+
+| スキル | 現在 | 目標 |
+|:-------|:-----|:-----|
+| s1-metron | v2.1.1 (~99行) | SAGE Mode (~120行) |
+| s2-mekhane | v2.1.0 (~102行) | SAGE Mode (~120行) |
+| s3-stathmos | v2.1.0 (~97行) | SAGE Mode (~120行) |
+| s4-praxis | v2.1.0 (~97行) | SAGE Mode (~120行) |
+
+**参考実装**: [session-audit/SKILL.md](file:///home/laihuip001/oikos/.agent/skills/akribeia/session-audit/SKILL.md)
+
+---
+
+## Proposed Changes
+
+### Schema Layer
+
+#### [MODIFY] [s1-metron/SKILL.md](file:///home/laihuip001/oikos/.agent/skills/schema/s1-metron/SKILL.md)
+
+- YAML frontmatter に `archetype: Precision` 追加
+- Phase 構造化: Scale Evaluation → Context Matching → Scale Selection
+- Input/Output YAML セクション追加
+- WARGAME_DB Check テーブル追加
+- バージョン → v3.0.0
+
+#### [MODIFY] [s2-mekhane/SKILL.md](file:///home/laihuip001/oikos/.agent/skills/schema/s2-mekhane/SKILL.md)
+
+- YAML frontmatter に `archetype: Autonomy` 追加
+- Phase 構造化: Method Space Exploration → Tradeoff Evaluation → Method Selection
+- Input/Output YAML セクション追加
+- WARGAME_DB Check テーブル追加
+- バージョン → v3.0.0
+
+#### [MODIFY] [s3-stathmos/SKILL.md](file:///home/laihuip001/oikos/.agent/skills/schema/s3-stathmos/SKILL.md)
+
+- YAML frontmatter に `archetype: Precision` 追加
+- Phase 構造化: Scale Determination → Baseline Setting → Standard Output
+- Input/Output YAML セクション追加
+- WARGAME_DB Check テーブル追加
+- バージョン → v3.0.0
+
+#### [MODIFY] [s4-praxis/SKILL.md](file:///home/laihuip001/oikos/.agent/skills/schema/s4-praxis/SKILL.md)
+
+- YAML frontmatter に `archetype: Speed` 追加 (価値実現は素早い行動)
+- Phase 構造化: Method Space Evaluation → Value Matching → Praxis Output
+- Input/Output YAML セクション追加
+- WARGAME_DB Check テーブル追加
+- バージョン → v3.0.0
+
+---
+
+## Verification Plan
+
+### Automated Tests
+
+なし（SKILL.md はドキュメントであり、テスト対象外）
+
+### Manual Verification
+
+1. **構造確認**: 各 SKILL.md が SAGE Mode 必須要素を持つことを確認
+   - `> **Tekhne-Maker v6 SAGE Mode Generated**` バナー
+   - Phase 1, 2, 3 の構造化処理
+   - Input YAML + Output YAML
+   - WARGAME_DB Check テーブル
+2. **相互参照整合性**: X-series 接続図が壊れていないことを確認
+3. **コミット**: `git commit -m "feat(schema): S-series SAGE Mode refactoring (W6)"`
+
+---
+
+*Plan created: 2026-01-28 18:57 JST*

@@ -1,0 +1,92 @@
+# Zero-Trust CCL Executor 実装 Walkthrough
+
+**日付**: 2026-01-31
+**目的**: LLM の論外処理 (ドキュメント未読・省略・怠惰) を構造的に解消
+
+---
+
+## 背景: 発生した問題
+
+```
+問題1: operators.md に「! = 階乗」と明記 → 読まず「否定」と誤解
+問題2: 複雑な CCL 式 → 「長くなるから」と省略
+問題3: 「楽な方を選んだ」と自覚的に怠惰
+```
+
+---
+
+## 解決: 5段階 Zero-Trust アーキテクチャ
+
+```
+CCL Expression → Phase 0 (仕様注入) → Phase 1 (構造強制)
+             → Phase 2 (検証) → Phase 3 (監査) → Phase 4 (学習)
+             → Validated Output
+```
+
+---
+
+## 実装ファイル
+
+| Phase | ファイル | 機能 |
+|-------|----------|------|
+| 0 | [spec_injector.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/ccl/spec_injector.py) | 演算子仕様の自動注入 + クイズ |
+| 1 | [output_schema.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/ccl/output_schema.py) | Pydantic スキーマ |
+| 2 | [validators.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/ccl/guardrails/validators.py) | 出力検証 + リジェクト |
+| 4 | [failure_db.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/ccl/learning/failure_db.py) | 失敗パターン学習 |
+| 統合 | [executor.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/ccl/executor.py) | エントリポイント |
+
+---
+
+## テスト結果
+
+```
+Test 1: Spec Injector
+  Operators found: {'+', '~', '!', '/'}
+  Prompt length: 663 chars
+  ✅ Spec Injector works
+
+Test 2: Output Validator
+  Valid: False (不完全な出力を正しく検出)
+  Errors: 7
+  ✅ Validator works
+
+Test 3: Failure DB
+  Warnings for /noe!~/u+: 1
+  - 演算子 `!` は「階乗 = 全派生同時実行」です。「否定」ではありません。
+  ✅ Failure DB works
+```
+
+---
+
+## 使用例
+
+```python
+from mekhane.ccl import create_ccl_prompt, validate_ccl_output
+
+# 1. LLM に渡すプロンプトを生成
+prompt = create_ccl_prompt("/noe!~/u+")
+# → 演算子仕様 + 理解クイズ + 警告が自動注入
+
+# 2. LLM 出力を検証
+result = validate_ccl_output("/noe!~/u+", llm_output)
+if not result.valid:
+    print(result.regeneration_instruction)
+    # → 再生成を要求
+```
+
+---
+
+## 既知の警告 (自動注入)
+
+| 演算子 | 警告 |
+|--------|------|
+| `!` | 🔴 「階乗 = 全派生同時実行」であり「否定」ではない |
+| `*^` | 🟡 「融合 + メタ分析」両方のセクションが必要 |
+
+---
+
+## 残タスク
+
+- [ ] Phase 3: Multi-Agent Validator (論理監査)
+- [ ] 正式テスト追加
+- [ ] README.md 追加

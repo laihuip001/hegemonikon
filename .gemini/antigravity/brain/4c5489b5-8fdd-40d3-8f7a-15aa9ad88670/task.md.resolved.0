@@ -1,0 +1,29 @@
+# Task: OMEGA Integration Analysis
+
+## Status
+
+- [x] Boot: 最新 Handoff 読み込み
+- [x] tekhne-maker v5.1 現在構造の確認
+- [x] V6.0 統合計画 (503736ea) の確認
+- [x] /ax 分析: Hegemonikón 対応関係整理
+- [x] implementation_plan.md 作成
+- [ ] **ユーザーレビュー待ち**
+- [ ] 方針決定後 → EXECUTION
+
+## 統合診断（吸収度）
+
+| 層 | 馴染み度 | 備考 |
+|:---|:---------|:-----|
+| O | ✅ 完全 | RECURSIVE_CORE → O4 Energeia |
+| S | ✅ 完全 | Mekhanē として統合 |
+| H | ⚠️ 要整理 | Pre-Mortem 重複 |
+| P | ✅ 分離推奨 | Cognitive Armory → 独立 Skill |
+| K | ✅ 完全 | O/X Persona → M0 |
+| A | ✅ 単純追記 | WARGAME_DB 拡張 |
+
+## 次のアクション
+
+Creator の方針決定待ち:
+1. 優先度 (v6.0 vs 新Skill)
+2. Cognitive Armory の配置
+3. Workflow 命名

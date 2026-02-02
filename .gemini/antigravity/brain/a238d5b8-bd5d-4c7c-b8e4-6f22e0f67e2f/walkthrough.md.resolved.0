@@ -1,0 +1,56 @@
+# Jules Client 実装 Walkthrough
+
+## 完了項目
+
+### 新規ファイル
+
+| ファイル | 説明 |
+|---------|------|
+| [jules_client.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/symploke/jules_client.py) | Jules API クライアント |
+| [jules_mcp_server.py](file:///home/laihuip001/oikos/hegemonikon/mcp/jules_mcp_server.py) | MCP Server（4ツール）|
+
+### 更新ファイル
+
+| ファイル | 変更内容 |
+|---------|---------|
+| [tools.yaml](file:///home/laihuip001/oikos/.agent/tools.yaml) | Jules MCP 追加 |
+
+---
+
+## 実装機能
+
+### jules_client.py
+
+- [create_session()](file:///home/laihuip001/oikos/hegemonikon/mekhane/symploke/jules_client.py#77-126): セッション作成
+- [poll_session()](file:///home/laihuip001/oikos/hegemonikon/mekhane/symploke/jules_client.py#164-203): ポーリング（指数バックオフ対応）
+- [batch_execute()](file:///home/laihuip001/oikos/hegemonikon/mekhane/symploke/jules_client.py#228-269): 並列実行（Semaphore 制御、max 60）
+
+### jules_mcp_server.py
+
+| ツール | 説明 |
+|--------|------|
+| `jules_create_task` | 単一タスク作成 |
+| `jules_get_status` | ステータス確認 |
+| `jules_batch_execute` | 並列実行 |
+| `jules_list_repos` | リポジトリ一覧 |
+
+---
+
+## 依存関係（要インストール）
+
+```bash
+pip install aiohttp mcp
+```
+
+---
+
+## 次のステップ
+
+1. 依存関係インストール
+2. API キー設定（`JULES_API_KEY` 環境変数）
+3. 単一タスクテスト
+4. 並列実行テスト
+
+---
+
+*Generated 2026-01-27*

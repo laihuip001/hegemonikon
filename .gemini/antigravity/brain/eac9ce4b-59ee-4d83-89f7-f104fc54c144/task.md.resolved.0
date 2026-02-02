@@ -1,0 +1,15 @@
+# Task: n8n/Zapier 活用提案 for Hegemonikón
+
+## 目的
+CLL/mek+ に基づき、Hegemonikon ワークフロー体系に n8n/Zapier を統合する活用提案を策定
+
+## 進捗
+
+- [x] /boot ワークフロー読込 (v3.5)
+- [x] 前回 Handoff 確認 (2026-01-29_2311: CCL 100% 整合化)
+- [x] 週次レビューフラグ確認 (70件蓄積 → 超過)
+- [x] tools.yaml 読込
+- [x] /mek, /bye, /s ワークフロー分析
+- [x] n8n vs Zapier 比較調査
+- [x] 活用提案書作成 (implementation_plan.md)
+- [ ] Creator レビュー待ち

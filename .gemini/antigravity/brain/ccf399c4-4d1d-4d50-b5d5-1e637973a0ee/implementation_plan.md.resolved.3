@@ -1,0 +1,336 @@
+# 完全設計書: @extends/@mixin for Prompt-Lang v2.1
+
+## 概要
+
+テンプレート継承 (`@extends`) とコンポジション (`@mixin`) を Prompt-Lang に追加する。
+
+---
+
+## 懸念点と解決策
+
+### 懸念点 1: 名前解決のスコープ
+
+| 問題 | `@extends: base_spec` の `base_spec` をどこから探すか不明 |
+|:-----|:---|
+| **解決策** | **Phase 1: 同一ファイル内のみ** |
+| 理由 | シンプルに始めて段階的に拡張 |
+| 将来拡張 | Phase 2 で `@extends: "./shared/base.prompt#name"` 形式を追加 |
+
+```prompt-lang
+# Phase 1 (今回実装)
+@extends: base_spec  # 同一ファイル内の定義を参照
+
+# Phase 2 (将来)
+@extends: "./shared/base.prompt#base_spec"  # 外部ファイル参照
+```
+
+---
+
+### 懸念点 2: Mixin の格納場所
+
+| 問題 | 現在のパーサーは単一 [Prompt](file:///home/laihuip001/oikos/hegemonikon/mekhane/ergasterion/prompt-lang/prompt_lang.py#81-477) を返すだけ |
+|:-----|:---|
+| **解決策** | `ParseResult` dataclass を導入 |
+
+```python
+@dataclass
+class ParseResult:
+    """Result of parsing a prompt-lang file with multiple definitions."""
+    prompts: dict[str, Prompt] = field(default_factory=dict)  # name -> Prompt
+    mixins: dict[str, Mixin] = field(default_factory=dict)    # name -> Mixin
+    
+    def get_prompt(self, name: str) -> Prompt | None:
+        return self.prompts.get(name)
+    
+    def get_mixin(self, name: str) -> Mixin | None:
+        return self.mixins.get(name)
+```
+
+**後方互換性**: 既存の [parse()](file:///home/laihuip001/oikos/hegemonikon/mekhane/ergasterion/prompt-lang/prompt_lang.py#506-518) は単一 [Prompt](file:///home/laihuip001/oikos/hegemonikon/mekhane/ergasterion/prompt-lang/prompt_lang.py#81-477) を返し続ける。新規 `parse_all()` で `ParseResult` を返す。
+
+---
+
+### 懸念点 3: 循環参照の検出
+
+| 問題 | `A extends B extends C extends A` を検出する必要がある |
+|:-----|:---|
+| **解決策** | 参照チェーンを追跡し、ループを検出 |
+
+```python
+class CircularReferenceError(Exception):
+    def __init__(self, chain: list[str]):
+        self.chain = chain
+        super().__init__(f"Circular reference: {' → '.join(chain)}")
+```
+
+**実装**:
+
+```python
+def _resolve_with_chain(
+    name: str,
+    registry: ParseResult,
+    visited: set[str],
+    chain: list[str]
+) -> Prompt:
+    if name in visited:
+        raise CircularReferenceError(chain + [name])
+    
+    visited.add(name)
+    chain.append(name)
+    
+    prompt = registry.get_prompt(name) or registry.get_mixin(name)
+    if not prompt:
+        raise ReferenceError(f"Unknown reference: {name}")
+    
+    # 再帰的に親を解決
+    if prompt.extends:
+        parent = _resolve_with_chain(prompt.extends, registry, visited, chain)
+        prompt = _merge(parent, prompt)
+    
+    return prompt
+```
+
+---
+
+### 懸念点 4: compile() との統合
+
+| 問題 | 呼び出し元が継承解決を忘れるリスク |
+|:-----|:---|
+| **解決策** | 2つのオプション（B を採用） |
+
+| オプション | 内容 | 採用 |
+|:-----------|:-----|:----:|
+| A | [compile()](file:///home/laihuip001/oikos/hegemonikon/mekhane/ergasterion/prompt-lang/prompt_lang.py#159-254) 内で自動 [resolve()](file:///home/laihuip001/oikos/hegemonikon/mekhane/ergasterion/prompt-lang/prompt_lang.py#420-477) | ❌ 暗黙的すぎる |
+| **B** | 未解決の場合は警告 + 解決済みフラグ | ✅ |
+
+```python
+@dataclass
+class Prompt:
+    # 既存フィールド...
+    
+    # v2.1 additions
+    extends: Optional[str] = None
+    mixins: list[str] = field(default_factory=list)
+    _resolved: bool = False  # 内部フラグ
+    
+    def compile(self, context: dict = None, format: str = "markdown") -> str:
+        if (self.extends or self.mixins) and not self._resolved:
+            import warnings
+            warnings.warn(
+                f"Prompt '{self.name}' has unresolved extends/mixins. "
+                "Call resolve() first for complete compilation.",
+                UserWarning
+            )
+        # 既存のcompileロジック...
+```
+
+---
+
+## データ構造
+
+### 新規 dataclass
+
+```python
+@dataclass
+class Mixin:
+    """Reusable template fragment."""
+    name: str
+    # 全ブロックを持つが、role は省略可能
+    role: Optional[str] = None
+    goal: Optional[str] = None
+    constraints: list[str] = field(default_factory=list)
+    format: Optional[str] = None
+    examples: list[dict] = field(default_factory=list)
+    tools: dict[str, str] = field(default_factory=dict)
+    resources: dict[str, str] = field(default_factory=dict)
+    rubric: Optional[Rubric] = None
+    activation: Optional[Activation] = None
+    context: list[ContextItem] = field(default_factory=list)
+```
+
+### Prompt への追加
+
+```python
+@dataclass
+class Prompt:
+    # 既存フィールド...
+    
+    # v2.1 additions
+    extends: Optional[str] = None
+    mixins: list[str] = field(default_factory=list)
+    _resolved: bool = field(default=False, repr=False)
+```
+
+---
+
+## パーサー拡張
+
+### 新規パターン
+
+```python
+class PromptLangParser:
+    HEADER_PATTERN = re.compile(r'^#prompt\s+([a-z_][a-z0-9_-]*)$')
+    MIXIN_HEADER_PATTERN = re.compile(r'^#mixin\s+([a-z_][a-z0-9_-]*)$')  # 新規
+    EXTENDS_PATTERN = re.compile(r'^@extends:\s*(.+)$')                   # 新規
+    MIXIN_REF_PATTERN = re.compile(r'^@mixin:\s*\[([^\]]+)\]$')          # 新規
+```
+
+### parse_all() メソッド
+
+```python
+def parse_all(self) -> ParseResult:
+    """Parse file with multiple prompts and mixins."""
+    result = ParseResult()
+    
+    while self.pos < len(self.lines):
+        self._skip_empty_lines()
+        if self.pos >= len(self.lines):
+            break
+        
+        line = self._current_line()
+        
+        if match := self.MIXIN_HEADER_PATTERN.match(line):
+            mixin = self._parse_mixin(match.group(1))
+            result.mixins[mixin.name] = mixin
+        elif match := self.HEADER_PATTERN.match(line):
+            prompt = self._parse_prompt(match.group(1))
+            result.prompts[prompt.name] = prompt
+        else:
+            self.pos += 1  # Skip unknown
+    
+    return result
+```
+
+---
+
+## マージロジック
+
+### マージルール
+
+| フィールド | マージ動作 | 理由 |
+|:-----------|:-----------|:-----|
+| [role](file:///home/laihuip001/oikos/hegemonikon/mekhane/ergasterion/prompt-lang/test_prompt_lang.py#190-207) | 子で上書き | 役割は継承元と異なることが多い |
+| [goal](file:///home/laihuip001/oikos/hegemonikon/mekhane/ergasterion/prompt-lang/test_prompt_lang.py#147-163) | 子で上書き | 目標は具体化される |
+| [constraints](file:///home/laihuip001/oikos/hegemonikon/mekhane/ergasterion/prompt-lang/test_prompt_lang.py#132-146) | **追加** (親 + 子) | 制約は累積的 |
+| [format](file:///home/laihuip001/oikos/hegemonikon/mekhane/ergasterion/prompt-lang/prompt_lang.py#625-667) | 子で上書き | 出力形式は子が決定 |
+| `examples` | **追加** (親 + 子) | 例は累積的 |
+| [tools](file:///home/laihuip001/oikos/hegemonikon/mcp/prompt_lang_mcp_server.py#208-238) | **マージ** (子が優先) | 子がオーバーライド可能 |
+| `resources` | **マージ** (子が優先) | 子がオーバーライド可能 |
+| [rubric](file:///home/laihuip001/oikos/hegemonikon/mekhane/ergasterion/prompt-lang/prompt_lang.py#783-856) | 子で上書き | 評価基準は子が決定 |
+| [activation](file:///home/laihuip001/oikos/hegemonikon/mekhane/ergasterion/prompt-lang/prompt_lang.py#857-891) | 子で上書き | 活性化は子が決定 |
+| [context](file:///home/laihuip001/oikos/hegemonikon/mekhane/ergasterion/prompt-lang/prompt_lang.py#420-477) | **追加** (親 + 子) | コンテキストは累積的 |
+
+### 実装
+
+```python
+def _merge(parent: Prompt | Mixin, child: Prompt) -> Prompt:
+    """Merge parent into child. Child takes precedence for scalar fields."""
+    return Prompt(
+        name=child.name,
+        role=child.role or parent.role,
+        goal=child.goal or parent.goal,
+        constraints=parent.constraints + child.constraints,  # 追加
+        format=child.format or parent.format,
+        examples=parent.examples + child.examples,  # 追加
+        tools={**parent.tools, **child.tools},  # 子が優先
+        resources={**parent.resources, **child.resources},
+        rubric=child.rubric or parent.rubric,
+        activation=child.activation or parent.activation,
+        context=parent.context + child.context,  # 追加
+        extends=None,  # 解決済み
+        mixins=[],     # 解決済み
+        _resolved=True
+    )
+```
+
+---
+
+## 解決関数
+
+```python
+def resolve(prompt: Prompt, registry: ParseResult) -> Prompt:
+    """
+    Resolve extends and mixins for a prompt.
+    
+    Resolution order:
+    1. Mixins (left to right)
+    2. Extends (recursive, depth-first)
+    3. Self
+    
+    Returns:
+        Resolved Prompt with _resolved=True
+    """
+    if prompt._resolved:
+        return prompt
+    
+    result = prompt
+    visited = {prompt.name}
+    chain = [prompt.name]
+    
+    # 1. Apply mixins (left to right)
+    for mixin_name in prompt.mixins:
+        mixin = registry.get_mixin(mixin_name)
+        if not mixin:
+            raise ReferenceError(f"Mixin not found: {mixin_name}")
+        result = _merge(mixin, result)
+    
+    # 2. Apply extends (recursive)
+    if prompt.extends:
+        parent = _resolve_with_chain(prompt.extends, registry, visited, chain)
+        result = _merge(parent, result)
+    
+    result._resolved = True
+    return result
+```
+
+---
+
+## テストケース
+
+| # | テスト | 期待結果 |
+|:--|:-------|:---------|
+| 1 | 基本継承 | 親のrole/goalが子に継承される |
+| 2 | 上書き | 子のroleが親を上書き |
+| 3 | リスト追加 | constraintsが親+子で累積 |
+| 4 | dict マージ | toolsが子で上書き可能 |
+| 5 | 複数 mixin | 左から右へ順次マージ |
+| 6 | extends + mixin | mixin → extends → self の順で適用 |
+| 7 | 循環参照エラー | CircularReferenceError 発生 |
+| 8 | 未定義参照エラー | ReferenceError 発生 |
+| 9 | compile() 警告 | 未解決時に UserWarning |
+| 10 | 後方互換性 | 既存の単一 prompt がパース可能 |
+
+---
+
+## 実装フェーズ
+
+| Phase | 内容 | 工数 |
+|:------|:-----|:-----|
+| 1 | `Mixin`, `ParseResult` dataclass | 10分 |
+| 2 | [Prompt](file:///home/laihuip001/oikos/hegemonikon/mekhane/ergasterion/prompt-lang/prompt_lang.py#81-477) に extends/mixins 追加 | 5分 |
+| 3 | パーサー: `#mixin`, `@extends:`, `@mixin:` | 20分 |
+| 4 | `parse_all()` メソッド | 10分 |
+| 5 | [resolve()](file:///home/laihuip001/oikos/hegemonikon/mekhane/ergasterion/prompt-lang/prompt_lang.py#420-477) + 循環検出 | 15分 |
+| 6 | テスト 10ケース | 20分 |
+| **合計** | | **~80分** |
+
+---
+
+## 後方互換性
+
+| 既存機能 | 影響 |
+|:---------|:-----|
+| [parse()](file:///home/laihuip001/oikos/hegemonikon/mekhane/ergasterion/prompt-lang/prompt_lang.py#506-518) | 変更なし（単一Prompt返却） |
+| [parse_file()](file:///home/laihuip001/oikos/hegemonikon/mekhane/ergasterion/prompt-lang/prompt_lang.py#949-958) | 変更なし |
+| [compile()](file:///home/laihuip001/oikos/hegemonikon/mekhane/ergasterion/prompt-lang/prompt_lang.py#159-254) | 未解決警告を追加（動作は変更なし） |
+| テスト | 全て通過 |
+
+---
+
+## 制限事項 (Phase 1)
+
+| 制限 | 理由 | 将来対応 |
+|:-----|:-----|:---------|
+| 同一ファイル内参照のみ | シンプルさ優先 | Phase 2 で外部ファイル対応 |
+| 多重継承なし | 複雑さ回避 | 必要性に応じて検討 |
+| mixin は mixin を参照不可 | 循環リスク軽減 | 必要性に応じて検討 |

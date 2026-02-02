@@ -1,0 +1,190 @@
+# Prompt-Lang v2.1: @extends/@mixin 実装計画
+
+## 概要
+
+Prompt-Lang の未実装機能である `@extends`（テンプレート継承）と `@mixin`（モジュール合成）を実装する。
+
+**対象ファイル**: [hegemonikon/mekhane/ergasterion/prompt-lang/prompt_lang.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/ergasterion/prompt-lang/prompt_lang.py)
+
+---
+
+## Proposed Changes
+
+### Core Module
+
+#### [MODIFY] [prompt_lang.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/ergasterion/prompt-lang/prompt_lang.py)
+
+**1. 新規 dataclass 追加（60行付近）**
+
+```python
+@dataclass
+class Mixin:
+    """Mixin definition for reusable prompt components."""
+    name: str
+    constraints: list[str] = field(default_factory=list)
+    format: Optional[str] = None
+    rubric: Optional['Rubric'] = None
+    # Allow any block types
+    blocks: dict[str, Any] = field(default_factory=dict)
+```
+
+**2. [Prompt](file:///home/laihuip001/oikos/hegemonikon/mekhane/ergasterion/prompt-lang/prompt_lang.py#81-477) dataclass 拡張（81行付近）**
+
+```python
+# v2.1 additions (既存フィールドの後に追加)
+extends: Optional[str] = None  # Base prompt name
+mixins: list[str] = field(default_factory=list)  # Mixin names
+```
+
+**3. ヘッダーパターン拡張（PromptLangParser, 490行付近）**
+
+```python
+HEADER_PATTERN = re.compile(r'^#(prompt|mixin)\s+([a-z_][a-z0-9_-]*)$')
+```
+
+**4. [_parse_header()](file:///home/laihuip001/oikos/hegemonikon/mekhane/ergasterion/prompt-lang/prompt_lang.py#533-542) 修正**
+
+```python
+def _parse_header(self):
+    line = self._current_line()
+    match = self.HEADER_PATTERN.match(line)
+    if not match:
+        raise ParseError(...)
+    
+    header_type = match.group(1)  # "prompt" or "mixin"
+    name = match.group(2)
+    
+    if header_type == "mixin":
+        self.is_mixin = True
+        self.mixin = Mixin(name=name)
+    else:
+        self.prompt = Prompt(name=name)
+    self.pos += 1
+```
+
+**5. [_parse_block()](file:///home/laihuip001/oikos/hegemonikon/mekhane/ergasterion/prompt-lang/prompt_lang.py#543-591) 拡張（543行付近）**
+
+```python
+elif block_type == "@extends":
+    self.prompt.extends = self._parse_text_content().strip()
+elif block_type == "@mixin":
+    self.prompt.mixins = self._parse_mixin_list()
+```
+
+**6. 新規メソッド追加**
+
+```python
+def _parse_mixin_list(self) -> list[str]:
+    """Parse @mixin: [name1, name2] format."""
+    line = self._current_line()
+    # Handle inline list: @mixin: [json_output, security_constraints]
+    # or indented list format
+    ...
+```
+
+**7. 解決ロジック（Prompt クラスに追加）**
+
+```python
+def resolve(self, registry: dict[str, 'Prompt | Mixin']) -> 'Prompt':
+    """Resolve extends and mixins from registry."""
+    resolved = copy.deepcopy(self)
+    
+    # Apply base prompt (extends)
+    if self.extends and self.extends in registry:
+        base = registry[self.extends]
+        # Merge base into resolved (self overrides)
+        ...
+    
+    # Apply mixins (in order)
+    for mixin_name in self.mixins:
+        if mixin_name in registry:
+            mixin = registry[mixin_name]
+            # Merge mixin blocks
+            ...
+    
+    return resolved
+```
+
+---
+
+### Test Files
+
+#### [MODIFY] [test_prompt_lang.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/ergasterion/prompt-lang/test_prompt_lang.py)
+
+**新規テストケース追加**:
+
+```python
+class TestExtendsAndMixin(unittest.TestCase):
+    
+    def test_parse_extends(self):
+        """Test parsing @extends directive."""
+        content = '''#prompt derived
+@extends: base_prompt
+@role: Derived role
+'''
+        parser = PromptLangParser(content)
+        prompt = parser.parse()
+        self.assertEqual(prompt.extends, "base_prompt")
+    
+    def test_parse_mixin_list(self):
+        """Test parsing @mixin directive with list."""
+        content = '''#prompt with_mixins
+@mixin: [json_output, security_constraints]
+@role: Test role
+'''
+        parser = PromptLangParser(content)
+        prompt = parser.parse()
+        self.assertEqual(prompt.mixins, ["json_output", "security_constraints"])
+    
+    def test_resolve_extends(self):
+        """Test resolving inherited prompt."""
+        ...
+    
+    def test_resolve_mixin(self):
+        """Test resolving mixin application."""
+        ...
+```
+
+---
+
+## Verification Plan
+
+### Automated Tests
+
+**コマンド**:
+```bash
+cd /home/laihuip001/oikos/hegemonikon/mekhane/ergasterion/prompt-lang
+python -m pytest test_prompt_lang.py -v
+```
+
+既存テスト（8件）が全て通過すること + 新規テスト（4件以上）が通過すること。
+
+### Manual Verification
+
+1. **サンプルファイル作成**: `staging/test_extends.prompt` と `staging/test_mixin.prompt` を作成
+2. **パース確認**:
+   ```bash
+   python prompt_lang.py parse staging/test_extends.prompt
+   ```
+3. **JSON出力に `extends`, `mixins` フィールドが含まれていることを確認**
+
+---
+
+## Implementation Notes
+
+- **優先順位**: mixin < extends < 現在のprompt（後から適用されたものが優先）
+- **constraints は配列マージ**（重複を除去して結合）
+- **format, role, goal はオーバーライド**（単一値のため）
+- **rubric は dimensions をマージ**
+
+---
+
+## Estimated Effort
+
+| フェーズ | 工数 |
+|:---|:---|
+| データ構造追加 | 5分 |
+| パーサー拡張 | 20分 |
+| 解決ロジック | 15分 |
+| テスト追加 | 10分 |
+| **合計** | **50分** |

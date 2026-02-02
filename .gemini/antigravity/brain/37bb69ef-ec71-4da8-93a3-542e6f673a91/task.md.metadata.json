@@ -1,0 +1,6 @@
+{
+  "artifactType": "ARTIFACT_TYPE_TASK",
+  "summary": "FEP Agent拡張タスク完了状態。Phase 1-3完了、Phase 4はワークフロー統合として後続対応予定。",
+  "updatedAt": "2026-01-28T10:37:01.049466238Z",
+  "version": "3"
+}

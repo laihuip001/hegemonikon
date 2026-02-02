@@ -1,0 +1,68 @@
+# Dendron + LLM 強制機構 タスクリスト
+
+## Phase A: @dendron_prep v1.0 実行
+
+- [ ] Step 1: /bou+ (意志明確化)
+- [ ] Step 2: /kho+ (スコープ定義)
+- [ ] Step 3: /sta+ (成功基準)
+- [ ] Step 4: /pre+ (Premortem)
+- [ ] Step 5: /sop+ (外部調査)
+- [ ] Step 6: /syn+ (偉人評議会)
+- [ ] Step 7: /pan (盲点発見)
+- [ ] Step 8: /chr (期限設定)
+- [ ] Step 9: /euk (今やるべきか)
+
+---
+
+## Phase B: LLM 論外処理解消 (5段階実装)
+
+### Phase 0: 仕様強制注入 ✅
+
+- [x] [spec_injector.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/ccl/spec_injector.py) 作成
+- [x] 演算子定義の自動読み込み
+- [x] 理解確認クイズ生成
+- [x] 必須セクション定義
+
+### Phase 1: 出力構造強制 ✅
+
+- [x] [output_schema.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/ccl/output_schema.py) 作成
+- [x] Pydantic スキーマ定義
+- [x] 演算子別出力モデル
+- [x] min_length 制約
+
+### Phase 2: 出力検証 ✅
+
+- [x] [guardrails/validators.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/ccl/guardrails/validators.py) 作成
+- [x] 必須セクション検証
+- [x] 振動両方向検証
+- [x] 再生成指示生成
+
+### Phase 3: 論理監査
+
+- [ ] `agents/` Multi-Agent 実装
+- [ ] 演算子理解エージェント
+- [ ] 論理矛盾検出エージェント
+
+### Phase 4: 学習 ✅
+
+- [x] [learning/failure_db.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/ccl/learning/failure_db.py) 作成
+- [x] 既知の問題登録
+- [x] 警告自動生成
+- [x] 成功パターン記録
+
+### 統合 ✅
+
+- [x] [executor.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/ccl/executor.py) 統合エントリポイント
+- [x] [__init__.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/__init__.py) 更新
+- [ ] テスト追加
+- [ ] ドキュメント追加
+
+---
+
+## 完了済み
+
+- [x] PROOF traversal (203 ファイル)
+- [x] FEP 演繹 (L1/L2/L3)
+- [x] CI 統合 (check_proof.py, pre-commit)
+- [x] /sop 調査 (LLM 論外処理解消)
+- [x] Zero-Trust CCL Executor 実装 (Phase 0, 1, 2, 4)

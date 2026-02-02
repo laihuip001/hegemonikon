@@ -1,0 +1,69 @@
+{
+    "title": "Prompt and Skill Engineering (Tekhne-Maker v6.12 & Semantic Triggering v3.6)",
+    "summary": "Unified knowledge base for advanced prompt engineering (Prompt-Lang DSL v2.x) and autonomous skill activation standards. Features the 'Prompt Literacy Standard' (A3-PE) and the 'SE 5 Principles'. v2026-01-31: Completed 'Skill-WF Bridge' Phase 2 (24/24 Theorem Skills). Now entering Phase 3 'Project Mekhanē' for quality hardening, bidirectional linking, and sync verification.",
+    "dependencies": [
+        "cognitive_algebra_system"
+    ],
+    "references": [
+        {
+            "type": "conversation_id",
+            "value": "76b0afc4-c3a8-4b8d-a819-bb8b3f7644bd"
+        },
+        {
+            "type": "conversation_id",
+            "value": "788732d4-6e29-46d4-8aad-94ec8b8764c1"
+        },
+        {
+            "type": "conversation_id",
+            "value": "bot-11dbd940-5335-442d-a9d4-7e568bfa990a"
+        },
+        {
+            "type": "file",
+            "value": "/home/laihuip001/oikos/.agent/workflows/mek.md"
+        },
+        {
+            "type": "file",
+            "value": "/home/laihuip001/oikos/.agent/workflows/tek.md"
+        },
+        {
+            "type": "file",
+            "value": "/home/laihuip001/oikos/hegemonikon/docs/research/reports/2026-01-29_prompt_engineering_frontier.md"
+        },
+        {
+            "type": "file",
+            "value": "/home/laihuip001/oikos/.gemini/antigravity/knowledge/prompt_and_skill_engineering/artifacts/ideation/naturalized_ai_zen_techniques.md"
+        },
+        {
+            "type": "conversation_id",
+            "value": "2250519b-d64f-4664-b35f-25cc168ffe96"
+        },
+        {
+            "type": "conversation_id",
+            "value": "4b9687ba-a2e2-44ba-bb0d-e0bf5ed331cd"
+        },
+        {
+            "type": "conversation_id",
+            "value": "a1c02be0-25df-4097-a2b1-ccefbae68962"
+        },
+        {
+            "type": "conversation_id",
+            "value": "8a6ce380-bc6a-4c6b-bc2a-e0fcc3fa7868"
+        },
+        {
+            "type": "conversation_id",
+            "value": "08485a94-1a93-4c0d-aa1f-71a5e28b8e9d"
+        },
+        {
+            "type": "file",
+            "value": "prompt_and_skill_engineering/artifacts/tekhne_maker/v6_8_evolution.md"
+        },
+        {
+            "type": "conversation_id",
+            "value": "14366a7e-26ad-4b86-9f67-7881b5f5dfd2"
+        },
+        {
+            "type": "conversation_id",
+            "value": "eac9ce4b-59ee-4d83-89f7-f104fc54c144"
+        }
+    ]
+}

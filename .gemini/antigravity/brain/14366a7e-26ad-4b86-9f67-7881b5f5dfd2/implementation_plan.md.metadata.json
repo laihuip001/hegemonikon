@@ -1,0 +1,6 @@
+{
+  "artifactType": "ARTIFACT_TYPE_IMPLEMENTATION_PLAN",
+  "summary": "「定理は作らない、派生は許す」原則に基づき、A2 Krisis の `lex` 派生としてプロンプトエンジニアリング教養機能を統合。新規 Skill 作成ではなく既存 a2-krisis/SKILL.md への派生追加という「消化」アプローチ。",
+  "updatedAt": "2026-01-30T02:44:16.314998193Z",
+  "version": "1"
+}

@@ -1,0 +1,208 @@
+# Skill Architecture Enhancement + Workflow連携パターン実装
+
+> Hegemonikón v2.2 へのスキル構造改善（診断結果反映版）
+
+---
+
+## 背景
+
+2026-01-28 Perplexity Research + /dia + /chk 診断に基づく改善
+
+| 項目 | 推奨 | 現状 | 対応 |
+|:-----|:-----|:-----|:-----|
+| `when_not_to_use` | 必須 | なし | 追加 |
+| LLM固有セクション | 必須 | なし | 追加 |
+| frontmatter トークン | 100-150t | 約80t | 拡張 |
+
+---
+
+## Proposed Changes
+
+### Phase 1: O-series 完全版 (O1-O4) + A2 + S1
+
+---
+
+#### [MODIFY] [o1-noesis/SKILL.md](file:///home/laihuip001/oikos/.agent/skills/ousia/o1-noesis/SKILL.md)
+
+```yaml
+when_not_to_use: >
+  単純な情報検索、既知の解決策がある場合、時間が逼迫している場合。
+  代替: 情報検索 → Web検索(/src)、既知解決 → S2 Mekhanē
+
+llm_optimization:
+  claude: |
+    <instructions>直観的認識による根本理解。前提を疑い、パラダイム転換を促進。</instructions>
+  gemini: |
+    Apply the 5-phase Noēsis process systematically with full context utilization.
+  gpt: |
+    function_name: "noesis_analysis"
+    output: "{insight: string, confidence: float, paradigm_shift: boolean}"
+```
+
+---
+
+#### [MODIFY] [o2-boulesis/SKILL.md](file:///home/laihuip001/oikos/.agent/skills/ousia/o2-boulesis/SKILL.md)
+
+```yaml
+when_not_to_use: >
+  既に明確な計画がある場合、実行フェーズ中。
+  代替: 実行中 → O4 Energeia
+
+llm_optimization:
+  claude: |
+    <instructions>理性的意志による優先順位決定。5段階で目標を結晶化。</instructions>
+  gemini: |
+    Execute the full goal clarification pipeline with gap analysis.
+  gpt: |
+    function_name: "boulesis_prioritization"
+    output: "{goals: array, priorities: array, next_action: string}"
+```
+
+---
+
+#### [MODIFY] [o3-zetesis/SKILL.md](file:///home/laihuip001/oikos/.agent/skills/ousia/o3-zetesis/SKILL.md)
+
+```yaml
+when_not_to_use: >
+  十分な情報がある場合、実行フェーズ中。
+  代替: 情報十分 → O4 Energeia
+
+llm_optimization:
+  claude: |
+    <instructions>不確実性を分析し、最適なソースにルーティング。</instructions>
+  gemini: |
+    Leverage multiple sources (Gnōsis, Web, Vault) with reliability scoring.
+  gpt: |
+    function_name: "zetesis_research"
+    output: "{sources: array, findings: array, uncertainty_reduced: float}"
+```
+
+---
+
+#### [MODIFY] [o4-energeia/SKILL.md](file:///home/laihuip001/oikos/.agent/skills/ousia/o4-energeia/SKILL.md)
+
+```yaml
+when_not_to_use: >
+  まだ計画フェーズ、不確実性が高い場合。
+  代替: 不確実 → O3 Zētēsis、計画中 → O2 Boulēsis
+
+llm_optimization:
+  claude: |
+    <instructions>4段階実行フレームワーク。エラー時は適切な定理に委譲。</instructions>
+  gemini: |
+    Execute with full task decomposition, error handling, and verification.
+  gpt: |
+    function_name: "energeia_execute"
+    output: "{result: any, verification: boolean, errors: array}"
+```
+
+---
+
+#### [MODIFY] [a2-krisis/SKILL.md](file:///home/laihuip001/oikos/.agent/skills/akribeia/a2-krisis/SKILL.md)
+
+```yaml
+when_not_to_use: >
+  検証不要な確定事項、単純な yes/no 判断。
+  代替: 単純判断 → 直接回答
+
+llm_optimization:
+  claude: |
+    <instructions>三段階評価（仮説検証/テスト設計/Synedrion）を実行。</instructions>
+  gemini: |
+    Apply Absorption Matrix with explicit reasoning for each mapping.
+  gpt: |
+    function_name: "krisis_validation"
+    output: "{verdict: string, confidence: float, issues: array}"
+```
+
+---
+
+#### [MODIFY] [s1-metron/SKILL.md](file:///home/laihuip001/oikos/.agent/skills/schema/s1-metron/SKILL.md)
+
+```yaml
+when_not_to_use: >
+  スケールが既に決定されている場合。
+  代替: 既定スケール → 直接処理
+
+llm_optimization:
+  claude: |
+    <instructions>Micro/Macro の二項選択を文脈に基づき判断。</instructions>
+  gemini: |
+    Consider the full spectrum of scale options and contextual fit.
+  gpt: |
+    function_name: "scale_determination"
+    output: "{scale: string, rationale: string}"
+```
+
+---
+
+### Phase 2: ワークフロー連携パターン
+
+#### [MODIFY] [tools.yaml](file:///home/laihuip001/oikos/.agent/tools.yaml)
+
+```yaml
+skill_patterns:
+  paradigm: "workflow-as-caller"
+  linkage_types:
+    direct_reference:
+      description: "Workflow explicitly calls SKILL.md"
+      example: "/noe → O1 Noēsis"
+    metadata_reference:
+      description: "Runtime matching via frontmatter triggers"
+    inline_injection:
+      description: "Lightweight skill embedded in workflow"
+  optimization:
+    heavy_skills: ["O1", "O2", "O3", "O4", "A2"]
+    light_skills: ["S1", "S3", "P2"]
+```
+
+---
+
+## /zet 調査依頼書（敵対リサーチ）
+
+> **対象**: 未検証前提の実証
+
+### 調査テーマ
+
+**Antigravity IDE が SKILL.md の `llm_optimization` セクションを読み取るか？**
+
+### 背景
+
+実装計画では各SKILLに `llm_optimization` (claude/gemini/gpt) セクションを追加するが、このセクションが実際にIDEに読み取られ、LLM選択やプロンプト最適化に使用されるかは**未検証**。
+
+### 敵対的仮説
+
+1. Antigravity は `description` と `triggers` のみを使用し、`llm_optimization` は無視される
+2. YAML構文として読み込まれるが、ランタイムでは活用されない
+3. 追加のトークンコストだけが発生し、効果はゼロ
+
+### 調査依頼
+
+1. Antigravity IDE の SKILL.md 解析ロジックを調査
+2. frontmatter のどのフィールドが実際に使用されるか特定
+3. カスタムフィールド追加の効果・副作用を検証
+
+### 期待する出力
+
+- 使用フィールド一覧
+- カスタムフィールドの扱い（無視/パース/活用）
+- 推奨事項
+
+---
+
+## Verification Plan
+
+1. **Frontmatter トークン数**: 追加後も150t以下を確認
+2. **IDE認識テスト**: `/noe` で O1 発動、「目標設定」で O2 発動を確認
+3. **/zet 結果待ち**: llm_optimization の効果は追って検証
+
+---
+
+## 見積り
+
+| Phase | 工数 |
+|:------|-----:|
+| Phase 1 (6スキル) | 25min |
+| Phase 2 (tools.yaml) | 5min |
+| Phase 3 (検証) | 5min |
+| **合計** | **35min** |

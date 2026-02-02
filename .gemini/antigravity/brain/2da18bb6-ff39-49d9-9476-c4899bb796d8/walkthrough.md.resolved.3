@@ -1,0 +1,63 @@
+# Walkthrough: ワークフロー階層体系整備
+
+## 完了した作業
+
+### 1. `/k` ワークフロー作成
+
+- **ファイル**: [.agent/workflows/k.md](file:///home/laihuip001/oikos/.agent/workflows/k.md)
+- **内容**: K1-K4 (Eukairia, Chronos, Telos, Sophia) 対応
+
+### 2. T-series 削除
+
+- **削除対象**: [_archive/t-series/](file:///home/laihuip001/oikos/.agent/skills/_archive/t-series) (t1-t8)
+- **理由**: v2.1 体系に存在しない旧資産
+
+### 3. 階層構造ドキュメント作成
+
+- **ファイル**: [.agent/docs/workflow_hierarchy.md](file:///home/laihuip001/oikos/.agent/docs/workflow_hierarchy.md)
+- **内容**: 全ワークフローの Ω/Δ/τ 階層と派生関係
+
+### 4. ユースケースガイド全面更新
+
+- **ファイル**: [theorem_commands_guide.md](file:///home/laihuip001/oikos/.gemini/antigravity/brain/2da18bb6-ff39-49d9-9476-c4899bb796d8/theorem_commands_guide.md)
+- **修正内容**:
+  - `/k` 誤記載修正
+  - 階層原則追加
+  - 派生ワークフロー早見表追加
+
+---
+
+## 階層構造まとめ
+
+```
+Ω層     /ax
+         ↓
+Δ層     /o /s /h /p /k /a /x
+         ↓
+τ層     /noe /plan /dia /vet /pri /why ...
+```
+
+| シリーズ | 派生ワークフロー |
+|:---------|:----------------|
+| O | /noe /bou /zet /ene /src |
+| S | /plan /now |
+| H | /rec /exp /hist /bye /boot |
+| P | /dev /sop |
+| K | /pri /why |
+| A | /dia → /vet /audit |
+
+---
+
+## 検証結果
+
+| 項目 | 状態 |
+|:-----|:-----|
+| 全シリーズにワークフロー | ✅ |
+| 全シリーズにスキル | ✅ |
+| 階層構造ドキュメント | ✅ |
+| ユースケースガイド更新 | ✅ |
+| `/chk` → `/dia` 統合 | ✅ (既存) |
+
+---
+
+*Completed: 2026-01-28*

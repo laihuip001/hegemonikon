@@ -1,0 +1,46 @@
+# Jules API 統合 Walkthrough
+
+## 完了項目
+
+### Phase 1-5: コア統合 ✅
+
+| Phase | 結果 |
+|-------|------|
+| 1. コア実装 | [jules_client.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/symploke/jules_client.py), [jules_mcp_server.py](file:///home/laihuip001/oikos/hegemonikon/mcp/jules_mcp_server.py) |
+| 2. 実 API テスト | 7リポジトリ発見、セッション作成 |
+| 3. 並列実行 | 5タスク並列 (3/5完了, 311秒) |
+| 4. MCP 統合 | 4ツール動作確認 |
+| 5. mcp_config | Claude から呼び出し可能 |
+
+### hegemonikon テスト
+
+- **問題発見**: デフォルトブランチは `master`（[main](file:///home/laihuip001/oikos/hegemonikon/mcp/gnosis_mcp_server.py#252-266) ではない）
+- **修正済み**: `branch='master'` で成功
+- **実行中セッション**: `4555355503844092825`
+
+---
+
+## 発見事項
+
+1. **ブランチ名に注意**: hegemonikon は `master`、他リポジトリは確認が必要
+2. **タスク完了に1-3分**: ポーリング待機が必要
+3. **40%タイムアウト率**: 5並列で2つがタイムアウト（デフォルト300秒）
+
+---
+
+## ユースケースガイド
+
+[use_cases.md](file:///home/laihuip001/oikos/.gemini/antigravity/knowledge/jules_api_integration/artifacts/use_cases.md) に保存済み。
+
+### 向いている用途
+- 大規模リファクタリング（同パターン多数適用）
+- たたき台複数生成（並列探索）
+- テスト一括生成
+
+### 向いていない用途
+- 対話的デバッグ（レイテンシ高）
+- 順序依存変更
+
+---
+
+*Generated 2026-01-27*

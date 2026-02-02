@@ -1,0 +1,34 @@
+# Walkthrough: モード Naturalization
+
+> **🎉 成果**: 209セクション実装 → frontmatter完全一致 = **100%達成！**
+
+---
+
+## 本セッション追加
+
+| Batch | WF | 件数 |
+|:------|:---|:-----|
+| 21-35 | 各種 | 85 |
+| 36 | met, sta | 4 |
+| **計** | | **89** |
+
+---
+
+## 進捗
+
+```
+120 → 209 / 209 = 100% ✅
+frontmatter定義と実装が完全一致
+```
+
+---
+
+## 主要追加WF
+
+- `/gno`: analogy_*, personify, assumption (+10)
+- `/kho`: platform, segment, positioning, blue_ocean, a3, datamodel (+10)
+- `/sta`: norm, empi, accountability, opportunity, rela (+5)
+- `/met`: approximation, definition, dimensional, cognitive_load, check, ambiguity, units (+8)
+- `/noe`: nous, phro, meta (+3)
+- `/mek`: observability, substitute, nudge (+3)
+- `/epi`: triz40, generalize (+2)

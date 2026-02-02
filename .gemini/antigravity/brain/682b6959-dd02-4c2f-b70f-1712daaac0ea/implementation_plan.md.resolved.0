@@ -1,0 +1,131 @@
+# tekhne-maker 改善計画
+
+> **Origin**: /noe 分析 (N4) → Creator フィードバック → 改善計画
+
+---
+
+## 課題の特定
+
+Creator から以下のフィードバックを受領:
+
+| 課題 | 詳細 | 優先度 |
+|:-----|:-----|:------:|
+| **呼び出しにくさ** | ワークフローの存在を知らない / 使い方が分からない | H |
+| **トークン量不足** | 生成されるプロンプトが薄い、詳細さが足りない | H |
+
+---
+
+## 現状分析
+
+### 既存資産
+
+| 資産 | パス | バージョン | 状態 |
+|:-----|:-----|:----------|:-----|
+| SKILL.md | [tekhne/SKILL.md](file:///home/laihuip001/oikos/hegemonikon/mekhane/ergasterion/tekhne/SKILL.md) | v6.1 | 662行、成熟 |
+| Workflow | [/tek.md](file:///home/laihuip001/oikos/.agent/workflows/tek.md) | v1.0 | 168行、基本構造のみ |
+| .prompt | [tekhne-maker.prompt](file:///home/laihuip001/oikos/hegemonikon/mekhane/ergasterion/tekhne/tekhne-maker.prompt) | v5.0 ⚠️ | **SKILL.md と不整合** |
+| references/ | 15ファイル | — | 充実 |
+
+### 問題の根本原因
+
+1. **発見可能性**: `/tek` ワークフローが tools.yaml に未登録
+2. **トークン密度**: SKILL.md の `@format` セクションが簡潔すぎる (50字制限など)
+3. **バージョン不整合**: [.prompt](file:///home/laihuip001/oikos/hegemonikon/mekhane/ergasterion/tekhne/tekhne-maker.prompt) ファイルが v5.0 のまま
+
+---
+
+## Proposed Changes
+
+### 1. tools.yaml への /tek 登録
+
+#### [MODIFY] [tools.yaml](file:///home/laihuip001/oikos/.agent/tools.yaml)
+
+`workflows:` セクションに `/tek` を追加:
+
+```yaml
+  tek:
+    purpose: "プロンプト/スキル生成 (tekhne-maker)"
+    modules: [S2]
+    modes: [Generate, Diagnose, Improve, SAGE, Prompt-Lang]
+```
+
+---
+
+### 2. SKILL.md のトークン密度向上
+
+#### [MODIFY] [SKILL.md](file:///home/laihuip001/oikos/hegemonikon/mekhane/ergasterion/tekhne/SKILL.md)
+
+以下を変更:
+
+1. **出力形式の制限を緩和**:
+   - `[目的・スコープ 50字以内]` → `[目的・スコープ 200字以上]`
+   - 「簡潔よりも詳細を優先」を明示
+
+2. **Token Density Enforcement を追加**:
+   ```yaml
+   @constraints:
+     - MINIMUM_TOKEN_OUTPUT: 2000
+     - 各セクションは 3つ以上の具体例を含む
+     - Edge Cases は 5ケース以上
+   ```
+
+3. **1対3の法則を適用**:
+   - 各概念に対して **3つの具体例** を必須化
+
+---
+
+### 3. /tek.md ワークフローの強化
+
+#### [MODIFY] [tek.md](file:///home/laihuip001/oikos/.agent/workflows/tek.md)
+
+1. **Quick Reference セクション追加** (発見可能性向上):
+   ```markdown
+   ## Quick Start
+   
+   | やりたいこと | コマンド |
+   |:-------------|:---------|
+   | 新規スキル作成 | `/tek 「〇〇用のスキル」` |
+   | 既存プロンプト診断 | `/tek diagnose [file]` |
+   | 既存プロンプト改善 | `/tek improve [file]` |
+   ```
+
+2. **Token Density ガイドライン追加**:
+   ```markdown
+   ## 出力品質基準
+   
+   | 指標 | 最小値 |
+   |:-----|:-------|
+   | 合計トークン数 | 2000+ |
+   | セクション数 | 8+ |
+   | 具体例/セクション | 3+ |
+   ```
+
+---
+
+## Verification Plan
+
+### 手動検証
+
+1. **発見可能性テスト**:
+   - `/boot` 実行後、`tools.yaml` の出力に `/tek` が含まれることを確認
+   - Creator に「/tek を知ってるか」と問われた時に回答できることを確認
+
+2. **トークン密度テスト**:
+   - `/tek 「コードレビュースキル」` を実行
+   - 生成された SKILL.md のトークン数が 2000 以上であることを確認
+   - 各セクションに 3+ 具体例が含まれることを確認
+
+---
+
+## 作業順序
+
+| Step | タスク | 見積もり |
+|:----:|:-------|:---------|
+| 1 | tools.yaml に /tek 登録 | 1分 |
+| 2 | SKILL.md トークン密度向上 | 5分 |
+| 3 | /tek.md Quick Reference 追加 | 3分 |
+| 4 | 手動検証 | 5分 |
+
+---
+
+*Created: 2026-01-28 20:35 JST*

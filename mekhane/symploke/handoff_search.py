@@ -194,14 +194,23 @@ def get_boot_handoffs(mode: str = "standard", context: str = None) -> dict:
         results = search_handoffs(query, top_k=related_count + 1)
         related = [doc for doc, score in results if doc.id != latest.id][:related_count]
 
+    # 会話ログ検索用アダプタの準備 (必要な場合のみ一度だけロード)
+    conversation_adapter = None
+    should_load_adapter = (conv_count > 0) or (mode == "detailed")
+
+    if should_load_adapter and CONVERSATION_INDEX_PATH.exists():
+        try:
+            conversation_adapter = EmbeddingAdapter(model_name="all-MiniLM-L6-v2")
+            conversation_adapter.load(str(CONVERSATION_INDEX_PATH))
+        except Exception as e:
+            print(f"⚠️ Failed to load conversation index: {e}")
+
     # 関連会話ログ検索 (Kairos Index を使用)
     conversations = []
-    if conv_count > 0 and CONVERSATION_INDEX_PATH.exists():
+    if conv_count > 0 and conversation_adapter:
         try:
-            adapter = EmbeddingAdapter(model_name="all-MiniLM-L6-v2")
-            adapter.load(str(CONVERSATION_INDEX_PATH))
-            query_vec = adapter.encode([query])[0]
-            results = adapter.search(query_vec, k=conv_count)
+            query_vec = conversation_adapter.encode([query])[0]
+            results = conversation_adapter.search(query_vec, k=conv_count)
 
             # ファイルパスからドキュメントを再構築
             for r in results:
@@ -220,13 +229,11 @@ def get_boot_handoffs(mode: str = "standard", context: str = None) -> dict:
     proactive_memories = []
     if mode == "detailed" and latest:
         keywords = extract_keywords(latest)
-        if keywords and CONVERSATION_INDEX_PATH.exists():
+        if keywords and conversation_adapter:
             try:
                 proactive_query = " ".join(keywords[:3])
-                adapter = EmbeddingAdapter(model_name="all-MiniLM-L6-v2")
-                adapter.load(str(CONVERSATION_INDEX_PATH))
-                query_vec = adapter.encode([proactive_query])[0]
-                results = adapter.search(query_vec, k=3)
+                query_vec = conversation_adapter.encode([proactive_query])[0]
+                results = conversation_adapter.search(query_vec, k=3)
 
                 for r in results:
                     file_path = r.metadata.get("file_path")

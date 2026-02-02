@@ -205,6 +205,13 @@ def append_to_manifest(article, filepath, batch_id):
         f.write(json.dumps(manifest_entry, ensure_ascii=False) + "\n")
 
 
+def append_to_skip_log(result, batch_id):
+    """Append skipped URL to log file."""
+    skip_file = os.path.join(ROOT_DIR, "_index", f"skipped_fast_{batch_id}.txt")
+    with open(skip_file, "a", encoding="utf-8") as f:
+        f.write(f"{result['url']}\t{result.get('error', 'Unknown')}\n")
+
+
 async def process_single_url(url, session, semaphore, batch_id):
     """Process a single URL: fetch, parse, save markdown."""
     async with semaphore:
@@ -233,6 +240,7 @@ async def process_urls_async(target_urls, batch_id):
     """Main async processing loop."""
     semaphore = asyncio.Semaphore(MAX_CONCURRENT_REQUESTS)
     cookie_headers = load_cookies()
+    loop = asyncio.get_running_loop()
 
     print(
         f"[Fast Collect] Processing {len(target_urls)} URLs with concurrency {MAX_CONCURRENT_REQUESTS}"
@@ -265,7 +273,9 @@ async def process_urls_async(target_urls, batch_id):
 
             if result["status"] == "success":
                 # Append to manifest sequentially (safe in main loop)
-                append_to_manifest(result, result["filepath"], batch_id)
+                await loop.run_in_executor(
+                    None, append_to_manifest, result, result["filepath"], batch_id
+                )
                 print(f"[{i+1}/{len(target_urls)}] OK: {result['title'][:40]}...")
                 success_count += 1
             else:
@@ -275,12 +285,7 @@ async def process_urls_async(target_urls, batch_id):
                 error_count += 1
 
                 # Log skip
-                skip_file = os.path.join(
-                    ROOT_DIR, "_index", f"skipped_fast_{batch_id}.txt"
-                )
-                # Append to skip file sequentially
-                with open(skip_file, "a", encoding="utf-8") as f:
-                    f.write(f"{result['url']}\t{result.get('error', 'Unknown')}\n")
+                await loop.run_in_executor(None, append_to_skip_log, result, batch_id)
 
     print(f"\n[Fast Collect] Completed: {success_count} success, {error_count} errors")
 

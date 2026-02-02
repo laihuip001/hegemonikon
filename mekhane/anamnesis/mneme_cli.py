@@ -97,10 +97,17 @@ def cmd_ingest(args):
         except Exception as e:
             print(f"[Kairos] Error: {e}")
 
-    # Chronos (Conversation History) - Not yet implemented
+    # Chronos (Conversation History)
     if args.all or args.chronos:
-        # TODO: Implement when conversation history indexing is ready
-        results["chronos"] = 0
+        try:
+            from mekhane.symploke.chronos_ingest import ingest_to_chronos
+
+            count = ingest_to_chronos()
+            results["chronos"] = count
+        except ImportError as e:
+            print(f"[Chronos] Import error: {e}")
+        except Exception as e:
+            print(f"[Chronos] Error: {e}")
 
     # Output in /boot expected format
     total = sum(results.values())
@@ -137,8 +144,14 @@ def cmd_stats(args):
     )
     print(f"Kairos: {handoff_count} handoff files")
 
-    # Chronos stats (placeholder)
-    print("Chronos: Not implemented")
+    # Chronos stats
+    try:
+        from mekhane.symploke.chronos_ingest import get_chronos_count
+
+        count = get_chronos_count()
+        print(f"Chronos: {count} documents")
+    except Exception as e:
+        print(f"Chronos: Error - {e}")
 
     print("=" * 40)
     return 0

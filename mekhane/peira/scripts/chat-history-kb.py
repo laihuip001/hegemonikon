@@ -240,8 +240,12 @@ def build_index(incremental: bool = False, report_mode: bool = False):
                         )
                         if at <= last_sync:
                             continue
-                    except Exception:
-                        pass  # TODO: Add proper error handling
+                    except Exception as e:
+                        if not report_mode:
+                            print(
+                                f"Error parsing date for {artifact.get('session_id')} / {artifact.get('artifact_type')}: {e}"
+                            )
+                        continue
 
             # Generate ID
             art_type = (

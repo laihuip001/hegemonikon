@@ -16,7 +16,10 @@ Recast: Hegemonikón A2 Krisis (Epochē) vocabulary
 """
 
 import re
+import logging
 from typing import Dict, List, Tuple, Optional
+
+logger = logging.getLogger("epoche_shield")
 
 
 class EpocheScanner:
@@ -167,8 +170,10 @@ class EpocheShield:
                         masked_text = masked_text.replace(term, placeholder)
                         mapping[placeholder] = term
                         counter += 1
-            except Exception:
-                pass  # TODO: Add proper error handling
+            except ImportError:
+                logger.info("Custom vocabulary store not available. Skipping.")
+            except Exception as e:
+                logger.error(f"Error applying custom vocabulary mask: {e}")
 
         return masked_text, mapping
 

@@ -12,7 +12,7 @@
 
 ## 2. /v Workflow Enhancement
 
-[v.md](file:///home/laihuip001/oikos/hegemonikon/.agent/workflows/v.md) を Executor-Auditor パターンで強化。
+[v.md](file:///home/makaron8426/oikos/hegemonikon/.agent/workflows/v.md) を Executor-Auditor パターンで強化。
 
 ### 追加セクション
 

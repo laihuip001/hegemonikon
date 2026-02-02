@@ -14,6 +14,6 @@
 
 ## 📎 新規ファイル
 
-- [embedding_adapter.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/symploke/adapters/embedding_adapter.py)
-- [kairos_ingest.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/symploke/kairos_ingest.py)
-- [sophia_ingest.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/symploke/sophia_ingest.py)
+- [embedding_adapter.py](file:///home/makaron8426/oikos/hegemonikon/mekhane/symploke/adapters/embedding_adapter.py)
+- [kairos_ingest.py](file:///home/makaron8426/oikos/hegemonikon/mekhane/symploke/kairos_ingest.py)
+- [sophia_ingest.py](file:///home/makaron8426/oikos/hegemonikon/mekhane/symploke/sophia_ingest.py)

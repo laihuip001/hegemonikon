@@ -28,7 +28,7 @@
 
 ### A. Skill 本体
 
-#### [NEW] [SKILL.md](file:///home/laihuip001/oikos/.agent/skills/schema/s2-mekhane/prompt-literacy/SKILL.md)
+#### [NEW] [SKILL.md](file:///home/makaron8426/oikos/.agent/skills/schema/s2-mekhane/prompt-literacy/SKILL.md)
 
 プロンプトリテラシー教養 Skill:
 
@@ -66,7 +66,7 @@ derivatives: [didact, feed, mech]
 
 ### B. コンテンツ構造
 
-#### [NEW] [instruction_taxonomy.md](file:///home/laihuip001/oikos/.agent/skills/schema/s2-mekhane/prompt-literacy/references/instruction_taxonomy.md)
+#### [NEW] [instruction_taxonomy.md](file:///home/makaron8426/oikos/.agent/skills/schema/s2-mekhane/prompt-literacy/references/instruction_taxonomy.md)
 
 指示語の分類学:
 
@@ -125,7 +125,7 @@ derivatives: [didact, feed, mech]
 
 ### C. フィードバック機構
 
-#### [NEW] [feedback_analyzer.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/ergasterion/prompt_literacy/feedback_analyzer.py)
+#### [NEW] [feedback_analyzer.py](file:///home/makaron8426/oikos/hegemonikon/mekhane/ergasterion/prompt_literacy/feedback_analyzer.py)
 
 ```python
 """
@@ -170,7 +170,7 @@ TECHNIQUE_RECOMMENDATIONS = {
 
 ### D. ワークフロー連携
 
-#### [MODIFY] [mek.md](file:///home/laihuip001/oikos/.agent/workflows/mek.md)
+#### [MODIFY] [mek.md](file:///home/makaron8426/oikos/.agent/workflows/mek.md)
 
 `/mek` に派生を追加:
 
@@ -269,10 +269,10 @@ LLM は入力の動詞から「認知モード」を推定する:
 
 ```bash
 # Skill.md 構文チェック（存在確認）
-ls -la /home/laihuip001/oikos/.agent/skills/schema/s2-mekhane/prompt-literacy/SKILL.md
+ls -la /home/makaron8426/oikos/.agent/skills/schema/s2-mekhane/prompt-literacy/SKILL.md
 
 # Python モジュール構文チェック
-python -m py_compile /home/laihuip001/oikos/hegemonikon/mekhane/ergasterion/prompt_literacy/feedback_analyzer.py
+python -m py_compile /home/makaron8426/oikos/hegemonikon/mekhane/ergasterion/prompt_literacy/feedback_analyzer.py
 ```
 
 ### 4.2 Manual Verification

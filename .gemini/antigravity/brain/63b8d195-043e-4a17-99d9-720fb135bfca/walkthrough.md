@@ -54,7 +54,7 @@
 
 ### 成果物
 
-📄 [lmql_translator.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/ccl/lmql_translator.py)
+📄 [lmql_translator.py](file:///home/makaron8426/oikos/hegemonikon/mekhane/ccl/lmql_translator.py)
 
 ### テスト結果
 

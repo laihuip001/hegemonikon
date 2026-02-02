@@ -37,7 +37,7 @@ ccl_signature: "/tro+"
 
 # /tro: 軌道定義ワークフロー (Trokhia) v2.1
 
-> **正本参照**: [P3 Trokhia SKILL.md](file:///home/laihuip001/oikos/.agent/skills/perigraphe/p3-trokhia/SKILL.md)
+> **正本参照**: [P3 Trokhia SKILL.md](file:///home/makaron8426/oikos/.agent/skills/perigraphe/p3-trokhia/SKILL.md)
 > **目的**: 「どこまで適用するか」を決定する — 方法の適用範囲
 > **役割**: 軌道・サイクル・パターンの定義
 
@@ -357,12 +357,12 @@ ccl_signature: "/tro+"
 
 ## Artifact 自動保存
 
-> **標準参照**: [workflow_artifact_standard.md](file:///home/laihuip001/oikos/.agent/standards/workflow_artifact_standard.md)
+> **標準参照**: [workflow_artifact_standard.md](file:///home/makaron8426/oikos/.agent/standards/workflow_artifact_standard.md)
 
 ### 保存先
 
 ```
-/home/laihuip001/oikos/mneme/.hegemonikon/workflows/tro_<topic>_<date>.md
+/home/makaron8426/oikos/mneme/.hegemonikon/workflows/tro_<topic>_<date>.md
 ```
 
 例: `tro_軌道定義_20260129.md`
@@ -388,7 +388,7 @@ ccl_signature: "/tro+"
 
 | Module | Workflow | Skill (正本) | Status |
 |:-------|:---------|:-------------|:-------|
-| P3 Trokhia | /tro | [SKILL.md](file:///home/laihuip001/oikos/.agent/skills/perigraphe/p3-trokhia/SKILL.md) | v1.0 Ready |
+| P3 Trokhia | /tro | [SKILL.md](file:///home/makaron8426/oikos/.agent/skills/perigraphe/p3-trokhia/SKILL.md) | v1.0 Ready |
 
 ---
 

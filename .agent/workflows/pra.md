@@ -37,7 +37,7 @@ ccl_signature: "/pra+_/ene"
 
 # /pra: 実践配置ワークフロー (Praxis)
 
-> **正本参照**: [S4 Praxis SKILL.md](file:///home/laihuip001/oikos/.agent/skills/schema/s4-praxis/SKILL.md)
+> **正本参照**: [S4 Praxis SKILL.md](file:///home/makaron8426/oikos/.agent/skills/schema/s4-praxis/SKILL.md)
 > **目的**: 「どう実現するか」を決定する — 価値創造の方法選択
 > **役割**: 探索的 vs 確実な実現の判断
 
@@ -277,12 +277,12 @@ result = select_derivative("S4", "この機能をどう実現するか")
 
 ## Artifact 自動保存
 
-> **標準参照**: [workflow_artifact_standard.md](file:///home/laihuip001/oikos/.agent/standards/workflow_artifact_standard.md)
+> **標準参照**: [workflow_artifact_standard.md](file:///home/makaron8426/oikos/.agent/standards/workflow_artifact_standard.md)
 
 ### 保存先
 
 ```
-/home/laihuip001/oikos/mneme/.hegemonikon/workflows/pra_<topic>_<date>.md
+/home/makaron8426/oikos/mneme/.hegemonikon/workflows/pra_<topic>_<date>.md
 ```
 
 例: `pra_実践方法_20260129.md`
@@ -308,7 +308,7 @@ result = select_derivative("S4", "この機能をどう実現するか")
 
 | Module | Workflow | Skill (正本) | Status |
 |:-------|:---------|:-------------|:-------|
-| S4 Praxis | /pra | [SKILL.md](file:///home/laihuip001/oikos/.agent/skills/schema/s4-praxis/SKILL.md) | v1.0 Ready |
+| S4 Praxis | /pra | [SKILL.md](file:///home/makaron8426/oikos/.agent/skills/schema/s4-praxis/SKILL.md) | v1.0 Ready |
 
 ---
 

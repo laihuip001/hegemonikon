@@ -24,12 +24,36 @@ class ProofStatus(Enum):
 
 
 class ProofLevel(Enum):
-    """PROOF レベル"""
+    """PROOF レベル (Depth Layer)
+    
+    マトリクス構造の「深さ」軸:
+    - L0: ディレクトリ (Kairos - 文脈)
+    - L1: ファイル (Ousia/Schema - 本質)
+    - L2: 関数・クラス (Hormē/Perigraphē - 動機)
+    - L3: 変数・字句 (Akribeia - 精密)
+    """
 
-    L1 = "L1"  # 定理
-    L2 = "L2"  # インフラ
-    L3 = "L3"  # テスト
+    L0 = "L0"  # ディレクトリ / 文脈
+    L1 = "L1"  # 定理 / 本質
+    L2 = "L2"  # インフラ / 動機
+    L3 = "L3"  # テスト / 精密
     UNKNOWN = "unknown"
+
+
+class MetaLayer(Enum):
+    """Meta Layer (検証の種類)
+    
+    マトリクス構造の「検証」軸:
+    - SURFACE: 表層 - 何があるか（PROOF ヘッダー）
+    - STRUCTURE: 構造層 - どう繋がるか（import graph）
+    - FUNCTION: 機能層 - 何が同じか（類似度）
+    - VERIFICATION: 実証層 - 本当に必要か（削除テスト）
+    """
+
+    SURFACE = "surface"          # 表層
+    STRUCTURE = "structure"      # 構造層
+    FUNCTION = "function"        # 機能層  
+    VERIFICATION = "verification"  # 実証層
 
 
 @dataclass
@@ -100,8 +124,8 @@ PROOF_PATTERN_V2 = re.compile(r"#\s*PROOF:\s*\[([^\]]+)\](?:\s*<-\s*([^\s#]+))?"
 # 特殊親参照 (バリデーションをスキップ)
 SPECIAL_PARENTS = {"FEP", "external", "legacy"}
 
-# 有効なレベルプレフィックス (v2.2: 厳密検証)
-VALID_LEVEL_PREFIXES = {"L1", "L2", "L3"}
+# 有効なレベルプレフィックス (v2.2: 厳密検証, v3.0: L0追加)
+VALID_LEVEL_PREFIXES = {"L0", "L1", "L2", "L3"}
 
 # 最大ファイルサイズ (v2.2: リソース枯渇防止)
 MAX_FILE_SIZE = 10 * 1024 * 1024  # 10MB
@@ -256,11 +280,13 @@ class DendronChecker:  # noqa: AI-007
         )
 
     def _parse_level(self, level_str: str) -> ProofLevel:  # noqa: AI-007
-        """レベル文字列をパース (v2.2: 厳密検証)"""
+        """レベル文字列をパース (v3.0: L0追加)"""
         level_str_upper = level_str.upper()
         
-        # 厳密検証: L1/L2/L3 で始まる必要がある
-        if level_str_upper.startswith("L1"):
+        # 厳密検証: L0/L1/L2/L3 で始まる必要がある
+        if level_str_upper.startswith("L0"):
+            return ProofLevel.L0
+        elif level_str_upper.startswith("L1"):
             return ProofLevel.L1
         elif level_str_upper.startswith("L2"):
             return ProofLevel.L2
@@ -278,9 +304,9 @@ class DendronChecker:  # noqa: AI-007
         return stripped.startswith("#")
     
     def _validate_level(self, level: ProofLevel) -> tuple[bool, str]:
-        """レベルを検証 (v2.2: UNKNOWN を拒否)"""
+        """レベルを検証 (v3.0: L0追加)"""
         if level == ProofLevel.UNKNOWN:
-            return False, "無効なレベル: L1/L2/L3 のいずれかで始まる必要があります"
+            return False, "無効なレベル: L0/L1/L2/L3 のいずれかで始まる必要があります"
         return True, "OK"
 
     def check(self, root: Path) -> CheckResult:  # noqa: AI-007

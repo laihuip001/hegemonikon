@@ -70,7 +70,7 @@
 
 ## CCL Header (v1.1 — NEW)
 
-> **関連規則**: [ccl-manifest.md](file:///home/laihuip001/oikos/.agent/rules/ccl-manifest.md)
+> **関連規則**: [ccl-manifest.md](file:///home/makaron8426/oikos/.agent/rules/ccl-manifest.md)
 
 ### 必須: アーティファクト冒頭
 
@@ -230,9 +230,9 @@ Try: {1つ以上}
 ```markdown
 ## Artifact 自動保存
 
-> **標準参照**: [workflow_artifact_standard.md](file:///home/laihuip001/oikos/.agent/standards/workflow_artifact_standard.md)
+> **標準参照**: [workflow_artifact_standard.md](file:///home/makaron8426/oikos/.agent/standards/workflow_artifact_standard.md)
 
-**保存先**: `/home/laihuip001/oikos/mneme/.hegemonikon/workflows/{workflow}_{topic}_{date}.md`
+**保存先**: `/home/makaron8426/oikos/mneme/.hegemonikon/workflows/{workflow}_{topic}_{date}.md`
 
 **チャット出力**: 最小限（ファイルパスと要約のみ）
 ```

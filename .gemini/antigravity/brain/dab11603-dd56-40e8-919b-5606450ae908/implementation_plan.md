@@ -18,7 +18,7 @@
 
 ### Feature 1: X-series 36関係の FEP 統合
 
-#### [NEW] [x_series_navigator.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/fep/x_series_navigator.py)
+#### [NEW] [x_series_navigator.py](file:///home/makaron8426/oikos/hegemonikon/mekhane/fep/x_series_navigator.py)
 
 36関係を FEP 状態空間として定義し、現在地から次ステップを推奨。
 
@@ -39,7 +39,7 @@ def recommend_next_step(current_series: str, context: dict) -> XSeriesRecommenda
 
 ### Feature 2: FEP Agent のリアルタイム学習デモ
 
-#### [MODIFY] [encoding.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/fep/encoding.py)
+#### [MODIFY] [encoding.py](file:///home/makaron8426/oikos/hegemonikon/mekhane/fep/encoding.py)
 
 学習進捗の可視化関数を追加。
 
@@ -57,7 +57,7 @@ def format_learning_progress(
 
 ### Feature 3: /noe 実行時の自動 encoder 呼び出し
 
-#### [MODIFY] [encoding.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/fep/encoding.py)
+#### [MODIFY] [encoding.py](file:///home/makaron8426/oikos/hegemonikon/mekhane/fep/encoding.py)
 
 既存の `encode_noesis_output()` を拡張し、自動変換ロジックを強化。
 
@@ -69,7 +69,7 @@ def auto_encode_noesis(phase5_output: dict) -> tuple:
     return encode_noesis_output(confidence, zones)
 ```
 
-#### [MODIFY] [O1 Noēsis SKILL.md](file:///home/laihuip001/oikos/.agent/skills/ousia/o1-noesis/SKILL.md)
+#### [MODIFY] [O1 Noēsis SKILL.md](file:///home/makaron8426/oikos/.agent/skills/ousia/o1-noesis/SKILL.md)
 
 PHASE 5 完了後の FEP 統合を明確化。
 
@@ -81,8 +81,8 @@ PHASE 5 完了後の FEP 統合を明確化。
 
 ```bash
 # 既存テスト（336件）が通ることを確認
-cd /home/laihuip001/oikos/hegemonikon && \
-/home/laihuip001/oikos/hegemonikon/.venv/bin/python -m pytest mekhane/fep/tests/ -v
+cd /home/makaron8426/oikos/hegemonikon && \
+/home/makaron8426/oikos/hegemonikon/.venv/bin/python -m pytest mekhane/fep/tests/ -v
 
 # 新規テスト追加
 # - test_x_series_navigator.py (Feature 1)

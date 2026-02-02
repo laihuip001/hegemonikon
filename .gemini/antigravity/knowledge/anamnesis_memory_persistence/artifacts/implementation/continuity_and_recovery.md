@@ -18,7 +18,7 @@ A diagnostic score (0-1.0) based on the presence and integrity of these four lay
 ## 2. Recovery & Repository Normalization
 As of v4.8 (2026-02-01), the system implements a canonical hidden repository for session logs.
 
-- **Canonical Location**: `/home/laihuip001/oikos/mneme/.hegemonikon/sessions/`
+- **Canonical Location**: `/home/makaron8426/oikos/mneme/.hegemonikon/sessions/`
 - **Normalization**: Legacy empty placeholders are removed; symbolic links provide user-facing access.
 - **Virtual Scroll Resolution**: Lossless recovery via `scroll_and_collect_messages`, increasing yield by 14.6x for deep threads.
 

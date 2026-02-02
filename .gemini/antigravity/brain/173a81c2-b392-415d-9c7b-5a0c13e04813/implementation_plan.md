@@ -16,7 +16,7 @@
 
 ## Proposed Changes
 
-### [MODIFY] [vet.md](file:///home/laihuip001/oikos/.agent/workflows/vet.md)
+### [MODIFY] [vet.md](file:///home/makaron8426/oikos/.agent/workflows/vet.md)
 
 1. **L5: Jules Prior Art（新規追加）**
 

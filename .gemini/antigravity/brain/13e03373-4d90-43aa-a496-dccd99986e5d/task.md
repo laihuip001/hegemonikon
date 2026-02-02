@@ -12,7 +12,7 @@
 
 ## GitHub Actions Created
 
-[quality-review.yml](file:///home/laihuip001/oikos/hegemonikon/.github/workflows/quality-review.yml)
+[quality-review.yml](file:///home/makaron8426/oikos/hegemonikon/.github/workflows/quality-review.yml)
 
 - Ruff complexity (CC ≤ 15)
 - Bandit security scan

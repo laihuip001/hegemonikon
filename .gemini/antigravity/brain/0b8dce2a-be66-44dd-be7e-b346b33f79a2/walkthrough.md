@@ -37,14 +37,14 @@ graph TD
 
 | ファイル | 役割 |
 |:---------|:-----|
-| [**init**.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/ccl/__init__.py) | モジュールエクスポート |
-| [llm_parser.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/ccl/llm_parser.py) | Layer 1: Gemini API 連携 |
-| [doxa_learner.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/ccl/doxa_learner.py) | Layer 2: H4 Doxa パターン学習 |
-| [pattern_cache.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/ccl/pattern_cache.py) | Layer 3: 静的ヒューリスティック |
-| [syntax_validator.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/ccl/syntax_validator.py) | CCL v2.0 構文検証 |
-| [generator.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/ccl/generator.py) | メインジェネレータ (4層統合) |
-| [tracer.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/ccl/tracer.py) | セッション分離トレーサー |
-| [ccl_compiler.md](file:///home/laihuip001/oikos/hegemonikon/mekhane/ccl/prompts/ccl_compiler.md) | LLM System Prompt |
+| [**init**.py](file:///home/makaron8426/oikos/hegemonikon/mekhane/ccl/__init__.py) | モジュールエクスポート |
+| [llm_parser.py](file:///home/makaron8426/oikos/hegemonikon/mekhane/ccl/llm_parser.py) | Layer 1: Gemini API 連携 |
+| [doxa_learner.py](file:///home/makaron8426/oikos/hegemonikon/mekhane/ccl/doxa_learner.py) | Layer 2: H4 Doxa パターン学習 |
+| [pattern_cache.py](file:///home/makaron8426/oikos/hegemonikon/mekhane/ccl/pattern_cache.py) | Layer 3: 静的ヒューリスティック |
+| [syntax_validator.py](file:///home/makaron8426/oikos/hegemonikon/mekhane/ccl/syntax_validator.py) | CCL v2.0 構文検証 |
+| [generator.py](file:///home/makaron8426/oikos/hegemonikon/mekhane/ccl/generator.py) | メインジェネレータ (4層統合) |
+| [tracer.py](file:///home/makaron8426/oikos/hegemonikon/mekhane/ccl/tracer.py) | セッション分離トレーサー |
+| [ccl_compiler.md](file:///home/makaron8426/oikos/hegemonikon/mekhane/ccl/prompts/ccl_compiler.md) | LLM System Prompt |
 
 ---
 
@@ -79,7 +79,7 @@ mneme/.hegemonikon/ccl_traces/
     └── summary.md  ← 自動生成
 ```
 
-![Session Summary](file:///home/laihuip001/oikos/mneme/.hegemonikon/ccl_traces/20260129-205625/summary.md)
+![Session Summary](file:///home/makaron8426/oikos/mneme/.hegemonikon/ccl_traces/20260129-205625/summary.md)
 
 ---
 

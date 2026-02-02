@@ -108,8 +108,8 @@ V[session] >> {
 ### Step 1: Git状態取得
 
 ```bash
-git -C /home/laihuip001/oikos log -1 --oneline
-git -C /home/laihuip001/oikos status --short
+git -C /home/makaron8426/oikos log -1 --oneline
+git -C /home/makaron8426/oikos status --short
 ```
 
 ### Step 2: セッション情報収集
@@ -125,7 +125,7 @@ git -C /home/laihuip001/oikos status --short
 
 Prompt-Lang定義（`session-handoff.prompt`）に基づきHandoffドキュメントを生成。
 
-出力先: `/home/laihuip001/oikos/mneme/.hegemonikon/sessions/handoff_{YYYY-MM-DD}_{HHMM}.md`
+出力先: `/home/makaron8426/oikos/mneme/.hegemonikon/sessions/handoff_{YYYY-MM-DD}_{HHMM}.md`
 
 ### Step 3.5: チャット履歴エクスポート
 
@@ -137,11 +137,11 @@ Prompt-Lang定義（`session-handoff.prompt`）に基づきHandoffドキュメ�
 現在のセッションのチャット履歴を Markdown にエクスポート。
 
 ```bash
-cd /home/laihuip001/oikos/hegemonikon && \
+cd /home/makaron8426/oikos/hegemonikon && \
 .venv/bin/python mekhane/anamnesis/export_chats.py --single "Session_$(date +%Y%m%d_%H%M)"
 ```
 
-出力先: `/home/laihuip001/oikos/mneme/.hegemonikon/sessions/{date}_conv_{title}.md`
+出力先: `/home/makaron8426/oikos/mneme/.hegemonikon/sessions/{date}_conv_{title}.md`
 
 > **注意**: Antigravity が `--remote-debugging-port=9222` で起動している必要あり
 > **問題**: 複数タブがある場合、エクスポート先が不定になる可能性あり。失敗したら再実行するか、正しいタブをアクティブにして再試行。
@@ -203,7 +203,7 @@ epoche_events:
     session_id: "{conversation_id}"
 ```
 
-**出力先**: `/home/laihuip001/oikos/mneme/.hegemonikon/logs/dispatch_log.yaml`
+**出力先**: `/home/makaron8426/oikos/mneme/.hegemonikon/logs/dispatch_log.yaml`
 
 > **Phase B移行判定**: skill_activations >= 50, failure_rate < 10%, exception_patterns >= 3
 
@@ -212,7 +212,7 @@ epoche_events:
 生成された Handoff を Kairos インデックスに自動投入。次回 `/boot` で検索可能に。
 
 ```bash
-python3 /home/laihuip001/oikos/hegemonikon/mekhane/symploke/kairos_ingest.py
+python3 /home/makaron8426/oikos/hegemonikon/mekhane/symploke/kairos_ingest.py
 ```
 
 > **注意**: 最新の1件のみ投入。全件投入は `--all` オプション。
@@ -271,7 +271,7 @@ print(f"✅ Persona 更新: {persona['relationship']['sessions_together']} sessi
 Antigravity KI を Sophia インデックスに投入。Sophia を正本とし、KI を「提案」として吸収。
 
 ```bash
-python3 /home/laihuip001/oikos/hegemonikon/mekhane/symploke/sophia_ingest.py
+python3 /home/makaron8426/oikos/hegemonikon/mekhane/symploke/sophia_ingest.py
 ```
 
 > **原則**: Sophia = 正本、Antigravity KI = 便利なインターフェース
@@ -290,7 +290,7 @@ from mekhane.fep.persistence import save_A
 from pathlib import Path
 
 agent = HegemonikónFEPAgent(use_defaults=True)
-learned_a_path = Path('/home/laihuip001/oikos/mneme/.hegemonikon/learned_A.npy')
+learned_a_path = Path('/home/makaron8426/oikos/mneme/.hegemonikon/learned_A.npy')
 
 # 常に保存（初回セッションでも）
 saved_path = save_A(agent)
@@ -306,7 +306,7 @@ print(f"✅ FEP A行列保存: {saved_path}")
 セッション中にワークフローや派生が追加された場合、一覧を自動更新。
 
 ```bash
-python3 /home/laihuip001/oikos/hegemonikon/mekhane/anamnesis/workflow_inventory.py
+python3 /home/makaron8426/oikos/hegemonikon/mekhane/anamnesis/workflow_inventory.py
 ```
 
 **効果**:
@@ -315,7 +315,7 @@ python3 /home/laihuip001/oikos/hegemonikon/mekhane/anamnesis/workflow_inventory.
 - 次回 `/boot` で最新の一覧が確認可能
 - 46+ ワークフローの全体像を常に把握
 
-**出力先**: `/home/laihuip001/oikos/hegemonikon/docs/workflow_inventory.md`
+**出力先**: `/home/makaron8426/oikos/hegemonikon/docs/workflow_inventory.md`
 
 ### Step 3.11: 意味ある瞬間の保存 (Emotional Layer)
 
@@ -572,7 +572,7 @@ session_handoff:
 
 ## /boot との連携
 
-1. `/bye` で生成されたHandoffは `/home/laihuip001/oikos/mneme/.hegemonikon/sessions/` に保存
+1. `/bye` で生成されたHandoffは `/home/makaron8426/oikos/mneme/.hegemonikon/sessions/` に保存
 2. 次回 `/boot` 実行時、最新のHandoffを自動読み込み
 3. 「前回の続きから」スムーズに開始可能
 

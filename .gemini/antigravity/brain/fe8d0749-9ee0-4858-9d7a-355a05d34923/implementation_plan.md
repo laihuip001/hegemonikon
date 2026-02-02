@@ -35,12 +35,12 @@
 
 ## STAGE 3: Blueprint
 
-### [MODIFY] [encoding.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/fep/encoding.py)
+### [MODIFY] [encoding.py](file:///home/makaron8426/oikos/hegemonikon/mekhane/fep/encoding.py)
 
 ```python
 def run_fep_with_learning(
     obs_tuple: Tuple[int, int, int],
-    a_matrix_path: str = "/home/laihuip001/oikos/mneme/.hegemonikon/fep/learned_A.npy",
+    a_matrix_path: str = "/home/makaron8426/oikos/mneme/.hegemonikon/fep/learned_A.npy",
     learning_rate: float = 50.0,
 ) -> Dict:
     """FEP 推論 + Dirichlet 学習 + 永続化を一連で実行。
@@ -82,7 +82,7 @@ def should_trigger_epoche(agent_result: Dict, threshold: float = 2.0) -> bool:
 
 ---
 
-### [MODIFY] [o1-noesis/SKILL.md](file:///home/laihuip001/oikos/.agent/skills/ousia/o1-noesis/SKILL.md)
+### [MODIFY] [o1-noesis/SKILL.md](file:///home/makaron8426/oikos/.agent/skills/ousia/o1-noesis/SKILL.md)
 
 FEP Cognitive Layer セクションの使用コードを更新:
 

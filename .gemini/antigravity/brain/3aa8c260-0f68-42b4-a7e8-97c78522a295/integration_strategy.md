@@ -6,18 +6,18 @@
 
 ## 📊 Module Inventory Summary
 
-**Source**: `/home/laihuip001/ダウンロード/Brain/99_🗃️_保管庫｜Archive/プロンプト ライブラリー/モジュール/`
+**Source**: `/home/makaron8426/ダウンロード/Brain/99_🗃️_保管庫｜Archive/プロンプト ライブラリー/モジュール/`
 **Count**: 31 files (~5-7KB each)
 
 ### Module Classification (Sampled)
 
 | ID | Name | Function | Potential Mapping |
 |:---|:---|:---|:---|
-| A-9 | [第一原理思考](file:///home/laihuip001/ダウンロード/Brain/99_🗃️_保管庫｜Archive/プロンプト%20ライブラリー/モジュール/第一原理思考.md) | AXIOM/ASSUMPTION分解、物理的極限計算 | **O1 Noēsis** / /noe |
-| C-1 | [敵対的レビュー](file:///home/laihuip001/ダウンロード/Brain/99_🗃️_保管庫｜Archive/プロンプト%20ライブラリー/モジュール/敵対的レビュー凸.md) | Buzzword Guillotine、Logic Stress | **A2 Krisis** / /dia |
-| C-4 | [コード監査](file:///home/laihuip001/ダウンロード/Brain/99_🗃️_保管庫｜Archive/プロンプト%20ライブラリー/モジュール/コード監査凸.md) | Code Smell, Type Safety, Modernity | **/vet** / Synedrion |
-| M-1 | [仮想ユーザー座談会](file:///home/laihuip001/ダウンロード/Brain/99_🗃️_保管庫｜Archive/プロンプト%20ライブラリー/モジュール/仮想ユーザー座談会.md) | Wallet Voting, Chasm Theory | **/syn** (新規Persona?) |
-| Ω-1 | [自律思考](file:///home/laihuip001/ダウンロード/Brain/99_🗃️_保管庫｜Archive/プロンプト%20ライブラリー/モジュール/自律思考.md) | Creator/Critic/Strategist自律ループ | **Tekhne-Maker** RECURSIVE_CORE |
+| A-9 | [第一原理思考](file:///home/makaron8426/ダウンロード/Brain/99_🗃️_保管庫｜Archive/プロンプト%20ライブラリー/モジュール/第一原理思考.md) | AXIOM/ASSUMPTION分解、物理的極限計算 | **O1 Noēsis** / /noe |
+| C-1 | [敵対的レビュー](file:///home/makaron8426/ダウンロード/Brain/99_🗃️_保管庫｜Archive/プロンプト%20ライブラリー/モジュール/敵対的レビュー凸.md) | Buzzword Guillotine、Logic Stress | **A2 Krisis** / /dia |
+| C-4 | [コード監査](file:///home/makaron8426/ダウンロード/Brain/99_🗃️_保管庫｜Archive/プロンプト%20ライブラリー/モジュール/コード監査凸.md) | Code Smell, Type Safety, Modernity | **/vet** / Synedrion |
+| M-1 | [仮想ユーザー座談会](file:///home/makaron8426/ダウンロード/Brain/99_🗃️_保管庫｜Archive/プロンプト%20ライブラリー/モジュール/仮想ユーザー座談会.md) | Wallet Voting, Chasm Theory | **/syn** (新規Persona?) |
+| Ω-1 | [自律思考](file:///home/makaron8426/ダウンロード/Brain/99_🗃️_保管庫｜Archive/プロンプト%20ライブラリー/モジュール/自律思考.md) | Creator/Critic/Strategist自律ループ | **Tekhne-Maker** RECURSIVE_CORE |
 
 ---
 

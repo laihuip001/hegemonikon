@@ -33,7 +33,7 @@ Hermeneus を「CCL コンパイラ」から「実用的な LLM 実行エンジ�
 
 **修正**: `_execute_fallback` で context を常にプロンプト先頭に明示的に追加
 
-render_diffs(file:///home/laihuip001/oikos/hegemonikon/hermeneus/src/runtime.py)
+render_diffs(file:///home/makaron8426/oikos/hegemonikon/hermeneus/src/runtime.py)
 
 ### 4. Synteleia + LLM 統合分析
 
@@ -51,7 +51,7 @@ render_diffs(file:///home/laihuip001/oikos/hegemonikon/hermeneus/src/runtime.py)
 
 `execute_hermeneus` に Synteleia 監査結果を自動追加する機能を実装
 
-render_diffs(file:///home/laihuip001/oikos/hegemonikon/synergeia/coordinator.py)
+render_diffs(file:///home/makaron8426/oikos/hegemonikon/synergeia/coordinator.py)
 
 ---
 

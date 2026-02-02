@@ -118,7 +118,7 @@ ccl_signature: "/dev"
 ## 原典ベースパス
 
 ```
-/home/laihuip001/oikos/mneme\99_🗃️_保管庫｜Archive\プロンプト ライブラリー\モジュール（開発用）\個別のモジュール\
+/home/makaron8426/oikos/mneme\99_🗃️_保管庫｜Archive\プロンプト ライブラリー\モジュール（開発用）\個別のモジュール\
 ```
 
 ---

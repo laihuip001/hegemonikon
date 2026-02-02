@@ -57,6 +57,6 @@ Chronotopic Precision を `/zet` に統合:
 
 | ファイル | 変更内容 |
 |----------|----------|
-| [zet.md](file:///home/laihuip001/oikos/.agent/workflows/zet.md) | v2.3 ハイブリッド + Claude特化 |
-| [zet_redesign_summary.md](file:///home/laihuip001/oikos/.gemini/antigravity/knowledge/search_exploration_optimization/artifacts/workflows/zet_redesign_summary.md) | KI更新 |
-| [metadata.json](file:///home/laihuip001/oikos/.gemini/antigravity/knowledge/search_exploration_optimization/metadata.json) | summary更新 |
+| [zet.md](file:///home/makaron8426/oikos/.agent/workflows/zet.md) | v2.3 ハイブリッド + Claude特化 |
+| [zet_redesign_summary.md](file:///home/makaron8426/oikos/.gemini/antigravity/knowledge/search_exploration_optimization/artifacts/workflows/zet_redesign_summary.md) | KI更新 |
+| [metadata.json](file:///home/makaron8426/oikos/.gemini/antigravity/knowledge/search_exploration_optimization/metadata.json) | summary更新 |

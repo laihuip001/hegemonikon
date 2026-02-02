@@ -96,7 +96,7 @@ Antigravity IDE から Hermēneus を直接呼び出す:
     "hermeneus": {
       "command": "python",
       "args": ["-m", "hermeneus.src.mcp_server"],
-      "cwd": "/home/laihuip001/oikos/hegemonikon"
+      "cwd": "/home/makaron8426/oikos/hegemonikon"
     }
   }
 }

@@ -97,8 +97,8 @@ D-1 評価:
 
 #### 変更対象ファイル
 
-1. `/home/laihuip001/oikos/.gemini/antigravity/knowledge/cognitive_algebra_system/artifacts/architecture/operators_and_layers.md`
-2. `/home/laihuip001/oikos/.gemini/antigravity/knowledge/cognitive_algebra_system/artifacts/overview.md`
+1. `/home/makaron8426/oikos/.gemini/antigravity/knowledge/cognitive_algebra_system/artifacts/architecture/operators_and_layers.md`
+2. `/home/makaron8426/oikos/.gemini/antigravity/knowledge/cognitive_algebra_system/artifacts/overview.md`
 
 #### `_` 演算子の定義案
 

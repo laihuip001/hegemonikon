@@ -19,7 +19,7 @@
 
 | ファイル | 変更内容 |
 |:---------|:---------|
-| [operators_and_layers.md](file:///home/laihuip001/oikos/.gemini/antigravity/knowledge/cognitive_algebra_system/artifacts/architecture/operators_and_layers.md) | v6.35 へ更新、Section 7.7 Antistrophē v2.0 |
+| [operators_and_layers.md](file:///home/makaron8426/oikos/.gemini/antigravity/knowledge/cognitive_algebra_system/artifacts/architecture/operators_and_layers.md) | v6.35 へ更新、Section 7.7 Antistrophē v2.0 |
 
 ---
 

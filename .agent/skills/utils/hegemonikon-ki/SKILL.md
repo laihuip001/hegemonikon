@@ -34,7 +34,7 @@ triggers:
 ## 参照すべきアーティファクト
 
 ```
-/home/laihuip001/oikos/.gemini/antigravity/knowledge/hegemonikon_system/
+/home/makaron8426/oikos/.gemini/antigravity/knowledge/hegemonikon_system/
 ├── metadata.json
 └── artifacts/
     ├── overview.md

@@ -43,7 +43,7 @@ Dendron MVP は完成（mekhane/ 100% カバレッジ達成）。次フェーズ
 
 ### Phase A: check_proof.py 統合 (1-2時間)
 
-#### [MODIFY] [check_proof.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/scripts/check_proof.py)
+#### [MODIFY] [check_proof.py](file:///home/makaron8426/oikos/hegemonikon/mekhane/scripts/check_proof.py)
 
 - Dendron CLI への委譲ラッパーに変更
 - 後方互換性維持（同じ引数、同じ終了コード）
@@ -77,7 +77,7 @@ if __name__ == "__main__":
     main()
 ```
 
-#### [MODIFY] [checker.py](file:///home/laihuip001/oikos/hegemonikon/dendron/checker.py)
+#### [MODIFY] [checker.py](file:///home/makaron8426/oikos/hegemonikon/dendron/checker.py)
 
 - レベル統計を CheckResult に追加（check_proof.py の機能移植）
 
@@ -88,7 +88,7 @@ class CheckResult:
     level_stats: Dict[ProofLevel, int] = field(default_factory=dict)
 ```
 
-#### [MODIFY] [reporter.py](file:///home/laihuip001/oikos/hegemonikon/dendron/reporter.py)
+#### [MODIFY] [reporter.py](file:///home/makaron8426/oikos/hegemonikon/dendron/reporter.py)
 
 - レベル統計の出力を追加
 
@@ -98,11 +98,11 @@ class CheckResult:
 
 > **文脈**: 前回セッションで実装した Zero-Trust CCL Executor の Phase 3
 
-#### [NEW] [audit_agents/__init__.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/ccl/agents/__init__.py)
+#### [NEW] [audit_agents/__init__.py](file:///home/makaron8426/oikos/hegemonikon/mekhane/ccl/agents/__init__.py)
 
 パッケージ定義
 
-#### [NEW] [operator_agent.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/ccl/agents/operator_agent.py)
+#### [NEW] [operator_agent.py](file:///home/makaron8426/oikos/hegemonikon/mekhane/ccl/agents/operator_agent.py)
 
 CCL 演算子の正しい理解を検証するエージェント
 
@@ -115,15 +115,15 @@ class OperatorUnderstandingAgent:
         ...
 ```
 
-#### [NEW] [logic_agent.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/ccl/agents/logic_agent.py)
+#### [NEW] [logic_agent.py](file:///home/makaron8426/oikos/hegemonikon/mekhane/ccl/agents/logic_agent.py)
 
 論理矛盾検出エージェント
 
-#### [NEW] [completeness_agent.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/ccl/agents/completeness_agent.py)
+#### [NEW] [completeness_agent.py](file:///home/makaron8426/oikos/hegemonikon/mekhane/ccl/agents/completeness_agent.py)
 
 出力の完全性検証エージェント
 
-#### [NEW] [audit_orchestrator.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/ccl/agents/audit_orchestrator.py)
+#### [NEW] [audit_orchestrator.py](file:///home/makaron8426/oikos/hegemonikon/mekhane/ccl/agents/audit_orchestrator.py)
 
 3エージェントの統合オーケストレーター
 
@@ -135,15 +135,15 @@ class OperatorUnderstandingAgent:
 
 ```bash
 # 1. Dendron 単体テスト（現状テストなし → 新規作成が必要）
-cd /home/laihuip001/oikos/hegemonikon
-PYTHONPATH=/home/laihuip001/oikos/hegemonikon .venv/bin/python -m pytest dendron/tests/ -v
+cd /home/makaron8426/oikos/hegemonikon
+PYTHONPATH=/home/makaron8426/oikos/hegemonikon .venv/bin/python -m pytest dendron/tests/ -v
 
 # 2. 統合テスト: check_proof.py が Dendron に委譲することを確認
 python mekhane/scripts/check_proof.py --verbose
 # 期待: 非推奨警告 + 正常終了
 
 # 3. 回帰テスト: mekhane/ 100% カバレッジ維持
-PYTHONPATH=/home/laihuip001/oikos/hegemonikon .venv/bin/python -m dendron.cli check mekhane/ --format ci
+PYTHONPATH=/home/makaron8426/oikos/hegemonikon .venv/bin/python -m dendron.cli check mekhane/ --format ci
 # 期待: ✅ 100.0% coverage
 ```
 

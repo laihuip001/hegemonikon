@@ -138,7 +138,7 @@ version: "2.1.0"
 
 | 層 | 実現手段 | 参照 |
 |----|----------|------|
-| **Micro** | /bou workflow | [bou.md](file:///home/laihuip001/oikos/.agent/workflows/bou.md) |
+| **Micro** | /bou workflow | [bou.md](file:///home/makaron8426/oikos/.agent/workflows/bou.md) |
 | **Macro** | mekhane/boulesis/ | (将来実装) 目標履歴・価値関数更新 |
 
 ### Micro 実現 (/bou) の詳細
@@ -233,5 +233,5 @@ version: "2.1.0"
 
 ---
 
-*参照: [ousia.md](file:///home/laihuip001/oikos/hegemonikon/kernel/ousia.md)*  
+*参照: [ousia.md](file:///home/makaron8426/oikos/hegemonikon/kernel/ousia.md)*  
 *バージョン: 2.1.0 (2026-01-27)*

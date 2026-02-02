@@ -36,7 +36,7 @@ graph TD
 ### 2. Execute Command (Git Status)
 
 ```bash
-cd /home/laihuip001/oikos/hegemonikon && git log -1 --oneline
+cd /home/makaron8426/oikos/hegemonikon && git log -1 --oneline
 ```
 
 ### 3. HTTP Request (Handoff Search)

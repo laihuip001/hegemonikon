@@ -29,7 +29,7 @@ HEGEMONIKON_ROOT = Path(__file__).parent.parent
 sys.path.insert(0, str(HEGEMONIKON_ROOT))
 
 # Import Perplexity API
-PERPLEXITY_SCRIPT = Path("/home/laihuip001/oikos/hegemonikon/mekhane/peira/scripts")
+PERPLEXITY_SCRIPT = Path("/home/makaron8426/oikos/hegemonikon/mekhane/peira/scripts")
 sys.path.insert(0, str(PERPLEXITY_SCRIPT))
 
 from perplexity_api import search as perplexity_search
@@ -140,9 +140,9 @@ def select_thread(ccl: str, use_fep: bool = True) -> str:
 # CLI Paths
 # =============================================================================
 
-CLAUDE_CLI = "/home/laihuip001/oikos/.local/bin/claude"
-GEMINI_CLI = "node /home/laihuip001/oikos/.npm/_npx/38c708f8d73fe4c9/node_modules/@google/gemini-cli/bundle/gemini.js"
-CODEX_CLI = "/home/laihuip001/oikos/hegemonikon/synergeia/node_modules/.bin/codex"
+CLAUDE_CLI = "/home/makaron8426/oikos/.local/bin/claude"
+GEMINI_CLI = "node /home/makaron8426/oikos/.npm/_npx/38c708f8d73fe4c9/node_modules/@google/gemini-cli/bundle/gemini.js"
+CODEX_CLI = "/home/makaron8426/oikos/hegemonikon/synergeia/node_modules/.bin/codex"
 
 
 # =============================================================================
@@ -181,7 +181,7 @@ def execute_claude(ccl: str, context: str) -> Dict[str, Any]:
             capture_output=True,
             text=True,
             timeout=600,  # 最大10分
-            cwd="/home/laihuip001/oikos/hegemonikon"
+            cwd="/home/makaron8426/oikos/hegemonikon"
         )
         answer = result.stdout.strip()
         if result.returncode != 0:
@@ -217,13 +217,13 @@ Provide a detailed conceptual response without executing any tools."""
         result = subprocess.run(
             [
                 "node", 
-                "/home/laihuip001/oikos/.npm/_npx/38c708f8d73fe4c9/node_modules/@google/gemini-cli/bundle/gemini.js", 
+                "/home/makaron8426/oikos/.npm/_npx/38c708f8d73fe4c9/node_modules/@google/gemini-cli/bundle/gemini.js", 
                 "-p", prompt
             ],
             capture_output=True,
             text=True,
             timeout=600,  # 最大10分
-            cwd="/home/laihuip001/oikos/hegemonikon"
+            cwd="/home/makaron8426/oikos/hegemonikon"
         )
         # Geminiは最初の2行がログなので除去
         lines = result.stdout.strip().split("\n")
@@ -255,7 +255,7 @@ def execute_codex(ccl: str, context: str) -> Dict[str, Any]:
             capture_output=True,
             text=True,
             timeout=600,  # 最大10分
-            cwd="/home/laihuip001/oikos/hegemonikon"
+            cwd="/home/makaron8426/oikos/hegemonikon"
         )
         # Codex は最初と最後にメタデータがあるので整理
         lines = result.stdout.strip().split("\n")

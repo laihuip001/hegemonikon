@@ -90,7 +90,7 @@ def insert_noqa(file_path: Path, issues: list[tuple[int, str]]):
 
 
 def main():
-    base_dir = Path("/home/laihuip001/oikos/hegemonikon/mekhane")
+    base_dir = Path("/home/makaron8426/oikos/hegemonikon/mekhane")
     audit_file = Path("/tmp/audit_output.txt")
 
     if not audit_file.exists():

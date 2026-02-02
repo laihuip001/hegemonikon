@@ -55,7 +55,7 @@ Migration tasks are handled via the **Session Handoff** (`mneme/.hegemonikon/ses
 ### 3.2 Standardized Execution Environment
 
 Workflows must use the specific `.venv` path to resolve dependencies:
-`/home/laihuip001/oikos/hegemonikon/.venv/bin/python .../cli.py`
+`/home/makaron8426/oikos/hegemonikon/.venv/bin/python .../cli.py`
 
 ---
 *Gnōsis Implementation Guide | Updated: 2026-01-29*

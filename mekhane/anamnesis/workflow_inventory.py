@@ -27,8 +27,8 @@ from pathlib import Path
 from datetime import datetime
 from collections import defaultdict
 
-WORKFLOWS_DIR = Path("/home/laihuip001/oikos/.agent/workflows")
-DEFAULT_OUTPUT = Path("/home/laihuip001/oikos/hegemonikon/docs/workflow_inventory.md")
+WORKFLOWS_DIR = Path("/home/makaron8426/oikos/.agent/workflows")
+DEFAULT_OUTPUT = Path("/home/makaron8426/oikos/hegemonikon/docs/workflow_inventory.md")
 
 
 def extract_frontmatter(filepath: Path) -> dict:

@@ -118,8 +118,8 @@ echo "✅ ワークフロー品質チェック PASS"
 
 ## 📚 参照
 
-- [ワークフロー劣化監査報告書](file:///home/laihuip001/oikos/.gemini/antigravity/brain/1291d231-b66b-45f4-9d3c-599a9b400955/implementation_plan.md)
-- [深層監査報告書](file:///home/laihuip001/oikos/.gemini/antigravity/brain/1291d231-b66b-45f4-9d3c-599a9b400955/deep_workflow_audit.md)
+- [ワークフロー劣化監査報告書](file:///home/makaron8426/oikos/.gemini/antigravity/brain/1291d231-b66b-45f4-9d3c-599a9b400955/implementation_plan.md)
+- [深層監査報告書](file:///home/makaron8426/oikos/.gemini/antigravity/brain/1291d231-b66b-45f4-9d3c-599a9b400955/deep_workflow_audit.md)
 
 ---
 

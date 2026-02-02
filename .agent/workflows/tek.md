@@ -40,7 +40,7 @@ ccl_signature: "/tek+_/dev"
 
 # /tek: 技法選択ワークフロー (Tekhnē)
 
-> **正本参照**: [P4 Tekhnē SKILL.md](file:///home/laihuip001/oikos/.agent/skills/perigraphe/p4-tekhne/SKILL.md)
+> **正本参照**: [P4 Tekhnē SKILL.md](file:///home/makaron8426/oikos/.agent/skills/perigraphe/p4-tekhne/SKILL.md)
 > **目的**: 「どの技法で」を決定する — 技術的条件空間の評価
 > **役割**: 方法論的条件空間の定義
 
@@ -532,12 +532,12 @@ graph LR
 
 ## Artifact 自動保存
 
-> **標準参照**: [workflow_artifact_standard.md](file:///home/laihuip001/oikos/.agent/standards/workflow_artifact_standard.md)
+> **標準参照**: [workflow_artifact_standard.md](file:///home/makaron8426/oikos/.agent/standards/workflow_artifact_standard.md)
 
 ### 保存先
 
 ```
-/home/laihuip001/oikos/mneme/.hegemonikon/workflows/tek_<topic>_<date>.md
+/home/makaron8426/oikos/mneme/.hegemonikon/workflows/tek_<topic>_<date>.md
 ```
 
 例: `tek_技法選択_20260129.md`
@@ -563,7 +563,7 @@ graph LR
 
 | Module | Workflow | Skill (正本) | Status |
 |:-------|:---------|:-------------|:-------|
-| P4 Tekhnē | /tek | [SKILL.md](file:///home/laihuip001/oikos/.agent/skills/perigraphe/p4-tekhne/SKILL.md) | v1.0 Ready |
+| P4 Tekhnē | /tek | [SKILL.md](file:///home/makaron8426/oikos/.agent/skills/perigraphe/p4-tekhne/SKILL.md) | v1.0 Ready |
 
 ---
 

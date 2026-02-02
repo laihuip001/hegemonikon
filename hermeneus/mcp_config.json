@@ -6,9 +6,9 @@
                 "-m",
                 "hermeneus.src.mcp_server"
             ],
-            "cwd": "/home/laihuip001/oikos/hegemonikon",
+            "cwd": "/home/makaron8426/oikos/hegemonikon",
             "env": {
-                "PYTHONPATH": "/home/laihuip001/oikos/hegemonikon"
+                "PYTHONPATH": "/home/makaron8426/oikos/hegemonikon"
             }
         }
     }

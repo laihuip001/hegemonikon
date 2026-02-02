@@ -12,7 +12,7 @@ import sys
 import json
 import pytest
 
-sys.path.insert(0, "/home/laihuip001/oikos/hegemonikon")
+sys.path.insert(0, "/home/makaron8426/oikos/hegemonikon")
 
 
 @pytest.mark.asyncio
@@ -24,7 +24,7 @@ async def test_mcp_tools():
     print("=" * 70)
 
     # Import the server module (local, not from mcp package)
-    sys.path.insert(0, "/home/laihuip001/oikos/hegemonikon/mcp")
+    sys.path.insert(0, "/home/makaron8426/oikos/hegemonikon/mcp")
     import jules_mcp_server as server
 
     print("\n[1] Testing list_tools...")

@@ -56,4 +56,4 @@ AQ.Ab8RN6JtzFNxjIh-WJZtloeHGHLhH6uQKAabK6jZSsk_X8JF4w
 - キーは **コピー＆ペースト** で正確に入力
 - 前後の空白に注意
 - 登録後は値を再確認できないため、ローカルバックアップを保持
-  - バックアップ: `/home/laihuip001/oikos/hegemonikon/.env.jules`
+  - バックアップ: `/home/makaron8426/oikos/hegemonikon/.env.jules`

@@ -51,7 +51,7 @@ absorbed:
 
 # /noe: 最深層思考ワークフロー (Noēsis)
 
-> **正本参照**: [O1 Noēsis SKILL.md](file:///home/laihuip001/oikos/.agent/skills/ousia/o1-noesis/SKILL.md)
+> **正本参照**: [O1 Noēsis SKILL.md](file:///home/makaron8426/oikos/.agent/skills/ousia/o1-noesis/SKILL.md)
 > **目的**: 直観的認識、前提破壊、0 からの再構築
 > **発動条件**: 根本的な行き詰まり、パラダイム転換が必要な時
 
@@ -130,7 +130,7 @@ result = select_derivative("O1", problem_context)
 ```
 実行手順:
 1. view_file ツールで SKILL.md を読み込む
-   パス: /home/laihuip001/oikos/.agent/skills/ousia/o1-noesis/SKILL.md
+   パス: /home/makaron8426/oikos/.agent/skills/ousia/o1-noesis/SKILL.md
 2. Anti-Skip Protocol セクションを確認
 3. 各 PHASE の出力形式を確認
 4. 確認後、処理を開始
@@ -503,12 +503,12 @@ print(f"理由: {result.rationale}")
 
 ## Artifact 自動保存
 
-> **標準参照**: [workflow_artifact_standard.md](file:///home/laihuip001/oikos/.agent/standards/workflow_artifact_standard.md)
+> **標準参照**: [workflow_artifact_standard.md](file:///home/makaron8426/oikos/.agent/standards/workflow_artifact_standard.md)
 
 ### 保存先
 
 ```
-/home/laihuip001/oikos/mneme/.hegemonikon/workflows/noe_<topic>_<date>.md
+/home/makaron8426/oikos/mneme/.hegemonikon/workflows/noe_<topic>_<date>.md
 ```
 
 例: `noe_derivative_selector_20260129.md`
@@ -564,7 +564,7 @@ print(f"理由: {result.rationale}")
 
 | Module | Workflow | Skill (正本) | Status |
 | :------ | :-------- |--------------| :------ |
-| O1 Noēsis | /noe | [SKILL.md](file:///home/laihuip001/oikos/.agent/skills/ousia/o1-noesis/SKILL.md) | v4.0 Ready |
+| O1 Noēsis | /noe | [SKILL.md](file:///home/makaron8426/oikos/.agent/skills/ousia/o1-noesis/SKILL.md) | v4.0 Ready |
 
 ---
 

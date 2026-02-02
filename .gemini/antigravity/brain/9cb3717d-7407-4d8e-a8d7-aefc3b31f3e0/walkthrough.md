@@ -53,9 +53,9 @@
 
 | ファイル | 説明 |
 |:---------|:-----|
-| [perspectives.yaml](file:///home/laihuip001/oikos/hegemonikon/mekhane/ergasterion/synedrion/perspectives.yaml) | 20領域×6軸のマトリクス定義 |
-| [prompt_generator.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/ergasterion/synedrion/prompt_generator.py) | /mek で生成したプロンプト生成モジュール |
-| [test_prompt_generator.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/ergasterion/synedrion/tests/test_prompt_generator.py) | 15テスト (直交性検証含む) |
+| [perspectives.yaml](file:///home/makaron8426/oikos/hegemonikon/mekhane/ergasterion/synedrion/perspectives.yaml) | 20領域×6軸のマトリクス定義 |
+| [prompt_generator.py](file:///home/makaron8426/oikos/hegemonikon/mekhane/ergasterion/synedrion/prompt_generator.py) | /mek で生成したプロンプト生成モジュール |
+| [test_prompt_generator.py](file:///home/makaron8426/oikos/hegemonikon/mekhane/ergasterion/synedrion/tests/test_prompt_generator.py) | 15テスト (直交性検証含む) |
 
 ### コミット
 

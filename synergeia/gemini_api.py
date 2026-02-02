@@ -22,7 +22,7 @@ from datetime import datetime
 from pathlib import Path
 
 # Add venv to path
-VENV_PATH = Path("/home/laihuip001/oikos/hegemonikon/.venv/lib/python3.11/site-packages")
+VENV_PATH = Path("/home/makaron8426/oikos/hegemonikon/.venv/lib/python3.11/site-packages")
 sys.path.insert(0, str(VENV_PATH))
 
 import google.generativeai as genai
@@ -38,7 +38,7 @@ def get_api_key() -> str:
         for path in [
             Path(__file__).parent / ".env.local",
             Path.home() / ".gemini" / ".env.local",
-            Path("/home/laihuip001/oikos/.gemini") / ".env.local",
+            Path("/home/makaron8426/oikos/.gemini") / ".env.local",
         ]:
             if path.exists():
                 content = path.read_text().strip()

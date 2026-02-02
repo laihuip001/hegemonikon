@@ -123,7 +123,7 @@ graph TD
 #### 1. 🔄 Anti-Stale Protocol（正本読み直し）
 
 ```bash
-view_file /home/laihuip001/oikos/.agent/workflows/boot.md
+view_file /home/makaron8426/oikos/.agent/workflows/boot.md
 ```
 
 - このステップ自体が古いキャッシュから実行されている可能性がある
@@ -251,10 +251,10 @@ I: |/doxa'| > 0.3 {
 
 ```bash
 # 最終週次レビュー日付を取得
-ls -1t /home/laihuip001/oikos/mneme/.hegemonikon/sessions/weekly_review_*.md | head -1
+ls -1t /home/makaron8426/oikos/mneme/.hegemonikon/sessions/weekly_review_*.md | head -1
 
 # Handoff 件数を取得
-ls -1 /home/laihuip001/oikos/mneme/.hegemonikon/sessions/handoff_*.md | wc -l
+ls -1 /home/makaron8426/oikos/mneme/.hegemonikon/sessions/handoff_*.md | wc -l
 ```
 
 **トリガー条件**:
@@ -278,7 +278,7 @@ ls -1 /home/laihuip001/oikos/mneme/.hegemonikon/sessions/handoff_*.md | wc -l
 
 #### 3. 📋 前回 Handoff 読込
 
-- 対象: `/home/laihuip001/oikos/mneme/.hegemonikon/sessions/handoff_*.md` の最新ファイル
+- 対象: `/home/makaron8426/oikos/mneme/.hegemonikon/sessions/handoff_*.md` の最新ファイル
 - 存在する場合: 内容を表示し、「前回の続きから開始」を提案
 - 存在しない場合: スキップ
 
@@ -334,8 +334,8 @@ Kairos 検索で最新の `/bou` 出力を取得し、現在の目的をリマ�
 3軸（Handoff, Sophia, Persona）を統合して読み込む:
 
 ```bash
-cd /home/laihuip001/oikos/hegemonikon && \
-PYTHONPATH=/home/laihuip001/oikos/hegemonikon \
+cd /home/makaron8426/oikos/hegemonikon && \
+PYTHONPATH=/home/makaron8426/oikos/hegemonikon \
 .venv/bin/python mekhane/symploke/boot_integration.py --mode ${BOOT_MODE:-standard}
 ```
 
@@ -378,13 +378,13 @@ PYTHONPATH=/home/laihuip001/oikos/hegemonikon \
 > **Origin**: W3 KI連携 を消化。Sophia = 正本、Antigravity KI = 吸収済み
 
 ```bash
-cd /home/laihuip001/oikos/hegemonikon && \
-PYTHONPATH=/home/laihuip001/oikos/hegemonikon \
-/home/laihuip001/oikos/hegemonikon/.venv/bin/python -c "
+cd /home/makaron8426/oikos/hegemonikon && \
+PYTHONPATH=/home/makaron8426/oikos/hegemonikon \
+/home/makaron8426/oikos/hegemonikon/.venv/bin/python -c "
 from mekhane.symploke.sophia_ingest import load_sophia_index, search_loaded_index
 from pathlib import Path
 
-pkl = Path('/home/laihuip001/oikos/mneme/.hegemonikon/indices/sophia.pkl')
+pkl = Path('/home/makaron8426/oikos/mneme/.hegemonikon/indices/sophia.pkl')
 if pkl.exists():
     adapter = load_sophia_index(str(pkl))
     results = search_loaded_index(adapter, 'implementation design pattern', top_k=5)
@@ -420,7 +420,7 @@ from mekhane.fep import HegemonikónFEPAgent
 from pathlib import Path
 
 agent = HegemonikónFEPAgent(use_defaults=True)
-learned_a_path = Path('/home/laihuip001/oikos/mneme/.hegemonikon/learned_A.npy')
+learned_a_path = Path('/home/makaron8426/oikos/mneme/.hegemonikon/learned_A.npy')
 
 if learned_a_path.exists() and agent.load_learned_A():
     print("✅ FEP A行列: 学習済みモデル読込")
@@ -488,7 +488,7 @@ if derivative_beliefs:
 from pathlib import Path
 import random
 
-ki_dir = Path('/home/laihuip001/oikos/.gemini/antigravity/knowledge')
+ki_dir = Path('/home/makaron8426/oikos/.gemini/antigravity/knowledge')
 ki_folders = [d for d in ki_dir.iterdir() if d.is_dir() and d.name != 'knowledge.lock']
 
 # ランダムに2-3件選択
@@ -554,7 +554,7 @@ else:
 
 #### 8. 🧠 H4 長期記憶読込 (Load Phase)
 
-`/home/laihuip001/oikos/mneme/.hegemonikon/` から以下を読み込み:
+`/home/makaron8426/oikos/mneme/.hegemonikon/` から以下を読み込み:
 
 | ファイル | 用途 |
 |:---------|:-----|
@@ -634,7 +634,7 @@ else:
 **⚠️ 頻出誤解**:
 
 - `*^` は「`*` と `^` の独立」ではなく「**融合のメタ表示**」
-- 詳細: [operators_and_layers.md Section 5](file:///home/laihuip001/oikos/.gemini/antigravity/knowledge/cognitive_algebra_system/artifacts/architecture/operators_and_layers.md#L168)
+- 詳細: [operators_and_layers.md Section 5](file:///home/makaron8426/oikos/.gemini/antigravity/knowledge/cognitive_algebra_system/artifacts/architecture/operators_and_layers.md#L168)
 
 **出力形式**:
 
@@ -669,13 +669,13 @@ else:
 #### 12. 🔍 Gnōsis 知識鮮度チェック
 
 ```bash
-/home/laihuip001/oikos/hegemonikon/.venv/bin/python /home/laihuip001/oikos/hegemonikon/mekhane/anamnesis/cli.py check-freshness
+/home/makaron8426/oikos/hegemonikon/.venv/bin/python /home/makaron8426/oikos/hegemonikon/mekhane/anamnesis/cli.py check-freshness
 ```
 
 **Stale の場合**: 自動で収集実行:
 
 ```bash
-/home/laihuip001/oikos/hegemonikon/.venv/bin/python /home/laihuip001/oikos/hegemonikon/mekhane/anamnesis/cli.py collect --auto
+/home/makaron8426/oikos/hegemonikon/.venv/bin/python /home/makaron8426/oikos/hegemonikon/mekhane/anamnesis/cli.py collect --auto
 ```
 
 **未分類論文リマインド**:
@@ -692,9 +692,9 @@ else:
 > **Purpose**: セッション開始時に「食べるべき論文」を推薦
 
 ```bash
-cd /home/laihuip001/oikos/hegemonikon && \
-PYTHONPATH=/home/laihuip001/oikos/hegemonikon \
-/home/laihuip001/oikos/hegemonikon/.venv/bin/python -c "
+cd /home/makaron8426/oikos/hegemonikon && \
+PYTHONPATH=/home/makaron8426/oikos/hegemonikon \
+/home/makaron8426/oikos/hegemonikon/.venv/bin/python -c "
 from mekhane.ergasterion.digestor.pipeline import DigestorPipeline
 p = DigestorPipeline()
 result = p.run(max_papers=15, max_candidates=3, dry_run=True)
@@ -726,7 +726,7 @@ print(f'   → /eat で消化を開始するか確認してください')
 #### 13. 🗂️ Mnēmē Synthesis インデックス更新
 
 ```bash
-/home/laihuip001/oikos/hegemonikon/.venv/bin/python /home/laihuip001/oikos/hegemonikon/mekhane/anamnesis/mneme_cli.py ingest --all
+/home/makaron8426/oikos/hegemonikon/.venv/bin/python /home/makaron8426/oikos/hegemonikon/mekhane/anamnesis/mneme_cli.py ingest --all
 ```
 
 **出力形式**:
@@ -745,7 +745,7 @@ print(f'   → /eat で消化を開始するか確認してください')
 
 #### 14. 📊 Dispatch Log 進捗リマインド
 
-対象: `/home/laihuip001/oikos/mneme/.hegemonikon/logs/dispatch_log.yaml`
+対象: `/home/makaron8426/oikos/mneme/.hegemonikon/logs/dispatch_log.yaml`
 
 **出力形式**:
 
@@ -760,7 +760,7 @@ print(f'   → /eat で消化を開始するか確認してください')
 
 #### 15. 📥 Perplexity Inbox 読み込み
 
-対象フォルダ: `/home/laihuip001/oikos/hegemonikon/docs/research/perplexity/`
+対象フォルダ: `/home/makaron8426/oikos/hegemonikon/docs/research/perplexity/`
 
 **新規ファイルがある場合**:
 
@@ -783,10 +783,10 @@ print(f'   → /eat で消化を開始するか確認してください')
 
 ```bash
 # リモートブランチを最新化
-cd /home/laihuip001/oikos/hegemonikon && git fetch origin
+cd /home/makaron8426/oikos/hegemonikon && git fetch origin
 
 # Jules レビューブランチを検索
-cd /home/laihuip001/oikos/hegemonikon && git branch -a | grep jules-review | tail -5
+cd /home/makaron8426/oikos/hegemonikon && git branch -a | grep jules-review | tail -5
 ```
 
 **結果がある場合**:
@@ -854,7 +854,7 @@ import yaml
 from pathlib import Path
 from datetime import datetime, date
 
-pf = Path('/home/laihuip001/oikos/hegemonikon/projects.yaml')
+pf = Path('/home/makaron8426/oikos/hegemonikon/projects.yaml')
 if pf.exists():
     projects = yaml.safe_load(pf.read_text())['projects']
     active = [(k,v) for k,v in projects.items() if v['status'] != 'stable']

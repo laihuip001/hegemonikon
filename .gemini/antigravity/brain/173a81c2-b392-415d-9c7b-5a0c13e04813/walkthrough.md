@@ -11,8 +11,8 @@
 |:--|:-----|:----:|:-----|
 | W6 | T-series SAGE | ⏭️ SKIP | [/noe 分析](./noe_w6_value_analysis.md): 価値低 |
 | W8 | Perplexity Task | ✅ 既完了 | OMEGA BUILD v4 |
-| W9 | Jules /boot 統合 | ✅ 完了 | [21c7e080](file:///home/laihuip001/oikos/.agent/workflows/boot.md) |
-| W11 | Markdown lint | ✅ 完了 | [1a6c242d](file:///home/laihuip001/oikos/.markdownlint.json) |
+| W9 | Jules /boot 統合 | ✅ 完了 | [21c7e080](file:///home/makaron8426/oikos/.agent/workflows/boot.md) |
+| W11 | Markdown lint | ✅ 完了 | [1a6c242d](file:///home/makaron8426/oikos/.markdownlint.json) |
 
 ---
 

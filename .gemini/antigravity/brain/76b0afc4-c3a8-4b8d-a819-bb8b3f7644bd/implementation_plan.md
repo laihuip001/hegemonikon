@@ -18,7 +18,7 @@
 
 ### tekhne-maker SKILL.md
 
-#### [MODIFY] [SKILL.md](file:///home/laihuip001/oikos/hegemonikon/mekhane/ergasterion/tekhne/SKILL.md)
+#### [MODIFY] [SKILL.md](file:///home/makaron8426/oikos/hegemonikon/mekhane/ergasterion/tekhne/SKILL.md)
 
 **追加内容**:
 
@@ -42,7 +42,7 @@ Q2: 他のスキルを呼び出しますか？
 
 ### /tek.md ワークフロー
 
-#### [MODIFY] [tek.md](file:///home/laihuip001/oikos/.agent/workflows/tek.md)
+#### [MODIFY] [tek.md](file:///home/makaron8426/oikos/.agent/workflows/tek.md)
 
 **追加内容**:
 

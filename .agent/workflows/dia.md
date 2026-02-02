@@ -37,7 +37,7 @@ sel_enforcement:
 
 # /dia: A2 Krisis 発動コマンド v6.1
 
-> **正本参照**: [A2 Krisis SKILL.md](file:///home/laihuip001/oikos/.agent/skills/akribeia/a2-krisis/SKILL.md)
+> **正本参照**: [A2 Krisis SKILL.md](file:///home/makaron8426/oikos/.agent/skills/akribeia/a2-krisis/SKILL.md)
 > **層**: Δ（デルタ）— 抽象コマンド
 > **役割**: 判定・検証・批評の能力を発動する
 
@@ -75,7 +75,7 @@ sel_enforcement:
 ```text
 実行手順:
 1. view_file ツールで SKILL.md を読み込む
-   パス: /home/laihuip001/oikos/.agent/skills/akribeia/a2-krisis/SKILL.md
+   パス: /home/makaron8426/oikos/.agent/skills/akribeia/a2-krisis/SKILL.md
 2. 選択したモードに対応するセクションを確認
 3. 確認後、処理を開始
 ```
@@ -978,12 +978,12 @@ AI: /dia deliberative で三視点反復改善を実行します
 
 ## Artifact 自動保存
 
-> **標準参照**: [workflow_artifact_standard.md](file:///home/laihuip001/oikos/.agent/standards/workflow_artifact_standard.md)
+> **標準参照**: [workflow_artifact_standard.md](file:///home/makaron8426/oikos/.agent/standards/workflow_artifact_standard.md)
 
 ### 保存先
 
 ```
-/home/laihuip001/oikos/mneme/.hegemonikon/workflows/dia_<topic>_<date>.md
+/home/makaron8426/oikos/mneme/.hegemonikon/workflows/dia_<topic>_<date>.md
 ```
 
 例: `dia_検証_批評_20260129.md`

@@ -297,7 +297,7 @@ hegemonikon-guide/
 ### Step 1: プロジェクト初期化
 
 ```bash
-cd /home/laihuip001/oikos
+cd /home/makaron8426/oikos
 mkdir -p hegemonikon-guide
 cd hegemonikon-guide
 npx -y create-vite@latest ./ --template vanilla

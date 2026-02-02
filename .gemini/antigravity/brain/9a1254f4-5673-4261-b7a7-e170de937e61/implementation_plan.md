@@ -77,7 +77,7 @@ q2_protection:
 
 ## 📝 Proposed Changes
 
-### [MODIFY] [pri.md](file:///home/laihuip001/oikos/.agent/workflows/pri.md)
+### [MODIFY] [pri.md](file:///home/makaron8426/oikos/.agent/workflows/pri.md)
 
 **変更内容:**
 
@@ -96,7 +96,7 @@ q2_protection:
 
 ---
 
-### [NEW] [classify.md](file:///home/laihuip001/oikos/.agent/workflows/classify.md)
+### [NEW] [classify.md](file:///home/makaron8426/oikos/.agent/workflows/classify.md)
 
 **新規ワークフロー `/classify`**
 

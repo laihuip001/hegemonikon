@@ -19,7 +19,7 @@ Anthropic × OpenAI 共同発表の「MCP Apps」正式版により、UI リソ�
 
 ### 適用先
 
-`/home/laihuip001/oikos/hegemonikon/mekhane/exagoge/`
+`/home/makaron8426/oikos/hegemonikon/mekhane/exagoge/`
 
 ### 設計
 
@@ -51,7 +51,7 @@ dependencies:
 
 ### 適用先
 
-`/home/laihuip001/oikos/hegemonikon/mekhane/ergasterion/`
+`/home/makaron8426/oikos/hegemonikon/mekhane/ergasterion/`
 
 ### 設計
 
@@ -85,7 +85,7 @@ dependencies:
 
 ### 適用先
 
-`/home/laihuip001/oikos/hegemonikon/mekhane/exagoge/`
+`/home/makaron8426/oikos/hegemonikon/mekhane/exagoge/`
 
 ### 設計
 
@@ -119,7 +119,7 @@ dependencies:
 
 ### 適用先
 
-`/home/laihuip001/oikos/hegemonikon/mekhane/anamnesis/`
+`/home/makaron8426/oikos/hegemonikon/mekhane/anamnesis/`
 
 ### 設計
 

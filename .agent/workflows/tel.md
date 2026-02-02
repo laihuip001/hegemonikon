@@ -316,12 +316,12 @@ ccl_signature: "/tel+?k3"
 
 ## Artifact 自動保存
 
-> **標準参照**: [workflow_artifact_standard.md](file:///home/laihuip001/oikos/.agent/standards/workflow_artifact_standard.md)
+> **標準参照**: [workflow_artifact_standard.md](file:///home/makaron8426/oikos/.agent/standards/workflow_artifact_standard.md)
 
 ### 保存先
 
 ```
-/home/laihuip001/oikos/mneme/.hegemonikon/workflows/tel_<topic>_<date>.md
+/home/makaron8426/oikos/mneme/.hegemonikon/workflows/tel_<topic>_<date>.md
 ```
 
 例: `tel_目的評価_20260129.md`

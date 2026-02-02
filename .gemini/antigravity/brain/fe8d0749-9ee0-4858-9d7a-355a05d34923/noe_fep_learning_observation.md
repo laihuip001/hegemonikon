@@ -396,7 +396,7 @@ H_human_ai_cocreation
 ### A-Matrix 保存確認
 
 ```
-ファイル: /home/laihuip001/oikos/mneme/.hegemonikon/fep/learned_A.npy
+ファイル: /home/makaron8426/oikos/mneme/.hegemonikon/fep/learned_A.npy
 サイズ: 859 bytes
 更新: 5回の推論で Dirichlet 更新を蓄積
 ```

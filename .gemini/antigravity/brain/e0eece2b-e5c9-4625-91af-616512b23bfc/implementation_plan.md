@@ -21,7 +21,7 @@
 
 #### [NEW] ccl_usage_examples.md
 
-`/home/laihuip001/oikos/hegemonikon/docs/ccl_usage_examples.md`
+`/home/makaron8426/oikos/hegemonikon/docs/ccl_usage_examples.md`
 
 CEP-001 新記号の使用例を文書化:
 
@@ -35,7 +35,7 @@ CEP-001 新記号の使用例を文書化:
 
 #### [NEW] n8n_boot_automation.json
 
-`/home/laihuip001/oikos/hegemonikon/mekhane/ergasterion/n8n/boot_automation.json`
+`/home/makaron8426/oikos/hegemonikon/mekhane/ergasterion/n8n/boot_automation.json`
 
 /boot の一部を n8n で自動化:
 
@@ -51,7 +51,7 @@ CEP-001 新記号の使用例を文書化:
 
 #### [MODIFY] dendron_ci.py
 
-`/home/laihuip001/oikos/hegemonikon/mekhane/dendron/dendron_ci.py`
+`/home/makaron8426/oikos/hegemonikon/mekhane/dendron/dendron_ci.py`
 
 既存の Dendron CI に PROOF チェックを追加:
 

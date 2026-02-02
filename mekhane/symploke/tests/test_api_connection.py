@@ -11,7 +11,7 @@ import sys
 import pytest
 
 # Add parent to path
-sys.path.insert(0, "/home/laihuip001/oikos/hegemonikon")
+sys.path.insert(0, "/home/makaron8426/oikos/hegemonikon")
 
 from mekhane.symploke.jules_client import JulesClient
 

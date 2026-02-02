@@ -125,7 +125,7 @@ antigravity --remote-debugging-port=9222
 エクスポートツール (`export_chats.py`) の実行には Playwright が必要。
 
 ```bash
-cd /home/laihuip001/oikos/hegemonikon
+cd /home/makaron8426/oikos/hegemonikon
 .venv/bin/pip install playwright
 .venv/bin/playwright install chromium
 ```
@@ -140,8 +140,8 @@ cd /home/laihuip001/oikos/hegemonikon
 .venv/bin/python mekhane/anamnesis/export_chats.py --watch
 ```
 
-📁 保存先: `/home/laihuip001/oikos/mneme/.hegemonikon/sessions/`
-(アクセス用シンボリックリンク: `/home/laihuip001/oikos/mneme/sessions/`)
+📁 保存先: `/home/makaron8426/oikos/mneme/.hegemonikon/sessions/`
+(アクセス用シンボリックリンク: `/home/makaron8426/oikos/mneme/sessions/`)
 
 #### 🛠️ トラブルシューティング & 修正済み (2026-01-31)
 
@@ -295,8 +295,8 @@ ISO 25010 (品質特性) と 3M (ムリ・ムダ・ムラ) 管理に基づく、
 1. **配置**: ワークフローの「正本」はプロジェクトルートの `.agent/workflows/` に配置する。
 2. **パス形式 (Linux/oikos)**:
     - 以前: `m:\Hegemonikon\...` (Windows)
-    - 現在: `/home/laihuip001/oikos/hegemonikon/` (Linux)
-    - 以降の全ファイル参照は **oikos root** (`/home/laihuip001/oikos/`) を基準とした絶対パスを使用する。
+    - 現在: `/home/makaron8426/oikos/hegemonikon/` (Linux)
+    - 以降の全ファイル参照は **oikos root** (`/home/makaron8426/oikos/`) を基準とした絶対パスを使用する。
 3. **理由**:
     - **透明性**: IDE の AI が submodule 内の深いパスよりもルートパスを優先して検知しやすい。
     - **衝突防止**: サブモジュール内の変更は `git diff` で見落とされやすく、誤って古いバージョンで上書きされるリスクを回避。
@@ -382,7 +382,7 @@ Antigravity IDE はワークフローやルールのファイルをキャッシ�
 
 Hegemonikón v3.2 から導入された、リポジトリ・コンテキストの厳格化とパスの固定による堅牢化シーケンス。
 
-1. **Phase 1: 正本読込 (Anti-Stale Protocol)**: `view_file /home/laihuip001/oikos/.agent/workflows/boot.md` を実行し、キャッシュではなく物理ファイルに基づいた起動を保証。
+1. **Phase 1: 正本読込 (Anti-Stale Protocol)**: `view_file /home/makaron8426/oikos/.agent/workflows/boot.md` を実行し、キャッシュではなく物理ファイルに基づいた起動を保証。
 2. **Phase 2: セッション状態確認**: 週次レビュー判定、最新 Handoff 読込、目的リマインド (`/bou`)、Drift（乖離）診断。
 3. **Phase 3: 知識物理読込 (Cognitive & Emotional)**:
     - **Sophia**: 内部知識のサマリー提示。
@@ -480,15 +480,15 @@ without verification is a **Precondition Violation**.
 - **原因2 (Context)**: Git コマンド等が、メタプロジェクト（`oikos`）のルートで実行され、対象サブモジュール（`hegemonikon`）の設定（remote origin 等）を読み込めていない。
 
 - **解決策**:
-    1. **フルパス指定**: ワークフロー内では `python` ではなく `/home/laihuip001/oikos/hegemonikon/.venv/bin/python` のようにフルパスでバイナリを指定する。
+    1. **フルパス指定**: ワークフロー内では `python` ではなく `/home/makaron8426/oikos/hegemonikon/.venv/bin/python` のようにフルパスでバイナリを指定する。
     2. **Repo Context Enforcement**: Git 操作やサブモジュール内のスクリプトを叩く際は、必ず `cd {path} && ...` を使用してカレントディレクトリを明示する。
     3. **PYTHONPATH設定**: 依存モジュールのインポートを確実にするため、環境変数を明示的に渡す。
 
   ```bash
   # 修正例 (v3.2 パターン)
-  cd /home/laihuip001/oikos/hegemonikon && \
-  PYTHONPATH=/home/laihuip001/oikos/hegemonikon \
-  /home/laihuip001/oikos/hegemonikon/.venv/bin/python -c "import pymdp; ..."
+  cd /home/makaron8426/oikos/hegemonikon && \
+  PYTHONPATH=/home/makaron8426/oikos/hegemonikon \
+  /home/makaron8426/oikos/hegemonikon/.venv/bin/python -c "import pymdp; ..."
   ```
 
 - **検証済み (2026-01-29)**: `boot.md` における FEP A行列および Jules レビューブランチ取得において、このパターンを適用することでインポートエラーと Git 参照エラーを解消。

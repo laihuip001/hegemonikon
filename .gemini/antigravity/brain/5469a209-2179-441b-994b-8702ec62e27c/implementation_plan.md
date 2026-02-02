@@ -50,7 +50,7 @@ X-series: `/x`, `/ax`
 
 ### 1. 統一標準ドキュメント
 
-**場所**: `/home/laihuip001/oikos/.agent/standards/workflow_artifact_standard.md`
+**場所**: `/home/makaron8426/oikos/.agent/standards/workflow_artifact_standard.md`
 
 **内容**:
 
@@ -107,7 +107,7 @@ session_id: "{conversation_id}"
 
 ### Phase 1: 標準ドキュメント作成
 
-#### [NEW] [workflow_artifact_standard.md](file:///home/laihuip001/oikos/.agent/standards/workflow_artifact_standard.md)
+#### [NEW] [workflow_artifact_standard.md](file:///home/makaron8426/oikos/.agent/standards/workflow_artifact_standard.md)
 
 統一標準を定義。全ワークフローから参照。
 

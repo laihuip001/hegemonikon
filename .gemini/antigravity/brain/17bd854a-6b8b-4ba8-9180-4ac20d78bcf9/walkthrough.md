@@ -92,7 +92,7 @@ class CCLSemanticValidator:
         # LLM で意図-CCL 整合性を評価
 ```
 
-→ **[implementation_plan.md](file:///home/laihuip001/oikos/.gemini/antigravity/brain/17bd854a-6b8b-4ba8-9180-4ac20d78bcf9/implementation_plan.md)** に詳細
+→ **[implementation_plan.md](file:///home/makaron8426/oikos/.gemini/antigravity/brain/17bd854a-6b8b-4ba8-9180-4ac20d78bcf9/implementation_plan.md)** に詳細
 
 ---
 

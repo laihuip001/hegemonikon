@@ -82,7 +82,7 @@ async def main():
             print(f'  Error: {result.get("error")}')
         await asyncio.sleep(0.3)
     Path(
-        "/home/laihuip001/oikos/hegemonikon/docs/specialist_run_results_v3.json"
+        "/home/makaron8426/oikos/hegemonikon/docs/specialist_run_results_v3.json"
     ).write_text(
         json.dumps(
             {"timestamp": datetime.now().isoformat(), "results": results},

@@ -177,7 +177,7 @@ S3 Stathmos（基準）← 評価基準
 ### 保存先
 
 ```
-/home/laihuip001/oikos/mneme/.hegemonikon/workflows/tak_<date>.md
+/home/makaron8426/oikos/mneme/.hegemonikon/workflows/tak_<date>.md
 ```
 
 ---

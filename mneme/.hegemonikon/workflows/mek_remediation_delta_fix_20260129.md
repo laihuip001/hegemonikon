@@ -81,7 +81,7 @@ LOCATION: /mneme/.hegemonikon/workflows/
 | **neg** | ἀπόφασις (apophasis) | 否定・却下 |
 | **epo** | ἐποχή (epochē) | 判断停止・保留 |
 
-**実装位置**: `/home/laihuip001/oikos/.agent/workflows/dia.md` frontmatter
+**実装位置**: `/home/makaron8426/oikos/.agent/workflows/dia.md` frontmatter
 
 ---
 
@@ -100,7 +100,7 @@ LOCATION: /mneme/.hegemonikon/workflows/
 | **sta** | S3 Stathmos | 基準・ベンチマーク |
 | **pra** | S4 Praxis | 実践・価値実現 |
 
-**実装位置**: `/home/laihuip001/oikos/.agent/workflows/s.md` frontmatter
+**実装位置**: `/home/makaron8426/oikos/.agent/workflows/s.md` frontmatter
 
 ---
 
@@ -108,15 +108,15 @@ LOCATION: /mneme/.hegemonikon/workflows/
 
 ```bash
 # Step 1: /dia 修復
-vim /home/laihuip001/oikos/.agent/workflows/dia.md
+vim /home/makaron8426/oikos/.agent/workflows/dia.md
 # frontmatter に追加: derivatives: [aff, neg, epo]
 
 # Step 2: /s 修復
-vim /home/laihuip001/oikos/.agent/workflows/s.md
+vim /home/makaron8426/oikos/.agent/workflows/s.md
 # frontmatter に追加: derivatives: [met, mek, sta, pra]
 
 # Step 3: 検証
-grep "derivatives:" /home/laihuip001/oikos/.agent/workflows/{dia,s}.md
+grep "derivatives:" /home/makaron8426/oikos/.agent/workflows/{dia,s}.md
 ```
 
 ---

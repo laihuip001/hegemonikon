@@ -37,7 +37,7 @@ $ ls -la .agent/skills/utils/tekhne-maker
 lrwxrwxrwx tekhne-maker -> ../../../hegemonikon/mekhane/ergasterion/tekhne
 
 $ readlink -f .agent/skills/utils/tekhne-maker
-/home/laihuip001/oikos/hegemonikon/mekhane/ergasterion/tekhne
+/home/makaron8426/oikos/hegemonikon/mekhane/ergasterion/tekhne
 
 $ cat .agent/skills/utils/tekhne-maker/SKILL.md | head -5
 ---

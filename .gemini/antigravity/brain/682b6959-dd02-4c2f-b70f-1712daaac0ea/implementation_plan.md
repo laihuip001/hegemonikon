@@ -67,7 +67,7 @@ Goal: Hegemonikón Mode 実装
 
 #### [MODIFY] SKILL.md
 
-**Path**: `/home/laihuip001/oikos/hegemonikon/mekhane/ergasterion/tekhne/SKILL.md`
+**Path**: `/home/makaron8426/oikos/hegemonikon/mekhane/ergasterion/tekhne/SKILL.md`
 
 追加内容:
 
@@ -115,7 +115,7 @@ Utils は「暫定カテゴリ」。以下の場合のみ許可:
 
 #### [MODIFY] /tek.md
 
-**Path**: `/home/laihuip001/oikos/.agent/workflows/tek.md`
+**Path**: `/home/makaron8426/oikos/.agent/workflows/tek.md`
 
 追加内容:
 

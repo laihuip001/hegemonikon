@@ -37,7 +37,7 @@ ccl_signature: "/euk?k1"
 
 # /euk: 好機判定ワークフロー (Eukairia)
 
-> **正本参照**: [K1 Eukairia SKILL.md](file:///home/laihuip001/oikos/.agent/skills/kairos/k1-eukairia/SKILL.md)
+> **正本参照**: [K1 Eukairia SKILL.md](file:///home/makaron8426/oikos/.agent/skills/kairos/k1-eukairia/SKILL.md)
 > **目的**: 「今がチャンスか」を判定する — 好機の見極め
 > **役割**: タイミング判断と機会評価
 
@@ -290,12 +290,12 @@ ccl_signature: "/euk?k1"
 
 ## Artifact 自動保存
 
-> **標準参照**: [workflow_artifact_standard.md](file:///home/laihuip001/oikos/.agent/standards/workflow_artifact_standard.md)
+> **標準参照**: [workflow_artifact_standard.md](file:///home/makaron8426/oikos/.agent/standards/workflow_artifact_standard.md)
 
 ### 保存先
 
 ```
-/home/laihuip001/oikos/mneme/.hegemonikon/workflows/euk_<topic>_<date>.md
+/home/makaron8426/oikos/mneme/.hegemonikon/workflows/euk_<topic>_<date>.md
 ```
 
 例: `euk_タイミング判定_20260129.md`
@@ -321,7 +321,7 @@ ccl_signature: "/euk?k1"
 
 | Module | Workflow | Skill (正本) | Status |
 |:-------|:---------|:-------------|:-------|
-| K1 Eukairia | /euk | [SKILL.md](file:///home/laihuip001/oikos/.agent/skills/kairos/k1-eukairia/SKILL.md) | v1.0 Ready |
+| K1 Eukairia | /euk | [SKILL.md](file:///home/makaron8426/oikos/.agent/skills/kairos/k1-eukairia/SKILL.md) | v1.0 Ready |
 
 ---
 

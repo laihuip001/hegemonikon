@@ -17,7 +17,7 @@ L3 Token   │ Cell 13   │ Cell 14    │ Cell 15    │ Cell 16   │
 
 ## Phase 1: Surface Layer (完成度: 50%)
 
-### [MODIFY] [checker.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/dendron/checker.py)
+### [MODIFY] [checker.py](file:///home/makaron8426/oikos/hegemonikon/mekhane/dendron/checker.py)
 
 | Cell | 実装 | 説明 |
 |------|------|------|
@@ -53,7 +53,7 @@ def check_token_proof(self, path: Path) -> list[TokenProof]:
 
 ## Phase 2: Structural Layer (依存解析)
 
-### [NEW] [structural.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/dendron/structural.py)
+### [NEW] [structural.py](file:///home/makaron8426/oikos/hegemonikon/mekhane/dendron/structural.py)
 
 | Cell | 実装 | 説明 |
 |------|------|------|
@@ -99,7 +99,7 @@ class StructuralAnalyzer:
 
 ## Phase 3: Functional Layer (冗長性検出)
 
-### [NEW] [functional.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/dendron/functional.py)
+### [NEW] [functional.py](file:///home/makaron8426/oikos/hegemonikon/mekhane/dendron/functional.py)
 
 | Cell | 実装 | 説明 |
 |------|------|------|
@@ -137,7 +137,7 @@ class FunctionalAnalyzer:
 
 ## Phase 4: Empirical Layer (削除実験)
 
-### [NEW] [empirical.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/dendron/empirical.py)
+### [NEW] [empirical.py](file:///home/makaron8426/oikos/hegemonikon/mekhane/dendron/empirical.py)
 
 | Cell | 実装 | 説明 |
 |------|------|------|
@@ -169,7 +169,7 @@ class EmpiricalAnalyzer:
 
 ## Phase 5: CLI 統合
 
-### [MODIFY] [cli.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/dendron/cli.py)
+### [MODIFY] [cli.py](file:///home/makaron8426/oikos/hegemonikon/mekhane/dendron/cli.py)
 
 ```bash
 # 新コマンド

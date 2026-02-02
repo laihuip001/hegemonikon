@@ -21,15 +21,15 @@
 
 | ファイル | Phase | 人数 |
 |---------|-------|------|
-| [phase0_specialists.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/symploke/phase0_specialists.py) | 0 | 255 |
-| [specialist_prompts.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/symploke/specialist_prompts.py) | 1 | 91 |
-| [phase2_specialists.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/symploke/phase2_specialists.py) | 2前半 | 170 |
-| [phase2_remaining.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/symploke/phase2_remaining.py) | 2後半 | 120 |
-| [phase3_specialists.py](file:///home/laihuip001/oikos/hegemonikon/mekhane/symploke/phase3_specialists.py) | 3 | 230 |
+| [phase0_specialists.py](file:///home/makaron8426/oikos/hegemonikon/mekhane/symploke/phase0_specialists.py) | 0 | 255 |
+| [specialist_prompts.py](file:///home/makaron8426/oikos/hegemonikon/mekhane/symploke/specialist_prompts.py) | 1 | 91 |
+| [phase2_specialists.py](file:///home/makaron8426/oikos/hegemonikon/mekhane/symploke/phase2_specialists.py) | 2前半 | 170 |
+| [phase2_remaining.py](file:///home/makaron8426/oikos/hegemonikon/mekhane/symploke/phase2_remaining.py) | 2後半 | 120 |
+| [phase3_specialists.py](file:///home/makaron8426/oikos/hegemonikon/mekhane/symploke/phase3_specialists.py) | 3 | 230 |
 
 ### 更新ドキュメント
 
-- [jules-specialists-catalog.md](file:///home/laihuip001/oikos/hegemonikon/docs/jules-specialists-catalog.md) - v4 (Synedrion命名)
+- [jules-specialists-catalog.md](file:///home/makaron8426/oikos/hegemonikon/docs/jules-specialists-catalog.md) - v4 (Synedrion命名)
 
 ---
 
@@ -55,7 +55,7 @@ transfer: 40          theory_ext: 20      qa: 30
 - **対象**: Phase 1 + Phase 2 の最初の30人
 - **結果**: 28/30 成功
 - **失敗**: CL-002, CL-003 (空レスポンス - 一時的エラー)
-- **結果ファイル**: [pilot_test_30.json](file:///home/laihuip001/oikos/hegemonikon/docs/reviews/pilot_test_30.json)
+- **結果ファイル**: [pilot_test_30.json](file:///home/makaron8426/oikos/hegemonikon/docs/reviews/pilot_test_30.json)
 
 ---
 

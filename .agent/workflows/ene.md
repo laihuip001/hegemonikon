@@ -39,7 +39,7 @@ sel_enforcement:
 
 # /ene: 行為ワークフロー (Energeia) v4.3
 
-> **正本参照**: [O4 Energeia SKILL.md](file:///home/laihuip001/oikos/.agent/skills/ousia/o4-energeia/SKILL.md)
+> **正本参照**: [O4 Energeia SKILL.md](file:///home/makaron8426/oikos/.agent/skills/ousia/o4-energeia/SKILL.md)
 > **目的**: 意志を現実に具現化する — 思考を行動に変換する
 > **発動条件**: 計画が承認された時、意志が明確になった時
 
@@ -286,7 +286,7 @@ result = select_derivative("O4", problem_context)
 ```
 実行手順:
 1. view_file ツールで SKILL.md を読み込む
-   パス: /home/laihuip001/oikos/.agent/skills/ousia/o4-energeia/SKILL.md
+   パス: /home/makaron8426/oikos/.agent/skills/ousia/o4-energeia/SKILL.md
 2. Anti-Skip Protocol セクションを確認
 3. 各 PHASE の出力形式を確認
 4. 確認後、処理を開始
@@ -916,12 +916,12 @@ O4 Energeia（行為）← /ene
 
 ## Artifact 自動保存
 
-> **標準参照**: [workflow_artifact_standard.md](file:///home/laihuip001/oikos/.agent/standards/workflow_artifact_standard.md)
+> **標準参照**: [workflow_artifact_standard.md](file:///home/makaron8426/oikos/.agent/standards/workflow_artifact_standard.md)
 
 ### 保存先
 
 ```
-/home/laihuip001/oikos/mneme/.hegemonikon/workflows/ene_<task>_<date>.md
+/home/makaron8426/oikos/mneme/.hegemonikon/workflows/ene_<task>_<date>.md
 ```
 
 例: `ene_implement_auth_flow_20260129.md`
@@ -950,7 +950,7 @@ O4 Energeia（行為）← /ene
 
 | Module | Workflow | Skill (正本) | Status |
 | :------ | :-------- |--------------| :------ |
-| O4 Energeia | /ene | [SKILL.md](file:///home/laihuip001/oikos/.agent/skills/ousia/o4-energeia/SKILL.md) | v3.0 Ready |
+| O4 Energeia | /ene | [SKILL.md](file:///home/makaron8426/oikos/.agent/skills/ousia/o4-energeia/SKILL.md) | v3.0 Ready |
 
 ---
 

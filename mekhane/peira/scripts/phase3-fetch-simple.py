@@ -116,10 +116,10 @@ def extract_markdown(soup):
     return h2t.handle(str(article))
 
 
-def fetch_article(url):
+def fetch_article(session, url):
     """Fetch and parse a single article."""
     try:
-        response = requests.get(url, headers=HEADERS, timeout=10)
+        response = session.get(url, timeout=10)
 
         if response.status_code == 404:
             return None, "404 Not Found"
@@ -156,17 +156,20 @@ def main():
     articles = []
     skipped = []
 
-    for i, url in enumerate(urls, 1):
-        print(f"[Batch {batch_id}] [{i}/{len(urls)}] Fetching: {url}")
+    with requests.Session() as session:
+        session.headers.update(HEADERS)
 
-        article, error = fetch_article(url)
+        for i, url in enumerate(urls, 1):
+            print(f"[Batch {batch_id}] [{i}/{len(urls)}] Fetching: {url}")
 
-        if error:
-            print(f"  -> SKIPPED: {error}")
-            skipped.append(f"{url}\t{error}")
-        else:
-            print(f"  -> OK: {article['title'][:50]}...")
-            articles.append(article)
+            article, error = fetch_article(session, url)
+
+            if error:
+                print(f"  -> SKIPPED: {error}")
+                skipped.append(f"{url}\t{error}")
+            else:
+                print(f"  -> OK: {article['title'][:50]}...")
+                articles.append(article)
 
         # Rate limiting
         if i < len(urls):

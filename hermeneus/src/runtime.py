@@ -12,6 +12,7 @@ import os
 import re
 import json
 import asyncio
+from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional, Union
 from enum import Enum
@@ -134,7 +135,20 @@ class LMQLExecutor:
         variables: Optional[Dict[str, Any]] = None
     ) -> ExecutionResult:
         """LMQL プログラムを同期実行"""
-        return asyncio.run(self.execute_async(lmql_code, context, variables))
+        try:
+            loop = asyncio.get_running_loop()
+        except RuntimeError:
+            loop = None
+
+        if loop and loop.is_running():
+            # 非同期コンテキストから呼ばれた場合は、別スレッドで実行してクラッシュを回避
+            with ThreadPoolExecutor(max_workers=1) as pool:
+                return pool.submit(
+                    asyncio.run,
+                    self.execute_async(lmql_code, context, variables)
+                ).result()
+        else:
+            return asyncio.run(self.execute_async(lmql_code, context, variables))
     
     async def _execute_with_lmql(
         self,
@@ -482,29 +496,14 @@ class ConvergenceExecutor:
 # High-Level API
 # =============================================================================
 
-def execute_ccl(
+async def execute_ccl_async(
     ccl: str,
     context: str = "",
     model: str = "openai/gpt-4o",
     macros: Optional[Dict[str, str]] = None,
     **kwargs
 ) -> ExecutionResult:
-    """CCL 式をコンパイルして実行
-    
-    Args:
-        ccl: CCL 式 (例: "/noe+ >> V[] < 0.3")
-        context: 入力コンテキスト
-        model: 使用する LLM モデル
-        macros: マクロ定義
-        **kwargs: ExecutionConfig に渡す追加設定
-        
-    Returns:
-        ExecutionResult
-        
-    Example:
-        >>> result = execute_ccl("/noe+", "プロジェクト設計を分析")
-        >>> print(result.output)
-    """
+    """CCL 式をコンパイルして非同期実行"""
     # 遅延インポート (循環参照回避)
     from . import compile_ccl
     from .parser import parse_ccl
@@ -522,16 +521,55 @@ def execute_ccl(
         ast = parse_ccl(ccl)
         if isinstance(ast, ConvergenceLoop):
             conv_executor = ConvergenceExecutor(executor)
-            return asyncio.run(conv_executor.execute_convergence(
+            return await conv_executor.execute_convergence(
                 lmql_code,
                 context,
                 condition_var=ast.condition.var,
                 condition_op=ast.condition.op,
                 condition_value=ast.condition.value,
                 max_iterations=config.max_iterations
-            ))
+            )
     except Exception:
         pass  # パース失敗時は通常実行
     
     # 通常実行
-    return executor.execute(lmql_code, context)
+    return await executor.execute_async(lmql_code, context)
+
+
+def execute_ccl(
+    ccl: str,
+    context: str = "",
+    model: str = "openai/gpt-4o",
+    macros: Optional[Dict[str, str]] = None,
+    **kwargs
+) -> ExecutionResult:
+    """CCL 式をコンパイルして実行
+
+    Args:
+        ccl: CCL 式 (例: "/noe+ >> V[] < 0.3")
+        context: 入力コンテキスト
+        model: 使用する LLM モデル
+        macros: マクロ定義
+        **kwargs: ExecutionConfig に渡す追加設定
+
+    Returns:
+        ExecutionResult
+
+    Example:
+        >>> result = execute_ccl("/noe+", "プロジェクト設計を分析")
+        >>> print(result.output)
+    """
+    try:
+        loop = asyncio.get_running_loop()
+    except RuntimeError:
+        loop = None
+
+    if loop and loop.is_running():
+        # 非同期コンテキストから呼ばれた場合は、別スレッドで実行してクラッシュを回避
+        with ThreadPoolExecutor(max_workers=1) as pool:
+            return pool.submit(
+                asyncio.run,
+                execute_ccl_async(ccl, context, model, macros, **kwargs)
+            ).result()
+    else:
+        return asyncio.run(execute_ccl_async(ccl, context, model, macros, **kwargs))

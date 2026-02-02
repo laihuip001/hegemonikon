@@ -14,6 +14,8 @@ from unittest.mock import AsyncMock, MagicMock, patch
 import sys
 from pathlib import Path
 
+from aioresponses import aioresponses
+
 sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent))
 
 from mekhane.symploke.jules_client import (
@@ -92,11 +94,36 @@ class TestCreateSession:
     """Test create_session method with mocks."""
 
     @pytest.mark.asyncio
-    @pytest.mark.skip(reason="Requires aioresponses for proper async mocking")
     async def test_create_session_success(self):
         """Test successful session creation."""
-        # TODO: Use aioresponses for proper async HTTP mocking
-        pass
+        client = JulesClient(api_key="test-key")
+        prompt = "Fix bug"
+        source = "sources/github/owner/repo"
+
+        # Mock response from API
+        mock_response = {
+            "id": "session-123",
+            "name": "sessions/session-123",
+            "state": "PLANNING",
+        }
+
+        with aioresponses() as m:
+            m.post(
+                f"{client.BASE_URL}/sessions",
+                payload=mock_response,
+                status=200
+            )
+
+            session = await client.create_session(
+                prompt=prompt,
+                source=source,
+                branch="main"
+            )
+
+            assert session.id == "session-123"
+            assert session.state == SessionState.PLANNING
+            assert session.prompt == prompt
+            assert session.source == source
 
 
 class TestBatchExecute:

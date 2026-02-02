@@ -196,10 +196,13 @@ def get_boot_handoffs(mode: str = "standard", context: str = None) -> dict:
 
     # 関連会話ログ検索 (Kairos Index を使用)
     conversations = []
+    conversation_adapter = None
+
     if conv_count > 0 and CONVERSATION_INDEX_PATH.exists():
         try:
             adapter = EmbeddingAdapter(model_name="all-MiniLM-L6-v2")
             adapter.load(str(CONVERSATION_INDEX_PATH))
+            conversation_adapter = adapter
             query_vec = adapter.encode([query])[0]
             results = adapter.search(query_vec, k=conv_count)
 
@@ -223,8 +226,13 @@ def get_boot_handoffs(mode: str = "standard", context: str = None) -> dict:
         if keywords and CONVERSATION_INDEX_PATH.exists():
             try:
                 proactive_query = " ".join(keywords[:3])
-                adapter = EmbeddingAdapter(model_name="all-MiniLM-L6-v2")
-                adapter.load(str(CONVERSATION_INDEX_PATH))
+
+                if conversation_adapter:
+                    adapter = conversation_adapter
+                else:
+                    adapter = EmbeddingAdapter(model_name="all-MiniLM-L6-v2")
+                    adapter.load(str(CONVERSATION_INDEX_PATH))
+
                 query_vec = adapter.encode([proactive_query])[0]
                 results = adapter.search(query_vec, k=3)
 

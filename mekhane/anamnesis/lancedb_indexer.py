@@ -19,7 +19,7 @@ LanceDB にインデックスし、全文検索・ベクトル検索を可能に
 
 import re
 from pathlib import Path
-from typing import List, Optional
+from typing import List, Optional, Iterator
 
 import lancedb
 from pydantic import BaseModel
@@ -125,6 +125,22 @@ def parse_session_file(filepath: Path) -> Optional[SessionDocument]:
         return None
 
 
+def generate_session_batches(session_files: List[Path], batch_size: int = 100) -> Iterator[List[dict]]:
+    """Generates batches of session documents."""
+    batch = []
+    for filepath in session_files:
+        doc = parse_session_file(filepath)
+        if doc and len(doc.content) > 50:
+            batch.append(doc.model_dump())
+
+        if len(batch) >= batch_size:
+            yield batch
+            batch = []
+
+    if batch:
+        yield batch
+
+
 def index_sessions():
     """全セッションファイルをインデックス"""
     print("[*] LanceDB Session Indexer")
@@ -139,17 +155,7 @@ def index_sessions():
     session_files = list(SESSIONS_DIR.glob("*.md"))
     print(f"[*] Found {len(session_files)} session files")
 
-    # ドキュメントを作成
-    documents: List[SessionDocument] = []
-
-    for filepath in session_files:
-        doc = parse_session_file(filepath)
-        if doc and len(doc.content) > 50:
-            documents.append(doc)
-
-    print(f"[*] Parsed {len(documents)} valid documents")
-
-    if not documents:
+    if not session_files:
         print("[!] No documents to index")
         return
 
@@ -158,12 +164,17 @@ def index_sessions():
         db.drop_table(TABLE_NAME)
         print(f"[*] Dropped existing table: {TABLE_NAME}")
 
-    # ドキュメントを辞書に変換
-    data = [doc.model_dump() for doc in documents]
+    # Generator for batch processing
+    data_gen = generate_session_batches(session_files)
 
     # テーブル作成
-    table = db.create_table(TABLE_NAME, data)
-    print(f"[✓] Created table: {TABLE_NAME} ({len(documents)} rows)")
+    try:
+        # Note: We rely on data inference and do not pass schema to avoid pydantic v2 issues
+        table = db.create_table(TABLE_NAME, data_gen)
+        print(f"[✓] Created table: {TABLE_NAME} ({table.count_rows()} rows)")
+    except Exception as e:
+        print(f"[!] Failed to create table: {e}")
+        return db, None
 
     # Full-Text Search インデックスを作成
     try:

@@ -1,3 +1,9 @@
 {
-    "claudeCode.useTerminal": true
+    "claudeCode.useTerminal": true,
+    "geminicodeassist.project": "project-d6289e33-98ef-4fe8-8d1",
+    "github-actions.workflows.pinned.workflows": [
+        ".github/workflows/dendron.yml",
+        ".github/workflows/jules-scheduled-tasks.yml",
+        ".github/workflows/quality-review.yml"
+    ]
 }

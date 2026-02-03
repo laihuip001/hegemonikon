@@ -1,0 +1,41 @@
+# Jules Account Pool Configuration
+# 6アカウント、最大3同時使用、ローテーション
+
+version: "1.0"
+max_concurrent: 3
+
+accounts:
+  - id: jules_01
+    email: "makaron8426@gmail.com"
+    status: inactive
+    config_dir: ~/.jules/accounts/01
+    
+  - id: jules_02
+    email: "movement8426@gmail.com"
+    status: inactive
+    config_dir: ~/.jules/accounts/02
+    
+  - id: jules_03
+    email: "laihuip001@gmail.com"
+    status: inactive
+    config_dir: ~/.jules/accounts/03
+    
+  - id: jules_04
+    email: "h.raiki.biz@gmail.com"
+    status: inactive
+    config_dir: ~/.jules/accounts/04
+    
+  - id: jules_05
+    email: "t84432036@gmail.com"
+    status: inactive
+    config_dir: ~/.jules/accounts/05
+    
+  - id: jules_06
+    email: "rairaixoxoxo@gmail.com"
+    status: inactive
+    config_dir: ~/.jules/accounts/06
+
+rotation:
+  strategy: round_robin
+  cooldown_minutes: 5
+  max_sessions_per_account: 10

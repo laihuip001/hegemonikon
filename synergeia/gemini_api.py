@@ -25,7 +25,7 @@ from pathlib import Path
 VENV_PATH = Path("/home/makaron8426/oikos/hegemonikon/.venv/lib/python3.11/site-packages")
 sys.path.insert(0, str(VENV_PATH))
 
-import google.generativeai as genai
+from google import genai
 
 USAGE_FILE = Path(__file__).parent / "gemini_usage.json"
 DEFAULT_MODEL = "gemini-2.0-flash-exp"
@@ -85,7 +85,7 @@ def query(
         dict with answer, model, timestamp, and optionally structured_output
     """
     api_key = get_api_key()
-    genai.configure(api_key=api_key)
+    client = genai.Client(api_key=api_key)
     
     # Configure generation with optional schema
     generation_config = {}
@@ -93,15 +93,12 @@ def query(
         generation_config["response_mime_type"] = "application/json"
         generation_config["response_schema"] = response_schema
     
-    model_instance = genai.GenerativeModel(
-        model,
-        generation_config=generation_config if generation_config else None
-    )
-    
     try:
-        response = model_instance.generate_content(
-            prompt,
-            request_options={"timeout": timeout}
+        config = genai.types.GenerateContentConfig(**generation_config) if generation_config else None
+        response = client.models.generate_content(
+            model=model,
+            contents=prompt,
+            config=config
         )
         answer = response.text
         

@@ -802,6 +802,33 @@ cd /home/makaron8426/oikos/hegemonikon && git branch -a | grep jules-review | ta
 - {重大度: Critical/High の発見事項を要約}
 ```
 
+**バッチ実行結果 (API経由)**:
+
+```bash
+cd /home/makaron8426/oikos/hegemonikon && \
+PYTHONPATH=/home/makaron8426/oikos/hegemonikon \
+/home/makaron8426/oikos/hegemonikon/.venv/bin/python -c "
+from mekhane.symploke.jules_results_loader import load_latest_results, summarize_findings
+results = load_latest_results()
+print(summarize_findings(results))
+"
+```
+
+**出力形式 (バッチ結果がある場合)**:
+
+```text
+🔍 Jules 専門家レビュー結果
+| 項目 | 値 |
+|:-----|:---|
+| 日時 | 2026-02-03T10:00:00 |
+| 対象 | `mekhane/symploke/jules_client.py` |
+| 専門家数 | 91 |
+| 開始済み | 85 |
+| 失敗 | 6 |
+
+→ Critical/High 発見事項がある場合は優先的に対処
+```
+
 ---
 
 ### Phase 6: 完了

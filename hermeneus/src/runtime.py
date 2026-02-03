@@ -274,23 +274,27 @@ class LMQLExecutor:
         )
     
     async def _execute_google(self, prompt: str, api_key: str) -> ExecutionResult:
-        """Google Gemini API 呼び出し"""
+        """Google Gemini API 呼び出し (google.genai SDK)"""
         try:
-            import google.generativeai as genai
+            from google import genai
         except ImportError:
             return ExecutionResult(
                 status=ExecutionStatus.ERROR,
                 output="",
-                error="google-generativeai not installed. Run: pip install google-generativeai"
+                error="google-genai not installed. Run: pip install google-genai"
             )
         
-        genai.configure(api_key=api_key)
-        model = genai.GenerativeModel("gemini-3-pro-preview")
+        client = genai.Client(api_key=api_key)
+        model_name = "gemini-2.5-pro-preview-05-06"
         
         for attempt in range(self.config.max_retries):
             try:
                 response = await asyncio.wait_for(
-                    asyncio.to_thread(model.generate_content, prompt),
+                    asyncio.to_thread(
+                        client.models.generate_content,
+                        model=model_name,
+                        contents=prompt
+                    ),
                     timeout=self.config.timeout
                 )
                 
@@ -300,7 +304,7 @@ class LMQLExecutor:
                     output=output,
                     metadata={
                         "provider": "google",
-                        "model": "gemini-3-pro-preview",
+                        "model": model_name,
                         "attempt": attempt + 1,
                         "fallback": True
                     }

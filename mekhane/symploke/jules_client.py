@@ -23,6 +23,7 @@ import logging
 import os
 import time
 import uuid
+import random  # AI-022: Thundering Herd 対策用
 from dataclasses import dataclass, field
 from enum import Enum
 from typing import Optional
@@ -193,7 +194,9 @@ def with_retry(
                         f"Retry {attempt + 1}/{max_attempts} for {func.__name__}: "
                         f"{e}. Waiting {wait_time:.1f}s"
                     )
-                    await asyncio.sleep(wait_time)
+                    # AI-022 fix: Add jitter (0-25% of wait_time) to prevent thundering herd
+                    jitter = wait_time * random.uniform(0, 0.25)
+                    await asyncio.sleep(wait_time + jitter)
                     delay *= backoff_factor
 
             raise last_exception  # Should not reach here
@@ -556,23 +559,31 @@ class JulesClient:
             semaphore = asyncio.Semaphore(limit)
 
         async def bounded_execute(task: dict) -> JulesResult:
+            # AI-022 fix: Track session ID before polling to prevent zombie sessions
+            created_session_id: str | None = None
+            
             async with semaphore:
                 try:
-                    session = await self.create_and_poll(
+                    # First create the session to get the real ID
+                    session = await self.create_session(
                         prompt=task["prompt"],
                         source=task["source"],
                         branch=task.get("branch", "main"),
                     )
-                    return JulesResult(session=session, task=task)
+                    created_session_id = session.id  # Preserve real session ID
+                    
+                    # Then poll - if this fails, we still have the real ID
+                    final_session = await self.poll_session(session.id)
+                    return JulesResult(session=final_session, task=task)
                 except Exception as e:
-                    # Note: Python 3.8+ handles CancelledError as BaseException,
-                    # so it properly propagates and allows cancellation (as-003 review)
-                    # Return failed session with traceable ID and error type
-                    error_id = f"error-{uuid.uuid4().hex[:8]}"
-                    logger.error(f"Task failed [{error_id}]: {type(e).__name__}: {e}")
+                    # AI-022 fix: Preserve real session ID if available, for tracking/cleanup
+                    session_id = created_session_id or f"error-{uuid.uuid4().hex[:8]}"
+                    logger.error(
+                        f"Task failed [session={session_id}]: {type(e).__name__}: {e}"
+                    )
                     return JulesResult(
                         session=JulesSession(
-                            id=error_id,
+                            id=session_id,  # Use real session ID when available
                             name="",
                             state=SessionState.FAILED,
                             prompt=task["prompt"],
@@ -581,7 +592,7 @@ class JulesClient:
                             error_type=type(e).__name__,
                         ),
                         error=e,
-                        # NOTE: Removed self-assignment: task = task
+                        task=task,
                     )
 
         results = await asyncio.gather(*[bounded_execute(task) for task in tasks])

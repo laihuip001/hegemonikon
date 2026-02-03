@@ -1,0 +1,35 @@
+{
+  "accounts": {
+    "jules_01": {
+      "status": "active",
+      "sessions_count": 0,
+      "last_used": null
+    },
+    "jules_02": {
+      "status": "active",
+      "sessions_count": 0,
+      "last_used": null
+    },
+    "jules_03": {
+      "status": "active",
+      "sessions_count": 0,
+      "last_used": null
+    },
+    "jules_04": {
+      "status": "active",
+      "sessions_count": 0,
+      "last_used": null
+    },
+    "jules_05": {
+      "status": "active",
+      "sessions_count": 0,
+      "last_used": null
+    },
+    "jules_06": {
+      "status": "active",
+      "sessions_count": 0,
+      "last_used": null
+    }
+  },
+  "updated": "2026-02-03T00:27:28.152771"
+}

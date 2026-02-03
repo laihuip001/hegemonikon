@@ -55,6 +55,67 @@ server = Server(
 )
 log("Server initialized")
 
+# ============ API Key Pool (18 keys across 6 accounts, load-balanced) ============
+_api_key_pool = []
+_api_key_index = 0
+_dashboard = None
+
+def init_api_key_pool():
+    """Load API keys from environment (JULES_API_KEY_01 to JULES_API_KEY_18)."""
+    global _api_key_pool, _dashboard
+    for i in range(1, 19):  # 01 to 18
+        key_name = f"JULES_API_KEY_{i:02d}"
+        key = os.environ.get(key_name)
+        if key:
+            _api_key_pool.append((i, key))  # Store index with key
+            log(f"Loaded {key_name}")
+    log(f"API Key Pool: {len(_api_key_pool)} keys loaded")
+    
+    # Initialize dashboard for usage tracking
+    try:
+        sys.path.insert(0, str(Path(__file__).parent.parent.parent / "synergeia"))
+        from jules_dashboard import JulesDashboard
+        _dashboard = JulesDashboard()
+        log("Dashboard initialized for usage tracking")
+    except ImportError:
+        log("Dashboard not available, usage tracking disabled")
+
+def get_next_api_key():
+    """Get next API key using load-balanced selection (least-used account)."""
+    global _api_key_index, _dashboard
+    if not _api_key_pool:
+        init_api_key_pool()
+    if not _api_key_pool:
+        return None, 0
+    
+    # Try load-balanced selection if dashboard available
+    if _dashboard:
+        try:
+            _, best_key_index = _dashboard.get_best_account()
+            # Find key with this index
+            for idx, key in _api_key_pool:
+                if idx == best_key_index:
+                    log(f"Using least-used key index {idx}")
+                    return key, idx
+        except Exception as e:
+            log(f"Load-balance failed, falling back to round-robin: {e}")
+    
+    # Fallback to round-robin
+    idx, key = _api_key_pool[_api_key_index % len(_api_key_pool)]
+    _api_key_index += 1
+    log(f"Using API key index {idx} (round-robin)")
+    return key, idx
+
+def record_usage(key_index: int, session_id: str):
+    """Record usage to dashboard."""
+    global _dashboard
+    if _dashboard:
+        try:
+            _dashboard.record_usage(key_index, session_id)
+            log(f"Recorded usage for key {key_index}, session {session_id}")
+        except Exception as e:
+            log(f"Failed to record usage: {e}")
+
 
 @server.list_tools()
 async def list_tools():
@@ -147,12 +208,12 @@ async def call_tool(name: str, arguments: dict):
             TextContent(type="text", text=f"Error: Jules client not available: {e}")
         ]
 
-    # Get API key from environment
-    api_key = os.environ.get("JULES_API_KEY")
+    # Get API key from pool (18 keys across 6 accounts, load-balanced)
+    api_key, key_index = get_next_api_key()
     if not api_key:
         return [
             TextContent(
-                type="text", text="Error: JULES_API_KEY environment variable not set"
+                type="text", text="Error: No JULES_API_KEY_XX environment variables set"
             )
         ]
 
@@ -175,6 +236,9 @@ async def call_tool(name: str, arguments: dict):
         try:
             source = f"sources/github/{repo}"
             session = await client.create_session(prompt, source, branch)
+            
+            # Record usage
+            record_usage(key_index, session.id)
 
             output = f"""# Jules Task Created
 
@@ -182,6 +246,7 @@ async def call_tool(name: str, arguments: dict):
 - **State**: {session.state.value}
 - **Repository**: {repo}
 - **Branch**: {branch}
+- **Account**: Key #{key_index} (auto-balanced)
 
 Use `jules_get_status` with session_id to check progress.
 """

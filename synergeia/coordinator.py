@@ -81,10 +81,10 @@ THREAD_REGISTRY = {
         "executor": "api",
         "priority": 5,
     },
-    "claude": {
-        "name": "Claude CLI",
-        "supported_ccl": ["/s", "/mek"],
-        "executor": "cli",
+    "jules": {
+        "name": "Jules Pool",
+        "supported_ccl": ["/s", "/mek", "/ene"],
+        "executor": "api",
         "priority": 5,
     },
     "gemini": {
@@ -95,7 +95,7 @@ THREAD_REGISTRY = {
     },
     "codex": {
         "name": "OpenAI Codex",
-        "supported_ccl": ["/ene", "/pra"],  # 実行系
+        "supported_ccl": ["/pra"],  # 実行系（/eneはJulesに移行）
         "executor": "cli",
         "priority": 5,
     },
@@ -169,34 +169,31 @@ def execute_perplexity(ccl: str, context: str) -> Dict[str, Any]:
     }
 
 
-def execute_claude(ccl: str, context: str) -> Dict[str, Any]:
-    """Claude CLI でCCLを実行。"""
-    import subprocess
-    
-    prompt = f"{context}\n\nExecute CCL: {ccl}\n\nProvide a detailed response."
-    
+def execute_jules(ccl: str, context: str) -> Dict[str, Any]:
+    """Jules Pool でCCLを実行。"""
     try:
-        result = subprocess.run(
-            [CLAUDE_CLI, "-p", prompt],
-            capture_output=True,
-            text=True,
-            timeout=600,  # 最大10分
-            cwd="/home/makaron8426/oikos/hegemonikon"
-        )
-        answer = result.stdout.strip()
-        if result.returncode != 0:
-            return {"status": "error", "error": result.stderr, "ccl": ccl}
-    except subprocess.TimeoutExpired:
-        return {"status": "error", "error": "Timeout (120s)", "ccl": ccl}
+        from synergeia.jules_api import JulesPool
+        pool = JulesPool()
+        
+        # CCLをタスク説明に変換
+        task = f"{context}\n\nExecute CCL: {ccl}\n\nProvide a detailed response."
+        
+        result = pool.create_session(task)
+        
+        if "error" in result:
+            return {"status": "error", "error": result["error"], "ccl": ccl}
+        
+        return {
+            "status": "success",
+            "ccl": ccl,
+            "thread": "jules",
+            "session_id": result.get("session_id"),
+            "account_id": result.get("account_id"),
+            "answer": result.get("output", ""),
+            "note": "Julesは非同期実行。結果は後で取得。",
+        }
     except Exception as e:
         return {"status": "error", "error": str(e), "ccl": ccl}
-    
-    return {
-        "status": "success",
-        "ccl": ccl,
-        "thread": "claude",
-        "answer": answer,
-    }
 
 
 def execute_gemini(ccl: str, context: str) -> Dict[str, Any]:
@@ -323,7 +320,7 @@ def execute_hermeneus(ccl: str, context: str, compile_only: bool = False) -> Dic
         synteleia_report = None
         
         try:
-            from synteleia import SynteleiaOrchestrator, AuditTarget, AuditTargetType
+            from mekhane.synteleia import SynteleiaOrchestrator, AuditTarget, AuditTargetType
             
             # コンテキストに Synteleia 監査を実行
             if context and len(context) > 100:
@@ -408,8 +405,8 @@ def execute_ccl(ccl: str, context: str, use_hermeneus: bool = True) -> Dict[str,
     
     if thread == "perplexity":
         return execute_perplexity(ccl, context)
-    elif thread == "claude":
-        return execute_claude(ccl, context)
+    elif thread == "jules":
+        return execute_jules(ccl, context)
     elif thread == "gemini":
         return execute_gemini(ccl, context)
     elif thread == "codex":

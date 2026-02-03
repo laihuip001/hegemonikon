@@ -31,6 +31,15 @@ from pathlib import Path
 from datetime import datetime
 from dataclasses import dataclass, field
 from typing import Optional
+from mekhane.anamnesis.ux_utils import (
+    print_header,
+    print_error,
+    print_success,
+    print_warning,
+    print_info,
+    cprint,
+    colorize_usage,
+)
 
 
 @dataclass
@@ -259,25 +268,25 @@ class AntigravityLogCollector:
             "log_lines": len(lines),
         }
 
-    def format_summary(self, summary: dict) -> str:
-        """要約を人間が読みやすい形式でフォーマット"""
+    def print_summary(self, summary: dict):
+        """要約を人間が読みやすい形式で表示"""
         if "error" in summary:
-            return f"[Error] {summary['error']}"
+            print_error(summary["error"])
+            return
 
-        lines = [
-            f"[Antigravity] Session: {summary['session_id']}",
-            f"  Model: {summary['model']}",
-            f"  Requests: {summary['total_requests']}",
-            f"  Errors: {summary['error_count']} (503: {summary['capacity_errors']})",
-        ]
+        print_header(f"Antigravity Session: {summary['session_id']}")
+        print_info(f"Model: {summary['model']}")
+        print_info(f"Requests: {summary['total_requests']}")
+
+        if summary['error_count'] > 0:
+            print_error(f"Errors: {summary['error_count']} (503: {summary['capacity_errors']})")
+        else:
+            print_success("No errors")
 
         if summary.get("token_usage"):
             tu = summary["token_usage"]
-            lines.append(
-                f"  Tokens: {tu['current']:,} / {tu['limit']:,} ({tu['percentage']}%)"
-            )
-
-        return "\n".join(lines)
+            usage_str = colorize_usage(tu['current'], tu['limit'])
+            cprint(f"ℹ Tokens: {usage_str}", "cyan")
 
 
 # CLI 用のエントリポイント関数
@@ -289,11 +298,11 @@ def cmd_logs(args) -> int:
     if args.list:
         sessions = collector.get_sessions(limit=args.limit)
         if not sessions:
-            print("No sessions found")
+            print_warning("No sessions found")
             return 1
-        print(f"[Antigravity Sessions] ({len(sessions)} shown)")
+        print_header(f"Antigravity Sessions ({len(sessions)} shown)")
         for s in sessions:
-            print(f"  {s.name}")
+            print(f"  • {s.name}")
         return 0
 
     # 特定セッションまたは最新
@@ -301,7 +310,7 @@ def cmd_logs(args) -> int:
     if args.session:
         session = collector._log_base / args.session
         if not session.exists():
-            print(f"Session not found: {args.session}")
+            print_error(f"Session not found: {args.session}")
             return 1
 
     # エラーのみ
@@ -309,16 +318,30 @@ def cmd_logs(args) -> int:
         lines = collector.read_log(session)
         errors = collector.extract_errors(lines)
         capacity = collector.extract_capacity_errors(lines)
-        print(f"[Errors] {len(errors)} total, {len(capacity)} capacity (503)")
+
+        if not errors and not capacity:
+            print_success("No errors found in this session.")
+            return 0
+
+        print_header(f"Errors: {len(errors)} total, {len(capacity)} capacity (503)")
         for e in errors[:20]:  # 最大20件
-            print(f"  {e['timestamp']} [{e['level']}] {e['message'][:80]}...")
+            ts = e['timestamp']
+            lvl = e['level'].upper()
+            msg = e['message'][:80]
+            if "error" in lvl.lower():
+                print_error(f"{ts} [{lvl}] {msg}")
+            else:
+                print_warning(f"{ts} [{lvl}] {msg}")
         return 0
 
     # モデル情報のみ
     if args.models:
         lines = collector.read_log(session)
         models = collector.extract_model_info(lines)
-        print(f"[Models] Detected: {', '.join(models) if models else 'none'}")
+        if models:
+            print_info(f"Models Detected: {', '.join(models)}")
+        else:
+            print_warning("No models detected")
         return 0
 
     # トークン情報のみ
@@ -326,16 +349,15 @@ def cmd_logs(args) -> int:
         lines = collector.read_log(session)
         usage = collector.extract_token_usage(lines)
         if usage:
-            print(
-                f"[Tokens] {usage['current']:,} / {usage['limit']:,} ({usage['percentage']}%)"
-            )
+            usage_str = colorize_usage(usage['current'], usage['limit'])
+            cprint(f"Tokens: {usage_str}", "cyan")
         else:
-            print("[Tokens] Not found")
+            print_warning("Token usage not found")
         return 0
 
     # デフォルト: 要約
     summary = collector.summary(session)
-    print(collector.format_summary(summary))
+    collector.print_summary(summary)
     return 0
 
 
@@ -343,4 +365,4 @@ if __name__ == "__main__":
     # スタンドアロン実行用
     collector = AntigravityLogCollector()
     summary = collector.summary()
-    print(collector.format_summary(summary))
+    collector.print_summary(summary)

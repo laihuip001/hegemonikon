@@ -29,6 +29,16 @@ SESSIONS_DIR = Path(r"M:\Brain\.hegemonikon\sessions")
 DB_PATH = Path(r"M:\Brain\.hegemonikon\lancedb")
 TABLE_NAME = "sessions"
 
+# Regex patterns
+RE_EXPORTED_AT = re.compile(r"\d{4}-\d{2}-\d{2}T[\d:.]+")
+RE_MESSAGE_COUNT = re.compile(r"(\d+)")
+RE_CSS_COMMENT = re.compile(r"/\*.*?\*/", flags=re.DOTALL)
+RE_CSS_MEDIA = re.compile(r"@media\s*\([^)]*\)\s*\{[^}]*\}")
+RE_CSS_MARKDOWN_ALERT = re.compile(r"\.markdown[-\w]*\s*\{[^}]*\}")
+RE_THOUGHT_FOR = re.compile(r"Thought for \d+s\s*")
+RE_THOUGHT_FOR_LESS = re.compile(r"Thought for <\d+s\s*")
+RE_MULTI_NEWLINE = re.compile(r"\n{3,}")
+
 
 class SessionDocument(BaseModel):
     """セッションドキュメントのスキーマ"""
@@ -58,7 +68,7 @@ def parse_session_file(filepath: Path) -> Optional[SessionDocument]:
         exported_at = ""
         for line in lines[:10]:
             if "**Exported**" in line:
-                match = re.search(r"\d{4}-\d{2}-\d{2}T[\d:.]+", line)
+                match = RE_EXPORTED_AT.search(line)
                 if match:
                     exported_at = match.group()
                 break
@@ -67,7 +77,7 @@ def parse_session_file(filepath: Path) -> Optional[SessionDocument]:
         message_count = 0
         for line in lines[:10]:
             if "**Messages**" in line:
-                match = re.search(r"(\d+)", line)
+                match = RE_MESSAGE_COUNT.search(line)
                 if match:
                     message_count = int(match.group(1))
                 break
@@ -93,20 +103,20 @@ def parse_session_file(filepath: Path) -> Optional[SessionDocument]:
 
         # CSS ノイズを除去
         # /* ... */ コメントを除去
-        full_content = re.sub(r"/\*.*?\*/", "", full_content, flags=re.DOTALL)
+        full_content = RE_CSS_COMMENT.sub("", full_content)
 
         # @media { ... } ブロックを除去
-        full_content = re.sub(r"@media\s*\([^)]*\)\s*\{[^}]*\}", "", full_content)
+        full_content = RE_CSS_MEDIA.sub("", full_content)
 
         # .markdown-alert などの CSS ルールを除去
-        full_content = re.sub(r"\.markdown[-\w]*\s*\{[^}]*\}", "", full_content)
+        full_content = RE_CSS_MARKDOWN_ALERT.sub("", full_content)
 
         # "Thought for Xs" を除去
-        full_content = re.sub(r"Thought for \d+s\s*", "", full_content)
-        full_content = re.sub(r"Thought for <\d+s\s*", "", full_content)
+        full_content = RE_THOUGHT_FOR.sub("", full_content)
+        full_content = RE_THOUGHT_FOR_LESS.sub("", full_content)
 
         # 連続する空行を除去
-        full_content = re.sub(r"\n{3,}", "\n\n", full_content).strip()
+        full_content = RE_MULTI_NEWLINE.sub("\n\n", full_content).strip()
 
         # プレビュー（最初の 500 文字）
         preview = full_content[:500].replace("\n", " ")
@@ -125,6 +135,18 @@ def parse_session_file(filepath: Path) -> Optional[SessionDocument]:
         return None
 
 
+def generate_session_docs(session_files: List[Path]):
+    """セッションドキュメントを生成するジェネレーター"""
+    count = 0
+    for filepath in session_files:
+        doc = parse_session_file(filepath)
+        if doc and len(doc.content) > 50:
+            yield doc.model_dump()
+            count += 1
+            if count % 100 == 0:
+                print(f"    ... processed {count} docs", end="\r")
+
+
 def index_sessions():
     """全セッションファイルをインデックス"""
     print("[*] LanceDB Session Indexer")
@@ -139,31 +161,26 @@ def index_sessions():
     session_files = list(SESSIONS_DIR.glob("*.md"))
     print(f"[*] Found {len(session_files)} session files")
 
-    # ドキュメントを作成
-    documents: List[SessionDocument] = []
-
-    for filepath in session_files:
-        doc = parse_session_file(filepath)
-        if doc and len(doc.content) > 50:
-            documents.append(doc)
-
-    print(f"[*] Parsed {len(documents)} valid documents")
-
-    if not documents:
-        print("[!] No documents to index")
+    if not session_files:
+        print("[!] No session files found")
         return
 
     # テーブルが存在する場合は削除して再作成
-    if TABLE_NAME in db.table_names():
+    # lancedb v0.27+ list_tables returns object with .tables
+    tables_response = db.list_tables()
+    existing_tables = getattr(tables_response, "tables", tables_response)
+
+    if TABLE_NAME in existing_tables:
         db.drop_table(TABLE_NAME)
         print(f"[*] Dropped existing table: {TABLE_NAME}")
 
-    # ドキュメントを辞書に変換
-    data = [doc.model_dump() for doc in documents]
+    print("[*] Creating table with streaming data...")
+    # テーブル作成 (ジェネレーターを使用してメモリ使用量を削減)
+    table = db.create_table(TABLE_NAME, generate_session_docs(session_files))
 
-    # テーブル作成
-    table = db.create_table(TABLE_NAME, data)
-    print(f"[✓] Created table: {TABLE_NAME} ({len(documents)} rows)")
+    # 行数を確認 (ジェネレーター消費後なのでここで取得)
+    row_count = table.count_rows()
+    print(f"\n[✓] Created table: {TABLE_NAME} ({row_count} rows)")
 
     # Full-Text Search インデックスを作成
     try:
@@ -181,7 +198,10 @@ def search_sessions(query: str, limit: int = 5):
     """セッションを検索"""
     db = lancedb.connect(str(DB_PATH))
 
-    if TABLE_NAME not in db.table_names():
+    tables_response = db.list_tables()
+    existing_tables = getattr(tables_response, "tables", tables_response)
+
+    if TABLE_NAME not in existing_tables:
         print("[!] No sessions indexed. Run index_sessions() first.")
         return []
 

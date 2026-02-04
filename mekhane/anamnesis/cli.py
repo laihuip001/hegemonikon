@@ -166,56 +166,67 @@ def cmd_collect_all(args):  # noqa: AI-ALL
 def cmd_search(args):
     """論文検索"""
     from mekhane.anamnesis.index import GnosisIndex
+    from mekhane.anamnesis import ux_utils
 
-    print(f"[Search] Query: {args.query}")
+    ux_utils.print_info(f"Searching for: {args.query}", "Search")
 
     index = GnosisIndex()
     results = index.search(args.query, k=args.limit)
 
     if not results:
-        print("No results found")
+        ux_utils.print_warning("No results found")
         return 0
 
-    print(f"\nFound {len(results)} results:\n")
-    print("-" * 70)
+    ux_utils.print_header(f"Found {len(results)} results")
 
     for i, r in enumerate(results, 1):
-        print(f"\n[{i}] {r.get('title', 'Untitled')[:70]}")
-        print(f"    Source: {r.get('source')} | Citations: {r.get('citations', 'N/A')}")
+        print(
+            f"\n{ux_utils.colored(f'[{i}]', 'cyan')} {ux_utils.colored(r.get('title', 'Untitled')[:70], attrs=['bold'])}"
+        )
+        print(
+            f"    Source: {ux_utils.colored(r.get('source'), 'yellow')} | Citations: {r.get('citations', 'N/A')}"
+        )
         print(f"    Authors: {r.get('authors', '')[:60]}...")
         print(f"    Abstract: {r.get('abstract', '')[:150]}...")
         if r.get("url"):
-            print(f"    URL: {r.get('url')}")
+            print(
+                f"    URL: {ux_utils.colored(r.get('url'), 'blue', attrs=['underline'])}"
+            )
 
-    print("\n" + "-" * 70)
+    print()
     return 0
 
 
 def cmd_stats(args):
     """インデックス統計"""
     from mekhane.anamnesis.index import GnosisIndex
+    from mekhane.anamnesis import ux_utils
 
     index = GnosisIndex()
     stats = index.stats()
 
-    print("\n[Gnōsis Index Statistics]")
-    print("=" * 40)
-    print(f"Total Papers: {stats['total']}")
-    print(f"With DOI: {stats.get('unique_dois', 0)}")
-    print(f"With arXiv ID: {stats.get('unique_arxiv', 0)}")
-    print("\nBy Source:")
+    ux_utils.print_header("Gnōsis Index Statistics")
+
+    print(
+        f"  Total Papers: {ux_utils.colored(str(stats['total']), 'green', attrs=['bold'])}"
+    )
+    print(f"  With DOI: {stats.get('unique_dois', 0)}")
+    print(f"  With arXiv ID: {stats.get('unique_arxiv', 0)}")
+
+    print("\n  " + ux_utils.colored("By Source:", "cyan"))
     for source, count in stats.get("sources", {}).items():
-        print(f"  {source}: {count}")
+        print(f"    - {source}: {count}")
 
     # Show freshness
     if STATE_FILE.exists():
         try:
             state = json.loads(STATE_FILE.read_text(encoding="utf-8"))
-            print(f"Last Collected: {state.get('last_collected_at', 'Unknown')}")
+            last_collected = state.get("last_collected_at", "Unknown")
+            print(f"\n  Last Collected: {ux_utils.colored(last_collected, 'yellow')}")
         except Exception:
             pass  # TODO: Add proper error handling # noqa: AI-ALL
 
-    print("=" * 40)
+    print()
 
     return 0
 

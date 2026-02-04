@@ -31,6 +31,7 @@ from pathlib import Path
 from datetime import datetime
 from dataclasses import dataclass, field
 from typing import Optional
+from mekhane.anamnesis import ux_utils
 
 
 @dataclass
@@ -262,20 +263,34 @@ class AntigravityLogCollector:
     def format_summary(self, summary: dict) -> str:
         """要約を人間が読みやすい形式でフォーマット"""
         if "error" in summary:
-            return f"[Error] {summary['error']}"
+            return ux_utils.colored(
+                f"{ux_utils.CROSS} [Error] {summary['error']}", "red"
+            )
 
         lines = [
-            f"[Antigravity] Session: {summary['session_id']}",
-            f"  Model: {summary['model']}",
-            f"  Requests: {summary['total_requests']}",
-            f"  Errors: {summary['error_count']} (503: {summary['capacity_errors']})",
+            ux_utils.colored(
+                f"=== Antigravity Session: {summary['session_id']} ===",
+                "blue",
+                attrs=["bold"],
+            ),
+            f"  {ux_utils.INFO} Model: {ux_utils.colored(str(summary['model']), 'cyan')}",
+            f"  {ux_utils.CHECK} Requests: {summary['total_requests']}",
         ]
+
+        if summary["error_count"] > 0:
+            lines.append(
+                ux_utils.colored(
+                    f"  {ux_utils.CROSS} Errors: {summary['error_count']} (503: {summary['capacity_errors']})",
+                    "red",
+                )
+            )
+        else:
+            lines.append(ux_utils.colored(f"  {ux_utils.CHECK} Errors: 0", "green"))
 
         if summary.get("token_usage"):
             tu = summary["token_usage"]
-            lines.append(
-                f"  Tokens: {tu['current']:,} / {tu['limit']:,} ({tu['percentage']}%)"
-            )
+            usage_str = ux_utils.colorize_usage(tu["current"], tu["limit"])
+            lines.append(f"  {ux_utils.WARN} Tokens: {usage_str}")
 
         return "\n".join(lines)
 
@@ -289,11 +304,11 @@ def cmd_logs(args) -> int:
     if args.list:
         sessions = collector.get_sessions(limit=args.limit)
         if not sessions:
-            print("No sessions found")
+            ux_utils.print_warning("No sessions found")
             return 1
-        print(f"[Antigravity Sessions] ({len(sessions)} shown)")
+        ux_utils.print_header(f"Antigravity Sessions ({len(sessions)} shown)")
         for s in sessions:
-            print(f"  {s.name}")
+            print(f"  - {s.name}")
         return 0
 
     # 特定セッションまたは最新
@@ -301,7 +316,7 @@ def cmd_logs(args) -> int:
     if args.session:
         session = collector._log_base / args.session
         if not session.exists():
-            print(f"Session not found: {args.session}")
+            ux_utils.print_error(f"Session not found: {args.session}")
             return 1
 
     # エラーのみ
@@ -309,28 +324,36 @@ def cmd_logs(args) -> int:
         lines = collector.read_log(session)
         errors = collector.extract_errors(lines)
         capacity = collector.extract_capacity_errors(lines)
-        print(f"[Errors] {len(errors)} total, {len(capacity)} capacity (503)")
+        ux_utils.print_header(
+            f"Errors: {len(errors)} total, {len(capacity)} capacity (503)"
+        )
         for e in errors[:20]:  # 最大20件
-            print(f"  {e['timestamp']} [{e['level']}] {e['message'][:80]}...")
+            print(
+                f"  {e['timestamp']} [{ux_utils.colored(e['level'], 'red')}] {e['message'][:80]}..."
+            )
         return 0
 
     # モデル情報のみ
     if args.models:
         lines = collector.read_log(session)
         models = collector.extract_model_info(lines)
-        print(f"[Models] Detected: {', '.join(models) if models else 'none'}")
+        ux_utils.print_header("Detected Models")
+        if models:
+            for m in models:
+                print(f"  - {ux_utils.colored(m, 'cyan')}")
+        else:
+            print("  (none)")
         return 0
 
     # トークン情報のみ
     if args.tokens:
         lines = collector.read_log(session)
         usage = collector.extract_token_usage(lines)
+        ux_utils.print_header("Token Usage")
         if usage:
-            print(
-                f"[Tokens] {usage['current']:,} / {usage['limit']:,} ({usage['percentage']}%)"
-            )
+            print(f"  {ux_utils.colorize_usage(usage['current'], usage['limit'])}")
         else:
-            print("[Tokens] Not found")
+            print("  (Not found)")
         return 0
 
     # デフォルト: 要約

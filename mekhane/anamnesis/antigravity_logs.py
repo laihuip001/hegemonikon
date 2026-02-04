@@ -283,15 +283,23 @@ class AntigravityLogCollector:
 # CLI 用のエントリポイント関数
 def cmd_logs(args) -> int:
     """logs サブコマンドのハンドラ"""
+    from mekhane.anamnesis.ux_utils import (
+        print_error,
+        print_header,
+        print_info,
+        print_warning,
+        colorize_usage,
+    )
+
     collector = AntigravityLogCollector()
 
     # セッション一覧
     if args.list:
         sessions = collector.get_sessions(limit=args.limit)
         if not sessions:
-            print("No sessions found")
+            print_warning("No sessions found")
             return 1
-        print(f"[Antigravity Sessions] ({len(sessions)} shown)")
+        print_header(f"Antigravity Sessions ({len(sessions)} shown)")
         for s in sessions:
             print(f"  {s.name}")
         return 0
@@ -301,7 +309,7 @@ def cmd_logs(args) -> int:
     if args.session:
         session = collector._log_base / args.session
         if not session.exists():
-            print(f"Session not found: {args.session}")
+            print_error(f"Session not found: {args.session}")
             return 1
 
     # エラーのみ
@@ -309,7 +317,7 @@ def cmd_logs(args) -> int:
         lines = collector.read_log(session)
         errors = collector.extract_errors(lines)
         capacity = collector.extract_capacity_errors(lines)
-        print(f"[Errors] {len(errors)} total, {len(capacity)} capacity (503)")
+        print_header(f"Errors: {len(errors)} total, {len(capacity)} capacity (503)")
         for e in errors[:20]:  # 最大20件
             print(f"  {e['timestamp']} [{e['level']}] {e['message'][:80]}...")
         return 0
@@ -318,7 +326,7 @@ def cmd_logs(args) -> int:
     if args.models:
         lines = collector.read_log(session)
         models = collector.extract_model_info(lines)
-        print(f"[Models] Detected: {', '.join(models) if models else 'none'}")
+        print_info(f"Detected: {', '.join(models) if models else 'none'}", label="Models")
         return 0
 
     # トークン情報のみ
@@ -326,11 +334,10 @@ def cmd_logs(args) -> int:
         lines = collector.read_log(session)
         usage = collector.extract_token_usage(lines)
         if usage:
-            print(
-                f"[Tokens] {usage['current']:,} / {usage['limit']:,} ({usage['percentage']}%)"
-            )
+            colored_usage = colorize_usage(usage['current'], usage['limit'])
+            print_info(colored_usage, label="Tokens")
         else:
-            print("[Tokens] Not found")
+            print_warning("Tokens not found")
         return 0
 
     # デフォルト: 要約

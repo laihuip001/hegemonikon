@@ -70,6 +70,8 @@ class HegemonikónFEPAgent:
         C: Optional[np.ndarray] = None,
         D: Optional[np.ndarray] = None,
         use_defaults: bool = True,
+        state_dim: Optional[int] = None,
+        obs_dims: Optional[Dict[str, int]] = None,
     ):
         """Initialize the FEP agent.
 
@@ -79,6 +81,8 @@ class HegemonikónFEPAgent:
             C: Preference vector over observations. Shape: (num_obs,)
             D: Initial state belief (prior). Shape: (num_states,)
             use_defaults: If True and matrices not provided, use default Hegemonikón matrices
+            state_dim: Optional override for state dimension
+            obs_dims: Optional override for observation dimensions
 
         Raises:
             ImportError: If pymdp is not available
@@ -86,11 +90,18 @@ class HegemonikónFEPAgent:
         if not PYMDP_AVAILABLE:
             raise ImportError("pymdp is not installed. Install with: pip install pymdp")
 
-        self.state_dim = get_state_dim()
-        self.obs_dims = {k: len(v) for k, v in OBSERVATION_MODALITIES.items()}
+        self.state_dim = state_dim if state_dim is not None else get_state_dim()
+        self.obs_dims = (
+            obs_dims
+            if obs_dims is not None
+            else {k: len(v) for k, v in OBSERVATION_MODALITIES.items()}
+        )
 
         # Use provided matrices or generate defaults
         if use_defaults:
+            # Only use defaults if dimensions match standard Hegemonikón model
+            # or if we are the base class. Subclasses with custom dimensions should provide matrices
+            # or override _default_* methods.
             A = A if A is not None else self._default_A()
             B = B if B is not None else self._default_B()
             C = C if C is not None else self._default_C()
@@ -297,6 +308,18 @@ class HegemonikónFEPAgent:
         D = D / D.sum()
         return D
 
+    def _index_to_state_names(self, idx: int) -> Dict[str, str]:
+        """Convert state index to human-readable names.
+
+        Can be overridden by subclasses for different state spaces.
+        """
+        names = index_to_state(idx)
+        return {
+            "phantasia": names[0],
+            "assent": names[1],
+            "horme": names[2],
+        }
+
     def infer_states(self, observation: int) -> Dict[str, Any]:
         """O1 Noēsis: Update beliefs based on new observation.
 
@@ -310,7 +333,7 @@ class HegemonikónFEPAgent:
             Dict containing:
                 - beliefs: Updated belief distribution
                 - map_state: Maximum a posteriori state
-                - map_state_names: MAP state as (phantasia, assent, horme) tuple
+                - map_state_names: MAP state description
                 - entropy: Entropy of belief distribution
         """
         # pymdp expects observation as tuple/list for multi-modality
@@ -339,7 +362,7 @@ class HegemonikónFEPAgent:
 
         # Compute MAP state
         map_idx = int(np.argmax(beliefs_array))
-        map_names = index_to_state(map_idx)
+        map_names = self._index_to_state_names(map_idx)
 
         # Compute entropy
         # Avoid log(0) by adding small epsilon
@@ -349,11 +372,7 @@ class HegemonikónFEPAgent:
         result = {
             "beliefs": beliefs_array,
             "map_state": map_idx,
-            "map_state_names": {
-                "phantasia": map_names[0],
-                "assent": map_names[1],
-                "horme": map_names[2],
-            },
+            "map_state_names": map_names,
             "entropy": float(entropy),
         }
 

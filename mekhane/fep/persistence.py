@@ -34,9 +34,14 @@ LEARNED_A_METADATA_PATH = Path(
 )
 
 
-def ensure_persistence_dir() -> None:
-    """Ensure the persistence directory exists."""
-    LEARNED_A_PATH.parent.mkdir(parents=True, exist_ok=True)
+def ensure_persistence_dir(path: Optional[Path] = None) -> None:
+    """Ensure the persistence directory exists.
+
+    Args:
+        path: Optional custom path (defaults to LEARNED_A_PATH)
+    """
+    target_path = path or LEARNED_A_PATH
+    target_path.parent.mkdir(parents=True, exist_ok=True)
 
 
 def save_A(agent: "HegemonikónFEPAgent", path: Optional[Path] = None) -> Path:
@@ -57,7 +62,7 @@ def save_A(agent: "HegemonikónFEPAgent", path: Optional[Path] = None) -> Path:
         >>> saved_path = save_A(agent)
     """
     target_path = path or LEARNED_A_PATH
-    ensure_persistence_dir()
+    ensure_persistence_dir(target_path)
 
     # Get A matrix from pymdp agent
     A = agent.agent.A

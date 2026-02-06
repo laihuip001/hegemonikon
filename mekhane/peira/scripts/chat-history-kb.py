@@ -240,8 +240,12 @@ def build_index(incremental: bool = False, report_mode: bool = False):
                         )
                         if at <= last_sync:
                             continue
-                    except Exception:
-                        pass  # TODO: Add proper error handling
+                    except Exception as e:
+                        if not report_mode:
+                            print(
+                                f"Warning: Invalid timestamp for {artifact.get('file_path', 'unknown')}: {e}"
+                            )
+                        continue
 
             # Generate ID
             art_type = (

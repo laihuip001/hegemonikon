@@ -21,6 +21,7 @@ import datetime
 import os
 import sys
 import time
+import concurrent.futures
 
 # Configuration
 ROOT_DIR = os.path.join("Raw", "aidb")
@@ -205,6 +206,16 @@ def append_to_manifest(article, filepath, batch_id):
         f.write(json.dumps(manifest_entry, ensure_ascii=False) + "\n")
 
 
+def log_skip(url, error, batch_id):
+    """Log skipped URL to file."""
+    skip_file = os.path.join(
+        ROOT_DIR, "_index", f"skipped_fast_{batch_id}.txt"
+    )
+    # Append to skip file sequentially
+    with open(skip_file, "a", encoding="utf-8") as f:
+        f.write(f"{url}\t{error}\n")
+
+
 async def process_single_url(url, session, semaphore, batch_id):
     """Process a single URL: fetch, parse, save markdown."""
     async with semaphore:
@@ -251,36 +262,48 @@ async def process_urls_async(target_urls, batch_id):
     success_count = 0
     error_count = 0
 
-    async with aiohttp.ClientSession(headers=final_headers) as session:
-        tasks = []
-        for url in target_urls:
-            task = asyncio.create_task(
-                process_single_url(url, session, semaphore, batch_id)
-            )
-            tasks.append(task)
+    # Create a single-threaded executor for sequential file writes
+    io_executor = concurrent.futures.ThreadPoolExecutor(max_workers=1)
+    write_futures = []
+    loop = asyncio.get_running_loop()
 
-        # Use as_completed to process results as they come in
-        for i, future in enumerate(asyncio.as_completed(tasks)):
-            result = await future
-
-            if result["status"] == "success":
-                # Append to manifest sequentially (safe in main loop)
-                append_to_manifest(result, result["filepath"], batch_id)
-                print(f"[{i+1}/{len(target_urls)}] OK: {result['title'][:40]}...")
-                success_count += 1
-            else:
-                print(
-                    f"[{i+1}/{len(target_urls)}] SKIP: {result['url']} - {result.get('error', 'Unknown')}"
+    try:
+        async with aiohttp.ClientSession(headers=final_headers) as session:
+            tasks = []
+            for url in target_urls:
+                task = asyncio.create_task(
+                    process_single_url(url, session, semaphore, batch_id)
                 )
-                error_count += 1
+                tasks.append(task)
 
-                # Log skip
-                skip_file = os.path.join(
-                    ROOT_DIR, "_index", f"skipped_fast_{batch_id}.txt"
-                )
-                # Append to skip file sequentially
-                with open(skip_file, "a", encoding="utf-8") as f:
-                    f.write(f"{result['url']}\t{result.get('error', 'Unknown')}\n")
+            # Use as_completed to process results as they come in
+            for i, future in enumerate(asyncio.as_completed(tasks)):
+                result = await future
+
+                if result["status"] == "success":
+                    # Append to manifest sequentially (safe in main loop via executor)
+                    # We use io_executor to ensure writes are serial but don't block the loop
+                    wf = loop.run_in_executor(io_executor, append_to_manifest, result, result["filepath"], batch_id)
+                    write_futures.append(wf)
+
+                    print(f"[{i+1}/{len(target_urls)}] OK: {result['title'][:40]}...")
+                    success_count += 1
+                else:
+                    print(
+                        f"[{i+1}/{len(target_urls)}] SKIP: {result['url']} - {result.get('error', 'Unknown')}"
+                    )
+                    error_count += 1
+
+                    # Log skip in executor
+                    wf = loop.run_in_executor(io_executor, log_skip, result['url'], result.get('error', 'Unknown'), batch_id)
+                    write_futures.append(wf)
+
+        # Ensure all writes are finished before exiting
+        if write_futures:
+            await asyncio.gather(*write_futures)
+
+    finally:
+        io_executor.shutdown(wait=True)
 
     print(f"\n[Fast Collect] Completed: {success_count} success, {error_count} errors")
 

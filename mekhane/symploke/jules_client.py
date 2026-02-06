@@ -27,15 +27,6 @@ from dataclasses import dataclass, field
 from enum import Enum
 from typing import Optional
 
-# Optional OpenTelemetry support for distributed tracing
-try:
-    from opentelemetry import trace
-    from opentelemetry.propagate import inject
-
-    OTEL_AVAILABLE = True
-except ImportError:
-    OTEL_AVAILABLE = False
-
 # Configure module logger
 logger = logging.getLogger(__name__)
 
@@ -103,12 +94,6 @@ class SessionState(Enum):
             return cls.UNKNOWN
 
 
-# Legacy alias for backwards compatibility
-def parse_state(state_str: str) -> SessionState:
-    """Deprecated: Use SessionState.from_string() instead."""
-    return SessionState.from_string(state_str)
-
-
 # ============ Data Types ============
 
 
@@ -142,10 +127,6 @@ class JulesResult:
     @property
     def is_success(self) -> bool:
         return self.error is None and self.session is not None
-
-    @property
-    def is_failed(self) -> bool:
-        return not self.is_success
 
 
 # ============ Retry Decorator ============
@@ -278,11 +259,6 @@ class JulesClient:
             await self._owned_session.close()
             self._owned_session = None
 
-    @property
-    def _session(self) -> aiohttp.ClientSession:
-        """Get the active session (shared or owned)."""
-        return self._shared_session or self._owned_session or aiohttp.ClientSession()
-
     async def _request(
         self,
         method: str,
@@ -318,17 +294,14 @@ class JulesClient:
             close_after = True
 
         try:
-            # Prepare headers with optional trace context
+            # Prepare headers
             request_headers = dict(self._headers)
-            if OTEL_AVAILABLE:
-                # Inject W3C trace context into headers
-                inject(request_headers)
 
             async with session.request(
                 method,
                 url,
                 headers=request_headers,
-                # NOTE: Removed self-assignment: json = json
+                json=json,
             ) as resp:
                 if resp.status == 429:
                     retry_after = resp.headers.get("Retry-After")
@@ -387,9 +360,9 @@ class JulesClient:
         return JulesSession(
             id=data["id"],
             name=data["name"],
-            state=parse_state(data.get("state", "PLANNING")),
+            state=SessionState.from_string(data.get("state", "PLANNING")),
             prompt=prompt,
-            # NOTE: Removed self-assignment: source = source
+            source=source,
         )
 
     @with_retry(
@@ -417,7 +390,7 @@ class JulesClient:
         return JulesSession(
             id=data["id"],
             name=data["name"],
-            state=parse_state(data.get("state", "PLANNING")),
+            state=SessionState.from_string(data.get("state", "PLANNING")),
             prompt=data.get("prompt", ""),
             source=data.get("sourceContext", {}).get("source", ""),
             pull_request_url=pr_url,
@@ -480,7 +453,7 @@ class JulesClient:
                     if consecutive_unknown >= 3 and fail_on_unknown:
                         raise UnknownStateError(
                             state=session.state.value,
-                            # NOTE: Removed self-assignment: session_id = session_id
+                            session_id=session_id,
                         )
                 else:
                     consecutive_unknown = 0
@@ -581,7 +554,7 @@ class JulesClient:
                             error_type=type(e).__name__,
                         ),
                         error=e,
-                        # NOTE: Removed self-assignment: task = task
+                        task=task,
                     )
 
         results = await asyncio.gather(*[bounded_execute(task) for task in tasks])
@@ -706,62 +679,3 @@ class JulesClient:
         )
 
         return all_results
-
-
-# ============ Utilities ============
-
-
-def mask_api_key(key: str, visible_chars: int = 4) -> str:
-    """
-    Safely mask API key for display.
-
-    Prevents information leakage with short keys (ai-009, th-010 fix).
-
-    Args:
-        key: API key to mask
-        visible_chars: Number of chars to show at start and end
-
-    Returns:
-        Masked key string
-    """
-    min_length = visible_chars * 2 + 4  # Need enough chars to mask
-    if len(key) < min_length:
-        return "***"  # Fully mask short keys
-    return f"{key[:visible_chars]}...{key[-visible_chars:]}"
-
-
-# ============ CLI for testing ============
-
-
-def main():
-    """CLI entry point for testing."""
-    import argparse
-
-    parser = argparse.ArgumentParser(description="Jules API Client")
-    parser.add_argument("--test", action="store_true", help="Run connection test")
-    parser.add_argument("--key", help="API key (or set JULES_API_KEY)")
-    args = parser.parse_args()
-
-    if args.test:
-        print("Jules Client Test")
-        print("-" * 40)
-
-        api_key = args.key or os.environ.get("JULES_API_KEY")
-        if not api_key:
-            print("❌ No API key provided. Set JULES_API_KEY or use --key")
-            exit(1)
-
-        try:
-            client = JulesClient(api_key)
-            print("✅ Client initialized")
-            print(f"   API Key: {mask_api_key(api_key)}")
-            print(f"   Base URL: {client.BASE_URL}")
-            print(f"   Max Concurrent: {client.MAX_CONCURRENT}")
-            print(f"   Connection Pooling: Enabled (TCPConnector)")
-        except Exception as e:
-            print(f"❌ Error: {e}")
-            exit(1)
-
-
-if __name__ == "__main__":
-    main()

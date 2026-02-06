@@ -15,9 +15,12 @@ VectorStore Factory
 アダプタを動的に生成するファクトリパターン実装。
 """
 
+import logging
 from typing import Dict, Type, Optional
 from .adapters.base import VectorStoreAdapter
 from .config import VectorStoreConfig
+
+logger = logging.getLogger(__name__)
 
 
 class VectorStoreFactory:
@@ -101,8 +104,8 @@ def _register_adapters():
         from .adapters.hnswlib_adapter import HNSWlibAdapter
 
         VectorStoreFactory.register("hnswlib", HNSWlibAdapter)
-    except ImportError:
-        pass  # TODO: Add proper error handling
+    except ImportError as e:
+        logger.warning(f"Failed to register adapter 'hnswlib': {e}")
 
     # 将来の拡張用
     # try:

@@ -328,7 +328,7 @@ class JulesClient:
                 method,
                 url,
                 headers=request_headers,
-                # NOTE: Removed self-assignment: json = json
+                json=json,
             ) as resp:
                 if resp.status == 429:
                     retry_after = resp.headers.get("Retry-After")
@@ -389,7 +389,7 @@ class JulesClient:
             name=data["name"],
             state=parse_state(data.get("state", "PLANNING")),
             prompt=prompt,
-            # NOTE: Removed self-assignment: source = source
+            source=source,
         )
 
     @with_retry(

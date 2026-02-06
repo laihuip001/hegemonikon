@@ -60,6 +60,16 @@ INSIGHT_PATTERNS = {
 }
 
 
+# Pre-compile regex patterns
+COMPILED_PATTERNS = {
+    category: [re.compile(p, re.MULTILINE | re.DOTALL) for p in patterns]
+    for category, patterns in INSIGHT_PATTERNS.items()
+}
+
+RE_CLEAN_NOISE = re.compile(r"\n## 🤖.*$", flags=re.DOTALL)
+RE_CLEAN_NEWLINES = re.compile(r"\n\n+")
+
+
 def extract_context(content: str, match_start: int, context_size: int = 200) -> str:
     """マッチ周辺のコンテキストを抽出"""
     start = max(0, match_start - context_size)
@@ -99,8 +109,8 @@ def score_insight_quality(text: str) -> float:
 def clean_insight_text(text: str) -> str:
     """洞察テキストをクリーニング"""
     # 末尾のノイズを除去
-    text = re.sub(r"\n## 🤖.*$", "", text, flags=re.DOTALL)
-    text = re.sub(r"\n\n+", "\n", text)
+    text = RE_CLEAN_NOISE.sub("", text)
+    text = RE_CLEAN_NEWLINES.sub("\n", text)
     text = text.strip()
 
     # 最初の文だけを抽出（複数文の場合）
@@ -122,11 +132,11 @@ def mine_insights(
     categories = categories or list(INSIGHT_PATTERNS.keys())
 
     for category in categories:
-        if category not in INSIGHT_PATTERNS:
+        if category not in COMPILED_PATTERNS:
             continue
 
-        for pattern in INSIGHT_PATTERNS[category]:
-            for match in re.finditer(pattern, content, re.MULTILINE | re.DOTALL):
+        for pattern in COMPILED_PATTERNS[category]:
+            for match in pattern.finditer(content):
                 text = match.group(1) if match.groups() else match.group(0)
                 text = clean_insight_text(text)
 

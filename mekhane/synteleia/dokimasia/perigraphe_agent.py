@@ -36,6 +36,11 @@ class PerigrapheAgent(AuditAgent):
         (r"\band\s+also\b", "P-004", "範囲が曖昧に拡大"),
     ]
 
+    # Pre-compile patterns for performance
+    _COMPILED_PATTERNS = [
+        (re.compile(p, re.IGNORECASE), c, m) for p, c, m in SCOPE_CREEP_PATTERNS
+    ]
+
     # 境界明示キーワード
     BOUNDARY_KEYWORDS = [
         "スコープ",
@@ -76,8 +81,8 @@ class PerigrapheAgent(AuditAgent):
         """スコープ逸脱パターンを検出"""
         issues = []
 
-        for pattern, code, message in self.SCOPE_CREEP_PATTERNS:
-            for match in re.finditer(pattern, content, re.IGNORECASE):
+        for pattern, code, message in self._COMPILED_PATTERNS:
+            for match in pattern.finditer(content):
                 issues.append(
                     AuditIssue(
                         agent=self.name,

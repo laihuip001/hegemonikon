@@ -52,6 +52,7 @@ class FailureDB:
         )
         self.db_path.parent.mkdir(parents=True, exist_ok=True)
         self._data: Dict = None
+        self._operator_index: Optional[Dict[str, List[int]]] = None
 
     @property
     def data(self) -> Dict:
@@ -103,6 +104,14 @@ class FailureDB:
             # NOTE: Removed self-assignment: resolution = resolution
         )
         self.data["failures"].append(asdict(record))
+
+        # インデックスを更新
+        if self._operator_index is not None:
+            failure_id = len(self.data["failures"]) - 1
+            if operator not in self._operator_index:
+                self._operator_index[operator] = []
+            self._operator_index[operator].append(failure_id)
+
         self.save()
         return len(self.data["failures"]) - 1  # 記録ID
 
@@ -116,6 +125,15 @@ class FailureDB:
             }
         )
         self.save()
+
+    def _rebuild_index(self):
+        """失敗インデックスを再構築"""
+        self._operator_index = {}
+        for i, failure in enumerate(self.data.get("failures", [])):
+            op = failure["operator"]
+            if op not in self._operator_index:
+                self._operator_index[op] = []
+            self._operator_index[op].append(i)
 
     def get_warnings(self, ccl_expr: str) -> List[WarningRecord]:
         """CCL 式に関連する警告を取得"""
@@ -133,19 +151,29 @@ class FailureDB:
                     )
                 )
 
-        # 過去の失敗をチェック
-        for i, failure in enumerate(self.data.get("failures", [])):
-            # 同じ演算子を含む式で過去に失敗している場合
-            if failure["operator"] in ccl_expr:
-                warnings.append(
-                    WarningRecord(
-                        operator=failure["operator"],
-                        message=f"過去の失敗: {failure['cause']}",
-                        severity="warning",
-                        source_failure_id=i,
-                    )
-                )
+        # 過去の失敗をチェック (インデックスを使用)
+        if self._operator_index is None:
+            self._rebuild_index()
 
+        failures = self.data.get("failures", [])
+        for operator, indices in self._operator_index.items():
+            # 式の中に失敗した演算子が含まれているか確認
+            if operator in ccl_expr:
+                for i in indices:
+                    # インデックスが範囲外でないか確認（安全のため）
+                    if i < len(failures):
+                        failure = failures[i]
+                        warnings.append(
+                            WarningRecord(
+                                operator=failure["operator"],
+                                message=f"過去の失敗: {failure['cause']}",
+                                severity="warning",
+                                source_failure_id=i,
+                            )
+                        )
+
+        # 発生順（source_failure_id）でソート
+        warnings.sort(key=lambda w: w.source_failure_id)
         return warnings
 
     def format_warnings(self, warnings: List[WarningRecord]) -> str:

@@ -70,6 +70,8 @@ class HegemonikónFEPAgent:
         C: Optional[np.ndarray] = None,
         D: Optional[np.ndarray] = None,
         use_defaults: bool = True,
+        state_dim: Optional[int] = None,
+        obs_dims: Optional[Dict[str, int]] = None,
     ):
         """Initialize the FEP agent.
 
@@ -79,6 +81,8 @@ class HegemonikónFEPAgent:
             C: Preference vector over observations. Shape: (num_obs,)
             D: Initial state belief (prior). Shape: (num_states,)
             use_defaults: If True and matrices not provided, use default Hegemonikón matrices
+            state_dim: Optional override for state dimension
+            obs_dims: Optional override for observation dimensions
 
         Raises:
             ImportError: If pymdp is not available
@@ -86,8 +90,12 @@ class HegemonikónFEPAgent:
         if not PYMDP_AVAILABLE:
             raise ImportError("pymdp is not installed. Install with: pip install pymdp")
 
-        self.state_dim = get_state_dim()
-        self.obs_dims = {k: len(v) for k, v in OBSERVATION_MODALITIES.items()}
+        self.state_dim = state_dim if state_dim is not None else get_state_dim()
+        self.obs_dims = (
+            obs_dims
+            if obs_dims is not None
+            else {k: len(v) for k, v in OBSERVATION_MODALITIES.items()}
+        )
 
         # Use provided matrices or generate defaults
         if use_defaults:

@@ -19,6 +19,45 @@ import sys
 from pathlib import Path
 from typing import Optional
 
+try:
+    from termcolor import colored, cprint
+except ImportError:
+    # Fallback if termcolor is not installed
+    def colored(text, color=None, on_color=None, attrs=None):
+        return text
+
+    def cprint(text, color=None, on_color=None, attrs=None, **kwargs):
+        print(text, **kwargs)
+
+
+class UX:
+    """CLI UX Helper"""
+
+    @staticmethod
+    def print_header(text: str):
+        cprint(f"\n=== {text} ===", "cyan", attrs=["bold"])
+
+    @staticmethod
+    def print_success(text: str):
+        cprint(f"✅ {text}", "green", attrs=["bold"])
+
+    @staticmethod
+    def print_error(text: str):
+        cprint(f"❌ {text}", "red", attrs=["bold"], file=sys.stderr)
+
+    @staticmethod
+    def print_warning(text: str):
+        cprint(f"⚠️ {text}", "yellow", attrs=["bold"])
+
+    @staticmethod
+    def print_info(text: str):
+        cprint(f"ℹ️ {text}", "blue")
+
+    @staticmethod
+    def print_kv(key: str, value: str, color: str = "white"):
+        """Print Key-Value pair"""
+        print(f"{colored(key + ':', 'cyan')} {colored(value, color)}")
+
 
 def create_parser() -> argparse.ArgumentParser:
     """CLI パーサーを作成"""
@@ -160,17 +199,18 @@ def cmd_compile(args) -> int:
     from . import compile_ccl
     
     try:
+        # UX.print_header(f"Compiling: {args.ccl}")
         lmql_code = compile_ccl(args.ccl, model=args.model)
         
         if args.output:
             Path(args.output).write_text(lmql_code)
-            print(f"Compiled to: {args.output}")
+            UX.print_success(f"Compiled to: {args.output}")
         else:
             print(lmql_code)
         
         return 0
     except Exception as e:
-        print(f"Error: {e}", file=sys.stderr)
+        UX.print_error(str(e))
         return 1
 
 
@@ -179,6 +219,13 @@ def cmd_execute(args) -> int:
     from . import execute_ccl
     
     try:
+        if not args.json:
+            UX.print_header("Executing CCL Workflow")
+            UX.print_kv("CCL", args.ccl)
+            if args.context:
+                UX.print_kv("Context", args.context)
+            UX.print_info("Processing...")
+
         result = execute_ccl(
             args.ccl,
             context=args.context,
@@ -192,18 +239,24 @@ def cmd_execute(args) -> int:
                 "metadata": result.metadata
             }
             output_str = json.dumps(output, ensure_ascii=False, indent=2)
+            print(output_str)
+            content_to_save = output_str
         else:
-            output_str = f"Status: {result.status.value}\n\n{result.output}"
+            if result.status.value == "success":
+                UX.print_success("Execution Successful")
+            else:
+                UX.print_error(f"Execution Failed: {result.status.value}")
+
+            print("\n" + result.output)
+            content_to_save = result.output
         
         if args.output:
-            Path(args.output).write_text(output_str)
-            print(f"Output saved to: {args.output}")
-        else:
-            print(output_str)
+            Path(args.output).write_text(content_to_save)
+            UX.print_info(f"Output saved to: {args.output}")
         
         return 0 if result.status.value == "success" else 1
     except Exception as e:
-        print(f"Error: {e}", file=sys.stderr)
+        UX.print_error(str(e))
         return 1
 
 
@@ -212,6 +265,11 @@ def cmd_verify(args) -> int:
     from . import execute_ccl, verify_execution, record_verification
     
     try:
+        if not args.json:
+            UX.print_header("Verifying Execution")
+            UX.print_kv("CCL", args.ccl)
+            UX.print_info("Executing and Debating...")
+
         # まず実行
         exec_result = execute_ccl(args.ccl, context=args.context)
         
@@ -240,18 +298,23 @@ def cmd_verify(args) -> int:
             }
             print(json.dumps(output, ensure_ascii=False, indent=2))
         else:
-            status = "✅ ACCEPTED" if consensus.accepted else "❌ REJECTED"
-            print(f"Result: {status}")
-            print(f"Confidence: {consensus.confidence:.1%}")
-            print(f"Majority: {consensus.majority_ratio:.1%}")
+            if consensus.accepted:
+                UX.print_success("ACCEPTED")
+            else:
+                UX.print_error("REJECTED")
+
+            conf_color = "green" if consensus.confidence > 0.8 else "yellow" if consensus.confidence > 0.5 else "red"
+            UX.print_kv("Confidence", f"{consensus.confidence:.1%}", color=conf_color)
+            UX.print_kv("Majority", f"{consensus.majority_ratio:.1%}")
+
             if consensus.dissent_reasons:
-                print("\nDissent:")
+                UX.print_warning("Dissent Reasons:")
                 for reason in consensus.dissent_reasons:
-                    print(f"  - {reason}")
+                    print(colored(f"  - {reason}", "yellow"))
         
         return 0 if consensus.accepted else 1
     except Exception as e:
-        print(f"Error: {e}", file=sys.stderr)
+        UX.print_error(str(e))
         return 1
 
 
@@ -275,11 +338,12 @@ def cmd_audit(args) -> int:
             print(json.dumps(output, ensure_ascii=False, indent=2))
         else:
             report = get_audit_report(period=args.period)
+            # Assuming report is already formatted string
             print(report)
         
         return 0
     except Exception as e:
-        print(f"Error: {e}", file=sys.stderr)
+        UX.print_error(str(e))
         return 1
 
 
@@ -290,28 +354,29 @@ def cmd_typecheck(args) -> int:
     try:
         path = Path(args.file)
         if not path.exists():
-            print(f"File not found: {args.file}", file=sys.stderr)
+            UX.print_error(f"File not found: {args.file}")
             return 1
         
         code = path.read_text()
         prover = MypyProver(strict=args.strict)
         
         if not prover.is_available():
-            print("mypy is not available", file=sys.stderr)
+            UX.print_error("mypy is not available")
             return 1
         
+        UX.print_info(f"Checking {args.file}...")
         result = prover.verify(code)
         
         if result.verified:
-            print(f"✅ Type check passed ({result.execution_time_ms:.0f}ms)")
+            UX.print_success(f"Type check passed ({result.execution_time_ms:.0f}ms)")
             return 0
         else:
-            print(f"❌ Type check failed")
+            UX.print_error("Type check failed")
             for error in result.errors:
-                print(f"  - {error}")
+                print(colored(f"  - {error}", "red"))
             return 1
     except Exception as e:
-        print(f"Error: {e}", file=sys.stderr)
+        UX.print_error(str(e))
         return 1
 
 

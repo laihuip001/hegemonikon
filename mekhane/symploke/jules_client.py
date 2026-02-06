@@ -328,7 +328,6 @@ class JulesClient:
                 method,
                 url,
                 headers=request_headers,
-                # NOTE: Removed self-assignment: json = json
             ) as resp:
                 if resp.status == 429:
                     retry_after = resp.headers.get("Retry-After")
@@ -389,7 +388,6 @@ class JulesClient:
             name=data["name"],
             state=parse_state(data.get("state", "PLANNING")),
             prompt=prompt,
-            # NOTE: Removed self-assignment: source = source
         )
 
     @with_retry(
@@ -480,7 +478,6 @@ class JulesClient:
                     if consecutive_unknown >= 3 and fail_on_unknown:
                         raise UnknownStateError(
                             state=session.state.value,
-                            # NOTE: Removed self-assignment: session_id = session_id
                         )
                 else:
                     consecutive_unknown = 0
@@ -581,7 +578,6 @@ class JulesClient:
                             error_type=type(e).__name__,
                         ),
                         error=e,
-                        # NOTE: Removed self-assignment: task = task
                     )
 
         results = await asyncio.gather(*[bounded_execute(task) for task in tasks])
@@ -625,7 +621,6 @@ class JulesClient:
                 axes=["O1", "O2", "O3", "O4"]
             )
         """
-        # Import perspective matrix
         try:
             from mekhane.ergasterion.synedrion import PerspectiveMatrix
         except ImportError:
@@ -633,18 +628,15 @@ class JulesClient:
                 "Synedrion module not found. Ensure mekhane.ergasterion.synedrion is installed."
             )
 
-        # Load perspective matrix
         matrix = PerspectiveMatrix.load()
         perspectives = matrix.all_perspectives()
 
-        # Apply domain filter
         if domains:
             perspectives = [p for p in perspectives if p.domain_id in domains]
             logger.info(
                 f"Filtered to domains: {domains} ({len(perspectives)} perspectives)"
             )
 
-        # Apply axis filter
         if axes:
             perspectives = [p for p in perspectives if p.axis_id in axes]
             logger.info(f"Filtered to axes: {axes} ({len(perspectives)} perspectives)")

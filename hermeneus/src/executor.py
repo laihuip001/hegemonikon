@@ -320,26 +320,15 @@ class WorkflowExecutor:
         start = time.time()
         
         try:
-            from . import record_verification
-            
             consensus = verify_result.output if verify_result else None
             
-            if consensus:
-                audit_id = record_verification(ccl, output, consensus)
-            else:
-                # 検証なしの場合はダミー記録
-                from .audit import AuditStore, AuditRecord
-                store = AuditStore()
-                record = AuditRecord(
-                    record_id="",
-                    ccl_expression=ccl,
-                    execution_result=output[:500],
-                    debate_summary="検証スキップ",
-                    consensus_accepted=True,
-                    confidence=0.5,
-                    dissent_reasons=[]
-                )
-                audit_id = store.record(record)
+            # 同期IOをスレッドプールにオフロード
+            loop = asyncio.get_running_loop()
+            audit_id = await loop.run_in_executor(
+                None,
+                self._record_audit_sync,
+                ccl, output, consensus
+            )
             
             return PhaseResult(
                 phase=ExecutionPhase.AUDIT,
@@ -355,6 +344,30 @@ class WorkflowExecutor:
                 duration_ms=(time.time() - start) * 1000
             )
     
+    def _record_audit_sync(
+        self,
+        ccl: str,
+        output: str,
+        consensus: Optional[Any]
+    ) -> str:
+        """同期的に監査記録を行う (スレッドプールで実行用)"""
+        if consensus:
+            from . import record_verification
+            return record_verification(ccl, output, consensus)
+        else:
+            from .audit import AuditStore, AuditRecord
+            store = AuditStore()
+            record = AuditRecord(
+                record_id="",
+                ccl_expression=ccl,
+                execution_result=output[:500],
+                debate_summary="検証スキップ",
+                consensus_accepted=True,
+                confidence=0.5,
+                dissent_reasons=[]
+            )
+            return store.record(record)
+
     def _extract_workflow_name(self, ccl: str) -> str:
         """CCL からワークフロー名を抽出"""
         # /noe+ → noe, /bou+ >> /ene+ → bou

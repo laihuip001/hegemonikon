@@ -72,6 +72,26 @@ def extract_text_recursive(node: Union[str, list, dict]) -> str:
     return ""
 
 
+def parse_date_str(create_time: Union[int, float, str]) -> str:
+    """
+    日付文字列またはタイムスタンプを解析してYYYY-MM-DD形式の文字列を返す。
+    解析に失敗した場合は警告を表示し、"Unknown_Date"を返す。
+    """
+    if not create_time:
+        return "Unknown_Date"
+
+    try:
+        if isinstance(create_time, (int, float)):
+            dt = datetime.fromtimestamp(create_time)
+        else:
+            # ISO 8601 parsing with simplified timezone handling
+            dt = datetime.fromisoformat(create_time.replace("Z", "+00:00"))
+        return dt.strftime("%Y-%m-%d")
+    except Exception as e:
+        print(f"Warning: Failed to parse date '{create_time}': {e}", file=sys.stderr)
+        return "Unknown_Date"
+
+
 def process_conversations(data: Union[List, Dict, Iterable], output_dir: str):
     """メイン処理"""
 
@@ -107,16 +127,7 @@ def process_conversations(data: Union[List, Dict, Iterable], output_dir: str):
             create_time = item.get("create_time", item.get("created_at", ""))
 
             # Format date
-            date_str = "Unknown_Date"
-            if create_time:
-                try:
-                    if isinstance(create_time, (int, float)):
-                        dt = datetime.fromtimestamp(create_time)
-                    else:
-                        dt = datetime.fromisoformat(create_time.replace("Z", "+00:00"))
-                    date_str = dt.strftime("%Y-%m-%d")
-                except Exception:
-                    pass  # TODO: Add proper error handling
+            date_str = parse_date_str(create_time)
 
             # Safe Filename (Robustness)
             base_name = safe_filename(f"{date_str}_{title}")

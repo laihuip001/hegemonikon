@@ -22,6 +22,8 @@ from mekhane.symploke.jules_client import (
     SessionState,
     RateLimitError,
 )
+from aioresponses import aioresponses
+import re
 
 
 class TestJulesClient:
@@ -92,11 +94,35 @@ class TestCreateSession:
     """Test create_session method with mocks."""
 
     @pytest.mark.asyncio
-    @pytest.mark.skip(reason="Requires aioresponses for proper async mocking")
     async def test_create_session_success(self):
         """Test successful session creation."""
-        # TODO: Use aioresponses for proper async HTTP mocking
-        pass
+        client = JulesClient(api_key="test-key")
+
+        # Expected response from API
+        mock_response = {
+            "id": "session-123",
+            "name": "sessions/session-123",
+            "state": "PLANNING",
+        }
+
+        with aioresponses() as m:
+            # Mock the POST request
+            m.post(
+                re.compile(f"^{re.escape(client.BASE_URL)}/sessions$"),
+                payload=mock_response,
+                status=200,
+            )
+
+            session = await client.create_session(
+                prompt="Fix bug",
+                source="sources/github/owner/repo"
+            )
+
+            # Assertions
+            assert session.id == "session-123"
+            assert session.state == SessionState.PLANNING
+            assert session.prompt == "Fix bug"
+            assert session.source == "sources/github/owner/repo"
 
 
 class TestBatchExecute:

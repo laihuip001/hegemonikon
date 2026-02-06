@@ -97,10 +97,34 @@ def cmd_ingest(args):
         except Exception as e:
             print(f"[Kairos] Error: {e}")
 
-    # Chronos (Conversation History) - Not yet implemented
+    # Chronos (Conversation History)
     if args.all or args.chronos:
-        # TODO: Implement when conversation history indexing is ready
-        results["chronos"] = 0
+        try:
+            from mekhane.symploke.chronos_ingest import (
+                get_session_files,
+                parse_session_file,
+                ingest_to_chronos,
+            )
+
+            files = get_session_files()
+            if files:
+                docs = []
+                for f in files:
+                    d = parse_session_file(f)
+                    if d:
+                        docs.append(d)
+
+                if docs:
+                    count = ingest_to_chronos(docs)
+                    results["chronos"] = count
+                else:
+                    print("[Chronos] No valid documents to ingest")
+            else:
+                print("[Chronos] No session files found")
+        except ImportError as e:
+            print(f"[Chronos] Import error: {e}")
+        except Exception as e:
+            print(f"[Chronos] Error: {e}")
 
     # Output in /boot expected format
     total = sum(results.values())
@@ -137,8 +161,28 @@ def cmd_stats(args):
     )
     print(f"Kairos: {handoff_count} handoff files")
 
-    # Chronos stats (placeholder)
-    print("Chronos: Not implemented")
+    # Chronos stats
+    try:
+        import lancedb
+        from mekhane.symploke.chronos_ingest import DEFAULT_DB_PATH, TABLE_NAME
+
+        if DEFAULT_DB_PATH.exists():
+            db = lancedb.connect(str(DEFAULT_DB_PATH))
+            if TABLE_NAME in db.list_tables():
+                table = db.open_table(TABLE_NAME)
+                # Note: count_rows() might not be available in all versions, using len(to_arrow()) or similar if needed
+                # checking lancedb docs, table object usually supports len() or counting via query
+                try:
+                    count = table.count_rows()
+                except AttributeError:
+                    count = len(table.to_pandas())
+                print(f"Chronos: {count} conversations")
+            else:
+                print("Chronos: No table found")
+        else:
+            print("Chronos: Not indexed")
+    except Exception as e:
+        print(f"Chronos: Error - {e}")
 
     print("=" * 40)
     return 0

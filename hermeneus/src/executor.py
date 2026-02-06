@@ -321,25 +321,36 @@ class WorkflowExecutor:
         
         try:
             from . import record_verification
+            loop = asyncio.get_running_loop()
             
             consensus = verify_result.output if verify_result else None
             
             if consensus:
-                audit_id = record_verification(ccl, output, consensus)
+                audit_id = await loop.run_in_executor(
+                    None,
+                    record_verification,
+                    ccl,
+                    output,
+                    consensus
+                )
             else:
                 # 検証なしの場合はダミー記録
                 from .audit import AuditStore, AuditRecord
-                store = AuditStore()
-                record = AuditRecord(
-                    record_id="",
-                    ccl_expression=ccl,
-                    execution_result=output[:500],
-                    debate_summary="検証スキップ",
-                    consensus_accepted=True,
-                    confidence=0.5,
-                    dissent_reasons=[]
-                )
-                audit_id = store.record(record)
+
+                def _record_dummy():
+                    store = AuditStore()
+                    record = AuditRecord(
+                        record_id="",
+                        ccl_expression=ccl,
+                        execution_result=output[:500],
+                        debate_summary="検証スキップ",
+                        consensus_accepted=True,
+                        confidence=0.5,
+                        dissent_reasons=[]
+                    )
+                    return store.record(record)
+
+                audit_id = await loop.run_in_executor(None, _record_dummy)
             
             return PhaseResult(
                 phase=ExecutionPhase.AUDIT,

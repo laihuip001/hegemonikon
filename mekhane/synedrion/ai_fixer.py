@@ -20,6 +20,13 @@ from typing import List, Optional, Tuple, Dict
 import argparse
 
 
+# Pre-compile regex patterns for performance
+REGEX_BARE_EXCEPT = re.compile(r"^(\s*)except\s*:\s*$")
+REGEX_SELF_ASSIGNMENT = re.compile(r"^(\s*)(\w+)\s*=\s*(\w+)\s*$")
+REGEX_MUTABLE_DEFAULTS = re.compile(r"def\s+\w+\s*\([^)]*(\w+)\s*=\s*(\[\]|\{\})[^)]*\)")
+REGEX_HARDCODED_PATHS = re.compile(r'["\']\/home\/[^"\']+["\']')
+
+
 @dataclass
 class Fix:
     """A fix to apply."""
@@ -94,10 +101,9 @@ class AIFixer:
     def _fix_ai_020_bare_except(self, lines: List[str], file_path: Path) -> List[Fix]:
         """Fix bare except: → except Exception:"""
         fixes = []
-        pattern = re.compile(r"^(\s*)except\s*:\s*$")
 
         for i, line in enumerate(lines):
-            match = pattern.match(line)
+            match = REGEX_BARE_EXCEPT.match(line)
             if match:
                 indent = match.group(1)
                 fixes.append(
@@ -152,10 +158,9 @@ class AIFixer:
     ) -> List[Fix]:
         """Fix self-assignment: x = x → remove or mark."""
         fixes = []
-        pattern = re.compile(r"^(\s*)(\w+)\s*=\s*(\w+)\s*$")
 
         for i, line in enumerate(lines):
-            match = pattern.match(line)
+            match = REGEX_SELF_ASSIGNMENT.match(line)
             if match:
                 var1 = match.group(2)
                 var2 = match.group(3)
@@ -219,10 +224,7 @@ class AIFixer:
         """Fix mutable default arguments: def f(x=[]) → def f(x=None)"""
         fixes = []
 
-        # Pattern: def func(arg=[]) or def func(arg={})
-        pattern = re.compile(r"def\s+\w+\s*\([^)]*(\w+)\s*=\s*(\[\]|\{\})[^)]*\)")
-
-        for match in pattern.finditer(content):
+        for match in REGEX_MUTABLE_DEFAULTS.finditer(content):
             line_start = content.count("\n", 0, match.start()) + 1
             # This is complex to auto-fix correctly, so we skip for now
             # Would need to also add initialization in function body
@@ -234,10 +236,9 @@ class AIFixer:
     ) -> List[Fix]:
         """Suggest fixes for hardcoded paths (cannot fully auto-fix)."""
         fixes = []
-        pattern = re.compile(r'["\']\/home\/[^"\']+["\']')
 
         for i, line in enumerate(lines):
-            match = pattern.search(line)
+            match = REGEX_HARDCODED_PATHS.search(line)
             if match:
                 path_str = match.group(0)
                 # Suggest using Path(__file__).parent or os.environ

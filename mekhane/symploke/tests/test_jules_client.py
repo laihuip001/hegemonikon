@@ -16,6 +16,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent))
 
+from aioresponses import aioresponses
 from mekhane.symploke.jules_client import (
     JulesClient,
     JulesSession,
@@ -92,11 +93,27 @@ class TestCreateSession:
     """Test create_session method with mocks."""
 
     @pytest.mark.asyncio
-    @pytest.mark.skip(reason="Requires aioresponses for proper async mocking")
     async def test_create_session_success(self):
         """Test successful session creation."""
-        # TODO: Use aioresponses for proper async HTTP mocking
-        pass
+        with aioresponses() as m:
+            m.post(
+                "https://jules.googleapis.com/v1alpha/sessions",
+                payload={
+                    "id": "session-123",
+                    "name": "sessions/session-123",
+                    "state": "PLANNING",
+                },
+            )
+
+            client = JulesClient(api_key="test-key")
+            session = await client.create_session(
+                prompt="Fix bug",
+                source="sources/github/owner/repo"
+            )
+
+            assert session.id == "session-123"
+            assert session.state == SessionState.PLANNING
+            assert session.prompt == "Fix bug"
 
 
 class TestBatchExecute:

@@ -1,4 +1,5 @@
 # PROOF: [L2/インフラ] Hermēneus MCP Server
+from __future__ import annotations
 """
 Hermēneus MCP Server — AI 自己統合
 

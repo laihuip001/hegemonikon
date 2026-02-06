@@ -10,6 +10,7 @@ Origin: 2026-01-31 CCL Execution Guarantee Architecture
 
 import json
 import sqlite3
+import threading
 from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any, Dict, List, Optional
@@ -61,8 +62,22 @@ class AuditStore:
     def __init__(self, db_path: Optional[Path] = None):
         self.db_path = db_path or self.DEFAULT_PATH
         self.db_path.parent.mkdir(parents=True, exist_ok=True)
+        self._conn = sqlite3.connect(str(self.db_path))
+        self._conn.row_factory = sqlite3.Row
         self._init_db()
     
+    def close(self):
+        """データベース接続を閉じる"""
+        if self._conn:
+            self._conn.close()
+            self._conn = None
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.close()
+
     def _init_db(self):
         """データベースを初期化"""
         with self._connect() as conn:
@@ -92,12 +107,10 @@ class AuditStore:
     @contextmanager
     def _connect(self):
         """データベース接続を取得"""
-        conn = sqlite3.connect(str(self.db_path))
-        conn.row_factory = sqlite3.Row
-        try:
-            yield conn
-        finally:
-            conn.close()
+        if not self._conn:
+            self._conn = sqlite3.connect(str(self.db_path))
+            self._conn.row_factory = sqlite3.Row
+        yield self._conn
     
     def _generate_id(self) -> str:
         """一意の ID を生成"""
@@ -358,6 +371,21 @@ class AuditReporter:
 # Integration with Verifier
 # =============================================================================
 
+_thread_local = threading.local()
+
+def _get_store(db_path: Optional[Path] = None) -> AuditStore:
+    """AuditStore のインスタンスを取得 (スレッドローカルキャッシュ付き)"""
+    path = db_path or AuditStore.DEFAULT_PATH
+    key = str(path.absolute())
+
+    if not hasattr(_thread_local, "stores"):
+        _thread_local.stores = {}
+
+    if key not in _thread_local.stores:
+        _thread_local.stores[key] = AuditStore(path)
+
+    return _thread_local.stores[key]
+
 def record_verification(
     ccl: str,
     execution_result: str,
@@ -371,7 +399,7 @@ def record_verification(
         >>> result = verify_execution("/noe+", "分析結果")
         >>> audit_id = record_verification("/noe+", "分析結果", result)
     """
-    store = AuditStore(db_path)
+    store = _get_store(db_path)
     
     # ディベートサマリーを作成
     debate_summary = f"ラウンド数: {len(consensus_result.rounds)}, "
@@ -402,7 +430,7 @@ def query_audits(
     db_path: Optional[Path] = None
 ) -> List[AuditRecord]:
     """監査レコードをクエリ (便利関数)"""
-    store = AuditStore(db_path)
+    store = _get_store(db_path)
     reporter = AuditReporter(store)
     since = reporter._parse_period(period)
     
@@ -419,6 +447,6 @@ def get_audit_report(
     db_path: Optional[Path] = None
 ) -> str:
     """監査レポートを取得 (便利関数)"""
-    store = AuditStore(db_path)
+    store = _get_store(db_path)
     reporter = AuditReporter(store)
     return reporter.generate_summary(period)

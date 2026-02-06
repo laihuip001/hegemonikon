@@ -97,13 +97,13 @@ class JulesResultCollector:
         duration = None
         if created and updated:
             try:
-                from dateutil import parser as dt_parser
-
-                t1 = dt_parser.parse(created)
-                t2 = dt_parser.parse(updated)
+                t1 = datetime.fromisoformat(created)
+                t2 = datetime.fromisoformat(updated)
                 duration = int((t2 - t1).total_seconds())
-            except Exception:
-                pass  # TODO: Add proper error handling
+            except Exception as e:
+                logger.warning(
+                    f"Failed to calculate duration for session {data.get('id')}: {e}"
+                )
 
         # Check if silent (no output = no issues found)
         is_silent = data.get("state") == "COMPLETED" and not outputs

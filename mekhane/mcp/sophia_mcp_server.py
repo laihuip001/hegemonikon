@@ -198,8 +198,9 @@ async def call_tool(name: str, arguments: dict):
                                 doc_date = datetime.fromisoformat(ts.split("T")[0])
                                 if (now - doc_date).days > recent_days:
                                     continue
-                            except Exception:
-                                pass  # TODO: Add proper error handling
+                            except (ValueError, TypeError) as e:
+                                task_name = r.metadata.get("primary_task", "N/A")
+                                log(f"Error parsing date for task '{task_name}': {e}. Timestamp: '{ts}'")
 
                     results.append(
                         {

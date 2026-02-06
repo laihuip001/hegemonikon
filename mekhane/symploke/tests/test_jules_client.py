@@ -92,11 +92,31 @@ class TestCreateSession:
     """Test create_session method with mocks."""
 
     @pytest.mark.asyncio
-    @pytest.mark.skip(reason="Requires aioresponses for proper async mocking")
     async def test_create_session_success(self):
         """Test successful session creation."""
-        # TODO: Use aioresponses for proper async HTTP mocking
-        pass
+        from aioresponses import aioresponses
+
+        client = JulesClient(api_key="test-key")
+
+        with aioresponses() as m:
+            m.post(
+                f"{client.BASE_URL}/sessions",
+                payload={
+                    "id": "session-123",
+                    "name": "sessions/session-123",
+                    "state": "PLANNING",
+                },
+                status=200,
+            )
+
+            session = await client.create_session(
+                prompt="Do something", source="sources/github/me/repo"
+            )
+
+            assert session.id == "session-123"
+            assert session.state == SessionState.PLANNING
+            assert session.prompt == "Do something"
+            assert session.source == "sources/github/me/repo"
 
 
 class TestBatchExecute:

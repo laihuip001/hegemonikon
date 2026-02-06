@@ -30,12 +30,12 @@ class KairosAgent(AuditAgent):
 
     # タイミング問題パターン
     TIMING_PROBLEMS = [
-        (r"\b後で\b", "K-001", "「後で」は先延ばしの兆候"),
-        (r"\bいつか\b", "K-002", "「いつか」は時宜が不明確"),
-        (r"\bそのうち\b", "K-003", "「そのうち」は時宜が不明確"),
-        (r"\blater\b(?!\s+than)", "K-004", "「later」は先延ばしの兆候"),
-        (r"\bsomeday\b", "K-005", "「someday」は時宜が不明確"),
-        (r"\beventually\b", "K-006", "「eventually」は時宜が曖昧"),
+        (re.compile(r"\b後で\b", re.IGNORECASE), "K-001", "「後で」は先延ばしの兆候"),
+        (re.compile(r"\bいつか\b", re.IGNORECASE), "K-002", "「いつか」は時宜が不明確"),
+        (re.compile(r"\bそのうち\b", re.IGNORECASE), "K-003", "「そのうち」は時宜が不明確"),
+        (re.compile(r"\blater\b(?!\s+than)", re.IGNORECASE), "K-004", "「later」は先延ばしの兆候"),
+        (re.compile(r"\bsomeday\b", re.IGNORECASE), "K-005", "「someday」は時宜が不明確"),
+        (re.compile(r"\beventually\b", re.IGNORECASE), "K-006", "「eventually」は時宜が曖昧"),
     ]
 
     # 時間的コンテキストキーワード
@@ -56,9 +56,9 @@ class KairosAgent(AuditAgent):
 
     # 早すぎる最適化パターン
     PREMATURE_PATTERNS = [
-        (r"\b最適化\b.*\bまず\b", "K-010", "早すぎる最適化の兆候"),
-        (r"\boptimiz\w*\b.*\bfirst\b", "K-011", "Premature optimization detected"),
-        (r"\bパフォーマンス\b.*\b前に\b", "K-012", "機能完成前のパフォーマンス議論"),
+        (re.compile(r"\b最適化\b.*\bまず\b", re.IGNORECASE), "K-010", "早すぎる最適化の兆候"),
+        (re.compile(r"\boptimiz\w*\b.*\bfirst\b", re.IGNORECASE), "K-011", "Premature optimization detected"),
+        (re.compile(r"\bパフォーマンス\b.*\b前に\b", re.IGNORECASE), "K-012", "機能完成前のパフォーマンス議論"),
     ]
 
     def audit(self, target: AuditTarget) -> AgentResult:
@@ -92,7 +92,7 @@ class KairosAgent(AuditAgent):
         issues = []
 
         for pattern, code, message in self.TIMING_PROBLEMS:
-            for match in re.finditer(pattern, content, re.IGNORECASE):
+            for match in pattern.finditer(content):
                 issues.append(
                     AuditIssue(
                         agent=self.name,
@@ -111,7 +111,7 @@ class KairosAgent(AuditAgent):
         issues = []
 
         for pattern, code, message in self.PREMATURE_PATTERNS:
-            for match in re.finditer(pattern, content, re.IGNORECASE):
+            for match in pattern.finditer(content):
                 issues.append(
                     AuditIssue(
                         agent=self.name,

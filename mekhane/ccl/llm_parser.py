@@ -9,6 +9,7 @@ Migration: google.generativeai -> google.genai (deprecated Nov 2025)
 """
 
 import os
+import logging
 from typing import Optional
 from pathlib import Path
 
@@ -28,6 +29,9 @@ except ImportError:
     except ImportError:
         HAS_GENAI = False
         USE_NEW_SDK = False
+
+
+logger = logging.getLogger(__name__)
 
 
 def _get_api_key() -> Optional[str]:
@@ -68,8 +72,8 @@ class LLMParser:
                 else:
                     # Legacy SDK: google.generativeai
                     self.model = genai_legacy.GenerativeModel(model)
-            except Exception:
-                pass  # TODO: Add proper error handling
+            except Exception as e:
+                logger.error("Failed to initialize legacy SDK: %s", e)
 
     def _load_system_prompt(self) -> str:
         """Load the CCL compiler prompt."""
@@ -119,7 +123,7 @@ class LLMParser:
                     lines = ccl.split("\n")
                     ccl = "\n".join(lines[1:-1] if lines[-1] == "```" else lines[1:])
                 return ccl.strip()
-        except Exception:
-            pass  # TODO: Add proper error handling
+        except Exception as e:
+            logger.error("Error during parsing: %s", e)
 
         return None

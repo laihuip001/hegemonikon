@@ -59,6 +59,12 @@ INSIGHT_PATTERNS = {
     ],
 }
 
+# Pre-compile patterns for performance
+COMPILED_PATTERNS = {
+    category: [re.compile(pattern, re.MULTILINE | re.DOTALL) for pattern in patterns]
+    for category, patterns in INSIGHT_PATTERNS.items()
+}
+
 
 def extract_context(content: str, match_start: int, context_size: int = 200) -> str:
     """マッチ周辺のコンテキストを抽出"""
@@ -119,14 +125,14 @@ def mine_insights(
     content = file_path.read_text(encoding="utf-8")
     insights = []
 
-    categories = categories or list(INSIGHT_PATTERNS.keys())
+    categories = categories or list(COMPILED_PATTERNS.keys())
 
     for category in categories:
-        if category not in INSIGHT_PATTERNS:
+        if category not in COMPILED_PATTERNS:
             continue
 
-        for pattern in INSIGHT_PATTERNS[category]:
-            for match in re.finditer(pattern, content, re.MULTILINE | re.DOTALL):
+        for pattern in COMPILED_PATTERNS[category]:
+            for match in pattern.finditer(content):
                 text = match.group(1) if match.groups() else match.group(0)
                 text = clean_insight_text(text)
 
@@ -197,7 +203,7 @@ def main():
     parser.add_argument(
         "--pattern",
         type=str,
-        choices=list(INSIGHT_PATTERNS.keys()),
+        choices=list(COMPILED_PATTERNS.keys()),
         help="Filter by insight category",
     )
     parser.add_argument("--output", type=str, help="Output file path")

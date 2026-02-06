@@ -618,7 +618,12 @@ class JulesClient:
         progress_callback: Optional[callable] = None,
     ) -> list["JulesResult"]:
         """
-        Execute Synedrion v2.1 review with 480 orthogonal perspectives.
+        [DEPRECATED] Execute Synedrion v2.1 multi-perspective review.
+        
+        .. deprecated::
+            Use `SynedrionReviewer` from `mekhane.symploke.synedrion_reviewer` instead.
+            This method violates SRP by mixing API transport with business logic.
+            See TH-003, TH-009, ES-009, AI-011 reviews. with 480 orthogonal perspectives.
 
         Uses the Hegemonikón theorem grid (20 domains × 24 axes) to generate
         structurally orthogonal review perspectives, eliminating redundancy.

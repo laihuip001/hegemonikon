@@ -69,7 +69,9 @@ try:
         GEMINI_CLIENT = genai.Client(api_key=api_key)
         GEMINI_AVAILABLE = True
 except ImportError:
-    pass  # TODO: Add proper error handling
+    logger.warning(
+        "google.genai module not found. LLM fallback features will be disabled."
+    )
 
 
 # =============================================================================

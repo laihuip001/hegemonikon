@@ -125,18 +125,22 @@ def parse_session_file(filepath: Path) -> Optional[SessionDocument]:
         return None
 
 
-def index_sessions():
+def index_sessions(sessions_dir: Path = SESSIONS_DIR, db_path: Path = DB_PATH) -> int:
     """全セッションファイルをインデックス"""
     print("[*] LanceDB Session Indexer")
-    print(f"    Sessions: {SESSIONS_DIR}")
-    print(f"    Database: {DB_PATH}")
+    print(f"    Sessions: {sessions_dir}")
+    print(f"    Database: {db_path}")
 
     # データベース接続
-    DB_PATH.mkdir(parents=True, exist_ok=True)
-    db = lancedb.connect(str(DB_PATH))
+    db_path.mkdir(parents=True, exist_ok=True)
+    db = lancedb.connect(str(db_path))
 
     # セッションファイルを収集
-    session_files = list(SESSIONS_DIR.glob("*.md"))
+    if not sessions_dir.exists():
+        print(f"[!] Sessions directory not found: {sessions_dir}")
+        return 0
+
+    session_files = list(sessions_dir.glob("*.md"))
     print(f"[*] Found {len(session_files)} session files")
 
     # ドキュメントを作成
@@ -151,7 +155,7 @@ def index_sessions():
 
     if not documents:
         print("[!] No documents to index")
-        return
+        return 0
 
     # テーブルが存在する場合は削除して再作成
     if TABLE_NAME in db.table_names():
@@ -174,12 +178,31 @@ def index_sessions():
 
     print("[✓] Indexing complete!")
 
-    return db, table
+    return len(documents)
 
 
-def search_sessions(query: str, limit: int = 5):
+def get_session_count(db_path: Path = DB_PATH) -> int:
+    """セッション数を取得"""
+    if not db_path.exists():
+        return 0
+
+    try:
+        db = lancedb.connect(str(db_path))
+        if TABLE_NAME in db.table_names():
+            table = db.open_table(TABLE_NAME)
+            # count_rows is available in newer lancedb, fallback to len() if needed
+            if hasattr(table, "count_rows"):
+                return table.count_rows()
+            return len(table)
+    except Exception:
+        pass
+
+    return 0
+
+
+def search_sessions(query: str, limit: int = 5, db_path: Path = DB_PATH):
     """セッションを検索"""
-    db = lancedb.connect(str(DB_PATH))
+    db = lancedb.connect(str(db_path))
 
     if TABLE_NAME not in db.table_names():
         print("[!] No sessions indexed. Run index_sessions() first.")

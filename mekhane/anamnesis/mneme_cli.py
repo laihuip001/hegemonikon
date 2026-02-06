@@ -97,10 +97,22 @@ def cmd_ingest(args):
         except Exception as e:
             print(f"[Kairos] Error: {e}")
 
-    # Chronos (Conversation History) - Not yet implemented
+    # Chronos (Conversation History)
     if args.all or args.chronos:
-        # TODO: Implement when conversation history indexing is ready
-        results["chronos"] = 0
+        try:
+            from mekhane.anamnesis.lancedb_indexer import index_sessions
+
+            chronos_sessions_dir = _HEGEMONIKON_ROOT / "sessions"
+            chronos_db_path = _HEGEMONIKON_ROOT / "lancedb"
+
+            count = index_sessions(
+                sessions_dir=chronos_sessions_dir, db_path=chronos_db_path
+            )
+            results["chronos"] = count
+        except ImportError as e:
+            print(f"[Chronos] Import error: {e}")
+        except Exception as e:
+            print(f"[Chronos] Error: {e}")
 
     # Output in /boot expected format
     total = sum(results.values())
@@ -137,8 +149,15 @@ def cmd_stats(args):
     )
     print(f"Kairos: {handoff_count} handoff files")
 
-    # Chronos stats (placeholder)
-    print("Chronos: Not implemented")
+    # Chronos stats
+    try:
+        from mekhane.anamnesis.lancedb_indexer import get_session_count
+
+        chronos_db_path = _HEGEMONIKON_ROOT / "lancedb"
+        count = get_session_count(db_path=chronos_db_path)
+        print(f"Chronos: {count} documents")
+    except Exception as e:
+        print(f"Chronos: Error - {e}")
 
     print("=" * 40)
     return 0

@@ -115,8 +115,11 @@ def process_conversations(data: Union[List, Dict, Iterable], output_dir: str):
                     else:
                         dt = datetime.fromisoformat(create_time.replace("Z", "+00:00"))
                     date_str = dt.strftime("%Y-%m-%d")
-                except Exception:
-                    pass  # TODO: Add proper error handling
+                except Exception as e:
+                    print(
+                        f"Warning: Failed to parse date '{create_time}' for item '{title}'. Using default. Error: {e}",
+                        file=sys.stderr,
+                    )
 
             # Safe Filename (Robustness)
             base_name = safe_filename(f"{date_str}_{title}")

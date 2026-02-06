@@ -97,10 +97,30 @@ def cmd_ingest(args):
         except Exception as e:
             print(f"[Kairos] Error: {e}")
 
-    # Chronos (Conversation History) - Not yet implemented
+    # Chronos (Conversation History)
     if args.all or args.chronos:
-        # TODO: Implement when conversation history indexing is ready
-        results["chronos"] = 0
+        try:
+            from mekhane.symploke.chronos_ingest import (
+                get_conversation_files,
+                parse_conversation_chunks,
+                ingest_to_chronos,
+            )
+
+            files = get_conversation_files()
+            if files:
+                all_docs = []
+                for f in files:
+                    chunks = parse_conversation_chunks(f)
+                    all_docs.extend(chunks)
+
+                count = ingest_to_chronos(all_docs)
+                results["chronos"] = count
+            else:
+                print("[Chronos] No conversation files found")
+        except ImportError as e:
+            print(f"[Chronos] Import error: {e}")
+        except Exception as e:
+            print(f"[Chronos] Error: {e}")
 
     # Output in /boot expected format
     total = sum(results.values())
@@ -137,8 +157,22 @@ def cmd_stats(args):
     )
     print(f"Kairos: {handoff_count} handoff files")
 
-    # Chronos stats (placeholder)
-    print("Chronos: Not implemented")
+    # Chronos stats
+    try:
+        from mekhane.symploke.chronos_ingest import (
+            DEFAULT_INDEX_PATH as CHRONOS_INDEX_PATH,
+            load_chronos_index,
+        )
+
+        if CHRONOS_INDEX_PATH.exists():
+            adapter = load_chronos_index(str(CHRONOS_INDEX_PATH))
+            print(f"Chronos: {adapter.count()} vectors")
+        else:
+            print("Chronos: Not indexed")
+    except ImportError:
+        print("Chronos: Module not found")
+    except Exception as e:
+        print(f"Chronos: Error - {e}")
 
     print("=" * 40)
     return 0

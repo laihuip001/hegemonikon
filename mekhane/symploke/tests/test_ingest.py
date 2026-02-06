@@ -181,5 +181,33 @@ class TestSophiaIngest:
             assert any("implementation-examples-example1" in id for id in doc_ids)
 
 
+class TestChronosIngest:
+    """Tests for chronos_ingest.py"""
+
+    def test_parse_conversation_chunks(self):
+        """Test parsing conversation into chunks"""
+        from mekhane.symploke.chronos_ingest import parse_conversation_chunks
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            dir_path = Path(tmpdir)
+
+            # Use specific filename format required by parser
+            filename = "2026-01-31_conv_99_Test_Conversation.md"
+            file_path = dir_path / filename
+
+            # Write content with message separators (make it long enough to trigger split > 100 chars)
+            long_text = "A" * 100
+            content = f"# Test Conversation\n\n## 🤖 Claude\n{long_text}\n\n## 🤖 Claude\n{long_text}\n\n## 🤖 Claude\nTest Message"
+            file_path.write_text(content, encoding="utf-8")
+
+            # Use small chunk size to force splitting
+            chunks = parse_conversation_chunks(file_path, chunk_size=50)
+
+            assert len(chunks) >= 2
+            assert chunks[0].metadata["title"] == "Test Conversation"
+            assert chunks[0].metadata["conv_num"] == 99
+            assert "AAAAA" in chunks[0].content
+
+
 if __name__ == "__main__":
     pytest.main([__file__, "-v"])

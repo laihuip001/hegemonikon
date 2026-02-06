@@ -125,6 +125,7 @@ class JulesSession:
     pull_request_url: Optional[str] = None
     error: Optional[str] = None
     error_type: Optional[str] = None  # Preserves exception type for debugging
+    output: Optional[str] = None  # Review output text (TH-013, ES-009 fix)
 
 
 @dataclass
@@ -142,7 +143,11 @@ class JulesResult:
 
     @property
     def is_success(self) -> bool:
-        return self.error is None and self.session is not None
+        """True only if no error AND session completed successfully (ES-018 fix)."""
+        if self.error is not None or self.session is None:
+            return False
+        # ES-018: Check actual session state, not just error absence
+        return self.session.state == SessionState.COMPLETED
 
     @property
     def is_failed(self) -> bool:
@@ -410,12 +415,16 @@ class JulesClient:
         """
         data = await self._request("GET", f"sessions/{session_id}")
 
-        # Extract PR URL if available
+        # Extract PR URL and output text if available (TH-013 fix)
         pr_url = None
+        output_text = None
         outputs = data.get("outputs", [])
         if outputs:
-            pr = outputs[0].get("pullRequest", {})
+            first_output = outputs[0]
+            pr = first_output.get("pullRequest", {})
             pr_url = pr.get("url")
+            # TH-013: Preserve review output text for SILENCE detection
+            output_text = first_output.get("text") or first_output.get("content")
 
         return JulesSession(
             id=data["id"],
@@ -425,6 +434,7 @@ class JulesClient:
             source=data.get("sourceContext", {}).get("source", ""),
             pull_request_url=pr_url,
             error=data.get("error"),
+            output=output_text,
         )
 
     async def poll_session(
@@ -707,8 +717,10 @@ class JulesClient:
         # Log summary
         succeeded = sum(1 for r in all_results if r.is_success)
         failed = len(all_results) - succeeded
+        # TH-004, ES-009 fix: Check actual output text, not str(session)
         silent = sum(
-            1 for r in all_results if r.is_success and "SILENCE" in str(r.session)
+            1 for r in all_results 
+            if r.is_success and r.session.output and "SILENCE" in r.session.output
         )
 
         logger.info(

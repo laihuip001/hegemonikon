@@ -112,6 +112,19 @@ class TestJulesResult:
         assert result.is_success is False
         assert result.is_failed is True
 
+    def test_is_failed_with_failed_state(self):
+        """ES-018: FAILED 状態のセッションは is_success=False"""
+        session = JulesSession(
+            id="test-123",
+            name="test",
+            state=SessionState.FAILED,
+            prompt="test",
+            source="test",
+        )
+        result = JulesResult(session=session)
+        assert result.is_success is False
+        assert result.is_failed is True
+
 
 class TestBatchExecute:
     """batch_execute のテスト (AI-022 セッション追跡)"""

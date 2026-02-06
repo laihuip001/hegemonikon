@@ -72,6 +72,14 @@ class CompletenessAgent(AuditAgent):
         (r"except[^:]*:\s*\n\s*pass\s*$", "COMP-014", "空の except ブロック"),
     ]
 
+    # Pre-compile patterns for performance
+    _COMPILED_INCOMPLETE_MARKERS = [
+        (re.compile(p, re.MULTILINE), c, m) for p, c, m in INCOMPLETE_MARKERS
+    ]
+    _COMPILED_EMPTY_PATTERNS = [
+        (re.compile(p, re.MULTILINE), c, m) for p, c, m in EMPTY_PATTERNS
+    ]
+
     def audit(self, target: AuditTarget) -> AgentResult:
         """完全性を監査"""
         issues: List[AuditIssue] = []
@@ -105,8 +113,8 @@ class CompletenessAgent(AuditAgent):
         """未完了マーカーを検出"""
         issues = []
 
-        for pattern, code, message in self.INCOMPLETE_MARKERS:
-            for match in re.finditer(pattern, content, re.MULTILINE):
+        for pattern, code, message in self._COMPILED_INCOMPLETE_MARKERS:
+            for match in pattern.finditer(content):
                 # コメント内の TODO/FIXME の重大度を調整
                 line_start = content.rfind("\n", 0, match.start()) + 1
                 line = content[line_start : content.find("\n", match.start())]
@@ -132,8 +140,8 @@ class CompletenessAgent(AuditAgent):
         """空のブロックを検出"""
         issues = []
 
-        for pattern, code, message in self.EMPTY_PATTERNS:
-            for match in re.finditer(pattern, content, re.MULTILINE):
+        for pattern, code, message in self._COMPILED_EMPTY_PATTERNS:
+            for match in pattern.finditer(content):
                 issues.append(
                     AuditIssue(
                         agent=self.name,

@@ -259,9 +259,9 @@ class WorkflowExecutor:
         start = time.time()
         
         try:
-            from . import execute_ccl
+            from . import execute_ccl_async
             
-            result = execute_ccl(ccl, context=context, model=model)
+            result = await execute_ccl_async(ccl, context=context, model=model)
             
             return PhaseResult(
                 phase=ExecutionPhase.EXECUTE,

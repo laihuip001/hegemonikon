@@ -184,10 +184,12 @@ $$\text{prediction} \to \text{observation} \to \text{updated belief}$$
 
 | 項目 | 判定 |
 |:-----|:-----|
-| **`>*` の圏論的正体** | **Actegory (モノイダル作用) ⊳ : V × A → A** |
-| **確信度** | 0.75 (仮説段階、Smithe との接続は未検証) |
+| **`>*` の圏論的正体** | **Lax Actegory (弱モノイダル作用) ⊳ : V × A → A** |
+| **確信度** | 0.85 (V1-V5 検証済、Bayesian lens 接続も実証的に支持) |
+| **結合律** | **Lax**: (B⊗C)⊳A ⟹ B⊳(C⊳A) (射が存在、同型ではない) |
+| **単位律** | **Strict**: I⊳A = A |
 | **CCL における意味** | B のモノイダル構造が A に作用し、A を A 型のまま変容させる |
-| **Bayesian lens 接続** | forward = `>>`, backward = `>*` (仮説) |
+| **Bayesian lens 接続** | forward = `>>`, backward = `>*` (**V3 で実証的に確認**) |
 | **新規性** | Cog の自己作用 (Cog acts on itself) は CCL 固有の構造 |
 
 > **三法則との整合**:

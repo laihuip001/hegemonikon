@@ -41,7 +41,7 @@ def get_boot_context(mode: str = "standard", context: Optional[str] = None) -> d
     handoffs_result = get_boot_handoffs(mode=mode, context=context)
     print(" Done.", file=sys.stderr)
 
-    # 軸 B: Sophia アクティベーション
+    # 軸 B: Sophia アクティベーション (タイムアウト付き)
     print(" [2/4] 📚 Ingesting Knowledge (Sophia)...", file=sys.stderr, end="", flush=True)
     # コンテキストを Handoff から取得
     ki_context = context
@@ -50,12 +50,22 @@ def get_boot_context(mode: str = "standard", context: Optional[str] = None) -> d
         if not ki_context:
             ki_context = handoffs_result["latest"].content[:200]
 
-    from mekhane.symploke.sophia_ingest import get_boot_ki, format_ki_output
+    ki_result = {"ki_items": [], "count": 0}
+    try:
+        from concurrent.futures import ThreadPoolExecutor, TimeoutError as FutureTimeout
 
-    ki_result = get_boot_ki(context=ki_context, mode=mode)
-    print(" Done.", file=sys.stderr)
+        def _run_sophia():
+            from mekhane.symploke.sophia_ingest import get_boot_ki, format_ki_output
+            return get_boot_ki(context=ki_context, mode=mode)
 
-    # 軸 C: 人格永続化
+        with ThreadPoolExecutor(max_workers=1) as executor:
+            future = executor.submit(_run_sophia)
+            ki_result = future.result(timeout=15.0)
+        print(" Done.", file=sys.stderr)
+    except (FutureTimeout, TimeoutError):
+        print(" Timeout (skipped).", file=sys.stderr)
+    except Exception as e:
+        print(f" Failed ({str(e)}).", file=sys.stderr)
     print(" [4/4] 👤 Loading Persona...", file=sys.stderr, end="", flush=True)
     from mekhane.symploke.persona import get_boot_persona
 
@@ -160,6 +170,7 @@ def get_boot_context(mode: str = "standard", context: Optional[str] = None) -> d
 
     # KI
     if ki_result["ki_items"]:
+        from mekhane.symploke.sophia_ingest import format_ki_output
         lines.append(format_ki_output(ki_result))
 
     # PKS

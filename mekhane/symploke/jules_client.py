@@ -225,7 +225,7 @@ class JulesClient:
         MAX_CONCURRENT: Maximum concurrent sessions (per Ultra account)
     """
 
-    BASE_URL = "https://jules.googleapis.com/v1alpha"
+    BASE_URL = "https://jules.googleapis.com/v1alpha"  # Default, overridable via env/init
     DEFAULT_TIMEOUT = 300  # 5 minutes
     POLL_INTERVAL = 5  # seconds
     MAX_CONCURRENT = 60  # Ultra plan limit
@@ -243,6 +243,7 @@ class JulesClient:
         api_key: Optional[str] = None,
         session: Optional[aiohttp.ClientSession] = None,
         max_concurrent: Optional[int] = None,
+        base_url: Optional[str] = None,
     ):
         """
         Initialize Jules client.
@@ -251,10 +252,14 @@ class JulesClient:
             api_key: Jules API key. If None, reads from JULES_API_KEY env var.
             session: Optional shared aiohttp session for connection reuse.
             max_concurrent: Global concurrency limit. Defaults to MAX_CONCURRENT.
+            base_url: Override API base URL. Also reads JULES_BASE_URL env var.
         """
         self.api_key = api_key or os.environ.get("JULES_API_KEY")
         if not self.api_key:
             raise ValueError("API key required. Set JULES_API_KEY or pass api_key.")
+
+        # AI-001, AI-003, AI-018, TH-008 fix: Allow BASE_URL override
+        self.base_url = base_url or os.environ.get("JULES_BASE_URL") or self.BASE_URL
 
         self._headers = {
             "X-Goog-Api-Key": self.api_key,
@@ -316,7 +321,7 @@ class JulesClient:
             RateLimitError: If rate limited
             aiohttp.ClientResponseError: For other HTTP errors
         """
-        url = f"{self.BASE_URL}/{endpoint}"
+        url = f"{self.base_url}/{endpoint}"
 
         # Create session if not in context manager
         session = self._shared_session or self._owned_session

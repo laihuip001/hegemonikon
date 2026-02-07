@@ -10,7 +10,7 @@
 STOIC（Jeff Borneman, RELCOG Labs）と Hegemonikón は、異なる出発点から「統治された認知」という同一の設計原則に収斂する**独立した収斂進化**である。
 
 - **STOIC**: 実装完成度と計算効率で優れる（Production稼働中）
-- **Hegemonikón**: 理論的厳密性と文脈適応性で優位（60要素体系）
+- **Hegemonikón**: 理論的厳密性と文脈適応性で優位（96要素体系）
 
 ---
 

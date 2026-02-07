@@ -203,7 +203,7 @@ class DendronChecker:  # noqa: AI-007
         root: Path = None,  # v2.1: 親パス検証用ルート
         validate_parents: bool = True,  # v2.1: 親パス存在検証
     ):
-        self.exempt_patterns = [re.compile(p) for p in (exempt_patterns or EXEMPT_PATTERNS)]
+        self.exempt_patterns = [re.compile(p) for p in (EXEMPT_PATTERNS if exempt_patterns is None else exempt_patterns)]
         self.check_dirs = check_dirs
         self.check_files = check_files
         self.check_functions = check_functions  # v2.5

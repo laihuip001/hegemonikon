@@ -1,17 +1,17 @@
 ---
-description: O/S/H/P/K/A/X 定理群を順に実行し、問題を多層的に分析する統合ワークフロー。
+description: 6 Series Limit 統合。各Series極限を多層的に収束させ、X-series関係で接続する全体分析。
 hegemonikon: Taxis
 modules: [X-series]
 parent: "/x"
 layer: "τ"
 skill_ref:
   - ".agent/skills/taxis/x-series/SKILL.md"
-version: "3.3"
-lineage: "v3.2 + FBR変換 → v3.3"
+version: "4.0"
+lineage: "v3.3 + Limit整合 → v4.0"
 derivatives: []
 cognitive_algebra:
-  definition: "/ax = (/o~s~h~p~k~a) × X"
-  interpretation: "6 Series 振動 ⊗ 72関係マトリクス"
+  definition: "/ax = lim(/o · /s · /h · /p · /k · /a) × X"
+  interpretation: "6 Series Limit ⊗ 72関係マトリクス"
   operators:
     "+": "全7層を詳細モードで完全展開"
     "-": "全7層を縮約モードで即断サマリー"
@@ -37,10 +37,10 @@ anti_skip: enabled
 # /ax: 定理群統合ワークフロー (Axiom)
 
 > **Hegemonikón Layer**: 全定理層統合
-> **定義**: `/ax` = `(/o~s~h~p~k~a) × X` = 6 Series 振動 ⊗ 72関係マトリクス
-> **目的**: 問題を 6定理層 + 関係層 で多層的に分析
+> **定義**: `/ax` = `lim(/o · /s · /h · /p · /k · /a) × X` = 6 Series Limit ⊗ 72関係マトリクス
+> **目的**: 各 Series の Limit（収束判断）を多層的に統合し、X-series で接続する
 >
-> **制約**: 全7層を順次実行。単一視点では不十分な複雑問題に適用すること。
+> **制約**: 全7層 → 統合収束。単一視点では不十分な複雑問題に適用すること。
 
 ---
 
@@ -135,8 +135,8 @@ graph LR
 
 | Module | Workflow | Status |
 |:-------|:---------|:-------|
-| O+S+H+P+K+A+X | /ax | v3.3 Ready |
+| O+S+H+P+K+A+X | /ax | v4.0 Ready |
 
 ---
 
-*v3.3 — FBR変換 (2026-02-07)*
+*v4.0 — Limit整合 (2026-02-07)*

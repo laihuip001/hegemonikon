@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# PROOF: [L2/インフラ] <- mekhane/dendron/ <- mekhane/dendron/
+# PROOF: [L2/インフラ] <- mekhane/dendron/
 """
 Dendron 親参照移行スクリプト
 
@@ -66,7 +66,7 @@ def add_parent_reference(file_path: Path, root: Path, dry_run: bool = True) -> O
 
 
 # PURPOSE: CLI 引数をパースして移行処理を実行する
-def main():
+def main() -> None:
     import argparse
     
     parser = argparse.ArgumentParser(description="Dendron 親参照移行")

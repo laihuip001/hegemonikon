@@ -40,14 +40,45 @@ if sys.platform == "win32":
 
 
 class Embedder:
-    """ONNX-based text embedding (BGE-small)"""
+    """Text embedding with automatic GPU acceleration.
 
-    def __init__(self):
+    Strategy:
+      1. CUDA available → sentence-transformers on GPU (3.3x speedup, ~142MB VRAM)
+      2. Fallback → ONNX Runtime on CPU (original implementation)
+    """
+
+    def __init__(self, force_cpu: bool = False):
+        import numpy as np
+        self.np = np
+        self._use_gpu = False
+        self._st_model = None
+        self._ort_session = None
+        self._tokenizer = None
+
+        # GPU detection
+        if not force_cpu:
+            try:
+                import torch
+                if torch.cuda.is_available():
+                    from sentence_transformers import SentenceTransformer
+                    self._st_model = SentenceTransformer(
+                        'BAAI/bge-small-en-v1.5', device='cuda'
+                    )
+                    self._use_gpu = True
+                    vram_mb = torch.cuda.memory_allocated() / 1e6
+                    print(f"[Embedder] GPU mode (CUDA, {vram_mb:.0f}MB VRAM)")
+                    return
+            except ImportError:
+                pass  # torch or sentence-transformers not installed
+
+        # CPU fallback (ONNX)
+        self._init_onnx()
+        print("[Embedder] CPU mode (ONNX)")
+
+    def _init_onnx(self):
+        """Initialize ONNX Runtime session (original implementation)."""
         import onnxruntime as ort
         from tokenizers import Tokenizer
-        import numpy as np
-
-        self.np = np
 
         model_path = MODELS_DIR / "model.onnx"
         tokenizer_path = MODELS_DIR / "tokenizer.json"
@@ -57,16 +88,29 @@ class Embedder:
                 f"Model not found at {model_path}\n" "Run: python aidb-kb.py setup"
             )
 
-        self.session = ort.InferenceSession(str(model_path))
-        self.tokenizer = Tokenizer.from_file(str(tokenizer_path))
-        self.tokenizer.enable_truncation(max_length=512)
-        self.tokenizer.enable_padding(pad_to_multiple_of=8)
+        self._ort_session = ort.InferenceSession(str(model_path))
+        self._tokenizer = Tokenizer.from_file(str(tokenizer_path))
+        self._tokenizer.enable_truncation(max_length=512)
+        self._tokenizer.enable_padding(pad_to_multiple_of=8)
 
     def embed(self, text: str) -> list:
         return self.embed_batch([text])[0]
 
     def embed_batch(self, texts: list[str]) -> list[list]:
-        encoded_batch = self.tokenizer.encode_batch(texts)
+        if self._use_gpu:
+            return self._embed_gpu(texts)
+        return self._embed_onnx(texts)
+
+    def _embed_gpu(self, texts: list[str]) -> list[list]:
+        """GPU embedding via sentence-transformers."""
+        embeddings = self._st_model.encode(
+            texts, batch_size=32, normalize_embeddings=True
+        )
+        return embeddings.tolist()
+
+    def _embed_onnx(self, texts: list[str]) -> list[list]:
+        """CPU embedding via ONNX Runtime (original implementation)."""
+        encoded_batch = self._tokenizer.encode_batch(texts)
 
         input_ids_list = [e.ids for e in encoded_batch]
         attention_mask_list = [e.attention_mask for e in encoded_batch]
@@ -75,7 +119,7 @@ class Embedder:
         attention_mask = self.np.array(attention_mask_list, dtype=self.np.int64)
         token_type_ids = self.np.zeros_like(input_ids)
 
-        outputs = self.session.run(
+        outputs = self._ort_session.run(
             None,
             {
                 "input_ids": input_ids,

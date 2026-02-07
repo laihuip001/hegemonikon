@@ -220,6 +220,91 @@ def cmd_stats(args):
     return 0
 
 
+def cmd_proactive(args):
+    """PKS 能動的プッシュ"""
+    from mekhane.pks.pks_engine import PKSEngine
+    from mekhane.pks.narrator import PKSNarrator
+    from mekhane.pks.matrix_view import PKSMatrixView
+
+    # コンテキスト設定
+    topics = [t.strip() for t in args.context.split(",")] if args.context else []
+
+    if not topics:
+        print("[PKS] --context を指定してください (例: --context 'FEP,CCL')")
+        return 1
+
+    engine = PKSEngine(threshold=args.threshold, max_push=args.limit)
+    engine.set_context(topics=topics)
+
+    print(f"[PKS] Context: {topics}")
+    print(f"[PKS] Threshold: {args.threshold}, Max: {args.limit}")
+    print()
+
+    nuggets = engine.proactive_push(k=args.limit * 4)
+
+    if not nuggets:
+        print("📭 プッシュ対象の知識はありません。")
+        return 0
+
+    # Push Report
+    print(engine.format_push_report(nuggets))
+
+    # Narrator (--narrate)
+    if args.narrate:
+        narrator = PKSNarrator()
+        narratives = narrator.narrate_batch(nuggets[:3])
+        print()
+        print(narrator.format_report(narratives))
+
+    # Matrix View (--matrix)
+    if args.matrix:
+        matrix = PKSMatrixView()
+        print()
+        print(matrix.generate(nuggets))
+
+    return 0
+
+
+def cmd_links(args):
+    """Link Engine — ファイル間リレーション解析"""
+    from mekhane.pks.links.link_engine import LinkEngine
+
+    target_dir = Path(args.directory).resolve()
+    if not target_dir.exists():
+        print(f"[Links] Directory not found: {target_dir}")
+        return 1
+
+    engine = LinkEngine(target_dir)
+    idx = engine.build_index()
+
+    if args.backlinks:
+        # 特定ファイルの backlinks
+        links = engine.get_backlinks(args.backlinks)
+        print(f"\n[Backlinks for '{args.backlinks}'] {len(links)} found:\n")
+        for link in links:
+            print(f"  ← {link.source}:{link.line_number}  context: {link.context[:60]}")
+        return 0
+
+    if args.orphans:
+        orphans = engine.get_orphans()
+        print(f"\n[Orphans] {len(orphans)} files with no incoming links:\n")
+        for o in orphans:
+            print(f"  • {o}")
+        return 0
+
+    if args.graph == "json":
+        print(engine.export_graph_json())
+        return 0
+
+    if args.graph == "mermaid":
+        print(engine.export_graph_mermaid())
+        return 0
+
+    # Default: summary
+    print(engine.summary_markdown())
+    return 0
+
+
 def main():
     parser = argparse.ArgumentParser(
         description="Gnōsis - Knowledge Foundation CLI",
@@ -284,6 +369,43 @@ def main():
     )
     p_logs.add_argument("--limit", "-l", type=int, default=10, help="Max items to show")
     p_logs.set_defaults(func=cmd_logs)
+
+    # proactive (PKS Push)
+    p_proactive = subparsers.add_parser(
+        "proactive", help="PKS proactive knowledge push"
+    )
+    p_proactive.add_argument(
+        "--context", "-c", required=True, help="Topics (comma-separated)"
+    )
+    p_proactive.add_argument(
+        "--threshold", "-T", type=float, default=0.5, help="Relevance threshold"
+    )
+    p_proactive.add_argument(
+        "--limit", "-l", type=int, default=5, help="Max push count"
+    )
+    p_proactive.add_argument(
+        "--narrate", "-n", action="store_true", help="Include Narrator dialogue"
+    )
+    p_proactive.add_argument(
+        "--matrix", "-m", action="store_true", help="Include Matrix comparison table"
+    )
+    p_proactive.set_defaults(func=cmd_proactive)
+
+    # links (Link Engine)
+    p_links = subparsers.add_parser("links", help="File link analysis")
+    p_links.add_argument(
+        "directory", nargs="?", default=".", help="Target directory (default: cwd)"
+    )
+    p_links.add_argument(
+        "--backlinks", "-b", help="Show backlinks for a specific file/stem"
+    )
+    p_links.add_argument(
+        "--orphans", "-o", action="store_true", help="Show orphan files"
+    )
+    p_links.add_argument(
+        "--graph", "-g", choices=["json", "mermaid"], help="Export graph format"
+    )
+    p_links.set_defaults(func=cmd_links)
 
     args = parser.parse_args()
 

@@ -39,7 +39,7 @@ class ProofLevel(Enum):
     L0 = "L0"  # ディレクトリ / 文脈
     L1 = "L1"  # 定理 / 本質
     L2 = "L2"  # インフラ / 動機
-    L3 = "L3"  # テスト / 精密
+    L3 = "L3"  # 変数・字句 / 精密
     UNKNOWN = "unknown"
 
 
@@ -70,6 +70,19 @@ class FunctionProof:
     is_private: bool = False
     is_dunder: bool = False
     quality_issue: Optional[str] = None  # v2.6: WEAK の理由
+
+
+# PURPOSE: 変数・字句レベル (L3) のチェック結果を統一的に扱い、精密性の表層検証を行う
+@dataclass
+class VariableProof:
+    """変数・字句の存在証明情報 (L3 Akribeia)"""
+
+    name: str
+    path: Path
+    line_number: int
+    status: ProofStatus         # OK / MISSING / WEAK
+    check_type: str             # "type_hint" / "short_name"
+    reason: Optional[str] = None
 
 
 # PURPOSE: ディレクトリ単位のチェック結果を統一的に扱い、PROOF.md の有無を判定する
@@ -103,6 +116,13 @@ class CheckResult:
     functions_missing_purpose: int = 0
     functions_weak_purpose: int = 0  # v2.6: WEAK 品質の Purpose 数
     function_proofs: List[FunctionProof] = field(default_factory=list)
+
+    # v3.0 L3 Variable 統計
+    total_checked_signatures: int = 0
+    signatures_with_hints: int = 0
+    signatures_missing_hints: int = 0
+    short_name_violations: int = 0
+    variable_proofs: List[VariableProof] = field(default_factory=list)
     
     level_stats: Dict[str, int] = field(default_factory=dict)  # L1/L2/L3 統計
 
@@ -157,6 +177,11 @@ WEAK_PURPOSE_PATTERNS = [
     (re.compile(r"を定義する$"), "WHAT: 'を定義する' → 'を可能にする' etc."),
     (re.compile(r"^データクラス$"), "WHAT: 具体的な目的がない"),
     (re.compile(r"^列挙型$"), "WHAT: 具体的な目的がない"),
+    # v3.0: 英語 WEAK パターン (/dia+ レビューで追加)
+    (re.compile(r"^Represents?\b", re.IGNORECASE), "WHAT: 'Represents' → state WHY it exists"),
+    (re.compile(r"^Holds?\b", re.IGNORECASE), "WHAT: 'Holds' → state WHY it's needed"),
+    (re.compile(r"^Provides?\b", re.IGNORECASE), "WHAT: 'Provides' → state WHY it matters"),
+    (re.compile(r"^Defines?\b", re.IGNORECASE), "WHAT: 'Defines' → state WHY it enables"),
 ]
 
 # 特殊親参照 (バリデーションをスキップ)

@@ -1,10 +1,10 @@
 ---
 doc_id: "SACRED_TRUTH"
-version: "2.1.0"
+version: "3.0.0"
 tier: "KERNEL"
 status: "IMMUTABLE"
 created: "2026-01-20"
-updated: "2026-01-27"
+updated: "2026-02-07"
 ---
 
 > **Kernel Doc Index**: [SACRED_TRUTH](SACRED_TRUTH.md) ← 📍 | [axiom_hierarchy](axiom_hierarchy.md) | [naming_conventions](naming_conventions.md)
@@ -12,6 +12,8 @@ updated: "2026-01-27"
 # 🔒 Sacred Truth (不変真理) v2.2
 
 > **このドキュメントの内容は改変禁止。すべてのチャット/セッションで参照される不変の真理。**
+
+![Hegemonikón 96要素体系の全体構造](sacred_truth_overview.png)
 
 ## 0. アイデンティティ
 
@@ -62,17 +64,20 @@ updated: "2026-01-27"
 
 ---
 
-## 3. X-series 関係層 (36)
+## 3. X-series 関係層 (72)
 
-| X | 接続 | 数 |
-|---|------|---|
-| X-OS | O→S | 8 |
-| X-SH | S→H | 4 |
-| X-SP | S→P | 4 |
-| X-PK | P→K | 8 |
-| X-KA | K→A | 8 |
-| X-HA | H→A | 4 |
-| **計** | | **36** |
+| X | 接続 | 共有座標 | 数 |
+|---|------|---------|---|
+| X-OS | O→S | C1 (Flow) | 8 |
+| X-OH | O→H | C1 (Flow) | 8 |
+| X-SH | S→H | C1 (Flow) | 8 |
+| X-SP | S→P | C3 (Scale) | 8 |
+| X-SK | S→K | C3 (Scale) | 8 |
+| X-PK | P→K | C3 (Scale) | 8 |
+| X-HA | H→A | C5 (Valence) | 8 |
+| X-HK | H→K | C5 (Valence) | 8 |
+| X-KA | K→A | C5 (Valence) | 8 |
+| **計** | | | **72** |
 
 ---
 
@@ -82,8 +87,8 @@ updated: "2026-01-27"
 |------|---|------|
 | 公理 | **7** | 完全数 |
 | 定理 | **24** | 時間 |
-| 関係 | **36** | 6² |
-| **総数** | **60** | 時間・角度 |
+| 関係 | **72** | 9×8 |
+| **総数** | **96** | 24×4 |
 
 > **「真理は美しく、美しさは真理に近づく道標である」**
 
@@ -116,4 +121,4 @@ updated: "2026-01-27"
 
 ---
 
-*このドキュメントは Hegemonikón v2.1 の不変真理を記録する。改変時は Creator 承認必須。*
+*このドキュメントは Hegemonikón v3.0 の不変真理を記録する。改変時は Creator 承認必須。*

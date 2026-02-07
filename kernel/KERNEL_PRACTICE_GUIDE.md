@@ -37,9 +37,9 @@ L1.75: Which/How much — Valence (+/-), Precision (C/U)
 | Dokimasia | K | Kairos | 文脈 |
 | Dokimasia | A | Akribeia | 精密 |
 
-**X-series**: 36関係（定理群間の従属）
+**X-series**: 72関係（定理群間の従属）
 
-**総数**: 7 + 24 + 36 = **60**
+**総数**: 24 + 72 = **96**
 
 ---
 

@@ -19,6 +19,7 @@ from pathlib import Path
 from typing import Optional
 
 
+# PURPOSE: 5門の検証結果を保持し、合否判定を行う
 @dataclass
 class MetrikaResult:
     """Metrika 5門の検証結果"""
@@ -31,6 +32,7 @@ class MetrikaResult:
 
     violations: list[str] = field(default_factory=list)
 
+    # PURPOSE: 全ての基準を満たしているかを判定する
     @property
     def passed(self) -> bool:
         return all(
@@ -38,6 +40,7 @@ class MetrikaResult:
         )
 
 
+# PURPOSE: 技術的負債の項目を定義し、追跡可能にする
 @dataclass
 class ChreosItem:
     """技術負債項目"""
@@ -49,6 +52,7 @@ class ChreosItem:
     status: str  # "healthy", "warning", "rotten"
 
 
+# PURPOSE: コード内の歴史的遺物を記録し、分析可能にする
 @dataclass
 class PalimpsestItem:
     """コード考古学発見物"""
@@ -59,6 +63,7 @@ class PalimpsestItem:
     hypothesis: str
 
 
+# PURPOSE: 品質基準（Metrika, Chreos, Palimpsest）を統合的に検証する
 class QualityGate:
     """品質門 - Hegemonikón品質体系の実装"""
 

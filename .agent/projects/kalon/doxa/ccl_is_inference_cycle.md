@@ -1,6 +1,8 @@
 # CCL は推論サイクルだった
 
-> **Doxa (信念記録) — 2026-02-07**
+![CCL 5層アーキテクチャ](../assets/ccl_five_layer_map.png)
+
+![FEP 推論サイクル](../assets/fep_inference_cycle.png)
 > **確信度**: 0.85
 > **発見者**: Claude + Creator
 > **文脈**: Kalon Deep Examination → `>*` 形式化 → V1-V5 検証

@@ -17,6 +17,7 @@ from __future__ import annotations
 
 import sys
 from dataclasses import dataclass, field
+from enum import Enum
 from pathlib import Path
 from typing import Optional
 
@@ -111,8 +112,16 @@ OSCILLATION_MARGIN = 0.05
 
 
 # ---------------------------------------------------------------------------
-# Data Classes
+# Enums & Data Classes
 # ---------------------------------------------------------------------------
+
+class OscillationType(Enum):
+    """Attractor 収束パターンの分類 (Spisak 2025 からの理論的導出)"""
+    CLEAR = "clear"         # 明確な単一 attractor 収束
+    POSITIVE = "positive"   # 入力の多面性を反映した正の oscillation
+    NEGATIVE = "negative"   # basin 未分化による負の oscillation
+    WEAK = "weak"           # 全 attractor への引力が弱い
+
 
 @dataclass
 class AttractorResult:
@@ -124,6 +133,27 @@ class AttractorResult:
 
     def __repr__(self) -> str:
         return f"⟨{self.series}: {self.name} | sim={self.similarity:.3f}⟩"
+
+
+@dataclass
+class SuggestResult:
+    """suggest() の完全な結果（oscillation 診断付き）"""
+    attractors: list[AttractorResult]
+    oscillation: OscillationType
+    top_similarity: float
+    gap: float  # 1位と2位の差
+
+    @property
+    def primary(self) -> AttractorResult | None:
+        return self.attractors[0] if self.attractors else None
+
+    @property
+    def is_clear(self) -> bool:
+        return self.oscillation == OscillationType.CLEAR
+
+    def __repr__(self) -> str:
+        names = "+".join(r.series for r in self.attractors)
+        return f"⟨{names} | {self.oscillation.value} | top={self.top_similarity:.3f}⟩"
 
 
 # ---------------------------------------------------------------------------
@@ -225,6 +255,69 @@ class SeriesAttractor:
                 ))
 
         return results
+
+    def diagnose(
+        self,
+        user_input: str,
+        top_k: int = 3,
+    ) -> SuggestResult:
+        """
+        suggest() + oscillation 診断を返す。
+
+        OscillationType の判定基準:
+        - CLEAR:    top > 0.6 かつ gap > 0.1  → 明確な単一収束
+        - POSITIVE: top > 0.5 かつ gap < 0.05 → 多面的入力
+        - NEGATIVE: top < 0.5 かつ 複数拮抗    → basin 未分化
+        - WEAK:     top < threshold             → 引力不足
+        """
+        self._ensure_initialized()
+
+        input_emb = np.array(
+            self._embedder.embed(user_input), dtype=np.float32
+        )
+
+        similarities: list[tuple[str, float]] = []
+        for key, proto in self._prototypes.items():
+            sim = self._cosine_similarity(input_emb, proto)
+            similarities.append((key, float(sim)))
+
+        similarities.sort(key=lambda x: x[1], reverse=True)
+
+        top_sim = similarities[0][1] if similarities else 0.0
+        second_sim = similarities[1][1] if len(similarities) > 1 else 0.0
+        gap = top_sim - second_sim
+
+        # Oscillation 判定
+        if top_sim < self.threshold:
+            oscillation = OscillationType.WEAK
+        elif top_sim >= 0.6 and gap >= 0.1:
+            oscillation = OscillationType.CLEAR
+        elif top_sim >= 0.5 and gap < 0.05:
+            oscillation = OscillationType.POSITIVE
+        elif top_sim < 0.5:
+            oscillation = OscillationType.NEGATIVE
+        else:
+            # 中間領域: gap で判定
+            oscillation = OscillationType.CLEAR if gap >= 0.08 else OscillationType.POSITIVE
+
+        # Attractor 結果
+        results: list[AttractorResult] = []
+        for key, sim in similarities[:top_k]:
+            if sim >= self.threshold and (top_sim - sim) <= self.oscillation_margin:
+                defn = SERIES_DEFINITIONS[key]
+                results.append(AttractorResult(
+                    series=key,
+                    name=defn["name"],
+                    similarity=sim,
+                    workflows=defn["workflows"],
+                ))
+
+        return SuggestResult(
+            attractors=results,
+            oscillation=oscillation,
+            top_similarity=top_sim,
+            gap=gap,
+        )
 
     def suggest_all(
         self,

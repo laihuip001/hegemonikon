@@ -1,160 +1,137 @@
 ---
-# Theorem Metadata (v4.0)
+# Theorem Metadata (v3.0)
 id: "K4"
 name: "Sophia"
 greek: "Σοφία"
 series: "Kairos"
 generation:
   formula: "Function × Precision"
-  result: "知恵 — 情報収集と方法確信"
+  result: "機能精密 — 知恵の探求・調査"
 
 description: >
-  調べて・教えて・情報収集・Perplexityに聞いて・パプ君に聞いて時に発動。
-  Information gathering, research, external knowledge acquisition.
-  Use for: 調査, research, 情報収集, sop.
-  Also for: method reliability assessment, wisdom-based confidence.
+  何を調べるべき？・知恵は足りているか？・外部知識が必要な時に発動。
+  Wisdom seeking, research invocation, knowledge sufficiency check.
+  Use for: 調査, 知恵, 研究, research, wisdom, 十分か.
+  NOT for: verified knowledge (検証済み知識 → Epistēmē A4).
 
 triggers:
-  - 情報収集
-  - 調査依頼
-  - "調べて"
-  - "教えて"
+  - 外部調査の必要性
+  - 知識の不足感
+  - Perplexity/論文検索の起点
   - /sop コマンド
-  - Perplexity
-  - パプ君
 
-keywords:
-  - sophia
-  - wisdom
-  - research
-  - information
-  - gathering
-  - 調査
-  - 情報収集
+keywords: [sophia, wisdom, research, investigation, 知恵, 調査]
 
 related:
   upstream:
-    - "O3 Zētēsis"
+    - "S2 Mekhanē (X-SK6: 方法→知恵の充足度)"
+    - "S4 Praxis (X-SK8: 実践→知識の充足度)"
+    - "P3 Trokhia (X-PK6: サイクル→反復に必要な知恵)"
+    - "P4 Tekhnē (X-PK8: 技法→必要な知識)"
+    - "H2 Pistis (X-HK6: 確信→「何を知るべきか」を決定)"
+    - "H4 Doxa (X-HK8: 信念→知恵の源泉を選ぶ ⚠️)"
   downstream:
-    - "O1 Noēsis"
-    - "A3 Gnōmē"
-    - "A4 Epistēmē"
-  x_series:
-    - "← X-OK1 ← O3 Zētēsis (問いを立てる)"
-    - "X-KO1 → O1 Noēsis (深い分析)"
-    - "X-KA7 → A3 Gnōmē"
-    - "X-KA8 → A4 Epistēmē"
+    - "A3 Gnōmē (X-KA7: 知恵→格言抽出)"
+    - "A4 Epistēmē (X-KA8: 知恵→体系的知識昇格)"
 
-lineage: "K4 Sophia 統一リマッピング (2026-01-28) — 情報収集機能を追加"
-
-version: "4.0.0"
+version: "3.0.0"
 workflow_ref: ".agent/workflows/sop.md"
-risk_tier: L1
+risk_tier: L2
 reversible: true
 requires_approval: false
 risks:
-  - "文脈判断の誤りによるタイミング逸失"
-fallbacks: []
+  - "確証バイアス: 信念が知恵の源泉を選り好み (X-HK8)"
 ---
 
 # K4: Sophia (Σοφία)
 
 > **生成**: Function × Precision
-> **役割**: 情報収集 + 方法確信度評価
-> **本質**: σοφία = 知恵 — 外部ソースからの知識取得
+> **役割**: 知恵を探求し、知識の充足度を評価する
+> **認知的意味**: 「十分に知っているか」— 知識ギャップの自覚
 
----
+## Epistēmē (A4) との区別
 
-## When to Use
-
-### ✓ Trigger
-
-- 情報収集が必要
-- Perplexity に調査依頼したい
-- 「調べて」「教えて」という依頼
-- `/sop` コマンド
-
-### ✗ Not Trigger
-
-- 問いの発見 → O3 Zētēsis `/zet` を使え
-- 情報が既に十分
-
----
+| | Sophia (K4) | Epistēmē (A4) |
+|:--|:-----------|:--------------|
+| 層 | Kairos (文脈) | Akribeia (精密) |
+| 性質 | **文脈依存**。状況による知恵 | **文脈独立**。検証済み事実 |
+| 問い | 「この状況で何を知るべきか」 | 「これは知識として確立できるか」 |
+| 出力 | 調査結果、洞察 | 形式的知識宣言 |
 
 ## Processing Logic
 
 ```
-入力: 調査テーマ / 質問
+入力: 知識ギャップの認識
   ↓
-[PHASE 0] 目的確認（決定事項・仮説）
+[STEP 1] 充足度チェック
+  ├─ 十分: 現在の知識で行動可能
+  ├─ 不足: 調査が必要
+  └─ 不明: 何が不足かもわからない
   ↓
-[PHASE 1] 調査依頼書生成
-  ├─ 深掘り版テンプレート
-  ├─ 時間制約 (Chronotopic Precision)
-  └─ 出力フォーマット固定
+[STEP 2] 調査戦略 (不足時)
+  ├─ 内部: Gnōsis RAG (ベクトル検索)
+  ├─ 外部: Perplexity / 論文検索
+  └─ 対話: Creator に質問
   ↓
-[PHASE 2] 品質チェック
+[STEP 3] バイアスチェック
+  ├─ X-HK8: 信念が情報源を偏らせていないか
+  └─ 確証バイアス: 都合の良い情報だけ集めていないか
   ↓
-[PHASE 3] Artifact 保存
-  ↓
-出力: 調査依頼書 → ユーザーがパプ君にコピペ
+出力: [調査結果, 知識充足度, 次ステップ]
 ```
-
----
-
-## FEP Integration
-
-K4 Sophia は **observe** 行動に対応:
-
-```
-act = 問いを能動的に設定する (O3 Zētēsis)
-observe = 情報を受動的に取得する (K4 Sophia)
-```
-
----
 
 ## X-series 接続
 
-```mermaid
-graph LR
-    O3[O3 Zētēsis] -->|X-OK1| K4[K4 Sophia]
-    K4 -->|X-KO1| O1[O1 Noēsis]
-    K4 -->|X-KA7| A3[A3 Gnōmē]
-    K4 -->|X-KA8| A4[A4 Epistēmē]
+> K4 は6入力を受ける。確証バイアスリスクあり。
+
+### 入力射 (6本)
+
+| X | Source | 意味 | CCL |
+|:--|:-------|:-----|:----|
+| X-SK6 | S2 Mekhanē | 方法の粒度→知恵の粒度 (構造層) | `/mek >> /sop` |
+| X-SK8 | S4 Praxis | 実践の粒度→知識の粒度 (構造層) | `/pra >> /sop` |
+| X-PK6 | P3 Trokhia | サイクル→知恵のスケール (構造層) | `/tro >> /sop` |
+| X-PK8 | P4 Tekhnē | 技法→知識のスケール (構造層) | `/tek >> /sop` |
+| X-HK6 | H2 Pistis | 確信→知るべきことを決定 (反省層) | `/pis >> /sop` |
+| X-HK8 ⚠️ | H4 Doxa | 信念→知恵の源泉の選好 (反省層) | `/dox >> /sop` |
+
+### 出力射
+
+| X | Target | 意味 | CCL |
+|:--|:-------|:-----|:----|
+| X-KA7 | A3 Gnōmē | 知恵→格言を抽出 | `/sop >> /gno` |
+| X-KA8 | A4 Epistēmē | 知恵→知識に昇格 | `/sop >> /epi` |
+
+## CCL 使用例
+
+```ccl
+# 方法選択後の知識充足チェック
+/mek+{plan: "ready"} >> /sop{check: "knowledge_gap?"}
+
+# Perplexity 調査依頼
+/sop+{topic: "Markov blanket boundaries", source: "perplexity"}
+
+# 知恵→知識昇格パイプライン
+/sop{research: "done"} >> /epi{formalize: true}
 ```
 
-**認知サイクル**:
+## アンチパターン
 
-```
-問い → 調査 → 分析 → 新しい問い
-O3  →  K4  →  O1  →  O3 ...
-```
+| ❌ | 理由 |
+|:---|:-----|
+| 信念で情報源を選ぶ | X-HK8 の確証バイアス。多様な情報源を探る |
+| 調査なしに行動する | 知識ギャップの無自覚は危険 |
+| 知恵 = 知識と混同 | Sophia は文脈依存、Epistēmē は文脈独立 |
 
----
+## 派生モード
 
-## Integration
-
-| 依存 | 対象 | 関係 |
-|:-----|:-----|:-----|
-| **Precondition** | O3 Zētēsis | 問いを立ててから |
-| **Postcondition** | O1 Noēsis | 深い分析へ |
-| **Postcondition** | A3 Gnōmē | 原則として定着 |
-| **Postcondition** | A4 Epistēmē | 知識として確立 |
+| Mode | CCL | 用途 |
+|:-----|:----|:-----:|
+| deep | `/sop.deep` | 深掘り調査 (Perplexity) |
+| quick | `/sop.quick` | 簡易知識チェック |
+| gap | `/sop.gap` | 知識ギャップ分析 |
 
 ---
 
 *Sophia: 古代ギリシャにおける「知恵・叡智」*
-*v4.0.0 — 統一リマッピング (2026-01-28)*
-
----
-
-## Related Modes
-
-このスキルに関連する `/sop` WFモード (4件):
-
-| Mode | CCL | 用途 |
-|:-----|:----|:-----|
-| surf | `/sop.surf` | 表層調査 |
-| deep | `/sop.deep` | 深層調査 |
-| prag | `/sop.prag` | 実用調査 |
-| track | `/sop.track` | 追跡調査 |
+*v3.0: 6入力射 + 確証バイアス検出 + Epistēmē区別 (2026-02-07)*

@@ -1,133 +1,128 @@
 ---
-# Theorem Metadata (v2.1)
+# Theorem Metadata (v3.0)
 id: "A3"
 name: "Gnōmē"
 greek: "Γνώμη"
 series: "Akribeia"
 generation:
-  formula: "Precision × Valence"
-  result: "確信傾向 — 確信に基づく傾向"
+  formula: "Explore × Valence"
+  result: "探索傾向 — 原則・教訓の抽出"
 
 description: >
-  教訓は？・格言として残したい・原則を作りたい時に発動。
-  Principle-based judgments, maxim extraction, wisdom-based recommendations.
-  Use for: 格言, 原則, 教訓, principle, maxim.
-  NOT for: special case processing.
+  教訓は何か？・原則を抽出したい・格言として定式化したい時に発動。
+  Principle extraction, lesson learned, maxim formulation.
+  Use for: 教訓, 原則, 格言, principle, lesson.
+  NOT for: raw knowledge (知識 → Epistēmē A4), desire (欲求 → Orexis H3).
 
 triggers:
-  - 原則に基づく判断
-  - 格言・教訓の抽出
-  - 知恵に基づく見解
+  - 原則の抽出
+  - 教訓の言語化
+  - 「この経験から学んだことは」
+  - /gno コマンド
 
-keywords:
-  - gnome
-  - maxim
-  - principle
-  - opinion
-  - insight
-  - 格言
-  - 見解
+keywords: [gnome, maxim, principle, lesson, 格言, 原則, 教訓]
 
 related:
   upstream:
-    - "K3 Telos"
-    - "K4 Sophia"
-    - "H3 Orexis"
+    - "H2 Pistis (X-HA5: 確信→原則抽出)"
+    - "H4 Doxa (X-HA7: 信念→教訓を引き出す)"
+    - "K3 Telos (X-KA5: 目的→原則演繹)"
+    - "K4 Sophia (X-KA7: 知恵→格言抽出)"
   downstream: []
-  x_series:
-    - "← X-KA5 ← K3 Telos"
-    - "← X-KA7 ← K4 Sophia"
-    - "← X-HA3 ← H3 Orexis"
 
-implementation:
-  micro: "(implicit)"
-  macro: "(future)"
-  templates:
-    - "旧K9-K12 の確信判定"
-
-version: "2.1.0"
+version: "3.0.0"
 workflow_ref: ".agent/workflows/gno.md"
 risk_tier: L1
 reversible: true
 requires_approval: false
-risks:
-  - "判断基準の誤適用による過信・過少評価"
-fallbacks: []
 ---
 
 # A3: Gnōmē (Γνώμη)
 
-> **生成**: Precision × Valence
-> **役割**: 確信に基づく傾向
+> **生成**: Explore × Valence
+> **役割**: 経験から原則・教訓を抽出する
+> **認知的意味**: 「このことから何を学んだか」を格言にする
 
-## When to Use
+## 体系上の位置
 
-### ✓ Trigger
+Gnōmē は Akribeia (精密層) の教訓軸であり、**体系の教訓的終端**。
+Epistēmē (知識) が事実を扱うのに対し、Gnōmē は**行動指針**を扱う。
 
-- 原則・格言の適用
-- 経験に基づく見解の形成
-- 一般化可能な教訓の抽出
-
-### ✗ Not Trigger
-
-- 特殊事例の処理
+| 概念 | 定理 | 出力 |
+|:-----|:-----|:-----|
+| 知識 | A4 Epistēmē | 「Xは真である」 |
+| **教訓** | **A3 Gnōmē** | **「Xすべきである」** |
 
 ## Processing Logic
 
 ```
-入力: 状況 + 知識ベース
+入力: 経験 / 信念 / 目的
   ↓
-[STEP 1] 確信度評価
-  ├─ C: 確立された知識
-  └─ U: 暫定的知識
+[STEP 1] 出来事の要約
+  ├─ 何が起きたか
+  ├─ 何が予想と違ったか
+  └─ 何がうまくいったか
   ↓
-[STEP 2] 傾向抽出
-  ├─ +: 推奨される行動
-  └─ -: 避けるべき行動
+[STEP 2] 原則の抽出
+  ├─ 一般化: 特定事例 → 汎用原則
+  ├─ 制約条件: いつこの原則が適用されるか
+  └─ 反例: この原則が成り立たない場合は
   ↓
-出力: 格言・原則 + 適用指針
+[STEP 3] 格言への定式化
+  ├─ 1行サマリー (格言)
+  ├─ 根拠 (なぜこう言えるか)
+  └─ 適用範囲 (どこまで有効か)
+  ↓
+出力: [格言, 根拠, 適用範囲]
 ```
 
 ## X-series 接続
 
-```mermaid
-graph LR
-    K3[K3 Telos] -->|X-KA5| A3[A3 Gnōmē]
-    K4[K4 Sophia] -->|X-KA7| A3
-    H3[H3 Orexis] -->|X-HA3| A3
+> **自然度**: mixed（入力は反省層、出力はなし = 終端）
+
+### 入力射
+
+| X | Source | 意味 | CCL |
+|:--|:-------|:-----|:----|
+| X-HA5 | H2 Pistis | 確信→確信から原則を抽出 | `/pis >> /gno` |
+| X-HA7 | H4 Doxa | 信念→信念から教訓を引き出す | `/dox >> /gno` |
+| X-KA5 | K3 Telos | 目的→目的から原則を演繹 | `/tel >> /gno` |
+| X-KA7 | K4 Sophia | 知恵→知恵から格言を抽出 | `/sop >> /gno` |
+
+### 出力射
+
+**なし** — Gnōmē は体系の教訓的終端。出力は Doxa ファイルや格言集への永続化。
+
+## CCL 使用例
+
+```ccl
+# 信念から教訓を抽出
+/dox{belief: "ズームレベルの伝播"} >> /gno{extract: true}
+
+# 目的から原則を演繹
+/tel{purpose: "96体系"} >> /gno{deduce: "設計原則"}
+
+# 知恵→格言
+/sop{research: "FEP"} >> /gno{formulate: "格言"}
 ```
 
----
+## アンチパターン
 
-*Gnōmē: アリストテレス修辞学における「格言・箴言・判断力」*
+| ❌ | 理由 |
+|:---|:-----|
+| 経験なしに格言を作る | 空虚な一般化。入力射 (Doxa/Pistis) からの経験が必要 |
+| 格言を知識と混同 | Gnōmē = 「すべき」, Epistēmē = 「である」 |
+| 反例を無視する | 原則には適用範囲がある。「常に」は疑う |
 
----
-
-## Related Modes
-
-このスキルに関連する `/gno` WFモード (23件):
+## 派生モード
 
 | Mode | CCL | 用途 |
-|:-----|:----|:-----|
-| disc | `/gno.disc` | 原則発見 |
-| extr | `/gno.extr` | 原則抽出 |
-| appl | `/gno.appl` | 原則適用 |
-| analogy | `/gno.analogy` | アナロジー推論 |
-| analogy_structure | `/gno.analogy_structure` | 構造的類推 |
-| analogy_surface | `/gno.analogy_surface` | 表面的類推 |
-| analogy_negative | `/gno.analogy_negative` | 否定的類推 |
-| analogy_cross | `/gno.analogy_cross` | 領域横断類推 |
-| analogy_history | `/gno.analogy_history` | 歴史類推 |
-| analogy_cs | `/gno.analogy_cs` | CS類推 |
-| analogy_physics | `/gno.analogy_physics` | 物理類推 |
-| analogy_ecology | `/gno.analogy_ecology` | 生態類推 |
-| metaphor | `/gno.metaphor` | メタファー |
-| personify | `/gno.personify` | 擬人化 |
-| assumption | `/gno.assumption` | 前提抽出 |
-| invariant | `/gno.invariant` | 不変量発見 |
-| symmetry | `/gno.symmetry` | 対称性 |
-| rule | `/gno.rule` | ルール抽出 |
-| principle | `/gno.principle` | 原則抽出 |
-| story | `/gno.story` | 物語化 |
-| check | `/gno.check` | 前提確認 |
-| lit | `/gno.lit` | Prompt Literacy |
+|:-----|:----|:-----:|
+| extract | `/gno.extract` | 経験から抽出 |
+| analogy | `/gno.analogy` | アナロジーで原則化 |
+| critique | `/gno.critique` | 既存原則の批判 |
+
+---
+
+*Gnōmē: 古代ギリシャにおける「格言・判断力・意見」*
+*v3.0: 終端概念 + Epistēmēとの区別 (2026-02-07)*

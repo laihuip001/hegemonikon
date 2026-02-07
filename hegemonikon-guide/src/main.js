@@ -39,7 +39,8 @@ function init() {
 // --- Rendering ---
 function renderHubs() {
   el.hubGrid.innerHTML = state.hubs.map(hub => `
-    <div class="glass-card hub-card ${hub.color_var}" data-id="${hub.id}">
+    <div class="glass-card hub-card ${hub.color_var}" data-id="${hub.id}"
+         role="button" tabindex="0" aria-label="${hub.name} Hub">
       <div class="hub-icon">${hub.symbol}</div>
       <h3 class="font-lg">${hub.name}</h3>
       <p class="font-sm">${hub.meaning}</p>
@@ -49,6 +50,12 @@ function renderHubs() {
   // Add Click Listeners
   document.querySelectorAll('.hub-card').forEach(card => {
     card.addEventListener('click', () => showHubDetail(card.dataset.id));
+    card.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        showHubDetail(card.dataset.id);
+      }
+    });
   });
 }
 
@@ -234,7 +241,14 @@ function switchView(viewName) {
 function setupNavigation() {
   el.backBtn.addEventListener('click', () => switchView('home'));
   el.xBackBtn.addEventListener('click', () => switchView('home'));
+
   el.navXSeries.addEventListener('click', () => switchView('x-series'));
+  el.navXSeries.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      switchView('x-series');
+    }
+  });
 }
 
 // --- Command Input Logic ---

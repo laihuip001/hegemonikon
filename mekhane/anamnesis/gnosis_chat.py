@@ -81,6 +81,69 @@ class ConversationHistory:
         return len(self.turns) // 2
 
 
+class Reranker:
+    """Cross-encoder Reranker for precision improvement.
+
+    Strategy: bi-encoder でオーバーフェッチ → cross-encoder で re-score
+    → top-k に絞る。精度を大幅に向上させる。
+
+    VRAM: ~50MB (cross-encoder-ms-marco-MiniLM-L-6-v2)
+    """
+
+    DEFAULT_MODEL = "cross-encoder/ms-marco-MiniLM-L-6-v2"
+
+    def __init__(self, model_name: Optional[str] = None):
+        self.model_name = model_name or self.DEFAULT_MODEL
+        self._model = None
+
+    def _load(self):
+        if self._model is not None:
+            return
+        from sentence_transformers import CrossEncoder
+        self._model = CrossEncoder(self.model_name, device="cuda")
+        print(f"[Reranker] Loaded ({self.model_name})", flush=True)
+
+    def rerank(
+        self, query: str, results: list[dict], top_k: int = 5
+    ) -> list[dict]:
+        """検索結果を cross-encoder で再スコアリング.
+
+        Args:
+            query: 検索クエリ
+            results: bi-encoder の検索結果
+            top_k: 返す件数
+
+        Returns:
+            re-scored & sorted results (top_k)
+        """
+        if not results:
+            return results
+
+        self._load()
+
+        # (query, document) ペアを作成
+        pairs = []
+        for r in results:
+            table = r.get("_source_table", "unknown")
+            if table == "knowledge":
+                text = r.get("content", r.get("abstract", ""))[:512]
+            else:
+                text = f"{r.get('title', '')} {r.get('abstract', '')[:400]}"
+            pairs.append((query, text))
+
+        # Cross-encoder scoring
+        scores = self._model.predict(pairs)
+
+        # スコアを結果に付与
+        for r, score in zip(results, scores):
+            r["_rerank_score"] = float(score)
+
+        # re-rank score でソート (高い方が良い)
+        results.sort(key=lambda r: r.get("_rerank_score", -999), reverse=True)
+
+        return results[:top_k]
+
+
 class KnowledgeIndexer:
     """Hegemonikón 全知識をインデックスに追加するユーティリティ."""
 
@@ -297,16 +360,19 @@ class GnosisChat:
         max_new_tokens: int = 512,
         search_knowledge: bool = True,
         search_papers: bool = True,
+        use_reranker: bool = True,
     ):
         self.model_id = model_id or self.DEFAULT_MODEL
         self.top_k = top_k
         self.max_new_tokens = max_new_tokens
         self.search_knowledge = search_knowledge
         self.search_papers = search_papers
+        self.use_reranker = use_reranker
 
         self._index = None
         self._model = None
         self._tokenizer = None
+        self._reranker = Reranker() if use_reranker else None
         self.history = ConversationHistory(max_turns=5)
 
     def _load_index(self):
@@ -344,14 +410,23 @@ class GnosisChat:
         print(f"[Gnōsis Chat] Model loaded ({vram_mb:.0f}MB VRAM)", flush=True)
 
     def _retrieve(self, query: str) -> list[dict]:
-        """全テーブルからセマンティック検索."""
+        """全テーブルからセマンティック検索 + rerank.
+
+        Strategy:
+          1. bi-encoder で 3x オーバーフェッチ
+          2. cross-encoder で re-score
+          3. top-k に絞る
+        """
         self._load_index()
         results = []
+
+        # reranker 使用時は 3x オーバーフェッチ
+        fetch_k = self.top_k * 3 if self._reranker else self.top_k
 
         # Papers table
         if self.search_papers:
             try:
-                paper_results = self._index.search(query, k=self.top_k)
+                paper_results = self._index.search(query, k=fetch_k)
                 for r in paper_results:
                     r["_source_table"] = "papers"
                 results.extend(paper_results)
@@ -365,7 +440,7 @@ class GnosisChat:
                     embedder = self._index._get_embedder()
                     qvec = embedder.embed(query)
                     table = self._index.db.open_table("knowledge")
-                    k_results = table.search(qvec).limit(self.top_k).to_list()
+                    k_results = table.search(qvec).limit(fetch_k).to_list()
                     for r in k_results:
                         r["_source_table"] = "knowledge"
                     results.extend(k_results)
@@ -375,8 +450,13 @@ class GnosisChat:
         # _distance でソート (低い方が類似度が高い)
         results.sort(key=lambda r: r.get("_distance", 999))
 
-        # Top-K に絞る
-        return results[:self.top_k]
+        # Reranker で精度向上
+        if self._reranker and results:
+            results = self._reranker.rerank(query, results, top_k=self.top_k)
+        else:
+            results = results[:self.top_k]
+
+        return results
 
     def _build_context(self, results: list[dict]) -> str:
         """検索結果からコンテキスト文字列を構築."""

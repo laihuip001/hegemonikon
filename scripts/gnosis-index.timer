@@ -1,0 +1,15 @@
+[Unit]
+Description=Gnōsis Knowledge Index Update Timer
+Requires=gnosis-index.service
+
+[Timer]
+# 毎時間実行 (新しい Handoff を自動検出)
+OnCalendar=hourly
+# ブート後 5 分で初回実行
+OnBootSec=5min
+# ランダムなディレイ (0-5分) で同時実行を回避
+RandomizedDelaySec=300
+Persistent=true
+
+[Install]
+WantedBy=timers.target

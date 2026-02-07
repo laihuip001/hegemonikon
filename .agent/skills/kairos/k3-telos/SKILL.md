@@ -1,118 +1,143 @@
 ---
-# Theorem Metadata (v2.1)
+# Theorem Metadata (v3.0)
 id: "K3"
 name: "Telos"
 greek: "Τέλος"
 series: "Kairos"
 generation:
-  formula: "Function × Valence"
-  result: "方法傾向 — 目的志向の方向性"
+  formula: "Function × Explore"
+  result: "機能探索 — 目的の確認と自問"
 
 description: >
-  何のため？・目的を確認したい・なぜこれをやっている？時に発動。
-  Goal-means alignment, purpose verification.
-  Use for: 目的, purpose, 何のため, why, 終着点.
-  NOT for: purpose already clear (proceed directly).
+  何のためにやっている？・目的を自問したい・手段と目的が入れ替わっていないか？時に発動。
+  Purpose verification, means-ends check, goal alignment.
+  Use for: 目的, 何のため, why, purpose.
+  NOT for: desire (欲求 → Orexis H3), knowledge (知識 → Sophia K4).
 
 triggers:
-  - 目的との整合確認
-  - 手段-目的の評価
-  - ゴール志向の検証
+  - 目的の自問
+  - 手段と目的の入れ替わり防止
+  - Why の連鎖
+  - /tel コマンド
 
-keywords:
-  - telos
-  - purpose
-  - goal
-  - end
-  - aim
-  - 目的
-  - 終着
+keywords: [telos, purpose, goal, end, finality, 目的, 何のため]
 
 related:
   upstream:
-    - "P3 Trokhia"
-    - "P4 Tekhnē"
+    - "S2 Mekhanē (X-SK5: 方法→目的整合性)"
+    - "S4 Praxis (X-SK7: 実践→目的整合性)"
+    - "P3 Trokhia (X-PK5: サイクル→反復の目的)"
+    - "P4 Tekhnē (X-PK7: 技法→目的整合性)"
+    - "H1 Propatheia (X-HK2: 直感→目的修正)"
+    - "H3 Orexis (X-HK4: 欲求→目的書き換え ⚠️)"
   downstream:
-    - "A3 Gnōmē"
-    - "A4 Epistēmē"
-  x_series:
-    - "← X-PK5 ← P3 Trokhia"
-    - "← X-PK7 ← P4 Tekhnē"
-    - "X-KA5 → A3 Gnōmē"
-    - "X-KA6 → A4 Epistēmē"
+    - "A3 Gnōmē (X-KA5: 目的→原則演繹)"
+    - "A4 Epistēmē (X-KA6: 目的→必要知識確定)"
 
-implementation:
-  micro: ".agent/workflows/why.md"
-  macro: "(future)"
-  templates: []
-
-version: "2.1.0"
+version: "3.0.0"
 workflow_ref: ".agent/workflows/tel.md"
 risk_tier: L1
 reversible: true
 requires_approval: false
 risks:
-  - "文脈判断の誤りによるタイミング逸失"
-fallbacks: []
+  - "欲求による目的上書き (X-HK4)"
+  - "手段の目的化"
 ---
 
 # K3: Telos (Τέλος)
 
-> **生成**: Function × Valence
-> **役割**: 目的志向の方向性
+> **生成**: Function × Explore
+> **役割**: 「何のために」を問い続ける
+> **認知的意味**: 手段と目的の入れ替わりを防ぐ自問ツール
 
 ## When to Use
 
 ### ✓ Trigger
 
-- 目的との整合確認
-- 「何のためにやっているか」の検証
-- `/why` コマンド
-- 手段と目的の入れ替わり検出
+- 「これ何のためにやってるんだっけ」
+- 手段が目的化している疑い
+- Five Whys (/why) の起点
+- 行動の正当性確認
 
 ### ✗ Not Trigger
 
-- 目的が明確で整合済み
+- 欲求の同定 → `/ore`
+- 知恵の探求 → `/sop`
 
 ## Processing Logic
 
 ```
-入力: 手段 + 目的
+入力: 現在の活動 / 手段
   ↓
-[STEP 1] 方法評価
-  ├─ Explore: 探索的手段
-  └─ Exploit: 活用的手段
+[STEP 1] 目的の問い
+  ├─ L1: 「何のためにこれをしているか」
+  ├─ L2: 「その目的のさらに上の目的は」
+  └─ L3: 「最終的に何に至るか」
   ↓
-[STEP 2] 傾向評価
-  ├─ +: 目的に向かっている
-  └─ -: 目的から離れている
+[STEP 2] 手段-目的の整合性チェック
+  ├─ 整合: 手段は目的に向かっている
+  ├─ 漂流: 手段が目的から離れている
+  └─ 転倒: 手段が目的になっている ⚠️
   ↓
-出力: 整合判定 + 推奨アクション
+[STEP 3] 欲求バイアスチェック
+  ├─ X-HK4: 欲求が目的を書き換えていないか
+  └─ 元の目的と現在の目的は同一か
+  ↓
+出力: [目的確認, 整合/漂流/転倒, 修正提案]
 ```
 
 ## X-series 接続
 
-```mermaid
-graph LR
-    P3[P3 Trokhia] -->|X-PK5| K3[K3 Telos]
-    P4[P4 Tekhnē] -->|X-PK7| K3
-    K3 -->|X-KA5| A3[A3 Gnōmē]
-    K3 -->|X-KA6| A4[A4 Epistēmē]
+> **自然度**: 反省（注意を向ければ気づく）
+
+### 入力射 (6本)
+
+| X | Source | 意味 | CCL |
+|:--|:-------|:-----|:----|
+| X-SK5 | S2 Mekhanē | 方法の粒度→目的の粒度 (構造層) | `/mek >> /tel` |
+| X-SK7 | S4 Praxis | 実践の粒度→目的の粒度 (構造層) | `/pra >> /tel` |
+| X-PK5 | P3 Trokhia | サイクルのスケール→目的のスケール (構造層) | `/tro >> /tel` |
+| X-PK7 | P4 Tekhnē | 技法のスケール→目的のスケール (構造層) | `/tek >> /tel` |
+| X-HK2 | H1 Propatheia | 直感→直感が目的を修正 | `/pro >> /tel` |
+| X-HK4 ⚠️ | H3 Orexis | 欲求→欲求が目的を書き換える | `/ore >> /tel` |
+
+### 出力射
+
+| X | Target | 意味 | CCL |
+|:--|:-------|:-----|:----|
+| X-KA5 | A3 Gnōmē | 目的→目的から原則を演繹 | `/tel >> /gno` |
+| X-KA6 | A4 Epistēmē | 目的→必要な知識の確定 | `/tel >> /epi` |
+
+## CCL 使用例
+
+```ccl
+# 定期的な目的自問
+/tel{ask: "96体系の充実は何のためか"}
+
+# 手段-目的の整合性チェック
+/mek{method: "D1 Skill充実"} >> /tel{verify: "手段は目的に向かっているか"}
+
+# Five Whys
+/tel{level: "L1"} >> /tel{level: "L2"} >> /tel{level: "L3"}
 ```
 
----
+## アンチパターン
 
-*Telos: アリストテレス目的論における「目的・終着・完成」*
+| ❌ | 理由 |
+|:---|:-----|
+| 目的を後付けする | 行動→正当化 は逆。目的→行動 |
+| 欲求で目的を書き換える | X-HK4 のバイアス。「欲しいから」≠「目的だから」 |
+| 常に Why を問い続ける | 分析麻痺。3層 (L1-L3) で止める |
 
----
-
-## Related Modes
-
-このスキルに関連する `/tel` WFモード (4件):
+## 派生モード
 
 | Mode | CCL | 用途 |
-|:-----|:----|:-----|
-| objective | `/tel.objective` | 客観的目的 |
-| intr | `/tel.intr` | 内発的目的 |
-| extr | `/tel.extr` | 外発的目的 |
-| tran | `/tel.tran` | 超越的目的 |
+|:-----|:----|:-----:|
+| why | `/tel.why` | Five Whys (根本目的到達) |
+| align | `/tel.align` | 手段-目的整合チェック |
+| drift | `/tel.drift` | 目的漂流の検出 |
+
+---
+
+*Telos: アリストテレスにおける「目的・終極・完成」*
+*v3.0: 6入力射 + バイアスチェック統合 (2026-02-07)*

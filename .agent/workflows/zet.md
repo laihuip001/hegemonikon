@@ -12,6 +12,7 @@ triggers:
   - "探求"
   - "zetesis"
 version: "5.6"
+lcm_state: stable       # draft | beta | stable | deprecated
 lineage: "v5.5 + FBR変換 → v5.6"
 anti_skip: enabled
 ccl_signature: "/zet+"

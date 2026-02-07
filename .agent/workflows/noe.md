@@ -2,7 +2,18 @@
 description: O1 Noēsis（深い認識・直観）を発動する最深層思考ワークフロー。5フェーズで前提破壊・ゼロ設計・GoT分析を実行。
 hegemonikon: O1 Noēsis
 version: "5.0"
+lcm_state: stable       # draft | beta | stable | deprecated
 derivatives: [nous, phro, meta, separate, align, metalearning]
+trigonon:
+  series: O
+  type: Pure
+  theorem: O1
+  coordinates: [I, E]  # Flow=Internality, Value=Epistemic
+  bridge: [S, H]       # via C1 Flow
+  anchor_via: []        # Pure has no anchor (is the anchor)
+  morphisms:
+    ">>S": [/met, /mek, /sta, /pra]
+    ">>H": [/pro, /pis, /ore, /dox]
 cognitive_algebra:
   "+": 詳細分析（各フェーズで3倍の出力）
   "-": 要点分析（結論+理由1つのみ、5行以内）

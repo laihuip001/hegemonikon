@@ -23,7 +23,7 @@ CCL = Cognitive Programming Language
 |:-----|:------------------|:----|
 | 実行対象 | CPU | **認知エージェント** |
 | 関数 | `def f():` | `/wf` (ワークフロー) |
-| 変数 | `x = 1` | (暗黙 — 認知状態) |
+| 変数 | `x = 1` | `$var` (WM変数) |
 | 条件分岐 | `if/else` | `?cond{}` |
 | ループ | `for/while` | `F:[]`, `~` (振動) |
 | 再帰 | `f(f(x))` | `*` (深化) |
@@ -50,6 +50,8 @@ CCL = Cognitive Programming Language
 | `∃` | 存在演算子 | `∃?x` |
 | `@` | マクロ参照 | `@proof` |
 | `\` | 反転 | `\noe` |
+| `$` | WM変数定義/参照 | `$goal = /bou` |
+| `>>` | アーティファクト永続化 | `$x >> file.md` |
 
 ### 制御構造
 
@@ -94,6 +96,41 @@ CCL の「型」は Hegemonikón の定理体系に対応:
 # 使用
 @name
 @name{override=value}
+---
+
+## WM 変数（作業記憶）
+
+> **Origin**: 2026-02-05 — 「思考を書き出す」ことで LLM の認知を外在化
+
+### 構文
+
+```ccl
+# 定義
+$goal = /bou{extract=true}
+
+# 参照
+/dia{$goal}
+
+# 永続化
+$decision >> decision_log.md
+```
+
+### WM vs Doxa
+
+| 特性 | WM (`$var`) | Doxa (`/dox`) |
+|:-----|:------------|:--------------|
+| 寿命 | セッション内 | 永続 |
+| 用途 | 作業中の一時状態 | 確立された信念 |
+| 書き出し先 | `>> file` | Handoff/KI |
+
+### 型推論
+
+WM 変数は右辺のワークフローから定理型を継承:
+
+```ccl
+$insight = /noe+   # 型: O (Ousia)
+$plan = /s+        # 型: S (Schema)
+$emotion = /pro    # 型: H (Hormē)
 ```
 
 ---

@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 # PROOF: [L3/ユーティリティ] <- mekhane/symploke/ O4→実行スクリプトが必要→run_specialists が担う
 """
-Jules 専門家バッチ実行スクリプト v2.0
+Jules 専門家バッチ実行スクリプト v3.0
 
-tekhne-maker v5.0 アーキタイプ駆動設計を統合。
-GitHub Actions 定時実行対応。
+Specialist v2（純化された知性）統合版。
+140人の専門家、21カテゴリ対応。
 """
 
 import asyncio
@@ -17,17 +17,31 @@ from pathlib import Path
 
 # ローカルモジュールインポート
 try:
-    from specialist_prompts import (
+    from specialist_v2 import (
         ALL_SPECIALISTS,
+        Specialist,
         generate_prompt,
-        SpecialistDefinition,
+        get_all_categories,
+        get_specialists_by_category,
+    )
+    from specialists_tier1 import (
+        TIER1_SPECIALISTS,
+        get_tier1_by_category,
+        get_tier1_categories,
     )
 except ImportError:
     sys.path.insert(0, str(Path(__file__).parent))
-    from specialist_prompts import (
+    from specialist_v2 import (
         ALL_SPECIALISTS,
+        Specialist,
         generate_prompt,
-        SpecialistDefinition,
+        get_all_categories,
+        get_specialists_by_category,
+    )
+    from specialists_tier1 import (
+        TIER1_SPECIALISTS,
+        get_tier1_by_category,
+        get_tier1_categories,
     )
 
 
@@ -46,7 +60,7 @@ API_KEYS = [
 
 async def create_session(
     key: str,
-    spec: SpecialistDefinition,
+    spec: Specialist,
     target_file: str,
 ) -> dict:
     """Jules セッションを作成"""
@@ -77,6 +91,7 @@ async def create_session(
                     return {
                         "id": spec.id,
                         "name": spec.name,
+                        "category": spec.category,
                         "archetype": spec.archetype.value,
                         "session_id": data.get("id"),
                         "url": data.get("url"),
@@ -87,15 +102,16 @@ async def create_session(
                     return {
                         "id": spec.id,
                         "name": spec.name,
+                        "category": spec.category,
                         "error": resp.status,
                         "error_text": error_text[:200],
                     }
     except Exception as e:
-        return {"id": spec.id, "name": spec.name, "error": str(e)}
+        return {"id": spec.id, "name": spec.name, "category": spec.category, "error": str(e)}
 
 
 async def run_batch(
-    specialists: list[SpecialistDefinition],
+    specialists: list[Specialist],
     target_file: str,
     max_concurrent: int = 3,
 ) -> list[dict]:
@@ -107,14 +123,14 @@ async def run_batch(
     results = []
     semaphore = asyncio.Semaphore(max_concurrent)
 
-    async def bounded_create(i: int, spec: SpecialistDefinition):
+    async def bounded_create(i: int, spec: Specialist):
         async with semaphore:
             key_idx = i % len(API_KEYS)
             key = API_KEYS[key_idx]
             print(f"[{i+1}/{len(specialists)}] {spec.id} {spec.name[:20]}...")
             result = await create_session(key, spec, target_file)
             if "session_id" in result:
-                print(f"  ✓ Started")
+                print(f"  ✓ Started ({spec.category})")
             else:
                 print(f"  ✗ Error: {result.get('error')}")
             return result
@@ -143,7 +159,10 @@ async def main():
     """メイン実行"""
     import argparse
 
-    parser = argparse.ArgumentParser(description="Jules Specialist Batch Runner")
+    # 利用可能なカテゴリを動的に取得
+    available_categories = ["all"] + get_all_categories()
+
+    parser = argparse.ArgumentParser(description="Jules Specialist Batch Runner v3.0")
     parser.add_argument(
         "--target",
         "-t",
@@ -153,7 +172,7 @@ async def main():
     parser.add_argument(
         "--category",
         "-c",
-        choices=["all", "cognitive_load", "ai_risk", "async", "theory"],
+        choices=available_categories,
         default="all",
         help="Specialist category to run",
     )
@@ -169,24 +188,66 @@ async def main():
     parser.add_argument(
         "--dry-run", action="store_true", help="Print prompts without executing"
     )
+    parser.add_argument(
+        "--list-categories", action="store_true", help="List available categories"
+    )
+    parser.add_argument(
+        "--sample", "-s", type=int, help="Random sample N specialists"
+    )
+    parser.add_argument(
+        "--tier",
+        type=int,
+        choices=[1, 2],
+        help="Run only Tier 1 (evolutionary) or Tier 2 (hygiene) specialists",
+    )
 
     args = parser.parse_args()
 
-    # 専門家フィルタリング
-    if args.category == "all":
-        specialists = ALL_SPECIALISTS
-    else:
-        specialists = [s for s in ALL_SPECIALISTS if s.category == args.category]
+    # カテゴリ一覧
+    if args.list_categories:
+        print("=== Available Categories ===")
+        for cat in get_all_categories():
+            count = len(get_specialists_by_category(cat))
+            print(f"  {cat}: {count}人")
+        print(f"\n  all: {len(ALL_SPECIALISTS)}人")
+        return
 
-    print(f"=== Jules Specialist Batch Runner v2.0 ===")
+    # 専門家フィルタリング
+    if args.tier == 1:
+        # Tier 1: 進化専門家のみ
+        if args.category == "all":
+            specialists = list(TIER1_SPECIALISTS)
+        else:
+            specialists = get_tier1_by_category(args.category)
+    elif args.tier == 2:
+        # Tier 2: 衛生専門家のみ (Tier 1 を除外)
+        tier1_ids = {s.id for s in TIER1_SPECIALISTS}
+        if args.category == "all":
+            specialists = [s for s in ALL_SPECIALISTS if s.id not in tier1_ids]
+        else:
+            specialists = [s for s in get_specialists_by_category(args.category) if s.id not in tier1_ids]
+    else:
+        # 全専門家
+        if args.category == "all":
+            specialists = list(ALL_SPECIALISTS)
+        else:
+            specialists = get_specialists_by_category(args.category)
+
+    # ランダムサンプリング
+    if args.sample:
+        import random
+        specialists = random.sample(specialists, min(args.sample, len(specialists)))
+
+    print(f"=== Jules Specialist Batch Runner v3.0 ===")
     print(f"Target: {args.target}")
+    print(f"Category: {args.category}")
     print(f"Specialists: {len(specialists)}")
     print(f"API Keys: {len(API_KEYS)}")
     print()
 
     if args.dry_run:
         for spec in specialists:
-            print(f"--- {spec.id} {spec.name} ---")
+            print(f"--- {spec.id} {spec.name} ({spec.category}) ---")
             print(generate_prompt(spec, args.target))
             print()
         return
@@ -218,6 +279,18 @@ async def main():
     print(f"Started: {started}/{len(specialists)}")
     print(f"Failed: {failed}/{len(specialists)}")
     print(f"Results: {output_path}")
+
+    # カテゴリ別サマリー
+    categories_started = {}
+    for r in results:
+        cat = r.get("category", "unknown")
+        if "session_id" in r:
+            categories_started[cat] = categories_started.get(cat, 0) + 1
+    
+    if categories_started:
+        print("\nBy Category:")
+        for cat, count in sorted(categories_started.items()):
+            print(f"  {cat}: {count}")
 
 
 if __name__ == "__main__":

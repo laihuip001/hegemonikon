@@ -35,11 +35,14 @@ def get_boot_context(mode: str = "standard", context: Optional[str] = None) -> d
         }
     """
     # 軸 A: Handoff 活用
+    print(" [1/4] 📋 Searching Handoffs...", file=sys.stderr, end="", flush=True)
     from mekhane.symploke.handoff_search import get_boot_handoffs, format_boot_output
 
     handoffs_result = get_boot_handoffs(mode=mode, context=context)
+    print(" Done.", file=sys.stderr)
 
     # 軸 B: Sophia アクティベーション
+    print(" [2/4] 📚 Ingesting Knowledge (Sophia)...", file=sys.stderr, end="", flush=True)
     # コンテキストを Handoff から取得
     ki_context = context
     if not ki_context and handoffs_result["latest"]:
@@ -50,11 +53,65 @@ def get_boot_context(mode: str = "standard", context: Optional[str] = None) -> d
     from mekhane.symploke.sophia_ingest import get_boot_ki, format_ki_output
 
     ki_result = get_boot_ki(context=ki_context, mode=mode)
+    print(" Done.", file=sys.stderr)
 
     # 軸 C: 人格永続化
+    print(" [4/4] 👤 Loading Persona...", file=sys.stderr, end="", flush=True)
     from mekhane.symploke.persona import get_boot_persona
 
     persona_result = get_boot_persona(mode=mode)
+    print(" Done.", file=sys.stderr)
+
+    # 軸 D: PKS (能動的知識プッシュ)
+    # 重い処理なのでタイムアウトを設定
+    pks_result = {"nuggets": [], "count": 0, "formatted": ""}
+    
+    if mode != "fast":  # fastモードではPKSをスキップ
+        print(" [3/4] 🧠 Activating PKS Engine...", file=sys.stderr, end="", flush=True)
+        try:
+            from concurrent.futures import ThreadPoolExecutor
+            
+            def _run_pks():
+                from mekhane.pks.pks_engine import PKSEngine
+                pks_engine = PKSEngine(threshold=0.5, max_push=3)
+                
+                # コンテキスト設定
+                pks_topics = []
+                if context:
+                    pks_topics = [t.strip() for t in context.split(",")]
+                elif ki_context:
+                    # KI コンテキストからトピック抽出
+                    words = ki_context.split()[:5]
+                    pks_topics = [w for w in words if len(w) > 2]
+                
+                if pks_topics:
+                    pks_engine.set_context(topics=pks_topics)
+                    return pks_engine.proactive_push(k=10)
+                return []
+
+            # 10秒タイムアウト (detailedでも待たせすぎない)
+            with ThreadPoolExecutor(max_workers=1) as executor:
+                future = executor.submit(_run_pks)
+                nuggets = future.result(timeout=10.0)
+                
+            if nuggets:
+                from mekhane.pks.pks_engine import PKSEngine  # 型ヒント用
+                # インスタンス化せずにフォーマットメソッドだけ借用したいが、インスタンスメソッドなので
+                # 簡易フォーマッターを使用するか、再インスタンス化する（軽量）
+                pks_engine_dummy = PKSEngine()
+                pks_result = {
+                    "nuggets": nuggets,
+                    "count": len(nuggets),
+                    "formatted": pks_engine_dummy.format_push_report(nuggets),
+                }
+            print(" Done.", file=sys.stderr)
+            
+        except TimeoutError:
+            print(" Timeout (skipped).", file=sys.stderr)
+        except Exception as e:
+            print(f" Failed ({str(e)}).", file=sys.stderr)
+    else:
+         print(" [3/4] 🧠 PKS Engine skipped (fast mode).", file=sys.stderr)
 
     # 統合フォーマット
     lines = []
@@ -73,10 +130,16 @@ def get_boot_context(mode: str = "standard", context: Optional[str] = None) -> d
     if ki_result["ki_items"]:
         lines.append(format_ki_output(ki_result))
 
+    # PKS
+    if pks_result["formatted"]:
+        lines.append("")
+        lines.append(pks_result["formatted"])
+
     return {
         "handoffs": handoffs_result,
         "ki": ki_result,
         "persona": persona_result,
+        "pks": pks_result,
         "formatted": "\n".join(lines),
     }
 
@@ -92,7 +155,8 @@ def print_boot_summary(mode: str = "standard", context: Optional[str] = None):
     h_count = result["handoffs"]["count"]
     ki_count = result["ki"]["count"]
     sessions = result["persona"].get("sessions", 0)
-    print(f"📊 Handoff: {h_count}件 | KI: {ki_count}件 | Sessions: {sessions}")
+    pks_count = result.get("pks", {}).get("count", 0)
+    print(f"📊 Handoff: {h_count}件 | KI: {ki_count}件 | Sessions: {sessions} | PKS: {pks_count}件")
 
 
 def main():
@@ -110,7 +174,16 @@ def main():
 
     warnings.filterwarnings("ignore")
 
-    print_boot_summary(mode=args.mode, context=args.context)
+    print(f"⏳ Boot Mode: {args.mode}", file=sys.stderr)
+    
+    try:
+        print_boot_summary(mode=args.mode, context=args.context)
+    except KeyboardInterrupt:
+        print("\n⚠️ Boot sequence interrupted.", file=sys.stderr)
+        sys.exit(1)
+    except Exception as e:
+        print(f"\n❌ Boot sequence failed: {e}", file=sys.stderr)
+        sys.exit(1)
 
 
 if __name__ == "__main__":

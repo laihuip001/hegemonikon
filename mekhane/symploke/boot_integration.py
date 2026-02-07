@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # PROOF: [L2/インフラ] <- mekhane/symploke/ A0→継続する私が必要→boot_integration が担う
 """
-Boot Integration - 3軸を統合した /boot 用 API
+Boot Integration - 6軸を統合した /boot 用 API
 
 Usage:
     python boot_integration.py                    # 標準起動
@@ -31,18 +31,21 @@ def get_boot_context(mode: str = "standard", context: Optional[str] = None) -> d
             "handoffs": {...},    # 軸 A
             "ki": {...},          # 軸 B
             "persona": {...},     # 軸 C
+            "pks": {...},         # 軸 D
+            "safety": {...},      # 軸 E
+            "attractor": {...},   # 軸 F
             "formatted": str      # フォーマット済み出力
         }
     """
     # 軸 A: Handoff 活用
-    print(" [1/4] 📋 Searching Handoffs...", file=sys.stderr, end="", flush=True)
+    print(" [1/6] 📋 Searching Handoffs...", file=sys.stderr, end="", flush=True)
     from mekhane.symploke.handoff_search import get_boot_handoffs, format_boot_output
 
     handoffs_result = get_boot_handoffs(mode=mode, context=context)
     print(" Done.", file=sys.stderr)
 
     # 軸 B: Sophia アクティベーション (タイムアウト付き)
-    print(" [2/4] 📚 Ingesting Knowledge (Sophia)...", file=sys.stderr, end="", flush=True)
+    print(" [2/6] 📚 Ingesting Knowledge (Sophia)...", file=sys.stderr, end="", flush=True)
     # コンテキストを Handoff から取得
     ki_context = context
     if not ki_context and handoffs_result["latest"]:
@@ -66,7 +69,7 @@ def get_boot_context(mode: str = "standard", context: Optional[str] = None) -> d
         print(" Timeout (skipped).", file=sys.stderr)
     except Exception as e:
         print(f" Failed ({str(e)}).", file=sys.stderr)
-    print(" [4/4] 👤 Loading Persona...", file=sys.stderr, end="", flush=True)
+    print(" [3/6] 👤 Loading Persona...", file=sys.stderr, end="", flush=True)
     from mekhane.symploke.persona import get_boot_persona
 
     persona_result = get_boot_persona(mode=mode)
@@ -77,7 +80,7 @@ def get_boot_context(mode: str = "standard", context: Optional[str] = None) -> d
     pks_result = {"nuggets": [], "count": 0, "formatted": ""}
     
     if mode != "fast":  # fastモードではPKSをスキップ
-        print(" [3/4] 🧠 Activating PKS Engine...", file=sys.stderr, end="", flush=True)
+        print(" [4/6] 🧠 Activating PKS Engine...", file=sys.stderr, end="", flush=True)
         try:
             from concurrent.futures import ThreadPoolExecutor
             
@@ -121,11 +124,11 @@ def get_boot_context(mode: str = "standard", context: Optional[str] = None) -> d
         except Exception as e:
             print(f" Failed ({str(e)}).", file=sys.stderr)
     else:
-         print(" [3/4] 🧠 PKS Engine skipped (fast mode).", file=sys.stderr)
+         print(" [4/6] 🧠 PKS Engine skipped (fast mode).", file=sys.stderr)
 
     # 軸 E: Safety Contract Audit (v3.1)
     safety_result = {"skills": 0, "workflows": 0, "errors": 0, "warnings": 0, "formatted": ""}
-    print(" [5/5] 🛡️ Running Safety Contract Audit...", file=sys.stderr, end="", flush=True)
+    print(" [5/6] 🛡️ Running Safety Contract Audit...", file=sys.stderr, end="", flush=True)
     try:
         from mekhane.dendron.skill_checker import run_audit, AuditResult
         agent_dir = Path(__file__).parent.parent.parent / ".agent"
@@ -155,6 +158,39 @@ def get_boot_context(mode: str = "standard", context: Optional[str] = None) -> d
     except Exception as e:
         print(f" Failed ({str(e)}).", file=sys.stderr)
 
+    # 軸 F: Attractor Dispatch Engine
+    attractor_result = {"series": [], "workflows": [], "llm_format": "", "formatted": ""}
+    if context:
+        print(" [6/6] 🎯 Attractor Dispatch...", file=sys.stderr, end="", flush=True)
+        try:
+            from concurrent.futures import ThreadPoolExecutor
+
+            def _run_attractor():
+                from mekhane.fep.attractor_advisor import AttractorAdvisor
+                advisor = AttractorAdvisor(force_cpu=False)
+                rec = advisor.recommend(context)
+                llm_fmt = advisor.format_for_llm(context)
+                return {
+                    "series": rec.series,
+                    "workflows": rec.workflows,
+                    "llm_format": llm_fmt,
+                    "confidence": rec.confidence,
+                    "oscillation": rec.oscillation.value,
+                    "advice": rec.advice,
+                    "formatted": f"🎯 **Attractor**: {llm_fmt}" if llm_fmt else "",
+                }
+
+            with ThreadPoolExecutor(max_workers=1) as executor:
+                future = executor.submit(_run_attractor)
+                attractor_result = future.result(timeout=30.0)
+            print(" Done.", file=sys.stderr)
+        except TimeoutError:
+            print(" Timeout (skipped).", file=sys.stderr)
+        except Exception as e:
+            print(f" Failed ({str(e)}).", file=sys.stderr)
+    else:
+        print(" [6/6] 🎯 Attractor skipped (no context).", file=sys.stderr)
+
     # 統合フォーマット
     lines = []
 
@@ -183,12 +219,18 @@ def get_boot_context(mode: str = "standard", context: Optional[str] = None) -> d
         lines.append("")
         lines.append(safety_result["formatted"])
 
+    # Attractor
+    if attractor_result["formatted"]:
+        lines.append("")
+        lines.append(attractor_result["formatted"])
+
     return {
         "handoffs": handoffs_result,
         "ki": ki_result,
         "persona": persona_result,
         "pks": pks_result,
         "safety": safety_result,
+        "attractor": attractor_result,
         "formatted": "\n".join(lines),
     }
 
@@ -206,7 +248,9 @@ def print_boot_summary(mode: str = "standard", context: Optional[str] = None):
     sessions = result["persona"].get("sessions", 0)
     pks_count = result.get("pks", {}).get("count", 0)
     safety_errors = result.get("safety", {}).get("errors", 0)
-    print(f"📊 Handoff: {h_count}件 | KI: {ki_count}件 | Sessions: {sessions} | PKS: {pks_count}件 | Safety: {'✅' if safety_errors == 0 else f'⚠️{safety_errors}'}")
+    attractor_series = result.get("attractor", {}).get("series", [])
+    attractor_str = "+".join(attractor_series) if attractor_series else "—"
+    print(f"📊 Handoff: {h_count}件 | KI: {ki_count}件 | Sessions: {sessions} | PKS: {pks_count}件 | Safety: {'✅' if safety_errors == 0 else f'⚠️{safety_errors}'} | Attractor: {attractor_str}")
 
 
 def main():

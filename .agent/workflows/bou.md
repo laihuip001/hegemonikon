@@ -4,6 +4,7 @@ hegemonikon: Ousia
 modules: [O2]
 skill_ref: ".agent/skills/ousia/o2-boulesis/SKILL.md"
 version: "4.6"
+lcm_state: beta
 lineage: "v4.5 + FBR変換 → v4.6"
 anti_skip: enabled
 ccl_signature: "/bou*"

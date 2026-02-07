@@ -10,6 +10,7 @@ triggers:
   - "propatheia"
   - "intuition"
 version: "2.4"
+lcm_state: beta
 lineage: "v2.3 + FBR変換 → v2.4"
 derivatives: [appr, avoi, arre, random, forecast]
 trigonon:

@@ -55,6 +55,12 @@ lineage: "A2 Krisis + C-1 Adversarial + M-1 User Perspective + Epochē + Anti-Sk
 
 version: "3.1.0"
 workflow_ref: ".agent/workflows/dia.md"
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks:
+  - "判断基準の誤適用による過信・過少評価"
+fallbacks: []
 ---
 
 # A2: Krisis (Κρίσις)

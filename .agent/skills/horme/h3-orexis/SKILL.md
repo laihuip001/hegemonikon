@@ -44,6 +44,12 @@ implementation:
 
 version: "2.1.0"
 workflow_ref: ".agent/workflows/ore.md"
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks:
+  - "動機評価の偏りによる行動指針の歪み"
+fallbacks: []
 ---
 
 # H3: Orexis (Ὄρεξις)

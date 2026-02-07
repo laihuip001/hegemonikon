@@ -18,6 +18,12 @@ triggers:
     - τ-layer
     - v2.1
     - v2.2
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks:
+  - "ユーティリティの誤用による品質基準の逸脱"
+fallbacks: []
 ---
 
 # Hegemonikón Knowledge Item Skill

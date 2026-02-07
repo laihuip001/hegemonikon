@@ -10,6 +10,7 @@ triggers:
   - "pathos"
   - "emotion"
 version: "1.5"
+lcm_state: beta
 lineage: "v1.4 + FBR変換 → v1.5"
 derivatives: [rece, tran, regu, delta, neutral]
 trigonon:

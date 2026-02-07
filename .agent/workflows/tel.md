@@ -9,6 +9,7 @@ triggers:
   - "telos"
   - "why"
 version: "3.4"
+lcm_state: beta
 lineage: "v3.3 + FBR変換 → v3.4"
 derivatives: [intr, extr, tran, objective]
 trigonon:

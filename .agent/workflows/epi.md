@@ -10,6 +10,7 @@ triggers:
   - "episteme"
   - "knowledge"
 version: "1.4"
+lcm_state: beta
 lineage: "v1.3 + FBR変換 → v1.4"
 derivatives: [prac, theo, tech, case, transfer, pattern, statistical, base_rate, reuse, triz40, generalize, typed]
 trigonon:

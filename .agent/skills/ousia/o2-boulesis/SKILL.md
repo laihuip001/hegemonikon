@@ -42,6 +42,12 @@ lineage: "O2 Boulēsis + Anti-Skip Protocol + Artifact出力規則 → v3.0"
 
 version: "3.0.0"
 workflow_ref: ".agent/workflows/bou.md"
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks:
+  - "認知フレームの過度な適用による思考の硬直化"
+fallbacks: []
 ---
 
 # O2: Boulēsis (Βούλησις)

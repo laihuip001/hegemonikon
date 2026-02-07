@@ -41,6 +41,12 @@ lineage: "A-9 + X-1/X-2 + Anti-Skip Protocol + 出力保存規則 → v3.0"
 
 version: "3.0.0"
 workflow_ref: ".agent/workflows/noe.md"
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks:
+  - "認知フレームの過度な適用による思考の硬直化"
+fallbacks: []
 ---
 
 # O1: Noēsis (Νόησις)

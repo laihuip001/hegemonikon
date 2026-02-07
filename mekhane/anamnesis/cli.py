@@ -407,6 +407,30 @@ def main():
     )
     p_links.set_defaults(func=cmd_links)
 
+    # chat (Gnōsis Chat — RAG 対話)
+    from mekhane.anamnesis.gnosis_chat import cmd_chat
+
+    p_chat = subparsers.add_parser(
+        "chat", help="Interactive RAG chat with knowledge base"
+    )
+    p_chat.add_argument(
+        "question", nargs="?", default=None,
+        help="Question to ask (omit for interactive mode)"
+    )
+    p_chat.add_argument(
+        "--top-k", "-k", type=int, default=5,
+        help="Number of documents to retrieve (default: 5)"
+    )
+    p_chat.add_argument(
+        "--max-tokens", "-m", type=int, default=512,
+        help="Max tokens to generate (default: 512)"
+    )
+    p_chat.add_argument(
+        "--index", "-i", action="store_true",
+        help="Index all knowledge files before chatting"
+    )
+    p_chat.set_defaults(func=cmd_chat)
+
     args = parser.parse_args()
 
     if not args.command:

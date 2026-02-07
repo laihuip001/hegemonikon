@@ -1,3 +1,11 @@
+---
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks:
+  - "判断基準の誤適用による過信・過少評価"
+fallbacks: []
+---
 # Anti-Skip Protocol (段階省略防止プロトコル)
 
 > **Origin**: /zet 調査結果 (2026-01-28) + Constitutional AI + Grounded PRM

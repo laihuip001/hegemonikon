@@ -18,6 +18,12 @@ triggers:
     - handoff
     - drift
     - 統合品質
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks:
+  - "判断基準の誤適用による過信・過少評価"
+fallbacks: []
 ---
 
 # Session Audit Skill

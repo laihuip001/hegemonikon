@@ -49,6 +49,12 @@ implementation:
 
 version: "2.1.0"
 workflow_ref: ".agent/workflows/euk.md"
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks:
+  - "文脈判断の誤りによるタイミング逸失"
+fallbacks: []
 ---
 
 # K1: Eukairia (Εὐκαιρία)

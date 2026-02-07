@@ -3,6 +3,7 @@ description: 深読プロトコル。流し読み防止 + 思考沈潜 + 既知�
 hegemonikon: Akribeia + Bathys + Tribē
 modules: [A2, O1]
 version: "2.1"
+lcm_state: stable
 lineage: "v2.0 + FBR変換 → v2.1"
 anti_skip: enabled
 anti_skim: enabled

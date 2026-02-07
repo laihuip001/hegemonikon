@@ -4,6 +4,7 @@ hegemonikon: Schema
 modules: [S2.dialogue]
 skill_ref: "none"
 version: "2.4"
+lcm_state: stable
 lineage: "v2.3 + SEL 統合 → v2.4"
 derivatives: []
 cognitive_algebra:

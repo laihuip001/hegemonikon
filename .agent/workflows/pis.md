@@ -10,6 +10,7 @@ triggers:
   - "pistis"
   - "confidence"
 version: "2.3"
+lcm_state: beta
 lineage: "v2.2 + FBR変換 → v2.3"
 derivatives: [subj, inte, obje, bayes, probabilistic, uncertainty, calibrate]
 trigonon:

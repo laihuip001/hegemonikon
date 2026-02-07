@@ -42,6 +42,12 @@ lineage: "O3 Zētēsis 統一リマッピング (2026-01-28) — 問いを立て
 
 version: "4.0.0"
 workflow_ref: ".agent/workflows/zet.md"
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks:
+  - "認知フレームの過度な適用による思考の硬直化"
+fallbacks: []
 ---
 
 # O3: Zētēsis (Ζήτησις)

@@ -1,6 +1,6 @@
 # noqa: AI-ALL
 """
-# PROOF: [L2/インフラ] <- mekhane/symploke/adapters/ A0→ベクトルDBアダプタが必要→base が担う
+# PROOF: [L2/インフラ] <- mekhane/symploke/adapters/ S2→ベクトルDBアダプタが必要→base が担う
 VectorStore Adapter - Abstract Base Class
 
 Hegemonikón H3 Symplokē: ベクトルDB抽象インターフェース

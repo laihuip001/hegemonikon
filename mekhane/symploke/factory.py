@@ -1,4 +1,4 @@
-# PROOF: [L2/インフラ] <- mekhane/symploke/
+# PROOF: [L2/インフラ] <- mekhane/symploke/ S2→複数ベクトルDB対応が必要→factory が担う
 """
 PROOF: [L2/インフラ]
 

@@ -1,4 +1,4 @@
-# PROOF: [L2/インフラ] <- mekhane/symploke/indices/ A0→索引管理が必要→kairos が担う
+# PROOF: [L2/インフラ] <- mekhane/symploke/indices/ K2→索引管理が必要→kairos が担う
 """
 Kairos Index - Handoff (文脈)
 

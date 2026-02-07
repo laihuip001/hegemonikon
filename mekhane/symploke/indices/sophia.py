@@ -1,4 +1,4 @@
-# PROOF: [L2/インフラ] <- mekhane/symploke/indices/ A0→索引管理が必要→sophia が担う
+# PROOF: [L2/インフラ] <- mekhane/symploke/indices/ K4→索引管理が必要→sophia が担う
 """
 Sophia Index - Knowledge Items (静的知識)
 

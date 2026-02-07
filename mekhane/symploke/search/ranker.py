@@ -1,5 +1,5 @@
 """
-# PROOF: [L2/インフラ] <- mekhane/symploke/search/ A0→検索機能が必要→ranker が担う
+# PROOF: [L2/インフラ] <- mekhane/symploke/search/ A2→検索機能が必要→ranker が担う
 Symplokē Ranker
 
 Hegemonikón H3: 検索結果のリランキング

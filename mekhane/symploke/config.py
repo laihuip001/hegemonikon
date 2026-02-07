@@ -1,5 +1,5 @@
 # noqa: AI-ALL
-# PROOF: [L2/インフラ] <- mekhane/symploke/
+# PROOF: [L2/インフラ] <- mekhane/symploke/ S3→設定が必要→config が担う
 """
 PROOF: [L2/インフラ]
 

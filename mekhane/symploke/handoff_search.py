@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# PROOF: [L2/インフラ] <- mekhane/symploke/ A0→知識管理が必要→handoff_search が担う
+# PROOF: [L2/インフラ] <- mekhane/symploke/ O3→知識管理が必要→handoff_search が担う
 """
 Handoff & Conversation Search - /boot 時に関連 Handoff と会話ログを検索
 

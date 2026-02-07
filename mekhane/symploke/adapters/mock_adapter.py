@@ -1,5 +1,5 @@
 """
-# PROOF: [L2/インフラ] <- mekhane/symploke/adapters/ A0→ベクトルDBアダプタが必要→mock_adapter が担う
+# PROOF: [L2/インフラ] <- mekhane/symploke/adapters/ S2→ベクトルDBアダプタが必要→mock_adapter が担う
 MockAdapter - テスト用ダミーアダプタ
 
 データ無しでインターフェースの検証を可能にする

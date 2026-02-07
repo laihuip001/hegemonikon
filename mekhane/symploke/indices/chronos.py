@@ -1,4 +1,4 @@
-# PROOF: [L2/インフラ] <- mekhane/symploke/indices/ A0→索引管理が必要→chronos が担う
+# PROOF: [L2/インフラ] <- mekhane/symploke/indices/ K2→索引管理が必要→chronos が担う
 """
 Chronos Index - チャット履歴 (時系列)
 

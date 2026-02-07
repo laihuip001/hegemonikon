@@ -12,6 +12,7 @@ triggers:
   - "ボトルネック"
   - "制約理論"
 version: "2.4"
+lcm_state: beta
 lineage: "v2.3 + FBR変換 → v2.4"
 derivatives: [toc, fermi, cont, disc, abst, kiss, extreme, approximation, definition, dimensional, cognitive_load, check, ambiguity, units]
 trigonon:

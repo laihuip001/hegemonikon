@@ -1,4 +1,8 @@
-# GEMINI.md - Hegemonikón Doctrine (GCP/Linux)
+---
+description: 
+---
+
+# GEMINI.md - Hegemonikón Doctrine (Linux)
 
 > **Hegemonikon Project Profile**
 >
@@ -24,8 +28,8 @@ Hegemonikón は FEP (Free Energy Principle) に基づく認知ハイパーバ�
 |------|---:|
 | 公理 | 7 |
 | 定理 | 24 |
-| 関係 | 36 |
-| **総計** | **60** |
+| 関係 | 72 |
+| **総計** | **96** |
 
 ### 絶対遵守事項
 
@@ -47,7 +51,7 @@ Hegemonikón は FEP (Free Energy Principle) に基づく認知ハイパーバ�
 
 ## Environment
 
-- **OS**: Linux (GCP VM)
+- **OS**: Debian13
 - **Python**: 3.11
 - **Node.js**: 20.x
 - **MCP**: gnosis, prompt-lang

@@ -59,6 +59,12 @@ derivatives:
 
 version: "2.2.0"
 workflow_ref: ".agent/workflows/sta.md"
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks:
+  - "設計パターンの硬直的適用による柔軟性欠失"
+fallbacks: []
 ---
 
 # S3: Stathmos (Σταθμός)

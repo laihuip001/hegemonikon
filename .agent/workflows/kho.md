@@ -10,6 +10,7 @@ triggers:
   - "khora"
   - "scope"
 version: "2.3"
+lcm_state: beta
 lineage: "v2.2 + FBR変換 → v2.3"
 derivatives: [phys, conc, rela, mece, problem, constraint, scope, boundary, module, io, edge, frame, a3, datamodel, platform, segment, positioning, blue_ocean]
 trigonon:

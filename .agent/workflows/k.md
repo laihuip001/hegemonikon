@@ -8,6 +8,7 @@ skill_ref:
   - ".agent/skills/kairos/k3-telos/SKILL.md"
   - ".agent/skills/kairos/k4-sophia/SKILL.md"
 version: "6.0"
+lcm_state: beta
 layer: "Δ"
 lineage: "v5.2 + Limit演算復元 → v6.0"
 cognitive_algebra:
@@ -16,7 +17,9 @@ cognitive_algebra:
     axis_1: "Scale/Function"
     axis_2: "Valence/Precision"
   definition: "/k = lim(K1·K2·K3·K4)"
-  interpretation: "4定理の内積 → 最適収束点"
+  interpretation:
+    strict: "テンソル積 (Scale/Function⊗Valence/Precision) の Limit 射影"
+    short: "4定理の内積 → 最適収束点"
   operators:
     "+": "Limit強度↑ — 全4定理を詳細に収束"
     "-": "Limit強度↓ — 縮約収束"

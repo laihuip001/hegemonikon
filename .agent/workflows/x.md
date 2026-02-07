@@ -9,6 +9,7 @@ triggers:
   - "次は何"
   - "X-series"
 version: "6.0"
+lcm_state: stable
 lineage: "v5.5 + 暗黙発動プロトコル L0-L3 → v6.0"
 derivatives: [chain, toc, dependency, network, leverage, path_dep, separate, second_order]
 cognitive_algebra:

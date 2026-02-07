@@ -2,6 +2,7 @@
 description: セッション開始時の統合ブートシーケンス。二人で起動する。
 hegemonikon: O1 Noēsis + H4 Doxa
 version: "4.0"
+lcm_state: stable
 derivatives:
   "+": 詳細起動（全ステップ展開、Handoff 10件、KI 5件）→ boot/identity.md 参照
   "-": 高速起動（最小情報のみ、1分で開始）

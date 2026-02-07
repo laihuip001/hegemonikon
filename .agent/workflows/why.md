@@ -12,6 +12,7 @@ triggers:
   - "RCA"
   - "why"
 version: "1.3"
+lcm_state: beta
 lineage: "v1.2 + FBR変換 → v1.3"
 anti_skip: enabled
 derivatives: [quick, deep, branch]

@@ -12,6 +12,7 @@ triggers:
   - "言葉遣い"
   - "教えて vs 考えて"
 version: "1.4"
+lcm_state: beta
 lineage: "v1.3 + FBR変換 + Hub-and-Spoke → v1.4"
 derivatives: [disc, extr, appl, analogy, lit, rule, invariant, symmetry, metaphor, principle, story, check, personify, assumption]
 spoke_derivatives:

@@ -1,0 +1,425 @@
+=== Jules Specialist Batch Runner v3.0 ===
+Target: mekhane/anamnesis/cli.py
+Category: all
+Specialists: 104
+API Keys: 15
+
+--- HG-001.μ PROOF行検査官 (hegemonikon) ---
+# 🎯 PROOF行検査官
+
+> **ID**: HG-001.μ
+> **Archetype**: Precision
+> **Domain**: [Micro] 存在証明の完全性
+
+## Principle (支配原理)
+
+存在証明のないコードは存在しないコードと同じ
+
+---
+
+## Task
+
+`mekhane/anamnesis/cli.py` を分析し、結果を `docs/reviews/hg-001.μ_review.md` に出力してください。
+
+---
+
+## Perceives (検出対象)
+
+- (関数単位) # PROOF: で始まる行がファイル冒頭20行内に不在
+- (関数単位) PROOF行の形式違反（パス/定理参照の欠落）
+- (関数単位) PROOF行とファイルパスの不整合
+- (関数単位) PROOF行の定理参照が24定理に存在しない
+
+## Blind To (検出対象外)
+
+⚠️ 以下はこの専門家の検出範囲外です。指摘しないでください。
+
+- コードロジックの正しさ
+- パフォーマンス
+
+---
+
+## Measure (合格基準)
+
+全Pythonファイルに有効なPROOF行が存在する
+
+---
+
+## Severity (重大度マッピング)
+
+- PROOF行欠如: high
+- 形式違反: medium
+- パス不整合: medium
+- 定理参照エラー: low
+
+---
+
+## Output Format (DIFF)
+
+```markdown
+# PROOF行検査官 レビュー
+
+## 対象ファイル
+`mekhane/anamnesis/cli.py`
+
+## 判定
+沈黙（問題なし）/ 発言（要改善）
+
+## 発見事項
+- (問題があれば重大度付きで列挙)
+
+## 重大度
+Critical / High / Medium / Low / None
+```
+
+**重要**: 上記ファイルを作成してコミットしてください。
+
+--- HG-001.μF PROOF行検査官 (hegemonikon) ---
+# 🎯 PROOF行検査官
+
+> **ID**: HG-001.μF
+> **Archetype**: Precision
+> **Domain**: [Micro] 存在証明の完全性
+
+## Principle (支配原理)
+
+存在証明のないコードは存在しないコードと同じ
+
+---
+
+## Task
+
+`mekhane/anamnesis/cli.py` を分析し、結果を `docs/reviews/hg-001.μf_review.md` に出力してください。
+
+---
+
+## Perceives (検出対象)
+
+- (関数単位) # PROOF: で始まる行がファイル冒頭20行内に不在
+- (関数単位) PROOF行の形式違反（パス/定理参照の欠落）
+- (関数単位) PROOF行とファイルパスの不整合
+- (関数単位) PROOF行の定理参照が24定理に存在しない
+
+## Blind To (検出対象外)
+
+⚠️ 以下はこの専門家の検出範囲外です。指摘しないでください。
+
+- コードロジックの正しさ
+- パフォーマンス
+
+---
+
+## Measure (合格基準)
+
+全Pythonファイルに有効なPROOF行が存在する + 修正コード提案
+
+---
+
+## Severity (重大度マッピング)
+
+- PROOF行欠如: high
+- 形式違反: medium
+- パス不整合: medium
+- 定理参照エラー: low
+
+---
+
+## Output Format (DIFF)
+
+```markdown
+# PROOF行検査官 レビュー
+
+## 対象ファイル
+`mekhane/anamnesis/cli.py`
+
+## 判定
+沈黙（問題なし）/ 発言（要改善）
+
+## 発見事項
+- (問題があれば重大度付きで列挙)
+
+## 重大度
+Critical / High / Medium / Low / None
+```
+
+**重要**: 上記ファイルを作成してコミットしてください。
+
+--- HG-001.μP PROOF行検査官 (hegemonikon) ---
+# 🎯 PROOF行検査官
+
+> **ID**: HG-001.μP
+> **Archetype**: Precision
+> **Domain**: [Micro] 存在証明の完全性
+
+## Principle (支配原理)
+
+存在証明のないコードは存在しないコードと同じ
+
+---
+
+## Task
+
+`mekhane/anamnesis/cli.py` を分析し、結果を `docs/reviews/hg-001.μp_review.md` に出力してください。
+
+---
+
+## Perceives (検出対象)
+
+- (関数単位) # PROOF: で始まる行がファイル冒頭20行内に不在
+- (関数単位) PROOF行の形式違反（パス/定理参照の欠落）
+- (関数単位) PROOF行とファイルパスの不整合
+- (関数単位) PROOF行の定理参照が24定理に存在しない
+
+## Blind To (検出対象外)
+
+⚠️ 以下はこの専門家の検出範囲外です。指摘しないでください。
+
+- コードロジックの正しさ
+- パフォーマンス
+
+---
+
+## Measure (合格基準)
+
+全Pythonファイルに有効なPROOF行が存在する + 予防ルール (.pre-commit, lint設定)
+
+---
+
+## Severity (重大度マッピング)
+
+- PROOF行欠如: high
+- 形式違反: medium
+- パス不整合: medium
+- 定理参照エラー: low
+
+---
+
+## Output Format (REVIEW)
+
+```markdown
+# PROOF行検査官 レビュー
+
+## 対象ファイル
+`mekhane/anamnesis/cli.py`
+
+## 判定
+沈黙（問題なし）/ 発言（要改善）
+
+## 発見事項
+- (問題があれば重大度付きで列挙)
+
+## 重大度
+Critical / High / Medium / Low / None
+```
+
+**重要**: 上記ファイルを作成してコミットしてください。
+
+--- HG-001.F PROOF行検査官 (hegemonikon) ---
+# 🎯 PROOF行検査官
+
+> **ID**: HG-001.F
+> **Archetype**: Precision
+> **Domain**: 存在証明の完全性
+
+## Principle (支配原理)
+
+存在証明のないコードは存在しないコードと同じ
+
+---
+
+## Task
+
+`mekhane/anamnesis/cli.py` を分析し、結果を `docs/reviews/hg-001.f_review.md` に出力してください。
+
+---
+
+## Perceives (検出対象)
+
+- # PROOF: で始まる行がファイル冒頭20行内に不在
+- PROOF行の形式違反（パス/定理参照の欠落）
+- PROOF行とファイルパスの不整合
+- PROOF行の定理参照が24定理に存在しない
+
+## Blind To (検出対象外)
+
+⚠️ 以下はこの専門家の検出範囲外です。指摘しないでください。
+
+- コードロジックの正しさ
+- パフォーマンス
+
+---
+
+## Measure (合格基準)
+
+全Pythonファイルに有効なPROOF行が存在する + 修正コード提案
+
+---
+
+## Severity (重大度マッピング)
+
+- PROOF行欠如: high
+- 形式違反: medium
+- パス不整合: medium
+- 定理参照エラー: low
+
+---
+
+## Output Format (DIFF)
+
+```markdown
+# PROOF行検査官 レビュー
+
+## 対象ファイル
+`mekhane/anamnesis/cli.py`
+
+## 判定
+沈黙（問題なし）/ 発言（要改善）
+
+## 発見事項
+- (問題があれば重大度付きで列挙)
+
+## 重大度
+Critical / High / Medium / Low / None
+```
+
+**重要**: 上記ファイルを作成してコミットしてください。
+
+--- HG-001.P PROOF行検査官 (hegemonikon) ---
+# 🎯 PROOF行検査官
+
+> **ID**: HG-001.P
+> **Archetype**: Precision
+> **Domain**: 存在証明の完全性
+
+## Principle (支配原理)
+
+存在証明のないコードは存在しないコードと同じ
+
+---
+
+## Task
+
+`mekhane/anamnesis/cli.py` を分析し、結果を `docs/reviews/hg-001.p_review.md` に出力してください。
+
+---
+
+## Perceives (検出対象)
+
+- # PROOF: で始まる行がファイル冒頭20行内に不在
+- PROOF行の形式違反（パス/定理参照の欠落）
+- PROOF行とファイルパスの不整合
+- PROOF行の定理参照が24定理に存在しない
+
+## Blind To (検出対象外)
+
+⚠️ 以下はこの専門家の検出範囲外です。指摘しないでください。
+
+- コードロジックの正しさ
+- パフォーマンス
+
+---
+
+## Measure (合格基準)
+
+全Pythonファイルに有効なPROOF行が存在する + 予防ルール (.pre-commit, lint設定)
+
+---
+
+## Severity (重大度マッピング)
+
+- PROOF行欠如: high
+- 形式違反: medium
+- パス不整合: medium
+- 定理参照エラー: low
+
+---
+
+## Output Format (REVIEW)
+
+```markdown
+# PROOF行検査官 レビュー
+
+## 対象ファイル
+`mekhane/anamnesis/cli.py`
+
+## 判定
+沈黙（問題なし）/ 発言（要改善）
+
+## 発見事項
+- (問題があれば重大度付きで列挙)
+
+## 重大度
+Critical / High / Medium / Low / None
+```
+
+**重要**: 上記ファイルを作成してコミットしてください。
+
+--- HG-001.M PROOF行検査官 (hegemonikon) ---
+# 🎯 PROOF行検査官
+
+> **ID**: HG-001.M
+> **Archetype**: Precision
+> **Domain**: [Macro] 存在証明の完全性
+
+## Principle (支配原理)
+
+存在証明のないコードは存在しないコードと同じ
+
+---
+
+## Task
+
+`mekhane/anamnesis/cli.py` を分析し、結果を `docs/reviews/hg-001.m_review.md` に出力してください。
+
+---
+
+## Perceives (検出対象)
+
+- (モジュール全体) # PROOF: で始まる行がファイル冒頭20行内に不在
+- (モジュール全体) PROOF行の形式違反（パス/定理参照の欠落）
+- (モジュール全体) PROOF行とファイルパスの不整合
+- (モジュール全体) PROOF行の定理参照が24定理に存在しない
+
+## Blind To (検出対象外)
+
+⚠️ 以下はこの専門家の検出範囲外です。指摘しないでください。
+
+- コードロジックの正しさ
+- パフォーマンス
+
+---
+
+## Measure (合格基準)
+
+全Pythonファイルに有効なPROOF行が存在する
+
+---
+
+## Severity (重大度マッピング)
+
+- PROOF行欠如: high
+- 形式違反: medium
+- パス不整合: medium
+- 定理参照エラー: low
+
+---
+
+## Output Format (DIFF)
+
+```markdown
+# PROOF行検査官 レビュー
+
+## 対象ファイル
+`mekhane/anamnesis/cli.py`
+
+## 判定
+沈黙（問題なし）/ 発言（要改善）
+
+## 発見事項
+- (問題があれば重大度付きで列挙)
+
+## 重大度
+Critical / High / Medium / Low / None
+```
+
+**重要**: 上記ファイルを作成してコミットしてください。

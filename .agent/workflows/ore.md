@@ -10,6 +10,7 @@ triggers:
   - "orexis"
   - "desire"
 version: "2.4"
+lcm_state: beta
 lineage: "v2.3 + FBR変換 → v2.4"
 derivatives: [targ, acti, stat, jtbd, utility, risk_tolerance, incentive, loss_aversion, value_prop, audience, entropy]
 trigonon:

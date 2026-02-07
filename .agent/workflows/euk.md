@@ -10,6 +10,7 @@ triggers:
   - "機会"
   - "eukairia"
 version: "1.4"
+lcm_state: beta
 lineage: "v1.3 + FBR変換 → v1.4"
 derivatives: [dete, crea, main, stage]
 trigonon:

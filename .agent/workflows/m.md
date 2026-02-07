@@ -3,6 +3,7 @@ description: 本気モード。Creatorが真剣度を示すときに発動。効
 hegemonikon: Hormē
 modules: [H2]
 version: "1.1"
+lcm_state: beta
 lineage: "v1.0 FBR変換 → v1.1"
 ccl_signature: "/m"
 anti_skip: enforced

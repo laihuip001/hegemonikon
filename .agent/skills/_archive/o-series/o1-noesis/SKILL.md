@@ -57,6 +57,12 @@ related:
   macro: "mekhane/noesis/"
 
 version: "2.1.0"
+risk_tier: L0
+reversible: true
+requires_approval: false
+risks:
+  - "アーカイブ済みスキルの誤参照による古い手法の適用"
+fallbacks: []
 ---
 
 # O1: Noēsis (Νόησις) — 認識

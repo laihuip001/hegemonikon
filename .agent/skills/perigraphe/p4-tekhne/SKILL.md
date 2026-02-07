@@ -46,6 +46,12 @@ implementation:
 
 version: "2.1.0"
 workflow_ref: ".agent/workflows/tek.md"
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks:
+  - "環境設計の偏りによるスコープ逸脱"
+fallbacks: []
 ---
 
 # P4: Tekhnē (Τέχνη)

@@ -46,6 +46,12 @@ implementation:
 
 version: "2.1.0"
 workflow_ref: ".agent/workflows/epi.md"
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks:
+  - "判断基準の誤適用による過信・過少評価"
+fallbacks: []
 ---
 
 # A4: Epistēmē (Ἐπιστήμη)

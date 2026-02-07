@@ -10,6 +10,7 @@ triggers:
   - "hodos"
   - "path"
 version: "2.3"
+lcm_state: beta
 lineage: "v2.2 + FBR変換 → v2.3"
 derivatives: [line, bran, cycl, search, backward, bisect, backcast]
 trigonon:

@@ -4,6 +4,7 @@ hegemonikon: Perigraphē
 modules: [P4]
 skill_ref: ".agent/skills/perigraphē/p4-tekhne/SKILL.md"
 version: "1.4"
+lcm_state: beta
 lineage: "v1.3 + SEL 統合 → v1.4"
 derivatives: []
 cognitive_algebra:

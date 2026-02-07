@@ -715,8 +715,25 @@ def _load_additional_specialists():
             # バッチファイルがない場合
             return []
 
-_ADDITIONAL = _load_additional_specialists()
-ALL_SPECIALISTS = AESTHETICS_SPECIALISTS + NAMING_SPECIALISTS + _ADDITIONAL
+
+# ============ 遅延ロード ============
+# batch1/2/3 は ALL_SPECIALISTS にアクセスされた時点で初めてロードされる
+_ALL_SPECIALISTS_CACHE = None
+
+def _get_all_specialists():
+    """ALL_SPECIALISTS の遅延取得（キャッシュ付き）"""
+    global _ALL_SPECIALISTS_CACHE
+    if _ALL_SPECIALISTS_CACHE is None:
+        _additional = _load_additional_specialists()
+        _ALL_SPECIALISTS_CACHE = AESTHETICS_SPECIALISTS + NAMING_SPECIALISTS + _additional
+    return _ALL_SPECIALISTS_CACHE
+
+
+def __getattr__(name):
+    """モジュールレベルの遅延ロード (PEP 562)"""
+    if name == "ALL_SPECIALISTS":
+        return _get_all_specialists()
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
 
 
 # ============ プロンプト生成 ============
@@ -825,24 +842,25 @@ Critical / High / Medium / Low / None
 
 def get_specialists_by_category(category: str) -> list[Specialist]:
     """カテゴリ別に専門家を取得"""
-    return [s for s in ALL_SPECIALISTS if s.category == category]
+    return [s for s in _get_all_specialists() if s.category == category]
 
 
 def get_specialists_by_archetype(archetype: Archetype) -> list[Specialist]:
     """アーキタイプ別に専門家を取得"""
-    return [s for s in ALL_SPECIALISTS if s.archetype == archetype]
+    return [s for s in _get_all_specialists() if s.archetype == archetype]
 
 
 def get_all_categories() -> list[str]:
     """全カテゴリを取得"""
-    return sorted(set(s.category for s in ALL_SPECIALISTS))
+    return sorted(set(s.category for s in _get_all_specialists()))
 
 
 # ============ CLI ============
 
 if __name__ == "__main__":
+    all_specs = _get_all_specialists()
     print(f"=== Specialist v2: 純化された知性 ===")
-    print(f"Total specialists: {len(ALL_SPECIALISTS)}")
+    print(f"Total specialists: {len(all_specs)}")
     print()
     
     for cat in get_all_categories():
@@ -852,5 +870,5 @@ if __name__ == "__main__":
     print()
     print("=== サンプルプロンプト (AE-001) ===")
     print()
-    if ALL_SPECIALISTS:
-        print(generate_prompt(ALL_SPECIALISTS[0], "example.py"))
+    if all_specs:
+        print(generate_prompt(all_specs[0], "example.py"))

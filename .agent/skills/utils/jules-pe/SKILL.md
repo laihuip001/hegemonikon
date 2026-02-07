@@ -6,6 +6,12 @@ trigger:
   - プロンプト生成を Jules に
   - Jules でプロンプト
   - PE を Jules で
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks:
+  - "ユーティリティの誤用による品質基準の逸脱"
+fallbacks: []
 ---
 
 # Jules PE Skill

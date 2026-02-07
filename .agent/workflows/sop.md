@@ -2,6 +2,7 @@
 description: K4 Sophia（知恵）を発動し、Perplexityに調査を依頼する。深掘り版調査依頼書を生成。
 hegemonikon: K4 Sophia
 version: "7.0"
+lcm_state: stable
 triggers: ["調べて", "教えて", "Perplexityに聞いて", "パプ君に聞いて", "リサーチ"]
 derivatives:
   "+": 詳細調査（完全リサーチ依頼書、複数視点）

@@ -8,6 +8,7 @@ skill_ref:
   - ".agent/skills/perigraphē/p3-trokhia/SKILL.md"
   - ".agent/skills/perigraphē/p4-tekhne/SKILL.md"
 version: "5.0"
+lcm_state: beta
 layer: "Δ"
 lineage: "v4.3 + Limit演算復元 → v5.0"
 derivatives: [kho, hod, tro, tek]
@@ -17,7 +18,9 @@ cognitive_algebra:
     axis_1: "Scale (Micro/Macro)"
     axis_2: "Function (Explore/Exploit)"
   definition: "/p = lim(P1·P2·P3·P4)"
-  interpretation: "4定理の内積 → 最適収束点"
+  interpretation:
+    strict: "テンソル積 (Scale⊗Function) の Limit 射影"
+    short: "4定理の内積 → 最適収束点"
   operators:
     "+": "Limit強度↑ — 全4定理を詳細に収束"
     "-": "Limit強度↓ — 縮約収束"

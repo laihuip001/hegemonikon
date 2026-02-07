@@ -57,18 +57,18 @@ C1=A:  O3,O4 (C1=A) → S3,S4 (C1=A) = 2×2 = 4
 
 ## 関係一覧
 
-| X | 接続 | 共有座標 | 数 | 意味 |
-|---|------|---------|---|------|
-| X-OS | O→S | C1 (Flow) | 8 | 本質→様態 |
-| X-OH | O→H | C1 (Flow) | 8 | 本質→傾向 |
-| X-SH | S→H | C1 (Flow) | 8 | 様態→傾向 |
-| X-SP | S→P | C3 (Scale) | 8 | 様態→条件 |
-| X-SK | S→K | C3 (Scale) | 8 | 様態→文脈 |
-| X-PK | P→K | C3 (Scale) | 8 | 条件→文脈 |
-| X-HA | H→A | C5 (Valence) | 8 | 傾向→精密 |
-| X-HK | H→K | C5 (Valence) | 8 | 傾向→文脈 |
-| X-KA | K→A | C5 (Valence) | 8 | 文脈→精密 |
-| **計** | | | **72** | |
+| X | 接続 | 共有座標 | 数 | 意味 | 認知的意味 |
+|---|------|---------|---|------|:----------|
+| X-OS | O→S | C1 (Flow) | 8 | 本質→様態 | 理解したことを「どう実装するか」に落とす |
+| X-OH | O→H | C1 (Flow) | 8 | 本質→傾向 | 理解したことが「何を欲するか」を変える |
+| X-SH | S→H | C1 (Flow) | 8 | 様態→傾向 | 設計の精密さが実行への確信を左右する |
+| X-SP | S→P | C3 (Scale) | 8 | 様態→条件 | 設計の粒度が適用範囲を決定する |
+| X-SK | S→K | C3 (Scale) | 8 | 様態→文脈 | 設計の方法が好機と目的を制約する |
+| X-PK | P→K | C3 (Scale) | 8 | 条件→文脈 | 場の広さが「いつ・何のためか」を絞る |
+| X-HA | H→A | C5 (Valence) | 8 | 傾向→精密 | 動機の方向が判断の繊細さを決める |
+| X-HK | H→K | C5 (Valence) | 8 | 傾向→文脈 | 欲求・確信が好機の認識を歪める |
+| X-KA | K→A | C5 (Valence) | 8 | 文脈→精密 | 文脈の制約が精度要求を確定させる |
+| **計** | | | **72** | | |
 
 ### 構造の対称性
 
@@ -230,156 +230,165 @@ Bridge/Anchor の優先は FEP の explore/exploit に対応し、**文脈依存
 ## X-OS: Ousia → Schema (8)
 
 > **「本質が様態をどう展開するか」** (共有: C1 Flow)
+> **認知的意味**: 理解したことを「どう実装するか」に落とす。深い認識は設計を規定し、意志は方法を選ぶ。
 
-| X | O | S | 意味 |
-|---|---|---|------|
-| X-OS1 | O1 (I×E) | S1 (Flow×Scale) | Noēsis → Metron |
-| X-OS2 | O1 (I×E) | S2 (Flow×Function) | Noēsis → Mekhanē |
-| X-OS3 | O2 (I×P) | S1 (Flow×Scale) | Boulēsis → Metron |
-| X-OS4 | O2 (I×P) | S2 (Flow×Function) | Boulēsis → Mekhanē |
-| X-OS5 | O3 (A×E) | S3 (Value×Scale) | Zētēsis → Stathmos |
-| X-OS6 | O3 (A×E) | S4 (Value×Function) | Zētēsis → Praxis |
-| X-OS7 | O4 (A×P) | S3 (Value×Scale) | Energeia → Stathmos |
-| X-OS8 | O4 (A×P) | S4 (Value×Function) | Energeia → Praxis |
+| X | O | S | 意味 | 認知的説明 |
+|---|---|---|------|:-----------|
+| X-OS1 | O1 (I×E) | S1 (Flow×Scale) | Noēsis → Metron | 本質理解→何をどのスケールで測るか |
+| X-OS2 | O1 (I×E) | S2 (Flow×Function) | Noēsis → Mekhanē | 本質理解→どの方法で実装するか |
+| X-OS3 | O2 (I×P) | S1 (Flow×Scale) | Boulēsis → Metron | 目的定義→目標の大きさを決める |
+| X-OS4 | O2 (I×P) | S2 (Flow×Function) | Boulēsis → Mekhanē | 目的定義→達成手段を設計する |
+| X-OS5 | O3 (A×E) | S3 (Value×Scale) | Zētēsis → Stathmos | 問いの発見→評価基準を設定する |
+| X-OS6 | O3 (A×E) | S4 (Value×Function) | Zētēsis → Praxis | 問いの発見→探索方法を具体化する |
+| X-OS7 | O4 (A×P) | S3 (Value×Scale) | Energeia → Stathmos | 行為の実行→成果基準を定義する |
+| X-OS8 | O4 (A×P) | S4 (Value×Function) | Energeia → Praxis | 行為の実行→次の実践を選択する |
 
 ---
 
 ## X-OH: Ousia → Hormē (8) 🆕
 
 > **「本質が傾向をどう生むか」** (共有: C1 Flow)
+> **認知的意味**: 理解したことが「何を欲するか」を変える。認識は欲求を生み、意志は確信を形成する。
 
-| X | O | H | 意味 |
-|---|---|---|------|
-| X-OH1 | O1 (I×E) | H1 (Flow×Valence) | Noēsis → Propatheia |
-| X-OH2 | O1 (I×E) | H2 (Flow×Precision) | Noēsis → Pistis |
-| X-OH3 | O2 (I×P) | H1 (Flow×Valence) | Boulēsis → Propatheia |
-| X-OH4 | O2 (I×P) | H2 (Flow×Precision) | Boulēsis → Pistis |
-| X-OH5 | O3 (A×E) | H3 (Value×Valence) | Zētēsis → Orexis |
-| X-OH6 | O3 (A×E) | H4 (Value×Precision) | Zētēsis → Doxa |
-| X-OH7 | O4 (A×P) | H3 (Value×Valence) | Energeia → Orexis |
-| X-OH8 | O4 (A×P) | H4 (Value×Precision) | Energeia → Doxa |
+| X | O | H | 意味 | 認知的説明 |
+|---|---|---|------|:-----------|
+| X-OH1 | O1 (I×E) | H1 (Flow×Valence) | Noēsis → Propatheia | 深い認識→直感的な接近/回避反応 |
+| X-OH2 | O1 (I×E) | H2 (Flow×Precision) | Noēsis → Pistis | 深い認識→理解に対する確信度 |
+| X-OH3 | O2 (I×P) | H1 (Flow×Valence) | Boulēsis → Propatheia | 目的意識→やりたい/やりたくない |
+| X-OH4 | O2 (I×P) | H2 (Flow×Precision) | Boulēsis → Pistis | 目的意識→意志の確からしさ |
+| X-OH5 | O3 (A×E) | H3 (Value×Valence) | Zētēsis → Orexis | 問いの探求→「これが欲しい」の発生 |
+| X-OH6 | O3 (A×E) | H4 (Value×Precision) | Zētēsis → Doxa | 問いの探求→暫定的信念の形成 |
+| X-OH7 | O4 (A×P) | H3 (Value×Valence) | Energeia → Orexis | 行為の完了→次に何を望むか |
+| X-OH8 | O4 (A×P) | H4 (Value×Precision) | Energeia → Doxa | 行為の完了→経験が信念になる |
 
 ---
 
 ## X-SH: Schema → Hormē (8)
 
 > **「様態が傾向をどう方向づけるか」** (共有: C1 Flow)
+> **認知的意味**: 設計の精密さが実行への確信を左右する。計画がしっかりしていれば確信が高まり、曖昧なら不安が残る。
 > v3.0: 4→8 に拡張
 
-| X | S | H | 意味 |
-|---|---|---|------|
-| X-SH1 | S1 (Flow×Scale) | H1 (Flow×Valence) | Metron → Propatheia |
-| X-SH2 | S1 (Flow×Scale) | H2 (Flow×Precision) | Metron → Pistis |
-| X-SH3 | S2 (Flow×Function) | H1 (Flow×Valence) | Mekhanē → Propatheia |
-| X-SH4 | S2 (Flow×Function) | H2 (Flow×Precision) | Mekhanē → Pistis |
-| X-SH5 | S3 (Value×Scale) | H3 (Value×Valence) | Stathmos → Orexis |
-| X-SH6 | S3 (Value×Scale) | H4 (Value×Precision) | Stathmos → Doxa |
-| X-SH7 | S4 (Value×Function) | H3 (Value×Valence) | Praxis → Orexis |
-| X-SH8 | S4 (Value×Function) | H4 (Value×Precision) | Praxis → Doxa |
+| X | S | H | 意味 | 認知的説明 |
+|---|---|---|------|:-----------|
+| X-SH1 | S1 (Flow×Scale) | H1 (Flow×Valence) | Metron → Propatheia | スケール設定→「大きすぎ/小さすぎ」の直感 |
+| X-SH2 | S1 (Flow×Scale) | H2 (Flow×Precision) | Metron → Pistis | スケール設定→測定への確信度 |
+| X-SH3 | S2 (Flow×Function) | H1 (Flow×Valence) | Mekhanē → Propatheia | 方法選択→「これでいける」の直感 |
+| X-SH4 | S2 (Flow×Function) | H2 (Flow×Precision) | Mekhanē → Pistis | 方法選択→方法への確信度 |
+| X-SH5 | S3 (Value×Scale) | H3 (Value×Valence) | Stathmos → Orexis | 基準設定→基準を満たしたい欲求 |
+| X-SH6 | S3 (Value×Scale) | H4 (Value×Precision) | Stathmos → Doxa | 基準設定→基準の妥当性への信念 |
+| X-SH7 | S4 (Value×Function) | H3 (Value×Valence) | Praxis → Orexis | 実践選択→実践したい/したくない |
+| X-SH8 | S4 (Value×Function) | H4 (Value×Precision) | Praxis → Doxa | 実践選択→実践法の確からしさ |
 
 ---
 
 ## X-SP: Schema → Perigraphē (8)
 
 > **「様態が条件空間をどう定義するか」** (共有: C3 Scale)
+> **認知的意味**: 設計の粒度が適用範囲を決定する。測定の精度が場を定め、方法が軌道を規定する。
 > v3.0: 4→8 に拡張
 
-| X | S | P | 意味 |
-|---|---|---|------|
-| X-SP1 | S1 (Flow×Scale) | P1 (Scale×Function) | Metron → Khōra |
-| X-SP2 | S1 (Flow×Scale) | P2 (Scale×Explore) | Metron → Hodos |
-| X-SP3 | S3 (Value×Scale) | P1 (Scale×Function) | Stathmos → Khōra |
-| X-SP4 | S3 (Value×Scale) | P2 (Scale×Explore) | Stathmos → Hodos |
-| X-SP5 | S2 (Flow×Function) | P3 (Function×Scale) | Mekhanē → Trokhia |
-| X-SP6 | S2 (Flow×Function) | P4 (Function×Value) | Mekhanē → Tekhnē |
-| X-SP7 | S4 (Value×Function) | P3 (Function×Scale) | Praxis → Trokhia |
-| X-SP8 | S4 (Value×Function) | P4 (Function×Value) | Praxis → Tekhnē |
+| X | S | P | 意味 | 認知的説明 |
+|---|---|---|------|:-----------|
+| X-SP1 | S1 (Flow×Scale) | P1 (Scale×Function) | Metron → Khōra | 測定基準→適用領域を限定する |
+| X-SP2 | S1 (Flow×Scale) | P2 (Scale×Explore) | Metron → Hodos | 測定基準→到達経路を制約する |
+| X-SP3 | S3 (Value×Scale) | P1 (Scale×Function) | Stathmos → Khōra | 評価基準→評価対象の場を定める |
+| X-SP4 | S3 (Value×Scale) | P2 (Scale×Explore) | Stathmos → Hodos | 評価基準→達成への道筋を絞る |
+| X-SP5 | S2 (Flow×Function) | P3 (Function×Scale) | Mekhanē → Trokhia | 方法→繰り返しサイクルを設計する |
+| X-SP6 | S2 (Flow×Function) | P4 (Function×Value) | Mekhanē → Tekhnē | 方法→使う技法を選択する |
+| X-SP7 | S4 (Value×Function) | P3 (Function×Scale) | Praxis → Trokhia | 実践→実践の反復パターンを決める |
+| X-SP8 | S4 (Value×Function) | P4 (Function×Value) | Praxis → Tekhnē | 実践→実践に必要な技法を選ぶ |
 
 ---
 
 ## X-SK: Schema → Kairos (8) 🆕
 
 > **「様態が文脈をどう制約するか」** (共有: C3 Scale)
+> **認知的意味**: 設計の方法が好機と目的を制約する。選んだ方法は「いつやるか」「なぜやるか」を決める。
 
-| X | S | K | 意味 |
-|---|---|---|------|
-| X-SK1 | S1 (Flow×Scale) | K1 (Scale×Valence) | Metron → Eukairia |
-| X-SK2 | S1 (Flow×Scale) | K2 (Scale×Precision) | Metron → Chronos |
-| X-SK3 | S3 (Value×Scale) | K1 (Scale×Valence) | Stathmos → Eukairia |
-| X-SK4 | S3 (Value×Scale) | K2 (Scale×Precision) | Stathmos → Chronos |
-| X-SK5 | S2 (Flow×Function) | K3 (Function×Valence) | Mekhanē → Telos |
-| X-SK6 | S2 (Flow×Function) | K4 (Function×Precision) | Mekhanē → Sophia |
-| X-SK7 | S4 (Value×Function) | K3 (Function×Valence) | Praxis → Telos |
-| X-SK8 | S4 (Value×Function) | K4 (Function×Precision) | Praxis → Sophia |
+| X | S | K | 意味 | 認知的説明 |
+|---|---|---|------|:-----------|
+| X-SK1 | S1 (Flow×Scale) | K1 (Scale×Valence) | Metron → Eukairia | 測定基準→今が測定すべきタイミングか |
+| X-SK2 | S1 (Flow×Scale) | K2 (Scale×Precision) | Metron → Chronos | 測定基準→時間軸のスケール感 |
+| X-SK3 | S3 (Value×Scale) | K1 (Scale×Valence) | Stathmos → Eukairia | 評価基準→今が評価の好機か |
+| X-SK4 | S3 (Value×Scale) | K2 (Scale×Precision) | Stathmos → Chronos | 評価基準→評価に必要な時間枠 |
+| X-SK5 | S2 (Flow×Function) | K3 (Function×Valence) | Mekhanē → Telos | 方法→この方法の目的は正しいか |
+| X-SK6 | S2 (Flow×Function) | K4 (Function×Precision) | Mekhanē → Sophia | 方法→この方法に知恵は足りているか |
+| X-SK7 | S4 (Value×Function) | K3 (Function×Valence) | Praxis → Telos | 実践→この実践の目的整合性 |
+| X-SK8 | S4 (Value×Function) | K4 (Function×Precision) | Praxis → Sophia | 実践→実践に必要な知識の充足度 |
 
 ---
 
 ## X-PK: Perigraphē → Kairos (8)
 
 > **「条件が文脈をどう制約するか」** (共有: C3 Scale)
+> **認知的意味**: 場の広さが「いつ・何のためか」を絞る。領域が定まれば時間と目的も自ずと定まる。
 
-| X | P | K | 意味 |
-|---|---|---|------|
-| X-PK1 | P1 | K1 | Khōra → Eukairia |
-| X-PK2 | P1 | K2 | Khōra → Chronos |
-| X-PK3 | P2 | K1 | Hodos → Eukairia |
-| X-PK4 | P2 | K2 | Hodos → Chronos |
-| X-PK5 | P3 | K3 | Trokhia → Telos |
-| X-PK6 | P3 | K4 | Trokhia → Sophia |
-| X-PK7 | P4 | K3 | Tekhnē → Telos |
-| X-PK8 | P4 | K4 | Tekhnē → Sophia |
+| X | P | K | 意味 | 認知的説明 |
+|---|---|---|------|:-----------|
+| X-PK1 | P1 | K1 | Khōra → Eukairia | 場の範囲→この場で行動すべき好機 |
+| X-PK2 | P1 | K2 | Khōra → Chronos | 場の範囲→この場に必要な時間軸 |
+| X-PK3 | P2 | K1 | Hodos → Eukairia | 経路→今この道を進むべきか |
+| X-PK4 | P2 | K2 | Hodos → Chronos | 経路→この道にかかる時間 |
+| X-PK5 | P3 | K3 | Trokhia → Telos | サイクル→反復の目的は何か |
+| X-PK6 | P3 | K4 | Trokhia → Sophia | サイクル→反復に必要な知恵 |
+| X-PK7 | P4 | K3 | Tekhnē → Telos | 技法→この技法の目的整合性 |
+| X-PK8 | P4 | K4 | Tekhnē → Sophia | 技法→この技法に十分な知識があるか |
 
 ---
 
 ## X-HA: Hormē → Akribeia (8)
 
 > **「傾向が精密さをどう影響するか」** (共有: C5 Valence)
+> **認知的意味**: 動機の方向が判断の繊細さを決める。何を望むかが何を見極めるかを決定する。
 > v3.0: 4→8 に拡張
 
-| X | H | A | 意味 |
-|---|---|---|------|
-| X-HA1 | H1 (Flow×Valence) | A1 (Valence×Precision) | Propatheia → Pathos |
-| X-HA2 | H1 (Flow×Valence) | A2 (Valence×Certainty) | Propatheia → Krisis |
-| X-HA3 | H3 (Value×Valence) | A1 (Valence×Precision) | Orexis → Pathos |
-| X-HA4 | H3 (Value×Valence) | A2 (Valence×Certainty) | Orexis → Krisis |
-| X-HA5 | H2 (Flow×Precision) | A3 (Precision×Valence) | Pistis → Gnōmē |
-| X-HA6 | H2 (Flow×Precision) | A4 (Precision×Precision) | Pistis → Epistēmē |
-| X-HA7 | H4 (Value×Precision) | A3 (Precision×Valence) | Doxa → Gnōmē |
-| X-HA8 | H4 (Value×Precision) | A4 (Precision×Precision) | Doxa → Epistēmē |
+| X | H | A | 意味 | 認知的説明 |
+|---|---|---|------|:-----------|
+| X-HA1 | H1 (Flow×Valence) | A1 (Valence×Precision) | Propatheia → Pathos | 直感→感情の精緻な認識 |
+| X-HA2 | H1 (Flow×Valence) | A2 (Valence×Certainty) | Propatheia → Krisis | 直感→直感を批判的に検証 |
+| X-HA3 | H3 (Value×Valence) | A1 (Valence×Precision) | Orexis → Pathos | 欲求→欲求の正体を感じ取る |
+| X-HA4 | H3 (Value×Valence) | A2 (Valence×Certainty) | Orexis → Krisis | 欲求→欲求の妥当性を判定する |
+| X-HA5 | H2 (Flow×Precision) | A3 (Precision×Valence) | Pistis → Gnōmē | 確信→確信から原則を抽出する |
+| X-HA6 | H2 (Flow×Precision) | A4 (Precision×Precision) | Pistis → Epistēmē | 確信→確信を知識に昇格させる |
+| X-HA7 | H4 (Value×Precision) | A3 (Precision×Valence) | Doxa → Gnōmē | 信念→信念から教訓を引き出す |
+| X-HA8 | H4 (Value×Precision) | A4 (Precision×Precision) | Doxa → Epistēmē | 信念→信念を検証済み知識にする |
 
 ---
 
 ## X-HK: Hormē → Kairos (8) 🆕
 
 > **「傾向が文脈をどう変えるか」** (共有: C5 Valence)
+> **認知的意味**: 欲求・確信が好機の認識を歪める。強く望めば好機に見え、確信があれば時間感覚が変わる。
 
-| X | H | K | 意味 |
-|---|---|---|------|
-| X-HK1 | H1 (Flow×Valence) | K1 (Scale×Valence) | Propatheia → Eukairia |
-| X-HK2 | H1 (Flow×Valence) | K3 (Function×Valence) | Propatheia → Telos |
-| X-HK3 | H3 (Value×Valence) | K1 (Scale×Valence) | Orexis → Eukairia |
-| X-HK4 | H3 (Value×Valence) | K3 (Function×Valence) | Orexis → Telos |
-| X-HK5 | H2 (Flow×Precision) | K2 (Scale×Precision) | Pistis → Chronos |
-| X-HK6 | H2 (Flow×Precision) | K4 (Function×Precision) | Pistis → Sophia |
-| X-HK7 | H4 (Value×Precision) | K2 (Scale×Precision) | Doxa → Chronos |
-| X-HK8 | H4 (Value×Precision) | K4 (Function×Precision) | Doxa → Sophia |
+| X | H | K | 意味 | 認知的説明 |
+|---|---|---|------|:-----------|
+| X-HK1 | H1 (Flow×Valence) | K1 (Scale×Valence) | Propatheia → Eukairia | 直感→「今がチャンスだ」の認識 |
+| X-HK2 | H1 (Flow×Valence) | K3 (Function×Valence) | Propatheia → Telos | 直感→直感が目的を修正する |
+| X-HK3 | H3 (Value×Valence) | K1 (Scale×Valence) | Orexis → Eukairia | 欲求→欲しいものに好機を見出す |
+| X-HK4 | H3 (Value×Valence) | K3 (Function×Valence) | Orexis → Telos | 欲求→欲求が目的を書き換える |
+| X-HK5 | H2 (Flow×Precision) | K2 (Scale×Precision) | Pistis → Chronos | 確信→確信度が時間感覚を支配する |
+| X-HK6 | H2 (Flow×Precision) | K4 (Function×Precision) | Pistis → Sophia | 確信→確信が「何を知るべきか」を決める |
+| X-HK7 | H4 (Value×Precision) | K2 (Scale×Precision) | Doxa → Chronos | 信念→信念が時間感覚を拡張/圧縮する |
+| X-HK8 | H4 (Value×Precision) | K4 (Function×Precision) | Doxa → Sophia | 信念→信念が「知恵の源泉」を選ぶ |
 
 ---
 
 ## X-KA: Kairos → Akribeia (8)
 
 > **「文脈が精密さをどう決定するか」** (共有: C5 Valence)
+> **認知的意味**: 文脈の制約が精度要求を確定させる。締切が判断を鋭くし、目的が知識の深さを要求する。
 
-| X | K | A | 意味 |
-|---|---|---|------|
-| X-KA1 | K1 | A1 | Eukairia → Pathos |
-| X-KA2 | K1 | A2 | Eukairia → Krisis |
-| X-KA3 | K2 | A1 | Chronos → Pathos |
-| X-KA4 | K2 | A2 | Chronos → Krisis |
-| X-KA5 | K3 | A3 | Telos → Gnōmē |
-| X-KA6 | K3 | A4 | Telos → Epistēmē |
-| X-KA7 | K4 | A3 | Sophia → Gnōmē |
-| X-KA8 | K4 | A4 | Sophia → Epistēmē |
+| X | K | A | 意味 | 認知的説明 |
+|---|---|---|------|:-----------|
+| X-KA1 | K1 | A1 | Eukairia → Pathos | 好機→機会への感情的反応 |
+| X-KA2 | K1 | A2 | Eukairia → Krisis | 好機→今行動すべきかの批判的判定 |
+| X-KA3 | K2 | A1 | Chronos → Pathos | 時間圧→時間制約下の感情 |
+| X-KA4 | K2 | A2 | Chronos → Krisis | 時間圧→時間制約下の判断精度 |
+| X-KA5 | K3 | A3 | Telos → Gnōmē | 目的→目的から原則を演繹する |
+| X-KA6 | K3 | A4 | Telos → Epistēmē | 目的→目的達成に必要な知識の確定 |
+| X-KA7 | K4 | A3 | Sophia → Gnōmē | 知恵→知恵から格言を抽出する |
+| X-KA8 | K4 | A4 | Sophia → Epistēmē | 知恵→知恵を体系的知識に昇格させる |
 
 ---
 

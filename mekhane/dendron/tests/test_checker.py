@@ -355,3 +355,120 @@ class TestVariableCheck:
         short = [r for r in results if r.check_type == "short_name"]
         # i と x はどちらも _LOOP_VAR_NAMES に含まれる
         assert len(short) == 0
+
+    def test_vararg_with_hint(self, checker, tmp_py_file):
+        """*args に型ヒントあり → OK"""
+        f = tmp_py_file('# PROOF: [L2/x] <- parent/\ndef gather(*args: int) -> None:\n    pass\n')
+        results = checker.check_variables_in_file(f)
+        hints = [r for r in results if r.check_type == "type_hint"]
+        vararg_hints = [r for r in hints if "*args" in r.name]
+        assert len(vararg_hints) == 1
+        assert vararg_hints[0].status == ProofStatus.OK
+
+    def test_vararg_without_hint(self, checker, tmp_py_file):
+        """*args に型ヒントなし → MISSING"""
+        f = tmp_py_file('# PROOF: [L2/x] <- parent/\ndef gather(*args) -> None:\n    pass\n')
+        results = checker.check_variables_in_file(f)
+        hints = [r for r in results if r.check_type == "type_hint"]
+        missing = [r for r in hints if r.status == ProofStatus.MISSING and "*args" in r.name]
+        assert len(missing) == 1
+
+    def test_kwarg_with_hint(self, checker, tmp_py_file):
+        """**kwargs に型ヒントあり → OK"""
+        f = tmp_py_file('# PROOF: [L2/x] <- parent/\ndef configure(**kwargs: str) -> None:\n    pass\n')
+        results = checker.check_variables_in_file(f)
+        hints = [r for r in results if r.check_type == "type_hint"]
+        kwarg_hints = [r for r in hints if "**kwargs" in r.name]
+        assert len(kwarg_hints) == 1
+        assert kwarg_hints[0].status == ProofStatus.OK
+
+    def test_kwarg_without_hint(self, checker, tmp_py_file):
+        """**kwargs に型ヒントなし → MISSING"""
+        f = tmp_py_file('# PROOF: [L2/x] <- parent/\ndef configure(**kwargs) -> None:\n    pass\n')
+        results = checker.check_variables_in_file(f)
+        hints = [r for r in results if r.check_type == "type_hint"]
+        missing = [r for r in hints if r.status == ProofStatus.MISSING and "**kwargs" in r.name]
+        assert len(missing) == 1
+
+    def test_kwonlyargs_checked(self, checker, tmp_py_file):
+        """キーワード専用引数 (*, key) の型ヒントを検査"""
+        f = tmp_py_file('# PROOF: [L2/x] <- parent/\ndef action(*, key: str) -> None:\n    pass\n')
+        results = checker.check_variables_in_file(f)
+        hints = [r for r in results if r.check_type == "type_hint"]
+        key_hints = [r for r in hints if "(key)" in r.name]
+        assert len(key_hints) == 1
+        assert key_hints[0].status == ProofStatus.OK
+
+    def test_kwonlyargs_missing_hint(self, checker, tmp_py_file):
+        """キーワード専用引数に型ヒントなし → MISSING"""
+        f = tmp_py_file('# PROOF: [L2/x] <- parent/\ndef action(*, key) -> None:\n    pass\n')
+        results = checker.check_variables_in_file(f)
+        hints = [r for r in results if r.check_type == "type_hint"]
+        missing = [r for r in hints if r.status == ProofStatus.MISSING and "(key)" in r.name]
+        assert len(missing) == 1
+
+
+# ── L0: Directory PROOF.md Tests ────────────────────
+
+
+class TestDirProof:
+    """L0 ディレクトリ PROOF.md のテスト"""
+
+    def test_dir_with_proof_md(self, checker, tmp_path):
+        """PROOF.md が存在 → OK"""
+        proof = tmp_path / "PROOF.md"
+        proof.write_text("# PROOF: [L0/テスト] <- parent/\n\nテスト用。\n")
+        result = checker.check_dir_proof(tmp_path)
+        assert result.status == ProofStatus.OK
+        assert result.has_proof_md is True
+
+    def test_dir_without_proof_md(self, checker, tmp_path):
+        """PROOF.md なし → MISSING"""
+        result = checker.check_dir_proof(tmp_path)
+        assert result.status == ProofStatus.MISSING
+        assert result.has_proof_md is False
+
+    def test_dir_with_empty_proof_md(self, checker, tmp_path):
+        """空の PROOF.md → WEAK"""
+        proof = tmp_path / "PROOF.md"
+        proof.write_text("")
+        result = checker.check_dir_proof(tmp_path)
+        assert result.status == ProofStatus.WEAK
+        assert result.has_proof_md is True
+        assert "空" in result.reason
+
+    def test_dir_exempt(self, checker_with_exemptions, tmp_path):
+        """除外ディレクトリ → EXEMPT"""
+        pycache = tmp_path / "__pycache__"
+        pycache.mkdir()
+        result = checker_with_exemptions.check_dir_proof(pycache)
+        assert result.status == ProofStatus.EXEMPT
+
+
+# ── L2: English WEAK Purpose Tests ──────────────────
+
+
+class TestEnglishWeakPurpose:
+    """英語 WEAK パターンの回帰テスト"""
+
+    def test_english_weak_handles(self, checker, tmp_py_file):
+        """'Handles X' は WHAT であり WEAK"""
+        f = tmp_py_file('# PROOF: [L2/x] <- parent/\n# PURPOSE: Handles the user data\ndef process(data: str) -> None:\n    pass\n')
+        results = checker.check_functions_in_file(f)
+        weak = [r for r in results if r.status == ProofStatus.WEAK]
+        assert len(weak) == 1
+
+    def test_english_weak_manages(self, checker, tmp_py_file):
+        """'Manages X' は WHAT であり WEAK"""
+        f = tmp_py_file('# PROOF: [L2/x] <- parent/\n# PURPOSE: Manages the connection pool\ndef manage(pool: list) -> None:\n    pass\n')
+        results = checker.check_functions_in_file(f)
+        weak = [r for r in results if r.status == ProofStatus.WEAK]
+        assert len(weak) == 1
+
+    def test_english_good_purpose(self, checker, tmp_py_file):
+        """良い英語 PURPOSE (WHY) → OK"""
+        f = tmp_py_file('# PROOF: [L2/x] <- parent/\n# PURPOSE: Prevent memory leaks by closing idle connections after timeout\ndef cleanup(pool: list) -> None:\n    pass\n')
+        results = checker.check_functions_in_file(f)
+        ok = [r for r in results if r.status == ProofStatus.OK]
+        assert len(ok) == 1
+

@@ -4,7 +4,7 @@
 Jules 専門家定義: Phase 3 高度分析層 (Layer 16-20: 230人)
 """
 
-from .specialist_prompts import SpecialistDefinition, Archetype
+from .specialist_types import SpecialistDefinition, Archetype
 
 # === Layer 16: DSL・コード生成層 (50人) ===
 DSL_SPECIALISTS = [

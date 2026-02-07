@@ -13,7 +13,7 @@ Jules 専門家定義: Phase 0 従来的品質層 (Layer 1-6: 255人)
 - QA: テスト・品質保証 (30人) [Buffer層]
 """
 
-from .specialist_prompts import SpecialistDefinition, Archetype
+from .specialist_types import SpecialistDefinition, Archetype
 
 # === Layer 1: コード品質層 (CQ: 45人) ===
 CODE_QUALITY_SPECIALISTS = [

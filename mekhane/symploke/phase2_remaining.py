@@ -4,7 +4,7 @@
 Jules 専門家定義: Phase 2 運用・実務層 続き (Layer 11-15: 120人)
 """
 
-from .specialist_prompts import SpecialistDefinition, Archetype
+from .specialist_types import SpecialistDefinition, Archetype
 
 # === Layer 11: 自動化・ツール統合層 (30人) ===
 AUTOMATION_SPECIALISTS = [

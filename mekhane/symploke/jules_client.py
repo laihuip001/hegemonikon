@@ -610,9 +610,20 @@ class JulesClient:
                         task=task,
                     )
 
-        results = await asyncio.gather(*[bounded_execute(task) for task in tasks])
+        # AS-009 fix: Use TaskGroup for structured concurrency
+        # bounded_execute catches all exceptions internally, so TaskGroup
+        # won't receive unhandled exceptions from tasks.
+        results: list[JulesResult] = []
 
-        return list(results)
+        async def tracked_execute(task: dict) -> None:
+            result = await bounded_execute(task)
+            results.append(result)
+
+        async with asyncio.TaskGroup() as tg:
+            for task in tasks:
+                tg.create_task(tracked_execute(task))
+
+        return results
 
     async def synedrion_review(
         self,

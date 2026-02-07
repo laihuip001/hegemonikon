@@ -5,6 +5,16 @@ version: "7.0"
 lcm_state: stable       # draft | beta | stable | deprecated
 layer: "Δ"
 derivatives: [aff, neg, epo, root, devil, steelman, counterfactual, cold_mirror, deliberative]
+trigonon:
+  series: A
+  type: Pure
+  theorem: A2
+  coordinates: [C, U]
+  bridge: []
+  anchor_via: [H, K]
+  morphisms:
+    ">>H": [/pro, /pis, /ore, /dox]
+    ">>K": [/euk, /chr, /tel, /sop]
 cognitive_algebra:
   "+": 詳細判定（証拠/論拠/反論を完全展開）
   "-": 判定要約（PASS/FAIL + 1行理由）
@@ -127,3 +137,15 @@ default:
 ---
 
 *v7.1 — FBR 適用 (2026-02-07)*
+
+---
+
+## @complete: 射の提案 (暗黙発動 L1)
+
+> WF完了時、`/x` 暗黙発動プロトコルにより射を提案する。
+> 計算ツール: `python mekhane/taxis/morphism_proposer.py dia`
+
+```
+/dia 完了 → @complete 発動
+→ 結果に確信がありますか？ (Y: Anchor優先 / N: Bridge優先 / 完了)
+```

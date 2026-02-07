@@ -24,6 +24,12 @@ when_not_to_use: |
 
 layer: "Level 2' 関係層"
 version: "2.0"
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks:
+  - "定理間関係の誤推論による不適切な遷移提案"
+fallbacks: []
 ---
 
 # X-O: Ousia Relations

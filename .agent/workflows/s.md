@@ -15,6 +15,7 @@ triggers:
   - "schema"
   - "リーンキャンバス"
 version: "6.0"
+lcm_state: stable
 layer: "Δ"
 lineage: "v5.8 + Limit演算復元 → v6.0"
 derivatives: [met, mek, sta, pra]
@@ -24,7 +25,9 @@ cognitive_algebra:
     axis_1: "Flow/Value"
     axis_2: "Scale/Function"
   definition: "/s = lim(S1·S2·S3·S4)"
-  interpretation: "4定理の内積 → 最適収束点"
+  interpretation:
+    strict: "テンソル積 (Flow/Value⊗Scale/Function) の Limit 射影"
+    short: "4定理の内積 → 最適収束点"
   operators:
     "+": "Limit強度↑ — 全4定理を詳細に収束"
     "-": "Limit強度↓ — 縮約収束"

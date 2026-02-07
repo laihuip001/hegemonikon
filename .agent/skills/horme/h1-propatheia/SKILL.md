@@ -55,6 +55,12 @@ derivatives:
 
 version: "2.2.0"
 workflow_ref: ".agent/workflows/pro.md"
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks:
+  - "動機評価の偏りによる行動指針の歪み"
+fallbacks: []
 ---
 
 # H1: Propatheia (Προπάθεια)

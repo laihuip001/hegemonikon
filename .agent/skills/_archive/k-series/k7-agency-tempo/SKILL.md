@@ -24,6 +24,12 @@ when_not_to_use: |
   - 主体が未定の場合
 
 version: "2.0"
+risk_tier: L0
+reversible: true
+requires_approval: false
+risks:
+  - "アーカイブ済みスキルの誤参照による古い手法の適用"
+fallbacks: []
 ---
 
 # K7: Agency → Tempo

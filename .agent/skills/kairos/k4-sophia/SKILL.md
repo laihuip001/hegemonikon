@@ -49,6 +49,12 @@ lineage: "K4 Sophia 統一リマッピング (2026-01-28) — 情報収集機能
 
 version: "4.0.0"
 workflow_ref: ".agent/workflows/sop.md"
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks:
+  - "文脈判断の誤りによるタイミング逸失"
+fallbacks: []
 ---
 
 # K4: Sophia (Σοφία)

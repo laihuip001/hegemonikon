@@ -57,6 +57,12 @@ related:
   macro: null  # 個別 mekhane なし
 
 version: "2.1.0"
+risk_tier: L0
+reversible: true
+requires_approval: false
+risks:
+  - "アーカイブ済みスキルの誤参照による古い手法の適用"
+fallbacks: []
 ---
 
 # S1: Metron (Μέτρον) — 尺度

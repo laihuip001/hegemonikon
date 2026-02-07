@@ -8,6 +8,7 @@ skill_ref:
   - ".agent/skills/ousia/o3-zetesis/SKILL.md"
   - ".agent/skills/ousia/o4-energeia/SKILL.md"
 version: "4.0"
+lcm_state: stable
 layer: "Δ"
 lineage: "v3.2 + Limit演算復元 → v4.0"
 derivatives:
@@ -21,7 +22,9 @@ cognitive_algebra:
     axis_1: "Flow (I/A)"
     axis_2: "Value (E/P)"
   definition: "/o = lim(O1·O2·O3·O4)"
-  interpretation: "4定理の内積 → 最適収束点"
+  interpretation:
+    strict: "テンソル積 (Flow⊗Value) の Limit 射影"
+    short: "4定理の内積 → 最適収束点"
   operators:
     "+": "Limit強度↑ — 全4定理を詳細に収束"
     "-": "Limit強度↓ — 縮約収束"

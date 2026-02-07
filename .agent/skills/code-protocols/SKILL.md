@@ -40,15 +40,15 @@ fallbacks: []
 ## 原典参照パス
 
 ```
-M:\Brain\99_🗃️_保管庫｜Archive\プロンプト ライブラリー\モジュール（開発用）\個別のモジュール\
-├── Module 01 The Demilitarized Zone (DMZ) Protocol.md
-├── Module 04 Retro-Causal Testing Protocol (TDD Enforcement).md
-├── Module 06 Complexity Budget Protocol.md
-├── Module 07 The Devil's Advocate Protocol (Multi-Persona Critique).md
-├── Module 10 Ripple Effect Analysis (Impact Prediction).md
-├── Module 11 Automated Red Teaming Protocol.md
-├── Module 13 Code Archaeology Protocol (Chesterton's Fence).md
-├── Module 14 Narrative Commit Protocol.md
+~/Sync/10_📚_ライブラリ｜Library/prompts/modules/dev/
+├── module_01_dmz_protocol.md
+├── module_04_tdd_enforcement.md
+├── module_06_complexity_budget.md
+├── module_07_devils_advocate.md
+├── module_10_ripple_effect_analysis.md
+├── module_11_red_teaming.md
+├── module_13_chestertons_fence.md
+├── module_14_narrative_commit.md
 └── ... (全25モジュール)
 ```
 
@@ -79,4 +79,4 @@ M:\Brain\99_🗃️_保管庫｜Archive\プロンプト ライブラリー\モ�
 
 ## モジュール一覧インデックス
 
-詳細は [legacy-modules-index.md](file:///M:/Hegemonikon/docs/archive/legacy-rules/legacy-modules-index.md) を参照。
+詳細は `~/Sync/10_📚_ライブラリ｜Library/prompts/modules/dev/` 内の各ファイルを参照。

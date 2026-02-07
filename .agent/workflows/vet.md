@@ -7,6 +7,7 @@ pair: "/sop"
 tempo: Fast
 parent: "/dia"
 version: "3.1"
+lcm_state: beta
 lineage: "v3.0 + 再実行提案フロー → v3.1"
 anti_skip: enabled
 sel_enforcement:

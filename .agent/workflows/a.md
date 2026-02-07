@@ -8,6 +8,7 @@ skill_ref:
   - ".agent/skills/akribeia/a3-gnome/SKILL.md"
   - ".agent/skills/akribeia/a4-episteme/SKILL.md"
 version: "5.0"
+lcm_state: beta
 layer: "Δ"
 lineage: "v4.2 + Limit演算復元 → v5.0"
 cognitive_algebra:
@@ -16,7 +17,9 @@ cognitive_algebra:
     axis_1: "Valence (+/-)"
     axis_2: "Precision (C/U)"
   definition: "/a = lim(A1·A2·A3·A4)"
-  interpretation: "4定理の内積 → 最適収束点"
+  interpretation:
+    strict: "テンソル積 (Valence⊗Precision) の Limit 射影"
+    short: "4定理の内積 → 最適収束点"
   operators:
     "+": "Limit強度↑ — 全4定理を詳細に収束"
     "-": "Limit強度↓ — 縮約収束"

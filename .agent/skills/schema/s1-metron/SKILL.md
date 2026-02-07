@@ -48,6 +48,12 @@ implementation:
 
 version: "2.1.1"
 workflow_ref: ".agent/workflows/met.md"
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks:
+  - "設計パターンの硬直的適用による柔軟性欠失"
+fallbacks: []
 ---
 
 # S1: Metron (Μέτρον)

@@ -6,6 +6,7 @@ skill_ref:
   - "hegemonikon/mekhane/ergasterion/tekhne/SKILL.md"
   - ".agent/skills/akribeia/a2-krisis/SKILL.md"
 version: "1.4"
+lcm_state: stable
 lineage: "v1.3 + FBR変換 → v1.4"
 derivatives: [cook, dige, natu]
 cognitive_algebra:

@@ -41,6 +41,12 @@ lineage: "O4 Energeia + Anti-Skip Protocol + Artifact出力規則 → v3.0"
 
 version: "3.0.0"
 workflow_ref: ".agent/workflows/ene.md"
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks:
+  - "認知フレームの過度な適用による思考の硬直化"
+fallbacks: []
 ---
 
 # O4: Energeia (Ἐνέργεια)

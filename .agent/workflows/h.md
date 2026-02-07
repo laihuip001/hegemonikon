@@ -8,6 +8,7 @@ skill_ref:
   - ".agent/skills/horme/h3-orexis/SKILL.md"
   - ".agent/skills/horme/h4-doxa/SKILL.md"
 version: "5.0"
+lcm_state: beta
 layer: "Δ"
 lineage: "v4.4 + Limit演算復元 → v5.0"
 derivatives: [pro, pis, ore, dox, bias]
@@ -17,7 +18,9 @@ cognitive_algebra:
     axis_1: "Flow/Value"
     axis_2: "Valence/Precision"
   definition: "/h = lim(H1·H2·H3·H4)"
-  interpretation: "4定理の内積 → 最適収束点"
+  interpretation:
+    strict: "テンソル積 (Flow/Value⊗Valence/Precision) の Limit 射影"
+    short: "4定理の内積 → 最適収束点"
   operators:
     "+": "Limit強度↑ — 全4定理を詳細に収束"
     "-": "Limit強度↓ — 縮約収束"

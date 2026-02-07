@@ -4,6 +4,7 @@ hegemonikon: Akribeia
 modules: [A2]
 skill_ref: ".agent/skills/akribeia/a2-krisis/SKILL.md"
 version: "1.1"
+lcm_state: beta
 lineage: "v1.0 + SEL 統合 → v1.1"
 derivatives: [dict, mech, feed]
 cognitive_algebra:

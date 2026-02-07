@@ -28,6 +28,10 @@ try:
         TIER1_SPECIALISTS,
         get_tier1_by_category,
         get_tier1_categories,
+        derive_specialist,
+        get_all_derivatives,
+        Scope,
+        Intent,
     )
 except ImportError:
     sys.path.insert(0, str(Path(__file__).parent))
@@ -42,6 +46,10 @@ except ImportError:
         TIER1_SPECIALISTS,
         get_tier1_by_category,
         get_tier1_categories,
+        derive_specialist,
+        get_all_derivatives,
+        Scope,
+        Intent,
     )
 
 
@@ -200,6 +208,23 @@ async def main():
         choices=[1, 2],
         help="Run only Tier 1 (evolutionary) or Tier 2 (hygiene) specialists",
     )
+    parser.add_argument(
+        "--derive",
+        nargs="?",
+        const="all",
+        metavar="SPEC",
+        help="Generate derivatives: 'all' for all 8 variants, or 'SCOPE.INTENT' (e.g. M.F for Macro+Fix)",
+    )
+    parser.add_argument(
+        "--scope",
+        choices=["micro", "meso", "macro"],
+        help="Derivative scope filter (use with --derive)",
+    )
+    parser.add_argument(
+        "--intent",
+        choices=["detect", "fix", "prevent"],
+        help="Derivative intent filter (use with --derive)",
+    )
 
     args = parser.parse_args()
 
@@ -237,6 +262,23 @@ async def main():
     if args.sample:
         import random
         specialists = random.sample(specialists, min(args.sample, len(specialists)))
+
+    # 派生適用
+    if args.derive:
+        scope_map = {"micro": Scope.MICRO, "meso": Scope.MESO, "macro": Scope.MACRO}
+        intent_map = {"detect": Intent.DETECT, "fix": Intent.FIX, "prevent": Intent.PREVENT}
+        
+        if args.derive == "all" and not args.scope and not args.intent:
+            # 全派生: 各基本専門家から8派生を生成
+            derived = []
+            for base in specialists:
+                derived.extend(get_all_derivatives(base))
+            specialists = derived
+        else:
+            # 特定派生: scope/intent を指定
+            scope = scope_map.get(args.scope) if args.scope else None
+            intent = intent_map.get(args.intent) if args.intent else None
+            specialists = [derive_specialist(s, scope=scope, intent=intent) for s in specialists]
 
     print(f"=== Jules Specialist Batch Runner v3.0 ===")
     print(f"Target: {args.target}")

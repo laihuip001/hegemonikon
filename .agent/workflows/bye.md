@@ -2,6 +2,7 @@
 description: セッション終了時に引き継ぎドキュメントを生成し、経験を法則化する。次回セッションの/bootで読み込まれる。
 hegemonikon: H4 Doxa
 version: "4.0"
+lcm_state: stable
 derivatives:
   "+": 詳細終了（全ステップ展開、法則化、KI生成）
   "-": 高速終了（Handoff最小限、1分で退出）

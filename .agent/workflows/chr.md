@@ -10,6 +10,7 @@ triggers:
   - "deadline"
   - "chronos"
 version: "1.4"
+lcm_state: beta
 lineage: "v1.3 + FBR変換 → v1.4"
 derivatives: [regu, dead, esti]
 trigonon:

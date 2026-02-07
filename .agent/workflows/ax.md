@@ -7,6 +7,7 @@ layer: "τ"
 skill_ref:
   - ".agent/skills/taxis/x-series/SKILL.md"
 version: "4.0"
+lcm_state: beta
 lineage: "v3.3 + Limit整合 → v4.0"
 derivatives: []
 cognitive_algebra:

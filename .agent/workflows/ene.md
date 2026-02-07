@@ -4,6 +4,7 @@ hegemonikon: Ousia
 modules: [O4]
 skill_ref: ".agent/skills/ousia/o4-energeia/SKILL.md"
 version: "5.0"
+lcm_state: beta
 lineage: "v4.9 + FBR変換 → v5.0"
 anti_skip: enabled
 ccl_signature: "/ene+"

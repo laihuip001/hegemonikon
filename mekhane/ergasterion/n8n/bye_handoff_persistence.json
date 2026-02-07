@@ -1,0 +1,84 @@
+{
+    "name": "WF-02: Bye Handoff Persistence",
+    "nodes": [
+        {
+            "parameters": {
+                "httpMethod": "POST",
+                "path": "bye-handoff",
+                "responseMode": "lastNode",
+                "options": {}
+            },
+            "id": "webhook",
+            "name": "Webhook Trigger",
+            "type": "n8n-nodes-base.webhook",
+            "typeVersion": 1,
+            "position": [
+                250,
+                300
+            ],
+            "webhookId": "bye-handoff"
+        },
+        {
+            "parameters": {
+                "jsCode": "const fs = require('fs');\nconst path = require('path');\n\nconst subject = $input.item.json.body.subject || 'Unknown';\nconst timestamp = $input.item.json.body.timestamp || new Date().toISOString();\n\n// Find the latest exported file\nconst EXPORT_DIR = '/oikos/mneme/.hegemonikon/sessions';\n\ntry {\n  const files = fs.readdirSync(EXPORT_DIR)\n    .filter(f => f.endsWith('.md'))\n    .map(f => {\n      const stat = fs.statSync(path.join(EXPORT_DIR, f));\n      return { name: f, time: stat.mtime.getTime() };\n    })\n    .sort((a, b) => b.time - a.time);\n\n  const latestFile = files.length > 0 ? files[0].name : 'none';\n  const totalHandoffs = files.filter(f => f.includes('handoff')).length;\n  const totalSessions = files.length;\n\n  return [{ json: { \n    status: 'success', \n    file: latestFile, \n    subject: subject,\n    timestamp: timestamp,\n    totalHandoffs: totalHandoffs,\n    totalSessions: totalSessions\n  } }];\n\n} catch (e) {\n  return [{ json: { status: 'error', message: e.message, subject: subject, timestamp: timestamp } }];\n}"
+            },
+            "id": "process-handoff",
+            "name": "Process Handoff",
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                450,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "jsCode": "const { execSync } = require('child_process');\n\nconst data = $input.item.json;\n\n// process.env is sandboxed in n8n, use child_process instead\nlet webhookUrl = '';\ntry {\n  webhookUrl = execSync('echo $SLACK_WEBHOOK_URL', { encoding: 'utf-8' }).trim();\n} catch(e) {}\n\nif (!webhookUrl) {\n  return [{ json: { slack: 'skipped', reason: 'SLACK_WEBHOOK_URL not set' } }];\n}\n\nconst emoji = data.status === 'success' ? '👋' : '⚠️';\nconst statusText = data.status === 'success' ? '保存完了' : 'エラー';\n\nconst payload = {\n  blocks: [\n    {\n      type: 'header',\n      text: {\n        type: 'plain_text',\n        text: `${emoji} Session Ended`,\n        emoji: true\n      }\n    },\n    {\n      type: 'section',\n      fields: [\n        { type: 'mrkdwn', text: `*Subject:*\\n${data.subject}` },\n        { type: 'mrkdwn', text: `*Status:*\\n${statusText}` }\n      ]\n    },\n    {\n      type: 'section',\n      fields: [\n        { type: 'mrkdwn', text: `*Latest File:*\\n\\`${data.file || 'N/A'}\\`` },\n        { type: 'mrkdwn', text: `*Time:*\\n${data.timestamp}` }\n      ]\n    },\n    {\n      type: 'context',\n      elements: [\n        { type: 'mrkdwn', text: `📂 Total sessions: ${data.totalSessions || '?'} | 📝 Handoffs: ${data.totalHandoffs || '?'}` }\n      ]\n    }\n  ]\n};\n\ntry {\n  const payloadStr = JSON.stringify(payload).replace(/'/g, \"'\\\\'\");\n  const cmd = `curl -s -X POST -H 'Content-Type: application/json' -d '${payloadStr}' '${webhookUrl}'`;\n  const result = execSync(cmd, { encoding: 'utf-8', timeout: 10000 });\n  return [{ json: { slack: 'sent', response: result } }];\n} catch (e) {\n  return [{ json: { slack: 'error', message: e.message } }];\n}"
+            },
+            "id": "slack-notify",
+            "name": "Slack Notification",
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                650,
+                300
+            ]
+        }
+    ],
+    "connections": {
+        "Webhook Trigger": {
+            "main": [
+                [
+                    {
+                        "node": "Process Handoff",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Process Handoff": {
+            "main": [
+                [
+                    {
+                        "node": "Slack Notification",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        }
+    },
+    "settings": {
+        "executionOrder": "v1"
+    },
+    "tags": [
+        {
+            "name": "hegemonikon"
+        },
+        {
+            "name": "bye"
+        }
+    ],
+    "versionId": "2.0.0"
+}

@@ -113,6 +113,38 @@ def get_boot_context(mode: str = "standard", context: Optional[str] = None) -> d
     else:
          print(" [3/4] 🧠 PKS Engine skipped (fast mode).", file=sys.stderr)
 
+    # 軸 E: Safety Contract Audit (v3.1)
+    safety_result = {"skills": 0, "workflows": 0, "errors": 0, "warnings": 0, "formatted": ""}
+    print(" [5/5] 🛡️ Running Safety Contract Audit...", file=sys.stderr, end="", flush=True)
+    try:
+        from mekhane.dendron.skill_checker import run_audit, AuditResult
+        agent_dir = Path(__file__).parent.parent.parent / ".agent"
+        if agent_dir.exists():
+            audit = run_audit(agent_dir)
+            dist = audit.risk_distribution()
+            lcm = audit.lcm_distribution()
+            safety_lines = []
+            safety_lines.append("🛡️ **Safety Contract**")
+            safety_lines.append(f"  Skills: {audit.skills_checked} | WF: {audit.workflows_checked}")
+            risk_parts = [f"{k}:{v}" for k, v in dist.items() if v > 0]
+            if risk_parts:
+                safety_lines.append(f"  Risk: {' '.join(risk_parts)}")
+            lcm_parts = [f"{k}:{v}" for k, v in lcm.items() if v > 0]
+            if lcm_parts:
+                safety_lines.append(f"  LCM:  {' '.join(lcm_parts)}")
+            if audit.errors > 0:
+                safety_lines.append(f"  ⚠️ {audit.errors} error(s), {audit.warnings} warning(s)")
+            safety_result = {
+                "skills": audit.skills_checked,
+                "workflows": audit.workflows_checked,
+                "errors": audit.errors,
+                "warnings": audit.warnings,
+                "formatted": "\n".join(safety_lines),
+            }
+        print(" Done.", file=sys.stderr)
+    except Exception as e:
+        print(f" Failed ({str(e)}).", file=sys.stderr)
+
     # 統合フォーマット
     lines = []
 
@@ -135,11 +167,17 @@ def get_boot_context(mode: str = "standard", context: Optional[str] = None) -> d
         lines.append("")
         lines.append(pks_result["formatted"])
 
+    # Safety Contract
+    if safety_result["formatted"]:
+        lines.append("")
+        lines.append(safety_result["formatted"])
+
     return {
         "handoffs": handoffs_result,
         "ki": ki_result,
         "persona": persona_result,
         "pks": pks_result,
+        "safety": safety_result,
         "formatted": "\n".join(lines),
     }
 
@@ -156,7 +194,8 @@ def print_boot_summary(mode: str = "standard", context: Optional[str] = None):
     ki_count = result["ki"]["count"]
     sessions = result["persona"].get("sessions", 0)
     pks_count = result.get("pks", {}).get("count", 0)
-    print(f"📊 Handoff: {h_count}件 | KI: {ki_count}件 | Sessions: {sessions} | PKS: {pks_count}件")
+    safety_errors = result.get("safety", {}).get("errors", 0)
+    print(f"📊 Handoff: {h_count}件 | KI: {ki_count}件 | Sessions: {sessions} | PKS: {pks_count}件 | Safety: {'✅' if safety_errors == 0 else f'⚠️{safety_errors}'}")
 
 
 def main():

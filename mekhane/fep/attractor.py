@@ -1,0 +1,301 @@
+# PROOF: [L2/FEP] <- mekhane/fep/
+# PURPOSE: 6 Series を動的 Attractor として実現する
+"""
+Attractor Dispatch Engine
+
+6 Series (O/S/H/P/K/A) をセマンティック空間上の attractor として定義し、
+ユーザー入力を最も引力の強い Series に自然に収束させる。
+
+理論的根拠:
+- Spisak & Friston 2025: FEP → 自己直交化する attractor network
+- Kirchhoff et al. 2018: adaptive active inference の temporal depth
+
+Doxa DX-007: "6 Series は Attractor であるべき"
+"""
+
+from __future__ import annotations
+
+import sys
+from dataclasses import dataclass, field
+from pathlib import Path
+from typing import Optional
+
+import numpy as np
+
+
+# ---------------------------------------------------------------------------
+# Constants
+# ---------------------------------------------------------------------------
+
+# PURPOSE: 各 Series の本質を捉える定義テキスト（embedding の prototype）
+# NOTE: embedding model は bge-small-en-v1.5 (英語) のため、定義は英語で記述
+SERIES_DEFINITIONS: dict[str, dict] = {
+    "O": {
+        "name": "Ousia (本質)",
+        "definition": (
+            "Essence, existence, deep cognition. Why does this exist? "
+            "What is the fundamental nature and purpose? "
+            "Deep intuition, will, recursive self-evidencing. "
+            "Root cause analysis. Existential meaning. First principles thinking. "
+            "Ontology, teleology, raison d'être. Why. The meaning of existence."
+        ),
+        "keywords": ["なぜ", "本質", "目的", "意志", "存在", "根本", "問い", "探求"],
+        "workflows": ["/noe", "/bou", "/zet", "/ene"],
+    },
+    "S": {
+        "name": "Schema (様態)",
+        "definition": (
+            "Structure, design, architecture, methodology. How to build. "
+            "System design, framework, blueprint, engineering. "
+            "Scale determination, method arrangement, implementation plan. "
+            "Software architecture. Design patterns. Technical approach. "
+            "How to implement. Step-by-step procedure."
+        ),
+        "keywords": ["設計", "構造", "方法", "手順", "アーキテクチャ", "フレームワーク"],
+        "workflows": ["/met", "/mek", "/sta", "/pra"],
+    },
+    "H": {
+        "name": "Hormē (動機)",
+        "definition": (
+            "Motivation, emotion, conviction, belief. What drives you. "
+            "Gut feeling, intuition, confidence level, desire. "
+            "Emotional response, sentiment, passion, fear, hope. "
+            "Trust, faith, doubt, anxiety, excitement. "
+            "How do you feel about this? Inner drive and morale."
+        ),
+        "keywords": ["感情", "直感", "確信", "信念", "モチベーション", "不安", "期待"],
+        "workflows": ["/pro", "/pis", "/ore", "/dox"],
+    },
+    "P": {
+        "name": "Perigraphē (条件)",
+        "definition": (
+            "Boundaries, scope, spatial context. Where and within what limits. "
+            "Nested Markov blankets defining system boundaries. "
+            "Domain definition, perimeter, containment, territory. "
+            "What is in scope and out of scope. Geographic or logical boundaries. "
+            "Spatial arrangement, region, zone, area of operation."
+        ),
+        "keywords": ["境界", "スコープ", "範囲", "制約", "領域", "環境", "コンテキスト"],
+        "workflows": ["/kho", "/hod", "/tro", "/tek"],
+    },
+    "K": {
+        "name": "Kairos (文脈)",
+        "definition": (
+            "Timing, opportunity, wisdom, research. When is the right moment. "
+            "Temporal context, deadline, schedule, urgency. "
+            "Knowledge acquisition through investigation and study. "
+            "Academic research, literature review, scholarly inquiry. "
+            "Is now the right time? Chronological assessment."
+        ),
+        "keywords": ["タイミング", "いつ", "期限", "調査", "論文", "知識", "知恵"],
+        "workflows": ["/euk", "/chr", "/tel", "/sop"],
+    },
+    "A": {
+        "name": "Akribeia (精度)",
+        "definition": (
+            "Precision, judgment, decision-making, evaluation. How accurate. "
+            "Critical assessment, comparison, quality control. "
+            "Choosing between alternatives, trade-off analysis. "
+            "Decision criteria, verdict, ruling, appraisal. "
+            "Is this correct? Accuracy validation and verification."
+        ),
+        "keywords": ["判断", "評価", "選択", "比較", "品質", "基準", "正確"],
+        "workflows": ["/pat", "/dia", "/gno", "/epi"],
+    },
+}
+
+# Attractor 引力の閾値
+DEFAULT_THRESHOLD = 0.15
+# 複数 Series を返す際の、最大との差分閾値
+OSCILLATION_MARGIN = 0.05
+
+
+# ---------------------------------------------------------------------------
+# Data Classes
+# ---------------------------------------------------------------------------
+
+@dataclass
+class AttractorResult:
+    """Attractor への収束結果"""
+    series: str
+    name: str
+    similarity: float
+    workflows: list[str] = field(default_factory=list)
+
+    def __repr__(self) -> str:
+        return f"⟨{self.series}: {self.name} | sim={self.similarity:.3f}⟩"
+
+
+# ---------------------------------------------------------------------------
+# SeriesAttractor
+# ---------------------------------------------------------------------------
+
+class SeriesAttractor:
+    """
+    6 Series の Attractor Engine
+
+    各 Series の定義テキストを embedding 空間に射影し、
+    ユーザー入力との cosine similarity で最も引力の強い Series を特定する。
+
+    Usage:
+        sa = SeriesAttractor()
+        results = sa.suggest("なぜこのプロジェクトが必要なのか")
+        # → [⟨O: Ousia (本質) | sim=0.742⟩, ...]
+    """
+
+    def __init__(
+        self,
+        threshold: float = DEFAULT_THRESHOLD,
+        oscillation_margin: float = OSCILLATION_MARGIN,
+        force_cpu: bool = False,
+    ):
+        self.threshold = threshold
+        self.oscillation_margin = oscillation_margin
+        self._embedder = None
+        self._prototypes: dict[str, np.ndarray] = {}
+        self._force_cpu = force_cpu
+
+    # --- Lazy initialization ---
+
+    def _ensure_initialized(self) -> None:
+        """遅延初期化: 初回 suggest() 呼び出し時に embedding を計算"""
+        if self._prototypes:
+            return
+
+        # Embedder をインポート (mekhane.anamnesis.index から)
+        from mekhane.anamnesis.index import Embedder
+
+        self._embedder = Embedder(force_cpu=self._force_cpu)
+
+        # 各 Series の prototype embedding を計算
+        series_keys = list(SERIES_DEFINITIONS.keys())
+        texts = [SERIES_DEFINITIONS[k]["definition"] for k in series_keys]
+        embeddings = self._embedder.embed_batch(texts)
+
+        for key, emb in zip(series_keys, embeddings):
+            self._prototypes[key] = np.array(emb, dtype=np.float32)
+
+    # --- Core API ---
+
+    def suggest(
+        self,
+        user_input: str,
+        top_k: int = 3,
+    ) -> list[AttractorResult]:
+        """
+        入力を Series attractor に射影し、引力の強い順に返す。
+
+        Args:
+            user_input: ユーザーの入力テキスト
+            top_k: 返す最大 Series 数
+
+        Returns:
+            AttractorResult のリスト（引力順、閾値以上のもののみ）
+            境界入力は複数 Series を返す (oscillatory activity)
+        """
+        self._ensure_initialized()
+
+        # 入力を embedding
+        input_emb = np.array(
+            self._embedder.embed(user_input), dtype=np.float32
+        )
+
+        # 各 Series prototype との cosine similarity
+        similarities: list[tuple[str, float]] = []
+        for key, proto in self._prototypes.items():
+            sim = self._cosine_similarity(input_emb, proto)
+            similarities.append((key, float(sim)))
+
+        # similarity 降順ソート
+        similarities.sort(key=lambda x: x[1], reverse=True)
+
+        # 閾値フィルタリング + oscillation margin
+        results: list[AttractorResult] = []
+        max_sim = similarities[0][1] if similarities else 0.0
+
+        for key, sim in similarities[:top_k]:
+            # 閾値以上かつ、最大との差がmargin以内
+            if sim >= self.threshold and (max_sim - sim) <= self.oscillation_margin:
+                defn = SERIES_DEFINITIONS[key]
+                results.append(AttractorResult(
+                    series=key,
+                    name=defn["name"],
+                    similarity=sim,
+                    workflows=defn["workflows"],
+                ))
+
+        return results
+
+    def suggest_all(
+        self,
+        user_input: str,
+    ) -> list[AttractorResult]:
+        """全 6 Series の引力を返す（デバッグ/可視化用）"""
+        self._ensure_initialized()
+
+        input_emb = np.array(
+            self._embedder.embed(user_input), dtype=np.float32
+        )
+
+        results: list[AttractorResult] = []
+        for key, proto in self._prototypes.items():
+            sim = float(self._cosine_similarity(input_emb, proto))
+            defn = SERIES_DEFINITIONS[key]
+            results.append(AttractorResult(
+                series=key,
+                name=defn["name"],
+                similarity=sim,
+                workflows=defn["workflows"],
+            ))
+
+        results.sort(key=lambda x: x.similarity, reverse=True)
+        return results
+
+    # --- Internal ---
+
+    @staticmethod
+    def _cosine_similarity(a: np.ndarray, b: np.ndarray) -> float:
+        """Cosine similarity between two vectors"""
+        dot = np.dot(a, b)
+        norm_a = np.linalg.norm(a)
+        norm_b = np.linalg.norm(b)
+        if norm_a == 0 or norm_b == 0:
+            return 0.0
+        return dot / (norm_a * norm_b)
+
+
+# ---------------------------------------------------------------------------
+# CLI entry point
+# ---------------------------------------------------------------------------
+
+def main() -> None:
+    """CLI: python -m mekhane.fep.attractor "入力テキスト" """
+    if len(sys.argv) < 2:
+        print("Usage: python -m mekhane.fep.attractor <input_text>")
+        print('Example: python -m mekhane.fep.attractor "なぜこのプロジェクトが必要か"')
+        sys.exit(1)
+
+    user_input = " ".join(sys.argv[1:])
+    sa = SeriesAttractor()
+
+    print(f"\n入力: {user_input}")
+    print("=" * 60)
+
+    # 全 Series の引力を表示
+    all_results = sa.suggest_all(user_input)
+    print("\n全 Series 引力マップ:")
+    for r in all_results:
+        bar = "█" * int(r.similarity * 40)
+        print(f"  {r.series} {r.name:20s} {r.similarity:.3f} {bar}")
+
+    # Attractor 収束結果
+    results = sa.suggest(user_input)
+    print(f"\n収束先 ({len(results)} attractor):")
+    for r in results:
+        wf = ", ".join(r.workflows)
+        print(f"  → {r.series} {r.name} (sim={r.similarity:.3f})")
+        print(f"    workflows: {wf}")
+
+
+if __name__ == "__main__":
+    main()

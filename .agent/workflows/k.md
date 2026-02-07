@@ -1,5 +1,5 @@
 ---
-description: K-series 4定理Limit。L1.5×L1.75 の極限演算で文脈判断の統合を生成。
+description: K-series Peras。L1.5×L1.75 の極限演算で文脈判断の統合を生成。
 hegemonikon: Kairos
 modules: [K1, K2, K3, K4]
 skill_ref:
@@ -51,7 +51,7 @@ anti_skip: enabled
 ccl_signature: "/k+?k1"
 ---
 
-# /k: 文脈定理ワークフロー (Kairos)
+# /k: 文脈 Peras (Kairos)
 
 > **Hegemonikón Layer**: Kairos (K-series)
 > **定義**: `/k` = `lim(K1·K2·K3·K4)` — L1.5×L1.75 の極限演算

@@ -1,5 +1,5 @@
 ---
-description: S-series 4定理Limit。L1×L1.5 の極限演算で戦略設計の統合判断を生成。
+description: S-series Peras。L1×L1.5 の極限演算で戦略設計の統合判断を生成。
 hegemonikon: Schema
 modules: [S1, S2, S3, S4]
 skill_ref:
@@ -67,7 +67,7 @@ children:
   - "/pra"  # S4 Praxis (実践配置) → prax/pois/temp
 ---
 
-# /s: 戦略定理ワークフロー (Schema)
+# /s: 戦略設計 Peras (Schema)
 
 > **Hegemonikón Layer**: Schema (S-series)
 > **定義**: `/s` = `lim(S1·S2·S3·S4)` — L1×L1.5 の極限演算

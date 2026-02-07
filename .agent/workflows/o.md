@@ -1,5 +1,5 @@
 ---
-description: O-series 4定理Limit。L1×L1 の極限演算で純粋認知の統合判断を生成。
+description: O-series Peras。L1×L1 の極限演算で純粋認知の統合判断を生成。
 hegemonikon: Ousia
 modules: [O1, O2, O3, O4]
 skill_ref:
@@ -48,7 +48,7 @@ ccl_signature: "/o+*dia"
 anti_skip: enabled
 ---
 
-# /o: 純粋認知ワークフロー (Ousia)
+# /o: 純粋認知 Peras (Ousia)
 
 > **Hegemonikón Layer**: Ousia (O-series)
 > **定義**: `/o` = `lim(O1·O2·O3·O4)` — L1×L1 の極限演算

@@ -1,5 +1,5 @@
 ---
-description: A-series 4定理Limit。L1.75×L1.75 の極限演算で精度保証の統合判断を生成。
+description: A-series Peras。L1.75×L1.75 の極限演算で精度保証の統合判断を生成。
 hegemonikon: Akribeia
 modules: [A1, A2, A3, A4]
 skill_ref:
@@ -50,7 +50,7 @@ children:
 anti_skip: enabled
 ---
 
-# /a: 精度定理ワークフロー (Akribeia)
+# /a: 精度保証 Peras (Akribeia)
 
 > **Hegemonikón Layer**: Akribeia (A-series)
 > **定義**: `/a` = `lim(A1·A2·A3·A4)` — L1.75×L1.75 の極限演算

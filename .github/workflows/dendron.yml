@@ -1,45 +1,67 @@
 # Dendron — Existence Proof Check
 # Validates that all Python files have PROOF headers
+# v2.6: L2 Purpose quality check added
 name: Dendron
 
 on:
   push:
     branches: [master, main]
     paths:
-      - 'mekhane/**/*.py'
-      - 'hermeneus/**/*.py'
-      - 'synergeia/**/*.py'
-      - 'ccl/**/*.py'
+      - "mekhane/**/*.py"
+      - "hermeneus/**/*.py"
+      - "synergeia/**/*.py"
+      - "ccl/**/*.py"
   pull_request:
     branches: [master, main]
     paths:
-      - 'mekhane/**/*.py'
-      - 'hermeneus/**/*.py'
-      - 'synergeia/**/*.py'
-      - 'ccl/**/*.py'
+      - "mekhane/**/*.py"
+      - "hermeneus/**/*.py"
+      - "synergeia/**/*.py"
+      - "ccl/**/*.py"
 
 jobs:
   proof-check:
     runs-on: ubuntu-latest
     name: PROOF Header Validation
-    
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
-      
-      - name: Run Dendron PROOF Check
+          python-version: "3.11"
+
+      # L1: PROOF Header Check (blocking)
+      - name: "L1: PROOF Header Check"
         run: |
           export PYTHONPATH=${{ github.workspace }}
-          python -m mekhane.dendron check mekhane/ --ci --format ci
-      
+          python -m mekhane.dendron.cli check mekhane/ --ci --format ci
+
+      # L2: Purpose Quality Check — mekhane/dendron/ (strict: WEAK = FAIL)
+      - name: "L2: Purpose Check (dendron/ — strict)"
+        run: |
+          export PYTHONPATH=${{ github.workspace }}
+          python -m mekhane.dendron.cli purpose mekhane/dendron/ --ci --strict
+
+      # L2: Purpose Quality Check — mekhane/ 全体 (warn only)
+      - name: "L2: Purpose Check (mekhane/ — warn)"
+        continue-on-error: true
+        run: |
+          export PYTHONPATH=${{ github.workspace }}
+          python -m mekhane.dendron.cli purpose mekhane/ --ci
+
       - name: Upload Coverage Report
         if: always()
         run: |
           export PYTHONPATH=${{ github.workspace }}
-          python -m mekhane.dendron check mekhane/ --format markdown > proof-coverage.md
+          python -m mekhane.dendron.cli check mekhane/ --format markdown > proof-coverage.md
+          echo "" >> proof-coverage.md
+          echo "## L2 Purpose Quality" >> proof-coverage.md
+          echo "### dendron/ (strict)" >> proof-coverage.md
+          python -m mekhane.dendron.cli purpose mekhane/dendron/ --ci --strict >> proof-coverage.md 2>&1 || true
+          echo "" >> proof-coverage.md
+          echo "### mekhane/ (overview)" >> proof-coverage.md
+          python -m mekhane.dendron.cli purpose mekhane/ --ci >> proof-coverage.md 2>&1 || true
           cat proof-coverage.md >> $GITHUB_STEP_SUMMARY

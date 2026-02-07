@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/動機] <- mekhane/peira/
 """
 note.com 記事収集スクリプト v2
 シンプル版 - 即時実行

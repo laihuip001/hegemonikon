@@ -1,3 +1,4 @@
+# PROOF: [L2/動機] <- mekhane/taxis/
 """
 morphism_proposer.py — X-series 射提案エンジン
 

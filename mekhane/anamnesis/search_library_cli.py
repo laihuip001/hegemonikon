@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/動機] <- mekhane/anamnesis/library_search.py
 """
 Library Search CLI — /lib ワークフローのバックエンド
 

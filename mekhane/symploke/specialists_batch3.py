@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/動機] <- mekhane/symploke/specialist_v2.py
 """
 Specialist v2 カテゴリ: AI生成コード, Hegemonikón/FEP, 認知科学, エッジケース, 
 コードレビュー, ドキュメント, 日本語処理, 究極の純化

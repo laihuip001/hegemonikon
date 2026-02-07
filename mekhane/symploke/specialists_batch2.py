@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/動機] <- mekhane/symploke/specialist_v2.py
 """
 Specialist v2 カテゴリ: Git, テスト, API, セキュリティ, パフォーマンス, 非同期, DB
 """

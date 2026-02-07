@@ -1,3 +1,4 @@
+# PROOF: [L2/動機] <- mekhane/anamnesis/models/
 """
 Gnōsis Prompt Module Model - Library プロンプト統一スキーマ
 

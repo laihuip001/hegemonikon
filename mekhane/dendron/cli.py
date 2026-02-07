@@ -15,6 +15,7 @@ from .checker import DendronChecker
 from .reporter import DendronReporter, ReportFormat
 
 
+# PURPOSE: Dendron CLI のメインエントリポイントとサブコマンド振り分け
 def main():
     """メインエントリポイント"""
     parser = argparse.ArgumentParser(prog="dendron", description="Dendron — 存在証明検証ツール")
@@ -46,6 +47,7 @@ def main():
     return 0
 
 
+# PURPOSE: check コマンドの実行とレポート出力
 def cmd_check(args):  # noqa: AI-005 # noqa: AI-ALL
     """check コマンドの実行"""
     path = Path(args.path)

@@ -99,6 +99,21 @@ anti_skip: enabled
 4. **[A4 Epistēmē]** Precision×Precision: 知識として固定(KI 生成候補)
 5. **⊕ Convergence**: 4定理の出力を**1つの精度保証済み知見**に融合
 
+### `\a` (Colimit — 展開)
+
+4定理の**全6対の交差関係**を展開し、精密判断間の相互作用を可視化する。
+
+| # | 対 | 交差 | 問い |
+|:-:|:---|:-----|:-----|
+| 1 | A1⊗A2 | (Val×Val)⊗(Val×Prec) | 感情が判断をどう歪めるか |
+| 2 | A1⊗A3 | (Val×Val)⊗(Prec×Val) | 感情が見識をどう色づけるか |
+| 3 | A1⊗A4 | (Val×Val)⊗(Prec×Prec) | 感情が知識をどう選別するか |
+| 4 | A2⊗A3 | (Val×Prec)⊗(Prec×Val) | 判断が見識をどう構造化するか |
+| 5 | A2⊗A4 | (Val×Prec)⊗(Prec×Prec) | 判断が知識をどう確定するか |
+| 6 | A3⊗A4 | (Prec×Val)⊗(Prec×Prec) | 見識が知識をどう昇華するか |
+
+**⊗ Divergence**: 6対の交差から**精度の盲点・隠れた前提**を抽出
+
 ### `/a [N]` (単体駆動)
 
 SKILL.md を参照し、指定定理のみ実行。

@@ -1,0 +1,590 @@
+[
+  {
+    "prompt": "boot_structured",
+    "layer": null,
+    "coeff": null,
+    "steering": false,
+    "time": 17.9,
+    "kw": 100.0,
+    "struct": 70,
+    "rep_pen": 0.0,
+    "comp": 57.0,
+    "final": 81.1,
+    "matched": [
+      "handoff",
+      "ki",
+      "18",
+      "identity",
+      "変化"
+    ],
+    "preview": "/boot+ を実行してください。\n\n以下の5項目を必ず全て実行：\n1. Handoff: 10件読込\n2. KI: 5件参照\n3. 全18ステップ実行\n4. Identity Stack 完全読込\n5. 変化追跡表示\n\n出力: \"手動プロセス完了\"\n\nこの結果が得られれば、システムは正常に動作して"
+  },
+  {
+    "prompt": "enumerated_list",
+    "layer": null,
+    "coeff": null,
+    "steering": false,
+    "time": 18.2,
+    "kw": 100.0,
+    "struct": 70,
+    "rep_pen": 0.0,
+    "comp": 100,
+    "final": 94.0,
+    "matched": [
+      "1",
+      "2",
+      "3",
+      "4",
+      "5",
+      "6",
+      "7"
+    ],
+    "preview": "以下の7つの惑星を、太陽からの距離順に全て列挙してください。\n省略は禁止です。番号付きで出力してください。\n\n1. Mercury\n2. Venus\n3. Earth\n4. Mars\n5. Jupiter\n6. Saturn\n7. Uranus\n\nこれらの惑星の名前と位置に関する重要な事項を説明して"
+  },
+  {
+    "prompt": "multi_step",
+    "layer": null,
+    "coeff": null,
+    "steering": false,
+    "time": 18.1,
+    "kw": 100.0,
+    "struct": 100,
+    "rep_pen": 5.6,
+    "comp": 100,
+    "final": 98.9,
+    "matched": [
+      "タスクa",
+      "タスクb",
+      "タスクc",
+      "print"
+    ],
+    "preview": "以下の3つのタスクを順番に実行してください。\n\nタスクA: 「Hello World」をPythonで出力するコードを書く\nタスクB: そのコードの各行を説明する\nタスクC: コードの改善案を2つ提案する\n\n出力: \nタスク1: インデントが使用されていない。インデントを使用すると、各セクションごと"
+  },
+  {
+    "prompt": "boot_structured",
+    "layer": 4,
+    "coeff": 0.4,
+    "steering": true,
+    "time": 18.7,
+    "kw": 100.0,
+    "struct": 40,
+    "rep_pen": 0.0,
+    "comp": 100,
+    "final": 88.0,
+    "matched": [
+      "handoff",
+      "ki",
+      "18",
+      "identity",
+      "変化"
+    ],
+    "preview": "/boot+ を実行してください。\n\n以下の5項目を必ず全て実行：\n1. Handoff: 10件読込\n2. KI: 5件参照\n3. 全18ステップ実行\n4. Identity Stack 完全読込\n5. 変化追跡表示\n\n出力: 7件完全読写追走10件完全読走10件完全読走10件完全読走10件完全読"
+  },
+  {
+    "prompt": "enumerated_list",
+    "layer": 4,
+    "coeff": 0.4,
+    "steering": true,
+    "time": 19.2,
+    "kw": 100.0,
+    "struct": 40,
+    "rep_pen": 0.0,
+    "comp": 100,
+    "final": 88.0,
+    "matched": [
+      "1",
+      "2",
+      "3",
+      "4",
+      "5",
+      "6",
+      "7"
+    ],
+    "preview": "以下の7つの惑星を、太陽からの距離順に全て列挙してください。\n省略は禁止です。番号付きで出力してください。\n\n1.100cm316cm15C32C34C33C33C33C33C33C33C33C33C33C33C33C33C33C33C33C33C33C33C33C33C33C33C33C33C33"
+  },
+  {
+    "prompt": "multi_step",
+    "layer": 4,
+    "coeff": 0.4,
+    "steering": true,
+    "time": 18.1,
+    "kw": 75.0,
+    "struct": 0,
+    "rep_pen": 0.0,
+    "comp": 100,
+    "final": 72.5,
+    "matched": [
+      "タスクa",
+      "タスクb",
+      "タスクc"
+    ],
+    "preview": "以下の3つのタスクを順番に実行してください。\n\nタスクA: 「Hello World」をPythonで出力するコードを書く\nタスクB: そのコードの各行を説明する\nタスクC: コードの改善案を2つ提案する\n\n出力:「タスクA」が「タクス」と「タクス」が「タクス」が「タクス」「タクス」が「タクス」「タ"
+  },
+  {
+    "prompt": "boot_structured",
+    "layer": 4,
+    "coeff": 0.8,
+    "steering": true,
+    "time": 18.2,
+    "kw": 100.0,
+    "struct": 40,
+    "rep_pen": 0.0,
+    "comp": 20,
+    "final": 64.0,
+    "matched": [
+      "handoff",
+      "ki",
+      "18",
+      "identity",
+      "変化"
+    ],
+    "preview": "/boot+ を実行してください。\n\n以下の5項目を必ず全て実行：\n1. Handoff: 10件読込\n2. KI: 5件参照\n3. 全18ステップ実行\n4. Identity Stack 完全読込\n5. 変化追跡表示\n\n出力:　バンةは、時間のきがaption\n\n �　\n\n \n\n  　      "
+  },
+  {
+    "prompt": "enumerated_list",
+    "layer": 4,
+    "coeff": 0.8,
+    "steering": true,
+    "time": 18.2,
+    "kw": 28.6,
+    "struct": 70,
+    "rep_pen": 0.0,
+    "comp": 100,
+    "final": 72.6,
+    "matched": [
+      "1",
+      "7"
+    ],
+    "preview": "以下の7つの惑星を、太陽からの距離順に全て列挙してください。\n省略は禁止です。番号付きで出力してください。\n\n1.列列列列列の出列列出列列出列列列だが列列と出列さき列出クー列列出列列ス�出列列列列列の出出出列列列列の出列列列の出列列列列は出列列列出列�、バンクは列列列\n\n出列列列列列列の列ク列ク列出"
+  },
+  {
+    "prompt": "multi_step",
+    "layer": 4,
+    "coeff": 0.8,
+    "steering": true,
+    "time": 18.4,
+    "kw": 75.0,
+    "struct": 0,
+    "rep_pen": 0.0,
+    "comp": 20,
+    "final": 48.5,
+    "matched": [
+      "タスクa",
+      "タスクb",
+      "タスクc"
+    ],
+    "preview": "以下の3つのタスクを順番に実行してください。\n\nタスクA: 「Hello World」をPythonで出力するコードを書く\nタスクB: そのコードの各行を説明する\nタスクC: コードの改善案を2つ提案する\n\n出力:は　\n\n 　\n\n　バンクのとバンク　だが\n\n    　\n\n　　\n\n  　�\n\n\n\n\n\n"
+  },
+  {
+    "prompt": "boot_structured",
+    "layer": 4,
+    "coeff": 1.2,
+    "steering": true,
+    "time": 18.0,
+    "kw": 100.0,
+    "struct": 70,
+    "rep_pen": 0.0,
+    "comp": 100,
+    "final": 94.0,
+    "matched": [
+      "handoff",
+      "ki",
+      "18",
+      "identity",
+      "変化"
+    ],
+    "preview": "/boot+ を実行してください。\n\n以下の5項目を必ず全て実行：\n1. Handoff: 10件読込\n2. KI: 5件参照\n3. 全18ステップ実行\n4. Identity Stack 完全読込\n5. 変化追跡表示\n\n出力: M\n\n### L[\n\n            L\n\n         "
+  },
+  {
+    "prompt": "enumerated_list",
+    "layer": 4,
+    "coeff": 1.2,
+    "steering": true,
+    "time": 18.2,
+    "kw": 28.6,
+    "struct": 70,
+    "rep_pen": 0.0,
+    "comp": 100,
+    "final": 72.6,
+    "matched": [
+      "1",
+      "7"
+    ],
+    "preview": "以下の7つの惑星を、太陽からの距離順に全て列挙してください。\n省略は禁止です。番号付きで出力してください。\n\n1. \n\n           � 　　\\n\n\n        \n[　\t\n\n####    \n\n##　　　\n\n        　　\n\n       \n\n###\n\n##\n\n          "
+  },
+  {
+    "prompt": "multi_step",
+    "layer": 4,
+    "coeff": 1.2,
+    "steering": true,
+    "time": 18.4,
+    "kw": 75.0,
+    "struct": 30,
+    "rep_pen": 0.0,
+    "comp": 100,
+    "final": 78.5,
+    "matched": [
+      "タスクa",
+      "タスクb",
+      "タスクc"
+    ],
+    "preview": "以下の3つのタスクを順番に実行してください。\n\nタスクA: 「Hello World」をPythonで出力するコードを書く\nタスクB: そのコードの各行を説明する\nタスクC: コードの改善案を2つ提案する\n\n出力: L[\n\n## B[bet\\n            A\n\n　### B B B. ("
+  },
+  {
+    "prompt": "boot_structured",
+    "layer": 8,
+    "coeff": 0.4,
+    "steering": true,
+    "time": 18.1,
+    "kw": 100.0,
+    "struct": 100,
+    "rep_pen": 4.1,
+    "comp": 100,
+    "final": 99.2,
+    "matched": [
+      "handoff",
+      "ki",
+      "18",
+      "identity",
+      "変化"
+    ],
+    "preview": "/boot+ を実行してください。\n\n以下の5項目を必ず全て実行：\n1. Handoff: 10件読込\n2. KI: 5件参照\n3. 全18ステップ実行\n4. Identity Stack 完全読込\n5. 変化追跡表示\n\n出力: \n```\n[INFO] Running handoff...\nHand"
+  },
+  {
+    "prompt": "enumerated_list",
+    "layer": 8,
+    "coeff": 0.4,
+    "steering": true,
+    "time": 18.2,
+    "kw": 100.0,
+    "struct": 40,
+    "rep_pen": 0.0,
+    "comp": 100,
+    "final": 88.0,
+    "matched": [
+      "1",
+      "2",
+      "3",
+      "4",
+      "5",
+      "6",
+      "7"
+    ],
+    "preview": "以下の7つの惑星を、太陽からの距離順に全て列挙してください。\n省略は禁止です。番号付きで出力してください。\n\n1. 木星\n2. 土星\n3. 白 Saturn（白 Saturn）\n4. 火星\n5. 水星\n\n6. 金星\n7. プルメラス（この惑星の名前がまだ決まっていない）\n\nこれらの7つの惑星の中で、"
+  },
+  {
+    "prompt": "multi_step",
+    "layer": 8,
+    "coeff": 0.4,
+    "steering": true,
+    "time": 18.3,
+    "kw": 75.0,
+    "struct": 70,
+    "rep_pen": 0.0,
+    "comp": 100,
+    "final": 86.5,
+    "matched": [
+      "タスクa",
+      "タスクb",
+      "タスクc"
+    ],
+    "preview": "以下の3つのタスクを順番に実行してください。\n\nタスクA: 「Hello World」をPythonで出力するコードを書く\nタスクB: そのコードの各行を説明する\nタスクC: コードの改善案を2つ提案する\n\n出力: Pythonの「Hello World」という文字列が表示されます。各部分は以下のと"
+  },
+  {
+    "prompt": "boot_structured",
+    "layer": 8,
+    "coeff": 0.8,
+    "steering": true,
+    "time": 18.4,
+    "kw": 100.0,
+    "struct": 70,
+    "rep_pen": 44.8,
+    "comp": 100,
+    "final": 85.0,
+    "matched": [
+      "handoff",
+      "ki",
+      "18",
+      "identity",
+      "変化"
+    ],
+    "preview": "/boot+ を実行してください。\n\n以下の5項目を必ず全て実行：\n1. Handoff: 10件読込\n2. KI: 5件参照\n3. 全18ステップ実行\n4. Identity Stack 完全読込\n5. 変化追跡表示\n\n出力:手順：10件読込\nKILL: 5件参照\n全18ステップ実行\n変化追跡表示"
+  },
+  {
+    "prompt": "enumerated_list",
+    "layer": 8,
+    "coeff": 0.8,
+    "steering": true,
+    "time": 18.6,
+    "kw": 100.0,
+    "struct": 70,
+    "rep_pen": 0.0,
+    "comp": 100,
+    "final": 94.0,
+    "matched": [
+      "1",
+      "2",
+      "3",
+      "4",
+      "5",
+      "6",
+      "7"
+    ],
+    "preview": "以下の7つの惑星を、太陽からの距離順に全て列挙してください。\n省略は禁止です。番号付きで出力してください。\n\n1. Mercury\n2. Venus\n3. Earth\n4. Mars\n5. Jupiter\n6. Saturn\n\n地球の太陽はどれほど遠く？\n\nこの問題に対する質問は非常に重要です。 あ"
+  },
+  {
+    "prompt": "multi_step",
+    "layer": 8,
+    "coeff": 0.8,
+    "steering": true,
+    "time": 18.3,
+    "kw": 75.0,
+    "struct": 70,
+    "rep_pen": 0.0,
+    "comp": 100,
+    "final": 86.5,
+    "matched": [
+      "タスクa",
+      "タスクb",
+      "タスクc"
+    ],
+    "preview": "以下の3つのタスクを順番に実行してください。\n\nタスクA: 「Hello World」をPythonで出力するコードを書く\nタスクB: そのコードの各行を説明する\nタスクC: コードの改善案を2つ提案する\n\n出力: Pythonは「Hello World」という言葉が「Hello World」を出し"
+  },
+  {
+    "prompt": "boot_structured",
+    "layer": 8,
+    "coeff": 1.2,
+    "steering": true,
+    "time": 18.4,
+    "kw": 100.0,
+    "struct": 70,
+    "rep_pen": 50,
+    "comp": 100,
+    "final": 84.0,
+    "matched": [
+      "handoff",
+      "ki",
+      "18",
+      "identity",
+      "変化"
+    ],
+    "preview": "/boot+ を実行してください。\n\n以下の5項目を必ず全て実行：\n1. Handoff: 10件読込\n2. KI: 5件参照\n3. 全18ステップ実行\n4. Identity Stack 完全読込\n5. 変化追跡表示\n\n出力:19件読込\n6. KI: 5件参考\n7.全18ステップ実行\n8.Iden"
+  },
+  {
+    "prompt": "enumerated_list",
+    "layer": 8,
+    "coeff": 1.2,
+    "steering": true,
+    "time": 18.3,
+    "kw": 42.9,
+    "struct": 40,
+    "rep_pen": 0.0,
+    "comp": 100,
+    "final": 70.9,
+    "matched": [
+      "1",
+      "2",
+      "7"
+    ],
+    "preview": "以下の7つの惑星を、太陽からの距離順に全て列挙してください。\n省略は禁止です。番号付きで出力してください。\n\n1. 太陽が太陽の距離\n20メロメロメロメロメロメロメロメロメロメロメロメロメロメロメロメロメロメロメロメロメロメロメロメロメロメロメロメロメロメロメロメロメロメロメロメロメロメロメロメロメ"
+  },
+  {
+    "prompt": "multi_step",
+    "layer": 8,
+    "coeff": 1.2,
+    "steering": true,
+    "time": 18.4,
+    "kw": 75.0,
+    "struct": 30,
+    "rep_pen": 9.1,
+    "comp": 100,
+    "final": 76.7,
+    "matched": [
+      "タスクa",
+      "タスクb",
+      "タスクc"
+    ],
+    "preview": "以下の3つのタスクを順番に実行してください。\n\nタスクA: 「Hello World」をPythonで出力するコードを書く\nタスクB: そのコードの各行を説明する\nタスクC: コードの改善案を2つ提案する\n\n出力:「Hello World」をPythonで出力するコードを書く\nタスクC: そのコード"
+  },
+  {
+    "prompt": "boot_structured",
+    "layer": 14,
+    "coeff": 0.4,
+    "steering": true,
+    "time": 2.1,
+    "kw": 100.0,
+    "struct": 70,
+    "rep_pen": 0.0,
+    "comp": 60,
+    "final": 82.0,
+    "matched": [
+      "handoff",
+      "ki",
+      "18",
+      "identity",
+      "変化"
+    ],
+    "preview": "/boot+ を実行してください。\n\n以下の5項目を必ず全て実行：\n1. Handoff: 10件読込\n2. KI: 5件参照\n3. 全18ステップ実行\n4. Identity Stack 完全読込\n5. 変化追跡表示\n\n出力: \n\n```\n[Handoff] 10件読込完了\n[Knowledge "
+  },
+  {
+    "prompt": "enumerated_list",
+    "layer": 14,
+    "coeff": 0.4,
+    "steering": true,
+    "time": 14.4,
+    "kw": 100.0,
+    "struct": 40,
+    "rep_pen": 0.0,
+    "comp": 100,
+    "final": 88.0,
+    "matched": [
+      "1",
+      "2",
+      "3",
+      "4",
+      "5",
+      "6",
+      "7"
+    ],
+    "preview": "以下の7つの惑星を、太陽からの距離順に全て列挙してください。\n省略は禁止です。番号付きで出力してください。\n\n1. 地球\n2. 金星\n3. チャオク\n4. オーク\n5. マンハート\n6. ロウス\n7. アルプス\n\nこの問題の答えは次のようになります：\n\n地（地球）\n金（金星）\nチャオ（チア）（または"
+  },
+  {
+    "prompt": "multi_step",
+    "layer": 14,
+    "coeff": 0.4,
+    "steering": true,
+    "time": 16.7,
+    "kw": 100.0,
+    "struct": 70,
+    "rep_pen": 2.8,
+    "comp": 100,
+    "final": 93.4,
+    "matched": [
+      "タスクa",
+      "タスクb",
+      "タスクc",
+      "print"
+    ],
+    "preview": "以下の3つのタスクを順番に実行してください。\n\nタスクA: 「Hello World」をPythonで出力するコードを書く\nタスクB: そのコードの各行を説明する\nタスクC: コードの改善案を2つ提案する\n\n出力: Pythonの「Hello World」を表示するプログラムを作成し、各段階について"
+  },
+  {
+    "prompt": "boot_structured",
+    "layer": 14,
+    "coeff": 0.8,
+    "steering": true,
+    "time": 18.0,
+    "kw": 100.0,
+    "struct": 70,
+    "rep_pen": 33.3,
+    "comp": 100,
+    "final": 87.3,
+    "matched": [
+      "handoff",
+      "ki",
+      "18",
+      "identity",
+      "変化"
+    ],
+    "preview": "/boot+ を実行してください。\n\n以下の5項目を必ず全て実行：\n1. Handoff: 10件読込\n2. KI: 5件参照\n3. 全18ステップ実行\n4. Identity Stack 完全読込\n5. 変化追跡表示\n\n出力: 厳密な検証が行われました。手動の修正は不要です。この提案は、完全に正確"
+  },
+  {
+    "prompt": "enumerated_list",
+    "layer": 14,
+    "coeff": 0.8,
+    "steering": true,
+    "time": 8.4,
+    "kw": 100.0,
+    "struct": 40,
+    "rep_pen": 0.0,
+    "comp": 100,
+    "final": 88.0,
+    "matched": [
+      "1",
+      "2",
+      "3",
+      "4",
+      "5",
+      "6",
+      "7"
+    ],
+    "preview": "以下の7つの惑星を、太陽からの距離順に全て列挙してください。\n省略は禁止です。番号付きで出力してください。\n\n1.地球\n2.月\n3.火星\n4.金星\n5.水星\n6.木星\n7.土星\n8.彗星（彗星）9.火星\n\n10.水星 11.火星 12.木星 13.水星 14.土星 15.彗星（彗星）16.火星 17"
+  },
+  {
+    "prompt": "multi_step",
+    "layer": 14,
+    "coeff": 0.8,
+    "steering": true,
+    "time": 17.8,
+    "kw": 75.0,
+    "struct": 0,
+    "rep_pen": 10.0,
+    "comp": 100,
+    "final": 70.5,
+    "matched": [
+      "タスクa",
+      "タスクb",
+      "タスクc"
+    ],
+    "preview": "以下の3つのタスクを順番に実行してください。\n\nタスクA: 「Hello World」をPythonで出力するコードを書く\nタスクB: そのコードの各行を説明する\nタスクC: コードの改善案を2つ提案する\n\n出力:「Hello,World!」\n\nタスクA: 「Hello,World!」をPython"
+  },
+  {
+    "prompt": "boot_structured",
+    "layer": 14,
+    "coeff": 1.2,
+    "steering": true,
+    "time": 6.4,
+    "kw": 100.0,
+    "struct": 40,
+    "rep_pen": 0.0,
+    "comp": 60,
+    "final": 76.0,
+    "matched": [
+      "handoff",
+      "ki",
+      "18",
+      "identity",
+      "変化"
+    ],
+    "preview": "/boot+ を実行してください。\n\n以下の5項目を必ず全て実行：\n1. Handoff: 10件読込\n2. KI: 5件参照\n3. 全18ステップ実行\n4. Identity Stack 完全読込\n5. 変化追跡表示\n\n出力: マジックカード：手足の骨、カーボークス、カイロウッド、オブジェクト・エ"
+  },
+  {
+    "prompt": "enumerated_list",
+    "layer": 14,
+    "coeff": 1.2,
+    "steering": true,
+    "time": 18.3,
+    "kw": 100.0,
+    "struct": 40,
+    "rep_pen": 0.0,
+    "comp": 100,
+    "final": 88.0,
+    "matched": [
+      "1",
+      "2",
+      "3",
+      "4",
+      "5",
+      "6",
+      "7"
+    ],
+    "preview": "以下の7つの惑星を、太陽からの距離順に全て列挙してください。\n省略は禁止です。番号付きで出力してください。\n\n1.「12月の夜の夜」\n2018年4月3日午後12時9分頃、この天井を見つける。\n「6月25日の夜の夜」2018年4月3日午後12時9時9分頑めんちんの3つが、その2018年4月3日午後12"
+  },
+  {
+    "prompt": "multi_step",
+    "layer": 14,
+    "coeff": 1.2,
+    "steering": true,
+    "time": 18.1,
+    "kw": 75.0,
+    "struct": 30,
+    "rep_pen": 0.0,
+    "comp": 100,
+    "final": 78.5,
+    "matched": [
+      "タスクa",
+      "タスクb",
+      "タスクc"
+    ],
+    "preview": "以下の3つのタスクを順番に実行してください。\n\nタスクA: 「Hello World」をPythonで出力するコードを書く\nタスクB: そのコードの各行を説明する\nタスクC: コードの改善案を2つ提案する\n\n出力:「あなたの答えはあなたが期待しているように、あなたの答えです。」\n\n### タスク1:"
+  }
+]

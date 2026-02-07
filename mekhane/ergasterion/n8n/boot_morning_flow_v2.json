@@ -1,0 +1,112 @@
+{
+    "name": "Hegemonikón Boot Morning Notification v2",
+    "nodes": [
+        {
+            "parameters": {
+                "rule": {
+                    "interval": [
+                        {
+                            "field": "cronExpression",
+                            "expression": "0 8 * * *"
+                        }
+                    ]
+                }
+            },
+            "id": "cron-trigger",
+            "name": "毎朝 08:00",
+            "type": "n8n-nodes-base.scheduleTrigger",
+            "typeVersion": 1.2,
+            "position": [
+                250,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "jsCode": "const { execSync } = require('child_process');\n\ntry {\n  const gitLog = execSync('cd /oikos/hegemonikon && git log -1 --oneline', { encoding: 'utf-8' }).trim();\n  return [{ json: { gitLog } }];\n} catch (e) {\n  return [{ json: { gitLog: 'Git情報取得失敗: ' + e.message } }];\n}"
+            },
+            "id": "git-status",
+            "name": "Git 最新コミット",
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                450,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "jsCode": "const { execSync } = require('child_process');\nconst fs = require('fs');\n\ntry {\n  const files = execSync('ls -t /oikos/mneme/.hegemonikon/sessions/handoff_*.md 2>/dev/null | head -1', { encoding: 'utf-8' }).trim();\n  if (!files) {\n    return [{ json: { handoff: 'Handoff なし', content: '' } }];\n  }\n  const content = fs.readFileSync(files, 'utf-8');\n  const subjectMatch = content.match(/\\*\\*主題\\*\\*:\\s*(.+)/);\n  const subject = subjectMatch ? subjectMatch[1] : files.split('/').pop();\n  return [{ json: { handoff: subject, filename: files.split('/').pop() } }];\n} catch (e) {\n  return [{ json: { handoff: 'Handoff取得失敗: ' + e.message, filename: '' } }];\n}"
+            },
+            "id": "handoff-latest",
+            "name": "最新のハンドオフ",
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                650,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "jsCode": "const git = $input.all()[0].json.gitLog || 'N/A';\nconst handoff = $input.all()[0].json.handoff || 'N/A';\nconst filename = $input.all()[0].json.filename || '';\nconst now = new Date().toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' });\n\nconst message = `🌅 おはようございます！ (${now})\n\n📋 **Git**: ${git}\n📄 **Handoff**: ${handoff}\n📁 **File**: ${filename}\n\n→ /boot を推奨します`;\n\nreturn [{ json: { message } }];"
+            },
+            "id": "format-message",
+            "name": "メッセージ整形",
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                850,
+                300
+            ]
+        }
+    ],
+    "connections": {
+        "毎朝 08:00": {
+            "main": [
+                [
+                    {
+                        "node": "Git 最新コミット",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Git 最新コミット": {
+            "main": [
+                [
+                    {
+                        "node": "最新のハンドオフ",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "最新のハンドオフ": {
+            "main": [
+                [
+                    {
+                        "node": "メッセージ整形",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        }
+    },
+    "settings": {
+        "executionOrder": "v1"
+    },
+    "staticData": null,
+    "tags": [
+        {
+            "name": "hegemonikon",
+            "createdAt": "2026-02-07T00:00:00.000Z"
+        }
+    ],
+    "triggerCount": 0,
+    "updatedAt": "2026-02-07T04:40:00.000Z",
+    "versionId": "2.0.0"
+}

@@ -1,0 +1,111 @@
+{
+    "name": "WF-04: Perplexity Auto-Digest v2",
+    "nodes": [
+        {
+            "parameters": {
+                "rule": {
+                    "interval": [
+                        {
+                            "field": "cronExpression",
+                            "expression": "*/30 * * * *"
+                        }
+                    ]
+                }
+            },
+            "id": "schedule-trigger",
+            "name": "30分ごとチェック",
+            "type": "n8n-nodes-base.scheduleTrigger",
+            "typeVersion": 1.2,
+            "position": [
+                250,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "jsCode": "const fs = require('fs');\nconst path = require('path');\n\nconst INCOMING_DIR = '/oikos/mneme/.hegemonikon/incoming';\n\ntry {\n  if (!fs.existsSync(INCOMING_DIR)) {\n    return [];\n  }\n\n  const files = fs.readdirSync(INCOMING_DIR)\n    .filter(f => f.endsWith('.md') && !f.startsWith('.'))\n    .map(f => {\n      const fullPath = path.join(INCOMING_DIR, f);\n      const stat = fs.statSync(fullPath);\n      const content = fs.readFileSync(fullPath, 'utf-8');\n      return { filename: f, path: fullPath, size: stat.size, content: content };\n    })\n    .filter(f => f.content.trim().length > 0);\n\n  if (files.length === 0) {\n    return [];\n  }\n\n  return files.map(f => ({ json: f }));\n} catch (e) {\n  throw new Error('Scan failed: ' + e.message);\n}"
+            },
+            "id": "scan-incoming",
+            "name": "incoming/ スキャン",
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                450,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "jsCode": "const fs = require('fs');\nconst path = require('path');\n\nconst content = $input.item.json.content;\nconst filename = $input.item.json.filename;\n\nconst lines = content.split('\\n');\nlet title = '';\nlet sources = [];\nlet keyFindings = [];\n\nfor (const line of lines) {\n  if (line.startsWith('# ') && !title) {\n    title = line.replace('# ', '').trim();\n  }\n  if (line.match(/\\[\\d+\\]/) || line.match(/https?:\\/\\//)) {\n    sources.push(line.trim());\n  }\n  if (line.includes('**') && line.trim().length > 10) {\n    keyFindings.push(line.trim());\n  }\n}\n\nconst now = new Date().toISOString().slice(0, 10);\nconst digest = `# Perplexity Digest: ${title || filename}\\n\\n> **消化日**: ${now}\\n> **元ファイル**: ${filename}\\n> **サイズ**: ${$input.item.json.size} bytes\\n\\n---\\n\\n## 主要な発見 (${keyFindings.length}件)\\n\\n${keyFindings.slice(0, 15).map((f, i) => `${i+1}. ${f}`).join('\\n')}\\n\\n---\\n\\n## 引用・ソース (${sources.length}件)\\n\\n${sources.slice(0, 10).map(s => `- ${s}`).join('\\n')}\\n\\n---\\n\\n## 原文 (先頭500文字)\\n\\n${content.slice(0, 500)}...\\n\\n---\\n\\n*Auto-digested by Hegemonikon WF-04*\\n`;\n\nconst processedDir = '/oikos/mneme/.hegemonikon/processed';\nif (!fs.existsSync(processedDir)) {\n  fs.mkdirSync(processedDir, { recursive: true });\n}\n\nfs.renameSync($input.item.json.path, path.join(processedDir, filename));\nfs.writeFileSync(path.join(processedDir, `digest_${now}_${filename}`), digest, 'utf-8');\n\nreturn [{\n  json: {\n    title: title || filename,\n    findings: keyFindings.length,\n    sources: sources.length,\n    status: 'digested'\n  }\n}];"
+            },
+            "id": "digest-generator",
+            "name": "ダイジェスト生成",
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                650,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "jsCode": "const items = $input.all();\nconst now = new Date().toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' });\n\nconst summary = items.map(item => {\n  const d = item.json;\n  return `📄 **${d.title}** — 発見: ${d.findings}件 | ソース: ${d.sources}件`;\n}).join('\\n');\n\nreturn [{ json: {\n  message: `📥 Perplexity 消化完了 (${now})\\n\\n${items.length}件処理:\\n${summary}`,\n  count: items.length\n} }];"
+            },
+            "id": "summary",
+            "name": "サマリー生成",
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                850,
+                300
+            ]
+        }
+    ],
+    "connections": {
+        "30分ごとチェック": {
+            "main": [
+                [
+                    {
+                        "node": "incoming/ スキャン",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "incoming/ スキャン": {
+            "main": [
+                [
+                    {
+                        "node": "ダイジェスト生成",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "ダイジェスト生成": {
+            "main": [
+                [
+                    {
+                        "node": "サマリー生成",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        }
+    },
+    "settings": {
+        "executionOrder": "v1"
+    },
+    "tags": [
+        {
+            "name": "hegemonikon"
+        },
+        {
+            "name": "perplexity"
+        }
+    ],
+    "versionId": "2.0.0"
+}

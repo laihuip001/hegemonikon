@@ -14,6 +14,7 @@ import sys
 from .checker import CheckResult, FileProof, DirProof, ProofStatus, ProofLevel
 
 
+# PURPOSE: レポートの出力形式を定義する列挙型
 class ReportFormat(Enum):
     """レポート形式"""
 
@@ -23,12 +24,14 @@ class ReportFormat(Enum):
     CI = "ci"  # CI 向け最小出力
 
 
+# PURPOSE: チェック結果を様々な形式で出力するメインクラス
 class DendronReporter:  # noqa: AI-007
     """Dendron レポート生成器"""
 
     def __init__(self, output: TextIO = None):
         self.output = output or sys.stdout
 
+    # PURPOSE: 指定形式に応じたレポート出力メソッドを振り分ける
     def report(self, result: CheckResult, format: ReportFormat = ReportFormat.TEXT):
         """レポートを出力"""
         if format == ReportFormat.TEXT:

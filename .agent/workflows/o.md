@@ -1,5 +1,5 @@
 ---
-description: O-series 4項振動。認識↔意志↔探求↔行為を巡回する純粋認知サイクル。
+description: O-series 4定理Limit。L1×L1 の極限演算で純粋認知の統合判断を生成。
 hegemonikon: Ousia
 modules: [O1, O2, O3, O4]
 skill_ref:
@@ -7,27 +7,34 @@ skill_ref:
   - ".agent/skills/ousia/o2-boulesis/SKILL.md"
   - ".agent/skills/ousia/o3-zetesis/SKILL.md"
   - ".agent/skills/ousia/o4-energeia/SKILL.md"
-version: "3.1"
-lineage: "v3.0 (4項振動) + SEL 統合 → v3.1"
+version: "4.0"
+layer: "Δ"
+lineage: "v3.2 + Limit演算復元 → v4.0"
 derivatives:
   O1: [nous, phro, meta]
   O2: [desir, voli, akra]
   O3: [anom, hypo, eval]
   O4: [flow, prax, pois]
 cognitive_algebra:
-  definition: "/o = /noe~bou~zet~ene (4項振動)"
+  generation: "L1 × L1"
+  coordinates:
+    axis_1: "Flow (I/A)"
+    axis_2: "Value (E/P)"
+  definition: "/o = lim(O1·O2·O3·O4)"
+  interpretation: "4定理の内積 → 最適収束点"
   operators:
-    "+": "全4定理を詳細モードで順次実行"
-    "-": "全4定理を縮約モードで順次実行"
-    "*": "O-series 自体を問う: なぜ純粋認知層か"
+    "+": "Limit強度↑ — 全4定理を詳細に収束"
+    "-": "Limit強度↓ — 縮約収束"
+    "*": "Limit対象自体を問う: なぜ純粋認知層か"
 sel_enforcement:
   "+":
-    description: "MUST execute ALL 4 theorems in detailed mode"
+    description: "MUST execute ALL 4 theorems with deep convergence"
     minimum_requirements:
       - "全4定理実行"
       - "各定理詳細モード"
+      - "融合ステップ必須"
   "-":
-    description: "MAY execute all 4 theorems in condensed mode"
+    description: "MAY execute with condensed convergence"
     minimum_requirements:
       - "サマリーのみ"
   "*":
@@ -35,79 +42,61 @@ sel_enforcement:
     minimum_requirements:
       - "認知層選択の理由を問う"
 ccl_signature: "/o+*dia"
+anti_skip: enabled
 ---
 
-# /o ワークフロー — O-series 4項振動
+# /o: 純粋認知ワークフロー (Ousia)
 
-> **定義**: `/o` = `/noe~bou~zet~ene`
-> **意味**: 認識 ↔ 意志 ↔ 探求 ↔ 行為 を巡回する純粋認知サイクル
-
----
-
-## 本質
-
-```
-/o = O1 → O2 → O3 → O4 → O1' → O2' → ...
-   = 認識 → 意志 → 探求 → 行為 → 認識' → ...
-```
-
-**4項振動**とは、O-series の4定理を順に巡回し、深化させていくこと。
+> **Hegemonikón Layer**: Ousia (O-series)
+> **定義**: `/o` = `lim(O1·O2·O3·O4)` — L1×L1 の極限演算
+> **目的**: 認識・意志・探求・行為の4定理を**1つの統合判断に収束**させる
+>
+> **制約**: 全4定理 → 融合(Convergence)。途中の省略は`-`モード実行時のみ許容。
 
 ---
 
-## 使用法
+## Limit / Colimit
 
-### 基本呼び出し（4項振動開始）
+| 演算 | 記号 | 圏論 | 意味 |
+|:-----|:-----|:-----|:-----|
+| `/o` | `/` | **Limit** | 4定理 → 最適な1収束点 |
+| `\o` | `\` | **Colimit** | 4定理 → 全組み合わせに展開 |
+| `/o+` | `+` | Limit強度↑ | より深い収束（詳細モード） |
+| `/o-` | `-` | Limit強度↓ | 軽い収束（縮約モード） |
 
-```
-/o
-```
+---
 
-→ O1 Noēsis から開始し、O2 → O3 → O4 → O1' と巡回
+## 発動条件
 
-### Series間振動
+| トリガー | 説明 |
+|:---------|:-----|
+| `/o` | O-series Limit（4定理 → 収束） |
+| `/o~k` | O-series ↔ K-series 間を振動 |
+| `/o+` | Limit強度↑: 全4定理を詳細に収束 |
+| `/o-` | Limit強度↓: 縮約収束 |
+| `/o*` | 「なぜO-seriesを使うか」を問う |
+| `\o` | O-series Colimit（全展開） |
 
-```
-/o~k   → O-series ↔ K-series 間を振動
-/o~s   → O-series ↔ S-series 間を振動
-```
+---
 
-### 演算子適用
+## 処理フロー
 
-```
-/o+    → 全4定理を詳細モードで順次実行
-/o-    → 全4定理を縮約モードで順次実行
-/o*    → 「なぜ O-series を使うか」を問う
-```
+### `/o` (Limit — 収束)
+
+1. **[O1 Noēsis]** I×E: 認識推論 — 何を認識すべきか
+2. **[O2 Boulēsis]** I×P: 意志推論 — 何を望むか
+3. **[O3 Zētēsis]** A×E: 探索行動 — 何を問うべきか
+4. **[O4 Energeia]** A×P: 実用行動 — 何を実行するか
+5. **⊕ Convergence**: 4定理の出力を**1つの統合判断**に融合
 
 ### 個別定理への直接アクセス
 
-```
-/noe   → O1 Noēsis 単体
-/bou   → O2 Boulēsis 単体
-/zet   → O3 Zētēsis 単体
-/ene   → O4 Energeia 単体
-```
-
-### 派生直接指定（手動オーバーライド）
-
-```
-/o nous  → O1派生: 本質直観（抽象的原理把握）
-/o phro  → O1派生: 実践的判断（文脈依存）
-/o meta  → O1派生: メタ認識（反省・信頼度評価）
-
-/o desir → O2派生: 第一次欲動（望むこと）
-/o voli  → O2派生: 第二次意志（統合）
-/o akra  → O2派生: 意志-行為乖離（克服）
-
-/o anom  → O3派生: 異常認識（問題化）
-/o hypo  → O3派生: 仮説生成（創造的推測）
-/o eval  → O3派生: 仮説評価（優先順位）
-
-/o flow  → O4派生: Flow状態（没入）
-/o prax  → O4派生: 自己目的的行為
-/o pois  → O4派生: 産出活動（成果物）
-```
+| コマンド | 定理 | 生成 |
+|:---------|:-----|:-----|
+| `/noe` | O1 Noēsis 単体 | I × E |
+| `/bou` | O2 Boulēsis 単体 | I × P |
+| `/zet` | O3 Zētēsis 単体 | A × E |
+| `/ene` | O4 Energeia 単体 | A × P |
 
 ---
 
@@ -122,13 +111,23 @@ ccl_signature: "/o+*dia"
 
 **合計**: 12派生
 
+### 派生選択ロジック
+
+```python
+from mekhane.fep.derivative_selector import select_derivative
+
+result = select_derivative("O1", problem_context)
+# → nous: 抽象原理 → phro: 実践判断 → meta: メタ認知
+```
+
 ---
 
 ## 各定理の概要
 
-### O1 Noēsis（Νόησις / 認識）
+### O1 Noēsis（Νόησις / 認識） — I × E
 
 **問い**: 「何を認識すべきか？」「本質は何か？」
+**生成**: 推論(I) × 認識(E) = 知識獲得のための思考
 
 | 派生 | 適用場面 | 古典根拠 | 現代対応 |
 |:-----|:---------|:---------|:---------|
@@ -138,9 +137,10 @@ ccl_signature: "/o+*dia"
 
 → 詳細: `/noe` または `.agent/skills/ousia/o1-noesis/SKILL.md`
 
-### O2 Boulēsis（Βούλησις / 意志）
+### O2 Boulēsis（Βούλησις / 意志） — I × P
 
 **問い**: 「何を望むか？」「どの欲動を有効にするか？」
+**生成**: 推論(I) × 実用(P) = 目標設定のための思考
 
 | 派生 | 適用場面 | 古典根拠 | 現代対応 |
 |:-----|:---------|:---------|:---------|
@@ -150,9 +150,10 @@ ccl_signature: "/o+*dia"
 
 → 詳細: `/bou` または `.agent/skills/ousia/o2-boulesis/SKILL.md`
 
-### O3 Zētēsis（Ζήτησις / 探求）
+### O3 Zētēsis（Ζήτησις / 探求） — A × E
 
 **問い**: 「何を問うべきか？」「どの仮説を追求するか？」
+**生成**: 行為(A) × 認識(E) = 知識を得るための行動
 
 | 派生 | 適用場面 | 古典根拠 | 現代対応 |
 |:-----|:---------|:---------|:---------|
@@ -162,9 +163,10 @@ ccl_signature: "/o+*dia"
 
 → 詳細: `/zet` または `.agent/skills/ousia/o3-zetesis/SKILL.md`
 
-### O4 Energeia（Ἐνέργεια / 活動）
+### O4 Energeia（Ἐνέργεια / 活動） — A × P
 
 **問い**: 「どう活動するか？」「何を実現するか？」
+**生成**: 行為(A) × 実用(P) = 目的達成のための行動
 
 | 派生 | 適用場面 | 古典根拠 | 現代対応 |
 |:-----|:---------|:---------|:---------|
@@ -176,39 +178,7 @@ ccl_signature: "/o+*dia"
 
 ---
 
-## FEP 派生選択
-
-各ワークフロー（`/noe`, `/bou`, `/zet`, `/ene`）呼び出し時、FEP Cognitive Layer が状況を分析し、最適な派生を推奨する。
-
-```python
-from mekhane.fep.derivative_selector import select_derivative
-
-result = select_derivative(
-    theorem="O1",
-    problem_context="ユーザー入力テキスト"
-)
-# → DerivativeRecommendation(
-#     theorem="O1",
-#     derivative="phro",
-#     confidence=0.75,
-#     rationale="文脈依存度が高く、実践的判断が適切"
-# )
-```
-
-### 手動オーバーライド
-
-自動選択を上書きしたい場合：
-
-```
-/noe --derivative=nous   # 強制的に nous モードで実行
-/bou --derivative=akra   # 強制的に akra モードで実行
-```
-
----
-
 ## X-series 連携
-
-O-series 実行後、X-series により次のステップが推奨される：
 
 | 現在 | 推奨先 | 理由 |
 |:-----|:-------|:-----|
@@ -219,33 +189,12 @@ O-series 実行後、X-series により次のステップが推奨される：
 
 ---
 
-## 理論的背景
+## Hegemonikon Status
 
-### 古典哲学（60%）
-
-- **Aristotle**: Nous（理性的認識）、Phronēsis（実践的叡智）
-- **Stoic**: Hegemonikon（支配的理性）、Ousia（本質）
-- **Husserl**: Noēsis-Noēma 相関構造
-- **Frankfurt**: 階層的意志論
-- **Peirce**: Abductive Logic
-
-### 現代認知科学（40%）
-
-- **Kahneman**: Dual-process theory (System 1/System 2)
-- **Csikszentmihalyi**: Flow theory
-- **Friston**: Free Energy Principle, Active Inference
-- **Metacognition**: pMFC/aPFC 監視・調整
+| Module | Workflow | Status |
+|:-------|:---------|:-------|
+| O1-O4 | /o | v4.0 Ready |
 
 ---
 
-## 派生消化パターン
-
-> この設計は「派生消化パターン v1.0」として他のシリーズ（S, H, P, K, A）にも適用可能
-
-1. **Hub作成**: `/[series].md` で定理群と派生を一覧化
-2. **Phase追加**: 既存ワークフローに派生Phaseを追加
-3. **FEP統合**: `derivative_selector.py` で状況に応じた派生選択
-
----
-
-*v2.0 — 12派生統合Hub (2026-01-29)*
+*v4.0 — Limit演算復元 (2026-02-07)*

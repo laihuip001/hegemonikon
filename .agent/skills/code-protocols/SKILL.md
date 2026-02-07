@@ -6,6 +6,14 @@ triggers:
   - /do
   - /plan (implementation phase)
 hegemonikon: M6-Praxis
+# Safety Contract (v1.0 — /eat 消化洞察 2026-02-07)
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks:
+  - "古いプロトコルの適用による設計判断の誤誘導"
+  - "原典パスが Windows 依存（移植時に破損）"
+fallbacks: []
 ---
 
 # Code Protocols Skill
@@ -60,9 +68,11 @@ M:\Brain\99_🗃️_保管庫｜Archive\プロンプト ライブラリー\モ�
 ## 使用方法
 
 ### 自動発動（Claude）
+
 `/do` 実行時に M6 Praxis が自動でこの Skill を参照し、該当プロトコルを提示。
 
 ### 手動発動（Creator）
+
 `/dev` ワークフローで明示的にプロトコル一覧を表示。
 
 ---

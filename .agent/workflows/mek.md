@@ -5,6 +5,7 @@ modules: [S2]
 skill_ref: ".agent/skills/schema/s2-mekhane/SKILL.md"
 triggers: ["スキルを作る", "ワークフローを作る", "プロンプト", "mekhane", "ccl"]
 version: "7.1"
+lcm_state: stable       # draft | beta | stable | deprecated
 lineage: "v7.0 + Functional Beauty Redesign → v7.1"
 derivatives: [comp, inve, adap, model, simulation, observability, substitute, yagni, dry, nudge, visual, manual]
 cognitive_algebra:

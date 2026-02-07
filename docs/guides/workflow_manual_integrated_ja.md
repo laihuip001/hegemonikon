@@ -43,7 +43,7 @@ Skill (正本) → Workflow (手順) → KI (索引)
 ```mermaid
 graph TB
     subgraph "Tier 1: KERNEL"
-        D[doctrine.md<br/>60要素体系]
+        D[doctrine.md<br/>96要素体系]
         P[PRACTICE_GUIDE.md<br/>日常適用]
     end
     
@@ -90,8 +90,8 @@ graph TB
 ┌─────────────────────────────────────────────────────────────┐
 │                    Hegemonikón v2.1                         │
 │              「すべては予測誤差最小化に帰着する」             │
-│                    60要素体系                               │
-│                 7公理 → 24定理 → 36関係                     │
+│                    96要素体系                               │
+│                 7公理 → 24定理 → 72関係                     │
 └─────────────────────────────────────────────────────────────┘
                               ↓
 ┌─ Tier 1 ─┐ ┌─ Tier 2 ─┐ ┌─ Tier 3 ─┐ ┌─ Tier 4 ─┐
@@ -104,7 +104,7 @@ graph TB
 
 | 階層 | ドキュメント | 役割 |
 |:-----|:-------------|:-----|
-| **Tier 1** | doctrine.md | 60要素体系、FEP統一原理 |
+| **Tier 1** | doctrine.md | 96要素体系、FEP統一原理 |
 | **Tier 1** | KERNEL_PRACTICE_GUIDE.md | 公理階層の日常適用 |
 | **Tier 2** | ssot_3_layer_architecture.md | 3層SSOT設計標準 |
 | **Tier 3** | comprehensive_workflow_guide.md | 全ワークフロー総覧 |

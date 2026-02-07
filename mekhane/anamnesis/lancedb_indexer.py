@@ -29,6 +29,18 @@ SESSIONS_DIR = Path(r"M:\Brain\.hegemonikon\sessions")
 DB_PATH = Path(r"M:\Brain\.hegemonikon\lancedb")
 TABLE_NAME = "sessions"
 
+# 正規表現の事前コンパイル (Bolt Optimization)
+EXPORTED_AT_PATTERN = re.compile(r"\d{4}-\d{2}-\d{2}T[\d:.]+")
+MESSAGE_COUNT_PATTERN = re.compile(r"(\d+)")
+
+# CSS ノイズ除去用パターン
+CSS_COMMENT_PATTERN = re.compile(r"/\*.*?\*/", flags=re.DOTALL)
+MEDIA_QUERY_PATTERN = re.compile(r"@media\s*\([^)]*\)\s*\{[^}]*\}")
+MARKDOWN_ALERT_PATTERN = re.compile(r"\.markdown[-\w]*\s*\{[^}]*\}")
+THOUGHT_PATTERN = re.compile(r"Thought for (?:<)?\d+s\s*")
+
+NEWLINE_PATTERN = re.compile(r"\n{3,}")
+
 
 class SessionDocument(BaseModel):
     """セッションドキュメントのスキーマ"""
@@ -58,7 +70,7 @@ def parse_session_file(filepath: Path) -> Optional[SessionDocument]:
         exported_at = ""
         for line in lines[:10]:
             if "**Exported**" in line:
-                match = re.search(r"\d{4}-\d{2}-\d{2}T[\d:.]+", line)
+                match = EXPORTED_AT_PATTERN.search(line)
                 if match:
                     exported_at = match.group()
                 break
@@ -67,7 +79,7 @@ def parse_session_file(filepath: Path) -> Optional[SessionDocument]:
         message_count = 0
         for line in lines[:10]:
             if "**Messages**" in line:
-                match = re.search(r"(\d+)", line)
+                match = MESSAGE_COUNT_PATTERN.search(line)
                 if match:
                     message_count = int(match.group(1))
                 break
@@ -91,22 +103,16 @@ def parse_session_file(filepath: Path) -> Optional[SessionDocument]:
 
         full_content = "\n".join(body_lines)
 
-        # CSS ノイズを除去
-        # /* ... */ コメントを除去
-        full_content = re.sub(r"/\*.*?\*/", "", full_content, flags=re.DOTALL)
+        # CSS ノイズを除去 (順次適用)
+        full_content = CSS_COMMENT_PATTERN.sub("", full_content)
+        full_content = MEDIA_QUERY_PATTERN.sub("", full_content)
+        full_content = MARKDOWN_ALERT_PATTERN.sub("", full_content)
 
-        # @media { ... } ブロックを除去
-        full_content = re.sub(r"@media\s*\([^)]*\)\s*\{[^}]*\}", "", full_content)
-
-        # .markdown-alert などの CSS ルールを除去
-        full_content = re.sub(r"\.markdown[-\w]*\s*\{[^}]*\}", "", full_content)
-
-        # "Thought for Xs" を除去
-        full_content = re.sub(r"Thought for \d+s\s*", "", full_content)
-        full_content = re.sub(r"Thought for <\d+s\s*", "", full_content)
+        # "Thought for..." を除去
+        full_content = THOUGHT_PATTERN.sub("", full_content)
 
         # 連続する空行を除去
-        full_content = re.sub(r"\n{3,}", "\n\n", full_content).strip()
+        full_content = NEWLINE_PATTERN.sub("\n\n", full_content).strip()
 
         # プレビュー（最初の 500 文字）
         preview = full_content[:500].replace("\n", " ")

@@ -1,5 +1,5 @@
 ---
-description: P-series 4定理Limit。L1.5×L1.5 の極限演算で環境配置の統合判断を生成。
+description: P-series Peras。L1.5×L1.5 の極限演算で環境配置の統合判断を生成。
 hegemonikon: Perigraphē
 modules: [P1, P2, P3, P4]
 skill_ref:
@@ -52,7 +52,7 @@ ccl_signature: "/p+_/ene"
 anti_skip: enabled
 ---
 
-# /p: 環境定理ワークフロー (Perigraphē)
+# /p: 環境配置 Peras (Perigraphē)
 
 > **Hegemonikón Layer**: Perigraphē (P-series)
 > **定義**: `/p` = `lim(P1·P2·P3·P4)` — L1.5×L1.5 の極限演算

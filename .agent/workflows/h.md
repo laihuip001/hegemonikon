@@ -1,5 +1,5 @@
 ---
-description: H-series 4定理Limit。L1×L1.75 の極限演算で動機の統合判断を生成。
+description: H-series Peras。L1×L1.75 の極限演算で動機の統合判断を生成。
 hegemonikon: Hormē
 modules: [H1, H2, H3, H4]
 skill_ref:
@@ -53,7 +53,7 @@ ccl_signature: "/h+_/dia"
 anti_skip: enabled
 ---
 
-# /h: 動機定理ワークフロー (Hormē)
+# /h: 動機 Peras (Hormē)
 
 > **Hegemonikón Layer**: Hormē (H-series)
 > **定義**: `/h` = `lim(H1·H2·H3·H4)` — L1×L1.75 の極限演算

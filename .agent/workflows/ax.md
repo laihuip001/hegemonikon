@@ -1,5 +1,5 @@
 ---
-description: 6 Series Limit 統合。各Series極限を多層的に収束させ、X-series関係で接続する全体分析。
+description: Peras の Peras。6 Series 極限を多層的に収束させ、X-series関係で接続する全体分析。
 hegemonikon: Taxis
 modules: [X-series]
 parent: "/x"
@@ -35,7 +35,7 @@ ccl_signature: "/ax+"
 anti_skip: enabled
 ---
 
-# /ax: 定理群統合ワークフロー (Axiom)
+# /ax: Peras の Peras (全 Series 統合)
 
 > **Hegemonikón Layer**: 全定理層統合
 > **定義**: `/ax` = `lim(/o · /s · /h · /p · /k · /a) × X` = 6 Series Limit ⊗ 72関係マトリクス

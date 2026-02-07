@@ -4,6 +4,7 @@ hegemonikon: Kairos
 modules: [K2, O2, S3]
 skill_ref: null
 version: "1.2"
+lcm_state: stable       # draft | beta | stable | deprecated
 lineage: "v1.1 + 5項目プリプロセス統合 (Flow AI 消化) → v1.2"
 anti_skip: enabled
 ccl_signature: "/tak+"

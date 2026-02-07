@@ -2,6 +2,7 @@
 description: A2 Krisis（判定力）を発動する抽象コマンド。敵対的レビュー機能統合。
 hegemonikon: A2 Krisis
 version: "7.0"
+lcm_state: stable       # draft | beta | stable | deprecated
 layer: "Δ"
 derivatives: [aff, neg, epo, root, devil, steelman, counterfactual, cold_mirror, deliberative]
 cognitive_algebra:

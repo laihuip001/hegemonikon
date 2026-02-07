@@ -22,13 +22,13 @@ class ProofStatus(Enum):
     INVALID = "invalid"
     EXEMPT = "exempt"
     ORPHAN = "orphan"  # v2: 親参照なし
-    WEAK = "weak"      # v2.6: 弱い Purpose
+    WEAK = "weak"  # v2.6: 弱い Purpose
 
 
 # PURPOSE: 検証対象の粒度 (ディレクトリ/ファイル/関数/変数) を識別し、統計分類を可能にする
 class ProofLevel(Enum):
     """PROOF レベル (Depth Layer)
-    
+
     マトリクス構造の「深さ」軸:
     - L0: ディレクトリ (Kairos - 文脈)
     - L1: ファイル (Ousia/Schema - 本質)
@@ -80,8 +80,8 @@ class VariableProof:
     name: str
     path: Path
     line_number: int
-    status: ProofStatus         # OK / MISSING / WEAK
-    check_type: str             # "type_hint" / "short_name"
+    status: ProofStatus  # OK / MISSING / WEAK
+    check_type: str  # "type_hint" / "short_name"
     reason: Optional[str] = None
 
 
@@ -109,7 +109,7 @@ class CheckResult:
     files_orphan: int  # v2: 親参照なし
     file_proofs: List[FileProof]
     dir_proofs: List[DirProof]
-    
+
     # v2.5 L2 Purpose 統計
     total_functions: int = 0
     functions_with_purpose: int = 0
@@ -123,7 +123,7 @@ class CheckResult:
     signatures_missing_hints: int = 0
     short_name_violations: int = 0
     variable_proofs: List[VariableProof] = field(default_factory=list)
-    
+
     level_stats: Dict[str, int] = field(default_factory=dict)  # L1/L2/L3 統計
 
     # PURPOSE: チェック対象ファイル全体に対する証明カバレッジ率を計算する
@@ -153,12 +153,12 @@ EXEMPT_PATTERNS = [
     r"\.pyc$",
     r"\.git",
     r"\.egg-info",
-    r"\.venv",          # 仮想環境を除外
-    r"tests/",          # テストコードは Purpose 対象外
-    r"test_",           # テストファイル
-    r"\.codex/",        # Codex 自動生成スクリプト
-    r"\.agent/scripts/", # エージェント補助スクリプト
-    r"experiments/",    # 実験コード (PROOF 不要)
+    r"\.venv",  # 仮想環境を除外
+    r"tests/",  # テストコードは Purpose 対象外
+    r"test_",  # テストファイル
+    r"\.codex/",  # Codex 自動生成スクリプト
+    r"\.agent/scripts/",  # エージェント補助スクリプト
+    r"experiments/",  # 実験コード (PROOF 不要)
 ]
 
 # PROOF ヘッダーパターン (v2: 親参照付き、任意の後続テキスト許容)
@@ -178,10 +178,19 @@ WEAK_PURPOSE_PATTERNS = [
     (re.compile(r"^データクラス$"), "WHAT: 具体的な目的がない"),
     (re.compile(r"^列挙型$"), "WHAT: 具体的な目的がない"),
     # v3.0: 英語 WEAK パターン (/dia+ レビューで追加)
-    (re.compile(r"^Represents?\b", re.IGNORECASE), "WHAT: 'Represents' → state WHY it exists"),
+    (
+        re.compile(r"^Represents?\b", re.IGNORECASE),
+        "WHAT: 'Represents' → state WHY it exists",
+    ),
     (re.compile(r"^Holds?\b", re.IGNORECASE), "WHAT: 'Holds' → state WHY it's needed"),
-    (re.compile(r"^Provides?\b", re.IGNORECASE), "WHAT: 'Provides' → state WHY it matters"),
-    (re.compile(r"^Defines?\b", re.IGNORECASE), "WHAT: 'Defines' → state WHY it enables"),
+    (
+        re.compile(r"^Provides?\b", re.IGNORECASE),
+        "WHAT: 'Provides' → state WHY it matters",
+    ),
+    (
+        re.compile(r"^Defines?\b", re.IGNORECASE),
+        "WHAT: 'Defines' → state WHY it enables",
+    ),
 ]
 
 # 特殊親参照 (バリデーションをスキップ)

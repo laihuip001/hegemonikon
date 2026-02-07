@@ -12,6 +12,16 @@ triggers:
 version: "1.5"
 lineage: "v1.4 + FBR変換 → v1.5"
 derivatives: [rece, tran, regu, delta, neutral]
+trigonon:
+  series: A
+  type: Pure
+  theorem: A1
+  coordinates: [C, C]
+  bridge: []
+  anchor_via: [H, K]
+  morphisms:
+    ">>H": [/pro, /pis, /ore, /dox]
+    ">>K": [/euk, /chr, /tel, /sop]
 cognitive_algebra:
   "+": "詳細感情：二重傾向の根拠と分岐を深掘り"
   "-": "即感情：+→+/+→-/-→+/-→- の一言のみ"
@@ -257,6 +267,19 @@ ccl_signature: "/pat+"
 ```
 
 ---
+
+
+---
+
+## @complete: 射の提案 (暗黙発動 L1)
+
+> WF完了時、`/x` 暗黙発動プロトコルにより射を提案する。
+> 計算ツール: `python mekhane/taxis/morphism_proposer.py pat`
+
+```
+/pat 完了 → @complete 発動
+→ 結果に確信がありますか？ (Y: Anchor優先 / N: Bridge優先 / 完了)
+```
 
 ## Hegemonikon Status
 

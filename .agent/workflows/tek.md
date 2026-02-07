@@ -11,6 +11,16 @@ triggers:
   - "craft"
 version: "2.3"
 lineage: "v2.2 + FBR変換 → v2.3"
+trigonon:
+  series: P
+  type: Pure
+  theorem: P4
+  coordinates: [Function, Function]
+  bridge: []
+  anchor_via: [S, K]
+  morphisms:
+    ">>S": [/met, /mek, /sta, /pra]
+    ">>K": [/euk, /chr, /tel, /sop]
 cognitive_algebra:
   "+": "詳細技法分析。比較表、トレードオフ、習得曲線"
   "-": "即断技法。manu/mech/auto の1行選択"
@@ -363,6 +373,19 @@ graph LR
 ```
 
 ---
+
+
+---
+
+## @complete: 射の提案 (暗黙発動 L1)
+
+> WF完了時、`/x` 暗黙発動プロトコルにより射を提案する。
+> 計算ツール: `python mekhane/taxis/morphism_proposer.py tek`
+
+```
+/tek 完了 → @complete 発動
+→ 結果に確信がありますか？ (Y: Anchor優先 / N: Bridge優先 / 完了)
+```
 
 ## Hegemonikon Status
 

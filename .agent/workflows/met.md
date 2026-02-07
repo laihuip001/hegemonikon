@@ -13,7 +13,17 @@ triggers:
   - "制約理論"
 version: "2.4"
 lineage: "v2.3 + FBR変換 → v2.4"
-derivatives: [cont, disc, abst, fermi, extreme, approximation, definition, dimensional, cognitive_load, check, ambiguity, units, kiss, toc]
+derivatives: [toc, fermi, cont, disc, abst, kiss, extreme, approximation, definition, dimensional, cognitive_load, check, ambiguity, units]
+trigonon:
+  series: S
+  type: Mixed
+  theorem: S1
+  coordinates: [I, Scale]
+  bridge: [H, K]
+  anchor_via: [O, P]
+  morphisms:
+    ">>H": [/pro, /pis, /ore, /dox]
+    ">>K": [/euk, /chr, /tel, /sop]
 cognitive_algebra:
   "+": "詳細スケール分析。全層を展開、トレードオフ記載"
   "-": "即断スケール。Micro/Meso/Macro の1行判定"
@@ -391,6 +401,19 @@ ccl_signature: "/met+"
 **保存理由**: コンテキスト節約、参照可能性、パターン蓄積
 
 ---
+
+
+---
+
+## @complete: 射の提案 (暗黙発動 L1)
+
+> WF完了時、`/x` 暗黙発動プロトコルにより射を提案する。
+> 計算ツール: `python mekhane/taxis/morphism_proposer.py met`
+
+```
+/met 完了 → @complete 発動
+→ 結果に確信がありますか？ (Y: Anchor優先 / N: Bridge優先 / 完了)
+```
 
 ## Hegemonikon Status
 

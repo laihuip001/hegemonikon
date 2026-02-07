@@ -132,16 +132,17 @@ result = select_derivative("O1", problem_context)
 
 ---
 
-## X-series 推奨次ステップ
+## X-series 射の提案 (暗黙発動 L1)
 
-Noēsis 完了後の推奨遷移:
+> WF完了時、`/x` 暗黙発動プロトコルにより以下が自動提示される。
+> 詳細: [x.md § 暗黙発動プロトコル](x.md)
 
-| コマンド | 遷移 | 説明 |
-|:---------|:------|:-----|
-| /s | X-O1S1 | 認識→スケール |
-| /dia | X-O1A2 | 認識→検証 |
-| /pro | X-O1H1 | 認識→初期傾向 |
-| (完了) | — | このまま終了 |
+```
+🔀 射の提案 (trigonon: O/O1/Pure)
+├─ Bridge >> S: /met /mek /sta /pra  (様態系 — 構造化)
+├─ Bridge >> H: /pro /pis /ore /dox  (衝動系 — 直感検証)
+└─ (完了)
+```
 
 ---
 

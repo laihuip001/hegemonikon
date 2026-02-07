@@ -7,6 +7,16 @@ derivatives:
   "+": 詳細調査（完全リサーチ依頼書、複数視点）
   "-": 即調査（1質問のみ、簡潔）
   "*": メタ調査（調査方針自体を問う）
+trigonon:
+  series: K
+  type: Mixed
+  theorem: K4
+  coordinates: [Function, U]
+  bridge: [S, H]
+  anchor_via: [P, A]
+  morphisms:
+    ">>S": [/met, /mek, /sta, /pra]
+    ">>H": [/pro, /pis, /ore, /dox]
 modes: [surf, deep, prag, track]
 ---
 
@@ -184,3 +194,15 @@ A. 認知科学における〇〇
 ---
 
 *v7.0 — FBR 適用 (2026-02-07)*
+
+---
+
+## @complete: 射の提案 (暗黙発動 L1)
+
+> WF完了時、`/x` 暗黙発動プロトコルにより射を提案する。
+> 計算ツール: `python mekhane/taxis/morphism_proposer.py sop`
+
+```
+/sop 完了 → @complete 発動
+→ 結果に確信がありますか？ (Y: Anchor優先 / N: Bridge優先 / 完了)
+```

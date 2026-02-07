@@ -8,6 +8,16 @@ version: "7.1"
 lcm_state: stable       # draft | beta | stable | deprecated
 lineage: "v7.0 + Functional Beauty Redesign → v7.1"
 derivatives: [comp, inve, adap, model, simulation, observability, substitute, yagni, dry, nudge, visual, manual]
+trigonon:
+  series: S
+  type: Mixed
+  theorem: S2
+  coordinates: [I, Function]
+  bridge: [H, K]
+  anchor_via: [O, P]
+  morphisms:
+    ">>H": [/pro, /pis, /ore, /dox]
+    ">>K": [/euk, /chr, /tel, /sop]
 cognitive_algebra:
   "+": "詳細生成：全ステップ展開、設計根拠記載"
   "-": "高速生成：最小限の構造、すぐ使える形"
@@ -199,6 +209,19 @@ SKILL.md を必ず読み込んでから処理を開始する:
 10. **最終出力**: 成果物 → ファイル保存
 
 ---
+
+
+---
+
+## @complete: 射の提案 (暗黙発動 L1)
+
+> WF完了時、`/x` 暗黙発動プロトコルにより射を提案する。
+> 計算ツール: `python mekhane/taxis/morphism_proposer.py mek`
+
+```
+/mek 完了 → @complete 発動
+→ 結果に確信がありますか？ (Y: Anchor優先 / N: Bridge優先 / 完了)
+```
 
 ## Hegemonikon Status
 

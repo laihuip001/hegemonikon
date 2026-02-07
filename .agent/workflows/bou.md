@@ -8,6 +8,16 @@ lineage: "v4.5 + FBR変換 → v4.6"
 anti_skip: enabled
 ccl_signature: "/bou*"
 derivatives: [desir, voli, akra]
+trigonon:
+  series: O
+  type: Pure
+  theorem: O2
+  coordinates: [I, P]
+  bridge: [S, H]
+  anchor_via: []
+  morphisms:
+    ">>S": [/met, /mek, /sta, /pra]
+    ">>H": [/pro, /pis, /ore, /dox]
 cognitive_algebra:
   "+": "詳細な意志分析。優先度 + 理由 + トレードオフ"
   "-": "端的な意志。最優先1つのみ"
@@ -298,6 +308,19 @@ absorbed:
 ```
 
 ---
+
+
+---
+
+## @complete: 射の提案 (暗黙発動 L1)
+
+> WF完了時、`/x` 暗黙発動プロトコルにより射を提案する。
+> 計算ツール: `python mekhane/taxis/morphism_proposer.py bou`
+
+```
+/bou 完了 → @complete 発動
+→ 結果に確信がありますか？ (Y: Anchor優先 / N: Bridge優先 / 完了)
+```
 
 ## Hegemonikon Status
 

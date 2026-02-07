@@ -12,6 +12,16 @@ triggers:
 version: "2.4"
 lineage: "v2.3 + FBR変換 → v2.4"
 derivatives: [appr, avoi, arre, random, forecast]
+trigonon:
+  series: H
+  type: Mixed
+  theorem: H1
+  coordinates: [I, C]
+  bridge: [S, K]
+  anchor_via: [O, A]
+  morphisms:
+    ">>S": [/met, /mek, /sta, /pra]
+    ">>K": [/euk, /chr, /tel, /sop]
 cognitive_algebra:
   "+": "詳細直感：傾向の根拠を深掘り、神経科学的解釈"
   "-": "即断直感：接近/回避の一言判定のみ"
@@ -255,6 +265,19 @@ E[/pro] >> {
 ```
 
 ---
+
+
+---
+
+## @complete: 射の提案 (暗黙発動 L1)
+
+> WF完了時、`/x` 暗黙発動プロトコルにより射を提案する。
+> 計算ツール: `python mekhane/taxis/morphism_proposer.py pro`
+
+```
+/pro 完了 → @complete 発動
+→ 結果に確信がありますか？ (Y: Anchor優先 / N: Bridge優先 / 完了)
+```
 
 ## Hegemonikon Status
 

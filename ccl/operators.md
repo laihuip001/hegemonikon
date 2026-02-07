@@ -446,9 +446,7 @@ L:  → ASCII で入力可能、λ の代替
 |:-------|:-------------|:-----|
 | `@memoize` | `Caching` | 結果キャッシュ |
 | `@retry` | `Retry` | 失敗時リトライ |
-| `@log` | `Tracing` | 実行ログ |
 | `@validate` | `Validation` | 事前/事後検証 |
-| `@timed` | `Timing` | 実行時間計測 |
 | `@scoped` | (特殊) | スコープ限定 |
 | `@async` | (特殊) | 非同期実行 |
 
@@ -458,7 +456,7 @@ L:  → ASCII で入力可能、λ の代替
 # 基本形
 @memoize /sop{query="重い検索"}
 @retry /ene
-@log /noe+
+@validate /noe+
 
 # パラメータ付き
 @memoize(ttl="1h") /zet+
@@ -473,7 +471,7 @@ L:  → ASCII で入力可能、λ の代替
 
 | マクロ | pt |
 |:-------|:--:|
-| 単純 (`@log`, `@timed`) | 2 |
+| 単純 (`@memoize`, `@retry`) | 2 |
 | パラメータ付き | 3 |
 | 特殊 (`@scoped`, `@async`) | 4 |
 
@@ -593,14 +591,12 @@ F:[ALL]{ /sta }
 | マクロ | CCL 展開 | 意味 |
 |:-------|:---------|:-----|
 | `@ce` | `/mek{ctx>inst}` | 背景優先プロンプト |
-| `@ce+` | `/kho{broad}_@ce` | 広範文脈CE |
 
 ### 11.4 Metaprompt Strategy
 
 | マクロ | CCL 展開 | 意味 |
 |:-------|:---------|:-----|
 | `@optimize` | `/mek{metaprompt}` | 推論モデル最適化 |
-| `@refine(n)` | `F:[×N]{@optimize}` | N回洗練 |
 
 ### 11.5 Recoverable Autonomy
 
@@ -608,15 +604,12 @@ F:[ALL]{ /sta }
 |:-------|:---------|:-----|
 | `@risk(lv)` | `/ene{risk=lv}` | リスクタグ付与 |
 | `@checkpoint` | `/ene{checkpoint}` | 保存ポイント |
-| `@rollback` | `/rollback@last` | ロールバック |
 
 ### 11.6 Memory-First Architecture
 
 | マクロ | CCL 展開 | 意味 |
 |:-------|:---------|:-----|
 | `@memory(layer)` | `/zet{memory=layer}` | 指定層検索 |
-| `@recall` | `@memory(episodic)` | 経験想起 |
-| `@lookup` | `@memory(semantic)` | 知識検索 |
 
 ### 11.7 Graduated Supervision
 
@@ -632,9 +625,6 @@ F:[ALL]{ /sta }
 | マクロ | CCL 展開 | 意味 |
 |:-------|:---------|:-----|
 | `@enforce(lv)` | Anti-Skip/Schema | 強制レベル |
-| `@antiskip` | `@enforce(soft)` | 最小強制 |
-| `@schema` | `@enforce(medium)` | JSON Schema |
-| `@guardrails` | `@enforce(hard)` | 厳格検証 |
 
 ### 11.9 Continuing Me Identity
 
@@ -642,8 +632,6 @@ F:[ALL]{ /sta }
 |:-------|:---------|:-----|
 | `@identity` | `/boot{out=id}` | Identity Stack |
 | `@reflect` | `/noe.nous{self}` | メタ認知 |
-| `@values` | `@identity{L1}` | 価値観 |
-| `@persona` | `@identity{L2}` | 人格 |
 
 ### 11.10 X-series Integration
 
@@ -651,7 +639,6 @@ F:[ALL]{ /sta }
 |:-------|:---------|:-----|
 | `@next` | `/x{from=cur}` | 推奨次ステップ |
 | `@route(name)` | Sacred Routes | 黄金経路 |
-| `@connect(s)` | `/x{to=s}` | シリーズ接続 |
 
 ### 11.11 特殊
 
@@ -694,7 +681,6 @@ F:[ALL]{ /sta }
 | マクロ | CCL 展開 | 意味 |
 |:-------|:---------|:-----|
 | `@scoped(s,t){}` | `/kho{s}_WF_t` | スコープ限定実行 (setup/teardown) |
-| `@suppress(e)` | `I:[error=e]{continue}` | エラー抑制 |
 
 **パラメータ**:
 
@@ -702,7 +688,6 @@ F:[ALL]{ /sta }
 |:-----------|:---|:-----|:------------|
 | `setup:` | CCL | 事前処理 | `__enter__` |
 | `teardown:` | CCL | 事後処理 (例外時も実行) | `__exit__` |
-| `suppress:` | list | 抑制するエラー種別 | `suppress()` |
 
 **使用例**:
 
@@ -713,15 +698,6 @@ F:[ALL]{ /sta }
   teardown: /bye-
 ) {
   /noe+ _/s+ _/dia
-}
-
-# エラー抑制付き
-@scoped(
-  setup: /kho{ctx: "test"},
-  teardown: /sta.done,
-  suppress: [timeout]
-) {
-  /sop+{query: "..."}
 }
 
 # 簡略形: setup のみ

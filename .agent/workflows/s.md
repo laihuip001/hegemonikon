@@ -321,13 +321,32 @@ python3 $HOME/oikos/hegemonikon/mekhane/quality_gate.py <変更ファイル>
 | STAGE 4 | Devil's Advocate: {result} |
 | STAGE 5 | KPT: Keep/Problem/Try |
 
-### ⊕ Convergence 検証 (STAGE 4-5 統合)
+### ⊕ C1: 対比 (Contrast) — STAGE 0-3 出力
+
+| STAGE | 定理 | 出力要点 (1行) |
+|:------|:-----|:---------------|
+| 0 | S1 Metron | {Scale: Micro/Meso/Macro} |
+| 1 | S2 Mekhanē | {Strategy: Explore/Exploit, Plan: A/B/C} |
+| 2 | S3 Stathmos | {Rubric: Must/Should/Could} |
+| 3 | S4 Praxis | {Blueprint: path} |
+
+→ **V[outputs]** = 分散 (戦略の矛盾度: 0.0-1.0)
+
+### ⊕ C2: 解消 (Resolve) — STAGE 4 (Devil's Advocate)
+
+| V[outputs] | 状態 | 処理 |
+|:-----------|:-----|:-----|
+| > 0.3 | 戦略矛盾 | `/dia.root` → 重み付け融合 |
+| > 0.1 | 微妙な不整合 | 通常融合 (`@reduce(*)`) |
+| ≤ 0.1 | 戦略整合 | 単純集約 (`Σ`) |
+
+### ⊕ C3: 検証 (Verify) — STAGE 5 統合
 
 | 項目 | 内容 |
 |:-----|:-----|
 | 矛盾度 | V[STAGE 0-3 outputs] = {0.0-1.0} |
 | 解消法 | {root/weighted/simple} |
-| **統合判断** | {1文で} |
+| **統合配置判断** | {1文で} |
 | **確信度** | {C/U} ({confidence}%) |
 
 ---

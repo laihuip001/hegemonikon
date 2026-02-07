@@ -43,6 +43,22 @@ class ProofLevel(Enum):
     UNKNOWN = "unknown"
 
 
+# PURPOSE: EPT マトリクスのメタ軸 (正規形) を識別し、検査対象の層を制御する
+class MetaLayer(Enum):
+    """Meta Layer (Normal Form)
+    
+    - SURFACE (NF1): 存在宣言の有無
+    - STRUCTURE (NF2): 依存関係の明示性と妥当性
+    - FUNCTION (NF3): 機能的冗長性 (MECE)
+    - VERIFICATION (BCNF): 不可欠性 (削除耐性)
+    """
+
+    SURFACE = "surface"        # NF1: 宣言があるか
+    STRUCTURE = "structure"    # NF2: 依存が正当か
+    FUNCTION = "function"      # NF3: 重複がないか
+    VERIFICATION = "verification"  # BCNF: 消せないか
+
+
 # PURPOSE: ファイル単位のチェック結果を統一的に扱い、レポート生成とCI判定に渡す
 @dataclass
 class FileProof:
@@ -96,6 +112,49 @@ class DirProof:
     reason: Optional[str] = None
 
 
+# PURPOSE: 依存関係 (NF2 Structure) の検証結果を統一的に扱い、構造的健全性を判定する
+@dataclass
+class StructureProof:
+    """依存関係の構造証明 (NF2 Structure)"""
+
+    name: str               # import名, 呼出先名, 型名
+    path: Path              # 検出元ファイル
+    line_number: int
+    status: ProofStatus     # OK / MISSING / WEAK
+    check_type: str         # "import" / "call" / "type_ref" / "dir_ref"
+    target: Optional[str] = None    # 参照先パスまたはモジュール名
+    reason: Optional[str] = None
+
+
+# PURPOSE: 機能的冗長性 (NF3 Function) の検証結果を統一的に扱い、MECE性を判定する
+@dataclass
+class FunctionNFProof:
+    """機能的冗長性の検証 (NF3 Function)"""
+
+    name: str               # 関数名, Dir名, 変数名
+    path: Path              # 検出元ファイル
+    line_number: int
+    status: ProofStatus     # OK / WEAK
+    check_type: str         # "complexity" / "similarity" / "reassign" / "dir_overlap"
+    metric_value: Optional[int] = None   # 複雑度値, 類似度 etc.
+    threshold: Optional[int] = None      # 閲値
+    reason: Optional[str] = None
+
+
+# PURPOSE: 不可欠性 (BCNF Verification) の検証結果を統一的に扱い、削除耐性を判定する
+@dataclass
+class VerificationProof:
+    """不可欠性の検証 (BCNF Verification)"""
+
+    name: str               # Dir名, File名, 関数名, 変数名
+    path: Path              # 検出元
+    line_number: int
+    status: ProofStatus     # OK / WEAK / MISSING
+    check_type: str         # "dir_ref_count" / "file_import_count" / "dead_func" / "unused_var"
+    ref_count: int = 0      # 被参照カウント
+    reason: Optional[str] = None
+
+
 # PURPOSE: ディレクトリツリー全体のチェック結果を集計するデータクラス
 @dataclass
 class CheckResult:
@@ -125,6 +184,24 @@ class CheckResult:
     variable_proofs: List[VariableProof] = field(default_factory=list)
     
     level_stats: Dict[str, int] = field(default_factory=dict)  # L1/L2/L3 統計
+
+    # v3.1 NF2 Structure 統計
+    total_structure_checks: int = 0
+    structure_ok: int = 0
+    structure_missing: int = 0
+    structure_proofs: List[StructureProof] = field(default_factory=list)
+
+    # v3.2 NF3 Function 統計
+    total_function_nf_checks: int = 0
+    function_nf_ok: int = 0
+    function_nf_weak: int = 0
+    function_nf_proofs: List[FunctionNFProof] = field(default_factory=list)
+
+    # v3.3 BCNF Verification 統計
+    total_verification_checks: int = 0
+    verification_ok: int = 0
+    verification_weak: int = 0
+    verification_proofs: List[VerificationProof] = field(default_factory=list)
 
     # PURPOSE: チェック対象ファイル全体に対する証明カバレッジ率を計算する
     @property
@@ -182,6 +259,11 @@ WEAK_PURPOSE_PATTERNS = [
     (re.compile(r"^Holds?\b", re.IGNORECASE), "WHAT: 'Holds' → state WHY it's needed"),
     (re.compile(r"^Provides?\b", re.IGNORECASE), "WHAT: 'Provides' → state WHY it matters"),
     (re.compile(r"^Defines?\b", re.IGNORECASE), "WHAT: 'Defines' → state WHY it enables"),
+    (re.compile(r"^Handles?\b", re.IGNORECASE), "WHAT: 'Handles' → state WHY this handling matters"),
+    (re.compile(r"^Manages?\b", re.IGNORECASE), "WHAT: 'Manages' → state WHY management is needed"),
+    (re.compile(r"^Contains?\b", re.IGNORECASE), "WHAT: 'Contains' → state WHY containment matters"),
+    (re.compile(r"^Stores?\b", re.IGNORECASE), "WHAT: 'Stores' → state WHY storage is needed"),
+    (re.compile(r"^Returns?\b", re.IGNORECASE), "WHAT: 'Returns' → state WHY this value matters"),
 ]
 
 # 特殊親参照 (バリデーションをスキップ)

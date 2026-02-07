@@ -17,10 +17,14 @@ import ast
 from .models import (  # noqa: F401
     ProofStatus,
     ProofLevel,
+    MetaLayer,
     FileProof,
     FunctionProof,
     VariableProof,
     DirProof,
+    StructureProof,
+    FunctionNFProof,
+    VerificationProof,
     CheckResult,
     EXEMPT_PATTERNS,
     PROOF_PATTERN_V2,
@@ -49,6 +53,9 @@ class DendronChecker:  # noqa: AI-007
         check_files: bool = True,
         check_functions: bool = True,  # v2.5
         check_variables: bool = True,  # v3.0 L3
+        check_structure: bool = False,  # v3.1 NF2
+        check_function_nf: bool = False,  # v3.2 NF3
+        check_verification: bool = False,  # v3.3 BCNF
         root: Optional[Path] = None,  # v2.1: 親パス検証用ルート
         validate_parents: bool = True,  # v2.1: 親パス存在検証
     ):
@@ -57,6 +64,9 @@ class DendronChecker:  # noqa: AI-007
         self.check_files = check_files
         self.check_functions = check_functions  # v2.5
         self.check_variables = check_variables  # v3.0 L3
+        self.check_structure = check_structure  # v3.1 NF2
+        self.check_function_nf = check_function_nf  # v3.2 NF3
+        self.check_verification = check_verification  # v3.3 BCNF
         self.root = root
         self.validate_parents = validate_parents
 
@@ -320,6 +330,40 @@ class DendronChecker:  # noqa: AI-007
                             check_type="type_hint",
                         ))
 
+                # *args の型ヒント検査
+                if node.args.vararg:
+                    vararg = node.args.vararg
+                    if vararg.annotation is None:
+                        results.append(VariableProof(
+                            name=f"{name}(*{vararg.arg})", path=path,
+                            line_number=node.lineno, status=ProofStatus.MISSING,
+                            check_type="type_hint",
+                            reason=f"*{vararg.arg} に型ヒントなし",
+                        ))
+                    else:
+                        results.append(VariableProof(
+                            name=f"{name}(*{vararg.arg})", path=path,
+                            line_number=node.lineno, status=ProofStatus.OK,
+                            check_type="type_hint",
+                        ))
+
+                # **kwargs の型ヒント検査
+                if node.args.kwarg:
+                    kwarg = node.args.kwarg
+                    if kwarg.annotation is None:
+                        results.append(VariableProof(
+                            name=f"{name}(**{kwarg.arg})", path=path,
+                            line_number=node.lineno, status=ProofStatus.MISSING,
+                            check_type="type_hint",
+                            reason=f"**{kwarg.arg} に型ヒントなし",
+                        ))
+                    else:
+                        results.append(VariableProof(
+                            name=f"{name}(**{kwarg.arg})", path=path,
+                            line_number=node.lineno, status=ProofStatus.OK,
+                            check_type="type_hint",
+                        ))
+
             # --- 1文字変数検出 ---
             if isinstance(node, ast.Assign):
                 for target in node.targets:
@@ -400,6 +444,495 @@ class DendronChecker:  # noqa: AI-007
                 return issue_desc
         return None
 
+    # ── NF2: Structure Layer (依存関係検証) ─────────────────
+
+    # PURPOSE: import 文の参照先が実在するかを検証し、壊れた依存を検出する (P11)
+    def _check_imports_from_tree(self, path: Path, tree: ast.Module) -> List[StructureProof]:
+        """ファイル内の import 文を検証 (NF2 P11)"""
+        results: List[StructureProof] = []
+        
+        for node in ast.walk(tree):
+            if isinstance(node, ast.Import):
+                for alias in node.names:
+                    module_name = alias.name
+                    results.append(StructureProof(
+                        name=module_name, path=path,
+                        line_number=node.lineno, status=ProofStatus.OK,
+                        check_type="import", target=module_name,
+                    ))
+            elif isinstance(node, ast.ImportFrom):
+                module_name = node.module or ""
+                if node.level > 0:  # 相対 import
+                    # 相対 import はパス解決を試みる
+                    parts = path.parent.parts
+                    level_up = node.level - 1
+                    if level_up < len(parts):
+                        base = Path(*parts[:len(parts) - level_up]) if level_up > 0 else path.parent
+                        if module_name:
+                            target_path = base / module_name.replace(".", "/")
+                            if not (target_path.exists() or target_path.with_suffix(".py").exists()):
+                                results.append(StructureProof(
+                                    name=f"from {'.' * node.level}{module_name}",
+                                    path=path, line_number=node.lineno,
+                                    status=ProofStatus.MISSING,
+                                    check_type="import", target=str(target_path),
+                                    reason=f"相対 import 先が存在しない: {target_path}",
+                                ))
+                            else:
+                                results.append(StructureProof(
+                                    name=f"from {'.' * node.level}{module_name}",
+                                    path=path, line_number=node.lineno,
+                                    status=ProofStatus.OK,
+                                    check_type="import", target=str(target_path),
+                                ))
+                        else:
+                            results.append(StructureProof(
+                                name=f"from {'.' * node.level} import ...",
+                                path=path, line_number=node.lineno,
+                                status=ProofStatus.OK,
+                                check_type="import", target=str(base),
+                            ))
+                else:  # 絶対 import
+                    results.append(StructureProof(
+                        name=f"from {module_name}", path=path,
+                        line_number=node.lineno, status=ProofStatus.OK,
+                        check_type="import", target=module_name,
+                    ))
+        
+        return results
+
+    # PURPOSE: 関数内の呼出先が同モジュール内で解決可能か検証する (P21)
+    def _check_calls_from_tree(self, path: Path, tree: ast.Module) -> List[StructureProof]:
+        """関数呼出の解決可能性を検証 (NF2 P21)"""
+        results: List[StructureProof] = []
+        
+        # モジュール内の定義名を収集
+        defined_names: Set[str] = set()
+        imported_names: Set[str] = set()
+        
+        for node in ast.walk(tree):
+            if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
+                defined_names.add(node.name)
+            elif isinstance(node, ast.Import):
+                for alias in node.names:
+                    imported_names.add(alias.asname or alias.name.split(".")[0])
+            elif isinstance(node, ast.ImportFrom):
+                for alias in node.names:
+                    imported_names.add(alias.asname or alias.name)
+        
+        known_names = defined_names | imported_names | {"print", "len", "range", "int", "str",
+            "list", "dict", "set", "tuple", "bool", "float", "type", "super", "isinstance",
+            "issubclass", "hasattr", "getattr", "setattr", "enumerate", "zip", "map",
+            "filter", "sorted", "reversed", "any", "all", "min", "max", "sum", "abs",
+            "open", "repr", "id", "hash", "vars", "dir", "iter", "next", "property",
+            "staticmethod", "classmethod", "dataclass", "field",
+        }
+        
+        # public 関数内の呼出を検査
+        for node in ast.walk(tree):
+            if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                if node.name.startswith("_"):
+                    continue
+                for child in ast.walk(node):
+                    if isinstance(child, ast.Call):
+                        call_name = self._extract_call_name(child)
+                        if call_name and call_name not in known_names:
+                            results.append(StructureProof(
+                                name=f"{node.name}() -> {call_name}()",
+                                path=path, line_number=child.lineno,
+                                status=ProofStatus.WEAK,
+                                check_type="call",
+                                target=call_name,
+                                reason=f"呼出先 '{call_name}' がモジュール内で未解決",
+                            ))
+        
+        return results
+
+    # PURPOSE: 型アノテーションが import されているか検証する (P31)
+    def _check_type_refs_from_tree(self, path: Path, tree: ast.Module) -> List[StructureProof]:
+        """型参照の import 照合を検証 (NF2 P31)"""
+        results: List[StructureProof] = []
+        
+        # import された名前を収集
+        imported_names: Set[str] = set()
+        # 同ファイル内の定義 (class/function) も型として有効
+        defined_names: Set[str] = set()
+        for node in ast.walk(tree):
+            if isinstance(node, ast.Import):
+                for alias in node.names:
+                    imported_names.add(alias.asname or alias.name)
+            elif isinstance(node, ast.ImportFrom):
+                for alias in node.names:
+                    imported_names.add(alias.asname or alias.name)
+            elif isinstance(node, (ast.ClassDef, ast.FunctionDef, ast.AsyncFunctionDef)):
+                defined_names.add(node.name)
+        
+        # 組込型 + 特殊型
+        builtin_types = {"str", "int", "float", "bool", "bytes", "None", "list",
+            "dict", "set", "tuple", "type", "object", "Any", "Callable",
+        }
+        known_types = imported_names | builtin_types | defined_names
+        
+        # 関数の型アノテーションから型名を抽出
+        for node in ast.walk(tree):
+            if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                if node.name.startswith("_"):
+                    continue
+                annotations = []
+                if node.returns:
+                    annotations.append(("return", node.returns))
+                for arg in node.args.args + node.args.kwonlyargs + node.args.posonlyargs:
+                    if arg.annotation:
+                        annotations.append((arg.arg, arg.annotation))
+                
+                for label, ann in annotations:
+                    type_names = self._extract_type_names(ann)
+                    for tn in type_names:
+                        if tn not in known_types:
+                            results.append(StructureProof(
+                                name=f"{node.name}({label}: {tn})",
+                                path=path, line_number=node.lineno,
+                                status=ProofStatus.WEAK,
+                                check_type="type_ref",
+                                target=tn,
+                                reason=f"型 '{tn}' が import されていない",
+                            ))
+        
+        return results
+
+    # PURPOSE: ast.Call ノードから呼出先の名前を抽出する
+    def _extract_call_name(self, node: ast.Call) -> Optional[str]:
+        """呼出先名を抽出"""
+        if isinstance(node.func, ast.Name):
+            return node.func.id
+        elif isinstance(node.func, ast.Attribute):
+            # self.method() / module.func() は解決済みとみなす
+            return None
+        return None
+
+    # PURPOSE: 型アノテーション AST から型名文字列を再帰的に抽出する
+    def _extract_type_names(self, node: ast.expr) -> List[str]:
+        """型アノテーションから型名を抽出"""
+        names: List[str] = []
+        if isinstance(node, ast.Name):
+            names.append(node.id)
+        elif isinstance(node, ast.Attribute):
+            # module.Type → module は import で解決済み
+            pass
+        elif isinstance(node, ast.Subscript):
+            # List[X], Dict[K, V] など
+            names.extend(self._extract_type_names(node.value))
+            if isinstance(node.slice, ast.Tuple):
+                for elt in node.slice.elts:
+                    names.extend(self._extract_type_names(elt))
+            else:
+                names.extend(self._extract_type_names(node.slice))
+        elif isinstance(node, ast.BinOp):  # X | Y (union)
+            names.extend(self._extract_type_names(node.left))
+            names.extend(self._extract_type_names(node.right))
+        elif isinstance(node, ast.Constant):
+            if isinstance(node.value, str):
+                names.append(node.value)  # 文字列アノテーション (forward ref)
+        elif isinstance(node, ast.Tuple):
+            for elt in node.elts:
+                names.extend(self._extract_type_names(elt))
+        return names
+
+    # PURPOSE: PROOF.md 内の親参照が実在するか検証する (P01)
+    def check_dir_structure(self, path: Path) -> List[StructureProof]:
+        """ディレクトリの PROOF.md 内の親参照を検証 (NF2 P01)"""
+        results: List[StructureProof] = []
+        proof_md = path / "PROOF.md"
+        if not proof_md.exists():
+            return results
+        
+        try:
+            content = proof_md.read_text(encoding="utf-8")
+        except (OSError, UnicodeDecodeError):
+            return results
+        
+        # PROOF.md 内の <- 参照を検索
+        match = PROOF_PATTERN_V2.search(content)
+        if match and match.group(2):
+            parent = match.group(2).strip()
+            is_valid, reason = self.validate_parent(parent)
+            results.append(StructureProof(
+                name=f"PROOF.md <- {parent}",
+                path=proof_md, line_number=1,
+                status=ProofStatus.OK if is_valid else ProofStatus.MISSING,
+                check_type="dir_ref",
+                target=parent,
+                reason=None if is_valid else reason,
+            ))
+        
+        return results
+
+    # ── NF3: Function Layer (機能的冗長性) ────────────────
+
+    # --- 閾値定数 ---
+    _SRP_MAX_LINES = 50
+    _SRP_MAX_BRANCHES = 10
+    _SRP_MAX_PARAMS = 5
+    _SIMILARITY_THRESHOLD = 0.8  # 80% 以上で類似判定
+
+    # PURPOSE: 関数の複雑度メトリクスを計算し SRP 違反を検出する (P22)
+    def _check_complexity_from_tree(self, path: Path, tree: ast.Module) -> List[FunctionNFProof]:
+        """関数の SRP 検証 (NF3 P22)"""
+        results: List[FunctionNFProof] = []
+        
+        for node in ast.walk(tree):
+            if not isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                continue
+            if node.name.startswith("_"):
+                continue
+            
+            # 行数
+            lines = (node.end_lineno or node.lineno) - node.lineno + 1
+            if lines > self._SRP_MAX_LINES:
+                results.append(FunctionNFProof(
+                    name=node.name, path=path, line_number=node.lineno,
+                    status=ProofStatus.WEAK, check_type="complexity",
+                    metric_value=lines, threshold=self._SRP_MAX_LINES,
+                    reason=f"関数が長すぎる: {lines}行 (閾値: {self._SRP_MAX_LINES})",
+                ))
+            
+            # 分岐数 (cyclomatic complexity 近似)
+            branches = sum(1 for child in ast.walk(node)
+                if isinstance(child, (ast.If, ast.For, ast.While, ast.ExceptHandler,
+                                      ast.With, ast.Assert)))
+            # BoolOp の and/or もカウント
+            branches += sum(1 for child in ast.walk(node)
+                if isinstance(child, ast.BoolOp))
+            
+            if branches > self._SRP_MAX_BRANCHES:
+                results.append(FunctionNFProof(
+                    name=node.name, path=path, line_number=node.lineno,
+                    status=ProofStatus.WEAK, check_type="complexity",
+                    metric_value=branches, threshold=self._SRP_MAX_BRANCHES,
+                    reason=f"分岐が多すぎる: {branches} (閾値: {self._SRP_MAX_BRANCHES})",
+                ))
+            
+            # パラメータ数
+            all_params = [a for a in node.args.args if a.arg not in ("self", "cls")]
+            all_params += node.args.kwonlyargs + node.args.posonlyargs
+            param_count = len(all_params)
+            if node.args.vararg:
+                param_count += 1
+            if node.args.kwarg:
+                param_count += 1
+            
+            if param_count > self._SRP_MAX_PARAMS:
+                results.append(FunctionNFProof(
+                    name=node.name, path=path, line_number=node.lineno,
+                    status=ProofStatus.WEAK, check_type="complexity",
+                    metric_value=param_count, threshold=self._SRP_MAX_PARAMS,
+                    reason=f"引数が多すぎる: {param_count} (閾値: {self._SRP_MAX_PARAMS})",
+                ))
+            
+            # 全 OK の場合
+            if lines <= self._SRP_MAX_LINES and branches <= self._SRP_MAX_BRANCHES and param_count <= self._SRP_MAX_PARAMS:
+                results.append(FunctionNFProof(
+                    name=node.name, path=path, line_number=node.lineno,
+                    status=ProofStatus.OK, check_type="complexity",
+                    metric_value=lines,
+                ))
+        
+        return results
+
+    # PURPOSE: 同ファイル内の類似関数を AST 構造比較で検出する (P12)
+    def _check_similarity_from_tree(self, path: Path, tree: ast.Module) -> List[FunctionNFProof]:
+        """関数の類似性検証 (NF3 P12)"""
+        results: List[FunctionNFProof] = []
+        
+        # public 関数の AST 構造を抽出
+        func_signatures: List[tuple] = []  # (name, lineno, node_type_seq)
+        for node in ast.walk(tree):
+            if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                if node.name.startswith("_"):
+                    continue
+                # AST ノード型のシーケンスとして構造を表現
+                type_seq = tuple(type(child).__name__ for child in ast.walk(node))
+                func_signatures.append((node.name, node.lineno, type_seq))
+        
+        # ペア比較
+        reported_pairs: set = set()
+        for i, (name_a, line_a, seq_a) in enumerate(func_signatures):
+            for j, (name_b, line_b, seq_b) in enumerate(func_signatures):
+                if i >= j:
+                    continue
+                pair_key = (name_a, name_b)
+                if pair_key in reported_pairs:
+                    continue
+                
+                # Jaccard 類似度 (型シーケンスの集合比較)
+                set_a = set(enumerate(seq_a))
+                set_b = set(enumerate(seq_b))
+                if not set_a or not set_b:
+                    continue
+                intersection = len(set_a & set_b)
+                union = len(set_a | set_b)
+                similarity = intersection / union if union > 0 else 0
+                
+                if similarity > self._SIMILARITY_THRESHOLD:
+                    reported_pairs.add(pair_key)
+                    sim_pct = int(similarity * 100)
+                    results.append(FunctionNFProof(
+                        name=f"{name_a} ≈ {name_b}", path=path,
+                        line_number=line_a,
+                        status=ProofStatus.WEAK, check_type="similarity",
+                        metric_value=sim_pct, threshold=int(self._SIMILARITY_THRESHOLD * 100),
+                        reason=f"関数 '{name_a}' と '{name_b}' が {sim_pct}% 類似",
+                    ))
+        
+        return results
+
+    # PURPOSE: 同一スコープ内で変数が複数回代入されていないか検出する (P32)
+    def _check_reassignment_from_tree(self, path: Path, tree: ast.Module) -> List[FunctionNFProof]:
+        """変数の再代入検出 (NF3 P32)"""
+        results: List[FunctionNFProof] = []
+        
+        for node in ast.walk(tree):
+            if not isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                continue
+            if node.name.startswith("_"):
+                continue
+            
+            # 関数直下の代入先を収集 (ネストされたスコープは除外)
+            assignments: Dict[str, List[int]] = {}
+            for child in ast.iter_child_nodes(node):
+                self._collect_assignments(child, assignments)
+            
+            # 3回以上の代入は WEAK (ループ変数・累積パターンを考慮)
+            for var_name, lines in assignments.items():
+                if len(lines) >= 3 and var_name not in _LOOP_VAR_NAMES:
+                    results.append(FunctionNFProof(
+                        name=f"{node.name}.{var_name}", path=path,
+                        line_number=lines[0],
+                        status=ProofStatus.WEAK, check_type="reassign",
+                        metric_value=len(lines),
+                        reason=f"変数 '{var_name}' が {len(lines)} 回代入 (関数 {node.name} 内)",
+                    ))
+        
+        return results
+
+    # PURPOSE: AST ノードから代入先変数名を再帰的に収集する (NF3 P32 補助)
+    def _collect_assignments(self, node: ast.AST, assignments: Dict[str, List[int]]) -> None:
+        """代入先を収集 (ネストされた関数/クラスはスキップ)"""
+        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
+            return  # ネストされたスコープはスキップ
+        if isinstance(node, ast.Assign):
+            for target in node.targets:
+                if isinstance(target, ast.Name):
+                    assignments.setdefault(target.id, []).append(target.lineno)
+        elif isinstance(node, ast.AugAssign):
+            if isinstance(node.target, ast.Name):
+                assignments.setdefault(node.target.id, []).append(node.target.lineno)
+        elif isinstance(node, ast.AnnAssign):
+            if isinstance(node.target, ast.Name) and node.value is not None:
+                assignments.setdefault(node.target.id, []).append(node.target.lineno)
+        # 再帰
+        for child in ast.iter_child_nodes(node):
+            self._collect_assignments(child, assignments)
+
+    # ── BCNF: Verification Layer (不可欠性) ───────────────
+
+    # PURPOSE: プロジェクト全体で関数/変数の不可欠性を検証する (P23, P33)
+    def _check_verification_global(
+        self, root: Path, file_trees: Dict[Path, ast.Module],
+    ) -> List[VerificationProof]:
+        """プロジェクト横断の不可欠性検証 (BCNF)"""
+        results: List[VerificationProof] = []
+        
+        # P13: ファイルの被 import カウント
+        # 全ファイルの相対パス (拡張子なし) を正規化
+        file_stems: Dict[str, Path] = {}
+        for fp in file_trees:
+            rel = fp.relative_to(root) if fp.is_relative_to(root) else fp
+            stem = str(rel).replace(".py", "").replace("/", ".")
+            file_stems[stem] = fp
+        
+        # 全 import 先を収集
+        imported_modules: set = set()
+        for tree in file_trees.values():
+            for node in ast.walk(tree):
+                if isinstance(node, ast.ImportFrom) and node.module:
+                    imported_modules.add(node.module)
+                elif isinstance(node, ast.Import):
+                    for alias in node.names:
+                        imported_modules.add(alias.name)
+        
+        for stem, fp in file_stems.items():
+            is_imported = any(stem.endswith(m) or m.endswith(stem) for m in imported_modules)
+            # __init__.py と __main__.py はエントリポイントなので除外
+            if fp.name in ("__init__.py", "__main__.py"):
+                continue
+            results.append(VerificationProof(
+                name=fp.name, path=fp, line_number=1,
+                status=ProofStatus.OK if is_imported else ProofStatus.WEAK,
+                check_type="file_import_count",
+                ref_count=1 if is_imported else 0,
+                reason=None if is_imported else f"ファイル '{fp.name}' が他ファイルから import されていない",
+            ))
+        
+        # P23: dead function 検出
+        # 全定義を収集
+        all_definitions: Dict[str, tuple] = {}  # name -> (path, lineno)
+        all_calls: set = set()
+        
+        for fp, tree in file_trees.items():
+            for node in ast.walk(tree):
+                if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                    if not node.name.startswith("_"):
+                        all_definitions[f"{fp}:{node.name}"] = (fp, node.lineno, node.name)
+                if isinstance(node, ast.Call):
+                    if isinstance(node.func, ast.Name):
+                        all_calls.add(node.func.id)
+                    elif isinstance(node.func, ast.Attribute):
+                        all_calls.add(node.func.attr)
+        
+        for key, (fp, lineno, fname) in all_definitions.items():
+            is_called = fname in all_calls
+            results.append(VerificationProof(
+                name=fname, path=fp, line_number=lineno,
+                status=ProofStatus.OK if is_called else ProofStatus.WEAK,
+                check_type="dead_func",
+                ref_count=1 if is_called else 0,
+                reason=None if is_called else f"関数 '{fname}' がプロジェクト内で呼ばれていない",
+            ))
+        
+        # P33: unused variable (関数内の Store のみで Load なし)
+        for fp, tree in file_trees.items():
+            for node in ast.walk(tree):
+                if not isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                    continue
+                if node.name.startswith("_"):
+                    continue
+                
+                stores: set = set()
+                loads: set = set()
+                for child in ast.walk(node):
+                    if isinstance(child, ast.Name):
+                        if isinstance(child.ctx, ast.Store):
+                            stores.add(child.id)
+                        elif isinstance(child.ctx, (ast.Load, ast.Del)):
+                            loads.add(child.id)
+                
+                # パラメータ名は loads に含める
+                for arg in node.args.args + node.args.kwonlyargs:
+                    loads.add(arg.arg)
+                
+                unused = stores - loads - {"_"} - _LOOP_VAR_NAMES
+                for var in unused:
+                    results.append(VerificationProof(
+                        name=f"{node.name}.{var}", path=fp, line_number=node.lineno,
+                        status=ProofStatus.WEAK,
+                        check_type="unused_var",
+                        ref_count=0,
+                        reason=f"変数 '{var}' が関数 '{node.name}' 内で未使用",
+                    ))
+        
+        return results
+
     # PURPOSE: 指定ルート以下のディレクトリツリー全体を再帰的にチェックする
     def check(self, root: Path) -> CheckResult:  # noqa: AI-007
         """ディレクトリツリーをチェック"""
@@ -409,12 +942,18 @@ class DendronChecker:  # noqa: AI-007
         dir_proofs: List[DirProof] = []
         function_proofs: List[FunctionProof] = []
         variable_proofs: List[VariableProof] = []
+        structure_proofs: List[StructureProof] = []
+        function_nf_proofs: List[FunctionNFProof] = []
+        verification_proofs: List[VerificationProof] = []
+        file_trees: Dict[Path, ast.Module] = {}  # BCNF: AST キャッシュ
 
         # ディレクトリをチェック
         if self.check_dirs:
             for path in root.rglob("*"):
                 if path.is_dir() and not self.is_exempt(path):
                     dir_proofs.append(self.check_dir_proof(path))
+                    if self.check_structure:
+                        structure_proofs.extend(self.check_dir_structure(path))
 
         # ファイルをチェック
         if self.check_files:
@@ -424,7 +963,7 @@ class DendronChecker:  # noqa: AI-007
                     
                     # 関数をチェック (v2.5) + 変数をチェック (v3.0)
                     # AST を 1 回だけパースして共有 (exempt ファイルはスキップ)
-                    if (self.check_functions or self.check_variables) and not self.is_exempt(path):
+                    if (self.check_functions or self.check_variables or self.check_structure or self.check_function_nf or self.check_verification) and not self.is_exempt(path):
                         try:
                             content = path.read_text(encoding="utf-8")
                             tree = ast.parse(content, filename=str(path))
@@ -438,6 +977,27 @@ class DendronChecker:  # noqa: AI-007
                             if self.check_variables:
                                 vps = self._check_variables_from_tree(path, tree)
                                 variable_proofs.extend(vps)
+                            if self.check_structure:
+                                sps = self._check_imports_from_tree(path, tree)
+                                structure_proofs.extend(sps)
+                                sps2 = self._check_calls_from_tree(path, tree)
+                                structure_proofs.extend(sps2)
+                                sps3 = self._check_type_refs_from_tree(path, tree)
+                                structure_proofs.extend(sps3)
+                            if self.check_function_nf:
+                                fnp1 = self._check_complexity_from_tree(path, tree)
+                                function_nf_proofs.extend(fnp1)
+                                fnp2 = self._check_similarity_from_tree(path, tree)
+                                function_nf_proofs.extend(fnp2)
+                                fnp3 = self._check_reassignment_from_tree(path, tree)
+                                function_nf_proofs.extend(fnp3)
+                            if self.check_verification:
+                                file_trees[path] = tree  # BCNF: 後でグローバル解析に使う
+
+        # BCNF: プロジェクト横断解析 (全ファイルループ後)
+        if self.check_verification and file_trees:
+            vfps = self._check_verification_global(root, file_trees)
+            verification_proofs.extend(vfps)
 
         # 集計
         total_files = len(file_proofs)
@@ -492,4 +1052,22 @@ class DendronChecker:  # noqa: AI-007
             variable_proofs=variable_proofs,
             
             level_stats=level_stats,
+
+            # v3.1 NF2
+            total_structure_checks=len(structure_proofs),
+            structure_ok=sum(1 for s in structure_proofs if s.status == ProofStatus.OK),
+            structure_missing=sum(1 for s in structure_proofs if s.status in (ProofStatus.MISSING, ProofStatus.WEAK)),
+            structure_proofs=structure_proofs,
+
+            # v3.2 NF3
+            total_function_nf_checks=len(function_nf_proofs),
+            function_nf_ok=sum(1 for f in function_nf_proofs if f.status == ProofStatus.OK),
+            function_nf_weak=sum(1 for f in function_nf_proofs if f.status == ProofStatus.WEAK),
+            function_nf_proofs=function_nf_proofs,
+
+            # v3.3 BCNF
+            total_verification_checks=len(verification_proofs),
+            verification_ok=sum(1 for v in verification_proofs if v.status == ProofStatus.OK),
+            verification_weak=sum(1 for v in verification_proofs if v.status == ProofStatus.WEAK),
+            verification_proofs=verification_proofs,
         )

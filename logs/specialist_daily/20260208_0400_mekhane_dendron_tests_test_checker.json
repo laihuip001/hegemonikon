@@ -1,0 +1,737 @@
+{
+  "timestamp": "2026-02-08T04:02:42.263516",
+  "target_file": "mekhane/dendron/tests/test_checker.py",
+  "category": "all",
+  "total_specialists": 104,
+  "api_keys_used": 15,
+  "results": [
+    {
+      "id": "HG-001.μ",
+      "name": "PROOF行検査官",
+      "category": "hegemonikon",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n"
+    },
+    {
+      "id": "HG-001.μF",
+      "name": "PROOF行検査官",
+      "category": "hegemonikon",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n"
+    },
+    {
+      "id": "HG-001.μP",
+      "name": "PROOF行検査官",
+      "category": "hegemonikon",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n"
+    },
+    {
+      "id": "HG-001.F",
+      "name": "PROOF行検査官",
+      "category": "hegemonikon",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n"
+    },
+    {
+      "id": "HG-001.P",
+      "name": "PROOF行検査官",
+      "category": "hegemonikon",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n"
+    },
+    {
+      "id": "HG-001.M",
+      "name": "PROOF行検査官",
+      "category": "hegemonikon",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n"
+    },
+    {
+      "id": "HG-001.MF",
+      "name": "PROOF行検査官",
+      "category": "hegemonikon",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n"
+    },
+    {
+      "id": "HG-001.MP",
+      "name": "PROOF行検査官",
+      "category": "hegemonikon",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n"
+    },
+    {
+      "id": "HG-002.μ",
+      "name": "予測誤差審問官",
+      "category": "hegemonikon",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n"
+    },
+    {
+      "id": "HG-002.μF",
+      "name": "予測誤差審問官",
+      "category": "hegemonikon",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n"
+    },
+    {
+      "id": "HG-002.μP",
+      "name": "予測誤差審問官",
+      "category": "hegemonikon",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n"
+    },
+    {
+      "id": "HG-002.F",
+      "name": "予測誤差審問官",
+      "category": "hegemonikon",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n"
+    },
+    {
+      "id": "HG-002.P",
+      "name": "予測誤差審問官",
+      "category": "hegemonikon",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n"
+    },
+    {
+      "id": "HG-002.M",
+      "name": "予測誤差審問官",
+      "category": "hegemonikon",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n"
+    },
+    {
+      "id": "HG-002.MF",
+      "name": "予測誤差審問官",
+      "category": "hegemonikon",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n"
+    },
+    {
+      "id": "HG-002.MP",
+      "name": "予測誤差審問官",
+      "category": "hegemonikon",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n"
+    },
+    {
+      "id": "HG-003.μ",
+      "name": "ストア派制御審判",
+      "category": "hegemonikon",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n"
+    },
+    {
+      "id": "HG-003.μF",
+      "name": "ストア派制御審判",
+      "category": "hegemonikon",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n"
+    },
+    {
+      "id": "HG-003.μP",
+      "name": "ストア派制御審判",
+      "category": "hegemonikon",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n"
+    },
+    {
+      "id": "HG-003.F",
+      "name": "ストア派制御審判",
+      "category": "hegemonikon",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n"
+    },
+    {
+      "id": "HG-003.P",
+      "name": "ストア派制御審判",
+      "category": "hegemonikon",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n"
+    },
+    {
+      "id": "HG-003.M",
+      "name": "ストア派制御審判",
+      "category": "hegemonikon",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n"
+    },
+    {
+      "id": "HG-003.MF",
+      "name": "ストア派制御審判",
+      "category": "hegemonikon",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n"
+    },
+    {
+      "id": "HG-003.MP",
+      "name": "ストア派制御審判",
+      "category": "hegemonikon",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n"
+    },
+    {
+      "id": "HG-004.μ",
+      "name": "CCL式美学者",
+      "category": "hegemonikon",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n"
+    },
+    {
+      "id": "HG-004.μF",
+      "name": "CCL式美学者",
+      "category": "hegemonikon",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n"
+    },
+    {
+      "id": "HG-004.μP",
+      "name": "CCL式美学者",
+      "category": "hegemonikon",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n"
+    },
+    {
+      "id": "HG-004.F",
+      "name": "CCL式美学者",
+      "category": "hegemonikon",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n"
+    },
+    {
+      "id": "HG-004.P",
+      "name": "CCL式美学者",
+      "category": "hegemonikon",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n"
+    },
+    {
+      "id": "HG-004.M",
+      "name": "CCL式美学者",
+      "category": "hegemonikon",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n"
+    },
+    {
+      "id": "HG-004.MF",
+      "name": "CCL式美学者",
+      "category": "hegemonikon",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n"
+    },
+    {
+      "id": "HG-004.MP",
+      "name": "CCL式美学者",
+      "category": "hegemonikon",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n"
+    },
+    {
+      "id": "HG-005.μ",
+      "name": "定理整合性監査官",
+      "category": "hegemonikon",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n"
+    },
+    {
+      "id": "HG-005.μF",
+      "name": "定理整合性監査官",
+      "category": "hegemonikon",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n"
+    },
+    {
+      "id": "HG-005.μP",
+      "name": "定理整合性監査官",
+      "category": "hegemonikon",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n"
+    },
+    {
+      "id": "HG-005.F",
+      "name": "定理整合性監査官",
+      "category": "hegemonikon",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n"
+    },
+    {
+      "id": "HG-005.P",
+      "name": "定理整合性監査官",
+      "category": "hegemonikon",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n"
+    },
+    {
+      "id": "HG-005.M",
+      "name": "定理整合性監査官",
+      "category": "hegemonikon",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n"
+    },
+    {
+      "id": "HG-005.MF",
+      "name": "定理整合性監査官",
+      "category": "hegemonikon",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n"
+    },
+    {
+      "id": "HG-005.MP",
+      "name": "定理整合性監査官",
+      "category": "hegemonikon",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n"
+    },
+    {
+      "id": "HG-006.μ",
+      "name": "ワークフロー適合審査官",
+      "category": "hegemonikon",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n"
+    },
+    {
+      "id": "HG-006.μF",
+      "name": "ワークフロー適合審査官",
+      "category": "hegemonikon",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n"
+    },
+    {
+      "id": "HG-006.μP",
+      "name": "ワークフロー適合審査官",
+      "category": "hegemonikon",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n"
+    },
+    {
+      "id": "HG-006.F",
+      "name": "ワークフロー適合審査官",
+      "category": "hegemonikon",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n"
+    },
+    {
+      "id": "HG-006.P",
+      "name": "ワークフロー適合審査官",
+      "category": "hegemonikon",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n"
+    },
+    {
+      "id": "HG-006.M",
+      "name": "ワークフロー適合審査官",
+      "category": "hegemonikon",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n"
+    },
+    {
+      "id": "HG-006.MF",
+      "name": "ワークフロー適合審査官",
+      "category": "hegemonikon",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n"
+    },
+    {
+      "id": "HG-006.MP",
+      "name": "ワークフロー適合審査官",
+      "category": "hegemonikon",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n"
+    },
+    {
+      "id": "AI-002.μ",
+      "name": "ハルシネーション検出者",
+      "category": "ai_generated",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n"
+    },
+    {
+      "id": "AI-002.μF",
+      "name": "ハルシネーション検出者",
+      "category": "ai_generated",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n"
+    },
+    {
+      "id": "AI-002.μP",
+      "name": "ハルシネーション検出者",
+      "category": "ai_generated",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n"
+    },
+    {
+      "id": "AI-002.F",
+      "name": "ハルシネーション検出者",
+      "category": "ai_generated",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n"
+    },
+    {
+      "id": "AI-002.P",
+      "name": "ハルシネーション検出者",
+      "category": "ai_generated",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n"
+    },
+    {
+      "id": "AI-002.M",
+      "name": "ハルシネーション検出者",
+      "category": "ai_generated",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n"
+    },
+    {
+      "id": "AI-002.MF",
+      "name": "ハルシネーション検出者",
+      "category": "ai_generated",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n"
+    },
+    {
+      "id": "AI-002.MP",
+      "name": "ハルシネーション検出者",
+      "category": "ai_generated",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n"
+    },
+    {
+      "id": "AI-005.μ",
+      "name": "コード/コメント矛盾検出者",
+      "category": "ai_generated",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n"
+    },
+    {
+      "id": "AI-005.μF",
+      "name": "コード/コメント矛盾検出者",
+      "category": "ai_generated",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n"
+    },
+    {
+      "id": "AI-005.μP",
+      "name": "コード/コメント矛盾検出者",
+      "category": "ai_generated",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n"
+    },
+    {
+      "id": "AI-005.F",
+      "name": "コード/コメント矛盾検出者",
+      "category": "ai_generated",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n"
+    },
+    {
+      "id": "AI-005.P",
+      "name": "コード/コメント矛盾検出者",
+      "category": "ai_generated",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n"
+    },
+    {
+      "id": "AI-005.M",
+      "name": "コード/コメント矛盾検出者",
+      "category": "ai_generated",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n"
+    },
+    {
+      "id": "AI-005.MF",
+      "name": "コード/コメント矛盾検出者",
+      "category": "ai_generated",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n"
+    },
+    {
+      "id": "AI-005.MP",
+      "name": "コード/コメント矛盾検出者",
+      "category": "ai_generated",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n"
+    },
+    {
+      "id": "CG-001.μ",
+      "name": "ネスト深度警報者",
+      "category": "cognitive",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n"
+    },
+    {
+      "id": "CG-001.μF",
+      "name": "ネスト深度警報者",
+      "category": "cognitive",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n"
+    },
+    {
+      "id": "CG-001.μP",
+      "name": "ネスト深度警報者",
+      "category": "cognitive",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n"
+    },
+    {
+      "id": "CG-001.F",
+      "name": "ネスト深度警報者",
+      "category": "cognitive",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n"
+    },
+    {
+      "id": "CG-001.P",
+      "name": "ネスト深度警報者",
+      "category": "cognitive",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n"
+    },
+    {
+      "id": "CG-001.M",
+      "name": "ネスト深度警報者",
+      "category": "cognitive",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n"
+    },
+    {
+      "id": "CG-001.MF",
+      "name": "ネスト深度警報者",
+      "category": "cognitive",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n"
+    },
+    {
+      "id": "CG-001.MP",
+      "name": "ネスト深度警報者",
+      "category": "cognitive",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n"
+    },
+    {
+      "id": "CG-002.μ",
+      "name": "認知チャンク分析者",
+      "category": "cognitive",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n"
+    },
+    {
+      "id": "CG-002.μF",
+      "name": "認知チャンク分析者",
+      "category": "cognitive",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n"
+    },
+    {
+      "id": "CG-002.μP",
+      "name": "認知チャンク分析者",
+      "category": "cognitive",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n"
+    },
+    {
+      "id": "CG-002.F",
+      "name": "認知チャンク分析者",
+      "category": "cognitive",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n"
+    },
+    {
+      "id": "CG-002.P",
+      "name": "認知チャンク分析者",
+      "category": "cognitive",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n"
+    },
+    {
+      "id": "CG-002.M",
+      "name": "認知チャンク分析者",
+      "category": "cognitive",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n"
+    },
+    {
+      "id": "CG-002.MF",
+      "name": "認知チャンク分析者",
+      "category": "cognitive",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n"
+    },
+    {
+      "id": "CG-002.MP",
+      "name": "認知チャンク分析者",
+      "category": "cognitive",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n"
+    },
+    {
+      "id": "AE-012.μ",
+      "name": "視覚リズムの指揮者",
+      "category": "aesthetics",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n"
+    },
+    {
+      "id": "AE-012.μF",
+      "name": "視覚リズムの指揮者",
+      "category": "aesthetics",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n"
+    },
+    {
+      "id": "AE-012.μP",
+      "name": "視覚リズムの指揮者",
+      "category": "aesthetics",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n"
+    },
+    {
+      "id": "AE-012.F",
+      "name": "視覚リズムの指揮者",
+      "category": "aesthetics",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n"
+    },
+    {
+      "id": "AE-012.P",
+      "name": "視覚リズムの指揮者",
+      "category": "aesthetics",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n"
+    },
+    {
+      "id": "AE-012.M",
+      "name": "視覚リズムの指揮者",
+      "category": "aesthetics",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n"
+    },
+    {
+      "id": "AE-012.MF",
+      "name": "視覚リズムの指揮者",
+      "category": "aesthetics",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n"
+    },
+    {
+      "id": "AE-012.MP",
+      "name": "視覚リズムの指揮者",
+      "category": "aesthetics",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n"
+    },
+    {
+      "id": "AE-013.μ",
+      "name": "シンプリシティの門番",
+      "category": "aesthetics",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n"
+    },
+    {
+      "id": "AE-013.μF",
+      "name": "シンプリシティの門番",
+      "category": "aesthetics",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n"
+    },
+    {
+      "id": "AE-013.μP",
+      "name": "シンプリシティの門番",
+      "category": "aesthetics",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n"
+    },
+    {
+      "id": "AE-013.F",
+      "name": "シンプリシティの門番",
+      "category": "aesthetics",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n"
+    },
+    {
+      "id": "AE-013.P",
+      "name": "シンプリシティの門番",
+      "category": "aesthetics",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n"
+    },
+    {
+      "id": "AE-013.M",
+      "name": "シンプリシティの門番",
+      "category": "aesthetics",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n"
+    },
+    {
+      "id": "AE-013.MF",
+      "name": "シンプリシティの門番",
+      "category": "aesthetics",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n"
+    },
+    {
+      "id": "AE-013.MP",
+      "name": "シンプリシティの門番",
+      "category": "aesthetics",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n"
+    },
+    {
+      "id": "AE-014.μ",
+      "name": "比喩一貫性の詩人",
+      "category": "aesthetics",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n"
+    },
+    {
+      "id": "AE-014.μF",
+      "name": "比喩一貫性の詩人",
+      "category": "aesthetics",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n"
+    },
+    {
+      "id": "AE-014.μP",
+      "name": "比喩一貫性の詩人",
+      "category": "aesthetics",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n"
+    },
+    {
+      "id": "AE-014.F",
+      "name": "比喩一貫性の詩人",
+      "category": "aesthetics",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n"
+    },
+    {
+      "id": "AE-014.P",
+      "name": "比喩一貫性の詩人",
+      "category": "aesthetics",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n"
+    },
+    {
+      "id": "AE-014.M",
+      "name": "比喩一貫性の詩人",
+      "category": "aesthetics",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n"
+    },
+    {
+      "id": "AE-014.MF",
+      "name": "比喩一貫性の詩人",
+      "category": "aesthetics",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n"
+    },
+    {
+      "id": "AE-014.MP",
+      "name": "比喩一貫性の詩人",
+      "category": "aesthetics",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n"
+    }
+  ]
+}

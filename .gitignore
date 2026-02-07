@@ -35,7 +35,7 @@ mneme/.hegemonikon/sessions/*
 *.onnx
 *.bin
 *.safetensors
-mekhane/anamnesis/models/
+mekhane/anamnesis/models/bge-*/
 
 # Node modules (never commit)
 **/node_modules/
@@ -49,3 +49,7 @@ mekhane/ergasterion/n8n/data/
 
 # Runtime browser profile
 runtime/
+
+# Gnōsis data (LanceDB - contains embedded secrets from indexed content)
+gnosis_data/
+mekhane/anamnesis/data/*.lance/

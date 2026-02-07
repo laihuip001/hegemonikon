@@ -1,0 +1,11 @@
+[Unit]
+Description=Gnōsis Knowledge Index Update
+After=network.target
+
+[Service]
+Type=oneshot
+User=makaron8426
+WorkingDirectory=/home/makaron8426/oikos/hegemonikon
+ExecStart=/home/makaron8426/oikos/hegemonikon/.venv/bin/python scripts/gnosis_index_update.py --quiet
+StandardOutput=journal
+StandardError=journal

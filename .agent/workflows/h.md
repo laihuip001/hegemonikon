@@ -123,6 +123,21 @@ result = select_derivative("H1", problem_context)
 4. **[H4 Doxa]** Value×Precision: 信念として蓄積
 5. **⊕ Convergence**: 4定理の出力を**1つの動機的判断**に融合
 
+### `\h` (Colimit — 展開)
+
+4定理の**全6対の交差関係**を展開し、動機間の相互作用を可視化する。
+
+| # | 対 | 交差 | 問い |
+|:-:|:---|:-----|:-----|
+| 1 | H1⊗H2 | (Flow×Val)⊗(Flow×Prec) | 傾向が確信をどう揺さぶるか |
+| 2 | H1⊗H3 | (Flow×Val)⊗(Val×Val) | 傾向が欲求をどう刺激するか |
+| 3 | H1⊗H4 | (Flow×Val)⊗(Val×Prec) | 傾向が信念をどう形成するか |
+| 4 | H2⊗H3 | (Flow×Prec)⊗(Val×Val) | 確信が欲求をどう制御するか |
+| 5 | H2⊗H4 | (Flow×Prec)⊗(Val×Prec) | 確信が信念をどう補強するか |
+| 6 | H3⊗H4 | (Val×Val)⊗(Val×Prec) | 欲求が信念をどう書き換えるか |
+
+**⊗ Divergence**: 6対の交差から**動機の矛盾・隠れた欲求**を抽出
+
 ### `/h.bias` (バイアス検出) — CEP-001
 
 > **CCL**: `V[/h]` (CEP-001 FEP記号拡張 B1)

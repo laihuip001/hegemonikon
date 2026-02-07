@@ -1,10 +1,10 @@
 ---
 doc_id: "AXIOM_HIERARCHY"
-version: "5.0.0"
+version: "6.0.0"
 tier: "KERNEL"
 status: "CANONICAL"
 created: "2026-01-22"
-updated: "2026-01-27"
+updated: "2026-02-07"
 ---
 
 > **Kernel Doc Index**: [SACRED_TRUTH](SACRED_TRUTH.md) | [axiom_hierarchy](axiom_hierarchy.md) ← 📍 | [naming_conventions](naming_conventions.md)
@@ -12,6 +12,8 @@ updated: "2026-01-27"
 # 📐 公理階層構造 (Axiom Hierarchy) v2.1
 
 > **「予測誤差最小化から導出される認知の全体系」**
+
+![Hegemonikón 公理階層構造](axiom_hierarchy_structure.png)
 
 ---
 
@@ -21,8 +23,8 @@ updated: "2026-01-27"
 |------|---|------|
 | 公理 | **7** | 1+2+2+2 |
 | 定理 | **24** | 6×4 |
-| 関係 | **36** | 8+4+4+8+8+4 |
-| **総計** | **60** | — |
+| 関係 | **72** | 9×8 |
+| **総計** | **96** | 24×4 |
 
 ---
 
@@ -48,6 +50,17 @@ graph TD
 | L1.5 | How | Function | Explore ↔ Exploit |
 | L1.75 | Which | Valence | + ↔ - |
 | L1.75 | How much | Precision | C ↔ U |
+
+### L0 (FEP) の理論的含意
+
+> **直交性の必然性** (Spisak & Friston, 2025):
+> FEP を random dynamical system に適用すると、自己直交化する attractor network が創発する。
+> 直交性は predictive accuracy と model complexity の同時最適化の**数学的帰結**。
+> → **6 Series の直交配置は設計ではなく FEP からの演繹的必然**。
+
+> **Temporal Depth** (Kirchhoff et al., 2018):
+> 「mere active inference」(振り子の同期) と「adaptive active inference」(時間的深さを持つ生成モデル) を区別。
+> → 自律性は Markov blanket の存在ではなく、深い生成モデルの有無で決まる。
 
 ---
 
@@ -129,17 +142,20 @@ graph TD
 
 ---
 
-## X-series: 関係層（36）
+## X-series: 関係層（72）
 
-| X | 接続 | 数 | 意味 |
-|---|------|---|------|
-| X-OS | O→S | 8 | 本質→様態 |
-| X-SH | S→H | 4 | 様態→傾向 |
-| X-SP | S→P | 4 | 様態→条件 |
-| X-PK | P→K | 8 | 条件→文脈 |
-| X-KA | K→A | 8 | 文脈→精密 |
-| X-HA | H→A | 4 | 傾向→精密 |
-| **計** | | **36** | |
+| X | 接続 | 共有座標 | 数 | 意味 |
+|---|------|---------|---|------|
+| X-OS | O→S | C1 (Flow) | 8 | 本質→様態 |
+| X-OH | O→H | C1 (Flow) | 8 | 本質→傾向 |
+| X-SH | S→H | C1 (Flow) | 8 | 様態→傾向 |
+| X-SP | S→P | C3 (Scale) | 8 | 様態→条件 |
+| X-SK | S→K | C3 (Scale) | 8 | 様態→文脈 |
+| X-PK | P→K | C3 (Scale) | 8 | 条件→文脈 |
+| X-HA | H→A | C5 (Valence) | 8 | 傾向→精密 |
+| X-HK | H→K | C5 (Valence) | 8 | 傾向→文脈 |
+| X-KA | K→A | C5 (Valence) | 8 | 文脈→精密 |
+| **計** | | | **72** | |
 
 詳細: [taxis.md](taxis.md)
 
@@ -149,27 +165,47 @@ graph TD
 
 ```mermaid
 graph TD
-    subgraph "Poiēsis: 内容"
-        O[O: Ousia] --> S[S: Schema]
-        S --> H[H: Hormē]
+    subgraph "Poiēsis: Star(O) — L1含む"
+        O[O: Ousia] -->|X-OS| S[S: Schema]
+        O -->|X-OH| H[H: Hormē]
+        S -->|X-SH| H
     end
     
-    subgraph "Dokimasia: 条件"
-        S --> P[P: Perigraphē]
-        P --> K[K: Kairos]
-        K --> A[A: Akribeia]
+    subgraph "Dokimasia: Complement(O) — L1不含"
+        P[P: Perigraphē] -->|X-PK| K[K: Kairos]
+        K -->|X-KA| A[A: Akribeia]
     end
     
-    H --> A
+    S -->|X-SP| P
+    S -->|X-SK| K
+    H -->|X-HA| A
+    H -->|X-HK| K
 ```
+
+> **Trígōnon**: 6 Series は K₃ 三角形を形成する。
+> Pure (O,P,A) = 頂点、Mixed (S,H,K) = 辺。
+> 詳細: [trigonon.md](trigonon.md)
+
+---
+
+## 理論的基盤 (Theoretical Foundations)
+
+| 概念 | 根拠論文 | Hegemonikón 接続 |
+|:-----|:---------|:----------------|
+| Series 直交性 | Spisak & Friston 2025 (arXiv:2505.22749) | 6 Series = FEP の数学的帰結としての直交基底 |
+| ネストした MB | Kirchhoff et al. 2018 (J.R.Soc.Interface 15:20170792) | P₁ (Khōra) = blankets of blankets |
+| mere vs adaptive AI | Kirchhoff et al. 2018 | temporal depth = 自律性の必要条件 |
+| Replay と forgetting 耐性 | Spisak & Friston 2025 | /boot replay ≈ resting state attractor replay |
 
 ---
 
 ## 参照
 
+- **三角形構造**: [trigonon.md](trigonon.md)
+- **関係層**: [taxis.md](taxis.md)
 - **命名規則**: [naming_conventions.md](naming_conventions.md)
 - **不変真理**: [SACRED_TRUTH.md](SACRED_TRUTH.md)
 
 ---
 
-*Hegemonikón v2.1 — 60要素体系*
+*Hegemonikón v3.0 — 96要素体系 + 理論的基盤追記 (2026-02-07)*

@@ -6,43 +6,66 @@ pair: "S → K"
 shared_coordinate: "C3 (Scale)"
 relation_count: 8
 type: "Bridge"
-description: "設計 (Schema) が文脈 (Kairos) を制約する8つの射"
+naturality: "構造"
+zoom_chain: "設計のズーム → タイミングのズーム (X-SP + X-PK のショートカット)"
+description: "設計 (Schema) のズームレベルが文脈 (Kairos) のズームレベルを直接規定する8つの射"
 
 activation_conditions:
-  - context: "設計の方法が決まった後、タイミングや目的の妥当性が問われるとき"
-  - trigger: "「この方法で、いつ・なぜやるか」の遷移"
+  - context: "設計の方法が決まった後、タイミングや目的のスケールが問われるとき"
+  - trigger: "「この粒度で設計した。どのタイムスケールで実行するか」"
   - confidence_threshold: 0.5
   - priority: "medium"
 
-triggers: ["設計→文脈制約", "/mek >> /tel", "/met >> /euk", "様態→文脈"]
-keywords: [schema-kairos, design-to-context, x-sk]
+triggers: ["設計→タイミング粒度", "/mek >> /tel", "/met >> /euk", "ズーム直接伝播"]
+keywords: [schema-kairos, design-to-context, x-sk, zoom-propagation, shortcut]
 ---
 
 # X-SK: Schema → Kairos (様態→文脈)
 
-> **共有座標**: C3 (Scale) | **型**: Bridge (Mixed→Mixed)
-> **認知的意味**: 設計の方法が好機と目的を制約する
+> **共有座標**: C3 (Scale) | **型**: Bridge (Mixed→Mixed) | **自然度**: 構造
 
-## なぜこの接続が存在するか
+## 認知的意味: ズームレベルの直接伝播
 
-選んだ方法は「いつやるか」「なぜやるか」を規定する。高精度の測定は時間がかかり (Metron→Chronos)、選んだ方法は目的整合性を要求する (Mekhanē→Telos)。Bridge 接続で意味的密度が高い。
+> **設計のズームレベルがタイミングのズームレベルを直接規定する。**
+
+X-SP が S→P (設計→適用)、X-PK が P→K (適用→タイミング) のズーム伝播だとすると、
+X-SK は **S→K の直接ショートカット**: 設計の粒度が「いつやるか」を飛ばして決定する。
+
+### なぜショートカットが存在するか
+
+Bridge 接続 (Mixed→Mixed) は意味的密度が最も高い。
+設計のスケール感はタイミングのスケール感と**直接共鳴する**:
+
+- 微細な設計 → 短期のタイミング感覚
+- 壮大な設計 → 長期のタイミング感覚
 
 ## 8関係
 
-| X | Source | Target | 認知的説明 | CCL |
+| X | Source | Target | ズーム伝播 | CCL |
 |:--|:-------|:-------|:-----------|:----|
-| X-SK1 | S1 Metron | K1 Eukairia | 測定基準→今が測定の好機か | `/met >> /euk` |
-| X-SK2 | S1 Metron | K2 Chronos | 測定基準→時間軸のスケール感 | `/met >> /chr` |
-| X-SK3 | S3 Stathmos | K1 Eukairia | 評価基準→今が評価の好機か | `/sta >> /euk` |
-| X-SK4 | S3 Stathmos | K2 Chronos | 評価基準→評価に必要な時間枠 | `/sta >> /chr` |
-| X-SK5 | S2 Mekhanē | K3 Telos | 方法→目的は正しいか | `/mek >> /tel` |
-| X-SK6 | S2 Mekhanē | K4 Sophia | 方法→知恵は足りているか | `/mek >> /sop` |
-| X-SK7 | S4 Praxis | K3 Telos | 実践→目的整合性 | `/pra >> /tel` |
-| X-SK8 | S4 Praxis | K4 Sophia | 実践→知識の充足度 | `/pra >> /sop` |
+| X-SK1 | S1 Metron | K1 Eukairia | 測定のスケール → 好機のスケール | `/met >> /euk` |
+| X-SK2 | S1 Metron | K2 Chronos | 測定のスケール → 時間のスケール | `/met >> /chr` |
+| X-SK3 | S3 Stathmos | K1 Eukairia | 評価のスケール → 好機のスケール | `/sta >> /euk` |
+| X-SK4 | S3 Stathmos | K2 Chronos | 評価のスケール → 時間のスケール | `/sta >> /chr` |
+| X-SK5 | S2 Mekhanē | K3 Telos | 方法の粒度 → 目的の粒度 | `/mek >> /tel` |
+| X-SK6 | S2 Mekhanē | K4 Sophia | 方法の粒度 → 必要知恵の粒度 | `/mek >> /sop` |
+| X-SK7 | S4 Praxis | K3 Telos | 実践の粒度 → 目的の粒度 | `/pra >> /tel` |
+| X-SK8 | S4 Praxis | K4 Sophia | 実践の粒度 → 必要知恵の粒度 | `/pra >> /sop` |
 
 ## アンチパターン
 
 | ❌ | 理由 |
 |:---|:-----|
-| タイミング無視で設計実行 | Eukairia (好機) の評価なしに動くのは reckless |
-| 目的を後付けする | Telos が S の後に来るのは正しいが、S を正当化するためにTを変えてはいけない |
+| 微細な設計に壮大な目的を付ける | ズームミスマッチ。/tel のスケールが /mek のスケールと不整合 |
+| ショートカットを常用する | P を飛ばすことでスコープ検証が抜ける。X-SP + X-PK を経由する方が安全 |
+| 目的を後付けする | Telos が S の後に来るのは正しいが、S を正当化するために T を変えてはいけない |
+
+## ズームチェーン上の位置
+
+```
+S (設計のズーム) ──[X-SK]──→ K (タイミングのズーム)
+                    ↑ ショートカット
+S → [X-SP] → P → [X-PK] → K  ← 正規ルート
+```
+
+> Bridge ならではの直接接続。ただし正規ルート (S→P→K) も常に存在する。

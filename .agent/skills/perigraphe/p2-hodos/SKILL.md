@@ -1,115 +1,132 @@
 ---
-# Theorem Metadata (v2.1)
+# Theorem Metadata (v3.0)
 id: "P2"
 name: "Hodos"
 greek: "Ὁδός"
 series: "Perigraphē"
 generation:
-  formula: "Scale × Function"
-  result: "スケール方法 — 条件空間における経路"
+  formula: "Scale × Explore"
+  result: "スケール探索 — 到達経路の定義"
 
 description: >
-  どう進める？・経路を決めたい・道筋を選びたい時に発動。
-  Path definition, route planning, methodology selection.
-  Use for: 経路, 道筋, path, route, 方法論.
-  NOT for: path already determined (proceed directly).
+  どのルートで進む？・道筋を決めたい・経路を定義したい時に発動。
+  Path definition, route planning, journey mapping.
+  Use for: 道筋, 経路, route, path, ルート.
+  NOT for: 反復的なサイクル (→ Trokhia P3).
 
 triggers:
-  - 経路の定義
-  - 方法論の選択
-  - ナビゲーション計画
+  - 到達経路の定義
+  - ルート計画
+  - 段階的ステップの設計
+  - /hod コマンド
 
-keywords:
-  - hodos
-  - path
-  - way
-  - route
-  - methodology
-  - 経路
-  - 道
+keywords: [hodos, path, route, way, journey, 道, 経路]
 
 related:
   upstream:
-    - "S2 Mekhanē"
+    - "S1 Metron (X-SP2: 測定基準→到達経路を制約)"
+    - "S3 Stathmos (X-SP4: 評価基準→達成への道筋)"
   downstream:
-    - "K1 Eukairia"
-    - "K2 Chronos"
-  x_series:
-    - "← X-SP2 ← S2 Mekhanē"
-    - "X-PK3 → K1 Eukairia"
-    - "X-PK4 → K2 Chronos"
+    - "K1 Eukairia (X-PK3: 経路→今この道を進むべきか)"
+    - "K2 Chronos (X-PK4: 経路→この道にかかる時間)"
 
-implementation:
-  micro: "(implicit)"
-  macro: "(future)"
-  templates: []
-
-version: "2.1.0"
+version: "3.0.0"
 workflow_ref: ".agent/workflows/hod.md"
 risk_tier: L1
 reversible: true
 requires_approval: false
-risks:
-  - "環境設計の偏りによるスコープ逸脱"
-fallbacks: []
 ---
 
 # P2: Hodos (Ὁδός)
 
-> **生成**: Scale × Function
-> **役割**: 条件空間における経路
+> **生成**: Scale × Explore
+> **役割**: 到達経路を定義する（直線的な道筋）
+> **認知的意味**: 「どのルートで目的地に向かうか」を設計する
 
 ## When to Use
 
 ### ✓ Trigger
 
-- 経路・道筋の定義
-- スコープ内での方法選択
-- ナビゲーション計画
+- A 地点から B 地点へのルート計画
+- 段階的な実装ステップの設計
+- マイルストーンの定義
+- 「どう進めるか」の道筋
 
 ### ✗ Not Trigger
 
-- 経路が既に決まっている
+- 反復サイクル → `/tro` (Trokhia: 周回)
+- 領域の定義 → `/kho` (Khōra: 場)
+- 一回限りの実行 → `/ene` (Energeia: 行為)
 
 ## Processing Logic
 
 ```
-入力: 条件空間 + 目標
+入力: 出発点 + 目的地
   ↓
-[STEP 1] 経路探索
-  ├─ Explore経路: 新しい道を探る
-  └─ Exploit経路: 既知の道を辿る
+[STEP 1] 経路候補の生成
+  ├─ 直行ルート: 最短経路
+  ├─ 安全ルート: リスク最小化
+  └─ 探索ルート: 学習最大化
   ↓
-[STEP 2] 経路評価
+[STEP 2] マイルストーン設計
+  ├─ 中間目標の設定
+  └─ 各区間の見積もり
   ↓
-出力: 選択された経路
+[STEP 3] ズームレベル確認 (構造層)
+  ├─ 測定基準のズーム (S1) から伝播 → X-SP2
+  └─ 時間のズーム (K2) と整合 → X-PK4
+  ↓
+出力: [経路定義, マイルストーン, 所要時間]
 ```
 
 ## X-series 接続
 
-```mermaid
-graph LR
-    S2[S2 Mekhanē] -->|X-SP2| P2[P2 Hodos]
-    P2 -->|X-PK3| K1[K1 Eukairia]
-    P2 -->|X-PK4| K2[K2 Chronos]
+> **自然度**: 構造（ズームレベルの伝播）
+
+### 入力射
+
+| X | Source | ズーム伝播 | CCL |
+|:--|:-------|:-----------|:----|
+| X-SP2 | S1 Metron | 測定のスケール→経路のスケール | `/met >> /hod` |
+| X-SP4 | S3 Stathmos | 評価のスケール→道筋のスケール | `/sta >> /hod` |
+
+### 出力射
+
+| X | Target | ズーム伝播 | CCL |
+|:--|:-------|:-----------|:----|
+| X-PK3 | K1 Eukairia | 経路のスケール→好機のスケール | `/hod >> /euk` |
+| X-PK4 | K2 Chronos | 経路のスケール→時間のスケール | `/hod >> /chr` |
+
+## CCL 使用例
+
+```ccl
+# 評価基準から道筋を導出
+/sta{criteria: "96要素充実度"} >> /hod{milestone: true}
+
+# 道の時間見積もり
+/hod{route: "B→D→C"} >> /chr{estimate: true}
+
+# 経路と好機の同時評価
+/hod{path: "planned"} >> /euk{question: "今この道を進むべきか"}
 ```
 
----
+## アンチパターン
 
-*Hodos: 古代ギリシャにおける「道・道筋・方法」*
+| ❌ | 理由 |
+|:---|:-----|
+| 目的地なしに道を定義 | Boulēsis→Hodos の因果が必要 |
+| Trokhia との混同 | Hodos = 直線 (A→B), Trokhia = 周回 (A→...→A) |
+| ズーム不整合 | マクロ測定 + ミクロ経路 = ギャップ |
 
----
-
-## Related Modes
-
-このスキルに関連する `/hod` WFモード (7件):
+## 派生モード
 
 | Mode | CCL | 用途 |
-|:-----|:----|:-----|
-| line | `/hod.line` | 直線経路 |
-| bran | `/hod.bran` | 分岐経路 |
-| cycl | `/hod.cycl` | 循環経路 |
-| bisect | `/hod.bisect` | 二分探索 |
-| backcast | `/hod.backcast` | 逆算 |
-| search | `/hod.search` | 探索 |
-| backward | `/hod.backward` | 逆行 |
+|:-----|:----|:-----:|
+| direct | `/hod.direct` | 最短経路 |
+| safe | `/hod.safe` | リスク最小経路 |
+| explore | `/hod.explore` | 学習最大経路 |
+
+---
+
+*Hodos: 古代ギリシャにおける「道・旅路・方法」*
+*v3.0: ズームチェーン統合 + X-series全接続 (2026-02-07)*

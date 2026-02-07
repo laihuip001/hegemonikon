@@ -156,6 +156,33 @@ class SuggestResult:
         return f"⟨{names} | {self.oscillation.value} | top={self.top_similarity:.3f}⟩"
 
 
+@dataclass
+class SegmentResult:
+    """分解された各セグメントの結果"""
+    text: str
+    diagnosis: SuggestResult
+
+    def __repr__(self) -> str:
+        series = "+".join(r.series for r in self.diagnosis.attractors) or "?"
+        return f"⟨'{self.text[:30]}...' → {series}⟩"
+
+
+@dataclass
+class DecomposeResult:
+    """decompose() の結果: 各セグメント + マージされた結果"""
+    segments: list[SegmentResult]
+    merged_series: list[str]
+    merged_workflows: list[str]
+
+    @property
+    def is_multi(self) -> bool:
+        """複数の Series に分解されたか"""
+        return len(self.merged_series) > 1
+
+    def __repr__(self) -> str:
+        return f"⟨Decompose: {'+'.join(self.merged_series)} ({len(self.segments)} segments)⟩"
+
+
 # ---------------------------------------------------------------------------
 # SeriesAttractor
 # ---------------------------------------------------------------------------
@@ -344,7 +371,82 @@ class SeriesAttractor:
         results.sort(key=lambda x: x.similarity, reverse=True)
         return results
 
+    def decompose(
+        self,
+        user_input: str,
+    ) -> DecomposeResult:
+        """
+        入力を文に分解し、各文ごとに attractor を診断する。
+        複合的な入力から複数の Series を自然に抽出する。
+
+        例: "Why does this design need to be built now?"
+        → "Why does this" → O
+        → "design need to be built" → S
+        → "now" → K
+
+        Returns:
+            DecomposeResult with per-segment diagnoses and merged attractors
+        """
+        segments = self._split_sentences(user_input)
+
+        if len(segments) <= 1:
+            # 単一文 → 通常の diagnose に委譲
+            result = self.diagnose(user_input)
+            return DecomposeResult(
+                segments=[SegmentResult(text=user_input, diagnosis=result)],
+                merged_series=list({r.series for r in result.attractors}),
+                merged_workflows=self._merge_workflows(result.attractors),
+            )
+
+        segment_results: list[SegmentResult] = []
+        all_attractors: list[AttractorResult] = []
+
+        for seg in segments:
+            seg_text = seg.strip()
+            if not seg_text:
+                continue
+            diag = self.diagnose(seg_text)
+            segment_results.append(SegmentResult(text=seg_text, diagnosis=diag))
+            all_attractors.extend(diag.attractors)
+
+        # 重複排除して Series を集約（similarity 最大のものを保持）
+        best_per_series: dict[str, AttractorResult] = {}
+        for ar in all_attractors:
+            if ar.series not in best_per_series or ar.similarity > best_per_series[ar.series].similarity:
+                best_per_series[ar.series] = ar
+
+        # similarity 順でソート
+        merged = sorted(best_per_series.values(), key=lambda x: x.similarity, reverse=True)
+        merged_series = [r.series for r in merged]
+        merged_workflows = self._merge_workflows(merged)
+
+        return DecomposeResult(
+            segments=segment_results,
+            merged_series=merged_series,
+            merged_workflows=merged_workflows,
+        )
+
     # --- Internal ---
+
+    @staticmethod
+    def _split_sentences(text: str) -> list[str]:
+        """簡易文分割: 句読点・ピリオド・改行で分割"""
+        import re
+        # 日本語: 。！？  英語: . ! ?  共通: 改行
+        parts = re.split(r'[。！？.!?\n]+', text)
+        return [p.strip() for p in parts if p.strip()]
+
+    @staticmethod
+    def _merge_workflows(attractors: list[AttractorResult]) -> list[str]:
+        """ワークフローを重複排除してマージ"""
+        seen: set[str] = set()
+        result: list[str] = []
+        for ar in attractors:
+            for wf in ar.workflows:
+                if wf not in seen:
+                    seen.add(wf)
+                    result.append(wf)
+        return result
 
     @staticmethod
     def _cosine_similarity(a: np.ndarray, b: np.ndarray) -> float:

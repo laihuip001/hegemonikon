@@ -30,3 +30,22 @@ mneme/.hegemonikon/sessions/*
 **/.hegemonikon/sessions/*
 .gemini/oauth_creds.json
 .gemini/google_accounts.json
+
+# Large model files (download at runtime)
+*.onnx
+*.bin
+*.safetensors
+mekhane/anamnesis/models/
+
+# Node modules (never commit)
+**/node_modules/
+
+# SQLite WAL/SHM (transient)
+*.sqlite-wal
+*.sqlite-shm
+
+# n8n runtime data
+mekhane/ergasterion/n8n/data/
+
+# Runtime browser profile
+runtime/

@@ -11,6 +11,16 @@ triggers:
   - "practice"
 version: "2.3"
 lineage: "v2.2 + FBR変換 → v2.3"
+trigonon:
+  series: S
+  type: Mixed
+  theorem: S4
+  coordinates: [A, Function]
+  bridge: [H, K]
+  anchor_via: [O, P]
+  morphisms:
+    ">>H": [/pro, /pis, /ore, /dox]
+    ">>K": [/euk, /chr, /tel, /sop]
 cognitive_algebra:
   "+": "詳細実践分析。全ステップ、リスク、代替案"
   "-": "即断実践。次の1アクションのみ"
@@ -196,6 +206,19 @@ ccl_signature: "/pra+_/ene"
 ```
 
 ---
+
+
+---
+
+## @complete: 射の提案 (暗黙発動 L1)
+
+> WF完了時、`/x` 暗黙発動プロトコルにより射を提案する。
+> 計算ツール: `python mekhane/taxis/morphism_proposer.py pra`
+
+```
+/pra 完了 → @complete 発動
+→ 結果に確信がありますか？ (Y: Anchor優先 / N: Bridge優先 / 完了)
+```
 
 ## Hegemonikon Status
 

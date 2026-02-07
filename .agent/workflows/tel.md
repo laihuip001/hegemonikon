@@ -11,6 +11,16 @@ triggers:
 version: "3.4"
 lineage: "v3.3 + FBR変換 → v3.4"
 derivatives: [intr, extr, tran, objective]
+trigonon:
+  series: K
+  type: Mixed
+  theorem: K3
+  coordinates: [Function, C]
+  bridge: [S, H]
+  anchor_via: [P, A]
+  morphisms:
+    ">>S": [/met, /mek, /sta, /pra]
+    ">>H": [/pro, /pis, /ore, /dox]
 cognitive_algebra:
   "+": "詳細目的分析。5 Whys、目的階層、トレードオフ"
   "-": "即断目的。何のための1行回答"
@@ -232,6 +242,19 @@ ccl_signature: "/tel+?k3"
 ```
 
 ---
+
+
+---
+
+## @complete: 射の提案 (暗黙発動 L1)
+
+> WF完了時、`/x` 暗黙発動プロトコルにより射を提案する。
+> 計算ツール: `python mekhane/taxis/morphism_proposer.py tel`
+
+```
+/tel 完了 → @complete 発動
+→ 結果に確信がありますか？ (Y: Anchor優先 / N: Bridge優先 / 完了)
+```
 
 ## Hegemonikon Status
 

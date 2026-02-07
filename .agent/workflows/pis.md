@@ -12,6 +12,16 @@ triggers:
 version: "2.3"
 lineage: "v2.2 + FBR変換 → v2.3"
 derivatives: [subj, inte, obje, bayes, probabilistic, uncertainty, calibrate]
+trigonon:
+  series: H
+  type: Mixed
+  theorem: H2
+  coordinates: [I, U]
+  bridge: [S, K]
+  anchor_via: [O, A]
+  morphisms:
+    ">>S": [/met, /mek, /sta, /pra]
+    ">>K": [/euk, /chr, /tel, /sop]
 cognitive_algebra:
   "+": "詳細確信：根拠列挙、信頼区間、反証可能性"
   "-": "即断確信：HIGH/MEDIUM/LOW のみ"
@@ -283,6 +293,19 @@ ccl_signature: "/pis+?h2"
 ```
 
 ---
+
+
+---
+
+## @complete: 射の提案 (暗黙発動 L1)
+
+> WF完了時、`/x` 暗黙発動プロトコルにより射を提案する。
+> 計算ツール: `python mekhane/taxis/morphism_proposer.py pis`
+
+```
+/pis 完了 → @complete 発動
+→ 結果に確信がありますか？ (Y: Anchor優先 / N: Bridge優先 / 完了)
+```
 
 ## Hegemonikon Status
 

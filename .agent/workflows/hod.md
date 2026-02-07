@@ -12,6 +12,16 @@ triggers:
 version: "2.3"
 lineage: "v2.2 + FBR変換 → v2.3"
 derivatives: [line, bran, cycl, search, backward, bisect, backcast]
+trigonon:
+  series: P
+  type: Pure
+  theorem: P2
+  coordinates: [Scale, Function]
+  bridge: []
+  anchor_via: [S, K]
+  morphisms:
+    ">>S": [/met, /mek, /sta, /pra]
+    ">>K": [/euk, /chr, /tel, /sop]
 cognitive_algebra:
   "+": "詳細経路：代替経路とトレードオフを列挙"
   "-": "即経路：Explore/Exploit の一言のみ"
@@ -274,6 +284,19 @@ ccl_signature: "/hod+_/ene"
 ```
 
 ---
+
+
+---
+
+## @complete: 射の提案 (暗黙発動 L1)
+
+> WF完了時、`/x` 暗黙発動プロトコルにより射を提案する。
+> 計算ツール: `python mekhane/taxis/morphism_proposer.py hod`
+
+```
+/hod 完了 → @complete 発動
+→ 結果に確信がありますか？ (Y: Anchor優先 / N: Bridge優先 / 完了)
+```
 
 ## Hegemonikon Status
 

@@ -12,6 +12,16 @@ triggers:
 version: "1.4"
 lineage: "v1.3 + FBR変換 → v1.4"
 derivatives: [regu, dead, esti]
+trigonon:
+  series: K
+  type: Mixed
+  theorem: K2
+  coordinates: [Scale, U]
+  bridge: [S, H]
+  anchor_via: [P, A]
+  morphisms:
+    ">>S": [/met, /mek, /sta, /pra]
+    ">>H": [/pro, /pis, /ore, /dox]
 cognitive_algebra:
   "+": "詳細時間分析。短期/中期/長期、依存関係"
   "-": "即断期限。いつまでの1行回答"
@@ -204,6 +214,19 @@ ccl_signature: "/chr+"
 ```
 
 ---
+
+
+---
+
+## @complete: 射の提案 (暗黙発動 L1)
+
+> WF完了時、`/x` 暗黙発動プロトコルにより射を提案する。
+> 計算ツール: `python mekhane/taxis/morphism_proposer.py chr`
+
+```
+/chr 完了 → @complete 発動
+→ 結果に確信がありますか？ (Y: Anchor優先 / N: Bridge優先 / 完了)
+```
 
 ## Hegemonikon Status
 

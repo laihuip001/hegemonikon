@@ -12,6 +12,16 @@ triggers:
 version: "1.4"
 lineage: "v1.3 + FBR変換 → v1.4"
 derivatives: [prac, theo, tech, case, transfer, pattern, statistical, base_rate, reuse, triz40, generalize, typed]
+trigonon:
+  series: A
+  type: Pure
+  theorem: A4
+  coordinates: [U, U]
+  bridge: []
+  anchor_via: [H, K]
+  morphisms:
+    ">>H": [/pro, /pis, /ore, /dox]
+    ">>K": [/euk, /chr, /tel, /sop]
 cognitive_algebra:
   "+": "詳細検証：確信度・根拠・反証可能性を完全評価"
   "-": "即検証：Epistēmē/Doxa/Hypo の一言のみ"
@@ -345,6 +355,19 @@ ccl_signature: "/epi+"
 **保存理由**: コンテキスト節約、参照可能性、パターン蓄積
 
 ---
+
+
+---
+
+## @complete: 射の提案 (暗黙発動 L1)
+
+> WF完了時、`/x` 暗黙発動プロトコルにより射を提案する。
+> 計算ツール: `python mekhane/taxis/morphism_proposer.py epi`
+
+```
+/epi 完了 → @complete 発動
+→ 結果に確信がありますか？ (Y: Anchor優先 / N: Bridge優先 / 完了)
+```
 
 ## Hegemonikon Status
 

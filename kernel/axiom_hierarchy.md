@@ -56,7 +56,12 @@ graph TD
 > **直交性の必然性** (Spisak & Friston, 2025):
 > FEP を random dynamical system に適用すると、自己直交化する attractor network が創発する。
 > 直交性は predictive accuracy と model complexity の同時最適化の**数学的帰結**。
-> → **6 Series の直交配置は設計ではなく FEP からの演繹的必然**。
+> → **6 Series の直交配置は FEP からの演繹的導出であり、Spisak 2025 はこの構造が動力学的にも最適であることを裏付ける。**
+
+> **Attractor としての 6 Series**:
+> 現在の 6 Series は静的な基底ベクトル（手動コマンドで発動）。
+> FEP に従えば、**動的な attractor**（入力に応じて自然に収束）であるのが本来の姿。
+> → basin of attraction の実装が次の課題。
 
 > **Temporal Depth** (Kirchhoff et al., 2018):
 > 「mere active inference」(振り子の同期) と「adaptive active inference」(時間的深さを持つ生成モデル) を区別。

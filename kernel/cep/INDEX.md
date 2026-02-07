@@ -11,6 +11,7 @@
 |:----|:------|:-------|:-------|:-----|
 | [CEP-000](CEP-000.md) | CCL 初期仕様と言語進化ガバナンス | **Final** | Creator + AI | 2026-01-30 |
 | [CEP-001](CEP-001.md) | CCL FEP 記号拡張仕様 | **Accepted** | Creator + AI | 2026-01-31 |
+| [CEP-003](CEP-003.md) | Temporal Depth と Replay メトリクス | **Draft** | Claude (Antigravity) | 2026-02-07 |
 
 ---
 

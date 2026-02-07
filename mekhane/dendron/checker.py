@@ -120,6 +120,7 @@ class CheckResult:
     total_functions: int = 0
     functions_with_purpose: int = 0
     functions_missing_purpose: int = 0
+    functions_weak_purpose: int = 0  # v2.6: WEAK 品質の Purpose 数
     function_proofs: List[FunctionProof] = field(default_factory=list)
     
     level_stats: Dict[str, int] = field(default_factory=dict)  # L1/L2/L3 統計
@@ -539,10 +540,11 @@ class DendronChecker:  # noqa: AI-007
             file_proofs=file_proofs,
             dir_proofs=dir_proofs,
             
-            # v2.5
+            # v2.5, v2.6
             total_functions=total_functions,
             functions_with_purpose=funcs_ok,
             functions_missing_purpose=funcs_missing,
+            functions_weak_purpose=funcs_weak,
             function_proofs=function_proofs,
             
             level_stats=level_stats,

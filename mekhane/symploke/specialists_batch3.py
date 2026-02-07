@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L3/ユーティリティ] <- mekhane/symploke/ O4→専門家定義が必要→specialists_batch3 が担う
 """
 Specialist v2 カテゴリ: AI生成コード, Hegemonikón/FEP, 認知科学, エッジケース, 
 コードレビュー, ドキュメント, 日本語処理, 究極の純化

@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L3/ユーティリティ] <- mekhane/peira/scripts/ 実験的コード置き場
 """
 note.com 記事収集スクリプト v2
 シンプル版 - 即時実行

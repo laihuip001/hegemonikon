@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L3/ユーティリティ] <- mekhane/symploke/ O4→専門家定義が必要→specialists_batch1 が担う
 """
 Specialist v2 カテゴリ: 型・安全性、エラー処理、関数設計、クラス設計
 """

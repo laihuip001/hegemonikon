@@ -1,3 +1,4 @@
+# PROOF: [L3/ユーティリティ] <- mekhane/taxis/ O4→射提案が必要→morphism_proposer が担う
 """
 morphism_proposer.py — X-series 射提案エンジン
 

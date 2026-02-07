@@ -103,10 +103,15 @@ class Reranker:
         self._model = CrossEncoder(self.model_name, device="cuda")
         print(f"[Reranker] Loaded ({self.model_name})", flush=True)
 
+    # Cross-encoder score threshold (Layer 2)
+    # MiniLM scores are relative, not absolute.
+    # Used only as a secondary noise filter.
+    SCORE_THRESHOLD = -4.0
+
     def rerank(
         self, query: str, results: list[dict], top_k: int = 5
     ) -> list[dict]:
-        """検索結果を cross-encoder で再スコアリング.
+        """検索結果を cross-encoder で再スコアリング + 閾値フィルタ.
 
         Args:
             query: 検索クエリ
@@ -114,7 +119,7 @@ class Reranker:
             top_k: 返す件数
 
         Returns:
-            re-scored & sorted results (top_k)
+            re-scored, filtered & sorted results (top_k)
         """
         if not results:
             return results
@@ -138,10 +143,16 @@ class Reranker:
         for r, score in zip(results, scores):
             r["_rerank_score"] = float(score)
 
-        # re-rank score でソート (高い方が良い)
-        results.sort(key=lambda r: r.get("_rerank_score", -999), reverse=True)
+        # Layer 2: cross-encoder 閾値フィルタ
+        filtered = [
+            r for r in results
+            if r.get("_rerank_score", -999) > self.SCORE_THRESHOLD
+        ]
 
-        return results[:top_k]
+        # re-rank score でソート (高い方が良い)
+        filtered.sort(key=lambda r: r.get("_rerank_score", -999), reverse=True)
+
+        return filtered[:top_k]
 
 
 class KnowledgeIndexer:
@@ -348,10 +359,25 @@ class GnosisChat:
 
     NotebookLM のように、自分のデータに基づいて対話する。
     完全ローカル (オフライン動作可能)。
+
+    3層ハルシネーション防御:
+      Layer 1: bi-encoder distance threshold
+      Layer 2: cross-encoder score threshold
+      Layer 3: confidence assessment → prompt adaptation
     """
 
-    # Qwen 3B (4bit) — 品質とVRAMのバランス
     DEFAULT_MODEL = "Qwen/Qwen2.5-3B-Instruct"
+
+    # Layer 1: bi-encoder distance threshold
+    # LanceDB L2 distance on normalized vectors:
+    #   0 = identical, ~1.0 = unrelated, ~1.41 = opposite
+    DISTANCE_THRESHOLD = 0.85
+
+    # Confidence levels
+    CONFIDENCE_HIGH = "high"
+    CONFIDENCE_MEDIUM = "medium"
+    CONFIDENCE_LOW = "low"
+    CONFIDENCE_NONE = "none"
 
     def __init__(
         self,
@@ -409,24 +435,57 @@ class GnosisChat:
         vram_mb = torch.cuda.memory_allocated() / 1e6
         print(f"[Gnōsis Chat] Model loaded ({vram_mb:.0f}MB VRAM)", flush=True)
 
-    def _retrieve(self, query: str) -> list[dict]:
-        """全テーブルからセマンティック検索 + rerank.
+    def _translate_query(self, query: str) -> str:
+        """非英語クエリを英訳 (BGE-small は英語専用のため).
 
-        Strategy:
-          1. bi-encoder で 3x オーバーフェッチ
-          2. cross-encoder で re-score
-          3. top-k に絞る
+        BGE-small-en は英語のみ対応。日本語クエリでは全ベクトルが
+        狭い空間に圧縮され、距離閾値が機能しない。
+        Qwen 3B で英訳してから検索することで精度を改善する。
         """
-        self._load_index()
-        results = []
+        # ASCII比率で英語判定 (高速)
+        ascii_ratio = sum(1 for c in query if ord(c) < 128) / max(len(query), 1)
+        if ascii_ratio > 0.8:
+            return query  # 既に英語
 
-        # reranker 使用時は 3x オーバーフェッチ
+        self._load_model()
+        prompt = (
+            "<|im_start|>system\n"
+            "Translate the following text to English. "
+            "Output ONLY the translation, nothing else.<|im_end|>\n"
+            f"<|im_start|>user\n{query}<|im_end|>\n"
+            "<|im_start|>assistant\n"
+        )
+        import torch
+        inputs = self._tokenizer(prompt, return_tensors="pt").to(self._model.device)
+        with torch.no_grad():
+            outputs = self._model.generate(
+                **inputs, max_new_tokens=64,
+                do_sample=False, temperature=1.0,
+                pad_token_id=self._tokenizer.eos_token_id,
+            )
+        input_len = inputs["input_ids"].shape[1]
+        translated = self._tokenizer.decode(
+            outputs[0][input_len:], skip_special_tokens=True
+        ).strip()
+        if translated:
+            print(f"[Gnōsis Chat] Translated: {query} → {translated}", flush=True)
+            return translated
+        return query
+
+    def _retrieve(self, query: str) -> list[dict]:
+        """全テーブルからセマンティック検索 + 閾値フィルタ + rerank."""
+        self._load_index()
+
+        # クエリ英訳 (BGE-small 対策)
+        search_query = self._translate_query(query)
+
+        results = []
         fetch_k = self.top_k * 3 if self._reranker else self.top_k
 
         # Papers table
         if self.search_papers:
             try:
-                paper_results = self._index.search(query, k=fetch_k)
+                paper_results = self._index.search(search_query, k=fetch_k)
                 for r in paper_results:
                     r["_source_table"] = "papers"
                 results.extend(paper_results)
@@ -438,7 +497,7 @@ class GnosisChat:
             try:
                 if "knowledge" in self._index.db.table_names():
                     embedder = self._index._get_embedder()
-                    qvec = embedder.embed(query)
+                    qvec = embedder.embed(search_query)
                     table = self._index.db.open_table("knowledge")
                     k_results = table.search(qvec).limit(fetch_k).to_list()
                     for r in k_results:
@@ -447,16 +506,48 @@ class GnosisChat:
             except Exception:
                 pass
 
-        # _distance でソート (低い方が類似度が高い)
+        # Layer 1: bi-encoder 距離閾値フィルタ
+        before_filter = len(results)
+        results = [
+            r for r in results
+            if r.get("_distance", 999) < self.DISTANCE_THRESHOLD
+        ]
+        if before_filter > 0 and len(results) == 0:
+            print(f"[Gnōsis Chat] Layer 1: all {before_filter} results filtered "
+                  f"(min_dist > {self.DISTANCE_THRESHOLD})", flush=True)
+
         results.sort(key=lambda r: r.get("_distance", 999))
 
-        # Reranker で精度向上
+        # Layer 2: Reranker
         if self._reranker and results:
             results = self._reranker.rerank(query, results, top_k=self.top_k)
         else:
             results = results[:self.top_k]
 
         return results
+
+    def _assess_confidence(self, results: list[dict]) -> str:
+        """Layer 3: 検索結果の品質から確信度を判定.
+
+        距離 (bi-encoder) のみで判定する。
+        cross-encoder スコアは relative ranking 用であり absolute 判定には不適。
+        """
+        if not results:
+            return self.CONFIDENCE_NONE
+
+        distances = [r.get("_distance", 999) for r in results]
+        min_dist = min(distances)
+        avg_dist = sum(distances) / len(distances)
+        n = len(results)
+
+        if min_dist < 0.5 and n >= 3 and avg_dist < 0.7:
+            return self.CONFIDENCE_HIGH
+        elif min_dist < 0.6:
+            return self.CONFIDENCE_HIGH
+        elif min_dist < 0.75:
+            return self.CONFIDENCE_MEDIUM
+        else:
+            return self.CONFIDENCE_LOW
 
     def _build_context(self, results: list[dict]) -> str:
         """検索結果からコンテキスト文字列を構築."""
@@ -509,54 +600,68 @@ class GnosisChat:
         return self._tokenizer.decode(answer_tokens, skip_special_tokens=True)
 
     def ask(self, question: str) -> dict:
-        """質問に回答する (RAG + マルチターン).
-
-        Returns:
-            dict with keys: answer, sources, retrieval_time, generation_time
-        """
-        # 1. Retrieve
+        """質問に回答する (RAG + マルチターン + 3層防御)."""
+        # 1. Retrieve (Layer 1 + 2)
         t0 = time.time()
         results = self._retrieve(question)
         retrieval_time = time.time() - t0
 
-        # 2. Build context
+        # 2. Layer 3: Confidence
+        confidence = self._assess_confidence(results)
         context = self._build_context(results)
 
-        # 3. System prompt
-        system_prompt = (
-            "あなたは Hegemonikón の知識ベース対話アシスタントです。\n"
-            "以下の検索結果に基づいて、ユーザーの質問に日本語で正確に回答してください。\n"
-            "検索結果に含まれない情報については、その旨を明示してください。\n"
-            "回答は簡潔で構造的にしてください。\n"
-            "引用する場合は [番号] の形式で参照元を示してください。"
-        )
+        # 3. Confidence-adaptive response
+        if confidence == self.CONFIDENCE_NONE:
+            answer = (
+                "⚠️ 知識ベースにこの質問に関連する情報が見つかりませんでした。\n\n"
+                "以下をお試しください:\n"
+                "- 別のキーワードで質問する\n"
+                "- `/index` で知識ベースを更新する\n"
+                "- 関連する論文を `collect` で追加する"
+            )
+            generation_time = 0
+        else:
+            conf_instr = {
+                self.CONFIDENCE_HIGH: "検索結果に十分な情報があります。自信を持って回答してください。",
+                self.CONFIDENCE_MEDIUM: (
+                    "検索結果に部分的な情報があります。"
+                    "不確実な部分は『知識ベースに十分な情報がありません』と明示してください。"
+                ),
+                self.CONFIDENCE_LOW: (
+                    "検索結果との関連性が低い可能性があります。"
+                    "推測や創作は絶対にしないでください。"
+                    "回答冒頭に『⚠️ 関連性が低い情報に基づく回答です』と記載してください。"
+                    "答えられない場合は『十分な情報がありません』と正直に返してください。"
+                ),
+            }.get(confidence, "")
 
-        # 4. Build prompt with history
-        prompt = f"<|im_start|>system\n{system_prompt}<|im_end|>\n"
+            system_prompt = (
+                "あなたは Hegemonikón の知識ベース対話アシスタントです。\n"
+                "以下の検索結果に基づいて、ユーザーの質問に日本語で正確に回答してください。\n"
+                f"{conf_instr}\n"
+                "回答は簡潔で構造的にしてください。\n"
+                "引用する場合は [番号] の形式で参照元を示してください。\n"
+                "検索結果にない情報を創作・推測しないでください。"
+            )
 
-        # 過去の会話履歴を追加
-        history_text = self.history.format_for_prompt()
-        if history_text:
-            prompt += history_text + "\n"
+            prompt = f"<|im_start|>system\n{system_prompt}<|im_end|>\n"
+            history_text = self.history.format_for_prompt()
+            if history_text:
+                prompt += history_text + "\n"
+            prompt += (
+                f"<|im_start|>user\n"
+                f"## 検索結果 (関連文書)\n\n{context}\n\n"
+                f"## 質問\n{question}<|im_end|>\n"
+                f"<|im_start|>assistant\n"
+            )
 
-        # 現在の質問 + コンテキスト
-        prompt += (
-            f"<|im_start|>user\n"
-            f"## 検索結果 (関連文書)\n\n{context}\n\n"
-            f"## 質問\n{question}<|im_end|>\n"
-            f"<|im_start|>assistant\n"
-        )
+            t0 = time.time()
+            answer = self._generate(prompt)
+            generation_time = time.time() - t0
 
-        # 5. Generate
-        t0 = time.time()
-        answer = self._generate(prompt)
-        generation_time = time.time() - t0
-
-        # 6. 履歴に追加
         self.history.add("user", question)
         self.history.add("assistant", answer.strip())
 
-        # 7. Format sources
         sources = []
         for r in results:
             sources.append({
@@ -564,12 +669,14 @@ class GnosisChat:
                 "source": r.get("source", "unknown"),
                 "table": r.get("_source_table", "unknown"),
                 "url": r.get("url", ""),
-                "relevance": round(1 - r.get("_distance", 0), 2),
+                "distance": round(r.get("_distance", 0), 4),
+                "rerank_score": r.get("_rerank_score"),
             })
 
         return {
             "answer": answer.strip(),
             "sources": sources,
+            "confidence": confidence,
             "retrieval_time": round(retrieval_time, 3),
             "generation_time": round(generation_time, 1),
             "context_docs": len(results),
@@ -667,8 +774,10 @@ def cmd_chat(args) -> int:
             return 0
 
     if args.question:
-        # Single question mode
         result = chat.ask(args.question)
+        conf_icon = {"high": "🟢", "medium": "🟡", "low": "🟠", "none": "🔴"}.get(
+            result.get("confidence", ""), "⚪")
+        print(f"\n{conf_icon} Confidence: {result.get('confidence', '?')}")
         print(f"\n💡 Answer:\n\n{result['answer']}")
         print(f"\n---")
         print(f"📚 Sources ({result['context_docs']} docs, "
@@ -676,11 +785,13 @@ def cmd_chat(args) -> int:
               f"generation: {result['generation_time']}s):")
         for i, s in enumerate(result["sources"], 1):
             icon = {"papers": "📄", "knowledge": "🧠"}.get(s["table"], "📁")
-            print(f"  [{i}] {icon} [{s['source']}] {s['title']}")
+            d = s.get('distance', 0)
+            rs = s.get('rerank_score')
+            score_str = f" rs={rs:.1f}" if rs is not None else ""
+            print(f"  [{i}] {icon} [{s['source']}] {s['title']} (d={d:.4f}{score_str})")
             if s["url"]:
                 print(f"      {s['url']}")
         return 0
     else:
-        # Interactive mode
         chat.interactive()
         return 0

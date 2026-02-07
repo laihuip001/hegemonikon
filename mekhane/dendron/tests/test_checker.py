@@ -1,0 +1,357 @@
+# PROOF: [L3/テスト] <- mekhane/dendron/
+"""
+Dendron Checker テスト
+
+checker.py の各メソッドの単体テスト。
+v2.6: Purpose 品質チェック (WEAK 検出) のテストを含む。
+"""
+
+from pathlib import Path
+
+import pytest
+
+from mekhane.dendron.checker import (
+    DendronChecker,
+    ProofStatus,
+    ProofLevel,
+    FileProof,
+    FunctionProof,
+    VariableProof,
+    CheckResult,
+    PURPOSE_PATTERN,
+    WEAK_PURPOSE_PATTERNS,
+)
+
+
+# ─── Fixtures ─────────────────────────────────────
+
+
+@pytest.fixture
+def checker():
+    """標準チェッカー (exempt パターンなし)。
+    pytest の tmp ディレクトリ名に 'test_' が含まれるため、
+    L1/L2 テストでは exempt パターンを無効化する。"""
+    return DendronChecker(exempt_patterns=[])
+
+
+@pytest.fixture
+def checker_with_exemptions():
+    """除外パターン付きチェッカー (exemption テスト専用)"""
+    return DendronChecker()
+
+
+@pytest.fixture
+def tmp_py_file(tmp_path):
+    """一時 Python ファイルを生成するファクトリ"""
+    def _create(content: str, name: str = "sample_module.py") -> Path:
+        f = tmp_path / name
+        f.write_text(content, encoding="utf-8")
+        return f
+    return _create
+
+
+# ─── L1: PROOF Header Tests ──────────────────────
+
+
+class TestFileProof:
+    """L1 ファイル PROOF ヘッダーのテスト"""
+
+    def test_valid_proof_with_parent(self, checker, tmp_py_file):
+        f = tmp_py_file('# PROOF: [L2/インフラ] <- mekhane/dendron/\n"Module docstring"\n')
+        result = checker.check_file_proof(f)
+        assert result.status == ProofStatus.OK
+        assert result.level == ProofLevel.L2
+        assert result.parent == "mekhane/dendron/"
+
+    def test_missing_proof(self, checker, tmp_py_file):
+        f = tmp_py_file('"Module without proof"\ndef foo():\n    pass\n')
+        result = checker.check_file_proof(f)
+        assert result.status == ProofStatus.MISSING
+
+    def test_orphan_proof(self, checker, tmp_py_file):
+        f = tmp_py_file('# PROOF: [L1/定理]\n"Module with proof but no parent"\n')
+        result = checker.check_file_proof(f)
+        assert result.status == ProofStatus.ORPHAN
+
+    def test_exempt_pycache(self, checker_with_exemptions):
+        path = Path("__pycache__/something.pyc")
+        assert checker_with_exemptions.is_exempt(path) is True
+
+    def test_exempt_venv(self, checker_with_exemptions):
+        path = Path(".venv/lib/site-packages/foo.py")
+        assert checker_with_exemptions.is_exempt(path) is True
+
+    def test_not_exempt_normal(self, checker_with_exemptions):
+        path = Path("mekhane/dendron/checker.py")
+        assert checker_with_exemptions.is_exempt(path) is False
+
+
+# ─── L1: Parent Validation Tests ─────────────────
+
+
+class TestParentValidation:
+    """親参照の検証テスト"""
+
+    def test_special_parent_fep(self, checker):
+        valid, _ = checker.validate_parent("FEP")
+        assert valid is True
+
+    def test_special_parent_external(self, checker):
+        valid, _ = checker.validate_parent("external")
+        assert valid is True
+
+    def test_path_traversal_rejected(self, checker):
+        valid, reason = checker.validate_parent("../../etc/passwd")
+        assert valid is False
+        assert "パストラバーサル" in reason
+
+    def test_absolute_path_rejected(self, checker):
+        valid, reason = checker.validate_parent("/etc/passwd")
+        assert valid is False
+        assert "絶対パス" in reason
+
+    def test_too_long_path_rejected(self, checker):
+        valid, reason = checker.validate_parent("a" * 300)
+        assert valid is False
+        assert "長すぎる" in reason
+
+
+# ─── L2: Purpose Comment Tests ───────────────────
+
+
+class TestPurposeCheck:
+    """L2 Purpose コメントのテスト"""
+
+    def test_function_with_purpose(self, checker, tmp_py_file):
+        content = (
+            "# PROOF: [L2/テスト] <- sample/\n"
+            "# PURPOSE: ユーザー認証を一元化する\n"
+            "def authenticate(user, password):\n"
+            "    pass\n"
+        )
+        f = tmp_py_file(content)
+        results = checker.check_functions_in_file(f)
+        public = [r for r in results if not r.is_dunder]
+        assert len(public) == 1
+        assert public[0].status == ProofStatus.OK
+        assert public[0].purpose_text == "ユーザー認証を一元化する"
+
+    def test_function_without_purpose(self, checker, tmp_py_file):
+        content = (
+            "# PROOF: [L2/テスト] <- sample/\n"
+            "def authenticate(user, password):\n"
+            "    pass\n"
+        )
+        f = tmp_py_file(content)
+        results = checker.check_functions_in_file(f)
+        public = [r for r in results if not r.is_dunder]
+        assert len(public) == 1
+        assert public[0].status == ProofStatus.MISSING
+
+    def test_class_with_purpose(self, checker, tmp_py_file):
+        content = (
+            "# PROOF: [L2/テスト] <- sample/\n"
+            "# PURPOSE: 認証ロジックをカプセル化する\n"
+            "class AuthService:\n"
+            "    pass\n"
+        )
+        f = tmp_py_file(content)
+        results = checker.check_functions_in_file(f)
+        classes = [r for r in results if r.name == "AuthService"]
+        assert len(classes) == 1
+        assert classes[0].status == ProofStatus.OK
+
+    def test_private_function_exempt(self, checker, tmp_py_file):
+        content = (
+            "# PROOF: [L2/テスト] <- sample/\n"
+            "def _helper():\n"
+            "    pass\n"
+        )
+        f = tmp_py_file(content)
+        results = checker.check_functions_in_file(f)
+        private = [r for r in results if r.is_private]
+        assert len(private) == 1
+        assert private[0].status == ProofStatus.EXEMPT
+
+    def test_dunder_skipped(self, checker, tmp_py_file):
+        content = (
+            "# PROOF: [L2/テスト] <- sample/\n"
+            "class Foo:\n"
+            "    def __init__(self):\n"
+            "        pass\n"
+            "    def __repr__(self):\n"
+            "        pass\n"
+        )
+        f = tmp_py_file(content)
+        results = checker.check_functions_in_file(f)
+        dunders = [r for r in results if r.is_dunder]
+        assert len(dunders) == 0
+
+    def test_purpose_above_decorator(self, checker, tmp_py_file):
+        content = (
+            "# PROOF: [L2/テスト] <- sample/\n"
+            "# PURPOSE: プロパティとしてカバレッジを公開する\n"
+            "@property\n"
+            "def coverage(self):\n"
+            "    return 100.0\n"
+        )
+        f = tmp_py_file(content)
+        results = checker.check_functions_in_file(f)
+        public = [r for r in results if not r.is_dunder]
+        assert len(public) == 1
+        assert public[0].status == ProofStatus.OK
+
+
+# ─── L2: WEAK Purpose Quality Tests ─────────────
+
+
+class TestPurposeQuality:
+    """v2.6 Purpose 品質検証のテスト"""
+
+    def test_weak_wo_arawasu(self, checker):
+        """「を表す」パターンの検出"""
+        issue = checker._validate_purpose_quality("PROOF の状態を表す列挙型")
+        assert issue is not None
+        assert "を表す" in issue
+
+    def test_weak_wo_hoji_suru(self, checker):
+        """「を保持する」パターンの検出"""
+        issue = checker._validate_purpose_quality("ファイル情報を保持するデータクラス")
+        assert issue is not None
+        assert "を保持する" in issue
+
+    def test_weak_wo_teikyou_suru(self, checker):
+        """「を提供する」パターンの検出"""
+        issue = checker._validate_purpose_quality("検証ロジックを提供するクラス")
+        assert issue is not None
+        assert "を提供する" in issue
+
+    def test_good_purpose_passes(self, checker):
+        """良い Purpose は None を返す"""
+        issue = checker._validate_purpose_quality("チェック結果の分類と後続処理の分岐を可能にする")
+        assert issue is None
+
+    def test_good_purpose_with_action_verb(self, checker):
+        """動詞が明確な Purpose は通過する"""
+        issue = checker._validate_purpose_quality("ファイル内の PROOF ヘッダーを検出し、その妥当性を検証する")
+        assert issue is None
+
+    def test_weak_status_in_file(self, checker, tmp_py_file):
+        """WEAK Purpose がファイルチェックで検出される"""
+        content = (
+            "# PROOF: [L2/テスト] <- sample/\n"
+            "# PURPOSE: 状態を表す列挙型\n"
+            "class MyEnum:\n"
+            "    pass\n"
+        )
+        f = tmp_py_file(content)
+        results = checker.check_functions_in_file(f)
+        public = [r for r in results if not r.is_dunder]
+        assert len(public) == 1
+        assert public[0].status == ProofStatus.WEAK
+        assert public[0].quality_issue is not None
+
+
+# ─── Integration: check() method ─────────────────
+
+
+class TestCheckIntegration:
+    """check() メソッドの統合テスト"""
+
+    def test_dendron_self_check(self):
+        """Dendron が自分自身をチェックできる"""
+        real_checker = DendronChecker()  # 標準 exempt パターン付き
+        dendron_path = Path(__file__).parent.parent
+        result = real_checker.check(dendron_path)
+
+        assert result.total_files > 0
+        assert result.coverage > 0
+        assert result.functions_with_purpose > 0
+        assert result.functions_weak_purpose == 0
+
+    def test_empty_dir(self, checker, tmp_path):
+        """空ディレクトリは 100% カバレッジ"""
+        result = checker.check(tmp_path)
+        assert result.coverage == 100.0
+        assert result.is_passing is True
+
+
+# ─── PURPOSE_PATTERN regex tests ─────────────────
+
+
+class TestPurposePattern:
+    """PURPOSE_PATTERN 正規表現のテスト"""
+
+    def test_basic_match(self):
+        m = PURPOSE_PATTERN.search("# PURPOSE: テストする")
+        assert m is not None
+        assert m.group(1).strip() == "テストする"
+
+    def test_with_extra_spaces(self):
+        m = PURPOSE_PATTERN.search("#  PURPOSE:  テストする")
+        assert m is not None
+
+    def test_no_match_without_hash(self):
+        m = PURPOSE_PATTERN.search("PURPOSE: テストする")
+        assert m is None
+
+    def test_no_match_empty(self):
+        m = PURPOSE_PATTERN.search("# PURPOSE:")
+        assert m is None
+
+
+# ── L3: Variable / Type Hint Tests ─────────────────
+
+
+class TestVariableCheck:
+    """L3 変数・型ヒントのテスト"""
+
+    def test_function_with_type_hints(self, checker, tmp_py_file):
+        """型ヒント付き public 関数 → OK"""
+        f = tmp_py_file('# PROOF: [L2/x] <- parent/\ndef greet(name: str) -> str:\n    return f"Hello {name}"\n')
+        results = checker.check_variables_in_file(f)
+        hints = [r for r in results if r.check_type == "type_hint"]
+        assert len(hints) == 2  # return + arg
+        assert all(r.status == ProofStatus.OK for r in hints)
+
+    def test_function_missing_return_hint(self, checker, tmp_py_file):
+        """戻り値の型ヒントなし → MISSING"""
+        f = tmp_py_file('# PROOF: [L2/x] <- parent/\ndef greet(name: str):\n    return f"Hello {name}"\n')
+        results = checker.check_variables_in_file(f)
+        hints = [r for r in results if r.check_type == "type_hint"]
+        missing = [r for r in hints if r.status == ProofStatus.MISSING]
+        assert len(missing) == 1
+        assert "-> ???" in missing[0].name
+
+    def test_function_missing_arg_hint(self, checker, tmp_py_file):
+        """引数の型ヒストなし → MISSING"""
+        f = tmp_py_file('# PROOF: [L2/x] <- parent/\ndef greet(name) -> str:\n    return f"Hello {name}"\n')
+        results = checker.check_variables_in_file(f)
+        hints = [r for r in results if r.check_type == "type_hint"]
+        missing = [r for r in hints if r.status == ProofStatus.MISSING]
+        assert len(missing) == 1
+        assert "(name)" in missing[0].name
+
+    def test_private_function_skipped(self, checker, tmp_py_file):
+        """private 関数はスキップ"""
+        f = tmp_py_file('# PROOF: [L2/x] <- parent/\ndef _internal(x):\n    return x\n')
+        results = checker.check_variables_in_file(f)
+        hints = [r for r in results if r.check_type == "type_hint"]
+        assert len(hints) == 0
+
+    def test_short_name_detected(self, checker, tmp_py_file):
+        """1文字変数 (ループ用以外) → WEAK"""
+        f = tmp_py_file('# PROOF: [L2/x] <- parent/\ndef calc() -> int:\n    a = 42\n    return a\n')
+        results = checker.check_variables_in_file(f)
+        short = [r for r in results if r.check_type == "short_name"]
+        assert len(short) == 1
+        assert short[0].name == "a"
+        assert short[0].status == ProofStatus.WEAK
+
+    def test_loop_var_allowed(self, checker, tmp_py_file):
+        """ループ変数 (i, j, k) は許容"""
+        f = tmp_py_file('# PROOF: [L2/x] <- parent/\ndef loop() -> None:\n    for i in range(10):\n        x = i\n')
+        results = checker.check_variables_in_file(f)
+        short = [r for r in results if r.check_type == "short_name"]
+        # i と x はどちらも _LOOP_VAR_NAMES に含まれる
+        assert len(short) == 0

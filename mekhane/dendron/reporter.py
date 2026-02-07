@@ -1,9 +1,10 @@
 # PROOF: [L2/インフラ] <- mekhane/dendron/
 """
-Dendron Reporter — レポート生成 v2
+Dendron Reporter — レポート生成 v3
 
 チェック結果をさまざまな形式で出力する。
 v2: ORPHAN (親参照なし) の警告表示をサポート。
+v3: L2 Purpose 統計を全形式に統合。
 """
 
 from enum import Enum
@@ -11,7 +12,7 @@ from pathlib import Path
 from typing import TextIO
 import sys
 
-from .checker import CheckResult, FileProof, DirProof, ProofStatus, ProofLevel
+from .checker import CheckResult, FileProof, DirProof, ProofStatus, ProofLevel, FunctionProof, VariableProof
 
 
 # PURPOSE: レポートの出力形式を定義する列挙型
@@ -32,7 +33,7 @@ class DendronReporter:  # noqa: AI-007
         self.output = output or sys.stdout
 
     # PURPOSE: 指定形式に応じたレポート出力メソッドを振り分ける
-    def report(self, result: CheckResult, format: ReportFormat = ReportFormat.TEXT):
+    def report(self, result: CheckResult, format: ReportFormat = ReportFormat.TEXT) -> None:
         """レポートを出力"""
         if format == ReportFormat.TEXT:
             self._report_text(result)
@@ -84,6 +85,29 @@ class DendronReporter:  # noqa: AI-007
 
         # 結果
         self._print()
+
+        # L2 Purpose (v3)
+        if result.total_functions > 0:
+            self._print("-" * 40)
+            self._print("L2 Purpose:")
+            self._print(f"  OK:      {result.functions_with_purpose}")
+            self._print(f"  Weak:    {result.functions_weak_purpose}")
+            self._print(f"  Missing: {result.functions_missing_purpose}")
+            purpose_total = result.functions_with_purpose + result.functions_missing_purpose
+            if purpose_total > 0:
+                pcov = result.functions_with_purpose / purpose_total * 100
+                self._print(f"  Coverage: {pcov:.1f}%")
+            self._print()
+
+        # L3 Variable (v3.0)
+        if result.total_checked_signatures > 0:
+            self._print("-" * 40)
+            self._print("L3 Variable:")
+            self._print(f"  Type hints: {result.signatures_with_hints}/{result.total_checked_signatures}")
+            if result.short_name_violations > 0:
+                self._print(f"  Short names: {result.short_name_violations} violations")
+            self._print()
+
         if result.is_passing:
             self._print("✅ PASS")
         else:
@@ -119,8 +143,32 @@ class DendronReporter:  # noqa: AI-007
         else:
             self._print("**Result**: ❌ FAIL")
 
+        # L2 Purpose (v3)
+        if result.total_functions > 0:
+            self._print()
+            self._print("## L2 Purpose Quality\n")
+            self._print("| Metric | Value |")
+            self._print("|--------|-------|")
+            self._print(f"| OK | {result.functions_with_purpose} |")
+            self._print(f"| Weak | {result.functions_weak_purpose} |")
+            self._print(f"| Missing | {result.functions_missing_purpose} |")
+            purpose_total = result.functions_with_purpose + result.functions_missing_purpose
+            if purpose_total > 0:
+                pcov = result.functions_with_purpose / purpose_total * 100
+                self._print(f"| Coverage | {pcov:.1f}% |")
+
+        # L3 Variable (v3.0)
+        if result.total_checked_signatures > 0:
+            self._print()
+            self._print("## L3 Variable Quality\n")
+            self._print("| Metric | Value |")
+            self._print("|--------|-------|")
+            self._print(f"| Type hints | {result.signatures_with_hints}/{result.total_checked_signatures} |")
+            if result.short_name_violations > 0:
+                self._print(f"| Short names | {result.short_name_violations} violations |")
+
     def _report_ci(self, result: CheckResult):
-        """CI 向け最小出力 (v2: ORPHAN 警告対応)"""
+        """CI 向け最小出力 (v3: L2 Purpose 対応)"""
         if result.is_passing:
             stats = result.level_stats
             level_str = f" (L1:{stats.get('L1', 0)}/L2:{stats.get('L2', 0)}/L3:{stats.get('L3', 0)})" if stats else ""
@@ -131,6 +179,14 @@ class DendronReporter:  # noqa: AI-007
             for f in result.file_proofs:
                 if f.status == ProofStatus.MISSING:
                     self._print(f"  {f.path}")
+        # L2 Purpose summary (v3)
+        if result.total_functions > 0:
+            self._print(f"   Purpose: {result.functions_with_purpose} ok, {result.functions_weak_purpose} weak, {result.functions_missing_purpose} missing")
+        # L3 Variable summary (v3.0)
+        if result.total_checked_signatures > 0:
+            hint_cov = (result.signatures_with_hints / result.total_checked_signatures * 100) if result.total_checked_signatures > 0 else 100.0
+            short_str = f", {result.short_name_violations} short" if result.short_name_violations > 0 else ""
+            self._print(f"   TypeHints: {result.signatures_with_hints}/{result.total_checked_signatures} ({hint_cov:.0f}%){short_str}")
 
     def _report_json(self, result: CheckResult):
         """JSON 形式"""
@@ -147,6 +203,20 @@ class DendronReporter:  # noqa: AI-007
             "missing_files": [
                 str(f.path) for f in result.file_proofs if f.status == ProofStatus.MISSING
             ],
+            # v3: L2 Purpose
+            "purpose": {
+                "total": result.total_functions,
+                "ok": result.functions_with_purpose,
+                "weak": result.functions_weak_purpose,
+                "missing": result.functions_missing_purpose,
+            },
+            # v3.0: L3 Variable
+            "type_hints": {
+                "total": result.total_checked_signatures,
+                "ok": result.signatures_with_hints,
+                "missing": result.signatures_missing_hints,
+            },
+            "short_name_violations": result.short_name_violations,
         }
 
         self._print(json.dumps(data, indent=2, ensure_ascii=False))

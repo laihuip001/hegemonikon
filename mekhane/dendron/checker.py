@@ -19,6 +19,7 @@ from .models import (  # noqa: F401
     ProofLevel,
     FileProof,
     FunctionProof,
+    VariableProof,
     DirProof,
     CheckResult,
     EXEMPT_PATTERNS,
@@ -32,24 +33,30 @@ from .models import (  # noqa: F401
 )
 
 
+# L3: ループ変数として許容される 1 文字名 (/dia+ レビューで d/v/t 削除)
+_LOOP_VAR_NAMES = frozenset("i j k n m x y z _ e f".split())
+
+
 # PURPOSE: コードベースの存在証明を検証し、CI判定とレポートの判定結果を生成する
 class DendronChecker:  # noqa: AI-007
-    """Dendron PROOF チェッカー v2.1 (親パス検証付き)"""
+    """Dendron PROOF チェッカー v3.0 (L3 Surface 対応)"""
 
     # PURPOSE: チェッカーを初期化し、除外パターンと検証オプションを設定する
     def __init__(
         self,
-        exempt_patterns: List[str] = None,
+        exempt_patterns: Optional[List[str]] = None,
         check_dirs: bool = True,
         check_files: bool = True,
         check_functions: bool = True,  # v2.5
-        root: Path = None,  # v2.1: 親パス検証用ルート
+        check_variables: bool = True,  # v3.0 L3
+        root: Optional[Path] = None,  # v2.1: 親パス検証用ルート
         validate_parents: bool = True,  # v2.1: 親パス存在検証
     ):
         self.exempt_patterns = [re.compile(p) for p in (EXEMPT_PATTERNS if exempt_patterns is None else exempt_patterns)]
         self.check_dirs = check_dirs
         self.check_files = check_files
         self.check_functions = check_functions  # v2.5
+        self.check_variables = check_variables  # v3.0 L3
         self.root = root
         self.validate_parents = validate_parents
 
@@ -112,7 +119,7 @@ class DendronChecker:  # noqa: AI-007
 
         try:
             content = path.read_text(encoding="utf-8")
-        except Exception as e:
+        except (OSError, UnicodeDecodeError) as e:
             return FileProof(path=path, status=ProofStatus.INVALID, reason=f"読み込みエラー: {e}")
 
         # v2.3: バイナリファイル検出 (NULL バイトチェック)
@@ -180,90 +187,152 @@ class DendronChecker:  # noqa: AI-007
         try:
             content = path.read_text(encoding="utf-8")
             tree = ast.parse(content, filename=str(path))
-            results = []
-            
-            # コメントの取得 (各行へのマッピング)
-            # AST だけではコメントを取得できないため、別途処理が必要だが
-            # 簡易的に行番号で直前を検索するアプローチを取る
-            lines = content.splitlines()
-            
-            for node in ast.walk(tree):
-                if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
-                    name = node.name
-                    line_no = node.lineno
+        except (SyntaxError, UnicodeDecodeError):
+            return []
+        
+        return self._check_functions_from_tree(path, tree, content)
+
+    # PURPOSE: パース済み AST から関数の PURPOSE コメント有無を検証する (内部用)
+    def _check_functions_from_tree(self, path: Path, tree: ast.Module, content: str) -> List[FunctionProof]:
+        """AST から関数・クラスの Purpose をチェック (内部用)"""
+        results: List[FunctionProof] = []
+        lines = content.splitlines()
+        
+        for node in ast.walk(tree):
+            if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
+                name = node.name
+                line_no = node.lineno
+                
+                # 除外判定
+                is_private = name.startswith("_") and not name.startswith("__")
+                is_dunder = name.startswith("__") and name.endswith("__")
+                
+                # dunder は完全除外 (v2.5)
+                if is_dunder:
+                    continue
                     
-                    # 除外判定
-                    is_private = name.startswith("_") and not name.startswith("__")
-                    is_dunder = name.startswith("__") and name.endswith("__")
-                    
-                    # dunder は完全除外 (v2.5)
-                    if is_dunder:
+                # node.lineno は def 行。デコレータがある場合は node.decorator_list[0].lineno が開始行
+                start_scan_line = line_no
+                if getattr(node, 'decorator_list', []):
+                    start_scan_line = node.decorator_list[0].lineno
+                
+                # 直前行から遡って検索 (0-indexed に変換)
+                found_purpose = None
+                scan_idx = start_scan_line - 2  # 1行上 (0-indexed)
+                
+                while scan_idx >= 0 and scan_idx >= start_scan_line - 10:
+                    line = lines[scan_idx].strip()
+                    if not line:
+                        scan_idx -= 1
                         continue
-                        
-                    # 直前のコメントを検索 (最大 5行遡る)
-                    # デコレータがある場合はそれをスキップする必要がある
-                    # ast.FunctionDef.decorator_list を使う手もあるが
-                    # 行番号ベースで遡るのが確実
                     
-                    # node.lineno は def 行。デコレータがある場合は node.decorator_list[0].lineno が開始行
-                    start_scan_line = line_no
-                    if getattr(node, 'decorator_list', []):
-                        # 一番上のデコレータの開始行
-                        start_scan_line = node.decorator_list[0].lineno
-                    
-                    # 直前行から遡って検索 (0-indexed に変換)
-                    found_purpose = None
-                    scan_idx = start_scan_line - 2  # 1行上 (0-indexed)
-                    
-                    # 空行やデコレータ以外の要素をスキップしつつ、コメントを探す
-                    while scan_idx >= 0 and scan_idx >= start_scan_line - 10:  # 最大10行見る
-                        line = lines[scan_idx].strip()
-                        if not line:
-                            scan_idx -= 1
-                            continue
-                        
-                        if line.startswith("#"):
-                            match = PURPOSE_PATTERN.search(line)
-                            if match:
-                                found_purpose = match.group(1).strip()
-                                break
-                            # 他のコメントなら更に上を見る
-                            scan_idx -= 1
-                        else:
-                            # コード行なら探索終了
+                    if line.startswith("#"):
+                        match = PURPOSE_PATTERN.search(line)
+                        if match:
+                            found_purpose = match.group(1).strip()
                             break
-                    
-                    if found_purpose:
-                        # v2.6: Purpose 品質チェック
-                        quality_issue = self._validate_purpose_quality(found_purpose)
-                        if quality_issue:
-                            results.append(FunctionProof(
-                                name=name, path=path, line_number=line_no,
-                                status=ProofStatus.WEAK, purpose_text=found_purpose,
-                                is_private=is_private, is_dunder=is_dunder,
-                                quality_issue=quality_issue
-                            ))
-                        else:
-                            results.append(FunctionProof(
-                                name=name, path=path, line_number=line_no,
-                                status=ProofStatus.OK, purpose_text=found_purpose,
-                                is_private=is_private, is_dunder=is_dunder
-                            ))
+                        scan_idx -= 1
                     else:
-                        # Private は EXEMPT 扱いだが警告として記録も可能
-                        status = ProofStatus.EXEMPT if is_private else ProofStatus.MISSING
-                        reason = "Private method" if is_private else "No # PURPOSE comment found"
+                        break
+                
+                if found_purpose:
+                    quality_issue = self._validate_purpose_quality(found_purpose)
+                    if quality_issue:
                         results.append(FunctionProof(
                             name=name, path=path, line_number=line_no,
-                            status=status, purpose_text=None, reason=reason,
+                            status=ProofStatus.WEAK, purpose_text=found_purpose,
+                            is_private=is_private, is_dunder=is_dunder,
+                            quality_issue=quality_issue
+                        ))
+                    else:
+                        results.append(FunctionProof(
+                            name=name, path=path, line_number=line_no,
+                            status=ProofStatus.OK, purpose_text=found_purpose,
                             is_private=is_private, is_dunder=is_dunder
                         ))
-                        
-            return results
-            
-        except Exception:
-            # パースエラー等は無視 (コードとしては無効でもテキストとしては読める場合など)
+                else:
+                    status = ProofStatus.EXEMPT if is_private else ProofStatus.MISSING
+                    reason = "Private method" if is_private else "No # PURPOSE comment found"
+                    results.append(FunctionProof(
+                        name=name, path=path, line_number=line_no,
+                        status=status, purpose_text=None, reason=reason,
+                        is_private=is_private, is_dunder=is_dunder
+                    ))
+                    
+        return results
+
+    # PURPOSE: ファイル内の public 関数の型ヒント有無と 1文字変数を検出する (L3 Akribeia)
+    def check_variables_in_file(self, path: Path) -> List[VariableProof]:
+        """ファイル内の変数・字句を精密検証 (v3.0 L3 Surface)"""
+        if self.is_exempt(path):
             return []
+
+        try:
+            content = path.read_text(encoding="utf-8")
+            tree = ast.parse(content, filename=str(path))
+        except (SyntaxError, UnicodeDecodeError):
+            return []
+
+        return self._check_variables_from_tree(path, tree)
+
+    # PURPOSE: パース済み AST から型ヒントと 1文字変数を検出する (内部用)
+    def _check_variables_from_tree(self, path: Path, tree: ast.Module) -> List[VariableProof]:
+        """AST から変数・字句を精密検証 (内部用)"""
+        results: List[VariableProof] = []
+
+        for node in ast.walk(tree):
+            # --- 型ヒント検査: public 関数の引数と戻り値 ---
+            if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                name = node.name
+                if name.startswith("_"):
+                    continue
+
+                if node.returns is None:
+                    results.append(VariableProof(
+                        name=f"{name}() -> ???", path=path,
+                        line_number=node.lineno, status=ProofStatus.MISSING,
+                        check_type="type_hint",
+                        reason="戻り値の型ヒントなし",
+                    ))
+                else:
+                    results.append(VariableProof(
+                        name=f"{name}() -> ...", path=path,
+                        line_number=node.lineno, status=ProofStatus.OK,
+                        check_type="type_hint",
+                    ))
+
+                # 全引数種別を検査 (args + kwonlyargs + posonlyargs)
+                all_args = list(node.args.args) + list(node.args.kwonlyargs) + list(node.args.posonlyargs)
+                for arg in all_args:
+                    if arg.arg in ("self", "cls"):
+                        continue
+                    if arg.annotation is None:
+                        results.append(VariableProof(
+                            name=f"{name}({arg.arg})", path=path,
+                            line_number=node.lineno, status=ProofStatus.MISSING,
+                            check_type="type_hint",
+                            reason=f"引数 '{arg.arg}' に型ヒントなし",
+                        ))
+                    else:
+                        results.append(VariableProof(
+                            name=f"{name}({arg.arg})", path=path,
+                            line_number=node.lineno, status=ProofStatus.OK,
+                            check_type="type_hint",
+                        ))
+
+            # --- 1文字変数検出 ---
+            if isinstance(node, ast.Assign):
+                for target in node.targets:
+                    if isinstance(target, ast.Name) and len(target.id) == 1:
+                        if target.id not in _LOOP_VAR_NAMES:
+                            results.append(VariableProof(
+                                name=target.id, path=path,
+                                line_number=target.lineno, status=ProofStatus.WEAK,
+                                check_type="short_name",
+                                reason=f"1文字変数 '{target.id}' は可読性が低い",
+                            ))
+
+        return results
 
     # PURPOSE: ディレクトリ内の PROOF.md の存在を検証する
     def check_dir_proof(self, path: Path) -> DirProof:
@@ -273,6 +342,13 @@ class DendronChecker:  # noqa: AI-007
 
         proof_md = path / "PROOF.md"
         if proof_md.exists():
+            try:
+                content = proof_md.read_text(encoding="utf-8").strip()
+                if not content:
+                    return DirProof(path=path, status=ProofStatus.WEAK, has_proof_md=True,
+                                    reason="PROOF.md が空")
+            except (OSError, UnicodeDecodeError):
+                pass  # 読み込みエラーは存在確認で OK 扱い
             return DirProof(path=path, status=ProofStatus.OK, has_proof_md=True)
 
         return DirProof(
@@ -332,6 +408,7 @@ class DendronChecker:  # noqa: AI-007
         file_proofs: List[FileProof] = []
         dir_proofs: List[DirProof] = []
         function_proofs: List[FunctionProof] = []
+        variable_proofs: List[VariableProof] = []
 
         # ディレクトリをチェック
         if self.check_dirs:
@@ -345,10 +422,22 @@ class DendronChecker:  # noqa: AI-007
                 if path.is_file():
                     file_proofs.append(self.check_file_proof(path))
                     
-                    # 関数をチェック (v2.5)
-                    if self.check_functions:
-                        fps = self.check_functions_in_file(path)
-                        function_proofs.extend(fps)
+                    # 関数をチェック (v2.5) + 変数をチェック (v3.0)
+                    # AST を 1 回だけパースして共有 (exempt ファイルはスキップ)
+                    if (self.check_functions or self.check_variables) and not self.is_exempt(path):
+                        try:
+                            content = path.read_text(encoding="utf-8")
+                            tree = ast.parse(content, filename=str(path))
+                        except (SyntaxError, UnicodeDecodeError):
+                            tree = None
+                        
+                        if tree is not None:
+                            if self.check_functions:
+                                fps = self._check_functions_from_tree(path, tree, content)
+                                function_proofs.extend(fps)
+                            if self.check_variables:
+                                vps = self._check_variables_from_tree(path, tree)
+                                variable_proofs.extend(vps)
 
         # 集計
         total_files = len(file_proofs)
@@ -363,6 +452,13 @@ class DendronChecker:  # noqa: AI-007
         funcs_ok = sum(1 for f in function_proofs if f.status == ProofStatus.OK)
         funcs_missing = sum(1 for f in function_proofs if f.status == ProofStatus.MISSING)
         funcs_weak = sum(1 for f in function_proofs if f.status == ProofStatus.WEAK)
+
+        # L3 変数集計 (v3.0)
+        hint_proofs = [v for v in variable_proofs if v.check_type == "type_hint"]
+        total_sigs = len(hint_proofs)
+        sigs_ok = sum(1 for v in hint_proofs if v.status == ProofStatus.OK)
+        sigs_missing = sum(1 for v in hint_proofs if v.status == ProofStatus.MISSING)
+        short_violations = sum(1 for v in variable_proofs if v.check_type == "short_name")
 
         # レベル統計 (OK + ORPHAN を含む)
         level_counter: Counter = Counter()
@@ -387,6 +483,13 @@ class DendronChecker:  # noqa: AI-007
             functions_missing_purpose=funcs_missing,
             functions_weak_purpose=funcs_weak,
             function_proofs=function_proofs,
+
+            # v3.0 L3
+            total_checked_signatures=total_sigs,
+            signatures_with_hints=sigs_ok,
+            signatures_missing_hints=sigs_missing,
+            short_name_violations=short_violations,
+            variable_proofs=variable_proofs,
             
             level_stats=level_stats,
         )

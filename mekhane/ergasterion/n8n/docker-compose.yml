@@ -12,6 +12,7 @@ services:
       - WEBHOOK_URL=http://localhost:5678/
       - TZ=Asia/Tokyo
       - NODE_FUNCTION_ALLOW_BUILTIN=child_process,fs,path
+      - SLACK_WEBHOOK_URL=${SLACK_WEBHOOK_URL:-}
     volumes:
       - ./data:/home/node/.n8n
       - /home/makaron8426/oikos/hegemonikon:/oikos/hegemonikon:ro

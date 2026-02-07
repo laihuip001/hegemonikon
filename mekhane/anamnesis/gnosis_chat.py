@@ -409,10 +409,36 @@ class GnosisChat:
         self._index = GnosisIndex()
         print("[Gnōsis Chat] Index loaded", flush=True)
 
+    def _unload_embedder(self):
+        """VRAM タイムシェア: Embedder を解放して LLM 用に VRAM を確保.
+
+        BGE-m3 (2.3GB) + Qwen 3B (2.1GB) = 4.4GB > 8GB GPU
+        検索完了後に Embedder をアンロードして LLM ロード可能にする。
+        """
+        import gc
+        import torch
+        if self._index is not None:
+            embedder = self._index._get_embedder()
+            if hasattr(embedder, '_st_model') and embedder._st_model is not None:
+                del embedder._st_model
+                embedder._st_model = None
+                embedder._use_gpu = False
+            # Reranker も解放
+            if self._reranker and self._reranker._model is not None:
+                del self._reranker._model
+                self._reranker._model = None
+            gc.collect()
+            torch.cuda.empty_cache()
+            vram_mb = torch.cuda.memory_allocated() / 1e6
+            print(f"[Gnōsis Chat] Embedder unloaded ({vram_mb:.0f}MB VRAM)", flush=True)
+
     def _load_model(self):
         """LLM をロード (4bit量子化 on GPU)."""
         if self._model is not None:
             return
+
+        # VRAM タイムシェア: Embedder を先に解放
+        self._unload_embedder()
 
         import torch
         from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
@@ -435,57 +461,16 @@ class GnosisChat:
         vram_mb = torch.cuda.memory_allocated() / 1e6
         print(f"[Gnōsis Chat] Model loaded ({vram_mb:.0f}MB VRAM)", flush=True)
 
-    def _translate_query(self, query: str) -> str:
-        """非英語クエリを英訳 (BGE-small は英語専用のため).
-
-        BGE-small-en は英語のみ対応。日本語クエリでは全ベクトルが
-        狭い空間に圧縮され、距離閾値が機能しない。
-        Qwen 3B で英訳してから検索することで精度を改善する。
-        """
-        # ASCII比率で英語判定 (高速)
-        ascii_ratio = sum(1 for c in query if ord(c) < 128) / max(len(query), 1)
-        if ascii_ratio > 0.8:
-            return query  # 既に英語
-
-        self._load_model()
-        prompt = (
-            "<|im_start|>system\n"
-            "Translate the following text to English. "
-            "Output ONLY the translation, nothing else.<|im_end|>\n"
-            f"<|im_start|>user\n{query}<|im_end|>\n"
-            "<|im_start|>assistant\n"
-        )
-        import torch
-        inputs = self._tokenizer(prompt, return_tensors="pt").to(self._model.device)
-        with torch.no_grad():
-            outputs = self._model.generate(
-                **inputs, max_new_tokens=64,
-                do_sample=False, temperature=1.0,
-                pad_token_id=self._tokenizer.eos_token_id,
-            )
-        input_len = inputs["input_ids"].shape[1]
-        translated = self._tokenizer.decode(
-            outputs[0][input_len:], skip_special_tokens=True
-        ).strip()
-        if translated:
-            print(f"[Gnōsis Chat] Translated: {query} → {translated}", flush=True)
-            return translated
-        return query
-
     def _retrieve(self, query: str) -> list[dict]:
         """全テーブルからセマンティック検索 + 閾値フィルタ + rerank."""
         self._load_index()
-
-        # クエリ英訳 (BGE-small 対策)
-        search_query = self._translate_query(query)
-
         results = []
         fetch_k = self.top_k * 3 if self._reranker else self.top_k
 
         # Papers table
         if self.search_papers:
             try:
-                paper_results = self._index.search(search_query, k=fetch_k)
+                paper_results = self._index.search(query, k=fetch_k)
                 for r in paper_results:
                     r["_source_table"] = "papers"
                 results.extend(paper_results)
@@ -497,7 +482,7 @@ class GnosisChat:
             try:
                 if "knowledge" in self._index.db.table_names():
                     embedder = self._index._get_embedder()
-                    qvec = embedder.embed(search_query)
+                    qvec = embedder.embed(query)
                     table = self._index.db.open_table("knowledge")
                     k_results = table.search(qvec).limit(fetch_k).to_list()
                     for r in k_results:

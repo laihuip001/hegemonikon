@@ -62,7 +62,7 @@ class Embedder:
                 if torch.cuda.is_available():
                     from sentence_transformers import SentenceTransformer
                     self._st_model = SentenceTransformer(
-                        'BAAI/bge-small-en-v1.5', device='cuda'
+                        'BAAI/bge-m3', device='cuda'
                     )
                     self._use_gpu = True
                     vram_mb = torch.cuda.memory_allocated() / 1e6

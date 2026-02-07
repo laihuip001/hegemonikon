@@ -758,4 +758,92 @@ lim[E[/u+]]{}
 
 ---
 
-*v7.0 | 2026-02-07 | Kalon Deep Examination 修正: Series 積演算 → Limit/Colimit。`>>` = 射 (morphism)、`>*` (射的融合) 追加。収束は `lim` に一本化。X-series 圏論的構造の正式導入。*
+## 13. 圏論的意味論マップ (Kalon v1.0)
+
+> **目的**: CCL 全演算子の圏論的正体を一枚で把握する
+> **圏**: Cog (24対象 = 24定理、78射 = 72 X-series + 6恒等射)
+> **Topos**: PSh(Cog) = Set^{Cog^op} は elementary topos (内部論理 = 直観主義)
+
+### 13.1 FEP 推論サイクル
+
+CCL の `>>` と `>*` は FEP の Active Inference サイクルを構成する:
+
+```mermaid
+graph LR
+    A["信念 A"] -->|">> (forward/予測)"| B["予測 B"]
+    B -->|"/dia (観測と照合)"| C["予測誤差 ε"]
+    C -->|">* (backward/修正)"| A2["更新された信念 A'"]
+    A2 -->|">> (forward/予測)"| B2["改善された予測 B'"]
+    
+    style A fill:#4a90d9,color:#fff
+    style A2 fill:#4a90d9,color:#fff
+    style B fill:#e6a23c,color:#fff
+    style B2 fill:#e6a23c,color:#fff
+    style C fill:#f56c6c,color:#fff
+```
+
+```
+>> = レンズで撮る (変換)     A が B に変わる
+>* = フィルターをかける (修正)  A は A のまま、B の色がつく
+```
+
+### 13.2 全演算子マップ
+
+```mermaid
+graph TD
+    subgraph 骨格["骨格層: 量の変化"]
+        PLUS["+  深化"] --- NT_ETA["η:Id⟹T"]
+        MINUS["-  縮約"] --- NT_EPS["ε:T⟹Id"]
+    end
+    
+    subgraph 次元["次元層: 抽象度"]
+        UP["^  上昇"] --- EXP["指数対象"]
+        DOWN["√  下降"] --- EVAL["評価射"]
+    end
+    
+    subgraph 合成["合成層: 結合"]
+        PROD["*  融合"] --- PRODUCT["積 A×B"]
+        OSC["~  振動"] --- COLIM["ω-chain colimit"]
+        SEQ["_  順序"] --- COMP["射の合成 g∘f"]
+    end
+    
+    subgraph 射層["射層: 変換と変容"]
+        MOR[">>  射"] --- FORWARD["射 f:A→B (forward)"]
+        ACT[">*  変容"] --- BACKWARD["Lax Actegory ⊳ (backward)"]
+    end
+    
+    subgraph 位相["位相層: 極限"]
+        LIM["/  Limit"] --- CONE["Cone の頂点"]
+        COLIMIT["\\  Colimit"] --- COCONE["Cocone の底面"]
+    end
+
+    style 骨格 fill:#1a1a2e,color:#e0e0e0
+    style 次元 fill:#16213e,color:#e0e0e0
+    style 合成 fill:#0f3460,color:#e0e0e0
+    style 射層 fill:#533483,color:#e0e0e0
+    style 位相 fill:#e94560,color:#fff
+```
+
+### 13.3 対応表
+
+| CCL | 名称 | 圏論 | 日常語 | FEP |
+|:----|:-----|:-----|:-------|:----|
+| `+` | 深化 | 自然変換 η:Id⟹T | 深掘りする | 精度↑ |
+| `-` | 縮約 | 自然変換 ε:T⟹Id | 要約する | 圧縮 |
+| `^` | 上昇 | 指数対象 B^A | メタに上がる | モデル階層↑ |
+| `√` | 下降 | 評価射 eval | 具体に降りる | モデル階層↓ |
+| `*` | 融合 | 積 (Product) | 一つにまとめる | 統合 |
+| `~` | 振動 | ω-chain colimit | 行ったり来たり | FE最小化サイクル |
+| `_` | 順序 | 射の合成 g∘f | 次にこれをやる | 逐次推論 |
+| `>>` | 射 | 射 f:A→B | 変える | 予測 (forward) |
+| `>*` | 変容 | Lax Actegory ⊳ | 見直す | 修正 (backward) |
+| `/` | Limit | Cone の頂点 | 統合する | 収束 |
+| `\` | Colimit | Cocone の底面 | 展開する | 発散 |
+| `lim` | 収束 | 極限 | 行き着く先 | 予測誤差→0 |
+
+> **出典**: Kalon Deep Examination (2026-02-07), V1-V5 Actegory 検証
+> **参考**: Smithe (2020) "Bayesian Updates Compose Optically", nLab Actegory
+
+---
+
+*v7.1 | 2026-02-07 | Kalon v1.0: 全演算子に圏論カラム追加。`+/-` → 自然変換、`~` → ω-chain colimit、`>*` → Lax Actegory。恒等射追加 (78射)。PSh(Cog) = topos 確認。圏論的意味論マップ (Section 13) 追加。*

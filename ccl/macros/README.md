@@ -1,7 +1,7 @@
 # CCL デコレータマクロ (Pythōsis B3)
 
-> **Origin**: Python `@decorator` パターン
-> **Version**: v1.0 | 2026-02-01
+> **Origin**: Python `@decorator` パターン + Hub WF 深化
+> **Version**: v1.1 | 2026-02-07
 
 ---
 
@@ -12,6 +12,8 @@
 
 ## マクロ一覧
 
+### Mixin 系 (横断的関心事)
+
 | マクロ | Mixin 展開 | Python 対応 |
 |:-------|:-----------|:------------|
 | `@memoize` | `@with(Caching)` | `@functools.cache` |
@@ -21,6 +23,13 @@
 | `@timed` | `@with(Timing)` | `time` |
 | `@scoped` | 特殊展開 | `contextmanager` |
 | `@async` | 特殊展開 | `asyncio` |
+
+### 認知系 (Hub WF 深化)
+
+| マクロ | 定義 | 用途 |
+|:-------|:-----|:-----|
+| [`@converge`](converge.md) | C1対比→C2解消→C3検証 | Limit (/) 深化 |
+| [`@diverge`](diverge.md) | D1スキャン→D2深掘り→D3レポート | Colimit (\\) 深化 |
 
 ---
 
@@ -36,6 +45,7 @@ expansion: "@with(Caching{ttl=$ttl}) $target"
 ```
 
 **例**:
+
 ```ccl
 @memoize /sop{query="重い検索"}
 @memoize(ttl="1h") /zet+
@@ -54,6 +64,7 @@ expansion: "@with(Retry{max_attempts=$max, on_fail=$on_fail}) $target"
 ```
 
 **例**:
+
 ```ccl
 @retry /sop{query="外部API"}
 @retry(max=5, on_fail=L:{/dia^}) /ene
@@ -71,6 +82,7 @@ expansion: "@with(Tracing{log_level=$level}) $target"
 ```
 
 **例**:
+
 ```ccl
 @log /noe+
 @log(level="debug") /zet+
@@ -89,6 +101,7 @@ expansion: "@with(Validation{pre=$pre, post=$post}) $target"
 ```
 
 **例**:
+
 ```ccl
 @validate(pre=L:{$inputs != null}) /noe+
 @validate(post=L:[r]{r.confidence > 0.7}) /dia
@@ -106,6 +119,7 @@ expansion: "@with(Timing{warn_threshold=$warn}) $target"
 ```
 
 **例**:
+
 ```ccl
 @timed /noe+
 @timed(warn="2s") /sop{query="長い処理"}
@@ -128,6 +142,7 @@ expansion: |
 ```
 
 **例**:
+
 ```ccl
 @scoped(ctx="temp_workspace") /ene
 ```
@@ -147,6 +162,7 @@ expansion: |
 ```
 
 **例**:
+
 ```ccl
 @async /sop{query="バックグラウンド検索"}
 @async(await=true) /noe+

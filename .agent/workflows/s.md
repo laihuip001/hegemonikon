@@ -88,22 +88,34 @@ children:
 | `/s+` | `+` | Limit強度↑ | より深い収束 |
 | `/s-` | `-` | Limit強度↓ | 軽い収束 |
 
-### `\s` (Colimit — 展開)
+### `\s` (Colimit — 展開) `@diverge`
 
-4定理の**全6対の交差関係**を展開し、戦略間の相互作用を可視化する。
+#### ⊗ D1: スキャン (Scan) — 6対の張力評価
 
-| # | 対 | 交差 | 問い |
-|:-:|:---|:-----|:-----|
-| 1 | S1⊗S2 | (Flow×Sc)⊗(Flow×Fn) | スケールが手法をどう制約するか |
-| 2 | S1⊗S3 | (Flow×Sc)⊗(Val×Sc) | スケールが基準をどう規定するか |
-| 3 | S1⊗S4 | (Flow×Sc)⊗(Val×Fn) | スケールが実践をどう限定するか |
-| 4 | S2⊗S3 | (Flow×Fn)⊗(Val×Sc) | 手法が基準をどう変えるか |
-| 5 | S2⊗S4 | (Flow×Fn)⊗(Val×Fn) | 手法が実践をどう具現化するか |
-| 6 | S3⊗S4 | (Val×Sc)⊗(Val×Fn) | 基準が実践をどう検証するか |
+| # | 対 | 交差 | 問い | 張力 |
+|:-:|:---|:-----|:-----|:----:|
+| 1 | S1⊗S2 | (Flow×Sc)⊗(Flow×Fn) | スケールが手法をどう制約するか | 低(同軸Flow) |
+| 2 | S1⊗S3 | (Flow×Sc)⊗(Val×Sc) | スケールが基準をどう規定するか | 中(半直交) |
+| 3 | S1⊗S4 | (Flow×Sc)⊗(Val×Fn) | スケールが実践をどう限定するか | **高(完全直交)** |
+| 4 | S2⊗S3 | (Flow×Fn)⊗(Val×Sc) | 手法が基準をどう変えるか | **高(完全直交)** |
+| 5 | S2⊗S4 | (Flow×Fn)⊗(Val×Fn) | 手法が実践をどう具現化するか | 中(半直交) |
+| 6 | S3⊗S4 | (Val×Sc)⊗(Val×Fn) | 基準が実践をどう検証するか | 低(同軸Val) |
 
-**⊗ Divergence**: 6対の交差から**戦略の盲点・代替アプローチ**を抽出
+#### ⊗ D2: 深掘り (Probe) — 上位3対
 
----
+高張力対 (#3, #4, #2 or #5) に `/zet+` → `/noe-` を適用:
+
+- **S1⊗S4**: スケール(Flow×Sc)と実践(Val×Fn)の完全直交 → 粒度と実装の乖離
+- **S2⊗S3**: 手法(Flow×Fn)と基準(Val×Sc)の完全直交 → 方法と評価の不整合
+
+#### ⊗ D3: 盲点レポート
+
+| 項目 | 内容 |
+|:-----|:-----|
+| 最高張力対 | {pair} (tension: {score}) |
+| 盲点 | 1. {発見1} / 2. {発見2} / 3. {発見3} |
+| 確信度 | {C/U} ({confidence}%) |
+| 記録先 | `/dox.sens` → {path} |
 
 ## S-Series 12派生マトリックス
 
@@ -298,7 +310,7 @@ python3 $HOME/oikos/hegemonikon/mekhane/quality_gate.py <変更ファイル>
 
 ---
 
-## 出力形式
+## 出力形式 `@converge`
 
 | 項目 | 内容 |
 |:-----|:-----|
@@ -308,6 +320,15 @@ python3 $HOME/oikos/hegemonikon/mekhane/quality_gate.py <変更ファイル>
 | STAGE 3 | Blueprint: [artifact path] |
 | STAGE 4 | Devil's Advocate: {result} |
 | STAGE 5 | KPT: Keep/Problem/Try |
+
+### ⊕ Convergence 検証 (STAGE 4-5 統合)
+
+| 項目 | 内容 |
+|:-----|:-----|
+| 矛盾度 | V[STAGE 0-3 outputs] = {0.0-1.0} |
+| 解消法 | {root/weighted/simple} |
+| **統合判断** | {1文で} |
+| **確信度** | {C/U} ({confidence}%) |
 
 ---
 

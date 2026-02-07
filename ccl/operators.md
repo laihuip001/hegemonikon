@@ -658,9 +658,13 @@ F:[ALL]{ /sta }
 | `@plan` | `lim[/ene+]{(/bou~zet)*(/s~\s)_/kho*hod}` | 計画立案 (意志探求振動→戦略融合→詳細実行に収束) |
 | `@verify` | `lim[/epi]{(/dia~\dia)*(/sta^)}` | 厳密検証 (判定振動→メタ基準融合→知識化に収束) |
 | `@complete` | `{result} _ /x.trigonon _ ?confirm` | WF完了 (結果出力→射提案→確信度確認) |
+| `@converge` | `F:[T1..T4]{@selfcheck} _ I:[V>θ]{/dia.root_@reduce(*)} _ /pis` | Limit深化 (C1対比→C2解消→C3検証) |
+| `@diverge` | `F:[C(4,2)]{E[tension]} _ F:[@top3]{/zet+_/noe-} _ /dox.sens` | Colimit深化 (D1スキャン→D2深掘り→D3レポート) |
 
 > **`@complete` 使用義務**: 24定理WF完了時、暗黙的に `@complete` が発動する。
 > BC-8 (射出力義務) と連動。`/x.trigonon` が frontmatter を読み射を提案。
+>
+> **`@converge`/`@diverge`**: Hub WF (`/o`,`/s`,`/h`,`/p`,`/k`,`/a`) で使用。詳細: `ccl/macros/converge.md`, `ccl/macros/diverge.md`
 
 ### 11.14 Scope Management (Pythōsis Phase 3) v2.0
 

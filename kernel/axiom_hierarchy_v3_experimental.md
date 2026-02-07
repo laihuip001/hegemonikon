@@ -15,10 +15,9 @@ context: |
   このファイルは現行 axiom_hierarchy.md (v2.1) を置換する候補であり、
   Kalon PJ (.agent/projects/kalon/docs/axiom_v3_single_axiom.md) でも管理される。
   正式採用には Creator の承認が必要。
-open_questions: |
-  1. 15ペア中6ペアのみが定理を生成する必然性は証明されていない
-  2. 二項対立 (Opposition) が FEP から演繹可能かは部分的にしか検証されていない
-  3. 総数が60→67に変わることの影響 (ドキュメント全体の整合性)
+related_proofs: |
+  - 二項対立の必然性: .agent/projects/kalon/docs/binary_opposition_necessity.md (解決済み)
+  - 定理ペア選択: v2.1 時点で確定済み。v3.0 は名称変更のみで構造は同一。
 ---
 
 # 📐 公理階層構造 v3.0 (1公理 + 6座標)

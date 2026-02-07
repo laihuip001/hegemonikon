@@ -8,7 +8,7 @@ skill_ref:
 version: "1.4"
 lcm_state: stable
 lineage: "v1.3 + FBR変換 → v1.4"
-derivatives: [cook, dige, natu]
+derivatives: [cook, dige, natu, batch]
 cognitive_algebra:
   "+": "詳細消化。全ステップ、マッピング根拠、反芻"
   "-": "即消化。要点抽出のみ"
@@ -41,6 +41,14 @@ ccl_signature: "/eat+_/fit"
 > **目的**: 外部の知識・フレームワーク・技法を Hegemonikón に馴染む形で吸収する
 >
 > **制約**: 外部コンテンツをそのまま取り込むと「付着」になる。必ず /mek で調理し /fit で消化診断すること。
+
+---
+
+## サブモジュール
+
+| ファイル | 内容 |
+|----------|------|
+| [batch.md](eat/batch.md) | 大量ファイル一括変換パイプライン (10+ファイル用) |
 
 ---
 

@@ -16,6 +16,7 @@ from typing import Optional
 PROOF_PATTERN = re.compile(r"(#\s*PROOF:\s*\[[^\]]+\])")
 
 
+# PURPOSE: ファイルが属するディレクトリから親パスを決定する
 def get_parent_path(file_path: Path, root: Path) -> str:
     """ファイルの親パスを決定"""
     rel_path = file_path.relative_to(root)
@@ -28,6 +29,7 @@ def get_parent_path(file_path: Path, root: Path) -> str:
     return str(parent) + "/"
 
 
+# PURPOSE: ORPHAN ファイルの PROOF ヘッダーに親参照を追加する
 def add_parent_reference(file_path: Path, root: Path, dry_run: bool = True) -> Optional[str]:
     """ファイルに親参照を追加"""
     try:
@@ -63,6 +65,7 @@ def add_parent_reference(file_path: Path, root: Path, dry_run: bool = True) -> O
     return f"UPDATED: {old_proof} → {new_proof}"
 
 
+# PURPOSE: CLI 引数をパースして移行処理を実行する
 def main():
     import argparse
     

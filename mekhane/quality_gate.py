@@ -88,6 +88,7 @@ class QualityGate:
     }
     MAGIC_NUMBER = re.compile(r"(?<![a-zA-Z_])\d{3,}(?![a-zA-Z_])")
 
+    # PURPOSE: 指定されたファイルの品質検証を実行し、結果を辞書で返す
     def check_file(self, file_path: str) -> dict:
         """ファイルの品質を検証"""
         path = Path(file_path)
@@ -104,6 +105,7 @@ class QualityGate:
             "palimpsest": self.check_palimpsest(lines),
         }
 
+    # PURPOSE: Metrika 基準（複雑度、行数、デッドコード）に基づいてコードを検証する
     def check_metrika(self, lines: list[str]) -> MetrikaResult:
         """Metrika 5門の検証"""
         result = MetrikaResult()
@@ -133,6 +135,7 @@ class QualityGate:
 
         return result
 
+    # PURPOSE: コード内の TODO コメントを解析し、技術的負債の状態（腐敗、警告）を判定する
     def check_chreos(self, lines: list[str]) -> list[ChreosItem]:
         """Chreos: 技術負債検出"""
         items = []
@@ -177,6 +180,7 @@ class QualityGate:
 
         return items
 
+    # PURPOSE: レガシーパターンやマジックナンバーを検出し、コードの歴史的背景を推測する
     def check_palimpsest(self, lines: list[str]) -> list[PalimpsestItem]:
         """Palimpsest: コード考古学"""
         items = []
@@ -244,6 +248,7 @@ class QualityGate:
         }
         return hypotheses.get(pattern, "不明 — git log で調査が必要")
 
+    # PURPOSE: 検証結果（Metrika, Chreos, Palimpsest）を人間が読める形式のレポートに整形する
     def format_report(self, result: dict) -> str:
         """検証結果をフォーマット"""
         lines = [

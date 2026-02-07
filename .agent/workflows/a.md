@@ -1,5 +1,5 @@
 ---
-description: A-series 4項振動。感情↔判定↔原則↔知識を巡回する精度保証サイクル。
+description: A-series 4定理Limit。L1.75×L1.75 の極限演算で精度保証の統合判断を生成。
 hegemonikon: Akribeia
 modules: [A1, A2, A3, A4]
 skill_ref:
@@ -7,24 +7,29 @@ skill_ref:
   - ".agent/skills/akribeia/a2-krisis/SKILL.md"
   - ".agent/skills/akribeia/a3-gnome/SKILL.md"
   - ".agent/skills/akribeia/a4-episteme/SKILL.md"
-version: "4.1"
+version: "5.0"
 layer: "Δ"
-lineage: "v4.0 (4項振動化) + SEL 統合 → v4.1"
+lineage: "v4.2 + Limit演算復元 → v5.0"
 cognitive_algebra:
-  definition: "/a = /pat~dia~gno~epi (4項振動)"
+  generation: "L1.75 × L1.75"
+  coordinates:
+    axis_1: "Valence (+/-)"
+    axis_2: "Precision (C/U)"
+  definition: "/a = lim(A1·A2·A3·A4)"
+  interpretation: "4定理の内積 → 最適収束点"
   operators:
-    "+": "全4定理を詳細モードで順次実行"
-    "-": "全4定理を縮約モードで順次実行"
-    "*": "A-series 自体を問う: なぜ精度を問うか"
+    "+": "Limit強度↑ — 全4定理を詳細に収束"
+    "-": "Limit強度↓ — 縮約収束"
+    "*": "Limit対象自体を問う: なぜ精度を問うか"
 sel_enforcement:
   "+":
-    description: "MUST execute ALL 4 theorems in detailed mode"
+    description: "MUST execute ALL 4 theorems with deep convergence"
     minimum_requirements:
       - "全4定理実行"
       - "各定理詳細モード"
-      - "精度保証出力"
+      - "融合ステップ必須"
   "-":
-    description: "MAY execute all 4 theorems in condensed mode"
+    description: "MAY execute with condensed convergence"
     minimum_requirements:
       - "サマリーのみ"
   "*":
@@ -39,95 +44,76 @@ children:
   - "/gno"   # A3 Gnōmē (格言)
   - "/epi"   # A4 Epistēmē (知識)
   - "/vet"   # A2+A4 派生
+anti_skip: enabled
 ---
 
-# /a: 精度定理ワークフロー (12派生対応)
+# /a: 精度定理ワークフロー (Akribeia)
 
 > **Hegemonikón Layer**: Akribeia (A-series)
-> **目的**: 感情・判断・見識・知識の4軸で精度を保証する
+> **定義**: `/a` = `lim(A1·A2·A3·A4)` — L1.75×L1.75 の極限演算
+> **目的**: 感情・判断・見識・知識の4定理を**1つの精度保証済み判断に収束**させる
+>
+> **制約**: 全4定理 → 融合(Convergence)。途中の省略は`-`モード実行時のみ許容。
+
+---
+
+## Limit / Colimit
+
+| 演算 | 記号 | 圏論 | 意味 |
+|:-----|:-----|:-----|:-----|
+| `/a` | `/` | **Limit** | 4定理 → 最適な1収束点 |
+| `\a` | `\` | **Colimit** | 4定理 → 全組み合わせに展開 |
+| `/a+` | `+` | Limit強度↑ | より深い収束 |
+| `/a-` | `-` | Limit強度↓ | 軽い収束 |
+
+---
+
+## A-series 定理一覧
+
+| # | ID | Name | Greek | 生成 | 役割 |
+|:-:|:---|:-----|:------|:-----|:-----|
+| 1 | **A1** | Pathos | Πάθος | Valence × Valence | **精度感情** — 感情の精緻化・言語化 |
+| 2 | **A2** | Krisis | Κρίσις | Valence × Precision | **精度判断** — 判断・決定の精度確保 |
+| 3 | **A3** | Gnōmē | Γνώμη | Precision × Valence | **精度見識** — 見識・洞察の形成 |
+| 4 | **A4** | Epistēmē | Ἐπιστήμη | Precision × Precision | **精度知識** — 知識の確定・固定 |
 
 ---
 
 ## 発動条件
 
 | トリガー | 説明 |
-| :-------- | :---- |
+|:---------|:-----|
 | `/a` または `/akri` | Akribeia シリーズを起動 |
 | `/a [1-4]` | 特定の定理を指定して起動 |
 | 精度・検証が必要 | 判断・知識の確定 |
 
 ---
 
-## A-series 定理一覧
+## 処理フロー
 
-| # | ID | Name | Greek | 役割 |
-| :-: | :-- | :--- | :---- | :--- |
-| 1 | **A1** | Pathos | Πάθος | **精度感情** — 感情の精緻化・言語化 |
-| 2 | **A2** | Krisis | Κρίσις | **精度判断** — 判断・決定の精度確保 |
-| 3 | **A3** | Gnōmē | Γνώμη | **精度見識** — 見識・洞察の形成 |
-| 4 | **A4** | Epistēmē | Ἐπιστήμη | **精度知識** — 知識の確定・固定 |
+### `/a` (Limit — 収束)
 
----
+1. **[A1 Pathos]** Valence×Valence: 感情を精緻化(主観的反応)
+2. **[A2 Krisis]** Valence×Precision: 判断を確定(決定基準)
+3. **[A3 Gnōmē]** Precision×Valence: 見識を形成(洞察抽出)
+4. **[A4 Epistēmē]** Precision×Precision: 知識として固定(KI 生成候補)
+5. **⊕ Convergence**: 4定理の出力を**1つの精度保証済み知見**に融合
 
-## Process
+### `/a [N]` (単体駆動)
 
-### `/a` (全体駆動)
-
-```text
-入力: 対象 X
-  ↓
-[A1 Pathos] 感情を精緻化（主観的反応）
-  ↓
-[A2 Krisis] 判断を確定（決定基準）
-  ↓
-[A3 Gnōmē] 見識を形成（洞察抽出）
-  ↓
-[A4 Epistēmē] 知識として固定（KI 生成候補）
-  ↓
-出力: 精度保証済み知見
-```
-
-### `/a 2` (A2 Krisis 単体)
-
-```text
-入力: 判断対象
-  ↓
-SKILL.md 参照: .agent/skills/akribeia/a2-krisis/SKILL.md
-  ↓
-[STEP 1] 判断基準の明確化
-[STEP 2] 代替案の比較
-[STEP 3] 決定と根拠の出力
-  ↓
-出力: 精度保証済み判断
-```
-
-### `/a 4` (A4 Epistēmē 単体)
-
-```text
-入力: 知見
-  ↓
-SKILL.md 参照: .agent/skills/akribeia/a4-episteme/SKILL.md
-  ↓
-[STEP 1] 知識の構造化
-[STEP 2] KI 生成候補判定
-[STEP 3] 固定化 or 保留
-  ↓
-出力: 確定知識 / KI 候補
-```
+SKILL.md を参照し、指定定理のみ実行。
 
 ---
 
 ## 出力形式
 
-```markdown
-┌─[Hegemonikón]──────────────────────┐
-│ A{N} {Name}: 精度処理完了          │
-│ 対象: {対象}                       │
-│ 精度: {0-100}%                     │
-│ KI候補: {Yes/No}                   │
-│ 次の推奨: → O{X} / K{Y}            │
-└────────────────────────────────────┘
-```
+| 項目 | 内容 |
+|:-----|:-----|
+| 定理 | A{N} {Name} |
+| 対象 | {対象} |
+| 精度 | {0-100}% |
+| KI候補 | {Yes/No} |
+| 次の推奨 | → O{X} / K{Y} |
 
 ---
 
@@ -147,5 +133,9 @@ graph LR
 ## Hegemonikon Status
 
 | Module | Workflow | Status |
-| :----- | :------- | :----- |
-| A1-A4 | /a | v2.1 Ready |
+|:-------|:---------|:-------|
+| A1-A4 | /a | v5.0 Ready |
+
+---
+
+*v5.0 — Limit演算復元 (2026-02-07)*

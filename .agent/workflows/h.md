@@ -1,5 +1,5 @@
 ---
-description: H-series 4項振動。傾向↔確信↔欲求↔信念を巡回する動機処理サイクル。
+description: H-series 4定理Limit。L1×L1.75 の極限演算で動機の統合判断を生成。
 hegemonikon: Hormē
 modules: [H1, H2, H3, H4]
 skill_ref:
@@ -7,24 +7,30 @@ skill_ref:
   - ".agent/skills/horme/h2-pistis/SKILL.md"
   - ".agent/skills/horme/h3-orexis/SKILL.md"
   - ".agent/skills/horme/h4-doxa/SKILL.md"
-version: "4.3"
+version: "5.0"
 layer: "Δ"
-lineage: "v4.2 + SEL 統合 → v4.3"
+lineage: "v4.4 + Limit演算復元 → v5.0"
 derivatives: [pro, pis, ore, dox, bias]
 cognitive_algebra:
-  definition: "/h = /pro~pis~ore~dox (4項振動)"
+  generation: "L1 × L1.75"
+  coordinates:
+    axis_1: "Flow/Value"
+    axis_2: "Valence/Precision"
+  definition: "/h = lim(H1·H2·H3·H4)"
+  interpretation: "4定理の内積 → 最適収束点"
   operators:
-    "+": "全4定理を詳細モードで順次実行"
-    "-": "全4定理を縮約モードで順次実行"
-    "*": "H-series 自体を問う: なぜ動機を問うか"
+    "+": "Limit強度↑ — 全4定理を詳細に収束"
+    "-": "Limit強度↓ — 縮約収束"
+    "*": "Limit対象自体を問う: なぜ動機を問うか"
 sel_enforcement:
   "+":
-    description: "MUST execute ALL 4 theorems in detailed mode"
+    description: "MUST execute ALL 4 theorems with deep convergence"
     minimum_requirements:
       - "全4定理実行"
       - "各定理詳細モード"
+      - "融合ステップ必須"
   "-":
-    description: "MAY execute all 4 theorems in condensed mode"
+    description: "MAY execute with condensed convergence"
     minimum_requirements:
       - "サマリーのみ"
   "*":
@@ -41,13 +47,28 @@ children:
   - "/boot"  # H4 派生
   - "/bye"   # H4 派生
 ccl_signature: "/h+_/dia"
+anti_skip: enabled
 ---
 
-# /h: 動機定理ワークフロー
+# /h: 動機定理ワークフロー (Hormē)
 
 > **Hegemonikón Layer**: Hormē (H-series)
-> **目的**: 傾向・信頼・欲求・信念の4軸で動機を処理する
+> **定義**: `/h` = `lim(H1·H2·H3·H4)` — L1×L1.75 の極限演算
+> **目的**: 傾向・確信・欲求・信念の4定理を**1つの動機的判断に収束**させる
 > **派生**: 12派生（H1-H4 各3派生）
+>
+> **制約**: 全4定理 → 融合(Convergence)。途中の省略は`-`モード実行時のみ許容。
+
+---
+
+## Limit / Colimit
+
+| 演算 | 記号 | 圏論 | 意味 |
+|:-----|:-----|:-----|:-----|
+| `/h` | `/` | **Limit** | 4定理 → 最適な1収束点 |
+| `\h` | `\` | **Colimit** | 4定理 → 全組み合わせに展開 |
+| `/h+` | `+` | Limit強度↑ | より深い収束 |
+| `/h-` | `-` | Limit強度↓ | 軽い収束 |
 
 ---
 
@@ -60,18 +81,13 @@ ccl_signature: "/h+_/dia"
 | **H3 Orexis** | 何を欲している？ | `targ` (対象志向) | `acti` (活動志向) | `stat` (状態志向) |
 | **H4 Doxa** | どう信じている？ | `sens` (感覚的) | `conc` (概念的) | `form` (形式的) |
 
-### FEP 派生選択
+### 派生選択ロジック
 
 ```python
 from mekhane.fep.derivative_selector import select_derivative
 
-# 例: 前感情反応
-result = select_derivative("H1", "これには惹かれる、興味がある")
-# → DerivativeRecommendation(derivative="appr", confidence=0.75)
-
-# 例: 確信レベル
-result = select_derivative("H2", "データによると、証拠がある")
-# → DerivativeRecommendation(derivative="obje", confidence=0.80)
+result = select_derivative("H1", problem_context)
+# → appr: 接近傾向 → avoi: 回避傾向 → arre: 保留
 ```
 
 ---
@@ -79,7 +95,7 @@ result = select_derivative("H2", "データによると、証拠がある")
 ## 発動条件
 
 | トリガー | 説明 |
-| :-------- | :---- |
+|:---------|:-----|
 | `/h` または `/horme` | Hormē シリーズを起動 |
 | `/h [1-4]` | 特定の定理を指定して起動 |
 | 動機・衝動の分析が必要 | 感情・信念の整理 |
@@ -88,37 +104,28 @@ result = select_derivative("H2", "データによると、証拠がある")
 
 ## H-series 定理一覧
 
-| # | ID | Name | Greek | 役割 |
-|:-:| :--- | :----- | :------ | :----- |
-| 1 | **H1** | Propatheia | Προπάθεια | **流動傾向** — 接近/回避の初期反応 |
-| 2 | **H2** | Pistis | Πίστις | **流動信頼** — 情報源への信頼度評価 |
-| 3 | **H3** | Orexis | Ὄρεξις | **流動欲求** — 欲求の優先順位付け |
-| 4 | **H4** | Doxa | Δόξα | **流動信念** — 信念の形成・蓄積 |
+| # | ID | Name | Greek | 生成 | 役割 |
+|:-:|:---|:-----|:------|:-----|:-----|
+| 1 | **H1** | Propatheia | Προπάθεια | Flow × Valence | **流動傾向** — 接近/回避の初期反応 |
+| 2 | **H2** | Pistis | Πίστις | Flow × Precision | **流動信頼** — 情報源への信頼度評価 |
+| 3 | **H3** | Orexis | Ὄρεξις | Value × Valence | **流動欲求** — 欲求の優先順位付け |
+| 4 | **H4** | Doxa | Δόξα | Value × Precision | **流動信念** — 信念の形成・蓄積 |
 
 ---
 
-## Process
+## 処理フロー
 
-### `/h` (全体駆動)
+### `/h` (Limit — 収束)
 
-```text
-入力: 状況 S
-  ↓
-[H1 Propatheia] 初期傾向を検出 (+/-)
-  ↓
-[H2 Pistis] 情報源の信頼度を評価
-  ↓
-[H3 Orexis] 欲求を優先順位付け
-  ↓
-[H4 Doxa] 信念として蓄積
-  ↓
-出力: 動機的処理結果
-```
+1. **[H1 Propatheia]** Flow×Valence: 初期傾向を検出 (+/-)
+2. **[H2 Pistis]** Flow×Precision: 情報源の信頼度を評価
+3. **[H3 Orexis]** Value×Valence: 欲求を優先順位付け
+4. **[H4 Doxa]** Value×Precision: 信念として蓄積
+5. **⊕ Convergence**: 4定理の出力を**1つの動機的判断**に融合
 
 ### `/h.bias` (バイアス検出) — CEP-001
 
-> **CCL**: `V[/h]`
-> **Origin**: CEP-001 FEP 記号拡張 B1
+> **CCL**: `V[/h]` (CEP-001 FEP記号拡張 B1)
 
 傾向のエントロピーを測定し、認知バイアスを検出する。
 
@@ -132,42 +139,22 @@ V[/h] >> {
 }
 ```
 
-**出力形式**:
+**出力**: 傾向エントロピー(0.0-1.0) → 偏り方向(接近過多/回避過多/バランス) → 主要バイアス → 高バイアス時 `/dia.root` 推奨
 
-```text
-🧠 バイアス検出 (V[/h])
-  傾向エントロピー: {0.0-1.0}
-  偏りの方向: {接近過多 | 回避過多 | バランス}
-  主要バイアス: {確証バイアス | 現状維持 | 損失回避}
-  
-→ 高バイアス: /dia.root で根源探索を推奨
-```
+### `/h [N]` (単体駆動)
 
-### `/h 1` (H1 Propatheia 単体)
-
-```text
-入力: 対象
-  ↓
-SKILL.md 参照: .agent/skills/horme/h1-propatheia/SKILL.md
-  ↓
-[STEP 1] 傾向検出（接近 + / 回避 -）
-[STEP 2] 傾向の強度評価
-  ↓
-出力: 傾向ベクトル (方向, 強度)
-```
+SKILL.md を参照し、指定定理のみ実行。
 
 ---
 
 ## 出力形式
 
-```markdown
-┌─[Hegemonikón]──────────────────────┐
-│ H{N} {Name}: 動機処理完了          │
-│ 対象: {対象}                       │
-│ 傾向: {+/-} 強度: {0-100}          │
-│ 次の推奨: → A{X} / K{Y}            │
-└────────────────────────────────────┘
-```
+| 項目 | 内容 |
+|:-----|:-----|
+| 定理 | H{N} {Name} |
+| 対象 | {対象} |
+| 傾向 | {+/-} 強度: {0-100} |
+| 次の推奨 | → A{X} / K{Y} |
 
 ---
 
@@ -187,5 +174,9 @@ graph LR
 ## Hegemonikon Status
 
 | Module | Workflow | Status |
-| :------ | :-------- | :------ |
-| H1-H4 | /h | v2.1 Ready |
+|:-------|:---------|:-------|
+| H1-H4 | /h | v5.0 Ready |
+
+---
+
+*v5.0 — Limit演算復元 (2026-02-07)*

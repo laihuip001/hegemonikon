@@ -93,8 +93,10 @@ S-series: 2 × 2 = 4 定理
 | X | 接続 | 意味 |
 |---|------|------|
 | X-OS | ← O-series | 本質から様態へ |
+| X-OH | ← O-series (via C1) | 本質から傾向へ (S経由) |
 | X-SH | → H-series | 様態から傾向へ |
 | X-SP | → P-series | 様態から条件へ |
+| X-SK | → K-series | 様態から文脈へ |
 
 ---
 

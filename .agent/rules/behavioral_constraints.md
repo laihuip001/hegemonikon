@@ -179,6 +179,33 @@ cd ~/oikos/hegemonikon && python mekhane/anamnesis/cli.py search "query"
 
 ---
 
+## BC-8: 射出力義務（Morphism Output）⚠️ 高優先
+
+> **傾向**: WF 完了時に「次は何をしますか？」と聞くだけで、構造的な射の提案を忘れる。
+
+### 強制ルール
+
+**24定理WF のいずれかを完了したとき**、以下を**必ず**出力する:
+
+```
+🔀 射の提案 (trigonon: {series}/{theorem}/{type})
+├─ Bridge >> {series}: {wf_list}
+├─ Anchor >> {series}: {wf_list}
+└─ (完了)
+→ 結果に確信がありますか？ (Y: Anchor優先 / N: Bridge優先 / 完了)
+```
+
+1. **trigonon frontmatter を読む**: 完了した WF の `trigonon:` セクション参照
+2. **射を提示**: `bridge` → Bridge 先、`anchor_via` → Anchor 先を展開
+3. **確信度を Creator に問う**: Bridge/Anchor の優先を人間に委ねる
+4. **計算ツール使用可**: `morphism_proposer.py` でフォーマットを自動生成
+
+### 対象
+
+24定理WF（`/noe` `/bou` `/zet` `/ene` `/met` `/mek` `/sta` `/pra` `/pro` `/pis` `/ore` `/dox` `/kho` `/hod` `/tro` `/tek` `/euk` `/chr` `/tel` `/sop` `/pat` `/dia` `/gno` `/epi`）。Hub WF (`/o` `/s` 等) や補助WF (`/boot` `/bye` 等) は対象外。
+
+---
+
 ## 違反時の対処
 
 Creator が違反を指摘した場合:

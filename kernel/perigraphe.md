@@ -1,10 +1,10 @@
 ---
 doc_id: "PERIGRAPHE_SERIES"
-version: "1.1.0"
+version: "2.0.0"
 tier: "KERNEL"
 status: "CANONICAL"
 created: "2026-01-27"
-updated: "2026-02-01"
+updated: "2026-02-07"
 extends:
   axioms: [L0.FEP, L1.5.Scale, L1.5.Function]
   generation: "L1.5 × L1.5"
@@ -56,12 +56,14 @@ P-series: 2 × 2 = 4 定理
 
 ### P1: Khōra (空間)
 
-> **「条件空間そのもの」**
+> **「ネストした adaptive Markov blanket の階層」**
 
 - Scale が Scale と交差
-- 認知の「場」を定義
+- 認知の「場」を定義 — **静的境界ではなく動的にネストする境界群**
 - **プラトン『ティマイオス』**: 存在が現れる「受容体」
-- 例: 問題空間の定義、作業領域の設定
+- **Kirchhoff et al. 2018**: 「blankets of blankets」— 細胞から生物個体、社会系まで再帰的にネスト
+- **重要**: Khōra の境界は生物的境界と一致しない。環境の要素も含みうる
+- 例: 問題空間の定義、作業領域の設定、**システム境界の多層的定義**
 
 ### P2: Hodos (経路)
 
@@ -97,13 +99,35 @@ P-series: 2 × 2 = 4 定理
 | X-SP | ← S-series | 様態から条件へ |
 | X-PK | → K-series | 条件から文脈へ |
 
+## Markov Blanket 再解釈 (v2.0)
+
+> **Kirchhoff et al. 2018** に基づく P-series の理論的拡張
+
+| 概念 | v1 (2026-01) | v2 (2026-02) |
+|:-----|:-------------|:-------------|
+| P₁ (Khōra) | 静的な「場」 | **ネストした adaptive MB 階層** |
+| 境界 | 固定的 | **動的・自己組織化** |
+| 自律性 | 境界の存在 | **temporal depth を持つ生成モデル** |
+| 射程 | システム内部 | **環境要素も含む** |
+
+### Temporal Depth と自律性
+
+| 種類 | 例 | 生成モデル | 自律性 |
+|:-----|:----|:------------|:-------|
+| Mere active inference | 振り子の同期 | 今ここのみ | ❌ |
+| Adaptive active inference | 生物の行動選択 | **時間的深さあり** | ✅ |
+
+> **Hegemonikón への示唆**: `/boot` の Handoff replay は adaptive active inference。
+> `/ax` の 7層分析は「深い生成モデル」の人工的実装。
+
 ---
 
 ## 関連ドキュメント
 
 - [schema.md](schema.md) — S-series（上流）
 - [kairos.md](kairos.md) — K-series（下流）
+- [axiom_hierarchy.md](axiom_hierarchy.md) — 理論的基盤セクション
 
 ---
 
-*Perigraphē: 「周囲を描く」— 条件空間の境界付与*
+*Perigraphē v2.0: 「周囲を描く」— ネストした Markov blanket の階層的境界付与 (2026-02-07)*

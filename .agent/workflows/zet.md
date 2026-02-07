@@ -17,6 +17,16 @@ lineage: "v5.5 + FBR変換 → v5.6"
 anti_skip: enabled
 ccl_signature: "/zet+"
 derivatives: [anom, hypo, eval, abduction]
+trigonon:
+  series: O
+  type: Pure
+  theorem: O3
+  coordinates: [A, E]
+  bridge: [S, H]
+  anchor_via: []
+  morphisms:
+    ">>S": [/met, /mek, /sta, /pra]
+    ">>H": [/pro, /pis, /ore, /dox]
 cognitive_algebra:
   "+": "深い問い。5層の問いを展開"
   "-": "核心の問い。最も重要な1つだけ"
@@ -265,6 +275,19 @@ absorbed:
 ```
 
 ---
+
+
+---
+
+## @complete: 射の提案 (暗黙発動 L1)
+
+> WF完了時、`/x` 暗黙発動プロトコルにより射を提案する。
+> 計算ツール: `python mekhane/taxis/morphism_proposer.py zet`
+
+```
+/zet 完了 → @complete 発動
+→ 結果に確信がありますか？ (Y: Anchor優先 / N: Bridge優先 / 完了)
+```
 
 ## Hegemonikon Status
 

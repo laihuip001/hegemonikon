@@ -17,7 +17,7 @@ from pathlib import Path
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
-from mekhane.symploke.indices import Document, SophiaIndex
+from mekhane.symploke.indices import Document
 
 KNOWLEDGE_DIR = Path("/home/makaron8426/oikos/.gemini/antigravity/knowledge")
 
@@ -99,6 +99,7 @@ def ingest_to_sophia(docs: list[Document], save_path: str = None) -> int:
         save_path: If provided, save the index to this path after ingestion
     """
     from mekhane.symploke.adapters.embedding_adapter import EmbeddingAdapter
+    from mekhane.symploke.indices.sophia import SophiaIndex
 
     adapter = EmbeddingAdapter(model_name="all-MiniLM-L6-v2")
     index = SophiaIndex(adapter, "sophia", dimension=384)  # MiniLM = 384 dims

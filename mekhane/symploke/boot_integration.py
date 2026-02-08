@@ -1,7 +1,16 @@
 #!/usr/bin/env python3
 # PROOF: [L2/インフラ] <- mekhane/symploke/ A0→継続する私が必要→boot_integration が担う
 """
-Boot Integration - 8軸を統合した /boot 用 API
+Boot Integration - 10軸を統合した /boot 用 API
+
+Axes:
+  A. Handoff   B. Sophia/KI   C. Persona   D. PKS
+  E. Safety    F. Attractor   G. GPU       H. EPT
+  I. Projects  J. Skills
+
+Theorem Coverage:
+  全24定理 (O1-O4, S1-S4, H1-H4, P1-P4, K1-K4, A1-A4) を
+  TheoremAttractor + THEOREM_REGISTRY 経由で Boot 時にアクセス可能。
 
 Usage:
     python boot_integration.py                    # 標準起動
@@ -20,6 +29,49 @@ from typing import Optional
 
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
+
+
+# ── 24 Theorem Registry ─────────────────────────────
+# PURPOSE: 96要素体系の全24定理を Boot 時に明示的に参照可能にする
+THEOREM_REGISTRY: dict[str, dict] = {
+    # O-series (Ousia): Pure cognition — L1×L1
+    "O1": {"name": "Noēsis", "series": "O", "wf": "/noe", "level": "L0"},
+    "O2": {"name": "Boulēsis", "series": "O", "wf": "/bou", "level": "L0"},
+    "O3": {"name": "Zētēsis", "series": "O", "wf": "/zet", "level": "L0"},
+    "O4": {"name": "Energeia", "series": "O", "wf": "/ene", "level": "L0"},
+    # S-series (Schema): Strategic design — L1×L1.5
+    "S1": {"name": "Metron", "series": "S", "wf": "/met", "level": "L1"},
+    "S2": {"name": "Mekhanē", "series": "S", "wf": "/mek", "level": "L1"},
+    "S3": {"name": "Stathmos", "series": "S", "wf": "/sta", "level": "L1"},
+    "S4": {"name": "Praxis", "series": "S", "wf": "/pra", "level": "L1"},
+    # H-series (Hormē): Motivation — L1×L1.75
+    "H1": {"name": "Propatheia", "series": "H", "wf": "/pro", "level": "L2a"},
+    "H2": {"name": "Pistis", "series": "H", "wf": "/pis", "level": "L2a"},
+    "H3": {"name": "Orexis", "series": "H", "wf": "/ore", "level": "L2a"},
+    "H4": {"name": "Doxa", "series": "H", "wf": "/dox", "level": "L2a"},
+    # P-series (Perigraphē): Context placement — L1.5×L1.5
+    "P1": {"name": "Khōra", "series": "P", "wf": "/kho", "level": "L2b"},
+    "P2": {"name": "Hodos", "series": "P", "wf": "/hod", "level": "L2b"},
+    "P3": {"name": "Trokhia", "series": "P", "wf": "/tro", "level": "L2b"},
+    "P4": {"name": "Tekhnē", "series": "P", "wf": "/tek", "level": "L2b"},
+    # K-series (Kairos): Temporal judgment — L1.5×L1.75
+    "K1": {"name": "Eukairia", "series": "K", "wf": "/euk", "level": "L3"},
+    "K2": {"name": "Chronos", "series": "K", "wf": "/chr", "level": "L3"},
+    "K3": {"name": "Telos", "series": "K", "wf": "/tel", "level": "L3"},
+    "K4": {"name": "Sophia", "series": "K", "wf": "/sop", "level": "L3"},
+    # A-series (Akribeia): Precision judgment — L1.75×L1.75
+    "A1": {"name": "Pathos", "series": "A", "wf": "/pat", "level": "L4"},
+    "A2": {"name": "Krisis", "series": "A", "wf": "/dia", "level": "L4"},
+    "A3": {"name": "Gnōmē", "series": "A", "wf": "/gno", "level": "L4"},
+    "A4": {"name": "Epistēmē", "series": "A", "wf": "/epi", "level": "L4"},
+}
+
+# Series metadata for boot summary
+SERIES_INFO = {
+    "O": "Ousia (認知)", "S": "Schema (戦略)", "H": "Hormē (動機)",
+    "P": "Perigraphē (環境)", "K": "Kairos (時間)", "A": "Akribeia (精度)",
+}
+
 
 
 # PURPOSE: Extract Dispatcher dispatch plan from context

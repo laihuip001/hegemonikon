@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Infra] <- mekhane/pks/push_dialog.py
 # PURPOSE: Push された知識への対話インターフェース
 """
 PROOF: [L2/インフラ] このファイルは存在しなければならない

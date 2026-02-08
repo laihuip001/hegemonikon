@@ -260,7 +260,13 @@ def print_status(dashboard: JulesDashboard):
     print("-" * 40)
 
     total_remaining = status['total_remaining']
-    total_ratio = total_remaining / (DAILY_LIMIT * ACCOUNTS_COUNT)
+
+    accounts_count = len(status['accounts'])
+    if accounts_count > 0:
+        total_ratio = total_remaining / (DAILY_LIMIT * accounts_count)
+    else:
+        total_ratio = 0.0
+
     if total_ratio > 0.5:
         total_color = "green"
     elif total_ratio > 0.2:

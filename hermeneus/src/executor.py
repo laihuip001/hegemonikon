@@ -233,7 +233,11 @@ class WorkflowExecutor:
         
         try:
             from . import compile_ccl
-            lmql_code = compile_ccl(ccl, model=model)
+            from .macros import get_all_macros
+
+            # Auto-load all registered macros (builtin + ccl/macros/)
+            macros = get_all_macros()
+            lmql_code = compile_ccl(ccl, macros=macros, model=model)
             
             return PhaseResult(
                 phase=ExecutionPhase.COMPILE,

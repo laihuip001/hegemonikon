@@ -32,3 +32,11 @@ filterwarnings = [
     "ignore:This process.*is multi-threaded:DeprecationWarning",
     "ignore:lance is not fork-safe:UserWarning",
 ]
+
+[tool.ruff]
+line-length = 120
+
+[tool.ruff.lint]
+select = ["E", "F", "W"]
+ignore = []
+external = ["AI-ALL"]

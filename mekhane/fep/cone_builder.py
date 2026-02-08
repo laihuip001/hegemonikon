@@ -33,10 +33,29 @@ Usage:
 
 from __future__ import annotations
 
+import re
 from difflib import SequenceMatcher
 from typing import Dict, List, Optional
 
 from mekhane.fep.category import Cone, Series, build_cone
+
+
+# 否定語パターン (日本語 + 英語)
+_NEGATION_RE = re.compile(
+    r"(?:ない|しない|できない|不可|否定|反対|拒否|中止"
+    r"|stop|no|not|never|don'?t|won'?t|reject|cancel)",
+    re.IGNORECASE,
+)
+# 方向性: GO 系
+_DIR_GO = re.compile(
+    r"(?:する|進む|開始|GO|yes|accept|approve|keep|continue|実行|追加)",
+    re.IGNORECASE,
+)
+# 方向性: WAIT 系
+_DIR_WAIT = re.compile(
+    r"(?:しない|止める|中止|WAIT|no|reject|cancel|stop|remove|削除|廃止)",
+    re.IGNORECASE,
+)
 
 
 # =============================================================================
@@ -85,8 +104,13 @@ def is_uniform_pw(pw: Optional[Dict[str, float]]) -> bool:
 def compute_dispersion(outputs: Dict[str, str]) -> float:
     """Compute V[outputs] — the dispersion of theorem outputs.
 
-    Uses pairwise text similarity to estimate how much the 4 outputs
-    agree or contradict. Low dispersion = consistent Cone.
+    Uses pairwise text similarity + negation detection + direction coding
+    to estimate how much the 4 outputs agree or contradict.
+
+    Components:
+        1. SequenceMatcher similarity → base dispersion
+        2. Negation contradiction → bonus (テキスト間で否定が混在)
+        3. Direction contradiction → bonus (GO vs WAIT が混在)
 
     Returns:
         float: dispersion score (0.0-1.0)
@@ -108,7 +132,31 @@ def compute_dispersion(outputs: Dict[str, str]) -> float:
         return 0.0
 
     avg_similarity = sum(similarities) / len(similarities)
-    return round(1.0 - avg_similarity, 3)
+    base = 1.0 - avg_similarity
+
+    # 否定矛盾ボーナス: 一部だけ否定語がある = 矛盾
+    neg_flags = [bool(_NEGATION_RE.search(v)) for v in values]
+    neg_bonus = 0.0
+    if any(neg_flags) and not all(neg_flags):
+        neg_bonus = 0.15  # 否定の混在で +0.15
+
+    # 方向性矛盾ボーナス: GO と WAIT が混在
+    dir_bonus = 0.0
+    dirs = []
+    for v in values:
+        go = bool(_DIR_GO.search(v))
+        wait = bool(_DIR_WAIT.search(v))
+        if go and not wait:
+            dirs.append(1)
+        elif wait and not go:
+            dirs.append(-1)
+        else:
+            dirs.append(0)
+    non_zero = [d for d in dirs if d != 0]
+    if non_zero and any(d > 0 for d in non_zero) and any(d < 0 for d in non_zero):
+        dir_bonus = 0.2  # 方向性矛盾で +0.2
+
+    return round(min(1.0, base + neg_bonus + dir_bonus), 3)
 
 
 # =============================================================================
@@ -225,9 +273,22 @@ def converge(
     if apex:
         cone.apex = apex
 
-    # C3: Set confidence and universality
-    cone.confidence = confidence
-    cone.is_universal = confidence >= 70.0  # 70% threshold for universality
+    # C3: Cone 品質評価 (自動計算)
+    if confidence > 0:
+        cone.confidence = confidence  # 外部指定を優先
+    else:
+        # 自動計算: base = (1 - dispersion) * 100
+        base_conf = (1.0 - cone.dispersion) * 100.0
+        # 否定ペナルティ: apex と projection の矛盾
+        penalty = 0.0
+        if cone.apex:
+            apex_neg = bool(_NEGATION_RE.search(cone.apex))
+            for proj in cone.projections:
+                if proj.output and bool(_NEGATION_RE.search(proj.output)) != apex_neg:
+                    penalty += 5.0
+        cone.confidence = max(0.0, min(100.0, base_conf - penalty))
+
+    cone.is_universal = cone.dispersion <= 0.1 and cone.confidence >= 70.0
 
     return cone
 
@@ -280,15 +341,20 @@ def describe_cone(cone: Cone) -> str:
     # C2: Resolution
     lines.extend([
         "",
-        f"**V[outputs]** = {cone.dispersion:.3f}",
+        f"**V[outputs]** = {cone.dispersion:.3f}"
+        + (" ✅" if cone.dispersion <= 0.1
+           else " ⚠️" if cone.dispersion <= 0.3
+           else " 🔴"),
         f"**Resolution** = {cone.resolution_method}",
         f"**Apex** = {cone.apex or '(未設定)'}",
     ])
 
-    # C3: Universality
+    # C3: Cone 品質評価
     lines.extend([
         f"**Confidence** = {cone.confidence:.0f}%",
-        f"**Universal** = {'Yes' if cone.is_universal else 'No'}",
+        f"**Universal** = {'✅ Yes' if cone.is_universal else '❌ No'}",
     ])
+    if cone.needs_devil:
+        lines.append("⚠️ **Devil's Advocate 推奨** (S-series, V > 0.1)")
 
     return "\n".join(lines)

@@ -1,0 +1,60 @@
+{
+    "name": "WF-05: Health Alert → Auto-Recovery",
+    "nodes": [
+        {
+            "parameters": {
+                "httpMethod": "POST",
+                "path": "health-alert",
+                "responseMode": "lastNode",
+                "options": {}
+            },
+            "id": "webhook-health",
+            "name": "Health Alert Webhook",
+            "type": "n8n-nodes-base.webhook",
+            "typeVersion": 1,
+            "position": [
+                250,
+                300
+            ],
+            "webhookId": "health-alert"
+        },
+        {
+            "parameters": {
+                "jsCode": "const data = $input.item.json.body;\nconst items = data.items || [];\n\nconst errors = items.filter(i => i.status === 'error');\nconst warns = items.filter(i => i.status === 'warn');\nconst score = data.score || 0;\n\nlet severity = 'LOW';\nif (errors.length >= 3 || score < 0.5) severity = 'CRITICAL';\nelse if (errors.length >= 1) severity = 'HIGH';\nelse if (warns.length >= 2) severity = 'MEDIUM';\n\nreturn [{ json: {\n  severity,\n  score,\n  errorCount: errors.length,\n  warnCount: warns.length,\n  errorNames: errors.map(e => e.name).join(', ') || '(none)',\n  warnNames: warns.map(w => w.name).join(', ') || '(none)',\n  slack: severity === 'CRITICAL' || severity === 'HIGH' ? 'would_send' : 'skipped',\n  timestamp: new Date().toISOString()\n} }];"
+            },
+            "id": "classify",
+            "name": "分類",
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                450,
+                300
+            ]
+        }
+    ],
+    "connections": {
+        "Health Alert Webhook": {
+            "main": [
+                [
+                    {
+                        "node": "分類",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        }
+    },
+    "settings": {
+        "executionOrder": "v1"
+    },
+    "tags": [
+        {
+            "name": "hegemonikon"
+        },
+        {
+            "name": "health"
+        }
+    ],
+    "versionId": "3.0.0"
+}

@@ -7,12 +7,15 @@ skill_ref:
   - ".agent/skills/kairos/k2-chronos/SKILL.md"
   - ".agent/skills/kairos/k3-telos/SKILL.md"
   - ".agent/skills/kairos/k4-sophia/SKILL.md"
-version: "6.3"
+version: "6.4"
 lcm_state: beta
 layer: "Δ"
 category_theory:
+  yoneda: "Hom(-, Tn) ≅ F(Tn) — 各定理はその射の集合で完全に決まる"
+  limit: "Cone の頂点 — 全ての文脈射が一致する点"
+  converge_as_cone: "C0=PW決定, C1=文脈射の列挙, C2=PW加重融合, C3=普遍性検証"
   cone_builder: "mekhane/fep/cone_builder.py"
-lineage: "v5.2 + Limit演算復元 → v6.0"
+lineage: "v5.2 + Limit演算復元 → v6.0 + C0 PW/加重融合 → v6.4"
 cognitive_algebra:
   generation: "L1.5 × L1.75"
   coordinates:

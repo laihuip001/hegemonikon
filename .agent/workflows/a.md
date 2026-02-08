@@ -7,12 +7,15 @@ skill_ref:
   - ".agent/skills/akribeia/a2-krisis/SKILL.md"
   - ".agent/skills/akribeia/a3-gnome/SKILL.md"
   - ".agent/skills/akribeia/a4-episteme/SKILL.md"
-version: "5.3"
+version: "5.4"
 lcm_state: beta
 layer: "Δ"
 category_theory:
+  yoneda: "Hom(-, Tn) ≅ F(Tn) — 各定理はその射の集合で完全に決まる"
+  limit: "Cone の頂点 — 全ての精度射が一致する点"
+  converge_as_cone: "C0=PW決定, C1=精度射の列挙, C2=PW加重融合, C3=普遍性検証"
   cone_builder: "mekhane/fep/cone_builder.py"
-lineage: "v4.2 + Limit演算復元 → v5.0"
+lineage: "v4.2 + Limit演算復元 → v5.0 + C0 PW/加重融合 → v5.4"
 cognitive_algebra:
   generation: "L1.75 × L1.75"
   coordinates:

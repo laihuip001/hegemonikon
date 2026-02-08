@@ -116,6 +116,18 @@ class HegemonikónFEPAgent:
         # Learning parameters (from arXiv:2412.10425)
         self.learning_rate = 50.0  # η for Dirichlet updates
 
+        # Precision Weighting parameters
+        # Each modality has an independent precision weight (0.0-1.0)
+        # High precision = reliable signal → weight A matrix block more
+        # Low precision = noisy signal → attenuate A matrix block
+        self.precision_weights: Dict[str, float] = {
+            "context": 1.0,
+            "urgency": 1.0,
+            "confidence": 1.0,
+        }
+        self.precision_lr: float = 0.1  # EMA learning rate for precision
+        self._base_A: Optional[np.ndarray] = None  # Cache unscaled A
+
         # Track history for analysis
         self._history: List[Dict[str, Any]] = []
 
@@ -412,9 +424,11 @@ class HegemonikónFEPAgent:
         """Complete inference-action cycle.
 
         Performs:
-        1. O1 Noēsis: State inference
-        2. O2 Boulēsis: Policy selection
-        3. Action sampling
+        1. Apply precision weighting to A matrix
+        2. O1 Noēsis: State inference
+        3. O2 Boulēsis: Policy selection
+        4. Update precision weights from prediction error
+        5. Action sampling
 
         Args:
             observation: Index into observation space
@@ -427,14 +441,22 @@ class HegemonikónFEPAgent:
                 - q_pi: Policy probabilities
                 - action: Sampled action
                 - action_name: Human-readable action name
+                - precision_weights: Current precision weights per modality
         """
+        # 0. Apply precision weighting to A matrix
+        self._apply_precision()
+
         # 1. Infer states (O1 Noēsis)
         state_result = self.infer_states(observation)
 
         # 2. Infer policies (O2 Boulēsis)
         q_pi, neg_efe = self.infer_policies()
 
-        # 3. Sample action
+        # 3. Update precision from prediction error
+        predicted_obs = int(np.argmax(self._get_predicted_observation()))
+        self.update_precision(observation, predicted_obs)
+
+        # 4. Sample action
         action = self.sample_action()
 
         # Action interpretation
@@ -451,6 +473,158 @@ class HegemonikónFEPAgent:
             "neg_efe": neg_efe,
             "action": action,
             "action_name": action_name,
+            "precision_weights": dict(self.precision_weights),
+        }
+
+    # =========================================================================
+    # Precision Weighting (FEP Inference Cycle Completion)
+    # =========================================================================
+
+    # PURPOSE: Update precision weights based on prediction error per modality.
+    def update_precision(
+        self,
+        observed: int,
+        predicted: int,
+    ) -> None:
+        """Update precision weights based on prediction error per modality.
+
+        Precision weighting adjusts how much each observation modality
+        influences belief updating. High prediction accuracy → high precision.
+
+        Uses exponential moving average (EMA) update:
+            π_m = (1 - lr) * π_m + lr * accuracy_m
+
+        Args:
+            observed: Actual observation index (flat)
+            predicted: Predicted observation index (flat)
+        """
+        # Decompose flat observation into per-modality indices
+        obs_per_mod = self._decompose_observation(observed)
+        pred_per_mod = self._decompose_observation(predicted)
+
+        for modality in self.precision_weights:
+            obs_idx = obs_per_mod.get(modality, 0)
+            pred_idx = pred_per_mod.get(modality, 0)
+            mod_dim = len(OBSERVATION_MODALITIES[modality])
+
+            # Per-modality accuracy: 1.0 if match, scaled by distance otherwise
+            if mod_dim <= 1:
+                accuracy = 1.0
+            else:
+                distance = abs(obs_idx - pred_idx) / (mod_dim - 1)
+                accuracy = 1.0 - distance
+
+            # EMA update
+            old = self.precision_weights[modality]
+            self.precision_weights[modality] = (
+                (1 - self.precision_lr) * old + self.precision_lr * accuracy
+            )
+
+        self._history.append({
+            "type": "precision_update",
+            "observed": observed,
+            "predicted": predicted,
+            "precision_weights": dict(self.precision_weights),
+        })
+
+    # PURPOSE: Apply precision weights to scale the A matrix per modality.
+    def _apply_precision(self) -> None:
+        """Apply precision weights to scale the A matrix per modality.
+
+        Scales each modality's rows in the A matrix by its precision weight.
+        Higher precision → stronger influence on belief updating.
+        Lower precision → attenuated influence (noisy signal discounted).
+        """
+        # Cache the base A matrix on first call
+        A = self.agent.A
+        if isinstance(A, np.ndarray) and A.dtype == object:
+            A_matrix = np.asarray(A[0], dtype=np.float64)
+        elif isinstance(A, list):
+            A_matrix = np.asarray(A[0], dtype=np.float64)
+        else:
+            A_matrix = np.asarray(A, dtype=np.float64)
+
+        if self._base_A is None:
+            self._base_A = A_matrix.copy()
+
+        # Apply per-modality precision scaling
+        scaled_A = self._base_A.copy()
+        row_offset = 0
+        for modality in OBSERVATION_MODALITIES:
+            mod_dim = len(OBSERVATION_MODALITIES[modality])
+            weight = self.precision_weights.get(modality, 1.0)
+
+            # Scale rows for this modality: higher precision → keep original
+            # Lower precision → flatten toward uniform (less informative)
+            uniform = np.ones_like(scaled_A[row_offset:row_offset + mod_dim, :])
+            uniform /= mod_dim
+            scaled_A[row_offset:row_offset + mod_dim, :] = (
+                weight * self._base_A[row_offset:row_offset + mod_dim, :]
+                + (1 - weight) * uniform
+            )
+            row_offset += mod_dim
+
+        # Renormalize columns
+        col_sums = scaled_A.sum(axis=0, keepdims=True)
+        col_sums[col_sums == 0] = 1
+        scaled_A = scaled_A / col_sums
+
+        # Write back
+        if isinstance(self.agent.A, np.ndarray) and self.agent.A.dtype == object:
+            self.agent.A[0] = scaled_A
+        elif isinstance(self.agent.A, list):
+            self.agent.A[0] = scaled_A
+        else:
+            self.agent.A = scaled_A
+
+    # PURPOSE: Get predicted observation from current beliefs.
+    def _get_predicted_observation(self) -> np.ndarray:
+        """Get predicted observation from current beliefs.
+
+        Computes E[o] = A @ beliefs — the expected observation
+        given current beliefs. Used for prediction error calculation.
+        """
+        A = self.agent.A
+        if isinstance(A, np.ndarray) and A.dtype == object:
+            A_matrix = np.asarray(A[0], dtype=np.float64)
+        elif isinstance(A, list):
+            A_matrix = np.asarray(A[0], dtype=np.float64)
+        else:
+            A_matrix = np.asarray(A, dtype=np.float64)
+
+        if isinstance(self.beliefs, np.ndarray):
+            if self.beliefs.dtype == object:
+                beliefs_array = np.asarray(self.beliefs[0], dtype=np.float64).flatten()
+            else:
+                beliefs_array = np.asarray(self.beliefs, dtype=np.float64).flatten()
+        elif isinstance(self.beliefs, list):
+            beliefs_array = np.asarray(self.beliefs[0], dtype=np.float64).flatten()
+        else:
+            beliefs_array = np.asarray(self.beliefs, dtype=np.float64).flatten()
+
+        return A_matrix @ beliefs_array
+
+    @staticmethod
+    def _decompose_observation(flat_idx: int) -> Dict[str, int]:
+        """Decompose flat observation index into per-modality indices.
+
+        Inverse of encode_observation from state_spaces.py.
+        Maps flat index (0-7) back to per-modality indices.
+        """
+        # Layout: context=0-1, urgency=0-2, confidence=0-2
+        # Flat mapping from encode_observation:
+        #   base = 4 if context=clear else 0
+        #   modifier = (urgency + confidence) % 4
+        #   flat = base + modifier
+        context_idx = 1 if flat_idx >= 4 else 0
+        modifier = flat_idx % 4
+        # Approximate decomposition (best effort for discrete space)
+        urgency_idx = min(modifier, 2)
+        confidence_idx = min(modifier, 2)
+        return {
+            "context": context_idx,
+            "urgency": urgency_idx,
+            "confidence": confidence_idx,
         }
 
     # PURPOSE: Return inference history for analysis.

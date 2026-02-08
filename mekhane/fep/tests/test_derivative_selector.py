@@ -498,9 +498,10 @@ class TestSelectDerivativeP1:
         result = select_derivative("P1", "ネットワーク、関係性、コミュニティ、チーム")
         assert result.derivative == "rela"
 
-    def test_default_to_conc(self):
+    def test_default_to_phys(self):
+        """Physical is most concrete → default."""
         result = select_derivative("P1", "neutral test input")
-        assert result.derivative == "conc"
+        assert result.derivative == "phys"
 
 
 class TestSelectDerivativeP2:
@@ -615,9 +616,10 @@ class TestSelectDerivativeK1:
         result = select_derivative("K1", "もう遅い、逃した、後悔")
         assert result.derivative == "miss"
 
-    def test_default_to_miss(self):
+    def test_default_to_opti(self):
+        """Optimal timing is most common → default."""
         result = select_derivative("K1", "neutral test input")
-        assert result.derivative == "miss"
+        assert result.derivative == "opti"
 
 
 class TestSelectDerivativeK2:
@@ -679,9 +681,10 @@ class TestSelectDerivativeK4:
         result = select_derivative("K4", "メタ認識、何が分からないか、限界")
         assert result.derivative == "meta"
 
-    def test_default_to_taci(self):
+    def test_default_to_expl(self):
+        """Explicit knowledge is most common → default."""
         result = select_derivative("K4", "neutral test input")
-        assert result.derivative == "taci"
+        assert result.derivative == "expl"
 
 
 class TestKSeriesHelperFunctions:
@@ -770,9 +773,10 @@ class TestSelectDerivativeA2:
         result = select_derivative("A2", "保留、分からない、要検討")
         assert result.derivative == "susp"
 
-    def test_default_to_nega(self):
+    def test_default_to_susp(self):
+        """Suspend is safest → default."""
         result = select_derivative("A2", "neutral test input")
-        assert result.derivative == "nega"
+        assert result.derivative == "susp"
 
 
 class TestSelectDerivativeA3:

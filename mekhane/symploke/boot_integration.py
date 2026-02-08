@@ -494,6 +494,9 @@ def get_boot_context(mode: str = "standard", context: Optional[str] = None) -> d
                     if expl:
                         for line in expl.split("\n"):
                             formatted_parts.append(f"      {line}")
+                if learning_diff_fmt:
+                    for line in learning_diff_fmt.split("\n"):
+                        formatted_parts.append(f"   {line}")
 
                 return {
                     "series": rec.series,

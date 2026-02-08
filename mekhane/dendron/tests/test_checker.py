@@ -340,12 +340,12 @@ class TestVariableCheck:
         assert len(hints) == 0
 
     def test_short_name_detected(self, checker, tmp_py_file):
-        """1文字変数 (ループ用以外) → WEAK"""
-        f = tmp_py_file('# PROOF: [L2/x] <- parent/\ndef calc() -> int:\n    a = 42\n    return a\n')
+        """1文字変数 (ホワイトリスト外) → WEAK"""
+        f = tmp_py_file('# PROOF: [L2/x] <- parent/\ndef calc() -> int:\n    q = 42\n    return q\n')
         results = checker.check_variables_in_file(f)
         short = [r for r in results if r.check_type == "short_name"]
         assert len(short) == 1
-        assert short[0].name == "a"
+        assert short[0].name == "q"
         assert short[0].status == ProofStatus.WEAK
 
     def test_loop_var_allowed(self, checker, tmp_py_file):

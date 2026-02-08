@@ -1,172 +1,42 @@
-# CCL デコレータマクロ (Pythōsis B3)
+# CCL マクロレジストリ (v2.0)
 
-> **Origin**: Python `@decorator` パターン + Hub WF 深化
-> **Version**: v1.1 | 2026-02-07
-
----
-
-## 概要
-
-デコレータマクロは、CCL 操作に「横断的関心事」を簡潔に付与する構文糖衣。
-内部的には Mixin (`@with`) に展開される。
-
-## マクロ一覧
-
-### Mixin 系 (横断的関心事)
-
-| マクロ | Mixin 展開 | Python 対応 |
-|:-------|:-----------|:------------|
-| `@memoize` | `@with(Caching)` | `@functools.cache` |
-| `@retry` | `@with(Retry)` | `tenacity` |
-| `@log` | `@with(Tracing)` | `logging` |
-| `@validate` | `@with(Validation)` | `pydantic` |
-| `@timed` | `@with(Timing)` | `time` |
-| `@scoped` | 特殊展開 | `contextmanager` |
-| `@async` | 特殊展開 | `asyncio` |
-
-### 認知系 (Hub WF 深化)
-
-| マクロ | 定義 | 用途 |
-|:-------|:-----|:-----|
-| [`@converge`](converge.md) | C1対比→C2解消→C3検証 | Limit (/) 深化 |
-| [`@diverge`](diverge.md) | D1スキャン→D2深掘り→D3レポート | Colimit (\\) 深化 |
+> **Dendron 監査**: 2026-02-07 実施。58 → 44 マクロ (14 PHANTOM 削除)。
+> **3層アーキテクチャ**: Core / Future / Experimental
+>
+> 権威的マクロリファレンス: [`operators.md` Section 11](../operators.md)
 
 ---
 
-## 個別定義
+## 定義ファイル一覧 (14ファイル)
 
-### @memoize — 結果キャッシュ
+| ファイル | マクロ | 層 | 用途 |
+|:---------|:-------|:--:|:-----|
+| [`converge.md`](converge.md) | `@converge` | Core 🟢 | Limit深化 (C1→C2→C3) |
+| [`diverge.md`](diverge.md) | `@diverge` | Core 🟢 | Colimit深化 (D1→D2→D3) |
+| [`reduce.md`](reduce.md) | `@reduce` | Core 🟢 | 累積融合 |
+| [`chain.md`](chain.md) | `@chain` | Core 🔵 | 直列化 |
+| [`cycle.md`](cycle.md) | `@cycle` | Core 🔵 | 収束ループ |
+| [`repeat.md`](repeat.md) | `@repeat` | Exp. | N回反復 |
+| [`partial.md`](partial.md) | `@partial` | Core 🔵 | 部分適用 |
+| [`scoped.md`](scoped.md) | `@scoped` | Core 🔵 | スコープ限定 |
+| [`memoize.md`](memoize.md) | `@memoize` | Core 🔵 | キャッシュ |
+| [`validate.md`](validate.md) | `@validate` | Core 🔵 | 事前/事後検証 |
+| [`proof.md`](proof.md) | `@proof` | Core 🔵 | 証明 |
+| [`ground.md`](ground.md) | `@ground` | Core 🔵 | 6W3H 接地 |
+| [`syn.md`](syn.md) | `@council` | Core 🔵 | 外部評議会 |
 
-```yaml
-macro: @memoize
-parameters:
-  ttl: duration (default: session)
-expansion: "@with(Caching{ttl=$ttl}) $target"
-```
-
-**例**:
-
-```ccl
-@memoize /sop{query="重い検索"}
-@memoize(ttl="1h") /zet+
-```
-
----
-
-### @retry — 失敗時リトライ
-
-```yaml
-macro: @retry
-parameters:
-  max: int (default: 3)
-  on_fail: CCL (optional)
-expansion: "@with(Retry{max_attempts=$max, on_fail=$on_fail}) $target"
-```
-
-**例**:
-
-```ccl
-@retry /sop{query="外部API"}
-@retry(max=5, on_fail=L:{/dia^}) /ene
-```
+> 定義ファイルがないマクロは `operators.md` Section 11 のみで定義。
 
 ---
 
-### @log — 実行ログ
+## 3層 マクロ数
 
-```yaml
-macro: @log
-parameters:
-  level: string (default: info)
-expansion: "@with(Tracing{log_level=$level}) $target"
-```
-
-**例**:
-
-```ccl
-@log /noe+
-@log(level="debug") /zet+
-```
-
----
-
-### @validate — 事前/事後検証
-
-```yaml
-macro: @validate
-parameters:
-  pre: CCL (optional)
-  post: CCL (optional)
-expansion: "@with(Validation{pre=$pre, post=$post}) $target"
-```
-
-**例**:
-
-```ccl
-@validate(pre=L:{$inputs != null}) /noe+
-@validate(post=L:[r]{r.confidence > 0.7}) /dia
-```
-
----
-
-### @timed — 実行時間計測
-
-```yaml
-macro: @timed
-parameters:
-  warn: duration (optional)
-expansion: "@with(Timing{warn_threshold=$warn}) $target"
-```
-
-**例**:
-
-```ccl
-@timed /noe+
-@timed(warn="2s") /sop{query="長い処理"}
-```
-
----
-
-### @scoped — スコープ限定実行
-
-```yaml
-macro: @scoped
-parameters:
-  ctx: context (required)
-expansion: |
-  let _saved = $ctx
-  try:
-    $target
-  finally:
-    restore(_saved)
-```
-
-**例**:
-
-```ccl
-@scoped(ctx="temp_workspace") /ene
-```
-
----
-
-### @async — 非同期実行
-
-```yaml
-macro: @async
-parameters:
-  await: bool (default: false)
-expansion: |
-  spawn_async($target)
-  if $await:
-    await_result()
-```
-
-**例**:
-
-```ccl
-@async /sop{query="バックグラウンド検索"}
-@async(await=true) /noe+
-```
+| 層 | 数 | 説明 |
+|:---|:--:|:-----|
+| **Core** | 26 | 使用中。🟢 VITAL (8) + 🔵 USEFUL (18) |
+| **Future** | 6 | インフラ待ち。仕様温存 |
+| **Experimental** | 12 | 要検証。Sunset: 2026-08-07 |
+| **合計** | **44** | |
 
 ---
 
@@ -174,10 +44,11 @@ expansion: |
 
 | マクロ | pt |
 |:-------|:--:|
-| 単純 (`@log`, `@timed`) | 2 |
-| パラメータ付き (`@memoize`, `@retry`, `@validate`) | 3 |
-| 特殊 (`@scoped`, `@async`) | 4 |
+| 単純 (`@memoize`, `@retry`) | 2 |
+| パラメータ付き (`@validate`, `@partial`) | 3 |
+| 特殊 (`@scoped`) | 4 |
+| 認知 (`@converge`, `@diverge`) | 5-6 |
 
 ---
 
-*Pythōsis B3 | Decorator Macros v1.0*
+*Macro Registry v2.0 — Dendron-driven 3-layer architecture (2026-02-08)*

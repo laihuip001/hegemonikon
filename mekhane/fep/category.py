@@ -292,21 +292,114 @@ def hom_set(target: str) -> FrozenSet[str]:
     """Compute Hom(-, T) — all morphisms targeting theorem T.
 
     By the Yoneda lemma, this set completely determines T.
-    This is a simplified version that returns X-series morphism IDs.
+    Uses the actual X-series morphism registry.
     """
-    # In practice, this would query the X-series registry.
-    # For now, return the set of theorems that have morphisms to target.
-    series_order = ["O", "S", "H", "P", "K", "A"]
-    target_series = target[0]
-    target_idx = series_order.index(target_series)
+    return frozenset(
+        m.id for m in MORPHISMS.values() if m.target == target
+    )
 
-    sources: set[str] = set()
-    if target_idx > 0:
-        prev_series = series_order[target_idx - 1]
-        for i in range(1, 5):
-            sources.add(f"{prev_series}{i}")
 
-    return frozenset(sources)
+def hom_sources(target: str) -> FrozenSet[str]:
+    """Compute source theorems targeting T."""
+    return frozenset(
+        m.source for m in MORPHISMS.values() if m.target == target
+    )
+
+
+# =============================================================================
+# X-series Morphism Registry (72 morphisms)
+# Source: kernel/taxis.md v3.0
+# =============================================================================
+
+
+def _m(xid: str, src: str, tgt: str) -> Morphism:
+    """Shorthand for Morphism creation."""
+    return Morphism(id=xid, source=src, target=tgt)
+
+
+MORPHISMS: Dict[str, Morphism] = {
+    # --- X-OS: Ousia → Schema (8) ---
+    "X-OS1": _m("X-OS1", "O1", "S1"),  # Noēsis → Metron
+    "X-OS2": _m("X-OS2", "O1", "S2"),  # Noēsis → Mekhanē
+    "X-OS3": _m("X-OS3", "O2", "S1"),  # Boulēsis → Metron
+    "X-OS4": _m("X-OS4", "O2", "S2"),  # Boulēsis → Mekhanē
+    "X-OS5": _m("X-OS5", "O3", "S3"),  # Zētēsis → Stathmos
+    "X-OS6": _m("X-OS6", "O3", "S4"),  # Zētēsis → Praxis
+    "X-OS7": _m("X-OS7", "O4", "S3"),  # Energeia → Stathmos
+    "X-OS8": _m("X-OS8", "O4", "S4"),  # Energeia → Praxis
+    # --- X-OH: Ousia → Hormē (8) ---
+    "X-OH1": _m("X-OH1", "O1", "H1"),  # Noēsis → Propatheia
+    "X-OH2": _m("X-OH2", "O1", "H2"),  # Noēsis → Pistis
+    "X-OH3": _m("X-OH3", "O2", "H1"),  # Boulēsis → Propatheia
+    "X-OH4": _m("X-OH4", "O2", "H2"),  # Boulēsis → Pistis
+    "X-OH5": _m("X-OH5", "O3", "H3"),  # Zētēsis → Orexis
+    "X-OH6": _m("X-OH6", "O3", "H4"),  # Zētēsis → Doxa
+    "X-OH7": _m("X-OH7", "O4", "H3"),  # Energeia → Orexis
+    "X-OH8": _m("X-OH8", "O4", "H4"),  # Energeia → Doxa
+    # --- X-SH: Schema → Hormē (8) ---
+    "X-SH1": _m("X-SH1", "S1", "H1"),  # Metron → Propatheia
+    "X-SH2": _m("X-SH2", "S1", "H2"),  # Metron → Pistis
+    "X-SH3": _m("X-SH3", "S2", "H1"),  # Mekhanē → Propatheia
+    "X-SH4": _m("X-SH4", "S2", "H2"),  # Mekhanē → Pistis
+    "X-SH5": _m("X-SH5", "S3", "H3"),  # Stathmos → Orexis
+    "X-SH6": _m("X-SH6", "S3", "H4"),  # Stathmos → Doxa
+    "X-SH7": _m("X-SH7", "S4", "H3"),  # Praxis → Orexis
+    "X-SH8": _m("X-SH8", "S4", "H4"),  # Praxis → Doxa
+    # --- X-SP: Schema → Perigraphē (8) ---
+    "X-SP1": _m("X-SP1", "S1", "P1"),  # Metron → Khōra
+    "X-SP2": _m("X-SP2", "S1", "P2"),  # Metron → Hodos
+    "X-SP3": _m("X-SP3", "S3", "P1"),  # Stathmos → Khōra
+    "X-SP4": _m("X-SP4", "S3", "P2"),  # Stathmos → Hodos
+    "X-SP5": _m("X-SP5", "S2", "P3"),  # Mekhanē → Trokhia
+    "X-SP6": _m("X-SP6", "S2", "P4"),  # Mekhanē → Tekhnē
+    "X-SP7": _m("X-SP7", "S4", "P3"),  # Praxis → Trokhia
+    "X-SP8": _m("X-SP8", "S4", "P4"),  # Praxis → Tekhnē
+    # --- X-SK: Schema → Kairos (8) ---
+    "X-SK1": _m("X-SK1", "S1", "K1"),  # Metron → Eukairia
+    "X-SK2": _m("X-SK2", "S1", "K2"),  # Metron → Chronos
+    "X-SK3": _m("X-SK3", "S3", "K1"),  # Stathmos → Eukairia
+    "X-SK4": _m("X-SK4", "S3", "K2"),  # Stathmos → Chronos
+    "X-SK5": _m("X-SK5", "S2", "K3"),  # Mekhanē → Telos
+    "X-SK6": _m("X-SK6", "S2", "K4"),  # Mekhanē → Sophia
+    "X-SK7": _m("X-SK7", "S4", "K3"),  # Praxis → Telos
+    "X-SK8": _m("X-SK8", "S4", "K4"),  # Praxis → Sophia
+    # --- X-PK: Perigraphē → Kairos (8) ---
+    "X-PK1": _m("X-PK1", "P1", "K1"),  # Khōra → Eukairia
+    "X-PK2": _m("X-PK2", "P1", "K2"),  # Khōra → Chronos
+    "X-PK3": _m("X-PK3", "P2", "K1"),  # Hodos → Eukairia
+    "X-PK4": _m("X-PK4", "P2", "K2"),  # Hodos → Chronos
+    "X-PK5": _m("X-PK5", "P3", "K3"),  # Trokhia → Telos
+    "X-PK6": _m("X-PK6", "P3", "K4"),  # Trokhia → Sophia
+    "X-PK7": _m("X-PK7", "P4", "K3"),  # Tekhnē → Telos
+    "X-PK8": _m("X-PK8", "P4", "K4"),  # Tekhnē → Sophia
+    # --- X-HA: Hormē → Akribeia (8) ---
+    "X-HA1": _m("X-HA1", "H1", "A1"),  # Propatheia → Pathos
+    "X-HA2": _m("X-HA2", "H1", "A2"),  # Propatheia → Krisis
+    "X-HA3": _m("X-HA3", "H3", "A1"),  # Orexis → Pathos
+    "X-HA4": _m("X-HA4", "H3", "A2"),  # Orexis → Krisis
+    "X-HA5": _m("X-HA5", "H2", "A3"),  # Pistis → Gnōmē
+    "X-HA6": _m("X-HA6", "H2", "A4"),  # Pistis → Epistēmē
+    "X-HA7": _m("X-HA7", "H4", "A3"),  # Doxa → Gnōmē
+    "X-HA8": _m("X-HA8", "H4", "A4"),  # Doxa → Epistēmē
+    # --- X-HK: Hormē → Kairos (8) ---
+    "X-HK1": _m("X-HK1", "H1", "K1"),  # Propatheia → Eukairia
+    "X-HK2": _m("X-HK2", "H1", "K3"),  # Propatheia → Telos
+    "X-HK3": _m("X-HK3", "H3", "K1"),  # Orexis → Eukairia
+    "X-HK4": _m("X-HK4", "H3", "K3"),  # Orexis → Telos
+    "X-HK5": _m("X-HK5", "H2", "K2"),  # Pistis → Chronos
+    "X-HK6": _m("X-HK6", "H2", "K4"),  # Pistis → Sophia
+    "X-HK7": _m("X-HK7", "H4", "K2"),  # Doxa → Chronos
+    "X-HK8": _m("X-HK8", "H4", "K4"),  # Doxa → Sophia
+    # --- X-KA: Kairos → Akribeia (8) ---
+    "X-KA1": _m("X-KA1", "K1", "A1"),  # Eukairia → Pathos
+    "X-KA2": _m("X-KA2", "K1", "A2"),  # Eukairia → Krisis
+    "X-KA3": _m("X-KA3", "K2", "A1"),  # Chronos → Pathos
+    "X-KA4": _m("X-KA4", "K2", "A2"),  # Chronos → Krisis
+    "X-KA5": _m("X-KA5", "K3", "A3"),  # Telos → Gnōmē
+    "X-KA6": _m("X-KA6", "K3", "A4"),  # Telos → Epistēmē
+    "X-KA7": _m("X-KA7", "K4", "A3"),  # Sophia → Gnōmē
+    "X-KA8": _m("X-KA8", "K4", "A4"),  # Sophia → Epistēmē
+}
 
 
 def build_cone(series: Series, outputs: Dict[str, str]) -> Cone:

@@ -439,6 +439,7 @@ L:  → ASCII で入力可能、λ の代替
 
 > **Origin**: Python `@decorator` パターンの消化
 > **目的**: Mixin の簡潔な構文糖衣
+> **注意**: ここは Mixin **仕組み**の説明。マクロの **使用状態** (Core/Future/Experimental) は Section 11 で管理。
 
 ### 9.7.1 一覧
 
@@ -573,6 +574,25 @@ F:[ALL]{ /sta }
 
 > **原則**: マクロは CCL 式の糖衣構文。複雑な CCL パターンに名前を付けて再利用する。
 > **Dendron 監査**: 2026-02-07 実施。58 → 44 マクロ (14 PHANTOM 削除)。
+> **出自系統** (v1.x → v2.0 で旧サブセクションを統合):
+
+| 出自 | 対応マクロ | 旧セクション |
+|:-----|:-----------|:-------------|
+| Python itertools | `@chain`, `@cycle`, `@repeat` | 11.1 |
+| Python functools | `@reduce`, `@partial` | 11.2 |
+| Python contextlib | `@scoped` | 11.14 |
+| Python decorator | `@memoize`, `@validate`, `@retry`, `@async` | 9.7 (Mixin) |
+| Context Engineering | `@ce`, `@optimize` | 11.3-11.4 |
+| Recoverable Autonomy | `@risk`, `@checkpoint`, `@cache`, `@compact`, `@fault_tolerant` | 11.5 |
+| Memory Architecture | `@memory` | 11.6 |
+| Graduated Supervision | `@supervise`, `@selfcheck`, `@premortem`, `@council` | 11.7 |
+| Zero-Trust | `@enforce` | 11.8 |
+| Identity Stack | `@identity`, `@reflect` | 11.9 |
+| X-series | `@next`, `@route` | 11.10 |
+| Tier 1 Specialists | `@tak`, `@u`, `@dig`, `@go`, `@ground`, `@fix`, `@kyc` | 11.12 |
+| Cognitive Science | `@think`, `@plan`, `@verify`, `@complete`, `@converge`, `@diverge` | 11.13 |
+| Multi-Agent | `@batch`, `@thread`, `@delegate` | 1.6 |
+| Proof/Evidence | `@proof` | — |
 
 ### 11.1 Core — 使用中マクロ (26)
 

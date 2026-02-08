@@ -39,6 +39,7 @@ from mekhane.fep.cone_builder import (
     normalize_pw,
     resolve_method,
 )
+from mekhane.fep.cone_consumer import DecisionTrace
 
 
 # =============================================================================
@@ -1374,3 +1375,196 @@ class TestAdviseWithAttractor:
         # This tests the boundary condition
         assert enriched.action in ("devil", "investigate")
 
+
+# =============================================================================
+# Explanation Stack Tests (Layer 2-4)
+# =============================================================================
+
+
+class TestExplanationStack:
+    """Explanation Stack (Layer 2-4) tests.
+
+    Layer 1 (Structure) is covered by existing TestAdvise* classes.
+    """
+
+    def _make_cone(self, series=Series.O, dispersion=0.05,
+                   confidence=80.0, is_universal=True,
+                   resolution_method="simple_mean", pw=None,
+                   outputs=None):
+        """Helper: Create a test Cone with sensible defaults."""
+        if outputs is None:
+            outputs = {
+                f"{series.name}1": "出力1",
+                f"{series.name}2": "出力2",
+                f"{series.name}3": "出力3",
+                f"{series.name}4": "出力4",
+            }
+        cone = build_cone(series, outputs)
+        cone.dispersion = dispersion
+        cone.confidence = confidence
+        cone.is_universal = is_universal
+        cone.resolution_method = resolution_method
+        cone.pw = pw or {}
+        return cone
+
+    # --- Layer 2: DecisionTrace ---
+
+    def test_advise_returns_trace(self):
+        """Every advise() call should return a ConeAdvice with trace."""
+        from mekhane.fep.cone_consumer import advise
+        cone = self._make_cone(dispersion=0.05, confidence=80.0)
+        advice = advise(cone)
+        assert advice.trace is not None
+        assert isinstance(advice.trace, DecisionTrace)
+
+    def test_trace_records_all_rules_for_default(self):
+        """Default path evaluates all rules before falling through."""
+        from mekhane.fep.cone_consumer import advise
+        # Non-universal: dispersion=0.05, confidence=60 → not universal (conf<70)
+        cone = self._make_cone(dispersion=0.05, confidence=60.0, is_universal=False)
+        advice = advise(cone)
+        trace = advice.trace
+        # Count actual evaluations — implementation may have 6 or 7 checkpoints
+        assert len(trace.evaluations) >= 6
+        assert trace.matched_rule in ("Default", "Rule 5", "Rule 6")
+
+    def test_trace_records_fewer_for_early_match(self):
+        """Rule 1 match → only 1 evaluation recorded."""
+        from mekhane.fep.cone_consumer import advise
+        cone = self._make_cone(dispersion=0.55, confidence=30.0)
+        advice = advise(cone)
+        trace = advice.trace
+        assert len(trace.evaluations) == 1
+        assert trace.matched_rule == "Rule 1"
+        assert trace.evaluations[0].matched is True
+
+    def test_trace_rule5_has_six_evaluations(self):
+        """Rule 5 (universal) → 6 evaluations (R1 through R5)."""
+        from mekhane.fep.cone_consumer import advise
+        # is_universal: V≤0.1 and conf≥70
+        cone = self._make_cone(dispersion=0.05, confidence=80.0, is_universal=True)
+        advice = advise(cone)
+        trace = advice.trace
+        assert trace.matched_rule == "Rule 5"
+        assert len(trace.evaluations) == 6  # R1, R2, R2.5, R3, R4, R5
+
+    # --- Layer 3: RejectedAction ---
+
+    def test_rejected_actions_present_for_rule1(self):
+        """Rule 1 match → no rejected (it's the first rule)."""
+        from mekhane.fep.cone_consumer import advise
+        cone = self._make_cone(dispersion=0.55)
+        advice = advise(cone)
+        # Rule 1 is first → no prior rules to reject
+        assert len(advice.trace.rejected) == 0
+
+    def test_rejected_actions_for_default(self):
+        """Default path → all 6 rules rejected."""
+        from mekhane.fep.cone_consumer import advise
+        cone = self._make_cone(dispersion=0.05, confidence=80.0)
+        advice = advise(cone)
+        # If is_universal, Rule 5 matches → rejected = R1-R4
+        if advice.trace.matched_rule == "Rule 5":
+            rejected_actions = [r.action for r in advice.trace.rejected]
+            assert "devil" in rejected_actions  # R1 or R2
+        else:
+            # Default → all rules rejected
+            assert len(advice.trace.rejected) >= 5
+
+    def test_rejected_action_has_reason(self):
+        """Each rejected action should have a non-empty reason."""
+        from mekhane.fep.cone_consumer import advise
+        cone = self._make_cone(
+            series=Series.O, dispersion=0.15, confidence=40.0,
+        )
+        advice = advise(cone)
+        for r in advice.trace.rejected:
+            assert r.reason, f"Rejected action {r.action} has no reason"
+            assert r.rule_id, f"Rejected action {r.action} has no rule_id"
+
+    # --- Layer 4: format_advice_for_llm ---
+
+    def test_format_contains_cone_section(self):
+        """format_advice_for_llm output should contain [Cone: ...]."""
+        from mekhane.fep.cone_consumer import advise, format_advice_for_llm
+        cone = self._make_cone(dispersion=0.05, confidence=80.0)
+        advice = advise(cone)
+        text = format_advice_for_llm(advice)
+        assert "[Cone:" in text
+        assert advice.action in text
+
+    def test_format_contains_trace_section(self):
+        """format_advice_for_llm output should contain [Trace: ...]."""
+        from mekhane.fep.cone_consumer import advise, format_advice_for_llm
+        cone = self._make_cone(dispersion=0.05, confidence=80.0)
+        advice = advise(cone)
+        text = format_advice_for_llm(advice)
+        assert "[Trace:" in text
+        # Should contain ✓ and ✗ marks
+        assert "✓" in text or "✗" in text
+
+    def test_format_contains_rejected_section_when_rejected(self):
+        """If there are rejected actions, [Rejected: ...] should appear."""
+        from mekhane.fep.cone_consumer import advise, format_advice_for_llm
+        # Use low dispersion high conf → default → many rejected
+        cone = self._make_cone(dispersion=0.05, confidence=80.0)
+        advice = advise(cone)
+        text = format_advice_for_llm(advice)
+        if advice.trace.rejected:
+            assert "[Rejected:" in text
+
+    def test_format_devil_includes_severity(self):
+        """For devil action, format should include severity."""
+        from mekhane.fep.cone_consumer import advise, format_advice_for_llm
+        cone = self._make_cone(dispersion=0.55)
+        advice = advise(cone)
+        if advice.action == "devil":
+            text = format_advice_for_llm(advice)
+            assert "severity=" in text
+
+    def test_format_next_steps(self):
+        """format should include [Next: ...] when next_steps exist."""
+        from mekhane.fep.cone_consumer import advise, format_advice_for_llm
+        cone = self._make_cone(dispersion=0.55)
+        advice = advise(cone)
+        text = format_advice_for_llm(advice)
+        if advice.next_steps:
+            assert "[Next:" in text
+
+    # --- Cross-layer integration ---
+
+    def test_s_series_rule2_trace(self):
+        """S-series V>0.2 → Rule 2 match with proper trace."""
+        from mekhane.fep.cone_consumer import advise
+        cone = self._make_cone(
+            series=Series.S, dispersion=0.25, confidence=60.0,
+            outputs={"S1": "尺度", "S2": "方法", "S3": "基準", "S4": "実践"},
+        )
+        advice = advise(cone)
+        assert advice.action == "devil"
+        assert advice.trace.matched_rule == "Rule 2"
+        # Rule 1 was checked first → 1 rejected
+        assert len(advice.trace.evaluations) == 2
+        assert advice.trace.evaluations[0].matched is False  # Rule 1
+
+    def test_full_stack_integration(self):
+        """Full Explanation Stack: advise → trace → rejected → format_for_llm."""
+        from mekhane.fep.cone_consumer import advise, format_advice_for_llm
+        # Moderate dispersion, low confidence → investigate
+        cone = self._make_cone(
+            series=Series.O, dispersion=0.15, confidence=40.0,
+        )
+        advice = advise(cone)
+        # L1: action
+        assert advice.action == "investigate"
+        # L2: trace
+        assert advice.trace is not None
+        assert advice.trace.matched_rule == "Rule 3"
+        # L3: rejected
+        assert len(advice.trace.rejected) >= 2  # R1, R2 at minimum
+        # L4: format
+        text = format_advice_for_llm(advice)
+        assert "[Cone:" in text
+        assert "[Trace:" in text
+        assert "[Rejected:" in text
+        assert "investigate" in text

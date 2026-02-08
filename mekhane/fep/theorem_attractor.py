@@ -20,6 +20,7 @@ Usage:
 
 from __future__ import annotations
 
+import math
 import time
 from dataclasses import dataclass, field
 from typing import Optional
@@ -396,6 +397,27 @@ class BasinResult:
         return f"⟨Basins({self.n_samples}): {tops}⟩"
 
 
+# PURPOSE: Q2 — 24 定理の確率分布 (認知の配合)
+@dataclass
+class TheoremMixture:
+    """24 定理の確率分布 (配合).
+
+    argmax 的な「1つの答え」ではなく、
+    入力がどの定理にどれだけ引かれているかの全体像を提供する。
+    """
+    distribution: dict[str, float]      # {theorem: probability}, 合計≈1.0
+    top_theorems: list[TheoremResult]   # top-K (suggest と同じ)
+    entropy: float                      # 正規化 entropy (0=支配的, 1=完全均一)
+    dominant_series: str                # 最も支配的な Series
+    series_distribution: dict[str, float]  # Series 別集約 {O: 0.3, S: 0.2, ...}
+    temperature: float                  # 使用された temperature
+
+    def __repr__(self) -> str:
+        top = sorted(self.distribution.items(), key=lambda x: x[1], reverse=True)[:3]
+        tops = " + ".join(f"{t}({v:.0%})" for t, v in top)
+        return f"⟨Mixture: {tops} | H={self.entropy:.2f} | dom={self.dominant_series}⟩"
+
+
 # ---------------------------------------------------------------------------
 # TheoremAttractor
 # ---------------------------------------------------------------------------
@@ -442,14 +464,22 @@ class TheoremAttractor:
         embeddings = self._embedder.embed_batch(texts)
         proto_matrix = np.array(embeddings, dtype=np.float32)
 
-        # X-series 遷移行列 (24×24)
+        # X-series 遷移行列 (24×24) — Q5: cosine sim based weighting
         T = np.zeros((24, 24), dtype=np.float32)
         key_to_idx = {k: i for i, k in enumerate(THEOREM_KEYS)}
+
+        # Prototype 間の cosine similarity → 遷移の重み
+        proto_norms = np.linalg.norm(proto_matrix, axis=1, keepdims=True)
+        proto_norms[proto_norms == 0] = 1
+        proto_normed = proto_matrix / proto_norms
+
         for src, targets in MORPHISM_MAP.items():
             src_idx = key_to_idx[src]
             for tgt in targets:
                 tgt_idx = key_to_idx[tgt]
-                T[src_idx, tgt_idx] = 1.0
+                # cosine sim → clamp [0.1, 1.0]
+                weight = float(proto_normed[src_idx] @ proto_normed[tgt_idx])
+                T[src_idx, tgt_idx] = max(0.1, weight)
 
         # Row-normalize (確率遷移行列にする)
         row_sums = T.sum(axis=1, keepdims=True)
@@ -506,6 +536,102 @@ class TheoremAttractor:
                 command=defn["command"],
             ))
         return results
+
+    # --- 1b. Mixture Diagnosis (Q2) ---
+
+    # PURPOSE: Q2 — 24 定理の配合を確率分布として出力
+    def diagnose_mixture(
+        self, user_input: str, temperature: float = 0.5, top_k: int = 5,
+    ) -> TheoremMixture:
+        """24 定理の配合を確率分布として出力.
+
+        argmax (suggest) が「何」を返すのに対し、
+        mixture は「どれくらいの強さで」を返す。
+
+        Args:
+            temperature: 低い=尖った分布, 高い=平坦。0.5 default。
+            top_k: top_theorems に含める数。
+        """
+        self._ensure_initialized()
+        sims = self._compute_similarities(user_input)
+
+        # similarity → probability distribution (softmax)
+        sim_values = np.array(
+            [s for _, s in sorted(sims, key=lambda x: THEOREM_KEYS.index(x[0]))],
+            dtype=np.float32,
+        )
+        probs = self._softmax(sim_values, temperature=temperature)
+
+        # distribution dict
+        distribution = {k: float(probs[i]) for i, k in enumerate(THEOREM_KEYS)}
+
+        # Series 集約
+        series_dist: dict[str, float] = {}
+        for k, p in distribution.items():
+            s = THEOREM_DEFINITIONS[k]["series"]
+            series_dist[s] = series_dist.get(s, 0.0) + p
+        dominant_series = max(series_dist, key=series_dist.get)  # type: ignore
+
+        # Shannon entropy (正規化: 0=支配的, 1=完全均一)
+        max_entropy = math.log(24)
+        entropy = -sum(p * math.log(p + 1e-12) for p in probs)
+        norm_entropy = entropy / max_entropy if max_entropy > 0 else 0.0
+
+        # top-K TheoremResults
+        top_results = self.suggest(user_input, top_k=top_k)
+
+        return TheoremMixture(
+            distribution=distribution,
+            top_theorems=top_results,
+            entropy=round(norm_entropy, 4),
+            dominant_series=dominant_series,
+            series_distribution={s: round(v, 4) for s, v in series_dist.items()},
+            temperature=temperature,
+        )
+
+    # --- 1c. Basin Separation (Q1) ---
+
+    # PURPOSE: Q1 — 24 定理間の分離度メトリクス
+    def basin_separation(self) -> dict:
+        """24 定理間の embedding 距離行列 + 分離度の低いペアを報告.
+
+        Returns:
+            distance_matrix: (24, 24) cosine distance
+            closest_pairs: 最も近い 5 ペア
+            avg_separation: 平均分離度
+            min_separation: 最小分離度
+        """
+        self._ensure_initialized()
+        proto = self._proto_tensor
+        if hasattr(proto, 'cpu'):
+            proto = proto.cpu().numpy()
+
+        # L2 正規化
+        norms = np.linalg.norm(proto, axis=1, keepdims=True)
+        norms[norms == 0] = 1
+        normed = proto / norms
+
+        # Cosine distance matrix: 1 - cosine_sim
+        sim_matrix = normed @ normed.T
+        dist_matrix = 1.0 - sim_matrix
+
+        # 上三角の distance を収集 (自分自身を除く)
+        pairs = []
+        for i in range(24):
+            for j in range(i + 1, 24):
+                pairs.append((THEOREM_KEYS[i], THEOREM_KEYS[j], float(dist_matrix[i, j])))
+
+        pairs.sort(key=lambda x: x[2])
+        dists = [p[2] for p in pairs]
+
+        return {
+            "distance_matrix": dist_matrix,
+            "closest_pairs": pairs[:5],
+            "farthest_pairs": pairs[-5:],
+            "avg_separation": float(np.mean(dists)),
+            "min_separation": float(min(dists)) if dists else 0,
+            "max_separation": float(max(dists)) if dists else 0,
+        }
 
     # --- 2. X-series Flow Simulation ---
 

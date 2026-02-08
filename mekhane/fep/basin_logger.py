@@ -51,7 +51,7 @@ class AttractorLogEntry:
     actual_series: Optional[str] = None   # Creator の実際の選択
     correction: bool = False               # 推薦 ≠ 実際の選択
 
-    # PURPOSE: 関数: to_dict
+    # PURPOSE: 予測ログをJSON永続化可能な形式に変換
     def to_dict(self) -> dict:
         return asdict(self)
 
@@ -118,7 +118,7 @@ class BasinLogger:
         report = logger.bias_report()
     """
 
-    # PURPOSE: 内部処理: init__
+    # PURPOSE: 予測vs実績の偏り蓄積とbiasチューニング提案
     def __init__(self, log_dir: Path | None = None):
         self.log_dir = log_dir or DEFAULT_LOG_DIR
         self.log_dir.mkdir(parents=True, exist_ok=True)

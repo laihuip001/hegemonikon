@@ -14,9 +14,10 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 import json
-import os
 import re
 from typing import Optional
+
+from mekhane.pks.llm_client import PKSLLMClient
 
 from mekhane.pks.pks_engine import KnowledgeNugget
 
@@ -79,27 +80,12 @@ class PKSMatrixView:
         model: str = "gemini-2.0-flash",
     ):
         self.columns = columns or self.DEFAULT_COLUMNS
-        self._client = None
-        self._model = model
-        if use_llm:
-            self._init_client()
-
-    def _init_client(self) -> None:
-        try:
-            from google import genai
-            api_key = (
-                os.environ.get("GOOGLE_API_KEY")
-                or os.environ.get("GEMINI_API_KEY")
-                or os.environ.get("GOOGLE_GENAI_API_KEY")
-            )
-            self._client = genai.Client(api_key=api_key) if api_key else genai.Client()
-        except (ImportError, Exception):
-            self._client = None
+        self._llm = PKSLLMClient(model=model, enabled=use_llm)
 
     # PURPOSE: llm_available の処理
     @property
     def llm_available(self) -> bool:
-        return self._client is not None
+        return self._llm.available
 
     # PURPOSE: 比較表を Markdown テーブルとして生成
     def generate(self, nuggets: list[KnowledgeNugget]) -> str:
@@ -162,14 +148,11 @@ class PKSMatrixView:
         )
 
         try:
-            response = self._client.models.generate_content(
-                model=self._model, contents=prompt
-            )
-            text = response.text if response else ""
-            # JSON 抽出
-            match = re.search(r'\[.*\]', text, re.DOTALL)
-            if match:
-                return json.loads(match.group())
+            text = self._llm.generate(prompt)
+            if text:
+                match = re.search(r'\[.*\]', text, re.DOTALL)
+                if match:
+                    return json.loads(match.group())
         except Exception as e:
             print(f"[MatrixView] Axis extraction error: {e}")
 
@@ -186,13 +169,11 @@ class PKSMatrixView:
         )
 
         try:
-            response = self._client.models.generate_content(
-                model=self._model, contents=prompt
-            )
-            text = response.text if response else ""
-            match = re.search(r'\{.*\}', text, re.DOTALL)
-            if match:
-                return json.loads(match.group())
+            text = self._llm.generate(prompt)
+            if text:
+                match = re.search(r'\{.*\}', text, re.DOTALL)
+                if match:
+                    return json.loads(match.group())
         except Exception as e:
             print(f"[MatrixView] Fill error: {e}")
 

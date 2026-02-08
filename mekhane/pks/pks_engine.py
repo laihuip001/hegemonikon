@@ -23,6 +23,8 @@ from datetime import datetime
 from pathlib import Path
 from typing import Optional
 
+from mekhane.pks.llm_client import PKSLLMClient
+
 # Path resolution
 _PKS_DIR = Path(__file__).resolve().parent
 _MEKHANE_DIR = _PKS_DIR.parent
@@ -398,30 +400,12 @@ class SuggestedQuestionGenerator:
     # PURPOSE: Gemini クライアントを初期化
     def __init__(self, model: str = "gemini-2.0-flash"):
         self.model_name = model
-        self._client = None
-        self._init_client()
-
-    def _init_client(self) -> None:
-        """Gemini クライアントを遅延初期化"""
-        try:
-            from google import genai
-
-            api_key = (
-                os.environ.get("GOOGLE_API_KEY")
-                or os.environ.get("GEMINI_API_KEY")
-                or os.environ.get("GOOGLE_GENAI_API_KEY")
-            )
-            if api_key:
-                self._client = genai.Client(api_key=api_key)
-            else:
-                self._client = genai.Client()
-        except (ImportError, Exception):
-            self._client = None
+        self._llm = PKSLLMClient(model=model)
 
     # PURPOSE: is_available の処理
     @property
     def is_available(self) -> bool:
-        return self._client is not None
+        return self._llm.available
 
     # PURPOSE: KnowledgeNugget から「聞くべき質問」を生成
     def generate(
@@ -449,10 +433,7 @@ class SuggestedQuestionGenerator:
         )
 
         try:
-            response = self._client.models.generate_content(
-                model=self.model_name, contents=prompt
-            )
-            text = response.text if response else ""
+            text = self._llm.generate(prompt)
             if text:
                 lines = [
                     line.strip()

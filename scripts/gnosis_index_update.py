@@ -24,6 +24,7 @@ sys.path.insert(0, str(HEGEMONIKON_ROOT))
 
 def main():
     import argparse
+    import fcntl
 
     parser = argparse.ArgumentParser(description="Gnōsis Knowledge Index Update")
     parser.add_argument(
@@ -34,17 +35,31 @@ def main():
     )
     args = parser.parse_args()
 
-    from mekhane.anamnesis.gnosis_chat import KnowledgeIndexer
+    # GPU 排他制御 — Chat 使用中に timer 発火しても OOM しない
+    lock_path = Path("/tmp/gnosis_embedder.lock")
+    try:
+        lock_file = open(lock_path, "w")
+        fcntl.flock(lock_file, fcntl.LOCK_EX | fcntl.LOCK_NB)
+    except (IOError, OSError):
+        if not args.quiet:
+            print(f"[{time.strftime('%Y-%m-%d %H:%M:%S')}] Skipped: embedder locked")
+        return 0
 
-    if not args.quiet:
-        print(f"[{time.strftime('%Y-%m-%d %H:%M:%S')}] Gnōsis Index Update", flush=True)
+    try:
+        from mekhane.anamnesis.gnosis_chat import KnowledgeIndexer
 
-    t0 = time.time()
-    added = KnowledgeIndexer.index_knowledge(force_reindex=args.force)
-    elapsed = time.time() - t0
+        if not args.quiet:
+            print(f"[{time.strftime('%Y-%m-%d %H:%M:%S')}] Gnōsis Index Update", flush=True)
 
-    if not args.quiet:
-        print(f"[{time.strftime('%Y-%m-%d %H:%M:%S')}] Done: {added} new chunks in {elapsed:.1f}s")
+        t0 = time.time()
+        added = KnowledgeIndexer.index_knowledge(force_reindex=args.force)
+        elapsed = time.time() - t0
+
+        if not args.quiet:
+            print(f"[{time.strftime('%Y-%m-%d %H:%M:%S')}] Done: {added} new chunks in {elapsed:.1f}s")
+    finally:
+        fcntl.flock(lock_file, fcntl.LOCK_UN)
+        lock_file.close()
 
     return 0
 

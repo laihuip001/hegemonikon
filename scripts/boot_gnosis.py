@@ -56,15 +56,16 @@ def main():
         search_knowledge=True,
         top_k=args.top_k,
         use_reranker=True,
+        steering_profile="hegemonikon",
     )
 
     for i, q in enumerate(queries, 1):
         print(f"\n--- [{i}/{len(queries)}] {q}")
-        result = chat.ask(q)
+        result = chat.retrieve_only(q)
 
         conf = result.get("confidence", "?")
         icon = {"high": "🟢", "medium": "🟡", "low": "🟠", "none": "🔴"}.get(conf, "❓")
-        print(f"  {icon} Confidence: {conf}")
+        print(f"  {icon} Confidence: {conf} ({result['context_docs']} docs)")
 
         if result.get("sources"):
             for j, s in enumerate(result["sources"][:3], 1):
@@ -72,12 +73,12 @@ def main():
                 dist = s.get("distance", "?")
                 print(f"  [{j}] d={dist:.3f} {title}")
 
-        if result.get("answer"):
-            # Truncate for boot summary
-            answer = result["answer"][:300]
-            if len(result["answer"]) > 300:
-                answer += "..."
-            print(f"  💡 {answer}")
+        if result.get("context"):
+            # Show context snippet for boot summary
+            ctx = result["context"][:400]
+            if len(result["context"]) > 400:
+                ctx += "..."
+            print(f"  📚 {ctx}")
 
     elapsed = time.time() - t0
     print(f"\n{'=' * 60}")

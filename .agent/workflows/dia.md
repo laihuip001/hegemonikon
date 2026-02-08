@@ -111,6 +111,9 @@ if Gemini/Jules の成果物:
 if 空虚語・抽象論 を検出:
   → Buzzword Guillotine 発動
 
+if Cone.needs_devil == True (V > 0.3):
+  → --mode=devil (FEP devil_attack 自動発動)
+
 if 確信度が LOW or 認識限界を検出:
   → --mode=epochē (判断停止)
 

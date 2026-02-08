@@ -62,6 +62,11 @@ class CycleResult:
     cone_apex: Optional[str] = None
     cone_dispersion: Optional[float] = None
     cone_method: Optional[str] = None
+    # ConeAdvice + DevilAttack
+    advice_action: Optional[str] = None
+    advice_wf: Optional[str] = None
+    devil_severity: Optional[float] = None
+    devil_summary: Optional[str] = None
     # Learning
     a_matrix_updated: bool = False
     should_epoche: bool = False
@@ -123,8 +128,9 @@ def run_loop(
         run_fep_with_learning,
     )
     from mekhane.fep.attractor_dispatcher import AttractorDispatcher
-    from mekhane.fep.cone_builder import converge
+    from mekhane.fep.cone_builder import converge, compute_dispersion, resolve_method
     from mekhane.fep.category import Series
+    from mekhane.fep.cone_consumer import advise, devil_attack
 
     # 一時ファイルでA行列を管理 (テスト時のクリーン性)
     if a_matrix_path is None:
@@ -191,6 +197,21 @@ def run_loop(
             cycle.cone_apex = simulated_cone.get("apex")
             cycle.cone_dispersion = simulated_cone.get("dispersion")
             cycle.cone_method = simulated_cone.get("method")
+
+            # ── Step 4b: ConeAdvice + DevilAttack ──
+            try:
+                series_enum = Series[plan.primary.series]
+                outputs = simulated_cone.get("outputs", {})
+                cone = converge(series_enum, outputs)
+                advice = advise(cone)
+                cycle.advice_action = advice.action
+                cycle.advice_wf = advice.suggested_wf
+                if cone.needs_devil:
+                    attack = devil_attack(cone)
+                    cycle.devil_severity = attack.severity
+                    cycle.devil_summary = attack.attack_summary
+            except Exception:
+                pass  # cone_consumer is best-effort
 
         results.append(cycle)
 

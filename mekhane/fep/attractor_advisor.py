@@ -53,6 +53,15 @@ class AttractorAdvisor:
             and oscillation diagnosis.
         """
         result = self._attractor.diagnose(user_input)
+        return self._recommend_from_result(result)
+
+    # PURPOSE: SuggestResult から Recommendation を生成する（内部ヘルパー）
+    def _recommend_from_result(self, result: SuggestResult) -> Recommendation:
+        """SuggestResult から Recommendation を生成する。
+
+        recommend() と recommend_compound() の共通ロジック。
+        diagnose() の再呼出しを避けるために分離。
+        """
         interpretation = result.interpretation
 
         if not result.attractors:
@@ -151,14 +160,19 @@ class AttractorAdvisor:
         単一文の場合は通常の recommend() に委譲。
         複数文の場合は decompose() → 各セグメントごとに推薦 → マージ。
 
+        最適化: decompose() は内部で diagnose() を呼ぶため、
+        その SuggestResult を _recommend_from_result() で再利用し、
+        diagnose() の重複呼出を排除 (2N → N)。
+
         Returns:
             CompoundRecommendation with per-segment and merged recommendations
         """
         decomp = self._attractor.decompose(user_input)
 
+        # decompose() の SuggestResult をそのまま使い、diagnose() 再呼出しを避ける
         segments: list[tuple[str, Recommendation]] = []
         for seg in decomp.segments:
-            rec = self.recommend(seg.text)
+            rec = self._recommend_from_result(seg.diagnosis)
             segments.append((seg.text, rec))
 
         # マージ: 全 workflows を統合
@@ -178,6 +192,7 @@ class AttractorAdvisor:
             merged_series=decomp.merged_series,
             merged_workflows=all_workflows,
             is_compound=decomp.is_multi,
+            is_multi_segment=len(decomp.segments) > 1,
             primary=best_rec,
         )
 
@@ -209,7 +224,8 @@ class CompoundRecommendation:
     segments: list[tuple[str, Recommendation]]  # (text, recommendation) pairs
     merged_series: list[str]
     merged_workflows: list[str]
-    is_compound: bool  # 複数 Series に分解されたか
+    is_compound: bool  # 複数 Series に分解されたか (= is_multi_series)
+    is_multi_segment: bool  # 複数文に分解されたか
     primary: Recommendation | None  # 最高確信度の推薦
 
     # PURPOSE: 内部処理: repr__

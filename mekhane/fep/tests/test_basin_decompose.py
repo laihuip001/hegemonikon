@@ -276,3 +276,88 @@ class TestRecommendCompound:
         assert "Compound:" in repr_str
         assert "segments" in repr_str
 
+    def test_is_multi_segment_single(self, advisor):
+        """単一文 → is_multi_segment = False"""
+        result = advisor.recommend_compound("Design the architecture")
+        assert result.is_multi_segment is False
+
+    def test_is_multi_segment_multi(self, advisor):
+        """複数文 → is_multi_segment = True"""
+        result = advisor.recommend_compound(
+            "Why does this exist? How should we build it?"
+        )
+        assert result.is_multi_segment is True
+
+
+# --- C: E2E bias integration test ---
+
+class TestBiasE2E:
+    """Problem C: bias → diagnose 結果変化の E2E テスト"""
+
+    def test_bias_changes_similarity(self, attractor: SeriesAttractor):
+        """too_wide bias 適用で similarity が下がることを検証"""
+        from mekhane.fep.basin_logger import BasinBias
+
+        # Before bias
+        result_before = attractor.diagnose("Design the architecture and plan")
+        sim_before = result_before.top_similarity
+
+        # Apply strong too_wide bias to top series
+        top_series = result_before.primary.series
+        biases = {
+            top_series: BasinBias(
+                series=top_series,
+                over_predict_count=10,
+                under_predict_count=0,
+                correct_count=0,
+                total_count=10,
+            ),
+        }
+        attractor.apply_bias(biases)
+
+        # After bias
+        result_after = attractor.diagnose("Design the architecture and plan")
+        sim_after = result_after.top_similarity
+
+        # Similarity should be lower (penalized)
+        assert sim_after < sim_before
+
+        # Clean up: remove bias
+        attractor._bias_adjustments.clear()
+
+    def test_bias_too_narrow_increases_similarity(self, attractor: SeriesAttractor):
+        """too_narrow bias 適用で similarity が上がることを検証"""
+        from mekhane.fep.basin_logger import BasinBias
+
+        # Before bias
+        result_before = attractor.diagnose("When is the right time?")
+        # Find a series that's NOT the top (will be boosted)
+        sorted_results = sorted(
+            [(r.series, r.similarity) for r in result_before.attractors],
+            key=lambda x: x[1], reverse=True,
+        )
+        if len(sorted_results) >= 2:
+            target_series = sorted_results[1][0]
+            sim_before = sorted_results[1][1]
+
+            biases = {
+                target_series: BasinBias(
+                    series=target_series,
+                    over_predict_count=0,
+                    under_predict_count=10,
+                    correct_count=0,
+                    total_count=10,
+                ),
+            }
+            attractor.apply_bias(biases)
+
+            result_after = attractor.diagnose("When is the right time?")
+            # Find the boosted series
+            boosted = [r for r in result_after.attractors if r.series == target_series]
+            if boosted:
+                assert boosted[0].similarity > sim_before
+
+            # Clean up
+            attractor._bias_adjustments.clear()
+
+

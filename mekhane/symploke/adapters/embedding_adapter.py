@@ -11,7 +11,7 @@ import numpy as np
 from .base import VectorStoreAdapter, SearchResult
 
 # 環境変数でモデルを切り替え可能 (bge-m3 移行 Step 1)
-DEFAULT_MODEL = os.environ.get("EMBEDDING_MODEL", "all-MiniLM-L6-v2")
+DEFAULT_MODEL = os.environ.get("EMBEDDING_MODEL", "BAAI/bge-m3")
 
 
 class EmbeddingAdapter(VectorStoreAdapter):

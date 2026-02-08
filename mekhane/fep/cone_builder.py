@@ -264,6 +264,14 @@ def compute_pw_table(
     return table
 
 
+# Pre-compute composed functors for η/ε adjunction auto-resolve (F5)
+# Without these, verify_naturality() always falls back to component-only checks
+_boot = FUNCTORS["boot"]
+_bye = FUNCTORS["bye"]
+FUNCTORS["bye∘boot"] = _boot.compose(_bye)  # Mem → Mem (η target)
+FUNCTORS["boot∘bye"] = _bye.compose(_boot)  # Ses → Ses (ε source)
+
+
 # =============================================================================
 # Main: converge() — C0-C3 一括実行
 # =============================================================================
@@ -611,10 +619,22 @@ def is_cross_boundary_morphism(
 ) -> Optional[str]:
     """Determine if a morphism crosses the U/R boundary.
 
+    BRIDGE classification rationale (F6):
+    - BRIDGE_U_TO_R (A1 Pathos) is grouped with U_types because it
+      *originates from* Understanding. A1 transforms raw emotion
+      (understood) into precision (reasoning). The morphism A1→S1
+      crosses U→R because A1 is the "departure side" of understanding.
+    - BRIDGE_R_TO_U (A3 Gnōmē) is grouped with R_types because it
+      *originates from* Reasoning. A3 distills methodical analysis
+      into insight (understanding).
+    - This "origin-side" classification aligns with how MP (Wang & Zhao
+      2023) treats metacognitive transitions: the bridge belongs to
+      the side it departs from, not the side it arrives at.
+
     Returns:
         "U→R" if source is Understanding and target is Reasoning
         "R→U" if source is Reasoning and target is Understanding
-        None if both are same type or if either is Bridge/Mixed
+        None if both are same type or if either is MIXED
     """
     src_type = COGNITIVE_TYPES.get(source_id)
     tgt_type = COGNITIVE_TYPES.get(target_id)
@@ -622,6 +642,7 @@ def is_cross_boundary_morphism(
     if src_type is None or tgt_type is None:
         return None
 
+    # BRIDGE belongs to its origin side (departure classification)
     u_types = {CognitiveType.UNDERSTANDING, CognitiveType.BRIDGE_U_TO_R}
     r_types = {CognitiveType.REASONING, CognitiveType.BRIDGE_R_TO_U}
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # PROOF: [L2/インフラ] <- mekhane/symploke/ A0→継続する私が必要→boot_integration が担う
 """
-Boot Integration - 7軸を統合した /boot 用 API
+Boot Integration - 8軸を統合した /boot 用 API
 
 Usage:
     python boot_integration.py                    # 標準起動
@@ -24,7 +24,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 def get_boot_context(mode: str = "standard", context: Optional[str] = None) -> dict:
     """
-    /boot 統合 API: 6軸（Handoff, Sophia, Persona, PKS, Safety, Attractor）を統合して返す
+    /boot 統合 API: 8軸（Handoff, Sophia, Persona, PKS, Safety, EPT, Digestor, Attractor）を統合して返す
 
     GPU プリフライトチェック付き: GPU 占有時は embedding 系を CPU フォールバックで実行
 
@@ -39,6 +39,7 @@ def get_boot_context(mode: str = "standard", context: Optional[str] = None) -> d
             "persona": {...},     # 軸 C
             "pks": {...},         # 軸 D
             "safety": {...},      # 軸 E
+            "ept": {...},          # 軸 H
             "attractor": {...},   # 軸 F
             "formatted": str      # フォーマット済み出力
         }
@@ -60,14 +61,14 @@ def get_boot_context(mode: str = "standard", context: Optional[str] = None) -> d
         pass  # GPU チェック失敗時は無視して続行
 
     # 軸 A: Handoff 活用
-    print(" [1/7] 📋 Searching Handoffs...", file=sys.stderr, end="", flush=True)
+    print(" [1/8] 📋 Searching Handoffs...", file=sys.stderr, end="", flush=True)
     from mekhane.symploke.handoff_search import get_boot_handoffs, format_boot_output
 
     handoffs_result = get_boot_handoffs(mode=mode, context=context)
     print(" Done.", file=sys.stderr)
 
     # 軸 B: Sophia アクティベーション (タイムアウト付き)
-    print(" [2/7] 📚 Ingesting Knowledge (Sophia)...", file=sys.stderr, end="", flush=True)
+    print(" [2/8] 📚 Ingesting Knowledge (Sophia)...", file=sys.stderr, end="", flush=True)
     # コンテキストを Handoff から取得
     ki_context = context
     if not ki_context and handoffs_result["latest"]:
@@ -91,7 +92,7 @@ def get_boot_context(mode: str = "standard", context: Optional[str] = None) -> d
         print(" Timeout (skipped).", file=sys.stderr)
     except Exception as e:
         print(f" Failed ({str(e)}).", file=sys.stderr)
-    print(" [3/7] 👤 Loading Persona...", file=sys.stderr, end="", flush=True)
+    print(" [3/8] 👤 Loading Persona...", file=sys.stderr, end="", flush=True)
     from mekhane.symploke.persona import get_boot_persona
 
     persona_result = get_boot_persona(mode=mode)
@@ -102,7 +103,7 @@ def get_boot_context(mode: str = "standard", context: Optional[str] = None) -> d
     pks_result = {"nuggets": [], "count": 0, "formatted": ""}
     
     if mode != "fast":  # fastモードではPKSをスキップ
-        print(" [4/7] 🧠 Activating PKS Engine...", file=sys.stderr, end="", flush=True)
+        print(" [4/8] 🧠 Activating PKS Engine...", file=sys.stderr, end="", flush=True)
         try:
             from concurrent.futures import ThreadPoolExecutor
             
@@ -146,11 +147,11 @@ def get_boot_context(mode: str = "standard", context: Optional[str] = None) -> d
         except Exception as e:
             print(f" Failed ({str(e)}).", file=sys.stderr)
     else:
-         print(" [4/7] 🧠 PKS Engine skipped (fast mode).", file=sys.stderr)
+         print(" [4/8] 🧠 PKS Engine skipped (fast mode).", file=sys.stderr)
 
     # 軸 E: Safety Contract Audit (v3.1)
     safety_result = {"skills": 0, "workflows": 0, "errors": 0, "warnings": 0, "formatted": ""}
-    print(" [5/7] 🛡️ Running Safety Contract Audit...", file=sys.stderr, end="", flush=True)
+    print(" [5/8] 🛡️ Running Safety Contract Audit...", file=sys.stderr, end="", flush=True)
     try:
         from mekhane.dendron.skill_checker import run_audit, AuditResult
         agent_dir = Path(__file__).parent.parent.parent / ".agent"
@@ -180,9 +181,41 @@ def get_boot_context(mode: str = "standard", context: Optional[str] = None) -> d
     except Exception as e:
         print(f" Failed ({str(e)}).", file=sys.stderr)
 
+    # 軸 H: EPT (Existence Purpose Tensor)
+    ept_result = {"score": 0, "total": 0, "pct": 0, "formatted": ""}
+    print(" [6/8] 📐 Running EPT Matrix...", file=sys.stderr, end="", flush=True)
+    try:
+        from concurrent.futures import ThreadPoolExecutor
+        def _run_ept():
+            from mekhane.dendron.checker import DendronChecker
+            c = DendronChecker(
+                check_structure=True,
+                check_function_nf=True,
+                check_verification=True,
+            )
+            r = c.check(Path(__file__).parent.parent)  # mekhane/
+            total = r.total_structure_checks + r.total_function_nf_checks + r.total_verification_checks
+            ok = r.structure_ok + r.function_nf_ok + r.verification_ok
+            pct = (ok / total * 100) if total > 0 else 0
+            return {
+                "score": ok, "total": total, "pct": pct,
+                "nf2": f"{r.structure_ok}/{r.total_structure_checks}",
+                "nf3": f"{r.function_nf_ok}/{r.total_function_nf_checks}",
+                "bcnf": f"{r.verification_ok}/{r.total_verification_checks}",
+                "formatted": f"📐 **EPT**: {ok}/{total} ({pct:.0f}%) [NF2:{r.structure_ok}/{r.total_structure_checks} NF3:{r.function_nf_ok}/{r.total_function_nf_checks} BCNF:{r.verification_ok}/{r.total_verification_checks}]",
+            }
+        with ThreadPoolExecutor(max_workers=1) as executor:
+            future = executor.submit(_run_ept)
+            ept_result = future.result(timeout=10.0)
+        print(" Done.", file=sys.stderr)
+    except TimeoutError:
+        print(" Timeout (skipped).", file=sys.stderr)
+    except Exception as e:
+        print(f" Failed ({str(e)}).", file=sys.stderr)
+
     # 軸 G: Digestor 候補 (論文レコメンド)
     digestor_result = {"candidates": [], "count": 0, "formatted": ""}
-    print(" [6/7] 📄 Loading Digest Candidates...", file=sys.stderr, end="", flush=True)
+    print(" [7/8] 📄 Loading Digest Candidates...", file=sys.stderr, end="", flush=True)
     try:
         import glob
         digest_dir = Path.home() / ".hegemonikon" / "digestor"
@@ -210,7 +243,7 @@ def get_boot_context(mode: str = "standard", context: Optional[str] = None) -> d
     # 軸 F: Attractor Dispatch Engine
     attractor_result = {"series": [], "workflows": [], "llm_format": "", "formatted": ""}
     if context:
-        print(" [7/7] 🎯 Attractor Dispatch...", file=sys.stderr, end="", flush=True)
+        print(" [8/8] 🎯 Attractor Dispatch...", file=sys.stderr, end="", flush=True)
         try:
             from concurrent.futures import ThreadPoolExecutor
 
@@ -238,7 +271,7 @@ def get_boot_context(mode: str = "standard", context: Optional[str] = None) -> d
         except Exception as e:
             print(f" Failed ({str(e)}).", file=sys.stderr)
     else:
-        print(" [7/7] 🎯 Attractor skipped (no context).", file=sys.stderr)
+        print(" [8/8] 🎯 Attractor skipped (no context).", file=sys.stderr)
 
     # 統合フォーマット
     lines = []
@@ -268,6 +301,11 @@ def get_boot_context(mode: str = "standard", context: Optional[str] = None) -> d
         lines.append("")
         lines.append(safety_result["formatted"])
 
+    # EPT
+    if ept_result["formatted"]:
+        lines.append("")
+        lines.append(ept_result["formatted"])
+
     # Digestor
     if digestor_result["formatted"]:
         lines.append("")
@@ -284,6 +322,7 @@ def get_boot_context(mode: str = "standard", context: Optional[str] = None) -> d
         "persona": persona_result,
         "pks": pks_result,
         "safety": safety_result,
+        "ept": ept_result,
         "digestor": digestor_result,
         "attractor": attractor_result,
         "formatted": "\n".join(lines),
@@ -305,7 +344,9 @@ def print_boot_summary(mode: str = "standard", context: Optional[str] = None):
     safety_errors = result.get("safety", {}).get("errors", 0)
     attractor_series = result.get("attractor", {}).get("series", [])
     attractor_str = "+".join(attractor_series) if attractor_series else "—"
-    print(f"📊 Handoff: {h_count}件 | KI: {ki_count}件 | Sessions: {sessions} | PKS: {pks_count}件 | Safety: {'✅' if safety_errors == 0 else f'⚠️{safety_errors}'} | Attractor: {attractor_str}")
+    ept_pct = result.get("ept", {}).get("pct", 0)
+    ept_str = f"{ept_pct:.0f}%" if ept_pct > 0 else "—"
+    print(f"📊 Handoff: {h_count}件 | KI: {ki_count}件 | Sessions: {sessions} | PKS: {pks_count}件 | Safety: {'✅' if safety_errors == 0 else f'⚠️{safety_errors}'} | EPT: {ept_str} | Attractor: {attractor_str}")
 
     # detailed モード: テンプレートファイル生成
     if mode == "detailed":

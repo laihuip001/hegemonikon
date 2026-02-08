@@ -33,23 +33,23 @@ def infer_purpose(name: str, node_type: str, docstring: Optional[str] = None) ->
         if len(first_line) < 100 and first_line:
             return first_line[:80]
 
-    # 名前パターンからの推定
-    patterns = {
-        r'^get_|^fetch_|^load_|^read_': '取得',
-        r'^set_|^update_|^save_|^write_': '設定/保存',
-        r'^check_|^validate_|^verify_|^is_|^has_': '検証',
-        r'^run_|^execute_|^start_|^launch_': '実行',
-        r'^create_|^make_|^build_|^generate_': '生成',
-        r'^delete_|^remove_|^clear_|^cleanup_': '削除/クリーンアップ',
-        r'^parse_|^extract_|^split_': 'パース/抽出',
-        r'^format_|^render_|^display_|^print_': 'フォーマット/表示',
-        r'^test_': 'テスト',
-        r'^_': '内部処理',
-        r'^__init__$': '初期化',
-        r'^__str__|^__repr__': '文字列表現',
-    }
+    # 名前パターンからの推定 (順序重要: dunder → single underscore)
+    patterns = [
+        (r'^__init__$', '初期化'),
+        (r'^__str__|^__repr__', '文字列表現'),
+        (r'^get_|^fetch_|^load_|^read_', '取得'),
+        (r'^set_|^update_|^save_|^write_', '設定/保存'),
+        (r'^check_|^validate_|^verify_|^is_|^has_', '検証'),
+        (r'^run_|^execute_|^start_|^launch_', '実行'),
+        (r'^create_|^make_|^build_|^generate_', '生成'),
+        (r'^delete_|^remove_|^clear_|^cleanup_', '削除/クリーンアップ'),
+        (r'^parse_|^extract_|^split_', 'パース/抽出'),
+        (r'^format_|^render_|^display_|^print_', 'フォーマット/表示'),
+        (r'^test_', 'テスト'),
+        (r'^_', '内部処理'),
+    ]
 
-    for pattern, desc in patterns.items():
+    for pattern, desc in patterns:
         if re.match(pattern, name):
             clean_name = re.sub(r'^_+', '', name)
             return f"{desc}: {clean_name}"
@@ -99,7 +99,7 @@ def add_purpose_comments(filepath: Path, dry_run: bool = True) -> int:
             def_line = lines[start_line - 1]
             indent = def_line[:len(def_line) - len(def_line.lstrip())]
 
-        insertions.append((start_line - 1, f"{indent}# PURPOSE: {purpose}"))
+        insertions.append((start_line - 1, f"{indent}# PURPOSE: [L2-auto] {purpose}"))
 
     if dry_run:
         for line_no, comment in insertions:

@@ -337,6 +337,35 @@ class SeriesAttractor:
         self._proto_keys: list[str] = []  # Series keys in tensor order
         self._device = None  # torch.device
         self._force_cpu = force_cpu
+        # Problem C: per-series similarity adjustment from basin bias
+        self._bias_adjustments: dict[str, float] = {}
+
+    # PURPOSE: Problem C — BasinBias から per-series の similarity 補正を適用
+    def apply_bias(self, biases: dict[str, "BasinBias"]) -> None:
+        """BasinBias データから per-series の similarity 補正係数を計算・適用する。
+
+        too_wide → similarity を下げる (より厳しく)
+        too_narrow → similarity を上げる (より寛容に)
+
+        Args:
+            biases: {series_name: BasinBias} dict from BasinLogger._biases
+        """
+        for series, bias in biases.items():
+            if bias.total_count < 5:
+                continue  # データ不足はスキップ
+            direction = bias.bias_direction
+            if direction == "too_wide":
+                # Over-predict → この Series の similarity を下げる
+                # 最大 -0.05 の補正 (precision が低いほど大きく)
+                penalty = min(0.05, (1.0 - bias.precision) * 0.1)
+                self._bias_adjustments[series] = -penalty
+            elif direction == "too_narrow":
+                # Under-predict → この Series の similarity を上げる
+                # 最大 +0.05 の補正 (recall が低いほど大きく)
+                bonus = min(0.05, (1.0 - bias.recall) * 0.1)
+                self._bias_adjustments[series] = bonus
+            else:
+                self._bias_adjustments[series] = 0.0
 
     # --- Lazy initialization ---
 
@@ -432,6 +461,14 @@ class SeriesAttractor:
         self._ensure_initialized()
 
         similarities = self._compute_similarities(user_input)
+
+        # Problem C: bias 補正を適用
+        if self._bias_adjustments:
+            similarities = [
+                (key, sim + self._bias_adjustments.get(key, 0.0))
+                for key, sim in similarities
+            ]
+
         similarities.sort(key=lambda x: x[1], reverse=True)
 
         top_sim = similarities[0][1] if similarities else 0.0

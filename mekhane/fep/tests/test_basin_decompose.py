@@ -175,3 +175,102 @@ class TestDecompose:
         """単一 Series → is_multi = False"""
         result = attractor.decompose("Design the architecture")
         assert result.is_multi is False
+
+
+# --- C: apply_bias() integration tests ---
+
+class TestApplyBias:
+    """Problem C: SeriesAttractor.apply_bias() のテスト"""
+
+    def test_apply_bias_too_wide(self):
+        """too_wide bias → similarity が下がる"""
+        from mekhane.fep.basin_logger import BasinBias
+        a = SeriesAttractor(threshold=0.10, oscillation_margin=0.05)
+        biases = {
+            "P": BasinBias(series="P", over_predict_count=8, under_predict_count=0,
+                          correct_count=0, total_count=8),
+        }
+        a.apply_bias(biases)
+        assert a._bias_adjustments["P"] < 0
+
+    def test_apply_bias_too_narrow(self):
+        """too_narrow bias → similarity が上がる"""
+        from mekhane.fep.basin_logger import BasinBias
+        a = SeriesAttractor(threshold=0.10, oscillation_margin=0.05)
+        biases = {
+            "H": BasinBias(series="H", over_predict_count=0, under_predict_count=8,
+                          correct_count=2, total_count=10),
+        }
+        a.apply_bias(biases)
+        assert a._bias_adjustments["H"] > 0
+
+    def test_apply_bias_balanced(self):
+        """balanced bias → adjustment = 0"""
+        from mekhane.fep.basin_logger import BasinBias
+        a = SeriesAttractor(threshold=0.10, oscillation_margin=0.05)
+        biases = {
+            "O": BasinBias(series="O", over_predict_count=3, under_predict_count=3,
+                          correct_count=4, total_count=10),
+        }
+        a.apply_bias(biases)
+        assert a._bias_adjustments["O"] == 0.0
+
+    def test_apply_bias_insufficient_data(self):
+        """データ不足 (< 5) → スキップ"""
+        from mekhane.fep.basin_logger import BasinBias
+        a = SeriesAttractor(threshold=0.10, oscillation_margin=0.05)
+        biases = {
+            "K": BasinBias(series="K", over_predict_count=2, total_count=3),
+        }
+        a.apply_bias(biases)
+        assert "K" not in a._bias_adjustments
+
+
+# --- D: recommend_compound() tests ---
+
+class TestRecommendCompound:
+    """Problem D: AttractorAdvisor.recommend_compound() のテスト"""
+
+    @pytest.fixture(scope="class")
+    def advisor(self):
+        from mekhane.fep.attractor_advisor import AttractorAdvisor
+        return AttractorAdvisor()
+
+    def test_single_sentence(self, advisor):
+        """単一文 → 1セグメント"""
+        from mekhane.fep.attractor_advisor import CompoundRecommendation
+        result = advisor.recommend_compound("Why does this project exist?")
+        assert isinstance(result, CompoundRecommendation)
+        assert len(result.segments) == 1
+        assert result.is_compound is False
+
+    def test_compound_multi_segment(self, advisor):
+        """複数文 → 複数セグメント + is_compound"""
+        result = advisor.recommend_compound(
+            "Why does this project exist? Design the implementation plan."
+        )
+        assert len(result.segments) >= 2
+        assert result.is_compound is True
+
+    def test_compound_merged_workflows(self, advisor):
+        """マージされた workflows に重複がない"""
+        result = advisor.recommend_compound(
+            "Why? How to build? Is now the right time?"
+        )
+        assert len(result.merged_workflows) == len(set(result.merged_workflows))
+
+    def test_compound_primary_exists(self, advisor):
+        """primary は最高確信度の推薦"""
+        result = advisor.recommend_compound(
+            "Purpose and architecture design."
+        )
+        assert result.primary is not None
+        assert result.primary.confidence > 0
+
+    def test_compound_repr(self, advisor):
+        """CompoundRecommendation の repr"""
+        result = advisor.recommend_compound("Why? How?")
+        repr_str = repr(result)
+        assert "Compound:" in repr_str
+        assert "segments" in repr_str
+

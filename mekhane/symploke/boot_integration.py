@@ -340,6 +340,27 @@ def get_boot_context(mode: str = "standard", context: Optional[str] = None) -> d
         lines.append("")
         lines.append(attractor_result["formatted"])
 
+    # n8n WF-06: Session Start 通知
+    try:
+        import urllib.request
+        n8n_payload = json.dumps({
+            "mode": mode,
+            "context": context or "",
+            "agent": "Claude",
+            "handoff_count": handoffs_result["count"],
+            "ki_count": ki_result["count"],
+        }).encode("utf-8")
+        req = urllib.request.Request(
+            "http://localhost:5678/webhook/session-start",
+            data=n8n_payload,
+            headers={"Content-Type": "application/json"},
+            method="POST",
+        )
+        urllib.request.urlopen(req, timeout=3)
+        print(" 📡 n8n: session started", file=sys.stderr)
+    except Exception:
+        pass  # n8n 未起動でもブートは継続
+
     return {
         "handoffs": handoffs_result,
         "ki": ki_result,

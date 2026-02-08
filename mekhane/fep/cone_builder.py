@@ -236,6 +236,8 @@ def converge(
     pw: Optional[Dict[str, float]] = None,
     apex: Optional[str] = None,
     confidence: float = 0.0,
+    context: Optional[str] = None,
+    agent: object = None,
 ) -> Cone:
     """Execute @converge C0-C3 and return a fully populated Cone.
 
@@ -246,9 +248,11 @@ def converge(
         outputs: Dict mapping theorem_id -> output string
         pw: Precision Weighting dict {theorem_id: weight}.
             weight ∈ [-1, +1]. 0 = neutral, +1 = emphasize, -1 = suppress.
-            None or empty = uniform weighting (equivalent to +/- operators).
+            None or empty = uses pw_adapter cascade to auto-resolve.
         apex: Optional pre-computed integrated judgment
         confidence: Optional confidence score (0-100)
+        context: Optional natural language context for PW inference
+        agent: Optional HegemonikónFEPAgent for PW derivation
 
     Returns:
         Cone with C0 pw, C1 projections, C2 resolution, C3 universality
@@ -256,8 +260,19 @@ def converge(
     Formula (C2 weighted fusion):
         統合出力 = Σ(定理_i × (1 + pw_i)) / Σ(1 + pw_i)
     """
-    # C0: Precision Weighting
-    cone_pw = pw or {}
+    # C0: Precision Weighting (pw_adapter cascade)
+    if pw is not None:
+        cone_pw = pw
+    else:
+        try:
+            from mekhane.fep.pw_adapter import resolve_pw
+            cone_pw = resolve_pw(
+                series.name,
+                context=context,
+                agent=agent,
+            )
+        except ImportError:
+            cone_pw = {}
 
     # C1: Build Cone with projections
     cone = build_cone(series, outputs)
@@ -358,3 +373,82 @@ def describe_cone(cone: Cone) -> str:
         lines.append("⚠️ **Devil's Advocate 推奨** (S-series, V > 0.1)")
 
     return "\n".join(lines)
+
+
+# =============================================================================
+# CLI Entry Point — @converge turbo blocks call this
+# =============================================================================
+
+
+def _parse_pw(pw_str: str) -> Dict[str, float]:
+    """Parse PW string: 'O1:0.5,O3:-0.5' → {'O1': 0.5, 'O3': -0.5}"""
+    if not pw_str:
+        return {}
+    result = {}
+    for pair in pw_str.split(","):
+        pair = pair.strip()
+        if ":" in pair:
+            k, v = pair.split(":", 1)
+            result[k.strip()] = float(v.strip())
+    return result
+
+
+def _parse_outputs(args: list) -> Dict[str, str]:
+    """Parse 'O1=深い認識 O2=強い意志' → {'O1': '深い認識', ...}"""
+    result = {}
+    for arg in args:
+        if "=" in arg:
+            k, v = arg.split("=", 1)
+            result[k.strip()] = v.strip()
+    return result
+
+
+if __name__ == "__main__":
+    import argparse
+    import sys
+
+    parser = argparse.ArgumentParser(
+        description="Cone Builder — Hub Peras @converge C0-C3",
+        usage="python -m mekhane.fep.cone_builder --series O O1='出力1' O2='出力2' ...",
+    )
+    parser.add_argument(
+        "--series", "-s",
+        required=True,
+        choices=["O", "S", "H", "P", "K", "A"],
+        help="Series to build cone for",
+    )
+    parser.add_argument(
+        "--pw",
+        default="",
+        help="Precision Weighting: 'O1:0.5,O3:-0.5'",
+    )
+    parser.add_argument(
+        "--apex",
+        default=None,
+        help="Pre-computed apex (integrated judgment)",
+    )
+    parser.add_argument(
+        "--confidence",
+        type=float,
+        default=0.0,
+        help="Confidence score (0-100)",
+    )
+    parser.add_argument(
+        "outputs",
+        nargs="*",
+        help="Theorem outputs: O1='認識の結論' O2='意志の結論' ...",
+    )
+
+    args = parser.parse_args()
+
+    series = Series[args.series]
+    pw = _parse_pw(args.pw)
+    outputs = _parse_outputs(args.outputs)
+
+    if not outputs:
+        print("⚠️ No outputs provided. Use: O1='出力1' O2='出力2' ...", file=sys.stderr)
+        sys.exit(1)
+
+    cone = converge(series, outputs, pw=pw or None, apex=args.apex, confidence=args.confidence)
+    print(describe_cone(cone))
+

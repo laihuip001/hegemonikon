@@ -45,8 +45,9 @@ class AttractorAdvisor:
     """
 
     # PURPOSE: Attractor推薦結果をWFディスパッチに変換する中間層
-    def __init__(self, force_cpu: bool = False):
+    def __init__(self, force_cpu: bool = False, use_gnosis: bool = True):
         self._attractor = SeriesAttractor(force_cpu=force_cpu)
+        self._use_gnosis = use_gnosis
 
     # PURPOSE: ユーザー入力からワークフロー推薦を生成する。
     def recommend(self, user_input: str) -> Recommendation:
@@ -58,7 +59,43 @@ class AttractorAdvisor:
             and oscillation diagnosis.
         """
         result = self._attractor.diagnose(user_input)
-        return self._recommend_from_result(result)
+        rec = self._recommend_from_result(result)
+
+        # Gnōsis enrichment: Attractor Series に関連する知識を付与
+        if self._use_gnosis and rec.series:
+            rec.knowledge_context = self._retrieve_gnosis(user_input)
+
+        return rec
+
+    # PURPOSE: Sophia インデックスから関連知識を検索し推薦を補強する
+    def _retrieve_gnosis(self, query: str, top_k: int = 2) -> list[dict]:
+        """Sophia ベクトルインデックスから関連 KI を検索する。
+
+        Graceful degradation: index 不在やエラー時は空リストを返す。
+        """
+        try:
+            from mekhane.symploke.sophia_ingest import (
+                DEFAULT_INDEX_PATH,
+                load_sophia_index,
+                search_loaded_index,
+            )
+
+            if not DEFAULT_INDEX_PATH.exists():
+                return []
+
+            adapter = load_sophia_index(str(DEFAULT_INDEX_PATH))
+            results = search_loaded_index(adapter, query, top_k=top_k)
+
+            return [
+                {
+                    "ki_name": r.metadata.get("ki_name", "Unknown"),
+                    "summary": r.metadata.get("summary", "")[:80],
+                    "score": round(r.score, 3),
+                }
+                for r in results
+            ]
+        except Exception:
+            return []  # Gnōsis failure should never block recommendations
 
     # PURPOSE: SuggestResult から Recommendation を生成する（内部ヘルパー）
     def _recommend_from_result(self, result: SuggestResult) -> Recommendation:
@@ -183,6 +220,11 @@ class AttractorAdvisor:
                 f"{k}={v:+.1f}" for k, v in rec.pw_suggestion.items()
             )
             lines.append(f"[PW boost: {pw_str}]")
+
+        # Gnōsis knowledge context
+        if rec.knowledge_context:
+            ki_names = ", ".join(k["ki_name"] for k in rec.knowledge_context)
+            lines.append(f"[Knowledge: {ki_names}]")
 
         return "\n".join(lines)
 
@@ -341,6 +383,8 @@ class Recommendation:
     cognitive_types: Dict[str, str] = field(default_factory=dict)  # series→type
     boundary_crossings: List[str] = field(default_factory=list)  # e.g. ["U→R"]
     pw_suggestion: Dict[str, float] = field(default_factory=dict)  # PW adjustments
+    # Gnōsis knowledge context: related KI items
+    knowledge_context: List[dict] = field(default_factory=list)
 
     # PURPOSE: 推薦結果の概要を表示（WF名+理由）
     def __repr__(self) -> str:

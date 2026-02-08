@@ -23,6 +23,7 @@ from typing import List, Optional
 
 import lancedb
 from pydantic import BaseModel
+from mekhane.anamnesis.lancedb_compat import get_table_names
 
 # 設定 — 環境変数でオーバーライド可能
 _PROJECT_ROOT = Path(__file__).parent.parent.parent

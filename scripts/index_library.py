@@ -18,6 +18,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from mekhane.anamnesis.models.prompt_module import PromptModule
 from mekhane.anamnesis.index import Embedder
+from mekhane.anamnesis.lancedb_compat import get_table_names
 
 LIBRARY_BASE = os.path.expanduser(
     "~/Sync/10_📚_ライブラリ｜Library/prompts"
@@ -124,7 +125,7 @@ def main():
         data.append(record)
 
     # テーブル削除 → 再作成 (フルリインデックス)
-    if TABLE_NAME in db.table_names():
+    if TABLE_NAME in get_table_names(db):
         db.drop_table(TABLE_NAME)
         print(f"  🗑️ 既存 {TABLE_NAME} テーブル削除")
 

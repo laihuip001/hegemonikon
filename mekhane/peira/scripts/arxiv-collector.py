@@ -21,6 +21,7 @@ import json
 import time
 from pathlib import Path
 from datetime import datetime
+from mekhane.anamnesis.lancedb_compat import get_table_names
 
 # Paths
 ROOT_DIR = Path(__file__).parent.parent / "Raw" / "aidb"
@@ -247,7 +248,7 @@ def build_index():
     db = lancedb.connect(str(LANCE_DIR))
 
     # Create/overwrite table
-    if "arxiv_papers" in db.table_names():
+    if "arxiv_papers" in get_table_names(db):
         db.drop_table("arxiv_papers")
 
     table = db.create_table("arxiv_papers", data=all_data)
@@ -271,7 +272,7 @@ def search_papers(query: str, n_results: int = 5):
 
     db = lancedb.connect(str(LANCE_DIR))
 
-    if "arxiv_papers" not in db.table_names():
+    if "arxiv_papers" not in get_table_names(db):
         print("Error: Paper index not found. Run 'index' first.")
         return
 
@@ -319,7 +320,7 @@ def show_stats():
             import lancedb
 
             db = lancedb.connect(str(LANCE_DIR))
-            if "arxiv_papers" in db.table_names():
+            if "arxiv_papers" in get_table_names(db):
                 table = db.open_table("arxiv_papers")
                 print(f"Indexed Papers: {len(table.to_pandas())}")
             else:

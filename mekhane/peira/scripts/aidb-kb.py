@@ -26,6 +26,7 @@ import re
 from pathlib import Path
 from datetime import datetime
 from typing import Optional
+from mekhane.anamnesis.lancedb_compat import get_table_names
 
 # Paths
 ROOT_DIR = Path(__file__).parent.parent / "Raw" / "aidb"
@@ -286,7 +287,7 @@ def build_index():
     print("Writing to LanceDB...")
 
     # Create/overwrite table
-    if "aidb" in db.table_names():
+    if "aidb" in get_table_names(db):
         db.drop_table("aidb")
 
     table = db.create_table("aidb", data=all_data)
@@ -394,7 +395,7 @@ def show_stats():
             import lancedb
 
             db = lancedb.connect(str(LANCE_DIR))
-            if "aidb" in db.table_names():
+            if "aidb" in get_table_names(db):
                 table = db.open_table("aidb")
                 print(f"\nIndex Status: [OK] Active")
                 print(f"Indexed Chunks: {len(table.to_pandas())}")

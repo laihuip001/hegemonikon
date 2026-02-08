@@ -1568,3 +1568,86 @@ class TestExplanationStack:
         assert "[Trace:" in text
         assert "[Rejected:" in text
         assert "investigate" in text
+
+
+class TestTraceInAdviseWithAttractor:
+    """T1: advise_with_attractor must propagate base.trace."""
+
+    def _make_cone(self, series=Series.O, dispersion=0.05,
+                   confidence=80.0, is_universal=True):
+        cone = build_cone(series, {
+            f"{series.name}1": "出力1", f"{series.name}2": "出力2",
+            f"{series.name}3": "出力3", f"{series.name}4": "出力4",
+        })
+        cone.dispersion = dispersion
+        cone.confidence = confidence
+        cone.is_universal = is_universal
+        cone.resolution_method = "simple_mean"
+        cone.pw = {}
+        return cone
+
+    def test_negative_oscillation_preserves_trace(self):
+        from mekhane.fep.cone_consumer import advise_with_attractor
+        cone = self._make_cone(dispersion=0.05, confidence=80.0)
+        result = advise_with_attractor(cone, "negative", 0.5, "O")
+        assert result.trace is not None
+        assert len(result.trace.evaluations) > 0
+
+    def test_weak_oscillation_preserves_trace(self):
+        from mekhane.fep.cone_consumer import advise_with_attractor
+        cone = self._make_cone(dispersion=0.05, confidence=80.0)
+        result = advise_with_attractor(cone, "weak", 0.3, "O")
+        # proceed → investigate, trace should survive
+        assert result.trace is not None
+
+    def test_series_mismatch_preserves_trace(self):
+        from mekhane.fep.cone_consumer import advise_with_attractor
+        cone = self._make_cone(dispersion=0.05, confidence=80.0)
+        result = advise_with_attractor(cone, "clear", 0.8, "S")  # mismatch
+        assert result.action == "investigate"
+        assert result.trace is not None
+
+    def test_positive_oscillation_preserves_trace(self):
+        from mekhane.fep.cone_consumer import advise_with_attractor
+        # Need devil action with urgency < 0.8 — use Rule 1 path
+        cone = self._make_cone(dispersion=0.35, confidence=30.0)
+        result = advise_with_attractor(cone, "positive", 0.7, "O")
+        assert result.trace is not None
+
+    def test_clear_oscillation_returns_base_trace(self):
+        from mekhane.fep.cone_consumer import advise, advise_with_attractor
+        cone = self._make_cone(dispersion=0.05, confidence=80.0)
+        base = advise(cone)
+        result = advise_with_attractor(cone, "clear", 0.9, "O")
+        # CLEAR returns base unchanged
+        assert result.trace is not None
+        assert result.trace.matched_rule == base.trace.matched_rule
+
+
+class TestFormatEdgeCases:
+    """T2: format_advice_for_llm edge cases."""
+
+    def test_format_with_no_trace(self):
+        """ConeAdvice with trace=None should still produce [Cone:] output."""
+        from mekhane.fep.cone_consumer import format_advice_for_llm, ConeAdvice
+        advice = ConeAdvice(action="proceed", reason="test")
+        text = format_advice_for_llm(advice)
+        assert "[Cone:" in text
+        assert "[Trace:" not in text  # No trace → no trace section
+        assert "[Rejected:" not in text
+
+    def test_format_with_empty_rejected(self):
+        """Rule 1 match → trace exists but no rejected."""
+        from mekhane.fep.cone_consumer import advise, format_advice_for_llm
+        cone = build_cone(Series.O, {
+            "O1": "出力1", "O2": "出力2", "O3": "出力3", "O4": "出力4",
+        })
+        cone.dispersion = 0.55
+        cone.confidence = 30.0
+        cone.is_universal = False
+        cone.resolution_method = "simple_mean"
+        cone.pw = {}
+        advice = advise(cone)
+        text = format_advice_for_llm(advice)
+        assert "[Trace:" in text
+        assert "[Rejected:" not in text  # Rule 1 = first rule, no rejected

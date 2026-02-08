@@ -23,6 +23,7 @@ from typing import List, Optional
 
 import lancedb
 from pydantic import BaseModel
+from mekhane.anamnesis.lancedb_compat import get_table_names
 
 # 設定
 SESSIONS_DIR = Path(r"M:\Brain\.hegemonikon\sessions")
@@ -157,7 +158,7 @@ def index_sessions():
         return
 
     # テーブルが存在する場合は削除して再作成
-    if TABLE_NAME in db.table_names():
+    if TABLE_NAME in get_table_names(db):
         db.drop_table(TABLE_NAME)
         print(f"[*] Dropped existing table: {TABLE_NAME}")
 
@@ -185,7 +186,7 @@ def search_sessions(query: str, limit: int = 5):
     """セッションを検索"""
     db = lancedb.connect(str(DB_PATH))
 
-    if TABLE_NAME not in db.table_names():
+    if TABLE_NAME not in get_table_names(db):
         print("[!] No sessions indexed. Run index_sessions() first.")
         return []
 

@@ -21,6 +21,7 @@ from typing import Optional
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 from mekhane.anamnesis.models.prompt_module import PromptModule
+from mekhane.anamnesis.lancedb_compat import get_table_names
 
 # Library base path
 LIBRARY_BASE = Path.home() / "Sync" / "10_📚_ライブラリ｜Library" / "prompts"
@@ -47,7 +48,7 @@ class LibrarySearch:
         if self._db is None:
             import lancedb
             self._db = lancedb.connect(str(self._lance_dir))
-            if TABLE_NAME in self._db.table_names():
+            if TABLE_NAME in get_table_names(self._db):
                 self._table = self._db.open_table(TABLE_NAME)
             else:
                 raise RuntimeError(

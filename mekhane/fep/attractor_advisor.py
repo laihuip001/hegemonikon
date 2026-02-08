@@ -26,6 +26,7 @@ from mekhane.fep.cone_builder import (
     classify_cognitive_type,
     is_cross_boundary_morphism,
 )
+from mekhane.anamnesis.lancedb_compat import get_table_names
 
 
 # ---------------------------------------------------------------------------
@@ -83,7 +84,7 @@ class AttractorAdvisor:
                 return []
 
             db = lancedb.connect(str(db_path))
-            if "knowledge" not in db.table_names():
+            if "knowledge" not in get_table_names(db):
                 return []
 
             tbl = db.open_table("knowledge")

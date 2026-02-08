@@ -16,6 +16,7 @@ Gnōsis Index - LanceDB統合 + 重複排除
 import sys
 from pathlib import Path
 from typing import Optional
+from mekhane.anamnesis.lancedb_compat import get_table_names
 
 try:
     import lancedb
@@ -213,16 +214,7 @@ class GnosisIndex:
     # PURPOSE: テーブル存在チェック (LanceDB API 互換)
     def _table_exists(self) -> bool:
         """TABLE_NAME が DB に存在するか (LanceDB API 互換)"""
-        try:
-            result = self.db.list_tables()
-            # list_tables() may return ListTablesResponse or list
-            names = getattr(result, 'tables', result)
-            return self.TABLE_NAME in names
-        except Exception:
-            import warnings
-            with warnings.catch_warnings():
-                warnings.simplefilter("ignore", DeprecationWarning)
-                return self.TABLE_NAME in self.db.table_names()
+        return self.TABLE_NAME in get_table_names(self.db)
 
     # PURPOSE: 既存primary_keyとtitleをキャッシュ
     def _get_embedder(self) -> Embedder:

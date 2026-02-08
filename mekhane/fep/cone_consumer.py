@@ -19,8 +19,220 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import List, Optional
 
+from difflib import SequenceMatcher
+
 from mekhane.fep.category import COGNITIVE_TYPES, Cone, CognitiveType, Series
 from mekhane.fep.cone_builder import is_uniform_pw
+
+
+# =============================================================================
+# DevilAttack — Cocone 反例生成
+# =============================================================================
+
+
+@dataclass
+class ContradictionPair:
+    """A pair of projections that contradict each other."""
+
+    theorem_a: str  # e.g. "O1"
+    theorem_b: str  # e.g. "O4"
+    similarity: float  # Text similarity (lower = more contradictory)
+    output_a: str
+    output_b: str
+    diagnosis: str = ""  # Human-readable explanation
+
+    def __repr__(self) -> str:
+        return f"Contradiction({self.theorem_a}↔{self.theorem_b}, sim={self.similarity:.2f})"
+
+
+@dataclass
+class DevilAttack:
+    """Result of a devil's advocate attack on a Cone.
+
+    圏論的解釈: Devil = Cocone
+    Cone は全射を統合 (收束) するが、Cocone はその逆 — 全射を展開して矛盾を顕在化する。
+    FEP 的解釈: Surprise を最大化する反例を生成し、予測誤差を意識させる。
+    """
+
+    cone: Cone
+    contradictions: List[ContradictionPair]
+    attack_summary: str  # 1-line summary of the attack
+    counterarguments: List[str]  # Specific counterarguments
+    resolution_paths: List[str]  # Suggested ways to resolve
+    severity: float = 0.0  # 0.0 (mild) - 1.0 (severe)
+
+    @property
+    def worst_pair(self) -> Optional[ContradictionPair]:
+        """The most contradictory pair."""
+        if not self.contradictions:
+            return None
+        return min(self.contradictions, key=lambda c: c.similarity)
+
+    def __repr__(self) -> str:
+        return (
+            f"DevilAttack(V={self.cone.dispersion:.2f}, "
+            f"severity={self.severity:.1f}, "
+            f"contradictions={len(self.contradictions)})"
+        )
+
+
+def devil_attack(cone: Cone) -> DevilAttack:
+    """Generate a devil's advocate attack on a Cone.
+
+    Cocone 構成: Cone の projections を対にして矛盾を検出し、
+    反例 (counterargument) を構造的に生成する。
+
+    This is BS-1 (theory-implementation gap) direct resolution:
+    needs_devil property → actual devil_attack function.
+
+    Strategy:
+        1. Enumerate all projection pairs (C(4,2) = 6 pairs)
+        2. Compute pairwise text similarity
+        3. Identify contradiction signals (negation, direction)
+        4. Generate counterarguments for low-similarity pairs
+        5. Suggest resolution paths based on series type
+
+    Args:
+        cone: A Cone from converge()
+
+    Returns:
+        DevilAttack with structured adversarial analysis
+    """
+    projs = {p.theorem_id: p.output for p in cone.projections if p.output}
+
+    # Step 1: Enumerate all pairs and compute similarity
+    contradictions: List[ContradictionPair] = []
+    ids = list(projs.keys())
+
+    for i in range(len(ids)):
+        for j in range(i + 1, len(ids)):
+            a_id, b_id = ids[i], ids[j]
+            a_out, b_out = projs[a_id], projs[b_id]
+
+            sim = SequenceMatcher(None, a_out, b_out).ratio()
+
+            # Negation contradiction check
+            import re
+            neg_re = re.compile(
+                r"(?:ない|しない|できない|不可|否定|反対|拒否"
+                r"|stop|no|not|never|don'?t|won'?t|reject|cancel)",
+                re.IGNORECASE,
+            )
+            a_neg = bool(neg_re.search(a_out))
+            b_neg = bool(neg_re.search(b_out))
+            neg_contradiction = (a_neg != b_neg) and (a_neg or b_neg)
+
+            # Direction contradiction check
+            dir_go = re.compile(
+                r"(?:する|進む|開始|GO|yes|accept|approve|keep|continue|実行|追加)",
+                re.IGNORECASE,
+            )
+            dir_wait = re.compile(
+                r"(?:しない|止める|中止|WAIT|no|reject|cancel|stop|remove|削除|廃止)",
+                re.IGNORECASE,
+            )
+            a_go, a_wait = bool(dir_go.search(a_out)), bool(dir_wait.search(a_out))
+            b_go, b_wait = bool(dir_go.search(b_out)), bool(dir_wait.search(b_out))
+            dir_contradiction = (
+                (a_go and not a_wait and b_wait and not b_go)
+                or (b_go and not b_wait and a_wait and not a_go)
+            )
+
+            # Effective similarity (lower if contradictions found)
+            effective_sim = sim
+            if neg_contradiction:
+                effective_sim *= 0.5
+            if dir_contradiction:
+                effective_sim *= 0.5
+
+            # Build diagnosis
+            diag_parts = []
+            if neg_contradiction:
+                diag_parts.append("否定語の不一致")
+            if dir_contradiction:
+                diag_parts.append("方向性の矛盾 (GO vs WAIT)")
+            if sim < 0.3:
+                diag_parts.append("テキスト類似度が極めて低い")
+
+            pair = ContradictionPair(
+                theorem_a=a_id,
+                theorem_b=b_id,
+                similarity=effective_sim,
+                output_a=a_out[:100],
+                output_b=b_out[:100],
+                diagnosis="; ".join(diag_parts) if diag_parts else "微弱な不一致",
+            )
+            contradictions.append(pair)
+
+    # Step 2: Sort by contradiction severity (lowest similarity first)
+    contradictions.sort(key=lambda c: c.similarity)
+
+    # Step 3: Generate counterarguments from worst contradictions
+    counterarguments: List[str] = []
+    for pair in contradictions[:3]:  # Top 3 worst
+        if pair.similarity < 0.5:
+            counterarguments.append(
+                f"{pair.theorem_a} は「{pair.output_a[:40]}」、"
+                f"一方 {pair.theorem_b} は「{pair.output_b[:40]}」"
+                f"— {pair.diagnosis}"
+            )
+
+    if not counterarguments:
+        counterarguments.append("明確な矛盾は検出されず、dispersion は分布の偏りに起因する")
+
+    # Step 4: Resolution paths based on series
+    series_name = cone.series.name
+    resolution_paths: List[str] = []
+
+    if cone.series == Series.S:
+        resolution_paths = [
+            f"/{series_name.lower()} を全定理で再実行し、前提を統一する",
+            "/dia devil → S1(尺度) と S3(基準) の不整合を特定",
+            "PW で低信頼の定理を抑制し、高信頼定理で再融合",
+        ]
+    elif cone.series == Series.O:
+        resolution_paths = [
+            "/noe+ → O1(認識) を深化して前提を再検証",
+            "/zet → O3(探求) で矛盾の根本原因を問う",
+            "PW で最も確信の高い定理に重み付けし再融合",
+        ]
+    elif cone.series == Series.A:
+        resolution_paths = [
+            "/dia epo → 判断停止で U/R 境界の矛盾を受容",
+            "/epi → A4(知識) で確信度を引き上げる追加調査",
+            "分解統治: 矛盾する定理を独立に再評価",
+        ]
+    else:
+        resolution_paths = [
+            f"/{series_name.lower()} を再実行し、矛盾する projection を修正",
+            "/dia devil → 矛盾点を精査",
+            "PW 調整で矛盾解消を試みる",
+        ]
+
+    # Step 5: Compute severity
+    if contradictions:
+        worst_sim = contradictions[0].similarity
+        severity = min(1.0, max(0.0, 1.0 - worst_sim))
+    else:
+        severity = 0.0
+
+    # Step 6: Attack summary
+    n_serious = sum(1 for c in contradictions if c.similarity < 0.3)
+    attack_summary = (
+        f"V={cone.dispersion:.2f}: "
+        f"{n_serious}/{len(contradictions)} 対に深刻な矛盾"
+        if n_serious > 0
+        else f"V={cone.dispersion:.2f}: 軽微な不整合のみ"
+    )
+
+    return DevilAttack(
+        cone=cone,
+        contradictions=contradictions,
+        attack_summary=attack_summary,
+        counterarguments=counterarguments,
+        resolution_paths=resolution_paths,
+        severity=severity,
+    )
 
 
 # =============================================================================

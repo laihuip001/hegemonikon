@@ -196,7 +196,7 @@ class Embedder:
 class GnosisIndex:
     """Gnōsis論文インデックス"""
 
-    TABLE_NAME = "papers"
+    TABLE_NAME = "knowledge"
 
     # PURPOSE: GnosisIndex の構成と依存関係の初期化
     def __init__(self, lance_dir: Optional[Path] = None):
@@ -210,6 +210,20 @@ class GnosisIndex:
         self.embedder: Optional[Embedder] = None
         self._primary_key_cache: set[str] = set()
 
+    # PURPOSE: テーブル存在チェック (LanceDB API 互換)
+    def _table_exists(self) -> bool:
+        """TABLE_NAME が DB に存在するか (LanceDB API 互換)"""
+        try:
+            result = self.db.list_tables()
+            # list_tables() may return ListTablesResponse or list
+            names = getattr(result, 'tables', result)
+            return self.TABLE_NAME in names
+        except Exception:
+            import warnings
+            with warnings.catch_warnings():
+                warnings.simplefilter("ignore", DeprecationWarning)
+                return self.TABLE_NAME in self.db.table_names()
+
     # PURPOSE: 既存primary_keyとtitleをキャッシュ
     def _get_embedder(self) -> Embedder:
         if self.embedder is None:
@@ -219,7 +233,7 @@ class GnosisIndex:
     # PURPOSE: 既存primary_keyとtitleをキャッシュ
     def _load_primary_keys(self):
         """既存primary_keyとtitleをキャッシュ"""
-        if self.TABLE_NAME not in self.db.table_names():
+        if not self._table_exists():
             return
 
         table = self.db.open_table(self.TABLE_NAME)
@@ -299,7 +313,7 @@ class GnosisIndex:
             print(f"  Processed {min(i + BATCH_SIZE, len(papers))}/{len(papers)}...")
 
         # LanceDBに追加
-        if self.TABLE_NAME in self.db.table_names():
+        if self._table_exists():
             table = self.db.open_table(self.TABLE_NAME)
             table.add(data)
         else:
@@ -320,7 +334,7 @@ class GnosisIndex:
         Returns:
             検索結果のリスト
         """
-        if self.TABLE_NAME not in self.db.table_names():
+        if not self._table_exists():
             print("[GnosisIndex] No papers indexed yet")
             return []
 
@@ -335,7 +349,7 @@ class GnosisIndex:
     # PURPOSE: インデックス統計
     def stats(self) -> dict:
         """インデックス統計"""
-        if self.TABLE_NAME not in self.db.table_names():
+        if not self._table_exists():
             return {"total": 0, "sources": {}}
 
         table = self.db.open_table(self.TABLE_NAME)
@@ -353,7 +367,7 @@ class GnosisIndex:
     # PURPOSE: primary_keyで論文取得
     def get_by_primary_key(self, primary_key: str) -> Optional[dict]:
         """primary_keyで論文取得"""
-        if self.TABLE_NAME not in self.db.table_names():
+        if not self._table_exists():
             return None
 
         table = self.db.open_table(self.TABLE_NAME)

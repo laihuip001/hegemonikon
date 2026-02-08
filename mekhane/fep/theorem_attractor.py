@@ -529,6 +529,10 @@ class TheoremAttractor:
         self._logger = TheoremLogger() if enable_memory else None
         self._session_used: list[str] = []  # セッション内で使用した定理
         self._decay_factor = 0.7  # 使用済み定理の similarity 減衰率
+        # Q4: multiview prototype
+        self._multiview_proto = None  # (24, D) definition+WF
+        # Q7: inhibition matrix
+        self._inhibition_matrix = None  # (24, 24)
 
     # --- Initialization ---
 
@@ -596,6 +600,75 @@ class TheoremAttractor:
             print("[TheoremAttractor] CPU mode", flush=True)
 
         self._initialized = True
+
+        # Q4: Multiview prototype (definition 0.7 + WF description 0.3)
+        self._multiview_proto = self._build_multiview_proto(proto_matrix)
+
+        # Q7: Inhibition matrix (cosine distance based)
+        self._inhibition_matrix = self._build_inhibition_matrix(proto_normed)
+
+    # --- Private Builders (Q4, Q7) ---
+
+    # PURPOSE: Q4 — Definition + WF description の multiview prototype 構築
+    def _build_multiview_proto(self, def_matrix: np.ndarray) -> Optional[np.ndarray]:
+        """Definition (0.7) + WF description (0.3) の加重平均 embedding.
+
+        WF ファイルが見つからない定理は definition のみ (weight=1.0)。
+        """
+        wf_dir = Path(__file__).parent.parent.parent / ".agent" / "workflows"
+        if not wf_dir.exists():
+            return None
+
+        # 各定理の WF description を収集
+        wf_texts = []
+        for k in THEOREM_KEYS:
+            cmd = THEOREM_DEFINITIONS[k]["command"].lstrip("/")
+            wf_path = wf_dir / f"{cmd}.md"
+            desc = ""
+            if wf_path.exists():
+                try:
+                    content = wf_path.read_text(encoding="utf-8")
+                    # YAML frontmatter の description を抽出
+                    if content.startswith("---"):
+                        parts = content.split("---", 2)
+                        if len(parts) >= 3:
+                            for line in parts[1].strip().split("\n"):
+                                if line.startswith("description:"):
+                                    desc = line.split(":", 1)[1].strip().strip('"').strip("'")
+                                    break
+                    if not desc:
+                        # Fallback: 最初の非空行 (h1 以降)
+                        for line in content.split("\n"):
+                            stripped = line.strip()
+                            if stripped and not stripped.startswith("#") and not stripped.startswith("---"):
+                                desc = stripped[:200]
+                                break
+                except Exception:
+                    pass
+            wf_texts.append(desc if desc else THEOREM_DEFINITIONS[k]["definition"])
+
+        # WF embedding
+        wf_embeddings = self._embedder.embed_batch(wf_texts)
+        wf_matrix = np.array(wf_embeddings, dtype=np.float32)
+
+        # Multiview: weighted average
+        alpha = 0.7  # definition weight
+        multiview = alpha * def_matrix + (1 - alpha) * wf_matrix
+
+        print(f"[TheoremAttractor] Q4: multiview proto built "
+              f"(def={alpha:.0%} + wf={1-alpha:.0%})", flush=True)
+        return multiview
+
+    # PURPOSE: Q7 — 抑制行列構築 (cosine distance → inhibition strength)
+    def _build_inhibition_matrix(self, proto_normed: np.ndarray) -> np.ndarray:
+        """Cosine distance > threshold → inhibition strength.
+
+        距離が大きいほど抑制が強い。同一 theorem は 0。
+        """
+        sim_matrix = proto_normed @ proto_normed.T
+        dist_matrix = 1.0 - sim_matrix
+        np.fill_diagonal(dist_matrix, 0)
+        return dist_matrix.astype(np.float32)
 
     # --- 1. Theorem-Level Attractor ---
 
@@ -732,6 +805,135 @@ class TheoremAttractor:
             "avg_separation": float(np.mean(dists)),
             "min_separation": float(min(dists)) if dists else 0,
             "max_separation": float(max(dists)) if dists else 0,
+        }
+
+    # --- 1d. Multiview Suggest (Q4) ---
+
+    # PURPOSE: Q4 — WF 全文を加味した multiview prototype で suggest
+    def suggest_multiview(self, user_input: str, top_k: int = 5) -> list[TheoremResult]:
+        """Q4: Definition + WF description の multiview prototype で suggest.
+
+        通常の suggest() が definition のみを見るのに対し、
+        こちらは WF の description も加味した広い視野で判定する。
+        """
+        self._ensure_initialized()
+        if self._multiview_proto is None:
+            return self.suggest(user_input, top_k=top_k)  # fallback
+
+        input_emb = self._embedder.embed_batch([user_input])
+        input_vec = np.array(input_emb[0], dtype=np.float32)
+
+        # multiview proto との cosine similarity
+        mv_proto = self._multiview_proto
+        if hasattr(mv_proto, 'cpu'):
+            mv_proto = mv_proto.cpu().numpy()
+
+        proto_norms = np.linalg.norm(mv_proto, axis=1)
+        input_norm = np.linalg.norm(input_vec)
+        if input_norm == 0:
+            input_norm = 1
+        proto_norms[proto_norms == 0] = 1
+        sims = (mv_proto @ input_vec) / (proto_norms * input_norm)
+
+        results = []
+        indexed_sims = [(THEOREM_KEYS[i], float(sims[i])) for i in range(24)]
+        for theorem, sim in sorted(indexed_sims, key=lambda x: x[1], reverse=True)[:top_k]:
+            defn = THEOREM_DEFINITIONS[theorem]
+            results.append(TheoremResult(
+                theorem=theorem,
+                name=defn["name"],
+                series=defn["series"],
+                similarity=sim,
+                command=defn["command"],
+            ))
+        return results
+
+    # --- 1e. Inhibition Query (Q7) ---
+
+    # PURPOSE: Q7 — ある定理の“抑制対象”を返す
+    def get_inhibited(self, theorem: str, threshold: float = 0.5) -> list[tuple[str, float]]:
+        """Q7: 指定定理が抑制する定理を返す.
+
+        抑制 = cosine distance > threshold の定理。
+        「この定理が活性化するとき、どの定理が押されるか」。
+
+        Args:
+            theorem: e.g. "O1"
+            threshold: inhibition threshold (default 0.5)
+
+        Returns:
+            [(theorem, inhibition_strength), ...] sorted by strength
+        """
+        self._ensure_initialized()
+        if self._inhibition_matrix is None or theorem not in THEOREM_KEYS:
+            return []
+
+        idx = THEOREM_KEYS.index(theorem)
+        inhib = self._inhibition_matrix
+        if hasattr(inhib, 'cpu'):
+            inhib = inhib.cpu().numpy()
+
+        row = inhib[idx]
+        pairs = []
+        for i, strength in enumerate(row):
+            if i != idx and strength > threshold:
+                pairs.append((THEOREM_KEYS[i], float(strength)))
+        return sorted(pairs, key=lambda x: x[1], reverse=True)
+
+    # --- 1f. Keyword Decomposition (Q6) ---
+
+    # PURPOSE: Q6 — 入力をキーワード分解し、各要素で suggest
+    def suggest_decomposed(self, user_input: str, top_k: int = 3) -> dict:
+        """Q6: 入力をキーワード分解し、各要素で別々に suggest.
+
+        LLM-free: 単純なトークン分割で「何を」「どう」「なぜ」を抽出。
+        完全な分解はせず、「N-gram 窓」で入力の部分ごとに Attractor を通す。
+
+        Returns:
+            {
+                "full": [TheoremResult, ...],  # 全文での suggest
+                "segments": [
+                    {"text": str, "theorems": [TheoremResult, ...]},
+                    ...
+                ],
+                "divergence": float,  # segment 間の不一致度
+            }
+        """
+        self._ensure_initialized()
+
+        # 全文 suggest
+        full_results = self.suggest(user_input, top_k=top_k)
+
+        # セグメント分割: 句点、「、」「。」「、」「。」 で分割
+        import re
+        segments_text = re.split(r'[、。,.　]+', user_input)
+        segments_text = [s.strip() for s in segments_text if len(s.strip()) > 3]
+
+        if len(segments_text) <= 1:
+            # 分解できない (1 segment)
+            return {
+                "full": full_results,
+                "segments": [{"text": user_input, "theorems": full_results}],
+                "divergence": 0.0,
+            }
+
+        segments = []
+        all_top1 = set()
+        for seg in segments_text:
+            seg_results = self.suggest(seg, top_k=top_k)
+            segments.append({"text": seg, "theorems": seg_results})
+            if seg_results:
+                all_top1.add(seg_results[0].theorem)
+
+        # divergence: 何個の異なる top-1 theorem があるか
+        # 1 = 全 segment が同じ theorem, n/n = 全 segment が異なる theorem
+        n_seg = len(segments)
+        divergence = (len(all_top1) - 1) / max(n_seg - 1, 1) if n_seg > 1 else 0.0
+
+        return {
+            "full": full_results,
+            "segments": segments,
+            "divergence": round(divergence, 3),
         }
 
     # --- 2. X-series Flow Simulation ---

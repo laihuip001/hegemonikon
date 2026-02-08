@@ -432,3 +432,85 @@ class TestTheoremMemory:
         assert len(ta._session_used) >= 1
 
 
+# ---------------------------------------------------------------------------
+# Q4: Multiview Suggest
+# ---------------------------------------------------------------------------
+
+# PURPOSE: Q4 — multiview prototype テスト
+class TestMultiview:
+    """Q4 — multiview prototype テスト"""
+
+    # PURPOSE: suggest_multiview がリストを返す
+    def test_returns_list(self, attractor):
+        r = attractor.suggest_multiview("テスト")
+        assert isinstance(r, list)
+        assert len(r) == 5
+
+    # PURPOSE: multiview と通常の suggest で top-1 が異なりうる
+    def test_differs_from_standard(self, attractor):
+        std = attractor.suggest("テスト", top_k=24)
+        mv = attractor.suggest_multiview("テスト", top_k=24)
+        # 少なくとも similarity 値は異なるはず
+        std_sims = [r.similarity for r in std]
+        mv_sims = [r.similarity for r in mv]
+        assert std_sims != mv_sims, "Multiview should differ from standard"
+
+    # PURPOSE: multiview proto が構築されている
+    def test_multiview_proto_exists(self, attractor):
+        attractor._ensure_initialized()
+        assert attractor._multiview_proto is not None
+
+
+# ---------------------------------------------------------------------------
+# Q7: Inhibition
+# ---------------------------------------------------------------------------
+
+# PURPOSE: Q7 — 抑制射テスト
+class TestInhibition:
+    """Q7 — 抑制射テスト"""
+
+    # PURPOSE: get_inhibited が list を返す
+    def test_returns_list(self, attractor):
+        r = attractor.get_inhibited("O1")
+        assert isinstance(r, list)
+
+    # PURPOSE: 抑制強度が threshold 以上
+    def test_above_threshold(self, attractor):
+        r = attractor.get_inhibited("O1", threshold=0.5)
+        for t, strength in r:
+            assert strength > 0.5
+            assert t != "O1"
+
+    # PURPOSE: 無効な定理名は空リスト
+    def test_invalid_theorem(self, attractor):
+        r = attractor.get_inhibited("INVALID")
+        assert r == []
+
+
+# ---------------------------------------------------------------------------
+# Q6: Decomposition
+# ---------------------------------------------------------------------------
+
+# PURPOSE: Q6 — キーワード分解テスト
+class TestDecomposition:
+    """Q6 — キーワード分解テスト"""
+
+    # PURPOSE: 単一文は divergence=0
+    def test_single_segment(self, attractor):
+        r = attractor.suggest_decomposed("テスト")
+        assert r["divergence"] == 0.0
+        assert len(r["segments"]) == 1
+
+    # PURPOSE: 複数文は分解される
+    def test_multi_segment(self, attractor):
+        r = attractor.suggest_decomposed("設計の本質を問う。実装方法を選ぶ。品質を測る")
+        assert len(r["segments"]) >= 2
+        assert "full" in r
+
+    # PURPOSE: divergence が 0-1 範囲
+    def test_divergence_range(self, attractor):
+        r = attractor.suggest_decomposed("設計の本質を問う。実装方法を選ぶ。品質を測る")
+        assert 0.0 <= r["divergence"] <= 1.0
+
+
+

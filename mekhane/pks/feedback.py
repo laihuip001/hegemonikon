@@ -42,6 +42,7 @@ class PushFeedback:
 REACTION_WEIGHTS: dict[str, float] = {
     "used": 1.0,       # 活用された → 大幅ブースト
     "deepened": 1.5,   # さらに深掘りされた → 最大ブースト
+    "engaged": 0.3,    # 関連知識を探索した → 軽いブースト
     "dismissed": -0.5, # 明示的に却下 → ペナルティ
     "ignored": -0.1,   # 無視 → 軽いペナルティ
 }

@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# PROOF: [L3/ユーティリティ] <- scripts/
+# PURPOSE: Library モジュールへのアクティベーショントリガー追加
 """
 Library 111ファイルに activation_triggers と essence を追加
 PURPOSE: /dia+ で指摘された「静的ルーティングテーブル問題」の解決

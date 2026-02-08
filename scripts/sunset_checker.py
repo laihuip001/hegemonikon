@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# PROOF: [L3/ユーティリティ] <- scripts/
+# PURPOSE: 廃止予定モジュールの依存関係チェック
 """Sunset Checker — Experimental マクロの再審査リマインダー
 
 Boot Phase 4 で自動実行。Sunset 日に近づいたら警告。

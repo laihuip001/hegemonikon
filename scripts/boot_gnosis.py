@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# PROOF: [L2/インフラ] <- scripts/
+# PURPOSE: Gnōsis ベクトルインデックスのブート時自動構築
 """Gnōsis Boot Integration — /boot Phase 3 expansion.
 
 Boot 時に知識ベースから未解決タスクと保留事項を自動照会し、

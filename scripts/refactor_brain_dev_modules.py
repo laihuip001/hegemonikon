@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# PROOF: [L3/移行] <- scripts/
+# PURPOSE: dev モジュールのリファクタリング自動化
 """
 Brain 開発用 Module 01-25 → Hegemonikón Library 変換スクリプト
 PURPOSE: 旧形式(XML)の開発プロトコルをMarkdown+YAMLに変換

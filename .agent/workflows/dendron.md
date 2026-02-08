@@ -43,6 +43,7 @@ python -m mekhane.dendron check mekhane/ --format markdown
 | 複数ディレクトリ | `/dendron hermeneus/ synergeia/` |
 
 **Prompt 形式**:
+
 ```text
 /dendron [スコープ] [オプション]
 
@@ -68,6 +69,7 @@ python -m mekhane.dendron check mekhane/ --format markdown
 ## 出力例
 
 ### 通常モード
+
 ```text
 ============================================================
 Dendron PROOF Check Report
@@ -84,6 +86,7 @@ Levels:      L1:38 | L2:116 | L3:86
 ```
 
 ### CI モード
+
 ```text
 ✅ Dendron: 100.0% coverage (L1:38/L2:116/L3:86) ⚠️55 orphan
 ```
@@ -115,6 +118,27 @@ Levels:      L1:38 | L2:116 | L3:86
 | `pre-commit` | commit 前に自動実行 |
 | GitHub Actions | push/PR 時に自動実行 |
 
+## Dendron 判定基準 (マクロ/WF/モジュール汎用)
+
+> **Origin**: 2026-02-07 マクロ監査で策定。全 Dendron 監査で再利用する。
+
+| 判定 | 意味 | 基準 |
+|:-----|:-----|:-----|
+| 🟢 VITAL | 不可欠 | 実際に WF/CCL 式で使用されている。削除すると壊れる |
+| 🔵 USEFUL | 有用 | 明確な使用場面がある。糖衣の価値がある |
+| 🟡 DORMANT | 休眠 | 概念は正しいが未使用。将来の活性化可能性あり |
+| 🔴 PHANTOM | 幻影 | 使われていない。展開が自明。存在理由が薄い |
+
+**判定フロー**:
+
+```
+対象を特定 → 使用箇所を grep
+  → 使用あり → 削除すると壊れる？ → YES: 🟢 / NO: 🔵
+  → 使用なし → 概念に将来価値あり？ → YES: 🟡 / NO: 🔴
+```
+
+**Sunset ルール**: 🟡 DORMANT は6ヶ月後に再審査。未使用なら 🔴 降格。
+
 ---
 
-*v2.0 — 親参照義務化 (2026-02-01)*
+*v2.1 — 判定基準追加 (2026-02-08)*

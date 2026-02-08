@@ -20,7 +20,9 @@ sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 def get_boot_context(mode: str = "standard", context: Optional[str] = None) -> dict:
     """
-    /boot 統合 API: 3軸（Handoff, Sophia, Persona）を統合して返す
+    /boot 統合 API: 6軸（Handoff, Sophia, Persona, PKS, Safety, Attractor）を統合して返す
+
+    GPU プリフライトチェック付き: GPU 占有時は embedding 系を CPU フォールバックで実行
 
     Args:
         mode: "fast" (/boot-), "standard" (/boot), "detailed" (/boot+)
@@ -37,6 +39,22 @@ def get_boot_context(mode: str = "standard", context: Optional[str] = None) -> d
             "formatted": str      # フォーマット済み出力
         }
     """
+    # GPU プリフライトチェック (G)
+    gpu_ok = True
+    gpu_reason = ""
+    try:
+        from mekhane.symploke.gpu_guard import gpu_preflight, force_cpu_env
+        gpu_status = gpu_preflight()
+        gpu_ok = gpu_status.gpu_available
+        gpu_reason = gpu_status.reason
+        if not gpu_ok:
+            print(f" ⚠️ GPU busy ({gpu_reason}), embedding 系は CPU フォールバック", file=sys.stderr)
+            force_cpu_env()  # CUDA_VISIBLE_DEVICES="" を設定
+        else:
+            print(f" 🟢 GPU available ({gpu_status.utilization}%, {gpu_status.memory_used_mb}MiB)", file=sys.stderr)
+    except Exception:
+        pass  # GPU チェック失敗時は無視して続行
+
     # 軸 A: Handoff 活用
     print(" [1/6] 📋 Searching Handoffs...", file=sys.stderr, end="", flush=True)
     from mekhane.symploke.handoff_search import get_boot_handoffs, format_boot_output
@@ -167,7 +185,7 @@ def get_boot_context(mode: str = "standard", context: Optional[str] = None) -> d
 
             def _run_attractor():
                 from mekhane.fep.attractor_advisor import AttractorAdvisor
-                advisor = AttractorAdvisor(force_cpu=False)
+                advisor = AttractorAdvisor(force_cpu=not gpu_ok)
                 rec = advisor.recommend(context)
                 llm_fmt = advisor.format_for_llm(context)
                 return {

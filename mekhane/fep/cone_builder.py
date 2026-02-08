@@ -736,3 +736,16 @@ if __name__ == "__main__":
     cone = converge(series, outputs, pw=pw or None, apex=args.apex, confidence=args.confidence)
     print(describe_cone(cone))
 
+    # F4: Cone Consumer — active inference recommendation
+    from mekhane.fep.cone_consumer import advise
+    advice = advise(cone)
+    print()
+    print(f"🧭 **Next Action**: {advice.action}")
+    if advice.suggested_wf:
+        print(f"   推奨WF: {advice.suggested_wf}")
+    print(f"   理由: {advice.reason}")
+    if advice.next_steps:
+        for step in advice.next_steps:
+            print(f"   → {step}")
+    print(f"   urgency: {advice.urgency:.1f}")
+

@@ -13,8 +13,8 @@ Q.E.D.
 
 開発用モジュール インデクサー
 
-M:\\Brain\\99_保管庫\\プロンプト ライブラリー\\モジュール（開発用）内の
-全モジュールを LanceDB にインデックスする。
+.agent/skills/ 以下の全スキルモジュールを LanceDB にインデックスする。
+HGK_MODULES_DIR 環境変数でソースディレクトリを変更可能。
 """
 
 from pathlib import Path

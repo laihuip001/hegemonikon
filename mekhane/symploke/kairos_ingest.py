@@ -188,7 +188,7 @@ def ingest_to_kairos(docs: list[Document], save_path: str = None) -> int:
     """Ingest documents to Kairos index using real embeddings."""
     from mekhane.symploke.adapters.embedding_adapter import EmbeddingAdapter
 
-    adapter = EmbeddingAdapter(model_name="all-MiniLM-L6-v2")
+    adapter = EmbeddingAdapter()
     index = KairosIndex(adapter, "kairos", dimension=384)  # MiniLM = 384 dims
     index.initialize()
 
@@ -206,7 +206,7 @@ def load_kairos_index(load_path: str):
     """Load a previously saved Kairos index."""
     from mekhane.symploke.adapters.embedding_adapter import EmbeddingAdapter
 
-    adapter = EmbeddingAdapter(model_name="all-MiniLM-L6-v2")
+    adapter = EmbeddingAdapter()
     adapter.load(load_path)
     print(f"📂 Loaded index from: {load_path} ({adapter.count()} vectors)")
     return adapter

@@ -129,7 +129,7 @@ def get_engine():
 
         # Register all indices with EmbeddingAdapter (semantic search mode)
         # Using MiniLM-L6-v2: 384 dimensions
-        embedding_adapter = EmbeddingAdapter(model_name="all-MiniLM-L6-v2")
+        embedding_adapter = EmbeddingAdapter()
         log("EmbeddingAdapter initialized")
 
         for IndexClass, name in [
@@ -138,7 +138,7 @@ def get_engine():
             (SophiaIndex, "sophia"),
             (KairosIndex, "kairos"),
         ]:
-            adapter = EmbeddingAdapter(model_name="all-MiniLM-L6-v2")
+            adapter = EmbeddingAdapter()
             index = IndexClass(adapter, name, dimension=384)
             index.initialize()
 

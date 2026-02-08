@@ -51,7 +51,7 @@ def build_handoff_index(docs: List[Document] = None) -> EmbeddingAdapter:
     if not docs:
         return None
 
-    adapter = EmbeddingAdapter(model_name="all-MiniLM-L6-v2")
+    adapter = EmbeddingAdapter()
 
     # Encode all docs
     texts = [d.content for d in docs]
@@ -75,7 +75,7 @@ def build_handoff_index(docs: List[Document] = None) -> EmbeddingAdapter:
 
 def load_handoff_index() -> EmbeddingAdapter:
     """Load saved handoff index."""
-    adapter = EmbeddingAdapter(model_name="all-MiniLM-L6-v2")
+    adapter = EmbeddingAdapter()
     adapter.load(str(HANDOFF_INDEX_PATH))
     return adapter
 
@@ -198,7 +198,7 @@ def get_boot_handoffs(mode: str = "standard", context: str = None) -> dict:
     conversations = []
     if conv_count > 0 and CONVERSATION_INDEX_PATH.exists():
         try:
-            adapter = EmbeddingAdapter(model_name="all-MiniLM-L6-v2")
+            adapter = EmbeddingAdapter()
             adapter.load(str(CONVERSATION_INDEX_PATH))
             query_vec = adapter.encode([query])[0]
             results = adapter.search(query_vec, k=conv_count)
@@ -223,7 +223,7 @@ def get_boot_handoffs(mode: str = "standard", context: str = None) -> dict:
         if keywords and CONVERSATION_INDEX_PATH.exists():
             try:
                 proactive_query = " ".join(keywords[:3])
-                adapter = EmbeddingAdapter(model_name="all-MiniLM-L6-v2")
+                adapter = EmbeddingAdapter()
                 adapter.load(str(CONVERSATION_INDEX_PATH))
                 query_vec = adapter.encode([proactive_query])[0]
                 results = adapter.search(query_vec, k=3)

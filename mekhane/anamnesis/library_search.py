@@ -47,7 +47,15 @@ class LibrarySearch:
         if self._db is None:
             import lancedb
             self._db = lancedb.connect(str(self._lance_dir))
-            if TABLE_NAME in self._db.table_names():
+            # table_names is deprecated, use list_tables
+            tables = self._db.list_tables()
+            # Handle newer lancedb where list_tables returns an object with tables attribute
+            if hasattr(tables, "tables"):
+                table_names = tables.tables
+            else:
+                table_names = tables
+
+            if TABLE_NAME in table_names:
                 self._table = self._db.open_table(TABLE_NAME)
             else:
                 raise RuntimeError(
@@ -70,25 +78,21 @@ class LibrarySearch:
             マッチした PromptModule のリスト
         """
         self._connect()
-        keyword_lower = keyword.lower()
+        safe_keyword = keyword.replace("'", "''")
 
-        # LanceDB テーブルからフルスキャン
-        all_rows = self._table.to_pandas()
+        # Optimization: Use SQL-like filter to search multiple columns
+        where_clause = (
+            f"activation_triggers ILIKE '%{safe_keyword}%' OR "
+            f"name ILIKE '%{safe_keyword}%' OR "
+            f"hegemonikon_mapping ILIKE '%{safe_keyword}%'"
+        )
+
+        # Execute search
+        rows = self._table.search().where(where_clause).limit(limit).to_list()
+
         results = []
-
-        for _, row in all_rows.iterrows():
-            triggers_str = row.get("activation_triggers", "")
-            name = row.get("name", "")
-            mapping = row.get("hegemonikon_mapping", "")
-
-            # triggers, name, mapping のいずれかにマッチ
-            searchable = f"{triggers_str} {name} {mapping}".lower()
-            if keyword_lower in searchable:
-                module = PromptModule.from_dict(row.to_dict())
-                results.append(module)
-
-            if len(results) >= limit:
-                break
+        for row in rows:
+            results.append(PromptModule.from_dict(row))
 
         return results
 
@@ -128,19 +132,24 @@ class LibrarySearch:
                 search_terms.append(wf)
                 break
 
-        all_rows = self._table.to_pandas()
+        # Optimization: Use SQL-like filter with OR conditions
+        conditions = []
+        for term in search_terms:
+            safe_term = term.replace("'", "''")
+            conditions.append(f"hegemonikon_mapping ILIKE '%{safe_term}%'")
+
+        where_clause = " OR ".join(conditions)
+
+        # Execute search
+        rows = self._table.search().where(where_clause).to_list()
+
         results = []
         seen_ids = set()
-
-        for _, row in all_rows.iterrows():
-            mapping = row.get("hegemonikon_mapping", "").lower()
-            for term in search_terms:
-                if term.lower() in mapping:
-                    module = PromptModule.from_dict(row.to_dict())
-                    if module.id not in seen_ids:
-                        results.append(module)
-                        seen_ids.add(module.id)
-                    break
+        for row in rows:
+            module = PromptModule.from_dict(row)
+            if module.id not in seen_ids:
+                results.append(module)
+                seen_ids.add(module.id)
 
         return results
 
@@ -185,11 +194,10 @@ class LibrarySearch:
     def get_module(self, module_id: str) -> Optional[PromptModule]:
         """ID からモジュールを取得"""
         self._connect()
-        all_rows = self._table.to_pandas()
-
-        for _, row in all_rows.iterrows():
-            if row.get("id") == module_id:
-                return PromptModule.from_dict(row.to_dict())
+        # Optimization: Use SQL-like filter instead of full table scan
+        results = self._table.search().where(f"id = '{module_id}'").limit(1).to_list()
+        if results:
+            return PromptModule.from_dict(results[0])
         return None
 
     # PURPOSE: カテゴリ別のモジュール数を返す
@@ -209,4 +217,5 @@ class LibrarySearch:
     def count(self) -> int:
         """インデックス内のモジュール総数"""
         self._connect()
-        return self._table.to_pandas().shape[0]
+        # Optimization: Use count_rows instead of full table scan
+        return self._table.count_rows()

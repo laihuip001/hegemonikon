@@ -1,5 +1,8 @@
 # mekhane/ccl/ PROOF
 
+PURPOSE: CCL (Cognitive Command Language) のパーサーとジェネレーターを実装する
+REASON: Hegemonikón の操作体系を形式言語として定義し、曖昧性を排除する必要があった
+
 > **存在証明**: このディレクトリは CCL パーサー・ジェネレーター実装を格納
 
 ## 必然性の導出

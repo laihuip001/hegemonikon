@@ -6,7 +6,7 @@ Boot Integration - 10軸を統合した /boot 用 API
 Axes:
   A. Handoff   B. Sophia/KI   C. Persona   D. PKS
   E. Safety    F. Attractor   G. GPU       H. EPT
-  I. Projects  J. Skills
+  I. Projects  J. Skills      K. Doxa
 
 Theorem Coverage:
   全24定理 (O1-O4, S1-S4, H1-H4, P1-P4, K1-K4, A1-A4) を
@@ -261,10 +261,10 @@ def _load_skills(project_root: Path) -> dict:
     return result
 
 
-# PURPOSE: /boot 統合 API: 10軸（Handoff, Sophia, Persona, PKS, Safety, EPT, Digestor, Attractor, Projects, Skills）を統合して返す
+# PURPOSE: /boot 統合 API: 11軸（Handoff, Sophia, Persona, PKS, Safety, EPT, Digestor, Attractor, Projects, Skills, Doxa）を統合して返す
 def get_boot_context(mode: str = "standard", context: Optional[str] = None) -> dict:
     """
-    /boot 統合 API: 10軸（Handoff, Sophia, Persona, PKS, Safety, EPT, Digestor, Attractor, Projects, Skills）を統合して返す
+    /boot 統合 API: 11軸（Handoff, Sophia, Persona, PKS, Safety, EPT, Digestor, Attractor, Projects, Skills, Doxa）を統合して返す
 
     GPU プリフライトチェック付き: GPU 占有時は embedding 系を CPU フォールバックで実行
 
@@ -508,6 +508,23 @@ def get_boot_context(mode: str = "standard", context: Optional[str] = None) -> d
                 except Exception:
                     pass  # Bias loading failure should not block boot
 
+                # Problem C+: BasinLearner の学習済み重みを適用
+                try:
+                    from mekhane.fep.basin_learner import BasinLearner
+                    learner = BasinLearner()
+                    loaded_epochs = learner.load_history()
+                    if loaded_epochs > 0:
+                        overrides = learner.get_weight_overrides()
+                        if overrides:
+                            # weight → _bias_adjustments に変換
+                            # weight < 1.0 → contract → negative bias
+                            # weight > 1.0 → expand  → positive bias
+                            for series, weight in overrides.items():
+                                adjustment = (weight - 1.0) * 0.1  # scale down
+                                advisor._attractor._bias_adjustments[series] = adjustment
+                except Exception:
+                    pass  # Learner failure should not block boot
+
                 rec = advisor.recommend(attractor_context)
                 llm_fmt = advisor.format_for_llm(attractor_context)
 
@@ -732,6 +749,30 @@ def get_boot_context(mode: str = "standard", context: Optional[str] = None) -> d
         lines.append("")
         lines.append(skills_result["formatted"])
 
+    # 軸 K: Doxa (信念ストア)
+    doxa_result = {"beliefs_loaded": 0, "active_count": 0, "promotion_candidates": [], "formatted": ""}
+    print(" 🧿 Loading Doxa Beliefs...", end="", file=sys.stderr)
+    try:
+        from mekhane.symploke.doxa_boot import load_doxa_for_boot
+        doxa_boot = load_doxa_for_boot()
+        doxa_result = {
+            "beliefs_loaded": doxa_boot.beliefs_loaded,
+            "active_count": doxa_boot.active_count,
+            "archived_count": doxa_boot.archived_count,
+            "promotion_candidates": [
+                {"content": c.belief.content[:50], "score": c.score, "reasons": c.reasons}
+                for c in doxa_boot.promotion_candidates
+            ],
+            "formatted": doxa_boot.summary,
+        }
+        print(f" Done ({doxa_boot.beliefs_loaded} beliefs).", file=sys.stderr)
+    except Exception as e:
+        print(f" Failed ({str(e)}).", file=sys.stderr)
+
+    if doxa_result["formatted"]:
+        lines.append("")
+        lines.append(doxa_result["formatted"])
+
     # n8n WF-06: Session Start 通知
     try:
         import urllib.request
@@ -764,6 +805,7 @@ def get_boot_context(mode: str = "standard", context: Optional[str] = None) -> d
         "attractor": attractor_result,
         "projects": projects_result,
         "skills": skills_result,
+        "doxa": doxa_result,
         "formatted": "\n".join(lines),
     }
 

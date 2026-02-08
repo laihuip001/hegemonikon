@@ -231,23 +231,35 @@ def _load_skills(project_root: Path) -> dict:
                         pass
 
             abs_path = str(skill_md.resolve())
+            # frontmatter 後の本文を抽出
+            body = content
+            if content.startswith("---"):
+                parts = content.split("---", 2)
+                if len(parts) >= 3:
+                    body = parts[2].strip()
+
             skills.append({
                 "name": name,
                 "dir": skill_dir.name,
                 "path": abs_path,
                 "description": description,
+                "body": body,
             })
             skill_paths.append(abs_path)
 
         if not skills:
             return result
 
-        lines = ["🧠 **Skills** (自動プリロード)"]
-        lines.append(f"  {len(skills)}件の Skill を検出。view_file で読み込むこと:")
+        # 環境強制: SKILL.md の内容そのものを出力に含める
+        # Agent は boot 出力を読むだけで全 Skill がコンテキストに入る
+        # コスト: ~550行 = 200K コンテキストの 0.3%
+        lines = [f"🧠 **Skills** ({len(skills)}件 — 全文プリロード済み)"]
         for s in skills:
-            desc = f" — {s['description']}" if s['description'] else ""
-            lines.append(f"    📖 {s['name']}{desc}")
-            lines.append(f"       → `{s['path']}`")
+            lines.append(f"\n{'='*60}")
+            lines.append(f"📖 **{s['name']}** — {s['description']}")
+            lines.append(f"   Path: `{s['path']}`")
+            lines.append(f"{'='*60}")
+            lines.append(s["body"])
 
         result = {
             "skills": skills,
@@ -573,6 +585,7 @@ def get_boot_context(mode: str = "standard", context: Optional[str] = None) -> d
                     agent_v2 = HegemonikónFEPAgentV2()
                     agent_v2.load_learned_A()  # 前回セッションの学習を復元
                     agent_v2.load_learned_B()  # B行列も復元
+                    agent_v2.load_epsilon()    # Meta-ε も復元
 
                     # Snapshot: capture A BEFORE learning
                     import copy
@@ -591,11 +604,20 @@ def get_boot_context(mode: str = "standard", context: Optional[str] = None) -> d
                     r2 = agent_v2.step(topic_obs)
                     final = r2  # 2nd cycle = 学習後の判断
 
-                    # Dirichlet 学習 (A + B) + 永続化
                     agent_v2.update_A_dirichlet(topic_obs)
                     agent_v2.update_B_dirichlet(final["action"])
+
+                    # Meta-ε: track prediction accuracy + update
+                    import numpy as np
+                    predicted_obs = int(np.argmax(
+                        agent_v2._get_predicted_observation()
+                    ))
+                    agent_v2.track_prediction(topic_obs, predicted_obs)
+                    agent_v2.update_epsilon()
+
                     agent_v2.save_learned_A()
                     agent_v2.save_learned_B()
+                    agent_v2.save_epsilon()
 
                     # Snapshot: save AFTER learning + compute diff
                     save_snapshot(agent_v2, label="boot")
@@ -615,6 +637,7 @@ def get_boot_context(mode: str = "standard", context: Optional[str] = None) -> d
                         "map_state": final["map_state_names"],
                         "explanation": explanation,
                         "learning_diff": learning_diff,
+                        "epsilon": agent_v2.epsilon_summary(),
                     }
                 except Exception:
                     pass  # FEP v2 failure should not block boot

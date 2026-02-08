@@ -73,6 +73,7 @@ class HegemonikónFEPAgentV2:
         C: Optional[np.ndarray] = None,
         D: Optional[np.ndarray] = None,
         use_defaults: bool = True,
+        epsilon: Optional[Dict[str, float]] = None,
     ):
         if not PYMDP_AVAILABLE:
             raise ImportError("pymdp is not installed. Install with: pip install pymdp")
@@ -81,6 +82,21 @@ class HegemonikónFEPAgentV2:
         self.num_obs = NUM_OBS_V2       # 14
         self.num_actions = NUM_ACTIONS_V2  # 7
         self.obs_dims = {k: len(v) for k, v in OBSERVATION_MODALITIES_V2.items()}
+
+        # Epsilon Architecture: M = (1-ε) × structure + ε × uniform
+        # These are the ONLY free parameters in the generative model.
+        # All other values derive from domain structure (Stoic philosophy).
+        self.epsilon: Dict[str, float] = {
+            "A": 0.25,           # observation noise (/dia+ reviewed)
+            "B_observe": 0.10,   # state persistence under observation
+            "B_act": 0.15,       # transition noise under action
+            "D": 0.15,           # prior uncertainty
+        }
+        if epsilon:
+            self.epsilon.update(epsilon)
+
+        # Prediction tracking for Meta-ε learning
+        self._prediction_errors: List[float] = []
 
         if use_defaults:
             A = A if A is not None else self._default_A()
@@ -133,7 +149,7 @@ class HegemonikónFEPAgentV2:
         Rows 5-7:   confidence (3 values)
         Rows 8-13:  topic (6 values)
         """
-        EPS_A = 0.25  # observation noise — higher than EPS_B (transitions)
+        EPS_A = self.epsilon["A"]  # observation noise — higher than EPS_B (transitions)
 
         # Categorical mapping: hidden state factor → observation index
         # Each entry: (target_obs_index_within_modality, modality_size)
@@ -209,8 +225,8 @@ class HegemonikónFEPAgentV2:
           Hegemonikón /noe: σ one-parameter family analysis
         """
         # === ε parameters: the ONLY tunable values ===
-        EPS_OBSERVE = 0.10  # 90% state-preserving, 10% noise
-        EPS_ACT = 0.15      # 85% Stoic necessity, 15% noise
+        EPS_OBSERVE = self.epsilon["B_observe"]  # state-preserving under observation
+        EPS_ACT = self.epsilon["B_act"]            # Stoic necessity under action
 
         B = np.zeros((self.state_dim, self.state_dim, self.num_actions))
         uniform = 1.0 / self.state_dim  # Uniform noise floor
@@ -292,7 +308,7 @@ class HegemonikónFEPAgentV2:
           horme:     passive  (wait for warranted action)
           series:    uniform  (no prior preference for any Series)
         """
-        EPS_D = 0.15  # prior uncertainty
+        EPS_D = self.epsilon["D"]  # prior uncertainty
 
         # Stoic prior: the natural state before any evidence
         STOIC_PRIOR = {
@@ -696,6 +712,102 @@ class HegemonikónFEPAgentV2:
             "action": action_idx,
             "learning_rate": eta,
         })
+
+    # =========================================================================
+    # Meta-ε Learning
+    # =========================================================================
+    #
+    # FEP precision weighting applied to the ε parameters themselves.
+    # "How much should I trust my domain structure vs empirical data?"
+    #
+    # ε ∈ [0.01, 0.50]:
+    #   ε → 0.01: almost fully trust domain structure (rigid)
+    #   ε → 0.50: half structure, half data (maximally uncertain)
+    #
+    # update_epsilon() adjusts ε based on prediction accuracy:
+    #   accurate predictions → lower ε (trust structure more)
+    #   inaccurate predictions → raise ε (trust data more)
+    #
+
+    # PURPOSE: Track prediction error for Meta-ε
+    def track_prediction(self, observation: int, predicted: int) -> float:
+        """Track prediction accuracy for Meta-ε learning.
+
+        Call this after each step to record whether the Agent's
+        predicted observation matched the actual observation.
+
+        Returns:
+            error: 0.0 (correct) or 1.0 (incorrect)
+        """
+        error = 0.0 if observation == predicted else 1.0
+        self._prediction_errors.append(error)
+        return error
+
+    # PURPOSE: Meta-ε update — adjust ε based on prediction accuracy
+    def update_epsilon(
+        self,
+        window: int = 20,
+        adaptation_rate: float = 0.05,
+        eps_min: float = 0.01,
+        eps_max: float = 0.50,
+    ) -> Dict[str, float]:
+        """Update ε values based on accumulated prediction errors.
+
+        Law: ε_new = ε_old + adaptation_rate × (error_rate - ε_old)
+        This is an exponential moving average toward the error rate.
+
+        Intuition:
+        - If error_rate ≈ 0 (predictions correct): ε decreases → trust structure
+        - If error_rate ≈ 0.5 (random): ε increases → trust data
+        - ε converges toward the "true" noise level of the environment
+
+        Args:
+            window: Number of recent predictions to consider
+            adaptation_rate: Speed of ε adaptation (EMA coefficient)
+            eps_min: Floor for ε (never fully trust structure)
+            eps_max: Ceiling for ε (never fully abandon structure)
+
+        Returns:
+            Dict of updated ε values with deltas
+        """
+        if len(self._prediction_errors) < 5:
+            return {k: 0.0 for k in self.epsilon}  # Not enough data
+
+        recent = self._prediction_errors[-window:]
+        error_rate = sum(recent) / len(recent)
+
+        deltas: Dict[str, float] = {}
+        for key in self.epsilon:
+            old_val = self.epsilon[key]
+            # EMA toward error_rate: ε approaches the "true" noise level
+            new_val = old_val + adaptation_rate * (error_rate - old_val)
+            new_val = max(eps_min, min(eps_max, new_val))
+            deltas[key] = new_val - old_val
+            self.epsilon[key] = new_val
+
+        self._history.append({
+            "type": "meta_epsilon_update",
+            "error_rate": error_rate,
+            "window": len(recent),
+            "epsilon": dict(self.epsilon),
+            "deltas": deltas,
+        })
+
+        return deltas
+
+    # PURPOSE: Get Meta-ε diagnostic summary
+    def epsilon_summary(self) -> Dict[str, Any]:
+        """Return diagnostic summary of ε state."""
+        error_rate = None
+        if self._prediction_errors:
+            recent = self._prediction_errors[-20:]
+            error_rate = sum(recent) / len(recent)
+        return {
+            "epsilon": dict(self.epsilon),
+            "prediction_count": len(self._prediction_errors),
+            "error_rate": error_rate,
+            "total_errors": sum(self._prediction_errors) if self._prediction_errors else 0,
+        }
 
     # =========================================================================
     # Persistence

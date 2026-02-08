@@ -19,7 +19,14 @@ sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 from mekhane.symploke.indices import Document
 
-KNOWLEDGE_DIR = Path("/home/makaron8426/oikos/.gemini/antigravity/knowledge")
+# Configurable via env — defaults to project's kernel/knowledge
+_PROJECT_ROOT = Path(__file__).parent.parent.parent
+KNOWLEDGE_DIR = Path(
+    os.environ.get(
+        "HGK_KNOWLEDGE_DIR",
+        str(_PROJECT_ROOT / "kernel" / "knowledge"),
+    )
+)
 
 
 # PURPOSE: Parse a KI directory into Documents
@@ -88,7 +95,12 @@ def parse_ki_directory(ki_path: Path) -> list[Document]:
 
 # PURPOSE: Get all KI directories
 def get_ki_directories() -> list[Path]:
-    """Get all KI directories."""
+    """Get all KI directories.
+
+    Returns empty list if KNOWLEDGE_DIR doesn't exist (graceful degradation).
+    """
+    if not KNOWLEDGE_DIR.exists():
+        return []
     dirs = [d for d in KNOWLEDGE_DIR.iterdir() if d.is_dir()]
     return sorted(dirs)
 
@@ -141,9 +153,12 @@ def search_loaded_index(adapter, query: str, top_k: int = 5):
     return results
 
 
-# デフォルトの保存パス
+# Configurable via env — defaults to mneme indices
 DEFAULT_INDEX_PATH = Path(
-    "/home/makaron8426/oikos/mneme/.hegemonikon/indices/sophia.pkl"
+    os.environ.get(
+        "HGK_SOPHIA_INDEX",
+        str(_PROJECT_ROOT.parent / "mneme" / ".hegemonikon" / "indices" / "sophia.pkl"),
+    )
 )
 
 

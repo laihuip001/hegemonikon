@@ -35,10 +35,14 @@ _TOPIC_ROW_MAP = {"O": 8, "S": 9, "H": 10, "P": 11, "K": 12, "A": 13}
 # A行列のtopic行からSeries応答確率を抽出し、状態次元で平均化する
 _SERIES_LIST = ["O", "S", "H", "P", "K", "A"]
 
-# 最大 bias magnitude: ±0.03
+# 最大 bias magnitude: ±0.03 per extraction
 # 理由: Attractor の similarity gap は ~0.005-0.01 が boundary
 # ±0.03 は gap を反転させるのに十分だが、明らかに正しい分類を壊すほど大きくない
 MAX_BIAS = 0.03
+
+# 全ソースからの累積バイアス上限: ±0.05
+# スケーラビリティガード: N cycles でも bias が発散しない
+MAX_CUMULATIVE_BIAS = 0.05
 
 
 # PURPOSE: A行列 topic 行から per-Series 精度バイアスを抽出
@@ -79,23 +83,39 @@ def extract_topic_bias(agent: "HegemonikónFEPAgentV2") -> dict[str, float]:
     return biases
 
 
-# PURPOSE: Attractor に A行列由来のバイアスを注入
+# PURPOSE: Attractor に A行列由来のバイアスを注入 (idempotent + cap)
 def apply_fep_bias_to_attractor(
     agent: "HegemonikónFEPAgentV2",
     attractor: "SeriesAttractor",
 ) -> dict[str, float]:
     """A行列の学習結果を Attractor の similarity bias に注入する。
 
-    既存の BasinBias (Problem C) と加算的に共存する。
+    スケーラビリティ設計:
+    - FEP bias は毎回 **置換** (加算ではない) — N cycles で発散しない
+    - BasinBias (Problem C) からの既存バイアスは保持
+    - 合計値は MAX_CUMULATIVE_BIAS でクリップ
 
     Returns:
         適用されたバイアス辞書 (デバッグ/ログ用)
     """
     biases = extract_topic_bias(agent)
 
+    # FEP 固有のバイアスを追跡 (前回値を除去 → 置換)
+    if not hasattr(attractor, "_fep_bias"):
+        attractor._fep_bias = {}
+
     for series, bias in biases.items():
-        # 既存の bias (BasinBias 由来) と加算
-        existing = attractor._bias_adjustments.get(series, 0.0)
-        attractor._bias_adjustments[series] = existing + bias
+        # 前回の FEP bias を除去
+        old_fep = attractor._fep_bias.get(series, 0.0)
+        current = attractor._bias_adjustments.get(series, 0.0)
+        base = current - old_fep  # BasinBias のみ残す
+
+        # 新しい FEP bias を加算 + 累積キャップ
+        new_total = float(np.clip(
+            base + bias, -MAX_CUMULATIVE_BIAS, MAX_CUMULATIVE_BIAS
+        ))
+        attractor._bias_adjustments[series] = new_total
+        attractor._fep_bias[series] = bias
 
     return biases
+

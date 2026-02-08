@@ -304,6 +304,50 @@ class Functor:
         """Apply functor to a morphism."""
         return self.morphism_map.get(morphism_id)
 
+    def compose(self, other: Functor) -> Functor:
+        """Functor composition: G∘F (self=F, other=G).
+
+        F: A→B, G: B→C  →  G∘F: A→C
+
+        Object map: X ↦ G(F(X))
+        Morphism map: f ↦ G(F(f))
+
+        Raises:
+            ValueError: if F.target_cat != G.source_cat (incompatible)
+        """
+        if self.target_cat != other.source_cat:
+            raise ValueError(
+                f"Cannot compose {other.name}∘{self.name}: "
+                f"{self.name} target ({self.target_cat}) "
+                f"≠ {other.name} source ({other.source_cat})"
+            )
+
+        # G∘F object map: X ↦ G(F(X))
+        composed_obj = {}
+        for x, fx in self.object_map.items():
+            gfx = other.object_map.get(fx)
+            if gfx is not None:
+                composed_obj[x] = gfx
+
+        # G∘F morphism map: f ↦ G(F(f))
+        composed_mor = {}
+        for f, ff in self.morphism_map.items():
+            gff = other.morphism_map.get(ff)
+            if gff is not None:
+                composed_mor[f] = gff
+
+        result_source = self.source_cat
+        result_target = other.target_cat
+
+        return Functor(
+            name=f"{other.name}∘{self.name}",
+            source_cat=result_source,
+            target_cat=result_target,
+            object_map=composed_obj,
+            morphism_map=composed_mor,
+            is_endofunctor=(result_source == result_target),
+        )
+
 
 # =============================================================================
 # Natural Transformation (自然変換: Functor → Functor)

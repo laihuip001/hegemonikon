@@ -14,6 +14,8 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from typing import Optional
+import os
+import re
 
 from mekhane.pks.pks_engine import KnowledgeNugget
 
@@ -60,34 +62,119 @@ class Narrative:
 class PKSNarrator:
     """NotebookLM Audio Overview 相当の「知識が語りかける」機構
 
-    テキスト Markdown ベースの対話形式サマリーを生成する。
     2 視点: Advocate (ベネフィット主張) vs Critic (限界指摘)。
 
-    Note:
-        LLM 統合は Phase 2 で実装。
-        現時点ではテンプレートベースの簡易生成。
+    Phase 1: テンプレートベースの簡易生成
+    Phase 2: Gemini 経由の高品質対話生成 (フォールバック付き)
     """
+
+    _LLM_PROMPT = (
+        "以下の知識について、Advocate（推薦者）と Critic（批判者）の対話を生成してください。\n\n"
+        "タイトル: {title}\n"
+        "要約: {abstract}\n"
+        "ソース: {source}\n"
+        "関連度: {score}\n\n"
+        "出力形式 (厳密に守ってください):\n"
+        "ADVOCATE: (この知識の価値と応用可能性を具体的に主張)\n"
+        "CRITIC: (限界、注意点、前提条件を指摘)\n"
+        "ADVOCATE: (批判に応答し、最終的な推薦を述べる)\n\n"
+        "各発言は1-2文で簡潔に。日本語で。"
+    )
+
+    # PURPOSE: PKSNarrator の初期化
+    def __init__(self, use_llm: bool = True, model: str = "gemini-2.0-flash"):
+        self._client = None
+        self._model = model
+        if use_llm:
+            self._init_client()
+
+    def _init_client(self) -> None:
+        """Gemini クライアントを初期化"""
+        try:
+            from google import genai
+            api_key = (
+                os.environ.get("GOOGLE_API_KEY")
+                or os.environ.get("GEMINI_API_KEY")
+                or os.environ.get("GOOGLE_GENAI_API_KEY")
+            )
+            self._client = genai.Client(api_key=api_key) if api_key else genai.Client()
+        except (ImportError, Exception):
+            self._client = None
+
+    @property
+    def llm_available(self) -> bool:
+        return self._client is not None
 
     # PURPOSE: KnowledgeNugget を対話形式に変換
     def narrate(self, nugget: KnowledgeNugget) -> Narrative:
         """KnowledgeNugget を対話形式に変換
 
-        Phase 1: テンプレートベースの簡易生成
-        Phase 2: LLM 経由の高品質対話生成
+        LLM 可用時: Gemini で動的生成
+        LLM 不可時: テンプレートフォールバック
         """
+        if self.llm_available:
+            narrative = self._narrate_llm(nugget)
+            if narrative:
+                return narrative
+
+        return self._narrate_template(nugget)
+
+    # PURPOSE: LLM 経由の対話生成
+    def _narrate_llm(self, nugget: KnowledgeNugget) -> Optional[Narrative]:
+        """Gemini で Advocate/Critic 対話を生成"""
+        prompt = self._LLM_PROMPT.format(
+            title=nugget.title,
+            abstract=nugget.abstract[:500] if nugget.abstract else "(なし)",
+            source=nugget.source,
+            score=f"{nugget.relevance_score:.2f}",
+        )
+
+        try:
+            response = self._client.models.generate_content(
+                model=self._model, contents=prompt
+            )
+            text = response.text if response else ""
+            if text:
+                return self._parse_llm_response(text, nugget)
+        except Exception as e:
+            print(f"[Narrator] LLM error: {e}")
+
+        return None
+
+    # PURPOSE: LLM 応答をパース
+    def _parse_llm_response(
+        self, text: str, nugget: KnowledgeNugget
+    ) -> Optional[Narrative]:
+        """「ADVOCATE: ...」CRITIC: ...」形式をパース"""
         segments = []
+        pattern = re.compile(
+            r"(ADVOCATE|CRITIC):\s*(.+?)(?=(?:ADVOCATE|CRITIC):|$)",
+            re.DOTALL,
+        )
+        matches = pattern.findall(text)
 
-        # Advocate: ベネフィットを主張
-        advocate_text = self._generate_advocate(nugget)
-        segments.append(NarrativeSegment(speaker="Advocate", content=advocate_text))
+        for speaker_raw, content in matches:
+            speaker = "Advocate" if speaker_raw == "ADVOCATE" else "Critic"
+            content = content.strip()
+            if content:
+                segments.append(NarrativeSegment(speaker=speaker, content=content))
 
-        # Critic: 限界と注意点を指摘
-        critic_text = self._generate_critic(nugget)
-        segments.append(NarrativeSegment(speaker="Critic", content=critic_text))
+        if len(segments) >= 2:
+            return Narrative(
+                title=nugget.title,
+                segments=segments,
+                source_nugget=nugget,
+            )
 
-        # Advocate: 応答
-        response_text = self._generate_response(nugget)
-        segments.append(NarrativeSegment(speaker="Advocate", content=response_text))
+        return None  # パース失敗 → テンプレートフォールバック
+
+    # PURPOSE: テンプレートベース生成 (Phase 1 フォールバック)
+    def _narrate_template(self, nugget: KnowledgeNugget) -> Narrative:
+        """テンプレートベースの対話生成 (Phase 1)"""
+        segments = []
+        segments.append(NarrativeSegment(speaker="Advocate", content=self._generate_advocate(nugget)))
+        segments.append(NarrativeSegment(speaker="Critic", content=self._generate_critic(nugget)))
+        segments.append(NarrativeSegment(speaker="Advocate", content=self._generate_response(nugget)))
 
         return Narrative(
             title=nugget.title,

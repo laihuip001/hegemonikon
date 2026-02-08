@@ -747,6 +747,20 @@ class PKSEngine:
 
         # スコアリング + フィルタリング
         nuggets = self.detector.score(context, results)
+
+        # v2: セレンディピティスコア付与
+        if self.serendipity_scorer and nuggets:
+            # results と nuggets は順序が違う (nuggets はソート済み)
+            # nuggets の title → result の _distance マッピングを構築
+            distance_map = {
+                r.get("title", ""): r.get("_distance", 0.5)
+                for r in results
+            }
+            raw_distances = [
+                distance_map.get(n.title, 0.5) for n in nuggets
+            ]
+            self.serendipity_scorer.enrich(nuggets, raw_distances)
+
         pushable = self.controller.filter_pushable(nuggets)
 
         # 履歴記録

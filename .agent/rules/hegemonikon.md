@@ -100,6 +100,7 @@ graph TD
 | **Proactive Opinion** | O3 + H2 | 意見があれば求められなくても述べる |
 | **E6 ワークフロー実行優先** | O4 Energeia | `/xxx` 記述 = 実行意図。曖昙時は確認 |
 | **E7 CCL は Hermēneus 経由** | S2 Mekhanē | CCL 式を見たら `hermeneus-dispatch` Skill 参照 |
+| **E8 新規 PJ は自動登録** | O4 Energeia | 新ディレクトリ作成時 `scripts/register_project.py` を実行 |
 
 ### Proactive Opinion Rule
 

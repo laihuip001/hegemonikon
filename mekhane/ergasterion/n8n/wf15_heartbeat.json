@@ -1,0 +1,130 @@
+{
+    "name": "WF-15: Heartbeat (Sympatheia)",
+    "nodes": [
+        {
+            "parameters": {
+                "rule": {
+                    "interval": [
+                        {
+                            "field": "cronExpression",
+                            "expression": "*/5 * * * *"
+                        }
+                    ]
+                }
+            },
+            "id": "heartbeat-cron",
+            "name": "5分毎の鼓動",
+            "type": "n8n-nodes-base.scheduleTrigger",
+            "typeVersion": 1.2,
+            "position": [
+                250,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "jsCode": "const fs = require('fs');\nconst os = require('os');\nconst { execSync } = require('child_process');\n\nconst now = new Date();\nconst state = $getWorkflowStaticData('global');\n\n// 連続成功カウント\nif (!state.beats) state.beats = 0;\nif (!state.startedAt) state.startedAt = now.toISOString();\nstate.beats++;\n\nconst checks = [];\nlet healthy = true;\n\n// 1. ディスク空き容量\ntry {\n  const df = execSync('df -h / | tail -1', { encoding: 'utf-8' }).trim();\n  const parts = df.split(/\\s+/);\n  const usePct = parseInt(parts[4]) || 0;\n  if (usePct > 90) {\n    checks.push({ name: 'disk', status: 'error', detail: `${usePct}% used` });\n    healthy = false;\n  } else {\n    checks.push({ name: 'disk', status: 'ok', detail: `${usePct}% used` });\n  }\n} catch(e) {\n  checks.push({ name: 'disk', status: 'warn', detail: e.message.slice(0,50) });\n}\n\n// 2. メモリ\ntry {\n  const totalMem = os.totalmem();\n  const freeMem = os.freemem();\n  const usedPct = Math.round((1 - freeMem / totalMem) * 100);\n  if (usedPct > 90) {\n    checks.push({ name: 'memory', status: 'error', detail: `${usedPct}% used` });\n    healthy = false;\n  } else {\n    checks.push({ name: 'memory', status: 'ok', detail: `${usedPct}% used` });\n  }\n} catch(e) {\n  checks.push({ name: 'memory', status: 'warn', detail: e.message.slice(0,50) });\n}\n\n// 3. n8n DB アクセス\ntry {\n  const dbPath = '/home/node/.n8n/database.sqlite';\n  if (fs.existsSync(dbPath)) {\n    const stat = fs.statSync(dbPath);\n    const ageSec = (Date.now() - stat.mtimeMs) / 1000;\n    checks.push({ name: 'n8n_db', status: 'ok', detail: `modified ${Math.round(ageSec)}s ago` });\n  } else {\n    checks.push({ name: 'n8n_db', status: 'error', detail: 'DB not found' });\n    healthy = false;\n  }\n} catch(e) {\n  checks.push({ name: 'n8n_db', status: 'warn', detail: e.message.slice(0,50) });\n}\n\n// 4. mneme 書き込みテスト\ntry {\n  const testFile = '/oikos/mneme/.hegemonikon/heartbeat.json';\n  const heartbeat = {\n    timestamp: now.toISOString(),\n    beats: state.beats,\n    uptimeSince: state.startedAt,\n    uptimeMinutes: Math.round((now - new Date(state.startedAt)) / 60000),\n    healthy,\n    checks\n  };\n  fs.writeFileSync(testFile, JSON.stringify(heartbeat, null, 2), 'utf-8');\n  checks.push({ name: 'mneme_write', status: 'ok', detail: 'heartbeat.json written' });\n} catch(e) {\n  checks.push({ name: 'mneme_write', status: 'error', detail: e.message.slice(0,50) });\n  healthy = false;\n}\n\n// 5. Uptime 計算\nconst uptimeMin = Math.round((now - new Date(state.startedAt)) / 60000);\nconst uptimeStr = uptimeMin >= 60 \n  ? `${Math.floor(uptimeMin/60)}h ${uptimeMin%60}m` \n  : `${uptimeMin}m`;\n\n// Slack URL check\nconst slackUrl = (process.env.SLACK_WEBHOOK_URL || '').trim();\nconst hasSlackUrl = slackUrl.length > 0 && slackUrl.startsWith('http');\n\n// 異常時のみ通知 (正常時は沈黙 = heartbeat の本質)\nconst shouldAlert = !healthy && hasSlackUrl;\n\nconst slackPayload = shouldAlert ? JSON.stringify({\n  blocks: [\n    { type: 'header', text: { type: 'plain_text', text: '🫀 Sympatheia Heartbeat: ANOMALY', emoji: true } },\n    { type: 'section', fields: [\n      { type: 'mrkdwn', text: '*Uptime:* ' + uptimeStr + ' (' + state.beats + ' beats)' },\n      { type: 'mrkdwn', text: '*Status:* ' + checks.filter(c => c.status !== 'ok').map(c => `❌ ${c.name}: ${c.detail}`).join('\\n') }\n    ]},\n    { type: 'context', elements: [{ type: 'mrkdwn', text: '_WF-15 Sympatheia Heartbeat_' }] }\n  ]\n}) : '';\n\nreturn [{ json: {\n  healthy,\n  beats: state.beats,\n  uptime: uptimeStr,\n  uptimeMinutes: uptimeMin,\n  checks,\n  shouldAlert,\n  slackPayload\n} }];"
+            },
+            "id": "heartbeat-check",
+            "name": "自己診断",
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                450,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "conditions": {
+                    "boolean": [
+                        {
+                            "value1": "={{$json.shouldAlert}}",
+                            "value2": true
+                        }
+                    ]
+                }
+            },
+            "id": "if-alert",
+            "name": "異常あり?",
+            "type": "n8n-nodes-base.if",
+            "typeVersion": 1,
+            "position": [
+                650,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "={{ $env.SLACK_WEBHOOK_URL }}",
+                "sendBody": true,
+                "specifyBody": "json",
+                "jsonBody": "={{ $json.slackPayload }}",
+                "options": {
+                    "timeout": 10000
+                }
+            },
+            "id": "slack-sos",
+            "name": "SOS 通知",
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.2,
+            "position": [
+                850,
+                200
+            ]
+        }
+    ],
+    "connections": {
+        "5分毎の鼓動": {
+            "main": [
+                [
+                    {
+                        "node": "自己診断",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "自己診断": {
+            "main": [
+                [
+                    {
+                        "node": "異常あり?",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "異常あり?": {
+            "main": [
+                [
+                    {
+                        "node": "SOS 通知",
+                        "type": "main",
+                        "index": 0
+                    }
+                ],
+                []
+            ]
+        }
+    },
+    "settings": {
+        "executionOrder": "v1"
+    },
+    "tags": [
+        {
+            "name": "hegemonikon"
+        },
+        {
+            "name": "sympatheia"
+        },
+        {
+            "name": "heartbeat"
+        }
+    ],
+    "active": true,
+    "versionId": "1.0.0"
+}

@@ -106,6 +106,18 @@ ls -1 ~/oikos/mneme/.hegemonikon/sessions/handoff_*.md | wc -l
 - FEP A行列読込
 - KI ランダム想起
 
+### 3.5 Gnōsis Boot Recall
+
+```bash
+cd ~/oikos/hegemonikon && PYTHONPATH=. .venv/bin/python scripts/boot_gnosis.py --queries ${BOOT_GNOSIS_QUERIES:-3}
+```
+
+| 照会 | 内容 |
+|:-----|:-----|
+| 未解決タスク | 直近セッションの保留事項 |
+| 設計決定 | 最近のアーキテクチャ変更 |
+| 教訓 | 失敗から学んだこと |
+
 ---
 
 ## Phase 4: システム更新

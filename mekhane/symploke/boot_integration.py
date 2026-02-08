@@ -374,9 +374,35 @@ def get_boot_context(mode: str = "standard", context: Optional[str] = None) -> d
                 # Dispatcher integration (Problem A)
                 dispatch_info = extract_dispatch_info(context, gpu_ok=gpu_ok)
 
+                # Theorem-level attractor (24 定理: 6 Series の粒度拡張)
+                theorem_detail = {}
+                try:
+                    from mekhane.fep.theorem_attractor import TheoremAttractor
+                    ta = TheoremAttractor(force_cpu=not gpu_ok)
+                    top_theorems = ta.suggest(context, top_k=5)
+                    flow = ta.simulate_flow(context, steps=10)
+                    theorem_detail = {
+                        "top_theorems": [
+                            {"theorem": r.theorem, "name": r.name,
+                             "series": r.series, "sim": round(r.similarity, 3),
+                             "command": r.command}
+                            for r in top_theorems
+                        ],
+                        "flow_converged": flow.converged_at,
+                        "flow_final": [t for t, _ in flow.final_theorems[:3]],
+                    }
+                except Exception:
+                    pass  # Theorem attractor failure should not block boot
+
                 formatted_parts = []
                 if llm_fmt:
                     formatted_parts.append(f"🎯 **Attractor**: {llm_fmt}")
+                if theorem_detail.get("top_theorems"):
+                    tops = ", ".join(
+                        f"{t['theorem']}({t['sim']:.2f})"
+                        for t in theorem_detail["top_theorems"][:3]
+                    )
+                    formatted_parts.append(f"   🔬 Theorems: {tops}")
                 if dispatch_info["primary"]:
                     formatted_parts.append(f"   📎 Dispatch: {dispatch_info['dispatch_formatted']}")
 
@@ -389,6 +415,7 @@ def get_boot_context(mode: str = "standard", context: Optional[str] = None) -> d
                     "advice": rec.advice,
                     "dispatch_primary": dispatch_info["primary"],
                     "dispatch_alternatives": dispatch_info["alternatives"],
+                    "theorem_detail": theorem_detail,
                     "formatted": "\n".join(formatted_parts) if formatted_parts else "",
                 }
 

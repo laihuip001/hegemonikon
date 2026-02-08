@@ -95,3 +95,68 @@ class PKSMatrixView:
             lines.append("| " + " | ".join(cells) + " |")
 
         return "\n".join(lines)
+
+
+# PURPOSE: Obsidian 風の擬似バックリンク生成
+class PKSBacklinks:
+    """擬似 Backlinks — Obsidian Graph View のテキスト版
+
+    ベクトル類似度に基づき、指定された知識を「参照している」
+    他の知識を発見し、テキストベースの関連マップとして出力する。
+    """
+
+    # PURPOSE: 擬似バックリンクレポートを生成
+    def generate(
+        self,
+        origin_query: str,
+        related_nuggets: list[KnowledgeNugget],
+        max_links: int = 10,
+    ) -> str:
+        """擬似バックリンクレポートを生成
+
+        Args:
+            origin_query: 起点となるクエリ/トピック
+            related_nuggets: ベクトル検索で見つかった関連ナゲット
+            max_links: 最大表示件数
+
+        Returns:
+            Markdown 形式のバックリンクレポート
+        """
+        if not related_nuggets:
+            return f"📭 '{origin_query}' に関連するバックリンクはありません。"
+
+        nuggets = related_nuggets[:max_links]
+
+        lines = [
+            f"## 🔗 擬似バックリンク: {origin_query}",
+            "",
+            f"_関連知識: {len(nuggets)} 件_",
+            "",
+        ]
+
+        # テキストグラフ
+        lines.append("```")
+        lines.append(f"  [{origin_query}]")
+        for nugget in nuggets:
+            score_bar = "█" * int(nugget.relevance_score * 10)
+            score_pad = "░" * (10 - int(nugget.relevance_score * 10))
+            title_short = nugget.title[:40]
+            lines.append(
+                f"    ├── {score_bar}{score_pad} {nugget.relevance_score:.2f} │ {title_short}"
+            )
+        lines.append("```")
+        lines.append("")
+
+        # 詳細テーブル
+        lines.append("| 知識 | 関連度 | ソース | 接続理由 |")
+        lines.append("|:-----|:------:|:------:|:---------|")
+
+        for nugget in nuggets:
+            title = nugget.title[:50].replace("|", "\\|")
+            reason = nugget.push_reason[:60].replace("|", "\\|") if nugget.push_reason else "セマンティック類似"
+            lines.append(
+                f"| {title} | {nugget.relevance_score:.2f} | {nugget.source} | {reason} |"
+            )
+
+        return "\n".join(lines)
+

@@ -259,8 +259,12 @@ def send_slack(report: HealthReport):
 
 
 # PURPOSE: n8n WF-05 Health Alert webhook にレポートを送信
-def send_n8n_alert(report: HealthReport):
-    """n8n の health-alert webhook にデータを送信。n8n 側で重大度分類と通知を行う。"""
+def send_n8n_alert(report: HealthReport) -> bool:
+    """n8n の health-alert webhook にデータを送信。n8n 側で重大度分類と通知を行う。
+
+    Returns:
+        True if n8n accepted the alert, False otherwise.
+    """
     url = "http://localhost:5678/webhook/health-alert"
     payload = json.dumps({
         "items": [asdict(i) for i in report.items],
@@ -273,8 +277,10 @@ def send_n8n_alert(report: HealthReport):
             result = json.loads(resp.read().decode("utf-8"))
             severity = result.get("severity", "?")
             print(f"📡 n8n WF-05: severity={severity}", file=sys.stderr)
+            return True
     except Exception as e:
         print(f"⚠️ n8n WF-05 failed: {e}", file=sys.stderr)
+        return False
 
 
 # PURPOSE: CLI エントリポイント
@@ -284,6 +290,7 @@ def main():
     parser.add_argument("--json", action="store_true", help="JSON output")
     parser.add_argument("--slack", action="store_true", help="Send directly to Slack (bypass n8n)")
     parser.add_argument("--n8n", action="store_true", help="Send to n8n WF-05")
+    parser.add_argument("--auto", action="store_true", help="n8n first, Slack fallback (for cron)")
     parser.add_argument("--no-n8n", action="store_true", help="Suppress auto n8n send")
     args = parser.parse_args()
 
@@ -291,6 +298,13 @@ def main():
 
     if args.json:
         print(json.dumps([asdict(i) for i in report.items], indent=2, ensure_ascii=False))
+    elif args.auto:
+        # cron 用: n8n 優先 → 失敗時に Slack 直送フォールバック
+        print(format_terminal(report))
+        n8n_ok = send_n8n_alert(report)
+        if not n8n_ok and report.score < 0.7:
+            print("🔄 n8n unreachable, falling back to direct Slack", file=sys.stderr)
+            send_slack(report)
     elif args.slack:
         # 直接 Slack送信 (n8n 未起動時のフォールバック)
         send_slack(report)
@@ -299,8 +313,8 @@ def main():
         print(format_terminal(report))
 
     # n8n 通知: n8n が Slack 通知の一元窓口
-    # --n8n 明示指定 or スコア低下時は自動送信 (--slack との二重送信を回避)
-    if not args.no_n8n and not args.slack:
+    # --n8n 明示指定 or スコア低下時は自動送信 (--slack/--auto との二重送信を回避)
+    if not args.no_n8n and not args.slack and not args.auto:
         if args.n8n or report.score < 0.7:
             send_n8n_alert(report)
 

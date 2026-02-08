@@ -250,6 +250,117 @@ class Monad:
 
 
 # =============================================================================
+# Functor (映射: Category → Category)
+# =============================================================================
+
+
+@dataclass
+class Functor:
+    """A functor F: C → D between categories.
+
+    In Hegemonikón:
+    - /eat: Ext → Cog (digest external content into theorems)
+    - /zet: Cog → Cog (endofunctor: question generation)
+    - L (/boot): Mem → Ses (left adjoint: expand)
+    - R (/bye): Ses → Mem (right adjoint: compress)
+
+    A functor maps:
+    - Objects to objects: F(X) = Y
+    - Morphisms to morphisms: F(f: X→Y) = F(f): F(X)→F(Y)
+    Preserving composition and identity.
+    """
+
+    name: str  # e.g. "eat", "zet", "boot", "bye"
+    source_cat: str  # Source category name, e.g. "Ext", "Cog", "Mem"
+    target_cat: str  # Target category name, e.g. "Cog", "Ses"
+    object_map: Dict[str, str] = field(default_factory=dict)  # X → F(X)
+    morphism_map: Dict[str, str] = field(default_factory=dict)  # f → F(f)
+    is_endofunctor: bool = False  # C == D
+
+    @property
+    def is_faithful(self) -> bool:
+        """Faithful = injective on morphisms (no information loss)."""
+        values = list(self.morphism_map.values())
+        return len(values) == len(set(values))
+
+    @property
+    def is_full(self) -> bool:
+        """Full = surjective on morphisms (covers all arrows in target)."""
+        # Cannot compute without full category knowledge; default False
+        return False
+
+    def map_object(self, obj: str) -> Optional[str]:
+        """Apply functor to an object."""
+        return self.object_map.get(obj)
+
+    def map_morphism(self, morphism_id: str) -> Optional[str]:
+        """Apply functor to a morphism."""
+        return self.morphism_map.get(morphism_id)
+
+
+# =============================================================================
+# Natural Transformation (自然変換: Functor → Functor)
+# =============================================================================
+
+
+@dataclass
+class NaturalTransformation:
+    """A natural transformation α: F ⇒ G between functors.
+
+    In Hegemonikón:
+    - /eat v1 → /eat v2: WF version upgrade as natural transformation
+    - @converge C0→C1: PW selection → shot enumeration as α
+    - /boot η: Id_Mem ⇒ R∘L (unit of adjunction)
+    - /bye ε: L∘R ⇒ Id_Ses (counit of adjunction)
+
+    Naturality condition:
+        G(f) ∘ α_X = α_Y ∘ F(f)
+        "transforming then mapping = mapping then transforming"
+
+    This guarantees structural consistency across all objects.
+    """
+
+    name: str  # e.g. "η", "ε", "eat_upgrade"
+    source_functor: str  # F
+    target_functor: str  # G
+    components: Dict[str, str] = field(default_factory=dict)  # α_X for each object X
+
+    def component_at(self, obj: str) -> Optional[str]:
+        """Get the component α_X at object X."""
+        return self.components.get(obj)
+
+    def compose(self, other: NaturalTransformation) -> Optional[NaturalTransformation]:
+        """Vertical composition: β ∘ α (self = α, other = β).
+
+        α: F ⇒ G, β: G ⇒ H → β∘α: F ⇒ H
+        """
+        if self.target_functor != other.source_functor:
+            return None
+        # Component-wise composition
+        composed_components = {}
+        for obj in self.components:
+            if obj in other.components:
+                composed_components[obj] = f"{other.components[obj]}∘{self.components[obj]}"
+        return NaturalTransformation(
+            name=f"{other.name}∘{self.name}",
+            source_functor=self.source_functor,
+            target_functor=other.target_functor,
+            components=composed_components,
+        )
+
+    @property
+    def is_natural_isomorphism(self) -> bool:
+        """A natural isomorphism has invertible components.
+
+        Cannot fully verify without category structure;
+        checks that all components are non-empty as proxy.
+        """
+        return bool(self.components) and all(
+            v != "" for v in self.components.values()
+        )
+
+
+# =============================================================================
 # Cog Category (the whole thing)
 # =============================================================================
 

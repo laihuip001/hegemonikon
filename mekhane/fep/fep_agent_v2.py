@@ -713,6 +713,70 @@ class HegemonikónFEPAgentV2:
             "learning_rate": eta,
         })
 
+    # PURPOSE: Supervised Dirichlet update — Creator が正解 Series を教える
+    def update_A_with_feedback(
+        self,
+        correct_series: str,
+        beliefs_snapshot: Optional[np.ndarray] = None,
+        learning_rate: Optional[float] = None,
+    ) -> float:
+        """Supervised Dirichlet update — Creator が正解 Series を教える。
+
+        通常の update_A_dirichlet は current observation を正解とする (自己正当化)。
+        このメソッドは Creator が与えた correct_series を正解として使う。
+
+        /dia+ F1: Positive-only. 誤 Series の抑制は implicit competition で実現。
+        /dia+ F2: beliefs_snapshot を直接使用 (なければ uniform fallback)。
+
+        Args:
+            correct_series: Creator が指定した正解 Series ("O","S","H","P","K","A")
+            beliefs_snapshot: step() 実行時の beliefs 配列
+            learning_rate: 学習率 (省略時: self.learning_rate * 0.6)
+
+        Returns:
+            A行列の変化量 (Frobenius norm)
+        """
+        from mekhane.fep.credit_assignment import _SERIES_TO_TOPIC_ROW
+
+        if correct_series not in _SERIES_TO_TOPIC_ROW:
+            raise ValueError(f"Invalid series: {correct_series}")
+
+        # Learning rate: lower than unsupervised (more careful)
+        eta = learning_rate if learning_rate is not None else self.learning_rate * 0.6
+
+        A_matrix = self._get_A_matrix()
+        A_before = A_matrix.copy()
+
+        # Beliefs: use snapshot or uniform fallback
+        if beliefs_snapshot is not None:
+            beliefs = np.asarray(beliefs_snapshot, dtype=np.float64).flatten()
+            beliefs = beliefs / (beliefs.sum() + 1e-10)
+        else:
+            beliefs = np.ones(A_matrix.shape[1]) / A_matrix.shape[1]
+
+        # 1-hot at correct topic row
+        num_obs = A_matrix.shape[0]
+        topic_row = _SERIES_TO_TOPIC_ROW[correct_series]
+        obs_vector = np.zeros(num_obs)
+        obs_vector[topic_row] = 1.0
+
+        # Positive-only Dirichlet update
+        update = eta * np.outer(obs_vector, beliefs)
+        eps = 1e-10
+        A_matrix = np.clip(A_matrix + update, eps, None)
+        A_matrix = A_matrix / A_matrix.sum(axis=0, keepdims=True)
+
+        self._set_A_matrix(A_matrix)
+
+        delta = float(np.linalg.norm(A_matrix - A_before))
+        self._history.append({
+            "type": "feedback_update",
+            "correct_series": correct_series,
+            "learning_rate": eta,
+            "delta_norm": delta,
+        })
+        return delta
+
     # =========================================================================
     # Meta-ε Learning
     # =========================================================================

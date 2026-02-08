@@ -13,10 +13,12 @@ Q.E.D.
 Category Theory Types for Hegemonikón
 
 Provides Python dataclass representations for:
-- Cog category: 24 objects (theorems), 78 morphisms (72 X-series + 6 identity)
+- Cog category: 24 objects (theorems), 72 morphisms (X-series)
+- Cone: @converge C0-C3 with Precision Weighting (Hub Peras)
 - Adjunction: L ⊣ R (/boot ⊣ /bye)
 - Monad: T, η, μ (/zet)
-- Cone: @converge C1-C3 (Hub Peras)
+- Functor: F: C → D (e.g. /eat: Ext→Cog, /zet: Cog→Cog)
+- NaturalTransformation: α: F ⇒ G (e.g. η, ε, WF version upgrade)
 
 References:
 - ccl/operators.md §13 (圏論的意味論マップ)

@@ -149,21 +149,50 @@ class SyncWatcher:
 
     # PURPOSE: 変更ファイルを LanceDB にインデキシング
     def ingest_changes(self, changes: list[FileChange]) -> int:
-        """変更ファイルを LanceDB にインデキシング
+        """変更ファイルを GnosisIndex (LanceDB) にインデキシング
 
-        Note:
-            現段階ではリンクインデックスの更新のみ。
-            LanceDB へのベクトルインデキシングは将来の Anamnesis 拡張で実装。
+        v2: 実際の LanceDB 書き込みを実行。
+        GnosisIndex が利用不可の場合はログのみのフォールバック。
         """
         ingested = 0
+        index = None
+
+        # GnosisIndex を遅延初期化 (重い依存)
+        try:
+            from mekhane.anamnesis.index import GnosisIndex
+            index = GnosisIndex()
+        except Exception as e:
+            print(f"  ⚠️ GnosisIndex unavailable: {e}")
 
         for change in changes:
             if change.change_type == "deleted":
+                # TODO: LanceDB からの削除は将来実装
+                print(f"  [deleted] {change.path.name} (index removal pending)")
                 continue
 
-            if change.path.suffix in self.extensions:
-                print(f"  [{change.change_type}] {change.path.name}")
-                ingested += 1
+            if change.path.suffix not in self.extensions:
+                continue
+
+            print(f"  [{change.change_type}] {change.path.name}", end="")
+
+            if index is not None:
+                try:
+                    text = change.path.read_text(encoding="utf-8", errors="replace")
+                    if len(text.strip()) > 10:  # 空ファイルはスキップ
+                        index.add_document(
+                            doc_id=change.path.stem,
+                            content=text[:5000],  # 最大5000文字
+                            source=str(change.path),
+                        )
+                        print(" → indexed ✅")
+                    else:
+                        print(" → skipped (too short)")
+                except Exception as e:
+                    print(f" → error: {e}")
+            else:
+                print(" (no index)")
+
+            ingested += 1
 
         return ingested
 

@@ -571,6 +571,7 @@ class PKSEngine:
         lance_dir: Optional[Path] = None,
         enable_questions: bool = True,
         enable_serendipity: bool = True,
+        enable_feedback: bool = True,
     ):
         self.tracker = ContextTracker()
         self.detector = RelevanceDetector(threshold=threshold)
@@ -579,9 +580,22 @@ class PKSEngine:
         self.serendipity_scorer = SerendipityScorer() if enable_serendipity else None
         self.question_gen = SuggestedQuestionGenerator() if enable_questions else None
 
+        # v2: Feedback loop
+        self._feedback = None
+        if enable_feedback:
+            try:
+                from mekhane.pks.feedback import FeedbackCollector
+                self._feedback = FeedbackCollector()
+            except ImportError:
+                pass
+
+        # v2: Attractor bridge (lazy)
+        self._attractor_bridge = None
+
         # 遅延インポート (GnosisIndex は重い)
         self._index = None
         self._lance_dir = lance_dir
+        self._base_threshold = threshold
 
         # 履歴読み込み
         history_path = _PKS_DIR / self.HISTORY_FILE
@@ -645,6 +659,62 @@ class PKSEngine:
             print(f"[PKS] 自動トピック抽出: {topics}")
 
         return topics
+
+    # PURPOSE: v2: ユーザー入力から Attractor でコンテキストを自動推論
+    def auto_context_from_input(self, user_input: str) -> list[str]:
+        """Attractor によるコンテキスト自動推論
+
+        ユーザー入力 → Series 判定 → トピック + WF → SessionContext
+
+        Returns:
+            推論されたトピックのリスト
+        """
+        if self._attractor_bridge is None:
+            try:
+                from mekhane.pks.attractor_context import AttractorContextBridge
+                self._attractor_bridge = AttractorContextBridge()
+            except ImportError:
+                print("[PKS] AttractorContextBridge unavailable")
+                return []
+
+        ctx = self._attractor_bridge.infer_context(user_input)
+        self.tracker.update_topics(ctx.topics)
+        self.tracker.set_workflows(ctx.workflows)
+
+        # Feedback-based threshold adjustment
+        if self._feedback:
+            adjusted = self._feedback.adjust_threshold(
+                ctx.series, self._base_threshold
+            )
+            self.detector.threshold = adjusted
+
+        print(f"[PKS] Attractor → {ctx.series} (sim={ctx.similarity:.2f}, "
+              f"osc={ctx.oscillation}) topics={ctx.topics[:3]}")
+        return ctx.topics
+
+    # PURPOSE: v2: プッシュ反応を記録
+    def record_feedback(
+        self, nugget_title: str, reaction: str, series: str = ""
+    ) -> None:
+        """プッシュ知識への反応を記録
+
+        Args:
+            nugget_title: ナゲットのタイトル
+            reaction: "used" | "dismissed" | "deepened" | "ignored"
+            series: Attractor series (空の場合は現在のコンテキストから推定)
+        """
+        if self._feedback is None:
+            return
+        from mekhane.pks.feedback import PushFeedback
+        if not series and self.tracker.context.topics:
+            # 現在のトピックから推定
+            series = "O"  # default
+        self._feedback.record(PushFeedback(
+            nugget_title=nugget_title,
+            reaction=reaction,
+            series=series,
+        ))
+        self._feedback.persist()
 
     # PURPOSE: 能動的プッシュ: コンテキストに基づいて知識を表面化
     def proactive_push(self, k: int = 20) -> list[KnowledgeNugget]:

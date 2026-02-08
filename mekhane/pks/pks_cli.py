@@ -225,6 +225,47 @@ def cmd_feedback(args: argparse.Namespace) -> None:
     print(f"✅ Feedback recorded: '{args.title}' → {args.reaction}")
 
 
+# PURPOSE: `pks dialog` — プッシュされた知識への対話
+def cmd_dialog(args: argparse.Namespace) -> None:
+    """プッシュされた知識に対して対話的に探索"""
+    from mekhane.pks.pks_engine import PKSEngine
+    from mekhane.pks.push_dialog import PushDialog
+
+    engine = PKSEngine(
+        enable_questions=False,
+        enable_serendipity=False,
+    )
+
+    # title で nugget を検索
+    title = args.title
+    nuggets = engine.search_and_push(title, k=3)
+    if not nuggets:
+        print(f"📭 '{title}' に該当する知識が見つかりません。")
+        return
+
+    nugget = nuggets[0]  # 最も関連度が高いもの
+    dialog = PushDialog()
+
+    action = args.action
+    if action == "why":
+        print(dialog.why(nugget))
+    elif action == "ask":
+        if not args.question:
+            print("質問を指定してください: pks dialog ask <title> -q '質問'")
+            return
+        print(dialog.deeper(nugget, args.question))
+    elif action == "related":
+        related = dialog.related(nugget, k=args.k)
+        if not related:
+            print(f"📭 '{nugget.title}' の関連知識は見つかりませんでした。")
+            return
+        print(f"## 🔗 '{nugget.title}' の関連知識\n")
+        for i, r in enumerate(related, 1):
+            print(f"{i}. **{r.title}** (関連度: {r.relevance_score:.2f}) [{r.source}]")
+    else:
+        print(f"不明なアクション: {action}")
+
+
 # PURPOSE: メインエントリポイント
 def main() -> None:
     """PKS CLI メインエントリポイント"""
@@ -294,6 +335,14 @@ def main() -> None:
     p_feedback.add_argument("--series", "-s", help="Attractor series (任意)")
     p_feedback.add_argument("--stats", action="store_true", help="フィードバック統計を表示")
     p_feedback.set_defaults(func=cmd_feedback)
+
+    # --- dialog ---
+    p_dialog = subparsers.add_parser("dialog", help="プッシュ知識への対話")
+    p_dialog.add_argument("action", choices=["why", "ask", "related"], help="アクション")
+    p_dialog.add_argument("title", help="ナゲットタイトル (検索クエリ)")
+    p_dialog.add_argument("--question", "-q", help="質問 (ask 用)")
+    p_dialog.add_argument("--k", type=int, default=5, help="関連知識件数 (default: 5)")
+    p_dialog.set_defaults(func=cmd_dialog)
 
     args = parser.parse_args()
 

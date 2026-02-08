@@ -41,6 +41,7 @@ SERIES_WORKFLOWS: dict[str, list[str]] = {
 }
 
 
+# PURPOSE: Attractor 推論結果をまとめたコンテキスト
 @dataclass
 class AttractorContext:
     """Attractor 推論結果をまとめたコンテキスト"""
@@ -53,6 +54,7 @@ class AttractorContext:
     secondary_topics: list[str] = field(default_factory=list)
 
 
+# PURPOSE: Attractor → PKS コンテキスト変換
 class AttractorContextBridge:
     """Attractor → PKS コンテキスト変換
 
@@ -73,6 +75,7 @@ class AttractorContextBridge:
             self._attractor = SeriesAttractor(force_cpu=self._force_cpu)
         return self._attractor
 
+    # PURPOSE: ユーザー入力 → AttractorContext 推論
     def infer_context(self, user_input: str) -> AttractorContext:
         """ユーザー入力 → AttractorContext 推論
 
@@ -109,6 +112,7 @@ class AttractorContextBridge:
             secondary_topics=secondary_topics,
         )
 
+    # PURPOSE: AttractorContext → SessionContext 変換
     def to_session_context(self, attractor_ctx: AttractorContext) -> SessionContext:
         """AttractorContext → SessionContext 変換
 
@@ -127,6 +131,7 @@ class AttractorContextBridge:
             active_workflows=attractor_ctx.workflows,
         )
 
+    # PURPOSE: ワンショット: user_input → SessionContext
     def infer_session_context(self, user_input: str) -> SessionContext:
         """ワンショット: user_input → SessionContext"""
         attractor_ctx = self.infer_context(user_input)

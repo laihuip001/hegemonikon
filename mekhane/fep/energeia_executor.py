@@ -455,6 +455,7 @@ class EnergеiaExecutor:
             raise
 
 
+# PURPOSE: 実行結果をMarkdown形式でフォーマット
 def format_execution_markdown(result: ExecutionResult) -> str:
     """実行結果をMarkdown形式でフォーマット"""
     ctx = result.context
@@ -537,6 +538,7 @@ def format_execution_markdown(result: ExecutionResult) -> str:
 
 
 # FEP Integration
+# PURPOSE: FEP観察空間へのエンコード
 def encode_execution_observation(result: ExecutionResult) -> dict:
     """FEP観察空間へのエンコード
 

@@ -24,35 +24,43 @@ from mekhane.fep.eukairia_detector import (
 )
 
 
+# PURPOSE: OpportunityWindow enum tests
 class TestOpportunityWindow:
     """OpportunityWindow enum tests"""
 
+    # PURPOSE: all_windows_exist をテストする
     def test_all_windows_exist(self):
         assert OpportunityWindow.WIDE.value == "wide"
         assert OpportunityWindow.NARROW.value == "narrow"
         assert OpportunityWindow.CLOSING.value == "closing"
 
 
+# PURPOSE: OpportunityScale enum tests
 class TestOpportunityScale:
     """OpportunityScale enum tests"""
 
+    # PURPOSE: all_scales_exist をテストする
     def test_all_scales_exist(self):
         assert OpportunityScale.MICRO.value == "micro"
         assert OpportunityScale.MACRO.value == "macro"
 
 
+# PURPOSE: OpportunityDecision enum tests
 class TestOpportunityDecision:
     """OpportunityDecision enum tests"""
 
+    # PURPOSE: all_decisions_exist をテストする
     def test_all_decisions_exist(self):
         assert OpportunityDecision.GO.value == "go"
         assert OpportunityDecision.WAIT.value == "wait"
         assert OpportunityDecision.PASS.value == "pass"
 
 
+# PURPOSE: EukairiaResult dataclass tests
 class TestEukairiaResult:
     """EukairiaResult dataclass tests"""
 
+    # PURPOSE: should_act をテストする
     def test_should_act(self):
         result = EukairiaResult(
             action="test",
@@ -71,6 +79,7 @@ class TestEukairiaResult:
         assert result.should_wait is False
         assert result.net_value == pytest.approx(0.5)
 
+    # PURPOSE: should_wait をテストする
     def test_should_wait(self):
         result = EukairiaResult(
             action="test",
@@ -89,9 +98,11 @@ class TestEukairiaResult:
         assert result.should_wait is True
 
 
+# PURPOSE: OpportunityContext tests
 class TestOpportunityContext:
     """OpportunityContext tests"""
 
+    # PURPOSE: default_values をテストする
     def test_default_values(self):
         ctx = OpportunityContext()
         assert ctx.environment_ready == 0.5
@@ -99,9 +110,11 @@ class TestOpportunityContext:
         assert ctx.competition_high is False
 
 
+# PURPOSE: _calculate_readiness tests
 class TestCalculateReadiness:
     """_calculate_readiness tests"""
 
+    # PURPOSE: high_readiness をテストする
     def test_high_readiness(self):
         ctx = OpportunityContext(
             environment_ready=0.9,
@@ -112,6 +125,7 @@ class TestCalculateReadiness:
         readiness = _calculate_readiness(ctx)
         assert readiness > 0.8
 
+    # PURPOSE: low_readiness をテストする
     def test_low_readiness(self):
         ctx = OpportunityContext(
             environment_ready=0.2,
@@ -122,6 +136,7 @@ class TestCalculateReadiness:
         readiness = _calculate_readiness(ctx)
         assert readiness < 0.3
 
+    # PURPOSE: competition_reduces_readiness をテストする
     def test_competition_reduces_readiness(self):
         ctx_no_comp = OpportunityContext(
             environment_ready=0.8,
@@ -140,25 +155,31 @@ class TestCalculateReadiness:
         assert _calculate_readiness(ctx_with_comp) < _calculate_readiness(ctx_no_comp)
 
 
+# PURPOSE: _calculate_window tests
 class TestCalculateWindow:
     """_calculate_window tests"""
 
+    # PURPOSE: closing_window_high_pressure をテストする
     def test_closing_window_high_pressure(self):
         ctx = OpportunityContext(deadline_pressure=0.9)
         assert _calculate_window(ctx) == OpportunityWindow.CLOSING
 
+    # PURPOSE: wide_window をテストする
     def test_wide_window(self):
         ctx = OpportunityContext(timing_favorable=0.8, deadline_pressure=0.2)
         assert _calculate_window(ctx) == OpportunityWindow.WIDE
 
+    # PURPOSE: narrow_window をテストする
     def test_narrow_window(self):
         ctx = OpportunityContext(timing_favorable=0.4, deadline_pressure=0.5)
         assert _calculate_window(ctx) == OpportunityWindow.NARROW
 
 
+# PURPOSE: detect_opportunity integration tests
 class TestDetectOpportunity:
     """detect_opportunity integration tests"""
 
+    # PURPOSE: go_decision_high_readiness をテストする
     def test_go_decision_high_readiness(self):
         ctx = OpportunityContext(
             environment_ready=0.9,
@@ -174,6 +195,7 @@ class TestDetectOpportunity:
         assert result.decision == OpportunityDecision.GO
         assert result.should_act is True
 
+    # PURPOSE: wait_decision_low_readiness をテストする
     def test_wait_decision_low_readiness(self):
         ctx = OpportunityContext(
             environment_ready=0.8,
@@ -189,6 +211,7 @@ class TestDetectOpportunity:
         # Low readiness should lead to WAIT
         assert result.decision in (OpportunityDecision.WAIT, OpportunityDecision.PASS)
 
+    # PURPOSE: pass_decision_high_risk をテストする
     def test_pass_decision_high_risk(self):
         ctx = OpportunityContext(
             environment_ready=0.2,
@@ -206,6 +229,7 @@ class TestDetectOpportunity:
         # High risk, low readiness → PASS
         assert result.decision == OpportunityDecision.PASS
 
+    # PURPOSE: go_on_closing_window をテストする
     def test_go_on_closing_window(self):
         ctx = OpportunityContext(
             environment_ready=0.6,
@@ -222,6 +246,7 @@ class TestDetectOpportunity:
         # Closing window should push toward GO if net >= 0
         assert result.window == OpportunityWindow.CLOSING
 
+    # PURPOSE: factors_are_populated をテストする
     def test_factors_are_populated(self):
         ctx = OpportunityContext(
             environment_ready=0.9,
@@ -232,15 +257,18 @@ class TestDetectOpportunity:
         result = detect_opportunity("テスト", ctx)
         assert len(result.factors) > 0
 
+    # PURPOSE: default_context をテストする
     def test_default_context(self):
         result = detect_opportunity("デフォルト行動")
         assert result.action == "デフォルト行動"
         assert result.scale == OpportunityScale.MICRO
 
 
+# PURPOSE: format_eukairia_markdown tests
 class TestFormatEukairiaMarkdown:
     """format_eukairia_markdown tests"""
 
+    # PURPOSE: format_includes_key_fields をテストする
     def test_format_includes_key_fields(self):
         ctx = OpportunityContext(
             environment_ready=0.8,
@@ -255,9 +283,11 @@ class TestFormatEukairiaMarkdown:
         assert "判定" in markdown
 
 
+# PURPOSE: encode_eukairia_observation tests
 class TestEncodeEukairiaObservation:
     """encode_eukairia_observation tests"""
 
+    # PURPOSE: encode_go_decision をテストする
     def test_encode_go_decision(self):
         result = EukairiaResult(
             action="test",
@@ -277,6 +307,7 @@ class TestEncodeEukairiaObservation:
         assert obs["urgency"] == 0.3  # WIDE window
         assert obs["confidence"] == 0.8
 
+    # PURPOSE: encode_closing_window をテストする
     def test_encode_closing_window(self):
         result = EukairiaResult(
             action="test",

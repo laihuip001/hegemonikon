@@ -13,9 +13,11 @@ import sys
 sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent))
 
 
+# PURPOSE: Tests for kairos_ingest.py
 class TestKairosIngest:
     """Tests for kairos_ingest.py"""
 
+    # PURPOSE: Test parsing of Handoff v2 YAML + Markdown format
     def test_parse_handoff_v2_format(self):
         """Test parsing of Handoff v2 YAML + Markdown format"""
         from mekhane.symploke.kairos_ingest import parse_handoff
@@ -46,6 +48,7 @@ This is the summary content.
         finally:
             temp_path.unlink()
 
+    # PURPOSE: Test parsing handoff without YAML metadata
     def test_parse_handoff_missing_yaml(self):
         """Test parsing handoff without YAML metadata"""
         from mekhane.symploke.kairos_ingest import parse_handoff
@@ -63,6 +66,7 @@ This is the summary content.
         finally:
             temp_path.unlink()
 
+    # PURPOSE: Test that handoff files are returned sorted by date
     def test_get_handoff_files_sorted(self):
         """Test that handoff files are returned sorted by date"""
         from mekhane.symploke.kairos_ingest import get_handoff_files
@@ -79,9 +83,11 @@ This is the summary content.
                 assert files[i].name >= files[i + 1].name
 
 
+# PURPOSE: Tests for sophia_ingest.py
 class TestSophiaIngest:
     """Tests for sophia_ingest.py"""
 
+    # PURPOSE: Test parsing KI directory with metadata.json
     def test_parse_ki_with_metadata(self):
         """Test parsing KI directory with metadata.json"""
         from mekhane.symploke.sophia_ingest import parse_ki_directory
@@ -108,6 +114,7 @@ class TestSophiaIngest:
             assert "Test KI" in docs[0].content
             assert docs[0].metadata.get("ki_name") == "Test KI"
 
+    # PURPOSE: Test parsing KI with only metadata, no artifacts
     def test_parse_ki_without_artifacts(self):
         """Test parsing KI with only metadata, no artifacts"""
         from mekhane.symploke.sophia_ingest import parse_ki_directory
@@ -129,6 +136,7 @@ class TestSophiaIngest:
             assert len(docs) == 1
             assert "Summary Only KI" in docs[0].content
 
+    # PURPOSE: Test parsing KI without metadata.json
     def test_parse_ki_missing_metadata(self):
         """Test parsing KI without metadata.json"""
         from mekhane.symploke.sophia_ingest import parse_ki_directory
@@ -142,6 +150,7 @@ class TestSophiaIngest:
             # Should return empty list
             assert docs == []
 
+    # PURPOSE: Test parsing KI with nested artifact directories (rglob)
     def test_parse_ki_nested_artifacts(self):
         """Test parsing KI with nested artifact directories (rglob)"""
         from mekhane.symploke.sophia_ingest import parse_ki_directory

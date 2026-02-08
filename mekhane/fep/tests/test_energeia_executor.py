@@ -30,9 +30,11 @@ from mekhane.fep.tekhne_registry import (
 )
 
 
+# PURPOSE: ExecutionPhase enum tests
 class TestExecutionPhase:
     """ExecutionPhase enum tests"""
 
+    # PURPOSE: all_phases_exist をテストする
     def test_all_phases_exist(self):
         assert ExecutionPhase.INIT.value == "init"
         assert ExecutionPhase.EXECUTE.value == "execute"
@@ -42,9 +44,11 @@ class TestExecutionPhase:
         assert ExecutionPhase.ROLLBACK.value == "rollback"
 
 
+# PURPOSE: ExecutionStatus enum tests
 class TestExecutionStatus:
     """ExecutionStatus enum tests"""
 
+    # PURPOSE: all_statuses_exist をテストする
     def test_all_statuses_exist(self):
         assert ExecutionStatus.PENDING.value == "pending"
         assert ExecutionStatus.RUNNING.value == "running"
@@ -53,9 +57,11 @@ class TestExecutionStatus:
         assert ExecutionStatus.ABORTED.value == "aborted"
 
 
+# PURPOSE: ExecutionContext dataclass tests
 class TestExecutionContext:
     """ExecutionContext dataclass tests"""
 
+    # PURPOSE: create_context をテストする
     def test_create_context(self):
         ctx = ExecutionContext(
             goal="テスト目標",
@@ -68,6 +74,7 @@ class TestExecutionContext:
         assert ctx.phase == ExecutionPhase.INIT
         assert ctx.errors == []
 
+    # PURPOSE: to_dict をテストする
     def test_to_dict(self):
         ctx = ExecutionContext(
             goal="goal",
@@ -82,9 +89,11 @@ class TestExecutionContext:
         assert d["status"] == "running"
 
 
+# PURPOSE: EnergеiaExecutor class tests
 class TestEnergеiaExecutor:
     """EnergеiaExecutor class tests"""
 
+    # PURPOSE: initiate_creates_context をテストする
     def test_initiate_creates_context(self):
         executor = EnergеiaExecutor()
         ctx = executor.initiate(
@@ -95,6 +104,7 @@ class TestEnergеiaExecutor:
         assert ctx.status == ExecutionStatus.PENDING
         assert ctx.telos_result is not None
 
+    # PURPOSE: initiate_checks_telos_alignment をテストする
     def test_initiate_checks_telos_alignment(self):
         executor = EnergеiaExecutor()
         ctx = executor.initiate(goal="認証機能を実装する", plan="auth.py を作成する")
@@ -102,6 +112,7 @@ class TestEnergеiaExecutor:
         assert ctx.telos_result is not None
         assert ctx.telos_result.is_aligned
 
+    # PURPOSE: initiate_with_explicit_technique をテストする
     def test_initiate_with_explicit_technique(self):
         executor = EnergеiaExecutor()
         ctx = executor.initiate(
@@ -110,12 +121,14 @@ class TestEnergеiaExecutor:
         assert ctx.technique is not None
         assert ctx.technique.id == "noe"
 
+    # PURPOSE: execute_runs_action をテストする
     def test_execute_runs_action(self):
         executor = EnergеiaExecutor()
         ctx = executor.initiate(goal="テスト", plan="テスト計画")
 
         executed = False
 
+        # PURPOSE: action の処理
         def action():
             nonlocal executed
             executed = True
@@ -127,10 +140,12 @@ class TestEnergеiaExecutor:
         assert ctx.status == ExecutionStatus.RUNNING
         assert ctx.started_at is not None
 
+    # PURPOSE: execute_handles_exception をテストする
     def test_execute_handles_exception(self):
         executor = EnergеiaExecutor()
         ctx = executor.initiate(goal="テスト", plan="テスト計画")
 
+        # PURPOSE: failing_action の処理
         def failing_action():
             raise ValueError("Action failed")
 
@@ -140,6 +155,7 @@ class TestEnergеiaExecutor:
         assert len(ctx.errors) == 1
         assert "Action failed" in ctx.errors[0]
 
+    # PURPOSE: verify_all_pass をテストする
     def test_verify_all_pass(self):
         executor = EnergеiaExecutor()
         ctx = executor.initiate(goal="テスト", plan="テスト計画")
@@ -153,6 +169,7 @@ class TestEnergеiaExecutor:
         assert ctx.phase == ExecutionPhase.VERIFY
         assert ctx.checkpoints["phase_2"]["all_passed"] is True
 
+    # PURPOSE: verify_with_failure をテストする
     def test_verify_with_failure(self):
         executor = EnergеiaExecutor()
         ctx = executor.initiate(goal="テスト", plan="テスト計画")
@@ -165,6 +182,7 @@ class TestEnergеiaExecutor:
         ctx = executor.verify(ctx, verify_fns)
         assert ctx.checkpoints["phase_2"]["all_passed"] is False
 
+    # PURPOSE: check_deviation_no_deviation をテストする
     def test_check_deviation_no_deviation(self):
         executor = EnergеiaExecutor()
         ctx = executor.initiate(goal="テスト", plan="テスト計画")
@@ -174,6 +192,7 @@ class TestEnergеiaExecutor:
         assert ctx.phase == ExecutionPhase.DEVIATION
         assert ctx.checkpoints["phase_3"]["has_deviation"] is False
 
+    # PURPOSE: check_deviation_missing_artifact をテストする
     def test_check_deviation_missing_artifact(self):
         executor = EnergеiaExecutor()
         ctx = executor.initiate(goal="テスト", plan="テスト計画")
@@ -182,6 +201,7 @@ class TestEnergеiaExecutor:
         ctx = executor.check_deviation(ctx, expected_artifacts=["file1.py", "file2.py"])
         assert ctx.checkpoints["phase_3"]["has_deviation"] is True
 
+    # PURPOSE: confirm_completes をテストする
     def test_confirm_completes(self):
         executor = EnergеiaExecutor()
         ctx = executor.initiate(goal="認証機能を実装", plan="auth.py 作成")
@@ -193,6 +213,7 @@ class TestEnergеiaExecutor:
         assert result.commit_message is not None
         assert "feat" in result.commit_message
 
+    # PURPOSE: abort_creates_failed_result をテストする
     def test_abort_creates_failed_result(self):
         executor = EnergеiaExecutor()
         ctx = executor.initiate(goal="テスト", plan="テスト計画")
@@ -202,6 +223,7 @@ class TestEnergеiaExecutor:
         assert result.context.status == ExecutionStatus.ABORTED
         assert "ユーザーによる中断" in result.context.errors[0]
 
+    # PURPOSE: full_cycle_success をテストする
     def test_full_cycle_success(self):
         executor = EnergеiaExecutor()
 
@@ -216,9 +238,11 @@ class TestEnergеiaExecutor:
         assert result.context.status == ExecutionStatus.COMPLETED
 
 
+# PURPOSE: format_execution_markdown tests
 class TestFormatExecutionMarkdown:
     """format_execution_markdown tests"""
 
+    # PURPOSE: formats_successful_result をテストする
     def test_formats_successful_result(self):
         executor = EnergеiaExecutor()
         ctx = executor.initiate(goal="テスト目的", plan="テスト計画")
@@ -231,9 +255,11 @@ class TestFormatExecutionMarkdown:
         assert "PHASE 1" in markdown
 
 
+# PURPOSE: encode_execution_observation tests
 class TestEncodeExecutionObservation:
     """encode_execution_observation tests"""
 
+    # PURPOSE: encodes_successful_result をテストする
     def test_encodes_successful_result(self):
         executor = EnergеiaExecutor()
         ctx = executor.initiate(goal="テスト", plan="テスト")
@@ -243,6 +269,7 @@ class TestEncodeExecutionObservation:
         assert obs["context_clarity"] == 0.9  # success
         assert obs["urgency"] == 0.0  # no errors
 
+    # PURPOSE: encodes_failed_result をテストする
     def test_encodes_failed_result(self):
         executor = EnergеiaExecutor()
         ctx = executor.initiate(goal="テスト", plan="テスト")

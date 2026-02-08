@@ -37,6 +37,7 @@ from typing import Dict, FrozenSet, List, Optional, Tuple
 # =============================================================================
 
 
+# PURPOSE: The 6 series of Hegemonikón, each containing 4 theorems
 class Series(Enum):
     """The 6 series of Hegemonikón, each containing 4 theorems."""
 
@@ -48,6 +49,7 @@ class Series(Enum):
     A = "Akribeia"  # Accuracy assurance
 
 
+# PURPOSE: Understanding vs Reasoning classification for each theorem
 class CognitiveType(Enum):
     """Understanding vs Reasoning classification for each theorem.
 
@@ -73,6 +75,7 @@ class CognitiveType(Enum):
 # =============================================================================
 
 
+# PURPOSE: An object in the category Cog
 @dataclass(frozen=True)
 class Theorem:
     """An object in the category Cog.
@@ -88,6 +91,7 @@ class Theorem:
     greek: str  # Original Greek name
     generation: Tuple[str, str]  # Cognitive algebra axes
 
+    # PURPOSE: Position within series (1-4)
     @property
     def series_index(self) -> int:
         """Position within series (1-4)."""
@@ -99,6 +103,7 @@ class Theorem:
 # =============================================================================
 
 
+# PURPOSE: An arrow in the category Cog
 @dataclass(frozen=True)
 class Morphism:
     """An arrow in the category Cog.
@@ -112,11 +117,13 @@ class Morphism:
     target: str  # Target theorem id, e.g. "S1"
     strength: float = 1.0  # Morphism weight (0.0-1.0)
 
+    # PURPOSE: Whether this is an identity morphism
     @property
     def is_identity(self) -> bool:
         """Whether this is an identity morphism."""
         return self.source == self.target
 
+    # PURPOSE: Compose two morphisms g ∘ f (self = f, other = g)
     def compose(self, other: Morphism) -> Optional[Morphism]:
         """Compose two morphisms g ∘ f (self = f, other = g).
 
@@ -137,6 +144,7 @@ class Morphism:
 # =============================================================================
 
 
+# PURPOSE: A single projection from the apex to a diagram object
 @dataclass
 class ConeProjection:
     """A single projection from the apex to a diagram object.
@@ -150,6 +158,7 @@ class ConeProjection:
     hom_label: str  # e.g. "認識の射", "意志の射"
 
 
+# PURPOSE: A cone over a diagram in Cog
 @dataclass
 class Cone:
     """A cone over a diagram in Cog.
@@ -172,11 +181,13 @@ class Cone:
     is_universal: bool = False  # Whether this is the Limit
     pw: Dict[str, float] = field(default_factory=dict)  # C0: Precision Weighting [-1, +1]
 
+    # PURPOSE: V[outputs] ≤ 0.1 means projections are nearly consistent
     @property
     def is_consistent(self) -> bool:
         """V[outputs] ≤ 0.1 means projections are nearly consistent."""
         return self.dispersion <= 0.1
 
+    # PURPOSE: V[outputs] > 0.3 means serious contradiction
     @property
     def needs_devil(self) -> bool:
         """V[outputs] > 0.3 means serious contradiction."""
@@ -188,6 +199,7 @@ class Cone:
 # =============================================================================
 
 
+# PURPOSE: An adjunction L ⊣ R between two categories
 @dataclass
 class Adjunction:
     """An adjunction L ⊣ R between two categories.
@@ -207,6 +219,7 @@ class Adjunction:
     eta_quality: float = 0.0  # η: preservation rate (0-1)
     epsilon_precision: float = 0.0  # ε: restoration rate (0-1)
 
+    # PURPOSE: Context lost in the boot→bye→boot cycle
     @property
     def drift(self) -> float:
         """Context lost in the boot→bye→boot cycle.
@@ -215,6 +228,7 @@ class Adjunction:
         """
         return 1.0 - self.epsilon_precision
 
+    # PURPOSE: R is faithful if η quality > 0.8
     @property
     def is_faithful(self) -> bool:
         """R is faithful if η quality > 0.8."""
@@ -226,6 +240,7 @@ class Adjunction:
 # =============================================================================
 
 
+# PURPOSE: A monad T: Cog → Cog
 @dataclass
 class Monad:
     """A monad T: Cog → Cog.
@@ -254,6 +269,7 @@ class Monad:
     # Kleisli chain record
     kleisli_chain: List[str] = field(default_factory=list)
 
+    # PURPOSE: η: X → T(X) — generate questions from a concept
     def unit(self, concept: str) -> List[str]:
         """η: X → T(X) — generate questions from a concept.
 
@@ -263,6 +279,7 @@ class Monad:
         # Placeholder: actual implementation would call LLM
         return [f"Why does {concept} work this way?"]
 
+    # PURPOSE: μ: T(T(X)) → T(X) — flatten questions-of-questions
     def join(self, meta_questions: List[List[str]]) -> List[str]:
         """μ: T(T(X)) → T(X) — flatten questions-of-questions.
 
@@ -276,6 +293,7 @@ class Monad:
 # =============================================================================
 
 
+# PURPOSE: A functor F: C → D between categories
 @dataclass
 class Functor:
     """A functor F: C → D between categories.
@@ -299,12 +317,14 @@ class Functor:
     morphism_map: Dict[str, str] = field(default_factory=dict)  # f → F(f)
     is_endofunctor: bool = False  # C == D
 
+    # PURPOSE: Faithful = injective on morphisms (no information loss)
     @property
     def is_faithful(self) -> bool:
         """Faithful = injective on morphisms (no information loss)."""
         values = list(self.morphism_map.values())
         return len(values) == len(set(values))
 
+    # PURPOSE: Full = surjective on morphisms (covers all arrows in target)
     @property
     def is_full(self) -> bool:
         """Full = surjective on morphisms (covers all arrows in target).
@@ -316,14 +336,17 @@ class Functor:
             "is_full requires full category knowledge (all target morphisms)"
         )
 
+    # PURPOSE: Apply functor to an object
     def map_object(self, obj: str) -> Optional[str]:
         """Apply functor to an object."""
         return self.object_map.get(obj)
 
+    # PURPOSE: Apply functor to a morphism
     def map_morphism(self, morphism_id: str) -> Optional[str]:
         """Apply functor to a morphism."""
         return self.morphism_map.get(morphism_id)
 
+    # PURPOSE: Functor composition: G∘F (self=F, other=G)
     def compose(self, other: Functor) -> Functor:
         """Functor composition: G∘F (self=F, other=G).
 
@@ -374,6 +397,7 @@ class Functor:
 # =============================================================================
 
 
+# PURPOSE: A natural transformation α: F ⇒ G between functors
 @dataclass
 class NaturalTransformation:
     """A natural transformation α: F ⇒ G between functors.
@@ -396,10 +420,12 @@ class NaturalTransformation:
     target_functor: str  # G
     components: Dict[str, str] = field(default_factory=dict)  # α_X for each object X
 
+    # PURPOSE: Get the component α_X at object X
     def component_at(self, obj: str) -> Optional[str]:
         """Get the component α_X at object X."""
         return self.components.get(obj)
 
+    # PURPOSE: Vertical composition: β ∘ α (self = α, other = β)
     def compose(self, other: NaturalTransformation, *, strict: bool = False) -> Optional[NaturalTransformation]:
         """Vertical composition: β ∘ α (self = α, other = β).
 
@@ -447,6 +473,7 @@ class NaturalTransformation:
             components=composed_components,
         )
 
+    # PURPOSE: A natural isomorphism has invertible components
     @property
     def is_natural_isomorphism(self) -> bool:
         """A natural isomorphism has invertible components.
@@ -539,6 +566,7 @@ COGNITIVE_TYPES: Dict[str, CognitiveType] = {
 }
 
 
+# PURPOSE: Compute Hom(-, T) — all morphisms targeting theorem T
 def hom_set(target: str) -> FrozenSet[str]:
     """Compute Hom(-, T) — all morphisms targeting theorem T.
 
@@ -550,6 +578,7 @@ def hom_set(target: str) -> FrozenSet[str]:
     )
 
 
+# PURPOSE: Compute source theorems targeting T
 def hom_sources(target: str) -> FrozenSet[str]:
     """Compute source theorems targeting T."""
     return frozenset(
@@ -653,6 +682,7 @@ MORPHISMS: Dict[str, Morphism] = {
 }
 
 
+# PURPOSE: Build a Cone from theorem outputs
 def build_cone(series: Series, outputs: Dict[str, str]) -> Cone:
     """Build a Cone from theorem outputs.
 

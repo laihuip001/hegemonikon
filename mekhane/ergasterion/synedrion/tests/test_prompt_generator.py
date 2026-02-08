@@ -20,27 +20,33 @@ from mekhane.ergasterion.synedrion.prompt_generator import (
 )
 
 
+# PURPOSE: Tests for PerspectiveMatrix class
 class TestPerspectiveMatrix:
     """Tests for PerspectiveMatrix class."""
 
+    # PURPOSE: Load the perspective matrix
     @pytest.fixture
     def matrix(self) -> PerspectiveMatrix:
         """Load the perspective matrix."""
         return PerspectiveMatrix.load()
 
+    # PURPOSE: Verify matrix loads successfully
     def test_load_matrix(self, matrix: PerspectiveMatrix):
         """Verify matrix loads successfully."""
         assert matrix is not None
         assert matrix.total_perspectives == 480
 
+    # PURPOSE: Verify 20 domains are defined
     def test_domain_count(self, matrix: PerspectiveMatrix):
         """Verify 20 domains are defined."""
         assert len(matrix.domains) == 20
 
+    # PURPOSE: Verify 6 axes are defined
     def test_axis_count(self, matrix: PerspectiveMatrix):
         """Verify 6 axes are defined."""
         assert len(matrix.axes) == 24
 
+    # PURPOSE: Test getting a specific perspective
     def test_get_perspective(self, matrix: PerspectiveMatrix):
         """Test getting a specific perspective."""
         p = matrix.get("Resource", "O1")
@@ -48,27 +54,32 @@ class TestPerspectiveMatrix:
         assert p.axis_id == "O1"
         assert p.id == "Resource-O1"
 
+    # PURPOSE: Test error on invalid domain
     def test_get_invalid_domain(self, matrix: PerspectiveMatrix):
         """Test error on invalid domain."""
         with pytest.raises(KeyError):
             matrix.get("InvalidDomain", "O")
 
+    # PURPOSE: Test error on invalid axis
     def test_get_invalid_axis(self, matrix: PerspectiveMatrix):
         """Test error on invalid axis."""
         with pytest.raises(KeyError):
             matrix.get("Resource", "X")
 
+    # PURPOSE: Verify all_perspectives returns 120 items
     def test_all_perspectives_count(self, matrix: PerspectiveMatrix):
         """Verify all_perspectives returns 120 items."""
         perspectives = matrix.all_perspectives()
         assert len(perspectives) == 480
 
+    # PURPOSE: Verify all perspective IDs are unique
     def test_all_perspectives_unique(self, matrix: PerspectiveMatrix):
         """Verify all perspective IDs are unique."""
         perspectives = matrix.all_perspectives()
         ids = [p.id for p in perspectives]
         assert len(ids) == len(set(ids))  # No duplicates
 
+    # PURPOSE: Test prompt generation
     def test_generate_prompt(self, matrix: PerspectiveMatrix):
         """Test prompt generation."""
         p = matrix.get("Security", "H1")
@@ -80,6 +91,7 @@ class TestPerspectiveMatrix:
         assert "Propatheia" in prompt
         assert "SILENCE" in prompt
 
+    # PURPOSE: Test generating all 120 prompts
     def test_generate_all_prompts(self, matrix: PerspectiveMatrix):
         """Test generating all 120 prompts."""
         prompts = matrix.generate_all_prompts()
@@ -89,6 +101,7 @@ class TestPerspectiveMatrix:
         for pid, prompt in prompts.items():
             assert len(prompt) > 100, f"Prompt {pid} is too short"
 
+    # PURPOSE: Test batching for rate limiting
     def test_batch_perspectives(self, matrix: PerspectiveMatrix):
         """Test batching for rate limiting."""
         batches = matrix.batch_perspectives(batch_size=60)
@@ -97,9 +110,11 @@ class TestPerspectiveMatrix:
         assert len(batches[1]) == 60
 
 
+# PURPOSE: Tests for Perspective dataclass
 class TestPerspective:
     """Tests for Perspective dataclass."""
 
+    # PURPOSE: Test perspective ID generation
     def test_perspective_id(self):
         """Test perspective ID generation."""
         p = Perspective(
@@ -117,13 +132,16 @@ class TestPerspective:
         assert p.name == "テスト × 本質"
 
 
+# PURPOSE: Tests verifying structural orthogonality
 class TestOrthogonality:
     """Tests verifying structural orthogonality."""
 
+    # PURPOSE: matrix の処理
     @pytest.fixture
     def matrix(self) -> PerspectiveMatrix:
         return PerspectiveMatrix.load()
 
+    # PURPOSE: Verify perspectives are exactly domains × axes
     def test_domain_axis_direct_product(self, matrix: PerspectiveMatrix):
         """Verify perspectives are exactly domains × axes."""
         expected = set()
@@ -135,6 +153,7 @@ class TestOrthogonality:
 
         assert expected == actual
 
+    # PURPOSE: Verify no two perspectives can find the same issue
     def test_no_perspective_overlap(self, matrix: PerspectiveMatrix):
         """Verify no two perspectives can find the same issue."""
         perspectives = matrix.all_perspectives()
@@ -143,6 +162,7 @@ class TestOrthogonality:
         pairs = [(p.domain_id, p.axis_id) for p in perspectives]
         assert len(pairs) == len(set(pairs))
 
+    # PURPOSE: Verify complete coverage: every cell in the matrix is filled
     def test_complete_coverage(self, matrix: PerspectiveMatrix):
         """Verify complete coverage: every cell in the matrix is filled."""
         perspectives = matrix.all_perspectives()

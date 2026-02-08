@@ -5,9 +5,11 @@ import pytest
 from mekhane.quality_gate import QualityGate, MetrikaResult, ChreosItem, PalimpsestItem
 
 
+# PURPOSE: Metrika 5門テスト
 class TestMetrika:
     """Metrika 5門テスト"""
 
+    # PURPOSE: ネスト3以下はPass
     def test_syntomia_pass(self):
         """ネスト3以下はPass"""
         gate = QualityGate()
@@ -20,6 +22,7 @@ class TestMetrika:
         result = gate.check_metrika(lines)
         assert result.syntomia is True
 
+    # PURPOSE: ネスト4以上はFail
     def test_syntomia_fail(self):
         """ネスト4以上はFail"""
         gate = QualityGate()
@@ -34,6 +37,7 @@ class TestMetrika:
         result = gate.check_metrika(lines)
         assert result.syntomia is False
 
+    # PURPOSE: 120行以下はPass
     def test_atomos_pass(self):
         """120行以下はPass"""
         gate = QualityGate()
@@ -41,6 +45,7 @@ class TestMetrika:
         result = gate.check_metrika(lines)
         assert result.atomos is True
 
+    # PURPOSE: 120行超はFail
     def test_atomos_fail(self):
         """120行超はFail"""
         gate = QualityGate()
@@ -49,9 +54,11 @@ class TestMetrika:
         assert result.atomos is False
 
 
+# PURPOSE: Chreos 技術負債テスト
 class TestChreos:
     """Chreos 技術負債テスト"""
 
+    # PURPOSE: 正しい形式のTODO
     def test_valid_todo(self):
         """正しい形式のTODO"""
         gate = QualityGate()
@@ -61,6 +68,7 @@ class TestChreos:
         assert items[0].owner == "Creator"
         assert items[0].status == "healthy"
 
+    # PURPOSE: 不正形式のTODOは腐敗扱い
     def test_invalid_todo(self):
         """不正形式のTODOは腐敗扱い"""
         gate = QualityGate()
@@ -70,9 +78,11 @@ class TestChreos:
         assert items[0].status == "rotten"
 
 
+# PURPOSE: Palimpsest コード考古学テスト
 class TestPalimpsest:
     """Palimpsest コード考古学テスト"""
 
+    # PURPOSE: HACKパターン検出
     def test_hack_detection(self):
         """HACKパターン検出"""
         gate = QualityGate()
@@ -80,6 +90,7 @@ class TestPalimpsest:
         items = gate.check_palimpsest(lines)
         assert any(p.pattern == "HACK" for p in items)
 
+    # PURPOSE: FIXMEパターン検出
     def test_fixme_detection(self):
         """FIXMEパターン検出"""
         gate = QualityGate()
@@ -88,9 +99,11 @@ class TestPalimpsest:
         assert any(p.pattern == "FIXME" for p in items)
 
 
+# PURPOSE: 統合テスト
 class TestIntegration:
     """統合テスト"""
 
+    # PURPOSE: 自己検証が動作する
     def test_check_file_self(self):
         """自己検証が動作する"""
         gate = QualityGate()

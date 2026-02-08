@@ -22,6 +22,7 @@ from mekhane.symploke.indices import Document
 KNOWLEDGE_DIR = Path("/home/makaron8426/oikos/.gemini/antigravity/knowledge")
 
 
+# PURPOSE: Parse a KI directory into Documents
 def parse_ki_directory(ki_path: Path) -> list[Document]:
     """Parse a KI directory into Documents.
 
@@ -85,12 +86,14 @@ def parse_ki_directory(ki_path: Path) -> list[Document]:
     return docs
 
 
+# PURPOSE: Get all KI directories
 def get_ki_directories() -> list[Path]:
     """Get all KI directories."""
     dirs = [d for d in KNOWLEDGE_DIR.iterdir() if d.is_dir()]
     return sorted(dirs)
 
 
+# PURPOSE: Ingest documents to Sophia index using real embeddings (returns count)
 def ingest_to_sophia(docs: list[Document], save_path: str = None) -> int:
     """Ingest documents to Sophia index using real embeddings (returns count).
 
@@ -118,6 +121,7 @@ def ingest_to_sophia(docs: list[Document], save_path: str = None) -> int:
     return count
 
 
+# PURPOSE: Load a previously saved Sophia index
 def load_sophia_index(load_path: str):
     """Load a previously saved Sophia index."""
     from mekhane.symploke.adapters.embedding_adapter import EmbeddingAdapter
@@ -128,6 +132,7 @@ def load_sophia_index(load_path: str):
     return adapter
 
 
+# PURPOSE: Search using a loaded adapter directly
 def search_loaded_index(adapter, query: str, top_k: int = 5):
     """Search using a loaded adapter directly."""
     # Encode query
@@ -142,6 +147,7 @@ DEFAULT_INDEX_PATH = Path(
 )
 
 
+# PURPOSE: /boot 統合 API: コンテキストに基づいて関連 KI を自動プッシュ
 def get_boot_ki(context: str = None, mode: str = "standard") -> dict:
     """
     /boot 統合 API: コンテキストに基づいて関連 KI を自動プッシュ
@@ -187,6 +193,7 @@ def get_boot_ki(context: str = None, mode: str = "standard") -> dict:
     return {"ki_items": ki_items, "count": len(ki_items)}
 
 
+# PURPOSE: /boot 用の KI 出力フォーマット
 def format_ki_output(result: dict) -> str:
     """
     /boot 用の KI 出力フォーマット
@@ -208,6 +215,7 @@ def format_ki_output(result: dict) -> str:
     return "\n".join(lines)
 
 
+# PURPOSE: main の処理
 def main():
     parser = argparse.ArgumentParser(description="Ingest KIs to Sophia index")
     parser.add_argument(

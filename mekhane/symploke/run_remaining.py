@@ -30,6 +30,7 @@ SPECIALISTS = [
 ]
 
 
+# PURPOSE: session を生成する
 async def create_session(key, specialist_id, specialist_name, focus, file_path):
     headers = {"X-Goog-Api-Key": key, "Content-Type": "application/json"}
     prompt = f"""# 専門家レビュー: {specialist_name}
@@ -65,6 +66,7 @@ async def create_session(key, specialist_id, specialist_name, focus, file_path):
             return {"id": specialist_id, "name": specialist_name, "error": resp.status}
 
 
+# PURPOSE: main の処理
 async def main():
     keys = [os.environ.get(f"JULIUS_API_KEY_{i}") for i in [7, 8, 9]]
     print("=== 残りの専門家実行 ===")

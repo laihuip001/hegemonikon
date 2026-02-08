@@ -38,6 +38,7 @@ VRAM_TOTAL_MB = 8192         # RTX 2070 SUPER VRAM
 # Data Classes
 # ---------------------------------------------------------------------------
 
+# PURPOSE: GPU プリフライトチェック結果
 @dataclass
 class GPUStatus:
     """GPU プリフライトチェック結果"""
@@ -53,6 +54,7 @@ class GPUStatus:
 # Core Functions
 # ---------------------------------------------------------------------------
 
+# PURPOSE: GPU プリフライトチェック — GPU が新しいプロセスで使えるか判定
 def gpu_preflight() -> GPUStatus:
     """
     GPU プリフライトチェック — GPU が新しいプロセスで使えるか判定
@@ -158,6 +160,7 @@ def _find_blocking_process() -> Optional[str]:
     return None
 
 
+# PURPOSE: CUDA を無効化して CPU のみで実行させる。
 def force_cpu_env() -> None:
     """
     CUDA を無効化して CPU のみで実行させる。
@@ -168,6 +171,7 @@ def force_cpu_env() -> None:
     os.environ["CUDA_VISIBLE_DEVICES"] = ""
 
 
+# PURPOSE: GPU が安全に使えるか確認し、使えない場合は CPU モードに切り替える。
 def ensure_safe_gpu() -> bool:
     """
     GPU が安全に使えるか確認し、使えない場合は CPU モードに切り替える。
@@ -186,6 +190,7 @@ def ensure_safe_gpu() -> bool:
 # CLI
 # ---------------------------------------------------------------------------
 
+# PURPOSE: GPU プリフライトチェック CLI
 def main():
     """GPU プリフライトチェック CLI"""
     status = gpu_preflight()

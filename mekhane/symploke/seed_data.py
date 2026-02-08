@@ -81,6 +81,7 @@ KAIROS_SEED = [
 ]
 
 
+# PURPOSE: 全インデックスにシードデータを投入
 def seed_all():
     """全インデックスにシードデータを投入"""
     engine = SearchEngine()
@@ -106,6 +107,7 @@ def seed_all():
     return engine
 
 
+# PURPOSE: シードデータの検索テスト
 def test_search(engine: SearchEngine):
     """シードデータの検索テスト"""
     queries = [

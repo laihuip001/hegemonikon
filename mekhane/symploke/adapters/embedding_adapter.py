@@ -14,6 +14,7 @@ from .base import VectorStoreAdapter, SearchResult
 DEFAULT_MODEL = os.environ.get("EMBEDDING_MODEL", "BAAI/bge-m3")
 
 
+# PURPOSE: sentence-transformers を使用した本番用アダプタ
 class EmbeddingAdapter(VectorStoreAdapter):
     """
     sentence-transformers を使用した本番用アダプタ
@@ -33,10 +34,12 @@ class EmbeddingAdapter(VectorStoreAdapter):
         self._metadata: Dict[int, Dict[str, Any]] = {}
         self._next_id: int = 0
 
+    # PURPOSE: name の処理
     @property
     def name(self) -> str:
         return f"embedding:{self._model_name}"
 
+    # PURPOSE: dimension の処理
     @property
     def dimension(self) -> Optional[int]:
         return self._dimension
@@ -49,11 +52,13 @@ class EmbeddingAdapter(VectorStoreAdapter):
             self._model = SentenceTransformer(self._model_name)
         return self._model
 
+    # PURPOSE: Encode texts to vectors
     def encode(self, texts: List[str]) -> np.ndarray:
         """Encode texts to vectors."""
         model = self._get_model()
         return model.encode(texts, convert_to_numpy=True)
 
+    # PURPOSE: index を生成する
     def create_index(
         self, dimension: int, index_name: str = "default", **kwargs
     ) -> None:
@@ -62,6 +67,7 @@ class EmbeddingAdapter(VectorStoreAdapter):
         self._metadata = {}
         self._next_id = 0
 
+    # PURPOSE: vectors を追加する
     def add_vectors(
         self,
         vectors: np.ndarray,
@@ -94,6 +100,7 @@ class EmbeddingAdapter(VectorStoreAdapter):
 
         return ids
 
+    # PURPOSE: search を検索する
     def search(
         self, query: np.ndarray, k: int = 10, threshold: Optional[float] = None
     ) -> List[SearchResult]:
@@ -128,9 +135,11 @@ class EmbeddingAdapter(VectorStoreAdapter):
 
         return results
 
+    # PURPOSE: delete を削除する
     def delete(self, ids: List[int]) -> int:
         raise NotImplementedError("EmbeddingAdapter does not support delete yet")
 
+    # PURPOSE: save を保存する
     def save(self, path: str) -> None:
         import pickle
 
@@ -143,6 +152,7 @@ class EmbeddingAdapter(VectorStoreAdapter):
         with open(path, "wb") as f:
             pickle.dump(data, f)
 
+    # PURPOSE: load をロードする
     def load(self, path: str) -> None:
         import pickle
 
@@ -153,8 +163,10 @@ class EmbeddingAdapter(VectorStoreAdapter):
         self._metadata = data["metadata"]
         self._next_id = data["next_id"]
 
+    # PURPOSE: count の処理
     def count(self) -> int:
         return len(self._vectors)
 
+    # PURPOSE: metadata を取得する
     def get_metadata(self, id: int) -> Optional[Dict[str, Any]]:
         return self._metadata.get(id)

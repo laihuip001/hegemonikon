@@ -21,6 +21,7 @@ from ..base import (
 )
 
 
+# PURPOSE: 論理矛盾検出エージェント
 class LogicAgent(AuditAgent):
     """論理矛盾検出エージェント"""
 
@@ -49,6 +50,7 @@ class LogicAgent(AuditAgent):
         (r"\breturn\b.*\n.*\breturn\b", "LOG-004", "到達不能な return 文の可能性"),
     ]
 
+    # PURPOSE: 論理矛盾を監査
     def audit(self, target: AuditTarget) -> AgentResult:
         """論理矛盾を監査"""
         issues: List[AuditIssue] = []
@@ -158,6 +160,7 @@ class LogicAgent(AuditAgent):
 
         return issues
 
+    # PURPOSE: 全タイプをサポート
     def supports(self, target_type: AuditTargetType) -> bool:
         """全タイプをサポート"""
         return True

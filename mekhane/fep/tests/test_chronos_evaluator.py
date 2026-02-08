@@ -25,9 +25,11 @@ from mekhane.fep.chronos_evaluator import (
 )
 
 
+# PURPOSE: TimeScale enum tests
 class TestTimeScale:
     """TimeScale enum tests"""
 
+    # PURPOSE: all_scales_exist をテストする
     def test_all_scales_exist(self):
         assert TimeScale.IMMEDIATE.value == "immediate"
         assert TimeScale.SHORT.value == "short"
@@ -35,17 +37,21 @@ class TestTimeScale:
         assert TimeScale.LONG.value == "long"
 
 
+# PURPOSE: CertaintyLevel enum tests
 class TestCertaintyLevel:
     """CertaintyLevel enum tests"""
 
+    # PURPOSE: certainty_levels をテストする
     def test_certainty_levels(self):
         assert CertaintyLevel.CERTAIN.value == "C"
         assert CertaintyLevel.UNCERTAIN.value == "U"
 
 
+# PURPOSE: SlackLevel enum tests
 class TestSlackLevel:
     """SlackLevel enum tests"""
 
+    # PURPOSE: slack_levels をテストする
     def test_slack_levels(self):
         assert SlackLevel.AMPLE.value == "ample"
         assert SlackLevel.ADEQUATE.value == "adequate"
@@ -53,9 +59,11 @@ class TestSlackLevel:
         assert SlackLevel.OVERDUE.value == "overdue"
 
 
+# PURPOSE: ChronosResult dataclass tests
 class TestChronosResult:
     """ChronosResult dataclass tests"""
 
+    # PURPOSE: is_overdue をテストする
     def test_is_overdue(self):
         result = ChronosResult(
             task="test",
@@ -72,6 +80,7 @@ class TestChronosResult:
         assert result.is_overdue is True
         assert result.needs_acceleration is True
 
+    # PURPOSE: not_overdue をテストする
     def test_not_overdue(self):
         result = ChronosResult(
             task="test",
@@ -89,9 +98,11 @@ class TestChronosResult:
         assert result.needs_acceleration is False
 
 
+# PURPOSE: _parse_deadline tests
 class TestParseDeadline:
     """_parse_deadline tests"""
 
+    # PURPOSE: parse_iso_date をテストする
     def test_parse_iso_date(self):
         # Future date
         future = (datetime.now() + timedelta(days=10)).strftime("%Y-%m-%d")
@@ -99,82 +110,103 @@ class TestParseDeadline:
         assert deadline is not None
         assert certainty == CertaintyLevel.CERTAIN
 
+    # PURPOSE: parse_japanese_today をテストする
     def test_parse_japanese_today(self):
         deadline, scale, certainty = _parse_deadline("今日")
         assert deadline is not None
         assert scale == TimeScale.IMMEDIATE
         assert certainty == CertaintyLevel.CERTAIN
 
+    # PURPOSE: parse_japanese_tomorrow をテストする
     def test_parse_japanese_tomorrow(self):
         deadline, scale, certainty = _parse_deadline("明日")
         assert deadline is not None
         assert scale == TimeScale.IMMEDIATE
 
+    # PURPOSE: parse_japanese_days をテストする
     def test_parse_japanese_days(self):
         deadline, scale, certainty = _parse_deadline("3日")
         assert deadline is not None
         assert scale == TimeScale.SHORT
 
+    # PURPOSE: parse_english_tomorrow をテストする
     def test_parse_english_tomorrow(self):
         deadline, scale, certainty = _parse_deadline("tomorrow")
         assert deadline is not None
         assert scale == TimeScale.IMMEDIATE
 
+    # PURPOSE: parse_english_days をテストする
     def test_parse_english_days(self):
         deadline, scale, certainty = _parse_deadline("5 days")
         assert deadline is not None
         assert scale == TimeScale.SHORT
 
+    # PURPOSE: parse_unknown をテストする
     def test_parse_unknown(self):
         deadline, scale, certainty = _parse_deadline("something unknown")
         assert deadline is None
         assert certainty == CertaintyLevel.UNCERTAIN
 
 
+# PURPOSE: _calculate_urgency tests
 class TestCalculateUrgency:
     """_calculate_urgency tests"""
 
+    # PURPOSE: urgency_immediate をテストする
     def test_urgency_immediate(self):
         assert _calculate_urgency(12) == 1.0  # < 24h
 
+    # PURPOSE: urgency_3days をテストする
     def test_urgency_3days(self):
         assert _calculate_urgency(48) == 0.8  # < 72h
 
+    # PURPOSE: urgency_week をテストする
     def test_urgency_week(self):
         assert _calculate_urgency(120) == 0.6  # < 168h
 
+    # PURPOSE: urgency_3weeks をテストする
     def test_urgency_3weeks(self):
         assert _calculate_urgency(336) == 0.4  # < 504h
 
+    # PURPOSE: urgency_none をテストする
     def test_urgency_none(self):
         assert _calculate_urgency(None) == 0.3
 
 
+# PURPOSE: _calculate_slack tests
 class TestCalculateSlack:
     """_calculate_slack tests"""
 
+    # PURPOSE: slack_ample をテストする
     def test_slack_ample(self):
         assert _calculate_slack(100, 40) == SlackLevel.AMPLE  # ratio = 2.5
 
+    # PURPOSE: slack_adequate をテストする
     def test_slack_adequate(self):
         assert _calculate_slack(60, 40) == SlackLevel.ADEQUATE  # ratio = 1.5
 
+    # PURPOSE: slack_tight をテストする
     def test_slack_tight(self):
         assert _calculate_slack(30, 40) == SlackLevel.TIGHT  # ratio = 0.75
 
+    # PURPOSE: slack_overdue をテストする
     def test_slack_overdue(self):
         assert _calculate_slack(10, 40) == SlackLevel.OVERDUE  # ratio = 0.25
 
+    # PURPOSE: slack_zero_remaining をテストする
     def test_slack_zero_remaining(self):
         assert _calculate_slack(0, 40) == SlackLevel.OVERDUE
 
+    # PURPOSE: slack_none_remaining をテストする
     def test_slack_none_remaining(self):
         assert _calculate_slack(None, 40) == SlackLevel.ADEQUATE
 
 
+# PURPOSE: evaluate_time integration tests
 class TestEvaluateTime:
     """evaluate_time integration tests"""
 
+    # PURPOSE: evaluate_with_iso_date をテストする
     def test_evaluate_with_iso_date(self):
         future = (datetime.now() + timedelta(days=7)).strftime("%Y-%m-%d")
         result = evaluate_time(
@@ -186,6 +218,7 @@ class TestEvaluateTime:
         assert result.deadline is not None
         assert result.certainty == CertaintyLevel.CERTAIN
 
+    # PURPOSE: evaluate_with_japanese をテストする
     def test_evaluate_with_japanese(self):
         result = evaluate_time(
             task="ドキュメント作成",
@@ -195,6 +228,7 @@ class TestEvaluateTime:
         assert result.deadline is not None
         assert result.time_scale == TimeScale.SHORT
 
+    # PURPOSE: evaluate_includes_critical_path をテストする
     def test_evaluate_includes_critical_path(self):
         result = evaluate_time(
             task="最終レビュー",
@@ -204,6 +238,7 @@ class TestEvaluateTime:
         )
         assert len(result.critical_path) == 2
 
+    # PURPOSE: evaluate_generates_recommendation をテストする
     def test_evaluate_generates_recommendation(self):
         result = evaluate_time(
             task="緊急対応",
@@ -213,9 +248,11 @@ class TestEvaluateTime:
         assert "⚠️" in result.recommendation or "🛑" in result.recommendation
 
 
+# PURPOSE: format_chronos_markdown tests
 class TestFormatChronosMarkdown:
     """format_chronos_markdown tests"""
 
+    # PURPOSE: format_includes_key_fields をテストする
     def test_format_includes_key_fields(self):
         result = evaluate_time(
             task="テストタスク",
@@ -228,9 +265,11 @@ class TestFormatChronosMarkdown:
         assert "余裕度" in markdown
 
 
+# PURPOSE: encode_chronos_observation tests
 class TestEncodeChronosObservation:
     """encode_chronos_observation tests"""
 
+    # PURPOSE: encode_certain_deadline をテストする
     def test_encode_certain_deadline(self):
         result = ChronosResult(
             task="test",
@@ -249,6 +288,7 @@ class TestEncodeChronosObservation:
         assert obs["urgency"] == 0.8
         assert obs["confidence"] == 0.7  # Adequate
 
+    # PURPOSE: encode_uncertain_deadline をテストする
     def test_encode_uncertain_deadline(self):
         result = ChronosResult(
             task="test",

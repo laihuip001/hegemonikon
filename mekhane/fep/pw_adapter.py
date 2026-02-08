@@ -69,6 +69,7 @@ PHASE2_CONVERGE_THRESHOLD: int = 100
 PHASE2_BASIN_THRESHOLD: int = 50
 
 
+# PURPOSE: Check if enough data has accumulated to transition to Phase 2
 def is_phase2_ready() -> bool:
     """Check if enough data has accumulated to transition to Phase 2.
 
@@ -111,6 +112,7 @@ SERIES_THEOREMS: Dict[str, List[str]] = {
 # =============================================================================
 
 
+# PURPOSE: Parse explicit PW specification string
 def parse_pw_spec(spec: str, series: str) -> Dict[str, float]:
     """Parse explicit PW specification string.
 
@@ -212,6 +214,7 @@ _INFERENCE_RULES: Dict[str, List[Tuple[List[str], Dict[str, float]]]] = {
 }
 
 
+# PURPOSE: Infer PW from context using series-specific keyword rules
 def infer_pw(series: str, context: str) -> Dict[str, float]:
     """Infer PW from context using series-specific keyword rules.
 
@@ -327,6 +330,7 @@ _MODALITY_MAPPING: Dict[str, Dict[str, str]] = {
 }
 
 
+# PURPOSE: Derive L2 theorem PW from L1 modality precision weights
 def derive_pw(
     series: str,
     agent: "HegemonikónFEPAgent",
@@ -389,6 +393,7 @@ def derive_pw(
 # =============================================================================
 
 
+# PURPOSE: Resolve Precision Weighting with priority cascade
 def resolve_pw(
     series: str,
     pw_spec: Optional[str] = None,
@@ -440,6 +445,7 @@ def resolve_pw(
 # =============================================================================
 
 
+# PURPOSE: Format PW weights for human display
 def describe_pw(pw: Dict[str, float]) -> str:
     """Format PW weights for human display.
 
@@ -453,6 +459,7 @@ def describe_pw(pw: Dict[str, float]) -> str:
     return " ".join(parts)
 
 
+# PURPOSE: Check if PW is uniform (all zeros)
 def is_uniform(pw: Dict[str, float]) -> bool:
     """Check if PW is uniform (all zeros)."""
     return all(abs(v) < 1e-6 for v in pw.values())

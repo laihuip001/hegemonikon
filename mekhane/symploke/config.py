@@ -22,6 +22,7 @@ from typing import Literal, Optional
 import os
 
 
+# PURPOSE: ベクトルストア設定
 @dataclass
 class VectorStoreConfig:
     """ベクトルストア設定"""
@@ -57,6 +58,7 @@ class VectorStoreConfig:
         self.base_path.mkdir(parents=True, exist_ok=True)
 
 
+# PURPOSE: 埋め込みモデル設定
 @dataclass
 class EmbedderConfig:
     """埋め込みモデル設定"""
@@ -74,6 +76,7 @@ class EmbedderConfig:
             )
 
 
+# PURPOSE: Symploke config の実装
 @dataclass
 class SymplokeConfig:
     """統合設定"""
@@ -85,6 +88,7 @@ class SymplokeConfig:
     default_k: int = 10
     rerank: bool = False
 
+    # PURPOSE: 環境変数から設定を読み込み
     @classmethod
     def from_env(cls) -> "SymplokeConfig":
         """環境変数から設定を読み込み"""

@@ -11,6 +11,7 @@ from dataclasses import dataclass
 from ..indices.base import IndexedResult
 
 
+# PURPOSE: リランキング設定
 @dataclass
 class RankingConfig:
     """リランキング設定"""
@@ -19,6 +20,7 @@ class RankingConfig:
     min_score: float = 0.0  # 最低スコア閾値
 
 
+# PURPOSE: 検索結果リランキング
 class Ranker:
     """
     検索結果リランキング
@@ -35,6 +37,7 @@ class Ranker:
     def __init__(self, config: Optional[RankingConfig] = None):
         self._config = config or RankingConfig()
 
+    # PURPOSE: ソース別結果を統合ランキング (HybridSearch 対応)
     def rank(
         self,
         source_results: Dict[str, List[IndexedResult]],

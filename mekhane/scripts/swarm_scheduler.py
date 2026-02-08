@@ -256,6 +256,7 @@ class SwarmScheduler:
         }
 
 
+# PURPOSE: Execute daily swarm
 async def run_daily():
     """Execute daily swarm."""
     scheduler = SwarmScheduler()
@@ -277,6 +278,7 @@ async def run_daily():
     logger.info("=" * 60)
 
 
+# PURPOSE: main の処理
 def main():
     import argparse
 

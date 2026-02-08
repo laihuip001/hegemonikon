@@ -24,6 +24,7 @@ from pathlib import Path
 from typing import Optional
 
 
+# PURPOSE: プッシュ知識への反応記録
 @dataclass
 class PushFeedback:
     """プッシュ知識への反応記録"""
@@ -46,6 +47,7 @@ REACTION_WEIGHTS: dict[str, float] = {
 }
 
 
+# PURPOSE: プッシュ反応を収集し、次回の push 優先度を調整
 class FeedbackCollector:
     """プッシュ反応を収集し、次回の push 優先度を調整
 
@@ -64,6 +66,7 @@ class FeedbackCollector:
         self._series_counts: dict[str, int] = defaultdict(int)
         self._load()
 
+    # PURPOSE: 反応を記録
     def record(self, feedback: PushFeedback) -> None:
         """反応を記録"""
         self._history.append(asdict(feedback))
@@ -71,6 +74,7 @@ class FeedbackCollector:
         self._series_scores[feedback.series] += weight
         self._series_counts[feedback.series] += 1
 
+    # PURPOSE: シリーズごとの閾値調整
     def adjust_threshold(self, series: str, base_threshold: float = 0.65) -> float:
         """シリーズごとの閾値調整
 
@@ -91,6 +95,7 @@ class FeedbackCollector:
         adjusted = base_threshold + adjustment
         return max(0.3, min(0.9, adjusted))
 
+    # PURPOSE: シリーズごとの統計
     def get_stats(self) -> dict[str, dict]:
         """シリーズごとの統計"""
         stats = {}
@@ -105,6 +110,7 @@ class FeedbackCollector:
             }
         return stats
 
+    # PURPOSE: ディスクに保存
     def persist(self) -> Path:
         """ディスクに保存"""
         self._path.parent.mkdir(parents=True, exist_ok=True)

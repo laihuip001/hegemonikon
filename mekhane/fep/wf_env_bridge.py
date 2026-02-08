@@ -64,6 +64,7 @@ def _ctx_path(session_id: Optional[str] = None) -> Path:
     return _DEFAULT_DIR / f"hgk_wf_ctx_{sid}.json"
 
 
+# PURPOSE: Record of a single WF step's output
 @dataclass
 class WFStepRecord:
     """Record of a single WF step's output."""
@@ -79,6 +80,7 @@ class WFStepRecord:
             self.timestamp = datetime.now(timezone.utc).isoformat()
 
 
+# PURPOSE: WF turbo ブロック間のコンテキストストア。
 @dataclass
 class WFContext:
     """WF turbo ブロック間のコンテキストストア。
@@ -125,6 +127,7 @@ class WFContext:
             encoding="utf-8",
         )
 
+    # PURPOSE: 定理出力を保存。
     def set_output(self, theorem_id: str, output: str, *,
                    pw: float = 0.0,
                    metadata: Optional[Dict[str, Any]] = None) -> None:
@@ -144,15 +147,18 @@ class WFContext:
         )
         self._save()
 
+    # PURPOSE: 定理出力を取得。存在しなければ None。
     def get_output(self, theorem_id: str) -> Optional[str]:
         """定理出力を取得。存在しなければ None。"""
         rec = self.outputs.get(theorem_id)
         return rec.output if rec else None
 
+    # PURPOSE: 定理レコード全体を取得。
     def get_record(self, theorem_id: str) -> Optional[WFStepRecord]:
         """定理レコード全体を取得。"""
         return self.outputs.get(theorem_id)
 
+    # PURPOSE: シリーズ全定理の出力を Dict で返す。
     def get_series_outputs(self, series: str) -> Dict[str, str]:
         """シリーズ全定理の出力を Dict で返す。
 
@@ -168,6 +174,7 @@ class WFContext:
             if tid.startswith(series)
         }
 
+    # PURPOSE: シリーズ全定理の PW を Dict で返す。
     def get_series_pw(self, series: str) -> Dict[str, float]:
         """シリーズ全定理の PW を Dict で返す。"""
         return {
@@ -176,19 +183,23 @@ class WFContext:
             if tid.startswith(series)
         }
 
+    # PURPOSE: メタデータを設定。
     def set_meta(self, key: str, value: Any) -> None:
         """メタデータを設定。"""
         self.meta[key] = value
         self._save()
 
+    # PURPOSE: メタデータを取得。
     def get_meta(self, key: str, default: Any = None) -> Any:
         """メタデータを取得。"""
         return self.meta.get(key, default)
 
+    # PURPOSE: 保存されている全定理IDのリスト。
     def list_outputs(self) -> List[str]:
         """保存されている全定理IDのリスト。"""
         return sorted(self.outputs.keys())
 
+    # PURPOSE: コンテキストをクリア。
     def clear(self) -> None:
         """コンテキストをクリア。"""
         self.outputs.clear()
@@ -196,6 +207,7 @@ class WFContext:
         if self._path.exists():
             self._path.unlink()
 
+    # PURPOSE: cone_bridge.py 互換の入力辞書を生成。
     def to_cone_input(self, series: str) -> Dict[str, str]:
         """cone_bridge.py 互換の入力辞書を生成。
 
@@ -203,6 +215,7 @@ class WFContext:
         """
         return self.get_series_outputs(series)
 
+    # PURPOSE: cone_bridge.py --file 用の JSON ファイルを生成。
     def export_for_cone(self, series: str) -> Path:
         """cone_bridge.py --file 用の JSON ファイルを生成。
 

@@ -961,6 +961,7 @@ class AntigravityChatExporter:
 # ============================================================================
 
 
+# PURPOSE: main の処理
 async def main():
     parser = argparse.ArgumentParser(
         description="Antigravity IDE チャット履歴エクスポート"

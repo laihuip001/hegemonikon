@@ -40,6 +40,7 @@ from typing import Any, Dict, List, Optional
 # =============================================================================
 
 
+# PURPOSE: 1サイクルの E2E 結果
 @dataclass
 class CycleResult:
     """1サイクルの E2E 結果"""
@@ -72,6 +73,7 @@ class CycleResult:
     should_epoche: bool = False
 
 
+# PURPOSE: E2E ループの全サイクル結果
 @dataclass
 class E2EResult:
     """E2E ループの全サイクル結果"""
@@ -79,6 +81,7 @@ class E2EResult:
     cycles: List[CycleResult]
     learning_proof: Optional[str] = None
 
+    # PURPOSE: 人間向けサマリー
     @property
     def summary(self) -> str:
         """人間向けサマリー"""
@@ -103,6 +106,7 @@ class E2EResult:
 # =============================================================================
 
 
+# PURPOSE: FEP E2E ループを実行する。
 def run_loop(
     user_input: str,
     *,
@@ -333,6 +337,7 @@ def _simulate_cone(series: str, user_input: str) -> Dict[str, Any]:
 _SERIES_TO_TOPIC_OBS = {"O": 8, "S": 9, "H": 10, "P": 11, "K": 12, "A": 13}
 
 
+# PURPOSE: 1サイクルの E2E v2 結果 — 統合判断
 @dataclass
 class CycleResultV2:
     """1サイクルの E2E v2 結果 — 統合判断"""
@@ -358,6 +363,7 @@ class CycleResultV2:
     a_matrix_updated: bool = False
 
 
+# PURPOSE: E2E v2 ループの全サイクル結果
 @dataclass
 class E2EResultV2:
     """E2E v2 ループの全サイクル結果"""
@@ -365,6 +371,7 @@ class E2EResultV2:
     cycles: List[CycleResultV2]
     learning_proof: Optional[str] = None
 
+    # PURPOSE: summary の処理
     @property
     def summary(self) -> str:
         lines = [
@@ -386,6 +393,7 @@ class E2EResultV2:
         return "\n".join(lines)
 
 
+# PURPOSE: FEP E2E ループ v2 — 統合 48-state モデル。
 def run_loop_v2(
     user_input: str,
     *,

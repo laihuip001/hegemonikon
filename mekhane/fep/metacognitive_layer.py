@@ -94,6 +94,7 @@ MAX_FEEDBACK_LOOPS = 3
 # =============================================================================
 
 
+# PURPOSE: The 5 stages of UML, mapped to MP stages and HGK theorems
 class UMLStage(Enum):
     """The 5 stages of UML, mapped to MP stages and HGK theorems."""
 
@@ -129,6 +130,7 @@ STAGE_QUESTIONS: Dict[UMLStage, str] = {
 }
 
 
+# PURPOSE: Single metacognitive check result
 @dataclass
 class MetacognitiveCheck:
     """Single metacognitive check result."""
@@ -141,6 +143,7 @@ class MetacognitiveCheck:
     theorem: str = ""  # Corresponding HGK theorem
     cognitive_type: str = ""  # Understanding / Reasoning / Bridge
 
+    # PURPOSE: Human-readable stage label
     @property
     def stage_label(self) -> str:
         """Human-readable stage label."""
@@ -154,6 +157,7 @@ class MetacognitiveCheck:
         return labels.get(self.stage, self.stage.value)
 
 
+# PURPOSE: Complete UML check report for a WF execution
 @dataclass
 class UMLReport:
     """Complete UML check report for a WF execution."""
@@ -165,26 +169,31 @@ class UMLReport:
     feedback_loop_count: int = 0
     feedback_reason: str = ""
 
+    # PURPOSE: All checks in execution order
     @property
     def all_checks(self) -> List[MetacognitiveCheck]:
         """All checks in execution order."""
         return self.pre_checks + self.post_checks
 
+    # PURPOSE: All checks passed
     @property
     def overall_pass(self) -> bool:
         """All checks passed."""
         return all(c.passed for c in self.all_checks)
 
+    # PURPOSE: Number of checks that passed
     @property
     def pass_count(self) -> int:
         """Number of checks that passed."""
         return sum(1 for c in self.all_checks if c.passed)
 
+    # PURPOSE: Total number of checks
     @property
     def total_count(self) -> int:
         """Total number of checks."""
         return len(self.all_checks)
 
+    # PURPOSE: One-line summary
     @property
     def summary(self) -> str:
         """One-line summary."""
@@ -195,6 +204,7 @@ class UMLReport:
             f"({self.pass_count}/{self.total_count}){fb}"
         )
 
+    # PURPOSE: Multi-line description for WF output
     def describe(self) -> str:
         """Multi-line description for WF output."""
         lines = [
@@ -621,3 +631,79 @@ def run_full_uml(
         feedback_reason=feedback_reason,
     )
 
+
+# =============================================================================
+# Phase 2: Prompt Injection
+# =============================================================================
+
+
+# PURPOSE: WF turbo ブロックに注入するメタ認知プロンプトを生成
+def generate_prompt_injection(
+    wf_name: str,
+    stage: UMLStage,
+    context: str = "",
+) -> str:
+    """指定 Stage のメタ認知プロンプトを生成。
+
+    Phase 2: LLM の turbo ブロックに注入し、
+    MP 5段階を「環境で強制」する。
+
+    Args:
+        wf_name: ワークフロー名
+        stage: UML Stage
+        context: 入力コンテキスト（オプション）
+
+    Returns:
+        WF turbo ブロックに注入する質問文字列
+    """
+    theorem = STAGE_TO_THEOREM.get(stage, "?")
+    question = STAGE_QUESTIONS.get(stage, "")
+    ctype = STAGE_TO_COGNITIVE.get(stage)
+    type_label = ctype.name if ctype else ""
+
+    # Pre-check stages: "Before you begin..."
+    if stage in (UMLStage.PRE_UNDERSTANDING, UMLStage.PRE_INTUITION):
+        prefix = "【UML Pre-check】"
+        instruction = "以下の質問に1-2文で回答してから、本題に進んでください。"
+    else:
+        prefix = "【UML Post-check】"
+        instruction = "出力を確定する前に、以下の質問に回答してください。"
+
+    lines = [
+        f"{prefix} Stage {theorem} ({type_label})",
+        f"WF: /{wf_name}",
+        f"",
+        f"❓ {question}",
+        f"",
+        f"{instruction}",
+    ]
+
+    if context and stage == UMLStage.PRE_UNDERSTANDING:
+        lines.append(f"")
+        lines.append(f"入力の要約: 「{context[:100]}{'...' if len(context) > 100 else ''}」")
+
+    return "\n".join(lines)
+
+
+# PURPOSE: 全 Pre-check プロンプトを一括生成
+def generate_pre_injection(wf_name: str, context: str = "") -> str:
+    """WF 実行前に注入する全 Pre-check プロンプトを生成。"""
+    parts = [
+        generate_prompt_injection(wf_name, UMLStage.PRE_UNDERSTANDING, context),
+        "",
+        generate_prompt_injection(wf_name, UMLStage.PRE_INTUITION, context),
+    ]
+    return "\n".join(parts)
+
+
+# PURPOSE: 全 Post-check プロンプトを一括生成
+def generate_post_injection(wf_name: str) -> str:
+    """WF 実行後に注入する全 Post-check プロンプトを生成。"""
+    parts = [
+        generate_prompt_injection(wf_name, UMLStage.POST_EVALUATION),
+        "",
+        generate_prompt_injection(wf_name, UMLStage.POST_DECISION),
+        "",
+        generate_prompt_injection(wf_name, UMLStage.POST_CONFIDENCE),
+    ]
+    return "\n".join(parts)

@@ -55,6 +55,7 @@ from .state_spaces_v2 import (
 )
 
 
+# PURPOSE: 48-state Active Inference Agent with Series integration
 class HegemonikónFEPAgentV2:
     """48-state Active Inference Agent with Series integration.
 
@@ -306,6 +307,7 @@ class HegemonikónFEPAgentV2:
     # Inference Cycle
     # =========================================================================
 
+    # PURPOSE: O1 Noēsis: Update beliefs given observation
     def infer_states(self, observation: int) -> Dict[str, Any]:
         """O1 Noēsis: Update beliefs given observation."""
         obs_tuple = (
@@ -331,6 +333,7 @@ class HegemonikónFEPAgentV2:
         self._history.append({"type": "infer_states", "result": result})
         return result
 
+    # PURPOSE: O2 Boulēsis: Select policy minimizing EFE
     def infer_policies(self) -> Tuple[np.ndarray, np.ndarray]:
         """O2 Boulēsis: Select policy minimizing EFE."""
         q_pi, neg_efe = self.agent.infer_policies()
@@ -339,6 +342,7 @@ class HegemonikónFEPAgentV2:
         })
         return q_pi, neg_efe
 
+    # PURPOSE: Sample action from policy distribution
     def sample_action(self) -> int:
         """Sample action from policy distribution."""
         action = self.agent.sample_action()
@@ -347,6 +351,7 @@ class HegemonikónFEPAgentV2:
         self._history.append({"type": "action", "action": action})
         return int(action)
 
+    # PURPOSE: Complete inference-action cycle with 7-action output
     def step(self, observation: int) -> Dict[str, Any]:
         """Complete inference-action cycle with 7-action output.
 
@@ -380,6 +385,7 @@ class HegemonikónFEPAgentV2:
             "precision_weights": dict(self.precision_weights),
         }
 
+    # PURPOSE: Explain the last step decision in natural language
     def explain(self, step_result: Optional[Dict[str, Any]] = None) -> str:
         """Explain the last step decision in natural language.
 
@@ -529,6 +535,7 @@ class HegemonikónFEPAgentV2:
     # Precision Weighting
     # =========================================================================
 
+    # PURPOSE: Update precision weights based on prediction error per modality
     def update_precision(self, observed: int, predicted: int) -> None:
         """Update precision weights based on prediction error per modality."""
         obs_per_mod = self._decompose_observation(observed)
@@ -596,6 +603,7 @@ class HegemonikónFEPAgentV2:
     # Learning (Dirichlet)
     # =========================================================================
 
+    # PURPOSE: Dirichlet update: pA += η * outer(o, beliefs)
     def update_A_dirichlet(
         self, observation: int, learning_rate: Optional[float] = None,
     ) -> None:
@@ -622,6 +630,7 @@ class HegemonikónFEPAgentV2:
             "learning_rate": eta,
         })
 
+    # PURPOSE: Dirichlet B update: pB[:,:,a] += η * outer(beliefs_next, beliefs_prev)
     def update_B_dirichlet(
         self, action: int, learning_rate: Optional[float] = None,
     ) -> None:
@@ -674,6 +683,7 @@ class HegemonikónFEPAgentV2:
     # Persistence
     # =========================================================================
 
+    # PURPOSE: Save learned A matrix
     def save_learned_A(self, path: Optional[str] = None) -> str:
         """Save learned A matrix."""
         from .persistence import save_A
@@ -684,6 +694,7 @@ class HegemonikónFEPAgentV2:
         self._history.append({"type": "save_A", "path": str(saved_path)})
         return str(saved_path)
 
+    # PURPOSE: Load learned A matrix
     def load_learned_A(self, path: Optional[str] = None) -> bool:
         """Load learned A matrix."""
         from .persistence import load_A, A_exists, LEARNED_A_PATH
@@ -711,6 +722,7 @@ class HegemonikónFEPAgentV2:
             return True
         return False
 
+    # PURPOSE: Save learned B matrix
     def save_learned_B(self, path: Optional[str] = None) -> str:
         """Save learned B matrix."""
         from .persistence import LEARNED_A_PATH
@@ -724,6 +736,7 @@ class HegemonikónFEPAgentV2:
         self._history.append({"type": "save_B", "path": str(target_path)})
         return str(target_path)
 
+    # PURPOSE: Load learned B matrix
     def load_learned_B(self, path: Optional[str] = None) -> bool:
         """Load learned B matrix."""
         from .persistence import LEARNED_A_PATH
@@ -755,11 +768,13 @@ class HegemonikónFEPAgentV2:
             return True
         return False
 
+    # PURPOSE: Reset to initial beliefs
     def reset(self):
         """Reset to initial beliefs."""
         self.beliefs = self._default_D()
         self._history = []
 
+    # PURPOSE: Return inference history
     def get_history(self) -> List[Dict[str, Any]]:
         """Return inference history."""
         return self._history

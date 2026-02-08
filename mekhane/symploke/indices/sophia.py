@@ -12,6 +12,7 @@ from .base import DomainIndex, SourceType, Document, IndexedResult
 from ..adapters.base import VectorStoreAdapter
 
 
+# PURPOSE: Sophia: Knowledge Items のインデックス
 class SophiaIndex(DomainIndex):
     """
     Sophia: Knowledge Items のインデックス
@@ -47,6 +48,7 @@ class SophiaIndex(DomainIndex):
         self._embed_fn = embed_fn
         self._doc_store: Dict[str, Document] = {}
 
+    # PURPOSE: source_type の処理
     @property
     def source_type(self) -> SourceType:
         return SourceType.SOPHIA
@@ -59,6 +61,7 @@ class SophiaIndex(DomainIndex):
             # Stub mode
             return np.random.randn(self._dimension).astype(np.float32)
 
+    # PURPOSE: Knowledge Items をインジェスト
     def ingest(self, documents: List[Document]) -> int:
         """
         Knowledge Items をインジェスト
@@ -95,6 +98,7 @@ class SophiaIndex(DomainIndex):
 
         return len(documents)
 
+    # PURPOSE: Knowledge Items を検索
     def search(
         self,
         query: str,

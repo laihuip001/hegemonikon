@@ -44,12 +44,14 @@ logger = logging.getLogger(__name__)
 # ============ Exceptions ============
 
 
+# PURPOSE: Base exception for Jules client errors
 class JulesError(Exception):
     """Base exception for Jules client errors."""
 
     pass
 
 
+# PURPOSE: Raised when API rate limit is exceeded
 class RateLimitError(JulesError):
     """Raised when API rate limit is exceeded."""
 
@@ -60,6 +62,7 @@ class RateLimitError(JulesError):
         self.retry_after = retry_after
 
 
+# PURPOSE: Raised when API returns an unknown session state
 class UnknownStateError(JulesError):
     """Raised when API returns an unknown session state."""
 
@@ -72,6 +75,7 @@ class UnknownStateError(JulesError):
 # ============ Enums ============
 
 
+# PURPOSE: Jules session states
 class SessionState(Enum):
     """Jules session states."""
 
@@ -86,6 +90,7 @@ class SessionState(Enum):
     CANCELLED = "CANCELLED"  # User or system cancelled
     UNKNOWN = "UNKNOWN"  # Fallback for new/unknown states
 
+    # PURPOSE: Parse state string, returning UNKNOWN for unrecognized states
     @classmethod
     def from_string(cls, state_str: str) -> "SessionState":
         """Parse state string, returning UNKNOWN for unrecognized states.
@@ -105,6 +110,7 @@ class SessionState(Enum):
 
 
 # Legacy alias for backwards compatibility
+# PURPOSE: Deprecated: Use SessionState.from_string() instead
 def parse_state(state_str: str) -> SessionState:
     """Deprecated: Use SessionState.from_string() instead."""
     return SessionState.from_string(state_str)
@@ -113,6 +119,7 @@ def parse_state(state_str: str) -> SessionState:
 # ============ Data Types ============
 
 
+# PURPOSE: Represents a Jules API session
 @dataclass
 class JulesSession:
     """Represents a Jules API session."""
@@ -128,6 +135,7 @@ class JulesSession:
     output: Optional[str] = None  # Review output text (TH-013, ES-009 fix)
 
 
+# PURPOSE: Result wrapper for batch operations
 @dataclass
 class JulesResult:
     """
@@ -141,6 +149,7 @@ class JulesResult:
     error: Exception | None = None
     task: dict = field(default_factory=dict)
 
+    # PURPOSE: True only if no error AND session completed successfully (ES-018 fix)
     @property
     def is_success(self) -> bool:
         """True only if no error AND session completed successfully (ES-018 fix)."""
@@ -149,6 +158,7 @@ class JulesResult:
         # ES-018: Check actual session state, not just error absence
         return self.session.state == SessionState.COMPLETED
 
+    # PURPOSE: is_failed の処理
     @property
     def is_failed(self) -> bool:
         return not self.is_success
@@ -157,6 +167,7 @@ class JulesResult:
 # ============ Retry Decorator ============
 
 
+# PURPOSE: Decorator for async functions with exponential backoff retry
 def with_retry(
     max_attempts: int = 3,
     backoff_factor: float = 2.0,
@@ -175,7 +186,9 @@ def with_retry(
         retryable_exceptions: Tuple of exceptions to retry on
     """
 
+    # PURPOSE: decorator の処理
     def decorator(func):
+        # PURPOSE: wrapper の処理
         @functools.wraps(func)
         async def wrapper(*args, **kwargs):
             delay = initial_delay
@@ -214,6 +227,7 @@ def with_retry(
 # ============ Client ============
 
 
+# PURPOSE: Async client for Jules API
 class JulesClient:
     """
     Async client for Jules API.
@@ -361,6 +375,7 @@ class JulesClient:
             if close_after:
                 await session.close()
 
+    # PURPOSE: Create a new Jules session
     @with_retry(
         max_attempts=3, retryable_exceptions=(RateLimitError, aiohttp.ClientError)
     )
@@ -405,6 +420,7 @@ class JulesClient:
             # NOTE: Removed self-assignment: source = source
         )
 
+    # PURPOSE: Get session status
     @with_retry(
         max_attempts=3, retryable_exceptions=(RateLimitError, aiohttp.ClientError)
     )
@@ -442,6 +458,7 @@ class JulesClient:
             output=output_text,
         )
 
+    # PURPOSE: Poll session until completion or timeout
     async def poll_session(
         self,
         session_id: str,
@@ -518,6 +535,7 @@ class JulesClient:
 
         raise TimeoutError(f"Session {session_id} did not complete within {timeout}s")
 
+    # PURPOSE: Create session and poll until completion
     async def create_and_poll(
         self,
         prompt: str,
@@ -542,6 +560,7 @@ class JulesClient:
         session = await self.create_session(prompt, source, branch)
         return await self.poll_session(session.id, timeout)
 
+    # PURPOSE: Execute multiple tasks in parallel with concurrency control
     async def batch_execute(
         self,
         tasks: list[dict],
@@ -573,6 +592,7 @@ class JulesClient:
             )
             semaphore = asyncio.Semaphore(limit)
 
+        # PURPOSE: bounded_execute の処理
         async def bounded_execute(task: dict) -> JulesResult:
             # AI-022 fix: Track session ID before polling to prevent zombie sessions
             created_session_id: str | None = None
@@ -615,6 +635,7 @@ class JulesClient:
         # won't receive unhandled exceptions from tasks.
         results: list[JulesResult] = []
 
+        # PURPOSE: tracked_execute の処理
         async def tracked_execute(task: dict) -> None:
             result = await bounded_execute(task)
             results.append(result)
@@ -625,6 +646,7 @@ class JulesClient:
 
         return results
 
+    # PURPOSE: [DEPRECATED] Execute Synedrion v2.1 multi-perspective review
     async def synedrion_review(
         self,
         source: str,
@@ -755,6 +777,7 @@ class JulesClient:
 # ============ Utilities ============
 
 
+# PURPOSE: Safely mask API key for display
 def mask_api_key(key: str, visible_chars: int = 4) -> str:
     """
     Safely mask API key for display.
@@ -777,6 +800,7 @@ def mask_api_key(key: str, visible_chars: int = 4) -> str:
 # ============ CLI for testing ============
 
 
+# PURPOSE: CLI entry point for testing
 def main():
     """CLI entry point for testing."""
     import argparse

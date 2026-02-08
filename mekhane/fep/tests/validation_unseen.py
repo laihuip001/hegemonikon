@@ -44,6 +44,7 @@ VALIDATION_CASES = [
 ]
 
 
+# PURPOSE: validation を実行する
 def run_validation():
     from mekhane.fep.attractor import SeriesAttractor
 

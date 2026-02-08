@@ -300,6 +300,7 @@ class AntigravityLogCollector:
 
 
 # CLI 用のエントリポイント関数
+# PURPOSE: logs サブコマンドのハンドラ
 def cmd_logs(args) -> int:
     """logs サブコマンドのハンドラ"""
     collector = AntigravityLogCollector()

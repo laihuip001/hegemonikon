@@ -233,6 +233,7 @@ def get_store() -> DoxaStore:
     return _global_store
 
 
+# PURPOSE: H4 Doxa 結果をMarkdown形式でフォーマット
 def format_doxa_markdown(result: DoxaResult) -> str:
     """H4 Doxa 結果をMarkdown形式でフォーマット"""
     success_emoji = "✅" if result.success else "❌"
@@ -249,6 +250,7 @@ def format_doxa_markdown(result: DoxaResult) -> str:
     return "\n".join(lines)
 
 
+# PURPOSE: FEP観察空間へのエンコード
 def encode_doxa_observation(result: DoxaResult) -> dict:
     """FEP観察空間へのエンコード"""
     # 強さ → confidence

@@ -12,6 +12,7 @@ from .base import DomainIndex, SourceType, Document, IndexedResult
 from ..adapters.base import VectorStoreAdapter
 
 
+# PURPOSE: Gnōsis: 論文・外部知識のインデックス
 class GnosisIndex(DomainIndex):
     """
     Gnōsis: 論文・外部知識のインデックス
@@ -47,6 +48,7 @@ class GnosisIndex(DomainIndex):
         self._embed_fn = embed_fn
         self._doc_store: Dict[str, Document] = {}
 
+    # PURPOSE: source_type の処理
     @property
     def source_type(self) -> SourceType:
         return SourceType.GNOSIS
@@ -59,6 +61,7 @@ class GnosisIndex(DomainIndex):
             # Stub mode: ランダムベクトルを返す
             return np.random.randn(self._dimension).astype(np.float32)
 
+    # PURPOSE: 論文ドキュメントをインジェスト
     def ingest(self, documents: List[Document]) -> int:
         """
         論文ドキュメントをインジェスト
@@ -96,6 +99,7 @@ class GnosisIndex(DomainIndex):
 
         return len(documents)
 
+    # PURPOSE: 論文を検索
     def search(self, query: str, k: int = 10, **kwargs) -> List[IndexedResult]:
         """
         論文を検索

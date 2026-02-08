@@ -155,6 +155,7 @@ class ContextTracker:
         self._context.handoff_keywords = keywords[:10]
 
 
+# PURPOSE: コンテキスト × 未消化データの関連度スコアリング
 class RelevanceDetector:
     """コンテキスト × 未消化データの関連度スコアリング
 
@@ -417,6 +418,7 @@ class SuggestedQuestionGenerator:
         except (ImportError, Exception):
             self._client = None
 
+    # PURPOSE: is_available の処理
     @property
     def is_available(self) -> bool:
         return self._client is not None
@@ -489,6 +491,7 @@ class SuggestedQuestionGenerator:
         return nuggets
 
 
+# PURPOSE: 閾値超過時に知識を能動的にプッシュ
 class PushController:
     """閾値超過時に知識を能動的にプッシュ
 
@@ -549,6 +552,7 @@ class PushController:
 # --- Orchestrator ---
 
 
+# PURPOSE: Proactive Knowledge Surface — メインオーケストレータ
 class PKSEngine:
     """Proactive Knowledge Surface — メインオーケストレータ
 

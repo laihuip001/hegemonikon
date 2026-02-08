@@ -22,6 +22,7 @@ from ..base import (
 )
 
 
+# PURPOSE: 時宜判断エージェント (K-Agent)
 class KairosAgent(AuditAgent):
     """時宜判断エージェント (K-Agent)"""
 
@@ -61,6 +62,7 @@ class KairosAgent(AuditAgent):
         (r"\bパフォーマンス\b.*\b前に\b", "K-012", "機能完成前のパフォーマンス議論"),
     ]
 
+    # PURPOSE: タイミングの妥当性を監査
     def audit(self, target: AuditTarget) -> AgentResult:
         """タイミングの妥当性を監査"""
         issues: List[AuditIssue] = []
@@ -146,6 +148,7 @@ class KairosAgent(AuditAgent):
 
         return issues
 
+    # PURPOSE: 全タイプをサポート（特に計画に有効）
     def supports(self, target_type: AuditTargetType) -> bool:
         """全タイプをサポート（特に計画に有効）"""
         return True

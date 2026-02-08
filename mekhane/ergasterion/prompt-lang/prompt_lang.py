@@ -559,6 +559,7 @@ class Prompt:
 
 
 # v2.1 additions
+# PURPOSE: Result of parsing a prompt-lang file with multiple definitions
 @dataclass
 class ParseResult:
     """Result of parsing a prompt-lang file with multiple definitions."""
@@ -584,6 +585,7 @@ class ParseResult:
         return self.prompts.get(name) or self.mixins.get(name)
 
 
+# PURPOSE: Error during parsing
 class ParseError(Exception):
     """Error during parsing."""
 
@@ -593,6 +595,7 @@ class ParseError(Exception):
         super().__init__(f"Line {line}: {message}" if line else message)
 
 
+# PURPOSE: Parser for prompt-lang files
 class PromptLangParser:
     """Parser for prompt-lang files."""
 
@@ -1108,6 +1111,7 @@ class PromptLangParser:
         return condition
 
 
+# PURPOSE: Parse a .prompt file
 def parse_file(filepath: str) -> Prompt:
     """Parse a .prompt file."""
     path = Path(filepath)
@@ -1120,6 +1124,7 @@ def parse_file(filepath: str) -> Prompt:
 
 
 # v2.1 additions: parse_all and resolve functions
+# PURPOSE: Parse content with multiple prompts and mixins
 def parse_all(content: str) -> ParseResult:
     """
     Parse content with multiple prompts and mixins.
@@ -1306,6 +1311,7 @@ def _resolve_with_chain(
     return result
 
 
+# PURPOSE: Validate a .prompt file
 def validate_file(filepath: str) -> tuple[bool, str]:
     """Validate a .prompt file."""
     try:
@@ -1327,6 +1333,7 @@ def validate_file(filepath: str) -> tuple[bool, str]:
         return False, f"Error: {e}"
 
 
+# PURPOSE: main の処理
 def main():
     if len(sys.argv) < 3:
         print(__doc__)

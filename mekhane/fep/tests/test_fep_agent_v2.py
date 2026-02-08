@@ -19,15 +19,18 @@ import numpy as np
 import pytest
 
 
+# PURPOSE: State space definition tests
 class TestStateSpacesV2:
     """State space definition tests."""
 
+    # PURPOSE: dimensions をテストする
     def test_dimensions(self):
         from mekhane.fep.state_spaces_v2 import NUM_STATES_V2, NUM_OBS_V2, NUM_ACTIONS_V2
         assert NUM_STATES_V2 == 48
         assert NUM_OBS_V2 == 14
         assert NUM_ACTIONS_V2 == 7
 
+    # PURPOSE: index_round_trip をテストする
     def test_index_round_trip(self):
         from mekhane.fep.state_spaces_v2 import (
             state_to_index_v2, index_to_state_v2, NUM_STATES_V2,
@@ -37,6 +40,7 @@ class TestStateSpacesV2:
             j = state_to_index_v2(p, a, h, s)
             assert i == j, f"Round-trip failed: {i} → ({p},{a},{h},{s}) → {j}"
 
+    # PURPOSE: all_series_covered をテストする
     def test_all_series_covered(self):
         from mekhane.fep.state_spaces_v2 import (
             index_to_state_v2, NUM_STATES_V2, SERIES_STATES,
@@ -48,9 +52,11 @@ class TestStateSpacesV2:
         assert series_seen == set(SERIES_STATES)
 
 
+# PURPOSE: 48-state agent tests
 class TestFEPAgentV2:
     """48-state agent tests."""
 
+    # PURPOSE: matrix_shapes をテストする
     def test_matrix_shapes(self):
         from mekhane.fep.fep_agent_v2 import HegemonikónFEPAgentV2
         agent = HegemonikónFEPAgentV2()
@@ -65,6 +71,7 @@ class TestFEPAgentV2:
         assert C.shape == (14,), f"C shape: {C.shape}"
         assert D.shape == (48,), f"D shape: {D.shape}"
 
+    # PURPOSE: A_columns_normalized をテストする
     def test_A_columns_normalized(self):
         from mekhane.fep.fep_agent_v2 import HegemonikónFEPAgentV2
         agent = HegemonikónFEPAgentV2()
@@ -72,6 +79,7 @@ class TestFEPAgentV2:
         col_sums = A.sum(axis=0)
         np.testing.assert_allclose(col_sums, 1.0, atol=1e-10)
 
+    # PURPOSE: B_columns_normalized をテストする
     def test_B_columns_normalized(self):
         from mekhane.fep.fep_agent_v2 import HegemonikónFEPAgentV2
         agent = HegemonikónFEPAgentV2()
@@ -80,12 +88,14 @@ class TestFEPAgentV2:
             col_sums = B[:, :, a].sum(axis=0)
             np.testing.assert_allclose(col_sums, 1.0, atol=1e-10)
 
+    # PURPOSE: D_normalized をテストする
     def test_D_normalized(self):
         from mekhane.fep.fep_agent_v2 import HegemonikónFEPAgentV2
         agent = HegemonikónFEPAgentV2()
         D = agent._default_D()
         assert abs(D.sum() - 1.0) < 1e-10
 
+    # PURPOSE: step() returns selected_series for act_X actions
     def test_step_returns_series(self):
         """step() returns selected_series for act_X actions."""
         from mekhane.fep.fep_agent_v2 import HegemonikónFEPAgentV2
@@ -103,6 +113,7 @@ class TestFEPAgentV2:
         else:
             assert result["selected_series"] in ["O", "S", "H", "P", "K", "A"]
 
+    # PURPOSE: MAP state includes series field
     def test_step_returns_map_state_with_series(self):
         """MAP state includes series field."""
         from mekhane.fep.fep_agent_v2 import HegemonikónFEPAgentV2
@@ -117,6 +128,7 @@ class TestFEPAgentV2:
         assert "series" in names
         assert names["series"] in ["O", "S", "H", "P", "K", "A"]
 
+    # PURPOSE: Feeding topic=O observation should increase belief in O-series states
     def test_topic_observation_affects_beliefs(self):
         """Feeding topic=O observation should increase belief in O-series states."""
         from mekhane.fep.fep_agent_v2 import HegemonikónFEPAgentV2
@@ -136,6 +148,7 @@ class TestFEPAgentV2:
         # O-series should have notable probability mass
         assert o_mass > 0.1, f"O-series mass: {o_mass}"
 
+    # PURPOSE: Running step twice changes beliefs (not identical output)
     def test_two_step_learning(self):
         """Running step twice changes beliefs (not identical output)."""
         from mekhane.fep.fep_agent_v2 import HegemonikónFEPAgentV2
@@ -153,6 +166,7 @@ class TestFEPAgentV2:
         diff = np.abs(r1["beliefs"] - r2["beliefs"]).sum()
         assert diff > 0.001, f"Beliefs unchanged after learning: diff={diff}"
 
+    # PURPOSE: Save and load A matrix for v2 agent
     def test_persistence_v2(self):
         """Save and load A matrix for v2 agent."""
         from mekhane.fep.fep_agent_v2 import HegemonikónFEPAgentV2

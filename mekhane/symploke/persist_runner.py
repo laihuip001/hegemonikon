@@ -28,6 +28,7 @@ PROJECT_ROOT = Path(__file__).parent.parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))
 
 
+# PURPOSE: Phase 1: CPU のみのステップ (常に成功するはず)
 def run_phase1(insight: str = None) -> dict:
     """Phase 1: CPU のみのステップ (常に成功するはず)"""
     results = {}
@@ -64,6 +65,7 @@ def run_phase1(insight: str = None) -> dict:
     return results
 
 
+# PURPOSE: Phase 2: embedding が必要なステップ (GPU 不可時は CPU フォールバック)
 def run_phase2(force_cpu: bool = False) -> dict:
     """Phase 2: embedding が必要なステップ (GPU 不可時は CPU フォールバック)"""
     results = {}
@@ -111,6 +113,7 @@ def run_phase2(force_cpu: bool = False) -> dict:
     return results
 
 
+# PURPOSE: main の処理
 def main():
     parser = argparse.ArgumentParser(description="/bye 永続化ランナー")
     parser.add_argument("--light", action="store_true", help="Phase 1 のみ (CPU、軽量)")

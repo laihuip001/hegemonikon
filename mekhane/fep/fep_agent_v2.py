@@ -186,14 +186,26 @@ class HegemonikónFEPAgentV2:
     def _default_B(self) -> np.ndarray:
         """Generate 48-state transition matrix for 7 actions.
 
-        Key insight: The agent should prefer act_X when it knows the Series.
-        observe = passive waiting (state-preserving, no clarification)
-        act_X = active engagement (clarifies phantasia + transitions Series)
+        Architecture: B(a) = (1 - ε_a) × stoic_necessity + ε_a × uniform
 
-        This makes act_X epistemically and pragmatically superior when
-        topic observation provides clear Series signal.
+        ε_a (epsilon per action) = method uncertainty parameter.
+        Only 2 free parameters instead of ~20 magic numbers.
+
+        Stoic necessity defines deterministic transitions:
+          observe → identity (state preservation)
+          act_X   → clear phantasia, granted assent, active horme, target series
+
+        References:
+          /sop: Perplexity research (2026-02-08)
+          C3: "Identity + noise" structure (Da Costa et al. 2020)
+          Hegemonikón /noe: σ one-parameter family analysis
         """
+        # === ε parameters: the ONLY tunable values ===
+        EPS_OBSERVE = 0.10  # 90% state-preserving, 10% noise
+        EPS_ACT = 0.15      # 85% Stoic necessity, 15% noise
+
         B = np.zeros((self.state_dim, self.state_dim, self.num_actions))
+        uniform = 1.0 / self.state_dim  # Uniform noise floor
 
         for from_idx in range(self.state_dim):
             from_p, from_a, from_h, from_s = index_to_state_v2(from_idx)
@@ -201,46 +213,38 @@ class HegemonikónFEPAgentV2:
             for to_idx in range(self.state_dim):
                 to_p, to_a, to_h, to_s = index_to_state_v2(to_idx)
 
-                # --- Action 0: observe (passive waiting) ---
-                # State-preserving: high inertia on ALL dimensions
-                # Does NOT clarify — it's waiting, not investigating
-                p = 1.0
-                # Phantasia: STAYS as-is (observation alone doesn't clarify)
-                p *= 0.9 if to_p == from_p else 0.1
-                # Assent: stays (no decision)
-                p *= 0.9 if to_a == from_a else 0.1
-                # Horme: stays (no impulse change)
-                p *= 0.9 if to_h == from_h else 0.1
-                # Series: stays (no domain commitment)
-                p *= 0.85 if to_s == from_s else 0.03
-
-                B[to_idx, from_idx, 0] = p
+                # --- Action 0: observe ---
+                # Stoic necessity: identity (nothing changes when you wait)
+                is_identity = (
+                    to_p == from_p and to_a == from_a
+                    and to_h == from_h and to_s == from_s
+                )
+                if is_identity:
+                    B[to_idx, from_idx, 0] = (1 - EPS_OBSERVE) + EPS_OBSERVE * uniform
+                else:
+                    B[to_idx, from_idx, 0] = EPS_OBSERVE * uniform
 
                 # --- Actions 1-6: act_O..act_A ---
                 for act_idx in range(1, 7):
                     target_series = SERIES_STATES[act_idx - 1]
 
-                    p = 1.0
-                    # Phantasia: acting CLARIFIES (engagement reveals truth)
-                    if from_p == "uncertain" and to_p == "clear":
-                        p *= 0.7  # Action reveals
-                    elif to_p == "clear":
-                        p *= 0.6  # Maintains clarity
+                    # Stoic necessity: acting implies these transitions
+                    #   phantasia → clear (engagement reveals truth)
+                    #   assent → granted (acting IS assenting)
+                    #   horme → active (acting IS the impulse)
+                    #   series → target (acting on X means committing to X)
+                    is_stoic_target = (
+                        to_p == "clear"
+                        and to_a == "granted"
+                        and to_h == "active"
+                        and to_s == target_series
+                    )
+                    if is_stoic_target:
+                        B[to_idx, from_idx, act_idx] = (
+                            (1 - EPS_ACT) + EPS_ACT * uniform
+                        )
                     else:
-                        p *= 0.2  # Rarely regresses
-                    # Assent: action implies commitment
-                    p *= 0.75 if to_a == "granted" else 0.25
-                    # Horme: action activates
-                    p *= 0.8 if to_h == "active" else 0.2
-                    # Series: transitions to action's target
-                    if to_s == target_series:
-                        p *= 0.80
-                    elif to_s == from_s:
-                        p *= 0.10
-                    else:
-                        p *= 0.02
-
-                    B[to_idx, from_idx, act_idx] = p
+                        B[to_idx, from_idx, act_idx] = EPS_ACT * uniform
 
         # Normalize columns per action
         for a in range(self.num_actions):

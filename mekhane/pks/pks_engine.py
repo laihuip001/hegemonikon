@@ -121,7 +121,10 @@ class ContextTracker:
 
     # PURPOSE: 検索クエリを履歴に追加
     def add_query(self, query: str) -> None:
-        """検索クエリを履歴に追加"""
+        """検索クエリを履歴に追加（重複時は末尾に移動）"""
+        # 重複排除: 既存なら除去して末尾に再追加
+        if query in self._context.recent_queries:
+            self._context.recent_queries.remove(query)
         self._context.recent_queries.append(query)
         # 直近 20 件のみ保持
         if len(self._context.recent_queries) > 20:

@@ -51,8 +51,8 @@ def parse_macro_file(path: Path) -> Optional[MacroDefinition]:
     except Exception:
         return None
     
-    # マクロ名を抽出
-    name_match = re.search(r"#\s*@(\w+)\s+マクロ", content)
+    # マクロ名を抽出 (both "# @name マクロ" and "# @name — Description マクロ")
+    name_match = re.search(r"#\s*@(\w+)[\s—]", content)
     if not name_match:
         return None
     name = name_match.group(1)

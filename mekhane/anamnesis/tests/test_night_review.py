@@ -16,15 +16,19 @@ sys.path.insert(0, os.path.abspath("."))
 from mekhane.anamnesis import night_review
 
 
+# PURPOSE: Test night review の実装
 class TestNightReview(unittest.TestCase):
 
+    # PURPOSE: setUp をセットアップする
     def setUp(self):
         self.test_dir = tempfile.mkdtemp()
         self.brain_dir = Path(self.test_dir)
 
+    # PURPOSE: tearDown の処理
     def tearDown(self):
         shutil.rmtree(self.test_dir)
 
+    # PURPOSE: session を生成する
     def create_session(self, session_id, files_data, is_hidden=False):
         dir_name = session_id if not is_hidden else f"_{session_id}"
         session_path = self.brain_dir / dir_name
@@ -48,6 +52,7 @@ class TestNightReview(unittest.TestCase):
                     json.dump(meta, f)
         return session_path
 
+    # PURPOSE: get_sessions_basic をテストする
     def test_get_sessions_basic(self):
         files = [
             (
@@ -70,6 +75,7 @@ class TestNightReview(unittest.TestCase):
         self.assertEqual(sessions[0].title, "Title 1")
         self.assertEqual(len(sessions[0].artifacts), 1)
 
+    # PURPOSE: get_sessions_skip_hidden をテストする
     def test_get_sessions_skip_hidden(self):
         files = [("C", {"updatedAt": "2023-01-01T12:00:00Z"})]
         self.create_session("session_hidden", files, is_hidden=True)
@@ -79,6 +85,7 @@ class TestNightReview(unittest.TestCase):
 
         self.assertEqual(len(sessions), 0)
 
+    # PURPOSE: get_sessions_missing_metadata をテストする
     def test_get_sessions_missing_metadata(self):
         # File without metadata should be skipped, but if session has other valid files it might be included?
         # The code says: "if not meta_file.exists(): continue" inside the loop.
@@ -92,6 +99,7 @@ class TestNightReview(unittest.TestCase):
 
         self.assertEqual(len(sessions), 0)
 
+    # PURPOSE: get_sessions_date_filter をテストする
     def test_get_sessions_date_filter(self):
         # Session 1: 2023-10-27
         files1 = [("C1", {"updatedAt": "2023-10-27T10:00:00Z"})]
@@ -109,6 +117,7 @@ class TestNightReview(unittest.TestCase):
         self.assertEqual(len(sessions), 1)
         self.assertEqual(sessions[0].session_id, "s1")
 
+    # PURPOSE: get_sessions_sorting をテストする
     def test_get_sessions_sorting(self):
         # s1: old
         files1 = [("C1", {"updatedAt": "2023-01-01T10:00:00Z"})]

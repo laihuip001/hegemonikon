@@ -19,9 +19,11 @@ from mekhane.symploke.search.engine import SearchEngine, SearchConfig
 from mekhane.symploke.search.ranker import Ranker
 
 
+# PURPOSE: SearchEngine テスト
 class TestSearchEngine:
     """SearchEngine テスト"""
 
+    # PURPOSE: インデックス登録
     def test_register(self):
         """インデックス登録"""
         engine = SearchEngine()
@@ -32,6 +34,7 @@ class TestSearchEngine:
 
         assert "gnosis" in engine.registered_sources
 
+    # PURPOSE: インデックス登録解除
     def test_unregister(self):
         """インデックス登録解除"""
         engine = SearchEngine()
@@ -43,12 +46,14 @@ class TestSearchEngine:
         assert "gnosis" not in engine.registered_sources
         assert engine.unregister("nonexistent") is False
 
+    # PURPOSE: 空エンジンでの検索
     def test_search_empty(self):
         """空エンジンでの検索"""
         engine = SearchEngine()
         results = engine.search("test query")
         assert results == []
 
+    # PURPOSE: 単一ソース検索
     def test_search_single_source(self):
         """単一ソース検索"""
         engine = SearchEngine()
@@ -69,6 +74,7 @@ class TestSearchEngine:
         assert len(results) <= 5
         assert all(r.source == SourceType.GNOSIS for r in results)
 
+    # PURPOSE: stats をテストする
     def test_stats(self):
         """統計情報"""
         engine = SearchEngine()
@@ -85,6 +91,7 @@ class TestSearchEngine:
 
     # ━━━ 統合テスト (Symplokē) ━━━
 
+    # PURPOSE: 複数ソースからの統合検索
     def test_multi_source_search(self):
         """複数ソースからの統合検索"""
         engine = SearchEngine()
@@ -120,6 +127,7 @@ class TestSearchEngine:
         assert SourceType.GNOSIS in sources or SourceType.CHRONOS in sources
         assert len(results) <= 4
 
+    # PURPOSE: 重み付けが結果順序に影響
     def test_source_weights(self):
         """重み付けが結果順序に影響"""
         engine = SearchEngine()
@@ -155,6 +163,7 @@ class TestSearchEngine:
         assert len(results_gnosis_heavy) > 0
         assert len(results_sophia_heavy) > 0
 
+    # PURPOSE: 空のソースが混在しても動作
     def test_empty_source_handling(self):
         """空のソースが混在しても動作"""
         engine = SearchEngine()
@@ -182,6 +191,7 @@ class TestSearchEngine:
         # Chronos からのみ結果が返る
         assert all(r.source == SourceType.CHRONOS for r in results)
 
+    # PURPOSE: 特定ソースのみを検索
     def test_selective_source_search(self):
         """特定ソースのみを検索"""
         engine = SearchEngine()
@@ -202,6 +212,7 @@ class TestSearchEngine:
 
         assert all(r.source == SourceType.GNOSIS for r in results)
 
+    # PURPOSE: 4知識源すべての統合 (Symplokē の本質)
     def test_four_sources_integration(self):
         """4知識源すべての統合 (Symplokē の本質)"""
         engine = SearchEngine()
@@ -230,15 +241,18 @@ class TestSearchEngine:
         assert len(results) > 0
 
 
+# PURPOSE: Ranker テスト
 class TestRanker:
     """Ranker テスト"""
 
+    # PURPOSE: 空結果のランキング
     def test_rank_empty(self):
         """空結果のランキング"""
         ranker = Ranker()
         ranked = ranker.rank({}, {})
         assert ranked == []
 
+    # PURPOSE: 単一ソースのランキング
     def test_rank_single_source(self):
         """単一ソースのランキング"""
         from mekhane.symploke.indices.base import IndexedResult

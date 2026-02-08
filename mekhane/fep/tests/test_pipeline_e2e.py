@@ -41,15 +41,18 @@ _SKIP_NO_MODEL = pytest.mark.skipif(
 # =============================================================================
 
 
+# PURPOSE: Hermēneus CCL パースステージ。
 class TestStageHermeneus:
     """Hermēneus CCL パースステージ。"""
 
+    # PURPOSE: 単純なWFのパース。
     def test_simple_workflow(self):
         """単純なWFのパース。"""
         r = _stage_hermeneus("/dia")
         assert r.success
         assert "/dia" in r.data["workflows"]
 
+    # PURPOSE: 収束振動式のパース。
     def test_oscillation_expr(self):
         """収束振動式のパース。"""
         r = _stage_hermeneus("/dia+~*/noe")
@@ -57,24 +60,28 @@ class TestStageHermeneus:
         assert "/dia" in r.data["workflows"]
         assert "/noe" in r.data["workflows"]
 
+    # PURPOSE: 複合式のパース。
     def test_complex_expr(self):
         """複合式のパース。"""
         r = _stage_hermeneus("/dia+~*/noe~*/pan+")
         assert r.success
         assert len(r.data["workflows"]) >= 2
 
+    # PURPOSE: 不正な式はパース失敗。
     def test_invalid_expr(self):
         """不正な式はパース失敗。"""
         r = _stage_hermeneus("???invalid{{{")
         assert not r.success
         assert r.error is not None
 
+    # PURPOSE: 成功時にASTが存在する。
     def test_ast_is_present(self):
         """成功時にASTが存在する。"""
         r = _stage_hermeneus("/noe")
         assert r.success
         assert r.data["ast"] is not None
 
+    # PURPOSE: 成功時に木構造表示が存在する。
     def test_tree_is_present(self):
         """成功時に木構造表示が存在する。"""
         r = _stage_hermeneus("/noe+")
@@ -87,22 +94,26 @@ class TestStageHermeneus:
 # =============================================================================
 
 
+# PURPOSE: Attractor Series 識別ステージ。
 @_SKIP_NO_MODEL
 class TestStageAttractor:
     """Attractor Series 識別ステージ。"""
 
+    # PURPOSE: 日本語入力からSeriesを識別。
     def test_japanese_input(self):
         """日本語入力からSeriesを識別。"""
         r = _stage_attractor("なぜこれが存在するのか、本質を問いたい")
         assert r.success
         assert len(r.data["series"]) >= 1
 
+    # PURPOSE: OscillationType が返る。
     def test_returns_oscillation(self):
         """OscillationType が返る。"""
         r = _stage_attractor("設計パターンを評価して品質基準を決める")
         assert r.success
         assert r.data["oscillation"] is not None
 
+    # PURPOSE: 類似度スコアが返る。
     def test_returns_similarity(self):
         """類似度スコアが返る。"""
         r = _stage_attractor("アーキテクチャを設計する")
@@ -115,25 +126,30 @@ class TestStageAttractor:
 # =============================================================================
 
 
+# PURPOSE: PW 解決ステージ。
 class TestStagePW:
     """PW 解決ステージ。"""
 
+    # PURPOSE: O-series の PW が返る。
     def test_o_series_pw(self):
         """O-series の PW が返る。"""
         r = _stage_pw("O")
         assert r.success
         assert "pw" in r.data
 
+    # PURPOSE: コンテキスト付きPW推定。
     def test_s_series_with_context(self):
         """コンテキスト付きPW推定。"""
         r = _stage_pw("S", context="詳細な設計手順が必要")
         assert r.success
 
+    # PURPOSE: Series なし → 失敗。
     def test_none_series_fails(self):
         """Series なし → 失敗。"""
         r = _stage_pw(None)
         assert not r.success
 
+    # PURPOSE: 全6 Series でPWが返る。
     def test_all_series(self):
         """全6 Series でPWが返る。"""
         for s in ["O", "S", "H", "P", "K", "A"]:
@@ -146,9 +162,11 @@ class TestStagePW:
 # =============================================================================
 
 
+# PURPOSE: Cone 構築ステージ。
 class TestStageCone:
     """Cone 構築ステージ。"""
 
+    # PURPOSE: O-series の Cone が構築できる。
     def test_o_series_cone(self):
         """O-series の Cone が構築できる。"""
         outputs = _generate_stub_outputs("O")
@@ -157,6 +175,7 @@ class TestStageCone:
         assert r.data["apex"] is not None
         assert r.data["method"] is not None
 
+    # PURPOSE: PW付きCone構築。
     def test_s_series_with_pw(self):
         """PW付きCone構築。"""
         outputs = _generate_stub_outputs("S")
@@ -165,6 +184,7 @@ class TestStageCone:
         assert r.success
         assert r.data["method"] in ("simple", "pw_weighted", "root")
 
+    # PURPOSE: Series なし → 失敗。
     def test_none_series_fails(self):
         """Series なし → 失敗。"""
         r = _stage_cone(None, {}, {})
@@ -176,10 +196,12 @@ class TestStageCone:
 # =============================================================================
 
 
+# PURPOSE: E2E パイプライン統合テスト (ONNX モデル依存)。
 @_SKIP_NO_MODEL
 class TestE2EPipeline:
     """E2E パイプライン統合テスト (ONNX モデル依存)。"""
 
+    # PURPOSE: 単純WF: /dia → A-series まで通る。
     def test_simple_workflow_e2e(self):
         """単純WF: /dia → A-series まで通る。"""
         result = run_pipeline("/dia", force_cpu=True, use_gnosis=False)
@@ -188,6 +210,7 @@ class TestE2EPipeline:
         # PW + Cone may or may not succeed depending on attractor output
         assert len(result.stages) >= 3
 
+    # PURPOSE: 合成WF: /dia+~*/noe → 複数 Series oscillation。
     def test_oscillation_expr_e2e(self):
         """合成WF: /dia+~*/noe → 複数 Series oscillation。"""
         result = run_pipeline("/dia+~*/noe", force_cpu=True, use_gnosis=False)
@@ -196,6 +219,7 @@ class TestE2EPipeline:
         # Should get to at least Stage 3
         assert len(result.stages) >= 3
 
+    # PURPOSE: 明示PW付きWF: /noe → Oseriesまで通る。
     def test_explicit_pw_e2e(self):
         """明示PW付きWF: /noe → Oseriesまで通る。"""
         result = run_pipeline("/noe+", force_cpu=True, use_gnosis=False)
@@ -204,6 +228,7 @@ class TestE2EPipeline:
         if result.all_passed:
             assert result.llm_injection != ""
 
+    # PURPOSE: mock_outputsが使われると全ステージ通る。
     def test_mock_outputs_used(self):
         """mock_outputsが使われると全ステージ通る。"""
         mock = {
@@ -222,6 +247,7 @@ class TestE2EPipeline:
             if cone_stage.success:
                 assert cone_stage.data["apex"] is not None
 
+    # PURPOSE: summary() が読めるフォーマットを返す。
     def test_summary_format(self):
         """summary() が読めるフォーマットを返す。"""
         result = run_pipeline("/noe", force_cpu=True, use_gnosis=False)
@@ -230,9 +256,11 @@ class TestE2EPipeline:
         assert "✅" in summary or "❌" in summary
 
 
+# PURPOSE: E2E パイプラインテスト (モデル不要)。
 class TestE2EModelIndependent:
     """E2E パイプラインテスト (モデル不要)。"""
 
+    # PURPOSE: パース失敗 → Stage 1 で停止、残りスキップ。
     def test_parse_failure_graceful(self):
         """パース失敗 → Stage 1 で停止、残りスキップ。"""
         result = run_pipeline("???invalid{{{", force_cpu=True)
@@ -241,6 +269,7 @@ class TestE2EModelIndependent:
         assert len(result.stages) == 2  # uml_pre + hermeneus
         assert result.stages[-1].name == "hermeneus"
 
+    # PURPOSE: 日本語自然言語 → パース失敗 → Stage 1 で停止。
     def test_japanese_fallback_e2e(self):
         """日本語自然言語 → パース失敗 → Stage 1 で停止。
         (CCLパーサーは自然言語をパースしない — これは期待通りの挙動)"""
@@ -248,6 +277,7 @@ class TestE2EModelIndependent:
         # Natural language is NOT valid CCL, so hermeneus should fail
         assert result.failed_at == "hermeneus"
 
+    # PURPOSE: 空文字列 → パース失敗。
     def test_empty_ccl(self):
         """空文字列 → パース失敗。"""
         result = run_pipeline("", force_cpu=True)
@@ -259,9 +289,11 @@ class TestE2EModelIndependent:
 # =============================================================================
 
 
+# PURPOSE: スタブ出力生成。
 class TestStubOutputs:
     """スタブ出力生成。"""
 
+    # PURPOSE: O-series → O1-O4 のスタブ。
     def test_o_series_stubs(self):
         """O-series → O1-O4 のスタブ。"""
         outputs = _generate_stub_outputs("O")
@@ -269,11 +301,13 @@ class TestStubOutputs:
         assert "O1" in outputs
         assert "O4" in outputs
 
+    # PURPOSE: 未知Series → 空。
     def test_unknown_series_empty(self):
         """未知Series → 空。"""
         outputs = _generate_stub_outputs("Z")
         assert outputs == {}
 
+    # PURPOSE: none_series_empty をテストする
     def test_none_series_empty(self):
         outputs = _generate_stub_outputs(None)
         assert outputs == {}
@@ -284,9 +318,11 @@ class TestStubOutputs:
 # =============================================================================
 
 
+# PURPOSE: PipelineResult のプロパティ。
 class TestPipelineResult:
     """PipelineResult のプロパティ。"""
 
+    # PURPOSE: 全ステージ成功。
     def test_all_passed_true(self):
         """全ステージ成功。"""
         r = PipelineResult(ccl_expr="test", stages=[
@@ -296,6 +332,7 @@ class TestPipelineResult:
         assert r.all_passed
         assert r.failed_at is None
 
+    # PURPOSE: 1ステージ失敗。
     def test_all_passed_false(self):
         """1ステージ失敗。"""
         r = PipelineResult(ccl_expr="test", stages=[
@@ -305,6 +342,7 @@ class TestPipelineResult:
         assert not r.all_passed
         assert r.failed_at == "b"
 
+    # PURPOSE: ステージなし → all_passed = True (vacuous truth)。
     def test_empty_stages(self):
         """ステージなし → all_passed = True (vacuous truth)。"""
         r = PipelineResult(ccl_expr="test")

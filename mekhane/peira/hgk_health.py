@@ -28,6 +28,7 @@ class HealthItem:
     detail: str = ""
     metric: Optional[float] = None
 
+    # PURPOSE: emoji の処理
     @property
     def emoji(self) -> str:
         return {"ok": "🟢", "warn": "🟡", "error": "🔴", "unknown": "⚪"}.get(self.status, "❓")
@@ -38,6 +39,7 @@ class HealthReport:
     timestamp: str = ""
     items: list[HealthItem] = field(default_factory=list)
 
+    # PURPOSE: 0.0-1.0 の総合スコア
     @property
     def score(self) -> float:
         """0.0-1.0 の総合スコア"""

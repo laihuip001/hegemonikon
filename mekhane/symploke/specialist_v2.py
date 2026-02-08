@@ -27,6 +27,7 @@ from typing import Optional
 
 # ============ Archetype (アーキタイプ) ============
 
+# PURPOSE: tekhne-maker 5 Archetypes — 専門家の本質的傾向
 class Archetype(Enum):
     """tekhne-maker 5 Archetypes — 専門家の本質的傾向"""
     
@@ -37,6 +38,7 @@ class Archetype(Enum):
     SAFETY = "safety"          # 🛡 安全追求 — リスクを許さない
 
 
+# PURPOSE: 判決の形式
 class VerdictFormat(Enum):
     """判決の形式"""
     
@@ -46,6 +48,7 @@ class VerdictFormat(Enum):
     QUESTION = "question"      # 質問を出力（確認が必要な場合）
 
 
+# PURPOSE: 発見事項の重大度
 class Severity(Enum):
     """発見事項の重大度"""
     
@@ -58,6 +61,7 @@ class Severity(Enum):
 
 # ============ Specialist (専門家) ============
 
+# PURPOSE: 純化された知性 — 一点豪華主義者
 @dataclass
 class Specialist:
     """
@@ -738,6 +742,7 @@ def __getattr__(name):
 
 # ============ プロンプト生成 ============
 
+# PURPOSE: 専門家レビュープロンプトを生成。
 def generate_prompt(
     spec: Specialist,
     target_file: str,
@@ -840,16 +845,19 @@ Critical / High / Medium / Low / None
 
 # ============ ユーティリティ ============
 
+# PURPOSE: カテゴリ別に専門家を取得
 def get_specialists_by_category(category: str) -> list[Specialist]:
     """カテゴリ別に専門家を取得"""
     return [s for s in _get_all_specialists() if s.category == category]
 
 
+# PURPOSE: アーキタイプ別に専門家を取得
 def get_specialists_by_archetype(archetype: Archetype) -> list[Specialist]:
     """アーキタイプ別に専門家を取得"""
     return [s for s in _get_all_specialists() if s.archetype == archetype]
 
 
+# PURPOSE: 全カテゴリを取得
 def get_all_categories() -> list[str]:
     """全カテゴリを取得"""
     return sorted(set(s.category for s in _get_all_specialists()))

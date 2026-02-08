@@ -22,6 +22,7 @@ from typing import Optional
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 
+# PURPOSE: Extract Dispatcher dispatch plan from context
 def extract_dispatch_info(context: str, gpu_ok: bool = True) -> dict:
     """Extract Dispatcher dispatch plan from context.
 
@@ -137,6 +138,7 @@ def _load_projects(project_root: Path) -> dict:
     return result
 
 
+# PURPOSE: /boot 統合 API: 9軸（Handoff, Sophia, Persona, PKS, Safety, EPT, Digestor, Attractor, Projects）を統合して返す
 def get_boot_context(mode: str = "standard", context: Optional[str] = None) -> dict:
     """
     /boot 統合 API: 9軸（Handoff, Sophia, Persona, PKS, Safety, EPT, Digestor, Attractor, Projects）を統合して返す
@@ -619,6 +621,7 @@ def get_boot_context(mode: str = "standard", context: Optional[str] = None) -> d
     }
 
 
+# PURPOSE: Print formatted boot summary
 def print_boot_summary(mode: str = "standard", context: Optional[str] = None):
     """Print formatted boot summary."""
     result = get_boot_context(mode=mode, context=context)
@@ -686,6 +689,7 @@ MODE_REQUIREMENTS = {
 }
 
 
+# PURPOSE: 環境強制: モード別の穴埋めテンプレートを生成する。
 def generate_boot_template(result: dict) -> Path:
     """
     環境強制: モード別の穴埋めテンプレートを生成する。
@@ -821,6 +825,7 @@ def generate_boot_template(result: dict) -> Path:
 # ポストチェック (B) — 環境強制: 記入済みレポートの検証
 # ============================================================
 
+# PURPOSE: 記入済み boot report を検証する。
 def postcheck_boot_report(report_path: str, mode: str = "detailed") -> dict:
     """
     記入済み boot report を検証する。
@@ -952,6 +957,7 @@ def postcheck_boot_report(report_path: str, mode: str = "detailed") -> dict:
     }
 
 
+# PURPOSE: main の処理
 def main():
     parser = argparse.ArgumentParser(description="Boot integration API")
     parser.add_argument(

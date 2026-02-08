@@ -29,14 +29,17 @@ def _make_interpretation() -> OscillationDiagnosis:
     )
 
 
+# PURPOSE: Gnōsis × Attractor integration tests
 class TestGnosisEnrichment:
     """Gnōsis × Attractor integration tests."""
 
+    # PURPOSE: Recommendation dataclass has knowledge_context field
     def test_recommendation_has_knowledge_context_field(self):
         """Recommendation dataclass has knowledge_context field."""
         field_names = [f.name for f in fields(Recommendation)]
         assert "knowledge_context" in field_names
 
+    # PURPOSE: Default knowledge_context is empty list
     def test_recommendation_knowledge_context_default_empty(self):
         """Default knowledge_context is empty list."""
         rec = Recommendation(
@@ -49,16 +52,19 @@ class TestGnosisEnrichment:
         )
         assert rec.knowledge_context == []
 
+    # PURPOSE: AttractorAdvisor accepts use_gnosis parameter
     def test_advisor_has_use_gnosis_flag(self):
         """AttractorAdvisor accepts use_gnosis parameter."""
         advisor = AttractorAdvisor(force_cpu=True, use_gnosis=False)
         assert advisor._use_gnosis is False
 
+    # PURPOSE: Gnōsis is enabled by default
     def test_advisor_default_gnosis_enabled(self):
         """Gnōsis is enabled by default."""
         advisor = AttractorAdvisor(force_cpu=True)
         assert advisor._use_gnosis is True
 
+    # PURPOSE: _retrieve_gnosis always returns a list (empty or populated)
     def test_retrieve_gnosis_returns_list(self):
         """_retrieve_gnosis always returns a list (empty or populated)."""
         advisor = AttractorAdvisor(force_cpu=True)
@@ -68,6 +74,7 @@ class TestGnosisEnrichment:
         for item in result:
             assert "ki_name" in item
 
+    # PURPOSE: _retrieve_gnosis returns empty on import error
     def test_retrieve_gnosis_graceful_on_import_error(self):
         """_retrieve_gnosis returns empty on import error."""
         advisor = AttractorAdvisor(force_cpu=True)
@@ -76,6 +83,7 @@ class TestGnosisEnrichment:
             result = advisor._retrieve_gnosis("test query")
             assert isinstance(result, list)
 
+    # PURPOSE: format_for_llm outputs [Knowledge: ...] when knowledge_context is set
     def test_format_for_llm_includes_knowledge_line(self):
         """format_for_llm outputs [Knowledge: ...] when knowledge_context is set."""
         advisor = AttractorAdvisor(force_cpu=True, use_gnosis=False)
@@ -100,6 +108,7 @@ class TestGnosisEnrichment:
         assert "Core System" in output
         assert "FEP Theory" in output
 
+    # PURPOSE: format_for_llm omits [Knowledge:] when no knowledge_context
     def test_format_for_llm_no_knowledge_when_empty(self):
         """format_for_llm omits [Knowledge:] when no knowledge_context."""
         advisor = AttractorAdvisor(force_cpu=True, use_gnosis=False)
@@ -119,6 +128,7 @@ class TestGnosisEnrichment:
 
         assert "[Knowledge:" not in output
 
+    # PURPOSE: recommend() works without Gnōsis when use_gnosis=False
     def test_recommend_with_gnosis_disabled_no_crash(self):
         """recommend() works without Gnōsis when use_gnosis=False."""
         advisor = AttractorAdvisor(force_cpu=True, use_gnosis=False)
@@ -135,6 +145,7 @@ class TestGnosisEnrichment:
 
         assert rec.knowledge_context == []
 
+    # PURPOSE: recommend() with Gnōsis enabled completes (even without index)
     def test_recommend_with_gnosis_enabled_no_crash(self):
         """recommend() with Gnōsis enabled completes (even without index)."""
         advisor = AttractorAdvisor(force_cpu=True, use_gnosis=True)

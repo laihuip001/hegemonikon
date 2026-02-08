@@ -20,6 +20,7 @@ from .adapters.base import VectorStoreAdapter
 from .config import VectorStoreConfig
 
 
+# PURPOSE: ベクトルストアファクトリ
 class VectorStoreFactory:
     """
     ベクトルストアファクトリ
@@ -34,11 +35,13 @@ class VectorStoreFactory:
 
     _adapters: Dict[str, Type[VectorStoreAdapter]] = {}
 
+    # PURPOSE: アダプタを登録
     @classmethod
     def register(cls, name: str, adapter_class: Type[VectorStoreAdapter]) -> None:
         """アダプタを登録"""
         cls._adapters[name.lower()] = adapter_class
 
+    # PURPOSE: アダプタを生成
     @classmethod
     def create(
         cls, name: str, config: Optional[VectorStoreConfig] = None, **kwargs
@@ -83,11 +86,13 @@ class VectorStoreFactory:
         adapter = cls._adapters[name](**adapter_kwargs)
         return adapter
 
+    # PURPOSE: 登録済みアダプタ一覧
     @classmethod
     def list_adapters(cls) -> list[str]:
         """登録済みアダプタ一覧"""
         return list(cls._adapters.keys())
 
+    # PURPOSE: アダプタが登録済みか確認
     @classmethod
     def is_registered(cls, name: str) -> bool:
         """アダプタが登録済みか確認"""

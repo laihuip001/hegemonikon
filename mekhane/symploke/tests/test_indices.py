@@ -23,9 +23,11 @@ from mekhane.symploke.indices.sophia import SophiaIndex
 from mekhane.symploke.indices.kairos import KairosIndex
 
 
+# PURPOSE: MockAdapter テスト
 class TestMockAdapter:
     """MockAdapter テスト"""
 
+    # PURPOSE: インデックス作成
     def test_create_index(self):
         """インデックス作成"""
         adapter = MockAdapter()
@@ -33,6 +35,7 @@ class TestMockAdapter:
         assert adapter.dimension == 768
         assert adapter.count() == 0
 
+    # PURPOSE: ベクトル追加
     def test_add_vectors(self):
         """ベクトル追加"""
         adapter = MockAdapter()
@@ -44,6 +47,7 @@ class TestMockAdapter:
         assert len(ids) == 10
         assert adapter.count() == 10
 
+    # PURPOSE: メタデータ付きベクトル追加
     def test_add_vectors_with_metadata(self):
         """メタデータ付きベクトル追加"""
         adapter = MockAdapter()
@@ -56,6 +60,7 @@ class TestMockAdapter:
         assert len(ids) == 5
         assert adapter.get_metadata(0) == {"title": "Doc 0"}
 
+    # PURPOSE: search をテストする
     def test_search(self):
         """検索"""
         adapter = MockAdapter()
@@ -70,15 +75,18 @@ class TestMockAdapter:
         assert len(results) == 5
 
 
+# PURPOSE: GnosisIndex テスト
 class TestGnosisIndex:
     """GnosisIndex テスト"""
 
+    # PURPOSE: ソース種別
     def test_source_type(self):
         """ソース種別"""
         adapter = MockAdapter()
         gnosis = GnosisIndex(adapter, "gnosis")
         assert gnosis.source_type == SourceType.GNOSIS
 
+    # PURPOSE: ドキュメントインジェスト
     def test_ingest(self):
         """ドキュメントインジェスト"""
         adapter = MockAdapter()
@@ -93,6 +101,7 @@ class TestGnosisIndex:
         assert count == 2
         assert gnosis.count() == 2
 
+    # PURPOSE: search をテストする
     def test_search(self):
         """検索"""
         adapter = MockAdapter()
@@ -111,14 +120,17 @@ class TestGnosisIndex:
         assert all(r.source == SourceType.GNOSIS for r in results)
 
 
+# PURPOSE: ChronosIndex テスト
 class TestChronosIndex:
     """ChronosIndex テスト"""
 
+    # PURPOSE: source_type をテストする
     def test_source_type(self):
         adapter = MockAdapter()
         chronos = ChronosIndex(adapter, "chronos", dimension=128)
         assert chronos.source_type == SourceType.CHRONOS
 
+    # PURPOSE: ingest をテストする
     def test_ingest(self):
         adapter = MockAdapter()
         chronos = ChronosIndex(adapter, "chronos", dimension=128)
@@ -132,6 +144,7 @@ class TestChronosIndex:
         assert count == 2
         assert chronos.count() == 2
 
+    # PURPOSE: search をテストする
     def test_search(self):
         adapter = MockAdapter()
         chronos = ChronosIndex(adapter, "chronos", dimension=128)
@@ -144,14 +157,17 @@ class TestChronosIndex:
         assert all(r.source == SourceType.CHRONOS for r in results)
 
 
+# PURPOSE: SophiaIndex テスト
 class TestSophiaIndex:
     """SophiaIndex テスト"""
 
+    # PURPOSE: source_type をテストする
     def test_source_type(self):
         adapter = MockAdapter()
         sophia = SophiaIndex(adapter, "sophia", dimension=128)
         assert sophia.source_type == SourceType.SOPHIA
 
+    # PURPOSE: ingest をテストする
     def test_ingest(self):
         adapter = MockAdapter()
         sophia = SophiaIndex(adapter, "sophia", dimension=128)
@@ -166,14 +182,17 @@ class TestSophiaIndex:
         assert count == 1
 
 
+# PURPOSE: KairosIndex テスト
 class TestKairosIndex:
     """KairosIndex テスト"""
 
+    # PURPOSE: source_type をテストする
     def test_source_type(self):
         adapter = MockAdapter()
         kairos = KairosIndex(adapter, "kairos", dimension=128)
         assert kairos.source_type == SourceType.KAIROS
 
+    # PURPOSE: ingest をテストする
     def test_ingest(self):
         adapter = MockAdapter()
         kairos = KairosIndex(adapter, "kairos", dimension=128)
@@ -187,6 +206,7 @@ class TestKairosIndex:
 
         assert count == 1
 
+    # PURPOSE: get_pending_tasks をテストする
     def test_get_pending_tasks(self):
         adapter = MockAdapter()
         kairos = KairosIndex(adapter, "kairos", dimension=128)

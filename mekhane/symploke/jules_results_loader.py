@@ -26,6 +26,7 @@ RESULTS_DIR = Path(__file__).parent.parent.parent / "docs"
 RESULTS_PATTERN = "specialist_run_*.json"
 
 
+# PURPOSE: Finding の実装
 @dataclass
 class Finding:
     """発見事項"""
@@ -36,6 +37,7 @@ class Finding:
     file_path: Optional[str] = None
 
 
+# PURPOSE: Julesバッチ実行結果
 @dataclass
 class JulesRunResults:
     """Julesバッチ実行結果"""
@@ -49,6 +51,7 @@ class JulesRunResults:
     findings: List[Finding] = field(default_factory=list)
 
 
+# PURPOSE: 最新のJules実行結果を読み込み
 def load_latest_results() -> Optional[JulesRunResults]:
     """最新のJules実行結果を読み込み"""
     result_files = sorted(RESULTS_DIR.glob(RESULTS_PATTERN), reverse=True)
@@ -79,6 +82,7 @@ def load_latest_results() -> Optional[JulesRunResults]:
         return None
 
 
+# PURPOSE: 最近N日分の結果を読み込み
 def load_all_recent_results(days: int = 7) -> List[JulesRunResults]:
     """最近N日分の結果を読み込み"""
     result_files = sorted(RESULTS_DIR.glob(RESULTS_PATTERN), reverse=True)
@@ -113,6 +117,7 @@ def load_all_recent_results(days: int = 7) -> List[JulesRunResults]:
     return results
 
 
+# PURPOSE: 発見事項のサマリーを生成
 def summarize_findings(results: Optional[JulesRunResults]) -> str:
     """発見事項のサマリーを生成"""
     if not results:
@@ -148,6 +153,7 @@ def summarize_findings(results: Optional[JulesRunResults]) -> str:
     return "\n".join(lines)
 
 
+# PURPOSE: セッションURLのリストを取得
 def get_session_urls(results: Optional[JulesRunResults]) -> List[str]:
     """セッションURLのリストを取得"""
     if not results:
@@ -161,6 +167,7 @@ def get_session_urls(results: Optional[JulesRunResults]) -> List[str]:
     return urls
 
 
+# PURPOSE: サマリーを標準出力に表示（CLI用）
 def print_summary():
     """サマリーを標準出力に表示（CLI用）"""
     results = load_latest_results()

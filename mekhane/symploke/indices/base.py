@@ -15,6 +15,7 @@ if TYPE_CHECKING:
     from ..adapters.base import VectorStoreAdapter, SearchResult
 
 
+# PURPOSE: 知識ソース種別
 class SourceType(Enum):
     """知識ソース種別"""
 
@@ -24,6 +25,7 @@ class SourceType(Enum):
     KAIROS = "kairos"  # Handoff (文脈)
 
 
+# PURPOSE: インデックス用ドキュメント
 @dataclass
 class Document:
     """インデックス用ドキュメント"""
@@ -34,6 +36,7 @@ class Document:
     embedding: Optional[List[float]] = None
 
 
+# PURPOSE: ドメイン固有検索結果
 @dataclass
 class IndexedResult:
     """ドメイン固有検索結果"""
@@ -45,6 +48,7 @@ class IndexedResult:
     metadata: Dict[str, Any]
 
 
+# PURPOSE: ドメイン固有インデックスの抽象基底クラス
 class DomainIndex(ABC):
     """
     ドメイン固有インデックスの抽象基底クラス
@@ -75,26 +79,31 @@ class DomainIndex(ABC):
         self._dimension = dimension
         self._initialized = False
 
+    # PURPOSE: name の処理
     @property
     def name(self) -> str:
         return self._name
 
+    # PURPOSE: adapter の処理
     @property
     def adapter(self) -> "VectorStoreAdapter":
         return self._adapter
 
+    # PURPOSE: ソース種別 (gnosis/chronos/sophia/kairos)
     @property
     @abstractmethod
     def source_type(self) -> SourceType:
         """ソース種別 (gnosis/chronos/sophia/kairos)"""
         pass
 
+    # PURPOSE: インデックスを初期化
     def initialize(self) -> None:
         """インデックスを初期化"""
         if not self._initialized:
             self._adapter.create_index(dimension=self._dimension, index_name=self._name)
             self._initialized = True
 
+    # PURPOSE: ドキュメントをベクトル化して追加
     @abstractmethod
     def ingest(self, documents: List[Document]) -> int:
         """
@@ -108,6 +117,7 @@ class DomainIndex(ABC):
         """
         pass
 
+    # PURPOSE: テキストクエリで検索
     @abstractmethod
     def search(self, query: str, k: int = 10, **kwargs) -> List[IndexedResult]:
         """
@@ -123,14 +133,17 @@ class DomainIndex(ABC):
         """
         pass
 
+    # PURPOSE: 現在のドキュメント数
     def count(self) -> int:
         """現在のドキュメント数"""
         return self._adapter.count()
 
+    # PURPOSE: インデックスを永続化
     def save(self, path: str) -> None:
         """インデックスを永続化"""
         self._adapter.save(path)
 
+    # PURPOSE: インデックスを読み込み
     def load(self, path: str) -> None:
         """インデックスを読み込み"""
         self._adapter.load(path)

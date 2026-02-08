@@ -22,9 +22,11 @@ from mekhane.fep.config import (
 )
 
 
+# PURPOSE: Test FEPParameters dataclass
 class TestFEPParameters:
     """Test FEPParameters dataclass."""
 
+    # PURPOSE: Default values match literature
     def test_default_values(self):
         """Default values match literature."""
         params = FEPParameters()
@@ -49,9 +51,11 @@ class TestFEPParameters:
         assert params.hyperparams.alpha == 16.0
 
 
+# PURPOSE: Test load_parameters function
 class TestLoadParameters:
     """Test load_parameters function."""
 
+    # PURPOSE: Load parameters from module directory
     def test_load_from_default_path(self):
         """Load parameters from module directory."""
         if PARAMETERS_PATH.exists():
@@ -59,6 +63,7 @@ class TestLoadParameters:
             assert params.version != "default"
             assert params.confidence != "default"
 
+    # PURPOSE: Fallback to defaults when file missing
     def test_fallback_on_missing_file(self):
         """Fallback to defaults when file missing."""
         fake_path = Path("/nonexistent/parameters.yaml")
@@ -67,6 +72,7 @@ class TestLoadParameters:
         assert params.version == "default"
         assert params.A.high_reliability == 0.85
 
+    # PURPOSE: Load from custom YAML file
     def test_load_from_custom_yaml(self):
         """Load from custom YAML file."""
         custom_yaml = {
@@ -94,15 +100,18 @@ class TestLoadParameters:
             temp_path.unlink()
 
 
+# PURPOSE: Test parameter caching behavior
 class TestParametersCaching:
     """Test parameter caching behavior."""
 
+    # PURPOSE: get_default_params returns cached singleton
     def test_get_default_params_caching(self):
         """get_default_params returns cached singleton."""
         params1 = get_default_params()
         params2 = get_default_params()
         assert params1 is params2
 
+    # PURPOSE: reload_params forces fresh load
     def test_reload_params(self):
         """reload_params forces fresh load."""
         params1 = get_default_params()
@@ -111,9 +120,11 @@ class TestParametersCaching:
         assert params2.A.high_reliability == params1.A.high_reliability
 
 
+# PURPOSE: Integration tests with actual parameters.yaml
 class TestIntegrationWithParametersYAML:
     """Integration tests with actual parameters.yaml."""
 
+    # PURPOSE: Verify parameters.yaml has expected structure
     def test_actual_yaml_structure(self):
         """Verify parameters.yaml has expected structure."""
         if not PARAMETERS_PATH.exists():
@@ -129,6 +140,7 @@ class TestIntegrationWithParametersYAML:
         assert "D_vector" in data
         assert "hyperparameters" in data
 
+    # PURPOSE: Verify parameters match cross-validated sources
     def test_crossvalidated_values(self):
         """Verify parameters match cross-validated sources."""
         if not PARAMETERS_PATH.exists():

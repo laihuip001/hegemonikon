@@ -198,6 +198,7 @@ class Reranker:
         return filtered[:top_k]
 
 
+# PURPOSE: Hegemonikón 全知識をインデックスに追加するユーティリティ
 class KnowledgeIndexer:
     """Hegemonikón 全知識をインデックスに追加するユーティリティ."""
 
@@ -446,6 +447,7 @@ class KnowledgeIndexer:
         return len(data)
 
 
+# PURPOSE: Gnōsis 対話型 RAG エンジン
 class GnosisChat:
     """Gnōsis 対話型 RAG エンジン.
 
@@ -808,6 +810,7 @@ class GnosisChat:
             "turn": self.history.turn_count,
         }
 
+    # PURPOSE: 検索のみ実行 (LLM 不使用). Claude (IDE) が Generation する用
     def retrieve_only(self, query: str) -> dict:
         """検索のみ実行 (LLM 不使用). Claude (IDE) が Generation する用."""
         t0 = time.time()
@@ -926,6 +929,7 @@ class GnosisChat:
             print(f"\n📚 {len(result['sources'])} sources (/sources for details)")
 
 
+# PURPOSE: CLI entry point for chat command
 def cmd_chat(args) -> int:
     """CLI entry point for chat command."""
     chat = GnosisChat(
@@ -965,6 +969,7 @@ def cmd_chat(args) -> int:
         return 0
 
 
+# PURPOSE: CLI entry point for retrieve command (no LLM)
 def cmd_retrieve(args) -> int:
     """CLI entry point for retrieve command (no LLM)."""
     chat = GnosisChat(top_k=args.top_k)

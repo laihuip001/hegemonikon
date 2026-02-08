@@ -205,6 +205,7 @@ def mask_pii(text: str, use_custom_vocab: bool = True) -> Tuple[str, Dict[str, s
     return EpocheShield().mask(text, use_custom_vocab)
 
 
+# PURPOSE: Backward compatibility function
 def unmask_pii(text: str, mapping: Dict[str, str]) -> str:
     """Backward compatibility function"""
     return EpocheShield().unmask(text, mapping)

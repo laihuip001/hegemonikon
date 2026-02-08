@@ -21,6 +21,7 @@ from ..base import (
 )
 
 
+# PURPOSE: 演算子理解検証エージェント
 class OperatorAgent(AuditAgent):
     """演算子理解検証エージェント"""
 
@@ -53,6 +54,7 @@ class OperatorAgent(AuditAgent):
         (r"/\w+\s+/\w+", "OP-005", "ワークフロー間にスペース。>> または _ を使用"),
     ]
 
+    # PURPOSE: 演算子理解を監査
     def audit(self, target: AuditTarget) -> AgentResult:
         """演算子理解を監査"""
         issues: List[AuditIssue] = []
@@ -144,6 +146,7 @@ class OperatorAgent(AuditAgent):
 
         return issues
 
+    # PURPOSE: CCL出力とコードをサポート
     def supports(self, target_type: AuditTargetType) -> bool:
         """CCL出力とコードをサポート"""
         return target_type in (

@@ -30,6 +30,7 @@ class SELRequirement:
 
     description: str
     minimum_requirements: List[str]
+    uml_requirements: Dict[str, str] = field(default_factory=dict)  # stage -> 要件テキスト
 
 
 @dataclass
@@ -43,13 +44,21 @@ class SELValidationResult:
     met_requirements: List[str] = field(default_factory=list)
     missing_requirements: List[str] = field(default_factory=list)
     score: float = 0.0  # 遵守率 0.0-1.0
+    uml_score: float = 0.0  # UML 遵守率 0.0-1.0
+    uml_met: List[str] = field(default_factory=list)
+    uml_missing: List[str] = field(default_factory=list)
     details: str = ""
 
     @property
     # PURPOSE: SEL 遵守検証器
     def summary(self) -> str:
         status = "✅ 遵守" if self.is_compliant else "⚠️ 非遵守"
-        return f"{status} {self.workflow}{self.operator}: {self.score:.0%} ({len(self.met_requirements)}/{len(self.met_requirements) + len(self.missing_requirements)})"
+        total = len(self.met_requirements) + len(self.missing_requirements)
+        uml_part = ""
+        if self.uml_met or self.uml_missing:
+            uml_total = len(self.uml_met) + len(self.uml_missing)
+            uml_part = f" | UML: {len(self.uml_met)}/{uml_total}"
+        return f"{status} {self.workflow}{self.operator}: {self.score:.0%} ({len(self.met_requirements)}/{total}){uml_part}"
 
 # PURPOSE: SEL 遵守検証器
 
@@ -100,6 +109,7 @@ class SELValidator:
                 result[op] = SELRequirement(
                     description=data.get("description", ""),
                     minimum_requirements=data.get("minimum_requirements", []),
+                    uml_requirements=data.get("uml_requirements", {}),
                 )
 
         self._cache[workflow] = result
@@ -176,8 +186,22 @@ class SELValidator:
             else:
                 missing.append(req)
 
+        # UML requirements check
+        uml_met = []
+        uml_missing = []
+        for stage, uml_req in requirement.uml_requirements.items():
+            if self.check_requirement(uml_req, output):
+                uml_met.append(f"{stage}: {uml_req}")
+            else:
+                uml_missing.append(f"{stage}: {uml_req}")
+
         total = len(requirement.minimum_requirements)
         score = len(met) / total if total > 0 else 1.0
+
+        uml_total = len(requirement.uml_requirements)
+        uml_score = len(uml_met) / uml_total if uml_total > 0 else 1.0
+
+        # Combined compliance: SEL must pass, UML is supplementary
         is_compliant = len(missing) == 0
 
         return SELValidationResult(
@@ -187,6 +211,9 @@ class SELValidator:
             met_requirements=met,
             missing_requirements=missing,
             score=score,
+            uml_score=uml_score,
+            uml_met=uml_met,
+            uml_missing=uml_missing,
             details=requirement.description,
         )
 

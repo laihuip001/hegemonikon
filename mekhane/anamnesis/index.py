@@ -174,6 +174,7 @@ class Embedder:
         return normalized.tolist()
 
 
+# PURPOSE: Gnōsis論文インデックス
 class GnosisIndex:
     """Gnōsis論文インデックス"""
 

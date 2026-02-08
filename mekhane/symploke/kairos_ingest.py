@@ -28,6 +28,7 @@ DEFAULT_INDEX_PATH = Path(
 )
 
 
+# PURPOSE: Parse a handoff markdown file into a Document
 def parse_handoff(file_path: Path) -> Document:
     """Parse a handoff markdown file into a Document."""
     content = file_path.read_text(encoding="utf-8")
@@ -58,12 +59,14 @@ def parse_handoff(file_path: Path) -> Document:
     )
 
 
+# PURPOSE: Get all handoff files sorted by date (newest first)
 def get_handoff_files() -> list[Path]:
     """Get all handoff files sorted by date (newest first)."""
     files = list(HANDOFF_DIR.glob("handoff_*.md"))
     return sorted(files, reverse=True)
 
 
+# PURPOSE: Parse a conversation log markdown file into a Document
 def parse_conversation(file_path: Path) -> Document:
     """Parse a conversation log markdown file into a Document.
 
@@ -104,6 +107,7 @@ def parse_conversation(file_path: Path) -> Document:
     )
 
 
+# PURPOSE: Parse a conversation into multiple chunks for better search coverage
 def parse_conversation_chunks(
     file_path: Path, chunk_size: int = 1500
 ) -> list[Document]:
@@ -178,12 +182,14 @@ def parse_conversation_chunks(
     return chunks if chunks else [parse_conversation(file_path)]  # Fallback
 
 
+# PURPOSE: Get all conversation log files sorted by date (newest first)
 def get_conversation_files() -> list[Path]:
     """Get all conversation log files sorted by date (newest first)."""
     files = list(HANDOFF_DIR.glob("*_conv_*.md"))
     return sorted(files, reverse=True)
 
 
+# PURPOSE: Ingest documents to Kairos index using real embeddings
 def ingest_to_kairos(docs: list[Document], save_path: str = None) -> int:
     """Ingest documents to Kairos index using real embeddings."""
     from mekhane.symploke.adapters.embedding_adapter import EmbeddingAdapter
@@ -202,6 +208,7 @@ def ingest_to_kairos(docs: list[Document], save_path: str = None) -> int:
     return count
 
 
+# PURPOSE: Load a previously saved Kairos index
 def load_kairos_index(load_path: str):
     """Load a previously saved Kairos index."""
     from mekhane.symploke.adapters.embedding_adapter import EmbeddingAdapter
@@ -212,6 +219,7 @@ def load_kairos_index(load_path: str):
     return adapter
 
 
+# PURPOSE: Search using a loaded adapter directly
 def search_loaded_index(adapter, query: str, top_k: int = 5):
     """Search using a loaded adapter directly."""
     query_vec = adapter.encode([query])[0]
@@ -219,6 +227,7 @@ def search_loaded_index(adapter, query: str, top_k: int = 5):
     return results
 
 
+# PURPOSE: main の処理
 def main():
     parser = argparse.ArgumentParser(
         description="Ingest handoffs and conversations to Kairos index"

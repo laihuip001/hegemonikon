@@ -37,12 +37,14 @@ CONVERSATION_INDEX_PATH = Path(
 )
 
 
+# PURPOSE: Load all handoffs as documents
 def load_handoffs() -> List[Document]:
     """Load all handoffs as documents."""
     files = get_handoff_files()
     return [parse_handoff(f) for f in files]
 
 
+# PURPOSE: Build and save handoff index
 def build_handoff_index(docs: List[Document] = None) -> EmbeddingAdapter:
     """Build and save handoff index."""
     if docs is None:
@@ -73,6 +75,7 @@ def build_handoff_index(docs: List[Document] = None) -> EmbeddingAdapter:
     return adapter
 
 
+# PURPOSE: Load saved handoff index
 def load_handoff_index() -> EmbeddingAdapter:
     """Load saved handoff index."""
     adapter = EmbeddingAdapter()
@@ -88,6 +91,7 @@ SCORE_BOOST = {
 }
 
 
+# PURPOSE: タイプに基づいてスコアを調整する。
 def adjust_score(score: float, doc_type: str) -> float:
     """タイプに基づいてスコアを調整する。
 
@@ -98,6 +102,7 @@ def adjust_score(score: float, doc_type: str) -> float:
     return min(1.0, score + boost)
 
 
+# PURPOSE: Handoff からキーワードを抽出（Proactive Recall 用）
 def extract_keywords(doc: Document, max_keywords: int = 5) -> List[str]:
     """Handoff からキーワードを抽出（Proactive Recall 用）"""
     content = doc.content
@@ -122,6 +127,7 @@ def extract_keywords(doc: Document, max_keywords: int = 5) -> List[str]:
     return list(set(keywords))[:max_keywords]
 
 
+# PURPOSE: Search handoffs by semantic similarity using cached index
 def search_handoffs(query: str, top_k: int = 5) -> List[Tuple[Document, float]]:
     """Search handoffs by semantic similarity using cached index."""
     docs = load_handoffs()
@@ -150,6 +156,7 @@ def search_handoffs(query: str, top_k: int = 5) -> List[Tuple[Document, float]]:
     return matched
 
 
+# PURPOSE: /boot 統合 API: モードに応じた Handoff と会話ログを返す
 def get_boot_handoffs(mode: str = "standard", context: str = None) -> dict:
     """
     /boot 統合 API: モードに応じた Handoff と会話ログを返す
@@ -256,6 +263,7 @@ def get_boot_handoffs(mode: str = "standard", context: str = None) -> dict:
     }
 
 
+# PURPOSE: /boot 用の出力フォーマット
 def format_boot_output(result: dict, verbose: bool = False) -> str:
     """
     /boot 用の出力フォーマット
@@ -301,6 +309,7 @@ def format_boot_output(result: dict, verbose: bool = False) -> str:
     return "\n".join(lines)
 
 
+# PURPOSE: Show N most recent handoffs
 def show_latest(n: int = 1):
     """Show N most recent handoffs."""
     docs = load_handoffs()[:n]
@@ -313,6 +322,7 @@ def show_latest(n: int = 1):
         print(doc.content[:500] + "..." if len(doc.content) > 500 else doc.content)
 
 
+# PURPOSE: main の処理
 def main():
     parser = argparse.ArgumentParser(description="Search handoffs for /boot")
     parser.add_argument("query", nargs="?", help="Search query")

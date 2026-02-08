@@ -282,6 +282,7 @@ class OrexisResult:
         return self.net_tendency > 0.2
 
 
+# PURPOSE: H3 Orexis: 欲求傾向を評価
 def evaluate_orexis(
     target: str,
     benefits: Optional[List[str]] = None,
@@ -335,6 +336,7 @@ def evaluate_orexis(
 # =============================================================================
 
 
+# PURPOSE: H1 Propatheia 結果をMarkdown形式でフォーマット
 def format_propatheia_markdown(result: PropatheiaResult) -> str:
     """H1 Propatheia 結果をMarkdown形式でフォーマット"""
     valence_emoji = (
@@ -353,6 +355,7 @@ def format_propatheia_markdown(result: PropatheiaResult) -> str:
     return "\n".join(lines)
 
 
+# PURPOSE: H2 Pistis 結果をMarkdown形式でフォーマット
 def format_pistis_markdown(result: PistisResult) -> str:
     """H2 Pistis 結果をMarkdown形式でフォーマット"""
     conf_emoji = (
@@ -373,6 +376,7 @@ def format_pistis_markdown(result: PistisResult) -> str:
     return "\n".join(lines)
 
 
+# PURPOSE: H3 Orexis 結果をMarkdown形式でフォーマット
 def format_orexis_markdown(result: OrexisResult) -> str:
     """H3 Orexis 結果をMarkdown形式でフォーマット"""
     tend_emoji = (
@@ -398,6 +402,7 @@ def format_orexis_markdown(result: OrexisResult) -> str:
 # =============================================================================
 
 
+# PURPOSE: FEP観察空間へのエンコード
 def encode_horme_observation(
     propatheia: Optional[PropatheiaResult] = None,
     pistis: Optional[PistisResult] = None,

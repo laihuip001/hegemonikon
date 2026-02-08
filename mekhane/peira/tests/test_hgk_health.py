@@ -30,18 +30,22 @@ class TestHealthItem(unittest.TestCase):
         item = HealthItem("Test", "ok", "detail")
         self.assertEqual(item.emoji, "🟢")
 
+    # PURPOSE: error_emoji をテストする
     def test_error_emoji(self):
         item = HealthItem("Test", "error", "detail")
         self.assertEqual(item.emoji, "🔴")
 
+    # PURPOSE: warn_emoji をテストする
     def test_warn_emoji(self):
         item = HealthItem("Test", "warn", "detail")
         self.assertEqual(item.emoji, "🟡")
 
+    # PURPOSE: unknown_emoji をテストする
     def test_unknown_emoji(self):
         item = HealthItem("Test", "unknown", "detail")
         self.assertEqual(item.emoji, "⚪")
 
+    # PURPOSE: metric_optional をテストする
     def test_metric_optional(self):
         item = HealthItem("Test", "ok")
         self.assertIsNone(item.metric)
@@ -58,6 +62,7 @@ class TestHealthReport(unittest.TestCase):
         )
         self.assertAlmostEqual(report.score, 1.0)
 
+    # PURPOSE: all_error_score をテストする
     def test_all_error_score(self):
         report = HealthReport(
             timestamp="test",
@@ -65,6 +70,7 @@ class TestHealthReport(unittest.TestCase):
         )
         self.assertAlmostEqual(report.score, 0.0)
 
+    # PURPOSE: mixed_score をテストする
     def test_mixed_score(self):
         report = HealthReport(
             timestamp="test",
@@ -72,6 +78,7 @@ class TestHealthReport(unittest.TestCase):
         )
         self.assertAlmostEqual(report.score, 0.5)
 
+    # PURPOSE: warn_score をテストする
     def test_warn_score(self):
         report = HealthReport(
             timestamp="test",
@@ -79,6 +86,7 @@ class TestHealthReport(unittest.TestCase):
         )
         self.assertAlmostEqual(report.score, 0.6)
 
+    # PURPOSE: empty_score をテストする
     def test_empty_score(self):
         report = HealthReport(timestamp="test", items=[])
         self.assertAlmostEqual(report.score, 0.0)
@@ -93,12 +101,14 @@ class TestCheckSystemd(unittest.TestCase):
         self.assertEqual(result.status, "ok")
         self.assertEqual(result.detail, "active")
 
+    # PURPOSE: inactive_service をテストする
     @patch("subprocess.run")
     def test_inactive_service(self, mock_run):
         mock_run.return_value = MagicMock(stdout="inactive\n")
         result = check_systemd_service("Test Service", "test.service")
         self.assertEqual(result.status, "error")
 
+    # PURPOSE: timeout をテストする
     @patch("subprocess.run", side_effect=Exception("timeout"))
     def test_timeout(self, mock_run):
         result = check_systemd_service("Test Service", "test.service")
@@ -114,6 +124,7 @@ class TestCheckDocker(unittest.TestCase):
         self.assertEqual(result.status, "ok")
         self.assertIn("Up", result.detail)
 
+    # PURPOSE: container_not_running をテストする
     @patch("subprocess.run")
     def test_container_not_running(self, mock_run):
         mock_run.return_value = MagicMock(stdout="\n")
@@ -129,6 +140,7 @@ class TestCheckCron(unittest.TestCase):
         result = check_cron("Tier 1", "tier1")
         self.assertEqual(result.status, "ok")
 
+    # PURPOSE: cron_entry_missing をテストする
     @patch("subprocess.run")
     def test_cron_entry_missing(self, mock_run):
         mock_run.return_value = MagicMock(stdout="0 0 * * * backup.sh\n")
@@ -147,6 +159,7 @@ class TestCheckHandoff(unittest.TestCase):
         # For integration, we rely on the actual filesystem test below
         pass
 
+    # PURPOSE: Integration: 実際のファイルシステムで検証
     def test_actual_handoff_directory(self):
         """Integration: 実際のファイルシステムで検証"""
         handoff_dir = Path.home() / "oikos" / "mneme" / ".hegemonikon" / "handoffs"
@@ -168,6 +181,7 @@ class TestFormatTerminal(unittest.TestCase):
         self.assertIn("🟢", output)
         self.assertIn("Score:", output)
 
+    # PURPOSE: empty_report をテストする
     def test_empty_report(self):
         report = HealthReport(timestamp="test", items=[])
         output = format_terminal(report)

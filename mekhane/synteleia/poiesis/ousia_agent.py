@@ -22,6 +22,7 @@ from ..base import (
 )
 
 
+# PURPOSE: 本質洞察エージェント (O-Agent)
 class OusiaAgent(AuditAgent):
     """本質洞察エージェント (O-Agent)"""
 
@@ -45,6 +46,7 @@ class OusiaAgent(AuditAgent):
         (r"class\s+\w+[^:]*:", None, None),  # クラス定義あり = OK
     ]
 
+    # PURPOSE: 本質の明確さを監査
     def audit(self, target: AuditTarget) -> AgentResult:
         """本質の明確さを監査"""
         issues: List[AuditIssue] = []
@@ -113,6 +115,7 @@ class OusiaAgent(AuditAgent):
 
         return issues
 
+    # PURPOSE: 全タイプをサポート（特に計画・思考ログに有効）
     def supports(self, target_type: AuditTargetType) -> bool:
         """全タイプをサポート（特に計画・思考ログに有効）"""
         return True

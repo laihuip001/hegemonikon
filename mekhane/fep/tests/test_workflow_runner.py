@@ -30,6 +30,7 @@ from mekhane.workflow_runner import (
 # =============================================================================
 
 
+# PURPOSE: Test that all 24 theorems work with workflow_runner
 class TestTheoremCoverage:
     """Test that all 24 theorems work with workflow_runner."""
 
@@ -60,6 +61,7 @@ class TestTheoremCoverage:
         "A4",
     ]
 
+    # PURPOSE: All theorems should return valid WorkflowResult
     @pytest.mark.parametrize("theorem", ALL_THEOREMS)
     def test_run_workflow_all_theorems(self, theorem):
         """All theorems should return valid WorkflowResult."""
@@ -71,6 +73,7 @@ class TestTheoremCoverage:
         assert 0 <= result.confidence <= 1
         assert isinstance(result.x_series_recommendations, list)
 
+    # PURPOSE: All theorems should have workflow mapping
     @pytest.mark.parametrize("theorem", ALL_THEOREMS)
     def test_theorem_to_workflow_mapping(self, theorem):
         """All theorems should have workflow mapping."""
@@ -84,9 +87,11 @@ class TestTheoremCoverage:
 # =============================================================================
 
 
+# PURPOSE: Test X-series next step recommendations
 class TestXSeriesRecommendations:
     """Test X-series next step recommendations."""
 
+    # PURPOSE: O-series should get recommendations to other series
     def test_o_series_recommendations(self):
         """O-series should get recommendations to other series."""
         result = run_workflow("O1", "本質分析")
@@ -97,6 +102,7 @@ class TestXSeriesRecommendations:
         for rec in result.x_series_recommendations:
             assert rec.target != "O"
 
+    # PURPOSE: High confidence should prioritize S, P series
     def test_high_confidence_prioritizes_action(self):
         """High confidence should prioritize S, P series."""
         result = run_workflow("O1", "やって実行proceed")  # High confidence keywords
@@ -105,6 +111,7 @@ class TestXSeriesRecommendations:
         targets = [rec.target for rec in result.x_series_recommendations]
         assert "S" in targets or "P" in targets
 
+    # PURPOSE: XSeriesRecommendation should have all fields
     def test_x_series_recommendation_format(self):
         """XSeriesRecommendation should have all fields."""
         result = run_workflow("A2", "判定テスト")
@@ -123,9 +130,11 @@ class TestXSeriesRecommendations:
 # =============================================================================
 
 
+# PURPOSE: Test format_derivative_selection output
 class TestFormatOutput:
     """Test format_derivative_selection output."""
 
+    # PURPOSE: Output should include theorem code
     def test_format_includes_theorem(self):
         """Output should include theorem code."""
         result = run_workflow("S2", "ツール生成")
@@ -133,6 +142,7 @@ class TestFormatOutput:
 
         assert "S2" in output
 
+    # PURPOSE: Output should include X-series recommendations
     def test_format_includes_x_series(self):
         """Output should include X-series recommendations."""
         result = run_workflow("H1", "傾向評価")
@@ -140,6 +150,7 @@ class TestFormatOutput:
 
         assert "X-series" in output or "推奨" in output
 
+    # PURPOSE: Output should reference the workflow path
     def test_format_includes_workflow(self):
         """Output should reference the workflow path."""
         result = run_workflow("K3", "目的確認")
@@ -154,25 +165,30 @@ class TestFormatOutput:
 # =============================================================================
 
 
+# PURPOSE: Test edge cases and error handling
 class TestEdgeCases:
     """Test edge cases and error handling."""
 
+    # PURPOSE: Empty context should still work
     def test_empty_problem_context(self):
         """Empty context should still work."""
         result = run_workflow("O1", "")
         assert result.theorem == "O1"
 
+    # PURPOSE: Long context should work without error
     def test_long_problem_context(self):
         """Long context should work without error."""
         long_context = "テスト" * 1000
         result = run_workflow("O1", long_context)
         assert result.theorem == "O1"
 
+    # PURPOSE: Japanese input should be processed correctly
     def test_japanese_input(self):
         """Japanese input should be processed correctly."""
         result = run_workflow("O1", "この問題の本質は何か？深く考察してほしい。")
         assert isinstance(result.derivative, str)
 
+    # PURPOSE: English input should be processed correctly
     def test_english_input(self):
         """English input should be processed correctly."""
         result = run_workflow("O1", "What is the essence of this problem?")

@@ -46,6 +46,7 @@ _DIR_WAIT_RE = re.compile(
 # =============================================================================
 
 
+# PURPOSE: A pair of projections that contradict each other
 @dataclass
 class ContradictionPair:
     """A pair of projections that contradict each other."""
@@ -61,6 +62,7 @@ class ContradictionPair:
         return f"Contradiction({self.theorem_a}↔{self.theorem_b}, sim={self.similarity:.2f})"
 
 
+# PURPOSE: Result of a devil's advocate attack on a Cone
 @dataclass
 class DevilAttack:
     """Result of a devil's advocate attack on a Cone.
@@ -77,6 +79,7 @@ class DevilAttack:
     resolution_paths: List[str]  # Suggested ways to resolve
     severity: float = 0.0  # 0.0 (mild) - 1.0 (severe)
 
+    # PURPOSE: The most contradictory pair
     @property
     def worst_pair(self) -> Optional[ContradictionPair]:
         """The most contradictory pair."""
@@ -92,6 +95,7 @@ class DevilAttack:
         )
 
 
+# PURPOSE: Generate a devil's advocate attack on a Cone
 def devil_attack(cone: Cone) -> DevilAttack:
     """Generate a devil's advocate attack on a Cone.
 
@@ -244,6 +248,7 @@ def devil_attack(cone: Cone) -> DevilAttack:
 # =============================================================================
 
 
+# PURPOSE: Next-action recommendation from a Cone analysis
 @dataclass
 class ConeAdvice:
     """Next-action recommendation from a Cone analysis.
@@ -273,6 +278,7 @@ class ConeAdvice:
 # =============================================================================
 
 
+# PURPOSE: Consume a Cone and recommend the next action
 def advise(cone: Cone) -> ConeAdvice:
     """Consume a Cone and recommend the next action.
 
@@ -421,6 +427,7 @@ def advise(cone: Cone) -> ConeAdvice:
 # =============================================================================
 
 
+# PURPOSE: Enriched advise() that incorporates Attractor diagnosis
 def advise_with_attractor(
     cone: Cone,
     oscillation: str,

@@ -26,6 +26,7 @@ from mekhane.symploke.boot_integration import extract_dispatch_info
 # =============================================================================
 
 
+# PURPOSE: Dispatcher 統合のテスト (boot_integration.extract_dispatch_info)
 class TestDispatcherIntegration:
     """Dispatcher 統合のテスト (boot_integration.extract_dispatch_info)"""
 

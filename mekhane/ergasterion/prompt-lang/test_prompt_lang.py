@@ -21,9 +21,11 @@ sys.path.insert(0, str(Path(__file__).parent))
 from prompt_lang import Prompt, PromptLangParser, ParseError, parse_file, validate_file
 
 
+# PURPOSE: Test cases for PromptLangParser
 class TestPromptLangParser(unittest.TestCase):
     """Test cases for PromptLangParser."""
 
+    # PURPOSE: Test parsing a minimal prompt with only required fields
     def test_minimal_prompt(self):
         """Test parsing a minimal prompt with only required fields."""
         content = """#prompt test-minimal
@@ -41,6 +43,7 @@ class TestPromptLangParser(unittest.TestCase):
         self.assertEqual(prompt.role, "Test role")
         self.assertEqual(prompt.goal, "input -> output")
 
+    # PURPOSE: Test parsing a prompt with all fields
     def test_full_prompt(self):
         """Test parsing a prompt with all fields."""
         content = """#prompt test-full
@@ -87,6 +90,7 @@ class TestPromptLangParser(unittest.TestCase):
         self.assertEqual(len(prompt.examples), 1)
         self.assertEqual(prompt.examples[0]["input"], '"test input"')
 
+    # PURPOSE: Test that missing header raises error
     def test_missing_header(self):
         """Test that missing header raises error."""
         content = """@role:
@@ -96,6 +100,7 @@ class TestPromptLangParser(unittest.TestCase):
         with self.assertRaises(ParseError):
             parser.parse()
 
+    # PURPOSE: Test expanding prompt to natural language
     def test_expand(self):
         """Test expanding prompt to natural language."""
         content = """#prompt test-expand
@@ -113,6 +118,7 @@ class TestPromptLangParser(unittest.TestCase):
         self.assertIn("You are Expert assistant", expanded)
         self.assertIn("Your task: question -> answer", expanded)
 
+    # PURPOSE: Test JSON serialization
     def test_to_json(self):
         """Test JSON serialization."""
         content = """#prompt test-json
@@ -130,6 +136,7 @@ class TestPromptLangParser(unittest.TestCase):
         self.assertIn('"name": "test-json"', json_str)
         self.assertIn('"role": "JSON test"', json_str)
 
+    # PURPOSE: Test parsing prompt with no constraints
     def test_empty_constraints(self):
         """Test parsing prompt with no constraints."""
         content = """#prompt test-no-constraints
@@ -145,6 +152,7 @@ class TestPromptLangParser(unittest.TestCase):
 
         self.assertEqual(prompt.constraints, [])
 
+    # PURPOSE: Test parsing multi-line goal
     def test_multiline_goal(self):
         """Test parsing multi-line goal."""
         content = """#prompt test-multiline
@@ -163,9 +171,11 @@ class TestPromptLangParser(unittest.TestCase):
         self.assertIn("multiple lines", prompt.goal)
 
 
+# PURPOSE: Test cases for validation
 class TestValidation(unittest.TestCase):
     """Test cases for validation."""
 
+    # PURPOSE: Test validating a valid prompt
     def test_valid_file(self):
         """Test validating a valid prompt."""
         content = """#prompt valid
@@ -188,6 +198,7 @@ class TestValidation(unittest.TestCase):
         finally:
             temp_path.unlink(missing_ok=True)
 
+    # PURPOSE: Test validation fails with missing role
     def test_missing_role(self):
         """Test validation fails with missing role."""
         content = """#prompt missing-role
@@ -207,9 +218,11 @@ class TestValidation(unittest.TestCase):
             temp_path.unlink(missing_ok=True)
 
 
+# PURPOSE: Integration tests for prompt_lang_integrate.py
 class TestIntegration(unittest.TestCase):
     """Integration tests for prompt_lang_integrate.py."""
 
+    # PURPOSE: Test that generate creates a file in staging
     def test_generate_creates_file(self):
         """Test that generate creates a file in staging."""
         from prompt_lang_integrate import generate_prompt, STAGING_DIR
@@ -228,6 +241,7 @@ class TestIntegration(unittest.TestCase):
         finally:
             filepath.unlink(missing_ok=True)
 
+    # PURPOSE: Test listing prompts in staging
     def test_list_prompts(self):
         """Test listing prompts in staging."""
         from prompt_lang_integrate import list_prompts
@@ -237,9 +251,11 @@ class TestIntegration(unittest.TestCase):
         self.assertIsInstance(prompts, list)
 
 
+# PURPOSE: Test cases for v2.1 @extends and @mixin features
 class TestExtendsAndMixin(unittest.TestCase):
     """Test cases for v2.1 @extends and @mixin features."""
 
+    # PURPOSE: Test basic template inheritance
     def test_basic_extends(self):
         """Test basic template inheritance."""
         from prompt_lang import parse_all, resolve
@@ -272,6 +288,7 @@ class TestExtendsAndMixin(unittest.TestCase):
         self.assertIn("Base constraint", resolved.constraints)
         self.assertIn("Child constraint", resolved.constraints)
 
+    # PURPOSE: Test mixin composition
     def test_mixin_composition(self):
         """Test mixin composition."""
         from prompt_lang import parse_all, resolve
@@ -298,6 +315,7 @@ class TestExtendsAndMixin(unittest.TestCase):
         self.assertIn("type: json", resolved.format)
         self.assertIn("Output must be valid JSON", resolved.constraints)
 
+    # PURPOSE: Test multiple mixin composition (left to right)
     def test_multiple_mixins(self):
         """Test multiple mixin composition (left to right)."""
         from prompt_lang import parse_all, resolve
@@ -326,6 +344,7 @@ class TestExtendsAndMixin(unittest.TestCase):
         # Should have constraints from both mixins + self
         self.assertEqual(len(resolved.constraints), 3)
 
+    # PURPOSE: Test extends combined with mixin
     def test_extends_with_mixin(self):
         """Test extends combined with mixin."""
         from prompt_lang import parse_all, resolve
@@ -354,6 +373,7 @@ class TestExtendsAndMixin(unittest.TestCase):
         self.assertEqual(resolved.goal, "Parent goal")
         self.assertIn("markdown", resolved.format)
 
+    # PURPOSE: Test that circular references raise error
     def test_circular_reference_detection(self):
         """Test that circular references raise error."""
         from prompt_lang import parse_all, resolve, CircularReferenceError
@@ -378,6 +398,7 @@ class TestExtendsAndMixin(unittest.TestCase):
         with self.assertRaises(CircularReferenceError):
             resolve(prompt_a, result)
 
+    # PURPOSE: Test that undefined references raise error
     def test_undefined_reference(self):
         """Test that undefined references raise error."""
         from prompt_lang import (
@@ -399,6 +420,7 @@ class TestExtendsAndMixin(unittest.TestCase):
         with self.assertRaises(PromptReferenceError):
             resolve(child, result)
 
+    # PURPOSE: Test parsing multiple prompts in one file
     def test_parse_all_multiple_prompts(self):
         """Test parsing multiple prompts in one file."""
         from prompt_lang import parse_all
@@ -421,6 +443,7 @@ class TestExtendsAndMixin(unittest.TestCase):
         self.assertIn("first", result.prompts)
         self.assertIn("second", result.prompts)
 
+    # PURPOSE: Test that dict fields use child priority
     def test_dict_merge_child_priority(self):
         """Test that dict fields use child priority."""
         from prompt_lang import parse_all, resolve
@@ -448,6 +471,7 @@ class TestExtendsAndMixin(unittest.TestCase):
         # Parent's read should be inherited
         self.assertEqual(resolved.tools["read"], "Parent read")
 
+    # PURPOSE: Test that already resolved prompts are returned as-is
     def test_already_resolved_prompt(self):
         """Test that already resolved prompts are returned as-is."""
         from prompt_lang import parse_all, resolve

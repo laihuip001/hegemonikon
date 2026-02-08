@@ -289,6 +289,7 @@ class DigestorPipeline:
 
 
 # CLI エントリポイント
+# PURPOSE: CLI エントリポイント
 def main():
     """CLI エントリポイント"""
     import argparse

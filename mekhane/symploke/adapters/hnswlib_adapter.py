@@ -22,6 +22,7 @@ except ImportError:
     hnswlib = None
 
 
+# PURPOSE: hnswlib ベースのベクトルストア
 class HNSWlibAdapter(VectorStoreAdapter):
     """
     hnswlib ベースのベクトルストア
@@ -62,10 +63,12 @@ class HNSWlibAdapter(VectorStoreAdapter):
         self._metadata: Dict[int, Dict[str, Any]] = {}
         self._current_id: int = 0
 
+    # PURPOSE: name の処理
     @property
     def name(self) -> str:
         return "hnswlib"
 
+    # PURPOSE: インデックスを作成
     def create_index(
         self, dimension: int, index_name: str = "default", **kwargs
     ) -> None:
@@ -82,6 +85,7 @@ class HNSWlibAdapter(VectorStoreAdapter):
         self._metadata.clear()
         self._current_id = 0
 
+    # PURPOSE: ベクトルを追加
     def add_vectors(
         self,
         vectors: np.ndarray,
@@ -113,6 +117,7 @@ class HNSWlibAdapter(VectorStoreAdapter):
 
         return ids
 
+    # PURPOSE: search を検索する
     def search(
         self, query: np.ndarray, k: int = 10, threshold: Optional[float] = None
     ) -> List[SearchResult]:
@@ -143,6 +148,7 @@ class HNSWlibAdapter(VectorStoreAdapter):
 
         return results
 
+    # PURPOSE: 削除（非対応 - 再構築が必要）
     def delete(self, ids: List[int]) -> int:
         """削除（非対応 - 再構築が必要）"""
         raise NotImplementedError(
@@ -150,6 +156,7 @@ class HNSWlibAdapter(VectorStoreAdapter):
             "Rebuild the index without the deleted vectors."
         )
 
+    # PURPOSE: インデックスを永続化
     def save(self, path: str) -> None:
         """インデックスを永続化"""
         if self.index is None:
@@ -177,6 +184,7 @@ class HNSWlibAdapter(VectorStoreAdapter):
                 f,
             )
 
+    # PURPOSE: インデックスを読み込み
     def load(self, path: str) -> None:
         """インデックスを読み込み"""
         path = Path(path)
@@ -206,12 +214,14 @@ class HNSWlibAdapter(VectorStoreAdapter):
         self.index = hnswlib.Index(space=self.space, dim=self.dimension)
         self.index.load_index(str(path), max_elements=self.max_elements)
 
+    # PURPOSE: 現在のベクトル数
     def count(self) -> int:
         """現在のベクトル数"""
         if self.index is None:
             return 0
         return self.index.get_current_count()
 
+    # PURPOSE: メタデータを取得
     def get_metadata(self, id: int) -> Optional[Dict[str, Any]]:
         """メタデータを取得"""
         return self._metadata.get(id)

@@ -91,6 +91,7 @@ class Embedder:
         """単一テキストを埋め込み"""
         return self.embed_batch([text])[0]
 
+    # PURPOSE: 日本語テキストを形態素分解してスペース区切りにする。
     @staticmethod
     def preprocess_ja(text: str) -> str:
         """日本語テキストを形態素分解してスペース区切りにする。

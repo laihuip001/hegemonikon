@@ -12,6 +12,7 @@ from ..indices.base import DomainIndex, IndexedResult, SourceType
 from .ranker import Ranker
 
 
+# PURPOSE: Search config の実装
 @dataclass
 class SearchConfig:
     """検索設定"""
@@ -27,6 +28,7 @@ class SearchConfig:
     )
 
 
+# PURPOSE: 統合検索エンジン (Symplokē)
 class SearchEngine:
     """
     統合検索エンジン (Symplokē)
@@ -58,11 +60,13 @@ class SearchEngine:
         self._ranker = Ranker()
         self._backlinker = backlinker
 
+    # PURPOSE: 登録済みソース一覧
     @property
     def registered_sources(self) -> Set[str]:
         """登録済みソース一覧"""
         return set(self._indices.keys())
 
+    # PURPOSE: インデックスを登録
     def register(self, index: DomainIndex) -> None:
         """
         インデックスを登録
@@ -72,6 +76,7 @@ class SearchEngine:
         """
         self._indices[index.name] = index
 
+    # PURPOSE: インデックスを登録解除
     def unregister(self, name: str) -> bool:
         """
         インデックスを登録解除
@@ -84,6 +89,7 @@ class SearchEngine:
             return True
         return False
 
+    # PURPOSE: 統合検索 (HybridSearch 対応)
     def search(
         self,
         query: str,
@@ -159,6 +165,7 @@ class SearchEngine:
 
         return boost_map
 
+    # PURPOSE: 単一ソース検索 (リランキングなし)
     def search_source(
         self, query: str, source: str, k: int = 10
     ) -> List[IndexedResult]:
@@ -178,6 +185,7 @@ class SearchEngine:
 
         return self._indices[source].search(query, k=k)
 
+    # PURPOSE: 各ソースの統計情報
     def stats(self) -> Dict[str, int]:
         """各ソースの統計情報"""
         return {name: index.count() for name, index in self._indices.items()}

@@ -14,6 +14,7 @@ sys.path.insert(0, "/home/makaron8426/oikos/hegemonikon")
 from mekhane.symploke.jules_client import JulesClient, SessionState
 
 
+# PURPOSE: Create a simple test task
 async def create_test_task():
     """Create a simple test task."""
     api_key = os.environ.get("JULES_API_KEY")

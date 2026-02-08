@@ -15,6 +15,7 @@ import pytest
 sys.path.insert(0, "/home/makaron8426/oikos/hegemonikon")
 
 
+# PURPOSE: Test MCP server tools directly
 @pytest.mark.asyncio
 @pytest.mark.skipif(not os.environ.get("JULES_API_KEY"), reason="JULES_API_KEY not set")
 async def test_mcp_tools():

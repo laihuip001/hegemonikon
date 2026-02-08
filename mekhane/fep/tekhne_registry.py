@@ -506,6 +506,7 @@ class TekhnēRegistry:
 # =============================================================================
 
 
+# PURPOSE: 技法をB行列エントリ (状態遷移確率) に変換
 def encode_technique_as_b_matrix_entry(technique: Technique) -> Dict[str, float]:
     """技法をB行列エントリ (状態遷移確率) に変換
 
@@ -530,6 +531,7 @@ def encode_technique_as_b_matrix_entry(technique: Technique) -> Dict[str, float]
     }
 
 
+# PURPOSE: レジストリをMarkdown形式でフォーマット
 def format_registry_markdown(registry: TekhnēRegistry) -> str:
     """レジストリをMarkdown形式でフォーマット
 
@@ -579,6 +581,7 @@ def format_registry_markdown(registry: TekhnēRegistry) -> str:
 _default_registry: Optional[TekhnēRegistry] = None
 
 
+# PURPOSE: デフォルトレジストリを取得
 def get_registry() -> TekhnēRegistry:
     """デフォルトレジストリを取得"""
     global _default_registry
@@ -587,6 +590,7 @@ def get_registry() -> TekhnēRegistry:
     return _default_registry
 
 
+# PURPOSE: グローバルレジストリから技法を検索
 def search_techniques(keyword: str, **kwargs) -> List[Technique]:
     """グローバルレジストリから技法を検索
 

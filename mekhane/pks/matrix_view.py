@@ -96,6 +96,7 @@ class PKSMatrixView:
         except (ImportError, Exception):
             self._client = None
 
+    # PURPOSE: llm_available の処理
     @property
     def llm_available(self) -> bool:
         return self._client is not None

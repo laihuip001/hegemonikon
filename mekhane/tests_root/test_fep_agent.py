@@ -9,15 +9,18 @@ import pytest
 import numpy as np
 
 
+# PURPOSE: Test suite for HegemonikónFEPAgent
 class TestHegemonikónFEPAgent:
     """Test suite for HegemonikónFEPAgent."""
 
+    # PURPOSE: Module can be imported
     def test_import(self):
         """Module can be imported."""
         from mekhane.fep import HegemonikónFEPAgent
 
         assert HegemonikónFEPAgent is not None
 
+    # PURPOSE: Agent initializes with default matrices
     def test_init_with_defaults(self):
         """Agent initializes with default matrices."""
         from mekhane.fep import HegemonikónFEPAgent
@@ -28,6 +31,7 @@ class TestHegemonikónFEPAgent:
         assert agent.state_dim == 8  # 2 * 2 * 2
         assert agent.agent is not None
 
+    # PURPOSE: infer_states returns updated belief distribution
     def test_infer_states_returns_beliefs(self):
         """infer_states returns updated belief distribution."""
         from mekhane.fep import HegemonikónFEPAgent
@@ -47,6 +51,7 @@ class TestHegemonikónFEPAgent:
         assert np.allclose(np.sum(beliefs), 1.0)
         assert np.all(beliefs >= 0)
 
+    # PURPOSE: infer_policies returns policy probabilities and EFE values
     def test_infer_policies_returns_efe(self):
         """infer_policies returns policy probabilities and EFE values."""
         from mekhane.fep import HegemonikónFEPAgent
@@ -62,6 +67,7 @@ class TestHegemonikónFEPAgent:
         assert q_pi is not None
         assert neg_efe is not None
 
+    # PURPOSE: step() performs full inference-action cycle
     def test_step_completes_cycle(self):
         """step() performs full inference-action cycle."""
         from mekhane.fep import HegemonikónFEPAgent
@@ -81,6 +87,7 @@ class TestHegemonikónFEPAgent:
         assert result["action"] in [0, 1]
         assert result["action_name"] in ["observe", "act"]
 
+    # PURPOSE: Agent tracks inference history
     def test_history_tracking(self):
         """Agent tracks inference history."""
         from mekhane.fep import HegemonikónFEPAgent
@@ -95,6 +102,7 @@ class TestHegemonikónFEPAgent:
 
         assert len(history) > 0
 
+    # PURPOSE: reset() clears agent state
     def test_reset_clears_state(self):
         """reset() clears agent state."""
         from mekhane.fep import HegemonikónFEPAgent
@@ -111,9 +119,11 @@ class TestHegemonikónFEPAgent:
         assert len(agent.get_history()) == 0
 
 
+# PURPOSE: Test suite for state space definitions
 class TestStateSpaces:
     """Test suite for state space definitions."""
 
+    # PURPOSE: State constants are properly defined
     def test_state_constants_defined(self):
         """State constants are properly defined."""
         from mekhane.fep import (
@@ -128,6 +138,7 @@ class TestStateSpaces:
         assert len(HORME_STATES) == 2
         assert len(OBSERVATION_MODALITIES) == 3
 
+    # PURPOSE: state_to_index and index_to_state are inverses
     def test_state_to_index_roundtrip(self):
         """state_to_index and index_to_state are inverses."""
         from mekhane.fep.state_spaces import (
@@ -145,6 +156,7 @@ class TestStateSpaces:
                     p2, a2, h2 = index_to_state(idx)
                     assert (p, a, h) == (p2, a2, h2)
 
+    # PURPOSE: get_state_dim returns correct dimension
     def test_get_state_dim(self):
         """get_state_dim returns correct dimension."""
         from mekhane.fep.state_spaces import get_state_dim
@@ -153,9 +165,11 @@ class TestStateSpaces:
         assert get_state_dim() == 8
 
 
+# PURPOSE: Test suite for 2-step policy horizon (arXiv:2412.10425)
 class TestPolicyHorizon:
     """Test suite for 2-step policy horizon (arXiv:2412.10425)."""
 
+    # PURPOSE: Agent is initialized with policy_len=2
     def test_policy_len_is_2(self):
         """Agent is initialized with policy_len=2."""
         from mekhane.fep import HegemonikónFEPAgent
@@ -165,6 +179,7 @@ class TestPolicyHorizon:
         # Check that policy_len is correctly set
         assert agent.agent.policy_len == 2
 
+    # PURPOSE: Agent is initialized with inference_horizon=1
     def test_inference_horizon_is_1(self):
         """Agent is initialized with inference_horizon=1."""
         from mekhane.fep import HegemonikónFEPAgent
@@ -174,6 +189,7 @@ class TestPolicyHorizon:
         # Check that inference_horizon is correctly set
         assert agent.agent.inference_horizon == 1
 
+    # PURPOSE: Agent has default learning rate of 50.0
     def test_learning_rate_default(self):
         """Agent has default learning rate of 50.0."""
         from mekhane.fep import HegemonikónFEPAgent
@@ -183,9 +199,11 @@ class TestPolicyHorizon:
         assert agent.learning_rate == 50.0
 
 
+# PURPOSE: Test suite for A matrix persistence
 class TestPersistence:
     """Test suite for A matrix persistence."""
 
+    # PURPOSE: save_learned_A saves A matrix to file
     def test_save_learned_A(self, tmp_path):
         """save_learned_A saves A matrix to file."""
         from mekhane.fep import HegemonikónFEPAgent
@@ -198,6 +216,7 @@ class TestPersistence:
         assert save_path.exists()
         assert saved_path == str(save_path)
 
+    # PURPOSE: load_learned_A loads A matrix from file
     def test_load_learned_A(self, tmp_path):
         """load_learned_A loads A matrix from file."""
         from mekhane.fep import HegemonikónFEPAgent
@@ -215,6 +234,7 @@ class TestPersistence:
 
         assert loaded is True
 
+    # PURPOSE: load_learned_A returns False for nonexistent file
     def test_load_nonexistent_returns_false(self, tmp_path):
         """load_learned_A returns False for nonexistent file."""
         from mekhane.fep import HegemonikónFEPAgent
@@ -226,6 +246,7 @@ class TestPersistence:
 
         assert loaded is False
 
+    # PURPOSE: A matrix survives save/load cycle
     def test_persistence_roundtrip(self, tmp_path):
         """A matrix survives save/load cycle."""
         from mekhane.fep import HegemonikónFEPAgent
@@ -258,9 +279,11 @@ class TestPersistence:
         assert loaded_A.shape == original_A.shape
 
 
+# PURPOSE: Test suite for Dirichlet learning
 class TestDirichletUpdate:
     """Test suite for Dirichlet learning."""
 
+    # PURPOSE: update_A_dirichlet records update in history
     def test_dirichlet_update_records_history(self):
         """update_A_dirichlet records update in history."""
         from mekhane.fep import HegemonikónFEPAgent
@@ -280,6 +303,7 @@ class TestDirichletUpdate:
         assert dirichlet_updates[0]["observation"] == 0
         assert dirichlet_updates[0]["learning_rate"] == 50.0
 
+    # PURPOSE: update_A_dirichlet accepts custom learning rate
     def test_dirichlet_update_custom_learning_rate(self):
         """update_A_dirichlet accepts custom learning rate."""
         from mekhane.fep import HegemonikónFEPAgent
@@ -294,6 +318,7 @@ class TestDirichletUpdate:
 
         assert dirichlet_updates[0]["learning_rate"] == 100.0
 
+    # PURPOSE: update_A_dirichlet accepts tuple observation (from encode_noesis_output)
     def test_dirichlet_update_with_tuple_input(self):
         """update_A_dirichlet accepts tuple observation (from encode_noesis_output)."""
         from mekhane.fep import HegemonikónFEPAgent
@@ -315,9 +340,11 @@ class TestDirichletUpdate:
         assert dirichlet_updates[0]["observation"] == 3
 
 
+# PURPOSE: Test suite for workflow output encoding functions
 class TestWorkflowEncoding:
     """Test suite for workflow output encoding functions."""
 
+    # PURPOSE: encode_noesis_output correctly maps high confidence
     def test_encode_noesis_output_high_confidence(self):
         """encode_noesis_output correctly maps high confidence."""
         from mekhane.fep.encoding import encode_noesis_output
@@ -332,6 +359,7 @@ class TestWorkflowEncoding:
         assert obs[1] == 0  # low urgency (always for Noēsis)
         assert obs[2] == 2  # high confidence (0.87 >= 0.7)
 
+    # PURPOSE: encode_noesis_output handles many uncertainty zones
     def test_encode_noesis_output_many_uncertainty_zones(self):
         """encode_noesis_output handles many uncertainty zones."""
         from mekhane.fep.encoding import encode_noesis_output
@@ -343,6 +371,7 @@ class TestWorkflowEncoding:
         assert obs[0] == 0  # ambiguous context
         assert obs[2] == 1  # medium confidence
 
+    # PURPOSE: encode_boulesis_output correctly maps deliberate (low impulse)
     def test_encode_boulesis_output_deliberate(self):
         """encode_boulesis_output correctly maps deliberate (low impulse)."""
         from mekhane.fep.encoding import encode_boulesis_output
@@ -354,6 +383,7 @@ class TestWorkflowEncoding:
         assert obs[1] == 0  # low urgency (impulse < 40)
         assert obs[2] == 2  # high confidence (feasibility >= 70)
 
+    # PURPOSE: encode_boulesis_output correctly maps impulsive (high impulse)
     def test_encode_boulesis_output_impulsive(self):
         """encode_boulesis_output correctly maps impulsive (high impulse)."""
         from mekhane.fep.encoding import encode_boulesis_output
@@ -365,6 +395,7 @@ class TestWorkflowEncoding:
         assert obs[1] == 2  # high urgency (impulse >= 70)
         assert obs[2] == 1  # medium confidence (40 <= feasibility < 70)
 
+    # PURPOSE: generate_fep_feedback_markdown generates correct output for 'act'
     def test_generate_fep_feedback_markdown_act(self):
         """generate_fep_feedback_markdown generates correct output for 'act'."""
         from mekhane.fep.encoding import generate_fep_feedback_markdown
@@ -393,6 +424,7 @@ class TestWorkflowEncoding:
         assert "中程度の不確実性" in output
         assert "行動に移行可能" in output
 
+    # PURPOSE: generate_fep_feedback_markdown generates correct output for 'observe'
     def test_generate_fep_feedback_markdown_observe(self):
         """generate_fep_feedback_markdown generates correct output for 'observe'."""
         from mekhane.fep.encoding import generate_fep_feedback_markdown
@@ -417,9 +449,11 @@ class TestWorkflowEncoding:
         assert "追加調査" in output
 
 
+# PURPOSE: Test suite for run_fep_with_learning and should_trigger_epoche
 class TestFEPWithLearning:
     """Test suite for run_fep_with_learning and should_trigger_epoche."""
 
+    # PURPOSE: run_fep_with_learning returns valid result dict
     def test_run_fep_with_learning_returns_result(self, tmp_path):
         """run_fep_with_learning returns valid result dict."""
         from mekhane.fep.encoding import run_fep_with_learning
@@ -435,6 +469,7 @@ class TestFEPWithLearning:
         assert "should_epoche" in result
         assert result["action_name"] in ["observe", "act"]
 
+    # PURPOSE: run_fep_with_learning saves A-matrix to file
     def test_run_fep_with_learning_saves_a_matrix(self, tmp_path):
         """run_fep_with_learning saves A-matrix to file."""
         from mekhane.fep.encoding import run_fep_with_learning
@@ -444,6 +479,7 @@ class TestFEPWithLearning:
 
         assert a_path.exists()
 
+    # PURPOSE: run_fep_with_learning loads existing A-matrix
     def test_run_fep_with_learning_loads_existing(self, tmp_path):
         """run_fep_with_learning loads existing A-matrix."""
         from mekhane.fep.encoding import run_fep_with_learning
@@ -458,6 +494,7 @@ class TestFEPWithLearning:
 
         assert result["action_name"] in ["observe", "act"]
 
+    # PURPOSE: should_trigger_epoche returns True for high entropy
     def test_should_trigger_epoche_high_entropy(self):
         """should_trigger_epoche returns True for high entropy."""
         from mekhane.fep.encoding import should_trigger_epoche
@@ -465,6 +502,7 @@ class TestFEPWithLearning:
         result = {"entropy": 2.5}
         assert should_trigger_epoche(result) is True
 
+    # PURPOSE: should_trigger_epoche returns False for low entropy
     def test_should_trigger_epoche_low_entropy(self):
         """should_trigger_epoche returns False for low entropy."""
         from mekhane.fep.encoding import should_trigger_epoche
@@ -472,6 +510,7 @@ class TestFEPWithLearning:
         result = {"entropy": 1.5}
         assert should_trigger_epoche(result) is False
 
+    # PURPOSE: should_trigger_epoche respects custom threshold
     def test_should_trigger_epoche_custom_threshold(self):
         """should_trigger_epoche respects custom threshold."""
         from mekhane.fep.encoding import should_trigger_epoche

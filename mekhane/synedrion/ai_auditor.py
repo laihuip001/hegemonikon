@@ -14,6 +14,7 @@ from pathlib import Path
 from typing import List, Optional, Dict, Any
 
 
+# PURPOSE: Issue severity levels
 class Severity(Enum):
     """Issue severity levels."""
 
@@ -23,6 +24,7 @@ class Severity(Enum):
     LOW = "low"
 
 
+# PURPOSE: Detected issue
 @dataclass
 class Issue:
     """Detected issue."""
@@ -35,6 +37,7 @@ class Issue:
     suggestion: Optional[str] = None
 
 
+# PURPOSE: Result of auditing a file
 @dataclass
 class AuditResult:
     """Result of auditing a file."""
@@ -42,15 +45,18 @@ class AuditResult:
     file_path: Path
     issues: List[Issue] = field(default_factory=list)
 
+    # PURPOSE: has_critical の処理
     @property
     def has_critical(self) -> bool:
         return any(i.severity == Severity.CRITICAL for i in self.issues)
 
+    # PURPOSE: has_high の処理
     @property
     def has_high(self) -> bool:
         return any(i.severity == Severity.HIGH for i in self.issues)
 
 
+# PURPOSE: AI-generated code auditor with 22 evaluation axes
 class AIAuditor:
     """AI-generated code auditor with 22 evaluation axes."""
 
@@ -287,6 +293,7 @@ class AIAuditor:
         self.lines: List[str] = []
         self.file_path: Optional[Path] = None
 
+    # PURPOSE: Audit a Python file for AI-generated code issues
     def audit_file(self, file_path: Path) -> AuditResult:
         """Audit a Python file for AI-generated code issues."""
         self.issues = []
@@ -1666,6 +1673,7 @@ class AIAuditor:
                         )
 
 
+# PURPOSE: Audit all Python files in a directory
 def audit_directory(
     directory: Path, exclude_patterns: Optional[List[str]] = None
 ) -> List[AuditResult]:
@@ -1695,6 +1703,7 @@ def audit_directory(
     return results
 
 
+# PURPOSE: Format audit results as a report
 def format_report(results: List[AuditResult]) -> str:
     """Format audit results as a report."""
     if not results:

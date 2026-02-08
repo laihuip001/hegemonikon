@@ -159,6 +159,7 @@ CCL: `{ccl_expr}`
 """
 
 
+# PURPOSE: 過去の失敗パターンから警告を生成（Phase 4 連携用スタブ）
 def get_warnings_for_expr(ccl_expr: str) -> List[str]:
     """過去の失敗パターンから警告を生成（Phase 4 連携用スタブ）"""
     warnings = []

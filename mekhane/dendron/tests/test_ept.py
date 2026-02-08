@@ -22,6 +22,7 @@ from mekhane.dendron.models import (
 # ─── Fixtures ─────────────────────────────────────
 
 
+# PURPOSE: EPT 全レイヤー有効のチェッカー
 @pytest.fixture
 def ept_checker():
     """EPT 全レイヤー有効のチェッカー"""
@@ -33,6 +34,7 @@ def ept_checker():
     )
 
 
+# PURPOSE: テスト用プロジェクトを構築するファクトリ
 @pytest.fixture
 def tmp_project(tmp_path):
     """テスト用プロジェクトを構築するファクトリ"""
@@ -48,9 +50,11 @@ def tmp_project(tmp_path):
 # ─── NF2 Structure Tests ─────────────────────────
 
 
+# PURPOSE: NF2: Import/Call/TypeRef 構造チェック
 class TestNF2Structure:
     """NF2: Import/Call/TypeRef 構造チェック"""
 
+    # PURPOSE: P21: import 先ファイルが存在する → OK
     def test_import_resolution_ok(self, ept_checker, tmp_project):
         """P21: import 先ファイルが存在する → OK"""
         root = tmp_project({
@@ -63,6 +67,7 @@ class TestNF2Structure:
         ok_proofs = [s for s in import_proofs if s.status == ProofStatus.OK]
         assert len(ok_proofs) >= 1
 
+    # PURPOSE: P22: 呼出先関数が定義されている → OK
     def test_call_resolution_ok(self, ept_checker, tmp_project):
         """P22: 呼出先関数が定義されている → OK"""
         root = tmp_project({
@@ -76,6 +81,7 @@ class TestNF2Structure:
             if cp.name == "helper":
                 assert cp.status == ProofStatus.OK
 
+    # PURPOSE: P31: 型アノテーションが import されていない → WEAK
     def test_type_ref_missing(self, ept_checker, tmp_project):
         """P31: 型アノテーションが import されていない → WEAK"""
         root = tmp_project({
@@ -87,9 +93,11 @@ class TestNF2Structure:
         assert len(weak) >= 1  # MyCustomType は未 import
 
 
+# PURPOSE: NF3: 複雑度/類似度/再代入チェック
 class TestNF3Function:
     """NF3: 複雑度/類似度/再代入チェック"""
 
+    # PURPOSE: 短い関数は OK
     def test_complexity_short_function_ok(self, ept_checker, tmp_project):
         """短い関数は OK"""
         root = tmp_project({
@@ -101,6 +109,7 @@ class TestNF3Function:
             if c.name == "short_func":
                 assert c.status == ProofStatus.OK
 
+    # PURPOSE: 50行超の関数は WEAK
     def test_complexity_long_function_weak(self, ept_checker, tmp_project):
         """50行超の関数は WEAK"""
         lines = ["# PROOF: [L1/コア]", "def long_func():"]
@@ -114,6 +123,7 @@ class TestNF3Function:
         assert len(weak) == 1
         assert weak[0].status == ProofStatus.WEAK
 
+    # PURPOSE: 類似関数を検出する
     def test_similarity_detection(self, ept_checker, tmp_project):
         """類似関数を検出する"""
         root = tmp_project({
@@ -129,6 +139,7 @@ class TestNF3Function:
         if similarity:
             assert any(s.status == ProofStatus.WEAK for s in similarity)
 
+    # PURPOSE: 変数再代入を検出する
     def test_reassignment_detection(self, ept_checker, tmp_project):
         """変数再代入を検出する"""
         root = tmp_project({
@@ -147,9 +158,11 @@ class TestNF3Function:
         assert len(weak) >= 1  # result が 3 回代入
 
 
+# PURPOSE: BCNF: Dead func / Unused file / Unused var
 class TestBCNFVerification:
     """BCNF: Dead func / Unused file / Unused var"""
 
+    # PURPOSE: 呼ばれていない public 関数を検出する
     def test_dead_function_detection(self, ept_checker, tmp_project):
         """呼ばれていない public 関数を検出する"""
         root = tmp_project({
@@ -162,6 +175,7 @@ class TestBCNFVerification:
         assert len(dead) == 1
         assert dead[0].status == ProofStatus.WEAK
 
+    # PURPOSE: @property 関数は dead_func としてフラグしない
     def test_property_not_flagged_as_dead(self, ept_checker, tmp_project):
         """@property 関数は dead_func としてフラグしない"""
         root = tmp_project({
@@ -178,6 +192,7 @@ class TestBCNFVerification:
                 if v.check_type == "dead_func" and v.name == "name"]
         assert len(dead) == 0  # @property は除外
 
+    # PURPOSE: 関数内の未使用変数を検出する
     def test_unused_var_detection(self, ept_checker, tmp_project):
         """関数内の未使用変数を検出する"""
         root = tmp_project({
@@ -195,15 +210,18 @@ class TestBCNFVerification:
         assert unused[0].status == ProofStatus.WEAK
 
 
+# PURPOSE: REASON フィールド検出テスト
 class TestREASON:
     """REASON フィールド検出テスト"""
 
+    # PURPOSE: REASON_PATTERN が正しくマッチする
     def test_reason_pattern_match(self):
         """REASON_PATTERN が正しくマッチする"""
         assert REASON_PATTERN.match("REASON: テスト理由")
         assert REASON_PATTERN.match("# REASON: テスト理由")
         assert not REASON_PATTERN.match("NOT A REASON")
 
+    # PURPOSE: PROOF.md に REASON: があれば has_reason=True
     def test_proof_md_with_reason(self, ept_checker, tmp_project):
         """PROOF.md に REASON: があれば has_reason=True"""
         root = tmp_project({
@@ -222,6 +240,7 @@ class TestREASON:
         assert dp.purpose_text == "テスト目的"
         assert dp.reason_text == "テスト理由"
 
+    # PURPOSE: PROOF.md に REASON: がなければ has_reason=False
     def test_proof_md_without_reason(self, ept_checker, tmp_project):
         """PROOF.md に REASON: がなければ has_reason=False"""
         root = tmp_project({
@@ -234,9 +253,11 @@ class TestREASON:
         assert dir_proofs[0].has_reason is False
 
 
+# PURPOSE: EPT 統合テスト — CheckResult の統計が正しいか
 class TestEPTIntegration:
     """EPT 統合テスト — CheckResult の統計が正しいか"""
 
+    # PURPOSE: CheckResult に EPT 統計が含まれる
     def test_ept_stats_in_check_result(self, ept_checker, tmp_project):
         """CheckResult に EPT 統計が含まれる"""
         root = tmp_project({
@@ -250,6 +271,7 @@ class TestEPTIntegration:
         assert result.function_nf_ok >= 0
         assert result.verification_ok >= 0
 
+    # PURPOSE: デフォルトでは EPT レイヤーは無効
     def test_ept_disabled_by_default(self, tmp_project):
         """デフォルトでは EPT レイヤーは無効"""
         checker = DendronChecker(exempt_patterns=[])

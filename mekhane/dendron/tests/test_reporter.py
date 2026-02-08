@@ -64,6 +64,7 @@ def result_failing():
 
 # ── TEXT format ───────────────────────────────────
 
+# PURPOSE: TEXT 形式の出力検証
 class TestTextFormat:
     """TEXT 形式の出力検証"""
 
@@ -98,6 +99,7 @@ class TestTextFormat:
 
 # ── CI format ────────────────────────────────────
 
+# PURPOSE: CI 形式の出力検証
 class TestCIFormat:
     """CI 形式の出力検証"""
 
@@ -124,6 +126,7 @@ class TestCIFormat:
 
 # ── JSON format ──────────────────────────────────
 
+# PURPOSE: JSON 形式の出力検証
 class TestJSONFormat:
     """JSON 形式の出力検証"""
 
@@ -160,6 +163,7 @@ class TestJSONFormat:
 
 # ── Markdown format ──────────────────────────────
 
+# PURPOSE: Markdown 形式の出力検証
 class TestMarkdownFormat:
     """Markdown 形式の出力検証"""
 
@@ -177,6 +181,7 @@ class TestMarkdownFormat:
 
 # ── Edge cases ───────────────────────────────────
 
+# PURPOSE: エッジケースの検証
 class TestEdgeCases:
     """エッジケースの検証"""
 

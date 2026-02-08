@@ -314,6 +314,7 @@ def sequence_execution(context: str):
 # =============================================================================
 
 
+# PURPOSE: CCL 式を LMQL プログラムに変換
 def ccl_to_lmql(ccl_expr: str) -> str:
     """CCL 式を LMQL プログラムに変換"""
     parser = CCLParser()

@@ -219,6 +219,7 @@ CCL は Hegemonikón システムの認知制御言語で、以下のワーク�
 
 
 # Quick validation function
+# PURPOSE: Quick validation helper
 def validate_semantic(intent: str, ccl: str) -> SemanticResult:
     """Quick validation helper."""
     validator = CCLSemanticValidator()

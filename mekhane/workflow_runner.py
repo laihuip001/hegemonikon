@@ -29,6 +29,7 @@ from mekhane.fep.derivative_selector import (
 from mekhane.fep.encoding import get_x_series_recommendations
 
 
+# PURPOSE: X-series next step recommendation
 @dataclass
 class XSeriesRecommendation:
     """X-series next step recommendation."""
@@ -39,6 +40,7 @@ class XSeriesRecommendation:
     reason: str
 
 
+# PURPOSE: Result of workflow execution with derivative selection
 @dataclass
 class WorkflowResult:
     """Result of workflow execution with derivative selection."""
@@ -85,6 +87,7 @@ THEOREM_TO_WORKFLOW: Dict[str, str] = {
 WORKFLOWS_DIR = "/home/makaron8426/oikos/.agent/workflows"
 
 
+# PURPOSE: Get the absolute file path to a workflow .md file
 def get_workflow_path(theorem_or_workflow: str) -> Optional[str]:
     """
     Get the absolute file path to a workflow .md file.
@@ -196,6 +199,7 @@ X_SERIES_RELATIONS: Dict[str, Dict[str, List[str]]] = {
 }
 
 
+# PURPOSE: X-series から次に推奨される定理を提案。
 def suggest_next_theorems(current_theorem: str) -> List[Dict[str, str]]:
     """
     X-series から次に推奨される定理を提案。
@@ -231,6 +235,7 @@ def suggest_next_theorems(current_theorem: str) -> List[Dict[str, str]]:
     return suggestions
 
 
+# PURPOSE: Run a workflow with automatic derivative selection
 def run_workflow(theorem: str, problem_context: str) -> WorkflowResult:
     """
     Run a workflow with automatic derivative selection.
@@ -283,6 +288,7 @@ def run_workflow(theorem: str, problem_context: str) -> WorkflowResult:
     )
 
 
+# PURPOSE: Format derivative selection result for display
 def format_derivative_selection(result: WorkflowResult) -> str:
     """Format derivative selection result for display."""
     workflow = THEOREM_TO_WORKFLOW.get(result.theorem, "unknown")
@@ -313,6 +319,7 @@ def format_derivative_selection(result: WorkflowResult) -> str:
     return output
 
 
+# PURPOSE: Get workflow path for a theorem
 def get_workflow_for_theorem(theorem: str) -> Optional[str]:
     """Get workflow path for a theorem."""
     return THEOREM_TO_WORKFLOW.get(theorem)

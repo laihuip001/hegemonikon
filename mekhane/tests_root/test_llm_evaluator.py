@@ -4,9 +4,11 @@
 import pytest
 
 
+# PURPOSE: Tests for L1 encode_input_with_confidence
 class TestEncodeInputWithConfidence:
     """Tests for L1 encode_input_with_confidence."""
 
+    # PURPOSE: Returns observation tuple and confidence score
     def test_returns_tuple_and_confidence(self):
         """Returns observation tuple and confidence score."""
         from mekhane.fep.llm_evaluator import encode_input_with_confidence
@@ -18,6 +20,7 @@ class TestEncodeInputWithConfidence:
         assert isinstance(confidence, float)
         assert 0 <= confidence <= 1
 
+    # PURPOSE: Detailed input should have higher confidence
     def test_high_confidence_for_detailed_input(self):
         """Detailed input should have higher confidence."""
         from mekhane.fep.llm_evaluator import encode_input_with_confidence
@@ -33,6 +36,7 @@ class TestEncodeInputWithConfidence:
 
         assert long_conf > short_conf
 
+    # PURPOSE: Simple 'y' should be parsed correctly
     def test_simple_y_approval(self):
         """Simple 'y' should be parsed correctly."""
         from mekhane.fep.llm_evaluator import encode_input_with_confidence
@@ -43,9 +47,11 @@ class TestEncodeInputWithConfidence:
         assert obs[2] == 2  # high confidence index
 
 
+# PURPOSE: Tests for hierarchical_evaluate
 class TestHierarchicalEvaluate:
     """Tests for hierarchical_evaluate."""
 
+    # PURPOSE: Returns an EvaluationResult dataclass
     def test_returns_evaluation_result(self):
         """Returns an EvaluationResult dataclass."""
         from mekhane.fep.llm_evaluator import hierarchical_evaluate, EvaluationResult
@@ -54,6 +60,7 @@ class TestHierarchicalEvaluate:
 
         assert isinstance(result, EvaluationResult)
 
+    # PURPOSE: Uses L1 for simple, clear cases
     def test_uses_l1_for_simple_cases(self):
         """Uses L1 for simple, clear cases."""
         from mekhane.fep.llm_evaluator import hierarchical_evaluate
@@ -63,6 +70,7 @@ class TestHierarchicalEvaluate:
 
         assert result.layer_used == "L1"
 
+    # PURPOSE: Observation should be valid tuple of indices
     def test_observation_is_valid_tuple(self):
         """Observation should be valid tuple of indices."""
         from mekhane.fep.llm_evaluator import hierarchical_evaluate
@@ -74,6 +82,7 @@ class TestHierarchicalEvaluate:
         assert result.observation[1] in (0, 1, 2)  # urgency
         assert result.observation[2] in (0, 1, 2)  # confidence
 
+    # PURPOSE: Confidence should be between 0 and 1
     def test_confidence_in_valid_range(self):
         """Confidence should be between 0 and 1."""
         from mekhane.fep.llm_evaluator import hierarchical_evaluate
@@ -82,6 +91,7 @@ class TestHierarchicalEvaluate:
 
         assert 0 <= result.confidence <= 1
 
+    # PURPOSE: Interpretation should be a non-empty string
     def test_interpretation_is_populated(self):
         """Interpretation should be a non-empty string."""
         from mekhane.fep.llm_evaluator import hierarchical_evaluate
@@ -92,9 +102,11 @@ class TestHierarchicalEvaluate:
         assert len(result.interpretation) > 0
 
 
+# PURPOSE: Tests for scores_to_observation
 class TestScoresToObservation:
     """Tests for scores_to_observation."""
 
+    # PURPOSE: Converts LLM scores to observation indices
     def test_converts_scores_correctly(self):
         """Converts LLM scores to observation indices."""
         from mekhane.fep.llm_evaluator import scores_to_observation
@@ -109,6 +121,7 @@ class TestScoresToObservation:
 
         assert obs == (1, 2, 1)
 
+    # PURPOSE: Handles boundary values correctly
     def test_handles_boundary_cases(self):
         """Handles boundary values correctly."""
         from mekhane.fep.llm_evaluator import scores_to_observation
@@ -134,9 +147,11 @@ class TestScoresToObservation:
         assert obs_high == (1, 2, 2)
 
 
+# PURPOSE: Tests for evaluate_and_infer integration
 class TestEvaluateAndInfer:
     """Tests for evaluate_and_infer integration."""
 
+    # PURPOSE: Returns dict with evaluation, fep, and combined_feedback
     def test_returns_combined_result(self):
         """Returns dict with evaluation, fep, and combined_feedback."""
         from mekhane.fep.llm_evaluator import evaluate_and_infer
@@ -147,6 +162,7 @@ class TestEvaluateAndInfer:
         assert "fep" in result
         assert "combined_feedback" in result
 
+    # PURPOSE: Evaluation section has observation, confidence, layer
     def test_evaluation_section_has_required_keys(self):
         """Evaluation section has observation, confidence, layer."""
         from mekhane.fep.llm_evaluator import evaluate_and_infer
@@ -157,6 +173,7 @@ class TestEvaluateAndInfer:
         assert "confidence" in result["evaluation"]
         assert "layer" in result["evaluation"]
 
+    # PURPOSE: FEP section includes action recommendation
     def test_fep_section_has_action(self):
         """FEP section includes action recommendation."""
         from mekhane.fep.llm_evaluator import evaluate_and_infer
@@ -166,6 +183,7 @@ class TestEvaluateAndInfer:
         assert "action_name" in result["fep"]
         assert result["fep"]["action_name"] in ["observe", "act"]
 
+    # PURPOSE: Combined feedback is a formatted string
     def test_combined_feedback_is_string(self):
         """Combined feedback is a formatted string."""
         from mekhane.fep.llm_evaluator import evaluate_and_infer

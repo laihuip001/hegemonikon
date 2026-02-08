@@ -189,6 +189,7 @@ BENCHMARK_CASES: list[tuple[str, str, set[str], str]] = [
 # Evaluation Logic
 # ---------------------------------------------------------------------------
 
+# PURPOSE: 1件のベンチマーク結果
 @dataclass
 class BenchmarkResult:
     """1件のベンチマーク結果"""
@@ -204,6 +205,7 @@ class BenchmarkResult:
     is_correct_acceptable: bool  # primary が acceptable set に含まれる
 
 
+# PURPOSE: 全体レポート
 @dataclass
 class BenchmarkReport:
     """全体レポート"""
@@ -211,26 +213,31 @@ class BenchmarkReport:
     per_series: dict[str, dict] = field(default_factory=dict)
     elapsed_seconds: float = 0.0
 
+    # PURPOSE: total の処理
     @property
     def total(self) -> int:
         return len(self.results)
 
+    # PURPOSE: expected_primary と predicted_primary が一致する割合
     @property
     def primary_accuracy(self) -> float:
         """expected_primary と predicted_primary が一致する割合"""
         correct = sum(1 for r in self.results if r.is_correct_primary)
         return correct / self.total if self.total else 0.0
 
+    # PURPOSE: predicted_primary が acceptable set に含まれる割合
     @property
     def acceptable_accuracy(self) -> float:
         """predicted_primary が acceptable set に含まれる割合"""
         correct = sum(1 for r in self.results if r.is_correct_acceptable)
         return correct / self.total if self.total else 0.0
 
+    # PURPOSE: by_category の処理
     def by_category(self, category: str) -> list[BenchmarkResult]:
         return [r for r in self.results if r.category == category]
 
 
+# PURPOSE: Series ごとの Precision / Recall / F1 を計算
 def compute_per_series_metrics(results: list[BenchmarkResult]) -> dict[str, dict]:
     """Series ごとの Precision / Recall / F1 を計算"""
     series_names = ["O", "S", "H", "P", "K", "A"]
@@ -262,6 +269,7 @@ def compute_per_series_metrics(results: list[BenchmarkResult]) -> dict[str, dict
 # Runner
 # ---------------------------------------------------------------------------
 
+# PURPOSE: ベンチマーク実行
 def run_benchmark() -> BenchmarkReport:
     """ベンチマーク実行"""
     from mekhane.fep.attractor import SeriesAttractor
@@ -301,6 +309,7 @@ def run_benchmark() -> BenchmarkReport:
     return report
 
 
+# PURPOSE: レポート表示
 def print_report(report: BenchmarkReport) -> None:
     """レポート表示"""
     print("=" * 72)

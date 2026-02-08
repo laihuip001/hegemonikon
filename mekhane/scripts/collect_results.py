@@ -210,6 +210,7 @@ class JulesResultCollector:
         print(f"{'━' * 60}")
 
 
+# PURPOSE: main の処理
 async def main():
     import argparse
 

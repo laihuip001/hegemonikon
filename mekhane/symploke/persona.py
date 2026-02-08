@@ -60,6 +60,7 @@ DEFAULT_PERSONA = {
 }
 
 
+# PURPOSE: Load persona from file or create default
 def load_persona() -> dict:
     """Load persona from file or create default."""
     if PERSONA_PATH.exists():
@@ -68,6 +69,7 @@ def load_persona() -> dict:
     return DEFAULT_PERSONA.copy()
 
 
+# PURPOSE: Save persona to file
 def save_persona(persona: dict):
     """Save persona to file."""
     PERSONA_PATH.parent.mkdir(parents=True, exist_ok=True)
@@ -75,6 +77,7 @@ def save_persona(persona: dict):
         yaml.dump(persona, f, allow_unicode=True, default_flow_style=False)
 
 
+# PURPOSE: Load Creator profile from file
 def load_creator_profile() -> dict:
     """Load Creator profile from file."""
     if CREATOR_PROFILE_PATH.exists():
@@ -83,6 +86,7 @@ def load_creator_profile() -> dict:
     return {}
 
 
+# PURPOSE: /boot 用の Creator プロファイル出力 (v1.0)
 def format_boot_creator(profile: dict, verbose: bool = False) -> str:
     """
     /boot 用の Creator プロファイル出力 (v1.0)
@@ -124,6 +128,7 @@ def format_boot_creator(profile: dict, verbose: bool = False) -> str:
     return "\n".join(lines)
 
 
+# PURPOSE: Update persona with session information
 def update_persona(
     session_increment: int = 1,
     trust_delta: float = 0.0,
@@ -228,6 +233,7 @@ def update_persona(
     return persona
 
 
+# PURPOSE: /boot 用の persona 出力フォーマット (多次元信頼 v2.0)
 def format_boot_persona(persona: dict, verbose: bool = False) -> str:
     """
     /boot 用の persona 出力フォーマット (多次元信頼 v2.0)
@@ -286,6 +292,7 @@ def format_boot_persona(persona: dict, verbose: bool = False) -> str:
     return "\n".join(lines)
 
 
+# PURPOSE: /boot 統合 API: persona 情報を返す
 def get_boot_persona(mode: str = "standard") -> dict:
     """
     /boot 統合 API: persona 情報を返す
@@ -318,6 +325,7 @@ def get_boot_persona(mode: str = "standard") -> dict:
     }
 
 
+# PURPOSE: main の処理
 def main():
     parser = argparse.ArgumentParser(description="Manage AI persona")
     parser.add_argument("--update", action="store_true", help="Update session count")

@@ -15,7 +15,9 @@ from mekhane.anamnesis.index import GnosisIndex
 from mekhane.anamnesis.models.paper import Paper
 
 
+# PURPOSE: Test gnosis index の実装
 class TestGnosisIndex(unittest.TestCase):
+    # PURPOSE: setUp をセットアップする
     def setUp(self):
         self.test_dir = tempfile.mkdtemp()
         self.lance_dir = Path(self.test_dir) / "lancedb"
@@ -34,10 +36,12 @@ class TestGnosisIndex(unittest.TestCase):
         # Override _get_embedder to always return our mock
         self.index._get_embedder = lambda: self.mock_embedder_instance
 
+    # PURPOSE: tearDown の処理
     def tearDown(self):
         self.embedder_patcher.stop()
         shutil.rmtree(self.test_dir)
 
+    # PURPOSE: load_primary_keys をテストする
     def test_load_primary_keys(self):
         # Create dummy papers
         papers = []

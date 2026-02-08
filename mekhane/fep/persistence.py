@@ -132,6 +132,7 @@ def delete_A(path: Optional[Path] = None) -> bool:
 SNAPSHOT_DIR = LEARNED_A_PATH.parent / "snapshots"
 
 
+# PURPOSE: Save a timestamped A-matrix snapshot
 def save_snapshot(agent: "HegemonikónFEPAgent", label: str = "") -> Path:
     """Save a timestamped A-matrix snapshot.
 
@@ -161,6 +162,7 @@ def save_snapshot(agent: "HegemonikónFEPAgent", label: str = "") -> Path:
     return snap_path
 
 
+# PURPOSE: List all A-matrix snapshots (oldest first)
 def list_snapshots() -> list:
     """List all A-matrix snapshots (oldest first).
 
@@ -179,6 +181,7 @@ def list_snapshots() -> list:
     return result
 
 
+# PURPOSE: Compare two A-matrices and return per-Series change metrics
 def diff_A(
     A_old: np.ndarray, A_new: np.ndarray, series_labels: Optional[list] = None
 ) -> dict:
@@ -226,6 +229,7 @@ def diff_A(
     }
 
 
+# PURPOSE: Format A-matrix diff for boot output (compact Japanese)
 def format_learning_diff(diff_result: dict) -> str:
     """Format A-matrix diff for boot output (compact Japanese).
 

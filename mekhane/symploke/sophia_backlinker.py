@@ -28,6 +28,7 @@ except ImportError:
 KNOWLEDGE_DIR = Path("/home/makaron8426/oikos/.gemini/antigravity/knowledge")
 
 
+# PURPOSE: NetworkX ベースのバックリンク検出システム
 class SophiaBacklinker:
     """NetworkX ベースのバックリンク検出システム"""
 
@@ -35,6 +36,7 @@ class SophiaBacklinker:
         self.graph = nx.DiGraph()  # 方向性グラフ
         self.cache: Dict[str, Dict] = {}  # ノードキャッシュ
 
+    # PURPOSE: [[wikilink]] パターンを抽出
     def extract_links(self, content: str) -> Set[str]:
         """[[wikilink]] パターンを抽出
 
@@ -48,6 +50,7 @@ class SophiaBacklinker:
         matches = re.findall(pattern, content)
         return set(matches)
 
+    # PURPOSE: KI ディレクトリからリンクを抽出
     def parse_ki_links(self, ki_path: Path) -> Set[str]:
         """KI ディレクトリからリンクを抽出"""
         links = set()
@@ -62,6 +65,7 @@ class SophiaBacklinker:
 
         return links
 
+    # PURPOSE: 全 KI からグラフを構築
     def build_graph(self, ki_dir: Path = None) -> int:
         """全 KI からグラフを構築
 
@@ -105,6 +109,7 @@ class SophiaBacklinker:
                 self.cache[node] = {"outlinks": set(), "backlinks": set()}
             self.cache[node]["backlinks"] = backlinks
 
+    # PURPOSE: O(1) バックリンク検索
     def get_backlinks(self, note_name: str) -> Set[str]:
         """O(1) バックリンク検索"""
         if note_name in self.cache:
@@ -114,6 +119,7 @@ class SophiaBacklinker:
             return set(self.graph.predecessors(note_name))
         return set()
 
+    # PURPOSE: O(1) アウトリンク検索
     def get_outlinks(self, note_name: str) -> Set[str]:
         """O(1) アウトリンク検索"""
         if note_name in self.cache:
@@ -122,6 +128,7 @@ class SophiaBacklinker:
             return set(self.graph.successors(note_name))
         return set()
 
+    # PURPOSE: グラフ統計を返す
     def get_stats(self) -> Dict:
         """グラフ統計を返す"""
         return {
@@ -136,6 +143,7 @@ class SophiaBacklinker:
         in_degrees = [(node, self.graph.in_degree(node)) for node in self.graph.nodes()]
         return sorted(in_degrees, key=lambda x: x[1], reverse=True)[:n]
 
+    # PURPOSE: グラフを辞書形式でエクスポート
     def to_dict(self) -> Dict:
         """グラフを辞書形式でエクスポート"""
         return {
@@ -147,6 +155,7 @@ class SophiaBacklinker:
             },
         }
 
+    # PURPOSE: Mermaid.js 形式でグラフをエクスポート
     def to_mermaid(self, direction: str = "LR", max_nodes: int = 50) -> str:
         """Mermaid.js 形式でグラフをエクスポート
 
@@ -167,6 +176,7 @@ class SophiaBacklinker:
                 f"%% ⚠️ 警告: {node_count} ノード (> {max_nodes}) — 可視化が崩壊する可能性",
             )
 
+        # PURPOSE: ノード名をMermaid安全な形式に変換
         def sanitize(name: str) -> str:
             """ノード名をMermaid安全な形式に変換"""
             # 特殊文字を置換、引用符で囲む
@@ -178,6 +188,7 @@ class SophiaBacklinker:
 
         return "\n".join(lines)
 
+    # PURPOSE: D3.js force-directed 用 JSON
     def to_json_for_d3(self) -> Dict:
         """D3.js force-directed 用 JSON
 
@@ -193,6 +204,7 @@ class SophiaBacklinker:
         }
 
 
+# PURPOSE: main の処理
 def main():
     import argparse
 

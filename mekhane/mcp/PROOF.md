@@ -1,5 +1,8 @@
 # mekhane/mcp/ PROOF
 
+PURPOSE: MCP (Model Context Protocol) サーバー群を実装し、AI ツール間の統合インターフェースを提供する
+REASON: 異なる AI ツール間のプロトコル差異を吸収する統一的なインターフェースが必要だった
+
 > **存在証明**: MCP (Model Context Protocol) サーバー群を格納
 
 ## 必然性の導出

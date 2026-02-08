@@ -238,7 +238,8 @@ class TestE2EModelIndependent:
         result = run_pipeline("???invalid{{{", force_cpu=True)
         assert not result.all_passed
         assert result.failed_at == "hermeneus"
-        assert len(result.stages) == 1
+        assert len(result.stages) == 2  # uml_pre + hermeneus
+        assert result.stages[-1].name == "hermeneus"
 
     def test_japanese_fallback_e2e(self):
         """日本語自然言語 → パース失敗 → Stage 1 で停止。

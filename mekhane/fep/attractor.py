@@ -59,6 +59,13 @@ SERIES_DEFINITIONS: dict[str, dict] = {
             "本質的な問い。なぜ必要なのか。存在理由。意味。"
         ),
         "keywords": ["なぜ", "本質", "目的", "意志", "存在", "根本", "問い", "探求"],
+        "exemplars": [
+            "なぜこれが存在するのか、根本から考えたい",
+            "前提を疑い、ゼロから再構築する",
+            "パラダイムを転換しなければならない",
+            "問いの答えではなく、問い自体を問う",
+            "私たちが見落としている盲点は何か",
+        ],
         "workflows": ["/noe", "/bou", "/zet", "/ene"],
     },
     "S": {
@@ -80,6 +87,13 @@ SERIES_DEFINITIONS: dict[str, dict] = {
             "コード、プログラミング、API、モジュール、リファクタリング。"
         ),
         "keywords": ["設計", "構造", "方法", "手順", "アーキテクチャ", "フレームワーク", "実装", "コード"],
+        "exemplars": [
+            "アーキテクチャを設計して構造を決める",
+            "実装手順をステップバイステップで進める",
+            "モジュール構成とディレクトリ配置を整理する",
+            "リファクタリングしてコードを改善する",
+            "CI/CDパイプラインを構築してデプロイ自動化",
+        ],
         "workflows": ["/met", "/mek", "/sta", "/pra"],
     },
     "H": {
@@ -99,6 +113,13 @@ SERIES_DEFINITIONS: dict[str, dict] = {
             "どう感じるか。内なる衝動とモラール。やる気。"
         ),
         "keywords": ["感情", "直感", "確信", "信念", "モチベーション", "不安", "期待", "やる気"],
+        "exemplars": [
+            "不安で仕方がない、大丈夫だろうか",
+            "モチベーションが下がって疲れた",
+            "直感的にこの方向は間違っている気がする",
+            "ワクワクする、この機能を作りたい",
+            "何かが引っかかる、違和感がある",
+        ],
         "workflows": ["/pro", "/pis", "/ore", "/dox"],
     },
     "P": {
@@ -120,6 +141,13 @@ SERIES_DEFINITIONS: dict[str, dict] = {
             "対象範囲と対象外。制約条件、前提条件、環境設定。"
         ),
         "keywords": ["境界", "スコープ", "範囲", "制約", "領域", "環境", "コンテキスト", "対象"],
+        "exemplars": [
+            "スコープと対象範囲を明確に定義する",
+            "この機能は対象外にすべきか判断する",
+            "どのリージョンにデプロイするか決める",
+            "サポート対象のブラウザと環境を整理する",
+            "セキュリティの境界と制約条件を設定する",
+        ],
         "workflows": ["/kho", "/hod", "/tro", "/tek"],
     },
     "K": {
@@ -140,6 +168,13 @@ SERIES_DEFINITIONS: dict[str, dict] = {
             "学術研究、文献レビュー、優先順位、いつまでに。"
         ),
         "keywords": ["タイミング", "いつ", "期限", "調査", "論文", "知識", "知恵", "優先順位"],
+        "exemplars": [
+            "今がこの機能を開発する適切なタイミングか",
+            "締め切りまでのスケジュールを確認する",
+            "関連する論文や先行研究を調査する",
+            "この技術の最新動向を調べたい",
+            "リリース時期をいつにするか決める",
+        ],
         "workflows": ["/euk", "/chr", "/tel", "/sop"],
     },
     "A": {
@@ -160,6 +195,13 @@ SERIES_DEFINITIONS: dict[str, dict] = {
             "判断基準、判定、検証、レビュー、テスト。"
         ),
         "keywords": ["判断", "評価", "選択", "比較", "品質", "基準", "正確", "レビュー"],
+        "exemplars": [
+            "この実装は正しいか検証してレビューする",
+            "2つの選択肢を比較して最適を判断する",
+            "コードレビューでバグがないか精査する",
+            "テスト結果を評価して品質を確認する",
+            "性能ベンチマークを実行して精度を測る",
+        ],
         "workflows": ["/pat", "/dia", "/gno", "/epi"],
     },
 }
@@ -397,6 +439,9 @@ class SeriesAttractor:
         self._force_cpu = force_cpu
         # Problem C: per-series similarity adjustment from basin bias
         self._bias_adjustments: dict[str, float] = {}
+        # Multi-prototype: per-series exemplar embeddings
+        self._exemplar_embeddings: dict[str, list[np.ndarray]] = {}
+        self._exemplar_tensors: dict = {}  # {series: torch.Tensor(N, D)}
 
     # PURPOSE: Problem C — BasinBias から per-series の similarity 補正を適用
     def apply_bias(self, biases: dict[str, "BasinBias"]) -> None:
@@ -465,6 +510,20 @@ class SeriesAttractor:
             print(f"[Attractor] GPU mode ({self._device})", flush=True)
         else:
             print("[Attractor] CPU mode (torch unavailable)", flush=True)
+
+        # Multi-prototype: exemplar embeddings
+        for k in series_keys:
+            exemplar_texts = SERIES_DEFINITIONS[k].get("exemplars", [])
+            if exemplar_texts:
+                embs = self._embedder.embed_batch(exemplar_texts)
+                self._exemplar_embeddings[k] = [
+                    np.array(e, dtype=np.float32) for e in embs
+                ]
+                if TORCH_AVAILABLE:
+                    matrix = np.stack(self._exemplar_embeddings[k])
+                    self._exemplar_tensors[k] = to_tensor(matrix, self._device)
+            else:
+                self._exemplar_embeddings[k] = []
 
     # --- Core API ---
 

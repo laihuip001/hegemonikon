@@ -1,0 +1,40 @@
+{
+  "total": 100,
+  "primary_accuracy": 0.81,
+  "acceptable_accuracy": 0.85,
+  "macro_f1": 0.8102,
+  "elapsed_seconds": 9.76,
+  "per_series": {
+    "O": {
+      "precision": 1.0,
+      "recall": 0.6316,
+      "f1": 0.7742
+    },
+    "S": {
+      "precision": 0.625,
+      "recall": 1.0,
+      "f1": 0.7692
+    },
+    "H": {
+      "precision": 0.6957,
+      "recall": 1.0,
+      "f1": 0.8205
+    },
+    "P": {
+      "precision": 0.9167,
+      "recall": 0.6875,
+      "f1": 0.7857
+    },
+    "K": {
+      "precision": 0.9375,
+      "recall": 0.9375,
+      "f1": 0.9375
+    },
+    "A": {
+      "precision": 0.9231,
+      "recall": 0.6667,
+      "f1": 0.7742
+    }
+  },
+  "incorrect_count": 15
+}

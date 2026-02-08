@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# PROOF: [L3/実験] <- scripts/
+# PURPOSE: Activation Steering PoC — LLM行動制御の実験
 """Activation Steering PoC v2 — Final LayerNorm Injection.
 
 Key Finding: Decoder layer forward hooks DON'T propagate through

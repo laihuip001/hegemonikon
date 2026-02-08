@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# PROOF: [L2/インフラ] <- scripts/
+# PURPOSE: Gnōsis インデックスの増分更新
 """
 Gnōsis Knowledge Index — 自動更新スクリプト
 

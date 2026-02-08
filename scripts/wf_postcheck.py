@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# PROOF: [L2/運用] <- scripts/
+# PURPOSE: ワークフロー実行後の品質検証
 """
 wf_postcheck.py — 汎用 WF ポストチェック
 

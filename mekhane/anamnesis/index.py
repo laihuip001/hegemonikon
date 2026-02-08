@@ -49,7 +49,7 @@ class Embedder:
     """
 
     # PURPOSE: Embedder の構成と依存関係の初期化
-    def __init__(self, force_cpu: bool = False):
+    def __init__(self, force_cpu: bool = False, model_name: str = "BAAI/bge-m3"):
         import numpy as np
         self.np = np
         self._use_gpu = False
@@ -64,7 +64,7 @@ class Embedder:
                 if torch.cuda.is_available():
                     from sentence_transformers import SentenceTransformer
                     self._st_model = SentenceTransformer(
-                        'BAAI/bge-m3', device='cuda'
+                        model_name, device='cuda'
                     )
                     self._use_gpu = True
                     vram_mb = torch.cuda.memory_allocated() / 1e6
@@ -73,7 +73,18 @@ class Embedder:
             except ImportError:
                 pass  # torch or sentence-transformers not installed
 
-        # CPU fallback (ONNX)
+        # CPU with sentence-transformers (if available, avoids ONNX dependency)
+        try:
+            from sentence_transformers import SentenceTransformer
+            cpu_model = model_name if model_name != "BAAI/bge-m3" else "sentence-transformers/all-MiniLM-L6-v2"
+            self._st_model = SentenceTransformer(cpu_model, device='cpu')
+            self._use_gpu = False
+            print(f"[Embedder] CPU mode (sentence-transformers: {cpu_model})")
+            return
+        except ImportError:
+            pass
+
+        # ONNX fallback (original implementation)
         self._init_onnx()
         print("[Embedder] CPU mode (ONNX)")
 
@@ -102,13 +113,13 @@ class Embedder:
 
     # PURPOSE: GPU embedding via sentence-transformers.
     def embed_batch(self, texts: list[str]) -> list[list]:
-        if self._use_gpu:
-            return self._embed_gpu(texts)
+        if self._st_model is not None:
+            return self._embed_st(texts)
         return self._embed_onnx(texts)
 
-    # PURPOSE: GPU embedding via sentence-transformers.
-    def _embed_gpu(self, texts: list[str]) -> list[list]:
-        """GPU embedding via sentence-transformers."""
+    # PURPOSE: Embedding via sentence-transformers (GPU or CPU).
+    def _embed_st(self, texts: list[str]) -> list[list]:
+        """Embedding via sentence-transformers (GPU or CPU)."""
         embeddings = self._st_model.encode(
             texts, batch_size=32, normalize_embeddings=True
         )

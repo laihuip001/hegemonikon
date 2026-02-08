@@ -41,8 +41,14 @@ _THIS_DIR = Path(__file__).parent
 _HEGEMONIKON_ROOT = _THIS_DIR.parent.parent
 
 # Knowledge source paths
-MNEME_SESSIONS = Path.home() / "oikos" / "mneme" / ".hegemonikon" / "sessions"
-MNEME_KNOWLEDGE = Path.home() / "oikos" / "mneme" / ".hegemonikon" / "knowledge"
+_MNEME_ROOT = Path.home() / "oikos" / "mneme" / ".hegemonikon"
+MNEME_SESSIONS = _MNEME_ROOT / "sessions"
+MNEME_KNOWLEDGE = _MNEME_ROOT / "knowledge"
+MNEME_HANDOFFS = _MNEME_ROOT / "handoffs"
+MNEME_DOXA = _MNEME_ROOT / "doxa"
+MNEME_WORKFLOWS = _MNEME_ROOT / "workflows"
+MNEME_RESEARCH = _MNEME_ROOT / "research"
+MNEME_XSERIES = _MNEME_ROOT / "x-series"
 KERNEL_DIR = _HEGEMONIKON_ROOT / "kernel"
 HANDOFF_DIR = _HEGEMONIKON_ROOT / "docs" / "handoff"
 
@@ -257,7 +263,52 @@ class KnowledgeIndexer:
                     "title": f.stem.replace("_", " ").title(),
                 })
 
-        # 6. Kernel docs
+        # 6. Mneme Handoffs (handoffs/ dir)
+        if MNEME_HANDOFFS.exists():
+            for f in sorted(MNEME_HANDOFFS.glob("*.md")):
+                files.append({
+                    "path": f,
+                    "source_type": "handoff",
+                    "title": f.stem.replace("_", " ").title(),
+                })
+
+        # 7. Doxa (belief records)
+        if MNEME_DOXA.exists():
+            for f in sorted(MNEME_DOXA.rglob("*.md")):
+                files.append({
+                    "path": f,
+                    "source_type": "doxa",
+                    "title": f.stem.replace("_", " ").title(),
+                })
+
+        # 8. Workflow artifacts
+        if MNEME_WORKFLOWS.exists():
+            for f in sorted(MNEME_WORKFLOWS.glob("*.md")):
+                files.append({
+                    "path": f,
+                    "source_type": "workflow",
+                    "title": f.stem.replace("_", " ").title(),
+                })
+
+        # 9. Research notes
+        if MNEME_RESEARCH.exists():
+            for f in sorted(MNEME_RESEARCH.glob("*.md")):
+                files.append({
+                    "path": f,
+                    "source_type": "research",
+                    "title": f.stem.replace("_", " ").title(),
+                })
+
+        # 10. X-series relation maps
+        if MNEME_XSERIES.exists():
+            for f in sorted(MNEME_XSERIES.glob("*.md")):
+                files.append({
+                    "path": f,
+                    "source_type": "xseries",
+                    "title": f.stem.replace("_", " ").title(),
+                })
+
+        # 11. Kernel docs
         if KERNEL_DIR.exists():
             for f in sorted(KERNEL_DIR.glob("*.md")):
                 files.append({

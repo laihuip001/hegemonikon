@@ -23,7 +23,7 @@
         },
         {
             "parameters": {
-                "jsCode": "const { execSync } = require('child_process');\n\ntry {\n  const gitLog = execSync('cd /oikos/hegemonikon && git log -1 --oneline', { encoding: 'utf-8' }).trim();\n  return [{ json: { gitLog } }];\n} catch (e) {\n  return [{ json: { gitLog: 'Git情報取得失敗: ' + e.message } }];\n}"
+                "jsCode": "const fs = require('fs');\nconst path = require('path');\n\ntry {\n  const logPath = path.join(process.env.HOME || '/home/makaron8426', 'oikos/hegemonikon/.git/logs/HEAD');\n  const lines = fs.readFileSync(logPath, 'utf-8').trim().split('\\n');\n  const last = lines[lines.length - 1] || '';\n  const match = last.match(/commit:\\s*(.*?)$/);\n  const gitLog = match ? match[1] : last.slice(-80);\n  return [{ json: { gitLog } }];\n} catch (e) {\n  return [{ json: { gitLog: 'Git情報取得失敗: ' + e.message } }];\n}"
             },
             "id": "git-status",
             "name": "Git 最新コミット",
@@ -36,7 +36,7 @@
         },
         {
             "parameters": {
-                "jsCode": "const { execSync } = require('child_process');\nconst fs = require('fs');\n\ntry {\n  const files = execSync('ls -t /oikos/mneme/.hegemonikon/sessions/handoff_*.md 2>/dev/null | head -1', { encoding: 'utf-8' }).trim();\n  if (!files) {\n    return [{ json: { handoff: 'Handoff なし', content: '' } }];\n  }\n  const content = fs.readFileSync(files, 'utf-8');\n  const subjectMatch = content.match(/\\*\\*主題\\*\\*:\\s*(.+)/);\n  const subject = subjectMatch ? subjectMatch[1] : files.split('/').pop();\n  return [{ json: { handoff: subject, filename: files.split('/').pop() } }];\n} catch (e) {\n  return [{ json: { handoff: 'Handoff取得失敗: ' + e.message, filename: '' } }];\n}"
+                "jsCode": "const fs = require('fs');\nconst path = require('path');\n\ntry {\n  const sessDir = path.join(process.env.HOME || '/home/makaron8426', 'oikos/mneme/.hegemonikon/sessions');\n  const files = fs.readdirSync(sessDir)\n    .filter(f => f.startsWith('handoff_') && f.endsWith('.md'))\n    .map(f => ({ name: f, mtime: fs.statSync(path.join(sessDir, f)).mtimeMs }))\n    .sort((a, b) => b.mtime - a.mtime);\n  if (!files.length) {\n    return [{ json: { handoff: 'Handoff なし', content: '' } }];\n  }\n  const latest = files[0].name;\n  const content = fs.readFileSync(path.join(sessDir, latest), 'utf-8');\n  const subjectMatch = content.match(/\\*\\*主題\\*\\*:\\s*(.+)/);\n  const subject = subjectMatch ? subjectMatch[1] : latest;\n  return [{ json: { handoff: subject, filename: latest } }];\n} catch (e) {\n  return [{ json: { handoff: 'Handoff取得失敗: ' + e.message, filename: '' } }];\n}"
             },
             "id": "handoff-latest",
             "name": "最新のハンドオフ",

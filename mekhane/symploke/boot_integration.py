@@ -405,6 +405,47 @@ def get_boot_context(mode: str = "standard", context: Optional[str] = None) -> d
                 except Exception:
                     pass  # Theorem attractor failure should not block boot
 
+                # FEP v2 Agent: 統合認知判断 (48-state)
+                # Attractor の推薦を topic observation として注入し、
+                # Agent が自律的に Series + act/observe を判断する
+                fep_v2_result = {}
+                try:
+                    from mekhane.fep.fep_agent_v2 import HegemonikónFEPAgentV2
+                    from mekhane.fep.state_spaces_v2 import SERIES_STATES
+
+                    agent_v2 = HegemonikónFEPAgentV2()
+                    agent_v2.load_learned_A()  # 前回セッションの学習を復元
+
+                    # Attractor series → topic observation index
+                    # rec.series can be list (oscillation) or str
+                    _s2obs = {s: 8 + i for i, s in enumerate(SERIES_STATES)}
+                    att_series = rec.series
+                    if isinstance(att_series, list):
+                        att_series = att_series[0]  # Primary series
+                    topic_obs = _s2obs.get(att_series, 8)
+
+                    # 2-cycle inference (observe → act pattern を許容)
+                    r1 = agent_v2.step(topic_obs)
+                    r2 = agent_v2.step(topic_obs)
+                    final = r2  # 2nd cycle = 学習後の判断
+
+                    # Dirichlet 学習 + 永続化
+                    agent_v2.update_A_dirichlet(topic_obs)
+                    agent_v2.save_learned_A()
+
+                    conf_pct = int(100.0 * max(final["beliefs"]))
+                    fep_v2_result = {
+                        "action": final["action_name"],
+                        "selected_series": final.get("selected_series"),
+                        "entropy": round(final["entropy"], 3),
+                        "confidence_pct": conf_pct,
+                        "attractor_series": rec.series,
+                        "agreement": final.get("selected_series") == rec.series,
+                        "map_state": final["map_state_names"],
+                    }
+                except Exception:
+                    pass  # FEP v2 failure should not block boot
+
                 formatted_parts = []
                 if llm_fmt:
                     formatted_parts.append(f"🎯 **Attractor**: {llm_fmt}")
@@ -416,6 +457,17 @@ def get_boot_context(mode: str = "standard", context: Optional[str] = None) -> d
                     formatted_parts.append(f"   🔬 Theorems: {tops}")
                 if dispatch_info["primary"]:
                     formatted_parts.append(f"   📎 Dispatch: {dispatch_info['dispatch_formatted']}")
+                if fep_v2_result:
+                    act = fep_v2_result["action"]
+                    sel = fep_v2_result.get("selected_series") or "-"
+                    ent = fep_v2_result["entropy"]
+                    conf = fep_v2_result["confidence_pct"]
+                    att_s = fep_v2_result.get("attractor_series", "?")
+                    agree = "✓一致" if fep_v2_result.get("agreement") else "✗不一致"
+                    formatted_parts.append(
+                        f"   🧠 FEP v2: {act} [Series={sel}] "
+                        f"(entropy={ent}, conf={conf}%) ↔ ATT={att_s} [{agree}]"
+                    )
 
                 return {
                     "series": rec.series,
@@ -427,6 +479,7 @@ def get_boot_context(mode: str = "standard", context: Optional[str] = None) -> d
                     "dispatch_primary": dispatch_info["primary"],
                     "dispatch_alternatives": dispatch_info["alternatives"],
                     "theorem_detail": theorem_detail,
+                    "fep_v2": fep_v2_result,
                     "formatted": "\n".join(formatted_parts) if formatted_parts else "",
                 }
 

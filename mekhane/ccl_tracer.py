@@ -30,6 +30,7 @@ STATE_FILE = LOG_DIR / "ccl_state.json"
 
 
 # Palette: Colors for UX
+# PURPOSE: Colors class for CLI output
 class Colors:
     RED = "\033[91m"
     GREEN = "\033[92m"
@@ -40,6 +41,7 @@ class Colors:
     BOLD = "\033[1m"
 
 
+# PURPOSE: Print text with ANSI colors
 def color_print(text: str, color: str = Colors.RESET, bold: bool = False):
     """Prints text with ANSI colors."""
     start = color

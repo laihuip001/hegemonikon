@@ -324,6 +324,7 @@ async def call_tool(name: str, arguments: dict):
         return [TextContent(type="text", text=f"Unknown tool: {name}")]
 
 
+# PURPOSE: Run the MCP server via stdio transport.
 async def main():
     """Run the MCP server."""
     log("Starting stdio server...")

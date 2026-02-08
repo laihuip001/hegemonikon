@@ -58,6 +58,8 @@ parent: /dia
 ## devil (悪魔の代弁者)
 
 > `/dia.devil` — 意図的に反対意見を構築する
+> **FEP統合**: Cone の `needs_devil` (V > 0.3) が true のとき、自動発動。
+> 構造化された矛盾検出 + 反例生成を行う。
 
 発動: `/dia devil` または「反論」「穴を見つけて」
 
@@ -67,6 +69,22 @@ parent: /dia
 | 致命的懸念 | 最も深刻な問題 |
 | 要注意 | 注意すべき問題 |
 | 推奨 | 対処のための提案 |
+
+### FEP devil_attack 自動実行
+
+> Peras (`/o`, `/s`, `/h`, `/p`, `/k`, `/a`) 完了後に Cone が構築されており、
+> `needs_devil == True` (V > 0.3) の場合、以下の turbo ブロックを自動実行する。
+
+// turbo
+
+```bash
+cd ~/oikos/hegemonikon && cat <<'EOF' | PYTHONPATH=. .venv/bin/python scripts/cone_bridge.py --series "${SERIES}" --advise
+${CONE_OUTPUTS_JSON}
+EOF
+```
+
+> **出力**: ContradictionPair (矛盾ペア) + Counterarguments (反例) + Resolution Paths (解消路)
+> **severity > 0.7 の場合**: `/dia root` に委譲して根源分析
 
 ---
 

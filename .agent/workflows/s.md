@@ -332,6 +332,26 @@ python3 $HOME/oikos/hegemonikon/mekhane/quality_gate.py <変更ファイル>
 | STAGE 4 | Devil's Advocate: {result} |
 | STAGE 5 | KPT: Keep/Problem/Try |
 
+#### ⊕ C0: Precision Weighting (PW) — 実行時精度の決定
+
+> **FEP**: Precision Weighting = 各情報チャネルの信頼度を動的に決定する操作。
+> `+`/`-` は均等 PW（省略形）。`pw:` は不均等 PW（一般化）。
+
+**明示指定**: `/s{pw: S1+, S3-}` → S1 (スケール) を強化、S3 (基準) を抑制
+
+**暗黙推定**:
+
+| 条件 | PW 推定 | 理由 |
+|:-----|:--------|:-----|
+| 新規設計 | S2+ (Mekhanē) | 手法探索を重視 |
+| リファクタリング | S1+, S3+ | スケールと基準を重視 |
+| 実装フェーズ | S4+ (Praxis) | 実践を重視 |
+| 指定なし | 全0 (均等) | default |
+
+→ **pw[S1..S4]** = 各定理の実行時精度重み [-1, +1]
+
+---
+
 #### ⊕ C1: 射の対比 (Contrast) — STAGE 0-3 出力 = Cone の射後検査
 
 > **圏論**: 4つの戦略射 Hom(X, Sn) を列挙し、整合性を検査する。
@@ -350,28 +370,27 @@ print(describe_cone(cone))
 "
 ```
 
-| STAGE | 定理 | Hom(X, Sn) | 出力要点 (1行) |
-|:------|:-----|:-----------|:---------------|
-| 0 | S1 Metron | スケールの射 | {Scale: Micro/Meso/Macro} |
-| 1 | S2 Mekhanē | 手法の射 | {Strategy: Explore/Exploit, Plan: A/B/C} |
-| 2 | S3 Stathmos | 基準の射 | {Rubric: Must/Should/Could} |
-| 3 | S4 Praxis | 実践の射 | {Blueprint: path} |
+| STAGE | 定理 | Hom(X, Sn) | pw | 出力要点 (1行) |
+|:------|:-----|:-----------|:--:|:---------------|
+| 0 | S1 Metron | スケールの射 | {pw₁} | {Scale: Micro/Meso/Macro} |
+| 1 | S2 Mekhanē | 手法の射 | {pw₂} | {Strategy: Explore/Exploit, Plan: A/B/C} |
+| 2 | S3 Stathmos | 基準の射 | {pw₃} | {Rubric: Must/Should/Could} |
+| 3 | S4 Praxis | 実践の射 | {pw₄} | {Blueprint: path} |
 
 → **V[outputs]** = 戦略射の散布度 (矛盾度: 0.0-1.0)
 　V = 0: 全射が自然に整合 = Cone が自明に存在
 　V > 0: スケールと実践が矛盾、基準と手法が不整合 = Cone の頂点探索が必要
 
-#### ⊕ C2: Cone への敏対的検証 (Resolve) — STAGE 4 Devil's Advocate
+#### ⊕ C2: Cone への敏対的検証 (Resolve) — STAGE 4 Devil's Advocate + PW 加重融合
 
-> **圏論**: S-series 独自の構造。他の Hub の C2 が「中介射の構築」(受動的) なのに対し、
-> S-series の C2 は Devil's Advocate が **Cone を能動的に攻撃**する。
-> 「この Cone は本当に普遍的か？ 別の Cone があるのでは？」と問う。
+> **圏論**: S-series 独自の構造。Devil's Advocate が Cone を能動的に攻撃し、
+> PW 重みで加重融合する。統合出力 = Σ(定理_i × (1 + pw_i)) / Σ(1 + pw_i)
 
 | V[outputs] | Cone 状態 | Devil の攻撃方法 |
 |:-----------|:---------|:-------------------|
-| > 0.3 | 戦略矛盾 | `/dia.root` — 根本原因から代替 Cone を探索 |
-| > 0.1 | 微妙な不整合 | 通常融合 (`@reduce(*)`) |
-| ≤ 0.1 | 戦略整合 | 単純集約 (`Σ`) — Cone が自明。Devil にも崩せない |
+| > 0.3 | 戦略矛盾 | `/dia.root` + **PW 加重融合** |
+| > 0.1 | 微妙な不整合 | **PW 加重融合** (`@reduce(*, pw)`) |
+| ≤ 0.1 | 戦略整合 | PW ≠ 0 なら加重集約、= 0 なら `Σ` |
 
 #### ⊕ C3: 普遍性検証 (Verify) — STAGE 5 KPT 統合
 

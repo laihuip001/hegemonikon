@@ -72,6 +72,15 @@ def main() -> int:
     audit_parser.add_argument("--verbose", "-v", action="store_true", help="OK も表示")
     audit_parser.add_argument("--boot-summary", action="store_true", help="/boot 用コンパクト出力")
 
+    # diff コマンド (v3.3: EPT 差分検出)
+    diff_parser = subparsers.add_parser("diff", help="Git diff に基づく EPT 変化検出")
+    diff_parser.add_argument(
+        "path", nargs="?", default=".", help="プロジェクトルート (default: .)"
+    )
+    diff_parser.add_argument(
+        "--since", default="HEAD~1", help="比較起点 (default: HEAD~1)"
+    )
+
     args = parser.parse_args()
 
     if args.command == "check":
@@ -82,6 +91,8 @@ def main() -> int:
         return cmd_variables(args)
     elif args.command == "skill-audit":
         return cmd_skill_audit(args)
+    elif args.command == "diff":
+        return cmd_diff(args)
 
     return 0
 
@@ -283,6 +294,17 @@ def cmd_skill_audit(args: argparse.Namespace) -> int:  # noqa: AI-005
     if args.ci and not result.is_passing:
         return 1
 
+    return 0
+
+
+# PURPOSE: Git diff に基づく EPT 変化検出コマンド (v3.3)
+def cmd_diff(args: argparse.Namespace) -> int:
+    """diff コマンドの実行"""
+    from .diff import diff_check, format_diff_result
+
+    root = Path(args.path).resolve()
+    result = diff_check(root, since=args.since)
+    print(format_diff_result(result))
     return 0
 
 

@@ -690,6 +690,8 @@ class DendronChecker:  # noqa: AI-007
 
     # --- 閾値定数 ---
     _SRP_MAX_LINES = 50
+    _SRP_MAX_LINES_METHOD = 65   # クラスメソッドは状態管理で長くなる
+    _SRP_MAX_LINES_TEST = 80     # テストは setup/assertion で長くなる
     _SRP_MAX_BRANCHES = 10
     _SRP_MAX_PARAMS = 5
     _SIMILARITY_THRESHOLD = 0.8  # 80% 以上で類似判定
@@ -698,6 +700,15 @@ class DendronChecker:  # noqa: AI-007
     def _check_complexity_from_tree(self, path: Path, tree: ast.Module) -> List[FunctionNFProof]:
         """関数の SRP 検証 (NF3 P22)"""
         results: List[FunctionNFProof] = []
+        is_test_file = path.name.startswith("test_") or path.name.endswith("_test.py")
+        
+        # クラス内メソッドを収集
+        class_methods: set = set()
+        for node in ast.walk(tree):
+            if isinstance(node, ast.ClassDef):
+                for item in node.body:
+                    if isinstance(item, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                        class_methods.add(id(item))
         
         for node in ast.walk(tree):
             if not isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
@@ -705,14 +716,22 @@ class DendronChecker:  # noqa: AI-007
             if node.name.startswith("_"):
                 continue
             
+            # コンテキスト対応の行数閾値
+            if is_test_file:
+                max_lines = self._SRP_MAX_LINES_TEST
+            elif id(node) in class_methods:
+                max_lines = self._SRP_MAX_LINES_METHOD
+            else:
+                max_lines = self._SRP_MAX_LINES
+            
             # 行数
             lines = (node.end_lineno or node.lineno) - node.lineno + 1
-            if lines > self._SRP_MAX_LINES:
+            if lines > max_lines:
                 results.append(FunctionNFProof(
                     name=node.name, path=path, line_number=node.lineno,
                     status=ProofStatus.WEAK, check_type="complexity",
-                    metric_value=lines, threshold=self._SRP_MAX_LINES,
-                    reason=f"関数が長すぎる: {lines}行 (閾値: {self._SRP_MAX_LINES})",
+                    metric_value=lines, threshold=max_lines,
+                    reason=f"関数が長すぎる: {lines}行 (閾値: {max_lines})",
                 ))
             
             # 分岐数 (cyclomatic complexity 近似)
@@ -821,9 +840,13 @@ class DendronChecker:  # noqa: AI-007
             for child in ast.iter_child_nodes(node):
                 self._collect_assignments(child, assignments)
             
-            # 3回以上の代入は WEAK (ループ変数・累積パターンを考慮)
+            # 動的閾値: 条件分岐が多い関数では代入も自然に増える
+            branch_count = sum(1 for child in ast.walk(node)
+                if isinstance(child, (ast.If, ast.Match)))
+            reassign_threshold = 3 + branch_count // 3  # 分岐3つごとに+1
+            
             for var_name, lines in assignments.items():
-                if len(lines) >= 3 and var_name not in _LOOP_VAR_NAMES:
+                if len(lines) >= reassign_threshold and var_name not in _LOOP_VAR_NAMES:
                     results.append(FunctionNFProof(
                         name=f"{node.name}.{var_name}", path=path,
                         line_number=lines[0],

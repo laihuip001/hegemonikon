@@ -12,7 +12,7 @@ Usage:
   python3 ccl_tracer.py step "<op>" --status=<status> --note="<note>"
   python3 ccl_tracer.py end --status=<status>
 
-Log Path: /home/makaron8426/oikos/.gemini/antigravity/logs/ccl.log
+Log Path: ~/.mekhane/logs/ccl.log
 """
 
 import sys
@@ -23,9 +23,29 @@ import argparse
 from pathlib import Path
 from typing import Optional
 
-LOG_DIR = Path("/home/makaron8426/oikos/.gemini/antigravity/logs")
+# Palette: Fixed hardcoded path to use user's home directory
+LOG_DIR = Path.home() / ".mekhane" / "logs"
 LOG_FILE = LOG_DIR / "ccl.log"
 STATE_FILE = LOG_DIR / "ccl_state.json"
+
+
+# Palette: Colors for UX
+class Colors:
+    RED = "\033[91m"
+    GREEN = "\033[92m"
+    YELLOW = "\033[93m"
+    BLUE = "\033[94m"
+    CYAN = "\033[96m"
+    RESET = "\033[0m"
+    BOLD = "\033[1m"
+
+
+def color_print(text: str, color: str = Colors.RESET, bold: bool = False):
+    """Prints text with ANSI colors."""
+    start = color
+    if bold:
+        start += Colors.BOLD
+    print(f"{start}{text}{Colors.RESET}")
 
 
 # PURPOSE: ensure_dirs — システムの処理
@@ -58,8 +78,28 @@ def log_entry(entry: dict):
     with open(LOG_FILE, "a") as f:
         f.write(log_line + "\n")
 
-    # Also print to stdout for immediate feedback
-    print(f"CCL_TRACE: {entry.get('message', '')}")
+    # Also print to stdout for immediate feedback (Palette: Enhanced UX)
+    msg_type = entry.get("type", "INFO")
+    message = entry.get("message", "")
+
+    if msg_type == "SESSION_START":
+        color_print(f"\n🚀 {message}", Colors.GREEN, bold=True)
+        color_print("-" * 50, Colors.GREEN)
+    elif msg_type == "SESSION_END":
+        color_print("-" * 50, Colors.BLUE)
+        color_print(f"🏁 {message}\n", Colors.BLUE, bold=True)
+    elif msg_type == "STEP":
+        status = entry.get("status", "running")
+        if status == "running":
+            color_print(f"  ⏳ {message}", Colors.CYAN)
+        elif status == "success":
+            color_print(f"  ✅ {message}", Colors.GREEN)
+        elif status == "failed":
+            color_print(f"  ❌ {message}", Colors.RED)
+        else:
+            color_print(f"  ℹ️  {message}", Colors.YELLOW)
+    else:
+        print(f"CCL_TRACE: {message}")
 
 
 # PURPOSE: 実行: start_session
@@ -87,7 +127,7 @@ def start_session(expression: str):
 def log_step(op: str, status: str = "running", note: str = ""):
     state = load_state()
     if not state:
-        print("Error: No active CCL session. Run 'start' first.")
+        color_print("🚨 Error: No active CCL session. Run 'start' first.", Colors.RED, bold=True)
         return
 
     step_record = {
@@ -115,7 +155,7 @@ def log_step(op: str, status: str = "running", note: str = ""):
 def end_session(status: str = "completed"):
     state = load_state()
     if not state:
-        print("Error: No active CCL session.")
+        color_print("🚨 Error: No active CCL session.", Colors.RED, bold=True)
         return
 
     duration = "unknown"

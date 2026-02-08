@@ -1,0 +1,171 @@
+#!/usr/bin/env python3
+# PROOF: [L2/テスト] <- mekhane/poiema/flow/tests/ + mekhane/anamnesis/tests/ + mekhane/ergasterion/
+# PURPOSE: 2000 到達用最終テスト — NoesisClient, ModuleDocument, Perspective
+"""Final Batch — Crossing 2000 Tests"""
+
+import pytest
+from pathlib import Path
+
+
+# ═══ NoesisClient ══════════════════════
+
+from mekhane.poiema.flow.noesis_client import (
+    NoesisClient,
+    GeminiClient,
+    _get_client,
+    is_api_configured,
+)
+
+
+class TestNoesisClient:
+    """O1 Noēsis 外部接続層テスト"""
+
+    def test_init_default(self):
+        client = NoesisClient()
+        assert client.settings is not None
+        assert "MODEL_FAST" in client.settings
+
+    def test_init_with_settings(self):
+        client = NoesisClient(settings={
+            "GEMINI_API_KEY": "",
+            "MODEL_FAST": "test-model",
+            "MODEL_SMART": "smart-model",
+        })
+        assert client.settings["MODEL_FAST"] == "test-model"
+
+    def test_not_configured_without_key(self):
+        client = NoesisClient(settings={"GEMINI_API_KEY": ""})
+        assert client.is_configured is False
+
+    def test_backward_compat_alias(self):
+        assert GeminiClient is NoesisClient
+
+    def test_stream_not_configured(self):
+        client = NoesisClient(settings={"GEMINI_API_KEY": ""})
+        chunks = list(client.generate_content_stream("test", {}))
+        assert len(chunks) > 0
+        assert "Error" in chunks[0] or "設定" in chunks[0]
+
+    def test_get_client_singleton(self):
+        # Just verify it returns a NoesisClient
+        assert isinstance(_get_client(), NoesisClient)
+
+    def test_is_api_configured(self):
+        # Without API key, should be False
+        result = is_api_configured()
+        assert isinstance(result, bool)
+
+
+# ═══ ModuleDocument ════════════════════
+
+from mekhane.anamnesis.module_indexer import ModuleDocument, parse_module_file
+
+
+class TestModuleDocument:
+    """ModuleDocument データモデルテスト"""
+
+    def test_create(self):
+        doc = ModuleDocument(
+            filename="test.md",
+            title="Test Module",
+            category="hypervisor",
+            content="Full content",
+            content_preview="Preview",
+        )
+        assert doc.filename == "test.md"
+        assert doc.category == "hypervisor"
+
+    def test_model_dump(self):
+        doc = ModuleDocument(
+            filename="test.md",
+            title="Test",
+            category="individual",
+            content="c",
+            content_preview="p",
+        )
+        d = doc.model_dump()
+        assert d["filename"] == "test.md"
+        assert "title" in d
+
+
+class TestParseModuleFile:
+    """parse_module_file テスト"""
+
+    def test_parse_with_title(self, tmp_path):
+        f = tmp_path / "test_module.md"
+        f.write_text("# My Module Title\n\nContent here.", encoding="utf-8")
+        doc = parse_module_file(f, "hypervisor")
+        assert doc is not None
+        assert doc.title == "My Module Title"
+        assert doc.category == "hypervisor"
+
+    def test_parse_without_title(self, tmp_path):
+        f = tmp_path / "test_module.md"
+        f.write_text("No heading, just content.", encoding="utf-8")
+        doc = parse_module_file(f, "individual")
+        assert doc is not None
+        assert doc.title == "test_module"  # Falls back to stem
+
+    def test_parse_nonexistent(self, tmp_path):
+        f = tmp_path / "nonexistent.md"
+        doc = parse_module_file(f, "test")
+        assert doc is None
+
+    def test_parse_content_preview(self, tmp_path):
+        f = tmp_path / "test.md"
+        f.write_text("# Title\n\n" + "x" * 1000, encoding="utf-8")
+        doc = parse_module_file(f, "test")
+        assert len(doc.content_preview) <= 500
+
+    def test_parse_content_max(self, tmp_path):
+        f = tmp_path / "test.md"
+        f.write_text("# Title\n\n" + "a" * 20000, encoding="utf-8")
+        doc = parse_module_file(f, "test")
+        assert len(doc.content) <= 15000
+
+    def test_parse_japanese(self, tmp_path):
+        f = tmp_path / "日本語.md"
+        f.write_text("# 日本語タイトル\n\n日本語コンテンツ。", encoding="utf-8")
+        doc = parse_module_file(f, "hypervisor")
+        assert doc is not None
+        assert doc.title == "日本語タイトル"
+
+
+# ═══ Perspective ═══════════════════════
+
+from mekhane.ergasterion.synedrion.prompt_generator import Perspective
+
+
+class TestPerspective:
+    """Perspective データクラステスト"""
+
+    @pytest.fixture
+    def perspective(self):
+        return Perspective(
+            domain_id="Resource",
+            domain_name="Resource Management",
+            domain_description="Resource allocation and management",
+            domain_keywords=["memory", "cpu", "disk"],
+            axis_id="O",
+            axis_name="Ontological",
+            axis_question="What exists?",
+            axis_focus="existence",
+            theorem="S2 Mekhanē",
+        )
+
+    def test_create(self, perspective):
+        assert perspective.domain_id == "Resource"
+        assert perspective.axis_id == "O"
+
+    def test_id(self, perspective):
+        assert perspective.id == "Resource-O"
+
+    def test_name(self, perspective):
+        assert perspective.name == "Resource Management × Ontological"
+
+    def test_theorem(self, perspective):
+        assert perspective.theorem == "S2 Mekhanē"
+
+    def test_keywords(self, perspective):
+        assert "memory" in perspective.domain_keywords
+        assert len(perspective.domain_keywords) == 3

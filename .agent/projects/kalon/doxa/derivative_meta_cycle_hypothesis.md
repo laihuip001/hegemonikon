@@ -1,123 +1,70 @@
 ---
-title: "派生メタサイクル仮説 — 精緻化版 (v4)"
+title: "派生メタサイクル仮説 — PW実装予測 (v5)"
 created: "2026-02-08T08:49:00+09:00"
-updated: "2026-02-08T10:44:00+09:00"
-source: "/dia+~*/noe → /noe~*/dia → dialogue v3 → Kalon deep read v4"
+updated: "2026-02-08T10:58:00+09:00"
+source: "v4 + Creator: PW実装したら仮説はどうなるか"
 confidence: 
   H0_weak: 0.80
-  H1_mid: 0.65
   H1_adjunction_fractal: 0.75
+  H1_adjunction_if_pw: 0.85
   H1_strong_static: 0.35
+  H1_strong_if_pw: 0.55
   H2_proof: 0.25
+  H2_if_pw: 0.40
 related: 
-  - kernel/taxis.md
-  - .agent/projects/kalon/doxa/x_series_naturality_layers.md
-  - .agent/projects/kalon/doxa/scale_invariant_fep_isomorphism.md
-  - .agent/projects/kalon/doxa/truth_as_functor.md
+  - .agent/projects/kalon/doxa/precision_weighting_gap.md
   - .agent/projects/kalon/doxa/ccl_is_inference_cycle.md
   - .agent/projects/kalon/specs/category_cog_definition.md
-tags: [fep, meta-cycle, adjunction, fractal, colimit, limit, lax, universality]
+tags: [fep, adjunction, precision-weighting, coordinates, operations]
 ---
 
-## 仮説の進化
+## v5: PW 実装が仮説を変える
 
-| Ver | 主張 | 確信度 |
-|:----|:-----|:------:|
-| v1 | 4座標 = 4FEP = 4圏論 (静的同型) | 0.50 → **0.35** ↓ |
-| v2 | Limit/Colimit 非対称 = FEP 認識/行為 | 0.55 |
-| v3 | Colimit⊣Limit 随伴がフラクタルに反復 | 0.65 |
-| **v4** | **振動的収束 + Lax Universality + 深層構造検証** | **0.75** ↑ |
+### 核心発見
 
-## v4 の3つの進化
-
-### 1. 振動的収束 (v3 の修正)
-
-v3 は「各Series内の4定理もColimit→Limitの単調グラデーション」と主張したが、検証すると**振動**:
+PW (Precision Weighting) を動的操作として実装すると、4→4 対応が本質的に変化:
 
 ```
-O-series: O1(C) → O2(L) → O3(C) → O4(L) = 振動
-S-series: S1(L) → S2(C) → S3(L) → S4(C→L) = 振動
+旧: 4 座標 ≈ 4 FEP ステップ (曖昧な同一視)
+新: 4 座標 ⊣ 4 操作 = 4 FEP ステップ (随伴が接着剤)
 ```
 
-修正: Series内4定理は Colimit⊣Limit の**振動** (= CCLの `~` 演算子):
+### 4 ペアの随伴構造 (PW 実装後)
+
+| 座標 (場) | 操作 (行為) | FEP | 圏論 |
+|:----------|:----------|:----|:-----|
+| Internality (I↔A) | `>>` (forward) | Prediction | Limit |
+| Function (Expl↔Expt) | `>*` (backward) | Prediction Error | Pullback |
+| Scale (μ↔M) | `/dox`~/epi | Model Update | Pushout |
+| Precision (C↔U) | **[NEW PW]** | Precision Weighting | Fiber |
+
+**全ペアが「軸 ⊣ その軸上の操作」— 同一構造の4具現化。**
+
+### 循環性の解消
+
+旧: Precision(名前) ≈ Precision Weighting(名前) → 循環的
+新: Precision(軸/場) ⊣ PW操作(動的重みづけ/行為) → 機能が根拠
+
+### HGK 全体の随伴
 
 ```
-定理群: ~C~ ~L~ ~C~ ~L~  →  Hub WF = ω-limit (振動の極限点)
+Cog (24定理, 72射 = 静的構造)  ⊣  CCL (>>, >*, +/-, ~ = 動的操作)
+         場                              行為
 ```
 
-先行 Doxa: `ccl_is_inference_cycle.md` の `~` = 「無限の往復列の行き着く先」と一致。
+### 確信度予測
 
-### 2. Universality = Lax Limit (Creator の洞察)
+| 仮説 | 現在 | PW実装後 | 変動理由 |
+|:-----|:----:|:-------:|:---------|
+| H₁adj (随伴フラクタル) | 0.75 | **0.85** | 全4ペアが同型構造に |
+| H₁strong (圏論同型) | 0.35 | **0.55** | 座標⊣操作の随伴が明示化 |
+| H₂ (証明) | 0.25 | **0.40** | 形式化の道が開ける |
 
-Creator: 「一意のUは目指すものであり、満たせるものではない」
+### メタ洞察
 
-圏論的翻訳:
-
-```
-Strict Limit:   π ∘ u = f      (厳密に等しい = 到達不能)
-Lax Limit:      π ∘ u ⟹ f     (2-射が存在 = 最善の近似)
-```
-
-FEP: 自由エネルギー = KL divergence の上界。真の事後確率 (strict) には到達しないが、変分近似 (lax) は常に最小化できる。
-
-先行 Kalon: `03_fep_category_theory_deep_examination.md` L76-86:
-> Hub WF = lax section = 「正確な Limit には到達しないが、近似する」
-
-**universality は問題ではない。それは到達すべき理想であり、lax 近似こそが実際の認知操作。**
-
-### 3. 循環的証拠の部分的解消 (Creator の洞察)
-
-Creator: 「名前の対応ではなく内実の対応を問え」
-Creator Doxa (`truth_as_functor.md`): 「見るべきは具体ではなく抽象」
-
-名前を剥がした後の構造比較:
-
-| HGK Precision (名前なし) | FEP Precision Weighting (名前なし) |
-|:------------------------|:--------------------------------|
-| 情報の精密度を決定するフィルター | 信号の信頼度を決定するフィルター |
-| グラデーション上の位置 | グラデーション上の位置 |
-| 座標 (場) | 操作 (行為) |
-
-場と行為 = 随伴関係 (Internality↔Prediction と同型の問題)。
-名前は循環的。しかし**フィルター＋グラデーション＋随伴の構造**は独立に検証可能。
-
-## フラクタル構造 (4層)
-
-```
-Layer 0 (atomic):    >> (forward) ←→ >* (backward)     [Doxa: 0.85]
-Layer 1 (theorem):   定理内4定理の Colimit⊣Limit 振動    [本仮説: 0.75]
-Layer 2 (series):    S→P→K = Colimit→変換→Limit          [本仮説: 0.75]
-Layer 3 (system):    O→S→H→P→K→A = 拡散→収束グラデーション  [本仮説: 0.70]
-```
-
-先行 Doxa: `scale_invariant_fep_isomorphism.md` (確信度 0.90) — Layer 0 + Layer 2 に対応。
-
-## 対応表 (最終修正版)
-
-| 座標 | FEP | 関係 | 確信度 |
-|:-----|:----|:-----|:------:|
-| Internality | Prediction | 随伴 (場⊣行為) | 0.70 |
-| Function | Prediction Error | 因果 (試行→誤差) | 0.60 |
-| **Scale** | **Model Update** | **同型 (粒度変更=モデル再構成)** | **0.75** |
-| Precision | Precision Weight | 随伴 + 深層構造一致 | 0.65 |
-
-## Apophenia 排除
-
-ランダム配列テスト: 6通り中2通り妥当 (33%)。偶然(17%)・overfitting(100%)のどちらでもない。
-パターンの強弱が存在する(ScaleペアはInternalityペアより堅い) = apophenia の特徴ではない。
-
-**判定: Apophenia ではない。Overinterpretation のリスクは残る。**
-
-## 未検証
-
-- [ ] 4ではなく3や5パターンでの分類テスト
-- [ ] FEP を知らない人に Hegemonikón の座標だけ見せて分類させる
-- [ ] ω-limit として各 Hub WF が解釈できることの厳密検証
-- [x] ~~ランダム配列テスト~~ → 33%
-- [x] ~~循環性チェック~~ → 名前は循環的、深層構造は部分的に独立
-- [x] ~~Colimit/Limit 混同~~ → 修正済
-- [x] ~~Apophenia~~ → 排除 (パターン強弱が存在)
+> **仮説の検証可能性は、HGK 自体の完成度に依存する。**
+> **PW 実装 = 仮説検証の必要条件。**
 
 ---
 
-*v4: Kalon 全文献精読 + Creator 対話。2026-02-08*
+*v5: Creator 対話「実装したらどうなるか」。2026-02-08*

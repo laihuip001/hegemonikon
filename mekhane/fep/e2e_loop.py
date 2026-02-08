@@ -66,6 +66,8 @@ class CycleResult:
     # ConeAdvice + DevilAttack
     advice_action: Optional[str] = None
     advice_wf: Optional[str] = None
+    advice_trace: Optional[str] = None  # ES: DecisionTrace repr
+    advice_format: Optional[str] = None  # ES: format_advice_for_llm output
     devil_severity: Optional[float] = None
     devil_summary: Optional[str] = None
     # Learning
@@ -134,7 +136,7 @@ def run_loop(
     from mekhane.fep.attractor_dispatcher import AttractorDispatcher
     from mekhane.fep.cone_builder import converge, compute_dispersion, resolve_method
     from mekhane.fep.category import Series
-    from mekhane.fep.cone_consumer import advise, devil_attack
+    from mekhane.fep.cone_consumer import advise, devil_attack, format_advice_for_llm
 
     # 一時ファイルでA行列を管理 (テスト時のクリーン性)
     if a_matrix_path is None:
@@ -210,6 +212,10 @@ def run_loop(
                 advice = advise(cone)
                 cycle.advice_action = advice.action
                 cycle.advice_wf = advice.suggested_wf
+                # ES: preserve trace
+                if advice.trace:
+                    cycle.advice_trace = repr(advice.trace)
+                cycle.advice_format = format_advice_for_llm(advice)
                 if cone.needs_devil:
                     attack = devil_attack(cone)
                     cycle.devil_severity = attack.severity
@@ -436,6 +442,7 @@ def run_loop_v2(
     # Agent (persistent across cycles)
     agent = HegemonikónFEPAgentV2()
     agent.load_learned_A(a_matrix_path)
+    agent.load_epsilon()  # Meta-ε 復元
 
     results: List[CycleResultV2] = []
 
@@ -507,6 +514,7 @@ def run_loop_v2(
     import os
     os.makedirs(os.path.dirname(a_matrix_path), exist_ok=True)
     agent.save_learned_A(a_matrix_path)
+    agent.save_epsilon()  # Meta-ε 永続化
 
     # Learning proof
     learning_proof = None

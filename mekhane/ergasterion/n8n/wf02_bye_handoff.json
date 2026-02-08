@@ -1,0 +1,167 @@
+{
+    "name": "WF-02: Bye Handoff Persistence",
+    "nodes": [
+        {
+            "parameters": {
+                "httpMethod": "POST",
+                "path": "bye-handoff",
+                "responseMode": "lastNode",
+                "options": {}
+            },
+            "id": "webhook-bye",
+            "name": "Webhook Trigger",
+            "type": "n8n-nodes-base.webhook",
+            "typeVersion": 1,
+            "position": [
+                250,
+                300
+            ],
+            "webhookId": "bye-handoff"
+        },
+        {
+            "parameters": {
+                "jsCode": "const fs = require('fs');\nconst path = require('path');\n\nconst subject = ($input.item.json.body || {}).subject || 'Unknown';\nconst timestamp = ($input.item.json.body || {}).timestamp || new Date().toISOString();\n\nconst EXPORT_DIR = '/oikos/mneme/.hegemonikon/sessions';\n\ntry {\n  const files = fs.readdirSync(EXPORT_DIR)\n    .filter(f => f.endsWith('.md'))\n    .map(f => {\n      const stat = fs.statSync(path.join(EXPORT_DIR, f));\n      return { name: f, time: stat.mtime.getTime() };\n    })\n    .sort((a, b) => b.time - a.time);\n\n  const latestFile = files.length > 0 ? files[0].name : 'none';\n  const totalHandoffs = files.filter(f => f.includes('handoff')).length;\n  const totalSessions = files.length;\n\n  const emoji = '👋';\n  return [{ json: {\n    status: 'success', file: latestFile, subject, timestamp,\n    totalHandoffs, totalSessions,\n    slackPayload: JSON.stringify({\n      blocks: [\n        { type: 'header', text: { type: 'plain_text', text: emoji + ' Session Ended', emoji: true } },\n        { type: 'section', fields: [\n          { type: 'mrkdwn', text: '*Subject:*\\n' + subject },\n          { type: 'mrkdwn', text: '*Status:*\\n保存完了' }\n        ]},\n        { type: 'section', fields: [\n          { type: 'mrkdwn', text: '*Latest File:*\\n`' + latestFile + '`' },\n          { type: 'mrkdwn', text: '*Time:*\\n' + timestamp }\n        ]},\n        { type: 'context', elements: [\n          { type: 'mrkdwn', text: '📂 Total sessions: ' + totalSessions + ' | 📝 Handoffs: ' + totalHandoffs }\n        ]}\n      ]\n    })\n  } }];\n} catch (e) {\n  return [{ json: { status: 'error', message: e.message, subject, timestamp, slackPayload: '' } }];\n}"
+            },
+            "id": "process-handoff",
+            "name": "Process Handoff",
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                450,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "conditions": {
+                    "string": [
+                        {
+                            "value1": "={{$json.slackPayload}}",
+                            "operation": "isNotEmpty"
+                        }
+                    ]
+                }
+            },
+            "id": "if-has-payload",
+            "name": "Slack 送信可?",
+            "type": "n8n-nodes-base.if",
+            "typeVersion": 1,
+            "position": [
+                650,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "={{ $env.SLACK_WEBHOOK_URL }}",
+                "sendBody": true,
+                "specifyBody": "json",
+                "jsonBody": "={{ $json.slackPayload }}",
+                "options": {
+                    "timeout": 10000
+                }
+            },
+            "id": "slack-notify",
+            "name": "Slack 通知",
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.2,
+            "position": [
+                850,
+                200
+            ]
+        },
+        {
+            "parameters": {
+                "jsCode": "const prev = $('Process Handoff').item.json;\nreturn [{ json: { status: prev.status, file: prev.file, subject: prev.subject, slack: 'sent' } }];"
+            },
+            "id": "result-sent",
+            "name": "結果 (送信済)",
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                1050,
+                200
+            ]
+        },
+        {
+            "parameters": {
+                "jsCode": "const prev = $('Process Handoff').item.json;\nreturn [{ json: { status: prev.status, file: prev.file, subject: prev.subject, slack: 'skipped' } }];"
+            },
+            "id": "result-skipped",
+            "name": "結果 (スキップ)",
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                850,
+                400
+            ]
+        }
+    ],
+    "connections": {
+        "Webhook Trigger": {
+            "main": [
+                [
+                    {
+                        "node": "Process Handoff",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Process Handoff": {
+            "main": [
+                [
+                    {
+                        "node": "Slack 送信可?",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Slack 送信可?": {
+            "main": [
+                [
+                    {
+                        "node": "Slack 通知",
+                        "type": "main",
+                        "index": 0
+                    }
+                ],
+                [
+                    {
+                        "node": "結果 (スキップ)",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Slack 通知": {
+            "main": [
+                [
+                    {
+                        "node": "結果 (送信済)",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        }
+    },
+    "settings": {
+        "executionOrder": "v1"
+    },
+    "tags": [
+        {
+            "name": "hegemonikon"
+        },
+        {
+            "name": "bye"
+        }
+    ],
+    "active": true,
+    "versionId": "3.0.0"
+}

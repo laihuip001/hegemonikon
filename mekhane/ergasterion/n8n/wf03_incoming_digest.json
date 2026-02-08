@@ -23,7 +23,7 @@
         },
         {
             "parameters": {
-                "jsCode": "const fs = require('fs');\nconst path = require('path');\n\nconst INCOMING_DIR = '/oikos/mneme/.hegemonikon/incoming';\n\ntry {\n  if (!fs.existsSync(INCOMING_DIR)) {\n    return [];\n  }\n\n  const files = fs.readdirSync(INCOMING_DIR)\n    .filter(f => f.endsWith('.md') && !f.startsWith('.'))\n    .map(f => {\n      const fullPath = path.join(INCOMING_DIR, f);\n      const stat = fs.statSync(fullPath);\n      const content = fs.readFileSync(fullPath, 'utf-8');\n      return { filename: f, path: fullPath, size: stat.size, content: content, mtime: stat.mtime.toISOString() };\n    })\n    .filter(f => f.content.trim().length > 0);\n\n  if (files.length === 0) {\n    return [];\n  }\n\n  return files.map(f => ({ json: f }));\n} catch (e) {\n  throw new Error('Scan failed: ' + e.message);\n}"
+                "jsCode": "const fs = require('fs');\nconst path = require('path');\nconst INCOMING_DIR = '/oikos/mneme/.hegemonikon/incoming';\n\ntry {\n  if (!fs.existsSync(INCOMING_DIR)) return [];\n  const files = fs.readdirSync(INCOMING_DIR)\n    .filter(f => f.endsWith('.md') && !f.startsWith('.'))\n    .map(f => {\n      const fullPath = path.join(INCOMING_DIR, f);\n      const stat = fs.statSync(fullPath);\n      const content = fs.readFileSync(fullPath, 'utf-8');\n      return { filename: f, path: fullPath, size: stat.size, content, mtime: stat.mtime.toISOString() };\n    })\n    .filter(f => f.content.trim().length > 0);\n  return files.length === 0 ? [] : files.map(f => ({ json: f }));\n} catch (e) {\n  throw new Error('Scan failed: ' + e.message);\n}"
             },
             "id": "scan-incoming",
             "name": "incoming/ スキャン",
@@ -36,7 +36,7 @@
         },
         {
             "parameters": {
-                "jsCode": "const fs = require('fs');\nconst path = require('path');\n\nconst content = $input.item.json.content;\nconst filename = $input.item.json.filename;\n\nconst lines = content.split('\\n');\nlet title = filename;\nlet score = '?';\nlet topics = [];\nlet abstract = '';\nlet source = '';\nlet url = '';\nlet targets = '';\n\nfor (const line of lines) {\n  if (line.startsWith('# ')) {\n    title = line.replace(/^#\\s*\\/eat\\s*候補:\\s*/, '').trim();\n  }\n  const scoreMatch = line.match(/Score[*]*:\\s*([\\d.]+)/);\n  if (scoreMatch) score = scoreMatch[1];\n  const topicMatch = line.match(/Topics[*]*:\\s*(.+?)(?:\\s*\\||$)/);\n  if (topicMatch) topics = topicMatch[1].split(',').map(t => t.trim());\n  const sourceMatch = line.match(/Source[*]*:\\s*(.+?)(?:\\s*\\||$)/);\n  if (sourceMatch) source = sourceMatch[1].trim();\n  const urlMatch = line.match(/URL[*]*:\\s*(http\\S+)/);\n  if (urlMatch) url = urlMatch[1].trim();\n  const targetMatch = line.match(/消化先候補[*]*:\\s*(.+)/);\n  if (targetMatch) targets = targetMatch[1].trim();\n}\n\nconst absIdx = lines.findIndex(l => l.startsWith('## Abstract'));\nif (absIdx >= 0) {\n  abstract = lines.slice(absIdx + 1, absIdx + 5).join(' ').trim().slice(0, 200);\n}\n\nconst PROCESSED_DIR = '/oikos/mneme/.hegemonikon/processed';\nif (!fs.existsSync(PROCESSED_DIR)) {\n  fs.mkdirSync(PROCESSED_DIR, { recursive: true });\n}\n\nconst now = new Date().toISOString().slice(0, 10);\nconst digestFilename = `digest_${now}_${filename}`;\n\nconst digest = `# Digest: ${title}\\n\\n> **消化日**: ${now}\\n> **Score**: ${score}\\n> **Topics**: ${topics.join(', ')}\\n> **Source**: ${source}\\n> **URL**: ${url}\\n> **消化先**: ${targets}\\n\\n## Abstract\\n\\n${abstract}\\n\\n---\\n\\n*Auto-processed by WF-03 (n8n)*\\n`;\n\nfs.writeFileSync(path.join(PROCESSED_DIR, digestFilename), digest, 'utf-8');\nfs.renameSync($input.item.json.path, path.join(PROCESSED_DIR, `original_${filename}`));\n\nreturn [{\n  json: {\n    title, score, topics, source, url, abstract, targets,\n    status: 'digested', digestFile: digestFilename\n  }\n}];"
+                "jsCode": "const fs = require('fs');\nconst path = require('path');\nconst content = $input.item.json.content;\nconst filename = $input.item.json.filename;\n\nconst lines = content.split('\\n');\nlet title = filename, score = '?', topics = [], source = '', url = '', targets = '';\n\nfor (const line of lines) {\n  if (line.startsWith('# ')) title = line.replace(/^#\\s*\\/eat\\s*候補:\\s*/, '').trim();\n  const sm = line.match(/Score[*]*:\\s*([\\d.]+)/); if (sm) score = sm[1];\n  const tm = line.match(/Topics[*]*:\\s*(.+?)(?:\\s*\\||$)/); if (tm) topics = tm[1].split(',').map(t => t.trim());\n  const srcm = line.match(/Source[*]*:\\s*(.+?)(?:\\s*\\||$)/); if (srcm) source = srcm[1].trim();\n  const um = line.match(/URL[*]*:\\s*(http\\S+)/); if (um) url = um[1].trim();\n  const tgm = line.match(/消化先候補[*]*:\\s*(.+)/); if (tgm) targets = tgm[1].trim();\n}\n\nlet abstract = '';\nconst absIdx = lines.findIndex(l => l.startsWith('## Abstract'));\nif (absIdx >= 0) abstract = lines.slice(absIdx + 1, absIdx + 5).join(' ').trim().slice(0, 200);\n\nconst PROCESSED_DIR = '/oikos/mneme/.hegemonikon/processed';\nif (!fs.existsSync(PROCESSED_DIR)) fs.mkdirSync(PROCESSED_DIR, { recursive: true });\n\nconst now = new Date().toISOString().slice(0, 10);\nconst digestFilename = `digest_${now}_${filename}`;\nconst digest = `# Digest: ${title}\\n\\n> **消化日**: ${now}\\n> **Score**: ${score}\\n> **Topics**: ${topics.join(', ')}\\n> **Source**: ${source}\\n> **URL**: ${url}\\n> **消化先**: ${targets}\\n\\n## Abstract\\n\\n${abstract}\\n\\n---\\n*Auto-processed by WF-03 (n8n)*\\n`;\n\nfs.writeFileSync(path.join(PROCESSED_DIR, digestFilename), digest, 'utf-8');\nfs.renameSync($input.item.json.path, path.join(PROCESSED_DIR, `original_${filename}`));\n\nreturn [{ json: { title, score, topics, source, url, abstract, targets, status: 'digested', digestFile: digestFilename } }];"
             },
             "id": "digest-process",
             "name": "ダイジェスト生成 + 移動",
@@ -49,7 +49,7 @@
         },
         {
             "parameters": {
-                "jsCode": "const items = $input.all();\nconst now = new Date().toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' });\n\nconst summary = items.map(item => {\n  const d = item.json;\n  const emoji = parseFloat(d.score) >= 0.5 ? '⭐' : '📄';\n  return `${emoji} *${d.title}* (${d.score}) — ${d.topics.join(', ')}`;\n}).join('\\n');\n\nreturn [{ json: {\n  text: `📥 消化完了 (${now})\\n\\n${items.length}件処理:\\n${summary}`,\n  count: items.length,\n  items: items.map(i => i.json)\n} }];"
+                "jsCode": "const items = $input.all();\nconst now = new Date().toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' });\nconst summary = items.map(item => {\n  const d = item.json;\n  const emoji = parseFloat(d.score) >= 0.5 ? '⭐' : '📄';\n  return `${emoji} *${d.title}* (${d.score}) — ${d.topics.join(', ')}`;\n}).join('\\n');\n\nreturn [{ json: {\n  slackPayload: JSON.stringify({\n    blocks: [\n      { type: 'header', text: { type: 'plain_text', text: '📥 消化完了: ' + items.length + '件', emoji: true } },\n      { type: 'section', text: { type: 'mrkdwn', text: '消化完了 (' + now + ')\\n\\n' + items.length + '件処理:\\n' + summary } },\n      { type: 'context', elements: [{ type: 'mrkdwn', text: '_WF-03 Incoming → Digest | Hegemonikón_' }] }\n    ]\n  }),\n  count: items.length,\n  items: items.map(i => i.json)\n} }];"
             },
             "id": "format-summary",
             "name": "Slack メッセージ整形",
@@ -62,12 +62,19 @@
         },
         {
             "parameters": {
-                "jsCode": "const { execSync } = require('child_process');\n\nconst data = $input.item.json;\n\nlet webhookUrl = '';\ntry {\n  webhookUrl = execSync('echo $SLACK_WEBHOOK_URL', { encoding: 'utf-8' }).trim();\n} catch(e) {}\n\nif (!webhookUrl) {\n  return [{ json: { slack: 'skipped', reason: 'SLACK_WEBHOOK_URL not set', message: data.text } }];\n}\n\nconst payload = JSON.stringify({\n  blocks: [\n    { type: 'header', text: { type: 'plain_text', text: '📥 消化完了: ' + data.count + '件', emoji: true } },\n    { type: 'section', text: { type: 'mrkdwn', text: data.text } },\n    { type: 'context', elements: [\n      { type: 'mrkdwn', text: '_WF-03 Incoming → Digest | Hegemonikón_' }\n    ]}\n  ]\n});\n\ntry {\n  const escaped = payload.replace(/'/g, \"'\\\\''\");\n  execSync(`curl -s -X POST '${webhookUrl}' -H 'Content-Type: application/json' -d '${escaped}' --connect-timeout 5 --max-time 10`, { encoding: 'utf-8' });\n  return [{ json: { slack: 'sent' } }];\n} catch(e) {\n  return [{ json: { slack: 'error', msg: (e.message || '').slice(0, 100) } }];\n}"
+                "method": "POST",
+                "url": "={{ $env.SLACK_WEBHOOK_URL }}",
+                "sendBody": true,
+                "specifyBody": "json",
+                "jsonBody": "={{ $json.slackPayload }}",
+                "options": {
+                    "timeout": 10000
+                }
             },
             "id": "slack-notify",
             "name": "Slack 通知",
-            "type": "n8n-nodes-base.code",
-            "typeVersion": 2,
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.2,
             "position": [
                 1050,
                 300
@@ -135,5 +142,5 @@
         }
     ],
     "active": true,
-    "versionId": "4.0.0"
+    "versionId": "5.0.0"
 }

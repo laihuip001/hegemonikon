@@ -138,7 +138,7 @@ anti_skip: enabled
 ```bash
 cd ~/oikos/hegemonikon && PYTHONPATH=. .venv/bin/python mekhane/fep/cone_builder.py \
   --series A --pw "${PW_A:-}" \
-  A1="${A1_OUT}" A2="${A2_OUT}" A3="${A3_OUT}" A4="${A4_OUT}"
+  --file "$(PYTHONPATH=. .venv/bin/python -m mekhane.fep.wf_env_bridge export A)"
 ```
 
 **射の列挙** (各定理の精度射を計算):

@@ -364,7 +364,7 @@ python3 $HOME/oikos/hegemonikon/mekhane/quality_gate.py <変更ファイル>
 ```bash
 cd ~/oikos/hegemonikon && PYTHONPATH=. .venv/bin/python mekhane/fep/cone_builder.py \
   --series S --pw "${PW_S:-}" \
-  S1="${S1_OUT}" S2="${S2_OUT}" S3="${S3_OUT}" S4="${S4_OUT}"
+  --file "$(PYTHONPATH=. .venv/bin/python -m mekhane.fep.wf_env_bridge export S)"
 ```
 
 | STAGE | 定理 | Hom(X, Sn) | pw | 出力要点 (1行) |

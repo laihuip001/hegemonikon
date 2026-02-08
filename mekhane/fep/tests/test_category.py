@@ -11,7 +11,9 @@ Q.E.D.
 
 import pytest
 from mekhane.fep.category import (
+    FUNCTORS,
     MORPHISMS,
+    NATURAL_TRANSFORMATIONS,
     THEOREMS,
     Adjunction,
     Cone,
@@ -497,4 +499,85 @@ class TestNaturalTransformation:
             name="ε", source_functor="F", target_functor="G",
         )
         assert empty.is_natural_isomorphism is False
+
+
+# =============================================================================
+# Registry Tests (FUNCTORS / NATURAL_TRANSFORMATIONS)
+# =============================================================================
+
+
+class TestFunctorRegistry:
+    """FUNCTORS レジストリの検証"""
+
+    # PURPOSE: 4 concrete functors defined
+    def test_registry_count(self):
+        assert len(FUNCTORS) == 4
+        assert set(FUNCTORS.keys()) == {"boot", "bye", "zet", "eat"}
+
+    # PURPOSE: boot ⊣ bye adjunction consistency
+    def test_boot_bye_adjunction(self):
+        boot = FUNCTORS["boot"]
+        bye = FUNCTORS["bye"]
+        assert boot.source_cat == bye.target_cat  # Mem
+        assert boot.target_cat == bye.source_cat  # Ses
+
+    # PURPOSE: boot maps mem objects to session objects
+    def test_boot_maps(self):
+        boot = FUNCTORS["boot"]
+        assert boot.map_object("handoff") == "session_context"
+        assert boot.map_object("ki") == "knowledge_items"
+
+    # PURPOSE: bye is inverse direction of boot
+    def test_bye_inverse(self):
+        boot = FUNCTORS["boot"]
+        bye = FUNCTORS["bye"]
+        # Every boot target should be a bye source
+        for src, tgt in boot.object_map.items():
+            assert bye.map_object(tgt) == src
+
+    # PURPOSE: zet is an endofunctor
+    def test_zet_endofunctor(self):
+        zet = FUNCTORS["zet"]
+        assert zet.is_endofunctor is True
+        assert zet.source_cat == zet.target_cat == "Cog"
+
+    # PURPOSE: eat maps external content to Cog theorems
+    def test_eat_targets_are_theorems(self):
+        eat = FUNCTORS["eat"]
+        for tgt in eat.object_map.values():
+            assert tgt in THEOREMS
+
+    # PURPOSE: all functors are faithful (injective on morphisms)
+    def test_all_faithful(self):
+        for name, f in FUNCTORS.items():
+            assert f.is_faithful is True, f"{name} is not faithful"
+
+
+class TestNaturalTransformationRegistry:
+    """NATURAL_TRANSFORMATIONS レジストリの検証"""
+
+    # PURPOSE: η and ε defined
+    def test_registry_count(self):
+        assert len(NATURAL_TRANSFORMATIONS) == 2
+        assert set(NATURAL_TRANSFORMATIONS.keys()) == {"eta", "epsilon"}
+
+    # PURPOSE: η and ε form adjunction pair
+    def test_adjunction_pair(self):
+        eta = NATURAL_TRANSFORMATIONS["eta"]
+        eps = NATURAL_TRANSFORMATIONS["epsilon"]
+        # η: Id_Mem ⇒ R∘L, ε: L∘R ⇒ Id_Ses
+        assert eta.source_functor == "Id_Mem"
+        assert eps.target_functor == "Id_Ses"
+
+    # PURPOSE: both are natural isomorphisms (all components non-empty)
+    def test_both_are_isomorphisms(self):
+        for name, nt in NATURAL_TRANSFORMATIONS.items():
+            assert nt.is_natural_isomorphism is True, f"{name} not an isomorphism"
+
+    # PURPOSE: η components match boot object map domain
+    def test_eta_components_match_boot(self):
+        eta = NATURAL_TRANSFORMATIONS["eta"]
+        boot = FUNCTORS["boot"]
+        assert set(eta.components.keys()) == set(boot.object_map.keys())
+
 

@@ -1163,3 +1163,14 @@ class DendronChecker:  # noqa: AI-007
             verification_proofs=verification_proofs,
         )
 
+
+if __name__ == "__main__":
+    # Redirect: `python -m mekhane.dendron.checker` → `python -m mekhane.dendron`
+    import sys
+    print(
+        "⚠️  Direct execution of checker.py is not supported.\n"
+        "   Use: python -m mekhane.dendron check [PATH]",
+        file=sys.stderr,
+    )
+    sys.exit(1)
+

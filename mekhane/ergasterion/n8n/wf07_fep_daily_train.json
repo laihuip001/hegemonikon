@@ -1,0 +1,124 @@
+{
+    "name": "WF-07: FEP Daily Training",
+    "nodes": [
+        {
+            "parameters": {
+                "rule": {
+                    "interval": [
+                        {
+                            "triggerAtHour": 6,
+                            "triggerAtMinute": 0
+                        }
+                    ]
+                }
+            },
+            "id": "schedule-trigger",
+            "name": "⏰ Daily 6:00",
+            "type": "n8n-nodes-base.scheduleTrigger",
+            "typeVersion": 1,
+            "position": [
+                240,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "jsCode": "const { execSync } = require('child_process');\n\ntry {\n  const result = execSync(\n    'cd /home/makaron8426/oikos/hegemonikon && .venv/bin/python scripts/e2e_daily_train.py --rounds 5 --notify 2>&1',\n    { timeout: 300000, encoding: 'utf-8' }\n  );\n  \n  // Extract key metrics from output\n  const lines = result.split('\\n');\n  const actLine = lines.find(l => l.includes('Act:')) || '';\n  const entropyLine = lines.find(l => l.includes('entropy')) || '';\n  \n  return [{\n    json: {\n      status: 'success',\n      output: result.slice(-500),\n      actLine,\n      entropyLine,\n      timestamp: new Date().toISOString()\n    }\n  }];\n} catch (e) {\n  return [{\n    json: {\n      status: 'error',\n      error: e.message.slice(-300),\n      timestamp: new Date().toISOString()\n    }\n  }];\n}"
+            },
+            "id": "run-training",
+            "name": "🧠 Run E2E Training",
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                460,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "conditions": {
+                    "string": [
+                        {
+                            "value1": "={{ $json.status }}",
+                            "operation": "equals",
+                            "value2": "error"
+                        }
+                    ]
+                }
+            },
+            "id": "check-error",
+            "name": "❓ Error?",
+            "type": "n8n-nodes-base.if",
+            "typeVersion": 1,
+            "position": [
+                680,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "={{ $env.SLACK_WEBHOOK_URL || '' }}",
+                "sendBody": true,
+                "bodyParameters": {
+                    "parameters": [
+                        {
+                            "name": "text",
+                            "value": "❌ *FEP Daily Training Failed*\n```{{ $json.error }}```"
+                        }
+                    ]
+                }
+            },
+            "id": "notify-error",
+            "name": "🔴 Slack Error",
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4,
+            "position": [
+                900,
+                200
+            ]
+        }
+    ],
+    "connections": {
+        "⏰ Daily 6:00": {
+            "main": [
+                [
+                    {
+                        "node": "🧠 Run E2E Training",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "🧠 Run E2E Training": {
+            "main": [
+                [
+                    {
+                        "node": "❓ Error?",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "❓ Error?": {
+            "main": [
+                [
+                    {
+                        "node": "🔴 Slack Error",
+                        "type": "main",
+                        "index": 0
+                    }
+                ],
+                []
+            ]
+        }
+    },
+    "settings": {
+        "executionOrder": "v1"
+    },
+    "meta": {
+        "description": "FEP Dirichlet daily learning — 毎朝6:00にE2E v2ループを5rounds実行し、A行列を育てる"
+    }
+}

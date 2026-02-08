@@ -7,10 +7,12 @@ skill_ref:
   - ".agent/skills/horme/h2-pistis/SKILL.md"
   - ".agent/skills/horme/h3-orexis/SKILL.md"
   - ".agent/skills/horme/h4-doxa/SKILL.md"
-version: "5.0"
+version: "5.1"
 lcm_state: beta
 layer: "Δ"
 lineage: "v4.4 + Limit演算復元 → v5.0"
+category_theory:
+  cone_builder: "mekhane/fep/cone_builder.py"
 derivatives: [pro, pis, ore, dox, bias]
 cognitive_algebra:
   generation: "L1 × L1.75"
@@ -128,6 +130,19 @@ result = select_derivative("H1", problem_context)
 
 > **米田**: 各定理 Hn は Hom(-, Hn) で完全に決まる。
 > @converge = 動機的射の Cone を構築し、「傾向・確信・欲求・信念が整合する唯一の動機」を見つける。
+
+**Cone 自動構築** (C1 の射の対比完了後に実行):
+
+// turbo
+
+```bash
+cd ~/oikos/hegemonikon && PYTHONPATH=. .venv/bin/python -c "
+from mekhane.fep.cone_builder import converge, describe_cone
+from mekhane.fep.category import Series
+cone = converge(Series.H, {'H1': '<H1出力>', 'H2': '<H2出力>', 'H3': '<H3出力>', 'H4': '<H4出力>'})
+print(describe_cone(cone))
+"
+```
 
 **射の列挙** (各定理の動機的射を計算):
 

@@ -13,6 +13,7 @@ category_theory:
   yoneda: "Hom(-, Tn) ≅ F(Tn) — 各定理はその射の集合で完全に決まる"
   limit: "Cone の頂点 — 全ての射が一致する点"
   converge_as_cone: "C1=射の列挙, C2=Coneの中介射, C3=普遍性検証"
+  cone_builder: "mekhane/fep/cone_builder.py"
 layer: "Δ"
 lineage: "v3.2 + Limit演算復元 → v4.0"
 derivatives:
@@ -99,6 +100,19 @@ anti_skip: enabled
 > **米田の補題による解釈**: 各定理 Tn は Hom(-, Tn) で完全に決まる。
 > Limit = 「全ての定理の出力が整合する唯一の点」= Cone の頂点。
 > @converge はこの Cone を構築し、頂点を見つける操作。
+
+**Cone 自動構築** (C1 の射の対比完了後に実行):
+
+// turbo
+
+```bash
+cd ~/oikos/hegemonikon && PYTHONPATH=. .venv/bin/python -c "
+from mekhane.fep.cone_builder import converge, describe_cone
+from mekhane.fep.category import Series
+cone = converge(Series.O, {'O1': '<O1出力>', 'O2': '<O2出力>', 'O3': '<O3出力>', 'O4': '<O4出力>'})
+print(describe_cone(cone))
+"
+```
 
 **射の列挙** (各定理の Yoneda 表現を計算):
 

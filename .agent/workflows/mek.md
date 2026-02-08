@@ -240,6 +240,20 @@ SKILL.md を必ず読み込んでから処理を開始する:
 
 ---
 
+## Post-Check (環境強制)
+
+> **`+` モード時のみ自動発動。** 出力が sel_enforcement の minimum_requirements を満たすか検証。
+
+// turbo
+
+```bash
+cd ~/oikos/hegemonikon && PYTHONPATH=. .venv/bin/python scripts/wf_postcheck.py --wf mek --mode "+" --text "$MEK_OUTPUT"
+```
+
+> FAIL 時は不足を補完してから Creator に提示。PASS するまでループ。
+
+---
+
 ## Reminder
 
 - SKILL.md を読み込まずに生成を開始しない

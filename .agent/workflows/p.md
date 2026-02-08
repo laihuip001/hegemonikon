@@ -7,11 +7,14 @@ skill_ref:
   - ".agent/skills/perigraphē/p2-hodos/SKILL.md"
   - ".agent/skills/perigraphē/p3-trokhia/SKILL.md"
   - ".agent/skills/perigraphē/p4-tekhne/SKILL.md"
-version: "5.3"
+version: "5.4"
 lcm_state: beta
 layer: "Δ"
-lineage: "v4.3 + Limit演算復元 → v5.0"
+lineage: "v4.3 + Limit演算復元 → v5.0 + C0 PW/加重融合 → v5.4"
 category_theory:
+  yoneda: "Hom(-, Tn) ≅ F(Tn) — 各定理はその射の集合で完全に決まる"
+  limit: "Cone の頂点 — 全ての環境配置射が一致する点"
+  converge_as_cone: "C0=PW決定, C1=環境射の列挙, C2=PW加重融合, C3=普遍性検証"
   cone_builder: "mekhane/fep/cone_builder.py"
 derivatives: [kho, hod, tro, tek]
 cognitive_algebra:

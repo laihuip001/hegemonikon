@@ -14,15 +14,15 @@ triggers:
   - "plan"
   - "schema"
   - "リーンキャンバス"
-version: "6.1"
+version: "6.2"
 category_theory:
   yoneda: "Hom(-, Tn) ≅ F(Tn) — 各定理はその射の集合で完全に決まる"
   limit: "Cone の頂点 — 全ての射が一致する点"
-  converge_as_cone: "C1=STAGE 0-3の射列挙, C2=STAGE 4 Devilが中介射を攻撃, C3=STAGE 5 KPTで普遍性検証"
+  converge_as_cone: "C0=PW決定, C1=STAGE 0-3の射列挙, C2=STAGE 4 Devil+PW加重融合, C3=STAGE 5 KPT普遍性検証"
   cone_builder: "mekhane/fep/cone_builder.py"
 lcm_state: stable
 layer: "Δ"
-lineage: "v5.8 + Limit演算復元 → v6.0"
+lineage: "v5.8 + Limit演算復元 → v6.0 + C0 PW/加重融合 → v6.2"
 derivatives: [met, mek, sta, pra]
 cognitive_algebra:
   generation: "L1 × L1.5"

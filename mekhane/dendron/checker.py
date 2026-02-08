@@ -898,11 +898,21 @@ class DendronChecker:  # noqa: AI-007
         all_definitions: Dict[str, tuple] = {}  # name -> (path, lineno)
         all_calls: set = set()
         
+        _SKIP_DECORATORS = {"property", "staticmethod", "classmethod", "abstractmethod"}
+        
         for fp, tree in file_trees.items():
             for node in ast.walk(tree):
                 if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
                     if not node.name.startswith("_"):
-                        all_definitions[f"{fp}:{node.name}"] = (fp, node.lineno, node.name)
+                        # @property 等はアトリビュートアクセスなので除外
+                        dec_names = set()
+                        for d in node.decorator_list:
+                            if isinstance(d, ast.Name):
+                                dec_names.add(d.id)
+                            elif isinstance(d, ast.Attribute):
+                                dec_names.add(d.attr)
+                        if not dec_names & _SKIP_DECORATORS:
+                            all_definitions[f"{fp}:{node.name}"] = (fp, node.lineno, node.name)
                 if isinstance(node, ast.Call):
                     if isinstance(node.func, ast.Name):
                         all_calls.add(node.func.id)

@@ -148,6 +148,7 @@ class Cone:
     resolution_method: str = ""  # root / weighted / simple
     confidence: float = 0.0  # C3: universality strength (0-100)
     is_universal: bool = False  # Whether this is the Limit
+    pw: Dict[str, float] = field(default_factory=dict)  # C0: Precision Weighting [-1, +1]
 
     @property
     def is_consistent(self) -> bool:

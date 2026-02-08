@@ -24,6 +24,15 @@ from mekhane.fep.category import (
     hom_set,
     hom_sources,
 )
+from mekhane.fep.cone_builder import (
+    compute_dispersion,
+    compute_pw_table,
+    converge,
+    describe_cone,
+    is_uniform_pw,
+    normalize_pw,
+    resolve_method,
+)
 
 
 # =============================================================================
@@ -260,3 +269,95 @@ class TestYoneda:
     def test_returns_frozenset(self):
         hom = hom_set("H1")
         assert isinstance(hom, frozenset)
+
+
+# =============================================================================
+# Precision Weighting (PW) Tests
+# =============================================================================
+
+
+class TestPrecisionWeighting:
+    """C0: Precision Weighting の検証"""
+
+    _outputs = {
+        "O1": "認識", "O2": "意志", "O3": "問い", "O4": "行動",
+    }
+
+    # PURPOSE: normalize_pw: pw=0 → weight=1.0
+    def test_normalize_neutral(self):
+        w = normalize_pw(self._outputs)
+        assert all(abs(v - 1.0) < 1e-9 for v in w.values())
+
+    # PURPOSE: normalize_pw: pw=+1 → weight=2.0
+    def test_normalize_emphasize(self):
+        w = normalize_pw(self._outputs, {"O1": 1.0})
+        assert abs(w["O1"] - 2.0) < 1e-9
+        assert abs(w["O2"] - 1.0) < 1e-9
+
+    # PURPOSE: normalize_pw: pw=-1 → weight=0.0
+    def test_normalize_suppress(self):
+        w = normalize_pw(self._outputs, {"O3": -1.0})
+        assert abs(w["O3"] - 0.0) < 1e-9
+
+    # PURPOSE: normalize_pw: 値は [-1, +1] にクランプされる
+    def test_normalize_clamp(self):
+        w = normalize_pw(self._outputs, {"O1": 5.0, "O2": -3.0})
+        assert abs(w["O1"] - 2.0) < 1e-9  # clamped to +1 → 2.0
+        assert abs(w["O2"] - 0.0) < 1e-9  # clamped to -1 → 0.0
+
+    # PURPOSE: is_uniform_pw: None or empty = uniform
+    def test_uniform_none(self):
+        assert is_uniform_pw(None) is True
+        assert is_uniform_pw({}) is True
+
+    # PURPOSE: is_uniform_pw: all-zero = uniform
+    def test_uniform_all_zero(self):
+        assert is_uniform_pw({"O1": 0.0, "O2": 0.0}) is True
+
+    # PURPOSE: is_uniform_pw: non-zero = not uniform
+    def test_non_uniform(self):
+        assert is_uniform_pw({"O1": 0.5}) is False
+
+    # PURPOSE: resolve_method: low V + pw≠0 → pw_weighted (not simple)
+    def test_resolve_pw_forces_weighted(self):
+        assert resolve_method(0.05) == "simple"
+        assert resolve_method(0.05, {"O1": 0.5}) == "pw_weighted"
+
+    # PURPOSE: resolve_method: high V → root regardless of pw
+    def test_resolve_high_v_is_root(self):
+        assert resolve_method(0.5) == "root"
+        assert resolve_method(0.5, {"O1": 1.0}) == "root"
+
+    # PURPOSE: converge() with pw stores weights in Cone
+    def test_converge_stores_pw(self):
+        cone = converge(Series.O, self._outputs, pw={"O1": 0.8, "O3": -0.5})
+        assert abs(cone.pw["O1"] - 0.8) < 1e-9
+        assert abs(cone.pw["O3"] - (-0.5)) < 1e-9
+
+    # PURPOSE: converge() without pw → empty dict (uniform)
+    def test_converge_no_pw(self):
+        cone = converge(Series.O, self._outputs)
+        assert cone.pw == {}
+
+    # PURPOSE: compute_pw_table returns correct structure
+    def test_pw_table_structure(self):
+        table = compute_pw_table(self._outputs, {"O1": 1.0})
+        assert len(table) == 4
+        o1_row = next(r for r in table if r["theorem_id"] == "O1")
+        assert abs(o1_row["pw_raw"] - 1.0) < 1e-9
+        assert abs(o1_row["weight"] - 2.0) < 1e-9
+        assert o1_row["weight_pct"] > 25.0  # more than uniform share
+
+    # PURPOSE: describe_cone shows PW section when non-uniform
+    def test_describe_with_pw(self):
+        cone = converge(Series.O, self._outputs, pw={"O1": 1.0})
+        desc = describe_cone(cone)
+        assert "Precision Weighting" in desc
+        assert "+1.0" in desc
+
+    # PURPOSE: describe_cone hides PW section when uniform
+    def test_describe_without_pw(self):
+        cone = converge(Series.O, self._outputs)
+        desc = describe_cone(cone)
+        assert "Precision Weighting" not in desc
+

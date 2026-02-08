@@ -550,3 +550,103 @@ def build_cone(series: Series, outputs: Dict[str, str]) -> Cone:
         )
 
     return Cone(series=series, projections=projections)
+
+
+# =============================================================================
+# Functor Registry (concrete instances)
+# =============================================================================
+
+
+FUNCTORS: Dict[str, Functor] = {
+    # L (left adjoint): /boot — expand compressed memory to full session
+    "boot": Functor(
+        name="boot",
+        source_cat="Mem",
+        target_cat="Ses",
+        object_map={
+            "handoff": "session_context",
+            "ki": "knowledge_items",
+            "self_profile": "agent_state",
+            "doxa": "beliefs",
+        },
+        morphism_map={
+            "restore": "expand",
+            "decompress": "hydrate",
+        },
+    ),
+    # R (right adjoint): /bye — compress session to memory
+    "bye": Functor(
+        name="bye",
+        source_cat="Ses",
+        target_cat="Mem",
+        object_map={
+            "session_context": "handoff",
+            "knowledge_items": "ki",
+            "agent_state": "self_profile",
+            "beliefs": "doxa",
+        },
+        morphism_map={
+            "summarize": "compress",
+            "extract": "distill",
+        },
+    ),
+    # T (endofunctor): /zet — question generation
+    "zet": Functor(
+        name="zet",
+        source_cat="Cog",
+        target_cat="Cog",
+        object_map={
+            "O1": "O3",  # Noēsis → Zētēsis (recognition generates inquiry)
+            "S2": "S4",  # Mekhanē → Praxis (method generates practice)
+        },
+        is_endofunctor=True,
+    ),
+    # F: /eat — digest external content into Cog
+    "eat": Functor(
+        name="eat",
+        source_cat="Ext",
+        target_cat="Cog",
+        object_map={
+            "paper": "K4",     # Academic paper → Sophia (wisdom)
+            "tutorial": "S2",  # Tutorial → Mekhanē (method)
+            "concept": "O1",   # Concept → Noēsis (recognition)
+            "rule": "A3",      # Rule → Gnōmē (maxim)
+        },
+    ),
+}
+
+
+# =============================================================================
+# Natural Transformation Registry (concrete instances)
+# =============================================================================
+
+
+NATURAL_TRANSFORMATIONS: Dict[str, NaturalTransformation] = {
+    # η (unit of boot⊣bye): Id_Mem ⇒ R∘L
+    # "How well does bye(boot(mem)) preserve mem?"
+    "eta": NaturalTransformation(
+        name="η",
+        source_functor="Id_Mem",
+        target_functor="bye∘boot",
+        components={
+            "handoff": "handoff_preservation",
+            "ki": "ki_preservation",
+            "self_profile": "profile_preservation",
+            "doxa": "belief_preservation",
+        },
+    ),
+    # ε (counit of boot⊣bye): L∘R ⇒ Id_Ses
+    # "How well does boot(bye(ses)) restore ses?"
+    "epsilon": NaturalTransformation(
+        name="ε",
+        source_functor="boot∘bye",
+        target_functor="Id_Ses",
+        components={
+            "session_context": "context_restoration",
+            "knowledge_items": "knowledge_restoration",
+            "agent_state": "state_restoration",
+            "beliefs": "belief_restoration",
+        },
+    ),
+}
+

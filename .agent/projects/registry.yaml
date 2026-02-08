@@ -272,10 +272,26 @@ projects:
       cli: "python mekhane/mcp/gnosis_mcp_server.py"
     usage_trigger: "MCP 経由で Gnōsis にアクセスする時。"
 
+  - id: sympatheia
+    name: "Sympatheia (συμπάθεια)"
+    path: "mekhane/ergasterion/n8n/"
+    summary: "自律神経系 — n8n による感覚運動ループ・恒常性制御"
+    status: active
+    phase: implementation
+    etymology: "共感・万物の相互接続 — ストア哲学の宇宙的一体性"
+    proof: true
+    note: "Active Inference ループの物理インフラ。遠心性(通知)+求心性(監視)+反射弓(自動応答)"
+    entry_point:
+      cli: "cd mekhane/ergasterion/n8n && ./deploy.sh --test"
+      docker: "docker compose -f mekhane/ergasterion/n8n/docker-compose.yml up -d"
+      webhook: "http://localhost:5678/webhook/{path}"
+    usage_trigger: "n8n WF の操作・デプロイ・テスト時。Health 監視、セッション管理、自動通知。"
+
 # ─── 統計 ─────────────────────────────────────────
-# Total: 21 entries
-# Active: 17 | Dormant: 2 | Archived: 1 | Planned: 0
-# Greek-named: 16
-# With PROOF.md: 14
-# With entry_point: 15 (v1.1.0)
-# With usage_trigger: 16 (v1.1.0)
+# Total: 22 entries
+# Active: 18 | Dormant: 2 | Archived: 1 | Planned: 0
+# Greek-named: 17
+# With PROOF.md: 15
+# With entry_point: 16 (v1.1.0)
+# With usage_trigger: 17 (v1.1.0)
+

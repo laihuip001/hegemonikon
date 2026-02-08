@@ -139,12 +139,9 @@ ccl_signature: "/k+?k1"
 // turbo
 
 ```bash
-cd ~/oikos/hegemonikon && PYTHONPATH=. .venv/bin/python -c "
-from mekhane.fep.cone_builder import converge, describe_cone
-from mekhane.fep.category import Series
-cone = converge(Series.K, {'K1': '<K1出力>', 'K2': '<K2出力>', 'K3': '<K3出力>', 'K4': '<K4出力>'})
-print(describe_cone(cone))
-"
+cd ~/oikos/hegemonikon && PYTHONPATH=. .venv/bin/python mekhane/fep/cone_builder.py \
+  --series K --pw "${PW_K:-}" \
+  K1="${K1_OUT}" K2="${K2_OUT}" K3="${K3_OUT}" K4="${K4_OUT}"
 ```
 
 **射の列挙** (各定理の文脈射を計算):

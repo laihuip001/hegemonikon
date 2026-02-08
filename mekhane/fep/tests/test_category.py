@@ -336,10 +336,10 @@ class TestPrecisionWeighting:
         assert abs(cone.pw["O1"] - 0.8) < 1e-9
         assert abs(cone.pw["O3"] - (-0.5)) < 1e-9
 
-    # PURPOSE: converge() without pw → empty dict (uniform)
+    # PURPOSE: converge() without pw → uniform (all zero or empty)
     def test_converge_no_pw(self):
         cone = converge(Series.O, self._outputs)
-        assert cone.pw == {}
+        assert is_uniform_pw(cone.pw)
 
     # PURPOSE: compute_pw_table returns correct structure
     def test_pw_table_structure(self):

@@ -133,7 +133,16 @@ def run_endurance(
                             "confidence": round(c.fep_confidence, 3),
                             "cone_dispersion": c.cone_dispersion,
                             "a_updated": c.a_matrix_updated,
+                            # ES: Explanation Stack fields
+                            "advice_action": c.advice_action,
+                            "advice_wf": c.advice_wf,
                         }
+                        # ES: extract matched_rule from trace repr
+                        if c.advice_trace:
+                            import re
+                            m = re.search(r"matched_rule='([^']*)'", c.advice_trace)
+                            if m:
+                                entry["matched_rule"] = m.group(1)
                         f.write(json.dumps(entry, ensure_ascii=False) + "\n")
                         total_cycles += 1
 

@@ -34,6 +34,19 @@ try:
 except ImportError:
     EMBEDDER_AVAILABLE = False
 
+# Japanese morphological pre-tokenization (optional)
+try:
+    from janome.tokenizer import Tokenizer as JanomeTokenizer
+    _janome = JanomeTokenizer()
+    _JANOME_AVAILABLE = True
+except ImportError:
+    _janome = None
+    _JANOME_AVAILABLE = False
+
+# Content word POS tags for Japanese (same as cone_builder)
+_JA_CONTENT_POS = {'名詞', '動詞', '形容詞', '副詞'}
+_JA_EXCLUDE_DETAILS = {'非自立', '接尾', '数'}
+
 # Paths
 GNOSIS_DIR = Path(__file__).parent.parent.parent / "gnosis_data"
 INDEX_DIR = Path(__file__).parent.parent.parent.parent / "mneme" / "indices"
@@ -78,10 +91,53 @@ class Embedder:
         """単一テキストを埋め込み"""
         return self.embed_batch([text])[0]
 
+    @staticmethod
+    def preprocess_ja(text: str) -> str:
+        """日本語テキストを形態素分解してスペース区切りにする。
+
+        BGE-small の WordPiece トークナイザは空白で初期分割するため、
+        janome で事前に意味単位で分割しておくことで、
+        サブワード境界が意味的に正しくなる。
+
+        英数字やASCII部分はそのまま通す (混在テキスト対応)。
+        """
+        if not _JANOME_AVAILABLE or not text:
+            return text
+
+        # 日本語文字を含まない場合はスキップ
+        import re
+        if not re.search(r'[\u3000-\u9fff\uf900-\ufaff]', text):
+            return text
+
+        try:
+            tokens = []
+            for token in _janome.tokenize(text):
+                pos = token.part_of_speech.split(',')[0]
+                detail = token.part_of_speech.split(',')[1] if ',' in token.part_of_speech else ''
+                if pos in _JA_CONTENT_POS and detail not in _JA_EXCLUDE_DETAILS:
+                    # 内容語: 基本形があれば使う
+                    base = token.base_form if token.base_form != '*' else token.surface
+                    tokens.append(base)
+                else:
+                    # 機能語: 原形を保持
+                    tokens.append(token.surface)
+            # Merge consecutive ASCII tokens (e.g., 'E','2','E' → 'E2E')
+            merged = []
+            for t in tokens:
+                if t.isascii() and t.strip() and merged and merged[-1].isascii() and merged[-1].strip():
+                    merged[-1] += t
+                else:
+                    merged.append(t)
+            return ' '.join(merged)
+        except Exception:
+            return text  # fallback: 原文をそのまま返す
+
     # PURPOSE: バッチ埋め込み
     def embed_batch(self, texts: List[str]) -> np.ndarray:
-        """バッチ埋め込み"""
-        encoded_batch = self.tokenizer.encode_batch(texts)
+        """バッチ埋め込み (日本語前処理つき)"""
+        # Japanese pre-tokenization
+        processed = [self.preprocess_ja(t) for t in texts]
+        encoded_batch = self.tokenizer.encode_batch(processed)
 
         input_ids_list = [e.ids for e in encoded_batch]
         attention_mask_list = [e.attention_mask for e in encoded_batch]

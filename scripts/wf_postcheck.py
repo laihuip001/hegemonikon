@@ -203,6 +203,12 @@ def postcheck(
 
     checks = check_requirements(content, requirements)
 
+    # --- Extended checks ---
+    # Naturality check for boot/bye WFs
+    if wf_name in ("boot", "bye"):
+        nat_checks = check_naturality()
+        checks.extend(nat_checks)
+
     passed_count = sum(1 for c in checks if c["passed"])
     total = len(checks)
     all_passed = all(c["passed"] for c in checks)
@@ -218,6 +224,51 @@ def postcheck(
         "checks": checks,
         "formatted": "\n".join(lines),
     }
+
+
+# ============================================================
+# Extended Checks: Naturality Verification
+# ============================================================
+
+
+def check_naturality() -> list[dict]:
+    """Verify η/ε/η_MP natural transformations are well-formed.
+
+    Auto-runs verify_naturality() from cone_builder on all registered
+    natural transformations. Reports per-transformation pass/fail.
+
+    Returns:
+        list[dict]: Check results compatible with postcheck format.
+    """
+    checks = []
+    try:
+        from mekhane.fep.category import NATURAL_TRANSFORMATIONS
+        from mekhane.fep.cone_builder import verify_naturality
+    except ImportError:
+        checks.append({
+            "name": "naturality_import",
+            "passed": False,
+            "detail": "❌ Natural transformation modules not importable",
+        })
+        return checks
+
+    for nt_key, nt in NATURAL_TRANSFORMATIONS.items():
+        result = verify_naturality(nt)
+        checks.append({
+            "name": f"naturality_{nt_key}",
+            "passed": result.is_natural,
+            "detail": f"{'✅' if result.is_natural else '❌'} "
+                      f"NatTrans {nt.name}: {result.summary}",
+        })
+        # Add per-violation details
+        for violation in result.violations:
+            checks.append({
+                "name": f"naturality_{nt_key}_violation",
+                "passed": False,
+                "detail": f"  ⚠️ {violation}",
+            })
+
+    return checks
 
 
 # ============================================================

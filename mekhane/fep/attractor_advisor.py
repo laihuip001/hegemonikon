@@ -11,8 +11,8 @@ LLM が使える自然言語のワークフロー推薦に変換する。
 
 from __future__ import annotations
 
-from dataclasses import dataclass
-from typing import Optional
+from dataclasses import dataclass, field
+from typing import Dict, List, Optional
 
 from mekhane.fep.attractor import (
     OscillationDiagnosis,
@@ -20,6 +20,11 @@ from mekhane.fep.attractor import (
     SeriesAttractor,
     SuggestResult,
     DecomposeResult,
+)
+from mekhane.fep.category import CognitiveType, COGNITIVE_TYPES
+from mekhane.fep.cone_builder import (
+    classify_cognitive_type,
+    is_cross_boundary_morphism,
 )
 
 
@@ -39,7 +44,7 @@ class AttractorAdvisor:
         # → "O-series (Ousia) に収束。推薦: /noe, /bou, /zet, /ene"
     """
 
-    # PURPOSE: 内部処理: init__
+    # PURPOSE: Attractor推薦結果をWFディスパッチに変換する中間層
     def __init__(self, force_cpu: bool = False):
         self._attractor = SeriesAttractor(force_cpu=force_cpu)
 
@@ -109,6 +114,11 @@ class AttractorAdvisor:
         else:  # WEAK
             advice = "引力圏外。特定の Series に収束しません。"
 
+        # --- CognitiveType analysis ---
+        cognitive_types = _classify_series_list(series_list)
+        boundary_crossings = _detect_crossings(series_list)
+        pw_suggestion = _suggest_pw_for_crossings(boundary_crossings, series_list)
+
         return Recommendation(
             advice=advice,
             workflows=unique_workflows,
@@ -116,6 +126,9 @@ class AttractorAdvisor:
             oscillation=result.oscillation,
             confidence=result.top_similarity,
             interpretation=interpretation,
+            cognitive_types=cognitive_types,
+            boundary_crossings=boundary_crossings,
+            pw_suggestion=pw_suggestion,
         )
 
     # PURPOSE: LLM のシステムプロンプトに注入する形式でワークフロー推薦を返す。
@@ -133,25 +146,45 @@ class AttractorAdvisor:
 
         interp = rec.interpretation
 
+        # Base lines
+        lines: list[str] = []
+
         if rec.oscillation == OscillationType.CLEAR:
-            return (
-                f"[Attractor: {rec.series[0]} → {', '.join(rec.workflows)}]\n"
-                f"[FEP: {interp.theory}]"
+            lines.append(
+                f"[Attractor: {rec.series[0]} → {', '.join(rec.workflows)}]"
             )
+            lines.append(f"[FEP: {interp.theory}]")
         elif rec.oscillation == OscillationType.POSITIVE:
             series_str = "+".join(rec.series)
             morphisms = f" | morphisms: {', '.join(interp.morphisms)}" if interp.morphisms else ""
-            return (
-                f"[Attractor: {series_str} oscillating → {', '.join(rec.workflows)}]\n"
-                f"[FEP: {interp.theory}]\n"
-                f"[Action: {interp.action}{morphisms}]"
+            lines.append(
+                f"[Attractor: {series_str} oscillating → {', '.join(rec.workflows)}]"
             )
+            lines.append(f"[FEP: {interp.theory}]")
+            lines.append(f"[Action: {interp.action}{morphisms}]")
         else:
-            return (
-                f"[Attractor: weak ({rec.series[0]}?)]\n"
-                f"[FEP: {interp.theory}]\n"
-                f"[Action: {interp.action}]"
+            lines.append(f"[Attractor: weak ({rec.series[0]}?)]")
+            lines.append(f"[FEP: {interp.theory}]")
+            lines.append(f"[Action: {interp.action}]")
+
+        # CognitiveType line (Task 3 enrichment)
+        if rec.cognitive_types:
+            ct_str = ", ".join(
+                f"{s}={t}" for s, t in rec.cognitive_types.items()
             )
+            lines.append(f"[CognitiveType: {ct_str}]")
+
+        # Boundary crossing + PW boost (Task 3 enrichment)
+        if rec.boundary_crossings:
+            cross_str = ", ".join(rec.boundary_crossings)
+            lines.append(f"[Boundary: {cross_str}]")
+        if rec.pw_suggestion:
+            pw_str = ", ".join(
+                f"{k}={v:+.1f}" for k, v in rec.pw_suggestion.items()
+            )
+            lines.append(f"[PW boost: {pw_str}]")
+
+        return "\n".join(lines)
 
     # PURPOSE: Problem D — 複合入力を分解して各セグメントごとに推薦する
     def recommend_compound(self, user_input: str) -> CompoundRecommendation:
@@ -197,6 +230,99 @@ class AttractorAdvisor:
         )
 
 
+
+# ---------------------------------------------------------------------------
+# CognitiveType Analysis Helpers (Task 3: Attractor → CognitiveType → PW)
+# ---------------------------------------------------------------------------
+
+# Series → representative theorem (first theorem of each series)
+_SERIES_FIRST_THEOREM = {
+    "O": "O1", "S": "S1", "H": "H1", "P": "P1", "K": "K1", "A": "A1",
+}
+
+
+def _classify_series_list(series_list: list[str]) -> Dict[str, str]:
+    """Classify each series by its primary CognitiveType.
+
+    Maps series letter → CognitiveType value string.
+    Uses the first theorem of each series as representative.
+
+    Returns:
+        e.g. {"O": "understanding", "S": "reasoning"}
+    """
+    result = {}
+    for s in series_list:
+        theorem_id = _SERIES_FIRST_THEOREM.get(s)
+        if theorem_id:
+            ct = COGNITIVE_TYPES.get(theorem_id)
+            if ct:
+                result[s] = ct.value
+    return result
+
+
+def _detect_crossings(series_list: list[str]) -> List[str]:
+    """Detect U/R boundary crossings between recommended series.
+
+    When multiple series are recommended (oscillation), checks if they
+    cross the Understanding/Reasoning boundary.
+
+    Returns:
+        List of crossing strings, e.g. ["U→R", "R→U"]
+    """
+    if len(series_list) < 2:
+        return []
+
+    crossings = []
+    seen = set()
+    for i, s1 in enumerate(series_list):
+        for s2 in series_list[i + 1:]:
+            t1 = _SERIES_FIRST_THEOREM.get(s1)
+            t2 = _SERIES_FIRST_THEOREM.get(s2)
+            if t1 and t2:
+                crossing = is_cross_boundary_morphism(t1, t2)
+                if crossing and crossing not in seen:
+                    seen.add(crossing)
+                    crossings.append(crossing)
+    return crossings
+
+
+def _suggest_pw_for_crossings(
+    crossings: List[str],
+    series_list: list[str],
+) -> Dict[str, float]:
+    """Suggest PW adjustments when U/R boundary crossings are detected.
+
+    When an attractor recommendation spans both Understanding and Reasoning
+    series, the Bridge theorems (A1, A3) should have elevated PW to
+    facilitate the transition.
+
+    Strategy:
+    - U→R crossing: boost A1 (Pathos) — the U→R bridge
+    - R→U crossing: boost A3 (Gnōmē) — the R→U bridge
+    - Both: boost both bridges + K4 (Sophia, mixed)
+
+    Returns:
+        Dict of theorem_id → suggested PW adjustment (e.g. {"A1": 0.5})
+        Empty dict if no crossings.
+    """
+    if not crossings:
+        return {}
+
+    suggestion: Dict[str, float] = {}
+
+    if "U→R" in crossings:
+        # Boost A1 (Pathos) — the Understanding → Reasoning bridge
+        suggestion["A1"] = 0.5
+    if "R→U" in crossings:
+        # Boost A3 (Gnōmē) — the Reasoning → Understanding bridge
+        suggestion["A3"] = 0.5
+    if len(crossings) >= 2:
+        # Both directions: activate the mixed theorem (Sophia = wisdom)
+        suggestion["K4"] = 0.3
+
+    return suggestion
+
+
 # ---------------------------------------------------------------------------
 # Data Classes
 # PURPOSE: ワークフロー推薦の結果
@@ -211,10 +337,15 @@ class Recommendation:
     oscillation: OscillationType
     confidence: float
     interpretation: OscillationDiagnosis  # Problem B: FEP 理論的解釈
+    # Task 3: CognitiveType integration
+    cognitive_types: Dict[str, str] = field(default_factory=dict)  # series→type
+    boundary_crossings: List[str] = field(default_factory=list)  # e.g. ["U→R"]
+    pw_suggestion: Dict[str, float] = field(default_factory=dict)  # PW adjustments
 
-    # PURPOSE: 内部処理: repr__
+    # PURPOSE: 推薦結果の概要を表示（WF名+理由）
     def __repr__(self) -> str:
-        return f"⟨Rec: {'+'.join(self.series)} | {self.oscillation.value} | conf={self.confidence:.3f}⟩"
+        cross = f" [{','.join(self.boundary_crossings)}]" if self.boundary_crossings else ""
+        return f"⟨Rec: {'+'.join(self.series)} | {self.oscillation.value} | conf={self.confidence:.3f}{cross}⟩"
 
 
 # PURPOSE: Problem D — 複合入力の推薦結果
@@ -228,7 +359,7 @@ class CompoundRecommendation:
     is_multi_segment: bool  # 複数文に分解されたか
     primary: Recommendation | None  # 最高確信度の推薦
 
-    # PURPOSE: 内部処理: repr__
+    # PURPOSE: 分解推薦結果の概要を表示（セグメント数+統合WF）
     def __repr__(self) -> str:
         return (
             f"⟨Compound: {'+'.join(self.merged_series)} | "

@@ -84,7 +84,7 @@ class ExecutionContext:
     errors: List[str] = field(default_factory=list)  # エラー
     checkpoints: Dict[str, Any] = field(default_factory=dict)  # 各フェーズの結果
 
-    # PURPOSE: 関数: to_dict
+    # PURPOSE: 実行結果をJSON永続化可能な形式に変換
     def to_dict(self) -> Dict[str, Any]:
         return {
             "goal": self.goal,

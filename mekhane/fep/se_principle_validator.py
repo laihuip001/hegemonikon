@@ -60,7 +60,7 @@ class ValidationResult:
     violations: list[Violation]
     scale: Scale
 
-    # PURPOSE: 内部処理: str__
+    # PURPOSE: 検証結果のhuman-readable表示（PASS/FAIL+理由）
     def __str__(self) -> str:
         if self.valid:
             return f"✅ PASS (Scale: {self.scale.value})"
@@ -219,7 +219,7 @@ class SEPrincipleValidator:
         return ValidationResult(
             valid=not has_errors,
             violations=violations,
-# PURPOSE: 関数: main
+# PURPOSE: CLI起動: 指定ディレクトリのSE原則検証を実行
             scale=detected_scale,
         )
 

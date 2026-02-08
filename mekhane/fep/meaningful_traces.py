@@ -40,12 +40,12 @@ class MeaningfulTrace:
     session_id: Optional[str] = None
     context: Optional[str] = None
 
-    # PURPOSE: 関数: to_dict
+    # PURPOSE: トレースをJSON永続化可能な形式に変換
     def to_dict(self) -> dict:
         return asdict(self)
 
     @classmethod
-    # PURPOSE: 関数: from_dict
+    # PURPOSE: JSONからトレースを復元（セッション間継続性）
     def from_dict(cls, data: dict) -> "MeaningfulTrace":
         return cls(**data)
 # PURPOSE: Ensure the persistence directory exists.

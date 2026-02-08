@@ -239,16 +239,23 @@ class AutoTopicExtractor:
     _COMPLETED_TASKS = re.compile(r"-\s*\[x\]\s*(.+?)(?:\s*✓|$)", re.MULTILINE)
     _NEXT_TASKS = re.compile(r"-\s*\[\s\]\s*(.+?)$", re.MULTILINE)
     _HEADERS = re.compile(r"^#{1,3}\s+(.+)$", re.MULTILINE)
+    # SBAR 形式: 太字キーワード (**keyword**)
+    _BOLD_KEYWORDS = re.compile(r"\*\*([^*]{3,60})\*\*", re.MULTILINE)
+    # Situation セクションの冒頭文 (SBAR format)
+    _SITUATION_LINE = re.compile(
+        r"^##\s*Situation\s*\n+(.+?)$", re.MULTILINE
+    )
 
     # PURPOSE: Handoff テキストからトピックを自動抽出
     def extract(self, text: str, max_topics: int = 8) -> list[str]:
         """Handoff テキストからトピックを自動抽出
 
-        抽出戦略:
+        抽出戦略 (優先度順):
         1. YAML frontmatter のキー値 (primary_task, decision 等)
-        2. 完了タスクの名前
-        3. 未完了タスクの名前 (次のセッションの文脈)
-        4. セクションヘッダー
+        2. 完了タスクの名前 ([x])
+        3. 未完了タスクの名前 ([ ])
+        4. SBAR: Situation セクションの冒頭文
+        5. SBAR: 太字キーワード (**keyword**)
 
         Returns:
             重複排除されたトピックリスト (最大 max_topics 件)
@@ -264,7 +271,6 @@ class AutoTopicExtractor:
         # 2. 完了タスク名
         for m in self._COMPLETED_TASKS.finditer(text):
             task_name = m.group(1).strip()
-            # 短すぎるものは除外
             if len(task_name) > 5:
                 topics.append(task_name)
 
@@ -273,6 +279,29 @@ class AutoTopicExtractor:
             task_name = m.group(1).strip()
             if len(task_name) > 5:
                 topics.append(task_name)
+
+        # 4. SBAR: Situation セクションの冒頭文
+        for m in self._SITUATION_LINE.finditer(text):
+            situation = m.group(1).strip()
+            if len(situation) > 10:
+                # 長文は最初の句点で切る
+                first_sentence = situation.split("。")[0]
+                if len(first_sentence) > 5:
+                    topics.append(first_sentence)
+
+        # 5. SBAR: 太字キーワード (上限 5 件)
+        bold_count = 0
+        noise_words = {
+            "前セッション", "本セッション開始地点", "終了地点",
+            "セッション時間", "Handoff", "注意",
+        }
+        for m in self._BOLD_KEYWORDS.finditer(text):
+            kw = m.group(1).strip()
+            if kw in noise_words or kw.startswith("V["):
+                continue
+            if len(kw) > 3 and bold_count < 5:
+                topics.append(kw)
+                bold_count += 1
 
         # 重複排除 (順序保持)
         seen: set[str] = set()
@@ -593,10 +622,11 @@ class PKSEngine:
             # 最新の Handoff を自動検出
             handoff_dir = Path.home() / "oikos" / "mneme" / ".hegemonikon" / "sessions"
             if handoff_dir.exists():
-                handoffs = sorted(
-                    handoff_dir.glob("handoff_*.md"), reverse=True
-                )
+                # handoff_YYYY-MM-DD_HHMM.md パターンのみ対象 (handoff_final 等を除外)
+                handoffs = list(handoff_dir.glob("handoff_20??-??-??_????.md"))
                 if handoffs:
+                    # mtime でソート (最新優先)
+                    handoffs.sort(key=lambda p: p.stat().st_mtime, reverse=True)
                     handoff_path = handoffs[0]
 
         if handoff_path is None or not handoff_path.exists():

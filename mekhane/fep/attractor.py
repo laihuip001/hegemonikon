@@ -203,7 +203,7 @@ class OscillationDiagnosis:
     morphisms: list[str]     # 推薦 X-series 射 (POSITIVE 時)
     confidence_modifier: float  # 確信度への補正 (-1.0 ~ +1.0)
 
-    # PURPOSE: 内部処理: repr__
+    # PURPOSE: デバッグ時にoscillation状態を即座に確認するための表示
     def __repr__(self) -> str:
         return f"⟨OscDiag: {self.oscillation.value} | {self.action[:40]}⟩"
 
@@ -290,7 +290,7 @@ class AttractorResult:
     similarity: float
     workflows: list[str] = field(default_factory=list)
 
-    # PURPOSE: 内部処理: repr__
+    # PURPOSE: Series名と類似度をデバッグ出力で即確認
     def __repr__(self) -> str:
         return f"⟨{self.series}: {self.name} | sim={self.similarity:.3f}⟩"
 
@@ -305,7 +305,7 @@ class SuggestResult:
     gap: float  # 1位と2位の差
 
     @property
-    # PURPOSE: 関数: primary
+    # PURPOSE: 最も引力の強い単一Seriesを返す（WF自動選択用）
     def primary(self) -> AttractorResult | None:
         return self.attractors[0] if self.attractors else None
 
@@ -322,7 +322,7 @@ class SuggestResult:
             self.oscillation, self.attractors, self.gap, self.top_similarity
         )
 
-    # PURPOSE: 内部処理: repr__
+    # PURPOSE: 収束結果サマリの表示（Series+oscillation+top_sim）
     def __repr__(self) -> str:
         names = "+".join(r.series for r in self.attractors)
         return f"⟨{names} | {self.oscillation.value} | top={self.top_similarity:.3f}⟩"
@@ -334,7 +334,7 @@ class SegmentResult:
     text: str
     diagnosis: SuggestResult
 
-    # PURPOSE: 内部処理: repr__
+    # PURPOSE: 分解セグメントの表示（text先頭+収束先Series）
     def __repr__(self) -> str:
 # PURPOSE: decompose() の結果: 各セグメント + マージされた結果
         series = "+".join(r.series for r in self.diagnosis.attractors) or "?"
@@ -354,7 +354,7 @@ class DecomposeResult:
         """複数の Series に分解されたか"""
         return len(self.merged_series) > 1
 
-    # PURPOSE: 内部処理: repr__
+    # PURPOSE: 分解結果全体の表示（統合Series+セグメント数）
     def __repr__(self) -> str:
 # PURPOSE: 6 Series の Attractor Engine
         return f"⟨Decompose: {'+'.join(self.merged_series)} ({len(self.segments)} segments)⟩"
@@ -377,7 +377,7 @@ class SeriesAttractor:
         # → [⟨O: Ousia (本質) | sim=0.742⟩, ...]
     """
 
-    # PURPOSE: 内部処理: init__
+    # PURPOSE: 6 Seriesの attractorプロトタイプを遅延初期化可能に構成
     def __init__(
         self,
         threshold: float = DEFAULT_THRESHOLD,

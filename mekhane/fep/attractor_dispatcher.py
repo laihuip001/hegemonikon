@@ -59,7 +59,7 @@ class DispatchResult:
     description: str           # WF description
     library_prompts: list[str] = field(default_factory=list)  # Library 連携プロンプト名
 
-    # PURPOSE: 内部処理: repr__
+    # PURPOSE: ルーティング結果を即座に確認（WF名+根拠）
     def __repr__(self) -> str:
         lib = f" +{len(self.library_prompts)}lib" if self.library_prompts else ""
         return f"⟨Dispatch: {self.workflow} ({self.series}) conf={self.confidence:.3f}{lib}⟩"
@@ -80,7 +80,7 @@ class DispatchPlan:
         """primary + alternatives"""
         return [self.primary] + self.alternatives
 
-    # PURPOSE: 内部処理: repr__
+    # PURPOSE: 複合ルーティング結果を表示（セグメント+統合WF）
     def __repr__(self) -> str:
         alt_count = len(self.alternatives)
         return (
@@ -199,7 +199,7 @@ class AttractorDispatcher:
         print(dispatcher.format_dispatch(plan))
     """
 
-    # PURPOSE: 内部処理: init__
+    # PURPOSE: Attractor結果をWFディスパッチパスに変換する統合層
     def __init__(self, force_cpu: bool = False):
         self._advisor = AttractorAdvisor(force_cpu=force_cpu)
         self._library = None  # 遅延初期化

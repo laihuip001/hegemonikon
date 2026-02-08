@@ -692,7 +692,6 @@ class PKSEngine:
             return
         from mekhane.pks.feedback import PushFeedback
         if not series and self.tracker.context.topics:
-            # 現在のトピックから推定
             series = "O"  # default
         self._feedback.record(PushFeedback(
             nugget_title=nugget_title,
@@ -700,6 +699,24 @@ class PKSEngine:
             series=series,
         ))
         self._feedback.persist()
+
+    # PURPOSE: PushDialog 用フィードバックコールバック生成
+    def make_feedback_callback(self) -> "Optional[Callable[[str, str, str], None]]":
+        """PushDialog 用のフィードバックコールバックを生成。
+
+        PushDialog は FeedbackCollector を直接持たず、
+        このコールバック経由で疎結合にフィードバックを記録する。
+
+        Returns:
+            Callable[[nugget_title, reaction, series], None] or None
+        """
+        if self._feedback is None:
+            return None
+
+        def callback(nugget_title: str, reaction: str, series: str = "") -> None:
+            self.record_feedback(nugget_title, reaction, series)
+
+        return callback
 
     # PURPOSE: 能動的プッシュ: コンテキストに基づいて知識を表面化
     def proactive_push(self, k: int = 20) -> list[KnowledgeNugget]:
@@ -747,6 +764,16 @@ class PKSEngine:
             self.serendipity_scorer.enrich(nuggets, raw_distances)
 
         pushable = self.controller.filter_pushable(nuggets)
+
+        # v2.1: series-aware threshold via feedback learning
+        if self._feedback and pushable:
+            filtered = []
+            for n in pushable:
+                series = getattr(n, 'source', 'O')[:1].upper()
+                adjusted = self._feedback.adjust_threshold(series, self._base_threshold)
+                if n.relevance_score >= adjusted:
+                    filtered.append(n)
+            pushable = filtered
 
         # 履歴記録
         if pushable:

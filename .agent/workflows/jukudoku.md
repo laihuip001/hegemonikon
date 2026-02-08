@@ -4,7 +4,16 @@ hegemonikon: Akribeia + Bathys + Tribē
 modules: [A2, O1]
 version: "2.1"
 lcm_state: stable
-lineage: "v2.0 + FBR変換 → v2.1"
+lineage: "v2.0 + FBR変換 → v2.1 + MP論文接続 → v2.2"
+academic_basis:
+  - paper: "Metacognitive Prompting Improves Understanding in Large Language Models"
+    authors: "Wang & Zhao (UCSB, Meta)"
+    arxiv: "2308.05342"
+    connection: "/jukudoku はMP 5段階の拡張実装。L2沈潜≈Stage 3, L3摩擦≈Stage 3+外部衝突"
+    risks:
+      overthinking: "68.3% — 単純タスクの過度な複雑化。`-` モードで対処"
+      overcorrection: "31.7% — 正しい初期判断をL2で覆す。第一印象保存で対処"
+      false_positive: "32.5% — 高確信でも約1/3が過信"
 anti_skip: enabled
 anti_skim: enabled
 triggers:

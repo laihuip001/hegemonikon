@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
 # PROOF: [L2/インフラ] <- mekhane/symploke/ A0→継続する私が必要→boot_integration が担う
 """
-Boot Integration - 10軸を統合した /boot 用 API
+Boot Integration - 13軸を統合した /boot 用 API
 
 Axes:
   A. Handoff   B. Sophia/KI   C. Persona   D. PKS
   E. Safety    F. Attractor   G. GPU       H. EPT
-  I. Projects  J. Skills      K. Doxa
+  I. Projects  J. Skills      K. Doxa      L. Credit
+  M. Explanation Stack
 
 Theorem Coverage:
   全24定理 (O1-O4, S1-S4, H1-H4, P1-P4, K1-K4, A1-A4) を
@@ -273,7 +274,7 @@ def _load_skills(project_root: Path) -> dict:
     return result
 
 
-# PURPOSE: /boot 統合 API: 11軸（Handoff, Sophia, Persona, PKS, Safety, EPT, Digestor, Attractor, Projects, Skills, Doxa）を統合して返す
+# PURPOSE: /boot 統合 API: 13軸（Handoff, Sophia, Persona, PKS, Safety, EPT, Digestor, Attractor, Projects, Skills, Doxa, Credit, ES）を統合して返す
 def get_boot_context(mode: str = "standard", context: Optional[str] = None) -> dict:
     """
     /boot 統合 API: 11軸（Handoff, Sophia, Persona, PKS, Safety, EPT, Digestor, Attractor, Projects, Skills, Doxa）を統合して返す
@@ -857,6 +858,59 @@ def get_boot_context(mode: str = "standard", context: Optional[str] = None) -> d
         lines.append("")
         lines.append(feedback_result["formatted"])
 
+    # 軸 M: Explanation Stack (前回セッションの認知判断トレース)
+    es_result = {"last_action": None, "last_trace": None, "formatted": ""}
+    print(" 🔍 Loading Explanation Stack...", end="", file=sys.stderr)
+    try:
+        # Try to find the most recent ES output from logs
+        log_dir = Path.home() / "oikos/mneme/.hegemonikon/logs"
+        es_files = sorted(log_dir.glob("es_trace_*.json"), reverse=True)
+        if es_files:
+            import json as _json
+            with open(es_files[0]) as f:
+                es_data = _json.load(f)
+            es_lines = [f"### 🔍 軸 M: Explanation Stack (前回)"]
+            last_action = es_data.get("advice", {}).get("action", "unknown")
+            last_format = es_data.get("advice", {}).get("format_llm", "")
+            es_lines.append(f"Last Action: {last_action}")
+            if last_format:
+                es_lines.append(last_format)
+            es_result = {
+                "last_action": last_action,
+                "last_trace": last_format,
+                "formatted": "\n".join(es_lines),
+            }
+            print(f" Done (action={last_action}).", file=sys.stderr)
+        else:
+            # Fallback: generate a live trace from a neutral input
+            try:
+                from mekhane.fep.category import Series
+                from mekhane.fep.cone_builder import converge
+                from mekhane.fep.cone_consumer import advise, format_advice_for_llm
+
+                neutral_cone = converge(Series.O, {
+                    "O1": "セッション開始", "O2": "セッション開始",
+                    "O3": "セッション開始", "O4": "セッション開始",
+                })
+                advice = advise(neutral_cone)
+                es_format = format_advice_for_llm(advice)
+                es_lines = [f"### 🔍 軸 M: Explanation Stack (live)"]
+                es_lines.append(es_format)
+                es_result = {
+                    "last_action": advice.action,
+                    "last_trace": es_format,
+                    "formatted": "\n".join(es_lines),
+                }
+                print(f" Live (action={advice.action}).", file=sys.stderr)
+            except Exception:
+                print(" Skipped (no data).", file=sys.stderr)
+    except Exception as e:
+        print(f" Failed ({str(e)}).", file=sys.stderr)
+
+    if es_result["formatted"]:
+        lines.append("")
+        lines.append(es_result["formatted"])
+
     # n8n WF-06: Session Start 通知
     try:
         import urllib.request
@@ -891,6 +945,7 @@ def get_boot_context(mode: str = "standard", context: Optional[str] = None) -> d
         "skills": skills_result,
         "doxa": doxa_result,
         "feedback": feedback_result,
+        "es": es_result,
         "formatted": "\n".join(lines),
     }
 

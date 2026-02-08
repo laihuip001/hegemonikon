@@ -63,13 +63,9 @@ version: "2.0"
 cd ~/oikos/hegemonikon && PYTHONPATH=. .venv/bin/python -c "
 from hermeneus.src.dispatch import dispatch
 import json
-result = dispatch('CCL_EXPRESSION_HERE')
-print(json.dumps({
-    'success': result['success'],
-    'tree': result['tree'],
-    'workflows': result['workflows'],
-    'plan_template': result['plan_template']
-}, ensure_ascii=False, indent=2))
+r = dispatch('CCL_EXPRESSION_HERE')
+out = {k: v for k, v in r.items() if k != 'ast'}
+print(json.dumps(out, ensure_ascii=False, indent=2))
 "
 ```
 

@@ -43,6 +43,11 @@ def analyze(entries: list) -> dict:
     action_counts = Counter()
     series_counts = Counter()
     action_series_over_time = []  # (cycle_idx, action, series)
+
+    # ES: Explanation Stack analysis
+    advice_action_counts = Counter()
+    matched_rule_counts = Counter()
+    rejected_action_counts = Counter()
     
     # Sliding window for entropy trend
     window_size = 50
@@ -62,6 +67,15 @@ def analyze(entries: list) -> dict:
         action_counts[action] += 1
         series_counts[series] += 1
         action_series_over_time.append((i, action, series))
+
+        # ES: track advice fields if present
+        if "advice_action" in e:
+            advice_action_counts[e["advice_action"]] += 1
+        if "matched_rule" in e:
+            matched_rule_counts[e["matched_rule"]] += 1
+        if "rejected_actions" in e:
+            for ra in e["rejected_actions"]:
+                rejected_action_counts[ra] += 1
         
         # Sliding window entropy
         if len(entropy_over_time) >= window_size:
@@ -104,6 +118,10 @@ def analyze(entries: list) -> dict:
         "entropy_end": entropy_over_time[-1] if entropy_over_time else 0,
         "entropy_min": min(entropy_over_time) if entropy_over_time else 0,
         "entropy_max": max(entropy_over_time) if entropy_over_time else 0,
+        # ES: Explanation Stack
+        "advice_action_counts": dict(advice_action_counts),
+        "matched_rule_counts": dict(matched_rule_counts),
+        "rejected_action_counts": dict(rejected_action_counts),
     }
 
 
@@ -273,6 +291,16 @@ canvas {{ width: 100% !important; }}
             {"".join(f'<span class="phase-tag">Phase {i+1}: cycles {p["start"]}-{p["end"]} (entropy ≈ {p["mean_entropy"]:.2f})</span>' for i, p in enumerate(analysis["phases"]))}
         </div>
     </div>
+
+    <div class="chart-card">
+        <h3>🔍 Explanation Stack — Advice Actions</h3>
+        <canvas id="adviceChart" height="200"></canvas>
+    </div>
+
+    <div class="chart-card">
+        <h3>📋 Explanation Stack — Matched Rules</h3>
+        <canvas id="rulesChart" height="200"></canvas>
+    </div>
 </div>
 
 <script>
@@ -349,6 +377,63 @@ new Chart(seriesCtx, {{
         plugins: {{ legend: {{ position: 'bottom', labels: {{ color: '#a0aec0', padding: 12 }} }} }}
     }}
 }});
+
+// ES: Advice action chart
+const adviceCtx = document.getElementById('adviceChart').getContext('2d');
+const adviceData = {json.dumps(analysis['advice_action_counts'])};
+if (Object.keys(adviceData).length > 0) {{
+    new Chart(adviceCtx, {{
+        type: 'doughnut',
+        data: {{
+            labels: Object.keys(adviceData),
+            datasets: [{{
+                data: Object.values(adviceData),
+                backgroundColor: ['#68d391', '#63b3ed', '#f6ad55', '#fc8181', '#b794f6', '#4fd1c5'],
+                borderWidth: 0,
+            }}]
+        }},
+        options: {{
+            responsive: true,
+            plugins: {{ legend: {{ position: 'bottom', labels: {{ color: '#a0aec0', padding: 12 }} }} }}
+        }}
+    }});
+}} else {{
+    adviceCtx.font = '14px Inter';
+    adviceCtx.fillStyle = '#718096';
+    adviceCtx.fillText('No ES data in log (add advice_action to log entries)', 20, 100);
+}}
+
+// ES: Matched rules chart
+const rulesCtx = document.getElementById('rulesChart').getContext('2d');
+const rulesData = {json.dumps(analysis['matched_rule_counts'])};
+if (Object.keys(rulesData).length > 0) {{
+    new Chart(rulesCtx, {{
+        type: 'bar',
+        data: {{
+            labels: Object.keys(rulesData),
+            datasets: [{{
+                label: 'Matched Count',
+                data: Object.values(rulesData),
+                backgroundColor: 'rgba(183, 148, 246, 0.6)',
+                borderColor: '#b794f6',
+                borderWidth: 1,
+            }}]
+        }},
+        options: {{
+            responsive: true,
+            indexAxis: 'y',
+            scales: {{
+                x: {{ grid: {{ color: 'rgba(255,255,255,0.05)' }}, ticks: {{ color: '#718096' }} }},
+                y: {{ grid: {{ display: false }}, ticks: {{ color: '#a0aec0', font: {{ size: 10 }} }} }}
+            }},
+            plugins: {{ legend: {{ display: false }} }}
+        }}
+    }});
+}} else {{
+    rulesCtx.font = '14px Inter';
+    rulesCtx.fillStyle = '#718096';
+    rulesCtx.fillText('No ES data in log (add matched_rule to log entries)', 20, 100);
+}}
 </script>
 </body>
 </html>"""

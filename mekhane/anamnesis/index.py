@@ -176,18 +176,30 @@ class GnosisIndex:
             self.embedder = Embedder()
         return self.embedder
 
-    # PURPOSE: 既存primary_keyをキャッシュ
+    # PURPOSE: 既存primary_keyとtitleをキャッシュ
     def _load_primary_keys(self):
-        """既存primary_keyをキャッシュ"""
+        """既存primary_keyとtitleをキャッシュ"""
         if self.TABLE_NAME not in self.db.table_names():
             return
 
         table = self.db.open_table(self.TABLE_NAME)
         try:
-            df = table.search().select(["primary_key"]).limit(None).to_pandas()
+            df = table.search().select(["primary_key", "title"]).limit(None).to_pandas()
             self._primary_key_cache = set(df["primary_key"].tolist())
+            # Title cache: normalized_title -> primary_key
+            self._title_cache: dict[str, str] = {}
+            for _, row in df.iterrows():
+                norm = self._normalize_title(row.get("title", ""))
+                if norm:
+                    self._title_cache[norm] = row["primary_key"]
         except Exception:
-            pass  # TODO: Add proper error handling
+            pass
+
+    @staticmethod
+    def _normalize_title(title: str) -> str:
+        """タイトルの正規化: 小文字化 + 非英数字除去でファジーマッチ。"""
+        import re
+        return re.sub(r'[^a-z0-9]', '', title.lower().strip())
 
     # PURPOSE: 論文をインデックスに追加
     def add_papers(self, papers: list[Paper], dedupe: bool = True) -> int:
@@ -206,14 +218,24 @@ class GnosisIndex:
 
         embedder = self._get_embedder()
 
-        # 重複排除
+        # 重複排除: primary_key + title fuzzy match
         if dedupe:
             self._load_primary_keys()
+            title_cache = getattr(self, '_title_cache', {})
             new_papers = []
             for p in papers:
-                if p.primary_key not in self._primary_key_cache:
-                    new_papers.append(p)
-                    self._primary_key_cache.add(p.primary_key)
+                # Check 1: primary_key exact match
+                if p.primary_key in self._primary_key_cache:
+                    continue
+                # Check 2: normalized title match (cross-source dedup)
+                norm_title = self._normalize_title(p.title)
+                if norm_title and norm_title in title_cache:
+                    # Same paper from different source — skip
+                    continue
+                new_papers.append(p)
+                self._primary_key_cache.add(p.primary_key)
+                if norm_title:
+                    title_cache[norm_title] = p.primary_key
             papers = new_papers
 
         if not papers:

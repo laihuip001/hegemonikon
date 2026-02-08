@@ -481,6 +481,19 @@ def run_loop_v2(
         agent.update_A_dirichlet(observation=flat_obs)
         cycle.a_matrix_updated = True
 
+        # ── Step 5b: Feedback Bridge — A行列 → Attractor bias ──
+        # A行列の topic 精度を Attractor の similarity bias に注入
+        # これにより cycle N の学習が cycle N+1 の Series 感度に反映される
+        if dispatcher is not None:
+            try:
+                from mekhane.fep.fep_attractor_bridge import apply_fep_bias_to_attractor
+                biases = apply_fep_bias_to_attractor(
+                    agent, dispatcher._advisor._attractor,
+                )
+                cycle.fep_raw["feedback_bias"] = biases
+            except Exception:
+                pass  # feedback is best-effort
+
         # ── Step 6: Cone (if acting) ──
         if cycle.selected_series is not None:
             simulated_cone = _simulate_cone(cycle.selected_series, user_input)

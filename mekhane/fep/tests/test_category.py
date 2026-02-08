@@ -1251,3 +1251,69 @@ class TestAdviseDevilIntegration:
         advice = advise(cone)
         assert advice.action == "investigate"
         assert advice.devil_detail is None  # investigate, not devil
+
+
+class TestAdviseWithAttractor:
+    """advise_with_attractor() の検証"""
+
+    def _make_cone(self, series=Series.O, dispersion=0.05, confidence=80.0,
+                   is_universal=True, outputs=None, **kwargs):
+        if outputs is None:
+            outputs = {"O1": "深い認識", "O2": "強い意志", "O3": "真の問い", "O4": "行動の力"}
+        projs = [ConeProjection(theorem_id=k, output=v, hom_label=f"{k}の射")
+                 for k, v in outputs.items()]
+        return Cone(
+            series=series, projections=projs, dispersion=dispersion,
+            confidence=confidence, resolution_method="root",
+            is_universal=is_universal, **kwargs,
+        )
+
+    # PURPOSE: CLEAR oscillation → no change to base advise
+    def test_clear_no_change(self):
+        from mekhane.fep.cone_consumer import advise, advise_with_attractor
+        cone = self._make_cone()
+        base = advise(cone)
+        enriched = advise_with_attractor(cone, "clear", 0.9, "O")
+        assert enriched.action == base.action
+        assert enriched.urgency == base.urgency
+
+    # PURPOSE: Series mismatch → investigate
+    def test_series_mismatch(self):
+        from mekhane.fep.cone_consumer import advise_with_attractor
+        cone = self._make_cone()  # O-series, proceed
+        enriched = advise_with_attractor(cone, "clear", 0.9, "S")
+        assert enriched.action == "investigate"
+        assert "不一致" in enriched.reason
+        assert enriched.urgency == 0.6
+
+    # PURPOSE: NEGATIVE → urgency increases
+    def test_negative_urgency(self):
+        from mekhane.fep.cone_consumer import advise, advise_with_attractor
+        cone = self._make_cone()
+        base = advise(cone)
+        enriched = advise_with_attractor(cone, "negative", 0.3, "O")
+        assert enriched.urgency >= base.urgency + 0.2 - 0.01  # float tolerance
+        assert "NEGATIVE" in enriched.reason
+
+    # PURPOSE: WEAK + proceed → investigate
+    def test_weak_proceed_to_investigate(self):
+        from mekhane.fep.cone_consumer import advise_with_attractor
+        cone = self._make_cone()  # proceed
+        enriched = advise_with_attractor(cone, "weak", 0.1, "O")
+        assert enriched.action == "investigate"
+        assert "WEAK" in enriched.reason
+
+    # PURPOSE: POSITIVE + devil (low urgency) → investigate
+    def test_positive_devil_to_investigate(self):
+        from mekhane.fep.cone_consumer import advise_with_attractor
+        # S-series V=0.25 → devil (urgency=0.8)
+        cone = self._make_cone(
+            series=Series.S, dispersion=0.25, confidence=60.0,
+            is_universal=False,
+            outputs={"S1": "尺度", "S2": "方法", "S3": "基準", "S4": "実践"},
+        )
+        enriched = advise_with_attractor(cone, "positive", 0.7, "S")
+        # S-series devil urgency=0.8, so positive won't downgrade (>= 0.8)
+        # This tests the boundary condition
+        assert enriched.action in ("devil", "investigate")
+

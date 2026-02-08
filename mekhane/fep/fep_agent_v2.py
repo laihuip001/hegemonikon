@@ -372,6 +372,96 @@ class HegemonikónFEPAgentV2:
             "precision_weights": dict(self.precision_weights),
         }
 
+    def explain(self, step_result: Optional[Dict[str, Any]] = None) -> str:
+        """Explain the last step decision in natural language.
+
+        Aggregates EFE by first-action, ranks alternatives, and
+        produces a human-readable explanation of WHY this action
+        was chosen over alternatives.
+
+        Args:
+            step_result: Output of step(). If None, uses last history.
+
+        Returns:
+            Japanese explanation string.
+        """
+        if step_result is None:
+            # Try to reconstruct from history
+            return "（説明不可: step() の結果が提供されていません）"
+
+        q_pi = step_result.get("q_pi")
+        neg_efe = step_result.get("neg_efe")
+        if q_pi is None or neg_efe is None:
+            return "（説明不可: EFE データが不足）"
+
+        action = step_result["action"]
+        act_name = step_result["action_name"]
+        entropy = step_result["entropy"]
+        map_state = step_result.get("map_state_names", {})
+        selected_series = step_result.get("selected_series")
+
+        # Aggregate EFE by first-action
+        policies = self.agent.policies
+        if isinstance(policies, list):
+            policies = np.array(policies)
+        first_actions = policies[:, 0, 0].astype(int)
+
+        efe_by_action: Dict[str, float] = {}
+        prob_by_action: Dict[str, float] = {}
+        for act_idx in range(self.num_actions):
+            name = action_name_v2(act_idx)
+            mask = first_actions == act_idx
+            if mask.any():
+                efe_by_action[name] = float(neg_efe[mask].max())
+                prob_by_action[name] = float(q_pi[mask].sum())
+
+        # Rank by probability
+        ranked = sorted(prob_by_action.items(), key=lambda x: -x[1])
+
+        # Build explanation
+        lines = []
+
+        # 1. What was chosen and why
+        prob_pct = int(prob_by_action.get(act_name, 0) * 100)
+        if act_name == "observe":
+            lines.append(
+                f"選択: observe ({prob_pct}%) — 不確実性が高く行動を保留"
+            )
+            lines.append(f"  entropy={entropy:.2f} → まだ確信が持てない")
+        else:
+            lines.append(
+                f"選択: {act_name} ({prob_pct}%) — "
+                f"Series {selected_series} での行動が最も期待自由エネルギーを下げる"
+            )
+
+        # 2. State interpretation
+        p = map_state.get("phantasia", "?")
+        a = map_state.get("assent", "?")
+        h = map_state.get("horme", "?")
+        s = map_state.get("series", "?")
+        state_desc = {
+            ("clear", "granted", "active"): "明瞭な印象、確信あり、行動意欲あり",
+            ("clear", "withheld", "passive"): "明瞭だが判断保留、静観中",
+            ("uncertain", "withheld", "passive"): "不確実、Epochē 維持",
+            ("clear", "granted", "passive"): "確信はあるが衝動なし",
+            ("clear", "withheld", "active"): "明瞭で意欲あるが確信不足",
+            ("uncertain", "granted", "active"): "不確実だが行動に傾いている",
+        }
+        desc = state_desc.get(
+            (p, a, h),
+            f"phantasia={p}, assent={a}, horme={h}"
+        )
+        lines.append(f"  内部状態: {desc} (Series={s})")
+
+        # 3. Top 3 alternatives
+        lines.append("  代替候補:")
+        for name, prob in ranked[:3]:
+            pct = int(prob * 100)
+            marker = " ←" if name == act_name else ""
+            lines.append(f"    {name:8s} {pct:3d}%{marker}")
+
+        return "\n".join(lines)
+
     # =========================================================================
     # Utility Methods
     # =========================================================================

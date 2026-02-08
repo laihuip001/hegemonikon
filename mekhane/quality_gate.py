@@ -162,7 +162,7 @@ class QualityGate:
                         deadline=deadline,
                         description=desc,
                         line_number=i,
-                        # NOTE: Removed self-assignment: status = status
+                        status=status,
                     )
                 )
 

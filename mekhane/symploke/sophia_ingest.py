@@ -102,7 +102,10 @@ def ingest_to_sophia(docs: list[Document], save_path: str = None) -> int:
     from mekhane.symploke.indices.sophia import SophiaIndex
 
     adapter = EmbeddingAdapter()
-    index = SophiaIndex(adapter, "sophia", dimension=384)  # MiniLM = 384 dims
+    # Auto-detect embedding dimension from the model
+    sample_vec = adapter.encode(["test"])
+    dim = sample_vec.shape[1] if sample_vec.ndim == 2 else len(sample_vec[0])
+    index = SophiaIndex(adapter, "sophia", dimension=dim)
     index.initialize()
 
     count = index.ingest(docs)

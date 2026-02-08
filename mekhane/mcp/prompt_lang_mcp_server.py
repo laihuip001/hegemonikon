@@ -132,6 +132,7 @@ DOMAIN_KEYWORDS = {
 }
 
 
+# PURPOSE: Detect domain from requirements text.
 def detect_domain(text: str) -> str:
     """Detect domain from requirements text."""
     text_lower = text.lower()
@@ -151,6 +152,7 @@ def detect_domain(text: str) -> str:
 ALLOWED_DOMAINS = frozenset(["technical", "rag", "summarization"])
 
 
+# PURPOSE: Validate domain against whitelist.
 def validate_domain(domain: str) -> str:
     """
     Validate domain against whitelist.
@@ -369,6 +371,7 @@ async def call_tool(name: str, arguments: dict):
         return [TextContent(type="text", text=f"Unknown tool: {name}")]
 
 
+# PURPOSE: Run the MCP server.
 async def main():
     """Run the MCP server."""
     log("Starting stdio server...")

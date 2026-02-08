@@ -19,8 +19,8 @@ from pathlib import Path
 from typing import Optional
 
 
-@dataclass
 # PURPOSE: Metrika 5門の検証結果
+@dataclass
 class MetrikaResult:
     """Metrika 5門の検証結果"""
 
@@ -32,8 +32,8 @@ class MetrikaResult:
 
     violations: list[str] = field(default_factory=list)
 
-    @property
     # PURPOSE: passed — システムの処理
+    @property
     def passed(self) -> bool:
         """Metrika 全項目が合格か判定"""
         return all(

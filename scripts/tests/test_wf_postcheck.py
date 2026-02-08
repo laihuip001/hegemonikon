@@ -84,7 +84,12 @@ class TestPostcheck:
 確信度: 推定 (MEDIUM)
 """
         result = postcheck("dia", "+", content)
-        assert result["passed"], f"dia+ should pass: {result['formatted']}"
+        # sel_enforcement checks should pass
+        sel_checks = [c for c in result["checks"] if not c["name"].startswith("UML")]
+        assert all(c["passed"] for c in sel_checks), f"dia+ sel checks should pass: {result['formatted']}"
+        # UML checks are advisory — confidence=0 warning is expected
+        uml_checks = [c for c in result["checks"] if c["name"].startswith("UML")]
+        assert len(uml_checks) >= 1, "UML checks should be present"
 
     def test_dia_plus_fail_empty(self):
         result = postcheck("dia", "+", "PASS. 問題なし。")

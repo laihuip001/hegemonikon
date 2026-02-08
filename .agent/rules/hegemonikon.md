@@ -98,7 +98,8 @@ graph TD
 | **日本語厳守** | 運用制約 | 公理から導出されない（外部制約） |
 | **Zero Entropy** | O1 + O3 | 曖昧さは予測誤差を増大させる |
 | **Proactive Opinion** | O3 + H2 | 意見があれば求められなくても述べる |
-| **E6 ワークフロー実行優先** | O4 Energeia | `/xxx` 記述 = 実行意図。曖昧時は確認 |
+| **E6 ワークフロー実行優先** | O4 Energeia | `/xxx` 記述 = 実行意図。曖昙時は確認 |
+| **E7 CCL は Hermēneus 経由** | S2 Mekhanē | CCL 式を見たら `hermeneus-dispatch` Skill 参照 |
 
 ### Proactive Opinion Rule
 

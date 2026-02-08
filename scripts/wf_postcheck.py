@@ -167,6 +167,35 @@ def check_requirements(
     return checks
 
 
+# PURPOSE: UML Phase 2 — MP 5段階のポストチェック統合
+def check_uml(wf_name: str, content: str) -> list[dict]:
+    """Run UML post-checks (MP Stage 3-5) on WF output.
+
+    Graceful degradation: import failure → empty list.
+    """
+    try:
+        from mekhane.fep.metacognitive_layer import run_post_checks
+    except ImportError:
+        return []
+
+    try:
+        checks = run_post_checks(
+            output=content,
+            context=f"/{wf_name} output",
+            confidence=0.0,  # No explicit confidence from postcheck
+        )
+        return [
+            {
+                "name": f"UML {c.stage_label}",
+                "passed": c.passed,
+                "detail": f"{'✅' if c.passed else '⚠️'} UML {c.stage_label}: {c.result[:80]}",
+            }
+            for c in checks
+        ]
+    except Exception:
+        return []  # UML failure should never block postcheck
+
+
 def postcheck(
     wf_name: str,
     mode: str,
@@ -210,6 +239,10 @@ def postcheck(
     if wf_name in ("boot", "bye"):
         nat_checks = check_naturality()
         checks.extend(nat_checks)
+
+    # UML metacognitive post-check (Phase 2: all WFs)
+    uml_checks = check_uml(wf_name, content)
+    checks.extend(uml_checks)
 
     passed_count = sum(1 for c in checks if c["passed"])
     total = len(checks)

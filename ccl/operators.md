@@ -569,140 +569,103 @@ F:[ALL]{ /sta }
 
 ---
 
-## 11. マクロ (@)
+## 11. マクロ (@) — 3層アーキテクチャ (v2.0)
 
-### 11.1 itertools 由来
+> **原則**: マクロは CCL 式の糖衣構文。複雑な CCL パターンに名前を付けて再利用する。
+> **Dendron 監査**: 2026-02-07 実施。58 → 44 マクロ (14 PHANTOM 削除)。
 
-| マクロ | CCL 展開 | 意味 |
-|:-------|:---------|:-----|
-| `@chain` | `A_B_C` (continue) | 直列化 (エラー継続) |
-| `@cycle` | `~:cond{A~B}` | 収束まで無限ループ |
-| `@repeat(n)` | `F:[×N]{A}` | N回反復 |
+### 11.1 Core — 使用中マクロ (26)
 
-### 11.2 functools 由来
+実際に WF/CCL 式で使用されている、または明確な使用場面があるマクロ。
 
-| マクロ | CCL 展開 | 意味 |
-|:-------|:---------|:-----|
-| `@reduce(op)` | `((A op B) op C)` | 累積融合 |
-| `@partial(p=v)` | `/kho{ctx}_WF` | 部分適用 |
+#### 認知系 (Cognitive)
 
-### 11.3 Context Engineering
+| マクロ | CCL 展開 | 意味 | Dendron |
+|:-------|:---------|:-----|:-------:|
+| `@converge` | `F:[T1..T4]{@selfcheck} _ I:[V>θ]{/dia.root_@reduce(*)} _ /pis` | Limit深化 (C1→C2→C3) | 🟢 |
+| `@diverge` | `F:[C(4,2)]{E[tension]} _ F:[@top3]{/zet+_/noe-} _ /dox.sens` | Colimit深化 (D1→D2→D3) | 🟢 |
+| `@complete` | `{result} _ /x.trigonon _ ?confirm` | WF完了 (射提案+確信度) | 🟢 |
+| `@think` | `(/noe~\noe)*dia ^ /u+` | 深層思考 | 🔵 |
+| `@plan` | `lim[/ene+]{(/bou~zet)*(/s~\s)_/kho*hod}` | 計画立案 | 🔵 |
+| `@verify` | `lim[/epi]{(/dia~\dia)*(/sta^)}` | 厳密検証 | 🔵 |
 
-| マクロ | CCL 展開 | 意味 |
-|:-------|:---------|:-----|
-| `@ce` | `/mek{ctx>inst}` | 背景優先プロンプト |
+> **`@complete` 使用義務**: 24定理WF完了時、暗黙的に発動。BC-8 連動。
+> **`@converge`/`@diverge`**: Hub WF で使用。詳細: `ccl/macros/converge.md`, `ccl/macros/diverge.md`
 
-### 11.4 Metaprompt Strategy
+#### Tier 1 標準
 
-| マクロ | CCL 展開 | 意味 |
-|:-------|:---------|:-----|
-| `@optimize` | `/mek{metaprompt}` | 推論モデル最適化 |
+| マクロ | CCL 展開 | 意味 | Dendron |
+|:-------|:---------|:-----|:-------:|
+| `@tak` | `/s1_F:3{/sta~/chr}_?gap{/sop}_/bou` | タスク構造化 | 🟢 |
+| `@u` | `/bou+*^zet+` | 主観的意志決定 | 🟢 |
+| `@dig` | `/s+~(/p*/a)_/dia*/o+` | 深掘り分析 | 🔵 |
+| `@go` | `/s+_/ene+` | 戦略即時実行 | 🔵 |
+| `@ground` | `/tak-*/bou_6w3h` | 現実接地 (6W3H) | 🔵 |
+| `@fix` | `/dia+_/ene+_/dia` | 修正サイクル | 🔵 |
+| `@kyc` | `~(/sop_/noe_/ene_/dia-)` | κύκλος | 🔵 |
 
-### 11.5 Recoverable Autonomy
+#### 合成・制御系
 
-| マクロ | CCL 展開 | 意味 |
-|:-------|:---------|:-----|
-| `@risk(lv)` | `/ene{risk=lv}` | リスクタグ付与 |
-| `@checkpoint` | `/ene{checkpoint}` | 保存ポイント |
+| マクロ | CCL 展開 | 意味 | Dendron |
+|:-------|:---------|:-----|:-------:|
+| `@reduce(op)` | `((A op B) op C)` | 累積融合 | 🟢 |
+| `@selfcheck` | `@supervise(low)` | 自己検証 | 🟢 |
+| `@chain` | `A_B_C` (continue) | 直列化 (エラー継続) | 🔵 |
+| `@cycle` | `~:cond{A~B}` | 収束まで無限ループ | 🔵 |
+| `@partial(p=v)` | `/kho{ctx}_WF` | 部分適用 | 🔵 |
+| `@scoped(s,t){}` | `/kho{s}_WF_t` | スコープ限定実行 | 🔵 |
+| `@memoize` | `Caching` Mixin | 結果キャッシュ | 🔵 |
+| `@validate` | `Validation` Mixin | 事前/事後検証 | 🔵 |
+| `@proof` | (証明パターン) | 証明 | 🔵 |
 
-### 11.6 Memory-First Architecture
+#### 監視・X-series
 
-| マクロ | CCL 展開 | 意味 |
-|:-------|:---------|:-----|
-| `@memory(layer)` | `/zet{memory=layer}` | 指定層検索 |
+| マクロ | CCL 展開 | 意味 | Dendron |
+|:-------|:---------|:-----|:-------:|
+| `@supervise(lv)` | `/dia` / `/syn` | 監視レベル | 🔵 |
+| `@premortem` | `@supervise(mid)` | 失敗事前検討 | 🔵 |
+| `@council` | `@supervise(high)` | 外部評議会 | 🔵 |
+| `@next` | `/x{from=cur}` | 推奨次ステップ | 🔵 |
 
-### 11.7 Graduated Supervision
+---
 
-| マクロ | CCL 展開 | 意味 |
-|:-------|:---------|:-----|
-| `@supervise(lv)` | `/dia` / `/syn` | 監視レベル |
-| `@selfcheck` | `@supervise(low)` | 自己検証 |
-| `@premortem` | `@supervise(mid)` | 失敗事前検討 |
-| `@council` | `@supervise(high)` | 外部評議会 |
+### 11.2 Future — インフラ待ちマクロ (6)
 
-### 11.8 Zero-Trust Enforcement
+> マルチエージェント環境・pt最適化が成熟したら**即座に活性化**するマクロ。
+> 削除しない。仕様を温存する。
 
-| マクロ | CCL 展開 | 意味 |
-|:-------|:---------|:-----|
-| `@enforce(lv)` | Anti-Skip/Schema | 強制レベル |
+| マクロ | CCL 展開 | 意味 | 活性化条件 |
+|:-------|:---------|:-----|:-----------|
+| `@batch` | `@batch{F:[×100]{/s}}` | 非同期並列処理 | Tier 1 日次実行 |
+| `@thread` | `@thread[perplexity]{/sop+}` | 実行エージェント指定 | マルチエージェント |
+| `@delegate` | `@delegate[openmanus]{/ene+}` | 長時間タスク委譲 | Jules/OpenManus 統合 |
+| `@cache` | `@cache[L1]{/noe+}` | pt削減キャッシュ (**-10pt**) | pt制度成熟 |
+| `@compact` | `@compact{long_ctx}` | pt削減圧縮 (**-8pt**) | pt制度成熟 |
+| `@fault_tolerant` | `@fault_tolerant{WF @fallback{WF-}}` | 自動回復 (**+2pt**) | エラー処理体系化 |
 
-### 11.9 Continuing Me Identity
+---
 
-| マクロ | CCL 展開 | 意味 |
-|:-------|:---------|:-----|
-| `@identity` | `/boot{out=id}` | Identity Stack |
-| `@reflect` | `/noe.nous{self}` | メタ認知 |
+### 11.3 Experimental — 要検証マクロ (12)
 
-### 11.10 X-series Integration
+> 概念は正しいが使用実績なし。**6ヶ月後 (2026-08) に Dendron 再審査**。
+> 未使用なら PHANTOM 降格。
 
-| マクロ | CCL 展開 | 意味 |
-|:-------|:---------|:-----|
-| `@next` | `/x{from=cur}` | 推奨次ステップ |
-| `@route(name)` | Sacred Routes | 黄金経路 |
+| マクロ | CCL 展開 | 意味 | 課題 |
+|:-------|:---------|:-----|:-----|
+| `@repeat(n)` | `F:[×N]{A}` | N回反復 | `F:` で直接書ける |
+| `@ce` | `/mek{ctx>inst}` | 背景優先プロンプト | CE 体系化待ち |
+| `@optimize` | `/mek{metaprompt}` | 推論最適化 | 実装なし |
+| `@risk(lv)` | `/ene{risk=lv}` | リスクタグ | Safety Contract と重複 |
+| `@checkpoint` | `/ene{checkpoint}` | 保存ポイント | LLM セッション制約 |
+| `@memory(layer)` | `/zet{memory=layer}` | 指定層検索 | Gnōsis 成熟待ち |
+| `@identity` | `/boot{out=id}` | Identity Stack | `/boot` で代替可 |
+| `@reflect` | `/noe.nous{self}` | メタ認知 | 直接呼び出し可 |
+| `@enforce(lv)` | Anti-Skip/Schema | 強制レベル | SEL と重複 |
+| `@route(name)` | Sacred Routes | 黄金経路 | 未使用 |
+| `@retry` | `Retry` Mixin | 失敗時リトライ | API 層の仕事 |
+| `@async` | (特殊) | 非同期実行 | マルチエージェント前提 |
 
-### 11.11 特殊
-
-| マクロ | CCL 展開 | 意味 |
-|:-------|:---------|:-----|
-| `@u` | `/bou+*^zet+` | 主観的意志決定 |
-
-### 11.12 Tier 1 標準マクロ
-
-| マクロ | CCL 展開 | 意味 |
-|:-------|:---------|:-----|
-| `@tak` | `/s1_F:3{/sta~/chr}_?gap{/sop}_/bou` | タスク構造化 |
-| `@dig` | `/s+~(/p*/a)_/dia*/o+` | 深掘り分析 |
-| `@go` | `/s+_/ene+` | 戦略即時実行 |
-| `@ground` | `/tak-*/bou_6w3h` | 現実への接地 (6W3H) |
-| `@fix` | `/dia+_/ene+_/dia` | 修正サイクル |
-| `@kyc` | `~(/sop_/noe_/ene_/dia-)` | κύκλος (観察→推論→行動→判定) |
-
-### 11.13 認知マクロ (Cognitive Macros)
-
-| マクロ | CCL 展開 | 意味 |
-|:-------|:---------|:-----|
-| `@think` | `(/noe~\noe)*dia ^ /u+` | 深層思考 (認識振動→判定融合→メタ統合) |
-| `@plan` | `lim[/ene+]{(/bou~zet)*(/s~\s)_/kho*hod}` | 計画立案 (意志探求振動→戦略融合→詳細実行に収束) |
-| `@verify` | `lim[/epi]{(/dia~\dia)*(/sta^)}` | 厳密検証 (判定振動→メタ基準融合→知識化に収束) |
-| `@complete` | `{result} _ /x.trigonon _ ?confirm` | WF完了 (結果出力→射提案→確信度確認) |
-| `@converge` | `F:[T1..T4]{@selfcheck} _ I:[V>θ]{/dia.root_@reduce(*)} _ /pis` | Limit深化 (C1対比→C2解消→C3検証) |
-| `@diverge` | `F:[C(4,2)]{E[tension]} _ F:[@top3]{/zet+_/noe-} _ /dox.sens` | Colimit深化 (D1スキャン→D2深掘り→D3レポート) |
-
-> **`@complete` 使用義務**: 24定理WF完了時、暗黙的に `@complete` が発動する。
-> BC-8 (射出力義務) と連動。`/x.trigonon` が frontmatter を読み射を提案。
->
-> **`@converge`/`@diverge`**: Hub WF (`/o`,`/s`,`/h`,`/p`,`/k`,`/a`) で使用。詳細: `ccl/macros/converge.md`, `ccl/macros/diverge.md`
-
-### 11.14 Scope Management (Pythōsis Phase 3) v2.0
-
-> **Origin**: Python `contextlib` モジュールの消化
-> **目的**: CCL 実行にスコープ境界と setup/teardown を提供
-
-| マクロ | CCL 展開 | 意味 |
-|:-------|:---------|:-----|
-| `@scoped(s,t){}` | `/kho{s}_WF_t` | スコープ限定実行 (setup/teardown) |
-
-**パラメータ**:
-
-| パラメータ | 型 | 説明 | Python 対応 |
-|:-----------|:---|:-----|:------------|
-| `setup:` | CCL | 事前処理 | `__enter__` |
-| `teardown:` | CCL | 事後処理 (例外時も実行) | `__exit__` |
-
-**使用例**:
-
-```ccl
-# 基本: スコープ付き実行
-@scoped(
-  setup: /kho.scope{domain: "Pythōsis"},
-  teardown: /bye-
-) {
-  /noe+ _/s+ _/dia
-}
-
-# 簡略形: setup のみ
-@scoped(setup: /boot-) { /ene+ }
-```
+> ⚠️ **Sunset**: 2026-08-07 までに使用実績がなければ PHANTOM として削除予定
 
 ## 12. CCL 複雑度ポイント制 (Complexity Point System)
 

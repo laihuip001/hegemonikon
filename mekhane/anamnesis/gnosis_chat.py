@@ -485,7 +485,12 @@ class KnowledgeIndexer:
         BATCH_SIZE = 32
         for i in range(0, len(data), BATCH_SIZE):
             batch = data[i:i + BATCH_SIZE]
-            texts = [d["content"][:512] for d in batch]
+            texts = [
+                KnowledgeIndexer._build_embedding_text(
+                    d["title"], d["source"], d["content"]
+                )
+                for d in batch
+            ]
             vectors = embedder.embed_batch(texts)
 
             for d, v in zip(batch, vectors):

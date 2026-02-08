@@ -652,6 +652,9 @@ def postcheck_boot_report(report_path: str, mode: str = "detailed") -> dict:
     # Check 6: 随伴メトリクス (Adjunction L⊣R)
     # Drift = 1 - ε (失われた文脈の量)
     # ε precision: Handoff への言及 + Self-Profile 参照 + 意味ある瞬間の記述
+    # BS-3b fix: FILL 残存率で ε を割り引く
+    #   テンプレート見出しに "Handoff" 等が含まれるため、
+    #   記入前でもパターンマッチが成立してしまう問題を解消
     adjunction_indicators = {
         "handoff_context": bool(re.search(r"(?:引き継ぎ|handoff|Handoff|前回)", content, re.IGNORECASE)),
         "self_profile_ref": bool(re.search(r"(?:self.profile|ミスパターン|能力境界|Self-Profile)", content, re.IGNORECASE)),
@@ -659,12 +662,26 @@ def postcheck_boot_report(report_path: str, mode: str = "detailed") -> dict:
         "task_continuity": bool(re.search(r"(?:前回の続き|継続|再開|残タスク)", content, re.IGNORECASE)),
     }
     epsilon_count = sum(adjunction_indicators.values())
-    epsilon_precision = epsilon_count / len(adjunction_indicators)
+    epsilon_raw = epsilon_count / len(adjunction_indicators)
+
+    # BS-3b: FILL 残存ペナルティ (dia+ TH-005)
+    # 未記入セクションが多い → テンプレート見出しのマッチは信頼できない
+    fill_remaining = content.count("<!-- FILL -->")
+    if fill_remaining > 0:
+        # fill_ratio = 記入完了率 (0.0 = 全未記入, 1.0 = 全記入)
+        # 推定: テンプレートは ~25 FILL マーカーを含む (detailed mode)
+        estimated_total_fills = max(fill_remaining, 25)
+        fill_ratio = 1.0 - (fill_remaining / estimated_total_fills)
+        epsilon_precision = epsilon_raw * fill_ratio
+    else:
+        epsilon_precision = epsilon_raw
+
     drift = 1.0 - epsilon_precision
     checks.append({
         "name": "adjunction_metrics",
         "passed": True,  # Informational only, never blocks
         "detail": f"Adjunction L⊣R: ε={epsilon_precision:.0%}, Drift={drift:.0%}"
+            + (f" (fill_penalty: {fill_remaining} FILL remaining)" if fill_remaining > 0 else "")
             + f" ({', '.join(k for k, v in adjunction_indicators.items() if v)})"
             if epsilon_count > 0
             else f"Adjunction L⊣R: ε=0%, Drift=100% (no context restoration detected)",

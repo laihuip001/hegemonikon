@@ -282,8 +282,9 @@ def main():
     import argparse
     parser = argparse.ArgumentParser(description="Hegemonikón Health Dashboard")
     parser.add_argument("--json", action="store_true", help="JSON output")
-    parser.add_argument("--slack", action="store_true", help="Send to Slack")
+    parser.add_argument("--slack", action="store_true", help="Send directly to Slack (bypass n8n)")
     parser.add_argument("--n8n", action="store_true", help="Send to n8n WF-05")
+    parser.add_argument("--no-n8n", action="store_true", help="Suppress auto n8n send")
     args = parser.parse_args()
 
     report = run_health_check()
@@ -291,14 +292,17 @@ def main():
     if args.json:
         print(json.dumps([asdict(i) for i in report.items], indent=2, ensure_ascii=False))
     elif args.slack:
+        # 直接 Slack送信 (n8n 未起動時のフォールバック)
         send_slack(report)
         print(format_terminal(report))
     else:
         print(format_terminal(report))
 
-    # n8n 通知 (--n8n フラグ or スコアが低い場合は自動送信)
-    if args.n8n or report.score < 0.7:
-        send_n8n_alert(report)
+    # n8n 通知: n8n が Slack 通知の一元窓口
+    # --n8n 明示指定 or スコア低下時は自動送信 (--slack との二重送信を回避)
+    if not args.no_n8n and not args.slack:
+        if args.n8n or report.score < 0.7:
+            send_n8n_alert(report)
 
     # Exit code: 0 if score > 0.7, 1 otherwise
     sys.exit(0 if report.score >= 0.7 else 1)

@@ -58,6 +58,16 @@ _DIR_WAIT = re.compile(
 )
 
 
+def _char_bigrams(text: str) -> List[str]:
+    """Generate character bigrams from text (whitespace removed).
+
+    Used for Jaccard similarity — captures topic overlap even in Japanese
+    where SequenceMatcher's character-level matching performs poorly.
+    """
+    clean = re.sub(r"\s+", "", text)
+    return [clean[i:i + 2] for i in range(len(clean) - 1)]
+
+
 # =============================================================================
 # C0: Precision Weighting (PW)
 # =============================================================================
@@ -108,9 +118,14 @@ def compute_dispersion(outputs: Dict[str, str]) -> float:
     to estimate how much the 4 outputs agree or contradict.
 
     Components:
-        1. SequenceMatcher similarity → base dispersion
+        1. Ensemble similarity (SequenceMatcher + bigram Jaccard) → base dispersion
         2. Negation contradiction → bonus (テキスト間で否定が混在)
         3. Direction contradiction → bonus (GO vs WAIT が混在)
+
+    The ensemble approach addresses BS-2 (Japanese short text V being
+    systematically high). SequenceMatcher works at character level,
+    which is poor for Japanese. Bigram Jaccard captures topic overlap
+    via shared character pairs — higher for texts about the same topic.
 
     Returns:
         float: dispersion score (0.0-1.0)
@@ -125,8 +140,20 @@ def compute_dispersion(outputs: Dict[str, str]) -> float:
 
     for i in range(len(values)):
         for j in range(i + 1, len(values)):
-            ratio = SequenceMatcher(None, values[i], values[j]).ratio()
-            similarities.append(ratio)
+            # Method 1: SequenceMatcher (character-level)
+            seq_ratio = SequenceMatcher(None, values[i], values[j]).ratio()
+
+            # Method 2: Bigram Jaccard (topic-level, better for Japanese)
+            bigrams_a = set(_char_bigrams(values[i]))
+            bigrams_b = set(_char_bigrams(values[j]))
+            if bigrams_a or bigrams_b:
+                jaccard = len(bigrams_a & bigrams_b) / len(bigrams_a | bigrams_b)
+            else:
+                jaccard = 1.0
+
+            # Ensemble: take the max — if either method sees similarity,
+            # the texts are not contradictory
+            similarities.append(max(seq_ratio, jaccard))
 
     if not similarities:
         return 0.0

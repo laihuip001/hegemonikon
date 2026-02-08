@@ -121,6 +121,44 @@ class TestComputeDispersion:
         # 方向性ボーナス (+0.2) が加算される
         assert v > 0.3
 
+    # --- TDD 回帰テスト: 日本語 V 閾値 (BS-2) ---
+
+    def test_japanese_different_angles_not_contradiction(self):
+        """日本語: 同じトピックの異なる角度は矛盾度が低め。V ≤ 0.7。
+
+        TDD regression test for BS-2:
+        同じトピック (GPU リソース管理) について4つの角度から発言。
+        共通キーワードが多いため、bigram Jaccard が類似度を検出し、
+        V は「完全異トピック」より低くなるべき。
+        """
+        v = compute_dispersion({
+            "O1": "GPU リソース管理の改善が必要、GPU メモリの競合を解消する",
+            "O2": "GPU リソースの安定性を確保したい、リソース配分を見直す",
+            "O3": "GPU リソース競合の根本原因を探求する必要がある",
+            "O4": "GPU Guard を実装して GPU リソースを保護する",
+        })
+        assert v <= 0.7, f"Same-topic angles should have moderate V: V={v}"
+
+    def test_japanese_completely_different_topics_high_v(self):
+        """日本語: 完全に異なるトピックは V が高い。V > 0.5。"""
+        v = compute_dispersion({
+            "O1": "天気は晴れだった",
+            "O2": "猫を飼いたい",
+            "O3": "数学の問題を解く",
+            "O4": "料理のレシピを探す",
+        })
+        assert v > 0.5, f"Completely different topics should have high V: V={v}"
+
+    def test_japanese_actual_contradiction_detected(self):
+        """日本語: 実際の矛盾 (否定混在) は検出される。V > 0.3。"""
+        v = compute_dispersion({
+            "H1": "進むべきだ、行動を開始する",
+            "H2": "確信度は高い",
+            "H3": "進めるべきではない、中止すべきだ",
+            "H4": "判断を保留する、止める",
+        })
+        assert v > 0.3, f"Actual contradiction should be detected: V={v}"
+
 
 # =============================================================================
 # C2: Resolution Method

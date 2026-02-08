@@ -39,7 +39,7 @@ echo "=== /bye Sequence Initiated ==="
 echo "Subject: $SUBJECT"
 
 # 1. Handoff ファイル直接保存 (最優先)
-echo "[1/4] 💾 Saving Handoff locally..."
+echo "[1/5] 💾 Saving Handoff locally..."
 mkdir -p "$HANDOFF_DIR"
 
 # サブジェクトからファイル名安全な文字列を生成
@@ -67,7 +67,7 @@ EOF
 echo "  Saved: $HANDOFF_FILE"
 
 # 2. Export Chat History
-echo "[2/4] 📤 Exporting chat history..."
+echo "[2/5] 📤 Exporting chat history..."
 if [ -x "$VENV_PYTHON" ] && [ -f "$EXPORT_SCRIPT" ]; then
     if "$VENV_PYTHON" "$EXPORT_SCRIPT" --single "$SUBJECT" --format md 2>/dev/null; then
         echo "  Chat export successful."
@@ -79,7 +79,7 @@ else
 fi
 
 # 3. Slack 通知 (非同期 — ハングしない)
-echo "[3/4] 📱 Slack notification..."
+echo "[3/5] 📱 Slack notification..."
 if [ -n "$SLACK_WEBHOOK_URL" ]; then
     curl -s -X POST "$SLACK_WEBHOOK_URL" \
         -H "Content-type: application/json" \
@@ -91,7 +91,7 @@ else
 fi
 
 # 4. n8n Webhook (オプション — 失敗しても問題なし)
-echo "[4/4] 🔗 n8n Webhook..."
+echo "[4/5] 🔗 n8n Webhook..."
 RESPONSE=$(curl -s -X POST "$N8N_WEBHOOK_URL" \
     -H "Content-Type: application/json" \
     -d "{\"subject\": \"$SUBJECT\", \"timestamp\": \"$DATE_ISO\", \"handoff_file\": \"$HANDOFF_FILE\"}" \

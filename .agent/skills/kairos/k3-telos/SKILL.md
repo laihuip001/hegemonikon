@@ -42,6 +42,7 @@ requires_approval: false
 risks:
   - "欲求による目的上書き (X-HK4)"
   - "手段の目的化"
+fallbacks: ["manual execution"]
 ---
 
 # K3: Telos (Τέλος)

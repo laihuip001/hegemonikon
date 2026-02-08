@@ -16,6 +16,11 @@ activation_conditions:
 
 triggers: ["文脈→精密", "/euk >> /dia", "/tel >> /gno", "/sop >> /epi", "文脈→判断"]
 keywords: [kairos-akribeia, context-to-precision, x-ka, timing-to-judgment]
+risk_tier: L0
+risks: ["none identified"]
+reversible: true
+requires_approval: false
+fallbacks: ["manual execution"]
 ---
 
 # X-KA: Kairos → Akribeia (文脈→精密)

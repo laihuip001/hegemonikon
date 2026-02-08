@@ -22,6 +22,11 @@ triggers:
   - "理解→欲求"
 
 keywords: [ousia-horme, essence-to-drive, x-oh, understanding-to-motivation]
+risk_tier: L0
+risks: ["none identified"]
+reversible: true
+requires_approval: false
+fallbacks: ["manual execution"]
 ---
 
 # X-OH: Ousia → Hormē (本質→傾向)

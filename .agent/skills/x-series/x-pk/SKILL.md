@@ -18,6 +18,11 @@ activation_conditions:
 
 triggers: ["適用→タイミング粒度", "/kho >> /euk", "/tro >> /tel", "ズームチェーン第2段"]
 keywords: [perigraphe-kairos, scope-to-timing, x-pk, zoom-propagation, chain-stage-2]
+risk_tier: L0
+risks: ["none identified"]
+reversible: true
+requires_approval: false
+fallbacks: ["manual execution"]
 ---
 
 # X-PK: Perigraphē → Kairos (条件→文脈)

@@ -16,6 +16,11 @@ activation_conditions:
 
 triggers: ["傾向→精密", "/pro >> /dia", "/pis >> /epi", "/ore >> /pat", "動機→検証"]
 keywords: [horme-akribeia, drive-to-precision, x-ha, motivation-to-judgment]
+risk_tier: L0
+risks: ["none identified"]
+reversible: true
+requires_approval: false
+fallbacks: ["manual execution"]
 ---
 
 # X-HA: Hormē → Akribeia (傾向→精密)

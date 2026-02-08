@@ -2,6 +2,7 @@
 description: O1 Noēsis（深い認識・直観）を発動する最深層思考ワークフロー。5フェーズで前提破壊・ゼロ設計・GoT分析を実行。
 hegemonikon: O1 Noēsis
 version: "5.0"
+skill_ref: ".agent/skills/ousia/o1-noesis/SKILL.md"
 lcm_state: stable       # draft | beta | stable | deprecated
 derivatives: [nous, phro, meta, separate, align, metalearning]
 trigonon:
@@ -18,6 +19,16 @@ cognitive_algebra:
   "+": 詳細分析（各フェーズで3倍の出力）
   "-": 要点分析（結論+理由1つのみ、5行以内）
   "*": メタ分析（分析の前提を問い直す）
+sel_enforcement:
+  "+":
+    minimum_requirements:
+      - "各 PHASE の出力が標準の3倍以上（文字数）"
+      - "GoT (Graph of Thought) 分岐: 3つ以上の経路を探索"
+      - "発想モード: Analogy/10x/Gap 等を最低1つ実行"
+      - "最終出力: ファイル保存必須"
+  "-":
+    minimum_requirements:
+      - "結論 + 理由1つのみ、5行以内"
 ---
 
 # /noe: 最深層思考ワークフロー (Noēsis)

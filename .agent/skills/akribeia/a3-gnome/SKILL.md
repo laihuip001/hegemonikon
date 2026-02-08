@@ -35,6 +35,8 @@ workflow_ref: ".agent/workflows/gno.md"
 risk_tier: L1
 reversible: true
 requires_approval: false
+risks: ["none identified"]
+fallbacks: ["manual execution"]
 ---
 
 # A3: Gnōmē (Γνώμη)

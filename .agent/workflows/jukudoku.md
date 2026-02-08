@@ -18,6 +18,17 @@ cognitive_algebra:
   "+": "全行精査。一行ずつ理解を確認"
   "-": "要点確認。ただし存在検証は必須"
   "*": "メタ精査。なぜこのドキュメントを読むのか"
+sel_enforcement:
+  "+":
+    minimum_requirements:
+      - "全行を対象にセクション理解を出力"
+      - "L2 沈潜: 「待って…」箇所を3つ以上特定"
+      - "L2 沈黙のテスト: 3問全回答"
+      - "L3 摩擦: 衝突マッピング + 予測誤差の言語化"
+  "-":
+    minimum_requirements:
+      - "要点のみ確認"
+      - "参照実在検証は必須"
 ccl_signature: "/jukudoku_/dendron"
 ---
 

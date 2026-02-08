@@ -10,7 +10,7 @@ import yaml
 import re
 from pathlib import Path
 
-BASE_DIR = Path("/home/laihuip001/oikos/.agent")
+BASE_DIR = Path(__file__).resolve().parent.parent  # .agent/scripts/ → .agent/
 WORKFLOWS_DIR = BASE_DIR / "workflows"
 SKILLS_DIR = BASE_DIR / "skills"
 MAP_FILE = BASE_DIR / "data/theorem_map.yaml"

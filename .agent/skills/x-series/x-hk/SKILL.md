@@ -16,6 +16,11 @@ activation_conditions:
 
 triggers: ["傾向→文脈歪み", "/ore >> /euk", "/pis >> /chr", "欲求がタイミング認識を歪める"]
 keywords: [horme-kairos, drive-to-context, x-hk, bias-detection, wishful-timing]
+risk_tier: L0
+risks: ["none identified"]
+reversible: true
+requires_approval: false
+fallbacks: ["manual execution"]
 ---
 
 # X-HK: Hormē → Kairos (傾向→文脈)

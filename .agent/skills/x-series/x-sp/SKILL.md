@@ -18,6 +18,11 @@ activation_conditions:
 
 triggers: ["設計→適用範囲", "/met >> /kho", "/mek >> /tro", "ズーム伝播"]
 keywords: [schema-perigraphe, design-to-scope, x-sp, zoom-propagation]
+risk_tier: L0
+risks: ["none identified"]
+reversible: true
+requires_approval: false
+fallbacks: ["manual execution"]
 ---
 
 # X-SP: Schema → Perigraphē (様態→条件)

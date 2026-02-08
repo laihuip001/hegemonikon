@@ -168,7 +168,7 @@ class TestPostcheckBootReport:
 
             result = postcheck_boot_report(f.name, mode="standard")
             # Standard should check fewer requirements
-            assert len(result["checks"]) == 5
+            assert len(result["checks"]) == 6
             Path(f.name).unlink()
 
     def test_fast_mode_passes_easily(self):

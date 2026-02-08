@@ -14,6 +14,7 @@ category_theory:
     superficial: "成分 αX が定義できない"
     absorbed: "一部の可換図式が不成立"
     naturalized: "全ての可換図式が成立"
+lcm_state: beta
 ---
 
 # /fit: 消化品質診断 (Naturality Verification)

@@ -22,6 +22,11 @@ triggers:
   - "理解→実装"
 
 keywords: [ousia-schema, essence-to-design, x-os, understanding-to-implementation]
+risk_tier: L0
+risks: ["none identified"]
+reversible: true
+requires_approval: false
+fallbacks: ["manual execution"]
 ---
 
 # X-OS: Ousia → Schema (本質→様態)

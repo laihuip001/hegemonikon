@@ -41,6 +41,7 @@ reversible: true
 requires_approval: false
 risks:
   - "確証バイアス: 信念が知恵の源泉を選り好み (X-HK8)"
+fallbacks: ["manual execution"]
 ---
 
 # K4: Sophia (Σοφία)

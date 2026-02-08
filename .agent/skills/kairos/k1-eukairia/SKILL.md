@@ -42,6 +42,7 @@ requires_approval: false
 risks:
   - "直感/欲求による好機バイアス (X-HK1, X-HK3)"
   - "好機の見逃し (false negative)"
+fallbacks: ["manual execution"]
 ---
 
 # K1: Eukairia (Εὐκαιρία)

@@ -28,6 +28,9 @@ from dataclasses import dataclass, field
 from typing import Optional, List, Dict, Any
 from enum import Enum
 from datetime import datetime
+from pathlib import Path
+
+import yaml
 
 
 # PURPOSE: H4 Doxa の派生モード
@@ -103,6 +106,8 @@ class DoxaStore:
 
     信念の永続化を管理。
     """
+
+    DEFAULT_STORE_PATH = Path.home() / "oikos/mneme/.hegemonikon/doxa/beliefs.yaml"
 
     # PURPOSE: Dirichletパラメータの永続保存と復元（学習の蓄積）
     def __init__(self):
@@ -218,9 +223,101 @@ class DoxaStore:
 
     # PURPOSE: アーカイブ済みをリスト
     def list_archived(self) -> List[Belief]:
-# PURPOSE: グローバルストアを取得
         """アーカイブ済みをリスト"""
         return self._archive
+
+    # PURPOSE: 信念をYAMLファイルに保存
+    def save_to_file(self, path: Optional[Path] = None) -> Path:
+        """信念を YAML ファイルに永続化。
+
+        Args:
+            path: 保存先パス (省略時: DEFAULT_STORE_PATH)
+
+        Returns:
+            保存先パス
+        """
+        target = path or self.DEFAULT_STORE_PATH
+        target.parent.mkdir(parents=True, exist_ok=True)
+
+        data = {
+            "beliefs": [
+                {
+                    "content": b.content,
+                    "strength": b.strength.value,
+                    "confidence": b.confidence,
+                    "created_at": b.created_at.isoformat(),
+                    "updated_at": b.updated_at.isoformat(),
+                    "evidence": b.evidence,
+                }
+                for b in self._beliefs.values()
+            ],
+            "archived": [
+                {
+                    "content": b.content,
+                    "strength": b.strength.value,
+                    "confidence": b.confidence,
+                    "created_at": b.created_at.isoformat(),
+                    "updated_at": b.updated_at.isoformat(),
+                    "evidence": b.evidence,
+                }
+                for b in self._archive
+            ],
+            "meta": {
+                "saved_at": datetime.now().isoformat(),
+                "count": len(self._beliefs),
+                "archived_count": len(self._archive),
+            },
+        }
+
+        target.write_text(
+            yaml.dump(data, allow_unicode=True, default_flow_style=False),
+            encoding="utf-8",
+        )
+        return target
+
+    # PURPOSE: YAMLファイルから信念を復元
+    def load_from_file(self, path: Optional[Path] = None) -> int:
+        """YAML ファイルから信念を復元。
+
+        Args:
+            path: 読込元パス (省略時: DEFAULT_STORE_PATH)
+
+        Returns:
+            復元した信念の数
+        """
+        target = path or self.DEFAULT_STORE_PATH
+        if not target.exists():
+            return 0
+
+        data = yaml.safe_load(target.read_text(encoding="utf-8"))
+        if not data:
+            return 0
+
+        count = 0
+        for item in data.get("beliefs", []):
+            belief = Belief(
+                content=item["content"],
+                strength=BeliefStrength(item["strength"]),
+                confidence=item["confidence"],
+                created_at=datetime.fromisoformat(item["created_at"]),
+                updated_at=datetime.fromisoformat(item["updated_at"]),
+                evidence=item.get("evidence", []),
+            )
+            self._beliefs[belief.content] = belief
+            count += 1
+
+        for item in data.get("archived", []):
+            belief = Belief(
+                content=item["content"],
+                strength=BeliefStrength(item["strength"]),
+                confidence=item["confidence"],
+                created_at=datetime.fromisoformat(item["created_at"]),
+                updated_at=datetime.fromisoformat(item["updated_at"]),
+                evidence=item.get("evidence", []),
+            )
+            self._archive.append(belief)
+
+        return count
 
 
 # グローバルストア

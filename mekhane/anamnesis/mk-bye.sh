@@ -17,6 +17,7 @@ HEGEMONIKON_DIR="$(dirname "$(dirname "$SCRIPT_DIR")")"
 VENV_PYTHON="$HEGEMONIKON_DIR/.venv/bin/python"
 EXPORT_SCRIPT="$SCRIPT_DIR/export_chats.py"
 N8N_WEBHOOK_URL="http://localhost:5678/webhook/bye-handoff"
+N8N_SESSION_END_URL="http://localhost:5678/webhook/session-end"
 HANDOFF_DIR="$HOME/oikos/mneme/.hegemonikon/handoffs"
 
 # Slack Webhook
@@ -101,6 +102,14 @@ if [ "$RESPONSE" = "unreachable" ]; then
 else
     echo "  n8n: $RESPONSE"
 fi
+
+# 5. n8n Session End (WF-06 — セッション計時停止)
+echo "[5/5] ⏱️ n8n Session End..."
+curl -s -X POST "$N8N_SESSION_END_URL" \
+    -H "Content-Type: application/json" \
+    -d "{\"subject\": \"$SUBJECT\", \"handoff_file\": \"$(basename "$HANDOFF_FILE")\"}" \
+    --connect-timeout 3 --max-time 5 &>/dev/null &
+echo "  Session end: notified (background)"
 
 # デスクトップ通知
 if command -v notify-send &>/dev/null; then

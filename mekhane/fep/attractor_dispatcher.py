@@ -18,6 +18,7 @@ from __future__ import annotations
 
 import re
 import sys
+import logging
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Optional
@@ -56,10 +57,12 @@ class DispatchResult:
     reason: str                # 推薦理由
     when_to_use: str           # SKILL.md から抽出
     description: str           # WF description
+    library_prompts: list[str] = field(default_factory=list)  # Library 連携プロンプト名
 
     # PURPOSE: 内部処理: repr__
     def __repr__(self) -> str:
-        return f"⟨Dispatch: {self.workflow} ({self.series}) conf={self.confidence:.3f}⟩"
+        lib = f" +{len(self.library_prompts)}lib" if self.library_prompts else ""
+        return f"⟨Dispatch: {self.workflow} ({self.series}) conf={self.confidence:.3f}{lib}⟩"
 
 
 # PURPOSE: 完全な dispatch 計画（primary + alternatives）
@@ -199,6 +202,25 @@ class AttractorDispatcher:
     # PURPOSE: 内部処理: init__
     def __init__(self, force_cpu: bool = False):
         self._advisor = AttractorAdvisor(force_cpu=force_cpu)
+        self._library = None  # 遅延初期化
+        self._library_failed = False
+
+    def _get_library(self):
+        """LibrarySearch の遅延初期化 (LanceDB 未構築時はスキップ)"""
+        if self._library is not None:
+            return self._library
+        if self._library_failed:
+            return None
+        try:
+            from mekhane.anamnesis.library_search import LibrarySearch
+            lib = LibrarySearch()
+            lib.count()  # 接続テスト
+            self._library = lib
+            return lib
+        except Exception:
+            logging.debug("LibrarySearch unavailable, skipping prompt enrichment")
+            self._library_failed = True
+            return None
 
     # PURPOSE: ユーザー入力から WF dispatch plan を生成する
     def dispatch(self, user_input: str) -> Optional[DispatchPlan]:
@@ -263,6 +285,16 @@ class AttractorDispatcher:
         # Build reason
         reason = self._build_reason(rec, wf_name, description)
 
+        # Library 連携: WF に関連するプロンプトを検索
+        library_prompts: list[str] = []
+        lib = self._get_library()
+        if lib is not None:
+            try:
+                modules = lib.search_by_mapping(wf_name)
+                library_prompts = [m.name for m in modules[:5]]
+            except Exception:
+                pass  # Library 検索失敗は dispatch をブロックしない
+
         return DispatchResult(
             workflow=wf_name,
             wf_path=wf_path,
@@ -272,6 +304,7 @@ class AttractorDispatcher:
             reason=reason,
             when_to_use=when_to_use,
             description=description,
+            library_prompts=library_prompts,
         )
 
     # PURPOSE: 推薦理由テキストを構築する
@@ -313,6 +346,10 @@ class AttractorDispatcher:
         if plan.primary.when_to_use:
             wtu = plan.primary.when_to_use[:80]
             lines.append(f"│ 使用条件: {wtu}")
+
+        if plan.primary.library_prompts:
+            lib_str = ", ".join(plan.primary.library_prompts[:3])
+            lines.append(f"│ 📚 Library: {lib_str}")
 
         if plan.alternatives:
             alt_str = ", ".join(d.workflow for d in plan.alternatives)
@@ -363,6 +400,8 @@ def main() -> None:
         print(f"    WF: {d.wf_path}")
         print(f"    Skill: {d.skill_path or '(なし)'}")
         print(f"    When: {d.when_to_use[:100] or '(未記載)'}")
+        if d.library_prompts:
+            print(f"    📚 Library: {', '.join(d.library_prompts[:5])}")
 
     print(f"\nCompact: {dispatcher.format_compact(plan)}")
 

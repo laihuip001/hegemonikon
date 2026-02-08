@@ -15,9 +15,11 @@ from dataclasses import dataclass
 from typing import Optional
 
 from mekhane.fep.attractor import (
+    OscillationDiagnosis,
     OscillationType,
     SeriesAttractor,
     SuggestResult,
+    DecomposeResult,
 )
 
 
@@ -51,6 +53,7 @@ class AttractorAdvisor:
             and oscillation diagnosis.
         """
         result = self._attractor.diagnose(user_input)
+        interpretation = result.interpretation
 
         if not result.attractors:
             return Recommendation(
@@ -59,6 +62,7 @@ class AttractorAdvisor:
                 series=[],
                 oscillation=result.oscillation,
                 confidence=0.0,
+                interpretation=interpretation,
             )
 
         primary = result.primary
@@ -102,6 +106,7 @@ class AttractorAdvisor:
             series=series_list,
             oscillation=result.oscillation,
             confidence=result.top_similarity,
+            interpretation=interpretation,
         )
 
     # PURPOSE: LLM のシステムプロンプトに注入する形式でワークフロー推薦を返す。
@@ -117,13 +122,64 @@ class AttractorAdvisor:
         if not rec.workflows:
             return ""
 
+        interp = rec.interpretation
+
         if rec.oscillation == OscillationType.CLEAR:
-            return f"[Attractor: {rec.series[0]} → {', '.join(rec.workflows)}]"
+            return (
+                f"[Attractor: {rec.series[0]} → {', '.join(rec.workflows)}]\n"
+                f"[FEP: {interp.theory}]"
+            )
         elif rec.oscillation == OscillationType.POSITIVE:
             series_str = "+".join(rec.series)
-            return f"[Attractor: {series_str} oscillating → {', '.join(rec.workflows)}]"
+            morphisms = f" | morphisms: {', '.join(interp.morphisms)}" if interp.morphisms else ""
+            return (
+                f"[Attractor: {series_str} oscillating → {', '.join(rec.workflows)}]\n"
+                f"[FEP: {interp.theory}]\n"
+                f"[Action: {interp.action}{morphisms}]"
+            )
         else:
-            return f"[Attractor: weak ({rec.series[0]}?)]"
+            return (
+                f"[Attractor: weak ({rec.series[0]}?)]\n"
+                f"[FEP: {interp.theory}]\n"
+                f"[Action: {interp.action}]"
+            )
+
+    # PURPOSE: Problem D — 複合入力を分解して各セグメントごとに推薦する
+    def recommend_compound(self, user_input: str) -> CompoundRecommendation:
+        """複合入力を文分解し、各セグメントごとに推薦を生成する。
+
+        単一文の場合は通常の recommend() に委譲。
+        複数文の場合は decompose() → 各セグメントごとに推薦 → マージ。
+
+        Returns:
+            CompoundRecommendation with per-segment and merged recommendations
+        """
+        decomp = self._attractor.decompose(user_input)
+
+        segments: list[tuple[str, Recommendation]] = []
+        for seg in decomp.segments:
+            rec = self.recommend(seg.text)
+            segments.append((seg.text, rec))
+
+        # マージ: 全 workflows を統合
+        all_workflows: list[str] = []
+        seen: set[str] = set()
+        for _, rec in segments:
+            for wf in rec.workflows:
+                if wf not in seen:
+                    seen.add(wf)
+                    all_workflows.append(wf)
+
+        # 最高確信度の Recommendation を primary に
+        best_rec = max(segments, key=lambda x: x[1].confidence)[1] if segments else None
+
+        return CompoundRecommendation(
+            segments=segments,
+            merged_series=decomp.merged_series,
+            merged_workflows=all_workflows,
+            is_compound=decomp.is_multi,
+            primary=best_rec,
+        )
 
 
 # ---------------------------------------------------------------------------
@@ -139,10 +195,30 @@ class Recommendation:
     series: list[str]
     oscillation: OscillationType
     confidence: float
+    interpretation: OscillationDiagnosis  # Problem B: FEP 理論的解釈
 
     # PURPOSE: 内部処理: repr__
     def __repr__(self) -> str:
         return f"⟨Rec: {'+'.join(self.series)} | {self.oscillation.value} | conf={self.confidence:.3f}⟩"
+
+
+# PURPOSE: Problem D — 複合入力の推薦結果
+@dataclass
+class CompoundRecommendation:
+    """複合入力の推薦結果: 各セグメント + マージされたワークフロー"""
+    segments: list[tuple[str, Recommendation]]  # (text, recommendation) pairs
+    merged_series: list[str]
+    merged_workflows: list[str]
+    is_compound: bool  # 複数 Series に分解されたか
+    primary: Recommendation | None  # 最高確信度の推薦
+
+    # PURPOSE: 内部処理: repr__
+    def __repr__(self) -> str:
+        return (
+            f"⟨Compound: {'+'.join(self.merged_series)} | "
+            f"{len(self.segments)} segments | "
+            f"{len(self.merged_workflows)} WFs⟩"
+        )
 
 
 # PURPOSE: CLI: python -m mekhane.fep.attractor_advisor "入力テキスト"
@@ -170,8 +246,17 @@ def main() -> None:
     print(f"Confidence: {rec.confidence:.3f}")
     print(f"Workflows: {', '.join(rec.workflows)}")
 
+    # Problem B: 理論的解釈
+    interp = rec.interpretation
+    print(f"\n--- FEP 解釈 ---")
+    print(f"Theory: {interp.theory}")
+    print(f"Action: {interp.action}")
+    if interp.morphisms:
+        print(f"X-series: {', '.join(interp.morphisms)}")
+    print(f"Confidence mod: {interp.confidence_modifier:+.1f}")
+
     llm_format = advisor.format_for_llm(user_input)
-    print(f"\nLLM 注入形式: {llm_format}")
+    print(f"\nLLM 注入形式:\n{llm_format}")
 
 
 if __name__ == "__main__":

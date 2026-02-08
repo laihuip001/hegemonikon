@@ -130,6 +130,101 @@ class OscillationType(Enum):
     WEAK = "weak"           # 全 attractor への引力が弱い
 
 
+# PURPOSE: Oscillation の理論的意味と推薦行動 (Problem B)
+@dataclass
+class OscillationDiagnosis:
+    """Oscillation パターンの理論的解釈 (Spisak & Friston 2025 準拠)
+
+    FEP 的解釈:
+    - CLEAR:    自由エネルギー最小化が完了。単一 attractor basin で安定
+    - POSITIVE: 入力が複数 basin の交差領域にある。多面性は情報量が豊か
+    - NEGATIVE: 全 basin への距離が近似的に等しい。入力の抽象度が高すぎる
+    - WEAK:     生成モデルの外側。既存 Series では捉えられない新規領域
+    """
+    oscillation: OscillationType
+    theory: str              # FEP 理論的解釈
+    action: str              # 推薦される行動
+    morphisms: list[str]     # 推薦 X-series 射 (POSITIVE 時)
+    confidence_modifier: float  # 確信度への補正 (-1.0 ~ +1.0)
+
+    # PURPOSE: 内部処理: repr__
+    def __repr__(self) -> str:
+        return f"⟨OscDiag: {self.oscillation.value} | {self.action[:40]}⟩"
+
+
+# PURPOSE: OscillationType → 理論的解釈のマッピング
+def _build_diagnosis(
+    oscillation: OscillationType,
+    attractors: list,  # list[AttractorResult]
+    gap: float,
+    top_sim: float,
+) -> OscillationDiagnosis:
+    """OscillationType と文脈から OscillationDiagnosis を生成する。"""
+    if oscillation == OscillationType.CLEAR:
+        return OscillationDiagnosis(
+            oscillation=oscillation,
+            theory=(
+                "自由エネルギー最小化完了。入力は単一 basin に安定的に収束。"
+                f"gap={gap:.3f} は十分な分離を示す。"
+            ),
+            action="推薦 WF を直接実行。追加確認不要。",
+            morphisms=[],
+            confidence_modifier=0.1,
+        )
+    elif oscillation == OscillationType.POSITIVE:
+        # 複数 Series が関与 → X-series morphism を提案
+        series_pairs = []
+        if len(attractors) >= 2:
+            for i, a in enumerate(attractors):
+                for b in attractors[i + 1:]:
+                    pair = tuple(sorted([a.series, b.series]))
+                    series_pairs.append(f"X-{pair[0]}{pair[1]}")
+        return OscillationDiagnosis(
+            oscillation=oscillation,
+            theory=(
+                "入力は複数 basin の交差領域に位置。"
+                "Spisak (2025): 健全な oscillation は情報統合の証拠。"
+                f"関与 Series: {'+'.join(a.series for a in attractors)}"
+            ),
+            action=(
+                "複数 WF を順次実行、または Peras (極限) で統合。"
+                "X-series 射を通じた Series 間接続を推薦。"
+            ),
+            morphisms=series_pairs,
+            confidence_modifier=0.0,  # 多面性は信頼性を下げない
+        )
+    elif oscillation == OscillationType.NEGATIVE:
+        return OscillationDiagnosis(
+            oscillation=oscillation,
+            theory=(
+                "全 basin への距離が近似的に等しい (basin 未分化)。"
+                "FEP 的にはサプライズが高く、生成モデルの予測精度が低い状態。"
+                f"top_sim={top_sim:.3f} は閾値付近。"
+            ),
+            action=(
+                "入力をより具体的に再構成。"
+                "/zet (探求) で問いを分解するか、/met (尺度) でスコープを絞る。"
+            ),
+            morphisms=[],
+            confidence_modifier=-0.2,
+        )
+    else:  # WEAK
+        return OscillationDiagnosis(
+            oscillation=oscillation,
+            theory=(
+                "全 attractor への引力が閾値未満。"
+                "入力は既存 6 Series の生成モデルでは捉えられない。"
+                "新規カテゴリの可能性、またはノイズ。"
+            ),
+            action=(
+                "入力の意図を明確化。"
+                "6 Series のいずれにも該当しない場合は /noe (深い認識) で再評価。"
+            ),
+            morphisms=[],
+            confidence_modifier=-0.5,
+        )
+
+
 @dataclass
 # PURPOSE: Attractor への収束結果
 class AttractorResult:
@@ -163,10 +258,17 @@ class SuggestResult:
     def is_clear(self) -> bool:
         return self.oscillation == OscillationType.CLEAR
 
+    @property
+    # PURPOSE: Problem B: oscillation の理論的解釈を返す
+    def interpretation(self) -> OscillationDiagnosis:
+        """Oscillation の理論的意味と推薦行動を返す (Problem B)"""
+        return _build_diagnosis(
+            self.oscillation, self.attractors, self.gap, self.top_similarity
+        )
+
     # PURPOSE: 内部処理: repr__
     def __repr__(self) -> str:
         names = "+".join(r.series for r in self.attractors)
-# PURPOSE: 分解された各セグメントの結果
         return f"⟨{names} | {self.oscillation.value} | top={self.top_similarity:.3f}⟩"
 
 

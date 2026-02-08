@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/pks/
 #!/usr/bin/env python3
 # PURPOSE: 外部知識検索 (Perplexity API 統合)
 """

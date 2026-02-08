@@ -7,10 +7,12 @@ skill_ref:
   - ".agent/skills/perigraphē/p2-hodos/SKILL.md"
   - ".agent/skills/perigraphē/p3-trokhia/SKILL.md"
   - ".agent/skills/perigraphē/p4-tekhne/SKILL.md"
-version: "5.0"
+version: "5.3"
 lcm_state: beta
 layer: "Δ"
 lineage: "v4.3 + Limit演算復元 → v5.0"
+category_theory:
+  cone_builder: "mekhane/fep/cone_builder.py"
 derivatives: [kho, hod, tro, tek]
 cognitive_algebra:
   generation: "L1.5 × L1.5"
@@ -127,6 +129,19 @@ result = select_derivative("P1", problem_context)
 
 > **米田**: 各定理 Pn は Hom(-, Pn) で完全に決まる。
 > @converge = 環境配置射の Cone を構築し、「空間・経路・軌道・技術が整合する唯一の配置」を見つける。
+
+**Cone 自動構築** (C1 の射の対比完了後に実行):
+
+// turbo
+
+```bash
+cd ~/oikos/hegemonikon && PYTHONPATH=. .venv/bin/python -c "
+from mekhane.fep.cone_builder import converge, describe_cone
+from mekhane.fep.category import Series
+cone = converge(Series.P, {'P1': '<P1出力>', 'P2': '<P2出力>', 'P3': '<P3出力>', 'P4': '<P4出力>'})
+print(describe_cone(cone))
+"
+```
 
 **射の列挙** (各定理の環境射を計算):
 

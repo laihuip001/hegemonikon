@@ -19,6 +19,7 @@ category_theory:
   yoneda: "Hom(-, Tn) ≅ F(Tn) — 各定理はその射の集合で完全に決まる"
   limit: "Cone の頂点 — 全ての射が一致する点"
   converge_as_cone: "C1=STAGE 0-3の射列挙, C2=STAGE 4 Devilが中介射を攻撃, C3=STAGE 5 KPTで普遍性検証"
+  cone_builder: "mekhane/fep/cone_builder.py"
 lcm_state: stable
 layer: "Δ"
 lineage: "v5.8 + Limit演算復元 → v6.0"
@@ -331,10 +332,23 @@ python3 $HOME/oikos/hegemonikon/mekhane/quality_gate.py <変更ファイル>
 | STAGE 4 | Devil's Advocate: {result} |
 | STAGE 5 | KPT: Keep/Problem/Try |
 
-### ⊕ C1: 射の対比 (Contrast) — STAGE 0-3 出力 = Cone の射後検査
+#### ⊕ C1: 射の対比 (Contrast) — STAGE 0-3 出力 = Cone の射後検査
 
 > **圏論**: 4つの戦略射 Hom(X, Sn) を列挙し、整合性を検査する。
 > STAGE 0-3 が各定理の Yoneda 表現を計算するフェーズ。
+
+**Cone 自動構築** (C1 の射の対比完了後に実行):
+
+// turbo
+
+```bash
+cd ~/oikos/hegemonikon && PYTHONPATH=. .venv/bin/python -c "
+from mekhane.fep.cone_builder import converge, describe_cone
+from mekhane.fep.category import Series
+cone = converge(Series.S, {'S1': '<S1出力>', 'S2': '<S2出力>', 'S3': '<S3出力>', 'S4': '<S4出力>'})
+print(describe_cone(cone))
+"
+```
 
 | STAGE | 定理 | Hom(X, Sn) | 出力要点 (1行) |
 |:------|:-----|:-----------|:---------------|
@@ -347,7 +361,7 @@ python3 $HOME/oikos/hegemonikon/mekhane/quality_gate.py <変更ファイル>
 　V = 0: 全射が自然に整合 = Cone が自明に存在
 　V > 0: スケールと実践が矛盾、基準と手法が不整合 = Cone の頂点探索が必要
 
-### ⊕ C2: Cone への敏対的検証 (Resolve) — STAGE 4 Devil's Advocate
+#### ⊕ C2: Cone への敏対的検証 (Resolve) — STAGE 4 Devil's Advocate
 
 > **圏論**: S-series 独自の構造。他の Hub の C2 が「中介射の構築」(受動的) なのに対し、
 > S-series の C2 は Devil's Advocate が **Cone を能動的に攻撃**する。
@@ -359,7 +373,7 @@ python3 $HOME/oikos/hegemonikon/mekhane/quality_gate.py <変更ファイル>
 | > 0.1 | 微妙な不整合 | 通常融合 (`@reduce(*)`) |
 | ≤ 0.1 | 戦略整合 | 単純集約 (`Σ`) — Cone が自明。Devil にも崩せない |
 
-### ⊕ C3: 普遍性検証 (Verify) — STAGE 5 KPT 統合
+#### ⊕ C3: 普遍性検証 (Verify) — STAGE 5 KPT 統合
 
 > **圏論**: STAGE 5 (KPT) = Cone の普遍性検証。
 > Keep = 「この射は正しかった」(普遍性の証拠)

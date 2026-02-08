@@ -7,9 +7,11 @@ skill_ref:
   - ".agent/skills/kairos/k2-chronos/SKILL.md"
   - ".agent/skills/kairos/k3-telos/SKILL.md"
   - ".agent/skills/kairos/k4-sophia/SKILL.md"
-version: "6.0"
+version: "6.3"
 lcm_state: beta
 layer: "Δ"
+category_theory:
+  cone_builder: "mekhane/fep/cone_builder.py"
 lineage: "v5.2 + Limit演算復元 → v6.0"
 cognitive_algebra:
   generation: "L1.5 × L1.75"
@@ -108,6 +110,19 @@ ccl_signature: "/k+?k1"
 
 > **米田**: 各定理 Kn は Hom(-, Kn) で完全に決まる。
 > @converge = 文脈射の Cone を構築し、「好機・時間・目的・知恵が整合する唯一の文脈」を見つける。
+
+**Cone 自動構築** (C1 の射の対比完了後に実行):
+
+// turbo
+
+```bash
+cd ~/oikos/hegemonikon && PYTHONPATH=. .venv/bin/python -c "
+from mekhane.fep.cone_builder import converge, describe_cone
+from mekhane.fep.category import Series
+cone = converge(Series.K, {'K1': '<K1出力>', 'K2': '<K2出力>', 'K3': '<K3出力>', 'K4': '<K4出力>'})
+print(describe_cone(cone))
+"
+```
 
 **射の列挙** (各定理の文脈射を計算):
 

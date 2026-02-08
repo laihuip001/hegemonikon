@@ -7,9 +7,11 @@ skill_ref:
   - ".agent/skills/akribeia/a2-krisis/SKILL.md"
   - ".agent/skills/akribeia/a3-gnome/SKILL.md"
   - ".agent/skills/akribeia/a4-episteme/SKILL.md"
-version: "5.0"
+version: "5.3"
 lcm_state: beta
 layer: "Δ"
+category_theory:
+  cone_builder: "mekhane/fep/cone_builder.py"
 lineage: "v4.2 + Limit演算復元 → v5.0"
 cognitive_algebra:
   generation: "L1.75 × L1.75"
@@ -104,6 +106,19 @@ anti_skip: enabled
 
 > **米田**: 各定理 An は Hom(-, An) で完全に決まる。
 > @converge = 精度射の Cone を構築し、「感情・判断・見識・知識が整合する唯一の精度保証」を見つける。
+
+**Cone 自動構築** (C1 の射の対比完了後に実行):
+
+// turbo
+
+```bash
+cd ~/oikos/hegemonikon && PYTHONPATH=. .venv/bin/python -c "
+from mekhane.fep.cone_builder import converge, describe_cone
+from mekhane.fep.category import Series
+cone = converge(Series.A, {'A1': '<A1出力>', 'A2': '<A2出力>', 'A3': '<A3出力>', 'A4': '<A4出力>'})
+print(describe_cone(cone))
+"
+```
 
 **射の列挙** (各定理の精度射を計算):
 

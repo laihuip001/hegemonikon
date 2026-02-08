@@ -454,8 +454,12 @@ class TheoremAttractor:
         # Sinkhorn 正規化: doubly stochastic に近似
         # (in-degree の偏りによる S/H への過集中を緩和)
         for _ in range(10):
-            T = T / T.sum(axis=0, keepdims=True)  # column normalize
-            T = T / T.sum(axis=1, keepdims=True)  # row normalize
+            col_sums = T.sum(axis=0, keepdims=True)
+            col_sums[col_sums == 0] = 1
+            T = T / col_sums  # column normalize
+            row_sums = T.sum(axis=1, keepdims=True)
+            row_sums[row_sums == 0] = 1
+            T = T / row_sums  # row normalize
 
         # 自己ループの追加 (安定化)
         alpha = 0.3  # 30% 自己保持

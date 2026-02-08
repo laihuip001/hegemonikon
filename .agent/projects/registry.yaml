@@ -176,11 +176,19 @@ projects:
 
   - id: autophonos
     name: "Autophōnos (αὐτόφωνος)"
-    path: ".agent/projects/autophonos/"
-    summary: "自律提案 — データが主体的に価値を Push する機構"
+    path: "mekhane/pks/"
+    summary: "自律提案 — データが主体的に価値を Push する機構 (PKS v2)"
     status: active
-    phase: design
+    phase: implementation
     etymology: "自ら語る — データの擬人化"
+    proof: true
+    role_models:
+      - NotebookLM  # Source Grounding, Suggested Questions
+      - Notion AI   # DB×AI 横断検索
+      - Glean       # プロアクティブ配信
+      - Obsidian    # Graph/Backlinks 概念
+      - Guru        # 検証済みスニペットの能動配信
+      - Mem         # 自動トピック抽出
 
   # ─── 補助・インフラ ────────────────────────────
 

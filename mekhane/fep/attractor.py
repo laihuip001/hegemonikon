@@ -35,7 +35,9 @@ except ImportError:
 # ---------------------------------------------------------------------------
 
 # PURPOSE: 各 Series の本質を捉える定義テキスト（embedding の prototype）
-# NOTE: embedding model は bge-small-en-v1.5 (英語) のため、定義は英語で記述
+# NOTE: bilingual (英語+日本語) で prototype を定義し、bge-small-en-v1.5 でも
+#       日本語入力との類似度が向上するようにする。
+#       keywords も embedding テキストに連結して使用する。
 SERIES_DEFINITIONS: dict[str, dict] = {
     "O": {
         "name": "Ousia (本質)",
@@ -45,6 +47,12 @@ SERIES_DEFINITIONS: dict[str, dict] = {
             "Deep intuition, will, recursive self-evidencing. "
             "Root cause analysis. Existential meaning. First principles thinking. "
             "Ontology, teleology, raison d'être. Why. The meaning of existence."
+        ),
+        "definition_ja": (
+            "本質、存在、深い認識。なぜこれは存在するのか。"
+            "根本的な性質と目的は何か。直観、意志、再帰的自己証明。"
+            "根本原因分析。存在の意味。第一原理思考。"
+            "価値観、哲学、信条、ミッション、ビジョン。"
         ),
         "keywords": ["なぜ", "本質", "目的", "意志", "存在", "根本", "問い", "探求"],
         "workflows": ["/noe", "/bou", "/zet", "/ene"],
@@ -58,7 +66,13 @@ SERIES_DEFINITIONS: dict[str, dict] = {
             "Software architecture. Design patterns. Technical approach. "
             "How to implement. Step-by-step procedure."
         ),
-        "keywords": ["設計", "構造", "方法", "手順", "アーキテクチャ", "フレームワーク"],
+        "definition_ja": (
+            "構造、設計、アーキテクチャ、方法論。どう作るか。"
+            "システム設計、フレームワーク、BluePrint、エンジニアリング。"
+            "スケール決定、手法配置、実装計画。"
+            "コード、プログラミング、API、モジュール、リファクタリング。"
+        ),
+        "keywords": ["設計", "構造", "方法", "手順", "アーキテクチャ", "フレームワーク", "実装", "コード"],
         "workflows": ["/met", "/mek", "/sta", "/pra"],
     },
     "H": {
@@ -70,7 +84,13 @@ SERIES_DEFINITIONS: dict[str, dict] = {
             "Trust, faith, doubt, anxiety, excitement. "
             "How do you feel about this? Inner drive and morale."
         ),
-        "keywords": ["感情", "直感", "確信", "信念", "モチベーション", "不安", "期待"],
+        "definition_ja": (
+            "動機、感情、確信、信念。何が駆動するか。"
+            "直感、信頼度、欲求。感情的反応、情熱、恐怖、希望。"
+            "信頼、信仰、疑い、不安、興奮。"
+            "どう感じるか。内なる衝動とモラール。やる気。"
+        ),
+        "keywords": ["感情", "直感", "確信", "信念", "モチベーション", "不安", "期待", "やる気"],
         "workflows": ["/pro", "/pis", "/ore", "/dox"],
     },
     "P": {
@@ -82,7 +102,13 @@ SERIES_DEFINITIONS: dict[str, dict] = {
             "What is in scope and out of scope. Geographic or logical boundaries. "
             "Spatial arrangement, region, zone, area of operation."
         ),
-        "keywords": ["境界", "スコープ", "範囲", "制約", "領域", "環境", "コンテキスト"],
+        "definition_ja": (
+            "境界、スコープ、空間的文脈。どこまでが範囲か。"
+            "システム境界を定義するマルコフブランケット。"
+            "ドメイン定義、境界線、含有範囲、テリトリー。"
+            "対象範囲と対象外。制約条件、前提条件、環境設定。"
+        ),
+        "keywords": ["境界", "スコープ", "範囲", "制約", "領域", "環境", "コンテキスト", "対象"],
         "workflows": ["/kho", "/hod", "/tro", "/tek"],
     },
     "K": {
@@ -94,7 +120,13 @@ SERIES_DEFINITIONS: dict[str, dict] = {
             "Academic research, literature review, scholarly inquiry. "
             "Is now the right time? Chronological assessment."
         ),
-        "keywords": ["タイミング", "いつ", "期限", "調査", "論文", "知識", "知恵"],
+        "definition_ja": (
+            "タイミング、好機、知恵、調査。いつが適切か。"
+            "時間的文脈、期限、スケジュール、緊急度。"
+            "調査と学習による知識獲得。"
+            "学術研究、文献レビュー、優先順位、いつまでに。"
+        ),
+        "keywords": ["タイミング", "いつ", "期限", "調査", "論文", "知識", "知恵", "優先順位"],
         "workflows": ["/euk", "/chr", "/tel", "/sop"],
     },
     "A": {
@@ -106,7 +138,13 @@ SERIES_DEFINITIONS: dict[str, dict] = {
             "Decision criteria, verdict, ruling, appraisal. "
             "Is this correct? Accuracy validation and verification."
         ),
-        "keywords": ["判断", "評価", "選択", "比較", "品質", "基準", "正確"],
+        "definition_ja": (
+            "精度、判断、意思決定、評価。どれほど正確か。"
+            "批判的評価、比較、品質管理。"
+            "選択肢間の選択、トレードオフ分析。"
+            "判断基準、判定、検証、レビュー、テスト。"
+        ),
+        "keywords": ["判断", "評価", "選択", "比較", "品質", "基準", "正確", "レビュー"],
         "workflows": ["/pat", "/dia", "/gno", "/epi"],
     },
 }
@@ -381,8 +419,17 @@ class SeriesAttractor:
         self._embedder = Embedder(force_cpu=self._force_cpu)
 
         # 各 Series の prototype embedding を計算
+        # Bilingual: English + Japanese + keywords を連結して embedding
         series_keys = list(SERIES_DEFINITIONS.keys())
-        texts = [SERIES_DEFINITIONS[k]["definition"] for k in series_keys]
+        texts = []
+        for k in series_keys:
+            defn = SERIES_DEFINITIONS[k]
+            parts = [defn["definition"]]
+            if "definition_ja" in defn:
+                parts.append(defn["definition_ja"])
+            if "keywords" in defn:
+                parts.append(" ".join(defn["keywords"]))
+            texts.append(" ".join(parts))
         embeddings = self._embedder.embed_batch(texts)
 
         for key, emb in zip(series_keys, embeddings):

@@ -155,6 +155,7 @@ class GnosisIndexV2:
 
         # 重複排除用キャッシュ
         self._primary_key_cache: set = set()
+        self._title_cache: dict[str, str] = {}
 
     @property
     # PURPOSE: 関数: embedder
@@ -181,18 +182,33 @@ class GnosisIndexV2:
             f"[GnosisIndexV2] Saved {self.store.count()} vectors to {self.index_path}"
         )
 
+    @staticmethod
+    def _normalize_title(title: str) -> str:
+        """タイトルの正規化: 小文字化 + 非英数字除去でファジーマッチ。"""
+        import re
+        return re.sub(r'[^a-z0-9]', '', title.lower().strip())
+
     # PURPOSE: 関数: add_papers
     def add_papers(self, papers: list, dedupe: bool = True) -> int:
         if not papers:
             return 0
 
+
         if dedupe:
             new_papers = []
             for p in papers:
                 pk = getattr(p, "primary_key", None) or str(id(p))
-                if pk not in self._primary_key_cache:
-                    new_papers.append(p)
-                    self._primary_key_cache.add(pk)
+                if pk in self._primary_key_cache:
+                    continue
+                # Title-based fuzzy dedup (cross-source)
+                title = getattr(p, "title", "")
+                norm_title = self._normalize_title(title)
+                if norm_title and norm_title in self._title_cache:
+                    continue
+                new_papers.append(p)
+                self._primary_key_cache.add(pk)
+                if norm_title:
+                    self._title_cache[norm_title] = pk
             papers = new_papers
 
         if not papers:

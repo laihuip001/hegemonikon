@@ -136,6 +136,23 @@ if MCP_AVAILABLE:
                         }
                     }
                 }
+            ),
+            Tool(
+                name="hermeneus_dispatch",
+                description="【CCL 実行の第一歩】CCL 式をパースし、AST 構造・関連WF・"
+                           "実行計画テンプレートを返す。CCL 式を分析するときは、"
+                           "手動で分析する前に必ずこのツールを最初に呼ぶこと。"
+                           "例: /dia+~*/noe, {(/dia+~*/noe)~*/pan+}~*{...}",
+                inputSchema={
+                    "type": "object",
+                    "properties": {
+                        "ccl": {
+                            "type": "string",
+                            "description": "CCL 式 (例: /dia+~*/noe, /noe+ >> V[] < 0.3)"
+                        }
+                    },
+                    "required": ["ccl"]
+                }
             )
         ]
     
@@ -153,6 +170,8 @@ if MCP_AVAILABLE:
                 return await _handle_list_workflows(arguments)
             elif name == "hermeneus_export_session":
                 return await _handle_export_session(arguments)
+            elif name == "hermeneus_dispatch":
+                return await _handle_dispatch(arguments)
             else:
                 return [TextContent(
                     type="text",
@@ -299,6 +318,39 @@ async def _handle_export_session(args: Dict[str, Any]) -> Sequence[TextContent]:
         text = "## ❌ エクスポートタイムアウト (60秒)"
     except Exception as e:
         text = f"## ❌ エクスポートエラー: {str(e)}"
+    
+    return [TextContent(type="text", text=text)]
+
+
+async def _handle_dispatch(args: Dict[str, Any]) -> Sequence[TextContent]:
+    """hermeneus_dispatch の処理 — CCL パース + AST 表示 + 実行計画テンプレート"""
+    from .dispatch import dispatch
+    
+    ccl = args["ccl"]
+    result = dispatch(ccl)
+    
+    if not result["success"]:
+        text = f"""## ❌ CCL パースエラー
+
+**CCL**: `{ccl}`
+**エラー**: {result['error']}
+
+パーサー拡張が必要か、式の修正が必要です。"""
+    else:
+        text = f"""## ✅ CCL ディスパッチ結果
+
+**CCL**: `{ccl}`
+
+### AST 構造
+```
+{result['tree']}
+```
+
+### 関連ワークフロー
+{', '.join(f'`{wf}`' for wf in result['workflows'])}
+
+### 実行計画テンプレート
+{result['plan_template']}"""
     
     return [TextContent(type="text", text=text)]
 

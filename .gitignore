@@ -11,25 +11,28 @@ venv/
 .config/
 .antigravity/
 
-# Browser profile (large)
-.gemini/antigravity-browser-profile/
-.gemini/antigravity/browser_recordings/
-.gemini/antigravity/code_tracker/
-.gemini/tmp/
-
-# Conversations (large binary protobuf files)
-.gemini/antigravity/conversations/
-
 # Python cache
 __pycache__/
 *.pyc
 *.pyo
-# Session logs with secrets
+
+# Node modules (never commit)
+**/node_modules/
+
+# Runtime/browser data
+runtime/
+.gemini/antigravity-browser-profile/
+.gemini/antigravity/browser_recordings/
+.gemini/antigravity/code_tracker/
+.gemini/antigravity/conversations/
+.gemini/tmp/
+
+# Secrets / credentials
+.gemini/oauth_creds.json
+.gemini/google_accounts.json
 mneme/.hegemonikon/sessions/*
 **/sessions/*
 **/.hegemonikon/sessions/*
-.gemini/oauth_creds.json
-.gemini/google_accounts.json
 
 # Large model files (download at runtime)
 *.onnx
@@ -37,26 +40,23 @@ mneme/.hegemonikon/sessions/*
 *.safetensors
 mekhane/anamnesis/models/bge-*/
 
-# Node modules (never commit)
-**/node_modules/
+# Binary / compiled (never commit)
+*.exe
+*.wasm
+*.so
+*.dylib
 
-# SQLite WAL/SHM (transient)
+# SQLite (runtime data)
+*.sqlite
 *.sqlite-wal
 *.sqlite-shm
 
 # n8n runtime data
 mekhane/ergasterion/n8n/data/
 
-# Runtime browser profile
-runtime/
-
-# Gnōsis data (LanceDB - contains embedded secrets from indexed content)
-gnosis_data/
-mekhane/anamnesis/data/*.lance/
-
-# n8n runtime data
-mekhane/ergasterion/n8n/data/database.sqlite*
-mekhane/ergasterion/n8n/data/n8nEventLog*.log
-
 # Prompt-lang staging (temporary)
 mekhane/ergasterion/prompt-lang/staging/
+
+# Gnōsis data (LanceDB)
+gnosis_data/
+mekhane/anamnesis/data/*.lance/

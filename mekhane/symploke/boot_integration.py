@@ -437,6 +437,7 @@ def get_boot_context(mode: str = "standard", context: Optional[str] = None) -> d
                     agent_v2.save_learned_A()
 
                     conf_pct = int(100.0 * max(final["beliefs"]))
+                    explanation = agent_v2.explain(final)
                     fep_v2_result = {
                         "action": final["action_name"],
                         "selected_series": final.get("selected_series"),
@@ -445,6 +446,7 @@ def get_boot_context(mode: str = "standard", context: Optional[str] = None) -> d
                         "attractor_series": att_series,
                         "agreement": final.get("selected_series") == att_series,
                         "map_state": final["map_state_names"],
+                        "explanation": explanation,
                     }
                 except Exception:
                     pass  # FEP v2 failure should not block boot
@@ -471,6 +473,11 @@ def get_boot_context(mode: str = "standard", context: Optional[str] = None) -> d
                         f"   🧠 FEP v2: {act} [Series={sel}] "
                         f"(entropy={ent}, conf={conf}%) ↔ ATT={att_s} [{agree}]"
                     )
+                    # Explanation (indented under FEP v2 line)
+                    expl = fep_v2_result.get("explanation", "")
+                    if expl:
+                        for line in expl.split("\n"):
+                            formatted_parts.append(f"      {line}")
 
                 return {
                     "series": rec.series,

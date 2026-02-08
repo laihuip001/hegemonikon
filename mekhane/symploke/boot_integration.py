@@ -823,6 +823,40 @@ def get_boot_context(mode: str = "standard", context: Optional[str] = None) -> d
         lines.append("")
         lines.append(doxa_result["formatted"])
 
+    # 軸 L: Credit Assignment (フィードバック学習)
+    feedback_result = {"total": 0, "accept_rate": 0.0, "formatted": ""}
+    print(" 🎓 Loading Feedback History...", end="", file=sys.stderr)
+    try:
+        from mekhane.fep.credit_assignment import (
+            load_feedback_history,
+            feedback_summary,
+        )
+        fb_records = load_feedback_history(months=3)
+        if fb_records:
+            fb_summary = feedback_summary(fb_records)
+            fb_lines = [f"### 🎓 軸 L: Credit Assignment ({fb_summary['total']}件)"]
+            fb_lines.append(f"Accept Rate: {fb_summary['accept_rate']:.0%}")
+            if fb_summary["common_corrections"]:
+                corrections = ", ".join(
+                    f"{f}→{t}({c})" for f, t, c in fb_summary["common_corrections"][:3]
+                )
+                fb_lines.append(f"Common Corrections: {corrections}")
+            feedback_result = {
+                "total": fb_summary["total"],
+                "accept_rate": fb_summary["accept_rate"],
+                "per_series": fb_summary.get("per_series", {}),
+                "formatted": "\n".join(fb_lines),
+            }
+            print(f" Done ({fb_summary['total']} records, {fb_summary['accept_rate']:.0%} accept).", file=sys.stderr)
+        else:
+            print(" No feedback yet.", file=sys.stderr)
+    except Exception as e:
+        print(f" Failed ({str(e)}).", file=sys.stderr)
+
+    if feedback_result["formatted"]:
+        lines.append("")
+        lines.append(feedback_result["formatted"])
+
     # n8n WF-06: Session Start 通知
     try:
         import urllib.request
@@ -856,6 +890,7 @@ def get_boot_context(mode: str = "standard", context: Optional[str] = None) -> d
         "projects": projects_result,
         "skills": skills_result,
         "doxa": doxa_result,
+        "feedback": feedback_result,
         "formatted": "\n".join(lines),
     }
 
@@ -881,7 +916,10 @@ def print_boot_summary(mode: str = "standard", context: Optional[str] = None):
     proj_total = result.get("projects", {}).get("total", 0)
     proj_active = result.get("projects", {}).get("active", 0)
     proj_str = f"{proj_active}/{proj_total}" if proj_total > 0 else "—"
-    print(f"📊 Handoff: {h_count}件 | KI: {ki_count}件 | Sessions: {sessions} | PKS: {pks_count}件 | Safety: {'✅' if safety_errors == 0 else f'⚠️{safety_errors}'} | EPT: {ept_str} | PJ: {proj_str} | Attractor: {attractor_str}")
+    fb_total = result.get("feedback", {}).get("total", 0)
+    fb_rate = result.get("feedback", {}).get("accept_rate", 0)
+    fb_str = f"{fb_rate:.0%}({fb_total})" if fb_total > 0 else "—"
+    print(f"📊 Handoff: {h_count}件 | KI: {ki_count}件 | Sessions: {sessions} | PKS: {pks_count}件 | Safety: {'✅' if safety_errors == 0 else f'⚠️{safety_errors}'} | EPT: {ept_str} | PJ: {proj_str} | Attractor: {attractor_str} | FB: {fb_str}")
 
     # detailed モード: テンプレートファイル生成
     if mode == "detailed":

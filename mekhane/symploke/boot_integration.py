@@ -439,8 +439,8 @@ def get_boot_context(mode: str = "standard", context: Optional[str] = None) -> d
                         "selected_series": final.get("selected_series"),
                         "entropy": round(final["entropy"], 3),
                         "confidence_pct": conf_pct,
-                        "attractor_series": rec.series,
-                        "agreement": final.get("selected_series") == rec.series,
+                        "attractor_series": att_series,
+                        "agreement": final.get("selected_series") == att_series,
                         "map_state": final["map_state_names"],
                     }
                 except Exception:

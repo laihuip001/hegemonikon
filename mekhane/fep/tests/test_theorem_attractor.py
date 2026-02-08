@@ -19,6 +19,7 @@ from mekhane.fep.theorem_attractor import (
     FlowResult,
     FlowState,
     TheoremAttractor,
+    TheoremMixture,
     TheoremResult,
 )
 
@@ -260,3 +261,119 @@ class TestBasins:
         """10,000 samples は 5 秒以内で完了すべき"""
         result = attractor.detect_basins(n_samples=10000)
         assert result.elapsed < 5.0, f"Basin detection took {result.elapsed:.2f}s"
+
+
+# ---------------------------------------------------------------------------
+# Q2: Mixture Diagnosis
+# ---------------------------------------------------------------------------
+
+# PURPOSE: Q2 — 24 定理の確率分布 (配合) テスト
+class TestMixture:
+    """Q2 — 24 定理の確率分布 (配合) テスト"""
+
+    # PURPOSE: TheoremMixture が返ることを確認
+    def test_returns_mixture(self, attractor):
+        m = attractor.diagnose_mixture("テスト")
+        assert isinstance(m, TheoremMixture)
+
+    # PURPOSE: 分布の合計が 1 になることを確認
+    def test_distribution_sums_to_1(self, attractor):
+        m = attractor.diagnose_mixture("テスト")
+        total = sum(m.distribution.values())
+        assert abs(total - 1.0) < 0.01, f"Sum = {total}"
+
+    # PURPOSE: 全 24 定理が分布に含まれることを確認
+    def test_24_theorems_in_distribution(self, attractor):
+        m = attractor.diagnose_mixture("テスト")
+        assert len(m.distribution) == 24
+        for k in THEOREM_KEYS:
+            assert k in m.distribution
+
+    # PURPOSE: Series 分布の合計が 1 になることを確認
+    def test_series_distribution_sums_to_1(self, attractor):
+        m = attractor.diagnose_mixture("テスト")
+        total = sum(m.series_distribution.values())
+        assert abs(total - 1.0) < 0.01, f"Series sum = {total}"
+
+    # PURPOSE: 正規化エントロピーが 0-1 範囲であることを確認
+    def test_entropy_range(self, attractor):
+        m = attractor.diagnose_mixture("テスト")
+        assert 0 <= m.entropy <= 1.0, f"Entropy = {m.entropy}"
+
+    # PURPOSE: 低温は集中、高温は分散
+    def test_low_temperature_concentrates(self, attractor):
+        m_low = attractor.diagnose_mixture("テスト", temperature=0.1)
+        m_high = attractor.diagnose_mixture("テスト", temperature=2.0)
+        assert m_low.entropy < m_high.entropy, \
+            f"Low temp H={m_low.entropy} should < high temp H={m_high.entropy}"
+
+    # PURPOSE: dominant_series が有効な Series であることを確認
+    def test_dominant_series_valid(self, attractor):
+        m = attractor.diagnose_mixture("テスト")
+        assert m.dominant_series in ("O", "S", "H", "P", "K", "A")
+
+
+# ---------------------------------------------------------------------------
+# Q5: Weighted Transitions
+# ---------------------------------------------------------------------------
+
+# PURPOSE: Q5 — cosine sim based 遷移重みテスト
+class TestWeightedTransition:
+    """Q5 — cosine sim based 遷移重みテスト"""
+
+    # PURPOSE: 遷移重みが均一でないことを確認
+    def test_transition_weights_vary(self, attractor):
+        attractor._ensure_initialized()
+        T = attractor._transition_matrix
+        if hasattr(T, 'cpu'):
+            T = T.cpu().numpy()
+        nonzero = T[T > 0]
+        assert nonzero.std() > 0.001, \
+            f"Weights should vary, std={nonzero.std():.6f}"
+
+    # PURPOSE: 遷移重みが非負であることを確認
+    def test_transition_weights_nonneg(self, attractor):
+        attractor._ensure_initialized()
+        T = attractor._transition_matrix
+        if hasattr(T, 'cpu'):
+            T = T.cpu().numpy()
+        assert (T >= 0).all(), "Negative transition weights found"
+
+
+# ---------------------------------------------------------------------------
+# Q1: Basin Separation
+# ---------------------------------------------------------------------------
+
+# PURPOSE: Q1 — basin 分離度メトリクステスト
+class TestBasinSeparation:
+    """Q1 — basin 分離度メトリクステスト"""
+
+    # PURPOSE: basin_separation が dict を返す
+    def test_returns_dict(self, attractor):
+        sep = attractor.basin_separation()
+        assert isinstance(sep, dict)
+        assert "closest_pairs" in sep
+        assert "avg_separation" in sep
+
+    # PURPOSE: distance_matrix が (24, 24) で対角が 0
+    def test_distance_matrix_shape(self, attractor):
+        import numpy as np
+        sep = attractor.basin_separation()
+        dm = sep["distance_matrix"]
+        assert dm.shape == (24, 24)
+        for i in range(24):
+            assert abs(dm[i, i]) < 0.001, f"Diagonal [{i},{i}] = {dm[i,i]}"
+
+    # PURPOSE: 最近ペアの距離が正
+    def test_closest_pairs_positive(self, attractor):
+        sep = attractor.basin_separation()
+        for t1, t2, dist in sep["closest_pairs"]:
+            assert dist > 0, f"{t1}-{t2}: dist={dist} should be > 0"
+            assert t1 != t2
+
+    # PURPOSE: avg > min と max > avg の順序
+    def test_separation_ordering(self, attractor):
+        sep = attractor.basin_separation()
+        assert sep["min_separation"] <= sep["avg_separation"]
+        assert sep["avg_separation"] <= sep["max_separation"]
+

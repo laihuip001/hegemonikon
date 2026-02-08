@@ -138,10 +138,81 @@ def _load_projects(project_root: Path) -> dict:
     return result
 
 
-# PURPOSE: /boot 統合 API: 9軸（Handoff, Sophia, Persona, PKS, Safety, EPT, Digestor, Attractor, Projects）を統合して返す
+# PURPOSE: /boot 起動時に全 Skill を発見し、Agent がコンテキストに取り込めるようにする
+def _load_skills(project_root: Path) -> dict:
+    """Load all Skills from .agent/skills/ for boot preloading.
+
+    Returns:
+        dict: {
+            "skills": [{name, path, description}, ...],
+            "count": int,
+            "skill_paths": [str, ...],   # view_file 用の絶対パス一覧
+            "formatted": str
+        }
+    """
+    result = {"skills": [], "count": 0, "skill_paths": [], "formatted": ""}
+    skills_dir = project_root / ".agent" / "skills"
+    if not skills_dir.exists():
+        return result
+
+    try:
+        skills = []
+        skill_paths = []
+        for skill_dir in sorted(skills_dir.iterdir()):
+            skill_md = skill_dir / "SKILL.md"
+            if not skill_dir.is_dir() or not skill_md.exists():
+                continue
+
+            # Parse YAML frontmatter
+            content = skill_md.read_text(encoding="utf-8")
+            name = skill_dir.name
+            description = ""
+            if content.startswith("---"):
+                parts = content.split("---", 2)
+                if len(parts) >= 3:
+                    import yaml
+                    try:
+                        meta = yaml.safe_load(parts[1])
+                        name = meta.get("name", skill_dir.name)
+                        description = meta.get("description", "")
+                    except Exception:
+                        pass
+
+            abs_path = str(skill_md.resolve())
+            skills.append({
+                "name": name,
+                "dir": skill_dir.name,
+                "path": abs_path,
+                "description": description,
+            })
+            skill_paths.append(abs_path)
+
+        if not skills:
+            return result
+
+        lines = ["🧠 **Skills** (自動プリロード)"]
+        lines.append(f"  {len(skills)}件の Skill を検出。view_file で読み込むこと:")
+        for s in skills:
+            desc = f" — {s['description']}" if s['description'] else ""
+            lines.append(f"    📖 {s['name']}{desc}")
+            lines.append(f"       → `{s['path']}`")
+
+        result = {
+            "skills": skills,
+            "count": len(skills),
+            "skill_paths": skill_paths,
+            "formatted": "\n".join(lines),
+        }
+    except Exception:
+        pass  # Skill loading failure should not block boot
+
+    return result
+
+
+# PURPOSE: /boot 統合 API: 10軸（Handoff, Sophia, Persona, PKS, Safety, EPT, Digestor, Attractor, Projects, Skills）を統合して返す
 def get_boot_context(mode: str = "standard", context: Optional[str] = None) -> dict:
     """
-    /boot 統合 API: 9軸（Handoff, Sophia, Persona, PKS, Safety, EPT, Digestor, Attractor, Projects）を統合して返す
+    /boot 統合 API: 10軸（Handoff, Sophia, Persona, PKS, Safety, EPT, Digestor, Attractor, Projects, Skills）を統合して返す
 
     GPU プリフライトチェック付き: GPU 占有時は embedding 系を CPU フォールバックで実行
 
@@ -159,6 +230,7 @@ def get_boot_context(mode: str = "standard", context: Optional[str] = None) -> d
             "ept": {...},         # 軸 H
             "attractor": {...},   # 軸 F
             "projects": {...},    # 軸 I
+            "skills": {...},      # 軸 J (Skill プリロード)
             "formatted": str      # フォーマット済み出力
         }
     """
@@ -397,6 +469,7 @@ def get_boot_context(mode: str = "standard", context: Optional[str] = None) -> d
                     ta = TheoremAttractor(force_cpu=not gpu_ok)
                     top_theorems = ta.suggest(attractor_context, top_k=5)
                     flow = ta.simulate_flow(attractor_context, steps=10)
+                    mixture = ta.diagnose_mixture(attractor_context)
                     theorem_detail = {
                         "top_theorems": [
                             {"theorem": r.theorem, "name": r.name,
@@ -406,6 +479,11 @@ def get_boot_context(mode: str = "standard", context: Optional[str] = None) -> d
                         ],
                         "flow_converged": flow.converged_at,
                         "flow_final": [t for t, _ in flow.final_theorems[:3]],
+                        "mixture": {
+                            "entropy": mixture.entropy,
+                            "dominant_series": mixture.dominant_series,
+                            "series_distribution": mixture.series_distribution,
+                        },
                     }
                 except Exception:
                     pass  # Theorem attractor failure should not block boot
@@ -480,7 +558,10 @@ def get_boot_context(mode: str = "standard", context: Optional[str] = None) -> d
                         f"{t['theorem']}({t['sim']:.2f})"
                         for t in theorem_detail["top_theorems"][:3]
                     )
-                    formatted_parts.append(f"   🔬 Theorems: {tops}")
+                    mix = theorem_detail.get("mixture", {})
+                    h_str = f" | H={mix['entropy']:.2f}" if mix.get("entropy") is not None else ""
+                    dom = f" dom={mix['dominant_series']}" if mix.get("dominant_series") else ""
+                    formatted_parts.append(f"   🔬 Theorems: {tops}{h_str}{dom}")
                 if dispatch_info["primary"]:
                     formatted_parts.append(f"   📎 Dispatch: {dispatch_info['dispatch_formatted']}")
                 if fep_v2_result:
@@ -586,6 +667,19 @@ def get_boot_context(mode: str = "standard", context: Optional[str] = None) -> d
         lines.append("")
         lines.append(projects_result["formatted"])
 
+    # Skills (10軸目: Skill プリロード)
+    skills_result = {"skills": [], "count": 0, "skill_paths": [], "formatted": ""}
+    print(" 🧠 Loading Skills...", end="", file=sys.stderr)
+    try:
+        skills_result = _load_skills(project_root)
+        print(f" Done ({skills_result['count']} skills).", file=sys.stderr)
+    except Exception as e:
+        print(f" Failed ({str(e)}).", file=sys.stderr)
+
+    if skills_result["formatted"]:
+        lines.append("")
+        lines.append(skills_result["formatted"])
+
     # n8n WF-06: Session Start 通知
     try:
         import urllib.request
@@ -617,6 +711,7 @@ def get_boot_context(mode: str = "standard", context: Optional[str] = None) -> d
         "digestor": digestor_result,
         "attractor": attractor_result,
         "projects": projects_result,
+        "skills": skills_result,
         "formatted": "\n".join(lines),
     }
 

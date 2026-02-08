@@ -806,6 +806,7 @@ def cmd_chat(args) -> int:
     chat = GnosisChat(
         top_k=args.top_k,
         max_new_tokens=args.max_tokens,
+        steering_profile=args.steering,
     )
 
     if args.index:

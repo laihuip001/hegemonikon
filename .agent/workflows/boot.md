@@ -272,6 +272,19 @@ HEGEMONIKON BOOT COMPLETE v5.0 — L(M) = Ses
 
 Handoff から抽出したタスク提案を表示
 
+### 6.5 Post-Check — L(M) の品質検証
+
+> **環境強制**: postcheck が PASS しなければ Creator に報告してはならない。
+> `<!-- FILL -->` が残存 = 未消化。チェックリスト未完了 = 手抜き。
+
+// turbo
+
+```bash
+cd ~/oikos/hegemonikon && PYTHONPATH=. .venv/bin/python mekhane/symploke/boot_integration.py --postcheck /tmp/boot_report_$(date +%Y%m%d_%H%M).md --mode ${BOOT_MODE:-detailed}
+```
+
+**FAIL 時**: 不足セクションを補完してから Creator に報告すること。PASS するまでループ。
+
 ---
 
 ## Hegemonikón Status

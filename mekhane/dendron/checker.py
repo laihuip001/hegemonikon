@@ -39,7 +39,16 @@ from .models import (  # noqa: F401
 
 
 # L3: ループ変数として許容される 1 文字名 (/dia+ レビューで d/v/t 削除)
-_LOOP_VAR_NAMES = frozenset("i j k n m x y z _ e f".split())
+# Whitelisted single-char variables:
+#   Loop: i j k n m x y z _
+#   Math/FEP: A B C D T (matrices, Dirichlet, theorem)
+#   Series: O S H P K (category.py domain constants)
+#   Common idioms: e f r s d w c p a b h v t
+_LOOP_VAR_NAMES = frozenset(
+    "i j k n m x y z _ e f "
+    "A B C D T O S H P K "
+    "r s d w c p a b h v t".split()
+)
 
 
 # PURPOSE: コードベースの存在証明を検証し、CI判定とレポートの判定結果を生成する

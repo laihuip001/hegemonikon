@@ -28,11 +28,13 @@ LOG_FILE = LOG_DIR / "ccl.log"
 STATE_FILE = LOG_DIR / "ccl_state.json"
 
 
+# PURPOSE: 関数: ensure_dirs
 def ensure_dirs():
     if not LOG_DIR.exists():
         LOG_DIR.mkdir(parents=True, exist_ok=True)
 
 
+# PURPOSE: 取得: load_state
 def load_state() -> dict:
     if STATE_FILE.exists():
         try:
@@ -42,10 +44,12 @@ def load_state() -> dict:
     return {}
 
 
+# PURPOSE: 設定/保存: save_state
 def save_state(state: dict):
     STATE_FILE.write_text(json.dumps(state, indent=2))
 
 
+# PURPOSE: 関数: log_entry
 def log_entry(entry: dict):
     ensure_dirs()
     timestamp = datetime.datetime.now().isoformat()
@@ -58,6 +62,7 @@ def log_entry(entry: dict):
     print(f"CCL_TRACE: {entry.get('message', '')}")
 
 
+# PURPOSE: 実行: start_session
 def start_session(expression: str):
     session_id = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
     state = {
@@ -78,6 +83,7 @@ def start_session(expression: str):
     )
 
 
+# PURPOSE: 関数: log_step
 def log_step(op: str, status: str = "running", note: str = ""):
     state = load_state()
     if not state:
@@ -105,6 +111,7 @@ def log_step(op: str, status: str = "running", note: str = ""):
     )
 
 
+# PURPOSE: 関数: end_session
 def end_session(status: str = "completed"):
     state = load_state()
     if not state:
@@ -133,6 +140,7 @@ def end_session(status: str = "completed"):
     # For now, just leave it for inspection or next overwrite
 
 
+# PURPOSE: 関数: main
 def main():
     parser = argparse.ArgumentParser(description="CCL Tracer")
     subparsers = parser.add_subparsers(dest="command", required=True)

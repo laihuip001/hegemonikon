@@ -22,6 +22,7 @@ import re
 # =============================================================================
 
 
+# PURPOSE: CCL 演算子タイプ
 class OpType(Enum):
     """CCL 演算子タイプ"""
 
@@ -41,6 +42,7 @@ class OpType(Enum):
 
 
 @dataclass
+# PURPOSE: ワークフローノード
 class Workflow:
     """ワークフローノード"""
 
@@ -51,6 +53,7 @@ class Workflow:
 
 
 @dataclass
+# PURPOSE: 条件ノード
 class Condition:
     """条件ノード"""
 
@@ -60,6 +63,7 @@ class Condition:
 
 
 @dataclass
+# PURPOSE: 収束ループ: A >> cond
 class ConvergenceLoop:
     """収束ループ: A >> cond"""
 
@@ -68,6 +72,7 @@ class ConvergenceLoop:
 
 
 @dataclass
+# PURPOSE: シーケンス: A _ B
 class Sequence:
     """シーケンス: A _ B"""
 
@@ -79,6 +84,7 @@ class Sequence:
 # =============================================================================
 
 
+# PURPOSE: CCL 簡易パーサー（PoC）
 class CCLParser:
     """CCL 簡易パーサー（PoC）"""
 
@@ -134,6 +140,7 @@ class CCLParser:
         "!": OpType.EXPAND,
     }
 
+    # PURPOSE: CCL 式をパース
     def parse(self, ccl: str) -> Any:
         """CCL 式をパース"""
         ccl = ccl.strip()
@@ -153,6 +160,7 @@ class CCLParser:
 
         return self._parse_workflow(ccl)
 
+    # PURPOSE: ワークフロー式をパース
     def _parse_workflow(self, expr: str) -> Workflow:
         """ワークフロー式をパース"""
         # /wf+- 形式
@@ -167,6 +175,7 @@ class CCLParser:
 
         return Workflow(id=wf_id, operators=operators, modifiers={})
 
+    # PURPOSE: 条件式をパース
     def _parse_condition(self, expr: str) -> Condition:
         """条件式をパース"""
         # V[] < 0.3 形式
@@ -180,6 +189,7 @@ class CCLParser:
 
 # =============================================================================
 # LMQL Translator
+# PURPOSE: CCL AST → LMQL プログラム変換
 # =============================================================================
 
 
@@ -197,6 +207,7 @@ class LMQLTranslator:
         "sop": "調査: 以下について調査してください。",
     }
 
+    # PURPOSE: AST を LMQL プログラムに変換
     def translate(self, ast: Any) -> str:
         """AST を LMQL プログラムに変換"""
         if isinstance(ast, ConvergenceLoop):
@@ -208,6 +219,7 @@ class LMQLTranslator:
         else:
             raise ValueError(f"Unknown AST node: {type(ast)}")
 
+    # PURPOSE: ワークフローを LMQL に変換
     def _translate_workflow(self, wf: Workflow) -> str:
         """ワークフローを LMQL に変換"""
         prompt = self.WORKFLOW_PROMPTS.get(wf.id, f"/{wf.id} を実行:")
@@ -234,6 +246,7 @@ def ccl_{wf.id}(context: str):
         "openai/gpt-4o"
 '''
 
+    # PURPOSE: 収束ループを LMQL に変換
     def _translate_convergence(self, node: ConvergenceLoop) -> str:
         """収束ループを LMQL に変換"""
         body = self._translate_workflow(node.body)
@@ -271,6 +284,7 @@ def convergence_loop(context: str):
         "openai/gpt-4o"
 '''
 
+    # PURPOSE: シーケンスを LMQL に変換
     def _translate_sequence(self, node: Sequence) -> str:
         """シーケンスを LMQL に変換"""
         steps = "\n".join(
@@ -292,6 +306,7 @@ def sequence_execution(context: str):
     from
         "openai/gpt-4o"
 '''
+# PURPOSE: CCL 式を LMQL プログラムに変換
 
 
 # =============================================================================

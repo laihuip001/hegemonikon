@@ -20,6 +20,7 @@ from typing import Dict, Optional, Generator
 logger = logging.getLogger("noesis_client")
 
 
+# PURPOSE: O1 Noēsis の外部接続層: AI認識の委譲
 class NoesisClient:
     """
     O1 Noēsis の外部接続層: AI認識の委譲
@@ -33,6 +34,7 @@ class NoesisClient:
         外部AI（Gemini等）に認識を委譲する
     """
 
+    # PURPOSE: Initialize NoesisClient
     def __init__(self, settings: Dict = None):
         """
         Initialize NoesisClient
@@ -48,6 +50,7 @@ class NoesisClient:
         self.client = None
         self._configure()
 
+    # PURPOSE: API設定
     def _configure(self):
         """
         API設定
@@ -72,10 +75,12 @@ class NoesisClient:
             logger.warning("O1 Noēsis: API Key not configured")
 
     @property
+    # PURPOSE: 外部認識源が利用可能か
     def is_configured(self) -> bool:
         """外部認識源が利用可能か"""
         return self.client is not None
 
+    # PURPOSE: O1 Noēsis 核心機能: 外部認識の取得
     async def generate_content(
         self, text: str, config: Dict, model: Optional[str] = None
     ) -> Dict:
@@ -152,6 +157,7 @@ class NoesisClient:
                 "blocked_reason": error_msg,
             }
 
+    # PURPOSE: ストリーミング生成
     def generate_content_stream(
         self, text: str, config: Dict
     ) -> Generator[str, None, None]:
@@ -187,6 +193,7 @@ class NoesisClient:
 
 # Backward compatibility aliases
 GeminiClient = NoesisClient
+# PURPOSE: 内部処理: get_client
 
 # Singleton instance
 _default_client = None
@@ -194,15 +201,18 @@ _default_client = None
 
 def _get_client() -> NoesisClient:
     global _default_client
+# PURPOSE: 検証: is_api_configured
     if _default_client is None:
         _default_client = NoesisClient()
     return _default_client
 
+# PURPOSE: Backward compatibility function
 
 def is_api_configured() -> bool:
     return _get_client().is_configured
 
 
+# PURPOSE: Backward compatibility function
 async def execute_gemini(text: str, config: Dict, model: str = None) -> Dict:
     """Backward compatibility function"""
     return await _get_client().generate_content(text, config, model)

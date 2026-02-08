@@ -115,6 +115,7 @@ OSCILLATION_MARGIN = 0.05
 # Enums & Data Classes
 # ---------------------------------------------------------------------------
 
+# PURPOSE: Attractor 収束パターンの分類 (Spisak 2025 からの理論的導出)
 class OscillationType(Enum):
     """Attractor 収束パターンの分類 (Spisak 2025 からの理論的導出)"""
     CLEAR = "clear"         # 明確な単一 attractor 収束
@@ -124,6 +125,7 @@ class OscillationType(Enum):
 
 
 @dataclass
+# PURPOSE: Attractor への収束結果
 class AttractorResult:
     """Attractor への収束結果"""
     series: str
@@ -131,10 +133,12 @@ class AttractorResult:
     similarity: float
     workflows: list[str] = field(default_factory=list)
 
+    # PURPOSE: 内部処理: repr__
     def __repr__(self) -> str:
         return f"⟨{self.series}: {self.name} | sim={self.similarity:.3f}⟩"
 
 
+# PURPOSE: suggest() の完全な結果（oscillation 診断付き）
 @dataclass
 class SuggestResult:
     """suggest() の完全な結果（oscillation 診断付き）"""
@@ -144,15 +148,19 @@ class SuggestResult:
     gap: float  # 1位と2位の差
 
     @property
+    # PURPOSE: 関数: primary
     def primary(self) -> AttractorResult | None:
         return self.attractors[0] if self.attractors else None
 
     @property
+    # PURPOSE: 検証: is_clear
     def is_clear(self) -> bool:
         return self.oscillation == OscillationType.CLEAR
 
+    # PURPOSE: 内部処理: repr__
     def __repr__(self) -> str:
         names = "+".join(r.series for r in self.attractors)
+# PURPOSE: 分解された各セグメントの結果
         return f"⟨{names} | {self.oscillation.value} | top={self.top_similarity:.3f}⟩"
 
 
@@ -162,7 +170,9 @@ class SegmentResult:
     text: str
     diagnosis: SuggestResult
 
+    # PURPOSE: 内部処理: repr__
     def __repr__(self) -> str:
+# PURPOSE: decompose() の結果: 各セグメント + マージされた結果
         series = "+".join(r.series for r in self.diagnosis.attractors) or "?"
         return f"⟨'{self.text[:30]}...' → {series}⟩"
 
@@ -175,11 +185,14 @@ class DecomposeResult:
     merged_workflows: list[str]
 
     @property
+    # PURPOSE: 複数の Series に分解されたか
     def is_multi(self) -> bool:
         """複数の Series に分解されたか"""
         return len(self.merged_series) > 1
 
+    # PURPOSE: 内部処理: repr__
     def __repr__(self) -> str:
+# PURPOSE: 6 Series の Attractor Engine
         return f"⟨Decompose: {'+'.join(self.merged_series)} ({len(self.segments)} segments)⟩"
 
 
@@ -200,6 +213,7 @@ class SeriesAttractor:
         # → [⟨O: Ousia (本質) | sim=0.742⟩, ...]
     """
 
+    # PURPOSE: 内部処理: init__
     def __init__(
         self,
         threshold: float = DEFAULT_THRESHOLD,
@@ -214,6 +228,7 @@ class SeriesAttractor:
 
     # --- Lazy initialization ---
 
+    # PURPOSE: 遅延初期化: 初回 suggest() 呼び出し時に embedding を計算
     def _ensure_initialized(self) -> None:
         """遅延初期化: 初回 suggest() 呼び出し時に embedding を計算"""
         if self._prototypes:
@@ -234,6 +249,7 @@ class SeriesAttractor:
 
     # --- Core API ---
 
+    # PURPOSE: 入力を Series attractor に射影し、引力の強い順に返す。
     def suggest(
         self,
         user_input: str,
@@ -283,6 +299,7 @@ class SeriesAttractor:
 
         return results
 
+    # PURPOSE: suggest() + oscillation 診断を返す。
     def diagnose(
         self,
         user_input: str,
@@ -346,6 +363,7 @@ class SeriesAttractor:
             gap=gap,
         )
 
+    # PURPOSE: 全 6 Series の引力を返す（デバッグ/可視化用）
     def suggest_all(
         self,
         user_input: str,
@@ -371,6 +389,7 @@ class SeriesAttractor:
         results.sort(key=lambda x: x.similarity, reverse=True)
         return results
 
+    # PURPOSE: 入力を文に分解し、各文ごとに attractor を診断する。
     def decompose(
         self,
         user_input: str,
@@ -429,6 +448,7 @@ class SeriesAttractor:
     # --- Internal ---
 
     @staticmethod
+    # PURPOSE: 簡易文分割: 句読点・ピリオド・改行で分割
     def _split_sentences(text: str) -> list[str]:
         """簡易文分割: 句読点・ピリオド・改行で分割"""
         import re
@@ -437,6 +457,7 @@ class SeriesAttractor:
         return [p.strip() for p in parts if p.strip()]
 
     @staticmethod
+    # PURPOSE: ワークフローを重複排除してマージ
     def _merge_workflows(attractors: list[AttractorResult]) -> list[str]:
         """ワークフローを重複排除してマージ"""
         seen: set[str] = set()
@@ -448,7 +469,9 @@ class SeriesAttractor:
                     result.append(wf)
         return result
 
+# PURPOSE: CLI: python -m mekhane.fep.attractor "入力テキスト"
     @staticmethod
+    # PURPOSE: Cosine similarity between two vectors
     def _cosine_similarity(a: np.ndarray, b: np.ndarray) -> float:
         """Cosine similarity between two vectors"""
         dot = np.dot(a, b)

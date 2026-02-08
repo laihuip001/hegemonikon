@@ -77,6 +77,7 @@ except ImportError:
 # =============================================================================
 
 
+# PURPOSE: State spaces for derivative selection across O-series theorems.
 class DerivativeStateSpace:
     """State spaces for derivative selection across O-series theorems."""
 
@@ -1081,6 +1082,7 @@ A4_PATTERNS: Dict[str, List[str]] = {
 
 
 @dataclass
+# PURPOSE: Result of derivative selection.
 class DerivativeRecommendation:
     """Result of derivative selection."""
 
@@ -1096,6 +1098,7 @@ class DerivativeRecommendation:
 # =============================================================================
 
 
+# PURPOSE: Encode problem text for derivative selection.
 def encode_for_derivative_selection(
     problem_text: str, theorem: Literal["O1", "O2", "O3", "O4"]
 ) -> Tuple[int, int, int]:
@@ -1156,6 +1159,7 @@ def encode_for_derivative_selection(
     return (abstraction_level, context_dependency, reflection_need)
 
 
+# PURPOSE: Calculate how many patterns match in the text.
 def _calculate_pattern_score(text: str, patterns: List[str]) -> int:
     """Calculate how many patterns match in the text."""
     score = 0
@@ -1212,6 +1216,7 @@ DERIVATIVE_DESCRIPTIONS: Dict[str, Dict[str, str]] = {
 }
 
 
+# PURPOSE: Select derivative using LLM (Gemini Flash free tier).
 def _select_with_llm(theorem: str, problem: str) -> Optional[Tuple[str, float]]:
     """
     Select derivative using LLM (Gemini Flash free tier).
@@ -1254,6 +1259,7 @@ def _select_with_llm(theorem: str, problem: str) -> Optional[Tuple[str, float]]:
         return None
 
 
+# PURPOSE: Hybrid selection: LLM fallback when keyword confidence is low.
 def _hybrid_select(
     theorem: str, problem: str, keyword_result: "DerivativeRecommendation"
 ) -> "DerivativeRecommendation":
@@ -1289,6 +1295,7 @@ def _hybrid_select(
     return keyword_result
 
 
+# PURPOSE: 派生選択をログに記録 (v3.2 学習基盤)
 def _log_selection(
     theorem: str,
     problem: str,
@@ -1349,6 +1356,7 @@ def _log_selection(
 # =============================================================================
 
 
+# PURPOSE: Select the optimal derivative for the given theorem and problem context.
 def select_derivative(
     theorem: Literal[
         "O1", "O2", "O3", "O4", "S1", "S2", "S3", "S4", "H1", "H2", "H3", "H4"
@@ -1459,6 +1467,7 @@ def select_derivative(
     return keyword_result
 
 
+# PURPOSE: Select O1 Noēsis derivative: nous, phro, or meta.
 def _select_o1_derivative(text: str) -> DerivativeRecommendation:
     """Select O1 Noēsis derivative: nous, phro, or meta."""
     scores = {
@@ -1502,6 +1511,7 @@ def _select_o1_derivative(text: str) -> DerivativeRecommendation:
     )
 
 
+# PURPOSE: Select O2 Boulēsis derivative: desir, voli, or akra.
 def _select_o2_derivative(text: str) -> DerivativeRecommendation:
     """Select O2 Boulēsis derivative: desir, voli, or akra."""
     scores = {
@@ -1537,6 +1547,7 @@ def _select_o2_derivative(text: str) -> DerivativeRecommendation:
     )
 
 
+# PURPOSE: Select O3 Zētēsis derivative: anom, hypo, or eval.
 def _select_o3_derivative(text: str) -> DerivativeRecommendation:
     """Select O3 Zētēsis derivative: anom, hypo, or eval."""
     scores = {
@@ -1568,6 +1579,7 @@ def _select_o3_derivative(text: str) -> DerivativeRecommendation:
     )
 
 
+# PURPOSE: Select O4 Energeia derivative: flow, prax, or pois.
 def _select_o4_derivative(text: str) -> DerivativeRecommendation:
     """Select O4 Energeia derivative: flow, prax, or pois."""
     scores = {
@@ -1604,6 +1616,7 @@ def _select_o4_derivative(text: str) -> DerivativeRecommendation:
 # =============================================================================
 
 
+# PURPOSE: Select S1 Metron derivative: cont, disc, or abst.
 def _select_s1_derivative(text: str) -> DerivativeRecommendation:
     """Select S1 Metron derivative: cont, disc, or abst."""
     scores = {
@@ -1635,6 +1648,7 @@ def _select_s1_derivative(text: str) -> DerivativeRecommendation:
     )
 
 
+# PURPOSE: Select S2 Mekhanē derivative: comp, inve, or adap.
 def _select_s2_derivative(text: str) -> DerivativeRecommendation:
     """Select S2 Mekhanē derivative: comp, inve, or adap."""
     scores = {
@@ -1666,6 +1680,7 @@ def _select_s2_derivative(text: str) -> DerivativeRecommendation:
     )
 
 
+# PURPOSE: Select S3 Stathmos derivative: norm, empi, or rela.
 def _select_s3_derivative(text: str) -> DerivativeRecommendation:
     """Select S3 Stathmos derivative: norm, empi, or rela."""
     scores = {
@@ -1697,6 +1712,7 @@ def _select_s3_derivative(text: str) -> DerivativeRecommendation:
     )
 
 
+# PURPOSE: Select S4 Praxis derivative: prax, pois, or temp.
 def _select_s4_derivative(text: str) -> DerivativeRecommendation:
     """Select S4 Praxis derivative: prax, pois, or temp."""
     scores = {
@@ -1733,6 +1749,7 @@ def _select_s4_derivative(text: str) -> DerivativeRecommendation:
 # =============================================================================
 
 
+# PURPOSE: Select H1 Propatheia derivative: appr, avoi, or arre.
 def _select_h1_derivative(text: str) -> DerivativeRecommendation:
     """Select H1 Propatheia derivative: appr, avoi, or arre."""
     scores = {
@@ -1764,6 +1781,7 @@ def _select_h1_derivative(text: str) -> DerivativeRecommendation:
     )
 
 
+# PURPOSE: Select H2 Pistis derivative: subj, inte, or obje.
 def _select_h2_derivative(text: str) -> DerivativeRecommendation:
     """Select H2 Pistis derivative: subj, inte, or obje."""
     scores = {
@@ -1795,6 +1813,7 @@ def _select_h2_derivative(text: str) -> DerivativeRecommendation:
     )
 
 
+# PURPOSE: Select H3 Orexis derivative: targ, acti, or stat.
 def _select_h3_derivative(text: str) -> DerivativeRecommendation:
     """Select H3 Orexis derivative: targ, acti, or stat."""
     scores = {
@@ -1826,6 +1845,7 @@ def _select_h3_derivative(text: str) -> DerivativeRecommendation:
     )
 
 
+# PURPOSE: Select H4 Doxa derivative: sens, conc, or form.
 def _select_h4_derivative(text: str) -> DerivativeRecommendation:
     """Select H4 Doxa derivative: sens, conc, or form."""
     scores = {
@@ -1862,6 +1882,7 @@ def _select_h4_derivative(text: str) -> DerivativeRecommendation:
 # =============================================================================
 
 
+# PURPOSE: Select P1 Khōra derivative: phys, conc, or rela.
 def _select_p1_derivative(text: str) -> DerivativeRecommendation:
     """Select P1 Khōra derivative: phys, conc, or rela."""
     scores = {
@@ -1893,6 +1914,7 @@ def _select_p1_derivative(text: str) -> DerivativeRecommendation:
     )
 
 
+# PURPOSE: Select P2 Hodos derivative: line, bran, or cycl.
 def _select_p2_derivative(text: str) -> DerivativeRecommendation:
     """Select P2 Hodos derivative: line, bran, or cycl."""
     scores = {
@@ -1924,6 +1946,7 @@ def _select_p2_derivative(text: str) -> DerivativeRecommendation:
     )
 
 
+# PURPOSE: Select P3 Trokhia derivative: fixe, adap, or emer.
 def _select_p3_derivative(text: str) -> DerivativeRecommendation:
     """Select P3 Trokhia derivative: fixe, adap, or emer."""
     scores = {
@@ -1955,6 +1978,7 @@ def _select_p3_derivative(text: str) -> DerivativeRecommendation:
     )
 
 
+# PURPOSE: Select P4 Tekhnē derivative: manu, mech, or auto.
 def _select_p4_derivative(text: str) -> DerivativeRecommendation:
     """Select P4 Tekhnē derivative: manu, mech, or auto."""
     scores = {
@@ -1991,6 +2015,7 @@ def _select_p4_derivative(text: str) -> DerivativeRecommendation:
 # =============================================================================
 
 
+# PURPOSE: Select K1 Eukairia derivative: urge, opti, or miss.
 def _select_k1_derivative(text: str) -> DerivativeRecommendation:
     """Select K1 Eukairia derivative: urge, opti, or miss."""
     scores = {
@@ -2022,6 +2047,7 @@ def _select_k1_derivative(text: str) -> DerivativeRecommendation:
     )
 
 
+# PURPOSE: Select K2 Chronos derivative: shor, medi, or long.
 def _select_k2_derivative(text: str) -> DerivativeRecommendation:
     """Select K2 Chronos derivative: shor, medi, or long."""
     scores = {
@@ -2053,6 +2079,7 @@ def _select_k2_derivative(text: str) -> DerivativeRecommendation:
     )
 
 
+# PURPOSE: Select K3 Telos derivative: intr, inst, or ulti.
 def _select_k3_derivative(text: str) -> DerivativeRecommendation:
     """Select K3 Telos derivative: intr, inst, or ulti."""
     scores = {
@@ -2084,6 +2111,7 @@ def _select_k3_derivative(text: str) -> DerivativeRecommendation:
     )
 
 
+# PURPOSE: Select K4 Sophia derivative: taci, expl, or meta.
 def _select_k4_derivative(text: str) -> DerivativeRecommendation:
     """Select K4 Sophia derivative: taci, expl, or meta."""
     scores = {
@@ -2120,6 +2148,7 @@ def _select_k4_derivative(text: str) -> DerivativeRecommendation:
 # =============================================================================
 
 
+# PURPOSE: Select A1 Pathos derivative: prim, seco, or regu.
 def _select_a1_derivative(text: str) -> DerivativeRecommendation:
     """Select A1 Pathos derivative: prim, seco, or regu."""
     scores = {
@@ -2151,6 +2180,7 @@ def _select_a1_derivative(text: str) -> DerivativeRecommendation:
     )
 
 
+# PURPOSE: Select A2 Krisis derivative: affi, nega, or susp.
 def _select_a2_derivative(text: str) -> DerivativeRecommendation:
     """Select A2 Krisis derivative: affi, nega, or susp."""
     scores = {
@@ -2182,6 +2212,7 @@ def _select_a2_derivative(text: str) -> DerivativeRecommendation:
     )
 
 
+# PURPOSE: Select A3 Gnōmē derivative: conc, abst, or univ.
 def _select_a3_derivative(text: str) -> DerivativeRecommendation:
     """Select A3 Gnōmē derivative: conc, abst, or univ."""
     scores = {
@@ -2213,6 +2244,7 @@ def _select_a3_derivative(text: str) -> DerivativeRecommendation:
     )
 
 
+# PURPOSE: Select A4 Epistēmē derivative: tent, just, or cert.
 def _select_a4_derivative(text: str) -> DerivativeRecommendation:
     """Select A4 Epistēmē derivative: tent, just, or cert."""
     scores = {
@@ -2247,6 +2279,7 @@ def _select_a4_derivative(text: str) -> DerivativeRecommendation:
 # =============================================================================
 
 
+# PURPOSE: Generate rationale for O1 derivative selection.
 def _generate_o1_rationale(derivative: str, obs: Tuple[int, int, int]) -> str:
     """Generate rationale for O1 derivative selection."""
     rationales = {
@@ -2257,6 +2290,7 @@ def _generate_o1_rationale(derivative: str, obs: Tuple[int, int, int]) -> str:
     return rationales.get(derivative, "パターンマッチング選択")
 
 
+# PURPOSE: Generate rationale for O2 derivative selection.
 def _generate_o2_rationale(derivative: str, scores: Dict[str, int]) -> str:
     """Generate rationale for O2 derivative selection."""
     rationales = {
@@ -2267,6 +2301,7 @@ def _generate_o2_rationale(derivative: str, scores: Dict[str, int]) -> str:
     return rationales.get(derivative, "パターンマッチング選択")
 
 
+# PURPOSE: Generate rationale for O3 derivative selection.
 def _generate_o3_rationale(derivative: str, scores: Dict[str, int]) -> str:
     """Generate rationale for O3 derivative selection."""
     rationales = {
@@ -2277,6 +2312,7 @@ def _generate_o3_rationale(derivative: str, scores: Dict[str, int]) -> str:
     return rationales.get(derivative, "パターンマッチング選択")
 
 
+# PURPOSE: Generate rationale for O4 derivative selection.
 def _generate_o4_rationale(derivative: str, scores: Dict[str, int]) -> str:
     """Generate rationale for O4 derivative selection."""
     rationales = {
@@ -2290,6 +2326,7 @@ def _generate_o4_rationale(derivative: str, scores: Dict[str, int]) -> str:
 # S-series Rationale Generation
 
 
+# PURPOSE: Generate rationale for S1 derivative selection.
 def _generate_s1_rationale(derivative: str, scores: Dict[str, int]) -> str:
     """Generate rationale for S1 derivative selection."""
     rationales = {
@@ -2300,6 +2337,7 @@ def _generate_s1_rationale(derivative: str, scores: Dict[str, int]) -> str:
     return rationales.get(derivative, "パターンマッチング選択")
 
 
+# PURPOSE: Generate rationale for S2 derivative selection.
 def _generate_s2_rationale(derivative: str, scores: Dict[str, int]) -> str:
     """Generate rationale for S2 derivative selection."""
     rationales = {
@@ -2310,6 +2348,7 @@ def _generate_s2_rationale(derivative: str, scores: Dict[str, int]) -> str:
     return rationales.get(derivative, "パターンマッチング選択")
 
 
+# PURPOSE: Generate rationale for S3 derivative selection.
 def _generate_s3_rationale(derivative: str, scores: Dict[str, int]) -> str:
     """Generate rationale for S3 derivative selection."""
     rationales = {
@@ -2320,6 +2359,7 @@ def _generate_s3_rationale(derivative: str, scores: Dict[str, int]) -> str:
     return rationales.get(derivative, "パターンマッチング選択")
 
 
+# PURPOSE: Generate rationale for S4 derivative selection.
 def _generate_s4_rationale(derivative: str, scores: Dict[str, int]) -> str:
     """Generate rationale for S4 derivative selection."""
     rationales = {
@@ -2333,6 +2373,7 @@ def _generate_s4_rationale(derivative: str, scores: Dict[str, int]) -> str:
 # H-series Rationale Generation
 
 
+# PURPOSE: Generate rationale for H1 derivative selection.
 def _generate_h1_rationale(derivative: str, scores: Dict[str, int]) -> str:
     """Generate rationale for H1 derivative selection."""
     rationales = {
@@ -2343,6 +2384,7 @@ def _generate_h1_rationale(derivative: str, scores: Dict[str, int]) -> str:
     return rationales.get(derivative, "パターンマッチング選択")
 
 
+# PURPOSE: Generate rationale for H2 derivative selection.
 def _generate_h2_rationale(derivative: str, scores: Dict[str, int]) -> str:
     """Generate rationale for H2 derivative selection."""
     rationales = {
@@ -2353,6 +2395,7 @@ def _generate_h2_rationale(derivative: str, scores: Dict[str, int]) -> str:
     return rationales.get(derivative, "パターンマッチング選択")
 
 
+# PURPOSE: Generate rationale for H3 derivative selection.
 def _generate_h3_rationale(derivative: str, scores: Dict[str, int]) -> str:
     """Generate rationale for H3 derivative selection."""
     rationales = {
@@ -2363,6 +2406,7 @@ def _generate_h3_rationale(derivative: str, scores: Dict[str, int]) -> str:
     return rationales.get(derivative, "パターンマッチング選択")
 
 
+# PURPOSE: Generate rationale for H4 derivative selection.
 def _generate_h4_rationale(derivative: str, scores: Dict[str, int]) -> str:
     """Generate rationale for H4 derivative selection."""
     rationales = {
@@ -2376,6 +2420,7 @@ def _generate_h4_rationale(derivative: str, scores: Dict[str, int]) -> str:
 # P-series Rationale Generation
 
 
+# PURPOSE: Generate rationale for P1 derivative selection.
 def _generate_p1_rationale(derivative: str, scores: Dict[str, int]) -> str:
     """Generate rationale for P1 derivative selection."""
     rationales = {
@@ -2386,6 +2431,7 @@ def _generate_p1_rationale(derivative: str, scores: Dict[str, int]) -> str:
     return rationales.get(derivative, "パターンマッチング選択")
 
 
+# PURPOSE: Generate rationale for P2 derivative selection.
 def _generate_p2_rationale(derivative: str, scores: Dict[str, int]) -> str:
     """Generate rationale for P2 derivative selection."""
     rationales = {
@@ -2396,6 +2442,7 @@ def _generate_p2_rationale(derivative: str, scores: Dict[str, int]) -> str:
     return rationales.get(derivative, "パターンマッチング選択")
 
 
+# PURPOSE: Generate rationale for P3 derivative selection.
 def _generate_p3_rationale(derivative: str, scores: Dict[str, int]) -> str:
     """Generate rationale for P3 derivative selection."""
     rationales = {
@@ -2406,6 +2453,7 @@ def _generate_p3_rationale(derivative: str, scores: Dict[str, int]) -> str:
     return rationales.get(derivative, "パターンマッチング選択")
 
 
+# PURPOSE: Generate rationale for P4 derivative selection.
 def _generate_p4_rationale(derivative: str, scores: Dict[str, int]) -> str:
     """Generate rationale for P4 derivative selection."""
     rationales = {
@@ -2421,6 +2469,7 @@ def _generate_p4_rationale(derivative: str, scores: Dict[str, int]) -> str:
 # =============================================================================
 
 
+# PURPOSE: Generate rationale for K1 derivative selection.
 def _generate_k1_rationale(derivative: str, scores: Dict[str, int]) -> str:
     """Generate rationale for K1 derivative selection."""
     rationales = {
@@ -2431,6 +2480,7 @@ def _generate_k1_rationale(derivative: str, scores: Dict[str, int]) -> str:
     return rationales.get(derivative, "パターンマッチング選択")
 
 
+# PURPOSE: Generate rationale for K2 derivative selection.
 def _generate_k2_rationale(derivative: str, scores: Dict[str, int]) -> str:
     """Generate rationale for K2 derivative selection."""
     rationales = {
@@ -2441,6 +2491,7 @@ def _generate_k2_rationale(derivative: str, scores: Dict[str, int]) -> str:
     return rationales.get(derivative, "パターンマッチング選択")
 
 
+# PURPOSE: Generate rationale for K3 derivative selection.
 def _generate_k3_rationale(derivative: str, scores: Dict[str, int]) -> str:
     """Generate rationale for K3 derivative selection."""
     rationales = {
@@ -2451,6 +2502,7 @@ def _generate_k3_rationale(derivative: str, scores: Dict[str, int]) -> str:
     return rationales.get(derivative, "パターンマッチング選択")
 
 
+# PURPOSE: Generate rationale for K4 derivative selection.
 def _generate_k4_rationale(derivative: str, scores: Dict[str, int]) -> str:
     """Generate rationale for K4 derivative selection."""
     rationales = {
@@ -2466,6 +2518,7 @@ def _generate_k4_rationale(derivative: str, scores: Dict[str, int]) -> str:
 # =============================================================================
 
 
+# PURPOSE: Generate rationale for A1 derivative selection.
 def _generate_a1_rationale(derivative: str, scores: Dict[str, int]) -> str:
     """Generate rationale for A1 derivative selection."""
     rationales = {
@@ -2476,6 +2529,7 @@ def _generate_a1_rationale(derivative: str, scores: Dict[str, int]) -> str:
     return rationales.get(derivative, "パターンマッチング選択")
 
 
+# PURPOSE: Generate rationale for A2 derivative selection.
 def _generate_a2_rationale(derivative: str, scores: Dict[str, int]) -> str:
     """Generate rationale for A2 derivative selection."""
     rationales = {
@@ -2486,6 +2540,7 @@ def _generate_a2_rationale(derivative: str, scores: Dict[str, int]) -> str:
     return rationales.get(derivative, "パターンマッチング選択")
 
 
+# PURPOSE: Generate rationale for A3 derivative selection.
 def _generate_a3_rationale(derivative: str, scores: Dict[str, int]) -> str:
     """Generate rationale for A3 derivative selection."""
     rationales = {
@@ -2496,6 +2551,7 @@ def _generate_a3_rationale(derivative: str, scores: Dict[str, int]) -> str:
     return rationales.get(derivative, "パターンマッチング選択")
 
 
+# PURPOSE: Generate rationale for A4 derivative selection.
 def _generate_a4_rationale(derivative: str, scores: Dict[str, int]) -> str:
     """Generate rationale for A4 derivative selection."""
     rationales = {
@@ -2640,6 +2696,7 @@ DERIVATIVE_DESCRIPTIONS: Dict[str, Dict[str, str]] = {
 }
 
 
+# PURPOSE: Get human-readable description of a derivative.
 def get_derivative_description(theorem: str, derivative: str) -> str:
     """Get human-readable description of a derivative."""
     return DERIVATIVE_DESCRIPTIONS.get(theorem, {}).get(
@@ -2647,6 +2704,7 @@ def get_derivative_description(theorem: str, derivative: str) -> str:
     )
 
 
+# PURPOSE: List all derivatives for a theorem.
 def list_derivatives(theorem: str) -> List[str]:
     """List all derivatives for a theorem."""
     return list(DERIVATIVE_DESCRIPTIONS.get(theorem, {}).keys())
@@ -2657,6 +2715,7 @@ def list_derivatives(theorem: str) -> List[str]:
 # =============================================================================
 
 
+# PURPOSE: Record feedback for derivative selection learning.
 def update_derivative_selector(
     theorem: str, derivative: str, problem_context: str, success: bool
 ) -> None:

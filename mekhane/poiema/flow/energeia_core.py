@@ -32,6 +32,7 @@ logger = logging.getLogger("energeia_core")
 
 
 @dataclass
+# PURPOSE: O4 Energeia の中枢: 意志を現実化する統一行動層
 class EnergeiaCoreResolver:
     """
     O4 Energeia の中枢: 意志を現実化する統一行動層
@@ -51,6 +52,7 @@ class EnergeiaCoreResolver:
         - DoxaCache: H4 Doxa (キャッシュ)
     """
 
+    # PURPOSE: Initialize EnergeiaCoreResolver
     def __init__(self, settings: Any = None):
         """
         Initialize EnergeiaCoreResolver
@@ -67,6 +69,7 @@ class EnergeiaCoreResolver:
         self._gemini_client = None
         self._audit_logger = None
 
+    # PURPOSE: Default settings when no config provided
     def _default_settings(self) -> Dict:
         """Default settings when no config provided"""
         return {
@@ -76,6 +79,7 @@ class EnergeiaCoreResolver:
             "USER_SYSTEM_PROMPT": "",
         }
 
+    # PURPOSE: K1 Eukairia: Model selection based on timing/context
     def _select_model(self, text: str, metron_level: int) -> str:
         """
         K1 Eukairia: Model selection based on timing/context
@@ -95,6 +99,7 @@ class EnergeiaCoreResolver:
             return self.settings.get("MODEL_SMART", "gemini-2.0-pro-exp")
         return self.settings.get("MODEL_FAST", "gemini-2.0-flash-exp")
 
+    # PURPOSE: O4 Energeia 核心機能: 処理パイプラインの実行
     async def process(self, text: str, metron_level: int = 60) -> Dict:
         """
         O4 Energeia 核心機能: 処理パイプラインの実行
@@ -166,6 +171,7 @@ class EnergeiaCoreResolver:
                 "message": str(e),
             }
 
+    # PURPOSE: O1 Noēsis への委譲: AI生成
     async def _generate_content(
         self, text: str, system_prompt: str, model: str
     ) -> Dict:
@@ -182,6 +188,7 @@ class EnergeiaCoreResolver:
             "result": f"[Processed with {model}]: {text[:100]}...",
         }
 
+    # PURPOSE: 同期版の process メソッド
     def process_sync(self, text: str, metron_level: int = 60) -> Dict:
         """
         同期版の process メソッド

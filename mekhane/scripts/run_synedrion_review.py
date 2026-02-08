@@ -26,6 +26,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
+# PURPOSE: Execute Synedrion review via API.
 async def run_synedrion_review(
     source: str = "sources/github/laihuip001/hegemonikon",
     branch: str = "master",
@@ -55,6 +56,7 @@ async def run_synedrion_review(
     logger.info(f"  Domains: {domains or 'ALL (20)'}")
     logger.info(f"  Axes: {axes or 'ALL (24)'}")
 
+    # PURPOSE: 関数: progress
     def progress(batch_num, total, completed):
         logger.info(f"  Progress: Batch {batch_num}/{total}, {completed} completed")
 

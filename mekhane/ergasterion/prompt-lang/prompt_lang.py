@@ -25,6 +25,7 @@ from typing import Optional
 
 
 @dataclass
+# PURPOSE: A single block in a prompt-lang file.
 class PromptBlock:
     """A single block in a prompt-lang file."""
 
@@ -33,6 +34,7 @@ class PromptBlock:
 
 
 @dataclass
+# PURPOSE: A single rubric dimension for evaluation.
 class RubricDimension:
     """A single rubric dimension for evaluation."""
 
@@ -43,6 +45,7 @@ class RubricDimension:
 
 
 @dataclass
+# PURPOSE: Rubric block for self-evaluation.
 class Rubric:
     """Rubric block for self-evaluation."""
 
@@ -52,6 +55,7 @@ class Rubric:
 
 
 @dataclass
+# PURPOSE: Conditional block (@if/@else).
 class Condition:
     """Conditional block (@if/@else)."""
 
@@ -63,6 +67,7 @@ class Condition:
 
 
 @dataclass
+# PURPOSE: Activation metadata for glob/rule integration.
 class Activation:
     """Activation metadata for glob/rule integration."""
 
@@ -73,6 +78,7 @@ class Activation:
 
 
 @dataclass
+# PURPOSE: A single context resource reference.
 class ContextItem:
     """A single context resource reference."""
 
@@ -87,6 +93,7 @@ class ContextItem:
 
 # v2.1 additions
 @dataclass
+# PURPOSE: Reusable template fragment for composition.
 class Mixin:
     """Reusable template fragment for composition."""
 
@@ -103,21 +110,26 @@ class Mixin:
     context: list[ContextItem] = field(default_factory=list)
 
 
+# PURPOSE: Error when circular reference is detected in extends/mixin chain.
 class CircularReferenceError(Exception):
     """Error when circular reference is detected in extends/mixin chain."""
 
+    # PURPOSE: 内部処理: init__
     def __init__(self, chain: list[str]):
         self.chain = chain
         super().__init__(f"Circular reference: {' → '.join(chain)}")
 
+# PURPOSE: Error when referenced prompt/mixin is not found.
 
 class ReferenceError(Exception):
     """Error when referenced prompt/mixin is not found."""
 
+    # PURPOSE: 内部処理: init__
     def __init__(self, name: str):
         self.name = name
         super().__init__(f"Reference not found: {name}")
 
+# PURPOSE: Parsed prompt-lang document.
 
 @dataclass
 class Prompt:
@@ -142,14 +154,17 @@ class Prompt:
     mixins: list[str] = field(default_factory=list)
     _resolved: bool = field(default=False, repr=False)
 
+    # PURPOSE: Convert to dictionary.
     def to_dict(self) -> dict:
         """Convert to dictionary."""
         return {k: v for k, v in asdict(self).items() if v}
 
+    # PURPOSE: Convert to JSON string.
     def to_json(self, indent: int = 2) -> str:
         """Convert to JSON string."""
         return json.dumps(self.to_dict(), indent=indent, ensure_ascii=False)
 
+    # PURPOSE: Expand to natural language prompt.
     def expand(self) -> str:
         """Expand to natural language prompt."""
         parts = []
@@ -202,6 +217,7 @@ class Prompt:
 
         return "\n".join(parts)
 
+    # PURPOSE: Compile AST to system prompt string.
     def compile(self, context: dict = None, format: str = "markdown") -> str:
         """
         Compile AST to system prompt string.
@@ -300,6 +316,7 @@ class Prompt:
 
         return "\n".join(sections)
 
+    # PURPOSE: Async compile AST to system prompt string.
     async def compile_async(
         self, context: dict = None, mcp_handler=None, format: str = "markdown"
     ) -> str:
@@ -402,6 +419,7 @@ class Prompt:
 
         return "\n".join(sections)
 
+    # PURPOSE: Resolve a context item asynchronously.
     async def _resolve_context_item_async(
         self, item: "ContextItem", mcp_handler
     ) -> Optional[str]:
@@ -452,6 +470,7 @@ class Prompt:
 
         return self._resolve_context_item(item)
 
+    # PURPOSE: Evaluate a condition against the context.
     def _evaluate_condition(self, cond: "Condition", context: dict) -> bool:
         """Evaluate a condition against the context."""
         var_value = context.get(cond.variable)
@@ -473,6 +492,7 @@ class Prompt:
 
         return False
 
+    # PURPOSE: Resolve a context item to its content string.
     def _resolve_context_item(self, item: "ContextItem") -> Optional[str]:
         """Resolve a context item to its content string."""
         import os
@@ -529,6 +549,7 @@ class Prompt:
         elif item.ref_type == "mcp":
             # Placeholder for MCP server reference
             return f"[MCP Server: {item.path}]"
+# PURPOSE: Result of parsing a prompt-lang file with multiple definitions.
 
         elif item.ref_type == "ki":
             # Placeholder for Knowledge Item
@@ -545,14 +566,19 @@ class ParseResult:
     prompts: dict[str, Prompt] = field(default_factory=dict)  # name -> Prompt
     mixins: dict[str, Mixin] = field(default_factory=dict)  # name -> Mixin
 
+    # PURPOSE: Get a prompt by name.
     def get_prompt(self, name: str) -> Optional[Prompt]:
         """Get a prompt by name."""
+# PURPOSE: Error during parsing.
         return self.prompts.get(name)
 
+    # PURPOSE: Get a mixin by name.
     def get_mixin(self, name: str) -> Optional[Mixin]:
         """Get a mixin by name."""
         return self.mixins.get(name)
 
+    # PURPOSE: Get a prompt or mixin by name.
+# PURPOSE: Parser for prompt-lang files.
     def get(self, name: str) -> Optional[Prompt | Mixin]:
         """Get a prompt or mixin by name."""
         return self.prompts.get(name) or self.mixins.get(name)
@@ -561,6 +587,7 @@ class ParseResult:
 class ParseError(Exception):
     """Error during parsing."""
 
+    # PURPOSE: 内部処理: init__
     def __init__(self, message: str, line: int = 0):
         self.line = line
         super().__init__(f"Line {line}: {message}" if line else message)
@@ -584,12 +611,14 @@ class PromptLangParser:
     EXTENDS_INLINE_PATTERN = re.compile(r"^@extends:\s*(.+)$")
     MIXIN_REF_PATTERN = re.compile(r"^@mixin:\s*\[([^\]]+)\]$")
 
+    # PURPOSE: 内部処理: init__
     def __init__(self, content: str):
         self.content = content
         self.lines = content.split("\n")
         self.pos = 0
         self.prompt: Optional[Prompt] = None
 
+    # PURPOSE: Parse the content and return a Prompt object.
     def parse(self) -> Prompt:
         """Parse the content and return a Prompt object."""
         self._skip_empty_lines()
@@ -603,6 +632,7 @@ class PromptLangParser:
 
         return self.prompt
 
+    # PURPOSE: Skip empty lines and comments.
     def _skip_empty_lines(self):
         """Skip empty lines and comments."""
         while self.pos < len(self.lines):
@@ -611,12 +641,14 @@ class PromptLangParser:
                 break
             self.pos += 1
 
+    # PURPOSE: Get current line.
     def _current_line(self) -> str:
         """Get current line."""
         if self.pos < len(self.lines):
             return self.lines[self.pos].rstrip()
         return ""
 
+    # PURPOSE: Parse #prompt header.
     def _parse_header(self):
         """Parse #prompt header."""
         line = self._current_line()
@@ -627,6 +659,7 @@ class PromptLangParser:
         self.prompt = Prompt(name=match.group(1))
         self.pos += 1
 
+    # PURPOSE: Parse a block (@role, @goal, etc.).
     def _parse_block(self):
         """Parse a block (@role, @goal, etc.)."""
         line = self._current_line()
@@ -691,6 +724,7 @@ class PromptLangParser:
         elif block_type == "@context":
             self.prompt.context = self._parse_context_content()
 
+    # PURPOSE: Parse indented text content.
     def _parse_text_content(self) -> str:
         """Parse indented text content."""
         lines = []
@@ -707,6 +741,7 @@ class PromptLangParser:
                 break
         return "\n".join(lines)
 
+    # PURPOSE: Parse list items.
     def _parse_list_content(self) -> list[str]:
         """Parse list items."""
         items = []
@@ -724,6 +759,7 @@ class PromptLangParser:
                 break
         return items
 
+    # PURPOSE: Parse format content (may include fenced code block).
     def _parse_format_content(self) -> str:
         """Parse format content (may include fenced code block)."""
         lines = []
@@ -767,6 +803,7 @@ class PromptLangParser:
 
         return "\n".join(lines)
 
+    # PURPOSE: Parse example items.
     def _parse_example_content(self) -> list[dict]:
         """Parse example items."""
         examples = []
@@ -798,6 +835,7 @@ class PromptLangParser:
 
         return examples
 
+    # PURPOSE: Parse tool/resource items.
     def _parse_tool_content(self) -> dict[str, str]:
         """Parse tool/resource items."""
         items = {}
@@ -815,6 +853,7 @@ class PromptLangParser:
                 break
         return items
 
+    # PURPOSE: Parse @context block content.
     def _parse_context_content(self) -> list[ContextItem]:
         """Parse @context block content."""
         items = []
@@ -892,6 +931,7 @@ class PromptLangParser:
 
         return items
 
+    # PURPOSE: Parse @rubric block content.
     def _parse_rubric_content(self) -> Rubric:
         """Parse @rubric block content."""
         rubric = Rubric()
@@ -966,6 +1006,7 @@ class PromptLangParser:
 
         return rubric
 
+    # PURPOSE: Parse @activation block content.
     def _parse_activation_content(self) -> Activation:
         """Parse @activation block content."""
         activation = Activation()
@@ -1005,6 +1046,7 @@ class PromptLangParser:
 
         return activation
 
+    # PURPOSE: Parse @if/@else/@endif block.
     def _parse_condition_block(self) -> Optional[Condition]:
         """Parse @if/@else/@endif block."""
         line = self._current_line()
@@ -1035,6 +1077,7 @@ class PromptLangParser:
                 self.pos += 1
                 return condition
             elif line.startswith("  "):
+# PURPOSE: Parse a .prompt file.
                 if_lines.append(line[2:])
                 self.pos += 1
             elif line == "":
@@ -1047,6 +1090,7 @@ class PromptLangParser:
         # Collect else_content until @endif
         else_lines = []
         while self.pos < len(self.lines):
+# PURPOSE: Parse content with multiple prompts and mixins.
             line = self._current_line()
             if line == "@endif":
                 self.pos += 1
@@ -1129,6 +1173,7 @@ def parse_all(content: str) -> ParseResult:
                 rubric=prompt.rubric,
                 activation=prompt.activation,
                 context=prompt.context,
+# PURPOSE: Merge parent into child. Child takes precedence for scalar fields.
             )
             result.mixins[name] = mixin
             continue
@@ -1162,6 +1207,7 @@ def _merge(parent: Prompt | Mixin, child: Prompt) -> Prompt:
     """
     Merge parent into child. Child takes precedence for scalar fields.
 
+# PURPOSE: Resolve extends and mixins for a prompt.
     Rules:
         - str fields (role, goal, format): child overrides
         - list fields (constraints, examples, context): concatenate (parent + child)
@@ -1191,6 +1237,7 @@ def _merge(parent: Prompt | Mixin, child: Prompt) -> Prompt:
     )
 
 
+# PURPOSE: Internal resolver with cycle detection.
 def resolve(prompt: Prompt, registry: ParseResult) -> Prompt:
     """
     Resolve extends and mixins for a prompt.
@@ -1228,6 +1275,7 @@ def _resolve_with_chain(
 
     # 1. Apply mixins (left to right)
     for mixin_name in prompt.mixins:
+# PURPOSE: Validate a .prompt file.
         mixin = registry.get_mixin(mixin_name)
         if not mixin:
             raise ReferenceError(mixin_name)
@@ -1249,6 +1297,7 @@ def _resolve_with_chain(
 
         # Recursively resolve parent if it's a Prompt
         if isinstance(parent, Prompt) and (parent.extends or parent.mixins):
+# PURPOSE: 関数: main
             parent = _resolve_with_chain(parent, registry, visited, chain)
 
         result = _merge(parent, result)

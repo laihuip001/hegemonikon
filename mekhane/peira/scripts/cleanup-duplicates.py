@@ -12,6 +12,7 @@ ROOT_DIR = os.path.join("Raw", "aidb")
 MANIFEST_FILE = os.path.join(ROOT_DIR, "_index", "manifest.jsonl")
 
 
+# PURPOSE: 関数: main
 def main():
     # Load manifest
     manifest_paths = set()

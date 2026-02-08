@@ -20,6 +20,7 @@ from typing import Optional
 
 
 @dataclass
+# PURPOSE: Metrika 5門の検証結果
 class MetrikaResult:
     """Metrika 5門の検証結果"""
 
@@ -32,12 +33,14 @@ class MetrikaResult:
     violations: list[str] = field(default_factory=list)
 
     @property
+    # PURPOSE: 関数: passed
     def passed(self) -> bool:
         return all(
             [self.dokime, self.syntomia, self.prosbasimotes, self.atomos, self.katharos]
         )
 
 
+# PURPOSE: 技術負債項目
 @dataclass
 class ChreosItem:
     """技術負債項目"""
@@ -49,6 +52,7 @@ class ChreosItem:
     status: str  # "healthy", "warning", "rotten"
 
 
+# PURPOSE: コード考古学発見物
 @dataclass
 class PalimpsestItem:
     """コード考古学発見物"""
@@ -58,6 +62,7 @@ class PalimpsestItem:
     content: str
     hypothesis: str
 
+# PURPOSE: 品質門 - Hegemonikón品質体系の実装
 
 class QualityGate:
     """品質門 - Hegemonikón品質体系の実装"""
@@ -83,6 +88,7 @@ class QualityGate:
     }
     MAGIC_NUMBER = re.compile(r"(?<![a-zA-Z_])\d{3,}(?![a-zA-Z_])")
 
+    # PURPOSE: ファイルの品質を検証
     def check_file(self, file_path: str) -> dict:
         """ファイルの品質を検証"""
         path = Path(file_path)
@@ -99,6 +105,7 @@ class QualityGate:
             "palimpsest": self.check_palimpsest(lines),
         }
 
+    # PURPOSE: Metrika 5門の検証
     def check_metrika(self, lines: list[str]) -> MetrikaResult:
         """Metrika 5門の検証"""
         result = MetrikaResult()
@@ -128,6 +135,7 @@ class QualityGate:
 
         return result
 
+    # PURPOSE: Chreos: 技術負債検出
     def check_chreos(self, lines: list[str]) -> list[ChreosItem]:
         """Chreos: 技術負債検出"""
         items = []
@@ -172,6 +180,7 @@ class QualityGate:
 
         return items
 
+    # PURPOSE: Palimpsest: コード考古学
     def check_palimpsest(self, lines: list[str]) -> list[PalimpsestItem]:
         """Palimpsest: コード考古学"""
         items = []
@@ -203,6 +212,7 @@ class QualityGate:
 
         return items
 
+    # PURPOSE: ネスト深度を測定
     def _measure_nesting(self, lines: list[str]) -> int:
         """ネスト深度を測定"""
         max_depth = 0
@@ -213,6 +223,7 @@ class QualityGate:
                 max_depth = max(max_depth, depth)
         return max_depth
 
+    # PURPOSE: コメントアウトされたコード行を検出
     def _detect_commented_code(self, lines: list[str]) -> list[int]:
         """コメントアウトされたコード行を検出"""
         code_patterns = [
@@ -229,6 +240,7 @@ class QualityGate:
                     break
         return commented
 
+    # PURPOSE: 考古学的仮説を生成
     def _generate_hypothesis(self, pattern: str) -> str:
         """考古学的仮説を生成"""
         hypotheses = {
@@ -239,6 +251,7 @@ class QualityGate:
         }
         return hypotheses.get(pattern, "不明 — git log で調査が必要")
 
+    # PURPOSE: 検証結果をフォーマット
     def format_report(self, result: dict) -> str:
         """検証結果をフォーマット"""
         lines = [

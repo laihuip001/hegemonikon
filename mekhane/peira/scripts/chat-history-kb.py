@@ -36,6 +36,7 @@ MODELS_DIR = Path(r"M:\Hegemonikon\forge\models\bge-small")
 EMBEDDING_DIM = 384  # BGE-small
 
 
+# PURPOSE: Check if required packages are installed.
 def check_dependencies():
     """Check if required packages are installed."""
     missing = []
@@ -63,9 +64,11 @@ def check_dependencies():
     return True
 
 
+# PURPOSE: ONNX-based text embedding (reused from aidb-kb.py).
 class Embedder:
     """ONNX-based text embedding (reused from aidb-kb.py)."""
 
+    # PURPOSE: 内部処理: init__
     def __init__(self):
         import onnxruntime as ort
         from tokenizers import Tokenizer
@@ -86,6 +89,7 @@ class Embedder:
         self.tokenizer.enable_truncation(max_length=512)
         self.tokenizer.enable_padding(length=512)
 
+    # PURPOSE: Generate embedding for text.
     def embed(self, text: str) -> list:
         """Generate embedding for text."""
         encoded = self.tokenizer.encode(text)
@@ -111,6 +115,7 @@ class Embedder:
         normalized = pooled / norm
 
         return normalized[0].tolist()
+# PURPOSE: Get all sessions from brain directory.
 
 
 def get_sessions() -> list[dict]:
@@ -158,6 +163,7 @@ def get_sessions() -> list[dict]:
             )
 
     return sessions
+# PURPOSE: Load last sync timestamp.
 
 
 def load_sync_state() -> Optional[datetime]:
@@ -172,6 +178,7 @@ def load_sync_state() -> Optional[datetime]:
     if ts:
         return datetime.fromisoformat(ts.replace("Z", "+00:00"))
     return None
+# PURPOSE: Save current sync timestamp.
 
 
 def save_sync_state():
@@ -182,6 +189,7 @@ def save_sync_state():
     with open(SYNC_STATE_FILE, "w") as f:
         # Use timezone-aware UTC
         json.dump({"last_sync": datetime.now(timezone.utc).isoformat()}, f)
+# PURPOSE: Build LanceDB index.
 
 
 def build_index(incremental: bool = False, report_mode: bool = False):
@@ -332,6 +340,7 @@ def build_index(incremental: bool = False, report_mode: bool = False):
             )
         else:
             print(f"Error writing to DB: {e}")
+# PURPOSE: Semantic search.
 
 
 def search(query: str, n_results: int = 5):
@@ -363,6 +372,7 @@ def search(query: str, n_results: int = 5):
         print(f"    Updated: {r['updated_at']}")
 
     print("\n" + "-" * 60)
+# PURPOSE: Show statistics.
 
 
 def show_stats():
@@ -412,6 +422,7 @@ def show_stats():
         print(f"\nLast Sync: Never")
 
     print("=" * 40)
+# PURPOSE: Download ONNX embedding model.
 
 
 def setup_model():
@@ -447,6 +458,7 @@ def setup_model():
             return
 
     print("[OK] Model downloaded successfully!")
+# PURPOSE: 関数: main
 
 
 def main():

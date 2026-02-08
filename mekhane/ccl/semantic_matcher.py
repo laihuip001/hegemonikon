@@ -20,6 +20,7 @@ except ImportError:
 
 
 @dataclass
+# PURPOSE: A matched macro with similarity score.
 class MacroMatch:
     """A matched macro with similarity score."""
 
@@ -101,11 +102,13 @@ MACRO_DESCRIPTIONS_JP = {
 }
 
 
+# PURPOSE: Matches natural language to macros using embeddings.
 class SemanticMacroMatcher:
     """Matches natural language to macros using embeddings."""
 
     MODEL_NAME = "paraphrase-multilingual-MiniLM-L12-v2"
 
+    # PURPOSE: Initialize the semantic matcher.
     def __init__(self, registry: Optional[MacroRegistry] = None):
         """
         Initialize the semantic matcher.
@@ -125,6 +128,7 @@ class SemanticMacroMatcher:
             except Exception:
                 pass  # TODO: Add proper error handling
 
+    # PURPOSE: Build embedding index for all macro descriptions.
     def _build_index(self):
         """Build embedding index for all macro descriptions."""
         if not self.model:
@@ -141,10 +145,12 @@ class SemanticMacroMatcher:
             for i, term in enumerate(all_terms):
                 self.embeddings[term] = embeddings[i]
 
+    # PURPOSE: Check if semantic matching is available.
     def is_available(self) -> bool:
         """Check if semantic matching is available."""
         return self.model is not None and len(self.embeddings) > 0
 
+    # PURPOSE: Find macros that semantically match the query.
     def match(self, query: str, top_k: int = 3) -> List[MacroMatch]:
         """
         Find macros that semantically match the query.
@@ -188,6 +194,7 @@ class SemanticMacroMatcher:
 
         return results
 
+    # PURPOSE: Suggest the best macro for a query if confidence is high enough.
     def suggest(self, query: str, threshold: float = 0.6) -> Optional[Macro]:
         """
         Suggest the best macro for a query if confidence is high enough.

@@ -22,6 +22,7 @@ from typing import Optional
 
 
 @dataclass
+# PURPOSE: A single orthogonal review perspective = Domain × Axis.
 class Perspective:
     """A single orthogonal review perspective = Domain × Axis."""
 
@@ -36,14 +37,17 @@ class Perspective:
     theorem: str
 
     @property
+    # PURPOSE: Unique perspective ID.
     def id(self) -> str:
         """Unique perspective ID."""
         return f"{self.domain_id}-{self.axis_id}"
 
     @property
+    # PURPOSE: Human-readable perspective name.
     def name(self) -> str:
         """Human-readable perspective name."""
         return f"{self.domain_name} × {self.axis_name}"
+# PURPOSE: 20 Domains × 6 Axes = 120 Orthogonal Perspectives.
 
 
 class PerspectiveMatrix:
@@ -56,6 +60,7 @@ class PerspectiveMatrix:
         prompt = matrix.generate_prompt(perspective)
     """
 
+    # PURPOSE: 内部処理: init__
     def __init__(self, config: dict):
         self._config = config
         self._domains = {d["id"]: d for d in config["domains"]}
@@ -63,6 +68,7 @@ class PerspectiveMatrix:
         self._template = config["prompt_template"]
 
     @classmethod
+    # PURPOSE: Load perspective matrix from YAML.
     def load(cls, path: Optional[Path] = None) -> "PerspectiveMatrix":
         """Load perspective matrix from YAML."""
         if path is None:
@@ -74,20 +80,24 @@ class PerspectiveMatrix:
         return cls(config)
 
     @property
+    # PURPOSE: List of domain IDs.
     def domains(self) -> list[str]:
         """List of domain IDs."""
         return list(self._domains.keys())
 
     @property
+    # PURPOSE: List of axis IDs.
     def axes(self) -> list[str]:
         """List of axis IDs."""
         return list(self._axes.keys())
 
     @property
+    # PURPOSE: Total number of perspectives.
     def total_perspectives(self) -> int:
         """Total number of perspectives."""
         return len(self._domains) * len(self._axes)
 
+    # PURPOSE: Get a specific perspective by domain and axis.
     def get(self, domain_id: str, axis_id: str) -> Perspective:
         """Get a specific perspective by domain and axis."""
         domain = self._domains.get(domain_id)
@@ -110,6 +120,7 @@ class PerspectiveMatrix:
             theorem=axis["theorem"],
         )
 
+    # PURPOSE: Generate all 120 perspectives.
     def all_perspectives(self) -> list[Perspective]:
         """Generate all 120 perspectives."""
         perspectives = []
@@ -118,6 +129,7 @@ class PerspectiveMatrix:
                 perspectives.append(self.get(domain_id, axis_id))
         return perspectives
 
+    # PURPOSE: Generate review prompt for a perspective.
     def generate_prompt(self, perspective: Perspective) -> str:
         """Generate review prompt for a perspective."""
         return self._template.format(
@@ -132,6 +144,7 @@ class PerspectiveMatrix:
             theorem=perspective.theorem,
         )
 
+    # PURPOSE: Generate prompts for all 120 perspectives.
     def generate_all_prompts(self) -> dict[str, str]:
         """Generate prompts for all 120 perspectives."""
         prompts = {}
@@ -139,6 +152,8 @@ class PerspectiveMatrix:
             prompts[p.id] = self.generate_prompt(p)
         return prompts
 
+# PURPOSE: CLI entry point.
+    # PURPOSE: Split perspectives into batches for rate limiting.
     def batch_perspectives(self, batch_size: int = 60) -> list[list[Perspective]]:
         """Split perspectives into batches for rate limiting."""
         all_p = self.all_perspectives()

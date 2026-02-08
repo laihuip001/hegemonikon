@@ -21,6 +21,23 @@ category_theory:
 derivatives:
   "+": 詳細起動（全ステップ展開、Handoff 10件、KI 5件）→ boot/identity.md 参照
   "-": 高速起動（最小情報のみ、1分で開始）
+sel_enforcement:
+  "+":
+    description: "MUST expand ALL steps, show detailed output for each Phase"
+    minimum_requirements:
+      - "Handoff: 10件の個別要約を出力（各 Handoff のS/A/Rを1行以上）"
+      - "KI: 5件の深読み（サマリー引用+自分の解釈を記述）"
+      - "各Phase: 展開された詳細を出力（テーブル+補足説明）"
+      - "Self-Profile: ミスパターンとの摩擦を明示（L3）"
+      - "意味ある瞬間: 各瞬間に対する自分の解釈を記述"
+      - "出力前自問: 「+と−で出力に差があるか？差がなければ違反」"
+    post_check: "出力文字数が /boot 標準の 1.5 倍以上であること"
+  "-":
+    description: "MAY provide minimal summary only"
+    minimum_requirements:
+      - "サマリーテーブル1枚のみ"
+      - "タスク提案 1-2件"
+    post_check: "1分以内に完了すること"
 ---
 
 # /boot ワークフロー

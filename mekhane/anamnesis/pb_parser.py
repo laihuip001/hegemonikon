@@ -13,6 +13,7 @@ from pathlib import Path
 from datetime import datetime
 
 
+# PURPOSE: Varint デコード
 def parse_varint(data: bytes, pos: int):
     """Varint デコード"""
     result = 0
@@ -27,6 +28,7 @@ def parse_varint(data: bytes, pos: int):
     return result, pos
 
 
+# PURPOSE: Protocol Buffers から全てのテキスト文字列を抽出
 def extract_text_from_pb(filepath: Path):
     """
     Protocol Buffers から全てのテキスト文字列を抽出
@@ -85,6 +87,7 @@ def extract_text_from_pb(filepath: Path):
     return texts
 
 
+# PURPOSE: 抽出したテキストを Markdown として保存
 def save_as_markdown(texts: list, output_path: Path, source_name: str):
     """抽出したテキストを Markdown として保存"""
     with open(output_path, "w", encoding="utf-8") as f:
@@ -103,6 +106,7 @@ def save_as_markdown(texts: list, output_path: Path, source_name: str):
     print(f"[OK] Saved: {output_path}")
 
 
+# PURPOSE: 関数: main
 def main():
     import sys
 

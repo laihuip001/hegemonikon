@@ -30,6 +30,7 @@ TRACES_PATH = Path("/home/makaron8426/oikos/mneme/.hegemonikon/meaningful_traces
 
 
 @dataclass
+# PURPOSE: A moment marked as meaningful by Claude.
 class MeaningfulTrace:
     """A moment marked as meaningful by Claude."""
 
@@ -39,17 +40,21 @@ class MeaningfulTrace:
     session_id: Optional[str] = None
     context: Optional[str] = None
 
+    # PURPOSE: 関数: to_dict
     def to_dict(self) -> dict:
         return asdict(self)
 
     @classmethod
+    # PURPOSE: 関数: from_dict
     def from_dict(cls, data: dict) -> "MeaningfulTrace":
         return cls(**data)
+# PURPOSE: Ensure the persistence directory exists.
 
 
 def ensure_traces_dir() -> None:
     """Ensure the persistence directory exists."""
     TRACES_PATH.parent.mkdir(parents=True, exist_ok=True)
+# PURPOSE: Mark a moment as meaningful.
 
 
 def mark_meaningful(
@@ -92,17 +97,20 @@ def mark_meaningful(
 
 # Session-local storage (cleared each session, saved at /bye)
 _session_traces: List[MeaningfulTrace] = []
+# PURPOSE: Get all traces marked in this session.
 
 
 def get_session_traces() -> List[MeaningfulTrace]:
     """Get all traces marked in this session."""
     return _session_traces.copy()
+# PURPOSE: Clear session traces (called after saving).
 
 
 def clear_session_traces() -> None:
     """Clear session traces (called after saving)."""
     global _session_traces
     _session_traces = []
+# PURPOSE: Save all traces to file.
 
 
 def save_traces(path: Optional[Path] = None) -> Path:
@@ -131,6 +139,7 @@ def save_traces(path: Optional[Path] = None) -> Path:
     clear_session_traces()
 
     return target_path
+# PURPOSE: Load traces from file.
 
 
 def load_traces(path: Optional[Path] = None) -> List[MeaningfulTrace]:
@@ -151,6 +160,7 @@ def load_traces(path: Optional[Path] = None) -> List[MeaningfulTrace]:
         data = json.load(f)
 
     return [MeaningfulTrace.from_dict(t) for t in data]
+# PURPOSE: Get the most recent meaningful traces.
 
 
 def get_recent_traces(n: int = 5, min_intensity: int = 1) -> List[MeaningfulTrace]:
@@ -168,6 +178,7 @@ def get_recent_traces(n: int = 5, min_intensity: int = 1) -> List[MeaningfulTrac
     filtered = [t for t in all_traces if t.intensity >= min_intensity]
     sorted_traces = sorted(filtered, key=lambda t: t.timestamp, reverse=True)
     return sorted_traces[:n]
+# PURPOSE: Format traces for display at /boot.
 
 
 def format_traces_for_boot(traces: List[MeaningfulTrace]) -> str:

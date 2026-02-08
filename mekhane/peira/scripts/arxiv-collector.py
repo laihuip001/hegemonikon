@@ -38,9 +38,11 @@ if sys.platform == "win32":
     sys.stdout.reconfigure(encoding="utf-8")
 
 
+# PURPOSE: ONNX-based text embedding (Self-contained).
 class Embedder:
     """ONNX-based text embedding (Self-contained)."""
 
+    # PURPOSE: 内部処理: init__
     def __init__(self):
         import onnxruntime as ort
         from tokenizers import Tokenizer
@@ -61,6 +63,7 @@ class Embedder:
         self.tokenizer.enable_truncation(max_length=512)
         self.tokenizer.enable_padding(length=512)
 
+    # PURPOSE: 関数: embed
     def embed(self, text: str) -> list:
         encoded = self.tokenizer.encode(text)
         input_ids = self.np.array([encoded.ids], dtype=self.np.int64)
@@ -83,6 +86,7 @@ class Embedder:
         normalized = pooled / norm
 
         return normalized[0].tolist()
+# PURPOSE: Extract arXiv links from all AIDB markdown files.
 
 
 def extract_arxiv_links():
@@ -134,6 +138,7 @@ def extract_arxiv_links():
     print("\nTop referenced papers:")
     for p in top_sources:
         print(f"  {p['arxiv_id']}: {len(p['source_articles'])} articles")
+# PURPOSE: Fetch paper metadata from arXiv API.
 
 
 def fetch_metadata():
@@ -191,6 +196,7 @@ def fetch_metadata():
 
     print(f"\n[OK] Fetched {len(papers)} papers")
     print(f"    Saved to: {PAPERS_METADATA_FILE}")
+# PURPOSE: Build LanceDB index from paper metadata.
 
 
 def build_index():
@@ -249,6 +255,7 @@ def build_index():
     print(f"\n[OK] Index built successfully!")
     print(f"  Location: {LANCE_DIR}")
     print(f"  Papers: {len(all_data)}")
+# PURPOSE: Search papers by semantic similarity.
 
 
 def search_papers(query: str, n_results: int = 5):
@@ -282,6 +289,7 @@ def search_papers(query: str, n_results: int = 5):
         print(f"    PDF: {r['pdf_url']}")
 
     print("\n" + "-" * 70)
+# PURPOSE: Show paper database statistics.
 
 
 def show_stats():
@@ -322,6 +330,7 @@ def show_stats():
         print("Indexed Papers: (not yet indexed)")
 
     print("=" * 40)
+# PURPOSE: 関数: main
 
 
 def main():

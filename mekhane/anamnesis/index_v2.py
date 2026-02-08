@@ -47,9 +47,11 @@ if sys.platform == "win32":
         pass  # TODO: Add proper error handling
 
 
+# PURPOSE: ONNX-based text embedding (BGE-small)
 class Embedder:
     """ONNX-based text embedding (BGE-small)"""
 
+    # PURPOSE: 内部処理: init__
     def __init__(self, model_dir: Optional[Path] = None):
         if not EMBEDDER_AVAILABLE:
             raise ImportError(
@@ -71,10 +73,12 @@ class Embedder:
         self.tokenizer.enable_padding(pad_to_multiple_of=8)
         self.dimension = 384  # BGE-small
 
+    # PURPOSE: 単一テキストを埋め込み
     def embed(self, text: str) -> np.ndarray:
         """単一テキストを埋め込み"""
         return self.embed_batch([text])[0]
 
+    # PURPOSE: バッチ埋め込み
     def embed_batch(self, texts: List[str]) -> np.ndarray:
         """バッチ埋め込み"""
         encoded_batch = self.tokenizer.encode_batch(texts)
@@ -109,6 +113,7 @@ class Embedder:
         norm[norm == 0] = 1e-12
         normalized = pooled / norm
 
+# PURPOSE: Gnōsis論文インデックス V2
         return normalized.astype(np.float32)
 
 
@@ -120,6 +125,7 @@ class GnosisIndexV2:
     既存GnosisIndexとの互換APIを提供。
     """
 
+    # PURPOSE: 内部処理: init__
     def __init__(
         self,
         adapter: str = "hnswlib",
@@ -151,11 +157,13 @@ class GnosisIndexV2:
         self._primary_key_cache: set = set()
 
     @property
+    # PURPOSE: 関数: embedder
     def embedder(self) -> Embedder:
         if self._embedder is None:
             self._embedder = Embedder()
         return self._embedder
 
+    # PURPOSE: 内部処理: load
     def _load(self) -> None:
         try:
             self.store.load(str(self.index_path))
@@ -166,12 +174,14 @@ class GnosisIndexV2:
             print(f"[GnosisIndexV2] Failed to load index: {e}")
             self.store.create_index(dimension=self._dimension)
 
+    # PURPOSE: 内部処理: save
     def _save(self) -> None:
         self.store.save(str(self.index_path))
         print(
             f"[GnosisIndexV2] Saved {self.store.count()} vectors to {self.index_path}"
         )
 
+    # PURPOSE: 関数: add_papers
     def add_papers(self, papers: list, dedupe: bool = True) -> int:
         if not papers:
             return 0
@@ -214,6 +224,7 @@ class GnosisIndexV2:
         print(f"[GnosisIndexV2] Added {len(ids)} papers")
         return len(ids)
 
+    # PURPOSE: 関数: search
     def search(self, query: str, k: int = 10) -> List[Dict[str, Any]]:
         if self.store.count() == 0:
             print("[GnosisIndexV2] No papers indexed yet")
@@ -224,6 +235,7 @@ class GnosisIndexV2:
 
         return [{"id": r.id, "score": r.score, **r.metadata} for r in results]
 
+    # PURPOSE: 関数: stats
     def stats(self) -> Dict[str, Any]:
         return {
             "total": self.store.count(),
@@ -231,6 +243,7 @@ class GnosisIndexV2:
             "index_path": str(self.index_path),
         }
 
+    # PURPOSE: 取得: get_stats
     def get_stats(self) -> Dict[str, Any]:
         stats = self.stats()
         return {

@@ -12,6 +12,7 @@ RESTORED_MANIFEST = os.path.join(ROOT_DIR, "_index", "manifest_restored.jsonl")
 HEADERS = {"User-Agent": "Mozilla/5.0"}
 
 
+# PURPOSE: 取得: get_session_cookies
 def get_session_cookies():
     cookie_file = os.path.join(ROOT_DIR, "_index", "session_cookies.txt")
     cookies = {}
@@ -28,6 +29,7 @@ def get_session_cookies():
 COOKIES = get_session_cookies()
 
 
+# PURPOSE: 取得: fetch_article
 def fetch_article(url):
     try:
         resp = requests.get(url, headers=HEADERS, cookies=COOKIES, timeout=15)
@@ -39,6 +41,7 @@ def fetch_article(url):
         return None
 
 
+# PURPOSE: パース/抽出: parse_date
 def parse_date(date_str):
     # Same date parser as before
     import re
@@ -53,6 +56,7 @@ def parse_date(date_str):
     return datetime.date.today().strftime("%Y.%m.%d"), "2026", "01"
 
 
+# PURPOSE: 関数: restore_entry
 def restore_entry(entry):
     url = entry.get("url")
     if not url:
@@ -113,6 +117,7 @@ is_premium: unknown
     return entry
 
 
+# PURPOSE: 関数: main
 def main():
     if not os.path.exists(MANIFEST_FILE):
         print("Manifest not found")

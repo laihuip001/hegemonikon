@@ -37,6 +37,7 @@ HEADERS = {
 MAX_CONCURRENT_REQUESTS = 10
 
 
+# PURPOSE: Load session cookies from file.
 def load_cookies():
     """Load session cookies from file."""
     if os.path.exists(COOKIE_FILE):
@@ -46,6 +47,7 @@ def load_cookies():
     return {}
 
 
+# PURPOSE: Parse various date formats to YYYY.MM.DD.
 def parse_date(date_str):
     """Parse various date formats to YYYY.MM.DD."""
     if not date_str:
@@ -78,6 +80,7 @@ def parse_date(date_str):
     return "0000.00.00", "0000", "00"
 
 
+# PURPOSE: Fetch HTML content asynchronously.
 async def fetch_html_async(url, session):
     """Fetch HTML content asynchronously."""
     try:
@@ -92,6 +95,7 @@ async def fetch_html_async(url, session):
         return {"url": url, "status": "error", "error": str(e)}
 
 
+# PURPOSE: Parse HTML content and extract metadata/markdown (CPU bound).
 def parse_article_content(html_content, url):
     """Parse HTML content and extract metadata/markdown (CPU bound)."""
     try:
@@ -158,6 +162,7 @@ def parse_article_content(html_content, url):
         return {"url": url, "status": "error", "error": str(e)}
 
 
+# PURPOSE: Save article markdown to disk.
 def save_markdown_file(article, batch_id):
     """Save article markdown to disk."""
     post_id = article["url"].split("/")[-1]
@@ -187,6 +192,7 @@ batch_id: {batch_id}
     return filepath
 
 
+# PURPOSE: Append article entry to manifest file.
 def append_to_manifest(article, filepath, batch_id):
     """Append article entry to manifest file."""
     post_id = article["url"].split("/")[-1]
@@ -205,6 +211,7 @@ def append_to_manifest(article, filepath, batch_id):
         f.write(json.dumps(manifest_entry, ensure_ascii=False) + "\n")
 
 
+# PURPOSE: Process a single URL: fetch, parse, save markdown.
 async def process_single_url(url, session, semaphore, batch_id):
     """Process a single URL: fetch, parse, save markdown."""
     async with semaphore:
@@ -229,6 +236,7 @@ async def process_single_url(url, session, semaphore, batch_id):
     return article
 
 
+# PURPOSE: Main async processing loop.
 async def process_urls_async(target_urls, batch_id):
     """Main async processing loop."""
     semaphore = asyncio.Semaphore(MAX_CONCURRENT_REQUESTS)
@@ -285,6 +293,7 @@ async def process_urls_async(target_urls, batch_id):
     print(f"\n[Fast Collect] Completed: {success_count} success, {error_count} errors")
 
 
+# PURPOSE: 関数: main
 def main():
     if len(sys.argv) < 3:
         print(

@@ -29,6 +29,7 @@ from typing import Optional, List, Dict, Any
 from enum import Enum
 
 
+# PURPOSE: O3 Zētēsis の派生モード
 class ZetesisDerivative(Enum):
     """O3 Zētēsis の派生モード"""
 
@@ -37,6 +38,7 @@ class ZetesisDerivative(Enum):
     PIVOT = "pivot"  # 転換 (前提破壊)
 
 
+# PURPOSE: 問いの種類
 class QuestionType(Enum):
     """問いの種類"""
 
@@ -51,6 +53,7 @@ class QuestionType(Enum):
 
 
 @dataclass
+# PURPOSE: O3 Zētēsis 探求結果
 class ZetesisResult:
     """O3 Zētēsis 探求結果
 
@@ -71,14 +74,17 @@ class ZetesisResult:
     insights: List[str] = field(default_factory=list)
 
     @property
+    # PURPOSE: 生成した問いの数
     def question_count(self) -> int:
         """生成した問いの数"""
         return len(self.generated_questions)
 
     @property
+    # PURPOSE: 洞察があるか
     def has_insight(self) -> bool:
         """洞察があるか"""
         return len(self.insights) > 0
+# PURPOSE: Five Whysパターンで問いを生成
 
 
 def _generate_five_whys(topic: str, seed: str) -> List[str]:
@@ -90,6 +96,7 @@ def _generate_five_whys(topic: str, seed: str) -> List[str]:
         f"根本的な要因は？",
         f"どうすれば根本解決できるか？",
     ]
+# PURPOSE: 広域探索パターンで問いを生成
 
 
 def _generate_wide_questions(topic: str, seed: str) -> List[str]:
@@ -101,6 +108,7 @@ def _generate_wide_questions(topic: str, seed: str) -> List[str]:
         f"異なる分野での解決策は？",
         f"ステークホルダー全員の視点は？",
     ]
+# PURPOSE: 転換パターンで問いを生成
 
 
 def _generate_pivot_questions(topic: str, seed: str) -> List[str]:
@@ -112,6 +120,7 @@ def _generate_pivot_questions(topic: str, seed: str) -> List[str]:
         f"10倍のリソースがあったら？",
         f"10分の1のリソースしかなかったら？",
     ]
+# PURPOSE: O3 Zētēsis: 探求を実行
 
 
 def inquire(
@@ -166,6 +175,7 @@ def inquire(
         depth=depth,
         insights=insights,
     )
+# PURPOSE: O3 Zētēsis 結果をMarkdown形式でフォーマット
 
 
 def format_zetesis_markdown(result: ZetesisResult) -> str:
@@ -185,6 +195,7 @@ def format_zetesis_markdown(result: ZetesisResult) -> str:
             lines.append(f"│   • {insight[:40]}")
     lines.append("└──────────────────────────────────────────────────┘")
     return "\n".join(lines)
+# PURPOSE: FEP観察空間へのエンコード
 
 
 def encode_zetesis_observation(result: ZetesisResult) -> dict:

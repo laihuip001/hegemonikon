@@ -16,6 +16,7 @@ import re
 
 
 @dataclass
+# PURPOSE: 検証エラー
 class ValidationError:
     """検証エラー"""
 
@@ -26,6 +27,7 @@ class ValidationError:
 
 
 @dataclass
+# PURPOSE: 検証結果
 class ValidationResult:
     """検証結果"""
 
@@ -34,6 +36,7 @@ class ValidationResult:
     warnings: List[str]
 
     @property
+    # PURPOSE: 再生成用の指示を生成
     def regeneration_instruction(self) -> str:
         """再生成用の指示を生成"""
         if self.valid:
@@ -69,10 +72,12 @@ OPERATOR_MIN_LINES: Dict[str, int] = {
     "+": 15,
 }
 
+# PURPOSE: CCL 出力検証器
 
 class CCLOutputValidator:
     """CCL 出力検証器"""
 
+    # PURPOSE: CCL 式から演算子を抽出
     def parse_operators(self, ccl_expr: str) -> Set[str]:
         """CCL 式から演算子を抽出"""
         operators = set()
@@ -81,6 +86,7 @@ class CCLOutputValidator:
                 operators.add(char)
         return operators
 
+    # PURPOSE: 必須セクションの存在確認
     def check_required_sections(
         self, output: str, operators: Set[str]
     ) -> List[ValidationError]:
@@ -111,6 +117,7 @@ class CCLOutputValidator:
 
         return errors
 
+    # PURPOSE: 振動演算子の両方向確認
     def check_oscillation_bidirectional(self, output: str) -> List[ValidationError]:
         """振動演算子の両方向確認"""
         errors = []
@@ -131,6 +138,7 @@ class CCLOutputValidator:
 
         return errors
 
+    # PURPOSE: 最小長の確認
     def check_minimum_length(
         self, output: str, operators: Set[str]
     ) -> List[ValidationError]:
@@ -153,6 +161,7 @@ class CCLOutputValidator:
 
         return errors
 
+    # PURPOSE: 演算子理解の証拠確認
     def check_operator_understanding(
         self, output: str, operators: Set[str]
     ) -> List[ValidationError]:
@@ -174,6 +183,7 @@ class CCLOutputValidator:
 
         return errors
 
+    # PURPOSE: 出力を検証
     def validate(self, output: str, ccl_expr: str) -> ValidationResult:
         """出力を検証"""
         operators = self.parse_operators(ccl_expr)

@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/インフラ] <- mekhane/anamnesis/ A0→Library検索CLIが必要→search_library_cliが担う
 """
 Library Search CLI — /lib ワークフローのバックエンド
 
@@ -18,6 +19,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 
+# PURPOSE: Layer 1: activation_triggers キーワード検索
 def cmd_search(args):
     """Layer 1: activation_triggers キーワード検索"""
     from mekhane.anamnesis.library_search import LibrarySearch
@@ -50,6 +52,7 @@ def cmd_search(args):
                 print()
 
 
+# PURPOSE: Layer 2: hegemonikon_mapping ベース WF 連携検索
 def cmd_mapping(args):
     """Layer 2: hegemonikon_mapping ベース WF 連携検索"""
     from mekhane.anamnesis.library_search import LibrarySearch
@@ -73,6 +76,7 @@ def cmd_mapping(args):
         print()
 
 
+# PURPOSE: Layer 3: セマンティック検索
 def cmd_semantic(args):
     """Layer 3: セマンティック検索"""
     from mekhane.anamnesis.library_search import LibrarySearch
@@ -100,6 +104,7 @@ def cmd_semantic(args):
         print()
 
 
+# PURPOSE: モジュール詳細表示
 def cmd_detail(args):
     """モジュール詳細表示"""
     from mekhane.anamnesis.library_search import LibrarySearch
@@ -131,6 +136,7 @@ def cmd_detail(args):
         print(module.body[:500])
 
 
+# PURPOSE: 統計情報
 def cmd_stats(args):
     """統計情報"""
     from mekhane.anamnesis.library_search import LibrarySearch
@@ -148,6 +154,7 @@ def cmd_stats(args):
         print(f"    {cat:<30} {count:>3}件")
 
 
+# PURPOSE: 関数: main
 def main():
     parser = argparse.ArgumentParser(
         description="Library Search CLI — /lib ワークフローのバックエンド",

@@ -59,6 +59,7 @@ __all__ = [
 
 
 # Zero-Trust imports (lazy to avoid circular imports)
+# PURPOSE: Get ZeroTrustCCLExecutor instance
 def get_zero_trust_executor():
     """Get ZeroTrustCCLExecutor instance"""
     from .executor import ZeroTrustCCLExecutor
@@ -66,6 +67,7 @@ def get_zero_trust_executor():
     return ZeroTrustCCLExecutor()
 
 
+# PURPOSE: Create prompt with injected specs and warnings
 def create_ccl_prompt(ccl_expr: str) -> str:
     """Create prompt with injected specs and warnings"""
     from .executor import create_ccl_prompt as _create
@@ -73,6 +75,7 @@ def create_ccl_prompt(ccl_expr: str) -> str:
     return _create(ccl_expr)
 
 
+# PURPOSE: Validate CCL output
 def validate_ccl_output(ccl_expr: str, output: str):
     """Validate CCL output"""
     from .executor import validate_ccl_output as _validate

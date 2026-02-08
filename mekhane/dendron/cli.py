@@ -41,6 +41,9 @@ def main() -> int:
     check_parser.add_argument(
         "--no-dirs", action="store_true", help="ディレクトリの PROOF.md チェックをスキップ"
     )
+    check_parser.add_argument(
+        "--ept", action="store_true", help="EPT フルマトリクス (NF2/NF3/BCNF) を有効化"
+    )
 
     # purpose コマンド (v2.6)
     purpose_parser = subparsers.add_parser("purpose", help="L2 Purpose 品質チェック")
@@ -96,6 +99,9 @@ def cmd_check(args: argparse.Namespace) -> int:  # noqa: AI-005 # noqa: AI-ALL
     checker = DendronChecker(
         check_dirs=not args.no_dirs,
         check_files=True,
+        check_structure=getattr(args, 'ept', False),
+        check_function_nf=getattr(args, 'ept', False),
+        check_verification=getattr(args, 'ept', False),
     )
 
     # チェック実行

@@ -21,6 +21,7 @@ from mekhane.fep.state_spaces import (
 import numpy as np
 
 
+# PURPOSE: Print available observations.
 def print_observation_menu():
     """Print available observations."""
     print("\n📋 利用可能な観測:")
@@ -36,6 +37,7 @@ def print_observation_menu():
     print(f"      q: 終了")
 
 
+# PURPOSE: Print current state beautifully.
 def print_state(result: dict):
     """Print current state beautifully."""
     print(f"\n🧠 現在の信念状態:")
@@ -57,6 +59,7 @@ def print_state(result: dict):
         print(f"   ✅ 高確信: 行動推奨")
 
 
+# PURPOSE: Print policy selection.
 def print_policy(q_pi, neg_efe):
     """Print policy selection."""
     print(f"\n🎯 政策選択 (O2 Boulēsis):")
@@ -71,6 +74,7 @@ def print_policy(q_pi, neg_efe):
     print(f"\n   ➤ 推奨行動: {recommended}")
 
 
+# PURPOSE: Main interactive loop.
 def interactive_loop():
     """Main interactive loop."""
     agent = HegemonikónFEPAgent(use_defaults=True)
@@ -144,6 +148,7 @@ def interactive_loop():
             traceback.print_exc()
 
 
+# PURPOSE: Entry point.
 def main():
     """Entry point."""
     try:

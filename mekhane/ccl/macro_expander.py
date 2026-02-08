@@ -11,6 +11,7 @@ from typing import Tuple, Optional
 from .macro_registry import MacroRegistry
 
 
+# PURPOSE: Expands @macro references in CCL expressions.
 class MacroExpander:
     """Expands @macro references in CCL expressions."""
 
@@ -20,6 +21,7 @@ class MacroExpander:
     # Pattern to match old @N level syntax (for migration)
     OLD_LEVEL_PATTERN = re.compile(r"(@)(\d+)(?!\w)")
 
+    # PURPOSE: Initialize the expander.
     def __init__(self, registry: Optional[MacroRegistry] = None):
         """
         Initialize the expander.
@@ -29,6 +31,7 @@ class MacroExpander:
         """
         self.registry = registry or MacroRegistry()
 
+    # PURPOSE: Expand all @macro references in a CCL expression.
     def expand(self, ccl: str) -> Tuple[str, bool]:
         """
         Expand all @macro references in a CCL expression.
@@ -58,6 +61,7 @@ class MacroExpander:
 
         return result, expanded
 
+    # PURPOSE: Migrate old @N level syntax to new :N syntax.
     def migrate_level_syntax(self, ccl: str) -> str:
         """
         Migrate old @N level syntax to new :N syntax.
@@ -72,6 +76,7 @@ class MacroExpander:
         # But only when @ is followed by just digits (not a macro name)
         return self.OLD_LEVEL_PATTERN.sub(r":\2", ccl)
 
+    # PURPOSE: Check if expression contains macro references.
     def has_macros(self, ccl: str) -> bool:
         """Check if expression contains macro references."""
         for match in self.MACRO_PATTERN.finditer(ccl):
@@ -80,6 +85,7 @@ class MacroExpander:
                 return True
         return False
 
+    # PURPOSE: List all macros used in an expression.
     def list_macros_in_expr(self, ccl: str) -> list:
         """List all macros used in an expression."""
         macros = []

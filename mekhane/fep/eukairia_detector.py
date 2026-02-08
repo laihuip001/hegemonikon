@@ -29,6 +29,7 @@ from typing import Optional, List, Dict, Any
 from enum import Enum
 
 
+# PURPOSE: 機会窓の状態
 class OpportunityWindow(Enum):
     """機会窓の状態"""
 
@@ -37,6 +38,7 @@ class OpportunityWindow(Enum):
     CLOSING = "closing"  # 閉じかけ: 急いで判断必要
 
 
+# PURPOSE: 機会のスケール
 class OpportunityScale(Enum):
     """機会のスケール"""
 
@@ -44,6 +46,7 @@ class OpportunityScale(Enum):
     MACRO = "macro"  # 大局的機会 (長期・大規模)
 
 
+# PURPOSE: 好機判定結果
 class OpportunityDecision(Enum):
     """好機判定結果"""
 
@@ -53,6 +56,7 @@ class OpportunityDecision(Enum):
 
 
 @dataclass
+# PURPOSE: 好機判定結果
 class EukairiaResult:
     """好機判定結果
 
@@ -85,16 +89,19 @@ class EukairiaResult:
     factors: List[str] = field(default_factory=list)
 
     @property
+    # PURPOSE: 今行動すべきか
     def should_act(self) -> bool:
         """今行動すべきか"""
         return self.decision == OpportunityDecision.GO
 
     @property
+    # PURPOSE: 待機すべきか
     def should_wait(self) -> bool:
         """待機すべきか"""
         return self.decision == OpportunityDecision.WAIT
 
     @property
+    # PURPOSE: 純価値 (リターン - リスク)
     def net_value(self) -> float:
         """純価値 (リターン - リスク)"""
         return self.expected_return - self.expected_risk
@@ -103,6 +110,7 @@ class EukairiaResult:
 # =============================================================================
 # 好機評価パラメータ
 # =============================================================================
+# PURPOSE: 機会評価のコンテキスト
 
 
 @dataclass
@@ -123,6 +131,7 @@ class OpportunityContext:
     skills_prepared: float = 0.5
     timing_favorable: float = 0.5
     competition_high: bool = False
+# PURPOSE: 準備度を計算
     deadline_pressure: float = 0.0
 
 
@@ -137,6 +146,7 @@ def _calculate_readiness(ctx: OpportunityContext) -> float:
     # 競争が激しい場合は減点
     if ctx.competition_high:
         base *= 0.8
+# PURPOSE: 機会窓を評価
     return min(1.0, max(0.0, base))
 
 
@@ -147,6 +157,7 @@ def _calculate_window(ctx: OpportunityContext) -> OpportunityWindow:
     elif ctx.timing_favorable >= 0.7 and ctx.deadline_pressure < 0.5:
         return OpportunityWindow.WIDE
     else:
+# PURPOSE: 期待リターンを計算
         return OpportunityWindow.NARROW
 
 
@@ -157,6 +168,7 @@ def _calculate_return(
 ) -> float:
     """期待リターンを計算"""
     # 準備度 × 環境 × 行動価値
+# PURPOSE: 期待リスクを計算
     return readiness * ctx.environment_ready * action_value * 1.5
 
 
@@ -172,6 +184,7 @@ def _calculate_risk(
     # 競争 → 中リスク
     competition_risk = 0.2 if ctx.competition_high else 0.0
 
+# PURPOSE: 見送った場合の機会損失を計算
     return min(1.0, unpreparedness * 0.5 + pressure_risk + competition_risk)
 
 
@@ -185,6 +198,7 @@ def _calculate_opportunity_cost(
         OpportunityWindow.NARROW: 0.6,  # 逃すと痛い
         OpportunityWindow.CLOSING: 0.9,  # ほぼ最後のチャンス
     }
+# PURPOSE: 判定と理由を生成
     return window_factor[window] * action_value
 
 
@@ -223,6 +237,7 @@ def _make_decision(
         decision = OpportunityDecision.WAIT
         rationale = "条件が不十分 — 待機推奨"
 
+# PURPOSE: 推奨アクションを生成
     return decision, rationale
 
 
@@ -243,6 +258,7 @@ def _generate_recommendation(
 
 # =============================================================================
 # Public API
+# PURPOSE: 好機を判定
 # =============================================================================
 
 
@@ -333,6 +349,7 @@ def detect_opportunity(
         readiness_score=readiness,
         recommendation=recommendation,
         factors=factors,
+# PURPOSE: 結果をMarkdown形式でフォーマット
     )
 
 
@@ -379,6 +396,7 @@ def format_eukairia_markdown(result: EukairiaResult) -> str:
     )
 
     return "\n".join(lines)
+# PURPOSE: FEP観察空間へのエンコード
 
 
 # FEP Integration

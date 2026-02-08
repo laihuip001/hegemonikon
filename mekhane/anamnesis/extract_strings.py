@@ -12,6 +12,7 @@ from pathlib import Path
 from datetime import datetime
 
 
+# PURPOSE: バイナリファイルから読める文字列を抽出
 def extract_strings(filepath: Path, min_length: int = 20):
     """
     バイナリファイルから読める文字列を抽出
@@ -53,6 +54,7 @@ def extract_strings(filepath: Path, min_length: int = 20):
     return strings
 
 
+# PURPOSE: 抽出した文字列を Markdown として保存
 def save_as_markdown(strings: list, output_path: Path, source_name: str):
     """抽出した文字列を Markdown として保存"""
     with open(output_path, "w", encoding="utf-8") as f:
@@ -70,6 +72,7 @@ def save_as_markdown(strings: list, output_path: Path, source_name: str):
     print(f"[OK] Saved: {output_path}")
 
 
+# PURPOSE: 関数: main
 def main():
     import sys
 

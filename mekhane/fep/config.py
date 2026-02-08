@@ -31,6 +31,7 @@ PARAMETERS_PATH = Path(__file__).parent / "parameters.yaml"
 
 
 @dataclass
+# PURPOSE: Observation likelihood parameters P(o|s).
 class AMatrixParams:
     """Observation likelihood parameters P(o|s)."""
 
@@ -40,6 +41,7 @@ class AMatrixParams:
 
 
 @dataclass
+# PURPOSE: State transition parameters P(s'|s,a).
 class BMatrixParams:
     """State transition parameters P(s'|s,a)."""
 
@@ -50,6 +52,7 @@ class BMatrixParams:
 
 
 @dataclass
+# PURPOSE: Preference vector parameters.
 class CVectorParams:
     """Preference vector parameters."""
 
@@ -61,6 +64,7 @@ class CVectorParams:
 
 
 @dataclass
+# PURPOSE: Initial belief parameters.
 class DVectorParams:
     """Initial belief parameters."""
 
@@ -70,6 +74,7 @@ class DVectorParams:
 
 
 @dataclass
+# PURPOSE: Agent hyperparameters.
 class HyperParams:
     """Agent hyperparameters."""
 
@@ -81,6 +86,7 @@ class HyperParams:
 
 
 @dataclass
+# PURPOSE: Hegemonikón-specific parameters.
 class HegemonikónParams:
     """Hegemonikón-specific parameters."""
 
@@ -88,6 +94,7 @@ class HegemonikónParams:
 
 
 @dataclass
+# PURPOSE: Complete FEP parameter set.
 class FEPParameters:
     """Complete FEP parameter set.
 
@@ -106,6 +113,7 @@ class FEPParameters:
     confidence: str = "default"
 
 
+# PURPOSE: Extract value from nested YAML structure.
 def _extract_value(data: Dict[str, Any], key: str, default: float) -> float:
     """Extract value from nested YAML structure."""
     if key in data:
@@ -117,6 +125,7 @@ def _extract_value(data: Dict[str, Any], key: str, default: float) -> float:
     return default
 
 
+# PURPOSE: Load FEP parameters from YAML file.
 def load_parameters(path: Optional[Path] = None) -> FEPParameters:
     """Load FEP parameters from YAML file.
 
@@ -218,6 +227,7 @@ def load_parameters(path: Optional[Path] = None) -> FEPParameters:
 _default_params: Optional[FEPParameters] = None
 
 
+# PURPOSE: Get cached default parameters.
 def get_default_params() -> FEPParameters:
     """Get cached default parameters."""
     global _default_params
@@ -226,6 +236,7 @@ def get_default_params() -> FEPParameters:
     return _default_params
 
 
+# PURPOSE: Force reload parameters from disk.
 def reload_params() -> FEPParameters:
     """Force reload parameters from disk."""
     global _default_params

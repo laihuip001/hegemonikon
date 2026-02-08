@@ -39,6 +39,7 @@ logger = logging.getLogger(__name__)
 
 
 @dataclass
+# PURPOSE: Summary of a Jules session.
 class SessionSummary:
     """Summary of a Jules session."""
 
@@ -54,15 +55,18 @@ class SessionSummary:
     findings_count: int
 
 
+# PURPOSE: Collect and analyze Jules session results.
 class JulesResultCollector:
     """Collect and analyze Jules session results."""
 
     BASE_URL = "https://jules.googleapis.com/v1alpha"
 
+    # PURPOSE: 内部処理: init__
     def __init__(self, api_key: str):
         self.api_key = api_key
         self.headers = {"X-Goog-Api-Key": api_key, "Content-Type": "application/json"}
 
+    # PURPOSE: Get session details from API.
     async def get_session(self, session_id: str) -> dict:
         """Get session details from API."""
         async with aiohttp.ClientSession() as session:
@@ -73,6 +77,7 @@ class JulesResultCollector:
                 else:
                     return {"error": resp.status, "message": await resp.text()}
 
+    # PURPOSE: List recent sessions.
     async def list_sessions(self, limit: int = 20) -> list[dict]:
         """List recent sessions."""
         async with aiohttp.ClientSession() as session:
@@ -85,6 +90,7 @@ class JulesResultCollector:
                     logger.error(f"List error: {resp.status}")
                     return []
 
+    # PURPOSE: Parse session data into summary.
     def parse_session(self, data: dict) -> SessionSummary:
         """Parse session data into summary."""
         # Extract PR info
@@ -124,6 +130,7 @@ class JulesResultCollector:
             findings_count=len(outputs),
         )
 
+    # PURPOSE: Get summary for a single session.
     async def get_summary(self, session_id: str) -> SessionSummary:
         """Get summary for a single session."""
         data = await self.get_session(session_id)
@@ -142,6 +149,7 @@ class JulesResultCollector:
             )
         return self.parse_session(data)
 
+    # PURPOSE: Generate aggregate report from multiple sessions.
     async def generate_report(self, session_ids: list[str]) -> dict:
         """Generate aggregate report from multiple sessions."""
         summaries = await asyncio.gather(
@@ -174,6 +182,7 @@ class JulesResultCollector:
             "sessions": [asdict(s) for s in summaries],
         }
 
+    # PURPOSE: Print formatted summary.
     def print_summary(self, summary: SessionSummary):
         """Print formatted summary."""
         status_icon = {
@@ -193,6 +202,7 @@ class JulesResultCollector:
             secs = summary.duration_seconds % 60
             print(f"   Duration: {mins}m {secs}s")
         if summary.is_silent:
+# PURPOSE: 関数: main
             print(f"   Result: SILENCE (no issues found)")
         elif summary.has_pr:
             print(f"   PR: {summary.pr_url}")

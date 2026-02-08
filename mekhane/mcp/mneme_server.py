@@ -19,6 +19,7 @@ _original_stdout = sys.stdout
 _stderr_wrapper = sys.stderr
 
 
+# PURPOSE: Debug logging to stderr.
 def log(msg):
     """Debug logging to stderr."""
     print(f"[mneme] {msg}", file=sys.stderr)
@@ -36,16 +37,20 @@ log(f"Added to path: {Path(__file__).parent.parent}")
 
 
 # ============ Suppress stdout during imports ============
+# PURPOSE: クラス: StdoutSuppressor
 class StdoutSuppressor:
+    # PURPOSE: 内部処理: init__
     def __init__(self):
         self._null = io.StringIO()
         self._old_stdout = None
 
+    # PURPOSE: 内部処理: enter__
     def __enter__(self):
         self._old_stdout = sys.stdout
         sys.stdout = self._null
         return self
 
+    # PURPOSE: 内部処理: exit__
     def __exit__(self, *args):
         sys.stdout = self._old_stdout
 
@@ -91,6 +96,7 @@ log("Server initialized")
 
 
 # ============ Initialize SearchEngine ============
+# PURPOSE: Lazy initialization of SearchEngine.
 _engine = None
 
 
@@ -148,6 +154,7 @@ def get_engine():
         log("SearchEngine ready")
     return _engine
 
+# PURPOSE: List available tools.
 
 # ============ Tool definitions ============
 @server.list_tools()
@@ -186,6 +193,7 @@ async def list_tools() -> list[Tool]:
             inputSchema={"type": "object", "properties": {}, "required": []},
         ),
     ]
+# PURPOSE: Handle tool calls.
 
 
 @server.call_tool()
@@ -204,6 +212,7 @@ async def call_tool(name: str, arguments: dict) -> list[TextContent]:
             return [TextContent(type="text", text=f"Unknown tool: {name}")]
     except Exception as e:
         log(f"Tool error: {e}")
+# PURPOSE: Handle search tool.
         return [TextContent(type="text", text=f"Error: {str(e)}")]
 
 
@@ -231,6 +240,7 @@ async def _handle_search(arguments: dict) -> list[TextContent]:
             lines.append(f"Content: {r.content[:200]}...")
         lines.append("")
 
+# PURPOSE: Handle stats tool.
     return [TextContent(type="text", text="\n".join(lines))]
 
 
@@ -249,6 +259,7 @@ async def _handle_stats(arguments: dict) -> list[TextContent]:
         total += count
     lines.append(f"\n**Total**: {total} documents")
 
+# PURPOSE: Handle sources tool.
     return [TextContent(type="text", text="\n".join(lines))]
 
 
@@ -273,6 +284,7 @@ async def _handle_sources(arguments: dict) -> list[TextContent]:
         lines.append(f"- **{source}**: {desc}")
 
     return [TextContent(type="text", text="\n".join(lines))]
+# PURPOSE: Run the MCP server.
 
 
 # ============ Main ============

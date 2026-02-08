@@ -43,6 +43,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
+# PURPOSE: Orchestrate daily session execution.
 class SwarmScheduler:
     """Orchestrate daily session execution."""
 
@@ -54,12 +55,14 @@ class SwarmScheduler:
     KEYS_AVAILABLE = 9
     DAILY_BUDGET = 720  # 80% of max to avoid hitting limits
 
+    # PURPOSE: 内部処理: init__
     def __init__(self, repo_path: str = "."):
         self.repo_path = Path(repo_path)
         self.env_file = self.repo_path / ".env.jules"
         self.results_dir = self.repo_path / "swarm_results"
         self.results_dir.mkdir(exist_ok=True)
 
+    # PURPOSE: Load API keys from .env.jules.
     def load_api_keys(self) -> list[str]:
         """Load API keys from .env.jules."""
         keys = []
@@ -74,6 +77,7 @@ class SwarmScheduler:
         logger.info(f"Loaded {len(keys)} API keys")
         return keys
 
+    # PURPOSE: Execute a batch of tasks with one API key.
     async def execute_batch(
         self,
         api_key: str,
@@ -132,6 +136,7 @@ class SwarmScheduler:
 
             return results
 
+    # PURPOSE: Execute full allocation plan across all accounts.
     async def execute_plan(self, plan: AllocationPlan) -> dict:
         """Execute full allocation plan across all accounts."""
         keys = self.load_api_keys()
@@ -185,6 +190,7 @@ class SwarmScheduler:
         logger.info(f"Results saved to: {output_file}")
         return {"output_file": str(output_file), "results": all_results}
 
+    # PURPOSE: Generate crontab entry for 4AM daily.
     def get_crontab_entry(self) -> str:
         """Generate crontab entry for 4AM daily."""
         script_path = Path(__file__).absolute()
@@ -194,6 +200,7 @@ class SwarmScheduler:
         # 4:00 AM JST = 19:00 UTC (previous day)
         return f"0 19 * * * cd {repo_path} && {venv_python} {script_path} --run >> {repo_path}/swarm_scheduler.log 2>&1"
 
+    # PURPOSE: Install cron job.
     def install_cron(self) -> bool:
         """Install cron job."""
         entry = self.get_crontab_entry()
@@ -223,6 +230,7 @@ class SwarmScheduler:
             logger.error(f"Failed to install cron: {e}")
             return False
 
+    # PURPOSE: Get scheduler status.
     def get_status(self) -> dict:
         """Get scheduler status."""
         # Check cron
@@ -240,6 +248,7 @@ class SwarmScheduler:
 
         return {
             "cron_installed": cron_installed,
+# PURPOSE: Execute daily swarm.
             "results_dir": str(self.results_dir),
             "recent_runs": [str(r) for r in recent_runs],
             "api_keys": len(self.load_api_keys()),
@@ -260,6 +269,7 @@ async def run_daily():
     plan = allocator.create_allocation_plan(scheduler.DAILY_BUDGET)
 
     # Execute
+# PURPOSE: 関数: main
     results = await scheduler.execute_plan(plan)
 
     logger.info("=" * 60)

@@ -1,0 +1,282 @@
+#!/usr/bin/env python3
+# PROOF: [L2/インフラ] <- mekhane/peira/ A0→システム可観測性が必要→hgk_healthが担う
+"""
+Hegemonikón Health Dashboard — 全サービスの死活と品質を一覧表示
+
+Usage:
+    python -m mekhane.peira.hgk_health          # ターミナル出力
+    python -m mekhane.peira.hgk_health --json   # JSON出力 (監視連携用)
+    python -m mekhane.peira.hgk_health --slack  # Slack通知
+"""
+
+import json
+import os
+import subprocess
+import sys
+from dataclasses import dataclass, field, asdict
+from datetime import datetime
+from pathlib import Path
+from typing import Optional
+
+# PURPOSE: ヘルスチェック結果を保持するデータクラス
+@dataclass
+class HealthItem:
+    name: str
+    status: str  # "ok" | "warn" | "error" | "unknown"
+    detail: str = ""
+    metric: Optional[float] = None
+
+    @property
+    def emoji(self) -> str:
+        return {"ok": "🟢", "warn": "🟡", "error": "🔴", "unknown": "⚪"}.get(self.status, "❓")
+
+# PURPOSE: 全体のヘルスレポートを保持
+@dataclass
+class HealthReport:
+    timestamp: str = ""
+    items: list[HealthItem] = field(default_factory=list)
+
+    @property
+    def score(self) -> float:
+        """0.0-1.0 の総合スコア"""
+        if not self.items:
+            return 0.0
+        weights = {"ok": 1.0, "warn": 0.6, "error": 0.0, "unknown": 0.3}
+        return sum(weights.get(i.status, 0) for i in self.items) / len(self.items)
+
+
+# PURPOSE: systemd サービスの死活チェック
+def check_systemd_service(name: str, unit: str, is_user: bool = False) -> HealthItem:
+    try:
+        cmd = ["systemctl"]
+        if is_user:
+            cmd.append("--user")
+        cmd.extend(["is-active", unit])
+        result = subprocess.run(cmd, capture_output=True, text=True, timeout=5)
+        active = result.stdout.strip() == "active"
+        return HealthItem(name, "ok" if active else "error", result.stdout.strip())
+    except Exception as e:
+        return HealthItem(name, "unknown", str(e))
+
+
+# PURPOSE: Docker コンテナの死活チェック
+def check_docker(name: str, container_name: str = "n8n") -> HealthItem:
+    try:
+        result = subprocess.run(
+            ["sudo", "docker", "ps", "--filter", f"name={container_name}", "--format", "{{.Status}}"],
+            capture_output=True, text=True, timeout=10
+        )
+        status = result.stdout.strip()
+        if "Up" in status:
+            return HealthItem(name, "ok", status)
+        elif status:
+            return HealthItem(name, "error", status)
+        else:
+            return HealthItem(name, "error", "container not running")
+    except Exception as e:
+        return HealthItem(name, "unknown", str(e))
+
+
+# PURPOSE: crontab エントリの存在チェック
+def check_cron(name: str, pattern: str) -> HealthItem:
+    try:
+        result = subprocess.run(["crontab", "-l"], capture_output=True, text=True, timeout=5)
+        lines = [l for l in result.stdout.split("\n") if pattern in l and not l.strip().startswith("#")]
+        if lines:
+            return HealthItem(name, "ok", f"{len(lines)} entry(ies)")
+        return HealthItem(name, "error", "not found in crontab")
+    except Exception as e:
+        return HealthItem(name, "unknown", str(e))
+
+
+# PURPOSE: Handoff ディレクトリの状態チェック
+def check_handoff() -> HealthItem:
+    handoff_dir = Path.home() / "oikos" / "mneme" / ".hegemonikon" / "handoffs"
+    if not handoff_dir.exists():
+        return HealthItem("Handoff", "error", "directory does not exist")
+
+    files = sorted(handoff_dir.glob("*.md"), key=lambda f: f.stat().st_mtime, reverse=True)
+    if not files:
+        return HealthItem("Handoff", "error", "0 files — /bye→handoff path broken?")
+
+    latest = files[0]
+    age_hours = (datetime.now().timestamp() - latest.stat().st_mtime) / 3600
+    detail = f"{len(files)} files, latest: {latest.name} ({age_hours:.0f}h ago)"
+
+    if age_hours < 24:
+        return HealthItem("Handoff", "ok", detail, metric=age_hours)
+    elif age_hours < 72:
+        return HealthItem("Handoff", "warn", detail, metric=age_hours)
+    else:
+        return HealthItem("Handoff", "error", detail, metric=age_hours)
+
+
+# PURPOSE: Digestor の最新実行状態チェック
+def check_digestor_log() -> HealthItem:
+    log_file = Path.home() / ".hegemonikon" / "digestor" / "scheduler.log"
+    if not log_file.exists():
+        return HealthItem("Digestor Log", "error", "log file not found")
+
+    try:
+        lines = log_file.read_text(encoding="utf-8").strip().split("\n")
+        last_lines = lines[-5:] if len(lines) >= 5 else lines
+        last_text = "\n".join(last_lines)
+
+        if "error" in last_text.lower() or "Error" in last_text:
+            # エラーがあるが、その後 "Scheduler running" があれば warn
+            if "Scheduler running" in last_text:
+                return HealthItem("Digestor Log", "warn", "last run had errors but scheduler alive")
+            return HealthItem("Digestor Log", "error", "errors in last run")
+
+        if "Digestor complete" in last_text:
+            return HealthItem("Digestor Log", "ok", "last run successful")
+
+        if "Scheduler running" in last_text:
+            return HealthItem("Digestor Log", "ok", "scheduler waiting for next run")
+
+        return HealthItem("Digestor Log", "warn", "unknown state")
+    except Exception as e:
+        return HealthItem("Digestor Log", "unknown", str(e))
+
+
+# PURPOSE: Dendron カバレッジチェック
+def check_dendron() -> HealthItem:
+    try:
+        project_root = Path(__file__).parent.parent.parent
+        result = subprocess.run(
+            [sys.executable, "-m", "mekhane.dendron.cli", "check", "mekhane/", "--format", "ci"],
+            capture_output=True, text=True, timeout=30,
+            cwd=str(project_root),
+            env={**os.environ, "PYTHONPATH": str(project_root)}
+        )
+        output = result.stdout + result.stderr
+        if "✅" in output and "100.0%" in output:
+            return HealthItem("Dendron L1", "ok", "100% PROOF coverage")
+        elif "✅" in output:
+            return HealthItem("Dendron L1", "ok", output.strip().split("\n")[-3] if output.strip() else "ok")
+        elif "❌" in output:
+            return HealthItem("Dendron L1", "error", output.strip().split("\n")[-3] if output.strip() else "failures")
+        return HealthItem("Dendron L1", "unknown", "could not parse output")
+    except Exception as e:
+        return HealthItem("Dendron L1", "unknown", str(e))
+
+
+# PURPOSE: Digest レポートの鮮度チェック
+def check_digest_reports() -> HealthItem:
+    report_dir = Path.home() / ".hegemonikon" / "digestor"
+    reports = sorted(report_dir.glob("digest_report_*.json"), reverse=True)
+    if not reports:
+        return HealthItem("Digest Reports", "warn", "no reports yet (first run pending)")
+
+    latest = reports[0]
+    age_hours = (datetime.now().timestamp() - latest.stat().st_mtime) / 3600
+
+    try:
+        data = json.loads(latest.read_text(encoding="utf-8"))
+        candidates = data.get("candidates", [])
+        detail = f"{len(reports)} reports, latest: {len(candidates)} candidates ({age_hours:.0f}h ago)"
+    except Exception:
+        detail = f"{len(reports)} reports ({age_hours:.0f}h ago)"
+
+    if age_hours < 26:  # ~daily
+        return HealthItem("Digest Reports", "ok", detail, metric=age_hours)
+    elif age_hours < 72:
+        return HealthItem("Digest Reports", "warn", detail, metric=age_hours)
+    else:
+        return HealthItem("Digest Reports", "error", detail, metric=age_hours)
+
+
+# PURPOSE: 全ヘルスチェックを実行してレポートを生成
+def run_health_check() -> HealthReport:
+    report = HealthReport(timestamp=datetime.now().isoformat())
+
+    # Service checks
+    report.items.append(check_systemd_service("Digestor Scheduler", "digestor-scheduler@makaron8426"))
+    report.items.append(check_docker("n8n Container"))
+    report.items.append(check_systemd_service("Gnosis Index Timer", "gnosis-index.timer", is_user=True))
+    report.items.append(check_systemd_service("HGK Sync Timer", "hegemonikon-sync.timer", is_user=True))
+    report.items.append(check_cron("Tier 1 Daily Cron", "tier1"))
+
+    # Data checks
+    report.items.append(check_handoff())
+    report.items.append(check_digestor_log())
+    report.items.append(check_digest_reports())
+
+    # Quality checks (optional, slower)
+    report.items.append(check_dendron())
+
+    return report
+
+
+# PURPOSE: テキスト形式でレポートを表示
+def format_terminal(report: HealthReport) -> str:
+    lines = []
+    lines.append("╔══════════════════════════════════════════╗")
+    lines.append("║  Hegemonikón Health Dashboard            ║")
+    lines.append(f"║  {report.timestamp[:19]:>38s}  ║")
+    lines.append("╠══════════════════════════════════════════╣")
+
+    for item in report.items:
+        name = f"{item.name:.<25s}"
+        lines.append(f"║  {item.emoji} {name} {item.detail[:30]:30s} ║")
+
+    lines.append("╠══════════════════════════════════════════╣")
+    score = report.score
+    bar = "█" * int(score * 20) + "░" * (20 - int(score * 20))
+    emoji = "🟢" if score >= 0.8 else "🟡" if score >= 0.5 else "🔴"
+    lines.append(f"║  {emoji} Score: {score:.0%}  [{bar}]     ║")
+    lines.append("╚══════════════════════════════════════════╝")
+    return "\n".join(lines)
+
+
+# PURPOSE: Slack webhook にレポートを送信
+def send_slack(report: HealthReport):
+    webhook_url = os.environ.get("SLACK_WEBHOOK_URL", "")
+    if not webhook_url:
+        env_file = Path.home() / "oikos" / "hegemonikon" / ".env"
+        if env_file.exists():
+            for line in env_file.read_text().split("\n"):
+                if line.startswith("SLACK_WEBHOOK_URL="):
+                    webhook_url = line.split("=", 1)[1].strip().strip('"')
+
+    if not webhook_url:
+        print("⚠️ SLACK_WEBHOOK_URL not found", file=sys.stderr)
+        return
+
+    score = report.score
+    emoji = "🟢" if score >= 0.8 else "🟡" if score >= 0.5 else "🔴"
+    items_text = "\n".join(f"{i.emoji} {i.name}: {i.detail[:40]}" for i in report.items)
+    text = f"{emoji} *HGK Health* — Score: {score:.0%}\n```\n{items_text}\n```"
+
+    subprocess.run(
+        ["curl", "-s", "-X", "POST", webhook_url,
+         "-H", "Content-type: application/json",
+         "-d", json.dumps({"text": text})],
+        capture_output=True, timeout=10
+    )
+
+
+# PURPOSE: CLI エントリポイント
+def main():
+    import argparse
+    parser = argparse.ArgumentParser(description="Hegemonikón Health Dashboard")
+    parser.add_argument("--json", action="store_true", help="JSON output")
+    parser.add_argument("--slack", action="store_true", help="Send to Slack")
+    args = parser.parse_args()
+
+    report = run_health_check()
+
+    if args.json:
+        print(json.dumps([asdict(i) for i in report.items], indent=2, ensure_ascii=False))
+    elif args.slack:
+        send_slack(report)
+        print(format_terminal(report))
+    else:
+        print(format_terminal(report))
+
+    # Exit code: 0 if score > 0.7, 1 otherwise
+    sys.exit(0 if report.score >= 0.7 else 1)
+
+
+if __name__ == "__main__":
+    main()

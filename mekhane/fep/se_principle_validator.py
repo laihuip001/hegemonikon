@@ -31,18 +31,21 @@ from enum import Enum
 from typing import Optional
 
 
+# PURPOSE: クラス: Scale
 class Scale(Enum):
     MICRO = "micro"
     MESO = "meso"
     MACRO = "macro"
 
 
+# PURPOSE: クラス: Severity
 class Severity(Enum):
     ERROR = "error"  # ブロック
     WARNING = "warning"  # 警告のみ
 
 
 @dataclass
+# PURPOSE: クラス: Violation
 class Violation:
     field: str
     principle: str
@@ -51,11 +54,13 @@ class Violation:
 
 
 @dataclass
+# PURPOSE: クラス: ValidationResult
 class ValidationResult:
     valid: bool
     violations: list[Violation]
     scale: Scale
 
+    # PURPOSE: 内部処理: str__
     def __str__(self) -> str:
         if self.valid:
             return f"✅ PASS (Scale: {self.scale.value})"
@@ -66,6 +71,7 @@ class ValidationResult:
             lines.append(f"  {icon} {v.field}: {v.message} [{v.principle}]")
         return "\n".join(lines)
 
+# PURPOSE: SE 5原則の構造的強制を検証
 
 class SEPrincipleValidator:
     """SE 5原則の構造的強制を検証"""
@@ -144,6 +150,7 @@ class SEPrincipleValidator:
 
     SCALE_ORDER = {Scale.MICRO: 0, Scale.MESO: 1, Scale.MACRO: 2}
 
+    # PURPOSE: コンテンツからスケールを自動検出
     def detect_scale(self, content: str) -> Scale:
         """コンテンツからスケールを自動検出"""
         scale_patterns = [
@@ -162,10 +169,12 @@ class SEPrincipleValidator:
         # デフォルトは Meso
         return Scale.MESO
 
+    # PURPOSE: 現在のスケールでこのフィールドをチェックすべきか
     def should_check(self, field_min_scale: Scale, current_scale: Scale) -> bool:
         """現在のスケールでこのフィールドをチェックすべきか"""
         return self.SCALE_ORDER[current_scale] >= self.SCALE_ORDER[field_min_scale]
 
+    # PURPOSE: ファイルを検証
     def validate(
         self, filepath: Path, workflow: str, scale: Optional[Scale] = None
     ) -> ValidationResult:
@@ -210,6 +219,7 @@ class SEPrincipleValidator:
         return ValidationResult(
             valid=not has_errors,
             violations=violations,
+# PURPOSE: 関数: main
             scale=detected_scale,
         )
 

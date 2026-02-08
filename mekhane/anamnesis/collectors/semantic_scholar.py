@@ -26,6 +26,7 @@ from mekhane.anamnesis.collectors.base import BaseCollector
 from mekhane.anamnesis.models.paper import Paper
 
 
+# PURPOSE: Semantic Scholar論文コレクター
 class SemanticScholarCollector(BaseCollector):
     """Semantic Scholar論文コレクター"""
 
@@ -35,6 +36,7 @@ class SemanticScholarCollector(BaseCollector):
     BASE_URL = "https://api.semanticscholar.org/graph/v1"
     PAPER_FIELDS = "paperId,externalIds,title,authors,abstract,year,citationCount,venue,url,openAccessPdf"
 
+    # PURPOSE: 内部処理: init__
     def __init__(self, api_key: Optional[str] = None):
         super().__init__()
         if requests is None:
@@ -48,6 +50,7 @@ class SemanticScholarCollector(BaseCollector):
             self.session.headers["x-api-key"] = self.api_key
             self.rate_limit = 10.0  # 認証済みは10 req/sec
 
+    # PURPOSE: API応答 -> Paper 変換
     def _to_paper(self, data: dict) -> Paper:
         """API応答 -> Paper 変換"""
         external_ids = data.get("externalIds", {}) or {}
@@ -75,6 +78,7 @@ class SemanticScholarCollector(BaseCollector):
             venue=data.get("venue"),
         )
 
+    # PURPOSE: Semantic Scholarで論文検索
     def search(
         self,
         query: str,
@@ -132,6 +136,7 @@ class SemanticScholarCollector(BaseCollector):
 
         return papers
 
+    # PURPOSE: IDで論文取得
     def fetch_by_id(self, paper_id: str) -> Optional[Paper]:
         """
         IDで論文取得
@@ -153,6 +158,7 @@ class SemanticScholarCollector(BaseCollector):
             print(f"[SemanticScholar] Fetch error: {e}")
             return None
 
+    # PURPOSE: 論文の被引用論文を取得
     def get_citations(self, paper_id: str, limit: int = 10) -> list[Paper]:
         """論文の被引用論文を取得"""
         url = f"{self.BASE_URL}/paper/{paper_id}/citations"

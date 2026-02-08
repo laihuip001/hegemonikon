@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/インフラ] <- mekhane/peira/ A0→note.com記事収集が必要→note-collectorが担う
 """
 note.com 記事収集スクリプト v2
 シンプル版 - 即時実行
@@ -16,6 +17,7 @@ USER_URLNAME = "tasty_dunlin998"
 OUTPUT_DIR = Path("/home/makaron8426/oikos/hegemonikon/mekhane/peira/raw/note")
 API_BASE = "https://note.com/api/v2"
 
+# PURPOSE: 関数: main
 def main():
     print(f"🔍 Collecting articles from note.com/{USER_URLNAME}")
     

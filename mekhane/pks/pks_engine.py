@@ -32,6 +32,7 @@ if str(_HEGEMONIKON_ROOT) not in sys.path:
 
 
 @dataclass
+# PURPOSE: 知識の最小単位 — PKS がプッシュする情報の粒
 class KnowledgeNugget:
     """知識の最小単位 — PKS がプッシュする情報の粒"""
 
@@ -43,6 +44,7 @@ class KnowledgeNugget:
     authors: Optional[str] = None
     push_reason: str = ""  # なぜこの知識を今プッシュするのか
 
+    # PURPOSE: Markdown 形式で出力
     def to_markdown(self) -> str:
         """Markdown 形式で出力"""
         lines = [
@@ -64,6 +66,7 @@ class KnowledgeNugget:
         return "\n".join(lines)
 
 
+# PURPOSE: セッションの作業コンテキスト
 @dataclass
 class SessionContext:
     """セッションの作業コンテキスト"""
@@ -74,6 +77,7 @@ class SessionContext:
     handoff_keywords: list[str] = field(default_factory=list)
     timestamp: str = ""
 
+    # PURPOSE: コンテキストを埋め込み用テキストに変換
     def to_embedding_text(self) -> str:
         """コンテキストを埋め込み用テキストに変換"""
         parts = []
@@ -89,23 +93,28 @@ class SessionContext:
 
 
 # --- Core Engine ---
+# PURPOSE: 作業コンテキストのベクトル化保持
 
 
 class ContextTracker:
     """作業コンテキストのベクトル化保持"""
 
+    # PURPOSE: 内部処理: init__
     def __init__(self):
         self._context = SessionContext()
 
     @property
+    # PURPOSE: 関数: context
     def context(self) -> SessionContext:
         return self._context
 
+    # PURPOSE: トピック更新
     def update_topics(self, topics: list[str]) -> None:
         """トピック更新"""
         self._context.topics = topics
         self._context.timestamp = datetime.now().isoformat()
 
+    # PURPOSE: 検索クエリを履歴に追加
     def add_query(self, query: str) -> None:
         """検索クエリを履歴に追加"""
         self._context.recent_queries.append(query)
@@ -113,10 +122,12 @@ class ContextTracker:
         if len(self._context.recent_queries) > 20:
             self._context.recent_queries = self._context.recent_queries[-20:]
 
+    # PURPOSE: アクティブなワークフローを設定
     def set_workflows(self, workflows: list[str]) -> None:
         """アクティブなワークフローを設定"""
         self._context.active_workflows = workflows
 
+    # PURPOSE: 最新 Handoff からキーワードを抽出
     def load_from_handoff(self, handoff_path: Path) -> None:
         """最新 Handoff からキーワードを抽出"""
         if not handoff_path.exists():
@@ -127,6 +138,7 @@ class ContextTracker:
         # YAML frontmatter からキーワード抽出
         keywords = []
         for line in text.split("\n"):
+# PURPOSE: コンテキスト × 未消化データの関連度スコアリング
             line = line.strip()
             if line.startswith("primary_task:"):
                 keywords.append(line.split(":", 1)[1].strip().strip('"'))
@@ -142,9 +154,11 @@ class RelevanceDetector:
     現在のコンテキストに対する各知識の関連度を算出する。
     """
 
+    # PURPOSE: 内部処理: init__
     def __init__(self, threshold: float = 0.65):
         self.threshold = threshold
 
+    # PURPOSE: 検索結果をコンテキストとの関連度でスコアリング
     def score(
         self,
         context: SessionContext,
@@ -180,6 +194,7 @@ class RelevanceDetector:
         nuggets.sort(key=lambda n: n.relevance_score, reverse=True)
         return nuggets
 
+    # PURPOSE: プッシュ理由を生成
     def _generate_push_reason(
         self, context: SessionContext, result: dict, score: float
     ) -> str:
@@ -187,6 +202,7 @@ class RelevanceDetector:
         reasons = []
         title = result.get("title", "").lower()
         abstract = result.get("abstract", "").lower()
+# PURPOSE: 閾値超過時に知識を能動的にプッシュ
 
         for topic in context.topics:
             if topic.lower() in title or topic.lower() in abstract:
@@ -205,11 +221,13 @@ class PushController:
     プッシュ対象の制御（最大件数、重複排除等）を行う。
     """
 
+    # PURPOSE: 内部処理: init__
     def __init__(self, max_push: int = 5, cooldown_hours: float = 24.0):
         self.max_push = max_push
         self.cooldown_hours = cooldown_hours
         self._push_history: dict[str, str] = {}  # title -> last_pushed_at ISO
 
+    # PURPOSE: プッシュ対象をフィルタリング
     def filter_pushable(self, nuggets: list[KnowledgeNugget]) -> list[KnowledgeNugget]:
         """プッシュ対象をフィルタリング"""
         now = datetime.now()
@@ -230,18 +248,22 @@ class PushController:
 
         return pushable
 
+    # PURPOSE: プッシュ履歴を記録
     def record_push(self, nuggets: list[KnowledgeNugget]) -> None:
         """プッシュ履歴を記録"""
         now_iso = datetime.now().isoformat()
         for nugget in nuggets:
             self._push_history[nugget.title] = now_iso
 
+    # PURPOSE: プッシュ履歴をファイルに保存
     def save_history(self, path: Path) -> None:
+# PURPOSE: Proactive Knowledge Surface — メインオーケストレータ
         """プッシュ履歴をファイルに保存"""
         path.parent.mkdir(parents=True, exist_ok=True)
         with open(path, "w", encoding="utf-8") as f:
             json.dump(self._push_history, f, ensure_ascii=False, indent=2)
 
+    # PURPOSE: プッシュ履歴をファイルから読み込み
     def load_history(self, path: Path) -> None:
         """プッシュ履歴をファイルから読み込み"""
         if path.exists():
@@ -266,6 +288,7 @@ class PKSEngine:
     # Push 履歴の保存先
     HISTORY_FILE = "pks_push_history.json"
 
+    # PURPOSE: 内部処理: init__
     def __init__(
         self,
         threshold: float = 0.65,
@@ -284,6 +307,7 @@ class PKSEngine:
         history_path = _PKS_DIR / self.HISTORY_FILE
         self.controller.load_history(history_path)
 
+    # PURPOSE: GnosisIndex を遅延初期化
     def _get_index(self):
         """GnosisIndex を遅延初期化"""
         if self._index is None:
@@ -292,6 +316,7 @@ class PKSEngine:
             self._index = GnosisIndex(lance_dir=self._lance_dir)
         return self._index
 
+    # PURPOSE: セッションコンテキストを設定
     def set_context(
         self,
         topics: Optional[list[str]] = None,
@@ -306,6 +331,7 @@ class PKSEngine:
         if handoff_path:
             self.tracker.load_from_handoff(handoff_path)
 
+    # PURPOSE: 能動的プッシュ: コンテキストに基づいて知識を表面化
     def proactive_push(self, k: int = 20) -> list[KnowledgeNugget]:
         """能動的プッシュ: コンテキストに基づいて知識を表面化
 
@@ -345,6 +371,7 @@ class PKSEngine:
 
         return pushable
 
+    # PURPOSE: 明示的クエリでプッシュ: 通常検索 + PKS フィルタリング
     def search_and_push(self, query: str, k: int = 10) -> list[KnowledgeNugget]:
         """明示的クエリでプッシュ: 通常検索 + PKS フィルタリング
 
@@ -360,6 +387,7 @@ class PKSEngine:
         nuggets = self.detector.score(self.tracker.context, results)
         return nuggets  # 明示的検索ではクールダウンなし
 
+    # PURPOSE: プッシュ結果を Markdown レポートに整形
     def format_push_report(self, nuggets: list[KnowledgeNugget]) -> str:
         """プッシュ結果を Markdown レポートに整形"""
         if not nuggets:

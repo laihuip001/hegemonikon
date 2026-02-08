@@ -22,6 +22,7 @@ from .learning.failure_db import get_failure_db, FailureDB
 
 
 @dataclass
+# PURPOSE: CCL 実行コンテキスト
 class ExecutionContext:
     """CCL 実行コンテキスト"""
 
@@ -31,6 +32,7 @@ class ExecutionContext:
 
 
 @dataclass
+# PURPOSE: CCL 実行結果
 class ExecutionResult:
     """CCL 実行結果"""
 
@@ -40,17 +42,20 @@ class ExecutionResult:
     context: ExecutionContext
 
 
+# PURPOSE: Zero-Trust CCL 実行エンジン
 class ZeroTrustCCLExecutor:
     """Zero-Trust CCL 実行エンジン
 
     LLM を信用せず、構造的に正しい実行を強制する。
     """
 
+    # PURPOSE: 内部処理: init__
     def __init__(self):
         self.injector = SpecInjector()
         self.validator = CCLOutputValidator()
         self.failure_db = get_failure_db()
 
+    # PURPOSE: Phase 0: 実行準備
     def prepare(self, ccl_expr: str) -> ExecutionContext:
         """
         Phase 0: 実行準備
@@ -75,12 +80,14 @@ class ZeroTrustCCLExecutor:
             warnings=[w.message for w in warnings_records],
         )
 
+    # PURPOSE: Phase 2: 出力検証
     def validate(self, output: str, context: ExecutionContext) -> ValidationResult:
         """
         Phase 2: 出力検証
         """
         return self.validator.validate(output, context.ccl_expr)
 
+    # PURPOSE: Phase 4: 結果を記録
     def record_result(
         self, context: ExecutionContext, validation: ValidationResult, output: str
     ) -> None:
@@ -100,6 +107,7 @@ class ZeroTrustCCLExecutor:
                     cause=error.message,
                 )
 
+    # PURPOSE: CCL 実行フロー全体
     def execute(
         self, ccl_expr: str, output: str, record: bool = True
     ) -> ExecutionResult:
@@ -131,6 +139,7 @@ class ZeroTrustCCLExecutor:
             # NOTE: Removed self-assignment: context = context
         )
 
+    # PURPOSE: 再生成用のプロンプトを取得
     def get_regeneration_prompt(self, result: ExecutionResult) -> str:
         """再生成用のプロンプトを取得"""
         if result.success:
@@ -148,6 +157,7 @@ class ZeroTrustCCLExecutor:
 ---
 
 ## 再生成してください
+# PURPOSE: CCL 式から LLM に渡すプロンプトを生成
 
 上記の問題を修正した出力を生成してください。
 """
@@ -155,6 +165,7 @@ class ZeroTrustCCLExecutor:
 
 # 便利関数
 def create_ccl_prompt(ccl_expr: str) -> str:
+# PURPOSE: CCL 出力を検証
     """CCL 式から LLM に渡すプロンプトを生成"""
     executor = ZeroTrustCCLExecutor()
     context = executor.prepare(ccl_expr)

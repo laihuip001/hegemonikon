@@ -38,6 +38,7 @@ except ImportError:
 
 
 @dataclass
+# PURPOSE: ブランチ情報
 class BranchInfo:
     """ブランチ情報"""
 
@@ -48,6 +49,7 @@ class BranchInfo:
     has_pr: bool = False
 
 
+# PURPOSE: GitHub トークンを取得
 def get_github_token() -> str:
     """GitHub トークンを取得"""
     token = os.environ.get("GITHUB_TOKEN")
@@ -79,6 +81,7 @@ def get_github_token() -> str:
     return token
 
 
+# PURPOSE: ブランチ名をパースして情報を抽出
 def parse_branch_name(branch: str) -> Optional[BranchInfo]:
     """
     ブランチ名をパースして情報を抽出
@@ -196,6 +199,7 @@ def parse_branch_name(branch: str) -> Optional[BranchInfo]:
     return None
 
 
+# PURPOSE: リモートの Jules レビューブランチを取得
 def get_remote_branches() -> list[str]:
     """リモートの Jules レビューブランチを取得"""
     result = subprocess.run(
@@ -212,6 +216,7 @@ def get_remote_branches() -> list[str]:
     return branches
 
 
+# PURPOSE: 既存の PR のブランチ名を取得
 def get_existing_prs(token: str, owner: str, repo: str) -> set[str]:
     """既存の PR のブランチ名を取得"""
     headers = {
@@ -244,6 +249,7 @@ def get_existing_prs(token: str, owner: str, repo: str) -> set[str]:
     return existing_branches
 
 
+# PURPOSE: Pull Request を作成
 def create_pr(
     token: str, owner: str, repo: str, branch: BranchInfo, base: str = "master"
 ) -> dict:
@@ -295,6 +301,7 @@ This PR was automatically created from a Jules review branch.
     return resp.json()
 
 
+# PURPOSE: 関数: main
 def main():
     parser = argparse.ArgumentParser(description="Jules ブランチから PR を一括作成")
     parser.add_argument(

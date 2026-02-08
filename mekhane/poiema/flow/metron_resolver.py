@@ -24,6 +24,7 @@ METRON_MEDIUM = 60
 METRON_RICH = 100
 
 
+# PURPOSE: S1 Metron の instantiation: 尺度解決器
 class MetronResolver:
     """
     S1 Metron の instantiation: 尺度解決器
@@ -37,6 +38,7 @@ class MetronResolver:
     """
 
     @staticmethod
+    # PURPOSE: システムプロンプト生成
     def get_system_prompt(level: int = METRON_LIGHT_MAX, user_prompt: str = "") -> str:
         """
         システムプロンプト生成
@@ -93,6 +95,7 @@ class MetronResolver:
         return base
 
     @staticmethod
+    # PURPOSE: レベルの日本語ラベル
     def get_level_label(level: int) -> str:
         """レベルの日本語ラベル"""
         if level <= METRON_LIGHT_MAX:
@@ -104,6 +107,7 @@ class MetronResolver:
         return "Deep（深い）"
 
     @staticmethod
+    # PURPOSE: S1 Metron 核心機能: 連続値を3段階に正規化
     def resolve_level(level: int) -> int:
         """
         S1 Metron 核心機能: 連続値を3段階に正規化

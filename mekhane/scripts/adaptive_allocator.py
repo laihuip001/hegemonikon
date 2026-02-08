@@ -28,6 +28,7 @@ PERSPECTIVES_FILE = (
 
 
 @dataclass
+# PURPOSE: Daily allocation plan.
 class AllocationPlan:
     """Daily allocation plan."""
 
@@ -38,6 +39,7 @@ class AllocationPlan:
     weekly_focus: list[dict] = field(default_factory=list)
 
 
+# PURPOSE: Allocate sessions intelligently.
 class AdaptiveAllocator:
     """Allocate sessions intelligently."""
 
@@ -104,10 +106,12 @@ class AdaptiveAllocator:
         "Integration",
     ]
 
+    # PURPOSE: 内部処理: init__
     def __init__(self, repo_path: str = "."):
         self.repo_path = Path(repo_path)
         self.today = datetime.now()
 
+    # PURPOSE: Get files changed in the last N hours.
     def get_changed_files(self, since_hours: int = 24) -> list[str]:
         """Get files changed in the last N hours."""
         try:
@@ -129,6 +133,7 @@ class AdaptiveAllocator:
             print(f"Error getting changed files: {e}")
             return []
 
+    # PURPOSE: Match domains based on file paths/names.
     def match_domains_to_files(self, files: list[str]) -> list[str]:
         """Match domains based on file paths/names."""
         domains = set()
@@ -174,6 +179,7 @@ class AdaptiveAllocator:
 
         return list(domains) if domains else ["Architecture"]  # Default
 
+    # PURPOSE: Allocate based on recent changes.
     def allocate_change_driven(self, budget: int) -> list[dict]:
         """Allocate based on recent changes."""
         changed_files = self.get_changed_files()
@@ -218,6 +224,7 @@ class AdaptiveAllocator:
 
         return tasks[:budget]
 
+    # PURPOSE: Random sampling for discovery.
     def allocate_discovery(
         self, budget: int, excluded_domains: list[str] = None
     ) -> list[dict]:
@@ -244,6 +251,7 @@ class AdaptiveAllocator:
 
         return tasks
 
+    # PURPOSE: Weekly domain rotation.
     def allocate_weekly_focus(self, budget: int) -> list[dict]:
         """Weekly domain rotation."""
         weekday = self.today.weekday()
@@ -270,6 +278,7 @@ class AdaptiveAllocator:
 
         return tasks[:budget]
 
+    # PURPOSE: Create complete allocation plan.
     def create_allocation_plan(
         self,
         total_budget: int = 1800,
@@ -307,11 +316,13 @@ class AdaptiveAllocator:
 
         return plan
 
+    # PURPOSE: Save allocation plan to file.
     def save_plan(self, plan: AllocationPlan, output_path: Path = None):
         """Save allocation plan to file."""
         output_path = (
             output_path or self.repo_path / f"allocation_plan_{plan.date[:10]}.json"
         )
+# PURPOSE: 関数: main
 
         with open(output_path, "w", encoding="utf-8") as f:
             json.dump(asdict(plan), f, indent=2, ensure_ascii=False)

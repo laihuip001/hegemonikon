@@ -42,6 +42,7 @@ except ImportError:
 
 
 @dataclass
+# PURPOSE: Result from hierarchical evaluation.
 class EvaluationResult:
     """Result from hierarchical evaluation."""
 
@@ -65,6 +66,7 @@ GEMINI_MODEL = "gemini-2.0-flash-lite"
 # =============================================================================
 
 
+# PURPOSE: L1: Encode input with confidence score.
 def encode_input_with_confidence(text: str) -> Tuple[Tuple[int, int, int], float]:
     """L1: Encode input with confidence score.
 
@@ -140,6 +142,7 @@ GEMINI_EVALUATION_PROMPT = """あなたはActive Inference認知エージェン�
 }}"""
 
 
+# PURPOSE: L2: Evaluate text using Gemini Flash (free tier).
 def evaluate_with_gemini(text: str) -> Optional[Dict[str, float]]:
     """L2: Evaluate text using Gemini Flash (free tier).
 
@@ -194,6 +197,7 @@ def evaluate_with_gemini(text: str) -> Optional[Dict[str, float]]:
         return None
 
 
+# PURPOSE: Convert LLM evaluation scores to observation indices.
 def scores_to_observation(scores: Dict[str, float]) -> Tuple[int, int, int]:
     """Convert LLM evaluation scores to observation indices.
 
@@ -230,6 +234,7 @@ def scores_to_observation(scores: Dict[str, float]) -> Tuple[int, int, int]:
 # =============================================================================
 
 
+# PURPOSE: Perform hierarchical hybrid evaluation.
 def hierarchical_evaluate(
     text: str,
     force_layer: Optional[str] = None,
@@ -310,6 +315,7 @@ def hierarchical_evaluate(
 # =============================================================================
 
 
+# PURPOSE: Evaluate text and perform FEP inference in one call.
 def evaluate_and_infer(
     text: str,
     agent: Optional[Any] = None,

@@ -29,6 +29,7 @@ from typing import Optional, List, Dict, Any
 from enum import Enum
 
 
+# PURPOSE: K4 Sophia の派生モード
 class SophiaDerivative(Enum):
     """K4 Sophia の派生モード"""
 
@@ -37,6 +38,7 @@ class SophiaDerivative(Enum):
     SOCIAL = "soci"  # 社会的調査
 
 
+# PURPOSE: 調査深度
 class ResearchDepth(Enum):
     """調査深度"""
 
@@ -46,6 +48,7 @@ class ResearchDepth(Enum):
 
 
 @dataclass
+# PURPOSE: 調査クエリ
 class ResearchQuery:
     """調査クエリ
 
@@ -63,6 +66,7 @@ class ResearchQuery:
 
 
 @dataclass
+# PURPOSE: K4 Sophia 調査結果
 class SophiaResult:
     """K4 Sophia 調査結果
 
@@ -81,6 +85,7 @@ class SophiaResult:
     estimated_time_minutes: int
 
 
+# PURPOSE: K4 Sophia: 調査クエリを生成
 def research(
     topic: str,
     derivative: Optional[SophiaDerivative] = None,
@@ -151,6 +156,7 @@ def research(
     )
 
 
+# PURPOSE: K4 Sophia 結果をMarkdown形式でフォーマット
 def format_sophia_markdown(result: SophiaResult) -> str:
     """K4 Sophia 結果をMarkdown形式でフォーマット"""
     lines = [
@@ -172,6 +178,7 @@ def format_sophia_markdown(result: SophiaResult) -> str:
     return "\n".join(lines)
 
 
+# PURPOSE: FEP観察空間へのエンコード
 def encode_sophia_observation(result: SophiaResult) -> dict:
     """FEP観察空間へのエンコード"""
     # 深度 → confidence

@@ -15,6 +15,7 @@ from typing import List, Optional
 from enum import Enum
 
 
+# PURPOSE: CCL 演算子タイプ
 class OperatorType(str, Enum):
     """CCL 演算子タイプ"""
 
@@ -29,6 +30,7 @@ class OperatorType(str, Enum):
     INVERT = "\\"  # 反転
 
 
+# PURPOSE: 演算子理解の証明
 class OperatorVerification(BaseModel):
     """演算子理解の証明"""
 
@@ -40,12 +42,14 @@ class OperatorVerification(BaseModel):
     )
 
     @validator("operator")
+    # PURPOSE: 検証: validate_operator
     def validate_operator(cls, v):
         valid_ops = set("!~*^+-_?\\")
         if v not in valid_ops:
             raise ValueError(f"無効な演算子: {v}")
         return v
 
+# PURPOSE: CCL ステップの出力
 
 class StepOutput(BaseModel):
     """CCL ステップの出力"""
@@ -55,6 +59,7 @@ class StepOutput(BaseModel):
     verification: str = Field(..., min_length=50, description="検証内容")
     result: str = Field(..., description="結果")
 
+# PURPOSE: 振動演算子 (~) の出力
 
 class OscillationOutput(BaseModel):
     """振動演算子 (~) の出力"""
@@ -63,6 +68,7 @@ class OscillationOutput(BaseModel):
     direction_b: str = Field(..., min_length=100, description="B → A 方向の分析")
     synthesis: str = Field(..., description="振動の統合結果")
 
+# PURPOSE: 融合演算子 (*) の出力
 
 class MergeOutput(BaseModel):
     """融合演算子 (*) の出力"""
@@ -71,6 +77,7 @@ class MergeOutput(BaseModel):
     merge_process: str = Field(..., min_length=100, description="融合過程の説明")
     merged_result: str = Field(..., description="融合結果")
 
+# PURPOSE: メタ演算子 (^) の出力
 
 class MetaOutput(BaseModel):
     """メタ演算子 (^) の出力"""
@@ -81,6 +88,7 @@ class MetaOutput(BaseModel):
         ..., min_items=1, description="メタ分析から得られた洞察"
     )
 
+# PURPOSE: 階乗演算子 (!) の出力
 
 class FactorialOutput(BaseModel):
     """階乗演算子 (!) の出力"""
@@ -91,6 +99,7 @@ class FactorialOutput(BaseModel):
         ..., min_items=1, description="同時実行結果"
     )
 
+# PURPOSE: 自己監査
 
 class SelfAudit(BaseModel):
     """自己監査"""
@@ -101,6 +110,7 @@ class SelfAudit(BaseModel):
         default_factory=list, description="潜在的問題点"
     )
 
+# PURPOSE: CCL 完全実行出力
 
 class CCLExecutionOutput(BaseModel):
     """CCL 完全実行出力"""
@@ -133,6 +143,7 @@ class CCLExecutionOutput(BaseModel):
 
     self_audit: SelfAudit = Field(..., description="自己監査")
 
+    # PURPOSE: クラス: Config
     class Config:
         schema_extra = {
             "example": {

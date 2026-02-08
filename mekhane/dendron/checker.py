@@ -34,6 +34,7 @@ from .models import (  # noqa: F401
     VALID_LEVEL_PREFIXES,
     MAX_FILE_SIZE,
     PROOF_MD_PATTERN,
+    REASON_PATTERN,
 )
 
 
@@ -392,8 +393,26 @@ class DendronChecker:  # noqa: AI-007
                     return DirProof(path=path, status=ProofStatus.WEAK, has_proof_md=True,
                                     reason="PROOF.md が空")
             except (OSError, UnicodeDecodeError):
-                pass  # 読み込みエラーは存在確認で OK 扱い
-            return DirProof(path=path, status=ProofStatus.OK, has_proof_md=True)
+                return DirProof(path=path, status=ProofStatus.OK, has_proof_md=True)
+            
+            # PURPOSE: と REASON: を検出 (PROOF.md 内は # 接頭辞なし)
+            _md_purpose = re.compile(r"(?:#\s*)?PURPOSE:\s*(.+)")
+            purpose_text: Optional[str] = None
+            reason_text: Optional[str] = None
+            for line in content.splitlines():
+                pm = _md_purpose.match(line.strip())
+                if pm and not purpose_text:
+                    purpose_text = pm.group(1).strip()
+                rm = REASON_PATTERN.match(line.strip())
+                if rm and not reason_text:
+                    reason_text = rm.group(1).strip()
+            
+            return DirProof(
+                path=path, status=ProofStatus.OK, has_proof_md=True,
+                has_reason=reason_text is not None,
+                purpose_text=purpose_text,
+                reason_text=reason_text,
+            )
 
         return DirProof(
             path=path, status=ProofStatus.MISSING, has_proof_md=False, reason="PROOF.md なし"
@@ -945,7 +964,7 @@ class DendronChecker:  # noqa: AI-007
         structure_proofs: List[StructureProof] = []
         function_nf_proofs: List[FunctionNFProof] = []
         verification_proofs: List[VerificationProof] = []
-        file_trees: Dict[Path, ast.Module] = {}  # BCNF: AST キャッシュ
+        file_trees: Dict[Path, ast.Module] = {}
 
         # ディレクトリをチェック
         if self.check_dirs:
@@ -960,72 +979,100 @@ class DendronChecker:  # noqa: AI-007
             for path in root.rglob("*.py"):
                 if path.is_file():
                     file_proofs.append(self.check_file_proof(path))
-                    
-                    # 関数をチェック (v2.5) + 変数をチェック (v3.0)
-                    # AST を 1 回だけパースして共有 (exempt ファイルはスキップ)
-                    if (self.check_functions or self.check_variables or self.check_structure or self.check_function_nf or self.check_verification) and not self.is_exempt(path):
-                        try:
-                            content = path.read_text(encoding="utf-8")
-                            tree = ast.parse(content, filename=str(path))
-                        except (SyntaxError, UnicodeDecodeError):
-                            tree = None
-                        
-                        if tree is not None:
-                            if self.check_functions:
-                                fps = self._check_functions_from_tree(path, tree, content)
-                                function_proofs.extend(fps)
-                            if self.check_variables:
-                                vps = self._check_variables_from_tree(path, tree)
-                                variable_proofs.extend(vps)
-                            if self.check_structure:
-                                sps = self._check_imports_from_tree(path, tree)
-                                structure_proofs.extend(sps)
-                                sps2 = self._check_calls_from_tree(path, tree)
-                                structure_proofs.extend(sps2)
-                                sps3 = self._check_type_refs_from_tree(path, tree)
-                                structure_proofs.extend(sps3)
-                            if self.check_function_nf:
-                                fnp1 = self._check_complexity_from_tree(path, tree)
-                                function_nf_proofs.extend(fnp1)
-                                fnp2 = self._check_similarity_from_tree(path, tree)
-                                function_nf_proofs.extend(fnp2)
-                                fnp3 = self._check_reassignment_from_tree(path, tree)
-                                function_nf_proofs.extend(fnp3)
-                            if self.check_verification:
-                                file_trees[path] = tree  # BCNF: 後でグローバル解析に使う
+                    self._check_file_ast(
+                        path, function_proofs, variable_proofs,
+                        structure_proofs, function_nf_proofs, file_trees,
+                    )
 
-        # BCNF: プロジェクト横断解析 (全ファイルループ後)
+        # BCNF: プロジェクト横断解析
         if self.check_verification and file_trees:
-            vfps = self._check_verification_global(root, file_trees)
-            verification_proofs.extend(vfps)
+            verification_proofs.extend(
+                self._check_verification_global(root, file_trees)
+            )
 
-        # 集計
+        return self._aggregate_results(
+            file_proofs, dir_proofs, function_proofs,
+            variable_proofs, structure_proofs,
+            function_nf_proofs, verification_proofs,
+        )
+
+    # PURPOSE: 1ファイルの AST を解析し、各レイヤーのチェックを分配する
+    def _check_file_ast(
+        self, path: Path,
+        function_proofs: List[FunctionProof],
+        variable_proofs: List[VariableProof],
+        structure_proofs: List[StructureProof],
+        function_nf_proofs: List[FunctionNFProof],
+        file_trees: Dict[Path, ast.Module],
+    ) -> None:
+        """AST ベースのチェックを1ファイルに対して実行"""
+        needs_ast = (
+            self.check_functions or self.check_variables
+            or self.check_structure or self.check_function_nf
+            or self.check_verification
+        )
+        if not needs_ast or self.is_exempt(path):
+            return
+
+        try:
+            content = path.read_text(encoding="utf-8")
+            tree = ast.parse(content, filename=str(path))
+        except (SyntaxError, UnicodeDecodeError):
+            return
+
+        if self.check_functions:
+            function_proofs.extend(self._check_functions_from_tree(path, tree, content))
+        if self.check_variables:
+            variable_proofs.extend(self._check_variables_from_tree(path, tree))
+        if self.check_structure:
+            structure_proofs.extend(self._check_imports_from_tree(path, tree))
+            structure_proofs.extend(self._check_calls_from_tree(path, tree))
+            structure_proofs.extend(self._check_type_refs_from_tree(path, tree))
+        if self.check_function_nf:
+            function_nf_proofs.extend(self._check_complexity_from_tree(path, tree))
+            function_nf_proofs.extend(self._check_similarity_from_tree(path, tree))
+            function_nf_proofs.extend(self._check_reassignment_from_tree(path, tree))
+        if self.check_verification:
+            file_trees[path] = tree
+
+    # PURPOSE: 収集した各 proof リストから統計を集計し CheckResult を構築する
+    def _aggregate_results(
+        self,
+        file_proofs: List[FileProof],
+        dir_proofs: List[DirProof],
+        function_proofs: List[FunctionProof],
+        variable_proofs: List[VariableProof],
+        structure_proofs: List[StructureProof],
+        function_nf_proofs: List[FunctionNFProof],
+        verification_proofs: List[VerificationProof],
+    ) -> CheckResult:
+        """全 proof から CheckResult を構築"""
+        # ファイル集計
         total_files = len(file_proofs)
         ok = sum(1 for f in file_proofs if f.status == ProofStatus.OK)
         missing = sum(1 for f in file_proofs if f.status == ProofStatus.MISSING)
         invalid = sum(1 for f in file_proofs if f.status == ProofStatus.INVALID)
         exempt = sum(1 for f in file_proofs if f.status == ProofStatus.EXEMPT)
-        orphan = sum(1 for f in file_proofs if f.status == ProofStatus.ORPHAN)  # v2
-        
-        # 関数集計 (v2.5, v2.6: WEAK追加)
+        orphan = sum(1 for f in file_proofs if f.status == ProofStatus.ORPHAN)
+
+        # 関数集計
         total_functions = sum(1 for f in function_proofs if not f.is_dunder)
         funcs_ok = sum(1 for f in function_proofs if f.status == ProofStatus.OK)
         funcs_missing = sum(1 for f in function_proofs if f.status == ProofStatus.MISSING)
         funcs_weak = sum(1 for f in function_proofs if f.status == ProofStatus.WEAK)
 
-        # L3 変数集計 (v3.0)
+        # L3 変数集計
         hint_proofs = [v for v in variable_proofs if v.check_type == "type_hint"]
         total_sigs = len(hint_proofs)
         sigs_ok = sum(1 for v in hint_proofs if v.status == ProofStatus.OK)
         sigs_missing = sum(1 for v in hint_proofs if v.status == ProofStatus.MISSING)
         short_violations = sum(1 for v in variable_proofs if v.check_type == "short_name")
 
-        # レベル統計 (OK + ORPHAN を含む)
+        # レベル統計
         level_counter: Counter = Counter()
         for fp in file_proofs:
             if fp.status in (ProofStatus.OK, ProofStatus.ORPHAN) and fp.level:
                 level_counter[fp.level.value] += 1
-        level_stats = dict(level_counter)
 
         return CheckResult(
             total_files=total_files,
@@ -1036,38 +1083,28 @@ class DendronChecker:  # noqa: AI-007
             files_orphan=orphan,
             file_proofs=file_proofs,
             dir_proofs=dir_proofs,
-            
-            # v2.5, v2.6
             total_functions=total_functions,
             functions_with_purpose=funcs_ok,
             functions_missing_purpose=funcs_missing,
             functions_weak_purpose=funcs_weak,
             function_proofs=function_proofs,
-
-            # v3.0 L3
             total_checked_signatures=total_sigs,
             signatures_with_hints=sigs_ok,
             signatures_missing_hints=sigs_missing,
             short_name_violations=short_violations,
             variable_proofs=variable_proofs,
-            
-            level_stats=level_stats,
-
-            # v3.1 NF2
+            level_stats=dict(level_counter),
             total_structure_checks=len(structure_proofs),
             structure_ok=sum(1 for s in structure_proofs if s.status == ProofStatus.OK),
             structure_missing=sum(1 for s in structure_proofs if s.status in (ProofStatus.MISSING, ProofStatus.WEAK)),
             structure_proofs=structure_proofs,
-
-            # v3.2 NF3
             total_function_nf_checks=len(function_nf_proofs),
             function_nf_ok=sum(1 for f in function_nf_proofs if f.status == ProofStatus.OK),
             function_nf_weak=sum(1 for f in function_nf_proofs if f.status == ProofStatus.WEAK),
             function_nf_proofs=function_nf_proofs,
-
-            # v3.3 BCNF
             total_verification_checks=len(verification_proofs),
             verification_ok=sum(1 for v in verification_proofs if v.status == ProofStatus.OK),
             verification_weak=sum(1 for v in verification_proofs if v.status == ProofStatus.WEAK),
             verification_proofs=verification_proofs,
         )
+

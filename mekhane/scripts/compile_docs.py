@@ -31,6 +31,7 @@ INCLUDE_EXTS = {
 STRICT_EXTS = {".md"}
 
 
+# PURPOSE: 関数: main
 def main():
     print(f"📦 Scanning {SOURCE_ROOT}...")
 

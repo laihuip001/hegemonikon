@@ -31,6 +31,7 @@ WORKFLOWS_DIR = Path("/home/makaron8426/oikos/.agent/workflows")
 DEFAULT_OUTPUT = Path("/home/makaron8426/oikos/hegemonikon/docs/workflow_inventory.md")
 
 
+# PURPOSE: Extract YAML frontmatter from markdown file.
 def extract_frontmatter(filepath: Path) -> dict:
     """Extract YAML frontmatter from markdown file."""
     content = filepath.read_text(encoding="utf-8")
@@ -43,6 +44,7 @@ def extract_frontmatter(filepath: Path) -> dict:
     return {}
 
 
+# PURPOSE: Collect all workflow metadata.
 def collect_workflows() -> list[dict]:
     """Collect all workflow metadata."""
     workflows = []
@@ -62,6 +64,7 @@ def collect_workflows() -> list[dict]:
     return workflows
 
 
+# PURPOSE: Categorize workflows by series.
 def categorize_workflows(workflows: list[dict]) -> dict[str, list]:
     """Categorize workflows by series."""
     categories = defaultdict(list)
@@ -100,6 +103,7 @@ def categorize_workflows(workflows: list[dict]) -> dict[str, list]:
     return dict(categories)
 
 
+# PURPOSE: Count total derivatives and by theorem.
 def count_derivatives(workflows: list[dict]) -> tuple[int, dict]:
     """Count total derivatives and by theorem."""
     total = 0
@@ -123,6 +127,7 @@ def count_derivatives(workflows: list[dict]) -> tuple[int, dict]:
     return total, by_theorem
 
 
+# PURPOSE: Generate markdown inventory.
 def generate_markdown(
     workflows: list[dict], categories: dict, derivatives_info: tuple
 ) -> str:
@@ -215,6 +220,7 @@ def generate_markdown(
     return "\n".join(lines)
 
 
+# PURPOSE: 関数: main
 def main():
     import argparse
 

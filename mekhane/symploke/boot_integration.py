@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # PROOF: [L2/インフラ] <- mekhane/symploke/ A0→継続する私が必要→boot_integration が担う
 """
-Boot Integration - 6軸を統合した /boot 用 API
+Boot Integration - 7軸を統合した /boot 用 API
 
 Usage:
     python boot_integration.py                    # 標準起動
@@ -10,6 +10,7 @@ Usage:
 """
 
 import sys
+import json
 import argparse
 from pathlib import Path
 from typing import Optional
@@ -56,14 +57,14 @@ def get_boot_context(mode: str = "standard", context: Optional[str] = None) -> d
         pass  # GPU チェック失敗時は無視して続行
 
     # 軸 A: Handoff 活用
-    print(" [1/6] 📋 Searching Handoffs...", file=sys.stderr, end="", flush=True)
+    print(" [1/7] 📋 Searching Handoffs...", file=sys.stderr, end="", flush=True)
     from mekhane.symploke.handoff_search import get_boot_handoffs, format_boot_output
 
     handoffs_result = get_boot_handoffs(mode=mode, context=context)
     print(" Done.", file=sys.stderr)
 
     # 軸 B: Sophia アクティベーション (タイムアウト付き)
-    print(" [2/6] 📚 Ingesting Knowledge (Sophia)...", file=sys.stderr, end="", flush=True)
+    print(" [2/7] 📚 Ingesting Knowledge (Sophia)...", file=sys.stderr, end="", flush=True)
     # コンテキストを Handoff から取得
     ki_context = context
     if not ki_context and handoffs_result["latest"]:
@@ -87,7 +88,7 @@ def get_boot_context(mode: str = "standard", context: Optional[str] = None) -> d
         print(" Timeout (skipped).", file=sys.stderr)
     except Exception as e:
         print(f" Failed ({str(e)}).", file=sys.stderr)
-    print(" [3/6] 👤 Loading Persona...", file=sys.stderr, end="", flush=True)
+    print(" [3/7] 👤 Loading Persona...", file=sys.stderr, end="", flush=True)
     from mekhane.symploke.persona import get_boot_persona
 
     persona_result = get_boot_persona(mode=mode)
@@ -98,7 +99,7 @@ def get_boot_context(mode: str = "standard", context: Optional[str] = None) -> d
     pks_result = {"nuggets": [], "count": 0, "formatted": ""}
     
     if mode != "fast":  # fastモードではPKSをスキップ
-        print(" [4/6] 🧠 Activating PKS Engine...", file=sys.stderr, end="", flush=True)
+        print(" [4/7] 🧠 Activating PKS Engine...", file=sys.stderr, end="", flush=True)
         try:
             from concurrent.futures import ThreadPoolExecutor
             
@@ -142,11 +143,11 @@ def get_boot_context(mode: str = "standard", context: Optional[str] = None) -> d
         except Exception as e:
             print(f" Failed ({str(e)}).", file=sys.stderr)
     else:
-         print(" [4/6] 🧠 PKS Engine skipped (fast mode).", file=sys.stderr)
+         print(" [4/7] 🧠 PKS Engine skipped (fast mode).", file=sys.stderr)
 
     # 軸 E: Safety Contract Audit (v3.1)
     safety_result = {"skills": 0, "workflows": 0, "errors": 0, "warnings": 0, "formatted": ""}
-    print(" [5/6] 🛡️ Running Safety Contract Audit...", file=sys.stderr, end="", flush=True)
+    print(" [5/7] 🛡️ Running Safety Contract Audit...", file=sys.stderr, end="", flush=True)
     try:
         from mekhane.dendron.skill_checker import run_audit, AuditResult
         agent_dir = Path(__file__).parent.parent.parent / ".agent"
@@ -176,10 +177,37 @@ def get_boot_context(mode: str = "standard", context: Optional[str] = None) -> d
     except Exception as e:
         print(f" Failed ({str(e)}).", file=sys.stderr)
 
+    # 軸 G: Digestor 候補 (論文レコメンド)
+    digestor_result = {"candidates": [], "count": 0, "formatted": ""}
+    print(" [6/7] 📄 Loading Digest Candidates...", file=sys.stderr, end="", flush=True)
+    try:
+        import glob
+        digest_dir = Path.home() / ".hegemonikon" / "digestor"
+        reports = sorted(glob.glob(str(digest_dir / "digest_report_*.json")), reverse=True)
+        if reports:
+            with open(reports[0], "r", encoding="utf-8") as f:
+                report = json.load(f)
+            candidates = report.get("candidates", [])[:3]
+            if candidates:
+                digest_lines = ["📄 **Digest Candidates** (今日の論文推薦)"]
+                for i, c in enumerate(candidates, 1):
+                    title = c.get("title", "Unknown")[:60]
+                    score = c.get("score", 0)
+                    topics = ", ".join(c.get("matched_topics", [])[:2])
+                    digest_lines.append(f"  {i}. [{score:.2f}] {title}... ({topics})")
+                digestor_result = {
+                    "candidates": candidates,
+                    "count": len(candidates),
+                    "formatted": "\n".join(digest_lines),
+                }
+        print(" Done.", file=sys.stderr)
+    except Exception as e:
+        print(f" Failed ({str(e)}).", file=sys.stderr)
+
     # 軸 F: Attractor Dispatch Engine
     attractor_result = {"series": [], "workflows": [], "llm_format": "", "formatted": ""}
     if context:
-        print(" [6/6] 🎯 Attractor Dispatch...", file=sys.stderr, end="", flush=True)
+        print(" [7/7] 🎯 Attractor Dispatch...", file=sys.stderr, end="", flush=True)
         try:
             from concurrent.futures import ThreadPoolExecutor
 
@@ -207,7 +235,7 @@ def get_boot_context(mode: str = "standard", context: Optional[str] = None) -> d
         except Exception as e:
             print(f" Failed ({str(e)}).", file=sys.stderr)
     else:
-        print(" [6/6] 🎯 Attractor skipped (no context).", file=sys.stderr)
+        print(" [7/7] 🎯 Attractor skipped (no context).", file=sys.stderr)
 
     # 統合フォーマット
     lines = []
@@ -237,6 +265,11 @@ def get_boot_context(mode: str = "standard", context: Optional[str] = None) -> d
         lines.append("")
         lines.append(safety_result["formatted"])
 
+    # Digestor
+    if digestor_result["formatted"]:
+        lines.append("")
+        lines.append(digestor_result["formatted"])
+
     # Attractor
     if attractor_result["formatted"]:
         lines.append("")
@@ -248,6 +281,7 @@ def get_boot_context(mode: str = "standard", context: Optional[str] = None) -> d
         "persona": persona_result,
         "pks": pks_result,
         "safety": safety_result,
+        "digestor": digestor_result,
         "attractor": attractor_result,
         "formatted": "\n".join(lines),
     }

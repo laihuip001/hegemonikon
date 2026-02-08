@@ -9,6 +9,7 @@ from pathlib import Path
 DEFAULT_MIN_LENGTH = 10
 
 
+# PURPOSE: バイナリファイルから ASCII/日本語文字列を抽出
 def extract_strings(filepath: Path, min_length: int = DEFAULT_MIN_LENGTH):
     """バイナリファイルから ASCII/日本語文字列を抽出"""
     if not filepath.exists():

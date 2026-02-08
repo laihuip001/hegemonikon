@@ -26,6 +26,7 @@ from typing import Optional, List
 from enum import Enum
 
 
+# PURPOSE: 目的-行為の整合状態
 class AlignmentStatus(Enum):
     """目的-行為の整合状態"""
 
@@ -36,6 +37,7 @@ class AlignmentStatus(Enum):
 
 
 @dataclass
+# PURPOSE: Telos評価結果
 class TelосResult:
     """Telos評価結果
 
@@ -58,11 +60,13 @@ class TelосResult:
     suggestions: List[str] = field(default_factory=list)
 
     @property
+    # PURPOSE: 行為が目的に整合しているか
     def is_aligned(self) -> bool:
         """行為が目的に整合しているか"""
         return self.status in (AlignmentStatus.ALIGNED, AlignmentStatus.DRIFTING)
 
     @property
+    # PURPOSE: 軌道修正が必要か
     def needs_correction(self) -> bool:
         """軌道修正が必要か"""
         return self.status in (AlignmentStatus.MISALIGNED, AlignmentStatus.INVERTED)
@@ -107,6 +111,7 @@ DRIFT_PATTERNS = {
         "keywords": ["とりあえず", "一旦", "今は", "後で"],
     },
 }
+# PURPOSE: 目的と行為からドリフトパターンを検出
 
 
 def _detect_drift_patterns(goal: str, action: str) -> List[str]:
@@ -129,6 +134,7 @@ def _detect_drift_patterns(goal: str, action: str) -> List[str]:
                 break  # 1パターン1検出
 
     return indicators
+# PURPOSE: 整合度スコアを計算
 
 
 def _calculate_alignment(goal: str, action: str, drift_count: int) -> float:
@@ -155,6 +161,7 @@ def _calculate_alignment(goal: str, action: str, drift_count: int) -> float:
 
     # クリップ
     return max(0.0, min(1.0, score))
+# PURPOSE: スコアとドリフト数から状態を決定
 
 
 def _determine_status(score: float, drift_count: int) -> AlignmentStatus:
@@ -167,6 +174,7 @@ def _determine_status(score: float, drift_count: int) -> AlignmentStatus:
         return AlignmentStatus.INVERTED
     else:
         return AlignmentStatus.MISALIGNED
+# PURPOSE: 状態に応じた軌道修正提案を生成
 
 
 def _generate_suggestions(
@@ -194,6 +202,7 @@ def _generate_suggestions(
 # =============================================================================
 # Public API
 # =============================================================================
+# PURPOSE: 目的と行為の整合性を評価
 
 
 def check_alignment(goal: str, action: str) -> TelосResult:
@@ -249,6 +258,7 @@ def check_alignment(goal: str, action: str) -> TelосResult:
         drift_indicators=drift_indicators,
         suggestions=suggestions,
     )
+# PURPOSE: 結果をMarkdown形式でフォーマット
 
 
 def format_telos_markdown(result: TelосResult) -> str:
@@ -290,6 +300,7 @@ def format_telos_markdown(result: TelосResult) -> str:
 
     return "\n".join(lines)
 
+# PURPOSE: FEP観察空間へのエンコード
 
 # For FEP integration: encode telos result into observation
 def encode_telos_observation(result: TelосResult) -> dict:

@@ -14,7 +14,11 @@ triggers:
   - "plan"
   - "schema"
   - "リーンキャンバス"
-version: "6.0"
+version: "6.1"
+category_theory:
+  yoneda: "Hom(-, Tn) ≅ F(Tn) — 各定理はその射の集合で完全に決まる"
+  limit: "Cone の頂点 — 全ての射が一致する点"
+  converge_as_cone: "C1=STAGE 0-3の射列挙, C2=STAGE 4 Devilが中介射を攻撃, C3=STAGE 5 KPTで普遍性検証"
 lcm_state: stable
 layer: "Δ"
 lineage: "v5.8 + Limit演算復元 → v6.0"
@@ -87,6 +91,12 @@ children:
 | `\s` | `\` | **Colimit** | 4定理 → 全組み合わせに展開 |
 | `/s+` | `+` | Limit強度↑ | より深い収束 |
 | `/s-` | `-` | Limit強度↓ | 軽い収束 |
+
+### 米田の補題 (Yoneda)
+
+> 各定理 T は Hom(-, T) で完全に決まる。X-series が定理の意味そのもの。
+> Limit `/s` = 4定理の戦略射が一致する Cone の頂点。
+> S-series の特殊性: STAGE 4 (Devil's Advocate) = Cone への**敏対的検証**。C2 が受動的解消でなく能動的攻撃。
 
 ### `\s` (Colimit — 展開) `@diverge`
 
@@ -321,33 +331,47 @@ python3 $HOME/oikos/hegemonikon/mekhane/quality_gate.py <変更ファイル>
 | STAGE 4 | Devil's Advocate: {result} |
 | STAGE 5 | KPT: Keep/Problem/Try |
 
-### ⊕ C1: 対比 (Contrast) — STAGE 0-3 出力
+### ⊕ C1: 射の対比 (Contrast) — STAGE 0-3 出力 = Cone の射後検査
 
-| STAGE | 定理 | 出力要点 (1行) |
-|:------|:-----|:---------------|
-| 0 | S1 Metron | {Scale: Micro/Meso/Macro} |
-| 1 | S2 Mekhanē | {Strategy: Explore/Exploit, Plan: A/B/C} |
-| 2 | S3 Stathmos | {Rubric: Must/Should/Could} |
-| 3 | S4 Praxis | {Blueprint: path} |
+> **圏論**: 4つの戦略射 Hom(X, Sn) を列挙し、整合性を検査する。
+> STAGE 0-3 が各定理の Yoneda 表現を計算するフェーズ。
 
-→ **V[outputs]** = 分散 (戦略の矛盾度: 0.0-1.0)
+| STAGE | 定理 | Hom(X, Sn) | 出力要点 (1行) |
+|:------|:-----|:-----------|:---------------|
+| 0 | S1 Metron | スケールの射 | {Scale: Micro/Meso/Macro} |
+| 1 | S2 Mekhanē | 手法の射 | {Strategy: Explore/Exploit, Plan: A/B/C} |
+| 2 | S3 Stathmos | 基準の射 | {Rubric: Must/Should/Could} |
+| 3 | S4 Praxis | 実践の射 | {Blueprint: path} |
 
-### ⊕ C2: 解消 (Resolve) — STAGE 4 (Devil's Advocate)
+→ **V[outputs]** = 戦略射の散布度 (矛盾度: 0.0-1.0)
+　V = 0: 全射が自然に整合 = Cone が自明に存在
+　V > 0: スケールと実践が矛盾、基準と手法が不整合 = Cone の頂点探索が必要
 
-| V[outputs] | 状態 | 処理 |
-|:-----------|:-----|:-----|
-| > 0.3 | 戦略矛盾 | `/dia.root` → 重み付け融合 |
+### ⊕ C2: Cone への敏対的検証 (Resolve) — STAGE 4 Devil's Advocate
+
+> **圏論**: S-series 独自の構造。他の Hub の C2 が「中介射の構築」(受動的) なのに対し、
+> S-series の C2 は Devil's Advocate が **Cone を能動的に攻撃**する。
+> 「この Cone は本当に普遍的か？ 別の Cone があるのでは？」と問う。
+
+| V[outputs] | Cone 状態 | Devil の攻撃方法 |
+|:-----------|:---------|:-------------------|
+| > 0.3 | 戦略矛盾 | `/dia.root` — 根本原因から代替 Cone を探索 |
 | > 0.1 | 微妙な不整合 | 通常融合 (`@reduce(*)`) |
-| ≤ 0.1 | 戦略整合 | 単純集約 (`Σ`) |
+| ≤ 0.1 | 戦略整合 | 単純集約 (`Σ`) — Cone が自明。Devil にも崩せない |
 
-### ⊕ C3: 検証 (Verify) — STAGE 5 統合
+### ⊕ C3: 普遍性検証 (Verify) — STAGE 5 KPT 統合
 
-| 項目 | 内容 |
-|:-----|:-----|
-| 矛盾度 | V[STAGE 0-3 outputs] = {0.0-1.0} |
-| 解消法 | {root/weighted/simple} |
-| **統合配置判断** | {1文で} |
-| **確信度** | {C/U} ({confidence}%) |
+> **圏論**: STAGE 5 (KPT) = Cone の普遍性検証。
+> Keep = 「この射は正しかった」(普遍性の証拠)
+> Problem = 「この射は崩れた」(普遍性の反例)
+> Try = 「次回の Cone を改善する」(普遍性の強化)
+
+| 項目 | 圏論的意味 | 内容 |
+|:-----|:-------------|:-----|
+| 矛盾度 | 射の散布 | V[STAGE 0-3 outputs] = {0.0-1.0} |
+| 解消法 | Devil の攻撃結果 | {root/weighted/simple} |
+| **統合配置判断** | **Cone の頂点** | {1文で} |
+| **確信度** | **普遍性の強さ** | {C/U} ({confidence}%) |
 
 ---
 
@@ -400,3 +424,5 @@ graph LR
 ---
 
 *v6.0 — Limit演算復元 (2026-02-07)*
+*v6.1 — 米田の補題統合 (2026-02-08)*
+*v6.2 — 米田深層統合。STAGE 0-3=射の列挙, STAGE 4 Devil=敏対的Cone検証, STAGE 5 KPT=普遍性検証 (2026-02-08)*

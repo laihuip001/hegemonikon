@@ -31,6 +31,7 @@ DB_PATH = Path(r"M:\Brain\.hegemonikon\lancedb")
 TABLE_NAME = "dev_modules"
 
 
+# PURPOSE: モジュールドキュメントのスキーマ
 class ModuleDocument(BaseModel):
     """モジュールドキュメントのスキーマ"""
 
@@ -41,6 +42,7 @@ class ModuleDocument(BaseModel):
     content_preview: str
 
 
+# PURPOSE: モジュール md ファイルをパースしてドキュメントに変換
 def parse_module_file(filepath: Path, category: str) -> Optional[ModuleDocument]:
     """モジュール md ファイルをパースしてドキュメントに変換"""
     try:
@@ -73,6 +75,7 @@ def parse_module_file(filepath: Path, category: str) -> Optional[ModuleDocument]
         return None
 
 
+# PURPOSE: 全モジュールファイルをインデックス
 def index_modules():
     """全モジュールファイルをインデックス"""
     print("[*] 開発用モジュール インデクサー")
@@ -134,6 +137,7 @@ def index_modules():
     return db, table
 
 
+# PURPOSE: モジュールを検索
 def search_modules(query: str, limit: int = 5):
     """モジュールを検索"""
     db = lancedb.connect(str(DB_PATH))

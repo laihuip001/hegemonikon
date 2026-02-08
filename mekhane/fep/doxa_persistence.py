@@ -30,6 +30,7 @@ from enum import Enum
 from datetime import datetime
 
 
+# PURPOSE: H4 Doxa の派生モード
 class DoxaDerivative(Enum):
     """H4 Doxa の派生モード"""
 
@@ -38,6 +39,7 @@ class DoxaDerivative(Enum):
     ARCHIVE = "arch"  # アーカイブ (履歴化)
 
 
+# PURPOSE: 信念の強さ
 class BeliefStrength(Enum):
     """信念の強さ"""
 
@@ -48,6 +50,7 @@ class BeliefStrength(Enum):
 
 
 @dataclass
+# PURPOSE: 信念オブジェクト
 class Belief:
     """信念オブジェクト
 
@@ -68,11 +71,13 @@ class Belief:
     evidence: List[str] = field(default_factory=list)
 
     @property
+    # PURPOSE: 信念の年齢（日数）
     def age_days(self) -> float:
         """信念の年齢（日数）"""
         return (datetime.now() - self.created_at).total_seconds() / 86400
 
 
+# PURPOSE: H4 Doxa 操作結果
 @dataclass
 class DoxaResult:
     """H4 Doxa 操作結果
@@ -91,6 +96,7 @@ class DoxaResult:
     previous_state: Optional[Belief]
     success: bool
 
+# PURPOSE: H4 Doxa 信念ストア
 
 class DoxaStore:
     """H4 Doxa 信念ストア
@@ -98,10 +104,12 @@ class DoxaStore:
     信念の永続化を管理。
     """
 
+    # PURPOSE: 内部処理: init__
     def __init__(self):
         self._beliefs: Dict[str, Belief] = {}
         self._archive: List[Belief] = []
 
+    # PURPOSE: 信念を永続化
     def persist(
         self,
         content: str,
@@ -126,6 +134,7 @@ class DoxaStore:
             success=True,
         )
 
+    # PURPOSE: 信念を進化（更新）
     def evolve(
         self,
         content: str,
@@ -172,6 +181,7 @@ class DoxaStore:
             success=True,
         )
 
+    # PURPOSE: 信念をアーカイブ（履歴化）
     def archive(self, content: str) -> DoxaResult:
         """信念をアーカイブ（履歴化）"""
         if content not in self._beliefs:
@@ -196,20 +206,25 @@ class DoxaStore:
             success=True,
         )
 
+    # PURPOSE: 信念を取得
     def get(self, content: str) -> Optional[Belief]:
         """信念を取得"""
         return self._beliefs.get(content)
 
+    # PURPOSE: 全信念をリスト
     def list_all(self) -> List[Belief]:
         """全信念をリスト"""
         return list(self._beliefs.values())
 
+    # PURPOSE: アーカイブ済みをリスト
     def list_archived(self) -> List[Belief]:
+# PURPOSE: グローバルストアを取得
         """アーカイブ済みをリスト"""
         return self._archive
 
 
 # グローバルストア
+# PURPOSE: H4 Doxa 結果をMarkdown形式でフォーマット
 _global_store = DoxaStore()
 
 
@@ -225,6 +240,7 @@ def format_doxa_markdown(result: DoxaResult) -> str:
         "┌─[H4 Doxa 信念永続化]────────────────────────────────┐",
         f"│ 派生: {result.derivative.value}",
         f"│ 内容: {result.belief.content[:40]}",
+# PURPOSE: FEP観察空間へのエンコード
         f"│ 強さ: {result.belief.strength.value}",
         f"│ 確信度: {result.belief.confidence:.0%}",
         f"│ アクション: {success_emoji} {result.action_taken}",

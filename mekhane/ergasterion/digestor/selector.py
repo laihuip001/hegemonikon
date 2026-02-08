@@ -17,6 +17,7 @@ try:
 except ImportError:
     # フォールバック: 簡易 Paper dataclass
     @dataclass
+    # PURPOSE: クラス: Paper
     class Paper:
         id: str
         title: str
@@ -27,6 +28,7 @@ except ImportError:
         url: Optional[str] = None
 
 
+# PURPOSE: 消化候補
 @dataclass
 class DigestCandidate:
     """消化候補"""
@@ -36,9 +38,11 @@ class DigestCandidate:
     matched_topics: list[str]  # マッチしたトピック
     rationale: str  # 選定理由
 
+# PURPOSE: 消化候補選定ロジック
 
 class DigestorSelector:
     """消化候補選定ロジック"""
+    # PURPOSE: Args:
 
     def __init__(self, topics_file: Optional[Path] = None):
         """
@@ -47,10 +51,12 @@ class DigestorSelector:
         """
         self.topics_file = topics_file or self._default_topics_file()
         self.topics = self._load_topics()
+    # PURPOSE: デフォルトのトピックファイルパス
 
     def _default_topics_file(self) -> Path:
         """デフォルトのトピックファイルパス"""
         return Path(__file__).parent / "topics.yaml"
+    # PURPOSE: トピック定義を読み込む
 
     def _load_topics(self) -> dict:
         """トピック定義を読み込む"""
@@ -58,6 +64,7 @@ class DigestorSelector:
             with open(self.topics_file, "r", encoding="utf-8") as f:
                 return yaml.safe_load(f) or {}
         return {}
+    # PURPOSE: 優先度スコアを計算
 
     def _calculate_score(self, paper: Paper, matched_topics: list[str]) -> float:
         """
@@ -88,6 +95,7 @@ class DigestorSelector:
             score += 0.1  # 被引用情報あり
 
         return min(score, 1.0)
+    # PURPOSE: 論文がマッチするトピックを検出
 
     def _match_topics(self, paper: Paper) -> list[str]:
         """論文がマッチするトピックを検出"""
@@ -109,6 +117,7 @@ class DigestorSelector:
                 matched.append(topic_id)
 
         return matched
+    # PURPOSE: 消化候補を選定
 
     def select_candidates(
         self,
@@ -158,7 +167,7 @@ class DigestorSelector:
                     paper=paper,
                     score=score,
                     matched_topics=matched_topics,
-                    # NOTE: Removed self-assignment: rationale = rationale
+                    rationale=rationale,
                 )
             )
 
@@ -166,6 +175,7 @@ class DigestorSelector:
         candidates.sort(key=lambda c: c.score, reverse=True)
 
         return candidates[:max_candidates]
+    # PURPOSE: 定義済みトピックを取得
 
     def get_topics(self) -> list[dict]:
         """定義済みトピックを取得"""

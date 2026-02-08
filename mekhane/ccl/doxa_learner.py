@@ -13,6 +13,7 @@ import json
 
 
 @dataclass
+# PURPOSE: A learned intent-to-CCL mapping.
 class LearnedPattern:
     """A learned intent-to-CCL mapping."""
 
@@ -22,6 +23,7 @@ class LearnedPattern:
     usage_count: int
 
 
+# PURPOSE: H4 Doxa connected pattern learner (Layer 2).
 class DoxaLearner:
     """
     H4 Doxa connected pattern learner (Layer 2).
@@ -32,6 +34,7 @@ class DoxaLearner:
 
     STORE_PATH = Path("/home/makaron8426/oikos/mneme/.hegemonikon/ccl_patterns.json")
 
+    # PURPOSE: Initialize the learner.
     def __init__(self, store_path: Optional[Path] = None):
         """
         Initialize the learner.
@@ -45,6 +48,7 @@ class DoxaLearner:
             self.store_path = self.STORE_PATH
         self.patterns: List[LearnedPattern] = self._load()
 
+    # PURPOSE: Load patterns from disk.
     def _load(self) -> List[LearnedPattern]:
         """Load patterns from disk."""
         if self.store_path.exists():
@@ -55,12 +59,14 @@ class DoxaLearner:
                 return []
         return []
 
+    # PURPOSE: Persist patterns to disk.
     def _save(self):
         """Persist patterns to disk."""
         self.store_path.parent.mkdir(parents=True, exist_ok=True)
         data = [asdict(p) for p in self.patterns]
         self.store_path.write_text(json.dumps(data, indent=2, ensure_ascii=False))
 
+    # PURPOSE: Record a successful intent-to-CCL conversion.
     def record(self, intent: str, ccl: str, confidence: float = 0.8):
         """
         Record a successful intent-to-CCL conversion.
@@ -90,6 +96,7 @@ class DoxaLearner:
 
         self._save()
 
+    # PURPOSE: Look up a similar pattern.
     def lookup(self, intent: str) -> Optional[str]:
         """
         Look up a similar pattern.
@@ -112,6 +119,7 @@ class DoxaLearner:
 
         return None
 
+    # PURPOSE: Get statistics about learned patterns.
     def get_stats(self) -> dict:
         """Get statistics about learned patterns."""
         if not self.patterns:

@@ -29,6 +29,7 @@ class ReportFormat(Enum):
 class DendronReporter:  # noqa: AI-007
     """Dendron レポート生成器"""
 
+    # PURPOSE: 内部処理: init__
     def __init__(self, output: TextIO = None):
         self.output = output or sys.stdout
 
@@ -44,6 +45,7 @@ class DendronReporter:  # noqa: AI-007
         elif format == ReportFormat.JSON:
             self._report_json(result)
 
+    # PURPOSE: テキスト形式
     def _report_text(self, result: CheckResult):  # noqa: AI-007
         """テキスト形式"""
         self._print("=" * 60)
@@ -113,6 +115,7 @@ class DendronReporter:  # noqa: AI-007
         else:
             self._print("❌ FAIL")
 
+    # PURPOSE: Markdown 形式
     def _report_markdown(self, result: CheckResult):
         """Markdown 形式"""
         self._print("# Dendron PROOF Check Report\n")
@@ -167,6 +170,7 @@ class DendronReporter:  # noqa: AI-007
             if result.short_name_violations > 0:
                 self._print(f"| Short names | {result.short_name_violations} violations |")
 
+    # PURPOSE: CI 向け最小出力 (v3: L2 Purpose 対応)
     def _report_ci(self, result: CheckResult):
         """CI 向け最小出力 (v3: L2 Purpose 対応)"""
         if result.is_passing:
@@ -187,7 +191,17 @@ class DendronReporter:  # noqa: AI-007
             hint_cov = (result.signatures_with_hints / result.total_checked_signatures * 100) if result.total_checked_signatures > 0 else 100.0
             short_str = f", {result.short_name_violations} short" if result.short_name_violations > 0 else ""
             self._print(f"   TypeHints: {result.signatures_with_hints}/{result.total_checked_signatures} ({hint_cov:.0f}%){short_str}")
+        # EPT Matrix summary (v3.3)
+        total_ept = result.total_structure_checks + result.total_function_nf_checks + result.total_verification_checks
+        if total_ept > 0:
+            ok_ept = result.structure_ok + result.function_nf_ok + result.verification_ok
+            pct = (ok_ept / total_ept * 100)
+            nf2_str = f"NF2:{result.structure_ok}/{result.total_structure_checks}"
+            nf3_str = f"NF3:{result.function_nf_ok}/{result.total_function_nf_checks}"
+            bcnf_str = f"BCNF:{result.verification_ok}/{result.total_verification_checks}"
+            self._print(f"   EPT: {ok_ept}/{total_ept} ({pct:.0f}%) [{nf2_str} {nf3_str} {bcnf_str}]")
 
+    # PURPOSE: JSON 形式
     def _report_json(self, result: CheckResult):
         """JSON 形式"""
         import json
@@ -221,6 +235,7 @@ class DendronReporter:  # noqa: AI-007
 
         self._print(json.dumps(data, indent=2, ensure_ascii=False))
 
+    # PURPOSE: 出力
     def _print(self, text: str = ""):
         """出力"""
         print(text, file=self.output)

@@ -20,6 +20,7 @@ from .syntax_validator import CCLSyntaxValidator
 
 
 @dataclass
+# PURPOSE: Result of CCL generation.
 class GenerationResult:
     """Result of CCL generation."""
 
@@ -29,6 +30,7 @@ class GenerationResult:
     warnings: list
 
 
+# PURPOSE: CCL Generator with 4-layer fallback.
 class CCLGenerator:
     """
     CCL Generator with 4-layer fallback.
@@ -36,6 +38,7 @@ class CCLGenerator:
     Converts natural language intent into CCL v2.0 expressions.
     """
 
+    # PURPOSE: Initialize the generator.
     def __init__(self, enable_learning: bool = True):
         """
         Initialize the generator.
@@ -49,6 +52,7 @@ class CCLGenerator:
         self.validator = CCLSyntaxValidator()
         self.enable_learning = enable_learning
 
+    # PURPOSE: Generate CCL from natural language intent.
     def generate(self, intent: str) -> GenerationResult:
         """
         Generate CCL from natural language intent.
@@ -108,6 +112,7 @@ class CCLGenerator:
             warnings=["Could not generate CCL - asking user"],
         )
 
+# PURPOSE: Generate CCL from intent (simple interface).
 
 # Convenience function for backward compatibility
 def generate_ccl(intent: str) -> str:

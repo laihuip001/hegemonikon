@@ -19,6 +19,7 @@ import re
 from typing import Dict, List, Tuple, Optional
 
 
+# PURPOSE: A2 Krisis の偵察機能: リスク検知
 class EpocheScanner:
     """
     A2 Krisis の偵察機能: リスク検知
@@ -28,6 +29,7 @@ class EpocheScanner:
         = リスクの可視化
     """
 
+    # PURPOSE: 内部処理: init__
     def __init__(self):
         # PII検知パターン（A2 Krisis の「判断基準」）
         self.patterns = {
@@ -61,6 +63,7 @@ class EpocheScanner:
             "取扱注意",
         ]
 
+    # PURPOSE: リスクスキャン: PIIとセンシティブキーワードを検出
     def scan(self, text: str) -> Dict:
         """
         リスクスキャン: PIIとセンシティブキーワードを検出
@@ -87,6 +90,7 @@ class EpocheScanner:
         count = sum(len(v) for v in findings.values())
         return {"has_risks": count > 0, "risks": findings, "risk_count": count}
 
+    # PURPOSE: 厳格な拒否リストチェック
     def check_deny_list(self, text: str) -> Tuple[bool, Optional[str]]:
         """
         厳格な拒否リストチェック
@@ -99,6 +103,7 @@ class EpocheScanner:
         for kw in self.sensitive_keywords:
             if kw.upper() in text_upper:
                 return True, kw
+# PURPOSE: A2 Krisis (Epochē) の防御機能: PIIマスキング
         return False, None
 
 
@@ -119,9 +124,11 @@ class EpocheShield:
         これにより、外部が判断材料（PII）を得ることを防ぐ
     """
 
+    # PURPOSE: 内部処理: init__
     def __init__(self):
         self.scanner = EpocheScanner()
 
+    # PURPOSE: Epochē 発動: PIIをプレースホルダに置換
     def mask(
         self, text: str, use_custom_vocab: bool = True
     ) -> Tuple[str, Dict[str, str]]:
@@ -172,6 +179,7 @@ class EpocheShield:
 
         return masked_text, mapping
 
+    # PURPOSE: Epochē 解除: プレースホルダを元のPIIに復元
     def unmask(self, text: str, mapping: Dict[str, str]) -> str:
         """
         Epochē 解除: プレースホルダを元のPIIに復元
@@ -184,11 +192,13 @@ class EpocheShield:
             result = result.replace(placeholder, original)
         return result
 
+# PURPOSE: Backward compatibility function
 
 # Backward compatibility aliases
 PrivacyScanner = EpocheScanner
 PrivacyHandler = EpocheShield
 
+# PURPOSE: Backward compatibility function
 
 def mask_pii(text: str, use_custom_vocab: bool = True) -> Tuple[str, Dict[str, str]]:
     """Backward compatibility function"""

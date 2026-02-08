@@ -31,6 +31,7 @@ except ImportError:
 
 
 @dataclass
+# PURPOSE: Result from O1 Noēsis FEP analysis.
 class NoesisResult:
     """Result from O1 Noēsis FEP analysis."""
 
@@ -42,6 +43,7 @@ class NoesisResult:
 
 
 @dataclass
+# PURPOSE: Result from O2 Boulēsis FEP analysis.
 class BoulesisResult:
     """Result from O2 Boulēsis FEP analysis."""
 
@@ -56,6 +58,7 @@ class BoulesisResult:
 _agent: Optional[HegemonikónFEPAgent] = None
 
 
+# PURPOSE: Get or create the singleton FEP agent.
 def _get_agent() -> HegemonikónFEPAgent:
     """Get or create the singleton FEP agent."""
     global _agent
@@ -66,6 +69,7 @@ def _get_agent() -> HegemonikónFEPAgent:
     return _agent
 
 
+# PURPOSE: O1 Noēsis: Analyze cognitive state using Active Inference.
 def noesis_analyze(
     context_clarity: int = 1,
     reset_beliefs: bool = False,
@@ -119,6 +123,7 @@ def noesis_analyze(
     )
 
 
+# PURPOSE: O2 Boulēsis: Select optimal action using Expected Free Energy.
 def boulesis_analyze(
     prior_noesis: Optional[NoesisResult] = None,
 ) -> BoulesisResult:
@@ -176,6 +181,7 @@ def boulesis_analyze(
     )
 
 
+# PURPOSE: Complete O1→O2 inference cycle.
 def full_inference_cycle(
     context_clarity: int = 1,
     reset_beliefs: bool = True,
@@ -221,6 +227,7 @@ def full_inference_cycle(
     }
 
 
+# PURPOSE: Generate human-readable interpretation of Noēsis result.
 def _interpret_noesis_state(map_state: Dict[str, str], confidence: float) -> str:
     """Generate human-readable interpretation of Noēsis result."""
     phantasia = map_state.get("phantasia", "unknown")
@@ -236,6 +243,7 @@ def _interpret_noesis_state(map_state: Dict[str, str], confidence: float) -> str
     )
 
 
+# PURPOSE: Generate human-readable interpretation of Boulēsis result.
 def _interpret_boulesis_policy(q_pi: List[float], action_name: str) -> str:
     """Generate human-readable interpretation of Boulēsis result."""
     if len(q_pi) >= 2:
@@ -255,6 +263,7 @@ def _interpret_boulesis_policy(q_pi: List[float], action_name: str) -> str:
     return f"[FEP Boulēsis] 選択: {action_name}"
 
 
+# PURPOSE: Generate combined FEP analysis summary.
 def _generate_fep_summary(
     noesis: NoesisResult,
     boulesis: BoulesisResult,

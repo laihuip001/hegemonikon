@@ -20,6 +20,7 @@ except ImportError:
 url = "https://ai-data-base.com/archives/77445"
 
 
+# PURPOSE: 関数: main
 def main():
     if not HAS_DEPS:
         print("Missing dependencies: pip install html2text beautifulsoup4")

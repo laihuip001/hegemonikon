@@ -13,6 +13,7 @@ CONV_DIR = Path(r"M:\.gemini\antigravity\conversations")
 BACKUP_DIR = Path(r"M:\.gemini\backup") / datetime.now().strftime("%Y%m%d_%H%M%S")
 
 
+# PURPOSE: 破損 .pb ファイルを特定
 def scan_pb_files():
     """破損 .pb ファイルを特定"""
     print("=== Scanning .pb files ===\n")
@@ -37,6 +38,7 @@ def scan_pb_files():
     return problematic
 
 
+# PURPOSE: 問題ファイルをバックアップして削除
 def backup_problematic(files):
     """問題ファイルをバックアップして削除"""
     BACKUP_DIR.mkdir(parents=True, exist_ok=True)

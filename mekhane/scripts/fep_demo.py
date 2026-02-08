@@ -24,6 +24,7 @@ from mekhane.fep.state_spaces import (
 import numpy as np
 
 
+# PURPOSE: Print a visual separator.
 def print_separator(title: str = ""):
     """Print a visual separator."""
     if title:
@@ -34,6 +35,7 @@ def print_separator(title: str = ""):
         print(f"{'─' * 60}")
 
 
+# PURPOSE: Pretty print belief distribution.
 def print_beliefs(beliefs: np.ndarray, title: str = "信念分布"):
     """Pretty print belief distribution."""
     print(f"\n📊 {title}:")
@@ -44,6 +46,7 @@ def print_beliefs(beliefs: np.ndarray, title: str = "信念分布"):
             print(f"   [{p:9s} / {a:8s} / {h:7s}]: {prob:.2%} {bar}")
 
 
+# PURPOSE: Demonstrate single observation inference.
 def demo_single_observation():
     """Demonstrate single observation inference."""
     print_separator("O1 Noēsis: 単一観測からの信念更新")
@@ -63,6 +66,7 @@ def demo_single_observation():
     print(f"   エントロピー: {result['entropy']:.3f}")
 
 
+# PURPOSE: Demonstrate policy selection (O2 Boulēsis).
 def demo_policy_selection():
     """Demonstrate policy selection (O2 Boulēsis)."""
     print_separator("O2 Boulēsis: ポリシー選択")
@@ -83,6 +87,7 @@ def demo_policy_selection():
         print(f"      Expected Free Energy: {-efe:.3f}")
 
 
+# PURPOSE: Demonstrate full inference-action cycle.
 def demo_full_cycle():
     """Demonstrate full inference-action cycle."""
     print_separator("完全サイクル: O1 → O2 → O4")
@@ -105,6 +110,7 @@ def demo_full_cycle():
         print_separator()
 
 
+# PURPOSE: Demonstrate entropy as a measure of uncertainty.
 def demo_entropy_as_uncertainty():
     """Demonstrate entropy as a measure of uncertainty."""
     print_separator("エントロピー: 不確実性の定量化")
@@ -132,6 +138,7 @@ def demo_entropy_as_uncertainty():
         print(f"   {obs_name:20s} → エントロピー: {result['entropy']:.3f}")
 
 
+# PURPOSE: Run all demonstrations.
 def main():
     """Run all demonstrations."""
     import argparse
@@ -170,6 +177,7 @@ def main():
     return 0
 
 
+# PURPOSE: 対話型 FEP デモ (REPL)
 def interactive_mode():
     """対話型 FEP デモ (REPL)"""
     from mekhane.fep.encoding import encode_to_flat_index, decode_observation
@@ -192,6 +200,7 @@ def interactive_mode():
     history = []
     learning_count = 0
 
+    # PURPOSE: 現在のエントロピーを計算
     def get_entropy():
         """現在のエントロピーを計算"""
         beliefs = agent.beliefs
@@ -207,6 +216,7 @@ def interactive_mode():
             qs = np.asarray(beliefs, dtype=np.float64).flatten()
         return float(-np.sum(qs * np.log(qs + 1e-10)))
 
+    # PURPOSE: 関数: show_help
     def show_help():
         print("""
 ╭─────────────────────────────────────────────────────────╮

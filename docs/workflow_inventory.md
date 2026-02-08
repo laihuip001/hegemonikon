@@ -1,7 +1,7 @@
 # Hegemonikón ワークフロー一覧
 
-> **自動生成**: 2026-02-08 08:30
-> **総ワークフロー数**: 45
+> **自動生成**: 2026-02-08 09:22
+> **総ワークフロー数**: 46
 > **派生付きワークフロー**: 37
 > **総派生数**: 251
 
@@ -13,9 +13,9 @@
 |:---------|:-------|:-----|:--------|
 | `/bou` | O2 | desir, voli, akra | 4.6 |
 | `/ene` | O4 | flow, prax, pois, constructive | 5.0 |
-| `/o` | O1, O2, O3, O4 | — | 4.0 |
+| `/o` | O1, O2, O3, O4 | — | 4.1 |
 | `/why` | O3 | quick, deep, branch | 1.3 |
-| `/zet` | O3 | anom, hypo, eval, abduction | 5.6 |
+| `/zet` | O3 | anom, hypo, eval, abduction | 6.0 |
 
 ---
 
@@ -76,6 +76,7 @@
 |:---------|:-------|:-----|:--------|
 | `/a` | A1, A2, A3, A4 | prim, seco, regu, affi, nega, susp, conc, abst, univ, tent, just, cert | 5.0 |
 | `/epi` | A4 | prac, theo, tech, case, transfer, pattern, statistical, base_rate, reuse, triz40, generalize, typed | 1.4 |
+| `/fit` | A2 | — | 4.0 |
 | `/gno` | A3 | disc, extr, appl, analogy, lit, rule, invariant, symmetry, metaphor, principle, story, check, personify, assumption | 1.4 |
 | `/lex` | A2 | dict, mech, feed | 1.1 |
 | `/pat` | A1 | rece, tran, regu, delta, neutral | 1.5 |
@@ -97,7 +98,7 @@
 | Workflow | Module | 派生 | Version |
 |:---------|:-------|:-----|:--------|
 | `/dendron` | — | — | — |
-| `/eat` | S2, A2 | cook, dige, natu, batch | 1.4 |
+| `/eat` | S2, A2 | cook, dige, natu, batch | 2.0 |
 
 ---
 
@@ -141,10 +142,10 @@
 | H-series | 6 |
 | P-series | 6 |
 | K-series | 5 |
-| A-series | 6 |
+| A-series | 7 |
 | X-series | 2 |
 | Utils | 2 |
-| **合計** | **45** |
+| **合計** | **46** |
 
 ---
 

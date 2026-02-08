@@ -21,6 +21,7 @@ from typing import Optional
 
 
 @dataclass
+# PURPOSE: 統一論文スキーマ
 class Paper:
     """統一論文スキーマ"""
     
@@ -52,6 +53,7 @@ class Paper:
     collected_at: str = field(default_factory=lambda: datetime.now().isoformat())
     
     @property
+    # PURPOSE: 重複排除用プライマリキー (DOI > arXiv ID > source:id)
     def primary_key(self) -> str:
         """重複排除用プライマリキー (DOI > arXiv ID > source:id)"""
         if self.doi:
@@ -61,10 +63,12 @@ class Paper:
         return f"{self.source}:{self.source_id}"
     
     @property
+    # PURPOSE: 埋め込み生成用テキスト
     def embedding_text(self) -> str:
         """埋め込み生成用テキスト"""
         return f"{self.title} {self.abstract[:1000]}"
     
+    # PURPOSE: LanceDB保存用辞書
     def to_dict(self) -> dict:
         """LanceDB保存用辞書"""
         return {
@@ -87,6 +91,7 @@ class Paper:
         }
     
     @classmethod
+    # PURPOSE: 辞書から復元
     def from_dict(cls, data: dict) -> "Paper":
         """辞書から復元"""
         return cls(
@@ -104,6 +109,7 @@ class Paper:
             citations=data.get("citations") or None,
             categories=data.get("categories", "").split(", ") if data.get("categories") else [],
             venue=data.get("venue") or None,
+# PURPOSE: 同一primary_keyの論文をマージ。
             collected_at=data.get("collected_at", datetime.now().isoformat()),
         )
 

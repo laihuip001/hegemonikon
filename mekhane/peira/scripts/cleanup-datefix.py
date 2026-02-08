@@ -19,6 +19,7 @@ PROBLEM_DIR = os.path.join(ROOT_DIR, "0000", "00")
 HEADERS = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"}
 
 
+# PURPOSE: パース/抽出: parse_date
 def parse_date(date_str):
     if not date_str:
         return None, None, None
@@ -44,6 +45,7 @@ def parse_date(date_str):
     return None, None, None
 
 
+# PURPOSE: 取得: get_article_date
 def get_article_date(post_id):
     url = f"https://ai-data-base.com/archives/{post_id}"
     try:
@@ -67,6 +69,7 @@ def get_article_date(post_id):
         return None, None, None
 
 
+# PURPOSE: 関数: fix_file
 def fix_file(filepath):
     filename = os.path.basename(filepath)
     post_id = filename.replace(".md", "")
@@ -103,6 +106,7 @@ def fix_file(filepath):
     return True
 
 
+# PURPOSE: 関数: main
 def main():
     if not os.path.exists(PROBLEM_DIR):
         print("No 0000/00 directory found.")

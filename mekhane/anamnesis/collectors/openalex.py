@@ -24,6 +24,7 @@ from mekhane.anamnesis.collectors.base import BaseCollector
 from mekhane.anamnesis.models.paper import Paper
 
 
+# PURPOSE: OpenAlex論文コレクター
 class OpenAlexCollector(BaseCollector):
     """OpenAlex論文コレクター"""
 
@@ -32,6 +33,7 @@ class OpenAlexCollector(BaseCollector):
 
     BASE_URL = "https://api.openalex.org"
 
+    # PURPOSE: Args:
     def __init__(self, email: Optional[str] = None):
         """
         Args:
@@ -51,6 +53,7 @@ class OpenAlexCollector(BaseCollector):
         if email:
             self.session.params = {"mailto": email}
 
+    # PURPOSE: API応答 -> Paper 変換
     def _to_paper(self, data: dict) -> Paper:
         """API応答 -> Paper 変換"""
         # IDs
@@ -108,6 +111,7 @@ class OpenAlexCollector(BaseCollector):
             venue=self._get_venue(data),
         )
 
+    # PURPOSE: Abstract inverted index を復元
     def _get_abstract(self, data: dict) -> str:
         """Abstract inverted index を復元"""
         abstract_inverted = data.get("abstract_inverted_index")
@@ -125,12 +129,14 @@ class OpenAlexCollector(BaseCollector):
         except Exception:
             return ""
 
+    # PURPOSE: Venue/Journal名を取得
     def _get_venue(self, data: dict) -> Optional[str]:
         """Venue/Journal名を取得"""
         primary_location = data.get("primary_location") or {}
         source = primary_location.get("source") or {}
         return source.get("display_name")
 
+    # PURPOSE: OpenAlexで論文検索
     def search(
         self,
         query: str,
@@ -172,6 +178,7 @@ class OpenAlexCollector(BaseCollector):
 
         return papers
 
+    # PURPOSE: IDで論文取得
     def fetch_by_id(self, paper_id: str) -> Optional[Paper]:
         """
         IDで論文取得
@@ -196,6 +203,7 @@ class OpenAlexCollector(BaseCollector):
             print(f"[OpenAlex] Fetch error: {e}")
             return None
 
+    # PURPOSE: 著者IDで論文一覧取得
     def get_works_by_author(self, author_id: str, max_results: int = 50) -> list[Paper]:
         """著者IDで論文一覧取得"""
         url = f"{self.BASE_URL}/works"

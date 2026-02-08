@@ -83,16 +83,19 @@ PREFERENCES: Dict[str, Dict[str, float]] = {
 # =============================================================================
 
 
+# PURPOSE: Return the total number of hidden state factors.
 def get_state_dim() -> int:
     """Return the total number of hidden state factors."""
     return len(PHANTASIA_STATES) * len(ASSENT_STATES) * len(HORME_STATES)
 
 
+# PURPOSE: Return the dimension of each observation modality.
 def get_obs_dim() -> Dict[str, int]:
     """Return the dimension of each observation modality."""
     return {k: len(v) for k, v in OBSERVATION_MODALITIES.items()}
 
 
+# PURPOSE: Convert state names to flat index.
 def state_to_index(phantasia: str, assent: str, horme: str) -> int:
     """Convert state names to flat index.
 
@@ -116,6 +119,7 @@ def state_to_index(phantasia: str, assent: str, horme: str) -> int:
     )
 
 
+# PURPOSE: Convert flat index back to state names.
 def index_to_state(idx: int) -> tuple:
     """Convert flat index back to state names.
 
@@ -135,6 +139,7 @@ def index_to_state(idx: int) -> tuple:
     return (PHANTASIA_STATES[p_idx], ASSENT_STATES[a_idx], HORME_STATES[h_idx])
 
 
+# PURPOSE: Encode LLM-derived metrics into observation index.
 def encode_observation(
     context_clarity: float,
     urgency: float,

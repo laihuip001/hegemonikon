@@ -18,6 +18,7 @@ from typing import List, Dict, Optional
 
 
 @dataclass
+# PURPOSE: 失敗記録
 class FailureRecord:
     """失敗記録"""
 
@@ -30,6 +31,7 @@ class FailureRecord:
 
 
 @dataclass
+# PURPOSE: 警告記録
 class WarningRecord:
     """警告記録"""
 
@@ -39,9 +41,11 @@ class WarningRecord:
     source_failure_id: int
 
 
+# PURPOSE: 失敗パターンデータベース
 class FailureDB:
     """失敗パターンデータベース"""
 
+    # PURPOSE: 内部処理: init__
     def __init__(self, db_path: Path = None):
         self.db_path = (
             db_path
@@ -54,6 +58,7 @@ class FailureDB:
         self._data: Dict = None
 
     @property
+    # PURPOSE: データを遅延読み込み
     def data(self) -> Dict:
         """データを遅延読み込み"""
         if self._data is None:
@@ -79,12 +84,14 @@ class FailureDB:
                 }
         return self._data
 
+    # PURPOSE: データを保存
     def save(self):
         """データを保存"""
         self.db_path.write_text(
             json.dumps(self._data, ensure_ascii=False, indent=2), encoding="utf-8"
         )
 
+    # PURPOSE: 失敗を記録
     def record_failure(
         self,
         ccl_expr: str,
@@ -106,6 +113,7 @@ class FailureDB:
         self.save()
         return len(self.data["failures"]) - 1  # 記録ID
 
+    # PURPOSE: 成功パターンを記録
     def record_success(self, ccl_expr: str, output_summary: str):
         """成功パターンを記録"""
         self.data["success_patterns"].append(
@@ -117,6 +125,7 @@ class FailureDB:
         )
         self.save()
 
+    # PURPOSE: CCL 式に関連する警告を取得
     def get_warnings(self, ccl_expr: str) -> List[WarningRecord]:
         """CCL 式に関連する警告を取得"""
         warnings = []
@@ -148,6 +157,7 @@ class FailureDB:
 
         return warnings
 
+    # PURPOSE: 警告をフォーマット
     def format_warnings(self, warnings: List[WarningRecord]) -> str:
         """警告をフォーマット"""
         if not warnings:
@@ -165,12 +175,14 @@ class FailureDB:
         lines.append("")
         return "\n".join(lines)
 
+    # PURPOSE: 既知の問題を追加
     def add_known_issue(self, operator: str, message: str, severity: str = "warning"):
         """既知の問題を追加"""
         self.data["known_issues"][operator] = {
             "message": message,
             "severity": severity,
             "added": datetime.now().strftime("%Y-%m-%d"),
+# PURPOSE: FailureDB のシングルトンを取得
         }
         self.save()
 

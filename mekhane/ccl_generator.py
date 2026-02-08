@@ -40,6 +40,7 @@ KEYWORD_MAP = {
 }
 
 
+# PURPOSE: Generate a simple CCL expression from intent string.
 def generate_ccl(intent: str) -> str:
     """
     Generate a simple CCL expression from intent string.
@@ -60,6 +61,7 @@ def generate_ccl(intent: str) -> str:
     return _generate_inner_ccl(intent)
 
 
+# PURPOSE: 内部処理: generate_inner_ccl
 def _generate_inner_ccl(intent: str) -> str:
     # Heuristic: Find all operators in order
     ops = []

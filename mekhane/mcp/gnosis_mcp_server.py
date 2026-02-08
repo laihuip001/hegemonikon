@@ -30,6 +30,7 @@ _stderr_wrapper = sys.stderr
 
 
 # Debug logging to stderr (won't interfere with MCP stdio)
+# PURPOSE: 関数: log
 def log(msg):
     print(f"[gnosis-mcp] {msg}", file=sys.stderr, flush=True)
 
@@ -47,16 +48,20 @@ log(f"Added to path: {Path(__file__).parent.parent}")
 
 # ============ Suppress stdout during imports ============
 # Some libraries (like lancedb) print to stdout during import
+# PURPOSE: クラス: StdoutSuppressor
 class StdoutSuppressor:
+    # PURPOSE: 内部処理: init__
     def __init__(self):
         self._null = io.StringIO()
         self._old_stdout = None
 
+    # PURPOSE: 内部処理: enter__
     def __enter__(self):
         self._old_stdout = sys.stdout
         sys.stdout = self._null
         return self
 
+    # PURPOSE: 内部処理: exit__
     def __exit__(self, *args):
         sys.stdout = self._old_stdout
         captured = self._null.getvalue()
@@ -82,6 +87,7 @@ server = Server(
     instructions="Gnōsis knowledge base for academic paper search",
 )
 log("Server initialized")
+# PURPOSE: List available tools.
 
 
 @server.list_tools()
@@ -128,6 +134,7 @@ async def list_tools():
             },
         ),
     ]
+# PURPOSE: Handle tool calls.
 
 
 @server.call_tool(validate_input=True)
@@ -313,6 +320,7 @@ async def call_tool(name: str, arguments: dict):
         return [TextContent(type="text", text="\n".join(output_lines))]
 
     else:
+# PURPOSE: Run the MCP server.
         return [TextContent(type="text", text=f"Unknown tool: {name}")]
 
 

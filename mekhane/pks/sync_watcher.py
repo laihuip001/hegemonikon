@@ -29,6 +29,7 @@ if str(_HEGEMONIKON_ROOT) not in sys.path:
 
 
 @dataclass
+# PURPOSE: ファイル変更の記録
 class FileChange:
     """ファイル変更の記録"""
 
@@ -37,6 +38,7 @@ class FileChange:
     checksum: str = ""
 
 
+# PURPOSE: Syncthing 同期フォルダの変更検出 + LanceDB 差分インデキシング
 class SyncWatcher:
     """Syncthing 同期フォルダの変更検出 + LanceDB 差分インデキシング
 
@@ -48,6 +50,7 @@ class SyncWatcher:
 
     STATE_FILE = "sync_state.json"
 
+    # PURPOSE: 内部処理: init__
     def __init__(
         self,
         watch_dirs: list[Path],
@@ -60,6 +63,7 @@ class SyncWatcher:
         self._state: dict[str, str] = {}  # path -> checksum
         self._load_state()
 
+    # PURPOSE: 前回の状態を読み込み
     def _load_state(self) -> None:
         """前回の状態を読み込み"""
         state_path = self.state_dir / self.STATE_FILE
@@ -67,6 +71,7 @@ class SyncWatcher:
             with open(state_path, "r", encoding="utf-8") as f:
                 self._state = json.load(f)
 
+    # PURPOSE: 現在の状態を保存
     def _save_state(self) -> None:
         """現在の状態を保存"""
         state_path = self.state_dir / self.STATE_FILE
@@ -75,6 +80,7 @@ class SyncWatcher:
             json.dump(self._state, f, ensure_ascii=False, indent=2)
 
     @staticmethod
+    # PURPOSE: ファイルの MD5 チェックサム
     def _file_checksum(path: Path) -> str:
         """ファイルの MD5 チェックサム"""
         try:
@@ -83,6 +89,7 @@ class SyncWatcher:
         except (OSError, IOError):
             return ""
 
+    # PURPOSE: 変更のあったファイルを検出
     def detect_changes(self) -> list[FileChange]:
         """変更のあったファイルを検出"""
         changes = []
@@ -128,6 +135,7 @@ class SyncWatcher:
 
         return changes
 
+    # PURPOSE: 変更を状態に反映
     def apply_changes(self, changes: list[FileChange]) -> None:
         """変更を状態に反映"""
         for change in changes:
@@ -139,6 +147,7 @@ class SyncWatcher:
 
         self._save_state()
 
+    # PURPOSE: 変更ファイルを LanceDB にインデキシング
     def ingest_changes(self, changes: list[FileChange]) -> int:
         """変更ファイルを LanceDB にインデキシング
 
@@ -158,6 +167,7 @@ class SyncWatcher:
 
         return ingested
 
+    # PURPOSE: 一回の検出 + 状態更新サイクル
     def run_once(self) -> list[FileChange]:
         """一回の検出 + 状態更新サイクル"""
         changes = self.detect_changes()
@@ -172,6 +182,7 @@ class SyncWatcher:
 
         return changes
 
+    # PURPOSE: Polling ループ（デーモンモード）
     def run_polling(self, interval_seconds: int = 60, max_cycles: int = 0) -> None:
         """Polling ループ（デーモンモード）
 

@@ -32,6 +32,7 @@ HEADERS = {
 REQUEST_DELAY = 0.5  # seconds between requests (reduced)
 
 
+# PURPOSE: 取得: get_args
 def get_args():
     if len(sys.argv) < 4:
         print("Usage: python phase3-fetch-simple.py <batch_id> <start_line> <end_line>")
@@ -40,6 +41,7 @@ def get_args():
     return sys.argv[1], int(sys.argv[2]), int(sys.argv[3])
 
 
+# PURPOSE: Load URLs from the list file (1-indexed lines).
 def load_urls(start_line, end_line):
     """Load URLs from the list file (1-indexed lines)."""
     with open(URL_LIST_FILE, "r", encoding="utf-8") as f:
@@ -48,6 +50,7 @@ def load_urls(start_line, end_line):
     return [line.strip() for line in lines[start_line - 1 : end_line] if line.strip()]
 
 
+# PURPOSE: Extract metadata from parsed HTML.
 def extract_metadata(soup, url):
     """Extract metadata from parsed HTML."""
     result = {"url": url}
@@ -84,6 +87,7 @@ def extract_metadata(soup, url):
     return result
 
 
+# PURPOSE: Convert article content to Markdown.
 def extract_markdown(soup):
     """Convert article content to Markdown."""
     # Find main article content
@@ -116,6 +120,7 @@ def extract_markdown(soup):
     return h2t.handle(str(article))
 
 
+# PURPOSE: Fetch and parse a single article.
 def fetch_article(url):
     """Fetch and parse a single article."""
     try:
@@ -144,6 +149,7 @@ def fetch_article(url):
         return None, str(e)
 
 
+# PURPOSE: 関数: main
 def main():
     batch_id, start_line, end_line = get_args()
     output_file = f"temp_batch_data_{batch_id}.json"

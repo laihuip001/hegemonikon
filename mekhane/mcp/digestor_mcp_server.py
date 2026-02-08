@@ -19,6 +19,7 @@ _stderr_wrapper = sys.stderr
 
 
 # Debug logging to stderr (won't interfere with MCP stdio)
+# PURPOSE: 関数: log
 def log(msg):
     print(f"[Digestor MCP] {msg}", file=_stderr_wrapper)
 
@@ -33,16 +34,20 @@ log(f"Added to path: {Path(__file__).parent.parent}")
 
 
 # ============ Suppress stdout during imports ============
+# PURPOSE: クラス: StdoutSuppressor
 class StdoutSuppressor:
+    # PURPOSE: 内部処理: init__
     def __init__(self):
         self._null = io.StringIO()
         self._old_stdout = None
 
+    # PURPOSE: 内部処理: enter__
     def __enter__(self):
         self._old_stdout = sys.stdout
         sys.stdout = self._null
         return self
 
+    # PURPOSE: 内部処理: exit__
     def __exit__(self, *args):
         sys.stdout = self._old_stdout
 
@@ -77,6 +82,7 @@ server = Server(
     instructions="Digestor: Automated knowledge ingestion pipeline (Gnosis → /eat)",
 )
 log("Server initialized")
+# PURPOSE: List available tools.
 
 
 @server.list_tools()
@@ -132,6 +138,7 @@ async def list_tools():
             inputSchema={"type": "object", "properties": {}},
         ),
     ]
+# PURPOSE: Handle tool calls.
 
 
 @server.call_tool()
@@ -150,6 +157,7 @@ async def call_tool(name: str, arguments: dict):
             return [TextContent(type="text", text=f"Unknown tool: {name}")]
     except Exception as e:
         log(f"Tool error: {e}")
+# PURPOSE: 消化候補をリスト
         return [TextContent(type="text", text=f"Error: {str(e)}")]
 
 
@@ -173,6 +181,7 @@ async def handle_list_candidates(arguments: dict):
         output += f"   Topics: {', '.join(c.matched_topics)}\n"
         output += f"   Source: {c.paper.source}\n\n"
 
+# PURPOSE: 消化パイプライン実行
     return [TextContent(type="text", text=output)]
 
 
@@ -203,6 +212,7 @@ async def handle_run_digestor(arguments: dict):
         for i, c in enumerate(result.candidates, 1):
             output += f"  {i}. {c.paper.title[:50]}... (score: {c.score:.2f})\n"
 
+# PURPOSE: トピック一覧取得
     return [TextContent(type="text", text=output)]
 
 
@@ -223,6 +233,7 @@ async def handle_get_topics(arguments: dict):
             output += f"  消化先: {', '.join(digest_to)}\n"
         output += "\n"
 
+# PURPOSE: Run the MCP server.
     return [TextContent(type="text", text=output)]
 
 

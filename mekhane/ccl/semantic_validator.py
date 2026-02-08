@@ -25,6 +25,7 @@ except ImportError:
     HAS_LLM = False
 
 
+# PURPOSE: Get API key from environment.
 def _get_api_key() -> Optional[str]:
     """Get API key from environment."""
     return (
@@ -35,6 +36,7 @@ def _get_api_key() -> Optional[str]:
 
 
 @dataclass
+# PURPOSE: Result of semantic validation.
 class SemanticResult:
     """Result of semantic validation."""
 
@@ -43,9 +45,11 @@ class SemanticResult:
     reasoning: str
     suggestions: List[str]
 
+    # PURPOSE: 内部処理: bool__
     def __bool__(self) -> bool:
         return self.aligned
 
+# PURPOSE: LLM-based semantic validation for CCL expressions.
 
 class CCLSemanticValidator:
     """
@@ -57,6 +61,7 @@ class CCLSemanticValidator:
 
     PROMPT_PATH = Path(__file__).parent / "prompts" / "semantic_check.md"
 
+    # PURPOSE: Initialize the semantic validator.
     def __init__(self, model: str = "gemini-2.0-flash"):
         """Initialize the semantic validator."""
         self.model_name = model
@@ -71,12 +76,14 @@ class CCLSemanticValidator:
                 except Exception:
                     pass  # TODO: Add proper error handling
 
+    # PURPOSE: Load the semantic check prompt.
     def _load_prompt(self) -> str:
         """Load the semantic check prompt."""
         if self.PROMPT_PATH.exists():
             return self.PROMPT_PATH.read_text()
         return self._default_prompt()
 
+    # PURPOSE: Default prompt if file not found.
     def _default_prompt(self) -> str:
         """Default prompt if file not found."""
         return """あなたは CCL (Cognitive Control Language) の意味的検証器です。
@@ -95,10 +102,12 @@ CCL は Hegemonikón システムの認知制御言語で、以下のワーク�
 
 ユーザーの意図と CCL 式を比較し、意味的に一致しているか評価してください。"""
 
+    # PURPOSE: Check if LLM is available.
     def is_available(self) -> bool:
         """Check if LLM is available."""
         return self.client is not None
 
+    # PURPOSE: Validate semantic alignment between intent and CCL.
     def validate(
         self, intent: str, ccl: str, context: Optional[str] = None
     ) -> SemanticResult:
@@ -147,6 +156,7 @@ CCL は Hegemonikón システムの認知制御言語で、以下のワーク�
             suggestions=[],
         )
 
+    # PURPOSE: Build the validation prompt.
     def _build_prompt(self, intent: str, ccl: str, context: Optional[str]) -> str:
         """Build the validation prompt."""
         prompt = f"""{self.system_prompt}
@@ -177,6 +187,7 @@ CCL は Hegemonikón システムの認知制御言語で、以下のワーク�
 ```"""
         return prompt
 
+    # PURPOSE: Parse LLM response into SemanticResult.
     def _parse_response(self, text: str) -> SemanticResult:
         """Parse LLM response into SemanticResult."""
         import json
@@ -199,6 +210,7 @@ CCL は Hegemonikón システムの認知制御言語で、以下のワーク�
         # Fallback: try to infer from text
         aligned = "不一致" not in text and "aligned.*false" not in text.lower()
         return SemanticResult(
+# PURPOSE: Quick validation helper.
             aligned=aligned,
             confidence=0.5,
             reasoning=text[:200] if len(text) > 200 else text,

@@ -40,6 +40,7 @@ from .tekhne_registry import (
 )
 
 
+# PURPOSE: 実行フェーズ (6段階)
 class ExecutionPhase(Enum):
     """実行フェーズ (6段階)"""
 
@@ -51,6 +52,7 @@ class ExecutionPhase(Enum):
     ROLLBACK = "rollback"  # PHASE 5: 安全弁
 
 
+# PURPOSE: 実行状態
 class ExecutionStatus(Enum):
     """実行状態"""
 
@@ -63,6 +65,7 @@ class ExecutionStatus(Enum):
 
 
 @dataclass
+# PURPOSE: 実行コンテキスト
 class ExecutionContext:
     """実行コンテキスト
 
@@ -81,6 +84,7 @@ class ExecutionContext:
     errors: List[str] = field(default_factory=list)  # エラー
     checkpoints: Dict[str, Any] = field(default_factory=dict)  # 各フェーズの結果
 
+    # PURPOSE: 関数: to_dict
     def to_dict(self) -> Dict[str, Any]:
         return {
             "goal": self.goal,
@@ -97,6 +101,7 @@ class ExecutionContext:
         }
 
 
+# PURPOSE: 実行結果
 @dataclass
 class ExecutionResult:
     """実行結果
@@ -113,6 +118,7 @@ class ExecutionResult:
     output: Optional[Any] = None
     commit_message: Optional[str] = None
 
+# PURPOSE: O4 Energeia 実行エンジン
 
 class EnergеiaExecutor:
     """O4 Energeia 実行エンジン
@@ -120,6 +126,7 @@ class EnergеiaExecutor:
     6段階の実行フローを管理し、K3 Telos と P4 Tekhnē を統合。
     """
 
+    # PURPOSE: Args:
     def __init__(
         self,
         registry: Optional[TekhnēRegistry] = None,
@@ -135,10 +142,12 @@ class EnergеiaExecutor:
         self._current_context: Optional[ExecutionContext] = None
 
     @property
+    # PURPOSE: 現在の実行コンテキスト
     def current_context(self) -> Optional[ExecutionContext]:
         """現在の実行コンテキスト"""
         return self._current_context
 
+    # PURPOSE: PHASE 0: 入口確認 + 実行コンテキスト作成
     def initiate(
         self,
         goal: str,
@@ -202,6 +211,7 @@ class EnergеiaExecutor:
         self._current_context = context
         return context
 
+    # PURPOSE: PHASE 1: 実行
     def execute(
         self,
         context: ExecutionContext,
@@ -240,6 +250,7 @@ class EnergеiaExecutor:
                 self._registry.record_usage(context.technique.id, False)
             raise
 
+    # PURPOSE: PHASE 2: 検証
     def verify(
         self,
         context: ExecutionContext,
@@ -276,6 +287,7 @@ class EnergеiaExecutor:
 
         return context
 
+    # PURPOSE: PHASE 3: 偏差検知
     def check_deviation(
         self,
         context: ExecutionContext,
@@ -317,6 +329,7 @@ class EnergеiaExecutor:
 
         return context
 
+    # PURPOSE: PHASE 4: 完了確認
     def confirm(
         self,
         context: ExecutionContext,
@@ -354,6 +367,7 @@ class EnergеiaExecutor:
             commit_message=commit_message,
         )
 
+    # PURPOSE: PHASE 5: 安全弁 (中断)
     def abort(
         self,
         context: ExecutionContext,
@@ -383,6 +397,7 @@ class EnergеiaExecutor:
             context=context,
         )
 
+    # PURPOSE: 全6フェーズを一括実行
     def full_cycle(
         self,
         goal: str,
@@ -429,6 +444,7 @@ class EnergеiaExecutor:
 
         except ValueError as e:
             # 目的整合エラー
+# PURPOSE: 実行結果をMarkdown形式でフォーマット
             if self._current_context:
                 return self.abort(self._current_context, str(e))
             raise
@@ -510,6 +526,7 @@ def format_execution_markdown(result: ExecutionResult) -> str:
     lines.extend(
         [
             "═══════════════════════════════════════════════════════════",
+# PURPOSE: FEP観察空間へのエンコード
             f"📌 状態: {status_emoji} {ctx.status.value.upper()}",
             f"📝 提案: {result.commit_message or 'N/A'}",
             "═══════════════════════════════════════════════════════════",

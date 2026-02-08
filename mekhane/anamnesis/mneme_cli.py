@@ -40,6 +40,7 @@ if str(_HEGEMONIKON_ROOT) not in sys.path:
     sys.path.insert(0, str(_HEGEMONIKON_ROOT))
 
 
+# PURPOSE: 統合インジェスト実行
 def cmd_ingest(args):
     """統合インジェスト実行"""
     results = {
@@ -113,6 +114,7 @@ def cmd_ingest(args):
     return 0
 
 
+# PURPOSE: 統計情報表示
 def cmd_stats(args):
     """統計情報表示"""
     from mekhane.symploke.sophia_ingest import DEFAULT_INDEX_PATH, load_sophia_index
@@ -144,6 +146,7 @@ def cmd_stats(args):
     return 0
 
 
+# PURPOSE: 関数: main
 def main():
     parser = argparse.ArgumentParser(
         description="Mnēmē Synthesis - 統合セッション記憶CLI",

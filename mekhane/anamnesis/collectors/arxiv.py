@@ -26,6 +26,7 @@ from mekhane.anamnesis.collectors.base import BaseCollector
 from mekhane.anamnesis.models.paper import Paper
 
 
+# PURPOSE: arXiv論文コレクター
 class ArxivCollector(BaseCollector):
     """arXiv論文コレクター"""
 
@@ -35,12 +36,14 @@ class ArxivCollector(BaseCollector):
     # arXiv ID pattern
     ARXIV_PATTERN = re.compile(r"(\d{4}\.\d{4,5})(v\d+)?")
 
+    # PURPOSE: 内部処理: init__
     def __init__(self):
         super().__init__()
         if arxiv is None:
             raise ImportError("arxiv package required: pip install arxiv")
         self.client = arxiv.Client()
 
+    # PURPOSE: arXiv URLからIDを抽出
     def _parse_arxiv_id(self, entry_id: str) -> str:
         """arXiv URLからIDを抽出"""
         # http://arxiv.org/abs/2401.12345v1 -> 2401.12345
@@ -49,6 +52,7 @@ class ArxivCollector(BaseCollector):
             return match.group(1)
         return entry_id.split("/")[-1]
 
+    # PURPOSE: arxiv.Result -> Paper 変換
     def _to_paper(self, result: "arxiv.Result") -> Paper:
         """arxiv.Result -> Paper 変換"""
         arxiv_id = self._parse_arxiv_id(result.entry_id)
@@ -68,6 +72,7 @@ class ArxivCollector(BaseCollector):
             categories=list(result.categories),
         )
 
+    # PURPOSE: arXivで論文検索
     def search(
         self,
         query: str,
@@ -96,6 +101,7 @@ class ArxivCollector(BaseCollector):
 
         return papers
 
+    # PURPOSE: arXiv IDで論文取得
     def fetch_by_id(self, paper_id: str) -> Optional[Paper]:
         """arXiv IDで論文取得"""
         # IDの正規化（versionを除去）
@@ -112,6 +118,7 @@ class ArxivCollector(BaseCollector):
 
         return None
 
+    # PURPOSE: 指定カテゴリの最新論文を取得
     def search_recent(
         self,
         categories: list[str],

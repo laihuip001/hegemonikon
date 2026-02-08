@@ -25,6 +25,7 @@ from mekhane.fep.attractor import (
 # AttractorAdvisor
 # ---------------------------------------------------------------------------
 
+# PURPOSE: SeriesAttractor をワークフロー推薦システムとして利用する。
 class AttractorAdvisor:
     """
     SeriesAttractor をワークフロー推薦システムとして利用する。
@@ -36,9 +37,11 @@ class AttractorAdvisor:
         # → "O-series (Ousia) に収束。推薦: /noe, /bou, /zet, /ene"
     """
 
+    # PURPOSE: 内部処理: init__
     def __init__(self, force_cpu: bool = False):
         self._attractor = SeriesAttractor(force_cpu=force_cpu)
 
+    # PURPOSE: ユーザー入力からワークフロー推薦を生成する。
     def recommend(self, user_input: str) -> Recommendation:
         """
         ユーザー入力からワークフロー推薦を生成する。
@@ -101,6 +104,7 @@ class AttractorAdvisor:
             confidence=result.top_similarity,
         )
 
+    # PURPOSE: LLM のシステムプロンプトに注入する形式でワークフロー推薦を返す。
     def format_for_llm(self, user_input: str) -> str:
         """
         LLM のシステムプロンプトに注入する形式でワークフロー推薦を返す。
@@ -124,6 +128,7 @@ class AttractorAdvisor:
 
 # ---------------------------------------------------------------------------
 # Data Classes
+# PURPOSE: ワークフロー推薦の結果
 # ---------------------------------------------------------------------------
 
 @dataclass
@@ -135,10 +140,12 @@ class Recommendation:
     oscillation: OscillationType
     confidence: float
 
+    # PURPOSE: 内部処理: repr__
     def __repr__(self) -> str:
         return f"⟨Rec: {'+'.join(self.series)} | {self.oscillation.value} | conf={self.confidence:.3f}⟩"
 
 
+# PURPOSE: CLI: python -m mekhane.fep.attractor_advisor "入力テキスト"
 # ---------------------------------------------------------------------------
 # CLI
 # ---------------------------------------------------------------------------

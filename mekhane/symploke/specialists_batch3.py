@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/インフラ] <- mekhane/symploke/ A0→Tier1-3 Specialist定義が必要→specialists_batch3が担う
 """
 Specialist v2 カテゴリ: AI生成コード, Hegemonikón/FEP, 認知科学, エッジケース, 
 コードレビュー, ドキュメント, 日本語処理, 究極の純化

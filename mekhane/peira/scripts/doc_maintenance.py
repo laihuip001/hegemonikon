@@ -27,6 +27,7 @@ CRITICAL_FILES = [
 
 
 # --- Classes ---
+# PURPOSE: クラス: CheckResult
 class CheckResult(NamedTuple):
     name: str
     passed: bool
@@ -34,6 +35,7 @@ class CheckResult(NamedTuple):
 
 
 # --- Functions ---
+# PURPOSE: Check if target_path is within base_dir, handling Windows drive/case issues.
 def is_safe_path(target_path: Path, base_dir: Path) -> bool:
     """
     Check if target_path is within base_dir, handling Windows drive/case issues.
@@ -78,6 +80,7 @@ def is_safe_path(target_path: Path, base_dir: Path) -> bool:
     return False
 
 
+# PURPOSE: Verify existence of critical documentation files.
 def check_critical_files() -> list[CheckResult]:
     """Verify existence of critical documentation files."""
     results = []
@@ -98,6 +101,7 @@ def check_critical_files() -> list[CheckResult]:
     return results
 
 
+# PURPOSE: Verify local links in a markdown file.
 def check_link_validity(file_path: Path) -> list[CheckResult]:
     """Verify local links in a markdown file."""
     results = []
@@ -147,6 +151,7 @@ def check_link_validity(file_path: Path) -> list[CheckResult]:
     return results
 
 
+# PURPOSE: Run all verification checks.
 def verify_all() -> bool:
     """Run all verification checks."""
     all_results = []
@@ -172,6 +177,7 @@ def verify_all() -> bool:
 
 
 # --- Structure Scan ---
+# PURPOSE: Recursively generate directory tree string.
 def generate_tree(
     dir_path: Path,
     prefix: str = "",
@@ -238,6 +244,7 @@ def generate_tree(
     return output
 
 
+# PURPOSE: Update docs/STRUCTURE.md with current directory tree.
 def scan_structure() -> bool:
     """Update docs/STRUCTURE.md with current directory tree."""
     print("Scanning directory structure...")

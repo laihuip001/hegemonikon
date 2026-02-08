@@ -93,6 +93,7 @@ CONFIDENCE_PATTERNS: Dict[str, List[str]] = {
 # =============================================================================
 
 
+# PURPOSE: Analyze text for context clarity.
 def analyze_context(text: str) -> str:
     """Analyze text for context clarity.
 
@@ -120,6 +121,7 @@ def analyze_context(text: str) -> str:
     return "clear" if clear_score > ambiguous_score else "ambiguous"
 
 
+# PURPOSE: Analyze text for urgency level.
 def analyze_urgency(text: str) -> str:
     """Analyze text for urgency level.
 
@@ -143,6 +145,7 @@ def analyze_urgency(text: str) -> str:
     return max(scores, key=scores.get)
 
 
+# PURPOSE: Analyze text for confidence level.
 def analyze_confidence(text: str) -> str:
     """Analyze text for confidence level.
 
@@ -166,6 +169,7 @@ def analyze_confidence(text: str) -> str:
     return max(scores, key=scores.get)
 
 
+# PURPOSE: Convert text input to observation indices.
 def encode_input(text: str) -> Tuple[int, int, int]:
     """Convert text input to observation indices.
 
@@ -199,6 +203,7 @@ def encode_input(text: str) -> Tuple[int, int, int]:
     return (context_idx, urgency_idx, confidence_idx)
 
 
+# PURPOSE: Convert text input to flat observation index.
 def encode_to_flat_index(text: str) -> int:
     """Convert text input to flat observation index.
 
@@ -218,6 +223,7 @@ def encode_to_flat_index(text: str) -> int:
     return context_idx + 2 * urgency_idx + confidence_idx
 
 
+# PURPOSE: Convert observation indices back to human-readable format.
 def decode_observation(obs: Tuple[int, int, int]) -> Dict[str, str]:
     """Convert observation indices back to human-readable format.
 
@@ -239,6 +245,7 @@ def decode_observation(obs: Tuple[int, int, int]) -> Dict[str, str]:
 # =============================================================================
 
 
+# PURPOSE: Encode explicitly specified observation values.
 def encode_structured_input(
     context: Optional[str] = None,
     urgency: Optional[str] = None,
@@ -273,6 +280,7 @@ def encode_structured_input(
 # =============================================================================
 
 
+# PURPOSE: Encode O1 Noēsis PHASE 5 output to observation indices.
 def encode_noesis_output(
     confidence_score: float,
     uncertainty_zones: List[Dict],
@@ -318,6 +326,7 @@ def encode_noesis_output(
     )
 
 
+# PURPOSE: Encode O2 Boulēsis PHASE 5 output to observation indices.
 def encode_boulesis_output(
     impulse_score: float,
     feasibility_score: float,
@@ -367,6 +376,7 @@ def encode_boulesis_output(
     )
 
 
+# PURPOSE: Generate Markdown-formatted FEP cognitive feedback.
 def generate_fep_feedback_markdown(
     agent_result: Dict,
     observation_description: str,
@@ -444,6 +454,7 @@ def generate_fep_feedback_markdown(
 # =============================================================================
 
 
+# PURPOSE: Execute FEP inference + Dirichlet learning + persistence in one flow.
 def run_fep_with_learning(
     obs_tuple: Tuple[int, int, int],
     a_matrix_path: str = "/home/makaron8426/oikos/mneme/.hegemonikon/fep/learned_A.npy",
@@ -496,6 +507,7 @@ def run_fep_with_learning(
     return result
 
 
+# PURPOSE: Check if Epochē should be triggered based on entropy.
 def should_trigger_epoche(agent_result: Dict, threshold: float = 2.0) -> bool:
     """Check if Epochē should be triggered based on entropy.
 
@@ -521,6 +533,7 @@ def should_trigger_epoche(agent_result: Dict, threshold: float = 2.0) -> bool:
 # =============================================================================
 
 
+# PURPOSE: PHASE 5 JSON 出力を FEP 観察に自動変換.
 def auto_encode_noesis(phase5_output: dict) -> Tuple[int, int, int]:
     """PHASE 5 JSON 出力を FEP 観察に自動変換.
 
@@ -549,6 +562,7 @@ def auto_encode_noesis(phase5_output: dict) -> Tuple[int, int, int]:
 # =============================================================================
 
 
+# PURPOSE: A行列の学習進捗を Markdown で可視化.
 def format_learning_progress(
     before_A: Optional["np.ndarray"] = None,
     after_A: Optional["np.ndarray"] = None,
@@ -634,6 +648,7 @@ X_SERIES_REPRESENTATIVE_PATHS = {
 }
 
 
+# PURPOSE: 現在のシリーズから X-series 推奨次ステップを取得.
 def get_x_series_recommendations(
     current_series: str,
     confidence: float = 0.5,

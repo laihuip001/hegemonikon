@@ -29,6 +29,7 @@ from typing import Optional, List, Dict, Any
 from enum import Enum
 
 
+# PURPOSE: A2 Krisis の派生モード
 class KrisisDerivative(Enum):
     """A2 Krisis の派生モード"""
 
@@ -37,6 +38,7 @@ class KrisisDerivative(Enum):
     ADVOCATE = "advo"  # 敵対的レビュー (Devil's Advocate)
 
 
+# PURPOSE: 判定タイプ
 class VerdictType(Enum):
     """判定タイプ"""
 
@@ -47,6 +49,7 @@ class VerdictType(Enum):
 
 
 @dataclass
+# PURPOSE: 異議オブジェクト
 class Objection:
     """異議オブジェクト
 
@@ -62,6 +65,7 @@ class Objection:
 
 
 @dataclass
+# PURPOSE: A2 Krisis 判定結果
 class KrisisResult:
     """A2 Krisis 判定結果
 
@@ -82,14 +86,17 @@ class KrisisResult:
     recommendation: str
 
     @property
+    # PURPOSE: クリティカルな異議があるか
     def has_critical_objection(self) -> bool:
         """クリティカルな異議があるか"""
         return any(o.severity >= 0.8 for o in self.objections)
 
     @property
+    # PURPOSE: 異議の数
     def objection_count(self) -> int:
         """異議の数"""
         return len(self.objections)
+# PURPOSE: Devil's Advocate 異議を生成
 
 
 def _generate_objections(subject: str) -> List[Objection]:
@@ -100,6 +107,7 @@ def _generate_objections(subject: str) -> List[Objection]:
         Objection("Alternatives", f"より良い代替案はないか？", 0.3),
         Objection("Risks", "見落としているリスクは？", 0.6),
     ]
+# PURPOSE: A2 Krisis: 判定を実行
 
 
 def judge(
@@ -168,6 +176,7 @@ def judge(
         objections=objections,
         recommendation=recommendation,
     )
+# PURPOSE: A2 Krisis Epochē: 判断を停止
 
 
 def epochē(subject: str) -> KrisisResult:
@@ -183,6 +192,7 @@ def epochē(subject: str) -> KrisisResult:
         objections=[Objection("Epochē", "意図的な判断停止", 0.0)],
         recommendation="判断を保留し、追加情報を待つ",
     )
+# PURPOSE: A2 Krisis 結果をMarkdown形式でフォーマット
 
 
 def format_krisis_markdown(result: KrisisResult) -> str:
@@ -213,6 +223,7 @@ def format_krisis_markdown(result: KrisisResult) -> str:
         ]
     )
     return "\n".join(lines)
+# PURPOSE: FEP観察空間へのエンコード
 
 
 def encode_krisis_observation(result: KrisisResult) -> dict:

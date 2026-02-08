@@ -40,6 +40,7 @@ DEFAULT_LOG_DIR = Path.home() / "oikos" / "hegemonikon" / "mneme" / ".hegemoniko
 # ---------------------------------------------------------------------------
 
 @dataclass
+# PURPOSE: 1回の Attractor 推薦ログ
 class AttractorLogEntry:
     """1回の Attractor 推薦ログ"""
     timestamp: str
@@ -50,10 +51,12 @@ class AttractorLogEntry:
     actual_series: Optional[str] = None   # Creator の実際の選択
     correction: bool = False               # 推薦 ≠ 実際の選択
 
+    # PURPOSE: 関数: to_dict
     def to_dict(self) -> dict:
         return asdict(self)
 
 
+# PURPOSE: 各 Series の basin bias (非等方性の種)
 @dataclass
 class BasinBias:
     """各 Series の basin bias (非等方性の種)"""
@@ -64,18 +67,21 @@ class BasinBias:
     total_count: int = 0
 
     @property
+    # PURPOSE: 推薦の精度: 推薦した中で実際に選ばれた割合
     def precision(self) -> float:
         """推薦の精度: 推薦した中で実際に選ばれた割合"""
         predicted = self.correct_count + self.over_predict_count
         return self.correct_count / predicted if predicted > 0 else 0.0
 
     @property
+    # PURPOSE: 推薦の再現率: 実際に選ばれた中で推薦できた割合
     def recall(self) -> float:
         """推薦の再現率: 実際に選ばれた中で推薦できた割合"""
         actual = self.correct_count + self.under_predict_count
         return self.correct_count / actual if actual > 0 else 0.0
 
     @property
+    # PURPOSE: Basin の歪み方向
     def bias_direction(self) -> str:
         """Basin の歪み方向"""
         if self.over_predict_count > self.under_predict_count * 1.5:
@@ -85,6 +91,7 @@ class BasinBias:
         return "balanced"
 
 
+# PURPOSE: Attractor の使用ログを収集し、Basin の非等方性を学習する雛形。
 # ---------------------------------------------------------------------------
 # BasinLogger
 # ---------------------------------------------------------------------------
@@ -111,6 +118,7 @@ class BasinLogger:
         report = logger.bias_report()
     """
 
+    # PURPOSE: 内部処理: init__
     def __init__(self, log_dir: Path | None = None):
         self.log_dir = log_dir or DEFAULT_LOG_DIR
         self.log_dir.mkdir(parents=True, exist_ok=True)
@@ -119,6 +127,7 @@ class BasinLogger:
             s: BasinBias(series=s) for s in ["O", "S", "H", "P", "K", "A"]
         }
 
+    # PURPOSE: 推薦をログに記録
     def log_prediction(
         self,
         user_input: str,
@@ -137,6 +146,7 @@ class BasinLogger:
         self._entries.append(entry)
         return entry
 
+    # PURPOSE: Creator の実際の選択を記録し、bias を更新
     def log_correction(
         self,
         entry: AttractorLogEntry,
@@ -158,6 +168,7 @@ class BasinLogger:
             self._biases[actual_series].under_predict_count += 1
             self._biases[actual_series].total_count += 1
 
+    # PURPOSE: 全 Series の bias レポートを返す
     def bias_report(self) -> dict[str, dict]:
         """全 Series の bias レポートを返す"""
         report = {}
@@ -174,6 +185,7 @@ class BasinLogger:
                 }
         return report
 
+    # PURPOSE: ログを JSONL ファイルに保存
     def save(self) -> Path:
         """ログを JSONL ファイルに保存"""
         today = datetime.now(JST).strftime("%Y%m%d")
@@ -187,6 +199,7 @@ class BasinLogger:
         self._entries.clear()
         return log_file
 
+    # PURPOSE: 過去のログから bias を再計算
     def load_biases(self, log_file: Path) -> None:
         """過去のログから bias を再計算"""
         if not log_file.exists():
@@ -210,6 +223,7 @@ class BasinLogger:
                         self._biases[actual].total_count += 1
 
     @property
+    # PURPOSE: Bias データから、各 Series の定義テキスト改善の方向性を提案する。
     def suggestions_for_tuning(self) -> dict[str, str]:
         """
         Bias データから、各 Series の定義テキスト改善の方向性を提案する。

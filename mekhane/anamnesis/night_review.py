@@ -50,6 +50,7 @@ GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 
 
 @dataclass
+# PURPOSE: セッション情報
 class SessionInfo:
     """セッション情報"""
 
@@ -62,6 +63,7 @@ class SessionInfo:
 
 
 @dataclass
+# PURPOSE: ナイトレビュー構造体
 class NightReview:
     """ナイトレビュー構造体"""
 
@@ -73,6 +75,7 @@ class NightReview:
     generated_at: str
 
 
+# PURPOSE: 単一のセッションディレクトリを処理するヘルパー関数。
 def _process_session_dir(
     session_dir: Path, target_date: Optional[date]
 ) -> Optional[SessionInfo]:
@@ -159,6 +162,7 @@ def _process_session_dir(
     )
 
 
+# PURPOSE: Antigravity brain からセッション情報を取得。
 def get_sessions(target_date: Optional[date] = None) -> List[SessionInfo]:
     """
     Antigravity brain からセッション情報を取得。
@@ -194,6 +198,7 @@ def get_sessions(target_date: Optional[date] = None) -> List[SessionInfo]:
     return sessions
 
 
+# PURPOSE: Gemini API用のプロンプトを生成
 def generate_review_prompt(sessions: List[SessionInfo], target_date: date) -> str:
     """Gemini API用のプロンプトを生成"""
 
@@ -240,6 +245,7 @@ def generate_review_prompt(sessions: List[SessionInfo], target_date: date) -> st
 """
 
 
+# PURPOSE: Gemini API を呼び出してレビューを生成
 def call_gemini_api(prompt: str) -> str:
     """Gemini API を呼び出してレビューを生成"""
 
@@ -270,6 +276,7 @@ def call_gemini_api(prompt: str) -> str:
     return response.text
 
 
+# PURPOSE: APIレスポンスを構造化
 def parse_review_response(
     response_text: str, target_date: date, session_count: int
 ) -> NightReview:
@@ -320,6 +327,7 @@ def parse_review_response(
     )
 
 
+# PURPOSE: レビューをファイルに保存
 def save_review(review: NightReview) -> Path:
     """レビューをファイルに保存"""
 
@@ -362,6 +370,7 @@ def save_review(review: NightReview) -> Path:
     return vault_root / rel_path
 
 
+# PURPOSE: ナイトレビューを生成。
 def generate_night_review(
     target_date: Optional[date] = None,
     process_all: bool = False,
@@ -414,6 +423,7 @@ def generate_night_review(
     return review
 
 
+# PURPOSE: 全セッション一覧を表示
 def list_sessions():
     """全セッション一覧を表示"""
     sessions = get_sessions()
@@ -429,6 +439,7 @@ def list_sessions():
         print()
 
 
+# PURPOSE: 関数: main
 def main():
     import argparse
 

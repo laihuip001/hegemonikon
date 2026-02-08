@@ -13,6 +13,7 @@ CDP_PORT = 9222
 OUTPUT_FILE = Path(r"M:\Hegemonikon\mekhane\anamnesis\style_investigation.txt")
 
 
+# PURPOSE: 関数: main
 async def main():
     from playwright.async_api import async_playwright
 

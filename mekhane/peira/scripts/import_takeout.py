@@ -27,6 +27,7 @@ except ImportError:
     ijson = None
 
 
+# PURPOSE: ファイル名を安全な文字のみにし、バイト数で制限する。
 def safe_filename(text: str, max_bytes: int = 100) -> str:
     """
     ファイル名を安全な文字のみにし、バイト数で制限する。
@@ -50,6 +51,7 @@ def safe_filename(text: str, max_bytes: int = 100) -> str:
     return f"{truncated}_{hash_digest}"
 
 
+# PURPOSE: 複雑なネスト構造からテキストを再帰的に抽出する。
 def extract_text_recursive(node: Union[str, list, dict]) -> str:
     """
     複雑なネスト構造からテキストを再帰的に抽出する。
@@ -72,6 +74,7 @@ def extract_text_recursive(node: Union[str, list, dict]) -> str:
     return ""
 
 
+# PURPOSE: メイン処理
 def process_conversations(data: Union[List, Dict, Iterable], output_dir: str):
     """メイン処理"""
 
@@ -190,6 +193,7 @@ def process_conversations(data: Union[List, Dict, Iterable], output_dir: str):
     print(f"\nImport Complete: {success_count} success, {error_count} errors.")
 
 
+# PURPOSE: テスト用データを生成 (Nested content test included)
 def create_dummy_data() -> Dict:
     """テスト用データを生成 (Nested content test included)"""
     return {
@@ -220,6 +224,7 @@ def create_dummy_data() -> Dict:
     }
 
 
+# PURPOSE: JSON構造を判別してストリーミングイテレータを返す。
 def stream_conversations(f):
     """
     JSON構造を判別してストリーミングイテレータを返す。
@@ -256,6 +261,7 @@ def stream_conversations(f):
         )  # Assume list if unknown or let ijson handle error
 
 
+# PURPOSE: 関数: main
 def main():
     if len(sys.argv) < 2:
         print("Usage: python import_takeout.py [json_file_path] [output_dir]")

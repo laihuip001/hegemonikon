@@ -10,6 +10,8 @@ from mekhane.fep.pw_adapter import (
     resolve_pw,
     describe_pw,
     is_uniform,
+    is_phase2_ready,
+    PHASE2_BASIN_THRESHOLD,
     SERIES_THEOREMS,
 )
 
@@ -404,3 +406,45 @@ class TestConvergeIntegration:
         for v in cone.pw.values():
             assert abs(v) < 1e-6
 
+
+# =============================================================================
+# Phase 2 transition check
+# =============================================================================
+
+
+class TestPhase2Transition:
+    """Phase 2 migration condition checks."""
+
+    def test_phase2_not_ready_by_default(self):
+        """With no BasinLogger data, Phase 2 is not ready."""
+        assert is_phase2_ready() is False
+
+    def test_phase2_ready_with_sufficient_data(self):
+        """When BasinLogger has >= threshold entries, Phase 2 is ready."""
+        from unittest.mock import patch, MagicMock
+
+        mock_bias = MagicMock()
+        mock_bias.total_count = PHASE2_BASIN_THRESHOLD  # exactly at threshold
+
+        mock_logger = MagicMock()
+        mock_logger.biases = {"S": mock_bias}
+
+        with patch("mekhane.fep.basin_logger.BasinLogger", return_value=mock_logger):
+            from mekhane.fep import pw_adapter
+            result = pw_adapter.is_phase2_ready()
+            assert result is True
+
+    def test_phase2_not_ready_below_threshold(self):
+        """When BasinLogger has < threshold entries, Phase 2 is not ready."""
+        from unittest.mock import patch, MagicMock
+
+        mock_bias = MagicMock()
+        mock_bias.total_count = 10  # well below threshold
+
+        mock_logger = MagicMock()
+        mock_logger.biases = {"S": mock_bias}
+
+        with patch("mekhane.fep.basin_logger.BasinLogger", return_value=mock_logger):
+            from mekhane.fep import pw_adapter
+            result = pw_adapter.is_phase2_ready()
+            assert result is False

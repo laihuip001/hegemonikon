@@ -11,11 +11,13 @@ Q.E.D.
 
 import pytest
 from mekhane.fep.category import (
+    COGNITIVE_TYPES,
     FUNCTORS,
     MORPHISMS,
     NATURAL_TRANSFORMATIONS,
     THEOREMS,
     Adjunction,
+    CognitiveType,
     Cone,
     ConeProjection,
     Functor,
@@ -509,10 +511,10 @@ class TestNaturalTransformation:
 class TestFunctorRegistry:
     """FUNCTORS レジストリの検証"""
 
-    # PURPOSE: 4 concrete functors defined
+    # PURPOSE: 5 concrete functors defined (boot, bye, zet, eat, mp)
     def test_registry_count(self):
-        assert len(FUNCTORS) == 4
-        assert set(FUNCTORS.keys()) == {"boot", "bye", "zet", "eat"}
+        assert len(FUNCTORS) == 5
+        assert set(FUNCTORS.keys()) == {"boot", "bye", "zet", "eat", "mp"}
 
     # PURPOSE: boot ⊣ bye adjunction consistency
     def test_boot_bye_adjunction(self):
@@ -556,10 +558,10 @@ class TestFunctorRegistry:
 class TestNaturalTransformationRegistry:
     """NATURAL_TRANSFORMATIONS レジストリの検証"""
 
-    # PURPOSE: η and ε defined
+    # PURPOSE: η, ε, and η_MP defined
     def test_registry_count(self):
-        assert len(NATURAL_TRANSFORMATIONS) == 2
-        assert set(NATURAL_TRANSFORMATIONS.keys()) == {"eta", "epsilon"}
+        assert len(NATURAL_TRANSFORMATIONS) == 3
+        assert set(NATURAL_TRANSFORMATIONS.keys()) == {"eta", "epsilon", "mp_hgk"}
 
     # PURPOSE: η and ε form adjunction pair
     def test_adjunction_pair(self):
@@ -883,3 +885,173 @@ class TestJapaneseDispersion:
         outputs = {"O1": same, "O2": same, "O3": same, "O4": same}
         assert compute_dispersion(outputs) == 0.0
 
+
+# =============================================================================
+# F1: Creator Addition Tests
+# =============================================================================
+
+
+class TestCognitiveTypeRegistry:
+    """CognitiveType + COGNITIVE_TYPES registry の検証"""
+
+    # PURPOSE: all 24 theorems classified
+    def test_all_theorems_classified(self):
+        for tid in THEOREMS:
+            assert tid in COGNITIVE_TYPES, f"{tid} not in COGNITIVE_TYPES"
+
+    # PURPOSE: O-series = Understanding
+    def test_o_series_understanding(self):
+        for i in range(1, 5):
+            assert COGNITIVE_TYPES[f"O{i}"] == CognitiveType.UNDERSTANDING
+
+    # PURPOSE: S-series = Reasoning
+    def test_s_series_reasoning(self):
+        for i in range(1, 5):
+            assert COGNITIVE_TYPES[f"S{i}"] == CognitiveType.REASONING
+
+    # PURPOSE: A-series bridge structure
+    def test_a_series_bridge(self):
+        assert COGNITIVE_TYPES["A1"] == CognitiveType.BRIDGE_U_TO_R
+        assert COGNITIVE_TYPES["A3"] == CognitiveType.BRIDGE_R_TO_U
+        assert COGNITIVE_TYPES["A2"] == CognitiveType.REASONING
+        assert COGNITIVE_TYPES["A4"] == CognitiveType.REASONING
+
+    # PURPOSE: K4 is MIXED
+    def test_k4_mixed(self):
+        assert COGNITIVE_TYPES["K4"] == CognitiveType.MIXED
+
+    # PURPOSE: K2 is Reasoning (exception in K-series)
+    def test_k2_reasoning_exception(self):
+        assert COGNITIVE_TYPES["K2"] == CognitiveType.REASONING
+
+
+class TestClassifyCognitiveType:
+    """classify_cognitive_type() の検証"""
+
+    def test_known_theorem(self):
+        from mekhane.fep.cone_builder import classify_cognitive_type
+        assert classify_cognitive_type("O1") == CognitiveType.UNDERSTANDING
+
+    def test_unknown_raises(self):
+        from mekhane.fep.cone_builder import classify_cognitive_type
+        with pytest.raises(KeyError):
+            classify_cognitive_type("Z99")
+
+
+class TestIsCrossBoundaryMorphism:
+    """is_cross_boundary_morphism() の検証"""
+
+    def test_u_to_r(self):
+        from mekhane.fep.cone_builder import is_cross_boundary_morphism
+        # O1 (U) → S1 (R)
+        assert is_cross_boundary_morphism("O1", "S1") == "U→R"
+
+    def test_r_to_u(self):
+        from mekhane.fep.cone_builder import is_cross_boundary_morphism
+        # S1 (R) → O1 (U)
+        assert is_cross_boundary_morphism("S1", "O1") == "R→U"
+
+    def test_same_type(self):
+        from mekhane.fep.cone_builder import is_cross_boundary_morphism
+        # O1 (U) → O2 (U)
+        assert is_cross_boundary_morphism("O1", "O2") is None
+
+    def test_mixed_returns_none(self):
+        from mekhane.fep.cone_builder import is_cross_boundary_morphism
+        # K4 (MIXED) → anything
+        assert is_cross_boundary_morphism("K4", "O1") is None
+
+    def test_unknown_returns_none(self):
+        from mekhane.fep.cone_builder import is_cross_boundary_morphism
+        assert is_cross_boundary_morphism("Z99", "O1") is None
+
+    def test_bridge_u_to_r_counts_as_u(self):
+        from mekhane.fep.cone_builder import is_cross_boundary_morphism
+        # A1 (BRIDGE_U_TO_R ∈ u_types) → S1 (R)
+        assert is_cross_boundary_morphism("A1", "S1") == "U→R"
+
+
+class TestMPFunctor:
+    """MP Functor (Metacognitive Prompting) テスト"""
+
+    def test_mp_exists(self):
+        assert "mp" in FUNCTORS
+
+    def test_mp_maps_5_stages(self):
+        mp = FUNCTORS["mp"]
+        assert len(mp.object_map) == 5
+        assert set(mp.object_map.keys()) == {"S1", "S2", "S3", "S4", "S5"}
+
+    def test_mp_targets_are_theorems(self):
+        mp = FUNCTORS["mp"]
+        for stage, theorem in mp.object_map.items():
+            assert theorem in THEOREMS, f"MP {stage}→{theorem}: {theorem} not a theorem"
+
+    def test_mp_has_morphisms(self):
+        mp = FUNCTORS["mp"]
+        assert len(mp.morphism_map) >= 3
+
+    def test_mp_source_cat(self):
+        mp = FUNCTORS["mp"]
+        assert mp.source_cat == "MP"
+        assert mp.target_cat == "Cog"
+
+
+class TestMPNaturalTransformation:
+    """η_MP NatTrans テスト"""
+
+    def test_mp_hgk_exists(self):
+        assert "mp_hgk" in NATURAL_TRANSFORMATIONS
+
+    def test_mp_hgk_components_match_functor(self):
+        nt = NATURAL_TRANSFORMATIONS["mp_hgk"]
+        mp = FUNCTORS["mp"]
+        # η_MP components should match MP functor's object_map values
+        for stage, theorem in nt.components.items():
+            assert mp.object_map[stage] == theorem, (
+                f"η_MP[{stage}]={theorem} ≠ MP({stage})={mp.object_map[stage]}"
+            )
+
+    def test_mp_hgk_all_targets_valid(self):
+        nt = NATURAL_TRANSFORMATIONS["mp_hgk"]
+        for stage, theorem in nt.components.items():
+            assert theorem in COGNITIVE_TYPES, (
+                f"η_MP component {theorem} not in COGNITIVE_TYPES"
+            )
+
+
+class TestVerifyNaturality:
+    """verify_naturality() の検証"""
+
+    def test_mp_hgk_fallback(self):
+        """η_MP の source/target functor は直接解決できない → fallback"""
+        from mekhane.fep.cone_builder import verify_naturality
+        nt = NATURAL_TRANSFORMATIONS["mp_hgk"]
+        result = verify_naturality(nt)
+        # Fallback mode: component_validity checks
+        assert len(result.checks) == 5  # 5 MP stages
+        assert all(c["type"] == "component_validity" for c in result.checks)
+        # All components map to valid theorems
+        assert result.is_natural is True
+
+    def test_mp_hgk_with_explicit_functor(self):
+        """MP functor を明示的に渡すと morphism-level check"""
+        from mekhane.fep.cone_builder import verify_naturality
+        nt = NATURAL_TRANSFORMATIONS["mp_hgk"]
+        mp = FUNCTORS["mp"]
+        result = verify_naturality(nt, source_functor=mp)
+        # Should check morphisms in MP functor
+        assert len(result.checks) > 0
+
+    def test_invalid_component_detected(self):
+        """不正な component → violation"""
+        from mekhane.fep.cone_builder import verify_naturality
+        bad_nt = NaturalTransformation(
+            name="bad",
+            source_functor="X",
+            target_functor="Y",
+            components={"a": "NONEXISTENT_THEOREM"},
+        )
+        result = verify_naturality(bad_nt)
+        assert result.is_natural is False
+        assert len(result.violations) == 1

@@ -511,10 +511,17 @@ class TestNaturalTransformation:
 class TestFunctorRegistry:
     """FUNCTORS レジストリの検証"""
 
-    # PURPOSE: 5 concrete functors defined (boot, bye, zet, eat, mp)
+    # PURPOSE: 7 concrete functors defined (5 base + 2 composed)
     def test_registry_count(self):
-        assert len(FUNCTORS) == 5
-        assert set(FUNCTORS.keys()) == {"boot", "bye", "zet", "eat", "mp"}
+        assert len(FUNCTORS) >= 5  # at least base functors
+        assert {"boot", "bye", "zet", "eat", "mp"}.issubset(set(FUNCTORS.keys()))
+
+    # PURPOSE: composed functors registered by cone_builder import (F5)
+    def test_composed_functors_registered(self):
+        assert "bye∘boot" in FUNCTORS
+        assert "boot∘bye" in FUNCTORS
+        assert FUNCTORS["bye∘boot"].is_endofunctor is True
+        assert FUNCTORS["boot∘bye"].is_endofunctor is True
 
     # PURPOSE: boot ⊣ bye adjunction consistency
     def test_boot_bye_adjunction(self):
@@ -820,6 +827,16 @@ class TestConeConsumer:
         assert advice.action == "reweight"
         assert advice.suggested_wf == "/dia epo"
 
+    # PURPOSE: A-series Bridge tolerance (F3)
+    def test_a_series_bridge_tolerance(self):
+        from mekhane.fep.cone_consumer import advise
+        cone = self._make_cone(series=Series.A, dispersion=0.28,
+                               confidence=60.0, is_universal=False)
+        advice = advise(cone)
+        assert advice.action == "investigate"  # not devil
+        assert advice.suggested_wf == "/dia epo"
+        assert "Bridge" in advice.reason
+
     # PURPOSE: default → proceed (moderate dispersion)
     def test_default_proceed(self):
         from mekhane.fep.cone_consumer import advise
@@ -1055,3 +1072,14 @@ class TestVerifyNaturality:
         result = verify_naturality(bad_nt)
         assert result.is_natural is False
         assert len(result.violations) == 1
+
+    def test_eta_auto_resolve_with_composed(self):
+        """η の target_functor 'bye∘boot' が FUNCTORS から解決できる (F5)"""
+        from mekhane.fep.cone_builder import verify_naturality
+        eta = NATURAL_TRANSFORMATIONS["eta"]
+        result = verify_naturality(eta)
+        # With composed functor registered, should NOT be pure fallback
+        # (eta's source_functor is "Id_Mem" which won't resolve,
+        #  but target_functor "bye∘boot" will)
+        assert len(result.checks) > 0
+        assert result.transformation_name == "η"

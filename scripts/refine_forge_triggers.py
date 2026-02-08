@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# PROOF: [L3/ユーティリティ] <- scripts/
+# PURPOSE: Forge トリガー定義のリファインメント
 """
 Forge モジュールの activation_triggers を精緻化
 PURPOSE: "general" のままの triggers を具体的キーワードに置き換え

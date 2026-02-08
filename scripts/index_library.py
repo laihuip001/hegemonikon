@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# PROOF: [L2/インフラ] <- scripts/
+# PURPOSE: Library プロンプトのベクトルインデックス構築
 """
 Library 112ファイルを Gnōsis LanceDB にインデックス
 PURPOSE: セマンティック検索で /lib を強化 (Layer 3)

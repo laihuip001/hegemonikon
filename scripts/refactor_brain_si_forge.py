@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# PROOF: [L3/移行] <- scripts/
+# PURPOSE: SI/Forge モジュールのリファクタリング自動化
 """
 Brain Phase 3+4: System Instructions + Forge Prompt Structure → Library 変換
 PURPOSE: SI 12個 + Forge 43個を統一形式でLibraryに配置

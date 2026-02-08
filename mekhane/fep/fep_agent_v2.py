@@ -898,6 +898,58 @@ class HegemonikónFEPAgentV2:
             return True
         return False
 
+    # PURPOSE: Save learned ε values
+    def save_epsilon(self, path: Optional[str] = None) -> str:
+        """Save learned ε values as JSON."""
+        import json
+        from .persistence import LEARNED_A_PATH
+        from pathlib import Path as P
+
+        default_path = LEARNED_A_PATH.parent / "learned_epsilon.json"
+        target_path = P(path) if path else default_path
+        target_path.parent.mkdir(parents=True, exist_ok=True)
+
+        data = {
+            "epsilon": self.epsilon,
+            "prediction_count": len(self._prediction_errors),
+            "error_rate": (
+                sum(self._prediction_errors[-20:]) / len(self._prediction_errors[-20:])
+                if self._prediction_errors else None
+            ),
+        }
+        with open(target_path, "w") as f:
+            json.dump(data, f, indent=2)
+        self._history.append({"type": "save_epsilon", "path": str(target_path)})
+        return str(target_path)
+
+    # PURPOSE: Load learned ε values
+    def load_epsilon(self, path: Optional[str] = None) -> bool:
+        """Load learned ε values from JSON."""
+        import json
+        from .persistence import LEARNED_A_PATH
+        from pathlib import Path as P
+
+        default_path = LEARNED_A_PATH.parent / "learned_epsilon.json"
+        target_path = P(path) if path else default_path
+
+        if not target_path.exists():
+            return False
+
+        try:
+            with open(target_path, "r") as f:
+                data = json.load(f)
+            if "epsilon" in data:
+                self.epsilon.update(data["epsilon"])
+                self._history.append({
+                    "type": "load_epsilon",
+                    "path": str(target_path),
+                    "epsilon": dict(self.epsilon),
+                })
+                return True
+        except Exception:
+            pass
+        return False
+
     # PURPOSE: Reset to initial beliefs
     def reset(self):
         """Reset to initial beliefs."""

@@ -33,6 +33,7 @@ class OpType(Enum):
     FUSE = auto()        # * 融合
     OSC = auto()         # ~ 振動
     SEQ = auto()         # _ シーケンス
+    COLIMIT = auto()     # \ Colimit (展開・発散)
     
     # Tier 3: 制御演算子
     CONVERGE = auto()    # >> or lim 収束
@@ -115,12 +116,26 @@ class Fusion:
 
 @dataclass
 class Oscillation:
-    """振動: A ~ B
+    """振動: A ~ B, A ~* B (収束), A ~! B (発散)
     
-    例: /u+ ~ /noe!
+    例: /u+ ~ /noe!, /dia+~*/noe (収束振動)
     """
     left: Any
     right: Any
+    convergent: bool = False              # ~* 収束振動
+    divergent: bool = False               # ~! 発散振動
+    max_iterations: int = 5               # 収束時の最大反復回数
+
+
+@dataclass
+class ColimitExpansion:
+    """Colimit 展開: \\A
+    
+    例: \\pan+ (pan の全派生展開)
+    圏論的意味: Colimit = 余極限 = 全射影の合併
+    """
+    body: Any                              # 展開対象の WF/Expression
+    operators: List[OpType] = field(default_factory=list)  # 追加演算子
 
 
 # =============================================================================
@@ -185,7 +200,7 @@ class Program:
 
 ASTNode = Union[
     Workflow, Condition, MacroRef,
-    ConvergenceLoop, Sequence, Fusion, Oscillation,
+    ConvergenceLoop, Sequence, Fusion, Oscillation, ColimitExpansion,
     ForLoop, IfCondition, WhileLoop, Lambda,
     Program
 ]

@@ -12,7 +12,7 @@ import re
 from typing import Any, Optional, List, Dict
 from .ast import (
     OpType, Workflow, Condition, MacroRef,
-    ConvergenceLoop, Sequence, Fusion, Oscillation,
+    ConvergenceLoop, Sequence, Fusion, Oscillation, ColimitExpansion,
     ForLoop, IfCondition, WhileLoop, Lambda, Program
 )
 
@@ -51,7 +51,8 @@ class CCLParser:
     }
     
     # 二項演算子優先順位 (低い方が先に処理)
-    BINARY_OPS_PRIORITY = ['_', '~', '*', '>>', '|>', '||']
+    # ~* と ~! は ~ より先にマッチさせる（長いトークン優先）
+    BINARY_OPS_PRIORITY = ['_', '~*', '~!', '~', '*', '>>', '|>', '||']
     
     def __init__(self):
         self.errors: List[str] = []
@@ -70,6 +71,23 @@ class CCLParser:
     def _parse_expression(self, expr: str) -> Any:
         """式をパース (優先順位に従う)"""
         expr = expr.strip()
+        
+        # 括弧グループの剤離: (...) や {...} の外側が式全体を囲んでいる場合に剥がす
+        if (expr.startswith('(') and expr.endswith(')') and
+                self._is_balanced_group(expr, '(', ')')):
+            return self._parse_expression(expr[1:-1])
+        if (expr.startswith('{') and expr.endswith('}') and
+                self._is_balanced_group(expr, '{', '}')):
+            return self._parse_expression(expr[1:-1])
+        
+        # Colimit 前置演算子: \WF
+        if expr.startswith('\\'):
+            inner = expr[1:]
+            body = self._parse_expression(inner)
+            operators = []
+            if isinstance(body, Workflow):
+                operators = body.operators
+            return ColimitExpansion(body=body, operators=operators)
         
         # CPL 制御構文チェック
         if expr.startswith('F:'):
@@ -97,6 +115,22 @@ class CCLParser:
         
         # ワークフロー
         return self._parse_workflow(expr)
+    
+    def _is_balanced_group(self, expr: str, open_ch: str, close_ch: str) -> bool:
+        """式全体がバランスしたグループかを判定する。
+        例: (A~*B) -> True, (A)~*(B) -> False
+        """
+        if not (expr.startswith(open_ch) and expr.endswith(close_ch)):
+            return False
+        depth = 0
+        for i, c in enumerate(expr):
+            if c == open_ch:
+                depth += 1
+            elif c == close_ch:
+                depth -= 1
+            if depth == 0 and i < len(expr) - 1:
+                return False  # 途中で閉じた = 全体を囲んでいない
+        return True
     
     def _split_binary(self, expr: str, op: str) -> List[str]:
         """二項演算子で分割 (ネストを考慮)"""
@@ -134,8 +168,18 @@ class CCLParser:
             # シーケンス
             steps = [self._parse_expression(p) for p in parts]
             return Sequence(steps=steps)
+        elif op == '~*':
+            # 収束振動
+            left = self._parse_expression(parts[0])
+            right = self._parse_expression('~*'.join(parts[1:]))
+            return Oscillation(left=left, right=right, convergent=True)
+        elif op == '~!':
+            # 発散振動
+            left = self._parse_expression(parts[0])
+            right = self._parse_expression('~!'.join(parts[1:]))
+            return Oscillation(left=left, right=right, divergent=True)
         elif op == '~':
-            # 振動
+            # 通常の振動
             left = self._parse_expression(parts[0])
             right = self._parse_expression('~'.join(parts[1:]))
             return Oscillation(left=left, right=right)

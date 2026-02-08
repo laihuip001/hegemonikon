@@ -264,14 +264,6 @@ def compute_pw_table(
     return table
 
 
-# Pre-compute composed functors for η/ε adjunction auto-resolve (F5)
-# Without these, verify_naturality() always falls back to component-only checks
-_boot = FUNCTORS["boot"]
-_bye = FUNCTORS["bye"]
-FUNCTORS["bye∘boot"] = _boot.compose(_bye)  # Mem → Mem (η target)
-FUNCTORS["boot∘bye"] = _bye.compose(_boot)  # Ses → Ses (ε source)
-
-
 # =============================================================================
 # Main: converge() — C0-C3 一括実行
 # =============================================================================

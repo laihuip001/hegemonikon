@@ -30,6 +30,8 @@ try:
 except ImportError:
     MCP_AVAILABLE = False
     Server = None
+    TextContent = Any  # type: ignore
+    Tool = Any  # type: ignore
 
 
 # =============================================================================

@@ -7,11 +7,14 @@ Usage:
     python boot_integration.py                    # 標準起動
     python boot_integration.py --mode fast        # 高速起動
     python boot_integration.py --mode detailed    # 詳細起動
+    python boot_integration.py --postcheck /tmp/boot_report.md --mode detailed  # ポストチェック
 """
 
+import re
 import sys
 import json
 import argparse
+from datetime import datetime
 from pathlib import Path
 from typing import Optional
 
@@ -304,6 +307,258 @@ def print_boot_summary(mode: str = "standard", context: Optional[str] = None):
     attractor_str = "+".join(attractor_series) if attractor_series else "—"
     print(f"📊 Handoff: {h_count}件 | KI: {ki_count}件 | Sessions: {sessions} | PKS: {pks_count}件 | Safety: {'✅' if safety_errors == 0 else f'⚠️{safety_errors}'} | Attractor: {attractor_str}")
 
+    # detailed モード: テンプレートファイル生成
+    if mode == "detailed":
+        template_path = generate_boot_template(result)
+        print(f"\n📝 Boot Report Template: {template_path}", file=sys.stderr)
+        print(f"TEMPLATE:{template_path}")
+
+
+# ============================================================
+# テンプレート生成 (A+C) — 環境強制: 穴埋め式テンプレート
+# ============================================================
+
+# モード別の最低要件定義
+MODE_REQUIREMENTS = {
+    "detailed": {
+        "handoff_count": 10,
+        "ki_count": 5,
+        "min_chars": 3000,
+        "required_sections": [
+            "Handoff 個別要約",
+            "KI 深読み",
+            "Self-Profile 摩擦",
+            "意味ある瞬間",
+            "Phase 詳細",
+            "タスク提案",
+        ],
+    },
+    "standard": {
+        "handoff_count": 3,
+        "ki_count": 3,
+        "min_chars": 1000,
+        "required_sections": [
+            "Handoff サマリー",
+            "タスク提案",
+        ],
+    },
+    "fast": {
+        "handoff_count": 0,
+        "ki_count": 0,
+        "min_chars": 0,
+        "required_sections": [],
+    },
+}
+
+
+def generate_boot_template(result: dict) -> Path:
+    """
+    環境強制: モード別の穴埋めテンプレートを生成する。
+
+    <!-- REQUIRED --> マーカー付きセクションは必須。
+    <!-- FILL --> マーカーは LLM が記入すべき箇所。
+    postcheck で未記入の FILL が検出されると FAIL になる。
+    """
+    now = datetime.now()
+    template_path = Path(f"/tmp/boot_report_{now.strftime('%Y%m%d_%H%M')}.md")
+
+    lines = []
+    lines.append(f"# Boot Report — {now.strftime('%Y-%m-%d %H:%M')}")
+    lines.append("")
+    lines.append("## 必須セクション チェックリスト")
+    lines.append("")
+
+    reqs = MODE_REQUIREMENTS.get("detailed", {})
+    for section in reqs.get("required_sections", []):
+        lines.append(f"- [ ] {section}")
+    lines.append("")
+
+    # --- Handoff 個別要約 ---
+    lines.append("## Handoff 個別要約")
+    lines.append("<!-- REQUIRED: 各 Handoff の S/A/R を1行以上 -->")
+    lines.append("")
+
+    handoffs = result.get("handoffs", {})
+    related = handoffs.get("related", [])
+    latest = handoffs.get("latest")
+
+    all_handoffs = []
+    if latest:
+        all_handoffs.append(latest)
+    if related:
+        all_handoffs.extend(related)
+
+    for i, h in enumerate(all_handoffs[:10], 1):
+        title = "Unknown"
+        if hasattr(h, "metadata"):
+            title = h.metadata.get("primary_task", h.metadata.get("title", "Unknown"))
+        elif isinstance(h, dict):
+            title = h.get("primary_task", h.get("title", "Unknown"))
+        lines.append(f"### Handoff {i}: {title}")
+        lines.append("")
+        lines.append("> 要約: <!-- FILL -->")
+        lines.append("")
+
+    # --- KI 深読み ---
+    lines.append("## KI 深読み")
+    lines.append("<!-- REQUIRED: サマリー引用 + 自分の解釈を記述 -->")
+    lines.append("")
+
+    ki_items = result.get("ki", {}).get("ki_items", [])
+    for i, ki in enumerate(ki_items[:5], 1):
+        name = "Unknown"
+        summary = "N/A"
+        if hasattr(ki, "metadata"):
+            name = ki.metadata.get("ki_name", "Unknown")
+            summary = ki.metadata.get("summary", "N/A")
+        elif isinstance(ki, dict):
+            name = ki.get("ki_name", "Unknown")
+            summary = ki.get("summary", "N/A")
+        lines.append(f"### KI {i}: {name}")
+        lines.append("")
+        lines.append(f"> サマリー: {summary[:100]}")
+        lines.append("> 解釈: <!-- FILL -->")
+        lines.append("")
+
+    # 不足分はプレースホルダー
+    for i in range(len(ki_items) + 1, 6):
+        lines.append(f"### KI {i}: (session context から選択)")
+        lines.append("")
+        lines.append("> サマリー: <!-- FILL -->")
+        lines.append("> 解釈: <!-- FILL -->")
+        lines.append("")
+
+    # --- Self-Profile 摩擦 ---
+    lines.append("## Self-Profile 摩擦")
+    lines.append("<!-- REQUIRED: ミスパターンとの摩擦を明示 -->")
+    lines.append("")
+    lines.append("今回のセッションで注意すべきミスパターン: <!-- FILL -->")
+    lines.append("")
+
+    # --- 意味ある瞬間 ---
+    lines.append("## 意味ある瞬間")
+    lines.append("<!-- REQUIRED: 各瞬間に対する自分の解釈を記述 -->")
+    lines.append("")
+    lines.append("解釈: <!-- FILL -->")
+    lines.append("")
+
+    # --- Phase 詳細 ---
+    lines.append("## Phase 詳細")
+    lines.append("<!-- REQUIRED: 各 Phase の展開された詳細を出力 -->")
+    lines.append("")
+    for phase in range(7):
+        lines.append(f"### Phase {phase}")
+        lines.append("")
+        lines.append("<!-- FILL -->")
+        lines.append("")
+
+    # --- タスク提案 ---
+    lines.append("## タスク提案")
+    lines.append("<!-- REQUIRED: Handoff から抽出したタスク提案 -->")
+    lines.append("")
+    lines.append("1. <!-- FILL -->")
+    lines.append("")
+
+    template_path.write_text("\n".join(lines), encoding="utf-8")
+    return template_path
+
+
+# ============================================================
+# ポストチェック (B) — 環境強制: 記入済みレポートの検証
+# ============================================================
+
+def postcheck_boot_report(report_path: str, mode: str = "detailed") -> dict:
+    """
+    記入済み boot report を検証する。
+
+    Returns:
+        dict: {
+            "passed": bool,
+            "checks": [{"name": str, "passed": bool, "detail": str}],
+            "formatted": str
+        }
+    """
+    path = Path(report_path)
+    if not path.exists():
+        return {
+            "passed": False,
+            "checks": [{"name": "file_exists", "passed": False, "detail": f"File not found: {report_path}"}],
+            "formatted": f"❌ Boot Report Validation: FAIL\n  ❌ File not found: {report_path}",
+        }
+
+    content = path.read_text(encoding="utf-8")
+    reqs = MODE_REQUIREMENTS.get(mode, MODE_REQUIREMENTS["standard"])
+    checks = []
+
+    # Check 1: <!-- FILL --> の残存数
+    fill_count = content.count("<!-- FILL -->")
+    checks.append({
+        "name": "unfilled_sections",
+        "passed": fill_count == 0,
+        "detail": f"{'No' if fill_count == 0 else fill_count} unfilled sections"
+            + ("" if fill_count == 0 else f" remaining (<!-- FILL --> found {fill_count}x)"),
+    })
+
+    # Check 2: REQUIRED セクション数
+    required_count = content.count("<!-- REQUIRED")
+    expected = len(reqs.get("required_sections", []))
+    checks.append({
+        "name": "required_sections",
+        "passed": required_count >= expected,
+        "detail": f"Required sections: {required_count}/{expected}",
+    })
+
+    # Check 3: 総文字数
+    min_chars = reqs.get("min_chars", 0)
+    char_count = len(content)
+    checks.append({
+        "name": "content_length",
+        "passed": char_count >= min_chars,
+        "detail": f"Content length: {char_count} chars"
+            + (f" (≥ {min_chars})" if char_count >= min_chars else f" (< {min_chars}, need {min_chars - char_count} more)"),
+    })
+
+    # Check 4: Handoff 引用数 (### Handoff N: の数)
+    handoff_refs = len(re.findall(r"^### Handoff \d+:", content, re.MULTILINE))
+    expected_h = reqs.get("handoff_count", 0)
+    checks.append({
+        "name": "handoff_references",
+        "passed": handoff_refs >= expected_h,
+        "detail": f"Handoff references: {handoff_refs}"
+            + (f" (≥ {expected_h})" if handoff_refs >= expected_h else f" (< {expected_h})"),
+    })
+
+    # Check 5: チェックリスト完了率
+    unchecked = content.count("- [ ]")
+    checked = content.count("- [x]")
+    total_checks = unchecked + checked
+    all_checked = unchecked == 0 and total_checks > 0
+    checks.append({
+        "name": "checklist_completion",
+        "passed": all_checked,
+        "detail": f"Checklist: {checked}/{total_checks} completed"
+            + ("" if all_checked else f" ({unchecked} remaining)"),
+    })
+
+    # 結果集計
+    passed_count = sum(1 for c in checks if c["passed"])
+    total = len(checks)
+    all_passed = all(c["passed"] for c in checks)
+
+    # フォーマット
+    status = "PASS" if all_passed else "FAIL"
+    icon = "✅" if all_passed else "❌"
+    lines = [f"{icon} Boot Report Validation: {status} ({passed_count}/{total} checks)"]
+    for c in checks:
+        ci = "✅" if c["passed"] else "❌"
+        lines.append(f"  {ci} {c['detail']}")
+
+    return {
+        "passed": all_passed,
+        "checks": checks,
+        "formatted": "\n".join(lines),
+    }
+
 
 def main():
     parser = argparse.ArgumentParser(description="Boot integration API")
@@ -314,14 +569,27 @@ def main():
         help="Boot mode",
     )
     parser.add_argument("--context", type=str, help="Context for search")
+    parser.add_argument(
+        "--postcheck",
+        type=str,
+        metavar="REPORT_PATH",
+        help="Post-check a completed boot report file",
+    )
     args = parser.parse_args()
 
     import warnings
 
     warnings.filterwarnings("ignore")
 
+    # ポストチェックモード
+    if args.postcheck:
+        result = postcheck_boot_report(args.postcheck, mode=args.mode)
+        print(result["formatted"])
+        sys.exit(0 if result["passed"] else 1)
+
+    # 通常ブートモード
     print(f"⏳ Boot Mode: {args.mode}", file=sys.stderr)
-    
+
     try:
         print_boot_summary(mode=args.mode, context=args.context)
     except KeyboardInterrupt:
@@ -334,3 +602,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+

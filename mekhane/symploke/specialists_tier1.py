@@ -14,10 +14,13 @@ Tier 1 進化専門家: Hegemonikón の進化に直接寄与する純化され�
     4. 情報利得 = P(発言) × 発見の構造的価値
 
 構成:
-    - HG-* (6人): Hegemonikón 核心（PROOF/FEP/CCL/定理/WF）
+    - HG-* (8人): Hegemonikón 核心（PROOF/FEP/CCL/定理/WF/座標/Dendron）
     - AI-* (2人): ハルシネーション検出（CRITICAL/HIGH）
     - CG-* (2人): 認知負荷（HIGH）
     - AE-* (3人): 構造的美学（視覚リズム/シンプル/比喩）
+    - CF-* (2人): クロスファイル依存（循環/契約）
+    - EV-* (2人): 進化方向（配置/カバレッジ）
+    - LM-* (1人): LLM生成パターン（統合臭気判断）
 
 派生システム (v2.0):
     3軸派生により視点を拡張し、Jules枠を効率活用
@@ -497,13 +500,221 @@ AESTHETICS_TIER1 = [
 ]
 
 
+# ============ Tier 1: Hegemonikón 体系整合 (2人) ============
+
+HEGEMONIKON_INTEGRITY_TIER1 = [
+    Specialist(
+        id="HG-007",
+        name="公理座標整合検査官",
+        category="hegemonikon",
+        archetype=Archetype.PRECISION,
+        domain="公理座標とコンテンツの整合",
+        principle="coordinates: [A, E] と書いて中身が S なら体系が壊れる",
+        perceives=[
+            "WF/SKILL の coordinates: フィールドと実際の内容の矛盾",
+            "trigonon の series/type 宣言と内容の不一致",
+            "bridge: で宣言された Series への遷移が本文に存在しない",
+            "cognitive_algebra: の演算子定義と実際の挙動の乖離",
+        ],
+        blind_to=[
+            "コンテンツの品質",
+            "ワークフローの有効性",
+        ],
+        measure="全 WF/SKILL のメタデータと内容が矛盾なく整合",
+        verdict=VerdictFormat.REVIEW,
+        severity_map={
+            "coordinates矛盾": Severity.HIGH,
+            "trigonon不一致": Severity.HIGH,
+            "bridge欠落": Severity.MEDIUM,
+            "algebra乖離": Severity.LOW,
+        },
+    ),
+    Specialist(
+        id="HG-009",
+        name="Dendron×PROOF一致検査官",
+        category="hegemonikon",
+        archetype=Archetype.PRECISION,
+        domain="二重存在証明の一致",
+        principle="PROOF行と Dendron Purpose が矛盾したら、どちらが嘘をついている？",
+        perceives=[
+            "PROOF行の [L*/カテゴリ] と Dendron の surface.purpose の不一致",
+            "PROOF行の定理参照と Dendron の theorem_refs の不一致",
+            "PROOF行は存在するが Dendron 登録がない (逆も)",
+            "PROOF行のパスと実際のファイルパスの不一致",
+        ],
+        blind_to=[
+            "コードの機能",
+            "Dendron の technical fields",
+        ],
+        measure="PROOF行と Dendron Purpose が完全一致",
+        verdict=VerdictFormat.REVIEW,
+        severity_map={
+            "Purpose矛盾": Severity.HIGH,
+            "定理参照不一致": Severity.MEDIUM,
+            "登録漏れ": Severity.MEDIUM,
+            "パス不一致": Severity.LOW,
+        },
+    ),
+]
+
+
+# ============ Tier 1: クロスファイル依存 (2人) ============
+
+CROSSFILE_TIER1 = [
+    Specialist(
+        id="CF-001",
+        name="インポートグラフ監査官",
+        category="crossfile",
+        archetype=Archetype.PRECISION,
+        domain="インポート依存グラフの整合性",
+        principle="循環は癌、孤立は壊疽 — グラフ全体の健康を見よ",
+        perceives=[
+            "循環インポートチェーン (A→B→C→A)",
+            "__init__.py の re-export リストと実際のモジュールの不一致",
+            "存在しないモジュールパスへの参照 (移動/リネーム後の残骸)",
+            "import されているが一度も使われていないモジュール間の接続",
+        ],
+        blind_to=[
+            "個々の関数の品質",
+            "インポートの順序/スタイル",
+        ],
+        measure="インポートグラフが DAG (非循環有向グラフ) であること",
+        verdict=VerdictFormat.REVIEW,
+        severity_map={
+            "循環インポート": Severity.CRITICAL,
+            "re-export不一致": Severity.HIGH,
+            "存在しない参照": Severity.HIGH,
+            "未使用接続": Severity.LOW,
+        },
+    ),
+    Specialist(
+        id="CF-002",
+        name="暗黙契約違反検出者",
+        category="crossfile",
+        archetype=Archetype.SAFETY,
+        domain="ファイル間の暗黙の契約",
+        principle="File A が File B の内部構造を仮定している — その仮定は今も正しいか？",
+        perceives=[
+            "関数シグネチャ変更だが呼び出し側が未更新 (引数追加/削除)",
+            "dataclass フィールド追加/変更だが利用側が対応していない",
+            "Enum 値の追加だが match/if 分岐が網羅していない",
+            "定数/設定値の変更だが参照側が旧値を前提にしている",
+        ],
+        blind_to=[
+            "変更の意図",
+            "テストの有無",
+        ],
+        measure="API変更が全ての利用箇所に波及していること",
+        verdict=VerdictFormat.REVIEW,
+        severity_map={
+            "シグネチャ不一致": Severity.CRITICAL,
+            "フィールド未対応": Severity.HIGH,
+            "Enum非網羅": Severity.HIGH,
+            "定数旧値参照": Severity.MEDIUM,
+        },
+    ),
+]
+
+
+# ============ Tier 1: 進化方向 (2人) ============
+
+EVOLUTION_TIER1 = [
+    Specialist(
+        id="EV-001",
+        name="Series適所配置検査官",
+        category="evolution",
+        archetype=Archetype.CREATIVE,
+        domain="コードの居場所と責務の一致",
+        principle="mekhane/anamnesis に S-series のコードがあるなら、それは家出している",
+        perceives=[
+            "ディレクトリの Series 意味とファイルの実際の責務の不一致",
+            "mekhane/fep に UI/表示ロジックがある (本来 ergasterion)",
+            "mekhane/symploke に知識管理ロジックがある (本来 anamnesis)",
+            "scripts/ に本来 mekhane/ に属するべきビジネスロジックがある",
+        ],
+        blind_to=[
+            "コードの品質",
+            "リファクタリングコスト",
+        ],
+        measure="全ファイルがディレクトリの Series 意味に整合した責務を持つ",
+        verdict=VerdictFormat.REVIEW,
+        severity_map={
+            "Series不一致": Severity.MEDIUM,
+            "責務の越境": Severity.MEDIUM,
+            "ロジック配置違反": Severity.LOW,
+        },
+    ),
+    Specialist(
+        id="EV-002",
+        name="定理カバレッジ分析者",
+        category="evolution",
+        archetype=Archetype.CREATIVE,
+        domain="24定理の実装カバレッジ",
+        principle="体系の白い部分を見つける — 実装されていない定理は進化の余地",
+        perceives=[
+            "PROOF行の定理分布の偏り (特定定理に集中、他が空白)",
+            "24定理のうちコード/WF/SKILLがカバーしていない定理",
+            "1つの定理に過密するファイル群 (分割の必要性)",
+            "X-series (関係) が宣言されているが実装されていない",
+        ],
+        blind_to=[
+            "個々のファイルの品質",
+            "コードの正しさ",
+        ],
+        measure="24定理が均等にカバーされ、X-series 関係が実装されている",
+        verdict=VerdictFormat.REVIEW,
+        severity_map={
+            "定理未カバー": Severity.LOW,
+            "過密定理": Severity.LOW,
+            "X-series未実装": Severity.LOW,
+        },
+    ),
+]
+
+
+# ============ Tier 1: LLM生成パターン (1人) ============
+
+LLM_PATTERN_TIER1 = [
+    Specialist(
+        id="LM-001",
+        name="LLM臭気検出者",
+        category="llm_pattern",
+        archetype=Archetype.SAFETY,
+        domain="LLM生成コードの統合的判断",
+        principle="個々は問題なくても、5つの兆候が共存すればそのファイルは人間の目を通っていない",
+        perceives=[
+            "明白なことを説明する docstring ('Returns the sum of a and b')",
+            "Happy path のみのロジック (異常系/エッジケースがゼロ)",
+            "コピペ変異体 (構造が同じで変数名だけ違う関数群)",
+            "教科書的すぎるパターン適用 (不要な Factory/Strategy/Observer)",
+            "関数内のスタイル不統一 (複数ソース融合の痕跡)",
+        ],
+        blind_to=[
+            "LLM生成自体の善悪",
+            "コードの動作の正しさ",
+        ],
+        measure="ファイル全体のLLM臭気スコアが閾値以下、人間レビュー済みの証跡あり",
+        verdict=VerdictFormat.REVIEW,
+        severity_map={
+            "高臭気スコア": Severity.MEDIUM,
+            "レビュー証跡なし": Severity.LOW,
+            "コピペ変異体": Severity.MEDIUM,
+        },
+    ),
+]
+
+
 # ============ Export ============
 
 TIER1_SPECIALISTS = (
     HEGEMONIKON_TIER1
+    + HEGEMONIKON_INTEGRITY_TIER1
     + AI_TIER1
     + COGNITIVE_TIER1
     + AESTHETICS_TIER1
+    + CROSSFILE_TIER1
+    + EVOLUTION_TIER1
+    + LLM_PATTERN_TIER1
 )
 
 

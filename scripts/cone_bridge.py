@@ -73,7 +73,22 @@ def main():
         action="store_true",
         help="Also run advise() and devil_attack() if needed",
     )
+    parser.add_argument(
+        "--format",
+        choices=["text", "json", "trace"],
+        default="text",
+        help="Output format: text (default), json (machine-readable), trace (ES detail)",
+    )
+    parser.add_argument(
+        "--trace-detail",
+        action="store_true",
+        help="Show per-rule evaluation details (implies --advise)",
+    )
     args = parser.parse_args()
+
+    # --trace-detail implies --advise
+    if args.trace_detail:
+        args.advise = True
 
     # Read outputs from file or stdin
     if args.file:
@@ -98,7 +113,53 @@ def main():
     pw = _parse_pw(args.pw) or None
     cone = converge(series, outputs, pw=pw)
 
-    # Display
+    # === JSON output mode ===
+    if args.format == "json":
+        result = {
+            "cone": {
+                "series": cone.series.name,
+                "apex": cone.apex,
+                "dispersion": cone.dispersion,
+                "confidence": cone.confidence,
+                "method": cone.method,
+                "needs_devil": cone.needs_devil,
+            },
+        }
+        if args.advise:
+            from mekhane.fep.cone_consumer import advise, devil_attack, format_advice_for_llm
+            advice = advise(cone)
+            result["advice"] = {
+                "action": advice.action,
+                "reason": advice.reason,
+                "suggested_wf": advice.suggested_wf,
+                "next_steps": advice.next_steps,
+                "urgency": advice.urgency,
+                "format_llm": format_advice_for_llm(advice),
+            }
+            if advice.trace:
+                result["trace"] = {
+                    "matched_rule": advice.trace.matched_rule,
+                    "evaluations": [
+                        {"rule_id": e.rule_id, "matched": e.matched, "reason": e.reason}
+                        for e in advice.trace.evaluations
+                    ],
+                    "rejected": [
+                        {"action": r.action, "rule_id": r.rule_id, "reason": r.reason}
+                        for r in advice.trace.rejected
+                    ],
+                }
+            if cone.needs_devil:
+                attack = devil_attack(cone)
+                result["devil"] = {
+                    "severity": attack.severity,
+                    "summary": attack.attack_summary,
+                    "counterarguments": attack.counterarguments,
+                    "resolution_paths": attack.resolution_paths,
+                }
+        print(json.dumps(result, ensure_ascii=False, indent=2))
+        return
+
+    # === Text / trace output mode ===
     print(describe_cone(cone))
 
     # Optional advise + devil_attack
@@ -118,6 +179,17 @@ def main():
         # Explanation Stack output
         print(f"\n### Explanation Stack")
         print(format_advice_for_llm(advice))
+
+        # Trace detail (per-rule evaluation)
+        if (args.trace_detail or args.format == "trace") and advice.trace:
+            print(f"\n### Trace Detail ({len(advice.trace.evaluations)} evaluations)")
+            for ev in advice.trace.evaluations:
+                mark = "✓" if ev.matched else "✗"
+                print(f"  {mark} {ev.rule_id}: {ev.reason}")
+            if advice.trace.rejected:
+                print(f"\n### Rejected Actions ({len(advice.trace.rejected)})")
+                for rj in advice.trace.rejected:
+                    print(f"  ✗ {rj.action} — {rj.reason}")
 
         if cone.needs_devil:
             attack = devil_attack(cone)

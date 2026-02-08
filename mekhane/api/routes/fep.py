@@ -11,6 +11,8 @@ GET  /api/fep/dashboard   — 分析データ
 import threading
 from typing import Any, Optional
 
+import numpy as np
+
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
 
@@ -54,13 +56,15 @@ _MAX_HISTORY = 1000  # /dia+ fix #5: history 上限ガード
 router = APIRouter(prefix="/fep", tags=["fep"])
 
 
-# PURPOSE: Agent の遅延初期化
+# PURPOSE: Agent の遅延初期化 (R1 fix: Double-Checked Locking)
 def _get_agent():
-    """FEP Agent をシングルトンで取得。"""
+    """FEP Agent をシングルトンで取得。スレッドセーフ。"""
     global _agent
     if _agent is None:
-        from mekhane.fep.fep_agent_v2 import HegemonikónFEPAgentV2
-        _agent = HegemonikónFEPAgentV2(use_defaults=True)
+        with _agent_lock:
+            if _agent is None:  # Double-check
+                from mekhane.fep.fep_agent_v2 import HegemonikónFEPAgentV2
+                _agent = HegemonikónFEPAgentV2(use_defaults=True)
     return _agent
 
 
@@ -82,7 +86,6 @@ async def fep_step(req: FEPStepRequest) -> FEPStepResponse:
             pass
 
         # beliefs entropy (Shannon)
-        import numpy as np
         beliefs = agent._to_beliefs_array()
         eps = 1e-10
         entropy = float(-np.sum(beliefs * np.log(beliefs + eps)))

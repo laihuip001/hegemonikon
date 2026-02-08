@@ -18,7 +18,7 @@ import warnings
 from pathlib import Path
 
 
-# PURPOSE: 関数: main
+# PURPOSE: CLI エントリポイント — 運用ツールの直接実行
 def main():
     # 非推奨警告
     warnings.warn(

@@ -108,7 +108,7 @@ def hybrid_search(query: str) -> str:
     return "\n".join(output)
 
 
-# PURPOSE: 関数: main
+# PURPOSE: CLI エントリポイント — 知識基盤の直接実行
 def main():
     if len(sys.argv) < 2:
         print(__doc__)

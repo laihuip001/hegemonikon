@@ -293,7 +293,7 @@ async def process_urls_async(target_urls, batch_id):
     print(f"\n[Fast Collect] Completed: {success_count} success, {error_count} errors")
 
 
-# PURPOSE: 関数: main
+# PURPOSE: CLI エントリポイント — データパイプラインの直接実行
 def main():
     if len(sys.argv) < 3:
         print(

@@ -313,7 +313,7 @@ def cmd_links(args):
     return 0
 
 
-# PURPOSE: 関数: main
+# PURPOSE: CLI エントリポイント — 知識基盤の直接実行
 def main():
     parser = argparse.ArgumentParser(
         description="Gnōsis - Knowledge Foundation CLI",

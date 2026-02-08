@@ -29,7 +29,7 @@ class EpocheScanner:
         = リスクの可視化
     """
 
-    # PURPOSE: 内部処理: init__
+    # PURPOSE: EpocheScanner の構成と依存関係の初期化
     def __init__(self):
         # PII検知パターン（A2 Krisis の「判断基準」）
         self.patterns = {
@@ -124,7 +124,7 @@ class EpocheShield:
         これにより、外部が判断材料（PII）を得ることを防ぐ
     """
 
-    # PURPOSE: 内部処理: init__
+    # PURPOSE: EpocheShield の初期化 — Epochē 発動: PIIをプレースホルダに置換 Philosophical Reference: 判断を保留 → 外部に送信可能な状態にする
     def __init__(self):
         self.scanner = EpocheScanner()
 

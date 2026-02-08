@@ -22,7 +22,7 @@ import re
 import sys
 
 
-# PURPOSE: 取得: get_batch_id
+# PURPOSE: get_batch_id プロパティの取得
 def get_batch_id():
     if len(sys.argv) < 2:
         print("Usage: python phase3-save-batch-parallel.py <batch_id>")
@@ -103,7 +103,7 @@ is_premium: unknown
     return True
 
 
-# PURPOSE: 関数: main
+# PURPOSE: CLI エントリポイント — データパイプラインの直接実行
 def main():
     if not os.path.exists(TEMP_JSON_FILE):
         print(f"Error: {TEMP_JSON_FILE} not found.")

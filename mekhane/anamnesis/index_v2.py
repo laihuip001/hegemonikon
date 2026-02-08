@@ -64,7 +64,7 @@ if sys.platform == "win32":
 class Embedder:
     """ONNX-based text embedding (BGE-small)"""
 
-    # PURPOSE: 内部処理: init__
+    # PURPOSE: Embedder の構成と依存関係の初期化
     def __init__(self, model_dir: Optional[Path] = None):
         if not EMBEDDER_AVAILABLE:
             raise ImportError(
@@ -181,7 +181,7 @@ class GnosisIndexV2:
     既存GnosisIndexとの互換APIを提供。
     """
 
-    # PURPOSE: 内部処理: init__
+    # PURPOSE: GnosisIndexV2 の構成と依存関係の初期化
     def __init__(
         self,
         adapter: str = "hnswlib",
@@ -214,13 +214,13 @@ class GnosisIndexV2:
         self._title_cache: dict[str, str] = {}
 
     @property
-    # PURPOSE: 関数: embedder
+    # PURPOSE: embedder — 知識基盤の処理
     def embedder(self) -> Embedder:
         if self._embedder is None:
             self._embedder = Embedder()
         return self._embedder
 
-    # PURPOSE: 内部処理: load
+    # PURPOSE: 永続化された状態の復元
     def _load(self) -> None:
         try:
             self.store.load(str(self.index_path))
@@ -231,7 +231,7 @@ class GnosisIndexV2:
             print(f"[GnosisIndexV2] Failed to load index: {e}")
             self.store.create_index(dimension=self._dimension)
 
-    # PURPOSE: 内部処理: save
+    # PURPOSE: 状態のディスク永続化
     def _save(self) -> None:
         self.store.save(str(self.index_path))
         print(
@@ -244,7 +244,7 @@ class GnosisIndexV2:
         import re
         return re.sub(r'[^a-z0-9]', '', title.lower().strip())
 
-    # PURPOSE: 関数: add_papers
+    # PURPOSE: 論文データのインデックスへの追加
     def add_papers(self, papers: list, dedupe: bool = True) -> int:
         if not papers:
             return 0
@@ -296,7 +296,7 @@ class GnosisIndexV2:
         print(f"[GnosisIndexV2] Added {len(ids)} papers")
         return len(ids)
 
-    # PURPOSE: 関数: search
+    # PURPOSE: セマンティック検索の実行
     def search(self, query: str, k: int = 10) -> List[Dict[str, Any]]:
         if self.store.count() == 0:
             print("[GnosisIndexV2] No papers indexed yet")
@@ -307,7 +307,7 @@ class GnosisIndexV2:
 
         return [{"id": r.id, "score": r.score, **r.metadata} for r in results]
 
-    # PURPOSE: 関数: stats
+    # PURPOSE: インデックスの統計情報を集計
     def stats(self) -> Dict[str, Any]:
         return {
             "total": self.store.count(),
@@ -315,7 +315,7 @@ class GnosisIndexV2:
             "index_path": str(self.index_path),
         }
 
-    # PURPOSE: 取得: get_stats
+    # PURPOSE: インデックス統計の取得（ヘルスチェック用）
     def get_stats(self) -> Dict[str, Any]:
         stats = self.stats()
         return {

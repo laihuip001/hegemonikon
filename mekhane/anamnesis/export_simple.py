@@ -24,7 +24,7 @@ OUTPUT_DIR = Path(r"M:\Brain\.hegemonikon\sessions")
 CDP_PORT = 9222
 
 
-# PURPOSE: 関数: main
+# PURPOSE: CLI エントリポイント — 知識基盤の直接実行
 async def main():
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
     print(f"[DEBUG] Output: {OUTPUT_DIR} (exists: {OUTPUT_DIR.exists()})")

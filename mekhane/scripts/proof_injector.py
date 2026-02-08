@@ -110,7 +110,7 @@ def add_proof_header(filepath: Path, dry_run: bool = False) -> bool:
     return True
 
 
-# PURPOSE: 関数: main
+# PURPOSE: CLI エントリポイント — 運用ツールの直接実行
 def main():
     parser = argparse.ArgumentParser(description="PROOF Header Batch Injector")
     parser.add_argument("--dry-run", action="store_true", help="実際には変更しない")

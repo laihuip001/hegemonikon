@@ -17,7 +17,7 @@ USER_URLNAME = "tasty_dunlin998"
 OUTPUT_DIR = Path("/home/makaron8426/oikos/hegemonikon/mekhane/peira/raw/note")
 API_BASE = "https://note.com/api/v2"
 
-# PURPOSE: 関数: main
+# PURPOSE: CLI エントリポイント — データパイプラインの直接実行
 def main():
     print(f"🔍 Collecting articles from note.com/{USER_URLNAME}")
     

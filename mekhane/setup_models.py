@@ -10,7 +10,7 @@ MODEL_ID = "Xenova/bge-small-en-v1.5"
 DEST_DIR = Path(__file__).parent / "anamnesis" / "models" / "bge-small"
 
 
-# PURPOSE: 関数: setup_models
+# PURPOSE: setup_models — システムの処理
 def setup_models():
     print(f"Setting up models in {DEST_DIR}...")
     DEST_DIR.mkdir(parents=True, exist_ok=True)

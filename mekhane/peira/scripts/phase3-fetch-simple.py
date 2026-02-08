@@ -32,7 +32,7 @@ HEADERS = {
 REQUEST_DELAY = 0.5  # seconds between requests (reduced)
 
 
-# PURPOSE: 取得: get_args
+# PURPOSE: get_args プロパティの取得
 def get_args():
     if len(sys.argv) < 4:
         print("Usage: python phase3-fetch-simple.py <batch_id> <start_line> <end_line>")
@@ -149,7 +149,7 @@ def fetch_article(url):
         return None, str(e)
 
 
-# PURPOSE: 関数: main
+# PURPOSE: CLI エントリポイント — データパイプラインの直接実行
 def main():
     batch_id, start_line, end_line = get_args()
     output_file = f"temp_batch_data_{batch_id}.json"

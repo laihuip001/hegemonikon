@@ -106,7 +106,7 @@ class AdaptiveAllocator:
         "Integration",
     ]
 
-    # PURPOSE: 内部処理: init__
+    # PURPOSE: 運用ツールコンポーネントの初期化
     def __init__(self, repo_path: str = "."):
         self.repo_path = Path(repo_path)
         self.today = datetime.now()
@@ -322,7 +322,7 @@ class AdaptiveAllocator:
         output_path = (
             output_path or self.repo_path / f"allocation_plan_{plan.date[:10]}.json"
         )
-# PURPOSE: 関数: main
+# PURPOSE: CLI エントリポイント — 運用ツールの直接実行
 
         with open(output_path, "w", encoding="utf-8") as f:
             json.dump(asdict(plan), f, indent=2, ensure_ascii=False)

@@ -50,7 +50,7 @@ class SyncWatcher:
 
     STATE_FILE = "sync_state.json"
 
-    # PURPOSE: 内部処理: init__
+    # PURPOSE: SyncWatcher の構成と依存関係の初期化
     def __init__(
         self,
         watch_dirs: list[Path],

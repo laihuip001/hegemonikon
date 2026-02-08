@@ -55,7 +55,7 @@ class SwarmScheduler:
     KEYS_AVAILABLE = 9
     DAILY_BUDGET = 720  # 80% of max to avoid hitting limits
 
-    # PURPOSE: 内部処理: init__
+    # PURPOSE: SwarmScheduler の初期化 — Load API keys from .env.jules.
     def __init__(self, repo_path: str = "."):
         self.repo_path = Path(repo_path)
         self.env_file = self.repo_path / ".env.jules"
@@ -269,7 +269,7 @@ async def run_daily():
     plan = allocator.create_allocation_plan(scheduler.DAILY_BUDGET)
 
     # Execute
-# PURPOSE: 関数: main
+# PURPOSE: CLI エントリポイント — 運用ツールの直接実行
     results = await scheduler.execute_plan(plan)
 
     logger.info("=" * 60)

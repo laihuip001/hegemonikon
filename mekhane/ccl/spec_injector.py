@@ -47,7 +47,7 @@ OPERATOR_DEFINITIONS: Dict[str, Dict[str, str]] = {
 class SpecInjector:
     """CCL 仕様強制注入器"""
 
-    # PURPOSE: 内部処理: init__
+    # PURPOSE: SpecInjector の構成と依存関係の初期化
     def __init__(self, operators_path: Path = None):
         self.operators_path = (
             operators_path

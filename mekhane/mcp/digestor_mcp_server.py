@@ -19,7 +19,7 @@ _stderr_wrapper = sys.stderr
 
 
 # Debug logging to stderr (won't interfere with MCP stdio)
-# PURPOSE: 関数: log
+# PURPOSE: log — MCPサービスの処理
 def log(msg):
     print(f"[Digestor MCP] {msg}", file=_stderr_wrapper)
 
@@ -36,18 +36,18 @@ log(f"Added to path: {Path(__file__).parent.parent}")
 # ============ Suppress stdout during imports ============
 # PURPOSE: クラス: StdoutSuppressor
 class StdoutSuppressor:
-    # PURPOSE: 内部処理: init__
+    # PURPOSE: StdoutSuppressor の構成と依存関係の初期化
     def __init__(self):
         self._null = io.StringIO()
         self._old_stdout = None
 
-    # PURPOSE: 内部処理: enter__
+    # PURPOSE: enter__ — MCPサービスの内部処理
     def __enter__(self):
         self._old_stdout = sys.stdout
         sys.stdout = self._null
         return self
 
-    # PURPOSE: 内部処理: exit__
+    # PURPOSE: exit__ — MCPサービスの内部処理
     def __exit__(self, *args):
         sys.stdout = self._old_stdout
 

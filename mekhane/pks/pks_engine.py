@@ -104,12 +104,12 @@ class SessionContext:
 class ContextTracker:
     """作業コンテキストのベクトル化保持"""
 
-    # PURPOSE: 内部処理: init__
+    # PURPOSE: ContextTracker の構成と依存関係の初期化
     def __init__(self):
         self._context = SessionContext()
 
     @property
-    # PURPOSE: 関数: context
+    # PURPOSE: トピック更新
     def context(self) -> SessionContext:
         return self._context
 
@@ -162,7 +162,7 @@ class RelevanceDetector:
     現在のコンテキストに対する各知識の関連度を算出する。
     """
 
-    # PURPOSE: 内部処理: init__
+    # PURPOSE: RelevanceDetector の構成と依存関係の初期化
     def __init__(self, threshold: float = 0.65):
         self.threshold = threshold
 
@@ -496,7 +496,7 @@ class PushController:
     プッシュ対象の制御（最大件数、重複排除等）を行う。
     """
 
-    # PURPOSE: 内部処理: init__
+    # PURPOSE: PushController の初期化 — プッシュ対象をフィルタリング
     def __init__(self, max_push: int = 5, cooldown_hours: float = 24.0):
         self.max_push = max_push
         self.cooldown_hours = cooldown_hours
@@ -563,7 +563,7 @@ class PKSEngine:
     # Push 履歴の保存先
     HISTORY_FILE = "pks_push_history.json"
 
-    # PURPOSE: 内部処理: init__
+    # PURPOSE: PKSEngine の構成と依存関係の初期化
     def __init__(
         self,
         threshold: float = 0.65,

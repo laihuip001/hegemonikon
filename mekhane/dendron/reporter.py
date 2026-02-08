@@ -29,7 +29,7 @@ class ReportFormat(Enum):
 class DendronReporter:  # noqa: AI-007
     """Dendron レポート生成器"""
 
-    # PURPOSE: 内部処理: init__
+    # PURPOSE: DendronReporter の初期化 — レポートを出力
     def __init__(self, output: TextIO = None):
         self.output = output or sys.stdout
 

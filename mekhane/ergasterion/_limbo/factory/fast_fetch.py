@@ -20,7 +20,7 @@ except ImportError:
 url = "https://ai-data-base.com/archives/77445"
 
 
-# PURPOSE: 関数: main
+# PURPOSE: CLI エントリポイント — 自動化基盤の直接実行
 def main():
     if not HAS_DEPS:
         print("Missing dependencies: pip install html2text beautifulsoup4")

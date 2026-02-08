@@ -36,7 +36,7 @@ class SemanticScholarCollector(BaseCollector):
     BASE_URL = "https://api.semanticscholar.org/graph/v1"
     PAPER_FIELDS = "paperId,externalIds,title,authors,abstract,year,citationCount,venue,url,openAccessPdf"
 
-    # PURPOSE: 内部処理: init__
+    # PURPOSE: SemanticScholarCollector の構成と依存関係の初期化
     def __init__(self, api_key: Optional[str] = None):
         super().__init__()
         if requests is None:

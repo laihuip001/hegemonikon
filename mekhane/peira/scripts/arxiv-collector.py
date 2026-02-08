@@ -42,7 +42,7 @@ if sys.platform == "win32":
 class Embedder:
     """ONNX-based text embedding (Self-contained)."""
 
-    # PURPOSE: 内部処理: init__
+    # PURPOSE: Embedder の構成と依存関係の初期化
     def __init__(self):
         import onnxruntime as ort
         from tokenizers import Tokenizer
@@ -63,7 +63,7 @@ class Embedder:
         self.tokenizer.enable_truncation(max_length=512)
         self.tokenizer.enable_padding(length=512)
 
-    # PURPOSE: 関数: embed
+    # PURPOSE: テキストをベクトル空間に射影
     def embed(self, text: str) -> list:
         encoded = self.tokenizer.encode(text)
         input_ids = self.np.array([encoded.ids], dtype=self.np.int64)
@@ -330,7 +330,7 @@ def show_stats():
         print("Indexed Papers: (not yet indexed)")
 
     print("=" * 40)
-# PURPOSE: 関数: main
+# PURPOSE: CLI エントリポイント — データパイプラインの直接実行
 
 
 def main():

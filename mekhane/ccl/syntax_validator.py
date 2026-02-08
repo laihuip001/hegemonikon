@@ -73,7 +73,7 @@ class ValidationResult:
     errors: List[str]
     warnings: List[str]
 
-    # PURPOSE: 内部処理: bool__
+    # PURPOSE: Validate CCL v2.0 expressions. Checks for: - Balanced braces
     def __bool__(self) -> bool:
         return self.valid
 

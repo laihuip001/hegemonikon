@@ -96,7 +96,7 @@ is_premium: unknown
     print(f"Saved: {filepath}")
 
 
-# PURPOSE: 関数: main
+# PURPOSE: CLI エントリポイント — データパイプラインの直接実行
 def main():
     articles = json.loads(DATA_JSON)
     for art in articles:

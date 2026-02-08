@@ -31,7 +31,7 @@ INCLUDE_EXTS = {
 STRICT_EXTS = {".md"}
 
 
-# PURPOSE: 関数: main
+# PURPOSE: CLI エントリポイント — 運用ツールの直接実行
 def main():
     print(f"📦 Scanning {SOURCE_ROOT}...")
 

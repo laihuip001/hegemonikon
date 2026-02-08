@@ -116,11 +116,38 @@ class HegemonikónFEPAgentV2:
     def _default_A(self) -> np.ndarray:
         """Generate 48-state observation likelihood matrix.
 
-        Rows 0-1:   context (depends on phantasia)
-        Rows 2-4:   urgency (depends on horme)
-        Rows 5-7:   confidence (depends on assent)
-        Rows 8-13:  topic (depends on series)
+        Architecture: A(obs|state) = (1 - ε_A) × categorical_mapping + ε_A × uniform
+
+        ε_A = observation noise parameter.
+        Higher than ε_B because observations are noisier than transitions.
+        /dia+ review: ε_A=0.25 prevents overconfidence in 3-value modalities.
+
+        Categorical mapping (Stoic epistemic structure):
+          phantasia → context:    clear→clear, uncertain→ambiguous
+          horme    → urgency:    active→high, passive→low
+          assent   → confidence: granted→high, withheld→low
+          series   → topic:      X→X (identity)
+
+        Rows 0-1:   context (2 values)
+        Rows 2-4:   urgency (3 values)
+        Rows 5-7:   confidence (3 values)
+        Rows 8-13:  topic (6 values)
         """
+        EPS_A = 0.25  # observation noise — higher than EPS_B (transitions)
+
+        # Categorical mapping: hidden state factor → observation index
+        # Each entry: (target_obs_index_within_modality, modality_size)
+        CATEGORICAL = {
+            # phantasia → context
+            "context": {"clear": 1, "uncertain": 0},        # 2 values
+            # horme → urgency
+            "urgency": {"active": 2, "passive": 0},         # 3 values: low=0, med=1, high=2
+            # assent → confidence
+            "confidence": {"granted": 2, "withheld": 0},    # 3 values: low=0, med=1, high=2
+        }
+
+        MODALITY_SIZES = {"context": 2, "urgency": 3, "confidence": 3, "topic": 6}
+
         A = np.zeros((self.num_obs, self.state_dim))
 
         for s_idx in range(self.state_dim):
@@ -128,54 +155,33 @@ class HegemonikónFEPAgentV2:
             row = 0
 
             # --- Context (rows 0-1): phantasia ---
-            if phantasia == "clear":
-                A[row + 0, s_idx] = 0.1   # ambiguous
-                A[row + 1, s_idx] = 0.9   # clear
-            else:
-                A[row + 0, s_idx] = 0.7   # ambiguous
-                A[row + 1, s_idx] = 0.3   # clear
-            row += 2
+            n = MODALITY_SIZES["context"]
+            target = CATEGORICAL["context"][phantasia]
+            for i in range(n):
+                A[row + i, s_idx] = (1 - EPS_A) * (1.0 if i == target else 0.0) + EPS_A / n
+            row += n
 
             # --- Urgency (rows 2-4): horme ---
-            if horme == "active":
-                A[row + 0, s_idx] = 0.1   # low
-                A[row + 1, s_idx] = 0.3   # medium
-                A[row + 2, s_idx] = 0.6   # high
-            else:
-                A[row + 0, s_idx] = 0.6   # low
-                A[row + 1, s_idx] = 0.3   # medium
-                A[row + 2, s_idx] = 0.1   # high
-            row += 3
+            n = MODALITY_SIZES["urgency"]
+            target = CATEGORICAL["urgency"][horme]
+            for i in range(n):
+                A[row + i, s_idx] = (1 - EPS_A) * (1.0 if i == target else 0.0) + EPS_A / n
+            row += n
 
             # --- Confidence (rows 5-7): assent ---
-            if assent == "granted":
-                A[row + 0, s_idx] = 0.1   # low
-                A[row + 1, s_idx] = 0.2   # medium
-                A[row + 2, s_idx] = 0.7   # high
-            else:
-                A[row + 0, s_idx] = 0.5   # low
-                A[row + 1, s_idx] = 0.4   # medium
-                A[row + 2, s_idx] = 0.1   # high
-            row += 3
+            n = MODALITY_SIZES["confidence"]
+            target = CATEGORICAL["confidence"][assent]
+            for i in range(n):
+                A[row + i, s_idx] = (1 - EPS_A) * (1.0 if i == target else 0.0) + EPS_A / n
+            row += n
 
             # --- Topic (rows 8-13): series ---
-            #
-            # This is the key innovation:
-            # When the hidden state's series = X, the agent expects to
-            # observe topic = X with high probability.
-            #
-            # P(topic=X | series=X) = 0.75 (strong signal)
-            # P(topic=Y | series=X) = 0.05 (noise from other Series)
-            #
+            n = MODALITY_SIZES["topic"]
             series_idx = SERIES_STATES.index(series)
-            for t in range(6):
-                if t == series_idx:
-                    A[row + t, s_idx] = 0.75
-                else:
-                    A[row + t, s_idx] = 0.05
-            # row += 6
+            for i in range(n):
+                A[row + i, s_idx] = (1 - EPS_A) * (1.0 if i == series_idx else 0.0) + EPS_A / n
 
-        # Normalize columns
+        # Normalize columns (should already sum to 1, but safety)
         col_sums = A.sum(axis=0, keepdims=True)
         col_sums[col_sums == 0] = 1
         A = A / col_sums
@@ -274,31 +280,43 @@ class HegemonikónFEPAgentV2:
     # =========================================================================
 
     def _default_D(self) -> np.ndarray:
-        """Generate initial state belief — balanced action readiness.
+        """Generate initial state belief.
 
-        Prior:
-        - Epistemic humility on phantasia (uncertain > clear)
-        - Balanced assent (slight Epochē lean, not dominant)
-        - Balanced horme (ready to act, not stuck in passive)
-        - Uniform over Series
+        Architecture: D(state) = (1 - ε_D) × stoic_prior + ε_D × uniform
+
+        ε_D = prior uncertainty parameter.
+
+        Stoic prior (natural cognitive stance before evidence):
+          phantasia: uncertain (epistemic humility — don't assume clarity)
+          assent:    withheld (Epochē — suspend judgment until evidence)
+          horme:     passive  (wait for warranted action)
+          series:    uniform  (no prior preference for any Series)
         """
+        EPS_D = 0.15  # prior uncertainty
+
+        # Stoic prior: the natural state before any evidence
+        STOIC_PRIOR = {
+            "phantasia": "uncertain",  # epistemic humility
+            "assent":    "withheld",   # Epochē
+            "horme":     "passive",    # wait for evidence
+        }
+
         D = np.zeros(self.state_dim)
 
         for idx in range(self.state_dim):
             phantasia, assent, horme, series = index_to_state_v2(idx)
 
-            prob = 1.0
-            # Epistemic humility: prefer uncertain (humble about impressions)
-            prob *= 0.6 if phantasia == "uncertain" else 0.4
-            # Assent: slight lean toward withheld, but not dominant
-            prob *= 0.55 if assent == "withheld" else 0.45
-            # Horme: balanced — ready to act when evidence warrants it
-            # (Stoic: hormē is the natural impulse toward the good)
-            prob *= 0.5  # Equal for both active and passive
-            # Series: uniform
-            prob *= 1.0 / 6.0
+            # Stoic necessity: 1.0 if state matches prior, 0.0 otherwise
+            stoic = 1.0
+            stoic *= 1.0 if phantasia == STOIC_PRIOR["phantasia"] else 0.0
+            stoic *= 1.0 if assent == STOIC_PRIOR["assent"] else 0.0
+            stoic *= 1.0 if horme == STOIC_PRIOR["horme"] else 0.0
+            # Series: always uniform (no prior knowledge)
+            stoic *= 1.0 / len(SERIES_STATES)
 
-            D[idx] = prob
+            # ε decomposition
+            uniform = 1.0 / self.state_dim
+            D[idx] = (1 - EPS_D) * stoic + EPS_D * uniform
 
         D = D / D.sum()
         return D

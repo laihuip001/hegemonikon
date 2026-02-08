@@ -132,13 +132,13 @@ DAPL_REGISTRY: List[DirtyAdapter] = [
         id="pw_defensive",
         pattern=DAPLPattern.DEFENSIVE_FALLBACK,
         location="cone_builder.py:_parse_pw",
-        description="不正な float 値を try/except で静かにスキップ",
-        fep_analog="Active inference — 予測不能な入力を無視して自由エネルギーを下げる",
+        description="不正な float 値を logging.warning + スキップ (cleaned from silent pass)",
+        fep_analog="Active inference — 予測不能な入力を記録した上で無視",
         created=date(2026, 2, 8),
-        ttl_months=3,
-        upgrade_path="不正入力を logging + warning に変え、parse_error count を返す",
-        silent_failure_risk=SilentFailureRisk.HIGH,
-        notes="有効入力を捨てる false negative リスク。TTL 最短",
+        ttl_months=12,  # cleaned: silent→logging で TTL 延長
+        upgrade_path="parse_error count を戻り値に含め、呼び出し側で判断可能にする",
+        silent_failure_risk=SilentFailureRisk.LOW,  # cleaned: HIGH→LOW
+        notes="2026-02-08 clean化: silent pass→logging.warning。リスク LOW に降格",
     ),
 ]
 

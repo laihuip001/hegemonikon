@@ -763,7 +763,7 @@ def is_cross_boundary_morphism(
 def _parse_pw(pw_str: str) -> Dict[str, float]:
     """Parse PW string: 'O1:0.5,O3:-0.5' → {'O1': 0.5, 'O3': -0.5}
 
-    Invalid values are silently skipped (defensive parsing).
+    Invalid values are logged and skipped (DAPL: DefensiveFallback → cleaned).
     """
     if not pw_str:
         return {}
@@ -774,8 +774,12 @@ def _parse_pw(pw_str: str) -> Dict[str, float]:
             k, v = pair.split(":", 1)
             try:
                 result[k.strip()] = float(v.strip())
-            except ValueError:
-                pass  # Skip invalid values (e.g. "O1:abc")
+            except (ValueError, TypeError):
+                import logging
+                logging.getLogger(__name__).warning(
+                    "PW parse error: %r (key=%r, value=%r) — skipped",
+                    pair, k.strip(), v.strip(),
+                )
     return result
 
 

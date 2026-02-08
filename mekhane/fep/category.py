@@ -35,6 +35,21 @@ Type Layer Classification (Q16: /zet+ 2026-02-08):
         乖離: 乖離＝バグ。即修正
         判定: 削除するとコードが壊れる → Operational
 
+Role of Category Theory (Q7: /zet+ 2026-02-08):
+
+    圏論は「設計言語」でも「思考足場」でも「反射板」でもない。
+    圏論は Hegemonikón の **感覚器 (sensory organ)** である。
+
+    FEP の perception-action loop と同型:
+        Perception — 圏論でコードを「見る」(「これは Cone だ」)
+        Action     — 見えた構造に基づいてコードを書く (cone_builder)
+        Prediction — 理論が「次はこうあるべき」と予測する
+        Error      — 実装が予測とズレる → dirty adapter が生まれる
+
+    目を閉じれば手は盲目になる (理論なき実装)。
+    手を縛れば目は無意味になる (実装なき理論)。
+    設計と理論は密に連動し、相補的に循環する。
+
 Provides Python dataclass representations for:
 - Cog category: 24 objects (theorems), 72 morphisms (X-series)
 - Cone: @converge C0-C3 with Precision Weighting (Hub Peras)
@@ -835,28 +850,38 @@ FUNCTORS: Dict[str, Functor] = {
 NATURAL_TRANSFORMATIONS: Dict[str, NaturalTransformation] = {
     # η (unit of boot⊣bye): Id_Mem ⇒ R∘L
     # "How well does bye(boot(mem)) preserve mem?"
+    # Components map Mem objects to theorems governing preservation:
+    #   handoff → H4 (Doxa: belief/context preservation)
+    #   ki      → K4 (Sophia: knowledge preservation)
+    #   self_profile → A4 (Epistēmē: identity knowledge)
+    #   doxa    → H4 (Doxa: belief persistence)
     "eta": NaturalTransformation(
         name="η",
         source_functor="Id_Mem",
         target_functor="bye∘boot",
         components={
-            "handoff": "handoff_preservation",
-            "ki": "ki_preservation",
-            "self_profile": "profile_preservation",
-            "doxa": "belief_preservation",
+            "handoff": "H4",        # Doxa preserves context/beliefs
+            "ki": "K4",             # Sophia preserves knowledge
+            "self_profile": "A4",   # Epistēmē preserves identity
+            "doxa": "H4",           # Doxa preserves beliefs
         },
     ),
     # ε (counit of boot⊣bye): L∘R ⇒ Id_Ses
     # "How well does boot(bye(ses)) restore ses?"
+    # Components map Ses objects to theorems governing restoration:
+    #   session_context → O1 (Noēsis: context recognition)
+    #   knowledge_items → K4 (Sophia: knowledge retrieval)
+    #   agent_state     → O4 (Energeia: state activation)
+    #   beliefs         → H4 (Doxa: belief restoration)
     "epsilon": NaturalTransformation(
         name="ε",
         source_functor="boot∘bye",
         target_functor="Id_Ses",
         components={
-            "session_context": "context_restoration",
-            "knowledge_items": "knowledge_restoration",
-            "agent_state": "state_restoration",
-            "beliefs": "belief_restoration",
+            "session_context": "O1",    # Noēsis restores context recognition
+            "knowledge_items": "K4",    # Sophia restores knowledge
+            "agent_state": "O4",        # Energeia restores active state
+            "beliefs": "H4",            # Doxa restores beliefs
         },
     ),
     # η_MP: MP ⇒ HGK — Metacognitive Prompting → Hegemonikón

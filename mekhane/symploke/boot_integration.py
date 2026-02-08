@@ -358,7 +358,10 @@ def get_boot_context(mode: str = "standard", context: Optional[str] = None) -> d
 
     # 軸 F: Attractor Dispatch Engine
     attractor_result = {"series": [], "workflows": [], "llm_format": "", "formatted": ""}
-    if context:
+    # Handoff-derived context (ki_context) をフォールバックに使用
+    # → 明示的 context がなくても、Handoff 主題から自動推薦が発動する
+    attractor_context = context or ki_context
+    if attractor_context:
         print(" [8/9] 🎯 Attractor Dispatch...", file=sys.stderr, end="", flush=True)
         try:
             from concurrent.futures import ThreadPoolExecutor
@@ -379,19 +382,19 @@ def get_boot_context(mode: str = "standard", context: Optional[str] = None) -> d
                 except Exception:
                     pass  # Bias loading failure should not block boot
 
-                rec = advisor.recommend(context)
-                llm_fmt = advisor.format_for_llm(context)
+                rec = advisor.recommend(attractor_context)
+                llm_fmt = advisor.format_for_llm(attractor_context)
 
                 # Dispatcher integration (Problem A)
-                dispatch_info = extract_dispatch_info(context, gpu_ok=gpu_ok)
+                dispatch_info = extract_dispatch_info(attractor_context, gpu_ok=gpu_ok)
 
                 # Theorem-level attractor (24 定理: 6 Series の粒度拡張)
                 theorem_detail = {}
                 try:
                     from mekhane.fep.theorem_attractor import TheoremAttractor
                     ta = TheoremAttractor(force_cpu=not gpu_ok)
-                    top_theorems = ta.suggest(context, top_k=5)
-                    flow = ta.simulate_flow(context, steps=10)
+                    top_theorems = ta.suggest(attractor_context, top_k=5)
+                    flow = ta.simulate_flow(attractor_context, steps=10)
                     theorem_detail = {
                         "top_theorems": [
                             {"theorem": r.theorem, "name": r.name,
@@ -492,7 +495,7 @@ def get_boot_context(mode: str = "standard", context: Optional[str] = None) -> d
         except Exception as e:
             print(f" Failed ({str(e)}).", file=sys.stderr)
     else:
-        print(" [8/9] 🎯 Attractor skipped (no context).", file=sys.stderr)
+        print(" [8/9] 🎯 Attractor skipped (no context & no Handoff).", file=sys.stderr)
 
     # 軸 I: Projects (registry.yaml)
     projects_result = {"projects": [], "active": 0, "dormant": 0, "total": 0, "formatted": ""}

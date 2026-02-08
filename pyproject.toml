@@ -1,0 +1,33 @@
+[project]
+name = "hegemonikon"
+version = "0.1.0"
+description = "FEP-based cognitive hypervisor framework"
+requires-python = ">=3.11"
+
+[tool.pytest.ini_options]
+testpaths = [
+    "hermeneus/tests",
+    "mekhane/tests",
+    "mekhane/tests_root",
+    "mekhane/fep/tests",
+    "mekhane/pks/tests",
+    "mekhane/dendron/tests",
+    "mekhane/symploke/tests",
+    "mekhane/anamnesis/tests",
+    "mekhane/peira/tests",
+    "mekhane/poiema/flow/tests",
+    "mekhane/ergasterion/digestor/tests",
+    "mekhane/ergasterion/synedrion/tests",
+    "synergeia/tests",
+    "scripts/tests",
+    "kernel/constitution/tests",
+    "mneme/.hegemonikon/tests",
+]
+asyncio_mode = "strict"
+filterwarnings = [
+    "ignore::DeprecationWarning:lmql",
+    "ignore::DeprecationWarning:sre_parse",
+    "ignore::DeprecationWarning:sre_constants",
+    "ignore:table_names:DeprecationWarning",
+    "ignore:This process.*is multi-threaded:DeprecationWarning",
+]

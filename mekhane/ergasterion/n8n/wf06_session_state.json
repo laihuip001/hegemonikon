@@ -100,6 +100,73 @@
         },
         {
             "parameters": {
+                "amount": 4,
+                "unit": "hours"
+            },
+            "id": "wait-4h-autbye",
+            "name": "4時間待機 (Auto-Bye)",
+            "type": "n8n-nodes-base.wait",
+            "typeVersion": 1,
+            "position": [
+                1450,
+                200
+            ]
+        },
+        {
+            "parameters": {
+                "jsCode": "const { execSync } = require('child_process');\nconst state = $getWorkflowStaticData('global');\n\n// セッションが既に終了していれば何もしない\nif (!state.session || state.session.status !== 'active') {\n  return [{ json: { action: 'skip', reason: 'Session already ended', shouldNotify: false } }];\n}\n\nconst elapsedMs = Date.now() - new Date(state.session.startTime).getTime();\nconst elapsedHours = (elapsedMs / (1000 * 60 * 60)).toFixed(1);\n\n// auto_bye.py を実行して簡易 Handoff を生成\nlet autoBye = { status: 'error', message: 'unknown' };\ntry {\n  const cmd = 'cd /home/makaron8426/oikos/hegemonikon && PYTHONPATH=. .venv/bin/python scripts/auto_bye.py --auto';\n  const output = execSync(cmd, { timeout: 30000, encoding: 'utf-8' });\n  // 最終行の JSON を抽出\n  const lines = output.trim().split('\\n');\n  for (let i = lines.length - 1; i >= 0; i--) {\n    try { autoBye = JSON.parse(lines[i]); break; } catch(e) {}\n  }\n} catch(e) {\n  autoBye = { status: 'error', message: e.message };\n}\n\n// セッション状態を auto-bye に更新\nstate.session.status = 'auto-bye';\nstate.session.endTime = new Date().toISOString();\n\n// 履歴に追記\ntry {\n  const fs = require('fs');\n  const historyFile = '/home/makaron8426/oikos/mneme/.hegemonikon/session_history.jsonl';\n  fs.appendFileSync(historyFile, JSON.stringify(state.session) + '\\n', 'utf-8');\n} catch(e) {}\n\nstate.session = null;\n\nconst slackUrl = (process.env.SLACK_WEBHOOK_URL || '').trim();\nconst hasSlackUrl = slackUrl.length > 0 && slackUrl.startsWith('http');\n\nreturn [{ json: {\n  action: 'auto-bye',\n  shouldNotify: hasSlackUrl,\n  elapsedHours,\n  autoBye,\n  slackPayload: hasSlackUrl ? JSON.stringify({\n    blocks: [\n      { type: 'header', text: { type: 'plain_text', text: '⚠️ Auto-Bye 実行', emoji: true } },\n      { type: 'section', text: { type: 'mrkdwn', text: 'セッション *' + elapsedHours + '時間* 経過。`/bye` 未実行のため Auto-Bye を実行しました。\\n\\n> 状態: ' + autoBye.status + '\\n> ファイル: `' + (autoBye.file || 'N/A') + '`' } },\n      { type: 'context', elements: [{ type: 'mrkdwn', text: '_WF-06 Auto-Bye Safety Net | Hegemonikón_' }] }\n    ]\n  }) : ''\n} }];"
+            },
+            "id": "auto-bye-execute",
+            "name": "Auto-Bye 実行",
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                1650,
+                200
+            ]
+        },
+        {
+            "parameters": {
+                "conditions": {
+                    "boolean": [
+                        {
+                            "value1": "={{$json.shouldNotify}}",
+                            "value2": true
+                        }
+                    ]
+                }
+            },
+            "id": "if-notify-autbye",
+            "name": "Auto-Bye 通知?",
+            "type": "n8n-nodes-base.if",
+            "typeVersion": 1,
+            "position": [
+                1850,
+                200
+            ]
+        },
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "={{ $env.SLACK_WEBHOOK_URL }}",
+                "sendBody": true,
+                "specifyBody": "json",
+                "jsonBody": "={{ $json.slackPayload }}",
+                "options": {
+                    "timeout": 10000
+                }
+            },
+            "id": "slack-autbye",
+            "name": "Slack Auto-Bye 通知",
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.2,
+            "position": [
+                2050,
+                100
+            ]
+        },
+        {
+            "parameters": {
                 "httpMethod": "POST",
                 "path": "session-end",
                 "responseMode": "lastNode",
@@ -186,6 +253,51 @@
                 []
             ]
         },
+        "Slack リマインダー": {
+            "main": [
+                [
+                    {
+                        "node": "4時間待機 (Auto-Bye)",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "4時間待機 (Auto-Bye)": {
+            "main": [
+                [
+                    {
+                        "node": "Auto-Bye 実行",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Auto-Bye 実行": {
+            "main": [
+                [
+                    {
+                        "node": "Auto-Bye 通知?",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Auto-Bye 通知?": {
+            "main": [
+                [
+                    {
+                        "node": "Slack Auto-Bye 通知",
+                        "type": "main",
+                        "index": 0
+                    }
+                ],
+                []
+            ]
+        },
         "Bye Webhook": {
             "main": [
                 [
@@ -210,8 +322,11 @@
         },
         {
             "name": "state-machine"
+        },
+        {
+            "name": "auto-bye"
         }
     ],
     "active": true,
-    "versionId": "4.0.0"
+    "versionId": "5.0.0"
 }

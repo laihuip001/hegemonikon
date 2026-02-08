@@ -26,8 +26,9 @@ testpaths = [
 asyncio_mode = "strict"
 filterwarnings = [
     "ignore::DeprecationWarning:lmql",
-    "ignore::DeprecationWarning:sre_parse",
-    "ignore::DeprecationWarning:sre_constants",
+    "ignore:module 'sre_parse':DeprecationWarning",
+    "ignore:module 'sre_constants':DeprecationWarning",
     "ignore:table_names:DeprecationWarning",
     "ignore:This process.*is multi-threaded:DeprecationWarning",
+    "ignore:lance is not fork-safe:UserWarning",
 ]

@@ -1,1 +1,1 @@
-# tests_root package
+# PROOF: [L2/インフラ] <- mekhane/tests_root/

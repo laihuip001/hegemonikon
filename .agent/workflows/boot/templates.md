@@ -43,32 +43,22 @@ Phase サマリー:
 
 ## 開発中プロジェクト表示
 
+> **自動生成**: `boot_integration.py` が `.agent/projects/registry.yaml` を軸 I として自動読込する。
+> 手動スクリプトは不要。
+
 ```bash
+# 手動確認が必要な場合:
 python3 -c "
 import yaml
 from pathlib import Path
-from datetime import datetime, date
-pf = Path('~/oikos/hegemonikon/projects.yaml').expanduser()
+pf = Path('~/oikos/hegemonikon/.agent/projects/registry.yaml').expanduser()
 if pf.exists():
-    projects = yaml.safe_load(pf.read_text())['projects']
-    active = [(k,v) for k,v in projects.items() if v['status'] != 'stable']
-    if active:
-        print('開発中プロジェクト:')
-        priority_order = {'high':0, 'medium':1, 'low':2}
-        for k, p in sorted(active, key=lambda x: priority_order.get(x[1].get('priority','medium'), 1)):
-            updated = p.get('updated', '')
-            days_ago = ''
-            if updated:
-                try:
-                    d = datetime.strptime(updated, '%Y-%m-%d').date()
-                    days = (date.today() - d).days
-                    if days >= 21: days_ago = f' STALE({days}d)'
-                    elif days >= 7: days_ago = f' WARN({days}d)'
-                    else: days_ago = f' ({days}d)'
-                except: pass
-            next_act = p.get('next_action', '')
-            next_str = f' -> {next_act}' if next_act else ''
-            print(f\"  {p['name']} [{p['phase']}]{days_ago}{next_str}\")
+    data = yaml.safe_load(pf.read_text())
+    projects = data.get('projects', [])
+    active = [p for p in projects if p.get('status') == 'active']
+    print(f'Projects: {len(projects)}件 (Active: {len(active)})')
+    for p in active:
+        print(f\"  {p['name']} [{p.get('phase','')}] — {p.get('summary','')[:60]}\")
 "
 ```
 

@@ -541,7 +541,7 @@ class TheoremAttractor:
 
     # PURPOSE: Q2 — 24 定理の配合を確率分布として出力
     def diagnose_mixture(
-        self, user_input: str, temperature: float = 0.5, top_k: int = 5,
+        self, user_input: str, temperature: float = 0.05, top_k: int = 5,
     ) -> TheoremMixture:
         """24 定理の配合を確率分布として出力.
 
@@ -549,7 +549,9 @@ class TheoremAttractor:
         mixture は「どれくらいの強さで」を返す。
 
         Args:
-            temperature: 低い=尖った分布, 高い=平坦。0.5 default。
+            temperature: 低い=尖った分布, 高い=平坦。
+                0.05 default — similarity range が狭い (0.35-0.48) ため
+                高い T では均一分布になり情報量ゼロになる。
             top_k: top_theorems に含める数。
         """
         self._ensure_initialized()

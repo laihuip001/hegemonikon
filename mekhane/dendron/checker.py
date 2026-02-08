@@ -897,20 +897,42 @@ class DendronChecker:  # noqa: AI-007
         # 全定義を収集
         all_definitions: Dict[str, tuple] = {}  # name -> (path, lineno)
         all_calls: set = set()
+        all_exports: set = set()  # __all__ で export された名前
         
-        _SKIP_DECORATORS = {"property", "staticmethod", "classmethod", "abstractmethod"}
+        _SKIP_DECORATORS = {
+            "property", "staticmethod", "classmethod", "abstractmethod",
+            # CLI/API エントリポイント
+            "command", "callback", "route", "get", "post", "put", "delete",
+            # テスト
+            "fixture", "parametrize",
+        }
         
         for fp, tree in file_trees.items():
+            # __all__ を収集
+            for node in ast.walk(tree):
+                if isinstance(node, ast.Assign):
+                    for target in node.targets:
+                        if isinstance(target, ast.Name) and target.id == "__all__":
+                            if isinstance(node.value, (ast.List, ast.Tuple)):
+                                for elt in node.value.elts:
+                                    if isinstance(elt, ast.Constant) and isinstance(elt.value, str):
+                                        all_exports.add(elt.value)
+            
             for node in ast.walk(tree):
                 if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
                     if not node.name.startswith("_"):
-                        # @property 等はアトリビュートアクセスなので除外
+                        # @property, @command 等はスキップ
                         dec_names = set()
                         for d in node.decorator_list:
                             if isinstance(d, ast.Name):
                                 dec_names.add(d.id)
                             elif isinstance(d, ast.Attribute):
                                 dec_names.add(d.attr)
+                            elif isinstance(d, ast.Call):
+                                if isinstance(d.func, ast.Name):
+                                    dec_names.add(d.func.id)
+                                elif isinstance(d.func, ast.Attribute):
+                                    dec_names.add(d.func.attr)
                         if not dec_names & _SKIP_DECORATORS:
                             all_definitions[f"{fp}:{node.name}"] = (fp, node.lineno, node.name)
                 if isinstance(node, ast.Call):
@@ -920,7 +942,7 @@ class DendronChecker:  # noqa: AI-007
                         all_calls.add(node.func.attr)
         
         for key, (fp, lineno, fname) in all_definitions.items():
-            is_called = fname in all_calls
+            is_called = fname in all_calls or fname in all_exports
             results.append(VerificationProof(
                 name=fname, path=fp, line_number=lineno,
                 status=ProofStatus.OK if is_called else ProofStatus.WEAK,

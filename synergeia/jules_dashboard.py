@@ -31,6 +31,16 @@ HEGEMONIKON_ROOT = Path(__file__).parent.parent
 sys.path.insert(0, str(HEGEMONIKON_ROOT))
 
 try:
+    from termcolor import colored, cprint
+    TERMCOLOR_AVAILABLE = True
+except ImportError:
+    TERMCOLOR_AVAILABLE = False
+    def colored(text, color=None, on_color=None, attrs=None):
+        return text
+    def cprint(text, color=None, on_color=None, attrs=None, **kwargs):
+        print(text, **kwargs)
+
+try:
     from mekhane.symploke.jules_client import JulesClient, JulesSession, SessionState
     JULES_CLIENT_AVAILABLE = True
 except ImportError:
@@ -216,33 +226,60 @@ def print_status(dashboard: JulesDashboard):
     """使用状況を表示"""
     status = dashboard.get_status()
     
-    print(f"\n{'='*60}")
-    print(f"Jules Usage Dashboard - {status['date']}")
-    print(f"{'='*60}\n")
+    cprint(f"\n{'='*60}", "cyan")
+    cprint(f"Jules Usage Dashboard - {status['date']}", "cyan", attrs=["bold"])
+    cprint(f"{'='*60}\n", "cyan")
     
-    print(f"{'Account':<12} {'Used':<8} {'Remaining':<10} {'Sessions':<10}")
+    header = f"{'Account':<12} {'Used':<8} {'Remaining':<10} {'Sessions':<10}"
+    cprint(header, attrs=["bold"])
     print("-" * 40)
     
     for acc in status["accounts"]:
         remaining = acc["remaining"]
         bar_len = int(remaining / DAILY_LIMIT * 20)
-        bar = "█" * bar_len + "░" * (20 - bar_len)
-        print(f"{acc['account_id']:<12} {acc['used']:<8} {remaining:<10} {acc['sessions_count']:<10}")
-        print(f"  [{bar}] {remaining}/{DAILY_LIMIT}")
+        if bar_len < 0: bar_len = 0
+        if bar_len > 20: bar_len = 20
+
+        # Determine color based on remaining usage
+        ratio = remaining / DAILY_LIMIT
+        if ratio > 0.5:
+            color = "green"
+        elif ratio > 0.2:
+            color = "yellow"
+        else:
+            color = "red"
+
+        bar_filled = colored("█" * bar_len, color)
+        bar_empty = colored("░" * (20 - bar_len), "grey")
+
+        rem_str = colored(f"{remaining:<10}", color, attrs=["bold"])
+
+        print(f"{acc['account_id']:<12} {acc['used']:<8} {rem_str} {acc['sessions_count']:<10}")
+        print(f"  [{bar_filled}{bar_empty}] {remaining}/{DAILY_LIMIT}")
     
     print("-" * 40)
-    print(f"{'TOTAL':<12} {status['total_used']:<8} {status['total_remaining']:<10}")
+
+    total_remaining = status['total_remaining']
+    total_ratio = total_remaining / (DAILY_LIMIT * ACCOUNTS_COUNT)
+    if total_ratio > 0.5:
+        total_color = "green"
+    elif total_ratio > 0.2:
+        total_color = "yellow"
+    else:
+        total_color = "red"
+
+    cprint(f"{'TOTAL':<12} {status['total_used']:<8} {colored(str(total_remaining), total_color, attrs=['bold'])}")
     print(f"\nPRs created today: {status['prs_count']}")
-    print(f"{'='*60}\n")
+    cprint(f"{'='*60}\n", "cyan")
 
 
 def print_prs(dashboard: JulesDashboard):
     """PR一覧を表示"""
     prs = dashboard.get_prs()
     
-    print(f"\n{'='*60}")
-    print("Jules PRs")
-    print(f"{'='*60}\n")
+    cprint(f"\n{'='*60}", "cyan")
+    cprint("Jules PRs", "cyan", attrs=["bold"])
+    cprint(f"{'='*60}\n", "cyan")
     
     if not prs:
         print("No PRs recorded today.")

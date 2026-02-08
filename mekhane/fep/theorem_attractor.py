@@ -20,9 +20,11 @@ Usage:
 
 from __future__ import annotations
 
+import json
 import math
 import time
 from dataclasses import dataclass, field
+from pathlib import Path
 from typing import Optional
 
 import numpy as np
@@ -419,6 +421,80 @@ class TheoremMixture:
 
 
 # ---------------------------------------------------------------------------
+# Q3: TheoremLogger — 定理レベル記憶
+# ---------------------------------------------------------------------------
+
+# PURPOSE: Q3 — 定理の使用履歴追跡 + セッション内減衰
+class TheoremLogger:
+    """定理の使用履歴追跡.
+
+    JSONL 形式で使用ログを保存し、過少使用定理のブーストと
+    セッション内の既使用定理の減衰を提供する。
+    """
+    LOG_DIR = Path.home() / "oikos" / "mneme" / ".hegemonikon" / "logs"
+
+    def __init__(self):
+        self.LOG_DIR.mkdir(parents=True, exist_ok=True)
+
+    def _log_path(self) -> Path:
+        """今日のログファイルパス."""
+        from datetime import date
+        return self.LOG_DIR / f"theorem_log_{date.today().isoformat()}.jsonl"
+
+    def log(self, theorem: str, input_text: str, similarity: float) -> None:
+        """使用を記録."""
+        entry = {
+            "ts": time.time(),
+            "theorem": theorem,
+            "input": input_text[:100],
+            "sim": round(similarity, 4),
+        }
+        try:
+            with open(self._log_path(), "a", encoding="utf-8") as f:
+                f.write(json.dumps(entry, ensure_ascii=False) + "\n")
+        except Exception:
+            pass  # Logging failure should not break attractor
+
+    def get_usage_counts(self, days: int = 7) -> dict[str, int]:
+        """直近 N 日間の定理別使用回数."""
+        counts: dict[str, int] = {k: 0 for k in THEOREM_KEYS}
+        from datetime import date, timedelta
+        for d in range(days):
+            day = date.today() - timedelta(days=d)
+            path = self.LOG_DIR / f"theorem_log_{day.isoformat()}.jsonl"
+            if not path.exists():
+                continue
+            try:
+                for line in path.read_text(encoding="utf-8").strip().split("\n"):
+                    if not line:
+                        continue
+                    entry = json.loads(line)
+                    t = entry.get("theorem", "")
+                    if t in counts:
+                        counts[t] += 1
+            except Exception:
+                continue
+        return counts
+
+    def compute_novelty_boost(self, days: int = 7) -> dict[str, float]:
+        """過少使用定理のブースト係数 (1.0 = 平均, >1.0 = 過少使用)."""
+        counts = self.get_usage_counts(days)
+        total = sum(counts.values())
+        if total == 0:
+            return {k: 1.0 for k in THEOREM_KEYS}
+        avg = total / 24
+        boost = {}
+        for k in THEOREM_KEYS:
+            if counts[k] == 0:
+                boost[k] = 1.5  # 未使用 → 50% ブースト
+            elif counts[k] < avg:
+                boost[k] = 1.0 + 0.5 * (1 - counts[k] / avg)  # 1.0-1.5
+            else:
+                boost[k] = 1.0  # 十分使用済み → ブーストなし
+        return boost
+
+
+# ---------------------------------------------------------------------------
 # TheoremAttractor
 # ---------------------------------------------------------------------------
 
@@ -442,13 +518,17 @@ class TheoremAttractor:
         # → 各定理の basin サイズ分布
     """
 
-    def __init__(self, force_cpu: bool = False):
+    def __init__(self, force_cpu: bool = False, enable_memory: bool = True):
         self._embedder = None
         self._proto_tensor = None  # (24, D) GPU tensor
         self._transition_matrix = None  # (24, 24) GPU tensor
         self._device = None
         self._force_cpu = force_cpu
         self._initialized = False
+        # Q3: 定理レベル記憶
+        self._logger = TheoremLogger() if enable_memory else None
+        self._session_used: list[str] = []  # セッション内で使用した定理
+        self._decay_factor = 0.7  # 使用済み定理の similarity 減衰率
 
     # --- Initialization ---
 
@@ -519,11 +599,22 @@ class TheoremAttractor:
 
     # --- 1. Theorem-Level Attractor ---
 
-    # PURPOSE: 入力に最も引力の強い定理を返す
+    # PURPOSE: 入力に最も引力の強い定理を返す (Q3: セッション内減衰付き)
     def suggest(self, user_input: str, top_k: int = 5) -> list[TheoremResult]:
-        """入力に最も引力の強い定理を返す."""
+        """入力に最も引力の強い定理を返す.
+
+        Q3: セッション内で既に使用した定理は similarity を decay_factor (0.7x) で減衰。
+        これにより同一セッション内で異なる定理への探索を促す。
+        """
         self._ensure_initialized()
         sims = self._compute_similarities(user_input)
+
+        # Q3: セッション内減衰
+        if self._session_used:
+            sims = [
+                (t, s * self._decay_factor if t in self._session_used else s)
+                for t, s in sims
+            ]
 
         results = []
         for theorem, sim in sorted(sims, key=lambda x: x[1], reverse=True)[:top_k]:
@@ -535,6 +626,14 @@ class TheoremAttractor:
                 similarity=sim,
                 command=defn["command"],
             ))
+
+        # Q3: top-1 をログ + セッション使用済みに追加
+        if results and self._logger:
+            top = results[0]
+            self._logger.log(top.theorem, user_input, top.similarity)
+            if top.theorem not in self._session_used:
+                self._session_used.append(top.theorem)
+
         return results
 
     # --- 1b. Mixture Diagnosis (Q2) ---

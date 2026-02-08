@@ -16,8 +16,10 @@ from mekhane.fep.category import (
     Adjunction,
     Cone,
     ConeProjection,
+    Functor,
     Monad,
     Morphism,
+    NaturalTransformation,
     Series,
     Theorem,
     build_cone,
@@ -360,4 +362,139 @@ class TestPrecisionWeighting:
         cone = converge(Series.O, self._outputs)
         desc = describe_cone(cone)
         assert "Precision Weighting" not in desc
+
+
+# =============================================================================
+# Functor Tests
+# =============================================================================
+
+
+class TestFunctor:
+    """Functor (関手: 圏→圏) の検証"""
+
+    # PURPOSE: /eat functor maps external content to Cog objects
+    def test_eat_functor(self):
+        eat = Functor(
+            name="eat",
+            source_cat="Ext",
+            target_cat="Cog",
+            object_map={"paper": "O1", "tutorial": "S2"},
+            morphism_map={"ref": "X-OS1"},
+        )
+        assert eat.map_object("paper") == "O1"
+        assert eat.map_object("unknown") is None
+        assert eat.map_morphism("ref") == "X-OS1"
+
+    # PURPOSE: endofunctor has same source and target
+    def test_endofunctor(self):
+        zet = Functor(
+            name="zet",
+            source_cat="Cog",
+            target_cat="Cog",
+            is_endofunctor=True,
+        )
+        assert zet.is_endofunctor is True
+
+    # PURPOSE: is_faithful — injective on morphisms
+    def test_faithful(self):
+        f = Functor(
+            name="test",
+            source_cat="A",
+            target_cat="B",
+            morphism_map={"f1": "g1", "f2": "g2"},
+        )
+        assert f.is_faithful is True
+
+        # Non-faithful: two morphisms map to same target
+        g = Functor(
+            name="test",
+            source_cat="A",
+            target_cat="B",
+            morphism_map={"f1": "g1", "f2": "g1"},
+        )
+        assert g.is_faithful is False
+
+    # PURPOSE: empty morphism map is vacuously faithful
+    def test_empty_faithful(self):
+        f = Functor(name="empty", source_cat="A", target_cat="B")
+        assert f.is_faithful is True
+
+
+# =============================================================================
+# Natural Transformation Tests
+# =============================================================================
+
+
+class TestNaturalTransformation:
+    """NaturalTransformation (自然変換: F⇒G) の検証"""
+
+    # PURPOSE: basic component access
+    def test_component_at(self):
+        alpha = NaturalTransformation(
+            name="η",
+            source_functor="Id",
+            target_functor="RL",
+            components={"O1": "restore_O1", "O2": "restore_O2"},
+        )
+        assert alpha.component_at("O1") == "restore_O1"
+        assert alpha.component_at("O3") is None
+
+    # PURPOSE: vertical composition β∘α
+    def test_vertical_composition(self):
+        alpha = NaturalTransformation(
+            name="α",
+            source_functor="F",
+            target_functor="G",
+            components={"X": "α_X", "Y": "α_Y"},
+        )
+        beta = NaturalTransformation(
+            name="β",
+            source_functor="G",
+            target_functor="H",
+            components={"X": "β_X", "Y": "β_Y"},
+        )
+        composed = alpha.compose(beta)
+        assert composed is not None
+        assert composed.name == "β∘α"
+        assert composed.source_functor == "F"
+        assert composed.target_functor == "H"
+        assert composed.components["X"] == "β_X∘α_X"
+
+    # PURPOSE: non-composable natural transformations
+    def test_non_composable(self):
+        alpha = NaturalTransformation(
+            name="α", source_functor="F", target_functor="G",
+            components={"X": "a"},
+        )
+        gamma = NaturalTransformation(
+            name="γ", source_functor="H", target_functor="K",
+            components={"X": "g"},
+        )
+        assert alpha.compose(gamma) is None
+
+    # PURPOSE: natural isomorphism (all components non-empty)
+    def test_natural_isomorphism(self):
+        iso = NaturalTransformation(
+            name="η",
+            source_functor="F",
+            target_functor="G",
+            components={"X": "η_X", "Y": "η_Y"},
+        )
+        assert iso.is_natural_isomorphism is True
+
+        # Empty component = not an isomorphism
+        non_iso = NaturalTransformation(
+            name="α",
+            source_functor="F",
+            target_functor="G",
+            components={"X": "α_X", "Y": ""},
+        )
+        assert non_iso.is_natural_isomorphism is False
+
+    # PURPOSE: empty components = not isomorphism
+    def test_empty_not_isomorphism(self):
+        empty = NaturalTransformation(
+            name="ε", source_functor="F", target_functor="G",
+        )
+        assert empty.is_natural_isomorphism is False
 

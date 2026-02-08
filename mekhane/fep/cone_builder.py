@@ -354,7 +354,7 @@ def describe_cone(cone: Cone) -> str:
         f"**Confidence** = {cone.confidence:.0f}%",
         f"**Universal** = {'✅ Yes' if cone.is_universal else '❌ No'}",
     ])
-    if cone.needs_devil:
+    if cone.series == Series.S and cone.dispersion > 0.1:
         lines.append("⚠️ **Devil's Advocate 推奨** (S-series, V > 0.1)")
 
     return "\n".join(lines)

@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/インフラ] <- Perplexity 外部検索
 # PURPOSE: 外部知識検索 (Perplexity API 統合)
 """
 PROOF: [L2/インフラ] このファイルは存在しなければならない

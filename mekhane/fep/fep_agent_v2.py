@@ -105,6 +105,7 @@ class HegemonikónFEPAgentV2:
         }
         self.precision_lr: float = 0.1
         self._base_A: Optional[np.ndarray] = None
+        self._prev_beliefs: Optional[np.ndarray] = None  # For B learning
         self._history: List[Dict[str, Any]] = []
 
     # =========================================================================
@@ -352,6 +353,9 @@ class HegemonikónFEPAgentV2:
         Returns dict with action_name in {observe, act_O, ..., act_A}
         and selected_series for act_* actions.
         """
+        # Store beliefs BEFORE this step (for B learning)
+        self._prev_beliefs = self._to_beliefs_array().copy()
+
         self._apply_precision()
 
         state_result = self.infer_states(observation)
@@ -499,6 +503,24 @@ class HegemonikónFEPAgentV2:
         else:
             self.agent.A = A_matrix
 
+    def _get_B_matrix(self) -> np.ndarray:
+        """Extract B matrix from pymdp agent."""
+        B = self.agent.B
+        if isinstance(B, np.ndarray) and B.dtype == object:
+            return np.asarray(B[0], dtype=np.float64)
+        if isinstance(B, list):
+            return np.asarray(B[0], dtype=np.float64)
+        return np.asarray(B, dtype=np.float64)
+
+    def _set_B_matrix(self, B_matrix: np.ndarray) -> None:
+        """Write B matrix back to pymdp agent."""
+        if isinstance(self.agent.B, np.ndarray) and self.agent.B.dtype == object:
+            self.agent.B[0] = B_matrix
+        elif isinstance(self.agent.B, list):
+            self.agent.B[0] = B_matrix
+        else:
+            self.agent.B = B_matrix
+
     def _get_predicted_observation(self) -> np.ndarray:
         """E[o] = A @ beliefs."""
         return self._get_A_matrix() @ self._to_beliefs_array()
@@ -600,6 +622,54 @@ class HegemonikónFEPAgentV2:
             "learning_rate": eta,
         })
 
+    def update_B_dirichlet(
+        self, action: int, learning_rate: Optional[float] = None,
+    ) -> None:
+        """Dirichlet B update: pB[:,:,a] += η * outer(beliefs_next, beliefs_prev).
+
+        Learn state transitions from experience.
+        Requires step() to have been called first (stores _prev_beliefs).
+
+        Args:
+            action: Integer action index (0=observe, 1-6=act_O..act_A)
+            learning_rate: Optional override (default: self.learning_rate * 0.1)
+
+        References:
+            Da Costa et al. 2020, Eq. 2.18: Action-conditional B learning
+            /sop Perplexity research: Dirichlet B学習理論式
+        """
+        if self._prev_beliefs is None:
+            return  # No previous step to learn from
+
+        # B learning uses lower rate than A (transitions are slower to learn)
+        eta = learning_rate if learning_rate is not None else self.learning_rate * 0.1
+
+        beliefs_next = self._to_beliefs_array()
+        beliefs_prev = self._prev_beliefs
+        B_matrix = self._get_B_matrix()
+
+        action_idx = min(int(action), self.num_actions - 1)
+
+        # Sufficient statistic: outer product of posterior beliefs
+        # This is the empirical transition count for Dirichlet update
+        update = eta * np.outer(beliefs_next, beliefs_prev)
+        eps = 1e-10
+        B_matrix[:, :, action_idx] = np.clip(
+            B_matrix[:, :, action_idx] + update, eps, None
+        )
+
+        # Normalize columns per action (each column = transition dist from a state)
+        col_sums = B_matrix[:, :, action_idx].sum(axis=0, keepdims=True)
+        col_sums[col_sums == 0] = 1
+        B_matrix[:, :, action_idx] = B_matrix[:, :, action_idx] / col_sums
+
+        self._set_B_matrix(B_matrix)
+        self._history.append({
+            "type": "dirichlet_B_update",
+            "action": action_idx,
+            "learning_rate": eta,
+        })
+
     # =========================================================================
     # Persistence
     # =========================================================================
@@ -637,6 +707,50 @@ class HegemonikónFEPAgentV2:
             self._history.append({
                 "type": "load_A",
                 "path": str(target_path or LEARNED_A_PATH),
+            })
+            return True
+        return False
+
+    def save_learned_B(self, path: Optional[str] = None) -> str:
+        """Save learned B matrix."""
+        from .persistence import LEARNED_A_PATH
+        from pathlib import Path as P
+
+        default_path = LEARNED_A_PATH.parent / "learned_B.npy"
+        target_path = P(path) if path else default_path
+        target_path.parent.mkdir(parents=True, exist_ok=True)
+
+        np.save(str(target_path), self.agent.B)
+        self._history.append({"type": "save_B", "path": str(target_path)})
+        return str(target_path)
+
+    def load_learned_B(self, path: Optional[str] = None) -> bool:
+        """Load learned B matrix."""
+        from .persistence import LEARNED_A_PATH
+        from pathlib import Path as P
+
+        default_path = LEARNED_A_PATH.parent / "learned_B.npy"
+        target_path = P(path) if path else default_path
+
+        if not target_path.exists():
+            return False
+
+        loaded_B = np.load(str(target_path), allow_pickle=True)
+        if loaded_B is not None:
+            # Validate shape
+            expected_shape = (self.state_dim, self.state_dim, self.num_actions)
+            if hasattr(loaded_B, 'shape'):
+                actual = (
+                    loaded_B.shape if loaded_B.dtype != object
+                    else loaded_B[0].shape
+                )
+                if actual != expected_shape:
+                    return False
+
+            self.agent.B = loaded_B
+            self._history.append({
+                "type": "load_B",
+                "path": str(target_path),
             })
             return True
         return False

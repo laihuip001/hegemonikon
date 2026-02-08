@@ -423,6 +423,7 @@ def get_boot_context(mode: str = "standard", context: Optional[str] = None) -> d
 
                     agent_v2 = HegemonikónFEPAgentV2()
                     agent_v2.load_learned_A()  # 前回セッションの学習を復元
+                    agent_v2.load_learned_B()  # B行列も復元
 
                     # Snapshot: capture A BEFORE learning
                     import copy
@@ -441,9 +442,11 @@ def get_boot_context(mode: str = "standard", context: Optional[str] = None) -> d
                     r2 = agent_v2.step(topic_obs)
                     final = r2  # 2nd cycle = 学習後の判断
 
-                    # Dirichlet 学習 + 永続化
+                    # Dirichlet 学習 (A + B) + 永続化
                     agent_v2.update_A_dirichlet(topic_obs)
+                    agent_v2.update_B_dirichlet(final["action"])
                     agent_v2.save_learned_A()
+                    agent_v2.save_learned_B()
 
                     # Snapshot: save AFTER learning + compute diff
                     save_snapshot(agent_v2, label="boot")

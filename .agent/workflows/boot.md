@@ -98,6 +98,7 @@ Phase 6: L(M) を出力        — 完成したセッション状態
 | 0 | [identity.md](boot/identity.md) | id_L の復元 | Identity Stack 読込 |
 | 0.5 | [change-tracking.md](boot/change-tracking.md) | Δ(Mem) の検出 | セッション間変化の追跡 |
 | 3 | [knowledge.md](boot/knowledge.md) | Mem の構造展開 | 知識読込 (Sophia/KI/FEP) |
+| 3.6 | PKS auto-push (inline) | Mem の能動的表面化 | Handoff → トピック抽出 → プッシュ |
 | 4 | [system.md](boot/system.md) | L の射構築 | システム更新 (Hexis/Gnōsis) |
 | 5 | [external.md](boot/external.md) | 外部射の導入 | 外部入力 (Perplexity/Jules) |
 | - | [templates.md](boot/templates.md) | L(M) の出力形式 | 出力テンプレート |
@@ -212,6 +213,21 @@ cd ~/oikos/hegemonikon && PYTHONPATH=. .venv/bin/python scripts/boot_gnosis.py -
 | 未解決タスク | R(S_prev) の不完全な射 | 直近セッションの保留事項 |
 | 設計決定 | Mem に追加された新しい射 | 最近のアーキテクチャ変更 |
 | 教訓 | L の ε 改善に寄与する知識 | 失敗から学んだこと |
+
+### 3.6 PKS Proactive Push — Mem の能動的表面化
+
+> **圏論**: Mem の中で、現在のコンテキストに対して「プッシュすべき」対象を能動的に表面化する。
+> Pull (検索) ではなく Push (提示) — Creator が知らないかもしれない関連知識を提示する。
+
+```bash
+cd ~/oikos/hegemonikon && PYTHONPATH=. .venv/bin/python -m mekhane.pks.pks_cli auto --no-questions 2>&1 || echo "[PKS] スキップ（Gnōsis 未構築の可能性）"
+```
+
+| 項目 | 圏論的意味 | 説明 |
+|:-----|:-----------|:-----|
+| トピック自動抽出 | R(S_prev) からの射 | Handoff キーワードを自動抽出 |
+| 関連度スコアリング | Mem × Ses 間の距離 | ベクトル類似度で関連度を算出 |
+| セレンディピティ | Mem の意外な射 | 「関連するが意外」な知識を優先 |
 
 ---
 

@@ -1,5 +1,7 @@
 # PROOF: Hermēneus Directory
 
+REASON: CCL AST処理と展開機能を実装するため  <!-- AUTO-REASON -->
+
 ## Existence Justification
 
 | File | L | Justification |

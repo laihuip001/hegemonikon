@@ -1,5 +1,7 @@
 # PROOF.md — Pythōsis 存在証明
 
+REASON: Python の設計思想を消化することで Hegemonikón の予測精度を高めることの必要性を示すために導入された。  <!-- AUTO-REASON -->
+
 > **CCL**: `@proof pythosis/`
 
 ---

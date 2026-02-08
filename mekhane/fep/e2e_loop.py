@@ -298,41 +298,100 @@ _THEOREM_TEMPLATES = {
 
 
 def _simulate_cone(series: str, user_input: str) -> Dict[str, Any]:
-    """WF 実行をシミュレーションし、Cone 構築の動作を証明する。
+    """Build a Cone using real workflow infrastructure.
 
-    NOTE: これはシミュレーション。実際の WF 実行は行わない。
-    将来、Hermēneus と接続すれば実 WF 出力を使える。
+    Uses workflow_runner to select derivatives, then
+    cone_builder.converge() for real C0-C3 Cone construction.
+    Falls back to template simulation if imports fail.
+
+    Architecture:
+        Series → 4 theorems → workflow_runner.run_workflow() per theorem
+        → WFContext stores outputs → cone_builder.converge() → Cone
     """
     try:
-        from mekhane.fep.cone_builder import (
-            compute_dispersion,
-            resolve_method,
-        )
+        from mekhane.fep.cone_builder import converge
+        from mekhane.fep.category import Series
+        from mekhane.workflow_runner import run_workflow
     except ImportError:
-        return {"apex": "(cone_builder unavailable)", "dispersion": 0.0, "method": "n/a"}
+        return _simulate_cone_fallback(series, user_input)
 
+    theorems = _SERIES_THEOREMS.get(series, [])
+    if not theorems:
+        return {"apex": "(unknown series)", "dispersion": 0.0, "method": "n/a"}
+
+    topic = user_input[:100]
+
+    # Run workflow_runner for each theorem in the series
+    outputs: Dict[str, str] = {}
+    pw: Dict[str, float] = {}
+    for t in theorems:
+        try:
+            result = run_workflow(t, topic)
+            # Use derivative description as the "output" of this theorem
+            outputs[t] = (
+                f"[{result.derivative}] {result.description}"
+                if result.description
+                else f"[{result.derivative}] {result.rationale}"
+            )
+            pw[t] = result.confidence - 0.5  # Normalize to [-0.5, 0.5]
+        except Exception:
+            # Graceful fallback per-theorem
+            template = _THEOREM_TEMPLATES.get(t, "{topic} に関する分析")
+            outputs[t] = template.format(topic=topic[:30])
+
+    # Build real Cone via converge() C0-C3
+    try:
+        series_enum = Series[series] if hasattr(Series, series) else Series.O
+        cone = converge(
+            series=series_enum,
+            outputs=outputs,
+            pw=pw if any(v != 0 for v in pw.values()) else None,
+            context=topic,
+        )
+        return {
+            "apex": cone.apex,
+            "dispersion": cone.dispersion,
+            "method": cone.method,
+            "outputs": outputs,
+            "cone": cone,
+        }
+    except Exception:
+        # Fallback: partial result without Cone object
+        from mekhane.fep.cone_builder import compute_dispersion, resolve_method
+        dispersion = compute_dispersion(outputs)
+        method = resolve_method(dispersion)
+        return {
+            "apex": outputs.get(theorems[0], ""),
+            "dispersion": dispersion,
+            "method": method,
+            "outputs": outputs,
+        }
+
+
+def _simulate_cone_fallback(series: str, user_input: str) -> Dict[str, Any]:
+    """Original simulation fallback when imports are unavailable."""
     theorems = _SERIES_THEOREMS.get(series, ["T1", "T2", "T3", "T4"])
     topic = user_input[:30]
-
-    # シミュレーション出力を生成
     outputs = {}
     for t in theorems:
         template = _THEOREM_TEMPLATES.get(t, "{topic} に関する分析")
         outputs[t] = template.format(topic=topic)
 
-    # Dispersion と resolve method を計算
-    dispersion = compute_dispersion(outputs)
-    method = resolve_method(dispersion)
-
-    # Apex = 最も代表的な出力 (primary theorem)
-    apex = outputs.get(theorems[0], "")
+    try:
+        from mekhane.fep.cone_builder import compute_dispersion, resolve_method
+        dispersion = compute_dispersion(outputs)
+        method = resolve_method(dispersion)
+    except ImportError:
+        dispersion = 0.0
+        method = "n/a"
 
     return {
-        "apex": apex,
+        "apex": outputs.get(theorems[0], ""),
         "dispersion": dispersion,
         "method": method,
         "outputs": outputs,
     }
+
 
 
 # =============================================================================

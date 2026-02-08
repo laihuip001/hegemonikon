@@ -12,6 +12,29 @@ Q.E.D.
 
 Category Theory Types for Hegemonikón
 
+Type Layer Classification (Q16: /zet+ 2026-02-08):
+
+    Layer A — Scaffold (思考足場)
+        Monad, Functor, NaturalTransformation
+        品質基準: docstring が正確であること
+        消費者: Creator の認知 (コードで消費されなくてよい)
+        乖離: 乖離＝正常。消費者ゼロでも正当
+        判定: この型を削除してもコードは壊れない → Scaffold
+
+    Layer B — Constraint (設計制約)
+        Series, CognitiveType, Theorem
+        品質基準: 型チェックが通り、消費者 ≥ 1
+        消費者: cone_builder, attractor, pw_adapter
+        乖離: 乖離＝中程度の問題。消費者を要求する
+        判定: 削除するとコードは動くが型安全が失われる → Constraint
+
+    Layer C — Operational (実装消費)
+        Cone, ConeProjection, Morphism, Adjunction
+        品質基準: テスト PASS + 実行時検証 + 消費者コード必須
+        消費者: cone_builder, boot_integration, postcheck
+        乖離: 乖離＝バグ。即修正
+        判定: 削除するとコードが壊れる → Operational
+
 Provides Python dataclass representations for:
 - Cog category: 24 objects (theorems), 72 morphisms (X-series)
 - Cone: @converge C0-C3 with Precision Weighting (Hub Peras)
@@ -33,7 +56,7 @@ from typing import Dict, FrozenSet, List, Optional, Tuple
 
 
 # =============================================================================
-# Series (6 layers of Cog category)
+# Series (6 layers of Cog category)                          [Layer B: Constraint]
 # =============================================================================
 
 
@@ -71,7 +94,7 @@ class CognitiveType(Enum):
 
 
 # =============================================================================
-# Theorem (Object in Cog)
+# Theorem (Object in Cog)                                    [Layer B: Constraint]
 # =============================================================================
 
 
@@ -99,7 +122,7 @@ class Theorem:
 
 
 # =============================================================================
-# Morphism (Arrow in Cog = X-series relation)
+# Morphism (Arrow in Cog = X-series relation)               [Layer C: Operational]
 # =============================================================================
 
 
@@ -140,7 +163,7 @@ class Morphism:
 
 
 # =============================================================================
-# Cone (@converge structure)
+# Cone (@converge structure)                                [Layer C: Operational]
 # =============================================================================
 
 
@@ -195,7 +218,7 @@ class Cone:
 
 
 # =============================================================================
-# Adjunction (/boot ⊣ /bye)
+# Adjunction (/boot ⊣ /bye)                                [Layer C: Operational]
 # =============================================================================
 
 
@@ -236,7 +259,7 @@ class Adjunction:
 
 
 # =============================================================================
-# Monad (/zet)
+# Monad (/zet)                                               [Layer A: Scaffold]
 # =============================================================================
 
 
@@ -289,7 +312,7 @@ class Monad:
 
 
 # =============================================================================
-# Functor (映射: Category → Category)
+# Functor (映射: Category → Category)                        [Layer A: Scaffold]
 # =============================================================================
 
 
@@ -393,7 +416,7 @@ class Functor:
 
 
 # =============================================================================
-# Natural Transformation (自然変換: Functor → Functor)
+# Natural Transformation (自然変換: Functor → Functor)       [Layer A: Scaffold]
 # =============================================================================
 
 

@@ -244,7 +244,70 @@ def devil_attack(cone: Cone) -> DevilAttack:
 
 
 # =============================================================================
-# ConeAdvice
+# Explanation Stack — Layer 2: Decision Trace
+# =============================================================================
+
+
+# PURPOSE: Record of a single rule evaluation in advise()
+@dataclass
+class RuleEvaluation:
+    """Record of a single rule evaluation in advise().
+
+    Each if-elif branch in advise() generates one RuleEvaluation.
+    Together they form the trace — the "thinking path" of the decision.
+    """
+
+    rule_id: str        # "Rule 1: Contradiction (V > 0.3)"
+    matched: bool       # Did this rule fire?
+    reason: str         # "V=0.35 > 0.3" or "V=0.08 ≤ 0.3"
+    series_specific: bool = False  # Is this a Series-specific rule?
+
+    def __repr__(self) -> str:
+        mark = "✓" if self.matched else "✗"
+        return f"{mark} {self.rule_id}: {self.reason}"
+
+
+# PURPOSE: An action that advise() considered but rejected
+@dataclass
+class RejectedAction:
+    """An action that advise() considered but rejected.
+
+    Layer 3: Justification — "why NOT this action?"
+    Derived automatically from RuleEvaluation trace.
+    """
+
+    action: str         # "proceed", "investigate", "devil", "reweight"
+    rule_id: str        # Which rule's non-match implies this rejection
+    reason: str         # "V=0.35 > 0.3, devil takes priority"
+
+    def __repr__(self) -> str:
+        return f"✗ {self.action}: {self.reason}"
+
+
+# PURPOSE: Complete reasoning trace of an advise() call
+@dataclass
+class DecisionTrace:
+    """Complete reasoning trace of an advise() call.
+
+    Layer 2 (Trace) + Layer 3 (Justification) combined.
+    Built as a byproduct of advise()'s rule evaluation.
+
+    The trace records EVERY rule checked, not just the one that matched.
+    This is the "doctor showing the X-ray" — the process, not just the result.
+    """
+
+    evaluations: List[RuleEvaluation]
+    rejected: List[RejectedAction] = field(default_factory=list)
+    matched_rule: str = ""  # Final rule that fired
+
+    def __repr__(self) -> str:
+        n_eval = len(self.evaluations)
+        n_rej = len(self.rejected)
+        return f"Trace({n_eval} rules, {n_rej} rejected → {self.matched_rule})"
+
+
+# =============================================================================
+# Explanation Stack — Layer 1: ConeAdvice (Structure)
 # =============================================================================
 
 
@@ -253,8 +316,11 @@ def devil_attack(cone: Cone) -> DevilAttack:
 class ConeAdvice:
     """Next-action recommendation from a Cone analysis.
 
-    This is what makes the Cone a "consumer" type —
-    structured data drives structured decisions.
+    Explanation Stack:
+      Layer 1: action, reason, urgency (Structure)
+      Layer 2: trace (DecisionTrace — which rules were checked)
+      Layer 3: trace.rejected (RejectedAction[] — why not other actions)
+      Layer 4: format_advice_for_llm() (Narrative — see below)
 
     When action='devil', devil_detail is auto-populated with
     a DevilAttack containing structured contradiction analysis (CR-3).
@@ -266,16 +332,49 @@ class ConeAdvice:
     next_steps: List[str] = field(default_factory=list)
     urgency: float = 0.0  # 0.0 (低) - 1.0 (高)
     devil_detail: Optional[DevilAttack] = None  # CR-3: auto-populated
+    trace: Optional[DecisionTrace] = None  # ES: Layer 2+3
 
     def __repr__(self) -> str:
         wf = f" → {self.suggested_wf}" if self.suggested_wf else ""
         devil = f", devil={self.devil_detail}" if self.devil_detail else ""
-        return f"ConeAdvice({self.action}{wf}, urgency={self.urgency:.1f}{devil})"
+        trace = f", trace={self.trace}" if self.trace else ""
+        return f"ConeAdvice({self.action}{wf}, urgency={self.urgency:.1f}{devil}{trace})"
 
 
 # =============================================================================
-# advise() — Active inference decision
+# advise() — Active inference decision (with Explanation Stack)
 # =============================================================================
+
+
+# PURPOSE: Derive rejected actions from rule evaluations
+def _derive_rejected(evaluations: List[RuleEvaluation]) -> List[RejectedAction]:
+    """Derive Layer 3 (RejectedAction) from Layer 2 (RuleEvaluation).
+
+    Each non-matched rule implies a rejected action.
+    The action name is inferred from the rule's intended outcome.
+    """
+    # Rule → action mapping (what each rule would have produced)
+    _RULE_ACTION_MAP = {
+        "Rule 1": "devil",
+        "Rule 2": "devil",
+        "Rule 2.5": "investigate",
+        "Rule 3": "investigate",
+        "Rule 4": "reweight",
+        "Rule 5": "proceed",
+    }
+
+    rejected = []
+    for ev in evaluations:
+        if not ev.matched:
+            # Extract rule number prefix for action mapping
+            rule_prefix = ev.rule_id.split(":")[0].strip()
+            action = _RULE_ACTION_MAP.get(rule_prefix, "unknown")
+            rejected.append(RejectedAction(
+                action=action,
+                rule_id=ev.rule_id,
+                reason=ev.reason,
+            ))
+    return rejected
 
 
 # PURPOSE: Consume a Cone and recommend the next action
@@ -294,22 +393,34 @@ def advise(cone: Cone) -> ConeAdvice:
     | is_universal (V≤0.1, conf≥70)      | proceed     | —            |
     | else (low dispersion, moderate)    | proceed     | —            |
 
-    CognitiveType-aware:
-    - Understanding (O/H/K): V reflects interpretive diversity, tolerate more
-    - Reasoning (S/P): V reflects logical contradiction, strict
-    - Bridge (A): V at U/R boundary is naturally higher, lenient threshold
+    Explanation Stack (Layer 2+3):
+    Every rule check is recorded in DecisionTrace. Non-matched rules
+    generate RejectedAction entries. The trace is attached to the
+    returned ConeAdvice for inspection by LLM or developer.
 
     Args:
         cone: A fully populated Cone from converge()
 
     Returns:
-        ConeAdvice with action, reason, and suggested workflow
+        ConeAdvice with action, reason, suggested workflow, and trace
     """
     series_name = cone.series.name
+    evals: List[RuleEvaluation] = []
 
     # --- Rule 1: Serious contradiction (V > 0.3) ---
-    if cone.needs_devil:
-        attack = devil_attack(cone)  # CR-3: auto-execute
+    r1_match = cone.needs_devil
+    evals.append(RuleEvaluation(
+        rule_id="Rule 1: Contradiction (V > 0.3)",
+        matched=r1_match,
+        reason=f"V={cone.dispersion:.2f} {'>' if r1_match else '≤'} 0.3",
+    ))
+    if r1_match:
+        attack = devil_attack(cone)
+        trace = DecisionTrace(
+            evaluations=evals,
+            rejected=_derive_rejected(evals),
+            matched_rule="Rule 1",
+        )
         return ConeAdvice(
             action="devil",
             reason=f"V={cone.dispersion:.2f} > 0.3: 定理間に重大な矛盾。"
@@ -322,11 +433,28 @@ def advise(cone: Cone) -> ConeAdvice:
             ],
             urgency=min(1.0, cone.dispersion),
             devil_detail=attack,
+            trace=trace,
         )
 
     # --- Rule 2: S-series strategy risk (V > 0.2) ---
-    if cone.series == Series.S and cone.dispersion > 0.2:
-        attack = devil_attack(cone)  # CR-3: auto-execute
+    r2_match = cone.series == Series.S and cone.dispersion > 0.2
+    r2_reason = (
+        f"series={series_name}, V={cone.dispersion:.2f}"
+        f" {'(S + V>0.2)' if r2_match else '(not S-series or V≤0.2)'}"
+    )
+    evals.append(RuleEvaluation(
+        rule_id="Rule 2: S-series strategy (V > 0.2)",
+        matched=r2_match,
+        reason=r2_reason,
+        series_specific=True,
+    ))
+    if r2_match:
+        attack = devil_attack(cone)
+        trace = DecisionTrace(
+            evaluations=evals,
+            rejected=_derive_rejected(evals),
+            matched_rule="Rule 2",
+        )
         return ConeAdvice(
             action="devil",
             reason=f"S-series (Reasoning) + V={cone.dispersion:.2f} > 0.2: "
@@ -338,18 +466,33 @@ def advise(cone: Cone) -> ConeAdvice:
             ],
             urgency=0.8,
             devil_detail=attack,
+            trace=trace,
         )
 
     # --- Rule 2.5: A-series Bridge tolerance ---
-    # A-series spans U/R boundary, naturally higher V is expected
-    if cone.series == Series.A and cone.dispersion > 0.25:
-        # Determine dominant cognitive types in projections
+    r25_match = cone.series == Series.A and cone.dispersion > 0.25
+    r25_reason = (
+        f"series={series_name}, V={cone.dispersion:.2f}"
+        f" {'(A + V>0.25)' if r25_match else '(not A-series or V≤0.25)'}"
+    )
+    evals.append(RuleEvaluation(
+        rule_id="Rule 2.5: A-series Bridge (V > 0.25)",
+        matched=r25_match,
+        reason=r25_reason,
+        series_specific=True,
+    ))
+    if r25_match:
         bridge_projs = [p.theorem_id for p in cone.projections
                         if p.theorem_id in COGNITIVE_TYPES
                         and COGNITIVE_TYPES[p.theorem_id] in (
                             CognitiveType.BRIDGE_U_TO_R,
                             CognitiveType.BRIDGE_R_TO_U,
                         )]
+        trace = DecisionTrace(
+            evaluations=evals,
+            rejected=_derive_rejected(evals),
+            matched_rule="Rule 2.5",
+        )
         return ConeAdvice(
             action="investigate",
             reason=f"A-series (Bridge U↔R) + V={cone.dispersion:.2f}: "
@@ -361,16 +504,33 @@ def advise(cone: Cone) -> ConeAdvice:
                 "A2(Krisis) と A4(Epistēmē) の Reasoning 整合性を検証",
             ],
             urgency=0.5,
+            trace=trace,
         )
 
     # --- Rule 3: Low confidence + moderate dispersion ---
     # CR-4: A-series excluded (already handled by Rule 2.5)
-    if cone.dispersion > 0.1 and cone.confidence < 50 and cone.series != Series.A:
-        # Choose WF based on series
+    r3_match = (cone.dispersion > 0.1 and cone.confidence < 50
+                and cone.series != Series.A)
+    r3_reason = (
+        f"V={cone.dispersion:.2f}, conf={cone.confidence:.0f}%, "
+        f"series={series_name}"
+        f" {'(V>0.1, conf<50, not A)' if r3_match else '(conditions not met)'}"
+    )
+    evals.append(RuleEvaluation(
+        rule_id="Rule 3: Low confidence (V > 0.1, conf < 50)",
+        matched=r3_match,
+        reason=r3_reason,
+    ))
+    if r3_match:
         if cone.series == Series.K:
-            wf = "/sop"  # K: 調査で解消
+            wf = "/sop"
         else:
-            wf = "/zet"  # O/S/H/P: 問いを深める
+            wf = "/zet"
+        trace = DecisionTrace(
+            evaluations=evals,
+            rejected=_derive_rejected(evals),
+            matched_rule="Rule 3",
+        )
         return ConeAdvice(
             action="investigate",
             reason=f"V={cone.dispersion:.2f}, conf={cone.confidence:.0f}%: "
@@ -381,28 +541,57 @@ def advise(cone: Cone) -> ConeAdvice:
                 f"V を 0.1 以下にするために矛盾点を解消",
             ],
             urgency=0.5,
+            trace=trace,
         )
 
     # --- Rule 4: PW bias check ---
-    if (cone.resolution_method == "pw_weighted"
-            and not is_uniform_pw(cone.pw)):
-        # Check for extreme PW values
+    has_pw = (cone.resolution_method == "pw_weighted"
+              and not is_uniform_pw(cone.pw))
+    extreme_keys = []
+    if has_pw:
         extreme_keys = [k for k, v in cone.pw.items() if abs(v) > 0.7]
-        if extreme_keys:
-            return ConeAdvice(
-                action="reweight",
-                reason=f"PW バイアスが強い: {', '.join(extreme_keys)}。"
-                       f" 判断停止で検証を推奨",
-                suggested_wf="/dia epo",
-                next_steps=[
-                    f"極端な PW ({extreme_keys}) の根拠を確認",
-                    "PW なし (uniform) で再実行し結果を比較",
-                ],
-                urgency=0.4,
-            )
+    r4_match = has_pw and bool(extreme_keys)
+    r4_reason = (
+        f"resolution={cone.resolution_method}, "
+        f"extreme_pw={extreme_keys if extreme_keys else 'none'}"
+    )
+    evals.append(RuleEvaluation(
+        rule_id="Rule 4: PW bias (extreme weights)",
+        matched=r4_match,
+        reason=r4_reason,
+    ))
+    if r4_match:
+        trace = DecisionTrace(
+            evaluations=evals,
+            rejected=_derive_rejected(evals),
+            matched_rule="Rule 4",
+        )
+        return ConeAdvice(
+            action="reweight",
+            reason=f"PW バイアスが強い: {', '.join(extreme_keys)}。"
+                   f" 判断停止で検証を推奨",
+            suggested_wf="/dia epo",
+            next_steps=[
+                f"極端な PW ({extreme_keys}) の根拠を確認",
+                "PW なし (uniform) で再実行し結果を比較",
+            ],
+            urgency=0.4,
+            trace=trace,
+        )
 
     # --- Rule 5: Universal — proceed ---
-    if cone.is_universal:
+    r5_match = cone.is_universal
+    evals.append(RuleEvaluation(
+        rule_id="Rule 5: Universal (V≤0.1, conf≥70)",
+        matched=r5_match,
+        reason=f"is_universal={cone.is_universal}",
+    ))
+    if r5_match:
+        trace = DecisionTrace(
+            evaluations=evals,
+            rejected=_derive_rejected(evals),
+            matched_rule="Rule 5",
+        )
         return ConeAdvice(
             action="proceed",
             reason=f"V={cone.dispersion:.2f}, conf={cone.confidence:.0f}%: "
@@ -411,14 +600,26 @@ def advise(cone: Cone) -> ConeAdvice:
                 "apex をアクション計画に変換",
             ],
             urgency=0.0,
+            trace=trace,
         )
 
     # --- Default: moderate confidence, proceed ---
+    evals.append(RuleEvaluation(
+        rule_id="Default: proceed",
+        matched=True,
+        reason=f"V={cone.dispersion:.2f}, conf={cone.confidence:.0f}%: no prior rule matched",
+    ))
+    trace = DecisionTrace(
+        evaluations=evals,
+        rejected=_derive_rejected(evals),
+        matched_rule="Default",
+    )
     return ConeAdvice(
         action="proceed",
         reason=f"V={cone.dispersion:.2f}, conf={cone.confidence:.0f}%: "
                f"概ね整合。実行可能",
         urgency=0.1,
+        trace=trace,
     )
 
 
@@ -529,3 +730,72 @@ def advise_with_attractor(
     # CLEAR or no modification needed
     return base
 
+
+# =============================================================================
+# Explanation Stack — Layer 4: Narrative (format_for_llm)
+# =============================================================================
+
+
+# PURPOSE: Convert ConeAdvice to LLM system prompt injection text
+def format_advice_for_llm(advice: ConeAdvice) -> str:
+    """Convert ConeAdvice to LLM system prompt injection text.
+
+    Explanation Stack Layer 4 — the "narrative layer".
+    Symmetric with attractor_advisor.format_for_llm().
+
+    Output format (3 sections):
+      [Cone: <action> | V=<dispersion> | <reason_summary>]
+      [Trace: Rule1✗ → Rule2✓ ...]
+      [Rejected: proceed(reason), investigate(reason)]
+
+    This text is injected into the LLM's context so it can generate
+    a natural language narrative for the Creator.
+
+    Args:
+        advice: A ConeAdvice from advise() or advise_with_attractor()
+
+    Returns:
+        Formatted string for LLM injection
+    """
+    lines = []
+
+    # --- Section 1: Cone summary ---
+    wf = f" → {advice.suggested_wf}" if advice.suggested_wf else ""
+    devil = ""
+    if advice.devil_detail:
+        d = advice.devil_detail
+        worst = d.worst_pair
+        worst_desc = (
+            f", worst={worst.theorem_a}↔{worst.theorem_b}"
+            if worst else ""
+        )
+        devil = f", severity={d.severity:.2f}{worst_desc}"
+    lines.append(
+        f"[Cone: {advice.action}{wf} | "
+        f"urgency={advice.urgency:.1f}{devil}]"
+    )
+
+    # --- Section 2: Trace ---
+    if advice.trace:
+        trace_parts = []
+        for ev in advice.trace.evaluations:
+            mark = "✓" if ev.matched else "✗"
+            # Short rule name (e.g. "R1" from "Rule 1: ...")
+            short = ev.rule_id.split(":")[0].replace("Rule ", "R")
+            trace_parts.append(f"{short}{mark}")
+        lines.append(f"[Trace: {' → '.join(trace_parts)}]")
+
+    # --- Section 3: Rejected ---
+    if advice.trace and advice.trace.rejected:
+        rej_parts = []
+        for r in advice.trace.rejected:
+            # Compact: "proceed(V>0.3)"
+            short_reason = r.reason.split(",")[0] if r.reason else "—"
+            rej_parts.append(f"{r.action}({short_reason})")
+        lines.append(f"[Rejected: {', '.join(rej_parts)}]")
+
+    # --- Next steps ---
+    if advice.next_steps:
+        lines.append(f"[Next: {'; '.join(advice.next_steps)}]")
+
+    return "\n".join(lines)

@@ -96,10 +96,22 @@ class TestCheckUnderstanding:
 class TestCheckIntuition:
     """Pre-check Stage 2: A1 直感確認。"""
 
-    def test_always_passes(self):
-        """直感は常に形成可能 — 「わからない」も直感。"""
-        result = check_intuition("何でも入力")
+    def test_sufficient_input_passes(self):
+        """十分な長さの入力 → 直感形成可能。"""
+        result = check_intuition("これは十分な長さの入力テキストです")
         assert result.passed
+
+    def test_short_input_fails(self):
+        """短すぎる入力 → 直感形成不可 (/m dia+ P1)."""
+        result = check_intuition("短い")
+        assert not result.passed
+        assert "短すぎ" in result.result
+
+    def test_contradictory_signals_fail(self):
+        """緊急+熟考の矛盾 → fail (/m dia+ P1)."""
+        result = check_intuition("緊急だけどじっくり考えたい")
+        assert not result.passed
+        assert "矛盾" in result.result
 
     def test_detects_question(self):
         result = check_intuition("これはどうすればいい？")
@@ -109,8 +121,12 @@ class TestCheckIntuition:
         result = check_intuition("これはわからない点がある")
         assert "不確実" in result.result
 
+    def test_detects_urgency(self):
+        result = check_intuition("緊急でこの問題を解決してほしい")
+        assert "即応" in result.result
+
     def test_cognitive_type_is_bridge(self):
-        result = check_intuition("入力テキスト")
+        result = check_intuition("これは十分な長さの入力テキストです")
         assert result.cognitive_type == CognitiveType.BRIDGE_U_TO_R.value
 
 
@@ -145,8 +161,8 @@ class TestCheckEvaluation:
 
     def test_moderate_confidence_passes(self):
         result = check_evaluation(
-            output="十分な出力テキスト。",
-            context="入力テキスト",
+            output="これは十分に長い出力テキストです。内容も適切。",
+            context="入力テキストの文脈情報。",
             confidence=75.0,
         )
         assert result.passed

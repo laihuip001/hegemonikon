@@ -759,12 +759,38 @@ class SeriesAttractor:
             sims = batch_cosine_similarity(query_tensor, self._proto_tensor)
             raw_sims = sims.cpu().numpy()
             pairs = [(key, float(raw_sims[i])) for i, key in enumerate(self._proto_keys)]
+
+            # Multi-prototype: blend definition sim with exemplar max
+            # α = 0.7 (definition dominates, exemplars are supplementary)
+            _EXEMPLAR_WEIGHT = 0.3
+            boosted = []
+            for key, def_sim in pairs:
+                best_sim = def_sim
+                if key in self._exemplar_tensors:
+                    ex_sims = batch_cosine_similarity(
+                        query_tensor, self._exemplar_tensors[key]
+                    )
+                    ex_max = float(ex_sims.max().cpu())
+                    if ex_max > def_sim:
+                        # Blend: exemplar boosts but doesn't dominate
+                        best_sim = (1 - _EXEMPLAR_WEIGHT) * def_sim + _EXEMPLAR_WEIGHT * ex_max
+                boosted.append((key, best_sim))
+            pairs = boosted
         else:
             # CPU fallback
             pairs = []
+            _EXEMPLAR_WEIGHT = 0.3
             for key, proto in self._prototypes.items():
-                sim = self._cosine_similarity_np(input_emb, proto)
-                pairs.append((key, float(sim)))
+                def_sim = float(self._cosine_similarity_np(input_emb, proto))
+                # Multi-prototype: check exemplars
+                best_sim = def_sim
+                ex_max = def_sim
+                for ex_emb in self._exemplar_embeddings.get(key, []):
+                    ex_sim = float(self._cosine_similarity_np(input_emb, ex_emb))
+                    ex_max = max(ex_max, ex_sim)
+                if ex_max > def_sim:
+                    best_sim = (1 - _EXEMPLAR_WEIGHT) * def_sim + _EXEMPLAR_WEIGHT * ex_max
+                pairs.append((key, best_sim))
 
         # Temperature sharpening: amplify separation between basins
         if self.temperature > 1.0:

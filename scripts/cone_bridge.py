@@ -121,7 +121,7 @@ def main():
                 "apex": cone.apex,
                 "dispersion": cone.dispersion,
                 "confidence": cone.confidence,
-                "method": cone.method,
+                "method": cone.resolution_method,
                 "needs_devil": cone.needs_devil,
             },
         }

@@ -351,7 +351,7 @@ def _simulate_cone(series: str, user_input: str) -> Dict[str, Any]:
         return {
             "apex": cone.apex,
             "dispersion": cone.dispersion,
-            "method": cone.method,
+            "method": cone.resolution_method,
             "outputs": outputs,
             "cone": cone,
         }
@@ -597,6 +597,30 @@ def run_loop_v2(
     os.makedirs(os.path.dirname(a_matrix_path), exist_ok=True)
     agent.save_learned_A(a_matrix_path)
     agent.save_epsilon()  # Meta-ε 永続化
+
+    # ES: Persist last cycle's trace for boot Axis M
+    last_es = next(
+        (c for c in reversed(results) if c.advice_format),
+        None,
+    )
+    if last_es:
+        try:
+            import json as _json
+            es_log_dir = Path.home() / "oikos/mneme/.hegemonikon/logs"
+            os.makedirs(es_log_dir, exist_ok=True)
+            from datetime import datetime as _dt
+            es_path = es_log_dir / f"es_trace_{_dt.now().strftime('%Y%m%d_%H%M%S')}.json"
+            es_payload = {
+                "advice": {
+                    "action": last_es.advice_action,
+                    "format_llm": last_es.advice_format,
+                },
+                "cycle": last_es.cycle,
+            }
+            with open(es_path, "w") as f:
+                _json.dump(es_payload, f, ensure_ascii=False, indent=2)
+        except Exception:
+            pass  # ES persistence is best-effort
 
     # Learning proof
     learning_proof = None

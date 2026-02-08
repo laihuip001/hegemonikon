@@ -102,14 +102,42 @@ def extract_workflows(node) -> list:
     return wfs
 
 
+def resolve_wf_paths(wf_ids: list[str]) -> dict[str, str]:
+    """WF ID → .agent/workflows/*.md の絶対パスに解決。
+
+    /dia → dia.md, /noe → noe.md のように対応。
+    存在しないファイルは除外。
+
+    Returns:
+        {"/dia": "/absolute/path/.agent/workflows/dia.md", ...}
+    """
+    project_root = Path(__file__).parent.parent.parent
+    wf_dir = project_root / ".agent" / "workflows"
+    paths = {}
+    for wf_id in wf_ids:
+        clean = wf_id.lstrip("/")
+        wf_path = wf_dir / f"{clean}.md"
+        if wf_path.exists():
+            paths[wf_id] = str(wf_path.resolve())
+        else:
+            # エイリアス検索: boot+ → boot, dia+ → dia など
+            # (演算子付きの場合、ベース名で検索)
+            base = clean.rstrip("+-^!?'")
+            base_path = wf_dir / f"{base}.md"
+            if base_path.exists():
+                paths[wf_id] = str(base_path.resolve())
+    return paths
+
+
 def dispatch(ccl_expr: str) -> dict:
     """CCL 式をディスパッチ: パース → 構造表示 → 実行計画テンプレート
-    
+
     Returns:
-        dict with keys: success, ast, tree, workflows, plan_template, error
+        dict with keys: success, ast, tree, workflows, wf_paths,
+                        plan_template, error
     """
     from hermeneus.src.parser import CCLParser as _Parser
-    
+
     parser = _Parser()
     result = {
         "success": False,
@@ -117,10 +145,11 @@ def dispatch(ccl_expr: str) -> dict:
         "ast": None,
         "tree": "",
         "workflows": [],
+        "wf_paths": {},
         "plan_template": "",
         "error": None,
     }
-    
+
     # Step 0: パース
     try:
         ast = parser.parse(ccl_expr)
@@ -129,24 +158,35 @@ def dispatch(ccl_expr: str) -> dict:
     except Exception as e:
         result["error"] = str(e)
         return result
-    
+
     # Step 1: 木構造表示
     result["tree"] = format_ast_tree(ast)
-    
-    # Step 2: ワークフロー抽出
+
+    # Step 2: ワークフロー抽出 + パス解決
     result["workflows"] = extract_workflows(ast)
-    
+    result["wf_paths"] = resolve_wf_paths(result["workflows"])
+
     # Step 3: 実行計画テンプレート
     wf_list = ", ".join(result["workflows"])
+
+    # view_file コマンド一覧 (Agent がコピペで開ける)
+    view_cmds = "\n".join(
+        f"  view_file {p}" for p in result["wf_paths"].values()
+    )
+    if not view_cmds:
+        view_cmds = "  (WF 定義ファイルが見つかりません)"
+
     tmpl = f"""【CCL】{ccl_expr}
 【構造】
 {result['tree']}
 【関連WF】{wf_list}
+【WF定義】以下を view_file で開くこと:
+{view_cmds}
 【実行計画】(AI が AST 構造に基づいて記入)
 【/dia 反論】(AI が最低1つの懸念を提示)
 → これで進めてよいですか？"""
     result["plan_template"] = tmpl
-    
+
     return result
 
 
@@ -154,26 +194,28 @@ def main():
     """CLI エントリポイント"""
     if len(sys.argv) < 2:
         print("Usage: python hermeneus/src/dispatch.py '<CCL式>'")
-        print("Example: python hermeneus/src/dispatch.py '/dia+~*/noe'")
+        print("Example: python hermeneus/src/dispatch.py '/dia+~/noe'")
+        print("Example: python hermeneus/src/dispatch.py '(/dia+~/noe)~/pan+'")
         sys.exit(1)
-    
+
     ccl_expr = sys.argv[1]
-    
+
     print(f"{'='*60}")
     print(f"  Hermēneus CCL Dispatch")
     print(f"  入力: {ccl_expr}")
     print(f"{'='*60}")
     print()
-    
+
+    # 循環インポート回避: dispatch() 内でパーサーを遅延インポート
     result = dispatch(ccl_expr)
-    
+
     if not result["success"]:
         print(f"❌ Parse Error: {result['error']}")
         print()
         print("パーサー拡張が必要か、式の修正が必要です。")
         print("Creator に報告してください。")
         sys.exit(1)
-    
+
     print("✅ パース成功")
     print()
     print("── AST 構造 ──────────────────────────────")
@@ -181,12 +223,21 @@ def main():
     print()
     print(f"── 関連 WF: {', '.join(result['workflows'])} ──")
     print()
+
+    # WF 定義ファイルパス
+    if result["wf_paths"]:
+        print("── WF 定義ファイル (view_file で開け) ────")
+        for wf_id, path in result["wf_paths"].items():
+            print(f"  {wf_id} → {path}")
+        print()
+
     print("── 実行計画テンプレート ──────────────────")
     print(result["plan_template"])
     print()
     print("─" * 60)
-    print("↑ この出力を Creator に提示し、承認を得てから実行に移れ。")
+    print("↑ この出力を基に AST 順序で WF を実行せよ。")
 
 
 if __name__ == "__main__":
     main()
+

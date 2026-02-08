@@ -13,6 +13,14 @@ triggers:
   - "ワークフロー式"
   - "演算子"
 version: "1.0"
+risk_tier: L1
+risks:
+  - misinterpretation
+  - syntax_error
+reversible: true
+requires_approval: false
+fallbacks:
+  - manual_parse
 ---
 
 # Hermēneus CCL Dispatch

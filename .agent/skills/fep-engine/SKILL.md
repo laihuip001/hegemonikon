@@ -11,6 +11,14 @@ triggers:
   - "active inference"
   - "EFE"
   - "パイプライン"
+risk_tier: L2
+risks:
+  - high_compute_cost
+  - incomplete_model
+reversible: true
+requires_approval: false
+fallbacks:
+  - heuristic_eval
 ---
 
 # FEP Cognitive Engine

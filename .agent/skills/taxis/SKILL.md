@@ -9,6 +9,14 @@ triggers:
   - "振り分け"
   - "TODO"
   - "整理"
+risk_tier: L1
+risks:
+  - misclassification
+  - low_confidence
+reversible: true
+requires_approval: false
+fallbacks:
+  - manual_triage
 ---
 
 # Taxis Classifier

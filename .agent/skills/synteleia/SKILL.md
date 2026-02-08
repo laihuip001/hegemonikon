@@ -10,6 +10,14 @@ triggers:
   - "synteleia"
   - "免疫"
   - "検証"
+risk_tier: L2
+risks:
+  - security_bypass
+  - false_positive
+reversible: true
+requires_approval: true
+fallbacks:
+  - manual_check
 ---
 
 # Synteleia WBC (白血球)

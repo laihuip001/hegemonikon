@@ -10,6 +10,14 @@ triggers:
   - "多角"
   - "批評"
   - "/syn"
+risk_tier: L1
+risks:
+  - hallucination
+  - bias
+reversible: true
+requires_approval: false
+fallbacks:
+  - manual_review
 ---
 
 # Synedrion Council

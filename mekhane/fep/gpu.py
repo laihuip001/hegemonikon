@@ -28,6 +28,7 @@ except ImportError:
     TORCH_AVAILABLE = False
 
 
+# PURPOSE: CUDA 可用性チェック + デバイス選択
 def get_device(force_cpu: bool = False) -> "torch.device":
     """CUDA 可用性チェック + デバイス選択."""
     if not TORCH_AVAILABLE:
@@ -42,6 +43,7 @@ def get_device(force_cpu: bool = False) -> "torch.device":
     return torch.device("cpu")
 
 
+# PURPOSE: numpy → GPU tensor 変換
 def to_tensor(
     array: np.ndarray,
     device: Optional["torch.device"] = None,
@@ -59,6 +61,7 @@ def to_tensor(
     return torch.tensor(array, dtype=dtype, device=device)
 
 
+# PURPOSE: バッチ cosine similarity — 1 回の行列演算で全ターゲットとの類似度を計算
 def batch_cosine_similarity(
     query: "torch.Tensor",
     targets: "torch.Tensor",

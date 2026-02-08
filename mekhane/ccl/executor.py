@@ -164,6 +164,7 @@ class ZeroTrustCCLExecutor:
 
 
 # 便利関数
+# PURPOSE: CCL 式から LLM に渡すプロンプトを生成
 def create_ccl_prompt(ccl_expr: str) -> str:
 # PURPOSE: CCL 出力を検証
     """CCL 式から LLM に渡すプロンプトを生成"""
@@ -172,6 +173,7 @@ def create_ccl_prompt(ccl_expr: str) -> str:
     return context.injected_prompt
 
 
+# PURPOSE: CCL 出力を検証
 def validate_ccl_output(ccl_expr: str, output: str) -> ValidationResult:
     """CCL 出力を検証"""
     executor = ZeroTrustCCLExecutor()

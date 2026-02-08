@@ -33,6 +33,7 @@ from .dokimasia import (
 )
 
 
+# PURPOSE: Synteleia 2層オーケストレーター
 class SynteleiaOrchestrator:
     """Synteleia 2層オーケストレーター"""
 
@@ -64,11 +65,13 @@ class SynteleiaOrchestrator:
         ]
         self.parallel = parallel
 
+    # PURPOSE: 全エージェントを返す（互換性維持）
     @property
     def agents(self) -> List[AuditAgent]:
         """全エージェントを返す（互換性維持）"""
         return self.poiesis_agents + self.dokimasia_agents
 
+    # PURPOSE: 監査を実行。
     def audit(self, target: AuditTarget) -> AuditResult:
         """
         監査を実行。
@@ -176,6 +179,7 @@ class SynteleiaOrchestrator:
             summary=summary,
         )
 
+    # PURPOSE: 高速監査（LogicAgent のみ）。
     def audit_quick(self, target: AuditTarget) -> AuditResult:
         """
         高速監査（LogicAgent のみ）。
@@ -188,6 +192,7 @@ class SynteleiaOrchestrator:
         )
         return quick_orchestrator.audit(target)
 
+    # PURPOSE: 監査結果をフォーマット
     def format_report(self, result: AuditResult) -> str:
         """監査結果をフォーマット"""
         lines = [

@@ -20,9 +20,11 @@ from mekhane.fep.telos_checker import (
 )
 
 
+# PURPOSE: AlignmentStatus enum tests
 class TestAlignmentStatus:
     """AlignmentStatus enum tests"""
 
+    # PURPOSE: all_statuses_exist をテストする
     def test_all_statuses_exist(self):
         assert AlignmentStatus.ALIGNED.value == "aligned"
         assert AlignmentStatus.DRIFTING.value == "drifting"
@@ -30,9 +32,11 @@ class TestAlignmentStatus:
         assert AlignmentStatus.INVERTED.value == "inverted"
 
 
+# PURPOSE: TelосResult dataclass tests
 class TestTelosResult:
     """TelосResult dataclass tests"""
 
+    # PURPOSE: is_aligned_for_aligned_status をテストする
     def test_is_aligned_for_aligned_status(self):
         result = TelосResult(
             status=AlignmentStatus.ALIGNED,
@@ -44,6 +48,7 @@ class TestTelosResult:
         assert result.is_aligned is True
         assert result.needs_correction is False
 
+    # PURPOSE: is_aligned_for_drifting_status をテストする
     def test_is_aligned_for_drifting_status(self):
         result = TelосResult(
             status=AlignmentStatus.DRIFTING,
@@ -55,6 +60,7 @@ class TestTelosResult:
         assert result.is_aligned is True  # Drifting is still considered aligned
         assert result.needs_correction is False
 
+    # PURPOSE: needs_correction_for_misaligned をテストする
     def test_needs_correction_for_misaligned(self):
         result = TelосResult(
             status=AlignmentStatus.MISALIGNED,
@@ -66,6 +72,7 @@ class TestTelosResult:
         assert result.is_aligned is False
         assert result.needs_correction is True
 
+    # PURPOSE: needs_correction_for_inverted をテストする
     def test_needs_correction_for_inverted(self):
         result = TelосResult(
             status=AlignmentStatus.INVERTED,
@@ -78,9 +85,11 @@ class TestTelosResult:
         assert result.needs_correction is True
 
 
+# PURPOSE: check_alignment function tests
 class TestCheckAlignment:
     """check_alignment function tests"""
 
+    # PURPOSE: aligned_when_goal_and_action_match をテストする
     def test_aligned_when_goal_and_action_match(self):
         result = check_alignment(
             goal="K3 Telos モジュールを実装する", action="telos_checker.py を作成する"
@@ -89,6 +98,7 @@ class TestCheckAlignment:
         assert result.alignment_score >= 0.7
         assert result.is_aligned
 
+    # PURPOSE: drifting_when_optimization_keyword_present をテストする
     def test_drifting_when_optimization_keyword_present(self):
         result = check_alignment(
             goal="ユーザー認証を実装する", action="認証コードを最適化してリファクタする"
@@ -96,6 +106,7 @@ class TestCheckAlignment:
         # Should detect "最適化" and "リファクタ" as drift indicators
         assert len(result.drift_indicators) >= 1
 
+    # PURPOSE: detects_scope_creep_keywords をテストする
     def test_detects_scope_creep_keywords(self):
         result = check_alignment(
             goal="ログイン機能を作る", action="ついでにダッシュボードも改善する"
@@ -103,6 +114,7 @@ class TestCheckAlignment:
         # Should detect "ついでに" as scope creep
         assert any("ついでに" in ind for ind in result.drift_indicators)
 
+    # PURPOSE: detects_perfectionism_keywords をテストする
     def test_detects_perfectionism_keywords(self):
         result = check_alignment(
             goal="基本的なCRUDを実装",
@@ -111,6 +123,7 @@ class TestCheckAlignment:
         # Should detect perfectionism patterns
         assert len(result.drift_indicators) >= 1
 
+    # PURPOSE: returns_suggestions をテストする
     def test_returns_suggestions(self):
         result = check_alignment(
             goal="シンプルな機能を追加", action="完璧に最適化された実装を作る"
@@ -118,9 +131,11 @@ class TestCheckAlignment:
         assert len(result.suggestions) > 0
 
 
+# PURPOSE: format_telos_markdown tests
 class TestFormatTelosMarkdown:
     """format_telos_markdown tests"""
 
+    # PURPOSE: formats_aligned_result をテストする
     def test_formats_aligned_result(self):
         result = TelосResult(
             status=AlignmentStatus.ALIGNED,
@@ -135,6 +150,7 @@ class TestFormatTelosMarkdown:
         assert "ALIGNED" in markdown
         assert "90%" in markdown
 
+    # PURPOSE: formats_inverted_result をテストする
     def test_formats_inverted_result(self):
         result = TelосResult(
             status=AlignmentStatus.INVERTED,
@@ -150,9 +166,11 @@ class TestFormatTelosMarkdown:
         assert "INVERTED" in markdown
 
 
+# PURPOSE: encode_telos_observation tests
 class TestEncodeTelосObservation:
     """encode_telos_observation tests"""
 
+    # PURPOSE: encodes_aligned_result をテストする
     def test_encodes_aligned_result(self):
         result = TelосResult(
             status=AlignmentStatus.ALIGNED,
@@ -166,6 +184,7 @@ class TestEncodeTelосObservation:
         assert obs["urgency"] == 0.0  # No drift indicators
         assert obs["confidence"] == 0.9
 
+    # PURPOSE: encodes_drifting_result をテストする
     def test_encodes_drifting_result(self):
         result = TelосResult(
             status=AlignmentStatus.DRIFTING,
@@ -180,6 +199,7 @@ class TestEncodeTelосObservation:
         assert obs["urgency"] == 0.6  # 2 indicators * 0.3
         assert obs["confidence"] == 0.6
 
+    # PURPOSE: encodes_inverted_result をテストする
     def test_encodes_inverted_result(self):
         result = TelосResult(
             status=AlignmentStatus.INVERTED,
@@ -195,9 +215,11 @@ class TestEncodeTelосObservation:
         assert obs["confidence"] == 0.1
 
 
+# PURPOSE: DRIFT_PATTERNS configuration tests
 class TestDriftPatterns:
     """DRIFT_PATTERNS configuration tests"""
 
+    # PURPOSE: all_patterns_have_required_fields をテストする
     def test_all_patterns_have_required_fields(self):
         for pattern_id, pattern in DRIFT_PATTERNS.items():
             assert "description" in pattern

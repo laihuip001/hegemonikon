@@ -115,16 +115,19 @@ NUM_ACTIONS_V2 = len(ACTIONS_V2)  # 7
 # =============================================================================
 
 
+# PURPOSE: Return total hidden state dimension for v2 model
 def get_state_dim_v2() -> int:
     """Return total hidden state dimension for v2 model."""
     return NUM_STATES_V2
 
 
+# PURPOSE: Return observation dimensions for v2 model
 def get_obs_dim_v2() -> Dict[str, int]:
     """Return observation dimensions for v2 model."""
     return {k: len(v) for k, v in OBSERVATION_MODALITIES_V2.items()}
 
 
+# PURPOSE: Convert 4-factor state to flat index
 def state_to_index_v2(
     phantasia: str, assent: str, horme: str, series: str
 ) -> int:
@@ -149,6 +152,7 @@ def state_to_index_v2(
     )
 
 
+# PURPOSE: Convert flat index to 4-factor state names
 def index_to_state_v2(idx: int) -> Tuple[str, str, str, str]:
     """Convert flat index to 4-factor state names.
 
@@ -172,6 +176,7 @@ def index_to_state_v2(idx: int) -> Tuple[str, str, str, str]:
     )
 
 
+# PURPOSE: Convert action index to human-readable name
 def action_name_v2(action_idx: int) -> str:
     """Convert action index to human-readable name."""
     if 0 <= action_idx < len(ACTIONS_V2):
@@ -179,6 +184,7 @@ def action_name_v2(action_idx: int) -> str:
     return f"unknown_{action_idx}"
 
 
+# PURPOSE: Get the Series associated with an action (None for observe)
 def action_to_series(action_idx: int) -> str | None:
     """Get the Series associated with an action (None for observe)."""
     name = action_name_v2(action_idx)

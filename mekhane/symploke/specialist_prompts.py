@@ -17,6 +17,7 @@ from enum import Enum
 from typing import Optional
 
 
+# PURPOSE: tekhne-maker 5 Archetypes
 class Archetype(Enum):
     """tekhne-maker 5 Archetypes"""
 
@@ -27,6 +28,7 @@ class Archetype(Enum):
     SAFETY = "safety"  # 🛡 リスク = 0
 
 
+# PURPOSE: 発見事項の重大度
 class Severity(Enum):
     """発見事項の重大度"""
 
@@ -37,6 +39,7 @@ class Severity(Enum):
     NONE = "none"  # 問題なし
 
 
+# PURPOSE: 専門家定義
 @dataclass
 class SpecialistDefinition:
     """専門家定義"""
@@ -729,6 +732,7 @@ PHASE1_SPECIALISTS = (
 _ALL_SPECIALISTS_CACHE = None
 
 
+# PURPOSE: 全専門家リストを取得 (Phase 0-3: 866人)
 def get_all_specialists():
     """全専門家リストを取得 (Phase 0-3: 866人)"""
     global _ALL_SPECIALISTS_CACHE
@@ -752,6 +756,7 @@ def get_all_specialists():
 ALL_SPECIALISTS = PHASE1_SPECIALISTS
 
 
+# PURPOSE: tekhne-maker 形式の専門家レビュープロンプトを生成
 def generate_prompt(
     spec: SpecialistDefinition, target_file: str, output_dir: str = "docs/reviews"
 ) -> str:
@@ -802,6 +807,7 @@ def generate_prompt(
     return prompt.strip()
 
 
+# PURPOSE: カテゴリ別に専門家を取得
 def get_specialists_by_category(
     category: str, include_all_phases: bool = False
 ) -> list[SpecialistDefinition]:
@@ -810,6 +816,7 @@ def get_specialists_by_category(
     return [s for s in specialists if s.category == category]
 
 
+# PURPOSE: アーキタイプ別に専門家を取得
 def get_specialists_by_archetype(
     archetype: Archetype, include_all_phases: bool = False
 ) -> list[SpecialistDefinition]:
@@ -818,6 +825,7 @@ def get_specialists_by_archetype(
     return [s for s in specialists if s.archetype == archetype]
 
 
+# PURPOSE: 全カテゴリを取得
 def get_all_categories(include_all_phases: bool = False) -> list[str]:
     """全カテゴリを取得"""
     specialists = get_all_specialists() if include_all_phases else ALL_SPECIALISTS

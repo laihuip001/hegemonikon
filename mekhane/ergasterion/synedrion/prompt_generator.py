@@ -165,6 +165,7 @@ class PerspectiveMatrix:
 # =============================================================================
 
 
+# PURPOSE: CLI entry point
 def main():
     """CLI entry point."""
     import argparse

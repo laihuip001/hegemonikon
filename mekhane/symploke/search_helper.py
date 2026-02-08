@@ -22,6 +22,7 @@ SOPHIA_INDEX_PATH = Path("/home/makaron8426/oikos/mneme/.hegemonikon/indices/sop
 KAIROS_INDEX_PATH = Path("/home/makaron8426/oikos/mneme/.hegemonikon/indices/kairos.pkl")
 
 
+# PURPOSE: Load an adapter from a pickle file
 def load_adapter(path: Path) -> EmbeddingAdapter:
     """Load an adapter from a pickle file."""
     adapter = EmbeddingAdapter()
@@ -29,12 +30,14 @@ def load_adapter(path: Path) -> EmbeddingAdapter:
     return adapter
 
 
+# PURPOSE: Search using an adapter
 def search_index(adapter: EmbeddingAdapter, query: str, top_k: int = 5):
     """Search using an adapter."""
     query_vec = adapter.encode([query])[0]
     return adapter.search(query_vec, k=top_k)
 
 
+# PURPOSE: 統合検索: Sophia + Kairos を横断検索
 def unified_search(query: str, sources: list[str] = None, top_k: int = 5):
     """
     統合検索: Sophia + Kairos を横断検索
@@ -67,6 +70,7 @@ def unified_search(query: str, sources: list[str] = None, top_k: int = 5):
     return all_results[: top_k * 2]
 
 
+# PURPOSE: main の処理
 def main():
     parser = argparse.ArgumentParser(description="Symploke unified search")
     parser.add_argument("query", type=str, help="Search query")

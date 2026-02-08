@@ -8,12 +8,14 @@ import pytest
 from mekhane.anamnesis.vault import VaultManager
 
 
+# PURPOSE: dir をテストする
 @pytest.fixture
 def test_dir():  # noqa: AI-ALL
     with tempfile.TemporaryDirectory() as d:
         yield Path(d)
 
 
+# PURPOSE: Test writing a new file
 def test_write_new_file(test_dir):
     """Test writing a new file."""
     file_path = test_dir / "test.txt"
@@ -25,6 +27,7 @@ def test_write_new_file(test_dir):
     assert file_path.read_text(encoding="utf-8") == content
 
 
+# PURPOSE: Test overwriting an existing file creates a backup
 def test_write_overwrite_backup(test_dir):
     """Test overwriting an existing file creates a backup."""
     file_path = test_dir / "test.txt"
@@ -42,6 +45,7 @@ def test_write_overwrite_backup(test_dir):
     assert backup_path.read_text(encoding="utf-8") == content1
 
 
+# PURPOSE: Test reading a file safely
 def test_read_safe(test_dir):
     """Test reading a file safely."""
     file_path = test_dir / "read_test.txt"
@@ -53,6 +57,7 @@ def test_read_safe(test_dir):
     assert read_content == content
 
 
+# PURPOSE: Test reading from backup when main file is missing
 def test_read_backup_when_main_missing(test_dir):
     """Test reading from backup when main file is missing."""
     file_path = test_dir / "missing.txt"
@@ -76,6 +81,7 @@ def test_read_backup_when_main_missing(test_dir):
     assert read_content == content
 
 
+# PURPOSE: Test reading a non-existent file fails
 def test_read_fail_no_file(test_dir):
     """Test reading a non-existent file fails."""
     file_path = test_dir / "non_existent.txt"

@@ -19,52 +19,64 @@ class TestInferPurpose(unittest.TestCase):
         result = infer_purpose("func", "function", "日本語の説明文です")
         self.assertEqual(result, "日本語の説明文です")
 
+    # PURPOSE: docstring_english をテストする
     def test_docstring_english(self):
         result = infer_purpose("func", "function", "Short English description")
         self.assertEqual(result, "Short English description")
 
+    # PURPOSE: get_prefix をテストする
     def test_get_prefix(self):
         result = infer_purpose("get_user_data", "function")
         self.assertIn("取得", result)
         self.assertIn("get_user_data", result)
 
+    # PURPOSE: set_prefix をテストする
     def test_set_prefix(self):
         result = infer_purpose("set_config", "function")
         self.assertIn("設定/保存", result)
 
+    # PURPOSE: check_prefix をテストする
     def test_check_prefix(self):
         result = infer_purpose("check_validity", "function")
         self.assertIn("検証", result)
 
+    # PURPOSE: create_prefix をテストする
     def test_create_prefix(self):
         result = infer_purpose("create_report", "function")
         self.assertIn("生成", result)
 
+    # PURPOSE: test_prefix をテストする
     def test_test_prefix(self):
         result = infer_purpose("test_something", "function")
         self.assertIn("テスト", result)
 
+    # PURPOSE: init_method をテストする
     def test_init_method(self):
         result = infer_purpose("__init__", "function")
         self.assertIn("初期化", result)
 
+    # PURPOSE: private_method をテストする
     def test_private_method(self):
         result = infer_purpose("_internal_helper", "function")
         self.assertIn("内部処理", result)
 
+    # PURPOSE: class_fallback をテストする
     def test_class_fallback(self):
         result = infer_purpose("MyService", "class")
         self.assertIn("クラス", result)
 
+    # PURPOSE: function_fallback をテストする
     def test_function_fallback(self):
         result = infer_purpose("mysterious_action", "function")
         self.assertIn("関数", result)
 
+    # PURPOSE: docstring_truncation をテストする
     def test_docstring_truncation(self):
         long_doc = "A" * 200
         result = infer_purpose("func", "function", long_doc)
         self.assertLessEqual(len(result), 80)
 
+    # PURPOSE: docstring_multiline_first_line_only をテストする
     def test_docstring_multiline_first_line_only(self):
         doc = "First line.\nSecond line with details."
         result = infer_purpose("func", "function", doc)
@@ -80,6 +92,7 @@ class TestAddPurposeComments(unittest.TestCase):
         f.close()
         return Path(f.name)
 
+    # PURPOSE: dry_run_counts_additions をテストする
     def test_dry_run_counts_additions(self):
         path = self._make_temp_file("""\
             def hello():
@@ -117,6 +130,7 @@ class TestAddPurposeComments(unittest.TestCase):
         finally:
             path.unlink()
 
+    # PURPOSE: skips_existing_purpose をテストする
     def test_skips_existing_purpose(self):
         path = self._make_temp_file("""\
             # PURPOSE: Already documented
@@ -133,6 +147,7 @@ class TestAddPurposeComments(unittest.TestCase):
         finally:
             path.unlink()
 
+    # PURPOSE: handles_syntax_error をテストする
     def test_handles_syntax_error(self):
         path = self._make_temp_file("""\
             this is not valid python !!!
@@ -143,6 +158,7 @@ class TestAddPurposeComments(unittest.TestCase):
         finally:
             path.unlink()
 
+    # PURPOSE: preserves_indentation をテストする
     def test_preserves_indentation(self):
         path = self._make_temp_file("""\
             class Outer:
@@ -162,6 +178,7 @@ class TestAddPurposeComments(unittest.TestCase):
         finally:
             path.unlink()
 
+    # PURPOSE: docstring_extraction をテストする
     def test_docstring_extraction(self):
         path = self._make_temp_file('''\
             def with_docstring():

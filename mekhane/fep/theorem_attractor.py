@@ -340,6 +340,7 @@ assert len(THEOREM_KEYS) == 24
 # Data Classes
 # ---------------------------------------------------------------------------
 
+# PURPOSE: 定理レベルの attractor 収束結果
 @dataclass
 class TheoremResult:
     """定理レベルの attractor 収束結果"""
@@ -353,6 +354,7 @@ class TheoremResult:
         return f"⟨{self.theorem}: {self.name} | sim={self.similarity:.3f}⟩"
 
 
+# PURPOSE: X-series flow simulation の各ステップ
 @dataclass
 class FlowState:
     """X-series flow simulation の各ステップ"""
@@ -365,6 +367,7 @@ class FlowState:
         return f"⟨Step {self.step}: {tops}⟩"
 
 
+# PURPOSE: Flow simulation の完全な結果
 @dataclass
 class FlowResult:
     """Flow simulation の完全な結果"""
@@ -378,6 +381,7 @@ class FlowResult:
         return f"⟨Flow: {tops} | converged={self.converged_at}⟩"
 
 
+# PURPOSE: Monte Carlo basin detection の結果
 @dataclass
 class BasinResult:
     """Monte Carlo basin detection の結果"""
@@ -396,6 +400,7 @@ class BasinResult:
 # TheoremAttractor
 # ---------------------------------------------------------------------------
 
+# PURPOSE: 24 定理レベルの Attractor Engine + X-series Flow Simulator
 class TheoremAttractor:
     """24 定理レベルの Attractor Engine + X-series Flow Simulator
 
@@ -484,6 +489,7 @@ class TheoremAttractor:
 
     # --- 1. Theorem-Level Attractor ---
 
+    # PURPOSE: 入力に最も引力の強い定理を返す
     def suggest(self, user_input: str, top_k: int = 5) -> list[TheoremResult]:
         """入力に最も引力の強い定理を返す."""
         self._ensure_initialized()
@@ -503,6 +509,7 @@ class TheoremAttractor:
 
     # --- 2. X-series Flow Simulation ---
 
+    # PURPOSE: 入力の初期 activation を X-series 遷移行列で伝播シミュレーション
     def simulate_flow(
         self,
         user_input: str,
@@ -585,6 +592,7 @@ class TheoremAttractor:
 
     # --- 3. Monte Carlo Basin Detection ---
 
+    # PURPOSE: ランダム embedding でバッチ basin detection — GPU の真の居場所
     def detect_basins(self, n_samples: int = 10000) -> BasinResult:
         """ランダム embedding でバッチ basin detection — GPU の真の居場所.
 
@@ -703,6 +711,7 @@ class TheoremAttractor:
 # CLI
 # ---------------------------------------------------------------------------
 
+# PURPOSE: CLI: python -m mekhane.fep.theorem_attractor "入力テキスト"
 def main() -> None:
     """CLI: python -m mekhane.fep.theorem_attractor \"入力テキスト\" """
     import sys

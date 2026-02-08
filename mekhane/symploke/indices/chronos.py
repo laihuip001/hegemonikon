@@ -13,6 +13,7 @@ from .base import DomainIndex, SourceType, Document, IndexedResult
 from ..adapters.base import VectorStoreAdapter
 
 
+# PURPOSE: Chronos: チャット履歴のインデックス
 class ChronosIndex(DomainIndex):
     """
     Chronos: チャット履歴のインデックス
@@ -51,6 +52,7 @@ class ChronosIndex(DomainIndex):
         self._decay_rate = decay_rate
         self._doc_store: Dict[str, Document] = {}
 
+    # PURPOSE: source_type の処理
     @property
     def source_type(self) -> SourceType:
         return SourceType.CHRONOS
@@ -73,6 +75,7 @@ class ChronosIndex(DomainIndex):
         decay = np.exp(-self._decay_rate * age_hours / 24)  # 日単位で減衰
         return score * decay
 
+    # PURPOSE: チャット履歴をインジェスト
     def ingest(self, documents: List[Document]) -> int:
         """
         チャット履歴をインジェスト
@@ -109,6 +112,7 @@ class ChronosIndex(DomainIndex):
 
         return len(documents)
 
+    # PURPOSE: チャット履歴を検索
     def search(
         self,
         query: str,

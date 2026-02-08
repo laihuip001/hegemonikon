@@ -76,6 +76,7 @@ API_KEYS = [
 _RETRYABLE_CODES = {400, 429, 500, 503}
 
 
+# PURPOSE: Jules セッションを作成 (リトライ付き)
 async def create_session(
     key: str,
     spec: Specialist,
@@ -146,6 +147,7 @@ async def create_session(
         }
 
 
+# PURPOSE: 専門家バッチ実行 (レート制限 + リトライ付き)
 async def run_batch(
     specialists: list[Specialist],
     target_file: str,
@@ -171,6 +173,7 @@ async def run_batch(
     dispatch_lock = asyncio.Lock()
     dispatch_count = [0]  # mutable counter
 
+    # PURPOSE: bounded_create の処理
     async def bounded_create(i: int, spec: Specialist):
         key_idx = i % len(API_KEYS)
         key = API_KEYS[key_idx]
@@ -198,6 +201,7 @@ async def run_batch(
     return list(results)
 
 
+# PURPOSE: セッション状態を確認
 async def check_session_status(session_id: str, key: str) -> dict:
     """セッション状態を確認"""
     headers = {"X-Goog-Api-Key": key}
@@ -213,6 +217,7 @@ async def check_session_status(session_id: str, key: str) -> dict:
             return {"error": resp.status}
 
 
+# PURPOSE: メイン実行
 async def main():
     """メイン実行"""
     import argparse

@@ -10,6 +10,7 @@ import numpy as np
 from .base import VectorStoreAdapter, SearchResult
 
 
+# PURPOSE: テスト用 Mock アダプタ
 class MockAdapter(VectorStoreAdapter):
     """
     テスト用 Mock アダプタ
@@ -30,14 +31,17 @@ class MockAdapter(VectorStoreAdapter):
         self._metadata: Dict[int, Dict[str, Any]] = {}
         self._next_id: int = 0
 
+    # PURPOSE: name の処理
     @property
     def name(self) -> str:
         return "mock"
 
+    # PURPOSE: dimension の処理
     @property
     def dimension(self) -> Optional[int]:
         return self._dimension
 
+    # PURPOSE: index を生成する
     def create_index(
         self, dimension: int, index_name: str = "default", **kwargs
     ) -> None:
@@ -46,6 +50,7 @@ class MockAdapter(VectorStoreAdapter):
         self._metadata = {}
         self._next_id = 0
 
+    # PURPOSE: vectors を追加する
     def add_vectors(
         self,
         vectors: np.ndarray,
@@ -77,6 +82,7 @@ class MockAdapter(VectorStoreAdapter):
 
         return ids
 
+    # PURPOSE: search を検索する
     def search(
         self, query: np.ndarray, k: int = 10, threshold: Optional[float] = None
     ) -> List[SearchResult]:
@@ -99,20 +105,25 @@ class MockAdapter(VectorStoreAdapter):
 
         return results
 
+    # PURPOSE: delete を削除する
     def delete(self, ids: List[int]) -> int:
         # Mock: 削除はサポートしない（テスト用）
         raise NotImplementedError("MockAdapter does not support delete")
 
+    # PURPOSE: save を保存する
     def save(self, path: str) -> None:
         # Mock: 永続化は何もしない
         pass
 
+    # PURPOSE: load をロードする
     def load(self, path: str) -> None:
         # Mock: 読み込みは何もしない
         pass
 
+    # PURPOSE: count の処理
     def count(self) -> int:
         return len(self._vectors)
 
+    # PURPOSE: metadata を取得する
     def get_metadata(self, id: int) -> Optional[Dict[str, Any]]:
         return self._metadata.get(id)

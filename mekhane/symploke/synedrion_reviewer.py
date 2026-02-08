@@ -22,6 +22,7 @@ from mekhane.symploke.jules_client import JulesClient, JulesResult
 logger = logging.getLogger(__name__)
 
 
+# PURPOSE: Synedrion v2.1 review orchestrator
 class SynedrionReviewer:
     """
     Synedrion v2.1 review orchestrator.
@@ -47,6 +48,7 @@ class SynedrionReviewer:
         self.client = client
         self.batch_size = batch_size or client.MAX_CONCURRENT
     
+    # PURPOSE: Execute Synedrion v2.1 multi-perspective review
     async def review(
         self,
         source: str,
@@ -154,6 +156,7 @@ class SynedrionReviewer:
         return all_results
 
 
+# PURPOSE: Convenience function to run a review with default settings
 async def run_review(
     source: str,
     api_key: Optional[str] = None,

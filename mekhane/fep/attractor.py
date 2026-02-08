@@ -370,6 +370,7 @@ class SuggestResult:
         return f"⟨{names} | {self.oscillation.value} | top={self.top_similarity:.3f}⟩"
 
 
+# PURPOSE: 分解された各セグメントの結果
 @dataclass
 class SegmentResult:
     """分解された各セグメントの結果"""
@@ -383,6 +384,7 @@ class SegmentResult:
         return f"⟨'{self.text[:30]}...' → {series}⟩"
 
 
+# PURPOSE: decompose() の結果: 各セグメント + マージされた結果
 @dataclass
 class DecomposeResult:
     """decompose() の結果: 各セグメント + マージされた結果"""
@@ -406,6 +408,7 @@ class DecomposeResult:
 # SeriesAttractor
 # ---------------------------------------------------------------------------
 
+# PURPOSE: 6 Series の Attractor Engine
 class SeriesAttractor:
     """
     6 Series の Attractor Engine
@@ -858,6 +861,7 @@ class SeriesAttractor:
 # CLI entry point
 # ---------------------------------------------------------------------------
 
+# PURPOSE: CLI: python -m mekhane.fep.attractor "入力テキスト"
 def main() -> None:
     """CLI: python -m mekhane.fep.attractor "入力テキスト" """
     if len(sys.argv) < 2:

@@ -21,6 +21,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 from mekhane.symploke.kairos_ingest import get_conversation_files
 
 
+# PURPOSE: 抽出された洞察
 @dataclass
 class Insight:
     """抽出された洞察"""
@@ -60,6 +61,7 @@ INSIGHT_PATTERNS = {
 }
 
 
+# PURPOSE: マッチ周辺のコンテキストを抽出
 def extract_context(content: str, match_start: int, context_size: int = 200) -> str:
     """マッチ周辺のコンテキストを抽出"""
     start = max(0, match_start - context_size)
@@ -67,6 +69,7 @@ def extract_context(content: str, match_start: int, context_size: int = 200) -> 
     return content[start:end].strip()
 
 
+# PURPOSE: 洞察の品質をスコアリング (0.0 - 1.0)
 def score_insight_quality(text: str) -> float:
     """洞察の品質をスコアリング (0.0 - 1.0)"""
     score = 0.5  # ベーススコア
@@ -96,6 +99,7 @@ def score_insight_quality(text: str) -> float:
     return max(0.0, min(1.0, score))
 
 
+# PURPOSE: 洞察テキストをクリーニング
 def clean_insight_text(text: str) -> str:
     """洞察テキストをクリーニング"""
     # 末尾のノイズを除去
@@ -112,6 +116,7 @@ def clean_insight_text(text: str) -> str:
     return text.strip()
 
 
+# PURPOSE: 会話ログから洞察を抽出（フィルタリング付き）
 def mine_insights(
     file_path: Path, categories: Optional[List[str]] = None, min_quality: float = 0.4
 ) -> List[Insight]:
@@ -156,6 +161,7 @@ def mine_insights(
     return insights
 
 
+# PURPOSE: 全ログから洞察を抽出
 def mine_all_logs(
     limit: Optional[int] = None, categories: Optional[List[str]] = None
 ) -> List[Insight]:
@@ -172,6 +178,7 @@ def mine_all_logs(
     return all_insights
 
 
+# PURPOSE: KI候補レポートを生成
 def generate_ki_candidates(insights: List[Insight]) -> str:
     """KI候補レポートを生成"""
     lines = ["# 埋もれた洞察レポート\n"]
@@ -191,6 +198,7 @@ def generate_ki_candidates(insights: List[Insight]) -> str:
     return "\n".join(lines)
 
 
+# PURPOSE: main の処理
 def main():
     parser = argparse.ArgumentParser(description="Mine insights from conversation logs")
     parser.add_argument("--limit", type=int, help="Limit number of files to process")

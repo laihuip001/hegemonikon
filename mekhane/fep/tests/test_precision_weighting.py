@@ -17,18 +17,22 @@ from mekhane.fep.fep_agent import HegemonikónFEPAgent
 from mekhane.fep.state_spaces import OBSERVATION_MODALITIES
 
 
+# PURPOSE: Precision Weighting のテスト
 class TestPrecisionWeighting:
     """Precision Weighting のテスト"""
 
+    # PURPOSE: agent の処理
     @pytest.fixture
     def agent(self):
         return HegemonikónFEPAgent(use_defaults=True)
 
+    # PURPOSE: 初期精度は全 modality で 1.0
     def test_initial_precision_uniform(self, agent: HegemonikónFEPAgent):
         """初期精度は全 modality で 1.0"""
         for modality, weight in agent.precision_weights.items():
             assert weight == 1.0, f"{modality} should start at 1.0"
 
+    # PURPOSE: 正確な予測後、精度が維持される (1.0 に近い)
     def test_accurate_prediction_increases_precision(self, agent: HegemonikónFEPAgent):
         """正確な予測後、精度が維持される (1.0 に近い)"""
         # Same observation = perfect accuracy
@@ -36,6 +40,7 @@ class TestPrecisionWeighting:
         for modality, weight in agent.precision_weights.items():
             assert weight >= 0.99, f"{modality} should stay near 1.0 after match"
 
+    # PURPOSE: 不正確な予測後、精度が下がる
     def test_inaccurate_prediction_decreases_precision(self, agent: HegemonikónFEPAgent):
         """不正確な予測後、精度が下がる"""
         # Very different observations
@@ -44,6 +49,7 @@ class TestPrecisionWeighting:
         any_decreased = any(w < 1.0 for w in agent.precision_weights.values())
         assert any_decreased, "At least one modality should decrease on mismatch"
 
+    # PURPOSE: 繰り返しの予測誤差で精度が収束的に低下する
     def test_repeated_errors_converge_lower(self, agent: HegemonikónFEPAgent):
         """繰り返しの予測誤差で精度が収束的に低下する"""
         initial = dict(agent.precision_weights)
@@ -54,6 +60,7 @@ class TestPrecisionWeighting:
                 f"{modality} should be lower after repeated errors"
             )
 
+    # PURPOSE: _apply_precision がA行列を変更する
     def test_apply_precision_modifies_A(self, agent: HegemonikónFEPAgent):
         """_apply_precision がA行列を変更する"""
         # Cache base A
@@ -78,6 +85,7 @@ class TestPrecisionWeighting:
         context_diff = np.abs(current_A[:context_dim] - base_A[:context_dim]).sum()
         assert context_diff > 0.01, "Context rows should change with low precision"
 
+    # PURPOSE: precision scaling 後もA行列の列が正規化されている
     def test_apply_precision_preserves_normalization(self, agent: HegemonikónFEPAgent):
         """precision scaling 後もA行列の列が正規化されている"""
         agent.precision_weights["urgency"] = 0.5
@@ -95,6 +103,7 @@ class TestPrecisionWeighting:
         np.testing.assert_allclose(col_sums, 1.0, atol=1e-10,
                                    err_msg="Columns should sum to 1.0")
 
+    # PURPOSE: step() が precision_weights を返す
     def test_step_includes_precision_weights(self, agent: HegemonikónFEPAgent):
         """step() が precision_weights を返す"""
         result = agent.step(observation=3)
@@ -102,22 +111,26 @@ class TestPrecisionWeighting:
         assert isinstance(result["precision_weights"], dict)
         assert set(result["precision_weights"].keys()) == {"context", "urgency", "confidence"}
 
+    # PURPOSE: step() が precision_update を history に記録する
     def test_step_records_precision_in_history(self, agent: HegemonikónFEPAgent):
         """step() が precision_update を history に記録する"""
         agent.step(observation=3)
         precision_updates = [h for h in agent.get_history() if h["type"] == "precision_update"]
         assert len(precision_updates) >= 1, "step should record precision_update"
 
+    # PURPOSE: _decompose_observation: high flat_idx → context=clear
     def test_decompose_observation_context(self):
         """_decompose_observation: high flat_idx → context=clear"""
         result = HegemonikónFEPAgent._decompose_observation(5)
         assert result["context"] == 1, "flat_idx >= 4 should be clear context"
 
+    # PURPOSE: _decompose_observation: low flat_idx → context=ambiguous
     def test_decompose_observation_low(self):
         """_decompose_observation: low flat_idx → context=ambiguous"""
         result = HegemonikónFEPAgent._decompose_observation(1)
         assert result["context"] == 0, "flat_idx < 4 should be ambiguous context"
 
+    # PURPOSE: _get_predicted_observation が valid な確率分布を返す
     def test_get_predicted_observation(self, agent: HegemonikónFEPAgent):
         """_get_predicted_observation が valid な確率分布を返す"""
         pred = agent._get_predicted_observation()

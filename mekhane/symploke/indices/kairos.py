@@ -13,6 +13,7 @@ from .base import DomainIndex, SourceType, Document, IndexedResult
 from ..adapters.base import VectorStoreAdapter
 
 
+# PURPOSE: Kairos: Handoff (セッション間文脈) のインデックス
 class KairosIndex(DomainIndex):
     """
     Kairos: Handoff (セッション間文脈) のインデックス
@@ -48,6 +49,7 @@ class KairosIndex(DomainIndex):
         self._embed_fn = embed_fn
         self._doc_store: Dict[str, Document] = {}
 
+    # PURPOSE: source_type の処理
     @property
     def source_type(self) -> SourceType:
         return SourceType.KAIROS
@@ -60,6 +62,7 @@ class KairosIndex(DomainIndex):
             # Stub mode
             return np.random.randn(self._dimension).astype(np.float32)
 
+    # PURPOSE: Handoff をインジェスト
     def ingest(self, documents: List[Document]) -> int:
         """
         Handoff をインジェスト
@@ -96,6 +99,7 @@ class KairosIndex(DomainIndex):
 
         return len(documents)
 
+    # PURPOSE: Handoff を検索
     def search(
         self,
         query: str,
@@ -154,6 +158,7 @@ class KairosIndex(DomainIndex):
 
         return results[:k]
 
+    # PURPOSE: 未完了タスクを取得
     def get_pending_tasks(self) -> List[Dict[str, Any]]:
         """
         未完了タスクを取得

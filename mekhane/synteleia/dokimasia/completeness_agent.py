@@ -21,6 +21,7 @@ from ..base import (
 )
 
 
+# PURPOSE: 完全性検証エージェント
 class CompletenessAgent(AuditAgent):
     """完全性検証エージェント"""
 
@@ -72,6 +73,7 @@ class CompletenessAgent(AuditAgent):
         (r"except[^:]*:\s*\n\s*pass\s*$", "COMP-014", "空の except ブロック"),
     ]
 
+    # PURPOSE: 完全性を監査
     def audit(self, target: AuditTarget) -> AgentResult:
         """完全性を監査"""
         issues: List[AuditIssue] = []
@@ -196,6 +198,7 @@ class CompletenessAgent(AuditAgent):
 
         return issues
 
+    # PURPOSE: 全タイプをサポート
     def supports(self, target_type: AuditTargetType) -> bool:
         """全タイプをサポート"""
         return True

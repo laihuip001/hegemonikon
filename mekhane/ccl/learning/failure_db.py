@@ -191,6 +191,7 @@ class FailureDB:
 _db_instance: Optional[FailureDB] = None
 
 
+# PURPOSE: FailureDB のシングルトンを取得
 def get_failure_db() -> FailureDB:
     """FailureDB のシングルトンを取得"""
     global _db_instance

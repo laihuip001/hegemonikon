@@ -50,9 +50,11 @@ def _make_mock_result(handoff_count: int = 3, ki_count: int = 2) -> dict:
     }
 
 
+# PURPOSE: Template generation tests
 class TestGenerateBootTemplate:
     """Template generation tests."""
 
+    # PURPOSE: template_creates_file をテストする
     def test_template_creates_file(self):
         result = _make_mock_result(handoff_count=10, ki_count=5)
         path = generate_boot_template(result)
@@ -61,6 +63,7 @@ class TestGenerateBootTemplate:
         assert "# Boot Report" in content
         path.unlink()
 
+    # PURPOSE: template_has_fill_markers をテストする
     def test_template_has_fill_markers(self):
         result = _make_mock_result(handoff_count=10, ki_count=5)
         path = generate_boot_template(result)
@@ -69,6 +72,7 @@ class TestGenerateBootTemplate:
         assert fill_count > 0, "No FILL markers in template"
         path.unlink()
 
+    # PURPOSE: template_has_required_markers をテストする
     def test_template_has_required_markers(self):
         result = _make_mock_result(handoff_count=10, ki_count=5)
         path = generate_boot_template(result)
@@ -80,6 +84,7 @@ class TestGenerateBootTemplate:
         )
         path.unlink()
 
+    # PURPOSE: template_has_handoff_sections をテストする
     def test_template_has_handoff_sections(self):
         result = _make_mock_result(handoff_count=10, ki_count=5)
         path = generate_boot_template(result)
@@ -89,6 +94,7 @@ class TestGenerateBootTemplate:
         assert handoff_sections == 10, f"Expected 10 Handoff sections, got {handoff_sections}"
         path.unlink()
 
+    # PURPOSE: When fewer than 5 KIs are available, create placeholders
     def test_template_fills_ki_placeholders(self):
         """When fewer than 5 KIs are available, create placeholders."""
         result = _make_mock_result(handoff_count=2, ki_count=2)
@@ -99,6 +105,7 @@ class TestGenerateBootTemplate:
         assert ki_sections == 5, f"Expected 5 KI sections (2 real + 3 placeholder), got {ki_sections}"
         path.unlink()
 
+    # PURPOSE: template_has_checklist をテストする
     def test_template_has_checklist(self):
         result = _make_mock_result()
         path = generate_boot_template(result)
@@ -107,14 +114,17 @@ class TestGenerateBootTemplate:
         path.unlink()
 
 
+# PURPOSE: Postcheck validation tests
 class TestPostcheckBootReport:
     """Postcheck validation tests."""
 
+    # PURPOSE: missing_file_fails をテストする
     def test_missing_file_fails(self):
         result = postcheck_boot_report("/tmp/nonexistent_boot_report.md", mode="detailed")
         assert not result["passed"]
         assert "File not found" in result["formatted"]
 
+    # PURPOSE: A raw template with FILL markers should FAIL
     def test_unfilled_template_fails(self):
         """A raw template with FILL markers should FAIL."""
         mock_result = _make_mock_result(handoff_count=10, ki_count=5)
@@ -126,6 +136,7 @@ class TestPostcheckBootReport:
         assert not unfilled_check["passed"], "Unfilled sections should be detected"
         path.unlink()
 
+    # PURPOSE: A fully filled template should PASS all checks
     def test_filled_template_passes(self):
         """A fully filled template should PASS all checks."""
         mock_result = _make_mock_result(handoff_count=10, ki_count=5)
@@ -149,6 +160,7 @@ class TestPostcheckBootReport:
         assert result["passed"], f"Filled template should PASS: {result['formatted']}"
         path.unlink()
 
+    # PURPOSE: Standard mode should have lower requirements than detailed
     def test_standard_mode_has_lower_requirements(self):
         """Standard mode should have lower requirements than detailed."""
         with tempfile.NamedTemporaryFile(mode="w", suffix=".md", delete=False, encoding="utf-8") as f:
@@ -171,6 +183,7 @@ class TestPostcheckBootReport:
             assert len(result["checks"]) == 6
             Path(f.name).unlink()
 
+    # PURPOSE: Fast mode has minimal requirements
     def test_fast_mode_passes_easily(self):
         """Fast mode has minimal requirements."""
         with tempfile.NamedTemporaryFile(mode="w", suffix=".md", delete=False, encoding="utf-8") as f:
@@ -183,6 +196,7 @@ class TestPostcheckBootReport:
             Path(f.name).unlink()
 
 
+# PURPOSE: Run all tests and report results
 def run_tests():
     """Run all tests and report results."""
     import traceback

@@ -22,6 +22,7 @@ from ..base import (
 )
 
 
+# PURPOSE: 境界画定エージェント (P-Agent)
 class PerigrapheAgent(AuditAgent):
     """境界画定エージェント (P-Agent)"""
 
@@ -49,6 +50,7 @@ class PerigrapheAgent(AuditAgent):
         "limit",
     ]
 
+    # PURPOSE: スコープの妥当性を監査
     def audit(self, target: AuditTarget) -> AgentResult:
         """スコープの妥当性を監査"""
         issues: List[AuditIssue] = []
@@ -112,6 +114,7 @@ class PerigrapheAgent(AuditAgent):
 
         return issues
 
+    # PURPOSE: 全タイプをサポート（特に計画に有効）
     def supports(self, target_type: AuditTargetType) -> bool:
         """全タイプをサポート（特に計画に有効）"""
         return True

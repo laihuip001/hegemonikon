@@ -18,6 +18,7 @@ sys.path.insert(0, "/home/makaron8426/oikos/hegemonikon")
 from mekhane.symploke.jules_client import JulesClient, SessionState
 
 
+# PURPOSE: Test 5 parallel task execution
 @pytest.mark.asyncio
 @pytest.mark.skipif(not os.environ.get("JULES_API_KEY"), reason="JULES_API_KEY not set")
 async def test_parallel_execution():

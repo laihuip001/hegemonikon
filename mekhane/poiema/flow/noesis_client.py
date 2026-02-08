@@ -218,6 +218,7 @@ async def execute_gemini(text: str, config: Dict, model: str = None) -> Dict:
     return await _get_client().generate_content(text, config, model)
 
 
+# PURPOSE: Backward compatibility function
 def execute_gemini_stream(text: str, config: Dict) -> Generator[str, None, None]:
     """Backward compatibility function"""
     return _get_client().generate_content_stream(text, config)

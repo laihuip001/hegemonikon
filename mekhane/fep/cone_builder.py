@@ -477,6 +477,7 @@ def describe_cone(cone: Cone) -> str:
 # =============================================================================
 
 
+# PURPOSE: Result of verifying the naturality condition for a natural transformation
 @dataclass
 class NaturalityResult:
     """Result of verifying the naturality condition for a natural transformation.
@@ -490,6 +491,7 @@ class NaturalityResult:
     checks: List[Dict]  # Individual check results
     violations: List[str]  # Human-readable violation descriptions
 
+    # PURPOSE: One-line summary
     @property
     def summary(self) -> str:
         """One-line summary."""

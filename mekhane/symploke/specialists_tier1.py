@@ -52,6 +52,7 @@ except ImportError:
 
 # ============ 派生軸 (Derivative Axes) ============
 
+# PURPOSE: 検査範囲 (Scale公理からの導出)
 class Scope(Enum):
     """検査範囲 (Scale公理からの導出)"""
     MICRO = "μ"   # 関数レベル
@@ -59,6 +60,7 @@ class Scope(Enum):
     MACRO = "M"   # モジュール/パッケージレベル
 
 
+# PURPOSE: 検査意図 (Value公理からの導出)
 class Intent(Enum):
     """検査意図 (Value公理からの導出)"""
     DETECT = "D"   # 検出のみ (デフォルト)
@@ -68,6 +70,7 @@ class Intent(Enum):
 
 # ============ 派生生成 ============
 
+# PURPOSE: 基本専門家から派生を生成する
 def derive_specialist(
     base: Specialist,
     scope: Optional[Scope] = None,
@@ -128,6 +131,7 @@ def derive_specialist(
     return derived
 
 
+# PURPOSE: 基本専門家から全派生を生成する (3×3=9派生)
 def get_all_derivatives(base: Specialist) -> list[Specialist]:
     """
     基本専門家から全派生を生成する (3×3=9派生)
@@ -718,11 +722,13 @@ TIER1_SPECIALISTS = (
 )
 
 
+# PURPOSE: カテゴリ別に Tier 1 専門家を取得
 def get_tier1_by_category(category: str) -> list[Specialist]:
     """カテゴリ別に Tier 1 専門家を取得"""
     return [s for s in TIER1_SPECIALISTS if s.category == category]
 
 
+# PURPOSE: Tier 1 に含まれるカテゴリ一覧を取得
 def get_tier1_categories() -> list[str]:
     """Tier 1 に含まれるカテゴリ一覧を取得"""
     return list(set(s.category for s in TIER1_SPECIALISTS))

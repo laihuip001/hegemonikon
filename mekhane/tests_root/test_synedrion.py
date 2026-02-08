@@ -33,35 +33,43 @@ from mekhane.symploke.phase2_remaining import PHASE2_LAYER_11_15_SPECIALISTS
 from mekhane.symploke.phase3_specialists import PHASE3_SPECIALISTS
 
 
+# PURPOSE: 専門家数のテスト
 class TestSpecialistCount:
     """専門家数のテスト"""
 
+    # PURPOSE: 866人の専門家が正確に読み込まれる
     def test_get_all_specialists_count_is_866(self):
         """866人の専門家が正確に読み込まれる"""
         specialists = get_all_specialists()
         assert len(specialists) == 866, f"Expected 866, got {len(specialists)}"
 
+    # PURPOSE: Phase 0 は 255人
     def test_phase0_count_is_255(self):
         """Phase 0 は 255人"""
         assert len(PHASE0_SPECIALISTS) == 255
 
+    # PURPOSE: Phase 1 は 91人
     def test_phase1_count_is_91(self):
         """Phase 1 は 91人"""
         assert len(PHASE1_SPECIALISTS) == 91
 
+    # PURPOSE: Phase 2 は 290人 (170 + 120)
     def test_phase2_count_is_290(self):
         """Phase 2 は 290人 (170 + 120)"""
         total = len(PHASE2_LAYER_7_10_SPECIALISTS) + len(PHASE2_LAYER_11_15_SPECIALISTS)
         assert total == 290
 
+    # PURPOSE: Phase 3 は 230人
     def test_phase3_count_is_230(self):
         """Phase 3 は 230人"""
         assert len(PHASE3_SPECIALISTS) == 230
 
 
+# PURPOSE: 専門家定義の構造テスト
 class TestSpecialistDefinition:
     """専門家定義の構造テスト"""
 
+    # PURPOSE: 全専門家が必須フィールドを持つ
     def test_specialist_has_required_fields(self):
         """全専門家が必須フィールドを持つ"""
         for spec in get_all_specialists():
@@ -71,11 +79,13 @@ class TestSpecialistDefinition:
             assert hasattr(spec, "archetype"), f"{spec} missing 'archetype'"
             assert hasattr(spec, "focus"), f"{spec} missing 'focus'"
 
+    # PURPOSE: 専門家IDは一意
     def test_specialist_ids_are_unique(self):
         """専門家IDは一意"""
         ids = [spec.id for spec in get_all_specialists()]
         assert len(ids) == len(set(ids)), "Duplicate IDs found"
 
+    # PURPOSE: 専門家IDは正しいフォーマット (XX-NNN)
     def test_specialist_id_format(self):
         """専門家IDは正しいフォーマット (XX-NNN)"""
         # I18N, STAT など1-4文字のプレフィックス対応
@@ -84,9 +94,11 @@ class TestSpecialistDefinition:
             assert re.match(pattern, spec.id), f"Invalid ID format: {spec.id}"
 
 
+# PURPOSE: プロンプト生成テスト
 class TestPromptGeneration:
     """プロンプト生成テスト"""
 
+    # PURPOSE: プロンプトにターゲットファイルが含まれる
     def test_generate_prompt_contains_target_file(self):
         """プロンプトにターゲットファイルが含まれる"""
         spec = get_all_specialists()[0]
@@ -94,12 +106,14 @@ class TestPromptGeneration:
         prompt = generate_prompt(spec, target)
         assert target in prompt
 
+    # PURPOSE: プロンプトに専門家名が含まれる
     def test_generate_prompt_contains_specialist_name(self):
         """プロンプトに専門家名が含まれる"""
         spec = get_all_specialists()[0]
         prompt = generate_prompt(spec, "test.py")
         assert spec.name in prompt
 
+    # PURPOSE: プロンプトに出力パスが含まれる
     def test_generate_prompt_contains_output_path(self):
         """プロンプトに出力パスが含まれる"""
         spec = get_all_specialists()[0]
@@ -107,15 +121,18 @@ class TestPromptGeneration:
         assert "docs/reviews/" in prompt
 
 
+# PURPOSE: カテゴリ分布テスト
 class TestCategoryDistribution:
     """カテゴリ分布テスト"""
 
+    # PURPOSE: 全カテゴリが取得できる
     def test_get_all_categories(self):
         """全カテゴリが取得できる"""
         # get_all_specialists() から動的にカテゴリを収集
         categories = set(spec.category for spec in get_all_specialists())
         assert len(categories) >= 20, f"Expected at least 20, got {len(categories)}"
 
+    # PURPOSE: 主要カテゴリがカバーされている
     def test_category_coverage(self):
         """主要カテゴリがカバーされている"""
         categories = set(spec.category for spec in get_all_specialists())
@@ -133,9 +150,11 @@ class TestCategoryDistribution:
             assert cat in categories, f"Missing category: {cat}"
 
 
+# PURPOSE: アーキタイプ分布テスト
 class TestArchetypeDistribution:
     """アーキタイプ分布テスト"""
 
+    # PURPOSE: 全5アーキタイプが使用されている
     def test_all_archetypes_used(self):
         """全5アーキタイプが使用されている"""
         used_archetypes = set(spec.archetype for spec in get_all_specialists())
@@ -144,9 +163,11 @@ class TestArchetypeDistribution:
         assert Archetype.CREATIVE in used_archetypes
 
 
+# PURPOSE: エラーハンドリングテスト (Devil's Advocate 対策)
 class TestErrorHandling:
     """エラーハンドリングテスト (Devil's Advocate 対策)"""
 
+    # PURPOSE: 空エラーと沈黙を区別できる
     def test_empty_error_vs_silence(self):
         """空エラーと沈黙を区別できる"""
         error_result = {"id": "CL-002", "error": ""}

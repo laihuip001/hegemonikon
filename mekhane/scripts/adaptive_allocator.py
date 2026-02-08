@@ -331,6 +331,7 @@ class AdaptiveAllocator:
         return output_path
 
 
+# PURPOSE: main の処理
 def main():
     import argparse
 

@@ -12,6 +12,7 @@ from enum import Enum
 from typing import Any, Dict, List, Optional
 
 
+# PURPOSE: 監査結果の重大度
 class AuditSeverity(Enum):
     """監査結果の重大度"""
 
@@ -22,6 +23,7 @@ class AuditSeverity(Enum):
     INFO = "info"  # 情報: 参考情報
 
 
+# PURPOSE: 監査対象の種類
 class AuditTargetType(Enum):
     """監査対象の種類"""
 
@@ -33,6 +35,7 @@ class AuditTargetType(Enum):
     GENERIC = "generic"  # 汎用
 
 
+# PURPOSE: Audit target の実装
 @dataclass
 class AuditTarget:
     """監査対象"""
@@ -43,6 +46,7 @@ class AuditTarget:
     source: Optional[str] = None  # ファイルパスや識別子
 
 
+# PURPOSE: 監査で検出された問題
 @dataclass
 class AuditIssue:
     """監査で検出された問題"""
@@ -55,6 +59,7 @@ class AuditIssue:
     suggestion: Optional[str] = None  # 改善提案
 
 
+# PURPOSE: 単一エージェントの監査結果
 @dataclass
 class AgentResult:
     """単一エージェントの監査結果"""
@@ -66,6 +71,7 @@ class AgentResult:
     metadata: Dict[str, Any] = field(default_factory=dict)
 
 
+# PURPOSE: 統合監査結果
 @dataclass
 class AuditResult:
     """統合監査結果"""
@@ -75,6 +81,7 @@ class AuditResult:
     passed: bool = True
     summary: str = ""
 
+    # PURPOSE: 全エージェントからの問題を集約
     @property
     def all_issues(self) -> List[AuditIssue]:
         """全エージェントからの問題を集約"""
@@ -83,21 +90,25 @@ class AuditResult:
             issues.extend(ar.issues)
         return issues
 
+    # PURPOSE: critical_count の処理
     @property
     def critical_count(self) -> int:
         return sum(1 for i in self.all_issues if i.severity == AuditSeverity.CRITICAL)
 
+    # PURPOSE: high_count の処理
     @property
     def high_count(self) -> int:
         return sum(1 for i in self.all_issues if i.severity == AuditSeverity.HIGH)
 
 
+# PURPOSE: 監査エージェント基底クラス
 class AuditAgent(ABC):
     """監査エージェント基底クラス"""
 
     name: str = "BaseAgent"
     description: str = "Base audit agent"
 
+    # PURPOSE: 監査を実行する。
     @abstractmethod
     def audit(self, target: AuditTarget) -> AgentResult:
         """
@@ -111,6 +122,7 @@ class AuditAgent(ABC):
         """
         pass
 
+    # PURPOSE: このエージェントが対象タイプをサポートするか
     def supports(self, target_type: AuditTargetType) -> bool:
         """このエージェントが対象タイプをサポートするか"""
         return True  # デフォルトは全タイプをサポート

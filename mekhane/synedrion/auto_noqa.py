@@ -6,6 +6,7 @@ import re
 from pathlib import Path
 
 
+# PURPOSE: Parse auditor output file
 def parse_audit_file(audit_file: Path) -> dict[str, list[tuple[int, str]]]:
     """Parse auditor output file.
 
@@ -33,6 +34,7 @@ def parse_audit_file(audit_file: Path) -> dict[str, list[tuple[int, str]]]:
     return findings
 
 
+# PURPOSE: Find a file by name in the directory tree
 def find_file(file_name: str, base_dir: Path) -> Path | None:
     """Find a file by name in the directory tree."""
     # Try direct path first
@@ -46,6 +48,7 @@ def find_file(file_name: str, base_dir: Path) -> Path | None:
     return None
 
 
+# PURPOSE: Insert # noqa comments for the given issues
 def insert_noqa(file_path: Path, issues: list[tuple[int, str]]):
     """Insert # noqa comments for the given issues."""
     if not file_path.exists():
@@ -89,6 +92,7 @@ def insert_noqa(file_path: Path, issues: list[tuple[int, str]]):
     return updated_count
 
 
+# PURPOSE: main の処理
 def main():
     base_dir = Path("/home/makaron8426/oikos/hegemonikon/mekhane")
     audit_file = Path("/tmp/audit_output.txt")

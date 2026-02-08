@@ -11,12 +11,15 @@ sys.path.insert(0, str(Path(__file__).parent))
 from prompt_lang_integrate import SkillAdapter, generate_prompt, list_prompts
 
 
+# PURPOSE: Test integration の実装
 class TestIntegration(unittest.TestCase):
+    # PURPOSE: setUp をセットアップする
     def setUp(self):
         # Setup staging dir
         self.staging_dir = Path(__file__).parent / "staging"
         self.staging_dir.mkdir(exist_ok=True)
 
+    # PURPOSE: Test the full workflow via SkillAdapter
     def test_skill_adapter_workflow(self):
         """Test the full workflow via SkillAdapter."""
 

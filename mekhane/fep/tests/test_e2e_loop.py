@@ -15,9 +15,11 @@ from pathlib import Path
 import pytest
 
 
+# PURPOSE: E2E Loop の基本動作テスト
 class TestE2ELoop:
     """E2E Loop の基本動作テスト"""
 
+    # PURPOSE: 明確な入力 → WF dispatch が生成される
     def test_clear_input_produces_dispatch(self):
         """明確な入力 → WF dispatch が生成される"""
         from mekhane.fep.e2e_loop import run_loop
@@ -42,6 +44,7 @@ class TestE2ELoop:
         # A-matrix 更新
         assert c.a_matrix_updated is True
 
+    # PURPOSE: Attractor が WF を推薦する
     def test_dispatch_resolves_workflow(self):
         """Attractor が WF を推薦する"""
         from mekhane.fep.e2e_loop import run_loop
@@ -59,6 +62,7 @@ class TestE2ELoop:
             assert c.dispatch_series in ("O", "S", "H", "P", "K", "A")
             assert c.dispatch_wf.startswith("/")
 
+    # PURPOSE: 2サイクルで学習証明が生成される
     def test_two_cycles_produce_learning_proof(self):
         """2サイクルで学習証明が生成される"""
         from mekhane.fep.e2e_loop import run_loop
@@ -78,6 +82,7 @@ class TestE2ELoop:
         assert "Cycle 0" in summary
         assert "Cycle 1" in summary
 
+    # PURPOSE: FEP が observe を返す時、dispatch が抑制される
     def test_observe_mode_suppresses_dispatch(self):
         """FEP が observe を返す時、dispatch が抑制される"""
         from mekhane.fep.e2e_loop import CycleResult
@@ -97,6 +102,7 @@ class TestE2ELoop:
         assert cycle.fep_action == "observe"
         assert "SUPPRESSED" in cycle.dispatch_reason
 
+    # PURPOSE: シミュレーション Cone が出力を生成する
     def test_simulated_cone_produces_output(self):
         """シミュレーション Cone が出力を生成する"""
         from mekhane.fep.e2e_loop import _simulate_cone
@@ -108,6 +114,7 @@ class TestE2ELoop:
         assert isinstance(result["dispersion"], float)
         assert 0.0 <= result["dispersion"] <= 1.0
 
+    # PURPOSE: E2EResult.summary が正しく生成される
     def test_e2e_result_summary(self):
         """E2EResult.summary が正しく生成される"""
         from mekhane.fep.e2e_loop import E2EResult, CycleResult
@@ -143,6 +150,7 @@ class TestE2ELoop:
         assert "Cycle 1" in summary
         assert "Learning" in summary
 
+    # PURPOSE: 各テストが独立したA行列を使用する
     def test_a_matrix_isolation(self):
         """各テストが独立したA行列を使用する"""
         from mekhane.fep.e2e_loop import run_loop

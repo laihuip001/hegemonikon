@@ -22,6 +22,7 @@ from ..base import (
 )
 
 
+# PURPOSE: 構造設計エージェント (S-Agent)
 class SchemaAgent(AuditAgent):
     """構造設計エージェント (S-Agent)"""
 
@@ -42,6 +43,7 @@ class SchemaAgent(AuditAgent):
         (r"(?:^|\n)####\s+(?!.*\n###\s+)", "S-011", "h4 が h3 なしに出現"),
     ]
 
+    # PURPOSE: 構造の妥当性を監査
     def audit(self, target: AuditTarget) -> AgentResult:
         """構造の妥当性を監査"""
         issues: List[AuditIssue] = []
@@ -136,6 +138,7 @@ class SchemaAgent(AuditAgent):
 
         return issues
 
+    # PURPOSE: 全タイプをサポート
     def supports(self, target_type: AuditTargetType) -> bool:
         """全タイプをサポート"""
         return True

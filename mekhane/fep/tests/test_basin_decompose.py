@@ -12,9 +12,11 @@ from mekhane.fep.basin_logger import BasinLogger, AttractorLogEntry, BasinBias
 
 # --- C: BasinLogger tests ---
 
+# PURPOSE: BasinLogger のテスト
 class TestBasinLogger:
     """BasinLogger のテスト"""
 
+    # PURPOSE: log_prediction をテストする
     def test_log_prediction(self):
         logger = BasinLogger(log_dir=Path(tempfile.mkdtemp()))
         entry = logger.log_prediction(
@@ -27,6 +29,7 @@ class TestBasinLogger:
         assert entry.predicted_series == ["O"]
         assert entry.actual_series is None
 
+    # PURPOSE: log_correction_correct をテストする
     def test_log_correction_correct(self):
         logger = BasinLogger(log_dir=Path(tempfile.mkdtemp()))
         entry = logger.log_prediction(
@@ -39,6 +42,7 @@ class TestBasinLogger:
         assert entry.correction is False
         assert entry.actual_series == "S"
 
+    # PURPOSE: log_correction_wrong をテストする
     def test_log_correction_wrong(self):
         logger = BasinLogger(log_dir=Path(tempfile.mkdtemp()))
         entry = logger.log_prediction(
@@ -50,6 +54,7 @@ class TestBasinLogger:
         logger.log_correction(entry, actual_series="K")
         assert entry.correction is True
 
+    # PURPOSE: bias_report をテストする
     def test_bias_report(self):
         logger = BasinLogger(log_dir=Path(tempfile.mkdtemp()))
 
@@ -69,6 +74,7 @@ class TestBasinLogger:
         assert "P" in report
         assert report["P"]["precision"] == 0.0  # 0/2 correct
 
+    # PURPOSE: save_and_load をテストする
     def test_save_and_load(self):
         tmp = Path(tempfile.mkdtemp())
         logger = BasinLogger(log_dir=tmp)
@@ -83,6 +89,7 @@ class TestBasinLogger:
         assert data["user_input"] == "test"
         assert data["actual_series"] == "O"
 
+    # PURPOSE: suggestions_for_tuning をテストする
     def test_suggestions_for_tuning(self):
         logger = BasinLogger(log_dir=Path(tempfile.mkdtemp()))
 
@@ -96,25 +103,31 @@ class TestBasinLogger:
         assert "広すぎる" in suggestions["P"]
 
 
+# PURPOSE: BasinBias のプロパティテスト
 class TestBasinBias:
     """BasinBias のプロパティテスト"""
 
+    # PURPOSE: precision をテストする
     def test_precision(self):
         bias = BasinBias(series="O", correct_count=3, over_predict_count=1, total_count=4)
         assert bias.precision == 0.75
 
+    # PURPOSE: recall をテストする
     def test_recall(self):
         bias = BasinBias(series="O", correct_count=3, under_predict_count=2, total_count=5)
         assert bias.recall == 0.6
 
+    # PURPOSE: bias_direction_balanced をテストする
     def test_bias_direction_balanced(self):
         bias = BasinBias(series="O", over_predict_count=2, under_predict_count=2, total_count=4)
         assert bias.bias_direction == "balanced"
 
+    # PURPOSE: bias_direction_too_wide をテストする
     def test_bias_direction_too_wide(self):
         bias = BasinBias(series="P", over_predict_count=5, under_predict_count=1, total_count=6)
         assert bias.bias_direction == "too_wide"
 
+    # PURPOSE: bias_direction_too_narrow をテストする
     def test_bias_direction_too_narrow(self):
         bias = BasinBias(series="H", over_predict_count=1, under_predict_count=5, total_count=6)
         assert bias.bias_direction == "too_narrow"
@@ -122,14 +135,17 @@ class TestBasinBias:
 
 # --- D: decompose() tests ---
 
+# PURPOSE: attractor の処理
 @pytest.fixture(scope="module")
 def attractor():
     return SeriesAttractor(threshold=0.10, oscillation_margin=0.05)
 
 
+# PURPOSE: decompose() メソッドのテスト
 class TestDecompose:
     """decompose() メソッドのテスト"""
 
+    # PURPOSE: 単一文 → 1セグメント
     def test_single_sentence(self, attractor: SeriesAttractor):
         """単一文 → 1セグメント"""
         result = attractor.decompose("Why does this exist?")
@@ -137,6 +153,7 @@ class TestDecompose:
         assert len(result.segments) == 1
         assert "O" in result.merged_series
 
+    # PURPOSE: 複数文 → 複数セグメントに分解
     def test_multi_sentence(self, attractor: SeriesAttractor):
         """複数文 → 複数セグメントに分解"""
         result = attractor.decompose(
@@ -145,6 +162,7 @@ class TestDecompose:
         assert len(result.segments) >= 2
         assert result.is_multi is True
 
+    # PURPOSE: O + S の複合入力 → merged_series に両方
     def test_multi_series_merged(self, attractor: SeriesAttractor):
         """O + S の複合入力 → merged_series に両方"""
         result = attractor.decompose(
@@ -153,6 +171,7 @@ class TestDecompose:
         # O と S が両方含まれるはず
         assert len(result.merged_series) >= 2
 
+    # PURPOSE: マージされた workflows に重複がない
     def test_merged_workflows_no_duplicates(self, attractor: SeriesAttractor):
         """マージされた workflows に重複がない"""
         result = attractor.decompose(
@@ -160,17 +179,20 @@ class TestDecompose:
         )
         assert len(result.merged_workflows) == len(set(result.merged_workflows))
 
+    # PURPOSE: empty_input をテストする
     def test_empty_input(self, attractor: SeriesAttractor):
         """空入力"""
         result = attractor.decompose("")
         assert isinstance(result, DecomposeResult)
 
+    # PURPOSE: DecomposeResult の repr
     def test_decompose_repr(self, attractor: SeriesAttractor):
         """DecomposeResult の repr"""
         result = attractor.decompose("Why? How?")
         repr_str = repr(result)
         assert "Decompose:" in repr_str
 
+    # PURPOSE: 単一 Series → is_multi = False
     def test_is_multi_single(self, attractor: SeriesAttractor):
         """単一 Series → is_multi = False"""
         result = attractor.decompose("Design the architecture")
@@ -179,9 +201,11 @@ class TestDecompose:
 
 # --- C: apply_bias() integration tests ---
 
+# PURPOSE: Problem C: SeriesAttractor.apply_bias() のテスト
 class TestApplyBias:
     """Problem C: SeriesAttractor.apply_bias() のテスト"""
 
+    # PURPOSE: too_wide bias → similarity が下がる
     def test_apply_bias_too_wide(self):
         """too_wide bias → similarity が下がる"""
         from mekhane.fep.basin_logger import BasinBias
@@ -193,6 +217,7 @@ class TestApplyBias:
         a.apply_bias(biases)
         assert a._bias_adjustments["P"] < 0
 
+    # PURPOSE: too_narrow bias → similarity が上がる
     def test_apply_bias_too_narrow(self):
         """too_narrow bias → similarity が上がる"""
         from mekhane.fep.basin_logger import BasinBias
@@ -204,6 +229,7 @@ class TestApplyBias:
         a.apply_bias(biases)
         assert a._bias_adjustments["H"] > 0
 
+    # PURPOSE: balanced bias → adjustment = 0
     def test_apply_bias_balanced(self):
         """balanced bias → adjustment = 0"""
         from mekhane.fep.basin_logger import BasinBias
@@ -215,6 +241,7 @@ class TestApplyBias:
         a.apply_bias(biases)
         assert a._bias_adjustments["O"] == 0.0
 
+    # PURPOSE: データ不足 (< 5) → スキップ
     def test_apply_bias_insufficient_data(self):
         """データ不足 (< 5) → スキップ"""
         from mekhane.fep.basin_logger import BasinBias
@@ -228,14 +255,17 @@ class TestApplyBias:
 
 # --- D: recommend_compound() tests ---
 
+# PURPOSE: Problem D: AttractorAdvisor.recommend_compound() のテスト
 class TestRecommendCompound:
     """Problem D: AttractorAdvisor.recommend_compound() のテスト"""
 
+    # PURPOSE: advisor の処理
     @pytest.fixture(scope="module")
     def advisor(self):
         from mekhane.fep.attractor_advisor import AttractorAdvisor
         return AttractorAdvisor()
 
+    # PURPOSE: 単一文 → 1セグメント
     def test_single_sentence(self, advisor):
         """単一文 → 1セグメント"""
         from mekhane.fep.attractor_advisor import CompoundRecommendation
@@ -246,6 +276,7 @@ class TestRecommendCompound:
         # if the input resonates with multiple Series (POSITIVE oscillation)
         assert result.primary is not None
 
+    # PURPOSE: 複数文 → 複数セグメント + is_compound
     def test_compound_multi_segment(self, advisor):
         """複数文 → 複数セグメント + is_compound"""
         result = advisor.recommend_compound(
@@ -254,6 +285,7 @@ class TestRecommendCompound:
         assert len(result.segments) >= 2
         assert result.is_compound is True
 
+    # PURPOSE: マージされた workflows に重複がない
     def test_compound_merged_workflows(self, advisor):
         """マージされた workflows に重複がない"""
         result = advisor.recommend_compound(
@@ -261,6 +293,7 @@ class TestRecommendCompound:
         )
         assert len(result.merged_workflows) == len(set(result.merged_workflows))
 
+    # PURPOSE: primary は最高確信度の推薦
     def test_compound_primary_exists(self, advisor):
         """primary は最高確信度の推薦"""
         result = advisor.recommend_compound(
@@ -269,6 +302,7 @@ class TestRecommendCompound:
         assert result.primary is not None
         assert result.primary.confidence > 0
 
+    # PURPOSE: CompoundRecommendation の repr
     def test_compound_repr(self, advisor):
         """CompoundRecommendation の repr"""
         result = advisor.recommend_compound("Why? How?")
@@ -276,11 +310,13 @@ class TestRecommendCompound:
         assert "Compound:" in repr_str
         assert "segments" in repr_str
 
+    # PURPOSE: 単一文 → is_multi_segment = False
     def test_is_multi_segment_single(self, advisor):
         """単一文 → is_multi_segment = False"""
         result = advisor.recommend_compound("Design the architecture")
         assert result.is_multi_segment is False
 
+    # PURPOSE: 複数文 → is_multi_segment = True
     def test_is_multi_segment_multi(self, advisor):
         """複数文 → is_multi_segment = True"""
         result = advisor.recommend_compound(
@@ -291,9 +327,11 @@ class TestRecommendCompound:
 
 # --- C: E2E bias integration test ---
 
+# PURPOSE: Problem C: bias → diagnose 結果変化の E2E テスト
 class TestBiasE2E:
     """Problem C: bias → diagnose 結果変化の E2E テスト"""
 
+    # PURPOSE: too_wide bias 適用で similarity が下がることを検証
     def test_bias_changes_similarity(self, attractor: SeriesAttractor):
         """too_wide bias 適用で similarity が下がることを検証"""
         from mekhane.fep.basin_logger import BasinBias
@@ -325,6 +363,7 @@ class TestBiasE2E:
         # Clean up: remove bias
         attractor._bias_adjustments.clear()
 
+    # PURPOSE: too_narrow bias 適用で similarity が上がることを検証
     def test_bias_too_narrow_increases_similarity(self, attractor: SeriesAttractor):
         """too_narrow bias 適用で similarity が上がることを検証"""
         from mekhane.fep.basin_logger import BasinBias

@@ -46,6 +46,7 @@ from mekhane.fep.cone_builder import (
 # =============================================================================
 
 
+# PURPOSE: Theorem (Cog の対象) の検証
 class TestTheorem:
     """Theorem (Cog の対象) の検証"""
 
@@ -83,6 +84,7 @@ class TestTheorem:
 # =============================================================================
 
 
+# PURPOSE: Morphism (Cog の射 / X-series) の検証
 class TestMorphism:
     """Morphism (Cog の射 / X-series) の検証"""
 
@@ -134,6 +136,7 @@ class TestMorphism:
 # =============================================================================
 
 
+# PURPOSE: Cone (@converge 構造) の検証
 class TestCone:
     """Cone (@converge 構造) の検証"""
 
@@ -180,6 +183,7 @@ class TestCone:
 # =============================================================================
 
 
+# PURPOSE: Adjunction (L⊣R = /boot⊣/bye) の検証
 class TestAdjunction:
     """Adjunction (L⊣R = /boot⊣/bye) の検証"""
 
@@ -205,6 +209,7 @@ class TestAdjunction:
 # =============================================================================
 
 
+# PURPOSE: Monad (T:Cog→Cog = /zet) の検証
 class TestMonad:
     """Monad (T:Cog→Cog = /zet) の検証"""
 
@@ -234,6 +239,7 @@ class TestMonad:
 # =============================================================================
 
 
+# PURPOSE: hom_set (Yoneda 表現) の検証
 class TestYoneda:
     """hom_set (Yoneda 表現) の検証"""
 
@@ -282,6 +288,7 @@ class TestYoneda:
 # =============================================================================
 
 
+# PURPOSE: C0: Precision Weighting の検証
 class TestPrecisionWeighting:
     """C0: Precision Weighting の検証"""
 
@@ -373,6 +380,7 @@ class TestPrecisionWeighting:
 # =============================================================================
 
 
+# PURPOSE: Functor (関手: 圏→圏) の検証
 class TestFunctor:
     """Functor (関手: 圏→圏) の検証"""
 
@@ -429,6 +437,7 @@ class TestFunctor:
 # =============================================================================
 
 
+# PURPOSE: NaturalTransformation (自然変換: F⇒G) の検証
 class TestNaturalTransformation:
     """NaturalTransformation (自然変換: F⇒G) の検証"""
 
@@ -508,6 +517,7 @@ class TestNaturalTransformation:
 # =============================================================================
 
 
+# PURPOSE: FUNCTORS レジストリの検証
 class TestFunctorRegistry:
     """FUNCTORS レジストリの検証"""
 
@@ -562,6 +572,7 @@ class TestFunctorRegistry:
             assert f.is_faithful is True, f"{name} is not faithful"
 
 
+# PURPOSE: NATURAL_TRANSFORMATIONS レジストリの検証
 class TestNaturalTransformationRegistry:
     """NATURAL_TRANSFORMATIONS レジストリの検証"""
 
@@ -595,23 +606,28 @@ class TestNaturalTransformationRegistry:
 # =============================================================================
 
 
+# PURPOSE: Fix #2: _parse_pw() ValueError 防御
 class TestDiaPlusFix2ParsePw:
     """Fix #2: _parse_pw() ValueError 防御"""
 
+    # PURPOSE: valid_pw をテストする
     def test_valid_pw(self):
         from mekhane.fep.cone_builder import _parse_pw
         result = _parse_pw("O1:0.5,O3:-0.5")
         assert result == {"O1": 0.5, "O3": -0.5}
 
+    # PURPOSE: invalid_value_skipped をテストする
     def test_invalid_value_skipped(self):
         from mekhane.fep.cone_builder import _parse_pw
         result = _parse_pw("O1:abc,O3:0.5")
         assert result == {"O3": 0.5}  # O1 skipped
 
+    # PURPOSE: empty_string をテストする
     def test_empty_string(self):
         from mekhane.fep.cone_builder import _parse_pw
         assert _parse_pw("") == {}
 
+    # PURPOSE: mixed_valid_invalid をテストする
     def test_mixed_valid_invalid(self):
         from mekhane.fep.cone_builder import _parse_pw
         result = _parse_pw("O1:1.0, O2:, O3:0.5")
@@ -620,6 +636,7 @@ class TestDiaPlusFix2ParsePw:
         assert "O2" not in result  # empty value → ValueError
 
 
+# PURPOSE: Fix #3: NatTrans compose() 部分合成 warning + strict mode
 class TestDiaPlusFix3ComposeStrict:
     """Fix #3: NatTrans compose() 部分合成 warning + strict mode"""
 
@@ -643,12 +660,14 @@ class TestDiaPlusFix3ComposeStrict:
             components={"X": "β_X", "Y": "β_Y"},
         )
 
+    # PURPOSE: strict_raises_on_mismatch をテストする
     def test_strict_raises_on_mismatch(self):
         alpha = self._make_alpha()
         beta = self._make_beta_partial()
         with pytest.raises(ValueError, match="Object mismatch"):
             alpha.compose(beta, strict=True)
 
+    # PURPOSE: nonstrict_warns_on_mismatch をテストする
     def test_nonstrict_warns_on_mismatch(self):
         import warnings
         alpha = self._make_alpha()
@@ -660,6 +679,7 @@ class TestDiaPlusFix3ComposeStrict:
             assert len(w) == 1
             assert "Partial composition" in str(w[0].message)
 
+    # PURPOSE: full_match_no_warning をテストする
     def test_full_match_no_warning(self):
         import warnings
         alpha = self._make_alpha()
@@ -671,6 +691,7 @@ class TestDiaPlusFix3ComposeStrict:
             assert len(w) == 0
             assert set(result.components.keys()) == {"X", "Y"}
 
+    # PURPOSE: strict_ok_with_full_match をテストする
     def test_strict_ok_with_full_match(self):
         alpha = self._make_alpha()
         beta = self._make_beta_full()
@@ -679,14 +700,17 @@ class TestDiaPlusFix3ComposeStrict:
         assert result.name == "β∘α"
 
 
+# PURPOSE: Fix #4: Functor.is_full → NotImplementedError
 class TestDiaPlusFix4IsFull:
     """Fix #4: Functor.is_full → NotImplementedError"""
 
+    # PURPOSE: is_full_raises をテストする
     def test_is_full_raises(self):
         f = Functor(name="test", source_cat="C", target_cat="D")
         with pytest.raises(NotImplementedError, match="full category knowledge"):
             _ = f.is_full
 
+    # PURPOSE: registry_is_full_raises をテストする
     def test_registry_is_full_raises(self):
         for name, f in FUNCTORS.items():
             with pytest.raises(NotImplementedError):
@@ -698,6 +722,7 @@ class TestDiaPlusFix4IsFull:
 # =============================================================================
 
 
+# PURPOSE: Functor.compose() の検証
 class TestFunctorCompose:
     """Functor.compose() の検証"""
 
@@ -753,6 +778,7 @@ class TestFunctorCompose:
 # =============================================================================
 
 
+# PURPOSE: cone_consumer.advise() の検証
 class TestConeConsumer:
     """cone_consumer.advise() の検証"""
 
@@ -851,6 +877,7 @@ class TestConeConsumer:
 # =============================================================================
 
 
+# PURPOSE: Creator の bigram Jaccard ensemble が日本語で正しく動作するか検証
 class TestJapaneseDispersion:
     """Creator の bigram Jaccard ensemble が日本語で正しく動作するか検証"""
 
@@ -860,11 +887,13 @@ class TestJapaneseDispersion:
         result = _char_bigrams("認識")
         assert result == ["認識"]
 
+    # PURPOSE: char_bigrams_longer をテストする
     def test_char_bigrams_longer(self):
         from mekhane.fep.cone_builder import _char_bigrams
         result = _char_bigrams("深い認識")
         assert len(result) == 3  # 深い, い認, 認識
 
+    # PURPOSE: char_bigrams_whitespace をテストする
     def test_char_bigrams_whitespace(self):
         from mekhane.fep.cone_builder import _char_bigrams
         result = _char_bigrams("深い 認識")
@@ -908,6 +937,7 @@ class TestJapaneseDispersion:
 # =============================================================================
 
 
+# PURPOSE: CognitiveType + COGNITIVE_TYPES registry の検証
 class TestCognitiveTypeRegistry:
     """CognitiveType + COGNITIVE_TYPES registry の検証"""
 
@@ -945,81 +975,99 @@ class TestCognitiveTypeRegistry:
 class TestClassifyCognitiveType:
     """classify_cognitive_type() の検証"""
 
+    # PURPOSE: known_theorem をテストする
     def test_known_theorem(self):
         from mekhane.fep.cone_builder import classify_cognitive_type
         assert classify_cognitive_type("O1") == CognitiveType.UNDERSTANDING
 
+    # PURPOSE: unknown_raises をテストする
     def test_unknown_raises(self):
         from mekhane.fep.cone_builder import classify_cognitive_type
         with pytest.raises(KeyError):
             classify_cognitive_type("Z99")
 
 
+# PURPOSE: is_cross_boundary_morphism() の検証
 class TestIsCrossBoundaryMorphism:
     """is_cross_boundary_morphism() の検証"""
 
+    # PURPOSE: u_to_r をテストする
     def test_u_to_r(self):
         from mekhane.fep.cone_builder import is_cross_boundary_morphism
         # O1 (U) → S1 (R)
         assert is_cross_boundary_morphism("O1", "S1") == "U→R"
 
+    # PURPOSE: r_to_u をテストする
     def test_r_to_u(self):
         from mekhane.fep.cone_builder import is_cross_boundary_morphism
         # S1 (R) → O1 (U)
         assert is_cross_boundary_morphism("S1", "O1") == "R→U"
 
+    # PURPOSE: same_type をテストする
     def test_same_type(self):
         from mekhane.fep.cone_builder import is_cross_boundary_morphism
         # O1 (U) → O2 (U)
         assert is_cross_boundary_morphism("O1", "O2") is None
 
+    # PURPOSE: mixed_returns_none をテストする
     def test_mixed_returns_none(self):
         from mekhane.fep.cone_builder import is_cross_boundary_morphism
         # K4 (MIXED) → anything
         assert is_cross_boundary_morphism("K4", "O1") is None
 
+    # PURPOSE: unknown_returns_none をテストする
     def test_unknown_returns_none(self):
         from mekhane.fep.cone_builder import is_cross_boundary_morphism
         assert is_cross_boundary_morphism("Z99", "O1") is None
 
+    # PURPOSE: bridge_u_to_r_counts_as_u をテストする
     def test_bridge_u_to_r_counts_as_u(self):
         from mekhane.fep.cone_builder import is_cross_boundary_morphism
         # A1 (BRIDGE_U_TO_R ∈ u_types) → S1 (R)
         assert is_cross_boundary_morphism("A1", "S1") == "U→R"
 
 
+# PURPOSE: MP Functor (Metacognitive Prompting) テスト
 class TestMPFunctor:
     """MP Functor (Metacognitive Prompting) テスト"""
 
+    # PURPOSE: mp_exists をテストする
     def test_mp_exists(self):
         assert "mp" in FUNCTORS
 
+    # PURPOSE: mp_maps_5_stages をテストする
     def test_mp_maps_5_stages(self):
         mp = FUNCTORS["mp"]
         assert len(mp.object_map) == 5
         assert set(mp.object_map.keys()) == {"S1", "S2", "S3", "S4", "S5"}
 
+    # PURPOSE: mp_targets_are_theorems をテストする
     def test_mp_targets_are_theorems(self):
         mp = FUNCTORS["mp"]
         for stage, theorem in mp.object_map.items():
             assert theorem in THEOREMS, f"MP {stage}→{theorem}: {theorem} not a theorem"
 
+    # PURPOSE: mp_has_morphisms をテストする
     def test_mp_has_morphisms(self):
         mp = FUNCTORS["mp"]
         assert len(mp.morphism_map) >= 3
 
+    # PURPOSE: mp_source_cat をテストする
     def test_mp_source_cat(self):
         mp = FUNCTORS["mp"]
         assert mp.source_cat == "MP"
         assert mp.target_cat == "Cog"
 
 
+# PURPOSE: η_MP NatTrans テスト
 class TestMPNaturalTransformation:
     """η_MP NatTrans テスト"""
 
+    # PURPOSE: mp_hgk_exists をテストする
     def test_mp_hgk_exists(self):
         assert "mp_hgk" in NATURAL_TRANSFORMATIONS
 
+    # PURPOSE: mp_hgk_components_match_functor をテストする
     def test_mp_hgk_components_match_functor(self):
         nt = NATURAL_TRANSFORMATIONS["mp_hgk"]
         mp = FUNCTORS["mp"]
@@ -1029,6 +1077,7 @@ class TestMPNaturalTransformation:
                 f"η_MP[{stage}]={theorem} ≠ MP({stage})={mp.object_map[stage]}"
             )
 
+    # PURPOSE: mp_hgk_all_targets_valid をテストする
     def test_mp_hgk_all_targets_valid(self):
         nt = NATURAL_TRANSFORMATIONS["mp_hgk"]
         for stage, theorem in nt.components.items():
@@ -1037,9 +1086,11 @@ class TestMPNaturalTransformation:
             )
 
 
+# PURPOSE: verify_naturality() の検証
 class TestVerifyNaturality:
     """verify_naturality() の検証"""
 
+    # PURPOSE: η_MP の source/target functor は直接解決できない → fallback
     def test_mp_hgk_fallback(self):
         """η_MP の source/target functor は直接解決できない → fallback"""
         from mekhane.fep.cone_builder import verify_naturality
@@ -1051,6 +1102,7 @@ class TestVerifyNaturality:
         # All components map to valid theorems
         assert result.is_natural is True
 
+    # PURPOSE: MP functor を明示的に渡すと morphism-level check
     def test_mp_hgk_with_explicit_functor(self):
         """MP functor を明示的に渡すと morphism-level check"""
         from mekhane.fep.cone_builder import verify_naturality
@@ -1060,6 +1112,7 @@ class TestVerifyNaturality:
         # Should check morphisms in MP functor
         assert len(result.checks) > 0
 
+    # PURPOSE: 不正な component → violation
     def test_invalid_component_detected(self):
         """不正な component → violation"""
         from mekhane.fep.cone_builder import verify_naturality
@@ -1073,6 +1126,7 @@ class TestVerifyNaturality:
         assert result.is_natural is False
         assert len(result.violations) == 1
 
+    # PURPOSE: η の target_functor 'bye∘boot' が FUNCTORS から解決できる (F5)
     def test_eta_auto_resolve_with_composed(self):
         """η の target_functor 'bye∘boot' が FUNCTORS から解決できる (F5)"""
         from mekhane.fep.cone_builder import verify_naturality
@@ -1090,6 +1144,7 @@ class TestVerifyNaturality:
 # =============================================================================
 
 
+# PURPOSE: devil_attack() の検証
 class TestDevilAttack:
     """devil_attack() の検証"""
 
@@ -1199,6 +1254,7 @@ class TestDevilAttack:
         assert len(attack.counterarguments) > 0
 
 
+# PURPOSE: advise() → devil_attack() パイプライン (CR-3) の検証
 class TestAdviseDevilIntegration:
     """advise() → devil_attack() パイプライン (CR-3) の検証"""
 
@@ -1253,6 +1309,7 @@ class TestAdviseDevilIntegration:
         assert advice.devil_detail is None  # investigate, not devil
 
 
+# PURPOSE: advise_with_attractor() の検証
 class TestAdviseWithAttractor:
     """advise_with_attractor() の検証"""
 

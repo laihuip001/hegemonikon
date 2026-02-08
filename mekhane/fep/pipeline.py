@@ -1,18 +1,21 @@
 # PROOF: [L2/FEP] <- mekhane/fep/
-# PURPOSE: CCL → Hermēneus → Attractor → PW → Cone のE2Eパイプライン
+# PURPOSE: UML Pre → CCL → Hermēneus → Attractor → PW → Cone → UML Post のE2Eパイプライン
 """
 PROOF: [L2/FEP] このファイルは存在しなければならない
 
 A0 → 個々のPJは単体テスト済みだが、パイプラインとして接続されていない
    → CCL式から最終Coneまで一気通貫で実行するオーケストレータが必要
+   → UML Pre/Post チェックで MP 5段階を環境強制する
    → pipeline.py が担う
 
 接続:
-  Hermēneus dispatch() → AST + workflows
-  Attractor diagnose() → SuggestResult (series, oscillation)
-  PW resolve_pw()      → Dict[str, float] (theorem weights)
-  Cone converge()      → Cone dataclass
-  Advisor format_for_llm() → LLM注入文字列
+  UML Pre-check        → generate_pre_injection() (Stage 0)
+  Hermēneus dispatch() → AST + workflows (Stage 1)
+  Attractor diagnose() → SuggestResult (Stage 2)
+  PW resolve_pw()      → Dict[str, float] (Stage 3)
+  Cone converge()      → Cone dataclass (Stage 4)
+  Advisor format_for_llm() → LLM注入文字列 (Stage 5)
+  UML Post-check       → run_full_uml() (Stage 6)
 
 Q.E.D.
 """
@@ -28,6 +31,7 @@ from typing import Any, Dict, List, Optional
 # =============================================================================
 
 
+# PURPOSE: 1ステージの実行結果。
 @dataclass
 class StageResult:
     """1ステージの実行結果。"""
@@ -37,6 +41,7 @@ class StageResult:
     error: Optional[str] = None
 
 
+# PURPOSE: E2E パイプラインの全体結果。
 @dataclass
 class PipelineResult:
     """E2E パイプラインの全体結果。"""
@@ -47,11 +52,16 @@ class PipelineResult:
     series: List[str] = field(default_factory=list)
     pw: Dict[str, float] = field(default_factory=dict)
     llm_injection: str = ""
+    # UML Phase 2
+    uml_pre_prompt: str = ""
+    uml_report: Any = None  # UMLReport from metacognitive_layer
 
+    # PURPOSE: all_passed の処理
     @property
     def all_passed(self) -> bool:
         return all(s.success for s in self.stages)
 
+    # PURPOSE: failed_at の処理
     @property
     def failed_at(self) -> Optional[str]:
         for s in self.stages:
@@ -59,6 +69,7 @@ class PipelineResult:
                 return s.name
         return None
 
+    # PURPOSE: Human-readable summary
     def summary(self) -> str:
         """Human-readable summary."""
         lines = [f"Pipeline: {self.ccl_expr}"]
@@ -66,8 +77,12 @@ class PipelineResult:
             mark = "✅" if s.success else "❌"
             err = f" — {s.error}" if s.error else ""
             lines.append(f"  {mark} {s.name}{err}")
+        if self.uml_pre_prompt:
+            lines.append(f"\nUML Pre-prompt ({len(self.uml_pre_prompt)} chars)")
         if self.llm_injection:
             lines.append(f"\nLLM injection:\n{self.llm_injection}")
+        if self.uml_report:
+            lines.append(f"\nUML Report: {self.uml_report.summary}")
         return "\n".join(lines)
 
 
@@ -76,21 +91,24 @@ class PipelineResult:
 # =============================================================================
 
 
+# PURPOSE: Execute the full UML Pre → CCL → Cone → UML Post pipeline
 def run_pipeline(
     ccl_expr: str,
     *,
     context: Optional[str] = None,
     force_cpu: bool = True,
     use_gnosis: bool = False,
+    use_uml: bool = True,
     mock_outputs: Optional[Dict[str, str]] = None,
 ) -> PipelineResult:
-    """Execute the full CCL → Cone pipeline.
+    """Execute the full UML Pre → CCL → Cone → UML Post pipeline.
 
     Args:
         ccl_expr: CCL expression string (e.g. "/dia+~*/noe")
         context: Optional context for PW inference
         force_cpu: Force CPU for embeddings (default True for tests)
         use_gnosis: Enable Gnōsis knowledge enrichment
+        use_uml: Enable UML metacognitive pre/post checks
         mock_outputs: Mock theorem outputs for Cone converge
                       (in production, LLM generates these)
 
@@ -99,6 +117,14 @@ def run_pipeline(
     """
     result = PipelineResult(ccl_expr=ccl_expr)
 
+    # ─── Stage 0: UML Pre-check ───
+    if use_uml:
+        stage0 = _stage_uml_pre(ccl_expr, context=context)
+        result.stages.append(stage0)
+        if stage0.success:
+            result.uml_pre_prompt = stage0.data.get("prompt", "")
+        # UML pre-check failure is non-blocking (advisory)
+
     # ─── Stage 1: Hermēneus Parse ───
     stage1 = _stage_hermeneus(ccl_expr)
     result.stages.append(stage1)
@@ -106,8 +132,10 @@ def run_pipeline(
         return result
     result.workflows = stage1.data.get("workflows", [])
 
+    # Derive WF name for UML (first workflow without /)
+    wf_name = result.workflows[0].lstrip("/") if result.workflows else "unknown"
+
     # ─── Stage 2: Attractor Diagnose ───
-    # Use the CCL expression itself as semantic input to the attractor
     stage2 = _stage_attractor(ccl_expr, force_cpu=force_cpu)
     result.stages.append(stage2)
     if not stage2.success:
@@ -134,6 +162,26 @@ def run_pipeline(
     result.stages.append(stage5)
     if stage5.success:
         result.llm_injection = stage5.data.get("injection", "")
+
+    # ─── Stage 6: UML Post-check ───
+    if use_uml:
+        # Use cone apex as "output" for UML post check
+        cone_output = ""
+        if stage4.success and stage4.data:
+            cone_output = stage4.data.get("apex", "") or ""
+        confidence = 0.0
+        if stage4.success and stage4.data:
+            confidence = stage4.data.get("confidence", 0.0)
+
+        stage6 = _stage_uml_post(
+            wf_name=wf_name,
+            context=ccl_expr,
+            output=cone_output,
+            confidence=confidence,
+        )
+        result.stages.append(stage6)
+        if stage6.success and stage6.data:
+            result.uml_report = stage6.data.get("report")
 
     return result
 
@@ -234,10 +282,14 @@ def _stage_cone(
             error="No series for cone construction",
         )
     try:
+        from mekhane.fep.category import Series
         from mekhane.fep.cone_builder import converge
 
+        # Convert string series to Series enum
+        series_enum = Series[series]
+
         cone = converge(
-            series=series,
+            series=series_enum,
             outputs=outputs,
             pw=pw if any(v != 0 for v in pw.values()) else None,
         )
@@ -246,7 +298,7 @@ def _stage_cone(
             success=True,
             data={
                 "apex": cone.apex,
-                "method": cone.method,
+                "method": cone.resolution_method,
                 "confidence": cone.confidence,
                 "dispersion": cone.dispersion,
             },
@@ -276,6 +328,94 @@ def _stage_llm_format(
         )
     except Exception as e:
         return StageResult(name="llm_format", success=False, error=str(e))
+
+
+def _stage_uml_pre(
+    ccl_expr: str,
+    *,
+    context: Optional[str] = None,
+) -> StageResult:
+    """Stage 0: UML Pre-check — generate metacognitive prompts.
+
+    Generates the MP Stage 1-2 prompts that should be injected
+    into the LLM's context before WF execution.
+    """
+    try:
+        from mekhane.fep.metacognitive_layer import (
+            generate_pre_injection,
+            run_pre_checks,
+        )
+
+        # Derive WF name from CCL (best effort)
+        wf_name = "unknown"
+        if ccl_expr.startswith("/"):
+            # Extract first workflow ID: "/dia+~*/noe" -> "dia"
+            import re
+            m = re.match(r"/([a-z]+)", ccl_expr)
+            if m:
+                wf_name = m.group(1)
+
+        input_context = context or ccl_expr
+        prompt = generate_pre_injection(wf_name, context=input_context)
+
+        # Also run pre-checks to validate input quality
+        pre_checks = run_pre_checks(input_context)
+        checks_data = [
+            {
+                "stage": c.stage.value,
+                "passed": c.passed,
+                "result": c.result,
+            }
+            for c in pre_checks
+        ]
+
+        return StageResult(
+            name="uml_pre",
+            success=True,
+            data={
+                "prompt": prompt,
+                "checks": checks_data,
+                "wf_name": wf_name,
+            },
+        )
+    except Exception as e:
+        return StageResult(name="uml_pre", success=False, error=str(e))
+
+
+def _stage_uml_post(
+    wf_name: str,
+    context: str,
+    output: str,
+    confidence: float = 0.0,
+) -> StageResult:
+    """Stage 6: UML Post-check — run full metacognitive evaluation.
+
+    Runs MP Stage 3-5 checks on the pipeline output and generates
+    a UMLReport with feedback loop status.
+    """
+    try:
+        from mekhane.fep.metacognitive_layer import run_full_uml
+
+        report = run_full_uml(
+            context=context,
+            output=output,
+            wf_name=wf_name,
+            confidence=confidence,
+        )
+
+        return StageResult(
+            name="uml_post",
+            success=True,
+            data={
+                "report": report,
+                "overall_pass": report.overall_pass,
+                "summary": report.summary,
+                "pass_count": report.pass_count,
+                "total_count": report.total_count,
+            },
+        )
+    except Exception as e:
+        return StageResult(name="uml_post", success=False, error=str(e))
 
 
 # =============================================================================
@@ -316,6 +456,7 @@ def _generate_stub_outputs(series: Optional[str]) -> Dict[str, str]:
 # =============================================================================
 
 
+# PURPOSE: CLI: python -m mekhane.fep.pipeline '/dia+~*/noe'
 def main() -> None:
     """CLI: python -m mekhane.fep.pipeline '/dia+~*/noe'"""
     import sys

@@ -20,6 +20,7 @@ from typing import List, Optional, Tuple, Dict
 import argparse
 
 
+# PURPOSE: A fix to apply
 @dataclass
 class Fix:
     """A fix to apply."""
@@ -32,6 +33,7 @@ class Fix:
     description: str
 
 
+# PURPOSE: Auto-fixer for AI Audit issues
 class AIFixer:
     """Auto-fixer for AI Audit issues."""
 
@@ -43,6 +45,7 @@ class AIFixer:
         self.fixes_applied: List[Fix] = []
         self.fixes_skipped: List[Fix] = []
 
+    # PURPOSE: Fix issues in a single file
     def fix_file(self, file_path: Path) -> List[Fix]:
         """Fix issues in a single file."""
         try:
@@ -294,6 +297,7 @@ class AIFixer:
 
         file_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
+    # PURPOSE: Fix all Python files in directory
     def fix_directory(
         self, directory: Path, exclude_patterns: Optional[List[str]] = None
     ) -> Dict[str, int]:
@@ -320,6 +324,7 @@ class AIFixer:
         return stats
 
 
+# PURPOSE: Format fixes as a report
 def format_fixes_report(fixes: List[Fix]) -> str:
     """Format fixes as a report."""
     if not fixes:

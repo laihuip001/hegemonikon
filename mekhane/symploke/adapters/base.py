@@ -13,6 +13,7 @@ from typing import List, Tuple, Dict, Any, Optional
 import numpy as np
 
 
+# PURPOSE: Search result の実装
 @dataclass
 class SearchResult:
     """検索結果"""
@@ -22,6 +23,7 @@ class SearchResult:
     metadata: Dict[str, Any]
 
 
+# PURPOSE: ベクトルDB抽象インターフェース
 class VectorStoreAdapter(ABC):
     """
     ベクトルDB抽象インターフェース
@@ -33,12 +35,14 @@ class VectorStoreAdapter(ABC):
         results = store.search(query, k=10)
     """
 
+    # PURPOSE: アダプタ名
     @property
     @abstractmethod
     def name(self) -> str:
         """アダプタ名"""
         pass
 
+    # PURPOSE: インデックスを作成
     @abstractmethod
     def create_index(
         self, dimension: int, index_name: str = "default", **kwargs
@@ -53,6 +57,7 @@ class VectorStoreAdapter(ABC):
         """
         pass
 
+    # PURPOSE: ベクトルを追加
     @abstractmethod
     def add_vectors(
         self,
@@ -73,6 +78,7 @@ class VectorStoreAdapter(ABC):
         """
         pass
 
+    # PURPOSE: search を検索する
     @abstractmethod
     def search(
         self, query: np.ndarray, k: int = 10, threshold: Optional[float] = None
@@ -90,6 +96,7 @@ class VectorStoreAdapter(ABC):
         """
         pass
 
+    # PURPOSE: ベクトルを削除
     @abstractmethod
     def delete(self, ids: List[int]) -> int:
         """
@@ -106,6 +113,7 @@ class VectorStoreAdapter(ABC):
         """
         pass
 
+    # PURPOSE: インデックスを永続化
     @abstractmethod
     def save(self, path: str) -> None:
         """
@@ -116,6 +124,7 @@ class VectorStoreAdapter(ABC):
         """
         pass
 
+    # PURPOSE: インデックスを読み込み
     @abstractmethod
     def load(self, path: str) -> None:
         """
@@ -126,11 +135,13 @@ class VectorStoreAdapter(ABC):
         """
         pass
 
+    # PURPOSE: 現在のベクトル数を取得
     @abstractmethod
     def count(self) -> int:
         """現在のベクトル数を取得"""
         pass
 
+    # PURPOSE: メタデータを取得 (オプション実装)
     def get_metadata(self, id: int) -> Optional[Dict[str, Any]]:
         """
         メタデータを取得 (オプション実装)

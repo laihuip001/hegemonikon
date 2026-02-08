@@ -16,9 +16,11 @@ from mekhane.symploke.adapters.base import SearchResult
 from mekhane.symploke.factory import VectorStoreFactory
 
 
+# PURPOSE: HNSWlib Adapter テスト
 class TestHNSWlibAdapter:
     """HNSWlib Adapter テスト"""
 
+    # PURPOSE: インデックス作成
     def test_create_index(self):
         """インデックス作成"""
         adapter = HNSWlibAdapter()
@@ -26,6 +28,7 @@ class TestHNSWlibAdapter:
         assert adapter.dimension == 128
         assert adapter.count() == 0
 
+    # PURPOSE: ベクトル追加
     def test_add_vectors(self):
         """ベクトル追加"""
         adapter = HNSWlibAdapter()
@@ -37,6 +40,7 @@ class TestHNSWlibAdapter:
         assert len(ids) == 100
         assert adapter.count() == 100
 
+    # PURPOSE: メタデータ付きベクトル追加
     def test_add_vectors_with_metadata(self):
         """メタデータ付きベクトル追加"""
         adapter = HNSWlibAdapter()
@@ -49,6 +53,7 @@ class TestHNSWlibAdapter:
         assert len(ids) == 10
         assert adapter.get_metadata(0) == {"title": "Paper 0"}
 
+    # PURPOSE: search をテストする
     def test_search(self):
         """検索"""
         adapter = HNSWlibAdapter()
@@ -66,6 +71,7 @@ class TestHNSWlibAdapter:
         assert isinstance(results[0], SearchResult)
         assert results[0].id == 0  # 自分自身が最近傍
 
+    # PURPOSE: 永続化と読み込み
     def test_save_load(self):
         """永続化と読み込み"""
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -88,9 +94,11 @@ class TestHNSWlibAdapter:
             assert adapter2.get_metadata(10) == {"id": 10}
 
 
+# PURPOSE: Factory テスト
 class TestVectorStoreFactory:
     """Factory テスト"""
 
+    # PURPOSE: hnswlibアダプタ生成
     def test_create_hnswlib(self):
         """hnswlibアダプタ生成"""
         if not VectorStoreFactory.is_registered("hnswlib"):
@@ -99,11 +107,13 @@ class TestVectorStoreFactory:
         store = VectorStoreFactory.create("hnswlib")
         assert store.name == "hnswlib"
 
+    # PURPOSE: 未知のアダプタ
     def test_unknown_adapter(self):
         """未知のアダプタ"""
         with pytest.raises(ValueError):
             VectorStoreFactory.create("unknown_adapter")
 
+    # PURPOSE: 登録済みアダプタ一覧
     def test_list_adapters(self):
         """登録済みアダプタ一覧"""
         adapters = VectorStoreFactory.list_adapters()

@@ -16,6 +16,7 @@ CDP_PORT = 9222
 OUTPUT_DIR = Path(r"M:\Brain\.hegemonikon\sessions")
 
 
+# PURPOSE: STYLE 要素を除外してテキストを取得
 async def extract_text_without_style(element):
     """STYLE 要素を除外してテキストを取得"""
     return await element.evaluate("""
@@ -41,6 +42,7 @@ async def extract_text_without_style(element):
     """)
 
 
+# PURPOSE: メッセージを抽出
 async def extract_messages(page):
     """メッセージを抽出"""
     messages = []
@@ -122,6 +124,7 @@ async def extract_messages(page):
         return []
 
 
+# PURPOSE: main の処理
 async def main():
     from playwright.async_api import async_playwright
 

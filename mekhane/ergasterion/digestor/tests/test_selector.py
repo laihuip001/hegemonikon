@@ -10,6 +10,7 @@ from typing import Optional
 from mekhane.ergasterion.digestor.selector import DigestorSelector, DigestCandidate
 
 
+# PURPOSE: テスト用の Paper モック
 @dataclass
 class MockPaper:
     """テスト用の Paper モック"""
@@ -23,15 +24,18 @@ class MockPaper:
     url: Optional[str] = None
 
 
+# PURPOSE: DigestorSelector のテスト
 class TestDigestorSelector:
     """DigestorSelector のテスト"""
 
+    # PURPOSE: 空のリストを渡した場合
     def test_select_candidates_empty(self):
         """空のリストを渡した場合"""
         selector = DigestorSelector()
         candidates = selector.select_candidates([])
         assert candidates == []
 
+    # PURPOSE: マッチする論文がある場合
     def test_select_candidates_with_matching_paper(self):
         """マッチする論文がある場合"""
         selector = DigestorSelector()
@@ -51,6 +55,7 @@ class TestDigestorSelector:
         # （マッチしない場合は空リスト）
         assert isinstance(candidates, list)
 
+    # PURPOSE: スコア順にソートされることを確認
     def test_select_candidates_score_ordering(self):
         """スコア順にソートされることを確認"""
         selector = DigestorSelector()
@@ -77,6 +82,7 @@ class TestDigestorSelector:
         if len(candidates) >= 2:
             assert candidates[0].score >= candidates[1].score
 
+    # PURPOSE: トピック取得
     def test_get_topics(self):
         """トピック取得"""
         selector = DigestorSelector()
@@ -86,9 +92,11 @@ class TestDigestorSelector:
         assert isinstance(topics, list)
 
 
+# PURPOSE: DigestCandidate のテスト
 class TestDigestCandidate:
     """DigestCandidate のテスト"""
 
+    # PURPOSE: 候補の作成
     def test_create_candidate(self):
         """候補の作成"""
         paper = MockPaper(id="test-1", title="Test Paper", abstract="Test abstract")

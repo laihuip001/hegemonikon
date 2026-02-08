@@ -1,0 +1,26 @@
+# staging/
+
+> ステージング — 実験的・一時的ファイル置場
+
+## 構成
+
+- 20260121_1031_test-translator.prompt
+- 20260121_1046_integration-test.prompt
+- 20260121_1347_match_test.prompt
+- 20260121_1349_integration_test_adapter.prompt
+- 20260121_1356_integration_test_adapter.prompt
+- 20260121_1356_integration_test_adapter_1768971404.prompt
+- 20260121_1357_integration_test_adapter_1768971420.prompt
+- 20260128_0846_integration_test_adapter_1769557612.prompt
+- 20260128_2300_integration_test_adapter_1769608842.prompt
+- 20260128_2301_integration_test_adapter_1769608899.prompt
+- 20260208_1828_integration_test_adapter_1770542931.prompt
+- 20260208_1832_integration_test_adapter_1770543134.prompt
+- 20260208_1858_integration_test_adapter_1770544716.prompt
+- 20260208_1903_integration_test_adapter_1770545038.prompt
+- 20260208_1908_integration_test_adapter_1770545280.prompt
+- 20260208_1908_integration_test_adapter_1770545333.prompt
+- 20260208_1910_integration_test_adapter_1770545408.prompt
+- README.md
+- _test_full.prompt
+- draft_code-reviewer.prompt

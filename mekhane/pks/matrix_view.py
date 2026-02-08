@@ -13,6 +13,10 @@ A0 (FEP) → 知識の比較には構造化された多軸評価が必要
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+import json
+import os
+import re
+from typing import Optional
 
 from mekhane.pks.pks_engine import KnowledgeNugget
 
@@ -39,10 +43,8 @@ class MatrixRow:
 class PKSMatrixView:
     """Elicit 風の構造化比較表生成
 
-    複数論文/記事を共通軸で比較し、Markdown テーブルとして出力する。
-
     Phase 1: メタデータベース（タイトル, ソース, スコア, 要約）
-    Phase 2: LLM による軸抽出（methodology, findings, limitations）
+    Phase 2: LLM による横断軸抽出（methodology, findings, limitations）
     """
 
     DEFAULT_COLUMNS = [
@@ -52,9 +54,51 @@ class PKSMatrixView:
         MatrixColumn(name="Key Insight"),
     ]
 
-    # PURPOSE: PKSMatrixView の初期化 — 比較表を Markdown テーブルとして生成
-    def __init__(self, columns: list[MatrixColumn] | None = None):
+    _AXIS_PROMPT = (
+        "以下の{count}件の知識を比較するための横断軸を抽出してください。\n\n"
+        "{summaries}\n\n"
+        "JSON形式で軸群を出力:"
+        ' [{{"name": "軸名", "description": "説明"}}]\n'
+        "軸は3-5個。日本語で。横断比較に有用なもののみ。"
+    )
+
+    _FILL_PROMPT = (
+        "以下の知識について、指定された軸で評価してください。\n\n"
+        "タイトル: {title}\n"
+        "要約: {abstract}\n\n"
+        "軸: {axes}\n\n"
+        "JSON形式で各軸の値を出力 (各値は20文字以内):\n"
+        ' {{"axis_name": "value", ...}}'
+    )
+
+    # PURPOSE: PKSMatrixView の初期化
+    def __init__(
+        self,
+        columns: list[MatrixColumn] | None = None,
+        use_llm: bool = False,
+        model: str = "gemini-2.0-flash",
+    ):
         self.columns = columns or self.DEFAULT_COLUMNS
+        self._client = None
+        self._model = model
+        if use_llm:
+            self._init_client()
+
+    def _init_client(self) -> None:
+        try:
+            from google import genai
+            api_key = (
+                os.environ.get("GOOGLE_API_KEY")
+                or os.environ.get("GEMINI_API_KEY")
+                or os.environ.get("GOOGLE_GENAI_API_KEY")
+            )
+            self._client = genai.Client(api_key=api_key) if api_key else genai.Client()
+        except (ImportError, Exception):
+            self._client = None
+
+    @property
+    def llm_available(self) -> bool:
+        return self._client is not None
 
     # PURPOSE: 比較表を Markdown テーブルとして生成
     def generate(self, nuggets: list[KnowledgeNugget]) -> str:
@@ -65,9 +109,98 @@ class PKSMatrixView:
         rows = [self._nugget_to_row(n) for n in nuggets]
         return self._render_markdown(rows)
 
+    # PURPOSE: Phase 2: LLM で動的比較軸を抽出して表を生成
+    def generate_with_llm(
+        self, nuggets: list[KnowledgeNugget]
+    ) -> str:
+        """LLM で比較軸を抽出し、動的比較表を生成
+
+        LLM 不可時は Phase 1 フォールバック
+        """
+        if not nuggets:
+            return "📭 比較対象なし"
+
+        if not self.llm_available:
+            return self.generate(nuggets)
+
+        # Step 1: 軸抽出
+        axes = self._extract_axes(nuggets)
+        if not axes:
+            return self.generate(nuggets)  # フォールバック
+
+        # Step 2: 各 nugget を軸で評価
+        llm_columns = [
+            MatrixColumn(name="Title"),
+            *[MatrixColumn(name=a["name"], extractor=a.get("description", "")) for a in axes],
+            MatrixColumn(name="Score"),
+        ]
+
+        rows = []
+        for nugget in nuggets:
+            cells = self._fill_cells(nugget, axes)
+            cells["Title"] = nugget.title[:50]
+            cells["Score"] = f"{nugget.relevance_score:.2f}"
+            rows.append(MatrixRow(nugget=nugget, cells=cells))
+
+        # レンダリング
+        old_columns = self.columns
+        self.columns = llm_columns
+        result = self._render_markdown(rows)
+        self.columns = old_columns
+        return result
+
+    # PURPOSE: LLM で比較軸を抽出
+    def _extract_axes(self, nuggets: list[KnowledgeNugget]) -> list[dict]:
+        """複数 nugget から比較軸を抽出"""
+        summaries = "\n".join(
+            f"- {n.title}: {(n.abstract[:150] if n.abstract else '(none)')}"
+            for n in nuggets[:8]  # 最大8件
+        )
+        prompt = self._AXIS_PROMPT.format(
+            count=min(len(nuggets), 8), summaries=summaries
+        )
+
+        try:
+            response = self._client.models.generate_content(
+                model=self._model, contents=prompt
+            )
+            text = response.text if response else ""
+            # JSON 抽出
+            match = re.search(r'\[.*\]', text, re.DOTALL)
+            if match:
+                return json.loads(match.group())
+        except Exception as e:
+            print(f"[MatrixView] Axis extraction error: {e}")
+
+        return []
+
+    # PURPOSE: 各 nugget の軸値を LLM で埋める
+    def _fill_cells(self, nugget: KnowledgeNugget, axes: list[dict]) -> dict[str, str]:
+        """指定軸で nugget を評価"""
+        axis_list = ", ".join(a["name"] for a in axes)
+        prompt = self._FILL_PROMPT.format(
+            title=nugget.title,
+            abstract=nugget.abstract[:300] if nugget.abstract else "(none)",
+            axes=axis_list,
+        )
+
+        try:
+            response = self._client.models.generate_content(
+                model=self._model, contents=prompt
+            )
+            text = response.text if response else ""
+            match = re.search(r'\{.*\}', text, re.DOTALL)
+            if match:
+                return json.loads(match.group())
+        except Exception as e:
+            print(f"[MatrixView] Fill error: {e}")
+
+        # フォールバック: 空セル
+        return {a["name"]: "-" for a in axes}
+
     # PURPOSE: KnowledgeNugget をテーブル行に変換
     def _nugget_to_row(self, nugget: KnowledgeNugget) -> MatrixRow:
-        """KnowledgeNugget をテーブル行に変換"""
+        """メタデータベースの行変換 (Phase 1)"""
         cells = {
             "Title": nugget.title[:50],
             "Source": nugget.source,
@@ -78,7 +211,7 @@ class PKSMatrixView:
 
     # PURPOSE: Markdown テーブルをレンダリング
     def _render_markdown(self, rows: list[MatrixRow]) -> str:
-        """Markdown テーブルをレンダリング"""
+        """テーブルを文字列でレンダリング"""
         col_names = [c.name for c in self.columns]
 
         lines = [

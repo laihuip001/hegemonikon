@@ -15,6 +15,22 @@ Q.E.D.
 
 Universal Metacognitive Layer (UML)
 
+⚠️ Phase 1 Status: SPECIFICATION (仕様書 / Contract)
+
+  現在の実装は LLM のプロンプト注入によるメタ認知ではなく、
+  テキストベースのヒューリスティック検査である。
+  本来 MP が要求する「自己質問→応答→再評価」のループは
+  Python 関数では実現できず、LLM プロンプトチェーンとして
+  Phase 2 で実装する必要がある。
+
+  Phase 1 (現在): ヒューリスティック検査 = CONTRACT
+    - 各 Stage の検査条件を形式的に定義
+    - BC-9 のリマインダーとして機能
+    - 「常に PASS を返す Stage は Stage ではない」(/m dia+ E2)
+  Phase 2 (将来): プロンプト注入による真の環境強制
+    - sel_enforcement との統合
+    - LLM に Stage 質問を強制的に回答させる仕組み
+
 MP の5段階を全WFの前後に環境強制するレイヤー。
 
 Pre-check (WF実行前):

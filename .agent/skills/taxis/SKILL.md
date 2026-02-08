@@ -9,36 +9,46 @@ triggers:
   - "振り分け"
   - "TODO"
   - "整理"
+  - "morphism"
 ---
 
 # Taxis Classifier
 
-> **目的**: タスク・入力を自動分類し、最適な処理パイプラインに振り分ける。
+> **目的**: ワークフロー間の関係 (morphism) を解析し、タスクの構造を可視化する。
 
 ## 発動条件
 
-- 曖昧な入力の分類が必要な時
-- タスクの優先順位付け
+- タスク間の依存関係を知りたい時
+- WF の分類・優先順位付け
 - /tak ワークフロー実行時
 
 ## 手順
 
-### Step 1: 入力を分類
+### Step 1: WF ディレクトリから morphism を解析
 
 // turbo
 
 ```bash
+cd ~/oikos/hegemonikon && PYTHONPATH=. .venv/bin/python mekhane/taxis/morphism_proposer.py
+```
+
+### Step 2: 特定 WF の trigonon (三角関係) を解析
+
+```bash
 cd ~/oikos/hegemonikon && PYTHONPATH=. .venv/bin/python -c "
-from mekhane.taxis.morphism_proposer import propose_morphisms
-result = propose_morphisms('INPUT_TEXT')
-for m in result:
-    print(f'{m[\"source\"]} → {m[\"target\"]}: {m[\"type\"]}')
+from mekhane.taxis.morphism_proposer import parse_trigonon
+from pathlib import Path
+result = parse_trigonon(Path('.agent/workflows/WF_NAME.md'))
+if result:
+    print(f'WF: {result[\"name\"]}')
+    print(f'Modules: {result.get(\"modules\", [])}')
+    print(f'Derivatives: {result.get(\"derivatives\", [])}')
 "
 ```
 
-> ⚠️ `INPUT_TEXT` を実際の入力に置換。
+> ⚠️ `WF_NAME` を実際の WF ファイル名に置換。
 
-### Step 2: 分類結果に基づいてルーティング
+### Step 3: 分類結果に基づいてルーティング
 
 | 分類 | ルーティング先 |
 |:---|:---|
@@ -48,4 +58,4 @@ for m in result:
 
 ---
 
-*v1.0 — 全PJ IDE配線 (2026-02-08)*
+*v1.1 — import パス検証済み (2026-02-08)*

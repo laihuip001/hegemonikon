@@ -661,13 +661,18 @@ class TheoremAttractor:
 
     # PURPOSE: Q7 — 抑制行列構築 (cosine distance → inhibition strength)
     def _build_inhibition_matrix(self, proto_normed: np.ndarray) -> np.ndarray:
-        """Cosine distance > threshold → inhibition strength.
+        """Cosine distance → 行正規化された inhibition strength.
 
         距離が大きいほど抑制が強い。同一 theorem は 0。
+        行正規化: transition matrix と同スケール (行和≈1) にする。
         """
         sim_matrix = proto_normed @ proto_normed.T
         dist_matrix = 1.0 - sim_matrix
         np.fill_diagonal(dist_matrix, 0)
+        # 行正規化: transition matrix と同スケールにする
+        row_sums = dist_matrix.sum(axis=1, keepdims=True)
+        row_sums[row_sums == 0] = 1
+        dist_matrix = dist_matrix / row_sums
         return dist_matrix.astype(np.float32)
 
     # --- 1. Theorem-Level Attractor ---
@@ -1010,6 +1015,138 @@ class TheoremAttractor:
         for step in range(1, steps + 1):
             state = state @ T
             state = state / state.sum()
+            states.append(self._make_flow_state(step, state.copy()))
+
+            if step > 1:
+                diff = np.abs(state - states[-2].activation).max()
+                if diff < threshold:
+                    break
+
+        return states
+
+    # --- 2b. Excitation-Inhibition Flow (E/I) ---
+
+    # PURPOSE: 興奮-抑制統合の flow simulation
+    def simulate_flow_ei(
+        self,
+        user_input: str,
+        steps: int = 15,
+        beta: float = 0.3,
+        convergence_threshold: float = 0.001,
+    ) -> FlowResult:
+        """興奮-抑制統合の flow simulation.
+
+        通常の simulate_flow() が興奮射のみで伝播するのに対し、
+        こちらは各ステップで抑制を同時に適用する。
+
+        各ステップ:
+            excitation = state @ T           (興奮: 遷移行列)
+            inhibition = state @ I           (抑制: distance 行列)
+            next_state = ReLU(excitation - β * inhibition)
+            next_state = normalize(next_state)
+
+        Args:
+            beta: 抑制の強さ (0=抑制なし=通常flow, 1=最大抑制)
+            steps: シミュレーションステップ数
+        """
+        self._ensure_initialized()
+
+        # 初期 activation
+        sims = self._compute_similarities(user_input)
+        initial = np.array(
+            [s for _, s in sorted(sims, key=lambda x: THEOREM_KEYS.index(x[0]))],
+            dtype=np.float32,
+        )
+        initial = self._softmax(initial, temperature=0.2)
+
+        # Inhibition matrix
+        inhib = self._inhibition_matrix
+        if inhib is None:
+            # Fallback to excitation-only
+            return self.simulate_flow(user_input, steps=steps,
+                                      convergence_threshold=convergence_threshold)
+
+        if TORCH_AVAILABLE and self._device is not None and self._device.type == "cuda":
+            states = self._simulate_ei_gpu(initial, inhib, steps, beta, convergence_threshold)
+        else:
+            states = self._simulate_ei_cpu(initial, inhib, steps, beta, convergence_threshold)
+
+        # 収束判定
+        converged_at = -1
+        for i in range(1, len(states)):
+            diff = np.abs(states[i].activation - states[i - 1].activation).max()
+            if diff < convergence_threshold:
+                converged_at = i
+                break
+
+        return FlowResult(
+            initial_similarities=sorted(sims, key=lambda x: x[1], reverse=True),
+            states=states,
+            converged_at=converged_at,
+            final_theorems=states[-1].top_theorems,
+        )
+
+    def _simulate_ei_gpu(
+        self,
+        initial: np.ndarray,
+        inhib: np.ndarray,
+        steps: int,
+        beta: float,
+        threshold: float,
+    ) -> list[FlowState]:
+        """GPU E/I flow."""
+        from mekhane.fep.gpu import to_tensor
+        state = to_tensor(initial, self._device)
+        T = self._transition_matrix
+        I = to_tensor(inhib if isinstance(inhib, np.ndarray) else inhib.cpu().numpy(),
+                      self._device)
+        states = [self._make_flow_state(0, initial)]
+
+        for step in range(1, steps + 1):
+            excitation = state @ T
+            inhibition = state @ I
+            state = torch.clamp(excitation - beta * inhibition, min=0)
+            # Re-normalize
+            s = state.sum()
+            if s > 0:
+                state = state / s
+            else:
+                state = torch.ones_like(state) / 24  # 全抑制 → uniform fallback
+            state_np = state.cpu().numpy()
+            states.append(self._make_flow_state(step, state_np))
+
+            if step > 1:
+                diff = np.abs(state_np - states[-2].activation).max()
+                if diff < threshold:
+                    break
+
+        return states
+
+    def _simulate_ei_cpu(
+        self,
+        initial: np.ndarray,
+        inhib: np.ndarray,
+        steps: int,
+        beta: float,
+        threshold: float,
+    ) -> list[FlowState]:
+        """CPU E/I flow."""
+        state = initial.copy()
+        T = self._transition_matrix if isinstance(self._transition_matrix, np.ndarray) \
+            else self._transition_matrix.cpu().numpy()
+        I = inhib if isinstance(inhib, np.ndarray) else inhib.cpu().numpy()
+        states = [self._make_flow_state(0, state)]
+
+        for step in range(1, steps + 1):
+            excitation = state @ T
+            inhibition = state @ I
+            state = np.maximum(excitation - beta * inhibition, 0)
+            # Re-normalize
+            s = state.sum()
+            if s > 0:
+                state = state / s
+            else:
+                state = np.ones(24, dtype=np.float32) / 24
             states.append(self._make_flow_state(step, state.copy()))
 
             if step > 1:

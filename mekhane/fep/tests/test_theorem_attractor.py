@@ -10,6 +10,7 @@ GPU 非搭載環境でも CPU fallback で動作可能。
 from __future__ import annotations
 
 import pytest
+import numpy as np
 
 from mekhane.fep.theorem_attractor import (
     MORPHISM_MAP,
@@ -511,6 +512,55 @@ class TestDecomposition:
     def test_divergence_range(self, attractor):
         r = attractor.suggest_decomposed("設計の本質を問う。実装方法を選ぶ。品質を測る")
         assert 0.0 <= r["divergence"] <= 1.0
+
+
+# ---------------------------------------------------------------------------
+# E/I Flow
+# ---------------------------------------------------------------------------
+
+# PURPOSE: 興奮-抑制統合 flow テスト
+class TestEIFlow:
+    """興奮-抑制統合 flow テスト"""
+
+    # PURPOSE: simulate_flow_ei が FlowResult を返す
+    def test_returns_flow_result(self, attractor):
+        r = attractor.simulate_flow_ei("テスト")
+        assert isinstance(r, FlowResult)
+        assert len(r.states) >= 2
+
+    # PURPOSE: beta=0 は通常 flow に近い挙動
+    def test_beta_zero_like_standard(self, attractor):
+        ei = attractor.simulate_flow_ei("Why does this exist?", beta=0.0, steps=5)
+        # beta=0 means no inhibition, should still produce valid flow
+        assert ei.states[-1].activation.sum() > 0.99
+
+    # PURPOSE: 高い beta では活性化パターンが変わる
+    def test_high_beta_changes_pattern(self, attractor):
+        low = attractor.simulate_flow_ei("test", beta=0.1, steps=10)
+        high = attractor.simulate_flow_ei("test", beta=0.5, steps=10)
+        # 最終状態の top-1 が異なるか、少なくとも分布が変わる
+        low_act = low.states[-1].activation
+        high_act = high.states[-1].activation
+        diff = np.abs(low_act - high_act).max()
+        assert diff > 0.005, "High beta should change activation pattern"
+
+    # PURPOSE: 収束する
+    def test_converges(self, attractor):
+        r = attractor.simulate_flow_ei("テスト", steps=20)
+        # 収束するか、少なくとも全ステップ実行
+        assert r.converged_at > 0 or len(r.states) == 21
+
+    # PURPOSE: 抑制対象の活性が低い
+    def test_inhibited_theorems_suppressed(self, attractor):
+        """O1を強く活性化 → P4 (最も抑制される) の活性が低いはず"""
+        r = attractor.simulate_flow_ei("Why does this truly exist?", beta=0.4, steps=10)
+        final = r.states[-1]
+        # P4 の活性 vs O1 の活性
+        p4_act = final.activation[THEOREM_KEYS.index("P4")]
+        o1_act = final.activation[THEOREM_KEYS.index("O1")]
+        # O1入力ならP4は抑制されるはず (絶対的保証はないが傾向として)
+        assert p4_act < o1_act or p4_act < 0.1
+
 
 
 

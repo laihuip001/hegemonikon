@@ -10,43 +10,65 @@ triggers:
   - "synteleia"
   - "免疫"
   - "検証"
+  - "監査"
+  - "audit"
 ---
 
 # Synteleia WBC (白血球)
 
-> **目的**: システムの免疫系。操作の安全性を検証し、不正操作を検知する。
+> **目的**: システムの免疫系。6視点認知アンサンブルで多角監査を実行する。
 
 ## 発動条件
 
 - 破壊的操作 (ファイル削除、大規模変更) の前
 - WF/Skill の変更時
 - セキュリティ関連の確認
+- コード・設計の品質監査
 
 ## 手順
 
-### Step 1: 安全性チェック
+### Step 1: Synteleia オーケストレーターで監査
 
 // turbo
 
 ```bash
 cd ~/oikos/hegemonikon && PYTHONPATH=. .venv/bin/python -c "
-from mekhane.synteleia.wbc import WhiteBloodCell
-wbc = WhiteBloodCell()
-result = wbc.check('OPERATION_DESCRIPTION')
-print(result)
+from mekhane.synteleia import SynteleiaOrchestrator, AuditTarget, AuditTargetType
+orchestrator = SynteleiaOrchestrator()
+target = AuditTarget(
+    name='AUDIT_TARGET_NAME',
+    target_type=AuditTargetType.CODE,
+    content='AUDIT_TARGET_CONTENT',
+)
+result = orchestrator.audit(target)
+print(f'Score: {result.overall_score:.1f}/10')
+print(f'Issues: {len(result.issues)}')
+for issue in result.issues[:5]:
+    print(f'  [{issue.severity.value}] {issue.message}')
 "
 ```
 
-> ⚠️ `OPERATION_DESCRIPTION` を実際の操作内容に置換。
+> ⚠️ `AUDIT_TARGET_NAME` と `AUDIT_TARGET_CONTENT` を置換。
 
-### Step 2: リスク判定
+### Step 2: 個別エージェントで深堀り
+
+| Agent | import | 視点 |
+|:---|:---|:---|
+| OusiaAgent | `from mekhane.synteleia.poiesis import OusiaAgent` | 本質 (O) |
+| SchemaAgent | 同上 `SchemaAgent` | 構造 (S) |
+| HormeAgent | 同上 `HormeAgent` | 動機 (H) |
+| PerigrapheAgent | `from mekhane.synteleia.dokimasia import PerigrapheAgent` | 範囲 (P) |
+| KairosAgent | 同上 `KairosAgent` | 時期 (K) |
+| OperatorAgent | 同上 `OperatorAgent` | 精度 (A) |
+
+### Step 3: リスク判定
 
 | リスク | アクション |
 |:---|:---|
-| LOW | 続行 |
-| MEDIUM | Creator に確認 |
-| HIGH | **停止**、理由を報告 |
+| スコア ≥ 7 | 続行 |
+| スコア 4-6 | Creator に確認 |
+| スコア < 4 | **停止**、理由を報告 |
 
 ---
 
-*v1.0 — 全PJ IDE配線 (2026-02-08)*
+*v1.1 — import パス検証済み (2026-02-08)*

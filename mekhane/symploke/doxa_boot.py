@@ -29,11 +29,16 @@ from mekhane.fep.doxa_persistence import (
 # Constants
 # =============================================================================
 
-# Sophia 昇格閾値 (仮値 — 実データで調整)
-PROMOTION_MIN_STRENGTH = BeliefStrength.STRONG
-PROMOTION_MIN_CONFIDENCE = 0.85
-PROMOTION_MIN_AGE_DAYS = 14.0
-PROMOTION_MIN_EVIDENCE = 2
+# Sophia 昇格閾値
+# ⚠️ PROVISIONAL: 以下は全て仮値。実データ収集後に calibration すべき。
+# Calibration Plan:
+#   1. 10+ 信念が蓄積されたら precision/recall を測定
+#   2. Sophia に昇格した信念の「使われ度」を追跡
+#   3. 使われない昇格 = 閾値が低すぎる証拠
+PROMOTION_MIN_STRENGTH = BeliefStrength.STRONG  # PROVISIONAL
+PROMOTION_MIN_CONFIDENCE = 0.85  # PROVISIONAL: 実感として 0.8-0.9 の範囲
+PROMOTION_MIN_AGE_DAYS = 14.0  # PROVISIONAL: 2週間の定着期間
+PROMOTION_MIN_EVIDENCE = 2  # PROVISIONAL: 最低2件の根拠
 
 
 # =============================================================================

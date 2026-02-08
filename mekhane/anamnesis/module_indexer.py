@@ -18,16 +18,26 @@ M:\\Brain\\99_保管庫\\プロンプト ライブラリー\\モジュール（�
 """
 
 from pathlib import Path
+import os
 from typing import List, Optional
 
 import lancedb
 from pydantic import BaseModel
 
-# 設定
+# 設定 — 環境変数でオーバーライド可能
+_PROJECT_ROOT = Path(__file__).parent.parent.parent
 MODULES_DIR = Path(
-    r"M:\Brain\99_🗃️_保管庫｜Archive\プロンプト ライブラリー\モジュール（開発用）"
+    os.environ.get(
+        "HGK_MODULES_DIR",
+        str(_PROJECT_ROOT / ".agent" / "skills"),
+    )
 )
-DB_PATH = Path(r"M:\Brain\.hegemonikon\lancedb")
+DB_PATH = Path(
+    os.environ.get(
+        "HGK_MODULE_DB_PATH",
+        str(_PROJECT_ROOT / "gnosis_data" / "lancedb"),
+    )
+)
 TABLE_NAME = "dev_modules"
 
 
@@ -114,7 +124,7 @@ def index_modules():
         return
 
     # テーブルが存在する場合は削除して再作成
-    if TABLE_NAME in db.table_names():
+    if TABLE_NAME in db.list_tables():
         db.drop_table(TABLE_NAME)
         print(f"[*] Dropped existing table: {TABLE_NAME}")
 
@@ -142,7 +152,7 @@ def search_modules(query: str, limit: int = 5):
     """モジュールを検索"""
     db = lancedb.connect(str(DB_PATH))
 
-    if TABLE_NAME not in db.table_names():
+    if TABLE_NAME not in db.list_tables():
         print("[!] No modules indexed. Run index_modules() first.")
         return []
 

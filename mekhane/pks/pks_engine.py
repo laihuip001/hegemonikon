@@ -14,6 +14,9 @@ A0 (FEP) → 予測誤差最小化には能動的知識表面化が必要
 from __future__ import annotations
 
 import json
+import math
+import os
+import re
 import sys
 from dataclasses import dataclass, field
 from datetime import datetime
@@ -43,6 +46,8 @@ class KnowledgeNugget:
     url: Optional[str] = None
     authors: Optional[str] = None
     push_reason: str = ""  # なぜこの知識を今プッシュするのか
+    suggested_questions: list[str] = field(default_factory=list)  # v2: 聞くべき質問
+    serendipity_score: float = 0.0  # v2: 意外性スコア
 
     # PURPOSE: Markdown 形式で出力
     def to_markdown(self) -> str:
@@ -214,6 +219,244 @@ class RelevanceDetector:
         return " / ".join(reasons)
 
 
+# --- v2: Autophōnos コンポーネント ---
+
+
+# PURPOSE: Handoff テキストからトピックを自動抽出する
+class AutoTopicExtractor:
+    """Handoff テキストからトピックを自動抽出する (Mem 風)
+
+    Handoff の構造（YAML frontmatter + Markdown）を解析し、
+    重要なトピックを正規表現ベースで抽出する。
+    LLM 不要の軽量実装。
+    """
+
+    # キーワード抽出の正規表現パターン
+    _YAML_KEYS = re.compile(
+        r"(?:primary_task|decision|pattern|topic|recommendation):\s*[\"']?(.+?)[\"']?\s*$",
+        re.MULTILINE,
+    )
+    _COMPLETED_TASKS = re.compile(r"-\s*\[x\]\s*(.+?)(?:\s*✓|$)", re.MULTILINE)
+    _NEXT_TASKS = re.compile(r"-\s*\[\s\]\s*(.+?)$", re.MULTILINE)
+    _HEADERS = re.compile(r"^#{1,3}\s+(.+)$", re.MULTILINE)
+
+    # PURPOSE: Handoff テキストからトピックを自動抽出
+    def extract(self, text: str, max_topics: int = 8) -> list[str]:
+        """Handoff テキストからトピックを自動抽出
+
+        抽出戦略:
+        1. YAML frontmatter のキー値 (primary_task, decision 等)
+        2. 完了タスクの名前
+        3. 未完了タスクの名前 (次のセッションの文脈)
+        4. セクションヘッダー
+
+        Returns:
+            重複排除されたトピックリスト (最大 max_topics 件)
+        """
+        topics: list[str] = []
+
+        # 1. YAML キー値
+        for m in self._YAML_KEYS.finditer(text):
+            val = m.group(1).strip()
+            if len(val) > 3:  # ノイズ除去
+                topics.append(val)
+
+        # 2. 完了タスク名
+        for m in self._COMPLETED_TASKS.finditer(text):
+            task_name = m.group(1).strip()
+            # 短すぎるものは除外
+            if len(task_name) > 5:
+                topics.append(task_name)
+
+        # 3. 未完了タスク名 (次回の文脈として重要)
+        for m in self._NEXT_TASKS.finditer(text):
+            task_name = m.group(1).strip()
+            if len(task_name) > 5:
+                topics.append(task_name)
+
+        # 重複排除 (順序保持)
+        seen: set[str] = set()
+        unique: list[str] = []
+        for t in topics:
+            key = t.lower()
+            if key not in seen:
+                seen.add(key)
+                unique.append(t)
+
+        return unique[:max_topics]
+
+
+# PURPOSE: 「関連するが意外」な情報を優先するスコアリング
+class SerendipityScorer:
+    """Serendipity Score — 意外だが有用な情報を発見する (Glean/Obsidian 風)
+
+    通常の関連度スコアは「完全一致」を最高としてランク付けするが、
+    セレンディピティスコアは「関連するが予想外」な情報を優先する。
+
+    情報理論: Serendipity ≈ Relevance × Surprise
+    - Relevance: 既存の関連度スコア
+    - Surprise: コンテキストからの「距離」(近すぎず遠すぎずの情報量)
+    """
+
+    # PURPOSE: セレンディピティスコアを算出
+    def score(
+        self,
+        relevance: float,
+        distance: float,
+        sweet_spot: float = 0.45,
+        spread: float = 0.15,
+    ) -> float:
+        """セレンディピティスコアを算出
+
+        Relevance × Gaussian(distance, sweet_spot, spread)
+
+        sweet_spot: 「ちょうどいい意外性」の距離
+        spread: sweet_spot 周りの許容幅
+
+        Returns:
+            0.0〜1.0 のセレンディピティスコア
+        """
+        # ガウシアン: sweet_spot 付近で最大、離れるほど減衰
+        surprise = math.exp(
+            -((distance - sweet_spot) ** 2) / (2 * spread**2)
+        )
+        return relevance * surprise
+
+    # PURPOSE: KnowledgeNugget リストにセレンディピティスコアを付与
+    def enrich(
+        self, nuggets: list[KnowledgeNugget], raw_distances: list[float]
+    ) -> list[KnowledgeNugget]:
+        """KnowledgeNugget リストにセレンディピティスコアを付与
+
+        Args:
+            nuggets: スコア付きナゲット
+            raw_distances: 各ナゲットの元のベクトル距離
+        """
+        for nugget, dist in zip(nuggets, raw_distances):
+            nugget.serendipity_score = self.score(nugget.relevance_score, dist)
+        return nuggets
+
+
+# PURPOSE: プッシュされた知識から「聞くべき質問」を LLM 生成する
+class SuggestedQuestionGenerator:
+    """Suggested Questions — NotebookLM の「聞くべき質問」機能の再現
+
+    プッシュされた KnowledgeNugget を分析し、
+    Creator が深掘りすべき質問を 3 つ自動生成する。
+
+    Gemini API (google.genai SDK) を使用。
+    API 不可時はテンプレートベースのフォールバック。
+    """
+
+    _PROMPT_TEMPLATE = (
+        "以下の知識について、この知識を活用して洞察を得るために"
+        "最も重要な質問を3つ生成してください。\n\n"
+        "質問は具体的で、単なる要約の繰り返しではなく、\n"
+        "- 応用可能性\n"
+        "- 既存知識との接続点\n"
+        "- 隠れた前提や限界\n"
+        "を問うものにしてください。\n\n"
+        "タイトル: {title}\n"
+        "要約: {abstract}\n"
+        "ソース: {source}\n\n"
+        "出力形式: 各質問を1行ずつ、番号なしで出力してください。"
+    )
+
+    # PURPOSE: Gemini クライアントを初期化
+    def __init__(self, model: str = "gemini-2.0-flash"):
+        self.model_name = model
+        self._client = None
+        self._init_client()
+
+    def _init_client(self) -> None:
+        """Gemini クライアントを遅延初期化"""
+        try:
+            from google import genai
+
+            api_key = (
+                os.environ.get("GOOGLE_API_KEY")
+                or os.environ.get("GEMINI_API_KEY")
+                or os.environ.get("GOOGLE_GENAI_API_KEY")
+            )
+            if api_key:
+                self._client = genai.Client(api_key=api_key)
+            else:
+                self._client = genai.Client()
+        except (ImportError, Exception):
+            self._client = None
+
+    @property
+    def is_available(self) -> bool:
+        return self._client is not None
+
+    # PURPOSE: KnowledgeNugget から「聞くべき質問」を生成
+    def generate(
+        self, nugget: KnowledgeNugget, num_questions: int = 3
+    ) -> list[str]:
+        """KnowledgeNugget から「聞くべき質問」を生成
+
+        LLM 可用時は Gemini で生成。不可時はテンプレートフォールバック。
+
+        Returns:
+            質問文字列のリスト (最大 num_questions 件)
+        """
+        if self.is_available:
+            return self._generate_llm(nugget, num_questions)
+        return self._generate_fallback(nugget, num_questions)
+
+    def _generate_llm(
+        self, nugget: KnowledgeNugget, num_questions: int
+    ) -> list[str]:
+        """Gemini API で質問を生成"""
+        prompt = self._PROMPT_TEMPLATE.format(
+            title=nugget.title,
+            abstract=nugget.abstract[:500] if nugget.abstract else "(なし)",
+            source=nugget.source,
+        )
+
+        try:
+            response = self._client.models.generate_content(
+                model=self.model_name, contents=prompt
+            )
+            text = response.text if response else ""
+            if text:
+                lines = [
+                    line.strip()
+                    for line in text.strip().split("\n")
+                    if line.strip() and not line.strip().startswith("#")
+                ]
+                # 番号プレフィックスを除去
+                cleaned = []
+                for line in lines:
+                    cleaned_line = re.sub(r"^\d+[.\)]\s*", "", line)
+                    if cleaned_line:
+                        cleaned.append(cleaned_line)
+                return cleaned[:num_questions]
+        except Exception as e:
+            print(f"[PKS] SuggestedQuestion LLM error: {e}")
+
+        return self._generate_fallback(nugget, num_questions)
+
+    def _generate_fallback(
+        self, nugget: KnowledgeNugget, num_questions: int
+    ) -> list[str]:
+        """テンプレートベースのフォールバック生成"""
+        title = nugget.title
+        questions = [
+            f"『{title}』の知見は、現在の作業にどう応用できるか？",
+            f"『{title}』が前提としている仮定は何か？その仮定は妥当か？",
+            f"『{title}』と矛盾する既知の知識はあるか？",
+        ]
+        return questions[:num_questions]
+
+    # PURPOSE: 複数ナゲットに一括で質問を付与
+    def enrich_batch(self, nuggets: list[KnowledgeNugget]) -> list[KnowledgeNugget]:
+        """複数ナゲットに一括で質問を付与"""
+        for nugget in nuggets:
+            nugget.suggested_questions = self.generate(nugget)
+        return nuggets
+
+
 class PushController:
     """閾値超過時に知識を能動的にプッシュ
 
@@ -294,10 +537,15 @@ class PKSEngine:
         threshold: float = 0.65,
         max_push: int = 5,
         lance_dir: Optional[Path] = None,
+        enable_questions: bool = True,
+        enable_serendipity: bool = True,
     ):
         self.tracker = ContextTracker()
         self.detector = RelevanceDetector(threshold=threshold)
         self.controller = PushController(max_push=max_push)
+        self.topic_extractor = AutoTopicExtractor()
+        self.serendipity_scorer = SerendipityScorer() if enable_serendipity else None
+        self.question_gen = SuggestedQuestionGenerator() if enable_questions else None
 
         # 遅延インポート (GnosisIndex は重い)
         self._index = None
@@ -330,6 +578,40 @@ class PKSEngine:
             self.tracker.set_workflows(workflows)
         if handoff_path:
             self.tracker.load_from_handoff(handoff_path)
+
+    # PURPOSE: v2: Handoff から自動的にコンテキストを設定
+    def auto_context_from_handoff(self, handoff_path: Optional[Path] = None) -> list[str]:
+        """Handoff テキストからトピックを自動抽出してコンテキストに設定
+
+        Args:
+            handoff_path: Handoff ファイルパス。None の場合は最新を自動検出。
+
+        Returns:
+            抽出されたトピックのリスト
+        """
+        if handoff_path is None:
+            # 最新の Handoff を自動検出
+            handoff_dir = Path.home() / "oikos" / "mneme" / ".hegemonikon" / "sessions"
+            if handoff_dir.exists():
+                handoffs = sorted(
+                    handoff_dir.glob("handoff_*.md"), reverse=True
+                )
+                if handoffs:
+                    handoff_path = handoffs[0]
+
+        if handoff_path is None or not handoff_path.exists():
+            print("[PKS] Handoff ファイルが見つかりません")
+            return []
+
+        text = handoff_path.read_text(encoding="utf-8", errors="replace")
+        topics = self.topic_extractor.extract(text)
+
+        if topics:
+            self.tracker.update_topics(topics)
+            self.tracker.load_from_handoff(handoff_path)
+            print(f"[PKS] 自動トピック抽出: {topics}")
+
+        return topics
 
     # PURPOSE: 能動的プッシュ: コンテキストに基づいて知識を表面化
     def proactive_push(self, k: int = 20) -> list[KnowledgeNugget]:
@@ -387,6 +669,19 @@ class PKSEngine:
         nuggets = self.detector.score(self.tracker.context, results)
         return nuggets  # 明示的検索ではクールダウンなし
 
+    # PURPOSE: v2: プッシュされた知識に対する「聞くべき質問」を生成
+    def suggest_questions(
+        self, nuggets: list[KnowledgeNugget]
+    ) -> list[KnowledgeNugget]:
+        """プッシュされたナゲットに「聞くべき質問」を付与
+
+        Returns:
+            suggested_questions が付与された KnowledgeNugget リスト
+        """
+        if self.question_gen:
+            return self.question_gen.enrich_batch(nuggets)
+        return nuggets
+
     # PURPOSE: プッシュ結果を Markdown レポートに整形
     def format_push_report(self, nuggets: list[KnowledgeNugget]) -> str:
         """プッシュ結果を Markdown レポートに整形"""
@@ -405,6 +700,19 @@ class PKSEngine:
         for nugget in nuggets:
             lines.append("")
             lines.append(nugget.to_markdown())
+
+            # v2: 聞くべき質問を表示
+            if nugget.suggested_questions:
+                lines.append("")
+                lines.append("**💡 聞くべき質問:**")
+                for q in nugget.suggested_questions:
+                    lines.append(f"- {q}")
+
+            # v2: セレンディピティスコアを表示
+            if nugget.serendipity_score > 0:
+                lines.append(f"")
+                lines.append(f"_🎲 意外性: {nugget.serendipity_score:.2f}_")
+
             lines.append("")
             lines.append("---")
 

@@ -277,10 +277,16 @@ Handoff から抽出したタスク提案を表示
 > **環境強制**: postcheck が PASS しなければ Creator に報告してはならない。
 > `<!-- FILL -->` が残存 = 未消化。チェックリスト未完了 = 手抜き。
 
+**手順**:
+
+1. Phase 6 の `boot_integration.py --mode detailed` 出力に `TEMPLATE:/tmp/boot_report_XXXX.md` が含まれる
+2. テンプレートファイルに `write_to_file` で全セクションを記入する
+3. 記入後に postcheck を実行する:
+
 // turbo
 
 ```bash
-cd ~/oikos/hegemonikon && PYTHONPATH=. .venv/bin/python mekhane/symploke/boot_integration.py --postcheck /tmp/boot_report_$(date +%Y%m%d_%H%M).md --mode ${BOOT_MODE:-detailed}
+cd ~/oikos/hegemonikon && PYTHONPATH=. .venv/bin/python mekhane/symploke/boot_integration.py --postcheck "$(ls -t /tmp/boot_report_*.md 2>/dev/null | head -1)" --mode detailed
 ```
 
 **FAIL 時**: 不足セクションを補完してから Creator に報告すること。PASS するまでループ。

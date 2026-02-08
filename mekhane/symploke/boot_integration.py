@@ -22,6 +22,28 @@ from typing import Optional
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 
+def extract_dispatch_info(context: str, gpu_ok: bool = True) -> dict:
+    """Extract Dispatcher dispatch plan from context.
+
+    Graceful degradation: returns empty-primary dict on any failure.
+    Separated from _run_attractor() for testability (dia+ issue #1).
+    """
+    dispatch_info = {"primary": "", "alternatives": [], "dispatch_formatted": ""}
+    try:
+        from mekhane.fep.attractor_dispatcher import AttractorDispatcher
+        dispatcher = AttractorDispatcher(force_cpu=not gpu_ok)
+        plan = dispatcher.dispatch(context)
+        if plan:
+            dispatch_info = {
+                "primary": plan.primary.workflow,
+                "alternatives": [d.workflow for d in plan.alternatives[:3]],
+                "dispatch_formatted": dispatcher.format_compact(plan),
+            }
+    except Exception:
+        pass  # Dispatcher failure should not block boot
+    return dispatch_info
+
+
 def get_boot_context(mode: str = "standard", context: Optional[str] = None) -> dict:
     """
     /boot 統合 API: 8軸（Handoff, Sophia, Persona, PKS, Safety, EPT, Digestor, Attractor）を統合して返す
@@ -250,23 +272,24 @@ def get_boot_context(mode: str = "standard", context: Optional[str] = None) -> d
             def _run_attractor():
                 from mekhane.fep.attractor_advisor import AttractorAdvisor
                 advisor = AttractorAdvisor(force_cpu=not gpu_ok)
+
+                # Problem C: 過去の basin bias を適用
+                try:
+                    from mekhane.fep.basin_logger import BasinLogger
+                    basin_logger = BasinLogger()
+                    log_files = sorted(basin_logger.log_dir.glob("attractor_log_*.jsonl"))
+                    if log_files:
+                        for lf in log_files[-3:]:  # 直近3日分
+                            basin_logger.load_biases(lf)
+                        advisor._attractor.apply_bias(basin_logger._biases)
+                except Exception:
+                    pass  # Bias loading failure should not block boot
+
                 rec = advisor.recommend(context)
                 llm_fmt = advisor.format_for_llm(context)
 
                 # Dispatcher integration (Problem A)
-                dispatch_info = {"primary": "", "alternatives": [], "dispatch_formatted": ""}
-                try:
-                    from mekhane.fep.attractor_dispatcher import AttractorDispatcher
-                    dispatcher = AttractorDispatcher(force_cpu=not gpu_ok)
-                    plan = dispatcher.dispatch(context)
-                    if plan:
-                        dispatch_info = {
-                            "primary": plan.primary.workflow,
-                            "alternatives": [d.workflow for d in plan.alternatives[:3]],
-                            "dispatch_formatted": dispatcher.format_compact(plan),
-                        }
-                except Exception:
-                    pass  # Dispatcher failure should not block boot
+                dispatch_info = extract_dispatch_info(context, gpu_ok=gpu_ok)
 
                 formatted_parts = []
                 if llm_fmt:

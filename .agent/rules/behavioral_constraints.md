@@ -213,6 +213,42 @@ cd ~/oikos/hegemonikon && python mekhane/anamnesis/cli.py search "query"
 
 ---
 
+## BC-9: メタ認知レイヤー義務 (UML) ⚠️ 高優先
+
+> **導出**: MP 研究 (arXiv:2308.05342) — 5段階メタ認知が LLM 推論を有意に改善
+> **コード**: `mekhane/fep/metacognitive_layer.py`
+
+### 5段階チェック
+
+| # | Stage | 実行タイミング | HGK 射 | 質問 |
+|:-:|:------|:-------------|:--------|:-----|
+| 1 | Pre-Understanding | WF 実行**前** | O1 Noēsis | 入力を正しく理解したか？ |
+| 2 | Pre-Intuition | WF 実行**前** | A1 Pathos | 第一印象・直感はどうか？ |
+| 3 | Post-Evaluation | WF 実行**後** | A2 Krisis | 批判的に再評価したか？ |
+| 4 | Post-Decision | WF 実行**後** | O4 Energeia | 決定は妥当か？ 説明できるか？ |
+| 5 | Post-Confidence | WF 実行**後** | A4 Epistēmē | 確信度は適切か？ 過信していないか？ |
+
+### AMP フィードバックループ
+
+> Stage 3 (A2) で過信を検出 → **Stage 1 (O1) に戻る** (X-AO1 射)
+> 「そもそも入力を正しく理解していたか？」を再確認。
+
+### 強制ルール
+
+1. **全WF に適用**: 24定理WF + Hub WF を含む全ての WF
+2. **Pre-check (Stage 1-2)**: WF 実行前に暗黙発動。出力に明示する義務はないが、自己チェックとして実行する
+3. **Post-check (Stage 3-5)**: WF 実行後に暗黙発動。確信度 90%+ の場合は出力に明示する（FP 32.5% 対策）
+4. **AMP ループ**: 最大3回。3回ループしても解決しない場合は現在の理解で進行する
+5. **計算ツール**: `run_full_uml()` で全5段階を一括実行し、`UMLReport` で品質を表示可能
+
+```python
+from mekhane.fep.metacognitive_layer import run_full_uml
+report = run_full_uml(context="入力", output="出力", wf_name="noe", confidence=75.0)
+print(report.summary)  # UML [noe]: ✅ PASS (5/5)
+```
+
+---
+
 ## 違反時の対処
 
 Creator が違反を指摘した場合:

@@ -44,8 +44,9 @@ class Embedder:
     """Text embedding with automatic GPU acceleration.
 
     Strategy:
-      1. CUDA available → sentence-transformers on GPU (3.3x speedup, ~142MB VRAM)
-      2. Fallback → ONNX Runtime on CPU (original implementation)
+      1. CUDA available → sentence-transformers on GPU (fp16, ~1175MB VRAM for bge-m3)
+      2. CUDA OOM → sentence-transformers on CPU (same model)
+      3. Fallback → ONNX Runtime on CPU (bge-small, legacy)
     """
 
     # PURPOSE: Embedder の構成と依存関係の初期化
@@ -56,30 +57,39 @@ class Embedder:
         self._st_model = None
         self._ort_session = None
         self._tokenizer = None
+        self.model_name = model_name
 
-        # GPU detection
+        # GPU detection with fp16
         if not force_cpu:
             try:
                 import torch
                 if torch.cuda.is_available():
                     from sentence_transformers import SentenceTransformer
-                    self._st_model = SentenceTransformer(
-                        model_name, device='cuda'
-                    )
-                    self._use_gpu = True
-                    vram_mb = torch.cuda.memory_allocated() / 1e6
-                    print(f"[Embedder] GPU mode (CUDA, {vram_mb:.0f}MB VRAM)")
-                    return
+                    try:
+                        self._st_model = SentenceTransformer(
+                            model_name, device='cuda',
+                            model_kwargs={'torch_dtype': torch.float16},
+                        )
+                        self._use_gpu = True
+                        vram_mb = torch.cuda.memory_allocated() / 1e6
+                        print(f"[Embedder] GPU mode (CUDA fp16, {vram_mb:.0f}MB VRAM)")
+                        return
+                    except RuntimeError as e:
+                        # CUDA OOM — fall through to CPU
+                        if "out of memory" in str(e).lower():
+                            print(f"[Embedder] CUDA OOM, falling back to CPU")
+                            torch.cuda.empty_cache()
+                        else:
+                            raise
             except ImportError:
                 pass  # torch or sentence-transformers not installed
 
-        # CPU with sentence-transformers (if available, avoids ONNX dependency)
+        # CPU with sentence-transformers
         try:
             from sentence_transformers import SentenceTransformer
-            cpu_model = model_name if model_name != "BAAI/bge-m3" else "sentence-transformers/all-MiniLM-L6-v2"
-            self._st_model = SentenceTransformer(cpu_model, device='cpu')
+            self._st_model = SentenceTransformer(model_name, device='cpu')
             self._use_gpu = False
-            print(f"[Embedder] CPU mode (sentence-transformers: {cpu_model})")
+            print(f"[Embedder] CPU mode (sentence-transformers: {model_name})")
             return
         except ImportError:
             pass

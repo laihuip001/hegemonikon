@@ -3,7 +3,7 @@
   "primary_accuracy": 0.97,
   "acceptable_accuracy": 0.99,
   "macro_f1": 0.9705,
-  "elapsed_seconds": 15.06,
+  "elapsed_seconds": 9.67,
   "per_series": {
     "O": {
       "precision": 1.0,

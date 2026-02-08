@@ -104,13 +104,35 @@ class Reranker:
         self.model_name = model_name or self.DEFAULT_MODEL
         self._model = None
 
-    # PURPOSE: 内部処理: load
+    # PURPOSE: 内部処理: load (ネットワーク耐障害)
     def _load(self):
         if self._model is not None:
             return
+        if getattr(self, "_failed", False):
+            return  # 既に失敗済み — ロード再試行しない
+        import os
         from sentence_transformers import CrossEncoder
-        self._model = CrossEncoder(self.model_name, device="cuda")
-        print(f"[Reranker] Loaded ({self.model_name})", flush=True)
+        # Strategy: ローカルキャッシュ優先 → リモートフォールバック → 無効化
+        for attempt, offline in enumerate(["1", ""]):
+            try:
+                if offline:
+                    os.environ["HF_HUB_OFFLINE"] = "1"
+                    os.environ["TRANSFORMERS_OFFLINE"] = "1"
+                self._model = CrossEncoder(self.model_name, device="cuda")
+                print(f"[Reranker] Loaded ({self.model_name},"
+                      f" offline={bool(offline)})", flush=True)
+                return
+            except Exception as e:
+                if attempt == 0:
+                    # ローカル失敗 → リモート試行
+                    os.environ.pop("HF_HUB_OFFLINE", None)
+                    os.environ.pop("TRANSFORMERS_OFFLINE", None)
+                    continue
+                # 全試行失敗
+                print(f"[Reranker] ⚠️ Failed to load ({e}), "
+                      f"falling back to bi-encoder only", flush=True)
+                self._failed = True
+                return
 
     # Cross-encoder score threshold (Layer 2)
     # MiniLM scores are relative, not absolute.
@@ -135,6 +157,10 @@ class Reranker:
             return results
 
         self._load()
+
+        # Reranker ロード失敗時は bi-encoder 結果をそのまま返す
+        if self._model is None:
+            return sorted(results, key=lambda r: r.get("_distance", 999))[:top_k]
 
         # (query, document) ペアを作成
         pairs = []

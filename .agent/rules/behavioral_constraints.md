@@ -260,6 +260,45 @@ Creator が違反を指摘した場合:
 
 ---
 
+## BC-7: 道具利用義務（Tool-First）🔴 構造的
+
+> **傾向**: 既存 PJ の機能を手動で再実装する。「道具を作る」が「道具を使う」に繋がらない。
+> **導出**: 第零原則 — 意志（「次から使おう」）ではなく環境（ルーティングテーブル）で強制。
+
+### 違反パターン
+
+- CCL 式を手動で構文解析する（→ Hermēneus に投げろ）
+- 知識を grep で検索する（→ Anamnesis のベクトル検索を使え）
+- マルチエージェント連携を手動で調整する（→ Synergeia の Coordinator を使え）
+- EPT/存在証明を手動チェックする（→ Dendron の checker を使え）
+- Boot コンテキストを記憶から再構成する（→ Symploke の boot_integration を使え）
+
+### ルーティングテーブル（環境強制）
+
+| やろうとしていること | 使うべき PJ | コマンド |
+|:---|:---|:---|
+| CCL 式の解析・実行 | **Hermēneus** | `python -m hermeneus.src compile '{CCL}'` |
+| 知識の検索 | **Anamnesis** | `python mekhane/anamnesis/cli.py search '{query}'` |
+| 存在証明の検証 | **Dendron** | `python mekhane/dendron/checker.py {dir}` |
+| システムの健全性 | **Peira** | `python mekhane/peira/hgk_health.py` |
+| マルチエージェント連携 | **Synergeia** | `python synergeia/coordinator.py` |
+| 公理・定理の参照 | **Kernel** | `kernel/SACRED_TRUTH.md` を読め |
+| 演算子の仕様確認 | **CCL** + **Kalon** | `ccl/operators.md` を読め |
+
+### 強制ルール
+
+1. **タスク着手前に自問**: 「この作業を代行する PJ が既にないか？」
+2. **registry.yaml を参照**: `usage_trigger` に該当するなら PJ を使え
+3. **手動分析の禁止**: PJ にパーサーやエンジンがあるなら、手で解析するな
+4. **entry_point を使え**: CLI があるなら CLI で、Python API があるなら API で
+
+### 自己検証チェック
+
+出力前に自問: **「既存PJのどの機能を使ったか？ 手動でやったのはなぜか？」**
+→ 手動でやった正当な理由がないなら、PJ を使い直せ。
+
+---
+
 ## 違反ログ（Append Only）
 
 > 以下に違反事例を時系列で追記する。パターン認識による自己改善のため。
@@ -277,6 +316,21 @@ BC: BC-1 (流し読み), BC-3 (WF実体読込義務)
 教訓: 環境で強制しないものは守れない（第零原則の直接適用）
 ```
 
+### 2026-02-08: BC-7 違反 — Hermēneus 不使用
+
+```
+BC: BC-7 (道具利用義務)
+状況: マクロ {(/dia+~*/noe)~*/pan+}~*{(/dia+~*/noe)~*\pan+} を手動で
+      47pt 分析し、堕落確率 55% と推定。Hermēneus に投げれば 5秒で
+      「Parse error: ~* 未対応」と返ってきた。
+原因: registry.yaml に entry_point/usage_trigger がなく、Boot 出力にも
+      PJ の利用導線が存在しなかった。全レイヤーで構造的断絶。
+修正: registry.yaml v1.1.0 に entry_point/usage_trigger 追加、
+      BC-7 ルーティングテーブル追加、Boot 出力に利用条件表示追加
+教訓: 道具を作ることと使うことは別の認知プロセス。
+      「使う導線」は環境で配線しなければ発火しない。
+```
+
 ---
 
-*BC v1.1 — 認知プロテーゼ + 主観表出 (2026-02-07)*
+*BC v1.2 — 認知プロテーゼ + 主観表出 + 道具利用義務 (2026-02-08)*

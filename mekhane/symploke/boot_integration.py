@@ -581,6 +581,27 @@ def postcheck_boot_report(report_path: str, mode: str = "detailed") -> dict:
             + ("" if all_checked else f" ({unchecked} remaining)"),
     })
 
+    # Check 6: 随伴メトリクス (Adjunction L⊣R)
+    # Drift = 1 - ε (失われた文脈の量)
+    # ε precision: Handoff への言及 + Self-Profile 参照 + 意味ある瞬間の記述
+    adjunction_indicators = {
+        "handoff_context": bool(re.search(r"(?:引き継ぎ|handoff|Handoff|前回)", content, re.IGNORECASE)),
+        "self_profile_ref": bool(re.search(r"(?:self.profile|ミスパターン|能力境界|Self-Profile)", content, re.IGNORECASE)),
+        "meaningful_moment": bool(re.search(r"(?:意味ある瞬間|印象的|感動|発見)", content, re.IGNORECASE)),
+        "task_continuity": bool(re.search(r"(?:前回の続き|継続|再開|残タスク)", content, re.IGNORECASE)),
+    }
+    epsilon_count = sum(adjunction_indicators.values())
+    epsilon_precision = epsilon_count / len(adjunction_indicators)
+    drift = 1.0 - epsilon_precision
+    checks.append({
+        "name": "adjunction_metrics",
+        "passed": True,  # Informational only, never blocks
+        "detail": f"Adjunction L⊣R: ε={epsilon_precision:.0%}, Drift={drift:.0%}"
+            + f" ({', '.join(k for k, v in adjunction_indicators.items() if v)})"
+            if epsilon_count > 0
+            else f"Adjunction L⊣R: ε=0%, Drift=100% (no context restoration detected)",
+    })
+
     # 結果集計
     passed_count = sum(1 for c in checks if c["passed"])
     total = len(checks)

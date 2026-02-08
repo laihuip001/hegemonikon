@@ -45,7 +45,7 @@ class WarningRecord:
 class FailureDB:
     """失敗パターンデータベース"""
 
-    # PURPOSE: 内部処理: init__
+    # PURPOSE: FailureDB の構成と依存関係の初期化
     def __init__(self, db_path: Path = None):
         self.db_path = (
             db_path

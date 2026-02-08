@@ -72,7 +72,7 @@ def save_as_markdown(strings: list, output_path: Path, source_name: str):
     print(f"[OK] Saved: {output_path}")
 
 
-# PURPOSE: 関数: main
+# PURPOSE: CLI エントリポイント — バイナリファイルから読める文字列を抽出
 def main():
     import sys
 

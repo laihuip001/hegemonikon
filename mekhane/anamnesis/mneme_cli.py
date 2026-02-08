@@ -146,7 +146,7 @@ def cmd_stats(args):
     return 0
 
 
-# PURPOSE: 関数: main
+# PURPOSE: CLI エントリポイント — 知識基盤の直接実行
 def main():
     parser = argparse.ArgumentParser(
         description="Mnēmē Synthesis - 統合セッション記憶CLI",

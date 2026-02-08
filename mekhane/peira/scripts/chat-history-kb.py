@@ -68,7 +68,7 @@ def check_dependencies():
 class Embedder:
     """ONNX-based text embedding (reused from aidb-kb.py)."""
 
-    # PURPOSE: 内部処理: init__
+    # PURPOSE: Embedder の構成と依存関係の初期化
     def __init__(self):
         import onnxruntime as ort
         from tokenizers import Tokenizer
@@ -458,7 +458,7 @@ def setup_model():
             return
 
     print("[OK] Model downloaded successfully!")
-# PURPOSE: 関数: main
+# PURPOSE: CLI エントリポイント — データパイプラインの直接実行
 
 
 def main():

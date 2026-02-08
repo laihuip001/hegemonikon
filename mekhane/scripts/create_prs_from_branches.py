@@ -301,7 +301,7 @@ This PR was automatically created from a Jules review branch.
     return resp.json()
 
 
-# PURPOSE: 関数: main
+# PURPOSE: CLI エントリポイント — 運用ツールの直接実行
 def main():
     parser = argparse.ArgumentParser(description="Jules ブランチから PR を一括作成")
     parser.add_argument(

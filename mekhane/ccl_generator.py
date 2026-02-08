@@ -61,7 +61,7 @@ def generate_ccl(intent: str) -> str:
     return _generate_inner_ccl(intent)
 
 
-# PURPOSE: 内部処理: generate_inner_ccl
+# PURPOSE: generate_inner_ccl — システムの内部処理
 def _generate_inner_ccl(intent: str) -> str:
     # Heuristic: Find all operators in order
     ops = []

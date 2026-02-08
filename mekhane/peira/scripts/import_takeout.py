@@ -261,7 +261,7 @@ def stream_conversations(f):
         )  # Assume list if unknown or let ijson handle error
 
 
-# PURPOSE: 関数: main
+# PURPOSE: CLI エントリポイント — データパイプラインの直接実行
 def main():
     if len(sys.argv) < 2:
         print("Usage: python import_takeout.py [json_file_path] [output_dir]")

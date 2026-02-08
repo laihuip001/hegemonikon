@@ -16,7 +16,7 @@ CDP_PORT = 9222
 OUTPUT_FILE = Path(r"M:\Hegemonikon\mekhane\anamnesis\complete_dom_analysis.txt")
 
 
-# PURPOSE: 関数: main
+# PURPOSE: CLI エントリポイント — 知識基盤の直接実行
 async def main():
     from playwright.async_api import async_playwright
 

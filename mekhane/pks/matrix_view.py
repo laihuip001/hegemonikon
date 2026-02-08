@@ -52,7 +52,7 @@ class PKSMatrixView:
         MatrixColumn(name="Key Insight"),
     ]
 
-    # PURPOSE: 内部処理: init__
+    # PURPOSE: PKSMatrixView の初期化 — 比較表を Markdown テーブルとして生成
     def __init__(self, columns: list[MatrixColumn] | None = None):
         self.columns = columns or self.DEFAULT_COLUMNS
 

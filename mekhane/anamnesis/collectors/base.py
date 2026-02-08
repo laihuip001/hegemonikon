@@ -28,7 +28,7 @@ class BaseCollector(ABC):
     name: str = "base"
     rate_limit: float = 1.0  # requests per second
 
-    # PURPOSE: 内部処理: init__
+    # PURPOSE: BaseCollector の初期化 — レート制限準拠のための待機
     def __init__(self):
         self._last_request_time: float = 0
 

@@ -181,7 +181,7 @@ def show_usage() -> dict:
     }
 
 
-# PURPOSE: 関数: main
+# PURPOSE: CLI エントリポイント — データパイプラインの直接実行
 def main():
     if len(sys.argv) < 2:
         print(__doc__)

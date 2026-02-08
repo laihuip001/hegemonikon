@@ -21,7 +21,7 @@ ROOT_DIR = os.path.join("Raw", "aidb", "_index")
 OUTPUT_FILE = os.path.join(ROOT_DIR, "manifest.jsonl")
 
 
-# PURPOSE: 関数: main
+# PURPOSE: CLI エントリポイント — データパイプラインの直接実行
 def main():
     pattern = os.path.join(ROOT_DIR, "manifest_*.jsonl")
     batch_files = glob.glob(pattern)

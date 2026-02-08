@@ -45,7 +45,7 @@ class SemanticResult:
     reasoning: str
     suggestions: List[str]
 
-    # PURPOSE: 内部処理: bool__
+    # PURPOSE: LLM-based semantic validation for CCL expressions. Validates whether a CCL expre
     def __bool__(self) -> bool:
         return self.aligned
 

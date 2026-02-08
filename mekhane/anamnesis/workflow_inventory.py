@@ -220,7 +220,7 @@ def generate_markdown(
     return "\n".join(lines)
 
 
-# PURPOSE: 関数: main
+# PURPOSE: CLI エントリポイント — 知識基盤の直接実行
 def main():
     import argparse
 

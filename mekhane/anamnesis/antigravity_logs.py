@@ -57,7 +57,7 @@ class LogSummary:
     warnings: list = field(default_factory=list)
     token_usage: Optional[dict] = None
 
-    # PURPOSE: 関数: to_dict
+    # PURPOSE: シリアライズ用辞書への変換
     def to_dict(self) -> dict:
         return {
             "session_id": self.session_id,
@@ -85,7 +85,7 @@ class AntigravityLogCollector:
     RE_PLANNER = re.compile(r"Requesting planner with (\d+) chat messages")
     RE_UNAVAILABLE = re.compile(r"UNAVAILABLE.*No capacity available for model (\S+)")
 
-    # PURPOSE: 内部処理: init__
+    # PURPOSE: AntigravityLogCollector の初期化 — Antigravity ログディレクトリのパスを取得
     def __init__(self):
         self._log_base = self._get_log_directory()
 

@@ -35,7 +35,7 @@ TABLE_NAME = "prompts"
 class LibrarySearch:
     """Library プロンプト検索エンジン"""
 
-    # PURPOSE: 内部処理: init__
+    # PURPOSE: LibrarySearch の初期化 — LanceDB に遅延接続
     def __init__(self, lance_dir: Optional[str] = None):
         self._lance_dir = Path(lance_dir) if lance_dir else LANCE_DIR
         self._db = None

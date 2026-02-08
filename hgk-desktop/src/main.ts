@@ -2,7 +2,7 @@ import { api } from './api/client';
 import './styles.css';
 
 // Simple Router
-const routes: Record<string, () => void | Promise<void>> = {
+const routes: Record<string, () => Promise<void>> = {
     'dashboard': renderDashboard,
     'fep': renderFep,
     'gnosis': renderGnosis,
@@ -42,7 +42,7 @@ function navigate(route: string) {
         const renderer = routes[route];
         if (renderer) {
             renderer().catch(err => {
-                app.innerHTML = `<div class="error">Error: ${err.message}</div>`;
+                app.innerHTML = `< div class="error" > Error: ${err.message} </div>`;
             });
         }
     }

@@ -7,12 +7,14 @@ Usage:
     python -m mekhane.peira.hgk_health          # ターミナル出力
     python -m mekhane.peira.hgk_health --json   # JSON出力 (監視連携用)
     python -m mekhane.peira.hgk_health --slack  # Slack通知
+    python -m mekhane.peira.hgk_health --n8n   # n8n WF-05 webhook送信
 """
 
 import json
 import os
 import subprocess
 import sys
+import urllib.request
 from dataclasses import dataclass, field, asdict
 from datetime import datetime
 from pathlib import Path
@@ -256,12 +258,32 @@ def send_slack(report: HealthReport):
     )
 
 
+# PURPOSE: n8n WF-05 Health Alert webhook にレポートを送信
+def send_n8n_alert(report: HealthReport):
+    """n8n の health-alert webhook にデータを送信。n8n 側で重大度分類と通知を行う。"""
+    url = "http://localhost:5678/webhook/health-alert"
+    payload = json.dumps({
+        "items": [asdict(i) for i in report.items],
+        "score": report.score,
+        "timestamp": report.timestamp,
+    }).encode("utf-8")
+    try:
+        req = urllib.request.Request(url, data=payload, headers={"Content-Type": "application/json"}, method="POST")
+        with urllib.request.urlopen(req, timeout=10) as resp:
+            result = json.loads(resp.read().decode("utf-8"))
+            severity = result.get("severity", "?")
+            print(f"📡 n8n WF-05: severity={severity}", file=sys.stderr)
+    except Exception as e:
+        print(f"⚠️ n8n WF-05 failed: {e}", file=sys.stderr)
+
+
 # PURPOSE: CLI エントリポイント
 def main():
     import argparse
     parser = argparse.ArgumentParser(description="Hegemonikón Health Dashboard")
     parser.add_argument("--json", action="store_true", help="JSON output")
     parser.add_argument("--slack", action="store_true", help="Send to Slack")
+    parser.add_argument("--n8n", action="store_true", help="Send to n8n WF-05")
     args = parser.parse_args()
 
     report = run_health_check()
@@ -273,6 +295,10 @@ def main():
         print(format_terminal(report))
     else:
         print(format_terminal(report))
+
+    # n8n 通知 (--n8n フラグ or スコアが低い場合は自動送信)
+    if args.n8n or report.score < 0.7:
+        send_n8n_alert(report)
 
     # Exit code: 0 if score > 0.7, 1 otherwise
     sys.exit(0 if report.score >= 0.7 else 1)

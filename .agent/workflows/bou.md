@@ -310,6 +310,19 @@ absorbed:
 
 ---
 
+---
+
+## Post-Check (環境強制)
+
+> **`+` モード時のみ自動発動。** 出力が sel_enforcement の minimum_requirements を満たすか検証。
+
+// turbo
+
+```bash
+cd ~/oikos/hegemonikon && PYTHONPATH=. .venv/bin/python scripts/wf_postcheck.py --wf bou --mode "+" --text "$BOU_OUTPUT"
+```
+
+> FAIL 時は不足を補完してから Creator に提示。PASS するまでループ。
 
 ---
 

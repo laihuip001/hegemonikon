@@ -23,6 +23,12 @@ from typing import Optional
 
 import numpy as np
 
+try:
+    import torch
+    TORCH_AVAILABLE = True
+except ImportError:
+    TORCH_AVAILABLE = False
+
 
 # ---------------------------------------------------------------------------
 # Constants
@@ -224,13 +230,17 @@ class SeriesAttractor:
         self.oscillation_margin = oscillation_margin
         self._embedder = None
         self._prototypes: dict[str, np.ndarray] = {}
+        # GPU tensor: (6, D) — 全 Series の prototype を 1 つの行列に
+        self._proto_tensor = None  # torch.Tensor or None
+        self._proto_keys: list[str] = []  # Series keys in tensor order
+        self._device = None  # torch.device
         self._force_cpu = force_cpu
 
     # --- Lazy initialization ---
 
-    # PURPOSE: 遅延初期化: 初回 suggest() 呼び出し時に embedding を計算
+    # PURPOSE: 遅延初期化: 初回 suggest() 呼び出し時に embedding を GPU tensor 化
     def _ensure_initialized(self) -> None:
-        """遅延初期化: 初回 suggest() 呼び出し時に embedding を計算"""
+        """遅延初期化: 初回 suggest() 呼び出し時に embedding を GPU tensor 化"""
         if self._prototypes:
             return
 
@@ -246,6 +256,17 @@ class SeriesAttractor:
 
         for key, emb in zip(series_keys, embeddings):
             self._prototypes[key] = np.array(emb, dtype=np.float32)
+
+        # GPU tensor 化: (6, D) 行列
+        if TORCH_AVAILABLE:
+            from mekhane.fep.gpu import get_device, to_tensor
+            self._device = get_device(force_cpu=self._force_cpu)
+            proto_matrix = np.stack([self._prototypes[k] for k in series_keys])
+            self._proto_tensor = to_tensor(proto_matrix, self._device)
+            self._proto_keys = series_keys
+            print(f"[Attractor] GPU mode ({self._device})", flush=True)
+        else:
+            print("[Attractor] CPU mode (torch unavailable)", flush=True)
 
     # --- Core API ---
 
@@ -268,16 +289,8 @@ class SeriesAttractor:
         """
         self._ensure_initialized()
 
-        # 入力を embedding
-        input_emb = np.array(
-            self._embedder.embed(user_input), dtype=np.float32
-        )
-
-        # 各 Series prototype との cosine similarity
-        similarities: list[tuple[str, float]] = []
-        for key, proto in self._prototypes.items():
-            sim = self._cosine_similarity(input_emb, proto)
-            similarities.append((key, float(sim)))
+        # 全 Series の similarity を一括計算
+        similarities = self._compute_similarities(user_input)
 
         # similarity 降順ソート
         similarities.sort(key=lambda x: x[1], reverse=True)
@@ -316,15 +329,7 @@ class SeriesAttractor:
         """
         self._ensure_initialized()
 
-        input_emb = np.array(
-            self._embedder.embed(user_input), dtype=np.float32
-        )
-
-        similarities: list[tuple[str, float]] = []
-        for key, proto in self._prototypes.items():
-            sim = self._cosine_similarity(input_emb, proto)
-            similarities.append((key, float(sim)))
-
+        similarities = self._compute_similarities(user_input)
         similarities.sort(key=lambda x: x[1], reverse=True)
 
         top_sim = similarities[0][1] if similarities else 0.0
@@ -371,13 +376,10 @@ class SeriesAttractor:
         """全 6 Series の引力を返す（デバッグ/可視化用）"""
         self._ensure_initialized()
 
-        input_emb = np.array(
-            self._embedder.embed(user_input), dtype=np.float32
-        )
+        similarities = self._compute_similarities(user_input)
 
         results: list[AttractorResult] = []
-        for key, proto in self._prototypes.items():
-            sim = float(self._cosine_similarity(input_emb, proto))
+        for key, sim in similarities:
             defn = SERIES_DEFINITIONS[key]
             results.append(AttractorResult(
                 series=key,
@@ -469,11 +471,36 @@ class SeriesAttractor:
                     result.append(wf)
         return result
 
-# PURPOSE: CLI: python -m mekhane.fep.attractor "入力テキスト"
+    # PURPOSE: 全 Series の similarity を一括計算 (GPU バッチ or CPU fallback)
+    def _compute_similarities(self, user_input: str) -> list[tuple[str, float]]:
+        """全 Series の similarity を一括計算.
+
+        GPU 利用可能時: batch_cosine_similarity で 1 回の行列演算
+        CPU fallback: numpy の cosine similarity
+        """
+        input_emb = np.array(
+            self._embedder.embed(user_input), dtype=np.float32
+        )
+
+        if self._proto_tensor is not None:
+            # GPU バッチ: (1, D) @ (D, 6) → (6,)
+            from mekhane.fep.gpu import to_tensor, batch_cosine_similarity
+            query_tensor = to_tensor(input_emb, self._device)
+            sims = batch_cosine_similarity(query_tensor, self._proto_tensor)
+            sims_cpu = sims.cpu().numpy()
+            return [(key, float(sims_cpu[i])) for i, key in enumerate(self._proto_keys)]
+        else:
+            # CPU fallback
+            results = []
+            for key, proto in self._prototypes.items():
+                sim = self._cosine_similarity_np(input_emb, proto)
+                results.append((key, float(sim)))
+            return results
+
     @staticmethod
-    # PURPOSE: Cosine similarity between two vectors
-    def _cosine_similarity(a: np.ndarray, b: np.ndarray) -> float:
-        """Cosine similarity between two vectors"""
+    # PURPOSE: Cosine similarity (numpy fallback)
+    def _cosine_similarity_np(a: np.ndarray, b: np.ndarray) -> float:
+        """Cosine similarity between two vectors (numpy fallback)"""
         dot = np.dot(a, b)
         norm_a = np.linalg.norm(a)
         norm_b = np.linalg.norm(b)

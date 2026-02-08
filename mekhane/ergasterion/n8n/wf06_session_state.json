@@ -1,0 +1,209 @@
+{
+    "name": "WF-06: Session State Machine",
+    "nodes": [
+        {
+            "parameters": {
+                "httpMethod": "POST",
+                "path": "session-start",
+                "responseMode": "lastNode",
+                "options": {}
+            },
+            "id": "boot-webhook",
+            "name": "Boot Webhook",
+            "type": "n8n-nodes-base.webhook",
+            "typeVersion": 1,
+            "position": [
+                250,
+                300
+            ],
+            "webhookId": "session-start"
+        },
+        {
+            "parameters": {
+                "jsCode": "const fs = require('fs');\nconst data = $input.item.json.body || {};\nconst now = new Date();\n\nconst session = {\n  startTime: now.toISOString(),\n  mode: data.mode || 'standard',\n  context: data.context || '',\n  agent: data.agent || 'unknown',\n  status: 'active'\n};\n\n// セッションファイルに保存\nconst sessionFile = '/oikos/mneme/.hegemonikon/current_session.json';\nfs.writeFileSync(sessionFile, JSON.stringify(session, null, 2), 'utf-8');\n\nreturn [{ json: { ...session, message: 'Session started' } }];"
+            },
+            "id": "start-session",
+            "name": "セッション開始記録",
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                450,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "amount": 2,
+                "unit": "hours"
+            },
+            "id": "wait-2h",
+            "name": "2時間待機",
+            "type": "n8n-nodes-base.wait",
+            "typeVersion": 1,
+            "position": [
+                650,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "jsCode": "const fs = require('fs');\n\nconst sessionFile = '/oikos/mneme/.hegemonikon/current_session.json';\n\ntry {\n  if (!fs.existsSync(sessionFile)) {\n    return [{ json: { sessionActive: false, message: 'No active session' } }];\n  }\n  \n  const session = JSON.parse(fs.readFileSync(sessionFile, 'utf-8'));\n  \n  if (session.status !== 'active') {\n    return [{ json: { sessionActive: false, message: 'Session already ended' } }];\n  }\n  \n  const elapsedMs = Date.now() - new Date(session.startTime).getTime();\n  const elapsedHours = (elapsedMs / (1000 * 60 * 60)).toFixed(1);\n  \n  return [{ json: {\n    sessionActive: true,\n    elapsedHours,\n    startTime: session.startTime,\n    mode: session.mode,\n    context: session.context\n  } }];\n} catch (e) {\n  return [{ json: { sessionActive: false, error: e.message } }];\n}"
+            },
+            "id": "check-session",
+            "name": "セッション状態確認",
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                850,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "conditions": {
+                    "boolean": [
+                        {
+                            "value1": "={{$json.sessionActive}}",
+                            "value2": true
+                        }
+                    ]
+                }
+            },
+            "id": "if-active",
+            "name": "まだ Active?",
+            "type": "n8n-nodes-base.if",
+            "typeVersion": 1,
+            "position": [
+                1050,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "jsCode": "const https = require('https');\nconst data = $input.item.json;\nconst webhookUrl = process.env.SLACK_WEBHOOK_URL;\n\nif (!webhookUrl) {\n  return [{ json: { slack: 'skipped' } }];\n}\n\nconst payload = JSON.stringify({\n  blocks: [\n    { type: 'header', text: { type: 'plain_text', text: '⏰ セッション継続中', emoji: true } },\n    { type: 'section', text: {\n      type: 'mrkdwn',\n      text: `セッション開始から *${data.elapsedHours}時間* 経過しました。\\n\\n> Context: ${data.context || '(none)'}\\n\\n休憩や \\`/bye\\` のタイミングかもしれません。`\n    }},\n    { type: 'context', elements: [\n      { type: 'mrkdwn', text: '_WF-06 Session State Machine | Hegemonikón_' }\n    ]}\n  ]\n});\n\nconst urlObj = new URL(webhookUrl);\nawait new Promise((resolve) => {\n  const req = https.request({\n    hostname: urlObj.hostname, path: urlObj.pathname, method: 'POST',\n    headers: { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(payload) },\n    timeout: 10000\n  }, (res) => { let b=''; res.on('data',c=>b+=c); res.on('end',()=>resolve(b)); });\n  req.on('error', () => resolve('error'));\n  req.write(payload); req.end();\n});\n\nreturn [{ json: { slack: 'sent', reminder: 'session-check' } }];"
+            },
+            "id": "slack-reminder",
+            "name": "Slack リマインダー",
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                1250,
+                200
+            ]
+        },
+        {
+            "parameters": {
+                "httpMethod": "POST",
+                "path": "session-end",
+                "responseMode": "lastNode",
+                "options": {}
+            },
+            "id": "bye-webhook",
+            "name": "Bye Webhook",
+            "type": "n8n-nodes-base.webhook",
+            "typeVersion": 1,
+            "position": [
+                250,
+                500
+            ],
+            "webhookId": "session-end"
+        },
+        {
+            "parameters": {
+                "jsCode": "const fs = require('fs');\nconst data = $input.item.json.body || {};\n\nconst sessionFile = '/oikos/mneme/.hegemonikon/current_session.json';\n\ntry {\n  let session = { status: 'unknown' };\n  if (fs.existsSync(sessionFile)) {\n    session = JSON.parse(fs.readFileSync(sessionFile, 'utf-8'));\n  }\n  \n  const endTime = new Date();\n  const startTime = new Date(session.startTime || endTime);\n  const durationMinutes = ((endTime - startTime) / (1000 * 60)).toFixed(0);\n  const durationHours = (durationMinutes / 60).toFixed(1);\n  \n  session.status = 'ended';\n  session.endTime = endTime.toISOString();\n  session.durationMinutes = parseInt(durationMinutes);\n  session.subject = data.subject || 'Unknown';\n  \n  // 履歴に追記\n  const historyFile = '/oikos/mneme/.hegemonikon/session_history.jsonl';\n  fs.appendFileSync(historyFile, JSON.stringify(session) + '\\n', 'utf-8');\n  \n  // current_session をクリア\n  fs.unlinkSync(sessionFile);\n  \n  return [{ json: {\n    status: 'ended',\n    duration: `${durationHours}h (${durationMinutes}min)`,\n    subject: session.subject,\n    mode: session.mode,\n    startTime: session.startTime,\n    endTime: session.endTime\n  } }];\n} catch (e) {\n  return [{ json: { status: 'error', error: e.message } }];\n}"
+            },
+            "id": "end-session",
+            "name": "セッション終了記録",
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                450,
+                500
+            ]
+        }
+    ],
+    "connections": {
+        "Boot Webhook": {
+            "main": [
+                [
+                    {
+                        "node": "セッション開始記録",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "セッション開始記録": {
+            "main": [
+                [
+                    {
+                        "node": "2時間待機",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "2時間待機": {
+            "main": [
+                [
+                    {
+                        "node": "セッション状態確認",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "セッション状態確認": {
+            "main": [
+                [
+                    {
+                        "node": "まだ Active?",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "まだ Active?": {
+            "main": [
+                [
+                    {
+                        "node": "Slack リマインダー",
+                        "type": "main",
+                        "index": 0
+                    }
+                ],
+                []
+            ]
+        },
+        "Bye Webhook": {
+            "main": [
+                [
+                    {
+                        "node": "セッション終了記録",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        }
+    },
+    "settings": {
+        "executionOrder": "v1"
+    },
+    "tags": [
+        {
+            "name": "hegemonikon"
+        },
+        {
+            "name": "session"
+        },
+        {
+            "name": "state-machine"
+        }
+    ],
+    "versionId": "1.0.0"
+}

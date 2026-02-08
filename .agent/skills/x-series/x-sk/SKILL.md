@@ -18,6 +18,11 @@ activation_conditions:
 
 triggers: ["設計→タイミング粒度", "/mek >> /tel", "/met >> /euk", "ズーム直接伝播"]
 keywords: [schema-kairos, design-to-context, x-sk, zoom-propagation, shortcut]
+risk_tier: L0
+risks: ["none identified"]
+reversible: true
+requires_approval: false
+fallbacks: ["manual execution"]
 ---
 
 # X-SK: Schema → Kairos (様態→文脈)

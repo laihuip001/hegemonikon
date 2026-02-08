@@ -260,8 +260,10 @@ def run_audit(agent_dir: Path) -> AuditResult:
     skills_dir = agent_dir / "skills"
     if skills_dir.exists():
         for skill_md in skills_dir.rglob("SKILL.md"):
-            # SKILL_TEMPLATE.md は除外
+            # SKILL_TEMPLATE.md と _archive/ は除外
             if "TEMPLATE" in skill_md.name.upper():
+                continue
+            if "_archive" in skill_md.parts:
                 continue
             result.skills_checked += 1
             result.findings.extend(check_skill(skill_md))

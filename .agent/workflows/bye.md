@@ -23,6 +23,17 @@ derivatives:
   "+": 詳細終了（全ステップ展開、法則化、KI生成）
   "-": 高速終了（Handoff最小限、1分で退出）
   "*": 終了のメタ分析（なぜ今終わるか）
+sel_enforcement:
+  "+":
+    minimum_requirements:
+      - "Handoff: SBAR形式 + 全変更ファイルリスト"
+      - "法則化: 今日学んだことを法則として記述"
+      - "KI生成: 新しい知識項目を1つ以上生成"
+      - "Self-Profile: id_R の更新内容を明記"
+      - "ker(R): チャット履歴エクスポート実行済み"
+  "-":
+    minimum_requirements:
+      - "Handoff 最小限（タスク名 + 残タスク）"
 ---
 
 # /bye ワークフロー
@@ -234,7 +245,15 @@ cd ~/oikos/hegemonikon && \
 **手順**:
 
 1. Handoff 生成後、上記4項目を自己検証
-2. FAIL 時: 不足を補完してから Creator に提示。PASS するまでループ。
+2. **汎用 postcheck で自動検証**:
+
+// turbo
+
+```bash
+cd ~/oikos/hegemonikon && PYTHONPATH=. .venv/bin/python scripts/wf_postcheck.py --wf bye --mode "+" --output "$(ls -t ~/oikos/mneme/.hegemonikon/sessions/handoff_*.md 2>/dev/null | head -1)"
+```
+
+1. FAIL 時: 不足を補完してから Creator に提示。PASS するまでループ。
 
 ---
 

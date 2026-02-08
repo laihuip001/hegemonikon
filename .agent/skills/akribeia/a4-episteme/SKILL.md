@@ -37,6 +37,7 @@ reversible: false
 requires_approval: true
 risks:
   - "偽陽性の知識確立 (未検証のまま知識と宣言)"
+fallbacks: ["manual execution"]
 ---
 
 # A4: Epistēmē (Ἐπιστήμη)

@@ -22,6 +22,16 @@ cognitive_algebra:
   "+": "詳細生成：全ステップ展開、設計根拠記載"
   "-": "高速生成：最小限の構造、すぐ使える形"
   "*": "メタ生成：生成プロセス自体を問う"
+sel_enforcement:
+  "+":
+    minimum_requirements:
+      - "全 STEP (0-7) を展開して出力"
+      - "設計根拠: 各選択の WHY を記載"
+      - "Pre-Mortem: 失敗シナリオを1つ以上"
+      - "CCL 複雑度: ポイント計算を明示"
+  "-":
+    minimum_requirements:
+      - "最小構造のみ、即座に使える形で出力"
 submodules:
   - basic-modes.md
   - engineering-modes.md
@@ -209,7 +219,6 @@ SKILL.md を必ず読み込んでから処理を開始する:
 10. **最終出力**: 成果物 → ファイル保存
 
 ---
-
 
 ---
 

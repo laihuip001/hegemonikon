@@ -41,6 +41,7 @@ reversible: true
 requires_approval: false
 risks:
   - "直感の過信 (X-HK1 バイアス: 直感→好機認識の歪み)"
+fallbacks: ["manual execution"]
 ---
 
 # H1: Propatheia (Προπάθεια)

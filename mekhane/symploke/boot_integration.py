@@ -639,6 +639,22 @@ def get_boot_context(mode: str = "standard", context: Optional[str] = None) -> d
                         "learning_diff": learning_diff,
                         "epsilon": agent_v2.epsilon_summary(),
                     }
+
+                    # Convergence tracking: record Agent/Attractor agreement
+                    try:
+                        from mekhane.fep.convergence_tracker import (
+                            record_agreement, format_convergence,
+                        )
+                        conv_summary = record_agreement(
+                            agent_series=final.get("selected_series"),
+                            attractor_series=att_series,
+                            agent_action=final["action_name"],
+                            epsilon=dict(agent_v2.epsilon),
+                        )
+                        fep_v2_result["convergence"] = conv_summary
+                    except Exception:
+                        pass  # Convergence tracking failure is non-fatal
+
                 except Exception:
                     pass  # FEP v2 failure should not block boot
 
@@ -672,6 +688,17 @@ def get_boot_context(mode: str = "standard", context: Optional[str] = None) -> d
                     if expl:
                         for line in expl.split("\n"):
                             formatted_parts.append(f"      {line}")
+                    # Convergence rate
+                    conv = fep_v2_result.get("convergence")
+                    if conv:
+                        from mekhane.fep.convergence_tracker import format_convergence
+                        formatted_parts.append(f"   {format_convergence(conv)}")
+                    # Epsilon state
+                    eps_info = fep_v2_result.get("epsilon", {})
+                    eps_vals = eps_info.get("epsilon", {})
+                    if eps_vals:
+                        eps_str = " ".join(f"{k}={v:.3f}" for k, v in eps_vals.items())
+                        formatted_parts.append(f"   ε: {eps_str}")
                 if learning_diff_fmt:
                     for line in learning_diff_fmt.split("\n"):
                         formatted_parts.append(f"   {line}")

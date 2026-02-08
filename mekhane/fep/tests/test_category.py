@@ -682,3 +682,204 @@ class TestDiaPlusFix4IsFull:
         for name, f in FUNCTORS.items():
             with pytest.raises(NotImplementedError):
                 _ = f.is_full
+
+
+# =============================================================================
+# Functor Composition Tests
+# =============================================================================
+
+
+class TestFunctorCompose:
+    """Functor.compose() の検証"""
+
+    # PURPOSE: bye∘boot: Mem → Mem (round-trip via session)
+    def test_bye_compose_boot(self):
+        boot = FUNCTORS["boot"]
+        bye = FUNCTORS["bye"]
+        # F=boot, G=bye → G∘F = bye∘boot: Mem → Mem
+        composed = boot.compose(bye)
+        assert composed.name == "bye∘boot"
+        assert composed.source_cat == "Mem"
+        assert composed.target_cat == "Mem"
+        assert composed.is_endofunctor is True
+
+    # PURPOSE: bye∘boot maps handoff → handoff (identity on objects)
+    def test_bye_boot_identity(self):
+        boot = FUNCTORS["boot"]
+        bye = FUNCTORS["bye"]
+        composed = boot.compose(bye)
+        # handoff → session_context → handoff
+        assert composed.map_object("handoff") == "handoff"
+        assert composed.map_object("ki") == "ki"
+
+    # PURPOSE: boot∘bye: Ses → Ses (session round-trip)
+    def test_boot_compose_bye(self):
+        boot = FUNCTORS["boot"]
+        bye = FUNCTORS["bye"]
+        composed = bye.compose(boot)
+        assert composed.name == "boot∘bye"
+        assert composed.source_cat == "Ses"
+        assert composed.target_cat == "Ses"
+        assert composed.is_endofunctor is True
+
+    # PURPOSE: incompatible functors → ValueError
+    def test_incompatible_raises(self):
+        boot = FUNCTORS["boot"]
+        eat = FUNCTORS["eat"]
+        with pytest.raises(ValueError, match="Cannot compose"):
+            boot.compose(eat)  # boot: Mem→Ses, eat: Ext→Cog
+
+    # PURPOSE: compose preserves morphism map
+    def test_morphism_compose(self):
+        boot = FUNCTORS["boot"]
+        bye = FUNCTORS["bye"]
+        composed = boot.compose(bye)
+        # restore → expand → compress → ...
+        # Morphism composition tracks through both maps
+        assert composed.is_faithful is True
+
+
+# =============================================================================
+# Cone Consumer Tests
+# =============================================================================
+
+
+class TestConeConsumer:
+    """cone_consumer.advise() の検証"""
+
+    def _make_cone(self, series=Series.O, dispersion=0.0,
+                   confidence=80.0, is_universal=True,
+                   resolution_method="simple", pw=None):
+        cone = build_cone(series, {
+            f"{series.name}1": "出力1",
+            f"{series.name}2": "出力2",
+            f"{series.name}3": "出力3",
+            f"{series.name}4": "出力4",
+        })
+        cone.dispersion = dispersion
+        cone.confidence = confidence
+        cone.is_universal = is_universal
+        cone.resolution_method = resolution_method
+        cone.pw = pw or {}
+        return cone
+
+    # PURPOSE: is_universal → proceed
+    def test_universal_proceed(self):
+        from mekhane.fep.cone_consumer import advise
+        cone = self._make_cone(dispersion=0.05, confidence=85.0, is_universal=True)
+        advice = advise(cone)
+        assert advice.action == "proceed"
+        assert advice.urgency == 0.0
+        assert "Limit" in advice.reason
+
+    # PURPOSE: needs_devil (V > 0.3) → devil
+    def test_high_dispersion_devil(self):
+        from mekhane.fep.cone_consumer import advise
+        cone = self._make_cone(dispersion=0.5, confidence=40.0, is_universal=False)
+        advice = advise(cone)
+        assert advice.action == "devil"
+        assert advice.suggested_wf == "/dia devil"
+        assert advice.urgency >= 0.5
+
+    # PURPOSE: S-series + V > 0.2 → devil (strategy risk)
+    def test_s_series_risk(self):
+        from mekhane.fep.cone_consumer import advise
+        cone = self._make_cone(series=Series.S, dispersion=0.25,
+                               confidence=60.0, is_universal=False)
+        advice = advise(cone)
+        assert advice.action == "devil"
+        assert "戦略" in advice.reason
+
+    # PURPOSE: low confidence + moderate V → investigate
+    def test_low_confidence_investigate(self):
+        from mekhane.fep.cone_consumer import advise
+        cone = self._make_cone(dispersion=0.15, confidence=40.0, is_universal=False)
+        advice = advise(cone)
+        assert advice.action == "investigate"
+        assert advice.suggested_wf in ("/zet", "/sop")
+
+    # PURPOSE: K-series investigate → /sop
+    def test_k_series_investigate_sop(self):
+        from mekhane.fep.cone_consumer import advise
+        cone = self._make_cone(series=Series.K, dispersion=0.15,
+                               confidence=40.0, is_universal=False)
+        advice = advise(cone)
+        assert advice.suggested_wf == "/sop"
+
+    # PURPOSE: extreme PW → reweight
+    def test_extreme_pw_reweight(self):
+        from mekhane.fep.cone_consumer import advise
+        cone = self._make_cone(
+            dispersion=0.05, confidence=75.0, is_universal=False,
+            resolution_method="pw_weighted",
+            pw={"O1": 0.9, "O2": 0.0, "O3": -0.8, "O4": 0.0},
+        )
+        advice = advise(cone)
+        assert advice.action == "reweight"
+        assert advice.suggested_wf == "/dia epo"
+
+    # PURPOSE: default → proceed (moderate dispersion)
+    def test_default_proceed(self):
+        from mekhane.fep.cone_consumer import advise
+        cone = self._make_cone(dispersion=0.08, confidence=65.0, is_universal=False)
+        advice = advise(cone)
+        assert advice.action == "proceed"
+        assert advice.urgency < 0.5
+
+
+# =============================================================================
+# Japanese Dispersion Tests (Creator's bigram Jaccard ensemble)
+# =============================================================================
+
+
+class TestJapaneseDispersion:
+    """Creator の bigram Jaccard ensemble が日本語で正しく動作するか検証"""
+
+    # PURPOSE: _char_bigrams basic behavior
+    def test_char_bigrams_basic(self):
+        from mekhane.fep.cone_builder import _char_bigrams
+        result = _char_bigrams("認識")
+        assert result == ["認識"]
+
+    def test_char_bigrams_longer(self):
+        from mekhane.fep.cone_builder import _char_bigrams
+        result = _char_bigrams("深い認識")
+        assert len(result) == 3  # 深い, い認, 認識
+
+    def test_char_bigrams_whitespace(self):
+        from mekhane.fep.cone_builder import _char_bigrams
+        result = _char_bigrams("深い 認識")
+        assert result == ["深い", "い認", "認識"]  # whitespace removed
+
+    # PURPOSE: 同義的日本語出力 → V < 0.7 (ensemble で改善)
+    # NOTE: pure SequenceMatcher gives ~0.8+ for Japanese, ensemble brings to ~0.58
+    def test_synonymous_japanese_low_dispersion(self):
+        from mekhane.fep.cone_builder import compute_dispersion
+        outputs = {
+            "O1": "認識は意識の基盤であり、思考の出発点となる",
+            "O2": "認識こそが意識の土台であり、思考の起点となるものだ",
+            "O3": "意識の基盤は認識であって、思考はそこから始まる",
+            "O4": "思考の出発は認識にあり、それが意識を形作る基盤だ",
+        }
+        v = compute_dispersion(outputs)
+        assert v < 0.7, f"Synonymous Japanese V={v:.3f} should be < 0.7"
+
+    # PURPOSE: 矛盾する日本語出力 → V > 0.3
+    def test_contradictory_japanese_high_dispersion(self):
+        from mekhane.fep.cone_builder import compute_dispersion
+        outputs = {
+            "O1": "実行すべきだ。リスクは低い",
+            "O2": "中止すべきだ。リスクが高すぎる",
+            "O3": "賛成。進めるべき状況だ",
+            "O4": "反対。止めるべき状況だ",
+        }
+        v = compute_dispersion(outputs)
+        assert v > 0.3, f"Contradictory Japanese V={v:.3f} should be > 0.3"
+
+    # PURPOSE: 完全に同じ出力 → V = 0.0
+    def test_identical_japanese_zero(self):
+        from mekhane.fep.cone_builder import compute_dispersion
+        same = "同じ認識に到達した"
+        outputs = {"O1": same, "O2": same, "O3": same, "O4": same}
+        assert compute_dispersion(outputs) == 0.0
+

@@ -5,9 +5,13 @@ EmbeddingAdapter - sentence-transformers を使用した実ベクトル検索ア
 MockAdapter とは異なり、実際の埋め込み計算と類似度検索を行う。
 """
 
+import os
 from typing import List, Dict, Any, Optional
 import numpy as np
 from .base import VectorStoreAdapter, SearchResult
+
+# 環境変数でモデルを切り替え可能 (bge-m3 移行 Step 1)
+DEFAULT_MODEL = os.environ.get("EMBEDDING_MODEL", "all-MiniLM-L6-v2")
 
 
 class EmbeddingAdapter(VectorStoreAdapter):
@@ -15,13 +19,13 @@ class EmbeddingAdapter(VectorStoreAdapter):
     sentence-transformers を使用した本番用アダプタ
 
     Usage:
-        adapter = EmbeddingAdapter(model_name="all-MiniLM-L6-v2")
-        adapter.create_index(384)  # MiniLM の次元
+        adapter = EmbeddingAdapter()  # EMBEDDING_MODEL 環境変数 or デフォルト
+        adapter.create_index(384)     # MiniLM: 384d, bge-m3: 1024d
         ids = adapter.add_vectors(vectors, metadata=[...])
         results = adapter.search(query_vector, k=5)
     """
 
-    def __init__(self, model_name: str = "all-MiniLM-L6-v2"):
+    def __init__(self, model_name: str = DEFAULT_MODEL):
         self._model_name = model_name
         self._model = None  # Lazy load
         self._dimension: Optional[int] = None

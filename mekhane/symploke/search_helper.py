@@ -24,7 +24,7 @@ KAIROS_INDEX_PATH = Path("/home/makaron8426/oikos/mneme/.hegemonikon/indices/kai
 
 def load_adapter(path: Path) -> EmbeddingAdapter:
     """Load an adapter from a pickle file."""
-    adapter = EmbeddingAdapter(model_name="all-MiniLM-L6-v2")
+    adapter = EmbeddingAdapter()
     adapter.load(str(path))
     return adapter
 

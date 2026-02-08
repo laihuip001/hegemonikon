@@ -35,6 +35,7 @@ import sys
 import time
 from pathlib import Path
 from typing import Optional
+from mekhane.anamnesis.lancedb_compat import get_table_names
 
 # Hegemonikon root
 _THIS_DIR = Path(__file__).parent
@@ -372,7 +373,7 @@ class KnowledgeIndexer:
         table_name = "knowledge"
         existing_keys = set()
 
-        if not force_reindex and table_name in index.db.table_names():
+        if not force_reindex and table_name in get_table_names(index.db):
             try:
                 table = index.db.open_table(table_name)
                 df = table.search().select(["primary_key"]).limit(None).to_pandas()
@@ -437,7 +438,7 @@ class KnowledgeIndexer:
 
 # PURPOSE: Gnōsis 対話型 RAG エンジン.
         # LanceDB に追加
-        if table_name in index.db.table_names():
+        if table_name in get_table_names(index.db):
             table = index.db.open_table(table_name)
             table.add(data)
         else:
@@ -607,7 +608,7 @@ class GnosisChat:
         # Knowledge table
         if self.search_knowledge:
             try:
-                if "knowledge" in self._index.db.table_names():
+                if "knowledge" in get_table_names(self._index.db):
                     embedder = self._index._get_embedder()
                     qvec = embedder.embed(query)
                     table = self._index.db.open_table("knowledge")
@@ -890,7 +891,7 @@ class GnosisChat:
                     print(f"   {src}: {cnt}")
 
                 # Knowledge table stats
-                if "knowledge" in self._index.db.table_names():
+                if "knowledge" in get_table_names(self._index.db):
                     kt = self._index.db.open_table("knowledge")
                     kdf = kt.to_pandas()
                     print(f"\n🧠 Knowledge chunks: {len(kdf)}")

@@ -163,6 +163,83 @@ class TestCompilation:
         assert "while" in lmql.lower()
 
 
+class TestProcessOperators:
+    """Process Layer 演算子のテスト (~*, ~!, \\, (), {})"""
+    
+    def test_convergent_oscillation(self):
+        """/dia+~*/noe (収束振動)"""
+        ast = parse_ccl("/dia+~*/noe")
+        assert isinstance(ast, Oscillation)
+        assert ast.convergent is True
+        assert ast.divergent is False
+    
+    def test_divergent_oscillation(self):
+        """/dia+~!/noe (発散振動)"""
+        ast = parse_ccl("/dia+~!/noe")
+        assert isinstance(ast, Oscillation)
+        assert ast.divergent is True
+        assert ast.convergent is False
+    
+    def test_plain_oscillation_unchanged(self):
+        """/dia+ ~ /noe (通常振動、既存互換)"""
+        ast = parse_ccl("/dia+ ~ /noe")
+        assert isinstance(ast, Oscillation)
+        assert ast.convergent is False
+        assert ast.divergent is False
+    
+    def test_parenthesized_group(self):
+        """(/dia+~*/noe) — 括弧グループの剥離"""
+        ast = parse_ccl("(/dia+~*/noe)")
+        assert isinstance(ast, Oscillation)
+        assert ast.convergent is True
+    
+    def test_brace_group(self):
+        """{/dia+~*/noe} — ブレースグループの剥離"""
+        ast = parse_ccl("{/dia+~*/noe}")
+        assert isinstance(ast, Oscillation)
+        assert ast.convergent is True
+    
+    def test_colimit(self):
+        """\\pan+ — Colimit 演算子"""
+        from hermeneus.src import ColimitExpansion
+        ast = parse_ccl("\\pan+")
+        assert isinstance(ast, ColimitExpansion)
+        assert isinstance(ast.body, Workflow)
+        assert ast.body.id == "pan"
+    
+    def test_nested_convergent(self):
+        """(/dia+~*/noe)~*/pan+ — ネストされた収束振動"""
+        ast = parse_ccl("(/dia+~*/noe)~*/pan+")
+        assert isinstance(ast, Oscillation)
+        assert ast.convergent is True
+        # left は /dia+~*/noe の Oscillation
+        assert isinstance(ast.left, Oscillation)
+        assert ast.left.convergent is True
+    
+    def test_full_macro_group_a(self):
+        """{(/dia+~*/noe)~*/pan+} — マクロ前半"""
+        ast = parse_ccl("{(/dia+~*/noe)~*/pan+}")
+        assert isinstance(ast, Oscillation)
+        assert ast.convergent is True
+    
+    def test_full_macro_group_b(self):
+        """{(/dia+~*/noe)~*\\pan+} — マクロ後半 (Colimit 含む)"""
+        from hermeneus.src import ColimitExpansion
+        ast = parse_ccl("{(/dia+~*/noe)~*\\pan+}")
+        assert isinstance(ast, Oscillation)
+        assert ast.convergent is True
+        assert isinstance(ast.right, ColimitExpansion)
+    
+    def test_full_macro(self):
+        """完全マクロ: {(/dia+~*/noe)~*/pan+}~*{(/dia+~*/noe)~*\\pan+}"""
+        ast = parse_ccl("{(/dia+~*/noe)~*/pan+}~*{(/dia+~*/noe)~*\\pan+}")
+        assert isinstance(ast, Oscillation)
+        assert ast.convergent is True
+        # left = グループ A, right = グループ B
+        assert isinstance(ast.left, Oscillation)
+        assert isinstance(ast.right, Oscillation)
+
+
 # =============================================================================
 # Run
 # =============================================================================

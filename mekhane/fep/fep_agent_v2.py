@@ -186,11 +186,12 @@ class HegemonikónFEPAgentV2:
     def _default_B(self) -> np.ndarray:
         """Generate 48-state transition matrix for 7 actions.
 
-        Actions:
-            0: observe — clarifies phantasia, withholds assent, calms horme,
-                         series stays (no domain commitment)
-            1-6: act_O..act_A — grants assent, activates horme,
-                                transitions series to the action's target
+        Key insight: The agent should prefer act_X when it knows the Series.
+        observe = passive waiting (state-preserving, no clarification)
+        act_X = active engagement (clarifies phantasia + transitions Series)
+
+        This makes act_X epistemically and pragmatically superior when
+        topic observation provides clear Series signal.
         """
         B = np.zeros((self.state_dim, self.state_dim, self.num_actions))
 
@@ -200,22 +201,17 @@ class HegemonikónFEPAgentV2:
             for to_idx in range(self.state_dim):
                 to_p, to_a, to_h, to_s = index_to_state_v2(to_idx)
 
-                # --- Action 0: observe (Epochē) ---
+                # --- Action 0: observe (passive waiting) ---
+                # State-preserving: high inertia on ALL dimensions
+                # Does NOT clarify — it's waiting, not investigating
                 p = 1.0
-                # Phantasia: observation clarifies
-                if from_p == "uncertain" and to_p == "clear":
-                    p *= 0.6
-                elif from_p == "clear" and to_p == "clear":
-                    p *= 0.8
-                elif from_p == "uncertain" and to_p == "uncertain":
-                    p *= 0.4
-                else:
-                    p *= 0.1
-                # Assent: tends toward withheld
-                p *= 0.6 if to_a == "withheld" else 0.4
-                # Horme: calms
-                p *= 0.7 if to_h == "passive" else 0.3
-                # Series: stays (no domain commitment during observation)
+                # Phantasia: STAYS as-is (observation alone doesn't clarify)
+                p *= 0.9 if to_p == from_p else 0.1
+                # Assent: stays (no decision)
+                p *= 0.9 if to_a == from_a else 0.1
+                # Horme: stays (no impulse change)
+                p *= 0.9 if to_h == from_h else 0.1
+                # Series: stays (no domain commitment)
                 p *= 0.85 if to_s == from_s else 0.03
 
                 B[to_idx, from_idx, 0] = p
@@ -225,19 +221,24 @@ class HegemonikónFEPAgentV2:
                     target_series = SERIES_STATES[act_idx - 1]
 
                     p = 1.0
-                    # Phantasia: unchanged by action
-                    p *= 0.6 if to_p == from_p else 0.4
+                    # Phantasia: acting CLARIFIES (engagement reveals truth)
+                    if from_p == "uncertain" and to_p == "clear":
+                        p *= 0.7  # Action reveals
+                    elif to_p == "clear":
+                        p *= 0.6  # Maintains clarity
+                    else:
+                        p *= 0.2  # Rarely regresses
                     # Assent: action implies commitment
-                    p *= 0.7 if to_a == "granted" else 0.3
+                    p *= 0.75 if to_a == "granted" else 0.25
                     # Horme: action activates
                     p *= 0.8 if to_h == "active" else 0.2
                     # Series: transitions to action's target
                     if to_s == target_series:
-                        p *= 0.80  # Strong pull to target
+                        p *= 0.80
                     elif to_s == from_s:
-                        p *= 0.10  # Weak inertia
+                        p *= 0.10
                     else:
-                        p *= 0.02  # Noise
+                        p *= 0.02
 
                     B[to_idx, from_idx, act_idx] = p
 
@@ -267,10 +268,13 @@ class HegemonikónFEPAgentV2:
     # =========================================================================
 
     def _default_D(self) -> np.ndarray:
-        """Generate initial state belief with epistemic humility.
+        """Generate initial state belief — balanced action readiness.
 
-        Prior: uncertain phantasia, withheld assent, passive horme,
-               uniform over Series (no domain bias).
+        Prior:
+        - Epistemic humility on phantasia (uncertain > clear)
+        - Balanced assent (slight Epochē lean, not dominant)
+        - Balanced horme (ready to act, not stuck in passive)
+        - Uniform over Series
         """
         D = np.zeros(self.state_dim)
 
@@ -278,10 +282,14 @@ class HegemonikónFEPAgentV2:
             phantasia, assent, horme, series = index_to_state_v2(idx)
 
             prob = 1.0
+            # Epistemic humility: prefer uncertain (humble about impressions)
             prob *= 0.6 if phantasia == "uncertain" else 0.4
-            prob *= 0.6 if assent == "withheld" else 0.4
-            prob *= 0.6 if horme == "passive" else 0.4
-            # Uniform over Series — no a priori domain preference
+            # Assent: slight lean toward withheld, but not dominant
+            prob *= 0.55 if assent == "withheld" else 0.45
+            # Horme: balanced — ready to act when evidence warrants it
+            # (Stoic: hormē is the natural impulse toward the good)
+            prob *= 0.5  # Equal for both active and passive
+            # Series: uniform
             prob *= 1.0 / 6.0
 
             D[idx] = prob

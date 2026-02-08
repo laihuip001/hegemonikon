@@ -502,6 +502,21 @@ class NaturalityResult:
 
 
 # PURPOSE: BFS composite morphism path search (/m dia+ P4)
+# C3 fix: Module-level adjacency cache (MORPHISMS is constant)
+_MORPHISM_ADJACENCY: Optional[Dict[str, List[str]]] = None
+
+
+def _get_morphism_adjacency() -> Dict[str, List[str]]:
+    """Get or build the morphism adjacency graph (cached)."""
+    global _MORPHISM_ADJACENCY
+    if _MORPHISM_ADJACENCY is None:
+        adj: Dict[str, List[str]] = {}
+        for m in MORPHISMS.values():
+            adj.setdefault(m.source, []).append(m.target)
+        _MORPHISM_ADJACENCY = adj
+    return _MORPHISM_ADJACENCY
+
+
 def _has_morphism_path(source: str, target: str, max_depth: int = 4) -> bool:
     """Check if a morphism path exists from source to target in MORPHISMS.
 
@@ -519,10 +534,7 @@ def _has_morphism_path(source: str, target: str, max_depth: int = 4) -> bool:
     if source == target:
         return True
 
-    # Build adjacency from MORPHISMS registry
-    adjacency: Dict[str, List[str]] = {}
-    for m in MORPHISMS.values():
-        adjacency.setdefault(m.source, []).append(m.target)
+    adjacency = _get_morphism_adjacency()
 
     # BFS
     visited: set = {source}
@@ -777,7 +789,9 @@ def _parse_outputs(args: list) -> Dict[str, str]:
 
 if __name__ == "__main__":
     import argparse
+    import json
     import sys
+    from pathlib import Path
 
     parser = argparse.ArgumentParser(
         description="Cone Builder — Hub Peras @converge C0-C3",
@@ -793,6 +807,11 @@ if __name__ == "__main__":
         "--pw",
         default="",
         help="Precision Weighting: 'O1:0.5,O3:-0.5'",
+    )
+    parser.add_argument(
+        "--file", "-f",
+        default=None,
+        help="JSON file from wf_env_bridge export (overrides positional outputs)",
     )
     parser.add_argument(
         "--apex",
@@ -814,11 +833,25 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     series = Series[args.series]
-    pw = _parse_pw(args.pw)
-    outputs = _parse_outputs(args.outputs)
+
+    # --file mode: load outputs + pw from wf_env_bridge JSON export
+    if args.file:
+        try:
+            file_data = json.loads(Path(args.file).read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError) as e:
+            print(f"⚠️ Failed to read --file {args.file}: {e}", file=sys.stderr)
+            sys.exit(1)
+        outputs = file_data.get("outputs", {})
+        pw = file_data.get("pw", {})
+        # CLI --pw overrides file pw if explicitly given
+        if args.pw:
+            pw = _parse_pw(args.pw)
+    else:
+        pw = _parse_pw(args.pw)
+        outputs = _parse_outputs(args.outputs)
 
     if not outputs:
-        print("⚠️ No outputs provided. Use: O1='出力1' O2='出力2' ...", file=sys.stderr)
+        print("⚠️ No outputs provided. Use: O1='出力1' O2='出力2' ... or --file", file=sys.stderr)
         sys.exit(1)
 
     cone = converge(series, outputs, pw=pw or None, apex=args.apex, confidence=args.confidence)

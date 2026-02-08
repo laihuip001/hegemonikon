@@ -133,7 +133,7 @@ anti_skip: enabled
 ```bash
 cd ~/oikos/hegemonikon && PYTHONPATH=. .venv/bin/python mekhane/fep/cone_builder.py \
   --series O --pw "${PW_O:-}" \
-  O1="${O1_OUT}" O2="${O2_OUT}" O3="${O3_OUT}" O4="${O4_OUT}"
+  --file "$(PYTHONPATH=. .venv/bin/python -m mekhane.fep.wf_env_bridge export O)"
 ```
 
 **射の列挙** (各定理の Yoneda 表現を計算):

@@ -161,7 +161,7 @@ result = select_derivative("H1", problem_context)
 ```bash
 cd ~/oikos/hegemonikon && PYTHONPATH=. .venv/bin/python mekhane/fep/cone_builder.py \
   --series H --pw "${PW_H:-}" \
-  H1="${H1_OUT}" H2="${H2_OUT}" H3="${H3_OUT}" H4="${H4_OUT}"
+  --file "$(PYTHONPATH=. .venv/bin/python -m mekhane.fep.wf_env_bridge export H)"
 ```
 
 **射の列挙** (各定理の動機的射を計算):

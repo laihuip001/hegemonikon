@@ -1,0 +1,18 @@
+{
+    "servers": {
+        "gnosis": {
+            "type": "stdio",
+            "command": "/home/makaron8426/oikos/hegemonikon/.venv/bin/python",
+            "args": [
+                "/home/makaron8426/oikos/hegemonikon/mekhane/mcp/gnosis_mcp_server.py"
+            ]
+        },
+        "hermeneus": {
+            "type": "stdio",
+            "command": "/home/makaron8426/oikos/hegemonikon/.venv/bin/python",
+            "args": [
+                "/home/makaron8426/oikos/hegemonikon/scripts/hermeneus_mcp.py"
+            ]
+        }
+    }
+}

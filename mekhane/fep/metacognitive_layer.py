@@ -290,11 +290,15 @@ def check_intuition(context: str) -> MetacognitiveCheck:
         "わからない", "不明", "uncertain", "maybe", "perhaps",
         "かもしれない", "推測", "仮説",
     ])
+    # Urgency: intentional request to hurry (C1 fix: exclude 急に/急すぎ)
     has_urgency = any(w in context for w in [
-        "緊急", "urgent", "今すぐ", "急", "至急", "immediately",
+        "緊急", "urgent", "今すぐ", "至急", "immediately",
+        "急いで", "急ぎで", "急を要する", "早急",
     ])
+    # Reflection: intentional request to slow down (C1 fix: stem forms)
     has_reflection = any(w in context for w in [
-        "じっくり", "熟考", "深く", "慎重に", "carefully", "deliberate",
+        "じっくり", "熟考", "慎重", "carefully", "deliberate",
+        "ゆっくり", "落ち着いて", "深く考え",
     ])
 
     # Contradiction: urgent + reflective = ambiguous intuition
@@ -556,9 +560,14 @@ def run_full_uml(
     final_pre: List[MetacognitiveCheck] = []
     final_post: List[MetacognitiveCheck] = []
 
+    # C2 fix: Accumulated feedback enriches context for each loop.
+    # This makes each iteration's pre-check meaningfully different,
+    # approximating MP's "re-understanding" process.
+    enriched_context = context
+
     for loop_idx in range(MAX_FEEDBACK_LOOPS + 1):
-        pre = run_pre_checks(context)
-        post = run_post_checks(output, context, effective_confidence)
+        pre = run_pre_checks(enriched_context)
+        post = run_post_checks(output, enriched_context, effective_confidence)
 
         final_pre = pre
         final_post = post
@@ -578,11 +587,24 @@ def run_full_uml(
 
         # AMP feedback: reduce confidence and re-evaluate
         feedback_count += 1
+
+        # Collect failed post-check results as feedback
+        failed_issues = [
+            c.result for c in post if not c.passed
+        ]
+        feedback_summary = "; ".join(failed_issues)
         reason = (
             f"Loop {feedback_count}: confidence={effective_confidence:.1f}% > "
-            f"{OVERCONFIDENCE_THRESHOLD}%. X-AO1 射で O1 に戻り再理解。"
+            f"{OVERCONFIDENCE_THRESHOLD}%. 検出問題: {feedback_summary}. "
+            f"X-AO1 射で O1 に戻り再理解。"
         )
         feedback_reasons.append(reason)
+
+        # Enrich context with feedback for next iteration's pre-check
+        enriched_context = (
+            f"{context}\n[AMP feedback loop {feedback_count}] "
+            f"前回検出: {feedback_summary}"
+        )
 
         # Reduce effective confidence by FP rate
         effective_confidence *= (1.0 - MP_FALSE_POSITIVE_RATE)

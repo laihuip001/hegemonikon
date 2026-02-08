@@ -93,6 +93,10 @@ class CCLSyntaxValidator:
     WORKFLOW_PATTERN = r"/([a-z]+)"
     UNARY_OPS = set("+-^/")
     BINARY_OPS = set("_*~")
+    # Compound operators (Hermēneus AST 準拠)
+    COMPOUND_OPS = {"~*", "~!", ">>", "|>", "||"}
+    # Colimit prefix operator
+    COLIMIT_OP = "\\"
 
     # PURPOSE: Validate a CCL expression.
     def validate(self, ccl: str) -> ValidationResult:
@@ -129,8 +133,26 @@ class CCLSyntaxValidator:
                 warnings.append(f"Unknown workflow: /{wf}")
 
         # Check for invalid operator sequences
-        if re.search(r"[_*~]{2,}", ccl):
+        # ~* and ~! are valid compound operators, skip those
+        stripped = ccl
+        for cop in sorted(self.COMPOUND_OPS, key=len, reverse=True):
+            stripped = stripped.replace(cop, " ")
+        if re.search(r"[_*~]{2,}", stripped):
             errors.append("Consecutive binary operators")
+
+        # Validate colimit operator usage
+        if "\\" in ccl:
+            # \ must be followed by / (workflow) or ( (group)
+            for m in re.finditer(r"\\(?![/(])", ccl):
+                # Allow \\ at start followed by alphanumeric (shorthand)
+                pos = m.start()
+                if pos + 1 < len(ccl) and ccl[pos + 1].isalpha():
+                    pass  # \pan+ 形式 — OK
+                else:
+                    warnings.append(
+                        f"Colimit operator (\\) at pos {pos} "
+                        f"should be followed by workflow or group"
+                    )
 
         # Check control syntax
         control_matches = re.findall(r"([FI]):([^{]*)\{", ccl)
@@ -147,5 +169,5 @@ class CCLSyntaxValidator:
         return ValidationResult(
             valid=len(errors) == 0,
             errors=errors,
-            # NOTE: Removed self-assignment: warnings = warnings
+            warnings=warnings,
         )

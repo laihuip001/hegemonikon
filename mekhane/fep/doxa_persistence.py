@@ -104,7 +104,7 @@ class DoxaStore:
     信念の永続化を管理。
     """
 
-    # PURPOSE: 内部処理: init__
+    # PURPOSE: Dirichletパラメータの永続保存と復元（学習の蓄積）
     def __init__(self):
         self._beliefs: Dict[str, Belief] = {}
         self._archive: List[Belief] = []

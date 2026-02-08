@@ -581,3 +581,104 @@ class TestNaturalTransformationRegistry:
         assert set(eta.components.keys()) == set(boot.object_map.keys())
 
 
+# =============================================================================
+# /dia+ Fix Tests
+# =============================================================================
+
+
+class TestDiaPlusFix2ParsePw:
+    """Fix #2: _parse_pw() ValueError 防御"""
+
+    def test_valid_pw(self):
+        from mekhane.fep.cone_builder import _parse_pw
+        result = _parse_pw("O1:0.5,O3:-0.5")
+        assert result == {"O1": 0.5, "O3": -0.5}
+
+    def test_invalid_value_skipped(self):
+        from mekhane.fep.cone_builder import _parse_pw
+        result = _parse_pw("O1:abc,O3:0.5")
+        assert result == {"O3": 0.5}  # O1 skipped
+
+    def test_empty_string(self):
+        from mekhane.fep.cone_builder import _parse_pw
+        assert _parse_pw("") == {}
+
+    def test_mixed_valid_invalid(self):
+        from mekhane.fep.cone_builder import _parse_pw
+        result = _parse_pw("O1:1.0, O2:, O3:0.5")
+        assert "O1" in result
+        assert "O3" in result
+        assert "O2" not in result  # empty value → ValueError
+
+
+class TestDiaPlusFix3ComposeStrict:
+    """Fix #3: NatTrans compose() 部分合成 warning + strict mode"""
+
+    def _make_alpha(self):
+        return NaturalTransformation(
+            name="α", source_functor="F", target_functor="G",
+            components={"X": "α_X", "Y": "α_Y"},
+        )
+
+    def _make_beta_partial(self):
+        """β has X and Z but not Y"""
+        return NaturalTransformation(
+            name="β", source_functor="G", target_functor="H",
+            components={"X": "β_X", "Z": "β_Z"},
+        )
+
+    def _make_beta_full(self):
+        """β has X and Y (matching α)"""
+        return NaturalTransformation(
+            name="β", source_functor="G", target_functor="H",
+            components={"X": "β_X", "Y": "β_Y"},
+        )
+
+    def test_strict_raises_on_mismatch(self):
+        alpha = self._make_alpha()
+        beta = self._make_beta_partial()
+        with pytest.raises(ValueError, match="Object mismatch"):
+            alpha.compose(beta, strict=True)
+
+    def test_nonstrict_warns_on_mismatch(self):
+        import warnings
+        alpha = self._make_alpha()
+        beta = self._make_beta_partial()
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")
+            result = alpha.compose(beta)
+            assert result is not None
+            assert len(w) == 1
+            assert "Partial composition" in str(w[0].message)
+
+    def test_full_match_no_warning(self):
+        import warnings
+        alpha = self._make_alpha()
+        beta = self._make_beta_full()
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")
+            result = alpha.compose(beta)
+            assert result is not None
+            assert len(w) == 0
+            assert set(result.components.keys()) == {"X", "Y"}
+
+    def test_strict_ok_with_full_match(self):
+        alpha = self._make_alpha()
+        beta = self._make_beta_full()
+        result = alpha.compose(beta, strict=True)
+        assert result is not None
+        assert result.name == "β∘α"
+
+
+class TestDiaPlusFix4IsFull:
+    """Fix #4: Functor.is_full → NotImplementedError"""
+
+    def test_is_full_raises(self):
+        f = Functor(name="test", source_cat="C", target_cat="D")
+        with pytest.raises(NotImplementedError, match="full category knowledge"):
+            _ = f.is_full
+
+    def test_registry_is_full_raises(self):
+        for name, f in FUNCTORS.items():
+            with pytest.raises(NotImplementedError):
+                _ = f.is_full

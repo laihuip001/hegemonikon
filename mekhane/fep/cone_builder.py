@@ -381,7 +381,10 @@ def describe_cone(cone: Cone) -> str:
 
 
 def _parse_pw(pw_str: str) -> Dict[str, float]:
-    """Parse PW string: 'O1:0.5,O3:-0.5' → {'O1': 0.5, 'O3': -0.5}"""
+    """Parse PW string: 'O1:0.5,O3:-0.5' → {'O1': 0.5, 'O3': -0.5}
+
+    Invalid values are silently skipped (defensive parsing).
+    """
     if not pw_str:
         return {}
     result = {}
@@ -389,7 +392,10 @@ def _parse_pw(pw_str: str) -> Dict[str, float]:
         pair = pair.strip()
         if ":" in pair:
             k, v = pair.split(":", 1)
-            result[k.strip()] = float(v.strip())
+            try:
+                result[k.strip()] = float(v.strip())
+            except ValueError:
+                pass  # Skip invalid values (e.g. "O1:abc")
     return result
 
 

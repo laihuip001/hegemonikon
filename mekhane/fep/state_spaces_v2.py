@@ -86,9 +86,11 @@ ACTION_TO_SERIES: Dict[str, str] = {
 PREFERENCES_V2: Dict[str, Dict[str, float]] = {
     **V1_PREFERENCES,
     "topic": {
-        # 全 Series は等価に好ましい — 特定の Series への偏向なし
-        "O": 0.5, "S": 0.5, "H": 0.5,
-        "P": 0.5, "K": 0.5, "A": 0.5,
+        # Series を認識したら行動を促す — Epochē からの脱出誘因
+        # 高い値 = Agent は topic signal に応答して act_X を選びたがる
+        # 4.0: context の ambiguous(-2.0)/clear(+2.0) と同等のインパクト
+        "O": 4.0, "S": 4.0, "H": 4.0,
+        "P": 4.0, "K": 4.0, "A": 4.0,
     },
 }
 

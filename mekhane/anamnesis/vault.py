@@ -73,7 +73,7 @@ class VaultManager:
                 mode="w",
                 dir=target_path.parent,
                 delete=False,
-                # NOTE: Removed self-assignment: encoding = encoding
+                encoding=encoding,
             ) as tmp_file:
                 tmp_file.write(content)
                 tmp_path = Path(tmp_file.name)

@@ -73,10 +73,8 @@ PHASE2_BASIN_THRESHOLD: int = 50
 def is_phase2_ready() -> bool:
     """Check if enough data has accumulated to transition to Phase 2.
 
-    Queries BasinLogger log directory for total entries.
-    Returns True if either threshold is met:
-      - Total attractor log entries >= PHASE2_BASIN_THRESHOLD (50)
-      - (Future) converge execution count >= PHASE2_CONVERGE_THRESHOLD (100)
+    Queries BasinLogger bias_report for total entries.
+    Returns True if total entries >= PHASE2_BASIN_THRESHOLD (50).
 
     Returns False gracefully if BasinLogger is unavailable or log dir is empty.
     """
@@ -85,10 +83,76 @@ def is_phase2_ready() -> bool:
         from mekhane.fep.basin_logger import BasinLogger
 
         logger = BasinLogger()
-        total = sum(b.total_count for b in logger.biases.values())
+        report = logger.bias_report()
+        total = sum(s.get("total", 0) for s in report.values())
         return total >= PHASE2_BASIN_THRESHOLD
     except Exception:
         return False
+
+
+# PURPOSE: Phase 2 — 学習的 Modality マッピング調整
+def learn_modality_mapping() -> Dict[str, Dict[str, str]]:
+    """Phase 2: BasinLogger データから MODALITY_MAPPING を調整。
+
+    学習ロジック:
+      1. BasinLogger から各 Series の precision/recall を取得
+      2. precision < 0.5 の Series について、modality rotation を適用
+         - urgency → context (urgency 依存過多を context で補完)
+         - context → confidence (context 不足を確信度で補完)
+         - confidence → urgency (確信度過信を urgency で是正)
+      3. 調整された mapping を返す (元の _MODALITY_MAPPING は不変)
+
+    Returns:
+        調整済み MODALITY_MAPPING (Phase 1 がコピーされ、低精度 series のみ修正)
+        データ不足時は Phase 1 のコピーをそのまま返す
+    """
+    import copy
+    adjusted = copy.deepcopy(_MODALITY_MAPPING)
+
+    try:
+        from mekhane.fep.basin_logger import BasinLogger
+        logger = BasinLogger()
+        report = logger.bias_report()
+    except Exception:
+        return adjusted
+
+    # Modality rotation table
+    _ROTATION = {
+        "urgency": "context",
+        "context": "confidence",
+        "confidence": "urgency",
+    }
+
+    for series, stats in report.items():
+        precision = stats.get("precision", 1.0)
+        direction = stats.get("direction", "neutral")
+
+        # Only adjust series with poor precision
+        if precision >= 0.5 or series not in adjusted:
+            continue
+
+        mapping = adjusted[series]
+
+        if direction == "over":
+            # Over-prediction: the dominant modality is too sensitive
+            # → rotate the most common modality to reduce false positives
+            modality_counts: Dict[str, int] = {}
+            for mod in mapping.values():
+                modality_counts[mod] = modality_counts.get(mod, 0) + 1
+            dominant = max(modality_counts, key=modality_counts.get)  # type: ignore
+
+            for tid, mod in mapping.items():
+                if mod == dominant:
+                    mapping[tid] = _ROTATION.get(mod, mod)
+
+        elif direction == "under":
+            # Under-prediction: the modality is too suppressive
+            # → boost by rotating to a more action-oriented modality
+            for tid, mod in mapping.items():
+                if mod == "confidence":
+                    mapping[tid] = "context"  # broaden sensitivity
+
+    return adjusted
 
 
 
@@ -372,7 +436,12 @@ def derive_pw(
     if not theorems:
         return {}
 
-    mapping = _MODALITY_MAPPING.get(series.upper(), {})
+    # Phase 2: use learned mapping if enough data
+    if is_phase2_ready():
+        mapping = learn_modality_mapping().get(series.upper(), {})
+    else:
+        mapping = _MODALITY_MAPPING.get(series.upper(), {})
+
     if not mapping:
         return {t: 0.0 for t in theorems}
 

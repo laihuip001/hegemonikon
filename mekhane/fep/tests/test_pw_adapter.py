@@ -487,11 +487,10 @@ class TestPhase2Transition:
         """When BasinLogger has >= threshold entries, Phase 2 is ready."""
         from unittest.mock import patch, MagicMock
 
-        mock_bias = MagicMock()
-        mock_bias.total_count = PHASE2_BASIN_THRESHOLD  # exactly at threshold
-
         mock_logger = MagicMock()
-        mock_logger.biases = {"S": mock_bias}
+        mock_logger.bias_report.return_value = {
+            "S": {"total": PHASE2_BASIN_THRESHOLD, "precision": 0.8, "direction": "neutral"},
+        }
 
         with patch("mekhane.fep.basin_logger.BasinLogger", return_value=mock_logger):
             from mekhane.fep import pw_adapter
@@ -503,11 +502,10 @@ class TestPhase2Transition:
         """When BasinLogger has < threshold entries, Phase 2 is not ready."""
         from unittest.mock import patch, MagicMock
 
-        mock_bias = MagicMock()
-        mock_bias.total_count = 10  # well below threshold
-
         mock_logger = MagicMock()
-        mock_logger.biases = {"S": mock_bias}
+        mock_logger.bias_report.return_value = {
+            "S": {"total": 10, "precision": 0.5, "direction": "neutral"},
+        }
 
         with patch("mekhane.fep.basin_logger.BasinLogger", return_value=mock_logger):
             from mekhane.fep import pw_adapter

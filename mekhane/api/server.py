@@ -15,7 +15,14 @@ Usage:
 import argparse
 import logging
 import sys
+import time
 from pathlib import Path
+
+# R4 fix: scripts/ パッケージが PYTHONPATH なしで import 可能になるよう
+# プロジェクトルートを sys.path に追加
+_PROJECT_ROOT = Path(__file__).resolve().parents[2]  # hegemonikon/
+if str(_PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(_PROJECT_ROOT))
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -46,6 +53,9 @@ def create_app() -> FastAPI:
         allow_methods=["*"],
         allow_headers=["*"],
     )
+
+    # R3 fix: app.state.start_time でサーバー起動時刻を正確に記録
+    app.state.start_time = time.time()
 
     # ルーター登録
     _register_routers(app)

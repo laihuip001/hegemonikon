@@ -424,6 +424,11 @@ class CycleResultV2:
     cone_apex: Optional[str] = None
     cone_dispersion: Optional[float] = None
     cone_method: Optional[str] = None
+    # ConeAdvice + ES
+    advice_action: Optional[str] = None
+    advice_wf: Optional[str] = None
+    advice_trace: Optional[str] = None  # ES: DecisionTrace repr
+    advice_format: Optional[str] = None  # ES: format_advice_for_llm output
     # Learning
     a_matrix_updated: bool = False
 
@@ -560,12 +565,30 @@ def run_loop_v2(
             except Exception:
                 pass  # feedback is best-effort
 
-        # ── Step 6: Cone (if acting) ──
+        # ── Step 6: Cone + ConeAdvice (if acting) ──
         if cycle.selected_series is not None:
             simulated_cone = _simulate_cone(cycle.selected_series, user_input)
             cycle.cone_apex = simulated_cone.get("apex")
             cycle.cone_dispersion = simulated_cone.get("dispersion")
             cycle.cone_method = simulated_cone.get("method")
+
+            # ES: ConeAdvice + Explanation Stack
+            try:
+                from mekhane.fep.cone_consumer import advise, format_advice_for_llm
+                from mekhane.fep.cone_builder import converge as _converge
+                from mekhane.fep.category import Series as SeriesEnum
+                cone_obj = simulated_cone.get("cone")
+                if cone_obj is None:
+                    series_enum = SeriesEnum[cycle.selected_series]
+                    cone_obj = _converge(series_enum, simulated_cone.get("outputs", {}))
+                advice = advise(cone_obj)
+                cycle.advice_action = advice.action
+                cycle.advice_wf = advice.suggested_wf
+                if advice.trace:
+                    cycle.advice_trace = repr(advice.trace)
+                cycle.advice_format = format_advice_for_llm(advice)
+            except Exception:
+                pass  # ES is best-effort
 
         results.append(cycle)
 

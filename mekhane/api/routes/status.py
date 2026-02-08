@@ -12,7 +12,7 @@ import time
 from dataclasses import asdict
 from typing import Any
 
-from fastapi import APIRouter
+from fastapi import APIRouter, Request
 from pydantic import BaseModel, Field
 
 # PURPOSE: レスポンスモデル (/dia+ fix #3: Pydantic models)
@@ -39,20 +39,21 @@ class HealthCheckResponse(BaseModel):
     uptime_seconds: float = 0.0
 
 
-# PURPOSE: モジュールレベルの起動時刻
+# PURPOSE: R3 fix — サーバー起動時刻（app.state 未設定時のフォールバック）
 _start_time = time.time()
 
 router = APIRouter(prefix="/status", tags=["status"])
 
 
 @router.get("/health", response_model=HealthCheckResponse)
-async def health_check() -> HealthCheckResponse:
+async def health_check(request: Request) -> HealthCheckResponse:
     """Tauri ヘルスチェック用の軽量エンドポイント。"""
     from mekhane.api import __version__
+    start = getattr(request.app.state, "start_time", _start_time)
     return HealthCheckResponse(
         status="ok",
         version=__version__,
-        uptime_seconds=round(time.time() - _start_time, 1),
+        uptime_seconds=round(time.time() - start, 1),
     )
 
 

@@ -53,3 +53,10 @@ runtime/
 # Gnōsis data (LanceDB - contains embedded secrets from indexed content)
 gnosis_data/
 mekhane/anamnesis/data/*.lance/
+
+# n8n runtime data
+mekhane/ergasterion/n8n/data/database.sqlite*
+mekhane/ergasterion/n8n/data/n8nEventLog*.log
+
+# Prompt-lang staging (temporary)
+mekhane/ergasterion/prompt-lang/staging/

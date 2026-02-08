@@ -47,10 +47,28 @@ class Embedder:
       1. CUDA available → sentence-transformers on GPU (fp16, ~1175MB VRAM for bge-m3)
       2. CUDA OOM → sentence-transformers on CPU (same model)
       3. Fallback → ONNX Runtime on CPU (bge-small, legacy)
+
+    Singleton: Same (model_name, force_cpu) key returns cached instance
+    to prevent GPU VRAM duplication across Attractor, Gnōsis, tests, etc.
     """
+
+    _instances: dict[tuple, "Embedder"] = {}
+
+    def __new__(cls, force_cpu: bool = False, model_name: str = "BAAI/bge-m3"):
+        key = (model_name, force_cpu)
+        if key in cls._instances:
+            return cls._instances[key]
+        instance = super().__new__(cls)
+        instance._initialized = False
+        cls._instances[key] = instance
+        return instance
 
     # PURPOSE: Embedder の構成と依存関係の初期化
     def __init__(self, force_cpu: bool = False, model_name: str = "BAAI/bge-m3"):
+        if self._initialized:
+            return
+        self._initialized = True
+
         import numpy as np
         self.np = np
         self._use_gpu = False

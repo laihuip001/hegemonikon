@@ -412,12 +412,21 @@ def get_boot_context(mode: str = "standard", context: Optional[str] = None) -> d
                 # Attractor の推薦を topic observation として注入し、
                 # Agent が自律的に Series + act/observe を判断する
                 fep_v2_result = {}
+                learning_diff_fmt = ""
                 try:
                     from mekhane.fep.fep_agent_v2 import HegemonikónFEPAgentV2
                     from mekhane.fep.state_spaces_v2 import SERIES_STATES
+                    from mekhane.fep.persistence import (
+                        save_snapshot, list_snapshots, diff_A,
+                        format_learning_diff,
+                    )
 
                     agent_v2 = HegemonikónFEPAgentV2()
                     agent_v2.load_learned_A()  # 前回セッションの学習を復元
+
+                    # Snapshot: capture A BEFORE learning
+                    import copy
+                    A_before = copy.deepcopy(agent_v2.agent.A)
 
                     # Attractor series → topic observation index
                     # rec.series can be list (oscillation) or str
@@ -436,6 +445,12 @@ def get_boot_context(mode: str = "standard", context: Optional[str] = None) -> d
                     agent_v2.update_A_dirichlet(topic_obs)
                     agent_v2.save_learned_A()
 
+                    # Snapshot: save AFTER learning + compute diff
+                    save_snapshot(agent_v2, label="boot")
+                    A_after = agent_v2.agent.A
+                    learning_diff = diff_A(A_before, A_after)
+                    learning_diff_fmt = format_learning_diff(learning_diff)
+
                     conf_pct = int(100.0 * max(final["beliefs"]))
                     explanation = agent_v2.explain(final)
                     fep_v2_result = {
@@ -447,6 +462,7 @@ def get_boot_context(mode: str = "standard", context: Optional[str] = None) -> d
                         "agreement": final.get("selected_series") == att_series,
                         "map_state": final["map_state_names"],
                         "explanation": explanation,
+                        "learning_diff": learning_diff,
                     }
                 except Exception:
                     pass  # FEP v2 failure should not block boot

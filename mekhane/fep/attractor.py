@@ -180,13 +180,13 @@ SERIES_DEFINITIONS: dict[str, dict] = {
     "A": {
         "name": "Akribeia (精度)",
         "definition": (
-            "Precision, judgment, decision-making, evaluation. "
-            "Critical assessment, comparison, quality control, verification. "
-            "Choosing between alternatives, trade-off analysis. "
+            "Precision, evaluation, quality control, verification. "
+            "Critical assessment, comparison, accuracy checking. "
             "Review, inspection, validation, checking correctness. "
-            "Code review, bug detection, quality assurance. "
-            "Decision criteria, verdict, ruling, appraisal, grading. "
-            "Is this correct? Accuracy check. Pass or fail judgment."
+            "Code review, bug detection, quality assurance, testing. "
+            "Is this correct? Is this good enough? Pass or fail. "
+            "Grading, scoring, benchmarking, performance measurement. "
+            "Identifying errors, finding flaws, detecting problems."
         ),
         "definition_ja": (
             "精度、判断、意思決定、評価。どれほど正確か。"
@@ -197,9 +197,9 @@ SERIES_DEFINITIONS: dict[str, dict] = {
         "keywords": ["判断", "評価", "選択", "比較", "品質", "基準", "正確", "レビュー"],
         "exemplars": [
             "この実装は正しいか検証してレビューする",
-            "2つの選択肢を比較して最適を判断する",
+            "テスト結果を確認して品質が基準を満たすか調べる",
             "コードレビューでバグがないか精査する",
-            "テスト結果を評価して品質を確認する",
+            "出力が期待値と一致しているか検証する",
             "性能ベンチマークを実行して精度を測る",
         ],
         "workflows": ["/pat", "/dia", "/gno", "/epi"],

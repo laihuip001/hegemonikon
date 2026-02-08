@@ -1,9 +1,10 @@
 # PROOF: [L2/テスト] <- mekhane/fep/tests/
-"""Tests for AttractorAdvisor and OscillationType diagnosis"""
+"""Tests for AttractorAdvisor, OscillationType diagnosis, and Problem B"""
 
 import pytest
 from mekhane.fep.attractor import (
     OscillationType,
+    OscillationDiagnosis,
     SeriesAttractor,
     SuggestResult,
 )
@@ -125,3 +126,62 @@ class TestBackwardCompatibility:
         """suggest_all() は 6 Series を返す"""
         results = attractor.suggest_all("test")
         assert len(results) == 6
+
+
+# --- Problem B: Oscillation Interpretation ---
+
+class TestOscillationInterpretation:
+    """Problem B: oscillation の理論的意味テスト"""
+
+    def test_clear_interpretation(self, attractor: SeriesAttractor):
+        """CLEAR → theory + action が返る"""
+        result = attractor.diagnose(
+            "How should we design the architecture and implementation plan?"
+        )
+        interp = result.interpretation
+        assert isinstance(interp, OscillationDiagnosis)
+        assert interp.oscillation == OscillationType.CLEAR
+        assert "自由エネルギー" in interp.theory
+        assert len(interp.action) > 0
+        assert interp.morphisms == []
+        assert interp.confidence_modifier > 0
+
+    def test_interpretation_has_theory(self, attractor: SeriesAttractor):
+        """全 OscillationType に theory がある"""
+        result = attractor.diagnose("Why does this exist?")
+        interp = result.interpretation
+        assert len(interp.theory) > 10
+
+    def test_interpretation_repr(self, attractor: SeriesAttractor):
+        """OscillationDiagnosis の repr"""
+        result = attractor.diagnose("Why?")
+        repr_str = repr(result.interpretation)
+        assert "OscDiag:" in repr_str
+
+    def test_negative_confidence_modifier(self, attractor: SeriesAttractor):
+        """NEGATIVE/WEAK → confidence modifier は 0 以下"""
+        # Build a known NEGATIVE/WEAK case manually
+        from mekhane.fep.attractor import _build_diagnosis, AttractorResult
+        diag = _build_diagnosis(
+            OscillationType.NEGATIVE,
+            [AttractorResult("O", "Ousia", 0.4)],
+            gap=0.02,
+            top_sim=0.4,
+        )
+        assert diag.confidence_modifier < 0
+
+    def test_positive_morphisms(self, attractor: SeriesAttractor):
+        """POSITIVE → X-series morphism が提案される"""
+        from mekhane.fep.attractor import _build_diagnosis, AttractorResult
+        diag = _build_diagnosis(
+            OscillationType.POSITIVE,
+            [
+                AttractorResult("O", "Ousia", 0.55),
+                AttractorResult("S", "Schema", 0.53),
+            ],
+            gap=0.02,
+            top_sim=0.55,
+        )
+        assert len(diag.morphisms) >= 1
+        assert "X-OS" in diag.morphisms
+

@@ -50,7 +50,7 @@ class FEPDashboardResponse(BaseModel):
 
 # PURPOSE: FEP Agent シングルトン + スレッドロック (/dia+ fix #1)
 _agent = None
-_agent_lock = threading.Lock()
+_agent_lock = threading.RLock()  # RLock: _get_agent() + endpoint 両方で取得するため再入可能
 _MAX_HISTORY = 1000  # /dia+ fix #5: history 上限ガード
 
 router = APIRouter(prefix="/fep", tags=["fep"])

@@ -414,3 +414,111 @@ def advise(cone: Cone) -> ConeAdvice:
                f"概ね整合。実行可能",
         urgency=0.1,
     )
+
+
+# =============================================================================
+# Attractor-Cone Integration
+# =============================================================================
+
+
+def advise_with_attractor(
+    cone: Cone,
+    oscillation: str,
+    attractor_confidence: float,
+    attractor_series: Optional[str] = None,
+) -> ConeAdvice:
+    """Enriched advise() that incorporates Attractor diagnosis.
+
+    This bridges the two FEP subsystems:
+    - Attractor: "which Series should we use?" (macro-level routing)
+    - Cone: "does the Series output cohere?" (micro-level validation)
+
+    Integration rules (applied as post-processing on base advise):
+
+    | Oscillation | Effect on ConeAdvice                        |
+    |:------------|:--------------------------------------------|
+    | CLEAR       | No change — Attractor is confident           |
+    | POSITIVE    | devil → investigate if urgency < 0.8         |
+    | NEGATIVE    | urgency += 0.2 — weak convergence is risky   |
+    | WEAK        | proceed → investigate                        |
+
+    Series mismatch (attractor says O, cone says S) → investigate.
+
+    Args:
+        cone: A Cone from converge()
+        oscillation: OscillationType.value string ("clear"/"positive"/"negative"/"weak")
+        attractor_confidence: Attractor's top_similarity (0.0-1.0)
+        attractor_series: Primary Series from Attractor (e.g. "O")
+
+    Returns:
+        ConeAdvice, potentially modified by Attractor context
+    """
+    # Start with base advise
+    base = advise(cone)
+
+    # --- Series mismatch check ---
+    if (attractor_series
+            and attractor_series != cone.series.name
+            and base.action == "proceed"):
+        return ConeAdvice(
+            action="investigate",
+            reason=f"Series 不一致: Attractor={attractor_series}, "
+                   f"Cone={cone.series.name}。routing を再検討",
+            suggested_wf="/zet",
+            next_steps=[
+                f"Attractor が {attractor_series} を推薦した理由を確認",
+                f"入力を {cone.series.name}-series として再評価",
+            ],
+            urgency=0.6,
+            devil_detail=base.devil_detail,
+        )
+
+    # --- Oscillation modifiers ---
+    if oscillation == "negative":
+        # Attractor の収束が弱い → urgency を上げる
+        return ConeAdvice(
+            action=base.action,
+            reason=f"{base.reason} | Attractor: NEGATIVE "
+                   f"(conf={attractor_confidence:.2f}) — 収束弱",
+            suggested_wf=base.suggested_wf,
+            next_steps=base.next_steps + [
+                "Attractor Basin 未分化を解消するために入力を具体化",
+            ],
+            urgency=min(1.0, base.urgency + 0.2),
+            devil_detail=base.devil_detail,
+        )
+
+    if oscillation == "weak":
+        # 引力圏外 → investigate に昇格
+        if base.action == "proceed":
+            return ConeAdvice(
+                action="investigate",
+                reason=f"{base.reason} | Attractor: WEAK — "
+                       f"引力圏外のため追加調査推奨",
+                suggested_wf="/zet",
+                next_steps=[
+                    "入力テキストを再構成して Attractor 収束を試みる",
+                    "Series を手動指定して再実行",
+                ],
+                urgency=0.5,
+                devil_detail=base.devil_detail,
+            )
+
+    if oscillation == "positive":
+        # 多面的 — V が高くても自然
+        if base.action == "devil" and base.urgency < 0.8:
+            return ConeAdvice(
+                action="investigate",
+                reason=f"{base.reason} | Attractor: POSITIVE — "
+                       f"multi-Series 共鳴のため V 高は自然",
+                suggested_wf=base.suggested_wf or "/dia epo",
+                next_steps=base.next_steps + [
+                    "multi-Series の交差点を /x で分析",
+                ],
+                urgency=max(0.3, base.urgency - 0.2),
+                devil_detail=base.devil_detail,
+            )
+
+    # CLEAR or no modification needed
+    return base
+

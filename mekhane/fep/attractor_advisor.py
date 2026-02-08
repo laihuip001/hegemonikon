@@ -69,28 +69,32 @@ class AttractorAdvisor:
 
     # PURPOSE: Sophia インデックスから関連知識を検索し推薦を補強する
     def _retrieve_gnosis(self, query: str, top_k: int = 2) -> list[dict]:
-        """Sophia ベクトルインデックスから関連 KI を検索する。
+        """LanceDB knowledge テーブルから関連知識を検索する。
 
         Graceful degradation: index 不在やエラー時は空リストを返す。
+        Uses the same Embedder (bge-m3) as the Attractor for consistency.
         """
         try:
-            from mekhane.symploke.sophia_ingest import (
-                DEFAULT_INDEX_PATH,
-                load_sophia_index,
-                search_loaded_index,
-            )
+            import lancedb
+            from pathlib import Path
 
-            if not DEFAULT_INDEX_PATH.exists():
+            db_path = Path(__file__).parent.parent.parent / "gnosis_data" / "lancedb"
+            if not db_path.exists():
                 return []
 
-            adapter = load_sophia_index(str(DEFAULT_INDEX_PATH))
-            results = search_loaded_index(adapter, query, top_k=top_k)
+            db = lancedb.connect(str(db_path))
+            if "knowledge" not in db.table_names():
+                return []
+
+            tbl = db.open_table("knowledge")
+            q_vec = self._attractor._embedder.embed(query)
+            results = tbl.search(q_vec).limit(top_k).to_list()
 
             return [
                 {
-                    "ki_name": r.metadata.get("ki_name", "Unknown"),
-                    "summary": r.metadata.get("summary", "")[:80],
-                    "score": round(r.score, 3),
+                    "ki_name": r.get("title", r.get("source", "Unknown")),
+                    "summary": r.get("text", "")[:80],
+                    "score": round(1.0 / (1.0 + r.get("_distance", 1.0)), 3),
                 }
                 for r in results
             ]

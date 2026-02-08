@@ -131,12 +131,9 @@ anti_skip: enabled
 // turbo
 
 ```bash
-cd ~/oikos/hegemonikon && PYTHONPATH=. .venv/bin/python -c "
-from mekhane.fep.cone_builder import converge, describe_cone
-from mekhane.fep.category import Series
-cone = converge(Series.O, {'O1': '<O1出力>', 'O2': '<O2出力>', 'O3': '<O3出力>', 'O4': '<O4出力>'})
-print(describe_cone(cone))
-"
+cd ~/oikos/hegemonikon && PYTHONPATH=. .venv/bin/python mekhane/fep/cone_builder.py \
+  --series O --pw "${PW_O:-}" \
+  O1="${O1_OUT}" O2="${O2_OUT}" O3="${O3_OUT}" O4="${O4_OUT}"
 ```
 
 **射の列挙** (各定理の Yoneda 表現を計算):

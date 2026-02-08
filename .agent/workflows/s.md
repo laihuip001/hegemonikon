@@ -362,12 +362,9 @@ python3 $HOME/oikos/hegemonikon/mekhane/quality_gate.py <変更ファイル>
 // turbo
 
 ```bash
-cd ~/oikos/hegemonikon && PYTHONPATH=. .venv/bin/python -c "
-from mekhane.fep.cone_builder import converge, describe_cone
-from mekhane.fep.category import Series
-cone = converge(Series.S, {'S1': '<S1出力>', 'S2': '<S2出力>', 'S3': '<S3出力>', 'S4': '<S4出力>'})
-print(describe_cone(cone))
-"
+cd ~/oikos/hegemonikon && PYTHONPATH=. .venv/bin/python mekhane/fep/cone_builder.py \
+  --series S --pw "${PW_S:-}" \
+  S1="${S1_OUT}" S2="${S2_OUT}" S3="${S3_OUT}" S4="${S4_OUT}"
 ```
 
 | STAGE | 定理 | Hom(X, Sn) | pw | 出力要点 (1行) |

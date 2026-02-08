@@ -158,12 +158,9 @@ result = select_derivative("P1", problem_context)
 // turbo
 
 ```bash
-cd ~/oikos/hegemonikon && PYTHONPATH=. .venv/bin/python -c "
-from mekhane.fep.cone_builder import converge, describe_cone
-from mekhane.fep.category import Series
-cone = converge(Series.P, {'P1': '<P1出力>', 'P2': '<P2出力>', 'P3': '<P3出力>', 'P4': '<P4出力>'})
-print(describe_cone(cone))
-"
+cd ~/oikos/hegemonikon && PYTHONPATH=. .venv/bin/python mekhane/fep/cone_builder.py \
+  --series P --pw "${PW_P:-}" \
+  P1="${P1_OUT}" P2="${P2_OUT}" P3="${P3_OUT}" P4="${P4_OUT}"
 ```
 
 **射の列挙** (各定理の環境射を計算):

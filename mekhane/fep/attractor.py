@@ -42,11 +42,13 @@ SERIES_DEFINITIONS: dict[str, dict] = {
     "O": {
         "name": "Ousia (本質)",
         "definition": (
-            "Essence, existence, deep cognition. Why does this exist? "
-            "What is the fundamental nature and purpose? "
-            "Deep intuition, will, recursive self-evidencing. "
+            "Essence, existence, ontology, purpose, will, intention. "
+            "Why does this exist? What is the fundamental nature? "
             "Root cause analysis. Existential meaning. First principles thinking. "
-            "Ontology, teleology, raison d'être. Why. The meaning of existence."
+            "Ontology, teleology, raison d'etre. Philosophical inquiry. "
+            "Paradigm shift, worldview, assumption, premise, foundation. "
+            "Questioning the question itself. Meta-inquiry. "
+            "The meaning of existence. What are we not seeing? Blind spots."
         ),
         "definition_ja": (
             "本質、存在、深い認識。なぜこれは存在するのか。"
@@ -62,11 +64,14 @@ SERIES_DEFINITIONS: dict[str, dict] = {
     "S": {
         "name": "Schema (様態)",
         "definition": (
-            "Structure, design, architecture, methodology. How to build. "
-            "System design, framework, blueprint, engineering. "
+            "Structure, design, architecture, methodology. How to build and construct. "
+            "System design, framework, blueprint, engineering approach. "
             "Scale determination, method arrangement, implementation plan. "
-            "Software architecture. Design patterns. Technical approach. "
-            "How to implement. Step-by-step procedure."
+            "Software architecture. Design patterns. Technical blueprint. "
+            "Code structure, module organization, directory layout. Refactoring. "
+            "Step-by-step procedure. How to implement. Construction plan. "
+            "Test strategy design. Data model design. CI/CD pipeline design. "
+            "Configuration, optimization of systems and pipelines."
         ),
         "definition_ja": (
             "構造、設計、アーキテクチャ、方法論。どう作るか。"
@@ -81,10 +86,11 @@ SERIES_DEFINITIONS: dict[str, dict] = {
         "name": "Hormē (動機)",
         "definition": (
             "Motivation, emotion, conviction, belief. What drives you. "
-            "Gut feeling, intuition, confidence level, desire. "
-            "Emotional response, sentiment, passion, fear, hope. "
-            "Trust, faith, doubt, anxiety, excitement. "
-            "How do you feel about this? Inner drive and morale."
+            "Gut feeling, intuition, confidence level, desire, passion. "
+            "Emotional response, sentiment, fear, hope, anxiety, excitement. "
+            "Trust, faith, doubt, morale, burnout, frustration, joy. "
+            "How do you feel about this? Inner drive and emotional state. "
+            "Personal feeling, subjective experience, mood, worry."
         ),
         "definition_ja": (
             "動機、感情、確信、信念。何が駆動するか。"
@@ -100,9 +106,12 @@ SERIES_DEFINITIONS: dict[str, dict] = {
         "definition": (
             "Boundaries, scope, spatial context. Where and within what limits. "
             "Nested Markov blankets defining system boundaries. "
-            "Domain definition, perimeter, containment, territory. "
-            "What is in scope and out of scope. Geographic or logical boundaries. "
-            "Spatial arrangement, region, zone, area of operation."
+            "Domain definition, perimeter, containment, territory, region. "
+            "What is in scope and out of scope. Target audience, coverage. "
+            "Deployment region, supported platforms, browser compatibility. "
+            "Responsibility boundary, module ownership, access control. "
+            "Constraints, limitations, requirements, preconditions. "
+            "Geographic, logical, or organizational boundaries."
         ),
         "definition_ja": (
             "境界、スコープ、空間的文脈。どこまでが範囲か。"
@@ -120,7 +129,9 @@ SERIES_DEFINITIONS: dict[str, dict] = {
             "Temporal context, deadline, schedule, urgency. "
             "Knowledge acquisition through investigation and study. "
             "Academic research, literature review, scholarly inquiry. "
-            "Is now the right time? Chronological assessment."
+            "Latest trends, current state of the art, state of technology. "
+            "Is now the right time? Chronological assessment. "
+            "Release timing, scheduling decisions, milestone planning."
         ),
         "definition_ja": (
             "タイミング、好機、知恵、調査。いつが適切か。"
@@ -134,11 +145,13 @@ SERIES_DEFINITIONS: dict[str, dict] = {
     "A": {
         "name": "Akribeia (精度)",
         "definition": (
-            "Precision, judgment, decision-making, evaluation. How accurate. "
-            "Critical assessment, comparison, quality control. "
+            "Precision, judgment, decision-making, evaluation. "
+            "Critical assessment, comparison, quality control, verification. "
             "Choosing between alternatives, trade-off analysis. "
-            "Decision criteria, verdict, ruling, appraisal. "
-            "Is this correct? Accuracy validation and verification."
+            "Review, inspection, validation, checking correctness. "
+            "Code review, bug detection, quality assurance. "
+            "Decision criteria, verdict, ruling, appraisal, grading. "
+            "Is this correct? Accuracy check. Pass or fail judgment."
         ),
         "definition_ja": (
             "精度、判断、意思決定、評価。どれほど正確か。"

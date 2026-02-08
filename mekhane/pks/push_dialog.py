@@ -12,6 +12,8 @@ A0 (FEP) → 能動的推論 = 受身のプッシュではなく対話的探求
 
 from __future__ import annotations
 
+from typing import Callable, Optional
+
 from mekhane.pks.llm_client import PKSLLMClient
 from mekhane.pks.pks_engine import KnowledgeNugget
 
@@ -51,8 +53,14 @@ class PushDialog:
     )
 
     # PURPOSE: PushDialog の初期化
-    def __init__(self, use_llm: bool = True, model: str = "gemini-2.0-flash"):
+    def __init__(
+        self,
+        use_llm: bool = True,
+        model: str = "gemini-2.0-flash",
+        on_feedback: Optional[Callable[[str, str, str], None]] = None,
+    ):
         self._llm = PKSLLMClient(model=model, enabled=use_llm)
+        self._on_feedback = on_feedback
 
     # PURPOSE: なぜこの知識が push されたか説明
     def why(self, nugget: KnowledgeNugget) -> str:
@@ -107,6 +115,8 @@ class PushDialog:
             )
             result = self._llm.generate(prompt)
             if result:
+                if self._on_feedback:
+                    self._on_feedback(nugget.title, "deepened", nugget.source[:1].upper())
                 return result
 
         return (
@@ -139,6 +149,8 @@ class PushDialog:
                             push_reason="関連知識",
                         )
                     )
+            if nuggets and self._on_feedback:
+                self._on_feedback(nugget.title, "engaged", nugget.source[:1].upper())
             return nuggets[:k]
         except Exception as e:
             print(f"[PushDialog] Related search error: {e}")

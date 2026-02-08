@@ -244,7 +244,7 @@ def cmd_dialog(args: argparse.Namespace) -> None:
         return
 
     nugget = nuggets[0]  # 最も関連度が高いもの
-    dialog = PushDialog()
+    dialog = PushDialog(on_feedback=engine.make_feedback_callback())
 
     action = args.action
     if action == "why":

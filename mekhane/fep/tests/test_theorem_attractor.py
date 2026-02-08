@@ -19,6 +19,7 @@ from mekhane.fep.theorem_attractor import (
     FlowResult,
     FlowState,
     TheoremAttractor,
+    TheoremLogger,
     TheoremMixture,
     TheoremResult,
 )
@@ -376,4 +377,58 @@ class TestBasinSeparation:
         sep = attractor.basin_separation()
         assert sep["min_separation"] <= sep["avg_separation"]
         assert sep["avg_separation"] <= sep["max_separation"]
+
+
+# ---------------------------------------------------------------------------
+# Q3: Theorem Memory
+# ---------------------------------------------------------------------------
+
+# PURPOSE: Q3 — 定理レベル記憶 + セッション内減衰テスト
+class TestTheoremMemory:
+    """Q3 — 定理レベル記憶テスト"""
+
+    # PURPOSE: セッション内減衰: 2回目の suggest で top-1 が変化しうる
+    def test_session_decay_changes_ranking(self):
+        """2回同じ質問 → top-1 の similarity が減衰する"""
+        ta = TheoremAttractor(enable_memory=True)
+        r1 = ta.suggest("Why does this truly exist?", top_k=1)
+        first_theorem = r1[0].theorem
+        first_sim = r1[0].similarity
+
+        # 2回目: first_theorem は decay 適用
+        r2 = ta.suggest("Why does this truly exist?", top_k=24)
+        decayed = next(r for r in r2 if r.theorem == first_theorem)
+        assert decayed.similarity < first_sim, \
+            f"{first_theorem}: {decayed.similarity} should < {first_sim}"
+
+    # PURPOSE: memory disabled だと減衰しない
+    def test_no_decay_when_disabled(self):
+        """enable_memory=False → 同一質問でも結果不変"""
+        ta = TheoremAttractor(enable_memory=False)
+        r1 = ta.suggest("test", top_k=1)[0]
+        r2 = ta.suggest("test", top_k=1)[0]
+        assert r1.similarity == r2.similarity
+        assert r1.theorem == r2.theorem
+
+    # PURPOSE: TheoremLogger.get_usage_counts() が dict を返す
+    def test_logger_usage_counts(self):
+        logger = TheoremLogger()
+        counts = logger.get_usage_counts(days=1)
+        assert isinstance(counts, dict)
+        assert len(counts) == 24
+
+    # PURPOSE: TheoremLogger.compute_novelty_boost() が全定理をカバー
+    def test_novelty_boost_all_theorems(self):
+        logger = TheoremLogger()
+        boost = logger.compute_novelty_boost(days=1)
+        assert len(boost) == 24
+        for v in boost.values():
+            assert 1.0 <= v <= 1.5
+
+    # PURPOSE: session_used が正しく追跡される
+    def test_session_used_tracking(self):
+        ta = TheoremAttractor(enable_memory=True)
+        ta.suggest("test query", top_k=1)
+        assert len(ta._session_used) >= 1
+
 

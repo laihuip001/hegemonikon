@@ -9,7 +9,20 @@ parent: /bye
 >
 > **制約**: 全ステップを順番に実行すること。失敗時はスキップして次へ進む。
 
+## 🚀 自動実行 (推奨)
+
+// turbo
+
+```bash
+cd ~/oikos/hegemonikon && PYTHONPATH=. .venv/bin/python scripts/bye_persist.py
+```
+
+> 上記コマンドで全9ステップが一括実行される。個別実行は `--steps 1,2,5` で指定可能。
+> `--dry-run` で実行せず確認。
+
 ---
+
+## 手動実行 (個別ステップ)
 
 ## 1. Kairos インデックス投入
 

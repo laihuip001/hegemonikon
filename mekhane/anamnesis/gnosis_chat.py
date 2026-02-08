@@ -516,6 +516,11 @@ class GnosisChat:
 
         距離 (bi-encoder) のみで判定する。
         cross-encoder スコアは relative ranking 用であり absolute 判定には不適。
+
+        BGE-m3 距離スケール (L2, normalized):
+          - 関連: 0.5-0.8
+          - 曖昧: 0.8-0.9
+          - 無関連: >0.9 (DISTANCE_THRESHOLD で除去済み)
         """
         if not results:
             return self.CONFIDENCE_NONE
@@ -525,11 +530,11 @@ class GnosisChat:
         avg_dist = sum(distances) / len(distances)
         n = len(results)
 
-        if min_dist < 0.5 and n >= 3 and avg_dist < 0.7:
+        if min_dist < 0.6 and n >= 3 and avg_dist < 0.75:
             return self.CONFIDENCE_HIGH
-        elif min_dist < 0.6:
+        elif min_dist < 0.7:
             return self.CONFIDENCE_HIGH
-        elif min_dist < 0.75:
+        elif min_dist < 0.8:
             return self.CONFIDENCE_MEDIUM
         else:
             return self.CONFIDENCE_LOW

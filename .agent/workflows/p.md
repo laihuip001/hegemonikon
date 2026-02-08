@@ -160,7 +160,7 @@ result = select_derivative("P1", problem_context)
 ```bash
 cd ~/oikos/hegemonikon && PYTHONPATH=. .venv/bin/python mekhane/fep/cone_builder.py \
   --series P --pw "${PW_P:-}" \
-  P1="${P1_OUT}" P2="${P2_OUT}" P3="${P3_OUT}" P4="${P4_OUT}"
+  --file "$(PYTHONPATH=. .venv/bin/python -m mekhane.fep.wf_env_bridge export P)"
 ```
 
 **射の列挙** (各定理の環境射を計算):

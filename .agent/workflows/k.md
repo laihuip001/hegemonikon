@@ -141,7 +141,7 @@ ccl_signature: "/k+?k1"
 ```bash
 cd ~/oikos/hegemonikon && PYTHONPATH=. .venv/bin/python mekhane/fep/cone_builder.py \
   --series K --pw "${PW_K:-}" \
-  K1="${K1_OUT}" K2="${K2_OUT}" K3="${K3_OUT}" K4="${K4_OUT}"
+  --file "$(PYTHONPATH=. .venv/bin/python -m mekhane.fep.wf_env_bridge export K)"
 ```
 
 **射の列挙** (各定理の文脈射を計算):

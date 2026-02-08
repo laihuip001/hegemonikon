@@ -289,7 +289,8 @@ def _cli():
 
     elif args.command == "export":
         path = ctx.export_for_cone(args.series)
-        print(f"✅ Exported to {path}")
+        # Print only the path (no prefix) for $() shell capture compatibility
+        print(path)
 
     elif args.command == "list":
         ids = ctx.list_outputs()

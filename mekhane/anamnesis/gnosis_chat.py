@@ -331,21 +331,70 @@ class KnowledgeIndexer:
         return files
 
     @staticmethod
-    # PURPOSE: テキストをチャンクに分割 (overlap 付き).
-    def _chunk_text(text: str, chunk_size: int = 1000, overlap: int = 200) -> list[str]:
-        """テキストをチャンクに分割 (overlap 付き)."""
+    # PURPOSE: テキストをセマンティック境界で分割 (Markdown セクション対応).
+    def _chunk_text(text: str, chunk_size: int = 800, overlap: int = 100) -> list[str]:
+        """テキストをセマンティック境界で分割.
+
+        戦略:
+          1. Markdown ## ヘッダーでセクション分割 (セマンティック単位)
+          2. セクションが chunk_size を超える場合、段落 (空行) で分割
+          3. それでも超える場合、文の途中で切らないよう改行で分割
+        """
         if len(text) <= chunk_size:
             return [text]
 
+        import re
+
+        # Phase 1: Markdown セクション分割 (##, ###, ----)
+        sections = re.split(r'\n(?=#{1,4}\s|\-{3,})', text)
+
+        chunks = []
+        for section in sections:
+            section = section.strip()
+            if not section:
+                continue
+
+            if len(section) <= chunk_size:
+                chunks.append(section)
+            else:
+                # Phase 2: 空行で段落分割
+                paragraphs = re.split(r'\n\s*\n', section)
+                buffer = ""
+                for para in paragraphs:
+                    para = para.strip()
+                    if not para:
+                        continue
+
+                    if len(buffer) + len(para) + 2 <= chunk_size:
+                        buffer = f"{buffer}\n\n{para}" if buffer else para
+                    else:
+                        if buffer:
+                            chunks.append(buffer)
+                        # Phase 3: 段落自体が大きい場合、改行で切る
+                        if len(para) > chunk_size:
+                            sub_chunks = KnowledgeIndexer._split_long_text(
+                                para, chunk_size, overlap
+                            )
+                            chunks.extend(sub_chunks)
+                        else:
+                            buffer = para
+                            continue
+                        buffer = ""
+                if buffer:
+                    chunks.append(buffer)
+
+        return [c for c in chunks if c and len(c) > 20]
+
+    @staticmethod
+    def _split_long_text(text: str, chunk_size: int, overlap: int) -> list[str]:
+        """フォールバック: 改行で切る固定サイズ分割."""
         chunks = []
         start = 0
         while start < len(text):
             end = start + chunk_size
             chunk = text[start:end]
 
-            # 文の途中で切らないようにする
             if end < len(text):
-                # 最後の改行で切る
                 last_nl = chunk.rfind("\n")
                 if last_nl > chunk_size // 2:
                     end = start + last_nl + 1
@@ -353,8 +402,17 @@ class KnowledgeIndexer:
 
             chunks.append(chunk.strip())
             start = end - overlap
-
         return [c for c in chunks if c]
+
+    @staticmethod
+    def _build_embedding_text(title: str, source: str, content: str) -> str:
+        """embedding 用テキストを構築 (タイトル + ソース + コンテンツ).
+
+        検索精度向上のため、構造化されたプレフィックスを付与。
+        """
+        prefix = f"[{source}] {title}\n"
+        max_content = 500 - len(prefix)
+        return prefix + content[:max_content]
 
     @staticmethod
     # PURPOSE: 全知識をインデックスに追加.

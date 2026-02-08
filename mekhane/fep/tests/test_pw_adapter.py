@@ -268,3 +268,139 @@ class TestUtilities:
 
     def test_is_uniform_empty(self):
         assert is_uniform({})
+
+
+# =============================================================================
+# E1: Compound keyword tests (sum mode)
+# =============================================================================
+
+
+class TestInferPwCompound:
+    """Verify that multiple matching rules are summed, not first-match."""
+
+    def test_s_design_and_refactor(self):
+        """'新規設計をリファクタリング' should activate BOTH rules."""
+        pw = infer_pw("S", "新規設計をリファクタリングする")
+        assert pw["S2"] > 0  # from design rule
+        assert pw["S1"] > 0  # from refactor rule
+        assert pw["S3"] > 0  # from refactor rule
+
+    def test_s_all_three_contexts(self):
+        """All 3 S-series rules match → S1+S2+S3+S4 all positive."""
+        pw = infer_pw("S", "新規設計 リファクタリング 実装フェーズ")
+        assert pw["S1"] > 0
+        assert pw["S2"] > 0
+        assert pw["S3"] > 0
+        assert pw["S4"] > 0
+
+    def test_o_bias_and_uncertainty(self):
+        """Bias + uncertainty → O1 negative, O3 positive (cancel out if same)."""
+        pw = infer_pw("O", "不確実な状態 バイアス警告")
+        assert pw["O3"] > 0  # uncertainty → O3+
+        assert pw["O1"] < 0  # bias → O1-
+
+    def test_clamping_on_accumulation(self):
+        """Even if many rules match, clamp to [-1, +1]."""
+        # K-series: urgent + priority both boost K1
+        pw = infer_pw("K", "緊急 優先順位判定")
+        assert pw["K1"] <= 1.0
+        assert pw["K1"] > 0
+
+
+# =============================================================================
+# E4: Parse error protection tests
+# =============================================================================
+
+
+class TestParsePwSpecEdgeCases:
+    """Parse protection for malformed inputs."""
+
+    def test_empty_string(self):
+        pw = parse_pw_spec("", "S")
+        assert is_uniform(pw)
+
+    def test_whitespace_only(self):
+        pw = parse_pw_spec("   ", "S")
+        assert is_uniform(pw)
+
+    def test_malformed_equals(self):
+        """'S1=abc' should not crash, just skip the bad part."""
+        pw = parse_pw_spec("S1=abc", "S")
+        # Will fail float() conversion, so S1 stays 0
+        assert pw["S1"] == 0.0
+
+    def test_mixed_valid_invalid(self):
+        """Valid specs work even with garbage mixed in."""
+        pw = parse_pw_spec("S1+, garbage, S3-", "S")
+        assert pw["S1"] == 0.5
+        assert pw["S3"] == -0.5
+
+    def test_cross_series_theorem(self):
+        """O1+ in S-series should be ignored."""
+        pw = parse_pw_spec("O1+", "S")
+        assert is_uniform(pw)
+
+
+# =============================================================================
+# E5: Integration tests with converge()
+# =============================================================================
+
+
+class TestConvergeIntegration:
+    """Integration: converge() + pw_adapter cascade."""
+
+    def test_converge_with_context_infers_pw(self):
+        """converge() with context= should auto-derive PW via adapter."""
+        from mekhane.fep.cone_builder import converge
+        from mekhane.fep.category import Series
+
+        cone = converge(
+            Series.S,
+            {"S1": "Meso scale", "S2": "Composition", "S3": "Test-driven", "S4": "Production"},
+            context="新規設計 アーキテクチャ",
+        )
+        assert cone.pw.get("S2", 0.0) > 0  # design context → S2+
+
+    def test_converge_with_agent_derives_pw(self):
+        """converge() with agent= should auto-derive PW from modality."""
+        from mekhane.fep.cone_builder import converge
+        from mekhane.fep.category import Series
+
+        agent = MagicMock()
+        agent.precision_weights = {"context": 1.0, "urgency": 0.5, "confidence": 0.5}
+
+        cone = converge(
+            Series.S,
+            {"S1": "Meso", "S2": "Composition", "S3": "Standard", "S4": "Production"},
+            agent=agent,
+        )
+        assert cone.pw.get("S1", 0.0) > 0  # high context → S1+
+        assert cone.pw.get("S2", 0.0) > 0  # high context → S2+
+
+    def test_converge_explicit_pw_overrides(self):
+        """Explicit pw= should bypass adapter entirely."""
+        from mekhane.fep.cone_builder import converge
+        from mekhane.fep.category import Series
+
+        cone = converge(
+            Series.S,
+            {"S1": "A", "S2": "B", "S3": "C", "S4": "D"},
+            pw={"S4": 1.0},
+            context="新規設計",  # would infer S2+ if pw was None
+        )
+        assert cone.pw.get("S4", 0.0) == 1.0
+        assert cone.pw.get("S2", 0.0) == 0.0  # context ignored
+
+    def test_converge_no_adapter_kwargs(self):
+        """converge() without context/agent/pw → empty pw (backward compat)."""
+        from mekhane.fep.cone_builder import converge
+        from mekhane.fep.category import Series
+
+        cone = converge(
+            Series.O,
+            {"O1": "deep", "O2": "strong", "O3": "sharp", "O4": "decisive"},
+        )
+        # All pw should be 0 (uniform)
+        for v in cone.pw.values():
+            assert abs(v) < 1e-6
+

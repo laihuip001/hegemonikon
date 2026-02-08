@@ -171,7 +171,7 @@ def infer_pw(series: str, context: str) -> Dict[str, float]:
     """Infer PW from context using series-specific keyword rules.
 
     Scans context text for keywords defined in the WF 暗黙推定 tables.
-    First matching rule wins.
+    All matching rules are **summed** (additive), clamped to [-1, +1].
 
     Args:
         series: Series identifier (O/S/H/P/K/A)
@@ -185,18 +185,19 @@ def infer_pw(series: str, context: str) -> Dict[str, float]:
     if not theorems:
         return {}
 
-    default_pw = {t: 0.0 for t in theorems}
+    result = {t: 0.0 for t in theorems}
     rules = _INFERENCE_RULES.get(series.upper(), [])
 
     context_lower = context.lower()
+    matched = False
 
     for keywords, pw_delta in rules:
         if any(kw.lower() in context_lower for kw in keywords):
-            result = default_pw.copy()
-            result.update(pw_delta)
-            return result
+            matched = True
+            for tid, val in pw_delta.items():
+                result[tid] = max(-1.0, min(1.0, result[tid] + val))
 
-    return default_pw
+    return result
 
 
 # =============================================================================
@@ -214,46 +215,69 @@ def infer_pw(series: str, context: str) -> Dict[str, float]:
 
 _MODALITY_MAPPING: Dict[str, Dict[str, str]] = {
     # O-series: Ousia (pure cognition)
+    # Rationale: O is the innermost layer. O1/O3 (recognition/inquiry) need
+    # information clarity (context). O2 (will) needs certainty (confidence).
+    # O4 (action) responds to time pressure (urgency).
     "O": {
-        "O1": "context",     # Noēsis: recognition depends on context clarity
-        "O2": "confidence",  # Boulēsis: will depends on confidence
-        "O3": "context",     # Zētēsis: inquiry depends on context
-        "O4": "urgency",     # Energeia: action depends on urgency
+        "O1": "context",     # Noēsis = phantasia clarity → context
+        "O2": "confidence",  # Boulēsis = assent strength → confidence
+        "O3": "context",     # Zētēsis = anomaly detection → context
+        "O4": "urgency",     # Energeia = hormē activation → urgency
     },
     # S-series: Schema (strategic design)
+    # Rationale: S mediates between cognition and environment.
+    # S1/S2 (scale/method) need information (context).
+    # S3 (criteria) needs certainty (confidence). S4 (practice) is time-bound.
     "S": {
-        "S1": "context",     # Metron: scale depends on context clarity
-        "S2": "context",     # Mekhanē: method depends on understanding
-        "S3": "confidence",  # Stathmos: criteria need confident assessment
-        "S4": "urgency",     # Praxis: implementation responds to urgency
+        "S1": "context",     # Metron = scale assessment → context
+        "S2": "context",     # Mekhanē = method selection → context
+        "S3": "confidence",  # Stathmos = benchmark setting → confidence
+        "S4": "urgency",     # Praxis = production delivery → urgency
     },
     # H-series: Hormē (motivation)
+    # Rationale: H drives action through emotion/belief.
+    # H1 (Propatheia) is pre-cognitive reflex → urgency (fight/flight).
+    # H2 (Pistis: trust) maps to confidence. H3 (Orexis) has urgency
+    # component (desire acts as internal time pressure).
+    # H4 (Doxa: belief) needs clear data → context.
     "H": {
-        "H1": "urgency",     # Propatheia: initial reaction is urgency-driven
-        "H2": "confidence",  # Pistis: trust depends on confidence
-        "H3": "urgency",     # Orexis: desire has urgency component
-        "H4": "context",     # Doxa: belief formation needs clear context
+        "H1": "urgency",     # Propatheia = fight/flight reflex → urgency
+        "H2": "confidence",  # Pistis = trust assessment → confidence
+        "H3": "urgency",     # Orexis = desire as internal pressure → urgency
+        "H4": "context",     # Doxa = belief from evidence → context
     },
     # P-series: Perigraphē (environment)
+    # Rationale: P maps the external world.
+    # P1/P4 (space/technique) need environmental data (context).
+    # P2 (path) has time constraint (urgency).
+    # P3 (trajectory) needs predictive certainty (confidence).
     "P": {
-        "P1": "context",     # Khōra: space/scope depends on context
-        "P2": "urgency",     # Hodos: path urgency (time pressure)
-        "P3": "confidence",  # Trokhia: trajectory needs confident assessment
-        "P4": "context",     # Tekhnē: technique selection needs information
+        "P1": "context",     # Khōra = scope definition → context
+        "P2": "urgency",     # Hodos = path under time pressure → urgency
+        "P3": "confidence",  # Trokhia = trajectory prediction → confidence
+        "P4": "context",     # Tekhnē = technique evaluation → context
     },
     # K-series: Kairos (context/timing)
+    # Rationale: K is inherently temporal.
+    # K1/K2 (opportunity/time) are both urgency-driven.
+    # K3 (Telos: purpose) needs confident assessment.
+    # K4 (Sophia: wisdom) needs information quality (context).
     "K": {
-        "K1": "urgency",     # Eukairia: opportunity is urgency-sensitive
-        "K2": "urgency",     # Chronos: time allocation
-        "K3": "confidence",  # Telos: purpose needs confident assessment
-        "K4": "context",     # Sophia: wisdom depends on information quality
+        "K1": "urgency",     # Eukairia = window closing → urgency
+        "K2": "urgency",     # Chronos = deadline pressure → urgency
+        "K3": "confidence",  # Telos = purpose alignment → confidence
+        "K4": "context",     # Sophia = wisdom from data → context
     },
     # A-series: Akribeia (accuracy)
+    # Rationale: A ensures precision.
+    # A1 (Pathos) under pressure amplifies errors → urgency.
+    # A2/A4 (judgment/knowledge) require high certainty → confidence.
+    # A3 (insight) needs broad information → context.
     "A": {
-        "A1": "urgency",     # Pathos: emotional precision under pressure
-        "A2": "confidence",  # Krisis: judgment depends on confidence
-        "A3": "context",     # Gnōmē: insight needs clear context
-        "A4": "confidence",  # Epistēmē: knowledge requires high confidence
+        "A1": "urgency",     # Pathos = emotional pressure → urgency
+        "A2": "confidence",  # Krisis = judgment certainty → confidence
+        "A3": "context",     # Gnōmē = insight from broad data → context
+        "A4": "confidence",  # Epistēmē = knowledge fixation → confidence
     },
 }
 

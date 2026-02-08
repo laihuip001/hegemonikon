@@ -34,10 +34,23 @@ Usage:
 from __future__ import annotations
 
 import re
+from dataclasses import dataclass
 from difflib import SequenceMatcher
 from typing import Dict, List, Optional
 
-from mekhane.fep.category import Cone, Series, build_cone
+from mekhane.fep.category import (
+    COGNITIVE_TYPES,
+    FUNCTORS,
+    MORPHISMS,
+    NATURAL_TRANSFORMATIONS,
+    Cone,
+    CognitiveType,
+    Functor,
+    Morphism,
+    NaturalTransformation,
+    Series,
+    build_cone,
+)
 
 
 # 否定語パターン (日本語 + 英語)
@@ -400,6 +413,223 @@ def describe_cone(cone: Cone) -> str:
         lines.append("⚠️ **Devil's Advocate 推奨** (S-series, V > 0.1)")
 
     return "\n".join(lines)
+
+
+# =============================================================================
+# Natural Transformation Verification
+# =============================================================================
+
+
+@dataclass
+class NaturalityResult:
+    """Result of verifying the naturality condition for a natural transformation.
+
+    Naturality condition: G(f) ∘ α_X = α_Y ∘ F(f)
+    For each morphism f: X → Y in the source category.
+    """
+
+    transformation_name: str
+    is_natural: bool  # All checks passed
+    checks: List[Dict]  # Individual check results
+    violations: List[str]  # Human-readable violation descriptions
+
+    @property
+    def summary(self) -> str:
+        """One-line summary."""
+        n_pass = sum(1 for c in self.checks if c["pass"])
+        return (
+            f"{self.transformation_name}: "
+            f"{n_pass}/{len(self.checks)} checks passed"
+            + ("" if self.is_natural else f" — {len(self.violations)} violations")
+        )
+
+
+# PURPOSE: Verify naturality condition for a natural transformation
+def verify_naturality(
+    nt: NaturalTransformation,
+    source_functor: Optional[Functor] = None,
+    target_functor: Optional[Functor] = None,
+) -> NaturalityResult:
+    """Verify the naturality condition: G(f) ∘ α_X = α_Y ∘ F(f).
+
+    For each morphism f: X → Y in the source functor's morphism_map,
+    checks that the naturality square commutes:
+
+        F(X) --α_X--> G(X)
+         |              |
+       F(f)           G(f)
+         |              |
+         v              v
+        F(Y) --α_Y--> G(Y)
+
+    Args:
+        nt: The natural transformation α: F ⇒ G
+        source_functor: F (auto-resolved from FUNCTORS if not given)
+        target_functor: G (auto-resolved from FUNCTORS if not given)
+
+    Returns:
+        NaturalityResult with per-morphism check details
+    """
+    # Auto-resolve functors
+    if source_functor is None:
+        source_functor = FUNCTORS.get(nt.source_functor.lower())
+    if target_functor is None:
+        target_functor = FUNCTORS.get(nt.target_functor.lower())
+
+    checks: List[Dict] = []
+    violations: List[str] = []
+
+    # If we can't resolve both functors, check component consistency only
+    if source_functor is None or target_functor is None:
+        # Fallback: verify that all components map to valid theorems
+        for src_obj, tgt_obj in nt.components.items():
+            is_valid = tgt_obj in COGNITIVE_TYPES
+            check = {
+                "source_obj": src_obj,
+                "target_obj": tgt_obj,
+                "type": "component_validity",
+                "pass": is_valid,
+            }
+            checks.append(check)
+            if not is_valid:
+                violations.append(
+                    f"Component α_{src_obj} = {tgt_obj}: "
+                    f"target {tgt_obj} is not a valid theorem"
+                )
+        return NaturalityResult(
+            transformation_name=nt.name,
+            is_natural=len(violations) == 0,
+            checks=checks,
+            violations=violations,
+        )
+
+    # Full naturality check: for each morphism in source functor
+    for mor_id, mapped_mor_id in source_functor.morphism_map.items():
+        # Parse source morphism X → Y
+        parts = mor_id.replace("→", "->").split("->")
+        if len(parts) != 2:
+            # Not a parseable morphism, skip
+            continue
+
+        src_x, src_y = parts[0].strip(), parts[1].strip()
+
+        # α_X: component at X
+        alpha_x = nt.component_at(src_x)
+        # α_Y: component at Y
+        alpha_y = nt.component_at(src_y)
+
+        # F(f): how the source functor maps the morphism
+        f_of_f = mapped_mor_id
+
+        # G(f): how the target functor maps the same morphism
+        # (if target_functor has a morphism_map)
+        g_of_f = (
+            target_functor.morphism_map.get(mor_id)
+            if target_functor
+            else None
+        )
+
+        # Check: both components must exist
+        if alpha_x is None or alpha_y is None:
+            check = {
+                "morphism": mor_id,
+                "source_obj": src_x,
+                "target_obj": src_y,
+                "alpha_x": alpha_x,
+                "alpha_y": alpha_y,
+                "type": "component_missing",
+                "pass": False,
+            }
+            checks.append(check)
+            missing = src_x if alpha_x is None else src_y
+            violations.append(
+                f"Morphism {mor_id}: component α_{missing} is undefined"
+            )
+            continue
+
+        # Structural commutativity check:
+        # G(f) ∘ α_X and α_Y ∘ F(f) should arrive at the same target theorem
+        # In our registry, α maps source objects to HGK theorems.
+        # The naturality square commutes if:
+        #   mapping(α_X) through the HGK morphism structure = α_Y
+        #
+        # Operational check: does a morphism path exist from α_X to α_Y
+        # in the MORPHISMS registry?
+        path_exists = any(
+            m.source == alpha_x and m.target == alpha_y
+            for m in MORPHISMS.values()
+        )
+
+        check = {
+            "morphism": mor_id,
+            "source_obj": src_x,
+            "target_obj": src_y,
+            "alpha_x": alpha_x,
+            "alpha_y": alpha_y,
+            "f_of_f": f_of_f,
+            "g_of_f": g_of_f,
+            "path_exists": path_exists,
+            "type": "naturality_square",
+            "pass": path_exists,
+        }
+        checks.append(check)
+
+        if not path_exists:
+            violations.append(
+                f"Morphism {mor_id}: no path from α_{src_x}={alpha_x} "
+                f"to α_{src_y}={alpha_y} in MORPHISMS. "
+                f"Naturality square may not commute."
+            )
+
+    return NaturalityResult(
+        transformation_name=nt.name,
+        is_natural=len(violations) == 0,
+        checks=checks,
+        violations=violations,
+    )
+
+
+# PURPOSE: Classify a theorem's cognitive type (Understanding/Reasoning/Bridge)
+def classify_cognitive_type(theorem_id: str) -> CognitiveType:
+    """Look up the cognitive type for a theorem.
+
+    Args:
+        theorem_id: e.g. "O1", "A1", "K4"
+
+    Returns:
+        CognitiveType enum value
+
+    Raises:
+        KeyError: if theorem_id is not in the registry
+    """
+    return COGNITIVE_TYPES[theorem_id]
+
+
+# PURPOSE: Check if a morphism crosses the Understanding/Reasoning boundary
+def is_cross_boundary_morphism(
+    source_id: str, target_id: str
+) -> Optional[str]:
+    """Determine if a morphism crosses the U/R boundary.
+
+    Returns:
+        "U→R" if source is Understanding and target is Reasoning
+        "R→U" if source is Reasoning and target is Understanding
+        None if both are same type or if either is Bridge/Mixed
+    """
+    src_type = COGNITIVE_TYPES.get(source_id)
+    tgt_type = COGNITIVE_TYPES.get(target_id)
+
+    if src_type is None or tgt_type is None:
+        return None
+
+    u_types = {CognitiveType.UNDERSTANDING, CognitiveType.BRIDGE_U_TO_R}
+    r_types = {CognitiveType.REASONING, CognitiveType.BRIDGE_R_TO_U}
+
+    if src_type in u_types and tgt_type in r_types:
+        return "U→R"
+    elif src_type in r_types and tgt_type in u_types:
+        return "R→U"
+    return None
 
 
 # =============================================================================

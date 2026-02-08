@@ -44,9 +44,91 @@ def extract_dispatch_info(context: str, gpu_ok: bool = True) -> dict:
     return dispatch_info
 
 
+def _load_projects(project_root: Path) -> dict:
+    """Load project registry from .agent/projects/registry.yaml.
+
+    Returns:
+        dict: {
+            "projects": [...],   # 全プロジェクト
+            "active": int,
+            "dormant": int,
+            "total": int,
+            "formatted": str     # フォーマット済み出力
+        }
+    """
+    result = {"projects": [], "active": 0, "dormant": 0, "total": 0, "formatted": ""}
+    registry_path = project_root / ".agent" / "projects" / "registry.yaml"
+    if not registry_path.exists():
+        return result
+
+    try:
+        import yaml
+        data = yaml.safe_load(registry_path.read_text(encoding="utf-8"))
+        projects = data.get("projects", [])
+        if not projects:
+            return result
+
+        active = [p for p in projects if p.get("status") == "active"]
+        dormant = [p for p in projects if p.get("status") == "dormant"]
+        archived = [p for p in projects if p.get("status") == "archived"]
+
+        lines = ["📦 **Projects** (registry.yaml)"]
+        # Group by category based on path patterns
+        categories = {
+            "コアランタイム": [],
+            "Mekhane モジュール": [],
+            "理論・言語基盤": [],
+            "研究・概念": [],
+            "補助": [],
+        }
+        for p in projects:
+            path = p.get("path", "")
+            status = p.get("status", "")
+            if status == "archived":
+                categories["補助"].append(p)
+            elif path.startswith("mekhane/"):
+                categories["Mekhane モジュール"].append(p)
+            elif path.startswith(".") or p.get("id") in ("kalon", "aristos", "autophonos"):
+                categories["研究・概念"].append(p)
+            elif p.get("id") in ("ccl", "kernel", "pythosis"):
+                categories["理論・言語基盤"].append(p)
+            elif p.get("id") in ("hegemonikon-guide",):
+                categories["補助"].append(p)
+            else:
+                categories["コアランタイム"].append(p)
+
+        status_icons = {"active": "🟢", "dormant": "💤", "archived": "🗄️", "planned": "📋"}
+        for cat_name, cat_projects in categories.items():
+            if not cat_projects:
+                continue
+            lines.append(f"  [{cat_name}]")
+            for p in cat_projects:
+                icon = status_icons.get(p.get("status", ""), "❓")
+                name = p.get("name", p.get("id", "?"))
+                phase = p.get("phase", "")
+                summary = p.get("summary", "")
+                if len(summary) > 50:
+                    summary = summary[:50] + "..."
+                lines.append(f"    {icon} {name} [{phase}] — {summary}")
+
+        lines.append(f"  統計: {len(projects)}件 / Active {len(active)} / Dormant {len(dormant)} / Archived {len(archived)}")
+
+        result = {
+            "projects": projects,
+            "active": len(active),
+            "dormant": len(dormant),
+            "total": len(projects),
+            "formatted": "\n".join(lines),
+        }
+    except Exception:
+        pass  # Registry loading failure should not block boot
+
+    return result
+
+
 def get_boot_context(mode: str = "standard", context: Optional[str] = None) -> dict:
     """
-    /boot 統合 API: 8軸（Handoff, Sophia, Persona, PKS, Safety, EPT, Digestor, Attractor）を統合して返す
+    /boot 統合 API: 9軸（Handoff, Sophia, Persona, PKS, Safety, EPT, Digestor, Attractor, Projects）を統合して返す
 
     GPU プリフライトチェック付き: GPU 占有時は embedding 系を CPU フォールバックで実行
 
@@ -61,8 +143,9 @@ def get_boot_context(mode: str = "standard", context: Optional[str] = None) -> d
             "persona": {...},     # 軸 C
             "pks": {...},         # 軸 D
             "safety": {...},      # 軸 E
-            "ept": {...},          # 軸 H
+            "ept": {...},         # 軸 H
             "attractor": {...},   # 軸 F
+            "projects": {...},    # 軸 I
             "formatted": str      # フォーマット済み出力
         }
     """
@@ -83,14 +166,14 @@ def get_boot_context(mode: str = "standard", context: Optional[str] = None) -> d
         pass  # GPU チェック失敗時は無視して続行
 
     # 軸 A: Handoff 活用
-    print(" [1/8] 📋 Searching Handoffs...", file=sys.stderr, end="", flush=True)
+    print(" [1/9] 📋 Searching Handoffs...", file=sys.stderr, end="", flush=True)
     from mekhane.symploke.handoff_search import get_boot_handoffs, format_boot_output
 
     handoffs_result = get_boot_handoffs(mode=mode, context=context)
     print(" Done.", file=sys.stderr)
 
     # 軸 B: Sophia アクティベーション (タイムアウト付き)
-    print(" [2/8] 📚 Ingesting Knowledge (Sophia)...", file=sys.stderr, end="", flush=True)
+    print(" [2/9] 📚 Ingesting Knowledge (Sophia)...", file=sys.stderr, end="", flush=True)
     # コンテキストを Handoff から取得
     ki_context = context
     if not ki_context and handoffs_result["latest"]:
@@ -114,7 +197,7 @@ def get_boot_context(mode: str = "standard", context: Optional[str] = None) -> d
         print(" Timeout (skipped).", file=sys.stderr)
     except Exception as e:
         print(f" Failed ({str(e)}).", file=sys.stderr)
-    print(" [3/8] 👤 Loading Persona...", file=sys.stderr, end="", flush=True)
+    print(" [3/9] 👤 Loading Persona...", file=sys.stderr, end="", flush=True)
     from mekhane.symploke.persona import get_boot_persona
 
     persona_result = get_boot_persona(mode=mode)
@@ -125,7 +208,7 @@ def get_boot_context(mode: str = "standard", context: Optional[str] = None) -> d
     pks_result = {"nuggets": [], "count": 0, "formatted": ""}
     
     if mode != "fast":  # fastモードではPKSをスキップ
-        print(" [4/8] 🧠 Activating PKS Engine...", file=sys.stderr, end="", flush=True)
+        print(" [4/9] 🧠 Activating PKS Engine...", file=sys.stderr, end="", flush=True)
         try:
             from concurrent.futures import ThreadPoolExecutor
             
@@ -169,11 +252,11 @@ def get_boot_context(mode: str = "standard", context: Optional[str] = None) -> d
         except Exception as e:
             print(f" Failed ({str(e)}).", file=sys.stderr)
     else:
-         print(" [4/8] 🧠 PKS Engine skipped (fast mode).", file=sys.stderr)
+         print(" [4/9] 🧠 PKS Engine skipped (fast mode).", file=sys.stderr)
 
     # 軸 E: Safety Contract Audit (v3.1)
     safety_result = {"skills": 0, "workflows": 0, "errors": 0, "warnings": 0, "formatted": ""}
-    print(" [5/8] 🛡️ Running Safety Contract Audit...", file=sys.stderr, end="", flush=True)
+    print(" [5/9] 🛡️ Running Safety Contract Audit...", file=sys.stderr, end="", flush=True)
     try:
         from mekhane.dendron.skill_checker import run_audit, AuditResult
         agent_dir = Path(__file__).parent.parent.parent / ".agent"
@@ -205,7 +288,7 @@ def get_boot_context(mode: str = "standard", context: Optional[str] = None) -> d
 
     # 軸 H: EPT (Existence Purpose Tensor)
     ept_result = {"score": 0, "total": 0, "pct": 0, "formatted": ""}
-    print(" [6/8] 📐 Running EPT Matrix...", file=sys.stderr, end="", flush=True)
+    print(" [6/9] 📐 Running EPT Matrix...", file=sys.stderr, end="", flush=True)
     try:
         from concurrent.futures import ThreadPoolExecutor
         def _run_ept():
@@ -237,7 +320,7 @@ def get_boot_context(mode: str = "standard", context: Optional[str] = None) -> d
 
     # 軸 G: Digestor 候補 (論文レコメンド)
     digestor_result = {"candidates": [], "count": 0, "formatted": ""}
-    print(" [7/8] 📄 Loading Digest Candidates...", file=sys.stderr, end="", flush=True)
+    print(" [7/9] 📄 Loading Digest Candidates...", file=sys.stderr, end="", flush=True)
     try:
         import glob
         digest_dir = Path.home() / ".hegemonikon" / "digestor"
@@ -265,7 +348,7 @@ def get_boot_context(mode: str = "standard", context: Optional[str] = None) -> d
     # 軸 F: Attractor Dispatch Engine
     attractor_result = {"series": [], "workflows": [], "llm_format": "", "formatted": ""}
     if context:
-        print(" [8/8] 🎯 Attractor Dispatch...", file=sys.stderr, end="", flush=True)
+        print(" [8/9] 🎯 Attractor Dispatch...", file=sys.stderr, end="", flush=True)
         try:
             from concurrent.futures import ThreadPoolExecutor
 
@@ -318,7 +401,17 @@ def get_boot_context(mode: str = "standard", context: Optional[str] = None) -> d
         except Exception as e:
             print(f" Failed ({str(e)}).", file=sys.stderr)
     else:
-        print(" [8/8] 🎯 Attractor skipped (no context).", file=sys.stderr)
+        print(" [8/9] 🎯 Attractor skipped (no context).", file=sys.stderr)
+
+    # 軸 I: Projects (registry.yaml)
+    projects_result = {"projects": [], "active": 0, "dormant": 0, "total": 0, "formatted": ""}
+    print(" [9/9] 📦 Loading Projects Registry...", file=sys.stderr, end="", flush=True)
+    try:
+        project_root = Path(__file__).parent.parent.parent
+        projects_result = _load_projects(project_root)
+        print(" Done.", file=sys.stderr)
+    except Exception as e:
+        print(f" Failed ({str(e)}).", file=sys.stderr)
 
     # 統合フォーマット
     lines = []
@@ -363,6 +456,11 @@ def get_boot_context(mode: str = "standard", context: Optional[str] = None) -> d
         lines.append("")
         lines.append(attractor_result["formatted"])
 
+    # Projects
+    if projects_result["formatted"]:
+        lines.append("")
+        lines.append(projects_result["formatted"])
+
     # n8n WF-06: Session Start 通知
     try:
         import urllib.request
@@ -393,6 +491,7 @@ def get_boot_context(mode: str = "standard", context: Optional[str] = None) -> d
         "ept": ept_result,
         "digestor": digestor_result,
         "attractor": attractor_result,
+        "projects": projects_result,
         "formatted": "\n".join(lines),
     }
 
@@ -414,7 +513,10 @@ def print_boot_summary(mode: str = "standard", context: Optional[str] = None):
     attractor_str = "+".join(attractor_series) if attractor_series else "—"
     ept_pct = result.get("ept", {}).get("pct", 0)
     ept_str = f"{ept_pct:.0f}%" if ept_pct > 0 else "—"
-    print(f"📊 Handoff: {h_count}件 | KI: {ki_count}件 | Sessions: {sessions} | PKS: {pks_count}件 | Safety: {'✅' if safety_errors == 0 else f'⚠️{safety_errors}'} | EPT: {ept_str} | Attractor: {attractor_str}")
+    proj_total = result.get("projects", {}).get("total", 0)
+    proj_active = result.get("projects", {}).get("active", 0)
+    proj_str = f"{proj_active}/{proj_total}" if proj_total > 0 else "—"
+    print(f"📊 Handoff: {h_count}件 | KI: {ki_count}件 | Sessions: {sessions} | PKS: {pks_count}件 | Safety: {'✅' if safety_errors == 0 else f'⚠️{safety_errors}'} | EPT: {ept_str} | PJ: {proj_str} | Attractor: {attractor_str}")
 
     # detailed モード: テンプレートファイル生成
     if mode == "detailed":
@@ -439,6 +541,7 @@ MODE_REQUIREMENTS = {
             "Self-Profile 摩擦",
             "意味ある瞬間",
             "Phase 詳細",
+            "開発中プロジェクト",
             "タスク提案",
         ],
     },
@@ -560,6 +663,25 @@ def generate_boot_template(result: dict) -> Path:
         lines.append("")
         lines.append("<!-- FILL -->")
         lines.append("")
+
+    # --- 開発中プロジェクト ---
+    lines.append("## 開発中プロジェクト")
+    lines.append("<!-- REQUIRED: registry.yaml から読み込んだ PJ 一覧 -->")
+    lines.append("")
+
+    projects = result.get("projects", {}).get("projects", [])
+    if projects:
+        active_projects = [p for p in projects if p.get("status") == "active"]
+        for p in active_projects:
+            name = p.get("name", p.get("id", "?"))
+            phase = p.get("phase", "")
+            summary_text = p.get("summary", "")
+            lines.append(f"- **{name}** [{phase}]: {summary_text}")
+        lines.append("")
+        lines.append(f"統計: Active {len(active_projects)} / Total {len(projects)}")
+    else:
+        lines.append("<!-- FILL: registry.yaml が見つかりません -->")
+    lines.append("")
 
     # --- タスク提案 ---
     lines.append("## タスク提案")

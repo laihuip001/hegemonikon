@@ -48,6 +48,26 @@ class Series(Enum):
     A = "Akribeia"  # Accuracy assurance
 
 
+class CognitiveType(Enum):
+    """Understanding vs Reasoning classification for each theorem.
+
+    Based on: Wang & Zhao (2023) "Metacognitive Prompting"
+    - Understanding: grasping underlying semantics and broader contextual meanings
+    - Reasoning: methodically connecting concepts
+    - Bridge: transitions between U and R
+
+    Mapping: O-series/H-series/K-series ≈ Understanding
+             S-series/P-series ≈ Reasoning
+             A-series = Bridge layer (A1: U→R, A3: R→U, A2/A4: Reasoning)
+    """
+
+    UNDERSTANDING = "understanding"  # 基底意味論の把握 (O/H/K)
+    REASONING = "reasoning"          # 方法的概念接続 (S/P/A2/A4)
+    BRIDGE_U_TO_R = "bridge_u_to_r"  # Understanding → Reasoning (A1 Pathos)
+    BRIDGE_R_TO_U = "bridge_r_to_u"  # Reasoning → Understanding (A3 Gnōmē)
+    MIXED = "mixed"                  # Both (K4 Sophia)
+
+
 # =============================================================================
 # Theorem (Object in Cog)
 # =============================================================================
@@ -479,6 +499,46 @@ THEOREMS: Dict[str, Theorem] = {
 }
 
 
+# =============================================================================
+# Cognitive Type Classification (Understanding vs Reasoning)
+# Source: MP Natural Transformation (2026-02-08)
+# =============================================================================
+
+
+COGNITIVE_TYPES: Dict[str, CognitiveType] = {
+    # O-series: Understanding (本質の把握)
+    "O1": CognitiveType.UNDERSTANDING,   # Noēsis — 意味の直観
+    "O2": CognitiveType.UNDERSTANDING,   # Boulēsis — 意志の方向性
+    "O3": CognitiveType.UNDERSTANDING,   # Zētēsis — 問いの発見
+    "O4": CognitiveType.UNDERSTANDING,   # Energeia — 意味の行動化
+    # S-series: Reasoning (方法的設計)
+    "S1": CognitiveType.REASONING,       # Metron — スケール決定
+    "S2": CognitiveType.REASONING,       # Mekhanē — 方法配置
+    "S3": CognitiveType.REASONING,       # Stathmos — 基準設定
+    "S4": CognitiveType.REASONING,       # Praxis — 実践選択
+    # H-series: Understanding (動機の把握)
+    "H1": CognitiveType.UNDERSTANDING,   # Propatheia — 直感
+    "H2": CognitiveType.UNDERSTANDING,   # Pistis — 確信の深度
+    "H3": CognitiveType.UNDERSTANDING,   # Orexis — 欲求の理解
+    "H4": CognitiveType.UNDERSTANDING,   # Doxa — 信念の理解
+    # P-series: Reasoning (環境の構造化)
+    "P1": CognitiveType.REASONING,       # Khōra — 場の設定
+    "P2": CognitiveType.REASONING,       # Hodos — 経路設計
+    "P3": CognitiveType.REASONING,       # Trokhia — 軌道定義
+    "P4": CognitiveType.REASONING,       # Tekhnē — 技法選択
+    # K-series: Understanding (文脈の認識)
+    "K1": CognitiveType.UNDERSTANDING,   # Eukairia — 好機の認識
+    "K2": CognitiveType.REASONING,       # Chronos — 時間配分 (手続き的)
+    "K3": CognitiveType.UNDERSTANDING,   # Telos — 目的の理解
+    "K4": CognitiveType.MIXED,           # Sophia — 知恵 (U+R)
+    # A-series: Bridge layer
+    "A1": CognitiveType.BRIDGE_U_TO_R,   # Pathos — 感情→精度 (U→R)
+    "A2": CognitiveType.REASONING,       # Krisis — 批判的評価
+    "A3": CognitiveType.BRIDGE_R_TO_U,   # Gnōmē — 精度→見識 (R→U)
+    "A4": CognitiveType.REASONING,       # Epistēmē — 知識確定
+}
+
+
 def hom_set(target: str) -> FrozenSet[str]:
     """Compute Hom(-, T) — all morphisms targeting theorem T.
 
@@ -690,6 +750,27 @@ FUNCTORS: Dict[str, Functor] = {
             "rule": "A3",      # Rule → Gnōmē (maxim)
         },
     ),
+    # MP: Metacognitive Prompting 5-Stage → Cog
+    # Source: Wang & Zhao (2023) arXiv:2308.05342
+    # Maps MP stages to the cognitive category as external objects
+    "mp": Functor(
+        name="MP",
+        source_cat="MP",   # MP category (5 stages)
+        target_cat="Cog",  # Hegemonikón cognitive category
+        object_map={
+            "S1": "O1",  # Understanding → Noēsis
+            "S2": "A1",  # Preliminary Judgment → Pathos
+            "S3": "A2",  # Critical Evaluation → Krisis
+            "S4": "O4",  # Decision + Explanation → Energeia
+            "S5": "A4",  # Confidence Assessment → Epistēmē
+        },
+        morphism_map={
+            "S1→S2": "X-OH1",  # Understanding→Judgment ≈ Noēsis→Propatheia→Pathos
+            "S2→S3": "X-HA2",  # Judgment→Critique ≈ Propatheia→Krisis
+            "S3→S4": "X-OS8",  # Critique→Decision ≈ (via A2→O4, approximated)
+            "S3→S1": "X-KA2",  # Feedback loop: Critique→Understanding (AMP)
+        },
+    ),
 }
 
 
@@ -723,6 +804,22 @@ NATURAL_TRANSFORMATIONS: Dict[str, NaturalTransformation] = {
             "knowledge_items": "knowledge_restoration",
             "agent_state": "state_restoration",
             "beliefs": "belief_restoration",
+        },
+    ),
+    # η_MP: MP ⇒ HGK — Metacognitive Prompting → Hegemonikón
+    # Source: Wang & Zhao (2023) arXiv:2308.05342
+    # Each component η_i maps MP Stage i to the corresponding HGK theorem.
+    # Operationally: "Stage i of MP is implemented by theorem T in HGK"
+    "mp_hgk": NaturalTransformation(
+        name="η_MP",
+        source_functor="MP",
+        target_functor="HGK",
+        components={
+            "S1": "O1",  # η₁: 理解 → Noēsis (Understanding)
+            "S2": "A1",  # η₂: 予備判断 → Pathos (感情精緻化, Bridge U→R)
+            "S3": "A2",  # η₃: 批判的再評価 → Krisis (判定, Reasoning)
+            "S4": "O4",  # η₄: 決定+説明 → Energeia (活動, Understanding)
+            "S5": "A4",  # η₅: 確信度評価 → Epistēmē (知識確定, Reasoning)
         },
     ),
 }

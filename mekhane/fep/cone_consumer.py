@@ -19,7 +19,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import List, Optional
 
-from mekhane.fep.category import Cone, Series
+from mekhane.fep.category import COGNITIVE_TYPES, Cone, CognitiveType, Series
 from mekhane.fep.cone_builder import is_uniform_pw
 
 
@@ -61,10 +61,16 @@ def advise(cone: Cone) -> ConeAdvice:
     |:-----------------------------------|:------------|:-------------|
     | V > 0.3 (needs_devil)              | devil       | /dia devil   |
     | S-series + V > 0.2                 | devil       | /dia devil   |
+    | A-series (Bridge) + V > 0.25       | investigate | /dia epo     |
     | V > 0.1 + conf < 50               | investigate | /zet or /sop |
     | PW non-uniform + resolution=pw_w.  | reweight    | /dia epo     |
     | is_universal (V≤0.1, conf≥70)      | proceed     | —            |
     | else (low dispersion, moderate)    | proceed     | —            |
+
+    CognitiveType-aware:
+    - Understanding (O/H/K): V reflects interpretive diversity, tolerate more
+    - Reasoning (S/P): V reflects logical contradiction, strict
+    - Bridge (A): V at U/R boundary is naturally higher, lenient threshold
 
     Args:
         cone: A fully populated Cone from converge()
@@ -93,7 +99,7 @@ def advise(cone: Cone) -> ConeAdvice:
     if cone.series == Series.S and cone.dispersion > 0.2:
         return ConeAdvice(
             action="devil",
-            reason=f"S-series + V={cone.dispersion:.2f} > 0.2: "
+            reason=f"S-series (Reasoning) + V={cone.dispersion:.2f} > 0.2: "
                    f"戦略判断の矛盾は実行リスクが高い",
             suggested_wf="/dia devil",
             next_steps=[
@@ -101,6 +107,29 @@ def advise(cone: Cone) -> ConeAdvice:
                 "S2(方法) が S4(実践) と整合するか検証",
             ],
             urgency=0.8,
+        )
+
+    # --- Rule 2.5: A-series Bridge tolerance ---
+    # A-series spans U/R boundary, naturally higher V is expected
+    if cone.series == Series.A and cone.dispersion > 0.25:
+        # Determine dominant cognitive types in projections
+        bridge_projs = [p.theorem_id for p in cone.projections
+                        if p.theorem_id in COGNITIVE_TYPES
+                        and COGNITIVE_TYPES[p.theorem_id] in (
+                            CognitiveType.BRIDGE_U_TO_R,
+                            CognitiveType.BRIDGE_R_TO_U,
+                        )]
+        return ConeAdvice(
+            action="investigate",
+            reason=f"A-series (Bridge U↔R) + V={cone.dispersion:.2f}: "
+                   f"U/R 境界での矛盾は自然だが確認が必要。"
+                   f" Bridge theorems: {bridge_projs}",
+            suggested_wf="/dia epo",
+            next_steps=[
+                "A1(U→R) と A3(R→U) の方向が逆転していないか確認",
+                "A2(Krisis) と A4(Epistēmē) の Reasoning 整合性を検証",
+            ],
+            urgency=0.5,
         )
 
     # --- Rule 3: Low confidence + moderate dispersion ---

@@ -18,6 +18,16 @@ FEP の Precision Weighting は2層構造:
   L2: Theorem PW (cone_builder.py) — 定理の実行時重み [-1, +1]
       {"S1": 0.5, "S2": 0.0, "S3": -0.3, "S4": 0.0}
 
+Precision のセマンティクス (/pan+~*/noe+ 合意 2026-02-08):
+  precision = trustworthiness (信頼度), NOT importance (重要度)
+  高い precision → そのチャネルの出力を信頼できる → 対応する定理の出力を重視
+  これは FEP 本来の意味と整合: precision = inverse variance of prediction error
+
+Phase ロードマップ:
+  Phase 1 (現在): 固定マッピング + keyword inference (bootstrapping)
+  Phase 2 (PHASE2_THRESHOLD 後): BasinLogger データから学習的マッピング
+  Phase 3 (将来): 事前的精度制御 — sel_enforcement の連続化
+
 このモジュールは3つの戦略で L2 PW を決定する:
   1. parse_pw_spec()   — 明示指定 "/s{pw: S1+, S3-}" をパース
   2. infer_pw()        — 暗黙推定 (WF 文書の条件テーブルを実装)
@@ -45,6 +55,41 @@ from typing import TYPE_CHECKING, Dict, List, Optional, Tuple
 
 if TYPE_CHECKING:
     from mekhane.fep.fep_agent import HegemonikónFEPAgent
+
+
+# =============================================================================
+# Phase transition thresholds
+# =============================================================================
+
+# Phase 2 移行条件 (/pan+ 盲点 #6 対応 2026-02-08):
+# BasinLogger にこの回数以上の converge 記録が蓄積されたら、
+# 固定マッピング (Phase 1) → 学習マッピング (Phase 2) へ移行可能とする。
+PHASE2_CONVERGE_THRESHOLD: int = 100
+# Alternative: BasinLogger のレコード数で判定
+PHASE2_BASIN_THRESHOLD: int = 50
+
+
+def is_phase2_ready() -> bool:
+    """Check if enough data has accumulated to transition to Phase 2.
+
+    Queries BasinLogger log directory for total entries.
+    Returns True if either threshold is met:
+      - Total attractor log entries >= PHASE2_BASIN_THRESHOLD (50)
+      - (Future) converge execution count >= PHASE2_CONVERGE_THRESHOLD (100)
+
+    Returns False gracefully if BasinLogger is unavailable or log dir is empty.
+    """
+    try:
+        from pathlib import Path
+        from mekhane.fep.basin_logger import BasinLogger
+
+        logger = BasinLogger()
+        total = sum(b.total_count for b in logger.biases.values())
+        return total >= PHASE2_BASIN_THRESHOLD
+    except Exception:
+        return False
+
+
 
 
 # =============================================================================
@@ -290,13 +335,27 @@ def derive_pw(
 
     Natural transformation η: F(modality) ⇒ G(theorem)
 
+    Semantics (/pan+~*/noe+ session 2026-02-08):
+        precision = trustworthiness (信頼度), NOT importance
+        High precision → channel output is reliable → emphasize theorem
+        Low precision  → channel output is noisy   → suppress theorem
+
+        This is NOT "importance-based weighting". A high-context-precision
+        agent trusts its S1 (Metron) output because the context data is
+        clear — not because S1 is inherently more important.
+
     The mapping converts modality precision [0, 1] to theorem weight [-1, +1]:
         pw_theorem = (precision_modality - 0.5) * 2
 
     This means:
-        precision = 1.0 → pw = +1.0 (fully emphasize)
-        precision = 0.5 → pw =  0.0 (neutral)
-        precision = 0.0 → pw = -1.0 (fully suppress)
+        precision = 1.0 → pw = +1.0 (fully emphasize: high trust)
+        precision = 0.5 → pw =  0.0 (neutral: no information)
+        precision = 0.0 → pw = -1.0 (fully suppress: untrusted)
+
+    Known limitations (Phase 1):
+        - Linear transform is Series-independent (/pan+ 盲点 #1)
+        - _MODALITY_MAPPING is fixed, not learned (/pan+ 盲点 #6)
+        - Scalar PW per theorem; vector PW deferred to Phase 3
 
     Args:
         series: Series identifier (O/S/H/P/K/A)

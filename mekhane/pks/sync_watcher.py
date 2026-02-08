@@ -56,11 +56,13 @@ class SyncWatcher:
         watch_dirs: list[Path],
         extensions: tuple[str, ...] = (".md",),
         state_dir: Optional[Path] = None,
+        on_change: Optional[callable] = None,
     ):
         self.watch_dirs = [d.resolve() for d in watch_dirs]
         self.extensions = extensions
         self.state_dir = state_dir or _PKS_DIR
         self._state: dict[str, str] = {}  # path -> checksum
+        self._on_change = on_change  # v2: callback(changes) after ingest
         self._load_state()
 
     # PURPOSE: 前回の状態を読み込み
@@ -206,10 +208,65 @@ class SyncWatcher:
             ingested = self.ingest_changes(changes)
             self.apply_changes(changes)
             print(f"[SyncWatcher] {ingested} files processed")
+
+            # v2: on_change callback (e.g., PKS auto-push)
+            if self._on_change and ingested > 0:
+                try:
+                    self._on_change(changes)
+                except Exception as e:
+                    print(f"[SyncWatcher] on_change callback error: {e}")
         else:
             print("[SyncWatcher] No changes detected")
 
         return changes
+
+    # PURPOSE: v2: PKS auto-push コールバックファクトリ
+    @staticmethod
+    def create_push_callback(
+        topics: list[str] | None = None,
+        threshold: float = 0.65,
+    ) -> callable:
+        """ファイル変更時に PKS push を発火するコールバックを生成
+
+        Usage:
+            callback = SyncWatcher.create_push_callback(topics=["FEP"])
+            watcher = SyncWatcher(watch_dirs=[...], on_change=callback)
+            watcher.run_polling()
+        """
+        def _push_on_change(changes: list[FileChange]) -> None:
+            from mekhane.pks.pks_engine import PKSEngine
+
+            added_modified = [
+                c for c in changes if c.change_type != "deleted"
+            ]
+            if not added_modified:
+                return
+
+            print(f"[SyncWatcher→PKS] {len(added_modified)} 件の変更を検出、プッシュ実行中...")
+            engine = PKSEngine(
+                threshold=threshold,
+                enable_questions=False,
+                enable_serendipity=True,
+            )
+
+            if topics:
+                engine.set_context(topics=topics)
+            else:
+                # 変更ファイル名からトピックを推測
+                auto_topics = [
+                    c.path.stem.replace("_", " ").replace("-", " ")
+                    for c in added_modified[:5]
+                ]
+                engine.set_context(topics=auto_topics)
+
+            nuggets = engine.proactive_push(k=10)
+            if nuggets:
+                report = engine.format_push_report(nuggets)
+                print(report)
+            else:
+                print("[SyncWatcher→PKS] プッシュ対象なし")
+
+        return _push_on_change
 
     # PURPOSE: Polling ループ（デーモンモード）
     def run_polling(self, interval_seconds: int = 60, max_cycles: int = 0) -> None:

@@ -824,3 +824,14 @@ NATURAL_TRANSFORMATIONS: Dict[str, NaturalTransformation] = {
     ),
 }
 
+
+# =============================================================================
+# Composed Functors (CR-2: co-located with FUNCTORS for discoverability)
+# =============================================================================
+
+# Pre-compute bye∘boot and boot∘bye for η/ε adjunction auto-resolve.
+# η target_functor = "bye∘boot", ε source_functor = "boot∘bye"
+_boot = FUNCTORS["boot"]
+_bye = FUNCTORS["bye"]
+FUNCTORS["bye∘boot"] = _boot.compose(_bye)  # Mem → Mem (η target)
+FUNCTORS["boot∘bye"] = _bye.compose(_boot)  # Ses → Ses (ε source)

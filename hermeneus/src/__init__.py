@@ -14,7 +14,7 @@ Origin: 2026-01-31 CCL Execution Guarantee Architecture
 
 from .ast import (
     OpType, Workflow, Condition, MacroRef,
-    ConvergenceLoop, Sequence, Fusion, Oscillation,
+    ConvergenceLoop, Sequence, Fusion, Oscillation, ColimitExpansion,
     ForLoop, IfCondition, WhileLoop, Lambda, Program,
     ASTNode
 )
@@ -91,7 +91,7 @@ __version__ = "0.7.0"  # Phase 7
 __all__ = [
     # AST Nodes
     "OpType", "Workflow", "Condition", "MacroRef",
-    "ConvergenceLoop", "Sequence", "Fusion", "Oscillation",
+    "ConvergenceLoop", "Sequence", "Fusion", "Oscillation", "ColimitExpansion",
     "ForLoop", "IfCondition", "WhileLoop", "Lambda", "Program",
     "ASTNode",
     # Expander

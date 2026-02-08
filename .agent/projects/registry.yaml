@@ -9,9 +9,10 @@
 # status: active / dormant / planned / archived
 # phase: theory / design / implementation / operational / maintenance
 #
-# Updated: 2026-02-07
+# v1.1.0 — entry_point / usage_trigger 追加 (PJ 利用導線配線)
+# Updated: 2026-02-08
 
-version: "1.0.0"
+version: "1.1.0"
 
 projects:
 
@@ -24,6 +25,8 @@ projects:
     status: active
     phase: operational
     etymology: "指導的理性 — ストア哲学の統治原理"
+    entry_point: null  # 全体フレームワーク (直接呼び出しなし)
+    usage_trigger: null
 
   # ─── コアランタイム ─────────────────────────────
 
@@ -35,6 +38,11 @@ projects:
     phase: implementation
     etymology: "翻訳者・解釈者 — ヘルメスの使者"
     proof: true
+    entry_point:
+      cli: "python -m hermeneus.src compile '{CCL式}'"
+      python: "from hermeneus.src import compile_ccl, execute_ccl"
+      mcp: "hermeneus_execute, hermeneus_compile"
+    usage_trigger: "CCL 式の解析・コンパイル・実行時。手動で CCL を分析するな。"
 
   - id: synergeia
     name: "Synergeia (συνέργεια)"
@@ -44,6 +52,10 @@ projects:
     phase: operational
     etymology: "共同作業・協力"
     proof: true
+    entry_point:
+      cli: "python synergeia/coordinator.py"
+      python: "from synergeia.coordinator import Coordinator"
+    usage_trigger: "複数エージェント連携時。Jules への委任、並列実行、結果統合。"
 
   - id: mekhane
     name: "Mekhane (μηχανή)"
@@ -53,6 +65,8 @@ projects:
     phase: operational
     etymology: "機械・装置 — デウス・エクス・マキナの語源"
     proof: true
+    entry_point: null  # 親コンテナ (子モジュール経由)
+    usage_trigger: null
 
   # ─── Mekhane 内コアモジュール ───────────────────
 
@@ -65,6 +79,10 @@ projects:
     etymology: "樹木 — コードの存在が根を張り枝を伸ばす"
     proof: true
     note: "core_architecture.md に構造柱として明記"
+    entry_point:
+      cli: "python mekhane/dendron/checker.py {target_dir}"
+      python: "from mekhane.dendron.checker import DendronChecker"
+    usage_trigger: "コード品質・存在証明の検証時。PROOF.md の有無、EPT スコア確認。"
 
   - id: symploke
     name: "Symploke (συμπλοκή)"
@@ -74,6 +92,10 @@ projects:
     phase: operational
     etymology: "編み合わせ・結合 — プラトンの概念"
     proof: true
+    entry_point:
+      cli: "python mekhane/symploke/boot_integration.py --mode {mode}"
+      python: "from mekhane.symploke.boot_integration import get_boot_context"
+    usage_trigger: "/boot 実行時に自動。スペシャリスト Tier 実行時。"
 
   - id: anamnesis
     name: "Anamnesis (ἀνάμνησις)"
@@ -83,6 +105,10 @@ projects:
     phase: operational
     etymology: "想起・回想 — プラトンのアナムネーシス"
     proof: true
+    entry_point:
+      cli: "python mekhane/anamnesis/cli.py search '{query}'"
+      python: "from mekhane.anamnesis.cli import search"
+    usage_trigger: "知識検索時。grep/キーワード検索ではなく、必ずベクトル検索を使え。"
 
   - id: synteleia
     name: "Synteleia (συντέλεια)"
@@ -91,6 +117,9 @@ projects:
     status: active
     phase: design
     etymology: "完成・終末 — 全てを見届ける監視者"
+    entry_point:
+      python: "from mekhane.synteleia.wbc import WhiteBloodCell"
+    usage_trigger: "安全性チェック時。WF/Skill のリスク検証、不正操作検知。"
 
   - id: ergasterion
     name: "Ergasterion (ἐργαστήριον)"
@@ -100,6 +129,9 @@ projects:
     phase: implementation
     etymology: "工房・作業場"
     proof: true
+    entry_point:
+      python: "from mekhane.ergasterion.forge import ForgeEngine"
+    usage_trigger: "新しい WF/Skill の鍛造時。実験的実装はここで。"
 
   - id: peira
     name: "Peira (πείρα)"
@@ -109,6 +141,9 @@ projects:
     phase: operational
     etymology: "経験・試み — 知識は経験から"
     proof: true
+    entry_point:
+      cli: "python mekhane/peira/hgk_health.py"
+    usage_trigger: "ヘルスチェック時。システム全体の健全性確認。"
 
   - id: poiema
     name: "Poiema (ποίημα)"
@@ -118,6 +153,9 @@ projects:
     phase: implementation
     etymology: "作品・創造物 — ポイエーシス（制作）の産物"
     proof: true
+    entry_point:
+      python: "from mekhane.poiema import generate"
+    usage_trigger: "構造化出力の生成時。Boot レポート、Handoff 等の定型出力。"
 
   - id: exagoge
     name: "Exagōgē (ἐξαγωγή)"
@@ -126,6 +164,8 @@ projects:
     status: active
     phase: design
     etymology: "引き出し・輸出"
+    entry_point: null  # 設計中
+    usage_trigger: "外部データからの知識抽出時。CDP エクスポート等。"
 
   # ─── 理論・言語基盤 ────────────────────────────
 
@@ -136,14 +176,21 @@ projects:
     status: active
     phase: operational
     proof: true
+    entry_point:
+      reference: "ccl/operators.md"
+      macros: "ccl/macros/"
+    usage_trigger: "CCL 構文の仕様確認時。演算子の意味・pt 計算の正本。"
 
   - id: kernel
     name: "Kernel"
     path: "kernel/"
-    summary: "公理・定理・憲法 — 60要素体系の根幹"
+    summary: "公理・定理・憲法 — 96要素体系の根幹"
     status: active
     phase: operational
     proof: true
+    entry_point:
+      reference: "kernel/SACRED_TRUTH.md"
+    usage_trigger: "公理・定理の参照時。96要素体系の正本。"
 
   - id: pythosis
     name: "Pythōsis (Πύθων + ὄσις)"
@@ -153,6 +200,8 @@ projects:
     phase: implementation
     etymology: "Python + 吸収/消化"
     proof: true
+    entry_point: null  # dormant
+    usage_trigger: null
 
   # ─── 研究・概念プロジェクト ─────────────────────
 
@@ -164,6 +213,9 @@ projects:
     phase: theory
     etymology: "美 — 美しいもの"
     note: "core_architecture.md に構造柱として明記。CCL と同等の深淵。"
+    entry_point:
+      reference: "ccl/operators.md §13 圏論的意味論マップ"
+    usage_trigger: "圏論的解釈が必要な時。演算子の数学的基盤、随伴・モナド・極限。"
 
   - id: aristos
     name: "Aristos (ἄριστος)"
@@ -173,22 +225,19 @@ projects:
     phase: theory
     etymology: "最善・最良 — アリストクラシーの語源"
     note: "core_architecture.md に構造柱として明記"
+    entry_point: null  # 理論研究 (実装なし)
+    usage_trigger: "最適化問題、グラフ理論的分析が必要な時。"
 
   - id: autophonos
     name: "Autophōnos (αὐτόφωνος)"
-    path: "mekhane/pks/"
-    summary: "自律提案 — データが主体的に価値を Push する機構 (PKS v2)"
+    path: ".agent/projects/autophonos/"
+    summary: "自律提案 — データが主体的に価値を Push する機構"
     status: active
-    phase: implementation
+    phase: design
     etymology: "自ら語る — データの擬人化"
-    proof: true
-    role_models:
-      - NotebookLM  # Source Grounding, Suggested Questions
-      - Notion AI   # DB×AI 横断検索
-      - Glean       # プロアクティブ配信
-      - Obsidian    # Graph/Backlinks 概念
-      - Guru        # 検証済みスニペットの能動配信
-      - Mem         # 自動トピック抽出
+    entry_point:
+      python: "from mekhane.pks.pks_engine import PKSEngine"
+    usage_trigger: "能動的知識プッシュが必要な時。PKS エンジン経由。"
 
   # ─── 補助・インフラ ────────────────────────────
 
@@ -200,6 +249,8 @@ projects:
     phase: maintenance
     etymology: "知識・認識"
     proof: true
+    entry_point: null  # → Anamnesis を使え
+    usage_trigger: "使うな。Anamnesis (mekhane/anamnesis/) を使え。"
 
   - id: hegemonikon-guide
     name: "Hegemonikón Guide"
@@ -207,6 +258,8 @@ projects:
     summary: "インタラクティブ視覚ガイド (Vite)"
     status: dormant
     phase: implementation
+    entry_point: null  # dormant
+    usage_trigger: null
 
   - id: mcp
     name: "MCP Server"
@@ -215,9 +268,14 @@ projects:
     status: active
     phase: operational
     proof: true
+    entry_point:
+      cli: "python mekhane/mcp/gnosis_mcp_server.py"
+    usage_trigger: "MCP 経由で Gnōsis にアクセスする時。"
 
 # ─── 統計 ─────────────────────────────────────────
 # Total: 21 entries
 # Active: 17 | Dormant: 2 | Archived: 1 | Planned: 0
 # Greek-named: 16
 # With PROOF.md: 14
+# With entry_point: 15 (v1.1.0)
+# With usage_trigger: 16 (v1.1.0)

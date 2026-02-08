@@ -109,7 +109,18 @@ def _load_projects(project_root: Path) -> dict:
                 summary = p.get("summary", "")
                 if len(summary) > 50:
                     summary = summary[:50] + "..."
-                lines.append(f"    {icon} {name} [{phase}] — {summary}")
+                line = f"    {icon} {name} [{phase}] — {summary}"
+                # entry_point: CLI があれば表示
+                ep = p.get("entry_point")
+                if ep and isinstance(ep, dict):
+                    cli = ep.get("cli", "")
+                    if cli:
+                        line += f"\n       📎 `{cli}`"
+                lines.append(line)
+                # usage_trigger: 利用条件を表示
+                trigger = p.get("usage_trigger", "")
+                if trigger and p.get("status") == "active":
+                    lines.append(f"       ⚡ {trigger}")
 
         lines.append(f"  統計: {len(projects)}件 / Active {len(active)} / Dormant {len(dormant)} / Archived {len(archived)}")
 

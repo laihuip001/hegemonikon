@@ -16,13 +16,29 @@ Usage:
 
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass, field
-from typing import List, Optional
-
 from difflib import SequenceMatcher
+from typing import TYPE_CHECKING, List, Optional
 
 from mekhane.fep.category import COGNITIVE_TYPES, Cone, CognitiveType, Series
 from mekhane.fep.cone_builder import is_uniform_pw
+
+
+# Pre-compiled regexes for devil_attack (CR-5: moved out of loop)
+_NEG_RE = re.compile(
+    r"(?:ない|しない|できない|不可|否定|反対|拒否"
+    r"|stop|no|not|never|don'?t|won'?t|reject|cancel)",
+    re.IGNORECASE,
+)
+_DIR_GO_RE = re.compile(
+    r"(?:する|進む|開始|GO|yes|accept|approve|keep|continue|実行|追加)",
+    re.IGNORECASE,
+)
+_DIR_WAIT_RE = re.compile(
+    r"(?:しない|止める|中止|WAIT|no|reject|cancel|stop|remove|削除|廃止)",
+    re.IGNORECASE,
+)
 
 
 # =============================================================================
@@ -111,28 +127,16 @@ def devil_attack(cone: Cone) -> DevilAttack:
 
             sim = SequenceMatcher(None, a_out, b_out).ratio()
 
-            # Negation contradiction check
-            import re
-            neg_re = re.compile(
-                r"(?:ない|しない|できない|不可|否定|反対|拒否"
-                r"|stop|no|not|never|don'?t|won'?t|reject|cancel)",
-                re.IGNORECASE,
-            )
-            a_neg = bool(neg_re.search(a_out))
-            b_neg = bool(neg_re.search(b_out))
+            # Negation contradiction check (CR-5: uses module-level regex)
+            a_neg = bool(_NEG_RE.search(a_out))
+            b_neg = bool(_NEG_RE.search(b_out))
             neg_contradiction = (a_neg != b_neg) and (a_neg or b_neg)
 
-            # Direction contradiction check
-            dir_go = re.compile(
-                r"(?:する|進む|開始|GO|yes|accept|approve|keep|continue|実行|追加)",
-                re.IGNORECASE,
-            )
-            dir_wait = re.compile(
-                r"(?:しない|止める|中止|WAIT|no|reject|cancel|stop|remove|削除|廃止)",
-                re.IGNORECASE,
-            )
-            a_go, a_wait = bool(dir_go.search(a_out)), bool(dir_wait.search(a_out))
-            b_go, b_wait = bool(dir_go.search(b_out)), bool(dir_wait.search(b_out))
+            # Direction contradiction check (CR-5: uses module-level regex)
+            a_go = bool(_DIR_GO_RE.search(a_out))
+            a_wait = bool(_DIR_WAIT_RE.search(a_out))
+            b_go = bool(_DIR_GO_RE.search(b_out))
+            b_wait = bool(_DIR_WAIT_RE.search(b_out))
             dir_contradiction = (
                 (a_go and not a_wait and b_wait and not b_go)
                 or (b_go and not b_wait and a_wait and not a_go)
@@ -246,6 +250,9 @@ class ConeAdvice:
 
     This is what makes the Cone a "consumer" type —
     structured data drives structured decisions.
+
+    When action='devil', devil_detail is auto-populated with
+    a DevilAttack containing structured contradiction analysis (CR-3).
     """
 
     action: str  # "proceed" | "investigate" | "devil" | "reweight"
@@ -253,10 +260,12 @@ class ConeAdvice:
     suggested_wf: str = ""  # Recommended WF (e.g. "/dia devil")
     next_steps: List[str] = field(default_factory=list)
     urgency: float = 0.0  # 0.0 (低) - 1.0 (高)
+    devil_detail: Optional[DevilAttack] = None  # CR-3: auto-populated
 
     def __repr__(self) -> str:
         wf = f" → {self.suggested_wf}" if self.suggested_wf else ""
-        return f"ConeAdvice({self.action}{wf}, urgency={self.urgency:.1f})"
+        devil = f", devil={self.devil_detail}" if self.devil_detail else ""
+        return f"ConeAdvice({self.action}{wf}, urgency={self.urgency:.1f}{devil})"
 
 
 # =============================================================================
@@ -294,6 +303,7 @@ def advise(cone: Cone) -> ConeAdvice:
 
     # --- Rule 1: Serious contradiction (V > 0.3) ---
     if cone.needs_devil:
+        attack = devil_attack(cone)  # CR-3: auto-execute
         return ConeAdvice(
             action="devil",
             reason=f"V={cone.dispersion:.2f} > 0.3: 定理間に重大な矛盾。"
@@ -305,10 +315,12 @@ def advise(cone: Cone) -> ConeAdvice:
                 "apex が projection と整合するか検証",
             ],
             urgency=min(1.0, cone.dispersion),
+            devil_detail=attack,
         )
 
     # --- Rule 2: S-series strategy risk (V > 0.2) ---
     if cone.series == Series.S and cone.dispersion > 0.2:
+        attack = devil_attack(cone)  # CR-3: auto-execute
         return ConeAdvice(
             action="devil",
             reason=f"S-series (Reasoning) + V={cone.dispersion:.2f} > 0.2: "
@@ -319,6 +331,7 @@ def advise(cone: Cone) -> ConeAdvice:
                 "S2(方法) が S4(実践) と整合するか検証",
             ],
             urgency=0.8,
+            devil_detail=attack,
         )
 
     # --- Rule 2.5: A-series Bridge tolerance ---
@@ -345,10 +358,11 @@ def advise(cone: Cone) -> ConeAdvice:
         )
 
     # --- Rule 3: Low confidence + moderate dispersion ---
-    if cone.dispersion > 0.1 and cone.confidence < 50:
+    # CR-4: A-series excluded (already handled by Rule 2.5)
+    if cone.dispersion > 0.1 and cone.confidence < 50 and cone.series != Series.A:
         # Choose WF based on series
-        if cone.series in (Series.K, Series.A):
-            wf = "/sop"  # K/A: 調査で解消
+        if cone.series == Series.K:
+            wf = "/sop"  # K: 調査で解消
         else:
             wf = "/zet"  # O/S/H/P: 問いを深める
         return ConeAdvice(

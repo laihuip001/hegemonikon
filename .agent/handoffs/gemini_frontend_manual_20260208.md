@@ -1,0 +1,191 @@
+# /zet × /mek+~/manual — API 拡張探求 + Gemini 引き渡し
+
+---
+
+## Part 1: /zet — 拡張方向の探求
+
+> T: Cog → Cog — 概念 X = "mekhane/api の次" から問いの集合 T(X) を生成
+
+### PHASE 1: η (Unit) — 問いの生成
+
+#### 源泉 A: 摩擦点 (Friction)
+
+| # | 摩擦 | 問い |
+|:--|:---|:---|
+| F1 | FEP observation (0-47) は手動入力 | **「環境 → observation の自動マッピングは可能か？」** |
+| F2 | beliefs は `list[float]` で意味がない | **「48 次元の各ラベルを API に含めるべきか？」** |
+| F3 | Gnōsis shape mismatch が起動時に発生 | **「インデックスの次元統一は今やるべきか？」** |
+| F4 | Tauri からの起動は PYTHONPATH に依存 | **「pyproject.toml のエントリーポイントにすべきか？」** |
+
+#### 源泉 B: 成功の裏 (Success Shadow)
+
+| # | 成功 | 問い |
+|:--|:---|:---|
+| S1 | 全ルートが独立して動作 | **「この独立性を n8n からも活用できないか？」** |
+| S2 | OpenAPI スキーマ自動生成 | **「スキーマから Tauri の型も自動生成できないか？」** |
+| S3 | 15/15 テスト全通過 | **「このテストは十分か？ 負荷・並行のテストは？」** |
+
+#### 源泉 C: 前提の棚卸し (Assumption Audit)
+
+| # | 前提 | 問い |
+|:--|:---|:---|
+| A1 | REST で十分 | **「WebSocket なしで UX は許容範囲か？」** |
+| A2 | ローカル専用 | **「リモートアクセスの需要は将来あるか？」** |
+| A3 | 単一ユーザー | **「複数デバイスから同時に使う可能性は？」** |
+
+### PHASE 2: μ (Join) — 平坦化
+
+| 問い | 深さ | 緊急度 | 影響 | /noe 適性 |
+|:---|:---|:---|:---|:---|
+| F1 observe 自動化 | 構造的 | Phase 2 | システム全体 | **高** |
+| F2 dimension_labels | 表層 | Phase 2 | UI のみ | 低 — 実装で解決 |
+| F3 Gnōsis 次元統一 | 根本的 | いつか | 基盤 | 中 |
+| F4 エントリーポイント | 表層 | Phase 2 | 運用 | 低 — 設定で解決 |
+| S1 n8n 連携 | 構造的 | Phase 2 | エコシステム | **高** |
+| S2 型自動生成 | 構造的 | Phase 2 | 開発効率 | 中 |
+| S3 テスト充実 | 表層 | Phase 2 | 品質 | 低 |
+| A1 WebSocket | 構造的 | Phase 2 | UX | **高** |
+| A2 リモート | 将来 | いつか | アーキテクチャ | 低（今は不要） |
+| A3 複数デバイス | 将来 | いつか | アーキテクチャ | 低（今は不要） |
+
+### PHASE 3: T(X) 出力 — 問い候補
+
+| 優先 | 問い | 次ステップ |
+|:---|:---|:---|
+| **🥇 A** | observe 自動化（F1）: Session 状態 → FEP observation の API 化 | `/noe` → 設計 |
+| **🥈 B** | WebSocket（A1）: リアルタイム通知の必要性と範囲 | `/zet eval` → 要件定義 |
+| **🥉 C** | n8n 連携（S1）: Sympatheia WF から API を呼ぶ hub endpoint | `/mek` → WF 生成 |
+| D | 型自動生成（S2）: OpenAPI → TypeScript 型 | 調査 (`openapi-typescript`) |
+
+**私のおすすめ**: **A (observe 自動化)** — FEP Agent が Active Inference を完結するには、観測が環境から自動生成されるべき。手動 observation は FEP の本質に反する。
+
+---
+
+## Part 2: /mek+~/manual — Gemini 引き渡しマニュアル
+
+> **対象**: Gemini (別 AI エージェント)
+> **目的**: Tauri v2 フロントエンド構築の作業指示書
+> **制約**: AI 補完によるドリフト防止のため、具体的コマンドと検証条件を明示
+
+### 0. 前提条件
+
+```
+Backend: FastAPI on http://127.0.0.1:9696
+API Docs: http://127.0.0.1:9696/api/docs (Swagger UI)
+OpenAPI Schema: http://127.0.0.1:9696/api/openapi.json
+OS: Debian 13 / Node.js 20.x
+```
+
+### 1. プロジェクト初期化
+
+```bash
+# Tauri v2 + Next.js (or Vite)
+cd ~/oikos/hegemonikon
+npx -y create-tauri-app@latest hgk-desktop \
+  --template vanilla \
+  --manager npm \
+  --yes
+```
+
+**検証**: `ls hgk-desktop/src-tauri/tauri.conf.json` が存在すること
+
+### 2. API 接続設定
+
+`hgk-desktop/src-tauri/tauri.conf.json` に追加:
+
+```json
+{
+  "http": {
+    "scope": ["http://127.0.0.1:9696/*"]
+  }
+}
+```
+
+### 3. 型定義の取得
+
+```bash
+# サーバーを起動して OpenAPI スキーマを取得
+cd ~/oikos/hegemonikon && PYTHONPATH=. .venv/bin/python -m mekhane.api.server &
+sleep 2
+curl -s http://localhost:9696/api/openapi.json > hgk-desktop/src/api-schema.json
+
+# (Optional) TypeScript 型自動生成
+npx -y openapi-typescript hgk-desktop/src/api-schema.json \
+  -o hgk-desktop/src/api-types.ts
+```
+
+**検証**: `hgk-desktop/src/api-schema.json` が有効な JSON であること
+
+### 4. API クライアント
+
+以下のエンドポイントを呼ぶクライアントを作成:
+
+| Method | Endpoint | 用途 | ポーリング間隔 |
+|:---|:---|:---|:---|
+| GET | `/api/status/health` | 接続確認 | 起動時 + 30秒 |
+| GET | `/api/status` | ヘルスダッシュボード | 60秒 |
+| GET | `/api/fep/state` | FEP 信念状態 | 30秒 |
+| POST | `/api/fep/step` | FEP 推論実行 | 手動 |
+| GET | `/api/fep/dashboard` | FEP 集計 | 60秒 |
+| GET | `/api/gnosis/search?q=...` | 検索 | 手動 |
+| GET | `/api/gnosis/stats` | 統計 | 起動時 |
+| GET | `/api/postcheck/list` | WF 一覧 | 起動時 |
+| POST | `/api/postcheck/run` | 品質検証 | 手動 |
+| GET | `/api/dendron/report` | コード品質 | 起動時 |
+
+### 5. UI 画面構成
+
+| 画面 | 主要データソース | レイアウト |
+|:---|:---|:---|
+| **Dashboard** | `/api/status`, `/api/fep/state` | カード + チャート |
+| **FEP Agent** | `/api/fep/*` | 信念分布 + 操作パネル |
+| **Gnōsis Search** | `/api/gnosis/*` | 検索バー + 結果リスト |
+| **Quality** | `/api/dendron/report`, `/api/postcheck/*` | スコアカード |
+
+### 6. デザイン要件
+
+- **カラー**: ダーク基調 (`#0d1117` 背景, `#58a6ff` アクセント)
+- **フォント**: Inter / Noto Sans JP
+- **アニメーション**: beliefs 分布の変化を滑らかにトランジション
+- **レスポンシブ**: 最小幅 800px
+
+### 7. 検証手順
+
+```bash
+# Backend 起動
+cd ~/oikos/hegemonikon && PYTHONPATH=. .venv/bin/python -m mekhane.api.server &
+
+# Frontend 起動
+cd ~/oikos/hegemonikon/hgk-desktop && npm run tauri dev
+
+# 確認項目:
+# [ ] Dashboard にヘルススコアが表示される
+# [ ] FEP Agent の beliefs が 48 バーで可視化される
+# [ ] Gnōsis 検索が結果を返す
+# [ ] Dendron カバレッジが表示される
+```
+
+### 8. 禁止事項
+
+> ⚠️ 以下は Gemini が勝手にやりがちな行為。確認なしで実行しないこと。
+
+1. **Backend のコードを変更しない** — `mekhane/api/` は Claude が管理
+2. **独自の API サーバーを立てない** — 既存の FastAPI を使う
+3. **npm パッケージを大量に追加しない** — 必要最小限 (React/Vue は 1 つ)
+4. **ポート 9696 を変更しない** — 固定
+5. **Python の依存を追加しない** — `requirements.txt` は Claude が管理
+
+---
+
+## 🔀 射の提案
+
+```
+/zet 完了 → 問い候補 A (observe 自動化) が最優先
+/mek 完了 → Gemini 引き渡しマニュアル生成済み
+
+→ 次: /noe (問い A を深掘り) or Gemini に渡す (manual 使用)？
+```
+
+---
+
+*Generated by O3 Zētēsis v7.0 + S2 Mekhanē v7.1 ~/manual (2026-02-08)*

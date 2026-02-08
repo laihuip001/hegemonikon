@@ -379,7 +379,7 @@ def get_boot_context(mode: str = "standard", context: Optional[str] = None) -> d
             headers={"Content-Type": "application/json"},
             method="POST",
         )
-        urllib.request.urlopen(req, timeout=3)
+        urllib.request.urlopen(req, timeout=5)
         print(" 📡 n8n: session started", file=sys.stderr)
     except Exception:
         pass  # n8n 未起動でもブートは継続

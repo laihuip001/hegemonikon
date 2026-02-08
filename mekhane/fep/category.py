@@ -287,9 +287,14 @@ class Functor:
 
     @property
     def is_full(self) -> bool:
-        """Full = surjective on morphisms (covers all arrows in target)."""
-        # Cannot compute without full category knowledge; default False
-        return False
+        """Full = surjective on morphisms (covers all arrows in target).
+
+        Raises NotImplementedError: cannot compute without full category
+        knowledge (all morphisms in target category).
+        """
+        raise NotImplementedError(
+            "is_full requires full category knowledge (all target morphisms)"
+        )
 
     def map_object(self, obj: str) -> Optional[str]:
         """Apply functor to an object."""
@@ -331,14 +336,42 @@ class NaturalTransformation:
         """Get the component α_X at object X."""
         return self.components.get(obj)
 
-    def compose(self, other: NaturalTransformation) -> Optional[NaturalTransformation]:
+    def compose(self, other: NaturalTransformation, *, strict: bool = False) -> Optional[NaturalTransformation]:
         """Vertical composition: β ∘ α (self = α, other = β).
 
         α: F ⇒ G, β: G ⇒ H → β∘α: F ⇒ H
+
+        Args:
+            strict: if True, raise ValueError when objects mismatch
+                    (some objects in α not in β or vice versa).
+                    Default False for backward compatibility.
         """
         if self.target_functor != other.source_functor:
             return None
-        # Component-wise composition
+
+        # Detect object mismatch
+        alpha_objs = set(self.components.keys())
+        beta_objs = set(other.components.keys())
+        missing_in_beta = alpha_objs - beta_objs
+        missing_in_alpha = beta_objs - alpha_objs
+
+        if strict and (missing_in_beta or missing_in_alpha):
+            raise ValueError(
+                f"Object mismatch in composition {other.name}∘{self.name}: "
+                f"α has {missing_in_beta or '∅'} not in β, "
+                f"β has {missing_in_alpha or '∅'} not in α"
+            )
+
+        if missing_in_beta or missing_in_alpha:
+            import warnings
+            dropped = missing_in_beta | missing_in_alpha
+            warnings.warn(
+                f"Partial composition {other.name}∘{self.name}: "
+                f"objects {dropped} dropped (not in both transformations)",
+                stacklevel=2,
+            )
+
+        # Component-wise composition (only shared objects)
         composed_components = {}
         for obj in self.components:
             if obj in other.components:

@@ -445,6 +445,21 @@ def main():
     )
     p_chat.set_defaults(func=cmd_chat)
 
+    # retrieve (LLM 不使用 — 検索結果のみ返す)
+    from mekhane.anamnesis.gnosis_chat import cmd_retrieve
+
+    p_retrieve = subparsers.add_parser(
+        "retrieve", help="Retrieve context only (no LLM generation)"
+    )
+    p_retrieve.add_argument(
+        "query", help="Search query"
+    )
+    p_retrieve.add_argument(
+        "--top-k", "-k", type=int, default=5,
+        help="Number of documents to retrieve (default: 5)"
+    )
+    p_retrieve.set_defaults(func=cmd_retrieve)
+
     args = parser.parse_args()
 
     if not args.command:

@@ -203,7 +203,7 @@ def cmd_feedback(args: argparse.Namespace) -> None:
     if args.stats:
         # 統計表示
         if engine._feedback:
-            stats = engine._feedback.get_stats()
+            stats = engine._feedback.report_stats()
             if not stats:
                 print("📭 フィードバック履歴がありません。")
                 return
@@ -218,7 +218,7 @@ def cmd_feedback(args: argparse.Namespace) -> None:
 
     # 反応記録
     engine.record_feedback(
-        nugget_title=args.title,
+        item_title=args.title,
         reaction=args.reaction,
         series=args.series or "",
     )

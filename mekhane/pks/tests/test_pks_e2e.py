@@ -121,13 +121,13 @@ class TestScenario2_FeedbackLoop:
             collector.record(PushFeedback(f"paper_{i}", "used", "S"))
 
         base = 0.65
-        adjusted = collector.adjust_threshold("S", base)
+        adjusted = collector.calculate_threshold("S", base)
         assert adjusted < base, f"Expected < {base}, got {adjusted}"
 
         # persist → reload → 同じ結果
-        collector.persist()
+        collector.save()
         collector2 = FeedbackCollector(persist_path=fb_path)
-        adjusted2 = collector2.adjust_threshold("S", base)
+        adjusted2 = collector2.calculate_threshold("S", base)
         assert adjusted2 == adjusted, "Reloaded threshold should match"
 
     def test_negative_feedback_raises_threshold_for_series(self, tmp_path):
@@ -138,7 +138,7 @@ class TestScenario2_FeedbackLoop:
         for i in range(5):
             collector.record(PushFeedback(f"paper_{i}", "dismissed", "H"))
 
-        adjusted = collector.adjust_threshold("H", 0.65)
+        adjusted = collector.calculate_threshold("H", 0.65)
         assert adjusted > 0.65
 
     def test_mixed_feedback_converges(self, tmp_path):
@@ -152,7 +152,7 @@ class TestScenario2_FeedbackLoop:
         for i in range(2):
             collector.record(PushFeedback(f"bad_{i}", "dismissed", "O"))
 
-        adjusted = collector.adjust_threshold("O", 0.65)
+        adjusted = collector.calculate_threshold("O", 0.65)
         # Net positive → slightly lower
         assert abs(adjusted - 0.65) < 0.15, "Mixed feedback should converge near base"
 
@@ -166,8 +166,8 @@ class TestScenario2_FeedbackLoop:
             collector.record(PushFeedback(f"k_{i}", "used", "K"))
             collector.record(PushFeedback(f"h_{i}", "dismissed", "H"))
 
-        k_threshold = collector.adjust_threshold("K", 0.65)
-        h_threshold = collector.adjust_threshold("H", 0.65)
+        k_threshold = collector.calculate_threshold("K", 0.65)
+        h_threshold = collector.calculate_threshold("H", 0.65)
 
         assert k_threshold < 0.65, "K should be lower (positive)"
         assert h_threshold > 0.65, "H should be higher (negative)"
@@ -187,7 +187,7 @@ class TestScenario2_FeedbackLoop:
         engine.record_feedback("test_paper", "deepened", "A")
 
         if engine._feedback:
-            stats = engine._feedback.get_stats()
+            stats = engine._feedback.report_stats()
             assert "A" in stats
             assert stats["A"]["count"] == 1
 
@@ -412,7 +412,7 @@ class TestScenario6_FullLoop:
         # 4. 次回の auto_context_from_input をシミュレート
         #    (Attractor は使わず、feedback 調整だけ確認)
         if engine._feedback:
-            adjusted = engine._feedback.adjust_threshold("O", engine._base_threshold)
+            adjusted = engine._feedback.calculate_threshold("O", engine._base_threshold)
             engine.detector.threshold = adjusted
 
         # 5. 閾値が下がったことを確認 (positive feedback)
@@ -441,8 +441,8 @@ class TestScenario6_FullLoop:
         for i in range(3):
             engine.record_feedback(f"h_paper_{i}", "dismissed", "H")
 
-        k_adj = engine._feedback.adjust_threshold("K", 0.65)
-        h_adj = engine._feedback.adjust_threshold("H", 0.65)
+        k_adj = engine._feedback.calculate_threshold("K", 0.65)
+        h_adj = engine._feedback.calculate_threshold("H", 0.65)
 
         assert k_adj < 0.65, "K should be lower"
         assert h_adj > 0.65, "H should be higher"

@@ -6,12 +6,12 @@ PKS Feedback Loop — プッシュ知識への反応を収集・学習
 Usage:
     collector = FeedbackCollector()
     collector.record(PushFeedback(
-        nugget_title="Active Inference and FEP",
+        item_title="Active Inference and FEP",
         reaction="used",
         series="K",
     ))
     # 次回プッシュ時に K-series の閾値を動的調整
-    threshold = collector.adjust_threshold("K")
+    threshold = collector.calculate_threshold("K")
 """
 
 from __future__ import annotations
@@ -28,7 +28,7 @@ from typing import Optional
 @dataclass
 class PushFeedback:
     """プッシュ知識への反応記録"""
-    nugget_title: str
+    item_title: str
     reaction: str  # "used" | "dismissed" | "deepened" | "ignored"
     series: str    # Attractor series at push time
     timestamp: str = ""
@@ -74,9 +74,9 @@ class FeedbackCollector:
         self._series_scores[feedback.series] += weight
         self._series_counts[feedback.series] += 1
 
-    # PURPOSE: シリーズごとの閾値調整
-    def adjust_threshold(self, series: str, base_threshold: float = 0.65) -> float:
-        """シリーズごとの閾値調整
+    # PURPOSE: シリーズごとの閾値調整計算
+    def calculate_threshold(self, series: str, base_threshold: float = 0.65) -> float:
+        """シリーズごとの閾値調整計算
 
         positive feedback が多い series → 閾値を下げる (より多くプッシュ)
         negative feedback が多い series → 閾値を上げる (厳選)
@@ -95,9 +95,9 @@ class FeedbackCollector:
         adjusted = base_threshold + adjustment
         return max(0.3, min(0.9, adjusted))
 
-    # PURPOSE: シリーズごとの統計
-    def get_stats(self) -> dict[str, dict]:
-        """シリーズごとの統計"""
+    # PURPOSE: シリーズごとの統計報告
+    def report_stats(self) -> dict[str, dict]:
+        """シリーズごとの統計報告"""
         stats = {}
         for series in set(list(self._series_scores.keys()) + list(self._series_counts.keys())):
             count = self._series_counts[series]
@@ -106,12 +106,12 @@ class FeedbackCollector:
                 "count": count,
                 "total_score": score,
                 "avg_score": score / count if count > 0 else 0,
-                "threshold_adjustment": self.adjust_threshold(series) - 0.65,
+                "threshold_adjustment": self.calculate_threshold(series) - 0.65,
             }
         return stats
 
     # PURPOSE: ディスクに保存
-    def persist(self) -> Path:
+    def save(self) -> Path:
         """ディスクに保存"""
         self._path.parent.mkdir(parents=True, exist_ok=True)
         data = {

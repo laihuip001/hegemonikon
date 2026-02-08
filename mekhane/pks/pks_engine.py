@@ -668,7 +668,7 @@ class PKSEngine:
 
         # Feedback-based threshold adjustment
         if self._feedback:
-            adjusted = self._feedback.adjust_threshold(
+            adjusted = self._feedback.calculate_threshold(
                 ctx.series, self._base_threshold
             )
             self.detector.threshold = adjusted
@@ -679,12 +679,12 @@ class PKSEngine:
 
     # PURPOSE: v2: プッシュ反応を記録
     def record_feedback(
-        self, nugget_title: str, reaction: str, series: str = ""
+        self, item_title: str, reaction: str, series: str = ""
     ) -> None:
         """プッシュ知識への反応を記録
 
         Args:
-            nugget_title: ナゲットのタイトル
+            item_title: ナゲットのタイトル
             reaction: "used" | "dismissed" | "deepened" | "ignored"
             series: Attractor series (空の場合は現在のコンテキストから推定)
         """
@@ -695,11 +695,11 @@ class PKSEngine:
             # 現在のトピックから推定
             series = "O"  # default
         self._feedback.record(PushFeedback(
-            nugget_title=nugget_title,
+            item_title=item_title,
             reaction=reaction,
             series=series,
         ))
-        self._feedback.persist()
+        self._feedback.save()
 
     # PURPOSE: 能動的プッシュ: コンテキストに基づいて知識を表面化
     def proactive_push(self, k: int = 20) -> list[KnowledgeNugget]:

@@ -142,14 +142,14 @@ class TestPushFeedback:
     # PURPOSE: auto_timestamp をテストする
     def test_auto_timestamp(self):
         fb = PushFeedback(
-            nugget_title="test", reaction="used", series="K"
+            item_title="test", reaction="used", series="K"
         )
         assert fb.timestamp != ""
 
     # PURPOSE: explicit_timestamp をテストする
     def test_explicit_timestamp(self):
         fb = PushFeedback(
-            nugget_title="test",
+            item_title="test",
             reaction="used",
             series="K",
             timestamp="2026-01-01T00:00:00",
@@ -165,7 +165,7 @@ class TestFeedbackCollector:
         collector.record(PushFeedback("paper1", "used", "K"))
         collector.record(PushFeedback("paper2", "dismissed", "K"))
 
-        stats = collector.get_stats()
+        stats = collector.report_stats()
         assert "K" in stats
         assert stats["K"]["count"] == 2
 
@@ -176,7 +176,7 @@ class TestFeedbackCollector:
         for i in range(5):
             collector.record(PushFeedback(f"paper{i}", "used", "S"))
 
-        threshold = collector.adjust_threshold("S", base_threshold=0.65)
+        threshold = collector.calculate_threshold("S", base_threshold=0.65)
         assert threshold < 0.65  # positive feedback lowers threshold
 
     # PURPOSE: adjust_threshold_negative_feedback をテストする
@@ -186,14 +186,14 @@ class TestFeedbackCollector:
         for i in range(5):
             collector.record(PushFeedback(f"paper{i}", "dismissed", "H"))
 
-        threshold = collector.adjust_threshold("H", base_threshold=0.65)
+        threshold = collector.calculate_threshold("H", base_threshold=0.65)
         assert threshold > 0.65  # negative feedback raises threshold
 
     # PURPOSE: adjust_threshold_no_data をテストする
     def test_adjust_threshold_no_data(self):
         collector = FeedbackCollector(persist_path=Path("/tmp/test_fb4.json"))
         # No data → base threshold
-        threshold = collector.adjust_threshold("X", base_threshold=0.65)
+        threshold = collector.calculate_threshold("X", base_threshold=0.65)
         assert threshold == 0.65
 
     # PURPOSE: adjust_threshold_clamped をテストする
@@ -202,7 +202,7 @@ class TestFeedbackCollector:
         # Extreme positive
         for i in range(100):
             collector.record(PushFeedback(f"p{i}", "deepened", "A"))
-        threshold = collector.adjust_threshold("A")
+        threshold = collector.calculate_threshold("A")
         assert threshold >= 0.3  # clamped
 
     # PURPOSE: persist_and_reload をテストする
@@ -210,12 +210,12 @@ class TestFeedbackCollector:
         fb_path = tmp_path / "feedback.json"
         collector = FeedbackCollector(persist_path=fb_path)
         collector.record(PushFeedback("paper1", "used", "K"))
-        collector.persist()
+        collector.save()
         assert fb_path.exists()
 
         # Reload
         collector2 = FeedbackCollector(persist_path=fb_path)
-        stats = collector2.get_stats()
+        stats = collector2.report_stats()
         assert stats["K"]["count"] == 1
 
     # PURPOSE: reaction_weights_defined をテストする

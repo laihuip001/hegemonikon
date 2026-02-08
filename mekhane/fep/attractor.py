@@ -155,6 +155,9 @@ SERIES_DEFINITIONS: dict[str, dict] = {
 DEFAULT_THRESHOLD = 0.15
 # 複数 Series を返す際の、最大との差分閾値
 OSCILLATION_MARGIN = 0.05
+# Temperature for softmax sharpening (higher = sharper basin boundaries)
+# Raw cosine sims are compressed (0.35-0.55 range), temperature amplifies gaps
+DEFAULT_TEMPERATURE = 5.0
 
 
 # ---------------------------------------------------------------------------
@@ -367,9 +370,11 @@ class SeriesAttractor:
         threshold: float = DEFAULT_THRESHOLD,
         oscillation_margin: float = OSCILLATION_MARGIN,
         force_cpu: bool = False,
+        temperature: float = DEFAULT_TEMPERATURE,
     ):
         self.threshold = threshold
         self.oscillation_margin = oscillation_margin
+        self.temperature = temperature
         self._embedder = None
         self._prototypes: dict[str, np.ndarray] = {}
         # GPU tensor: (6, D) — 全 Series の prototype を 1 つの行列に
@@ -501,10 +506,10 @@ class SeriesAttractor:
         """
         suggest() + oscillation 診断を返す。
 
-        OscillationType の判定基準:
-        - CLEAR:    top > 0.6 かつ gap > 0.1  → 明確な単一収束
-        - POSITIVE: top > 0.5 かつ gap < 0.05 → 多面的入力
-        - NEGATIVE: top < 0.5 かつ 複数拮抗    → basin 未分化
+        OscillationType の判定基準 (temperature-sharpened similarities):
+        - CLEAR:    top > 0.5 かつ gap > 0.1  → 明確な単一収束
+        - POSITIVE: top > 0.4 かつ gap < 0.05 → 多面的入力
+        - NEGATIVE: top < 0.4 かつ 複数拮抗    → basin 未分化
         - WEAK:     top < threshold             → 引力不足
         """
         self._ensure_initialized()
@@ -524,14 +529,14 @@ class SeriesAttractor:
         second_sim = similarities[1][1] if len(similarities) > 1 else 0.0
         gap = top_sim - second_sim
 
-        # Oscillation 判定
+        # Oscillation 判定 (thresholds adjusted for temperature-sharpened sims)
         if top_sim < self.threshold:
             oscillation = OscillationType.WEAK
-        elif top_sim >= 0.6 and gap >= 0.1:
+        elif top_sim >= 0.5 and gap >= 0.1:
             oscillation = OscillationType.CLEAR
-        elif top_sim >= 0.5 and gap < 0.05:
+        elif top_sim >= 0.4 and gap < 0.05:
             oscillation = OscillationType.POSITIVE
-        elif top_sim < 0.5:
+        elif top_sim < 0.4:
             oscillation = OscillationType.NEGATIVE
         else:
             # 中間領域: gap で判定
@@ -665,6 +670,11 @@ class SeriesAttractor:
 
         GPU 利用可能時: batch_cosine_similarity で 1 回の行列演算
         CPU fallback: numpy の cosine similarity
+
+        Temperature sharpening:
+            raw cosine similarities (0.35-0.55 range) are compressed.
+            Softmax(sim * temperature) amplifies differences, making
+            basin boundaries sharper and reducing O1-concentration.
         """
         input_emb = np.array(
             self._embedder.embed(user_input), dtype=np.float32
@@ -675,15 +685,64 @@ class SeriesAttractor:
             from mekhane.fep.gpu import to_tensor, batch_cosine_similarity
             query_tensor = to_tensor(input_emb, self._device)
             sims = batch_cosine_similarity(query_tensor, self._proto_tensor)
-            sims_cpu = sims.cpu().numpy()
-            return [(key, float(sims_cpu[i])) for i, key in enumerate(self._proto_keys)]
+            raw_sims = sims.cpu().numpy()
+            pairs = [(key, float(raw_sims[i])) for i, key in enumerate(self._proto_keys)]
         else:
             # CPU fallback
-            results = []
+            pairs = []
             for key, proto in self._prototypes.items():
                 sim = self._cosine_similarity_np(input_emb, proto)
-                results.append((key, float(sim)))
-            return results
+                pairs.append((key, float(sim)))
+
+        # Temperature sharpening: amplify separation between basins
+        if self.temperature > 1.0:
+            pairs = self._apply_temperature(pairs)
+
+        return pairs
+
+    def _apply_temperature(self, pairs: list[tuple[str, float]]) -> list[tuple[str, float]]:
+        """Apply softmax temperature scaling to sharpen basin boundaries.
+
+        Softmax(sim_i * T) redistributes similarities so that the
+        top-scoring series gets amplified while close competitors
+        are suppressed. The output is rescaled to preserve
+        the original similarity range for threshold compatibility.
+        """
+        keys = [k for k, _ in pairs]
+        sims = np.array([s for _, s in pairs], dtype=np.float64)
+
+        # Softmax with temperature
+        scaled = sims * self.temperature
+        scaled -= scaled.max()  # numerical stability
+        exp_scaled = np.exp(scaled)
+        softmax = exp_scaled / exp_scaled.sum()
+
+        # Rescale to [min_raw, max_raw] range to preserve threshold semantics
+        min_raw, max_raw = float(sims.min()), float(sims.max())
+        if max_raw > min_raw:
+            sharpened = min_raw + (max_raw - min_raw) * (softmax / softmax.max())
+        else:
+            sharpened = sims  # all equal, no sharpening needed
+
+        return list(zip(keys, [float(s) for s in sharpened]))
+
+    # PURPOSE: Inter-prototype 類似度を測定し、basin分離度を診断
+    def calibrate_prototypes(self) -> dict[str, float]:
+        """Measure inter-prototype cosine similarities (basin separation).
+
+        Returns dict of "X-Y": similarity for all series pairs.
+        High values (> 0.8) indicate insufficient separation.
+        """
+        self._ensure_initialized()
+        pairs: dict[str, float] = {}
+        keys = list(self._prototypes.keys())
+        for i, k1 in enumerate(keys):
+            for k2 in keys[i + 1:]:
+                sim = self._cosine_similarity_np(
+                    self._prototypes[k1], self._prototypes[k2]
+                )
+                pairs[f"{k1}-{k2}"] = float(sim)
+        return pairs
 
     @staticmethod
     # PURPOSE: Cosine similarity (numpy fallback)

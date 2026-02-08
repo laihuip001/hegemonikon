@@ -81,6 +81,52 @@ def _char_bigrams(text: str) -> List[str]:
     return [clean[i:i + 2] for i in range(len(clean) - 1)]
 
 
+# Japanese morphological tokenization (janome, graceful fallback)
+_JANOME_TOKENIZER = None
+_JANOME_AVAILABLE = False
+
+try:
+    from janome.tokenizer import Tokenizer as _JanomeTokenizer
+    _JANOME_TOKENIZER = _JanomeTokenizer()
+    _JANOME_AVAILABLE = True
+except ImportError:
+    pass  # janome not installed; falls back to char bigrams
+
+# Content word POS prefixes (nouns, verbs, adjectives)
+_CONTENT_POS = ("名詞", "動詞", "形容詞")
+# Suffix/non-independent POS to exclude
+_EXCLUDE_POS_DETAIL = ("接尾", "非自立", "数")
+
+
+def _tokenize_ja(text: str) -> List[str]:
+    """Tokenize Japanese text into content words using janome.
+
+    Extracts base forms of nouns, verbs, and adjectives,
+    filtering out suffixes (的, さ, 性) and non-independent words.
+
+    Returns:
+        List of base-form content words.
+        Empty list if janome is not available.
+    """
+    if not _JANOME_AVAILABLE or _JANOME_TOKENIZER is None:
+        return []
+
+    tokens = []
+    for tok in _JANOME_TOKENIZER.tokenize(text):
+        pos = tok.part_of_speech
+        # Must be content word
+        if not pos.startswith(_CONTENT_POS):
+            continue
+        # Exclude suffixes and non-independent forms
+        if any(excl in pos for excl in _EXCLUDE_POS_DETAIL):
+            continue
+        # Use base_form for normalization (深い→深い, なる→なる)
+        base = tok.base_form if tok.base_form != "*" else tok.surface
+        if len(base) >= 2 or not base.isascii():  # skip 1-char ASCII
+            tokens.append(base)
+    return tokens
+
+
 # =============================================================================
 # C0: Precision Weighting (PW)
 # =============================================================================
@@ -164,9 +210,20 @@ def compute_dispersion(outputs: Dict[str, str]) -> float:
             else:
                 jaccard = 1.0
 
-            # Ensemble: take the max — if either method sees similarity,
+            # Method 3: Morphological Jaccard (semantic-level, best for Japanese)
+            # Uses content words (nouns/verbs/adjectives) in base form.
+            morph_jaccard = 0.0
+            if _JANOME_AVAILABLE:
+                words_a = set(_tokenize_ja(values[i]))
+                words_b = set(_tokenize_ja(values[j]))
+                if words_a or words_b:
+                    morph_jaccard = len(words_a & words_b) / len(words_a | words_b)
+                else:
+                    morph_jaccard = 1.0
+
+            # Ensemble: take the max — if any method sees similarity,
             # the texts are not contradictory
-            similarities.append(max(seq_ratio, jaccard))
+            similarities.append(max(seq_ratio, jaccard, morph_jaccard))
 
     if not similarities:
         return 0.0
@@ -444,6 +501,48 @@ class NaturalityResult:
         )
 
 
+# PURPOSE: BFS composite morphism path search (/m dia+ P4)
+def _has_morphism_path(source: str, target: str, max_depth: int = 4) -> bool:
+    """Check if a morphism path exists from source to target in MORPHISMS.
+
+    Uses BFS to find composite paths (e.g., O1→O2→O4) in addition to
+    direct morphisms. Bounded by max_depth to prevent graph explosion.
+
+    Args:
+        source: Source theorem ID (e.g., "O1")
+        target: Target theorem ID (e.g., "O4")
+        max_depth: Maximum BFS depth (default 4)
+
+    Returns:
+        True if any path (direct or composite) exists
+    """
+    if source == target:
+        return True
+
+    # Build adjacency from MORPHISMS registry
+    adjacency: Dict[str, List[str]] = {}
+    for m in MORPHISMS.values():
+        adjacency.setdefault(m.source, []).append(m.target)
+
+    # BFS
+    visited: set = {source}
+    frontier: List[str] = [source]
+    for _depth in range(max_depth):
+        next_frontier: List[str] = []
+        for node in frontier:
+            for neighbor in adjacency.get(node, []):
+                if neighbor == target:
+                    return True
+                if neighbor not in visited:
+                    visited.add(neighbor)
+                    next_frontier.append(neighbor)
+        frontier = next_frontier
+        if not frontier:
+            break
+
+    return False
+
+
 # PURPOSE: Verify naturality condition for a natural transformation
 def verify_naturality(
     nt: NaturalTransformation,
@@ -547,18 +646,15 @@ def verify_naturality(
             )
             continue
 
-        # Structural commutativity check:
+        # Structural commutativity check (/m dia+ P4):
         # G(f) ∘ α_X and α_Y ∘ F(f) should arrive at the same target theorem
         # In our registry, α maps source objects to HGK theorems.
         # The naturality square commutes if:
         #   mapping(α_X) through the HGK morphism structure = α_Y
         #
         # Operational check: does a morphism path exist from α_X to α_Y
-        # in the MORPHISMS registry?
-        path_exists = any(
-            m.source == alpha_x and m.target == alpha_y
-            for m in MORPHISMS.values()
-        )
+        # in the MORPHISMS registry?  Includes composite paths via BFS.
+        path_exists = _has_morphism_path(alpha_x, alpha_y, max_depth=4)
 
         check = {
             "morphism": mor_id,
@@ -577,7 +673,7 @@ def verify_naturality(
         if not path_exists:
             violations.append(
                 f"Morphism {mor_id}: no path from α_{src_x}={alpha_x} "
-                f"to α_{src_y}={alpha_y} in MORPHISMS. "
+                f"to α_{src_y}={alpha_y} in MORPHISMS (direct or composite). "
                 f"Naturality square may not commute."
             )
 

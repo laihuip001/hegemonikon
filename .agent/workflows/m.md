@@ -90,14 +90,56 @@ Creator が `/m` を付与したとき、以下のモードに入る。
 
 ---
 
+## CCL 式実行パイプライン
+
+> **環境強制**: `/m` に CCL 式が添付されたとき、以下を**手順**として実行する。
+> テキストルールではなく、ステップバイステップのパイプラインである。
+
+### Step 0: Hermēneus ディスパッチ（省略不可）
+
+```bash
+cd ~/oikos/hegemonikon && PYTHONPATH=. .venv/bin/python -c "
+from hermeneus.src.dispatch import dispatch
+result = dispatch('{CCL式}')
+if result['success']:
+    print('✅ パース成功')
+    print(result['tree'])
+    print('── 関連 WF:', ', '.join(result['workflows']))
+    print()
+    print(result['plan_template'])
+else:
+    print('❌ Parse Error:', result['error'])
+"
+```
+
+**出力を確認**:
+
+- **✅ パース成功** → 出力の実行計画テンプレートを Creator に提示
+- **❌ Parse error** → パーサー拡張が必要。Creator に報告。
+
+> [!CAUTION]
+> **このステップを飛ばして手動分析を始めてはならない。**
+> もし飛ばしたなら、BC-7 違反として違反ログに記録せよ。
+
+### Step 1: 実行計画を Creator に提案
+
+Step 0 の出力テンプレートに基づき、AST 構造を参照して具体的な実行計画を記入し **Creator に提案** する（/m 効果 #2: 承諾なき実装禁止）。
+
+### Step 2: ステップ実行
+
+Creator の承認後、AST の各ノードを深さ優先で実行する。
+
+---
+
 ## Hegemonikon Status
 
 | Module | Workflow | Status |
 |:-------|:---------|:-------|
-| H2 Pistis | /m | v1.1 Ready |
+| H2 Pistis | /m | v1.2 Ready |
 
 > **制約リマインダ**: 効率ではなく信頼を選べ。
+> **CCL リマインダ**: CCL を見たら Hermēneus を叩け。手動で分析するな。
 
 ---
 
-*v1.1 — FBR変換 (2026-02-07)*
+*v1.2 — CCL 実行パイプライン追加 (2026-02-08)*

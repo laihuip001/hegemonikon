@@ -269,34 +269,64 @@ def check_intuition(context: str) -> MetacognitiveCheck:
 
     This stage captures the pre-reflective assessment.
     In LLM terms: does the input trigger any known patterns?
+
+    Fails when (/m dia+ P1 fix):
+    - Input is too short to form intuition (< 10 chars)
+    - Input contains contradictory signals (both urgent AND reflective)
     """
     stage = UMLStage.PRE_INTUITION
     question = STAGE_QUESTIONS[stage]
 
-    # Check: can we form an initial impression?
-    # Heuristic: if context contains question marks, uncertainty words, etc.
+    issues: List[str] = []
+
+    # Check 1: Sufficient substance to form an impression
+    stripped = context.strip()
+    if len(stripped) < 10:
+        issues.append("入力が短すぎて直感を形成できない")
+
+    # Check 2: Contradictory signals detection
     has_question = "?" in context or "？" in context
     has_uncertainty = any(w in context for w in [
         "わからない", "不明", "uncertain", "maybe", "perhaps",
         "かもしれない", "推測", "仮説",
     ])
+    has_urgency = any(w in context for w in [
+        "緊急", "urgent", "今すぐ", "急", "至急", "immediately",
+    ])
+    has_reflection = any(w in context for w in [
+        "じっくり", "熟考", "深く", "慎重に", "carefully", "deliberate",
+    ])
 
-    # Initial impression is always formable (even "I don't know" is valid)
-    passed = True
-    result = "初期印象を形成: "
-    if has_question:
-        result += "明確な問いがある — 探求的文脈"
+    # Contradiction: urgent + reflective = ambiguous intuition
+    contradictory = has_urgency and has_reflection
+    if contradictory:
+        issues.append("矛盾する信号: 緊急性と熟考が同時に存在 — 直感が定まらない")
+
+    passed = len(issues) == 0
+
+    # Build result description
+    if not passed:
+        result = f"直感形成に問題: {'; '.join(issues)}"
+        confidence = 30.0
+    elif has_question:
+        result = "初期印象を形成: 明確な問いがある — 探求的文脈"
+        confidence = 70.0
     elif has_uncertainty:
-        result += "不確実性がある — 慎重さが必要"
+        result = "初期印象を形成: 不確実性がある — 慎重さが必要"
+        confidence = 60.0
+    elif has_urgency:
+        result = "初期印象を形成: 緊急性がある — 即応モード"
+        confidence = 75.0
     else:
-        result += "明確な入力 — 標準処理"
+        result = "初期印象を形成: 明確な入力 — 標準処理"
+        confidence = 70.0
 
     return MetacognitiveCheck(
         stage=stage,
         question=question,
         result=result,
         passed=passed,
-        confidence=70.0,
+        confidence=confidence,
         theorem="A1",
         cognitive_type=CognitiveType.BRIDGE_U_TO_R.value,
     )
@@ -501,11 +531,13 @@ def run_full_uml(
 ) -> UMLReport:
     """Run the complete Universal Metacognitive Layer.
 
-    Executes all 5 stages and detects AMP feedback loop triggers.
+    Executes all 5 stages and implements AMP feedback loop recursion.
 
-    Feedback loop conditions (from mp_natural_transformation.md):
+    AMP (Adaptive Metacognitive Prompting) feedback loop (/m dia+ P3):
     - Stage 3 (A2) detects overconfidence → loop back to Stage 1 (O1)
-    - Stage 5 (A4) confidence > 90% on complex task → re-evaluate
+    - Each loop reduces effective confidence by FP rate (32.5%)
+    - Max loops: MAX_FEEDBACK_LOOPS (3)
+    - If still failing after max loops, proceed with current understanding
 
     Args:
         context: Input text that triggered the WF
@@ -516,41 +548,54 @@ def run_full_uml(
     Returns:
         UMLReport with all checks and feedback loop status
     """
-    pre = run_pre_checks(context)
-    post = run_post_checks(output, context, confidence)
-
-    # AMP Feedback loop detection
-    feedback_triggered = False
     feedback_count = 0
-    feedback_reason = ""
+    feedback_reasons: List[str] = []
+    effective_confidence = confidence
 
-    # Condition 1: Post-evaluation (A2) failed on overconfidence
-    eval_check = post[0]  # Stage 3
-    if not eval_check.passed and confidence > OVERCONFIDENCE_THRESHOLD:
-        feedback_triggered = True
-        feedback_count = 1
-        feedback_reason = (
-            f"A2 (Krisis) が過信を検出: confidence={confidence}% > "
-            f"{OVERCONFIDENCE_THRESHOLD}%. X-AO1 射により O1 (Noēsis) へ戻る。"
-            f" 「そもそも入力を正しく理解していたか？」を再確認せよ。"
+    # Store the final pre/post checks across loops
+    final_pre: List[MetacognitiveCheck] = []
+    final_post: List[MetacognitiveCheck] = []
+
+    for loop_idx in range(MAX_FEEDBACK_LOOPS + 1):
+        pre = run_pre_checks(context)
+        post = run_post_checks(output, context, effective_confidence)
+
+        final_pre = pre
+        final_post = post
+
+        # Check AMP trigger conditions
+        eval_check = post[0]  # Stage 3 (A2)
+        conf_check = post[2]  # Stage 5 (A4)
+
+        overconfidence_detected = (
+            (not eval_check.passed and effective_confidence > OVERCONFIDENCE_THRESHOLD)
+            or (not conf_check.passed and effective_confidence > OVERCONFIDENCE_THRESHOLD)
         )
 
-    # Condition 2: Confidence check (A4) triggers on high confidence
-    conf_check = post[2]  # Stage 5
-    if not conf_check.passed and confidence > OVERCONFIDENCE_THRESHOLD:
-        feedback_triggered = True
-        feedback_count = max(feedback_count, 1)
-        if not feedback_reason:
-            feedback_reason = (
-                f"A4 (Epistēmē) が過信を検出: confidence={confidence}%. "
-                f"FP {MP_FALSE_POSITIVE_RATE*100:.1f}% に基づく再評価が必要。"
-            )
+        if not overconfidence_detected or loop_idx == MAX_FEEDBACK_LOOPS:
+            # No overconfidence or max loops reached — stop
+            break
+
+        # AMP feedback: reduce confidence and re-evaluate
+        feedback_count += 1
+        reason = (
+            f"Loop {feedback_count}: confidence={effective_confidence:.1f}% > "
+            f"{OVERCONFIDENCE_THRESHOLD}%. X-AO1 射で O1 に戻り再理解。"
+        )
+        feedback_reasons.append(reason)
+
+        # Reduce effective confidence by FP rate
+        effective_confidence *= (1.0 - MP_FALSE_POSITIVE_RATE)
+
+    feedback_triggered = feedback_count > 0
+    feedback_reason = " → ".join(feedback_reasons) if feedback_reasons else ""
 
     return UMLReport(
         wf_name=wf_name,
-        pre_checks=pre,
-        post_checks=post,
+        pre_checks=final_pre,
+        post_checks=final_post,
         feedback_loop_triggered=feedback_triggered,
         feedback_loop_count=feedback_count,
         feedback_reason=feedback_reason,
     )
+

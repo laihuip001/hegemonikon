@@ -43,9 +43,11 @@ OPERATOR_DEFINITIONS: Dict[str, Dict[str, str]] = {
 }
 
 
+# PURPOSE: CCL 仕様強制注入器
 class SpecInjector:
     """CCL 仕様強制注入器"""
 
+    # PURPOSE: 内部処理: init__
     def __init__(self, operators_path: Path = None):
         self.operators_path = (
             operators_path
@@ -54,6 +56,7 @@ class SpecInjector:
         self._operators_content: str = None
 
     @property
+    # PURPOSE: operators.md の内容をキャッシュ付きで読み込み
     def operators_content(self) -> str:
         """operators.md の内容をキャッシュ付きで読み込み"""
         if self._operators_content is None:
@@ -65,6 +68,7 @@ class SpecInjector:
                 self._operators_content = ""
         return self._operators_content
 
+    # PURPOSE: CCL 式から演算子を抽出
     def parse_operators(self, ccl_expr: str) -> Set[str]:
         """CCL 式から演算子を抽出"""
         operators = set()
@@ -73,6 +77,7 @@ class SpecInjector:
                 operators.add(char)
         return operators
 
+    # PURPOSE: 演算子仕様ブロックを生成
     def generate_spec_block(self, operators: Set[str]) -> str:
         """演算子仕様ブロックを生成"""
         if not operators:
@@ -90,6 +95,7 @@ class SpecInjector:
         lines.append("")
         return "\n".join(lines)
 
+    # PURPOSE: 理解確認クイズを生成
     def generate_quiz(self, operators: Set[str]) -> str:
         """理解確認クイズを生成"""
         if not operators:
@@ -108,6 +114,7 @@ class SpecInjector:
 
         return "\n".join(lines)
 
+    # PURPOSE: 必須出力セクションを生成
     def generate_required_sections(self, operators: Set[str]) -> str:
         """必須出力セクションを生成"""
         if not operators:
@@ -123,6 +130,7 @@ class SpecInjector:
         lines.append("")
         return "\n".join(lines)
 
+    # PURPOSE: CCL 式に仕様を注入
     def inject(self, ccl_expr: str) -> str:
         """CCL 式に仕様を注入"""
         operators = self.parse_operators(ccl_expr)
@@ -143,6 +151,7 @@ class SpecInjector:
 ---
 
 ## 実行開始
+# PURPOSE: 過去の失敗パターンから警告を生成（Phase 4 連携用スタブ）
 
 CCL: `{ccl_expr}`
 

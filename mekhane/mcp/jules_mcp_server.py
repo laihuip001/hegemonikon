@@ -24,6 +24,7 @@ if sys.platform == "win32":
 import io
 
 
+# PURPOSE: 関数: log
 def log(msg):
     print(f"[jules-mcp] {msg}", file=sys.stderr, flush=True)
 
@@ -60,6 +61,7 @@ _api_key_pool = []
 _api_key_index = 0
 _dashboard = None
 
+# PURPOSE: Load API keys from environment (JULES_API_KEY_01 to JULES_API_KEY_18).
 def init_api_key_pool():
     """Load API keys from environment (JULES_API_KEY_01 to JULES_API_KEY_18)."""
     global _api_key_pool, _dashboard
@@ -80,6 +82,7 @@ def init_api_key_pool():
     except ImportError:
         log("Dashboard not available, usage tracking disabled")
 
+# PURPOSE: Get next API key using load-balanced selection (least-used account).
 def get_next_api_key():
     """Get next API key using load-balanced selection (least-used account)."""
     global _api_key_index, _dashboard
@@ -106,6 +109,7 @@ def get_next_api_key():
     log(f"Using API key index {idx} (round-robin)")
     return key, idx
 
+# PURPOSE: Record usage to dashboard.
 def record_usage(key_index: int, session_id: str):
     """Record usage to dashboard."""
     global _dashboard
@@ -118,6 +122,7 @@ def record_usage(key_index: int, session_id: str):
 
 
 @server.list_tools()
+# PURPOSE: List available Jules tools.
 async def list_tools():
     """List available Jules tools."""
     log("list_tools called")
@@ -196,6 +201,7 @@ async def list_tools():
 
 
 @server.call_tool(validate_input=True)
+# PURPOSE: Handle Jules tool calls.
 async def call_tool(name: str, arguments: dict):
     """Handle Jules tool calls."""
     log(f"call_tool: {name} with {arguments}")
@@ -358,6 +364,7 @@ Use repository format: `owner/repo` (e.g., `laihuip001/hegemonikon`)
         return [TextContent(type="text", text=f"Unknown tool: {name}")]
 
 
+# PURPOSE: Run the MCP server.
 async def main():
     """Run the MCP server."""
     log("Starting stdio server...")

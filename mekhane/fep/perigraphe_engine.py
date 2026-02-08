@@ -35,6 +35,7 @@ from enum import Enum
 # =============================================================================
 
 
+# PURPOSE: P1 Khōra の派生モード (Lefebvre の空間三分法)
 class KhoraDerivative(Enum):
     """P1 Khōra の派生モード (Lefebvre の空間三分法)"""
 
@@ -43,6 +44,7 @@ class KhoraDerivative(Enum):
     RELATIONAL = "rela"  # 関係的空間 (Lived space)
 
 
+# PURPOSE: スコープのスケール
 class ScopeScale(Enum):
     """スコープのスケール"""
 
@@ -51,6 +53,7 @@ class ScopeScale(Enum):
 
 
 @dataclass
+# PURPOSE: P1 Khōra 評価結果
 class KhoraResult:
     """P1 Khōra 評価結果
 
@@ -73,10 +76,12 @@ class KhoraResult:
     excluded: List[str] = field(default_factory=list)
 
     @property
+    # PURPOSE: スコープラベル (Micro×Micro 等)
     def scope_label(self) -> str:
         """スコープラベル (Micro×Micro 等)"""
         return f"{self.x_scale.value.capitalize()}×{self.y_scale.value.capitalize()}"
 
+# PURPOSE: P1 Khōra: スコープを定義
 
 def define_scope(
     target: str,
@@ -138,6 +143,7 @@ def define_scope(
 # P2 Hodos (道・経路)
 # =============================================================================
 
+# PURPOSE: P2 Hodos の派生モード
 
 class HodosDerivative(Enum):
     """P2 Hodos の派生モード"""
@@ -147,6 +153,7 @@ class HodosDerivative(Enum):
     PARALLEL = "parallel"  # 並列経路 (A→B, A→C)
 
 
+# PURPOSE: P2 Hodos 評価結果
 @dataclass
 class HodosResult:
     """P2 Hodos 評価結果
@@ -168,9 +175,11 @@ class HodosResult:
     estimated_steps: int = 1
 
     @property
+    # PURPOSE: 総ノード数
     def total_nodes(self) -> int:
         """総ノード数"""
         return 2 + len(self.waypoints)
+# PURPOSE: P2 Hodos: 経路を定義
 
 
 def define_path(
@@ -224,6 +233,7 @@ def define_path(
 # =============================================================================
 # P3 Trokhia (軌道・サイクル)
 # =============================================================================
+# PURPOSE: P3 Trokhia の派生モード
 
 
 class TrokhiaDerivative(Enum):
@@ -233,6 +243,7 @@ class TrokhiaDerivative(Enum):
     SPIRAL = "spiral"  # 螺旋 (A→B→C→A' elevated)
     BRANCH = "branch"  # 分岐 (A→B or A→C)
 
+# PURPOSE: P3 Trokhia 評価結果
 
 @dataclass
 class TrokhiaResult:
@@ -255,6 +266,7 @@ class TrokhiaResult:
     max_iterations: Optional[int] = None
 
     @property
+    # PURPOSE: 現在フェーズ名
     def current_phase_name(self) -> str:
         """現在フェーズ名"""
         if 0 <= self.current_phase < len(self.phases):
@@ -262,9 +274,11 @@ class TrokhiaResult:
         return "unknown"
 
     @property
+    # PURPOSE: 軌道完了か
     def is_complete(self) -> bool:
         """軌道完了か"""
         if self.max_iterations is None:
+# PURPOSE: P3 Trokhia: 軌道を定義
             return False
         return self.iteration > self.max_iterations
 
@@ -301,6 +315,7 @@ def define_trajectory(
 
 
 # =============================================================================
+# PURPOSE: P1 Khōra 結果をMarkdown形式でフォーマット
 # Formatting
 # =============================================================================
 
@@ -318,6 +333,7 @@ def format_khora_markdown(result: KhoraResult) -> str:
         lines.append(f"│ 含む: {', '.join(result.included[:3])}")
     if result.excluded:
         lines.append(f"│ 除外: {', '.join(result.excluded[:3])}")
+# PURPOSE: P2 Hodos 結果をMarkdown形式でフォーマット
     lines.append("└──────────────────────────────────────────────────┘")
     return "\n".join(lines)
 
@@ -336,6 +352,7 @@ def format_hodos_markdown(result: HodosResult) -> str:
         f"│ {path_str}",
         f"│ ステップ: {result.estimated_steps}",
         "└──────────────────────────────────────────────────┘",
+# PURPOSE: P3 Trokhia 結果をMarkdown形式でフォーマット
     ]
     return "\n".join(lines)
 
@@ -361,6 +378,7 @@ def format_trokhia_markdown(result: TrokhiaResult) -> str:
 
 
 # =============================================================================
+# PURPOSE: FEP観察空間へのエンコード
 # FEP Integration
 # =============================================================================
 

@@ -35,6 +35,7 @@ from enum import Enum
 # =============================================================================
 
 
+# PURPOSE: H1 Propatheia の派生モード
 class PropatheiaDerivative(Enum):
     """H1 Propatheia の派生モード"""
 
@@ -44,6 +45,7 @@ class PropatheiaDerivative(Enum):
 
 
 @dataclass
+# PURPOSE: H1 Propatheia 評価結果
 class PropatheiaResult:
     """H1 Propatheia 評価結果
 
@@ -62,14 +64,17 @@ class PropatheiaResult:
     description: str
 
     @property
+    # PURPOSE: 正の情緒価か
     def is_positive(self) -> bool:
         """正の情緒価か"""
         return self.valence > 0
 
     @property
+    # PURPOSE: 有意な強度か
     def is_significant(self) -> bool:
         """有意な強度か"""
         return self.intensity >= 0.5
+# PURPOSE: H1 Propatheia: 前感情を評価
 
 
 def evaluate_propatheia(
@@ -139,6 +144,7 @@ def evaluate_propatheia(
 # =============================================================================
 # H2 Pistis (確信度・信頼性)
 # =============================================================================
+# PURPOSE: H2 Pistis の派生モード
 
 
 class PistisDerivative(Enum):
@@ -148,6 +154,7 @@ class PistisDerivative(Enum):
     MEDIUM = "med"  # 中確信度
     LOW = "low"  # 低確信度
 
+# PURPOSE: H2 Pistis 評価結果
 
 @dataclass
 class PistisResult:
@@ -170,12 +177,15 @@ class PistisResult:
     justification: str
 
     @property
+    # PURPOSE: 正味の根拠数
     def net_evidence(self) -> int:
         """正味の根拠数"""
         return self.evidence_count - self.counter_evidence_count
 
     @property
+    # PURPOSE: 信頼すべきか
     def should_trust(self) -> bool:
+# PURPOSE: H2 Pistis: 確信度を評価
         """信頼すべきか"""
         return self.confidence >= 0.6 and self.derivative != PistisDerivative.LOW
 
@@ -230,6 +240,7 @@ def evaluate_pistis(
 
 
 # =============================================================================
+# PURPOSE: H3 Orexis の派生モード
 # H3 Orexis (欲求傾向)
 # =============================================================================
 
@@ -239,6 +250,7 @@ class OrexisDerivative(Enum):
 
     APPROACH = "approach"  # 接近傾向
     AVOID = "avoid"  # 回避傾向
+# PURPOSE: H3 Orexis 評価結果
     NEUTRAL = "neutral"  # 中立傾向
 
 
@@ -263,6 +275,8 @@ class OrexisResult:
     motivation: str
 
     @property
+    # PURPOSE: 追求すべきか
+# PURPOSE: H3 Orexis: 欲求傾向を評価
     def should_pursue(self) -> bool:
         """追求すべきか"""
         return self.net_tendency > 0.2
@@ -315,6 +329,7 @@ def evaluate_orexis(
     )
 
 
+# PURPOSE: H1 Propatheia 結果をMarkdown形式でフォーマット
 # =============================================================================
 # Formatting
 # =============================================================================
@@ -332,6 +347,7 @@ def format_propatheia_markdown(result: PropatheiaResult) -> str:
         f"│ 強度: {result.intensity:.0%}",
         f"│ 情緒価: {valence_emoji} {result.valence:+.2f}",
         f"│ 直感: {result.description}",
+# PURPOSE: H2 Pistis 結果をMarkdown形式でフォーマット
         "└──────────────────────────────────────────────────┘",
     ]
     return "\n".join(lines)
@@ -351,6 +367,7 @@ def format_pistis_markdown(result: PistisResult) -> str:
         f"│ 確信度: {conf_emoji} {result.confidence:.0%}",
         f"│ 根拠: {result.evidence_count} / 反証: {result.counter_evidence_count}",
         f"│ 評価: {result.justification}",
+# PURPOSE: H3 Orexis 結果をMarkdown形式でフォーマット
         "└──────────────────────────────────────────────────┘",
     ]
     return "\n".join(lines)
@@ -375,6 +392,7 @@ def format_orexis_markdown(result: OrexisResult) -> str:
     return "\n".join(lines)
 
 
+# PURPOSE: FEP観察空間へのエンコード
 # =============================================================================
 # FEP Integration
 # =============================================================================

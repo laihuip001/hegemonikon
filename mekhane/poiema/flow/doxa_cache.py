@@ -24,6 +24,7 @@ from .metron_resolver import MetronResolver, METRON_LIGHT, METRON_MEDIUM, METRON
 logger = logging.getLogger("doxa_cache")
 
 
+# PURPOSE: H4 Doxa の instantiation: 信念の永続化
 class DoxaCache:
     """
     H4 Doxa の instantiation: 信念の永続化
@@ -39,6 +40,7 @@ class DoxaCache:
     """
 
     @staticmethod
+    # PURPOSE: テキストのハッシュを生成
     def get_text_hash(text: str) -> str:
         """
         テキストのハッシュを生成
@@ -49,6 +51,7 @@ class DoxaCache:
         return hashlib.sha256(text.encode()).hexdigest()[:32]
 
     @staticmethod
+    # PURPOSE: ログ用にテキストをサニタイズ（プライバシー保護）
     def sanitize_log(text: str) -> str:
         """
         ログ用にテキストをサニタイズ（プライバシー保護）
@@ -61,6 +64,7 @@ class DoxaCache:
         text_hash = DoxaCache.get_text_hash(text)[:8]
         return f"[text:{text_hash}...len={len(text)}]"
 
+    # PURPOSE: Initialize DoxaCache
     def __init__(self, settings: Dict = None):
         """
         Initialize DoxaCache
@@ -75,6 +79,7 @@ class DoxaCache:
         # In-memory cache for standalone mode
         self._memory_cache: Dict[str, Dict] = {}
 
+    # PURPOSE: TTL (賞味期限) チェック
     def _check_ttl(self, cache_entry: Dict) -> bool:
         """
         TTL (賞味期限) チェック
@@ -98,6 +103,7 @@ class DoxaCache:
             return True
         return False
 
+    # PURPOSE: LRU (容量制限) チェック
     def _enforce_limit(self):
         """
         LRU (容量制限) チェック
@@ -121,6 +127,7 @@ class DoxaCache:
                 del self._memory_cache[key]
             logger.info(f"🧹 Doxa Limit Enforced: removed {over} entries")
 
+    # PURPOSE: キャッシュ検索: 信念の想起
     def check_cache(
         self, text: str, metron_level: int, db_session: Any = None
     ) -> Optional[Dict]:
@@ -173,6 +180,7 @@ class DoxaCache:
 
         return None
 
+    # PURPOSE: キャッシュ保存: 信念の永続化
     def store_cache(
         self, text: str, metron_level: int, result: str, db_session: Any = None
     ) -> None:
@@ -202,6 +210,7 @@ class DoxaCache:
 
         logger.info(f"💾 Doxa Stored: {self.sanitize_log(result)}")
 
+    # PURPOSE: Warmup: 事前に信念を蓄積
     async def warmup_from_list(
         self,
         templates: List[str],

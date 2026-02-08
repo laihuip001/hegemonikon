@@ -66,6 +66,14 @@ summary: "6定理群の三角形構造 — Pure/Mixed 分類と関係の階層"
 
 ![Trígōnon — 6定理群の三角形構造](trigonon_structure.png)
 
+### 詳細ビジュアライゼーション
+
+![Trígōnon Full Architecture — Pure/Mixed with 96 elements](trigonon_full.png)
+
+![Poiēsis/Dokimasia — Star(O) 分割](trigonon_poiesis_dokimasia.png)
+
+![24 Theorems Complete Map](trigonon_24theorems.png)
+
 | 構造要素 | Series | 定理数 | 役割 |
 |:---------|:-------|:-------|:-----|
 | 頂点 (3) | O, P, A | 12 | 自己完結的原点 |

@@ -35,6 +35,7 @@ from enum import Enum
 # =============================================================================
 
 
+# PURPOSE: S1 Metron の派生モード
 class MetronDerivative(Enum):
     """S1 Metron の派生モード"""
 
@@ -43,6 +44,7 @@ class MetronDerivative(Enum):
     ABSTRACT = "abst"  # 抽象度
 
 
+# PURPOSE: スケールレベル
 class ScaleLevel(Enum):
     """スケールレベル"""
 
@@ -52,6 +54,7 @@ class ScaleLevel(Enum):
 
 
 @dataclass
+# PURPOSE: S1 Metron 評価結果
 class MetronResult:
     """S1 Metron 評価結果
 
@@ -70,6 +73,7 @@ class MetronResult:
     recommendation: str
 
 
+# PURPOSE: S1 Metron: スケールを分析
 def analyze_scale(
     subject: str,
     derivative: Optional[MetronDerivative] = None,
@@ -121,6 +125,7 @@ def analyze_scale(
 # =============================================================================
 
 
+# PURPOSE: S3 Stathmos の派生モード
 class StathmosDerivative(Enum):
     """S3 Stathmos の派生モード"""
 
@@ -129,6 +134,7 @@ class StathmosDerivative(Enum):
     RELATIVE = "rela"  # 相対的基準
 
 
+# PURPOSE: 基準の優先度
 class CriterionPriority(Enum):
     """基準の優先度"""
 
@@ -138,6 +144,7 @@ class CriterionPriority(Enum):
 
 
 @dataclass
+# PURPOSE: S3 Stathmos 評価結果
 class StathmosResult:
     """S3 Stathmos 評価結果
 
@@ -154,6 +161,7 @@ class StathmosResult:
     benchmark: str
 
 
+# PURPOSE: S3 Stathmos: 評価基準を定義
 def define_criteria(
     subject: str,
     must: Optional[List[str]] = None,
@@ -207,6 +215,7 @@ def define_criteria(
 # =============================================================================
 
 
+# PURPOSE: S4 Praxis の派生モード (Aristotle)
 class PraxisDerivative(Enum):
     """S4 Praxis の派生モード (Aristotle)"""
 
@@ -216,6 +225,7 @@ class PraxisDerivative(Enum):
 
 
 @dataclass
+# PURPOSE: S4 Praxis 評価結果
 class PraxisResult:
     """S4 Praxis 評価結果
 
@@ -234,6 +244,7 @@ class PraxisResult:
     intrinsic_value: bool
 
 
+# PURPOSE: S4 Praxis: 実践を計画
 def plan_praxis(
     action: str,
     derivative: Optional[PraxisDerivative] = None,
@@ -286,6 +297,7 @@ def plan_praxis(
 # =============================================================================
 
 
+# PURPOSE: S1 Metron 結果をMarkdown形式でフォーマット
 def format_metron_markdown(result: MetronResult) -> str:
     """S1 Metron 結果をMarkdown形式でフォーマット"""
     lines = [
@@ -300,6 +312,7 @@ def format_metron_markdown(result: MetronResult) -> str:
     return "\n".join(lines)
 
 
+# PURPOSE: S3 Stathmos 結果をMarkdown形式でフォーマット
 def format_stathmos_markdown(result: StathmosResult) -> str:
     """S3 Stathmos 結果をMarkdown形式でフォーマット"""
     lines = [
@@ -319,6 +332,7 @@ def format_stathmos_markdown(result: StathmosResult) -> str:
     return "\n".join(lines)
 
 
+# PURPOSE: S4 Praxis 結果をMarkdown形式でフォーマット
 def format_praxis_markdown(result: PraxisResult) -> str:
     """S4 Praxis 結果をMarkdown形式でフォーマット"""
     intrinsic_emoji = "✨" if result.intrinsic_value else "📦"
@@ -338,6 +352,7 @@ def format_praxis_markdown(result: PraxisResult) -> str:
 # =============================================================================
 
 
+# PURPOSE: FEP観察空間へのエンコード
 def encode_schema_observation(
     metron: Optional[MetronResult] = None,
     stathmos: Optional[StathmosResult] = None,

@@ -71,11 +71,13 @@ FILE_LEVELS = {
 DEFAULT_LEVEL = "L2/インフラ"
 
 
+# PURPOSE: ファイル名からPROOFレベルを取得
 def get_proof_level(filename: str) -> str:
     """ファイル名からPROOFレベルを取得"""
     return FILE_LEVELS.get(filename, DEFAULT_LEVEL)
 
 
+# PURPOSE: ファイルにPROOFヘッダーを追加
 def add_proof_header(filepath: Path, dry_run: bool = False) -> bool:
     """ファイルにPROOFヘッダーを追加"""
     try:
@@ -108,6 +110,7 @@ def add_proof_header(filepath: Path, dry_run: bool = False) -> bool:
     return True
 
 
+# PURPOSE: 関数: main
 def main():
     parser = argparse.ArgumentParser(description="PROOF Header Batch Injector")
     parser.add_argument("--dry-run", action="store_true", help="実際には変更しない")

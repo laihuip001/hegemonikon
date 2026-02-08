@@ -18,6 +18,7 @@ from mekhane.pks.pks_engine import KnowledgeNugget
 
 
 @dataclass
+# PURPOSE: 比較表の列定義
 class MatrixColumn:
     """比較表の列定義"""
 
@@ -26,6 +27,7 @@ class MatrixColumn:
 
 
 @dataclass
+# PURPOSE: 比較表の行（1 nugget = 1 行）
 class MatrixRow:
     """比較表の行（1 nugget = 1 行）"""
 
@@ -33,6 +35,7 @@ class MatrixRow:
     cells: dict[str, str] = field(default_factory=dict)
 
 
+# PURPOSE: Elicit 風の構造化比較表生成
 class PKSMatrixView:
     """Elicit 風の構造化比較表生成
 
@@ -49,9 +52,11 @@ class PKSMatrixView:
         MatrixColumn(name="Key Insight"),
     ]
 
+    # PURPOSE: 内部処理: init__
     def __init__(self, columns: list[MatrixColumn] | None = None):
         self.columns = columns or self.DEFAULT_COLUMNS
 
+    # PURPOSE: 比較表を Markdown テーブルとして生成
     def generate(self, nuggets: list[KnowledgeNugget]) -> str:
         """比較表を Markdown テーブルとして生成"""
         if not nuggets:
@@ -60,6 +65,7 @@ class PKSMatrixView:
         rows = [self._nugget_to_row(n) for n in nuggets]
         return self._render_markdown(rows)
 
+    # PURPOSE: KnowledgeNugget をテーブル行に変換
     def _nugget_to_row(self, nugget: KnowledgeNugget) -> MatrixRow:
         """KnowledgeNugget をテーブル行に変換"""
         cells = {
@@ -70,6 +76,7 @@ class PKSMatrixView:
         }
         return MatrixRow(nugget=nugget, cells=cells)
 
+    # PURPOSE: Markdown テーブルをレンダリング
     def _render_markdown(self, rows: list[MatrixRow]) -> str:
         """Markdown テーブルをレンダリング"""
         col_names = [c.name for c in self.columns]

@@ -39,6 +39,7 @@ if sys.platform == "win32":
         pass  # TODO: Add proper error handling
 
 
+# PURPOSE: Text embedding with automatic GPU acceleration.
 class Embedder:
     """Text embedding with automatic GPU acceleration.
 
@@ -47,6 +48,7 @@ class Embedder:
       2. Fallback → ONNX Runtime on CPU (original implementation)
     """
 
+    # PURPOSE: 内部処理: init__
     def __init__(self, force_cpu: bool = False):
         import numpy as np
         self.np = np
@@ -75,6 +77,7 @@ class Embedder:
         self._init_onnx()
         print("[Embedder] CPU mode (ONNX)")
 
+    # PURPOSE: Initialize ONNX Runtime session (original implementation).
     def _init_onnx(self):
         """Initialize ONNX Runtime session (original implementation)."""
         import onnxruntime as ort
@@ -93,14 +96,17 @@ class Embedder:
         self._tokenizer.enable_truncation(max_length=512)
         self._tokenizer.enable_padding(pad_to_multiple_of=8)
 
+    # PURPOSE: 関数: embed
     def embed(self, text: str) -> list:
         return self.embed_batch([text])[0]
 
+    # PURPOSE: 関数: embed_batch
     def embed_batch(self, texts: list[str]) -> list[list]:
         if self._use_gpu:
             return self._embed_gpu(texts)
         return self._embed_onnx(texts)
 
+    # PURPOSE: GPU embedding via sentence-transformers.
     def _embed_gpu(self, texts: list[str]) -> list[list]:
         """GPU embedding via sentence-transformers."""
         embeddings = self._st_model.encode(
@@ -108,6 +114,7 @@ class Embedder:
         )
         return embeddings.tolist()
 
+    # PURPOSE: CPU embedding via ONNX Runtime (original implementation).
     def _embed_onnx(self, texts: list[str]) -> list[list]:
         """CPU embedding via ONNX Runtime (original implementation)."""
         encoded_batch = self._tokenizer.encode_batch(texts)
@@ -139,6 +146,7 @@ class Embedder:
 
         # Normalize
         norm = self.np.linalg.norm(pooled, axis=1, keepdims=True)
+# PURPOSE: Gnōsis論文インデックス
         norm[norm == 0] = 1e-12  # Avoid division by zero
         normalized = pooled / norm
 
@@ -150,6 +158,7 @@ class GnosisIndex:
 
     TABLE_NAME = "papers"
 
+    # PURPOSE: 内部処理: init__
     def __init__(self, lance_dir: Optional[Path] = None):
         if lancedb is None:
             raise ImportError("lancedb package required: pip install lancedb")
@@ -161,11 +170,13 @@ class GnosisIndex:
         self.embedder: Optional[Embedder] = None
         self._primary_key_cache: set[str] = set()
 
+    # PURPOSE: 内部処理: get_embedder
     def _get_embedder(self) -> Embedder:
         if self.embedder is None:
             self.embedder = Embedder()
         return self.embedder
 
+    # PURPOSE: 既存primary_keyをキャッシュ
     def _load_primary_keys(self):
         """既存primary_keyをキャッシュ"""
         if self.TABLE_NAME not in self.db.table_names():
@@ -178,6 +189,7 @@ class GnosisIndex:
         except Exception:
             pass  # TODO: Add proper error handling
 
+    # PURPOSE: 論文をインデックスに追加
     def add_papers(self, papers: list[Paper], dedupe: bool = True) -> int:
         """
         論文をインデックスに追加
@@ -234,6 +246,7 @@ class GnosisIndex:
         print(f"[GnosisIndex] Added {len(data)} papers")
         return len(data)
 
+    # PURPOSE: セマンティック検索
     def search(self, query: str, k: int = 10) -> list[dict]:
         """
         セマンティック検索
@@ -257,6 +270,7 @@ class GnosisIndex:
 
         return results
 
+    # PURPOSE: インデックス統計
     def stats(self) -> dict:
         """インデックス統計"""
         if self.TABLE_NAME not in self.db.table_names():
@@ -274,6 +288,7 @@ class GnosisIndex:
             "unique_arxiv": df["arxiv_id"].notna().sum(),
         }
 
+    # PURPOSE: primary_keyで論文取得
     def get_by_primary_key(self, primary_key: str) -> Optional[dict]:
         """primary_keyで論文取得"""
         if self.TABLE_NAME not in self.db.table_names():

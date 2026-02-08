@@ -30,6 +30,7 @@ _original_stdout = sys.stdout
 _stderr_wrapper = sys.stderr
 
 
+# PURPOSE: 関数: log
 def log(msg):
     print(f"[prompt-lang-mcp] {msg}", file=sys.stderr, flush=True)
 
@@ -44,16 +45,20 @@ log(f"Added to path: {Path(__file__).parent.parent}")
 
 
 # ============ Suppress stdout during imports ============
+# PURPOSE: クラス: StdoutSuppressor
 class StdoutSuppressor:
+    # PURPOSE: 内部処理: init__
     def __init__(self):
         self._null = io.StringIO()
         self._old_stdout = None
 
+    # PURPOSE: 内部処理: enter__
     def __enter__(self):
         self._old_stdout = sys.stdout
         sys.stdout = self._null
         return self
 
+    # PURPOSE: 内部処理: exit__
     def __exit__(self, *args):
         sys.stdout = self._old_stdout
         captured = self._null.getvalue()
@@ -123,6 +128,7 @@ DOMAIN_KEYWORDS = {
         "議事録",
         "meeting notes",
     ],
+# PURPOSE: Detect domain from requirements text.
 }
 
 
@@ -141,6 +147,7 @@ def detect_domain(text: str) -> str:
 
 
 # ============ Security: Domain Validation (Defense-in-Depth) ============
+# PURPOSE: Validate domain against whitelist.
 ALLOWED_DOMAINS = frozenset(["technical", "rag", "summarization"])
 
 
@@ -159,6 +166,7 @@ def validate_domain(domain: str) -> str:
         log(f"SECURITY: Invalid domain '{domain}' rejected. Defaulting to 'technical'")
         return "technical"
     return domain
+# PURPOSE: Load YAML file as dict.
 
 
 # ============ Template Loading ============
@@ -172,6 +180,7 @@ def load_yaml_file(path: Path) -> dict:
     except Exception as e:
         log(f"Error loading {path}: {e}")
         return {}
+# PURPOSE: Generate Prompt-Lang code from requirements.
 
 
 # ============ Prompt-Lang Generation ============
@@ -270,6 +279,7 @@ server = Server(
     instructions="Prompt-Lang code generator for structured prompt definitions",
 )
 log("Server initialized")
+# PURPOSE: List available tools.
 
 
 @server.list_tools()
@@ -302,6 +312,7 @@ async def list_tools():
             },
         )
     ]
+# PURPOSE: Handle tool calls.
 
 
 @server.call_tool(validate_input=True)
@@ -354,6 +365,7 @@ async def call_tool(name: str, arguments: dict):
             return [TextContent(type="text", text=f"Error generating: {str(e)}")]
 
     else:
+# PURPOSE: Run the MCP server.
         return [TextContent(type="text", text=f"Unknown tool: {name}")]
 
 

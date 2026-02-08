@@ -35,6 +35,7 @@ from enum import Enum
 # =============================================================================
 
 
+# PURPOSE: A1 Pathos の派生モード
 class PathosDerivative(Enum):
     """A1 Pathos の派生モード"""
 
@@ -44,6 +45,7 @@ class PathosDerivative(Enum):
 
 
 @dataclass
+# PURPOSE: A1 Pathos 評価結果
 class PathosResult:
     """A1 Pathos 評価結果
 
@@ -64,10 +66,12 @@ class PathosResult:
     regulation_need: float
 
     @property
+    # PURPOSE: 調整が必要か
     def needs_regulation(self) -> bool:
         """調整が必要か"""
         return self.regulation_need >= 0.6
 
+# PURPOSE: A1 Pathos: メタ感情を評価
 
 def evaluate_pathos(
     experience: str,
@@ -121,6 +125,7 @@ def evaluate_pathos(
 # A3 Gnōmē (格言・原則)
 # =============================================================================
 
+# PURPOSE: A3 Gnōmē の派生モード
 
 class GnomeDerivative(Enum):
     """A3 Gnōmē の派生モード"""
@@ -130,6 +135,7 @@ class GnomeDerivative(Enum):
     PRAGMATIC = "prag"  # 実用的原則
 
 
+# PURPOSE: A3 Gnōmē 評価結果
 @dataclass
 class GnomeResult:
     """A3 Gnōmē 評価結果
@@ -151,9 +157,11 @@ class GnomeResult:
     examples: List[str] = field(default_factory=list)
 
     @property
+    # PURPOSE: 行動可能な原則か
     def is_actionable(self) -> bool:
         """行動可能な原則か"""
         return self.applicability >= 0.6
+# PURPOSE: A3 Gnōmē: 原則を抽出
 
 
 def extract_gnome(
@@ -202,6 +210,7 @@ def extract_gnome(
 # =============================================================================
 # A4 Epistēmē (知識確立)
 # =============================================================================
+# PURPOSE: A4 Epistēmē の派生モード (JTB条件)
 
 
 class EpistemeDerivative(Enum):
@@ -211,6 +220,7 @@ class EpistemeDerivative(Enum):
     TRUE = "true"  # 真である
     BELIEVED = "beli"  # 信じられている
 
+# PURPOSE: A4 Epistēmē 評価結果
 
 @dataclass
 class EpistemeResult:
@@ -235,8 +245,10 @@ class EpistemeResult:
     status: str
 
     @property
+    # PURPOSE: 知識として成立するか (JTB条件)
     def is_knowledge(self) -> bool:
         """知識として成立するか (JTB条件)"""
+# PURPOSE: A4 Epistēmē: 知識を評価
         return self.is_justified and (self.is_true is True) and self.is_believed
 
 
@@ -302,6 +314,7 @@ def evaluate_episteme(
 
 # =============================================================================
 # Formatting
+# PURPOSE: A1 Pathos 結果をMarkdown形式でフォーマット
 # =============================================================================
 
 
@@ -318,6 +331,7 @@ def format_pathos_markdown(result: PathosResult) -> str:
         f"│ 調整: {reg_emoji} {result.regulation_need:.0%}",
         "└──────────────────────────────────────────────────┘",
     ]
+# PURPOSE: A3 Gnōmē 結果をMarkdown形式でフォーマット
     return "\n".join(lines)
 
 
@@ -332,6 +346,7 @@ def format_gnome_markdown(result: GnomeResult) -> str:
         f"│ 一般化: {result.generalizability:.0%}",
         "└──────────────────────────────────────────────────┘",
     ]
+# PURPOSE: A4 Epistēmē 結果をMarkdown形式でフォーマット
     return "\n".join(lines)
 
 
@@ -355,6 +370,7 @@ def format_episteme_markdown(result: EpistemeResult) -> str:
 
 # =============================================================================
 # FEP Integration
+# PURPOSE: FEP観察空間へのエンコード
 # =============================================================================
 
 

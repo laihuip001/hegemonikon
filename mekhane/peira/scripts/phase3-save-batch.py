@@ -33,6 +33,7 @@ MANIFEST_FILE = os.path.join(ROOT_DIR, "_index", "manifest.jsonl")
 LOG_FILE = os.path.join(ROOT_DIR, "_index", "capture_log.csv")
 
 
+# PURPOSE: パース/抽出: parse_date
 def parse_date(date_str):
     if not date_str:
         return datetime.date.today(), "0000", "00"
@@ -44,6 +45,7 @@ def parse_date(date_str):
         return datetime.date.today(), "0000", "00"
 
 
+# PURPOSE: 設定/保存: save_article
 def save_article(article):
     url = article["url"]
     post_id = url.split("/")[-1]
@@ -94,6 +96,7 @@ is_premium: unknown
     print(f"Saved: {filepath}")
 
 
+# PURPOSE: 関数: main
 def main():
     articles = json.loads(DATA_JSON)
     for art in articles:

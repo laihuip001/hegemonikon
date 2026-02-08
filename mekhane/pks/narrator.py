@@ -19,6 +19,7 @@ from mekhane.pks.pks_engine import KnowledgeNugget
 
 
 @dataclass
+# PURPOSE: 対話の一セグメント
 class NarrativeSegment:
     """対話の一セグメント"""
 
@@ -27,6 +28,7 @@ class NarrativeSegment:
 
 
 @dataclass
+# PURPOSE: Advocate vs Critic の対話形式サマリー
 class Narrative:
     """Advocate vs Critic の対話形式サマリー"""
 
@@ -34,6 +36,7 @@ class Narrative:
     segments: list[NarrativeSegment]
     source_nugget: Optional[KnowledgeNugget] = None
 
+    # PURPOSE: Markdown 対話形式に出力
     def to_markdown(self) -> str:
         """Markdown 対話形式に出力"""
         lines = [
@@ -52,6 +55,7 @@ class Narrative:
 
         return "\n".join(lines)
 
+# PURPOSE: NotebookLM Audio Overview 相当の「知識が語りかける」機構
 
 class PKSNarrator:
     """NotebookLM Audio Overview 相当の「知識が語りかける」機構
@@ -64,6 +68,7 @@ class PKSNarrator:
         現時点ではテンプレートベースの簡易生成。
     """
 
+    # PURPOSE: KnowledgeNugget を対話形式に変換
     def narrate(self, nugget: KnowledgeNugget) -> Narrative:
         """KnowledgeNugget を対話形式に変換
 
@@ -90,10 +95,12 @@ class PKSNarrator:
             source_nugget=nugget,
         )
 
+    # PURPOSE: 複数 nugget をバッチで対話化
     def narrate_batch(self, nuggets: list[KnowledgeNugget]) -> list[Narrative]:
         """複数 nugget をバッチで対話化"""
         return [self.narrate(n) for n in nuggets]
 
+    # PURPOSE: ナラティブ群を一つのレポートに整形
     def format_report(self, narratives: list[Narrative]) -> str:
         """ナラティブ群を一つのレポートに整形"""
         if not narratives:
@@ -116,6 +123,7 @@ class PKSNarrator:
 
     # --- Phase 1: テンプレートベース生成 ---
 
+    # PURPOSE: Advocate の発言を生成
     def _generate_advocate(self, nugget: KnowledgeNugget) -> str:
         """Advocate の発言を生成"""
         abstract = nugget.abstract[:200] if nugget.abstract else "（要約なし）"
@@ -129,6 +137,7 @@ class PKSNarrator:
 
         return " ".join(parts)
 
+    # PURPOSE: Critic の発言を生成
     def _generate_critic(self, nugget: KnowledgeNugget) -> str:
         """Critic の発言を生成"""
         parts = ["ただし注意が必要です。"]
@@ -146,6 +155,7 @@ class PKSNarrator:
 
         return " ".join(parts)
 
+    # PURPOSE: Advocate の応答を生成
     def _generate_response(self, nugget: KnowledgeNugget) -> str:
         """Advocate の応答を生成"""
         return (

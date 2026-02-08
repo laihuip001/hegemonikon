@@ -32,6 +32,7 @@ from pathlib import Path
 import json
 
 
+# PURPOSE: 技法空間の4象限 (Explore/Exploit マトリクス)
 class TechniqueQuadrant(Enum):
     """技法空間の4象限 (Explore/Exploit マトリクス)"""
 
@@ -41,6 +42,7 @@ class TechniqueQuadrant(Enum):
     ESTABLISHED = "established"  # Exploit × Exploit: 確立技法
 
 
+# PURPOSE: 行為カテゴリ
 class ActionCategory(Enum):
     """行為カテゴリ"""
 
@@ -53,6 +55,7 @@ class ActionCategory(Enum):
 
 
 @dataclass
+# PURPOSE: 単一技法の定義
 class Technique:
     """単一技法の定義
 
@@ -82,6 +85,7 @@ class Technique:
     success_rate: float = 0.7
     keywords: List[str] = field(default_factory=list)
 
+    # PURPOSE: 辞書形式に変換
     def to_dict(self) -> Dict[str, Any]:
         """辞書形式に変換"""
         return {
@@ -292,6 +296,7 @@ STANDARD_TECHNIQUES: Dict[str, Technique] = {
     ),
 }
 
+# PURPOSE: 技法レジストリ
 
 class TekhnēRegistry:
     """技法レジストリ
@@ -300,6 +305,7 @@ class TekhnēRegistry:
     S2 Mekhanē がこのレジストリから技法を選択する。
     """
 
+    # PURPOSE: Args:
     def __init__(self, techniques: Optional[Dict[str, Technique]] = None):
         """
         Args:
@@ -314,15 +320,18 @@ class TekhnēRegistry:
         }
 
     @property
+    # PURPOSE: 登録済み技法の辞書
     def techniques(self) -> Dict[str, Technique]:
         """登録済み技法の辞書"""
         return self._techniques
 
     @property
+    # PURPOSE: レジストリサイズ
     def size(self) -> int:
         """レジストリサイズ"""
         return len(self._techniques)
 
+    # PURPOSE: 技法を登録
     def register(self, technique: Technique) -> None:
         """技法を登録
 
@@ -334,6 +343,7 @@ class TekhnēRegistry:
             self._usage_counts[technique.id] = 0
             self._success_history[technique.id] = []
 
+    # PURPOSE: IDで技法を取得
     def get(self, technique_id: str) -> Optional[Technique]:
         """IDで技法を取得
 
@@ -345,6 +355,7 @@ class TekhnēRegistry:
         """
         return self._techniques.get(technique_id)
 
+    # PURPOSE: 条件で技法を検索
     def search(
         self,
         keyword: Optional[str] = None,
@@ -399,14 +410,17 @@ class TekhnēRegistry:
 
         return results
 
+    # PURPOSE: カテゴリ別に技法を取得
     def get_by_category(self, category: ActionCategory) -> List[Technique]:
         """カテゴリ別に技法を取得"""
         return self.search(category=category)
 
+    # PURPOSE: 象限別に技法を取得
     def get_by_quadrant(self, quadrant: TechniqueQuadrant) -> List[Technique]:
         """象限別に技法を取得"""
         return self.search(quadrant=quadrant)
 
+    # PURPOSE: 技法使用を記録 (S2 Mekhanē の学習用)
     def record_usage(self, technique_id: str, success: bool) -> None:
         """技法使用を記録 (S2 Mekhanē の学習用)
 
@@ -418,6 +432,7 @@ class TekhnēRegistry:
             self._usage_counts[technique_id] += 1
             self._success_history[technique_id].append(success)
 
+    # PURPOSE: 経験的成功率を取得
     def get_empirical_success_rate(self, technique_id: str) -> Optional[float]:
         """経験的成功率を取得
 
@@ -432,6 +447,7 @@ class TekhnēRegistry:
             return None
         return sum(history) / len(history)
 
+    # PURPOSE: レジストリ統計を取得
     def get_statistics(self) -> Dict[str, Any]:
         """レジストリ統計を取得"""
         return {
@@ -446,6 +462,7 @@ class TekhnēRegistry:
             "total_usage": sum(self._usage_counts.values()),
         }
 
+    # PURPOSE: JSON形式でエクスポート
     def to_json(self) -> str:
         """JSON形式でエクスポート"""
         data = {
@@ -458,6 +475,7 @@ class TekhnēRegistry:
         return json.dumps(data, indent=2, ensure_ascii=False)
 
     @classmethod
+    # PURPOSE: JSONからインポート
     def from_json(cls, json_str: str) -> "TekhnēRegistry":
         """JSONからインポート"""
         data = json.loads(json_str)
@@ -473,6 +491,7 @@ class TekhnēRegistry:
                 outputs=tdata.get("outputs", []),
                 risk_level=tdata.get("risk_level", 0.3),
                 time_cost=tdata.get("time_cost", 3),
+# PURPOSE: 技法をB行列エントリ (状態遷移確率) に変換
                 success_rate=tdata.get("success_rate", 0.7),
                 keywords=tdata.get("keywords", []),
             )
@@ -496,6 +515,7 @@ def encode_technique_as_b_matrix_entry(technique: Technique) -> Dict[str, float]
     Args:
         technique: 技法
 
+# PURPOSE: レジストリをMarkdown形式でフォーマット
     Returns:
         {"transition_success": float, "transition_failure": float}
     """
@@ -543,6 +563,7 @@ def format_registry_markdown(registry: TekhnēRegistry) -> str:
         if count > 0:
             lines.append(f"│   {quad}: {count}")
 
+# PURPOSE: デフォルトレジストリを取得
     lines.extend(
         [
             f"│ 総使用回数: {stats['total_usage']}",
@@ -551,6 +572,7 @@ def format_registry_markdown(registry: TekhnēRegistry) -> str:
     )
 
     return "\n".join(lines)
+# PURPOSE: グローバルレジストリから技法を検索
 
 
 # Default global registry

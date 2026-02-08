@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/anamnesis/models/ A0→Libraryプロンプトのスキーマが必要→prompt_moduleが担う
 """
 Gnōsis Prompt Module Model - Library プロンプト統一スキーマ
 
@@ -11,6 +12,7 @@ from typing import Optional
 
 
 @dataclass
+# PURPOSE: Library プロンプトモジュール統一スキーマ
 class PromptModule:
     """Library プロンプトモジュール統一スキーマ"""
 
@@ -38,11 +40,13 @@ class PromptModule:
     indexed_at: str = field(default_factory=lambda: datetime.now().isoformat())
 
     @property
+    # PURPOSE: 重複排除用
     def primary_key(self) -> str:
         """重複排除用"""
         return self.filepath
 
     @property
+    # PURPOSE: 埋め込み生成用テキスト
     def embedding_text(self) -> str:
         """埋め込み生成用テキスト"""
         parts = [self.name, self.category, self.hegemonikon_mapping]
@@ -53,6 +57,7 @@ class PromptModule:
             parts.append(self.body[:500])
         return " ".join(p for p in parts if p)
 
+    # PURPOSE: LanceDB 保存用辞書
     def to_dict(self) -> dict:
         """LanceDB 保存用辞書"""
         return {
@@ -71,6 +76,7 @@ class PromptModule:
         }
 
     @classmethod
+    # PURPOSE: 辞書から復元
     def from_dict(cls, data: dict) -> "PromptModule":
         """辞書から復元"""
         return cls(

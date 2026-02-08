@@ -31,6 +31,7 @@ USAGE_FILE = Path(__file__).parent / "perplexity_usage.json"
 MONTHLY_BUDGET = 5.00  # USD
 
 
+# PURPOSE: Get API key from environment.
 def get_api_key() -> str:
     """Get API key from environment."""
     key = os.environ.get("PERPLEXITY_API_KEY")
@@ -62,6 +63,7 @@ def get_api_key() -> str:
     return key
 
 
+# PURPOSE: Load usage data.
 def load_usage() -> dict:
     """Load usage data."""
     if USAGE_FILE.exists():
@@ -74,11 +76,13 @@ def load_usage() -> dict:
     }
 
 
+# PURPOSE: Save usage data.
 def save_usage(usage: dict):
     """Save usage data."""
     USAGE_FILE.write_text(json.dumps(usage, indent=2, ensure_ascii=False))
 
 
+# PURPOSE: Estimate cost based on token usage.
 def estimate_cost(input_tokens: int, output_tokens: int, model: str) -> float:
     """Estimate cost based on token usage."""
     # Pricing: sonar $0.002/1K, sonar-pro $0.005/1K
@@ -86,6 +90,7 @@ def estimate_cost(input_tokens: int, output_tokens: int, model: str) -> float:
     return (input_tokens + output_tokens) / 1000 * rate
 
 
+# PURPOSE: Execute search query via Perplexity API.
 def search(query: str, model: str = DEFAULT_MODEL) -> dict:
     """
     Execute search query via Perplexity API.
@@ -163,6 +168,7 @@ def search(query: str, model: str = DEFAULT_MODEL) -> dict:
     }
 
 
+# PURPOSE: Show current usage statistics.
 def show_usage() -> dict:
     """Show current usage statistics."""
     usage = load_usage()
@@ -175,6 +181,7 @@ def show_usage() -> dict:
     }
 
 
+# PURPOSE: 関数: main
 def main():
     if len(sys.argv) < 2:
         print(__doc__)

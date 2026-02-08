@@ -39,6 +39,7 @@ DATA_DIR = _HEGEMONIKON_ROOT / "gnosis_data"
 STATE_FILE = DATA_DIR / "state.json"
 
 
+# PURPOSE: Update last collected timestamp.
 def update_state():
     """Update last collected timestamp."""
     try:
@@ -56,6 +57,7 @@ def update_state():
         print(f"[Warning] Failed to update state: {e}")
 
 
+# PURPOSE: Check if collection is needed based on threshold days.
 def cmd_check_freshness(args):
     """
     Check if collection is needed based on threshold days.
@@ -85,6 +87,7 @@ def cmd_check_freshness(args):
     return 0 if result["status"] == "fresh" else 1
 
 
+# PURPOSE: 論文収集
 def cmd_collect(args):
     """論文収集"""
     from mekhane.anamnesis.collectors.arxiv import ArxivCollector
@@ -129,6 +132,7 @@ def cmd_collect(args):
         return 1
 
 
+# PURPOSE: 全ソースから収集
 def cmd_collect_all(args):  # noqa: AI-ALL
     """全ソースから収集"""
     from mekhane.anamnesis.collectors.arxiv import ArxivCollector
@@ -163,6 +167,7 @@ def cmd_collect_all(args):  # noqa: AI-ALL
     return 0
 
 
+# PURPOSE: 論文検索
 def cmd_search(args):
     """論文検索"""
     from mekhane.anamnesis.index import GnosisIndex
@@ -191,6 +196,7 @@ def cmd_search(args):
     return 0
 
 
+# PURPOSE: インデックス統計
 def cmd_stats(args):
     """インデックス統計"""
     from mekhane.anamnesis.index import GnosisIndex
@@ -220,6 +226,7 @@ def cmd_stats(args):
     return 0
 
 
+# PURPOSE: PKS 能動的プッシュ
 def cmd_proactive(args):
     """PKS 能動的プッシュ"""
     from mekhane.pks.pks_engine import PKSEngine
@@ -265,6 +272,7 @@ def cmd_proactive(args):
     return 0
 
 
+# PURPOSE: Link Engine — ファイル間リレーション解析
 def cmd_links(args):
     """Link Engine — ファイル間リレーション解析"""
     from mekhane.pks.links.link_engine import LinkEngine
@@ -305,6 +313,7 @@ def cmd_links(args):
     return 0
 
 
+# PURPOSE: 関数: main
 def main():
     parser = argparse.ArgumentParser(
         description="Gnōsis - Knowledge Foundation CLI",
@@ -428,6 +437,11 @@ def main():
     p_chat.add_argument(
         "--index", "-i", action="store_true",
         help="Index all knowledge files before chatting"
+    )
+    p_chat.add_argument(
+        "--steering", "-s", default="hegemonikon",
+        choices=["hegemonikon", "neutral", "academic"],
+        help="Steering profile (default: hegemonikon)"
     )
     p_chat.set_defaults(func=cmd_chat)
 

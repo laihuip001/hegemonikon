@@ -95,6 +95,7 @@ ARTIFACT_TEMPLATE = """
 """
 
 
+# PURPOSE: Generate artifact section for a workflow.
 def generate_section(
     workflow: str, module: str, summary: str, date: str = "20260129"
 ) -> str:
@@ -111,6 +112,7 @@ def generate_section(
     )
 
 
+# PURPOSE: Find the line number to insert artifact section.
 def find_insertion_point(content: str) -> int:
     """Find the line number to insert artifact section."""
     lines = content.split("\n")
@@ -131,6 +133,7 @@ def find_insertion_point(content: str) -> int:
     return len(lines)
 
 
+# PURPOSE: Update a single workflow file with artifact section.
 def update_workflow(workflow: str, module: str, summary: str) -> bool:
     """Update a single workflow file with artifact section."""
     filepath = WORKFLOWS_DIR / f"{workflow}.md"
@@ -168,6 +171,7 @@ def update_workflow(workflow: str, module: str, summary: str) -> bool:
     return True
 
 
+# PURPOSE: 関数: main
 def main():
     print("🚀 Hegemonikón Workflow Artifact Standardization")
     print(f"📁 Target: {WORKFLOWS_DIR}")

@@ -31,6 +31,7 @@ from datetime import datetime, timedelta
 import re
 
 
+# PURPOSE: 時間スケール
 class TimeScale(Enum):
     """時間スケール"""
 
@@ -40,6 +41,7 @@ class TimeScale(Enum):
     LONG = "long"  # 長期 (月〜年): > 30d
 
 
+# PURPOSE: 確信度
 class CertaintyLevel(Enum):
     """確信度"""
 
@@ -47,6 +49,7 @@ class CertaintyLevel(Enum):
     UNCERTAIN = "U"  # 不確実な見積もり (可変)
 
 
+# PURPOSE: 余裕度 (期限までの相対時間)
 class SlackLevel(Enum):
     """余裕度 (期限までの相対時間)"""
 
@@ -57,6 +60,7 @@ class SlackLevel(Enum):
 
 
 @dataclass
+# PURPOSE: 時間評価結果
 class ChronosResult:
     """時間評価結果
 
@@ -87,11 +91,13 @@ class ChronosResult:
     critical_path: List[str] = field(default_factory=list)
 
     @property
+    # PURPOSE: 期限超過か
     def is_overdue(self) -> bool:
         """期限超過か"""
         return self.slack == SlackLevel.OVERDUE
 
     @property
+    # PURPOSE: 加速が必要か
     def needs_acceleration(self) -> bool:
         """加速が必要か"""
         return self.slack in (SlackLevel.TIGHT, SlackLevel.OVERDUE)
@@ -108,6 +114,7 @@ URGENCY_MAP = {
     "3weeks": 0.4,  # ≤ 21d
     "2months": 0.2,  # ≤ 60d
 }
+# PURPOSE: 期限文字列をパース
 
 
 def _parse_deadline(
@@ -230,6 +237,7 @@ def _parse_deadline(
 
     # パース不可
     return None, TimeScale.MEDIUM, CertaintyLevel.UNCERTAIN
+# PURPOSE: 残り時間から緊急度を計算
 
 
 def _calculate_urgency(remaining_hours: Optional[float]) -> float:
@@ -258,6 +266,7 @@ def _calculate_urgency(remaining_hours: Optional[float]) -> float:
         return 0.2
     else:
         return 0.1
+# PURPOSE: 余裕度を計算
 
 
 def _calculate_slack(
@@ -289,6 +298,7 @@ def _calculate_slack(
         return SlackLevel.TIGHT
     else:
         return SlackLevel.OVERDUE
+# PURPOSE: 余裕度と時間スケールから推奨を生成
 
 
 def _generate_recommendation(slack: SlackLevel, time_scale: TimeScale) -> str:
@@ -309,6 +319,7 @@ def _generate_recommendation(slack: SlackLevel, time_scale: TimeScale) -> str:
 # =============================================================================
 # Public API
 # =============================================================================
+# PURPOSE: 時間制約を評価
 
 
 def evaluate_time(
@@ -374,6 +385,7 @@ def evaluate_time(
         recommendation=recommendation,
         critical_path=critical_path or [],
     )
+# PURPOSE: 結果をMarkdown形式でフォーマット
 
 
 def format_chronos_markdown(result: ChronosResult) -> str:
@@ -417,6 +429,7 @@ def format_chronos_markdown(result: ChronosResult) -> str:
 
     return "\n".join(lines)
 
+# PURPOSE: FEP観察空間へのエンコード
 
 # FEP Integration
 def encode_chronos_observation(result: ChronosResult) -> dict:

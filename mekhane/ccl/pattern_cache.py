@@ -10,6 +10,7 @@ import re
 from typing import Optional
 
 
+# PURPOSE: Static pattern matcher (Layer 3).
 class PatternCache:
     """
     Static pattern matcher (Layer 3).
@@ -49,6 +50,7 @@ class PatternCache:
         r"(往復|対話|交互|行き来)": "~",
     }
 
+    # PURPOSE: Generate CCL from intent using heuristics.
     def generate(self, intent: str) -> Optional[str]:
         """
         Generate CCL from intent using heuristics.
@@ -72,6 +74,7 @@ class PatternCache:
 
         return self._generate_inner(intent_lower)
 
+    # PURPOSE: Generate the inner CCL expression.
     def _generate_inner(self, intent: str) -> Optional[str]:
         """Generate the inner CCL expression."""
         workflows = []

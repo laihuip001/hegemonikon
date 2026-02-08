@@ -30,6 +30,7 @@ except ImportError:
         USE_NEW_SDK = False
 
 
+# PURPOSE: Get API key from environment, trying multiple variable names.
 def _get_api_key() -> Optional[str]:
     """Get API key from environment, trying multiple variable names."""
     return (
@@ -39,9 +40,11 @@ def _get_api_key() -> Optional[str]:
     )
 
 
+# PURPOSE: LLM-based CCL intent parser (Layer 1).
 class LLMParser:
     """LLM-based CCL intent parser (Layer 1)."""
 
+    # PURPOSE: Initialize the LLM parser.
     def __init__(self, model: str = "gemini-2.0-flash"):
         """
         Initialize the LLM parser.
@@ -71,6 +74,7 @@ class LLMParser:
             except Exception:
                 pass  # TODO: Add proper error handling
 
+    # PURPOSE: Load the CCL compiler prompt.
     def _load_system_prompt(self) -> str:
         """Load the CCL compiler prompt."""
         prompt_path = Path(__file__).parent / "prompts" / "ccl_compiler.md"
@@ -78,10 +82,12 @@ class LLMParser:
             return prompt_path.read_text()
         return ""
 
+    # PURPOSE: Check if LLM is available.
     def is_available(self) -> bool:
         """Check if LLM is available."""
         return self.client is not None or self.model is not None
 
+    # PURPOSE: Convert natural language intent to CCL expression.
     def parse(self, intent: str) -> Optional[str]:
         """
         Convert natural language intent to CCL expression.

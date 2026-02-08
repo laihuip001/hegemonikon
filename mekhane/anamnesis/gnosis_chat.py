@@ -47,13 +47,16 @@ KERNEL_DIR = _HEGEMONIKON_ROOT / "kernel"
 HANDOFF_DIR = _HEGEMONIKON_ROOT / "docs" / "handoff"
 
 
+# PURPOSE: マルチターン対話の履歴管理.
 class ConversationHistory:
     """マルチターン対話の履歴管理."""
 
+    # PURPOSE: 内部処理: init__
     def __init__(self, max_turns: int = 5):
         self.max_turns = max_turns
         self.turns: list[dict] = []
 
+    # PURPOSE: ターンを追加.
     def add(self, role: str, content: str):
         """ターンを追加."""
         self.turns.append({"role": role, "content": content})
@@ -61,6 +64,7 @@ class ConversationHistory:
         if len(self.turns) > self.max_turns * 2:
             self.turns = self.turns[-(self.max_turns * 2):]
 
+    # PURPOSE: プロンプト用にフォーマット.
     def format_for_prompt(self) -> str:
         """プロンプト用にフォーマット."""
         if not self.turns:
@@ -73,10 +77,13 @@ class ConversationHistory:
                 parts.append(f"<|im_start|>assistant\n{t['content']}<|im_end|>")
         return "\n".join(parts)
 
+    # PURPOSE: 関数: clear
     def clear(self):
         self.turns.clear()
 
     @property
+# PURPOSE: Cross-encoder Reranker for precision improvement.
+    # PURPOSE: 関数: turn_count
     def turn_count(self) -> int:
         return len(self.turns) // 2
 
@@ -92,10 +99,12 @@ class Reranker:
 
     DEFAULT_MODEL = "cross-encoder/ms-marco-MiniLM-L-6-v2"
 
+    # PURPOSE: 内部処理: init__
     def __init__(self, model_name: Optional[str] = None):
         self.model_name = model_name or self.DEFAULT_MODEL
         self._model = None
 
+    # PURPOSE: 内部処理: load
     def _load(self):
         if self._model is not None:
             return
@@ -108,6 +117,7 @@ class Reranker:
     # Used only as a secondary noise filter.
     SCORE_THRESHOLD = -4.0
 
+    # PURPOSE: 検索結果を cross-encoder で再スコアリング + 閾値フィルタ.
     def rerank(
         self, query: str, results: list[dict], top_k: int = 5
     ) -> list[dict]:
@@ -147,6 +157,7 @@ class Reranker:
         filtered = [
             r for r in results
             if r.get("_rerank_score", -999) > self.SCORE_THRESHOLD
+# PURPOSE: Hegemonikón 全知識をインデックスに追加するユーティリティ.
         ]
 
         # re-rank score でソート (高い方が良い)
@@ -159,6 +170,7 @@ class KnowledgeIndexer:
     """Hegemonikón 全知識をインデックスに追加するユーティリティ."""
 
     @staticmethod
+    # PURPOSE: 全知識ソースからファイルを発見.
     def discover_knowledge_files() -> list[dict]:
         """全知識ソースからファイルを発見.
 
@@ -240,6 +252,7 @@ class KnowledgeIndexer:
         return files
 
     @staticmethod
+    # PURPOSE: テキストをチャンクに分割 (overlap 付き).
     def _chunk_text(text: str, chunk_size: int = 1000, overlap: int = 200) -> list[str]:
         """テキストをチャンクに分割 (overlap 付き)."""
         if len(text) <= chunk_size:
@@ -265,6 +278,7 @@ class KnowledgeIndexer:
         return [c for c in chunks if c]
 
     @staticmethod
+    # PURPOSE: 全知識をインデックスに追加.
     def index_knowledge(force_reindex: bool = False) -> int:
         """全知識をインデックスに追加.
 
@@ -343,6 +357,7 @@ class KnowledgeIndexer:
             done = min(i + BATCH_SIZE, len(data))
             print(f"  Embedded {done}/{len(data)}...", flush=True)
 
+# PURPOSE: Gnōsis 対話型 RAG エンジン.
         # LanceDB に追加
         if table_name in index.db.table_names():
             table = index.db.open_table(table_name)
@@ -364,6 +379,9 @@ class GnosisChat:
       Layer 1: bi-encoder distance threshold
       Layer 2: cross-encoder score threshold
       Layer 3: confidence assessment → prompt adaptation
+
+    Layer 4: Prompt-level steering
+      System prompt に contrastive guidance を注入して振る舞いを制御。
     """
 
     DEFAULT_MODEL = "Qwen/Qwen2.5-3B-Instruct"
@@ -373,12 +391,33 @@ class GnosisChat:
     #   0 = identical, ~1.0 = unrelated, ~1.41 = opposite
     DISTANCE_THRESHOLD = 0.85
 
+    # Prompt-level steering profiles
+    STEERING_PROFILES = {
+        "hegemonikon": (
+            "\n## 振る舞い指針 (Steering)\n"
+            "- 不確実な場合は『確信度が低いですが...』と前置きする\n"
+            "- 質問に答える前に、回答の前提条件を明示する\n"
+            "- 複数の解釈が可能な場合は、それぞれの可能性を列挙する\n"
+            "- 潜在的なリスクや注意点に気づいた場合は、積極的に指摘する\n"
+            "- 回答が知識ベースの情報のみに基づくことを意識し、推測と事実を明確に区別する\n"
+        ),
+        "neutral": "",  # No steering
+        "academic": (
+            "\n## 振る舞い指針 (Steering)\n"
+            "- 学術的な正確さを最優先する\n"
+            "- 主張には必ず根拠 [番号] を付与する\n"
+            "- 対立する見解がある場合は両方を提示する\n"
+            "- 方法論的な限界を指摘する\n"
+        ),
+    }
+
     # Confidence levels
     CONFIDENCE_HIGH = "high"
     CONFIDENCE_MEDIUM = "medium"
     CONFIDENCE_LOW = "low"
     CONFIDENCE_NONE = "none"
 
+    # PURPOSE: 内部処理: init__
     def __init__(
         self,
         model_id: Optional[str] = None,
@@ -387,6 +426,7 @@ class GnosisChat:
         search_knowledge: bool = True,
         search_papers: bool = True,
         use_reranker: bool = True,
+        steering_profile: str = "hegemonikon",
     ):
         self.model_id = model_id or self.DEFAULT_MODEL
         self.top_k = top_k
@@ -394,6 +434,7 @@ class GnosisChat:
         self.search_knowledge = search_knowledge
         self.search_papers = search_papers
         self.use_reranker = use_reranker
+        self.steering_profile = steering_profile
 
         self._index = None
         self._model = None
@@ -401,6 +442,7 @@ class GnosisChat:
         self._reranker = Reranker() if use_reranker else None
         self.history = ConversationHistory(max_turns=5)
 
+    # PURPOSE: Gnōsis インデックスをロード (GPU embedding).
     def _load_index(self):
         """Gnōsis インデックスをロード (GPU embedding)."""
         if self._index is not None:
@@ -409,6 +451,7 @@ class GnosisChat:
         self._index = GnosisIndex()
         print("[Gnōsis Chat] Index loaded", flush=True)
 
+    # PURPOSE: VRAM タイムシェア: Embedder を解放して LLM 用に VRAM を確保.
     def _unload_embedder(self):
         """VRAM タイムシェア: Embedder を解放して LLM 用に VRAM を確保.
 
@@ -432,6 +475,7 @@ class GnosisChat:
             vram_mb = torch.cuda.memory_allocated() / 1e6
             print(f"[Gnōsis Chat] Embedder unloaded ({vram_mb:.0f}MB VRAM)", flush=True)
 
+    # PURPOSE: LLM をロード (4bit量子化 on GPU).
     def _load_model(self):
         """LLM をロード (4bit量子化 on GPU)."""
         if self._model is not None:
@@ -461,6 +505,7 @@ class GnosisChat:
         vram_mb = torch.cuda.memory_allocated() / 1e6
         print(f"[Gnōsis Chat] Model loaded ({vram_mb:.0f}MB VRAM)", flush=True)
 
+    # PURPOSE: 全テーブルからセマンティック検索 + 閾値フィルタ + rerank.
     def _retrieve(self, query: str) -> list[dict]:
         """全テーブルからセマンティック検索 + 閾値フィルタ + rerank."""
         self._load_index()
@@ -511,6 +556,7 @@ class GnosisChat:
 
         return results
 
+    # PURPOSE: Layer 3: 検索結果の品質から確信度を判定.
     def _assess_confidence(self, results: list[dict]) -> str:
         """Layer 3: 検索結果の品質から確信度を判定.
 
@@ -539,6 +585,7 @@ class GnosisChat:
         else:
             return self.CONFIDENCE_LOW
 
+    # PURPOSE: 検索結果からコンテキスト文字列を構築.
     def _build_context(self, results: list[dict]) -> str:
         """検索結果からコンテキスト文字列を構築."""
         context_parts = []
@@ -563,6 +610,7 @@ class GnosisChat:
             )
         return "\n\n".join(context_parts)
 
+    # PURPOSE: LLM で回答を生成.
     def _generate(self, prompt: str) -> str:
         """LLM で回答を生成."""
         import torch
@@ -589,6 +637,7 @@ class GnosisChat:
         answer_tokens = outputs[0][input_len:]
         return self._tokenizer.decode(answer_tokens, skip_special_tokens=True)
 
+    # PURPOSE: 質問に回答する (RAG + マルチターン + 3層防御).
     def ask(self, question: str) -> dict:
         """質問に回答する (RAG + マルチターン + 3層防御)."""
         # 1. Retrieve (Layer 1 + 2)
@@ -632,6 +681,7 @@ class GnosisChat:
                 "回答は簡潔で構造的にしてください。\n"
                 "引用する場合は [番号] の形式で参照元を示してください。\n"
                 "検索結果にない情報を創作・推測しないでください。"
+                + self.STEERING_PROFILES.get(self.steering_profile, "")
             )
 
             prompt = f"<|im_start|>system\n{system_prompt}<|im_end|>\n"
@@ -673,6 +723,7 @@ class GnosisChat:
             "turn": self.history.turn_count,
         }
 
+    # PURPOSE: 対話ループ (REPL).
     def interactive(self):
         """対話ループ (REPL)."""
         print("\n" + "=" * 60)
@@ -728,6 +779,7 @@ class GnosisChat:
                     kdf = kt.to_pandas()
                     print(f"\n🧠 Knowledge chunks: {len(kdf)}")
                     for src, cnt in kdf["source"].value_counts().items():
+# PURPOSE: CLI entry point for chat command.
                         print(f"   {src}: {cnt}")
                 continue
 

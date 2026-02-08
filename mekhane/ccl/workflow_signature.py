@@ -13,6 +13,7 @@ import yaml
 
 
 @dataclass
+# PURPOSE: A workflow's CCL signature.
 class WorkflowSignature:
     """A workflow's CCL signature."""
 
@@ -99,13 +100,16 @@ WORKFLOW_SIGNATURES: Dict[str, WorkflowSignature] = {
 }
 
 
+# PURPOSE: Registry for workflow CCL signatures.
 class SignatureRegistry:
     """Registry for workflow CCL signatures."""
 
+    # PURPOSE: Initialize with built-in signatures.
     def __init__(self):
         """Initialize with built-in signatures."""
         self.signatures = dict(WORKFLOW_SIGNATURES)
 
+    # PURPOSE: Get CCL signature for a workflow.
     def get(self, workflow: str) -> Optional[WorkflowSignature]:
         """
         Get CCL signature for a workflow.
@@ -121,19 +125,23 @@ class SignatureRegistry:
             workflow = f"/{workflow}"
         return self.signatures.get(workflow)
 
+    # PURPOSE: Get just the CCL signature string.
     def get_ccl(self, workflow: str) -> Optional[str]:
         """Get just the CCL signature string."""
         sig = self.get(workflow)
         return sig.ccl_signature if sig else None
 
+    # PURPOSE: List workflows without side effects (pure CCL).
     def list_pure(self) -> list:
         """List workflows without side effects (pure CCL)."""
         return [s for s in self.signatures.values() if not s.has_side_effects]
 
+    # PURPOSE: List workflows with side effects.
     def list_impure(self) -> list:
         """List workflows with side effects."""
         return [s for s in self.signatures.values() if s.has_side_effects]
 
+    # PURPOSE: Extract CCL signature from a workflow YAML frontmatter.
     def add_from_yaml(self, workflow_path: Path):
         """
         Extract CCL signature from a workflow YAML frontmatter.

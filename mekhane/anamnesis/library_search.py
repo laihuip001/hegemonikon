@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/インフラ] <- mekhane/anamnesis/ A0→Library検索エンジンが必要→library_searchが担う
 """
 Library Search Engine — 3層検索で Library 112プロンプトを発動する
 
@@ -30,14 +31,17 @@ LANCE_DIR = Path(__file__).parent / "data"
 TABLE_NAME = "prompts"
 
 
+# PURPOSE: Library プロンプト検索エンジン
 class LibrarySearch:
     """Library プロンプト検索エンジン"""
 
+    # PURPOSE: 内部処理: init__
     def __init__(self, lance_dir: Optional[str] = None):
         self._lance_dir = Path(lance_dir) if lance_dir else LANCE_DIR
         self._db = None
         self._table = None
 
+    # PURPOSE: LanceDB に遅延接続
     def _connect(self):
         """LanceDB に遅延接続"""
         if self._db is None:
@@ -53,6 +57,7 @@ class LibrarySearch:
 
     # ── Layer 1: activation_triggers キーワードマッチ ──
 
+    # PURPOSE: activation_triggers のキーワード部分一致検索
     def search_by_triggers(self, keyword: str, limit: int = 20) -> list[PromptModule]:
         """
         activation_triggers のキーワード部分一致検索
@@ -89,6 +94,7 @@ class LibrarySearch:
 
     # ── Layer 2: hegemonikon_mapping ベース WF 連携 ──
 
+    # PURPOSE: hegemonikon_mapping ベースの WF 連携検索
     def search_by_mapping(self, wf_name: str) -> list[PromptModule]:
         """
         hegemonikon_mapping ベースの WF 連携検索
@@ -140,6 +146,7 @@ class LibrarySearch:
 
     # ── Layer 3: LanceDB ベクトル検索 ──
 
+    # PURPOSE: セマンティック検索 (LanceDB vector search)
     def search_semantic(self, query: str, limit: int = 5) -> list[dict]:
         """
         セマンティック検索 (LanceDB vector search)
@@ -174,6 +181,7 @@ class LibrarySearch:
 
     # ── ユーティリティ ──
 
+    # PURPOSE: ID からモジュールを取得
     def get_module(self, module_id: str) -> Optional[PromptModule]:
         """ID からモジュールを取得"""
         self._connect()
@@ -184,6 +192,7 @@ class LibrarySearch:
                 return PromptModule.from_dict(row.to_dict())
         return None
 
+    # PURPOSE: カテゴリ別のモジュール数を返す
     def list_categories(self) -> dict[str, int]:
         """カテゴリ別のモジュール数を返す"""
         self._connect()
@@ -196,6 +205,7 @@ class LibrarySearch:
 
         return dict(sorted(categories.items()))
 
+    # PURPOSE: インデックス内のモジュール総数
     def count(self) -> int:
         """インデックス内のモジュール総数"""
         self._connect()

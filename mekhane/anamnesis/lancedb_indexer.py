@@ -30,6 +30,7 @@ DB_PATH = Path(r"M:\Brain\.hegemonikon\lancedb")
 TABLE_NAME = "sessions"
 
 
+# PURPOSE: セッションドキュメントのスキーマ
 class SessionDocument(BaseModel):
     """セッションドキュメントのスキーマ"""
 
@@ -41,6 +42,7 @@ class SessionDocument(BaseModel):
     content_preview: str  # 検索結果表示用
 
 
+# PURPOSE: セッション md ファイルをパースしてドキュメントに変換
 def parse_session_file(filepath: Path) -> Optional[SessionDocument]:
     """セッション md ファイルをパースしてドキュメントに変換"""
     try:
@@ -125,6 +127,7 @@ def parse_session_file(filepath: Path) -> Optional[SessionDocument]:
         return None
 
 
+# PURPOSE: 全セッションファイルをインデックス
 def index_sessions():
     """全セッションファイルをインデックス"""
     print("[*] LanceDB Session Indexer")
@@ -177,6 +180,7 @@ def index_sessions():
     return db, table
 
 
+# PURPOSE: セッションを検索
 def search_sessions(query: str, limit: int = 5):
     """セッションを検索"""
     db = lancedb.connect(str(DB_PATH))

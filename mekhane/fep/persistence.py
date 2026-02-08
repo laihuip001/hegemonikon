@@ -34,11 +34,13 @@ LEARNED_A_METADATA_PATH = Path(
 )
 
 
+# PURPOSE: Ensure the persistence directory exists.
 def ensure_persistence_dir() -> None:
     """Ensure the persistence directory exists."""
     LEARNED_A_PATH.parent.mkdir(parents=True, exist_ok=True)
 
 
+# PURPOSE: Save learned A matrix to file.
 def save_A(agent: "HegemonikónFEPAgent", path: Optional[Path] = None) -> Path:
     """Save learned A matrix to file.
 
@@ -68,6 +70,7 @@ def save_A(agent: "HegemonikónFEPAgent", path: Optional[Path] = None) -> Path:
     return target_path
 
 
+# PURPOSE: Load A matrix from file.
 def load_A(path: Optional[Path] = None) -> Optional[np.ndarray]:
     """Load A matrix from file.
 
@@ -90,6 +93,7 @@ def load_A(path: Optional[Path] = None) -> Optional[np.ndarray]:
     return np.load(str(target_path), allow_pickle=True)
 
 
+# PURPOSE: Check if a saved A matrix exists.
 def A_exists(path: Optional[Path] = None) -> bool:
     """Check if a saved A matrix exists.
 
@@ -103,6 +107,7 @@ def A_exists(path: Optional[Path] = None) -> bool:
     return target_path.exists()
 
 
+# PURPOSE: Delete saved A matrix.
 def delete_A(path: Optional[Path] = None) -> bool:
     """Delete saved A matrix.
 

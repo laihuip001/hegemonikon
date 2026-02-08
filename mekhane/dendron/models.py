@@ -109,7 +109,10 @@ class DirProof:
     path: Path
     status: ProofStatus
     has_proof_md: bool = False
-    reason: Optional[str] = None
+    has_reason: bool = False         # REASON: フィールドの有無
+    purpose_text: Optional[str] = None  # PURPOSE: テキスト (未来の意図)
+    reason_text: Optional[str] = None   # REASON: テキスト (過去の経緯)
+    reason: Optional[str] = None        # 検証結果の理由
 
 
 # PURPOSE: 依存関係 (NF2 Structure) の検証結果を統一的に扱い、構造的健全性を判定する
@@ -245,6 +248,10 @@ PROOF_PATTERN_V2 = re.compile(r"#\s*PROOF:\s*\[([^\]]+)\](?:\s*<-\s*([^\s#]+))?"
 # PURPOSE ヘッダーパターン (v2.5: 関数直前コメント)
 # 形式: # PURPOSE: 目的の説明
 PURPOSE_PATTERN = re.compile(r"#\s*PURPOSE:\s*(.+)")
+
+# REASON ヘッダーパターン (v3.3: 経緯・背景の記録)
+# 形式: # REASON: 経緯の説明 (PROOF.md 内) or REASON: 経緯の説明 (markdown)
+REASON_PATTERN = re.compile(r"(?:#\s*)?REASON:\s*(.+)")
 
 # v2.6: 弱い Purpose パターン (WHAT であり WHY ではない)
 WEAK_PURPOSE_PATTERNS = [

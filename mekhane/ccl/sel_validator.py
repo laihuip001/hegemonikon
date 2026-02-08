@@ -24,6 +24,7 @@ import re
 
 
 @dataclass
+# PURPOSE: SEL 要件
 class SELRequirement:
     """SEL 要件"""
 
@@ -32,6 +33,7 @@ class SELRequirement:
 
 
 @dataclass
+# PURPOSE: SEL 検証結果
 class SELValidationResult:
     """SEL 検証結果"""
 
@@ -44,20 +46,24 @@ class SELValidationResult:
     details: str = ""
 
     @property
+    # PURPOSE: 関数: summary
     def summary(self) -> str:
         status = "✅ 遵守" if self.is_compliant else "⚠️ 非遵守"
         return f"{status} {self.workflow}{self.operator}: {self.score:.0%} ({len(self.met_requirements)}/{len(self.met_requirements) + len(self.missing_requirements)})"
 
+# PURPOSE: SEL 遵守検証器
 
 class SELValidator:
     """SEL 遵守検証器"""
 
+    # PURPOSE: 内部処理: init__
     def __init__(self, workflows_dir: Optional[Path] = None):
         self.workflows_dir = workflows_dir or Path(
             "/home/makaron8426/oikos/.agent/workflows"
         )
         self._cache: Dict[str, Dict] = {}
 
+    # PURPOSE: ワークフローの sel_enforcement をロード
     def load_sel_enforcement(
         self, workflow: str
     ) -> Optional[Dict[str, SELRequirement]]:
@@ -99,6 +105,7 @@ class SELValidator:
         self._cache[workflow] = result
         return result
 
+    # PURPOSE: 要件が出力に満たされているか確認
     def check_requirement(self, requirement: str, output: str) -> bool:
         """要件が出力に満たされているか確認"""
         # 日本語の要件を正規化してマッチング
@@ -134,6 +141,7 @@ class SELValidator:
 
         return False
 
+    # PURPOSE: ワークフロー出力の SEL 遵守を検証
     def validate(
         self, workflow: str, operator: str, output: str
     ) -> SELValidationResult:
@@ -182,6 +190,7 @@ class SELValidator:
             details=requirement.description,
         )
 
+    # PURPOSE: 複数出力を一括検証
     def validate_batch(
         self, outputs: Dict[str, Dict[str, str]]
     ) -> List[SELValidationResult]:
@@ -196,6 +205,7 @@ class SELValidator:
                 results.append(self.validate(workflow, operator, output))
         return results
 
+    # PURPOSE: 検証レポートを生成
     def generate_report(self, results: List[SELValidationResult]) -> str:
         """検証レポートを生成"""
         total = len(results)

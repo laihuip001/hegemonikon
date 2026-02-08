@@ -31,6 +31,7 @@ STAGING_DIR = Path(__file__).parent / "staging"
 LIBRARY_DIR = Path(__file__).parent.parent / "library"
 
 
+# PURPOSE: Generate a new prompt-lang file and save to staging.
 def generate_prompt(
     slug: str,
     role: str,
@@ -108,6 +109,7 @@ def generate_prompt(
     return filepath, prompt
 
 
+# PURPOSE: Load and expand a prompt file.
 def load_prompt(filepath: str) -> dict:
     """
     Load and expand a prompt file.
@@ -119,6 +121,7 @@ def load_prompt(filepath: str) -> dict:
     return {"parsed": prompt.to_dict(), "expanded": prompt.expand(), "valid": True}
 
 
+# PURPOSE: List all prompts in staging and library.
 def list_prompts() -> list[dict]:
     """
     List all prompts in staging and library.
@@ -142,10 +145,12 @@ def list_prompts() -> list[dict]:
     return prompts
 
 
+# PURPOSE: Interface for Hegemonikon Skills (M-Series).
 class SkillAdapter:
     """Interface for Hegemonikon Skills (M-Series)."""
 
     @staticmethod
+    # PURPOSE: Find best matching prompts for a user query.
     def find_prompt(query: str, threshold: float = 0.5) -> list[dict]:
         """Find best matching prompts for a user query."""
         query = query.lower()
@@ -177,10 +182,12 @@ class SkillAdapter:
         return matched
 
     @staticmethod
+    # PURPOSE: Create a new draft prompt from skill output.
     def create_draft(slug: str, role: str, goal: str, **kwargs) -> str:
         """Create a new draft prompt from skill output."""
         filepath, _ = generate_prompt(slug, role, goal, **kwargs)
         return str(filepath)
+# PURPOSE: Generate auto-fire header for AI output.
 
 
 def auto_fire_header(trigger: str, filename: str, purpose: str) -> str:
@@ -191,6 +198,7 @@ def auto_fire_header(trigger: str, filename: str, purpose: str) -> str:
   Trigger: {trigger}
   File: {filename}
   Purpose: {purpose}"""
+# PURPOSE: 関数: main
 
 
 def main():

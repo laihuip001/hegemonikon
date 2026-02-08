@@ -31,12 +31,13 @@ from mekhane.ergasterion.digestor.pipeline import DigestorPipeline
 # 設定
 SCHEDULE_TIME = "06:00"  # 毎日実行時刻
 MAX_PAPERS = 30  # 取得論文数
-DRY_RUN = True  # Dry run モード
+DRY_RUN = False  # Live mode — 実際に論文を取得
 LOG_DIR = Path.home() / ".hegemonikon" / "digestor"
 PID_FILE = LOG_DIR / "scheduler.pid"
 LOG_FILE = LOG_DIR / "scheduler.log"
 
 
+# PURPOSE: ログ出力
 def log(msg: str):
     """ログ出力"""
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -49,6 +50,7 @@ def log(msg: str):
         f.write(line + "\n")
 
 
+# PURPOSE: 消化パイプライン実行
 def run_digestor():
     """消化パイプライン実行"""
     log("Starting scheduled digestor run...")
@@ -69,6 +71,7 @@ def run_digestor():
         log(f"Digestor error: {e}")
 
 
+# PURPOSE: PID ファイル保存
 def save_pid():
     """PID ファイル保存"""
     LOG_DIR.mkdir(parents=True, exist_ok=True)
@@ -77,6 +80,7 @@ def save_pid():
     log(f"PID saved: {PID_FILE}")
 
 
+# PURPOSE: クリーンアップ
 def cleanup(signum=None, frame=None):
     """クリーンアップ"""
     log("Scheduler stopping...")
@@ -85,6 +89,7 @@ def cleanup(signum=None, frame=None):
     sys.exit(0)
 
 
+# PURPOSE: メインループ
 def main():
     """メインループ"""
     log("=" * 50)

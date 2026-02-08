@@ -47,6 +47,7 @@ from .state_spaces import (
 from .config import get_default_params
 
 
+# PURPOSE: Active Inference agent for Hegemonikón cognitive processes.
 class HegemonikónFEPAgent:
     """Active Inference agent for Hegemonikón cognitive processes.
 
@@ -63,6 +64,7 @@ class HegemonikónFEPAgent:
         beliefs: Current belief distribution over states
     """
 
+    # PURPOSE: Initialize the FEP agent.
     def __init__(
         self,
         A: Optional[np.ndarray] = None,
@@ -117,6 +119,7 @@ class HegemonikónFEPAgent:
         # Track history for analysis
         self._history: List[Dict[str, Any]] = []
 
+    # PURPOSE: Generate Hegemonikón-optimized observation likelihood matrix.
     def _default_A(self) -> np.ndarray:
         """Generate Hegemonikón-optimized observation likelihood matrix.
 
@@ -172,6 +175,7 @@ class HegemonikónFEPAgent:
         A = A / A.sum(axis=0, keepdims=True)
         return A
 
+    # PURPOSE: Generate Hegemonikón-optimized state transition matrix.
     def _default_B(self) -> np.ndarray:
         """Generate Hegemonikón-optimized state transition matrix.
 
@@ -245,6 +249,7 @@ class HegemonikónFEPAgent:
 
         return B
 
+    # PURPOSE: Generate Hegemonikón-optimized preference vector.
     def _default_C(self) -> np.ndarray:
         """Generate Hegemonikón-optimized preference vector.
 
@@ -269,6 +274,7 @@ class HegemonikónFEPAgent:
 
         return np.array(C, dtype=np.float64)
 
+    # PURPOSE: Generate Hegemonikón-optimized initial state belief.
     def _default_D(self) -> np.ndarray:
         """Generate Hegemonikón-optimized initial state belief.
 
@@ -297,6 +303,7 @@ class HegemonikónFEPAgent:
         D = D / D.sum()
         return D
 
+    # PURPOSE: O1 Noēsis: Update beliefs based on new observation.
     def infer_states(self, observation: int) -> Dict[str, Any]:
         """O1 Noēsis: Update beliefs based on new observation.
 
@@ -360,6 +367,7 @@ class HegemonikónFEPAgent:
         self._history.append({"type": "infer_states", "result": result})
         return result
 
+    # PURPOSE: O2 Boulēsis: Select policy minimizing expected free energy.
     def infer_policies(self) -> Tuple[np.ndarray, np.ndarray]:
         """O2 Boulēsis: Select policy minimizing expected free energy.
 
@@ -383,6 +391,7 @@ class HegemonikónFEPAgent:
 
         return q_pi, neg_efe
 
+    # PURPOSE: Sample action from policy distribution.
     def sample_action(self) -> int:
         """Sample action from policy distribution.
 
@@ -398,6 +407,7 @@ class HegemonikónFEPAgent:
         self._history.append({"type": "action", "action": action})
         return action
 
+    # PURPOSE: Complete inference-action cycle.
     def step(self, observation: int) -> Dict[str, Any]:
         """Complete inference-action cycle.
 
@@ -443,10 +453,12 @@ class HegemonikónFEPAgent:
             "action_name": action_name,
         }
 
+    # PURPOSE: Return inference history for analysis.
     def get_history(self) -> List[Dict[str, Any]]:
         """Return inference history for analysis."""
         return self._history
 
+    # PURPOSE: Reset agent state to initial beliefs.
     def reset(self):
         """Reset agent state to initial beliefs."""
         self.beliefs = self._default_D()
@@ -456,6 +468,7 @@ class HegemonikónFEPAgent:
     # Persistence Methods (arXiv:2412.10425 pattern)
     # =========================================================================
 
+    # PURPOSE: Save learned A matrix to file.
     def save_learned_A(self, path: Optional[str] = None) -> str:
         """Save learned A matrix to file.
 
@@ -483,6 +496,7 @@ class HegemonikónFEPAgent:
 
         return str(saved_path)
 
+    # PURPOSE: Load A matrix from file and update agent.
     def load_learned_A(self, path: Optional[str] = None) -> bool:
         """Load A matrix from file and update agent.
 
@@ -521,6 +535,7 @@ class HegemonikónFEPAgent:
     # Dirichlet Learning (arXiv:2412.10425 pattern)
     # =========================================================================
 
+    # PURPOSE: Update A matrix using Dirichlet concentration update.
     def update_A_dirichlet(
         self,
         observation: int,

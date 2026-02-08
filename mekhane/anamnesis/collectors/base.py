@@ -21,15 +21,18 @@ import time
 from mekhane.anamnesis.models.paper import Paper
 
 
+# PURPOSE: 論文コレクター基底クラス
 class BaseCollector(ABC):
     """論文コレクター基底クラス"""
 
     name: str = "base"
     rate_limit: float = 1.0  # requests per second
 
+    # PURPOSE: 内部処理: init__
     def __init__(self):
         self._last_request_time: float = 0
 
+    # PURPOSE: レート制限準拠のための待機
     def _rate_limit_wait(self):
         """レート制限準拠のための待機"""
         if self.rate_limit > 0:
@@ -40,6 +43,7 @@ class BaseCollector(ABC):
         self._last_request_time = time.time()
 
     @abstractmethod
+    # PURPOSE: クエリで論文検索
     def search(
         self,
         query: str,
@@ -60,6 +64,7 @@ class BaseCollector(ABC):
         pass
 
     @abstractmethod
+    # PURPOSE: IDで論文取得
     def fetch_by_id(self, paper_id: str) -> Optional[Paper]:
         """
         IDで論文取得
@@ -72,6 +77,7 @@ class BaseCollector(ABC):
         """
         pass
 
+    # PURPOSE: 論文収集（レート制限付き）
     def collect(
         self,
         query: str,

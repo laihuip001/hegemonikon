@@ -69,9 +69,11 @@ RE_MULTI_UNDERSCORE = re.compile(r"_+")
 # ============================================================================
 
 
+# PURPOSE: 簡潔版: Antigravity IDE のチャット履歴をエクスポート
 class AntigravityChatExporter:
     """簡潔版: Antigravity IDE のチャット履歴をエクスポート"""
 
+    # PURPOSE: 内部処理: init__
     def __init__(self, output_dir: Path = DEFAULT_OUTPUT_DIR, limit: int = None):
         self.output_dir = output_dir
         self.output_dir.mkdir(parents=True, exist_ok=True)
@@ -87,6 +89,7 @@ class AntigravityChatExporter:
         if limit:
             print(f"[DEBUG] Limit: {limit} conversations")
 
+    # PURPOSE: CDP 経由で Antigravity のブラウザに接続
     async def connect(self) -> bool:
         """CDP 経由で Antigravity のブラウザに接続"""
         try:
@@ -143,6 +146,7 @@ class AntigravityChatExporter:
             print("    → Antigravity IDE が起動していることを確認してください")
             return False
 
+    # PURPOSE: 会話リストを抽出
     async def extract_conversation_list(self) -> List[Dict]:
         """会話リストを抽出"""
         conversations = []
@@ -186,6 +190,7 @@ class AntigravityChatExporter:
             print(f"[!] Error finding conversations: {e}")
             return []
 
+    # PURPOSE: スクロールしながらメッセージを収集する
     async def scroll_and_collect_messages(self) -> List[Dict]:
         """スクロールしながらメッセージを収集する
 
@@ -334,6 +339,7 @@ class AntigravityChatExporter:
             traceback.print_exc()
             return all_messages
 
+    # PURPOSE: 収集したメッセージをロール判定してフォーマット
     def _process_raw_messages(self, raw_messages: List[Dict]) -> List[Dict]:
         """収集したメッセージをロール判定してフォーマット"""
         messages = []
@@ -408,6 +414,7 @@ class AntigravityChatExporter:
 
         return messages
 
+    # PURPOSE: 現在表示されている会話のメッセージを抽出
     async def extract_messages(self) -> List[Dict]:
         """現在表示されている会話のメッセージを抽出
 
@@ -607,6 +614,7 @@ class AntigravityChatExporter:
             print(f"    [!] Error extracting messages: {e}")
             return []
 
+    # PURPOSE: 全会話をエクスポート
     async def export_all(self):
         """全会話をエクスポート"""
         if not await self.connect():
@@ -719,6 +727,7 @@ class AntigravityChatExporter:
         finally:
             await self.close()
 
+    # PURPOSE: Markdown 形式で保存
     def save_markdown(self, filename: Optional[str] = None):
         """Markdown 形式で保存"""
         if not filename:
@@ -756,6 +765,7 @@ class AntigravityChatExporter:
         print(f"[✓] Saved: {filepath}")
         return filepath
 
+    # PURPOSE: JSON 形式で保存
     def save_json(self, filename: Optional[str] = None):
         """JSON 形式で保存"""
         if not filename:
@@ -771,6 +781,7 @@ class AntigravityChatExporter:
         print(f"[✓] Saved: {filepath}")
         return filepath
 
+    # PURPOSE: 1つの会話を保存
     def save_single_chat(self, chat: Dict):
         """1つの会話を保存"""
         # ファイル名をサニタイズ（ASCII のみ許可）
@@ -816,12 +827,14 @@ class AntigravityChatExporter:
 
             traceback.print_exc()
 
+    # PURPOSE: （非推奨：逐次保存を使用）各会話を個別ファイルとして保存
     def save_individual(self):
         """（非推奨：逐次保存を使用）各会話を個別ファイルとして保存"""
         print("[*] Re-saving all chats...")
         for chat in self.chats:
             self.save_single_chat(chat)
 
+    # PURPOSE: リソースを解放
     async def close(self):
         """リソースを解放"""
         if self.browser:
@@ -829,6 +842,7 @@ class AntigravityChatExporter:
         if hasattr(self, "playwright"):
             await self.playwright.stop()
 
+    # PURPOSE: 現在表示されている会話のみをエクスポート（手動モード）
     async def export_single(self, title: str = "current_chat"):
         """現在表示されている会話のみをエクスポート（手動モード）"""
         if not await self.connect():
@@ -865,6 +879,7 @@ class AntigravityChatExporter:
         finally:
             await self.close()
 
+    # PURPOSE: 待機モード: コンテンツ変化を検出して自動エクスポート
     async def export_watch(self):
         """待機モード: コンテンツ変化を検出して自動エクスポート"""
         if not await self.connect():
@@ -931,6 +946,7 @@ class AntigravityChatExporter:
                     break
                 except Exception as e:
                     print(f"[!] Error: {e}")
+# PURPOSE: 関数: main
                     await asyncio.sleep(2.0)
 
         finally:

@@ -18,6 +18,7 @@ import warnings
 from pathlib import Path
 
 
+# PURPOSE: 関数: main
 def main():
     # 非推奨警告
     warnings.warn(

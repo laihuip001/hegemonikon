@@ -21,6 +21,7 @@ BRAIN_DIR = OIKOS_ROOT / ".gemini/antigravity/brain"
 MNEME_DIR = OIKOS_ROOT / "mneme/.hegemonikon/sessions"
 
 
+# PURPOSE: Walkthrough を mneme にエクスポート
 def export_walkthrough(conversation_id: str | None = None) -> Path | None:
     """Walkthrough を mneme にエクスポート
 
@@ -72,6 +73,7 @@ def export_walkthrough(conversation_id: str | None = None) -> Path | None:
     return output_path
 
 
+# PURPOSE: 関数: main
 def main():
     conv_id = sys.argv[1] if len(sys.argv) > 1 else None
     result = export_walkthrough(conv_id)

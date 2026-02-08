@@ -26,6 +26,7 @@ TRACES_BASE = Path("/home/makaron8426/oikos/mneme/.hegemonikon/ccl_traces")
 
 
 @dataclass
+# PURPOSE: A single step in CCL execution.
 class Step:
     """A single step in CCL execution."""
 
@@ -36,6 +37,7 @@ class Step:
 
 
 @dataclass
+# PURPOSE: A CCL execution session.
 class Session:
     """A CCL execution session."""
 
@@ -47,6 +49,7 @@ class Session:
     steps: List[dict]
 
 
+# PURPOSE: Session-isolated CCL tracer.
 class CCLTracer:
     """
     Session-isolated CCL tracer.
@@ -54,6 +57,7 @@ class CCLTracer:
     Creates a directory for each session under ccl_traces/{session_id}/.
     """
 
+    # PURPOSE: Initialize the tracer.
     def __init__(self, base_path: Optional[Path] = None):
         """
         Initialize the tracer.
@@ -65,6 +69,7 @@ class CCLTracer:
         self.current_session: Optional[Session] = None
         self.session_dir: Optional[Path] = None
 
+    # PURPOSE: Start a new tracing session.
     def start(self, expression: str) -> str:
         """
         Start a new tracing session.
@@ -98,6 +103,7 @@ class CCLTracer:
         print(f"CCL_TRACE: Started session {session_id} for: {expression}")
         return session_id
 
+    # PURPOSE: Log a step in the current session.
     def step(self, op: str, status: str = "running", note: str = ""):
         """
         Log a step in the current session.
@@ -124,6 +130,7 @@ class CCLTracer:
 
         print(f"CCL_TRACE: {op} [{status}] {note}")
 
+    # PURPOSE: End the current session.
     def end(self, status: str = "completed"):
         """
         End the current session.
@@ -151,6 +158,7 @@ class CCLTracer:
         self.current_session = None
         self.session_dir = None
 
+    # PURPOSE: Load an existing session for continued tracing.
     def load_session(self, session_id: str) -> bool:
         """
         Load an existing session for continued tracing.
@@ -183,6 +191,7 @@ class CCLTracer:
             return False
 
     @classmethod
+    # PURPOSE: Load the most recent session.
     def load_latest(cls, base_path: Optional[Path] = None) -> Optional["CCLTracer"]:
         """
         Load the most recent session.
@@ -202,6 +211,7 @@ class CCLTracer:
             return tracer
         return None
 
+    # PURPOSE: Save current session state to JSON.
     def _save_state(self):
         """Save current session state to JSON."""
         if not self.session_dir or not self.current_session:
@@ -210,6 +220,7 @@ class CCLTracer:
         state_file = self.session_dir / "state.json"
         state_file.write_text(json.dumps(asdict(self.current_session), indent=2))
 
+    # PURPOSE: Append to trace log.
     def _log(self, message: str):
         """Append to trace log."""
         if not self.session_dir:
@@ -220,6 +231,7 @@ class CCLTracer:
         with open(log_file, "a") as f:
             f.write(f"[{timestamp}] {message}\n")
 
+    # PURPOSE: Generate summary.md for the session.
     def _generate_summary(self):
         """Generate summary.md for the session."""
         if not self.session_dir or not self.current_session:
@@ -265,6 +277,7 @@ class CCLTracer:
         summary_file = self.session_dir / "summary.md"
         summary_file.write_text(summary)
 
+    # PURPOSE: Calculate session duration.
     def _calculate_duration(self) -> str:
         """Calculate session duration."""
         if not self.current_session:

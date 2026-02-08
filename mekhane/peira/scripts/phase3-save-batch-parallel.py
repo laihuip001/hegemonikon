@@ -22,6 +22,7 @@ import re
 import sys
 
 
+# PURPOSE: 取得: get_batch_id
 def get_batch_id():
     if len(sys.argv) < 2:
         print("Usage: python phase3-save-batch-parallel.py <batch_id>")
@@ -37,6 +38,7 @@ MANIFEST_FILE = os.path.join(ROOT_DIR, "_index", f"manifest_{BATCH_ID}.jsonl")
 SKIP_LOG_FILE = os.path.join(ROOT_DIR, "_index", f"skipped_{BATCH_ID}.txt")
 
 
+# PURPOSE: パース/抽出: parse_date
 def parse_date(date_str):
     if not date_str:
         return datetime.date.today(), "0000", "00"
@@ -47,6 +49,7 @@ def parse_date(date_str):
         return datetime.date.today(), "0000", "00"
 
 
+# PURPOSE: 設定/保存: save_article
 def save_article(article):
     url = article["url"]
     post_id = url.split("/")[-1]
@@ -100,6 +103,7 @@ is_premium: unknown
     return True
 
 
+# PURPOSE: 関数: main
 def main():
     if not os.path.exists(TEMP_JSON_FILE):
         print(f"Error: {TEMP_JSON_FILE} not found.")

@@ -65,6 +65,7 @@ VALID_WORKFLOWS = {
 
 
 @dataclass
+# PURPOSE: Result of CCL validation.
 class ValidationResult:
     """Result of CCL validation."""
 
@@ -72,9 +73,11 @@ class ValidationResult:
     errors: List[str]
     warnings: List[str]
 
+    # PURPOSE: 内部処理: bool__
     def __bool__(self) -> bool:
         return self.valid
 
+# PURPOSE: Validate CCL v2.0 expressions.
 
 class CCLSyntaxValidator:
     """
@@ -91,6 +94,7 @@ class CCLSyntaxValidator:
     UNARY_OPS = set("+-^/")
     BINARY_OPS = set("_*~")
 
+    # PURPOSE: Validate a CCL expression.
     def validate(self, ccl: str) -> ValidationResult:
         """
         Validate a CCL expression.

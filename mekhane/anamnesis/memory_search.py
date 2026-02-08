@@ -33,6 +33,7 @@ PEIRA_SCRIPTS = Path(r"M:\Hegemonikon\mekhane\peira\scripts")
 ANAMNESIS_DIR = Path(r"M:\Hegemonikon\mekhane\anamnesis")
 
 
+# PURPOSE: ベクトル検索（chat-history-kb.py）
 def search_vector(query: str, limit: int = 3) -> str:
     """ベクトル検索（chat-history-kb.py）"""
     try:
@@ -48,6 +49,7 @@ def search_vector(query: str, limit: int = 3) -> str:
         return f"[ERROR] Vector search failed: {e}"
 
 
+# PURPOSE: FTS 検索（lancedb_indexer.py）
 def search_fts(query: str, limit: int = 3) -> str:
     """FTS 検索（lancedb_indexer.py）"""
     try:
@@ -63,6 +65,7 @@ def search_fts(query: str, limit: int = 3) -> str:
         return f"[ERROR] FTS search failed: {e}"
 
 
+# PURPOSE: モジュール検索（module_indexer.py）
 def search_modules(query: str, limit: int = 3) -> str:
     """モジュール検索（module_indexer.py）"""
     try:
@@ -78,6 +81,7 @@ def search_modules(query: str, limit: int = 3) -> str:
         return f"[ERROR] Module search failed: {e}"
 
 
+# PURPOSE: ハイブリッド検索（全ソースを実行）
 def hybrid_search(query: str) -> str:
     """ハイブリッド検索（全ソースを実行）"""
     output = []
@@ -104,6 +108,7 @@ def hybrid_search(query: str) -> str:
     return "\n".join(output)
 
 
+# PURPOSE: 関数: main
 def main():
     if len(sys.argv) < 2:
         print(__doc__)

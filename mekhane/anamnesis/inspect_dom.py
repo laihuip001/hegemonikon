@@ -9,6 +9,7 @@ from pathlib import Path
 OUTPUT_FILE = Path(r"M:\Hegemonikon\mekhane\anamnesis\dom_output.txt")
 
 
+# PURPOSE: 関数: inspect_dom
 async def inspect_dom():
     results = []
 

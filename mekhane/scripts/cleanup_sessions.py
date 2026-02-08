@@ -21,6 +21,7 @@ BACKUP_DIR = Path(
 )
 
 
+# PURPOSE: 関数: cleanup
 def cleanup():
     if not CONV_DIR.exists():
         print(f"Directory not found: {CONV_DIR}")

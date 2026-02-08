@@ -37,6 +37,7 @@ MODELS_DIR = Path(__file__).parent.parent / "models" / "bge-small"
 EMBEDDING_DIM = 384  # BGE-small dimension
 
 
+# PURPOSE: Check if required packages are installed.
 def check_dependencies():
     """Check if required packages are installed."""
     missing = []
@@ -64,6 +65,7 @@ def check_dependencies():
     return True
 
 
+# PURPOSE: Download ONNX embedding model.
 def setup_model():
     """Download ONNX embedding model."""
     import urllib.request
@@ -102,9 +104,11 @@ def setup_model():
     print("[OK] Model downloaded successfully!")
 
 
+# PURPOSE: ONNX-based text embedding.
 class Embedder:
     """ONNX-based text embedding."""
 
+    # PURPOSE: 内部処理: init__
     def __init__(self):
         import onnxruntime as ort
         from tokenizers import Tokenizer
@@ -125,6 +129,7 @@ class Embedder:
         self.tokenizer.enable_truncation(max_length=512)
         self.tokenizer.enable_padding(length=512)
 
+    # PURPOSE: Generate embedding for text.
     def embed(self, text: str) -> list:
         """Generate embedding for text."""
         # Tokenize
@@ -156,8 +161,10 @@ class Embedder:
 
         return normalized[0].tolist()
 
+    # PURPOSE: Embed multiple texts.
     def embed_batch(self, texts: list[str]) -> list[list]:
         """Embed multiple texts."""
+# PURPOSE: Extract frontmatter and body from markdown.
         return [self.embed(t) for t in texts]
 
 
@@ -176,6 +183,7 @@ def parse_frontmatter(content: str) -> tuple[dict, str]:
             key, value = line.split(":", 1)
             frontmatter[key.strip()] = value.strip().strip('"')
 
+# PURPOSE: Split article into semantic chunks.
     return frontmatter, parts[2].strip()
 
 
@@ -215,6 +223,7 @@ def chunk_article(article_id: str, content: str, meta: dict) -> list[dict]:
             }
         )
 
+# PURPOSE: Build LanceDB index from markdown files.
     return chunks
 
 
@@ -285,6 +294,7 @@ def build_index():
     print(f"\n[OK] Index built successfully!")
     print(f"  Location: {LANCE_DIR}")
     print(f"  Articles: {len(md_files)}")
+# PURPOSE: Semantic search.
     print(f"  Chunks: {len(all_data)}")
 
 
@@ -329,6 +339,7 @@ def search(query: str, n_results: int = 5):
         print(f"    URL: {r['url']}")
         print(f"    Snippet: {r['text'][:150]}...")
 
+# PURPOSE: Show full article content.
     print("\n" + "-" * 60)
 
 
@@ -352,6 +363,7 @@ def show_article(article_id: str):
     print(f"{'='*60}\n")
     print(body[:3000])
     if len(body) > 3000:
+# PURPOSE: Show KB statistics.
         print(f"\n... (truncated, {len(body)} chars total)")
 
 
@@ -401,6 +413,7 @@ def show_stats():
         print(f"\nModel Status: [X] Not downloaded")
         print(f"Run: python aidb-kb.py setup")
 
+# PURPOSE: 関数: main
     print("=" * 40)
 
 

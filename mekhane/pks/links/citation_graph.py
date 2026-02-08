@@ -19,6 +19,7 @@ from enum import Enum
 from typing import Optional
 
 
+# PURPOSE: 引用の種類 — Scite 準拠
 class CitationType(Enum):
     """引用の種類 — Scite 準拠"""
 
@@ -28,6 +29,7 @@ class CitationType(Enum):
 
 
 @dataclass
+# PURPOSE: 引用リレーション
 class Citation:
     """引用リレーション"""
 
@@ -39,6 +41,7 @@ class Citation:
 
 
 @dataclass
+# PURPOSE: 論文の引用統計
 class CitationStats:
     """論文の引用統計"""
 
@@ -49,15 +52,18 @@ class CitationStats:
     mentioning_count: int = 0
 
     @property
+    # PURPOSE: 関数: total
     def total(self) -> int:
         return self.supporting_count + self.contrasting_count + self.mentioning_count
 
     @property
+    # PURPOSE: 支持率
     def support_ratio(self) -> float:
         """支持率"""
         if self.total == 0:
             return 0.0
         return self.supporting_count / self.total
+# PURPOSE: 論文間の引用関係を管理
 
 
 class CitationGraph:
@@ -69,17 +75,20 @@ class CitationGraph:
     Obsidian Graph View 互換のリンク生成も可能。
     """
 
+    # PURPOSE: 内部処理: init__
     def __init__(self):
         self._citations: list[Citation] = []
         self._stats: dict[str, CitationStats] = defaultdict(
             lambda: CitationStats(primary_key="")
         )
 
+    # PURPOSE: 引用を追加
     def add_citation(self, citation: Citation) -> None:
         """引用を追加"""
         self._citations.append(citation)
         self._update_stats(citation)
 
+    # PURPOSE: LanceDB の論文メタデータから引用関係を抽出
     def add_citations_from_papers(self, papers: list[dict]) -> int:
         """LanceDB の論文メタデータから引用関係を抽出
 
@@ -119,6 +128,7 @@ class CitationGraph:
 
         return added
 
+    # PURPOSE: 引用統計を更新
     def _update_stats(self, citation: Citation) -> None:
         """引用統計を更新"""
         stats = self._stats[citation.target_key]
@@ -131,18 +141,22 @@ class CitationGraph:
         else:
             stats.mentioning_count += 1
 
+    # PURPOSE: 論文の引用統計を取得
     def get_stats(self, primary_key: str) -> Optional[CitationStats]:
         """論文の引用統計を取得"""
         return self._stats.get(primary_key)
 
+    # PURPOSE: 指定論文を引用している論文を取得
     def get_citing(self, primary_key: str) -> list[Citation]:
         """指定論文を引用している論文を取得"""
         return [c for c in self._citations if c.target_key == primary_key]
 
+    # PURPOSE: 指定論文が引用している論文を取得
     def get_cited_by(self, primary_key: str) -> list[Citation]:
         """指定論文が引用している論文を取得"""
         return [c for c in self._citations if c.source_key == primary_key]
 
+    # PURPOSE: 引用グラフを JSON 出力
     def export_json(self) -> str:
         """引用グラフを JSON 出力"""
         data = {
@@ -168,6 +182,7 @@ class CitationGraph:
         }
         return json.dumps(data, ensure_ascii=False, indent=2)
 
+    # PURPOSE: 引用グラフのサマリーを Markdown で出力
     def summary_markdown(self) -> str:
         """引用グラフのサマリーを Markdown で出力"""
         lines = [

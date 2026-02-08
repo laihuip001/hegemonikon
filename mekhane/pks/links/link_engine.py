@@ -32,6 +32,7 @@ WIKILINK_PATTERN = re.compile(r"\[\[([^\]|]+)(?:\|([^\]]+))?\]\]")
 
 
 @dataclass
+# PURPOSE: ファイル間リンク
 class Link:
     """ファイル間リンク"""
 
@@ -43,6 +44,7 @@ class Link:
 
 
 @dataclass
+# PURPOSE: リンクインデックス — 全ファイル間リレーションの索引
 class LinkIndex:
     """リンクインデックス — 全ファイル間リレーションの索引"""
 
@@ -51,6 +53,7 @@ class LinkIndex:
     orphans: list[str] = field(default_factory=list)  # どこからもリンクされていないファイル
 
     @property
+    # PURPOSE: 関数: total_files
     def total_files(self) -> int:
         all_files = set(self.forward_links.keys())
         for links in self.backlinks.values():
@@ -59,11 +62,13 @@ class LinkIndex:
         return len(all_files)
 
     @property
+    # PURPOSE: 関数: total_links
     def total_links(self) -> int:
         return sum(len(links) for links in self.forward_links.values())
 
 
 # --- Engine ---
+# PURPOSE: 構造化ディレクトリ内のファイル間リレーション管理
 
 
 class LinkEngine:
@@ -79,11 +84,13 @@ class LinkEngine:
         - Graph Export: リレーショングラフの JSON/Mermaid 出力
     """
 
+    # PURPOSE: 内部処理: init__
     def __init__(self, root_dir: Path, extensions: tuple[str, ...] = (".md",)):
         self.root_dir = root_dir.resolve()
         self.extensions = extensions
         self._index: Optional[LinkIndex] = None
 
+    # PURPOSE: ディレクトリ全体をスキャンしてリンクインデックスを構築
     def build_index(self) -> LinkIndex:
         """ディレクトリ全体をスキャンしてリンクインデックスを構築"""
         index = LinkIndex()
@@ -134,6 +141,7 @@ class LinkEngine:
         self._index = index
         return index
 
+    # PURPOSE: ファイルから [[wikilink]] を抽出
     def _extract_links(self, file_path: Path) -> list[Link]:
         """ファイルから [[wikilink]] を抽出"""
         links = []
@@ -167,6 +175,7 @@ class LinkEngine:
 
         return links
 
+    # PURPOSE: 特定ファイルの被参照元を取得
     def get_backlinks(self, target: str) -> list[Link]:
         """特定ファイルの被参照元を取得"""
         if self._index is None:
@@ -174,6 +183,7 @@ class LinkEngine:
         assert self._index is not None
         return self._index.backlinks.get(target, [])
 
+    # PURPOSE: 特定ファイルの参照先を取得
     def get_forward_links(self, source: str) -> list[Link]:
         """特定ファイルの参照先を取得"""
         if self._index is None:
@@ -181,6 +191,7 @@ class LinkEngine:
         assert self._index is not None
         return self._index.forward_links.get(source, [])
 
+    # PURPOSE: どこからもリンクされていないファイルを取得
     def get_orphans(self) -> list[str]:
         """どこからもリンクされていないファイルを取得"""
         if self._index is None:
@@ -190,6 +201,7 @@ class LinkEngine:
 
     # --- Export ---
 
+    # PURPOSE: リレーショングラフを JSON 出力
     def export_graph_json(self) -> str:
         """リレーショングラフを JSON 出力"""
         if self._index is None:
@@ -223,6 +235,7 @@ class LinkEngine:
 
         return json.dumps(graph, ensure_ascii=False, indent=2)
 
+    # PURPOSE: リレーショングラフを Mermaid 形式で出力
     def export_graph_mermaid(self, max_nodes: int = 50) -> str:
         """リレーショングラフを Mermaid 形式で出力"""
         if self._index is None:
@@ -256,10 +269,12 @@ class LinkEngine:
         return "\n".join(lines)
 
     @staticmethod
+    # PURPOSE: Mermaid ノード ID をサニタイズ
     def _sanitize_mermaid_id(name: str) -> str:
         """Mermaid ノード ID をサニタイズ"""
         return re.sub(r"[^a-zA-Z0-9_]", "_", name)
 
+    # PURPOSE: インデックスのサマリーを Markdown で出力
     def summary_markdown(self) -> str:
         """インデックスのサマリーを Markdown で出力"""
         if self._index is None:

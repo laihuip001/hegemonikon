@@ -156,11 +156,11 @@ class TestContextTracker:
         assert "test query" in tracker.context.recent_queries
         assert "another query" in tracker.context.recent_queries
 
-    def test_add_multiple_queries(self):
+    def test_add_query_deduplicates(self):
         tracker = ContextTracker()
-        for i in range(5):
-            tracker.add_query(f"query_{i}")
-        assert len(tracker.context.recent_queries) >= 5
+        tracker.add_query("test query")
+        tracker.add_query("test query")
+        assert tracker.context.recent_queries.count("test query") == 1
 
     def test_set_workflows(self):
         tracker = ContextTracker()

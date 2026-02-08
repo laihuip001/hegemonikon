@@ -4,9 +4,17 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "tauri": "tauri"
+    "tauri": "tauri",
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
   },
   "devDependencies": {
-    "@tauri-apps/cli": "^2"
+    "@tauri-apps/cli": "^2",
+    "typescript": "^5.0.2",
+    "vite": "^5.0.0"
+  },
+  "dependencies": {
+    "@tauri-apps/plugin-http": "^2.5.7"
   }
 }

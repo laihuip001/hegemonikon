@@ -168,7 +168,7 @@ async def call_tool(name: str, arguments: dict):
 
             # Search Sophia
             if source in ("sophia", "both") and SOPHIA_INDEX.exists():
-                adapter = EmbeddingAdapter(model_name="all-MiniLM-L6-v2")
+                adapter = EmbeddingAdapter()
                 adapter.load(str(SOPHIA_INDEX))
                 query_vec = adapter.encode([query])[0]
                 sophia_results = adapter.search(query_vec, k=limit)
@@ -187,7 +187,7 @@ async def call_tool(name: str, arguments: dict):
 
             # Search Kairos
             if source in ("kairos", "both") and KAIROS_INDEX.exists():
-                adapter = EmbeddingAdapter(model_name="all-MiniLM-L6-v2")
+                adapter = EmbeddingAdapter()
                 adapter.load(str(KAIROS_INDEX))
                 query_vec = adapter.encode([query])[0]
                 kairos_results = adapter.search(query_vec, k=limit)
@@ -257,14 +257,14 @@ async def call_tool(name: str, arguments: dict):
             stats = {}
 
             if SOPHIA_INDEX.exists():
-                adapter = EmbeddingAdapter(model_name="all-MiniLM-L6-v2")
+                adapter = EmbeddingAdapter()
                 adapter.load(str(SOPHIA_INDEX))
                 stats["sophia_count"] = adapter.count()
             else:
                 stats["sophia_count"] = 0
 
             if KAIROS_INDEX.exists():
-                adapter = EmbeddingAdapter(model_name="all-MiniLM-L6-v2")
+                adapter = EmbeddingAdapter()
                 adapter.load(str(KAIROS_INDEX))
                 stats["kairos_count"] = adapter.count()
             else:

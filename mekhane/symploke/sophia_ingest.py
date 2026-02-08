@@ -101,7 +101,7 @@ def ingest_to_sophia(docs: list[Document], save_path: str = None) -> int:
     from mekhane.symploke.adapters.embedding_adapter import EmbeddingAdapter
     from mekhane.symploke.indices.sophia import SophiaIndex
 
-    adapter = EmbeddingAdapter(model_name="all-MiniLM-L6-v2")
+    adapter = EmbeddingAdapter()
     index = SophiaIndex(adapter, "sophia", dimension=384)  # MiniLM = 384 dims
     index.initialize()
 
@@ -119,7 +119,7 @@ def load_sophia_index(load_path: str):
     """Load a previously saved Sophia index."""
     from mekhane.symploke.adapters.embedding_adapter import EmbeddingAdapter
 
-    adapter = EmbeddingAdapter(model_name="all-MiniLM-L6-v2")
+    adapter = EmbeddingAdapter()
     adapter.load(load_path)
     print(f"📂 Loaded index from: {load_path} ({adapter.count()} vectors)")
     return adapter

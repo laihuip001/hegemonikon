@@ -302,3 +302,195 @@ def _simulate_cone(series: str, user_input: str) -> Dict[str, Any]:
         "method": method,
         "outputs": outputs,
     }
+
+
+# =============================================================================
+# V2 Loop: Unified 48-state judgment
+# =============================================================================
+
+# Series → topic observation index mapping
+_SERIES_TO_TOPIC_OBS = {"O": 8, "S": 9, "H": 10, "P": 11, "K": 12, "A": 13}
+
+
+@dataclass
+class CycleResultV2:
+    """1サイクルの E2E v2 結果 — 統合判断"""
+    cycle: int
+    # Encoding
+    observation: tuple[int, int, int] = (0, 0, 0)
+    obs_decoded: Dict[str, str] = field(default_factory=dict)
+    # Attractor recommendation (input to agent)
+    attractor_series: Optional[str] = None
+    attractor_wf: Optional[str] = None
+    # Unified FEP v2 judgment
+    action_name: str = "observe"
+    selected_series: Optional[str] = None
+    fep_entropy: float = 0.0
+    fep_confidence: float = 0.0
+    map_state: Dict[str, str] = field(default_factory=dict)
+    fep_raw: Dict[str, Any] = field(default_factory=dict)
+    # Cone
+    cone_apex: Optional[str] = None
+    cone_dispersion: Optional[float] = None
+    cone_method: Optional[str] = None
+    # Learning
+    a_matrix_updated: bool = False
+
+
+@dataclass
+class E2EResultV2:
+    """E2E v2 ループの全サイクル結果"""
+    input_text: str
+    cycles: List[CycleResultV2]
+    learning_proof: Optional[str] = None
+
+    @property
+    def summary(self) -> str:
+        lines = [
+            f"═══ FEP E2E Loop v2 (48-state): {len(self.cycles)} cycle(s) ═══",
+            f"Input: {self.input_text[:60]}",
+        ]
+        for c in self.cycles:
+            if c.action_name == "observe":
+                action = "🔴 observe"
+            else:
+                action = f"🟢 {c.action_name}"
+            series = c.selected_series or "-"
+            lines.append(
+                f"  Cycle {c.cycle}: {action} [Series={series}] "
+                f"(entropy={c.fep_entropy:.2f}, conf={c.fep_confidence:.0%})"
+            )
+        if self.learning_proof:
+            lines.append(f"📈 Learning: {self.learning_proof}")
+        return "\n".join(lines)
+
+
+def run_loop_v2(
+    user_input: str,
+    *,
+    cycles: int = 2,
+    a_matrix_path: Optional[str] = None,
+    force_cpu: bool = False,
+) -> E2EResultV2:
+    """FEP E2E ループ v2 — 統合 48-state モデル。
+
+    v1 との違い:
+    - FEP Agent が Series を内部で選択する (並列→統合)
+    - Attractor は observation provider (判断者→情報提供者)
+    - 行動 = observe / act_O / act_S / act_H / act_P / act_K / act_A
+
+    Args:
+        user_input: 自然言語入力
+        cycles: 実行サイクル数 (default: 2)
+        a_matrix_path: A行列の保存先 (None=一時ファイル)
+        force_cpu: Attractor の CPU 強制
+    """
+    from mekhane.fep.encoding import encode_input, decode_observation
+    from mekhane.fep.fep_agent_v2 import HegemonikónFEPAgentV2
+    from mekhane.fep.state_spaces_v2 import SERIES_STATES
+
+    # Attractor (optional — provides topic observation)
+    dispatcher = None
+    try:
+        from mekhane.fep.attractor_dispatcher import AttractorDispatcher
+        dispatcher = AttractorDispatcher(force_cpu=force_cpu)
+    except (FileNotFoundError, OSError, ImportError):
+        pass
+
+    # A行列パス
+    if a_matrix_path is None:
+        _tmp = tempfile.NamedTemporaryFile(suffix="_e2e_v2_A.npy", delete=False)
+        a_matrix_path = _tmp.name
+        _tmp.close()
+        Path(a_matrix_path).unlink(missing_ok=True)
+
+    # Agent (persistent across cycles)
+    agent = HegemonikónFEPAgentV2()
+    agent.load_learned_A(a_matrix_path)
+
+    results: List[CycleResultV2] = []
+
+    for i in range(cycles):
+        cycle = CycleResultV2(cycle=i)
+
+        # ── Step 1: Encode text → (context, urgency, confidence) ──
+        obs = encode_input(user_input)
+        cycle.observation = obs
+        cycle.obs_decoded = decode_observation(obs)
+
+        # ── Step 2: Get Attractor recommendation → topic observation ──
+        topic_obs_idx = 8  # default: O (neutral fallback)
+        if dispatcher is not None:
+            try:
+                plan = dispatcher.dispatch(user_input)
+                if plan is not None:
+                    cycle.attractor_series = plan.primary.series
+                    cycle.attractor_wf = plan.primary.workflow
+                    topic_obs_idx = _SERIES_TO_TOPIC_OBS.get(
+                        plan.primary.series, 8
+                    )
+            except (FileNotFoundError, OSError):
+                pass
+
+        # ── Step 3: Build flat observation for v2 agent ──
+        # Layout: context(2) + urgency(3) + confidence(3) + topic(6) = 14
+        # We pick the dominant observation index
+        # Use topic as the primary observation for Series selection
+        flat_obs = topic_obs_idx
+
+        # ── Step 4: Unified judgment (infer + act) ──
+        result = agent.step(observation=flat_obs)
+
+        cycle.action_name = result["action_name"]
+        cycle.selected_series = result.get("selected_series")
+        cycle.fep_entropy = result["entropy"]
+        cycle.fep_confidence = 1.0 - min(result["entropy"] / 4.0, 1.0)
+        cycle.map_state = result["map_state_names"]
+        cycle.fep_raw = result
+
+        # ── Step 5: Learn ──
+        agent.update_A_dirichlet(observation=flat_obs)
+        cycle.a_matrix_updated = True
+
+        # ── Step 6: Cone (if acting) ──
+        if cycle.selected_series is not None:
+            simulated_cone = _simulate_cone(cycle.selected_series, user_input)
+            cycle.cone_apex = simulated_cone.get("apex")
+            cycle.cone_dispersion = simulated_cone.get("dispersion")
+            cycle.cone_method = simulated_cone.get("method")
+
+        results.append(cycle)
+
+    # Save A matrix
+    import os
+    os.makedirs(os.path.dirname(a_matrix_path), exist_ok=True)
+    agent.save_learned_A(a_matrix_path)
+
+    # Learning proof
+    learning_proof = None
+    if len(results) >= 2:
+        e0 = results[0].fep_entropy
+        e1 = results[-1].fep_entropy
+        if e0 > 0:
+            change = ((e1 - e0) / e0) * 100
+            if e1 < e0:
+                learning_proof = (
+                    f"エントロピー減少: {e0:.3f} → {e1:.3f} "
+                    f"({change:+.1f}%) — モデルの確信度が向上"
+                )
+            elif e1 == e0:
+                learning_proof = (
+                    f"エントロピー安定: {e0:.3f} → {e1:.3f}"
+                )
+            else:
+                learning_proof = (
+                    f"エントロピー増加: {e0:.3f} → {e1:.3f} "
+                    f"({change:+.1f}%) — 探索フェーズ"
+                )
+
+    return E2EResultV2(
+        input_text=user_input,
+        cycles=results,
+        learning_proof=learning_proof,
+    )
+

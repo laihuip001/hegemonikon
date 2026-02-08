@@ -1083,3 +1083,171 @@ class TestVerifyNaturality:
         #  but target_functor "bye∘boot" will)
         assert len(result.checks) > 0
         assert result.transformation_name == "η"
+
+
+# =============================================================================
+# CR-1: DevilAttack Tests
+# =============================================================================
+
+
+class TestDevilAttack:
+    """devil_attack() の検証"""
+
+    def _make_cone(self, series=Series.O, dispersion=0.5, confidence=50.0,
+                   outputs=None, **kwargs):
+        if outputs is None:
+            outputs = {"O1": "深い認識", "O2": "強い意志", "O3": "真の問い", "O4": "行動の力"}
+        projs = [ConeProjection(theorem_id=k, output=v, hom_label=f"{k}の射")
+                 for k, v in outputs.items()]
+        return Cone(
+            series=series,
+            projections=projs,
+            dispersion=dispersion,
+            confidence=confidence,
+            resolution_method="root",
+            **kwargs,
+        )
+
+    # PURPOSE: basic pair enumeration (C(4,2) = 6)
+    def test_basic_pair_count(self):
+        from mekhane.fep.cone_consumer import devil_attack
+        cone = self._make_cone()
+        attack = devil_attack(cone)
+        assert len(attack.contradictions) == 6  # C(4,2)
+
+    # PURPOSE: severity between 0 and 1
+    def test_severity_range(self):
+        from mekhane.fep.cone_consumer import devil_attack
+        cone = self._make_cone()
+        attack = devil_attack(cone)
+        assert 0.0 <= attack.severity <= 1.0
+
+    # PURPOSE: negation detection
+    def test_negation_detection(self):
+        from mekhane.fep.cone_consumer import devil_attack
+        cone = self._make_cone(outputs={
+            "O1": "実行する必要がある",
+            "O2": "実行しない方がよい",
+            "O3": "慎重に検討",
+            "O4": "即座に開始",
+        })
+        attack = devil_attack(cone)
+        o1_o2 = [c for c in attack.contradictions
+                 if {c.theorem_a, c.theorem_b} == {"O1", "O2"}]
+        assert len(o1_o2) == 1
+        assert "否定" in o1_o2[0].diagnosis
+
+    # PURPOSE: direction contradiction detection (GO vs WAIT)
+    def test_direction_contradiction(self):
+        from mekhane.fep.cone_consumer import devil_attack
+        cone = self._make_cone(outputs={
+            "O1": "開始する",
+            "O2": "中止すべき",
+            "O3": "検討中",
+            "O4": "保留",
+        })
+        attack = devil_attack(cone)
+        o1_o2 = [c for c in attack.contradictions
+                 if {c.theorem_a, c.theorem_b} == {"O1", "O2"}]
+        assert len(o1_o2) == 1
+        assert "方向性" in o1_o2[0].diagnosis
+
+    # PURPOSE: identical outputs → mild
+    def test_identical_outputs_mild(self):
+        from mekhane.fep.cone_consumer import devil_attack
+        same = "全く同じ結論"
+        cone = self._make_cone(outputs={
+            "O1": same, "O2": same, "O3": same, "O4": same
+        })
+        attack = devil_attack(cone)
+        assert attack.severity < 0.1
+        assert "軽微" in attack.attack_summary
+
+    # PURPOSE: worst_pair property
+    def test_worst_pair(self):
+        from mekhane.fep.cone_consumer import devil_attack
+        cone = self._make_cone(outputs={
+            "O1": "全く異なる提案をする",
+            "O2": "まったく別の結論に達した",
+            "O3": "全く異なる提案をする",
+            "O4": "完全に一致する見解",
+        })
+        attack = devil_attack(cone)
+        worst = attack.worst_pair
+        assert worst is not None
+
+    # PURPOSE: resolution_paths vary by series
+    def test_s_series_resolution(self):
+        from mekhane.fep.cone_consumer import devil_attack
+        cone = self._make_cone(
+            series=Series.S,
+            outputs={"S1": "尺度A", "S2": "方法B", "S3": "基準C", "S4": "実践D"},
+        )
+        attack = devil_attack(cone)
+        assert any("/dia devil" in p for p in attack.resolution_paths)
+
+    # PURPOSE: counterarguments with real contradiction
+    def test_counterarguments_present(self):
+        from mekhane.fep.cone_consumer import devil_attack
+        cone = self._make_cone(outputs={
+            "O1": "即座に実行開始すべき",
+            "O2": "絶対にしないべき、不可能",
+            "O3": "慎重に検討する必要がある",
+            "O4": "問題ない、進めてよい",
+        })
+        attack = devil_attack(cone)
+        assert len(attack.counterarguments) > 0
+
+
+class TestAdviseDevilIntegration:
+    """advise() → devil_attack() パイプライン (CR-3) の検証"""
+
+    def _make_cone(self, series=Series.O, dispersion=0.5, confidence=50.0,
+                   outputs=None, **kwargs):
+        if outputs is None:
+            outputs = {"O1": "深い認識", "O2": "強い意志", "O3": "真の問い", "O4": "行動の力"}
+        projs = [ConeProjection(theorem_id=k, output=v, hom_label=f"{k}の射")
+                 for k, v in outputs.items()]
+        return Cone(
+            series=series, projections=projs, dispersion=dispersion,
+            confidence=confidence, resolution_method="root", **kwargs,
+        )
+
+    # PURPOSE: devil action → devil_detail populated (CR-3)
+    def test_devil_action_has_detail(self):
+        from mekhane.fep.cone_consumer import advise
+        cone = self._make_cone(dispersion=0.5)
+        advice = advise(cone)
+        assert advice.action == "devil"
+        assert advice.devil_detail is not None
+        assert len(advice.devil_detail.contradictions) == 6
+
+    # PURPOSE: S-series devil → devil_detail populated
+    def test_s_series_devil_has_detail(self):
+        from mekhane.fep.cone_consumer import advise
+        cone = self._make_cone(
+            series=Series.S, dispersion=0.25,
+            outputs={"S1": "尺度", "S2": "方法", "S3": "基準", "S4": "実践"},
+        )
+        advice = advise(cone)
+        assert advice.action == "devil"
+        assert advice.devil_detail is not None
+
+    # PURPOSE: proceed → no devil_detail
+    def test_proceed_no_devil_detail(self):
+        from mekhane.fep.cone_consumer import advise
+        cone = self._make_cone(dispersion=0.05, confidence=80.0, is_universal=True)
+        advice = advise(cone)
+        assert advice.action == "proceed"
+        assert advice.devil_detail is None
+
+    # PURPOSE: A-series investigate → no devil_detail
+    def test_a_series_no_devil_detail(self):
+        from mekhane.fep.cone_consumer import advise
+        cone = self._make_cone(
+            series=Series.A, dispersion=0.28, confidence=60.0,
+            outputs={"A1": "感情", "A2": "判定", "A3": "格言", "A4": "知識"},
+        )
+        advice = advise(cone)
+        assert advice.action == "investigate"
+        assert advice.devil_detail is None  # investigate, not devil

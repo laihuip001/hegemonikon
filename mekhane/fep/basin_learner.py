@@ -34,12 +34,18 @@ import yaml
 # Constants
 # =============================================================================
 
+# ⚠️ PROVISIONAL: 以下は全て仮値。実使用データ収集後に calibration すべき。
+# Calibration Plan:
+#   1. 100+ correction ログが蓄積されたら A/B テスト
+#   2. lr を 0.01-0.10 の範囲で探索
+#   3. MAX_ADJUSTMENT を precision/recall の収束速度で調整
+
 # 学習率 (conservative: 急激な変化を防ぐ)
-DEFAULT_LEARNING_RATE = 0.05
+DEFAULT_LEARNING_RATE = 0.05  # PROVISIONAL
 # bias_direction がこの回数以上 consistent なら補正を適用
-MIN_CONSISTENT_SIGNALS = 3
+MIN_CONSISTENT_SIGNALS = 3  # PROVISIONAL
 # 補正の最大変幅 (1回あたり)
-MAX_ADJUSTMENT = 0.15
+MAX_ADJUSTMENT = 0.15  # PROVISIONAL
 # 補正履歴の保存先
 DEFAULT_ADJUSTMENTS_PATH = (
     Path.home() / "oikos/mneme/.hegemonikon/basin/adjustments.yaml"

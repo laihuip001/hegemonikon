@@ -346,6 +346,17 @@ class ConeAdvice:
 # =============================================================================
 
 
+# Rule → action mapping (module-level constant for _derive_rejected)
+_RULE_ACTION_MAP = {
+    "Rule 1": "devil",
+    "Rule 2": "devil",
+    "Rule 2.5": "investigate",
+    "Rule 3": "investigate",
+    "Rule 4": "reweight",
+    "Rule 5": "proceed",
+}
+
+
 # PURPOSE: Derive rejected actions from rule evaluations
 def _derive_rejected(evaluations: List[RuleEvaluation]) -> List[RejectedAction]:
     """Derive Layer 3 (RejectedAction) from Layer 2 (RuleEvaluation).
@@ -353,16 +364,6 @@ def _derive_rejected(evaluations: List[RuleEvaluation]) -> List[RejectedAction]:
     Each non-matched rule implies a rejected action.
     The action name is inferred from the rule's intended outcome.
     """
-    # Rule → action mapping (what each rule would have produced)
-    _RULE_ACTION_MAP = {
-        "Rule 1": "devil",
-        "Rule 2": "devil",
-        "Rule 2.5": "investigate",
-        "Rule 3": "investigate",
-        "Rule 4": "reweight",
-        "Rule 5": "proceed",
-    }
-
     rejected = []
     for ev in evaluations:
         if not ev.matched:
@@ -551,10 +552,12 @@ def advise(cone: Cone) -> ConeAdvice:
     if has_pw:
         extreme_keys = [k for k, v in cone.pw.items() if abs(v) > 0.7]
     r4_match = has_pw and bool(extreme_keys)
-    r4_reason = (
-        f"resolution={cone.resolution_method}, "
-        f"extreme_pw={extreme_keys if extreme_keys else 'none'}"
-    )
+    if not has_pw:
+        r4_reason = f"resolution={cone.resolution_method} (not pw_weighted or uniform)"
+    elif not extreme_keys:
+        r4_reason = f"resolution=pw_weighted, PW present but no extreme (|v|>0.7) keys"
+    else:
+        r4_reason = f"resolution=pw_weighted, extreme_pw={extreme_keys}"
     evals.append(RuleEvaluation(
         rule_id="Rule 4: PW bias (extreme weights)",
         matched=r4_match,
@@ -679,6 +682,12 @@ def advise_with_attractor(
             ],
             urgency=0.6,
             devil_detail=base.devil_detail,
+            trace=_extend_trace_with_attractor(
+                base.trace,
+                rule_id="Attractor: Series mismatch",
+                matched=True,
+                reason=f"Attractor={attractor_series} ≠ Cone={cone.series.name}, action=proceed → investigate",
+            ),
         )
 
     # --- Oscillation modifiers ---
@@ -694,6 +703,12 @@ def advise_with_attractor(
             ],
             urgency=min(1.0, base.urgency + 0.2),
             devil_detail=base.devil_detail,
+            trace=_extend_trace_with_attractor(
+                base.trace,
+                rule_id="Attractor: NEGATIVE oscillation",
+                matched=True,
+                reason=f"oscillation=negative, conf={attractor_confidence:.2f} → urgency+0.2",
+            ),
         )
 
     if oscillation == "weak":
@@ -710,6 +725,12 @@ def advise_with_attractor(
                 ],
                 urgency=0.5,
                 devil_detail=base.devil_detail,
+                trace=_extend_trace_with_attractor(
+                    base.trace,
+                    rule_id="Attractor: WEAK oscillation",
+                    matched=True,
+                    reason=f"oscillation=weak, action=proceed → investigate",
+                ),
             )
 
     if oscillation == "positive":
@@ -725,10 +746,43 @@ def advise_with_attractor(
                 ],
                 urgency=max(0.3, base.urgency - 0.2),
                 devil_detail=base.devil_detail,
+                trace=_extend_trace_with_attractor(
+                    base.trace,
+                    rule_id="Attractor: POSITIVE oscillation",
+                    matched=True,
+                    reason=f"oscillation=positive, devil(urgency={base.urgency:.1f}<0.8) → investigate",
+                ),
             )
 
     # CLEAR or no modification needed
     return base
+
+
+# PURPOSE: Extend a DecisionTrace with an attractor-level evaluation
+def _extend_trace_with_attractor(
+    trace: Optional[DecisionTrace],
+    rule_id: str,
+    matched: bool,
+    reason: str,
+) -> Optional[DecisionTrace]:
+    """Append an attractor-level RuleEvaluation to an existing trace.
+
+    This records WHY the attractor modified (or didn't modify) the base advice.
+    """
+    if trace is None:
+        return None
+    extended_evals = list(trace.evaluations) + [
+        RuleEvaluation(
+            rule_id=rule_id,
+            matched=matched,
+            reason=reason,
+        )
+    ]
+    return DecisionTrace(
+        evaluations=extended_evals,
+        rejected=trace.rejected,
+        matched_rule=trace.matched_rule,
+    )
 
 
 # =============================================================================
@@ -743,10 +797,11 @@ def format_advice_for_llm(advice: ConeAdvice) -> str:
     Explanation Stack Layer 4 — the "narrative layer".
     Symmetric with attractor_advisor.format_for_llm().
 
-    Output format (3 sections):
-      [Cone: <action> | V=<dispersion> | <reason_summary>]
-      [Trace: Rule1✗ → Rule2✓ ...]
+    Output format (up to 4 sections):
+      [Cone: <action> → <wf> | urgency=<float>, severity=<float>]
+      [Trace: R1✗ → R2✓ ...]
       [Rejected: proceed(reason), investigate(reason)]
+      [Next: step1; step2]
 
     This text is injected into the LLM's context so it can generate
     a natural language narrative for the Creator.

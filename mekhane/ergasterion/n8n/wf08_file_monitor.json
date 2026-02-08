@@ -1,0 +1,158 @@
+{
+    "name": "WF-08: File Monitor (Sympatheia)",
+    "nodes": [
+        {
+            "parameters": {
+                "rule": {
+                    "interval": [
+                        {
+                            "field": "cronExpression",
+                            "expression": "*/10 * * * *"
+                        }
+                    ]
+                }
+            },
+            "id": "monitor-cron",
+            "name": "10分毎の走査",
+            "type": "n8n-nodes-base.scheduleTrigger",
+            "typeVersion": 1.2,
+            "position": [
+                250,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "httpMethod": "POST",
+                "path": "file-monitor",
+                "responseMode": "lastNode",
+                "options": {}
+            },
+            "id": "monitor-webhook",
+            "name": "手動トリガー",
+            "type": "n8n-nodes-base.webhook",
+            "typeVersion": 2,
+            "position": [
+                250,
+                500
+            ],
+            "webhookId": "file-monitor-wh"
+        },
+        {
+            "parameters": {
+                "jsCode": "const fs = require('fs');\nconst path = require('path');\n\n// 監視対象ファイル (触覚の受容器)\nconst WATCH_FILES = [\n  { path: '/oikos/hegemonikon/.agent/projects/registry.yaml', label: 'Registry', severity: 'high' },\n  { path: '/oikos/hegemonikon/kernel/SACRED_TRUTH.md', label: 'Sacred Truth', severity: 'critical' },\n  { path: '/oikos/hegemonikon/mekhane/ergasterion/n8n/docker-compose.yml', label: 'n8n Docker', severity: 'high' },\n  { path: '/oikos/hegemonikon/mekhane/symploke/boot_integration.py', label: 'Boot Integration', severity: 'medium' },\n  { path: '/oikos/hegemonikon/.agent/rules/hegemonikon.md', label: 'HGK Rules', severity: 'high' },\n  { path: '/oikos/hegemonikon/mekhane/fep/attractor.py', label: 'Attractor Engine', severity: 'medium' },\n  { path: '/oikos/hegemonikon/mekhane/fep/state_spaces_v2.py', label: 'State Spaces', severity: 'medium' }\n];\n\nconst STATE_FILE = '/oikos/mneme/.hegemonikon/file_monitor_state.json';\nconst now = new Date();\n\n// 前回の状態を読む\nlet prevState = {};\ntry {\n  prevState = JSON.parse(fs.readFileSync(STATE_FILE, 'utf-8'));\n} catch(e) {\n  // 初回実行 — 空で OK\n}\n\nvar changes = [];\nvar currentState = {};\nvar fileStatuses = [];\n\nfor (var i = 0; i < WATCH_FILES.length; i++) {\n  var wf = WATCH_FILES[i];\n  var fp = wf.path;\n  try {\n    var stat = fs.statSync(fp);\n    var mtime = stat.mtimeMs;\n    var size = stat.size;\n    currentState[fp] = { mtime: mtime, size: size };\n\n    var prev = prevState[fp];\n    if (prev) {\n      if (prev.mtime !== mtime || prev.size !== size) {\n        var sizeDiff = size - (prev.size || 0);\n        var sizeStr = sizeDiff > 0 ? '+' + sizeDiff + 'B' : sizeDiff + 'B';\n        changes.push({\n          label: wf.label,\n          path: fp,\n          severity: wf.severity,\n          sizeDiff: sizeStr,\n          oldSize: prev.size,\n          newSize: size\n        });\n        fileStatuses.push('🔴 ' + wf.label + ' (' + sizeStr + ')');\n      } else {\n        fileStatuses.push('🟢 ' + wf.label);\n      }\n    } else {\n      // 初回 — 変更なし扱い\n      fileStatuses.push('⚪ ' + wf.label + ' (初回)');\n    }\n  } catch(e) {\n    fileStatuses.push('⚠️ ' + wf.label + ' (read error)');\n    changes.push({\n      label: wf.label,\n      path: fp,\n      severity: 'critical',\n      sizeDiff: 'FILE_MISSING',\n      oldSize: 0,\n      newSize: 0\n    });\n  }\n}\n\n// 状態保存\ntry {\n  var stateDoc = {\n    lastScan: now.toISOString(),\n    scanCount: ((prevState._meta || {}).scanCount || 0) + 1,\n    fileCount: WATCH_FILES.length,\n    changesDetected: changes.length\n  };\n  currentState._meta = stateDoc;\n  fs.writeFileSync(STATE_FILE, JSON.stringify(currentState, null, 2), 'utf-8');\n} catch(e) {\n  // write error — but don't fail\n}\n\nvar shouldAlert = changes.length > 0;\nvar scanCount = ((prevState._meta || {}).scanCount || 0) + 1;\n\n// Slack ペイロード\nvar slackPayload = '';\nif (shouldAlert) {\n  var hasCritical = false;\n  for (var j = 0; j < changes.length; j++) {\n    if (changes[j].severity === 'critical') hasCritical = true;\n  }\n  var emoji = hasCritical ? '🚨' : '👁️';\n  var changeLines = [];\n  for (var k = 0; k < changes.length; k++) {\n    var c = changes[k];\n    var icon = c.severity === 'critical' ? '🔴' : c.severity === 'high' ? '🟠' : '🟡';\n    changeLines.push(icon + ' *' + c.label + '* — ' + c.sizeDiff);\n  }\n  slackPayload = JSON.stringify({\n    blocks: [\n      { type: 'header', text: { type: 'plain_text', text: emoji + ' Sympatheia: File Change Detected', emoji: true } },\n      { type: 'section', text: { type: 'mrkdwn', text: changeLines.join('\\n') } },\n      { type: 'context', elements: [{ type: 'mrkdwn', text: '_WF-08 File Monitor | Scan #' + scanCount + '_' }] }\n    ]\n  });\n}\n\nreturn [{ json: {\n  scanCount: scanCount,\n  timestamp: now.toISOString(),\n  filesMonitored: WATCH_FILES.length,\n  changesDetected: changes.length,\n  changes: changes,\n  fileStatuses: fileStatuses,\n  shouldAlert: shouldAlert,\n  slackPayload: slackPayload\n} }];"
+            },
+            "id": "monitor-check",
+            "name": "ファイル走査",
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                450,
+                400
+            ]
+        },
+        {
+            "parameters": {
+                "conditions": {
+                    "boolean": [
+                        {
+                            "value1": "={{$json.shouldAlert}}",
+                            "value2": true
+                        }
+                    ]
+                }
+            },
+            "id": "if-changed",
+            "name": "変更あり?",
+            "type": "n8n-nodes-base.if",
+            "typeVersion": 1,
+            "position": [
+                650,
+                400
+            ]
+        },
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "={{ $env.SLACK_WEBHOOK_URL }}",
+                "sendBody": true,
+                "specifyBody": "json",
+                "jsonBody": "={{ $json.slackPayload }}",
+                "options": {
+                    "timeout": 10000
+                }
+            },
+            "id": "slack-notify",
+            "name": "変更通知",
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.2,
+            "position": [
+                850,
+                300
+            ]
+        }
+    ],
+    "connections": {
+        "10分毎の走査": {
+            "main": [
+                [
+                    {
+                        "node": "ファイル走査",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "手動トリガー": {
+            "main": [
+                [
+                    {
+                        "node": "ファイル走査",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "ファイル走査": {
+            "main": [
+                [
+                    {
+                        "node": "変更あり?",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "変更あり?": {
+            "main": [
+                [
+                    {
+                        "node": "変更通知",
+                        "type": "main",
+                        "index": 0
+                    }
+                ],
+                []
+            ]
+        }
+    },
+    "settings": {
+        "executionOrder": "v1"
+    },
+    "tags": [
+        {
+            "name": "hegemonikon"
+        },
+        {
+            "name": "sympatheia"
+        },
+        {
+            "name": "file-monitor"
+        }
+    ],
+    "active": true,
+    "versionId": "1.0.0"
+}

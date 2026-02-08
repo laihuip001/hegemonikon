@@ -16,6 +16,7 @@ category_theory:
     step_2: "R₂: Ses の対象列挙 — セッション中の全対象を収集"
     step_3: "R₃: R(S) の計算 — 対象と射を Handoff に圧縮"
     step_3.5: "R₃.₅: 生データ保存 — R の核 (kernel) を計算前に保存"
+    step_3.6π: "R₃.₆π: R^π(S) の計算 — 成果の意義を抽出 (R^π: Ses → Sig)"
     step_3.7: "R₃.₇: id_R の更新 — 関手 R 自身の特性を更新"
     step_3.8: "R₃.₈: Mem への永続化 — R(S) を圏 Mem に配置"
     step_4: "R₄: R(S) の出力 — Creator による検証"
@@ -31,6 +32,7 @@ sel_enforcement:
       - "KI生成: 新しい知識項目を1つ以上生成"
       - "Self-Profile: id_R の更新内容を明記"
       - "ker(R): チャット履歴エクスポート実行済み"
+      - "Value Pitch: 成果ごとの売り込み文 + 5W1H接地 + 数字テーブル + 比喩結論"
   "-":
     minimum_requirements:
       - "Handoff 最小限（タスク名 + 残タスク）"
@@ -70,6 +72,7 @@ Step 2: S の対象を列挙   — セッション中の全対象を収集
 Step 3: R(S) を計算      — Handoff = S を Mem の対象に圧縮
 Step 3.5: ker(R) を保存  — R で失われる情報の生データを保存
 Step 3.6: S の行動射記録 — Dispatch Log = AI行動の射
+Step 3.6π: R^π(S) を計算 — Value Pitch = 成果の意義を抽出
 Step 3.7: id_R を更新    — R 自身の特性（Self-Profile）を更新
 Step 3.8: R(S) → Mem    — 圧縮結果を圏 Mem に永続配置
 Step 4: R(S) を出力      — Creator が R(S) の品質を検証
@@ -92,6 +95,7 @@ Step 4: R(S) を出力      — Creator が R(S) の品質を検証
 |------|----------|:-----------|------|
 | 3 | [handoff-format.md](bye/handoff-format.md) | R(S) の出力形式 | Handoff 出力形式 |
 | 3.6 | [dispatch-log.md](bye/dispatch-log.md) | 行動射の記録 | Dispatch Log 自動集計 |
+| 3.6π | [value-pitch.md](bye/value-pitch.md) | R^π(S) の計算 | 成果の意義売り込み |
 | 3.8 | [persistence.md](bye/persistence.md) | R(S) → Mem | 永続化ステップ |
 
 ---
@@ -177,6 +181,36 @@ cd ~/oikos/hegemonikon && \
 > **圏論**: セッション中に AI が発動したスキル・WF = 圏 Ses 内で traversal した射の記録。
 > 次の L で「前回何をしたか」を復元するための射のログ。
 > 詳細: [bye/dispatch-log.md](bye/dispatch-log.md)
+
+---
+
+## Step 3.6π: R^π(S) の計算 — Value Pitch
+
+> **圏論**: R^π: Ses → Sig — R (事実圧縮) とは独立な関手。
+> 同じ圏 Ses から「意義 (Significance)」の圏への射影。
+> Handoff が「何をしたか」なら、Value Pitch は「で、なんなの？」。
+> 詳細: [bye/value-pitch.md](bye/value-pitch.md)
+
+> **本質**: 技術的事実 (聖) を行為可能性 (俗) に降ろす変換。
+> 成果ごとに Benefit Angle (HGK 7公理から演繹された8次元) を選び、
+> 「何が変わった / 何で変えた / で何が嬉しい」の3層で語る。
+
+| Benefit Angle | 公理 | 問い |
+|:--------------|:-----|:-----|
+| わかる | FEP | なぜ因果が見えるようになったか |
+| できる | Flow | なぜ不可能が可能になったか |
+| 深い | Value | なぜ構造を貫く原理か |
+| 軽い | Scale | なぜ貴方の負担を減らすか |
+| 育つ | Function | なぜ未来の貴方を助け続けるか |
+| 守る | Valence | なぜ貴方を○○から守るか |
+| 確か | Precision | なぜ根拠を持って語れるか |
+| 響く | X-series | なぜ掛け合わさって効くか |
+
+| モード | 扱い |
+|:-------|:-----|
+| `/bye+` | 全成果展開 + 相乗効果 + 結論比喩 |
+| `/bye` | 主要2-3成果 + Before→After + 数字テーブル + 結論 |
+| `/bye-` | 省略可 |
 
 ---
 
@@ -284,7 +318,7 @@ graph LR
 
 | Module | Workflow | Status |
 |:-------|:---------|:-------|
-| H4 Doxa | /bye | v6.0 Ready |
+| H4 Doxa | /bye | v6.1 Ready |
 
 > **制約リマインダ**: Handoff は「赤の他人基準」(R の自己完結性) で記述。Step 3.5 スキップ禁止。
 
@@ -292,4 +326,5 @@ graph LR
 
 *v4.1 — FBR 適用 (2026-02-07)*
 *v5.0 — 随伴統合 (2026-02-08)*
-*v6.0 — 随伴深層統合。各Step を右随伴 R の計算ステップとして再定義。S品質評価(0) → 射記録(1) → 対象列挙(2) → R(S)計算(3) → ker(R)保存(3.5) → id_R更新(3.7) → Mem永続化(3.8) → 出力(4) (2026-02-08)*
+*v6.0 — 随伴深層統合。各Step を右随伴 R の計算ステップとして再定義 (2026-02-08)*
+*v6.1 — Step 3.6π Value Pitch 追加。R^π: Ses→Sig (意味抽出関手)。HGK 7公理から演繹した8次元 Benefit Angle (2026-02-08)*

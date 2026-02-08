@@ -103,7 +103,7 @@ def main():
 
     # Optional advise + devil_attack
     if args.advise:
-        from mekhane.fep.cone_consumer import advise, devil_attack
+        from mekhane.fep.cone_consumer import advise, devil_attack, format_advice_for_llm
 
         advice = advise(cone)
         print(f"\n### ConeAdvice")
@@ -114,6 +114,10 @@ def main():
         if advice.next_steps:
             for step in advice.next_steps:
                 print(f"  - {step}")
+
+        # Explanation Stack output
+        print(f"\n### Explanation Stack")
+        print(format_advice_for_llm(advice))
 
         if cone.needs_devil:
             attack = devil_attack(cone)

@@ -1651,3 +1651,79 @@ class TestFormatEdgeCases:
         text = format_advice_for_llm(advice)
         assert "[Trace:" in text
         assert "[Rejected:" not in text  # Rule 1 = first rule, no rejected
+
+
+class TestAttractorTraceExtension:
+    """R3: advise_with_attractor extends trace with attractor reasoning."""
+
+    def _make_cone(self, series=Series.O, dispersion=0.05,
+                   confidence=80.0, is_universal=True):
+        cone = build_cone(series, {
+            f"{series.name}1": "出力1", f"{series.name}2": "出力2",
+            f"{series.name}3": "出力3", f"{series.name}4": "出力4",
+        })
+        cone.dispersion = dispersion
+        cone.confidence = confidence
+        cone.is_universal = is_universal
+        cone.resolution_method = "simple_mean"
+        cone.pw = {}
+        return cone
+
+    def test_series_mismatch_extends_trace(self):
+        from mekhane.fep.cone_consumer import advise, advise_with_attractor
+        cone = self._make_cone(dispersion=0.05, confidence=80.0)
+        base = advise(cone)
+        result = advise_with_attractor(cone, "clear", 0.8, "S")
+        # Trace should have base evals + 1 attractor eval
+        assert len(result.trace.evaluations) == len(base.trace.evaluations) + 1
+        last = result.trace.evaluations[-1]
+        assert "Attractor" in last.rule_id
+        assert "mismatch" in last.rule_id
+
+    def test_negative_extends_trace(self):
+        from mekhane.fep.cone_consumer import advise, advise_with_attractor
+        cone = self._make_cone(dispersion=0.05, confidence=80.0)
+        base = advise(cone)
+        result = advise_with_attractor(cone, "negative", 0.5, "O")
+        assert len(result.trace.evaluations) == len(base.trace.evaluations) + 1
+        last = result.trace.evaluations[-1]
+        assert "NEGATIVE" in last.rule_id
+
+    def test_weak_extends_trace(self):
+        from mekhane.fep.cone_consumer import advise, advise_with_attractor
+        cone = self._make_cone(dispersion=0.05, confidence=80.0)
+        base = advise(cone)
+        result = advise_with_attractor(cone, "weak", 0.3, "O")
+        assert len(result.trace.evaluations) == len(base.trace.evaluations) + 1
+        last = result.trace.evaluations[-1]
+        assert "WEAK" in last.rule_id
+
+    def test_clear_does_not_extend_trace(self):
+        """CLEAR oscillation returns base unchanged — no extension."""
+        from mekhane.fep.cone_consumer import advise, advise_with_attractor
+        cone = self._make_cone(dispersion=0.05, confidence=80.0)
+        base = advise(cone)
+        result = advise_with_attractor(cone, "clear", 0.9, "O")
+        assert len(result.trace.evaluations) == len(base.trace.evaluations)
+
+
+class TestRule4ReasonPrecision:
+    """R4: Rule 4 reason accuracy."""
+
+    def test_non_pw_weighted_reason(self):
+        """simple_mean → reason says 'not pw_weighted or uniform'."""
+        from mekhane.fep.cone_consumer import advise
+        cone = build_cone(Series.O, {
+            "O1": "出力1", "O2": "出力2", "O3": "出力3", "O4": "出力4",
+        })
+        cone.dispersion = 0.05
+        cone.confidence = 60.0
+        cone.is_universal = False
+        cone.resolution_method = "simple_mean"
+        cone.pw = {}
+        advice = advise(cone)
+        # Find Rule 4 eval
+        r4_evals = [e for e in advice.trace.evaluations
+                    if "Rule 4" in e.rule_id]
+        assert len(r4_evals) == 1
+        assert "not pw_weighted" in r4_evals[0].reason

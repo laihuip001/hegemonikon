@@ -140,18 +140,29 @@ triggers:
 
 > **目的**: {summary}
 
+> [!CAUTION]
+> このテンプレートは自動生成です。
+> **以下の import パスを実際のコードと照合して検証してください。**
+> 存在しないクラス名・関数名を書くと、Skill が機能しません。
+> 検証コマンド: `PYTHONPATH=. .venv/bin/python -c "from {path.replace('/', '.').rstrip('.')} import YOUR_CLASS"`
+
 ## 発動条件
 
 - TODO: トリガー条件を定義
 
 ## 手順
 
-### Step 1: TODO
+### Step 1: TODO — import パスを検証して書き換えること
 
 // turbo
 
 ```bash
-cd ~/oikos/hegemonikon && echo "TODO: {project_id} の実行コマンドを定義"
+# FIXME: 以下は仮のコマンド。実際のモジュールに合わせて書き換えること
+cd ~/oikos/hegemonikon && PYTHONPATH=. .venv/bin/python -c "
+# TODO: import パスを実際のコードと照合
+# from {path.replace('/', '.').rstrip('.')} import MAIN_CLASS
+print('TODO: {project_id} の実行コマンドを定義')
+"
 ```
 
 ---

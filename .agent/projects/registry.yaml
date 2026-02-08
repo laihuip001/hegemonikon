@@ -287,6 +287,16 @@ projects:
       webhook: "http://localhost:5678/webhook/{path}"
     usage_trigger: "n8n WF の操作・デプロイ・テスト時。Health 監視、セッション管理、自動通知。"
 
+
+  - id: hgk-api
+    name: "Hegemonikón API"
+    path: "mekhane/api"
+    summary: "FastAPI backend for Tauri v2 desktop app. Wraps mekhane modules as REST endpoints on :9696."
+    status: "active"
+    phase: "implementation"
+    entry_point: null
+    usage_trigger: null
+
 # ─── 統計 ─────────────────────────────────────────
 # Total: 22 entries
 # Active: 18 | Dormant: 2 | Archived: 1 | Planned: 0

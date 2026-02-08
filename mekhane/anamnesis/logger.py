@@ -33,7 +33,7 @@ from typing import Dict, Optional
 
 # PURPOSE: クラス: SessionLogger
 class SessionLogger:
-    # PURPOSE: 内部処理: init__
+    # PURPOSE: SessionLogger の構成と依存関係の初期化
     def __init__(
         self, session_id: Optional[str] = None, base_dir: str = "vault/logs/raw"
     ):
@@ -50,7 +50,7 @@ class SessionLogger:
         self.log_path = self.log_dir / f"{self.session_id}.jsonl"
         self.temp_path = self.log_dir / f"{self.session_id}.tmp"
 
-    # PURPOSE: 内部処理: find_root
+    # PURPOSE: find_root — 知識基盤の内部処理
     def _find_root(self) -> Path:
         # Try to find M:\Hegemonikon
         # Check current working directory parents
@@ -95,11 +95,11 @@ class SessionLogger:
             print(f"Error logging message: {e}")
             return False
 
-    # PURPOSE: 取得: read_logs
+    # PURPOSE: read_logs プロパティの取得
     def read_logs(self) -> list:
         if not self.log_path.exists():
             return []
-# PURPOSE: 関数: main
+# PURPOSE: CLI エントリポイント — 知識基盤の直接実行
         with open(self.log_path, "r", encoding="utf-8") as f:
             return [json.loads(line) for line in f]
 

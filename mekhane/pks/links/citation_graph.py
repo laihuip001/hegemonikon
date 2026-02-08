@@ -52,7 +52,7 @@ class CitationStats:
     mentioning_count: int = 0
 
     @property
-    # PURPOSE: 関数: total
+    # PURPOSE: 支持率
     def total(self) -> int:
         return self.supporting_count + self.contrasting_count + self.mentioning_count
 
@@ -75,7 +75,7 @@ class CitationGraph:
     Obsidian Graph View 互換のリンク生成も可能。
     """
 
-    # PURPOSE: 内部処理: init__
+    # PURPOSE: CitationGraph の初期化 — 引用を追加
     def __init__(self):
         self._citations: list[Citation] = []
         self._stats: dict[str, CitationStats] = defaultdict(

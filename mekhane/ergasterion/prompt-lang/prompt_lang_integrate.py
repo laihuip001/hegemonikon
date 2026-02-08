@@ -198,7 +198,7 @@ def auto_fire_header(trigger: str, filename: str, purpose: str) -> str:
   Trigger: {trigger}
   File: {filename}
   Purpose: {purpose}"""
-# PURPOSE: 関数: main
+# PURPOSE: CLI エントリポイント — 自動化基盤の直接実行
 
 
 def main():

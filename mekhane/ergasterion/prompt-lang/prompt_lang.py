@@ -114,7 +114,7 @@ class Mixin:
 class CircularReferenceError(Exception):
     """Error when circular reference is detected in extends/mixin chain."""
 
-    # PURPOSE: 内部処理: init__
+    # PURPOSE: CircularReferenceError の初期化 — Error when referenced prompt/mixin is not found.
     def __init__(self, chain: list[str]):
         self.chain = chain
         super().__init__(f"Circular reference: {' → '.join(chain)}")
@@ -124,7 +124,7 @@ class CircularReferenceError(Exception):
 class ReferenceError(Exception):
     """Error when referenced prompt/mixin is not found."""
 
-    # PURPOSE: 内部処理: init__
+    # PURPOSE: ReferenceError の初期化 — Parsed prompt-lang document.
     def __init__(self, name: str):
         self.name = name
         super().__init__(f"Reference not found: {name}")
@@ -587,7 +587,7 @@ class ParseResult:
 class ParseError(Exception):
     """Error during parsing."""
 
-    # PURPOSE: 内部処理: init__
+    # PURPOSE: ParseError の初期化 — Parser for prompt-lang files.
     def __init__(self, message: str, line: int = 0):
         self.line = line
         super().__init__(f"Line {line}: {message}" if line else message)
@@ -611,7 +611,7 @@ class PromptLangParser:
     EXTENDS_INLINE_PATTERN = re.compile(r"^@extends:\s*(.+)$")
     MIXIN_REF_PATTERN = re.compile(r"^@mixin:\s*\[([^\]]+)\]$")
 
-    # PURPOSE: 内部処理: init__
+    # PURPOSE: PromptLangParser の初期化 — Parse the content and return a Prompt object.
     def __init__(self, content: str):
         self.content = content
         self.lines = content.split("\n")
@@ -1297,7 +1297,7 @@ def _resolve_with_chain(
 
         # Recursively resolve parent if it's a Prompt
         if isinstance(parent, Prompt) and (parent.extends or parent.mixins):
-# PURPOSE: 関数: main
+# PURPOSE: CLI エントリポイント — 自動化基盤の直接実行
             parent = _resolve_with_chain(parent, registry, visited, chain)
 
         result = _merge(parent, result)

@@ -36,7 +36,7 @@ class ArxivCollector(BaseCollector):
     # arXiv ID pattern
     ARXIV_PATTERN = re.compile(r"(\d{4}\.\d{4,5})(v\d+)?")
 
-    # PURPOSE: 内部処理: init__
+    # PURPOSE: ArxivCollector の初期化 — arXiv URLからIDを抽出
     def __init__(self):
         super().__init__()
         if arxiv is None:

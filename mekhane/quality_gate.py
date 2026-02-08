@@ -33,7 +33,7 @@ class MetrikaResult:
     violations: list[str] = field(default_factory=list)
 
     @property
-    # PURPOSE: 関数: passed
+    # PURPOSE: passed — システムの処理
     def passed(self) -> bool:
         return all(
             [self.dokime, self.syntomia, self.prosbasimotes, self.atomos, self.katharos]

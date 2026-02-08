@@ -108,7 +108,7 @@ def setup_model():
 class Embedder:
     """ONNX-based text embedding."""
 
-    # PURPOSE: 内部処理: init__
+    # PURPOSE: Embedder の構成と依存関係の初期化
     def __init__(self):
         import onnxruntime as ort
         from tokenizers import Tokenizer
@@ -413,7 +413,7 @@ def show_stats():
         print(f"\nModel Status: [X] Not downloaded")
         print(f"Run: python aidb-kb.py setup")
 
-# PURPOSE: 関数: main
+# PURPOSE: CLI エントリポイント — データパイプラインの直接実行
     print("=" * 40)
 
 

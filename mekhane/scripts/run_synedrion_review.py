@@ -56,7 +56,7 @@ async def run_synedrion_review(
     logger.info(f"  Domains: {domains or 'ALL (20)'}")
     logger.info(f"  Axes: {axes or 'ALL (24)'}")
 
-    # PURPOSE: 関数: progress
+    # PURPOSE: progress — 運用ツールの処理
     def progress(batch_num, total, completed):
         logger.info(f"  Progress: Batch {batch_num}/{total}, {completed} completed")
 

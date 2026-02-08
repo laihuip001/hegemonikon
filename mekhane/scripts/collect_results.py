@@ -61,7 +61,7 @@ class JulesResultCollector:
 
     BASE_URL = "https://jules.googleapis.com/v1alpha"
 
-    # PURPOSE: 内部処理: init__
+    # PURPOSE: JulesResultCollector の初期化 — Get session details from API.
     def __init__(self, api_key: str):
         self.api_key = api_key
         self.headers = {"X-Goog-Api-Key": api_key, "Content-Type": "application/json"}
@@ -202,7 +202,7 @@ class JulesResultCollector:
             secs = summary.duration_seconds % 60
             print(f"   Duration: {mins}m {secs}s")
         if summary.is_silent:
-# PURPOSE: 関数: main
+# PURPOSE: CLI エントリポイント — 運用ツールの直接実行
             print(f"   Result: SILENCE (no issues found)")
         elif summary.has_pr:
             print(f"   PR: {summary.pr_url}")

@@ -60,7 +60,7 @@ class PerspectiveMatrix:
         prompt = matrix.generate_prompt(perspective)
     """
 
-    # PURPOSE: 内部処理: init__
+    # PURPOSE: PerspectiveMatrix の構成と依存関係の初期化
     def __init__(self, config: dict):
         self._config = config
         self._domains = {d["id"]: d for d in config["domains"]}

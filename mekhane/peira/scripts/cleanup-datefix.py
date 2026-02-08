@@ -45,7 +45,7 @@ def parse_date(date_str):
     return None, None, None
 
 
-# PURPOSE: 取得: get_article_date
+# PURPOSE: get_article_date プロパティの取得
 def get_article_date(post_id):
     url = f"https://ai-data-base.com/archives/{post_id}"
     try:
@@ -69,7 +69,7 @@ def get_article_date(post_id):
         return None, None, None
 
 
-# PURPOSE: 関数: fix_file
+# PURPOSE: fix_file — データパイプラインの処理
 def fix_file(filepath):
     filename = os.path.basename(filepath)
     post_id = filename.replace(".md", "")
@@ -106,7 +106,7 @@ def fix_file(filepath):
     return True
 
 
-# PURPOSE: 関数: main
+# PURPOSE: CLI エントリポイント — データパイプラインの直接実行
 def main():
     if not os.path.exists(PROBLEM_DIR):
         print("No 0000/00 directory found.")

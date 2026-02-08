@@ -7,7 +7,7 @@ INDEX_DIR = r"Raw/aidb/_index"
 MASTER_MANIFEST = os.path.join(INDEX_DIR, "manifest.jsonl")
 
 
-# PURPOSE: 関数: main
+# PURPOSE: CLI エントリポイント — データパイプラインの直接実行
 def main():
     print("Merging manifest files...")
 

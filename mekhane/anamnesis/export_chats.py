@@ -73,7 +73,7 @@ RE_MULTI_UNDERSCORE = re.compile(r"_+")
 class AntigravityChatExporter:
     """簡潔版: Antigravity IDE のチャット履歴をエクスポート"""
 
-    # PURPOSE: 内部処理: init__
+    # PURPOSE: AntigravityChatExporter の構成と依存関係の初期化
     def __init__(self, output_dir: Path = DEFAULT_OUTPUT_DIR, limit: int = None):
         self.output_dir = output_dir
         self.output_dir.mkdir(parents=True, exist_ok=True)
@@ -946,7 +946,7 @@ class AntigravityChatExporter:
                     break
                 except Exception as e:
                     print(f"[!] Error: {e}")
-# PURPOSE: 関数: main
+# PURPOSE: CLI エントリポイント — 知識基盤の直接実行
                     await asyncio.sleep(2.0)
 
         finally:

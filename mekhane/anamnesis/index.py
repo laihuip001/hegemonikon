@@ -48,7 +48,7 @@ class Embedder:
       2. Fallback → ONNX Runtime on CPU (original implementation)
     """
 
-    # PURPOSE: 内部処理: init__
+    # PURPOSE: Embedder の構成と依存関係の初期化
     def __init__(self, force_cpu: bool = False):
         import numpy as np
         self.np = np
@@ -96,11 +96,11 @@ class Embedder:
         self._tokenizer.enable_truncation(max_length=512)
         self._tokenizer.enable_padding(pad_to_multiple_of=8)
 
-    # PURPOSE: 関数: embed
+    # PURPOSE: テキストをベクトル空間に射影
     def embed(self, text: str) -> list:
         return self.embed_batch([text])[0]
 
-    # PURPOSE: 関数: embed_batch
+    # PURPOSE: GPU embedding via sentence-transformers.
     def embed_batch(self, texts: list[str]) -> list[list]:
         if self._use_gpu:
             return self._embed_gpu(texts)
@@ -158,7 +158,7 @@ class GnosisIndex:
 
     TABLE_NAME = "papers"
 
-    # PURPOSE: 内部処理: init__
+    # PURPOSE: GnosisIndex の構成と依存関係の初期化
     def __init__(self, lance_dir: Optional[Path] = None):
         if lancedb is None:
             raise ImportError("lancedb package required: pip install lancedb")
@@ -170,7 +170,7 @@ class GnosisIndex:
         self.embedder: Optional[Embedder] = None
         self._primary_key_cache: set[str] = set()
 
-    # PURPOSE: 内部処理: get_embedder
+    # PURPOSE: 既存primary_keyとtitleをキャッシュ
     def _get_embedder(self) -> Embedder:
         if self.embedder is None:
             self.embedder = Embedder()

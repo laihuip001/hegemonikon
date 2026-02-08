@@ -216,7 +216,7 @@ def interactive_mode():
             qs = np.asarray(beliefs, dtype=np.float64).flatten()
         return float(-np.sum(qs * np.log(qs + 1e-10)))
 
-    # PURPOSE: 関数: show_help
+    # PURPOSE: show_help — 運用ツールの処理
     def show_help():
         print("""
 ╭─────────────────────────────────────────────────────────╮

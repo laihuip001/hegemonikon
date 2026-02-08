@@ -106,7 +106,7 @@ def save_as_markdown(texts: list, output_path: Path, source_name: str):
     print(f"[OK] Saved: {output_path}")
 
 
-# PURPOSE: 関数: main
+# PURPOSE: CLI エントリポイント — Varint デコード
 def main():
     import sys
 

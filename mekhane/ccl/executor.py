@@ -49,7 +49,7 @@ class ZeroTrustCCLExecutor:
     LLM を信用せず、構造的に正しい実行を強制する。
     """
 
-    # PURPOSE: 内部処理: init__
+    # PURPOSE: ZeroTrustCCLExecutor の初期化 — Phase 0: 実行準備 1. 演算子仕様を注入 2. 過去の失敗から警告を生成
     def __init__(self):
         self.injector = SpecInjector()
         self.validator = CCLOutputValidator()

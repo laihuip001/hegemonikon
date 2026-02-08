@@ -154,7 +154,7 @@ def cmd_stats(args):
         print(f"    {cat:<30} {count:>3}件")
 
 
-# PURPOSE: 関数: main
+# PURPOSE: CLI エントリポイント — 知識基盤の直接実行
 def main():
     parser = argparse.ArgumentParser(
         description="Library Search CLI — /lib ワークフローのバックエンド",

@@ -46,7 +46,7 @@ class SELValidationResult:
     details: str = ""
 
     @property
-    # PURPOSE: 関数: summary
+    # PURPOSE: SEL 遵守検証器
     def summary(self) -> str:
         status = "✅ 遵守" if self.is_compliant else "⚠️ 非遵守"
         return f"{status} {self.workflow}{self.operator}: {self.score:.0%} ({len(self.met_requirements)}/{len(self.met_requirements) + len(self.missing_requirements)})"
@@ -56,7 +56,7 @@ class SELValidationResult:
 class SELValidator:
     """SEL 遵守検証器"""
 
-    # PURPOSE: 内部処理: init__
+    # PURPOSE: SELValidator の構成と依存関係の初期化
     def __init__(self, workflows_dir: Optional[Path] = None):
         self.workflows_dir = workflows_dir or Path(
             "/home/makaron8426/oikos/.agent/workflows"

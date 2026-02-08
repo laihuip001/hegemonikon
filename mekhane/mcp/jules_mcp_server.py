@@ -24,7 +24,7 @@ if sys.platform == "win32":
 import io
 
 
-# PURPOSE: 関数: log
+# PURPOSE: log — MCPサービスの処理
 def log(msg):
     print(f"[jules-mcp] {msg}", file=sys.stderr, flush=True)
 

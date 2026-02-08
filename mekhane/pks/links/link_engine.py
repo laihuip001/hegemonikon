@@ -53,7 +53,7 @@ class LinkIndex:
     orphans: list[str] = field(default_factory=list)  # どこからもリンクされていないファイル
 
     @property
-    # PURPOSE: 関数: total_files
+    # PURPOSE: total_files — 知識プッシュの処理
     def total_files(self) -> int:
         all_files = set(self.forward_links.keys())
         for links in self.backlinks.values():
@@ -62,7 +62,7 @@ class LinkIndex:
         return len(all_files)
 
     @property
-    # PURPOSE: 関数: total_links
+    # PURPOSE: total_links — 知識プッシュの処理
     def total_links(self) -> int:
         return sum(len(links) for links in self.forward_links.values())
 
@@ -84,7 +84,7 @@ class LinkEngine:
         - Graph Export: リレーショングラフの JSON/Mermaid 出力
     """
 
-    # PURPOSE: 内部処理: init__
+    # PURPOSE: LinkEngine の初期化 — ディレクトリ全体をスキャンしてリンクインデックスを構築
     def __init__(self, root_dir: Path, extensions: tuple[str, ...] = (".md",)):
         self.root_dir = root_dir.resolve()
         self.extensions = extensions

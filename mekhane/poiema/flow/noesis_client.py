@@ -193,7 +193,7 @@ class NoesisClient:
 
 # Backward compatibility aliases
 GeminiClient = NoesisClient
-# PURPOSE: 内部処理: get_client
+# PURPOSE: get_client — 生成エンジンの内部処理
 
 # Singleton instance
 _default_client = None

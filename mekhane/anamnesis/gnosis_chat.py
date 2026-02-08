@@ -57,7 +57,7 @@ HANDOFF_DIR = _HEGEMONIKON_ROOT / "docs" / "handoff"
 class ConversationHistory:
     """マルチターン対話の履歴管理."""
 
-    # PURPOSE: 内部処理: init__
+    # PURPOSE: ConversationHistory の初期化 — ターンを追加.
     def __init__(self, max_turns: int = 5):
         self.max_turns = max_turns
         self.turns: list[dict] = []
@@ -83,13 +83,13 @@ class ConversationHistory:
                 parts.append(f"<|im_start|>assistant\n{t['content']}<|im_end|>")
         return "\n".join(parts)
 
-    # PURPOSE: 関数: clear
+    # PURPOSE: 状態のリセットと再初期化
     def clear(self):
         self.turns.clear()
 
     @property
 # PURPOSE: Cross-encoder Reranker for precision improvement.
-    # PURPOSE: 関数: turn_count
+    # PURPOSE: Cross-encoder Reranker for precision improvement. Strategy: bi-encoder でオーバーフェッチ
     def turn_count(self) -> int:
         return len(self.turns) // 2
 
@@ -105,12 +105,12 @@ class Reranker:
 
     DEFAULT_MODEL = "cross-encoder/ms-marco-MiniLM-L-6-v2"
 
-    # PURPOSE: 内部処理: init__
+    # PURPOSE: Reranker の構成と依存関係の初期化
     def __init__(self, model_name: Optional[str] = None):
         self.model_name = model_name or self.DEFAULT_MODEL
         self._model = None
 
-    # PURPOSE: 内部処理: load (ネットワーク耐障害)
+    # PURPOSE: cross-encoder モデルの遅延ロード — ネットワーク障害時のフォールバック付き
     def _load(self):
         if self._model is not None:
             return
@@ -497,7 +497,7 @@ class GnosisChat:
     CONFIDENCE_LOW = "low"
     CONFIDENCE_NONE = "none"
 
-    # PURPOSE: 内部処理: init__
+    # PURPOSE: 知識基盤コンポーネントの初期化
     def __init__(
         self,
         model_id: Optional[str] = None,

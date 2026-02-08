@@ -171,7 +171,7 @@ def update_workflow(workflow: str, module: str, summary: str) -> bool:
     return True
 
 
-# PURPOSE: 関数: main
+# PURPOSE: CLI エントリポイント — 知識基盤の直接実行
 def main():
     print("🚀 Hegemonikón Workflow Artifact Standardization")
     print(f"📁 Target: {WORKFLOWS_DIR}")

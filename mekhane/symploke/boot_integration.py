@@ -252,6 +252,28 @@ def get_boot_context(mode: str = "standard", context: Optional[str] = None) -> d
                 advisor = AttractorAdvisor(force_cpu=not gpu_ok)
                 rec = advisor.recommend(context)
                 llm_fmt = advisor.format_for_llm(context)
+
+                # Dispatcher integration (Problem A)
+                dispatch_info = {"primary": "", "alternatives": [], "dispatch_formatted": ""}
+                try:
+                    from mekhane.fep.attractor_dispatcher import AttractorDispatcher
+                    dispatcher = AttractorDispatcher(force_cpu=not gpu_ok)
+                    plan = dispatcher.dispatch(context)
+                    if plan:
+                        dispatch_info = {
+                            "primary": plan.primary.workflow,
+                            "alternatives": [d.workflow for d in plan.alternatives[:3]],
+                            "dispatch_formatted": dispatcher.format_compact(plan),
+                        }
+                except Exception:
+                    pass  # Dispatcher failure should not block boot
+
+                formatted_parts = []
+                if llm_fmt:
+                    formatted_parts.append(f"🎯 **Attractor**: {llm_fmt}")
+                if dispatch_info["primary"]:
+                    formatted_parts.append(f"   📎 Dispatch: {dispatch_info['dispatch_formatted']}")
+
                 return {
                     "series": rec.series,
                     "workflows": rec.workflows,
@@ -259,7 +281,9 @@ def get_boot_context(mode: str = "standard", context: Optional[str] = None) -> d
                     "confidence": rec.confidence,
                     "oscillation": rec.oscillation.value,
                     "advice": rec.advice,
-                    "formatted": f"🎯 **Attractor**: {llm_fmt}" if llm_fmt else "",
+                    "dispatch_primary": dispatch_info["primary"],
+                    "dispatch_alternatives": dispatch_info["alternatives"],
+                    "formatted": "\n".join(formatted_parts) if formatted_parts else "",
                 }
 
             with ThreadPoolExecutor(max_workers=1) as executor:

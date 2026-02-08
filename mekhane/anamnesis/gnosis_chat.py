@@ -391,6 +391,9 @@ class GnosisChat:
     #   0 = identical, ~1.0 = unrelated, ~1.41 = opposite
     DISTANCE_THRESHOLD = 0.85
 
+    # Papers: cross-language gap (+0.21~0.28) を考慮して緩和
+    PAPERS_DISTANCE_THRESHOLD = 0.95
+
     # Prompt-level steering profiles
     STEERING_PROFILES = {
         "hegemonikon": (
@@ -536,15 +539,20 @@ class GnosisChat:
             except Exception:
                 pass
 
-        # Layer 1: bi-encoder 距離閾値フィルタ
+        # Layer 1: bi-encoder 距離閾値フィルタ (papers/knowledge で閾値分離)
         before_filter = len(results)
         results = [
             r for r in results
-            if r.get("_distance", 999) < self.DISTANCE_THRESHOLD
+            if r.get("_distance", 999) < (
+                self.PAPERS_DISTANCE_THRESHOLD
+                if r.get("_source_table") == "papers"
+                else self.DISTANCE_THRESHOLD
+            )
         ]
         if before_filter > 0 and len(results) == 0:
             print(f"[Gnōsis Chat] Layer 1: all {before_filter} results filtered "
-                  f"(min_dist > {self.DISTANCE_THRESHOLD})", flush=True)
+                  f"(knowledge>{self.DISTANCE_THRESHOLD}, "
+                  f"papers>{self.PAPERS_DISTANCE_THRESHOLD})", flush=True)
 
         results.sort(key=lambda r: r.get("_distance", 999))
 
@@ -723,13 +731,41 @@ class GnosisChat:
             "turn": self.history.turn_count,
         }
 
+    def retrieve_only(self, query: str) -> dict:
+        """検索のみ実行 (LLM 不使用). Claude (IDE) が Generation する用."""
+        t0 = time.time()
+        results = self._retrieve(query)
+        retrieval_time = time.time() - t0
+        confidence = self._assess_confidence(results)
+        context = self._build_context(results)
+
+        sources = []
+        for r in results:
+            sources.append({
+                "title": r.get("title", "Untitled")[:80],
+                "source": r.get("source", "unknown"),
+                "table": r.get("_source_table", "unknown"),
+                "url": r.get("url", ""),
+                "distance": round(r.get("_distance", 0), 4),
+                "rerank_score": r.get("_rerank_score"),
+            })
+
+        return {
+            "context": context,
+            "sources": sources,
+            "confidence": confidence,
+            "retrieval_time": round(retrieval_time, 3),
+            "context_docs": len(results),
+        }
+
     # PURPOSE: 対話ループ (REPL).
     def interactive(self):
         """対話ループ (REPL)."""
         print("\n" + "=" * 60)
         print("  Gnōsis Chat — Hegemonikón ローカル知識ベース対話")
         print(f"  Model: {self.model_id}")
-        print("  Commands: /quit, /sources, /stats, /clear, /index")
+        print(f"  Steering: {self.steering_profile}")
+        print("  Commands: /quit, /sources, /stats, /clear, /index, /steering")
         print("=" * 60)
 
         last_result = None
@@ -789,6 +825,18 @@ class GnosisChat:
                 print(f"✅ Indexed {added} new chunks")
                 continue
 
+            if question.startswith("/steering"):
+                parts = question.split()
+                if len(parts) == 1:
+                    print(f"🧭 Current: {self.steering_profile}")
+                    print(f"   Available: {', '.join(self.STEERING_PROFILES.keys())}")
+                elif parts[1] in self.STEERING_PROFILES:
+                    self.steering_profile = parts[1]
+                    print(f"🧭 Switched to: {self.steering_profile}")
+                else:
+                    print(f"❌ Unknown: {parts[1]}. Available: {', '.join(self.STEERING_PROFILES.keys())}")
+                continue
+
             # Ask
             print("🔍 Searching...", flush=True)
             result = self.ask(question)
@@ -838,3 +886,35 @@ def cmd_chat(args) -> int:
     else:
         chat.interactive()
         return 0
+
+
+def cmd_retrieve(args) -> int:
+    """CLI entry point for retrieve command (no LLM)."""
+    chat = GnosisChat(top_k=args.top_k)
+
+    result = chat.retrieve_only(args.query)
+
+    conf_icon = {"high": "🟢", "medium": "🟡", "low": "🟠", "none": "🔴"}.get(
+        result.get("confidence", ""), "⚪")
+
+    print(f"\n{conf_icon} Confidence: {result['confidence']} "
+          f"({result['context_docs']} docs, {result['retrieval_time']}s)")
+
+    if result["context"]:
+        print(f"\n{'=' * 60}")
+        print("📚 Retrieved Context")
+        print(f"{'=' * 60}\n")
+        print(result["context"])
+        print(f"\n{'=' * 60}")
+
+    print("\n📑 Sources:")
+    for i, s in enumerate(result["sources"], 1):
+        icon = {"papers": "📄", "knowledge": "🧠"}.get(s["table"], "📁")
+        d = s.get("distance", 0)
+        rs = s.get("rerank_score")
+        score_str = f" rs={rs:.1f}" if rs is not None else ""
+        print(f"  [{i}] {icon} [{s['source']}] {s['title']} (d={d:.4f}{score_str})")
+        if s["url"]:
+            print(f"      {s['url']}")
+
+    return 0

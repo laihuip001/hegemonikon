@@ -139,16 +139,21 @@ if MCP_AVAILABLE:
             ),
             Tool(
                 name="hermeneus_dispatch",
-                description="【CCL 実行の第一歩】CCL 式をパースし、AST 構造・関連WF・"
-                           "実行計画テンプレートを返す。CCL 式を分析するときは、"
-                           "手動で分析する前に必ずこのツールを最初に呼ぶこと。"
-                           "例: /dia+~*/noe, {(/dia+~*/noe)~*/pan+}~*{...}",
+                description=(
+                    "Parse Hegemonikón CCL (Cognitive Control Language) expressions into AST. "
+                    "USE THIS TOOL for ANY CCL expression analysis — ALWAYS call before manual analysis. "
+                    "CCL operators: / (workflow), + (detail), - (reduction), ~ (oscillation), "
+                    "~* (convergent), >> (sequence), {} (group), () (sub-expr), \\ (colimit). "
+                    "Example: hermeneus_dispatch('/dia+~*/noe') returns AST tree + related workflows + execution plan. "
+                    "Example: hermeneus_dispatch('{(/dia+~*/noe)~*/pan+}') returns nested structure analysis. "
+                    "Returns: {success, tree, workflows, plan_template}"
+                ),
                 inputSchema={
                     "type": "object",
                     "properties": {
                         "ccl": {
                             "type": "string",
-                            "description": "CCL 式 (例: /dia+~*/noe, /noe+ >> V[] < 0.3)"
+                            "description": "CCL expression to parse. Examples: '/noe+', '/dia+~*/noe', '(/noe+~*/dia+)~*/mek+'"
                         }
                     },
                     "required": ["ccl"]

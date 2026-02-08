@@ -42,6 +42,7 @@ requires_approval: false
 risks:
   - "確信/信念による時間感覚歪曲 (X-HK5, X-HK7)"
   - "楽観バイアスによる過小見積もり"
+fallbacks: ["manual execution"]
 ---
 
 # K2: Chronos (Χρόνος)

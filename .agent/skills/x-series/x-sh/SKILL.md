@@ -21,6 +21,11 @@ triggers:
   - "様態→傾向"
 
 keywords: [schema-horme, design-to-drive, x-sh, plan-to-confidence]
+risk_tier: L0
+risks: ["none identified"]
+reversible: true
+requires_approval: false
+fallbacks: ["manual execution"]
 ---
 
 # X-SH: Schema → Hormē (様態→傾向)

@@ -1,6 +1,7 @@
 ---
 lcm_state: draft
 description: Dendron 存在証明チェック。粒度・スコープを自由に指定可能。
+version: "1.0.0"
 ---
 
 # /dendron: 存在証明チェック

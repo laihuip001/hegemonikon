@@ -35,6 +35,8 @@ workflow_ref: ".agent/workflows/tek.md"
 risk_tier: L1
 reversible: true
 requires_approval: false
+risks: ["none identified"]
+fallbacks: ["manual execution"]
 ---
 
 # P4: Tekhnē (Τέχνη)

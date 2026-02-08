@@ -2,6 +2,7 @@
 description: A2 Krisis（判定力）を発動する抽象コマンド。敵対的レビュー機能統合。
 hegemonikon: A2 Krisis
 version: "7.0"
+skill_ref: ".agent/skills/akribeia/a2-krisis/SKILL.md"
 lcm_state: stable       # draft | beta | stable | deprecated
 layer: "Δ"
 derivatives: [aff, neg, epo, root, devil, steelman, counterfactual, cold_mirror, deliberative]
@@ -19,6 +20,16 @@ cognitive_algebra:
   "+": 詳細判定（証拠/論拠/反論を完全展開）
   "-": 判定要約（PASS/FAIL + 1行理由）
   "*": メタ判定（判定プロセス自体を判定）
+sel_enforcement:
+  "+":
+    minimum_requirements:
+      - "証拠セクション: 具体的データ/事実を引用"
+      - "論拠セクション: 推論の連鎖を明示"
+      - "反論セクション: 最も強い反論を提示"
+      - "確信度: [確信/推定/仮説] を明示"
+  "-":
+    minimum_requirements:
+      - "PASS/FAIL + 1行理由のみ"
 ---
 
 # /dia: A2 Krisis 発動コマンド

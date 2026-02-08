@@ -42,6 +42,7 @@ requires_approval: false
 risks:
   - "欲求による好機歪曲 (X-HK3)"
   - "欲求による目的上書き (X-HK4)"
+fallbacks: ["manual execution"]
 ---
 
 # H3: Orexis (Ὄρεξις)

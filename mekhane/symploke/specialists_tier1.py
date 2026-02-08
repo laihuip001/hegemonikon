@@ -530,7 +530,7 @@ HEGEMONIKON_INTEGRITY_TIER1 = [
         },
     ),
     Specialist(
-        id="HG-009",
+        id="HG-008",
         name="Dendron×PROOF一致検査官",
         category="hegemonikon",
         archetype=Archetype.PRECISION,

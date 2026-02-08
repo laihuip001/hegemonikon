@@ -128,8 +128,13 @@ def build_prompt(ctx: dict) -> str:
 REASON: (ここに1行で記述)"""
 
 
-def generate_reason_llm(prompt: str, model_name: str = "Qwen/Qwen2.5-7B-Instruct") -> str:
-    """ローカル LLM で REASON を生成する"""
+def generate_reason_llm(prompt: str, model_name: str = "Qwen/Qwen2.5-3B-Instruct",
+                         quantize: bool = False) -> str:
+    """ローカル LLM で REASON を生成する
+
+    Args:
+        quantize: True なら 4-bit (NF4) 量子化。7B を 8GB GPU で動かすため。
+    """
     try:
         from transformers import AutoModelForCausalLM, AutoTokenizer
         import torch
@@ -139,14 +144,30 @@ def generate_reason_llm(prompt: str, model_name: str = "Qwen/Qwen2.5-7B-Instruct
 
     # グローバルキャッシュでモデル再利用
     if not hasattr(generate_reason_llm, "_model"):
-        print(f"Loading model: {model_name}...")
+        print(f"Loading model: {model_name} {'(4-bit NF4)' if quantize else '(fp16)'}...")
+
         tokenizer = AutoTokenizer.from_pretrained(model_name, trust_remote_code=True)
-        model = AutoModelForCausalLM.from_pretrained(
-            model_name,
-            torch_dtype=torch.float16,
-            device_map="auto",
-            trust_remote_code=True,
-        )
+
+        load_kwargs = {
+            "trust_remote_code": True,
+            "device_map": "auto",
+        }
+
+        if quantize:
+            try:
+                from transformers import BitsAndBytesConfig
+                load_kwargs["quantization_config"] = BitsAndBytesConfig(
+                    load_in_4bit=True,
+                    bnb_4bit_compute_dtype=torch.float16,
+                    bnb_4bit_quant_type="nf4",
+                )
+            except ImportError:
+                print("WARNING: bitsandbytes not installed, falling back to fp16")
+                load_kwargs["torch_dtype"] = torch.float16
+        else:
+            load_kwargs["torch_dtype"] = torch.float16
+
+        model = AutoModelForCausalLM.from_pretrained(model_name, **load_kwargs)
         generate_reason_llm._model = model
         generate_reason_llm._tokenizer = tokenizer
         print("Model loaded.")
@@ -229,8 +250,10 @@ def main():
     parser = argparse.ArgumentParser(description="REASON Auto-Generator")
     parser.add_argument("--dry-run", action="store_true", help="生成結果を表示のみ")
     parser.add_argument("--target", type=str, help="特定の PROOF.md パス")
-    parser.add_argument("--model", type=str, default="Qwen/Qwen2.5-7B-Instruct",
-                        help="使用する LLM モデル")
+    parser.add_argument("--model", type=str, default="Qwen/Qwen2.5-3B-Instruct",
+                        help="使用する LLM モデル (default: 3B)")
+    parser.add_argument("--quantize", action="store_true",
+                        help="4-bit NF4 量子化 (7B を 8GB GPU で動かすため)")
     args = parser.parse_args()
 
     if args.target:
@@ -263,7 +286,7 @@ def main():
 
         print(f"  Context: purpose='{ctx['purpose'][:50]}', files={len(ctx['files'].split(chr(10)))}")
 
-        reason_line = generate_reason_llm(prompt, model_name=args.model)
+        reason_line = generate_reason_llm(prompt, model_name=args.model, quantize=args.quantize)
         print(f"  Generated: {reason_line}")
 
         insert_reason(proof_path, reason_line, dry_run=args.dry_run)

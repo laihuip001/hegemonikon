@@ -18,3 +18,11 @@ Proactive Knowledge Surface (PKS): Pull 型検索 (Gnōsis) を Push 型に逆�
 
 - mekhane/anamnesis (GnosisIndex, LanceDB)
 - mekhane/fep (リスクタグ)
+
+## 内容物
+
+| ファイル | 演繹 |
+|:---------|:-----|
+| push_dialog.py | PKS → 対話的インターフェース |
+| external_search.py | Gnōsis → 外部知識統合 |
+| llm_client.py | DRY → 共通LLMクライアント |

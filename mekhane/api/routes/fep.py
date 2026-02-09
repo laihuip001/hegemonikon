@@ -145,3 +145,42 @@ async def fep_dashboard() -> FEPDashboardResponse:
         action_distribution=action_dist,
         series_distribution=series_dist,
     )
+
+
+# =============================================================================
+# Convergence Tracker — E2E endpoint
+# =============================================================================
+
+class ConvergenceRecordRequest(BaseModel):
+    """Convergence 記録リクエスト。"""
+    agent_series: str | None = None
+    attractor_series: str | None = None
+    agent_action: str = ""
+    epsilon: dict[str, float] | None = None
+
+
+@router.get("/convergence")
+async def get_convergence():
+    """現在の収束状態を取得。"""
+    from mekhane.fep.convergence_tracker import convergence_summary, format_convergence
+    summary = convergence_summary()
+    return {
+        "summary": summary,
+        "formatted": format_convergence(summary),
+    }
+
+
+@router.post("/convergence")
+async def post_convergence(req: ConvergenceRecordRequest):
+    """Agent/Attractor 一致を記録。"""
+    from mekhane.fep.convergence_tracker import record_agreement, format_convergence
+    summary = record_agreement(
+        agent_series=req.agent_series,
+        attractor_series=req.attractor_series,
+        agent_action=req.agent_action,
+        epsilon=req.epsilon,
+    )
+    return {
+        "summary": summary,
+        "formatted": format_convergence(summary),
+    }

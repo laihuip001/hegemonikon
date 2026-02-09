@@ -124,7 +124,6 @@ class Oscillation:
     right: Any
     convergent: bool = False              # ~* 収束振動
     divergent: bool = False               # ~! 発散振動
-    invert: bool = False                  # ~(...) グループ否定
     max_iterations: int = 5               # 収束時の最大反復回数
 
 

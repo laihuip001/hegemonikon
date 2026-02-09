@@ -282,3 +282,48 @@ def format_convergence(summary: Optional[Dict[str, Any]] = None) -> str:
         base += f" disagree=[{', '.join(parts)}]"
 
     return base
+
+
+# =============================================================================
+# CLI — E2E 接続ポイント (2)
+# =============================================================================
+
+def main():
+    """Convergence Tracker CLI.
+
+    Usage:
+        python convergence_tracker.py                    # 現在の収束状態を表示
+        python convergence_tracker.py --record O O act_O # 手動記録
+        python convergence_tracker.py --json             # JSON 出力
+    """
+    import argparse
+
+    parser = argparse.ArgumentParser(description="Convergence Tracker CLI")
+    parser.add_argument(
+        "--record", nargs=3, metavar=("AGENT", "ATTRACTOR", "ACTION"),
+        help="Record agreement: AGENT_SERIES ATTRACTOR_SERIES ACTION",
+    )
+    parser.add_argument("--json", action="store_true", help="Output as JSON")
+    args = parser.parse_args()
+
+    if args.record:
+        agent_s, attractor_s, action = args.record
+        # "None" → None
+        agent_s = None if agent_s.lower() == "none" else agent_s
+        attractor_s = None if attractor_s.lower() == "none" else attractor_s
+        summary = record_agreement(agent_s, attractor_s, agent_action=action)
+        print(f"✅ Recorded: agent={agent_s} attractor={attractor_s} action={action}")
+        if args.json:
+            print(json.dumps(summary, indent=2, ensure_ascii=False))
+        else:
+            print(format_convergence(summary))
+    else:
+        summary = convergence_summary()
+        if args.json:
+            print(json.dumps(summary, indent=2, ensure_ascii=False))
+        else:
+            print(format_convergence(summary))
+
+
+if __name__ == "__main__":
+    main()

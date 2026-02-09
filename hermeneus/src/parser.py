@@ -101,12 +101,13 @@ class CCLParser:
         if expr.startswith('lim['):
             return self._parse_lim(expr)
         
-        # グループ否定: ~(...) — 中身を順序結合の否定として処理
+        # グループ振動: ~(...) — シーケンス全体を振動（反復実行）
+        # 例: ~(/sop_/noe_/ene_/dia-) = 4WFシーケンスを反復
         # 二項演算子より先にチェック（括弧内の _ で分割されるのを防ぐ）
         if expr.startswith('~(') and expr.endswith(')') and self._is_balanced_group(expr[1:], '(', ')'):
             inner = expr[2:-1]  # ~( と ) を除去
             body = self._parse_expression(inner)
-            return Oscillation(left=body, right=body, invert=True)
+            return Oscillation(left=body, right=body)
         
         # 二項演算子を優先順位順にチェック
         for op in self.BINARY_OPS_PRIORITY:

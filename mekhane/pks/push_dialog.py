@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
+# PROOF: [L2/PKS] <- mekhane/pks/ Push Dialog Workflow
 # PURPOSE: Push された知識への対話インターフェース
 """
-PROOF: [L2/インフラ] このファイルは存在しなければならない
+PROOF: [L2/PKS] <- mekhane/pks/ Push Dialog Workflow
 
 A0 (FEP) → 能動的推論 = 受身のプッシュではなく対話的探求
 → Creator が「なぜ？」「もっと」「関連は？」と問える

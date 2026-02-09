@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
+# PROOF: [L2/インフラ] <- mekhane/pks/ LLM Client Wrapper
 # PURPOSE: PKS 共通 LLM クライアント
 """
-PROOF: [L2/インフラ] このファイルは存在しなければならない
+PROOF: [L2/インフラ] <- mekhane/pks/ LLM Client Wrapper
 
 A0 (FEP) → 複数コンポーネントが同一の LLM 初期化パターンを持つ
 → DRY 原則により共通化

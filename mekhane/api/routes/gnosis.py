@@ -16,6 +16,7 @@ from pydantic import BaseModel, Field
 logger = logging.getLogger("hegemonikon.api.gnosis")
 
 # PURPOSE: レスポンスモデル
+# PURPOSE: 検索結果1件
 class GnosisSearchResult(BaseModel):
     """検索結果1件。"""
     title: str = ""
@@ -27,6 +28,7 @@ class GnosisSearchResult(BaseModel):
     score: float | None = None
 
 
+# PURPOSE: 検索レスポンス
 class GnosisSearchResponse(BaseModel):
     """検索レスポンス。"""
     query: str
@@ -34,6 +36,7 @@ class GnosisSearchResponse(BaseModel):
     total: int
 
 
+# PURPOSE: インデックス統計
 class GnosisStatsResponse(BaseModel):
     """インデックス統計。"""
     total: int = 0
@@ -74,6 +77,7 @@ def _get_index():
 
 
 @router.get("/search", response_model=GnosisSearchResponse)
+# PURPOSE: Gnōsis ベクトル検索
 async def gnosis_search(
     q: str = Query(..., min_length=1, description="検索クエリ"),
     limit: int = Query(10, ge=1, le=50, description="結果件数"),

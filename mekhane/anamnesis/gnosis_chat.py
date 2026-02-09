@@ -401,7 +401,8 @@ class KnowledgeIndexer:
                     chunk = text[start:end]
 
             chunks.append(chunk.strip())
-            start = end - overlap
+            # Guard: start は必ず前進する (overlap > effective chunk 時の無限ループ防止)
+            start = max(start + 1, end - overlap)
         return [c for c in chunks if c]
 
     @staticmethod
@@ -673,12 +674,25 @@ class GnosisChat:
             try:
                 if "knowledge" in get_table_names(self._index.db):
                     embedder = self._index._get_embedder()
-                    qvec = embedder.embed(query)
+                    # Dimension check: knowledge table may be indexed with a different model
                     table = self._index.db.open_table("knowledge")
-                    k_results = table.search(qvec).limit(fetch_k).to_list()
-                    for r in k_results:
-                        r["_source_table"] = "knowledge"
-                    results.extend(k_results)
+                    from mekhane.anamnesis.index import _get_vector_dimension
+                    table_dim = _get_vector_dimension(table)
+                    embedder_dim = getattr(embedder, '_dimension', 0)
+                    if table_dim and embedder_dim and table_dim != embedder_dim:
+                        print(
+                            f"[Gnōsis Chat] ⚠️ Knowledge table dimension mismatch: "
+                            f"table={table_dim}, embedder={embedder_dim} "
+                            f"({'ONNX fallback' if getattr(embedder, '_is_onnx_fallback', False) else embedder.model_name}). "
+                            f"Skipping knowledge search.",
+                            flush=True,
+                        )
+                    else:
+                        qvec = embedder.embed(query)
+                        k_results = table.search(qvec).limit(fetch_k).to_list()
+                        for r in k_results:
+                            r["_source_table"] = "knowledge"
+                        results.extend(k_results)
             except Exception:
                 pass
 
@@ -736,9 +750,13 @@ class GnosisChat:
         else:
             return self.CONFIDENCE_LOW
 
-    # PURPOSE: 検索結果からコンテキスト文字列を構築.
+    # PURPOSE: 検索結果からコンテキスト文字列を構築 (Source Grounding 強化).
     def _build_context(self, results: list[dict]) -> str:
-        """検索結果からコンテキスト文字列を構築."""
+        """検索結果からコンテキスト文字列を構築.
+
+        Source Grounding: 各引用パッセージにソースファイルパスと
+        チャンク ID を付与し、回答の追跡可能性を確保する。
+        """
         context_parts = []
         for i, r in enumerate(results, 1):
             title = r.get("title", "Untitled")
@@ -754,9 +772,19 @@ class GnosisChat:
             authors = r.get("authors", "")[:80]
             dist = r.get("_distance", 0)
 
+            # Source Grounding: ファイルパスと chunk_id で追跡可能にする
+            primary_key = r.get("primary_key", "")
+            url = r.get("url", "")
+            source_loc = ""
+            if primary_key:
+                source_loc = f"    Source: {primary_key}\n"
+            elif url:
+                source_loc = f"    Source: {url}\n"
+
             context_parts.append(
                 f"[{i}] [{source}] {title}\n"
                 f"    Relevance: {1 - dist:.2f}\n"
+                f"{source_loc}"
                 f"    {content}"
             )
         return "\n\n".join(context_parts)
@@ -803,11 +831,14 @@ class GnosisChat:
         # 3. Confidence-adaptive response
         if confidence == self.CONFIDENCE_NONE:
             answer = (
-                "⚠️ 知識ベースにこの質問に関連する情報が見つかりませんでした。\n\n"
-                "以下をお試しください:\n"
-                "- 別のキーワードで質問する\n"
-                "- `/index` で知識ベースを更新する\n"
-                "- 関連する論文を `collect` で追加する"
+                "📋 **ソースに情報がありません**\n\n"
+                "この質問に関連する情報は、現在の知識ベースに見つかりませんでした。\n"
+                "Gnōsis はソースに基づく回答のみを提供し、推測は行いません。\n\n"
+                "**対処法:**\n"
+                "- 🔄 別のキーワードで質問する\n"
+                "- 📥 `/index` で知識ベースを更新する\n"
+                "- 📄 `collect` コマンドで関連する論文を追加する\n"
+                "- 🔍 質問の範囲を狭める（具体的なトピック名を含める）"
             )
             generation_time = 0
         else:
@@ -860,7 +891,10 @@ class GnosisChat:
                 "source": r.get("source", "unknown"),
                 "table": r.get("_source_table", "unknown"),
                 "url": r.get("url", ""),
+                "primary_key": r.get("primary_key", ""),
+                "content_snippet": (r.get("content", r.get("abstract", "")))[:200],
                 "distance": round(r.get("_distance", 0), 4),
+                "relevance": round(1 - r.get("_distance", 0), 4),
                 "rerank_score": r.get("_rerank_score"),
             })
 

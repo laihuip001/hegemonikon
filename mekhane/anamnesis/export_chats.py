@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# PROOF: [L2/インフラ] <- mekhane/anamnesis/
+# PROOF: [L3/ユーティリティ] <- mekhane/anamnesis/
 """
 PROOF: [L3/ユーティリティ]
 

@@ -109,7 +109,9 @@ name = wf.get('name', '$basename')
 nodes = json.dumps(wf['nodes'])
 connections = json.dumps(wf['connections'])
 settings = json.dumps(wf.get('settings', {}))
-version_id = wf.get('versionId', '1.0.0')
+import uuid
+# versionId は必ず UUID を生成 (JSON の値は無視)
+version_id = str(uuid.uuid4())
 active = 1 if wf.get('active', True) else 0
 tags = json.dumps(wf.get('tags', []))
 
@@ -138,6 +140,39 @@ else:
         VALUES (?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))
     ''', (wf_id, name, nodes, connections, settings, version_id, active))
     print(f'  Created: {name} (ID: {wf_id})')
+
+# workflow_history にも登録 (publish と同等)
+cur.execute('''
+    INSERT OR REPLACE INTO workflow_history (workflowId, versionId, nodes, connections, name, authors, \"createdAt\", \"updatedAt\")
+    VALUES (?, ?, ?, ?, ?, 'deploy.sh', datetime('now'), datetime('now'))
+''', (wf_id, version_id, nodes, connections, name))
+
+# webhook_entity にも登録 (webhook ノードを自動検出)
+for node in wf['nodes']:
+    if node.get('type', '') in ('n8n-nodes-base.webhook',):
+        wh_path = node.get('parameters', {}).get('path', '')
+        wh_method = node.get('parameters', {}).get('httpMethod', 'POST')
+        wh_id = node.get('webhookId', '')
+        node_name = node.get('name', '')
+        if wh_path:
+            # 既存 webhook を削除して再登録
+            cur.execute('DELETE FROM webhook_entity WHERE "workflowId" = ? AND "webhookPath" = ?', (wf_id, wh_path))
+            cur.execute('''
+                INSERT INTO webhook_entity ("workflowId", "webhookPath", method, node, "webhookId", "pathLength")
+                VALUES (?, ?, ?, ?, ?, 1)
+            ''', (wf_id, wh_path, wh_method, node_name, wh_id or wh_path))
+            print(f'  Webhook: {wh_method} /{wh_path}')
+
+# shared_workflow が無ければ追加 (プロジェクト関連付け)
+cur.execute('SELECT COUNT(*) FROM shared_workflow WHERE \"workflowId\" = ?', (wf_id,))
+if cur.fetchone()[0] == 0:
+    cur.execute('SELECT role, \"projectId\" FROM shared_workflow LIMIT 1')
+    ref = cur.fetchone()
+    if ref:
+        cur.execute('''
+            INSERT INTO shared_workflow (role, \"workflowId\", \"projectId\", \"createdAt\", \"updatedAt\")
+            VALUES (?, ?, ?, datetime('now'), datetime('now'))
+        ''', (ref[0], wf_id, ref[1]))
 
 conn.commit()
 conn.close()

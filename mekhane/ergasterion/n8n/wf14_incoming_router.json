@@ -1,0 +1,63 @@
+{
+    "name": "WF-14: Incoming Router (Sympatheia)",
+    "nodes": [
+        {
+            "parameters": {
+                "httpMethod": "POST",
+                "path": "incoming",
+                "responseMode": "lastNode",
+                "options": {}
+            },
+            "id": "incoming-webhook",
+            "name": "統一入口",
+            "type": "n8n-nodes-base.webhook",
+            "typeVersion": 2,
+            "position": [
+                250,
+                400
+            ],
+            "webhookId": "incoming-wh"
+        },
+        {
+            "parameters": {
+                "jsCode": "const fs = require('fs');\n\nconst now = new Date();\nconst raw = $input.first().json;\nconst input = raw.body || raw;\nconst type = (input.type || '').toLowerCase();\nconst payload = input.payload || input;\n\nconst ROUTES = {\n  'health': { target: 'health-alert', wf: 'WF-05' },\n  'session-start': { target: 'session-state', wf: 'WF-06' },\n  'session-end': { target: 'session-state', wf: 'WF-06' },\n  'paper': { target: 'incoming-digest', wf: 'WF-03' },\n  'alert': { target: 'wbc-alert', wf: 'WF-09' },\n  'wbc': { target: 'wbc-alert', wf: 'WF-09' },\n  'feedback': { target: 'feedback-loop', wf: 'WF-12' },\n  'git': { target: 'git-sentinel', wf: 'WF-13' },\n  'digest': { target: 'weekly-digest', wf: 'WF-10' },\n  'heartbeat': { target: 'heartbeat', wf: 'WF-15' },\n  'attractor': { target: 'attractor', wf: 'WF-11' }\n};\n\nconst route = ROUTES[type];\n\nconst LOG_FILE = '/oikos/mneme/.hegemonikon/incoming_router.jsonl';\ntry { fs.appendFileSync(LOG_FILE, JSON.stringify({ timestamp: now.toISOString(), type: type, routed: route ? route.wf : 'UNKNOWN', source: input.source || 'unknown' }) + '\\n', 'utf-8'); } catch(e) {}\n\nif (!route) {\n  return [{ json: { error: 'Unknown type', type: type, available: Object.keys(ROUTES) } }];\n}\n\nreturn [{ json: { routed: true, target: route.target, wf: route.wf, webhookUrl: 'http://localhost:5678/webhook/' + route.target, type: type, timestamp: now.toISOString() } }];"
+            },
+            "id": "router",
+            "name": "視床",
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                450,
+                400
+            ]
+        }
+    ],
+    "connections": {
+        "統一入口": {
+            "main": [
+                [
+                    {
+                        "node": "視床",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        }
+    },
+    "settings": {
+        "executionOrder": "v1"
+    },
+    "tags": [
+        {
+            "name": "hegemonikon"
+        },
+        {
+            "name": "sympatheia"
+        },
+        {
+            "name": "router"
+        }
+    ],
+    "active": true
+}

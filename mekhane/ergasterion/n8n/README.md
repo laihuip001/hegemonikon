@@ -34,19 +34,19 @@
 | WF-05 | 感覚 | Health Alert → Severity Classification | v9 |
 | WF-06 | 覚醒/睡眠 | Session State Machine | v4 |
 | WF-07 | シナプス | FEP Daily Training | v1 |
+| WF-08 | 触覚 | File Monitor (7ファイル監視) | v1 |
+| WF-13 | DNA修復 | Git Sentinel (未コミット検出) | v1 |
+| WF-15 | 心拍 | Heartbeat (自己生存証明) | v3 |
 
 ### ロードマップ
 
 | WF | 生体比喩 | 役割 | Phase |
 |:---|:---------|:-----|:------|
-| WF-08 | 触覚 | File Monitor | α |
 | WF-09 | 白血球 | Anomaly → Auto Response | β |
 | WF-10 | 記憶圧縮 | Weekly Digest (sparkline) | γ |
 | WF-11 | 反射弓 | Attractor → WF Dispatch | δ |
 | WF-12 | 体温調節 | Feedback Loop (恒常性) | ε |
-| WF-13 | DNA修復 | Git Sentinel | α |
 | WF-14 | 視床 | Incoming Router (統一) | ζ |
-| WF-15 | 心拍 | Heartbeat (自己生存証明) | α |
 
 ---
 
@@ -72,6 +72,9 @@ mekhane/ergasterion/n8n/
 ├── wf05_health_alert.json
 ├── wf06_session_state.json
 ├── wf07_fep_daily_train.json
+├── wf08_file_monitor.json
+├── wf13_git_sentinel.json
+├── wf15_heartbeat.json
 ├── deploy.sh
 ├── docker-compose.yml
 └── data/              ← n8n DB (gitignore)
@@ -79,4 +82,4 @@ mekhane/ergasterion/n8n/
 
 ---
 
-*Sympatheia v0.1.0 — 2026-02-08*
+*Sympatheia v0.2.0 — 2026-02-09*

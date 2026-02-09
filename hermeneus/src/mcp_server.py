@@ -31,6 +31,21 @@ except ImportError:
     MCP_AVAILABLE = False
     Server = None
 
+    # Fallback types for when MCP is not available
+    class TextContent:
+        def __init__(self, type: str, text: str):
+            self.type = type
+            self.text = text
+
+    class Tool:
+        def __init__(self, name: str, description: str, inputSchema: Dict[str, Any]):
+            self.name = name
+            self.description = description
+            self.inputSchema = inputSchema
+
+    class CallToolResult:
+        pass
+
 
 # =============================================================================
 # MCP Server Implementation

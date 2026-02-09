@@ -35,8 +35,8 @@ def _get_api_key() -> Optional[str]:
     )
 
 
-@dataclass
 # PURPOSE: Result of semantic validation.
+@dataclass
 class SemanticResult:
     """Result of semantic validation."""
 

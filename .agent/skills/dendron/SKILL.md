@@ -9,6 +9,11 @@ triggers:
   - "dendron"
   - "checker"
   - "なぜ存在する"
+risk_tier: L1
+risks: none
+reversible: true
+requires_approval: false
+fallbacks: []
 ---
 
 # Dendron EPT Checker
@@ -51,10 +56,3 @@ cd ~/oikos/hegemonikon && PYTHONPATH=. .venv/bin/python scripts/generate_proofs.
 ---
 
 *v1.0 — 全PJ IDE配線 (2026-02-08)*
-
----
-risk_tier: L1
-risks: none
-reversible: true
-requires_approval: false
-fallbacks: []

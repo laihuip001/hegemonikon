@@ -31,6 +31,16 @@ except ImportError:
     MCP_AVAILABLE = False
     Server = None
 
+    # Fallback types for when mcp is not installed
+    class Tool:
+        def __init__(self, **kwargs): pass
+
+    class TextContent:
+        def __init__(self, **kwargs): pass
+
+    class CallToolResult:
+        def __init__(self, **kwargs): pass
+
 
 # =============================================================================
 # MCP Server Implementation

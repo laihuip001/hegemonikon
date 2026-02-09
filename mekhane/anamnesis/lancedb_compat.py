@@ -1,3 +1,4 @@
+# PROOF: [L3/ユーティリティ] <- mekhane/anamnesis/
 """LanceDB compatibility layer.
 
 Provides `get_table_names(db)` that works across LanceDB versions:

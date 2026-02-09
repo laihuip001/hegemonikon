@@ -1,3 +1,4 @@
+# PROOF: [L2/PKS] <- mekhane/pks/
 #!/usr/bin/env python3
 # PURPOSE: Push された知識への対話インターフェース
 """

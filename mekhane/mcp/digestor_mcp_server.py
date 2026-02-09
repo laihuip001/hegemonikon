@@ -198,7 +198,7 @@ async def handle_run_digestor(arguments: dict):
     result = pipeline.run(
         topics=topics,
         max_papers=max_papers,
-        # NOTE: Removed self-assignment: dry_run = dry_run
+        dry_run=dry_run,
     )
 
     output = f"=== Digestor パイプライン {'(Dry Run)' if dry_run else ''} ===\n"

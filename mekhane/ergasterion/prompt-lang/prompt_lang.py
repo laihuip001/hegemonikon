@@ -921,7 +921,7 @@ class PromptLangParser:
                         section=section,
                         filter=filter_opt,
                         depth=depth,
-                        # NOTE: Removed self-assignment: tool_chain = tool_chain
+                        tool_chain=tool_chain,
                     )
                 )
                 self.pos += 1

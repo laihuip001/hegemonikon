@@ -136,7 +136,7 @@ class ZeroTrustCCLExecutor:
             success=validation.valid,
             output=output,
             validation=validation,
-            # NOTE: Removed self-assignment: context = context
+            context=context,
         )
 
     # PURPOSE: 再生成用のプロンプトを取得

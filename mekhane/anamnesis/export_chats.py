@@ -74,13 +74,14 @@ class AntigravityChatExporter:
     """簡潔版: Antigravity IDE のチャット履歴をエクスポート"""
 
     # PURPOSE: AntigravityChatExporter の構成と依存関係の初期化
-    def __init__(self, output_dir: Path = DEFAULT_OUTPUT_DIR, limit: int = None):
+    def __init__(self, output_dir: Path = DEFAULT_OUTPUT_DIR, limit: int = None, cdp_port: int = CDP_PORT):
         self.output_dir = output_dir
         self.output_dir.mkdir(parents=True, exist_ok=True)
         self.chats: List[Dict] = []
         self.browser = None
         self.page = None
         self.limit = limit  # エクスポート上限
+        self.cdp_port = cdp_port
         self.filter_keyword = None
 
         # デバッグ: 出力ディレクトリ確認
@@ -98,7 +99,7 @@ class AntigravityChatExporter:
             self.playwright = await async_playwright().start()
 
             # CDP エンドポイントに接続
-            cdp_url = f"http://localhost:{CDP_PORT}"
+            cdp_url = f"http://localhost:{self.cdp_port}"
             print(f"[*] Connecting to CDP: {cdp_url}")
 
             self.browser = await self.playwright.chromium.connect_over_cdp(cdp_url)
@@ -1010,9 +1011,17 @@ async def main():
         help="指定した文字列をタイトルに含む会話のみエクスポート",
     )
 
+    parser.add_argument(
+        "--port",
+        "-p",
+        type=int,
+        default=CDP_PORT,
+        help=f"CDP (Chrome DevTools Protocol) ポート (default: {CDP_PORT})",
+    )
+
     args = parser.parse_args()
 
-    exporter = AntigravityChatExporter(output_dir=args.output, limit=args.limit)
+    exporter = AntigravityChatExporter(output_dir=args.output, limit=args.limit, cdp_port=args.port)
     exporter.filter_keyword = args.filter
 
     try:

@@ -135,9 +135,13 @@ AMP ループ: Stage 3 で過信検出 → Stage 1 に戻る（最大3回）
 | やろうとしていること | 使うべき PJ |
 |:---|:---|
 | CCL 式の解析 | **Hermēneus** `dispatch()` |
+| WF 定義の参照 | **Hermēneus** `WorkflowRegistry` |
+| WF の実行 | **Hermēneus** `WorkflowExecutor` |
 | 知識の検索 | **Anamnesis** `cli.py search` |
 | 存在証明 | **Dendron** `checker.py` |
 | 健全性 | **Peira** `hgk_health.py` |
+| 射の提案 | **Taxis** `morphism_proposer` |
+| Series/定理の推薦 | **FEP** `attractor_advisor` |
 
 **自己検証**: 「既存PJのどの機能を使ったか？ 手動でやったのはなぜか？」
 

@@ -1,9 +1,3 @@
----
-trigger: model_decision
-glob: 
-description: Protocol D-Extended: 存在系断言禁止
----
-
 # Protocol D-Extended: 存在系断言禁止
 
 > **ステータス**: 常時適用 (Invariant)

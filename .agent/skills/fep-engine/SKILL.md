@@ -13,6 +13,15 @@ triggers:
   - "パイプライン"
   - "attractor"
   - "series"
+
+# Safety Contract
+risk_tier: L2
+reversible: false
+requires_approval: false
+risks:
+  - "推論ループの暴走"
+fallbacks:
+  - "manual-override"
 ---
 
 # FEP Cognitive Engine

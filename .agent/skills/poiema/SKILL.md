@@ -9,6 +9,15 @@ triggers:
   - "poiema"
   - "テンプレート"
   - "ドキュメント生成"
+
+# Safety Contract
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks:
+  - "意図しないアーティファクト生成"
+fallbacks:
+  - "manual-creation"
 ---
 
 # Poiema Generator

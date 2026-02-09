@@ -13,6 +13,15 @@ triggers:
   - "ワークフロー式"
   - "演算子"
 version: "2.0"
+
+# Safety Contract
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks:
+  - "誤ったワークフロー呼び出し"
+fallbacks:
+  - "manual-execution"
 ---
 
 # Hermēneus CCL Dispatch v2.0

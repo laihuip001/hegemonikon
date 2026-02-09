@@ -30,6 +30,10 @@ try:
 except ImportError:
     MCP_AVAILABLE = False
     Server = None
+    # Dummy types for type hinting when MCP is not available
+    class Tool: pass
+    class TextContent: pass
+    class CallToolResult: pass
 
 
 # =============================================================================

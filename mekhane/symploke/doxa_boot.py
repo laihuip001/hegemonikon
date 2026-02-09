@@ -127,6 +127,10 @@ def check_promotion_candidates(
     candidates = []
 
     for belief in store.list_all():
+        # 昇格済みはスキップ
+        if belief.is_promoted:
+            continue
+
         reasons = []
         score = 0.0
 

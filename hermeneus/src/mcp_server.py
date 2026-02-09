@@ -15,7 +15,7 @@ import asyncio
 import json
 import sys
 from pathlib import Path
-from typing import Any, Dict, List, Sequence
+from typing import Any, Dict, List, Sequence, Optional
 
 # MCP SDK import (optional)
 try:
@@ -30,6 +30,22 @@ try:
 except ImportError:
     MCP_AVAILABLE = False
     Server = None
+
+    # Fallback types for type hinting when MCP is not installed
+    class TextContent:
+        def __init__(self, type: str, text: str):
+            self.type = type
+            self.text = text
+
+    class Tool:
+        def __init__(self, name: str, description: str, inputSchema: Dict):
+            self.name = name
+            self.description = description
+            self.inputSchema = inputSchema
+
+    class CallToolResult:
+        def __init__(self, content: List[TextContent]):
+            self.content = content
 
 
 # =============================================================================

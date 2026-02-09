@@ -132,9 +132,13 @@ def resolve_wf_paths(wf_ids: list[str]) -> dict[str, str]:
 def dispatch(ccl_expr: str) -> dict:
     """CCL 式をディスパッチ: パース → 構造表示 → 実行計画テンプレート
 
+    v3.0: @macro 検出時に MacroExecutor を自動実行し、
+    エントロピー計測 + 逆伝播の結果を plan_template に埋め込む。
+    これにより「意志より環境」(第零原則) が達成される。
+
     Returns:
         dict with keys: success, ast, tree, workflows, wf_paths,
-                        plan_template, error
+                        plan_template, macro_plan, error
     """
     from hermeneus.src.parser import CCLParser as _Parser
 
@@ -147,6 +151,7 @@ def dispatch(ccl_expr: str) -> dict:
         "workflows": [],
         "wf_paths": {},
         "plan_template": "",
+        "macro_plan": None,
         "error": None,
     }
 
@@ -165,6 +170,36 @@ def dispatch(ccl_expr: str) -> dict:
     # Step 2: ワークフロー抽出 + パス解決
     result["workflows"] = extract_workflows(ast)
     result["wf_paths"] = resolve_wf_paths(result["workflows"])
+
+    # Step 2.5: マクロ自動実行計画 (L1 環境制約)
+    macro_section = ""
+    if ccl_expr.strip().startswith("@"):
+        try:
+            from hermeneus.src.macro_executor import MacroExecutor
+            executor = MacroExecutor()
+            macro_result = executor.execute(ccl_expr)
+            result["macro_plan"] = macro_result
+
+            # マクロ実行計画セクションを生成
+            lines = [
+                f"【マクロ実行計画】@macro → AST walk (自動生成)",
+                f"  展開: {macro_result.expanded_ccl}",
+                f"  ステップ数: {len(macro_result.steps)}",
+                f"  確信度: {macro_result.final_confidence:.0%}",
+            ]
+            if macro_result.bottleneck_step:
+                lines.append(
+                    f"  ⚠️ ボトルネック: {macro_result.bottleneck_step} "
+                    f"(gradient={macro_result.gradient_map.get(macro_result.bottleneck_step, 0):.2f})"
+                )
+            lines.append("  実行順序:")
+            for i, step in enumerate(macro_result.steps, 1):
+                lines.append(f"    {i}. {step.node_id} (Δε={step.entropy_reduction:+.2f})")
+            lines.append("  → 上記順序で各 WF 定義を view_file し、順次実行せよ")
+
+            macro_section = "\n".join(lines)
+        except Exception as e:
+            macro_section = f"【マクロ実行計画】⚠️ MacroExecutor エラー: {e}"
 
     # Step 3: 射提案の自動生成 (BC-8 引力化)
     morphism_section = ""
@@ -190,12 +225,15 @@ def dispatch(ccl_expr: str) -> dict:
     if not view_cmds:
         view_cmds = "  (WF 定義ファイルが見つかりません)"
 
+    # マクロセクションがあれば plan_template の先頭に挿入
+    macro_block = f"\n{macro_section}\n" if macro_section else ""
+
     tmpl = f"""【CCL】{ccl_expr}
 【構造】
 {result['tree']}
 【関連WF】{wf_list}
 【WF定義】以下を view_file で開くこと:
-{view_cmds}
+{view_cmds}{macro_block}
 【UML Pre-check】(WF 実行前に回答)
   S1 [O1]: 入力を正しく理解したか？ → (回答)
   S2 [A1]: 第一印象・直感はどうか？ → (回答)

@@ -30,6 +30,10 @@ try:
 except ImportError:
     MCP_AVAILABLE = False
     Server = None
+    # Define dummy classes for type hints
+    Tool = Any
+    TextContent = Any
+    CallToolResult = Any
 
 
 # =============================================================================

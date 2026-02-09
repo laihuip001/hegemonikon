@@ -1,9 +1,9 @@
 ---
 description: セッション終了時に引き継ぎドキュメントを生成し、経験を法則化する。次回セッションの/bootで読み込まれる。
 hegemonikon: H4 Doxa
-version: "7.0"
+version: "7.1"
 lcm_state: stable
-lineage: "v6.1 + Value Pitch 品質革命 → v7.0"
+lineage: "v7.0 + Step 3.5 IDE ネイティブ Export → v7.1"
 category_theory:
   core: "随伴の右関手 R: Ses → Mem"
   adjunction: "L (Boot) ⊣ R (Bye)"
@@ -212,10 +212,18 @@ git -C ~/oikos status --short
 > Handoff は圧縮 (R) なので情報ロスがある。生チャットデータは ε 精度の上限を決める。
 > ker(R) を保存しなければ、ε は原理的に 1 に近づけない。
 
-```bash
-cd ~/oikos/hegemonikon && \
-.venv/bin/python mekhane/anamnesis/export_chats.py --single "Session_$(date +%Y%m%d_%H%M)"
-```
+### 手順: IDE ネイティブ Export
+
+1. **Antigravity IDE のエディタビュー**で現在のチャットを開く
+2. チャットパネル右上の **`...`** (メニュー) をクリック
+3. **Export → Markdown (.md)** を選択
+4. 保存先: `~/oikos/mneme/.hegemonikon/sessions/chat_export_YYYY-MM-DD.md`
+   - 例: `chat_export_2026-02-09.md`
+   - 同日に複数セッションがある場合: `chat_export_2026-02-09_2.md`
+
+> [!NOTE]
+> 以前は `export_chats.py` スクリプトを使用していたが、IDE ネイティブの Export 機能の方が
+> 確実かつ完全な会話データを出力するため、v7.1 よりこちらを正式手順とする。
 
 ---
 
@@ -336,7 +344,7 @@ graph LR
 
 | Module | Workflow | Status |
 |:-------|:---------|:-------|
-| H4 Doxa | /bye | v6.1 Ready |
+| H4 Doxa | /bye | v7.1 Ready |
 
 > **制約リマインダ**: Handoff は「赤の他人基準」(R の自己完結性) で記述。Step 3.5 スキップ禁止。
 
@@ -346,3 +354,4 @@ graph LR
 *v5.0 — 随伴統合 (2026-02-08)*
 *v6.0 — 随伴深層統合。各Step を右随伴 R の計算ステップとして再定義 (2026-02-08)*
 *v6.1 — Step 3.6π Value Pitch 追加。R^π: Ses→Sig (意味抽出関手)。HGK 7公理から演繹した8次元 Benefit Angle (2026-02-08)*
+*v7.1 — Step 3.5 を export_chats.py から IDE ネイティブ Export に変更。保存先: chat_export_YYYY-MM-DD.md (2026-02-09)*

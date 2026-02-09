@@ -102,6 +102,14 @@ def _register_routers(app: FastAPI) -> None:
     except Exception as exc:
         logger.warning("CCL router skipped: %s", exc)
 
+    # Sympatheia — AttractorAdvisor (モデルロード) に依存するため遅延ロード
+    try:
+        from mekhane.api.routes.sympatheia import router as sympatheia_router
+        app.include_router(sympatheia_router, prefix=API_PREFIX)
+        logger.info("Sympatheia router registered")
+    except Exception as exc:
+        logger.warning("Sympatheia router skipped: %s", exc)
+
 
 # PURPOSE: アプリケーションインスタンス（uvicorn 用）
 app = create_app()

@@ -50,6 +50,8 @@ Q.E.D.
 | vault/ | P3 → 永続化ストレージ |
 | kairos/ | P3 → 時間的文脈の記憶 |
 | doxa_store.py | P2 → 信念の永続化 |
+| export_chats.py | P3 → チャット履歴の外部保存 |
+| lancedb_compat.py | P3 → 永続化ストレージの互換性維持 |
 
 ---
 

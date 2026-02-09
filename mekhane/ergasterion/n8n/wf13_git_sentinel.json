@@ -7,13 +7,13 @@
                     "interval": [
                         {
                             "field": "cronExpression",
-                            "expression": "0 * * * *"
+                            "expression": "0 */2 * * *"
                         }
                     ]
                 }
             },
             "id": "sentinel-cron",
-            "name": "毎時の走査",
+            "name": "2時間毎の巡回",
             "type": "n8n-nodes-base.scheduleTrigger",
             "typeVersion": 1.2,
             "position": [
@@ -40,10 +40,10 @@
         },
         {
             "parameters": {
-                "jsCode": "const fs = require('fs');\nconst path = require('path');\n\n// === 設定 ===\nconst REPO_DIR = '/home/makaron8426/oikos/hegemonikon';\nconst GIT_DIR = path.join(REPO_DIR, '.git');\nconst STATE_FILE = '/home/makaron8426/oikos/mneme/.hegemonikon/git_sentinel_state.json';\n\n// HEAD から現在のブランチを解決\nconst headContent = fs.readFileSync(path.join(GIT_DIR, 'HEAD'), 'utf-8').trim();\nvar branchRef = null;\nvar branchName = 'detached';\nif (headContent.startsWith('ref: ')) {\n  branchRef = headContent.slice(5);\n  branchName = branchRef.split('/').pop();\n}\n\n// === mtime 取得 ===\nconst now = Date.now();\n\n// .git/index = working tree が変更されるたびに更新\nvar indexMtime = 0;\ntry {\n  indexMtime = fs.statSync(path.join(GIT_DIR, 'index')).mtimeMs;\n} catch(e) {}\n\n// .git/refs/heads/{branch} = 最終コミット時刻\nvar commitMtime = 0;\nif (branchRef) {\n  // packed-refs の場合は refs/heads ファイルが存在しないことがある\n  var refPath = path.join(GIT_DIR, branchRef);\n  try {\n    commitMtime = fs.statSync(refPath).mtimeMs;\n  } catch(e) {\n    // packed-refs を確認\n    try {\n      var packed = fs.readFileSync(path.join(GIT_DIR, 'packed-refs'), 'utf-8');\n      if (packed.indexOf(branchRef) !== -1) {\n        // packed-refs の mtime を代用\n        commitMtime = fs.statSync(path.join(GIT_DIR, 'packed-refs')).mtimeMs;\n      }\n    } catch(e2) {}\n  }\n}\n\n// === 未コミット検出ロジック ===\n// index が commit ref より新しい = staging area に変更がある可能性\nvar hasUncommitted = indexMtime > commitMtime + 1000; // 1秒マージン\nvar uncommittedSeconds = hasUncommitted ? Math.floor((now - commitMtime) / 1000) : 0;\nvar uncommittedHours = Math.floor(uncommittedSeconds / 3600);\n\n// MERGE_HEAD, REBASE_HEAD の存在チェック\nvar hasMergeInProgress = false;\nvar hasRebaseInProgress = false;\ntry { fs.statSync(path.join(GIT_DIR, 'MERGE_HEAD')); hasMergeInProgress = true; } catch(e) {}\ntry { fs.statSync(path.join(GIT_DIR, 'rebase-merge')); hasRebaseInProgress = true; } catch(e) {}\ntry { fs.statSync(path.join(GIT_DIR, 'rebase-apply')); hasRebaseInProgress = true; } catch(e) {}\n\n// === 状態ファイル 読み書き ===\nvar prevState = {};\ntry {\n  prevState = JSON.parse(fs.readFileSync(STATE_FILE, 'utf-8'));\n} catch(e) {}\n\nvar scanCount = ((prevState._meta || {}).scanCount || 0) + 1;\nvar prevAlerted = prevState.lastAlertedAt || null;\n\n// アラート判定: 24h以上未コミット\nvar ALERT_THRESHOLD_HOURS = 24;\nvar shouldAlert = hasUncommitted && uncommittedHours >= ALERT_THRESHOLD_HOURS;\n\n// リマインド間隔: 一度アラートしたら6時間は再通知しない\nvar REMIND_INTERVAL_MS = 6 * 3600 * 1000;\nif (shouldAlert && prevAlerted) {\n  var sinceLast = now - new Date(prevAlerted).getTime();\n  if (sinceLast < REMIND_INTERVAL_MS) {\n    shouldAlert = false; // 抑制\n  }\n}\n\n// 特殊状態の即時アラート\nvar hasSpecialState = hasMergeInProgress || hasRebaseInProgress;\nif (hasSpecialState) shouldAlert = true;\n\n// === Slack ペイロード ===\nvar slackPayload = '';\nif (shouldAlert) {\n  var emoji = hasSpecialState ? '🚨' : '🧬';\n  var title = hasSpecialState\n    ? emoji + ' Git: 特殊状態を検出'\n    : emoji + ' Git Sentinel: ' + uncommittedHours + 'h 未コミット';\n\n  var lines = [];\n  lines.push('*Branch*: `' + branchName + '`');\n  lines.push('*最終コミット*: ' + uncommittedHours + 'h ' + (uncommittedSeconds % 3600 > 0 ? Math.floor((uncommittedSeconds % 3600) / 60) + 'm' : '') + ' ago');\n  if (hasMergeInProgress) lines.push('⚠️ MERGE_HEAD が存在 — マージ途中');\n  if (hasRebaseInProgress) lines.push('⚠️ rebase が進行中');\n  lines.push('_Scan #' + scanCount + '_');\n\n  slackPayload = JSON.stringify({\n    blocks: [\n      { type: 'header', text: { type: 'plain_text', text: title, emoji: true } },\n      { type: 'section', text: { type: 'mrkdwn', text: lines.join('\\n') } },\n      { type: 'context', elements: [{ type: 'mrkdwn', text: '_WF-13 Git Sentinel | DNA修復酵素_' }] }\n    ]\n  });\n}\n\n// === 状態保存 ===\ntry {\n  var state = {\n    _meta: {\n      scanCount: scanCount,\n      lastScan: new Date(now).toISOString(),\n      lastAlertedAt: shouldAlert ? new Date(now).toISOString() : prevAlerted\n    },\n    branch: branchName,\n    indexMtime: indexMtime,\n    commitMtime: commitMtime,\n    hasUncommitted: hasUncommitted,\n    uncommittedHours: uncommittedHours,\n    hasMergeInProgress: hasMergeInProgress,\n    hasRebaseInProgress: hasRebaseInProgress\n  };\n  fs.writeFileSync(STATE_FILE, JSON.stringify(state, null, 2), 'utf-8');\n} catch(e) {}\n\nreturn [{ json: {\n  scanCount: scanCount,\n  timestamp: new Date(now).toISOString(),\n  branch: branchName,\n  hasUncommitted: hasUncommitted,\n  uncommittedHours: uncommittedHours,\n  hasMergeInProgress: hasMergeInProgress,\n  hasRebaseInProgress: hasRebaseInProgress,\n  shouldAlert: shouldAlert,\n  slackPayload: slackPayload\n} }];"
+                "jsCode": "const fs = require('fs');\n\nconst RAW = '/oikos/mneme/.hegemonikon/git_status_raw.json';\nconst OUT = '/oikos/mneme/.hegemonikon/git_sentinel.json';\nconst now = new Date();\n\nlet raw = {};\ntry { raw = JSON.parse(fs.readFileSync(RAW, 'utf-8')); } catch(e) {\n  return [{ json: { error: e.message, dirty: false, shouldAlert: false, slackPayload: '' } }];\n}\n\nconst lines = raw.status_lines || [];\nlet modified = 0, untracked = 0, staged = 0, deleted = 0;\nlet modFiles = [], untFiles = [];\nfor (let i = 0; i < lines.length; i++) {\n  const code = lines[i].substring(0,2);\n  const file = lines[i].substring(3).trim();\n  if (code === '??') { untracked++; untFiles.push(file); }\n  else if (code.indexOf('D') >= 0) deleted++;\n  else if (code.charAt(0) !== ' ' && code.charAt(0) !== '?') staged++;\n  else { modified++; modFiles.push(file); }\n}\n\nconst total = modified + untracked + staged + deleted;\nconst dirty = total > 0;\nconst commits = (raw.recent_commits || []).slice(0,3);\nconst stash = raw.stash_count || 0;\nconst rawAge = Math.round((now - new Date(raw.timestamp)) / 60000);\n\nconst result = {\n  timestamp: now.toISOString(),\n  branch: raw.branch || 'unknown',\n  dirty, total, modified, untracked, staged, deleted,\n  commits, stash, scanAge: rawAge + 'min'\n};\n\nfs.writeFileSync(OUT, JSON.stringify(result, null, 2), 'utf-8');\n\nconst shouldAlert = dirty;\nlet slackPayload = '';\nif (shouldAlert) {\n  const cl = [];\n  if (modified > 0) cl.push('📝 Modified: ' + modified + ' — ' + modFiles.slice(0,3).join(', ') + (modified > 3 ? '...' : ''));\n  if (untracked > 0) cl.push('❓ Untracked: ' + untracked + ' — ' + untFiles.slice(0,3).join(', ') + (untracked > 3 ? '...' : ''));\n  if (staged > 0) cl.push('✅ Staged: ' + staged);\n  if (deleted > 0) cl.push('🗑️ Deleted: ' + deleted);\n  if (stash > 0) cl.push('📦 Stashes: ' + stash);\n  const emoji = total > 10 ? '🧬🚨' : '🧬';\n  slackPayload = JSON.stringify({\n    blocks: [\n      { type: 'header', text: { type: 'plain_text', text: emoji + ' Git Sentinel: ' + total + ' uncommitted', emoji: true } },\n      { type: 'section', text: { type: 'mrkdwn', text: '*Branch:* `' + result.branch + '`\\n' + cl.join('\\n') } },\n      { type: 'context', elements: [{ type: 'mrkdwn', text: '_WF-13 | Last: ' + (commits[0] || 'N/A').substring(0,60) + '_' }] }\n    ]\n  });\n}\n\nreturn [{ json: Object.assign(result, { shouldAlert, slackPayload }) }];"
             },
-            "id": "sentinel-check",
-            "name": "Git状態走査",
+            "id": "parse-git",
+            "name": "DNA解析",
             "type": "n8n-nodes-base.code",
             "typeVersion": 2,
             "position": [
@@ -62,8 +62,8 @@
                     ]
                 }
             },
-            "id": "if-alert",
-            "name": "通知要?",
+            "id": "if-dirty",
+            "name": "DNA損傷?",
             "type": "n8n-nodes-base.if",
             "typeVersion": 1,
             "position": [
@@ -82,8 +82,8 @@
                     "timeout": 10000
                 }
             },
-            "id": "slack-notify",
-            "name": "コミット催促",
+            "id": "slack-alert",
+            "name": "修復要請",
             "type": "n8n-nodes-base.httpRequest",
             "typeVersion": 4.2,
             "position": [
@@ -93,11 +93,11 @@
         }
     ],
     "connections": {
-        "毎時の走査": {
+        "2時間毎の巡回": {
             "main": [
                 [
                     {
-                        "node": "Git状態走査",
+                        "node": "DNA解析",
                         "type": "main",
                         "index": 0
                     }
@@ -108,29 +108,29 @@
             "main": [
                 [
                     {
-                        "node": "Git状態走査",
+                        "node": "DNA解析",
                         "type": "main",
                         "index": 0
                     }
                 ]
             ]
         },
-        "Git状態走査": {
+        "DNA解析": {
             "main": [
                 [
                     {
-                        "node": "通知要?",
+                        "node": "DNA損傷?",
                         "type": "main",
                         "index": 0
                     }
                 ]
             ]
         },
-        "通知要?": {
+        "DNA損傷?": {
             "main": [
                 [
                     {
-                        "node": "コミット催促",
+                        "node": "修復要請",
                         "type": "main",
                         "index": 0
                     }
@@ -153,6 +153,5 @@
             "name": "git-sentinel"
         }
     ],
-    "active": true,
-    "versionId": "1.0.0"
+    "active": true
 }

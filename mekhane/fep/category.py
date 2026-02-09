@@ -57,6 +57,7 @@ Provides Python dataclass representations for:
 - Monad: T, η, μ (/zet)
 - Functor: F: C → D (e.g. /eat: Ext→Cog, /zet: Cog→Cog)
 - NaturalTransformation: α: F ⇒ G (e.g. η, ε, WF version upgrade)
+- EpsilonMixture: M = (1-ε)×structure + ε×uniform (ε-Architecture)
 
 References:
 - ccl/operators.md §13 (圏論的意味論マップ)
@@ -271,6 +272,97 @@ class Adjunction:
     def is_faithful(self) -> bool:
         """R is faithful if η quality > 0.8."""
         return self.eta_quality > 0.8
+
+
+# =============================================================================
+# EpsilonMixture (ε-Architecture)                            [Layer B: Constraint]
+# =============================================================================
+
+
+# PURPOSE: Convex combination M = (1-ε)×structure + ε×uniform
+@dataclass
+class EpsilonMixture:
+    """Convex combination in the simplex of distributions.
+
+    M = (1-ε) × structure + ε × uniform
+
+    Category-theoretic interpretation:
+    - Structure functor S: State → Dist (domain knowledge → distribution)
+    - Uniform functor U: State → Dist (constant uniform distribution)
+    - α_ε: S ⇒ U is a parametric natural transformation
+    - ε ∈ [0.01, 0.50] indexes the transformation family
+
+    Meta-ε learning makes ε itself a learned parameter:
+    - Learning functor L: (ε, error) → ε' via EMA
+    - L is a contraction mapping: ||L(ε₁) - L(ε₂)|| ≤ α||ε₁ - ε₂||
+    - Fixed point ε* = argmin F(ε) where F is variational free energy
+
+    The 4 ε parameters form a product: ε = ε_A × ε_B_obs × ε_B_act × ε_D
+    Each component governs one matrix of the generative model ABCD.
+    """
+
+    name: str  # e.g. "A", "B_observe", "B_act", "D"
+    epsilon: float  # Current ε value
+    eps_min: float = 0.01
+    eps_max: float = 0.50
+    description: str = ""
+
+    # PURPOSE: ε within valid bounds
+    @property
+    def is_valid(self) -> bool:
+        """ε within valid bounds."""
+        return self.eps_min <= self.epsilon <= self.eps_max
+
+    # PURPOSE: How much we trust domain structure vs uniform
+    @property
+    def structure_trust(self) -> float:
+        """How much we trust domain structure (1-ε)."""
+        return 1.0 - self.epsilon
+
+    # PURPOSE: Apply the mixture law
+    def apply(self, structure_val: float, uniform_val: float) -> float:
+        """Apply M = (1-ε) × structure + ε × uniform."""
+        return (1.0 - self.epsilon) * structure_val + self.epsilon * uniform_val
+
+    # PURPOSE: Verify convex combination invariant
+    def verify(self) -> bool:
+        """Verify the convex combination invariant.
+
+        The mixture must satisfy:
+        1. ε ∈ [eps_min, eps_max]
+        2. (1-ε) + ε = 1 (trivially true, but documented)
+        3. Both coefficients are non-negative
+        """
+        return (
+            self.is_valid
+            and self.epsilon >= 0
+            and self.structure_trust >= 0
+        )
+
+
+# The 4 ε parameters of the generative model
+EPSILON_REGISTRY: Dict[str, EpsilonMixture] = {
+    "A": EpsilonMixture(
+        name="A",
+        epsilon=0.25,
+        description="Observation likelihood: categorical mapping + noise",
+    ),
+    "B_observe": EpsilonMixture(
+        name="B_observe",
+        epsilon=0.10,
+        description="State persistence under observation",
+    ),
+    "B_act": EpsilonMixture(
+        name="B_act",
+        epsilon=0.15,
+        description="Transition noise under action",
+    ),
+    "D": EpsilonMixture(
+        name="D",
+        epsilon=0.15,
+        description="Prior uncertainty (Stoic prior + uniform)",
+    ),
+}
 
 
 # =============================================================================

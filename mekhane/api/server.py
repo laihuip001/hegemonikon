@@ -94,6 +94,14 @@ def _register_routers(app: FastAPI) -> None:
     except Exception as exc:
         logger.warning("Gnōsis router skipped: %s", exc)
 
+    # CCL — Hermēneus/Synergeia に依存するため遅延ロード
+    try:
+        from mekhane.api.routes.ccl import router as ccl_router
+        app.include_router(ccl_router, prefix=API_PREFIX)
+        logger.info("CCL router registered")
+    except Exception as exc:
+        logger.warning("CCL router skipped: %s", exc)
+
 
 # PURPOSE: アプリケーションインスタンス（uvicorn 用）
 app = create_app()

@@ -32,6 +32,20 @@ MODELS_DIR = (
     Path(__file__).parent.parent / "models" / "bge-small"
 )  # forge/models/bge-small
 
+
+def _get_vector_dimension(table) -> int | None:
+    """LanceDB テーブルの vector カラムの次元数を取得.
+
+    Returns:
+        次元数。取得できない場合は None。
+    """
+    import re as _re
+    for field in table.schema:
+        if field.name == "vector":
+            m = _re.search(r'\[(\d+)\]', str(field.type))
+            return int(m.group(1)) if m else None
+    return None
+
 # Windows UTF-8
 if sys.platform == "win32":
     try:
@@ -65,6 +79,12 @@ class Embedder:
         return instance
 
     # PURPOSE: Embedder の構成と依存関係の初期化
+    # Known model dimensions
+    _MODEL_DIMENSIONS: dict[str, int] = {
+        "BAAI/bge-m3": 1024,
+        "BAAI/bge-small-en-v1.5": 384,
+    }
+
     def __init__(self, force_cpu: bool = False, model_name: str = "BAAI/bge-m3"):
         if self._initialized:
             return
@@ -77,6 +97,8 @@ class Embedder:
         self._ort_session = None
         self._tokenizer = None
         self.model_name = model_name
+        self._dimension: int = self._MODEL_DIMENSIONS.get(model_name, 0)
+        self._is_onnx_fallback = False
 
         # GPU detection with fp16
         if not force_cpu:
@@ -90,8 +112,9 @@ class Embedder:
                             model_kwargs={'torch_dtype': torch.float16},
                         )
                         self._use_gpu = True
+                        self._dimension = self._st_model.get_sentence_embedding_dimension()
                         vram_mb = torch.cuda.memory_allocated() / 1e6
-                        print(f"[Embedder] GPU mode (CUDA fp16, {vram_mb:.0f}MB VRAM)")
+                        print(f"[Embedder] GPU mode (CUDA fp16, {vram_mb:.0f}MB VRAM, dim={self._dimension})")
                         return
                     except RuntimeError as e:
                         # CUDA OOM — fall through to CPU
@@ -108,14 +131,17 @@ class Embedder:
             from sentence_transformers import SentenceTransformer
             self._st_model = SentenceTransformer(model_name, device='cpu')
             self._use_gpu = False
-            print(f"[Embedder] CPU mode (sentence-transformers: {model_name})")
+            self._dimension = self._st_model.get_sentence_embedding_dimension()
+            print(f"[Embedder] CPU mode (sentence-transformers: {model_name}, dim={self._dimension})")
             return
         except ImportError:
             pass
 
-        # ONNX fallback (original implementation)
+        # ONNX fallback (original implementation — BGE-small, 384d)
         self._init_onnx()
-        print("[Embedder] CPU mode (ONNX)")
+        self._is_onnx_fallback = True
+        self._dimension = 384  # BGE-small ONNX model
+        print(f"[Embedder] CPU mode (ONNX bge-small, dim=384) ⚠️ 次元が bge-m3 (1024) と異なります")
 
     # PURPOSE: Initialize ONNX Runtime session (original implementation).
     def _init_onnx(self):
@@ -334,6 +360,19 @@ class GnosisIndex:
         query_vector = embedder.embed(query)
 
         table = self.db.open_table(self.TABLE_NAME)
+
+        # Dimension safety check
+        embedder_dim = getattr(embedder, '_dimension', len(query_vector))
+        table_dim = _get_vector_dimension(table)
+        if table_dim and table_dim != embedder_dim:
+            print(
+                f"[GnosisIndex] ⚠️ Dimension mismatch: "
+                f"table={table_dim}d, embedder={embedder_dim}d "
+                f"({embedder.model_name}). Cannot search.",
+                flush=True,
+            )
+            return []
+
         results = table.search(query_vector).limit(k).to_list()
 
         return results

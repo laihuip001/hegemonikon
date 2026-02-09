@@ -341,13 +341,14 @@ class GnosisIndex:
         return len(data)
 
     # PURPOSE: セマンティック検索
-    def search(self, query: str, k: int = 10) -> list[dict]:
+    def search(self, query: str, k: int = 10, source_filter: str | None = None) -> list[dict]:
         """
         セマンティック検索
 
         Args:
             query: 検索クエリ
             k: 取得件数
+            source_filter: ソースフィルタ (例: "arxiv", "session", "handoff")
 
         Returns:
             検索結果のリスト
@@ -373,7 +374,14 @@ class GnosisIndex:
             )
             return []
 
-        results = table.search(query_vector).limit(k).to_list()
+        search_query = table.search(query_vector).limit(k)
+
+        if source_filter:
+            search_query = search_query.where(
+                f"source = '{source_filter}'", prefilter=True
+            )
+
+        results = search_query.to_list()
 
         return results
 

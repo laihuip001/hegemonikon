@@ -179,7 +179,7 @@
       "content": "「どう書くか」より「何が必然か」。必然性を問わずに書くと恥をかく。",
       "source": "session_2026-01-31_dendron_audit",
       "timestamp": "2026-01-31T23:00:00.000000",
-      "confidence": 0.90
+      "confidence": 0.9
     },
     {
       "id": "learn_reduction_vs_refinement",
@@ -222,6 +222,19 @@
         "Creator Psychological Profile",
         "セッション中の観察: 15項目を全て消化するまで終わらない意思"
       ]
+    },
+    {
+      "content": "ONNX フォールバック時の embedding 次元不整合は間欠的エラーの典型パターン。Singleton Embedder が GPU (1024d) で成功→ ONNX (384d) でテーブル次元と不一致。対策: テーブル次元を事前チェックし不一致時は graceful に検索スキップ。",
+      "evidence": "/v 2026-02-09: index.py Embedder ONNX fallback 384d vs 1024d table shape mismatch",
+      "strength": "strong",
+      "tags": [
+        "embedding",
+        "dimension-mismatch",
+        "onnx-fallback",
+        "graceful-degradation"
+      ],
+      "created": "2026-02-09T19:41:48.429775",
+      "source": "/v self-verification"
     }
   ],
   "archive": []

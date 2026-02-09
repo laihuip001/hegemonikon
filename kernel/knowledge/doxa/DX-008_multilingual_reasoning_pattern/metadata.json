@@ -1,0 +1,25 @@
+{
+    "name": "Doxa: 多言語推論パターン切り替え仮説",
+    "summary": "翻訳による「ニュアンス喪失」は表面的現象であり、本質的には「言語構造が決定する推論パターンの切り替え」が起きている。日本語→英語翻訳は日本語固有の「全体→部分」パターンをリセットし、英語固有の「並列・構造的」パターンに切り替える。Sapir-Whorf LLM版として確信度55%。",
+    "source": "doxa_promotion",
+    "ki_id": "DX-008",
+    "promoted_at": "2026-02-09T14:50:00+09:00",
+    "original_created_at": "2026-02-09T14:50:00+09:00",
+    "strength": "hypothesis",
+    "confidence": 0.55,
+    "evidence_count": 3,
+    "evidence": [
+        "Wang et al. (2025) Under the Shadow of Babel (arXiv:2506.16151) — 因果語順バイアスの内在化",
+        "/noe 英日比較実験 (2026-02-09) — 質的観察：日本語はWHY、英語はHOW",
+        "Rabin et al. (2023) Translate-and-Reason — 翻訳前後での推論パターン変化"
+    ],
+    "counter_hypotheses": [
+        "訓練データ構成説: 英語データのジャンル偏りが推論スタイルを規定",
+        "言語学的複雑性説: 統語 vs 語彙の複雑性差異",
+        "モデル設計説: 英語優先アーキテクチャの副産物"
+    ],
+    "related": [
+        "DX-007",
+        "BC-12"
+    ]
+}

@@ -24,6 +24,19 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 
+class _NumpyEncoder(json.JSONEncoder):
+    """numpy float32/int64 → Python native."""
+    def default(self, obj):
+        import numpy as np
+        if isinstance(obj, (np.floating,)):
+            return float(obj)
+        if isinstance(obj, (np.integer,)):
+            return int(obj)
+        if isinstance(obj, np.ndarray):
+            return obj.tolist()
+        return super().default(obj)
+
+
 def generate_attractor_data(query: str) -> dict:
     """入力クエリに対する Attractor 分析データを生成."""
     from mekhane.fep.theorem_attractor import TheoremAttractor, THEOREM_KEYS
@@ -137,7 +150,7 @@ def generate_html(data: dict) -> str:
         "O": "#e74c3c", "S": "#3498db", "H": "#f39c12",
         "P": "#2ecc71", "K": "#9b59b6", "A": "#1abc9c",
     }
-    data_json = json.dumps(data, ensure_ascii=False)
+    data_json = json.dumps(data, ensure_ascii=False, cls=_NumpyEncoder)
     colors_json = json.dumps(series_colors)
 
     html = f"""<!DOCTYPE html>

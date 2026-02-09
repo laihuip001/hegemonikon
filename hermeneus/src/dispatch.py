@@ -166,7 +166,21 @@ def dispatch(ccl_expr: str) -> dict:
     result["workflows"] = extract_workflows(ast)
     result["wf_paths"] = resolve_wf_paths(result["workflows"])
 
-    # Step 3: 実行計画テンプレート
+    # Step 3: 射提案の自動生成 (BC-8 引力化)
+    morphism_section = ""
+    try:
+        from mekhane.taxis.morphism_proposer import parse_trigonon, format_proposal
+        for wf_id, wf_path in result["wf_paths"].items():
+            trigonon = parse_trigonon(Path(wf_path))
+            if trigonon:
+                proposal = format_proposal(
+                    wf_id.lstrip("/"), trigonon, confidence=None
+                )
+                morphism_section += f"\n{proposal}\n"
+    except Exception:
+        morphism_section = "\n  (射提案の自動生成に失敗 — 手動で trigonon を確認)\n"
+
+    # Step 4: 実行計画テンプレート
     wf_list = ", ".join(result["workflows"])
 
     # view_file コマンド一覧 (Agent がコピペで開ける)
@@ -182,9 +196,17 @@ def dispatch(ccl_expr: str) -> dict:
 【関連WF】{wf_list}
 【WF定義】以下を view_file で開くこと:
 {view_cmds}
+【UML Pre-check】(WF 実行前に回答)
+  S1 [O1]: 入力を正しく理解したか？ → (回答)
+  S2 [A1]: 第一印象・直感はどうか？ → (回答)
 【実行計画】(AI が AST 構造に基づいて記入)
 【/dia 反論】(AI が最低1つの懸念を提示)
-→ これで進めてよいですか？"""
+【UML Post-check】(WF 実行後に回答)
+  S3 [A2]: 批判的に再評価したか？ → (回答)
+  S4 [O4]: 決定は妥当か？ 説明できるか？ → (回答)
+  S5 [A4]: 確信度は適切か？ 過信していないか？ (FP 32.5%) → (回答)
+【射提案 @complete】(WF 完了時に以下を出力すること)
+{morphism_section}→ これで進めてよいですか？"""
     result["plan_template"] = tmpl
 
     return result

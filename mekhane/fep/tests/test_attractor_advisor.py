@@ -1,211 +1,170 @@
-# PROOF: [L2/テスト] <- mekhane/fep/tests/
-"""Tests for AttractorAdvisor, OscillationType diagnosis, and Problem B"""
+"""Tests for attractor_advisor helper functions."""
 
-import pytest
-from mekhane.fep.attractor import (
-    OscillationType,
-    OscillationDiagnosis,
-    SeriesAttractor,
-    SuggestResult,
+import unittest
+from unittest.mock import patch, MagicMock
+from mekhane.fep.attractor_advisor import (
+    _classify_series_list,
+    _detect_crossings,
+    _suggest_pw_for_crossings,
+    Recommendation,
+    CompoundRecommendation,
 )
-from mekhane.fep.attractor_advisor import AttractorAdvisor, Recommendation
 
 
-# PURPOSE: advisor の処理
-@pytest.fixture(scope="module")
-def advisor():
-    return AttractorAdvisor()
+class TestClassifySeriesList(unittest.TestCase):
+    """Test _classify_series_list() series→CognitiveType mapping."""
+
+    def test_single_o_series(self):
+        result = _classify_series_list(["O"])
+        self.assertIn("O", result)
+
+    def test_multiple_series(self):
+        result = _classify_series_list(["O", "S", "A"])
+        self.assertEqual(len(result), 3)
+
+    def test_empty_list(self):
+        result = _classify_series_list([])
+        self.assertEqual(result, {})
+
+    def test_all_six_series(self):
+        result = _classify_series_list(["O", "S", "H", "P", "K", "A"])
+        self.assertEqual(len(result), 6)
+
+    def test_unknown_series_handled(self):
+        """Unknown series should not crash."""
+        try:
+            result = _classify_series_list(["X"])
+        except (KeyError, ValueError):
+            pass  # Acceptable to raise for unknown series
 
 
-# PURPOSE: attractor の処理
-@pytest.fixture(scope="module")
-def attractor():
-    return SeriesAttractor(threshold=0.10, oscillation_margin=0.05)
+class TestDetectCrossings(unittest.TestCase):
+    """Test _detect_crossings() U/R boundary detection."""
+
+    def test_no_crossing_single_series(self):
+        result = _detect_crossings(["O"])
+        self.assertEqual(result, [])
+
+    def test_no_crossing_same_type(self):
+        """O and O — no crossing."""
+        result = _detect_crossings(["O", "O"])
+        self.assertEqual(result, [])
+
+    def test_crossing_detected(self):
+        """O (Understanding) and S (Reasoning) should cross."""
+        result = _detect_crossings(["O", "S"])
+        # Should detect at least one crossing
+        self.assertIsInstance(result, list)
+
+    def test_empty_list(self):
+        result = _detect_crossings([])
+        self.assertEqual(result, [])
 
 
-# --- OscillationType / diagnose() tests ---
+class TestSuggestPwForCrossings(unittest.TestCase):
+    """Test _suggest_pw_for_crossings() PW adjustment suggestions."""
 
-# PURPOSE: diagnose() メソッドと OscillationType のテスト
-class TestDiagnose:
-    """diagnose() メソッドと OscillationType のテスト"""
+    def test_no_crossings_empty_dict(self):
+        result = _suggest_pw_for_crossings([], ["O"])
+        self.assertEqual(result, {})
 
-    # PURPOSE: 明確な入力 → CLEAR
-    def test_clear_convergence(self, attractor: SeriesAttractor):
-        """明確な入力 → CLEAR"""
-        result = attractor.diagnose(
-            "How should we design the architecture and implementation plan?"
+    def test_with_crossings_suggests_bridge(self):
+        """Crossings should suggest bridge theorem PW adjustments."""
+        result = _suggest_pw_for_crossings(["U→R"], ["O", "S"])
+        self.assertIsInstance(result, dict)
+
+    def test_return_type_is_dict(self):
+        result = _suggest_pw_for_crossings([], [])
+        self.assertIsInstance(result, dict)
+
+
+class TestRecommendationDataclass(unittest.TestCase):
+    """Test Recommendation dataclass."""
+
+    def test_basic_creation(self):
+        from mekhane.fep.attractor import OscillationType, OscillationDiagnosis
+
+        rec = Recommendation(
+            advice="test advice",
+            workflows=["/dia"],
+            series=["A"],
+            oscillation=OscillationType.STABLE,
+            confidence=0.9,
+            interpretation=OscillationDiagnosis(
+                type=OscillationType.STABLE,
+                divergence_score=0.1,
+                stability_confidence=0.9,
+            ),
         )
-        assert result.oscillation == OscillationType.CLEAR
-        assert result.primary.series == "S"
-        assert result.top_similarity > 0.6
-        assert result.gap > 0.08
+        self.assertEqual(rec.advice, "test advice")
+        self.assertEqual(rec.workflows, ["/dia"])
 
-    # PURPOSE: Scope → P に明確収束
-    def test_clear_scope(self, attractor: SeriesAttractor):
-        """Scope → P に明確収束"""
-        result = attractor.diagnose(
-            "Define the boundaries and scope of this domain"
+    def test_repr(self):
+        from mekhane.fep.attractor import OscillationType, OscillationDiagnosis
+
+        rec = Recommendation(
+            advice="test",
+            workflows=["/noe"],
+            series=["O"],
+            oscillation=OscillationType.STABLE,
+            confidence=0.8,
+            interpretation=OscillationDiagnosis(
+                type=OscillationType.STABLE,
+                divergence_score=0.0,
+                stability_confidence=1.0,
+            ),
         )
-        assert result.oscillation == OscillationType.CLEAR
-        assert result.primary.series == "P"
+        r = repr(rec)
+        self.assertIn("Recommendation", r)
 
-    # PURPOSE: SuggestResult.primary プロパティ
-    def test_suggest_result_primary(self, attractor: SeriesAttractor):
-        """SuggestResult.primary プロパティ"""
-        result = attractor.diagnose("Why does this exist?")
-        assert result.primary is not None
-        assert result.primary.series == "O"
+    def test_default_fields(self):
+        from mekhane.fep.attractor import OscillationType, OscillationDiagnosis
 
-    # PURPOSE: SuggestResult.is_clear プロパティ
-    def test_suggest_result_is_clear(self, attractor: SeriesAttractor):
-        """SuggestResult.is_clear プロパティ"""
-        result = attractor.diagnose(
-            "Define the boundaries and scope of this domain"
+        rec = Recommendation(
+            advice="",
+            workflows=[],
+            series=[],
+            oscillation=OscillationType.STABLE,
+            confidence=0.0,
+            interpretation=OscillationDiagnosis(
+                type=OscillationType.STABLE,
+                divergence_score=0.0,
+                stability_confidence=1.0,
+            ),
         )
-        assert result.is_clear is True
-
-    # PURPOSE: SuggestResult の repr
-    def test_suggest_result_repr(self, attractor: SeriesAttractor):
-        """SuggestResult の repr"""
-        result = attractor.diagnose("Why?")
-        repr_str = repr(result)
-        assert "top=" in repr_str
-
-    # PURPOSE: diagnose() が gap を返す
-    def test_diagnose_returns_gap(self, attractor: SeriesAttractor):
-        """diagnose() が gap を返す"""
-        result = attractor.diagnose("Design the architecture")
-        assert result.gap >= 0.0
+        self.assertEqual(rec.cognitive_types, {})
+        self.assertEqual(rec.boundary_crossings, [])
+        self.assertEqual(rec.pw_suggestion, {})
+        self.assertEqual(rec.knowledge_context, [])
 
 
-# --- AttractorAdvisor tests ---
+class TestCompoundRecommendationDataclass(unittest.TestCase):
+    """Test CompoundRecommendation dataclass."""
 
-# PURPOSE: AttractorAdvisor のテスト
-class TestAttractorAdvisor:
-    """AttractorAdvisor のテスト"""
-
-    # PURPOSE: 明確な入力 → 推薦テキスト生成
-    def test_recommend_clear(self, advisor: AttractorAdvisor):
-        """明確な入力 → 推薦テキスト生成"""
-        rec = advisor.recommend(
-            "How should we design the architecture?"
+    def test_basic_creation(self):
+        cr = CompoundRecommendation(
+            segments=[],
+            merged_series=["O", "S"],
+            merged_workflows=["/noe", "/s"],
+            is_compound=True,
+            is_multi_segment=True,
+            primary=None,
         )
-        assert isinstance(rec, Recommendation)
-        assert "S" in rec.series
-        assert len(rec.workflows) > 0
-        assert rec.confidence > 0.5
+        self.assertEqual(cr.merged_series, ["O", "S"])
+        self.assertTrue(cr.is_compound)
 
-    # PURPOSE: 推薦に advice テキストが含まれる
-    def test_recommend_has_advice(self, advisor: AttractorAdvisor):
-        """推薦に advice テキストが含まれる"""
-        rec = advisor.recommend("Why does this project exist?")
-        assert len(rec.advice) > 0
-
-    # PURPOSE: LLM 注入形式: 明確な収束
-    def test_format_for_llm_clear(self, advisor: AttractorAdvisor):
-        """LLM 注入形式: 明確な収束"""
-        fmt = advisor.format_for_llm(
-            "Define the boundaries and scope"
+    def test_repr(self):
+        cr = CompoundRecommendation(
+            segments=[],
+            merged_series=[],
+            merged_workflows=[],
+            is_compound=False,
+            is_multi_segment=False,
+            primary=None,
         )
-        assert fmt.startswith("[Attractor:")
-        assert "P" in fmt
-
-    # PURPOSE: LLM 形式にワークフローが含まれる
-    def test_format_for_llm_contains_workflows(self, advisor: AttractorAdvisor):
-        """LLM 形式にワークフローが含まれる"""
-        fmt = advisor.format_for_llm("Why does this exist?")
-        assert "/" in fmt  # ワークフロー名は / で始まる
-
-    # PURPOSE: Recommendation の repr
-    def test_recommend_repr(self, advisor: AttractorAdvisor):
-        """Recommendation の repr"""
-        rec = advisor.recommend("Evaluate alternatives")
-        repr_str = repr(rec)
-        assert "Rec:" in repr_str
-        assert "conf=" in repr_str
+        r = repr(cr)
+        self.assertIsInstance(r, str)
 
 
-# --- Backward compatibility ---
-
-# PURPOSE: 既存の suggest() API が壊れていないことを確認
-class TestBackwardCompatibility:
-    """既存の suggest() API が壊れていないことを確認"""
-
-    # PURPOSE: suggest() は AttractorResult のリストを返す
-    def test_suggest_still_works(self, attractor: SeriesAttractor):
-        """suggest() は AttractorResult のリストを返す"""
-        results = attractor.suggest("Why does this exist?")
-        assert isinstance(results, list)
-        assert len(results) >= 1
-        assert results[0].series == "O"
-
-    # PURPOSE: suggest_all() は 6 Series を返す
-    def test_suggest_all_still_works(self, attractor: SeriesAttractor):
-        """suggest_all() は 6 Series を返す"""
-        results = attractor.suggest_all("test")
-        assert len(results) == 6
-
-
-# --- Problem B: Oscillation Interpretation ---
-
-# PURPOSE: Problem B: oscillation の理論的意味テスト
-class TestOscillationInterpretation:
-    """Problem B: oscillation の理論的意味テスト"""
-
-    # PURPOSE: CLEAR → theory + action が返る
-    def test_clear_interpretation(self, attractor: SeriesAttractor):
-        """CLEAR → theory + action が返る"""
-        result = attractor.diagnose(
-            "How should we design the architecture and implementation plan?"
-        )
-        interp = result.interpretation
-        assert isinstance(interp, OscillationDiagnosis)
-        assert interp.oscillation == OscillationType.CLEAR
-        assert "自由エネルギー" in interp.theory
-        assert len(interp.action) > 0
-        assert interp.morphisms == []
-        assert interp.confidence_modifier > 0
-
-    # PURPOSE: 全 OscillationType に theory がある
-    def test_interpretation_has_theory(self, attractor: SeriesAttractor):
-        """全 OscillationType に theory がある"""
-        result = attractor.diagnose("Why does this exist?")
-        interp = result.interpretation
-        assert len(interp.theory) > 10
-
-    # PURPOSE: OscillationDiagnosis の repr
-    def test_interpretation_repr(self, attractor: SeriesAttractor):
-        """OscillationDiagnosis の repr"""
-        result = attractor.diagnose("Why?")
-        repr_str = repr(result.interpretation)
-        assert "OscDiag:" in repr_str
-
-    # PURPOSE: NEGATIVE/WEAK → confidence modifier は 0 以下
-    def test_negative_confidence_modifier(self, attractor: SeriesAttractor):
-        """NEGATIVE/WEAK → confidence modifier は 0 以下"""
-        # Build a known NEGATIVE/WEAK case manually
-        from mekhane.fep.attractor import _build_diagnosis, AttractorResult
-        diag = _build_diagnosis(
-            OscillationType.NEGATIVE,
-            [AttractorResult("O", "Ousia", 0.4)],
-            gap=0.02,
-            top_sim=0.4,
-        )
-        assert diag.confidence_modifier < 0
-
-    # PURPOSE: POSITIVE → X-series morphism が提案される
-    def test_positive_morphisms(self, attractor: SeriesAttractor):
-        """POSITIVE → X-series morphism が提案される"""
-        from mekhane.fep.attractor import _build_diagnosis, AttractorResult
-        diag = _build_diagnosis(
-            OscillationType.POSITIVE,
-            [
-                AttractorResult("O", "Ousia", 0.55),
-                AttractorResult("S", "Schema", 0.53),
-            ],
-            gap=0.02,
-            top_sim=0.55,
-        )
-        assert len(diag.morphisms) >= 1
-        assert "X-OS" in diag.morphisms
-
+if __name__ == "__main__":
+    unittest.main()

@@ -1,0 +1,1411 @@
+{
+  "timestamp": "2026-02-09T04:33:57.978240",
+  "target_file": "mekhane/pks/push_dialog.py",
+  "category": "all",
+  "total_specialists": 160,
+  "api_keys_used": 15,
+  "results": [
+    {
+      "id": "HG-001.μ",
+      "name": "PROOF行検査官",
+      "category": "hegemonikon",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n",
+      "retries": 3
+    },
+    {
+      "id": "HG-001.μF",
+      "name": "PROOF行検査官",
+      "category": "hegemonikon",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n",
+      "retries": 3
+    },
+    {
+      "id": "HG-001.μP",
+      "name": "PROOF行検査官",
+      "category": "hegemonikon",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n",
+      "retries": 3
+    },
+    {
+      "id": "HG-001.F",
+      "name": "PROOF行検査官",
+      "category": "hegemonikon",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n",
+      "retries": 3
+    },
+    {
+      "id": "HG-001.P",
+      "name": "PROOF行検査官",
+      "category": "hegemonikon",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n",
+      "retries": 3
+    },
+    {
+      "id": "HG-001.M",
+      "name": "PROOF行検査官",
+      "category": "hegemonikon",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n",
+      "retries": 3
+    },
+    {
+      "id": "HG-001.MF",
+      "name": "PROOF行検査官",
+      "category": "hegemonikon",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n",
+      "retries": 3
+    },
+    {
+      "id": "HG-001.MP",
+      "name": "PROOF行検査官",
+      "category": "hegemonikon",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n",
+      "retries": 3
+    },
+    {
+      "id": "HG-002.μ",
+      "name": "予測誤差審問官",
+      "category": "hegemonikon",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n",
+      "retries": 3
+    },
+    {
+      "id": "HG-002.μF",
+      "name": "予測誤差審問官",
+      "category": "hegemonikon",
+      "archetype": "creative",
+      "session_id": "4289873941670559567",
+      "url": "https://jules.google.com/session/4289873941670559567",
+      "status": "started",
+      "retries": 0
+    },
+    {
+      "id": "HG-002.μP",
+      "name": "予測誤差審問官",
+      "category": "hegemonikon",
+      "archetype": "creative",
+      "session_id": "10810493896106764214",
+      "url": "https://jules.google.com/session/10810493896106764214",
+      "status": "started",
+      "retries": 0
+    },
+    {
+      "id": "HG-002.F",
+      "name": "予測誤差審問官",
+      "category": "hegemonikon",
+      "archetype": "creative",
+      "session_id": "5940881114371390125",
+      "url": "https://jules.google.com/session/5940881114371390125",
+      "status": "started",
+      "retries": 0
+    },
+    {
+      "id": "HG-002.P",
+      "name": "予測誤差審問官",
+      "category": "hegemonikon",
+      "archetype": "creative",
+      "session_id": "8662400069855185127",
+      "url": "https://jules.google.com/session/8662400069855185127",
+      "status": "started",
+      "retries": 0
+    },
+    {
+      "id": "HG-002.M",
+      "name": "予測誤差審問官",
+      "category": "hegemonikon",
+      "archetype": "creative",
+      "session_id": "8755142717008471716",
+      "url": "https://jules.google.com/session/8755142717008471716",
+      "status": "started",
+      "retries": 0
+    },
+    {
+      "id": "HG-002.MF",
+      "name": "予測誤差審問官",
+      "category": "hegemonikon",
+      "archetype": "creative",
+      "session_id": "6622403774115407585",
+      "url": "https://jules.google.com/session/6622403774115407585",
+      "status": "started",
+      "retries": 0
+    },
+    {
+      "id": "HG-002.MP",
+      "name": "予測誤差審問官",
+      "category": "hegemonikon",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n",
+      "retries": 3
+    },
+    {
+      "id": "HG-003.μ",
+      "name": "ストア派制御審判",
+      "category": "hegemonikon",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n",
+      "retries": 3
+    },
+    {
+      "id": "HG-003.μF",
+      "name": "ストア派制御審判",
+      "category": "hegemonikon",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n",
+      "retries": 3
+    },
+    {
+      "id": "HG-003.μP",
+      "name": "ストア派制御審判",
+      "category": "hegemonikon",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n",
+      "retries": 3
+    },
+    {
+      "id": "HG-003.F",
+      "name": "ストア派制御審判",
+      "category": "hegemonikon",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n",
+      "retries": 3
+    },
+    {
+      "id": "HG-003.P",
+      "name": "ストア派制御審判",
+      "category": "hegemonikon",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n",
+      "retries": 3
+    },
+    {
+      "id": "HG-003.M",
+      "name": "ストア派制御審判",
+      "category": "hegemonikon",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n",
+      "retries": 3
+    },
+    {
+      "id": "HG-003.MF",
+      "name": "ストア派制御審判",
+      "category": "hegemonikon",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n",
+      "retries": 3
+    },
+    {
+      "id": "HG-003.MP",
+      "name": "ストア派制御審判",
+      "category": "hegemonikon",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n",
+      "retries": 3
+    },
+    {
+      "id": "HG-004.μ",
+      "name": "CCL式美学者",
+      "category": "hegemonikon",
+      "archetype": "creative",
+      "session_id": "13973134846359877944",
+      "url": "https://jules.google.com/session/13973134846359877944",
+      "status": "started",
+      "retries": 0
+    },
+    {
+      "id": "HG-004.μF",
+      "name": "CCL式美学者",
+      "category": "hegemonikon",
+      "archetype": "creative",
+      "session_id": "15484516058758207874",
+      "url": "https://jules.google.com/session/15484516058758207874",
+      "status": "started",
+      "retries": 0
+    },
+    {
+      "id": "HG-004.μP",
+      "name": "CCL式美学者",
+      "category": "hegemonikon",
+      "archetype": "creative",
+      "session_id": "12763217430360402263",
+      "url": "https://jules.google.com/session/12763217430360402263",
+      "status": "started",
+      "retries": 0
+    },
+    {
+      "id": "HG-004.F",
+      "name": "CCL式美学者",
+      "category": "hegemonikon",
+      "archetype": "creative",
+      "session_id": "4981737465052618770",
+      "url": "https://jules.google.com/session/4981737465052618770",
+      "status": "started",
+      "retries": 0
+    },
+    {
+      "id": "HG-004.P",
+      "name": "CCL式美学者",
+      "category": "hegemonikon",
+      "archetype": "creative",
+      "session_id": "2346526026835956124",
+      "url": "https://jules.google.com/session/2346526026835956124",
+      "status": "started",
+      "retries": 0
+    },
+    {
+      "id": "HG-004.M",
+      "name": "CCL式美学者",
+      "category": "hegemonikon",
+      "archetype": "creative",
+      "session_id": "2794207769374788081",
+      "url": "https://jules.google.com/session/2794207769374788081",
+      "status": "started",
+      "retries": 0
+    },
+    {
+      "id": "HG-004.MF",
+      "name": "CCL式美学者",
+      "category": "hegemonikon",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n",
+      "retries": 3
+    },
+    {
+      "id": "HG-004.MP",
+      "name": "CCL式美学者",
+      "category": "hegemonikon",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n",
+      "retries": 3
+    },
+    {
+      "id": "HG-005.μ",
+      "name": "定理整合性監査官",
+      "category": "hegemonikon",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n",
+      "retries": 3
+    },
+    {
+      "id": "HG-005.μF",
+      "name": "定理整合性監査官",
+      "category": "hegemonikon",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n",
+      "retries": 3
+    },
+    {
+      "id": "HG-005.μP",
+      "name": "定理整合性監査官",
+      "category": "hegemonikon",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n",
+      "retries": 3
+    },
+    {
+      "id": "HG-005.F",
+      "name": "定理整合性監査官",
+      "category": "hegemonikon",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n",
+      "retries": 3
+    },
+    {
+      "id": "HG-005.P",
+      "name": "定理整合性監査官",
+      "category": "hegemonikon",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n",
+      "retries": 3
+    },
+    {
+      "id": "HG-005.M",
+      "name": "定理整合性監査官",
+      "category": "hegemonikon",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n",
+      "retries": 3
+    },
+    {
+      "id": "HG-005.MF",
+      "name": "定理整合性監査官",
+      "category": "hegemonikon",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n",
+      "retries": 3
+    },
+    {
+      "id": "HG-005.MP",
+      "name": "定理整合性監査官",
+      "category": "hegemonikon",
+      "archetype": "precision",
+      "session_id": "14429499577906899816",
+      "url": "https://jules.google.com/session/14429499577906899816",
+      "status": "started",
+      "retries": 0
+    },
+    {
+      "id": "HG-006.μ",
+      "name": "ワークフロー適合審査官",
+      "category": "hegemonikon",
+      "archetype": "precision",
+      "session_id": "15920680311039238086",
+      "url": "https://jules.google.com/session/15920680311039238086",
+      "status": "started",
+      "retries": 0
+    },
+    {
+      "id": "HG-006.μF",
+      "name": "ワークフロー適合審査官",
+      "category": "hegemonikon",
+      "archetype": "precision",
+      "session_id": "11793313109695934366",
+      "url": "https://jules.google.com/session/11793313109695934366",
+      "status": "started",
+      "retries": 0
+    },
+    {
+      "id": "HG-006.μP",
+      "name": "ワークフロー適合審査官",
+      "category": "hegemonikon",
+      "archetype": "precision",
+      "session_id": "4748970825612886079",
+      "url": "https://jules.google.com/session/4748970825612886079",
+      "status": "started",
+      "retries": 0
+    },
+    {
+      "id": "HG-006.F",
+      "name": "ワークフロー適合審査官",
+      "category": "hegemonikon",
+      "archetype": "precision",
+      "session_id": "12172524998616338185",
+      "url": "https://jules.google.com/session/12172524998616338185",
+      "status": "started",
+      "retries": 0
+    },
+    {
+      "id": "HG-006.P",
+      "name": "ワークフロー適合審査官",
+      "category": "hegemonikon",
+      "archetype": "precision",
+      "session_id": "16128007035079896066",
+      "url": "https://jules.google.com/session/16128007035079896066",
+      "status": "started",
+      "retries": 0
+    },
+    {
+      "id": "HG-006.M",
+      "name": "ワークフロー適合審査官",
+      "category": "hegemonikon",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n",
+      "retries": 3
+    },
+    {
+      "id": "HG-006.MF",
+      "name": "ワークフロー適合審査官",
+      "category": "hegemonikon",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n",
+      "retries": 3
+    },
+    {
+      "id": "HG-006.MP",
+      "name": "ワークフロー適合審査官",
+      "category": "hegemonikon",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n",
+      "retries": 3
+    },
+    {
+      "id": "HG-007.μ",
+      "name": "公理座標整合検査官",
+      "category": "hegemonikon",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n",
+      "retries": 3
+    },
+    {
+      "id": "HG-007.μF",
+      "name": "公理座標整合検査官",
+      "category": "hegemonikon",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n",
+      "retries": 3
+    },
+    {
+      "id": "HG-007.μP",
+      "name": "公理座標整合検査官",
+      "category": "hegemonikon",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n",
+      "retries": 3
+    },
+    {
+      "id": "HG-007.F",
+      "name": "公理座標整合検査官",
+      "category": "hegemonikon",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n",
+      "retries": 3
+    },
+    {
+      "id": "HG-007.P",
+      "name": "公理座標整合検査官",
+      "category": "hegemonikon",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n",
+      "retries": 3
+    },
+    {
+      "id": "HG-007.M",
+      "name": "公理座標整合検査官",
+      "category": "hegemonikon",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n",
+      "retries": 3
+    },
+    {
+      "id": "HG-007.MF",
+      "name": "公理座標整合検査官",
+      "category": "hegemonikon",
+      "archetype": "precision",
+      "session_id": "10851058926739572393",
+      "url": "https://jules.google.com/session/10851058926739572393",
+      "status": "started",
+      "retries": 0
+    },
+    {
+      "id": "HG-007.MP",
+      "name": "公理座標整合検査官",
+      "category": "hegemonikon",
+      "archetype": "precision",
+      "session_id": "13545973409620947970",
+      "url": "https://jules.google.com/session/13545973409620947970",
+      "status": "started",
+      "retries": 0
+    },
+    {
+      "id": "HG-008.μ",
+      "name": "Dendron×PROOF一致検査官",
+      "category": "hegemonikon",
+      "archetype": "precision",
+      "session_id": "4514928373893029204",
+      "url": "https://jules.google.com/session/4514928373893029204",
+      "status": "started",
+      "retries": 0
+    },
+    {
+      "id": "HG-008.μF",
+      "name": "Dendron×PROOF一致検査官",
+      "category": "hegemonikon",
+      "archetype": "precision",
+      "session_id": "6608705955245277012",
+      "url": "https://jules.google.com/session/6608705955245277012",
+      "status": "started",
+      "retries": 0
+    },
+    {
+      "id": "HG-008.μP",
+      "name": "Dendron×PROOF一致検査官",
+      "category": "hegemonikon",
+      "archetype": "precision",
+      "session_id": "9634647994451141014",
+      "url": "https://jules.google.com/session/9634647994451141014",
+      "status": "started",
+      "retries": 0
+    },
+    {
+      "id": "HG-008.F",
+      "name": "Dendron×PROOF一致検査官",
+      "category": "hegemonikon",
+      "archetype": "precision",
+      "session_id": "2347893460573672535",
+      "url": "https://jules.google.com/session/2347893460573672535",
+      "status": "started",
+      "retries": 0
+    },
+    {
+      "id": "HG-008.P",
+      "name": "Dendron×PROOF一致検査官",
+      "category": "hegemonikon",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n",
+      "retries": 3
+    },
+    {
+      "id": "HG-008.M",
+      "name": "Dendron×PROOF一致検査官",
+      "category": "hegemonikon",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n",
+      "retries": 3
+    },
+    {
+      "id": "HG-008.MF",
+      "name": "Dendron×PROOF一致検査官",
+      "category": "hegemonikon",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n",
+      "retries": 3
+    },
+    {
+      "id": "HG-008.MP",
+      "name": "Dendron×PROOF一致検査官",
+      "category": "hegemonikon",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n",
+      "retries": 3
+    },
+    {
+      "id": "AI-002.μ",
+      "name": "ハルシネーション検出者",
+      "category": "ai_generated",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n",
+      "retries": 3
+    },
+    {
+      "id": "AI-002.μF",
+      "name": "ハルシネーション検出者",
+      "category": "ai_generated",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n",
+      "retries": 3
+    },
+    {
+      "id": "AI-002.μP",
+      "name": "ハルシネーション検出者",
+      "category": "ai_generated",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n",
+      "retries": 3
+    },
+    {
+      "id": "AI-002.F",
+      "name": "ハルシネーション検出者",
+      "category": "ai_generated",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n",
+      "retries": 3
+    },
+    {
+      "id": "AI-002.P",
+      "name": "ハルシネーション検出者",
+      "category": "ai_generated",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n",
+      "retries": 3
+    },
+    {
+      "id": "AI-002.M",
+      "name": "ハルシネーション検出者",
+      "category": "ai_generated",
+      "archetype": "safety",
+      "session_id": "12876302957273934751",
+      "url": "https://jules.google.com/session/12876302957273934751",
+      "status": "started",
+      "retries": 0
+    },
+    {
+      "id": "AI-002.MF",
+      "name": "ハルシネーション検出者",
+      "category": "ai_generated",
+      "archetype": "safety",
+      "session_id": "2163853299241489455",
+      "url": "https://jules.google.com/session/2163853299241489455",
+      "status": "started",
+      "retries": 0
+    },
+    {
+      "id": "AI-002.MP",
+      "name": "ハルシネーション検出者",
+      "category": "ai_generated",
+      "archetype": "safety",
+      "session_id": "4486754470030925178",
+      "url": "https://jules.google.com/session/4486754470030925178",
+      "status": "started",
+      "retries": 0
+    },
+    {
+      "id": "AI-005.μ",
+      "name": "コード/コメント矛盾検出者",
+      "category": "ai_generated",
+      "archetype": "safety",
+      "session_id": "10675440626644403027",
+      "url": "https://jules.google.com/session/10675440626644403027",
+      "status": "started",
+      "retries": 0
+    },
+    {
+      "id": "AI-005.μF",
+      "name": "コード/コメント矛盾検出者",
+      "category": "ai_generated",
+      "archetype": "safety",
+      "session_id": "16268515556086291717",
+      "url": "https://jules.google.com/session/16268515556086291717",
+      "status": "started",
+      "retries": 0
+    },
+    {
+      "id": "AI-005.μP",
+      "name": "コード/コメント矛盾検出者",
+      "category": "ai_generated",
+      "archetype": "safety",
+      "session_id": "4297102612250648869",
+      "url": "https://jules.google.com/session/4297102612250648869",
+      "status": "started",
+      "retries": 0
+    },
+    {
+      "id": "AI-005.F",
+      "name": "コード/コメント矛盾検出者",
+      "category": "ai_generated",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n",
+      "retries": 3
+    },
+    {
+      "id": "AI-005.P",
+      "name": "コード/コメント矛盾検出者",
+      "category": "ai_generated",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n",
+      "retries": 3
+    },
+    {
+      "id": "AI-005.M",
+      "name": "コード/コメント矛盾検出者",
+      "category": "ai_generated",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n",
+      "retries": 3
+    },
+    {
+      "id": "AI-005.MF",
+      "name": "コード/コメント矛盾検出者",
+      "category": "ai_generated",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n",
+      "retries": 3
+    },
+    {
+      "id": "AI-005.MP",
+      "name": "コード/コメント矛盾検出者",
+      "category": "ai_generated",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n",
+      "retries": 3
+    },
+    {
+      "id": "CG-001.μ",
+      "name": "ネスト深度警報者",
+      "category": "cognitive",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n",
+      "retries": 3
+    },
+    {
+      "id": "CG-001.μF",
+      "name": "ネスト深度警報者",
+      "category": "cognitive",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n",
+      "retries": 3
+    },
+    {
+      "id": "CG-001.μP",
+      "name": "ネスト深度警報者",
+      "category": "cognitive",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n",
+      "retries": 3
+    },
+    {
+      "id": "CG-001.F",
+      "name": "ネスト深度警報者",
+      "category": "cognitive",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n",
+      "retries": 3
+    },
+    {
+      "id": "CG-001.P",
+      "name": "ネスト深度警報者",
+      "category": "cognitive",
+      "archetype": "precision",
+      "session_id": "7459787678291140232",
+      "url": "https://jules.google.com/session/7459787678291140232",
+      "status": "started",
+      "retries": 0
+    },
+    {
+      "id": "CG-001.M",
+      "name": "ネスト深度警報者",
+      "category": "cognitive",
+      "archetype": "precision",
+      "session_id": "12781117521827180513",
+      "url": "https://jules.google.com/session/12781117521827180513",
+      "status": "started",
+      "retries": 0
+    },
+    {
+      "id": "CG-001.MF",
+      "name": "ネスト深度警報者",
+      "category": "cognitive",
+      "archetype": "precision",
+      "session_id": "2904475912253615893",
+      "url": "https://jules.google.com/session/2904475912253615893",
+      "status": "started",
+      "retries": 0
+    },
+    {
+      "id": "CG-001.MP",
+      "name": "ネスト深度警報者",
+      "category": "cognitive",
+      "archetype": "precision",
+      "session_id": "13781334433621030275",
+      "url": "https://jules.google.com/session/13781334433621030275",
+      "status": "started",
+      "retries": 0
+    },
+    {
+      "id": "CG-002.μ",
+      "name": "認知チャンク分析者",
+      "category": "cognitive",
+      "archetype": "precision",
+      "session_id": "921468518507776176",
+      "url": "https://jules.google.com/session/921468518507776176",
+      "status": "started",
+      "retries": 0
+    },
+    {
+      "id": "CG-002.μF",
+      "name": "認知チャンク分析者",
+      "category": "cognitive",
+      "archetype": "precision",
+      "session_id": "15772558090229219119",
+      "url": "https://jules.google.com/session/15772558090229219119",
+      "status": "started",
+      "retries": 0
+    },
+    {
+      "id": "CG-002.μP",
+      "name": "認知チャンク分析者",
+      "category": "cognitive",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n",
+      "retries": 3
+    },
+    {
+      "id": "CG-002.F",
+      "name": "認知チャンク分析者",
+      "category": "cognitive",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n",
+      "retries": 3
+    },
+    {
+      "id": "CG-002.P",
+      "name": "認知チャンク分析者",
+      "category": "cognitive",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n",
+      "retries": 3
+    },
+    {
+      "id": "CG-002.M",
+      "name": "認知チャンク分析者",
+      "category": "cognitive",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n",
+      "retries": 3
+    },
+    {
+      "id": "CG-002.MF",
+      "name": "認知チャンク分析者",
+      "category": "cognitive",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n",
+      "retries": 3
+    },
+    {
+      "id": "CG-002.MP",
+      "name": "認知チャンク分析者",
+      "category": "cognitive",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n",
+      "retries": 3
+    },
+    {
+      "id": "AE-012.μ",
+      "name": "視覚リズムの指揮者",
+      "category": "aesthetics",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n",
+      "retries": 3
+    },
+    {
+      "id": "AE-012.μF",
+      "name": "視覚リズムの指揮者",
+      "category": "aesthetics",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n",
+      "retries": 3
+    },
+    {
+      "id": "AE-012.μP",
+      "name": "視覚リズムの指揮者",
+      "category": "aesthetics",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n",
+      "retries": 3
+    },
+    {
+      "id": "AE-012.F",
+      "name": "視覚リズムの指揮者",
+      "category": "aesthetics",
+      "archetype": "creative",
+      "session_id": "10028822380527882209",
+      "url": "https://jules.google.com/session/10028822380527882209",
+      "status": "started",
+      "retries": 0
+    },
+    {
+      "id": "AE-012.P",
+      "name": "視覚リズムの指揮者",
+      "category": "aesthetics",
+      "archetype": "creative",
+      "session_id": "4208425612926052410",
+      "url": "https://jules.google.com/session/4208425612926052410",
+      "status": "started",
+      "retries": 0
+    },
+    {
+      "id": "AE-012.M",
+      "name": "視覚リズムの指揮者",
+      "category": "aesthetics",
+      "archetype": "creative",
+      "session_id": "14901884380532129723",
+      "url": "https://jules.google.com/session/14901884380532129723",
+      "status": "started",
+      "retries": 0
+    },
+    {
+      "id": "AE-012.MF",
+      "name": "視覚リズムの指揮者",
+      "category": "aesthetics",
+      "archetype": "creative",
+      "session_id": "13467435343947350153",
+      "url": "https://jules.google.com/session/13467435343947350153",
+      "status": "started",
+      "retries": 0
+    },
+    {
+      "id": "AE-012.MP",
+      "name": "視覚リズムの指揮者",
+      "category": "aesthetics",
+      "archetype": "creative",
+      "session_id": "15759951691039856924",
+      "url": "https://jules.google.com/session/15759951691039856924",
+      "status": "started",
+      "retries": 0
+    },
+    {
+      "id": "AE-013.μ",
+      "name": "シンプリシティの門番",
+      "category": "aesthetics",
+      "archetype": "creative",
+      "session_id": "15928189542990532763",
+      "url": "https://jules.google.com/session/15928189542990532763",
+      "status": "started",
+      "retries": 0
+    },
+    {
+      "id": "AE-013.μF",
+      "name": "シンプリシティの門番",
+      "category": "aesthetics",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n",
+      "retries": 3
+    },
+    {
+      "id": "AE-013.μP",
+      "name": "シンプリシティの門番",
+      "category": "aesthetics",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n",
+      "retries": 3
+    },
+    {
+      "id": "AE-013.F",
+      "name": "シンプリシティの門番",
+      "category": "aesthetics",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n",
+      "retries": 3
+    },
+    {
+      "id": "AE-013.P",
+      "name": "シンプリシティの門番",
+      "category": "aesthetics",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n",
+      "retries": 3
+    },
+    {
+      "id": "AE-013.M",
+      "name": "シンプリシティの門番",
+      "category": "aesthetics",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n",
+      "retries": 3
+    },
+    {
+      "id": "AE-013.MF",
+      "name": "シンプリシティの門番",
+      "category": "aesthetics",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n",
+      "retries": 3
+    },
+    {
+      "id": "AE-013.MP",
+      "name": "シンプリシティの門番",
+      "category": "aesthetics",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n",
+      "retries": 3
+    },
+    {
+      "id": "AE-014.μ",
+      "name": "比喩一貫性の詩人",
+      "category": "aesthetics",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n",
+      "retries": 3
+    },
+    {
+      "id": "AE-014.μF",
+      "name": "比喩一貫性の詩人",
+      "category": "aesthetics",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n",
+      "retries": 3
+    },
+    {
+      "id": "AE-014.μP",
+      "name": "比喩一貫性の詩人",
+      "category": "aesthetics",
+      "archetype": "creative",
+      "session_id": "10523988036306299891",
+      "url": "https://jules.google.com/session/10523988036306299891",
+      "status": "started",
+      "retries": 0
+    },
+    {
+      "id": "AE-014.F",
+      "name": "比喩一貫性の詩人",
+      "category": "aesthetics",
+      "archetype": "creative",
+      "session_id": "12920986026528828075",
+      "url": "https://jules.google.com/session/12920986026528828075",
+      "status": "started",
+      "retries": 0
+    },
+    {
+      "id": "AE-014.P",
+      "name": "比喩一貫性の詩人",
+      "category": "aesthetics",
+      "archetype": "creative",
+      "session_id": "14858166618466148817",
+      "url": "https://jules.google.com/session/14858166618466148817",
+      "status": "started",
+      "retries": 0
+    },
+    {
+      "id": "AE-014.M",
+      "name": "比喩一貫性の詩人",
+      "category": "aesthetics",
+      "archetype": "creative",
+      "session_id": "692705948254735526",
+      "url": "https://jules.google.com/session/692705948254735526",
+      "status": "started",
+      "retries": 0
+    },
+    {
+      "id": "AE-014.MF",
+      "name": "比喩一貫性の詩人",
+      "category": "aesthetics",
+      "archetype": "creative",
+      "session_id": "10395250768321908815",
+      "url": "https://jules.google.com/session/10395250768321908815",
+      "status": "started",
+      "retries": 0
+    },
+    {
+      "id": "AE-014.MP",
+      "name": "比喩一貫性の詩人",
+      "category": "aesthetics",
+      "archetype": "creative",
+      "session_id": "11570782957182931138",
+      "url": "https://jules.google.com/session/11570782957182931138",
+      "status": "started",
+      "retries": 0
+    },
+    {
+      "id": "CF-001.μ",
+      "name": "インポートグラフ監査官",
+      "category": "crossfile",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n",
+      "retries": 3
+    },
+    {
+      "id": "CF-001.μF",
+      "name": "インポートグラフ監査官",
+      "category": "crossfile",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n",
+      "retries": 3
+    },
+    {
+      "id": "CF-001.μP",
+      "name": "インポートグラフ監査官",
+      "category": "crossfile",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n",
+      "retries": 3
+    },
+    {
+      "id": "CF-001.F",
+      "name": "インポートグラフ監査官",
+      "category": "crossfile",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n",
+      "retries": 3
+    },
+    {
+      "id": "CF-001.P",
+      "name": "インポートグラフ監査官",
+      "category": "crossfile",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n",
+      "retries": 3
+    },
+    {
+      "id": "CF-001.M",
+      "name": "インポートグラフ監査官",
+      "category": "crossfile",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n",
+      "retries": 3
+    },
+    {
+      "id": "CF-001.MF",
+      "name": "インポートグラフ監査官",
+      "category": "crossfile",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n",
+      "retries": 3
+    },
+    {
+      "id": "CF-001.MP",
+      "name": "インポートグラフ監査官",
+      "category": "crossfile",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n",
+      "retries": 3
+    },
+    {
+      "id": "CF-002.μ",
+      "name": "暗黙契約違反検出者",
+      "category": "crossfile",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n",
+      "retries": 3
+    },
+    {
+      "id": "CF-002.μF",
+      "name": "暗黙契約違反検出者",
+      "category": "crossfile",
+      "archetype": "safety",
+      "session_id": "3777497461976192106",
+      "url": "https://jules.google.com/session/3777497461976192106",
+      "status": "started",
+      "retries": 0
+    },
+    {
+      "id": "CF-002.μP",
+      "name": "暗黙契約違反検出者",
+      "category": "crossfile",
+      "archetype": "safety",
+      "session_id": "7587127785222680917",
+      "url": "https://jules.google.com/session/7587127785222680917",
+      "status": "started",
+      "retries": 0
+    },
+    {
+      "id": "CF-002.F",
+      "name": "暗黙契約違反検出者",
+      "category": "crossfile",
+      "archetype": "safety",
+      "session_id": "3926734550252118401",
+      "url": "https://jules.google.com/session/3926734550252118401",
+      "status": "started",
+      "retries": 0
+    },
+    {
+      "id": "CF-002.P",
+      "name": "暗黙契約違反検出者",
+      "category": "crossfile",
+      "archetype": "safety",
+      "session_id": "17096154516220042485",
+      "url": "https://jules.google.com/session/17096154516220042485",
+      "status": "started",
+      "retries": 0
+    },
+    {
+      "id": "CF-002.M",
+      "name": "暗黙契約違反検出者",
+      "category": "crossfile",
+      "archetype": "safety",
+      "session_id": "3515386084061507651",
+      "url": "https://jules.google.com/session/3515386084061507651",
+      "status": "started",
+      "retries": 0
+    },
+    {
+      "id": "CF-002.MF",
+      "name": "暗黙契約違反検出者",
+      "category": "crossfile",
+      "archetype": "safety",
+      "session_id": "12818313905385833727",
+      "url": "https://jules.google.com/session/12818313905385833727",
+      "status": "started",
+      "retries": 0
+    },
+    {
+      "id": "CF-002.MP",
+      "name": "暗黙契約違反検出者",
+      "category": "crossfile",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n",
+      "retries": 3
+    },
+    {
+      "id": "EV-001.μ",
+      "name": "Series適所配置検査官",
+      "category": "evolution",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n",
+      "retries": 3
+    },
+    {
+      "id": "EV-001.μF",
+      "name": "Series適所配置検査官",
+      "category": "evolution",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n",
+      "retries": 3
+    },
+    {
+      "id": "EV-001.μP",
+      "name": "Series適所配置検査官",
+      "category": "evolution",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n",
+      "retries": 3
+    },
+    {
+      "id": "EV-001.F",
+      "name": "Series適所配置検査官",
+      "category": "evolution",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n",
+      "retries": 3
+    },
+    {
+      "id": "EV-001.P",
+      "name": "Series適所配置検査官",
+      "category": "evolution",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n",
+      "retries": 3
+    },
+    {
+      "id": "EV-001.M",
+      "name": "Series適所配置検査官",
+      "category": "evolution",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n",
+      "retries": 3
+    },
+    {
+      "id": "EV-001.MF",
+      "name": "Series適所配置検査官",
+      "category": "evolution",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n",
+      "retries": 3
+    },
+    {
+      "id": "EV-001.MP",
+      "name": "Series適所配置検査官",
+      "category": "evolution",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n",
+      "retries": 3
+    },
+    {
+      "id": "EV-002.μ",
+      "name": "定理カバレッジ分析者",
+      "category": "evolution",
+      "archetype": "creative",
+      "session_id": "4558890847876936603",
+      "url": "https://jules.google.com/session/4558890847876936603",
+      "status": "started",
+      "retries": 0
+    },
+    {
+      "id": "EV-002.μF",
+      "name": "定理カバレッジ分析者",
+      "category": "evolution",
+      "archetype": "creative",
+      "session_id": "620866381864331668",
+      "url": "https://jules.google.com/session/620866381864331668",
+      "status": "started",
+      "retries": 0
+    },
+    {
+      "id": "EV-002.μP",
+      "name": "定理カバレッジ分析者",
+      "category": "evolution",
+      "archetype": "creative",
+      "session_id": "10297502134006799540",
+      "url": "https://jules.google.com/session/10297502134006799540",
+      "status": "started",
+      "retries": 0
+    },
+    {
+      "id": "EV-002.F",
+      "name": "定理カバレッジ分析者",
+      "category": "evolution",
+      "archetype": "creative",
+      "session_id": "16096215919647892964",
+      "url": "https://jules.google.com/session/16096215919647892964",
+      "status": "started",
+      "retries": 0
+    },
+    {
+      "id": "EV-002.P",
+      "name": "定理カバレッジ分析者",
+      "category": "evolution",
+      "archetype": "creative",
+      "session_id": "14908396093093670137",
+      "url": "https://jules.google.com/session/14908396093093670137",
+      "status": "started",
+      "retries": 0
+    },
+    {
+      "id": "EV-002.M",
+      "name": "定理カバレッジ分析者",
+      "category": "evolution",
+      "archetype": "creative",
+      "session_id": "11438755416695154397",
+      "url": "https://jules.google.com/session/11438755416695154397",
+      "status": "started",
+      "retries": 0
+    },
+    {
+      "id": "EV-002.MF",
+      "name": "定理カバレッジ分析者",
+      "category": "evolution",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n",
+      "retries": 3
+    },
+    {
+      "id": "EV-002.MP",
+      "name": "定理カバレッジ分析者",
+      "category": "evolution",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n",
+      "retries": 3
+    },
+    {
+      "id": "LM-001.μ",
+      "name": "LLM臭気検出者",
+      "category": "llm_pattern",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n",
+      "retries": 3
+    },
+    {
+      "id": "LM-001.μF",
+      "name": "LLM臭気検出者",
+      "category": "llm_pattern",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n",
+      "retries": 3
+    },
+    {
+      "id": "LM-001.μP",
+      "name": "LLM臭気検出者",
+      "category": "llm_pattern",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n",
+      "retries": 3
+    },
+    {
+      "id": "LM-001.F",
+      "name": "LLM臭気検出者",
+      "category": "llm_pattern",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n",
+      "retries": 3
+    },
+    {
+      "id": "LM-001.P",
+      "name": "LLM臭気検出者",
+      "category": "llm_pattern",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n",
+      "retries": 3
+    },
+    {
+      "id": "LM-001.M",
+      "name": "LLM臭気検出者",
+      "category": "llm_pattern",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n",
+      "retries": 3
+    },
+    {
+      "id": "LM-001.MF",
+      "name": "LLM臭気検出者",
+      "category": "llm_pattern",
+      "error": 400,
+      "error_text": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Precondition check failed.\",\n    \"status\": \"FAILED_PRECONDITION\"\n  }\n}\n",
+      "retries": 3
+    },
+    {
+      "id": "LM-001.MP",
+      "name": "LLM臭気検出者",
+      "category": "llm_pattern",
+      "archetype": "safety",
+      "session_id": "17833696136667060870",
+      "url": "https://jules.google.com/session/17833696136667060870",
+      "status": "started",
+      "retries": 0
+    }
+  ]
+}

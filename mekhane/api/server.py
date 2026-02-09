@@ -78,11 +78,13 @@ def _register_routers(app: FastAPI) -> None:
     from mekhane.api.routes.fep import router as fep_router
     from mekhane.api.routes.postcheck import router as postcheck_router
     from mekhane.api.routes.dendron import router as dendron_router
+    from mekhane.api.routes.graph import router as graph_router
 
     app.include_router(status_router, prefix=API_PREFIX)
     app.include_router(fep_router, prefix=API_PREFIX)
     app.include_router(postcheck_router, prefix=API_PREFIX)
     app.include_router(dendron_router, prefix=API_PREFIX)
+    app.include_router(graph_router, prefix=API_PREFIX)
 
     # Gnōsis — shape mismatch の可能性があるため遅延ロード
     try:

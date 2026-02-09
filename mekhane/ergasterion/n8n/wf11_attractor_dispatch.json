@@ -5,31 +5,52 @@
             "parameters": {
                 "httpMethod": "POST",
                 "path": "attractor",
-                "responseMode": "lastNode",
+                "responseMode": "responseNode",
                 "options": {}
             },
-            "id": "attractor-webhook",
-            "name": "コンテキスト受信",
             "type": "n8n-nodes-base.webhook",
             "typeVersion": 2,
             "position": [
-                250,
-                400
+                260,
+                300
             ],
-            "webhookId": "attractor-wh"
+            "id": "wf11-webhook",
+            "name": "コンテキスト受信",
+            "webhookId": "attractor"
         },
         {
             "parameters": {
-                "jsCode": "const fs = require('fs');\n\nconst now = new Date();\nconst raw = $input.first().json;\nconst input = raw.body || raw;\nconst context = (input.context || input.text || '').toLowerCase();\n\nconst THEOREM_MAP = [\n  { keywords: ['なぜ','本質','根本','why','essence'], series: 'O', theorem: 'O1', name: 'Noēsis', cmd: '/noe' },\n  { keywords: ['目的','意志','望む','goal','purpose'], series: 'O', theorem: 'O2', name: 'Boulēsis', cmd: '/bou' },\n  { keywords: ['問い','探求','疑問','question','explore'], series: 'O', theorem: 'O3', name: 'Zētēsis', cmd: '/zet' },\n  { keywords: ['実装','作る','コード','build','implement'], series: 'O', theorem: 'O4', name: 'Energeia', cmd: '/ene' },\n  { keywords: ['尺度','スケール','粒度','measure','scale'], series: 'S', theorem: 'S1', name: 'Metron', cmd: '/met' },\n  { keywords: ['方法','手順','手法','method','how'], series: 'S', theorem: 'S2', name: 'Mekhanē', cmd: '/mek' },\n  { keywords: ['基準','評価','ベンチ','standard','benchmark'], series: 'S', theorem: 'S3', name: 'Stathmos', cmd: '/sta' },\n  { keywords: ['実践','価値','行動','practice','action'], series: 'S', theorem: 'S4', name: 'Praxis', cmd: '/pra' },\n  { keywords: ['直感','初期','感覚','intuition','gut'], series: 'H', theorem: 'H1', name: 'Propatheia', cmd: '/pro' },\n  { keywords: ['確信','信頼','自信','confidence','trust'], series: 'H', theorem: 'H2', name: 'Pistis', cmd: '/pis' },\n  { keywords: ['欲求','価値','モチベ','desire','motivation'], series: 'H', theorem: 'H3', name: 'Orexis', cmd: '/ore' },\n  { keywords: ['信念','記録','学習','belief','record'], series: 'H', theorem: 'H4', name: 'Doxa', cmd: '/dox' },\n  { keywords: ['判断','評価','レビュー','judge','review'], series: 'A', theorem: 'A2', name: 'Krisis', cmd: '/dia' },\n  { keywords: ['調査','研究','論文','research','paper'], series: 'K', theorem: 'K4', name: 'Sophia', cmd: '/sop' },\n  { keywords: ['時間','期限','deadline','timing','when'], series: 'K', theorem: 'K2', name: 'Chronos', cmd: '/chr' },\n  { keywords: ['好機','チャンス','機会','opportunity'], series: 'K', theorem: 'K1', name: 'Eukairia', cmd: '/euk' }\n];\n\nlet bestMatch = null;\nlet bestScore = 0;\nfor (let i = 0; i < THEOREM_MAP.length; i++) {\n  const t = THEOREM_MAP[i];\n  let score = 0;\n  for (let j = 0; j < t.keywords.length; j++) {\n    if (context.indexOf(t.keywords[j]) >= 0) score += 1;\n  }\n  if (score > bestScore) { bestScore = score; bestMatch = t; }\n}\n\nconst confidence = bestScore > 0 ? Math.min(1.0, bestScore * 0.3) : 0;\nconst shouldAutoDispatch = confidence >= 0.7;\n\nconst STATE_FILE = '/oikos/mneme/.hegemonikon/attractor_dispatch.json';\nlet state = { dispatches: [], totalDispatches: 0 };\ntry { state = JSON.parse(fs.readFileSync(STATE_FILE, 'utf-8')); } catch(e) {}\n\nstate.dispatches = (state.dispatches || []).slice(-50);\nstate.dispatches.push({ timestamp: now.toISOString(), context: context.substring(0, 200), recommendation: bestMatch ? { theorem: bestMatch.theorem, name: bestMatch.name, cmd: bestMatch.cmd } : null, confidence: confidence });\nstate.totalDispatches = (state.totalDispatches || 0) + 1;\ntry { fs.writeFileSync(STATE_FILE, JSON.stringify(state, null, 2), 'utf-8'); } catch(e) {}\n\nreturn [{ json: { timestamp: now.toISOString(), recommendation: bestMatch ? { theorem: bestMatch.theorem, name: bestMatch.name, series: bestMatch.series, command: bestMatch.cmd, confidence: confidence } : null, autoDispatch: shouldAutoDispatch, context: context.substring(0, 100) } }];"
+                "method": "POST",
+                "url": "http://172.18.0.1:9696/api/sympatheia/attractor",
+                "sendBody": true,
+                "specifyBody": "json",
+                "jsonBody": "={{ JSON.stringify($input.first().json.body || $input.first().json) }}",
+                "options": {
+                    "timeout": 30000
+                }
             },
-            "id": "attractor-engine",
-            "name": "Attractor推論",
-            "type": "n8n-nodes-base.code",
-            "typeVersion": 2,
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.2,
             "position": [
-                450,
-                400
-            ]
+                480,
+                300
+            ],
+            "id": "wf11-api",
+            "name": "mekhane API (Attractor)"
+        },
+        {
+            "parameters": {
+                "respondWith": "json",
+                "responseBody": "={{ JSON.stringify($input.first().json) }}"
+            },
+            "type": "n8n-nodes-base.respondToWebhook",
+            "typeVersion": 1.1,
+            "position": [
+                700,
+                300
+            ],
+            "id": "wf11-respond",
+            "name": "応答返却"
         }
     ],
     "connections": {
@@ -37,7 +58,18 @@
             "main": [
                 [
                     {
-                        "node": "Attractor推論",
+                        "node": "mekhane API (Attractor)",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "mekhane API (Attractor)": {
+            "main": [
+                [
+                    {
+                        "node": "応答返却",
                         "type": "main",
                         "index": 0
                     }
@@ -45,19 +77,13 @@
             ]
         }
     },
+    "active": true,
     "settings": {
         "executionOrder": "v1"
     },
     "tags": [
         {
-            "name": "hegemonikon"
-        },
-        {
             "name": "sympatheia"
-        },
-        {
-            "name": "attractor"
         }
-    ],
-    "active": true
+    ]
 }

@@ -12,84 +12,48 @@
                     ]
                 }
             },
-            "id": "daily-feedback",
-            "name": "毎日 6:00",
             "type": "n8n-nodes-base.scheduleTrigger",
             "typeVersion": 1.2,
             "position": [
-                250,
+                260,
                 300
-            ]
+            ],
+            "id": "wf12-cron",
+            "name": "毎日 6:00"
         },
         {
             "parameters": {
                 "httpMethod": "POST",
                 "path": "feedback-loop",
-                "responseMode": "lastNode",
                 "options": {}
             },
-            "id": "feedback-webhook",
-            "name": "手動トリガー",
             "type": "n8n-nodes-base.webhook",
             "typeVersion": 2,
             "position": [
-                250,
+                260,
                 500
             ],
-            "webhookId": "feedback-loop-wh"
-        },
-        {
-            "parameters": {
-                "jsCode": "const fs = require('fs');\n\nconst MNEME = '/oikos/mneme/.hegemonikon';\nconst CONFIG_FILE = MNEME + '/sympatheia_config.json';\nconst now = new Date();\nconst threeDaysAgo = now.getTime() - 3 * 86400000;\n\n// --- デフォルト設定 ---\nlet config = {\n  thresholds: { health_high: 0.5, health_low: 0.3, stale_minutes: 60 },\n  sensitivity: 1.0,\n  lastAdjusted: null,\n  adjustmentHistory: []\n};\ntry { config = JSON.parse(fs.readFileSync(CONFIG_FILE, 'utf-8')); } catch(e) {}\n\n// --- Health Metrics 分析 (直近3日) ---\nlet scores = [];\ntry {\n  const lines = fs.readFileSync(MNEME + '/health_metrics.jsonl', 'utf-8').trim().split('\\n');\n  for (let i = Math.max(0, lines.length - 200); i < lines.length; i++) {\n    try {\n      const m = JSON.parse(lines[i]);\n      if (new Date(m.timestamp).getTime() > threeDaysAgo) scores.push(m.score || 0);\n    } catch(e) {}\n  }\n} catch(e) {}\n\n// --- WBC Alert 頻度 ---\nlet wbcAlerts = 0;\ntry {\n  const wbc = JSON.parse(fs.readFileSync(MNEME + '/wbc_state.json', 'utf-8'));\n  wbcAlerts = (wbc.alerts || []).filter(function(a) { return new Date(a.timestamp).getTime() > threeDaysAgo; }).length;\n} catch(e) {}\n\n// --- トレンド計算 ---\nconst avg = scores.length > 0 ? scores.reduce(function(a,b){return a+b;},0) / scores.length : 0.5;\nconst trend = scores.length >= 6 ? (\n  scores.slice(-3).reduce(function(a,b){return a+b;},0)/3 - scores.slice(-6,-3).reduce(function(a,b){return a+b;},0)/3\n) : 0;\n\nconst adjustments = [];\nconst oldConfig = JSON.parse(JSON.stringify(config.thresholds));\n\n// --- 恒常性ロジック ---\n// 3日連続高スコア → 感度向上 (閾値引下げ)\nif (avg > 0.9 && scores.length >= 10) {\n  config.thresholds.health_high = Math.max(0.3, config.thresholds.health_high - 0.05);\n  adjustments.push('health_high: ' + oldConfig.health_high + ' → ' + config.thresholds.health_high + ' (高スコア持続→感度向上)');\n}\n// 低スコア傾向 → 感度低下 (閾値引上げ、アラート疲れ防止)\nif (avg < 0.4 && scores.length >= 5) {\n  config.thresholds.health_high = Math.min(0.7, config.thresholds.health_high + 0.05);\n  adjustments.push('health_high: ' + oldConfig.health_high + ' → ' + config.thresholds.health_high + ' (低スコア→感度低下)');\n}\n// WBC アラート過多 → stale_minutes 延長\nif (wbcAlerts > 10) {\n  config.thresholds.stale_minutes = Math.min(120, config.thresholds.stale_minutes + 15);\n  adjustments.push('stale_minutes: 延長 → ' + config.thresholds.stale_minutes + ' (アラート過多)');\n}\n\nconst adjusted = adjustments.length > 0;\nif (adjusted) {\n  config.lastAdjusted = now.toISOString();\n  config.adjustmentHistory = (config.adjustmentHistory || []).slice(-20);\n  config.adjustmentHistory.push({ timestamp: now.toISOString(), changes: adjustments });\n}\n\ntry { fs.writeFileSync(CONFIG_FILE, JSON.stringify(config, null, 2), 'utf-8'); } catch(e) {}\n\nconst result = {\n  timestamp: now.toISOString(),\n  metrics: { avg: Math.round(avg*100)/100, trend: Math.round(trend*100)/100, samples: scores.length, wbcAlerts: wbcAlerts },\n  thresholds: config.thresholds,\n  adjusted: adjusted,\n  adjustments: adjustments\n};\n\nconst slackPayload = adjusted ? JSON.stringify({\n  blocks: [\n    { type: 'header', text: { type: 'plain_text', text: '⚖️ Homeostasis: 閾値調整', emoji: true } },\n    { type: 'section', text: { type: 'mrkdwn', text: '*Avg Score:* ' + result.metrics.avg + ' (trend: ' + result.metrics.trend + ')\\n*WBC Alerts (3d):* ' + wbcAlerts + '\\n*Changes:*\\n• ' + adjustments.join('\\n• ') } },\n    { type: 'context', elements: [{ type: 'mrkdwn', text: '_WF-12 Feedback Loop (Sympatheia)_' }] }\n  ]\n}) : null;\n\nreturn [{ json: Object.assign(result, { shouldNotify: adjusted, slackPayload: slackPayload }) }];"
-            },
-            "id": "homeostasis",
-            "name": "恒常性制御",
-            "type": "n8n-nodes-base.code",
-            "typeVersion": 2,
-            "position": [
-                450,
-                400
-            ]
-        },
-        {
-            "parameters": {
-                "conditions": {
-                    "boolean": [
-                        {
-                            "value1": "={{$json.shouldNotify}}",
-                            "value2": true
-                        }
-                    ]
-                }
-            },
-            "id": "if-adjusted",
-            "name": "調整あり?",
-            "type": "n8n-nodes-base.if",
-            "typeVersion": 1,
-            "position": [
-                650,
-                400
-            ]
+            "id": "wf12-webhook",
+            "name": "手動トリガー",
+            "webhookId": "feedback-loop"
         },
         {
             "parameters": {
                 "method": "POST",
-                "url": "={{ $env.SLACK_WEBHOOK_URL }}",
+                "url": "http://localhost:9696/api/sympatheia/feedback",
                 "sendBody": true,
-                "specifyBody": "json",
-                "jsonBody": "={{ $json.slackPayload }}",
                 "options": {
-                    "timeout": 10000
+                    "timeout": 15000
                 }
             },
-            "id": "slack-feedback",
-            "name": "調整報告",
             "type": "n8n-nodes-base.httpRequest",
             "typeVersion": 4.2,
             "position": [
-                850,
-                300
-            ]
+                480,
+                400
+            ],
+            "id": "wf12-api",
+            "name": "mekhane API (Feedback)"
         }
     ],
     "connections": {
@@ -97,7 +61,7 @@
             "main": [
                 [
                     {
-                        "node": "恒常性制御",
+                        "node": "mekhane API (Feedback)",
                         "type": "main",
                         "index": 0
                     }
@@ -108,50 +72,21 @@
             "main": [
                 [
                     {
-                        "node": "恒常性制御",
+                        "node": "mekhane API (Feedback)",
                         "type": "main",
                         "index": 0
                     }
                 ]
-            ]
-        },
-        "恒常性制御": {
-            "main": [
-                [
-                    {
-                        "node": "調整あり?",
-                        "type": "main",
-                        "index": 0
-                    }
-                ]
-            ]
-        },
-        "調整あり?": {
-            "main": [
-                [
-                    {
-                        "node": "調整報告",
-                        "type": "main",
-                        "index": 0
-                    }
-                ],
-                []
             ]
         }
     },
+    "active": true,
     "settings": {
         "executionOrder": "v1"
     },
     "tags": [
         {
-            "name": "hegemonikon"
-        },
-        {
             "name": "sympatheia"
-        },
-        {
-            "name": "homeostasis"
         }
-    ],
-    "active": true
+    ]
 }

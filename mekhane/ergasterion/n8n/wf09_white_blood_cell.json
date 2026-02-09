@@ -5,71 +5,50 @@
             "parameters": {
                 "httpMethod": "POST",
                 "path": "wbc-alert",
-                "responseMode": "lastNode",
+                "responseMode": "responseNode",
                 "options": {}
             },
-            "id": "wbc-webhook",
-            "name": "異常受信",
             "type": "n8n-nodes-base.webhook",
             "typeVersion": 2,
             "position": [
-                250,
-                400
+                260,
+                300
             ],
-            "webhookId": "wbc-alert-wh"
-        },
-        {
-            "parameters": {
-                "jsCode": "const fs = require('fs');\n\nconst STATE_FILE = '/oikos/mneme/.hegemonikon/wbc_state.json';\nconst now = new Date();\n\n// 入力を取得 (webhook v2: body にネスト)\nconst raw = $input.first().json;\nconst input = raw.body || raw;\nconst source = input.source || 'unknown';\nconst severity = input.severity || 'medium';\nconst details = input.details || 'No details';\nconst files = input.files || [];\n\n// 過去のアラート履歴を読み込み\nlet state = { alerts: [], totalAlerts: 0, lastEscalation: null };\ntry { state = JSON.parse(fs.readFileSync(STATE_FILE, 'utf-8')); } catch(e) {}\n\n// 脅威レベル判定\nconst THREAT_WEIGHTS = {\n  'SACRED_TRUTH.md': 10,\n  'registry.yaml': 7,\n  'docker-compose.yml': 7,\n  'behavioral_constraints.md': 8,\n  'hegemonikon.md': 6\n};\n\nlet threatScore = 0;\nif (severity === 'critical') threatScore += 5;\nelse if (severity === 'high') threatScore += 3;\nelse threatScore += 1;\n\nfor (let i = 0; i < files.length; i++) {\n  for (const key in THREAT_WEIGHTS) {\n    if (files[i].indexOf(key) >= 0) threatScore += THREAT_WEIGHTS[key];\n  }\n}\n\n// 直近1時間のアラート数 (連続攻撃検知)\nconst oneHourAgo = now.getTime() - 3600000;\nconst recentAlerts = (state.alerts || []).filter(function(a) { return new Date(a.timestamp).getTime() > oneHourAgo; });\nif (recentAlerts.length >= 3) threatScore += 5;\n\nconst level = threatScore >= 8 ? 'CRITICAL' : threatScore >= 4 ? 'HIGH' : 'LOW';\nconst shouldEscalate = level === 'CRITICAL' || level === 'HIGH';\n\n// 診断結果\nconst diagnosis = {\n  timestamp: now.toISOString(),\n  source: source,\n  severity: severity,\n  threatScore: threatScore,\n  level: level,\n  details: details,\n  files: files,\n  recentAlertCount: recentAlerts.length,\n  shouldEscalate: shouldEscalate\n};\n\n// 状態保存 (直近24時間分のみ保持)\nconst oneDayAgo = now.getTime() - 86400000;\nstate.alerts = (state.alerts || []).filter(function(a) { return new Date(a.timestamp).getTime() > oneDayAgo; });\nstate.alerts.push(diagnosis);\nstate.totalAlerts = (state.totalAlerts || 0) + 1;\nif (shouldEscalate) state.lastEscalation = now.toISOString();\n\ntry { fs.writeFileSync(STATE_FILE, JSON.stringify(state, null, 2), 'utf-8'); } catch(e) {}\n\n// Slack ペイロード生成\nconst emoji = level === 'CRITICAL' ? '🚨🩸' : level === 'HIGH' ? '⚠️🩸' : '🩸';\nconst fileList = files.length > 0 ? files.slice(0,5).join(', ') : 'N/A';\nconst slackPayload = JSON.stringify({\n  blocks: [\n    { type: 'header', text: { type: 'plain_text', text: emoji + ' WBC Alert: ' + level + ' threat detected', emoji: true } },\n    { type: 'section', text: { type: 'mrkdwn', text: '*Source:* ' + source + '\\n*Severity:* ' + severity + '\\n*Threat Score:* ' + threatScore + '/15\\n*Details:* ' + details } },\n    { type: 'section', text: { type: 'mrkdwn', text: '*Files:* ' + fileList + '\\n*Recent alerts (1h):* ' + recentAlerts.length } },\n    { type: 'context', elements: [{ type: 'mrkdwn', text: '_WF-09 White Blood Cell | Total: ' + state.totalAlerts + '_' }] }\n  ]\n});\n\nreturn [{ json: Object.assign(diagnosis, { slackPayload: slackPayload }) }];"
-            },
-            "id": "threat-analysis",
-            "name": "脅威分析",
-            "type": "n8n-nodes-base.code",
-            "typeVersion": 2,
-            "position": [
-                450,
-                400
-            ]
-        },
-        {
-            "parameters": {
-                "conditions": {
-                    "boolean": [
-                        {
-                            "value1": "={{$json.shouldEscalate}}",
-                            "value2": true
-                        }
-                    ]
-                }
-            },
-            "id": "if-escalate",
-            "name": "エスカレート?",
-            "type": "n8n-nodes-base.if",
-            "typeVersion": 1,
-            "position": [
-                650,
-                400
-            ]
+            "id": "wf09-webhook",
+            "name": "異常受信",
+            "webhookId": "wbc-alert"
         },
         {
             "parameters": {
                 "method": "POST",
-                "url": "={{ $env.SLACK_WEBHOOK_URL }}",
+                "url": "http://localhost:9696/api/sympatheia/wbc",
                 "sendBody": true,
-                "specifyBody": "json",
-                "jsonBody": "={{ $json.slackPayload }}",
                 "options": {
-                    "timeout": 10000
+                    "timeout": 15000
                 }
             },
-            "id": "slack-escalate",
-            "name": "Creator緊急通知",
             "type": "n8n-nodes-base.httpRequest",
             "typeVersion": 4.2,
             "position": [
-                850,
+                480,
                 300
-            ]
+            ],
+            "id": "wf09-api",
+            "name": "mekhane API"
+        },
+        {
+            "parameters": {
+                "respondWith": "json",
+                "responseBody": "={{ JSON.stringify($input.first().json) }}"
+            },
+            "type": "n8n-nodes-base.respondToWebhook",
+            "typeVersion": 1.1,
+            "position": [
+                700,
+                300
+            ],
+            "id": "wf09-respond",
+            "name": "応答返却"
         }
     ],
     "connections": {
@@ -77,50 +56,32 @@
             "main": [
                 [
                     {
-                        "node": "脅威分析",
+                        "node": "mekhane API",
                         "type": "main",
                         "index": 0
                     }
                 ]
             ]
         },
-        "脅威分析": {
+        "mekhane API": {
             "main": [
                 [
                     {
-                        "node": "エスカレート?",
+                        "node": "応答返却",
                         "type": "main",
                         "index": 0
                     }
                 ]
-            ]
-        },
-        "エスカレート?": {
-            "main": [
-                [
-                    {
-                        "node": "Creator緊急通知",
-                        "type": "main",
-                        "index": 0
-                    }
-                ],
-                []
             ]
         }
     },
+    "active": true,
     "settings": {
         "executionOrder": "v1"
     },
     "tags": [
         {
-            "name": "hegemonikon"
-        },
-        {
             "name": "sympatheia"
-        },
-        {
-            "name": "wbc"
         }
-    ],
-    "active": true
+    ]
 }

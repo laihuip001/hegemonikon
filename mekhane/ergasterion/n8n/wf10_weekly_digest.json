@@ -12,64 +12,48 @@
                     ]
                 }
             },
-            "id": "weekly-cron",
-            "name": "毎週日曜 9:00",
             "type": "n8n-nodes-base.scheduleTrigger",
             "typeVersion": 1.2,
             "position": [
-                250,
+                260,
                 300
-            ]
+            ],
+            "id": "wf10-cron",
+            "name": "毎週日曜 9:00"
         },
         {
             "parameters": {
                 "httpMethod": "POST",
                 "path": "weekly-digest",
-                "responseMode": "lastNode",
                 "options": {}
             },
-            "id": "digest-webhook",
-            "name": "手動トリガー",
             "type": "n8n-nodes-base.webhook",
             "typeVersion": 2,
             "position": [
-                250,
+                260,
                 500
             ],
-            "webhookId": "weekly-digest-wh"
-        },
-        {
-            "parameters": {
-                "jsCode": "const fs = require('fs');\n\nconst MNEME = '/oikos/mneme/.hegemonikon';\nconst now = new Date();\nconst oneWeekAgo = new Date(now.getTime() - 7 * 86400000);\n\n// --- Heartbeat 状況 ---\nlet heartbeat = { beats: 0, healthy: false };\ntry { heartbeat = JSON.parse(fs.readFileSync(MNEME + '/heartbeat.json', 'utf-8')); } catch(e) {}\n\n// --- File Monitor 状況 ---\nlet fileMon = { _meta: { scanCount: 0, changesDetected: 0 } };\ntry { fileMon = JSON.parse(fs.readFileSync(MNEME + '/file_monitor_state.json', 'utf-8')); } catch(e) {}\n\n// --- Git Sentinel 状況 ---\nlet git = { dirty: false, total: 0, branch: 'unknown', stash: 0 };\ntry { git = JSON.parse(fs.readFileSync(MNEME + '/git_sentinel.json', 'utf-8')); } catch(e) {}\n\n// --- WBC 状況 ---\nlet wbc = { alerts: [], totalAlerts: 0 };\ntry { wbc = JSON.parse(fs.readFileSync(MNEME + '/wbc_state.json', 'utf-8')); } catch(e) {}\nconst weekAlerts = (wbc.alerts || []).filter(function(a) {\n  return new Date(a.timestamp).getTime() > oneWeekAgo.getTime();\n});\nconst criticals = weekAlerts.filter(function(a) { return a.level === 'CRITICAL'; }).length;\nconst highs = weekAlerts.filter(function(a) { return a.level === 'HIGH'; }).length;\n\n// --- Health Metrics (JSONL) ---\nlet healthScores = [];\ntry {\n  const lines = fs.readFileSync(MNEME + '/health_metrics.jsonl', 'utf-8').trim().split('\\n');\n  for (let i = Math.max(0, lines.length - 50); i < lines.length; i++) {\n    try {\n      const m = JSON.parse(lines[i]);\n      if (new Date(m.timestamp).getTime() > oneWeekAgo.getTime()) {\n        healthScores.push(m.score || 0);\n      }\n    } catch(e) {}\n  }\n} catch(e) {}\n\nconst avgScore = healthScores.length > 0 \n  ? Math.round(healthScores.reduce(function(a,b){return a+b;}, 0) / healthScores.length * 100) / 100 \n  : 0;\nconst minScore = healthScores.length > 0 ? Math.min.apply(null, healthScores) : 0;\nconst maxScore = healthScores.length > 0 ? Math.max.apply(null, healthScores) : 0;\n\n// --- Session 数 ---\nlet sessions = 0;\ntry {\n  const sessDir = '/oikos/mneme/.hegemonikon/sessions';\n  const files = fs.readdirSync(sessDir);\n  for (let i = 0; i < files.length; i++) {\n    if (files[i].indexOf('handoff_') === 0) {\n      try {\n        const stat = fs.statSync(sessDir + '/' + files[i]);\n        if (stat.mtime.getTime() > oneWeekAgo.getTime()) sessions++;\n      } catch(e) {}\n    }\n  }\n} catch(e) {}\n\n// --- Digest 保存 ---\nconst digest = {\n  timestamp: now.toISOString(),\n  weekEnding: now.toISOString().substring(0, 10),\n  heartbeat: { beats: heartbeat.beats, healthy: heartbeat.healthy },\n  fileMon: { scans: fileMon._meta.scanCount, changes: fileMon._meta.changesDetected || 0 },\n  git: { dirty: git.dirty, changes: git.total, branch: git.branch, stashes: git.stash },\n  wbc: { weekAlerts: weekAlerts.length, criticals: criticals, highs: highs, totalAll: wbc.totalAlerts },\n  health: { avg: avgScore, min: minScore, max: maxScore, samples: healthScores.length },\n  sessions: sessions\n};\n\ntry { fs.writeFileSync(MNEME + '/weekly_digest.json', JSON.stringify(digest, null, 2), 'utf-8'); } catch(e) {}\n\n// --- Slack Block Kit ---\nconst heartIcon = heartbeat.healthy ? '💚' : '💔';\nconst gitIcon = git.dirty ? '🔴' : '🟢';\nconst wbcIcon = criticals > 0 ? '🚨' : highs > 0 ? '⚠️' : '✅';\n\nconst slackPayload = JSON.stringify({\n  blocks: [\n    { type: 'header', text: { type: 'plain_text', text: '📊 Weekly Digest — ' + digest.weekEnding, emoji: true } },\n    { type: 'section', text: { type: 'mrkdwn', text: \n      heartIcon + ' *Heartbeat:* ' + heartbeat.beats + ' beats\\n' +\n      '📁 *File Monitor:* ' + fileMon._meta.scanCount + ' scans, ' + (fileMon._meta.changesDetected || 0) + ' changes\\n' +\n      gitIcon + ' *Git:* ' + git.total + ' uncommitted on `' + git.branch + '`\\n' +\n      wbcIcon + ' *WBC:* ' + weekAlerts.length + ' alerts (' + criticals + ' critical, ' + highs + ' high)'\n    } },\n    { type: 'section', text: { type: 'mrkdwn', text:\n      '🏥 *Health:* avg=' + avgScore + ' min=' + minScore + ' max=' + maxScore + ' (' + healthScores.length + ' samples)\\n' +\n      '🧠 *Sessions:* ' + sessions + ' handoffs this week'\n    } },\n    { type: 'context', elements: [{ type: 'mrkdwn', text: '_WF-10 Weekly Digest (Sympatheia)_' }] }\n  ]\n});\n\nreturn [{ json: Object.assign(digest, { slackPayload: slackPayload }) }];"
-            },
-            "id": "compile-digest",
-            "name": "記憶圧縮",
-            "type": "n8n-nodes-base.code",
-            "typeVersion": 2,
-            "position": [
-                450,
-                400
-            ]
+            "id": "wf10-webhook",
+            "name": "手動トリガー",
+            "webhookId": "weekly-digest"
         },
         {
             "parameters": {
                 "method": "POST",
-                "url": "={{ $env.SLACK_WEBHOOK_URL }}",
+                "url": "http://localhost:9696/api/sympatheia/digest",
                 "sendBody": true,
-                "specifyBody": "json",
-                "jsonBody": "={{ $json.slackPayload }}",
                 "options": {
-                    "timeout": 10000
+                    "timeout": 15000
                 }
             },
-            "id": "slack-digest",
-            "name": "週次報告",
             "type": "n8n-nodes-base.httpRequest",
             "typeVersion": 4.2,
             "position": [
-                650,
+                480,
                 400
-            ]
+            ],
+            "id": "wf10-api",
+            "name": "mekhane API"
         }
     ],
     "connections": {
@@ -77,7 +61,7 @@
             "main": [
                 [
                     {
-                        "node": "記憶圧縮",
+                        "node": "mekhane API",
                         "type": "main",
                         "index": 0
                     }
@@ -88,18 +72,7 @@
             "main": [
                 [
                     {
-                        "node": "記憶圧縮",
-                        "type": "main",
-                        "index": 0
-                    }
-                ]
-            ]
-        },
-        "記憶圧縮": {
-            "main": [
-                [
-                    {
-                        "node": "週次報告",
+                        "node": "mekhane API",
                         "type": "main",
                         "index": 0
                     }
@@ -107,19 +80,13 @@
             ]
         }
     },
+    "active": true,
     "settings": {
         "executionOrder": "v1"
     },
     "tags": [
         {
-            "name": "hegemonikon"
-        },
-        {
             "name": "sympatheia"
-        },
-        {
-            "name": "digest"
         }
-    ],
-    "active": true
+    ]
 }

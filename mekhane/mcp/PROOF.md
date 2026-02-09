@@ -26,3 +26,4 @@ Hegemonikón は外部アプリケーションと連携する
 | `jules_mcp_server.py` | Jules API |
 | `digestor_mcp_server.py` | 消化処理 |
 | `mneme_server.py` | 記憶管理 |
+| `sympatheia_mcp_server.py` | 自律神経 |

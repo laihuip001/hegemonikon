@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# PROOF: [L2/Sympatheia] <- mekhane/mcp/
+# PROOF: [L2/インフラ] <- mekhane/mcp/
 # PURPOSE: Sympatheia MCP Server — 自律神経系への直接アクセス
 """
 Sympatheia MCP Server

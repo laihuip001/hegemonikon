@@ -25,6 +25,7 @@ class DendronFileResult(BaseModel):
     issues: list[str] = []
 
 
+# PURPOSE: Dendron レポートサマリー
 class DendronSummary(BaseModel):
     """Dendron レポートサマリー。"""
     total_files: int = 0

@@ -114,6 +114,7 @@ async def gnosis_search(
 
 
 @router.get("/stats", response_model=GnosisStatsResponse)
+# PURPOSE: Gnōsis インデックス統計
 async def gnosis_stats() -> GnosisStatsResponse:
     """Gnōsis インデックス統計。"""
     try:

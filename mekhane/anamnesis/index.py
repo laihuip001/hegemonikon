@@ -29,7 +29,7 @@ from mekhane.anamnesis.models.paper import Paper, merge_papers
 GNOSIS_DIR = Path(__file__).parent.parent.parent / "gnosis_data"
 LANCE_DIR = GNOSIS_DIR / "lancedb"
 MODELS_DIR = (
-    Path(__file__).parent.parent / "models" / "bge-small"
+    Path(__file__).parent / "models" / "bge-small"
 )  # forge/models/bge-small
 
 # Windows UTF-8

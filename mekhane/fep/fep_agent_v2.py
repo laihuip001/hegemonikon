@@ -231,50 +231,36 @@ class HegemonikónFEPAgentV2:
         B = np.zeros((self.state_dim, self.state_dim, self.num_actions))
         uniform = 1.0 / self.state_dim  # Uniform noise floor
 
-        for from_idx in range(self.state_dim):
-            from_p, from_a, from_h, from_s = index_to_state_v2(from_idx)
+        # --- Action 0: observe ---
+        # Stoic necessity: identity (nothing changes when you wait)
+        # B[:, :, 0] = (1 - EPS_OBSERVE) * I + EPS_OBSERVE * uniform
+        B[:, :, 0] = EPS_OBSERVE * uniform
+        np.fill_diagonal(B[:, :, 0], (1 - EPS_OBSERVE) + EPS_OBSERVE * uniform)
 
-            for to_idx in range(self.state_dim):
-                to_p, to_a, to_h, to_s = index_to_state_v2(to_idx)
+        # --- Actions 1-6: act_O..act_A ---
+        # Stoic necessity: acting implies transitions to specific target states.
+        # Target state for act_X: (clear, granted, active, X)
 
-                # --- Action 0: observe ---
-                # Stoic necessity: identity (nothing changes when you wait)
-                is_identity = (
-                    to_p == from_p and to_a == from_a
-                    and to_h == from_h and to_s == from_s
-                )
-                if is_identity:
-                    B[to_idx, from_idx, 0] = (1 - EPS_OBSERVE) + EPS_OBSERVE * uniform
-                else:
-                    B[to_idx, from_idx, 0] = EPS_OBSERVE * uniform
+        # Precompute base target index for (clear, granted, active, O)
+        # p=1 ("clear"), a=1 ("granted"), h=1 ("active"), s=0 ("O")
+        # index = p*2*2*6 + a*2*6 + h*6 + s
+        #       = 1*24 + 1*12 + 1*6 + 0 = 42
+        base_target = 42
 
-                # --- Actions 1-6: act_O..act_A ---
-                for act_idx in range(1, 7):
-                    target_series = SERIES_STATES[act_idx - 1]
+        for act_idx in range(1, 7):
+            target_series_idx = act_idx - 1  # 0..5 corresponding to O..A
+            target_state_idx = base_target + target_series_idx
 
-                    # Stoic necessity: acting implies these transitions
-                    #   phantasia → clear (engagement reveals truth)
-                    #   assent → granted (acting IS assenting)
-                    #   horme → active (acting IS the impulse)
-                    #   series → target (acting on X means committing to X)
-                    is_stoic_target = (
-                        to_p == "clear"
-                        and to_a == "granted"
-                        and to_h == "active"
-                        and to_s == target_series
-                    )
-                    if is_stoic_target:
-                        B[to_idx, from_idx, act_idx] = (
-                            (1 - EPS_ACT) + EPS_ACT * uniform
-                        )
-                    else:
-                        B[to_idx, from_idx, act_idx] = EPS_ACT * uniform
+            # All columns transition to target_state_idx with high probability
+            # (1 - EPS_ACT) probability to go to target_state_idx
+            # EPS_ACT probability distributed uniformly
+            B[:, :, act_idx] = EPS_ACT * uniform
+            B[target_state_idx, :, act_idx] = (1 - EPS_ACT) + EPS_ACT * uniform
 
         # Normalize columns per action
-        for a in range(self.num_actions):
-            col_sums = B[:, :, a].sum(axis=0, keepdims=True)
-            col_sums[col_sums == 0] = 1
-            B[:, :, a] = B[:, :, a] / col_sums
+        col_sums = B.sum(axis=0, keepdims=True)
+        col_sums[col_sums == 0] = 1
+        B = B / col_sums
 
         return B
 

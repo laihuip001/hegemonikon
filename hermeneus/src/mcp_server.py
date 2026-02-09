@@ -30,6 +30,10 @@ try:
 except ImportError:
     MCP_AVAILABLE = False
     Server = None
+    # Define fallback types for type hints
+    class Tool: pass
+    class TextContent: pass
+    class CallToolResult: pass
 
 
 # =============================================================================

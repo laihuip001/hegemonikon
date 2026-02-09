@@ -1,3 +1,9 @@
+---
+trigger: model_decision
+glob: 
+description: AI間引き継ぎフォーマット — Handoff Format
+---
+
 # Handoff Format（AI間引き継ぎスキーマ）
 
 > **Hegemonikón Multi-Agent Coordination**: 標準化された引き継ぎフォーマット

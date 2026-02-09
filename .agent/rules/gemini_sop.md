@@ -1,10 +1,8 @@
 ---
-id: gemini-sop
-title: Gemini エージェント向け標準作業手順書 (SOP)
-severity: CRITICAL
-applies_to: Gemini 3 Pro, Gemini 2.5 Pro
+trigger: model_decision
+glob: 
+description: Gemini エージェント向け標準作業手順書
 ---
-
 # Gemini エージェント向け SOP
 
 > **根拠**: Lost-in-the-Middle 現象により、Gemini は長文の中央部を飛ばす傾向がある（Scope Adherence 71.9%）。

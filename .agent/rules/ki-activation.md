@@ -1,3 +1,9 @@
+---
+trigger: model_decision
+glob: 
+description: Knowledge Item 活用パターン発動ルール
+---
+
 # KI 活用パターン発動ルール
 
 > **目的**: Knowledge Item の適切なタイミングでの参照を促進

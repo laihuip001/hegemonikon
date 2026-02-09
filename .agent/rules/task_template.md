@@ -1,8 +1,8 @@
 ---
-id: task-template
-title: task.md テンプレート（フェーズ依存関係付き）
+trigger: model_decision
+glob: 
+description: task.md テンプレート — フェーズ依存関係付き
 ---
-
 # task.md テンプレート
 
 以下のフォーマットを使用して、フェーズ間の依存関係を明示すること。

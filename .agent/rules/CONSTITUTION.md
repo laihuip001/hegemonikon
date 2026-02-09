@@ -1,3 +1,9 @@
+---
+trigger: always_on
+glob: 
+description: Hegemonikón Identity Architecture — 不変ルール
+---
+
 # 🏛️ CONSTITUTION.md — Hegemonikón Identity Architecture
 
 > **このドキュメントは不変（Immutable）である。**

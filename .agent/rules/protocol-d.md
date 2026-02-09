@@ -1,3 +1,9 @@
+---
+trigger: always_on
+glob: 
+description: Protocol D: 外部サービス検証 — 常時適用
+---
+
 # Protocol D: 外部サービス検証
 
 > **ステータス**: 常時適用 (Invariant)
@@ -61,3 +67,9 @@ search_web: "[サービス名] 終了 deprecated shutdown"
 ✅ 「search_webで確認した結果、OpenAI API v1は2026年1月現在稼働中です」
 ✅ 「確認したところ、Heroku Free Tierは2022年11月に廃止されていました。代替としてRailway/Render/Flyを提案します」
 ```
+
+---
+
+## 参照
+
+- [Protocol D-Extended](protocol-d/extended.md) — 存在系断言禁止の拡張ルール

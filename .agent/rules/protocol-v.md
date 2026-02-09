@@ -1,3 +1,9 @@
+---
+trigger: model_decision
+glob: 
+description: Protocol V: バージョン検証
+---
+
 # Protocol V: バージョン検証
 
 > **ステータス**: 常時適用 (Invariant)

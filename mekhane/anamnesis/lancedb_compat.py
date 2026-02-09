@@ -1,7 +1,9 @@
 # PROOF: [L3/ユーティリティ] <- mekhane/anamnesis/
+from __future__ import annotations
 """
 PROOF: [L3/ユーティリティ]
 """
+
 
 """LanceDB compatibility layer.
 
@@ -15,7 +17,6 @@ Usage:
     if "knowledge" in names: ...
 """
 
-from __future__ import annotations
 
 from typing import TYPE_CHECKING
 

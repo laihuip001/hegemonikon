@@ -31,6 +31,11 @@ except ImportError:
     MCP_AVAILABLE = False
     Server = None
 
+    # Fallback types for when mcp is not available
+    class Tool: pass
+    class TextContent: pass
+    class CallToolResult: pass
+
 
 # =============================================================================
 # MCP Server Implementation

@@ -1,8 +1,3 @@
----
-trigger: model_decision
-glob: 
-description: 破壊的操作の安全ガード — ファイル削除・上書き防止
----
 # 破壊的操作の安全ガード
 
 > **Guard 法則**: 大事なものには触らせない

@@ -35,8 +35,8 @@ def _get_api_key() -> Optional[str]:
     )
 
 
-@dataclass
 # PURPOSE: Result of semantic validation.
+@dataclass
 class SemanticResult:
     """Result of semantic validation."""
 
@@ -50,7 +50,6 @@ class SemanticResult:
         return self.aligned
 
 # PURPOSE: LLM-based semantic validation for CCL expressions.
-
 class CCLSemanticValidator:
     """
     LLM-based semantic validation for CCL expressions.

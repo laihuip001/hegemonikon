@@ -72,3 +72,12 @@ for issue in result.issues[:5]:
 ---
 
 *v1.1 — import パス検証済み (2026-02-08)*
+
+## Safety Contract
+- **risk_tier**: L1 (Low Risk)
+- **reversible**: true
+- **requires_approval**: false
+- **risks**:
+  - none
+- **fallbacks**:
+  - none

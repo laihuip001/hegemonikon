@@ -19,8 +19,8 @@ from pathlib import Path
 from typing import Optional
 
 
-@dataclass
 # PURPOSE: Metrika 5門の検証結果
+@dataclass
 class MetrikaResult:
     """Metrika 5門の検証結果"""
 
@@ -32,8 +32,8 @@ class MetrikaResult:
 
     violations: list[str] = field(default_factory=list)
 
-    @property
     # PURPOSE: passed — システムの処理
+    @property
     def passed(self) -> bool:
         return all(
             [self.dokime, self.syntomia, self.prosbasimotes, self.atomos, self.katharos]
@@ -63,7 +63,6 @@ class PalimpsestItem:
     hypothesis: str
 
 # PURPOSE: 品質門 - Hegemonikón品質体系の実装
-
 class QualityGate:
     """品質門 - Hegemonikón品質体系の実装"""
 

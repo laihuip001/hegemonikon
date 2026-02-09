@@ -48,3 +48,12 @@ print(result)
 ---
 
 *v1.0 — 全PJ IDE配線 (2026-02-08)*
+
+## Safety Contract
+- **risk_tier**: L1 (Low Risk)
+- **reversible**: true
+- **requires_approval**: false
+- **risks**:
+  - none
+- **fallbacks**:
+  - none

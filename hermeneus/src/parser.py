@@ -52,7 +52,7 @@ class CCLParser:
     
     # 二項演算子優先順位 (低い方が先に処理)
     # ~* と ~! は ~ より先にマッチさせる（長いトークン優先）
-    BINARY_OPS_PRIORITY = ['_', '~*', '~!', '~', '*', '>>', '|>', '||']
+    BINARY_OPS_PRIORITY = ['_', '~*', '~!', '~', '*^', '*', '>>', '|>', '||']
     
     def __init__(self):
         self.errors: List[str] = []
@@ -100,6 +100,13 @@ class CCLParser:
             return self._parse_lambda(expr)
         if expr.startswith('lim['):
             return self._parse_lim(expr)
+        
+        # グループ否定: ~(...) — 中身を順序結合の否定として処理
+        # 二項演算子より先にチェック（括弧内の _ で分割されるのを防ぐ）
+        if expr.startswith('~(') and expr.endswith(')') and self._is_balanced_group(expr[1:], '(', ')'):
+            inner = expr[2:-1]  # ~( と ) を除去
+            body = self._parse_expression(inner)
+            return Oscillation(left=body, right=body, invert=True)
         
         # 二項演算子を優先順位順にチェック
         for op in self.BINARY_OPS_PRIORITY:
@@ -183,12 +190,16 @@ class CCLParser:
             left = self._parse_expression(parts[0])
             right = self._parse_expression('~'.join(parts[1:]))
             return Oscillation(left=left, right=right)
+        elif op == '*^':
+            # 融合 + メタ表示 (fusion with meta display)
+            left = self._parse_expression(parts[0])
+            right = self._parse_expression('*^'.join(parts[1:]))
+            return Fusion(left=left, right=right, meta_display=True)
         elif op == '*':
             # 融合
             left = self._parse_expression(parts[0])
             right = self._parse_expression('*'.join(parts[1:]))
-            meta = parts[0].endswith('^')  # *^ パターン
-            return Fusion(left=left, right=right, meta_display=meta)
+            return Fusion(left=left, right=right, meta_display=False)
         elif op == '>>':
             # 収束ループ
             body = self._parse_expression(parts[0])

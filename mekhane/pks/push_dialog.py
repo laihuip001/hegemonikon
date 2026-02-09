@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/PKS] <- mekhane/pks/
 # PURPOSE: Push された知識への対話インターフェース
 """
 PROOF: [L2/インフラ] このファイルは存在しなければならない

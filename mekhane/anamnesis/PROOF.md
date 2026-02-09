@@ -53,4 +53,4 @@ Q.E.D.
 
 ---
 
-*anamnesis/ は FEP から演繹される。発明ではない。*
+*anamnesis/ は FEP から演繹される。発明ではない。*- [ ] lancedb_compat.py

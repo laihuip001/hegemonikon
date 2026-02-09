@@ -1,1 +1,3 @@
-# peira package
+"""
+PROOF: [L2/PKS] <- mekhane/peira/
+"""

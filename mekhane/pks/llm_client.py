@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/PKS] <- mekhane/pks/llm_client.py
 # PURPOSE: PKS 共通 LLM クライアント
 """
 PROOF: [L2/インフラ] このファイルは存在しなければならない

@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/PKS] <- mekhane/pks/external_search.py
 # PURPOSE: 外部知識検索 (Perplexity API 統合)
 """
 PROOF: [L2/インフラ] このファイルは存在しなければならない

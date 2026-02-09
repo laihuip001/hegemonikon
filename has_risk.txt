@@ -1,3 +1,0 @@
-.agent/skills/code-protocols/SKILL.md
-.agent/skills/gnosis-dialog/SKILL.md
-.agent/skills/prompt-library/SKILL.md

@@ -43,8 +43,10 @@ jobs:
                   python -m pip install --upgrade pip
                   # Install PyTorch (CPU-only) first from its index
                   pip install torch --index-url https://download.pytorch.org/whl/cpu
-                  # Install core test dependencies (PyPI)
-                  pip install pytest pytest-asyncio pytest-timeout pyyaml pydantic lancedb numpy scipy \
+                  # Install core test dependencies (PyPI) and allow resolution from PyTorch index
+                  # This prevents upgrading to GPU torch if needed
+                  pip install --extra-index-url https://download.pytorch.org/whl/cpu \
+                              pytest pytest-asyncio pytest-timeout pyyaml pydantic lancedb numpy scipy \
                               networkx pandas tabulate requests httpx schedule \
                               sentence-transformers aiohttp
                   # Install project in development mode if setup exists

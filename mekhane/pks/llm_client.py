@@ -1,13 +1,18 @@
 #!/usr/bin/env python3
+# PROOF: [L2/インフラ] <- mekhane/pks/
 # PURPOSE: PKS 共通 LLM クライアント
 """
-PROOF: [L2/インフラ] このファイルは存在しなければならない
+PROOF: [L2/インフラ]
 
 A0 (FEP) → 複数コンポーネントが同一の LLM 初期化パターンを持つ
 → DRY 原則により共通化
 → llm_client.py が担う
 
-# PURPOSE: Gemini クライアントの共通初期化と提供
+Q.E.D.
+
+---
+
+Gemini クライアントの共通初期化と提供
 """
 
 from __future__ import annotations

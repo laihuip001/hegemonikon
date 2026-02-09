@@ -1,4 +1,15 @@
-"""LanceDB compatibility layer.
+# PROOF: [L3/ユーティリティ] <- mekhane/anamnesis/
+"""
+PROOF: [L3/ユーティリティ]
+
+P3 → LanceDB の互換性レイヤーが必要
+   → lancedb_compat が担う
+
+Q.E.D.
+
+---
+
+LanceDB compatibility layer.
 
 Provides `get_table_names(db)` that works across LanceDB versions:
   - Old API: db.table_names()  → list[str]      (deprecated)

@@ -30,6 +30,15 @@ try:
 except ImportError:
     MCP_AVAILABLE = False
     Server = None
+    Tool = Any
+
+    # Dummy class for type hinting and instantiation fallback
+    class TextContent:
+        def __init__(self, type: str, text: str):
+            self.type = type
+            self.text = text
+
+    CallToolResult = Any
 
 
 # =============================================================================

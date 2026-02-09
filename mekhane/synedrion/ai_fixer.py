@@ -153,27 +153,50 @@ class AIFixer:
     def _fix_ai_015_self_assignment(
         self, lines: List[str], file_path: Path
     ) -> List[Fix]:
-        """Fix self-assignment: x = x → remove or mark."""
-        fixes = []
-        pattern = re.compile(r"^(\s*)(\w+)\s*=\s*(\w+)\s*$")
+        """Fix self-assignment: x = x → remove or mark.
 
-        for i, line in enumerate(lines):
-            match = pattern.match(line)
-            if match:
-                var1 = match.group(2)
-                var2 = match.group(3)
-                if var1 == var2:
-                    indent = match.group(1)
-                    fixes.append(
-                        Fix(
-                            code="AI-015",
-                            file_path=file_path,
-                            line=i + 1,
-                            original=line,
-                            replacement=f"{indent}# NOTE: Removed self-assignment: {var1} = {var1}",
-                            description=f"self-assignment {var1} = {var1} → commented out",
+        Uses AST analysis to distinguish true self-assignments (standalone
+        assignment statements like `x = x`) from keyword argument passes
+        (like `func(param=param)`) which are valid Python.
+
+        Previous regex-based approach caused 11 production bugs by
+        commenting out keyword arguments inside function calls.
+        """
+        fixes = []
+
+        try:
+            content = "\n".join(lines)
+            tree = ast.parse(content)
+        except SyntaxError:
+            return fixes
+
+        for node in ast.walk(tree):
+            # Only match standalone assignment statements: x = x
+            # NOT keyword arguments in function calls: func(x=x)
+            if isinstance(node, ast.Assign):
+                # Single target, single value, both must be simple Names
+                if (
+                    len(node.targets) == 1
+                    and isinstance(node.targets[0], ast.Name)
+                    and isinstance(node.value, ast.Name)
+                    and node.targets[0].id == node.value.id
+                ):
+                    var_name = node.targets[0].id
+                    line_idx = node.lineno - 1
+                    if 0 <= line_idx < len(lines):
+                        original = lines[line_idx]
+                        indent = len(original) - len(original.lstrip())
+                        indent_str = " " * indent
+                        fixes.append(
+                            Fix(
+                                code="AI-015",
+                                file_path=file_path,
+                                line=node.lineno,
+                                original=original,
+                                replacement=f"{indent_str}# NOTE: Removed self-assignment: {var_name} = {var_name}",
+                                description=f"self-assignment {var_name} = {var_name} → commented out",
+                            )
                         )
-                    )
 
         return fixes
 

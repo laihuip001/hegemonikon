@@ -446,3 +446,122 @@ class TestAntiRegressionScan:
             f"Found {len(violations)} removed self-assignment comment(s) in production code:\n"
             + "\n".join(violations)
         )
+
+
+# ============ 9. D1: JulesClient json= mock verification ============
+
+
+class TestJulesClientJsonPassthrough:
+    """D1: Verify _request() actually passes json= to aiohttp.session.request().
+
+    This is the most critical verification — the json=json bug caused
+    all HTTP POST bodies to be empty.
+    """
+
+    @pytest.mark.asyncio
+    async def test_request_passes_json_to_session(self):
+        """json payload must reach aiohttp.session.request()."""
+        from mekhane.symploke.jules_client import JulesClient
+
+        client = JulesClient(api_key="test-key")
+
+        # Create a mock response
+        mock_response = AsyncMock()
+        mock_response.status = 200
+        mock_response.ok = True
+        mock_response.json = AsyncMock(return_value={"result": "ok"})
+
+        # Create a mock context manager for session.request
+        mock_cm = AsyncMock()
+        mock_cm.__aenter__ = AsyncMock(return_value=mock_response)
+        mock_cm.__aexit__ = AsyncMock(return_value=False)
+
+        payload = {"prompt": "test prompt", "name": "test-session"}
+
+        with patch("aiohttp.ClientSession") as MockSession:
+            mock_session = MagicMock()
+            mock_session.request = MagicMock(return_value=mock_cm)
+            mock_session.close = AsyncMock()
+            MockSession.return_value = mock_session
+
+            # Force creation of a new session
+            client._shared_session = None
+            client._owned_session = None
+
+            await client._request("POST", "sessions", json=payload)
+
+            # THE CRITICAL ASSERTION: json= must be passed through
+            mock_session.request.assert_called_once()
+            call_kwargs = mock_session.request.call_args
+            assert call_kwargs.kwargs.get("json") == payload or \
+                   (len(call_kwargs.args) > 3 and call_kwargs.args[3] == payload), \
+                f"json payload was NOT passed to session.request! kwargs: {call_kwargs}"
+
+
+# ============ 10. D2: ai_fixer AST-based self-assignment ============
+
+
+class TestAIFixerSelfAssignment:
+    """D2: Verify ai_fixer correctly distinguishes self-assignment from keyword args.
+
+    The root cause of the 11 param=param bugs was a regex that couldn't
+    tell apart `x = x` (self-assignment) from `func(x=x)` (keyword arg).
+    The fix uses AST analysis.
+    """
+
+    def test_detects_true_self_assignment(self):
+        """ai_fixer should flag `x = x` as a self-assignment."""
+        from mekhane.synedrion.ai_fixer import AIFixer
+
+        fixer = AIFixer(dry_run=True)
+        code = [
+            "def example():",
+            "    x = 42",
+            "    y = y",          # <-- This IS a self-assignment
+            "    return x",
+        ]
+
+        fixes = fixer._fix_ai_015_self_assignment(code, Path("test.py"))
+        assert len(fixes) == 1
+        assert "y = y" in fixes[0].description
+
+    def test_ignores_keyword_argument_pass(self):
+        """ai_fixer must NOT flag `func(param=param)` as self-assignment."""
+        from mekhane.synedrion.ai_fixer import AIFixer
+
+        fixer = AIFixer(dry_run=True)
+        # This code contains keyword argument passes, NOT self-assignments
+        code = [
+            "def example(context, json, source):",
+            "    result = SomeClass(",
+            "        context=context,",    # keyword arg — must be IGNORED
+            "        json=json,",          # keyword arg — must be IGNORED
+            "        source=source,",      # keyword arg — must be IGNORED
+            "    )",
+            "    return result",
+        ]
+
+        fixes = fixer._fix_ai_015_self_assignment(code, Path("test.py"))
+        assert fixes == [], (
+            f"ai_fixer incorrectly flagged keyword arguments as self-assignments: "
+            f"{[f.description for f in fixes]}"
+        )
+
+    def test_mixed_code_only_flags_assignment(self):
+        """In code with both patterns, only true self-assignments are flagged."""
+        from mekhane.synedrion.ai_fixer import AIFixer
+
+        fixer = AIFixer(dry_run=True)
+        code = [
+            "def build():",
+            "    name = name",           # <-- True self-assignment
+            "    obj = Builder(",
+            "        name=name,",        # keyword arg — IGNORE
+            "        value=value,",      # keyword arg — IGNORE
+            "    )",
+            "    return obj",
+        ]
+
+        fixes = fixer._fix_ai_015_self_assignment(code, Path("test.py"))
+        assert len(fixes) == 1
+        assert "name = name" in fixes[0].description

@@ -1,4 +1,14 @@
 ---
+
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks:
+  - none
+fallbacks:
+  - manual_review
+
+---
 name: FEP Cognitive Engine
 description: FEP (自由エネルギー原理) に基づく認知評価・意思決定エンジン
 triggers:
@@ -13,7 +23,6 @@ triggers:
   - "パイプライン"
   - "attractor"
   - "series"
----
 
 # FEP Cognitive Engine
 
@@ -83,6 +92,5 @@ print(llm_fmt)
 "
 ```
 
----
 
 *v1.1 — import パス検証済み (2026-02-08)*

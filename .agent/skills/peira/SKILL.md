@@ -1,4 +1,14 @@
 ---
+
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks:
+  - none
+fallbacks:
+  - manual_review
+
+---
 name: Peira Health Check
 description: システム全体のヘルスチェック・健全性確認
 triggers:
@@ -9,7 +19,6 @@ triggers:
   - "peira"
   - "動作確認"
   - "テスト"
----
 
 # Peira Health Check
 
@@ -37,6 +46,5 @@ cd ~/oikos/hegemonikon && PYTHONPATH=. .venv/bin/python mekhane/peira/hgk_health
 cd ~/oikos/hegemonikon && PYTHONPATH=. .venv/bin/python -m pytest --tb=short -q 2>&1 | tail -10
 ```
 
----
 
 *v1.0 — 全PJ IDE配線 (2026-02-08)*

@@ -2,6 +2,14 @@
 description: T-series（拡張定理 T1-T8）を駆動し、具体的な様態機能を呼び出す。
 hegemonikon: Tropos
 modules: [T1, T2, T3, T4, T5, T6, T7, T8]
+
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks:
+  - none
+fallbacks:
+  - manual_review
 ---
 
 # /t: 拡張定理ワークフロー

@@ -1,4 +1,3 @@
----
 name: Synteleia WBC
 description: 安全性チェック・白血球 (WBC) による不正操作検知
 triggers:
@@ -12,7 +11,6 @@ triggers:
   - "検証"
   - "監査"
   - "audit"
----
 
 # Synteleia WBC (白血球)
 
@@ -53,7 +51,15 @@ for issue in result.issues[:5]:
 ### Step 2: 個別エージェントで深堀り
 
 | Agent | import | 視点 |
-|:---|:---|:---|
+|:---|:
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks:
+  - none
+fallbacks:
+  - manual_review
+---|:---|
 | OusiaAgent | `from mekhane.synteleia.poiesis import OusiaAgent` | 本質 (O) |
 | SchemaAgent | 同上 `SchemaAgent` | 構造 (S) |
 | HormeAgent | 同上 `HormeAgent` | 動機 (H) |
@@ -69,6 +75,5 @@ for issue in result.issues[:5]:
 | スコア 4-6 | Creator に確認 |
 | スコア < 4 | **停止**、理由を報告 |
 
----
 
 *v1.1 — import パス検証済み (2026-02-08)*

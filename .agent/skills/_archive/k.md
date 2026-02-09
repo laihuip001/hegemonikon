@@ -2,6 +2,14 @@
 description: K-series（文脈定理 K1-K12）を駆動し、状況に応じた文脈フィルターを適用する。
 hegemonikon: Kairos
 modules: [K1, K2, K3, K4, K5, K6, K7, K8, K9, K10, K11, K12]
+
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks:
+  - none
+fallbacks:
+  - manual_review
 ---
 
 # /k: 文脈定理ワークフロー

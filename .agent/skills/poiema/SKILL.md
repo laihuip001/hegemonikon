@@ -1,4 +1,3 @@
----
 name: Poiema Generator
 description: 構造化出力の生成 (Boot レポート, Handoff, 定型ドキュメント)
 triggers:
@@ -9,7 +8,6 @@ triggers:
   - "poiema"
   - "テンプレート"
   - "ドキュメント生成"
----
 
 # Poiema Generator
 
@@ -24,7 +22,15 @@ triggers:
 ## モジュール構造
 
 | モジュール | import | 用途 |
-|:---|:---|:---|
+|:---|:
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks:
+  - none
+fallbacks:
+  - manual_review
+---|:---|
 | NoesisClient | `from mekhane.poiema.flow.noesis_client import NoesisClient` | Gemini API 呼び出し |
 | EnergeiaCoreResolver | `from mekhane.poiema.flow.energeia_core import EnergeiaCoreResolver` | コア実行解決 |
 | EpocheShield | `from mekhane.poiema.flow.epoche_shield import EpocheShield` | PII マスキング |
@@ -71,6 +77,5 @@ print(f'Mapping: {len(mapping)} entries')
 
 > ⚠️ `INPUT_TEXT` を実際のテキストに置換。
 
----
 
 *v1.1 — import パス検証済み (2026-02-09)*

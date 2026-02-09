@@ -1,4 +1,3 @@
----
 name: Taxis Classifier
 description: タスク/入力の自動分類・優先順位付け
 triggers:
@@ -10,7 +9,6 @@ triggers:
   - "TODO"
   - "整理"
   - "morphism"
----
 
 # Taxis Classifier
 
@@ -51,11 +49,18 @@ if result:
 ### Step 3: 分類結果に基づいてルーティング
 
 | 分類 | ルーティング先 |
-|:---|:---|
+|:---|:
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks:
+  - none
+fallbacks:
+  - manual_review
+---|
 | 認知系 (O/S/H) | /noe, /dia 等 |
 | 環境系 (P/K) | /sop, /chr 等 |
 | 精密系 (A) | /dia+, /epi 等 |
 
----
 
 *v1.1 — import パス検証済み (2026-02-08)*

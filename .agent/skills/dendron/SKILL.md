@@ -1,4 +1,3 @@
----
 name: Dendron EPT Checker
 description: コード品質・存在証明 (PROOF.md) の検証を実行する
 triggers:
@@ -9,7 +8,6 @@ triggers:
   - "dendron"
   - "checker"
   - "なぜ存在する"
----
 
 # Dendron EPT Checker
 
@@ -36,7 +34,15 @@ cd ~/oikos/hegemonikon && PYTHONPATH=. .venv/bin/python mekhane/dendron/checker.
 ### Step 2: 結果を解釈
 
 | スコア | 意味 | アクション |
-|:---|:---|:---|
+|:---|:
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks:
+  - none
+fallbacks:
+  - manual_review
+---|:---|
 | ≥ 80% | 健全 | OK |
 | 50-79% | 要改善 | PROOF.md 追加を提案 |
 | < 50% | 危険 | 即時対応 |
@@ -48,6 +54,5 @@ cd ~/oikos/hegemonikon && PYTHONPATH=. .venv/bin/python mekhane/dendron/checker.
 cd ~/oikos/hegemonikon && PYTHONPATH=. .venv/bin/python scripts/generate_proofs.py TARGET_DIR
 ```
 
----
 
 *v1.0 — 全PJ IDE配線 (2026-02-08)*

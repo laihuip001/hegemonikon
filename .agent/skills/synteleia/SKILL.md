@@ -12,6 +12,11 @@ triggers:
   - "検証"
   - "監査"
   - "audit"
+risk_tier: L1
+risks: none
+reversible: true
+requires_approval: false
+fallbacks: []
 ---
 
 # Synteleia WBC (白血球)

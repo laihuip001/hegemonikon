@@ -78,6 +78,19 @@ ccl_signature: "/gno+_/dox"
 
 ---
 
+## STEP 0: SKILL.md 読込（必須・省略不可）
+
+> **環境強制**: このステップを飛ばして PHASE に進んではならない。
+> パスは以下にリテラルで記載されている。「パスがわからない」は発生しない。
+
+// turbo
+
+```
+view_file /home/makaron8426/oikos/hegemonikon/.agent/skills/akribeia/a3-gnome/SKILL.md
+```
+
+---
+
 ## 処理フロー
 
 1. **確信度評価**: C(確立された知識) / U(暫定的知識) を判定

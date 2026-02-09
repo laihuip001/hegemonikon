@@ -74,6 +74,19 @@ ccl_signature: "/euk?k1"
 
 ---
 
+## STEP 0: SKILL.md 読込（必須・省略不可）
+
+> **環境強制**: このステップを飛ばして PHASE に進んではならない。
+> パスは以下にリテラルで記載されている。「パスがわからない」は発生しない。
+
+// turbo
+
+```
+view_file /home/makaron8426/oikos/hegemonikon/.agent/skills/kairos/k1-eukairia/SKILL.md
+```
+
+---
+
 ## 処理フロー
 
 1. **機会窓の評価**: 機会の存在確認、窓の広さ(広い/狭い/閉じかけ)

@@ -949,8 +949,14 @@ class TheoremAttractor:
         user_input: str,
         steps: int = 10,
         convergence_threshold: float = 0.001,
+        temperature: float = 0.3,
     ) -> FlowResult:
-        """入力の初期 activation を X-series 遷移行列で伝播シミュレーション."""
+        """入力の初期 activation を X-series 遷移行列で伝播シミュレーション.
+
+        Args:
+            temperature: softmax 温度。低い=鋭い初期分布、高い=均一な初期分布。
+                         simulate_flow_ei() と同一デフォルト値で統一。
+        """
         self._ensure_initialized()
 
         # 初期 activation = cosine similarity
@@ -959,7 +965,7 @@ class TheoremAttractor:
                            dtype=np.float32)
 
         # Softmax で確率分布化
-        initial = self._softmax(initial, temperature=0.5)
+        initial = self._softmax(initial, temperature=temperature)
 
         if TORCH_AVAILABLE and self._device is not None and self._device.type == "cuda":
             states = self._simulate_gpu(initial, steps, convergence_threshold)
@@ -1033,6 +1039,7 @@ class TheoremAttractor:
         steps: int = 15,
         beta: float = 0.3,
         convergence_threshold: float = 0.001,
+        temperature: float = 0.3,
     ) -> FlowResult:
         """興奮-抑制統合の flow simulation.
 
@@ -1048,6 +1055,13 @@ class TheoremAttractor:
         Args:
             beta: 抑制の強さ (0=抑制なし=通常flow, 1=最大抑制)
             steps: シミュレーションステップ数
+            temperature: softmax 温度。simulate_flow() と同一デフォルト値。
+
+        Note:
+            inhibition matrix と precision_weighting (PW) の関係:
+            - PW は各定理の「信頼度」を重み付けする (prior modulation)
+            - inhibition は定理間の「排他的競合」をモデル化 (lateral inhibition)
+            - 両者は直交する操作: PW=縦方向スケール、I=横方向抑制
         """
         self._ensure_initialized()
 
@@ -1057,7 +1071,7 @@ class TheoremAttractor:
             [s for _, s in sorted(sims, key=lambda x: THEOREM_KEYS.index(x[0]))],
             dtype=np.float32,
         )
-        initial = self._softmax(initial, temperature=0.2)
+        initial = self._softmax(initial, temperature=temperature)
 
         # Inhibition matrix
         inhib = self._inhibition_matrix

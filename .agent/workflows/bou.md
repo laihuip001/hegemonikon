@@ -99,7 +99,7 @@ absorbed:
 
 | Phase | 名称 | 内容 |
 |:------|:-----|:-----|
-| **STEP 0** | SKILL.md 読込 | view_file で正本を読み込む (**必須**) |
+| **STEP 0** | SKILL.md 読込 | `view_file /home/makaron8426/oikos/hegemonikon/.agent/skills/ousia/o2-boulesis/SKILL.md` (**必須・省略不可**) |
 | **PHASE 0** | 私の望み提示 | Claude が3-5個の望みを提示(たたき台) |
 | **PHASE 1-2** | 対話+深掘り | 5 Whys + 多面的問い(達成後の変化/困ること/誰のため) |
 | **PHASE 3** | 衝動vs熟慮 | 衝動スコア(0-100)付与。低=熟慮された意志 |

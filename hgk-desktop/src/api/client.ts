@@ -1,5 +1,5 @@
 import { fetch } from '@tauri-apps/plugin-http';
-import type { paths } from '../api-types';
+import type { paths, components } from '../api-types';
 
 const API_BASE = 'http://127.0.0.1:9696';
 
@@ -12,18 +12,48 @@ async function apiFetch<T>(path: string, options?: RequestInit): Promise<T> {
     return response.json() as Promise<T>;
 }
 
+// --- Exported Types ---
 export type HealthCheckResponse = paths['/api/status/health']['get']['responses']['200']['content']['application/json'];
 export type HealthReportResponse = paths['/api/status']['get']['responses']['200']['content']['application/json'];
 export type FEPStateResponse = paths['/api/fep/state']['get']['responses']['200']['content']['application/json'];
+export type FEPStepRequest = components['schemas']['FEPStepRequest'];
+export type FEPStepResponse = paths['/api/fep/step']['post']['responses']['200']['content']['application/json'];
 export type FEPDashboardResponse = paths['/api/fep/dashboard']['get']['responses']['200']['content']['application/json'];
 export type GnosisSearchResponse = paths['/api/gnosis/search']['get']['responses']['200']['content']['application/json'];
+export type GnosisStatsResponse = paths['/api/gnosis/stats']['get']['responses']['200']['content']['application/json'];
 export type DendronReportResponse = paths['/api/dendron/report']['get']['responses']['200']['content']['application/json'];
+export type PostcheckResponse = paths['/api/postcheck/run']['post']['responses']['200']['content']['application/json'];
+export type SELListResponse = paths['/api/postcheck/list']['get']['responses']['200']['content']['application/json'];
 
 export const api = {
+    // Status
     health: () => apiFetch<HealthCheckResponse>('/api/status/health'),
     status: () => apiFetch<HealthReportResponse>('/api/status'),
+
+    // FEP
     fepState: () => apiFetch<FEPStateResponse>('/api/fep/state'),
+    fepStep: (observation: number) => apiFetch<FEPStepResponse>('/api/fep/step', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ observation } satisfies FEPStepRequest),
+    }),
     fepDashboard: () => apiFetch<FEPDashboardResponse>('/api/fep/dashboard'),
-    gnosisSearch: (q: string, limit = 10) => apiFetch<GnosisSearchResponse>(`/api/gnosis/search?q=${encodeURIComponent(q)}&limit=${limit}`),
-    dendronReport: (detail: 'summary' | 'full' = 'summary') => apiFetch<DendronReportResponse>(`/api/dendron/report?detail=${detail}`),
+
+    // Gnōsis
+    gnosisSearch: (q: string, limit = 10) =>
+        apiFetch<GnosisSearchResponse>(`/api/gnosis/search?q=${encodeURIComponent(q)}&limit=${limit}`),
+    gnosisStats: () => apiFetch<GnosisStatsResponse>('/api/gnosis/stats'),
+
+    // Quality
+    dendronReport: (detail: 'summary' | 'full' = 'summary') =>
+        apiFetch<DendronReportResponse>(`/api/dendron/report?detail=${detail}`),
+
+    // Postcheck
+    postcheckList: () => apiFetch<SELListResponse>('/api/postcheck/list'),
+    postcheckRun: (wfName: string, content: string, mode = '') =>
+        apiFetch<PostcheckResponse>('/api/postcheck/run', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ wf_name: wfName, content, mode }),
+        }),
 };

@@ -72,6 +72,19 @@ ccl_signature: "/hod+_/ene"
 
 ---
 
+## STEP 0: SKILL.md 読込（必須・省略不可）
+
+> **環境強制**: このステップを飛ばして PHASE に進んではならない。
+> パスは以下にリテラルで記載されている。「パスがわからない」は発生しない。
+
+// turbo
+
+```
+view_file /home/makaron8426/oikos/hegemonikon/.agent/skills/perigraphe/p2-hodos/SKILL.md
+```
+
+---
+
 ## 処理フロー
 
 1. **経路探索**: Explore経路(新しい道を探る) / Exploit経路(既知の道を辿る)

@@ -36,6 +36,19 @@ ccl_signature: "/lex mech"
 
 ---
 
+## STEP 0: SKILL.md 読込（必須・省略不可）
+
+> **環境強制**: このステップを飛ばして PHASE に進んではならない。
+> パスは以下にリテラルで記載されている。「パスがわからない」は発生しない。
+
+// turbo
+
+```
+view_file /home/makaron8426/oikos/hegemonikon/.agent/skills/akribeia/a2-krisis/SKILL.md
+```
+
+---
+
 ## 派生モード
 
 | 派生 | コマンド | 機能 |

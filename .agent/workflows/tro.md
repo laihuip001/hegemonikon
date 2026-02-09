@@ -73,6 +73,19 @@ ccl_signature: "/tro+"
 
 ---
 
+## STEP 0: SKILL.md 読込（必須・省略不可）
+
+> **環境強制**: このステップを飛ばして PHASE に進んではならない。
+> パスは以下にリテラルで記載されている。「パスがわからない」は発生しない。
+
+// turbo
+
+```
+view_file /home/makaron8426/oikos/hegemonikon/.agent/skills/perigraphe/p3-trokhia/SKILL.md
+```
+
+---
+
 ## 処理フロー
 
 1. **軌道評価**: 短周期(局所的適用) / 長周期(広域適用)

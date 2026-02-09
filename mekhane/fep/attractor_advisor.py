@@ -51,11 +51,20 @@ class AttractorAdvisor:
     """
 
     # PURPOSE: Attractor推薦結果をWFディスパッチに変換する中間層
-    def __init__(self, force_cpu: bool = False, use_gnosis: bool = True):
+    def __init__(self, force_cpu: bool = False, use_gnosis: bool = True,
+                 theorem_attractor: TheoremAttractor | None = None):
         self._attractor = SeriesAttractor(force_cpu=force_cpu)
-        self._theorem_attractor: TheoremAttractor | None = None  # lazy init
+        self._theorem_attractor = theorem_attractor  # 外部から共有可能
         self._force_cpu = force_cpu
         self._use_gnosis = use_gnosis
+
+    def get_theorem_attractor(self) -> TheoremAttractor:
+        """TheoremAttractor インスタンスを取得 (lazy init + 共有用)."""
+        if self._theorem_attractor is None:
+            self._theorem_attractor = TheoremAttractor(
+                force_cpu=self._force_cpu, enable_memory=True,
+            )
+        return self._theorem_attractor
 
     # PURPOSE: ユーザー入力からワークフロー推薦を生成する。
     def recommend(self, user_input: str) -> Recommendation:
@@ -304,9 +313,17 @@ class AttractorAdvisor:
         )
 
     # PURPOSE: LLM プロンプトに注入する定理レベル推薦を生成
-    def format_theorem_for_llm(self, user_input: str) -> str:
-        """LLM のシステムプロンプトに定理レベル推薦を注入."""
-        rec = self.recommend_theorem(user_input)
+    def format_theorem_for_llm(
+        self, user_input: str, rec: "TheoremRecommendation | None" = None,
+    ) -> str:
+        """LLM のシステムプロンプトに定理レベル推薦を注入.
+
+        Args:
+            rec: 事前計算済み TheoremRecommendation。None なら内部で生成。
+                 recommend_theorem() の結果を渡すことで二重呼出しを回避。
+        """
+        if rec is None:
+            rec = self.recommend_theorem(user_input)
         if not rec.primary_theorem:
             return ""
 

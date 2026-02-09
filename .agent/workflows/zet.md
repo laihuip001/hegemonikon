@@ -139,6 +139,19 @@ anom >=> hypo >=> eval
 
 ---
 
+## STEP 0: SKILL.md 読込（必須・省略不可）
+
+> **環境強制**: このステップを飛ばして PHASE に進んではならない。
+> パスは以下にリテラルで記載されている。「パスがわからない」は発生しない。
+
+// turbo
+
+```
+view_file /home/makaron8426/oikos/hegemonikon/.agent/skills/ousia/o3-zetesis/SKILL.md
+```
+
+---
+
 ## 処理フロー
 
 ### PHASE 1: η (Unit) — 概念 X から問い T(X) を生成

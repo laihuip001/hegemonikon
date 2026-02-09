@@ -72,6 +72,19 @@ ccl_signature: "/pat+"
 
 ---
 
+## STEP 0: SKILL.md 読込（必須・省略不可）
+
+> **環境強制**: このステップを飛ばして PHASE に進んではならない。
+> パスは以下にリテラルで記載されている。「パスがわからない」は発生しない。
+
+// turbo
+
+```
+view_file /home/makaron8426/oikos/hegemonikon/.agent/skills/akribeia/a1-pathos/SKILL.md
+```
+
+---
+
 ## 処理フロー
 
 1. **二重傾向評価**:

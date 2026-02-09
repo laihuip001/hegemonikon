@@ -119,6 +119,45 @@ class TestBinaryOperators:
         assert ast.condition.var == "V[]"
         assert ast.condition.value == 0.3
 
+    # --- 11a. 融合メタ結合 (*^) ---
+    def test_11a_fusion_meta_binding(self, parser):
+        """/u+*^/u^ — @nous (問いの深化)"""
+        ast = parser.parse("/u+*^/u^")
+        assert isinstance(ast, Fusion)
+        assert ast.meta_display is True
+        assert ast.left.id == "u"
+        assert ast.right.id == "u"
+        assert OpType.ASCEND in ast.right.operators
+
+    def test_11b_fusion_meta_in_sequence(self, parser):
+        """/dox+*^/u+_/bye+ — @learn (学習永続化)"""
+        ast = parser.parse("/dox+*^/u+_/bye+")
+        assert isinstance(ast, Sequence)
+        assert len(ast.steps) == 2
+        fusion = ast.steps[0]
+        assert isinstance(fusion, Fusion)
+        assert fusion.meta_display is True
+        assert fusion.left.id == "dox"
+        assert fusion.right.id == "u"
+        assert ast.steps[1].id == "bye"
+
+    def test_11c_normal_fusion_not_meta(self, parser):
+        """/noe*/dia — 通常融合は meta_display=False"""
+        ast = parser.parse("/noe*/dia")
+        assert isinstance(ast, Fusion)
+        assert ast.meta_display is False
+
+    # --- 11d. グループ振動 ~(...) ---
+    def test_11d_group_oscillation(self, parser):
+        """~(/sop_/noe_/ene_/dia-) — @kyc (認知循環)"""
+        ast = parser.parse("~(/sop_/noe_/ene_/dia-)")
+        assert isinstance(ast, Oscillation)
+        # left == right (自己振動 = 反復)
+        assert isinstance(ast.left, Sequence)
+        assert len(ast.left.steps) == 4
+        assert ast.left.steps[0].id == "sop"
+        assert ast.left.steps[3].id == "dia"
+
 
 # =============================================================================
 # 3. 制御構文 (CPL v2.0)

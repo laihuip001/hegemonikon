@@ -281,41 +281,62 @@ class CCLParser:
         raise ValueError(f"Invalid macro: {expr}")
     
     def _parse_for(self, expr: str) -> ForLoop:
-        """FOR ループをパース: F:[×N]{body} or F:[A,B]{body}"""
+        """FOR ループをパース: F:[×N]{body} or F:[A,B]{body} or F:N{body}"""
+        # Pattern 1: F:[...]{body} (角括弧あり)
         match = re.match(r'F:\[([^\]]+)\]\{(.+)\}$', expr)
-        if not match:
-            raise ValueError(f"Invalid FOR loop: {expr}")
-        
-        iter_spec = match.group(1).strip()
-        body_str = match.group(2).strip()
-        
-        # ×N 形式
-        if iter_spec.startswith('×'):
-            iterations = int(iter_spec[1:])
-        else:
-            # リスト形式
-            iterations = [i.strip() for i in iter_spec.split(',')]
-        
-        body = self._parse_expression(body_str)
-        return ForLoop(iterations=iterations, body=body)
+        if match:
+            iter_spec = match.group(1).strip()
+            body_str = match.group(2).strip()
+
+            # ×N 形式
+            if iter_spec.startswith('×'):
+                iterations = int(iter_spec[1:])
+            else:
+                # リスト形式
+                iterations = [i.strip() for i in iter_spec.split(',')]
+
+            body = self._parse_expression(body_str)
+            return ForLoop(iterations=iterations, body=body)
+
+        # Pattern 2: F:N{body} (角括弧なし、数値直接指定)
+        match2 = re.match(r'F:(\d+)\{(.+)\}$', expr)
+        if match2:
+            iterations = int(match2.group(1))
+            body_str = match2.group(2).strip()
+            body = self._parse_expression(body_str)
+            return ForLoop(iterations=iterations, body=body)
+
+        raise ValueError(f"Invalid FOR loop: {expr}")
     
     def _parse_if(self, expr: str) -> IfCondition:
-        """IF 条件分岐をパース: I:[cond]{then} E:{else}"""
-        # V[] を含む条件式を許容するパターン
+        """IF 条件分岐をパース: I:[cond]{then} E:{else} or I:cond{then}"""
+        # Pattern 1: I:[cond]{then} E:{else} (角括弧あり, V[] 含む条件式対応)
         pattern = r'I:\[([^\]]*(?:\[\][^\]]*)*)\]\{([^}]+)\}(?:\s*E:\{([^}]+)\})?'
         match = re.match(pattern, expr)
-        if not match:
-            raise ValueError(f"Invalid IF: {expr}")
-        
-        condition = self._parse_condition(match.group(1))
-        then_branch = self._parse_expression(match.group(2))
-        else_branch = self._parse_expression(match.group(3)) if match.group(3) else None
-        
-        return IfCondition(
-            condition=condition,
-            then_branch=then_branch,
-            else_branch=else_branch
-        )
+        if match:
+            condition = self._parse_condition(match.group(1))
+            then_branch = self._parse_expression(match.group(2))
+            else_branch = self._parse_expression(match.group(3)) if match.group(3) else None
+            return IfCondition(
+                condition=condition,
+                then_branch=then_branch,
+                else_branch=else_branch
+            )
+
+        # Pattern 2: I:cond{then} (角括弧なし、シンプル条件)
+        match2 = re.match(r'I:(\w+)\{(.+)\}(?:\s*E:\{(.+)\})?$', expr)
+        if match2:
+            # シンプル条件: 変数名のみ (e.g., "gap")
+            condition = Condition(var=match2.group(1), op=">", value=0)
+            then_branch = self._parse_expression(match2.group(2))
+            else_branch = self._parse_expression(match2.group(3)) if match2.group(3) else None
+            return IfCondition(
+                condition=condition,
+                then_branch=then_branch,
+                else_branch=else_branch
+            )
+
+        raise ValueError(f"Invalid IF: {expr}")
     
     def _parse_while(self, expr: str) -> WhileLoop:
         """WHILE ループをパース: W:[cond]{body}"""

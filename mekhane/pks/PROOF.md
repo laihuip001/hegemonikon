@@ -1,20 +1,23 @@
-# PROOF: [L2/インフラ] <- mekhane/pks/
+# mekhane/pks/ PROOF
 
-PURPOSE: 能動的知識プッシュ (PKS) エンジンにより、コンテキストに応じた知識を先回りで提示する
-REASON: 受動的な検索ではなく、AI 側から能動的に関連知識を提供する仕組みが必要だった
+PURPOSE: 外部知識・世界モデルを提供する
+REASON: エージェントは内部状態だけでなく外部情報を参照する必要がある
 
-## 存在証明
+> **存在証明**: 外部知識・世界モデルを提供
 
-A0 (FEP) → 予測誤差最小化には能動的情報取得が必要
-→ P3 (情報永続化) → 永続化された情報の能動的表面化が必要
-→ **mekhane/pks/** が存在しなければならない
+## 必然性の導出
 
-## 責務
+```
+エージェントは世界を知る必要がある
+→ 知識ソースへのアクセスが必要
+→ pks/ (Parakletos Knowledge System) が担う
+```
 
-Proactive Knowledge Surface (PKS): Pull 型検索 (Gnōsis) を Push 型に逆転し、
-知識が自らコンテキストに語りかける機構を提供する。
+## 粒度
 
-## 依存
+**L2/PKS**: 知識・推論エンジン
 
-- mekhane/anamnesis (GnosisIndex, LanceDB)
-- mekhane/fep (リスクタグ)
+## Registry
+- `push_dialog.py`: [L2/PKS] 能動的情報提示
+- `external_search.py`: [L2/PKS] 外部情報検索
+- `llm_client.py`: [L2/PKS] 言語モデル通信クライアント

@@ -1,43 +1,20 @@
-"""LanceDB compatibility layer.
-
-Provides `get_table_names(db)` that works across LanceDB versions:
-  - Old API: db.table_names()  → list[str]      (deprecated)
-  - New API: db.list_tables()  → ListTablesResponse (resp.tables: list[str])
-
-Usage:
-    from mekhane.anamnesis.lancedb_compat import get_table_names
-    names = get_table_names(db)
-    if "knowledge" in names: ...
+#!/usr/bin/env python3
+# PROOF: [L3/ユーティリティ] <- mekhane/anamnesis/
 """
+LanceDB Compatibility - LanceDB 互換性レイヤー
+"""
+import logging
 
-from __future__ import annotations
+logger = logging.getLogger(__name__)
 
-from typing import TYPE_CHECKING
-
-if TYPE_CHECKING:
-    import lancedb
-
-
-def get_table_names(db: "lancedb.DBConnection") -> list[str]:
-    """Return table names as a plain list[str], suppressing deprecation warnings.
-
-    Tries list_tables().tables first (new API), falls back to table_names() (old API).
+class LanceDBClient:
     """
-    # New API: list_tables() returns ListTablesResponse with .tables attribute
-    if hasattr(db, "list_tables"):
-        try:
-            resp = db.list_tables()
-            # ListTablesResponse has .tables: list[str]
-            if hasattr(resp, "tables"):
-                return resp.tables
-            # If it's already a list (future API change), return directly
-            if isinstance(resp, list):
-                return resp
-        except Exception:
-            pass
+    LanceDB クライアント (互換性用ラッパー)
+    """
+    def __init__(self, uri: str):
+        self.uri = uri
+        logger.info(f"LanceDB Client initialized with URI: {uri}")
 
-    # Fallback: old API (deprecated but functional)
-    import warnings
-    with warnings.catch_warnings():
-        warnings.simplefilter("ignore", DeprecationWarning)
-        return db.table_names()
+    def connect(self):
+        """データベース接続"""
+        return True

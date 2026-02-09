@@ -1,29 +1,21 @@
-# PROOF.md — 存在証明書
+# mekhane/tests_root/ PROOF
 
-PURPOSE: tests_root モジュールの実装
-REASON: tests_root の機能が必要だった
+PURPOSE: テスト環境の初期化と共通フィクスチャを提供
+REASON: テストのセットアップコード重複を避け、統一された環境を保証するため
 
-> **∃ tests_root/** — この場所は存在しなければならない
+> **存在証明**: テスト環境の初期化
 
----
+## 必然性の導出
 
-## 公理
+```
+テストには共通の前処理が必要
+→ セットアップコードを共有したい
+→ tests_root/ が担う
+```
 
-1. **存在公理**: このディレクトリは `Hegemonikón の実装コード (Mēkhanē) を格納し、認知ハイパーバイザーの全機能を提供する` の一部として存在が要請される
-2. **機能公理**: `tests_root モジュールの実装` を実現するファイル群がここに配置される
+## 粒度
 
-## ファイル構成
+**L3/テスト**: テスト支援
 
-| ファイル | 役割 |
-|:---------|:-----|
-| `test_encoding.py` | Tests for encoding.py - Text-to-Observation encoding. |
-| `test_fep_agent.py` | Tests for Hegemonikón FEP Agent |
-| `test_fep_bridge.py` | Tests for FEP Bridge - Workflow Integration Layer. |
-| `test_fep_config.py` | Tests for FEP config module. |
-| `test_llm_evaluator.py` | Tests for LLM Evaluator - Hierarchical Hybrid Evaluation. |
-| `test_synedrion.py` | Synedrion テストスイート |
-| `test_vault.py` | Test writing a new file. |
-
----
-
-*Generated: 2026-02-08 by generate_proofs.py*
+## Registry
+- `__init__.py`: [L3/テスト] モジュール定義

@@ -46,7 +46,7 @@ jobs:
                   # Install other core dependencies from PyPI
                   pip install pytest pytest-asyncio pytest-timeout pyyaml pydantic lancedb numpy scipy \
                               networkx pandas tabulate requests httpx schedule \
-                              sentence-transformers aiohttp
+                              sentence-transformers aiohttp python-dotenv
                   # Install project in development mode if setup exists
                   pip install -e ".[test]" 2>/dev/null || true
 

@@ -21,8 +21,8 @@ from .guardrails.validators import CCLOutputValidator, ValidationResult
 from .learning.failure_db import get_failure_db, FailureDB
 
 
-@dataclass
 # PURPOSE: CCL 実行コンテキスト
+@dataclass
 class ExecutionContext:
     """CCL 実行コンテキスト"""
 
@@ -31,8 +31,8 @@ class ExecutionContext:
     warnings: List[str]
 
 
-@dataclass
 # PURPOSE: CCL 実行結果
+@dataclass
 class ExecutionResult:
     """CCL 実行結果"""
 

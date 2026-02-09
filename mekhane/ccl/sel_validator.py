@@ -23,8 +23,8 @@ import yaml
 import re
 
 
-@dataclass
 # PURPOSE: SEL 要件
+@dataclass
 class SELRequirement:
     """SEL 要件"""
 
@@ -33,8 +33,8 @@ class SELRequirement:
     uml_requirements: Dict[str, str] = field(default_factory=dict)  # stage -> 要件テキスト
 
 
-@dataclass
 # PURPOSE: SEL 検証結果
+@dataclass
 class SELValidationResult:
     """SEL 検証結果"""
 
@@ -49,8 +49,8 @@ class SELValidationResult:
     uml_missing: List[str] = field(default_factory=list)
     details: str = ""
 
-    @property
     # PURPOSE: SEL 遵守検証器
+    @property
     def summary(self) -> str:
         status = "✅ 遵守" if self.is_compliant else "⚠️ 非遵守"
         total = len(self.met_requirements) + len(self.missing_requirements)

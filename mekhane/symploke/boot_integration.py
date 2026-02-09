@@ -274,10 +274,10 @@ def _load_skills(project_root: Path) -> dict:
     return result
 
 
-# PURPOSE: /boot 統合 API: 13軸（Handoff, Sophia, Persona, PKS, Safety, EPT, Digestor, Attractor, Projects, Skills, Doxa, Credit, ES）を統合して返す
+# PURPOSE: /boot 統合 API: 12軸を boot_axes.py に委譲して統合返却する
 def get_boot_context(mode: str = "standard", context: Optional[str] = None) -> dict:
     """
-    /boot 統合 API: 11軸（Handoff, Sophia, Persona, PKS, Safety, EPT, Digestor, Attractor, Projects, Skills, Doxa）を統合して返す
+    /boot 統合 API: 12軸を統合して返す (boot_axes.py に委譲)
 
     GPU プリフライトチェック付き: GPU 占有時は embedding 系を CPU フォールバックで実行
 
@@ -286,630 +286,69 @@ def get_boot_context(mode: str = "standard", context: Optional[str] = None) -> d
         context: 現在のコンテキスト（Handoff の主題など）
 
     Returns:
-        dict: {
-            "handoffs": {...},    # 軸 A
-            "ki": {...},          # 軸 B
-            "persona": {...},     # 軸 C
-            "pks": {...},         # 軸 D
-            "safety": {...},      # 軸 E
-            "ept": {...},         # 軸 H
-            "attractor": {...},   # 軸 F
-            "projects": {...},    # 軸 I
-            "skills": {...},      # 軸 J (Skill プリロード)
-            "formatted": str      # フォーマット済み出力
-        }
+        dict: 各軸の結果 + "formatted" キーにフォーマット済み出力
     """
-    # GPU プリフライトチェック (G)
-    gpu_ok = True
-    gpu_reason = ""
-    try:
-        from mekhane.symploke.gpu_guard import gpu_preflight, force_cpu_env
-        gpu_status = gpu_preflight()
-        gpu_ok = gpu_status.gpu_available
-        gpu_reason = gpu_status.reason
-        if not gpu_ok:
-            print(f" ⚠️ GPU busy ({gpu_reason}), embedding 系は CPU フォールバック", file=sys.stderr)
-            force_cpu_env()  # CUDA_VISIBLE_DEVICES="" を設定
-        else:
-            print(f" 🟢 GPU available ({gpu_status.utilization}%, {gpu_status.memory_used_mb}MiB)", file=sys.stderr)
-    except Exception:
-        pass  # GPU チェック失敗時は無視して続行
+    from mekhane.symploke.boot_axes import (
+        gpu_preflight as _gpu_pf,
+        load_handoffs, load_sophia, load_persona, load_pks,
+        load_safety, load_ept, load_digestor, load_attractor,
+        load_projects, load_skills, load_doxa, load_feedback,
+    )
 
-    # 軸 A: Handoff 活用
-    print(" [1/9] 📋 Searching Handoffs...", file=sys.stderr, end="", flush=True)
-    from mekhane.symploke.handoff_search import get_boot_handoffs, format_boot_output
+    # GPU プリフライトチェック
+    gpu_ok, gpu_reason = _gpu_pf()
 
-    handoffs_result = get_boot_handoffs(mode=mode, context=context)
-    print(" Done.", file=sys.stderr)
+    # ── 軸ロード (A-L) ──
+    handoffs_result = load_handoffs(mode, context)
 
-    # 軸 B: Sophia アクティベーション (タイムアウト付き)
-    print(" [2/9] 📚 Ingesting Knowledge (Sophia)...", file=sys.stderr, end="", flush=True)
-    # コンテキストを Handoff から取得
+    # KI コンテキスト: Handoff 主題からフォールバック
     ki_context = context
-    if not ki_context and handoffs_result["latest"]:
+    if not ki_context and handoffs_result.get("latest"):
         ki_context = handoffs_result["latest"].metadata.get("primary_task", "")
         if not ki_context:
             ki_context = handoffs_result["latest"].content[:200]
 
-    ki_result = {"ki_items": [], "count": 0}
-    try:
-        from concurrent.futures import ThreadPoolExecutor, TimeoutError as FutureTimeout
+    ki_result = load_sophia(mode, context, ki_context=ki_context)
+    persona_result = load_persona(mode, context)
+    pks_result = load_pks(mode, context, ki_context=ki_context)
+    safety_result = load_safety(mode, context)
+    ept_result = load_ept(mode, context)
+    digestor_result = load_digestor(mode, context)
 
-        def _run_sophia():
-            from mekhane.symploke.sophia_ingest import get_boot_ki, format_ki_output
-            return get_boot_ki(context=ki_context, mode=mode)
-
-        with ThreadPoolExecutor(max_workers=1) as executor:
-            future = executor.submit(_run_sophia)
-            ki_result = future.result(timeout=15.0)
-        print(" Done.", file=sys.stderr)
-    except (FutureTimeout, TimeoutError):
-        print(" Timeout (skipped).", file=sys.stderr)
-    except Exception as e:
-        print(f" Failed ({str(e)}).", file=sys.stderr)
-    print(" [3/9] 👤 Loading Persona...", file=sys.stderr, end="", flush=True)
-    from mekhane.symploke.persona import get_boot_persona
-
-    persona_result = get_boot_persona(mode=mode)
-    print(" Done.", file=sys.stderr)
-
-    # 軸 D: PKS (能動的知識プッシュ)
-    # 重い処理なのでタイムアウトを設定
-    pks_result = {"nuggets": [], "count": 0, "formatted": ""}
-    
-    if mode != "fast":  # fastモードではPKSをスキップ
-        print(" [4/9] 🧠 Activating PKS Engine...", file=sys.stderr, end="", flush=True)
-        try:
-            from concurrent.futures import ThreadPoolExecutor
-            
-            def _run_pks():
-                from mekhane.pks.pks_engine import PKSEngine
-                pks_engine = PKSEngine(threshold=0.5, max_push=3)
-                
-                # コンテキスト設定
-                pks_topics = []
-                if context:
-                    pks_topics = [t.strip() for t in context.split(",")]
-                elif ki_context:
-                    # KI コンテキストからトピック抽出
-                    words = ki_context.split()[:5]
-                    pks_topics = [w for w in words if len(w) > 2]
-                
-                if pks_topics:
-                    pks_engine.set_context(topics=pks_topics)
-                    return pks_engine.proactive_push(k=10)
-                return []
-
-            # 10秒タイムアウト (detailedでも待たせすぎない)
-            with ThreadPoolExecutor(max_workers=1) as executor:
-                future = executor.submit(_run_pks)
-                nuggets = future.result(timeout=10.0)
-                
-            if nuggets:
-                from mekhane.pks.pks_engine import PKSEngine  # 型ヒント用
-                # インスタンス化せずにフォーマットメソッドだけ借用したいが、インスタンスメソッドなので
-                # 簡易フォーマッターを使用するか、再インスタンス化する（軽量）
-                pks_engine_dummy = PKSEngine()
-                pks_result = {
-                    "nuggets": nuggets,
-                    "count": len(nuggets),
-                    "formatted": pks_engine_dummy.format_push_report(nuggets),
-                }
-            print(" Done.", file=sys.stderr)
-            
-        except TimeoutError:
-            print(" Timeout (skipped).", file=sys.stderr)
-        except Exception as e:
-            print(f" Failed ({str(e)}).", file=sys.stderr)
-    else:
-         print(" [4/9] 🧠 PKS Engine skipped (fast mode).", file=sys.stderr)
-
-    # 軸 E: Safety Contract Audit (v3.1)
-    safety_result = {"skills": 0, "workflows": 0, "errors": 0, "warnings": 0, "formatted": ""}
-    print(" [5/9] 🛡️ Running Safety Contract Audit...", file=sys.stderr, end="", flush=True)
-    try:
-        from mekhane.dendron.skill_checker import run_audit, AuditResult
-        agent_dir = Path(__file__).parent.parent.parent / ".agent"
-        if agent_dir.exists():
-            audit = run_audit(agent_dir)
-            dist = audit.risk_distribution()
-            lcm = audit.lcm_distribution()
-            safety_lines = []
-            safety_lines.append("🛡️ **Safety Contract**")
-            safety_lines.append(f"  Skills: {audit.skills_checked} | WF: {audit.workflows_checked}")
-            risk_parts = [f"{k}:{v}" for k, v in dist.items() if v > 0]
-            if risk_parts:
-                safety_lines.append(f"  Risk: {' '.join(risk_parts)}")
-            lcm_parts = [f"{k}:{v}" for k, v in lcm.items() if v > 0]
-            if lcm_parts:
-                safety_lines.append(f"  LCM:  {' '.join(lcm_parts)}")
-            if audit.errors > 0:
-                safety_lines.append(f"  ⚠️ {audit.errors} error(s), {audit.warnings} warning(s)")
-            safety_result = {
-                "skills": audit.skills_checked,
-                "workflows": audit.workflows_checked,
-                "errors": audit.errors,
-                "warnings": audit.warnings,
-                "formatted": "\n".join(safety_lines),
-            }
-        print(" Done.", file=sys.stderr)
-    except Exception as e:
-        print(f" Failed ({str(e)}).", file=sys.stderr)
-
-    # 軸 H: EPT (Existence Purpose Tensor)
-    ept_result = {"score": 0, "total": 0, "pct": 0, "formatted": ""}
-    print(" [6/9] 📐 Running EPT Matrix...", file=sys.stderr, end="", flush=True)
-    try:
-        from concurrent.futures import ThreadPoolExecutor
-        def _run_ept():
-            from mekhane.dendron.checker import DendronChecker
-            c = DendronChecker(
-                check_structure=True,
-                check_function_nf=True,
-                check_verification=True,
-            )
-            r = c.check(Path(__file__).parent.parent)  # mekhane/
-            total = r.total_structure_checks + r.total_function_nf_checks + r.total_verification_checks
-            ok = r.structure_ok + r.function_nf_ok + r.verification_ok
-            pct = (ok / total * 100) if total > 0 else 0
-            return {
-                "score": ok, "total": total, "pct": pct,
-                "nf2": f"{r.structure_ok}/{r.total_structure_checks}",
-                "nf3": f"{r.function_nf_ok}/{r.total_function_nf_checks}",
-                "bcnf": f"{r.verification_ok}/{r.total_verification_checks}",
-                "formatted": f"📐 **EPT**: {ok}/{total} ({pct:.0f}%) [NF2:{r.structure_ok}/{r.total_structure_checks} NF3:{r.function_nf_ok}/{r.total_function_nf_checks} BCNF:{r.verification_ok}/{r.total_verification_checks}]",
-            }
-        with ThreadPoolExecutor(max_workers=1) as executor:
-            future = executor.submit(_run_ept)
-            ept_result = future.result(timeout=10.0)
-        print(" Done.", file=sys.stderr)
-    except TimeoutError:
-        print(" Timeout (skipped).", file=sys.stderr)
-    except Exception as e:
-        print(f" Failed ({str(e)}).", file=sys.stderr)
-
-    # 軸 G: Digestor 候補 (論文レコメンド)
-    digestor_result = {"candidates": [], "count": 0, "formatted": ""}
-    print(" [7/9] 📄 Loading Digest Candidates...", file=sys.stderr, end="", flush=True)
-    try:
-        import glob
-        digest_dir = Path.home() / ".hegemonikon" / "digestor"
-        reports = sorted(glob.glob(str(digest_dir / "digest_report_*.json")), reverse=True)
-        if reports:
-            with open(reports[0], "r", encoding="utf-8") as f:
-                report = json.load(f)
-            candidates = report.get("candidates", [])[:3]
-            if candidates:
-                digest_lines = ["📄 **Digest Candidates** (今日の論文推薦)"]
-                for i, c in enumerate(candidates, 1):
-                    title = c.get("title", "Unknown")[:60]
-                    score = c.get("score", 0)
-                    topics = ", ".join(c.get("matched_topics", [])[:2])
-                    digest_lines.append(f"  {i}. [{score:.2f}] {title}... ({topics})")
-                digestor_result = {
-                    "candidates": candidates,
-                    "count": len(candidates),
-                    "formatted": "\n".join(digest_lines),
-                }
-        print(" Done.", file=sys.stderr)
-    except Exception as e:
-        print(f" Failed ({str(e)}).", file=sys.stderr)
-
-    # 軸 F: Attractor Dispatch Engine
-    attractor_result = {"series": [], "workflows": [], "llm_format": "", "formatted": ""}
-    # Handoff-derived context (ki_context) をフォールバックに使用
-    # → 明示的 context がなくても、Handoff 主題から自動推薦が発動する
+    # Attractor: Handoff-derived context をフォールバック
     attractor_context = context or ki_context
-    if attractor_context:
-        print(" [8/9] 🎯 Attractor Dispatch...", file=sys.stderr, end="", flush=True)
-        try:
-            from concurrent.futures import ThreadPoolExecutor
+    attractor_result = load_attractor(mode, attractor_context, gpu_ok=gpu_ok)
 
-            def _run_attractor():
-                from mekhane.fep.attractor_advisor import AttractorAdvisor
-                advisor = AttractorAdvisor(force_cpu=not gpu_ok)
+    projects_result = load_projects(mode, context)
+    skills_result = load_skills(mode, context)
+    doxa_result = load_doxa(mode, context)
+    feedback_result = load_feedback(mode, context)
 
-                # Problem C: 過去の basin bias を適用
-                try:
-                    from mekhane.fep.basin_logger import BasinLogger
-                    basin_logger = BasinLogger()
-                    log_files = sorted(basin_logger.log_dir.glob("attractor_log_*.jsonl"))
-                    if log_files:
-                        for lf in log_files[-3:]:  # 直近3日分
-                            basin_logger.load_biases(lf)
-                        advisor._attractor.apply_bias(basin_logger._biases)
-                except Exception:
-                    pass  # Bias loading failure should not block boot
+    # ── 統合フォーマット ──
+    lines: list[str] = []
 
-                # Problem C+: BasinLearner の学習済み重みを適用
-                try:
-                    from mekhane.fep.basin_learner import BasinLearner
-                    learner = BasinLearner()
-                    loaded_epochs = learner.load_history()
-                    if loaded_epochs > 0:
-                        overrides = learner.get_weight_overrides()
-                        if overrides:
-                            # weight → _bias_adjustments に変換
-                            # weight < 1.0 → contract → negative bias
-                            # weight > 1.0 → expand  → positive bias
-                            for series, weight in overrides.items():
-                                adjustment = (weight - 1.0) * 0.1  # scale down
-                                advisor._attractor._bias_adjustments[series] = adjustment
-                except Exception:
-                    pass  # Learner failure should not block boot
-
-                rec = advisor.recommend(attractor_context)
-                llm_fmt = advisor.format_for_llm(attractor_context)
-
-                # Dispatcher integration (Problem A)
-                dispatch_info = extract_dispatch_info(attractor_context, gpu_ok=gpu_ok)
-
-                # Theorem-level attractor (24 定理: 6 Series の粒度拡張)
-                theorem_detail = {}
-                try:
-                    from mekhane.fep.theorem_attractor import TheoremAttractor
-                    ta = TheoremAttractor(force_cpu=not gpu_ok)
-                    top_theorems = ta.suggest(attractor_context, top_k=5)
-                    flow = ta.simulate_flow(attractor_context, steps=10)
-                    mixture = ta.diagnose_mixture(attractor_context)
-                    theorem_detail = {
-                        "top_theorems": [
-                            {"theorem": r.theorem, "name": r.name,
-                             "series": r.series, "sim": round(r.similarity, 3),
-                             "command": r.command}
-                            for r in top_theorems
-                        ],
-                        "flow_converged": flow.converged_at,
-                        "flow_final": [t for t, _ in flow.final_theorems[:3]],
-                        "mixture": {
-                            "entropy": mixture.entropy,
-                            "dominant_series": mixture.dominant_series,
-                            "series_distribution": mixture.series_distribution,
-                        },
-                    }
-                except Exception:
-                    pass  # Theorem attractor failure should not block boot
-
-                # FEP v2 Agent: 統合認知判断 (48-state)
-                # Attractor の推薦を topic observation として注入し、
-                # Agent が自律的に Series + act/observe を判断する
-                fep_v2_result = {}
-                learning_diff_fmt = ""
-                try:
-                    from mekhane.fep.fep_agent_v2 import HegemonikónFEPAgentV2
-                    from mekhane.fep.state_spaces_v2 import SERIES_STATES
-                    from mekhane.fep.persistence import (
-                        save_snapshot, list_snapshots, diff_A,
-                        format_learning_diff,
-                    )
-
-                    agent_v2 = HegemonikónFEPAgentV2()
-                    agent_v2.load_learned_A()  # 前回セッションの学習を復元
-                    agent_v2.load_learned_B()  # B行列も復元
-                    agent_v2.load_epsilon()    # Meta-ε も復元
-
-                    # Snapshot: capture A BEFORE learning
-                    import copy
-                    A_before = copy.deepcopy(agent_v2.agent.A)
-
-                    # Attractor series → topic observation index
-                    # rec.series can be list (oscillation) or str
-                    _s2obs = {s: 8 + i for i, s in enumerate(SERIES_STATES)}
-                    att_series = rec.series
-                    if isinstance(att_series, list):
-                        att_series = att_series[0]  # Primary series
-                    topic_obs = _s2obs.get(att_series, 8)
-
-                    # 2-cycle inference (observe → act pattern を許容)
-                    r1 = agent_v2.step(topic_obs)
-                    r2 = agent_v2.step(topic_obs)
-                    final = r2  # 2nd cycle = 学習後の判断
-
-                    agent_v2.update_A_dirichlet(topic_obs)
-                    agent_v2.update_B_dirichlet(final["action"])
-
-                    # Meta-ε: track prediction accuracy + update
-                    import numpy as np
-                    predicted_obs = int(np.argmax(
-                        agent_v2._get_predicted_observation()
-                    ))
-                    agent_v2.track_prediction(topic_obs, predicted_obs)
-                    agent_v2.update_epsilon()
-
-                    agent_v2.save_learned_A()
-                    agent_v2.save_learned_B()
-                    agent_v2.save_epsilon()
-
-                    # Snapshot: save AFTER learning + compute diff
-                    save_snapshot(agent_v2, label="boot")
-                    A_after = agent_v2.agent.A
-                    learning_diff = diff_A(A_before, A_after)
-                    learning_diff_fmt = format_learning_diff(learning_diff)
-
-                    conf_pct = int(100.0 * max(final["beliefs"]))
-                    explanation = agent_v2.explain(final)
-                    fep_v2_result = {
-                        "action": final["action_name"],
-                        "selected_series": final.get("selected_series"),
-                        "entropy": round(final["entropy"], 3),
-                        "confidence_pct": conf_pct,
-                        "attractor_series": att_series,
-                        "agreement": final.get("selected_series") == att_series,
-                        "map_state": final["map_state_names"],
-                        "explanation": explanation,
-                        "learning_diff": learning_diff,
-                        "epsilon": agent_v2.epsilon_summary(),
-                    }
-
-                    # Convergence tracking: record Agent/Attractor agreement
-                    try:
-                        from mekhane.fep.convergence_tracker import (
-                            record_agreement, format_convergence,
-                        )
-                        conv_summary = record_agreement(
-                            agent_series=final.get("selected_series"),
-                            attractor_series=att_series,
-                            agent_action=final["action_name"],
-                            epsilon=dict(agent_v2.epsilon),
-                        )
-                        fep_v2_result["convergence"] = conv_summary
-                    except Exception:
-                        pass  # Convergence tracking failure is non-fatal
-
-                except Exception:
-                    pass  # FEP v2 failure should not block boot
-
-                formatted_parts = []
-                if llm_fmt:
-                    formatted_parts.append(f"🎯 **Attractor**: {llm_fmt}")
-                if theorem_detail.get("top_theorems"):
-                    tops = ", ".join(
-                        f"{t['theorem']}({t['sim']:.2f})"
-                        for t in theorem_detail["top_theorems"][:3]
-                    )
-                    mix = theorem_detail.get("mixture", {})
-                    h_str = f" | H={mix['entropy']:.2f}" if mix.get("entropy") is not None else ""
-                    dom = f" dom={mix['dominant_series']}" if mix.get("dominant_series") else ""
-                    formatted_parts.append(f"   🔬 Theorems: {tops}{h_str}{dom}")
-                if dispatch_info["primary"]:
-                    formatted_parts.append(f"   📎 Dispatch: {dispatch_info['dispatch_formatted']}")
-                if fep_v2_result:
-                    act = fep_v2_result["action"]
-                    sel = fep_v2_result.get("selected_series") or "-"
-                    ent = fep_v2_result["entropy"]
-                    conf = fep_v2_result["confidence_pct"]
-                    att_s = fep_v2_result.get("attractor_series", "?")
-                    agree = "✓一致" if fep_v2_result.get("agreement") else "✗不一致"
-                    formatted_parts.append(
-                        f"   🧠 FEP v2: {act} [Series={sel}] "
-                        f"(entropy={ent}, conf={conf}%) ↔ ATT={att_s} [{agree}]"
-                    )
-                    # Explanation (indented under FEP v2 line)
-                    expl = fep_v2_result.get("explanation", "")
-                    if expl:
-                        for line in expl.split("\n"):
-                            formatted_parts.append(f"      {line}")
-                    # Convergence rate
-                    conv = fep_v2_result.get("convergence")
-                    if conv:
-                        from mekhane.fep.convergence_tracker import format_convergence
-                        formatted_parts.append(f"   {format_convergence(conv)}")
-                    # Epsilon state
-                    eps_info = fep_v2_result.get("epsilon", {})
-                    eps_vals = eps_info.get("epsilon", {})
-                    if eps_vals:
-                        eps_str = " ".join(f"{k}={v:.3f}" for k, v in eps_vals.items())
-                        formatted_parts.append(f"   ε: {eps_str}")
-                if learning_diff_fmt:
-                    for line in learning_diff_fmt.split("\n"):
-                        formatted_parts.append(f"   {line}")
-
-                return {
-                    "series": rec.series,
-                    "workflows": rec.workflows,
-                    "llm_format": llm_fmt,
-                    "confidence": rec.confidence,
-                    "oscillation": rec.oscillation.value,
-                    "advice": rec.advice,
-                    "dispatch_primary": dispatch_info["primary"],
-                    "dispatch_alternatives": dispatch_info["alternatives"],
-                    "theorem_detail": theorem_detail,
-                    "fep_v2": fep_v2_result,
-                    "formatted": "\n".join(formatted_parts) if formatted_parts else "",
-                }
-
-            with ThreadPoolExecutor(max_workers=1) as executor:
-                future = executor.submit(_run_attractor)
-                attractor_result = future.result(timeout=30.0)
-            print(" Done.", file=sys.stderr)
-        except TimeoutError:
-            print(" Timeout (skipped).", file=sys.stderr)
-        except Exception as e:
-            print(f" Failed ({str(e)}).", file=sys.stderr)
-    else:
-        print(" [8/9] 🎯 Attractor skipped (no context & no Handoff).", file=sys.stderr)
-
-    # 軸 I: Projects (registry.yaml)
-    projects_result = {"projects": [], "active": 0, "dormant": 0, "total": 0, "formatted": ""}
-    print(" [9/9] 📦 Loading Projects Registry...", file=sys.stderr, end="", flush=True)
-    try:
-        project_root = Path(__file__).parent.parent.parent
-        projects_result = _load_projects(project_root)
-        print(" Done.", file=sys.stderr)
-    except Exception as e:
-        print(f" Failed ({str(e)}).", file=sys.stderr)
-
-    # 統合フォーマット
-    lines = []
-
-    # Persona (最初に)
+    # 表示順: Persona → Handoff → KI → PKS → Safety → EPT
+    #       → Digestor → Attractor → Projects → Skills → Doxa → Feedback
     if persona_result.get("formatted"):
         lines.append(persona_result["formatted"])
         lines.append("")
 
-    # Handoff
-    if handoffs_result["latest"]:
+    if handoffs_result.get("latest"):
+        from mekhane.symploke.handoff_search import format_boot_output
         lines.append(format_boot_output(handoffs_result, verbose=(mode == "detailed")))
         lines.append("")
 
-    # KI
-    if ki_result["ki_items"]:
+    if ki_result.get("ki_items"):
         from mekhane.symploke.sophia_ingest import format_ki_output
         lines.append(format_ki_output(ki_result))
 
-    # PKS
-    if pks_result["formatted"]:
-        lines.append("")
-        lines.append(pks_result["formatted"])
-
-    # Safety Contract
-    if safety_result["formatted"]:
-        lines.append("")
-        lines.append(safety_result["formatted"])
-
-    # EPT
-    if ept_result["formatted"]:
-        lines.append("")
-        lines.append(ept_result["formatted"])
-
-    # Digestor
-    if digestor_result["formatted"]:
-        lines.append("")
-        lines.append(digestor_result["formatted"])
-
-    # Attractor
-    if attractor_result["formatted"]:
-        lines.append("")
-        lines.append(attractor_result["formatted"])
-
-    # Projects
-    if projects_result["formatted"]:
-        lines.append("")
-        lines.append(projects_result["formatted"])
-
-    # Skills (10軸目: Skill プリロード)
-    skills_result = {"skills": [], "count": 0, "skill_paths": [], "formatted": ""}
-    print(" 🧠 Loading Skills...", end="", file=sys.stderr)
-    try:
-        skills_result = _load_skills(project_root)
-        print(f" Done ({skills_result['count']} skills).", file=sys.stderr)
-    except Exception as e:
-        print(f" Failed ({str(e)}).", file=sys.stderr)
-
-    if skills_result["formatted"]:
-        lines.append("")
-        lines.append(skills_result["formatted"])
-
-    # 軸 K: Doxa (信念ストア)
-    doxa_result = {"beliefs_loaded": 0, "active_count": 0, "promotion_candidates": [], "formatted": ""}
-    print(" 🧿 Loading Doxa Beliefs...", end="", file=sys.stderr)
-    try:
-        from mekhane.symploke.doxa_boot import load_doxa_for_boot
-        doxa_boot = load_doxa_for_boot()
-        doxa_result = {
-            "beliefs_loaded": doxa_boot.beliefs_loaded,
-            "active_count": doxa_boot.active_count,
-            "archived_count": doxa_boot.archived_count,
-            "promotion_candidates": [
-                {"content": c.belief.content[:50], "score": c.score, "reasons": c.reasons}
-                for c in doxa_boot.promotion_candidates
-            ],
-            "formatted": doxa_boot.summary,
-        }
-        print(f" Done ({doxa_boot.beliefs_loaded} beliefs).", file=sys.stderr)
-    except Exception as e:
-        print(f" Failed ({str(e)}).", file=sys.stderr)
-
-    if doxa_result["formatted"]:
-        lines.append("")
-        lines.append(doxa_result["formatted"])
-
-    # 軸 L: Credit Assignment (フィードバック学習)
-    feedback_result = {"total": 0, "accept_rate": 0.0, "formatted": ""}
-    print(" 🎓 Loading Feedback History...", end="", file=sys.stderr)
-    try:
-        from mekhane.fep.credit_assignment import (
-            load_feedback_history,
-            feedback_summary,
-        )
-        fb_records = load_feedback_history(months=3)
-        if fb_records:
-            fb_summary = feedback_summary(fb_records)
-            fb_lines = [f"### 🎓 軸 L: Credit Assignment ({fb_summary['total']}件)"]
-            fb_lines.append(f"Accept Rate: {fb_summary['accept_rate']:.0%}")
-            if fb_summary["common_corrections"]:
-                corrections = ", ".join(
-                    f"{f}→{t}({c})" for f, t, c in fb_summary["common_corrections"][:3]
-                )
-                fb_lines.append(f"Common Corrections: {corrections}")
-            feedback_result = {
-                "total": fb_summary["total"],
-                "accept_rate": fb_summary["accept_rate"],
-                "per_series": fb_summary.get("per_series", {}),
-                "formatted": "\n".join(fb_lines),
-            }
-            print(f" Done ({fb_summary['total']} records, {fb_summary['accept_rate']:.0%} accept).", file=sys.stderr)
-        else:
-            print(" No feedback yet.", file=sys.stderr)
-    except Exception as e:
-        print(f" Failed ({str(e)}).", file=sys.stderr)
-
-    if feedback_result["formatted"]:
-        lines.append("")
-        lines.append(feedback_result["formatted"])
-
-    # 軸 M: Explanation Stack (前回セッションの認知判断トレース)
-    es_result = {"last_action": None, "last_trace": None, "formatted": ""}
-    print(" 🔍 Loading Explanation Stack...", end="", file=sys.stderr)
-    try:
-        # Try to find the most recent ES output from logs
-        log_dir = Path.home() / "oikos/mneme/.hegemonikon/logs"
-        es_files = sorted(log_dir.glob("es_trace_*.json"), reverse=True)
-        if es_files:
-            import json as _json
-            with open(es_files[0]) as f:
-                es_data = _json.load(f)
-            es_lines = [f"### 🔍 軸 M: Explanation Stack (前回)"]
-            last_action = es_data.get("advice", {}).get("action", "unknown")
-            last_format = es_data.get("advice", {}).get("format_llm", "")
-            es_lines.append(f"Last Action: {last_action}")
-            if last_format:
-                es_lines.append(last_format)
-            es_result = {
-                "last_action": last_action,
-                "last_trace": last_format,
-                "formatted": "\n".join(es_lines),
-            }
-            print(f" Done (action={last_action}).", file=sys.stderr)
-        else:
-            # Fallback: generate a live trace from a neutral input
-            try:
-                from mekhane.fep.category import Series
-                from mekhane.fep.cone_builder import converge
-                from mekhane.fep.cone_consumer import advise, format_advice_for_llm
-
-                neutral_cone = converge(Series.O, {
-                    "O1": "セッション開始", "O2": "セッション開始",
-                    "O3": "セッション開始", "O4": "セッション開始",
-                })
-                advice = advise(neutral_cone)
-                es_format = format_advice_for_llm(advice)
-                es_lines = [f"### 🔍 軸 M: Explanation Stack (live)"]
-                es_lines.append(es_format)
-                es_result = {
-                    "last_action": advice.action,
-                    "last_trace": es_format,
-                    "formatted": "\n".join(es_lines),
-                }
-                print(f" Live (action={advice.action}).", file=sys.stderr)
-            except Exception:
-                print(" Skipped (no data).", file=sys.stderr)
-    except Exception as e:
-        print(f" Failed ({str(e)}).", file=sys.stderr)
-
-    if es_result["formatted"]:
-        lines.append("")
-        lines.append(es_result["formatted"])
+    for axis_result in [pks_result, safety_result, ept_result, digestor_result,
+                        attractor_result, projects_result, skills_result,
+                        doxa_result, feedback_result]:
+        fmt = axis_result.get("formatted", "")
+        if fmt:
+            lines.append("")
+            lines.append(fmt)
 
     # n8n WF-06: Session Start 通知
     try:
@@ -918,8 +357,8 @@ def get_boot_context(mode: str = "standard", context: Optional[str] = None) -> d
             "mode": mode,
             "context": context or "",
             "agent": "Claude",
-            "handoff_count": handoffs_result["count"],
-            "ki_count": ki_result["count"],
+            "handoff_count": handoffs_result.get("count", 0),
+            "ki_count": ki_result.get("count", 0),
         }).encode("utf-8")
         req = urllib.request.Request(
             "http://localhost:5678/webhook/session-start",
@@ -945,9 +384,10 @@ def get_boot_context(mode: str = "standard", context: Optional[str] = None) -> d
         "skills": skills_result,
         "doxa": doxa_result,
         "feedback": feedback_result,
-        "es": es_result,
         "formatted": "\n".join(lines),
     }
+
+
 
 
 # PURPOSE: Print formatted boot summary

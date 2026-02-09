@@ -15,7 +15,7 @@ import asyncio
 import json
 import sys
 from pathlib import Path
-from typing import Any, Dict, List, Sequence
+from typing import Any, Dict, List, Sequence, Optional
 
 # MCP SDK import (optional)
 try:
@@ -30,6 +30,21 @@ try:
 except ImportError:
     MCP_AVAILABLE = False
     Server = None
+
+    # Fallback types for type hinting
+    class Tool:
+        def __init__(self, name: str, description: str, inputSchema: Dict[str, Any]):
+            self.name = name
+            self.description = description
+            self.inputSchema = inputSchema
+
+    class TextContent:
+        def __init__(self, type: str, text: str):
+            self.type = type
+            self.text = text
+
+    class CallToolResult:
+        pass
 
 
 # =============================================================================
@@ -187,6 +202,28 @@ if MCP_AVAILABLE:
                 type="text",
                 text=f"Error: {str(e)}"
             )]
+else:
+    # MCP が利用できない場合のダミー関数定義
+    # これにより、テスト環境で NameError を回避しつつ、
+    # 実行時には FallbackServer を使用するようにする
+
+    async def _handle_execute(args: Dict[str, Any]) -> Sequence[TextContent]:
+        return []
+
+    async def _handle_compile(args: Dict[str, Any]) -> Sequence[TextContent]:
+        return []
+
+    async def _handle_audit(args: Dict[str, Any]) -> Sequence[TextContent]:
+        return []
+
+    async def _handle_list_workflows(args: Dict[str, Any]) -> Sequence[TextContent]:
+        return []
+
+    async def _handle_export_session(args: Dict[str, Any]) -> Sequence[TextContent]:
+        return []
+
+    async def _handle_dispatch(args: Dict[str, Any]) -> Sequence[TextContent]:
+        return []
 
 
 async def _handle_execute(args: Dict[str, Any]) -> Sequence[TextContent]:

@@ -172,10 +172,12 @@ def cmd_search(args):
     """論文検索"""
     from mekhane.anamnesis.index import GnosisIndex
 
-    print(f"[Search] Query: {args.query}")
+    source_filter = getattr(args, "source", None)
+    filter_msg = f" (source={source_filter})" if source_filter else ""
+    print(f"[Search] Query: {args.query}{filter_msg}")
 
     index = GnosisIndex()
-    results = index.search(args.query, k=args.limit)
+    results = index.search(args.query, k=args.limit, source_filter=source_filter)
 
     if not results:
         print("No results found")
@@ -344,6 +346,10 @@ def main():
     p_search = subparsers.add_parser("search", help="Search indexed papers")
     p_search.add_argument("query", help="Search query")
     p_search.add_argument("--limit", "-l", type=int, default=10, help="Max results")
+    p_search.add_argument(
+        "--source", "-s", default=None,
+        help="Filter by source (arxiv, session, handoff, etc.)"
+    )
     p_search.set_defaults(func=cmd_search)
 
     # stats

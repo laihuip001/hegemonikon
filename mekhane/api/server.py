@@ -8,12 +8,17 @@ Tauri v2 デスクトップアプリのバックエンド。
 既存の mekhane/* モジュールを REST API として公開する。
 
 Usage:
-    PYTHONPATH=. python -m mekhane.api.server
-    PYTHONPATH=. python -m mekhane.api.server --port 9696
+    # TCP モード (開発・n8n 連携用)
+    python -m mekhane.api.server
+    python -m mekhane.api.server --port 9696
+
+    # UDS モード (Tauri デスクトップアプリ用)
+    python -m mekhane.api.server --uds /tmp/hgk.sock
 """
 
 import argparse
 import logging
+import os
 import sys
 import time
 from pathlib import Path
@@ -28,6 +33,9 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from mekhane.api import API_PREFIX, API_TITLE, DEFAULT_PORT, __version__
+
+# PURPOSE: デフォルト UDS パス
+DEFAULT_UDS_PATH = "/tmp/hgk.sock"
 
 # PURPOSE: ロギング設定
 logger = logging.getLogger("hegemonikon.api")
@@ -45,10 +53,10 @@ def create_app() -> FastAPI:
         openapi_url=f"{API_PREFIX}/openapi.json",
     )
 
-    # CORS — Tauri WebView (localhost) からのアクセスを許可
+    # CORS — TCP モード時のみ意味がある（UDS では不要だが害もない）
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=["*"],  # Tauri は tauri://localhost を使う
+        allow_origins=["*"],
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],
@@ -89,6 +97,25 @@ def _register_routers(app: FastAPI) -> None:
 app = create_app()
 
 
+# PURPOSE: 残留ソケットファイルの安全な削除
+def _cleanup_stale_socket(uds_path: str) -> None:
+    """前回のクラッシュで残ったソケットファイルを削除する。"""
+    sock = Path(uds_path)
+    if sock.exists():
+        try:
+            # ソケットファイルかどうか確認
+            import stat
+            if stat.S_ISSOCK(sock.stat().st_mode):
+                sock.unlink()
+                logger.info("Removed stale socket: %s", uds_path)
+            else:
+                logger.error("%s exists but is not a socket file", uds_path)
+                sys.exit(1)
+        except OSError as e:
+            logger.error("Cannot remove %s: %s", uds_path, e)
+            sys.exit(1)
+
+
 # PURPOSE: CLI エントリポイント
 def main() -> int:
     """サーバーを起動する。"""
@@ -97,18 +124,31 @@ def main() -> int:
     parser = argparse.ArgumentParser(description="Hegemonikón API Server")
     parser.add_argument("--port", type=int, default=DEFAULT_PORT, help=f"Port (default: {DEFAULT_PORT})")
     parser.add_argument("--host", default="127.0.0.1", help="Host (default: 127.0.0.1)")
+    parser.add_argument("--uds", type=str, default=None,
+                        help=f"Unix Domain Socket path (default: None, use --uds for Tauri mode)")
     parser.add_argument("--reload", action="store_true", help="Enable auto-reload")
     args = parser.parse_args()
 
-    logger.info("Starting Hegemonikón API on %s:%d", args.host, args.port)
-
-    uvicorn.run(
-        "mekhane.api.server:app",
-        host=args.host,
-        port=args.port,
-        reload=args.reload,
-        log_level="info",
-    )
+    if args.uds:
+        # UDS モード — Tauri デスクトップアプリ用
+        _cleanup_stale_socket(args.uds)
+        logger.info("Starting Hegemonikón API on UDS: %s", args.uds)
+        uvicorn.run(
+            "mekhane.api.server:app",
+            uds=args.uds,
+            reload=args.reload,
+            log_level="info",
+        )
+    else:
+        # TCP モード — 開発・n8n 連携用
+        logger.info("Starting Hegemonikón API on %s:%d", args.host, args.port)
+        uvicorn.run(
+            "mekhane.api.server:app",
+            host=args.host,
+            port=args.port,
+            reload=args.reload,
+            log_level="info",
+        )
     return 0
 
 

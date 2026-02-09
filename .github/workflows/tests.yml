@@ -46,7 +46,8 @@ jobs:
                   pip install torch --index-url https://download.pytorch.org/whl/cpu
                   # 2. Install other dependencies from standard PyPI
                   pip install pytest pytest-asyncio pytest-timeout pyyaml pydantic lancedb numpy scipy \
-                              networkx pandas tabulate requests httpx schedule sentence-transformers aiohttp
+                              networkx pandas tabulate requests httpx schedule sentence-transformers aiohttp \
+                              inferactively-pymdp tenacity google-genai lmql dspy-ai
                   # Install project in development mode if setup exists
                   pip install -e ".[test]" 2>/dev/null || true
 

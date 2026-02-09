@@ -31,6 +31,12 @@ except ImportError:
     MCP_AVAILABLE = False
     Server = None
 
+    # Fallback types for type hints
+    class Tool: pass
+    class TextContent:
+        def __init__(self, type: str, text: str): pass
+    class CallToolResult: pass
+
 
 # =============================================================================
 # MCP Server Implementation

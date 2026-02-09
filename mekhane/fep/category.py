@@ -297,8 +297,9 @@ class EpsilonMixture:
     - L is a contraction mapping: ||L(ε₁) - L(ε₂)|| ≤ α||ε₁ - ε₂||
     - Fixed point ε* = argmin F(ε) where F is variational free energy
 
-    The 4 ε parameters form a product: ε = ε_A × ε_B_obs × ε_B_act × ε_D
-    Each component governs one matrix of the generative model ABCD.
+    The 4 ε parameters form a product object (independent tuple):
+    ε = (ε_A, ε_B_obs, ε_B_act, ε_D)
+    Each component governs one matrix of the generative model ABCD independently.
     """
 
     name: str  # e.g. "A", "B_observe", "B_act", "D"
@@ -323,21 +324,6 @@ class EpsilonMixture:
     def apply(self, structure_val: float, uniform_val: float) -> float:
         """Apply M = (1-ε) × structure + ε × uniform."""
         return (1.0 - self.epsilon) * structure_val + self.epsilon * uniform_val
-
-    # PURPOSE: Verify convex combination invariant
-    def verify(self) -> bool:
-        """Verify the convex combination invariant.
-
-        The mixture must satisfy:
-        1. ε ∈ [eps_min, eps_max]
-        2. (1-ε) + ε = 1 (trivially true, but documented)
-        3. Both coefficients are non-negative
-        """
-        return (
-            self.is_valid
-            and self.epsilon >= 0
-            and self.structure_trust >= 0
-        )
 
 
 # The 4 ε parameters of the generative model

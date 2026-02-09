@@ -28,6 +28,8 @@ Action Space:
 """
 
 from typing import Any, Dict, List, Optional, Tuple
+
+from mekhane.fep.category import EPSILON_REGISTRY
 import numpy as np
 
 try:
@@ -86,11 +88,9 @@ class HegemonikónFEPAgentV2:
         # Epsilon Architecture: M = (1-ε) × structure + ε × uniform
         # These are the ONLY free parameters in the generative model.
         # All other values derive from domain structure (Stoic philosophy).
+        # Source of truth: EPSILON_REGISTRY in category.py (Layer B)
         self.epsilon: Dict[str, float] = {
-            "A": 0.25,           # observation noise (/dia+ reviewed)
-            "B_observe": 0.10,   # state persistence under observation
-            "B_act": 0.15,       # transition noise under action
-            "D": 0.15,           # prior uncertainty
+            k: em.epsilon for k, em in EPSILON_REGISTRY.items()
         }
         if epsilon:
             self.epsilon.update(epsilon)

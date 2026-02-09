@@ -13,12 +13,21 @@ cognitive domain — this is the fundamental consistency proof of Hegemonikón.
 """
 
 import json
+import os
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
-# Same directory as learned_A.npy
-CONVERGENCE_PATH = Path("/home/makaron8426/oikos/mneme/.hegemonikon/convergence.json")
+# Max records to retain (prevents unbounded JSON growth)
+MAX_RECORDS = 500
+
+# Configurable via environment variable; falls back to default
+_DEFAULT_PATH = os.path.expanduser(
+    "~/oikos/mneme/.hegemonikon/convergence.json"
+)
+CONVERGENCE_PATH = Path(
+    os.environ.get("HGK_CONVERGENCE_PATH", _DEFAULT_PATH)
+)
 
 
 def _load_records() -> List[Dict[str, Any]]:
@@ -73,6 +82,11 @@ def record_agreement(
         "epsilon": epsilon,
     }
     records.append(record)
+
+    # Truncate to MAX_RECORDS (keep most recent)
+    if len(records) > MAX_RECORDS:
+        records = records[-MAX_RECORDS:]
+
     _save_records(records)
 
     return convergence_summary(records)

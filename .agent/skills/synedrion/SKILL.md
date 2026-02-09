@@ -10,6 +10,13 @@ triggers:
   - "多角"
   - "批評"
   - "/syn"
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks:
+  - "監査結果の誤検知"
+fallbacks:
+  - "人間による手動レビュー"
 ---
 
 # Synedrion Council

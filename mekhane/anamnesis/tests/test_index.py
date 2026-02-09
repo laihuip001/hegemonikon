@@ -74,5 +74,105 @@ class TestGnosisIndex(unittest.TestCase):
         self.assertEqual(len(self.index._primary_key_cache), 15)
 
 
+class TestEmbedderDimension(unittest.TestCase):
+    """Embedder._dimension と _is_onnx_fallback の検証。"""
+
+    @patch("mekhane.anamnesis.index.Embedder._instances", {})
+    def test_dimension_property_exists_after_init(self):
+        """Embedder 初期化後、_dimension が正の整数であること。"""
+        from mekhane.anamnesis.index import Embedder
+        with patch.object(Embedder, '__init__', lambda self, **kw: None):
+            e = object.__new__(Embedder)
+            e._initialized = False
+            e._dimension = 1024
+            e._is_onnx_fallback = False
+            self.assertEqual(e._dimension, 1024)
+            self.assertFalse(e._is_onnx_fallback)
+
+    def test_model_dimensions_map(self):
+        """_MODEL_DIMENSIONS に既知モデルが登録されていること。"""
+        from mekhane.anamnesis.index import Embedder
+        self.assertEqual(Embedder._MODEL_DIMENSIONS["BAAI/bge-m3"], 1024)
+        self.assertEqual(Embedder._MODEL_DIMENSIONS["BAAI/bge-small-en-v1.5"], 384)
+
+
+class TestGetVectorDimension(unittest.TestCase):
+    """_get_vector_dimension() ヘルパーの検証。"""
+
+    def test_extracts_dimension_from_schema(self):
+        """fixed_size_list<item: float>[1024] 形式から次元を抽出。"""
+        from mekhane.anamnesis.index import _get_vector_dimension
+        mock_field = MagicMock()
+        mock_field.name = "vector"
+        mock_field.type = "fixed_size_list<item: float>[1024]"
+        mock_table = MagicMock()
+        mock_table.schema = [mock_field]
+        self.assertEqual(_get_vector_dimension(mock_table), 1024)
+
+    def test_returns_none_for_no_vector_column(self):
+        """vector カラムがない場合 None を返す。"""
+        from mekhane.anamnesis.index import _get_vector_dimension
+        mock_field = MagicMock()
+        mock_field.name = "text"
+        mock_table = MagicMock()
+        mock_table.schema = [mock_field]
+        self.assertIsNone(_get_vector_dimension(mock_table))
+
+
+class TestDimensionMismatchGuard(unittest.TestCase):
+    """GnosisIndex.search() の次元不一致防御の検証。"""
+
+    def setUp(self):
+        self.test_dir = tempfile.mkdtemp()
+        self.lance_dir = Path(self.test_dir) / "lancedb"
+
+        self.embedder_patcher = patch("mekhane.anamnesis.index.Embedder")
+        self.mock_embedder_class = self.embedder_patcher.start()
+        self.mock_embedder_instance = self.mock_embedder_class.return_value
+        # 384-dim embedder (ONNX fallback scenario)
+        self.mock_embedder_instance.embed_batch.side_effect = lambda texts: [
+            [0.1] * 384 for _ in texts
+        ]
+        self.mock_embedder_instance.embed.return_value = [0.1] * 384
+        self.mock_embedder_instance._dimension = 384
+        self.mock_embedder_instance._is_onnx_fallback = True
+        self.mock_embedder_instance.model_name = "bge-small-onnx"
+
+        self.index = GnosisIndex(lance_dir=self.lance_dir)
+        self.index._get_embedder = lambda: self.mock_embedder_instance
+
+    def tearDown(self):
+        self.embedder_patcher.stop()
+        shutil.rmtree(self.test_dir)
+
+    def test_search_returns_empty_on_dimension_mismatch(self):
+        """384-dim embedder で 1024-dim テーブルを検索 → 空リスト。"""
+        # Create table with 1024-dim vectors to simulate bge-m3 index
+        import lancedb
+        db = lancedb.connect(str(self.lance_dir))
+        db.create_table("knowledge", data=[{
+            "primary_key": "test-001",
+            "title": "Test Paper",
+            "abstract": "Abstract",
+            "source": "test",
+            "source_id": "1",
+            "vector": [0.1] * 1024,  # 1024-dim
+        }])
+
+        results = self.index.search("test query")
+        self.assertEqual(results, [])
+
+    def test_search_succeeds_on_matching_dimensions(self):
+        """384-dim embedder で 384-dim テーブルを検索 → 正常結果。"""
+        papers = [Paper(
+            id="test-001", source="test", source_id="1",
+            title="Test Paper", abstract="Abstract",
+        )]
+        self.index.add_papers(papers, dedupe=False)
+
+        results = self.index.search("test query")
+        self.assertEqual(len(results), 1)
+
+
 if __name__ == "__main__":
     unittest.main()

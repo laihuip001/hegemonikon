@@ -72,12 +72,19 @@ class Belief:
     created_at: datetime = field(default_factory=datetime.now)
     updated_at: datetime = field(default_factory=datetime.now)
     evidence: List[str] = field(default_factory=list)
+    promoted_at: Optional[datetime] = None
+    sophia_ki_id: Optional[str] = None
 
     @property
     # PURPOSE: 信念の年齢（日数）
     def age_days(self) -> float:
         """信念の年齢（日数）"""
         return (datetime.now() - self.created_at).total_seconds() / 86400
+
+    @property
+    def is_promoted(self) -> bool:
+        """Sophia に昇格済みか"""
+        return self.promoted_at is not None
 
 
 # PURPOSE: H4 Doxa 操作結果
@@ -248,6 +255,8 @@ class DoxaStore:
                     "created_at": b.created_at.isoformat(),
                     "updated_at": b.updated_at.isoformat(),
                     "evidence": b.evidence,
+                    "promoted_at": b.promoted_at.isoformat() if b.promoted_at else None,
+                    "sophia_ki_id": b.sophia_ki_id,
                 }
                 for b in self._beliefs.values()
             ],
@@ -259,6 +268,8 @@ class DoxaStore:
                     "created_at": b.created_at.isoformat(),
                     "updated_at": b.updated_at.isoformat(),
                     "evidence": b.evidence,
+                    "promoted_at": b.promoted_at.isoformat() if b.promoted_at else None,
+                    "sophia_ki_id": b.sophia_ki_id,
                 }
                 for b in self._archive
             ],
@@ -295,6 +306,7 @@ class DoxaStore:
 
         count = 0
         for item in data.get("beliefs", []):
+            promoted_raw = item.get("promoted_at")
             belief = Belief(
                 content=item["content"],
                 strength=BeliefStrength(item["strength"]),
@@ -302,11 +314,14 @@ class DoxaStore:
                 created_at=datetime.fromisoformat(item["created_at"]),
                 updated_at=datetime.fromisoformat(item["updated_at"]),
                 evidence=item.get("evidence", []),
+                promoted_at=datetime.fromisoformat(promoted_raw) if promoted_raw else None,
+                sophia_ki_id=item.get("sophia_ki_id"),
             )
             self._beliefs[belief.content] = belief
             count += 1
 
         for item in data.get("archived", []):
+            promoted_raw = item.get("promoted_at")
             belief = Belief(
                 content=item["content"],
                 strength=BeliefStrength(item["strength"]),
@@ -314,6 +329,8 @@ class DoxaStore:
                 created_at=datetime.fromisoformat(item["created_at"]),
                 updated_at=datetime.fromisoformat(item["updated_at"]),
                 evidence=item.get("evidence", []),
+                promoted_at=datetime.fromisoformat(promoted_raw) if promoted_raw else None,
+                sophia_ki_id=item.get("sophia_ki_id"),
             )
             self._archive.append(belief)
 

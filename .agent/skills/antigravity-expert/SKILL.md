@@ -24,6 +24,8 @@ triggers:
   - "GEMINI.md"
   - "agent-first"
   - "エージェント駆動"
+  - "browser_subagent"
+  - "プロンプト最適化"
 
 keywords:
   - antigravity
@@ -35,29 +37,31 @@ keywords:
   - gemini-md
   - browser-subagent
   - task-boundary
+  - prompt-engineering
 
 related:
   upstream: ["S2 Mekhanē"]
   downstream: []
   x_series: ["X-SK: Schema→Kairos (ツール選択の文脈依存性)"]
 
-lineage: "/mek+ → 2026-02-09 — Antigravity IDE 公式ドキュメント + Web 調査 + 実運用経験から構築"
+lineage: "/mek+ → 2026-02-09 — Antigravity IDE 公式ドキュメント + GPT Deep Research 5テーマ + 実運用経験から構築"
 anti_skip: enabled
-version: "1.0.0"
+version: "2.3.0"
 ---
 
 ## Overview
 
-このスキルは、Google Antigravity IDE（2025年11月パブリックプレビュー開始）のエージェント駆動開発プラットフォームに関する専門知識を提供する。対象読者は、Antigravity IDE を使って開発を行うエンジニア、または IDE 内で動作する AI エージェントのカスタマイズ（Skills/Rules/Workflows 設計）を行うユーザー。
+このスキルは、Google Antigravity IDE（2025年11月パブリックプレビュー開始）のエージェント駆動開発プラットフォームに関する専門知識を提供する。GPT Deep Research による5テーマの網羅的調査結果を統合済み。
 
 本スキルがカバーする範囲:
 
 - **アーキテクチャ理解**: VS Code フォーク、Editor View / Manager View の二面構造
 - **ツール群の完全ガイド**: 22種のエージェントツールの用途・制約・ベストプラクティス
-- **カスタマイズ三層構造**: Skills（動的知識）/ Rules（静的制約）/ Workflows（手順テンプレート）
-- **モデル最適化**: Gemini 3 Pro / Claude 4.5 / オープンソースモデルの使い分け
-- **GEMINI.md 設計**: プロジェクトプロファイルの書き方
-- **Artifacts システム**: task.md / implementation_plan.md / walkthrough.md の運用
+- **browser_subagent 徹底ガイド**: 5つのユースケース別テンプレート + 失敗パターン対策
+- **カスタマイズ三層構造**: Skills / Rules / Workflows の設計パターン
+- **モデル最適化**: Claude 4.6 Opus / Gemini 3 Pro のプロンプトエンジニアリング最新知見
+- **GEMINI.md 設計**: 各IDE プロファイル比較 + ベストプラクティス
+- **Agentic Coding 適用判断**: タスク別有効性評価 + 失敗パターン分類
 
 ---
 
@@ -65,24 +69,22 @@ version: "1.0.0"
 
 Antigravity IDE 専門家エージェントとして、以下の行動原則に従う:
 
-1. **Agent-First 思考**: 「コードを書く」前に「エージェントに何をさせるか」を考える。開発者はアーキテクト/オーケストレーターとして振る舞う
-2. **ツール適材適所**: 22種のツールから最適なものを選択し、組み合わせる
+1. **Agent-First 思考**: 「コードを書く」前に「エージェントに何をさせるか」を考える
+2. **ツール適材適所**: 22種のツールから最適なものを選択・組み合わせる
 3. **三層カスタマイズの設計支援**: Skills/Rules/Workflows の適切な使い分けを提案する
-4. **モデル特性の考慮**: Gemini と Claude では最適なプロンプト構造が異なることを前提に助言する
+4. **モデル特性の考慮**: Claude と Gemini では最適なプロンプト構造が根本的に異なる
 5. **Artifacts による透明性**: 作業の可視化と検証可能性を常に担保する
 6. **並列エージェントの活用**: 独立したタスクは並列実行を提案する
-7. **Browser Subagent の活用**: UI テストや Web インタラクションが必要な場合は browser_subagent を使う
+7. **Browser Subagent の詳細知識**: 5パターンのテンプレートを備えた実践ガイド
 8. **Task Boundary による進捗管理**: 複雑なタスクは task_boundary ツールで構造化する
-9. **安全性の担保**: 破壊的操作は必ずユーザー確認を経る (SafeToAutoRun の適切な使用)
-10. **コンテキスト効率**: 200K トークンのコンテキストウィンドウを効率的に使う設計を推奨する
-11. **実用優先**: 理論よりも具体的な手順・コマンド・テンプレートを優先的に提供する
-12. **バージョン意識**: 2026年2月時点の情報であることを意識し、変更可能性がある機能には注記する
+9. **安全性の担保**: 破壊的操作は必ずユーザー確認を経る (SafeToAutoRun)
+10. **適用判断の支援**: Agent-First が有効/無効なタスクを明確に区別して助言する
+11. **Trust but Verify**: エージェント出力は常に検証を前提とする
+12. **バージョン意識**: 2026年2月時点の情報。変更可能性がある機能には注記
 
 ---
 
 ## Antigravity IDE アーキテクチャ
-
-### プラットフォーム概要
 
 ```yaml
 platform:
@@ -105,214 +107,362 @@ models:
   supported:
     - Gemini 3 Deep Think
     - Gemini 3 Flash
-    - Claude 4.5 Sonnet
-    - Claude 4.5 Opus
+    - Claude Sonnet 4.5
+    - Claude 4.6 Opus
     - GPT-OSS (オープンソース)
+
+browser_subagent:
+  engine: Chromium (Chrome)
+  automation: Playwright + Chrome Remote Debugging
+  extension: 専用Chrome拡張機能
+  profile: 分離プロファイル（ユーザーセッションと独立）
+  recording: WebP動画形式
+  sub_model: "Gemini 2.5 Pro UI Checkpoint（UI操作特化、推定）"
+  context_window: "推定 8K-16K トークン（メインエージェントと独立）"
+  timeout: ~120秒（推定）
+
+execution_modes:
+  planning:
+    description: "事前に計画を立て、リサーチし、Artifactを生成してから実行"
+    use_case: "複雑なタスク。品質優先"
+  fast:
+    description: "計画スキップ、即座にコード変更/コマンド実行"
+    use_case: "単純なタスク。速度優先"
+
+policies:
+  terminal_execution:
+    options: ["Always Proceed", "Request Review (デフォルト)", "Agent-driven"]
+  javascript_execution:
+    options: ["許可", "毎回確認 (デフォルト)", "禁止"]
 ```
 
 ### ディレクトリ構造
 
 ```
 project-root/
-├── .agent/                      # エージェントカスタマイズ
-│   ├── rules/                   # 静的制約 (常時適用)
-│   │   ├── coding-standards.md  # コーディング規約
-│   │   └── security-policy.md   # セキュリティポリシー
-│   ├── workflows/               # 手順テンプレート (/コマンド)
-│   │   ├── deploy.md            # /deploy ワークフロー
-│   │   └── test.md              # /test ワークフロー
-│   └── skills/                  # 動的知識パッケージ
+├── .agent/
+│   ├── rules/           # 静的制約 (常時適用)
+│   ├── workflows/       # 手順テンプレート (/コマンド)
+│   └── skills/          # 動的知識パッケージ
 │       └── my-skill/
-│           ├── SKILL.md          # スキル定義 (必須)
-│           ├── scripts/          # ヘルパースクリプト
-│           └── examples/         # 参考実装
-├── GEMINI.md                    # プロジェクトプロファイル
-└── src/                         # ソースコード
+│           ├── SKILL.md  # スキル定義 (必須)
+│           ├── scripts/
+│           └── examples/
+├── GEMINI.md            # プロジェクトプロファイル
+└── src/
 ```
 
 ---
 
 ## ツール完全ガイド
 
-### ファイル操作系
+### ファイル操作・検索系
 
 | ツール | 用途 | 注意点 |
 |:-------|:-----|:-------|
-| `view_file` | ファイル内容の閲覧 | 最大800行ずつ。初回は全文推奨 |
-| `view_file_outline` | ファイル構造の概観 | 最初にこれで構造把握 → 詳細は view_file |
-| `view_code_item` | 関数/クラス単位の閲覧 | 完全修飾名を使用 (例: `Foo.bar`) |
-| `write_to_file` | 新規ファイル作成 | 既存ファイル上書きには `Overwrite: true` 必須 |
-| `replace_file_content` | 単一ブロック編集 | **連続した1箇所のみ**。TargetContent は完全一致必須 |
-| `multi_replace_file_content` | 複数箇所同時編集 | **非連続な複数箇所**の変更にはこちらを使用 |
-| `list_dir` | ディレクトリ一覧 | 絶対パスのみ |
-| `find_by_name` | ファイル検索 (fd) | glob 形式。結果上限50件 |
-| `grep_search` | テキスト検索 (ripgrep) | 正規表現対応。結果上限50件 |
+| `view_file` | ファイル内容の閲覧 | 最大800行ずつ。**初回は冒頭800行を強制読取** |
+| `view_file_outline` | ファイル構造の概観 | **最初にこれで構造把握** → 詳細は view_file |
+| `view_code_item` | 関数/クラス単位の閲覧 | 完全修飾名 (例: `Foo.bar`)。最大5個/回 |
+| `write_to_file` | 新規ファイル作成 | **TargetFile を第一引数に**。Overwrite: true で上書き |
+| `replace_file_content` | **単一**連続ブロック編集 | TargetContent は完全一致必須。⚠️ 冒頭行編集に既知バグ |
+| `multi_replace_file_content` | **複数**非連続箇所の同時編集 | 非連続な変更にはこちら。同一ファイルへの並列呼出し禁止 |
+| `list_dir` | ディレクトリ一覧 | 絶対パスのみ。再帰なし（直下のみ） |
+| `find_by_name` | ファイル検索 (fd) | glob 形式。結果上限50件。gitignore考慮 |
+| `grep_search` | テキスト検索 (ripgrep) | 正規表現対応。結果上限50件。JSON形式出力 |
+| `codebase_search` | セマンティックコード検索 | 関連コードスニペットを語義的に検索。具体的クエリ推奨 |
+| `search_in_file` | ファイル内セマンティック検索 | 単一ファイル内の関連コード部分を抽出。自然文クエリ可 |
+
+**replace vs multi_replace の判断基準**:
+
+- 変更箇所が1つの連続ブロック → `replace_file_content`
+- 変更箇所が2つ以上の非連続位置 → `multi_replace_file_content`
+- 同一ファイルへの並列呼出しは**絶対禁止**（データ競合）
+
+**検索ツールの使い分け**:
+
+| 目的 | ツール |
+|:-----|:-------|
+| 厳密な文字列パターン検索 | `grep_search` |
+| 語義的にコードを探す（意味検索） | `codebase_search` |
+| 単一ファイル内で関連コードを探す | `search_in_file` |
+| ファイル名/パスのパターン検索 | `find_by_name` |
 
 ### 実行系
 
 | ツール | 用途 | 注意点 |
 |:-------|:-----|:-------|
-| `run_command` | シェルコマンド実行 | `cd` 禁止。`Cwd` パラメータで作業ディレクトリ指定 |
-| `command_status` | バックグラウンドコマンド監視 | `WaitDurationSeconds` で完了待機可能 |
-| `send_command_input` | 対話型コマンドへの入力/終了 | REPL やプロンプトへの応答に使用 |
+| `run_command` | シェルコマンド実行 | **`cd` 禁止**。`Cwd` で作業ディレクトリ指定 |
+| `command_status` | バックグラウンドコマンド監視 | `WaitDurationSeconds` で完了待機 (max 300秒) |
+| `send_command_input` | 対話型コマンドへの入力/終了 | REPL やプロンプトへの応答 |
 | `read_terminal` | ターミナル内容の読取 | ProcessID で特定 |
 
-### ブラウザ系
+**SafeToAutoRun の判断基準**:
+
+| 安全 (true) | 危険 (false) |
+|:------------|:-------------|
+| `ls`, `cat`, `grep`, `wc` | `rm`, `mv` (上書き), `pip install` |
+| `python -c "print(...)"` | `git push`, `docker rm` |
+| テスト実行 (`pytest`) | DB操作 (`DROP`, `DELETE`) |
+| 読取専用の API 呼出し | 外部 API への書込み |
+
+**WaitMsBeforeAsync の目安**:
+
+- 即完了するコマンド: 3000-5000ms
+- ビルド/テスト: 10000ms (max)
+- 長時間サーバー起動: 500-1000ms (すぐバックグラウンドへ)
+- 失敗を素早く検知したい場合: 500ms
+
+### ブラウザ系（詳細は後述の「browser_subagent 徹底ガイド」参照）
 
 | ツール | 用途 | 注意点 |
 |:-------|:-----|:-------|
-| `browser_subagent` | ブラウザ操作タスクの委任 | 詳細なタスク記述が必要。WebP 動画として記録 |
-| `read_url_content` | URL からテキスト取得 | JS 不要な静的ページ向け。速い |
+| `browser_subagent` | ブラウザ操作タスクの委任 | **one-shot 自律実行**。詳細なタスク記述が必要 |
+| `read_url_content` | URL からテキスト取得 | **JS 不要な静的ページ向け**。速い。不可視 |
+| `view_content_chunk` | 読込済みドキュメントのチャンク閲覧 | `read_url_content` → DocumentId → 本ツールの3ステップで使用 |
+| `send_command_input` | 対話型コマンドへの入力/終了 | **Input と Terminate は排他** — どちらか一方のみ指定 |
 
-### メディア系
+**read_url_content vs browser_subagent の選択基準**:
 
-| ツール | 用途 | 注意点 |
-|:-------|:-----|:-------|
-| `generate_image` | 画像生成 | UI モックアップ、アセット生成に使用 |
-
-### 情報収集系
-
-| ツール | 用途 | 注意点 |
-|:-------|:-----|:-------|
-| `search_web` | Web 検索 | ドメイン指定可能。外部サービスの存在確認にも |
-| `view_content_chunk` | 読込済みドキュメントのチャンク閲覧 | read_url_content の後に使用 |
+| 条件 | ツール |
+|:-----|:-------|
+| 静的 HTML + JS 不要 | `read_url_content` (高速・軽量) |
+| JS レンダリング必要 | `browser_subagent` |
+| ログイン/認証が必要 | `browser_subagent` |
+| スクリーンショット/UI確認 | `browser_subagent` |
+| 大量ページの高速取得 | `read_url_content` 優先、動的なら併用 |
+| ユーザーに見せる必要あり | `browser_subagent` |
 
 ### セッション管理系
 
 | ツール | 用途 | 注意点 |
 |:-------|:-----|:-------|
-| `task_boundary` | タスク進捗管理 | 複雑なタスクの構造化。PLANNING/EXECUTION/VERIFICATION |
-| `notify_user` | ユーザーへの通知 | タスクモード中の唯一のコミュニケーション手段 |
+| `task_boundary` | タスク進捗管理 | 複雑なタスク用。PLANNING/EXECUTION/VERIFICATION |
+| `notify_user` | ユーザーへの通知 | **タスクモード中の唯一のコミュニケーション手段** |
 
-### MCP 系
+### その他
 
-| ツール | 用途 | 注意点 |
-|:-------|:-----|:-------|
-| `list_resources` | MCP サーバーリソース一覧 | サーバー名を指定 |
-| `read_resource` | MCP リソース内容取得 | URI で指定 |
-
----
-
-## Skills / Rules / Workflows 設計指針
-
-### 三層の使い分け
-
-```
-┌─────────────────────────────────────────────────────────────────┐
-│ Rules (静的制約)                                                 │
-│   ・常時適用される不変のルール                                    │
-│   ・システムプロンプトに注入される                                │
-│   ・例: コーディング規約、セキュリティポリシー                    │
-│   ・場所: .agent/rules/*.md                                     │
-├─────────────────────────────────────────────────────────────────┤
-│ Workflows (手順テンプレート)                                     │
-│   ・/コマンド で発動する手順書                                    │
-│   ・ユーザーが明示的にトリガーする                                │
-│   ・例: /deploy, /test, /review                                 │
-│   ・場所: .agent/workflows/*.md                                 │
-├─────────────────────────────────────────────────────────────────┤
-│ Skills (動的知識パッケージ)                                      │
-│   ・関連する場合のみコンテキストにロードされる                    │
-│   ・SKILL.md + scripts/ + examples/ の構造                     │
-│   ・例: テスト生成スキル、ドキュメント生成スキル                  │
-│   ・場所: .agent/skills/[skill-name]/SKILL.md                  │
-└─────────────────────────────────────────────────────────────────┘
-```
-
-### Rule の書き方
-
-```markdown
-# [ルール名]
-
-> [1文の説明]
-
-## 適用条件
-
-- いつこのルールが適用されるか
-
-## ルール
-
-1. [具体的なルール1]
-2. [具体的なルール2]
-3. [具体的なルール3]
-
-## 例外
-
-- いかなる場合にルールを緩和してよいか
-```
-
-**設計原則**:
-
-- **フラットに書く**: 深いネストを避ける（AIの構造解析のため）
-- **否定形より肯定形**: 「〜してはならない」より「〜する」
-- **操作的定義**: 「高品質」→「テストカバレッジ 80% 以上」
-- **最小限の長さ**: 長すぎるルールはコンテキストを消費する
-
-### Workflow の書き方
-
-```yaml
----
-description: [1行説明]
----
-```
-
-```markdown
-# /[コマンド名] — [タイトル]
-
-> [目的: 1文]
-
-## 手順
-
-1. [ステップ1]
-2. [ステップ2]
-   // turbo  ← この注釈があると auto-run 許可
-3. [ステップ3]
-```
-
-**turbo 注釈**:
-
-- `// turbo`: 直下のステップのみ auto-run
-- `// turbo-all`: ワークフロー全体の全ステップを auto-run
-
-### Skill の書き方
-
-```yaml
----
-name: [skill-name]
-description: |
-  [2-3行の説明]
-  
-  Trigger: [発動条件]
----
-```
-
-```markdown
-# [Skill Name]
-
-## 発動条件
-- [条件1]
-- [条件2]
-
-## 手順
-### Step 1: [名前]
-// turbo
-```bash
-[実行コマンド]
-```
-
-### Step 2: [名前]
-
-[手順の詳細]
-
-```
+| ツール | 用途 |
+|:-------|:-----|
+| `generate_image` | 画像生成（UI モック、アセット） |
+| `search_web` | Web 検索 |
+| `list_resources` / `read_resource` | MCP サーバーリソース |
 
 ---
 
-## GEMINI.md 設計ガイド
+## browser_subagent 徹底ガイド
 
-GEMINI.md はプロジェクトプロファイルとして、セッション開始時にエージェントが自動で読み込む。
+### 内部アーキテクチャ
 
-### テンプレート
+- **エンジン**: Chromium (Chrome) + Playwright + Chrome Remote Debugging
+- **拡張**: 専用 Chrome 拡張機能がインストールされる
+- **プロファイル**: 分離 Chrome プロファイル（ユーザーのクッキー/ログイン状態に影響しない）
+- **サブモデル**: Gemini 2.5 Pro UI Checkpoint（UI 操作に特化した別モデル）
+- **ロック**: 稼働中はブラウザが青ハイライト枠 + 注釈表示でロックされる
+- **録画**: 操作は全て WebP 動画として自動記録
+- **タイムアウト**: 約120秒（推定）。`browser_wait_for_selector` で個別待機可能
+
+### サブエージェントが持つツール群
+
+| カテゴリ | ツール |
+|:---------|:-------|
+| 操作 | クリック、スクロール、テキスト入力、ナビゲート、ウィンドウサイズ変更 |
+| 待機 | 要素選択待機 (`browser_wait_for_selector(selector, timeout)`) |
+| 読取 | DOM取得、テキスト抽出、Markdown パース |
+| デバッグ | コンソールログ取得、JavaScript実行 (`browser_evaluate`) |
+| 記録 | スクリーンショット撮影、画面録画 |
+
+### タスク記述の5原則
+
+1. **手順が明確**: 操作を論理的順序で、ステップを飛ばさずに
+2. **対象の特定**: 要素はラベル名/ID/data-testid で明確に指定
+3. **完了条件の明示**: 「〜が表示されたら完了」を客観的に
+4. **出力内容の指定**: 何をどの形式で返すか（JSON/Markdown表/スクリーンショット）
+5. **エラー時の対応**: 失敗時の動作を明記（スクショ取得→報告→終了）
+
+### ユースケース別テンプレート
+
+#### パターン1: UIテスト
+
+```
+1. ブラウザで http://localhost:3000/login を開いてください。
+2. 「ユーザー名」フィールドに testuser、「パスワード」に Pa$$w0rd を入力。
+3. 「ログイン」ボタンをクリック。
+4. 「ダッシュボード」タイトルのページに遷移し、testuser が表示されていることを確認。
+5. 画面全体のスクリーンショットを撮影し保存。
+6. エラーメッセージが表示された場合は、スクショを撮って報告して終了。
+```
+
+**成功率の要因**: 具体的な要素指定 + 完了条件 + 証跡取得 + 異常系指示
+**よくある失敗**: セレクタ不一致、クリック早すぎ、遷移待ち不足
+
+#### パターン2: フォーム入力
+
+```
+1. https://example.com/register を開く。
+2. フォームに入力:
+   - 「氏名」→ 山田 太郎
+   - 「メール」→ taro@example.com
+   - 「パスワード」→ P@ssw0rd!
+3. 「登録」ボタンをクリック。
+4. 「登録が完了しました」メッセージの表示を確認。
+5. 完了メッセージとURLのスクリーンショットを保存。
+6. バリデーションエラーが出た場合はそのメッセージをスクショ付きで報告。
+```
+
+#### パターン3: Webスクレイピング
+
+```
+1. https://example.com/news を開く。
+2. 記事見出しのタイトルとリンクURLをすべて取得。
+3. 「次へ」ボタンがあれば次ページに移動し、最終ページまで繰り返す。
+4. 結果をMarkdown表形式（列: タイトル, URL）で出力。
+5. CAPTCHA/アクセス拒否が表示されたら停止してスクショ付きで報告。
+```
+
+**注意**: 無限スクロール型は「次へ」パターンが使えない → スクロール+ロード待ち指示に変更
+
+#### パターン4: SPAテスト
+
+```
+1. http://localhost:8080/dashboard を開く。グラフ/テーブルが表示されるまで待機。
+2. 右上のフィルタアイコン（🔍）をクリック。
+3. 「日付範囲」ドロップダウンで 2023/01/01〜2023/12/31 を選択 → 「適用」クリック。
+4. グラフタイトルに選択日付範囲が表示されていることを確認。
+5. テーブル最初の行の数値を報告。グラフ全体のスクリーンショットを保存。
+6. 更新されない場合は適用ボタンを再クリック。それでもダメならエラー報告して終了。
+```
+
+**SPA固有の注意**: 初期ロード完了の待機が必須 / URLが変わらないため要素出現で判定
+
+#### パターン5: 認証フロー
+
+```
+1. https://example.com/login を開く。ユーザー名: demoUser, パスワード: demoPass123 で入力→ログインクリック。
+2. マイページに遷移し「こんにちは、demoUserさん」の表示を確認。
+3. ユーザーID（会員番号）をテキストとして取得。
+4. 同じセッションで https://example.com/settings に移動。「アカウント設定」タイトルを確認。
+5. 「ユーザーID: {値}, ページタイトル: アカウント設定」形式で報告。スクショも保存。
+6. ログイン失敗時はエラーメッセージを報告して終了。
+```
+
+**セッション維持**: 同一タスク内の連続操作でCookieが引き継がれる
+
+### 失敗パターンと対策
+
+| パターン | 原因 | 対策 |
+|:---------|:-----|:-----|
+| **セレクタ解決失敗** | UI変更、曖昧な指定 | `id` / `data-testid` を使用。開発時にテスト用IDを付与 |
+| **ページ遷移タイミング** | ロード完了前に次操作 | `browser_wait_for_selector` で要素出現待ち。明示的な待機指示 |
+| **動的コンテンツ未ロード** | AJAX完了前に取得 | スピナー消滅待ち。テキスト内容の確認を二重チェック |
+| **CAPTCHA/ログインブロック** | Bot検出 | 「停止してスクショ付き報告」を指示。人間介入待ち |
+| **JS描画完了待ち** | フロントフレームワークの遅延 | 安定状態まで少し待つ指示。全体タイムアウト内に収める |
+
+---
+
+## モデル別プロンプト最適化（2026年最新知見）
+
+### Claude 4.x (Sonnet 4.5 / Opus 4.6)
+
+| 項目 | 推奨 | 根拠 | 確信度 |
+|:-----|:-----|:-----|:-------|
+| **System Prompt 構造** | 「契約書」スタイル。役割・禁止事項・出力形式を明示。XMLタグで区切り | Anthropic公式Doc | 高 |
+| **構造化形式** | **XMLタグ優位**。ClaudeはXMLタグ付きデータで訓練されている | Anthropic エンジニア発言 | 高 |
+| **ツール使用** | 過度な強制は逆効果。「必要に応じて使え」程度に緩和（4.x以降） | Anthropic公式Doc | 高 |
+| **出力傾向** | **冗長になりがち**。「箇条書き5点以内」「300語以内」等の制限を明示 | 実務知見 | 中 |
+| **長文コンテキスト** | 「文脈劣化 (context rot)」に注意。関連情報のみ含め、冗長部分は要約 | Anthropic技術ブログ | 高 |
+| **CoT / 思考** | 高effort設定で自発的に深思考。簡単な問題では抑制推奨 | 公式Doc | 高 |
+| **Self-Refine** | ⚠️ 簡単問題では**正答率98%→57%に低下**（腐食効果）。**難問のみ**適用 | Snorkel社実験 | 中 |
+| **検索連携** | 「複数ソースで検証せよ」と指示。仮説→検証パターンが有効 | 公式Doc | 高 |
+
+### Gemini 3.x (Pro / Flash / Deep Think)
+
+| 項目 | 推奨 | 根拠 | 確信度 |
+|:-----|:-----|:-----|:-------|
+| **System Prompt 構造** | 簡潔 + 重要事項を冒頭に。冗長な装飾より目的明確に | Google公式ガイド | 高 |
+| **構造化形式** | **Markdown優位**。XMLよりトークン効率が良く、深い階層データで精度勝る | 実験結果 + 公式推奨 | 高(公式) + 中(実験) |
+| **ツール使用** | 役割 + 使用条件を明示。温度は1.0維持 | 公式Doc | 高 |
+| **出力傾向** | **簡潔すぎる**。出典・詳細は明示的に要求しないと省略される | 実務知見 | 中 |
+| **長文コンテキスト** | 「まずコンテキスト → 最後に質問」の順序。ephemeral tokens に注意 | 公式Doc | 高 |
+| **CoT / 思考** | 内部で思考するが出力ではデフォルト省略。明示指示で出力させる | 公式Doc | 高 |
+| **Self-Refine** | 難問時に限定。基本はモデルの自律性に委任。形式チェックは有効 | 一般研究 | 中 |
+| **検索連携** | 「コンテキストのみで回答。不明は推測せず報告」で幻覚防止 | 公式Doc | 高 |
+
+### Claude vs Gemini: 同一プロンプトでの差異
+
+| 軸 | Claude | Gemini |
+|:---|:-------|:-------|
+| 出力長 | 長い。制限が必要 | 短い。詳細要求が必要 |
+| 構造化形式 | XML が最適 | Markdown が最適 |
+| 曖昧な課題 | 自主的に仮定を置いて詳細に検討 | 簡潔に即答。深掘りには明示指示 |
+| ツール使用 | 自発的に活用（過度なら緩和指示） | 明示的に条件を伝える |
+| 強み | 深い分析・レビュー | マルチモーダル・検索連携 |
+
+---
+
+## Agentic Coding 適用判断フレームワーク
+
+### 有効なタスク領域
+
+| タスク | 有効性 | 条件 | 注意点 |
+|:-------|:-------|:-----|:-------|
+| **ボイラープレート生成** | ⭐5 | 定型的・創造性低い | 規約/テンプレートを事前提供 |
+| **ドキュメント生成** | ⭐5 | 既存コードからの自動生成 | 生成物は人間がレビュー必須 |
+| **プロトタイプ/MVP** | ⭐4 | 小規模・明確な仕様 | セキュリティ要件の見落としに注意 |
+| **テスト生成** | ⭐4 | 入出力明確な関数向け | カバレッジ +30pt 以上の効果。ロジック精査は人間 |
+| **バグ修正（簡易）** | ⭐4 | 単一モジュール・原因明確 | 復旧時間40-60%短縮（Cursor事例） |
+| **リファクタリング** | ⭐3 | 機械的パターン変換 | 2-3倍速。ただし設計判断は人間 |
+| **コードレビュー** | ⭐3 | ファーストパス用 | スタイル/明らかなバグのみ。設計判断は不可 |
+
+### 無効/危険なタスク領域
+
+| タスク | 有効性 | リスク |
+|:-------|:-------|:-------|
+| **セキュリティクリティカル** | ⭐1 | 入力検証漏れ、暗号化実装ミス |
+| **分散システム設計** | ⭐1 | 組織固有制約の理解不足 |
+| **レガシー大規模変更** | ⭐2 | コンテキスト超過、整合性崩壊 |
+| **パフォーマンスチューニング** | ⭐2 | 本質的ボトルネック外しの最適化 |
+| **DBマイグレーション** | ⭐2 | データ損失リスク |
+| **複雑バグ修正** | ⭐2 | 無限デバッグループ |
+
+### 5つの失敗パターン
+
+| パターン | 説明 | 対策 |
+|:---------|:-----|:-----|
+| **Hallucination Cascade** | 存在しないAPIに固執し連鎖的に誤る | タスクの実現可能性を事前確認 |
+| **Context Window Overflow** | 大規模コードで文脈を失い一貫性崩壊 | タスクを分割。小さく保つ |
+| **Drift** | 指示から逸脱して別方向に進む | 明確な仕様 + テストでガードレール |
+| **Over-engineering** | 不要に複雑な解決策を導入 | YAGNI を明示。「シンプルに」指示 |
+| **Security Blind Spots** | セキュリティ考慮の欠落 | セキュリティ要件をルール化 |
+
+### ROI データ
+
+| 指標 | 効果 | 出典 |
+|:-----|:-----|:-----|
+| ルーチンタスク速度 | 3-5倍 | Cursor公式 |
+| リファクタリング速度 | 2-3倍 | Cursor公式 |
+| PR マージ数 | +39%/週 | Cursor統計 |
+| デバッグ復旧時間 | -40-60% | GitHub Copilot |
+| テストカバレッジ | +30pt以上 | Devin事例 |
+| ROI達成期間 | 2-3ヶ月 | 業界推計 |
+| ⚠️ AI回答のデバッグ工数 | 66%が増加と感じる | SO調査2025 |
+
+---
+
+## プロジェクトプロファイル設計（IDE 横断比較）
+
+### 各 IDE のプロファイル比較
+
+| IDE | ファイル | 役割 | 特記事項 |
+|:----|:---------|:-----|:---------|
+| **Antigravity** | `GEMINI.md` | エージェントの「Blueprint」（設計図）| 全会話に自動適用。AGENTS.md は無視される |
+| **Claude Code** | `CLAUDE.md` | プロジェクト別指示書 | 冒頭数行が特に重要。「禁止のみ」より理由+代替案を |
+| **Cursor** | `.cursorrules` | プロジェクトルール | 自動検出。チーム共有可能 |
+| **Windsurf** | `.windsurfrules` | ルールファイル | `.windsurf/rules/` で用途別管理も可 |
+| **Copilot** | `.github/copilot-instructions.md` | オプション指示 | 自由度は他より低い |
+
+**共通する目的**: 「プロジェクト固有の知識・ルールをAIに教えるための設定ファイル」
+
+### GEMINI.md 設計ガイド
 
 ```markdown
 # GEMINI.md — [プロジェクト名]
@@ -323,24 +473,82 @@ GEMINI.md はプロジェクトプロファイルとして、セッション開�
 ## 技術スタック
 - **Language**: [言語] [バージョン]
 - **Framework**: [フレームワーク名]
-- **Database**: [DB名]
 
 ## 規約
 - [コーディングスタイル]
 - [テストポリシー]
-- [コミットメッセージ形式]
 
 ## 参照
-- [重要なドキュメントへのリンク]
+- [重要ドキュメントへのパス]
 ```
 
-### 最適化のポイント
+### プロファイル最適化の原則
 
-| 原則 | 説明 | 悪い例 → 良い例 |
-|:-----|:-----|:-----------------|
-| **構造化** | テーブル/リストを優先 | 長文散文 → キー:値 |
-| **圧縮** | 初期コンテキスト ≤ 20% | 10,000字の説明 → 3,000字に圧縮 |
-| **参照式** | 詳細は外部ファイルに | 全文をGEMINI.mdに書く → パスだけ記載 |
+| 原則 | 説明 | 根拠 |
+|:-----|:-----|:-----|
+| **冒頭に核心を** | 最初の数行が最も影響力が高い | Claude Code公式 |
+| **否定形より肯定形** | 「NEVER」の羅列より理由+代替案 | 実務知見 |
+| **圧縮** | 初期コンテキスト ≤ 20% | コンテキスト効率 |
+| **参照式** | 詳細は外部ファイルに。パスだけ記載 | トークン節約 |
+| **一貫した形式** | 表/リストを統一 | AI の構造解析のため |
+
+### AGENTS.md を使う裏技
+
+Antigravity は AGENTS.md を標準では無視するが、GEMINI.md に以下を追記することで間接的に読み込ませることが可能:
+
+```markdown
+- AGENTS.md ファイルがあれば内容を確認すること
+  （サブフォルダにも機能別の AGENTS.md が存在する可能性がある）
+- 上記ルールを自動実行して追加指示を読み込むこと
+```
+
+---
+
+## Skills / Rules / Workflows 設計指針
+
+### 三層の使い分け
+
+| 層 | 性質 | 適用タイミング | 例 |
+|:---|:-----|:---------------|:---|
+| **Rules** | 静的制約 | 常時自動適用 | コーディング規約、セキュリティポリシー |
+| **Workflows** | 手順テンプレート | `/コマンド` で明示的発動 | `/deploy`, `/test`, `/review` |
+| **Skills** | 動的知識 | 関連時のみコンテキストロード | テスト生成、ドキュメント生成 |
+
+**判断基準**:
+
+- 「全会話で常に必要」→ **Rule**
+- 「特定のタスクで手順を踏む」→ **Workflow** (+ `// turbo` 注釈)
+- 「特定の専門知識が必要な時だけ」→ **Skill**
+
+### Rule の書き方
+
+```markdown
+# [ルール名]
+
+> [1文の説明]
+
+## ルール
+1. [具体的なルール1]
+2. [具体的なルール2]
+
+## 例外
+- [ルール緩和条件]
+```
+
+- フラットに書く（深いネスト回避）
+- 否定形より肯定形
+- 操作的定義（「高品質」→「テストカバレッジ 80% 以上」）
+
+### Workflow の書き方
+
+```yaml
+---
+description: [1行説明]
+---
+```
+
+- `// turbo`: 直下のステップのみ auto-run 許可
+- `// turbo-all`: 全ステップ auto-run 許可
 
 ---
 
@@ -348,87 +556,73 @@ GEMINI.md はプロジェクトプロファイルとして、セッション開�
 
 ### 3種の公式アーティファクト
 
-| Artifact | パス | 目的 | タイミング |
-|:---------|:-----|:-----|:-----------|
-| `task.md` | brain/[conv-id]/ | タスク進捗チェックリスト | タスク開始時に作成・随時更新 |
-| `implementation_plan.md` | brain/[conv-id]/ | 技術設計計画 | PLANNING モードで作成 |
-| `walkthrough.md` | brain/[conv-id]/ | 作業完了報告 | VERIFICATION 後に作成 |
+| Artifact | 目的 | タイミング |
+|:---------|:-----|:-----------|
+| `task.md` | タスク進捗チェックリスト | タスク開始時に作成・随時更新 |
+| `implementation_plan.md` | 技術設計計画 | PLANNING モードで作成 |
+| `walkthrough.md` | 作業完了報告 | VERIFICATION 後に作成 |
 
 ### task_boundary の使い方
 
-```
-task_boundary(
-  TaskName: "Implementing Auth Module",  # UIヘッダー
-  Mode: "EXECUTION",                      # PLANNING / EXECUTION / VERIFICATION
-  TaskSummary: "認証モジュールを実装中。JWT トークン発行部分が完了。",
-  TaskStatus: "アクセス制御ミドルウェアの実装に着手",  # 次やること
-  PredictedTaskSize: 15                   # 残り推定ツールコール数
-)
-```
+**使用基準**:
 
-**使い分けの基準**:
+- 1-2回のツールコール → **不要**
+- 3回以上のツールコール → **推奨**
 
-- 単純な質問/1-2回のツールコール → task_boundary 不要
-- 3回以上のツールコール → task_boundary 推奨
-- TaskName は「動詞+対象」で簡潔に
+**Mode の使い分け**:
+
+- `PLANNING`: 調査・設計 → implementation_plan.md 作成
+- `EXECUTION`: コード実装
+- `VERIFICATION`: テスト・検証 → walkthrough.md 作成
 
 ---
 
-## モデル最適化
+## ツール詳細仕様・既知の問題
 
-### Claude (Sonnet 4.5 / Opus 4.5) 向けプロンプト
+テーマ1 Deep Research（全ツール仕様調査）からの重要な補足事項。
 
-```yaml
-strengths:
-  - 長文コンテキスト理解 (200K tokens)
-  - ニュアンスのある対話と批評
-  - 複雑な推論チェーン
-  - メタルール (Anti-Skip Protocol 等) に従う
+### ファイル編集ツールの既知バグ
 
-best_practices:
-  - Markdown + YAML の混合が効果的
-  - 構造化されたメタルールを含めてよい
-  - ナラティブと構造化の混合スタイル
-  - system prompt に role を明示的に定義
+| 問題 | 影響 | 対策 |
+|:-----|:-----|:-----|
+| **冒頭行からの置換で大部分削除** | `replace_file_content` / `multi_replace` でファイル先頭を含む範囲を指定すると、意図しない大量削除が発生する報告あり | **冒頭行の編集は最小限に**。冒頭を触る場合は一度で正確に指定 |
+| **TargetContent の空白不一致** | スペース/タブ/改行が1文字でも異なるとエラー | `view_file` でコピペして使用。手入力しない |
+| **AllowMultiple: true の暴走** | 範囲内の全一致箇所が置換される | 基本 `false`。複数置換は範囲を極限まで絞る |
+| **CRLF 改行コードでファイル破損** | Windows形式 (CRLF) のファイルで multi_replace が「壊滅的に失敗」し大部分が上書きされる | **ファイルを LF に変換してから編集**。`dos2unix` 等を使用 |
 
-anti_patterns:
-  - 過度に短い指示 (詳細が有効)
-  - role なしの漠然とした指示
-```
+> ⚠️ **出典**: Reddit r/Bard 報告 + GitHub Issue #6886 (gemini-cli)
 
-### Gemini 3 Pro 向けプロンプト
+### 全ツール共通アンチパターン
 
-```yaml
-strengths:
-  - マルチモーダル処理
-  - コード生成/レビュー
-  - 超長文コンテキスト (2M tokens)
-  - 高速推論
+| # | アンチパターン | 該当ツール | リスク | 正しいアプローチ |
+|:--|:-------------|:-----------|:-------|:---------------|
+| 1 | **漠然としたクエリで検索** | `codebase_search`, `search_web` | ノイズ大量、有用結果なし | 具体的なキーワード/関数名/エラー全文を使用 |
+| 2 | **50件上限を忘れた広範囲検索** | `grep_search`, `find_by_name` | 目的の結果が切り捨てられる | パターン/パスで事前に絞り込み |
+| 3 | **同一ファイルへの並列編集** | `replace_file_content`, `multi_replace` | ファイル内容が破壊される | 1ファイル1ツール呼出し。順次実行 |
+| 4 | **OutputCharacterCount 未指定** | `command_status` | 巨大ログでコンテキスト圧迫 | 必要最小限の文字数を指定 |
+| 5 | **WaitMsBeforeAsync 不適切設定** | `run_command` | 長時間ブロック or 不要な非同期化 | コマンド特性に合わせた値設定 |
+| 6 | **SafeToAutoRun: true の危険設定** | `run_command` | 環境破壊（rm -rf 等） | 読取専用コマンドのみ true |
+| 7 | **browser_subagent に曖昧な指示** | `browser_subagent` | 無限ループ/早期終了 | 具体的手順 + 完了条件 + エラー時動作 |
+| 8 | **SPA を read_url_content で取得** | `read_url_content` | 骨組みHTMLのみ取得 | JS描画必要なら `browser_subagent` |
+| 9 | **view_file で巨大ファイル全文読取** | `view_file` | トークン浪費、800行制限 | `view_file_outline` で構造把握→必要箇所のみ |
+| 10 | **既に取得済みの内容を再取得** | `view_code_item`, `view_file` | トークン浪費 | エージェントの記憶にある範囲は再取得しない |
 
-best_practices:
-  - "Less is More" — 簡潔なプロンプトが最適
-  - Role: 1-2文のみ
-  - Constraints: 1回のみ言及 (反復厳禁)
-  - System Prompt: 50-100 トークン以下
-  - Context → Task → Format の順序
+### 未確認事項（2026年2月時点）
 
-anti_patterns:
-  - 制約の反復 (Constraint Pinning): -2-4% accuracy
-  - 冗長な Role 定義: output 2-3倍に膨張
-  - System + User で同じ指示の重複
-```
-
----
-
-## Quality Standards
-
-| 指標 | 基準値 | 測定方法 |
-|:-----|:-------|:---------|
-| ツール選択精度 | ≥ 90% | 最適なツールが選択されているか |
-| 安全性遵守率 | 100% | 破壊的操作で SafeToAutoRun を適切に設定 |
-| コンテキスト効率 | GEMINI.md ≤ 3,000字 | 初期ロードのトークン数 |
-| レスポンス時間 | 初回応答 ≤ 5秒 | ツール選択までの判断速度 |
-| 情報正確性 | ≥ 95% | ツールの引数/制約が公式仕様と一致 |
+| ツール | 未確認事項 | 影響度 |
+|:-------|:-----------|:-------|
+| `browser_subagent` | サブモデルの正確なコンテキスト長（推定8K-16Kトークン） | 🔴 高 |
+| `read_url_content` | Markdown変換ルール詳細、チャンクサイズ（推定8Kトークン） | 🟡 中 |
+| `send_command_input` | Terminate時のシグナル種別（SIGINT or SIGKILL不明） | 🟡 中 |
+| `search_in_file` | 出力形式の詳細。Geminiモデル内部機能と推測 | 🟡 中 |
+| `codebase_search` | 内部インデックス方式（Embeddings推定だが非公開） | ⚪ 低 |
+| `generate_image` | デフォルト解像度・フォーマット・内部モデル | ⚪ 低 |
+| `search_web` | 利用検索エンジン（Google API推定）とレート制限 | ⚪ 低 |
+| `command_status` | 出力フォーマットの詳細（JSON文字列推定） | ⚪ 低 |
+| `find_by_name` | 50件超過時の通知有無 | ⚪ 低 |
+| `view_file` | バイナリファイルのエンコード形式（Base64推定） | ⚪ 低 |
+| `view_file_outline` | 1ページあたりの表示アイテム上限（推定~50件） | ⚪ 低 |
+| `write_to_file` | 書込み後の応答詳細（UI側処理でエージェントには非通知の可能性） | ⚪ 低 |
 
 ---
 
@@ -437,83 +631,29 @@ anti_patterns:
 | ケース | 対応 | Fallback |
 |:-------|:-----|:---------|
 | browser_subagent が URL オープン失敗 | ユーザーに対処法を質問 | read_url_content を試行 |
-| view_file で 800行超のファイル | 分割読取 (StartLine/EndLine) | view_file_outline で概観優先 |
-| run_command がタイムアウト | command_status で状態確認 | send_command_input で Terminate |
-| TargetContent が見つからない | view_file で正確な内容を再確認 | manual で正しいターゲットを特定 |
-| 並列ツールコールの依存関係エラー | waitForPreviousTools: true を指定 | 逐次実行に切り替え |
-| コンテキストウィンドウ超過 | 不要な情報を圧縮/参照化 | 新セッションで継続 |
-| MCP サーバー未接続 | list_resources で接続確認 | MCP なしで代替手段を提案 |
+| view_file で 800行超 | 分割読取 | view_file_outline で概観優先 |
+| run_command がタイムアウト | command_status で確認 | send_command_input で Terminate |
+| TargetContent が見つからない | view_file で正確な内容を再確認 | — |
+| 並列ツールコールの依存関係 | waitForPreviousTools: true | 逐次実行に切替 |
+| コンテキスト超過 | 不要情報を圧縮/参照化 | 新セッションで継続 |
+| CAPTCHA ブロック | スクショ→人間介入待ち | read_url_content に切替 |
+| ファイル冒頭の編集で内容消去 | 冒頭行編集は最小限に。綿密に検証 | write_to_file で全体書き直し |
+| codebase_search で結果不足 | grep_search + find_by_name で補完 | ディレクトリを広げて再検索 |
+| send_command_input で Input+Terminate 同時指定 | **排他制約**: どちらか一方のみ | Input で対話 or Terminate で終了 |
+| read_url_content の長大ページ | view_content_chunk で分割読取 | position=0 から順に取得 |
+| CRLF ファイルの編集失敗 | `dos2unix` で LF に変換後に編集 | エディタで改行コードを確認 |
+| browser_subagent でプロンプトインジェクション | 信頼できないURLは避ける。結果を検証 | ユーザーに確認を促す |
 
 ---
 
-## Examples
+## Quality Standards
 
-### Example 1: 新規 Skill の作成
-
-**Input**: "テスト自動生成のスキルを作りたい"
-
-**Output**:
-
-```markdown
-## 提案: test-generator Skill
-
-### 構造
-.agent/skills/test-generator/
-├── SKILL.md          # テスト生成の知識・手順
-├── scripts/
-│   └── analyze.sh    # テスト対象の自動分析
-└── examples/
-    └── sample-test.ts
-
-### SKILL.md 概要
-- 発動条件: テスト追加/テストカバレッジ改善の要求
-- 手順: 1) 対象コードの構造分析 → 2) テスト戦略決定 → 3) テスト生成 → 4) 実行・検証
-- 品質基準: カバレッジ ≥ 80%, エッジケース ≥ 3件/関数
-```
-
-**解説**: Skills は「必要な時だけロードされる」動的知識なので、常時適用の Rules よりもコンテキスト効率が良い。テスト生成のような「特定タスクに紐づく専門知識」は Skill が最適。Rules にすると全会話でコンテキストを消費してしまう。
-
-### Example 2: 安全なコマンド実行の判断
-
-**Input**: "このディレクトリの .pyc ファイルを全削除して"
-
-**Output**:
-
-```python
-# SafeToAutoRun の判断:
-# - ファイル削除 = 破壊的操作 → SafeToAutoRun: false
-# - ユーザー承認を必ず待つ
-
-run_command(
-  CommandLine="find /path/to/project -name '*.pyc' -type f -delete",
-  Cwd="/path/to/project",
-  SafeToAutoRun=false,  # ❌ 破壊的操作は絶対に auto-run しない
-  WaitMsBeforeAsync=5000
-)
-```
-
-**解説**: `SafeToAutoRun` は「安全かどうか」の判断が要。ファイルの読取、`ls`、`cat` 等の非破壊操作は `true` で良いが、`rm`、`pip install`、外部 API 呼出し等は必ず `false`。ワークフローの `// turbo` 注釈がある場合のみ例外的に `true` が許可される。
-
-### Example 3: task_boundary の適切な使い分け
-
-**Input**: "このファイルのタイポを直して"
-
-**Output**: task_boundary **不使用** — 1-2回のツールコールで完了する単純タスクには不要。
-
-**Input**: "認証システムを設計・実装して"
-
-**Output**: task_boundary **使用**:
-
-```
-1. task_boundary(TaskName="Planning Auth System", Mode="PLANNING", ...)
-2. → implementation_plan.md を作成 → レビュー依頼
-3. task_boundary(TaskName="Implementing Auth System", Mode="EXECUTION", ...)
-4. → コード実装
-5. task_boundary(TaskName="Verifying Auth System", Mode="VERIFICATION", ...)
-6. → テスト実行 → walkthrough.md 作成
-```
-
-**解説**: task_boundary は「ユーザーが進捗を把握するための UI」。粒度は「一つの bullet point in task.md」に対応する。同じ TaskName 内で Mode を変えるのは OK（例: EXECUTION 中に追加調査が必要 → PLANNING に戻る）。
+| 指標 | 基準値 |
+|:-----|:-------|
+| ツール選択精度 | ≥ 90% |
+| 安全性遵守率 (SafeToAutoRun) | 100% |
+| GEMINI.md サイズ | ≤ 3,000字 |
+| 情報正確性 | ≥ 95% |
 
 ---
 
@@ -521,17 +661,59 @@ run_command(
 
 | 失敗シナリオ | 確率 | 対策 |
 |:-------------|:-----|:-----|
-| ツール仕様の変更により情報が陳腐化 | 中 | バージョン情報を明記、定期的な更新を推奨 |
-| Claude/Gemini のモデル差異を無視した助言 | 中 | モデル名を明示的に確認してから助言する |
-| SafeToAutoRun の誤判定により破壊的操作を自動実行 | 低 | 判断基準を厳格に定義、疑わしい場合は常に false |
-| コンテキストウィンドウの浪費 | 中 | GEMINI.md の圧縮原則を自ら実践する |
+| ツール仕様の変更で情報陳腐化 | 中 | バージョン明記 + 定期更新 |
+| Claude/Gemini 差異を無視した助言 | 中 | モデル名を確認してから助言 |
+| SafeToAutoRun 誤判定 | 低 | 疑わしい場合は常に false |
+| Self-Refine の腐食効果 | 中 | 難問のみ適用。簡単な問題には使わない |
+| Agent-First への過信 | 中 | 適用判断フレームワークで事前評価 |
 
 ---
 
 ## References
 
-- [Antigravity IDE 公式ドキュメント](https://antigravity.google) — ツール仕様の正本
-- [Antigravity IDE Skills ドキュメント](https://antigravity.google) — Skills / Rules / Workflows の公式ガイド
+出典元（GPT Deep Research により調査）:
+
+### テーマ1: ツール仕様調査
+
+- [Antigravity System Prompts (GitHub Gist)](https://gist.github.com/CypherpunkSamurai/f16e384ed1629cc0dd11fea33e444c17)
+- [Antigravity System Prompts (LinkedIn)](https://www.linkedin.com/pulse/googles-antigravity-system-prompt-johnmark-obiefuna--cyq6f)
+- [File Editing Bug Reports (Reddit)](https://www.reddit.com/r/Bard/comments/1p4snfs/file_editing_tool_use_seems_broken_in_antigravity/)
+- [Raw String Literal Bug (GitHub Issue #6886)](https://github.com/google-gemini/gemini-cli/issues/6886)
+- [Antigravity Codelab](https://codelabs.developers.google.com/getting-started-google-antigravity)
+
+### テーマ1.5: 未確認事項調査（Perplexity + Web検索）
+
+- [Google Developers Blog — Antigravity 公式発表](https://developers.googleblog.com/build-with-google-antigravity-our-new-agentic-development-platform/)
+- [PromptArmor — browser_subagent プロンプトインジェクション報告](https://mjtsai.com/blog/2025/11/)
+- [Gemini CLI Documentation](https://geminicli.com/docs/)
+- [Qiita: Antigravity上で4モデル比較](https://qiita.com/takashimax/items/f10d8923b058c894d6c7)
+
+### テーマ2: プロンプト最適化
+
+- [Anthropic Context Engineering](https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents)
+- [Gemini Prompt Design Strategies](https://ai.google.dev/gemini-api/docs/prompting-strategies)
+- [Claude Prompting Best Practices](https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices)
+- [Nested Data Format Comparison (JSON/YAML/XML/Markdown)](https://www.improvingagents.com/blog/best-nested-data-format/)
+- [Snorkel: Self-Critique Paradox](https://snorkel.ai/blog/the-self-critique-paradox-why-ai-verification-fails-where-its-needed-most/)
+
+### テーマ3: Agentic Coding 限界
+
+- [Devin 2025 Performance Review](https://cognition.ai/blog/devin-annual-performance-review-2025)
+- [Cursor Productivity Impact](https://cursor.com/blog/productivity)
+- [Anthropic: How AI Is Transforming Work](https://www.anthropic.com/research/how-ai-is-transforming-work-at-anthropic)
+- [Stack Overflow 2025 AI Report](https://tessl.io/blog/what-happened-devs-appear-to-use-ai-more-and-believe-it-less/)
+
+### テーマ4: browser_subagent
+
+- [Antigravity Codelab](https://codelabs.developers.google.com/getting-started-google-antigravity)
+- [Antigravity System Prompts](https://gist.github.com/Phantomn/ac35e2eb15be2eb63bc58f5eeee9c99a)
+- [Qiita: Antigravity 完全攻略ガイド](https://qiita.com/akira_papa_AI/items/0acf2679e4ce9f7fb153)
+
+### テーマ5: プロファイル設計
+
+- [Awesome CursorRules](https://github.com/PatrickJS/awesome-cursorrules)
+- [Awesome Claude Code](https://github.com/hesreallyhim/awesome-claude-code)
+- [What Great CLAUDE.md Files Have in Common](https://blog.devgenius.io/what-great-claude-md-files-have-in-common-db482172ad2c)
 
 ---
 
@@ -539,8 +721,12 @@ run_command(
 
 | Version | Date | Changes |
 |:--------|:-----|:--------|
-| 1.0.0 | 2026-02-09 | /mek+ 生成 — 初版。22ツール完全ガイド、三層設計指針、モデル最適化を収録 |
+| 1.0.0 | 2026-02-09 | /mek+ 初版生成 |
+| 2.0.0 | 2026-02-09 | GPT Deep Research テーマ2-5統合。browser_subagent 徹底ガイド、モデル別最適化、Agentic Coding 判断、IDE横断プロファイル比較、ROIデータ追加 |
+| 2.1.0 | 2026-02-09 | テーマ1（全ツール仕様調査）統合。`codebase_search`/`search_in_file` 追記、既知バグ文書化、アンチパターン10選、未確認事項12件を追加 |
+| 2.2.0 | 2026-02-09 | /dia+ audit 改善適用。未確認事項に影響度トリアージ、`view_content_chunk` 3ステップフロー、`send_command_input` 排他制約を追記 |
+| 2.3.0 | 2026-02-09 | /sop deep 調査結果統合。CRLFバグ追加、Planning/Fastモード、Terminal/JS実行ポリシー、プロンプトインジェクション警告、Perplexity出典追加 |
 
 ---
 
-*Generated by /mek+ v7.1 — Archetype: Precision — 2026-02-09*
+*Generated by /mek+ v7.1 → GPT Deep Research 5テーマ統合 — 2026-02-09*

@@ -21,8 +21,8 @@ from .guardrails.validators import CCLOutputValidator, ValidationResult
 from .learning.failure_db import get_failure_db, FailureDB
 
 
-@dataclass
 # PURPOSE: CCL 実行コンテキスト
+@dataclass
 class ExecutionContext:
     """CCL 実行コンテキスト"""
 
@@ -31,8 +31,8 @@ class ExecutionContext:
     warnings: List[str]
 
 
-@dataclass
 # PURPOSE: CCL 実行結果
+@dataclass
 class ExecutionResult:
     """CCL 実行結果"""
 
@@ -49,7 +49,7 @@ class ZeroTrustCCLExecutor:
     LLM を信用せず、構造的に正しい実行を強制する。
     """
 
-    # PURPOSE: ZeroTrustCCLExecutor の初期化 — Phase 0: 実行準備 1. 演算子仕様を注入 2. 過去の失敗から警告を生成
+    # PURPOSE: ZeroTrustCCLExecutor の初期化
     def __init__(self):
         self.injector = SpecInjector()
         self.validator = CCLOutputValidator()
@@ -157,7 +157,6 @@ class ZeroTrustCCLExecutor:
 ---
 
 ## 再生成してください
-# PURPOSE: CCL 式から LLM に渡すプロンプトを生成
 
 上記の問題を修正した出力を生成してください。
 """
@@ -166,7 +165,6 @@ class ZeroTrustCCLExecutor:
 # 便利関数
 # PURPOSE: CCL 式から LLM に渡すプロンプトを生成
 def create_ccl_prompt(ccl_expr: str) -> str:
-# PURPOSE: CCL 出力を検証
     """CCL 式から LLM に渡すプロンプトを生成"""
     executor = ZeroTrustCCLExecutor()
     context = executor.prepare(ccl_expr)

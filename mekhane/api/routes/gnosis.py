@@ -27,6 +27,7 @@ class GnosisSearchResult(BaseModel):
     score: float | None = None
 
 
+# PURPOSE: 検索レスポンスモデル
 class GnosisSearchResponse(BaseModel):
     """検索レスポンス。"""
     query: str
@@ -34,6 +35,7 @@ class GnosisSearchResponse(BaseModel):
     total: int
 
 
+# PURPOSE: 統計レスポンスモデル
 class GnosisStatsResponse(BaseModel):
     """インデックス統計。"""
     total: int = 0
@@ -73,6 +75,7 @@ def _get_index():
     return _index
 
 
+# PURPOSE: Gnōsis ベクトル検索
 @router.get("/search", response_model=GnosisSearchResponse)
 async def gnosis_search(
     q: str = Query(..., min_length=1, description="検索クエリ"),
@@ -109,6 +112,7 @@ async def gnosis_search(
     )
 
 
+# PURPOSE: Gnōsis インデックス統計
 @router.get("/stats", response_model=GnosisStatsResponse)
 async def gnosis_stats() -> GnosisStatsResponse:
     """Gnōsis インデックス統計。"""

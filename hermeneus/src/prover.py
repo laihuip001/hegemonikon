@@ -322,6 +322,7 @@ class SchemaProver(ProverInterface):
         start: float
     ) -> ProofResult:
         """フォールバック検証"""
+        import time
         required = schema.get("required", [])
         missing = [f for f in required if f not in data]
         

@@ -79,7 +79,13 @@ sel_enforcement:
 
 ## 処理フロー
 
-1. **STEP 0**: SKILL.md を view_file で読み込む（必須）
+1. **STEP 0**: SKILL.md を view_file で読み込む（必須・省略不可）
+   // turbo
+
+   ```
+   view_file /home/makaron8426/oikos/hegemonikon/.agent/skills/ousia/o1-noesis/SKILL.md
+   ```
+
 2. **PHASE 0**: 派生選択（Derivative Selection）
 3. **PHASE 0.5**: 盲点カテゴリチェック
 4. **PHASE 1**: 前提掘出（Premise Excavation）

@@ -74,6 +74,19 @@ ccl_signature: "/tek+_/dev"
 
 ---
 
+## STEP 0: SKILL.md 読込（必須・省略不可）
+
+> **環境強制**: このステップを飛ばして PHASE に進んではならない。
+> パスは以下にリテラルで記載されている。「パスがわからない」は発生しない。
+
+// turbo
+
+```
+view_file /home/makaron8426/oikos/hegemonikon/.agent/skills/perigraphe/p4-tekhne/SKILL.md
+```
+
+---
+
 ## 処理フロー
 
 1. **技法空間マッピング**: 2×2マトリクスで象限を特定

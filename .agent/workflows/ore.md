@@ -72,6 +72,19 @@ ccl_signature: "/ore+"
 
 ---
 
+## STEP 0: SKILL.md 読込（必須・省略不可）
+
+> **環境強制**: このステップを飛ばして PHASE に進んではならない。
+> パスは以下にリテラルで記載されている。「パスがわからない」は発生しない。
+
+// turbo
+
+```
+view_file /home/makaron8426/oikos/hegemonikon/.agent/skills/horme/h3-orexis/SKILL.md
+```
+
+---
+
 ## 処理フロー
 
 1. **価値傾向判定**: +(欲求: 価値あり・望ましい) / -(回避: 価値なし・避けたい)

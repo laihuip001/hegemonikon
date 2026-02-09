@@ -79,6 +79,19 @@ ccl_signature: "/met+"
 
 ---
 
+## STEP 0: SKILL.md 読込（必須・省略不可）
+
+> **環境強制**: このステップを飛ばして PHASE に進んではならない。
+> パスは以下にリテラルで記載されている。「パスがわからない」は発生しない。
+
+// turbo
+
+```
+view_file /home/makaron8426/oikos/hegemonikon/.agent/skills/schema/s1-metron/SKILL.md
+```
+
+---
+
 ## 処理フロー
 
 1. **スケール評価**: Micro(詳細・局所・短期) / Macro(全体・大局・長期) を判定

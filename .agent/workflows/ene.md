@@ -214,7 +214,13 @@ result = select_derivative("O4", problem_context)
 
 // turbo-all
 
-1. **STEP 0**: SKILL.md を view_file で読み込む ← 必須
+1. **STEP 0**: SKILL.md を view_file で読み込む（必須・省略不可）
+   // turbo
+
+   ```
+   view_file /home/makaron8426/oikos/hegemonikon/.agent/skills/ousia/o4-energeia/SKILL.md
+   ```
+
 2. **PHASE 0**: 入口確認 + Read-Resolve-Proceed
 3. **PHASE 1**: 実行（Execute）
 4. **PHASE 1.5**: Quality Gate Check
@@ -510,7 +516,6 @@ O1 Noēsis(認識:何が真実か) → O2 Boulēsis(意志:何を望むか) → 
 **保存理由**: コンテキスト節約、参照可能性、ロールバック支援
 
 ---
-
 
 ---
 

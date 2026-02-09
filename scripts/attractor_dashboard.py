@@ -70,16 +70,6 @@ def generate_attractor_data(query: str) -> dict:
     # Q6: Decomposition
     decomp = ta.suggest_decomposed(query)
 
-    # 24 定理の SimMatrix for heatmap (from prototype)
-    ta._ensure_initialized()
-    proto = ta._proto_tensor
-    if hasattr(proto, 'cpu'):
-        proto = proto.cpu().numpy()
-    import numpy as np
-    norms = np.linalg.norm(proto, axis=1, keepdims=True)
-    norms[norms == 0] = 1
-    proto_normed = proto / norms
-    sim_matrix = (proto_normed @ proto_normed.T).tolist()
 
     return {
         "query": query,
@@ -140,7 +130,6 @@ def generate_attractor_data(query: str) -> dict:
             "closest": [(t1, t2, round(d, 4)) for t1, t2, d in sep["closest_pairs"]],
             "farthest": [(t1, t2, round(d, 4)) for t1, t2, d in sep["farthest_pairs"]],
         },
-        "sim_matrix": [[round(v, 3) for v in row] for row in sim_matrix],
     }
 
 

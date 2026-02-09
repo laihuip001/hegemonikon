@@ -186,7 +186,14 @@ SKILL.md を必ず読み込んでから処理を開始する:
 
 ## Process
 
-1. **STEP 0**: SKILL.md を view_file で読み込む（必須）
+1. **STEP 0**: SKILL.md を view_file で読み込む（必須・省略不可）
+   // turbo
+
+   ```
+   view_file /home/makaron8426/oikos/hegemonikon/mekhane/ergasterion/tekhne/SKILL.md
+   view_file /home/makaron8426/oikos/hegemonikon/.agent/skills/schema/s2-mekhane/SKILL.md
+   ```
+
 2. **STEP 1**: モード判定 (1分)
    - 明示的指定がない場合 → Generate
    - diagnose/improve → 対象ファイル読み込み

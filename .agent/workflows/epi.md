@@ -73,6 +73,19 @@ ccl_signature: "/epi+"
 
 ---
 
+## STEP 0: SKILL.md 読込（必須・省略不可）
+
+> **環境強制**: このステップを飛ばして PHASE に進んではならない。
+> パスは以下にリテラルで記載されている。「パスがわからない」は発生しない。
+
+// turbo
+
+```
+view_file /home/makaron8426/oikos/hegemonikon/.agent/skills/akribeia/a4-episteme/SKILL.md
+```
+
+---
+
 ## 処理フロー
 
 1. **確信度マトリクス評価**: C×C(確立), C×U/U×C(部分的確信), U×U(未確立)

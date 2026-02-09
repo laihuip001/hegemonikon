@@ -290,18 +290,32 @@ projects:
 
   - id: hgk-api
     name: "Hegemonikón API"
-    path: "mekhane/api"
-    summary: "FastAPI backend for Tauri v2 desktop app. Wraps mekhane modules as REST endpoints on :9696."
-    status: "active"
-    phase: "implementation"
-    entry_point: null
-    usage_trigger: null
+    path: "mekhane/api/"
+    summary: "FastAPI backend — UDS (/tmp/hgk.sock) for Tauri, TCP (:9696) for n8n/dev"
+    status: active
+    phase: operational
+    entry_point:
+      cli_uds: "python -m mekhane.api.server --uds /tmp/hgk.sock"
+      cli_tcp: "python -m mekhane.api.server --port 9696"
+    usage_trigger: "デスクトップアプリのバックエンド起動時。"
+
+  - id: hgk-app
+    name: "Hegemonikón Desktop App"
+    path: "hgk-app/"
+    summary: "サイバーパンク 3D デスクトップアプリ — Tauri v2 + Three.js"
+    status: active
+    phase: design
+    etymology: null
+    proof: false
+    entry_point:
+      dev: "cd hgk-app && npm run tauri dev"
+    usage_trigger: "デスクトップアプリの開発・ビルド時。"
 
 # ─── 統計 ─────────────────────────────────────────
-# Total: 22 entries
-# Active: 18 | Dormant: 2 | Archived: 1 | Planned: 0
+# Total: 23 entries
+# Active: 19 | Dormant: 2 | Archived: 1 | Planned: 0
 # Greek-named: 17
 # With PROOF.md: 15
-# With entry_point: 16 (v1.1.0)
-# With usage_trigger: 17 (v1.1.0)
+# With entry_point: 17 (v1.1.0)
+# With usage_trigger: 18 (v1.1.0)
 

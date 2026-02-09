@@ -59,3 +59,10 @@ if result:
 ---
 
 *v1.1 — import パス検証済み (2026-02-08)*
+
+---
+risk_tier: L1
+risks: none
+reversible: true
+requires_approval: false
+fallbacks: []

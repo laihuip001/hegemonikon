@@ -1,3 +1,9 @@
+---
+trigger: model_decision
+glob: 
+description: K-series 文脈定理の発動条件
+---
+
 # K-series（文脈定理）発動条件
 
 > **Hegemonikón K-series**: Kairos（適時）— 選択公理×選択公理 = 12文脈定理

@@ -1,8 +1,6 @@
 ---
-name: Cognitive Axioms
-version: "1.0"
-type: system_rule
-activation: passive
+trigger: model_decision
+glob:
 description: 全ワークフローに暗黙的に適用される認知的公理
 ---
 

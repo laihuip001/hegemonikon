@@ -1,11 +1,8 @@
 ---
-doc_id: "MODEL_SELECTION_GUIDE"
-version: "1.1.0"
-tier: "RULES"
-parent: "T2_KRISIS"
-activation: always_on
+trigger: model_decision
+glob: 
+description: モデル選択ガイド — 用途別推奨
 ---
-
 # Claude / Gemini モデル選択ガイド
 
 > **目的**: タスク特性に応じて最適なAIモデルを選択・推奨する。

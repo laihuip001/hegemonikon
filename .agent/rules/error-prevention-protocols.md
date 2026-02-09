@@ -1,3 +1,9 @@
+---
+trigger: model_decision
+glob: 
+description: エラー防止プロトコル体系 P1-P9
+---
+
 # エラー防止プロトコル体系 (P1-P9)
 
 > **基盤原則**: P0 (Environment over Will) - GEMINI.md 第零原則参照

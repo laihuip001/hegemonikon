@@ -1,10 +1,8 @@
 ---
-doc_id: "GEMINI_HANDOFF_PROTOCOL"
-tier: "RULES"
-applies_to: "Gemini"
-activation: manual
+trigger: manual
+glob: 
+description: Gemini専用 Handoff Protocol
 ---
-
 # Gemini 引継書生成プロトコル
 
 > **目的**: Geminiが作業完了時に、Claudeセッションへ引き継ぐための文書を自動生成する。

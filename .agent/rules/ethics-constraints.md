@@ -1,12 +1,8 @@
 ---
-doc_id: "ETHICS_CONSTRAINTS"
-version: "1.1.0"
-tier: "RULES"
-parent: "KERNEL_DOCTRINE"
-level: "3 (Artifact)"
-activation: always_on
+trigger: always_on
+glob: 
+description: 倫理的制約 — 安全性とプライバシー
 ---
-
 # 倫理的制約 (Ethics Constraints)
 
 > **位置づけ (Level 3)**: これらの制約は、Hegemonikón 64機能（Level 2: 定理）から**論理的に導出された成果物**である。

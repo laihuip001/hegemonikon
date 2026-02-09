@@ -1,9 +1,8 @@
 ---
-id: metacognition
-title: Metacognition Checkpoints（自己評価チェックポイント）
-applies_to: All LLM Agents
+trigger: model_decision
+glob: 
+description: Metacognition Checkpoints — 自己評価
 ---
-
 # Metacognition Checkpoints
 
 > **効果**: タスク間での飛ばし行動を **62% 削減**

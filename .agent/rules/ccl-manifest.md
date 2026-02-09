@@ -1,3 +1,9 @@
+---
+trigger: model_decision
+glob: 
+description: CCL式の透明性・再現性・学習性の必須規約
+---
+
 # CCL Manifest Requirement (CCL明記規約)
 
 > **CCL式の透明性・再現性・学習性を確保するための必須規約**

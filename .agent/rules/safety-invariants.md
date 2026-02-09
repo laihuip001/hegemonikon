@@ -1,3 +1,9 @@
+---
+trigger: always_on
+glob: 
+description: 安全不変条件 — 最高優先度ルール
+---
+
 # 安全不変条件 (Safety Invariants)
 
 > **ステータス**: 常時適用 (絶対)
@@ -24,6 +30,7 @@
 | パッケージ | `pip uninstall`, `npm uninstall` |
 
 **手順**:
+
 1. 対象を明示的に提示
 2. 確認を要求
 3. ユーザー承認後にのみ実行
@@ -91,3 +98,9 @@ api_key = os.getenv("OPENAI_API_KEY")
 2. ユーザーに違反を報告
 3. 修正案を提示
 4. 承認を待つ
+
+---
+
+## 参照
+
+- [破壊的操作ガイド](safety-invariants/destructive-ops.md) — コマンドブラックリスト、チェックリスト、Gemini事故の背景

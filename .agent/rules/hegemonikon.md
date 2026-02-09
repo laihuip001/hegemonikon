@@ -1,13 +1,8 @@
 ---
-doc_id: "HEGEMONIKON_AXIOMS"
-version: "3.3.0"
-tier: "RULES"
-parent: "KERNEL_DOCTRINE"
-status: "CANONICAL_TRUTH"
-activation: always_on
-updated: "2026-02-07"
+trigger: always_on
+glob: 
+description: Hegemonikón 公理体系 v3.3 — 96要素認知フレームワーク
 ---
-
 # Hegemonikón 公理体系 v3.3
 
 > **「管理などどうでもいい、美しさと正しさを損ねてはならない」**

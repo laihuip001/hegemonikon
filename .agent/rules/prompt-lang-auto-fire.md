@@ -1,12 +1,8 @@
 ---
-doc_id: "PROMPT_LANG_AUTO_FIRE"
-version: "1.0.0"
-tier: "RULES"
-parent: "KERNEL_DOCTRINE"
-status: "ENFORCED"
-activation: model_decision
+trigger: glob
+glob: **/*.prompt
+description: Prompt-Lang 自動発火ルール
 ---
-
 # prompt-lang 自動発火プロトコル
 
 > **AIがプロンプトを必要とする時、prompt-langで生成し、stagingに保存する**

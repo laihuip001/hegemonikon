@@ -1,3 +1,9 @@
+---
+trigger: model_decision
+glob: 
+description: 運用ログ収集機構 — Phase B移行判定用
+---
+
 # 運用ログ収集機構（Phase B移行判定用）
 
 > **Hegemonikón T8 Anamnēsis**: 運用実績の定量的記録

@@ -1,11 +1,8 @@
 ---
+trigger: glob
+glob: **/*.prompt
 description: .prompt ファイル編集時のプロンプト生成ルール
-activation: glob
-pattern: "**/*.prompt"
-priority: 1
-hegemonikon: Taxis
 ---
-
 # Prompt-Lang 編集ルール
 
 > **適用条件**: `.prompt` 拡張子のファイルを編集・作成する際に自動適用

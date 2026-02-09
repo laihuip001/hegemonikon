@@ -1,10 +1,8 @@
 ---
-name: derivative-selection
+trigger: model_decision
+glob: 
 description: ワークフロー実行時の派生選択ルール
-always_on: true
-priority: high
 ---
-
 # E7: Workflow Derivative Selection Protocol
 
 > **発効**: 2026-01-29  

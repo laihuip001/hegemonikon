@@ -1,12 +1,8 @@
 ---
-doc_id: "SESSION_PROTOCOL"
-version: "1.1.0"
-tier: "RULES"
-parent: "KERNEL_DOCTRINE"
-status: "ENFORCED"
-activation: always_on
+trigger: model_decision
+glob: 
+description: セッションプロトコル — 開始/終了手順
 ---
-
 # セッション管理プロトコル
 
 > **1作業 = 1ターン原則**

@@ -1,3 +1,9 @@
+---
+trigger: model_decision
+glob: 
+description: Dispatch Protocol — 静的ルール Phase A
+---
+
 # Dispatch Protocol（静的ルール Phase A）
 
 > **Hegemonikón Multi-Agent Coordination**: T-series → Agent Mapping

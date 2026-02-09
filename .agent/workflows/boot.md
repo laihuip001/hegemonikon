@@ -245,32 +245,15 @@ cd ~/oikos/hegemonikon && PYTHONPATH=. .venv/bin/python -m mekhane.pks.pks_cli a
 - Gnōsis 鮮度チェック — **Mem 内の対象の鮮度**
 - 白血球 — **Mem の未消化対象の検出**
 
-### 4.5 Skill プリロード — L の利用可能な技法を全展開
+### 4.5 Skill プリロード — L の利用可能な技法を全展開 (環境強制)
 
 > **圏論**: L が利用可能な全ての射（ツール・技法）をコンテキストに読込む。
-> コスト: 11 SKILL.md × ~50行 = ~550行 = 200K コンテキストの 0.3%。無視できる。
+> **環境強制**: `boot_integration.py` の `_load_skills()` が全 SKILL.md の内容を
+> boot 出力に直接含める。Agent は boot 出力を読むだけで全 Skill がコンテキストに入る。
+> **コスト**: ~780行 = 200K コンテキストの ~0.4%。有効コンテキストの 2-3% (許容範囲)。
 
-```bash
-# boot_integration.py の _load_skills が出力した全パスを view_file する
-for skill_md in \
-  ~/.agent/skills/code-protocols/SKILL.md \
-  ~/.agent/skills/dendron/SKILL.md \
-  ~/.agent/skills/fep-engine/SKILL.md \
-  ~/.agent/skills/gnosis-dialog/SKILL.md \
-  ~/.agent/skills/hermeneus-dispatch/SKILL.md \
-  ~/.agent/skills/peira/SKILL.md \
-  ~/.agent/skills/poiema/SKILL.md \
-  ~/.agent/skills/prompt-library/SKILL.md \
-  ~/.agent/skills/synedrion/SKILL.md \
-  ~/.agent/skills/synteleia/SKILL.md \
-  ~/.agent/skills/taxis/SKILL.md \
-; do
-  echo "--- $skill_md ---"
-done
-```
-
-> ⚠️ **上記は参考用**。実際には Agent が各 SKILL.md を `view_file` で読み込むこと。
-> Boot レポートの Skills セクションにパス一覧が出力されるので、全件 view_file する。
+Phase 0 の `boot_integration.py --mode` 実行で自動的にプリロードされる。
+追加操作は不要 (view_file も不要)。
 
 ---
 

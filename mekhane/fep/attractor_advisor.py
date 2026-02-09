@@ -21,6 +21,11 @@ from mekhane.fep.attractor import (
     SuggestResult,
     DecomposeResult,
 )
+from mekhane.fep.theorem_attractor import (
+    TheoremAttractor,
+    THEOREM_DEFINITIONS,
+    THEOREM_KEYS,
+)
 from mekhane.fep.category import CognitiveType, COGNITIVE_TYPES
 from mekhane.fep.cone_builder import (
     classify_cognitive_type,
@@ -48,6 +53,8 @@ class AttractorAdvisor:
     # PURPOSE: Attractor推薦結果をWFディスパッチに変換する中間層
     def __init__(self, force_cpu: bool = False, use_gnosis: bool = True):
         self._attractor = SeriesAttractor(force_cpu=force_cpu)
+        self._theorem_attractor: TheoremAttractor | None = None  # lazy init
+        self._force_cpu = force_cpu
         self._use_gnosis = use_gnosis
 
     # PURPOSE: ユーザー入力からワークフロー推薦を生成する。
@@ -234,6 +241,86 @@ class AttractorAdvisor:
         return "\n".join(lines)
 
     # PURPOSE: Problem D — 複合入力を分解して各セグメントごとに推薦する
+    # PURPOSE: 定理レベルのワークフロー推薦を生成する
+    def recommend_theorem(self, user_input: str, top_k: int = 3) -> "TheoremRecommendation":
+        """TheoremAttractor を使って定理レベルの WF dispatch を行う。
+
+        Series レベルの recommend() が「O-series → /noe, /bou, /zet, /ene」と
+        複数候補を返すのに対し、こちらは「O1 → /noe」と 1:1 で直接 dispatch する。
+
+        Returns:
+            TheoremRecommendation with ranked theorem→WF pairs and inhibition info.
+        """
+        if self._theorem_attractor is None:
+            self._theorem_attractor = TheoremAttractor(
+                force_cpu=self._force_cpu, enable_memory=True,
+            )
+        ta = self._theorem_attractor
+
+        # Top-k suggest
+        results = ta.suggest(user_input, top_k=top_k)
+        if not results:
+            return TheoremRecommendation(
+                theorem_workflows=[],
+                primary_theorem="",
+                primary_command="",
+                advice="引力圏外。定理レベルで収束しません。",
+                inhibited=[],
+                confidence=0.0,
+            )
+
+        primary = results[0]
+        theorem_wfs = []
+        for r in results:
+            defn = THEOREM_DEFINITIONS.get(r.theorem, {})
+            theorem_wfs.append((
+                r.theorem,
+                defn.get("name", ""),
+                defn.get("command", ""),
+                round(r.similarity, 4),
+            ))
+
+        # Inhibition: top-1 が何を抑制するか
+        inhibited = ta.get_inhibited(primary.theorem, threshold=0.03)
+
+        # Advice
+        primary_defn = THEOREM_DEFINITIONS.get(primary.theorem, {})
+        primary_cmd = primary_defn.get("command", "")
+        advice = (
+            f"{primary.theorem} ({primary_defn.get('name', '')}) に収束。"
+            f"Dispatch: {primary_cmd}"
+        )
+        if len(results) > 1:
+            alts = ", ".join(f"{r.theorem}({THEOREM_DEFINITIONS[r.theorem]['command']})" for r in results[1:])
+            advice += f" | Alt: {alts}"
+
+        return TheoremRecommendation(
+            theorem_workflows=theorem_wfs,
+            primary_theorem=primary.theorem,
+            primary_command=primary_cmd,
+            advice=advice,
+            inhibited=[(t, round(s, 4)) for t, s in inhibited[:5]],
+            confidence=round(primary.similarity, 4),
+        )
+
+    # PURPOSE: LLM プロンプトに注入する定理レベル推薦を生成
+    def format_theorem_for_llm(self, user_input: str) -> str:
+        """LLM のシステムプロンプトに定理レベル推薦を注入."""
+        rec = self.recommend_theorem(user_input)
+        if not rec.primary_theorem:
+            return ""
+
+        parts = [f"[TheoremDispatch: {rec.primary_theorem} → {rec.primary_command}]"]
+        if len(rec.theorem_workflows) > 1:
+            alts = " | ".join(
+                f"{t}({cmd})" for t, _, cmd, _ in rec.theorem_workflows[1:]
+            )
+            parts.append(f"  Alternatives: {alts}")
+        if rec.inhibited:
+            inh = ", ".join(f"{t}" for t, _ in rec.inhibited[:3])
+            parts.append(f"  Inhibited: {inh}")
+        return "\n".join(parts)
+
     def recommend_compound(self, user_input: str) -> CompoundRecommendation:
         """複合入力を文分解し、各セグメントごとに推薦を生成する。
 
@@ -415,6 +502,24 @@ class CompoundRecommendation:
             f"{len(self.segments)} segments | "
             f"{len(self.merged_workflows)} WFs⟩"
         )
+
+
+# PURPOSE: 定理レベルのワークフロー推薦結果
+@dataclass
+class TheoremRecommendation:
+    """定理レベルの WF dispatch 結果.
+
+    Series→複数WF ではなく、Theorem→単一WF の 1:1 dispatch。
+    """
+    theorem_workflows: list[tuple[str, str, str, float]]  # [(theorem, name, command, sim)]
+    primary_theorem: str
+    primary_command: str
+    advice: str
+    inhibited: list[tuple[str, float]]  # 抑制対象
+    confidence: float
+
+    def __repr__(self) -> str:
+        return f"⟨TheoremRec: {self.primary_theorem}→{self.primary_command} | conf={self.confidence:.3f}⟩"
 
 
 # PURPOSE: CLI: python -m mekhane.fep.attractor_advisor "入力テキスト"

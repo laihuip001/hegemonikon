@@ -1,4 +1,10 @@
 ---
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks: []
+fallbacks: []
+---
 id: "U1"
 name: antigravity-ide-expert
 series: Utils
@@ -47,6 +53,11 @@ related:
 lineage: "/mek+ → 2026-02-09 — Antigravity IDE 公式ドキュメント + GPT Deep Research 5テーマ + 実運用経験から構築"
 anti_skip: enabled
 version: "2.3.0"
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks: []
+fallbacks: []
 ---
 
 ## Overview
@@ -63,6 +74,11 @@ version: "2.3.0"
 - **GEMINI.md 設計**: 各IDE プロファイル比較 + ベストプラクティス
 - **Agentic Coding 適用判断**: タスク別有効性評価 + 失敗パターン分類
 
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks: []
+fallbacks: []
 ---
 
 ## Core Behavior
@@ -82,6 +98,11 @@ Antigravity IDE 専門家エージェントとして、以下の行動原則に�
 11. **Trust but Verify**: エージェント出力は常に検証を前提とする
 12. **バージョン意識**: 2026年2月時点の情報。変更可能性がある機能には注記
 
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks: []
+fallbacks: []
 ---
 
 ## Antigravity IDE アーキテクチャ
@@ -152,6 +173,11 @@ project-root/
 └── src/
 ```
 
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks: []
+fallbacks: []
 ---
 
 ## ツール完全ガイド
@@ -247,6 +273,11 @@ project-root/
 | `search_web` | Web 検索 |
 | `list_resources` / `read_resource` | MCP サーバーリソース |
 
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks: []
+fallbacks: []
 ---
 
 ## browser_subagent 徹底ガイド
@@ -357,6 +388,11 @@ project-root/
 | **CAPTCHA/ログインブロック** | Bot検出 | 「停止してスクショ付き報告」を指示。人間介入待ち |
 | **JS描画完了待ち** | フロントフレームワークの遅延 | 安定状態まで少し待つ指示。全体タイムアウト内に収める |
 
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks: []
+fallbacks: []
 ---
 
 ## モデル別プロンプト最適化（2026年最新知見）
@@ -397,6 +433,11 @@ project-root/
 | ツール使用 | 自発的に活用（過度なら緩和指示） | 明示的に条件を伝える |
 | 強み | 深い分析・レビュー | マルチモーダル・検索連携 |
 
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks: []
+fallbacks: []
 ---
 
 ## Agentic Coding 適用判断フレームワーク
@@ -446,6 +487,11 @@ project-root/
 | ROI達成期間 | 2-3ヶ月 | 業界推計 |
 | ⚠️ AI回答のデバッグ工数 | 66%が増加と感じる | SO調査2025 |
 
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks: []
+fallbacks: []
 ---
 
 ## プロジェクトプロファイル設計（IDE 横断比較）
@@ -502,6 +548,11 @@ Antigravity は AGENTS.md を標準では無視するが、GEMINI.md に以下�
 - 上記ルールを自動実行して追加指示を読み込むこと
 ```
 
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks: []
+fallbacks: []
 ---
 
 ## Skills / Rules / Workflows 設計指針
@@ -542,14 +593,29 @@ Antigravity は AGENTS.md を標準では無視するが、GEMINI.md に以下�
 ### Workflow の書き方
 
 ```yaml
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks: []
+fallbacks: []
 ---
 description: [1行説明]
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks: []
+fallbacks: []
 ---
 ```
 
 - `// turbo`: 直下のステップのみ auto-run 許可
 - `// turbo-all`: 全ステップ auto-run 許可
 
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks: []
+fallbacks: []
 ---
 
 ## Artifacts 運用ガイド
@@ -575,6 +641,11 @@ description: [1行説明]
 - `EXECUTION`: コード実装
 - `VERIFICATION`: テスト・検証 → walkthrough.md 作成
 
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks: []
+fallbacks: []
 ---
 
 ## ツール詳細仕様・既知の問題
@@ -624,6 +695,11 @@ description: [1行説明]
 | `view_file_outline` | 1ページあたりの表示アイテム上限（推定~50件） | ⚪ 低 |
 | `write_to_file` | 書込み後の応答詳細（UI側処理でエージェントには非通知の可能性） | ⚪ 低 |
 
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks: []
+fallbacks: []
 ---
 
 ## Edge Cases
@@ -644,6 +720,11 @@ description: [1行説明]
 | CRLF ファイルの編集失敗 | `dos2unix` で LF に変換後に編集 | エディタで改行コードを確認 |
 | browser_subagent でプロンプトインジェクション | 信頼できないURLは避ける。結果を検証 | ユーザーに確認を促す |
 
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks: []
+fallbacks: []
 ---
 
 ## Quality Standards
@@ -655,6 +736,11 @@ description: [1行説明]
 | GEMINI.md サイズ | ≤ 3,000字 |
 | 情報正確性 | ≥ 95% |
 
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks: []
+fallbacks: []
 ---
 
 ## Pre-mortem
@@ -667,6 +753,11 @@ description: [1行説明]
 | Self-Refine の腐食効果 | 中 | 難問のみ適用。簡単な問題には使わない |
 | Agent-First への過信 | 中 | 適用判断フレームワークで事前評価 |
 
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks: []
+fallbacks: []
 ---
 
 ## References
@@ -715,6 +806,11 @@ description: [1行説明]
 - [Awesome Claude Code](https://github.com/hesreallyhim/awesome-claude-code)
 - [What Great CLAUDE.md Files Have in Common](https://blog.devgenius.io/what-great-claude-md-files-have-in-common-db482172ad2c)
 
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks: []
+fallbacks: []
 ---
 
 ## Version History
@@ -727,6 +823,11 @@ description: [1行説明]
 | 2.2.0 | 2026-02-09 | /dia+ audit 改善適用。未確認事項に影響度トリアージ、`view_content_chunk` 3ステップフロー、`send_command_input` 排他制約を追記 |
 | 2.3.0 | 2026-02-09 | /sop deep 調査結果統合。CRLFバグ追加、Planning/Fastモード、Terminal/JS実行ポリシー、プロンプトインジェクション警告、Perplexity出典追加 |
 
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks: []
+fallbacks: []
 ---
 
 *Generated by /mek+ v7.1 → GPT Deep Research 5テーマ統合 — 2026-02-09*

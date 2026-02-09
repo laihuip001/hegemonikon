@@ -1,4 +1,10 @@
 ---
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks: []
+fallbacks: []
+---
 name: Poiema Generator
 description: 構造化出力の生成 (Boot レポート, Handoff, 定型ドキュメント)
 triggers:
@@ -9,6 +15,11 @@ triggers:
   - "poiema"
   - "テンプレート"
   - "ドキュメント生成"
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks: []
+fallbacks: []
 ---
 
 # Poiema Generator
@@ -71,6 +82,11 @@ print(f'Mapping: {len(mapping)} entries')
 
 > ⚠️ `INPUT_TEXT` を実際のテキストに置換。
 
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks: []
+fallbacks: []
 ---
 
 *v1.1 — import パス検証済み (2026-02-09)*

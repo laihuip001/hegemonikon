@@ -88,12 +88,14 @@ class TestRecommendationDataclass(unittest.TestCase):
             advice="test advice",
             workflows=["/dia"],
             series=["A"],
-            oscillation=OscillationType.STABLE,
+            oscillation=OscillationType.CLEAR,
             confidence=0.9,
             interpretation=OscillationDiagnosis(
-                type=OscillationType.STABLE,
-                divergence_score=0.1,
-                stability_confidence=0.9,
+                oscillation=OscillationType.CLEAR,
+                theory="test",
+                action="proceed",
+                morphisms=[],
+                confidence_modifier=0.0,
             ),
         )
         self.assertEqual(rec.advice, "test advice")
@@ -106,16 +108,18 @@ class TestRecommendationDataclass(unittest.TestCase):
             advice="test",
             workflows=["/noe"],
             series=["O"],
-            oscillation=OscillationType.STABLE,
+            oscillation=OscillationType.CLEAR,
             confidence=0.8,
             interpretation=OscillationDiagnosis(
-                type=OscillationType.STABLE,
-                divergence_score=0.0,
-                stability_confidence=1.0,
+                oscillation=OscillationType.CLEAR,
+                theory="test",
+                action="proceed",
+                morphisms=[],
+                confidence_modifier=0.0,
             ),
         )
         r = repr(rec)
-        self.assertIn("Recommendation", r)
+        self.assertIn("Rec:", r)
 
     def test_default_fields(self):
         from mekhane.fep.attractor import OscillationType, OscillationDiagnosis
@@ -124,12 +128,14 @@ class TestRecommendationDataclass(unittest.TestCase):
             advice="",
             workflows=[],
             series=[],
-            oscillation=OscillationType.STABLE,
+            oscillation=OscillationType.CLEAR,
             confidence=0.0,
             interpretation=OscillationDiagnosis(
-                type=OscillationType.STABLE,
-                divergence_score=0.0,
-                stability_confidence=1.0,
+                oscillation=OscillationType.CLEAR,
+                theory="test",
+                action="proceed",
+                morphisms=[],
+                confidence_modifier=0.0,
             ),
         )
         self.assertEqual(rec.cognitive_types, {})

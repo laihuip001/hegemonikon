@@ -1,13 +1,12 @@
 #!/usr/bin/env python3
+# PROOF: [L2/PKS] <- mekhane/pks/external_search.py
 # PURPOSE: 外部知識検索 (Perplexity API 統合)
 """
-PROOF: [L2/インフラ] このファイルは存在しなければならない
+PerplexitySearch — 外部知識検索
 
 A0 (FEP) → Gnōsis 内部知識だけでは自由エネルギーの最小化に限界
 → 外部知識ソースとの統合が能動的推論を完成させる
 → external_search.py が担う
-
-# PURPOSE: Perplexity API 経由の外部知識検索
 """
 
 from __future__ import annotations

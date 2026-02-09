@@ -1,13 +1,11 @@
 #!/usr/bin/env python3
+# PROOF: [L2/PKS] <- mekhane/pks/push_dialog.py
 # PURPOSE: Push された知識への対話インターフェース
 """
-PROOF: [L2/インフラ] このファイルは存在しなければならない
+PushDialog — 推薦知識への対話的アクセス
 
 A0 (FEP) → 能動的推論 = 受身のプッシュではなく対話的探求
 → Creator が「なぜ？」「もっと」「関連は？」と問える
-→ push_dialog.py が担う
-
-# PURPOSE: PushDialog — 推薦知識への対話的アクセス
 """
 
 from __future__ import annotations

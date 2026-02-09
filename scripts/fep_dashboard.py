@@ -219,6 +219,11 @@ body {{
     margin-bottom: 16px;
     font-weight: 500;
 }}
+.chart-container {{
+    position: relative;
+    width: 100%;
+    min-height: 200px;
+}}
 canvas {{ width: 100% !important; }}
 .phase-list {{
     display: flex;
@@ -234,6 +239,22 @@ canvas {{ width: 100% !important; }}
     font-size: 0.75rem;
     color: #63b3ed;
 }}
+.empty-state {{
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: rgba(26, 32, 44, 0.4);
+    border-radius: 8px;
+    color: #a0aec0;
+    text-align: center;
+    pointer-events: none;
+    display: none;
+}}
+.empty-state p {{ font-weight: 600; margin-bottom: 6px; color: #cbd5e0; }}
+.empty-state small {{ font-size: 0.85em; opacity: 0.7; color: #718096; }}
 </style>
 </head>
 <body>
@@ -272,17 +293,23 @@ canvas {{ width: 100% !important; }}
 <div class="charts">
     <div class="chart-card full">
         <h3>📈 Entropy Over Time (Sliding Window = 50)</h3>
-        <canvas id="entropyChart" height="80"></canvas>
+        <div class="chart-container">
+            <canvas id="entropyChart" height="80" role="img" aria-label="Line chart showing entropy over time"></canvas>
+        </div>
     </div>
 
     <div class="chart-card">
         <h3>🎯 Action Distribution</h3>
-        <canvas id="actionChart" height="200"></canvas>
+        <div class="chart-container">
+            <canvas id="actionChart" height="200" role="img" aria-label="Doughnut chart showing action distribution"></canvas>
+        </div>
     </div>
 
     <div class="chart-card">
         <h3>📊 Series Distribution</h3>
-        <canvas id="seriesChart" height="200"></canvas>
+        <div class="chart-container">
+            <canvas id="seriesChart" height="200" role="img" aria-label="Doughnut chart showing series distribution"></canvas>
+        </div>
     </div>
 
     <div class="chart-card full">
@@ -294,12 +321,24 @@ canvas {{ width: 100% !important; }}
 
     <div class="chart-card">
         <h3>🔍 Explanation Stack — Advice Actions</h3>
-        <canvas id="adviceChart" height="200"></canvas>
+        <div class="chart-container">
+            <canvas id="adviceChart" height="200" role="img" aria-label="Doughnut chart showing advice action distribution"></canvas>
+            <div id="adviceEmpty" class="empty-state">
+                <p>No ES Data</p>
+                <small>Add 'advice_action' to log entries</small>
+            </div>
+        </div>
     </div>
 
     <div class="chart-card">
         <h3>📋 Explanation Stack — Matched Rules</h3>
-        <canvas id="rulesChart" height="200"></canvas>
+        <div class="chart-container">
+            <canvas id="rulesChart" height="200" role="img" aria-label="Bar chart showing matched rules distribution"></canvas>
+            <div id="rulesEmpty" class="empty-state">
+                <p>No ES Data</p>
+                <small>Add 'matched_rule' to log entries</small>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -328,6 +367,7 @@ new Chart(entropyCtx, {{
     }},
     options: {{
         responsive: true,
+        maintainAspectRatio: false,
         scales: {{
             x: {{ display: false }},
             y: {{
@@ -354,6 +394,7 @@ new Chart(actionCtx, {{
     }},
     options: {{
         responsive: true,
+        maintainAspectRatio: false,
         plugins: {{ legend: {{ position: 'bottom', labels: {{ color: '#a0aec0', padding: 12 }} }} }}
     }}
 }});
@@ -374,6 +415,7 @@ new Chart(seriesCtx, {{
     }},
     options: {{
         responsive: true,
+        maintainAspectRatio: false,
         plugins: {{ legend: {{ position: 'bottom', labels: {{ color: '#a0aec0', padding: 12 }} }} }}
     }}
 }});
@@ -382,6 +424,7 @@ new Chart(seriesCtx, {{
 const adviceCtx = document.getElementById('adviceChart').getContext('2d');
 const adviceData = {json.dumps(analysis['advice_action_counts'])};
 if (Object.keys(adviceData).length > 0) {{
+    document.getElementById('adviceEmpty').style.display = 'none';
     new Chart(adviceCtx, {{
         type: 'doughnut',
         data: {{
@@ -394,19 +437,20 @@ if (Object.keys(adviceData).length > 0) {{
         }},
         options: {{
             responsive: true,
+            maintainAspectRatio: false,
             plugins: {{ legend: {{ position: 'bottom', labels: {{ color: '#a0aec0', padding: 12 }} }} }}
         }}
     }});
 }} else {{
-    adviceCtx.font = '14px Inter';
-    adviceCtx.fillStyle = '#718096';
-    adviceCtx.fillText('No ES data in log (add advice_action to log entries)', 20, 100);
+    document.getElementById('adviceEmpty').style.display = 'flex';
+    document.getElementById('adviceChart').style.display = 'none';
 }}
 
 // ES: Matched rules chart
 const rulesCtx = document.getElementById('rulesChart').getContext('2d');
 const rulesData = {json.dumps(analysis['matched_rule_counts'])};
 if (Object.keys(rulesData).length > 0) {{
+    document.getElementById('rulesEmpty').style.display = 'none';
     new Chart(rulesCtx, {{
         type: 'bar',
         data: {{
@@ -421,6 +465,7 @@ if (Object.keys(rulesData).length > 0) {{
         }},
         options: {{
             responsive: true,
+            maintainAspectRatio: false,
             indexAxis: 'y',
             scales: {{
                 x: {{ grid: {{ color: 'rgba(255,255,255,0.05)' }}, ticks: {{ color: '#718096' }} }},
@@ -430,9 +475,8 @@ if (Object.keys(rulesData).length > 0) {{
         }}
     }});
 }} else {{
-    rulesCtx.font = '14px Inter';
-    rulesCtx.fillStyle = '#718096';
-    rulesCtx.fillText('No ES data in log (add matched_rule to log entries)', 20, 100);
+    document.getElementById('rulesEmpty').style.display = 'flex';
+    document.getElementById('rulesChart').style.display = 'none';
 }}
 </script>
 </body>

@@ -86,11 +86,3 @@ print(llm_fmt)
 ---
 
 *v1.1 — import パス検証済み (2026-02-08)*
-
-risk_tier: L1
-reversible: true
-requires_approval: false
-risks:
-  - Implicit assumptions
-fallbacks:
-  - Manual intervention

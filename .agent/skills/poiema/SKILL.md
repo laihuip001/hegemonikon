@@ -74,11 +74,3 @@ print(f'Mapping: {len(mapping)} entries')
 ---
 
 *v1.1 — import パス検証済み (2026-02-09)*
-
-risk_tier: L1
-reversible: true
-requires_approval: false
-risks:
-  - Implicit assumptions
-fallbacks:
-  - Manual intervention

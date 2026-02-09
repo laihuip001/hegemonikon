@@ -51,11 +51,3 @@ cd ~/oikos/hegemonikon && PYTHONPATH=. .venv/bin/python scripts/generate_proofs.
 ---
 
 *v1.0 — 全PJ IDE配線 (2026-02-08)*
-
-risk_tier: L1
-reversible: true
-requires_approval: false
-risks:
-  - Implicit assumptions
-fallbacks:
-  - Manual intervention

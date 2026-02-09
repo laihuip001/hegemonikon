@@ -86,3 +86,12 @@ print(llm_fmt)
 ---
 
 *v1.1 — import パス検証済み (2026-02-08)*
+
+## Risk Assessment
+
+- **risk_tier**: L1
+- **risks**:
+  - None identified for this utility skill.
+- **reversible**: true
+- **requires_approval**: false
+- **fallbacks**: []

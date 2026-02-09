@@ -40,3 +40,12 @@ cd ~/oikos/hegemonikon && PYTHONPATH=. .venv/bin/python -m pytest --tb=short -q 
 ---
 
 *v1.0 — 全PJ IDE配線 (2026-02-08)*
+
+## Risk Assessment
+
+- **risk_tier**: L1
+- **risks**:
+  - None identified for this utility skill.
+- **reversible**: true
+- **requires_approval**: false
+- **fallbacks**: []

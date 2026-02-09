@@ -177,3 +177,12 @@ AST の構造に従って、**左から右、深さ優先で** WF を実行す�
 ---
 
 *v3.0 — MacroExecutor 統合 + Step 1.5 (マクロ実行計画) 追加 (2026-02-09)*
+
+## Risk Assessment
+
+- **risk_tier**: L1
+- **risks**:
+  - None identified for this utility skill.
+- **reversible**: true
+- **requires_approval**: false
+- **fallbacks**: []

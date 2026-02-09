@@ -142,7 +142,9 @@ for series_id in SERIES:
 
 # --- Pydantic Models ---
 
+# PURPOSE: グラフノードの定義
 class GraphNode(BaseModel):
+    """グラフノードの定義"""
     id: str
     series: str
     name: str
@@ -153,7 +155,9 @@ class GraphNode(BaseModel):
     color: str
     position: dict[str, float]
 
+# PURPOSE: グラフエッジの定義
 class GraphEdge(BaseModel):
+    """グラフエッジの定義"""
     id: str
     pair: str
     source: str
@@ -163,7 +167,9 @@ class GraphEdge(BaseModel):
     meaning: str
     type: str = Field(description="anchor, bridge, or identity")
 
+# PURPOSE: グラフ全データの定義
 class GraphFullResponse(BaseModel):
+    """グラフ全データの定義"""
     nodes: list[GraphNode]
     edges: list[GraphEdge]
     meta: dict[str, Any]

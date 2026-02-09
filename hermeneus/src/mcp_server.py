@@ -30,6 +30,10 @@ try:
 except ImportError:
     MCP_AVAILABLE = False
     Server = None
+    # Dummy types for type hints to avoid NameError
+    Tool = Any
+    TextContent = Any
+    CallToolResult = Any
 
 
 # =============================================================================

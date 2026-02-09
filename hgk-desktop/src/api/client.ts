@@ -1,11 +1,29 @@
-import { fetch } from '@tauri-apps/plugin-http';
 import type { paths, components } from '../api-types';
 
 const API_BASE = 'http://127.0.0.1:9696';
 
+// Tauri 環境判定: __TAURI_INTERNALS__ 存在時のみ Tauri fetch を使用
+let resolvedFetch: typeof globalThis.fetch | null = null;
+
+async function getFetch(): Promise<typeof globalThis.fetch> {
+    if (resolvedFetch) return resolvedFetch;
+    if ((window as any).__TAURI_INTERNALS__) {
+        try {
+            const mod = await import('@tauri-apps/plugin-http');
+            resolvedFetch = mod.fetch as unknown as typeof globalThis.fetch;
+        } catch {
+            resolvedFetch = globalThis.fetch;
+        }
+    } else {
+        resolvedFetch = globalThis.fetch;
+    }
+    return resolvedFetch;
+}
+
 // Helper for type-safe fetch
 async function apiFetch<T>(path: string, options?: RequestInit): Promise<T> {
-    const response = await fetch(`${API_BASE}${path}`, options);
+    const fetchFn = await getFetch();
+    const response = await fetchFn(`${API_BASE}${path}`, options);
     if (!response.ok) {
         throw new Error(`API Error: ${response.status} ${response.statusText}`);
     }
@@ -56,4 +74,45 @@ export const api = {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ wf_name: wfName, content, mode }),
         }),
+
+    // Graph
+    graphNodes: () => apiFetch<GraphNode[]>('/api/graph/nodes'),
+    graphEdges: () => apiFetch<GraphEdge[]>('/api/graph/edges'),
+    graphFull: () => apiFetch<GraphFullResponse>('/api/graph/full'),
 };
+
+// --- Graph Types ---
+export interface GraphNode {
+    id: string;
+    series: string;
+    name: string;
+    greek: string;
+    meaning: string;
+    workflow: string;
+    type: string;
+    color: string;
+    position: { x: number; y: number; z: number };
+}
+
+export interface GraphEdge {
+    id: string;
+    pair: string;
+    source: string;
+    target: string;
+    shared_coordinate: string;
+    naturality: string;
+    meaning: string;
+    type: string;
+}
+
+export interface GraphFullResponse {
+    nodes: GraphNode[];
+    edges: GraphEdge[];
+    meta: {
+        total_nodes: number;
+        total_edges: number;
+        series: Record<string, { name: string; color: string; theorems: number }>;
+        trigonon: { vertices: string[]; description: string };
+        naturality: Record<string, string>;
+    };
+}

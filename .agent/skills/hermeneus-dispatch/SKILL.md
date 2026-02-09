@@ -14,6 +14,15 @@ triggers:
   - "ワークフロー式"
   - "演算子"
 version: "3.0"
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks:
+  - "パースエラーによる実行中断"
+  - "誤ったAST解釈による意図しない実行順序"
+fallbacks:
+  - "手動での段階的実行"
+  - "シンプルなCCL式への書き換え提案"
 ---
 
 # Hermēneus CCL Dispatch v3.0

@@ -13,6 +13,13 @@ triggers:
   - "パイプライン"
   - "attractor"
   - "series"
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks:
+  - "none"
+fallbacks:
+  - "manual"
 ---
 
 # FEP Cognitive Engine

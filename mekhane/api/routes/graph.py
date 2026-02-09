@@ -177,18 +177,21 @@ class GraphFullResponse(BaseModel):
 router = APIRouter(prefix="/graph", tags=["graph"])
 
 
+# PURPOSE: 24 定理ノードを取得
 @router.get("/nodes", response_model=list[GraphNode])
 async def get_graph_nodes() -> list[GraphNode]:
     """24 定理ノードを返す。"""
     return [GraphNode(**t) for t in THEOREMS]
 
 
+# PURPOSE: 78 X-series エッジを取得
 @router.get("/edges", response_model=list[GraphEdge])
 async def get_graph_edges() -> list[GraphEdge]:
     """78 X-series エッジを返す (72 relations + 6 identity morphisms)。"""
     return [GraphEdge(**e) for e in EDGES]
 
 
+# PURPOSE: グラフ全データを一括取得
 @router.get("/full", response_model=GraphFullResponse)
 async def get_graph_full() -> GraphFullResponse:
     """ノード + エッジ + メタデータを一括で返す。"""

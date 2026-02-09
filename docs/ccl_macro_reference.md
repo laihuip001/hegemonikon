@@ -218,7 +218,7 @@ F:3{@fix}         # 3回繰り返し修正
 ### @tak — タスク整理 (v2.0)
 
 ```ccl
-@tak = /s1 _ F:3{/sta~/chr} _ F:3{/kho~/zet} _ ?gap{/sop} _ /euk _ /bou
+@tak = /s1 _ F:3{/sta~/chr} _ F:3{/kho~/zet} _ I:gap{/sop} _ /euk _ /bou
 ```
 
 **用途**: TODO/タスク/アイデアを整理・分類
@@ -228,8 +228,37 @@ F:3{@fix}         # 3回繰り返し修正
 1. `/s1` — スケール設定
 2. `F:3{/sta~/chr}` — 基準×時間を3回振動
 3. `F:3{/kho~/zet}` — 空間×探求を3回振動
-4. `?gap{/sop}` — ギャップあれば調査
+4. `I:gap{/sop}` — ギャップあれば調査
 5. `/euk_/bou` — 好機判定→意志確認
+
+---
+
+## 追加マクロ
+
+### @v — 自己検証 (v2.0 → macro)
+
+```ccl
+@v = /kho{git_diff} _ @fix _ /pra{test} _ /pis _ /dox
+```
+
+**用途**: 実装完了後の構造的自己検証
+
+**解説**:
+
+1. `/kho{git_diff}` — スコープ検出 (P1 Khōra)
+2. `@fix` — 5角度スキャン→修正→再批判 (A2 Krisis + O4 Energeia)
+3. `/pra{test}` — テスト実行 (S4 Praxis)
+4. `/pis` — 確信度検証 (H2 Pistis)
+5. `/dox` — 発見パターンの永続化 (H4 Doxa)
+
+**使用例**:
+
+```ccl
+@v               # 標準検証
+@v+              # 詳細検証 (全WFを+)
+F:3{@v}          # 3回ループ検証
+@v _ /dia+       # 検証後に敵対的レビュー
+```
 
 ---
 
@@ -239,8 +268,8 @@ F:3{@fix}         # 3回繰り返し修正
 
 ```ccl
 @proof = /noe{axiom:FEP}~/dia _
-  I:confidence=1 { /ene{output:PROOF.md} }
-  else { /ene{action:move, to:_limbo/} }
+  I:confidence=1{/ene{output:PROOF.md}} _
+  E:{/ene{action:move, to:_limbo/}}
 ```
 
 **用途**: ファイル/ディレクトリの存在理由を証明

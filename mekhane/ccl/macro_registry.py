@@ -85,6 +85,49 @@ BUILTIN_MACROS: Dict[str, Macro] = {
         description="目覚め: 詳細ブート→深掘り→計画のセッション開始シーケンス",
         is_builtin=True,
     ),
+    # === v2.5 Macros ===
+    "tak": Macro(
+        name="tak",
+        ccl="/s1_F:3{/sta~/chr}_F:3{/kho~/zet}_I:gap{/sop}_/euk_/bou",
+        description="タスク整理: スケール→基準×時間→空間×探求→ギャップ調査→好機→意志",
+        is_builtin=True,
+    ),
+    "v": Macro(
+        name="v",
+        ccl="/kho{git_diff}_@fix_/pra{test}_/pis_/dox",
+        description="自己検証: スコープ検出→修正サイクル→テスト→確信度→Doxa永続化",
+        is_builtin=True,
+    ),
+    "why": Macro(
+        name="why",
+        ccl="F:5{/zet{why}}_/noe{root_cause}",
+        description="Five Whys: 5回問い→深い認識で根本原因を発見",
+        is_builtin=True,
+    ),
+    "eat": Macro(
+        name="eat",
+        ccl="/mek{digest}_/ene{mapping}_/dia{quality}_/dox",
+        description="消化: 調理→マッピング→品質判定→永続化",
+        is_builtin=True,
+    ),
+    "fit": Macro(
+        name="fit",
+        ccl="/dia{naturality}_/pis{integration}",
+        description="消化品質診断: 可換性検証→統合確認",
+        is_builtin=True,
+    ),
+    "lex": Macro(
+        name="lex",
+        ccl="/dia{expression}_/gno{feedback}",
+        description="表現分析: プロンプト表現の批判→フィードバック",
+        is_builtin=True,
+    ),
+    "vet": Macro(
+        name="vet",
+        ccl="/dia+{cross_model}_/epi{verify}_/pis",
+        description="Cross-Model監査: 敵対的検証→知識昇格→確信度",
+        is_builtin=True,
+    ),
 }
 
 

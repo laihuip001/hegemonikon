@@ -138,7 +138,13 @@ async function renderFep(): Promise<void> {
 
   // Render Beliefs Bar Chart (normalized to max)
   const beliefsHtml = state.beliefs.map((b: number, idx: number) =>
-    `<div class="belief-bar" style="height: ${(b / maxBelief) * 100}%" title="[${idx}] ${b.toFixed(4)}"></div>`
+    `<div
+      class="belief-bar"
+      style="height: ${(b / maxBelief) * 100}%"
+      title="[${idx}] ${b.toFixed(4)}"
+      role="img"
+      aria-label="Belief ${idx}: ${b.toFixed(4)}"
+    ></div>`
   ).join('');
 
   const epsilonEntries = Object.entries(state.epsilon)
@@ -149,8 +155,15 @@ async function renderFep(): Promise<void> {
     <h1>FEP Agent State</h1>
     <div class="card">
       <h3>Belief Distribution (${state.beliefs.length} dimensions)</h3>
-      <div class="beliefs-chart">${beliefsHtml}</div>
-      <small style="color:#8b949e;">Hover bars for values. Normalized to max = ${maxBelief.toFixed(4)}</small>
+      <div
+        class="beliefs-chart"
+        role="group"
+        aria-label="Belief Distribution Chart"
+      >${beliefsHtml}</div>
+      <small style="color:#8b949e;">
+        <span aria-hidden="true">Hover bars for values. </span>
+        Normalized to max = ${maxBelief.toFixed(4)}
+      </small>
     </div>
     <div class="grid">
       <div class="card">

@@ -282,3 +282,81 @@ ul {
 ul li {
   margin-bottom: 0.25rem;
 }
+
+/* ─── Graph 3D ──────────────────────────────────────────── */
+
+#graph-container {
+  width: 100%;
+  height: calc(100vh - 4rem);
+  position: relative;
+  overflow: hidden;
+}
+
+#graph-container canvas {
+  display: block;
+}
+
+.node-tooltip {
+  position: absolute;
+  background: rgba(13, 17, 23, 0.95);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 0.75rem;
+  color: var(--text-color);
+  font-size: 0.85rem;
+  pointer-events: none;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 0 20px rgba(0, 212, 255, 0.15);
+  z-index: 100;
+  max-width: 250px;
+  line-height: 1.5;
+}
+
+.graph-info-panel {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  width: 320px;
+  max-height: calc(100% - 2rem);
+  overflow-y: auto;
+  background: rgba(22, 27, 34, 0.95);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 1rem;
+  color: var(--text-color);
+  font-size: 0.85rem;
+  backdrop-filter: blur(12px);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4), 0 0 30px rgba(0, 212, 255, 0.08);
+  z-index: 50;
+}
+
+.graph-info-panel h3 {
+  margin: 0 0 0.5rem;
+  font-size: 1.1rem;
+}
+
+.graph-info-panel h4 {
+  margin: 0.75rem 0 0.25rem;
+  font-size: 0.9rem;
+  color: #8b949e;
+}
+
+.graph-info-panel ul {
+  padding-left: 1rem;
+  font-size: 0.8rem;
+  line-height: 1.6;
+}
+
+.graph-label {
+  font-size: 11px;
+  font-weight: 600;
+  text-shadow: 0 0 6px rgba(0, 0, 0, 0.8);
+  pointer-events: none;
+  user-select: none;
+}
+
+/* Graph view: hide main padding */
+main:has(#graph-container) {
+  padding: 0;
+  overflow: hidden;
+}

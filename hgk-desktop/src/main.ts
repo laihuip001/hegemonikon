@@ -1,4 +1,5 @@
 import { api } from './api/client';
+import { renderGraph3D } from './views/graph3d';
 import type {
   HealthReportResponse,
   FEPStateResponse,
@@ -46,6 +47,7 @@ const routes: Record<string, ViewRenderer> = {
   'gnosis': renderGnosis,
   'quality': renderQuality,
   'postcheck': renderPostcheck,
+  'graph': renderGraph3D,
 };
 
 let currentRoute = '';

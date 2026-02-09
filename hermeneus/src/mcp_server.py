@@ -30,6 +30,9 @@ try:
 except ImportError:
     MCP_AVAILABLE = False
     Server = None
+    Tool = Any
+    TextContent = Any
+    CallToolResult = Any
 
 
 # =============================================================================

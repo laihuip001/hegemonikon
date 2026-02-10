@@ -147,8 +147,8 @@ result = select_derivative("S2", "新しいワークフローを作りたい")
 | `/mek` | Hegemonikon Mode (デフォルト) — 定理体系に馴染む生成 |
 | `/mek vulg` | 俗モード — 例外的に体系外の生成が必要な場合のみ |
 | `/mek [要件]` | 指定要件でスキル生成 |
-| `/mek diagnose [file]` | 既存プロンプトを診断 |
-| `/mek improve [file]` | 既存プロンプトを改善 |
+| `/mek diagnose [file]` | 既存プロンプトを診断 (`prompt_quality_scorer.py -v`) |
+| `/mek improve [file]` | 既存プロンプトを改善 (`self_refine_pipeline.py --mode full`) |
 | `/mek ccl "意図"` | CCL生成モード — 自然言語から CCL v2.0 式を生成 |
 
 ---
@@ -229,6 +229,20 @@ SKILL.md を必ず読み込んでから処理を開始する:
    - BLUF Rule + Visual Logic Rule
 8. **STEP 6**: M5 QUALITY_ASSURANCE — 検証 (2分)
    - Pre-Mortem Simulation + WARGAME_DB Check
+   - **自動品質スコアリング** (v7.2):
+
+   // turbo
+
+   ```bash
+   cd ~/oikos/hegemonikon && PYTHONPATH=. .venv/bin/python mekhane/ergasterion/tekhne/prompt_quality_scorer.py "$OUTPUT_FILE" -v
+   ```
+
+   - スコア80未満 → Self-Refine で改善:
+
+   ```bash
+   cd ~/oikos/hegemonikon && PYTHONPATH=. .venv/bin/python mekhane/ergasterion/tekhne/self_refine_pipeline.py --input "$OUTPUT_FILE" --mode full --threshold 80
+   ```
+
 9. **STEP 7**: SE反復原則 — 初版確認
    - `/dia-` クイックレビュー推奨
    - `/dia+` 詳細レビュー
@@ -277,3 +291,4 @@ cd ~/oikos/hegemonikon && PYTHONPATH=. .venv/bin/python scripts/wf_postcheck.py 
 - 生成物は初版。`/dia-` でレビューを推奨
 
 *v7.1 — Functional Beauty Redesign (2026-02-07)*
+*v7.2 — Quality Scorer + Self-Refine 統合 (2026-02-11)*

@@ -429,6 +429,7 @@ async function renderGnosis(): Promise<void> {
     ${statsHtml}
     <div class="card">
       <div style="display:flex; gap:0.5rem;">
+        <label for="gnosis-search-input" class="sr-only">Search knowledge base</label>
         <input type="text" id="gnosis-search-input" class="input" placeholder="Search knowledge base..." style="flex:1;" />
         <button id="gnosis-search-btn" class="btn">🔍 Search</button>
         <button id="gnosis-papers-btn" class="btn btn-outline">📚 Papers</button>
@@ -572,13 +573,13 @@ async function renderPostcheck(): Promise<void> {
       <h3>Manual Postcheck</h3>
       <div class="grid" style="grid-template-columns: 1fr 100px;">
         <div>
-          <label>Workflow name:</label>
+          <label for="pc-wf">Workflow name:</label>
           <input type="text" id="pc-wf" class="input" placeholder="e.g. dia, noe, boot" style="margin-bottom:0.5rem;" />
-          <label>Content to check:</label>
+          <label for="pc-content">Content to check:</label>
           <textarea id="pc-content" class="input" rows="4" placeholder="Paste output text here..."></textarea>
         </div>
         <div style="display:flex; flex-direction:column; gap:0.5rem;">
-          <label>Mode:</label>
+          <label for="pc-mode">Mode:</label>
           <select id="pc-mode" class="input">
             <option value="">default</option>
             <option value="+">+ (deep)</option>
@@ -739,6 +740,7 @@ async function renderNotificationsContent(): Promise<void> {
   app.innerHTML = `
     <div class="notif-header">
       <h1>🔔 通知 <small class="poll-badge">自動更新 30秒</small></h1>
+      <label for="notif-level-filter" class="sr-only">Filter by level</label>
       <select id="notif-level-filter" class="input" style="width:130px;">
         <option value="">すべて</option>
         <option value="CRITICAL" ${notifLevelFilter === 'CRITICAL' ? 'selected' : ''}>🚨 緊急</option>

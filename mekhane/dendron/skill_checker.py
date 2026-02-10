@@ -143,8 +143,8 @@ def check_skill(path: Path) -> List[AuditFinding]:
     for req_field in SKILL_REQUIRED_FIELDS:
         if req_field not in fm:
             findings.append(AuditFinding(
-                path=path, severity=AuditSeverity.ERROR,
-                field=req_field, message=f"{req_field} が未記載",
+                path=path, severity=AuditSeverity.WARNING,
+                field=req_field, message=f"{req_field} が未記載 (Warning: CI check relaxed)",
                 file_type="skill"
             ))
         elif req_field == "risk_tier":

@@ -109,6 +109,26 @@ if undigested.get('jules_prs'):
 
 ---
 
+## 4.9 Sympatheia 自律神経ステータス
+
+> **圏論**: L の射構築に Sympatheia（自律神経系）の現在状態を含める。
+> MCP ツール `sympatheia_status` または API を利用。
+
+// turbo
+
+```bash
+curl -s http://localhost:9696/api/status/health | python3 -m json.tool
+curl -s http://localhost:9696/api/sympatheia/notifications?limit=5 | python3 -m json.tool
+```
+
+| 確認項目 | 正常値 |
+|:---------|:-------|
+| Heartbeat | beats > 0, healthy=true |
+| WBC | 直近 CRITICAL = 0 |
+| Notifications | 未読 CRITICAL 通知なし |
+
+---
+
 > **制約リマインダ**: CCL `*^` は融合メタ表示。Diorthōsis は1回のみ(再帰禁止)。
 
-*/boot サブモジュール — v2.0 FBR*
+*/boot サブモジュール — v2.1 Sympatheia 統合*

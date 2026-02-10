@@ -42,6 +42,17 @@ sel_enforcement:
     minimum_requirements:
       - "欲求プロセスを問う"
 ccl_signature: "/ore+"
+category_theory:
+  core: "随伴 F⊣G の右随伴 G（忘却関手）"
+  adjunction: "Propatheia (F) ⊣ Orexis (G)"
+  role: "G: Gut → Desire（直感から生の熱を忘却し、価値根拠のある欲求に変換）"
+  G_definition: "System 1 の即時反応を System 2 で言語化し、情動の鮮度を不可逆的に冷ます"
+  G_two_layers:
+    言語化可能: "「なぜ好きか」を根拠として説明できる部分。well-defined"
+    生の熱: "言語化すると消える情動強度（raw intensity）。不可逆。affect labeling 効果"
+  drift: "Drift = 生の熱の量。言語化で不可逆的に失われる情動の鮮度"
+  affect_labeling: "感情に名前をつけると扁桃体活性が低下する（fMRI 研究）= G の神経科学的実体"
+  insight: "瞬間的なエネルギー（熱量）が消える。知ってしまえば知る前には戻れない — Creator, 2026-02-10"
 ---
 
 # /ore: 価値傾向評価ワークフロー (Orexis)
@@ -412,7 +423,6 @@ V[/ore] >> {
 ```
 
 ---
-
 
 ---
 

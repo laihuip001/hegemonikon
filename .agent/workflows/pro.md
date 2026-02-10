@@ -43,6 +43,15 @@ sel_enforcement:
     minimum_requirements:
       - "直感プロセスを問う"
 ccl_signature: "/pro+"
+category_theory:
+  core: "随伴 F⊣G の左随伴 F（自由関手）"
+  adjunction: "Propatheia (F) ⊣ Orexis (G)"
+  role: "F: Desire → Gut（欲求に生の熱を載せて直感的判定に構成 = System 1）"
+  F_definition: "価値判断に即時性・情動強度を付与して、瞬間的な接近/回避を構成する"
+  unit: "η: Desire → G(F(Desire)) — 欲求を直感にして冷まして欲求に戻す = 検証"
+  counit: "ε: F(G(Gut)) → Gut — 直感を欲求にして再点火 = 再直感化"
+  stoic: "Propatheia = 第一運動（first movement）。理性の判断の前に不随意的に生じる初期反応"
+  insight: "直感 = シンプルなモデル + 高precision。速いが狭い — Creator, 2026-02-10"
 ---
 
 # /pro: 初期傾向評価ワークフロー (Propatheia)
@@ -279,7 +288,6 @@ E[/pro] >> {
 ```
 
 ---
-
 
 ---
 

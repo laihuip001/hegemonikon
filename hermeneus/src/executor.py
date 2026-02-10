@@ -306,9 +306,9 @@ class WorkflowExecutor:
         start = time.time()
         
         try:
-            from hermeneus.src.verifier import verify_execution
+            from hermeneus.src.verifier import verify_execution_async
             
-            result = verify_execution(
+            result = await verify_execution_async(
                 ccl=ccl,
                 execution_output=output,
                 context=context

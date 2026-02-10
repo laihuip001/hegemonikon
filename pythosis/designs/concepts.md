@@ -196,11 +196,11 @@ finally: /bye-
 
 | タスク | 状態 | 優先度 | 備考 |
 |:-------|:----:|:------:|:-----|
-| B1: 定理継承 | 設計完了 | ★★★ | kernel/*.md への適用が必要 |
-| B2: Mixin | 設計完了 | ★★☆ | CCL 構文拡張要検討 |
-| B3: デコレータマクロ | 設計完了 | ★★☆ | macros/ に追加可能 |
+| B1: 定理継承 | ✅ **実装済** | ★★★ | kernel/*.md frontmatter に `extends` 追加済 |
+| B2: Mixin | ✅ **実装済** | ★★☆ | kernel/mixins/ (5 Mixin: Tracing/Caching/Retry/Validation/Timing) |
+| B3: デコレータマクロ | ✅ **実装済** | ★★☆ | B2 に吸収。`@with(Mixin) target` 構文 |
 | B4: KI 依存 | 設計完了 | ★☆☆ | metadata.json 拡張 |
-| B5: エラー構文 | 検討のみ | ★☆☆ | 長期課題として保留 |
+| B5: エラー構文 | 🚫 **意図的スコープ外** | — | 模倣リスク。本質は @scoped/Hermēneus で消化済 |
 
 ---
 

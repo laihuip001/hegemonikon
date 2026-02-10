@@ -21,7 +21,7 @@
 | **abc.ABC** | Hub WF (6) | ★★★★☆ |
 | **functools** | @reduce, @partial | ★★★★☆ |
 | **itertools** | @chain, @cycle | ★★★★☆ |
-| **import** | X-series (36) | ★★★★☆ |
+| **import** | X-series (72) | ★★★★☆ |
 
 ## 3. 部分成立
 

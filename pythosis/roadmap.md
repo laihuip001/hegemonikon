@@ -24,7 +24,7 @@
 | 1 | `typing` | `/epi.typed` 派生 | ✅ |
 | 2 | `dataclasses` | `/dox.structured` 派生 | ✅ |
 | 3 | `contextlib` | `@scoped` v2 | ✅ |
-| 4 | `asyncio` | Synergeia 統合 (`||`,`|>`) | ✅ |
+| 4 | `asyncio` | Synergeia 統合 | ✅ |
 
 ## Phase 4: Zen 抽出 ✅
 
@@ -34,11 +34,16 @@
 - [x] 明示性原則の体系化 (原則 2)
 - [x] 縮約優先原則の適用 (原則 3)
 
-## Phase 5: 高度な統合
+## Phase 5: 高度な統合 — 達成確認 (2026-02-10)
 
-- [ ] エラーハンドリング構文
-- [ ] 型システム (静的検証)
-- [ ] 並行思考モデル
+- [x] 並行思考モデル → `||`, `|>`, Synergeia で消化済み 🟢
+- [x] 型システム (動的) → `/epi.typed`, `?T` で消化済み 🟢
+- [x] エラーハンドリング (本質) → `@scoped(suppress:)`, Hermēneus fallback で消化済み 🟡
+
+### 意図的スコープ外 🚫
+
+- 🚫 `try/except` CCL 構文 — 模倣になる。本質は消化済み
+- 🚫 静的型検証 — CCL は LLM 解釈言語。静的検証は不適合
 
 ---
 

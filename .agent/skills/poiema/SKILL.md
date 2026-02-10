@@ -2,13 +2,19 @@
 name: Poiema Generator
 description: 構造化出力の生成 (Boot レポート, Handoff, 定型ドキュメント)
 triggers:
-  - "生成"
-  - "レポート"
-  - "Handoff"
-  - "出力"
-  - "poiema"
-  - "テンプレート"
-  - "ドキュメント生成"
+- 生成
+- レポート
+- Handoff
+- 出力
+- poiema
+- テンプレート
+- ドキュメント生成
+risk_tier: L1
+risks:
+- none
+reversible: true
+requires_approval: false
+fallbacks: []
 ---
 
 # Poiema Generator

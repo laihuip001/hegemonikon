@@ -36,17 +36,25 @@ from dataclasses import dataclass, asdict
 from mekhane.anamnesis.vault import VaultManager
 
 # Load environment
-from dotenv import load_dotenv
+try:
+    from dotenv import load_dotenv
+    # Paths
+    PROJECT_ROOT = Path(__file__).parent.parent.parent
+    BRAIN_DIR = Path(r"C:\Users\makar\.gemini\antigravity\brain")
+    OUTPUT_DIR = Path(r"M:\Brain\.hegemonikon\session_summaries")
+    ENV_FILE = PROJECT_ROOT / ".env.local"
 
-# Paths
-PROJECT_ROOT = Path(__file__).parent.parent.parent
-BRAIN_DIR = Path(r"C:\Users\makar\.gemini\antigravity\brain")
-OUTPUT_DIR = Path(r"M:\Brain\.hegemonikon\session_summaries")
-ENV_FILE = PROJECT_ROOT / ".env.local"
-
-# Load API key
-load_dotenv(ENV_FILE)
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+    # Load API key
+    load_dotenv(ENV_FILE)
+    GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+except ImportError:
+    # Fallback for environments without python-dotenv (e.g. basic tests)
+    load_dotenv = None
+    GEMINI_API_KEY = None
+    # Define placeholder paths if needed, though they won't be used without API key
+    PROJECT_ROOT = Path(__file__).parent.parent.parent
+    BRAIN_DIR = Path("mock_brain_dir")
+    OUTPUT_DIR = Path("mock_output_dir")
 
 
 @dataclass

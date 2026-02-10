@@ -150,6 +150,7 @@ for series_id in SERIES:
 
 # --- Pydantic Models ---
 
+# PURPOSE: GraphNode Pydantic Model
 class GraphNode(BaseModel):
     id: str
     series: str
@@ -161,6 +162,7 @@ class GraphNode(BaseModel):
     color: str
     position: dict[str, float]
 
+# PURPOSE: GraphEdge Pydantic Model
 class GraphEdge(BaseModel):
     id: str
     pair: str
@@ -171,6 +173,7 @@ class GraphEdge(BaseModel):
     meaning: str
     type: str = Field(description="anchor, bridge, or identity")
 
+# PURPOSE: GraphFullResponse Pydantic Model
 class GraphFullResponse(BaseModel):
     nodes: list[GraphNode]
     edges: list[GraphEdge]

@@ -2,14 +2,20 @@
 name: Taxis Classifier
 description: タスク/入力の自動分類・優先順位付け
 triggers:
-  - "分類"
-  - "優先"
-  - "タスク"
-  - "taxis"
-  - "振り分け"
-  - "TODO"
-  - "整理"
-  - "morphism"
+- 分類
+- 優先
+- タスク
+- taxis
+- 振り分け
+- TODO
+- 整理
+- morphism
+risk_tier: L1
+risks:
+- none
+reversible: true
+requires_approval: false
+fallbacks: []
 ---
 
 # Taxis Classifier

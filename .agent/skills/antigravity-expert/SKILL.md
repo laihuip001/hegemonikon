@@ -2,6 +2,12 @@
 id: "U1"
 name: antigravity-ide-expert
 series: Utils
+risk_tier: L1
+risks:
+  - none
+reversible: true
+requires_approval: false
+fallbacks: []
 
 description: |
   Antigravity IDE の利用ガイド・専門知識を提供するシステムプロンプト。
@@ -38,6 +44,8 @@ keywords:
   - browser-subagent
   - task-boundary
   - prompt-engineering
+
+tags: [antigravity, fix, session-audit]
 
 related:
   upstream: ["S2 Mekhanē"]

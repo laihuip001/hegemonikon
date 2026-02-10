@@ -289,7 +289,7 @@ async def _handle_export_session(args: Dict[str, Any]) -> Sequence[TextContent]:
         session_name = f"Session_{datetime.now().strftime('%Y%m%d_%H%M')}"
     
     # エクスポートスクリプトを実行
-    hegemonikon_dir = Path(__file__).parent.parent.parent.parent
+    hegemonikon_dir = Path(__file__).parent.parent.parent
     export_script = hegemonikon_dir / "mekhane" / "anamnesis" / "export_chats.py"
     python_path = hegemonikon_dir / ".venv" / "bin" / "python"
     

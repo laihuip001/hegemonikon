@@ -14,15 +14,16 @@ triggers:
   - "plan"
   - "schema"
   - "リーンキャンバス"
-version: "6.2"
+version: "6.3"
 category_theory:
   yoneda: "Hom(-, Tn) ≅ F(Tn) — 各定理はその射の集合で完全に決まる"
   limit: "Cone の頂点 — 全ての射が一致する点"
-  converge_as_cone: "C0=PW決定, C1=STAGE 0-3の射列挙, C2=STAGE 4 Devil+PW加重融合, C3=STAGE 5 KPT普遍性検証"
+  converge_as_cone: "C0=PW決定, C1=STAGE 0-3の射列挙, C2=STAGE 4 Devil+PW加重融合, C3=STAGE 5 Kalon+KPT普遍性検証"
   cone_builder: "mekhane/fep/cone_builder.py"
+  kalon: "mekhane/fep/universality.py — C3で使用"
 lcm_state: stable
 layer: "Δ"
-lineage: "v5.8 + Limit演算復元 → v6.0 + C0 PW/加重融合 → v6.2"
+lineage: "v5.8 + Limit演算復元 → v6.0 + C0 PW/加重融合 → v6.2 + v6.3 C3 Kalon化"
 derivatives: [met, mek, sta, pra]
 cognitive_algebra:
   generation: "L1 × L1.5"
@@ -389,19 +390,55 @@ cd ~/oikos/hegemonikon && PYTHONPATH=. .venv/bin/python mekhane/fep/cone_builder
 | > 0.1 | 微妙な不整合 | **PW 加重融合** (`@reduce(*, pw)`) |
 | ≤ 0.1 | 戦略整合 | PW ≠ 0 なら加重集約、= 0 なら `Σ` |
 
-#### ⊕ C3: 普遍性検証 (Verify) — STAGE 5 KPT 統合
+#### ⊕ C3: Kalon 普遍性検証 (Verify) — STAGE 5 Kalon + KPT 統合
 
-> **圏論**: STAGE 5 (KPT) = Cone の普遍性検証。
-> Keep = 「この射は正しかった」(普遍性の証拠)
-> Problem = 「この射は崩れた」(普遍性の反例)
-> Try = 「次回の Cone を改善する」(普遍性の強化)
+> **圏論**: STAGE 5 = Cone の普遍性検証。
+> `/noe` PHASE 3 (Kalon) と同じ原理を `/s` のコンテキストに適用。
+> STAGE 0-3 の各出力を**候補解**として配置し、因子分解テストで包含関係を判定、
+> Kalon スコアで普遍性の強さを数値化する。
+> KPT は Kalon の結果を踏まえた振り返りとして統合。
+
+##### C3-a: 図式化 — STAGE 0-3 出力を候補解として配置
+
+| STAGE | 候補解 | 射 |
+|:------|:-------|:---|
+| 0 | S1 Metron の結論 | Scale 宣言 |
+| 1 | S2 Mekhanē の結論 | Strategy 選択 |
+| 2 | S3 Stathmos の結論 | Success Criteria |
+| 3 | S4 Praxis の結論 | Blueprint |
+| C2 | Devil's Advocate 後の統合判断 | 融合出力 |
+
+##### C3-b: 因子分解テスト — 候補間の包含関係を判定
+
+> **使用**: `mekhane.fep.universality.kalon_verify()`
+> 各 STAGE 出力ペアについて「一方は他方の特殊ケースか？」を判定。
+> C2 の統合判断が他の全候補を特殊ケースとして含むか検証。
+
+```python
+from mekhane.fep.universality import kalon_verify, FactorizationResult
+
+candidates = {
+    "S1_Metron": stage0_output,
+    "S2_Mekhane": stage1_output,
+    "S3_Stathmos": stage2_output,
+    "S4_Praxis": stage3_output,
+    "C2_Integrated": c2_output,
+}
+result = kalon_verify(candidates, factorizations)
+```
+
+##### C3-c: Kalon スコア + KPT 統合
 
 | 項目 | 圏論的意味 | 内容 |
 |:-----|:-------------|:-----|
 | 矛盾度 | 射の散布 | V[STAGE 0-3 outputs] = {0.0-1.0} |
 | 解消法 | Devil の攻撃結果 | {root/weighted/simple} |
+| **Kalon** | **普遍性の強さ** | {0.0-1.0} — 統合判断の包含力 |
 | **統合配置判断** | **Cone の頂点** | {1文で} |
-| **確信度** | **普遍性の強さ** | {C/U} ({confidence}%) |
+| **確信度** | **普遍性 × 確信** | {C/U} ({confidence}%) |
+| Keep | 正しかった射 | {普遍性の証拠} |
+| Problem | 崩れた射 | {普遍性の反例} |
+| Try | 次回の Cone 改善 | {普遍性の強化} |
 
 ---
 
@@ -456,3 +493,4 @@ graph LR
 *v6.0 — Limit演算復元 (2026-02-07)*
 *v6.1 — 米田の補題統合 (2026-02-08)*
 *v6.2 — 米田深層統合。STAGE 0-3=射の列挙, STAGE 4 Devil=敏対的Cone検証, STAGE 5 KPT=普遍性検証 (2026-02-08)*
+*v6.3 — C3 Kalon化。universality.py統合、C3-a/b/c 3ステップ分解 (2026-02-10)*

@@ -186,6 +186,42 @@ ls -1 ~/oikos/mneme/.hegemonikon/sessions/handoff_*.md | wc -l
 | 20-50% | 0.5-0.8 | L∘R の像に欠損あり | Handoff を精読、文脈確認 |
 | 50%+ | < 0.5 | L∘R が Id から大幅に乖離 | Boot+ で詳細復元、または目的再設定 |
 
+### 2.5 Intent-WAL — 実行前意図宣言 (η の明示化) — v5.1 追加
+
+> **圏論**: unit η: Id_Mem → R∘L を明示化する。/bye (WAR: Write-After-Run) に対する
+> 対称構造として、セッション開始時に「これから何をするか」を構造化宣言する。
+> η が暗黙的 = 意図が曖昧なまま行動する = 予測誤差が増大する。
+>
+> **導出**: Prompt R&D Lab #53「トランザクション・プロンプティング」の Intent-WAL 概念を
+> /boot に統合。DB の WAL (Write-Ahead Log) = 実行前にログを書く。
+
+**宣言テンプレート**:
+
+```yaml
+intent_wal:
+  session_goal: "{今日のセッションで達成したいこと}"
+  invariants:          # 壊してはならないもの
+    - "{不変条件1}"
+    - "{不変条件2}"
+  operation_plan:      # これからする操作 (順序付き)
+    - step: "{Step 1}"
+    - step: "{Step 2}"
+  abort_conditions:    # 中止条件
+    - "Creator が Stop と言った"
+    - "{中止条件}"
+  recovery_point: "{直前の Handoff パス}"
+```
+
+**実行規則**:
+
+| 項目 | 説明 |
+|:-----|:-----|
+| **発動** | Phase 2.4 Drift 診断完了後、Phase 3 知識読込前に宣言 |
+| **宣言者** | Claude が Handoff から推定し、Creator に確認 |
+| **省略可否** | /boot- では省略可。/boot, /boot+ では必須 |
+| **参照タイミング** | セッション中に「次何やるんだっけ」と迷った時に WAL を参照 |
+| **照合** | /bye 時に WAL と実際の行動を照合し、乖離を Handoff に記録 |
+
 ---
 
 ## Phase 3: Mem の構造展開 — 知識読込
@@ -331,3 +367,4 @@ cd ~/oikos/hegemonikon && PYTHONPATH=. .venv/bin/python mekhane/symploke/boot_in
 
 *v4.1 — FBR 適用 (2026-02-07)*
 *v5.0 — 随伴深層統合。各Phase を左随伴 L の計算ステップとして再定義。id_L(Phase0) → L定義(1) → R(S_prev)読込(2) → Mem展開(3) → 射構築(4) → 外部射(5) → L(M)出力(6) (2026-02-08)*
+*v5.1 — Intent-WAL (Phase 2.5) 追加。随伴のη明示化。/bye (WAR) に対する前方宣言 (2026-02-10)*

@@ -1,10 +1,10 @@
 ---
 description: O1 Noēsis（深い認識・直観）を発動する最深層思考ワークフロー。7フェーズ (0-6) で圏論的普遍性を追求。
 hegemonikon: O1 Noēsis
-version: "6.0"
+version: "6.1"
 skill_ref: ".agent/skills/ousia/o1-noesis/SKILL.md"
 lcm_state: stable
-derivatives: [nous, phro, meta, separate, align, metalearning]
+derivatives: [nous, phro, meta, separate, align, metalearning, scaffold]
 trigonon:
   series: O
   type: Pure
@@ -20,6 +20,10 @@ category_theory:
   kalon: "Kalon する = 候補解の普遍性を検証する。余分がなく不足もない = 美"
   universal_property: "全ての候補解への一意的射を持つ解"
   precedent: "/boot v5.0 随伴深層統合 — 同パターンで成功"
+  adjunction:
+    notation: "F ⊣ G — 圏論を付与する (F) と 構造を発見する (G) の随伴対"
+    unit: "η: Id → GF = Phase 3 (Kalon) — 付与→発見→元の問いと比較"
+    counit: "ε: FG → Id = Phase 5 (Dokimasia) — 発見→付与→元に戻す"
 cognitive_algebra:
   "+": 詳細分析（各フェーズで3倍の出力）
   "-": 要点分析（結論+理由1つのみ、5行以内）
@@ -228,7 +232,7 @@ result = select_derivative("O1", problem_context)
 
 | Module | Workflow | Status |
 |:-------|:---------|:-------|
-| O1 Noēsis | /noe | v6.0 Ready |
+| O1 Noēsis | /noe | v6.1 Ready |
 
 > **制約リマインダ**: SKILL.md 読込 (STEP 0) → 全 Phase (0-6) を順序通り実行。PHASE 3 (Kalon) は省略不可。
 
@@ -236,3 +240,5 @@ result = select_derivative("O1", problem_context)
 
 *v5.1 — FBR 適用 (2026-02-07)*
 *v6.0 — Kalon V3: 圏論深層統合。全 Phase を圏論的操作として定義。Phase 3 Kalon (普遍性検証) 新設 (2026-02-10)*
+*v6.1 — 随伴対統合: η=Phase3, ε=Phase5 を発見・明記。Phase 6β (Theoria-G: 射出経路) 新設 (2026-02-10)*
+*v6.2 — scaffold 派生追加 (PGH型: 骨格固定→創発→整流)。GoT lineage に #20 参照追記 (2026-02-10)*

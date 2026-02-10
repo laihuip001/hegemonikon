@@ -720,6 +720,27 @@ description: [1行説明]
 
 ---
 
+## 外部語彙 → HGK 翻訳テーブル
+
+> 外部記事 (note.com 等) で使われる「一般的な」Antigravity 用語と、
+> HGK (Hegemonikón) での対応概念の翻訳。/jukudoku + /eat+ 消化 (2026-02-10) による。
+
+| 外部語彙 | HGK 対応 | 差分・注記 |
+|:---------|:---------|:----------|
+| 4つの階層構造 | 96要素体系 (7公理+24定理+72関係) | HGK は4→96に拡張。圏論的意味付き |
+| GEMINI.md (グローバルルール) | GEMINI.md + CONSTITUTION.md + SACRED_TRUTH.md | HGK は不変性の3層分離 |
+| Rules | `.agent/rules/` + BC (Behavioral Constraints) | HGK は BC-1〜BC-16 の認知的制約 |
+| Skills | 24定理 × 派生 × cognitive_algebra | HGK は CCL で合成可能 |
+| Workflows | `/xxx` WF + Ω/Δ/τ 階層 | HGK は3層命名規則 |
+| Artifacts Review | /v (自己検証) + /fit (消化品質) + /dia (判定) | HGK は形式的検証パイプライン |
+| 安全柵 (ターミナル許可等) | I-1 (破壊的操作禁止) + WBC (白血球) + Synteleia | HGK は能動的脅威検知 |
+| Agent Manager | Synergeia (Jules連携) + Agent Manager View | 並列エージェント管理 |
+| 第二の脳 (Obsidian連携) | Sophia (KI) + Mnēmē (記憶) + Gnōsis (論文) | HGK はベクトル検索統合済み |
+| バイブコーディング | /ene (行為) + /mek (方法配置) | HGK は FEP に基づく意志→行為変換 |
+| Artifact Review Policy | BC-5 (Proposal First) + /v + Anti-Spec | HGK は形式的チェックポイント |
+
+---
+
 ## Version History
 
 | Version | Date | Changes |

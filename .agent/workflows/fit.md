@@ -263,6 +263,41 @@ FOR EACH f: A→B in Ext:
     - 消化先に「境界」が残っている
 ```
 
+### Step 3.5: Anti-Spec 検証 (Negative Naturality) — v4.1 追加
+
+**問い**: 自然変換 α は**してはならない変換**を避けているか？
+
+> **導出**: Prompt R&D Lab #48「往復整合プロンプティング」の反仕様 (Anti-Spec) 概念を /fit に統合。
+> **圏論的意味**: 自然変換の kernel (核) の検証。α の像が G(X) 内に収まるだけでなく、G(X) の禁止部分集合を避けることを検証する。
+
+```yaml
+anti_spec:
+  定義: 消化時に「破壊してはならないもの」のリスト
+  テンプレート:
+    - "αX は既存 WF の cognitive_algebra の意味を変えてはならない"
+    - "αX は既存の CCL 文法を破壊してはならない"
+    - "αX は SACRED_TRUTH.md に矛盾する変換を導入してはならない"
+    - "αX は消化先 WF の lineage を切断してはならない"
+    - "{素材固有の Anti-Spec をここに追加}"
+
+process:
+  FOR EACH 成分 αX:
+    FOR EACH anti_spec_rule:
+      1. αX の出力が禁止領域に入っていないか検証
+      2. 入っている場合 → ⛔ Anti-Spec 違反
+      3. 判定:
+         ✅ 全 Anti-Spec をクリア → Step 4 へ
+         ⛔ 違反あり → αX の再設計。消化レベルは最大でも Absorbed
+```
+
+**チェック項目**:
+
+- [ ] 既存 WF の cognitive_algebra が変更されていない
+- [ ] CCL 文法が破壊されていない
+- [ ] SACRED_TRUTH.md との矛盾がない
+- [ ] 消化先 WF の lineage が維持されている
+- [ ] 素材固有の Anti-Spec が定義され、全てクリアしている
+
 ### Step 4: 強化度評価 (Empowerment Score)
 
 **問い**: 自然変換 α は価値を生んでいるか？
@@ -402,3 +437,4 @@ graph TD
 
 *v3.1 — 親子アーキテクチャ適用 (2026-02-07)*
 *v4.0 — 自然変換統合。消化診断を可換図式の検証として再設計。Superficial/Absorbed/Naturalized を圏論的に再定義 (2026-02-08)*
+*v4.1 — Anti-Spec (反仕様) 追加。Step 3.5 として否定的可換性検証を導入 (2026-02-10)*

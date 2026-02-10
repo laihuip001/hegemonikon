@@ -63,3 +63,17 @@ mekhane/anamnesis/data/*.lance/
 
 # Runtime logs
 logs/
+
+# Editor swap files
+*.swp
+*.swo
+*~
+
+# Codex temporary files
+.codex/tmp/
+
+# gcloud SDK (installed locally)
+gcloud*/
+
+# Downloads (not project files)
+Downloads/

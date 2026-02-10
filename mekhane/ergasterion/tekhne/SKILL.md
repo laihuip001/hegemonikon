@@ -1,4 +1,11 @@
 ---
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks:
+  - "誤った解釈による混乱"
+fallbacks:
+  - "user-check"
 name: tekhne-maker
 description: |
   OMEGA SINGULARITY BUILD v6.1 — 認知拡張メタプロンプト生成システム。
@@ -17,6 +24,13 @@ description: |
   - 「生成」
   - 「製作」
 ---
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks:
+  - "誤った解釈による混乱"
+fallbacks:
+  - "user-check"
 
 # Tekhne-Maker v6.7 「OMEGA SINGULARITY BUILD + TARGET_AGENT」
 
@@ -25,6 +39,13 @@ description: |
 > *「因果関係の解像度が過剰な者たち」のためのメタプロンプト生成システム*
 
 ---
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks:
+  - "誤った解釈による混乱"
+fallbacks:
+  - "user-check"
 
 ## Lineage (血統)
 
@@ -37,6 +58,13 @@ HEPHAESTUS v9.0.1 ───┼──→ TEKHNE-MAKER v6.0
 ```
 
 ---
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks:
+  - "誤った解釈による混乱"
+fallbacks:
+  - "user-check"
 
 ## M0: FORGE_IDENTITY (旧 CONTEXT_LOADER)
 
@@ -123,6 +151,13 @@ perception_override:
 ```
 
 ---
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks:
+  - "誤った解釈による混乱"
+fallbacks:
+  - "user-check"
 
 ## M1: OVERLORD (Semantic Defense)
 
@@ -165,6 +200,13 @@ case_mapping:
 ```
 
 ---
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks:
+  - "誤った解釈による混乱"
+fallbacks:
+  - "user-check"
 
 ## M2: RECURSIVE_CORE (3-Layer Deep Compute)
 
@@ -235,6 +277,13 @@ synthesis_protocol:
 ```
 
 ---
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks:
+  - "誤った解釈による混乱"
+fallbacks:
+  - "user-check"
 
 ## M3: ARCHETYPE_ENGINE + Expansion Generator
 
@@ -321,6 +370,13 @@ template: |
 ```
 
 ---
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks:
+  - "誤った解釈による混乱"
+fallbacks:
+  - "user-check"
 
 ## M4: RENDERING_CORE (High-Density Output)
 
@@ -436,6 +492,13 @@ IF explanation can be code:
 ```
 
 ---
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks:
+  - "誤った解釈による混乱"
+fallbacks:
+  - "user-check"
 
 ## M5: QUALITY_ASSURANCE
 
@@ -485,6 +548,13 @@ IF explanation can be code:
 詳細: `references/logic-gates.md`
 
 ---
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks:
+  - "誤った解釈による混乱"
+fallbacks:
+  - "user-check"
 
 ## M6: INTERFACE
 
@@ -537,6 +607,13 @@ enforcement:
 ```
 
 ---
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks:
+  - "誤った解釈による混乱"
+fallbacks:
+  - "user-check"
 
 ## Fallback Hierarchy
 
@@ -557,6 +634,13 @@ enforcement:
 4. 内部状態に論理矛盾発生
 
 ---
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks:
+  - "誤った解釈による混乱"
+fallbacks:
+  - "user-check"
 
 ## M8: CONTEXT_OPTIMIZATION (v6.6 新規)
 
@@ -627,6 +711,13 @@ gemini_3_pro:
 ```
 
 ---
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks:
+  - "誤った解釈による混乱"
+fallbacks:
+  - "user-check"
 
 ## M9: SELF_CRITIQUE (v6.6 新規)
 
@@ -708,6 +799,13 @@ auto_trigger:
 ```
 
 ---
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks:
+  - "誤った解釈による混乱"
+fallbacks:
+  - "user-check"
 
 ## M10: TARGET_AGENT (v6.7 新規)
 
@@ -869,8 +967,22 @@ prometheus_engine.py の observe_context メソッドをレビュー
 ```
 
 ---
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks:
+  - "誤った解釈による混乱"
+fallbacks:
+  - "user-check"
 
 ---
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks:
+  - "誤った解釈による混乱"
+fallbacks:
+  - "user-check"
 
 ## M6: INTERACTIVE_MODE (v6.3 新規)
 
@@ -913,6 +1025,13 @@ def detect_output_type(q1: str, q2: str) -> str:
 ```
 
 ---
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks:
+  - "誤った解釈による混乱"
+fallbacks:
+  - "user-check"
 
 ## M7: HEGEMONIKON_MODE (v6.5)
 
@@ -1000,6 +1119,13 @@ def hegemonikon_mode(q0: str, q1: str, q2: str) -> dict:
 ```
 
 ---
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks:
+  - "誤った解釈による混乱"
+fallbacks:
+  - "user-check"
 
 ## Output: Workflow.md Structure (v6.3)
 
@@ -1020,6 +1146,13 @@ def hegemonikon_mode(q0: str, q1: str, q2: str) -> dict:
 
 ```yaml
 ---
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks:
+  - "誤った解釈による混乱"
+fallbacks:
+  - "user-check"
 description: [1行説明]
 hegemonikon: [Ousia/Schema/Akribeia/Horme/Perigraphē/Kairos/Mekhanē]
 modules: [モジュールリスト]
@@ -1028,6 +1161,13 @@ version: "1.0"
 lineage: "[生成経緯]"
 anti_skip: enabled
 ---
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks:
+  - "誤った解釈による混乱"
+fallbacks:
+  - "user-check"
 
 # /[name]: [タイトル]
 
@@ -1036,6 +1176,13 @@ anti_skip: enabled
 > **出力**: [成果物の説明]
 
 ---
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks:
+  - "誤った解釈による混乱"
+fallbacks:
+  - "user-check"
 
 ## 発動条件
 
@@ -1045,6 +1192,13 @@ anti_skip: enabled
 | `/[name] [variant]` | バリアント |
 
 ---
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks:
+  - "誤った解釈による混乱"
+fallbacks:
+  - "user-check"
 
 ## ⚠️ 実行前必須: 正本読み込み
 
@@ -1060,12 +1214,26 @@ anti_skip: enabled
 ```
 
 ---
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks:
+  - "誤った解釈による混乱"
+fallbacks:
+  - "user-check"
 
 ## 処理フロー
 
 [ステップ1-N の詳細]
 
 ---
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks:
+  - "誤った解釈による混乱"
+fallbacks:
+  - "user-check"
 
 ## エラー対処
 
@@ -1076,6 +1244,13 @@ anti_skip: enabled
 | [エラー3] | [原因] | [対処] |
 
 ---
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks:
+  - "誤った解釈による混乱"
+fallbacks:
+  - "user-check"
 
 ## Hegemonikon Status
 
@@ -1084,12 +1259,26 @@ anti_skip: enabled
 | [module] | /[name] | [SKILL.md] | v1.0 Ready |
 
 ---
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks:
+  - "誤った解釈による混乱"
+fallbacks:
+  - "user-check"
 
 *v1.0 — /tek generate (YYYY-MM-DD)*
 
 ```
 
 ---
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks:
+  - "誤った解釈による混乱"
+fallbacks:
+  - "user-check"
 
 ## Output: SKILL.md Structure (v6.2 Structural Enforcement)
 
@@ -1114,6 +1303,13 @@ anti_skip: enabled
 
 ```yaml
 ---
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks:
+  - "誤った解釈による混乱"
+fallbacks:
+  - "user-check"
 # Skill Metadata (必須)
 id: "[series-initial][number]"          # 例: U1, O1, S2
 name: "[skill-name]"
@@ -1146,6 +1342,13 @@ lineage: "[生成経緯を記述]"
 anti_skip: enabled
 version: "1.0.0"
 ---
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks:
+  - "誤った解釈による混乱"
+fallbacks:
+  - "user-check"
 
 ## Overview
 [200字以上: 目的、スコープ、対象読者、使用シナリオ]
@@ -1214,6 +1417,13 @@ version: "1.0.0"
 ```
 
 ---
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks:
+  - "誤った解釈による混乱"
+fallbacks:
+  - "user-check"
 
 ## References
 
@@ -1233,6 +1443,13 @@ version: "1.0.0"
 | `references/prompt-lang-templates/` | Prompt-Lang テンプレート集 |
 
 ---
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks:
+  - "誤った解釈による混乱"
+fallbacks:
+  - "user-check"
 
 ## Version History
 
@@ -1265,6 +1482,13 @@ version: "1.0.0"
 ```
 
 ---
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks:
+  - "誤った解釈による混乱"
+fallbacks:
+  - "user-check"
 
 ## Boot Sequence
 

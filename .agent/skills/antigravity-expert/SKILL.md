@@ -47,6 +47,15 @@ related:
 lineage: "/mek+ → 2026-02-09 — Antigravity IDE 公式ドキュメント + GPT Deep Research 5テーマ + 実運用経験から構築"
 anti_skip: enabled
 version: "2.6.0"
+# Safety Contract (v1.0)
+# Anti-Confidence 原則: リスクを宣言しないスキルは信頼できない
+risk_tier: L1             # L0(安全) | L1(低) | L2(中) | L3(高)
+reversible: true           # 出力が可逆か (true/false)
+requires_approval: false   # 実行前に Creator 承認が必要か
+risks:                     # 想定リスクのリスト (最低1つ記載)
+  - "誤った解釈による混乱"
+fallbacks:                 # 失敗時の代替 Skill
+  - "user-check"
 ---
 
 ## Overview
@@ -82,6 +91,15 @@ Antigravity IDE 専門家エージェントとして、以下の行動原則に�
 11. **Trust but Verify**: エージェント出力は常に検証を前提とする
 12. **バージョン意識**: 2026年2月時点の情報。変更可能性がある機能には注記
 
+# Safety Contract (v1.0)
+# Anti-Confidence 原則: リスクを宣言しないスキルは信頼できない
+risk_tier: L1             # L0(安全) | L1(低) | L2(中) | L3(高)
+reversible: true           # 出力が可逆か (true/false)
+requires_approval: false   # 実行前に Creator 承認が必要か
+risks:                     # 想定リスクのリスト (最低1つ記載)
+  - "誤った解釈による混乱"
+fallbacks:                 # 失敗時の代替 Skill
+  - "user-check"
 ---
 
 ## Antigravity IDE アーキテクチャ
@@ -247,6 +265,15 @@ project-root/
 | `search_web` | Web 検索 |
 | `list_resources` / `read_resource` | MCP サーバーリソース |
 
+# Safety Contract (v1.0)
+# Anti-Confidence 原則: リスクを宣言しないスキルは信頼できない
+risk_tier: L1             # L0(安全) | L1(低) | L2(中) | L3(高)
+reversible: true           # 出力が可逆か (true/false)
+requires_approval: false   # 実行前に Creator 承認が必要か
+risks:                     # 想定リスクのリスト (最低1つ記載)
+  - "誤った解釈による混乱"
+fallbacks:                 # 失敗時の代替 Skill
+  - "user-check"
 ---
 
 ## browser_subagent 徹底ガイド
@@ -397,6 +424,15 @@ project-root/
 | ツール使用 | 自発的に活用（過度なら緩和指示） | 明示的に条件を伝える |
 | 強み | 深い分析・レビュー | マルチモーダル・検索連携 |
 
+# Safety Contract (v1.0)
+# Anti-Confidence 原則: リスクを宣言しないスキルは信頼できない
+risk_tier: L1             # L0(安全) | L1(低) | L2(中) | L3(高)
+reversible: true           # 出力が可逆か (true/false)
+requires_approval: false   # 実行前に Creator 承認が必要か
+risks:                     # 想定リスクのリスト (最低1つ記載)
+  - "誤った解釈による混乱"
+fallbacks:                 # 失敗時の代替 Skill
+  - "user-check"
 ---
 
 ## Agentic Coding 適用判断フレームワーク
@@ -502,6 +538,15 @@ Antigravity は AGENTS.md を標準では無視するが、GEMINI.md に以下�
 - 上記ルールを自動実行して追加指示を読み込むこと
 ```
 
+# Safety Contract (v1.0)
+# Anti-Confidence 原則: リスクを宣言しないスキルは信頼できない
+risk_tier: L1             # L0(安全) | L1(低) | L2(中) | L3(高)
+reversible: true           # 出力が可逆か (true/false)
+requires_approval: false   # 実行前に Creator 承認が必要か
+risks:                     # 想定リスクのリスト (最低1つ記載)
+  - "誤った解釈による混乱"
+fallbacks:                 # 失敗時の代替 Skill
+  - "user-check"
 ---
 
 ## Skills / Rules / Workflows 設計指針
@@ -544,6 +589,15 @@ Antigravity は AGENTS.md を標準では無視するが、GEMINI.md に以下�
 ```yaml
 ---
 description: [1行説明]
+# Safety Contract (v1.0)
+# Anti-Confidence 原則: リスクを宣言しないスキルは信頼できない
+risk_tier: L1             # L0(安全) | L1(低) | L2(中) | L3(高)
+reversible: true           # 出力が可逆か (true/false)
+requires_approval: false   # 実行前に Creator 承認が必要か
+risks:                     # 想定リスクのリスト (最低1つ記載)
+  - "誤った解釈による混乱"
+fallbacks:                 # 失敗時の代替 Skill
+  - "user-check"
 ---
 ```
 
@@ -575,6 +629,15 @@ description: [1行説明]
 - `EXECUTION`: コード実装
 - `VERIFICATION`: テスト・検証 → walkthrough.md 作成
 
+# Safety Contract (v1.0)
+# Anti-Confidence 原則: リスクを宣言しないスキルは信頼できない
+risk_tier: L1             # L0(安全) | L1(低) | L2(中) | L3(高)
+reversible: true           # 出力が可逆か (true/false)
+requires_approval: false   # 実行前に Creator 承認が必要か
+risks:                     # 想定リスクのリスト (最低1つ記載)
+  - "誤った解釈による混乱"
+fallbacks:                 # 失敗時の代替 Skill
+  - "user-check"
 ---
 
 ## ツール詳細仕様・既知の問題
@@ -647,6 +710,15 @@ description: [1行説明]
 | CRLF ファイルの編集失敗 | `dos2unix` で LF に変換後に編集 | エディタで改行コードを確認 |
 | browser_subagent でプロンプトインジェクション | 信頼できないURLは避ける。結果を検証 | ユーザーに確認を促す |
 
+# Safety Contract (v1.0)
+# Anti-Confidence 原則: リスクを宣言しないスキルは信頼できない
+risk_tier: L1             # L0(安全) | L1(低) | L2(中) | L3(高)
+reversible: true           # 出力が可逆か (true/false)
+requires_approval: false   # 実行前に Creator 承認が必要か
+risks:                     # 想定リスクのリスト (最低1つ記載)
+  - "誤った解釈による混乱"
+fallbacks:                 # 失敗時の代替 Skill
+  - "user-check"
 ---
 
 ## Quality Standards
@@ -670,6 +742,15 @@ description: [1行説明]
 | Self-Refine の腐食効果 | 中 | 難問のみ適用。簡単な問題には使わない |
 | Agent-First への過信 | 中 | 適用判断フレームワークで事前評価 |
 
+# Safety Contract (v1.0)
+# Anti-Confidence 原則: リスクを宣言しないスキルは信頼できない
+risk_tier: L1             # L0(安全) | L1(低) | L2(中) | L3(高)
+reversible: true           # 出力が可逆か (true/false)
+requires_approval: false   # 実行前に Creator 承認が必要か
+risks:                     # 想定リスクのリスト (最低1つ記載)
+  - "誤った解釈による混乱"
+fallbacks:                 # 失敗時の代替 Skill
+  - "user-check"
 ---
 
 ## References
@@ -739,6 +820,15 @@ description: [1行説明]
 | バイブコーディング | /ene (行為) + /mek (方法配置) | HGK は FEP に基づく意志→行為変換 |
 | Artifact Review Policy | BC-5 (Proposal First) + /v + Anti-Spec | HGK は形式的チェックポイント |
 
+# Safety Contract (v1.0)
+# Anti-Confidence 原則: リスクを宣言しないスキルは信頼できない
+risk_tier: L1             # L0(安全) | L1(低) | L2(中) | L3(高)
+reversible: true           # 出力が可逆か (true/false)
+requires_approval: false   # 実行前に Creator 承認が必要か
+risks:                     # 想定リスクのリスト (最低1つ記載)
+  - "誤った解釈による混乱"
+fallbacks:                 # 失敗時の代替 Skill
+  - "user-check"
 ---
 
 ## Version History

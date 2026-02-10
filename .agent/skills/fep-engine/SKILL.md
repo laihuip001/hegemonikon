@@ -22,6 +22,15 @@ triggers:
 version: "2.0.0"
 lineage: |
   v1.1 (手順のみ) → /sop deep 15論点50論文調査 (2026-02-10) → /noe+ 3命題抽出 → v2.0
+# Safety Contract (v1.0)
+# Anti-Confidence 原則: リスクを宣言しないスキルは信頼できない
+risk_tier: L1             # L0(安全) | L1(低) | L2(中) | L3(高)
+reversible: true           # 出力が可逆か (true/false)
+requires_approval: false   # 実行前に Creator 承認が必要か
+risks:                     # 想定リスクのリスト (最低1つ記載)
+  - "誤った解釈による混乱"
+fallbacks:                 # 失敗時の代替 Skill
+  - "user-check"
 ---
 
 # FEP Cognitive Engine v2.0
@@ -55,6 +64,15 @@ lineage: |
 > **Aguilera 2021 の警告**: Markov blanket + ソレノイダルフロー制約が成り立つパラメータ領域は極めて狭い。
 > 「任意のシステムに MB を仮定する」強い読みは不適切。[arXiv:2105.11203](https://arxiv.org/abs/2105.11203)
 
+# Safety Contract (v1.0)
+# Anti-Confidence 原則: リスクを宣言しないスキルは信頼できない
+risk_tier: L1             # L0(安全) | L1(低) | L2(中) | L3(高)
+reversible: true           # 出力が可逆か (true/false)
+requires_approval: false   # 実行前に Creator 承認が必要か
+risks:                     # 想定リスクのリスト (最低1つ記載)
+  - "誤った解釈による混乱"
+fallbacks:                 # 失敗時の代替 Skill
+  - "user-check"
 ---
 
 ## Layer 1: 操作的定義 — 概念を「使える」レベルで
@@ -167,6 +185,15 @@ A4 Epistēmē → 精度の確立（知識として正当化された高精度�
 | O3 Zētēsis | **Epistemic value** | 情報利得を最大化する行動。探索 |
 | O4 Energeia | **Pragmatic value** | 報酬を最大化する行動。実行 |
 
+# Safety Contract (v1.0)
+# Anti-Confidence 原則: リスクを宣言しないスキルは信頼できない
+risk_tier: L1             # L0(安全) | L1(低) | L2(中) | L3(高)
+reversible: true           # 出力が可逆か (true/false)
+requires_approval: false   # 実行前に Creator 承認が必要か
+risks:                     # 想定リスクのリスト (最低1つ記載)
+  - "誤った解釈による混乱"
+fallbacks:                 # 失敗時の代替 Skill
+  - "user-check"
 ---
 
 ## Layer 3: 実装手順
@@ -264,6 +291,15 @@ print(llm_fmt)
 - [ ] Markov blanket を具体的な I/O で定義できるか？
 - [ ] 「FEP だから正しい」ではなく「FEP に基づいてこの具体的予測を立てる」と言えるか？
 
+# Safety Contract (v1.0)
+# Anti-Confidence 原則: リスクを宣言しないスキルは信頼できない
+risk_tier: L1             # L0(安全) | L1(低) | L2(中) | L3(高)
+reversible: true           # 出力が可逆か (true/false)
+requires_approval: false   # 実行前に Creator 承認が必要か
+risks:                     # 想定リスクのリスト (最低1つ記載)
+  - "誤った解釈による混乱"
+fallbacks:                 # 失敗時の代替 Skill
+  - "user-check"
 ---
 
 ## Layer 5: 理論的基盤
@@ -306,6 +342,15 @@ print(llm_fmt)
 | AIF_Meeting_EEC | Deep AIF for industrial control | [GitHub](https://github.com/YavarYeganeh/AIF_Meeting_EEC) |
 | pymdp | Active Inference の Python 実装 | [GitHub](https://github.com/infer-actively/pymdp) |
 
+# Safety Contract (v1.0)
+# Anti-Confidence 原則: リスクを宣言しないスキルは信頼できない
+risk_tier: L1             # L0(安全) | L1(低) | L2(中) | L3(高)
+reversible: true           # 出力が可逆か (true/false)
+requires_approval: false   # 実行前に Creator 承認が必要か
+risks:                     # 想定リスクのリスト (最低1つ記載)
+  - "誤った解釈による混乱"
+fallbacks:                 # 失敗時の代替 Skill
+  - "user-check"
 ---
 
 ## 結語

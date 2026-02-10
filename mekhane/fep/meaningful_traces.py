@@ -24,9 +24,13 @@ from datetime import datetime
 from pathlib import Path
 from typing import Optional, List
 import json
+import os
 
 # Default persistence path
-TRACES_PATH = Path("/home/makaron8426/oikos/mneme/.hegemonikon/meaningful_traces.json")
+TRACES_PATH = Path(os.environ.get(
+    "HGK_TRACES_PATH",
+    Path.home() / ".hegemonikon" / "meaningful_traces.json"
+))
 
 
 @dataclass

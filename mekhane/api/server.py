@@ -126,6 +126,14 @@ def _register_routers(app: FastAPI) -> None:
     except Exception as exc:
         logger.warning("Gnōsis Narrator router skipped: %s", exc)
 
+    # Link Graph — ファイルシステム IO に依存するため遅延ロード
+    try:
+        from mekhane.api.routes.link_graph import router as link_graph_router
+        app.include_router(link_graph_router, prefix=API_PREFIX)
+        logger.info("Link Graph router registered")
+    except Exception as exc:
+        logger.warning("Link Graph router skipped: %s", exc)
+
 
 # PURPOSE: アプリケーションインスタンス（uvicorn 用）
 app = create_app()

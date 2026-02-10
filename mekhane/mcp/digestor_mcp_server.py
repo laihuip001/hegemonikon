@@ -29,8 +29,11 @@ log("Starting Digestor MCP Server...")
 # ============ Import path setup ============
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).parent.parent))
-log(f"Added to path: {Path(__file__).parent.parent}")
+# プロジェクトルート (hegemonikon/) を追加 — from mekhane.* を解決
+_project_root = str(Path(__file__).parent.parent.parent)
+if _project_root not in sys.path:
+    sys.path.insert(0, _project_root)
+log(f"Added to path: {_project_root}")
 
 
 # ============ Suppress stdout during imports ============

@@ -17,7 +17,31 @@ NOTE: 以前は大量の re-export をしていたが、循環インポートの
       新: from hermeneus.src.ccl_ast import Workflow
 """
 
-__version__ = "0.8.0"  # Phase 8: __init__.py 軽量化
+__version__ = "0.8.1"  # Phase 8.1: 後方互換 re-export (MCP キャッシュ対策)
+
+
+# =============================================================================
+# 後方互換 re-export (レイジーインポート)
+# 循環インポートを避けるため __getattr__ で遅延ロードする。
+# MCP サーバープロセスが古い import パスを使っている場合に対応。
+# =============================================================================
+
+def __getattr__(name: str):
+    """後方互換: from hermeneus.src import X をサポート"""
+    _lazy_imports = {
+        # audit.py
+        "get_audit_report": "hermeneus.src.audit",
+        "query_audits": "hermeneus.src.audit",
+        # registry.py
+        "list_workflows": "hermeneus.src.registry",
+        "get_workflow": "hermeneus.src.registry",
+        "WorkflowRegistry": "hermeneus.src.registry",
+    }
+    if name in _lazy_imports:
+        import importlib
+        module = importlib.import_module(_lazy_imports[name])
+        return getattr(module, name)
+    raise AttributeError(f"module 'hermeneus.src' has no attribute {name!r}")
 
 
 def compile_ccl(

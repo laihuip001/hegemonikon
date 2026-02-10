@@ -54,7 +54,7 @@ category_theory:
     暗黙知: "言語化できない部分（名人芸、勘、手触り）。ポラニーの暗黙知"
   drift: "Drift = 暗黙知の量。G が言語化できない残差"
   explore_exploit: "Explore = F の自由度を広げる / Exploit = G の確実性を使う"
-  fep_connection: "G = perception（世界モデル更新）。実践が内部モデルを書き換える"
+  fep_connection: "座学⇄実践の循環。知覚⇄運動とアナロジカルだが、スケールは異なる"
   insight: "IF-THENの集積 = 条件反射 = 無意識的技能 — Creator, 2026-02-10"
 ---
 

@@ -5,6 +5,11 @@ description: |
   「全てを説明する理論」ではなく「行動選択の objective」として FEP を使う。
   VFE/EFE の数学的分解、精度加重の操作的定義、HGK 体系との対応を含む。
 
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks: []
+fallbacks: []
 triggers:
   - "FEP"
   - "自由エネルギー"

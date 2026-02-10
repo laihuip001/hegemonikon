@@ -1,6 +1,11 @@
 ---
 name: Synedrion Council
 description: 偉人評議会 (Synedrion) による多角的レビュー・監査
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks: []
+fallbacks: []
 triggers:
   - "評議会"
   - "レビュー"

@@ -1,6 +1,11 @@
 ---
 name: Poiema Generator
 description: 構造化出力の生成 (Boot レポート, Handoff, 定型ドキュメント)
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks: []
+fallbacks: []
 triggers:
   - "生成"
   - "レポート"

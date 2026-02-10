@@ -1,6 +1,11 @@
 ---
 name: Hermēneus CCL Dispatch
 description: CCL 式を検出したら Hermēneus パーサーで構造解析し、AST に基づいて実行する
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks: []
+fallbacks: []
 triggers:
   - "/"
   - "~"

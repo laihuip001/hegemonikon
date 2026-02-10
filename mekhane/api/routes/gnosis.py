@@ -76,6 +76,7 @@ def _get_index():
 
 
 @router.get("/search", response_model=GnosisSearchResponse)
+# PURPOSE: 検索実行
 async def gnosis_search(
     q: str = Query(..., min_length=1, description="検索クエリ"),
     limit: int = Query(10, ge=1, le=50, description="結果件数"),
@@ -112,6 +113,7 @@ async def gnosis_search(
 
 
 @router.get("/stats", response_model=GnosisStatsResponse)
+# PURPOSE: 統計取得
 async def gnosis_stats() -> GnosisStatsResponse:
     """Gnōsis インデックス統計。"""
     try:

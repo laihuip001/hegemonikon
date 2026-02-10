@@ -1,23 +1,29 @@
 #!/usr/bin/env python3
-# PROOF: [L3/機能] <- mekhane/fep/ FEP Agent と Attractor の一致率を追跡
+# PROOF: [L3/機能] <- mekhane/fep/ FEP Agent と Attractor の統合追跡
 """
-Convergence Tracker — Agent/Attractor 一致率の永続的追跡
+Convergence Tracker — Agent/Attractor 統合スコアの永続的追跡
 
-PURPOSE: FEP Agent と Attractor が同じ Series を選ぶかの収束を証明する。
+PURPOSE: FEP Agent と Attractor の「統合的価値」を測定する。
 
-Law: convergence_rate = Σ(agreements) / Σ(total)
+Design: Convergence as Pushout (圏論的再定義)
+  旧: Equalizer = 「同じか？」 → rate = Σ(agreements) / Σ(total)
+  新: Pushout  = 「一緒に何を作れるか？」 → 3成分統合スコア
+
+ConvergenceScore = agreement×w₁ + value_alignment×w₂ + complementarity×w₃
+  - agreement:       Agent と Attractor が一致したか (旧来の指標)
+  - value_alignment:  結果が良かったか (本質的指標)
+  - complementarity:  不一致が価値を生んだか (新規指標)
 
 Convergence proof (3-layer criteria, /noe+ designed):
-  1. Statistical: rate > chance (1/6) with p < 0.05 (binomial test)
+  1. Statistical: pushout_score > 0.3 with sufficient data
   2. Categorical: disagreements classified as explore/exploit/error
   3. Temporal: trend != "degrading"
-
-If all 3 hold, convergence is proven.
 """
 
 import json
 import math
 import os
+from dataclasses import dataclass, asdict
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Literal
@@ -35,6 +41,70 @@ _DEFAULT_PATH = os.path.expanduser(
 CONVERGENCE_PATH = Path(
     os.environ.get("HGK_CONVERGENCE_PATH", _DEFAULT_PATH)
 )
+
+# Pushout weights (configurable)
+W_AGREEMENT = 0.2
+W_VALUE_ALIGNMENT = 0.5
+W_COMPLEMENTARITY = 0.3
+
+
+@dataclass
+class ConvergenceScore:
+    """普遍的 Convergence スコア — Pushout として定義.
+
+    Agent と Attractor の判断を「統合」し、
+    一致/不一致を超えた価値を測定する。
+    """
+
+    # 射 π₁: Agent → Score
+    agent_series: Optional[str]
+    agent_confidence: float = 0.0
+
+    # 射 π₂: Attractor → Score
+    attractor_series: Optional[str] = None
+    attractor_similarity: float = 0.0
+
+    # Pushout の同値類（統合判断）
+    agreement: bool = False
+    value_alignment: float = 0.5      # [0,1] 中立初期値, /bye で更新
+    complementarity: float = 0.0      # [0,1] 不一致が有益だったか
+
+    @property
+    def score(self) -> float:
+        """統合 convergence スコア [0, 1]."""
+        return (
+            (1.0 if self.agreement else 0.0) * W_AGREEMENT
+            + self.value_alignment * W_VALUE_ALIGNMENT
+            + self.complementarity * W_COMPLEMENTARITY
+        )
+
+    def to_dict(self) -> Dict[str, Any]:
+        """Serialize for JSON storage."""
+        d = asdict(self)
+        d["score"] = round(self.score, 3)
+        return d
+
+
+def _compute_complementarity(
+    agent_series: Optional[str],
+    attractor_series: Optional[str],
+    category: DisagreementCategory,
+) -> float:
+    """不一致の補完性を推定.
+
+    - explore: Agent が情報収集 → 高い補完性 (0.7)
+    - exploit: 異なる Series で行動 → 中程度 (0.4)
+    - error:   エラー → 低い (0.1)
+    - unknown: 不明 → 中立 (0.3)
+    """
+    if agent_series == attractor_series:
+        return 0.0  # 一致時は complementarity 不要
+    return {
+        "explore": 0.7,
+        "exploit": 0.4,
+        "error": 0.1,
+        "unknown": 0.3,
+    }.get(category, 0.3)
 
 
 def _load_records() -> List[Dict[str, Any]]:
@@ -96,20 +166,43 @@ def record_agreement(
     attractor_series: Optional[str],
     agent_action: str = "",
     epsilon: Optional[Dict[str, float]] = None,
+    agent_confidence: float = 0.0,
+    attractor_similarity: float = 0.0,
 ) -> Dict[str, Any]:
-    """Record an agreement/disagreement between Agent and Attractor.
+    """Record a convergence event between Agent and Attractor.
 
     Args:
         agent_series: Series selected by FEP Agent (None = observe)
         attractor_series: Series recommended by Attractor
         agent_action: Action name (e.g. "act_O", "observe")
         epsilon: Current ε values (for correlation analysis)
+        agent_confidence: Agent's belief confidence [0, 1]
+        attractor_similarity: Attractor's embedding similarity [0, 1]
 
     Returns:
         Updated convergence summary
     """
     records = _load_records()
     agreed = agent_series == attractor_series
+
+    # Disagreement category
+    category: DisagreementCategory = "unknown"
+    if not agreed:
+        category = classify_disagreement(
+            agent_series, attractor_series, agent_action
+        )
+
+    # Compute ConvergenceScore (pushout)
+    comp = _compute_complementarity(agent_series, attractor_series, category)
+    conv_score = ConvergenceScore(
+        agent_series=agent_series,
+        agent_confidence=agent_confidence,
+        attractor_series=attractor_series,
+        attractor_similarity=attractor_similarity,
+        agreement=agreed,
+        value_alignment=0.5,  # 中立初期値, /bye で後から更新
+        complementarity=comp,
+    )
 
     record = {
         "timestamp": datetime.now().isoformat(),
@@ -118,13 +211,11 @@ def record_agreement(
         "agent_action": agent_action,
         "agreed": agreed,
         "epsilon": epsilon,
+        "convergence_score": conv_score.to_dict(),
     }
 
-    # Add disagreement category if not agreed
     if not agreed:
-        record["disagreement_category"] = classify_disagreement(
-            agent_series, attractor_series, agent_action
-        )
+        record["disagreement_category"] = category
 
     records.append(record)
 
@@ -233,11 +324,31 @@ def convergence_summary(
             cat = r.get("disagreement_category", "unknown")
             breakdown[cat] = breakdown.get(cat, 0) + 1
 
-    # Convergence: 3-layer criteria (/noe+ design)
-    #   1. Statistical: p < 0.05
+    # Pushout score: 統合スコアの平均
+    pushout_scores = []
+    for r in records:
+        cs = r.get("convergence_score")
+        if cs and "score" in cs:
+            pushout_scores.append(cs["score"])
+    avg_pushout = (
+        sum(pushout_scores) / len(pushout_scores) if pushout_scores else 0.0
+    )
+    recent_pushout_scores = [
+        r.get("convergence_score", {}).get("score", 0.0)
+        for r in recent
+        if r.get("convergence_score")
+    ]
+    recent_pushout = (
+        sum(recent_pushout_scores) / len(recent_pushout_scores)
+        if recent_pushout_scores
+        else 0.0
+    )
+
+    # Convergence: 3-layer criteria (pushout version)
+    #   1. Pushout score > 0.3 (better than degenerate case)
     #   2. Temporal: trend != "degrading"
     #   3. Minimum data: total >= 10
-    converged = p_value < 0.05 and trend != "degrading" and total >= 10
+    converged = avg_pushout > 0.3 and trend != "degrading" and total >= 10
 
     return {
         "total": total,
@@ -248,6 +359,9 @@ def convergence_summary(
         "recent_rate": round(recent_rate, 3),
         "trend": trend,
         "disagreement_breakdown": breakdown,
+        # Pushout metrics
+        "pushout_score": round(avg_pushout, 3),
+        "recent_pushout": round(recent_pushout, 3),
     }
 
 
@@ -264,15 +378,14 @@ def format_convergence(summary: Optional[Dict[str, Any]] = None) -> str:
         summary["trend"], "?"
     )
 
-    p = summary.get("p_value", 1.0)
-    p_str = f"p={p:.3f}" if p >= 0.001 else "p<0.001"
-    p_icon = "✓" if p < 0.05 else "✗"
+    pushout = summary.get("pushout_score", 0.0)
+    recent_p = summary.get("recent_pushout", 0.0)
 
     base = (
-        f"{icon} Convergence: {summary['rate']*100:.0f}% "
+        f"{icon} Convergence: pushout={pushout:.2f} "
+        f"agree={summary['rate']*100:.0f}% "
         f"({summary['agreements']}/{summary['total']}) "
-        f"{p_str}{p_icon} "
-        f"recent={summary['recent_rate']*100:.0f}% {trend_icon}"
+        f"recent_pushout={recent_p:.2f} {trend_icon}"
     )
 
     # Add disagreement breakdown if any

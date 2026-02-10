@@ -26,6 +26,7 @@ from mekhane.fep.convergence_tracker import (
     convergence_summary,
     format_convergence,
     record_agreement,
+    ConvergenceScore,
 )
 
 
@@ -131,10 +132,21 @@ class TestConvergenceSummary:
         assert result["disagreement_breakdown"] == {}
 
     def test_all_agree(self):
-        records = [{"agreed": True} for _ in range(15)]
+        # Records with convergence_score (pushout format)
+        records = [
+            {
+                "agreed": True,
+                "convergence_score": ConvergenceScore(
+                    agent_series="O", attractor_series="O",
+                    agreement=True, value_alignment=0.5,
+                ).to_dict(),
+            }
+            for _ in range(15)
+        ]
         result = convergence_summary(records)
         assert result["rate"] == 1.0
         assert result["p_value"] < 0.001
+        assert result["pushout_score"] > 0.3
         assert result["converged"] is True
 
     def test_all_disagree(self):
@@ -189,7 +201,7 @@ class TestFormatConvergence:
         result = format_convergence({"total": 0})
         assert "No data" in result
 
-    def test_converged_with_p_value(self):
+    def test_converged_with_pushout(self):
         summary = {
             "total": 20,
             "agreements": 15,
@@ -199,12 +211,13 @@ class TestFormatConvergence:
             "recent_rate": 0.8,
             "trend": "stable",
             "disagreement_breakdown": {"explore": 3, "exploit": 2},
+            "pushout_score": 0.65,
+            "recent_pushout": 0.7,
         }
         result = format_convergence(summary)
         assert "✅" in result
-        assert "75%" in result
-        assert "p=" in result or "p<" in result
-        assert "✓" in result  # p < 0.05
+        assert "pushout=" in result
+        assert "agree=75%" in result
         assert "disagree=" in result
 
     def test_not_converged(self):
@@ -217,10 +230,12 @@ class TestFormatConvergence:
             "recent_rate": 0.2,
             "trend": "insufficient_data",
             "disagreement_breakdown": {},
+            "pushout_score": 0.15,
+            "recent_pushout": 0.15,
         }
         result = format_convergence(summary)
         assert "📊" in result
-        assert "✗" in result  # p >= 0.05
+        assert "pushout=" in result
 
 
 # ============================================================

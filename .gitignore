@@ -28,6 +28,8 @@ runtime/
 .gemini/tmp/
 
 # Secrets / credentials
+.env
+**/.env
 .gemini/oauth_creds.json
 .gemini/google_accounts.json
 mneme/.hegemonikon/sessions/*

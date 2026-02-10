@@ -4,6 +4,9 @@ version = "0.1.0"
 description = "FEP-based cognitive hypervisor framework"
 requires-python = ">=3.11"
 
+[tool.setuptools]
+packages = ["mekhane", "hermeneus", "synergeia", "kernel", "pythosis"]
+
 [tool.pytest.ini_options]
 testpaths = [
     "hermeneus/tests",

@@ -51,6 +51,14 @@ Q.E.D.
 | embeddings/ | P3 → ベクトル表現 |
 | backlinker/ | P3 → 逆リンク発見 |
 
+## ファイル構成
+
+| ファイル | 役割 |
+|:---------|:-----|
+| `boot_integration.py` | # PROOF: [L2/インフラ] <- mekhane/symploke/ A0→継続する私が必要→boot_integration が担う |
+| `boot_axes.py` | # PROOF: [L2/インフラ] <- mekhane/symploke/ A0→統合処理の複雑性→分割が必要→boot_axes が担う |
+| `config.py` | # PROOF: [L2/インフラ] <- mekhane/symploke/ A0→知識システムには設定が必要→config が担う |
+
 ---
 
 *symploke/ は FEP から演繹される。発明ではない。*

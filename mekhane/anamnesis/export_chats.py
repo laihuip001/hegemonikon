@@ -245,25 +245,14 @@ class AntigravityChatExporter:
                         const children = container.querySelectorAll(':scope > div');
                         const excludeTags = new Set(['STYLE', 'SCRIPT', 'CODE', 'PRE']);
                         
-                        function getTextContent(node, root) {
+                        function getTextContent(node) {
                             let text = '';
                             for (const child of node.childNodes) {
                                 if (child.nodeType === Node.TEXT_NODE) {
-                                    let parent = child.parentElement;
-                                    let shouldExclude = false;
-                                    while (parent && parent !== root) {
-                                        if (excludeTags.has(parent.tagName)) {
-                                            shouldExclude = true;
-                                            break;
-                                        }
-                                        parent = parent.parentElement;
-                                    }
-                                    if (!shouldExclude) {
-                                        text += child.textContent;
-                                    }
+                                    text += child.textContent;
                                 } else if (child.nodeType === Node.ELEMENT_NODE) {
                                     if (!excludeTags.has(child.tagName)) {
-                                        text += getTextContent(child, root);
+                                        text += getTextContent(child);
                                     }
                                 }
                             }
@@ -271,7 +260,7 @@ class AntigravityChatExporter:
                         }
                         
                         for (const child of children) {
-                            const text = getTextContent(child, child).trim();
+                            const text = getTextContent(child).trim();
                             if (text && text.length > 0) {
                                 results.push({
                                     clean_text: text,
@@ -446,26 +435,14 @@ class AntigravityChatExporter:
                     const children = container.querySelectorAll(':scope > div');
                     const excludeTags = new Set(['STYLE', 'SCRIPT', 'CODE', 'PRE']);
                     
-                    function getTextContent(node, root) {
+                    function getTextContent(node) {
                         let text = '';
                         for (const child of node.childNodes) {
                             if (child.nodeType === Node.TEXT_NODE) {
-                                // 除外すべき親があるか再帰的に確認
-                                let parent = child.parentElement;
-                                let shouldExclude = false;
-                                while (parent && parent !== root) {
-                                    if (excludeTags.has(parent.tagName)) {
-                                        shouldExclude = true;
-                                        break;
-                                    }
-                                    parent = parent.parentElement;
-                                }
-                                if (!shouldExclude) {
-                                    text += child.textContent;
-                                }
+                                text += child.textContent;
                             } else if (child.nodeType === Node.ELEMENT_NODE) {
                                 if (!excludeTags.has(child.tagName)) {
-                                    text += getTextContent(child, root);
+                                    text += getTextContent(child);
                                 }
                             }
                         }
@@ -475,7 +452,7 @@ class AntigravityChatExporter:
                     for (const child of children) {
                         results.push({
                             classes: child.className || "",
-                            clean_text: getTextContent(child, child).trim(),
+                            clean_text: getTextContent(child).trim(),
                             raw_text: child.textContent || "",
                             section_idx: child.getAttribute('data-section-index')
                         });

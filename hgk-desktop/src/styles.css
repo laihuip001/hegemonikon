@@ -252,6 +252,12 @@ h1 small {
   background-color: #388bfd;
 }
 
+button:disabled,
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 .btn-sm {
   padding: 0.25rem 0.5rem;
   font-size: 0.8rem;

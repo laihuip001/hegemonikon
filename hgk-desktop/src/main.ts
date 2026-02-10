@@ -305,7 +305,10 @@ async function renderFepContent(): Promise<void> {
   `;
 
   // S6: FEP Step event handler
-  document.getElementById('step-btn')?.addEventListener('click', async () => {
+  document.getElementById('step-btn')?.addEventListener('click', async (e) => {
+    const btn = e.currentTarget as HTMLButtonElement;
+    const originalText = btn.innerHTML || 'Step';
+
     const obsInput = document.getElementById('obs-input') as HTMLInputElement;
     const obs = parseInt(obsInput.value, 10);
     if (isNaN(obs) || obs < 0 || obs > 47) {
@@ -314,8 +317,11 @@ async function renderFepContent(): Promise<void> {
       return;
     }
 
+    btn.disabled = true;
+    btn.innerHTML = 'Running...';
     const resultDiv = document.getElementById('step-result')!;
     resultDiv.innerHTML = '<span class="loading">Running...</span>';
+
     try {
       const res: FEPStepResponse = await api.fepStep(obs);
       resultDiv.innerHTML = `
@@ -330,6 +336,8 @@ async function renderFepContent(): Promise<void> {
       void renderFepContent();
     } catch (e) {
       resultDiv.innerHTML = `<span class="status-error">Step failed: ${esc((e as Error).message)}</span>`;
+      btn.disabled = false;
+      btn.innerHTML = originalText;
     }
   });
 }

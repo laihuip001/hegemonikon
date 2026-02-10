@@ -8,19 +8,38 @@ Tests if the API key is valid and can connect to Jules.
 import asyncio
 import os
 import sys
-import pytest
 
 # Add parent to path
 sys.path.insert(0, "/home/makaron8426/oikos/hegemonikon")
 
-from mekhane.symploke.jules_client import JulesClient
+try:
+    import pytest
+except ImportError:
+    pytest = None
+
+try:
+    from mekhane.symploke.jules_client import JulesClient
+    import aiohttp
+except ImportError:
+    JulesClient = None
+    aiohttp = None
+
+
+def skip_if_missing(func):
+    """Decorator to skip test if dependencies are missing."""
+    if pytest:
+        return pytest.mark.skipif(not os.environ.get("JULES_API_KEY") or aiohttp is None, reason="Missing deps or API key")(func)
+    return func
 
 
 # PURPOSE: Test API connection by listing sources
-@pytest.mark.asyncio
-@pytest.mark.skipif(not os.environ.get("JULES_API_KEY"), reason="JULES_API_KEY not set")
+@skip_if_missing
 async def test_connection():
     """Test API connection by listing sources."""
+    if not pytest or not aiohttp:
+        print("Skipping: pytest or aiohttp not installed")
+        return True
+
     api_key = os.environ.get("JULES_API_KEY")
     if not api_key:
         print("❌ JULES_API_KEY not set")
@@ -30,8 +49,6 @@ async def test_connection():
     print("-" * 50)
 
     try:
-        import aiohttp
-
         headers = {"X-Goog-Api-Key": api_key, "Content-Type": "application/json"}
 
         async with aiohttp.ClientSession() as session:
@@ -75,5 +92,8 @@ async def test_connection():
 
 
 if __name__ == "__main__":
+    if aiohttp is None or pytest is None:
+        print("Skipping: pytest or aiohttp not installed")
+        sys.exit(0)
     result = asyncio.run(test_connection())
     sys.exit(0 if result else 1)

@@ -16,6 +16,11 @@ description: |
   - 「PE」
   - 「生成」
   - 「製作」
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks: []
+fallbacks: []
 ---
 
 # Tekhne-Maker v6.7 「OMEGA SINGULARITY BUILD + TARGET_AGENT」

@@ -9,6 +9,11 @@ triggers:
   - "poiema"
   - "テンプレート"
   - "ドキュメント生成"
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks: []
+fallbacks: []
 ---
 
 # Poiema Generator

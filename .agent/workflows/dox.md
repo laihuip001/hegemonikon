@@ -43,6 +43,17 @@ sel_enforcement:
     minimum_requirements:
       - "記録プロセスを問う"
 ccl_signature: "/dox+_/bye"
+category_theory:
+  core: "随伴 F⊣G の右随伴 G（忘却関手）"
+  adjunction: "Pistis (F) ⊣ Doxa (G)"
+  role: "G: Trust → Belief（確信から推論過程を忘却し、結論だけを信念として保存）"
+  G_definition: "エビデンスの取捨選択・重み付け・比較検討の過程を捨てて、結果のみ保持"
+  G_two_layers:
+    結論: "「○○は正しい」という判断結果。well-defined"
+    導出文脈: "「なぜそう信じるか」の推論過程。信念化すると消える"
+  drift: "Drift = 導出文脈の喪失量。「なぜそう信じるか」を再構成できない度合い"
+  bc6_connection: "BC-6 TAINT/SOURCE 追跡 = Drift 低減のための仕組み。推論過程を記録し信念化を防ぐ"
+  insight: "信念は結果のみしか取り合わない。過程が忘れ去られる — Creator, 2026-02-10"
 ---
 
 # /dox: 信念定着ワークフロー (Doxa)
@@ -305,7 +316,6 @@ view_file /home/makaron8426/oikos/hegemonikon/.agent/skills/horme/h4-doxa/SKILL.
 ```
 
 ---
-
 
 ---
 

@@ -43,6 +43,15 @@ sel_enforcement:
     minimum_requirements:
       - "確信プロセスを問う"
 ccl_signature: "/pis+?h2"
+category_theory:
+  core: "随伴 F⊣G の左随伴 F（自由関手）"
+  adjunction: "Pistis (F) ⊣ Doxa (G)"
+  role: "F: Belief → Trust（信念にエビデンス・推論過程を載せて確信度に構成）"
+  F_definition: "結論に根拠列挙・反証検討・信頼区間の推論過程を付与して確信度を構成する"
+  unit: "η: Belief → G(F(Belief)) — 信念を確信にして結論だけ残す = 信念の安定性検証"
+  counit: "ε: F(G(Trust)) → Trust — 確信を信念にして再検証 = ベイズ更新の再実行"
+  bayes: "ベイズ更新(/pis.bayes) = F の反復適用。P(H|E) = 新しいエビデンスで確信度を更新"
+  insight: "確信 = 結論 + 推論過程。信念 = 結論のみ — Creator, 2026-02-10"
 ---
 
 # /pis: 確信度評価ワークフロー (Pistis)
@@ -307,7 +316,6 @@ view_file /home/makaron8426/oikos/hegemonikon/.agent/skills/horme/h2-pistis/SKIL
 ```
 
 ---
-
 
 ---
 

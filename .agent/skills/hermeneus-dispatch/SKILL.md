@@ -14,6 +14,16 @@ triggers:
   - "ワークフロー式"
   - "演算子"
 version: "3.0"
+
+# Safety Contract (v1.0)
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks:
+  - "パースエラーによる実行中断"
+  - "誤った解釈による予期せぬWF実行"
+fallbacks:
+  - "manual-analysis"
 ---
 
 # Hermēneus CCL Dispatch v3.0

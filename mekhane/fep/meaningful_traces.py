@@ -26,7 +26,8 @@ from typing import Optional, List
 import json
 
 # Default persistence path
-TRACES_PATH = Path("/home/makaron8426/oikos/mneme/.hegemonikon/meaningful_traces.json")
+# Use Path.home() to adapt to different environments (e.g., CI, production)
+TRACES_PATH = Path.home() / "oikos/mneme/.hegemonikon/meaningful_traces.json"
 
 
 @dataclass

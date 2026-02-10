@@ -9,6 +9,15 @@ triggers:
   - "dendron"
   - "checker"
   - "なぜ存在する"
+
+# Safety Contract (v1.0)
+risk_tier: L0
+reversible: true
+requires_approval: false
+risks:
+  - "判定ロジックの誤りによる誤検知"
+fallbacks:
+  - "manual-review"
 ---
 
 # Dendron EPT Checker

@@ -8,13 +8,6 @@ description: |
   IDE のアーキテクチャ、ツール群、Skills/Rules/Workflows の設計パターン、
   モデル固有の最適化、およびエージェント駆動開発のベストプラクティスを体系化。
 
-  Triggers:
-    - "Antigravity IDE の使い方を教えて"
-    - "IDE のツールについて知りたい"
-    - "Skills / Rules / Workflows の設計がしたい"
-    - "エージェント駆動開発の相談"
-    - "GEMINI.md の書き方"
-
 triggers:
   - "Antigravity"
   - "IDE"
@@ -47,6 +40,15 @@ related:
 lineage: "/mek+ → 2026-02-09 — Antigravity IDE 公式ドキュメント + GPT Deep Research 5テーマ + 実運用経験から構築"
 anti_skip: enabled
 version: "2.6.0"
+
+# Safety Contract (v1.0)
+risk_tier: L0
+reversible: true
+requires_approval: false
+risks:
+  - "古い情報の参照による誤った操作指示"
+fallbacks:
+  - "manual-search"
 ---
 
 ## Overview

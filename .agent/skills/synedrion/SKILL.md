@@ -10,6 +10,16 @@ triggers:
   - "多角"
   - "批評"
   - "/syn"
+
+# Safety Contract (v1.0)
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks:
+  - "過度な批判によるモチベーション低下"
+  - "実行コスト増大"
+fallbacks:
+  - "kairos/self-reflection"
 ---
 
 # Synedrion Council

@@ -9,6 +9,16 @@ triggers:
   - "poiema"
   - "テンプレート"
   - "ドキュメント生成"
+
+# Safety Contract (v1.0)
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks:
+  - "PIIマスキング漏れ"
+  - "不適切なテンプレート生成"
+fallbacks:
+  - "manual-drafting"
 ---
 
 # Poiema Generator

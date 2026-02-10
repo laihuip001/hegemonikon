@@ -12,6 +12,16 @@ triggers:
   - "検証"
   - "監査"
   - "audit"
+
+# Safety Contract (v1.0)
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks:
+  - "過剰反応による作業ブロック"
+  - "誤検知"
+fallbacks:
+  - "manual-audit"
 ---
 
 # Synteleia WBC (白血球)

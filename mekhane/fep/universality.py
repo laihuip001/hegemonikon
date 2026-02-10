@@ -1,3 +1,4 @@
+# PROOF: [L1/定理] <- mekhane/fep/ A0→圏論的普遍性検証(Kalon)→美の評価基盤
 """
 Kalon — 圏論的普遍性検証モジュール
 

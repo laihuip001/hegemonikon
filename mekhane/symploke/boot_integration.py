@@ -293,6 +293,7 @@ def get_boot_context(mode: str = "standard", context: Optional[str] = None) -> d
         load_handoffs, load_sophia, load_persona, load_pks,
         load_safety, load_ept, load_digestor, load_attractor,
         load_projects, load_skills, load_doxa, load_feedback,
+        load_proactive_push,
     )
 
     # GPU プリフライトチェック
@@ -323,6 +324,7 @@ def get_boot_context(mode: str = "standard", context: Optional[str] = None) -> d
     skills_result = load_skills(mode, context)
     doxa_result = load_doxa(mode, context)
     feedback_result = load_feedback(mode, context)
+    proactive_push_result = load_proactive_push(mode, context)
 
     # ── 統合フォーマット ──
     lines: list[str] = []
@@ -344,7 +346,7 @@ def get_boot_context(mode: str = "standard", context: Optional[str] = None) -> d
 
     for axis_result in [pks_result, safety_result, ept_result, digestor_result,
                         attractor_result, projects_result, skills_result,
-                        doxa_result, feedback_result]:
+                        doxa_result, feedback_result, proactive_push_result]:
         fmt = axis_result.get("formatted", "")
         if fmt:
             lines.append("")
@@ -384,6 +386,7 @@ def get_boot_context(mode: str = "standard", context: Optional[str] = None) -> d
         "skills": skills_result,
         "doxa": doxa_result,
         "feedback": feedback_result,
+        "proactive_push": proactive_push_result,
         "formatted": "\n".join(lines),
     }
 

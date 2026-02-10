@@ -247,9 +247,10 @@ class TestProactivePush:
         formatted = ProactivePush.format_compact(result)
         assert "関連知識" in formatted
 
+    @patch("mekhane.anamnesis.proactive_push.ProactivePush._graph_recommendations")
     @patch("mekhane.anamnesis.proactive_push.ProactivePush._extract_latest_context")
     @patch("mekhane.anamnesis.proactive_push.ProactivePush._retrieve")
-    def test_boot_recommendations(self, mock_retrieve, mock_context):
+    def test_boot_recommendations(self, mock_retrieve, mock_context, mock_graph):
         mock_context.return_value = "セッション管理と記憶検索"
         mock_retrieve.return_value = [
             {
@@ -261,11 +262,49 @@ class TestProactivePush:
                 "primary_key": "session:mem:0",
             }
         ]
+        mock_graph.return_value = []  # Graph 推薦なし
 
         push = ProactivePush()
         result = push.boot_recommendations()
         assert result.trigger_type == "boot"
         assert len(result.recommendations) == 1
+
+    @patch("mekhane.anamnesis.proactive_push.ProactivePush._graph_recommendations")
+    @patch("mekhane.anamnesis.proactive_push.ProactivePush._extract_latest_context")
+    @patch("mekhane.anamnesis.proactive_push.ProactivePush._retrieve")
+    def test_boot_with_graph_recommendations(self, mock_retrieve, mock_context, mock_graph):
+        """Context-Triggered + Graph-Triggered の統合テスト."""
+        mock_context.return_value = "認知アーキテクチャ"
+        mock_retrieve.return_value = [
+            {
+                "title": "Context Paper",
+                "_source_table": "papers",
+                "source": "arxiv",
+                "_distance": 0.3,
+                "abstract": "ベクトル近傍の論文",
+                "primary_key": "ctx_001",
+            }
+        ]
+        mock_graph.return_value = [
+            Recommendation(
+                title="Bridge Node",
+                source_type="kernel",
+                relevance=0.7,
+                trigger="bridge",
+                benefit="ブリッジノード推薦",
+                content_snippet="グラフ上の構造的関連",
+                primary_key="bridge_001",
+            )
+        ]
+
+        push = ProactivePush()
+        result = push.boot_recommendations()
+        assert result.trigger_type == "boot"
+        assert len(result.recommendations) == 2
+        triggers = {r.trigger for r in result.recommendations}
+        assert "context" in triggers
+        assert "bridge" in triggers
+        assert result.total_candidates == 2  # 1 context + 1 graph
 
     def test_boot_no_context(self):
         push = ProactivePush()

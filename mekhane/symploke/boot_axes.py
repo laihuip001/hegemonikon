@@ -1,7 +1,7 @@
 # PROOF: [L2/インフラ] <- mekhane/symploke/
 # PURPOSE: Boot 軸ローダー群 — boot_integration.py から抽出された個別軸ロード関数
 """
-Boot Axes — get_boot_context() から抽出された 12 軸ローダー.
+Boot Axes — get_boot_context() から抽出された 13 軸ローダー.
 
 各関数は同じパターン:
     1. デフォルト結果を定義
@@ -51,7 +51,7 @@ def gpu_preflight() -> tuple[bool, str]:
 # ─────────────────────────────────────────────────────────────────────
 
 def load_handoffs(mode: str, context: Optional[str] = None, **kw) -> dict:
-    print(" [1/12] 📋 Searching Handoffs...", file=sys.stderr, end="", flush=True)
+    print(" [1/13] 📋 Searching Handoffs...", file=sys.stderr, end="", flush=True)
     from mekhane.symploke.handoff_search import get_boot_handoffs
     result = get_boot_handoffs(mode=mode, context=context)
     print(" Done.", file=sys.stderr)
@@ -63,7 +63,7 @@ def load_handoffs(mode: str, context: Optional[str] = None, **kw) -> dict:
 # ─────────────────────────────────────────────────────────────────────
 
 def load_sophia(mode: str, context: Optional[str] = None, **kw) -> dict:
-    print(" [2/12] 📚 Ingesting Knowledge (Sophia)...", file=sys.stderr, end="", flush=True)
+    print(" [2/13] 📚 Ingesting Knowledge (Sophia)...", file=sys.stderr, end="", flush=True)
     ki_context = context or kw.get("ki_context")
     ki_result: dict = {"ki_items": [], "count": 0}
     try:
@@ -87,7 +87,7 @@ def load_sophia(mode: str, context: Optional[str] = None, **kw) -> dict:
 # ─────────────────────────────────────────────────────────────────────
 
 def load_persona(mode: str, context: Optional[str] = None, **kw) -> dict:
-    print(" [3/12] 👤 Loading Persona...", file=sys.stderr, end="", flush=True)
+    print(" [3/13] 👤 Loading Persona...", file=sys.stderr, end="", flush=True)
     from mekhane.symploke.persona import get_boot_persona
     result = get_boot_persona(mode=mode)
     print(" Done.", file=sys.stderr)
@@ -101,10 +101,10 @@ def load_persona(mode: str, context: Optional[str] = None, **kw) -> dict:
 def load_pks(mode: str, context: Optional[str] = None, **kw) -> dict:
     result: dict = {"nuggets": [], "count": 0, "formatted": ""}
     if mode == "fast":
-        print(" [4/12] 🧠 PKS Engine skipped (fast mode).", file=sys.stderr)
+        print(" [4/13] 🧠 PKS Engine skipped (fast mode).", file=sys.stderr)
         return result
 
-    print(" [4/12] 🧠 Activating PKS Engine...", file=sys.stderr, end="", flush=True)
+    print(" [4/13] 🧠 Activating PKS Engine...", file=sys.stderr, end="", flush=True)
     ki_context = kw.get("ki_context")
     try:
         def _run():
@@ -147,7 +147,7 @@ def load_pks(mode: str, context: Optional[str] = None, **kw) -> dict:
 
 def load_safety(mode: str, context: Optional[str] = None, **kw) -> dict:
     result: dict = {"skills": 0, "workflows": 0, "errors": 0, "warnings": 0, "formatted": ""}
-    print(" [5/12] 🛡️ Running Safety Contract Audit...", file=sys.stderr, end="", flush=True)
+    print(" [5/13] 🛡️ Running Safety Contract Audit...", file=sys.stderr, end="", flush=True)
     try:
         from mekhane.dendron.skill_checker import run_audit
         agent_dir = Path(__file__).parent.parent.parent / ".agent"
@@ -184,7 +184,7 @@ def load_safety(mode: str, context: Optional[str] = None, **kw) -> dict:
 
 def load_ept(mode: str, context: Optional[str] = None, **kw) -> dict:
     result: dict = {"score": 0, "total": 0, "pct": 0, "formatted": ""}
-    print(" [6/12] 📐 Running EPT Matrix...", file=sys.stderr, end="", flush=True)
+    print(" [6/13] 📐 Running EPT Matrix...", file=sys.stderr, end="", flush=True)
     try:
         def _run():
             from mekhane.dendron.checker import DendronChecker
@@ -226,7 +226,7 @@ def load_ept(mode: str, context: Optional[str] = None, **kw) -> dict:
 
 def load_digestor(mode: str, context: Optional[str] = None, **kw) -> dict:
     result: dict = {"candidates": [], "count": 0, "formatted": ""}
-    print(" [7/12] 📄 Loading Digest Candidates...", file=sys.stderr, end="", flush=True)
+    print(" [7/13] 📄 Loading Digest Candidates...", file=sys.stderr, end="", flush=True)
     try:
         import glob
         digest_dir = Path.home() / ".hegemonikon" / "digestor"
@@ -264,10 +264,10 @@ def load_attractor(mode: str, context: Optional[str] = None, **kw) -> dict:
     attractor_context = context
 
     if not attractor_context:
-        print(" [8/12] 🎯 Attractor skipped (no context & no Handoff).", file=sys.stderr)
+        print(" [8/13] 🎯 Attractor skipped (no context & no Handoff).", file=sys.stderr)
         return result
 
-    print(" [8/12] 🎯 Attractor Dispatch...", file=sys.stderr, end="", flush=True)
+    print(" [8/13] 🎯 Attractor Dispatch...", file=sys.stderr, end="", flush=True)
     try:
         def _run():
             from mekhane.fep.attractor_advisor import AttractorAdvisor
@@ -512,7 +512,7 @@ def _format_attractor(
 
 def load_projects(mode: str, context: Optional[str] = None, **kw) -> dict:
     result: dict = {"projects": [], "active": 0, "dormant": 0, "total": 0, "formatted": ""}
-    print(" [9/12] 📦 Loading Projects Registry...", file=sys.stderr, end="", flush=True)
+    print(" [9/13] 📦 Loading Projects Registry...", file=sys.stderr, end="", flush=True)
     try:
         from mekhane.symploke.boot_integration import _load_projects
         project_root = Path(__file__).parent.parent.parent
@@ -529,7 +529,7 @@ def load_projects(mode: str, context: Optional[str] = None, **kw) -> dict:
 
 def load_skills(mode: str, context: Optional[str] = None, **kw) -> dict:
     result: dict = {"skills": [], "count": 0, "skill_paths": [], "formatted": ""}
-    print(" [10/12] 🧠 Loading Skills...", file=sys.stderr, end="", flush=True)
+    print(" [10/13] 🧠 Loading Skills...", file=sys.stderr, end="", flush=True)
     try:
         from mekhane.symploke.boot_integration import _load_skills
         project_root = Path(__file__).parent.parent.parent
@@ -546,7 +546,7 @@ def load_skills(mode: str, context: Optional[str] = None, **kw) -> dict:
 
 def load_doxa(mode: str, context: Optional[str] = None, **kw) -> dict:
     result: dict = {"beliefs_loaded": 0, "active_count": 0, "promotion_candidates": [], "formatted": ""}
-    print(" [11/12] 🧿 Loading Doxa Beliefs...", file=sys.stderr, end="", flush=True)
+    print(" [11/13] 🧿 Loading Doxa Beliefs...", file=sys.stderr, end="", flush=True)
     try:
         from mekhane.symploke.doxa_boot import load_doxa_for_boot
         doxa_boot = load_doxa_for_boot()
@@ -572,7 +572,7 @@ def load_doxa(mode: str, context: Optional[str] = None, **kw) -> dict:
 
 def load_feedback(mode: str, context: Optional[str] = None, **kw) -> dict:
     result: dict = {"total": 0, "accept_rate": 0.0, "formatted": ""}
-    print(" [12/12] 🎓 Loading Feedback History...", file=sys.stderr, end="", flush=True)
+    print(" [12/13] 🎓 Loading Feedback History...", file=sys.stderr, end="", flush=True)
     try:
         from mekhane.fep.credit_assignment import (
             load_feedback_history,
@@ -603,21 +603,108 @@ def load_feedback(mode: str, context: Optional[str] = None, **kw) -> dict:
 
 
 # ─────────────────────────────────────────────────────────────────────
+# 軸 M: Proactive Push (知識推薦)
+# ─────────────────────────────────────────────────────────────────────
+
+def load_proactive_push(mode: str, context: Optional[str] = None, **kw) -> dict:
+    """Proactive Push 軸: 知識が自ら語りかけてくる推薦."""
+    result: dict = {"recommendations": [], "count": 0, "formatted": ""}
+    if mode == "fast":
+        print(" [13/15] 💡 Proactive Push skipped (fast mode).", file=sys.stderr)
+        return result
+
+    print(" [13/15] 💡 Proactive Push...", file=sys.stderr, end="", flush=True)
+    try:
+        from mekhane.anamnesis.proactive_push import ProactivePush
+        push = ProactivePush(max_recommendations=3)
+        push_result = push.boot_recommendations(context)
+
+        if push_result.recommendations:
+            result = {
+                "recommendations": [
+                    {
+                        "title": r.title,
+                        "source_type": r.source_type,
+                        "relevance": r.relevance,
+                        "benefit": r.benefit,
+                        "actions": r.actions,
+                    }
+                    for r in push_result.recommendations
+                ],
+                "count": len(push_result.recommendations),
+                "retrieval_time": push_result.retrieval_time,
+                "formatted": ProactivePush.format_recommendations(push_result),
+            }
+        print(f" Done ({len(push_result.recommendations)} recs).", file=sys.stderr)
+    except Exception as e:
+        print(f" Failed ({e}).", file=sys.stderr)
+    return result
+
+
+# ─────────────────────────────────────────────────────────────────────
+# 軸 N: Violation Trends (違反傾向)
+# ─────────────────────────────────────────────────────────────────────
+
+def load_violations(mode: str, context: Optional[str] = None, **kw) -> dict:
+    """Violation Trends 軸: 直近の違反パターン傾向を /boot に表示."""
+    result: dict = {"total": 0, "patterns": {}, "recurrence": 0, "formatted": ""}
+    print(" [14/15] ⚠️ Analyzing Violation Trends...", file=sys.stderr, end="", flush=True)
+    try:
+        from scripts.violation_analyzer import parse_violations, analyze, format_boot_summary
+        entries = parse_violations()
+        stats = analyze(entries, since_days=7)
+        result = {
+            "total": stats["total"],
+            "patterns": stats["patterns"],
+            "recurrence": stats["recurrence"],
+            "formatted": format_boot_summary(stats),
+        }
+        print(" Done.", file=sys.stderr)
+    except Exception as e:
+        print(f" Failed ({e}).", file=sys.stderr)
+    return result
+
+
+# ─────────────────────────────────────────────────────────────────────
+# 軸 O: Gnōsis Advice (知識アドバイス)
+# ─────────────────────────────────────────────────────────────────────
+
+def load_gnosis_advice(mode: str, context: Optional[str] = None, **kw) -> dict:
+    """Gnōsis Advice 軸: WF に関連する学術知識のハイライト."""
+    result: dict = {"advice": "", "formatted": ""}
+    if mode == "fast":
+        print(" [15/15] 📖 Gnōsis Advice skipped (fast mode).", file=sys.stderr)
+        return result
+    print(" [15/15] 📖 Loading Gnōsis Advice...", file=sys.stderr, end="", flush=True)
+    try:
+        from scripts.gnosis_advisor import daily_topics
+        advice = daily_topics()
+        result = {"advice": advice, "formatted": advice}
+        print(" Done.", file=sys.stderr)
+    except Exception as e:
+        print(f" Failed ({e}).", file=sys.stderr)
+    return result
+
+
+# ─────────────────────────────────────────────────────────────────────
 # Axis Registry — 統合フォーマット用の順序定義
 # ─────────────────────────────────────────────────────────────────────
 
 # (key, loader, format_order) — format_order は統合フォーマットでの表示順
 AXIS_REGISTRY: list[tuple[str, Any, int]] = [
-    ("handoffs",  load_handoffs,  2),
-    ("ki",        load_sophia,    3),
-    ("persona",   load_persona,   1),    # 最初に表示
-    ("pks",       load_pks,       4),
-    ("safety",    load_safety,    5),
-    ("ept",       load_ept,       6),
-    ("digestor",  load_digestor,  7),
-    ("attractor", load_attractor, 8),
-    ("projects",  load_projects,  9),
-    ("skills",    load_skills,    10),
-    ("doxa",      load_doxa,      11),
-    ("feedback",  load_feedback,  12),
+    ("handoffs",        load_handoffs,        2),
+    ("ki",              load_sophia,          3),
+    ("persona",         load_persona,         1),    # 最初に表示
+    ("pks",             load_pks,             4),
+    ("safety",          load_safety,          5),
+    ("ept",             load_ept,             6),
+    ("digestor",        load_digestor,        7),
+    ("attractor",       load_attractor,       8),
+    ("projects",        load_projects,        9),
+    ("skills",          load_skills,          10),
+    ("doxa",            load_doxa,            11),
+    ("feedback",        load_feedback,        12),
+    ("proactive_push",  load_proactive_push,  13),
+    ("violations",      load_violations,      14),
+    ("gnosis_advice",   load_gnosis_advice,   15),
 ]

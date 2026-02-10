@@ -281,6 +281,11 @@ class ProactivePush:
     ) -> PushResult:
         """/boot 時の推薦 — 「今日の推薦」.
 
+        Context-Triggered + Graph-Triggered を統合:
+          1. ベクトル近傍から Context-Triggered 推薦を取得
+          2. LinkGraph からバックリンク/ブリッジ推薦を取得
+          3. 重複除去して統合
+
         Args:
             context: 直近の Handoff の primary_task や目的テキスト。
                      None の場合、直近 Handoff から自動抽出を試みる。
@@ -303,25 +308,147 @@ class ProactivePush:
                 total_candidates=0,
             )
 
-        # 検索実行
+        # Layer 1: Context-Triggered (ベクトル近傍)
         results = self._retrieve(context, k=self.max_recommendations * 2)
-        retrieval_time = time.time() - t0
-
-        # Recommendation に変換
         recs = [
             self._to_recommendation(r, context, trigger="context")
             for r in results
         ]
 
+        # Layer 2: Graph-Triggered (リンクグラフ)
+        graph_recs = self._graph_recommendations(context)
+        recs.extend(graph_recs)
+
+        retrieval_time = time.time() - t0
+
         # 重複除去 + 上限適用
         recs = self._deduplicate(recs)[: self.max_recommendations]
+
+        total_candidates = len(results) + len(graph_recs)
 
         return PushResult(
             recommendations=recs,
             trigger_type="boot",
             query_used=context[:100],
             retrieval_time=round(retrieval_time, 3),
-            total_candidates=len(results),
+            total_candidates=total_candidates,
+        )
+
+    def _graph_recommendations(
+        self, context: str, max_recs: int = 2
+    ) -> list[Recommendation]:
+        """Graph-Triggered 推薦: リンクグラフ上の構造的関連を推薦.
+
+        LinkGraph のバックリンクとブリッジノードを活用:
+          1. コンテキスト中のノード名をマッチング
+          2. マッチしたノードの近傍 (2 hop) を取得
+          3. ブリッジノードを優先的に推薦
+
+        Args:
+            context: 検索コンテキスト
+            max_recs: 最大推薦数
+
+        Returns:
+            Graph-Triggered Recommendation のリスト
+        """
+        try:
+            from mekhane.anamnesis.link_graph import load_or_build_graph
+
+            graph = load_or_build_graph()
+            if not graph.nodes:
+                return []
+
+            # コンテキストからノード名をマッチング
+            context_lower = context.lower()
+            matched_nodes = []
+            for node_id in graph.nodes:
+                if node_id.lower() in context_lower:
+                    matched_nodes.append(node_id)
+
+            # マッチしなければ、ブリッジノードを推薦
+            if not matched_nodes:
+                bridges = graph.find_bridge_nodes()[:max_recs]
+                return [
+                    self._graph_node_to_recommendation(graph, nid, "bridge")
+                    for nid in bridges
+                    if nid in graph.nodes
+                ]
+
+            # マッチしたノードの近傍を取得
+            neighbor_ids: set[str] = set()
+            for node_id in matched_nodes[:3]:  # 最大 3 ノードから
+                neighbors = graph.get_neighbors(node_id, hops=2)
+                neighbor_ids.update(neighbors)
+
+            # マッチしたノード自身は除外
+            neighbor_ids -= set(matched_nodes)
+
+            if not neighbor_ids:
+                return []
+
+            # ブリッジノードを優先
+            bridges = set(graph.find_bridge_nodes())
+            bridge_neighbors = neighbor_ids & bridges
+            other_neighbors = neighbor_ids - bridges
+
+            # ブリッジ優先でソート
+            sorted_neighbors = list(bridge_neighbors) + list(other_neighbors)
+
+            return [
+                self._graph_node_to_recommendation(graph, nid, "graph")
+                for nid in sorted_neighbors[:max_recs]
+                if nid in graph.nodes
+            ]
+
+        except Exception as e:
+            logger.warning(f"[ProactivePush] Graph recommendations failed: {e}")
+            return []
+
+    def _graph_node_to_recommendation(
+        self, graph, node_id: str, trigger: str
+    ) -> Recommendation:
+        """LinkGraph ノードを Recommendation に変換."""
+        node = graph.nodes[node_id]
+        backlink_count = len(node.in_links)
+
+        # 接続度から relevance を推定 (多くのリンクを持つノードほど重要)
+        degree = len(set(node.out_links + node.in_links))
+        relevance = min(1.0, degree / 20.0)  # 20 リンクで 100%
+
+        # ソースタイプ別のベネフィット
+        if trigger == "bridge":
+            benefit = (
+                f"ブリッジノード '{node.title}' — "
+                f"{backlink_count} 個のバックリンク。"
+                f"複数の知識領域を接続するハブ。"
+            )
+        else:
+            benefit = (
+                f"'{node.title}' はリンクグラフ上で "
+                f"現在のコンテキストと {degree} ホップで接続。"
+            )
+
+        # コンテンツスニペット: ファイルの先頭を読む
+        snippet = ""
+        try:
+            content = Path(node.path).read_text(encoding="utf-8")
+            # YAML フロントマター後の本文
+            body = re.sub(r"^---.*?---\s*", "", content, flags=re.DOTALL)
+            snippet = body[:300].replace("\n", " ")
+        except Exception:
+            pass
+
+        return Recommendation(
+            title=node.title[:100],
+            source_type=node.source_type,
+            relevance=round(relevance, 4),
+            trigger=trigger,
+            benefit=benefit,
+            content_snippet=snippet,
+            url=f"file://{node.path}",
+            primary_key=node_id,
+            distance=round(1 - relevance, 4),
+            actions=["/jukudoku", "/eat"],
         )
 
     def context_recommendations(

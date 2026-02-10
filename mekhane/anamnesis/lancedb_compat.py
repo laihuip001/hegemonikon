@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/anamnesis/ A0→LanceDB APIバージョン差異の吸収→互換レイヤーが担う
 """LanceDB compatibility layer.
 
 Provides `get_table_names(db)` that works across LanceDB versions:

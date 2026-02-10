@@ -9,6 +9,10 @@ triggers:
   - "dendron"
   - "checker"
   - "なぜ存在する"
+
+risk_tier: "L1"
+risks:
+  - "検証漏れによる品質ゲート形骸化"
 ---
 
 # Dendron EPT Checker

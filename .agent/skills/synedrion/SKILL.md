@@ -10,6 +10,10 @@ triggers:
   - "多角"
   - "批評"
   - "/syn"
+
+risk_tier: "L1"
+risks:
+  - "評議会の意見が合意バイアスに陥る"
 ---
 
 # Synedrion Council

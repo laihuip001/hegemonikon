@@ -9,6 +9,10 @@ triggers:
   - "peira"
   - "動作確認"
   - "テスト"
+
+risk_tier: "L1"
+risks:
+  - "ヘルスチェック偽陽性による不要な修正作業"
 ---
 
 # Peira Health Check

@@ -14,6 +14,11 @@ triggers:
   - "ワークフロー式"
   - "演算子"
 version: "3.0"
+
+risk_tier: "L2"
+risks:
+  - "CCL パースエラーによるワークフロー誤実行"
+  - "LLM API 呼出コスト"
 ---
 
 # Hermēneus CCL Dispatch v3.0

@@ -9,6 +9,10 @@ triggers:
   - "poiema"
   - "テンプレート"
   - "ドキュメント生成"
+
+risk_tier: "L1"
+risks:
+  - "テンプレート不整合による出力品質低下"
 ---
 
 # Poiema Generator

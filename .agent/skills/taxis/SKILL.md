@@ -10,6 +10,10 @@ triggers:
   - "TODO"
   - "整理"
   - "morphism"
+
+risk_tier: "L1"
+risks:
+  - "分類ミスによる優先順位の歪み"
 ---
 
 # Taxis Classifier

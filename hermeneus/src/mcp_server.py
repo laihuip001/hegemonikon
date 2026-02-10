@@ -269,9 +269,9 @@ async def _handle_list_workflows(args: Dict[str, Any]) -> Sequence[TextContent]:
     for name in names[:20]:  # 最大20件
         wf = get_workflow(name)
         if wf:
-            lines.append(f"- **/{name}+**: {wf.description}")
+            lines.append(f"- **/{name}**: {wf.description}")
         else:
-            lines.append(f"- **/{name}+**")
+            lines.append(f"- **/{name}**")
     
     if len(names) > 20:
         lines.append(f"\n... 他 {len(names) - 20} 件")

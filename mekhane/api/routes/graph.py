@@ -186,18 +186,21 @@ router = APIRouter(prefix="/graph", tags=["graph"])
 
 
 @router.get("/nodes", response_model=list[GraphNode])
+# PURPOSE: 24 定理ノードを取得
 async def get_graph_nodes() -> list[GraphNode]:
     """24 定理ノードを返す。"""
     return [GraphNode(**t) for t in THEOREMS]
 
 
 @router.get("/edges", response_model=list[GraphEdge])
+# PURPOSE: 78 X-series エッジを取得
 async def get_graph_edges() -> list[GraphEdge]:
     """78 X-series エッジを返す (72 relations + 6 identity morphisms)。"""
     return [GraphEdge(**e) for e in EDGES]
 
 
 @router.get("/full", response_model=GraphFullResponse)
+# PURPOSE: ノード+エッジ+メタデータを一括取得
 async def get_graph_full() -> GraphFullResponse:
     """ノード + エッジ + メタデータを一括で返す。"""
     return GraphFullResponse(

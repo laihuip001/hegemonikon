@@ -5,7 +5,7 @@ version: "7.0"
 skill_ref: ".agent/skills/akribeia/a2-krisis/SKILL.md"
 lcm_state: stable       # draft | beta | stable | deprecated
 layer: "Δ"
-derivatives: [aff, neg, epo, root, devil, steelman, counterfactual, cold_mirror, deliberative]
+derivatives: [aff, neg, epo, root, devil, steelman, counterfactual, cold_mirror, deliberative, explore]
 trigonon:
   series: A
   type: Pure
@@ -84,6 +84,7 @@ sel_enforcement:
 | `cross-model` | Cross-Model Verification | 「別のAI」 |
 | `cold_mirror` | 冷徹な鏡 | 「厳しく」 |
 | `deliberative` | 三視点反復改善 | 「反復改善」 |
+| `explore` | 探索的テスト (UI) | 「触って壊して」「UIテスト」 |
 
 ---
 
@@ -97,6 +98,23 @@ sel_enforcement:
 ```
 view_file /home/makaron8426/oikos/hegemonikon/.agent/skills/akribeia/a2-krisis/SKILL.md
 ```
+
+---
+
+## STEP 0.5: 適用基準（Self-Refine 腐食効果対策）
+
+> **警告**: Snorkel 研究 (2025) により、簡単な問題に Self-Refine を適用すると
+> 正答率が **98% → 57%** に低下することが判明（腐食効果）。
+> /dia は Self-Refine の一形態であるため、**適用基準を守ること**。
+
+| タスク複雑度 | /dia 適用 | 理由 |
+|:-----------|:---------|:-----|
+| **瑣末** (typo修正、1行変更) | ❌ 不要 | 腐食リスク > 改善効果 |
+| **中程度** (関数追加、バグ修正) | ⚠️ `/dia-` のみ | PASS/FAIL + 1行理由で十分 |
+| **複雑** (設計変更、新機能) | ✅ `/dia` or `/dia+` | 詳細レビューが正当化される |
+| **クリティカル** (安全性、不変資料) | ✅ `/dia+` 必須 | 腐食リスクより見落としリスクが大きい |
+
+> **自問**: 「この /dia は腐食を起こさないか？ タスクの複雑度に見合っているか？」
 
 ---
 

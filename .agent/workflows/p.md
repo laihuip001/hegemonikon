@@ -7,20 +7,26 @@ skill_ref:
   - ".agent/skills/perigraphē/p2-hodos/SKILL.md"
   - ".agent/skills/perigraphē/p3-trokhia/SKILL.md"
   - ".agent/skills/perigraphē/p4-tekhne/SKILL.md"
-version: "5.5"
+version: "5.6"
 lcm_state: beta
 layer: "Δ"
-lineage: "v4.3 + Limit演算復元 → v5.0 + C0 PW/加重融合 → v5.4 → v5.5 C3 Kalon化"
+lineage: "v4.3 + Limit演算復元 → v5.0 + C0 PW/加重融合 → v5.4 → v5.5 C3 Kalon化 → v5.6 固有層 Top-enrichment"
 category_theory:
   yoneda: "Hom(-, Tn) ≅ F(Tn) — 各定理はその射の集合で完全に決まる"
   limit: "Cone の頂点 — 全ての環境配置射が一致する点"
   converge_as_cone: "C0=PW決定, C1=環境射の列挙, C2=PW加重融合, C3=Kalon+普遍性検証"
   cone_builder: "mekhane/fep/cone_builder.py"
   kalon: "mekhane/fep/universality.py — C3で使用"
-  adjunction:
-    notation: "F ⊣ G — 圏論を付与する (F) と 構造を発見する (G) の随伴対"
-    unit: "η = C3 普遍性検証 — 付与→発見→元の問いと比較"
-    counit: "ε = 忠実性チェック — 発見→付与→元に戻す"
+  adjunction: "F ⊣ G — 圏論を付与する (F) と 構造を発見する (G) の随伴対"
+  enrichment:
+    concept: "/p は「器」— Hom が Set に値を取る = enrichment 不要。これが /p の本質"
+    mode: resolved
+    variant: "Set (enrichment なし = 通常の圏)"
+    note: "3回試行し3回棄却。「ない」ことが正しい結論"
+    history:
+      - "Top (0.55, 棄却: 言い換え)"
+      - "Op (0.55, 棄却: P2⊗P3転置のみ)"
+      - "Presheaf (0.70, 棄却: 不均等な派生は全Series共通)"
 derivatives: [kho, hod, tro, tek]
 cognitive_algebra:
   generation: "L1.5 × L1.5"

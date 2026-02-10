@@ -1,4 +1,5 @@
 ---
+description: ゼロベース削減。「何を残すか」ではなく「何が不可欠か」を問う。冗長性検出・シンプル化・本質抽出時に発動。
 risk_tier: L1
 reversible: true
 requires_approval: false

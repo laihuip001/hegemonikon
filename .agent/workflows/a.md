@@ -7,7 +7,7 @@ skill_ref:
   - ".agent/skills/akribeia/a2-krisis/SKILL.md"
   - ".agent/skills/akribeia/a3-gnome/SKILL.md"
   - ".agent/skills/akribeia/a4-episteme/SKILL.md"
-version: "5.5"
+version: "5.6"
 lcm_state: beta
 layer: "Δ"
 category_theory:
@@ -16,11 +16,16 @@ category_theory:
   converge_as_cone: "C0=PW決定, C1=精度射の列挙, C2=PW加重融合, C3=Kalon+普遍性検証"
   cone_builder: "mekhane/fep/cone_builder.py"
   kalon: "mekhane/fep/universality.py — C3で使用"
-  adjunction:
-    notation: "F ⊣ G — 圏論を付与する (F) と 構造を発見する (G) の随伴対"
-    unit: "η = C3 普遍性検証 — 付与→発見→元の問いと比較"
-    counit: "ε = 忠実性チェック — 発見→付与→元に戻す"
-lineage: "v4.2 + Limit演算復元 → v5.0 + C0 PW/加重融合 → v5.4 → v5.5 C3 Kalon化"
+  adjunction: "F ⊣ G — 圏論を付与する (F) と 構造を発見する (G) の随伴対"
+  enrichment:
+    concept: "Hom に確信度/精度 [0,1] を入れる — /a 固有 (PWが研究対象そのもの)"
+    mode: conceptual
+    variant: "Fuzzy-enrichment (Hom → [0,1])"
+    structures:
+      - "A4 Epistēmē: tent/just/cert = 確信度のグレーディング"
+      - "A2 Krisis: PASS/FAIL = 二値判定 (ファジィの値域)"
+      - "PW が A-series の核心操作かつ研究対象 = 自己参照的 enrichment"
+lineage: "v4.2 + Limit演算復元 → v5.0 + C0 PW/加重融合 → v5.4 → v5.5 C3 Kalon化 → v5.6 固有層 Fuzzy-enrichment"
 cognitive_algebra:
   generation: "L1.75 × L1.75"
   coordinates:

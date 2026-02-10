@@ -7,7 +7,7 @@ skill_ref:
   - ".agent/skills/ousia/o2-boulesis/SKILL.md"
   - ".agent/skills/ousia/o3-zetesis/SKILL.md"
   - ".agent/skills/ousia/o4-energeia/SKILL.md"
-version: "5.2"
+version: "5.3"
 lcm_state: stable
 category_theory:
   yoneda: "Hom(-, Tn) ≅ F(Tn) — 各定理はその射の集合で完全に決まる"
@@ -15,12 +15,17 @@ category_theory:
   converge_as_cone: "C0=PW決定, C1=射の列挙, C2=PW加重融合, C3=Kalon+普遍性検証"
   cone_builder: "mekhane/fep/cone_builder.py"
   kalon: "mekhane/fep/universality.py — C3で使用"
-  adjunction:
-    notation: "F ⊣ G — 圏論を付与する (F) と 構造を発見する (G) の随伴対"
-    unit: "η = C3 普遍性検証 — 付与→発見→元の問いと比較"
-    counit: "ε = 忠実性チェック — 発見→付与→元に戻す"
+  adjunction: "F ⊣ G — 圏論を付与する (F) と 構造を発見する (G) の随伴対"
+  enrichment:
+    concept: "Hom(O,O) 自己射で enrich — V→PW フィードバック + meta 自己参照 + /o* — /o 固有"
+    mode: conceptual
+    variant: "End-enrichment (Hom → End)"
+    structures:
+      - "V[] > 0.5 → O3+: Cone 内部状態を PW にフィードバック (他WFは外部文脈ベース)"
+      - "O1.meta = 認知の認知 (endomorphism)"
+      - "/o* = 認知層が自分自身を問う (endomorphism の問い)"
 layer: "Δ"
-lineage: "v3.2 + Limit演算復元 → v4.0 → v5.0 + C0 PW/加重融合 → v5.1 → v5.2 C3 Kalon化"
+lineage: "v3.2 + Limit演算復元 → v4.0 → v5.0 + C0 PW/加重融合 → v5.1 → v5.2 C3 Kalon化 → v5.3 固有層 Ord-enrichment"
 derivatives:
   O1: [nous, phro, meta]
   O2: [desir, voli, akra]

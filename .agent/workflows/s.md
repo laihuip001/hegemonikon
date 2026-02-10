@@ -14,16 +14,24 @@ triggers:
   - "plan"
   - "schema"
   - "リーンキャンバス"
-version: "6.3"
+version: "6.4"
 category_theory:
   yoneda: "Hom(-, Tn) ≅ F(Tn) — 各定理はその射の集合で完全に決まる"
   limit: "Cone の頂点 — 全ての射が一致する点"
   converge_as_cone: "C0=PW決定, C1=STAGE 0-3の射列挙, C2=STAGE 4 Devil+PW加重融合, C3=STAGE 5 Kalon+KPT普遍性検証"
   cone_builder: "mekhane/fep/cone_builder.py"
   kalon: "mekhane/fep/universality.py — C3で使用"
+  adjunction: "F ⊣ G — 圏論を付与する (F) と 構造を発見する (G) の随伴対"
+  enrichment:
+    concept: "Hom(Si,Sj) を張力 {低/中/高} で enrich — /s 固有の圏論概念"
+    mode: conceptual  # 形式的等価ではなく概念的対応
+    structures:
+      - "6対の張力 = Hom の enrichment (Set → Met)"
+      - "Devil's Advocate = enriched Hom 上のテスト射"
+      - "PW 加重融合 = テスト射後の加重 colimit"
 lcm_state: stable
 layer: "Δ"
-lineage: "v5.8 + Limit演算復元 → v6.0 + C0 PW/加重融合 → v6.2 + v6.3 C3 Kalon化"
+lineage: "v5.8 + Limit演算復元 → v6.0 + C0 PW/加重融合 → v6.2 + v6.3 C3 Kalon化 → v6.4 固有層 Enrichment"
 derivatives: [met, mek, sta, pra]
 cognitive_algebra:
   generation: "L1 × L1.5"

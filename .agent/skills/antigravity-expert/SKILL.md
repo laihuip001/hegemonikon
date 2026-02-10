@@ -543,6 +543,22 @@ Antigravity は AGENTS.md を標準では無視するが、GEMINI.md に以下�
 - 否定形より肯定形
 - 操作的定義（「高品質」→「テストカバレッジ 80% 以上」）
 
+### activation_mode 設計基準
+
+| モード | いつ使うか | 例 | コンテキストコスト |
+|:-------|:---------|:---|:-----------------|
+| `always_on` | **全会話で違反が致命的**な制約 | BC, 安全性, 日本語強制 | 高 (常時ロード) |
+| `conditional` | **特定キーワード/状況でのみ必要** | K-series, CCL-manifest | 中 (条件マッチ時のみ) |
+| `model_decision` | **モデルが文脈から判断**してロード | Protocol-D extended | 低 (AI判断) |
+
+**選択の自問**: 「このルールが適用されないセッションは存在するか？」
+
+- No → `always_on`
+- Yes, 特定キーワードで発動 → `conditional`
+- Yes, 曖昧な状況判断 → `model_decision`
+
+**コスト意識**: always_on Rules 合計が全体コンテキストの **20% 以下**を推奨。現状 ~10% (20K/200K)
+
 ### Workflow の書き方
 
 ```yaml
@@ -578,6 +594,19 @@ description: [1行説明]
 - `PLANNING`: 調査・設計 → implementation_plan.md 作成
 - `EXECUTION`: コード実装
 - `VERIFICATION`: テスト・検証 → walkthrough.md 作成
+
+### Artifact Review Policy 設計基準
+
+> `ShouldAutoProceed` の判断を意識的に設計する。
+
+| 状況 | ShouldAutoProceed | 理由 |
+|:-----|:-----------------|:-----|
+| 実装計画の初回提示 | `false` | Creator の承認なしに設計を進めてはならない |
+| 軽微な修正の完了報告 | `true` | 確認不要で進行可能 |
+| 破壊的変更を含む計画 | `false` | I-1 安全不変条件 |
+| walkthrough (完了報告) | 場合による | BlockedOnUser=false で通知のみ |
+
+**意識すべき点**: デフォルトの「毎回確認」は安全だがフローを止める。安全性 × 効率のバランスを意識的に選ぶこと。
 
 ---
 

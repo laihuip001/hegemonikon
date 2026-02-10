@@ -1,4 +1,5 @@
 ---
+description: WFステップの暗黙的省略を防止する。段階スキップ検出・Constitutional AI ベースの自己規制。
 risk_tier: L1
 reversible: true
 requires_approval: false

@@ -1,4 +1,5 @@
 ---
+description: 監査結果に基づく外科的コード修正。/vet で Critical/Major 検出時、またはリファクタ・改善要求時に発動。
 risk_tier: L1
 reversible: true
 requires_approval: false

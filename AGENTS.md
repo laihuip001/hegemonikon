@@ -7,7 +7,7 @@
 
 | 公理 | 定理 | 関係 | 総数 |
 |:----:|:----:|:----:|:----:|
-| 7 | 24 | 36 | **60** |
+| 7 | 24 | 72 | **96** |
 
 ---
 
@@ -75,4 +75,45 @@
 
 ---
 
-*Hegemonikón v3.0 — 6ペルソナ × 96要素体系*
+## MCP サーバー (2026-02-10 追加)
+
+| サーバー | 目的 | Transport |
+|:---------|:-----|:----------|
+| **gnosis** | 論文知識ベース検索 (Gnōsis) | stdio |
+| **sophia** | Knowledge Item / Kairos 検索 | stdio |
+| **hermeneus** | CCL パース・実行・監査 | stdio |
+| **sympatheia** | システム状態監視・WBC | stdio |
+| **mneme** | 統合記憶検索 | stdio |
+| **digestor** | 論文消化パイプライン | stdio |
+| **prompt-lang** | Prompt-Lang コード生成 | stdio |
+| **jules** | Jules (Gemini) タスク管理 | stdio |
+| **context-packer** | デバッグコンテキスト集約 | stdio (PoC) |
+
+---
+
+## セキュリティポリシー (2026-02-10 追加)
+
+| ポリシー | 内容 |
+|:---------|:-----|
+| **Input Isolation** | ユーザー入力は `<user_input_zone>` で隔離 (XML Sandwich) |
+| **Constraint-Last** | 制約はプロンプト末尾に配置 (recency bias 活用) |
+| **Split-Step Verification** | 高リスクタスクでは検証フェーズを強制 |
+| **Injection Regression** | 6種攻撃ベクタの回帰テスト (`.agent/workflows/security/`) |
+| **Destructive Guard** | 破壊的操作は human-in-the-loop 必須 |
+| **Thought Signature** | Gemini 3 マルチターンでは thought_signature を自動管理 |
+
+---
+
+## プロンプトエンジニアリング標準 (2026-02-10 追加)
+
+| 標準 | 参照先 |
+|:-----|:-------|
+| SAGE Mode テンプレート | `mekhane/ergasterion/tekhne/references/sage-blueprint.md` |
+| 5 Archetypes | `mekhane/ergasterion/tekhne/references/archetypes.md` |
+| Self-Optimization | `mekhane/ergasterion/tekhne/references/self-optimization.md` |
+| thought_signature | `mekhane/ergasterion/tekhne/references/thought-signature.md` |
+| Gateway 設計 | `mekhane/synedrion/gateway_design.md` |
+
+---
+
+*Hegemonikón v3.1 — 6ペルソナ × 96要素体系 + AAIF 準拠拡張 (2026-02-10)*

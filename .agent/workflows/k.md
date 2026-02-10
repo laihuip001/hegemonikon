@@ -7,7 +7,7 @@ skill_ref:
   - ".agent/skills/kairos/k2-chronos/SKILL.md"
   - ".agent/skills/kairos/k3-telos/SKILL.md"
   - ".agent/skills/kairos/k4-sophia/SKILL.md"
-version: "6.5"
+version: "6.6"
 lcm_state: beta
 layer: "Δ"
 category_theory:
@@ -16,11 +16,17 @@ category_theory:
   converge_as_cone: "C0=PW決定, C1=文脈射の列挙, C2=PW加重融合, C3=Kalon+普遍性検証"
   cone_builder: "mekhane/fep/cone_builder.py"
   kalon: "mekhane/fep/universality.py — C3で使用"
-  adjunction:
-    notation: "F ⊣ G — 圏論を付与する (F) と 構造を発見する (G) の随伴対"
-    unit: "η = C3 普遍性検証 — 付与→発見→元の問いと比較"
-    counit: "ε = 忠実性チェック — 発見→付与→元に戻す"
-lineage: "v5.2 + Limit演算復元 → v6.0 + C0 PW/加重融合 → v6.4 → v6.5 C3 Kalon化"
+  adjunction: "F ⊣ G — 圏論を付与する (F) と 構造を発見する (G) の随伴対"
+  enrichment:
+    concept: "Hom(task,K) に時間的重み (urgency) と Eisenhower 2軸 を入れる — /k 固有"
+    mode: conceptual
+    variant: "Temporal-enrichment (Hom → ([0,1], decay) × ℝ²)"
+    structures:
+      - "K2 Urgency マッピング = 時間 → [0,1] の非線形スケール"
+      - "Eisenhower Matrix = 2軸 (重要性 × 緊急性) の enrichment"
+      - "Q2 保護 = enrichment 上のバイアス補正 (q2_boost)"
+      - "/s Met, /h Prob と共通の上位概念: Typed Enrichment"
+lineage: "v5.2 + Limit演算復元 → v6.0 + C0 PW/加重融合 → v6.4 → v6.5 C3 Kalon化 → v6.6 固有層 Temporal-enrichment"
 cognitive_algebra:
   generation: "L1.5 × L1.75"
   coordinates:

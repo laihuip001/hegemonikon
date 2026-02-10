@@ -236,6 +236,26 @@ store.add('{pattern_content}', evidence='{evidence}', strength=0.9, tags=['{tags
 
 ---
 
+## STEP 7.5: Browser Recordings (UI変更時)
+
+> **UI/フロントエンド変更を含む場合**: `browser_subagent` で操作を録画し、
+> walkthrough に WebP 動画を埋め込む。コードレビューだけでは検証不能な
+> 視覚的動作を**証拠として残す**。
+
+```markdown
+# walkthrough.md への埋め込み例
+![ダッシュボード操作の検証](/path/to/recording.webp)
+```
+
+| 録画すべきケース | 理由 |
+|:---------------|:-----|
+| UI レイアウト変更 | 意図通りか視覚確認 |
+| アニメーション/トランジション | コードだけでは判定不能 |
+| エラー表示のUX | ユーザー体験は動画で伝わる |
+| レスポンシブ対応 | 複数 viewport の確認 |
+
+---
+
 ## 完了報告フォーマット
 
 ```

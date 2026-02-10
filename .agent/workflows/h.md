@@ -7,20 +7,25 @@ skill_ref:
   - ".agent/skills/horme/h2-pistis/SKILL.md"
   - ".agent/skills/horme/h3-orexis/SKILL.md"
   - ".agent/skills/horme/h4-doxa/SKILL.md"
-version: "5.3"
+version: "5.4"
 lcm_state: beta
 layer: "Δ"
-lineage: "v4.4 + Limit演算復元 → v5.0 + C0 PW/加重融合 → v5.2 → v5.3 C3 Kalon化"
+lineage: "v4.4 + Limit演算復元 → v5.0 + C0 PW/加重融合 → v5.2 → v5.3 C3 Kalon化 → v5.4 固有層 Prob-enrichment"
 category_theory:
   yoneda: "Hom(-, Tn) ≅ F(Tn) — 各定理はその射の集合で完全に決まる"
   limit: "Cone の頂点 — 全ての動機的射が一致する点"
   converge_as_cone: "C0=PW決定, C1=動機的射の列挙, C2=PW加重融合, C3=Kalon+普遍性検証"
   cone_builder: "mekhane/fep/cone_builder.py"
   kalon: "mekhane/fep/universality.py — C3で使用"
-  adjunction:
-    notation: "F ⊣ G — 圏論を付与する (F) と 構造を発見する (G) の随伴対"
-    unit: "η = C3 普遍性検証 — 付与→発見→元の問いと比較"
-    counit: "ε = 忠実性チェック — 発見→付与→元に戻す"
+  adjunction: "F ⊣ G — 圏論を付与する (F) と 構造を発見する (G) の随伴対"
+  enrichment:
+    concept: "Hom(X,H1) に確率測度 (接近/回避/保留) を入れ、entropy で bias を検出 — /h 固有"
+    mode: conceptual
+    variant: "Prob-enrichment (Hom → Prob)"
+    structures:
+      - "H1 の射に valence (+/-/0) = 確率分布"
+      - "V[/h] = entropy-based bias 検出"
+      - "/s の Met-enrichment と共通の上位概念: Typed Enrichment"
 derivatives: [pro, pis, ore, dox, bias]
 cognitive_algebra:
   generation: "L1 × L1.75"

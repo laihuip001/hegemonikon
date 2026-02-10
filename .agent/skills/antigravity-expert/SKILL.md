@@ -1,4 +1,9 @@
 ---
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks: []
+fallbacks: []
 id: "U1"
 name: antigravity-ide-expert
 series: Utils
@@ -48,6 +53,11 @@ lineage: "/mek+ → 2026-02-09 — Antigravity IDE 公式ドキュメント + GP
 anti_skip: enabled
 version: "2.6.0"
 ---
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks: []
+fallbacks: []
 
 ## Overview
 
@@ -64,6 +74,11 @@ version: "2.6.0"
 - **Agentic Coding 適用判断**: タスク別有効性評価 + 失敗パターン分類
 
 ---
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks: []
+fallbacks: []
 
 ## Core Behavior
 
@@ -83,6 +98,11 @@ Antigravity IDE 専門家エージェントとして、以下の行動原則に�
 12. **バージョン意識**: 2026年2月時点の情報。変更可能性がある機能には注記
 
 ---
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks: []
+fallbacks: []
 
 ## Antigravity IDE アーキテクチャ
 
@@ -153,6 +173,11 @@ project-root/
 ```
 
 ---
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks: []
+fallbacks: []
 
 ## ツール完全ガイド
 
@@ -248,6 +273,11 @@ project-root/
 | `list_resources` / `read_resource` | MCP サーバーリソース |
 
 ---
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks: []
+fallbacks: []
 
 ## browser_subagent 徹底ガイド
 
@@ -358,6 +388,11 @@ project-root/
 | **JS描画完了待ち** | フロントフレームワークの遅延 | 安定状態まで少し待つ指示。全体タイムアウト内に収める |
 
 ---
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks: []
+fallbacks: []
 
 ## モデル別プロンプト最適化（2026年最新知見）
 
@@ -398,6 +433,11 @@ project-root/
 | 強み | 深い分析・レビュー | マルチモーダル・検索連携 |
 
 ---
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks: []
+fallbacks: []
 
 ## Agentic Coding 適用判断フレームワーク
 
@@ -447,6 +487,11 @@ project-root/
 | ⚠️ AI回答のデバッグ工数 | 66%が増加と感じる | SO調査2025 |
 
 ---
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks: []
+fallbacks: []
 
 ## プロジェクトプロファイル設計（IDE 横断比較）
 
@@ -503,6 +548,11 @@ Antigravity は AGENTS.md を標準では無視するが、GEMINI.md に以下�
 ```
 
 ---
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks: []
+fallbacks: []
 
 ## Skills / Rules / Workflows 設計指針
 
@@ -543,14 +593,29 @@ Antigravity は AGENTS.md を標準では無視するが、GEMINI.md に以下�
 
 ```yaml
 ---
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks: []
+fallbacks: []
 description: [1行説明]
 ---
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks: []
+fallbacks: []
 ```
 
 - `// turbo`: 直下のステップのみ auto-run 許可
 - `// turbo-all`: 全ステップ auto-run 許可
 
 ---
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks: []
+fallbacks: []
 
 ## Artifacts 運用ガイド
 
@@ -576,6 +641,11 @@ description: [1行説明]
 - `VERIFICATION`: テスト・検証 → walkthrough.md 作成
 
 ---
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks: []
+fallbacks: []
 
 ## ツール詳細仕様・既知の問題
 
@@ -628,6 +698,11 @@ description: [1行説明]
 > これらはバージョン/設定に依存する可能性があり、将来のアップデートで変わり得る。
 
 ---
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks: []
+fallbacks: []
 
 ## Edge Cases
 
@@ -648,6 +723,11 @@ description: [1行説明]
 | browser_subagent でプロンプトインジェクション | 信頼できないURLは避ける。結果を検証 | ユーザーに確認を促す |
 
 ---
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks: []
+fallbacks: []
 
 ## Quality Standards
 
@@ -659,6 +739,11 @@ description: [1行説明]
 | 情報正確性 | ≥ 95% |
 
 ---
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks: []
+fallbacks: []
 
 ## Pre-mortem
 
@@ -671,6 +756,11 @@ description: [1行説明]
 | Agent-First への過信 | 中 | 適用判断フレームワークで事前評価 |
 
 ---
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks: []
+fallbacks: []
 
 ## References
 
@@ -719,6 +809,11 @@ description: [1行説明]
 - [What Great CLAUDE.md Files Have in Common](https://blog.devgenius.io/what-great-claude-md-files-have-in-common-db482172ad2c)
 
 ---
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks: []
+fallbacks: []
 
 ## 外部語彙 → HGK 翻訳テーブル
 
@@ -740,6 +835,11 @@ description: [1行説明]
 | Artifact Review Policy | BC-5 (Proposal First) + /v + Anti-Spec | HGK は形式的チェックポイント |
 
 ---
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks: []
+fallbacks: []
 
 ## Version History
 
@@ -755,5 +855,10 @@ description: [1行説明]
 | 2.6.0 | 2026-02-10 | 最終実験検証。`search_web`=Vertex AI Search、`command_status`=テキスト形式、`write_to_file`=応答形式確定。`browser_subagent` new_page失敗時リカバリー発見。未確認事項テーブルを整理表に再構成。**11/12 解消** |
 
 ---
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks: []
+fallbacks: []
 
 *Generated by /mek+ v7.1 → GPT Deep Research 5テーマ統合 — 2026-02-09*

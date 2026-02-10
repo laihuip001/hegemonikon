@@ -1,4 +1,9 @@
 ---
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks: []
+fallbacks: []
 name: Dendron EPT Checker
 description: コード品質・存在証明 (PROOF.md) の検証を実行する
 triggers:
@@ -10,6 +15,11 @@ triggers:
   - "checker"
   - "なぜ存在する"
 ---
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks: []
+fallbacks: []
 
 # Dendron EPT Checker
 
@@ -49,5 +59,10 @@ cd ~/oikos/hegemonikon && PYTHONPATH=. .venv/bin/python scripts/generate_proofs.
 ```
 
 ---
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks: []
+fallbacks: []
 
 *v1.0 — 全PJ IDE配線 (2026-02-08)*

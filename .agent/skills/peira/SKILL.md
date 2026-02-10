@@ -1,4 +1,9 @@
 ---
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks: []
+fallbacks: []
 name: Peira Health Check
 description: システム全体のヘルスチェック・健全性確認
 triggers:
@@ -10,6 +15,11 @@ triggers:
   - "動作確認"
   - "テスト"
 ---
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks: []
+fallbacks: []
 
 # Peira Health Check
 
@@ -38,5 +48,10 @@ cd ~/oikos/hegemonikon && PYTHONPATH=. .venv/bin/python -m pytest --tb=short -q 
 ```
 
 ---
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks: []
+fallbacks: []
 
 *v1.0 — 全PJ IDE配線 (2026-02-08)*

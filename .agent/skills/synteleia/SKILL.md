@@ -1,4 +1,9 @@
 ---
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks: []
+fallbacks: []
 name: Synteleia WBC
 description: 安全性チェック・白血球 (WBC) による不正操作検知
 triggers:
@@ -13,6 +18,11 @@ triggers:
   - "監査"
   - "audit"
 ---
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks: []
+fallbacks: []
 
 # Synteleia WBC (白血球)
 
@@ -70,5 +80,10 @@ for issue in result.issues[:5]:
 | スコア < 4 | **停止**、理由を報告 |
 
 ---
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks: []
+fallbacks: []
 
 *v1.1 — import パス検証済み (2026-02-08)*

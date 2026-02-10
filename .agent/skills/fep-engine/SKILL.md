@@ -1,4 +1,9 @@
 ---
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks: []
+fallbacks: []
 name: FEP Cognitive Engine
 description: |
   FEP (自由エネルギー原理) に基づく認知設計原理。
@@ -23,6 +28,11 @@ version: "2.0.0"
 lineage: |
   v1.1 (手順のみ) → /sop deep 15論点50論文調査 (2026-02-10) → /noe+ 3命題抽出 → v2.0
 ---
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks: []
+fallbacks: []
 
 # FEP Cognitive Engine v2.0
 
@@ -32,6 +42,11 @@ lineage: |
 > FEP は「行動選択の objective function」として最も力を発揮する設計原理である。
 
 ---
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks: []
+fallbacks: []
 
 ## Layer 0: 哲学的基盤 — なぜ FEP か
 
@@ -56,6 +71,11 @@ lineage: |
 > 「任意のシステムに MB を仮定する」強い読みは不適切。[arXiv:2105.11203](https://arxiv.org/abs/2105.11203)
 
 ---
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks: []
+fallbacks: []
 
 ## Layer 1: 操作的定義 — 概念を「使える」レベルで
 
@@ -133,6 +153,11 @@ LLM エージェントにおける Markov Blanket:
 > 厳密な Markov blanket の数学的条件（Aguilera 2021）を満たすかは未検証。[推定: 60%]
 
 ---
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks: []
+fallbacks: []
 
 ## Layer 2: HGK 対応 — 定理体系との接続
 
@@ -168,6 +193,11 @@ A4 Epistēmē → 精度の確立（知識として正当化された高精度�
 | O4 Energeia | **Pragmatic value** | 報酬を最大化する行動。実行 |
 
 ---
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks: []
+fallbacks: []
 
 ## Layer 3: 実装手順
 
@@ -238,6 +268,11 @@ print(llm_fmt)
 | **λ** (選好精度) | 4.0–8.0 | C ベクトルへの依存度 | 推奨値（文献明記なし） |
 
 ---
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks: []
+fallbacks: []
 
 ## Layer 4: 判断支援 — 問いとチェックリスト
 
@@ -265,6 +300,11 @@ print(llm_fmt)
 - [ ] 「FEP だから正しい」ではなく「FEP に基づいてこの具体的予測を立てる」と言えるか？
 
 ---
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks: []
+fallbacks: []
 
 ## Layer 5: 理論的基盤
 
@@ -297,6 +337,11 @@ print(llm_fmt)
 | LLM トークン生成の FEP 直接モデル | 概念的対応のみ | 数理的な同一視は時期尚早 (A1-4) |
 
 ---
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks: []
+fallbacks: []
 
 ## 参照実装
 
@@ -307,6 +352,11 @@ print(llm_fmt)
 | pymdp | Active Inference の Python 実装 | [GitHub](https://github.com/infer-actively/pymdp) |
 
 ---
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks: []
+fallbacks: []
 
 ## 結語
 
@@ -324,6 +374,11 @@ print(llm_fmt)
 > その一瞬の停止こそが、精度（precision）の正体である。
 
 ---
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks: []
+fallbacks: []
 
 *v2.1 — /dia+ 敵対的レビュー反映 + Layer 3 実証テスト済み (2026-02-10)*
 *Lineage: v1.1 手順のみ → v2.0 /sop + /noe+ → v2.1 /dia+ 修正 + 結語追加*

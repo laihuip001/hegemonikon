@@ -1,4 +1,9 @@
 ---
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks: []
+fallbacks: []
 name: Taxis Classifier
 description: タスク/入力の自動分類・優先順位付け
 triggers:
@@ -11,6 +16,11 @@ triggers:
   - "整理"
   - "morphism"
 ---
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks: []
+fallbacks: []
 
 # Taxis Classifier
 
@@ -57,5 +67,10 @@ if result:
 | 精密系 (A) | /dia+, /epi 等 |
 
 ---
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks: []
+fallbacks: []
 
 *v1.1 — import パス検証済み (2026-02-08)*

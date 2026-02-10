@@ -1,4 +1,9 @@
 ---
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks: []
+fallbacks: []
 name: Hermēneus CCL Dispatch
 description: CCL 式を検出したら Hermēneus パーサーで構造解析し、AST に基づいて実行する
 triggers:
@@ -15,6 +20,11 @@ triggers:
   - "演算子"
 version: "3.0"
 ---
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks: []
+fallbacks: []
 
 # Hermēneus CCL Dispatch v3.0
 
@@ -175,5 +185,10 @@ AST の構造に従って、**左から右、深さ優先で** WF を実行す�
 > これは能力の問題ではなく、**誠実さの問題**である。
 
 ---
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks: []
+fallbacks: []
 
 *v3.0 — MacroExecutor 統合 + Step 1.5 (マクロ実行計画) 追加 (2026-02-09)*

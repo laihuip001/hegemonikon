@@ -1,4 +1,9 @@
 ---
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks: []
+fallbacks: []
 name: Synedrion Council
 description: 偉人評議会 (Synedrion) による多角的レビュー・監査
 triggers:
@@ -11,6 +16,11 @@ triggers:
   - "批評"
   - "/syn"
 ---
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks: []
+fallbacks: []
 
 # Synedrion Council
 
@@ -46,5 +56,10 @@ print(result)
 大規模レビューには `/syn` WF を実行すること。
 
 ---
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks: []
+fallbacks: []
 
 *v1.0 — 全PJ IDE配線 (2026-02-08)*

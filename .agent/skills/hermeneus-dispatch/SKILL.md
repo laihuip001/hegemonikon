@@ -13,6 +13,11 @@ triggers:
   - "マクロ"
   - "ワークフロー式"
   - "演算子"
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks: []
+fallbacks: []
 version: "3.0"
 ---
 

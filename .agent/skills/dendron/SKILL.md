@@ -1,6 +1,11 @@
 ---
 name: Dendron EPT Checker
 description: コード品質・存在証明 (PROOF.md) の検証を実行する
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks: []
+fallbacks: []
 triggers:
   - "品質"
   - "PROOF"
@@ -19,7 +24,7 @@ triggers:
 
 - コード品質・存在証明の検証が必要な時
 - 新しいモジュール/ファイル追加後の検証
-- `/dev` ワークフロー内での品質ゲート
+-  ワークフロー内での品質ゲート
 
 ## 手順
 

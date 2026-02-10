@@ -25,6 +25,16 @@ category_theory:
     left_unit: "μ∘ηT = id: 新しい問いを生んで平坦化 = そのまま"
     right_unit: "μ∘Tη = id: 既存の問いに問いを被せて平坦化 = そのまま"
     associativity: "μ∘μT = μ∘Tμ: 平坦化の順序は結果に影響しない"
+  noe_zet_adjunction:
+    adjunction: "Noēsis (F) ⊣ Zētēsis (G)"
+    G_role: "G: Insight → Question（認識から自信を忘却し、不確実性を拡散させる）"
+    G_definition: "既知への重み付け(precision)を捨てて、問いだけを残す操作"
+    G_two_layers:
+      既知未知: "知っているが不確実なもの → 問いにできる。well-defined"
+      未知未知: "知らないことすら知らないもの → 問えない。unknown unknowns"
+    drift: "Drift = unknown unknowns の量。/pan (Panorama) は Drift 低減を試みる"
+    precision_axis: "L1.75 Precision (C↔U) 上の操作。/noe = C寄り、/zet = U寄り"
+    insight: "/noe は不確実性→確実性、/zet は確実性→不確実性の拡散 — Creator, 2026-02-10"
 derivatives: [anom, hypo, eval, abduction]
 trigonon:
   series: O

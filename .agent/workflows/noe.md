@@ -24,6 +24,12 @@ category_theory:
     notation: "F ⊣ G — 圏論を付与する (F) と 構造を発見する (G) の随伴対"
     unit: "η: Id → GF = Phase 3 (Kalon) — 付与→発見→元の問いと比較"
     counit: "ε: FG → Id = Phase 5 (Dokimasia) — 発見→付与→元に戻す"
+    noe_zet_pair:
+      adjunction: "Noēsis (F) ⊣ Zētēsis (G)"
+      F_role: "F: Question → Insight（問いから確実性を構成する = precision ↑）"
+      G_role: "G: Insight → Question（認識から自信を忘却し問いだけを残す = precision ↓）"
+      drift: "Drift = unknown unknowns — 問えない問い。疑うべきかすら気づけない前提"
+      insight: "自信 = 既知への重み付け(precision)を捨てることで問いが生まれる — Creator, 2026-02-10"
 cognitive_algebra:
   "+": 詳細分析（各フェーズで3倍の出力）
   "-": 要点分析（結論+理由1つのみ、5行以内）

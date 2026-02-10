@@ -9,6 +9,16 @@ triggers:
   - "peira"
   - "動作確認"
   - "テスト"
+
+# Safety Contract
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks:
+  - "システム負荷増大"
+  - "テスト用副作用の発生"
+fallbacks:
+  - "手動ログ確認"
 ---
 
 # Peira Health Check

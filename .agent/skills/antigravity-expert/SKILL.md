@@ -47,6 +47,16 @@ related:
 lineage: "/mek+ → 2026-02-09 — Antigravity IDE 公式ドキュメント + GPT Deep Research 5テーマ + 実運用経験から構築"
 anti_skip: enabled
 version: "2.6.0"
+
+# Safety Contract
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks:
+  - "IDEの仕様変更による情報陳腐化"
+  - "誤ったツール使用法の推奨"
+fallbacks:
+  - "最新の公式ドキュメント参照"
 ---
 
 ## Overview

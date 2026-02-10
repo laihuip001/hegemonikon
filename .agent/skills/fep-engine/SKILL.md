@@ -22,6 +22,16 @@ triggers:
 version: "2.0.0"
 lineage: |
   v1.1 (手順のみ) → /sop deep 15論点50論文調査 (2026-02-10) → /noe+ 3命題抽出 → v2.0
+
+# Safety Contract
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks:
+  - "過度な理論適用による認知負荷増大"
+  - "数理モデルの誤解釈"
+fallbacks:
+  - "標準的なReAct/CoT推論"
 ---
 
 # FEP Cognitive Engine v2.0

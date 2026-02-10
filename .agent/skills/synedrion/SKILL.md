@@ -10,6 +10,15 @@ triggers:
   - "多角"
   - "批評"
   - "/syn"
+
+# Safety Contract
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks:
+  - "批評過多による進行停滞"
+  - "主観的意見の混入"
+fallbacks: []
 ---
 
 # Synedrion Council

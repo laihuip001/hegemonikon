@@ -14,6 +14,16 @@ triggers:
   - "ワークフロー式"
   - "演算子"
 version: "3.0"
+
+# Safety Contract
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks:
+  - "複雑なCCL式のパースエラーによる中断"
+  - "マクロ展開時の無限ループ"
+fallbacks:
+  - "手動ステップ実行"
 ---
 
 # Hermēneus CCL Dispatch v3.0

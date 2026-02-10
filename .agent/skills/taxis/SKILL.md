@@ -10,6 +10,16 @@ triggers:
   - "TODO"
   - "整理"
   - "morphism"
+
+# Safety Contract
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks:
+  - "誤分類によるタスク遅延"
+  - "優先順位の誤判定"
+fallbacks:
+  - "手動分類"
 ---
 
 # Taxis Classifier

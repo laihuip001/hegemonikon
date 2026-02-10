@@ -13,16 +13,9 @@ from datetime import datetime
 # パッケージパスを追加
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
-from hermeneus.src import (
-    # Registry
-    WorkflowDefinition, WorkflowStage, WorkflowParser, WorkflowRegistry,
-    # Executor
-    ExecutionPhase, PhaseResult, ExecutionPipeline,
-    WorkflowExecutor, BatchExecutor,
-    # Synergeia Adapter
-    ThreadStatus, ThreadConfig, ThreadResult, ExecutionPlan,
-    SynergeiaAdapter, PlanBuilder,
-)
+from hermeneus.src.executor import ExecutionPhase, PhaseResult, ExecutionPipeline, WorkflowExecutor, BatchExecutor
+from hermeneus.src.registry import WorkflowDefinition, WorkflowStage, WorkflowParser, WorkflowRegistry
+from hermeneus.src.synergeia_adapter import ThreadStatus, ThreadConfig, ThreadResult, ExecutionPlan, SynergeiaAdapter, PlanBuilder
 
 
 class TestWorkflowStage:

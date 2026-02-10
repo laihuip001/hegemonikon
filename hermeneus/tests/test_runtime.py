@@ -13,12 +13,9 @@ from unittest.mock import patch, MagicMock, AsyncMock
 # パッケージパスを追加
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
-from hermeneus.src import (
-    compile_ccl,
-    ExecutionStatus, ExecutionResult, ExecutionConfig,
-    LMQLExecutor, ConvergenceExecutor,
-    CCLOutputSchema, SchemaGenerator, ConstrainedDecoder,
-)
+from hermeneus.src import compile_ccl
+from hermeneus.src.constraints import CCLOutputSchema, SchemaGenerator, ConstrainedDecoder
+from hermeneus.src.runtime import ExecutionStatus, ExecutionResult, ExecutionConfig, LMQLExecutor, ConvergenceExecutor
 
 
 class TestExecutionConfig:

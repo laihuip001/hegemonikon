@@ -14,13 +14,8 @@ from unittest.mock import patch, MagicMock
 # パッケージパスを追加
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
-from hermeneus.src import (
-    # Verifier
-    AgentRole, VerdictType, DebateArgument, Verdict,
-    DebateRound, ConsensusResult, DebateAgent, DebateEngine,
-    # Audit
-    AuditRecord, AuditStats, AuditStore, AuditReporter,
-)
+from hermeneus.src.audit import AuditRecord, AuditStats, AuditStore, AuditReporter
+from hermeneus.src.verifier import AgentRole, VerdictType, DebateArgument, Verdict, DebateRound, ConsensusResult, DebateAgent, DebateEngine
 
 
 class TestAgentRole:

@@ -184,7 +184,7 @@ class TestHermeneusIntegration:
 
     def test_execute_with_synteleia(self):
         """Synteleia 付き CCL 実行"""
-        from hermeneus.src import execute_ccl
+        from hermeneus.src.runtime import execute_ccl
         
         # コンテキスト付きで @syn 実行
         result = execute_ccl(
@@ -198,7 +198,7 @@ class TestHermeneusIntegration:
 
     def test_poiesis_only_execution(self):
         """@poiesis のみ実行（生成層）"""
-        from hermeneus.src import execute_ccl
+        from hermeneus.src.runtime import execute_ccl
         
         result = execute_ccl(
             "@poiesis",
@@ -210,7 +210,7 @@ class TestHermeneusIntegration:
 
     def test_dokimasia_only_execution(self):
         """@dokimasia のみ実行（審査層）"""
-        from hermeneus.src import execute_ccl
+        from hermeneus.src.runtime import execute_ccl
         
         result = execute_ccl(
             "@dokimasia",

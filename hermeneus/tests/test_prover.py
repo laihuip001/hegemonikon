@@ -14,12 +14,7 @@ from datetime import datetime
 # パッケージパスを追加
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
-from hermeneus.src import (
-    # Prover
-    ProofType, ProofStatus, ProofResult,
-    MypyProver, SchemaProver, Lean4Prover,
-    ProofCache, verify_code, verify_schema,
-)
+from hermeneus.src.prover import ProofType, ProofStatus, ProofResult, MypyProver, SchemaProver, Lean4Prover, ProofCache, verify_code, verify_schema
 
 
 class TestProofType:

@@ -522,7 +522,7 @@ def execute_ccl(
     # 遅延インポート (循環参照回避)
     from . import compile_ccl
     from .parser import parse_ccl
-    from .ast import ConvergenceLoop
+    from .ccl_ast import ConvergenceLoop
     
     # コンパイル
     lmql_code = compile_ccl(ccl, macros=macros, model=model)

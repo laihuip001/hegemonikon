@@ -90,7 +90,7 @@ class CCLGraphBuilder:
     def build(self, ast: Any) -> "CompiledGraph":
         """AST からグラフを構築"""
         # 遅延インポート
-        from .ast import (
+        from .ccl_ast import (
             Workflow, Sequence, ConvergenceLoop, Fusion, Oscillation,
             ForLoop, IfCondition, WhileLoop
         )
@@ -110,7 +110,7 @@ class CCLGraphBuilder:
     
     def _build_node(self, ast: Any) -> str:
         """AST ノードからグラフノードを構築"""
-        from .ast import (
+        from .ccl_ast import (
             Workflow, Sequence, ConvergenceLoop, Fusion, Oscillation,
             ForLoop, IfCondition, WhileLoop
         )

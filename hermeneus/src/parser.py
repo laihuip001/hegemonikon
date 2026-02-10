@@ -10,7 +10,7 @@ Origin: 2026-01-31 CCL Execution Guarantee Architecture
 
 import re
 from typing import Any, Optional, List, Dict
-from .ast import (
+from .ccl_ast import (
     OpType, Workflow, Condition, MacroRef,
     ConvergenceLoop, Sequence, Fusion, Oscillation, ColimitExpansion,
     ForLoop, IfCondition, WhileLoop, Lambda, Program

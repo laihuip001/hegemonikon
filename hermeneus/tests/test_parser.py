@@ -12,12 +12,9 @@ from pathlib import Path
 # パッケージパスを追加
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
-from hermeneus.src import (
-    parse_ccl, compile_ccl,
-    Workflow, Sequence, ConvergenceLoop, Fusion, Oscillation,
-    ForLoop, IfCondition, WhileLoop, Lambda,
-    OpType
-)
+from hermeneus.src import compile_ccl
+from hermeneus.src.ccl_ast import Workflow, Sequence, ConvergenceLoop, Fusion, Oscillation, ForLoop, IfCondition, WhileLoop, Lambda, OpType
+from hermeneus.src.parser import parse_ccl
 
 
 class TestBasicWorkflows:
@@ -201,7 +198,7 @@ class TestProcessOperators:
     
     def test_colimit(self):
         """\\pan+ — Colimit 演算子"""
-        from hermeneus.src import ColimitExpansion
+        from hermeneus.src.ccl_ast import ColimitExpansion
         ast = parse_ccl("\\pan+")
         assert isinstance(ast, ColimitExpansion)
         assert isinstance(ast.body, Workflow)
@@ -224,7 +221,7 @@ class TestProcessOperators:
     
     def test_full_macro_group_b(self):
         """{(/dia+~*/noe)~*\\pan+} — マクロ後半 (Colimit 含む)"""
-        from hermeneus.src import ColimitExpansion
+        from hermeneus.src.ccl_ast import ColimitExpansion
         ast = parse_ccl("{(/dia+~*/noe)~*\\pan+}")
         assert isinstance(ast, Oscillation)
         assert ast.convergent is True

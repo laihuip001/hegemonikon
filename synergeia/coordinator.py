@@ -36,9 +36,10 @@ from perplexity_api import search as perplexity_search
 
 # Import Hermeneus CCL Compiler
 try:
-    from hermeneus.src import compile_ccl, expand_ccl
-    from hermeneus.src import execute_ccl as hermeneus_execute
-    from hermeneus.src import parse_ccl as hermeneus_parse
+    from hermeneus.src import compile_ccl
+    from hermeneus.src.expander import expand_ccl
+    from hermeneus.src.runtime import execute_ccl as hermeneus_execute
+    from hermeneus.src.parser import parse_ccl as hermeneus_parse
     from hermeneus.src.macros import get_all_macros
     HERMENEUS_AVAILABLE = True
     STANDARD_MACROS = get_all_macros()

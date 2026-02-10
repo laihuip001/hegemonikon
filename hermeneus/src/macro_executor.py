@@ -263,7 +263,7 @@ class ASTWalker:
 
     def walk(self, node: Any, ctx: ExecutionContext) -> StepResult:
         """AST ノードを実行 (forward pass)"""
-        from hermeneus.src.ast import (
+        from hermeneus.src.ccl_ast import (
             Workflow, MacroRef, Sequence, ForLoop, IfCondition,
             Oscillation, Fusion, Program,
         )

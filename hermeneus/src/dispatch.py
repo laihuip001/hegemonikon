@@ -24,7 +24,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 def format_ast_tree(node, indent=0) -> str:
     """AST をインデント付きで木構造表示"""
-    from hermeneus.src.ast import (
+    from hermeneus.src.ccl_ast import (
         Workflow, Oscillation, Fusion, Sequence, ConvergenceLoop,
         ColimitExpansion, ForLoop, IfCondition, WhileLoop
     )
@@ -62,7 +62,7 @@ def format_ast_tree(node, indent=0) -> str:
     elif isinstance(node, Workflow):
         ops = ""
         if node.operators:
-            from hermeneus.src.ast import OpType
+            from hermeneus.src.ccl_ast import OpType
             ops_map = {
                 OpType.DEEPEN: "+", OpType.CONDENSE: "-",
                 OpType.ASCEND: "^", OpType.EXPAND: "!",
@@ -79,7 +79,7 @@ def format_ast_tree(node, indent=0) -> str:
 
 def extract_workflows(node) -> list:
     """AST から全ワークフロー ID を再帰的に抽出"""
-    from hermeneus.src.ast import (
+    from hermeneus.src.ccl_ast import (
         Workflow, Oscillation, Fusion, Sequence, ConvergenceLoop,
         ColimitExpansion
     )

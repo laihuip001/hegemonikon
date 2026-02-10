@@ -9,7 +9,7 @@ CCL v2.0 表現力実証テスト。
 
 import pytest
 from hermeneus.src.parser import CCLParser, parse_ccl
-from hermeneus.src.ast import (
+from hermeneus.src.ccl_ast import (
     Workflow, Sequence, Oscillation, Fusion,
     ConvergenceLoop, ColimitExpansion,
     ForLoop, IfCondition, WhileLoop, Lambda,

@@ -248,7 +248,7 @@ async def _handle_compile(args: Dict[str, Any]) -> Sequence[TextContent]:
 
 async def _handle_audit(args: Dict[str, Any]) -> Sequence[TextContent]:
     """hermeneus_audit の処理"""
-    from . import get_audit_report, query_audits
+    from .audit import get_audit_report, query_audits
     
     period = args.get("period", "last_7_days")
     limit = args.get("limit", 10)
@@ -260,7 +260,7 @@ async def _handle_audit(args: Dict[str, Any]) -> Sequence[TextContent]:
 
 async def _handle_list_workflows(args: Dict[str, Any]) -> Sequence[TextContent]:
     """hermeneus_list_workflows の処理"""
-    from . import list_workflows, get_workflow
+    from .registry import list_workflows, get_workflow
     
     names = list_workflows()
     

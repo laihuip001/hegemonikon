@@ -280,49 +280,50 @@ async def _handle_list_workflows(args: Dict[str, Any]) -> Sequence[TextContent]:
 
 
 async def _handle_export_session(args: Dict[str, Any]) -> Sequence[TextContent]:
-    """hermeneus_export_session の処理 — チャットエクスポート"""
-    import subprocess
+    """hermeneus_export_session の処理 — セッション記録・Handoff 補助"""
     from datetime import datetime
     
     session_name = args.get("session_name", "")
     if not session_name:
         session_name = f"Session_{datetime.now().strftime('%Y%m%d_%H%M')}"
     
-    # エクスポートスクリプトを実行
     hegemonikon_dir = Path(__file__).parent.parent.parent
-    export_script = hegemonikon_dir / "mekhane" / "anamnesis" / "export_chats.py"
-    python_path = hegemonikon_dir / ".venv" / "bin" / "python"
+    handoff_dir = hegemonikon_dir.parent / "mneme" / ".hegemonikon" / "sessions"
     
-    try:
-        result = subprocess.run(
-            [str(python_path), str(export_script), "--single", session_name],
-            cwd=str(hegemonikon_dir),
-            capture_output=True,
-            text=True,
-            timeout=60
-        )
+    # 最新の Handoff ファイルを検索
+    handoffs = sorted(handoff_dir.glob("handoff_*.md"), reverse=True) if handoff_dir.exists() else []
+    
+    if handoffs:
+        latest = handoffs[0]
+        # 先頭 30 行をサマリーとして取得
+        try:
+            content = latest.read_text(encoding="utf-8")
+            summary_lines = content.split("\n")[:30]
+            summary = "\n".join(summary_lines)
+        except Exception:
+            summary = "(読み取りエラー)"
         
-        if result.returncode == 0:
-            text = f"""## ✅ セッションエクスポート完了
+        text = f"""## ✅ セッション記録確認
 
 **セッション名**: `{session_name}`
+**最新 Handoff**: `{latest.name}`
+**Handoff 数**: {len(handoffs)} 件
 
+### 最新 Handoff サマリー
 ```
-{result.stdout[-500:] if len(result.stdout) > 500 else result.stdout}
+{summary}
 ```
-"""
-        else:
-            text = f"""## ❌ エクスポート失敗
 
-**エラー**:
-```
-{result.stderr[-500:] if len(result.stderr) > 500 else result.stderr}
-```
+> 💡 チャットエクスポートは IDE ネイティブ機能を使用してください。
 """
-    except subprocess.TimeoutExpired:
-        text = "## ❌ エクスポートタイムアウト (60秒)"
-    except Exception as e:
-        text = f"## ❌ エクスポートエラー: {str(e)}"
+    else:
+        text = f"""## ⚠️ Handoff 未検出
+
+**セッション名**: `{session_name}`
+**Handoff ディレクトリ**: `{handoff_dir}`
+
+Handoff ファイルが見つかりません。`/bye` でセッションを終了すると自動生成されます。
+"""
     
     return [TextContent(type="text", text=text)]
 

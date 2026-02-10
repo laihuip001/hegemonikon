@@ -118,6 +118,14 @@ def _register_routers(app: FastAPI) -> None:
     except Exception as exc:
         logger.warning("PKS router skipped: %s", exc)
 
+    # Gnōsis Narrator — PKSEngine + PKSNarrator に依存するため遅延ロード
+    try:
+        from mekhane.api.routes.gnosis_narrator import router as narrator_router
+        app.include_router(narrator_router, prefix=API_PREFIX)
+        logger.info("Gnōsis Narrator router registered")
+    except Exception as exc:
+        logger.warning("Gnōsis Narrator router skipped: %s", exc)
+
 
 # PURPOSE: アプリケーションインスタンス（uvicorn 用）
 app = create_app()

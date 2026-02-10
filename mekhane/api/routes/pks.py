@@ -119,6 +119,10 @@ async def run_push(k: int = Query(20, ge=1, le=100)) -> PushResponse:
     if not engine:
         return PushResponse(timestamp=now.isoformat())
 
+    # NOTE: PKSEngine のメソッドは同期的。FastAPI の async 内でブロックする可能性がある。
+    # 現時点ではモデルロード以外のブロッキングは軽微なため許容。
+    # 将来的に重くなる場合は asyncio.to_thread() でラップすること。
+
     # Handoff からトピック抽出
     topics = engine.auto_context_from_handoff()
     if not topics:
@@ -161,21 +165,29 @@ async def record_feedback(req: FeedbackRequest) -> FeedbackResponse:
     now = datetime.now(timezone.utc)
 
     engine = _get_engine()
-    if engine:
-        try:
-            engine.record_feedback(
-                nugget_title=req.title,
-                reaction=req.reaction,
-                series=req.series,
-            )
-        except Exception as e:
-            logger.warning("Feedback recording failed: %s", e)
-            return FeedbackResponse(
-                timestamp=now.isoformat(),
-                title=req.title,
-                reaction=req.reaction,
-                recorded=False,
-            )
+    if not engine:
+        logger.warning("Feedback skipped: PKSEngine not available")
+        return FeedbackResponse(
+            timestamp=now.isoformat(),
+            title=req.title,
+            reaction=req.reaction,
+            recorded=False,
+        )
+
+    try:
+        engine.record_feedback(
+            nugget_title=req.title,
+            reaction=req.reaction,
+            series=req.series,
+        )
+    except Exception as e:
+        logger.warning("Feedback recording failed: %s", e)
+        return FeedbackResponse(
+            timestamp=now.isoformat(),
+            title=req.title,
+            reaction=req.reaction,
+            recorded=False,
+        )
 
     return FeedbackResponse(
         timestamp=now.isoformat(),

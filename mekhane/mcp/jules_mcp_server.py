@@ -34,7 +34,7 @@ log("Starting Jules MCP Server...")
 # ============ Import path setup ============
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).parent.parent))
+sys.path.insert(0, str(Path(__file__).parent.parent.parent))  # hegemonikon root
 
 # ============ Import MCP SDK ============
 try:

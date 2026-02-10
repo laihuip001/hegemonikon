@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/インフラ] <- mekhane/pks/ A0→能動的推論には対話的探求が必要→push_dialogが担う
 # PURPOSE: Push された知識への対話インターフェース
 """
 PROOF: [L2/インフラ] このファイルは存在しなければならない

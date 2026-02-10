@@ -110,14 +110,22 @@ _EDGE_DEFS = [
 ]
 
 # 各ペアの 8 エッジを生成
+# 4×4=16 の可能な接続から 8 つを選択 (各src→2tgt, 各tgt←2src)
+# 重要: index 1-2 と 3-4 のクロスエッジを含めて全ノードが接続されること
+_EDGE_PAIRS = [
+    (1, 3), (1, 4),  # src1 → tgt3, tgt4 (cross)
+    (2, 3), (2, 4),  # src2 → tgt3, tgt4 (cross)
+    (3, 1), (3, 2),  # src3 → tgt1, tgt2 (cross)
+    (4, 1), (4, 2),  # src4 → tgt1, tgt2 (cross)
+]
 EDGES: list[dict[str, Any]] = []
 for pair_id, src_s, tgt_s, shared, nat, meaning in _EDGE_DEFS:
-    for i in range(1, 9):
+    for i, (si, ti) in enumerate(_EDGE_PAIRS, 1):
         EDGES.append({
             "id": f"{pair_id}{i}",
             "pair": pair_id,
-            "source": f"{src_s}{((i-1)//2)%2 + 1 + ((i-1)//4)*2}",
-            "target": f"{tgt_s}{((i-1) % 2) + 1 + ((i-1)//4)*2}",
+            "source": f"{src_s}{si}",
+            "target": f"{tgt_s}{ti}",
             "shared_coordinate": shared,
             "naturality": nat,
             "meaning": meaning,

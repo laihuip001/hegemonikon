@@ -219,6 +219,7 @@ class JulesPool:
     ) -> Dict[str, Any]:
         """
         新しいセッションを作成。
+        `jules remote new --session` で非対話的に実行。
         """
         account = self.get_available_account()
         if not account:
@@ -231,7 +232,8 @@ class JulesPool:
             self._save_state()
         
         try:
-            args = ["new", task]
+            # `jules remote new` は非対話的（APIベース）
+            args = ["remote", "new", "--session", task]
             if repo:
                 args.extend(["--repo", repo])
             if parallel > 1:
@@ -244,9 +246,9 @@ class JulesPool:
                 self._save_state()
                 return result
             
-            # セッションIDを抽出（出力から）
+            # セッションIDを出力から抽出
             output = result.get("output", "")
-            session_id = f"{account.id}_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+            session_id = self._extract_session_id(output, account.id)
             
             session = JulesSession(
                 session_id=session_id,
@@ -273,6 +275,16 @@ class JulesPool:
             account.status = "active"
             self._save_state()
             return {"error": str(e)}
+    
+    @staticmethod
+    def _extract_session_id(output: str, account_id: str) -> str:
+        """出力からセッションIDを抽出。見つからなければタイムスタンプで生成。"""
+        import re
+        # 典型的な出力: "Session created: 1234567" or URL with session ID
+        match = re.search(r'(?:session[:\s]+|/sessions?/)(\d+)', output, re.IGNORECASE)
+        if match:
+            return match.group(1)
+        return f"{account_id}_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
     
     def list_sessions(self, account_id: Optional[str] = None) -> Dict[str, Any]:
         """

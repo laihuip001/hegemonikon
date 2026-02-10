@@ -43,7 +43,7 @@ logger = logging.getLogger("hegemonikon.api")
 
 # PURPOSE: FastAPI アプリケーション生成
 def create_app() -> FastAPI:
-    """FastAPI インスタンスを生成し、ルーターを登録する。"""
+    """FastAPI インスタンスを生成し、ルーターをマウントする。"""
     app = FastAPI(
         title=API_TITLE,
         version=__version__,
@@ -66,14 +66,14 @@ def create_app() -> FastAPI:
     app.state.start_time = time.time()
 
     # ルーター登録
-    _register_routers(app)
+    _mount_routers(app)
 
     return app
 
 
-# PURPOSE: 全ルーターを登録（Gnōsis は遅延ロードで安全に）
-def _register_routers(app: FastAPI) -> None:
-    """各ルートモジュールのルーターを登録する。"""
+# PURPOSE: 全ルーターをマウント（Gnōsis は遅延ロードで安全に）
+def _mount_routers(app: FastAPI) -> None:
+    """各ルートモジュールのルーターをマウントする。"""
     from mekhane.api.routes.status import router as status_router
     from mekhane.api.routes.fep import router as fep_router
     from mekhane.api.routes.postcheck import router as postcheck_router
@@ -140,7 +140,7 @@ app = create_app()
 
 
 # PURPOSE: 残留ソケットファイルの安全な削除
-def _cleanup_stale_socket(uds_path: str) -> None:
+def _remove_stale_socket(uds_path: str) -> None:
     """前回のクラッシュで残ったソケットファイルを削除する。"""
     sock = Path(uds_path)
     if sock.exists():
@@ -173,7 +173,7 @@ def main() -> int:
 
     if args.uds:
         # UDS モード — Tauri デスクトップアプリ用
-        _cleanup_stale_socket(args.uds)
+        _remove_stale_socket(args.uds)
         logger.info("Starting Hegemonikón API on UDS: %s", args.uds)
         uvicorn.run(
             "mekhane.api.server:app",

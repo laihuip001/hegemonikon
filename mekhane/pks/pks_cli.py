@@ -142,7 +142,28 @@ def cmd_auto(args: argparse.Namespace) -> None:
     print(f"[PKS] 抽出トピック: {topics}")
     print("[PKS] Gnōsis 検索中...")
 
+    # verbose: 検索結果の距離・スコアを表示
+    verbose = getattr(args, 'verbose', False)
+    if verbose:
+        context = engine.tracker.context
+        query_text = context.to_embedding_text()
+        print(f"[PKS verbose] Query: {query_text[:200]}")
+        print(f"[PKS verbose] Threshold: {engine.detector.threshold}")
+
+        index = engine._get_index()
+        results = index.search(query_text, k=args.k)
+        print(f"[PKS verbose] 検索結果: {len(results)} 件")
+        for i, r in enumerate(results[:10]):
+            dist = r.get('_distance', float('inf'))
+            score = max(0.0, 1.0 - (dist / 2.0))
+            passed = '✅' if score >= engine.detector.threshold else '❌'
+            print(f"  {i+1}. [{r.get('source', '?'):8s}] {r.get('title', '?')[:50]:50s}"
+                  f" dist={dist:.3f} score={score:.3f} {passed}")
+
     nuggets = engine.proactive_push(k=args.k)
+
+    if verbose:
+        print(f"[PKS verbose] Nuggets after scoring+filter: {len(nuggets)}")
 
     if not nuggets:
         print("📭 プッシュ対象の知識はありません。")
@@ -292,7 +313,7 @@ def main() -> None:
     p_push.add_argument("--topics", "-t", help="トピック (カンマ区切り)")
     p_push.add_argument("--auto", "-a", action="store_true", help="Handoff からトピック自動抽出")
     p_push.add_argument("--infer", "-i", help="Attractor でコンテキスト推論 (テキスト入力)")
-    p_push.add_argument("--threshold", type=float, default=0.65, help="関連度閾値 (default: 0.65)")
+    p_push.add_argument("--threshold", type=float, default=0.50, help="関連度閾値 (default: 0.50)")
     p_push.add_argument("--max", "-m", type=int, default=5, help="最大プッシュ件数 (default: 5)")
     p_push.add_argument("--k", type=int, default=20, help="検索候補数 (default: 20)")
     p_push.add_argument("--no-questions", action="store_true", help="質問生成を無効化")
@@ -315,6 +336,7 @@ def main() -> None:
     p_auto = subparsers.add_parser("auto", help="Handoff から全自動プッシュ")
     p_auto.add_argument("--k", type=int, default=20, help="検索候補数 (default: 20)")
     p_auto.add_argument("--no-questions", action="store_true", help="質問生成を無効化")
+    p_auto.add_argument("--verbose", "-v", action="store_true", help="検索結果のスコア詳細を表示")
     p_auto.set_defaults(func=cmd_auto)
 
     # --- infer ---

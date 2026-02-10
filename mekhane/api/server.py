@@ -110,6 +110,14 @@ def _register_routers(app: FastAPI) -> None:
     except Exception as exc:
         logger.warning("Sympatheia router skipped: %s", exc)
 
+    # PKS — 埋め込みモデルに依存するため遅延ロード
+    try:
+        from mekhane.api.routes.pks import router as pks_router
+        app.include_router(pks_router, prefix=API_PREFIX)
+        logger.info("PKS router registered")
+    except Exception as exc:
+        logger.warning("PKS router skipped: %s", exc)
+
 
 # PURPOSE: アプリケーションインスタンス（uvicorn 用）
 app = create_app()

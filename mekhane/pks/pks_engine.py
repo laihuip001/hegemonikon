@@ -166,7 +166,7 @@ class RelevanceDetector:
     """
 
     # PURPOSE: RelevanceDetector の構成と依存関係の初期化
-    def __init__(self, threshold: float = 0.65):
+    def __init__(self, threshold: float = 0.50):
         self.threshold = threshold
 
     # PURPOSE: 検索結果をコンテキストとの関連度でスコアリング
@@ -186,7 +186,8 @@ class RelevanceDetector:
             distance = result.get("_distance", float("inf"))
 
             # 距離を 0-1 のスコアに正規化 (低距離 = 高スコア)
-            # BGE-small の cosine distance は通常 0〜2 の範囲
+            # BGE-large-en-v1.5 の cosine distance は通常 0.6〜1.2 の範囲
+            # (BGE-large は BGE-small より距離が大きい傾向)
             score = max(0.0, 1.0 - (distance / 2.0))
 
             if score >= self.threshold:
@@ -235,6 +236,10 @@ class AutoTopicExtractor:
     Handoff の構造（YAML frontmatter + Markdown）を解析し、
     重要なトピックを正規表現ベースで抽出する。
     LLM 不要の軽量実装。
+
+    v2.1: セマンティックトピック抽出を追加。
+    タスク名だけでなく、ドメイン概念（FEP, Active Inference 等）も
+    抽出することで、知識ベースとのセマンティック距離を縮小する。
     """
 
     # キーワード抽出の正規表現パターン
@@ -251,17 +256,38 @@ class AutoTopicExtractor:
     _SITUATION_LINE = re.compile(
         r"^##\s*Situation\s*\n+(.+?)$", re.MULTILINE
     )
+    # v2.1: ドメイン概念パターン — 知識ベースとのセマンティック接続用
+    _DOMAIN_CONCEPTS = re.compile(
+        r"\b("
+        r"FEP|Free Energy Principle|Active Inference|"
+        r"CCL|Hegemonikón|Boulēsis|Noēsis|Energeia|Praxis|"
+        r"PKS|Proactive Knowledge|Gnōsis|Anamnesis|"
+        r"cognitive|metacognition|epistemic|"
+        r"protobuf|protocol buffer|"
+        r"attractor|morphism|adjunction|functor|"
+        r"FileMaker|腎生検|"
+        r"behavioral constraint|self-correction|"
+        r"precision weighting|prediction error"
+        r")\b",
+        re.IGNORECASE,
+    )
+    # v2.1: Lessons Learned / 教訓セクションのキーワード
+    _LESSON_LINE = re.compile(
+        r"^[-*]\s*(?:教訓|Lesson|学び|気づき)[：:]?\s*(.+?)$", re.MULTILINE
+    )
 
     # PURPOSE: Handoff テキストからトピックを自動抽出
-    def extract(self, text: str, max_topics: int = 8) -> list[str]:
+    def extract(self, text: str, max_topics: int = 12) -> list[str]:
         """Handoff テキストからトピックを自動抽出
 
         抽出戦略 (優先度順):
         1. YAML frontmatter のキー値 (primary_task, decision 等)
-        2. 完了タスクの名前 ([x])
-        3. 未完了タスクの名前 ([ ])
-        4. SBAR: Situation セクションの冒頭文
-        5. SBAR: 太字キーワード (**keyword**)
+        2. ドメイン概念 (FEP, Active Inference, CCL 等) — v2.1 追加
+        3. 完了タスクの名前 ([x])
+        4. 未完了タスクの名前 ([ ])
+        5. SBAR: Situation セクションの冒頭文
+        6. SBAR: 太字キーワード (**keyword**)
+        7. 教訓・気づきセクションのキーワード — v2.1 追加
 
         Returns:
             重複排除されたトピックリスト (最大 max_topics 件)
@@ -274,19 +300,28 @@ class AutoTopicExtractor:
             if len(val) > 3:  # ノイズ除去
                 topics.append(val)
 
-        # 2. 完了タスク名
+        # 2. ドメイン概念 (v2.1: 知識ベースとのセマンティック接続)
+        domain_seen: set[str] = set()
+        for m in self._DOMAIN_CONCEPTS.finditer(text):
+            concept = m.group(1)
+            key = concept.lower()
+            if key not in domain_seen:
+                domain_seen.add(key)
+                topics.append(concept)
+
+        # 3. 完了タスク名
         for m in self._COMPLETED_TASKS.finditer(text):
             task_name = m.group(1).strip()
             if len(task_name) > 5:
                 topics.append(task_name)
 
-        # 3. 未完了タスク名 (次回の文脈として重要)
+        # 4. 未完了タスク名 (次回の文脈として重要)
         for m in self._NEXT_TASKS.finditer(text):
             task_name = m.group(1).strip()
             if len(task_name) > 5:
                 topics.append(task_name)
 
-        # 4. SBAR: Situation セクションの冒頭文
+        # 5. SBAR: Situation セクションの冒頭文
         for m in self._SITUATION_LINE.finditer(text):
             situation = m.group(1).strip()
             if len(situation) > 10:
@@ -295,7 +330,7 @@ class AutoTopicExtractor:
                 if len(first_sentence) > 5:
                     topics.append(first_sentence)
 
-        # 5. SBAR: 太字キーワード (上限 5 件)
+        # 6. SBAR: 太字キーワード (上限 5 件)
         bold_count = 0
         noise_words = {
             "前セッション", "本セッション開始地点", "終了地点",
@@ -308,6 +343,12 @@ class AutoTopicExtractor:
             if len(kw) > 3 and bold_count < 5:
                 topics.append(kw)
                 bold_count += 1
+
+        # 7. 教訓・気づき (v2.1)
+        for m in self._LESSON_LINE.finditer(text):
+            lesson = m.group(1).strip()
+            if len(lesson) > 10:
+                topics.append(lesson[:80])
 
         # 重複排除 (順序保持)
         seen: set[str] = set()
@@ -551,7 +592,7 @@ class PKSEngine:
     # PURPOSE: PKSEngine の構成と依存関係の初期化
     def __init__(
         self,
-        threshold: float = 0.65,
+        threshold: float = 0.50,
         max_push: int = 5,
         lance_dir: Optional[Path] = None,
         enable_questions: bool = True,

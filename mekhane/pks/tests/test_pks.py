@@ -264,6 +264,99 @@ class TestRelevanceDetector:
         assert len(nuggets) >= 1
         assert nuggets[0].push_reason != ""
 
+    # PURPOSE: BGE-large の実測距離範囲 (0.7-0.8) でスコアリングするテスト
+    def test_bge_large_distance_range_passes_default_threshold(self):
+        """BGE-large の典型的な距離 0.764 で閾値 0.50 を通過すること"""
+        detector = RelevanceDetector()  # default threshold=0.50
+        results = [
+            {
+                "title": "Active Inference Paper",
+                "abstract": "FEP and active inference framework.",
+                "source": "arxiv",
+                "_distance": 0.764,  # 実測値
+                "url": "#",
+                "authors": "Friston",
+            },
+            {
+                "title": "Somewhat Related",
+                "abstract": "Another paper.",
+                "source": "session",
+                "_distance": 0.787,  # 実測値
+                "url": "#",
+                "authors": "B",
+            },
+        ]
+        ctx = SessionContext(topics=["Active Inference"])
+        nuggets = detector.score(ctx, results)
+        # 0.764 → score=0.618, 0.787 → score=0.607: 両方 >= 0.50
+        assert len(nuggets) == 2
+        assert nuggets[0].relevance_score > 0.60
+
+    # PURPOSE: 旧閾値 0.65 では BGE-large 距離がフィルタされるテスト
+    def test_bge_large_distance_fails_old_threshold(self):
+        """旧閾値 0.65 では BGE-large の典型距離がフィルタされる"""
+        detector = RelevanceDetector(threshold=0.65)
+        results = [
+            {
+                "title": "Paper A",
+                "abstract": "Something.",
+                "source": "arxiv",
+                "_distance": 0.764,
+                "url": "#",
+                "authors": "A",
+            },
+        ]
+        ctx = SessionContext(topics=["test"])
+        nuggets = detector.score(ctx, results)
+        # 0.764 → score=0.618 < 0.65 → フィルタされる
+        assert len(nuggets) == 0
+
+
+# =============================================================================
+# AutoTopicExtractor v2.1
+# =============================================================================
+
+
+# PURPOSE: Test auto topic extractor v2.1 の実装
+class TestAutoTopicExtractorV21:
+    # PURPOSE: ドメイン概念の抽出テスト
+    def test_domain_concepts_extracted(self):
+        from mekhane.pks.pks_engine import AutoTopicExtractor
+        extractor = AutoTopicExtractor()
+        text = """---
+primary_task: "PKS修正"
+---
+## Situation
+FEP に基づく Active Inference の実装を進めている。
+CCL パーサーの修正が完了した。
+"""
+        topics = extractor.extract(text)
+        topic_lower = [t.lower() for t in topics]
+        assert any("fep" in t for t in topic_lower)
+        assert any("active inference" in t for t in topic_lower)
+        assert any("ccl" in t for t in topic_lower)
+
+    # PURPOSE: 教訓セクションの抽出テスト
+    def test_lesson_extraction(self):
+        from mekhane.pks.pks_engine import AutoTopicExtractor
+        extractor = AutoTopicExtractor()
+        text = """
+- 教訓: 閾値をモデルに合わせて調整する必要がある
+- 学び: BGE-large のスコア分布は BGE-small と異なる
+"""
+        topics = extractor.extract(text)
+        assert any("閾値" in t for t in topics)
+
+    # PURPOSE: max_topics 制限テスト
+    def test_max_topics_limit(self):
+        from mekhane.pks.pks_engine import AutoTopicExtractor
+        extractor = AutoTopicExtractor()
+        # 大量のコンテンツを生成
+        lines = [f"- [x] Task {i} completed ✓" for i in range(30)]
+        text = "\n".join(lines)
+        topics = extractor.extract(text, max_topics=5)
+        assert len(topics) <= 5
+
 
 # =============================================================================
 # SerendipityScorer
@@ -353,17 +446,17 @@ class TestPushController:
 # PURPOSE: Test narrator の実装
 class TestNarrator:
     # PURPOSE: narrate_produces_3_segments をテストする
-    def test_narrate_produces_3_segments(self, sample_nugget):
+    def test_narrate_produces_5_segments(self, sample_nugget):
         narrator = PKSNarrator()
         narrative = narrator.narrate(sample_nugget)
-        assert len(narrative.segments) == 3
+        assert len(narrative.segments) == 5
 
     # PURPOSE: segment_speakers をテストする
     def test_segment_speakers(self, sample_nugget):
         narrator = PKSNarrator()
         narrative = narrator.narrate(sample_nugget)
         speakers = [s.speaker for s in narrative.segments]
-        assert speakers == ["Advocate", "Critic", "Advocate"]
+        assert speakers == ["Advocate", "Critic", "Advocate", "Critic", "Advocate"]
 
     # PURPOSE: narrative_to_markdown をテストする
     def test_narrative_to_markdown(self, sample_nugget):

@@ -84,13 +84,20 @@ class DigestorPipeline:
                 # 全トピックから上位3つ
                 queries = [t.get("query", "") for t in topics_list[:3]]
 
-            # 各クエリで検索
-            for query in queries:
+            # 各クエリで検索 (arXiv rate limit 対策: 3秒間隔)
+            import time as _time
+            for i, query in enumerate(queries):
                 if query:
-                    results = collector.search(
-                        query, max_results=max_papers // len(queries)
-                    )
-                    papers.extend(results)
+                    if i > 0:
+                        _time.sleep(3)  # arXiv API rate limit 回避
+                    try:
+                        results = collector.search(
+                            query, max_results=max_papers // len(queries)
+                        )
+                        papers.extend(results)
+                    except Exception as e:
+                        print(f"[Digestor] Query '{query[:30]}...' failed: {e}")
+                        continue
 
             # 重複除去 (arXiv ID or URL ベース)
             seen_ids = set()

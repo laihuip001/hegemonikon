@@ -134,8 +134,9 @@ async function renderDashboard(): Promise<void> {
 }
 
 async function renderDashboardContent(): Promise<void> {
-  const [health, fep, gnosisStats, criticals] = await Promise.all([
+  const [health, healthCheck, fep, gnosisStats, criticals] = await Promise.all([
     api.status().catch((): null => null),
+    api.health().catch((): null => null),
     api.fepState().catch((): null => null),
     api.gnosisStats().catch((): null => null),
     api.notifications(5, 'CRITICAL').catch((): Notification[] => []),
@@ -151,8 +152,10 @@ async function renderDashboardContent(): Promise<void> {
     : '<span class="status-error">オフライン</span>';
 
   const historyLen = fep ? fep.history_length : '-';
-  const uptimeItem = health?.items.find((i: HealthReportResponse['items'][number]) => i.name === 'uptime');
-  const uptimeSec = uptimeItem?.metric?.toFixed(0) ?? '0';
+  const uptimeSec = healthCheck?.uptime_seconds ?? 0;
+  const uptimeDisplay = uptimeSec >= 3600 ? `${(uptimeSec / 3600).toFixed(1)}時間`
+    : uptimeSec >= 60 ? `${Math.floor(uptimeSec / 60)}分`
+      : `${Math.floor(uptimeSec)}秒`;
 
   const gnosisCount = gnosisStats?.total ?? '-';
 
@@ -177,7 +180,7 @@ async function renderDashboardContent(): Promise<void> {
       <div class="card">
         <h3>システム状態</h3>
         <div class="metric">${healthStatus}</div>
-        <p>稼働時間: ${esc(uptimeSec)}秒</p>
+        <p>稼働時間: ${esc(uptimeDisplay)}</p>
       </div>
       <div class="card">
         <h3>FEP エージェント</h3>

@@ -88,6 +88,104 @@ class Series(Enum):
     A = "Akribeia"  # Accuracy assurance
 
 
+# =============================================================================
+# Enrichment (Typed Enrichment — Hom-set structure)          [Layer B: Constraint]
+# =============================================================================
+
+
+# PURPOSE: The type of enrichment for each series' Hom-set
+class EnrichmentType(Enum):
+    """Typed Enrichment — what structure the Hom-set carries.
+
+    Discovered via /noe+ bottom-up analysis (2026-02-10).
+    Each series enriches its Hom-set with a distinct mathematical structure.
+    """
+
+    END = "End"       # /o: Hom(O,O) self-endomorphisms (V→PW feedback, meta, /o*)
+    MET = "Met"       # /s: Hom as metric space (tension = distance between theorems)
+    PROB = "Prob"     # /h: Hom as probability (valence bias via entropy)
+    SET = "Set"       # /p: Hom in Set (no enrichment — "container" series)
+    TEMP = "Temp"     # /k: Hom with temporal weights (urgency, Eisenhower)
+    FUZZY = "Fuzzy"   # /a: Hom in [0,1] (precision weighting, confidence grading)
+
+
+# PURPOSE: Enrichment metadata for a series
+@dataclass(frozen=True)
+class Enrichment:
+    """Enrichment metadata for a series.
+
+    Describes what mathematical structure the Hom-set carries.
+    Discovered via bottom-up /noe+ analysis, not top-down imposition.
+    """
+
+    type: EnrichmentType
+    concept: str                    # One-line description
+    kalon: Optional[float] = None   # Kalon score (None for Set = no enrichment)
+    structures: Tuple[str, ...] = ()  # Evidence / structural basis
+
+
+# PURPOSE: Map each series to its Typed Enrichment
+SERIES_ENRICHMENTS: Dict[Series, Enrichment] = {
+    Series.O: Enrichment(
+        type=EnrichmentType.END,
+        concept="V→PW feedback + meta cognition + /o* self-reference",
+        kalon=0.75,
+        structures=(
+            "V[] > 0.5 → O3+: Cone internal state feeds back to PW",
+            "O1.meta = cognition of cognition (endomorphism)",
+            "/o* = cognition layer questioning itself",
+        ),
+    ),
+    Series.S: Enrichment(
+        type=EnrichmentType.MET,
+        concept="6-pair tension as distance + Devil's Advocate",
+        kalon=0.75,
+        structures=(
+            "S-series computes pairwise tension (metric) between 4 theorems",
+            "V > 0.1 triggers Devil's Advocate (distance-based escalation)",
+        ),
+    ),
+    Series.H: Enrichment(
+        type=EnrichmentType.PROB,
+        concept="V[/h] bias detection via entropy",
+        kalon=0.85,
+        structures=(
+            "H-series bias mode detects valence skew (probability distribution)",
+            "Entropy-based divergence measures motivational balance",
+        ),
+    ),
+    Series.P: Enrichment(
+        type=EnrichmentType.SET,
+        concept="Container series — Hom in Set, no enrichment needed",
+        kalon=None,
+        structures=(
+            "/p defines the stage where other WFs execute",
+            "3 hypotheses tested and rejected: Top, Op, Presheaf",
+        ),
+    ),
+    Series.K: Enrichment(
+        type=EnrichmentType.TEMP,
+        concept="Urgency weights + Eisenhower matrix + Q2 protection",
+        kalon=0.85,
+        structures=(
+            "K-series pri mode applies temporal urgency weighting",
+            "Eisenhower 2x2 prioritizes importance over urgency",
+            "Q2 protection: important-not-urgent tasks get elevated weight",
+        ),
+    ),
+    Series.A: Enrichment(
+        type=EnrichmentType.FUZZY,
+        concept="PW self-reference + confidence grading [0,1]",
+        kalon=0.80,
+        structures=(
+            "A4 Epistēmē grades confidence: tentative/justified/certain",
+            "A2 Krisis: binary PASS/FAIL judgment",
+            "PW is both tool and research subject in A-series",
+        ),
+    ),
+}
+
+
 # PURPOSE: Understanding vs Reasoning classification for each theorem
 class CognitiveType(Enum):
     """Understanding vs Reasoning classification for each theorem.
@@ -219,6 +317,7 @@ class Cone:
     confidence: float = 0.0  # C3: universality strength (0-100)
     is_universal: bool = False  # Whether this is the Limit
     pw: Dict[str, float] = field(default_factory=dict)  # C0: Precision Weighting [-1, +1]
+    enrichment: Optional[Enrichment] = None  # Typed Enrichment for this series
 
     # PURPOSE: V[outputs] ≤ 0.1 means projections are nearly consistent
     @property

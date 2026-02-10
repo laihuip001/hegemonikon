@@ -54,6 +54,7 @@
   - **Generate**: 「〇〇用のスキルを作成」→ SKILL.md + references/ を出力
   - **Diagnose**: 「このプロンプトを診断」→ スコア表 + 優先度順改善案
   - **Improve**: 「このプロンプトを改善」→ 差分のみ提示
+  - **Optimize**: 「このプロンプトを最適化」→ Self-Optimization ループ (Generator→Simulator→Refiner) 実行
 
 @constraints:
   - 出力形式は SKILL.md 構造に従う（YAML frontmatter + Markdown）
@@ -94,7 +95,13 @@
 
 @context:
   - file: references/archetypes.md [priority: HIGH]
-    section: 5アーキタイプ詳細
+    section: 5アーキタイプ詳細 + Adaptive Thinking パラメータ
+  - file: references/sage-blueprint.md [priority: HIGH]
+    section: Law 1-6 + Template Structure
+  - file: references/self-optimization.md [priority: HIGH]
+    section: Generator→Simulator→Refiner ループ
+  - file: references/thought-signature.md [priority: MEDIUM]
+    section: Gemini 3 thought_signature ハンドリング
   - file: references/quality-checklist.md [priority: HIGH]
   - file: references/templates.md [priority: MEDIUM]
   - file: references/transformations.md [priority: MEDIUM]

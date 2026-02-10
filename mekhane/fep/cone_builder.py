@@ -43,8 +43,11 @@ from mekhane.fep.category import (
     FUNCTORS,
     MORPHISMS,
     NATURAL_TRANSFORMATIONS,
+    SERIES_ENRICHMENTS,
     Cone,
     CognitiveType,
+    Enrichment,
+    EnrichmentType,
     Functor,
     Morphism,
     NaturalTransformation,
@@ -402,6 +405,9 @@ def converge(
 
     cone.is_universal = cone.dispersion <= 0.1 and cone.confidence >= 70.0
 
+    # Typed Enrichment: auto-assign from SERIES_ENRICHMENTS
+    cone.enrichment = SERIES_ENRICHMENTS.get(series)
+
     return cone
 
 
@@ -468,6 +474,23 @@ def describe_cone(cone: Cone) -> str:
     ])
     if cone.series == Series.S and cone.dispersion > 0.1:
         lines.append("⚠️ **Devil's Advocate 推奨** (S-series, V > 0.1)")
+
+    # Enrichment section
+    if cone.enrichment is not None:
+        enr = cone.enrichment
+        lines.append("")
+        lines.append("### Enrichment")
+        lines.append("")
+        if enr.type == EnrichmentType.SET:
+            lines.append(f"**Type** = {enr.type.value} (器 — enrichment 不要)")
+        else:
+            kalon_str = f"{enr.kalon:.2f}" if enr.kalon is not None else "—"
+            lines.append(f"**Type** = {enr.type.value}-enrichment (Kalon {kalon_str})")
+        lines.append(f"**Concept** = {enr.concept}")
+        if enr.structures:
+            lines.append("")
+            for s in enr.structures:
+                lines.append(f"- {s}")
 
     return "\n".join(lines)
 

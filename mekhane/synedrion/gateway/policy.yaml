@@ -1,0 +1,60 @@
+# MCP Gateway Security Policy
+# synedrion/gateway/policy.yaml
+#
+# 3種のポリシーで MCP ツール呼び出しを制御する:
+# 1. destructive-operations-guard: 破壊的操作に人間の承認を要求
+# 2. rate-limit: 全ツールにレートリミットを適用
+# 3. allowed-servers: 許可されたサーバーのみアクセス可能
+
+policies:
+  - name: "destructive-operations-guard"
+    description: "破壊的操作 (削除, DROP, rm) に人間の承認を要求"
+    match:
+      tools:
+        - "delete_*"
+        - "drop_*"
+        - "rm_*"
+        - "*_destroy"
+        - "*_remove"
+        - "git_reset_*"
+    action:
+      require_human_approval: true
+      log_level: "audit"
+      message: "⚠️ 破壊的操作: {tool_name} — 人間の承認が必要です"
+
+  - name: "write-operations-log"
+    description: "書き込み操作をログに記録"
+    match:
+      tools:
+        - "*_create"
+        - "*_update"
+        - "*_write"
+        - "*_add"
+        - "*_commit"
+        - "*_push"
+    action:
+      require_human_approval: false
+      log_level: "info"
+
+  - name: "rate-limit"
+    description: "全ツールに1分間60回のレートリミット"
+    match:
+      tools: ["*"]
+    rate_limit:
+      requests_per_minute: 60
+
+  - name: "allowed-servers"
+    description: "許可されたサーバーのみアクセス可能 (デフォルト拒否)"
+    servers:
+      allow:
+        - "gnosis"
+        - "sophia"
+        - "hermeneus"
+        - "sympatheia"
+        - "mneme"
+        - "digestor"
+        - "jules"
+        - "prompt-lang"
+        - "sequential-thinking"
+      deny:
+        - "*"  # 未登録サーバーはデフォルト拒否

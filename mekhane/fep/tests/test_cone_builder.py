@@ -12,7 +12,7 @@ Q.E.D.
 
 import pytest
 
-from mekhane.fep.category import Cone, Series
+from mekhane.fep.category import Cone, EnrichmentType, Series
 from mekhane.fep.cone_builder import (
     compute_dispersion,
     converge,
@@ -341,3 +341,49 @@ class TestDescribeCone:
             })
             out = describe_cone(cone)
             assert "Devil" not in out, f"Devil should not appear for {s.name}"
+
+
+# =============================================================================
+# Typed Enrichment
+# =============================================================================
+
+
+# PURPOSE: Typed Enrichment テスト。
+class TestTypedEnrichment:
+    """Typed Enrichment テスト。"""
+
+    # PURPOSE: converge() で enrichment が自動付与される。
+    def test_enrichment_auto_assigned(self):
+        """converge() で enrichment が自動付与される。"""
+        for s in Series:
+            prefix = s.name[0]
+            cone = converge(s, {
+                f"{prefix}1": "a", f"{prefix}2": "b",
+                f"{prefix}3": "c", f"{prefix}4": "d",
+            })
+            assert cone.enrichment is not None, f"{s.name} should have enrichment"
+            assert cone.enrichment.type.name in (
+                "END", "MET", "PROB", "SET", "TEMP", "FUZZY",
+            )
+
+    # PURPOSE: describe_cone() に enrichment セクションが表示される。
+    def test_enrichment_in_describe(self):
+        """describe_cone() に enrichment セクションが表示される。"""
+        cone = converge(Series.S, {
+            "S1": "a", "S2": "b", "S3": "c", "S4": "d",
+        })
+        out = describe_cone(cone)
+        assert "### Enrichment" in out
+        assert "Met-enrichment" in out
+
+    # PURPOSE: P-series は Set enrichment (enrichment 不要) と表示される。
+    def test_set_enrichment_for_p(self):
+        """P-series は Set enrichment (enrichment 不要) と表示される。"""
+        cone = converge(Series.P, {
+            "P1": "a", "P2": "b", "P3": "c", "P4": "d",
+        })
+        assert cone.enrichment is not None
+        assert cone.enrichment.type == EnrichmentType.SET
+        assert cone.enrichment.kalon is None
+        out = describe_cone(cone)
+        assert "器" in out

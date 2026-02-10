@@ -188,3 +188,30 @@ async def post_convergence(req: ConvergenceRecordRequest):
         "summary": summary,
         "formatted": format_convergence(summary),
     }
+
+
+# =============================================================================
+# Typed Enrichment — 3D 可視化用データ
+# =============================================================================
+
+
+@router.get("/enrichments")
+async def get_enrichments():
+    """全 Series の Typed Enrichment 情報を返す。
+
+    3D graph 可視化で各 Series ノードに色・アイコンを付けるためのデータ。
+    """
+    from mekhane.fep.category import SERIES_ENRICHMENTS, Series
+
+    result = {}
+    for series in Series:
+        enr = SERIES_ENRICHMENTS.get(series)
+        if enr:
+            result[series.name] = {
+                "type": enr.type.value,
+                "concept": enr.concept,
+                "kalon": enr.kalon,
+                "structures": list(enr.structures) if enr.structures else [],
+            }
+    return {"enrichments": result}
+

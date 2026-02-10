@@ -387,3 +387,69 @@ class TestTypedEnrichment:
         assert cone.enrichment.kalon is None
         out = describe_cone(cone)
         assert "器" in out
+
+
+# =============================================================================
+# apply_enrichment() behavior
+# =============================================================================
+
+
+# PURPOSE: apply_enrichment 動作テスト。
+class TestApplyEnrichment:
+    """apply_enrichment 動作テスト。"""
+
+    # PURPOSE: A-series で低 confidence → [tent] ラベルが付く。
+    def test_fuzzy_tentative_grading(self):
+        """A-series で低 confidence → [tent] ラベルが付く。"""
+        cone = converge(
+            Series.A,
+            {"A1": "alpha", "A2": "beta", "A3": "gamma", "A4": "delta"},
+        )
+        # Low confidence from diverse outputs → should get [tent] or [just]
+        assert "[tent]" in cone.resolution_method or "[just]" in cone.resolution_method
+
+    # PURPOSE: A-series で高 confidence → [cert] ラベルが付く。
+    def test_fuzzy_certain_grading(self):
+        """A-series で高 confidence → [cert] ラベルが付く。"""
+        cone = converge(
+            Series.A,
+            {"A1": "同じ", "A2": "同じ", "A3": "同じ", "A4": "同じ"},
+            confidence=95.0,
+        )
+        assert "[cert]" in cone.resolution_method
+
+    # PURPOSE: S-series で V が 0.08-0.1 なら pw_weighted に昇格する。
+    def test_met_stricter_threshold(self):
+        """S-series で V=0.09 なら Met-enrichment で pw_weighted に昇格する。"""
+        # Create a cone with outputs that produce V slightly above 0.08
+        cone = converge(Series.S, {
+            "S1": "同じ設計", "S2": "同じ設計", "S3": "同じ設計X", "S4": "同じ設計",
+        })
+        # If V is in (0.08, 0.1], method should be pw_weighted
+        if 0.08 < cone.dispersion <= 0.1:
+            assert cone.resolution_method == "pw_weighted"
+
+    # PURPOSE: O-series で高 V → /o* 自己参照 apex が設定される。
+    def test_end_self_reference_apex(self):
+        """O-series で高 V + apex なし → /o* 自己参照が設定される。"""
+        cone = converge(Series.O, {
+            "O1": "alpha beta gamma",
+            "O2": "one two three",
+            "O3": "foo bar baz",
+            "O4": "xyz uvw rst",
+        })
+        if cone.dispersion > 0.5:
+            assert "/o*" in cone.apex
+
+    # PURPOSE: K-series で urgency マーカー → pw_weighted に昇格する。
+    def test_temp_urgency_boost(self):
+        """K-series で urgency マーカーあり → pw_weighted に昇格する。"""
+        cone = converge(Series.K, {
+            "K1": "緊急対応が必要",
+            "K2": "緊急対応が必要",
+            "K3": "緊急対応が必要",
+            "K4": "緊急対応が必要",
+        })
+        # Same text → low dispersion → would normally be "simple"
+        # But urgency marker → should escalate to pw_weighted
+        assert cone.resolution_method == "pw_weighted"

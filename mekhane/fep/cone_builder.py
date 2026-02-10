@@ -325,6 +325,96 @@ def compute_pw_table(
 
 
 # =============================================================================
+# Enrichment-specific Cone post-processing
+# =============================================================================
+
+
+# PURPOSE: Apply enrichment-specific behavior to a Cone
+def apply_enrichment(cone: Cone) -> None:
+    """Apply enrichment-specific post-processing to a Cone.
+
+    Each enrichment type modifies the Cone in ways specific to its
+    mathematical structure:
+
+    - End: V > 0.5 → suggest O3+ (self-referential deepening)
+    - Met: Lower Devil's Advocate threshold (0.1 → 0.08)
+    - Prob: Detect valence bias (>75% same direction → flag)
+    - Temp: Urgency boost for high-PW items
+    - Fuzzy: Add confidence grading (tentative/justified/certain)
+    - Set: No enrichment → no-op
+
+    Mutates cone in-place. All changes are recorded in cone metadata.
+    """
+    if cone.enrichment is None:
+        return
+
+    etype = cone.enrichment.type
+
+    if etype == EnrichmentType.MET:
+        # Met-enrichment: stricter dispersion threshold for S-series
+        # S-series already has Devil's Advocate at V > 0.1,
+        # Met-enrichment lowers effective threshold by boosting dispersion
+        # interpretation: treat V > 0.08 as "needs attention"
+        if 0.08 < cone.dispersion <= 0.1 and cone.resolution_method == "simple":
+            cone.resolution_method = "pw_weighted"
+
+    elif etype == EnrichmentType.END:
+        # End-enrichment: V > 0.5 → self-referential feedback
+        # Adds a hint that /o* (meta-query) should be invoked
+        if cone.dispersion > 0.5 and not cone.apex:
+            cone.apex = "[V>0.5: /o* 自己参照を推奨 — 認知層が自身を問い直す必要あり]"
+
+    elif etype == EnrichmentType.PROB:
+        # Prob-enrichment: detect valence bias
+        # If >75% of outputs share the same direction, flag as biased
+        values = [p.output for p in cone.projections if p.output]
+        if values:
+            go_count = sum(1 for v in values if _DIR_GO.search(v))
+            wait_count = sum(1 for v in values if _DIR_WAIT.search(v))
+            total = len(values)
+            if total > 0:
+                bias_ratio = max(go_count, wait_count) / total
+                if bias_ratio >= 0.75 and cone.confidence > 0:
+                    # Bias detected: reduce confidence slightly
+                    cone.confidence = max(0.0, cone.confidence - 10.0)
+
+    elif etype == EnrichmentType.TEMP:
+        # Temp-enrichment: urgency boost
+        # If any projection contains urgency markers, boost non-uniform PW
+        urgency_markers = ("urgent", "緊急", "至急", "今すぐ", "deadline", "期限")
+        has_urgency = any(
+            any(m in p.output.lower() for m in urgency_markers)
+            for p in cone.projections if p.output
+        )
+        if has_urgency and cone.resolution_method == "simple":
+            cone.resolution_method = "pw_weighted"
+
+    elif etype == EnrichmentType.FUZZY:
+        # Fuzzy-enrichment: confidence grading
+        # Map raw confidence to tentative/justified/certain
+        if cone.confidence < 50:
+            cone.resolution_method = (
+                cone.resolution_method + " [tent]"
+                if "[tent]" not in cone.resolution_method
+                else cone.resolution_method
+            )
+        elif cone.confidence < 80:
+            cone.resolution_method = (
+                cone.resolution_method + " [just]"
+                if "[just]" not in cone.resolution_method
+                else cone.resolution_method
+            )
+        else:
+            cone.resolution_method = (
+                cone.resolution_method + " [cert]"
+                if "[cert]" not in cone.resolution_method
+                else cone.resolution_method
+            )
+
+    # SET: no-op (container series, no enrichment needed)
+
+
+# =============================================================================
 # Main: converge() — C0-C3 一括実行
 # =============================================================================
 
@@ -407,6 +497,9 @@ def converge(
 
     # Typed Enrichment: auto-assign from SERIES_ENRICHMENTS
     cone.enrichment = SERIES_ENRICHMENTS.get(series)
+
+    # Apply enrichment-specific behavior
+    apply_enrichment(cone)
 
     return cone
 

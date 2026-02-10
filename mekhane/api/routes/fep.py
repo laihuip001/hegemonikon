@@ -157,6 +157,8 @@ class ConvergenceRecordRequest(BaseModel):
     attractor_series: str | None = None
     agent_action: str = ""
     epsilon: dict[str, float] | None = None
+    agent_confidence: float = 0.0
+    attractor_similarity: float = 0.0
 
 
 @router.get("/convergence")
@@ -172,13 +174,15 @@ async def get_convergence():
 
 @router.post("/convergence")
 async def post_convergence(req: ConvergenceRecordRequest):
-    """Agent/Attractor 一致を記録。"""
+    """Agent/Attractor 統合を記録 (Pushout)。"""
     from mekhane.fep.convergence_tracker import record_agreement, format_convergence
     summary = record_agreement(
         agent_series=req.agent_series,
         attractor_series=req.attractor_series,
         agent_action=req.agent_action,
         epsilon=req.epsilon,
+        agent_confidence=req.agent_confidence,
+        attractor_similarity=req.attractor_similarity,
     )
     return {
         "summary": summary,

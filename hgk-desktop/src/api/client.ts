@@ -110,6 +110,15 @@ export const api = {
             body: JSON.stringify({ title, fmt }),
         }),
 
+    // Link Graph
+    linkGraphFull: (sourceType?: string) =>
+        apiFetch<LinkGraphFullResponse>(
+            `/api/link-graph/full${sourceType ? `?source_type=${encodeURIComponent(sourceType)}` : ''}`
+        ),
+    linkGraphStats: () => apiFetch<LinkGraphStatsResponse>('/api/link-graph/stats'),
+    linkGraphNeighbors: (nodeId: string, hops = 2) =>
+        apiFetch<LinkGraphNeighborsResponse>(`/api/link-graph/neighbors/${encodeURIComponent(nodeId)}?hops=${hops}`),
+
     // CCL + Workflows
     cclParse: (ccl: string) =>
         apiFetch<CCLParseResponse>('/api/ccl/parse', {
@@ -264,4 +273,59 @@ export interface WFDetailResponse {
     source_path: string | null;
     raw_content: string | null;
     metadata: Record<string, unknown>;
+}
+
+// --- Link Graph Types ---
+export interface LinkGraphNode {
+    id: string;
+    title: string;
+    source_type: string;
+    projected_series: string;
+    projected_theorem: string;
+    degree: number;
+    backlink_count: number;
+    community: number;
+    orbit_angle: number;
+    orbit_radius: number;
+}
+
+export interface LinkGraphEdge {
+    source: string;
+    target: string;
+    type: string;
+}
+
+export interface LinkGraphFullResponse {
+    nodes: LinkGraphNode[];
+    edges: LinkGraphEdge[];
+    meta: {
+        total_nodes: number;
+        total_edges: number;
+        source_type_counts: Record<string, number>;
+        projection_counts: Record<string, number>;
+        projection_map: Record<string, string>;
+    };
+}
+
+export interface LinkGraphStatsResponse {
+    total_nodes: number;
+    total_edges: number;
+    bridge_nodes: string[];
+    source_type_counts: Record<string, number>;
+    projection_counts: Record<string, number>;
+}
+
+export interface LinkGraphNeighborsResponse {
+    node_id: string;
+    hops: number;
+    neighbors: Array<{
+        id: string;
+        title: string;
+        source_type: string;
+        projected_series: string;
+        projected_theorem: string;
+        degree: number;
+    }>;
+    total: number;
+    error?: string;
 }

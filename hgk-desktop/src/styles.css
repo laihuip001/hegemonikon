@@ -462,6 +462,74 @@ ul li {
   padding-left: 1rem;
 }
 
+/* Layer Toggle */
+.graph-layer-toggle {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  z-index: 50;
+  display: flex;
+  gap: 0.35rem;
+}
+
+.btn-layer {
+  background: rgba(5, 5, 8, 0.85);
+  border: 1px solid rgba(88, 166, 255, 0.15);
+  color: #6e7681;
+  backdrop-filter: blur(12px);
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.btn-layer:hover {
+  color: #c9d1d9;
+  border-color: rgba(88, 166, 255, 0.3);
+}
+
+.btn-layer-ready {
+  color: #8b949e;
+}
+
+.btn-layer-active {
+  background: rgba(88, 166, 255, 0.15);
+  border-color: rgba(88, 166, 255, 0.4);
+  color: #58a6ff;
+}
+
+/* Satellite List */
+.satellite-list {
+  padding-left: 0 !important;
+  list-style: none;
+}
+
+.sat-item {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.25rem 0;
+  font-size: 0.78rem;
+  color: #8b949e;
+}
+
+.sat-item.sat-bridge {
+  color: #c9d1d9;
+  font-weight: 600;
+}
+
+.sat-type {
+  display: inline-block;
+  font-size: 0.65rem;
+  background: rgba(88, 166, 255, 0.1);
+  border: 1px solid rgba(88, 166, 255, 0.12);
+  border-radius: 3px;
+  padding: 0 0.3rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: #6e7681;
+  white-space: nowrap;
+}
+
 /* Node Labels */
 .graph-label {
   font-size: 10px;

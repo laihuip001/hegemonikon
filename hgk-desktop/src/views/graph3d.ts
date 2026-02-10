@@ -5,7 +5,7 @@ import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
 import { api } from '../api/client';
-import type { GraphNode, GraphEdge, GraphFullResponse } from '../api/client';
+import type { GraphNode, GraphEdge, GraphFullResponse, LinkGraphNode, LinkGraphFullResponse } from '../api/client';
 // @ts-ignore — d3-force-3d has no types
 import { forceSimulation, forceLink, forceManyBody, forceCenter } from 'd3-force-3d';
 
@@ -21,6 +21,21 @@ const NATURALITY_COLORS: Record<string, string> = {
 };
 
 const BG_COLOR = 0x050508;
+
+// ─── Source type colors (dimmed series colors) ───────────────
+
+const SOURCE_TYPE_COLORS: Record<string, string> = {
+    kernel: '#005570', ki: '#006688', doxa: '#772222',
+    workflow: '#086640', research: '#7a5000', xseries: '#7a3a00',
+    handoff: '#6a4d00', session: '#5a4000', review: '#5a2a00',
+    knowledge: '#553388',
+};
+
+// ─── LOD thresholds ──────────────────────────────────────────
+
+const LOD_FAR = 120;       // > 120: theorem only
+const LOD_MEDIUM = 60;     // 60-120: theorem + bridge nodes
+const LOD_CLOSE = 30;      // < 30: all knowledge nodes + labels
 
 // ─── Series-specific Geometry ────────────────────────────────
 
@@ -48,6 +63,12 @@ interface SimNode extends GraphNode {
 }
 interface SimLink { source: SimNode | string; target: SimNode | string; edge: GraphEdge; }
 
+// Knowledge node with computed 3D position
+interface KnowledgeNode3D extends LinkGraphNode {
+    x: number; y: number; z: number;
+    isBridge: boolean;
+}
+
 // ─── Cleanup ─────────────────────────────────────────────────
 
 let cleanup: (() => void) | null = null;
@@ -62,9 +83,14 @@ export async function renderGraph3D(): Promise<void> {
     <div id="graph-container">
       <div id="graph-tooltip" class="node-tooltip hidden"></div>
       <div id="graph-info-panel" class="graph-info-panel hidden"></div>
+      <div id="graph-layer-toggle" class="graph-layer-toggle">
+        <button id="toggle-knowledge" class="btn btn-sm btn-layer" title="Toggle knowledge nodes">🧠 Knowledge</button>
+      </div>
     </div>
   `;
     const graphContainer = document.getElementById('graph-container')!;
+
+    // ─── Fetch theorem data ──────────────────────────────────
 
     let data: GraphFullResponse;
     try { data = await api.graphFull(); }
@@ -75,6 +101,15 @@ export async function renderGraph3D(): Promise<void> {
 
     const edges = data.edges.filter(e => e.type !== 'identity');
     const nodes = data.nodes;
+
+    // ─── Fetch knowledge data (non-blocking) ─────────────────
+
+    let linkGraphData: LinkGraphFullResponse | null = null;
+    let knowledgeVisible = false;
+    const linkGraphPromise = api.linkGraphFull().catch(err => {
+        console.warn('[LinkGraph] unavailable:', err);
+        return null;
+    });
 
     // ─── Three.js ─────────────────────────────────────────────
 
@@ -240,6 +275,145 @@ export async function renderGraph3D(): Promise<void> {
         edgeLines.push(line);
     });
 
+    // ═══════════════════════════════════════════════════════════
+    // ─── LinkGraph Satellite Layer ────────────────────────────
+    // ═══════════════════════════════════════════════════════════
+
+    const knowledgeGroup = new THREE.Group();
+    knowledgeGroup.visible = false;
+    scene.add(knowledgeGroup);
+
+    const kNodes3D: KnowledgeNode3D[] = [];
+    const kEdgeLines: THREE.Line[] = [];
+    let knowledgeInitialized = false;
+    let bridgeNodeIds: Set<string> = new Set();
+
+    // Initialize knowledge satellites after sim stabilizes and data arrives
+    async function initKnowledgeSatellites(): Promise<void> {
+        if (knowledgeInitialized) return;
+        linkGraphData = await linkGraphPromise;
+        if (!linkGraphData || linkGraphData.nodes.length === 0) return;
+        knowledgeInitialized = true;
+
+        // Get bridge nodes from stats
+        try {
+            const stats = await api.linkGraphStats();
+            bridgeNodeIds = new Set(stats.bridge_nodes);
+        } catch { /* ignore */ }
+
+        // Build 3D positions for knowledge nodes
+        for (const kn of linkGraphData.nodes) {
+            const theorem = nodeById.get(kn.projected_theorem);
+            if (!theorem) continue;
+
+            // Satellite position = theorem position + orbit
+            const x = theorem.x + kn.orbit_radius * Math.cos(kn.orbit_angle);
+            const y = theorem.y + kn.orbit_radius * Math.sin(kn.orbit_angle) * 0.5;
+            const z = theorem.z + kn.orbit_radius * Math.sin(kn.orbit_angle);
+
+            kNodes3D.push({
+                ...kn,
+                x, y, z,
+                isBridge: bridgeNodeIds.has(kn.id),
+            });
+        }
+
+        // InstancedMesh per source_type for performance
+        const groups = new Map<string, KnowledgeNode3D[]>();
+        for (const kn of kNodes3D) {
+            const g = groups.get(kn.source_type) || [];
+            g.push(kn);
+            groups.set(kn.source_type, g);
+        }
+
+        const sphereGeo = new THREE.SphereGeometry(0.35, 6, 6);
+
+        for (const [srcType, knodes] of groups) {
+            const color = new THREE.Color(SOURCE_TYPE_COLORS[srcType] || '#333355');
+            const mat = new THREE.MeshPhongMaterial({
+                color: color.clone().multiplyScalar(0.5),
+                emissive: color,
+                emissiveIntensity: 0.4,
+                transparent: true,
+                opacity: 0.5,
+            });
+
+            const mesh = new THREE.InstancedMesh(sphereGeo, mat, knodes.length);
+            const dummy = new THREE.Object3D();
+
+            knodes.forEach((kn, i) => {
+                dummy.position.set(kn.x, kn.y, kn.z);
+                // Bridge nodes are slightly larger
+                const scale = kn.isBridge ? 1.8 : 1.0;
+                dummy.scale.setScalar(scale);
+                dummy.updateMatrix();
+                mesh.setMatrixAt(i, dummy.matrix);
+
+                // Per-instance color for bridges
+                if (kn.isBridge) {
+                    mesh.setColorAt(i, new THREE.Color('#ffffff'));
+                }
+            });
+
+            mesh.instanceMatrix.needsUpdate = true;
+            if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
+            mesh.userData = { sourceType: srcType, knodes };
+            knowledgeGroup.add(mesh);
+        }
+
+        // Knowledge edges — thin semi-transparent curves
+        const kNodeMap = new Map<string, KnowledgeNode3D>();
+        kNodes3D.forEach(kn => kNodeMap.set(kn.id, kn));
+
+        for (const edge of linkGraphData.edges) {
+            const src = kNodeMap.get(edge.source);
+            const tgt = kNodeMap.get(edge.target);
+            if (!src || !tgt) continue;
+
+            // Quadratic bezier — midpoint lifted for curve
+            const mid = new THREE.Vector3(
+                (src.x + tgt.x) / 2 + (Math.random() - 0.5) * 3,
+                (src.y + tgt.y) / 2 + 2,
+                (src.z + tgt.z) / 2 + (Math.random() - 0.5) * 3,
+            );
+            const curve = new THREE.QuadraticBezierCurve3(
+                new THREE.Vector3(src.x, src.y, src.z),
+                mid,
+                new THREE.Vector3(tgt.x, tgt.y, tgt.z),
+            );
+            const points = curve.getPoints(12);
+            const geo = new THREE.BufferGeometry().setFromPoints(points);
+            const mat = new THREE.LineBasicMaterial({
+                color: 0x334466,
+                transparent: true,
+                opacity: 0.04,
+            });
+            const line = new THREE.Line(geo, mat);
+            knowledgeGroup.add(line);
+            kEdgeLines.push(line);
+        }
+
+        sphereGeo.dispose(); // InstancedMesh keeps its own copy
+
+        // Enable toggle button
+        const btn = document.getElementById('toggle-knowledge');
+        if (btn) {
+            btn.classList.add('btn-layer-ready');
+            btn.textContent = `🧠 Knowledge (${kNodes3D.length})`;
+        }
+    }
+
+    // Layer toggle
+    const toggleBtn = document.getElementById('toggle-knowledge');
+    if (toggleBtn) {
+        toggleBtn.addEventListener('click', async () => {
+            if (!knowledgeInitialized) await initKnowledgeSatellites();
+            knowledgeVisible = !knowledgeVisible;
+            knowledgeGroup.visible = knowledgeVisible;
+            toggleBtn.classList.toggle('btn-layer-active', knowledgeVisible);
+        });
+    }
+
     // ─── Raycaster (cached targets) ───────────────────────────
 
     const raycaster = new THREE.Raycaster();
@@ -316,6 +490,17 @@ export async function renderGraph3D(): Promise<void> {
         <span class="edge-meta">${e.naturality} · ${e.shared_coordinate}</span>
         <div class="edge-meaning">${e.meaning}</div></li>`;
         }).join('');
+
+        // Count satellite knowledge nodes
+        const satellites = kNodes3D.filter(kn => kn.projected_theorem === nodeId);
+        const satInfo = satellites.length > 0
+            ? `<h4>Satellites <span class="conn-count">${satellites.length}</span></h4>
+               <ul class="satellite-list">${satellites.slice(0, 8).map(s =>
+                `<li class="sat-item${s.isBridge ? ' sat-bridge' : ''}">
+                    <span class="sat-type">${s.source_type}</span> ${s.title.slice(0, 50)}
+                </li>`).join('')}${satellites.length > 8 ? `<li>... +${satellites.length - 8} more</li>` : ''}</ul>`
+            : '';
+
         infoPanel.innerHTML = `
       <h3 style="color:${SERIES_COLORS[node.series]}">${node.id} — ${node.name}</h3>
       <p class="info-greek">${node.greek}</p>
@@ -323,6 +508,7 @@ export async function renderGraph3D(): Promise<void> {
       <p class="info-meta">${node.workflow} · ${node.type}</p>
       <h4>Connections <span class="conn-count">${conn.length}</span></h4>
       <ul>${list || '<li>None</li>'}</ul>
+      ${satInfo}
       <button id="close-info" class="btn btn-sm">Close</button>`;
         infoPanel.classList.remove('hidden');
         document.getElementById('close-info')?.addEventListener('click', () => {
@@ -332,6 +518,11 @@ export async function renderGraph3D(): Promise<void> {
 
     renderer.domElement.addEventListener('mousemove', onMouseMove);
     renderer.domElement.addEventListener('click', onClick);
+
+    // ─── Auto-init knowledge after sim stabilizes ─────────────
+    // /dia+ 修正提案 #3: alpha < 0.001 後にのみ知識ノード配置開始
+
+    let simStabilized = false;
 
     // ─── Animation ────────────────────────────────────────────
 
@@ -353,7 +544,13 @@ export async function renderGraph3D(): Promise<void> {
             camera.lookAt(0, 0, 0);
         }
 
-        if (simulation.alpha() > 0.001) simulation.tick();
+        if (simulation.alpha() > 0.001) {
+            simulation.tick();
+        } else if (!simStabilized) {
+            simStabilized = true;
+            // Trigger knowledge satellite initialization
+            initKnowledgeSatellites().catch(console.warn);
+        }
 
         simNodes.forEach(node => {
             const group = nodeMeshes.get(node.id);
@@ -390,6 +587,36 @@ export async function renderGraph3D(): Promise<void> {
                 : 0.12;
         });
 
+        // LOD for knowledge layer
+        if (knowledgeVisible && knowledgeInitialized) {
+            const camDist = camera.position.length();
+            knowledgeGroup.children.forEach(child => {
+                if (child instanceof THREE.InstancedMesh) {
+                    const knodes = child.userData.knodes as KnowledgeNode3D[] | undefined;
+                    if (!knodes) return;
+                    // Bridge nodes always visible when layer is on
+                    // Other nodes only when camera is close enough
+                    if (camDist > LOD_FAR) {
+                        child.visible = false;
+                    } else if (camDist > LOD_MEDIUM) {
+                        // Only show bridge nodes
+                        child.visible = knodes.some(kn => kn.isBridge);
+                    } else {
+                        child.visible = true;
+                    }
+
+                    // Pulsate bridge nodes
+                    if (child.visible) {
+                        const mat = child.material as THREE.MeshPhongMaterial;
+                        mat.emissiveIntensity = 0.4 + Math.sin(frame * 0.03) * 0.15;
+                    }
+                } else if (child instanceof THREE.Line) {
+                    // Knowledge edges only visible when close
+                    child.visible = camera.position.length() < LOD_CLOSE;
+                }
+            });
+        }
+
         particles.rotation.y += 0.0001;
         controls.update();
         composer.render();
@@ -419,7 +646,7 @@ export async function renderGraph3D(): Promise<void> {
         renderer.domElement.removeEventListener('mousemove', onMouseMove);
         renderer.domElement.removeEventListener('click', onClick);
         scene.traverse(obj => {
-            if (obj instanceof THREE.Mesh || obj instanceof THREE.Line) {
+            if (obj instanceof THREE.Mesh || obj instanceof THREE.Line || obj instanceof THREE.InstancedMesh) {
                 obj.geometry.dispose();
                 const m = obj.material;
                 if (Array.isArray(m)) m.forEach(x => x.dispose()); else (m as THREE.Material).dispose();

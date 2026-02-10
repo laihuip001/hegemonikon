@@ -12,8 +12,15 @@ Tools:
   - sympatheia_attractor: 定理推薦（反射弓）
   - sympatheia_digest: 記憶圧縮（週次集約）
   - sympatheia_feedback: 恒常性制御（閾値調整）
-  - sympatheia_route: ルーティング（視床）
+  - sympatheia_notifications: 通知 CRUD
   - sympatheia_status: 全 state ファイルのサマリ
+
+Resources:
+  - sympatheia://heartbeat — heartbeat.json
+  - sympatheia://wbc — wbc_state.json
+  - sympatheia://config — sympatheia_config.json
+  - sympatheia://notifications — notifications.jsonl (最新 20 件)
+  - sympatheia://digest — weekly_digest.json
 
 CRITICAL: stdout は JSON-RPC 専用。ログは stderr に出力。
 """
@@ -61,11 +68,13 @@ class StdoutSuppressor:
 try:
     from mcp.server import Server
     from mcp.server.stdio import stdio_server
-    from mcp.types import Tool, TextContent
+    from mcp.types import Tool, TextContent, Resource
     log("MCP imports OK")
 except Exception as e:
     log(f"MCP import error: {e}")
     sys.exit(1)
+
+import json as _json
 
 
 # ============ Sympatheia imports (lazy) ============
@@ -97,6 +106,58 @@ server = Server(
 )
 log("Server initialized")
 
+
+# ============ Resources ============
+_MNEME = Path(os.getenv("HGK_MNEME", str(Path.home() / "oikos/mneme/.hegemonikon")))
+
+_RESOURCES = {
+    "sympatheia://heartbeat": ("heartbeat.json", "Heartbeat state — beats, healthy, lastBeat"),
+    "sympatheia://wbc": ("wbc_state.json", "WBC state — alerts, totalAlerts, lastEscalation"),
+    "sympatheia://config": ("sympatheia_config.json", "Sympatheia config — thresholds, sensitivity"),
+    "sympatheia://notifications": ("notifications.jsonl", "Notification log — 最新 20 件"),
+    "sympatheia://digest": ("weekly_digest.json", "Weekly digest — 最新の週次集約"),
+    "sympatheia://attractor": ("attractor_dispatch.json", "Attractor dispatch history"),
+}
+
+
+@server.list_resources()
+async def list_resources():
+    """公開リソース一覧。"""
+    resources = []
+    for uri, (filename, desc) in _RESOURCES.items():
+        resources.append(Resource(
+            uri=uri,
+            name=filename,
+            description=desc,
+            mimeType="application/json",
+        ))
+    return resources
+
+
+@server.read_resource()
+async def read_resource(uri: str):
+    """リソース読み取り。"""
+    log(f"read_resource: {uri}")
+    uri_str = str(uri)
+    if uri_str not in _RESOURCES:
+        return f"Unknown resource: {uri_str}"
+    filename, _ = _RESOURCES[uri_str]
+    fpath = _MNEME / filename
+    try:
+        raw = fpath.read_text("utf-8")
+        if filename.endswith(".jsonl"):
+            # JSONL: 最新 20 行を JSON array に変換
+            lines = [l.strip() for l in raw.strip().split("\n") if l.strip()][-20:]
+            lines.reverse()
+            return "[" + ",".join(lines) + "]"
+        return raw
+    except FileNotFoundError:
+        return f"{{}}"
+    except Exception as e:
+        return f"Error reading {filename}: {e}"
+
+
+# ============ Tools ============
 
 @server.list_tools()
 async def list_tools():
@@ -150,10 +211,31 @@ async def list_tools():
             inputSchema={"type": "object", "properties": {}},
         ),
         Tool(
+            name="sympatheia_notifications",
+            description=(
+                "通知 CRUD: 未読通知の取得と新規通知の送信。"
+                "action='list' で最新通知を取得、action='send' で通知を送信。"
+                "/boot 時に CRITICAL 通知がないか確認するのに使う。"
+            ),
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "action": {"type": "string", "enum": ["list", "send"], "default": "list"},
+                    "limit": {"type": "integer", "description": "取得件数 (list時)", "default": 10},
+                    "level": {"type": "string", "description": "フィルタ: INFO|HIGH|CRITICAL (list時)"},
+                    "source": {"type": "string", "description": "通知元 (send時)", "default": "claude"},
+                    "title": {"type": "string", "description": "通知タイトル (send時)"},
+                    "body": {"type": "string", "description": "通知本文 (send時)"},
+                    "notification_level": {"type": "string", "enum": ["INFO", "HIGH", "CRITICAL"], "default": "INFO"},
+                },
+            },
+        ),
+        Tool(
             name="sympatheia_status",
             description=(
                 "Sympatheia 全体ステータス: 全 state ファイルのサマリを一発で確認。"
-                "Heartbeat beats, WBC alert count, Git dirty status, Config thresholds を返す。"
+                "Heartbeat beats, WBC alert count, Git dirty status, Config thresholds, 未読通知数を返す。"
+                "セッション開始時 (/boot Phase 4.9) に呼ぶことを推奨。"
             ),
             inputSchema={"type": "object", "properties": {}},
         ),
@@ -263,6 +345,49 @@ async def call_tool(name: str, arguments: dict):
                     lines.append(f"- {a}")
             return [TextContent(type="text", text="\n".join(lines))]
 
+        elif name == "sympatheia_notifications":
+            action = arguments.get("action", "list")
+            if action == "send":
+                notif_id = sym._send_notification(
+                    source=arguments.get("source", "claude"),
+                    level=arguments.get("notification_level", "INFO"),
+                    title=arguments.get("title", ""),
+                    body=arguments.get("body", ""),
+                    data={},
+                )
+                return [TextContent(type="text", text=f"✅ Notification sent: id={notif_id}")]
+            else:
+                # list
+                limit = arguments.get("limit", 10)
+                level_filter = arguments.get("level")
+                notif_file = sym.MNEME / "notifications.jsonl"
+                results = []
+                try:
+                    for line in notif_file.read_text("utf-8").strip().split("\n"):
+                        if not line.strip():
+                            continue
+                        try:
+                            record = _json.loads(line)
+                            if level_filter and record.get("level", "") != level_filter.upper():
+                                continue
+                            results.append(record)
+                        except Exception:
+                            continue
+                except FileNotFoundError:
+                    pass
+                results.reverse()
+                results = results[:limit]
+                if not results:
+                    return [TextContent(type="text", text="📭 通知なし")]
+                lines = [f"# 🔔 通知一覧 ({len(results)} 件)\n"]
+                for r in results:
+                    emoji = "🚨" if r.get("level") == "CRITICAL" else "⚠️" if r.get("level") == "HIGH" else "ℹ️"
+                    lines.append(f"{emoji} **[{r.get('source')}]** {r.get('title')}")
+                    lines.append(f"  {r.get('body', '')[:100]}")
+                    lines.append(f"  _{r.get('timestamp', '')}_ | level={r.get('level')}")
+                    lines.append("")
+                return [TextContent(type="text", text="\n".join(lines))]
+
         elif name == "sympatheia_status":
             # 全 state ファイルサマリ
             mneme = sym.MNEME
@@ -296,6 +421,14 @@ async def call_tool(name: str, arguments: dict):
             # Weekly Digest
             wd = sym._read_json(mneme / "weekly_digest.json")
             status["digest"] = f"weekEnding={wd.get('weekEnding', 'N/A')}"
+
+            # Notifications (未読 CRITICAL)
+            try:
+                notif_raw = (mneme / "notifications.jsonl").read_text("utf-8").strip().split("\n")
+                crits = [l for l in notif_raw if '"CRITICAL"' in l]
+                status["notifications"] = f"total={len(notif_raw)}, critical={len(crits)}"
+            except Exception:
+                status["notifications"] = "no data"
 
             lines = ["# 🧬 Sympatheia Status\n"]
             for k, v in status.items():

@@ -434,7 +434,7 @@ def _run_fep_v2(rec: Any, context: str, gpu_ok: bool) -> tuple[dict, str]:
             "epsilon": agent.epsilon_summary(),
         }
 
-        # Convergence tracking
+        # Convergence tracking (pushout)
         try:
             from mekhane.fep.convergence_tracker import record_agreement
             conv_summary = record_agreement(
@@ -442,6 +442,8 @@ def _run_fep_v2(rec: Any, context: str, gpu_ok: bool) -> tuple[dict, str]:
                 attractor_series=att_series,
                 agent_action=final["action_name"],
                 epsilon=dict(agent.epsilon),
+                agent_confidence=max(final["beliefs"]),
+                attractor_similarity=rec.confidence if hasattr(rec, 'confidence') else 0.0,
             )
             fep_v2_result["convergence"] = conv_summary
         except Exception:

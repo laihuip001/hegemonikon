@@ -43,6 +43,18 @@ sel_enforcement:
     minimum_requirements:
       - "知識検証プロセスを問う"
 ccl_signature: "/epi+"
+category_theory:
+  core: "随伴 F⊣G の右随伴 G（忘却関手）"
+  adjunction: "Krisis (F) ⊣ Epistēmē (G)"
+  role: "G: Judgement → Knowledge（判定から具体を忘却し、抽象的知識を抽出）"
+  G_definition: "具体的文脈（誰が、いつ、何を判定したか）を忘却し、普遍的知識だけを残す"
+  G_two_layers:
+    意味記憶: "普遍化・抽象化できる部分。レンジが広がる。well-defined"
+    エピソード記憶: "抽象化に耐えない具体。特殊すぎてルール化できない"
+  drift: "Drift = 普遍化できないエピソードの量。その文脈でしか成立しない判定"
+  scale_operation: "G = レンジを広げる（一般化）/ F = レンジを狭める（具体的適用）"
+  generalize_mode: "/epi.generalize は G そのもの — 具体→抽象の操作"
+  insight: "対象のレンジが広がることで知識になる — Creator, 2026-02-10"
 ---
 
 # /epi: 知識確立ワークフロー (Epistēmē)
@@ -369,7 +381,6 @@ view_file /home/makaron8426/oikos/hegemonikon/.agent/skills/akribeia/a4-episteme
 **保存理由**: コンテキスト節約、参照可能性、パターン蓄積
 
 ---
-
 
 ---
 

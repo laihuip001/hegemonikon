@@ -30,6 +30,15 @@ sel_enforcement:
   "-":
     minimum_requirements:
       - "PASS/FAIL + 1行理由のみ"
+category_theory:
+  core: "随伴 F⊣G の左随伴 F（自由関手）"
+  adjunction: "Krisis (F) ⊣ Epistēmē (G)"
+  role: "F: Knowledge → Judgement（抽象的知識に具体的文脈を載せて判定に）"
+  F_definition: "普遍的知識（意味記憶）に具体的状況を適用して判定を構成する"
+  unit: "η: Know → G(F(Know)) — 知識を判定に適用して再び知識に戻す = 検証の効果"
+  counit: "ε: F(G(Judge)) → Judge — 判定を知識化して再判定 = 判例の確認"
+  memory_analogy: "エピソード記憶（判定=具体）⇄ 意味記憶（知識=抽象）"
+  insight: "判定=具体、知識=抽象。具体を忘れることで普遍性が残る — Creator, 2026-02-10"
 ---
 
 # /dia: A2 Krisis 発動コマンド

@@ -237,6 +237,94 @@ class TestProcessOperators:
         assert isinstance(ast.right, Oscillation)
 
 
+class TestFusionMeta:
+    """融合メタ表示 (*^) のテスト"""
+    
+    def test_fusion_meta_basic(self):
+        """/u+*^/u^ — 基本的な *^ 融合"""
+        ast = parse_ccl("/u+*^/u^")
+        assert isinstance(ast, Fusion)
+        assert ast.meta_display is True
+        assert isinstance(ast.left, Workflow)
+        assert ast.left.id == "u"
+        assert isinstance(ast.right, Workflow)
+        assert ast.right.id == "u"
+    
+    def test_fusion_meta_vs_plain(self):
+        """*^ と * の区別"""
+        ast_meta = parse_ccl("/noe*^/dia")
+        ast_plain = parse_ccl("/noe*/dia")
+        assert isinstance(ast_meta, Fusion)
+        assert isinstance(ast_plain, Fusion)
+        assert ast_meta.meta_display is True
+        assert ast_plain.meta_display is False
+    
+    def test_fusion_meta_in_sequence(self):
+        """/dox+*^/u+_/bye+ — マクロ @learn 相当"""
+        ast = parse_ccl("/dox+*^/u+_/bye+")
+        assert isinstance(ast, Sequence)
+        assert isinstance(ast.steps[0], Fusion)
+        assert ast.steps[0].meta_display is True
+
+
+class TestPipeline:
+    """パイプライン (|>) のテスト"""
+    
+    def test_pipeline_basic(self):
+        """/noe+|>/dia+ — 基本パイプライン"""
+        from hermeneus.src.ccl_ast import Pipeline
+        ast = parse_ccl("/noe+|>/dia+")
+        assert isinstance(ast, Pipeline)
+        assert len(ast.steps) == 2
+        assert ast.steps[0].id == "noe"
+        assert ast.steps[1].id == "dia"
+    
+    def test_pipeline_three_steps(self):
+        """/noe+|>/dia+|>/ene — 3段パイプライン"""
+        from hermeneus.src.ccl_ast import Pipeline
+        ast = parse_ccl("/noe+|>/dia+|>/ene")
+        assert isinstance(ast, Pipeline)
+        assert len(ast.steps) == 3
+    
+    def test_pipeline_in_sequence(self):
+        """/boot_/noe+|>/dia+ — |> は _ より弱い結合力 → Pipeline(Seq(boot,noe+), dia+)"""
+        from hermeneus.src.ccl_ast import Pipeline
+        ast = parse_ccl("/boot_/noe+|>/dia+")
+        assert isinstance(ast, Pipeline)
+        assert len(ast.steps) == 2
+        assert isinstance(ast.steps[0], Sequence)  # /boot_/noe+ がシーケンス
+        assert isinstance(ast.steps[1], Workflow)   # /dia+ が単体 WF
+
+
+class TestParallel:
+    """並列実行 (||) のテスト"""
+    
+    def test_parallel_basic(self):
+        """/noe+||/dia+ — 基本並列"""
+        from hermeneus.src.ccl_ast import Parallel
+        ast = parse_ccl("/noe+||/dia+")
+        assert isinstance(ast, Parallel)
+        assert len(ast.branches) == 2
+        assert ast.branches[0].id == "noe"
+        assert ast.branches[1].id == "dia"
+    
+    def test_parallel_three_branches(self):
+        """/noe+||/dia+||/ene — 3並列"""
+        from hermeneus.src.ccl_ast import Parallel
+        ast = parse_ccl("/noe+||/dia+||/ene")
+        assert isinstance(ast, Parallel)
+        assert len(ast.branches) == 3
+    
+    def test_parallel_in_sequence(self):
+        """/boot_/noe+||/dia+ — || は _ より弱い結合力 → Parallel(Seq(boot,noe+), dia+)"""
+        from hermeneus.src.ccl_ast import Parallel
+        ast = parse_ccl("/boot_/noe+||/dia+")
+        assert isinstance(ast, Parallel)
+        assert len(ast.branches) == 2
+        assert isinstance(ast.branches[0], Sequence)  # /boot_/noe+ がシーケンス
+        assert isinstance(ast.branches[1], Workflow)   # /dia+ が単体 WF
+
+
 # =============================================================================
 # Run
 # =============================================================================

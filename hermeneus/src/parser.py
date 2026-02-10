@@ -13,6 +13,7 @@ from typing import Any, Optional, List, Dict
 from .ccl_ast import (
     OpType, Workflow, Condition, MacroRef,
     ConvergenceLoop, Sequence, Fusion, Oscillation, ColimitExpansion,
+    Pipeline, Parallel,
     ForLoop, IfCondition, WhileLoop, Lambda, Program
 )
 
@@ -52,7 +53,7 @@ class CCLParser:
     
     # 二項演算子優先順位 (低い方が先に処理)
     # ~* と ~! は ~ より先にマッチさせる（長いトークン優先）
-    BINARY_OPS_PRIORITY = ['_', '~*', '~!', '~', '*^', '*', '>>', '|>', '||']
+    BINARY_OPS_PRIORITY = ['||', '|>', '_', '~*', '~!', '~', '*^', '*', '>>']
     
     def __init__(self):
         self.errors: List[str] = []
@@ -206,8 +207,16 @@ class CCLParser:
             body = self._parse_expression(parts[0])
             condition = self._parse_condition(parts[1])
             return ConvergenceLoop(body=body, condition=condition)
+        elif op == '|>':
+            # パイプライン: 前段の出力を次段の入力に
+            steps = [self._parse_expression(p) for p in parts]
+            return Pipeline(steps=steps)
+        elif op == '||':
+            # 並列実行
+            branches = [self._parse_expression(p) for p in parts]
+            return Parallel(branches=branches)
         
-        # パイプライン・並列は未実装 (将来)
+        # 未知の演算子
         return self._parse_workflow(parts[0])
     
     def _parse_workflow(self, expr: str) -> Workflow:
@@ -413,6 +422,11 @@ if __name__ == "__main__":
         "W:[E[] > 0.3]{/dia}",
         "L:[wf]{wf+}",
         "lim[V[] < 0.3]{/noe+}",
+        "/noe+ |> /dia+",
+        "/noe+ |> /dia+ |> /ene",
+        "/noe+ || /dia+",
+        "/noe+ || /dia+ || /ene",
+        "(/noe+ || /dia+) |> /ene",
     ]
     
     parser = CCLParser()

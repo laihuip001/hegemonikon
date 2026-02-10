@@ -232,8 +232,8 @@ class WorkflowExecutor:
         start = time.time()
         
         try:
-            from . import compile_ccl
-            from .macros import get_all_macros
+            from hermeneus.src import compile_ccl
+            from hermeneus.src.macros import get_all_macros
 
             # Auto-load all registered macros (builtin + ccl/macros/)
             macros = get_all_macros()
@@ -259,13 +259,27 @@ class WorkflowExecutor:
         context: str,
         model: str
     ) -> PhaseResult:
-        """実行フェーズ"""
+        """実行フェーズ
+        
+        compile_ccl → LMQLExecutor.execute_async の非同期パイプライン。
+        同期版 execute_ccl は asyncio.run() を内部で呼ぶため、
+        既に async コンテキストにいる executor.execute() からは使えない。
+        """
         start = time.time()
         
         try:
-            from . import execute_ccl
+            from hermeneus.src import compile_ccl
+            from hermeneus.src.macros import get_all_macros
+            from hermeneus.src.runtime import LMQLExecutor, ExecutionConfig
             
-            result = execute_ccl(ccl, context=context, model=model)
+            # Step 1: compile (LMQL コード生成)
+            macros = get_all_macros()
+            lmql_code = compile_ccl(ccl, macros=macros, model=model)
+            
+            # Step 2: LLM で実行 (非同期)
+            config = ExecutionConfig(model=model)
+            llm = LMQLExecutor(config)
+            result = await llm.execute_async(lmql_code, context=context)
             
             return PhaseResult(
                 phase=ExecutionPhase.EXECUTE,
@@ -292,7 +306,7 @@ class WorkflowExecutor:
         start = time.time()
         
         try:
-            from . import verify_execution
+            from hermeneus.src.verifier import verify_execution
             
             result = verify_execution(
                 ccl=ccl,
@@ -324,7 +338,7 @@ class WorkflowExecutor:
         start = time.time()
         
         try:
-            from . import record_verification
+            from hermeneus.src.audit import record_verification
             
             consensus = verify_result.output if verify_result else None
             

@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L3/ユーティリティ] <- scripts/ ルールファイルのfrontmatter一括修正→構造整合性維持
 """
 Antigravity Rules frontmatter 一括修正スクリプト
 - activation → trigger に変換

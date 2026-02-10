@@ -182,7 +182,7 @@ class LMQLExecutor:
     ) -> ExecutionResult:
         """フォールバック: 複数プロバイダー対応の LLM 呼び出し
         
-        優先順位:
+        優先順位 (順に試行、失敗時は次へ):
         1. Anthropic (Claude) - ANTHROPIC_API_KEY
         2. Google (Gemini) - GOOGLE_API_KEY  
         3. OpenAI - OPENAI_API_KEY
@@ -197,7 +197,6 @@ class LMQLExecutor:
             )
         
         # コンテキストを明示的にプロンプトに追加
-        # (LMQL の {context} プレースホルダーが抽出されない場合があるため)
         if context and context.strip():
             full_prompt = f"""## コンテキスト
 {context}
@@ -209,23 +208,39 @@ class LMQLExecutor:
         else:
             full_prompt = prompt
         
-        # プロバイダー検出と実行
+        # プロバイダーを順に試行 (失敗時は次へフォールバック)
+        providers = []
         anthropic_key = os.environ.get("ANTHROPIC_API_KEY")
         google_key = os.environ.get("GOOGLE_API_KEY")
         openai_key = self.config.api_key or os.environ.get("OPENAI_API_KEY")
         
         if anthropic_key:
-            return await self._execute_anthropic(full_prompt, anthropic_key)
-        elif google_key:
-            return await self._execute_google(full_prompt, google_key)
-        elif openai_key:
-            return await self._execute_openai(full_prompt, openai_key)
-        else:
+            providers.append(("anthropic", anthropic_key, self._execute_anthropic))
+        if google_key:
+            providers.append(("google", google_key, self._execute_google))
+        if openai_key:
+            providers.append(("openai", openai_key, self._execute_openai))
+        
+        if not providers:
             return ExecutionResult(
                 status=ExecutionStatus.ERROR,
                 output="",
                 error="No API key found. Set ANTHROPIC_API_KEY, GOOGLE_API_KEY, or OPENAI_API_KEY"
             )
+        
+        errors = []
+        for provider_name, key, executor_fn in providers:
+            result = await executor_fn(full_prompt, key)
+            if result.status == ExecutionStatus.SUCCESS:
+                return result
+            errors.append(f"{provider_name}: {result.error}")
+        
+        # 全プロバイダー失敗
+        return ExecutionResult(
+            status=ExecutionStatus.ERROR,
+            output="",
+            error=f"All providers failed: {'; '.join(errors)}"
+        )
     
     async def _execute_anthropic(self, prompt: str, api_key: str) -> ExecutionResult:
         """Anthropic Claude API 呼び出し"""
@@ -264,8 +279,18 @@ class LMQLExecutor:
                 )
             except asyncio.TimeoutError:
                 if attempt == self.config.max_retries - 1:
-                    raise
+                    return ExecutionResult(
+                        status=ExecutionStatus.TIMEOUT,
+                        output="",
+                        error="Anthropic API call timed out"
+                    )
                 await asyncio.sleep(2 ** attempt)
+            except Exception as e:
+                return ExecutionResult(
+                    status=ExecutionStatus.ERROR,
+                    output="",
+                    error=f"Anthropic error: {str(e)[:200]}"
+                )
         
         return ExecutionResult(
             status=ExecutionStatus.ERROR,
@@ -285,7 +310,7 @@ class LMQLExecutor:
             )
         
         client = genai.Client(api_key=api_key)
-        model_name = "gemini-2.5-pro-preview-05-06"
+        model_name = "gemini-2.5-pro"
         
         for attempt in range(self.config.max_retries):
             try:
@@ -311,8 +336,18 @@ class LMQLExecutor:
                 )
             except asyncio.TimeoutError:
                 if attempt == self.config.max_retries - 1:
-                    raise
+                    return ExecutionResult(
+                        status=ExecutionStatus.TIMEOUT,
+                        output="",
+                        error="Google API call timed out"
+                    )
                 await asyncio.sleep(2 ** attempt)
+            except Exception as e:
+                return ExecutionResult(
+                    status=ExecutionStatus.ERROR,
+                    output="",
+                    error=f"Google error: {str(e)[:200]}"
+                )
         
         return ExecutionResult(
             status=ExecutionStatus.ERROR,
@@ -357,8 +392,18 @@ class LMQLExecutor:
                 )
             except asyncio.TimeoutError:
                 if attempt == self.config.max_retries - 1:
-                    raise
+                    return ExecutionResult(
+                        status=ExecutionStatus.TIMEOUT,
+                        output="",
+                        error="OpenAI API call timed out"
+                    )
                 await asyncio.sleep(2 ** attempt)
+            except Exception as e:
+                return ExecutionResult(
+                    status=ExecutionStatus.ERROR,
+                    output="",
+                    error=f"OpenAI error: {str(e)[:200]}"
+                )
         
         return ExecutionResult(
             status=ExecutionStatus.ERROR,

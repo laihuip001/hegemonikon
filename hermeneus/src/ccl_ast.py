@@ -138,6 +138,24 @@ class ColimitExpansion:
     operators: List[OpType] = field(default_factory=list)  # 追加演算子
 
 
+@dataclass
+class Pipeline:
+    """パイプライン: A |> B |> C
+    
+    例: /noe+ |> /dia+ (前段の出力を次段の入力に)
+    """
+    steps: List[Any] = field(default_factory=list)
+
+
+@dataclass
+class Parallel:
+    """並列実行: A || B || C
+    
+    例: /noe+ || /dia+ (同時並行で実行)
+    """
+    branches: List[Any] = field(default_factory=list)
+
+
 # =============================================================================
 # AST Nodes: CPL v2.0 Control Structures
 # =============================================================================
@@ -201,6 +219,7 @@ class Program:
 ASTNode = Union[
     Workflow, Condition, MacroRef,
     ConvergenceLoop, Sequence, Fusion, Oscillation, ColimitExpansion,
+    Pipeline, Parallel,
     ForLoop, IfCondition, WhileLoop, Lambda,
     Program
 ]

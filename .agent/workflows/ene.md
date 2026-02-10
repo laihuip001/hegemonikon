@@ -52,6 +52,15 @@ sel_enforcement:
     minimum_requirements:
       - "行為の正当性を問う"
       - "代替行為の検討"
+category_theory:
+  core: "随伴 F⊣G の左随伴 F（自由関手）"
+  adjunction: "Energeia (F) ⊣ Boulēsis (G)"
+  role: "F: Will → Act（純粋な望みに制約を載せて、行為計画を自由構成）"
+  F_definition: "理想（願望）に現実制約を付与して、実行可能な目標を組み立てる"
+  unit: "η: Will → G(F(Will)) — 望みを目標にして制約を外したら、元の望みか？"
+  counit: "ε: F(G(Act)) → Act — 行為からなぜを遡って再計画したら、同じ行為か？"
+  drift: "ε 崩壊 = 手段が目的化 = /tel 発動条件"
+  replan_as_adjunction: "PHASE 3.5 動的リプランニング = G∘F サイクルの再実行"
 ---
 
 # /ene: 行為ワークフロー (Energeia)

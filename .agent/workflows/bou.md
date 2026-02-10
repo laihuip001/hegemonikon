@@ -44,6 +44,24 @@ sel_enforcement:
 absorbed:
   - "AI Zen 技法25: 6W3H 具体化フレームワーク"
   - "/pre (Premortem) → --mode=premortem"
+category_theory:
+  core: "随伴 F⊣G の右随伴 G（忘却関手）"
+  adjunction: "Energeia (F) ⊣ Boulēsis (G)"
+  role: "G: Act → Will（行為から制約を忘却し、純粋な望みを抽出）"
+  G_definition: "制約（時間, コスト, 他者の期待）を剥いで、純粋な望みだけを残す"
+  G_two_layers:
+    目的層: "5-WHY で遡れる。「なんのために」を問い続ける。well-defined"
+    望み層: "到達不能。望みは湧くもの、選ぶものではない。ill-defined"
+  unit: "η: Will → G(F(Will)) — 望みを目標にして制約を外したら、元の望みか？"
+  counit: "ε: F(G(Act)) → Act — 行為からなぜを遡って再計画したら、同じ行為か？"
+  drift: "Drift = 望みと目的の距離。G が望み層に到達できない残差"
+  epsilon_failure: "ε 崩壊 = 手段が目的化している = /tel (Telos 自問) の発動条件"
+  insight: "「望みは選ぶものではなく湧くもの」— Creator, 2026-02-10。G の不完全性はバグではなく仕様"
+  phases_as_G:
+    phase_0: "G の出力 — 制約なしの純粋な望み"
+    phase_3: "G の品質検証 — 衝動 vs 熟慮（本当に純粋か？）"
+    phase_4: "F の開始 — 制約を導入"
+    phase_5: "F の出力 — 制約付きの目標（行動計画）"
 ---
 
 # /bou: 意志明確化ワークフロー (Boulēsis)

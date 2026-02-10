@@ -1,26 +1,32 @@
 ---
-description: 消化品質診断（可換性検証）。自然変換 α の可換図式が成立しているか検証する。
+description: 消化品質診断（三角恒等式検証）。随伴 F⊣G の三角恒等式が成立しているか検証する。
 hegemonikon: Akribeia
 modules: [A2]
 skill_ref: ".agent/skills/akribeia/a2-krisis/SKILL.md"
-version: "4.0"
+version: "5.0"
 parent: "/dia"
-lineage: "v3.1 + 自然変換統合 → v4.0"
+lineage: "v4.0 + 随伴昇格 (可換性→三角恒等式) → v5.0"
 anti_skip: enabled
 category_theory:
-  core: "自然変換の可換性検証"
-  naturality_condition: "αB ∘ F(f) = G(f) ∘ αA for all f: A→B in Ext"
+  core: "随伴 F⊣G の三角恒等式検証"
+  adjunction: "F (取り込み=自由構成) ⊣ G (忘却=第一原理分解)"
+  triangle_identities:
+    left: "ε_F ∘ F(η) = id_F"
+    right: "G(ε) ∘ η_G = id_G"
+  eta: "η: Id_Ext → G∘F — 情報保存率"
+  epsilon: "ε: F∘G → Id_Int — 構造の非冗長性"
+  drift: "Drift = 1 - ε"
   levels:
-    superficial: "成分 αX が定義できない"
-    absorbed: "一部の可換図式が不成立"
-    naturalized: "全ての可換図式が成立"
+    superficial: "F or G が well-defined でない"
+    absorbed: "η は成立するが ε が不完全、または逆"
+    naturalized: "両方の三角恒等式が成立 = 完全な随伴"
 lcm_state: beta
 ---
 
-# /fit: 消化品質診断 (Naturality Verification)
+# /fit: 消化品質診断 (Triangle Identity Verification)
 
 > **親クラス (抽象)**: [A2 Krisis SKILL.md § 消化原則](file:///home/makaron8426/oikos/.agent/skills/akribeia/a2-krisis/SKILL.md)
-> **目的**: 自然変換 α: F ⟹ G の可換条件が全ての図式で成立しているか検証する
+> **目的**: 随伴 F⊣G の三角恒等式が成立しているか検証する（消化 = 分解⇆再構成の往復が恒等的）
 > **親コマンド**: /dia
 
 ---
@@ -40,40 +46,37 @@ lcm_state: beta
 
 ---
 
-## 第一原理: 可換性
+## 第一原理: 三角恒等式
 
-> **「消化とは、全ての経路が同じ結果に至ること」**
+> **「消化とは、分解して再構成しても元に戻ること」**
+> **「既知を忘却して再構成し直すことが第零原則」** — Creator, 2026-02-10
 
 ```
-          F(f)
-  F(A) --------→ F(B)
-   |                |
-   | αA              | αB
-   ↓                ↓
-  G(A) --------→ G(B)
-          G(f)
+     F = Eat    (取り込み = 自由構成)
+Ext ←────────────────────────────→ Int
+     G = Forget (忘却    = 第一原理分解)
 
-可換 = αB ∘ F(f) = G(f) ∘ αA
-意味 = 概念Aを先に調理してから関係fを適用しても、
-       先に関係fを辿ってから概念Bを調理しても、結果が同じ
+三角恒等式:
+  左: ε_F(X) ∘ F(η_X) = id_F(X)
+      取込→分解→再取込→counit = 恒等
+  右: G(ε_Y) ∘ η_G(Y) = id_G(Y)
+      分解→取込→分解→unit = 恒等
 ```
 
-| 概念 | 旧定義 | 圏論的定義 |
+| 概念 | v4.0 定義 | v5.0 定義 (随伴) |
 |:-----|:-------|:-----------|
-| 消化 | A + B → A' | 自然変換 α: F ⟹ G |
-| 付着 | A に B がくっついている | 成分 αX が未定義 or 可換性が崩壊 |
-| Naturalized | 境界消失 | **全ての可換図式が成立** |
+| 消化 | 自然変換 α: F ⟹ G | **随伴 F⊣G の確立** |
+| 付着 | 可換性崩壊 | **G で分解せず F のみ実行（随伴未確立）** |
+| Naturalized | 全可換図式が成立 | **両方の三角恒等式が成立** |
+| Drift | — | **1 - ε（構造の非冗長性の欠損）** |
 
-### なぜ可換性が本質か
+### なぜ三角恒等式が本質か
 
-可換性が崩れている = **経路によって結果が変わる** = **整合性がない**
+三角恒等式が崩れている = **分解⇆再構成の往復で元に戻らない** = **随伴がない**
 
-例: 概念 A (評議) と概念 B (批評) に関係 f: A→B (評議は批評の特殊形態) があるとき、
-
-- 経路1: A を /syn に調理 → f で /dia に遷移 → G(B) = /dia の批評機能
-- 経路2: A から f で B に遷移 → B を /dia に調理 → G(B) = /dia の批評機能
-- 可換 = 両経路が同じ → ✅ Naturalized
-- 不可換 = 経路1 で /syn に残ってしまう → ⚠️ Absorbed（境界が残る）
+- η ≈ id: 取り込んで(F)分解して(G)戻したら、元のチャンクが全部残る（情報保存）
+- ε ≈ id: 分解して(G)再構成して(F)戻したら、元の構造が復元する（非冗長性）
+- Drift = 1 - ε: /boot⊣/bye と同型の測定方法
 
 ---
 
@@ -117,14 +120,15 @@ view_file /home/makaron8426/oikos/hegemonikon/.agent/skills/akribeia/a2-krisis/S
 
 // turbo-all
 
-### Step 0: 自然変換の特定
+### Step 0: 随伴の特定
 
 ```yaml
 診断対象:
   素材: [消化された外部コンテンツ]
-  関手F: [素材概念 → HGK対象 の素朴マッピング]
-  関手G: [素材概念 → HGK対象 の理想マッピング]
-  自然変換α: [各成分 αX の一覧]
+  関手F: [Ext → Int: 取り込み関手（自由構成）]
+  関手G: [Int → Ext: 忘却関手（第一原理分解）]
+  η: [unit: Id_Ext → G∘F の各成分]
+  ε: [counit: F∘G → Id_Int の各成分]
 ```
 
 ---
@@ -193,9 +197,9 @@ process:
   ❌ 大部分が不可換 → 関手そのものの問題、Phase 1 へ差し戻し
 ```
 
-### Level 3: 全体検証 (Global Naturality)
+### Level 3: 三角恒等式検証 (Triangle Identity Verification) — v5.0 更新
 
-> 旧: 統合消化 → 新: 自然変換全体の well-definedness
+> v4.0: 自然変換全体の well-definedness → v5.0: 三角恒等式の成立
 
 ```yaml
 process:
@@ -204,14 +208,19 @@ process:
   3. 関手性チェック:
      - F が射の合成を保存: F(g∘f) = F(g)∘F(f)
      - G が射の合成を保存: G(g∘f) = G(g)∘G(f)
-  4. 自然変換の一意性:
-     - 同じ F, G に対して α が（実質的に）唯一か
-     - 複数の α が可能な場合、選択の根拠を文書化
+  4. 三角恒等式検証:
+     左: ε_F(X) ∘ F(η_X) = id_F(X)
+       → X を取込(F)→分解(G)→再取込(F)→counit(ε) = 元と同じ？
+     右: G(ε_Y) ∘ η_G(Y) = id_G(Y)
+       → Y を分解(G)→取込(F)→分解(G)→unit(η) = 元と同じ？
+  5. Drift 測定:
+     Drift = 1 - ε
+     → /boot⊣/bye の Drift と同じ構造
 
 判定:
-  🟢 Naturalized — 全検証通過
-  🟡 Absorbed — Level 1-2 通過だが Level 3 で関手性に問題
-  🔴 Superficial — Level 1 で成分が定義できない
+  🟢 Naturalized — 両方の三角恒等式が成立 (Drift ≤ 20%)
+  🟡 Absorbed — η は成立するが ε が不完全、または逆 (20% < Drift ≤ 50%)
+  🔴 Superficial — F or G が well-defined でない (Drift > 50%)
 ```
 
 ---
@@ -310,45 +319,50 @@ process:
 
 **empowerment_score** = capability + coherence + cognitive (最大5, 最小-2)
 
-### Step 5: 消化レベル判定 (Naturality Level)
+### Step 5: 消化レベル判定 (Adjunction Level)
 
-| レベル | 圏論的条件 | 実践的意味 |
-|:-------|:-----------|:-----------|
-| 🟢 Naturalized | 全成分 well-defined ∧ 全図式可換 | 境界消失、「元からあった」 |
-| 🟡 Absorbed | 成分定義済だが一部不可換 | 機能するが境界が見える |
-| 🔴 Superficial | 成分が未定義 | ファイルはあるが統合されていない |
+| レベル | 圏論的条件 | 実践的意味 | Drift |
+|:-------|:-----------|:-----------|:------|
+| 🟢 Naturalized | 両方の三角恒等式が成立 | 境界消失、「元からあった」 | ≤ 20% |
+| 🟡 Absorbed | η 成立だが ε 不完全、または逆 | 機能するが境界が見える | 20-50% |
+| 🔴 Superficial | F or G が well-defined でない | 関手の再設計が必要 | > 50% |
 
 ### Step 6: レポート出力
 
 ```
-━━━ /fit: 可換性検証レポート ━━━
+━━━ /fit: 三角恒等式検証レポート (v5.0) ━━━
 
 📋 対象: {素材名}
-🔀 自然変換: α: F ⟹ G
+🔀 随伴: F⊣G (Eat ⊣ Forget)
 
-━━━ 成分検証 ━━━
+━━━ 関手検証 ━━━
 
-| 対象 X | F(X) | G(X) | αX | 状態 |
-|:-------|:-----|:-----|:---|:-----|
-| A | {F(A)} | {G(A)} | {patch} | ✅/⚠️ |
+| 対象 X | F(X) | G(Y) | 関手性 |
+|:-------|:-----|:-----|:-------|
+| A | {F(A)} | {G(F(A))} | ✅/⚠️ |
 
-━━━ 可換性検証 ━━━
+━━━ η 検証 (情報保存率) ━━━
 
-  f: A→B
-          F(f)
-  F(A) --------→ F(B)
-   |                |
-   | αA              | αB
-   ↓                ↓
-  G(A) --------→ G(B)
-          G(f)
-  結果: ✅ 可換 / ⚠️ 不可換（原因: {reason}）
+  η_X: X → G(F(X))
+  X を取り込み(F) → 分解(G) → 元のチャンクが残るか？
+  結果: {情報保存率}% — ✅/⚠️
+
+━━━ ε 検証 (構造の非冗長性) ━━━
+
+  ε_Y: F(G(Y)) → Y
+  Y を分解(G) → 再構成(F) → 元の構造に戻るか？
+  結果: {非冗長性}% — ✅/⚠️
+
+━━━ 三角恒等式 ━━━
+
+  左: ε_F(X) ∘ F(η_X) = id_F(X)? {✅/⚠️}
+  右: G(ε_Y) ∘ η_G(Y) = id_G(Y)? {✅/⚠️}
 
 ━━━ 判定 ━━━
 
   消化レベル: [🔴 Superficial / 🟡 Absorbed / 🟢 Naturalized]
+  Drift: {1-ε}%
   強化スコア: {N}/5
-  可換図式充足率: {M}/{Total} ({percentage}%)
 
 ━━━ 推奨アクション ━━━
 
@@ -431,10 +445,11 @@ graph TD
 
 | Module | Workflow | Skill (親クラス) | Status |
 |:-------|:---------|:-----------------|:-------|
-| A2 Krisis | /fit | [消化原則](file:///home/makaron8426/oikos/.agent/skills/akribeia/a2-krisis/SKILL.md) | v4.0 Ready |
+| A2 Krisis | /fit | [消化原則](file:///home/makaron8426/oikos/.agent/skills/akribeia/a2-krisis/SKILL.md) | v5.0 Ready |
 
 ---
 
 *v3.1 — 親子アーキテクチャ適用 (2026-02-07)*
 *v4.0 — 自然変換統合。消化診断を可換図式の検証として再設計。Superficial/Absorbed/Naturalized を圏論的に再定義 (2026-02-08)*
 *v4.1 — Anti-Spec (反仕様) 追加。Step 3.5 として否定的可換性検証を導入 (2026-02-10)*
+*v5.0 — 随伴昇格。可換性→三角恒等式。F⊣G の η(情報保存率)/ε(構造非冗長性)/Drift(1-ε) を導入。Level 0-2 は維持し Level 3 を拡張 (2026-02-10)*

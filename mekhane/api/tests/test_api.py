@@ -198,3 +198,74 @@ class TestOpenAPI:
         """GET /api/docs → 200 (Swagger UI)"""
         r = client.get("/api/docs")
         assert r.status_code == 200
+
+
+# ============================================================
+# Link Graph
+# ============================================================
+
+
+class TestLinkGraph:
+    """/api/link-graph/* エンドポイント。"""
+
+    def test_link_graph_full(self, client: TestClient):
+        """GET /api/link-graph/full → 200 + nodes + edges + meta."""
+        r = client.get("/api/link-graph/full")
+        assert r.status_code == 200
+        data = r.json()
+        assert "nodes" in data
+        assert "edges" in data
+        assert "meta" in data
+        assert isinstance(data["nodes"], list)
+        assert isinstance(data["edges"], list)
+        # ノードが1件以上存在
+        if data["nodes"]:
+            node = data["nodes"][0]
+            assert "id" in node
+            assert "projected_series" in node
+            assert "projected_theorem" in node
+            assert "orbit_angle" in node
+            assert "orbit_radius" in node
+            # 射影先は有効な Series
+            assert node["projected_series"] in "OSHPKA"
+
+    def test_link_graph_full_filter(self, client: TestClient):
+        """GET /api/link-graph/full?source_type=kernel → フィルタ動作。"""
+        r = client.get("/api/link-graph/full", params={"source_type": "kernel"})
+        assert r.status_code == 200
+        data = r.json()
+        for node in data["nodes"]:
+            assert node["source_type"] == "kernel"
+
+    def test_link_graph_stats(self, client: TestClient):
+        """GET /api/link-graph/stats → 200 + 統計."""
+        r = client.get("/api/link-graph/stats")
+        assert r.status_code == 200
+        data = r.json()
+        assert "total_nodes" in data
+        assert "total_edges" in data
+        assert "bridge_nodes" in data
+        assert "source_type_counts" in data
+        assert "projection_counts" in data
+        assert isinstance(data["bridge_nodes"], list)
+
+    def test_link_graph_neighbors(self, client: TestClient):
+        """GET /api/link-graph/neighbors/{node_id} → 200."""
+        # まずノード一覧を取得
+        r = client.get("/api/link-graph/full")
+        data = r.json()
+        if data["nodes"]:
+            node_id = data["nodes"][0]["id"]
+            r2 = client.get(f"/api/link-graph/neighbors/{node_id}", params={"hops": 2})
+            assert r2.status_code == 200
+            data2 = r2.json()
+            assert data2["node_id"] == node_id
+            assert "neighbors" in data2
+
+    def test_link_graph_neighbors_not_found(self, client: TestClient):
+        """GET /api/link-graph/neighbors/xxx → error: not found."""
+        r = client.get("/api/link-graph/neighbors/nonexistent_node_12345")
+        assert r.status_code == 200
+        data = r.json()
+        assert data["error"] == "not found"
+

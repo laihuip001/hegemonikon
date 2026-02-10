@@ -84,13 +84,16 @@ G(π) = - Epistemic Value - Pragmatic Value
       = - 「知ることの価値」 - 「得ることの価値」
 ```
 
+> **最小化の意味**: G(π) を**最小化**するので、Epistemic Value と Pragmatic Value が
+> **大きい**ポリシーが選ばれる。つまり「情報利得が大きく、かつ報酬が高い行動」が最適。
+
 | 項 | 意味 | HGK Series | 行動の例 |
 |:---|:-----|:-----------|:---------|
 | **Epistemic** | 情報利得。不確実性を下げる行動を促す | O3 Zētēsis | 追加調査, ツール呼出し, 質問 |
 | **Pragmatic** | 報酬。好ましい結果に近づく行動を促す | O4 Energeia | コード実装, 成果物生成, 回答 |
 
 > **ReAct/CoT との違い**: ReAct/CoT は epistemic と pragmatic を暗黙に混ぜている。
-> EFE は明示的に分解する → 「今は探索すべきか、実行すべきか」を数学的に判断できる。
+> EFE は明示的に分解し、「今は探索すべきか、実行すべきか」の設計思想を提供する。
 > [arXiv:2509.05651](https://arxiv.org/html/2509.05651v1)
 
 ### 精度 (Precision) — 確信度との区別
@@ -137,12 +140,12 @@ LLM エージェントにおける Markov Blanket:
 
 | Series | FEP 対応 | 根拠 |
 |:-------|:---------|:-----|
-| **O (Ousia)** | 生成モデルの核。認識 (I×E) と行動 (A×P) の本質 | 直接導出 |
-| **S (Schema)** | 方法の選択 = ポリシー空間の構造化 | 間接 |
-| **H (Hormē)** | 精度加重。どの予測誤差をどれだけ信じるか | A-series = 精度加重の4段階 |
-| **P (Perigraphē)** | Markov blanket 境界の定義。スコープ設定 | Kirchhoff 2018: nested MB |
-| **K (Kairos)** | 文脈依存の精度調整。時間・状況 | EFE の時間的深さ |
-| **A (Akribeia)** | 最終的な精度の精密化。知識の正当化 | Epistēmē = 検証済み事後分布 |
+| **O (Ousia)** | 生成モデルの核。認識 (I×E) と行動 (A×P) の本質 | L0 FEP = L1 Flow × L1 Value から導出 (axiom_hierarchy.md) |
+| **S (Schema)** | 方法の選択 = ポリシー空間の構造化 | L1 Flow × L1.5 Scale: ポリシー = 方法の離散表現 |
+| **H (Hormē)** | 精度加重。どの予測誤差をどれだけ信じるか | conv_43: A-series = 精度加重の4段階。Precision in Action review |
+| **P (Perigraphē)** | Markov blanket 境界の定義。スコープ設定 | Kirchhoff 2018: nested MB。L1.5 Scale × L1.5 Function |
+| **K (Kairos)** | 文脈依存の精度調整。時間・状況 | EFE の planning horizon。L1.5 Scale × L1.75 Valence |
+| **A (Akribeia)** | 最終的な精度の精密化。知識の正当化 | Epistēmē = 検証済み事後分布。L1.75 × L1.75 |
 
 ### A-series = 精度加重の4段階
 
@@ -188,12 +191,15 @@ print(result.summary())
 cd ~/oikos/hegemonikon && PYTHONPATH=. .venv/bin/python -c "
 from mekhane.fep.attractor import SeriesAttractor
 attractor = SeriesAttractor()
-result = attractor.classify('INPUT_TEXT')
-print(f'Series: {result.series}')
+result = attractor.suggest('INPUT_TEXT')
+for r in result.attractors:
+    print(f'Series: {r.series} ({r.name}) sim={r.similarity:.3f}')
 print(f'Oscillation: {result.oscillation}')
-print(f'Similarity: {result.similarity:.3f}')
+print(f'Interpretation: {result.interpretation()}')
 "
 ```
+
+> ✅ 検証済み (2026-02-10)。`suggest()` が正しい API。`classify()` は存在しない。
 
 ### FEP Agent v2 で行動説明
 
@@ -201,13 +207,15 @@ print(f'Similarity: {result.similarity:.3f}')
 cd ~/oikos/hegemonikon && PYTHONPATH=. .venv/bin/python -c "
 from mekhane.fep.fep_agent_v2 import HegemonikónFEPAgentV2
 agent = HegemonikónFEPAgentV2()
-agent.observe('OBSERVATION_TEXT')
-action = agent.act()
-explanation = agent.explain()
-print(f'Action: {action}')
+result = agent.step(observation=0)  # 0-13 の observation index
+explanation = agent.explain(result)
+print(f'Action: {result[\"action_name\"]}')
 print(f'Explanation: {explanation}')
 "
 ```
+
+> ✅ 検証済み (2026-02-10)。`step(observation: int)` + `explain(step_result)` が正しい API。
+> 48状態 × 7行動の Active Inference エージェント。`observe()` / `act()` は存在しない。
 
 ### Attractor Advisor で WF 推薦
 
@@ -300,5 +308,22 @@ print(llm_fmt)
 
 ---
 
-*v2.0 — /sop deep 15論点50論文調査 + /noe+ 3命題抽出から構築 (2026-02-10)*
-*Lineage: v1.1 手順のみ → v2.0 哲学 + 操作的定義 + HGK対応 + 理論的基盤*
+## 結語
+
+> FEP は呼吸のようなものだ。
+> 呼吸していることを意識しなくても生きていける。
+> だが意識すれば、より深く、より正確に呼吸できる。
+>
+> 問題は「FEP を知っているか」ではない。「FEP を使って何が変わるか」だ。
+>
+> 変わるのは1つだけ —— **判断の前に、一瞬止まるようになる。**
+> 「今は探索すべきか？ 実行すべきか？」
+> 「この確信の根拠は SOURCE か？ TAINT か？」
+> 「Markov blanket の外に、見えていないものがないか？」
+>
+> その一瞬の停止こそが、精度（precision）の正体である。
+
+---
+
+*v2.1 — /dia+ 敵対的レビュー反映 + Layer 3 実証テスト済み (2026-02-10)*
+*Lineage: v1.1 手順のみ → v2.0 /sop + /noe+ → v2.1 /dia+ 修正 + 結語追加*

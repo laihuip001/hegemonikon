@@ -9,6 +9,10 @@ import type {
   GnosisStatsResponse,
   DendronReportResponse,
   SELListResponse,
+  Notification,
+  PKSPushResponse,
+  PKSNugget,
+  PKSStatsResponse,
 } from './api/client';
 import './styles.css';
 
@@ -48,6 +52,8 @@ const routes: Record<string, ViewRenderer> = {
   'quality': renderQuality,
   'postcheck': renderPostcheck,
   'graph': renderGraph3D,
+  'notifications': renderNotifications,
+  'pks': renderPKS,
 };
 
 let currentRoute = '';
@@ -55,6 +61,9 @@ let currentRoute = '';
 document.addEventListener('DOMContentLoaded', () => {
   setupNavigation();
   navigate('dashboard');
+  // Start global badge polling
+  void updateNotifBadge();
+  setInterval(() => { void updateNotifBadge(); }, 60_000);
 });
 
 function setupNavigation(): void {
@@ -64,6 +73,26 @@ function setupNavigation(): void {
       if (route) navigate(route);
     });
   });
+}
+
+// ─── Nav Badge (CRITICAL count) ──────────────────────────────
+
+async function updateNotifBadge(): Promise<void> {
+  try {
+    const criticals = await api.notifications(100, 'CRITICAL');
+    const count = criticals.length;
+    const notifBtn = document.querySelector('nav button[data-route="notifications"]');
+    if (!notifBtn) return;
+    // Remove existing badge
+    const existing = notifBtn.querySelector('.nav-badge');
+    if (existing) existing.remove();
+    if (count > 0) {
+      const badge = document.createElement('span');
+      badge.className = 'nav-badge';
+      badge.textContent = String(count);
+      notifBtn.appendChild(badge);
+    }
+  } catch { /* silent */ }
 }
 
 function navigate(route: string): void {
@@ -95,20 +124,21 @@ async function renderDashboard(): Promise<void> {
 }
 
 async function renderDashboardContent(): Promise<void> {
-  const [health, fep, gnosisStats] = await Promise.all([
+  const [health, fep, gnosisStats, criticals] = await Promise.all([
     api.status().catch((): null => null),
     api.fepState().catch((): null => null),
     api.gnosisStats().catch((): null => null),
+    api.notifications(5, 'CRITICAL').catch((): Notification[] => []),
   ]);
 
   const app = document.getElementById('view-content')!;
-  if (currentRoute !== 'dashboard') return; // guard against stale render
+  if (currentRoute !== 'dashboard') return;
 
   const score = health ? health.score : 0;
   const scoreClass = score >= 0.8 ? 'status-ok' : score >= 0.5 ? 'status-warn' : 'status-error';
   const healthStatus = health
-    ? `<span class="${scoreClass}">Online (${score.toFixed(2)})</span>`
-    : '<span class="status-error">Offline</span>';
+    ? `<span class="${scoreClass}">稼働中 (${score.toFixed(2)})</span>`
+    : '<span class="status-error">オフライン</span>';
 
   const historyLen = fep ? fep.history_length : '-';
   const uptimeItem = health?.items.find((i: HealthReportResponse['items'][number]) => i.name === 'uptime');
@@ -116,23 +146,38 @@ async function renderDashboardContent(): Promise<void> {
 
   const gnosisCount = gnosisStats?.total ?? '-';
 
+  // CRITICAL alert widget
+  const alertHtml = criticals.length > 0 ? `
+    <div class="card dashboard-alert">
+      <div class="dashboard-alert-title">🚨 緊急通知 ${criticals.length}件</div>
+      ${criticals.slice(0, 3).map((n: Notification) => `
+        <div class="dashboard-alert-item">
+          <strong>${esc(n.title)}</strong>
+          <span class="notif-time"> — ${esc(relativeTime(n.timestamp))}</span>
+        </div>
+      `).join('')}
+      ${criticals.length > 3 ? `<div class="dashboard-alert-item" style="color:#8b949e;">他 ${criticals.length - 3}件...</div>` : ''}
+    </div>
+  ` : '';
+
   app.innerHTML = `
-    <h1>Dashboard <small class="poll-badge">auto-refresh 60s</small></h1>
+    <h1>ダッシュボード <small class="poll-badge">自動更新 60秒</small></h1>
+    ${alertHtml}
     <div class="grid">
       <div class="card">
-        <h3>System Status</h3>
+        <h3>システム状態</h3>
         <div class="metric">${healthStatus}</div>
-        <p>Uptime: ${esc(uptimeSec)}s</p>
+        <p>稼働時間: ${esc(uptimeSec)}秒</p>
       </div>
       <div class="card">
-        <h3>FEP Agent</h3>
-        <div class="metric">${String(historyLen)} <small>steps</small></div>
-        <p>Active Inference History</p>
+        <h3>FEP エージェント</h3>
+        <div class="metric">${String(historyLen)} <small>ステップ</small></div>
+        <p>能動推論の履歴</p>
       </div>
       <div class="card">
         <h3>Gnōsis</h3>
-        <div class="metric">${String(gnosisCount)} <small>papers</small></div>
-        <p>Knowledge Base</p>
+        <div class="metric">${String(gnosisCount)} <small>論文</small></div>
+        <p>知識基盤</p>
       </div>
     </div>
     ${renderHealthItems(health)}
@@ -143,15 +188,16 @@ function renderHealthItems(health: HealthReportResponse | null): string {
   if (!health) return '';
   return `
     <div class="card" style="margin-top: 1rem;">
-      <h3>Service Details</h3>
+      <h3>サービス詳細</h3>
       <table class="data-table">
-        <thead><tr><th>Service</th><th>Status</th><th>Detail</th></tr></thead>
+        <thead><tr><th>サービス</th><th>状態</th><th>詳細</th></tr></thead>
         <tbody>
           ${health.items.map((item: HealthReportResponse['items'][number]) => {
     const cls = item.status === 'ok' ? 'status-ok' : item.status === 'warn' ? 'status-warn' : 'status-error';
+    const statusJa = item.status === 'ok' ? '正常' : item.status === 'warn' ? '注意' : 'エラー';
     return `<tr>
               <td>${esc(item.emoji)} ${esc(item.name)}</td>
-              <td class="${cls}">${esc(item.status)}</td>
+              <td class="${cls}">${esc(statusJa)}</td>
               <td>${esc(item.detail)}</td>
             </tr>`;
   }).join('')}
@@ -491,3 +537,249 @@ async function renderPostcheck(): Promise<void> {
     });
   });
 }
+
+// ─── Notifications ───────────────────────────────────────────────
+
+function relativeTime(isoTimestamp: string): string {
+  const now = Date.now();
+  const then = new Date(isoTimestamp).getTime();
+  const diffSec = Math.floor((now - then) / 1000);
+  if (diffSec < 60) return `${diffSec}秒前`;
+  const diffMin = Math.floor(diffSec / 60);
+  if (diffMin < 60) return `${diffMin}分前`;
+  const diffHour = Math.floor(diffMin / 60);
+  if (diffHour < 24) return `${diffHour}時間前`;
+  const diffDay = Math.floor(diffHour / 24);
+  return `${diffDay}日前`;
+}
+
+const LEVEL_LABELS: Record<string, string> = {
+  CRITICAL: '🚨 緊急',
+  HIGH: '⚠️ 重要',
+  INFO: 'ℹ️ 情報',
+};
+
+/** Parse body text into structured meta tags + remaining text */
+function formatNotifBody(body: string): string {
+  const lines = body.split('\n');
+  const metaTags: string[] = [];
+  const textLines: string[] = [];
+
+  for (const line of lines) {
+    const match = line.match(/^([A-Za-z_]+):\s*(.+)$/);
+    if (match) {
+      metaTags.push(`<span class="notif-meta-tag"><strong>${esc(match[1])}</strong> ${esc(match[2])}</span>`);
+    } else if (line.trim()) {
+      textLines.push(esc(line));
+    }
+  }
+
+  let html = '';
+  if (textLines.length > 0) {
+    html += `<div class="notif-body-text">${textLines.join('<br>')}</div>`;
+  }
+  if (metaTags.length > 0) {
+    html += `<div class="notif-meta-row">${metaTags.join('')}</div>`;
+  }
+  return html;
+}
+
+let notifLevelFilter = '';
+
+async function renderNotifications(): Promise<void> {
+  await renderNotificationsContent();
+  startPolling(renderNotificationsContent, 30_000);
+}
+
+async function renderNotificationsContent(): Promise<void> {
+  let notifications: Notification[] = [];
+  try {
+    notifications = await api.notifications(
+      50,
+      notifLevelFilter || undefined,
+    );
+  } catch (err) {
+    const app = document.getElementById('view-content')!;
+    if (currentRoute !== 'notifications') return;
+    app.innerHTML = `<div class="card status-error">通知を取得できません: ${esc((err as Error).message)}</div>`;
+    return;
+  }
+
+  const app = document.getElementById('view-content')!;
+  if (currentRoute !== 'notifications') return;
+
+  const cardsHtml = notifications.length === 0
+    ? '<div class="notif-empty">📭 通知はありません</div>'
+    : notifications.map((n: Notification) => {
+      const levelClass = n.level.toLowerCase();
+      const levelLabel = LEVEL_LABELS[n.level] ?? n.level;
+      return `
+          <div class="card notif-card level-${levelClass}">
+            <div class="notif-top">
+              <span class="notif-source">${esc(n.source)}</span>
+              <span class="notif-level ${levelClass}">${esc(levelLabel)}</span>
+              <span class="notif-time">${esc(relativeTime(n.timestamp))}</span>
+            </div>
+            <div class="notif-title">${esc(n.title)}</div>
+            <div class="notif-body">${formatNotifBody(n.body)}</div>
+          </div>`;
+    }).join('');
+
+  app.innerHTML = `
+    <div class="notif-header">
+      <h1>🔔 通知 <small class="poll-badge">自動更新 30秒</small></h1>
+      <select id="notif-level-filter" class="input" style="width:130px;">
+        <option value="">すべて</option>
+        <option value="CRITICAL" ${notifLevelFilter === 'CRITICAL' ? 'selected' : ''}>🚨 緊急</option>
+        <option value="HIGH" ${notifLevelFilter === 'HIGH' ? 'selected' : ''}>⚠️ 重要</option>
+        <option value="INFO" ${notifLevelFilter === 'INFO' ? 'selected' : ''}>ℹ️ 情報</option>
+      </select>
+      <button id="notif-refresh-btn" class="btn btn-sm">更新</button>
+    </div>
+    ${cardsHtml}
+  `;
+
+  // Filter change handler
+  document.getElementById('notif-level-filter')?.addEventListener('change', (e) => {
+    notifLevelFilter = (e.target as HTMLSelectElement).value;
+    void renderNotificationsContent();
+  });
+
+  // Manual refresh
+  document.getElementById('notif-refresh-btn')?.addEventListener('click', () => {
+    void renderNotificationsContent();
+  });
+}
+
+// ─── PKS (Proactive Knowledge Surface) ───────────────────────
+
+async function renderPKS(): Promise<void> {
+  await renderPKSContent();
+  startPolling(renderPKSContent, 30_000);
+}
+
+async function renderPKSContent(): Promise<void> {
+  let push: PKSPushResponse | null = null;
+  let stats: PKSStatsResponse | null = null;
+  try {
+    [push, stats] = await Promise.all([
+      api.pksPush().catch((): null => null),
+      api.pksStats().catch((): null => null),
+    ]);
+  } catch { /* ok */ }
+
+  const app = document.getElementById('view-content')!;
+  if (currentRoute !== 'pks') return;
+
+  // --- Stats cards ---
+  const statsHtml = stats && stats.total_feedbacks > 0 ? `
+    <div class="grid" style="margin-bottom:1rem;">
+      <div class="card">
+        <h3>フィードバック総数</h3>
+        <div class="metric">${stats.total_feedbacks}</div>
+      </div>
+      ${Object.entries(stats.series_stats).map(([k, v]) => `
+        <div class="card">
+          <h3>${esc(k)}</h3>
+          <div style="font-size:0.9rem;">
+            件数: <strong>${(v as Record<string, number>).count ?? 0}</strong><br/>
+            平均スコア: <strong>${((v as Record<string, number>).avg_score ?? 0).toFixed(2)}</strong>
+          </div>
+        </div>
+      `).join('')}
+    </div>
+  ` : '';
+
+  // --- Nugget cards ---
+  const nuggetsHtml = push && push.nuggets.length > 0
+    ? push.nuggets.map((n: PKSNugget) => {
+      const scoreClass = n.relevance_score >= 0.7 ? 'status-ok'
+        : n.relevance_score >= 0.5 ? 'status-warn' : '';
+      return `
+          <div class="card pks-nugget" data-title="${esc(n.title)}">
+            <div class="pks-nugget-header">
+              <span class="pks-score ${scoreClass}">${(n.relevance_score * 100).toFixed(0)}%</span>
+              <span class="pks-source">${esc(n.source)}</span>
+              ${n.serendipity_score > 0.3 ? '<span class="pks-serendipity">✨ セレンディピティ</span>' : ''}
+            </div>
+            <div class="pks-title">${esc(n.title)}</div>
+            ${n.push_reason ? `<div class="pks-reason">💡 ${esc(n.push_reason)}</div>` : ''}
+            ${n.abstract ? `<div class="pks-abstract">${esc(n.abstract.substring(0, 300))}${n.abstract.length > 300 ? '...' : ''}</div>` : ''}
+            ${n.authors ? `<div class="pks-meta">👤 ${esc(n.authors)}</div>` : ''}
+            ${n.url ? `<div class="pks-meta"><a href="${esc(n.url)}" target="_blank" rel="noopener">📎 開く</a></div>` : ''}
+            ${n.suggested_questions.length > 0 ? `
+              <div class="pks-questions">
+                <strong>❓ 探求すべき問い:</strong>
+                <ul>${n.suggested_questions.map(q => `<li>${esc(q)}</li>`).join('')}</ul>
+              </div>
+            ` : ''}
+            <div class="pks-feedback-row">
+              <button class="btn btn-sm pks-fb-btn" data-reaction="used">👍 活用した</button>
+              <button class="btn btn-sm pks-fb-btn" data-reaction="deepened">🔬 深掘りした</button>
+              <button class="btn btn-sm pks-fb-btn" data-reaction="dismissed">👎 不要</button>
+            </div>
+          </div>`;
+    }).join('')
+    : '<div class="notif-empty">📭 プッシュされた知識はありません</div>';
+
+  // --- Topics ---
+  const topicsHtml = push && push.topics.length > 0
+    ? `<div class="pks-topics">${push.topics.map(t => `<span class="pks-topic-tag">${esc(t)}</span>`).join('')}</div>`
+    : '';
+
+  app.innerHTML = `
+    <div class="notif-header">
+      <h1>📡 知識プッシュ <small class="poll-badge">自動更新 30秒</small></h1>
+      <button id="pks-trigger-btn" class="btn">プッシュ実行</button>
+      <button id="pks-refresh-btn" class="btn btn-sm">更新</button>
+    </div>
+    ${topicsHtml}
+    ${statsHtml}
+    <div id="pks-nuggets">${nuggetsHtml}</div>
+  `;
+
+  // --- Event handlers ---
+
+  // Trigger push
+  document.getElementById('pks-trigger-btn')?.addEventListener('click', async () => {
+    const btn = document.getElementById('pks-trigger-btn') as HTMLButtonElement;
+    btn.disabled = true;
+    btn.textContent = 'プッシュ中...';
+    try {
+      await api.pksTriggerPush();
+      void renderPKSContent();
+    } catch (e) {
+      btn.textContent = `エラー: ${(e as Error).message}`;
+    }
+  });
+
+  // Refresh
+  document.getElementById('pks-refresh-btn')?.addEventListener('click', () => {
+    void renderPKSContent();
+  });
+
+  // Feedback buttons
+  document.querySelectorAll('.pks-fb-btn').forEach(btn => {
+    btn.addEventListener('click', async (e) => {
+      const target = e.currentTarget as HTMLButtonElement;
+      const reaction = target.dataset.reaction ?? '';
+      const nuggetCard = target.closest('.pks-nugget') as HTMLElement;
+      const title = nuggetCard?.dataset.title ?? '';
+
+      target.disabled = true;
+      target.textContent = '...';
+      try {
+        await api.pksFeedback(title, reaction);
+        // Visually confirm
+        const row = target.closest('.pks-feedback-row') as HTMLElement;
+        if (row) {
+          const reactionLabel = reaction === 'used' ? '✅ 活用した' : reaction === 'deepened' ? '✅ 深掘りした' : '✅ 不要';
+          row.innerHTML = `<span class="status-ok">${reactionLabel}</span>`;
+        }
+      } catch {
+        target.textContent = '❌';
+      }
+    });
+  });
+}
+

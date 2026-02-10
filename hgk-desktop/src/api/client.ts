@@ -79,7 +79,71 @@ export const api = {
     graphNodes: () => apiFetch<GraphNode[]>('/api/graph/nodes'),
     graphEdges: () => apiFetch<GraphEdge[]>('/api/graph/edges'),
     graphFull: () => apiFetch<GraphFullResponse>('/api/graph/full'),
+
+    // Notifications (Sympatheia)
+    notifications: (limit = 50, level?: string) =>
+        apiFetch<Notification[]>(
+            `/api/sympatheia/notifications?limit=${limit}${level ? `&level=${level}` : ''}`
+        ),
+
+    // PKS
+    pksPush: () => apiFetch<PKSPushResponse>('/api/pks/push'),
+    pksTriggerPush: (_k = 20) => apiFetch<PKSPushResponse>('/api/pks/push', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+    }),
+    pksFeedback: (title: string, reaction: string, series = '') =>
+        apiFetch<PKSFeedbackResponse>('/api/pks/feedback', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ title, reaction, series }),
+        }),
+    pksStats: () => apiFetch<PKSStatsResponse>('/api/pks/stats'),
 };
+
+// --- Notification Types ---
+export interface Notification {
+    id: string;
+    timestamp: string;
+    source: string;
+    level: 'INFO' | 'HIGH' | 'CRITICAL';
+    title: string;
+    body: string;
+    data: Record<string, unknown>;
+}
+
+// --- PKS Types ---
+export interface PKSNugget {
+    title: string;
+    abstract: string;
+    source: string;
+    relevance_score: number;
+    url: string;
+    authors: string;
+    push_reason: string;
+    serendipity_score: number;
+    suggested_questions: string[];
+}
+
+export interface PKSPushResponse {
+    timestamp: string;
+    topics: string[];
+    nuggets: PKSNugget[];
+    total: number;
+}
+
+export interface PKSFeedbackResponse {
+    timestamp: string;
+    title: string;
+    reaction: string;
+    recorded: boolean;
+}
+
+export interface PKSStatsResponse {
+    timestamp: string;
+    series_stats: Record<string, { count: number; avg_score: number; threshold_adjustment: number }>;
+    total_feedbacks: number;
+}
 
 // --- Graph Types ---
 export interface GraphNode {

@@ -12,7 +12,9 @@
 }
 
 /* Reset */
-*, *::before, *::after {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
 }
 
@@ -73,9 +75,21 @@ main {
   overflow-y: auto;
 }
 
-h1, h2, h3 { margin-top: 0; }
-h1 { font-size: 1.5rem; margin-bottom: 1rem; }
-h1 small { font-size: 0.6em; font-weight: 400; }
+h1,
+h2,
+h3 {
+  margin-top: 0;
+}
+
+h1 {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+h1 small {
+  font-size: 0.6em;
+  font-weight: 400;
+}
 
 /* Components */
 .card {
@@ -104,9 +118,17 @@ h1 small { font-size: 0.6em; font-weight: 400; }
 }
 
 /* Status */
-.status-ok { color: var(--success-color); }
-.status-warn { color: var(--warning-color); }
-.status-error { color: var(--error-color); }
+.status-ok {
+  color: var(--success-color);
+}
+
+.status-warn {
+  color: var(--warning-color);
+}
+
+.status-error {
+  color: var(--error-color);
+}
 
 /* Polling badge */
 .poll-badge {
@@ -263,8 +285,15 @@ select.input:focus {
 }
 
 @keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.5;
+  }
 }
 
 .loading {
@@ -272,7 +301,9 @@ select.input:focus {
 }
 
 /* Utilities */
-.hidden { display: none; }
+.hidden {
+  display: none;
+}
 
 ul {
   padding-left: 1.5rem;
@@ -287,75 +318,163 @@ ul li {
 
 #graph-container {
   width: 100%;
-  height: calc(100vh - 4rem);
+  height: 100vh;
   position: relative;
   overflow: hidden;
+  background: #050508;
 }
 
 #graph-container canvas {
   display: block;
 }
 
+/* Tooltip */
 .node-tooltip {
   position: absolute;
-  background: rgba(13, 17, 23, 0.95);
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
-  padding: 0.75rem;
+  background: rgba(5, 5, 8, 0.92);
+  border: 1px solid rgba(88, 166, 255, 0.2);
+  border-radius: 10px;
+  padding: 0.85rem 1rem;
   color: var(--text-color);
   font-size: 0.85rem;
   pointer-events: none;
-  backdrop-filter: blur(8px);
-  box-shadow: 0 0 20px rgba(0, 212, 255, 0.15);
+  backdrop-filter: blur(16px);
+  box-shadow:
+    0 0 24px rgba(0, 212, 255, 0.12),
+    0 8px 32px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
   z-index: 100;
-  max-width: 250px;
-  line-height: 1.5;
+  max-width: 260px;
+  line-height: 1.6;
 }
 
+.tooltip-header {
+  font-weight: 700;
+  font-size: 0.95rem;
+  margin-bottom: 0.3rem;
+}
+
+.tooltip-greek {
+  font-size: 0.9rem;
+  opacity: 0.7;
+  font-style: italic;
+}
+
+.tooltip-meaning {
+  margin-top: 0.25rem;
+  font-size: 0.8rem;
+  color: #b0b8c4;
+}
+
+.tooltip-wf {
+  margin-top: 0.3rem;
+  font-size: 0.75rem;
+  color: #6e7681;
+  font-family: monospace;
+}
+
+/* Info Panel */
 .graph-info-panel {
   position: absolute;
   top: 1rem;
   right: 1rem;
-  width: 320px;
+  width: 340px;
   max-height: calc(100% - 2rem);
   overflow-y: auto;
-  background: rgba(22, 27, 34, 0.95);
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
-  padding: 1rem;
+  background: rgba(5, 5, 8, 0.92);
+  border: 1px solid rgba(88, 166, 255, 0.15);
+  border-radius: 12px;
+  padding: 1.25rem;
   color: var(--text-color);
   font-size: 0.85rem;
-  backdrop-filter: blur(12px);
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4), 0 0 30px rgba(0, 212, 255, 0.08);
+  backdrop-filter: blur(20px);
+  box-shadow:
+    0 8px 40px rgba(0, 0, 0, 0.5),
+    0 0 40px rgba(0, 212, 255, 0.06);
   z-index: 50;
 }
 
 .graph-info-panel h3 {
+  margin: 0 0 0.25rem;
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+
+.graph-info-panel .info-greek {
+  font-style: italic;
+  opacity: 0.7;
+  margin: 0 0 0.25rem;
+}
+
+.graph-info-panel .info-meaning {
   margin: 0 0 0.5rem;
-  font-size: 1.1rem;
+  color: #b0b8c4;
+}
+
+.graph-info-panel .info-meta {
+  font-size: 0.75rem;
+  color: #6e7681;
+  font-family: monospace;
+  margin: 0 0 0.75rem;
 }
 
 .graph-info-panel h4 {
-  margin: 0.75rem 0 0.25rem;
-  font-size: 0.9rem;
+  margin: 0.75rem 0 0.35rem;
+  font-size: 0.85rem;
   color: #8b949e;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.graph-info-panel .conn-count {
+  background: rgba(88, 166, 255, 0.15);
+  padding: 0.1rem 0.4rem;
+  border-radius: 8px;
+  font-size: 0.75rem;
 }
 
 .graph-info-panel ul {
-  padding-left: 1rem;
+  padding-left: 0;
+  list-style: none;
   font-size: 0.8rem;
-  line-height: 1.6;
+  line-height: 1.5;
 }
 
+.graph-info-panel ul li {
+  padding: 0.4rem 0;
+  border-bottom: 1px solid rgba(48, 54, 61, 0.5);
+}
+
+.graph-info-panel ul li:last-child {
+  border-bottom: none;
+}
+
+.edge-meta {
+  font-size: 0.7rem;
+  color: #6e7681;
+  margin-left: 0.3rem;
+}
+
+.edge-meaning {
+  font-size: 0.72rem;
+  color: #8b949e;
+  margin-top: 0.15rem;
+  padding-left: 1rem;
+}
+
+/* Node Labels */
 .graph-label {
-  font-size: 11px;
-  font-weight: 600;
-  text-shadow: 0 0 6px rgba(0, 0, 0, 0.8);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-shadow:
+    0 0 8px currentColor,
+    0 0 16px rgba(0, 0, 0, 0.9);
   pointer-events: none;
   user-select: none;
 }
 
-/* Graph view: hide main padding */
+/* Graph view: full-screen, no padding */
 main:has(#graph-container) {
   padding: 0;
   overflow: hidden;

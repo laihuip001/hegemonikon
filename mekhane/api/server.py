@@ -18,7 +18,6 @@ Usage:
 
 import argparse
 import logging
-import os
 import sys
 import time
 from pathlib import Path
@@ -164,10 +163,11 @@ def main() -> int:
     import uvicorn
 
     parser = argparse.ArgumentParser(description="Hegemonikón API Server")
-    parser.add_argument("--port", type=int, default=DEFAULT_PORT, help=f"Port (default: {DEFAULT_PORT})")
+    parser.add_argument("--port", type=int, default=DEFAULT_PORT,
+                        help=f"Port (default: {DEFAULT_PORT})")
     parser.add_argument("--host", default="127.0.0.1", help="Host (default: 127.0.0.1)")
     parser.add_argument("--uds", type=str, default=None,
-                        help=f"Unix Domain Socket path (default: None, use --uds for Tauri mode)")
+                        help="Unix Domain Socket path (default: None, use --uds for Tauri mode)")
     parser.add_argument("--reload", action="store_true", help="Enable auto-reload")
     args = parser.parse_args()
 

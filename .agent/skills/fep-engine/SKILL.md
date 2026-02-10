@@ -1,4 +1,9 @@
 ---
+risk_tier: L1
+risks: []
+reversible: true
+requires_approval: false
+fallbacks: []
 name: FEP Cognitive Engine
 description: |
   FEP (自由エネルギー原理) に基づく認知設計原理。

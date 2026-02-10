@@ -1,4 +1,9 @@
 ---
+risk_tier: L1
+risks: []
+reversible: true
+requires_approval: false
+fallbacks: []
 name: Taxis Classifier
 description: タスク/入力の自動分類・優先順位付け
 triggers:

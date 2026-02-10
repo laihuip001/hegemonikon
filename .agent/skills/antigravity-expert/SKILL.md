@@ -1,4 +1,9 @@
 ---
+risk_tier: L1
+risks: []
+reversible: true
+requires_approval: false
+fallbacks: []
 id: "U1"
 name: antigravity-ide-expert
 series: Utils

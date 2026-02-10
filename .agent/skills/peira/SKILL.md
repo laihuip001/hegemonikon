@@ -1,4 +1,9 @@
 ---
+risk_tier: L1
+risks: []
+reversible: true
+requires_approval: false
+fallbacks: []
 name: Peira Health Check
 description: システム全体のヘルスチェック・健全性確認
 triggers:

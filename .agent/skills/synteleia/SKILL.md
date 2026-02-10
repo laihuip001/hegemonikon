@@ -1,4 +1,9 @@
 ---
+risk_tier: L1
+risks: []
+reversible: true
+requires_approval: false
+fallbacks: []
 name: Synteleia WBC
 description: 安全性チェック・白血球 (WBC) による不正操作検知
 triggers:

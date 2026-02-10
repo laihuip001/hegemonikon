@@ -1,4 +1,9 @@
 ---
+risk_tier: L1
+risks: []
+reversible: true
+requires_approval: false
+fallbacks: []
 name: Dendron EPT Checker
 description: コード品質・存在証明 (PROOF.md) の検証を実行する
 triggers:

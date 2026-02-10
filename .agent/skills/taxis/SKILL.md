@@ -10,7 +10,16 @@ triggers:
   - "TODO"
   - "整理"
   - "morphism"
+
+# Safety Contract (v1.0)
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks:
+  - "Unspecified risk (auto-added)"
+fallbacks: []
 ---
+
 
 # Taxis Classifier
 

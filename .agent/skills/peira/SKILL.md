@@ -9,7 +9,16 @@ triggers:
   - "peira"
   - "動作確認"
   - "テスト"
+
+# Safety Contract (v1.0)
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks:
+  - "Unspecified risk (auto-added)"
+fallbacks: []
 ---
+
 
 # Peira Health Check
 

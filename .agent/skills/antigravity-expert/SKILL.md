@@ -46,7 +46,7 @@ related:
 
 lineage: "/mek+ → 2026-02-09 — Antigravity IDE 公式ドキュメント + GPT Deep Research 5テーマ + 実運用経験から構築"
 anti_skip: enabled
-version: "2.3.0"
+version: "2.4.0"
 ---
 
 ## Overview
@@ -219,7 +219,7 @@ project-root/
 | `browser_subagent` | ブラウザ操作タスクの委任 | **one-shot 自律実行**。詳細なタスク記述が必要 |
 | `read_url_content` | URL からテキスト取得 | **JS 不要な静的ページ向け**。速い。不可視 |
 | `view_content_chunk` | 読込済みドキュメントのチャンク閲覧 | `read_url_content` → DocumentId → 本ツールの3ステップで使用 |
-| `send_command_input` | 対話型コマンドへの入力/終了 | **Input と Terminate は排他** — どちらか一方のみ指定 |
+| `send_command_input` | 対話型コマンドへの入力/終了 | **Input と Terminate は排他**。Terminate は **SIGINT** を送信（実験確認済み、exit code 130） |
 
 **read_url_content vs browser_subagent の選択基準**:
 
@@ -613,9 +613,9 @@ description: [1行説明]
 |:-------|:-----------|:-------|
 | `browser_subagent` | サブモデルの正確なコンテキスト長（推定8K-16Kトークン） | 🔴 高 |
 | `read_url_content` | Markdown変換ルール詳細、チャンクサイズ（推定8Kトークン） | 🟡 中 |
-| `send_command_input` | Terminate時のシグナル種別（SIGINT or SIGKILL不明） | 🟡 中 |
-| `search_in_file` | 出力形式の詳細。Geminiモデル内部機能と推測 | 🟡 中 |
-| `codebase_search` | 内部インデックス方式（Embeddings推定だが非公開） | ⚪ 低 |
+| ~~`send_command_input`~~ | ~~Terminate時のシグナル種別~~ → **SIGINT 確定**（exit code 130、実験検証済み） | ✅ 解消 |
+| ~~`search_in_file`~~ | ~~出力形式の詳細~~ → **現在のツールセットに存在しない**（実験検証済み） | ✅ 解消 |
+| ~~`codebase_search`~~ | ~~内部インデックス方式~~ → **現在のツールセットに存在しない**（実験検証済み） | ✅ 解消 |
 | `generate_image` | デフォルト解像度・フォーマット・内部モデル | ⚪ 低 |
 | `search_web` | 利用検索エンジン（Google API推定）とレート制限 | ⚪ 低 |
 | `command_status` | 出力フォーマットの詳細（JSON文字列推定） | ⚪ 低 |
@@ -623,6 +623,10 @@ description: [1行説明]
 | `view_file` | バイナリファイルのエンコード形式（Base64推定） | ⚪ 低 |
 | `view_file_outline` | 1ページあたりの表示アイテム上限（推定~50件） | ⚪ 低 |
 | `write_to_file` | 書込み後の応答詳細（UI側処理でエージェントには非通知の可能性） | ⚪ 低 |
+
+> **実験手法**: `send_command_input` は bash trap スクリプトで SIGINT を検出（exit code 130）。
+> `codebase_search`/`search_in_file` は現在のセッションのツールリストに不在であることを確認。
+> これらはバージョン/設定に依存する可能性があり、将来のアップデートで変わり得る。
 
 ---
 
@@ -726,6 +730,7 @@ description: [1行説明]
 | 2.1.0 | 2026-02-09 | テーマ1（全ツール仕様調査）統合。`codebase_search`/`search_in_file` 追記、既知バグ文書化、アンチパターン10選、未確認事項12件を追加 |
 | 2.2.0 | 2026-02-09 | /dia+ audit 改善適用。未確認事項に影響度トリアージ、`view_content_chunk` 3ステップフロー、`send_command_input` 排他制約を追記 |
 | 2.3.0 | 2026-02-09 | /sop deep 調査結果統合。CRLFバグ追加、Planning/Fastモード、Terminal/JS実行ポリシー、プロンプトインジェクション警告、Perplexity出典追加 |
+| 2.4.0 | 2026-02-10 | 実験的検証。`send_command_input` Terminate=SIGINT確定(exit code 130)。`codebase_search`/`search_in_file` 現ツールセットに不在確定。未確認12→9件に削減 |
 
 ---
 

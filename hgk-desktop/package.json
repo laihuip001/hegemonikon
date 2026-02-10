@@ -19,6 +19,7 @@
     "@tauri-apps/plugin-http": "^2.5.7",
     "@types/three": "^0.182.0",
     "d3-force-3d": "^3.0.6",
+    "marked": "^17.0.1",
     "three": "^0.182.0"
   }
 }

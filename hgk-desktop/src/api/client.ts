@@ -329,3 +329,90 @@ export interface LinkGraphNeighborsResponse {
     total: number;
     error?: string;
 }
+
+// ─── Sophia KI Types ─────────────────────────────────────
+
+export interface KIListItem {
+    id: string;
+    title: string;
+    source_type: string;
+    updated: string;
+    created: string;
+    size_bytes: number;
+}
+
+export interface KIDetail {
+    id: string;
+    title: string;
+    content: string;
+    source_type: string;
+    updated: string;
+    created: string;
+    size_bytes: number;
+    backlinks: string[];
+}
+
+export interface KICreateRequest {
+    title: string;
+    content?: string;
+    source_type?: string;
+}
+
+export interface KIUpdateRequest {
+    title?: string;
+    content?: string;
+}
+
+export interface KIListResponse {
+    items: KIListItem[];
+    total: number;
+}
+
+export interface KISearchResult {
+    id: string;
+    title: string;
+    snippet: string;
+    line_number: number;
+}
+
+export interface KISearchResponse {
+    query: string;
+    results: KISearchResult[];
+    total: number;
+}
+
+// ─── Sophia KI API Methods ───────────────────────────────
+
+export async function kiList(): Promise<KIListResponse> {
+    return apiFetch<KIListResponse>('/api/sophia/ki');
+}
+
+export async function kiGet(id: string): Promise<KIDetail> {
+    return apiFetch<KIDetail>(`/api/sophia/ki/${encodeURIComponent(id)}`);
+}
+
+export async function kiCreate(req: KICreateRequest): Promise<KIDetail> {
+    return apiFetch<KIDetail>('/api/sophia/ki', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(req),
+    });
+}
+
+export async function kiUpdate(id: string, req: KIUpdateRequest): Promise<KIDetail> {
+    return apiFetch<KIDetail>(`/api/sophia/ki/${encodeURIComponent(id)}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(req),
+    });
+}
+
+export async function kiDelete(id: string): Promise<{ status: string; id: string }> {
+    return apiFetch<{ status: string; id: string }>(`/api/sophia/ki/${encodeURIComponent(id)}`, {
+        method: 'DELETE',
+    });
+}
+
+export async function kiSearch(query: string, limit = 20): Promise<KISearchResponse> {
+    return apiFetch<KISearchResponse>(`/api/sophia/search?q=${encodeURIComponent(query)}&limit=${limit}`);
+}

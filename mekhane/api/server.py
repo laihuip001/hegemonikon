@@ -134,6 +134,14 @@ def _register_routers(app: FastAPI) -> None:
     except Exception as exc:
         logger.warning("Link Graph router skipped: %s", exc)
 
+    # Sophia KI — ファイルシステム CRUD
+    try:
+        from mekhane.api.routes.sophia import router as sophia_router
+        app.include_router(sophia_router, prefix=API_PREFIX)
+        logger.info("Sophia KI router registered")
+    except Exception as exc:
+        logger.warning("Sophia KI router skipped: %s", exc)
+
 
 # PURPOSE: アプリケーションインスタンス（uvicorn 用）
 app = create_app()

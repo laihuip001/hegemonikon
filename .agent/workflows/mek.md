@@ -39,6 +39,15 @@ submodules:
   - output-modes.md
   - ccl-generation.md
   - artifact-rules.md
+category_theory:
+  core: "随伴 F⊣G の左随伴 F（自由関手）"
+  adjunction: "Mekhanē (F) ⊣ Praxis (G)"
+  role: "F: Practice → Method（IF-THENチャンクを束ねて方法論に構造化）"
+  F_definition: "実践知・事例・パターンに理論的構造を載せて体系化する"
+  unit: "η: Practice → G(F(Practice)) — 体で覚えたことを理論化して体に戻す = 座学の効果"
+  counit: "ε: F(G(Method)) → Method — 方法を実践して方法に戻す = 実践の効果"
+  fep_connection: "FEP perception-action loop の S-series 特殊化。F=action, G=perception"
+  insight: "座学⇄実践は循環。理屈→身体でも身体→理屈でも技術は生まれる — Creator, 2026-02-10"
 ---
 
 # /mek — 方法配置ワークフロー (Mekhane)

@@ -44,6 +44,18 @@ sel_enforcement:
 derivatives: [prax, pois, temp]
 anti_skip: enabled
 ccl_signature: "/pra+_/ene"
+category_theory:
+  core: "随伴 F⊣G の右随伴 G（忘却関手）"
+  adjunction: "Mekhanē (F) ⊣ Praxis (G)"
+  role: "G: Method → Practice（方法論を多数のIF-THENチャンクに分解）"
+  G_definition: "1つの解（技術・方法論）の理論的構造を忘却し、条件反射的なIF-THENに分解する"
+  G_two_layers:
+    明示知: "IF-THEN に言語化できる部分。well-defined"
+    暗黙知: "言語化できない部分（名人芸、勘、手触り）。ポラニーの暗黙知"
+  drift: "Drift = 暗黙知の量。G が言語化できない残差"
+  explore_exploit: "Explore = F の自由度を広げる / Exploit = G の確実性を使う"
+  fep_connection: "G = perception（世界モデル更新）。実践が内部モデルを書き換える"
+  insight: "IF-THENの集積 = 条件反射 = 無意識的技能 — Creator, 2026-02-10"
 ---
 
 # /pra: 実践配置ワークフロー (Praxis)
@@ -220,7 +232,6 @@ view_file /home/makaron8426/oikos/hegemonikon/.agent/skills/schema/s4-praxis/SKI
 ```
 
 ---
-
 
 ---
 

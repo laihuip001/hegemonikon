@@ -1310,3 +1310,296 @@ main:has(#graph-container) {
 .cp-wf-stages li {
   margin-bottom: 0.2rem;
 }
+
+/* ─── Sophia KI ─────────────────────────────────────── */
+
+.sophia-view {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  gap: 1rem;
+}
+
+.sophia-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.sophia-header h2 {
+  margin: 0;
+  font-size: 1.3rem;
+}
+
+.sophia-toolbar {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.sophia-search-wrap {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.sophia-search {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  color: var(--text-color);
+  padding: 0.4rem 0.75rem;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  width: 220px;
+}
+
+.sophia-search:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 2px rgba(88, 166, 255, 0.2);
+}
+
+.sophia-layout {
+  display: flex;
+  gap: 1rem;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.sophia-sidebar {
+  width: 280px;
+  min-width: 220px;
+  overflow-y: auto;
+  border-right: 1px solid var(--border-color);
+  padding-right: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.sophia-main {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0 0.5rem;
+}
+
+.sophia-empty {
+  color: #8b949e;
+  font-style: italic;
+  padding: 2rem;
+  text-align: center;
+}
+
+/* KI List Items */
+.sophia-ki-item {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  padding: 0.6rem 0.75rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.sophia-ki-item:hover {
+  background: var(--hover-bg);
+  border-color: var(--primary-color);
+}
+
+.sophia-ki-item.active {
+  background: rgba(88, 166, 255, 0.1);
+  border-color: var(--primary-color);
+}
+
+.sophia-ki-title {
+  font-weight: 600;
+  font-size: 0.9rem;
+  margin-bottom: 0.2rem;
+}
+
+.sophia-ki-meta {
+  display: flex;
+  gap: 0.5rem;
+  font-size: 0.75rem;
+  color: #8b949e;
+}
+
+.sophia-ki-type {
+  background: rgba(88, 166, 255, 0.15);
+  color: var(--primary-color);
+  padding: 0.1rem 0.4rem;
+  border-radius: 3px;
+  font-size: 0.7rem;
+}
+
+/* Detail View */
+.sophia-detail-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.sophia-detail-header h3 {
+  margin: 0;
+  font-size: 1.2rem;
+}
+
+.sophia-detail-actions {
+  display: flex;
+  gap: 0.3rem;
+}
+
+.sophia-detail-meta {
+  display: flex;
+  gap: 1rem;
+  font-size: 0.8rem;
+  color: #8b949e;
+  margin-bottom: 1rem;
+}
+
+.sophia-backlinks {
+  background: rgba(88, 166, 255, 0.08);
+  border: 1px solid rgba(88, 166, 255, 0.2);
+  border-radius: 6px;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.85rem;
+  margin-bottom: 1rem;
+}
+
+.sophia-backlink {
+  color: var(--primary-color);
+  text-decoration: none;
+}
+
+.sophia-backlink:hover {
+  text-decoration: underline;
+}
+
+/* Markdown Content */
+.sophia-content {
+  line-height: 1.7;
+  font-size: 0.95rem;
+}
+
+.sophia-content h1,
+.sophia-content h2,
+.sophia-content h3 {
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 0.3rem;
+  margin-top: 1.2rem;
+}
+
+.sophia-content code {
+  background: rgba(110, 118, 129, 0.2);
+  color: #f0883e;
+  padding: 0.15rem 0.4rem;
+  border-radius: 4px;
+  font-size: 0.85em;
+}
+
+.sophia-content pre {
+  background: #0d1117;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  padding: 1rem;
+  overflow-x: auto;
+}
+
+.sophia-content pre code {
+  background: none;
+  color: var(--text-color);
+  padding: 0;
+}
+
+.sophia-content blockquote {
+  border-left: 3px solid var(--primary-color);
+  margin: 0.5rem 0;
+  padding: 0.5rem 1rem;
+  color: #8b949e;
+  background: rgba(88, 166, 255, 0.05);
+}
+
+.sophia-content table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0.5rem 0;
+}
+
+.sophia-content th,
+.sophia-content td {
+  border: 1px solid var(--border-color);
+  padding: 0.4rem 0.6rem;
+  text-align: left;
+}
+
+.sophia-content th {
+  background: var(--card-bg);
+}
+
+/* Editor */
+.sophia-editor h3 {
+  margin: 0 0 1rem 0;
+}
+
+.sophia-editor-form label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin: 0.75rem 0 0.25rem;
+  color: #8b949e;
+}
+
+.sophia-input {
+  width: 100%;
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  color: var(--text-color);
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  font-size: 0.95rem;
+}
+
+.sophia-input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 2px rgba(88, 166, 255, 0.2);
+}
+
+.sophia-textarea {
+  width: 100%;
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  color: var(--text-color);
+  padding: 0.75rem;
+  border-radius: 6px;
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  font-size: 0.9rem;
+  resize: vertical;
+  line-height: 1.6;
+}
+
+.sophia-textarea:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 2px rgba(88, 166, 255, 0.2);
+}
+
+.sophia-editor-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+.btn-danger {
+  background: var(--error-color);
+  color: white;
+  border: none;
+}
+
+.btn-danger:hover {
+  background: #f85149;
+}

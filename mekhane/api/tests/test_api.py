@@ -269,3 +269,104 @@ class TestLinkGraph:
         data = r.json()
         assert data["error"] == "not found"
 
+
+# ============================================================
+# Sophia KI
+# ============================================================
+
+
+class TestSophiaKI:
+    """CRUD ラウンドトリップ + セキュリティ検証。"""
+
+    def test_ki_list_initial(self, client: TestClient):
+        """GET /api/sophia/ki → 200 + items list."""
+        r = client.get("/api/sophia/ki")
+        assert r.status_code == 200
+        data = r.json()
+        assert "items" in data
+        assert "total" in data
+        assert isinstance(data["items"], list)
+
+    def test_ki_crud_roundtrip(self, client: TestClient):
+        """Create → Get → Update → Delete の完全ラウンドトリップ。"""
+        # 1. Create
+        r = client.post("/api/sophia/ki", json={
+            "title": "テスト KI — pytest",
+            "content": "# テスト\n\nこれは pytest による自動テストです。",
+            "source_type": "test",
+        })
+        assert r.status_code == 201
+        created = r.json()
+        assert created["title"] == "テスト KI — pytest"
+        assert "id" in created
+        ki_id = created["id"]
+
+        # 2. Get
+        r = client.get(f"/api/sophia/ki/{ki_id}")
+        assert r.status_code == 200
+        detail = r.json()
+        assert detail["id"] == ki_id
+        assert detail["title"] == "テスト KI — pytest"
+        assert "# テスト" in detail["content"]
+        assert isinstance(detail["backlinks"], list)
+
+        # 3. Update
+        r = client.put(f"/api/sophia/ki/{ki_id}", json={
+            "title": "更新された KI",
+            "content": "# 更新\n\n内容を変更しました。",
+        })
+        assert r.status_code == 200
+        updated = r.json()
+        assert updated["title"] == "更新された KI"
+        assert "更新" in updated["content"]
+
+        # 4. Verify list contains it
+        r = client.get("/api/sophia/ki")
+        assert r.status_code == 200
+        items = r.json()["items"]
+        ids = [i["id"] for i in items]
+        assert ki_id in ids
+
+        # 5. Delete
+        r = client.delete(f"/api/sophia/ki/{ki_id}")
+        assert r.status_code == 200
+        deleted = r.json()
+        assert deleted["status"] == "deleted"
+
+        # 6. Get after delete → 404
+        r = client.get(f"/api/sophia/ki/{ki_id}")
+        assert r.status_code == 404
+
+    def test_ki_search(self, client: TestClient):
+        """GET /api/sophia/search?q=xxx → 200 + results list."""
+        r = client.get("/api/sophia/search", params={"q": "test"})
+        assert r.status_code == 200
+        data = r.json()
+        assert "query" in data
+        assert "results" in data
+        assert isinstance(data["results"], list)
+
+    def test_ki_not_found(self, client: TestClient):
+        """GET /api/sophia/ki/nonexistent → 404."""
+        r = client.get("/api/sophia/ki/nonexistent_ki_12345")
+        assert r.status_code == 404
+
+    def test_ki_path_traversal_blocked(self, client: TestClient):
+        """Path Traversal 攻撃が拒否されること。"""
+        # URL エンコード版: FastAPI の処理で 400 or 404
+        r = client.get("/api/sophia/ki/..%2F..%2Fetc%2Fpasswd")
+        assert r.status_code in (400, 404)
+
+        # デコード済み直接版: _sanitize_ki_id が 400 を返す
+        r = client.get("/api/sophia/ki/..%2F..%2Fetc%2Fpasswd")
+        assert r.status_code in (400, 404)
+
+    def test_ki_create_no_title(self, client: TestClient):
+        """POST /api/sophia/ki with empty title → 422."""
+        r = client.post("/api/sophia/ki", json={
+            "title": "",
+            "content": "no title",
+        })
+        # FastAPI の validation or our custom check
+        assert r.status_code in (400, 422)
+

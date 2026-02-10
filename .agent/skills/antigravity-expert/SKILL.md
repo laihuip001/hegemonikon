@@ -1,52 +1,48 @@
 ---
-id: "U1"
+id: U1
 name: antigravity-ide-expert
 series: Utils
-
-description: |
-  Antigravity IDE の利用ガイド・専門知識を提供するシステムプロンプト。
-  IDE のアーキテクチャ、ツール群、Skills/Rules/Workflows の設計パターン、
-  モデル固有の最適化、およびエージェント駆動開発のベストプラクティスを体系化。
-
-  Triggers:
-    - "Antigravity IDE の使い方を教えて"
-    - "IDE のツールについて知りたい"
-    - "Skills / Rules / Workflows の設計がしたい"
-    - "エージェント駆動開発の相談"
-    - "GEMINI.md の書き方"
-
+description: "Antigravity IDE の利用ガイド・専門知識を提供するシステムプロンプト。\nIDE のアーキテクチャ、ツール群、Skills/Rules/Workflows\
+  \ の設計パターン、\nモデル固有の最適化、およびエージェント駆動開発のベストプラクティスを体系化。\n\nTriggers:\n  - \"Antigravity\
+  \ IDE の使い方を教えて\"\n  - \"IDE のツールについて知りたい\"\n  - \"Skills / Rules / Workflows の設計がしたい\"\
+  \n  - \"エージェント駆動開発の相談\"\n  - \"GEMINI.md の書き方\"\n"
 triggers:
-  - "Antigravity"
-  - "IDE"
-  - "Skills"
-  - "Rules"
-  - "Workflows"
-  - "GEMINI.md"
-  - "agent-first"
-  - "エージェント駆動"
-  - "browser_subagent"
-  - "プロンプト最適化"
-
+- Antigravity
+- IDE
+- Skills
+- Rules
+- Workflows
+- GEMINI.md
+- agent-first
+- エージェント駆動
+- browser_subagent
+- プロンプト最適化
 keywords:
-  - antigravity
-  - ide
-  - agent-first
-  - skill
-  - workflow
-  - rule
-  - gemini-md
-  - browser-subagent
-  - task-boundary
-  - prompt-engineering
-
+- antigravity
+- ide
+- agent-first
+- skill
+- workflow
+- rule
+- gemini-md
+- browser-subagent
+- task-boundary
+- prompt-engineering
 related:
-  upstream: ["S2 Mekhanē"]
+  upstream:
+  - S2 Mekhanē
   downstream: []
-  x_series: ["X-SK: Schema→Kairos (ツール選択の文脈依存性)"]
-
-lineage: "/mek+ → 2026-02-09 — Antigravity IDE 公式ドキュメント + GPT Deep Research 5テーマ + 実運用経験から構築"
+  x_series:
+  - 'X-SK: Schema→Kairos (ツール選択の文脈依存性)'
+lineage: /mek+ → 2026-02-09 — Antigravity IDE 公式ドキュメント + GPT Deep Research 5テーマ +
+  実運用経験から構築
 anti_skip: enabled
-version: "2.6.0"
+version: 2.6.0
+risk_tier: L1
+risks: []
+reversible: true
+requires_approval: false
+fallbacks: []
 ---
 
 ## Overview

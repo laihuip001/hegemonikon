@@ -9,6 +9,10 @@ triggers:
   - "dendron"
   - "checker"
   - "なぜ存在する"
+risk_tier: L1
+risks:
+  - Low impact info-only skill
+
 ---
 
 # Dendron EPT Checker

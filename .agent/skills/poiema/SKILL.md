@@ -9,6 +9,10 @@ triggers:
   - "poiema"
   - "テンプレート"
   - "ドキュメント生成"
+risk_tier: L1
+risks:
+  - Low impact info-only skill
+
 ---
 
 # Poiema Generator

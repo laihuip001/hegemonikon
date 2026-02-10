@@ -12,6 +12,10 @@ triggers:
   - "検証"
   - "監査"
   - "audit"
+risk_tier: L1
+risks:
+  - Low impact info-only skill
+
 ---
 
 # Synteleia WBC (白血球)

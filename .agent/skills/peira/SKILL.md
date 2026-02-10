@@ -9,6 +9,10 @@ triggers:
   - "peira"
   - "動作確認"
   - "テスト"
+risk_tier: L1
+risks:
+  - Low impact info-only skill
+
 ---
 
 # Peira Health Check

@@ -10,6 +10,10 @@ triggers:
   - "多角"
   - "批評"
   - "/syn"
+risk_tier: L1
+risks:
+  - Low impact info-only skill
+
 ---
 
 # Synedrion Council

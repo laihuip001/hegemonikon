@@ -60,3 +60,6 @@ mekhane/ergasterion/prompt-lang/staging/
 # Gnōsis data (LanceDB)
 gnosis_data/
 mekhane/anamnesis/data/*.lance/
+
+# Runtime logs
+logs/

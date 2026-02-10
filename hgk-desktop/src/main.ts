@@ -121,7 +121,7 @@ function navigate(route: string): void {
 
   const app = document.getElementById('view-content');
   if (!app) return;
-  app.innerHTML = '<div class="loading">Loading...</div>';
+  app.innerHTML = '<div class="loading">読み込み中...</div>';
 
   const renderer = routes[route];
   if (renderer) {
@@ -243,7 +243,7 @@ async function renderFepContent(): Promise<void> {
     ]);
   } catch (err) {
     const app = document.getElementById('view-content')!;
-    app.innerHTML = `<div class="card status-error">FEP Agent unavailable: ${esc((err as Error).message)}</div>`;
+    app.innerHTML = `<div class="card status-error">FEP エージェント利用不可: ${esc((err as Error).message)}</div>`;
     return;
   }
 
@@ -271,20 +271,20 @@ async function renderFepContent(): Promise<void> {
     .join('') : '';
 
   app.innerHTML = `
-    <h1>FEP Agent <small class="poll-badge">auto-refresh 30s</small></h1>
+    <h1>FEP エージェント <small class="poll-badge">自動更新 30秒</small></h1>
 
     <div class="card">
-      <h3>Belief Distribution (${state.beliefs.length} dims)</h3>
+      <h3>信念分布 (${state.beliefs.length} 次元)</h3>
       <div class="beliefs-chart">${beliefsHtml}</div>
-      <small style="color:#8b949e;">Hover for values. Max = ${maxBelief.toFixed(4)}</small>
+      <small style="color:#8b949e;">ホバーで値表示。最大値 = ${maxBelief.toFixed(4)}</small>
     </div>
 
     <div class="card step-panel">
-      <h3>Run Inference Step</h3>
+      <h3>推論ステップ実行</h3>
       <div style="display:flex; gap:0.5rem; align-items:center;">
-        <label for="obs-input">Observation (0-47):</label>
+        <label for="obs-input">観測値 (0-47):</label>
         <input type="number" id="obs-input" class="input" min="0" max="47" value="0" style="width:80px;" />
-        <button id="step-btn" class="btn">Step</button>
+        <button id="step-btn" class="btn">ステップ</button>
       </div>
       <div id="step-result" style="margin-top:0.5rem;"></div>
     </div>
@@ -295,18 +295,18 @@ async function renderFepContent(): Promise<void> {
         <table class="data-table">${epsilonEntries}</table>
       </div>
       <div class="card">
-        <h3>History</h3>
+        <h3>履歴</h3>
         <div class="metric">${state.history_length}</div>
-        <p>inference steps</p>
+        <p>推論ステップ</p>
       </div>
       ${dashboard ? `
       <div class="card">
-        <h3>Action Distribution</h3>
-        <table class="data-table">${actionDist || '<tr><td colspan="2">No data</td></tr>'}</table>
+        <h3>行動分布</h3>
+        <table class="data-table">${actionDist || '<tr><td colspan="2">データなし</td></tr>'}</table>
       </div>
       <div class="card">
-        <h3>Series Distribution</h3>
-        <table class="data-table">${seriesDist || '<tr><td colspan="2">No data</td></tr>'}</table>
+        <h3>シリーズ分布</h3>
+        <table class="data-table">${seriesDist || '<tr><td colspan="2">データなし</td></tr>'}</table>
       </div>
       ` : ''}
     </div>
@@ -318,26 +318,26 @@ async function renderFepContent(): Promise<void> {
     const obs = parseInt(obsInput.value, 10);
     if (isNaN(obs) || obs < 0 || obs > 47) {
       document.getElementById('step-result')!.innerHTML =
-        '<span class="status-error">Observation must be 0-47</span>';
+        '<span class="status-error">観測値は 0-47 の範囲で入力してください</span>';
       return;
     }
 
     const resultDiv = document.getElementById('step-result')!;
-    resultDiv.innerHTML = '<span class="loading">Running...</span>';
+    resultDiv.innerHTML = '<span class="loading">実行中...</span>';
     try {
       const res: FEPStepResponse = await api.fepStep(obs);
       resultDiv.innerHTML = `
         <div class="step-result-box">
-          <strong>Action:</strong> ${esc(res.action_name)} (idx: ${res.action_index})<br/>
-          <strong>Series:</strong> ${esc(res.selected_series ?? 'N/A')}<br/>
-          <strong>Entropy:</strong> ${res.beliefs_entropy?.toFixed(4) ?? '-'}<br/>
-          ${res.explanation ? `<strong>Explanation:</strong> ${esc(res.explanation)}` : ''}
+          <strong>行動:</strong> ${esc(res.action_name)} (idx: ${res.action_index})<br/>
+          <strong>シリーズ:</strong> ${esc(res.selected_series ?? 'N/A')}<br/>
+          <strong>エントロピー:</strong> ${res.beliefs_entropy?.toFixed(4) ?? '-'}<br/>
+          ${res.explanation ? `<strong>説明:</strong> ${esc(res.explanation)}` : ''}
         </div>
       `;
       // Refresh charts after step
       void renderFepContent();
     } catch (e) {
-      resultDiv.innerHTML = `<span class="status-error">Step failed: ${esc((e as Error).message)}</span>`;
+      resultDiv.innerHTML = `<span class="status-error">ステップ失敗: ${esc((e as Error).message)}</span>`;
     }
   });
 }
@@ -362,9 +362,9 @@ function renderPaperCard(p: PaperCard): string {
       ${p.abstract ? `<p class="nr-abstract">${esc(p.abstract.substring(0, 200))}${p.abstract.length > 200 ? '...' : ''}</p>` : ''}
       ${p.question ? `<div class="nr-question">💡 ${esc(p.question)}</div>` : ''}
       <div class="nr-actions">
-        <button class="btn btn-sm nr-narrate-btn" data-title="${esc(p.title)}" data-fmt="deep_dive">🎙️ Narrate</button>
-        <button class="btn btn-sm btn-outline nr-narrate-btn" data-title="${esc(p.title)}" data-fmt="brief">📝 Brief</button>
-        <button class="btn btn-sm btn-outline nr-narrate-btn" data-title="${esc(p.title)}" data-fmt="critique">🔍 Critique</button>
+        <button class="btn btn-sm nr-narrate-btn" data-title="${esc(p.title)}" data-fmt="deep_dive">🎙️ ナレーション</button>
+        <button class="btn btn-sm btn-outline nr-narrate-btn" data-title="${esc(p.title)}" data-fmt="brief">📝 概要</button>
+        <button class="btn btn-sm btn-outline nr-narrate-btn" data-title="${esc(p.title)}" data-fmt="critique">🔍 批評</button>
       </div>
       <div class="nr-narration" style="display:none;"></div>
     </div>
@@ -378,12 +378,12 @@ async function handleNarrate(btn: HTMLButtonElement): Promise<void> {
   const narrationDiv = card.querySelector('.nr-narration') as HTMLElement;
 
   narrationDiv.style.display = 'block';
-  narrationDiv.innerHTML = '<div class="loading">Generating narration...</div>';
+  narrationDiv.innerHTML = '<div class="loading">ナレーション生成中...</div>';
 
   try {
     const res: GnosisNarrateResponse = await api.gnosisNarrate(title, fmt);
     if (!res.generated || res.segments.length === 0) {
-      narrationDiv.innerHTML = '<div class="nr-narration-empty">Narration not available</div>';
+      narrationDiv.innerHTML = '<div class="nr-narration-empty">ナレーション利用不可</div>';
       return;
     }
     narrationDiv.innerHTML = `
@@ -396,7 +396,7 @@ async function handleNarrate(btn: HTMLButtonElement): Promise<void> {
       `).join('')}
     `;
   } catch (e) {
-    narrationDiv.innerHTML = `<div class="status-error">Narration failed: ${esc((e as Error).message)}</div>`;
+    narrationDiv.innerHTML = `<div class="status-error">ナレーション失敗: ${esc((e as Error).message)}</div>`;
   }
 }
 
@@ -411,23 +411,23 @@ async function renderGnosis(): Promise<void> {
   const statsHtml = stats ? `
     <div class="grid" style="margin-bottom:1rem;">
       <div class="card">
-        <h3>Total Papers</h3>
+        <h3>論文総数</h3>
         <div class="metric">${stats.total}</div>
       </div>
       <div class="card">
-        <h3>Unique DOIs</h3>
+        <h3>固有 DOI</h3>
         <div class="metric">${stats.unique_dois}</div>
       </div>
       <div class="card">
-        <h3>Unique arXiv</h3>
+        <h3>固有 arXiv</h3>
         <div class="metric">${stats.unique_arxiv}</div>
       </div>
       <div class="card">
-        <h3>Sources</h3>
+        <h3>ソース</h3>
         <div style="font-size:0.9rem;">
           ${Object.entries(stats.sources).map(([k, v]) => `${esc(k)}: <strong>${String(v)}</strong>`).join(' · ')}
         </div>
-        <small>Last collected: ${esc(stats.last_collected)}</small>
+        <small>最終収集: ${esc(stats.last_collected)}</small>
       </div>
     </div>
   ` : '';
@@ -437,9 +437,9 @@ async function renderGnosis(): Promise<void> {
     ${statsHtml}
     <div class="card">
       <div style="display:flex; gap:0.5rem;">
-        <input type="text" id="gnosis-search-input" class="input" placeholder="Search knowledge base..." style="flex:1;" />
-        <button id="gnosis-search-btn" class="btn">🔍 Search</button>
-        <button id="gnosis-papers-btn" class="btn btn-outline">📚 Papers</button>
+        <input type="text" id="gnosis-search-input" class="input" placeholder="知識基盤を検索..." style="flex:1;" />
+        <button id="gnosis-search-btn" class="btn">🔍 検索</button>
+        <button id="gnosis-papers-btn" class="btn btn-outline">📚 論文</button>
       </div>
     </div>
     <div id="search-results"></div>
@@ -453,37 +453,37 @@ async function renderGnosis(): Promise<void> {
     const query = searchInput.value.trim();
     if (!query) return;
     const resultsDiv = document.getElementById('search-results')!;
-    resultsDiv.innerHTML = '<div class="loading">Searching...</div>';
+    resultsDiv.innerHTML = '<div class="loading">検索中...</div>';
     try {
       const res: GnosisSearchResponse = await api.gnosisSearch(query);
       if (res.results.length === 0) {
-        resultsDiv.innerHTML = '<div class="card">No results found.</div>';
+        resultsDiv.innerHTML = '<div class="card">結果が見つかりませんでした。</div>';
         return;
       }
       resultsDiv.innerHTML = res.results.map(r => `
         <div class="search-result card">
-          <h3><a href="${esc(r.url) || '#'}" target="_blank" rel="noopener">${esc(r.title) || 'Untitled'}</a></h3>
+          <h3><a href="${esc(r.url) || '#'}" target="_blank" rel="noopener">${esc(r.title) || '無題'}</a></h3>
           <p>${esc(r.abstract?.substring(0, 300))}</p>
-          <small>Score: ${r.score?.toFixed(3) ?? '-'} | Source: ${esc(r.source)} | ${esc(r.authors)}</small>
+          <small>スコア: ${r.score?.toFixed(3) ?? '-'} | ソース: ${esc(r.source)} | ${esc(r.authors)}</small>
         </div>
       `).join('');
     } catch (e) {
-      resultsDiv.innerHTML = `<div class="card status-error">Search failed: ${esc((e as Error).message)}</div>`;
+      resultsDiv.innerHTML = `<div class="card status-error">検索失敗: ${esc((e as Error).message)}</div>`;
     }
   };
 
   const loadPapers = async (): Promise<void> => {
     const query = searchInput.value.trim();
     const resultsDiv = document.getElementById('search-results')!;
-    resultsDiv.innerHTML = '<div class="loading">Loading papers...</div>';
+    resultsDiv.innerHTML = '<div class="loading">論文読み込み中...</div>';
     try {
       const res: GnosisPapersResponse = await api.gnosisPapers(query, 20);
       if (res.papers.length === 0) {
-        resultsDiv.innerHTML = '<div class="card">No papers found.</div>';
+        resultsDiv.innerHTML = '<div class="card">論文が見つかりませんでした。</div>';
         return;
       }
       resultsDiv.innerHTML = `
-        <div class="nr-header">📚 ${res.total} papers ${query ? `matching "${esc(query)}"` : ''}</div>
+        <div class="nr-header">📚 ${res.total} 件 ${query ? `「${esc(query)}」に一致` : ''}</div>
         ${res.papers.map(p => renderPaperCard(p)).join('')}
       `;
       // Bind narrate buttons
@@ -491,7 +491,7 @@ async function renderGnosis(): Promise<void> {
         btn.addEventListener('click', () => void handleNarrate(btn as HTMLButtonElement));
       });
     } catch (e) {
-      resultsDiv.innerHTML = `<div class="card status-error">Papers load failed: ${esc((e as Error).message)}</div>`;
+      resultsDiv.innerHTML = `<div class="card status-error">論文読み込み失敗: ${esc((e as Error).message)}</div>`;
     }
   };
 
@@ -511,7 +511,7 @@ async function renderQuality(): Promise<void> {
     report = await api.dendronReport('summary');
   } catch (err) {
     const app = document.getElementById('view-content')!;
-    app.innerHTML = `<div class="card status-error">Quality report unavailable: ${esc((err as Error).message)}</div>`;
+    app.innerHTML = `<div class="card status-error">品質レポート利用不可: ${esc((err as Error).message)}</div>`;
     return;
   }
 
@@ -522,22 +522,22 @@ async function renderQuality(): Promise<void> {
   const coverageClass = pct >= 0.7 ? 'status-ok' : pct >= 0.4 ? 'status-warn' : 'status-error';
 
   app.innerHTML = `
-    <h1>Code Quality (Dendron)</h1>
+    <h1>コード品質 (Dendron)</h1>
     <div class="grid">
       <div class="card">
-        <h3>Coverage</h3>
+        <h3>カバレッジ</h3>
         <div class="metric ${coverageClass}">${displayPct}%</div>
-        <p>${s.files_with_proof} / ${s.total_files} files verified</p>
+        <p>${s.files_with_proof} / ${s.total_files} ファイル検証済み</p>
       </div>
       <div class="card">
-        <h3>Structure</h3>
+        <h3>構造</h3>
         <div class="metric">${s.total_dirs}</div>
-        <p>${s.dirs_with_proof} / ${s.total_dirs} dirs verified</p>
+        <p>${s.dirs_with_proof} / ${s.total_dirs} ディレクトリ検証済み</p>
       </div>
     </div>
     ${s.issues.length > 0 ? `
       <div class="card" style="margin-top:1rem;">
-        <h3>Issues (${s.issues.length})</h3>
+        <h3>課題 (${s.issues.length})</h3>
         <ul>${s.issues.map(i => `<li>${esc(i)}</li>`).join('')}</ul>
       </div>
     ` : ''}
@@ -552,7 +552,7 @@ async function renderPostcheck(): Promise<void> {
     selList = await api.postcheckList();
   } catch (err) {
     const app = document.getElementById('view-content')!;
-    app.innerHTML = `<div class="card status-error">Postcheck unavailable: ${esc((err as Error).message)}</div>`;
+    app.innerHTML = `<div class="card status-error">ポストチェック利用不可: ${esc((err as Error).message)}</div>`;
     return;
   }
 
@@ -563,37 +563,37 @@ async function renderPostcheck(): Promise<void> {
     return `<tr>
       <td>${esc(item.wf_name)}</td>
       <td>${esc(modes)}</td>
-      <td><button class="btn btn-sm run-postcheck-btn" data-wf="${esc(item.wf_name)}">Run</button></td>
+      <td><button class="btn btn-sm run-postcheck-btn" data-wf="${esc(item.wf_name)}">実行</button></td>
     </tr>`;
   }).join('');
 
   app.innerHTML = `
-    <h1>Postcheck</h1>
+    <h1>ポストチェック</h1>
     <div class="card">
-      <h3>Workflow Registry (${selList.total} workflows)</h3>
+      <h3>ワークフロー登録 (${selList.total} 件)</h3>
       <table class="data-table">
-        <thead><tr><th>Workflow</th><th>Modes</th><th>Action</th></tr></thead>
+        <thead><tr><th>ワークフロー</th><th>モード</th><th>アクション</th></tr></thead>
         <tbody>${wfRows}</tbody>
       </table>
     </div>
     <div class="card">
-      <h3>Manual Postcheck</h3>
+      <h3>手動ポストチェック</h3>
       <div class="grid" style="grid-template-columns: 1fr 100px;">
         <div>
-          <label>Workflow name:</label>
-          <input type="text" id="pc-wf" class="input" placeholder="e.g. dia, noe, boot" style="margin-bottom:0.5rem;" />
-          <label>Content to check:</label>
-          <textarea id="pc-content" class="input" rows="4" placeholder="Paste output text here..."></textarea>
+          <label>ワークフロー名:</label>
+          <input type="text" id="pc-wf" class="input" placeholder="例: dia, noe, boot" style="margin-bottom:0.5rem;" />
+          <label>チェック対象:</label>
+          <textarea id="pc-content" class="input" rows="4" placeholder="出力テキストを貼り付け..."></textarea>
         </div>
         <div style="display:flex; flex-direction:column; gap:0.5rem;">
-          <label>Mode:</label>
+          <label>モード:</label>
           <select id="pc-mode" class="input">
-            <option value="">default</option>
-            <option value="+">+ (deep)</option>
-            <option value="-">- (minimal)</option>
-            <option value="*">* (meta)</option>
+            <option value="">デフォルト</option>
+            <option value="+">+ (深層)</option>
+            <option value="-">- (最小)</option>
+            <option value="*">* (メタ)</option>
           </select>
-          <button id="pc-run-btn" class="btn" style="margin-top:auto;">Run Check</button>
+          <button id="pc-run-btn" class="btn" style="margin-top:auto;">チェック実行</button>
         </div>
       </div>
       <div id="pc-result" style="margin-top:1rem;"></div>
@@ -606,11 +606,11 @@ async function renderPostcheck(): Promise<void> {
     const content = (document.getElementById('pc-content') as HTMLTextAreaElement).value.trim();
     const mode = (document.getElementById('pc-mode') as HTMLSelectElement).value;
     if (!wf || !content) {
-      document.getElementById('pc-result')!.innerHTML = '<span class="status-warn">Enter workflow name and content</span>';
+      document.getElementById('pc-result')!.innerHTML = '<span class="status-warn">ワークフロー名とチェック対象を入力してください</span>';
       return;
     }
     const resultDiv = document.getElementById('pc-result')!;
-    resultDiv.innerHTML = '<span class="loading">Checking...</span>';
+    resultDiv.innerHTML = '<span class="loading">チェック中...</span>';
     try {
       const res = await api.postcheckRun(wf, content, mode);
       const passClass = res.passed ? 'status-ok' : 'status-error';
@@ -625,7 +625,7 @@ async function renderPostcheck(): Promise<void> {
         </div>
       `;
     } catch (e) {
-      resultDiv.innerHTML = `<span class="status-error">Check failed: ${esc((e as Error).message)}</span>`;
+      resultDiv.innerHTML = `<span class="status-error">チェック失敗: ${esc((e as Error).message)}</span>`;
     }
   });
 
@@ -911,7 +911,7 @@ async function renderSophiaView(): Promise<void> {
   app.innerHTML = `
     <div class="sophia-view">
       <div class="sophia-header">
-        <h2>📚 Sophia KI — Knowledge Items</h2>
+        <h2>📚 Sophia KI — 知識項目</h2>
         <div class="sophia-toolbar">
           <div class="sophia-search-wrap">
             <input type="text" id="sophia-search" class="sophia-search" placeholder="🔍 KI を検索..." />
@@ -922,7 +922,7 @@ async function renderSophiaView(): Promise<void> {
       </div>
       <div class="sophia-layout">
         <div class="sophia-sidebar" id="sophia-ki-list">
-          <div class="loading">Loading...</div>
+          <div class="loading">読み込み中...</div>
         </div>
         <div class="sophia-main" id="sophia-detail">
           <div class="sophia-empty">← KI を選択してください</div>
@@ -989,7 +989,7 @@ async function renderKIDetail(kiId: string): Promise<void> {
   const detailEl = document.getElementById('sophia-detail');
   if (!detailEl) return;
 
-  detailEl.innerHTML = '<div class="loading">Loading...</div>';
+  detailEl.innerHTML = '<div class="loading">読み込み中...</div>';
 
   try {
     const ki = await kiGet(kiId);
@@ -1004,14 +1004,14 @@ async function renderKIDetail(kiId: string): Promise<void> {
         </div>
       </div>
       <div class="sophia-detail-meta">
-        <span>Type: ${esc(ki.source_type)}</span>
-        ${ki.created ? `<span>Created: ${new Date(ki.created).toLocaleString('ja-JP')}</span>` : ''}
-        ${ki.updated ? `<span>Updated: ${new Date(ki.updated).toLocaleString('ja-JP')}</span>` : ''}
+        <span>種別: ${esc(ki.source_type)}</span>
+        ${ki.created ? `<span>作成日: ${new Date(ki.created).toLocaleString('ja-JP')}</span>` : ''}
+        ${ki.updated ? `<span>更新日: ${new Date(ki.updated).toLocaleString('ja-JP')}</span>` : ''}
         <span>${Math.round(ki.size_bytes / 1024)}KB</span>
       </div>
       ${ki.backlinks.length > 0 ? `
         <div class="sophia-backlinks">
-          <strong>🔗 Backlinks:</strong>
+          <strong>🔗 逆リンク:</strong>
           ${ki.backlinks.map(bl => `<a href="#" class="sophia-backlink" data-ki-id="${esc(bl)}">${esc(bl)}</a>`).join(', ')}
         </div>
       ` : ''}

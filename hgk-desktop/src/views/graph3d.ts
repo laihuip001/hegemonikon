@@ -154,30 +154,9 @@ export async function renderGraph3D(): Promise<void> {
         .filter(e => nodeById.has(e.source) && nodeById.has(e.target))
         .map(e => ({ source: e.source, target: e.target, edge: e }));
 
-    // Bridge disconnected components: add weak virtual links between
-    // same-series nodes across components (e.g., O1↔O3, O2↔O4)
-    const SERIES_LIST = ['O', 'S', 'H', 'P', 'K', 'A'];
-    const dummyEdge: GraphEdge = {
-        id: 'virtual', pair: 'virtual',
-        source: '', target: '', type: 'virtual',
-        naturality: 'structural', shared_coordinate: 'series',
-        meaning: 'series bridge',
-    };
-    SERIES_LIST.forEach(s => {
-        const group = simNodes.filter(n => n.series === s);
-        // Connect index 1,2 nodes with index 3,4 nodes
-        const compA = group.filter(n => parseInt(n.id.slice(-1)) <= 2);
-        const compB = group.filter(n => parseInt(n.id.slice(-1)) > 2);
-        compA.forEach(a => {
-            compB.forEach(b => {
-                simLinks.push({ source: a.id, target: b.id, edge: { ...dummyEdge, source: a.id, target: b.id } });
-            });
-        });
-    });
-
     const simulation = forceSimulation(simNodes, 3)
-        .force('link', forceLink(simLinks).id((d: SimNode) => d.id).distance(20).strength(0.5))
-        .force('charge', forceManyBody().strength(-50).distanceMax(150))
+        .force('link', forceLink(simLinks).id((d: SimNode) => d.id).distance(18).strength(0.5))
+        .force('charge', forceManyBody().strength(-40).distanceMax(120))
         .force('center', forceCenter(0, 0, 0).strength(0.05))
         .alpha(1.0)
         .alphaDecay(0.008)

@@ -99,6 +99,26 @@ export const api = {
             body: JSON.stringify({ title, reaction, series }),
         }),
     pksStats: () => apiFetch<PKSStatsResponse>('/api/pks/stats'),
+
+    // Gnōsis Narrator
+    gnosisPapers: (query = '', limit = 20) =>
+        apiFetch<GnosisPapersResponse>(`/api/gnosis/papers?query=${encodeURIComponent(query)}&limit=${limit}`),
+    gnosisNarrate: (title: string, fmt = 'deep_dive') =>
+        apiFetch<GnosisNarrateResponse>('/api/gnosis/narrate', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ title, fmt }),
+        }),
+
+    // CCL + Workflows
+    cclParse: (ccl: string) =>
+        apiFetch<CCLParseResponse>('/api/ccl/parse', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ ccl }),
+        }),
+    wfList: () => apiFetch<WFListResponse>('/api/wf/list'),
+    wfDetail: (name: string) => apiFetch<WFDetailResponse>(`/api/wf/${encodeURIComponent(name)}`),
 };
 
 // --- Notification Types ---
@@ -179,4 +199,69 @@ export interface GraphFullResponse {
         trigonon: { vertices: string[]; description: string };
         naturality: Record<string, string>;
     };
+}
+
+// --- Gnōsis Narrator Types ---
+export interface PaperCard {
+    title: string;
+    authors: string;
+    abstract: string;
+    source: string;
+    topics: string[];
+    relevance_score: number;
+    question: string;  // kalon: この論文が投げかける問い
+}
+
+export interface GnosisPapersResponse {
+    timestamp: string;
+    papers: PaperCard[];
+    total: number;
+}
+
+export interface NarrateSegment {
+    speaker: string;
+    content: string;
+}
+
+export interface GnosisNarrateResponse {
+    timestamp: string;
+    title: string;
+    fmt: string;
+    segments: NarrateSegment[];
+    icon: string;
+    generated: boolean;
+}
+
+// --- CCL Types ---
+export interface CCLParseResponse {
+    success: boolean;
+    ccl: string;
+    tree: string | null;
+    workflows: string[];
+    wf_paths: Record<string, string>;
+    plan_template: string | null;
+    error: string | null;
+}
+
+export interface WFSummary {
+    name: string;
+    description: string;
+    ccl: string;
+    modes: string[];
+}
+
+export interface WFListResponse {
+    total: number;
+    workflows: WFSummary[];
+}
+
+export interface WFDetailResponse {
+    name: string;
+    description: string;
+    ccl: string;
+    stages: Array<{ name?: string; description?: string }>;
+    modes: string[];
+    source_path: string | null;
+    raw_content: string | null;
+    metadata: Record<string, unknown>;
 }

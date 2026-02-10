@@ -13,7 +13,12 @@ import type {
   PKSPushResponse,
   PKSNugget,
   PKSStatsResponse,
+  PaperCard,
+  GnosisPapersResponse,
+  GnosisNarrateResponse,
 } from './api/client';
+import { recordView, renderUsageCard } from './telemetry';
+import { initCommandPalette } from './command_palette';
 import './styles.css';
 
 // ─── Utilities ───────────────────────────────────────────────
@@ -64,6 +69,10 @@ document.addEventListener('DOMContentLoaded', () => {
   // Start global badge polling
   void updateNotifBadge();
   setInterval(() => { void updateNotifBadge(); }, 60_000);
+  // PKS auto-push on startup (fire-and-forget)
+  void api.pksTriggerPush().catch(() => { /* silent */ });
+  // CCL Command Palette — Ctrl+K
+  initCommandPalette();
 });
 
 function setupNavigation(): void {
@@ -99,6 +108,7 @@ function navigate(route: string): void {
   if (route === currentRoute) return;
   currentRoute = route;
   clearPolling();
+  recordView(route);
 
   document.querySelectorAll('nav button').forEach(btn => {
     btn.classList.toggle('active', btn.getAttribute('data-route') === route);
@@ -181,6 +191,7 @@ async function renderDashboardContent(): Promise<void> {
       </div>
     </div>
     ${renderHealthItems(health)}
+    ${renderUsageCard()}
   `;
 }
 
@@ -323,13 +334,69 @@ async function renderFepContent(): Promise<void> {
   });
 }
 
-// ─── Gnōsis Search ───────────────────────────────────────────
+// ─── Gnōsis Narrator ─── kalon: 知識は問いとして走ってくる ──
+
+function renderPaperCard(p: PaperCard): string {
+  const score = p.relevance_score > 0
+    ? `<span class="nr-score">${(p.relevance_score * 100).toFixed(0)}%</span>`
+    : '';
+  const topics = p.topics.length > 0
+    ? p.topics.slice(0, 3).map(t => `<span class="nr-tag">${esc(t)}</span>`).join('')
+    : '';
+  return `
+    <div class="nr-card" data-title="${esc(p.title)}">
+      <div class="nr-card-header">
+        <h3 class="nr-title">${esc(p.title)}</h3>
+        ${score}
+      </div>
+      ${p.authors ? `<div class="nr-authors">${esc(p.authors)}</div>` : ''}
+      ${topics ? `<div class="nr-topics">${topics}</div>` : ''}
+      ${p.abstract ? `<p class="nr-abstract">${esc(p.abstract.substring(0, 200))}${p.abstract.length > 200 ? '...' : ''}</p>` : ''}
+      ${p.question ? `<div class="nr-question">💡 ${esc(p.question)}</div>` : ''}
+      <div class="nr-actions">
+        <button class="btn btn-sm nr-narrate-btn" data-title="${esc(p.title)}" data-fmt="deep_dive">🎙️ Narrate</button>
+        <button class="btn btn-sm btn-outline nr-narrate-btn" data-title="${esc(p.title)}" data-fmt="brief">📝 Brief</button>
+        <button class="btn btn-sm btn-outline nr-narrate-btn" data-title="${esc(p.title)}" data-fmt="critique">🔍 Critique</button>
+      </div>
+      <div class="nr-narration" style="display:none;"></div>
+    </div>
+  `;
+}
+
+async function handleNarrate(btn: HTMLButtonElement): Promise<void> {
+  const title = btn.dataset.title ?? '';
+  const fmt = btn.dataset.fmt ?? 'deep_dive';
+  const card = btn.closest('.nr-card') as HTMLElement;
+  const narrationDiv = card.querySelector('.nr-narration') as HTMLElement;
+
+  narrationDiv.style.display = 'block';
+  narrationDiv.innerHTML = '<div class="loading">Generating narration...</div>';
+
+  try {
+    const res: GnosisNarrateResponse = await api.gnosisNarrate(title, fmt);
+    if (!res.generated || res.segments.length === 0) {
+      narrationDiv.innerHTML = '<div class="nr-narration-empty">Narration not available</div>';
+      return;
+    }
+    narrationDiv.innerHTML = `
+      <div class="nr-narration-header">${esc(res.icon)} ${esc(res.fmt.toUpperCase())}</div>
+      ${res.segments.map(s => `
+        <div class="nr-segment">
+          <span class="nr-speaker">${esc(s.speaker)}:</span>
+          <span class="nr-content">${esc(s.content)}</span>
+        </div>
+      `).join('')}
+    `;
+  } catch (e) {
+    narrationDiv.innerHTML = `<div class="status-error">Narration failed: ${esc((e as Error).message)}</div>`;
+  }
+}
 
 async function renderGnosis(): Promise<void> {
   let stats: GnosisStatsResponse | null = null;
   try {
     stats = await api.gnosisStats();
-  } catch { /* ok, show search anyway */ }
+  } catch { /* ok */ }
 
   const app = document.getElementById('view-content')!;
 
@@ -363,13 +430,15 @@ async function renderGnosis(): Promise<void> {
     <div class="card">
       <div style="display:flex; gap:0.5rem;">
         <input type="text" id="gnosis-search-input" class="input" placeholder="Search knowledge base..." style="flex:1;" />
-        <button id="gnosis-search-btn" class="btn">Search</button>
+        <button id="gnosis-search-btn" class="btn">🔍 Search</button>
+        <button id="gnosis-papers-btn" class="btn btn-outline">📚 Papers</button>
       </div>
     </div>
     <div id="search-results"></div>
   `;
 
   const searchBtn = document.getElementById('gnosis-search-btn')!;
+  const papersBtn = document.getElementById('gnosis-papers-btn')!;
   const searchInput = document.getElementById('gnosis-search-input') as HTMLInputElement;
 
   const doSearch = async (): Promise<void> => {
@@ -395,7 +464,31 @@ async function renderGnosis(): Promise<void> {
     }
   };
 
+  const loadPapers = async (): Promise<void> => {
+    const query = searchInput.value.trim();
+    const resultsDiv = document.getElementById('search-results')!;
+    resultsDiv.innerHTML = '<div class="loading">Loading papers...</div>';
+    try {
+      const res: GnosisPapersResponse = await api.gnosisPapers(query, 20);
+      if (res.papers.length === 0) {
+        resultsDiv.innerHTML = '<div class="card">No papers found.</div>';
+        return;
+      }
+      resultsDiv.innerHTML = `
+        <div class="nr-header">📚 ${res.total} papers ${query ? `matching "${esc(query)}"` : ''}</div>
+        ${res.papers.map(p => renderPaperCard(p)).join('')}
+      `;
+      // Bind narrate buttons
+      resultsDiv.querySelectorAll('.nr-narrate-btn').forEach(btn => {
+        btn.addEventListener('click', () => void handleNarrate(btn as HTMLButtonElement));
+      });
+    } catch (e) {
+      resultsDiv.innerHTML = `<div class="card status-error">Papers load failed: ${esc((e as Error).message)}</div>`;
+    }
+  };
+
   searchBtn.addEventListener('click', doSearch);
+  papersBtn.addEventListener('click', () => void loadPapers());
   searchInput.addEventListener('keydown', (e: KeyboardEvent) => {
     if (e.key === 'Enter') void doSearch();
   });
@@ -603,6 +696,24 @@ async function renderNotificationsContent(): Promise<void> {
     if (currentRoute !== 'notifications') return;
     app.innerHTML = `<div class="card status-error">通知を取得できません: ${esc((err as Error).message)}</div>`;
     return;
+  }
+
+  // Merge PKS nuggets as virtual notifications
+  const pksNuggets = await api.pksPush().catch((): null => null);
+  if (pksNuggets && pksNuggets.nuggets.length > 0) {
+    const pksAsNotifs: Notification[] = pksNuggets.nuggets.map((n) => ({
+      id: `pks-${n.title.slice(0, 20)}`,
+      timestamp: pksNuggets.timestamp,
+      source: '📡 PKS',
+      level: 'INFO' as const,
+      title: n.title,
+      body: (n.push_reason ? `💡 ${n.push_reason}\n` : '') +
+        (n.abstract ? n.abstract.substring(0, 200) : '') +
+        (n.relevance_score ? `\nRelevance: ${(n.relevance_score * 100).toFixed(0)}%` : ''),
+      data: { pks: true, relevance_score: n.relevance_score },
+    }));
+    // Prepend PKS notifications (most recent first)
+    notifications = [...pksAsNotifs, ...notifications];
   }
 
   const app = document.getElementById('view-content')!;

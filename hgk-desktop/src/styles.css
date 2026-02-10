@@ -775,3 +775,470 @@ main:has(#graph-container) {
   border-radius: 12px;
   font-weight: 500;
 }
+
+/* ─── Telemetry ────────────────────────────────────────────── */
+
+.telemetry-card {
+  margin-top: 1rem;
+}
+
+.telemetry-total {
+  font-size: 0.8rem;
+  color: #8b949e;
+  margin-bottom: 0.5rem;
+}
+
+.telemetry-empty {
+  color: #8b949e;
+  font-style: italic;
+  padding: 0.5rem 0;
+}
+
+.telemetry-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.35rem;
+}
+
+.telemetry-route {
+  min-width: 100px;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.telemetry-bar-bg {
+  flex: 1;
+  height: 8px;
+  background: var(--border-color);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.telemetry-bar {
+  height: 100%;
+  background: linear-gradient(90deg, #58a6ff, #6e40c9);
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+.telemetry-count {
+  min-width: 30px;
+  text-align: right;
+  font-size: 0.8rem;
+  color: #8b949e;
+  font-weight: 600;
+}
+
+/* ─── Gnōsis Narrator ──────────────────────────────────────── */
+/* kalon: 知識は問いとして走ってくる */
+
+.nr-header {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #c9d1d9;
+  margin: 1rem 0 0.5rem;
+}
+
+.nr-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 0.75rem;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.nr-card:hover {
+  border-color: #58a6ff;
+  box-shadow: 0 0 12px rgba(88, 166, 255, 0.1);
+}
+
+.nr-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+
+.nr-title {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #c9d1d9;
+  line-height: 1.3;
+}
+
+.nr-score {
+  flex-shrink: 0;
+  background: linear-gradient(135deg, #238636, #2ea043);
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.15rem 0.5rem;
+  border-radius: 12px;
+}
+
+.nr-authors {
+  font-size: 0.8rem;
+  color: #8b949e;
+  margin-top: 0.25rem;
+}
+
+.nr-topics {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  margin-top: 0.4rem;
+}
+
+.nr-tag {
+  font-size: 0.72rem;
+  background: rgba(88, 166, 255, 0.12);
+  color: #58a6ff;
+  padding: 0.1rem 0.45rem;
+  border-radius: 10px;
+  font-weight: 500;
+}
+
+.nr-abstract {
+  font-size: 0.85rem;
+  color: #8b949e;
+  margin: 0.5rem 0 0;
+  line-height: 1.45;
+}
+
+/* 💡 kalon: 問いの一行 — 視覚的アフォーダンス */
+.nr-question {
+  margin-top: 0.6rem;
+  padding: 0.5rem 0.75rem;
+  background: linear-gradient(135deg, rgba(136, 87, 229, 0.08), rgba(88, 166, 255, 0.08));
+  border-left: 3px solid #8957e5;
+  border-radius: 0 6px 6px 0;
+  font-size: 0.88rem;
+  color: #d2a8ff;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.nr-actions {
+  display: flex;
+  gap: 0.4rem;
+  margin-top: 0.6rem;
+}
+
+.btn-sm {
+  font-size: 0.78rem;
+  padding: 0.25rem 0.6rem;
+}
+
+.btn-outline {
+  background: transparent;
+  border: 1px solid var(--border-color);
+  color: #8b949e;
+}
+
+.btn-outline:hover {
+  border-color: #58a6ff;
+  color: #58a6ff;
+}
+
+/* narration expanded */
+.nr-narration {
+  margin-top: 0.75rem;
+  padding: 0.75rem;
+  background: rgba(22, 27, 34, 0.6);
+  border-radius: 6px;
+  border: 1px solid rgba(88, 166, 255, 0.15);
+}
+
+.nr-narration-header {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #58a6ff;
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.nr-narration-empty {
+  color: #8b949e;
+  font-style: italic;
+  font-size: 0.85rem;
+}
+
+.nr-segment {
+  margin-bottom: 0.5rem;
+  line-height: 1.5;
+}
+
+.nr-speaker {
+  font-weight: 700;
+  color: #f0883e;
+  font-size: 0.82rem;
+  margin-right: 0.25rem;
+}
+
+.nr-content {
+  font-size: 0.85rem;
+  color: #c9d1d9;
+}
+
+/* ─── Command Palette ──────────────────────────────────────── */
+/* Ctrl+K で起動する CCL コマンドパレット */
+
+.cp-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding-top: 15vh;
+  backdrop-filter: blur(4px);
+  animation: cp-fade-in 0.15s ease;
+}
+
+@keyframes cp-fade-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+.cp-dialog {
+  width: min(640px, 90vw);
+  background: #161b22;
+  border: 1px solid #30363d;
+  border-radius: 12px;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.4);
+  overflow: hidden;
+  animation: cp-slide-in 0.15s ease;
+}
+
+@keyframes cp-slide-in {
+  from {
+    transform: translateY(-10px);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.cp-input-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid #30363d;
+}
+
+.cp-icon {
+  font-size: 1.1rem;
+  color: #8b949e;
+}
+
+.cp-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: #c9d1d9;
+  font-size: 1rem;
+  outline: none;
+  font-family: inherit;
+}
+
+.cp-input::placeholder {
+  color: #484f58;
+}
+
+.cp-kbd {
+  font-size: 0.7rem;
+  background: #21262d;
+  color: #8b949e;
+  padding: 0.15rem 0.4rem;
+  border-radius: 4px;
+  border: 1px solid #30363d;
+  font-family: monospace;
+}
+
+.cp-results {
+  max-height: 400px;
+  overflow-y: auto;
+  padding: 0.5rem;
+}
+
+.cp-footer {
+  display: flex;
+  gap: 1rem;
+  padding: 0.4rem 1rem;
+  border-top: 1px solid #30363d;
+  font-size: 0.72rem;
+  color: #484f58;
+}
+
+/* items */
+.cp-item {
+  padding: 0.6rem 0.75rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.1s;
+}
+
+.cp-item:hover,
+.cp-item-active {
+  background: rgba(88, 166, 255, 0.08);
+}
+
+.cp-item-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.cp-item-name {
+  font-weight: 600;
+  color: #58a6ff;
+  font-size: 0.9rem;
+}
+
+.cp-item-ccl {
+  font-family: monospace;
+  font-size: 0.75rem;
+  color: #8b949e;
+}
+
+.cp-item-desc {
+  font-size: 0.8rem;
+  color: #8b949e;
+  margin-top: 0.15rem;
+  line-height: 1.3;
+}
+
+.cp-item-modes {
+  display: flex;
+  gap: 0.25rem;
+  margin-top: 0.3rem;
+}
+
+.cp-mode-tag {
+  font-size: 0.68rem;
+  background: rgba(136, 87, 229, 0.15);
+  color: #d2a8ff;
+  padding: 0.1rem 0.4rem;
+  border-radius: 8px;
+  font-weight: 500;
+}
+
+.cp-empty {
+  padding: 1rem;
+  text-align: center;
+  color: #484f58;
+  font-style: italic;
+}
+
+.cp-loading {
+  padding: 1rem;
+  text-align: center;
+  color: #8b949e;
+}
+
+/* Parse result */
+.cp-parse-result {
+  padding: 0.75rem;
+}
+
+.cp-parse-header {
+  font-size: 0.85rem;
+  color: #3fb950;
+  margin-bottom: 0.5rem;
+}
+
+.cp-parse-header code {
+  background: #21262d;
+  padding: 0.15rem 0.4rem;
+  border-radius: 4px;
+  font-size: 0.82rem;
+}
+
+.cp-parse-error {
+  padding: 0.75rem;
+  color: #f85149;
+  font-size: 0.85rem;
+}
+
+.cp-parse-tree {
+  font-family: monospace;
+  font-size: 0.78rem;
+  color: #c9d1d9;
+  background: #0d1117;
+  padding: 0.5rem;
+  border-radius: 6px;
+  overflow-x: auto;
+  margin: 0.5rem 0;
+  white-space: pre;
+}
+
+.cp-parse-wfs,
+.cp-parse-plan {
+  font-size: 0.82rem;
+  color: #8b949e;
+  margin-top: 0.5rem;
+}
+
+.cp-parse-plan {
+  font-family: monospace;
+  font-size: 0.75rem;
+  background: #0d1117;
+  padding: 0.5rem;
+  border-radius: 6px;
+  white-space: pre-wrap;
+}
+
+/* WF detail view */
+.cp-wf-detail {
+  padding: 0.75rem;
+}
+
+.cp-wf-detail h3 {
+  margin: 0 0 0.5rem;
+  color: #58a6ff;
+  font-size: 1rem;
+}
+
+.cp-wf-detail p {
+  color: #c9d1d9;
+  font-size: 0.85rem;
+  margin: 0 0 0.5rem;
+  line-height: 1.4;
+}
+
+.cp-wf-ccl,
+.cp-wf-modes,
+.cp-wf-stages {
+  font-size: 0.82rem;
+  color: #8b949e;
+  margin-top: 0.4rem;
+}
+
+.cp-wf-ccl code {
+  background: #21262d;
+  padding: 0.1rem 0.35rem;
+  border-radius: 4px;
+}
+
+.cp-wf-stages ol {
+  margin: 0.3rem 0 0 1.2rem;
+  padding: 0;
+}
+
+.cp-wf-stages li {
+  margin-bottom: 0.2rem;
+}

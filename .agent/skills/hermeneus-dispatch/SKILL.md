@@ -14,6 +14,13 @@ triggers:
   - "ワークフロー式"
   - "演算子"
 version: "3.0"
+
+# Safety Contract
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks: []
+fallbacks: []
 ---
 
 # Hermēneus CCL Dispatch v3.0

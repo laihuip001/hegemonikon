@@ -17,7 +17,6 @@ Usage:
 """
 
 import asyncio
-import aiohttp
 import functools
 import logging
 import os
@@ -26,7 +25,15 @@ import uuid
 import random  # AI-022: Thundering Herd 対策用
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Optional
+from typing import Optional, TYPE_CHECKING, Any
+
+# Optional aiohttp support
+try:
+    import aiohttp
+    AIOHTTP_AVAILABLE = True
+except ImportError:
+    AIOHTTP_AVAILABLE = False
+    aiohttp = None  # type: ignore
 
 # Optional OpenTelemetry support for distributed tracing
 try:
@@ -173,7 +180,7 @@ def with_retry(
     backoff_factor: float = 2.0,
     initial_delay: float = 1.0,
     max_delay: float = 60.0,
-    retryable_exceptions: tuple = (RateLimitError, aiohttp.ClientError),
+    retryable_exceptions: tuple | None = None,
 ):
     """
     Decorator for async functions with exponential backoff retry.
@@ -185,6 +192,11 @@ def with_retry(
         max_delay: Maximum delay cap
         retryable_exceptions: Tuple of exceptions to retry on
     """
+    if retryable_exceptions is None:
+        if AIOHTTP_AVAILABLE:
+            retryable_exceptions = (RateLimitError, aiohttp.ClientError)
+        else:
+            retryable_exceptions = (RateLimitError,)
 
     # PURPOSE: decorator の処理
     def decorator(func):
@@ -255,7 +267,7 @@ class JulesClient:
     def __init__(
         self,
         api_key: Optional[str] = None,
-        session: Optional[aiohttp.ClientSession] = None,
+        session: Optional[Any] = None,
         max_concurrent: Optional[int] = None,
         base_url: Optional[str] = None,
     ):
@@ -268,6 +280,11 @@ class JulesClient:
             max_concurrent: Global concurrency limit. Defaults to MAX_CONCURRENT.
             base_url: Override API base URL. Also reads JULES_BASE_URL env var.
         """
+        if not AIOHTTP_AVAILABLE:
+            raise ImportError(
+                "aiohttp is required for JulesClient. Install it with: pip install aiohttp"
+            )
+
         self.api_key = api_key or os.environ.get("JULES_API_KEY")
         if not self.api_key:
             raise ValueError("API key required. Set JULES_API_KEY or pass api_key.")
@@ -280,7 +297,7 @@ class JulesClient:
             "Content-Type": "application/json",
         }
         self._shared_session = session
-        self._owned_session: Optional[aiohttp.ClientSession] = None
+        self._owned_session: Optional[Any] = None
 
         # Global semaphore for cross-batch rate limiting (th-003 fix)
         self._global_semaphore = asyncio.Semaphore(
@@ -289,7 +306,7 @@ class JulesClient:
 
     async def __aenter__(self):
         """Context manager entry - creates pooled session for connection reuse."""
-        if self._shared_session is None:
+        if self._shared_session is None and AIOHTTP_AVAILABLE:
             # Connection pooling: reuse TCP connections (cl-004, as-008 fix)
             connector = aiohttp.TCPConnector(
                 limit=self.MAX_CONCURRENT,  # Max concurrent connections
@@ -306,8 +323,10 @@ class JulesClient:
             self._owned_session = None
 
     @property
-    def _session(self) -> aiohttp.ClientSession:
+    def _session(self) -> Any:
         """Get the active session (shared or owned)."""
+        if not AIOHTTP_AVAILABLE:
+            raise ImportError("aiohttp is required")
         return self._shared_session or self._owned_session or aiohttp.ClientSession()
 
     async def _request(
@@ -335,6 +354,9 @@ class JulesClient:
             RateLimitError: If rate limited
             aiohttp.ClientResponseError: For other HTTP errors
         """
+        if not AIOHTTP_AVAILABLE:
+            raise ImportError("aiohttp is required")
+
         url = f"{self.base_url}/{endpoint}"
 
         # Create session if not in context manager
@@ -377,7 +399,7 @@ class JulesClient:
 
     # PURPOSE: Create a new Jules session
     @with_retry(
-        max_attempts=3, retryable_exceptions=(RateLimitError, aiohttp.ClientError)
+        max_attempts=3
     )
     async def create_session(
         self,
@@ -422,7 +444,7 @@ class JulesClient:
 
     # PURPOSE: Get session status
     @with_retry(
-        max_attempts=3, retryable_exceptions=(RateLimitError, aiohttp.ClientError)
+        max_attempts=3
     )
     async def get_session(self, session_id: str) -> JulesSession:
         """

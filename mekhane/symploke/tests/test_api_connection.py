@@ -13,12 +13,20 @@ import pytest
 # Add parent to path
 sys.path.insert(0, "/home/makaron8426/oikos/hegemonikon")
 
+# Try to import aiohttp first to determine if we should skip
+try:
+    import aiohttp
+    HAS_AIOHTTP = True
+except ImportError:
+    HAS_AIOHTTP = False
+
 from mekhane.symploke.jules_client import JulesClient
 
 
 # PURPOSE: Test API connection by listing sources
 @pytest.mark.asyncio
 @pytest.mark.skipif(not os.environ.get("JULES_API_KEY"), reason="JULES_API_KEY not set")
+@pytest.mark.skipif(not HAS_AIOHTTP, reason="aiohttp not installed")
 async def test_connection():
     """Test API connection by listing sources."""
     api_key = os.environ.get("JULES_API_KEY")
@@ -75,5 +83,8 @@ async def test_connection():
 
 
 if __name__ == "__main__":
+    if not HAS_AIOHTTP:
+        print("Skipping test: aiohttp not installed")
+        sys.exit(0)
     result = asyncio.run(test_connection())
     sys.exit(0 if result else 1)

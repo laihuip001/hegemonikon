@@ -9,6 +9,12 @@ triggers:
   - "dendron"
   - "checker"
   - "なぜ存在する"
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks: []
+fallbacks: []
+
 ---
 
 # Dendron EPT Checker

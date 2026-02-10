@@ -10,6 +10,12 @@ triggers:
   - "TODO"
   - "整理"
   - "morphism"
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks: []
+fallbacks: []
+
 ---
 
 # Taxis Classifier

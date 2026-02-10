@@ -9,6 +9,12 @@ triggers:
   - "peira"
   - "動作確認"
   - "テスト"
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks: []
+fallbacks: []
+
 ---
 
 # Peira Health Check

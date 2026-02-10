@@ -1,14 +1,20 @@
 ---
 name: Peira Health Check
-description: システム全体のヘルスチェック・健全性確認
+description: "\u30B7\u30B9\u30C6\u30E0\u5168\u4F53\u306E\u30D8\u30EB\u30B9\u30C1\u30A7\
+  \u30C3\u30AF\u30FB\u5065\u5168\u6027\u78BA\u8A8D"
 triggers:
-  - "ヘルス"
-  - "健全"
-  - "health"
-  - "状態"
-  - "peira"
-  - "動作確認"
-  - "テスト"
+- "\u30D8\u30EB\u30B9"
+- "\u5065\u5168"
+- health
+- "\u72B6\u614B"
+- peira
+- "\u52D5\u4F5C\u78BA\u8A8D"
+- "\u30C6\u30B9\u30C8"
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks: []
+fallbacks: []
 ---
 
 # Peira Health Check

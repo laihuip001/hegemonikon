@@ -1,19 +1,26 @@
 ---
-name: Hermēneus CCL Dispatch
-description: CCL 式を検出したら Hermēneus パーサーで構造解析し、AST に基づいて実行する
+name: "Herm\u0113neus CCL Dispatch"
+description: "CCL \u5F0F\u3092\u691C\u51FA\u3057\u305F\u3089 Herm\u0113neus \u30D1\
+  \u30FC\u30B5\u30FC\u3067\u69CB\u9020\u89E3\u6790\u3057\u3001AST \u306B\u57FA\u3065\
+  \u3044\u3066\u5B9F\u884C\u3059\u308B"
 triggers:
-  - "/"
-  - "~"
-  - "~*"
-  - "~!"
-  - ">>"
-  - "@"
-  - "CCL"
-  - "ccl"
-  - "マクロ"
-  - "ワークフロー式"
-  - "演算子"
-version: "3.0"
+- /
+- '~'
+- ~*
+- ~!
+- '>>'
+- '@'
+- CCL
+- ccl
+- "\u30DE\u30AF\u30ED"
+- "\u30EF\u30FC\u30AF\u30D5\u30ED\u30FC\u5F0F"
+- "\u6F14\u7B97\u5B50"
+version: '3.0'
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks: []
+fallbacks: []
 ---
 
 # Hermēneus CCL Dispatch v3.0

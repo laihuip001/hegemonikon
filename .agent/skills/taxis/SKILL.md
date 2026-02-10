@@ -1,15 +1,21 @@
 ---
 name: Taxis Classifier
-description: タスク/入力の自動分類・優先順位付け
+description: "\u30BF\u30B9\u30AF/\u5165\u529B\u306E\u81EA\u52D5\u5206\u985E\u30FB\u512A\
+  \u5148\u9806\u4F4D\u4ED8\u3051"
 triggers:
-  - "分類"
-  - "優先"
-  - "タスク"
-  - "taxis"
-  - "振り分け"
-  - "TODO"
-  - "整理"
-  - "morphism"
+- "\u5206\u985E"
+- "\u512A\u5148"
+- "\u30BF\u30B9\u30AF"
+- taxis
+- "\u632F\u308A\u5206\u3051"
+- TODO
+- "\u6574\u7406"
+- morphism
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks: []
+fallbacks: []
 ---
 
 # Taxis Classifier

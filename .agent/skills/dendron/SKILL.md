@@ -1,14 +1,20 @@
 ---
 name: Dendron EPT Checker
-description: コード品質・存在証明 (PROOF.md) の検証を実行する
+description: "\u30B3\u30FC\u30C9\u54C1\u8CEA\u30FB\u5B58\u5728\u8A3C\u660E (PROOF.md)\
+  \ \u306E\u691C\u8A3C\u3092\u5B9F\u884C\u3059\u308B"
 triggers:
-  - "品質"
-  - "PROOF"
-  - "存在証明"
-  - "EPT"
-  - "dendron"
-  - "checker"
-  - "なぜ存在する"
+- "\u54C1\u8CEA"
+- PROOF
+- "\u5B58\u5728\u8A3C\u660E"
+- EPT
+- dendron
+- checker
+- "\u306A\u305C\u5B58\u5728\u3059\u308B"
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks: []
+fallbacks: []
 ---
 
 # Dendron EPT Checker

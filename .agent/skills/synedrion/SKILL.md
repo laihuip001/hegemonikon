@@ -1,15 +1,21 @@
 ---
 name: Synedrion Council
-description: 偉人評議会 (Synedrion) による多角的レビュー・監査
+description: "\u5049\u4EBA\u8A55\u8B70\u4F1A (Synedrion) \u306B\u3088\u308B\u591A\u89D2\
+  \u7684\u30EC\u30D3\u30E5\u30FC\u30FB\u76E3\u67FB"
 triggers:
-  - "評議会"
-  - "レビュー"
-  - "監査"
-  - "synedrion"
-  - "偉人"
-  - "多角"
-  - "批評"
-  - "/syn"
+- "\u8A55\u8B70\u4F1A"
+- "\u30EC\u30D3\u30E5\u30FC"
+- "\u76E3\u67FB"
+- synedrion
+- "\u5049\u4EBA"
+- "\u591A\u89D2"
+- "\u6279\u8A55"
+- /syn
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks: []
+fallbacks: []
 ---
 
 # Synedrion Council

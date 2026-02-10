@@ -1,27 +1,33 @@
 ---
 name: FEP Cognitive Engine
-description: |
-  FEP (自由エネルギー原理) に基づく認知設計原理。
-  「全てを説明する理論」ではなく「行動選択の objective」として FEP を使う。
-  VFE/EFE の数学的分解、精度加重の操作的定義、HGK 体系との対応を含む。
-
+description: "FEP (\u81EA\u7531\u30A8\u30CD\u30EB\u30AE\u30FC\u539F\u7406) \u306B\u57FA\
+  \u3065\u304F\u8A8D\u77E5\u8A2D\u8A08\u539F\u7406\u3002\n\u300C\u5168\u3066\u3092\
+  \u8AAC\u660E\u3059\u308B\u7406\u8AD6\u300D\u3067\u306F\u306A\u304F\u300C\u884C\u52D5\
+  \u9078\u629E\u306E objective\u300D\u3068\u3057\u3066 FEP \u3092\u4F7F\u3046\u3002\
+  \nVFE/EFE \u306E\u6570\u5B66\u7684\u5206\u89E3\u3001\u7CBE\u5EA6\u52A0\u91CD\u306E\
+  \u64CD\u4F5C\u7684\u5B9A\u7FA9\u3001HGK \u4F53\u7CFB\u3068\u306E\u5BFE\u5FDC\u3092\
+  \u542B\u3080\u3002\n"
 triggers:
-  - "FEP"
-  - "自由エネルギー"
-  - "認知"
-  - "意思決定"
-  - "予測誤差"
-  - "能動推論"
-  - "active inference"
-  - "EFE"
-  - "precision"
-  - "精度加重"
-  - "attractor"
-  - "series"
-
-version: "2.0.0"
-lineage: |
-  v1.1 (手順のみ) → /sop deep 15論点50論文調査 (2026-02-10) → /noe+ 3命題抽出 → v2.0
+- FEP
+- "\u81EA\u7531\u30A8\u30CD\u30EB\u30AE\u30FC"
+- "\u8A8D\u77E5"
+- "\u610F\u601D\u6C7A\u5B9A"
+- "\u4E88\u6E2C\u8AA4\u5DEE"
+- "\u80FD\u52D5\u63A8\u8AD6"
+- active inference
+- EFE
+- precision
+- "\u7CBE\u5EA6\u52A0\u91CD"
+- attractor
+- series
+version: 2.0.0
+lineage: "v1.1 (\u624B\u9806\u306E\u307F) \u2192 /sop deep 15\u8AD6\u70B950\u8AD6\u6587\
+  \u8ABF\u67FB (2026-02-10) \u2192 /noe+ 3\u547D\u984C\u62BD\u51FA \u2192 v2.0\n"
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks: []
+fallbacks: []
 ---
 
 # FEP Cognitive Engine v2.0

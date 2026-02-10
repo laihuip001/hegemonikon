@@ -1,17 +1,23 @@
 ---
 name: Synteleia WBC
-description: 安全性チェック・白血球 (WBC) による不正操作検知
+description: "\u5B89\u5168\u6027\u30C1\u30A7\u30C3\u30AF\u30FB\u767D\u8840\u7403 (WBC)\
+  \ \u306B\u3088\u308B\u4E0D\u6B63\u64CD\u4F5C\u691C\u77E5"
 triggers:
-  - "安全"
-  - "安全性"
-  - "リスク"
-  - "白血球"
-  - "WBC"
-  - "synteleia"
-  - "免疫"
-  - "検証"
-  - "監査"
-  - "audit"
+- "\u5B89\u5168"
+- "\u5B89\u5168\u6027"
+- "\u30EA\u30B9\u30AF"
+- "\u767D\u8840\u7403"
+- WBC
+- synteleia
+- "\u514D\u75AB"
+- "\u691C\u8A3C"
+- "\u76E3\u67FB"
+- audit
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks: []
+fallbacks: []
 ---
 
 # Synteleia WBC (白血球)

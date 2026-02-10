@@ -1,14 +1,20 @@
 ---
 name: Poiema Generator
-description: 構造化出力の生成 (Boot レポート, Handoff, 定型ドキュメント)
+description: "\u69CB\u9020\u5316\u51FA\u529B\u306E\u751F\u6210 (Boot \u30EC\u30DD\u30FC\
+  \u30C8, Handoff, \u5B9A\u578B\u30C9\u30AD\u30E5\u30E1\u30F3\u30C8)"
 triggers:
-  - "生成"
-  - "レポート"
-  - "Handoff"
-  - "出力"
-  - "poiema"
-  - "テンプレート"
-  - "ドキュメント生成"
+- "\u751F\u6210"
+- "\u30EC\u30DD\u30FC\u30C8"
+- Handoff
+- "\u51FA\u529B"
+- poiema
+- "\u30C6\u30F3\u30D7\u30EC\u30FC\u30C8"
+- "\u30C9\u30AD\u30E5\u30E1\u30F3\u30C8\u751F\u6210"
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks: []
+fallbacks: []
 ---
 
 # Poiema Generator

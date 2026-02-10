@@ -1,52 +1,58 @@
 ---
-id: "U1"
+id: U1
 name: antigravity-ide-expert
 series: Utils
-
-description: |
-  Antigravity IDE の利用ガイド・専門知識を提供するシステムプロンプト。
-  IDE のアーキテクチャ、ツール群、Skills/Rules/Workflows の設計パターン、
-  モデル固有の最適化、およびエージェント駆動開発のベストプラクティスを体系化。
-
-  Triggers:
-    - "Antigravity IDE の使い方を教えて"
-    - "IDE のツールについて知りたい"
-    - "Skills / Rules / Workflows の設計がしたい"
-    - "エージェント駆動開発の相談"
-    - "GEMINI.md の書き方"
-
+description: "Antigravity IDE \u306E\u5229\u7528\u30AC\u30A4\u30C9\u30FB\u5C02\u9580\
+  \u77E5\u8B58\u3092\u63D0\u4F9B\u3059\u308B\u30B7\u30B9\u30C6\u30E0\u30D7\u30ED\u30F3\
+  \u30D7\u30C8\u3002\nIDE \u306E\u30A2\u30FC\u30AD\u30C6\u30AF\u30C1\u30E3\u3001\u30C4\
+  \u30FC\u30EB\u7FA4\u3001Skills/Rules/Workflows \u306E\u8A2D\u8A08\u30D1\u30BF\u30FC\
+  \u30F3\u3001\n\u30E2\u30C7\u30EB\u56FA\u6709\u306E\u6700\u9069\u5316\u3001\u304A\
+  \u3088\u3073\u30A8\u30FC\u30B8\u30A7\u30F3\u30C8\u99C6\u52D5\u958B\u767A\u306E\u30D9\
+  \u30B9\u30C8\u30D7\u30E9\u30AF\u30C6\u30A3\u30B9\u3092\u4F53\u7CFB\u5316\u3002\n\
+  \nTriggers:\n  - \"Antigravity IDE \u306E\u4F7F\u3044\u65B9\u3092\u6559\u3048\u3066\
+  \"\n  - \"IDE \u306E\u30C4\u30FC\u30EB\u306B\u3064\u3044\u3066\u77E5\u308A\u305F\
+  \u3044\"\n  - \"Skills / Rules / Workflows \u306E\u8A2D\u8A08\u304C\u3057\u305F\u3044\
+  \"\n  - \"\u30A8\u30FC\u30B8\u30A7\u30F3\u30C8\u99C6\u52D5\u958B\u767A\u306E\u76F8\
+  \u8AC7\"\n  - \"GEMINI.md \u306E\u66F8\u304D\u65B9\"\n"
 triggers:
-  - "Antigravity"
-  - "IDE"
-  - "Skills"
-  - "Rules"
-  - "Workflows"
-  - "GEMINI.md"
-  - "agent-first"
-  - "エージェント駆動"
-  - "browser_subagent"
-  - "プロンプト最適化"
-
+- Antigravity
+- IDE
+- Skills
+- Rules
+- Workflows
+- GEMINI.md
+- agent-first
+- "\u30A8\u30FC\u30B8\u30A7\u30F3\u30C8\u99C6\u52D5"
+- browser_subagent
+- "\u30D7\u30ED\u30F3\u30D7\u30C8\u6700\u9069\u5316"
 keywords:
-  - antigravity
-  - ide
-  - agent-first
-  - skill
-  - workflow
-  - rule
-  - gemini-md
-  - browser-subagent
-  - task-boundary
-  - prompt-engineering
-
+- antigravity
+- ide
+- agent-first
+- skill
+- workflow
+- rule
+- gemini-md
+- browser-subagent
+- task-boundary
+- prompt-engineering
 related:
-  upstream: ["S2 Mekhanē"]
+  upstream:
+  - "S2 Mekhan\u0113"
   downstream: []
-  x_series: ["X-SK: Schema→Kairos (ツール選択の文脈依存性)"]
-
-lineage: "/mek+ → 2026-02-09 — Antigravity IDE 公式ドキュメント + GPT Deep Research 5テーマ + 実運用経験から構築"
+  x_series:
+  - "X-SK: Schema\u2192Kairos (\u30C4\u30FC\u30EB\u9078\u629E\u306E\u6587\u8108\u4F9D\
+    \u5B58\u6027)"
+lineage: "/mek+ \u2192 2026-02-09 \u2014 Antigravity IDE \u516C\u5F0F\u30C9\u30AD\u30E5\
+  \u30E1\u30F3\u30C8 + GPT Deep Research 5\u30C6\u30FC\u30DE + \u5B9F\u904B\u7528\u7D4C\
+  \u9A13\u304B\u3089\u69CB\u7BC9"
 anti_skip: enabled
-version: "2.6.0"
+version: 2.6.0
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks: []
+fallbacks: []
 ---
 
 ## Overview

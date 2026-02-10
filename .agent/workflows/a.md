@@ -7,15 +7,20 @@ skill_ref:
   - ".agent/skills/akribeia/a2-krisis/SKILL.md"
   - ".agent/skills/akribeia/a3-gnome/SKILL.md"
   - ".agent/skills/akribeia/a4-episteme/SKILL.md"
-version: "5.4"
+version: "5.5"
 lcm_state: beta
 layer: "Δ"
 category_theory:
   yoneda: "Hom(-, Tn) ≅ F(Tn) — 各定理はその射の集合で完全に決まる"
   limit: "Cone の頂点 — 全ての精度射が一致する点"
-  converge_as_cone: "C0=PW決定, C1=精度射の列挙, C2=PW加重融合, C3=普遍性検証"
+  converge_as_cone: "C0=PW決定, C1=精度射の列挙, C2=PW加重融合, C3=Kalon+普遍性検証"
   cone_builder: "mekhane/fep/cone_builder.py"
-lineage: "v4.2 + Limit演算復元 → v5.0 + C0 PW/加重融合 → v5.4"
+  kalon: "mekhane/fep/universality.py — C3で使用"
+  adjunction:
+    notation: "F ⊣ G — 圏論を付与する (F) と 構造を発見する (G) の随伴対"
+    unit: "η = C3 普遍性検証 — 付与→発見→元の問いと比較"
+    counit: "ε = 忠実性チェック — 発見→付与→元に戻す"
+lineage: "v4.2 + Limit演算復元 → v5.0 + C0 PW/加重融合 → v5.4 → v5.5 C3 Kalon化"
 cognitive_algebra:
   generation: "L1.75 × L1.75"
   coordinates:
@@ -172,16 +177,35 @@ cd ~/oikos/hegemonikon && PYTHONPATH=. .venv/bin/python mekhane/fep/cone_builder
 | > 0.1 | 微妙な不一致 | **PW 加重融合** (`@reduce(*, pw)`) |
 | ≤ 0.1 | 精度一致 | PW ≠ 0 なら加重集約、= 0 なら `Σ` |
 
-#### ⊕ C3: 普遍性検証 (Verify) — Cone の普遍性
+#### ⊕ C3: Kalon 普遍性検証 (Verify) — Cone の普遍性
 
 > **圏論**: 「この精度保証済み知見が唯一の自然な収束点か？」を検証。
+> `/noe` Phase 3 (Kalon) と同じ原理を `/a` のコンテキストに適用。
+
+##### C3-a: 図式化 — 各定理出力を候補解として配置
+
+| 定理 | 候補解 | 射 |
+|:------|:-------|:---|
+| A1 Pathos | 情念の結論 | メタ感情 |
+| A2 Krisis | 判定の結論 | 判断 |
+| A3 Gnōmē | 格言の結論 | 原則 |
+| A4 Epistēmē | 知識の結論 | 確実知 |
+| C2 | 融合判断 | 統合出力 |
+
+##### C3-b: 因子分解テスト — 候補間の包含関係を判定
+
+> **使用**: `mekhane.fep.universality.kalon_verify()`
+> C2 の統合判断が他の全候補を特殊ケースとして含むか検証。
+
+##### C3-c: Kalon スコア + 統合
 
 | 項目 | 圏論的意味 | 内容 |
 |:-----|:-------------|:-----|
 | 矛盾度 | 射の散布 | V[outputs] = {0.0-1.0} |
 | 解消法 | 中介射の構築法 | {root/weighted/simple} |
+| **Kalon** | **普遍性の強さ** | {0.0-1.0} — 統合判断の包含力 |
 | **精度保証済み知見** | **Cone の頂点** | {1文で} |
-| **確信度** | **普遍性の強さ** | {C/U} ({confidence}%) |
+| **確信度** | **普遍性 × 確信** | {C/U} ({confidence}%) |
 
 ---
 

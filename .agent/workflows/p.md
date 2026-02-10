@@ -7,15 +7,20 @@ skill_ref:
   - ".agent/skills/perigraphē/p2-hodos/SKILL.md"
   - ".agent/skills/perigraphē/p3-trokhia/SKILL.md"
   - ".agent/skills/perigraphē/p4-tekhne/SKILL.md"
-version: "5.4"
+version: "5.5"
 lcm_state: beta
 layer: "Δ"
-lineage: "v4.3 + Limit演算復元 → v5.0 + C0 PW/加重融合 → v5.4"
+lineage: "v4.3 + Limit演算復元 → v5.0 + C0 PW/加重融合 → v5.4 → v5.5 C3 Kalon化"
 category_theory:
   yoneda: "Hom(-, Tn) ≅ F(Tn) — 各定理はその射の集合で完全に決まる"
   limit: "Cone の頂点 — 全ての環境配置射が一致する点"
-  converge_as_cone: "C0=PW決定, C1=環境射の列挙, C2=PW加重融合, C3=普遍性検証"
+  converge_as_cone: "C0=PW決定, C1=環境射の列挙, C2=PW加重融合, C3=Kalon+普遍性検証"
   cone_builder: "mekhane/fep/cone_builder.py"
+  kalon: "mekhane/fep/universality.py — C3で使用"
+  adjunction:
+    notation: "F ⊣ G — 圏論を付与する (F) と 構造を発見する (G) の随伴対"
+    unit: "η = C3 普遍性検証 — 付与→発見→元の問いと比較"
+    counit: "ε = 忠実性チェック — 発見→付与→元に戻す"
 derivatives: [kho, hod, tro, tek]
 cognitive_algebra:
   generation: "L1.5 × L1.5"
@@ -194,16 +199,35 @@ cd ~/oikos/hegemonikon && PYTHONPATH=. .venv/bin/python mekhane/fep/cone_builder
 | > 0.1 | 微妙な不整合 | **PW 加重融合** (`@reduce(*, pw)`) |
 | ≤ 0.1 | 配置整合 | PW ≠ 0 なら加重集約、= 0 なら `Σ` |
 
-#### ⊕ C3: 普遍性検証 (Verify) — Cone の普遍性
+#### ⊕ C3: Kalon 普遍性検証 (Verify) — Cone の普遍性
 
 > **圏論**: 「この環境配置判断が唯一の自然な収束点か？」を検証。
+> `/noe` Phase 3 (Kalon) と同じ原理を `/p` のコンテキストに適用。
+
+##### C3-a: 図式化 — 各定理出力を候補解として配置
+
+| 定理 | 候補解 | 射 |
+|:------|:-------|:---|
+| P1 Khōra | 場の結論 | スコープ |
+| P2 Hodos | 道の結論 | 経路 |
+| P3 Trokhia | 軌道の結論 | サイクル |
+| P4 Tekhnē | 技法の結論 | 手法 |
+| C2 | 融合判断 | 統合出力 |
+
+##### C3-b: 因子分解テスト — 候補間の包含関係を判定
+
+> **使用**: `mekhane.fep.universality.kalon_verify()`
+> C2 の統合判断が他の全候補を特殊ケースとして含むか検証。
+
+##### C3-c: Kalon スコア + 統合
 
 | 項目 | 圏論的意味 | 内容 |
 |:-----|:-------------|:-----|
 | 矛盾度 | 射の散布 | V[outputs] = {0.0-1.0} |
 | 解消法 | 中介射の構築法 | {root/weighted/simple} |
+| **Kalon** | **普遍性の強さ** | {0.0-1.0} — 統合判断の包含力 |
 | **環境配置判断** | **Cone の頂点** | {1文で} |
-| **確信度** | **普遍性の強さ** | {C/U} ({confidence}%) |
+| **確信度** | **普遍性 × 確信** | {C/U} ({confidence}%) |
 
 ---
 

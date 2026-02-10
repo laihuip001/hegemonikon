@@ -136,6 +136,12 @@ F:3{@fix}         # 3回繰り返し修正
 @osc+             # 詳細振動
 ```
 
+> **意味論注釈** (Prompt R&D Lab #16 Oscillation Synesthesia 参照):
+>
+> - `~` (非収束振動) = 探索的 (Explore)。2対象間を行き来し差分から知見を得る
+> - `~*` (収束振動) = 活用的 (Exploit)。2対象間を行き来し一意解に収束する
+> - FEP Explore-Exploit 公理 (L1.5 Function) の2表現
+
 ---
 
 ### @kyc — κύκλος (認知循環)

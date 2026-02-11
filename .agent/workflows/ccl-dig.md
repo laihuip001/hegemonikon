@@ -1,11 +1,9 @@
 ---
-description: "[CCL Macro] 深掘り — @dig = /s+~(/p*/a)_/dia*/o+"
 lcm_state: stable
 version: "1.0.0"
+description: "[CCL Macro] 深掘り — @dig = /s+~(/p*/a)_/dia*/o+"
 ---
 
-lcm_state: stable
-version: "1.0.0"
 # /ccl-dig: 深掘りマクロ
 
 > **CCL**: `@dig = /s+~(/p*/a)_/dia*/o+`

@@ -19,8 +19,8 @@ from pathlib import Path
 from typing import Optional
 
 
-@dataclass
 # PURPOSE: Metrika 5門の検証結果
+@dataclass
 class MetrikaResult:
     """Metrika 5門の検証結果"""
 

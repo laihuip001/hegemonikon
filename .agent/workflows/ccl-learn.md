@@ -1,5 +1,8 @@
 ---
 description: "[CCL Macro] 学習永続化 — @learn = /dox+*^/u+_/bye+"
+
+lcm_state: beta
+version: 1.0.0
 ---
 
 # /ccl-learn: 学習永続化マクロ

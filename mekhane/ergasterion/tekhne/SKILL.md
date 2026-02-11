@@ -16,6 +16,11 @@ description: |
   - 「PE」
   - 「生成」
   - 「製作」
+
+risk_tier: L1
+risks:
+  - Over-engineering
+  - Recursive loop
 ---
 
 # Tekhne-Maker v6.7 「OMEGA SINGULARITY BUILD + TARGET_AGENT」

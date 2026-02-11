@@ -40,11 +40,13 @@ from ..base import (
 class LLMBackend(ABC):
     """LLM バックエンドの抽象インターフェース"""
 
+    # PURPOSE: LLM にクエリを送信し、テキスト応答を返す
     @abstractmethod
     def query(self, prompt: str, context: str) -> str:
         """LLM にクエリを送信し、テキスト応答を返す"""
         pass
 
+    # PURPOSE: バックエンドが利用可能か
     @abstractmethod
     def is_available(self) -> bool:
         """バックエンドが利用可能か"""

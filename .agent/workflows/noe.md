@@ -120,14 +120,24 @@ sel_enforcement:
    view_file /home/makaron8426/oikos/hegemonikon/.agent/skills/ousia/o1-noesis/SKILL.md
    ```
 
-2. **PHASE 0 — Prolegomena** (前限定): 図式 D の定義域 J を選ぶ
-3. **PHASE 1 — Excavation** (対象の列挙): 圏の対象（前提）を炙り出す
-4. **PHASE 2 — Genesis** (Cone の射を生成): 各仮説 = apex → 対象への射
-5. **PHASE 3 — Kalon** (普遍性検証): Limit の頂点を発見する ← **新設**
-6. **PHASE 4 — Synthesis** (射の合成と検証): 経路を辿り整合性を確認
-7. **PHASE 5 — Dokimasia** (忠実性テスト): 関手 F が射を保存するか
-8. **PHASE 6 — Theoria** (Yoneda 適用): Hom(-, 結論) で結論の完全性を検証
-9. 最終出力: 構造化知見 → ファイル保存
+2. **STEP 0.5 — Gnōsis 検索** (BC-4 環境強制): 対象テーマの学術知見を事前取得
+   // turbo
+
+   ```bash
+   cd ~/oikos/hegemonikon && python mekhane/anamnesis/cli.py search "{対象テーマ}"
+   ```
+
+   > **目的**: 27,000件の Gnōsis から関連知見を引き出し、Phase 1 の前提に組み込む
+   > **省略禁止**: このステップを飛ばした /noe は「自分の記憶だけで考える」に等しい
+
+3. **PHASE 0 — Prolegomena** (前限定): 図式 D の定義域 J を選ぶ
+4. **PHASE 1 — Excavation** (対象の列挙): 圏の対象（前提）を炙り出す
+5. **PHASE 2 — Genesis** (Cone の射を生成): 各仮説 = apex → 対象への射
+6. **PHASE 3 — Kalon** (普遍性検証): Limit の頂点を発見する ← **新設**
+7. **PHASE 4 — Synthesis** (射の合成と検証): 経路を辿り整合性を確認
+8. **PHASE 5 — Dokimasia** (忠実性テスト): 関手 F が射を保存するか
+9. **PHASE 6 — Theoria** (Yoneda 適用): Hom(-, 結論) で結論の完全性を検証
+10. 最終出力: 構造化知見 → ファイル保存
 
 ---
 

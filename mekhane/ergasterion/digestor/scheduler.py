@@ -35,7 +35,7 @@ from mekhane.ergasterion.digestor.pipeline import DigestorPipeline
 # 設定
 SCHEDULE_TIME = "06:00"  # 毎日実行時刻
 MAX_PAPERS = 30  # 取得論文数
-DRY_RUN = False  # Live mode — 実際に論文を取得
+DRY_RUN = True  # Dry-run mode — 候補リスト生成のみ（/eat は Creator 承認後に手動実行）
 LOG_DIR = Path.home() / ".hegemonikon" / "digestor"
 PID_FILE = LOG_DIR / "scheduler.pid"
 LOG_FILE = LOG_DIR / "scheduler.log"

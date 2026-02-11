@@ -140,6 +140,21 @@ view_file /home/makaron8426/oikos/hegemonikon/.agent/skills/akribeia/a2-krisis/S
 
 ---
 
+## STEP 0.7: Gnōsis 検索 (BC-4 環境強制)
+
+> **目的**: レビュー対象に関する学術的先行知見を取得し、判断の根拠を強化する
+> **発動**: `/dia` または `/dia+` 実行時（`/dia-` は省略可）
+
+// turbo
+
+```bash
+cd ~/oikos/hegemonikon && python mekhane/anamnesis/cli.py search "{レビュー対象のテーマ}"
+```
+
+> **省略禁止**: 知識なき判断は空虚。Gnōsis の27,000件から1件でも引けば判断の密度が変わる
+
+---
+
 ## 発動条件
 
 | トリガー | 動作 |

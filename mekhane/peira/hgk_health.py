@@ -169,6 +169,49 @@ def check_dendron() -> HealthItem:
         return HealthItem("Dendron L1", "unknown", str(e))
 
 
+# PURPOSE: 定理活性度チェック (Theorem Activity Report)
+def check_theorem_activity() -> HealthItem:
+    """24定理の活性度を集計し、体系の健全性を判定"""
+    try:
+        from mekhane.peira.theorem_activity import (
+            scan_handoffs, classify_activity, THEOREM_WORKFLOWS
+        )
+        data = scan_handoffs(days=90)
+        months = sorted(data["wf_by_month"].keys())
+        months_span = max(len(months), 1)
+
+        alive = dormant = dead = 0
+        for wf_id in THEOREM_WORKFLOWS:
+            direct = data["wf_counts"].get(wf_id, 0)
+            via_hub = data["hub_counts"].get(wf_id, 0)
+            total = direct + via_hub
+            status = classify_activity(wf_id, total, months_span)
+            if "alive" in status:
+                alive += 1
+            elif "death" in status:
+                dead += 1
+            else:
+                dormant += 1
+
+        total_theorems = len(THEOREM_WORKFLOWS)
+        alive_rate = alive / total_theorems if total_theorems else 0
+        detail = f"{alive}/{total_theorems} alive"
+        if dormant:
+            detail += f", {dormant} dormant"
+        if dead:
+            detail += f", {dead} dead"
+        detail += f" ({alive_rate:.0%})"
+
+        if alive >= 20:  # 83%+
+            return HealthItem("Theorem Activity", "ok", detail, metric=alive_rate)
+        elif alive >= 16:  # 66%+
+            return HealthItem("Theorem Activity", "warn", detail, metric=alive_rate)
+        else:
+            return HealthItem("Theorem Activity", "error", detail, metric=alive_rate)
+    except Exception as e:
+        return HealthItem("Theorem Activity", "unknown", str(e))
+
+
 # PURPOSE: Digest レポートの鮮度チェック
 def check_digest_reports() -> HealthItem:
     report_dir = Path.home() / ".hegemonikon" / "digestor"
@@ -212,6 +255,7 @@ def run_health_check() -> HealthReport:
 
     # Quality checks (optional, slower)
     report.items.append(check_dendron())
+    report.items.append(check_theorem_activity())
 
     return report
 

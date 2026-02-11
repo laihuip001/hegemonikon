@@ -19,6 +19,7 @@ from mekhane.peira.hgk_health import (
     check_handoff,
     check_digestor_log,
     check_digest_reports,
+    check_theorem_activity,
     format_terminal,
     run_health_check,
 )
@@ -106,8 +107,9 @@ class TestHealthReport(unittest.TestCase):
 
 # PURPOSE: systemd サービスチェックのモックテスト
 class TestCheckSystemd(unittest.TestCase):
-    @patch("subprocess.run")
     """Test suite for check systemd."""
+
+    @patch("subprocess.run")
     def test_active_service(self, mock_run):
         """Verify active service behavior."""
         mock_run.return_value = MagicMock(stdout="active\n")
@@ -133,8 +135,9 @@ class TestCheckSystemd(unittest.TestCase):
 
 # PURPOSE: Docker チェックのモックテスト
 class TestCheckDocker(unittest.TestCase):
-    @patch("subprocess.run")
     """Test suite for check docker."""
+
+    @patch("subprocess.run")
     def test_container_up(self, mock_run):
         """Verify container up behavior."""
         mock_run.return_value = MagicMock(stdout="Up 5 hours\n")
@@ -153,8 +156,9 @@ class TestCheckDocker(unittest.TestCase):
 
 # PURPOSE: cron チェックのモックテスト
 class TestCheckCron(unittest.TestCase):
-    @patch("subprocess.run")
     """Test suite for check cron."""
+
+    @patch("subprocess.run")
     def test_cron_entry_exists(self, mock_run):
         """Verify cron entry exists behavior."""
         mock_run.return_value = MagicMock(stdout="0 4 * * * tier1_daily.sh\n")
@@ -172,8 +176,9 @@ class TestCheckCron(unittest.TestCase):
 
 # PURPOSE: Handoff チェックのモックテスト
 class TestCheckHandoff(unittest.TestCase):
-    @patch("mekhane.peira.hgk_health.Path")
     """Test suite for check handoff."""
+
+    @patch("mekhane.peira.hgk_health.Path")
     def test_directory_not_exists(self, mock_path_cls):
         """Verify directory not exists behavior."""
         mock_dir = MagicMock()
@@ -213,6 +218,61 @@ class TestFormatTerminal(unittest.TestCase):
         report = HealthReport(timestamp="test", items=[])
         output = format_terminal(report)
         self.assertIn("Score: 0%", output)
+
+
+# PURPOSE: 定理活性度チェックのテスト
+class TestCheckTheoremActivity(unittest.TestCase):
+    """Test suite for check_theorem_activity."""
+
+    @patch("mekhane.peira.hgk_health.check_theorem_activity.__module__", "mekhane.peira.hgk_health")
+    def test_actual_integration(self):
+        """Integration: 実際の Handoff ディレクトリで検証"""
+        result = check_theorem_activity()
+        self.assertIn(result.status, ["ok", "warn", "error", "unknown"])
+        if result.status in ["ok", "warn", "error"]:
+            self.assertIn("alive", result.detail)
+            self.assertIsNotNone(result.metric)
+
+    @patch("mekhane.peira.theorem_activity.scan_handoffs")
+    def test_all_alive(self, mock_scan):
+        """全24定理が alive の場合"""
+        from collections import Counter
+        # 全定理が direct 10回 + hub 0回 → alive
+        mock_scan.return_value = {
+            "total_files": 50,
+            "skipped": 0,
+            "wf_counts": Counter({wf: 10 for wf in [
+                "noe", "bou", "zet", "ene", "sta", "mek", "chr", "pra",
+                "pro", "pis", "ore", "dox", "tak", "kho", "euk", "tel",
+                "sym", "met", "ana", "sop", "kat", "dia", "syn", "epi",
+            ]}),
+            "hub_counts": Counter(),
+            "wf_by_month": {"2026-01": Counter(), "2026-02": Counter()},
+        }
+        result = check_theorem_activity()
+        self.assertEqual(result.status, "ok")
+        self.assertIn("24/24 alive", result.detail)
+        self.assertAlmostEqual(result.metric, 1.0)
+
+    @patch("mekhane.peira.theorem_activity.scan_handoffs")
+    def test_some_dormant(self, mock_scan):
+        """一部 dormant (0回) がある場合"""
+        from collections import Counter
+        counts = Counter({wf: 10 for wf in [
+            "noe", "bou", "zet", "ene", "sta", "mek", "chr", "pra",
+            "pro", "pis", "ore", "dox", "tak", "kho", "euk", "tel",
+        ]})
+        # sym, met, ana, sop, kat, dia, syn, epi は 0回 → 8 dead
+        mock_scan.return_value = {
+            "total_files": 50,
+            "skipped": 0,
+            "wf_counts": counts,
+            "hub_counts": Counter(),
+            "wf_by_month": {"2026-01": Counter(), "2026-02": Counter()},
+        }
+        result = check_theorem_activity()
+        self.assertEqual(result.status, "warn")
+        self.assertIn("16/24 alive", result.detail)
 
 
 if __name__ == "__main__":

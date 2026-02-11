@@ -200,6 +200,19 @@ async function renderDashboardContent(): Promise<void> {
         <div class="metric">${String(gnosisCount)} <small>論文</small></div>
         <p>知識基盤</p>
       </div>
+      <div class="card kalon-card">
+        <div class="kalon-card-header">
+          <span class="kalon-card-icon">◆</span>
+          <span class="kalon-card-title">Kalon</span>
+        </div>
+        <div class="kalon-card-equation">Kalon(x) ⟺ x = Fix(G∘F)</div>
+        <div class="kalon-card-attrs">
+          <span class="kalon-card-attr">✅ Fix</span>
+          <span class="kalon-card-attr">✅ Presheaf</span>
+          <span class="kalon-card-attr">✅ Self-ref</span>
+        </div>
+        <div class="kalon-card-hint">Ctrl+K → kalon [概念] で判定</div>
+      </div>
     </div>
     ${renderHealthItems(health)}
     ${renderUsageCard()}

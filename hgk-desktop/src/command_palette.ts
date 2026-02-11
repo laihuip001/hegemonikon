@@ -77,6 +77,102 @@ function renderParseResult(res: CCLParseResponse): string {
   `;
 }
 
+// --- Kalon Judge ---
+
+function renderKalonJudge(concept: string): string {
+    const id = `kalon-${Date.now()}`;
+    return `
+    <div class="kalon-judge" id="${id}">
+      <div class="kalon-header">
+        <span class="kalon-icon">◆</span>
+        <span class="kalon-title">Kalon 判定: <code>${esc(concept)}</code></span>
+      </div>
+      <div class="kalon-definition">Fix(G∘F) ∧ Presheaf ∧ Self-referential</div>
+
+      <div class="kalon-step" data-step="g">
+        <div class="kalon-step-label">Step 1: G テスト（蒸留）</div>
+        <div class="kalon-step-question">これ以上蒸留しても変化しないか？</div>
+        <div class="kalon-step-buttons">
+          <button class="kalon-btn kalon-btn-yes" data-answer="yes" data-target="${id}">はい — 不変 ✅</button>
+          <button class="kalon-btn kalon-btn-no" data-answer="no" data-target="${id}">いいえ — まだ圧縮可能</button>
+        </div>
+      </div>
+
+      <div class="kalon-step" data-step="f">
+        <div class="kalon-step-label">Step 2: F テスト（展開）</div>
+        <div class="kalon-step-question">ここから3つ以上の新しい概念を導出できるか？</div>
+        <div class="kalon-step-buttons">
+          <button class="kalon-btn kalon-btn-yes" data-answer="yes" data-target="${id}">はい — 3+ 導出可 ✅</button>
+          <button class="kalon-btn kalon-btn-no" data-answer="no" data-target="${id}">いいえ — 展開なし</button>
+        </div>
+      </div>
+
+      <div class="kalon-result" id="${id}-result">
+        <div class="kalon-result-pending">↑ G/F テストに回答してください</div>
+      </div>
+
+      <div class="kalon-attrs">
+        <span class="kalon-attr" title="Fix(G∘F) — 不動点">Fix</span>
+        <span class="kalon-attr" title="Presheaf — 多面性">Presheaf</span>
+        <span class="kalon-attr" title="Self-referential — 自己参照">Self-ref</span>
+      </div>
+    </div>
+  `;
+}
+
+function initKalonButtons(resultsEl: HTMLElement): void {
+    const judge = resultsEl.querySelector('.kalon-judge') as HTMLElement;
+    if (!judge) return;
+
+    let gAnswer: boolean | null = null;
+    let fAnswer: boolean | null = null;
+
+    judge.querySelectorAll('.kalon-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const step = (btn.closest('.kalon-step') as HTMLElement)?.dataset.step;
+            const answer = (btn as HTMLElement).dataset.answer === 'yes';
+
+            // Highlight selected button
+            const stepEl = btn.closest('.kalon-step')!;
+            stepEl.querySelectorAll('.kalon-btn').forEach(b => b.classList.remove('kalon-btn-selected'));
+            btn.classList.add('kalon-btn-selected');
+
+            if (step === 'g') gAnswer = answer;
+            if (step === 'f') fAnswer = answer;
+
+            // Update result when both answered
+            if (gAnswer !== null && fAnswer !== null) {
+                const resultEl = judge.querySelector('.kalon-result')!;
+                if (gAnswer && fAnswer) {
+                    resultEl.innerHTML = `
+                      <div class="kalon-result-kalon">
+                        <span class="kalon-verdict-icon">◎</span>
+                        <span class="kalon-verdict-text">kalon — Fix(G∘F) に到達</span>
+                      </div>`;
+                } else if (gAnswer && !fAnswer) {
+                    resultEl.innerHTML = `
+                      <div class="kalon-result-partial">
+                        <span class="kalon-verdict-icon">✗</span>
+                        <span class="kalon-verdict-text">自明 — lim だが colim なし (π パターン)</span>
+                      </div>`;
+                } else if (!gAnswer && fAnswer) {
+                    resultEl.innerHTML = `
+                      <div class="kalon-result-partial">
+                        <span class="kalon-verdict-icon">◯</span>
+                        <span class="kalon-verdict-text">許容 — もう一回 G∘F を回すと改善</span>
+                      </div>`;
+                } else {
+                    resultEl.innerHTML = `
+                      <div class="kalon-result-fail">
+                        <span class="kalon-verdict-icon">✗</span>
+                        <span class="kalon-verdict-text">要蒸留 — Fix から遠い</span>
+                      </div>`;
+                }
+            }
+        });
+    });
+}
+
 // --- Logic ---
 
 function esc(s: string): string {
@@ -116,6 +212,16 @@ function updateActive(resultsEl: HTMLElement, delta: number): void {
 
 async function handleInput(input: HTMLInputElement, resultsEl: HTMLElement): Promise<void> {
     const val = input.value.trim();
+
+    // Kalon judge command
+    if (val.toLowerCase().startsWith('kalon ')) {
+        const concept = val.slice(6).trim();
+        if (concept) {
+            resultsEl.innerHTML = renderKalonJudge(concept);
+            initKalonButtons(resultsEl);
+            return;
+        }
+    }
 
     // CCL expression (contains operators like +, >>, ~, etc.)
     if (val && /[+>~{(\\]/.test(val)) {

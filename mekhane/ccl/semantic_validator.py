@@ -214,7 +214,6 @@ CCL は Hegemonikón システムの認知制御言語で、以下のワーク�
         # Fallback: try to infer from text
         aligned = "不一致" not in text and "aligned.*false" not in text.lower()
         return SemanticResult(
-# PURPOSE: Quick validation helper.
             aligned=aligned,
             confidence=0.5,
             reasoning=text[:200] if len(text) > 200 else text,
@@ -223,7 +222,7 @@ CCL は Hegemonikón システムの認知制御言語で、以下のワーク�
 
 
 # Quick validation function
-# PURPOSE: Quick validation helper
+# PURPOSE: Quick validation helper.
 def validate_semantic(intent: str, ccl: str) -> SemanticResult:
     """Quick validation helper."""
     validator = CCLSemanticValidator()

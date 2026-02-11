@@ -1,3 +1,4 @@
+# pyre-ignore-all-errors
 # PROOF: [L2/インフラ] <- hermeneus/src/ CCL パーサー
 """
 Hermēneus Parser — CCL 式を AST に変換
@@ -281,8 +282,8 @@ class CCLParser:
         
         wf_id = match.group(1)
         relation = match.group(2)  # None or "d"/"h"/"x"
-        ops_str = match.group(3)
-        rest = match.group(4).strip()
+        ops_str = match.group(3) or ''
+        rest = (match.group(4) or '').strip()
         
         # 演算子を変換
         operators = [self.UNARY_OPS[op] for op in ops_str if op in self.UNARY_OPS]

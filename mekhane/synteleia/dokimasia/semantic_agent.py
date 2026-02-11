@@ -20,6 +20,7 @@ import re
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import Any, Dict, List, Optional
+from pathlib import Path
 
 from ..base import (
     AgentResult,
@@ -221,7 +222,10 @@ def _parse_severity(s: str) -> AuditSeverity:
 # =============================================================================
 
 # Synteleia L2 監査プロンプト
-SEMANTIC_AUDIT_PROMPT = """\
+# v2: 外部 .prompt ファイルからロード。フォールバック: ハードコード版。
+_PROMPT_FILE = Path(__file__).parent / "semantic_audit.prompt"
+
+_FALLBACK_PROMPT = """\
 あなたは Hegemonikón の認知監査官です。以下のテキストをセマンティック（意味的）に監査してください。
 
 ## 監査基準
@@ -255,6 +259,19 @@ JSON で回答してください:
 
 問題がない場合は `"issues": []` を返してください。
 """
+
+
+def _load_prompt() -> str:
+    """外部 .prompt ファイルからプロンプトをロード。失敗時はフォールバック。"""
+    try:
+        if _PROMPT_FILE.exists():
+            return _PROMPT_FILE.read_text(encoding="utf-8")
+    except Exception:
+        pass
+    return _FALLBACK_PROMPT
+
+
+SEMANTIC_AUDIT_PROMPT = _load_prompt()
 
 
 # PURPOSE: セマンティック監査エージェント (L2)

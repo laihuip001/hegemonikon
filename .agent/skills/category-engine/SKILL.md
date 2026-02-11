@@ -12,6 +12,17 @@ triggers:
   - 構造の保存・忘却を問う時
   - Trigonon / X-series を参照する時
   - 「なぜこの変換は正当か」を問う時
+
+# Safety Contract
+risk_tier: L0
+reversible: true
+requires_approval: false
+risks:
+  - 圏論の厳密性と実用性のバランスが崩れるリスク (Level A vs Level B)
+  - 前順序圏の前提を忘れ、一般の圏の性質を安易に適用するリスク
+fallbacks:
+  - /noe (直観による再構築)
+  - /dia (論理による検証)
 ---
 
 # 🏛️ Category Theory Engine — 構造認識の言語

@@ -527,6 +527,38 @@ def check_archetype_fit(content: str, archetype: Optional[str]) -> DimensionScor
                           suggestions=suggestions)
 
 
+# === Convergence/Divergence Policy ===
+
+# FEP Function axiom: Explore ↔ Exploit
+# .prompt = precision weighting ↑ = Exploit optimal, Explore detrimental
+CONVERGENT_TASKS = frozenset([
+    "data_extraction", "spec_generation", "test_generation",
+    "code_formatting", "translation", "schema_validation",
+    "jules_coding",
+])
+
+DIVERGENT_TASKS = frozenset([
+    "brainstorming", "ideation", "exploration",
+    "creative_writing", "design_review",
+])
+
+
+def check_convergence_policy(archetype: Optional[str], fmt: str) -> list[str]:
+    """Check if .prompt format is appropriate for detected archetype.
+
+    Returns list of warnings (empty = no issues).
+    FEP basis: Function axiom (Explore ↔ Exploit)
+    """
+    warnings = []
+    if fmt == "prompt" and archetype == "Creative":
+        warnings.append(
+            "⚠️ POLICY: Creative archetype + .prompt 形式は多様性喪失リスクあり。"
+            " .prompt は precision weighting を上げるため、拡散タスクには不向き。"
+            " (FEP Function 公理: Explore ↔ Exploit)"
+        )
+    return warnings
+
+
 # === Main Scoring ===
 
 def score_prompt(filepath: str) -> QualityReport:
@@ -535,7 +567,7 @@ def score_prompt(filepath: str) -> QualityReport:
     fmt = detect_format(content)
     archetype = detect_archetype(content)
 
-    return QualityReport(
+    report = QualityReport(
         filepath=filepath,
         structure=check_structure(content, fmt),
         safety=check_safety(content),
@@ -544,6 +576,13 @@ def score_prompt(filepath: str) -> QualityReport:
         detected_format=fmt,
         detected_archetype=archetype,
     )
+
+    # Add convergence/divergence policy warnings
+    policy_warnings = check_convergence_policy(archetype, fmt)
+    for w in policy_warnings:
+        report.archetype_fit.suggestions.append(w)
+
+    return report
 
 
 def format_report(report: QualityReport, verbose: bool = False) -> str:

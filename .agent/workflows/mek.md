@@ -222,6 +222,13 @@ SKILL.md を必ず読み込んでから処理を開始する:
      - Q3: その失敗を今の時点で回避できるか？
      - 答えられない場合、生成を中断して再設計
    - Layer 3: CONVERGENCE (収束)
+5.5. **STEP 3.5**: 收束/拡散ポリシーチェック (30秒)
+   - タスク記述を MCP `policy_check` または `classify_task()` で分類
+   - **convergent** → .prompt 形式で出力を推奨。STEP 5 で Prompt-Lang `@constraints/@rubric/@examples` を活用
+   - **divergent** → .prompt 非推奨。自然言語プロンプトを推奨。Creative archetype の場合は特に警告
+   - **ambiguous** → Creator に確認: 「この生成物は構造化 (.prompt) と自由記述どちらで出力しますか？」
+   - 結果を STEP 4 の Archetype 選択に連携（Creative archetype × convergent → 矛盾検出）
+   > **FEP 根拠**: Function 公理 (Explore ↔ Exploit)。.prompt = precision weighting ↑ = Exploit 最適化
 6. **STEP 4**: M3 ARCHETYPE_ENGINE — アーキタイプ選択 (2分)
    - 5 Diagnostic Questions
    - Precision / Speed / Autonomy / Creative / Safety

@@ -101,9 +101,14 @@ except Exception as e:
 # ============ Paths ============
 SKILL_DIR = Path(__file__).parent.parent / ".agent/skills/utils/prompt-lang-generator"
 TEMPLATES_DIR = SKILL_DIR / "templates"
-DOMAIN_TEMPLATES_DIR = TEMPLATES_DIR / "domain_templates"
+# v2.1: Use correct domain templates path
+DOMAIN_TEMPLATES_DIR = (
+    Path(__file__).parent.parent / "ergasterion" / "tekhne" / "references"
+    / "prompt-lang-templates" / "domain_templates"
+)
 
 log(f"SKILL_DIR: {SKILL_DIR}")
+log(f"DOMAIN_TEMPLATES_DIR: {DOMAIN_TEMPLATES_DIR} (exists: {DOMAIN_TEMPLATES_DIR.exists()})")
 
 # ============ Domain Detection ============
 DOMAIN_KEYWORDS = {
@@ -233,9 +238,16 @@ def load_yaml_file(path: Path) -> dict:
         return {}
 
 
-# ============ Prompt-Lang Generation ============
+# ============ Prompt-Lang Generation (v2.1) ============
 def generate_prompt_lang(requirements: str, domain: str, output_format: str) -> str:
-    """Generate Prompt-Lang code from requirements (enhanced v2.0)."""
+    """Generate Prompt-Lang code from requirements.
+
+    v2.1 Enhancement:
+      - domain_examples → @examples (few-shot from YAML)
+      - domain_format → @format (from YAML, not hardcoded)
+      - anti_patterns → @constraints (negative guidance)
+      - convergence/divergence policy check with warning
+    """
 
     # Extract skill name from requirements
     name_match = re.search(r'「(.+?)」|"(.+?)"|を作|スキル', requirements)
@@ -245,13 +257,31 @@ def generate_prompt_lang(requirements: str, domain: str, output_format: str) -> 
     else:
         skill_name = "generated_skill"
 
-    # Load domain template for constraints/rubric hints
+    # Load domain template (v2.1: full template utilization)
     domain_template = load_yaml_file(DOMAIN_TEMPLATES_DIR / f"{domain}.yaml")
     domain_constraints = domain_template.get("domain_constraints", [])
     domain_rubric = domain_template.get("domain_rubric", [])
+    domain_examples = domain_template.get("domain_examples", [])
+    domain_format = domain_template.get("domain_format", "")
+    anti_patterns = domain_template.get("anti_patterns", [])
+    output_style = domain_template.get("output_style", {})
+
+    # Convergence/divergence policy check
+    policy = classify_task(requirements)
+    policy_warning = ""
+    if policy["classification"] in ("divergent", "divergent-leaning"):
+        policy_warning = (
+            f"# ⚠️ DIVERGENT TASK DETECTED (conf: {policy['confidence']})\n"
+            f"# {policy['recommendation']}\n"
+            f"# Consider using natural language prompt instead of .prompt format\n\n"
+        )
 
     # Build improved Prompt-Lang code
-    lines = [
+    lines = []
+    if policy_warning:
+        lines.append(policy_warning)
+
+    lines.extend([
         f"#prompt {skill_name}",
         "",
         "@role:",
@@ -261,11 +291,11 @@ def generate_prompt_lang(requirements: str, domain: str, output_format: str) -> 
         f"  {requirements}",
         "",
         "@constraints:",
-    ]
+    ])
 
     # Add domain-specific constraints
     if domain_constraints:
-        for c in domain_constraints[:5]:
+        for c in domain_constraints[:6]:
             lines.append(f"  - {c}")
     else:
         lines.extend([
@@ -275,7 +305,15 @@ def generate_prompt_lang(requirements: str, domain: str, output_format: str) -> 
             "  - 出力は再現可能であること",
         ])
 
-    # Context section (v2.0 enhancement)
+    # v2.1: Add anti-pattern constraints from template
+    if anti_patterns:
+        lines.append("  # --- 避けるべきパターン ---")
+        for ap in anti_patterns[:3]:
+            pattern = ap.get("pattern", "")
+            bad = ap.get("bad", "")
+            lines.append(f"  - 禁止: {pattern}（例: 「{bad}」）")
+
+    # Context section
     lines.extend([
         "",
         "@context:",
@@ -286,12 +324,21 @@ def generate_prompt_lang(requirements: str, domain: str, output_format: str) -> 
     # Rubric section
     lines.extend(["", "@rubric:"])
     if domain_rubric:
-        for rubric in domain_rubric[:3]:
+        for rubric in domain_rubric[:4]:
+            rubric_name = rubric.get("name", "quality")
+            rubric_desc = rubric.get("description", "品質評価")
+            rubric_scale = rubric.get("scale", "1-5")
+            criteria = rubric.get("criteria", {})
             lines.extend([
-                f"  - {rubric.get('name', 'quality')}:",
-                f"      description: {rubric.get('description', '品質評価')}",
-                f"      scale: {rubric.get('scale', '1-5')}",
+                f"  - {rubric_name}:",
+                f"      description: {rubric_desc}",
+                f"      scale: {rubric_scale}",
             ])
+            # v2.1: Include criteria details for precision
+            if criteria:
+                lines.append("      criteria:")
+                for score, desc in sorted(criteria.items(), reverse=True):
+                    lines.append(f"        {score}: \"{desc}\"")
     else:
         lines.extend([
             "  - correctness:",
@@ -302,33 +349,47 @@ def generate_prompt_lang(requirements: str, domain: str, output_format: str) -> 
             "      scale: 1-5",
         ])
 
-    # Format section
-    lines.extend([
-        "",
-        "@format:",
-        "  ```json",
-        "  {",
-        '    "result": "string",',
-        '    "confidence": "high | medium | low",',
-        '    "reasoning": "string"',
-        "  }",
-        "  ```",
-    ])
+    # Format section — v2.1: use domain template format instead of hardcoded
+    lines.extend(["", "@format:"])
+    if output_style and output_style.get("structure"):
+        for fmt_line in output_style["structure"].strip().split("\n"):
+            lines.append(f"  {fmt_line}")
+    elif domain_format:
+        for fmt_line in domain_format.strip().split("\n"):
+            lines.append(f"  {fmt_line}")
+    else:
+        lines.extend([
+            "  ```json",
+            "  {",
+            '    "result": "string",',
+            '    "confidence": "high | medium | low",',
+            '    "reasoning": "string"',
+            "  }",
+            "  ```",
+        ])
 
-    # Examples section
-    lines.extend([
-        "",
-        "@examples:",
-        '  - input: "サンプル入力（実際のユースケースに置き換えてください）"',
-        "    output: |",
-        "      {",
-        '        "result": "具体的な出力例",',
-        '        "confidence": "high",',
-        '        "reasoning": "判断の根拠"',
-        "      }",
-    ])
+    # Examples section — v2.1: use domain_examples from YAML (few-shot)
+    lines.extend(["", "@examples:"])
+    if domain_examples:
+        for ex in domain_examples[:2]:
+            ex_input = ex.get("input", "").strip()
+            ex_output = ex.get("output", "").strip()
+            # Truncate long inputs for .prompt format
+            if len(ex_input) > 200:
+                ex_input = ex_input[:200] + "..."
+            lines.append(f"  - input: |")
+            for input_line in ex_input.split("\n"):
+                lines.append(f"      {input_line}")
+            lines.append(f"    output: |")
+            for output_line in ex_output.split("\n"):
+                lines.append(f"      {output_line}")
+    else:
+        lines.extend([
+            '  - input: "サンプル入力"',
+            '    output: "具体的な出力例"',
+        ])
 
-    # Activation section (v2.0 enhancement)
+    # Activation section
     lines.extend([
         "",
         "@activation:",

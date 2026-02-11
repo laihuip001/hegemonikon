@@ -1,6 +1,7 @@
-# Summarization Domain Template
+# Summarization Domain Template v2.0
 # =============================
 # 要約、抽出、圧縮タスク向け
+# Enhanced: domain_examples, anti_patterns, output_style 追加
 
 domain: "summarization"
 applicable_tasks:
@@ -16,6 +17,7 @@ domain_constraints:
   - "要約率を明示（例: 元文の20%以下）"
   - "重要度に基づき情報を取捨選択"
   - "固有名詞、数値、日付は正確に保持"
+  - "主観的評価を加えず、事実のみを抽出"
 
 # --- ドメイン固有の評価軸 ---
 domain_rubric:
@@ -24,9 +26,9 @@ domain_rubric:
     scale: "1-5"
     criteria:
       5: "原文の内容のみ、歪曲なし"
-      3: "一部解釈あり"
-      1: "原文にない情報を含む"
-      
+      3: "一部解釈あり、重大な歪曲なし"
+      1: "原文にない情報を含む（捏造）"
+
   - name: "coverage"
     description: "重要情報の網羅度"
     scale: "1-5"
@@ -34,31 +36,88 @@ domain_rubric:
       5: "主要ポイント全て含む"
       3: "主要ポイントの半分程度"
       1: "重要情報が欠落"
-      
+
   - name: "conciseness"
     description: "簡潔さ"
     scale: "1-5"
     criteria:
       5: "冗長性なし、最適な長さ"
-      3: "やや冗長"
-      1: "不必要に長い"
+      3: "やや冗長だが許容範囲"
+      1: "不必要に長い、繰り返し多い"
 
-# --- ドメイン固有のフォーマット ---
-domain_format: |
-  ```json
-  {
-    "summary": "要約本文",
-    "key_points": [
-      "ポイント1",
-      "ポイント2"
-    ],
-    "metadata": {
-      "original_length": 1000,
-      "summary_length": 200,
-      "compression_ratio": 0.2
+# --- ドメイン固有の入出力例 (few-shot) ---
+domain_examples:
+  - name: "meeting_summary_example"
+    input: |
+      以下の議事録を要約してください:
+      「田中: Q1売上は前年比120%。新製品Aが好調。
+       佐藤: 製造コストが15%上昇。原材料費の高騰が原因。
+       山田: Q2の見通しは慎重。競合X社が類似製品を発表予定。
+       田中: マーケティング予算を30%増額して対応する提案。
+       全員: 承認。次回は4/15に進捗確認。」
+    output: |
+      {
+        "summary": "Q1売上は前年比120%で新製品Aが牽引。一方、製造コストは原材料費高騰で15%上昇。Q2は競合X社の類似製品発表を見据え、マーケティング予算30%増額を全員承認。",
+        "key_points": [
+          "Q1売上: 前年比120%（新製品A好調）",
+          "製造コスト: 15%上昇（原材料費高騰）",
+          "Q2見通し: 慎重（競合X社の類似製品発表予定）",
+          "決定事項: マーケティング予算30%増額",
+          "次回会議: 4/15 進捗確認"
+        ],
+        "metadata": {
+          "original_length": 180,
+          "summary_length": 90,
+          "compression_ratio": 0.5
+        }
+      }
+
+  - name: "article_summary_example"
+    input: "以下の技術記事のキーポイントを3つ抽出してください: ..."
+    output: |
+      {
+        "summary": "記事はXXXについて論じ、3つの主要な知見を示している",
+        "key_points": [
+          "知見1: 具体的な事実",
+          "知見2: 具体的な事実",
+          "知見3: 具体的な事実"
+        ],
+        "metadata": {
+          "original_length": 2000,
+          "summary_length": 150,
+          "compression_ratio": 0.075
+        }
+      }
+
+# --- アンチパターン（避けるべき出力パターン） ---
+anti_patterns:
+  - pattern: "捏造"
+    bad: "売上は150%と大幅に成長した（原文にない数値）"
+    good: "売上は前年比120%（原文の数値そのまま）"
+  - pattern: "主観の混入"
+    bad: "素晴らしい成果を収めた"
+    good: "Q1売上は前年比120%で目標を達成した"
+  - pattern: "重要情報の欠落"
+    bad: "Q1は好調でした"
+    good: "Q1売上は前年比120%。製造コスト15%上昇。マーケティング予算30%増額を承認"
+
+# --- 出力スタイル設定 ---
+output_style:
+  format: "json"
+  structure: |
+    {
+      "summary": "要約本文",
+      "key_points": [
+        "ポイント1",
+        "ポイント2"
+      ],
+      "metadata": {
+        "original_length": "int (文字数)",
+        "summary_length": "int (文字数)",
+        "compression_ratio": "float (0.0-1.0)"
+      }
     }
-  }
-  ```
+  tone: "客観的。原文の事実のみ。数値・固有名詞は正確に"
 
 # --- 要約タイプ別テンプレート ---
 subtypes:
@@ -66,12 +125,12 @@ subtypes:
     description: "原文から重要文を抽出"
     constraints:
       - "原文の文をそのまま使用"
-      
+
   abstractive:
     description: "内容を再構成して要約"
     constraints:
       - "意味を保ちつつ言い換え可"
-      
+
   bullet_points:
     description: "箇条書き形式"
     format: "- ポイント1\n- ポイント2\n..."

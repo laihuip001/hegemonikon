@@ -43,6 +43,16 @@ sel_enforcement:
       - "スコープ設定の根拠を問う"
 ccl_signature: "/kho+"
 anti_skip: enabled
+category_theory:
+  core: "随伴 F⊣G の左随伴 F（自由関手）"
+  adjunction: "Khōra (F) ⊣ Trokhia (G)"
+  role: "F: Orbit → Space（軌道に解像度を載せて場を構成 = Micro化）"
+  F_definition: "大局的サイクルに細部の空間構造を付与して、高解像度の場を構成する"
+  same_formula: "kho と tro は同じ式（Explore）の累乗（Scale）が違うだけ"
+  coordinates: "P1[Micro,Explore] — Function(Explore)を保存し Scale を Micro に設定"
+  unit: "η: Orbit → G(F(Orbit)) — 軌道を場にして粗視化して軌道に戻す = サイクル検証"
+  counit: "ε: F(G(Space)) → Space — 場を軌道にして再展開 = ズームイン"
+  insight: "空間と時間は同じ式。累乗（次元数）が違えば全く違う意味になる — Creator, 2026-02-11"
 ---
 
 # /kho: 条件空間定義ワークフロー (Khōra)
@@ -455,7 +465,6 @@ result = select_derivative("P1", problem_context)
 **保存理由**: コンテキスト節約、参照可能性、パターン蓄積
 
 ---
-
 
 ---
 

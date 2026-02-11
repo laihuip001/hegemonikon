@@ -43,6 +43,19 @@ sel_enforcement:
     minimum_requirements:
       - "軌道設計の根拠を問う"
 ccl_signature: "/tro+"
+category_theory:
+  core: "随伴 F⊣G の右随伴 G（忘却関手）"
+  adjunction: "Khōra (F) ⊣ Trokhia (G)"
+  role: "G: Space → Orbit（場から解像度を忘却し、軌道（Macroサイクル）に圧縮）"
+  G_definition: "高解像度の空間構造を粗視化して、周回可能な1本の経路に落とす"
+  same_formula: "kho と tro は同じ式（Explore）の累乗（Scale）が違うだけ"
+  coordinates: "P3[Macro,Explore] — Function(Explore)を保存し Scale を Macro に設定"
+  G_two_layers:
+    構造: "周回できる大局パターン。well-defined"
+    粒度: "Macroでは見えないMicroの細部。忘却される"
+  drift: "Drift = Macroで見えないMicroの構造。サイクルで回しても見落とす細部"
+  skewness_kurtosis: "歪度(3乗)と尖度(4乗)の比喩 — 同じ中心モーメント式の次元違い"
+  insight: "元の式は同じ。次元を忘却している — Creator, 2026-02-11"
 ---
 
 # /tro: 軌道定義ワークフロー (Trokhia)
@@ -273,7 +286,6 @@ view_file /home/makaron8426/oikos/hegemonikon/.agent/skills/perigraphe/p3-trokhi
 ```
 
 ---
-
 
 ---
 

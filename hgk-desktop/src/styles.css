@@ -2618,3 +2618,143 @@ main:has(#graph-container) {
 .syn-sev-low {
   color: var(--text-muted);
 }
+
+/* ─── Digestor View ─────────────────────────────────────── */
+
+.dg-report-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0;
+  margin-bottom: 0.5rem;
+  font-size: 0.82rem;
+  color: #8b949e;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.dg-candidate {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+  padding: 0.75rem 1rem;
+  transition: all 0.15s ease;
+  border-left: 3px solid transparent;
+}
+
+.dg-candidate:hover {
+  border-left-color: #58a6ff;
+  background: var(--hover-bg);
+}
+
+.dg-candidate-rank {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #58a6ff;
+  min-width: 2rem;
+  text-align: center;
+  padding-top: 0.15rem;
+}
+
+.dg-candidate-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.dg-candidate-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 0.4rem;
+}
+
+.dg-candidate-title {
+  margin: 0;
+  font-size: 0.92rem;
+  font-weight: 600;
+  line-height: 1.35;
+  flex: 1;
+}
+
+.dg-candidate-title a {
+  color: #c9d1d9;
+  text-decoration: none;
+}
+
+.dg-candidate-title a:hover {
+  color: #58a6ff;
+  text-decoration: underline;
+}
+
+.dg-score-bar-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-width: 100px;
+  flex-shrink: 0;
+}
+
+.dg-score-bar {
+  height: 6px;
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+
+.dg-score-high {
+  background: linear-gradient(90deg, #3fb950, #56d364);
+}
+
+.dg-score-mid {
+  background: linear-gradient(90deg, #d29922, #f0c674);
+}
+
+.dg-score-low {
+  background: linear-gradient(90deg, #8b949e, #6e7681);
+}
+
+.dg-score-label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  font-family: monospace;
+  color: #8b949e;
+}
+
+.dg-candidate-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  margin-bottom: 0.3rem;
+}
+
+.dg-topic-tag {
+  display: inline-block;
+  background: rgba(88, 166, 255, 0.12);
+  color: #58a6ff;
+  padding: 0.1rem 0.45rem;
+  border-radius: 10px;
+  font-size: 0.72rem;
+  font-weight: 500;
+}
+
+.dg-template-tag {
+  display: inline-block;
+  background: rgba(240, 198, 100, 0.12);
+  color: #f0c674;
+  padding: 0.1rem 0.45rem;
+  border-radius: 10px;
+  font-size: 0.72rem;
+  font-weight: 500;
+}
+
+.dg-source {
+  font-size: 0.72rem;
+  color: #6e7681;
+}
+
+.dg-rationale {
+  font-size: 0.78rem;
+  color: #8b949e;
+  font-family: monospace;
+  line-height: 1.4;
+  padding: 0.3rem 0;
+}

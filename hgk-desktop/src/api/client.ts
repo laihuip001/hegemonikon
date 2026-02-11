@@ -122,6 +122,30 @@ export interface SynteleiaAgentInfo {
     layer: string;
 }
 
+// --- Digestor Types ---
+export interface DigestCandidate {
+    title: string;
+    source: string;
+    url: string;
+    score: number;
+    matched_topics: string[];
+    rationale: string;
+    suggested_templates: Array<{ id: string; score: number }>;
+}
+export interface DigestReport {
+    timestamp: string;
+    source: string;
+    total_papers: number;
+    candidates_selected: number;
+    dry_run: boolean;
+    candidates: DigestCandidate[];
+    filename: string;
+}
+export interface DigestReportListResponse {
+    reports: DigestReport[];
+    total: number;
+}
+
 export const api = {
     // Status
     health: () => apiFetch<HealthCheckResponse>('/api/status/health'),
@@ -248,6 +272,12 @@ export const api = {
             body: JSON.stringify({ content, target_type: targetType }),
         }),
     synteleiaAgents: () => apiFetch<SynteleiaAgentInfo[]>('/api/synteleia/agents'),
+
+    // Digestor
+    digestorReports: (limit = 10) =>
+        apiFetch<DigestReportListResponse>(`/api/digestor/reports?limit=${limit}`),
+    digestorLatest: () =>
+        apiFetch<DigestReport | null>('/api/digestor/latest'),
 };
 
 // --- Notification Types ---

@@ -182,6 +182,14 @@ def _register_routers(app: FastAPI) -> None:
     except Exception as exc:
         logger.warning("Gateway router skipped: %s", exc)
 
+    # Digestor — 候補レポート閲覧 (ファイルシステム IO のみ)
+    try:
+        from mekhane.api.routes.digestor import router as digestor_router
+        app.include_router(digestor_router, prefix=API_PREFIX)
+        logger.info("Digestor router registered")
+    except Exception as exc:
+        logger.warning("Digestor router skipped: %s", exc)
+
 
 # PURPOSE: アプリケーションインスタンス（uvicorn 用）
 app = create_app()

@@ -10,6 +10,7 @@ Origin: 2026-01-31 CCL Execution Guarantee Architecture
 
 import json
 import sqlite3
+import threading
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, Iterator, List, Optional, Tuple
@@ -56,6 +57,8 @@ class CCLCheckpointer:
     def __init__(self, db_path: Optional[Path] = None):
         self.db_path = db_path or self.DEFAULT_PATH
         self.db_path.parent.mkdir(parents=True, exist_ok=True)
+        self._conn: Optional[sqlite3.Connection] = None
+        self._lock = threading.RLock()
         self._init_db()
     
     def _init_db(self):
@@ -81,12 +84,27 @@ class CCLCheckpointer:
     @contextmanager
     def _connect(self):
         """データベース接続を取得"""
-        conn = sqlite3.connect(str(self.db_path))
-        conn.row_factory = sqlite3.Row
-        try:
-            yield conn
-        finally:
-            conn.close()
+        with self._lock:
+            if self._conn is None:
+                self._conn = sqlite3.connect(str(self.db_path), check_same_thread=False)
+                self._conn.row_factory = sqlite3.Row
+            try:
+                yield self._conn
+            except Exception:
+                if self._conn.in_transaction:
+                    self._conn.rollback()
+                raise
+
+    def close(self):
+        """データベース接続を閉じる"""
+        with self._lock:
+            if self._conn:
+                self._conn.close()
+                self._conn = None
+
+    def __del__(self):
+        """デストラクタ"""
+        self.close()
     
     def _generate_id(self) -> str:
         """一意の ID を生成"""

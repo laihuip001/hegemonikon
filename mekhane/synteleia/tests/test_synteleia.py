@@ -310,3 +310,201 @@ class TestOrchestrator:
         o = SynteleiaOrchestrator()
         assert isinstance(o.agents, list)
         assert all(isinstance(a, AuditAgent) for a in o.agents)
+
+
+# ── L2 SemanticAgent (StubBackend) ───────
+
+class TestSemanticAgentStub:
+    """L2 SemanticAgent の StubBackend テスト"""
+
+    @pytest.fixture
+    def stub_agent(self):
+        from mekhane.synteleia.dokimasia.semantic_agent import SemanticAgent, StubBackend
+        return SemanticAgent(backend=StubBackend())
+
+    @pytest.fixture
+    def target_clean(self):
+        return AuditTarget(
+            content="This is well-structured content with clear intent.",
+            target_type=AuditTargetType.GENERIC,
+        )
+
+    @pytest.fixture
+    def target_code(self):
+        return AuditTarget(
+            content="def process(data):\n    result = eval(data)\n    return result",
+            target_type=AuditTargetType.CODE,
+        )
+
+    def test_stub_audit_returns_result(self, stub_agent, target_clean):
+        result = stub_agent.audit(target_clean)
+        assert isinstance(result, AgentResult)
+        assert result.agent_name == "SemanticAgent"
+
+    def test_stub_audit_passes_clean(self, stub_agent, target_clean):
+        result = stub_agent.audit(target_clean)
+        assert result.passed is True
+        assert len(result.issues) == 0
+
+    def test_stub_confidence_is_low(self, stub_agent, target_clean):
+        """StubBackend の confidence は 0.5 (デフォルト) であるべき"""
+        result = stub_agent.audit(target_clean)
+        assert result.confidence <= 0.5
+
+    def test_stub_metadata_has_backend(self, stub_agent, target_clean):
+        result = stub_agent.audit(target_clean)
+        assert result.metadata.get("backend") == "StubBackend"
+
+    def test_stub_with_issues_response(self):
+        """StubBackend に Issue 付き JSON を渡した場合"""
+        import json
+        from mekhane.synteleia.dokimasia.semantic_agent import SemanticAgent, StubBackend
+
+        response = json.dumps({
+            "issues": [
+                {
+                    "code": "SEM-001",
+                    "severity": "high",
+                    "message": "設計意図との不整合: 関数名が処理内容と一致しない",
+                    "location": "line 1",
+                    "suggestion": "関数名を process_data に変更",
+                }
+            ],
+            "summary": "1 issue found",
+            "confidence": 0.85,
+        })
+        agent = SemanticAgent(backend=StubBackend(response=response))
+        target = AuditTarget(content="def foo(): pass", target_type=AuditTargetType.CODE)
+        result = agent.audit(target)
+
+        assert result.passed is False  # HIGH issue → not passed
+        assert len(result.issues) == 1
+        assert result.issues[0].code == "SEM-001"
+        assert result.issues[0].severity == AuditSeverity.HIGH
+        assert result.confidence == 0.85
+
+    def test_supports_ccl_output(self, stub_agent):
+        assert stub_agent.supports(AuditTargetType.CCL_OUTPUT) is True
+
+    def test_supports_thought(self, stub_agent):
+        assert stub_agent.supports(AuditTargetType.THOUGHT) is True
+
+    def test_supports_plan(self, stub_agent):
+        assert stub_agent.supports(AuditTargetType.PLAN) is True
+
+    def test_not_supports_code(self, stub_agent):
+        """SemanticAgent は CODE をサポートしない (L1 が担当)"""
+        assert stub_agent.supports(AuditTargetType.CODE) is False
+
+    def test_not_supports_proof(self, stub_agent):
+        assert stub_agent.supports(AuditTargetType.PROOF) is False
+
+
+# ── L2 parse_llm_response ────────────────
+
+class TestParseLlmResponse:
+    """LLM レスポンスパーサーのテスト"""
+
+    def test_json_response(self):
+        import json
+        from mekhane.synteleia.dokimasia.semantic_agent import parse_llm_response
+
+        response = json.dumps({
+            "issues": [
+                {"code": "SEM-002", "severity": "medium", "message": "暗黙の前提あり"},
+                {"code": "SEM-004", "severity": "high", "message": "論理の飛躍"},
+            ],
+            "summary": "2 issues",
+            "confidence": 0.9,
+        })
+        issues = parse_llm_response(response, "SemanticAgent")
+        assert len(issues) == 2
+        assert issues[0].code == "SEM-002"
+        assert issues[1].severity == AuditSeverity.HIGH
+
+    def test_empty_issues(self):
+        import json
+        from mekhane.synteleia.dokimasia.semantic_agent import parse_llm_response
+
+        response = json.dumps({"issues": [], "summary": "Clean", "confidence": 0.95})
+        issues = parse_llm_response(response, "SemanticAgent")
+        assert len(issues) == 0
+
+    def test_markdown_fallback(self):
+        from mekhane.synteleia.dokimasia.semantic_agent import parse_llm_response
+
+        response = "- [HIGH] SEM-001: 設計意図との不整合\n- [LOW] SEM-005: 過度な抽象化"
+        issues = parse_llm_response(response, "SemanticAgent")
+        assert len(issues) == 2
+        assert issues[0].severity == AuditSeverity.HIGH
+
+    def test_invalid_json_returns_empty(self):
+        from mekhane.synteleia.dokimasia.semantic_agent import parse_llm_response
+
+        issues = parse_llm_response("not json at all", "SemanticAgent")
+        assert len(issues) == 0
+
+
+# ── L2 Backend availability ─────────────
+
+class TestBackendAvailability:
+    """各 Backend の is_available テスト"""
+
+    def test_stub_always_available(self):
+        from mekhane.synteleia.dokimasia.semantic_agent import StubBackend
+        assert StubBackend().is_available() is True
+
+    def test_openai_availability_depends_on_env(self):
+        from mekhane.synteleia.dokimasia.semantic_agent import OpenAIBackend
+        import os
+        backend = OpenAIBackend()
+        expected = bool(os.environ.get("OPENAI_API_KEY"))
+        assert backend.is_available() == expected
+
+
+# ── L2 Orchestrator Integration ──────────
+
+class TestOrchestratorWithL2:
+    """with_l2() 統合テスト"""
+
+    @pytest.fixture
+    def target(self):
+        return AuditTarget(
+            content="Synteleia monitors agent outputs for quality.",
+            target_type=AuditTargetType.GENERIC,
+        )
+
+    def test_with_l2_creates_orchestrator(self):
+        o = SynteleiaOrchestrator.with_l2()
+        assert isinstance(o, SynteleiaOrchestrator)
+
+    def test_with_l2_has_more_agents(self):
+        o_l1 = SynteleiaOrchestrator()
+        o_l2 = SynteleiaOrchestrator.with_l2()
+        assert len(o_l2.dokimasia_agents) == len(o_l1.dokimasia_agents) + 1
+
+    def test_with_l2_includes_semantic_agent(self):
+        from mekhane.synteleia.dokimasia.semantic_agent import SemanticAgent
+        o = SynteleiaOrchestrator.with_l2()
+        semantic_agents = [a for a in o.dokimasia_agents if isinstance(a, SemanticAgent)]
+        assert len(semantic_agents) == 1
+
+    def test_with_l2_audit_runs(self, target):
+        o = SynteleiaOrchestrator.with_l2()
+        result = o.audit(target)
+        assert isinstance(result, AuditResult)
+
+    def test_with_l2_report_includes_semantic(self, target):
+        o = SynteleiaOrchestrator.with_l2()
+        result = o.audit(target)
+        report = o.format_report(result)
+        assert "SemanticAgent" in report
+
+    def test_with_l2_wbc_alert_on_clean(self, target):
+        """クリーンな入力では WBC アラートは None"""
+        o = SynteleiaOrchestrator.with_l2()
+        result = o.audit(target)
+        alert = o.to_wbc_alert(result)
+        # StubBackend はクリーンなので alert は None のはず
+        if result.passed:
+            assert alert is None

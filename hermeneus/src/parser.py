@@ -223,18 +223,55 @@ class CCLParser:
         # 未知の演算子
         return self._parse_workflow(parts[0])
     
+    # Relation suffix partner table (v7.2)
+    # Generated from .agent/workflows/*.md category_theory: YAML
+    RELATION_PARTNERS = {
+        # .d = adjunction (diagonal), .h = natural transformation (horizontal), .x = duality (anti-diagonal)
+        # O-series
+        "noe": {"d": "zet", "h": "bou", "x": ("ene", "transition")},
+        "bou": {"d": "ene", "h": "noe", "x": ("zet", "tension")},
+        "zet": {"d": "noe", "h": "ene", "x": ("bou", "tension")},
+        "ene": {"d": "bou", "h": "zet", "x": ("noe", "transition")},
+        # S-series
+        "met": {"d": "sta", "h": "mek", "x": ("pra", "transition")},
+        "mek": {"d": "pra", "h": "met", "x": ("sta", "tension")},
+        "sta": {"d": "met", "h": "pra", "x": ("mek", "tension")},
+        "pra": {"d": "mek", "h": "sta", "x": ("met", "transition")},
+        # H-series
+        "pro": {"d": "ore", "h": "pis", "x": ("dox", "transition")},
+        "pis": {"d": "dox", "h": "pro", "x": ("ore", "tension")},
+        "ore": {"d": "pro", "h": "dox", "x": ("pis", "tension")},
+        "dox": {"d": "pis", "h": "ore", "x": ("pro", "transition")},
+        # P-series
+        "kho": {"d": "tro", "h": "hod", "x": ("tek", "transition")},
+        "hod": {"d": "tek", "h": "kho", "x": ("tro", "tension")},
+        "tro": {"d": "kho", "h": "tek", "x": ("hod", "tension")},
+        "tek": {"d": "hod", "h": "tro", "x": ("kho", "transition")},
+        # K-series
+        "euk": {"d": "tel", "h": "chr", "x": ("sop", "transition")},
+        "chr": {"d": "sop", "h": "euk", "x": ("tel", "tension")},
+        "tel": {"d": "chr", "h": "sop", "x": ("euk", "tension")},
+        "sop": {"d": "tel", "h": "chr", "x": ("euk", "transition")},
+        # A-series
+        "pat": {"d": "gno", "h": "dia", "x": ("epi", "transition")},
+        "dia": {"d": "epi", "h": "pat", "x": ("gno", "tension")},
+        "gno": {"d": "pat", "h": "epi", "x": ("dia", "tension")},
+        "epi": {"d": "dia", "h": "gno", "x": ("pat", "transition")},
+    }
+
     def _parse_workflow(self, expr: str) -> Workflow:
         """ワークフロー式をパース"""
-        # /wf+- 形式 または wf+-
-        pattern = r'^/?([a-z][a-z0-9]*)([\+\-\^\?\!\'\\]*)(.*)$'
+        # /wf.h+- 形式: relation suffix (.d/.h/.x) を認識
+        pattern = r"^/?([a-z][a-z0-9]*)(?:\.(d|h|x))?([+\-\^\?\!\'\\\\]*)(.*)$"
         match = re.match(pattern, expr)
         
         if not match:
             raise ValueError(f"Invalid workflow: {expr}")
         
         wf_id = match.group(1)
-        ops_str = match.group(2)
-        rest = match.group(3).strip()
+        relation = match.group(2)  # None or "d"/"h"/"x"
+        ops_str = match.group(3)
+        rest = match.group(4).strip()
         
         # 演算子を変換
         operators = [self.UNARY_OPS[op] for op in ops_str if op in self.UNARY_OPS]
@@ -253,11 +290,40 @@ class CCLParser:
         for mod_match in re.finditer(mod_pattern, rest):
             modifiers[mod_match.group(1)] = int(mod_match.group(2))
         
+        # .d/.h/.x 展開: パートナーに自動展開
+        if relation and wf_id in self.RELATION_PARTNERS:
+            partner_info = self.RELATION_PARTNERS[wf_id].get(relation)
+            if partner_info:
+                source = Workflow(
+                    id=wf_id, operators=[], modifiers={}, mode=None
+                )
+                if relation == "x" and isinstance(partner_info, tuple):
+                    partner_id, duality_type = partner_info
+                    target = Workflow(
+                        id=partner_id, operators=operators,
+                        modifiers=modifiers, mode=mode, relation=relation
+                    )
+                    if duality_type == "tension":
+                        # tension → ~ (oscillation)
+                        return Oscillation(left=source, right=target)
+                    else:
+                        # transition → >> (sequence)
+                        return Sequence(steps=[source, target])
+                else:
+                    # .d or .h → >> (sequence)
+                    partner_id = partner_info
+                    target = Workflow(
+                        id=partner_id, operators=operators,
+                        modifiers=modifiers, mode=mode, relation=relation
+                    )
+                    return Sequence(steps=[source, target])
+        
         return Workflow(
             id=wf_id,
             operators=operators,
             modifiers=modifiers,
-            mode=mode
+            mode=mode,
+            relation=relation
         )
     
     def _parse_condition(self, expr: str) -> Condition:

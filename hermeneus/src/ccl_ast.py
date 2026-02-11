@@ -49,13 +49,14 @@ class OpType(Enum):
 class Workflow:
     """ワークフローノード
     
-    例: /noe+, /bou-, /s+a1:2
+    例: /noe+, /bou-, /s+a1:2, /noe.h, /bou.x
     """
     id: str                              # ワークフロー ID (e.g., "noe", "bou")
     operators: List[OpType] = field(default_factory=list)  # 適用された演算子
     modifiers: Dict[str, Any] = field(default_factory=dict)  # 修飾子 (e.g., {"a1": 2})
     mode: Optional[str] = None           # --mode 指定 (e.g., "nous")
     selector: Optional[str] = None       # [target] セレクタ
+    relation: Optional[str] = None       # .d/.h/.x 関係サフィックス (v7.2)
 
 
 @dataclass

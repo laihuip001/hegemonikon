@@ -213,11 +213,19 @@ def load_standard_macros() -> Dict[str, MacroDefinition]:
                  parameters={},
                  expansion=exp,
                  description="Builtin macro",
-                 source_file=Path("builtin"),
+                 source_file=Path(__file__), # Use current file for builtin existence check
                  signature=None
              )
     
     return macros
+
+
+def get_macro_expansion(name: str) -> Optional[str]:
+    """マクロ名から展開形を取得 (互換性用)"""
+    macros = load_standard_macros()
+    if name in macros:
+        return macros[name].expansion
+    return None
 
 
 def expand_macro(name: str, args: List[str], kwargs: Dict[str, Any] = None) -> Optional[str]:

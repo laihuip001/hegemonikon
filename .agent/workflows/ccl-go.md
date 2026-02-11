@@ -1,5 +1,7 @@
 ---
 description: "[CCL Macro] 即実行 — @go = /s+_/ene+"
+lcm_state: beta
+version: "1.0"
 ---
 
 # /ccl-go: 即実行マクロ

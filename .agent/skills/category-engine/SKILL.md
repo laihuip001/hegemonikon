@@ -12,6 +12,11 @@ triggers:
   - 構造の保存・忘却を問う時
   - Trigonon / X-series を参照する時
   - 「なぜこの変換は正当か」を問う時
+
+risk_tier: "L1"
+risks:
+  - "圏論的類推の乱用による判断ミス (Drift の過小評価)"
+  - "数学的厳密性の欠如による論理的飛躍"
 ---
 
 # 🏛️ Category Theory Engine — 構造認識の言語

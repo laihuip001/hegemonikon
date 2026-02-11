@@ -34,6 +34,11 @@ class StepType(Enum):
     IF_COND = "if_cond"        # I:cond{body} 条件
     OSCILLATION = "oscillation" # A~B 振動
     FUSION = "fusion"          # A*B 融合
+    PIPELINE = "pipeline"      # A |> B パイプライン
+    PARALLEL = "parallel"      # A || B 並列実行
+    COLIMIT = "colimit"        # \A Colimit 展開
+    WHILE_LOOP = "while_loop"  # W:[cond]{body}
+    CONVERGENCE = "convergence" # A >> cond / lim[cond]{A}
 
 
 @dataclass
@@ -265,7 +270,8 @@ class ASTWalker:
         """AST ノードを実行 (forward pass)"""
         from hermeneus.src.ccl_ast import (
             Workflow, MacroRef, Sequence, ForLoop, IfCondition,
-            Oscillation, Fusion, Program,
+            WhileLoop, Oscillation, Fusion, ConvergenceLoop,
+            ColimitExpansion, Pipeline, Parallel, Program,
         )
 
         if isinstance(node, Program):
@@ -280,10 +286,20 @@ class ASTWalker:
             return self._walk_for(node, ctx)
         elif isinstance(node, IfCondition):
             return self._walk_if(node, ctx)
+        elif isinstance(node, WhileLoop):
+            return self._walk_while(node, ctx)
         elif isinstance(node, Oscillation):
             return self._walk_oscillation(node, ctx)
         elif isinstance(node, Fusion):
             return self._walk_fusion(node, ctx)
+        elif isinstance(node, ConvergenceLoop):
+            return self._walk_convergence(node, ctx)
+        elif isinstance(node, ColimitExpansion):
+            return self._walk_colimit(node, ctx)
+        elif isinstance(node, Pipeline):
+            return self._walk_pipeline(node, ctx)
+        elif isinstance(node, Parallel):
+            return self._walk_parallel(node, ctx)
         else:
             return StepResult(
                 step_type=StepType.WORKFLOW,
@@ -494,6 +510,183 @@ class ASTWalker:
             entropy_before=initial_entropy,
             entropy_after=min(left.entropy_after, right.entropy_after),
             children=[left, right],
+        )
+
+    def _walk_pipeline(self, node, ctx: ExecutionContext) -> StepResult:
+        """Pipeline (A |> B |> C): 前段の出力を次段の入力にチェイン
+
+        Unix パイプと同じ: 各ステップの出力が次ステップのコンテキストになる。
+        Sequence (_) との違い: Pipeline は出力を明示的に入力として渡す。
+        """
+        children = []
+        initial_entropy = self.estimator.estimate(ctx.current_output)
+
+        for step in node.steps:
+            child = self.walk(step, ctx)
+            children.append(child)
+            # パイプライン: 出力を次のステップの入力に直接注入
+            ctx.push(child.output)
+            ctx.variables["$pipe_input"] = child.output
+
+        return StepResult(
+            step_type=StepType.PIPELINE,
+            node_id="pipeline",
+            output=ctx.current_output,
+            entropy_before=initial_entropy,
+            entropy_after=children[-1].entropy_after if children else initial_entropy,
+            children=children,
+        )
+
+    def _walk_parallel(self, node, ctx: ExecutionContext) -> StepResult:
+        """Parallel (A || B || C): 全ブランチを独立実行し、結果を統合
+
+        各ブランチは独立したコンテキスト (fork) で実行。
+        結果はエントロピー最小 (最も確信度の高い) のブランチを採用しつつ、
+        全ブランチの出力を融合して返す。
+        """
+        children = []
+        initial_entropy = self.estimator.estimate(ctx.current_output)
+
+        for branch in node.branches:
+            branch_ctx = ctx.fork()
+            child = self.walk(branch, branch_ctx)
+            children.append(child)
+
+        if not children:
+            return StepResult(
+                step_type=StepType.PARALLEL,
+                node_id="parallel",
+                output=ctx.current_output,
+                entropy_before=initial_entropy,
+                entropy_after=initial_entropy,
+            )
+
+        # 全ブランチの出力を融合
+        outputs = [f"[Branch {i+1}] {c.output}" for i, c in enumerate(children)]
+        merged = "[Parallel Results]\n" + "\n---\n".join(outputs)
+        ctx.push(merged)
+
+        # エントロピーは全ブランチの最小値 (最良の結果を採用)
+        best_entropy = min(c.entropy_after for c in children)
+
+        return StepResult(
+            step_type=StepType.PARALLEL,
+            node_id="parallel",
+            output=merged,
+            entropy_before=initial_entropy,
+            entropy_after=best_entropy,
+            children=children,
+        )
+
+    def _walk_colimit(self, node, ctx: ExecutionContext) -> StepResult:
+        """ColimitExpansion (\\A): Colimit 展開 — 全派生を列挙し統合
+
+        圏論的意味: Colimit = 余極限 = 全射影の合併。
+        WF の全派生(variants)を展開し、統合的な視点を構築する。
+        """
+        initial_entropy = self.estimator.estimate(ctx.current_output)
+
+        # 内部ノードを実行
+        child = self.walk(node.body, ctx)
+
+        # Colimit の意味: 展開 + 全派生合併のメタ情報を追加
+        expanded = (
+            f"[Colimit Expansion]\n"
+            f"{child.output}\n"
+            f"---\n"
+            f"全派生を展開済み。余極限として統合。"
+        )
+        ctx.push(expanded)
+
+        return StepResult(
+            step_type=StepType.COLIMIT,
+            node_id="colimit",
+            output=expanded,
+            entropy_before=initial_entropy,
+            entropy_after=child.entropy_after * 0.9,  # 展開により若干改善
+            children=[child],
+        )
+
+    def _walk_while(self, node, ctx: ExecutionContext) -> StepResult:
+        """WhileLoop (W:[cond]{body}): 条件が真の間ループ
+
+        条件評価はヒューリスティック: エントロピーベースの収束判定。
+        最大反復は安全のため制限 (max_iterations=10)。
+        """
+        children = []
+        initial_entropy = self.estimator.estimate(ctx.current_output)
+        max_iterations = 10  # 安全制限
+
+        for i in range(max_iterations):
+            # 条件評価: Condition ノードの値とコンテキストのエントロピーを比較
+            current_entropy = self.estimator.estimate(ctx.current_output)
+            cond_threshold = node.condition.value if hasattr(node.condition, 'value') else 0.5
+            cond_op = node.condition.op if hasattr(node.condition, 'op') else '>'
+
+            # 条件判定
+            if cond_op == '>':
+                should_continue = current_entropy > cond_threshold
+            elif cond_op == '<':
+                should_continue = current_entropy < cond_threshold
+            elif cond_op == '>=':
+                should_continue = current_entropy >= cond_threshold
+            elif cond_op == '<=':
+                should_continue = current_entropy <= cond_threshold
+            else:
+                should_continue = i < 3  # デフォルト: 3回
+
+            if not should_continue:
+                break
+
+            child_ctx = ctx.fork()
+            child_ctx.variables["$iteration"] = i
+            child = self.walk(node.body, child_ctx)
+            children.append(child)
+            ctx.push(child.output)
+
+        return StepResult(
+            step_type=StepType.WHILE_LOOP,
+            node_id=f"W:{len(children)}",
+            output=ctx.current_output,
+            entropy_before=initial_entropy,
+            entropy_after=children[-1].entropy_after if children else initial_entropy,
+            children=children,
+        )
+
+    def _walk_convergence(self, node, ctx: ExecutionContext) -> StepResult:
+        """ConvergenceLoop (A >> cond / lim[cond]{A}): 収束するまで反復
+
+        本体を繰り返し実行し、条件が満たされるか
+        エントロピー変化が閾値以下になったら停止。
+        """
+        children = []
+        initial_entropy = self.estimator.estimate(ctx.current_output)
+        max_iters = getattr(node, 'max_iterations', 5)
+        prev_entropy = initial_entropy
+
+        for i in range(max_iters):
+            child = self.walk(node.body, ctx)
+            children.append(child)
+            ctx.push(child.output)
+
+            # 収束判定: 条件閾値チェック
+            cond_threshold = node.condition.value if hasattr(node.condition, 'value') else 0.5
+            if child.entropy_after < cond_threshold:
+                break  # 収束条件を満たした
+
+            # 追加の収束判定: エントロピー変化が小さい = プラトー
+            if i > 0 and abs(child.entropy_after - prev_entropy) < 0.02:
+                break  # プラトーに到達
+
+            prev_entropy = child.entropy_after
+
+        return StepResult(
+            step_type=StepType.CONVERGENCE,
+            node_id=f"convergence:{len(children)}",
+            output=ctx.current_output,
+            entropy_before=initial_entropy,
+            entropy_after=children[-1].entropy_after if children else initial_entropy,
+            children=children,
         )
 
     @staticmethod

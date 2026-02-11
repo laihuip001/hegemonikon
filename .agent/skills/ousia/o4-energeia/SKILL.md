@@ -390,6 +390,12 @@ fallbacks: []
 📌 成果: {成果物サマリー}
 ✅ 検証: 全ゲート Pass
 📝 コミット提案: {Conventional Commits}
+
+━━━ 🧠 WM (Working Memory) ━━━
+$goal = {この /ene 実行の目的}
+$constraints = {制約・前提条件}
+$decision = {主要な判断とその根拠}
+$next = {次のアクション}
 ═══════════════════════════════════════════════════════════
 ```
 

@@ -197,6 +197,13 @@ Layer 6: Graveyard Walk (墓場歩き)
 ## ⚔️ 10th Man Dissent
 ## 💀 Graveyard Walk
 ## 🎯 Synthesized Blind Spots
+
+## 🧠 WM (Working Memory)
+
+$goal = {この /dia 実行の目的}
+$constraints = {制約・前提条件}
+$decision = {主要な判断とその根拠}
+$next = {次のアクション}
 ```
 
 ---

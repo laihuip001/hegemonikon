@@ -58,6 +58,10 @@ category_theory:
   counit: "ε: F(G(Emotion)) → Emotion — 感情を教訓化して再び感じ直す = 感情の真正性検証"
   drift: "Drift = 教訓が生きた感情から切り離されている度合い。格言が空虚になる"
   insight: "violations.md の教訓こそ G の出力。失敗の痛みを格言に昇華するプロセス"
+  qualia: "G はクオリア（体験の質）を忘却する側。主観→客観、一人称→三人称の変換"
+  episodic_to_semantic: "格言 = エピソード記憶の意味記憶化（一般化/客体化）— dia⊣epi と同型だが感情レイヤー"
+  drift_qualia: "Drift = 格言にならないクオリア。言葉にできない「あの感覚」の喪失量"
+  creator_insight: "主体感・主観・現象的意識が消える — Creator, 2026-02-11"
 ---
 
 # /gno: 原則抽出ワークフロー (Gnōmē)

@@ -51,6 +51,9 @@ category_theory:
   unit: "η: Principle → G(F(Principle)) — 原則を感情で評価し教訓に戻す = 原則の情動的妥当性"
   counit: "ε: F(G(Emotion)) → Emotion — 感情を教訓化して再び感じ直す = 感情の真正性検証"
   drift: "Drift = 感情と原則の乖離。感じていることと信じていることの不一致"
+  qualia: "F はクオリア（体験の質）を構成する側。一人称視点の主観的体験を付与する"
+  pro_pat_complementarity: "pro⊣ore = 情動強度(量的喪失) / pat⊣gno = クオリア(質的喪失)"
+  insight: "情念 = 一人称体験。格言 = 三人称命題。消えるのはクオリア — Creator, 2026-02-11"
 ---
 
 # /pat: メタ感情評価ワークフロー (Pathos)

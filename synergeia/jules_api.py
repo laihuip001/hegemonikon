@@ -23,16 +23,18 @@ import os
 import sys
 import json
 import yaml
+import sqlite3
 import subprocess
 from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Optional, Dict, Any, List
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from threading import Lock
 import shutil
 
 CONFIG_FILE = Path(__file__).parent / "jules_accounts.yaml"
 POOL_STATE_FILE = Path(__file__).parent / "jules_pool_state.json"
+POOL_DB_FILE = Path(__file__).parent / "jules_pool_state.db"
 JULES_CLI = "jules"
 
 
@@ -73,9 +75,27 @@ class JulesPool:
         self.accounts: List[JulesAccount] = []
         self.sessions: Dict[str, JulesSession] = {}
         self.lock = Lock()
+        self.conn = None
         self._init_accounts()
+        self._init_db()
         self._load_state()
     
+    def _init_db(self):
+        """データベース初期化"""
+        self.conn = sqlite3.connect(POOL_DB_FILE, check_same_thread=False)
+        self.conn.row_factory = sqlite3.Row
+        self.conn.execute("PRAGMA journal_mode=WAL")
+
+        self.conn.execute("""
+            CREATE TABLE IF NOT EXISTS accounts (
+                id TEXT PRIMARY KEY,
+                status TEXT,
+                sessions_count INTEGER DEFAULT 0,
+                last_used TEXT
+            )
+        """)
+        self.conn.commit()
+
     def _load_config(self) -> dict:
         """設定ファイル読み込み"""
         if not self.config_path.exists():
@@ -95,32 +115,71 @@ class JulesPool:
                 config_dir=config_dir,
             ))
     
+    def _migrate_from_json(self):
+        """JSONからDBへ移行"""
+        if not POOL_STATE_FILE.exists():
+            return
+
+        # Check if table is empty
+        cursor = self.conn.execute("SELECT COUNT(*) FROM accounts")
+        if cursor.fetchone()[0] > 0:
+            return  # Already migrated or populated
+
+        try:
+            state = json.loads(POOL_STATE_FILE.read_text())
+            accounts = state.get("accounts", {})
+            for acc_id, acc_data in accounts.items():
+                self.conn.execute("""
+                    INSERT OR REPLACE INTO accounts (id, status, sessions_count, last_used)
+                    VALUES (?, ?, ?, ?)
+                """, (
+                    acc_id,
+                    acc_data.get("status", "inactive"),
+                    acc_data.get("sessions_count", 0),
+                    acc_data.get("last_used")
+                ))
+            self.conn.commit()
+            print(f"[JulesPool] Migrated {len(accounts)} accounts from JSON to DB.")
+
+            # Backup JSON file
+            backup_path = POOL_STATE_FILE.with_suffix(".json.bak")
+            shutil.move(POOL_STATE_FILE, backup_path)
+            print(f"[JulesPool] Backed up JSON state to {backup_path.name}")
+
+        except Exception as e:
+            print(f"[JulesPool] Migration failed: {e}")
+
     def _load_state(self):
         """プール状態を読み込み"""
-        if POOL_STATE_FILE.exists():
-            state = json.loads(POOL_STATE_FILE.read_text())
-            for acc in self.accounts:
-                if acc.id in state.get("accounts", {}):
-                    acc_state = state["accounts"][acc.id]
-                    acc.status = acc_state.get("status", acc.status)
-                    acc.sessions_count = acc_state.get("sessions_count", 0)
-                    if acc_state.get("last_used"):
-                        acc.last_used = datetime.fromisoformat(acc_state["last_used"])
+        # Try migration first
+        self._migrate_from_json()
+
+        cursor = self.conn.execute("SELECT * FROM accounts")
+        rows = {row["id"]: row for row in cursor.fetchall()}
+
+        for acc in self.accounts:
+            if acc.id in rows:
+                row = rows[acc.id]
+                acc.status = row["status"]
+                acc.sessions_count = row["sessions_count"]
+                if row["last_used"]:
+                    acc.last_used = datetime.fromisoformat(row["last_used"])
     
-    def _save_state(self):
-        """プール状態を保存"""
-        state = {
-            "accounts": {
-                acc.id: {
-                    "status": acc.status,
-                    "sessions_count": acc.sessions_count,
-                    "last_used": acc.last_used.isoformat() if acc.last_used else None,
-                }
-                for acc in self.accounts
-            },
-            "updated": datetime.now().isoformat(),
-        }
-        POOL_STATE_FILE.write_text(json.dumps(state, indent=2, ensure_ascii=False))
+    def _update_account_state(self, account: JulesAccount):
+        """
+        特定アカウントの状態をDBに保存。
+        JSON保存と異なり、該当レコードのみ更新する。
+        """
+        self.conn.execute("""
+            INSERT OR REPLACE INTO accounts (id, status, sessions_count, last_used)
+            VALUES (?, ?, ?, ?)
+        """, (
+            account.id,
+            account.status,
+            account.sessions_count,
+            account.last_used.isoformat() if account.last_used else None
+        ))
+        self.conn.commit()
     
     def get_available_account(self) -> Optional[JulesAccount]:
         """
@@ -193,7 +252,7 @@ class JulesPool:
         
         print(f"[JulesPool] ログイン: {account_id}")
         print(f"[JulesPool] Config dir: {account.config_dir}")
-        print(f"[JulesPool] ブラウザでログインしてください...")
+        print("[JulesPool] ブラウザでログインしてください...")
         
         # 対話的にログイン
         env = os.environ.copy()
@@ -206,7 +265,7 @@ class JulesPool:
         
         if result.returncode == 0:
             account.status = "active"
-            self._save_state()
+            self._update_account_state(account)
             return {"status": "success", "account_id": account_id}
         
         return {"error": "Login failed", "returncode": result.returncode}
@@ -229,7 +288,7 @@ class JulesPool:
             account.status = "busy"
             account.last_used = datetime.now()
             account.sessions_count += 1
-            self._save_state()
+            self._update_account_state(account)
         
         try:
             # `jules remote new` は非対話的（APIベース）
@@ -243,7 +302,7 @@ class JulesPool:
             
             if "error" in result:
                 account.status = "active"
-                self._save_state()
+                self._update_account_state(account)
                 return result
             
             # セッションIDを出力から抽出
@@ -262,7 +321,7 @@ class JulesPool:
             
             # クールダウンに移行
             account.status = "cooldown"
-            self._save_state()
+            self._update_account_state(account)
             
             return {
                 "status": "success",
@@ -273,7 +332,7 @@ class JulesPool:
             
         except Exception as e:
             account.status = "active"
-            self._save_state()
+            self._update_account_state(account)
             return {"error": str(e)}
     
     @staticmethod

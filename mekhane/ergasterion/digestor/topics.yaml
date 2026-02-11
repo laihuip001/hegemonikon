@@ -29,59 +29,99 @@ templates:
 
 # 消化対象トピック
 # gnosis_topics.yaml からインポート + Hegemonikón 固有トピック
+# v2.1: クエリ充実化 — BGE-M3 セマンティック空間精度向上
 topics:
   # ===== Gnosis からインポート =====
   - id: agent-architecture
-    query: "LLM autonomous agent architecture"
+    query: >-
+      LLM autonomous agent architecture, multi-agent systems,
+      agent orchestration and planning, ReAct reasoning and acting,
+      tool-augmented language model, agentic workflow design patterns,
+      cognitive architecture for AI agents
     digest_to: ["/noe", "/s"]
     template_hint: T3_absorption
     description: 自律エージェントアーキテクチャ → 設計パターン消化
 
   - id: active-inference
-    query: "Active Inference in artificial intelligence"
+    query: >-
+      Active Inference framework, variational inference for action selection,
+      expected free energy minimization, Bayesian brain hypothesis,
+      generative model for perception and action, belief updating,
+      prior preferences and goal-directed behavior
     digest_to: ["/noe", "/bou"]
     template_hint: T2_extraction
     description: 能動的推論 → FEP 理論消化
 
   - id: structured-prompting
-    query: "Structured prompting languages for LLM"
+    query: >-
+      Structured prompting languages for LLM, prompt engineering frameworks,
+      template-based prompt design, constraint-driven prompt generation,
+      domain-specific prompt patterns, few-shot and chain-of-thought templates,
+      prompt optimization and automatic prompt tuning
     digest_to: ["/mek", "/tek"]
     template_hint: T3_absorption
     description: 構造化プロンプト → tekhne-maker 強化
 
   - id: chain-of-thought
-    query: "Chain-of-Thought reasoning optimization"
+    query: >-
+      Chain-of-Thought reasoning, step-by-step problem solving in LLMs,
+      reasoning trace optimization, tree-of-thought and graph-of-thought,
+      self-consistency decoding, long chain-of-thought compression,
+      faithful reasoning and logical deduction in language models
     digest_to: ["/noe", "/dia"]
     template_hint: T3_absorption
     description: 推論最適化 → 認知プロトコル消化
 
   - id: tool-use
-    query: "Tool use and function calling in LLMs"
+    query: >-
+      Tool use and function calling in LLMs, API integration for agents,
+      retrieval-augmented generation, code execution and interpreter tools,
+      external knowledge retrieval, model context protocol,
+      grounding language models with external tools
     digest_to: ["/ene", "/mek"]
     template_hint: T3_absorption
     description: ツール利用 → 実行パターン消化
 
   - id: self-correction
-    query: "Self-correction and verification in LLM agents"
+    query: >-
+      Self-correction and verification in LLM agents,
+      self-reflection and iterative refinement, constitutional AI,
+      self-critique and debate-based verification,
+      hallucination detection, output validation and fact-checking,
+      multi-agent debate for quality assurance
     digest_to: ["/dia", "/epo"]
     template_hint: T3_absorption
     description: 自己修正 → 検証プロトコル消化
 
   # ===== Hegemonikón 固有 =====
   - id: stoic-philosophy
-    query: "Stoic philosophy cognitive science"
+    query: >-
+      Stoic philosophy and cognitive science, hegemonikon ruling faculty,
+      Epictetus Seneca Marcus Aurelius, rational agent decision making,
+      virtue ethics and practical wisdom, prohairesis moral choice,
+      ancient philosophy meets modern artificial intelligence
     digest_to: ["/noe", "/bou"]
     template_hint: T2_extraction
     description: ストア哲学 × 認知科学
 
   - id: free-energy-principle
-    query: "Free Energy Principle practical application"
+    query: >-
+      Free Energy Principle, variational free energy minimization,
+      Karl Friston predictive processing, Bayesian surprise,
+      prediction error minimization, generative model for cognition,
+      embodied cognition, allostasis and interoception,
+      Markov blanket and self-organization
     digest_to: ["/bou", "/ore"]
     template_hint: T2_extraction
     description: 自由エネルギー原理の実用化
 
   - id: metacognition
-    query: "Metacognition and self-awareness in AI"
+    query: >-
+      Metacognition and self-awareness in AI, confidence calibration,
+      uncertainty quantification in neural networks,
+      introspective reasoning, epistemic humility in language models,
+      knowing what you don't know, meta-learning and learning to learn,
+      cognitive monitoring and self-regulation
     digest_to: ["/dia", "/epo"]
     template_hint: T4_import
     description: メタ認知 → Akribeia 強化

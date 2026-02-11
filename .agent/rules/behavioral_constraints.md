@@ -100,6 +100,19 @@ cd ~/oikos/hegemonikon && python mekhane/anamnesis/cli.py search "query"
 
 例外: turbo 指定時 / 明示的「やって」/ 軽微修正
 
+**EAFP 使い分け (Pythōsis 骨髄 M3)**:
+
+> BC-5 (LBYL) と Python の EAFP は Function 公理 (Explore/Exploit) の二面性。
+
+| 状況 | 方針 | 根拠 |
+|:-----|:-----|:-----|
+| 破壊的操作 (rm, DELETE) | **LBYL** (BC-5) | 取り返しがつかない |
+| 探索的操作 (/zet, /poc) | **EAFP** | 失敗から学べる |
+| 新規作成 (write_to_file) | **EAFP** | 壊すものがない |
+| 既存変更 (replace) | **LBYL** (BC-5) | 既存の価値を守る |
+| 実験 (experiments/) | **EAFP** | 実験の目的は失敗から学ぶこと |
+| 本番 (kernel/) | **LBYL** (BC-5) | SACRED_TRUTH を守る |
+
 ### BC-6: 確信度明示義務（Confidence Labels + TAINT 追跡）
 
 | ラベル | 確信度 | 使用場面 |

@@ -10,6 +10,13 @@ category_theory:
   unit: "η: Id_Mem → R∘L (boot→bye の保存率)"
   counit: "ε: L∘R → Id_Ses (bye→boot の復元率)"
   insight: "赤の他人基準 = R の像が自己完結的であること"
+  python_analog: "Generator パターン (Pythōsis 骨髄消化 M1)"
+  generator_correspondence:
+    yield: "Handoff = セッションの yield。状態を保持したまま中断"
+    next: "/boot = next(gen)。前回の状態から再開"
+    send: "Creatorの新指示 = send(value)。Handoff + 新コンテキスト"
+    close: "/bye final = close()。finally ブロック（永続化）が走る"
+    yield_from: "CCL >> = yield from。子WFに制御を委譲"
   steps_as_R:
     step_0: "R₀: Ses の状態評価 — 圧縮前の品質チェック"
     step_1: "R₁: Ses の射を取得 — Git = コード圏の射の記録"

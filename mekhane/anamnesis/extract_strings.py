@@ -8,6 +8,7 @@ Usage: python extract_strings.py [pb_file]
 """
 
 import re
+import logging
 from pathlib import Path
 from datetime import datetime
 
@@ -28,8 +29,8 @@ def extract_strings(filepath: Path, min_length: int = 20):
         try:
             text = match.group().decode("ascii")
             strings.append(("ascii", text))
-        except Exception:
-            pass  # TODO: Add proper error handling
+        except Exception as e:
+            logging.warning(f"Error decoding ASCII match at {match.start()}: {e}")
 
     # UTF-8 文字列 (日本語を含む)
     # マジックバイトで UTF-8 開始を検出

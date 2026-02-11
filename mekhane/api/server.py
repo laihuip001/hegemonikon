@@ -142,6 +142,22 @@ def _register_routers(app: FastAPI) -> None:
     except Exception as exc:
         logger.warning("Sophia KI router skipped: %s", exc)
 
+    # Symploke — 埋め込みモデル (ベクトル検索) に依存するため遅延ロード
+    try:
+        from mekhane.api.routes.symploke import router as symploke_router
+        app.include_router(symploke_router, prefix=API_PREFIX)
+        logger.info("Symploke router registered")
+    except Exception as exc:
+        logger.warning("Symploke router skipped: %s", exc)
+
+    # MCP Gateway — PolicyEnforcer + DiscoveryEngine に依存するため遅延ロード
+    try:
+        from mekhane.api.routes.gateway import router as gateway_router
+        app.include_router(gateway_router, prefix=API_PREFIX)
+        logger.info("Gateway router registered")
+    except Exception as exc:
+        logger.warning("Gateway router skipped: %s", exc)
+
 
 # PURPOSE: アプリケーションインスタンス（uvicorn 用）
 app = create_app()

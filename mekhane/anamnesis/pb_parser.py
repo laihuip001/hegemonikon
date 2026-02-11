@@ -67,8 +67,10 @@ def extract_text_from_pb(filepath: Path):
                     # (最低10文字、ASCII/日本語を含む)
                     if len(text) >= 10 and re.search(r"[\u3040-\u9fff\w]{3,}", text):
                         texts.append(text)
-                except Exception:
-                    pass  # TODO: Add proper error handling
+                except UnicodeDecodeError:
+                    pass  # Not a text field, ignore
+                except Exception as e:
+                    print(f"[!] Error processing text field at offset {pos - length}: {e}")
 
             elif wire_type == 5:  # 32-bit
                 pos += 4

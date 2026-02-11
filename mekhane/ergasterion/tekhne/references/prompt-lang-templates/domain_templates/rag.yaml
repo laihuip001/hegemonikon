@@ -87,6 +87,24 @@ domain_examples:
         "no_answer_reason": "検索結果に該当する情報なし"
       }
 
+  - name: "conflicting_sources_edge"
+    type: "edge"
+    input: |
+      質問: バッチサイズは大きい方が良いか？
+      検索結果:
+        [1] Smith (2024): "大きいバッチサイズは汎化性能を低下させる"
+        [2] Lee (2025): "大きいバッチサイズは学習を安定化させる"
+    output: |
+      {
+        "answer": "バッチサイズの効果は研究間で見解が分かれています。Smith (2024) は汎化性能の低下を指摘 [1] する一方、Lee (2025) は学習の安定化を報告 [2] しています。タスクとデータセットに応じた実験的検証が推奨されます。",
+        "citations": [
+          {"id": "[1]", "source": "Smith (2024)", "excerpt": "大きいバッチサイズは汎化性能を低下させる", "relevance_score": 0.90},
+          {"id": "[2]", "source": "Lee (2025)", "excerpt": "大きいバッチサイズは学習を安定化させる", "relevance_score": 0.88}
+        ],
+        "confidence": "medium",
+        "no_answer_reason": null
+      }
+
 # --- アンチパターン（避けるべき出力パターン） ---
 anti_patterns:
   - pattern: "ハルシネーション"

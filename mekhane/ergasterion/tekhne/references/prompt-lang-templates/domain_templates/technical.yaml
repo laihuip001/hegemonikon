@@ -89,6 +89,25 @@ domain_examples:
         }
       }
 
+  - name: "edge_case_no_issues"
+    type: "edge"
+    input: |
+      以下の関数をレビューしてください:
+      ```python
+      def add(a: int, b: int) -> int:
+          return a + b
+      ```
+    output: |
+      {
+        "summary": "問題なし。シンプルで正確な実装",
+        "issues": [],
+        "evaluation": {
+          "correctness": 5,
+          "security": 5,
+          "maintainability": 5
+        }
+      }
+
 # --- アンチパターン（避けるべき出力パターン） ---
 anti_patterns:
   - pattern: "曖昧な指摘"

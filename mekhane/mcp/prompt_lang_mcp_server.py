@@ -128,6 +128,13 @@ DOMAIN_KEYWORDS = {
         "圧縮", "compress", "ポイント", "key points",
         "議事録", "meeting notes", "condensation",
     ],
+    "research": [
+        "調査", "research", "リサーチ", "survey", "動向", "trend",
+        "文献", "literature", "レビュー", "review", "分析", "analysis",
+        "比較", "comparison", "ベストプラクティス", "best practice",
+        "フレームワーク", "framework", "手法", "methodology",
+        "feasibility", "可能性", "competitive", "競合",
+    ],
 }
 
 
@@ -144,7 +151,7 @@ def detect_domain(text: str) -> str:
 
 
 # ============ Security: Domain Validation (Defense-in-Depth) ============
-ALLOWED_DOMAINS = frozenset(["technical", "rag", "summarization"])
+ALLOWED_DOMAINS = frozenset(["technical", "rag", "summarization", "research"])
 
 
 def validate_domain(domain: str) -> str:

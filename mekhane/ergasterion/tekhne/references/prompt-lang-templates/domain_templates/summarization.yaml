@@ -89,6 +89,21 @@ domain_examples:
         }
       }
 
+  - name: "too_short_edge"
+    type: "edge"
+    input: "以下を要約してください: 「明日は晴れ。」"
+    output: |
+      {
+        "summary": "「明日は晴れ。」",
+        "key_points": ["天気予報: 明日は晴れ"],
+        "metadata": {
+          "original_length": 6,
+          "summary_length": 6,
+          "compression_ratio": 1.0,
+          "note": "入力が短いため、圧縮不要。原文をそのまま返却"
+        }
+      }
+
 # --- アンチパターン（避けるべき出力パターン） ---
 anti_patterns:
   - pattern: "捏造"

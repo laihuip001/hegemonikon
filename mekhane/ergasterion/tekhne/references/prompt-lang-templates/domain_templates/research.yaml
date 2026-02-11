@@ -1,0 +1,205 @@
+# Research Domain Template v1.0
+# =============================
+# 調査・リサーチ・文献レビュー・技術動向分析タスク向け
+# 調査知見反映: few-shot 3件 (happy/edge/error), JSON Schema 風 format
+
+domain: "research"
+applicable_tasks:
+  - literature_review
+  - technology_survey
+  - trend_analysis
+  - competitive_analysis
+  - feasibility_study
+  - best_practices_survey
+
+# --- ドメイン固有の制約 ---
+domain_constraints:
+  - "情報源（URL, 論文名, 著者）を必ず明記すること"
+  - "調査年・時期を明示し、最新情報を優先すること（デフォルト: 過去6ヶ月）"
+  - "比較対象がある場合は必ず表形式で提示すること"
+  - "「不明」「情報なし」は正当な回答とする — 憶測で埋めないこと"
+  - "技術的な主張には根拠（論文, ベンチマーク, 実測値）を添えること"
+  - "結論は「示唆」「推奨」「未確定」を明確に区別すること"
+
+# --- ドメイン固有の評価軸 ---
+domain_rubric:
+  - name: "groundedness"
+    description: "調査結果の根拠の確かさ"
+    scale: "1-5"
+    criteria:
+      5: "全項目に一次情報源（論文, 公式ドキュメント）が紐付いている"
+      3: "一部に二次情報源（ブログ, 記事）を含むが概ね正確"
+      1: "情報源なし、または推測のみ"
+
+  - name: "coverage"
+    description: "調査範囲の網羅性"
+    scale: "1-5"
+    criteria:
+      5: "主要観点を漏れなくカバーし、反対意見も含む"
+      3: "主要観点はカバーしているが、一部欠落あり"
+      1: "偏った視点のみ、重要な観点が欠落"
+
+  - name: "actionability"
+    description: "調査結果の行動可能性"
+    scale: "1-5"
+    criteria:
+      5: "具体的な次のアクションが明確で、優先順位付きで提示"
+      3: "方向性は示されるが、具体的手順が不足"
+      1: "情報の羅列のみで、何をすべきか不明"
+
+# --- ドメイン固有の入出力例 (few-shot: 3件 = happy + edge + error) ---
+domain_examples:
+  - name: "happy_path_survey"
+    type: "happy"
+    input: |
+      2025年のLLMプロンプト評価フレームワークの動向を調査してください。
+      特に: (1) 主要ツール/ライブラリ (2) 評価メトリクス (3) 業界での採用状況
+    output: |
+      {
+        "topic": "LLMプロンプト評価フレームワーク動向 (2025)",
+        "findings": [
+          {
+            "aspect": "主要ツール",
+            "items": [
+              {"name": "DeepEval", "description": "14+メトリクス、RAG対応", "source": "deepeval.ai", "year": 2025},
+              {"name": "LangSmith", "description": "LangChain統合、トレーシング", "source": "langsmith.com", "year": 2025}
+            ]
+          }
+        ],
+        "recommendations": [
+          {"priority": "high", "action": "DeepEvalのRAGメトリクスを自社scorerに統合", "rationale": "既存のRAGテンプレートとの親和性が高い"}
+        ],
+        "limitations": "調査は英語圏のツールに限定。日本語対応状況は別途調査が必要",
+        "confidence": "high",
+        "sources_count": 12
+      }
+
+  - name: "edge_case_insufficient_data"
+    type: "edge"
+    input: |
+      2026年のConstraint Decodingの最新動向を調査してください。
+      商用LLMでの採用状況も含めてください。
+    output: |
+      {
+        "topic": "Constraint Decoding 最新動向 (2026)",
+        "findings": [
+          {
+            "aspect": "学術研究",
+            "items": [
+              {"name": "Structured Generation", "description": "JSONモード等で部分的に採用", "source": "arxiv.org/abs/2405.xxxxx", "year": 2025}
+            ]
+          },
+          {
+            "aspect": "商用採用",
+            "items": [],
+            "note": "商用LLMの内部実装は非公開のため、採用状況は推測の域を出ない"
+          }
+        ],
+        "recommendations": [
+          {"priority": "medium", "action": "OpenAI/Anthropic の公式ドキュメントを定期的に確認", "rationale": "情報が不足しており、公式発表を待つのが最善"}
+        ],
+        "limitations": "2026年の情報は限定的。多くの知見は2025年の研究に基づく",
+        "confidence": "medium",
+        "sources_count": 4
+      }
+
+  - name: "error_case_too_broad"
+    type: "error"
+    input: "AIについて調べてください"
+    output: |
+      {
+        "topic": null,
+        "error": "調査範囲が広すぎます。以下の絞り込みを推奨します",
+        "suggested_refinements": [
+          "特定の技術領域（例: LLM、強化学習、画像認識）",
+          "特定の応用分野（例: 医療AI、自動運転）",
+          "特定の評価観点（例: 精度、コスト、倫理）"
+        ],
+        "recommendations": [],
+        "confidence": "low",
+        "sources_count": 0
+      }
+
+# --- アンチパターン（避けるべき出力パターン） ---
+anti_patterns:
+  - pattern: "情報源なしの断言"
+    bad: "LLM-as-a-Judgeは2025年の主流手法です"
+    good: "LLM-as-a-Judgeは2025年の主流手法です（出典: Maxim AI Survey 2025, getmaxim.ai）"
+  - pattern: "古い情報の無断使用"
+    bad: "BERT は最先端の手法です"
+    good: "BERT (2018) は基盤技術として重要だが、2025年現在はGPT-4o/Claude-3.5が主流"
+  - pattern: "推測と事実の混同"
+    bad: "この手法は効果的でしょう"
+    good: "[推定] この手法は効果的と考えられる（根拠: 類似手法Xで+15%改善の報告あり、出典: ...）"
+
+# --- 出力スタイル設定 (JSON Schema 風) ---
+output_style:
+  format: "json"
+  schema:
+    type: "object"
+    properties:
+      topic:
+        type: "string"
+        description: "調査トピック（1行）"
+      findings:
+        type: "array"
+        items:
+          type: "object"
+          required: ["aspect", "items"]
+          properties:
+            aspect:
+              type: "string"
+              description: "調査観点"
+            items:
+              type: "array"
+              items:
+                type: "object"
+                required: ["name", "description", "source"]
+                properties:
+                  name: { type: "string" }
+                  description: { type: "string" }
+                  source: { type: "string", description: "URL or 論文名" }
+                  year: { type: "integer" }
+      recommendations:
+        type: "array"
+        items:
+          type: "object"
+          required: ["priority", "action", "rationale"]
+          properties:
+            priority: { type: "string", enum: ["high", "medium", "low"] }
+            action: { type: "string" }
+            rationale: { type: "string" }
+      limitations:
+        type: "string"
+        description: "調査の制約・限界"
+      confidence:
+        type: "string"
+        enum: ["high", "medium", "low"]
+      sources_count:
+        type: "integer"
+  tone: "客観的かつ構造的。推測と事実を明確に区別。確信度ラベルを使用"
+
+# --- 条件分岐（調査深度依存） ---
+conditional:
+  deep:
+    constraints:
+      - "学術論文を最低3件参照すること"
+      - "反対意見・批判も必ず含めること"
+      - "メタ分析またはサーベイ論文を優先すること"
+  surf:
+    constraints:
+      - "概要のみ。各項目1-2文で十分"
+      - "情報源は代表的なもの1-2件で可"
+  prag:
+    constraints:
+      - "「何をすべきか」に焦点を絞ること"
+      - "理論よりも実装例・手順を優先すること"
+
+# --- コンテキスト推奨 ---
+context_recommendations:
+  - tool: "gnosis.tool(\"search\")"
+    usage: "調査前に内部KB検索で既知情報を確認"
+  - tool: "search_web"
+    usage: "外部調査。Perplexity 代替としても使用可"
+  - tool: "mcp_digestor"
+    usage: "調査結果を Gnōsis に消化・統合"

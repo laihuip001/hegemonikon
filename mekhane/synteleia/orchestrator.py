@@ -9,6 +9,7 @@ CCL:
 - @syn×  外積モード（3×3 交差検証）
 """
 
+import threading
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from typing import List, Optional
 
@@ -36,6 +37,21 @@ from .dokimasia import (
 # PURPOSE: Synteleia 2層オーケストレーター
 class SynteleiaOrchestrator:
     """Synteleia 2層オーケストレーター"""
+
+    _shared_executor: Optional[ThreadPoolExecutor] = None
+    _executor_lock = threading.Lock()
+    _MAX_WORKERS = 64
+
+    @classmethod
+    def _get_executor(cls) -> ThreadPoolExecutor:
+        """共有スレッドプールを取得"""
+        if cls._shared_executor is None:
+            with cls._executor_lock:
+                if cls._shared_executor is None:
+                    # 高負荷時のストールを防ぐため、スレッド数を多めに確保
+                    # 多くのエージェントが I/O バウンド (LLM 呼び出し) である可能性があるため
+                    cls._shared_executor = ThreadPoolExecutor(max_workers=cls._MAX_WORKERS)
+        return cls._shared_executor
 
     def __init__(
         self,
@@ -120,28 +136,28 @@ class SynteleiaOrchestrator:
         """並列監査"""
         results = []
 
-        with ThreadPoolExecutor(max_workers=len(self.agents)) as executor:
-            futures = {
-                executor.submit(agent.audit, target): agent
-                for agent in self.agents
-                if agent.supports(target.target_type)
-            }
+        executor = self._get_executor()
+        futures = {
+            executor.submit(agent.audit, target): agent
+            for agent in self.agents
+            if agent.supports(target.target_type)
+        }
 
-            for future in as_completed(futures):
-                try:
-                    result = future.result()
-                    results.append(result)
-                except Exception as e:
-                    agent = futures[future]
-                    results.append(
-                        AgentResult(
-                            agent_name=agent.name,
-                            passed=False,
-                            issues=[],
-                            confidence=0.0,
-                            metadata={"error": str(e)},
-                        )
+        for future in as_completed(futures):
+            try:
+                result = future.result()
+                results.append(result)
+            except Exception as e:
+                agent = futures[future]
+                results.append(
+                    AgentResult(
+                        agent_name=agent.name,
+                        passed=False,
+                        issues=[],
+                        confidence=0.0,
+                        metadata={"error": str(e)},
                     )
+                )
 
         return results
 

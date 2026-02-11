@@ -9,6 +9,7 @@ Origin: 2026-01-31 CCL Execution Guarantee Architecture
 """
 
 import asyncio
+import re
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
@@ -70,6 +71,14 @@ class ConsensusResult:
     dissent_reasons: List[str]
     rounds: List[DebateRound]
     metadata: Dict[str, Any] = field(default_factory=dict)
+
+
+# =============================================================================
+# Constants
+# =============================================================================
+
+CONFIDENCE_PATTERN = re.compile(r'(\d+)\s*%')
+REASONING_PATTERN = re.compile(r'理由[:：]\s*(.+)', re.DOTALL)
 
 
 # =============================================================================
@@ -277,15 +286,14 @@ class DebateAgent:
             verdict_type = VerdictType.UNCERTAIN
         
         # 確信度
-        import re
-        conf_match = re.search(r'(\d+)\s*%', text)
+        conf_match = CONFIDENCE_PATTERN.search(text)
         if conf_match:
             confidence = int(conf_match.group(1)) / 100.0
         else:
             confidence = 0.5
         
         # 理由
-        reason_match = re.search(r'理由[:：]\s*(.+)', text, re.DOTALL)
+        reason_match = REASONING_PATTERN.search(text)
         if reason_match:
             reasoning = reason_match.group(1).strip()[:200]
         else:

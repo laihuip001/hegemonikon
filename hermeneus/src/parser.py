@@ -429,20 +429,37 @@ class CCLParser:
     
     def _parse_if(self, expr: str) -> IfCondition:
         """IF 条件分岐をパース: I:[cond]{then} EI:[cond]{elif} E:{else}"""
-        # Pattern 1: I:[cond]{then} — ネストした {} に対応
-        cond_match = re.match(r'I:\[([^\]]*(?:\[[^\]]*\][^\]]*)*)\]', expr)
-        if cond_match:
-            condition = self._parse_condition(cond_match.group(1))
-            rest_after_cond = expr[cond_match.end():]
-            body_str, rest = self._extract_braced_body(rest_after_cond)
-            if body_str is not None:
-                then_branch = self._parse_expression(body_str)
-                else_branch = self._parse_else_chain(rest) if rest else None
-                return IfCondition(
-                    condition=condition,
-                    then_branch=then_branch,
-                    else_branch=else_branch
-                )
+        # Pattern 1: I:[cond]{then} — ネストした [] と {} に対応
+        if expr.startswith('I:['):
+            # I:[ の後から対応する ] を見つける（]{の並びを閉じ判定に使用）
+            depth = 0
+            cond_end = -1
+            for i in range(3, len(expr)):
+                if expr[i] == '[':
+                    depth += 1
+                elif expr[i] == ']':
+                    if depth > 0:
+                        depth -= 1
+                    else:
+                        # 次の文字が { なら正しい閉じ括弧
+                        if i + 1 < len(expr) and expr[i + 1] == '{':
+                            cond_end = i
+                            break
+                        # V[] のような内部 [] はスキップ
+            
+            if cond_end > 0:
+                cond_str = expr[3:cond_end]
+                condition = self._parse_condition(cond_str)
+                rest_after_cond = expr[cond_end + 1:]
+                body_str, rest = self._extract_braced_body(rest_after_cond)
+                if body_str is not None:
+                    then_branch = self._parse_expression(body_str)
+                    else_branch = self._parse_else_chain(rest) if rest else None
+                    return IfCondition(
+                        condition=condition,
+                        then_branch=then_branch,
+                        else_branch=else_branch
+                    )
 
         # Pattern 2: I:cond{then} (角括弧なし、シンプル条件)
         match2 = re.match(r'I:(\w+)', expr)

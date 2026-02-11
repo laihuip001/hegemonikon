@@ -20,6 +20,19 @@ trigonon:
     ">>S": [/met, /mek, /sta, /pra]
     ">>H": [/pro, /pis, /ore, /dox]
 modes: [surf, deep, prag, track]
+category_theory:
+  core: "随伴 F⊣G の右随伴 G（忘却関手）"
+  adjunction: "Chronos (F) ⊣ Sophia (G)"
+  role: "G: Time → Wisdom（時間判定から進捗・期限の文脈を忘却し、大局の知見に戻る）"
+  G_definition: "「いつまでに」の時間圧力を捨てて、「そもそも何を知るべきか」に立ち返る"
+  same_formula: "chr と sop は同じ Valence(-) の Scale 違い"
+  coordinates: "K4[Macro,-] — Valence(-)を保存し Scale を Macro に設定"
+  G_two_layers:
+    知見: "「何を知るべきか」という調査対象。well-defined"
+    時間文脈: "「いつまでに」「進捗はどうか」。調査に戻ると忘却される"
+  drift: "Drift = 時間的文脈の喪失。調査に没頭して期限を忘れる"
+  k_series_pattern: "K-series 全体: euk⊣tel(+) と chr⊣sop(-) で Valence の表裏"
+  insight: "問うべき対象のレイヤーが上下している — Creator, 2026-02-11"
 ---
 
 # /sop: 情報収集ワークフロー (Sophia)

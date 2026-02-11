@@ -43,6 +43,16 @@ sel_enforcement:
       - "時間感覚プロセスを問う"
 anti_skip: enabled
 ccl_signature: "/chr+"
+category_theory:
+  core: "随伴 F⊣G の左随伴 F（自由関手）"
+  adjunction: "Chronos (F) ⊣ Sophia (G)"
+  role: "F: Wisdom → Time（知見に時間制約を載せて時間判定を構成 = Micro化）"
+  F_definition: "大局的な知見に「いつまでに」「どれくらい」の時間文脈を付与する"
+  same_formula: "chr と sop は同じ Valence(-) の Scale 違い"
+  coordinates: "K2[Micro,-] — Valence(-)を保存し Scale を Micro に設定"
+  k_series_pattern: "K-series 全体: 問うべき対象のレイヤー（モーメント）が上下する"
+  unit: "η: Wisdom → G(F(Wisdom)) — 知見を時間評価して調査に戻す = 知見の時間的妥当性検証"
+  insight: "euk⊣tel と同じパターン。レイヤーが上下している — Creator, 2026-02-11"
 ---
 
 # /chr: 時間配置ワークフロー (Chronos)
@@ -228,7 +238,6 @@ view_file /home/makaron8426/oikos/hegemonikon/.agent/skills/kairos/k2-chronos/SK
 ```
 
 ---
-
 
 ---
 

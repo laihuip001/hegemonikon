@@ -161,11 +161,15 @@ class TestMacroRegistry:
         r = MacroRegistry(path=path)
         assert r.get("dig") is not None  # Builtins still work
 
-    def test_corrupt_file_loads(self, tmp_path):
+    def test_corrupt_file_loads(self, tmp_path, caplog):
         path = tmp_path / "corrupt.json"
         path.write_text("{invalid json")
-        r = MacroRegistry(path=path)
+        import logging
+
+        with caplog.at_level(logging.WARNING):
+            r = MacroRegistry(path=path)
         assert r.get("dig") is not None  # Gracefully falls back
+        assert "Failed to load macros" in caplog.text
 
 
 # ── MacroExpander ────────────────────────

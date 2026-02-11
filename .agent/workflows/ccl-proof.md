@@ -1,5 +1,7 @@
 ---
 description: "[CCL Macro] 存在証明 — @proof = /noe{axiom:FEP}~/dia_I:confidence=1{/ene{output:PROOF.md}}"
+version: "1.0"
+lcm_state: beta
 ---
 
 # /ccl-proof: 存在証明マクロ

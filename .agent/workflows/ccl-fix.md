@@ -1,5 +1,7 @@
 ---
 description: "[CCL Macro] 修正サイクル — @fix = /dia+_/ene+_/dia"
+version: "1.0"
+lcm_state: beta
 ---
 
 # /ccl-fix: 修正サイクルマクロ

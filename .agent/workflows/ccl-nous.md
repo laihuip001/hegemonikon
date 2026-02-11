@@ -1,5 +1,7 @@
 ---
 description: "[CCL Macro] 問いの深化 — @nous = /u+*^/u^"
+version: "1.0"
+lcm_state: beta
 ---
 
 # /ccl-nous: 問いの深化マクロ (νοῦς)

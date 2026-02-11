@@ -42,12 +42,20 @@ class LLMBackend(ABC):
 
     @abstractmethod
     def query(self, prompt: str, context: str) -> str:
-        """LLM にクエリを送信し、テキスト応答を返す"""
+        """LLM にクエリを送信し、テキスト応答を返す。
+
+        Args:
+            prompt: システムプロンプト
+            context: ユーザーコンテキスト
+
+        Returns:
+            LLMからの応答テキスト
+        """
         pass
 
     @abstractmethod
     def is_available(self) -> bool:
-        """バックエンドが利用可能か"""
+        """バックエンドが利用可能かどうかを返す。"""
         pass
 
 
@@ -60,7 +68,7 @@ class LMQLBackend(LLMBackend):
         self._available: Optional[bool] = None
 
     def query(self, prompt: str, context: str) -> str:
-        """LMQL 経由でクエリを実行"""
+        """LMQL 経由でクエリを実行する。"""
         try:
             from mekhane.ccl.lmql_translator import ccl_to_lmql
 

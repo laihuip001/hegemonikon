@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/インフラ] <- mekhane/ergasterion/tekhne/ A0→プロンプト品質定量化が必要→prompt_quality_scorerが担う
 """
 Prompt Quality Scorer — システムプロンプトの品質を定量的にスコアリング
 

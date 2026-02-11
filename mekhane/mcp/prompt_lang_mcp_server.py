@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/インフラ] <- mekhane/mcp/ A0→Prompt-Lang MCP統合が必要→prompt_lang_mcp_serverが担う
 """
 Prompt-Lang MCP Server v2.0 — Hegemonikón Skill Generator
 
@@ -347,9 +348,9 @@ def generate_prompt_lang(requirements: str, domain: str, output_format: str) -> 
             bad = ap.get("bad", "")
             lines.append(f"  - 禁止: {pattern}（例: 「{bad}」）")
 
-    # v2.2 施策 1: Safety 基盤制約の注入
+    # v2.3 施策 1: Safety 基盤制約の注入 (ドメイン文脈付き)
     if safety_base:
-        lines.append("  # --- 安全基盤制約 ---")
+        lines.append(f"  # --- 安全基盤制約 ({domain} ドメイン) ---")
         for sc in safety_base:
             lines.append(f"  - {sc}")
 
@@ -418,9 +419,33 @@ def generate_prompt_lang(requirements: str, domain: str, output_format: str) -> 
             "      scale: 1-5",
         ])
 
-    # Format section — v2.1: use domain template format instead of hardcoded
+    # Format section — v2.3: schema 展開 + structure + domain_format
     lines.extend(["", "@format:"])
-    if output_style and output_style.get("structure"):
+    if output_style and output_style.get("schema"):
+        # v2.3: JSON Schema を @format に展開
+        schema = output_style["schema"]
+        lines.append("  ```json")
+        lines.append("  {")
+        props = schema.get("properties", {})
+        prop_items = list(props.items())
+        for i, (key, val) in enumerate(prop_items):
+            ptype = val.get("type", "string")
+            desc = val.get("description", "")
+            enum_vals = val.get("enum", [])
+            comma = "," if i < len(prop_items) - 1 else ""
+            if ptype == "array":
+                arr_desc = desc or f"{key} の配列"
+                lines.append(f'    "{key}": [...]  // {arr_desc}')
+            elif enum_vals:
+                lines.append(f'    "{key}": "{" | ".join(enum_vals)}"{comma}  // {desc}')
+            else:
+                lines.append(f'    "{key}": "{ptype}"{comma}  // {desc}')
+        lines.append("  }")
+        lines.append("  ```")
+        tone = output_style.get("tone", "")
+        if tone:
+            lines.append(f"  tone: {tone}")
+    elif output_style and output_style.get("structure"):
         for fmt_line in output_style["structure"].strip().split("\n"):
             lines.append(f"  {fmt_line}")
     elif domain_format:
@@ -440,7 +465,7 @@ def generate_prompt_lang(requirements: str, domain: str, output_format: str) -> 
     # Examples section — v2.1: use domain_examples from YAML (few-shot)
     lines.extend(["", "@examples:"])
     if domain_examples:
-        for ex in domain_examples[:2]:
+        for ex in domain_examples[:3]:  # v2.3: 3件目 (edge/error) も出力
             ex_input = ex.get("input", "").strip()
             ex_output = ex.get("output", "").strip()
             # Truncate long inputs for .prompt format

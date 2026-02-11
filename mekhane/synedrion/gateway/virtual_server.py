@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/synedrion/gateway/ A0→MCP統合が必要→VirtualServerが担う
 """
 Virtual MCP Server — 複数の下流 MCP サーバーを束ねて単一サーバーとして公開
 

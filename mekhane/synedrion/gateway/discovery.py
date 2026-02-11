@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/synedrion/gateway/ A0→MCPサーバー発見が必要→DiscoveryEngineが担う
 """
 Discovery Engine — MCP サーバーの自動発見と手動登録
 

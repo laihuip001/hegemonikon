@@ -162,3 +162,30 @@ subtypes:
   bullet_points:
     description: "箇条書き形式"
     format: "- ポイント1\n- ポイント2\n..."
+
+# --- 条件分岐（環境依存） ---
+conditional:
+  prod:
+    constraints:
+      - "要約率は必ず明示し、原文の30%以下を目標とする"
+      - "固有名詞・数値の正確性を要約後に検証すること"
+  dev:
+    constraints:
+      - "実験的な要約手法（chain-of-density 等）も許可"
+      - "要約率の制限を緩和可"
+  formal:
+    constraints:
+      - "敬体（です・ます）を使用"
+      - "専門用語は初出時に定義を添えること"
+
+# --- @context 推奨設定 ---
+context_recommendations:
+  - type: "mcp"
+    tool: "gnosis.tool(\"search\")"
+    priority: "MEDIUM"
+    description: "要約対象の関連文献を検索し、文脈を補完"
+  - type: "dir"
+    path: "docs/"
+    filter: "*.md"
+    priority: "LOW"
+    description: "ローカルドキュメントから関連資料を参照"

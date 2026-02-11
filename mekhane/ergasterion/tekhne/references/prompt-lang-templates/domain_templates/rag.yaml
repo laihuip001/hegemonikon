@@ -161,3 +161,18 @@ context_recommendations:
     filter: "*.md"
     priority: "MEDIUM"
     description: "ローカルドキュメントを検索"
+
+# --- 条件分岐（環境依存） ---
+conditional:
+  prod:
+    constraints:
+      - "引用元の信頼度スコアが 0.8 未満の情報は [低確信] ラベルを付与"
+      - "ハルシネーション防止: 検索結果にない情報は一切使用しないこと"
+  dev:
+    constraints:
+      - "実験的な検索拡張（chain-of-thought retrieval 等）も許可"
+      - "引用元スコア閾値を 0.5 に緩和可"
+  realtime:
+    constraints:
+      - "レイテンシ重視: 検索結果の上位3件のみ使用"
+      - "回答は200トークン以内に収めること"

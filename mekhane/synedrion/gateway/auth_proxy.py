@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/synedrion/gateway/ A0→MCP認証委譲が必要→AuthProxyが担う
 """
 Auth Proxy — MCP Gateway の認証委譲
 

@@ -95,7 +95,11 @@ def check_cron(name: str, pattern: str) -> HealthItem:
 
 # PURPOSE: Handoff ディレクトリの状態チェック
 def check_handoff() -> HealthItem:
-    handoff_dir = Path.home() / "oikos" / "mneme" / ".hegemonikon" / "handoffs"
+    # Primary: sessions/ (current /bye output)
+    handoff_dir = Path.home() / "oikos" / "mneme" / ".hegemonikon" / "sessions"
+    # Fallback: handoffs/ (legacy)
+    if not handoff_dir.exists():
+        handoff_dir = Path.home() / "oikos" / "mneme" / ".hegemonikon" / "handoffs"
     if not handoff_dir.exists():
         return HealthItem("Handoff", "error", "directory does not exist")
 

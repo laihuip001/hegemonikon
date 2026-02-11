@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/synedrion/gateway/ A0→MCP Gateway統合が必要→gatewayパッケージが担う
 """
 synedrion.gateway — MCP Gateway
 

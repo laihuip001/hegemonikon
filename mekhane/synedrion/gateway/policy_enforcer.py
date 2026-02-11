@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/synedrion/gateway/ A0→セキュリティポリシー強制が必要→PolicyEnforcerが担う
 """
 Policy Enforcer — MCP Gateway のセキュリティポリシー強制
 

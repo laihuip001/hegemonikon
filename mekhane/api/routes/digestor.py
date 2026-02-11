@@ -9,11 +9,14 @@ scheduler が生成した digest_report_*.json を読み取ってフロントに
 
 import glob
 import json
+import logging
 from pathlib import Path
 from typing import Optional
 
 from fastapi import APIRouter, Query
 from pydantic import BaseModel
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/digestor", tags=["digestor"])
 
@@ -22,9 +25,8 @@ DIGESTOR_DIR = Path.home() / ".hegemonikon" / "digestor"
 
 
 # ─── Models ───────────────────────────────────────────────
-# PURPOSE: の統一的インターフェースを実現する
 class DigestCandidate(BaseModel):
-    """候補1件"""
+    """Digestor 候補1件"""
     title: str
     source: str = ""
     url: str = ""
@@ -34,9 +36,8 @@ class DigestCandidate(BaseModel):
     suggested_templates: list[dict] = []
 
 
-# PURPOSE: の統一的インターフェースを実現する
 class DigestReport(BaseModel):
-    """1つのレポート"""
+    """Digestor レポート1件"""
     timestamp: str
     source: str = "gnosis"
     total_papers: int = 0
@@ -46,60 +47,17 @@ class DigestReport(BaseModel):
     filename: str = ""
 
 
-# PURPOSE: の統一的インターフェースを実現する
 class DigestReportListResponse(BaseModel):
-    """レポート一覧"""
+    """レポート一覧レスポンス"""
     reports: list[DigestReport]
     total: int
 
 
-# ─── Endpoints ────────────────────────────────────────────
-# PURPOSE: digestor の list reports 処理を実行する
-@router.get("/reports", response_model=DigestReportListResponse)
-async def list_reports(
-    limit: int = Query(default=10, ge=1, le=50),
-    offset: int = Query(default=0, ge=0),
-) -> DigestReportListResponse:
-    """digest_report 一覧を取得（新しい順）"""
-    pattern = str(DIGESTOR_DIR / "digest_report_*.json")
-    files = sorted(glob.glob(pattern), reverse=True)  # newest first
-    total = len(files)
-    page = files[offset:offset + limit]
-
-    reports = []
-    for fpath in page:
-        try:
-            with open(fpath) as f:
-                data = json.load(f)
-            report = DigestReport(
-                timestamp=data.get("timestamp", ""),
-                source=data.get("source", "gnosis"),
-                total_papers=data.get("total_papers", 0),
-                candidates_selected=data.get("candidates_selected", 0),
-                dry_run=data.get("dry_run", True),
-                candidates=[
-                    DigestCandidate(**c) for c in data.get("candidates", [])
-                ],
-                filename=Path(fpath).name,
-            )
-            reports.append(report)
-        except (json.JSONDecodeError, KeyError):
-            continue
-
-    return DigestReportListResponse(reports=reports, total=total)
-
-
-# PURPOSE: digestor の latest report 処理を実行する
-@router.get("/latest", response_model=Optional[DigestReport])
-async def latest_report() -> Optional[DigestReport]:
-    """最新のレポートを取得"""
-    pattern = str(DIGESTOR_DIR / "digest_report_*.json")
-    files = sorted(glob.glob(pattern), reverse=True)
-    if not files:
-        return None
-
+# ─── Helpers ──────────────────────────────────────────────
+def _load_report(fpath: str) -> Optional[DigestReport]:
+    """JSON ファイルから DigestReport を生成。失敗時は None。"""
     try:
-        with open(files[0]) as f:
+        with open(fpath) as f:
             data = json.load(f)
         return DigestReport(
             timestamp=data.get("timestamp", ""),
@@ -110,7 +68,43 @@ async def latest_report() -> Optional[DigestReport]:
             candidates=[
                 DigestCandidate(**c) for c in data.get("candidates", [])
             ],
-            filename=Path(files[0]).name,
+            filename=Path(fpath).name,
         )
-    except (json.JSONDecodeError, KeyError):
+    except (json.JSONDecodeError, KeyError, TypeError) as exc:
+        logger.warning("Failed to load digest report %s: %s", fpath, exc)
         return None
+
+
+def _list_report_files() -> list[str]:
+    """digest_report_*.json を新しい順に返す。"""
+    pattern = str(DIGESTOR_DIR / "digest_report_*.json")
+    return sorted(glob.glob(pattern), reverse=True)
+
+
+# ─── Endpoints ────────────────────────────────────────────
+@router.get("/reports", response_model=DigestReportListResponse)
+async def list_reports(
+    limit: int = Query(default=10, ge=1, le=50),
+    offset: int = Query(default=0, ge=0),
+) -> DigestReportListResponse:
+    """digest_report 一覧を取得（新しい順）"""
+    files = _list_report_files()
+    total = len(files)
+    page = files[offset:offset + limit]
+
+    reports: list[DigestReport] = []
+    for fpath in page:
+        report = _load_report(fpath)
+        if report is not None:
+            reports.append(report)
+
+    return DigestReportListResponse(reports=reports, total=total)
+
+
+@router.get("/latest", response_model=Optional[DigestReport])
+async def latest_report() -> Optional[DigestReport]:
+    """最新のレポートを取得"""
+    files = _list_report_files()
+    if not files:
+        return None
+    return _load_report(files[0])

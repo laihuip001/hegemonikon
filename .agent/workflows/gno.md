@@ -48,6 +48,16 @@ sel_enforcement:
     minimum_requirements:
       - "原則抽出プロセスを問う"
 ccl_signature: "/gno+_/dox"
+category_theory:
+  core: "随伴 F⊣G の右随伴 G（忘却関手）"
+  adjunction: "Pathos (F) ⊣ Gnōmē (G)"
+  role: "G: Emotion → Principle（感情から精密さの文脈を剥いで、原則・教訓に圧縮する）"
+  G_definition: "「感じたこと」から情動の生々しさを忘却し、「学んだこと」という原則だけを残す"
+  coordinates: "A3[U,C] — Precision(U:不確実)を保存。原則は仮説として暫定的"
+  unit: "η: Principle → G(F(Principle)) — 原則を感情で評価し教訓に戻す = 原則の情動的妥当性"
+  counit: "ε: F(G(Emotion)) → Emotion — 感情を教訓化して再び感じ直す = 感情の真正性検証"
+  drift: "Drift = 教訓が生きた感情から切り離されている度合い。格言が空虚になる"
+  insight: "violations.md の教訓こそ G の出力。失敗の痛みを格言に昇華するプロセス"
 ---
 
 # /gno: 原則抽出ワークフロー (Gnōmē)
@@ -406,7 +416,6 @@ result = select_derivative("A3", problem_context)
 **保存理由**: コンテキスト節約、参照可能性、パターン蓄積
 
 ---
-
 
 ---
 

@@ -43,6 +43,15 @@ sel_enforcement:
 derivatives: [norm, empi, rela, pareto, optimize, safety, sensitivity, robust, done, test, delta, signal, failsafe, security, fairness, accountability, opportunity]
 anti_skip: enabled
 ccl_signature: "/sta+?s3"
+category_theory:
+  core: "随伴 F⊣G の右随伴 G（忘却関手）"
+  adjunction: "Metron (F) ⊣ Stathmos (G)"
+  role: "G: Scale → Criterion（尺度からスケールの具体性を剥いで、純粋な基準に戻る）"
+  G_definition: "「どう測るか」という手段を忘却し、「何を良しとするか」という判断基準だけを残す"
+  coordinates: "S3[A,Scale] — Flow(A:行為)を保存し Scale 軸で抽象化"
+  unit: "η: Criterion → G(F(Criterion)) — 基準を尺度にして基準に戻す = 基準の安定性検証"
+  counit: "ε: F(G(Scale)) → Scale — 尺度を基準で見直して再設定 = 尺度の妥当性検証"
+  drift: "Drift = Must/Should/Could が形骸化し、測定可能性だけが残っている状態"
 ---
 
 # /sta: 基準配置ワークフロー (Stathmos)
@@ -452,7 +461,6 @@ result = select_derivative("S3", problem_context)
 **保存理由**: コンテキスト節約、参照可能性、パターン蓄積
 
 ---
-
 
 ---
 

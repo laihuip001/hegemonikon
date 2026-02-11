@@ -48,6 +48,15 @@ anti_skip: enabled
 absorbed:
   - "Forge ⛓️ ボトルネックを突く → --mode=toc"
 ccl_signature: "/met+"
+category_theory:
+  core: "随伴 F⊣G の左随伴 F（自由関手）"
+  adjunction: "Metron (F) ⊣ Stathmos (G)"
+  role: "F: Criterion → Scale（基準に測定の具体性を載せて尺度を構成）"
+  F_definition: "「何を良しとするか」という基準に、Micro/Meso/Macro の粒度と測定方法を自由に構成する"
+  coordinates: "S1[I,Scale] — Flow(I:推論)を保存し Scale 軸で具体化"
+  unit: "η: Criterion → G(F(Criterion)) — 基準を尺度にして基準に戻す = 基準の安定性検証"
+  counit: "ε: F(G(Scale)) → Scale — 尺度を基準で見直して再設定 = 尺度の妥当性検証"
+  drift: "Drift = 尺度と基準の乖離。測定が目的化し、本来の基準を見失っている度合い"
 ---
 
 # /met: スケール配置ワークフロー (Metron)
@@ -415,7 +424,6 @@ view_file /home/makaron8426/oikos/hegemonikon/.agent/skills/schema/s1-metron/SKI
 **保存理由**: コンテキスト節約、参照可能性、パターン蓄積
 
 ---
-
 
 ---
 

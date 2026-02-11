@@ -71,6 +71,28 @@ class SynteleiaOrchestrator:
         """全エージェントを返す（互換性維持）"""
         return self.poiesis_agents + self.dokimasia_agents
 
+    # PURPOSE: L1 + L2 統合監査 (/dia+ 用ファクトリ)
+    @classmethod
+    def with_l2(cls, backend=None) -> "SynteleiaOrchestrator":
+        """
+        L1 全エージェント + L2 SemanticAgent を含むオーケストレータを生成。
+
+        /dia+ ワークフローから呼ばれる想定。
+        L2 バックエンドが利用不可の場合も安全にフォールバック。
+
+        Args:
+            backend: LLM バックエンド（省略時は自動選択）
+
+        Returns:
+            SynteleiaOrchestrator: L1+L2 統合オーケストレータ
+        """
+        from .dokimasia.semantic_agent import SemanticAgent
+
+        orchestrator = cls()  # L1 デフォルト構成
+        semantic = SemanticAgent(backend=backend)
+        orchestrator.dokimasia_agents.append(semantic)
+        return orchestrator
+
     # PURPOSE: 監査を実行。
     def audit(self, target: AuditTarget) -> AuditResult:
         """

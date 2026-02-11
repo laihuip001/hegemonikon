@@ -200,11 +200,11 @@ default:
 
 ## Synteleia 監査フック (自動発動)
 
-> **CCL**: `@syn·` — 内積モード（全8エージェント統合監査）
+> **CCL**: `@syn·` — 内積モード（L1 全8エージェント + L2 SemanticAgent 統合監査）
 > **発動条件**: `/dia+` モード時に自動発動。`/dia-` では省略。
 >
 > `/dia` 完了後、判定対象を Synteleia に渡して多角監査を実施する。
-> 静的解析 (regex/パターンマッチ) による高速チェック。
+> L1 = 静的解析 (regex, 0.07s) + L2 = LLM セマンティック監査 (5-15s)。
 
 ### 手順
 
@@ -218,7 +218,8 @@ target = AuditTarget(
     target_type=AuditTargetType.GENERIC,
     source="/dia+ output",
 )
-orchestrator = SynteleiaOrchestrator()
+# L1 + L2 統合オーケストレータ (OpenAI API 自動検出)
+orchestrator = SynteleiaOrchestrator.with_l2()
 result = orchestrator.audit(target)
 ```
 

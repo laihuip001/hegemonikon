@@ -15,6 +15,7 @@ CCL: @syn· (内積モード) の L2 層
 """
 
 import json
+import os
 import re
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
@@ -79,6 +80,39 @@ class LMQLBackend(LLMBackend):
                 self._available = True
             except ImportError:
                 self._available = False
+        return self._available
+
+
+# PURPOSE: OpenAI API バックエンド (直接呼出)
+class OpenAIBackend(LLMBackend):
+    """OpenAI API を直接呼出すバックエンド"""
+
+    def __init__(self, model: str = "gpt-4o-mini"):
+        self.model = model
+        self._available: Optional[bool] = None
+
+    def query(self, prompt: str, context: str) -> str:
+        """OpenAI API でクエリを実行"""
+        import openai
+
+        client = openai.OpenAI()  # OPENAI_API_KEY from env
+
+        response = client.chat.completions.create(
+            model=self.model,
+            messages=[
+                {"role": "system", "content": prompt},
+                {"role": "user", "content": context},
+            ],
+            response_format={"type": "json_object"},
+            temperature=0.3,
+            max_tokens=2000,
+        )
+        return response.choices[0].message.content or "{}"
+
+    def is_available(self) -> bool:
+        """OpenAI API キーが設定されているか"""
+        if self._available is None:
+            self._available = bool(os.environ.get("OPENAI_API_KEY"))
         return self._available
 
 
@@ -249,9 +283,13 @@ class SemanticAgent(AuditAgent):
         if backend is not None:
             self.backend = backend
         else:
-            # 自動選択: LMQL > Stub
-            lmql = LMQLBackend()
-            self.backend = lmql if lmql.is_available() else StubBackend()
+            # 自動選択: OpenAI > LMQL > Stub
+            openai_be = OpenAIBackend()
+            if openai_be.is_available():
+                self.backend = openai_be
+            else:
+                lmql = LMQLBackend()
+                self.backend = lmql if lmql.is_available() else StubBackend()
 
     # PURPOSE: セマンティック監査を実行
     def audit(self, target: AuditTarget) -> AgentResult:

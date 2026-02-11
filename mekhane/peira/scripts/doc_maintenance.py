@@ -15,13 +15,11 @@ from typing import NamedTuple
 
 # --- Constants ---
 ROOT_DIR = Path(__file__).resolve().parents[3]
-DOCS_DIR = ROOT_DIR / "docs"
-
 CRITICAL_FILES = [
     "AGENTS.md",
     "llms.txt",
-    "docs/STRUCTURE.md",
-    "docs/ARCHITECTURE.md",
+    "STRUCTURE.md",
+    "ARCHITECTURE.md",
     ".ai/guidelines.md",
 ]
 
@@ -244,9 +242,9 @@ def generate_tree(
     return output
 
 
-# PURPOSE: Update docs/STRUCTURE.md with current directory tree.
+# PURPOSE: Update STRUCTURE.md with current directory tree.
 def scan_structure() -> bool:
-    """Update docs/STRUCTURE.md with current directory tree."""
+    """Update STRUCTURE.md with current directory tree."""
     print("Scanning directory structure...")
 
     # Generate Tree with max_depth=3 for cleanliness
@@ -259,7 +257,7 @@ def scan_structure() -> bool:
     tree_block = "```text\n" + tree_content.strip() + "\n```"
 
     # 2. Update File
-    struct_file = DOCS_DIR / "STRUCTURE.md"
+    struct_file = ROOT_DIR / "STRUCTURE.md"
     if not struct_file.exists():
         print(f"❌ Error: {struct_file} not found.")
         return False
@@ -271,7 +269,7 @@ def scan_structure() -> bool:
     )
 
     if not pattern.search(content):
-        print("❌ Error: Structure markers not found in docs/STRUCTURE.md")
+        print("❌ Error: Structure markers not found in STRUCTURE.md")
         return False
 
     # Fix for Windows paths in regex substitution: escape backslashes
@@ -280,7 +278,7 @@ def scan_structure() -> bool:
 
     if content != new_content:
         struct_file.write_text(new_content, encoding="utf-8")
-        print("✅ Directory tree updated in docs/STRUCTURE.md")
+        print("✅ Directory tree updated in STRUCTURE.md")
     else:
         print("✅ Directory tree is up to date.")
 

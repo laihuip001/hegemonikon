@@ -65,4 +65,4 @@ print(orchestrator.format_report(result))
 
 ## 参照
 
-- [設計文書](../../docs/architecture/synteleia.md)
+- [設計文書](synteleia_design.md)

@@ -42,5 +42,5 @@ synteleia_audit($target, agents=["O", "A", "K"])
 
 ## 関連
 
-- [synteleia.md](../../docs/architecture/synteleia.md)
+- [synteleia_design.md](../../mekhane/synteleia/synteleia_design.md)
 - [orchestrator.py](../../mekhane/synteleia/orchestrator.py)

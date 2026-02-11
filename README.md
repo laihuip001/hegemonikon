@@ -120,7 +120,7 @@ CCL は認知プロセスを代数的に記述する言語です。
 | `\|>` | パイプライン | 出力→入力 |
 | `\|\|` | 並列 | 同時実行 |
 
-→ [CCL 詳細](ccl/README.md) | [マクロ一覧](docs/ccl_macro_reference.md)
+→ [CCL 詳細](ccl/README.md) | [マクロ一覧](ccl/ccl_macro_reference.md)
 
 ---
 
@@ -192,7 +192,7 @@ hegemonikon/
 |:-------------|:-----|
 | [kernel/SACRED_TRUTH.md](kernel/SACRED_TRUTH.md) | 不変真理 |
 | [mekhane/ARCHITECTURE.md](mekhane/ARCHITECTURE.md) | システムアーキテクチャ |
-| [docs/ccl_macro_reference.md](docs/ccl_macro_reference.md) | CCL マクロリファレンス |
+| [ccl/ccl_macro_reference.md](ccl/ccl_macro_reference.md) | CCL マクロリファレンス |
 | [AGENTS.md](AGENTS.md) | AI エージェント向けガイド |
 
 ---

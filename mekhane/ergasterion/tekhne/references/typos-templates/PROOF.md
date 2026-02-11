@@ -1,6 +1,6 @@
-# prompt-lang-templates/
+# typos-templates/
 
-> 'prompt-lang-templates' ディレクトリ
+> 'typos-templates' ディレクトリ
 
 ## 構成
 

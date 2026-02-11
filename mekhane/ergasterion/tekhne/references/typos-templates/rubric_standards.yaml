@@ -3,7 +3,7 @@
 # @rubric で使用する標準評価軸の定義
 
 version: "1.0.0"
-schema: "prompt-lang/rubric/v1"
+schema: "typos/rubric/v1"
 
 # --- 共通評価軸（全ドメイン共通） ---
 common_rubrics:
@@ -21,14 +21,14 @@ common_rubrics:
       0: "構造なし"
 
   syntactic_correctness:
-    description: "Prompt-Lang v2.0 としてパース可能か"
+    description: "Týpos v2.0 としてパース可能か"
     scale: "binary"
     weight: 0.30
     criteria:
-      yes: "prompt_lang.py parse でエラーなし"
+      yes: "typos.py parse でエラーなし"
       no: "パースエラーあり"
     validation:
-      command: "python forge/prompt-lang/prompt_lang.py parse {file}"
+      command: "python forge/typos/typos.py parse {file}"
       expected: "exit code 0"
 
   semantic_relevance:
@@ -66,7 +66,7 @@ composite_score:
 # --- 自動チェック可能な項目 ---
 automated_checks:
   - name: "構文検証"
-    command: "python forge/prompt-lang/prompt_lang.py parse {file}"
+    command: "python forge/typos/typos.py parse {file}"
     pass_condition: "exit code == 0"
     
   - name: "必須ディレクティブ存在"

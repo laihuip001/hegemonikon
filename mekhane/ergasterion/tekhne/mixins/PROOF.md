@@ -6,5 +6,5 @@
 
 - archetype-engine.prompt
 - fallback-hierarchy.prompt
-- prompt_lang_mode.prompt
+- typos_mode.prompt
 - quality-assurance.prompt

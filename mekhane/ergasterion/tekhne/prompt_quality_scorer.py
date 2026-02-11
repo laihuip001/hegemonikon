@@ -253,7 +253,7 @@ def check_structure(content: str, fmt: str) -> DimensionScore:
             suggestions.append("最低200語以上の内容を記述してください")
 
     elif fmt == "prompt":
-        # Prompt-Lang format checks
+        # Týpos format checks
         max_score += 40
         if "#prompt" in content:
             score += 10

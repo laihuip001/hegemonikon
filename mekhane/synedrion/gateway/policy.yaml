@@ -54,7 +54,7 @@ policies:
         - "mneme"
         - "digestor"
         - "jules"
-        - "prompt-lang"
+        - "typos"
         - "sequential-thinking"
       deny:
         - "*"  # 未登録サーバーはデフォルト拒否

@@ -211,7 +211,7 @@ def _find_file_by_id(event_id: str) -> Path | None:
 async def timeline_events(
     limit: int = Query(50, ge=1, le=200),
     offset: int = Query(0, ge=0),
-    event_type: str | None = Query(None, regex="^(handoff|doxa|workflow|kalon)$"),
+    event_type: str | None = Query(None, pattern="^(handoff|doxa|workflow|kalon)$"),
 ) -> dict[str, Any]:
     """統合タイムラインイベントを返す。"""
     all_events = _scan_events(event_type)

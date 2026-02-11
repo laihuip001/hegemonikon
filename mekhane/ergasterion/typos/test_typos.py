@@ -1,13 +1,13 @@
-# PROOF: [L2/インフラ] <- mekhane/ergasterion/prompt-lang/ S2→プロンプト言語が必要→test_prompt_lang が担う
+# PROOF: [L2/インフラ] <- mekhane/ergasterion/typos/ S2→プロンプト言語が必要→test_typos が担う
 #!/usr/bin/env python3
 """
-prompt-lang Unit Tests
+typos Unit Tests
 ======================
 
-Test suite for prompt-lang parser and integration.
+Test suite for typos parser and integration.
 
 Usage:
-    python test_prompt_lang.py
+    python test_typos.py
 """
 
 import sys
@@ -18,7 +18,7 @@ from io import StringIO
 # Add parent directory to path
 sys.path.insert(0, str(Path(__file__).parent))
 
-from prompt_lang import Prompt, PromptLangParser, ParseError, parse_file, validate_file
+from typos import Prompt, PromptLangParser, ParseError, parse_file, validate_file
 
 
 # PURPOSE: Test cases for PromptLangParser
@@ -218,14 +218,14 @@ class TestValidation(unittest.TestCase):
             temp_path.unlink(missing_ok=True)
 
 
-# PURPOSE: Integration tests for prompt_lang_integrate.py
+# PURPOSE: Integration tests for typos_integrate.py
 class TestIntegration(unittest.TestCase):
-    """Integration tests for prompt_lang_integrate.py."""
+    """Integration tests for typos_integrate.py."""
 
     # PURPOSE: Test that generate creates a file in staging
     def test_generate_creates_file(self):
         """Test that generate creates a file in staging."""
-        from prompt_lang_integrate import generate_prompt, STAGING_DIR
+        from typos_integrate import generate_prompt, STAGING_DIR
 
         filepath, prompt = generate_prompt(
             slug="_test-gen",
@@ -244,7 +244,7 @@ class TestIntegration(unittest.TestCase):
     # PURPOSE: Test listing prompts in staging
     def test_list_prompts(self):
         """Test listing prompts in staging."""
-        from prompt_lang_integrate import list_prompts
+        from typos_integrate import list_prompts
 
         prompts = list_prompts()
         # Should return a list (may be empty or have items)
@@ -258,7 +258,7 @@ class TestExtendsAndMixin(unittest.TestCase):
     # PURPOSE: Test basic template inheritance
     def test_basic_extends(self):
         """Test basic template inheritance."""
-        from prompt_lang import parse_all, resolve
+        from typos import parse_all, resolve
 
         content = """#prompt base_spec
 @role:
@@ -291,7 +291,7 @@ class TestExtendsAndMixin(unittest.TestCase):
     # PURPOSE: Test mixin composition
     def test_mixin_composition(self):
         """Test mixin composition."""
-        from prompt_lang import parse_all, resolve
+        from typos import parse_all, resolve
 
         content = """#mixin json_output
 @format:
@@ -318,7 +318,7 @@ class TestExtendsAndMixin(unittest.TestCase):
     # PURPOSE: Test multiple mixin composition (left to right)
     def test_multiple_mixins(self):
         """Test multiple mixin composition (left to right)."""
-        from prompt_lang import parse_all, resolve
+        from typos import parse_all, resolve
 
         content = """#mixin mixin_a
 @constraints:
@@ -347,7 +347,7 @@ class TestExtendsAndMixin(unittest.TestCase):
     # PURPOSE: Test extends combined with mixin
     def test_extends_with_mixin(self):
         """Test extends combined with mixin."""
-        from prompt_lang import parse_all, resolve
+        from typos import parse_all, resolve
 
         content = """#mixin common_format
 @format:
@@ -376,7 +376,7 @@ class TestExtendsAndMixin(unittest.TestCase):
     # PURPOSE: Test that circular references raise error
     def test_circular_reference_detection(self):
         """Test that circular references raise error."""
-        from prompt_lang import parse_all, resolve, CircularReferenceError
+        from typos import parse_all, resolve, CircularReferenceError
 
         content = """#prompt a
 @extends: b
@@ -401,7 +401,7 @@ class TestExtendsAndMixin(unittest.TestCase):
     # PURPOSE: Test that undefined references raise error
     def test_undefined_reference(self):
         """Test that undefined references raise error."""
-        from prompt_lang import (
+        from typos import (
             parse_all,
             resolve,
             ReferenceError as PromptReferenceError,
@@ -423,7 +423,7 @@ class TestExtendsAndMixin(unittest.TestCase):
     # PURPOSE: Test parsing multiple prompts in one file
     def test_parse_all_multiple_prompts(self):
         """Test parsing multiple prompts in one file."""
-        from prompt_lang import parse_all
+        from typos import parse_all
 
         content = """#prompt first
 @role:
@@ -446,7 +446,7 @@ class TestExtendsAndMixin(unittest.TestCase):
     # PURPOSE: Test that dict fields use child priority
     def test_dict_merge_child_priority(self):
         """Test that dict fields use child priority."""
-        from prompt_lang import parse_all, resolve
+        from typos import parse_all, resolve
 
         content = """#prompt parent
 @role:
@@ -474,7 +474,7 @@ class TestExtendsAndMixin(unittest.TestCase):
     # PURPOSE: Test that already resolved prompts are returned as-is
     def test_already_resolved_prompt(self):
         """Test that already resolved prompts are returned as-is."""
-        from prompt_lang import parse_all, resolve
+        from typos import parse_all, resolve
 
         content = """#prompt simple
 @role:

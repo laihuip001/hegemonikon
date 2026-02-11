@@ -1,6 +1,6 @@
 # Evaluation Checklist
 # ====================
-# Prompt-Lang 生成物の品質確認用チェックリスト
+# Týpos 生成物の品質確認用チェックリスト
 
 ## 簡易評価（5問セット）
 
@@ -10,7 +10,7 @@
 - [ ] 高リスクドメイン（医療/法律）で免責注記があるか
 
 ### 2. 構文正確性
-- [ ] `prompt_lang.py parse` でエラーなし
+- [ ] `typos.py parse` でエラーなし
 - [ ] YAML インデントが正しい
 - [ ] コロン後にスペースあり
 
@@ -39,5 +39,5 @@
 | 構造 | @examples 数 | 1個以上 | count |
 | 品質 | 曖昧語 | 0件 | 禁止語リスト照合 |
 | 品質 | 定量的基準 | @rubric に数値あり | pattern match |
-| 形式 | YAMLパース | エラーなし | prompt_lang.py parse |
+| 形式 | YAMLパース | エラーなし | typos.py parse |
 | 形式 | メタデータ | version, name, owner | exist check |

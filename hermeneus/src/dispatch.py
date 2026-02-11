@@ -129,6 +129,52 @@ def resolve_wf_paths(wf_ids: list[str]) -> dict[str, str]:
     return paths
 
 
+def resolve_submodules(wf_paths: dict[str, str]) -> dict[str, list[str]]:
+    """WF 定義ファイルからサブモジュールのパスを抽出。
+
+    WF の md ファイルを読み、## サブモジュール テーブル内の
+    Markdown リンク [name](../path) を検出して絶対パスに解決する。
+
+    Returns:
+        {"/bye": ["/abs/path/value-pitch.md", "/abs/path/pitch_gallery.md"], ...}
+    """
+    import re
+    submodules: dict[str, list[str]] = {}
+
+    # Markdown リンクパターン: [text](relative/path.md)
+    link_pattern = re.compile(r'\[([^\]]+)\]\(([^)]+\.md)\)')
+
+    for wf_id, wf_path_str in wf_paths.items():
+        wf_path = Path(wf_path_str)
+        subs: list[str] = []
+
+        try:
+            content = wf_path.read_text(encoding='utf-8')
+        except Exception:
+            continue
+
+        # サブモジュールセクションを探す
+        in_submodule_section = False
+        for line in content.split('\n'):
+            if line.strip().startswith('## サブモジュール') or line.strip().startswith('## Sub'):
+                in_submodule_section = True
+                continue
+            if in_submodule_section and line.strip().startswith('## '):
+                break  # 次のセクションに入った
+            if in_submodule_section:
+                for match in link_pattern.finditer(line):
+                    rel_path = match.group(2)
+                    # 相対パスを絶対パスに解決
+                    abs_path = (wf_path.parent / rel_path).resolve()
+                    if abs_path.exists():
+                        subs.append(str(abs_path))
+
+        if subs:
+            submodules[wf_id] = subs
+
+    return submodules
+
+
 def dispatch(ccl_expr: str) -> dict:
     """CCL 式をディスパッチ: パース → 構造表示 → 実行計画テンプレート
 
@@ -138,7 +184,7 @@ def dispatch(ccl_expr: str) -> dict:
 
     Returns:
         dict with keys: success, ast, tree, workflows, wf_paths,
-                        plan_template, macro_plan, error
+                        wf_submodules, plan_template, macro_plan, error
     """
     from hermeneus.src.parser import CCLParser as _Parser
 
@@ -150,6 +196,7 @@ def dispatch(ccl_expr: str) -> dict:
         "tree": "",
         "workflows": [],
         "wf_paths": {},
+        "wf_submodules": {},
         "plan_template": "",
         "macro_plan": None,
         "error": None,
@@ -170,6 +217,7 @@ def dispatch(ccl_expr: str) -> dict:
     # Step 2: ワークフロー抽出 + パス解決
     result["workflows"] = extract_workflows(ast)
     result["wf_paths"] = resolve_wf_paths(result["workflows"])
+    result["wf_submodules"] = resolve_submodules(result["wf_paths"])
 
     # Step 2.5: マクロ自動実行計画 (L1 環境制約)
     macro_section = ""
@@ -219,9 +267,16 @@ def dispatch(ccl_expr: str) -> dict:
     wf_list = ", ".join(result["workflows"])
 
     # view_file コマンド一覧 (Agent がコピペで開ける)
-    view_cmds = "\n".join(
-        f"  view_file {p}" for p in result["wf_paths"].values()
-    )
+    view_lines = []
+    for wf_id, wf_path in result["wf_paths"].items():
+        view_lines.append(f"  view_file {wf_path}")
+        # サブモジュールがあれば階層表示
+        subs = result["wf_submodules"].get(wf_id, [])
+        for i, sub_path in enumerate(subs):
+            prefix = "└──" if i == len(subs) - 1 else "├──"
+            sub_name = Path(sub_path).name
+            view_lines.append(f"    {prefix} view_file {sub_path}  ({sub_name})")
+    view_cmds = "\n".join(view_lines)
     if not view_cmds:
         view_cmds = "  (WF 定義ファイルが見つかりません)"
 

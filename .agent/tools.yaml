@@ -448,7 +448,7 @@ skills:
     purpose: "汎用 SKILL.md / .prompt 生成（アーキタイプ駆動、7モジュール構成）"
     trigger:
       - "「〇〇用のスキル/プロンプトを作成」"
-      - "「Prompt-Lang でスキルを作成」"
+      - "「Týpos でスキルを作成」"
       - "「.prompt ファイルを作って」"
       - "「このプロンプトを診断/改善」"
       - "「〇〇AIエージェントを構築」"
@@ -460,7 +460,7 @@ skills:
       - "「製作」"
     modes:
       generate: "SKILL.md 生成（デフォルト）"
-      prompt-lang: ".prompt 生成（収束タスク向け）"
+      typos: ".prompt 生成（収束タスク向け）"
       sage: "XML/MD ハイブリッド"
       diagnose: "既存プロンプト診断"
       improve: "既存プロンプト改善"
@@ -469,15 +469,15 @@ skills:
       - references/quality-checklist.md
       - references/logic-gates.md
       - references/wargame-db.md
-      - references/prompt-lang-templates/
+      - references/typos-templates/
     status: production
     workflow: "/tek"
     history: "meta-prompt-generator v1.0-2.1 → HEPHAESTUS → v3.0-4.0 → tekhne-maker v5.0 → v6.0 → v6.1 (j2p absorbed)"
 
   # DEPRECATED: 以下はtekhne-makerに統合済み
-  # prompt-lang-generator:
+  # typos-generator:
   #   status: deprecated
-  #   migrated_to: tekhne-maker (prompt-lang mode)
+  #   migrated_to: tekhne-maker (typos mode)
   # meta-prompt-generator:
   #   status: deprecated
   #   migrated_to: tekhne-maker

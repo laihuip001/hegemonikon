@@ -49,7 +49,7 @@ TRIGGER_MAP = {
     
     # === glob: ファイルパターン ===
     "prompt-generation.md": ("glob", "**/*.prompt", ".prompt ファイル編集時のプロンプト生成ルール"),
-    "prompt-lang-auto-fire.md": ("glob", "**/*.prompt", "Prompt-Lang 自動発火ルール"),
+    "typos-auto-fire.md": ("glob", "**/*.prompt", "Týpos 自動発火ルール"),
 }
 
 def fix_frontmatter(filepath: Path, trigger: str, glob: str, description: str) -> bool:

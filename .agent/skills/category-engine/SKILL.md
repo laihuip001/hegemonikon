@@ -133,14 +133,18 @@ HGK の 96要素体系（7公理→24定理→72関係）は圏論的構造を�
 
 ### CCL 演算子の圏論的意味
 
-| CCL | 圏論的意味 | 前順序圏での意味 | 例 |
-|:----|:----------|:----------------|:----|
-| `/` | 関手適用 | 順序保存写像の適用 | `/noe` = Noēsis を適用 |
-| `+` | 詳細化 (meet 方向) | より細かい粒度へ | `/noe+` = 深い派生 |
-| `-` | 還元 (join 方向) | より粗い粒度へ | `/noe-` = 簡略派生 |
-| `~` | 振動 | 自然変換的往復 | `~/noe` = 2つの view を往復 |
-| `>>` | 合成 | パイプライン | `/noe >> /dia` = 認識→判定 |
-| `{}` | 群 | 並列実行 | `{/noe, /dia}` = 同時実行 |
+| CCL | 統一的意味 | L1 (前順序) | L2 (豊穣) | L3 (弱2-圏) |
+|:----|:----------|:-----------|:----------|:-----------|
+| `/` | 関手適用 | 順序保存写像 | Hom 値付き変換 | 1-cell の適用 |
+| `+` | **精度を上げる** | meet (下限) | precision ↑ | 1-cell への精度加重 |
+| `-` | **精度を下げる** | join (上限) | precision ↓ | 1-cell への粗さ加重 |
+| `~` | **振動する** | ≤ の往復 | Hom 上の振動 | 1-cell ペアの交互適用 |
+| `>>` | 合成 | パイプライン | Hom の合成 | 1-cell の水平合成 |
+| `{}` | 群 | 並列実行 | 積 | 1-cell の集合 |
+
+> **設計判断 (2026-02-11)**: +/- は 1-cell (WF) への修飾であり、2-cell (派生遷移) ではない。
+> meet/join = 詳細/要点 は同一操作の L1/CCL 両面。
+> 2-cell は派生間の遷移 (nous⇒phro) であり、`two_cell.py` で実装。
 
 ---
 
@@ -152,6 +156,8 @@ HGK の 96要素体系（7公理→24定理→72関係）は圏論的構造を�
 |:-------|:-----|:-----|
 | **cone_builder** | `mekhane/fep/cone_builder.py` | Limit (Cone) の構築・検証 |
 | **attractor** | `mekhane/fep/attractor.py` | Series attractor（oscillation スコア） |
+| **two_cell** | `mekhane/fep/two_cell.py` | 弱2-圏: 派生間の 2-cell 構造 (L3) |
+| **drift_calculator** | `mekhane/fep/drift_calculator.py` | TF-IDF Drift 計算 (L2) |
 | **CCL dispatch** | Hermēneus MCP `dispatch()` | CCL 式の解析と実行 |
 | **Gnōsis CLI** | `mekhane/anamnesis/cli.py` | 339 CT論文のベクトル検索 |
 
@@ -289,8 +295,9 @@ cd ~/oikos/hegemonikon && PYTHONPATH=. .venv/bin/python mekhane/anamnesis/cli.py
 
 | 限界 | 対処 |
 |:-----|:-----|
-| HGK は前順序圏に限定 | 正直に認める。一般の圏の性質を安易に適用しない |
+| HGK は前順序圏に限定 | **限定ではなく出発点**。L2 ([0,1]-豊穣), L3 (弱2-圏) が共存 |
 | 関手性の破れ | 合成保存を仮定しない。個別に検証する |
+| 自然変換の多義性 | L1 では ≤ に退化するが、L2/L3 では豊かな構造。層を明示する |
 | 数学的厳密性 vs 実用性 | Level B（精密な比喩）を目標。Level A（厳密な証明）は個別に追求 |
 
 ---
@@ -326,6 +333,6 @@ cd ~/oikos/hegemonikon && PYTHONPATH=. .venv/bin/python mekhane/anamnesis/cli.py
 
 ---
 
-*Category Theory Engine v3.1 — Kalon 判定層統合 (2026-02-11)*
-*v1.0 (291行) → v2.0 (F/G統一+Q1/Q3具体化+Kan拡張) → v3.0 (Kalon認定) → v3.1 (Q6 Kalon判定統合)*
+*Category Theory Engine v3.2 — CCL多層定義 + two_cell/drift_calculator 統合 (2026-02-11)*
+*v1.0 (291行) → v2.0 (F/G統一+Q1/Q3具体化+Kan拡張) → v3.0 (Kalon認定) → v3.1 (Q6 Kalon判定統合) → v3.2 (CCL修飾子のL1/L2/L3統一)*
 *対称: FEP Skill v2.1 と同じ6層構造*

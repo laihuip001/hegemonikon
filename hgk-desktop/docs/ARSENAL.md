@@ -43,7 +43,7 @@
 | サーバー | パス | 状態 |
 |:---|:---|:---|
 | gnosis | `mekhane/mcp/gnosis_mcp_server.py` | 設定済み・要接続確認 |
-| prompt-lang | 外部 | 設定済み・要接続確認 |
+| typos | 外部 | 設定済み・要接続確認 |
 
 ---
 

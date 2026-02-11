@@ -3,7 +3,7 @@
 PURPOSE: プロンプト言語の解析・実行エンジン
 REASON: 構造化されたプロンプト記法の機械的処理が必要だった
 
-> **∃ prompt-lang/** — この場所は存在しなければならない
+> **∃ typos/** — この場所は存在しなければならない
 
 ---
 
@@ -16,10 +16,10 @@ REASON: 構造化されたプロンプト記法の機械的処理が必要だっ
 
 | ファイル | 役割 |
 |:---------|:-----|
-| `prompt_lang.py` | prompt-lang Parser |
-| `prompt_lang_integrate.py` | PROOF: [L2/インフラ] <- mekhane/ergasterion/prompt-lang/ S2→プロンプ |
-| `test_integration.py` | PROOF: [L2/インフラ] <- mekhane/ergasterion/prompt-lang/ S2→プロンプ |
-| `test_prompt_lang.py` | prompt-lang Unit Tests |
+| `typos.py` | typos Parser |
+| `typos_integrate.py` | PROOF: [L2/インフラ] <- mekhane/ergasterion/typos/ S2→プロンプ |
+| `test_integration.py` | PROOF: [L2/インフラ] <- mekhane/ergasterion/typos/ S2→プロンプ |
+| `test_typos.py` | typos Unit Tests |
 
 ---
 

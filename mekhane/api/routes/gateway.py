@@ -62,7 +62,7 @@ def _get_gateway():
         "mneme": ["search", "sources", "stats"],
         "digestor": ["get_topics", "list_candidates", "run_digestor"],
         "jules": ["jules_create_task", "jules_get_status", "jules_list_repos", "jules_batch_execute"],
-        "prompt-lang": ["generate"],
+        "typos": ["generate"],
         "sequential-thinking": ["sequentialthinking"],
     }
     for server, tools in standard_tools.items():

@@ -179,8 +179,8 @@ class DiscoveryEngine:
                        command="python mekhane/mcp/digestor_mcp_server.py"),
             ServerInfo(name="jules", transport=TransportType.STDIO,
                        command="python mekhane/mcp/jules_mcp_server.py"),
-            ServerInfo(name="prompt-lang", transport=TransportType.STDIO,
-                       command="python mekhane/mcp/prompt_lang_mcp_server.py"),
+            ServerInfo(name="typos", transport=TransportType.STDIO,
+                       command="python mekhane/mcp/typos_mcp_server.py"),
             ServerInfo(name="sequential-thinking", transport=TransportType.STDIO,
                        command="npx -y @anthropic/mcp-sequential-thinking"),
         ]

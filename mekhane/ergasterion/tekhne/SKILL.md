@@ -329,7 +329,7 @@ template: |
 | Mode | Trigger | Output | 適性 |
 |:---|:---|:---|:---|
 | **Generate** | 「〇〇用のスキルを作成」 | SKILL.md + references/ | 拡散・創発的タスク |
-| **Prompt-Lang** | 「Prompt-Langで作成」 | .prompt ファイル | 収束・Zero-Entropy |
+| **Týpos** | 「Týposで作成」 | .prompt ファイル | 収束・Zero-Entropy |
 | **SAGE** | 「XMLで作成」「SAGE形式で」 | XML/MD ハイブリッド | 構造重視・移植性 |
 | **Diagnose** | 「このプロンプトを診断」 | スコア表 + 改善案 | 既存資産の分析 |
 | **Improve** | 「このプロンプトを改善」 | 差分のみ提示 | 既存資産の改善 |
@@ -833,12 +833,12 @@ target_optimizations:
 | Mode | Claude | Gemini | Jules |
 |:-----|:-------|:-------|:------|
 | Generate | SKILL.md | 簡潔版 SKILL.md | N/A |
-| Prompt-Lang | .prompt | .prompt (簡潔) | N/A |
+| Týpos | .prompt | .prompt (簡潔) | N/A |
 | SAGE | XML/MD | XML (簡潔) | N/A |
 | Diagnose | スコア表 | スコア表 | N/A |
 | Manual | 対話型手順書 | タスク委託書 | タスク委託書 |
 
-> **Note**: Jules は「コード変更タスク」専用のため、Generate/Prompt-Lang/SAGE/Diagnose は非対応。Manual モードのみ対応。
+> **Note**: Jules は「コード変更タスク」専用のため、Generate/Týpos/SAGE/Diagnose は非対応。Manual モードのみ対応。
 
 ### Usage Example
 
@@ -1230,7 +1230,7 @@ version: "1.0.0"
 | `references/codex-infra.md` | インフラ仕様 |
 | `references/sage-blueprint.md` | SAGE形式テンプレート |
 | `references/expansion-templates.md` | Expansion Module テンプレート |
-| `references/prompt-lang-templates/` | Prompt-Lang テンプレート集 |
+| `references/typos-templates/` | Týpos テンプレート集 |
 
 ---
 
@@ -1242,7 +1242,7 @@ version: "1.0.0"
 | 3.0 | 2025-01-05 | HEPHAESTUS統合、references/分離 |
 | 4.0 | 2025-01-25 | 7フレームワーク統合 (OMEGA, Dual-Core等) |
 | 5.0 | 2025-01-27 | v3.0 + v4.0 統合、8 references体制 |
-| 5.1 | 2025-01-28 | prompt-lang-generator統合 |
+| 5.1 | 2025-01-28 | typos-generator統合 |
 | 6.0 | 2025-01-28 | OMEGA SINGULARITY BUILD: 完全吸収版 |
 | 6.2 | 2026-01-28 | Structural Enforcement: 8必須frontmatter項目 + Validation Checklist |
 | **6.6** | **2026-01-29** | **M8: CONTEXT_OPTIMIZATION + M9: SELF_CRITIQUE 追加 (2026-01 調査レポートから抽出)** |

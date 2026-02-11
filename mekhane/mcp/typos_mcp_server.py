@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# PROOF: [L2/インフラ] <- mekhane/mcp/ A0→Prompt-Lang MCP統合が必要→prompt_lang_mcp_serverが担う
+# PROOF: [L2/インフラ] <- mekhane/mcp/ A0→Týpos MCP統合が必要→typos_mcp_serverが担う
 """
 Týpos MCP Server v2.0 — Hegemonikón Skill Generator
 
@@ -85,7 +85,7 @@ try:
     _pl_path = Path(__file__).parent.parent / "ergasterion" / "typos"
     if str(_pl_path) not in sys.path:
         sys.path.insert(0, str(_pl_path))
-    _pl_module = importlib.import_module("prompt_lang")
+    _pl_module = importlib.import_module("typos")
     PromptLangParser = _pl_module.PromptLangParser
     parse_file = _pl_module.parse_file
     parse_all = _pl_module.parse_all
@@ -403,7 +403,7 @@ ARCHETYPE_CONSTRAINTS = {
 }
 
 
-def generate_prompt_lang(requirements: str, domain: str, output_format: str) -> str:
+def generate_typos(requirements: str, domain: str, output_format: str) -> str:
     """Generate Týpos code from requirements.
 
     v3.0: Task-Specific Dynamic Generation
@@ -863,7 +863,7 @@ async def _handle_generate(arguments: dict):
 
     log(f"Generating for domain: {domain}, policy: {policy['classification']}")
 
-    code = generate_prompt_lang(requirements, domain, output_format)
+    code = generate_typos(requirements, domain, output_format)
 
     output_lines = [
         "# [Hegemonikon] Týpos Generator v2.3\n",

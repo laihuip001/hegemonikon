@@ -1,6 +1,6 @@
-# prompt-lang-examples/
+# typos-examples/
 
-> 'prompt-lang-examples' ディレクトリ
+> 'typos-examples' ディレクトリ
 
 ## 構成
 

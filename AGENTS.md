@@ -85,7 +85,7 @@
 | **sympatheia** | システム状態監視・WBC | stdio |
 | **mneme** | 統合記憶検索 | stdio |
 | **digestor** | 論文消化パイプライン | stdio |
-| **prompt-lang** | Prompt-Lang コード生成 | stdio |
+| **typos** | Týpos コード生成 | stdio |
 | **jules** | Jules (Gemini) タスク管理 | stdio |
 | **context-packer** | デバッグコンテキスト集約 | stdio (PoC) |
 

@@ -1,6 +1,6 @@
 # Anti-Patterns
 # =============
-# Prompt-Lang 生成で避けるべきパターン
+# Týpos 生成で避けるべきパターン
 
 ## 1. 構文エラー系
 
@@ -121,7 +121,7 @@
 @activation:
   mode: model_decision
   conditions:
-    - input_contains: ["prompt-lang", "プロンプト定義", ".prompt"]
+    - input_contains: ["typos", "プロンプト定義", ".prompt"]
     - input_length: "> 30"
     - intent: "generate structured prompt"
   priority: 3

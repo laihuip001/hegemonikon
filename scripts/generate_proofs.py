@@ -43,7 +43,7 @@ KNOWN = {
         "外部コンテンツを Hegemonikón に消化する変換エンジン",
         "外部知識を内部形式に変換する統一インターフェースが必要だった",
     ),
-    "mekhane/ergasterion/prompt-lang": (
+    "mekhane/ergasterion/typos": (
         "プロンプト言語の解析・実行エンジン",
         "構造化されたプロンプト記法の機械的処理が必要だった",
     ),

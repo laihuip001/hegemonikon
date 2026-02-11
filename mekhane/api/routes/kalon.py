@@ -62,10 +62,9 @@ async def kalon_judge(req: KalonJudgeRequest) -> dict[str, Any]:
     verdict = _verdict(req.g_test, req.f_test)
     label = _verdict_label(req.g_test, req.f_test)
 
-    # Markdown ファイルとして保存
-    filename = f"kalon_{req.concept}_{now.strftime('%Y-%m-%d_%H%M')}.md"
-    # ファイル名の安全化
-    safe_filename = "".join(c if c.isalnum() or c in "-_." else "_" for c in filename)
+    # Markdown ファイルとして保存（概念名を先にサニタイズ）
+    safe_concept = "".join(c if c.isalnum() or c in "-_" else "_" for c in req.concept)[:60]
+    safe_filename = f"kalon_{safe_concept}_{now.strftime('%Y-%m-%d_%H%M')}.md"
 
     content = f"""# Kalon 判定: {req.concept}
 

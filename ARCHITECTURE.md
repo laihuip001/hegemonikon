@@ -137,7 +137,7 @@ CCL 式 → Parser → AST → Expander → LMQL → LLM 実行 → 検証
 | **mneme** | ローカル | 3 | 統合記憶検索 |
 | **sympatheia** | ローカル | 6 | 通知、WBC、フィードバック |
 | **jules** | ローカル | 4 | Jules コーディング連携 |
-| **prompt-lang** | ローカル | 1 | プロンプト生成 |
+| **typos** | ローカル | 1 | プロンプト生成 |
 | **digestor** | ローカル | 3 | 論文消化パイプライン |
 
 ---

@@ -1,4 +1,4 @@
-# prompt-lang Staging Directory
+# typos Staging Directory
 
 このディレクトリは、AIが動的に生成したプロンプトの**暫定置き場**です。
 
@@ -19,7 +19,7 @@
 
 - **timestamp**: `YYYYMMDD_HHMM` 形式
 - **slug**: 小文字英数字とハイフンのみ (`[a-z0-9-]+`)
-- **拡張子**: `.prompt` (prompt-lang形式)
+- **拡張子**: `.prompt` (typos形式)
 
 ## 保持期間
 
@@ -28,4 +28,4 @@
 
 ---
 
-*このディレクトリは prompt-lang Phase 0.2 で作成されました。*
+*このディレクトリは typos Phase 0.2 で作成されました。*

@@ -1,4 +1,4 @@
-# PROOF: [L2/インフラ] <- mekhane/ergasterion/prompt-lang/ S2→プロンプト言語が必要→test_integration が担う
+# PROOF: [L2/インフラ] <- mekhane/ergasterion/typos/ S2→プロンプト言語が必要→test_integration が担う
 import sys
 import json
 import unittest
@@ -8,7 +8,7 @@ import shutil
 # Add current directory to path
 sys.path.insert(0, str(Path(__file__).parent))
 
-from prompt_lang_integrate import SkillAdapter, generate_prompt, list_prompts
+from typos_integrate import SkillAdapter, generate_prompt, list_prompts
 
 
 # PURPOSE: Test integration の実装

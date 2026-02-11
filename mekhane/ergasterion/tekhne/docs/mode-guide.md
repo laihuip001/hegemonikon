@@ -9,7 +9,7 @@
 | Mode | Trigger | Output | 適性 |
 |:-----|:--------|:-------|:-----|
 | **Generate** | 「〇〇用のスキルを作成」 | SKILL.md + references/ | 拡散・創発的タスク |
-| **Prompt-Lang** | 「Prompt-Langで」「.promptで」 | .prompt ファイル | 収束・Zero-Entropy |
+| **Týpos** | 「Týposで」「.promptで」 | .prompt ファイル | 収束・Zero-Entropy |
 | **SAGE** | 「XMLで」「SAGE形式で」 | XML/MD ハイブリッド | 構造重視・移植性 |
 | **Diagnose** | 「診断して」 | スコア表 + 改善案 | 既存資産の分析 |
 | **Improve** | 「改善して」 | 差分のみ | 既存資産の改善 |
@@ -41,11 +41,11 @@ Output:  SKILL.md + references/
 
 ---
 
-## 2. Prompt-Lang Mode
+## 2. Týpos Mode
 
 ```
-Trigger: 「Prompt-Langで作成」「.promptで」「.prompt ファイルを作って」
-Output:  .prompt ファイル（Prompt-Lang v2.1 準拠）
+Trigger: 「Týposで作成」「.promptで」「.prompt ファイルを作って」
+Output:  .prompt ファイル（Týpos v2.1 準拠）
 適性:    収束・Zero-Entropy タスク（コード生成、データ抽出、分類）
 ```
 
@@ -54,12 +54,12 @@ Output:  .prompt ファイル（Prompt-Lang v2.1 準拠）
 - 必須ディレクティブ: @role, @goal, @constraints, @format, @examples
 - 曖昧語禁止（「適切に」「うまく」検出）
 - @rubric による自己評価軸
-- 構文検証: `prompt_lang.py parse` でエラーチェック
+- 構文検証: `typos.py parse` でエラーチェック
 
 ### 使用例
 
 ```
-「Prompt-LangでSQL生成スキルを作成」
+「TýposでSQL生成スキルを作成」
 「.promptでログ解析ツールを作って」
 ```
 
@@ -225,7 +225,7 @@ Layer 3: CONVERGENCE (収束)
 | `references/archetypes.md` | 5アーキタイプ詳細 |
 | `references/sage-blueprint.md` | SAGE形式テンプレート |
 | `references/expansion-templates.md` | 拡張モジュールテンプレート |
-| `references/prompt-lang-templates/` | Prompt-Lang テンプレート集 |
+| `references/typos-templates/` | Týpos テンプレート集 |
 | `references/cognitive-armory.md` | 思考フレームワーク |
 
 ---

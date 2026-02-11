@@ -204,17 +204,17 @@ class TestExecutorContextRegression:
         assert hasattr(result.context, "warnings")
 
 
-# ============ 4. PromptLang — tool_chain regression ============
+# ============ 4. Typos — tool_chain regression ============
 
 
-class TestPromptLangToolChainRegression:
+class TestTyposToolChainRegression:
     """Verify that tool_chain= is passed to ContextItem."""
 
     def test_context_item_tool_chain(self):
         """ContextItem must preserve tool_chain field."""
         import sys
-        sys.path.insert(0, str(Path(__file__).parent.parent / "ergasterion" / "prompt-lang"))
-        import prompt_lang as pl
+        sys.path.insert(0, str(Path(__file__).parent.parent / "ergasterion" / "typos"))
+        import typos_lang as pl
 
         # Create a ContextItem with tool_chain
         item = pl.ContextItem(
@@ -227,8 +227,8 @@ class TestPromptLangToolChainRegression:
     def test_parse_mcp_with_tool_chain(self):
         """Parser should extract MCP context references."""
         import sys
-        sys.path.insert(0, str(Path(__file__).parent.parent / "ergasterion" / "prompt-lang"))
-        import prompt_lang as pl
+        sys.path.insert(0, str(Path(__file__).parent.parent / "ergasterion" / "typos"))
+        import typos_lang as pl
 
         # Test that ContextItem preserves tool_chain when explicitly set
         item = pl.ContextItem(

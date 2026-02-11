@@ -15,8 +15,8 @@
 - gdr-converter.md
 - gemini-meta-prompt.md
 - logic-gates.md
-- prompt-lang-anti-patterns.md
-- prompt-lang-checklist.md
+- typos-anti-patterns.md
+- typos-checklist.md
 - quality-checklist.md
 - repo-to-context.md
 - sage-blueprint.md
@@ -24,5 +24,5 @@
 - transformations.md
 - wargame-db.md
 - `examples/`
-- `prompt-lang-examples/`
-- `prompt-lang-templates/`
+- `typos-examples/`
+- `typos-templates/`

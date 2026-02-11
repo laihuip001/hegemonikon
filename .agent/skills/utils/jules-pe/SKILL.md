@@ -36,7 +36,7 @@ Antigravity Runtime は `.agent/skills/` と `AGENTS.md` のルールを読み�
 When the task involves generating prompts (*.prompt files):
 - Prefer Gemini 3 Pro for generation tasks
 - Use Claude for design and review tasks
-- Follow the Prompt-Lang v2 specification
+- Follow the Týpos v2 specification
 ```
 
 ### 2. このスキルの発動条件
@@ -79,18 +79,18 @@ Prompt Engineering (PE)
 - **Archetype**: [Precision / Speed / Autonomy / Creative / Safety]
 - **勝利条件**: [何を最大化するか]
 
-### Prompt-Lang 要件
+### Týpos 要件
 - @role: [役割の定義]
 - @goal: [目標の定義]
 - @context: [リソースの種類]
 - @rubric: [評価次元数]
 
 ## Output
-- **ファイルパス**: forge/prompt-lang/prompts/[name].prompt
-- **フォーマット**: Prompt-Lang v2
+- **ファイルパス**: forge/typos/prompts/[name].prompt
+- **フォーマット**: Týpos v2
 
 ## References
-- `docs/specs/prompt-lang-v2-spec.md`
+- `docs/specs/typos-v2-spec.md`
 - `.agent/skills/utils/meta-prompt-generator/SKILL.md`
 
 ## Success Criteria
@@ -105,7 +105,7 @@ Prompt Engineering (PE)
 
 ```bash
 # 生成されたプロンプトを検証
-python M:\Hegemonikon\forge\prompt-lang\prompt_lang.py parse [ファイルパス]
+python M:\Hegemonikon\forge\typos\prompt_lang.py parse [ファイルパス]
 ```
 
 ---

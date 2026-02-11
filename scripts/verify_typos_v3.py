@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Prompt-Lang v2.3 品質検証スクリプト"""
+"""Týpos v2.3 品質検証スクリプト"""
 import sys
 import io
 from pathlib import Path
@@ -11,7 +11,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent / "mekhane"))
 # Suppress stdout during import
 _orig = sys.stdout
 sys.stdout = io.StringIO()
-from prompt_lang_mcp_server import generate_prompt_lang
+from typos_mcp_server import generate_typos
 sys.stdout = _orig
 
 cases = [
@@ -25,7 +25,7 @@ for req, domain, fmt in cases:
     print(f"\n{'='*60}")
     print(f"Domain: {domain} | Req: {req}")
     print(f"{'='*60}")
-    result = generate_prompt_lang(req, domain, fmt)
+    result = generate_typos(req, domain, fmt)
     print(result)
 
     # v2.3 features check

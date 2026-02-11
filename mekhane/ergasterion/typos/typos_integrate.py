@@ -1,16 +1,16 @@
-# PROOF: [L2/インフラ] <- mekhane/ergasterion/prompt-lang/ S2→プロンプト言語が必要→prompt_lang_integrate が担う
+# PROOF: [L2/インフラ] <- mekhane/ergasterion/typos/ S2→プロンプト言語が必要→typos_integrate が担う
 #!/usr/bin/env python3
 """
-prompt-lang Auto-Fire Integration
+typos Auto-Fire Integration
 ==================================
 
-Integrates prompt-lang parser with AI workflow.
+Integrates typos parser with AI workflow.
 Called when AI generates a new prompt.
 
 Usage:
-    python prompt_lang_integrate.py generate <slug> <role> <goal> [--constraints <c1> <c2>...]
-    python prompt_lang_integrate.py load <file>
-    python prompt_lang_integrate.py list
+    python typos_integrate.py generate <slug> <role> <goal> [--constraints <c1> <c2>...]
+    python typos_integrate.py load <file>
+    python typos_integrate.py list
 
 Requirements:
     Python 3.10+
@@ -24,14 +24,14 @@ from typing import Optional
 
 # Import the parser
 sys.path.insert(0, str(Path(__file__).parent))
-from prompt_lang import Prompt, PromptLangParser, parse_file, validate_file
+from typos import Prompt, PromptLangParser, parse_file, validate_file
 
 # Configuration
 STAGING_DIR = Path(__file__).parent / "staging"
 LIBRARY_DIR = Path(__file__).parent.parent / "library"
 
 
-# PURPOSE: Generate a new prompt-lang file and save to staging.
+# PURPOSE: Generate a new typos file and save to staging.
 def generate_prompt(
     slug: str,
     role: str,
@@ -43,7 +43,7 @@ def generate_prompt(
     examples: Optional[list[dict]] = None,
 ) -> tuple[Path, Prompt]:
     """
-    Generate a new prompt-lang file and save to staging.
+    Generate a new typos file and save to staging.
 
     Returns:
         Tuple of (file_path, parsed_prompt)
@@ -56,7 +56,7 @@ def generate_prompt(
     filename = f"{timestamp}_{slug}.prompt"
     filepath = STAGING_DIR / filename
 
-    # Build prompt-lang content
+    # Build typos content
     lines = [f"#prompt {slug}", ""]
 
     lines.append("@role:")
@@ -194,7 +194,7 @@ def auto_fire_header(trigger: str, filename: str, purpose: str) -> str:
     """
     Generate auto-fire header for AI output.
     """
-    return f"""[prompt-lang] Auto-generated
+    return f"""[typos] Auto-generated
   Trigger: {trigger}
   File: {filename}
   Purpose: {purpose}"""
@@ -210,7 +210,7 @@ def main():
 
     if command == "generate":
         if len(sys.argv) < 5:
-            print("Usage: prompt_lang_integrate.py generate <slug> <role> <goal>")
+            print("Usage: typos_integrate.py generate <slug> <role> <goal>")
             sys.exit(1)
 
         slug = sys.argv[2]
@@ -231,7 +231,7 @@ def main():
 
     elif command == "load":
         if len(sys.argv) < 3:
-            print("Usage: prompt_lang_integrate.py load <file>")
+            print("Usage: typos_integrate.py load <file>")
             sys.exit(1)
 
         result = load_prompt(sys.argv[2])
@@ -243,7 +243,7 @@ def main():
 
     elif command == "match":
         if len(sys.argv) < 3:
-            print("Usage: prompt_lang_integrate.py match <query>")
+            print("Usage: typos_integrate.py match <query>")
             sys.exit(1)
 
         query = sys.argv[2].lower()

@@ -2,7 +2,7 @@
 """
 Generate → Score Pipeline CI Tests
 
-Prompt-Lang generate v2.1 の出力が各ドメインテンプレートを正しく反映し、
+Týpos generate v2.1 の出力が各ドメインテンプレートを正しく反映し、
 品質スコアがリグレッションしていないことを検証する。
 
 テスト項目:
@@ -29,7 +29,7 @@ PROJECT_ROOT = Path(__file__).parent.parent.parent.parent.parent  # hegemonikon/
 sys.path.insert(0, str(PROJECT_ROOT / "mekhane" / "mcp"))
 sys.path.insert(0, str(PROJECT_ROOT / "mekhane" / "ergasterion" / "tekhne"))
 
-from prompt_lang_mcp_server import generate_prompt_lang, detect_domain, classify_task
+from typos_mcp_server import generate_typos, detect_domain, classify_task
 from prompt_quality_scorer import score_prompt
 
 
@@ -39,7 +39,7 @@ from prompt_quality_scorer import score_prompt
 
 def _score_generated(task: str, domain: str):
     """Generate a .prompt from task/domain then score it. Returns QualityReport."""
-    result = generate_prompt_lang(task, domain, ".prompt")
+    result = generate_typos(task, domain, ".prompt")
     with tempfile.NamedTemporaryFile(
         mode="w", suffix=".prompt", delete=False, dir="/tmp"
     ) as f:

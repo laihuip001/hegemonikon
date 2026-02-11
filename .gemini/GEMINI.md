@@ -54,7 +54,7 @@ Hegemonikón は FEP (Free Energy Principle) に基づく認知ハイパーバ�
 - **OS**: Debian13
 - **Python**: 3.11
 - **Node.js**: 20.x
-- **MCP**: gnosis, prompt-lang
+- **MCP**: gnosis, typos
 
 ---
 

@@ -1,10 +1,10 @@
-# Prompt-Lang v2.0 Base Template
+# Týpos v2.0 Base Template
 # ================================
 # 全ての生成物のベースとなる骨格テンプレート
 # Phase 2 で可変部を LLM が埋める
 
 version: "2.0"
-schema: "prompt-lang/base/v1"
+schema: "typos/base/v1"
 
 # --- メタデータ（必須）---
 metadata:

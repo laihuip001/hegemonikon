@@ -1,4 +1,4 @@
-# Prompt-Lang v2 仕様書
+# Týpos v2 仕様書
 
 **バージョン**: 2.0.0
 **作成日**: 2026-01-24
@@ -8,7 +8,7 @@
 
 ## 1. 概要
 
-Prompt-Lang v2 は、構造化プロンプト記述言語 v1 に以下の機能を追加する:
+Týpos v2 は、構造化プロンプト記述言語 v1 に以下の機能を追加する:
 
 | ディレクティブ | 目的 | 優先度 |
 |:---|:---|:---:|
@@ -45,7 +45,7 @@ output_spec     ::= "  output:" NEWLINE
 ```
 
 **例**:
-```prompt-lang
+```typos
 @rubric:
   - correctness:
       description: 事実・仕様への整合性
@@ -83,7 +83,7 @@ indented_content::= ("  " LINE NEWLINE)+
 ```
 
 **例**:
-```prompt-lang
+```typos
 @if env == "prod":
   @constraints:
     - 絶対にファイル削除を行わないこと
@@ -122,7 +122,7 @@ key              ::= "mode" | "pattern" | "priority" | "rules"
 | `model_decision` | モデル判断で適用 |
 
 **例**:
-```prompt-lang
+```typos
 @activation:
   mode: glob
   pattern: "**/src/**/*.prompt"
@@ -179,7 +179,7 @@ tool_chain      ::= "tool(" STRING ")" ["." "with(" resource_ref ")"]
 
 **例**:
 
-```prompt-lang
+```typos
 #prompt api_refactoring
 
 @context:
@@ -200,13 +200,13 @@ tool_chain      ::= "tool(" STRING ")" ["." "with(" resource_ref ")"]
 
 **Antigravity との対応**:
 
-| Prompt-Lang | Antigravity UI | 備考 |
+| Týpos | Antigravity UI | 備考 |
 |:---|:---|:---|
 | `file:"path"` | `@path/to/file` | 同等 |
-| `dir:"path"` | `@dir/` | フィルタはPrompt-Lang固有 |
+| `dir:"path"` | `@dir/` | フィルタはTýpos固有 |
 | `conv:"title"` | `@Conversation Title` | 同等 |
 | `mcp:server` | `@mcp:server:` | 同等 |
-| `ki:"name"` | Knowledge自動参照 | Prompt-Langで明示化 |
+| `ki:"name"` | Knowledge自動参照 | Týposで明示化 |
 
 ---
 
@@ -220,7 +220,7 @@ base_name     ::= IDENTIFIER
 ```
 
 **例**:
-```prompt-lang
+```typos
 #prompt security_review
 @extends: base_spec
 @goal:
@@ -243,7 +243,7 @@ mixin_name   ::= IDENTIFIER
 ```
 
 **例**:
-```prompt-lang
+```typos
 #mixin json_output
 @format:
   type: json
@@ -290,5 +290,5 @@ mixin_name   ::= IDENTIFIER
 
 - [Structured Prompting (arXiv)](https://arxiv.org/html/2511.20836v1)
 - [Multi-level Prompting (ScienceDirect)](https://www.sciencedirect.com/science/article/abs/pii/S095070512500591X)
-- [Prompt-Lang 統合研究レポート](file:///M:/Hegemonikon/docs/research/prompt-lang-complete-report.md)
+- [Týpos 統合研究レポート](file:///M:/Hegemonikon/docs/research/typos-complete-report.md)
 - [Antigravity メンション機能調査](file:///M:/Hegemonikon/docs/research/antigravity-mention-syntax-20260124.md)

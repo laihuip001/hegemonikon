@@ -1,15 +1,15 @@
-# PROOF: [L2/インフラ] <- mekhane/ergasterion/prompt-lang/ S2→プロンプト言語が必要→prompt_lang が担う
+# PROOF: [L2/インフラ] <- mekhane/ergasterion/typos/ S2→プロンプト言語が必要→typos が担う
 #!/usr/bin/env python3
 """
-prompt-lang Parser
+typos Parser
 ==================
 
 Parse .prompt files into structured data.
 
 Usage:
-    python prompt_lang.py parse <file>       # Parse and output JSON
-    python prompt_lang.py validate <file>    # Validate syntax
-    python prompt_lang.py expand <file>      # Expand to natural language prompt
+    python typos.py parse <file>       # Parse and output JSON
+    python typos.py validate <file>    # Validate syntax
+    python typos.py expand <file>      # Expand to natural language prompt
 
 Requirements:
     Python 3.10+
@@ -25,9 +25,9 @@ from typing import Optional
 
 
 @dataclass
-# PURPOSE: A single block in a prompt-lang file.
+# PURPOSE: A single block in a typos file.
 class PromptBlock:
-    """A single block in a prompt-lang file."""
+    """A single block in a typos file."""
 
     block_type: str
     content: str | list | dict
@@ -124,16 +124,16 @@ class CircularReferenceError(Exception):
 class ReferenceError(Exception):
     """Error when referenced prompt/mixin is not found."""
 
-    # PURPOSE: ReferenceError の初期化 — Parsed prompt-lang document.
+    # PURPOSE: ReferenceError の初期化 — Parsed typos document.
     def __init__(self, name: str):
         self.name = name
         super().__init__(f"Reference not found: {name}")
 
-# PURPOSE: Parsed prompt-lang document.
+# PURPOSE: Parsed typos document.
 
 @dataclass
 class Prompt:
-    """Parsed prompt-lang document."""
+    """Parsed typos document."""
 
     name: str
     role: Optional[str] = None
@@ -451,7 +451,7 @@ class Prompt:
                     # We might need to parse args more complexly later
                     args = (
                         {}
-                    )  # Arguments usually passed via .with() or similar in Prompt-Lang v2 spec?
+                    )  # Arguments usually passed via .with() or similar in Týpos v2 spec?
                     # The spec says: mcp:gnosis.tool("search")
                     # So tool name is passed as argument to .tool()?
                     # Or is it mcp:gnosis.search?
@@ -549,7 +549,7 @@ class Prompt:
         elif item.ref_type == "mcp":
             # Placeholder for MCP server reference
             return f"[MCP Server: {item.path}]"
-# PURPOSE: Result of parsing a prompt-lang file with multiple definitions.
+# PURPOSE: Result of parsing a typos file with multiple definitions.
 
         elif item.ref_type == "ki":
             # Placeholder for Knowledge Item
@@ -559,10 +559,10 @@ class Prompt:
 
 
 # v2.1 additions
-# PURPOSE: Result of parsing a prompt-lang file with multiple definitions
+# PURPOSE: Result of parsing a typos file with multiple definitions
 @dataclass
 class ParseResult:
-    """Result of parsing a prompt-lang file with multiple definitions."""
+    """Result of parsing a typos file with multiple definitions."""
 
     prompts: dict[str, Prompt] = field(default_factory=dict)  # name -> Prompt
     mixins: dict[str, Mixin] = field(default_factory=dict)  # name -> Mixin
@@ -579,7 +579,7 @@ class ParseResult:
         return self.mixins.get(name)
 
     # PURPOSE: Get a prompt or mixin by name.
-# PURPOSE: Parser for prompt-lang files.
+# PURPOSE: Parser for typos files.
     def get(self, name: str) -> Optional[Prompt | Mixin]:
         """Get a prompt or mixin by name."""
         return self.prompts.get(name) or self.mixins.get(name)
@@ -589,15 +589,15 @@ class ParseResult:
 class ParseError(Exception):
     """Error during parsing."""
 
-    # PURPOSE: ParseError の初期化 — Parser for prompt-lang files.
+    # PURPOSE: ParseError の初期化 — Parser for typos files.
     def __init__(self, message: str, line: int = 0):
         self.line = line
         super().__init__(f"Line {line}: {message}" if line else message)
 
 
-# PURPOSE: Parser for prompt-lang files
+# PURPOSE: Parser for typos files
 class PromptLangParser:
-    """Parser for prompt-lang files."""
+    """Parser for typos files."""
 
     # Regex patterns
     HEADER_PATTERN = re.compile(r"^#prompt\s+([a-z_][a-z0-9_-]*)$")

@@ -198,7 +198,7 @@ SKILL.md を必ず読み込んでから処理を開始する:
 | Diagnose | `/tek diagnose` | スコア表 + 改善案 |
 | Improve | `/tek improve` | 差分のみ提示 |
 | SAGE | `/tek sage` | XML/MD ハイブリッド |
-| Prompt-Lang | `/tek pl` | .prompt ファイル |
+| Týpos | `/mek typos "要件"` | .prompt ファイル (MCP `generate` 呼出) |
 | Reverse | `/mek reverse` | 出力→プロンプト逆生成 |
 | Constitutional | `/mek constitution` | 原則優先度付き生成 |
 | YAML | `/mek yaml` | YAML+MD ハイブリッド |
@@ -236,12 +236,23 @@ SKILL.md を必ず読み込んでから処理を開始する:
      - 答えられない場合、生成を中断して再設計
    - Layer 3: CONVERGENCE (収束)
 5.5. **STEP 3.5**: 收束/拡散ポリシーチェック (30秒)
-   - タスク記述を MCP `policy_check` または `classify_task()` で分類
-   - **convergent** → .prompt 形式で出力を推奨。STEP 5 で Prompt-Lang `@constraints/@rubric/@examples` を活用
-   - **divergent** → .prompt 非推奨。自然言語プロンプトを推奨。Creative archetype の場合は特に警告
-   - **ambiguous** → Creator に確認: 「この生成物は構造化 (.prompt) と自由記述どちらで出力しますか？」
-   - 結果を STEP 4 の Archetype 選択に連携（Creative archetype × convergent → 矛盾検出）
-   > **FEP 根拠**: Function 公理 (Explore ↔ Exploit)。.prompt = precision weighting ↑ = Exploit 最適化
+    - タスク記述を MCP `policy_check` または `classify_task()` で分類
+    - **convergent** → .prompt 形式で出力を推奨。Týpos MCP `generate` で自動生成
+    - **divergent** → .prompt 非推奨。自然言語プロンプトを推奨。Creative archetype の場合は特に警告
+    - **ambiguous** → Creator に確認: 「この生成物は構造化 (.prompt) と自由記述どちらで出力しますか？」
+    - 結果を STEP 4 の Archetype 選択に連携（Creative archetype × convergent → 矛盾検出）
+    > **FEP 根拠**: Function 公理 (Explore ↔ Exploit)。.prompt = precision weighting ↑ = Exploit 最適化
+
+    **Týpos 連携** (convergent 時):
+
+    ```python
+    # MCP 経由
+    mcp_prompt-lang_generate(requirements="要件", domain="auto")  # → .prompt 出力
+    # または直接
+    from mekhane.mcp.prompt_lang_mcp_server import generate_prompt_lang
+    result = generate_prompt_lang(requirements, domain, ".prompt")
+    ```
+
 6. **STEP 4**: M3 ARCHETYPE_ENGINE — アーキタイプ選択 (2分)
    - 5 Diagnostic Questions
    - Precision / Speed / Autonomy / Creative / Safety

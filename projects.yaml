@@ -126,15 +126,15 @@ projects:
     updated: "2026-02-11"
     next_action: "成果の本体取込み判断"
 
-  prompt_lang:
+  typos:
     name: "Týpos"
     description: "プロンプト言語 MCP サーバ"
-    path: "(MCP server)"
+    path: "mekhane/ergasterion/typos/"
     status: "active"
-    phase: "品質改善中"
+    phase: "v3.0 タスク固有化完了"
     priority: medium
     updated: "2026-02-11"
-    next_action: "スコア改善の実装完了"
+    next_action: "スコア改善の検証"
 
   digestor:
     name: "Digestor"

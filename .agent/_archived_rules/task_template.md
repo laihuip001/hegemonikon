@@ -44,7 +44,7 @@ description: task.md テンプレート — フェーズ依存関係付き
 
 ## 進行状況
 
-- [x] Phase 1: prompt-lang → mekhane/ergasterion/
+- [x] Phase 1: typos → mekhane/ergasterion/
   - blockers: なし
 - [x] Phase 2: 44 modules → T-series skills
   - blockers: なし（独立可能）

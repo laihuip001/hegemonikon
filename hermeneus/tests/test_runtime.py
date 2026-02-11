@@ -24,7 +24,7 @@ class TestExecutionConfig:
     def test_default_config(self):
         """デフォルト設定"""
         config = ExecutionConfig()
-        assert config.model == "openai/gpt-4o"
+        assert config.model == "auto"
         assert config.timeout == 300
         assert config.max_retries == 3
     
@@ -45,7 +45,7 @@ class TestLMQLExecutor:
     def test_executor_creation(self):
         """Executor 作成"""
         executor = LMQLExecutor()
-        assert executor.config.model == "openai/gpt-4o"
+        assert executor.config.model == "auto"
     
     def test_executor_with_config(self):
         """カスタム設定で Executor 作成"""

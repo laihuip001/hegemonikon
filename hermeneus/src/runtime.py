@@ -6,11 +6,13 @@ compile_ccl() の出力を実際の LLM で実行し、
 結果を構造化して返す。
 
 Origin: 2026-01-31 CCL Execution Guarantee Architecture
+Updated: 2026-02-11 Vertex AI Multi-Model Integration
 """
 
 import os
 import re
 import json
+import time
 import asyncio
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional, Union
@@ -35,6 +37,83 @@ def _load_env():
                             os.environ[key] = value.strip()
 
 _load_env()
+
+
+# =============================================================================
+# Model Registry — 設定駆動のモデルカタログ
+# =============================================================================
+
+MODEL_REGISTRY: Dict[str, Dict[str, str]] = {
+    # --- Google Gemini (google-genai SDK, API key) ---
+    "gemini-3-pro": {
+        "provider": "google",
+        "model_id": "gemini-3-pro-preview",
+    },
+    "gemini-2.5-pro": {
+        "provider": "google",
+        "model_id": "gemini-2.5-pro",
+    },
+    "gemini-2.5-flash": {
+        "provider": "google",
+        "model_id": "gemini-2.5-flash",
+    },
+    "gemini-2.5-flash-lite": {
+        "provider": "google",
+        "model_id": "gemini-2.5-flash-lite",
+    },
+    # --- Anthropic Direct (anthropic SDK, API key) ---
+    "claude-sonnet-4": {
+        "provider": "anthropic",
+        "model_id": "claude-sonnet-4-20250514",
+    },
+    # --- Vertex AI Anthropic (AnthropicVertex SDK, ADC) ---
+    "vertex/claude-opus-4.6": {
+        "provider": "vertex-anthropic",
+        "model_id": "claude-opus-4-6@latest",
+        "region": "us-east5",
+    },
+    "vertex/claude-sonnet-4.5": {
+        "provider": "vertex-anthropic",
+        "model_id": "claude-sonnet-4-5@latest",
+        "region": "us-east5",
+    },
+    "vertex/claude-haiku-4.5": {
+        "provider": "vertex-anthropic",
+        "model_id": "claude-haiku-4-5@latest",
+        "region": "us-east5",
+    },
+    # --- Vertex AI Open Models (OpenAI-compatible SDK, ADC) ---
+    "vertex/deepseek-v3.1": {
+        "provider": "vertex-openai",
+        "model_id": "deepseek-v3.1-maas",
+        "publisher": "deepseek",
+        "region": "us-east5",
+    },
+    "vertex/deepseek-r1": {
+        "provider": "vertex-openai",
+        "model_id": "deepseek-r1-maas",
+        "publisher": "deepseek",
+        "region": "us-east5",
+    },
+    "vertex/mistral-medium-3": {
+        "provider": "vertex-openai",
+        "model_id": "mistral-medium-3@latest",
+        "publisher": "mistralai",
+        "region": "us-east5",
+    },
+    "vertex/codestral-2": {
+        "provider": "vertex-openai",
+        "model_id": "codestral-2@latest",
+        "publisher": "mistralai",
+        "region": "us-east5",
+    },
+    "vertex/llama-4-maverick": {
+        "provider": "vertex-openai",
+        "model_id": "llama-4-maverick-17b-128e-instruct-maas",
+        "publisher": "meta",
+        "region": "us-east5",
+    },
+}
 
 
 # =============================================================================
@@ -65,7 +144,8 @@ class ExecutionResult:
 @dataclass
 class ExecutionConfig:
     """実行設定"""
-    model: str = "openai/gpt-4o"
+    model: str = "auto"                      # MODEL_REGISTRY のキー or "auto"
+    provider: str = "auto"                   # auto | anthropic | google | vertex-anthropic | vertex-openai | openai
     timeout: int = 300                       # 秒
     max_retries: int = 3
     max_iterations: int = 5                  # 収束ループの最大反復
@@ -81,8 +161,19 @@ class LMQLExecutor:
     """LMQL プログラム実行器
     
     LMQL がインストールされていない場合は、
-    フォールバック実行 (直接 OpenAI API) を使用。
+    フォールバック実行 (直接 LLM API) を使用。
+    
+    対応プロバイダー:
+    - anthropic: Anthropic API (ANTHROPIC_API_KEY)
+    - google: Google Gemini (GOOGLE_API_KEY)
+    - openai: OpenAI (OPENAI_API_KEY)
+    - vertex-anthropic: Vertex AI 経由 Claude (ADC)
+    - vertex-openai: Vertex AI 経由 Open Models (ADC + OpenAI互換)
     """
+    
+    # ADC token キャッシュ (クラス変数)
+    _adc_token: Optional[str] = None
+    _adc_token_expiry: float = 0.0
     
     def __init__(self, config: Optional[ExecutionConfig] = None):
         self.config = config or ExecutionConfig()
@@ -174,6 +265,38 @@ class LMQLExecutor:
                 error=f"LMQL execution error: {e}"
             )
     
+    def _resolve_model(self) -> Dict[str, str]:
+        """config.model を MODEL_REGISTRY で解決する"""
+        model = self.config.model
+        if model in MODEL_REGISTRY:
+            return MODEL_REGISTRY[model]
+        # レジストリ未登録 → provider/model_id を推測
+        if "/" in model and model.startswith("vertex/"):
+            return {"provider": "vertex-anthropic", "model_id": model.replace("vertex/", "")}
+        if model.startswith("claude"):
+            return {"provider": "anthropic", "model_id": model}
+        if model.startswith("gemini"):
+            return {"provider": "google", "model_id": model}
+        # デフォルト: openai
+        return {"provider": "openai", "model_id": model.replace("openai/", "")}
+    
+    @classmethod
+    def _get_adc_token(cls) -> Optional[str]:
+        """ADC トークンを取得 (キャッシュ付き、有効期限 50分)"""
+        if cls._adc_token and time.time() < cls._adc_token_expiry:
+            return cls._adc_token
+        try:
+            import google.auth
+            import google.auth.transport.requests
+            creds, _ = google.auth.default()
+            creds.refresh(google.auth.transport.requests.Request())
+            cls._adc_token = creds.token
+            cls._adc_token_expiry = time.time() + 3000  # 50分キャッシュ
+            return cls._adc_token
+        except Exception:
+            cls._adc_token = None
+            return None
+    
     async def _execute_fallback(
         self,
         lmql_code: str,
@@ -182,10 +305,14 @@ class LMQLExecutor:
     ) -> ExecutionResult:
         """フォールバック: 複数プロバイダー対応の LLM 呼び出し
         
-        優先順位 (順に試行、失敗時は次へ):
-        1. Anthropic (Claude) - ANTHROPIC_API_KEY
-        2. Google (Gemini) - GOOGLE_API_KEY  
-        3. OpenAI - OPENAI_API_KEY
+        provider 指定モード:
+          config.model が MODEL_REGISTRY にある → そのプロバイダーを使用
+        
+        auto モード (デフォルト):
+          優先順位 (順に試行、失敗時は次へ):
+          1. Anthropic (Claude) - ANTHROPIC_API_KEY
+          2. Google (Gemini) - GOOGLE_API_KEY  
+          3. OpenAI - OPENAI_API_KEY
         """
         # LMQL コードからプロンプトを抽出
         prompt = self._extract_prompt_from_lmql(lmql_code)
@@ -208,7 +335,30 @@ class LMQLExecutor:
         else:
             full_prompt = prompt
         
-        # プロバイダーを順に試行 (失敗時は次へフォールバック)
+        # --- モデル指定モード: MODEL_REGISTRY から解決 ---
+        if self.config.model != "auto":
+            model_info = self._resolve_model()
+            provider = model_info["provider"]
+            
+            if provider == "vertex-anthropic":
+                return await self._execute_vertex_anthropic(full_prompt, model_info)
+            elif provider == "vertex-openai":
+                return await self._execute_vertex_openai(full_prompt, model_info)
+            elif provider == "anthropic":
+                key = os.environ.get("ANTHROPIC_API_KEY")
+                if key:
+                    return await self._execute_anthropic(full_prompt, key, model_info.get("model_id"))
+            elif provider == "google":
+                key = os.environ.get("GOOGLE_API_KEY")
+                if key:
+                    return await self._execute_google(full_prompt, key, model_info.get("model_id"))
+            elif provider == "openai":
+                key = self.config.api_key or os.environ.get("OPENAI_API_KEY")
+                if key:
+                    return await self._execute_openai(full_prompt, key, model_info.get("model_id"))
+            # 指定プロバイダー失敗 → auto フォールバックへ
+        
+        # --- Auto モード: 順に試行 ---
         providers = []
         anthropic_key = os.environ.get("ANTHROPIC_API_KEY")
         google_key = os.environ.get("GOOGLE_API_KEY")
@@ -242,8 +392,10 @@ class LMQLExecutor:
             error=f"All providers failed: {'; '.join(errors)}"
         )
     
-    async def _execute_anthropic(self, prompt: str, api_key: str) -> ExecutionResult:
-        """Anthropic Claude API 呼び出し"""
+    async def _execute_anthropic(
+        self, prompt: str, api_key: str, model_id: Optional[str] = None
+    ) -> ExecutionResult:
+        """Anthropic Claude API 呼び出し (直接 API key)"""
         try:
             from anthropic import AsyncAnthropic
         except ImportError:
@@ -253,13 +405,14 @@ class LMQLExecutor:
                 error="anthropic not installed. Run: pip install anthropic"
             )
         
+        model_name = model_id or "claude-sonnet-4-20250514"
         client = AsyncAnthropic(api_key=api_key)
         
         for attempt in range(self.config.max_retries):
             try:
                 response = await asyncio.wait_for(
                     client.messages.create(
-                        model="claude-sonnet-4-20250514",
+                        model=model_name,
                         max_tokens=4096,
                         messages=[{"role": "user", "content": prompt}],
                     ),
@@ -272,9 +425,9 @@ class LMQLExecutor:
                     output=output,
                     metadata={
                         "provider": "anthropic",
-                        "model": "claude-sonnet-4-20250514",
+                        "model": model_name,
                         "attempt": attempt + 1,
-                        "fallback": True
+                        "fallback": self.config.model == "auto"
                     }
                 )
             except asyncio.TimeoutError:
@@ -298,7 +451,9 @@ class LMQLExecutor:
             error="Anthropic API call failed after retries"
         )
     
-    async def _execute_google(self, prompt: str, api_key: str) -> ExecutionResult:
+    async def _execute_google(
+        self, prompt: str, api_key: str, model_id: Optional[str] = None
+    ) -> ExecutionResult:
         """Google Gemini API 呼び出し (google.genai SDK)"""
         try:
             from google import genai
@@ -310,7 +465,7 @@ class LMQLExecutor:
             )
         
         client = genai.Client(api_key=api_key)
-        model_name = "gemini-2.5-pro"
+        model_name = model_id or "gemini-2.5-flash"
         
         for attempt in range(self.config.max_retries):
             try:
@@ -331,7 +486,7 @@ class LMQLExecutor:
                         "provider": "google",
                         "model": model_name,
                         "attempt": attempt + 1,
-                        "fallback": True
+                        "fallback": self.config.model == "auto"
                     }
                 )
             except asyncio.TimeoutError:
@@ -355,7 +510,9 @@ class LMQLExecutor:
             error="Google API call failed after retries"
         )
     
-    async def _execute_openai(self, prompt: str, api_key: str) -> ExecutionResult:
+    async def _execute_openai(
+        self, prompt: str, api_key: str, model_id: Optional[str] = None
+    ) -> ExecutionResult:
         """OpenAI API 呼び出し"""
         try:
             from openai import AsyncOpenAI
@@ -366,13 +523,16 @@ class LMQLExecutor:
                 error="openai not installed. Run: pip install openai"
             )
         
+        model_name = model_id or self.config.model.replace("openai/", "")
+        if model_name == "auto":
+            model_name = "gpt-4o"
         client = AsyncOpenAI(api_key=api_key)
         
         for attempt in range(self.config.max_retries):
             try:
                 response = await asyncio.wait_for(
                     client.chat.completions.create(
-                        model=self.config.model.replace("openai/", ""),
+                        model=model_name,
                         messages=[{"role": "user", "content": prompt}],
                         temperature=self.config.temperature,
                     ),
@@ -385,9 +545,9 @@ class LMQLExecutor:
                     output=output,
                     metadata={
                         "provider": "openai",
-                        "model": self.config.model,
+                        "model": model_name,
                         "attempt": attempt + 1,
-                        "fallback": True
+                        "fallback": self.config.model == "auto"
                     }
                 )
             except asyncio.TimeoutError:
@@ -409,6 +569,192 @@ class LMQLExecutor:
             status=ExecutionStatus.ERROR,
             output="",
             error="Max retries exceeded"
+        )
+    
+    async def _execute_vertex_anthropic(
+        self, prompt: str, model_info: Dict[str, str]
+    ) -> ExecutionResult:
+        """Vertex AI 経由 Claude 呼び出し (AnthropicVertex SDK, ADC 認証)"""
+        try:
+            from anthropic import AnthropicVertex
+        except ImportError:
+            return ExecutionResult(
+                status=ExecutionStatus.ERROR,
+                output="",
+                error="anthropic[vertex] not installed. Run: pip install 'anthropic[vertex]'"
+            )
+        
+        project_id = os.environ.get("GOOGLE_CLOUD_PROJECT")
+        if not project_id:
+            return ExecutionResult(
+                status=ExecutionStatus.ERROR,
+                output="",
+                error="GOOGLE_CLOUD_PROJECT not set in environment"
+            )
+        
+        region = model_info.get("region", "us-east5")
+        model_name = model_info.get("model_id", "claude-sonnet-4-5@latest")
+        
+        try:
+            client = AnthropicVertex(project_id=project_id, region=region)
+        except Exception as e:
+            # ADC 未設定時のグレースフルフォールバック
+            anthropic_key = os.environ.get("ANTHROPIC_API_KEY")
+            if anthropic_key:
+                # 直接 API に降格
+                fallback_model = model_name.split("@")[0]  # @latest を除去
+                return await self._execute_anthropic(prompt, anthropic_key, fallback_model)
+            return ExecutionResult(
+                status=ExecutionStatus.ERROR,
+                output="",
+                error=f"Vertex ADC failed and no ANTHROPIC_API_KEY fallback: {str(e)[:200]}"
+            )
+        
+        for attempt in range(self.config.max_retries):
+            try:
+                response = await asyncio.wait_for(
+                    asyncio.to_thread(
+                        client.messages.create,
+                        model=model_name,
+                        max_tokens=4096,
+                        messages=[{"role": "user", "content": prompt}],
+                    ),
+                    timeout=self.config.timeout
+                )
+                
+                output = response.content[0].text
+                return ExecutionResult(
+                    status=ExecutionStatus.SUCCESS,
+                    output=output,
+                    metadata={
+                        "provider": "vertex-anthropic",
+                        "model": model_name,
+                        "region": region,
+                        "project": project_id,
+                        "attempt": attempt + 1,
+                    }
+                )
+            except asyncio.TimeoutError:
+                if attempt == self.config.max_retries - 1:
+                    return ExecutionResult(
+                        status=ExecutionStatus.TIMEOUT,
+                        output="",
+                        error=f"Vertex Anthropic API call timed out (region={region})"
+                    )
+                await asyncio.sleep(2 ** attempt)
+            except Exception as e:
+                return ExecutionResult(
+                    status=ExecutionStatus.ERROR,
+                    output="",
+                    error=f"Vertex Anthropic error: {str(e)[:200]}"
+                )
+        
+        return ExecutionResult(
+            status=ExecutionStatus.ERROR,
+            output="",
+            error="Vertex Anthropic API call failed after retries"
+        )
+    
+    async def _execute_vertex_openai(
+        self, prompt: str, model_info: Dict[str, str]
+    ) -> ExecutionResult:
+        """Vertex AI 経由 Open Models (OpenAI互換 SDK, ADC 認証)
+        
+        DeepSeek, Mistral, Llama 4 等のオープンモデルを
+        Vertex AI の OpenAI 互換エンドポイント経由で呼び出す。
+        """
+        try:
+            from openai import AsyncOpenAI
+        except ImportError:
+            return ExecutionResult(
+                status=ExecutionStatus.ERROR,
+                output="",
+                error="openai not installed. Run: pip install openai"
+            )
+        
+        project_id = os.environ.get("GOOGLE_CLOUD_PROJECT")
+        if not project_id:
+            return ExecutionResult(
+                status=ExecutionStatus.ERROR,
+                output="",
+                error="GOOGLE_CLOUD_PROJECT not set in environment"
+            )
+        
+        # ADC token 取得
+        token = self._get_adc_token()
+        if not token:
+            return ExecutionResult(
+                status=ExecutionStatus.ERROR,
+                output="",
+                error="Failed to get ADC token. Run: gcloud auth application-default login"
+            )
+        
+        region = model_info.get("region", "us-east5")
+        model_id = model_info.get("model_id", "")
+        publisher = model_info.get("publisher", "google")
+        
+        base_url = (
+            f"https://{region}-aiplatform.googleapis.com/v1beta1/"
+            f"projects/{project_id}/locations/{region}/"
+            f"endpoints/openapi"
+        )
+        
+        # OpenAI互換の model 名: publishers/{publisher}/models/{model_id}
+        oai_model_name = f"google/{model_id}" if publisher == "google" else f"{publisher}/{model_id}"
+        
+        client = AsyncOpenAI(base_url=base_url, api_key=token)
+        
+        for attempt in range(self.config.max_retries):
+            try:
+                response = await asyncio.wait_for(
+                    client.chat.completions.create(
+                        model=oai_model_name,
+                        messages=[{"role": "user", "content": prompt}],
+                        temperature=self.config.temperature,
+                    ),
+                    timeout=self.config.timeout
+                )
+                
+                output = response.choices[0].message.content
+                return ExecutionResult(
+                    status=ExecutionStatus.SUCCESS,
+                    output=output,
+                    metadata={
+                        "provider": "vertex-openai",
+                        "model": model_id,
+                        "publisher": publisher,
+                        "region": region,
+                        "attempt": attempt + 1,
+                    }
+                )
+            except asyncio.TimeoutError:
+                if attempt == self.config.max_retries - 1:
+                    return ExecutionResult(
+                        status=ExecutionStatus.TIMEOUT,
+                        output="",
+                        error=f"Vertex OpenAI-compat API timed out (region={region})"
+                    )
+                await asyncio.sleep(2 ** attempt)
+            except Exception as e:
+                error_msg = str(e)[:200]
+                # token 期限切れ → リフレッシュ試行
+                if "401" in error_msg or "403" in error_msg:
+                    LMQLExecutor._adc_token = None  # キャッシュ無効化
+                    new_token = self._get_adc_token()
+                    if new_token and attempt < self.config.max_retries - 1:
+                        client = AsyncOpenAI(base_url=base_url, api_key=new_token)
+                        await asyncio.sleep(1)
+                        continue
+                return ExecutionResult(
+                    status=ExecutionStatus.ERROR,
+                    output="",
+                    error=f"Vertex OpenAI-compat error: {error_msg}"
+                )
+        
+        return ExecutionResult(
+            status=ExecutionStatus.ERROR,
+            output="",
+            error="Vertex OpenAI-compat API call failed after retries"
         )
     
     def _extract_prompt_from_lmql(self, lmql_code: str) -> Optional[str]:
@@ -544,7 +890,7 @@ class ConvergenceExecutor:
 def execute_ccl(
     ccl: str,
     context: str = "",
-    model: str = "openai/gpt-4o",
+    model: str = "auto",
     macros: Optional[Dict[str, str]] = None,
     **kwargs
 ) -> ExecutionResult:

@@ -95,8 +95,8 @@ async def main():
                         lines.append(
                             f"  [{i}] <{tag}> class='{classes[:80]}' text_len={len(text) if text else 0}"
                         )
-            except Exception:
-                pass  # TODO: Add proper error handling
+            except Exception as e:
+                lines.append(f"  [!] Error inspecting selector '{sel}': {e}")
 
         # 3. テキストが長いdivを探す（メッセージコンテナ候補）
         lines.append("\n\n=== Large divs (text > 1000) ===")
@@ -110,8 +110,8 @@ async def main():
                     classes = await div.get_attribute("class") or ""
                     children = await div.evaluate("el => el.children.length")
                     large_divs.append((classes, len(text), children))
-            except Exception:
-                pass  # TODO: Add proper error handling
+            except Exception as e:
+                lines.append(f"  [!] Error inspecting div: {e}")
 
         large_divs.sort(key=lambda x: x[1], reverse=True)
 
@@ -143,8 +143,8 @@ async def main():
                 )
                 lines.append(f"       class='{classes[:60]}'")
                 lines.append(f"       text='{text_preview}'")
-            except Exception:
-                pass  # TODO: Add proper error handling
+            except Exception as e:
+                lines.append(f"  [!] Error inspecting data element: {e}")
 
         # 書き込み
         with open(OUTPUT_FILE, "w", encoding="utf-8") as f:

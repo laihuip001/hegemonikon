@@ -12,8 +12,8 @@ from pathlib import Path
 import yaml
 
 
-@dataclass
 # PURPOSE: A workflow's CCL signature.
+@dataclass
 class WorkflowSignature:
     """A workflow's CCL signature."""
 

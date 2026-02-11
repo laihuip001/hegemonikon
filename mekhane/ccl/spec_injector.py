@@ -55,8 +55,8 @@ class SpecInjector:
         )
         self._operators_content: str = None
 
-    @property
     # PURPOSE: operators.md の内容をキャッシュ付きで読み込み
+    @property
     def operators_content(self) -> str:
         """operators.md の内容をキャッシュ付きで読み込み"""
         if self._operators_content is None:

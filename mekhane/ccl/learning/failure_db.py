@@ -17,8 +17,8 @@ from dataclasses import dataclass, asdict
 from typing import List, Dict, Optional
 
 
-@dataclass
 # PURPOSE: 失敗記録
+@dataclass
 class FailureRecord:
     """失敗記録"""
 
@@ -30,8 +30,8 @@ class FailureRecord:
     resolution: Optional[str] = None
 
 
-@dataclass
 # PURPOSE: 警告記録
+@dataclass
 class WarningRecord:
     """警告記録"""
 
@@ -57,8 +57,8 @@ class FailureDB:
         self.db_path.parent.mkdir(parents=True, exist_ok=True)
         self._data: Dict = None
 
-    @property
     # PURPOSE: データを遅延読み込み
+    @property
     def data(self) -> Dict:
         """データを遅延読み込み"""
         if self._data is None:
@@ -182,7 +182,6 @@ class FailureDB:
             "message": message,
             "severity": severity,
             "added": datetime.now().strftime("%Y-%m-%d"),
-# PURPOSE: FailureDB のシングルトンを取得
         }
         self.save()
 

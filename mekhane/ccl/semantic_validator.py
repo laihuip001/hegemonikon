@@ -35,8 +35,8 @@ def _get_api_key() -> Optional[str]:
     )
 
 
-@dataclass
 # PURPOSE: Result of semantic validation.
+@dataclass
 class SemanticResult:
     """Result of semantic validation."""
 
@@ -45,12 +45,12 @@ class SemanticResult:
     reasoning: str
     suggestions: List[str]
 
-    # PURPOSE: LLM-based semantic validation for CCL expressions. Validates whether a CCL expre
+    # PURPOSE: __bool__ — check alignment status
     def __bool__(self) -> bool:
         return self.aligned
 
-# PURPOSE: LLM-based semantic validation for CCL expressions.
 
+# PURPOSE: LLM-based semantic validation for CCL expressions.
 class CCLSemanticValidator:
     """
     LLM-based semantic validation for CCL expressions.
@@ -210,7 +210,6 @@ CCL は Hegemonikón システムの認知制御言語で、以下のワーク�
         # Fallback: try to infer from text
         aligned = "不一致" not in text and "aligned.*false" not in text.lower()
         return SemanticResult(
-# PURPOSE: Quick validation helper.
             aligned=aligned,
             confidence=0.5,
             reasoning=text[:200] if len(text) > 200 else text,

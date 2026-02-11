@@ -15,8 +15,8 @@ from typing import List, Dict, Set, Optional
 import re
 
 
-@dataclass
 # PURPOSE: 検証エラー
+@dataclass
 class ValidationError:
     """検証エラー"""
 
@@ -26,8 +26,8 @@ class ValidationError:
     suggestion: str
 
 
-@dataclass
 # PURPOSE: 検証結果
+@dataclass
 class ValidationResult:
     """検証結果"""
 
@@ -35,8 +35,8 @@ class ValidationResult:
     errors: List[ValidationError]
     warnings: List[str]
 
-    @property
     # PURPOSE: 再生成用の指示を生成
+    @property
     def regeneration_instruction(self) -> str:
         """再生成用の指示を生成"""
         if self.valid:
@@ -73,7 +73,6 @@ OPERATOR_MIN_LINES: Dict[str, int] = {
 }
 
 # PURPOSE: CCL 出力検証器
-
 class CCLOutputValidator:
     """CCL 出力検証器"""
 

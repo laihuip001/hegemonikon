@@ -12,8 +12,8 @@ from pathlib import Path
 import json
 
 
-@dataclass
 # PURPOSE: A CCL macro definition.
+@dataclass
 class Macro:
     """A CCL macro definition."""
 

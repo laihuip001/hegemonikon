@@ -19,8 +19,8 @@ except ImportError:
     HAS_EMBEDDINGS = False
 
 
-@dataclass
 # PURPOSE: A matched macro with similarity score.
+@dataclass
 class MacroMatch:
     """A matched macro with similarity score."""
 

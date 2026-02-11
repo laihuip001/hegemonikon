@@ -41,8 +41,8 @@ class OpType(Enum):
     EXPAND = auto()  # !
 
 
-@dataclass
 # PURPOSE: ワークフローノード
+@dataclass
 class Workflow:
     """ワークフローノード"""
 
@@ -52,8 +52,8 @@ class Workflow:
     selector: Optional[str] = None
 
 
-@dataclass
 # PURPOSE: 条件ノード
+@dataclass
 class Condition:
     """条件ノード"""
 
@@ -62,8 +62,8 @@ class Condition:
     value: float
 
 
-@dataclass
 # PURPOSE: 収束ループ: A >> cond
+@dataclass
 class ConvergenceLoop:
     """収束ループ: A >> cond"""
 
@@ -71,8 +71,8 @@ class ConvergenceLoop:
     condition: Condition
 
 
-@dataclass
 # PURPOSE: シーケンス: A _ B
+@dataclass
 class Sequence:
     """シーケンス: A _ B"""
 

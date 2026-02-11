@@ -41,8 +41,8 @@ class OperatorVerification(BaseModel):
         ..., min_length=20, description="自分の言葉での説明（省略禁止）"
     )
 
-    @validator("operator")
     # PURPOSE: 検証: validate_operator
+    @validator("operator")
     def validate_operator(cls, v):
         valid_ops = set("!~*^+-_?\\")
         if v not in valid_ops:
@@ -50,7 +50,6 @@ class OperatorVerification(BaseModel):
         return v
 
 # PURPOSE: CCL ステップの出力
-
 class StepOutput(BaseModel):
     """CCL ステップの出力"""
 
@@ -60,7 +59,6 @@ class StepOutput(BaseModel):
     result: str = Field(..., description="結果")
 
 # PURPOSE: 振動演算子 (~) の出力
-
 class OscillationOutput(BaseModel):
     """振動演算子 (~) の出力"""
 
@@ -69,7 +67,6 @@ class OscillationOutput(BaseModel):
     synthesis: str = Field(..., description="振動の統合結果")
 
 # PURPOSE: 融合演算子 (*) の出力
-
 class MergeOutput(BaseModel):
     """融合演算子 (*) の出力"""
 
@@ -78,7 +75,6 @@ class MergeOutput(BaseModel):
     merged_result: str = Field(..., description="融合結果")
 
 # PURPOSE: メタ演算子 (^) の出力
-
 class MetaOutput(BaseModel):
     """メタ演算子 (^) の出力"""
 
@@ -89,7 +85,6 @@ class MetaOutput(BaseModel):
     )
 
 # PURPOSE: 階乗演算子 (!) の出力
-
 class FactorialOutput(BaseModel):
     """階乗演算子 (!) の出力"""
 
@@ -100,7 +95,6 @@ class FactorialOutput(BaseModel):
     )
 
 # PURPOSE: 自己監査
-
 class SelfAudit(BaseModel):
     """自己監査"""
 
@@ -111,7 +105,6 @@ class SelfAudit(BaseModel):
     )
 
 # PURPOSE: CCL 完全実行出力
-
 class CCLExecutionOutput(BaseModel):
     """CCL 完全実行出力"""
 

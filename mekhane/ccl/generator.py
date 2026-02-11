@@ -19,8 +19,8 @@ from .pattern_cache import PatternCache
 from .syntax_validator import CCLSyntaxValidator
 
 
-@dataclass
 # PURPOSE: Result of CCL generation.
+@dataclass
 class GenerationResult:
     """Result of CCL generation."""
 
@@ -112,9 +112,8 @@ class CCLGenerator:
             warnings=["Could not generate CCL - asking user"],
         )
 
-# PURPOSE: Generate CCL from intent (simple interface).
-
 # Convenience function for backward compatibility
+# PURPOSE: Generate CCL from intent (simple interface).
 def generate_ccl(intent: str) -> str:
     """
     Generate CCL from intent (simple interface).

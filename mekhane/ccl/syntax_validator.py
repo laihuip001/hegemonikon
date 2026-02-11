@@ -64,8 +64,8 @@ VALID_WORKFLOWS = {
 }
 
 
-@dataclass
 # PURPOSE: Result of CCL validation.
+@dataclass
 class ValidationResult:
     """Result of CCL validation."""
 
@@ -73,12 +73,12 @@ class ValidationResult:
     errors: List[str]
     warnings: List[str]
 
-    # PURPOSE: Validate CCL v2.0 expressions. Checks for: - Balanced braces
+    # PURPOSE: __bool__ — check validity status
     def __bool__(self) -> bool:
         return self.valid
 
-# PURPOSE: Validate CCL v2.0 expressions.
 
+# PURPOSE: Validate CCL v2.0 expressions.
 class CCLSyntaxValidator:
     """
     Validate CCL v2.0 expressions.

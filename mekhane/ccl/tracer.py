@@ -25,8 +25,8 @@ from dataclasses import dataclass, asdict
 TRACES_BASE = Path("/home/makaron8426/oikos/mneme/.hegemonikon/ccl_traces")
 
 
-@dataclass
 # PURPOSE: A single step in CCL execution.
+@dataclass
 class Step:
     """A single step in CCL execution."""
 
@@ -36,8 +36,8 @@ class Step:
     note: str
 
 
-@dataclass
 # PURPOSE: A CCL execution session.
+@dataclass
 class Session:
     """A CCL execution session."""
 
@@ -190,8 +190,8 @@ class CCLTracer:
         except (json.JSONDecodeError, KeyError):
             return False
 
-    @classmethod
     # PURPOSE: Load the most recent session.
+    @classmethod
     def load_latest(cls, base_path: Optional[Path] = None) -> Optional["CCLTracer"]:
         """
         Load the most recent session.

@@ -12,8 +12,8 @@ from pathlib import Path
 import json
 
 
-@dataclass
 # PURPOSE: A learned intent-to-CCL mapping.
+@dataclass
 class LearnedPattern:
     """A learned intent-to-CCL mapping."""
 

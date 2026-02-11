@@ -573,14 +573,19 @@ def generate_boot_template(result: dict) -> Path:
 
     projects = result.get("projects", {}).get("projects", [])
     if projects:
-        active_projects = [p for p in projects if p.get("status") == "active"]
-        for p in active_projects:
+        status_icons = {"active": "🟢", "dormant": "💤", "archived": "🗄️", "planned": "📋"}
+        active = [p for p in projects if p.get("status") == "active"]
+        dormant = [p for p in projects if p.get("status") == "dormant"]
+        archived = [p for p in projects if p.get("status") == "archived"]
+        # 全PJを表示（status で区別）— dormant/archived を省略しない
+        for p in projects:
+            icon = status_icons.get(p.get("status", ""), "❓")
             name = p.get("name", p.get("id", "?"))
             phase = p.get("phase", "")
             summary_text = p.get("summary", "")
-            lines.append(f"- **{name}** [{phase}]: {summary_text}")
+            lines.append(f"- {icon} **{name}** [{phase}]: {summary_text}")
         lines.append("")
-        lines.append(f"統計: Active {len(active_projects)} / Total {len(projects)}")
+        lines.append(f"統計: Active {len(active)} / Dormant {len(dormant)} / Archived {len(archived)} / Total {len(projects)}")
     else:
         lines.append("<!-- FILL: registry.yaml が見つかりません -->")
     lines.append("")

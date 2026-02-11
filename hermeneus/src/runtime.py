@@ -178,6 +178,8 @@ class LMQLExecutor:
     def __init__(self, config: Optional[ExecutionConfig] = None):
         self.config = config or ExecutionConfig()
         self._lmql_available = self._check_lmql()
+        # API Client キャッシュ (インスタンス変数) - 繰り返し実行時(ConvergenceLoop等)のクライアント生成コスト削減
+        self._clients: Dict[str, Any] = {}
     
     def _check_lmql(self) -> bool:
         """LMQL がインストールされているか確認"""
@@ -406,7 +408,13 @@ class LMQLExecutor:
             )
         
         model_name = model_id or "claude-sonnet-4-20250514"
-        client = AsyncAnthropic(api_key=api_key)
+
+        # クライアントのキャッシュ/再利用
+        client_key = f"anthropic:{api_key}"
+        client = self._clients.get(client_key)
+        if not client:
+            client = AsyncAnthropic(api_key=api_key)
+            self._clients[client_key] = client
         
         for attempt in range(self.config.max_retries):
             try:
@@ -464,7 +472,13 @@ class LMQLExecutor:
                 error="google-genai not installed. Run: pip install google-genai"
             )
         
-        client = genai.Client(api_key=api_key)
+        # クライアントのキャッシュ/再利用
+        client_key = f"google:{api_key}"
+        client = self._clients.get(client_key)
+        if not client:
+            client = genai.Client(api_key=api_key)
+            self._clients[client_key] = client
+
         model_name = model_id or "gemini-2.5-flash"
         
         for attempt in range(self.config.max_retries):
@@ -526,7 +540,13 @@ class LMQLExecutor:
         model_name = model_id or self.config.model.replace("openai/", "")
         if model_name == "auto":
             model_name = "gpt-4o"
-        client = AsyncOpenAI(api_key=api_key)
+
+        # クライアントのキャッシュ/再利用
+        client_key = f"openai:{api_key}"
+        client = self._clients.get(client_key)
+        if not client:
+            client = AsyncOpenAI(api_key=api_key)
+            self._clients[client_key] = client
         
         for attempt in range(self.config.max_retries):
             try:
@@ -596,7 +616,12 @@ class LMQLExecutor:
         model_name = model_info.get("model_id", "claude-sonnet-4-5@latest")
         
         try:
-            client = AnthropicVertex(project_id=project_id, region=region)
+            # クライアントのキャッシュ/再利用
+            client_key = f"vertex-anthropic:{project_id}:{region}"
+            client = self._clients.get(client_key)
+            if not client:
+                client = AnthropicVertex(project_id=project_id, region=region)
+                self._clients[client_key] = client
         except Exception as e:
             # ADC 未設定時のグレースフルフォールバック
             anthropic_key = os.environ.get("ANTHROPIC_API_KEY")
@@ -702,7 +727,12 @@ class LMQLExecutor:
         # OpenAI互換の model 名: publishers/{publisher}/models/{model_id}
         oai_model_name = f"google/{model_id}" if publisher == "google" else f"{publisher}/{model_id}"
         
-        client = AsyncOpenAI(base_url=base_url, api_key=token)
+        # クライアントのキャッシュ/再利用
+        client_key = f"vertex-openai:{region}:{project_id}:{token}"
+        client = self._clients.get(client_key)
+        if not client:
+            client = AsyncOpenAI(base_url=base_url, api_key=token)
+            self._clients[client_key] = client
         
         for attempt in range(self.config.max_retries):
             try:
@@ -739,6 +769,10 @@ class LMQLExecutor:
                 error_msg = str(e)[:200]
                 # token 期限切れ → リフレッシュ試行
                 if "401" in error_msg or "403" in error_msg:
+                    # キャッシュ無効化
+                    if client_key in self._clients:
+                        del self._clients[client_key]
+
                     LMQLExecutor._adc_token = None  # キャッシュ無効化
                     new_token = self._get_adc_token()
                     if new_token and attempt < self.config.max_retries - 1:

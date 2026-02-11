@@ -19,6 +19,7 @@ from pathlib import Path
 from typing import Optional
 
 
+# PURPOSE: MetrikaResult の機能を提供する
 @dataclass
 # PURPOSE: Metrika 5門の検証結果
 class MetrikaResult:
@@ -32,6 +33,7 @@ class MetrikaResult:
 
     violations: list[str] = field(default_factory=list)
 
+    # PURPOSE: quality_gate の passed 処理を実行する
     @property
     # PURPOSE: passed — システムの処理
     def passed(self) -> bool:

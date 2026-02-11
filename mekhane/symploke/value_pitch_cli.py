@@ -65,6 +65,7 @@ def _get_git_diff_stat(n: int, cwd: str | None = None) -> list[str]:
         return []
 
 
+# PURPOSE: value_pitch_cli の main 処理を実行する
 def main():
     parser = argparse.ArgumentParser(
         description="Value Pitch 骨格生成 — Git log からタスク収集",

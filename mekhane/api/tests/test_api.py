@@ -29,9 +29,11 @@ def client():
 # ============================================================
 
 
+# PURPOSE: Test suite validating status correctness
 class TestStatus:
     """/api/status/* エンドポイント。"""
 
+    # PURPOSE: Verify health endpoint behaves correctly
     def test_health_endpoint(self, client: TestClient):
         """GET /api/status/health → 200 + status=ok"""
         r = client.get("/api/status/health")
@@ -41,6 +43,7 @@ class TestStatus:
         assert "version" in data
         assert "uptime_seconds" in data
 
+    # PURPOSE: Verify full status behaves correctly
     def test_full_status(self, client: TestClient):
         """GET /api/status → 200 + score + items"""
         r = client.get("/api/status")
@@ -59,9 +62,11 @@ class TestStatus:
 # ============================================================
 
 
+# PURPOSE: Test suite validating f e p correctness
 class TestFEP:
     """/api/fep/* エンドポイント。"""
 
+    # PURPOSE: Verify fep state behaves correctly
     def test_fep_state(self, client: TestClient):
         """GET /api/fep/state → 200 + beliefs"""
         r = client.get("/api/fep/state")
@@ -72,6 +77,7 @@ class TestFEP:
         assert isinstance(data["beliefs"], list)
         assert len(data["beliefs"]) == 48  # 48-state model
 
+    # PURPOSE: Verify fep step behaves correctly
     def test_fep_step(self, client: TestClient):
         """POST /api/fep/step → 200 + action_name"""
         r = client.post("/api/fep/step", json={"observation": 0})
@@ -81,11 +87,13 @@ class TestFEP:
         assert "action_index" in data
         assert data["action_index"] >= 0
 
+    # PURPOSE: Verify fep step invalid observation behaves correctly
     def test_fep_step_invalid_observation(self, client: TestClient):
         """POST /api/fep/step with invalid observation → 422"""
         r = client.post("/api/fep/step", json={"observation": 999})
         assert r.status_code == 422  # validation error
 
+    # PURPOSE: Verify fep dashboard behaves correctly
     def test_fep_dashboard(self, client: TestClient):
         """GET /api/fep/dashboard → 200"""
         r = client.get("/api/fep/dashboard")
@@ -100,20 +108,24 @@ class TestFEP:
 # ============================================================
 
 
+# PURPOSE: Test suite validating gnosis correctness
 class TestGnosis:
     """/api/gnosis/* エンドポイント。"""
 
+    # PURPOSE: Verify gnosis stats behaves correctly
     def test_gnosis_stats(self, client: TestClient):
         """GET /api/gnosis/stats → 200 (インデックス障害時も graceful)"""
         r = client.get("/api/gnosis/stats")
         # 503 or 200 — shape mismatch 時は available=false
         assert r.status_code in (200, 503)
 
+    # PURPOSE: Verify gnosis search behaves correctly
     def test_gnosis_search(self, client: TestClient):
         """GET /api/gnosis/search?q=FEP → 200 or 503"""
         r = client.get("/api/gnosis/search", params={"q": "FEP"})
         assert r.status_code in (200, 503)
 
+    # PURPOSE: Verify gnosis search missing query behaves correctly
     def test_gnosis_search_missing_query(self, client: TestClient):
         """GET /api/gnosis/search without q → 422"""
         r = client.get("/api/gnosis/search")
@@ -125,9 +137,11 @@ class TestGnosis:
 # ============================================================
 
 
+# PURPOSE: Test suite validating postcheck correctness
 class TestPostcheck:
     """/api/postcheck/* エンドポイント。"""
 
+    # PURPOSE: Verify postcheck list behaves correctly
     def test_postcheck_list(self, client: TestClient):
         """GET /api/postcheck/list → 200 + items"""
         r = client.get("/api/postcheck/list")
@@ -137,6 +151,7 @@ class TestPostcheck:
         assert "total" in data
         assert isinstance(data["items"], list)
 
+    # PURPOSE: Verify postcheck run behaves correctly
     def test_postcheck_run(self, client: TestClient):
         """POST /api/postcheck/run → 200"""
         r = client.post("/api/postcheck/run", json={
@@ -155,9 +170,11 @@ class TestPostcheck:
 # ============================================================
 
 
+# PURPOSE: Test suite validating dendron correctness
 class TestDendron:
     """/api/dendron/* エンドポイント。"""
 
+    # PURPOSE: Verify dendron report summary behaves correctly
     def test_dendron_report_summary(self, client: TestClient):
         """GET /api/dendron/report → 200 + summary"""
         r = client.get("/api/dendron/report")
@@ -168,6 +185,7 @@ class TestDendron:
         # サマリーモードでは file_results は空
         assert data["file_results"] == []
 
+    # PURPOSE: Verify dendron check nonexistent behaves correctly
     def test_dendron_check_nonexistent(self, client: TestClient):
         """POST /api/dendron/check with bad path → error message"""
         r = client.post("/api/dendron/check", json={
@@ -183,9 +201,11 @@ class TestDendron:
 # ============================================================
 
 
+# PURPOSE: Test suite validating open a p i correctness
 class TestOpenAPI:
     """OpenAPI スキーマの公開確認。"""
 
+    # PURPOSE: Verify openapi schema behaves correctly
     def test_openapi_schema(self, client: TestClient):
         """GET /api/openapi.json → 200 + valid schema"""
         r = client.get("/api/openapi.json")
@@ -194,6 +214,7 @@ class TestOpenAPI:
         assert data["info"]["title"] == "Hegemonikón API"
         assert "paths" in data
 
+    # PURPOSE: Verify docs page behaves correctly
     def test_docs_page(self, client: TestClient):
         """GET /api/docs → 200 (Swagger UI)"""
         r = client.get("/api/docs")
@@ -205,9 +226,11 @@ class TestOpenAPI:
 # ============================================================
 
 
+# PURPOSE: Test suite validating link graph correctness
 class TestLinkGraph:
     """/api/link-graph/* エンドポイント。"""
 
+    # PURPOSE: Verify link graph full behaves correctly
     def test_link_graph_full(self, client: TestClient):
         """GET /api/link-graph/full → 200 + nodes + edges + meta."""
         r = client.get("/api/link-graph/full")
@@ -229,6 +252,7 @@ class TestLinkGraph:
             # 射影先は有効な Series
             assert node["projected_series"] in "OSHPKA"
 
+    # PURPOSE: Verify link graph full filter behaves correctly
     def test_link_graph_full_filter(self, client: TestClient):
         """GET /api/link-graph/full?source_type=kernel → フィルタ動作。"""
         r = client.get("/api/link-graph/full", params={"source_type": "kernel"})
@@ -237,6 +261,7 @@ class TestLinkGraph:
         for node in data["nodes"]:
             assert node["source_type"] == "kernel"
 
+    # PURPOSE: Verify link graph stats behaves correctly
     def test_link_graph_stats(self, client: TestClient):
         """GET /api/link-graph/stats → 200 + 統計."""
         r = client.get("/api/link-graph/stats")
@@ -249,6 +274,7 @@ class TestLinkGraph:
         assert "projection_counts" in data
         assert isinstance(data["bridge_nodes"], list)
 
+    # PURPOSE: Verify link graph neighbors behaves correctly
     def test_link_graph_neighbors(self, client: TestClient):
         """GET /api/link-graph/neighbors/{node_id} → 200."""
         # まずノード一覧を取得
@@ -262,6 +288,7 @@ class TestLinkGraph:
             assert data2["node_id"] == node_id
             assert "neighbors" in data2
 
+    # PURPOSE: Verify link graph neighbors not found behaves correctly
     def test_link_graph_neighbors_not_found(self, client: TestClient):
         """GET /api/link-graph/neighbors/xxx → error: not found."""
         r = client.get("/api/link-graph/neighbors/nonexistent_node_12345")
@@ -275,9 +302,11 @@ class TestLinkGraph:
 # ============================================================
 
 
+# PURPOSE: Test suite validating sophia k i correctness
 class TestSophiaKI:
     """CRUD ラウンドトリップ + セキュリティ検証。"""
 
+    # PURPOSE: Verify ki list initial behaves correctly
     def test_ki_list_initial(self, client: TestClient):
         """GET /api/sophia/ki → 200 + items list."""
         r = client.get("/api/sophia/ki")
@@ -287,6 +316,7 @@ class TestSophiaKI:
         assert "total" in data
         assert isinstance(data["items"], list)
 
+    # PURPOSE: Verify ki crud roundtrip behaves correctly
     def test_ki_crud_roundtrip(self, client: TestClient):
         """Create → Get → Update → Delete の完全ラウンドトリップ。"""
         # 1. Create
@@ -337,6 +367,7 @@ class TestSophiaKI:
         r = client.get(f"/api/sophia/ki/{ki_id}")
         assert r.status_code == 404
 
+    # PURPOSE: Verify ki search behaves correctly
     def test_ki_search(self, client: TestClient):
         """GET /api/sophia/search?q=xxx → 200 + results list."""
         r = client.get("/api/sophia/search", params={"q": "test"})
@@ -346,11 +377,13 @@ class TestSophiaKI:
         assert "results" in data
         assert isinstance(data["results"], list)
 
+    # PURPOSE: Verify ki not found behaves correctly
     def test_ki_not_found(self, client: TestClient):
         """GET /api/sophia/ki/nonexistent → 404."""
         r = client.get("/api/sophia/ki/nonexistent_ki_12345")
         assert r.status_code == 404
 
+    # PURPOSE: Verify ki path traversal blocked behaves correctly
     def test_ki_path_traversal_blocked(self, client: TestClient):
         """Path Traversal 攻撃が拒否されること。"""
         # URL エンコード版: FastAPI の処理で 400 or 404
@@ -361,6 +394,7 @@ class TestSophiaKI:
         r = client.get("/api/sophia/ki/..%2F..%2Fetc%2Fpasswd")
         assert r.status_code in (400, 404)
 
+    # PURPOSE: Verify ki create no title behaves correctly
     def test_ki_create_no_title(self, client: TestClient):
         """POST /api/sophia/ki with empty title → 422."""
         r = client.post("/api/sophia/ki", json={
@@ -376,9 +410,11 @@ class TestSophiaKI:
 # ============================================================
 
 
+# PURPOSE: Test suite validating graph correctness
 class TestGraph:
     """/api/graph/* エンドポイント。"""
 
+    # PURPOSE: Verify graph nodes behaves correctly
     def test_graph_nodes(self, client: TestClient):
         """GET /api/graph/nodes → 200 + 24ノード."""
         r = client.get("/api/graph/nodes")
@@ -393,6 +429,7 @@ class TestGraph:
         assert "name" in node
         assert "position" in node
 
+    # PURPOSE: Verify graph edges behaves correctly
     def test_graph_edges(self, client: TestClient):
         """GET /api/graph/edges → 200 + エッジリスト."""
         r = client.get("/api/graph/edges")
@@ -402,6 +439,7 @@ class TestGraph:
         # 72 relations + 24 identity = 96
         assert len(data) == 96
 
+    # PURPOSE: Verify graph full behaves correctly
     def test_graph_full(self, client: TestClient):
         """GET /api/graph/full → 200 + nodes + edges + meta."""
         r = client.get("/api/graph/full")
@@ -413,6 +451,7 @@ class TestGraph:
         assert data["meta"]["total_nodes"] == 24
         assert data["meta"]["total_edges"] == 96
 
+    # PURPOSE: Verify graph node has position behaves correctly
     def test_graph_node_has_position(self, client: TestClient):
         """各ノードが3D座標を持つことを確認."""
         r = client.get("/api/graph/nodes")
@@ -429,9 +468,11 @@ class TestGraph:
 # ============================================================
 
 
+# PURPOSE: Test suite validating c c l correctness
 class TestCCL:
     """/api/ccl/* エンドポイント。"""
 
+    # PURPOSE: Verify ccl parse simple behaves correctly
     def test_ccl_parse_simple(self, client: TestClient):
         """POST /api/ccl/parse with /noe+ → success + AST."""
         r = client.post("/api/ccl/parse", json={"ccl": "/noe+"})
@@ -441,6 +482,7 @@ class TestCCL:
         assert data["ccl"] == "/noe+"
         assert any("noe" in w for w in data["workflows"])
 
+    # PURPOSE: Verify ccl parse sequence behaves correctly
     def test_ccl_parse_sequence(self, client: TestClient):
         """POST /api/ccl/parse with /s+_/ene → success + 2 WFs."""
         r = client.post("/api/ccl/parse", json={"ccl": "/s+_/ene"})
@@ -449,6 +491,7 @@ class TestCCL:
         assert data["success"] is True
         assert len(data["workflows"]) >= 2
 
+    # PURPOSE: Verify ccl parse invalid behaves correctly
     def test_ccl_parse_invalid(self, client: TestClient):
         """POST /api/ccl/parse with empty → error."""
         r = client.post("/api/ccl/parse", json={"ccl": ""})
@@ -457,6 +500,7 @@ class TestCCL:
         # 空文字列はパースエラーになるはず
         assert data["success"] is False or data["error"] is not None
 
+    # PURPOSE: Verify ccl execute graceful behaves correctly
     def test_ccl_execute_graceful(self, client: TestClient):
         """POST /api/ccl/execute → 200 (成功 or graceful error)."""
         r = client.post("/api/ccl/execute", json={
@@ -473,9 +517,11 @@ class TestCCL:
 # ============================================================
 
 
+# PURPOSE: Test suite validating w f registry correctness
 class TestWFRegistry:
     """/api/wf/* エンドポイント。"""
 
+    # PURPOSE: Verify wf list behaves correctly
     def test_wf_list(self, client: TestClient):
         """GET /api/wf/list → 200 + total + workflows."""
         r = client.get("/api/wf/list")
@@ -488,6 +534,7 @@ class TestWFRegistry:
         names = [w["name"] for w in data["workflows"]]
         assert any("noe" in n for n in names)
 
+    # PURPOSE: Verify wf detail behaves correctly
     def test_wf_detail(self, client: TestClient):
         """GET /api/wf/noe → 200 + description."""
         r = client.get("/api/wf/noe")
@@ -496,6 +543,7 @@ class TestWFRegistry:
         assert data["name"] == "noe"
         assert data["description"] != ""
 
+    # PURPOSE: Verify wf not found behaves correctly
     def test_wf_not_found(self, client: TestClient):
         """GET /api/wf/nonexistent → 200 + error in metadata."""
         r = client.get("/api/wf/nonexistent_wf_12345")
@@ -509,9 +557,11 @@ class TestWFRegistry:
 # ============================================================
 
 
+# PURPOSE: Test suite validating sympatheia correctness
 class TestSympatheia:
     """/api/sympatheia/* エンドポイント (遅延ロード)."""
 
+    # PURPOSE: Verify sympatheia attractor behaves correctly
     def test_sympatheia_attractor(self, client: TestClient):
         """POST /api/sympatheia/attractor → 200 or graceful."""
         r = client.post("/api/sympatheia/attractor", json={
@@ -519,11 +569,13 @@ class TestSympatheia:
         })
         assert r.status_code in (200, 503)
 
+    # PURPOSE: Verify sympatheia notifications behaves correctly
     def test_sympatheia_notifications(self, client: TestClient):
         """GET /api/sympatheia/notifications → 200."""
         r = client.get("/api/sympatheia/notifications")
         assert r.status_code in (200, 503)
 
+    # PURPOSE: Verify sympatheia wbc behaves correctly
     def test_sympatheia_wbc(self, client: TestClient):
         """POST /api/sympatheia/wbc → 200."""
         r = client.post("/api/sympatheia/wbc", json={
@@ -538,9 +590,11 @@ class TestSympatheia:
 # ============================================================
 
 
+# PURPOSE: Test suite validating gnosis narrator correctness
 class TestGnosisNarrator:
     """/api/gnosis/papers + /api/gnosis/narrate."""
 
+    # PURPOSE: Verify papers list behaves correctly
     def test_papers_list(self, client: TestClient):
         """GET /api/gnosis/papers → 200 + papers list."""
         r = client.get("/api/gnosis/papers")
@@ -550,6 +604,7 @@ class TestGnosisNarrator:
         assert "total" in data
         assert isinstance(data["papers"], list)
 
+    # PURPOSE: Verify narrate requires paper id behaves correctly
     def test_narrate_requires_paper_id(self, client: TestClient):
         """POST /api/gnosis/narrate without paper_id → 422."""
         r = client.post("/api/gnosis/narrate", json={})
@@ -561,9 +616,11 @@ class TestGnosisNarrator:
 # ============================================================
 
 
+# PURPOSE: Test suite validating synteleia correctness
 class TestSynteleia:
     """/api/synteleia/* エンドポイント。"""
 
+    # PURPOSE: Verify synteleia agents behaves correctly
     def test_synteleia_agents(self, client: TestClient):
         """GET /api/synteleia/agents → 200 + agent list."""
         r = client.get("/api/synteleia/agents")
@@ -573,6 +630,7 @@ class TestSynteleia:
             # agents はリスト直接返し or dict
             assert isinstance(data, (list, dict))
 
+    # PURPOSE: Verify synteleia audit behaves correctly
     def test_synteleia_audit(self, client: TestClient):
         """POST /api/synteleia/audit → 200 or 503."""
         r = client.post("/api/synteleia/audit", json={
@@ -587,19 +645,23 @@ class TestSynteleia:
 # ============================================================
 
 
+# PURPOSE: Test suite validating gateway correctness
 class TestGateway:
     """/api/gateway/* エンドポイント。"""
 
+    # PURPOSE: Verify gateway status behaves correctly
     def test_gateway_status(self, client: TestClient):
         """GET /api/gateway/status → 200."""
         r = client.get("/api/gateway/status")
         assert r.status_code in (200, 503)
 
+    # PURPOSE: Verify gateway servers behaves correctly
     def test_gateway_servers(self, client: TestClient):
         """GET /api/gateway/servers → 200 + servers list."""
         r = client.get("/api/gateway/servers")
         assert r.status_code in (200, 503)
 
+    # PURPOSE: Verify gateway policies behaves correctly
     def test_gateway_policies(self, client: TestClient):
         """GET /api/gateway/policies → 200."""
         r = client.get("/api/gateway/policies")

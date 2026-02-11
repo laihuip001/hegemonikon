@@ -441,6 +441,7 @@ class TheoremLogger:
         from datetime import date
         return self.LOG_DIR / f"theorem_log_{date.today().isoformat()}.jsonl"
 
+    # PURPOSE: theorem_attractor の log 処理を実行する
     def log(self, theorem: str, input_text: str, similarity: float) -> None:
         """使用を記録."""
         entry = {
@@ -455,6 +456,7 @@ class TheoremLogger:
         except Exception:
             pass  # Logging failure should not break attractor
 
+    # PURPOSE: usage counts を取得する
     def get_usage_counts(self, days: int = 7) -> dict[str, int]:
         """直近 N 日間の定理別使用回数."""
         counts: dict[str, int] = {k: 0 for k in THEOREM_KEYS}
@@ -476,6 +478,7 @@ class TheoremLogger:
                 continue
         return counts
 
+    # PURPOSE: novelty boost を計算する
     def compute_novelty_boost(self, days: int = 7) -> dict[str, float]:
         """過少使用定理のブースト係数 (1.0 = 平均, >1.0 = 過少使用)."""
         counts = self.get_usage_counts(days)

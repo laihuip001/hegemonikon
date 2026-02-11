@@ -31,6 +31,7 @@ WIKILINK_PATTERN = re.compile(r"\[\[([^\]|]+)(?:\|([^\]]+))?\]\]")
 # --- Data Models ---
 
 
+# PURPOSE: Link の機能を提供する
 @dataclass
 # PURPOSE: ファイル間リンク
 class Link:
@@ -43,6 +44,7 @@ class Link:
     context: str = ""  # リンク前後のテキスト
 
 
+# PURPOSE: LinkIndex の機能を提供する
 @dataclass
 # PURPOSE: リンクインデックス — 全ファイル間リレーションの索引
 class LinkIndex:
@@ -52,6 +54,7 @@ class LinkIndex:
     backlinks: dict[str, list[Link]] = field(default_factory=lambda: defaultdict(list))
     orphans: list[str] = field(default_factory=list)  # どこからもリンクされていないファイル
 
+    # PURPOSE: link_engine の total files 処理を実行する
     @property
     # PURPOSE: total_files — 知識プッシュの処理
     def total_files(self) -> int:
@@ -61,6 +64,7 @@ class LinkIndex:
                 all_files.add(str(link.source))
         return len(all_files)
 
+    # PURPOSE: link_engine の total links 処理を実行する
     @property
     # PURPOSE: total_links — 知識プッシュの処理
     def total_links(self) -> int:

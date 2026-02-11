@@ -36,6 +36,7 @@ class AlignmentStatus(Enum):
     INVERTED = "inverted"  # 手段と目的が入れ替わっている
 
 
+# PURPOSE: TelосResult の機能を提供する
 @dataclass
 # PURPOSE: Telos評価結果
 class TelосResult:
@@ -59,12 +60,14 @@ class TelосResult:
     drift_indicators: List[str] = field(default_factory=list)
     suggestions: List[str] = field(default_factory=list)
 
+    # PURPOSE: telos_checker の is aligned 処理を実行する
     @property
     # PURPOSE: 行為が目的に整合しているか
     def is_aligned(self) -> bool:
         """行為が目的に整合しているか"""
         return self.status in (AlignmentStatus.ALIGNED, AlignmentStatus.DRIFTING)
 
+    # PURPOSE: telos_checker の needs correction 処理を実行する
     @property
     # PURPOSE: 軌道修正が必要か
     def needs_correction(self) -> bool:

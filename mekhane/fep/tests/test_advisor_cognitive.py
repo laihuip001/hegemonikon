@@ -31,33 +31,39 @@ class TestClassifySeriesList:
 
     # PURPOSE: single_understanding_series をテストする
     def test_single_understanding_series(self):
+        """Verify single understanding series behavior."""
         result = _classify_series_list(["O"])
         assert result == {"O": "understanding"}
 
     # PURPOSE: single_reasoning_series をテストする
     def test_single_reasoning_series(self):
+        """Verify single reasoning series behavior."""
         result = _classify_series_list(["S"])
         assert result == {"S": "reasoning"}
 
     # PURPOSE: mixed_series をテストする
     def test_mixed_series(self):
+        """Verify mixed series behavior."""
         result = _classify_series_list(["O", "S"])
         assert result == {"O": "understanding", "S": "reasoning"}
 
     # PURPOSE: all_understanding をテストする
     def test_all_understanding(self):
+        """Verify all understanding behavior."""
         result = _classify_series_list(["O", "H", "K"])
         for v in result.values():
             assert v in ("understanding", "mixed", "bridge_u_to_r")
 
     # PURPOSE: all_reasoning をテストする
     def test_all_reasoning(self):
+        """Verify all reasoning behavior."""
         result = _classify_series_list(["S", "P"])
         for v in result.values():
             assert v == "reasoning"
 
     # PURPOSE: empty_list をテストする
     def test_empty_list(self):
+        """Verify empty list behavior."""
         result = _classify_series_list([])
         assert result == {}
 
@@ -110,6 +116,7 @@ class TestDetectCrossings:
 
     # PURPOSE: empty_no_crossing をテストする
     def test_empty_no_crossing(self):
+        """Verify empty no crossing behavior."""
         crossings = _detect_crossings([])
         assert len(crossings) == 0
 

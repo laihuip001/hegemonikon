@@ -32,6 +32,7 @@ sys.path.insert(0, str(Path(__file__).parent))
 from prompt_quality_scorer import QualityReport, format_report, score_prompt
 
 
+# PURPOSE: self_refine_pipeline の static refine 処理を実行する
 def static_refine(filepath: str, threshold: int = 80, max_iter: int = 3) -> dict:
     """
     Run static analysis refinement loop.
@@ -87,6 +88,7 @@ def static_refine(filepath: str, threshold: int = 80, max_iter: int = 3) -> dict
     }
 
 
+# PURPOSE: self_refine_pipeline の llm refine 処理を実行する
 def llm_refine(filepath: str, threshold: int = 80) -> dict:
     """
     LLM-based refinement using Hermēneus execute /dia-.
@@ -179,6 +181,7 @@ def llm_refine(filepath: str, threshold: int = 80) -> dict:
         }
 
 
+# PURPOSE: self_refine_pipeline の full refine 処理を実行する
 def full_refine(filepath: str, threshold: int = 80, max_iter: int = 3) -> dict:
     """Run static analysis first, then LLM refinement if needed."""
     print("=" * 60)
@@ -202,6 +205,7 @@ def full_refine(filepath: str, threshold: int = 80, max_iter: int = 3) -> dict:
     }
 
 
+# PURPOSE: self_refine_pipeline の main 処理を実行する
 def main():
     parser = argparse.ArgumentParser(description="Self-Refine Pipeline")
     parser.add_argument("--input", required=True, help="Input prompt file")

@@ -54,6 +54,7 @@ class ActionCategory(Enum):
     PERSISTENCE = "persistence"  # 永続化行為 (/bye, /dox)
 
 
+# PURPOSE: Technique の機能を提供する
 @dataclass
 # PURPOSE: 単一技法の定義
 class Technique:
@@ -319,12 +320,14 @@ class TekhnēRegistry:
             tid: [] for tid in self._techniques
         }
 
+    # PURPOSE: tekhne_registry の techniques 処理を実行する
     @property
     # PURPOSE: 登録済み技法の辞書
     def techniques(self) -> Dict[str, Technique]:
         """登録済み技法の辞書"""
         return self._techniques
 
+    # PURPOSE: tekhne_registry の size 処理を実行する
     @property
     # PURPOSE: レジストリサイズ
     def size(self) -> int:
@@ -474,6 +477,7 @@ class TekhnēRegistry:
         }
         return json.dumps(data, indent=2, ensure_ascii=False)
 
+    # PURPOSE: tekhne_registry の from json 処理を実行する
     @classmethod
     # PURPOSE: JSONからインポート
     def from_json(cls, json_str: str) -> "TekhnēRegistry":

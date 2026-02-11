@@ -57,6 +57,7 @@ DEFAULT_ADJUSTMENTS_PATH = (
 # =============================================================================
 
 
+# PURPOSE: WeightAdjustment の機能を提供する
 @dataclass
 class WeightAdjustment:
     """1つの Series に対する重み補正。"""
@@ -68,6 +69,7 @@ class WeightAdjustment:
     applied_at: Optional[str] = None
 
 
+# PURPOSE: LearningEpoch の機能を提供する
 @dataclass
 class LearningEpoch:
     """1回の学習サイクルの結果。"""
@@ -85,6 +87,7 @@ class LearningEpoch:
 # =============================================================================
 
 
+# PURPOSE: BasinLearner の機能を提供する
 class BasinLearner:
     """Basin の bias から prototype weights を学習する。
 
@@ -108,11 +111,13 @@ class BasinLearner:
         self._epochs: List[LearningEpoch] = []
         self._current_weights: Dict[str, float] = {}  # series -> weight multiplier
 
+    # PURPOSE: basin_learner の epoch count 処理を実行する
     @property
     def epoch_count(self) -> int:
         """完了したエポック数。"""
         return len(self._epochs)
 
+    # PURPOSE: basin_learner の current weights 処理を実行する
     @property
     def current_weights(self) -> Dict[str, float]:
         """現在の重み乗数。"""

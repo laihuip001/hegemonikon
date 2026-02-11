@@ -26,6 +26,7 @@ router = APIRouter(prefix="/pks", tags=["pks"])
 # Pydantic Models
 # ===========================================================================
 
+# PURPOSE: NuggetResponse の機能を提供する
 class NuggetResponse(BaseModel):
     title: str
     abstract: str = ""
@@ -38,6 +39,7 @@ class NuggetResponse(BaseModel):
     suggested_questions: list[str] = Field(default_factory=list)
 
 
+# PURPOSE: PushResponse の機能を提供する
 class PushResponse(BaseModel):
     timestamp: str
     topics: list[str] = Field(default_factory=list)
@@ -45,12 +47,14 @@ class PushResponse(BaseModel):
     total: int = 0
 
 
+# PURPOSE: FeedbackRequest の機能を提供する
 class FeedbackRequest(BaseModel):
     title: str
     reaction: str  # used | dismissed | deepened | ignored
     series: str = ""
 
 
+# PURPOSE: FeedbackResponse の機能を提供する
 class FeedbackResponse(BaseModel):
     timestamp: str
     title: str
@@ -58,6 +62,7 @@ class FeedbackResponse(BaseModel):
     recorded: bool = True
 
 
+# PURPOSE: FeedbackStatsResponse の機能を提供する
 class FeedbackStatsResponse(BaseModel):
     timestamp: str
     series_stats: dict = Field(default_factory=dict)
@@ -96,6 +101,7 @@ def _get_engine():
 _last_push: Optional[PushResponse] = None
 
 
+# PURPOSE: push を取得する
 @router.get("/push", response_model=PushResponse)
 async def get_push() -> PushResponse:
     """最新の PKS auto-push 結果を返す。"""
@@ -109,6 +115,7 @@ async def get_push() -> PushResponse:
     )
 
 
+# PURPOSE: push を実行する
 @router.post("/push", response_model=PushResponse)
 async def run_push(k: int = Query(20, ge=1, le=100)) -> PushResponse:
     """PKS auto-push を実行し、結果を返す。"""
@@ -159,6 +166,7 @@ async def run_push(k: int = Query(20, ge=1, le=100)) -> PushResponse:
 # Feedback
 # ===========================================================================
 
+# PURPOSE: pks の record feedback 処理を実行する
 @router.post("/feedback", response_model=FeedbackResponse)
 async def record_feedback(req: FeedbackRequest) -> FeedbackResponse:
     """フィードバックを記録する。"""
@@ -197,6 +205,7 @@ async def record_feedback(req: FeedbackRequest) -> FeedbackResponse:
     )
 
 
+# PURPOSE: pks の feedback stats 処理を実行する
 @router.get("/stats", response_model=FeedbackStatsResponse)
 async def feedback_stats() -> FeedbackStatsResponse:
     """フィードバック統計を返す。"""

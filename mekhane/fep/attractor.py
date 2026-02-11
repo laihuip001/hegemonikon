@@ -323,6 +323,7 @@ def _build_diagnosis(
         )
 
 
+# PURPOSE: AttractorResult の機能を提供する
 @dataclass
 # PURPOSE: Attractor への収束結果
 class AttractorResult:
@@ -346,16 +347,19 @@ class SuggestResult:
     top_similarity: float
     gap: float  # 1位と2位の差
 
+    # PURPOSE: attractor の primary 処理を実行する
     @property
     # PURPOSE: 最も引力の強い単一Seriesを返す（WF自動選択用）
     def primary(self) -> AttractorResult | None:
         return self.attractors[0] if self.attractors else None
 
+    # PURPOSE: attractor の is clear 処理を実行する
     @property
     # PURPOSE: 検証: is_clear
     def is_clear(self) -> bool:
         return self.oscillation == OscillationType.CLEAR
 
+    # PURPOSE: attractor の interpretation 処理を実行する
     @property
     # PURPOSE: Problem B: oscillation の理論的解釈を返す
     def interpretation(self) -> OscillationDiagnosis:
@@ -392,6 +396,7 @@ class DecomposeResult:
     merged_series: list[str]
     merged_workflows: list[str]
 
+    # PURPOSE: attractor の is multi 処理を実行する
     @property
     # PURPOSE: 複数の Series に分解されたか
     def is_multi(self) -> bool:

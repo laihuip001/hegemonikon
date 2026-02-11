@@ -68,22 +68,31 @@ def _make_candidate(belief: Belief = None) -> PromotionCandidate:
 # =============================================================================
 
 
+# PURPOSE: Test suite validating slugify correctness
 class TestSlugify:
     """ファイル名用スラッグ生成テスト。"""
 
+    # PURPOSE: Verify basic japanese behaves correctly
     def test_basic_japanese(self):
+        """Verify basic japanese behavior."""
         assert _slugify("意志より環境") == "意志より環境"
 
+    # PURPOSE: Verify spaces to underscores behaves correctly
     def test_spaces_to_underscores(self):
+        """Verify spaces to underscores behavior."""
         assert _slugify("hello world") == "hello_world"
 
+    # PURPOSE: Verify dangerous chars removed behaves correctly
     def test_dangerous_chars_removed(self):
+        """Verify dangerous chars removed behavior."""
         result = _slugify('test/path:name*"file')
         assert "/" not in result
         assert ":" not in result
         assert "*" not in result
 
+    # PURPOSE: Verify max length behaves correctly
     def test_max_length(self):
+        """Verify max length behavior."""
         long_text = "あ" * 100
         result = _slugify(long_text, max_len=10)
         assert len(result) == 10
@@ -94,21 +103,30 @@ class TestSlugify:
 # =============================================================================
 
 
+# PURPOSE: Test suite validating next ki number correctness
 class TestNextKiNumber:
     """次の DX 番号決定テスト。"""
 
+    # PURPOSE: Verify empty directory behaves correctly
     def test_empty_directory(self, tmp_path):
+        """Verify empty directory behavior."""
         assert _next_ki_number(tmp_path) == 1
 
+    # PURPOSE: Verify nonexistent directory behaves correctly
     def test_nonexistent_directory(self, tmp_path):
+        """Verify nonexistent directory behavior."""
         assert _next_ki_number(tmp_path / "nope") == 1
 
+    # PURPOSE: Verify existing dx behaves correctly
     def test_existing_dx(self, tmp_path):
+        """Verify existing dx behavior."""
         (tmp_path / "DX-003_test").mkdir()
         (tmp_path / "DX-007_another").mkdir()
         assert _next_ki_number(tmp_path) == 8
 
+    # PURPOSE: Verify ignores non dx behaves correctly
     def test_ignores_non_dx(self, tmp_path):
+        """Verify ignores non dx behavior."""
         (tmp_path / "not_a_dx").mkdir()
         (tmp_path / "DX-005_real").mkdir()
         assert _next_ki_number(tmp_path) == 6
@@ -119,9 +137,11 @@ class TestNextKiNumber:
 # =============================================================================
 
 
+# PURPOSE: Test suite validating promote to sophia correctness
 class TestPromoteToSophia:
     """昇格実行テスト。"""
 
+    # PURPOSE: Verify successful promotion behaves correctly
     def test_successful_promotion(self, tmp_path):
         """昇格成功 → KI 構造が生成される。"""
         store = DoxaStore()
@@ -137,6 +157,7 @@ class TestPromoteToSophia:
         assert result.metadata_path.exists()
         assert result.markdown_path.exists()
 
+    # PURPOSE: Verify ki structure behaves correctly
     def test_ki_structure(self, tmp_path):
         """KI 構造: metadata.json + artifacts/*.md."""
         store = DoxaStore()
@@ -157,6 +178,7 @@ class TestPromoteToSophia:
         assert "意志より環境" in md_content
         assert "PROMOTED" in md_content
 
+    # PURPOSE: Verify belief gets promoted flag behaves correctly
     def test_belief_gets_promoted_flag(self, tmp_path):
         """昇格後、Belief に promoted_at と sophia_ki_id が設定される。"""
         store = DoxaStore()
@@ -172,6 +194,7 @@ class TestPromoteToSophia:
         assert belief.sophia_ki_id == "DX-001"
         assert belief.promoted_at is not None
 
+    # PURPOSE: Verify double promotion prevented behaves correctly
     def test_double_promotion_prevented(self, tmp_path):
         """二重昇格は失敗する。"""
         store = DoxaStore()
@@ -188,6 +211,7 @@ class TestPromoteToSophia:
         assert result2.success is False
         assert "既に昇格済み" in result2.error
 
+    # PURPOSE: Verify sequential numbering behaves correctly
     def test_sequential_numbering(self, tmp_path):
         """複数の昇格が DX-001, DX-002... と連番になる。"""
         store = DoxaStore()
@@ -203,6 +227,7 @@ class TestPromoteToSophia:
         assert r1.ki_id == "DX-001"
         assert r2.ki_id == "DX-002"
 
+    # PURPOSE: Verify promoted roundtrip persistence behaves correctly
     def test_promoted_roundtrip_persistence(self, tmp_path):
         """promoted フラグが save/load で維持される。"""
         store = DoxaStore()
@@ -231,9 +256,11 @@ class TestPromoteToSophia:
 # =============================================================================
 
 
+# PURPOSE: Test suite validating promote approved correctness
 class TestPromoteApproved:
     """一括昇格テスト。"""
 
+    # PURPOSE: Verify batch promotion behaves correctly
     def test_batch_promotion(self, tmp_path):
         """複数候補の一括昇格。"""
         store = DoxaStore()
@@ -256,13 +283,18 @@ class TestPromoteApproved:
 # =============================================================================
 
 
+# PURPOSE: Test suite validating format promotion prompt correctness
 class TestFormatPromotionPrompt:
     """Creator 承認ゲート表示テスト。"""
 
+    # PURPOSE: Verify empty candidates behaves correctly
     def test_empty_candidates(self):
+        """Verify empty candidates behavior."""
         assert format_promotion_prompt([]) == ""
 
+    # PURPOSE: Verify prompt contents behaves correctly
     def test_prompt_contents(self):
+        """Verify prompt contents behavior."""
         candidate = _make_candidate()
         prompt = format_promotion_prompt([candidate])
 
@@ -271,7 +303,9 @@ class TestFormatPromotionPrompt:
         assert "90%" in prompt
         assert "kernel/knowledge/doxa/" in prompt
 
+    # PURPOSE: Verify multiple candidates behaves correctly
     def test_multiple_candidates(self):
+        """Verify multiple candidates behavior."""
         c1 = _make_candidate(_make_promotable_belief("信念A"))
         c2 = _make_candidate(_make_promotable_belief("信念B"))
         prompt = format_promotion_prompt([c1, c2])
@@ -285,9 +319,11 @@ class TestFormatPromotionPrompt:
 # =============================================================================
 
 
+# PURPOSE: Test suite validating integration correctness
 class TestIntegration:
     """検出 → 昇格 → 永続化の統合テスト。"""
 
+    # PURPOSE: Verify full pipeline behaves correctly
     def test_full_pipeline(self, tmp_path):
         """信念作成 → 候補検出 → 昇格 → 保存 → 復元 → 再検出しない。"""
         # 1. 信念作成

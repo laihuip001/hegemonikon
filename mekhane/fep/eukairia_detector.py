@@ -55,6 +55,7 @@ class OpportunityDecision(Enum):
     PASS = "pass"  # 見送り — この機会は取らない
 
 
+# PURPOSE: EukairiaResult の機能を提供する
 @dataclass
 # PURPOSE: 好機判定結果
 class EukairiaResult:
@@ -88,18 +89,21 @@ class EukairiaResult:
     recommendation: str
     factors: List[str] = field(default_factory=list)
 
+    # PURPOSE: eukairia_detector の should act 処理を実行する
     @property
     # PURPOSE: 今行動すべきか
     def should_act(self) -> bool:
         """今行動すべきか"""
         return self.decision == OpportunityDecision.GO
 
+    # PURPOSE: eukairia_detector の should wait 処理を実行する
     @property
     # PURPOSE: 待機すべきか
     def should_wait(self) -> bool:
         """待機すべきか"""
         return self.decision == OpportunityDecision.WAIT
 
+    # PURPOSE: eukairia_detector の net value 処理を実行する
     @property
     # PURPOSE: 純価値 (リターン - リスク)
     def net_value(self) -> float:
@@ -353,6 +357,7 @@ def detect_opportunity(
     )
 
 
+# PURPOSE: eukairia markdown を整形する
 def format_eukairia_markdown(result: EukairiaResult) -> str:
     """結果をMarkdown形式でフォーマット"""
     decision_emoji = {

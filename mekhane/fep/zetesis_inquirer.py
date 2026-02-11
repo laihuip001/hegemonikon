@@ -52,6 +52,7 @@ class QuestionType(Enum):
     IF = "if"  # もし〜なら？
 
 
+# PURPOSE: ZetesisResult の機能を提供する
 @dataclass
 # PURPOSE: O3 Zētēsis 探求結果
 class ZetesisResult:
@@ -73,12 +74,14 @@ class ZetesisResult:
     depth: int
     insights: List[str] = field(default_factory=list)
 
+    # PURPOSE: zetesis_inquirer の question count 処理を実行する
     @property
     # PURPOSE: 生成した問いの数
     def question_count(self) -> int:
         """生成した問いの数"""
         return len(self.generated_questions)
 
+    # PURPOSE: zetesis_inquirer の has insight 処理を実行する
     @property
     # PURPOSE: 洞察があるか
     def has_insight(self) -> bool:

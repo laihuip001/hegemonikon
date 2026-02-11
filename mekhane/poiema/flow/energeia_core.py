@@ -31,6 +31,7 @@ METRON_DEEP_THRESHOLD = 100  # Use Smart Model for deep processing
 logger = logging.getLogger("energeia_core")
 
 
+# PURPOSE: EnergeiaCoreResolver の機能を提供する
 @dataclass
 # PURPOSE: O4 Energeia の中枢: 意志を現実化する統一行動層
 class EnergeiaCoreResolver:

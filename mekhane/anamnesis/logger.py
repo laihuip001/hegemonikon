@@ -104,6 +104,7 @@ class SessionLogger:
             return [json.loads(line) for line in f]
 
 
+# PURPOSE: logger の main 処理を実行する
 def main():
     if len(sys.argv) < 2:
         print(__doc__)

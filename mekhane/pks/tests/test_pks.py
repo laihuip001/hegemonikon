@@ -55,6 +55,7 @@ def sample_nugget():
 # PURPOSE: low_score_nugget の処理
 @pytest.fixture
 def low_score_nugget():
+    """Verify low score nugget behavior."""
     return KnowledgeNugget(
         title="Cooking Recipes",
         abstract="A guide to making pasta.",
@@ -67,6 +68,7 @@ def low_score_nugget():
 # PURPOSE: multi_nuggets の処理
 @pytest.fixture
 def multi_nuggets(sample_nugget, low_score_nugget):
+    """Verify multi nuggets behavior."""
     return [
         sample_nugget,
         low_score_nugget,
@@ -95,27 +97,34 @@ def tmp_state_dir(tmp_path):
 # PURPOSE: Test knowledge nugget の実装
 class TestKnowledgeNugget:
     # PURPOSE: to_markdown_contains_title をテストする
+    """Test suite for knowledge nugget."""
+    # PURPOSE: Verify to markdown contains title behaves correctly
     def test_to_markdown_contains_title(self, sample_nugget):
+        """Verify to markdown contains title behavior."""
         md = sample_nugget.to_markdown()
         assert "Active Inference and FEP" in md
 
     # PURPOSE: to_markdown_contains_abstract をテストする
     def test_to_markdown_contains_abstract(self, sample_nugget):
+        """Verify to markdown contains abstract behavior."""
         md = sample_nugget.to_markdown()
         assert "active inference" in md.lower()
 
     # PURPOSE: to_markdown_contains_source をテストする
     def test_to_markdown_contains_source(self, sample_nugget):
+        """Verify to markdown contains source behavior."""
         md = sample_nugget.to_markdown()
         assert "arxiv" in md
 
     # PURPOSE: to_markdown_contains_url をテストする
     def test_to_markdown_contains_url(self, sample_nugget):
+        """Verify to markdown contains url behavior."""
         md = sample_nugget.to_markdown()
         assert "https://arxiv.org" in md
 
     # PURPOSE: to_markdown_without_url をテストする
     def test_to_markdown_without_url(self, low_score_nugget):
+        """Verify to markdown without url behavior."""
         md = low_score_nugget.to_markdown()
         assert "Cooking" in md
 
@@ -128,7 +137,10 @@ class TestKnowledgeNugget:
 # PURPOSE: Test session context の実装
 class TestSessionContext:
     # PURPOSE: to_embedding_text_includes_topics をテストする
+    """Test suite for session context."""
+    # PURPOSE: Verify to embedding text includes topics behaves correctly
     def test_to_embedding_text_includes_topics(self):
+        """Verify to embedding text includes topics behavior."""
         ctx = SessionContext(topics=["FEP", "CCL"])
         text = ctx.to_embedding_text()
         assert "FEP" in text
@@ -136,18 +148,21 @@ class TestSessionContext:
 
     # PURPOSE: to_embedding_text_includes_queries をテストする
     def test_to_embedding_text_includes_queries(self):
+        """Verify to embedding text includes queries behavior."""
         ctx = SessionContext(recent_queries=["active inference implementation"])
         text = ctx.to_embedding_text()
         assert "active inference" in text
 
     # PURPOSE: to_embedding_text_includes_workflows をテストする
     def test_to_embedding_text_includes_workflows(self):
+        """Verify to embedding text includes workflows behavior."""
         ctx = SessionContext(active_workflows=["/boot", "/dia"])
         text = ctx.to_embedding_text()
         assert "/boot" in text
 
     # PURPOSE: empty_context_returns_text をテストする
     def test_empty_context_returns_text(self):
+        """Verify empty context returns text behavior."""
         ctx = SessionContext()
         text = ctx.to_embedding_text()
         assert isinstance(text, str)
@@ -161,13 +176,17 @@ class TestSessionContext:
 # PURPOSE: Test context tracker の実装
 class TestContextTracker:
     # PURPOSE: update_topics をテストする
+    """Test suite for context tracker."""
+    # PURPOSE: Verify update topics behaves correctly
     def test_update_topics(self):
+        """Verify update topics behavior."""
         tracker = ContextTracker()
         tracker.update_topics(["FEP", "Attractor"])
         assert "FEP" in tracker.context.topics
 
     # PURPOSE: add_query_appends をテストする
     def test_add_query_appends(self):
+        """Verify add query appends behavior."""
         tracker = ContextTracker()
         tracker.add_query("test query")
         tracker.add_query("another query")
@@ -176,6 +195,7 @@ class TestContextTracker:
 
     # PURPOSE: add_query_deduplicates をテストする
     def test_add_query_deduplicates(self):
+        """Verify add query deduplicates behavior."""
         tracker = ContextTracker()
         tracker.add_query("test query")
         tracker.add_query("test query")
@@ -183,12 +203,14 @@ class TestContextTracker:
 
     # PURPOSE: set_workflows をテストする
     def test_set_workflows(self):
+        """Verify set workflows behavior."""
         tracker = ContextTracker()
         tracker.set_workflows(["/boot", "/dia"])
         assert "/boot" in tracker.context.active_workflows
 
     # PURPOSE: load_from_handoff_nonexistent_file をテストする
     def test_load_from_handoff_nonexistent_file(self):
+        """Verify load from handoff nonexistent file behavior."""
         tracker = ContextTracker()
         tracker.load_from_handoff(Path("/nonexistent/handoff.md"))
         # Should not raise — graceful degradation
@@ -205,7 +227,10 @@ class TestContextTracker:
 # PURPOSE: Test relevance detector の実装
 class TestRelevanceDetector:
     # PURPOSE: high_relevance_passes_threshold をテストする
+    """Test suite for relevance detector."""
+    # PURPOSE: Verify high relevance passes threshold behaves correctly
     def test_high_relevance_passes_threshold(self):
+        """Verify high relevance passes threshold behavior."""
         detector = RelevanceDetector(threshold=0.5)
         results = [
             {
@@ -224,6 +249,7 @@ class TestRelevanceDetector:
 
     # PURPOSE: low_relevance_filtered をテストする
     def test_low_relevance_filtered(self):
+        """Verify low relevance filtered behavior."""
         detector = RelevanceDetector(threshold=0.9)
         results = [
             {
@@ -241,6 +267,7 @@ class TestRelevanceDetector:
 
     # PURPOSE: empty_results をテストする
     def test_empty_results(self):
+        """Verify empty results behavior."""
         detector = RelevanceDetector()
         ctx = SessionContext(topics=["FEP"])
         nuggets = detector.score(ctx, [])
@@ -248,6 +275,7 @@ class TestRelevanceDetector:
 
     # PURPOSE: push_reason_generated をテストする
     def test_push_reason_generated(self):
+        """Verify push reason generated behavior."""
         detector = RelevanceDetector(threshold=0.3)
         results = [
             {
@@ -320,7 +348,10 @@ class TestRelevanceDetector:
 # PURPOSE: Test auto topic extractor v2.1 の実装
 class TestAutoTopicExtractorV21:
     # PURPOSE: ドメイン概念の抽出テスト
+    """Test suite for auto topic extractor v21."""
+    # PURPOSE: Verify domain concepts extracted behaves correctly
     def test_domain_concepts_extracted(self):
+        """Verify domain concepts extracted behavior."""
         from mekhane.pks.pks_engine import AutoTopicExtractor
         extractor = AutoTopicExtractor()
         text = """---
@@ -338,6 +369,7 @@ CCL パーサーの修正が完了した。
 
     # PURPOSE: 教訓セクションの抽出テスト
     def test_lesson_extraction(self):
+        """Verify lesson extraction behavior."""
         from mekhane.pks.pks_engine import AutoTopicExtractor
         extractor = AutoTopicExtractor()
         text = """
@@ -349,6 +381,7 @@ CCL パーサーの修正が完了した。
 
     # PURPOSE: max_topics 制限テスト
     def test_max_topics_limit(self):
+        """Verify max topics limit behavior."""
         from mekhane.pks.pks_engine import AutoTopicExtractor
         extractor = AutoTopicExtractor()
         # 大量のコンテンツを生成
@@ -366,7 +399,10 @@ CCL パーサーの修正が完了した。
 # PURPOSE: Test serendipity scorer の実装
 class TestSerendipityScorer:
     # PURPOSE: sweet_spot_high_score をテストする
+    """Test suite for serendipity scorer."""
+    # PURPOSE: Verify sweet spot high score behaves correctly
     def test_sweet_spot_high_score(self):
+        """Verify sweet spot high score behavior."""
         scorer = SerendipityScorer()
         # At sweet_spot distance, score should be high
         score = scorer.score(relevance=0.8, distance=0.45)
@@ -374,6 +410,7 @@ class TestSerendipityScorer:
 
     # PURPOSE: very_close_lower_serendipity をテストする
     def test_very_close_lower_serendipity(self):
+        """Verify very close lower serendipity behavior."""
         scorer = SerendipityScorer()
         # Very close = obvious, low serendipity
         score_close = scorer.score(relevance=0.8, distance=0.1)
@@ -382,6 +419,7 @@ class TestSerendipityScorer:
 
     # PURPOSE: very_far_lower_serendipity をテストする
     def test_very_far_lower_serendipity(self):
+        """Verify very far lower serendipity behavior."""
         scorer = SerendipityScorer()
         # Very far = irrelevant
         score_far = scorer.score(relevance=0.8, distance=0.9)
@@ -390,12 +428,14 @@ class TestSerendipityScorer:
 
     # PURPOSE: zero_relevance_zero_serendipity をテストする
     def test_zero_relevance_zero_serendipity(self):
+        """Verify zero relevance zero serendipity behavior."""
         scorer = SerendipityScorer()
         score = scorer.score(relevance=0.0, distance=0.45)
         assert score == 0.0
 
     # PURPOSE: enrich_adds_scores をテストする
     def test_enrich_adds_scores(self, multi_nuggets):
+        """Verify enrich adds scores behavior."""
         scorer = SerendipityScorer()
         distances = [0.3, 0.8, 0.45]
         scorer.enrich(multi_nuggets, distances)
@@ -411,13 +451,17 @@ class TestSerendipityScorer:
 # PURPOSE: Test push controller の実装
 class TestPushController:
     # PURPOSE: max_push_limit をテストする
+    """Test suite for push controller."""
+    # PURPOSE: Verify max push limit behaves correctly
     def test_max_push_limit(self, multi_nuggets):
+        """Verify max push limit behavior."""
         controller = PushController(max_push=1)
         filtered = controller.filter_pushable(multi_nuggets)
         assert len(filtered) <= 1
 
     # PURPOSE: record_and_cooldown をテストする
     def test_record_and_cooldown(self, sample_nugget):
+        """Verify record and cooldown behavior."""
         controller = PushController(cooldown_hours=24.0)
         controller.record_push([sample_nugget])
         # Same nugget should be filtered by cooldown
@@ -426,6 +470,7 @@ class TestPushController:
 
     # PURPOSE: save_and_load_history をテストする
     def test_save_and_load_history(self, sample_nugget, tmp_path):
+        """Verify save and load history behavior."""
         controller = PushController()
         controller.record_push([sample_nugget])
         history_path = tmp_path / "history.json"
@@ -446,13 +491,17 @@ class TestPushController:
 # PURPOSE: Test narrator の実装
 class TestNarrator:
     # PURPOSE: narrate_produces_3_segments をテストする
+    """Test suite for narrator."""
+    # PURPOSE: Verify narrate produces 5 segments behaves correctly
     def test_narrate_produces_5_segments(self, sample_nugget):
+        """Verify narrate produces 5 segments behavior."""
         narrator = PKSNarrator()
         narrative = narrator.narrate(sample_nugget)
         assert len(narrative.segments) == 5
 
     # PURPOSE: segment_speakers をテストする
     def test_segment_speakers(self, sample_nugget):
+        """Verify segment speakers behavior."""
         narrator = PKSNarrator()
         narrative = narrator.narrate(sample_nugget)
         speakers = [s.speaker for s in narrative.segments]
@@ -460,6 +509,7 @@ class TestNarrator:
 
     # PURPOSE: narrative_to_markdown をテストする
     def test_narrative_to_markdown(self, sample_nugget):
+        """Verify narrative to markdown behavior."""
         narrator = PKSNarrator()
         narrative = narrator.narrate(sample_nugget)
         md = narrative.to_markdown()
@@ -468,18 +518,21 @@ class TestNarrator:
 
     # PURPOSE: narrate_batch をテストする
     def test_narrate_batch(self, multi_nuggets):
+        """Verify narrate batch behavior."""
         narrator = PKSNarrator()
         narratives = narrator.narrate_batch(multi_nuggets)
         assert len(narratives) == len(multi_nuggets)
 
     # PURPOSE: format_report_empty をテストする
     def test_format_report_empty(self):
+        """Verify format report empty behavior."""
         narrator = PKSNarrator()
         report = narrator.format_report([])
         assert "なし" in report
 
     # PURPOSE: format_report_nonempty をテストする
     def test_format_report_nonempty(self, sample_nugget):
+        """Verify format report nonempty behavior."""
         narrator = PKSNarrator()
         narrative = narrator.narrate(sample_nugget)
         report = narrator.format_report([narrative])
@@ -487,6 +540,7 @@ class TestNarrator:
 
     # PURPOSE: critic_mentions_preprint_for_arxiv をテストする
     def test_critic_mentions_preprint_for_arxiv(self, sample_nugget):
+        """Verify critic mentions preprint for arxiv behavior."""
         narrator = PKSNarrator()
         narrative = narrator.narrate(sample_nugget)
         critic_text = narrative.segments[1].content
@@ -494,6 +548,7 @@ class TestNarrator:
 
     # PURPOSE: critic_relevance_warning_low_score をテストする
     def test_critic_relevance_warning_low_score(self, low_score_nugget):
+        """Verify critic relevance warning low score behavior."""
         narrator = PKSNarrator()
         narrative = narrator.narrate(low_score_nugget)
         critic_text = narrative.segments[1].content
@@ -508,13 +563,17 @@ class TestNarrator:
 # PURPOSE: Test matrix view の実装
 class TestMatrixView:
     # PURPOSE: generate_empty をテストする
+    """Test suite for matrix view."""
+    # PURPOSE: Verify generate empty behaves correctly
     def test_generate_empty(self):
+        """Verify generate empty behavior."""
         matrix = PKSMatrixView()
         result = matrix.generate([])
         assert "なし" in result
 
     # PURPOSE: generate_table をテストする
     def test_generate_table(self, multi_nuggets):
+        """Verify generate table behavior."""
         matrix = PKSMatrixView()
         table = matrix.generate(multi_nuggets)
         assert "Title" in table
@@ -524,6 +583,7 @@ class TestMatrixView:
 
     # PURPOSE: pipe_escape をテストする
     def test_pipe_escape(self):
+        """Verify pipe escape behavior."""
         nugget = KnowledgeNugget(
             title="Title|with|pipes",
             abstract="Abstract",
@@ -539,13 +599,17 @@ class TestMatrixView:
 # PURPOSE: Test backlinks の実装
 class TestBacklinks:
     # PURPOSE: empty_nuggets をテストする
+    """Test suite for backlinks."""
+    # PURPOSE: Verify empty nuggets behaves correctly
     def test_empty_nuggets(self):
+        """Verify empty nuggets behavior."""
         bl = PKSBacklinks()
         result = bl.generate("FEP", [])
         assert "なし" in result or "ありません" in result
 
     # PURPOSE: backlinks_report をテストする
     def test_backlinks_report(self, multi_nuggets):
+        """Verify backlinks report behavior."""
         bl = PKSBacklinks()
         result = bl.generate("FEP", multi_nuggets)
         assert "バックリンク" in result
@@ -554,6 +618,7 @@ class TestBacklinks:
 
     # PURPOSE: max_links_limit をテストする
     def test_max_links_limit(self, multi_nuggets):
+        """Verify max links limit behavior."""
         bl = PKSBacklinks()
         result = bl.generate("FEP", multi_nuggets, max_links=1)
         # Should only show 1 entry in the detail table
@@ -569,7 +634,10 @@ class TestBacklinks:
 # PURPOSE: Test sync watcher の実装
 class TestSyncWatcher:
     # PURPOSE: detect_new_files をテストする
+    """Test suite for sync watcher."""
+    # PURPOSE: Verify detect new files behaves correctly
     def test_detect_new_files(self, tmp_path):
+        """Verify detect new files behavior."""
         watch_dir = tmp_path / "watch"
         watch_dir.mkdir()
         (watch_dir / "test.md").write_text("# Test", encoding="utf-8")
@@ -585,6 +653,7 @@ class TestSyncWatcher:
 
     # PURPOSE: detect_modified_files をテストする
     def test_detect_modified_files(self, tmp_path):
+        """Verify detect modified files behavior."""
         watch_dir = tmp_path / "watch"
         watch_dir.mkdir()
         f = watch_dir / "test.md"
@@ -600,6 +669,7 @@ class TestSyncWatcher:
 
     # PURPOSE: detect_deleted_files をテストする
     def test_detect_deleted_files(self, tmp_path):
+        """Verify detect deleted files behavior."""
         watch_dir = tmp_path / "watch"
         watch_dir.mkdir()
         f = watch_dir / "test.md"
@@ -615,6 +685,7 @@ class TestSyncWatcher:
 
     # PURPOSE: no_changes をテストする
     def test_no_changes(self, tmp_path):
+        """Verify no changes behavior."""
         watch_dir = tmp_path / "watch"
         watch_dir.mkdir()
         (watch_dir / "stable.md").write_text("stable", encoding="utf-8")
@@ -627,6 +698,7 @@ class TestSyncWatcher:
 
     # PURPOSE: extension_filter をテストする
     def test_extension_filter(self, tmp_path):
+        """Verify extension filter behavior."""
         watch_dir = tmp_path / "watch"
         watch_dir.mkdir()
         (watch_dir / "test.txt").write_text("not md", encoding="utf-8")
@@ -648,17 +720,22 @@ class TestSyncWatcher:
 # PURPOSE: Test wikilinks の実装
 class TestWikilinks:
     # PURPOSE: basic_wikilink をテストする
+    """Test suite for wikilinks."""
+    # PURPOSE: Verify basic wikilink behaves correctly
     def test_basic_wikilink(self):
+        """Verify basic wikilink behavior."""
         matches = WIKILINK_PATTERN.findall("See [[target]] for details")
         assert len(matches) >= 1
 
     # PURPOSE: aliased_wikilink をテストする
     def test_aliased_wikilink(self):
+        """Verify aliased wikilink behavior."""
         matches = WIKILINK_PATTERN.findall("See [[target|display text]]")
         assert len(matches) >= 1
 
     # PURPOSE: multiple_wikilinks をテストする
     def test_multiple_wikilinks(self):
+        """Verify multiple wikilinks behavior."""
         matches = WIKILINK_PATTERN.findall("[[a]] and [[b]] and [[c]]")
         assert len(matches) == 3
 
@@ -666,7 +743,10 @@ class TestWikilinks:
 # PURPOSE: Test citation graph の実装
 class TestCitationGraph:
     # PURPOSE: add_and_query をテストする
+    """Test suite for citation graph."""
+    # PURPOSE: Verify add and query behaves correctly
     def test_add_and_query(self):
+        """Verify add and query behavior."""
         graph = CitationGraph()
         graph.add_citation(Citation("paper_a", "paper_b", CitationType.SUPPORTS))
         stats = graph.get_stats("paper_b")
@@ -674,6 +754,7 @@ class TestCitationGraph:
 
     # PURPOSE: multiple_citations をテストする
     def test_multiple_citations(self):
+        """Verify multiple citations behavior."""
         graph = CitationGraph()
         graph.add_citation(Citation("a", "b", CitationType.SUPPORTS))
         graph.add_citation(Citation("c", "b", CitationType.CONTRASTS))
@@ -682,6 +763,7 @@ class TestCitationGraph:
 
     # PURPOSE: unknown_paper_returns_none をテストする
     def test_unknown_paper_returns_none(self):
+        """Verify unknown paper returns none behavior."""
         graph = CitationGraph()
         stats = graph.get_stats("nonexistent")
         assert stats is None

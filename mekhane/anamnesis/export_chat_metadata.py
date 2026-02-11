@@ -61,6 +61,7 @@ JST = timezone(timedelta(hours=9))
 # ============================================================================
 
 
+# PURPOSE: varint を解析する
 def parse_varint(buf: bytes, pos: int) -> Tuple[int, int]:
     """Parse a protobuf varint from buffer at position."""
     result = 0
@@ -75,6 +76,7 @@ def parse_varint(buf: bytes, pos: int) -> Tuple[int, int]:
     return result, pos
 
 
+# PURPOSE: protobuf を解析する
 def parse_protobuf(buf: bytes) -> List[Tuple[int, str, Any]]:
     """Parse protobuf wire format without schema.
 
@@ -116,6 +118,7 @@ def parse_protobuf(buf: bytes) -> List[Tuple[int, str, Any]]:
     return fields
 
 
+# PURPOSE: export_chat_metadata の try decode utf8 処理を実行する
 def try_decode_utf8(data: bytes) -> Optional[str]:
     """Attempt to decode bytes as UTF-8 string."""
     try:
@@ -128,6 +131,7 @@ def try_decode_utf8(data: bytes) -> Optional[str]:
     return None
 
 
+# PURPOSE: timestamp を解析する
 def parse_timestamp(fields: List[Tuple[int, str, Any]]) -> Optional[datetime]:
     """Parse a protobuf Timestamp message (seconds + nanos)."""
     seconds = None
@@ -151,6 +155,7 @@ def parse_timestamp(fields: List[Tuple[int, str, Any]]) -> Optional[datetime]:
 # ============================================================================
 
 
+# PURPOSE: export_chat_metadata の extract summary text 処理を実行する
 def extract_summary_text(data: bytes) -> Optional[str]:
     """Extract readable summary text from nested protobuf summary fields."""
     fields = parse_protobuf(data)
@@ -171,6 +176,7 @@ def extract_summary_text(data: bytes) -> Optional[str]:
     return "\n".join(texts) if texts else None
 
 
+# PURPOSE: conversation entry を解析する
 def parse_conversation_entry(entry_data: bytes) -> Optional[Dict]:
     """Parse a single conversation entry from protobuf."""
     subfields = parse_protobuf(entry_data)
@@ -258,6 +264,7 @@ def parse_conversation_entry(entry_data: bytes) -> Optional[Dict]:
 # ============================================================================
 
 
+# PURPOSE: export_chat_metadata の read trajectory summaries 処理を実行する
 def read_trajectory_summaries(db_path: Path = STATE_DB_PATH) -> bytes:
     """Read and decode the trajectrySummaries from state.vscdb."""
     if not db_path.exists():
@@ -287,6 +294,7 @@ def read_trajectory_summaries(db_path: Path = STATE_DB_PATH) -> bytes:
         conn.close()
 
 
+# PURPOSE: all conversations を解析する
 def parse_all_conversations(db_path: Path = STATE_DB_PATH) -> List[Dict]:
     """Parse all conversation entries from state.vscdb."""
     decoded = read_trajectory_summaries(db_path)
@@ -311,6 +319,7 @@ def parse_all_conversations(db_path: Path = STATE_DB_PATH) -> List[Dict]:
 # ============================================================================
 
 
+# PURPOSE: json を出力する
 def export_json(conversations: List[Dict], output_path: Path) -> None:
     """Export conversations to JSON."""
     output = {
@@ -323,6 +332,7 @@ def export_json(conversations: List[Dict], output_path: Path) -> None:
     print(f"✅ JSON exported: {output_path} ({len(conversations)} conversations)")
 
 
+# PURPOSE: markdown を出力する
 def export_markdown(conversations: List[Dict], output_path: Path) -> None:
     """Export conversations to Markdown."""
     lines = [
@@ -394,6 +404,7 @@ def export_markdown(conversations: List[Dict], output_path: Path) -> None:
     print(f"✅ Markdown exported: {output_path} ({len(conversations)} conversations)")
 
 
+# PURPOSE: export_chat_metadata の print table 処理を実行する
 def print_table(conversations: List[Dict]) -> None:
     """Print conversation list as a formatted table."""
     print(f"\n{'#':>3}  {'Title':<50}  {'Steps':>6}  {'Created':<12}  {'Last Active':<12}")
@@ -427,6 +438,7 @@ def print_table(conversations: List[Dict]) -> None:
 # ============================================================================
 
 
+# PURPOSE: export_chat_metadata の main 処理を実行する
 def main():
     parser = argparse.ArgumentParser(
         description="Antigravity IDE チャット履歴メタデータ エクスポーター"

@@ -28,6 +28,7 @@ from typing import Optional
 
 # === Score Data Structures ===
 
+# PURPOSE: DimensionScore の機能を提供する
 @dataclass
 class DimensionScore:
     """Individual dimension score with details."""
@@ -37,6 +38,7 @@ class DimensionScore:
     checks_failed: list[str] = field(default_factory=list)
     suggestions: list[str] = field(default_factory=list)
 
+    # PURPOSE: prompt_quality_scorer の normalized 処理を実行する
     @property
     def normalized(self) -> int:
         """Normalize to 0-100 scale."""
@@ -45,6 +47,7 @@ class DimensionScore:
         return min(100, int((self.score / self.max_score) * 100))
 
 
+# PURPOSE: QualityReport の機能を提供する
 @dataclass
 class QualityReport:
     """Complete quality assessment report."""
@@ -56,6 +59,7 @@ class QualityReport:
     detected_format: str  # "skill" | "prompt" | "sage" | "unknown"
     detected_archetype: Optional[str] = None
 
+    # PURPOSE: prompt_quality_scorer の total 処理を実行する
     @property
     def total(self) -> int:
         """Weighted total score (Structure 30, Safety 20, Completeness 30, Fit 20)."""
@@ -66,6 +70,7 @@ class QualityReport:
             + self.archetype_fit.normalized * 0.20
         )
 
+    # PURPOSE: prompt_quality_scorer の grade 処理を実行する
     @property
     def grade(self) -> str:
         t = self.total
@@ -82,6 +87,7 @@ class QualityReport:
         else:
             return "F"
 
+    # PURPOSE: prompt_quality_scorer の to dict 処理を実行する
     def to_dict(self) -> dict:
         return {
             "filepath": self.filepath,
@@ -120,6 +126,7 @@ class QualityReport:
 
 # === Format Detection ===
 
+# PURPOSE: prompt_quality_scorer の detect format 処理を実行する
 def detect_format(content: str) -> str:
     """Detect prompt format: skill, prompt, sage, or unknown."""
     if content.strip().startswith("---") and "name:" in content[:500]:
@@ -131,6 +138,7 @@ def detect_format(content: str) -> str:
     return "unknown"
 
 
+# PURPOSE: prompt_quality_scorer の extract frontmatter 処理を実行する
 def extract_frontmatter(content: str) -> dict:
     """Extract YAML frontmatter from SKILL.md format."""
     match = re.match(r"^---\s*\n(.*?)\n---", content, re.DOTALL)
@@ -158,6 +166,7 @@ ARCHETYPE_KEYWORDS = {
 }
 
 
+# PURPOSE: prompt_quality_scorer の detect archetype 処理を実行する
 def detect_archetype(content: str) -> Optional[str]:
     """Detect the most likely archetype from content."""
     scores: dict[str, int] = {}
@@ -171,6 +180,7 @@ def detect_archetype(content: str) -> Optional[str]:
 
 # === Dimension Checkers ===
 
+# PURPOSE: structure を検証する
 def check_structure(content: str, fmt: str) -> DimensionScore:
     """Check structural quality of the prompt."""
     score = 0
@@ -334,6 +344,7 @@ def check_structure(content: str, fmt: str) -> DimensionScore:
                           suggestions=suggestions)
 
 
+# PURPOSE: safety を検証する
 def check_safety(content: str) -> DimensionScore:
     """Check safety-related qualities."""
     score = 0
@@ -380,6 +391,7 @@ def check_safety(content: str) -> DimensionScore:
                           suggestions=suggestions)
 
 
+# PURPOSE: completeness を検証する
 def check_completeness(content: str, fmt: str) -> DimensionScore:
     """Check completeness of the prompt."""
     score = 0
@@ -481,6 +493,7 @@ ARCHETYPE_FORBIDDEN_TECH = {
 }
 
 
+# PURPOSE: archetype fit を検証する
 def check_archetype_fit(content: str, archetype: Optional[str]) -> DimensionScore:
     """Check archetype-specific fitness."""
     score = 0
@@ -544,6 +557,7 @@ DIVERGENT_TASKS = frozenset([
 ])
 
 
+# PURPOSE: convergence policy を検証する
 def check_convergence_policy(archetype: Optional[str], fmt: str) -> list[str]:
     """Check if .prompt format is appropriate for detected archetype.
 
@@ -562,6 +576,7 @@ def check_convergence_policy(archetype: Optional[str], fmt: str) -> list[str]:
 
 # === Main Scoring ===
 
+# PURPOSE: prompt_quality_scorer の score prompt 処理を実行する
 def score_prompt(filepath: str) -> QualityReport:
     """Score a prompt file and return a QualityReport."""
     content = Path(filepath).read_text(encoding="utf-8")
@@ -586,6 +601,7 @@ def score_prompt(filepath: str) -> QualityReport:
     return report
 
 
+# PURPOSE: report を整形する
 def format_report(report: QualityReport, verbose: bool = False) -> str:
     """Format a QualityReport as human-readable text."""
     lines = []
@@ -617,6 +633,7 @@ def format_report(report: QualityReport, verbose: bool = False) -> str:
 
 # === CLI ===
 
+# PURPOSE: prompt_quality_scorer の main 処理を実行する
 def main():
     parser = argparse.ArgumentParser(description="Prompt Quality Scorer")
     parser.add_argument("filepath", nargs="?", help="Path to prompt file")

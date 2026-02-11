@@ -82,16 +82,19 @@ class DirtyAdapter:
     silent_failure_risk: SilentFailureRisk
     notes: str = ""                      # 補足
 
+    # PURPOSE: dapl の expires 処理を実行する
     @property
     def expires(self) -> date:
         """TTL 満了日。"""
         return self.created + timedelta(days=self.ttl_months * 30)
 
+    # PURPOSE: dapl の is expired 処理を実行する
     @property
     def is_expired(self) -> bool:
         """TTL を超過しているか。"""
         return date.today() > self.expires
 
+    # PURPOSE: dapl の days remaining 処理を実行する
     @property
     def days_remaining(self) -> int:
         """残り日数 (負 = 超過)。"""

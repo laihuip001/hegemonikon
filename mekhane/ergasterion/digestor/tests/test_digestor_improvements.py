@@ -15,6 +15,7 @@ from unittest.mock import patch, MagicMock
 
 # ═══ テスト用 Paper モック ═══════════════════════════════
 
+# PURPOSE: Test suite validating mock paper correctness
 @dataclass
 class MockPaper:
     """テスト用の Paper モック"""
@@ -29,16 +30,20 @@ class MockPaper:
     doi: Optional[str] = None
     arxiv_id: Optional[str] = None
 
+    # PURPOSE: Verify primary key behaves correctly
     @property
     def primary_key(self) -> str:
+        """Verify primary key behavior."""
         if self.doi:
             return f"doi:{self.doi}"
         if self.arxiv_id:
             return f"arxiv:{self.arxiv_id}"
         return f"{self.source}:{self.source_id}"
 
+    # PURPOSE: Verify embedding text behaves correctly
     @property
     def embedding_text(self) -> str:
+        """Verify embedding text behavior."""
         return f"{self.title} {self.abstract[:1000]}"
 
 
@@ -46,9 +51,11 @@ class MockPaper:
 # F: MCP Import Path Hardening
 # ═══════════════════════════════════════════════════════════
 
+# PURPOSE: Test suite validating f  m c p import path correctness
 class TestF_MCPImportPath:
     """F: digestor_mcp_server.py が正しく import path を設定すること"""
 
+    # PURPOSE: Verify import path pattern behaves correctly
     def test_import_path_pattern(self):
         """import path 設定コードが他の MCP サーバーと同パターンであること"""
         mcp_path = Path(__file__).parent.parent.parent.parent / "mcp" / "digestor_mcp_server.py"
@@ -66,9 +73,11 @@ class TestF_MCPImportPath:
 # E: Exponential Backoff
 # ═══════════════════════════════════════════════════════════
 
+# PURPOSE: Test suite validating e  exponential backoff correctness
 class TestE_ExponentialBackoff:
     """E: pipeline.py に exponential backoff が実装されていること"""
 
+    # PURPOSE: Verify backoff in code behaves correctly
     def test_backoff_in_code(self):
         """pipeline.py に exponential backoff コードが含まれること"""
         pipeline_path = Path(__file__).parent.parent / "pipeline.py"
@@ -81,9 +90,11 @@ class TestE_ExponentialBackoff:
 # A: SemanticMatcher
 # ═══════════════════════════════════════════════════════════
 
+# PURPOSE: Test suite validating a  semantic matcher correctness
 class TestA_SemanticMatcher:
     """A: SemanticMatcher のベクトル類似度マッチング"""
 
+    # PURPOSE: Verify semantic matcher init behaves correctly
     def test_semantic_matcher_init(self):
         """SemanticMatcher が初期化できること"""
         from mekhane.ergasterion.digestor.selector import SemanticMatcher
@@ -91,6 +102,7 @@ class TestA_SemanticMatcher:
         assert matcher._adapter is None  # Lazy load
         assert matcher._topic_vectors == {}
 
+    # PURPOSE: Verify keyword fallback behaves correctly
     def test_keyword_fallback(self):
         """semantic mode 失敗時にキーワードフォールバックすること"""
         from mekhane.ergasterion.digestor.selector import DigestorSelector
@@ -104,6 +116,7 @@ class TestA_SemanticMatcher:
             # フォールバックしてキーワードモードになる
             assert selector.mode == "keyword"
 
+    # PURPOSE: Verify keyword mode explicit behaves correctly
     def test_keyword_mode_explicit(self):
         """keyword モードを明示指定した場合に動作すること"""
         from mekhane.ergasterion.digestor.selector import DigestorSelector
@@ -130,6 +143,7 @@ class TestA_SemanticMatcher:
         matched = selector._match_topics_keyword(paper)
         assert "fep" in matched
 
+    # PURPOSE: Verify semantic match with mock adapter behaves correctly
     def test_semantic_match_with_mock_adapter(self):
         """SemanticMatcher がモックアダプターで動作すること"""
         from mekhane.ergasterion.digestor.selector import SemanticMatcher
@@ -161,11 +175,14 @@ class TestA_SemanticMatcher:
 # B: Deduplication
 # ═══════════════════════════════════════════════════════════
 
+# PURPOSE: Test suite validating b  deduplication correctness
 class TestB_Deduplication:
     """B: 既存インデックスとの重複排除"""
 
+    # PURPOSE: Verify pipeline behaves correctly
     @pytest.fixture
     def pipeline(self, tmp_path):
+        """Verify pipeline behavior."""
         from mekhane.ergasterion.digestor.pipeline import DigestorPipeline
         from mekhane.ergasterion.digestor.selector import DigestorSelector
 
@@ -176,6 +193,7 @@ class TestB_Deduplication:
         selector = DigestorSelector(topics_file=topics_file, mode="keyword")
         return DigestorPipeline(output_dir=tmp_path / "output", selector=selector)
 
+    # PURPOSE: Verify deduplicate by primary key behaves correctly
     def test_deduplicate_by_primary_key(self, pipeline, tmp_path):
         """primary_key 完全一致で除外されること"""
         # 既存キーの作成
@@ -197,11 +215,13 @@ class TestB_Deduplication:
         assert len(result) == 1
         assert result[0].id == "2"
 
+    # PURPOSE: Verify deduplicate empty papers behaves correctly
     def test_deduplicate_empty_papers(self, pipeline):
         """空リストは空リストを返すこと"""
         result = pipeline._deduplicate_against_indices([])
         assert result == []
 
+    # PURPOSE: Verify dedup similarity threshold value behaves correctly
     def test_dedup_similarity_threshold_value(self, pipeline):
         """閾値が 0.92 (偽陽性許容) であること"""
         assert pipeline.DEDUP_SIMILARITY_THRESHOLD == 0.92
@@ -211,9 +231,11 @@ class TestB_Deduplication:
 # C: TemplateClassifier
 # ═══════════════════════════════════════════════════════════
 
+# PURPOSE: Test suite validating c  template classifier correctness
 class TestC_TemplateClassifier:
     """C: 消化テンプレート T1-T4 のセマンティック分類"""
 
+    # PURPOSE: Verify template classifier init behaves correctly
     def test_template_classifier_init(self):
         """TemplateClassifier が初期化できること"""
         from mekhane.ergasterion.digestor.selector import TemplateClassifier
@@ -221,6 +243,7 @@ class TestC_TemplateClassifier:
         assert classifier._adapter is None
         assert classifier._prototype_vectors == {}
 
+    # PURPOSE: Verify template prototypes defined behaves correctly
     def test_template_prototypes_defined(self):
         """4つの prototype description が定義されていること"""
         from mekhane.ergasterion.digestor.selector import TEMPLATE_PROTOTYPES
@@ -230,6 +253,7 @@ class TestC_TemplateClassifier:
         assert "T3_absorption" in TEMPLATE_PROTOTYPES
         assert "T4_import" in TEMPLATE_PROTOTYPES
 
+    # PURPOSE: Verify classify with mock adapter behaves correctly
     def test_classify_with_mock_adapter(self):
         """TemplateClassifier がモックアダプタで Top-2 を返すこと"""
         from mekhane.ergasterion.digestor.selector import TemplateClassifier
@@ -266,6 +290,7 @@ class TestC_TemplateClassifier:
         assert result[0][0] == "T3_absorption"
         assert result[0][1] > result[1][1]
 
+    # PURPOSE: Verify digest candidate has templates behaves correctly
     def test_digest_candidate_has_templates(self):
         """DigestCandidate に suggested_templates フィールドがあること"""
         from mekhane.ergasterion.digestor.selector import DigestCandidate
@@ -287,11 +312,14 @@ class TestC_TemplateClassifier:
 # D: 出力フォーマット強化
 # ═══════════════════════════════════════════════════════════
 
+# PURPOSE: Test suite validating d  output format correctness
 class TestD_OutputFormat:
     """D: incoming/ .md テンプレートの強化"""
 
+    # PURPOSE: Verify pipeline behaves correctly
     @pytest.fixture
     def pipeline(self, tmp_path):
+        """Verify pipeline behavior."""
         from mekhane.ergasterion.digestor.pipeline import DigestorPipeline
         from mekhane.ergasterion.digestor.selector import DigestorSelector
 
@@ -302,6 +330,7 @@ class TestD_OutputFormat:
         selector = DigestorSelector(topics_file=topics_file, mode="keyword")
         return DigestorPipeline(output_dir=tmp_path / "output", selector=selector)
 
+    # PURPOSE: Verify eat input has templates behaves correctly
     def test_eat_input_has_templates(self, pipeline):
         """_generate_eat_input が推奨テンプレートを含むこと"""
         from mekhane.ergasterion.digestor.selector import DigestCandidate
@@ -319,6 +348,7 @@ class TestD_OutputFormat:
         assert len(eat_input["推奨テンプレート"]) == 1
         assert eat_input["推奨テンプレート"][0]["id"] == "T2_extraction"
 
+    # PURPOSE: Verify report includes templates behaves correctly
     def test_report_includes_templates(self, pipeline):
         """レポート JSON に suggested_templates が含まれること"""
         from mekhane.ergasterion.digestor.pipeline import DigestResult
@@ -354,9 +384,11 @@ class TestD_OutputFormat:
 # Topics.yaml v2.0
 # ═══════════════════════════════════════════════════════════
 
+# PURPOSE: Test suite validating topics yaml correctness
 class TestTopicsYaml:
     """topics.yaml v2.0 の構造テスト"""
 
+    # PURPOSE: Verify topics yaml has template hints behaves correctly
     def test_topics_yaml_has_template_hints(self):
         """全トピックに template_hint があること"""
         topics_path = Path(__file__).parent.parent / "topics.yaml"
@@ -367,6 +399,7 @@ class TestTopicsYaml:
             assert "template_hint" in topic, f"Topic '{topic['id']}' missing template_hint"
             assert topic["template_hint"].startswith("T"), f"Invalid template_hint: {topic['template_hint']}"
 
+    # PURPOSE: Verify topics yaml has templates section behaves correctly
     def test_topics_yaml_has_templates_section(self):
         """templates セクションが定義されていること"""
         topics_path = Path(__file__).parent.parent / "topics.yaml"
@@ -376,6 +409,7 @@ class TestTopicsYaml:
         assert "templates" in data
         assert len(data["templates"]) == 4
 
+    # PURPOSE: Verify topics yaml version behaves correctly
     def test_topics_yaml_version(self):
         """バージョンが 2.0.0 であること"""
         topics_path = Path(__file__).parent.parent / "topics.yaml"

@@ -12,6 +12,7 @@ from pathlib import Path
 import json
 
 
+# PURPOSE: LearnedPattern の機能を提供する
 @dataclass
 # PURPOSE: A learned intent-to-CCL mapping.
 class LearnedPattern:

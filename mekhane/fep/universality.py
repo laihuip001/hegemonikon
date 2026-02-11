@@ -32,6 +32,7 @@ from typing import Dict, List, Optional, Tuple
 # Data Types
 # ---------------------------------------------------------------------------
 
+# PURPOSE: FactorizationResult の機能を提供する
 @dataclass
 class FactorizationResult:
     """因子分解テストの結果: 候補 A は候補 B の特殊ケースか？
@@ -45,6 +46,7 @@ class FactorizationResult:
     confidence: float     # 0.0 - 1.0
 
 
+# PURPOSE: KalonResult の機能を提供する
 @dataclass
 class KalonResult:
     """Kalon 検証の最終結果
@@ -64,6 +66,7 @@ class KalonResult:
 # Core Functions
 # ---------------------------------------------------------------------------
 
+# PURPOSE: kalon prompt を構築する
 def build_kalon_prompt(candidates: Dict[str, str]) -> str:
     """因子分解テスト用の一括 LLM プロンプトを生成。
 
@@ -119,6 +122,7 @@ def build_kalon_prompt(candidates: Dict[str, str]) -> str:
     return "\n".join(lines)
 
 
+# PURPOSE: kalon response を解析する
 def parse_kalon_response(
     response: str, candidates: Dict[str, str]
 ) -> List[FactorizationResult]:
@@ -188,6 +192,7 @@ def parse_kalon_response(
     return results
 
 
+# PURPOSE: universal candidate を検索する
 def find_universal_candidate(
     candidates: Dict[str, str],
     factorizations: List[FactorizationResult],
@@ -241,6 +246,7 @@ def find_universal_candidate(
     return best, uniqueness, diagram
 
 
+# PURPOSE: universality の kalon score 処理を実行する
 def kalon_score(
     universal: str,
     candidates: Dict[str, str],
@@ -269,6 +275,7 @@ def kalon_score(
     return actual / max_possible if max_possible > 0 else 0.0
 
 
+# PURPOSE: universality の kalon verify 処理を実行する
 def kalon_verify(
     candidates: Dict[str, str],
     factorizations: Optional[List[FactorizationResult]] = None,
@@ -318,6 +325,7 @@ def kalon_verify(
     )
 
 
+# PURPOSE: kalon output を整形する
 def format_kalon_output(result: KalonResult) -> str:
     """KalonResult を /noe PHASE 3 の出力形式にフォーマット。
 

@@ -35,32 +35,41 @@ from mekhane.fep.convergence_tracker import (
 # ============================================================
 
 
+# PURPOSE: Test suite validating binomial p value correctness
 class TestBinomialPValue:
     """Test the pure-Python binomial test implementation."""
 
+    # PURPOSE: Verify zero trials behaves correctly
     def test_zero_trials(self):
+        """Verify zero trials behavior."""
         assert _binomial_p_value(0, 0) == 1.0
 
+    # PURPOSE: Verify zero successes behaves correctly
     def test_zero_successes(self):
+        """Verify zero successes behavior."""
         assert _binomial_p_value(0, 10) == 1.0
 
+    # PURPOSE: Verify all successes behaves correctly
     def test_all_successes(self):
         """If all trials are successes, p should be very small."""
         p = _binomial_p_value(10, 10, chance=1 / 6)
         assert p < 0.001
 
+    # PURPOSE: Verify chance level behaves correctly
     def test_chance_level(self):
         """At chance level (1/6 of trials), p should be ~0.5 or higher."""
         # 5 out of 30 = 16.7% = exactly chance
         p = _binomial_p_value(5, 30, chance=1 / 6)
         assert p > 0.3  # Not significant
 
+    # PURPOSE: Verify above chance behaves correctly
     def test_above_chance(self):
         """Well above chance should give low p."""
         # 15 out of 30 = 50%, much higher than 1/6
         p = _binomial_p_value(15, 30, chance=1 / 6)
         assert p < 0.001
 
+    # PURPOSE: Verify moderate above chance behaves correctly
     def test_moderate_above_chance(self):
         """Moderately above chance with enough data."""
         # 10 out of 30 = 33%, about 2x chance
@@ -68,22 +77,31 @@ class TestBinomialPValue:
         assert p < 0.05
 
 
+# PURPOSE: Test suite validating log comb correctness
 class TestLogComb:
     """Test log-combination helper."""
 
+    # PURPOSE: Verify basic combinations behaves correctly
     def test_basic_combinations(self):
         # C(5,2) = 10
+        """Verify basic combinations behavior."""
         assert abs(math.exp(_log_comb(5, 2)) - 10.0) < 0.01
 
+    # PURPOSE: Verify edge k zero behaves correctly
     def test_edge_k_zero(self):
         # C(n,0) = 1
+        """Verify edge k zero behavior."""
         assert abs(math.exp(_log_comb(10, 0)) - 1.0) < 0.01
 
+    # PURPOSE: Verify edge k equals n behaves correctly
     def test_edge_k_equals_n(self):
         # C(n,n) = 1
+        """Verify edge k equals n behavior."""
         assert abs(math.exp(_log_comb(10, 10)) - 1.0) < 0.01
 
+    # PURPOSE: Verify invalid k behaves correctly
     def test_invalid_k(self):
+        """Verify invalid k behavior."""
         assert _log_comb(5, 6) == float("-inf")
         assert _log_comb(5, -1) == float("-inf")
 
@@ -93,25 +111,36 @@ class TestLogComb:
 # ============================================================
 
 
+# PURPOSE: Test suite validating classify disagreement correctness
 class TestClassifyDisagreement:
     """Test disagreement categorization."""
 
+    # PURPOSE: Verify agreement returns unknown behaves correctly
     def test_agreement_returns_unknown(self):
+        """Verify agreement returns unknown behavior."""
         assert classify_disagreement("O", "O") == "unknown"
 
+    # PURPOSE: Verify observe is explore behaves correctly
     def test_observe_is_explore(self):
+        """Verify observe is explore behavior."""
         result = classify_disagreement(None, "O", agent_action="observe")
         assert result == "explore"
 
+    # PURPOSE: Verify none agent is explore behaves correctly
     def test_none_agent_is_explore(self):
+        """Verify none agent is explore behavior."""
         result = classify_disagreement(None, "S")
         assert result == "explore"
 
+    # PURPOSE: Verify different series is exploit behaves correctly
     def test_different_series_is_exploit(self):
+        """Verify different series is exploit behavior."""
         result = classify_disagreement("O", "S", agent_action="act_O")
         assert result == "exploit"
 
+    # PURPOSE: Verify attractor none is error behaves correctly
     def test_attractor_none_is_error(self):
+        """Verify attractor none is error behavior."""
         result = classify_disagreement("O", None, agent_action="act_O")
         assert result == "error"
 
@@ -121,18 +150,23 @@ class TestClassifyDisagreement:
 # ============================================================
 
 
+# PURPOSE: Test suite validating convergence summary correctness
 class TestConvergenceSummary:
     """Test the convergence summary computation."""
 
+    # PURPOSE: Verify empty records behaves correctly
     def test_empty_records(self):
+        """Verify empty records behavior."""
         result = convergence_summary([])
         assert result["total"] == 0
         assert result["p_value"] == 1.0
         assert result["converged"] is False
         assert result["disagreement_breakdown"] == {}
 
+    # PURPOSE: Verify all agree behaves correctly
     def test_all_agree(self):
         # Records with convergence_score (pushout format)
+        """Verify all agree behavior."""
         records = [
             {
                 "agreed": True,
@@ -149,7 +183,9 @@ class TestConvergenceSummary:
         assert result["pushout_score"] > 0.3
         assert result["converged"] is True
 
+    # PURPOSE: Verify all disagree behaves correctly
     def test_all_disagree(self):
+        """Verify all disagree behavior."""
         records = [
             {"agreed": False, "disagreement_category": "exploit"}
             for _ in range(10)
@@ -159,6 +195,7 @@ class TestConvergenceSummary:
         assert result["converged"] is False
         assert result["disagreement_breakdown"]["exploit"] == 10
 
+    # PURPOSE: Verify not converged if degrading behaves correctly
     def test_not_converged_if_degrading(self):
         """Even with high rate, degrading trend should prevent convergence."""
         # First half: all agree (8/8)
@@ -170,13 +207,16 @@ class TestConvergenceSummary:
         assert result["trend"] == "degrading"
         assert result["converged"] is False
 
+    # PURPOSE: Verify not converged if too few behaves correctly
     def test_not_converged_if_too_few(self):
         """Even with good p-value, need >= 10 records."""
         records = [{"agreed": True} for _ in range(5)]
         result = convergence_summary(records)
         assert result["converged"] is False  # total < 10
 
+    # PURPOSE: Verify mixed disagreement breakdown behaves correctly
     def test_mixed_disagreement_breakdown(self):
+        """Verify mixed disagreement breakdown behavior."""
         records = [
             {"agreed": False, "disagreement_category": "explore"},
             {"agreed": False, "disagreement_category": "explore"},
@@ -194,14 +234,19 @@ class TestConvergenceSummary:
 # ============================================================
 
 
+# PURPOSE: Test suite validating format convergence correctness
 class TestFormatConvergence:
     """Test the display formatting."""
 
+    # PURPOSE: Verify no data behaves correctly
     def test_no_data(self):
+        """Verify no data behavior."""
         result = format_convergence({"total": 0})
         assert "No data" in result
 
+    # PURPOSE: Verify converged with pushout behaves correctly
     def test_converged_with_pushout(self):
+        """Verify converged with pushout behavior."""
         summary = {
             "total": 20,
             "agreements": 15,
@@ -220,7 +265,9 @@ class TestFormatConvergence:
         assert "agree=75%" in result
         assert "disagree=" in result
 
+    # PURPOSE: Verify not converged behaves correctly
     def test_not_converged(self):
+        """Verify not converged behavior."""
         summary = {
             "total": 5,
             "agreements": 1,
@@ -243,10 +290,13 @@ class TestFormatConvergence:
 # ============================================================
 
 
+# PURPOSE: Test suite validating record agreement correctness
 class TestRecordAgreement:
     """Integration test for record_agreement with temp file."""
 
+    # PURPOSE: Verify record and summarize behaves correctly
     def test_record_and_summarize(self, tmp_path):
+        """Verify record and summarize behavior."""
         test_path = tmp_path / "convergence.json"
         with mock.patch(
             "mekhane.fep.convergence_tracker.CONVERGENCE_PATH", test_path
@@ -260,7 +310,9 @@ class TestRecordAgreement:
             assert result["p_value"] < 0.001
             assert result["converged"] is True
 
+    # PURPOSE: Verify record disagreement category behaves correctly
     def test_record_disagreement_category(self, tmp_path):
+        """Verify record disagreement category behavior."""
         test_path = tmp_path / "convergence.json"
         with mock.patch(
             "mekhane.fep.convergence_tracker.CONVERGENCE_PATH", test_path

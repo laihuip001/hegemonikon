@@ -74,6 +74,7 @@ class NoesisClient:
         else:
             logger.warning("O1 Noēsis: API Key not configured")
 
+    # PURPOSE: noesis_client の is configured 処理を実行する
     @property
     # PURPOSE: 外部認識源が利用可能か
     def is_configured(self) -> bool:

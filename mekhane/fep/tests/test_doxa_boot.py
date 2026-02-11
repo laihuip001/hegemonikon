@@ -35,9 +35,11 @@ from mekhane.symploke.doxa_boot import (
 # =============================================================================
 
 
+# PURPOSE: Test suite validating doxa file persistence correctness
 class TestDoxaFilePersistence:
     """DoxaStore のファイル永続化テスト。"""
 
+    # PURPOSE: Verify save load roundtrip behaves correctly
     def test_save_load_roundtrip(self, tmp_path):
         """信念を保存→読込で完全復元。"""
         store = DoxaStore()
@@ -58,6 +60,7 @@ class TestDoxaFilePersistence:
         assert b1.confidence == 0.95
         assert b1.evidence == ["FEP", "MP"]
 
+    # PURPOSE: Verify save load with archive behaves correctly
     def test_save_load_with_archive(self, tmp_path):
         """アーカイブも含めて round-trip。"""
         store = DoxaStore()
@@ -73,12 +76,14 @@ class TestDoxaFilePersistence:
         assert len(store2.list_archived()) == 1
         assert store2.list_archived()[0].content == "temporary"
 
+    # PURPOSE: Verify load nonexistent file behaves correctly
     def test_load_nonexistent_file(self, tmp_path):
         """存在しないファイル → 0 件。"""
         store = DoxaStore()
         loaded = store.load_from_file(tmp_path / "nope.yaml")
         assert loaded == 0
 
+    # PURPOSE: Verify save creates directory behaves correctly
     def test_save_creates_directory(self, tmp_path):
         """ディレクトリが存在しなくても作成。"""
         store = DoxaStore()
@@ -88,6 +93,7 @@ class TestDoxaFilePersistence:
         store.save_to_file(path)
         assert path.exists()
 
+    # PURPOSE: Verify datetime roundtrip behaves correctly
     def test_datetime_roundtrip(self, tmp_path):
         """日時が正確に round-trip。"""
         store = DoxaStore()
@@ -104,6 +110,7 @@ class TestDoxaFilePersistence:
         # Microsecond precision may vary, check within 1 second
         assert abs((b.created_at - now).total_seconds()) < 1
 
+    # PURPOSE: Verify evolve then save behaves correctly
     def test_evolve_then_save(self, tmp_path):
         """進化後の状態も保存される。"""
         store = DoxaStore()
@@ -121,6 +128,7 @@ class TestDoxaFilePersistence:
         assert b.strength == BeliefStrength.STRONG  # Auto-promoted
         assert "new evidence" in b.evidence
 
+    # PURPOSE: Verify yaml is readable behaves correctly
     def test_yaml_is_readable(self, tmp_path):
         """保存されたYAMLが人間が読める形式。"""
         store = DoxaStore()
@@ -139,6 +147,7 @@ class TestDoxaFilePersistence:
 # =============================================================================
 
 
+# PURPOSE: Test suite validating promotion candidates correctness
 class TestPromotionCandidates:
     """Sophia 昇格候補検出テスト。"""
 
@@ -154,6 +163,7 @@ class TestPromotionCandidates:
             **kwargs,
         )
 
+    # PURPOSE: Verify promotable belief behaves correctly
     def test_promotable_belief(self):
         """全条件を満たす信念 → 昇格候補。"""
         store = DoxaStore()
@@ -171,6 +181,7 @@ class TestPromotionCandidates:
         assert candidates[0].belief.content == "意志より環境"
         assert candidates[0].score == 1.0
 
+    # PURPOSE: Verify weak belief not promoted behaves correctly
     def test_weak_belief_not_promoted(self):
         """strength < STRONG → 昇格しない。"""
         store = DoxaStore()
@@ -186,6 +197,7 @@ class TestPromotionCandidates:
         candidates = check_promotion_candidates(store)
         assert len(candidates) == 0
 
+    # PURPOSE: Verify young belief not promoted behaves correctly
     def test_young_belief_not_promoted(self):
         """age < 14 → 昇格しない。"""
         store = DoxaStore()
@@ -201,6 +213,7 @@ class TestPromotionCandidates:
         candidates = check_promotion_candidates(store)
         assert len(candidates) == 0
 
+    # PURPOSE: Verify low confidence not promoted behaves correctly
     def test_low_confidence_not_promoted(self):
         """confidence < 0.85 → 昇格しない。"""
         store = DoxaStore()
@@ -216,6 +229,7 @@ class TestPromotionCandidates:
         candidates = check_promotion_candidates(store)
         assert len(candidates) == 0
 
+    # PURPOSE: Verify no evidence not promoted behaves correctly
     def test_no_evidence_not_promoted(self):
         """evidence < 2 → 昇格しない。"""
         store = DoxaStore()
@@ -231,6 +245,7 @@ class TestPromotionCandidates:
         candidates = check_promotion_candidates(store)
         assert len(candidates) == 0
 
+    # PURPOSE: Verify core belief promotable behaves correctly
     def test_core_belief_promotable(self):
         """CORE strength も昇格対象。"""
         store = DoxaStore()
@@ -246,6 +261,7 @@ class TestPromotionCandidates:
         candidates = check_promotion_candidates(store)
         assert len(candidates) == 1
 
+    # PURPOSE: Verify empty store no candidates behaves correctly
     def test_empty_store_no_candidates(self):
         """空ストア → 候補なし。"""
         store = DoxaStore()
@@ -258,9 +274,11 @@ class TestPromotionCandidates:
 # =============================================================================
 
 
+# PURPOSE: Test suite validating doxa boot correctness
 class TestDoxaBoot:
     """/boot Phase 3 Doxa 統合テスト。"""
 
+    # PURPOSE: Verify load doxa for boot behaves correctly
     def test_load_doxa_for_boot(self, tmp_path):
         """beliefs.yaml → DoxaBootResult。"""
         # Create and save beliefs
@@ -275,12 +293,14 @@ class TestDoxaBoot:
         assert result.active_count == 1
         assert result.summary != ""
 
+    # PURPOSE: Verify boot with no file behaves correctly
     def test_boot_with_no_file(self, tmp_path):
         """ファイルなし → 0 件、エラーなし。"""
         result = load_doxa_for_boot(store_path=tmp_path / "nope.yaml")
         assert result.beliefs_loaded == 0
         assert result.active_count == 0
 
+    # PURPOSE: Verify summary format behaves correctly
     def test_summary_format(self, tmp_path):
         """サマリーに H4 Doxa ヘッダーがある。"""
         store = DoxaStore()
@@ -298,15 +318,18 @@ class TestDoxaBoot:
 # =============================================================================
 
 
+# PURPOSE: Test suite validating doxa summary correctness
 class TestDoxaSummary:
     """Creator 向けサマリーテスト。"""
 
+    # PURPOSE: Verify empty store summary behaves correctly
     def test_empty_store_summary(self):
         """空ストア → 基本テーブルのみ。"""
         store = DoxaStore()
         summary = format_doxa_summary(store, [])
         assert "Active | 0" in summary
 
+    # PURPOSE: Verify summary with promotion behaves correctly
     def test_summary_with_promotion(self):
         """昇格候補があればセクションが追加される。"""
         store = DoxaStore()

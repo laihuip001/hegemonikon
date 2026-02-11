@@ -121,6 +121,7 @@ def record_usage(key_index: int, session_id: str):
             log(f"Failed to record usage: {e}")
 
 
+# PURPOSE: jules_mcp_server の list tools 処理を実行する
 @server.list_tools()
 # PURPOSE: List available Jules tools.
 async def list_tools():
@@ -200,6 +201,7 @@ async def list_tools():
     ]
 
 
+# PURPOSE: jules_mcp_server の call tool 処理を実行する
 @server.call_tool(validate_input=True)
 # PURPOSE: Handle Jules tool calls.
 async def call_tool(name: str, arguments: dict):

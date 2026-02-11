@@ -11,6 +11,7 @@ from datetime import datetime
 from typing import Optional
 
 
+# PURPOSE: PromptModule の機能を提供する
 @dataclass
 # PURPOSE: Library プロンプトモジュール統一スキーマ
 class PromptModule:
@@ -39,12 +40,14 @@ class PromptModule:
     # Metadata
     indexed_at: str = field(default_factory=lambda: datetime.now().isoformat())
 
+    # PURPOSE: prompt_module の primary key 処理を実行する
     @property
     # PURPOSE: 重複排除用
     def primary_key(self) -> str:
         """重複排除用"""
         return self.filepath
 
+    # PURPOSE: prompt_module の embedding text 処理を実行する
     @property
     # PURPOSE: 埋め込み生成用テキスト
     def embedding_text(self) -> str:
@@ -75,6 +78,7 @@ class PromptModule:
             "indexed_at": self.indexed_at,
         }
 
+    # PURPOSE: prompt_module の from dict 処理を実行する
     @classmethod
     # PURPOSE: 辞書から復元
     def from_dict(cls, data: dict) -> "PromptModule":

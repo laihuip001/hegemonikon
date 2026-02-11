@@ -41,6 +41,7 @@ def _make_nugget(
     score: float = 0.75,
     abstract: str = "テスト要約",
 ) -> KnowledgeNugget:
+    """Verify make nugget behavior."""
     return KnowledgeNugget(
         title=title,
         source=source,
@@ -59,6 +60,7 @@ def _make_nugget(
 class TestScenario1_ContextPush:
     """Input → Attractor → Context → Push の統合テスト"""
 
+    # PURPOSE: Verify attractor bridge sets engine context behaves correctly
     def test_attractor_bridge_sets_engine_context(self):
         """AttractorContextBridge がエンジンのトピック/WFを設定できる"""
         engine = PKSEngine(
@@ -87,6 +89,7 @@ class TestScenario1_ContextPush:
         assert "調査" in engine.tracker.context.topics
         assert "/sop" in engine.tracker.context.active_workflows
 
+    # PURPOSE: Verify context produces embedding text behaves correctly
     def test_context_produces_embedding_text(self):
         """コンテキストが有効な embedding テキストを生成する"""
         engine = PKSEngine(
@@ -111,6 +114,7 @@ class TestScenario1_ContextPush:
 class TestScenario2_FeedbackLoop:
     """Feedback → Threshold 変動 → 次回 Push に反映"""
 
+    # PURPOSE: Verify positive feedback lowers threshold for series behaves correctly
     def test_positive_feedback_lowers_threshold_for_series(self, tmp_path):
         """正のフィードバックが閾値を下げる (より多く push)"""
         fb_path = tmp_path / "s2_feedback.json"
@@ -130,6 +134,7 @@ class TestScenario2_FeedbackLoop:
         adjusted2 = collector2.adjust_threshold("S", base)
         assert adjusted2 == adjusted, "Reloaded threshold should match"
 
+    # PURPOSE: Verify negative feedback raises threshold for series behaves correctly
     def test_negative_feedback_raises_threshold_for_series(self, tmp_path):
         """負のフィードバックが閾値を上げる (push を抑制)"""
         fb_path = tmp_path / "s2_feedback_neg.json"
@@ -141,6 +146,7 @@ class TestScenario2_FeedbackLoop:
         adjusted = collector.adjust_threshold("H", 0.65)
         assert adjusted > 0.65
 
+    # PURPOSE: Verify mixed feedback converges behaves correctly
     def test_mixed_feedback_converges(self, tmp_path):
         """混合フィードバックは微調整に収束する"""
         fb_path = tmp_path / "s2_feedback_mix.json"
@@ -156,6 +162,7 @@ class TestScenario2_FeedbackLoop:
         # Net positive → slightly lower
         assert abs(adjusted - 0.65) < 0.15, "Mixed feedback should converge near base"
 
+    # PURPOSE: Verify feedback independence across series behaves correctly
     def test_feedback_independence_across_series(self, tmp_path):
         """異なる series の feedback は互いに影響しない"""
         fb_path = tmp_path / "s2_feedback_ind.json"
@@ -173,6 +180,7 @@ class TestScenario2_FeedbackLoop:
         assert h_threshold > 0.65, "H should be higher (negative)"
         assert k_threshold != h_threshold, "Different series, different thresholds"
 
+    # PURPOSE: Verify engine record feedback persists behaves correctly
     def test_engine_record_feedback_persists(self, tmp_path):
         """PKSEngine.record_feedback が FeedbackCollector に記録される"""
         engine = PKSEngine(
@@ -201,11 +209,14 @@ class TestScenario2_FeedbackLoop:
 class TestScenario3_SyncWatcherCallback:
     """SyncWatcher on_change → Push callback の統合テスト"""
 
+    # PURPOSE: Verify on change callback fires on changes behaves correctly
     def test_on_change_callback_fires_on_changes(self, tmp_path):
         """ファイル変更時に callback が呼ばれる"""
         callback_called = []
 
+        # PURPOSE: Verify mock callback behaves correctly
         def mock_callback(changes):
+            """Verify mock callback behavior."""
             callback_called.append(changes)
 
         watch_dir = tmp_path / "watch"
@@ -226,11 +237,14 @@ class TestScenario3_SyncWatcherCallback:
         assert len(changes) > 0
         assert len(callback_called) == 1
 
+    # PURPOSE: Verify on change not called when no changes behaves correctly
     def test_on_change_not_called_when_no_changes(self, tmp_path):
         """変更がなければ callback は呼ばれない"""
         callback_called = []
 
+        # PURPOSE: Verify mock callback behaves correctly
         def mock_callback(changes):
+            """Verify mock callback behavior."""
             callback_called.append(changes)
 
         watch_dir = tmp_path / "watch2"
@@ -247,14 +261,18 @@ class TestScenario3_SyncWatcherCallback:
         watcher.run_once()
         assert len(callback_called) == 0
 
+    # PURPOSE: Verify create push callback returns callable behaves correctly
     def test_create_push_callback_returns_callable(self):
         """create_push_callback がコーラブルを返す"""
         callback = SyncWatcher.create_push_callback(topics=["FEP"])
         assert callable(callback)
 
+    # PURPOSE: Verify callback error does not crash watcher behaves correctly
     def test_callback_error_does_not_crash_watcher(self, tmp_path):
         """callback がエラーを起こしても watcher は止まらない"""
+        # PURPOSE: Verify bad callback behaves correctly
         def bad_callback(changes):
+            """Verify bad callback behavior."""
             raise RuntimeError("Intentional error")
 
         watch_dir = tmp_path / "watch3"
@@ -283,6 +301,7 @@ class TestScenario3_SyncWatcherCallback:
 class TestScenario4_NarratorFallback:
     """Narrator の LLM フォールバック動作"""
 
+    # PURPOSE: Verify narrator without llm uses template behaves correctly
     def test_narrator_without_llm_uses_template(self):
         """LLM なし → テンプレート生成"""
         narrator = PKSNarrator(use_llm=False)
@@ -294,6 +313,7 @@ class TestScenario4_NarratorFallback:
         assert narrative.segments[0].speaker == "Advocate"
         assert narrative.segments[1].speaker == "Critic"
 
+    # PURPOSE: Verify narrator batch consistency behaves correctly
     def test_narrator_batch_consistency(self):
         """バッチ処理で各 nugget が独立にナラレート"""
         narrator = PKSNarrator(use_llm=False)
@@ -306,6 +326,7 @@ class TestScenario4_NarratorFallback:
         assert narratives[0].title == "Paper A"
         assert narratives[1].title == "Paper B"
 
+    # PURPOSE: Verify narrator report format behaves correctly
     def test_narrator_report_format(self):
         """レポートフォーマットが正しい Markdown"""
         narrator = PKSNarrator(use_llm=False)
@@ -316,6 +337,7 @@ class TestScenario4_NarratorFallback:
         assert "Advocate" in report
         assert "Critic" in report
 
+    # PURPOSE: Verify llm parse response valid behaves correctly
     def test_llm_parse_response_valid(self):
         """LLM レスポンスの正常パース"""
         narrator = PKSNarrator(use_llm=False)
@@ -324,6 +346,7 @@ class TestScenario4_NarratorFallback:
         assert result is not None
         assert len(result.segments) == 3
 
+    # PURPOSE: Verify llm parse response invalid behaves correctly
     def test_llm_parse_response_invalid(self):
         """不正な LLM レスポンス → None (テンプレートにフォールバック)"""
         narrator = PKSNarrator(use_llm=False)
@@ -341,6 +364,7 @@ class TestScenario4_NarratorFallback:
 class TestScenario5_MatrixViewFallback:
     """MatrixView の LLM フォールバック動作"""
 
+    # PURPOSE: Verify matrix without llm behaves correctly
     def test_matrix_without_llm(self):
         """LLM なし → Phase 1 メタデータ比較表"""
         view = PKSMatrixView(use_llm=False)
@@ -355,6 +379,7 @@ class TestScenario5_MatrixViewFallback:
         assert "Paper A" in result
         assert "Paper B" in result
 
+    # PURPOSE: Verify generate with llm falls back behaves correctly
     def test_generate_with_llm_falls_back(self):
         """LLM 不可 → generate_with_llm が Phase 1 にフォールバック"""
         view = PKSMatrixView(use_llm=False)
@@ -362,12 +387,14 @@ class TestScenario5_MatrixViewFallback:
         result = view.generate_with_llm(nuggets)
         assert "📊 PKS Matrix View" in result
 
+    # PURPOSE: Verify matrix empty nuggets behaves correctly
     def test_matrix_empty_nuggets(self):
         """空リスト → 空メッセージ"""
         view = PKSMatrixView(use_llm=False)
         assert view.generate([]) == "📭 比較対象なし"
         assert view.generate_with_llm([]) == "📭 比較対象なし"
 
+    # PURPOSE: Verify matrix pipe escape behaves correctly
     def test_matrix_pipe_escape(self):
         """パイプ文字がエスケープされる"""
         view = PKSMatrixView(use_llm=False)
@@ -385,6 +412,7 @@ class TestScenario5_MatrixViewFallback:
 class TestScenario6_FullLoop:
     """最も重要: 全コンポーネントを横断するサイクルテスト"""
 
+    # PURPOSE: Verify context feedback threshold cycle behaves correctly
     def test_context_feedback_threshold_cycle(self, tmp_path):
         """Context設定 → (mock) Push → Feedback → 閾値変動 の完全サイクル"""
         fb_path = tmp_path / "cycle_fb.json"
@@ -421,6 +449,7 @@ class TestScenario6_FullLoop:
             f"got {engine.detector.threshold}"
         )
 
+    # PURPOSE: Verify multi series independent thresholds behaves correctly
     def test_multi_series_independent_thresholds(self, tmp_path):
         """複数 series の独立した閾値調整"""
         fb_path = tmp_path / "multi_fb.json"

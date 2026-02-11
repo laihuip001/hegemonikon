@@ -35,6 +35,7 @@ def _get_api_key() -> Optional[str]:
     )
 
 
+# PURPOSE: SemanticResult の機能を提供する
 @dataclass
 # PURPOSE: Result of semantic validation.
 class SemanticResult:

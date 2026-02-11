@@ -31,6 +31,7 @@ class NarratorFormat(Enum):
     CRITIQUE = "critique"
     DEBATE = "debate"
 
+    # PURPOSE: narrator_formats の from str 処理を実行する
     @classmethod
     def from_str(cls, s: str) -> "NarratorFormat":
         """文字列からフォーマットを取得。不明な場合は DEEP_DIVE。"""
@@ -144,11 +145,13 @@ FORMAT_SPECS: dict[NarratorFormat, FormatSpec] = {
 }
 
 
+# PURPOSE: format spec を取得する
 def get_format_spec(fmt: NarratorFormat) -> FormatSpec:
     """フォーマット仕様を取得。未定義の場合は DEEP_DIVE。"""
     return FORMAT_SPECS.get(fmt, FORMAT_SPECS[NarratorFormat.DEEP_DIVE])
 
 
+# PURPOSE: speaker pattern を取得する
 def get_speaker_pattern(fmt: NarratorFormat) -> str:
     """フォーマットのスピーカーパターン (正規表現) を生成。"""
     spec = get_format_spec(fmt)

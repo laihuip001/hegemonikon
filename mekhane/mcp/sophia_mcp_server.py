@@ -366,6 +366,7 @@ async def call_tool(name: str, arguments: dict):
         return [TextContent(type="text", text=f"Unknown tool: {name}")]
 
 
+# PURPOSE: sophia_mcp_server の main 処理を実行する
 async def main():
     """Run the MCP server."""
     log("Starting stdio server...")

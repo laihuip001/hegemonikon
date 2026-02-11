@@ -34,26 +34,31 @@ class TestNormalizePW:
 
     # PURPOSE: none_pw_gives_uniform をテストする
     def test_none_pw_gives_uniform(self):
+        """Verify none pw gives uniform behavior."""
         result = normalize_pw({"O1": "a", "O2": "b"}, pw=None)
         assert all(v == 1.0 for v in result.values())
 
     # PURPOSE: positive_pw_increases_weight をテストする
     def test_positive_pw_increases_weight(self):
+        """Verify positive pw increases weight behavior."""
         result = normalize_pw({"O1": "a"}, pw={"O1": 1.0})
         assert result["O1"] == 2.0
 
     # PURPOSE: negative_pw_decreases_weight をテストする
     def test_negative_pw_decreases_weight(self):
+        """Verify negative pw decreases weight behavior."""
         result = normalize_pw({"O1": "a"}, pw={"O1": -1.0})
         assert result["O1"] == 0.0
 
     # PURPOSE: pw_clamped_to_range をテストする
     def test_pw_clamped_to_range(self):
+        """Verify pw clamped to range behavior."""
         result = normalize_pw({"O1": "a"}, pw={"O1": 5.0})
         assert result["O1"] == 2.0  # clamped to 1.0 → 1+1=2
 
     # PURPOSE: missing_pw_keys_default_to_neutral をテストする
     def test_missing_pw_keys_default_to_neutral(self):
+        """Verify missing pw keys default to neutral behavior."""
         result = normalize_pw({"O1": "a", "O2": "b"}, pw={"O1": 0.5})
         assert result["O2"] == 1.0
 
@@ -64,18 +69,22 @@ class TestIsUniformPW:
 
     # PURPOSE: none_is_uniform をテストする
     def test_none_is_uniform(self):
+        """Verify none is uniform behavior."""
         assert is_uniform_pw(None) is True
 
     # PURPOSE: empty_is_uniform をテストする
     def test_empty_is_uniform(self):
+        """Verify empty is uniform behavior."""
         assert is_uniform_pw({}) is True
 
     # PURPOSE: all_zero_is_uniform をテストする
     def test_all_zero_is_uniform(self):
+        """Verify all zero is uniform behavior."""
         assert is_uniform_pw({"O1": 0.0, "O2": 0.0}) is True
 
     # PURPOSE: nonzero_is_not_uniform をテストする
     def test_nonzero_is_not_uniform(self):
+        """Verify nonzero is not uniform behavior."""
         assert is_uniform_pw({"O1": 0.5}) is False
 
 
@@ -90,14 +99,17 @@ class TestComputeDispersion:
 
     # PURPOSE: empty_outputs をテストする
     def test_empty_outputs(self):
+        """Verify empty outputs behavior."""
         assert compute_dispersion({}) == 0.0
 
     # PURPOSE: single_output をテストする
     def test_single_output(self):
+        """Verify single output behavior."""
         assert compute_dispersion({"O1": "hello"}) == 0.0
 
     # PURPOSE: identical_outputs_low_dispersion をテストする
     def test_identical_outputs_low_dispersion(self):
+        """Verify identical outputs low dispersion behavior."""
         v = compute_dispersion({
             "O1": "同じテキスト",
             "O2": "同じテキスト",
@@ -108,6 +120,7 @@ class TestComputeDispersion:
 
     # PURPOSE: different_outputs_high_dispersion をテストする
     def test_different_outputs_high_dispersion(self):
+        """Verify different outputs high dispersion behavior."""
         v = compute_dispersion({
             "O1": "alpha beta gamma",
             "O2": "one two three",
@@ -192,18 +205,22 @@ class TestResolveMethod:
 
     # PURPOSE: low_dispersion_uniform_pw をテストする
     def test_low_dispersion_uniform_pw(self):
+        """Verify low dispersion uniform pw behavior."""
         assert resolve_method(0.05, pw=None) == "simple"
 
     # PURPOSE: low_dispersion_with_pw をテストする
     def test_low_dispersion_with_pw(self):
+        """Verify low dispersion with pw behavior."""
         assert resolve_method(0.05, pw={"O1": 0.5}) == "pw_weighted"
 
     # PURPOSE: medium_dispersion をテストする
     def test_medium_dispersion(self):
+        """Verify medium dispersion behavior."""
         assert resolve_method(0.2) == "pw_weighted"
 
     # PURPOSE: high_dispersion をテストする
     def test_high_dispersion(self):
+        """Verify high dispersion behavior."""
         assert resolve_method(0.5) == "root"
 
 
@@ -218,6 +235,7 @@ class TestConverge:
 
     # PURPOSE: basic_converge をテストする
     def test_basic_converge(self):
+        """Verify basic converge behavior."""
         cone = converge(Series.O, {
             "O1": "認識",
             "O2": "意志",
@@ -232,6 +250,7 @@ class TestConverge:
 
     # PURPOSE: converge_with_pw をテストする
     def test_converge_with_pw(self):
+        """Verify converge with pw behavior."""
         cone = converge(
             Series.A,
             {"A1": "感情", "A2": "判断", "A3": "見識", "A4": "知識"},
@@ -242,6 +261,7 @@ class TestConverge:
 
     # PURPOSE: converge_with_apex をテストする
     def test_converge_with_apex(self):
+        """Verify converge with apex behavior."""
         cone = converge(
             Series.H,
             {"H1": "接近", "H2": "HIGH", "H3": "欲求", "H4": "信念"},
@@ -297,6 +317,7 @@ class TestDescribeCone:
 
     # PURPOSE: output_contains_series_name をテストする
     def test_output_contains_series_name(self):
+        """Verify output contains series name behavior."""
         cone = converge(Series.O, {
             "O1": "a", "O2": "b", "O3": "c", "O4": "d",
         })
@@ -305,6 +326,7 @@ class TestDescribeCone:
 
     # PURPOSE: output_contains_v_outputs をテストする
     def test_output_contains_v_outputs(self):
+        """Verify output contains v outputs behavior."""
         cone = converge(Series.H, {
             "H1": "a", "H2": "b", "H3": "c", "H4": "d",
         })
@@ -313,6 +335,7 @@ class TestDescribeCone:
 
     # PURPOSE: pw_section_shown_when_non_uniform をテストする
     def test_pw_section_shown_when_non_uniform(self):
+        """Verify pw section shown when non uniform behavior."""
         cone = converge(
             Series.A,
             {"A1": "a", "A2": "b", "A3": "c", "A4": "d"},
@@ -323,6 +346,7 @@ class TestDescribeCone:
 
     # PURPOSE: pw_section_hidden_when_uniform をテストする
     def test_pw_section_hidden_when_uniform(self):
+        """Verify pw section hidden when uniform behavior."""
         cone = converge(Series.A, {
             "A1": "a", "A2": "b", "A3": "c", "A4": "d",
         })

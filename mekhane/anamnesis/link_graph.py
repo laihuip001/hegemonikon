@@ -44,6 +44,7 @@ GRAPH_DIR = _MNEME_ROOT / "indices"
 GRAPH_PATH = GRAPH_DIR / "link_graph.json"
 
 
+# PURPOSE: GraphNode の機能を提供する
 @dataclass
 class GraphNode:
     """グラフ上のノード（1つの知識ファイル）."""
@@ -57,6 +58,7 @@ class GraphNode:
     community: int = -1  # コミュニティID（Louvainで設定）
 
 
+# PURPOSE: GraphStats の機能を提供する
 @dataclass
 class GraphStats:
     """グラフ統計情報."""
@@ -68,6 +70,7 @@ class GraphStats:
     top_connected: list[tuple[str, int]]  # 接続数上位
 
 
+# PURPOSE: LinkGraph の機能を提供する
 class LinkGraph:
     """Bidirectional Link Graph.
 
@@ -86,6 +89,7 @@ class LinkGraph:
         self.nodes: dict[str, GraphNode] = {}
         self._file_map: dict[str, str] = {}  # stem -> node_id
 
+    # PURPOSE: link_graph の scan directory 処理を実行する
     def scan_directory(self, root: Path) -> int:
         """ディレクトリ内の Markdown ファイルをスキャンしてグラフを構築.
 
@@ -228,11 +232,13 @@ class LinkGraph:
     # Analysis
     # ==========================================================
 
+    # PURPOSE: backlinks を取得する
     def get_backlinks(self, node_id: str) -> list[str]:
         """指定ノードのバックリンクを取得."""
         node = self.nodes.get(node_id)
         return node.in_links if node else []
 
+    # PURPOSE: neighbors を取得する
     def get_neighbors(self, node_id: str, hops: int = 2) -> set[str]:
         """指定ノードから N ホップ以内の全ノードを取得.
 
@@ -258,6 +264,7 @@ class LinkGraph:
         visited.discard(node_id)
         return visited
 
+    # PURPOSE: bridge nodes を検索する
     def find_bridge_nodes(self) -> list[str]:
         """クラスタ間のブリッジノードを検出.
 
@@ -274,6 +281,7 @@ class LinkGraph:
         sorted_nodes = sorted(degree.items(), key=lambda x: x[1], reverse=True)
         return [nid for nid, _ in sorted_nodes[:10]]
 
+    # PURPOSE: stats を取得する
     def get_stats(self) -> GraphStats:
         """グラフの統計情報を取得."""
         total_edges = sum(len(n.out_links) for n in self.nodes.values())
@@ -299,6 +307,7 @@ class LinkGraph:
     # Persistence
     # ==========================================================
 
+    # PURPOSE: link_graph の save 処理を実行する
     def save(self, path: Optional[Path] = None):
         """グラフを JSON に永続化."""
         target = path or GRAPH_PATH
@@ -314,6 +323,7 @@ class LinkGraph:
 
         logger.info(f"[LinkGraph] Saved {len(self.nodes)} nodes to {target}")
 
+    # PURPOSE: link_graph の load 処理を実行する
     def load(self, path: Optional[Path] = None) -> bool:
         """JSON からグラフを読み込み."""
         target = path or GRAPH_PATH
@@ -341,6 +351,7 @@ class LinkGraph:
     # Mermaid Export
     # ==========================================================
 
+    # PURPOSE: link_graph の to mermaid 処理を実行する
     def to_mermaid(self, max_nodes: int = 30) -> str:
         """Mermaid グラフフォーマットで出力.
 
@@ -377,6 +388,7 @@ class LinkGraph:
 # Convenience functions
 # ==========================================================
 
+# PURPOSE: knowledge graph を構築する
 def build_knowledge_graph() -> LinkGraph:
     """mneme ディレクトリ全体をスキャンしてリンクグラフを構築・保存."""
     graph = LinkGraph()
@@ -394,6 +406,7 @@ def build_knowledge_graph() -> LinkGraph:
     return graph
 
 
+# PURPOSE: or build graph を読み込む
 def load_or_build_graph() -> LinkGraph:
     """既存グラフを読み込み、なければ構築."""
     graph = LinkGraph()
@@ -402,6 +415,7 @@ def load_or_build_graph() -> LinkGraph:
     return graph
 
 
+# PURPOSE: link_graph の main 処理を実行する
 def main():
     """CLI エントリーポイント."""
     import argparse

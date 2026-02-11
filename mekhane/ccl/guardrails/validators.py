@@ -15,6 +15,7 @@ from typing import List, Dict, Set, Optional
 import re
 
 
+# PURPOSE: ValidationError の機能を提供する
 @dataclass
 # PURPOSE: 検証エラー
 class ValidationError:
@@ -26,6 +27,7 @@ class ValidationError:
     suggestion: str
 
 
+# PURPOSE: ValidationResult の機能を提供する
 @dataclass
 # PURPOSE: 検証結果
 class ValidationResult:
@@ -35,6 +37,7 @@ class ValidationResult:
     errors: List[ValidationError]
     warnings: List[str]
 
+    # PURPOSE: validators の regeneration instruction 処理を実行する
     @property
     # PURPOSE: 再生成用の指示を生成
     def regeneration_instruction(self) -> str:

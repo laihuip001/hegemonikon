@@ -67,6 +67,7 @@ def _run_cmd(cmd: str, cwd: str | None = None) -> str:
         return ""
 
 
+# PURPOSE: context_packer_server の capture debug context 処理を実行する
 @mcp.tool()
 def capture_debug_context(
     project_root: str = ".",
@@ -135,6 +136,7 @@ def capture_debug_context(
     return json.dumps(context, indent=2, ensure_ascii=False)
 
 
+# PURPOSE: context_packer_server の capture error context 処理を実行する
 @mcp.tool()
 def capture_error_context(
     error_message: str,

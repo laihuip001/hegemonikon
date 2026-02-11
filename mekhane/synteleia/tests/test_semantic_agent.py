@@ -25,9 +25,11 @@ from mekhane.synteleia.dokimasia.semantic_agent import (
 # =============================================================================
 
 
+# PURPOSE: Test suite validating parse l l m response correctness
 class TestParseLLMResponse:
     """LLM レスポンスパーサーのテスト"""
 
+    # PURPOSE: Verify parse json response behaves correctly
     def test_parse_json_response(self):
         """JSON 形式のレスポンスをパースできる"""
         response = json.dumps(
@@ -53,6 +55,7 @@ class TestParseLLMResponse:
         assert issues[0].location == "paragraph 2"
         assert issues[0].suggestion == "目的を明確化"
 
+    # PURPOSE: Verify parse json no issues behaves correctly
     def test_parse_json_no_issues(self):
         """問題なしの JSON レスポンス"""
         response = json.dumps(
@@ -61,6 +64,7 @@ class TestParseLLMResponse:
         issues = parse_llm_response(response, "TestAgent")
         assert len(issues) == 0
 
+    # PURPOSE: Verify parse json multiple issues behaves correctly
     def test_parse_json_multiple_issues(self):
         """複数の問題を含む JSON レスポンス"""
         response = json.dumps(
@@ -78,6 +82,7 @@ class TestParseLLMResponse:
         assert issues[0].severity == AuditSeverity.CRITICAL
         assert issues[1].severity == AuditSeverity.LOW
 
+    # PURPOSE: Verify parse markdown fallback behaves correctly
     def test_parse_markdown_fallback(self):
         """Markdown リスト形式のフォールバックパース"""
         response = "- [HIGH] SEM-001: 設計意図との不整合が検出されました\n- [LOW] SEM-002: 前提条件が不明確です"
@@ -87,12 +92,14 @@ class TestParseLLMResponse:
         assert issues[0].severity == AuditSeverity.HIGH
         assert issues[1].code == "SEM-002"
 
+    # PURPOSE: Verify parse unparseable response behaves correctly
     def test_parse_unparseable_response(self):
         """パースできないレスポンスは空リスト"""
         response = "This is just plain text without any structured output."
         issues = parse_llm_response(response, "TestAgent")
         assert len(issues) == 0
 
+    # PURPOSE: Verify parse severity behaves correctly
     def test_parse_severity(self):
         """severity 文字列変換"""
         assert _parse_severity("critical") == AuditSeverity.CRITICAL
@@ -108,9 +115,11 @@ class TestParseLLMResponse:
 # =============================================================================
 
 
+# PURPOSE: Test suite validating stub backend correctness
 class TestStubBackend:
     """スタブバックエンドのテスト"""
 
+    # PURPOSE: Verify default response behaves correctly
     def test_default_response(self):
         """デフォルトレスポンス（問題なし）"""
         backend = StubBackend()
@@ -119,6 +128,7 @@ class TestStubBackend:
         assert data["issues"] == []
         assert backend.is_available()
 
+    # PURPOSE: Verify custom response behaves correctly
     def test_custom_response(self):
         """カスタムレスポンス"""
         custom = json.dumps(
@@ -139,9 +149,11 @@ class TestStubBackend:
 # =============================================================================
 
 
+# PURPOSE: Test suite validating semantic agent correctness
 class TestSemanticAgent:
     """SemanticAgent のテスト"""
 
+    # PURPOSE: Verify stub no issues behaves correctly
     def test_stub_no_issues(self):
         """スタブモードで問題なし"""
         agent = SemanticAgent(backend=StubBackend())
@@ -152,6 +164,7 @@ class TestSemanticAgent:
         assert result.metadata.get("backend") == "StubBackend"
         assert result.metadata.get("l2") is True
 
+    # PURPOSE: Verify stub with issues behaves correctly
     def test_stub_with_issues(self):
         """スタブモードで問題検出"""
         response = json.dumps(
@@ -173,6 +186,7 @@ class TestSemanticAgent:
         assert len(result.issues) == 1
         assert result.issues[0].code == "SEM-001"
 
+    # PURPOSE: Verify stub critical issue behaves correctly
     def test_stub_critical_issue(self):
         """CRITICAL 検出時は passed=False"""
         response = json.dumps(
@@ -192,11 +206,16 @@ class TestSemanticAgent:
         assert not result.passed
         assert result.issues[0].severity == AuditSeverity.CRITICAL
 
+    # PURPOSE: Verify error handling behaves correctly
     def test_error_handling(self):
         """エラー時のフォールバック"""
 
+        # PURPOSE: Test suite validating error backend correctness
         class ErrorBackend(StubBackend):
+            """Test suite for error backend."""
+            # PURPOSE: Verify query behaves correctly
             def query(self, prompt, context):
+                """Verify query behavior."""
                 raise RuntimeError("LLM connection failed")
 
         agent = SemanticAgent(backend=ErrorBackend())
@@ -205,6 +224,7 @@ class TestSemanticAgent:
         assert result.confidence == 0.0
         assert any(i.code == "SEM-ERR" for i in result.issues)
 
+    # PURPOSE: Verify supports text types behaves correctly
     def test_supports_text_types(self):
         """テキスト系ターゲットのみサポート"""
         agent = SemanticAgent(backend=StubBackend())
@@ -214,6 +234,7 @@ class TestSemanticAgent:
         assert agent.supports(AuditTargetType.GENERIC)
         assert not agent.supports(AuditTargetType.CODE)  # コードは L1 が担当
 
+    # PURPOSE: Verify confidence extraction behaves correctly
     def test_confidence_extraction(self):
         """レスポンスから confidence が抽出される"""
         response = json.dumps(
@@ -229,9 +250,11 @@ class TestSemanticAgent:
 # =============================================================================
 
 
+# PURPOSE: Test suite validating orchestrator integration correctness
 class TestOrchestratorIntegration:
     """オーケストレータとの統合テスト"""
 
+    # PURPOSE: Verify semantic agent in orchestrator behaves correctly
     def test_semantic_agent_in_orchestrator(self):
         """SemanticAgent をオーケストレータに組み込める"""
         from mekhane.synteleia.orchestrator import SynteleiaOrchestrator
@@ -248,6 +271,7 @@ class TestOrchestratorIntegration:
         assert len(result.agent_results) == 1
         assert result.agent_results[0].agent_name == "SemanticAgent"
 
+    # PURPOSE: Verify l1 l2 combined behaves correctly
     def test_l1_l2_combined(self):
         """L1 + L2 の統合実行"""
         from mekhane.synteleia.dokimasia.logic_agent import LogicAgent

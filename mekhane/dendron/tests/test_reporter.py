@@ -70,6 +70,7 @@ class TestTextFormat:
 
     # PURPOSE: TEXT 形式で L2 Purpose セクションが出力されることを検証する
     def test_includes_purpose_section(self, result_passing):
+        """Verify includes purpose section behavior."""
         buf = io.StringIO()
         reporter = DendronReporter(output=buf)
         reporter.report(result_passing, ReportFormat.TEXT)
@@ -82,6 +83,7 @@ class TestTextFormat:
 
     # PURPOSE: TEXT 形式で PASS/FAIL が正しく表示されることを検証する
     def test_pass_indicator(self, result_passing):
+        """Verify pass indicator behavior."""
         buf = io.StringIO()
         reporter = DendronReporter(output=buf)
         reporter.report(result_passing, ReportFormat.TEXT)
@@ -89,6 +91,7 @@ class TestTextFormat:
 
     # PURPOSE: TEXT 形式で FAIL 時に missing ファイルが表示されることを検証する
     def test_fail_indicator(self, result_failing):
+        """Verify fail indicator behavior."""
         buf = io.StringIO()
         reporter = DendronReporter(output=buf)
         reporter.report(result_failing, ReportFormat.TEXT)
@@ -105,6 +108,7 @@ class TestCIFormat:
 
     # PURPOSE: CI 形式で Purpose サマリー行が出力されることを検証する
     def test_includes_purpose_summary(self, result_passing):
+        """Verify includes purpose summary behavior."""
         buf = io.StringIO()
         reporter = DendronReporter(output=buf)
         reporter.report(result_passing, ReportFormat.CI)
@@ -116,6 +120,7 @@ class TestCIFormat:
 
     # PURPOSE: CI 形式で FAIL 時にファイルリストが出力されることを検証する
     def test_fail_lists_files(self, result_failing):
+        """Verify fail lists files behavior."""
         buf = io.StringIO()
         reporter = DendronReporter(output=buf)
         reporter.report(result_failing, ReportFormat.CI)
@@ -132,6 +137,7 @@ class TestJSONFormat:
 
     # PURPOSE: JSON 形式で purpose オブジェクトが含まれることを検証する
     def test_includes_purpose_object(self, result_passing):
+        """Verify includes purpose object behavior."""
         buf = io.StringIO()
         reporter = DendronReporter(output=buf)
         reporter.report(result_passing, ReportFormat.JSON)
@@ -145,6 +151,7 @@ class TestJSONFormat:
 
     # PURPOSE: JSON 形式で is_passing が正しく出力されることを検証する
     def test_is_passing_field(self, result_passing):
+        """Verify is passing field behavior."""
         buf = io.StringIO()
         reporter = DendronReporter(output=buf)
         reporter.report(result_passing, ReportFormat.JSON)
@@ -153,6 +160,7 @@ class TestJSONFormat:
 
     # PURPOSE: JSON 形式で不合格時の missing_files が正しく出力されることを検証する
     def test_failing_missing_files(self, result_failing):
+        """Verify failing missing files behavior."""
         buf = io.StringIO()
         reporter = DendronReporter(output=buf)
         reporter.report(result_failing, ReportFormat.JSON)
@@ -169,6 +177,7 @@ class TestMarkdownFormat:
 
     # PURPOSE: Markdown 形式で L2 Purpose Quality テーブルが出力されることを検証する
     def test_includes_purpose_table(self, result_passing):
+        """Verify includes purpose table behavior."""
         buf = io.StringIO()
         reporter = DendronReporter(output=buf)
         reporter.report(result_passing, ReportFormat.MARKDOWN)
@@ -187,6 +196,7 @@ class TestEdgeCases:
 
     # PURPOSE: function が 0 件のとき Purpose セクションが出力されないことを検証する
     def test_no_functions_no_purpose_section(self):
+        """Verify no functions no purpose section behavior."""
         result = CheckResult(
             total_files=1,
             files_with_proof=1,
@@ -208,6 +218,7 @@ class TestEdgeCases:
 
     # PURPOSE: coverage 計算で exempt ファイルが分母から除外されることを検証する
     def test_coverage_excludes_exempt(self):
+        """Verify coverage excludes exempt behavior."""
         result = CheckResult(
             total_files=3,
             files_with_proof=2,

@@ -122,6 +122,7 @@ BENEFIT_ANGLES = {
 # =============================================================================
 
 
+# PURPOSE: CompletedTask の機能を提供する
 @dataclass
 class CompletedTask:
     """完了タスク。/bye 時に収集される。"""
@@ -133,6 +134,7 @@ class CompletedTask:
     tests_passed: int = 0
 
 
+# PURPOSE: AngleScore の機能を提供する
 @dataclass
 class AngleScore:
     """特定の角度に対するスコア。"""
@@ -144,6 +146,7 @@ class AngleScore:
     matched_keywords: List[str] = field(default_factory=list)
 
 
+# PURPOSE: PitchProposal の機能を提供する
 @dataclass
 class PitchProposal:
     """Value Pitch 提案。"""

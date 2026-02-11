@@ -27,6 +27,7 @@ router = APIRouter(tags=["kalon"])
 _KALON_DIR = Path.home() / "oikos" / "mneme" / ".hegemonikon" / "kalon"
 
 
+# PURPOSE: KalonJudgeRequest の機能を提供する
 class KalonJudgeRequest(BaseModel):
     concept: str
     g_test: bool  # G テスト (蒸留): True = 不変
@@ -53,6 +54,7 @@ def _verdict_label(g: bool, f: bool) -> str:
     return "要蒸留 — Fix から遠い"
 
 
+# PURPOSE: kalon の kalon judge 処理を実行する
 @router.post("/kalon/judge")
 async def kalon_judge(req: KalonJudgeRequest) -> dict[str, Any]:
     """Kalon 判定を記録する。"""
@@ -103,6 +105,7 @@ async def kalon_judge(req: KalonJudgeRequest) -> dict[str, Any]:
     }
 
 
+# PURPOSE: kalon の kalon history 処理を実行する
 @router.get("/kalon/history")
 async def kalon_history(limit: int = 50) -> dict[str, Any]:
     """Kalon 判定履歴を返す。"""

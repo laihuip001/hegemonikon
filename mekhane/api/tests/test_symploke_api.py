@@ -15,6 +15,7 @@ from fastapi.testclient import TestClient
 from mekhane.api.server import create_app
 
 
+# PURPOSE: Verify client behaves correctly
 @pytest.fixture(scope="module")
 def client():
     """TestClient を生成。"""
@@ -28,9 +29,11 @@ def client():
 # ============================================================
 
 
+# PURPOSE: Test suite validating symploke search correctness
 class TestSymplokeSearch:
     """/api/symploke/search エンドポイント。"""
 
+    # PURPOSE: Verify search basic behaves correctly
     def test_search_basic(self, client: TestClient):
         """GET /api/symploke/search?q=test → 200 + results"""
         r = client.get("/api/symploke/search", params={"q": "test"})
@@ -43,6 +46,7 @@ class TestSymplokeSearch:
         assert "sources_searched" in data
         assert isinstance(data["results"], list)
 
+    # PURPOSE: Verify search with sources filter behaves correctly
     def test_search_with_sources_filter(self, client: TestClient):
         """GET /api/symploke/search?q=test&sources=handoff → ソースフィルタ"""
         r = client.get("/api/symploke/search", params={
@@ -55,6 +59,7 @@ class TestSymplokeSearch:
         for item in data["results"]:
             assert item["source"] == "handoff"
 
+    # PURPOSE: Verify search with k behaves correctly
     def test_search_with_k(self, client: TestClient):
         """GET /api/symploke/search?q=test&k=2 → k 制限"""
         r = client.get("/api/symploke/search", params={"q": "test", "k": 2})
@@ -62,6 +67,7 @@ class TestSymplokeSearch:
         data = r.json()
         assert len(data["results"]) <= 2
 
+    # PURPOSE: Verify search missing query behaves correctly
     def test_search_missing_query(self, client: TestClient):
         """GET /api/symploke/search without q → 422"""
         r = client.get("/api/symploke/search")
@@ -73,9 +79,11 @@ class TestSymplokeSearch:
 # ============================================================
 
 
+# PURPOSE: Test suite validating symploke persona correctness
 class TestSymplokePersona:
     """/api/symploke/persona エンドポイント。"""
 
+    # PURPOSE: Verify persona basic behaves correctly
     def test_persona_basic(self, client: TestClient):
         """GET /api/symploke/persona → 200 + persona/creator"""
         r = client.get("/api/symploke/persona")
@@ -92,9 +100,11 @@ class TestSymplokePersona:
 # ============================================================
 
 
+# PURPOSE: Test suite validating symploke boot context correctness
 class TestSymplokeBootContext:
     """/api/symploke/boot-context エンドポイント。"""
 
+    # PURPOSE: Verify boot context fast behaves correctly
     def test_boot_context_fast(self, client: TestClient):
         """GET /api/symploke/boot-context?mode=fast → 200"""
         r = client.get("/api/symploke/boot-context", params={"mode": "fast"})
@@ -104,6 +114,7 @@ class TestSymplokeBootContext:
         assert "axes" in data
         assert "summary" in data
 
+    # PURPOSE: Verify boot context standard behaves correctly
     def test_boot_context_standard(self, client: TestClient):
         """GET /api/symploke/boot-context → 200 (内部エラーも catch される)"""
         r = client.get("/api/symploke/boot-context")
@@ -118,9 +129,11 @@ class TestSymplokeBootContext:
 # ============================================================
 
 
+# PURPOSE: Test suite validating symploke stats correctness
 class TestSymplokeStats:
     """/api/symploke/stats エンドポイント。"""
 
+    # PURPOSE: Verify stats basic behaves correctly
     def test_stats_basic(self, client: TestClient):
         """GET /api/symploke/stats → 200 + 統計情報"""
         r = client.get("/api/symploke/stats")

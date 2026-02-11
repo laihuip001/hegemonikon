@@ -48,6 +48,7 @@ W_VALUE_ALIGNMENT = 0.5
 W_COMPLEMENTARITY = 0.3
 
 
+# PURPOSE: ConvergenceScore の機能を提供する
 @dataclass
 class ConvergenceScore:
     """普遍的 Convergence スコア — Pushout として定義.
@@ -69,6 +70,7 @@ class ConvergenceScore:
     value_alignment: float = 0.5      # [0,1] 中立初期値, /bye で更新
     complementarity: float = 0.0      # [0,1] 不一致が有益だったか
 
+    # PURPOSE: convergence_tracker の score 処理を実行する
     @property
     def score(self) -> float:
         """統合 convergence スコア [0, 1]."""
@@ -78,6 +80,7 @@ class ConvergenceScore:
             + self.complementarity * W_COMPLEMENTARITY
         )
 
+    # PURPOSE: convergence_tracker の to dict 処理を実行する
     def to_dict(self) -> Dict[str, Any]:
         """Serialize for JSON storage."""
         d = asdict(self)
@@ -131,6 +134,7 @@ def _save_records(records: List[Dict[str, Any]]) -> None:
         json.dump(data, f, indent=2, ensure_ascii=False)
 
 
+# PURPOSE: convergence_tracker の classify disagreement 処理を実行する
 def classify_disagreement(
     agent_series: Optional[str],
     attractor_series: Optional[str],
@@ -161,6 +165,7 @@ def classify_disagreement(
     return "error"
 
 
+# PURPOSE: convergence_tracker の record agreement 処理を実行する
 def record_agreement(
     agent_series: Optional[str],
     attractor_series: Optional[str],
@@ -258,6 +263,7 @@ def _log_comb(n: int, k: int) -> float:
     return math.lgamma(n + 1) - math.lgamma(k + 1) - math.lgamma(n - k + 1)
 
 
+# PURPOSE: convergence_tracker の convergence summary 処理を実行する
 def convergence_summary(
     records: Optional[List[Dict[str, Any]]] = None,
 ) -> Dict[str, Any]:
@@ -365,6 +371,7 @@ def convergence_summary(
     }
 
 
+# PURPOSE: convergence を整形する
 def format_convergence(summary: Optional[Dict[str, Any]] = None) -> str:
     """Format convergence summary for display."""
     if summary is None:
@@ -401,6 +408,7 @@ def format_convergence(summary: Optional[Dict[str, Any]] = None) -> str:
 # CLI — E2E 接続ポイント (2)
 # =============================================================================
 
+# PURPOSE: convergence_tracker の main 処理を実行する
 def main():
     """Convergence Tracker CLI.
 

@@ -59,6 +59,7 @@ class SlackLevel(Enum):
     OVERDUE = "overdue"  # 超過: 0.5x 未満 or 期限超過
 
 
+# PURPOSE: ChronosResult の機能を提供する
 @dataclass
 # PURPOSE: 時間評価結果
 class ChronosResult:
@@ -90,12 +91,14 @@ class ChronosResult:
     recommendation: str
     critical_path: List[str] = field(default_factory=list)
 
+    # PURPOSE: chronos_evaluator の is overdue 処理を実行する
     @property
     # PURPOSE: 期限超過か
     def is_overdue(self) -> bool:
         """期限超過か"""
         return self.slack == SlackLevel.OVERDUE
 
+    # PURPOSE: chronos_evaluator の needs acceleration 処理を実行する
     @property
     # PURPOSE: 加速が必要か
     def needs_acceleration(self) -> bool:

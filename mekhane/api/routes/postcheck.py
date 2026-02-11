@@ -21,6 +21,7 @@ class PostcheckRequest(BaseModel):
     content: str = Field(description="チェック対象テキスト")
 
 
+# PURPOSE: PostcheckResult の機能を提供する
 class PostcheckResult(BaseModel):
     """個別チェック結果。"""
     requirement: str
@@ -28,6 +29,7 @@ class PostcheckResult(BaseModel):
     detail: str = ""
 
 
+# PURPOSE: PostcheckResponse の機能を提供する
 class PostcheckResponse(BaseModel):
     """ポストチェック結果。"""
     wf_name: str
@@ -37,12 +39,14 @@ class PostcheckResponse(BaseModel):
     formatted: str = ""
 
 
+# PURPOSE: SELItem の機能を提供する
 class SELItem(BaseModel):
     """SEL enforcement 項目。"""
     wf_name: str
     modes: dict[str, Any] = {}
 
 
+# PURPOSE: SELListResponse の機能を提供する
 class SELListResponse(BaseModel):
     """全WF の SEL enforcement 一覧。"""
     items: list[SELItem]
@@ -52,6 +56,7 @@ class SELListResponse(BaseModel):
 router = APIRouter(prefix="/postcheck", tags=["postcheck"])
 
 
+# PURPOSE: postcheck を実行する
 @router.post("/run", response_model=PostcheckResponse)
 async def run_postcheck(req: PostcheckRequest) -> PostcheckResponse:
     """ワークフロー出力の品質検証を実行。"""
@@ -77,6 +82,7 @@ async def run_postcheck(req: PostcheckRequest) -> PostcheckResponse:
     )
 
 
+# PURPOSE: postcheck の list sel 処理を実行する
 @router.get("/list", response_model=SELListResponse)
 async def list_sel() -> SELListResponse:
     """全WF の sel_enforcement を一覧表示。"""

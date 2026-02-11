@@ -113,6 +113,7 @@ def _notify_wbc(alert: dict) -> bool:
 # --- Routes ---
 
 
+# PURPOSE: synteleia の audit 処理を実行する
 @router.post("/audit", response_model=AuditResponse)
 async def audit(request: AuditRequest):
     """統合監査を実行（全エージェント + オプション L2）。"""
@@ -188,6 +189,7 @@ async def audit(request: AuditRequest):
         raise HTTPException(status_code=500, detail=f"Audit failed: {exc}")
 
 
+# PURPOSE: synteleia の audit quick 処理を実行する
 @router.post("/audit-quick", response_model=AuditResponse)
 async def audit_quick(request: AuditRequest):
     """高速監査（LogicAgent のみ）。"""
@@ -254,6 +256,7 @@ async def audit_quick(request: AuditRequest):
         raise HTTPException(status_code=500, detail=f"Quick audit failed: {exc}")
 
 
+# PURPOSE: synteleia の list agents 処理を実行する
 @router.get("/agents", response_model=list[AgentInfo])
 async def list_agents():
     """利用可能な監査エージェントの一覧を取得。"""

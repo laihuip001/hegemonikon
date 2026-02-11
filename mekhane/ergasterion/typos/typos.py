@@ -24,6 +24,7 @@ from dataclasses import dataclass, field, asdict
 from typing import Optional
 
 
+# PURPOSE: PromptBlock の機能を提供する
 @dataclass
 # PURPOSE: A single block in a typos file.
 class PromptBlock:
@@ -33,6 +34,7 @@ class PromptBlock:
     content: str | list | dict
 
 
+# PURPOSE: RubricDimension の機能を提供する
 @dataclass
 # PURPOSE: A single rubric dimension for evaluation.
 class RubricDimension:
@@ -44,6 +46,7 @@ class RubricDimension:
     criteria: dict[str, str] = field(default_factory=dict)
 
 
+# PURPOSE: Rubric の機能を提供する
 @dataclass
 # PURPOSE: Rubric block for self-evaluation.
 class Rubric:
@@ -54,6 +57,7 @@ class Rubric:
     output_key: Optional[str] = None
 
 
+# PURPOSE: Condition の機能を提供する
 @dataclass
 # PURPOSE: Conditional block (@if/@else).
 class Condition:
@@ -66,6 +70,7 @@ class Condition:
     else_content: dict = field(default_factory=dict)
 
 
+# PURPOSE: Activation の機能を提供する
 @dataclass
 # PURPOSE: Activation metadata for glob/rule integration.
 class Activation:
@@ -77,6 +82,7 @@ class Activation:
     rules: list[str] = field(default_factory=list)
 
 
+# PURPOSE: ContextItem の機能を提供する
 @dataclass
 # PURPOSE: A single context resource reference.
 class ContextItem:
@@ -92,6 +98,7 @@ class ContextItem:
 
 
 # v2.1 additions
+# PURPOSE: Mixin の機能を提供する
 @dataclass
 # PURPOSE: Reusable template fragment for composition.
 class Mixin:

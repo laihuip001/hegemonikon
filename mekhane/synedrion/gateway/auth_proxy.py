@@ -16,6 +16,7 @@ from typing import Any
 logger = logging.getLogger(__name__)
 
 
+# PURPOSE: AuthMode の機能を提供する
 class AuthMode(Enum):
     """認証モード"""
     PASSTHROUGH = "passthrough"    # 認証なし (デフォルト)
@@ -23,6 +24,7 @@ class AuthMode(Enum):
     OAUTH2 = "oauth2"            # OAuth 2.1 (将来)
 
 
+# PURPOSE: AuthContext の機能を提供する
 @dataclass
 class AuthContext:
     """認証コンテキスト — リクエストに付与される認証情報"""
@@ -31,11 +33,13 @@ class AuthContext:
     server_name: str = ""
     authenticated: bool = False
 
+    # PURPOSE: auth_proxy の is passthrough 処理を実行する
     @property
     def is_passthrough(self) -> bool:
         return self.mode == AuthMode.PASSTHROUGH
 
 
+# PURPOSE: ServerAuthConfig の機能を提供する
 @dataclass
 class ServerAuthConfig:
     """サーバーごとの認証設定"""
@@ -45,6 +49,7 @@ class ServerAuthConfig:
     oauth_config: dict[str, Any] | None = None
 
 
+# PURPOSE: AuthProxy の機能を提供する
 class AuthProxy:
     """
     MCP Gateway の認証プロキシ。
@@ -71,11 +76,13 @@ class AuthProxy:
     def __init__(self) -> None:
         self._configs: dict[str, ServerAuthConfig] = {}
 
+    # PURPOSE: auth_proxy の configure server 処理を実行する
     def configure_server(self, config: ServerAuthConfig) -> None:
         """サーバーの認証設定を登録する"""
         self._configs[config.server_name] = config
         logger.info("Auth configured for %s: %s", config.server_name, config.mode.value)
 
+    # PURPOSE: auth_proxy の authenticate 処理を実行する
     def authenticate(self, server_name: str) -> AuthContext:
         """
         サーバーへのリクエストの認証コンテキストを生成する。
@@ -140,10 +147,12 @@ class AuthProxy:
             f"Server: {config.server_name}"
         )
 
+    # PURPOSE: configured servers を取得する
     def get_configured_servers(self) -> list[str]:
         """認証設定済みのサーバー一覧"""
         return list(self._configs.keys())
 
+    # PURPOSE: auth_proxy の config count 処理を実行する
     @property
     def config_count(self) -> int:
         return len(self._configs)

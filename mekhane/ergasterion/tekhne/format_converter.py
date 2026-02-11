@@ -18,6 +18,7 @@ from pathlib import Path
 from typing import Optional
 
 
+# PURPOSE: format_converter の detect format 処理を実行する
 def detect_format(content: str) -> str:
     """Auto-detect input format."""
     if content.strip().startswith("---") and "name:" in content[:500]:
@@ -29,6 +30,7 @@ def detect_format(content: str) -> str:
     return "unknown"
 
 
+# PURPOSE: format_converter の extract skill parts 処理を実行する
 def extract_skill_parts(content: str) -> dict:
     """Extract structured parts from SKILL.md."""
     parts = {
@@ -64,6 +66,7 @@ def extract_skill_parts(content: str) -> dict:
     return parts
 
 
+# PURPOSE: format_converter の extract prompt parts 処理を実行する
 def extract_prompt_parts(content: str) -> dict:
     """Extract structured parts from .prompt format."""
     parts = {
@@ -111,6 +114,7 @@ def extract_prompt_parts(content: str) -> dict:
     return parts
 
 
+# PURPOSE: format_converter の to prompt 処理を実行する
 def to_prompt(parts: dict, source_format: str) -> str:
     """Convert parts to .prompt format."""
     lines = []
@@ -154,6 +158,7 @@ def to_prompt(parts: dict, source_format: str) -> str:
     return "\n".join(lines)
 
 
+# PURPOSE: format_converter の to skill 処理を実行する
 def to_skill(parts: dict, source_format: str) -> str:
     """Convert parts to SKILL.md format."""
     lines = []
@@ -227,6 +232,7 @@ def to_skill(parts: dict, source_format: str) -> str:
     return "\n".join(lines)
 
 
+# PURPOSE: format_converter の to sage 処理を実行する
 def to_sage(parts: dict, source_format: str) -> str:
     """Convert parts to SAGE XML format."""
     name = parts.get("name", "unnamed")
@@ -280,6 +286,7 @@ def to_sage(parts: dict, source_format: str) -> str:
     return "\n".join(lines)
 
 
+# PURPOSE: format_converter の convert 処理を実行する
 def convert(input_path: str, output_format: str) -> str:
     """Convert a prompt file to the specified format."""
     content = Path(input_path).read_text(encoding="utf-8")
@@ -323,6 +330,7 @@ def convert(input_path: str, output_format: str) -> str:
         raise ValueError(f"Unknown output format: {output_format}")
 
 
+# PURPOSE: roundtrip を検証する
 def verify_roundtrip(input_path: str, via_format: str) -> bool:
     """Verify roundtrip conversion preserves key information."""
     content = Path(input_path).read_text(encoding="utf-8")
@@ -363,6 +371,7 @@ def verify_roundtrip(input_path: str, via_format: str) -> bool:
         Path(temp_path).unlink(missing_ok=True)
 
 
+# PURPOSE: format_converter の main 処理を実行する
 def main():
     parser = argparse.ArgumentParser(description="Format Converter")
     parser.add_argument("--input", required=True, help="Input file")

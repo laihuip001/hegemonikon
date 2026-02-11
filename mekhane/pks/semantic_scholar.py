@@ -33,6 +33,7 @@ from typing import Optional
 # Data Classes
 # ---------------------------------------------------------------------------
 
+# PURPOSE: Paper の機能を提供する
 @dataclass
 class Paper:
     """Semantic Scholar の論文メタデータ"""
@@ -46,9 +47,11 @@ class Paper:
     url: Optional[str] = None
     authors: list[str] = field(default_factory=list)
 
+    # PURPOSE: semantic_scholar の to dict 処理を実行する
     def to_dict(self) -> dict:
         return asdict(self)
 
+    # PURPOSE: semantic_scholar の from api 処理を実行する
     @classmethod
     def from_api(cls, data: dict) -> "Paper":
         """API レスポンスから Paper を構築"""
@@ -66,6 +69,7 @@ class Paper:
             authors=[a.get("name", "") for a in authors_raw],
         )
 
+    # PURPOSE: semantic_scholar の has abstract 処理を実行する
     @property
     def has_abstract(self) -> bool:
         return bool(self.abstract and len(self.abstract) > 20)
@@ -86,6 +90,7 @@ UNAUTHENTICATED_DELAY = 1.0  # seconds between requests
 AUTHENTICATED_DELAY = 1.1    # 1 req/sec + margin
 
 
+# PURPOSE: SemanticScholarClient の機能を提供する
 class SemanticScholarClient:
     """Semantic Scholar Academic Graph API クライアント
 
@@ -101,6 +106,7 @@ class SemanticScholarClient:
         self._last_request_time = 0.0
         self._total_requests = 0
 
+    # PURPOSE: semantic_scholar の authenticated 処理を実行する
     @property
     def authenticated(self) -> bool:
         return bool(self._api_key)
@@ -151,6 +157,7 @@ class SemanticScholarClient:
 
         return {}
 
+    # PURPOSE: semantic_scholar の search 処理を実行する
     def search(
         self,
         query: str,
@@ -181,6 +188,7 @@ class SemanticScholarClient:
         papers_raw = data.get("data", [])
         return [Paper.from_api(p) for p in papers_raw]
 
+    # PURPOSE: semantic_scholar の bulk search 処理を実行する
     def bulk_search(
         self,
         query: str,
@@ -223,6 +231,7 @@ class SemanticScholarClient:
 
         return all_papers[:max_papers]
 
+    # PURPOSE: paper を取得する
     def get_paper(self, paper_id: str, fields: str = DEFAULT_FIELDS) -> Optional[Paper]:
         """個別論文の詳細取得"""
         data = self._get(f"{API_BASE}/paper/{paper_id}", {"fields": fields})
@@ -230,6 +239,7 @@ class SemanticScholarClient:
             return Paper.from_api(data)
         return None
 
+    # PURPOSE: citations を取得する
     def get_citations(
         self, paper_id: str, limit: int = 50, fields: str = "title,year,citationCount"
     ) -> list[Paper]:
@@ -248,6 +258,7 @@ class SemanticScholarClient:
 # CLI
 # ---------------------------------------------------------------------------
 
+# PURPOSE: semantic_scholar の main 処理を実行する
 def main():
     import sys
 

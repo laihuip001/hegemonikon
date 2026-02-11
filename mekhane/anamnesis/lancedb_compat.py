@@ -19,6 +19,7 @@ if TYPE_CHECKING:
     import lancedb
 
 
+# PURPOSE: table names を取得する
 def get_table_names(db: "lancedb.DBConnection") -> list[str]:
     """Return table names as a plain list[str], suppressing deprecation warnings.
 

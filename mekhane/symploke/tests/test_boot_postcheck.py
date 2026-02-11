@@ -56,6 +56,7 @@ class TestGenerateBootTemplate:
 
     # PURPOSE: template_creates_file をテストする
     def test_template_creates_file(self):
+        """Verify template creates file behavior."""
         result = _make_mock_result(handoff_count=10, ki_count=5)
         path = generate_boot_template(result)
         assert path.exists(), f"Template file not created: {path}"
@@ -65,6 +66,7 @@ class TestGenerateBootTemplate:
 
     # PURPOSE: template_has_fill_markers をテストする
     def test_template_has_fill_markers(self):
+        """Verify template has fill markers behavior."""
         result = _make_mock_result(handoff_count=10, ki_count=5)
         path = generate_boot_template(result)
         content = path.read_text(encoding="utf-8")
@@ -74,6 +76,7 @@ class TestGenerateBootTemplate:
 
     # PURPOSE: template_has_required_markers をテストする
     def test_template_has_required_markers(self):
+        """Verify template has required markers behavior."""
         result = _make_mock_result(handoff_count=10, ki_count=5)
         path = generate_boot_template(result)
         content = path.read_text(encoding="utf-8")
@@ -86,6 +89,7 @@ class TestGenerateBootTemplate:
 
     # PURPOSE: template_has_handoff_sections をテストする
     def test_template_has_handoff_sections(self):
+        """Verify template has handoff sections behavior."""
         result = _make_mock_result(handoff_count=10, ki_count=5)
         path = generate_boot_template(result)
         content = path.read_text(encoding="utf-8")
@@ -107,6 +111,7 @@ class TestGenerateBootTemplate:
 
     # PURPOSE: template_has_checklist をテストする
     def test_template_has_checklist(self):
+        """Verify template has checklist behavior."""
         result = _make_mock_result()
         path = generate_boot_template(result)
         content = path.read_text(encoding="utf-8")
@@ -120,6 +125,7 @@ class TestPostcheckBootReport:
 
     # PURPOSE: missing_file_fails をテストする
     def test_missing_file_fails(self):
+        """Verify missing file fails behavior."""
         result = postcheck_boot_report("/tmp/nonexistent_boot_report.md", mode="detailed")
         assert not result["passed"]
         assert "File not found" in result["formatted"]

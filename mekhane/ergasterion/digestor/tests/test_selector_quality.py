@@ -20,6 +20,7 @@ import pytest
 
 # ─── Mock Paper ───────────────────────────────────────────
 
+# PURPOSE: Test suite validating mock paper correctness
 @dataclass
 class MockPaper:
     """テスト用の軽量 Paper"""
@@ -120,9 +121,11 @@ BORDERLINE_PAPERS = [
 # 層1: arXiv カテゴリフィルタ テスト
 # ═══════════════════════════════════════════════════════════
 
+# PURPOSE: Test suite validating category filter correctness
 class TestCategoryFilter:
     """層1: arXiv カテゴリフィルタの検証"""
 
+    # PURPOSE: Verify irrelevant papers rejected behaves correctly
     def test_irrelevant_papers_rejected(self):
         """無関係分野は全て除外される"""
         from mekhane.ergasterion.digestor.selector import _is_relevant_domain
@@ -132,6 +135,7 @@ class TestCategoryFilter:
                 f"{paper.id} ({paper.categories}) should be rejected"
             )
 
+    # PURPOSE: Verify relevant papers accepted behaves correctly
     def test_relevant_papers_accepted(self):
         """関連分野は全て通過する"""
         from mekhane.ergasterion.digestor.selector import _is_relevant_domain
@@ -141,6 +145,7 @@ class TestCategoryFilter:
                 f"{paper.id} ({paper.categories}) should be accepted"
             )
 
+    # PURPOSE: Verify no category passes behaves correctly
     def test_no_category_passes(self):
         """カテゴリなしは通す (偽陽性 > 偽陰性)"""
         from mekhane.ergasterion.digestor.selector import _is_relevant_domain
@@ -148,6 +153,7 @@ class TestCategoryFilter:
         paper = MockPaper(id="nocat", title="Unknown Source Paper", categories=[])
         assert _is_relevant_domain(paper)
 
+    # PURPOSE: Verify borderline cs lg passes behaves correctly
     def test_borderline_cs_lg_passes(self):
         """cs.LG を持つ論文は通過する"""
         from mekhane.ergasterion.digestor.selector import _is_relevant_domain
@@ -162,9 +168,11 @@ class TestCategoryFilter:
 # 層3: ドメインキーワード テスト
 # ═══════════════════════════════════════════════════════════
 
+# PURPOSE: Test suite validating domain relevance correctness
 class TestDomainRelevance:
     """層3: ドメインキーワード適合度の検証"""
 
+    # PURPOSE: Verify irrelevant low score behaves correctly
     def test_irrelevant_low_score(self):
         """無関連論文はドメイン適合度が低い"""
         from mekhane.ergasterion.digestor.selector import _domain_relevance
@@ -175,6 +183,7 @@ class TestDomainRelevance:
                 f"{paper.id} domain_relevance={score:.2f} should be < 0.34"
             )
 
+    # PURPOSE: Verify relevant high score behaves correctly
     def test_relevant_high_score(self):
         """関連論文はドメイン適合度が高い"""
         from mekhane.ergasterion.digestor.selector import _domain_relevance
@@ -190,9 +199,11 @@ class TestDomainRelevance:
 # 統合テスト: select_candidates (keyword mode)
 # ═══════════════════════════════════════════════════════════
 
+# PURPOSE: Test suite validating select candidates integration correctness
 class TestSelectCandidatesIntegration:
     """統合テスト: keyword モードでの候補選定"""
 
+    # PURPOSE: Verify irrelevant never selected behaves correctly
     def test_irrelevant_never_selected(self):
         """無関係論文は候補に選ばれない"""
         from mekhane.ergasterion.digestor.selector import DigestorSelector
@@ -206,6 +217,7 @@ class TestSelectCandidatesIntegration:
             f"{[c.paper.id for c in candidates]}"
         )
 
+    # PURPOSE: Verify mixed only relevant selected behaves correctly
     def test_mixed_only_relevant_selected(self):
         """混合リストから関連論文のみが選ばれる"""
         from mekhane.ergasterion.digestor.selector import DigestorSelector
@@ -228,6 +240,7 @@ class TestSelectCandidatesIntegration:
 # Live テスト (--live フラグで実行)
 # ═══════════════════════════════════════════════════════════
 
+# PURPOSE: Verify run live test behaves correctly
 def run_live_test():
     """実 arXiv API で候補を再生成して品質を確認"""
     print("=" * 60)

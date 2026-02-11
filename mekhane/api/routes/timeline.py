@@ -207,6 +207,7 @@ def _find_file_by_id(event_id: str) -> Path | None:
 
 # --- Endpoints ---
 
+# PURPOSE: timeline の timeline events 処理を実行する
 @router.get("/timeline/events")
 async def timeline_events(
     limit: int = Query(50, ge=1, le=200),
@@ -227,6 +228,7 @@ async def timeline_events(
     }
 
 
+# PURPOSE: timeline の timeline event detail 処理を実行する
 @router.get("/timeline/event/{event_id}")
 async def timeline_event_detail(event_id: str) -> dict[str, Any]:
     """個別イベントの全文コンテンツを返す。"""
@@ -260,6 +262,7 @@ async def timeline_event_detail(event_id: str) -> dict[str, Any]:
     }
 
 
+# PURPOSE: timeline の timeline stats 処理を実行する
 @router.get("/timeline/stats")
 async def timeline_stats() -> dict[str, Any]:
     """タイムラインの統計情報を返す。"""

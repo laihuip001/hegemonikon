@@ -31,15 +31,18 @@ from mekhane.anamnesis.gnosis_chat import (
 # ═══════════════════════════════════════
 
 
+# PURPOSE: Test suite validating conversation history correctness
 class TestConversationHistory:
     """マルチターン対話履歴のテスト."""
 
+    # PURPOSE: Verify initial state behaves correctly
     def test_initial_state(self):
         """初期状態: ターンなし."""
         h = ConversationHistory()
         assert h.turn_count == 0
         assert h.format_for_prompt() == ""
 
+    # PURPOSE: Verify add turn behaves correctly
     def test_add_turn(self):
         """ターン追加."""
         h = ConversationHistory()
@@ -48,6 +51,7 @@ class TestConversationHistory:
         assert h.turn_count == 1
         assert len(h.turns) == 2
 
+    # PURPOSE: Verify format user turn behaves correctly
     def test_format_user_turn(self):
         """user ターンのフォーマット."""
         h = ConversationHistory()
@@ -57,6 +61,7 @@ class TestConversationHistory:
         assert "What is FEP?" in fmt
         assert "<|im_end|>" in fmt
 
+    # PURPOSE: Verify format assistant turn behaves correctly
     def test_format_assistant_turn(self):
         """assistant ターンのフォーマット."""
         h = ConversationHistory()
@@ -65,6 +70,7 @@ class TestConversationHistory:
         assert "<|im_start|>assistant" in fmt
         assert "Free Energy Principle" in fmt
 
+    # PURPOSE: Verify format multi turn behaves correctly
     def test_format_multi_turn(self):
         """複数ターンのフォーマット — 正しい順序."""
         h = ConversationHistory()
@@ -77,6 +83,7 @@ class TestConversationHistory:
         assert fmt.index("Q1") < fmt.index("Q2")
         assert h.turn_count == 2
 
+    # PURPOSE: Verify max turns truncation behaves correctly
     def test_max_turns_truncation(self):
         """max_turns 超過時の古いターン削除."""
         h = ConversationHistory(max_turns=2)
@@ -89,6 +96,7 @@ class TestConversationHistory:
         assert h.turns[-1]["content"] == "A4"
         assert h.turns[-2]["content"] == "Q4"
 
+    # PURPOSE: Verify clear behaves correctly
     def test_clear(self):
         """clear() でリセット."""
         h = ConversationHistory()
@@ -97,6 +105,7 @@ class TestConversationHistory:
         assert h.turn_count == 0
         assert len(h.turns) == 0
 
+    # PURPOSE: Verify turn count odd entries behaves correctly
     def test_turn_count_odd_entries(self):
         """奇数エントリ時の turn_count (整数除算)."""
         h = ConversationHistory()
@@ -112,15 +121,18 @@ class TestConversationHistory:
 # ═══════════════════════════════════════
 
 
+# PURPOSE: Test suite validating chunk text correctness
 class TestChunkText:
     """KnowledgeIndexer._chunk_text のテスト."""
 
+    # PURPOSE: Verify short text single chunk behaves correctly
     def test_short_text_single_chunk(self):
         """chunk_size 以下のテキスト → 単一チャンク."""
         text = "Short text"
         result = KnowledgeIndexer._chunk_text(text, chunk_size=100)
         assert result == ["Short text"]
 
+    # PURPOSE: Verify markdown header split behaves correctly
     def test_markdown_header_split(self):
         """Markdown ヘッダーでセクション分割."""
         text = (
@@ -136,6 +148,7 @@ class TestChunkText:
         assert "Content B" in all_text
         assert "Content C" in all_text
 
+    # PURPOSE: Verify paragraph split behaves correctly
     def test_paragraph_split(self):
         """空行で段落分割 (Phase 2)."""
         # 各段落が chunk_size 以下だが合計は超える
@@ -144,6 +157,7 @@ class TestChunkText:
         result = KnowledgeIndexer._chunk_text(text, chunk_size=50)
         assert len(result) >= 2
 
+    # PURPOSE: Verify long text split behaves correctly
     def test_long_text_split(self):
         """改行で固定サイズ分割 (Phase 3)."""
         # 1000文字超、chunk_size=200 → 複数チャンク
@@ -155,6 +169,7 @@ class TestChunkText:
         for chunk in result:
             assert len(chunk) > 0
 
+    # PURPOSE: Verify filter short chunks behaves correctly
     def test_filter_short_chunks(self):
         """20文字以下のチャンクは除去."""
         text = "## A\nOK content here\n\n## B\nhi\n\n## C\nAnother good chunk"
@@ -162,15 +177,18 @@ class TestChunkText:
         for chunk in result:
             assert len(chunk) > 20
 
+    # PURPOSE: Verify empty text behaves correctly
     def test_empty_text(self):
         """空テキスト."""
         result = KnowledgeIndexer._chunk_text("", chunk_size=100)
         assert result == [""]
 
 
+# PURPOSE: Test suite validating split long text correctness
 class TestSplitLongText:
     """KnowledgeIndexer._split_long_text のテスト."""
 
+    # PURPOSE: Verify basic split behaves correctly
     def test_basic_split(self):
         """基本分割."""
         text = "A" * 300
@@ -179,6 +197,7 @@ class TestSplitLongText:
         for chunk in result:
             assert len(chunk) <= 100
 
+    # PURPOSE: Verify split at newline behaves correctly
     def test_split_at_newline(self):
         """改行位置で切断."""
         text = "A" * 60 + "\n" + "B" * 60
@@ -186,6 +205,7 @@ class TestSplitLongText:
         # 最初のチャンクが改行位置で切れている
         assert result[0].endswith("A" * 60)
 
+    # PURPOSE: Verify overlap behaves correctly
     def test_overlap(self):
         """overlap が機能する (次チャンクの開始が前チャンクの末尾と重複)."""
         text = "ABCDEFGHIJ" * 10  # 100 chars
@@ -193,9 +213,11 @@ class TestSplitLongText:
         assert len(result) >= 3
 
 
+# PURPOSE: Test suite validating build embedding text correctness
 class TestBuildEmbeddingText:
     """KnowledgeIndexer._build_embedding_text のテスト."""
 
+    # PURPOSE: Verify format behaves correctly
     def test_format(self):
         """[source] title\\ncontent 形式."""
         result = KnowledgeIndexer._build_embedding_text(
@@ -204,6 +226,7 @@ class TestBuildEmbeddingText:
         assert result.startswith("[handoff] My Paper\n")
         assert "This is the content" in result
 
+    # PURPOSE: Verify truncation behaves correctly
     def test_truncation(self):
         """content が 500文字制限にトランケート."""
         long_content = "x" * 1000
@@ -212,6 +235,7 @@ class TestBuildEmbeddingText:
         )
         assert len(result) <= 500
 
+    # PURPOSE: Verify prefix length affects content behaves correctly
     def test_prefix_length_affects_content(self):
         """長い title → content 埋め込み量が減る."""
         short_title = "T"
@@ -227,14 +251,17 @@ class TestBuildEmbeddingText:
 # ═══════════════════════════════════════
 
 
+# PURPOSE: Test suite validating reranker correctness
 class TestReranker:
     """Reranker のテスト — model は mock."""
 
+    # PURPOSE: Verify empty results behaves correctly
     def test_empty_results(self):
         """空結果はそのまま返却."""
         rr = Reranker()
         assert rr.rerank("query", []) == []
 
+    # PURPOSE: Verify fallback on load failure behaves correctly
     def test_fallback_on_load_failure(self):
         """モデルロード失敗時 → bi-encoder で distance ソート."""
         rr = Reranker()
@@ -251,6 +278,7 @@ class TestReranker:
         assert output[0]["title"] == "B"
         assert output[1]["title"] == "A"
 
+    # PURPOSE: Verify rerank with mock model behaves correctly
     def test_rerank_with_mock_model(self):
         """mock cross-encoder での rerank."""
         rr = Reranker()
@@ -269,6 +297,7 @@ class TestReranker:
         assert output[0]["_rerank_score"] == 5.0
         assert output[1]["title"] == "C"
 
+    # PURPOSE: Verify score threshold filter behaves correctly
     def test_score_threshold_filter(self):
         """SCORE_THRESHOLD 以下のスコアはフィルタ."""
         rr = Reranker()
@@ -283,6 +312,7 @@ class TestReranker:
         assert len(output) == 1
         assert output[0]["title"] == "Good"
 
+    # PURPOSE: Verify knowledge table uses content behaves correctly
     def test_knowledge_table_uses_content(self):
         """knowledge テーブルは content フィールドを使用."""
         rr = Reranker()
@@ -309,18 +339,22 @@ class TestReranker:
 # ═══════════════════════════════════════
 
 
+# PURPOSE: Test suite validating assess confidence correctness
 class TestAssessConfidence:
     """GnosisChat._assess_confidence のテスト."""
 
+    # PURPOSE: Verify chat behaves correctly
     @pytest.fixture
     def chat(self):
         """LLM/GPU 依存なしで GnosisChat インスタンスを生成."""
         return GnosisChat.__new__(GnosisChat)
 
+    # PURPOSE: Verify no results returns none behaves correctly
     def test_no_results_returns_none(self, chat):
         """結果なし → CONFIDENCE_NONE."""
         assert chat._assess_confidence([]) == "none"
 
+    # PURPOSE: Verify close results high behaves correctly
     def test_close_results_high(self, chat):
         """min_dist < 0.6 + n>=3 + avg < 0.75 → high."""
         results = [
@@ -330,33 +364,41 @@ class TestAssessConfidence:
         ]
         assert chat._assess_confidence(results) == "high"
 
+    # PURPOSE: Verify single close result high behaves correctly
     def test_single_close_result_high(self, chat):
         """min_dist < 0.7 → high (単一でも)."""
         results = [{"_distance": 0.65}]
         assert chat._assess_confidence(results) == "high"
 
+    # PURPOSE: Verify medium confidence behaves correctly
     def test_medium_confidence(self, chat):
         """min_dist 0.7-0.8 → medium."""
         results = [{"_distance": 0.75}]
         assert chat._assess_confidence(results) == "medium"
 
+    # PURPOSE: Verify low confidence behaves correctly
     def test_low_confidence(self, chat):
         """min_dist >= 0.8 → low."""
         results = [{"_distance": 0.82}]
         assert chat._assess_confidence(results) == "low"
 
 
+# PURPOSE: Test suite validating build context correctness
 class TestBuildContext:
     """GnosisChat._build_context のテスト."""
 
+    # PURPOSE: Verify chat behaves correctly
     @pytest.fixture
     def chat(self):
+        """Verify chat behavior."""
         return GnosisChat.__new__(GnosisChat)
 
+    # PURPOSE: Verify empty results behaves correctly
     def test_empty_results(self, chat):
         """結果なし → 空文字列."""
         assert chat._build_context([]) == ""
 
+    # PURPOSE: Verify numbering behaves correctly
     def test_numbering(self, chat):
         """結果に [1], [2] 番号が付く."""
         results = [
@@ -367,6 +409,7 @@ class TestBuildContext:
         assert "[1]" in ctx
         assert "[2]" in ctx
 
+    # PURPOSE: Verify knowledge uses content behaves correctly
     def test_knowledge_uses_content(self, chat):
         """knowledge テーブルは content を使う."""
         results = [
@@ -382,6 +425,7 @@ class TestBuildContext:
         ctx = chat._build_context(results)
         assert "Full knowledge content" in ctx
 
+    # PURPOSE: Verify papers uses abstract behaves correctly
     def test_papers_uses_abstract(self, chat):
         """papers テーブルは abstract を使う."""
         results = [
@@ -396,6 +440,7 @@ class TestBuildContext:
         ctx = chat._build_context(results)
         assert "Paper abstract here" in ctx
 
+    # PURPOSE: Verify source grounding behaves correctly
     def test_source_grounding(self, chat):
         """primary_key が Source として含まれる."""
         results = [
@@ -410,6 +455,7 @@ class TestBuildContext:
         ctx = chat._build_context(results)
         assert "Source: handoff:session_2026:0" in ctx
 
+    # PURPOSE: Verify relevance score behaves correctly
     def test_relevance_score(self, chat):
         """Relevance が 1-distance で計算される."""
         results = [
@@ -419,9 +465,11 @@ class TestBuildContext:
         assert "Relevance: 0.70" in ctx
 
 
+# PURPOSE: Test suite validating gnosis chat init correctness
 class TestGnosisChatInit:
     """GnosisChat.__init__ のテスト."""
 
+    # PURPOSE: Verify defaults behaves correctly
     def test_defaults(self):
         """デフォルトパラメータ."""
         with patch("mekhane.anamnesis.gnosis_chat.Reranker"):
@@ -433,6 +481,7 @@ class TestGnosisChatInit:
             assert chat.search_papers is True
             assert chat.steering_profile == "hegemonikon"
 
+    # PURPOSE: Verify custom params behaves correctly
     def test_custom_params(self):
         """カスタムパラメータ."""
         with patch("mekhane.anamnesis.gnosis_chat.Reranker"):
@@ -448,12 +497,14 @@ class TestGnosisChatInit:
             assert chat._reranker is None
             assert chat.steering_profile == "academic"
 
+    # PURPOSE: Verify steering profiles exist behaves correctly
     def test_steering_profiles_exist(self):
         """定義済み steering profiles の存在確認."""
         assert "hegemonikon" in GnosisChat.STEERING_PROFILES
         assert "neutral" in GnosisChat.STEERING_PROFILES
         assert "academic" in GnosisChat.STEERING_PROFILES
 
+    # PURPOSE: Verify distance thresholds behaves correctly
     def test_distance_thresholds(self):
         """距離閾値の妥当性."""
         assert 0 < GnosisChat.DISTANCE_THRESHOLD < 1.5
@@ -465,9 +516,11 @@ class TestGnosisChatInit:
 # ═══════════════════════════════════════
 
 
+# PURPOSE: Test suite validating discover knowledge files correctness
 class TestDiscoverKnowledgeFiles:
     """Filesystem をモックしたファイル発見テスト."""
 
+    # PURPOSE: Verify returns list behaves correctly
     def test_returns_list(self, tmp_path):
         """戻り値が list[dict] 形式."""
         with patch("mekhane.anamnesis.gnosis_chat.MNEME_SESSIONS", tmp_path):
@@ -482,6 +535,7 @@ class TestDiscoverKnowledgeFiles:
                                             result = KnowledgeIndexer.discover_knowledge_files()
             assert isinstance(result, list)
 
+    # PURPOSE: Verify discovers handoff behaves correctly
     def test_discovers_handoff(self, tmp_path):
         """handoff_*.md ファイルを発見."""
         sessions = tmp_path / "sessions"

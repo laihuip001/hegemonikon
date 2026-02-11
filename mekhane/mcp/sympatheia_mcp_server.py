@@ -36,6 +36,7 @@ if sys.platform == "win32":
 _original_stdout = sys.stdout
 
 
+# PURPOSE: sympatheia_mcp_server の log 処理を実行する
 def log(msg):
     print(f"[sympatheia-mcp] {msg}", file=sys.stderr, flush=True)
 
@@ -50,6 +51,7 @@ sys.path.insert(0, str(_PROJECT_ROOT))
 log(f"Project root: {_PROJECT_ROOT}")
 
 
+# PURPOSE: StdoutSuppressor の機能を提供する
 class StdoutSuppressor:
     def __init__(self):
         self._null = io.StringIO()
@@ -120,6 +122,7 @@ _RESOURCES = {
 }
 
 
+# PURPOSE: sympatheia_mcp_server の list resources 処理を実行する
 @server.list_resources()
 async def list_resources():
     """公開リソース一覧。"""
@@ -134,6 +137,7 @@ async def list_resources():
     return resources
 
 
+# PURPOSE: sympatheia_mcp_server の read resource 処理を実行する
 @server.read_resource()
 async def read_resource(uri: str):
     """リソース読み取り。"""
@@ -159,6 +163,7 @@ async def read_resource(uri: str):
 
 # ============ Tools ============
 
+# PURPOSE: sympatheia_mcp_server の list tools 処理を実行する
 @server.list_tools()
 async def list_tools():
     """利用可能なツール一覧。"""
@@ -242,6 +247,7 @@ async def list_tools():
     ]
 
 
+# PURPOSE: sympatheia_mcp_server の call tool 処理を実行する
 @server.call_tool(validate_input=True)
 async def call_tool(name: str, arguments: dict):
     """ツール実行。"""
@@ -446,6 +452,7 @@ async def call_tool(name: str, arguments: dict):
         return [TextContent(type="text", text=f"Error: {e}")]
 
 
+# PURPOSE: sympatheia_mcp_server の main 処理を実行する
 async def main():
     """MCP サーバー起動。"""
     log("Starting stdio server...")

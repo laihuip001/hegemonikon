@@ -139,6 +139,7 @@ class TestOrthogonality:
     # PURPOSE: matrix の処理
     @pytest.fixture
     def matrix(self) -> PerspectiveMatrix:
+        """Verify matrix behavior."""
         return PerspectiveMatrix.load()
 
     # PURPOSE: Verify perspectives are exactly domains × axes

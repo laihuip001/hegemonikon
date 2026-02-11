@@ -149,6 +149,7 @@ def list_prompts() -> list[dict]:
 class SkillAdapter:
     """Interface for Hegemonikon Skills (M-Series)."""
 
+    # PURPOSE: prompt を検索する
     @staticmethod
     # PURPOSE: Find best matching prompts for a user query.
     def find_prompt(query: str, threshold: float = 0.5) -> list[dict]:
@@ -181,6 +182,7 @@ class SkillAdapter:
         matched.sort(key=lambda x: x["score"], reverse=True)
         return matched
 
+    # PURPOSE: draft を構築する
     @staticmethod
     # PURPOSE: Create a new draft prompt from skill output.
     def create_draft(slug: str, role: str, goal: str, **kwargs) -> str:

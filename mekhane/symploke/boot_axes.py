@@ -27,6 +27,7 @@ from typing import Any, Dict, List, Optional
 # GPU Preflight
 # ─────────────────────────────────────────────────────────────────────
 
+# PURPOSE: boot_axes の gpu preflight 処理を実行する
 def gpu_preflight() -> tuple[bool, str]:
     """GPU プリフライトチェック。
 
@@ -50,6 +51,7 @@ def gpu_preflight() -> tuple[bool, str]:
 # 軸 A: Handoff
 # ─────────────────────────────────────────────────────────────────────
 
+# PURPOSE: handoffs を読み込む
 def load_handoffs(mode: str, context: Optional[str] = None, **kw) -> dict:
     print(" [1/13] 📋 Searching Handoffs...", file=sys.stderr, end="", flush=True)
     from mekhane.symploke.handoff_search import get_boot_handoffs
@@ -62,6 +64,7 @@ def load_handoffs(mode: str, context: Optional[str] = None, **kw) -> dict:
 # 軸 B: Sophia (KI)
 # ─────────────────────────────────────────────────────────────────────
 
+# PURPOSE: sophia を読み込む
 def load_sophia(mode: str, context: Optional[str] = None, **kw) -> dict:
     print(" [2/13] 📚 Ingesting Knowledge (Sophia)...", file=sys.stderr, end="", flush=True)
     ki_context = context or kw.get("ki_context")
@@ -86,6 +89,7 @@ def load_sophia(mode: str, context: Optional[str] = None, **kw) -> dict:
 # 軸 C: Persona
 # ─────────────────────────────────────────────────────────────────────
 
+# PURPOSE: persona を読み込む
 def load_persona(mode: str, context: Optional[str] = None, **kw) -> dict:
     print(" [3/13] 👤 Loading Persona...", file=sys.stderr, end="", flush=True)
     from mekhane.symploke.persona import get_boot_persona
@@ -98,6 +102,7 @@ def load_persona(mode: str, context: Optional[str] = None, **kw) -> dict:
 # 軸 D: PKS (能動的知識プッシュ)
 # ─────────────────────────────────────────────────────────────────────
 
+# PURPOSE: pks を読み込む
 def load_pks(mode: str, context: Optional[str] = None, **kw) -> dict:
     result: dict = {"nuggets": [], "count": 0, "formatted": ""}
     if mode == "fast":
@@ -145,6 +150,7 @@ def load_pks(mode: str, context: Optional[str] = None, **kw) -> dict:
 # 軸 E: Safety Contract Audit
 # ─────────────────────────────────────────────────────────────────────
 
+# PURPOSE: safety を読み込む
 def load_safety(mode: str, context: Optional[str] = None, **kw) -> dict:
     result: dict = {"skills": 0, "workflows": 0, "errors": 0, "warnings": 0, "formatted": ""}
     print(" [5/13] 🛡️ Running Safety Contract Audit...", file=sys.stderr, end="", flush=True)
@@ -182,6 +188,7 @@ def load_safety(mode: str, context: Optional[str] = None, **kw) -> dict:
 # 軸 H: EPT (Existence Purpose Tensor)
 # ─────────────────────────────────────────────────────────────────────
 
+# PURPOSE: ept を読み込む
 def load_ept(mode: str, context: Optional[str] = None, **kw) -> dict:
     result: dict = {"score": 0, "total": 0, "pct": 0, "formatted": ""}
     print(" [6/13] 📐 Running EPT Matrix...", file=sys.stderr, end="", flush=True)
@@ -224,6 +231,7 @@ def load_ept(mode: str, context: Optional[str] = None, **kw) -> dict:
 # 軸 G: Digestor 候補 (論文レコメンド)
 # ─────────────────────────────────────────────────────────────────────
 
+# PURPOSE: digestor を読み込む
 def load_digestor(mode: str, context: Optional[str] = None, **kw) -> dict:
     result: dict = {"candidates": [], "count": 0, "formatted": ""}
     print(" [7/13] 📄 Loading Digest Candidates...", file=sys.stderr, end="", flush=True)
@@ -257,6 +265,7 @@ def load_digestor(mode: str, context: Optional[str] = None, **kw) -> dict:
 # 軸 F: Attractor Dispatch Engine (最大: FEP v2 + TheoremAttractor 統合)
 # ─────────────────────────────────────────────────────────────────────
 
+# PURPOSE: attractor を読み込む
 def load_attractor(mode: str, context: Optional[str] = None, **kw) -> dict:
     """Attractor 軸: Series 推薦 + Theorem 粒度 + FEP v2 統合推論."""
     result: dict = {"series": [], "workflows": [], "llm_format": "", "formatted": ""}
@@ -510,6 +519,7 @@ def _format_attractor(
 # 軸 I: Projects
 # ─────────────────────────────────────────────────────────────────────
 
+# PURPOSE: projects を読み込む
 def load_projects(mode: str, context: Optional[str] = None, **kw) -> dict:
     result: dict = {"projects": [], "active": 0, "dormant": 0, "total": 0, "formatted": ""}
     print(" [9/13] 📦 Loading Projects Registry...", file=sys.stderr, end="", flush=True)
@@ -527,6 +537,7 @@ def load_projects(mode: str, context: Optional[str] = None, **kw) -> dict:
 # 軸 J: Skills
 # ─────────────────────────────────────────────────────────────────────
 
+# PURPOSE: skills を読み込む
 def load_skills(mode: str, context: Optional[str] = None, **kw) -> dict:
     result: dict = {"skills": [], "count": 0, "skill_paths": [], "formatted": ""}
     print(" [10/13] 🧠 Loading Skills...", file=sys.stderr, end="", flush=True)
@@ -544,6 +555,7 @@ def load_skills(mode: str, context: Optional[str] = None, **kw) -> dict:
 # 軸 K: Doxa (信念ストア)
 # ─────────────────────────────────────────────────────────────────────
 
+# PURPOSE: doxa を読み込む
 def load_doxa(mode: str, context: Optional[str] = None, **kw) -> dict:
     result: dict = {"beliefs_loaded": 0, "active_count": 0, "promotion_candidates": [], "formatted": ""}
     print(" [11/13] 🧿 Loading Doxa Beliefs...", file=sys.stderr, end="", flush=True)
@@ -570,6 +582,7 @@ def load_doxa(mode: str, context: Optional[str] = None, **kw) -> dict:
 # 軸 L: Credit Assignment (フィードバック学習)
 # ─────────────────────────────────────────────────────────────────────
 
+# PURPOSE: feedback を読み込む
 def load_feedback(mode: str, context: Optional[str] = None, **kw) -> dict:
     result: dict = {"total": 0, "accept_rate": 0.0, "formatted": ""}
     print(" [12/13] 🎓 Loading Feedback History...", file=sys.stderr, end="", flush=True)
@@ -606,6 +619,7 @@ def load_feedback(mode: str, context: Optional[str] = None, **kw) -> dict:
 # 軸 M: Proactive Push (知識推薦)
 # ─────────────────────────────────────────────────────────────────────
 
+# PURPOSE: proactive push を読み込む
 def load_proactive_push(mode: str, context: Optional[str] = None, **kw) -> dict:
     """Proactive Push 軸: 知識が自ら語りかけてくる推薦."""
     result: dict = {"recommendations": [], "count": 0, "formatted": ""}
@@ -645,6 +659,7 @@ def load_proactive_push(mode: str, context: Optional[str] = None, **kw) -> dict:
 # 軸 N: Violation Trends (違反傾向)
 # ─────────────────────────────────────────────────────────────────────
 
+# PURPOSE: violations を読み込む
 def load_violations(mode: str, context: Optional[str] = None, **kw) -> dict:
     """Violation Trends 軸: 直近の違反パターン傾向を /boot に表示."""
     result: dict = {"total": 0, "patterns": {}, "recurrence": 0, "formatted": ""}
@@ -669,6 +684,7 @@ def load_violations(mode: str, context: Optional[str] = None, **kw) -> dict:
 # 軸 O: Gnōsis Advice (知識アドバイス)
 # ─────────────────────────────────────────────────────────────────────
 
+# PURPOSE: gnosis advice を読み込む
 def load_gnosis_advice(mode: str, context: Optional[str] = None, **kw) -> dict:
     """Gnōsis Advice 軸: WF に関連する学術知識のハイライト."""
     result: dict = {"advice": "", "formatted": ""}

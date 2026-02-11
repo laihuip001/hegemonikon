@@ -88,6 +88,7 @@ class ConversationHistory:
     def clear(self):
         self.turns.clear()
 
+    # PURPOSE: gnosis_chat の turn count 処理を実行する
     @property
 # PURPOSE: Cross-encoder Reranker for precision improvement.
     # PURPOSE: Cross-encoder Reranker for precision improvement. Strategy: bi-encoder でオーバーフェッチ
@@ -95,6 +96,7 @@ class ConversationHistory:
         return len(self.turns) // 2
 
 
+# PURPOSE: Reranker の機能を提供する
 class Reranker:
     """Cross-encoder Reranker for precision improvement.
 
@@ -203,6 +205,7 @@ class Reranker:
 class KnowledgeIndexer:
     """Hegemonikón 全知識をインデックスに追加するユーティリティ."""
 
+    # PURPOSE: gnosis_chat の discover knowledge files 処理を実行する
     @staticmethod
     # PURPOSE: 全知識ソースからファイルを発見.
     def discover_knowledge_files() -> list[dict]:
@@ -415,6 +418,7 @@ class KnowledgeIndexer:
         max_content = 500 - len(prefix)
         return prefix + content[:max_content]
 
+    # PURPOSE: gnosis_chat の index knowledge 処理を実行する
     @staticmethod
     # PURPOSE: 全知識をインデックスに追加.
     def index_knowledge(force_reindex: bool = False) -> int:

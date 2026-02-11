@@ -39,6 +39,7 @@ def ept_checker():
 def tmp_project(tmp_path):
     """テスト用プロジェクトを構築するファクトリ"""
     def _create(files: dict) -> Path:
+        """Verify create behavior."""
         for name, content in files.items():
             fp = tmp_path / name
             fp.parent.mkdir(parents=True, exist_ok=True)

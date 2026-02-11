@@ -17,6 +17,7 @@ from dataclasses import dataclass, asdict
 from typing import List, Dict, Optional
 
 
+# PURPOSE: FailureRecord の機能を提供する
 @dataclass
 # PURPOSE: 失敗記録
 class FailureRecord:
@@ -30,6 +31,7 @@ class FailureRecord:
     resolution: Optional[str] = None
 
 
+# PURPOSE: WarningRecord の機能を提供する
 @dataclass
 # PURPOSE: 警告記録
 class WarningRecord:
@@ -57,6 +59,7 @@ class FailureDB:
         self.db_path.parent.mkdir(parents=True, exist_ok=True)
         self._data: Dict = None
 
+    # PURPOSE: failure_db の data 処理を実行する
     @property
     # PURPOSE: データを遅延読み込み
     def data(self) -> Dict:

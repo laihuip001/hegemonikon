@@ -17,9 +17,11 @@ from pydantic import BaseModel, Field
 
 # --- Pydantic Models ---
 
+# PURPOSE: CCLParseRequest の機能を提供する
 class CCLParseRequest(BaseModel):
     ccl: str = Field(description="CCL 式 (例: '/noe+ >> /met')")
 
+# PURPOSE: CCLParseResponse の機能を提供する
 class CCLParseResponse(BaseModel):
     success: bool
     ccl: str
@@ -29,26 +31,31 @@ class CCLParseResponse(BaseModel):
     plan_template: Optional[str] = None
     error: Optional[str] = None
 
+# PURPOSE: CCLExecuteRequest の機能を提供する
 class CCLExecuteRequest(BaseModel):
     ccl: str = Field(description="CCL 式")
     context: str = Field(default="", description="実行コンテキスト")
 
+# PURPOSE: CCLExecuteResponse の機能を提供する
 class CCLExecuteResponse(BaseModel):
     success: bool
     ccl: str
     result: Optional[dict[str, Any]] = None
     error: Optional[str] = None
 
+# PURPOSE: WFSummary の機能を提供する
 class WFSummary(BaseModel):
     name: str
     description: str
     ccl: str = ""
     modes: list[str] = []
 
+# PURPOSE: WFListResponse の機能を提供する
 class WFListResponse(BaseModel):
     total: int
     workflows: list[WFSummary]
 
+# PURPOSE: WFDetailResponse の機能を提供する
 class WFDetailResponse(BaseModel):
     name: str
     description: str
@@ -65,6 +72,7 @@ class WFDetailResponse(BaseModel):
 router = APIRouter(tags=["ccl"])
 
 
+# PURPOSE: ccl を解析する
 @router.post("/ccl/parse", response_model=CCLParseResponse)
 async def parse_ccl(request: CCLParseRequest) -> CCLParseResponse:
     """CCL 式をパースし、AST ツリー + WF パスを返す。"""
@@ -88,6 +96,7 @@ async def parse_ccl(request: CCLParseRequest) -> CCLParseResponse:
         )
 
 
+# PURPOSE: ccl を実行する
 @router.post("/ccl/execute", response_model=CCLExecuteResponse)
 async def execute_ccl(request: CCLExecuteRequest) -> CCLExecuteResponse:
     """CCL 式を Synergeia Coordinator 経由で実行する。"""
@@ -107,6 +116,7 @@ async def execute_ccl(request: CCLExecuteRequest) -> CCLExecuteResponse:
         )
 
 
+# PURPOSE: ccl の list workflows 処理を実行する
 @router.get("/wf/list", response_model=WFListResponse)
 async def list_workflows() -> WFListResponse:
     """WorkflowRegistry から全 WF 一覧を取得。"""
@@ -132,6 +142,7 @@ async def list_workflows() -> WFListResponse:
         return WFListResponse(total=0, workflows=[])
 
 
+# PURPOSE: workflow を取得する
 @router.get("/wf/{name}", response_model=WFDetailResponse)
 async def get_workflow(name: str) -> WFDetailResponse:
     """WF 定義の詳細を取得。"""

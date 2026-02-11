@@ -25,6 +25,7 @@ class HealthItemResponse(BaseModel):
     emoji: str = ""
 
 
+# PURPOSE: HealthReportResponse の機能を提供する
 class HealthReportResponse(BaseModel):
     """全体ヘルスレポート。"""
     timestamp: str
@@ -32,6 +33,7 @@ class HealthReportResponse(BaseModel):
     score: float = Field(ge=0.0, le=1.0, description="0.0-1.0 総合スコア")
 
 
+# PURPOSE: HealthCheckResponse の機能を提供する
 class HealthCheckResponse(BaseModel):
     """軽量ヘルスチェック。"""
     status: str = "ok"
@@ -45,6 +47,7 @@ _start_time = time.time()
 router = APIRouter(prefix="/status", tags=["status"])
 
 
+# PURPOSE: status の health check 処理を実行する
 @router.get("/health", response_model=HealthCheckResponse)
 async def health_check(request: Request) -> HealthCheckResponse:
     """Tauri ヘルスチェック用の軽量エンドポイント。"""
@@ -57,6 +60,7 @@ async def health_check(request: Request) -> HealthCheckResponse:
     )
 
 
+# PURPOSE: status の full status 処理を実行する
 @router.get("", response_model=HealthReportResponse)
 async def full_status() -> HealthReportResponse:
     """全サービスの詳細ヘルスレポート。

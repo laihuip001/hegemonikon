@@ -20,9 +20,11 @@ import pytest
 # ============ 1. MeaningfulTrace — context regression ============
 
 
+# PURPOSE: Test suite validating meaningful trace context regression correctness
 class TestMeaningfulTraceContextRegression:
     """Verify that context= is actually passed to MeaningfulTrace."""
 
+    # PURPOSE: Verify mark meaningful with context behaves correctly
     def test_mark_meaningful_with_context(self):
         """context must be stored in the trace, not silently dropped."""
         from mekhane.fep.meaningful_traces import (
@@ -50,6 +52,7 @@ class TestMeaningfulTraceContextRegression:
 
         clear_session_traces()
 
+    # PURPOSE: Verify mark meaningful context none by default behaves correctly
     def test_mark_meaningful_context_none_by_default(self):
         """context should default to None, not crash."""
         from mekhane.fep.meaningful_traces import mark_meaningful, clear_session_traces
@@ -59,6 +62,7 @@ class TestMeaningfulTraceContextRegression:
         assert trace.context is None
         clear_session_traces()
 
+    # PURPOSE: Verify trace roundtrip with context behaves correctly
     def test_trace_roundtrip_with_context(self):
         """context must survive to_dict -> from_dict roundtrip."""
         from mekhane.fep.meaningful_traces import MeaningfulTrace
@@ -77,6 +81,7 @@ class TestMeaningfulTraceContextRegression:
         restored = MeaningfulTrace.from_dict(data)
         assert restored.context == "survives roundtrip"
 
+    # PURPOSE: Verify save load preserves context behaves correctly
     def test_save_load_preserves_context(self):
         """context must survive save -> load cycle."""
         from mekhane.fep.meaningful_traces import (
@@ -111,9 +116,11 @@ class TestMeaningfulTraceContextRegression:
 # ============ 2. FailureDB — resolution regression ============
 
 
+# PURPOSE: Test suite validating failure d b resolution regression correctness
 class TestFailureDBResolutionRegression:
     """Verify that resolution= is actually passed to FailureRecord."""
 
+    # PURPOSE: Verify record failure with resolution behaves correctly
     def test_record_failure_with_resolution(self):
         """resolution must be stored, not silently dropped."""
         from mekhane.ccl.learning.failure_db import FailureDB
@@ -134,6 +141,7 @@ class TestFailureDBResolutionRegression:
             failure = db.data["failures"][record_id]
             assert failure["resolution"] == "operators.md を確認"
 
+    # PURPOSE: Verify record failure without resolution behaves correctly
     def test_record_failure_without_resolution(self):
         """resolution=None by default, not crash."""
         from mekhane.ccl.learning.failure_db import FailureDB
@@ -151,6 +159,7 @@ class TestFailureDBResolutionRegression:
             failure = db.data["failures"][record_id]
             assert failure["resolution"] is None
 
+    # PURPOSE: Verify record failure roundtrip behaves correctly
     def test_record_failure_roundtrip(self):
         """Failures with resolution must survive save -> reload."""
         from mekhane.ccl.learning.failure_db import FailureDB
@@ -177,9 +186,11 @@ class TestFailureDBResolutionRegression:
 # ============ 3. CCL Executor — context regression ============
 
 
+# PURPOSE: Test suite validating executor context regression correctness
 class TestExecutorContextRegression:
     """Verify that context= is passed to ExecutionResult."""
 
+    # PURPOSE: Verify execute preserves context behaves correctly
     def test_execute_preserves_context(self):
         """ExecutionResult.context must contain the actual ExecutionContext."""
         from mekhane.ccl.executor import ZeroTrustCCLExecutor
@@ -191,6 +202,7 @@ class TestExecutorContextRegression:
         assert result.context.ccl_expr == "/noe"
         assert result.context.injected_prompt  # Not empty
 
+    # PURPOSE: Verify execute result access chain behaves correctly
     def test_execute_result_access_chain(self):
         """Can traverse result.context.ccl_expr without error."""
         from mekhane.ccl.executor import ZeroTrustCCLExecutor
@@ -207,9 +219,11 @@ class TestExecutorContextRegression:
 # ============ 4. Typos — tool_chain regression ============
 
 
+# PURPOSE: Test suite validating typos tool chain regression correctness
 class TestTyposToolChainRegression:
     """Verify that tool_chain= is passed to ContextItem."""
 
+    # PURPOSE: Verify context item tool chain behaves correctly
     def test_context_item_tool_chain(self):
         """ContextItem must preserve tool_chain field."""
         import sys
@@ -224,6 +238,7 @@ class TestTyposToolChainRegression:
         )
         assert item.tool_chain == "gnosis.tool(search)"
 
+    # PURPOSE: Verify parse mcp with tool chain behaves correctly
     def test_parse_mcp_with_tool_chain(self):
         """Parser should extract MCP context references."""
         import sys
@@ -244,9 +259,11 @@ class TestTyposToolChainRegression:
 # ============ 5. Cross-module integration ============
 
 
+# PURPOSE: Test suite validating cross module integration correctness
 class TestCrossModuleIntegration:
     """Tests that span multiple modules to catch integration issues."""
 
+    # PURPOSE: Verify traces format for boot behaves correctly
     def test_traces_format_for_boot(self):
         """Verify traces with context format correctly for boot display."""
         from mekhane.fep.meaningful_traces import MeaningfulTrace, format_traces_for_boot
@@ -272,6 +289,7 @@ class TestCrossModuleIntegration:
         assert "洞察" in output  # intensity 2
         assert "Creator shared" in output
 
+    # PURPOSE: Verify failure db warnings flow behaves correctly
     def test_failure_db_warnings_flow(self):
         """Verify full flow: record failure with resolution -> get warnings."""
         from mekhane.ccl.learning.failure_db import FailureDB
@@ -300,6 +318,7 @@ class TestCrossModuleIntegration:
             assert "🔴" in formatted  # critical known issue
             assert "否定" in formatted  # from past failure
 
+    # PURPOSE: Verify executor regeneration prompt uses context behaves correctly
     def test_executor_regeneration_prompt_uses_context(self):
         """Regeneration prompt must use result.context (was None before fix)."""
         from mekhane.ccl.executor import ZeroTrustCCLExecutor
@@ -317,10 +336,12 @@ class TestCrossModuleIntegration:
 # ============ 6. JulesClient — regression (async) ============
 
 
+# PURPOSE: Test suite validating jules client param regression correctness
 class TestJulesClientParamRegression:
     """Verify jules_client params are passed correctly.
     These use mocks since we can't hit the real API."""
 
+    # PURPOSE: Verify jules session has source behaves correctly
     def test_jules_session_has_source(self):
         """JulesSession must accept and store source."""
         from mekhane.symploke.jules_client import JulesSession, SessionState
@@ -334,6 +355,7 @@ class TestJulesClientParamRegression:
         )
         assert session.source == "sources/github/owner/repo"
 
+    # PURPOSE: Verify unknown state error has session id behaves correctly
     def test_unknown_state_error_has_session_id(self):
         """UnknownStateError must store session_id."""
         from mekhane.symploke.jules_client import UnknownStateError
@@ -343,6 +365,7 @@ class TestJulesClientParamRegression:
         assert error.state == "WEIRD"
         assert "sess-123" in str(error)
 
+    # PURPOSE: Verify session state from string known behaves correctly
     def test_session_state_from_string_known(self):
         """SessionState.from_string should parse known states."""
         from mekhane.symploke.jules_client import SessionState
@@ -351,6 +374,7 @@ class TestJulesClientParamRegression:
         assert SessionState.from_string("FAILED") == SessionState.FAILED
         assert SessionState.from_string("QUEUED") == SessionState.QUEUED
 
+    # PURPOSE: Verify session state from string unknown behaves correctly
     def test_session_state_from_string_unknown(self):
         """SessionState.from_string should return UNKNOWN for unknown states."""
         from mekhane.symploke.jules_client import SessionState
@@ -358,6 +382,7 @@ class TestJulesClientParamRegression:
         state = SessionState.from_string("TOTALLY_NEW_STATE")
         assert state == SessionState.UNKNOWN
 
+    # PURPOSE: Verify jules result success requires completed behaves correctly
     def test_jules_result_success_requires_completed(self):
         """JulesResult.is_success must check session.state == COMPLETED."""
         from mekhane.symploke.jules_client import (
@@ -390,9 +415,11 @@ class TestJulesClientParamRegression:
 # ============ 7. DigestorMCP — dry_run regression ============
 
 
+# PURPOSE: Test suite validating digestor m c p dry run regression correctness
 class TestDigestorMCPDryRunRegression:
     """Verify dry_run is passed to pipeline.run()."""
 
+    # PURPOSE: Verify pipeline run signature behaves correctly
     def test_pipeline_run_signature(self):
         """DigestorPipeline.run should accept dry_run parameter."""
         try:
@@ -408,9 +435,11 @@ class TestDigestorMCPDryRunRegression:
 # ============ 8. Anti-regression scan ============
 
 
+# PURPOSE: Test suite validating anti regression scan correctness
 class TestAntiRegressionScan:
     """Scan for the dangerous comment pattern to catch future occurrences."""
 
+    # PURPOSE: Verify no removed self assignment in production code behaves correctly
     def test_no_removed_self_assignment_in_production_code(self):
         """No production Python files should have commented-out self-assignments.
         
@@ -451,6 +480,7 @@ class TestAntiRegressionScan:
 # ============ 9. D1: JulesClient json= mock verification ============
 
 
+# PURPOSE: Test suite validating jules client json passthrough correctness
 class TestJulesClientJsonPassthrough:
     """D1: Verify _request() actually passes json= to aiohttp.session.request().
 
@@ -458,6 +488,7 @@ class TestJulesClientJsonPassthrough:
     all HTTP POST bodies to be empty.
     """
 
+    # PURPOSE: Verify request passes json to session behaves correctly
     @pytest.mark.asyncio
     async def test_request_passes_json_to_session(self):
         """json payload must reach aiohttp.session.request()."""
@@ -501,6 +532,7 @@ class TestJulesClientJsonPassthrough:
 # ============ 10. D2: ai_fixer AST-based self-assignment ============
 
 
+# PURPOSE: Test suite validating a i fixer self assignment correctness
 class TestAIFixerSelfAssignment:
     """D2: Verify ai_fixer correctly distinguishes self-assignment from keyword args.
 
@@ -509,6 +541,7 @@ class TestAIFixerSelfAssignment:
     The fix uses AST analysis.
     """
 
+    # PURPOSE: Verify detects true self assignment behaves correctly
     def test_detects_true_self_assignment(self):
         """ai_fixer should flag `x = x` as a self-assignment."""
         from mekhane.synedrion.ai_fixer import AIFixer
@@ -525,6 +558,7 @@ class TestAIFixerSelfAssignment:
         assert len(fixes) == 1
         assert "y = y" in fixes[0].description
 
+    # PURPOSE: Verify ignores keyword argument pass behaves correctly
     def test_ignores_keyword_argument_pass(self):
         """ai_fixer must NOT flag `func(param=param)` as self-assignment."""
         from mekhane.synedrion.ai_fixer import AIFixer
@@ -547,6 +581,7 @@ class TestAIFixerSelfAssignment:
             f"{[f.description for f in fixes]}"
         )
 
+    # PURPOSE: Verify mixed code only flags assignment behaves correctly
     def test_mixed_code_only_flags_assignment(self):
         """In code with both patterns, only true self-assignments are flagged."""
         from mekhane.synedrion.ai_fixer import AIFixer

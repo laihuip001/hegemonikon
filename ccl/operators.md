@@ -1,4 +1,4 @@
-# CCL 演算子仕様 v7.0
+# CCL 演算子仕様 v7.4
 
 > **正本**: この文書は ccl/operators.md であり、全演算子仕様を定義する
 
@@ -332,7 +332,7 @@ Colimit (余極限):
 
 ```ccl
 F:[×3]{/bou.x}              # = F:[×3]{/bou~/zet}  (望む↔探すを3回)
-@cycle{/noe.h _ /dia}       # noe→bou→判定 を収束まで
+C:{/noe.h _ /dia}            # noe→bou→判定 を収束まで
 ```
 
 ### ルックアップ先
@@ -429,15 +429,15 @@ L:  → ASCII で入力可能、λ の代替
 | 用途 | 例 | 説明 |
 |:-----|:---|:-----|
 | **高階マクロ** | `@retry(3, on_fail=L:{/dia^})` | 失敗時にメタ分析 |
-| **動的パイプライン** | `@chain(L:[x]{/noe+{x}}, L:[x]{/dia{x}})` | 操作を順次適用 |
+| **動的パイプライン** | `L:[x]{/noe+{x}}_L:[x]{/dia{x}}` | 操作を順次適用 |
 | **マッピング** | `F:[tasks]{L:[t]{/noe+{target=t}}}` | 各タスクに認識適用 |
 | **アドホック定義** | `L:{/bou*zet}` | 一時的な認知操作 |
 
-### 9.5.4 @partial との使い分け
+### 9.5.4 パラメータ構文との使い分け
 
 | 状況 | 推奨 |
 |:-----|:-----|
-| 文脈を固定したい | `@partial(ctx="Heg") /zet+` |
+| 文脈を固定したい | `/zet+{ctx="Heg"}` |
 | 動的に引数を受け取りたい | `L:[x]{/noe+{target=x}}` |
 | 名前をつけずに即時使用 | `L:{...}` |
 
@@ -510,48 +510,49 @@ L:  → ASCII で入力可能、λ の代替
 
 ---
 
-## 9.7 デコレータマクロ (Pythōsis B3) v6.54
+## 9.7 記号構文 (CPL デコレータ圧縮 v3.1)
 
-> **Origin**: Python `@decorator` パターンの消化
-> **目的**: Mixin の簡潔な構文糖衣
-> **注意**: ここは Mixin **仕組み**の説明。マクロの **使用状態** (Core/Future/Experimental) は Section 11 で管理。
+> **Origin**: Python `@decorator` パターンの消化 → 記号構文に圧縮
+> **目的**: CCL 演算子と同等の情報密度で制御構文を提供
+> **経緯**: v6.54 で `@memoize`, `@validate` 等のデコレータマクロとして導入
+> 　　　→ v3.1 (2026-02-11) で `C:`, `R:`, `M:`, `V:` の1文字略記に移行
 
-### 9.7.1 一覧
+### 9.7.1 記号構文一覧
 
-| マクロ | 展開先 Mixin | 用途 |
-|:-------|:-------------|:-----|
-| `@memoize` | `Caching` | 結果キャッシュ |
-| `@retry` | `Retry` | 失敗時リトライ |
-| `@validate` | `Validation` | 事前/事後検証 |
-| `@scoped` | (特殊) | スコープ限定 |
-| `@async` | (特殊) | 非同期実行 |
+| 記号 | 意味 | 旧名 | Mixin 対応 | pt |
+|:-----|:-----|:-----|:-----------|:--:|
+| `C:{X}` | 収束ループ | @cycle | — | 4 |
+| `R:{X}` | 累積融合 | @reduce | — | 3 |
+| `M:{X}` | 記憶・キャッシュ | @memoize | `Caching` | 2 |
+| `V:{X}` | 検証ゲート | @validate | `Validation` | 3 |
 
-### 9.7.2 使用例
+### 9.7.2 除去された構文
+
+以下は CCL 既存構文で代替可能なため除去:
+
+| 旧名 | 代替 | 理由 |
+|:-----|:-----|:-----|
+| `@chain` | `_` (シーケンス演算子) | `A_B_C` で同義 |
+| `@partial{/wf, p=v}` | `/wf{p=v}` (パラメータ構文) | CCL 既存構文で十分 |
+| `@scoped{/wf{s}}` | `/wf{s}` (パラメータ構文) | CCL 既存構文で十分 |
+| `@repeat(N)` | `F:[×N]{}` (反復構文) | 制御構文で同義 |
+
+### 9.7.3 使用例
 
 ```ccl
-# 基本形
-@memoize /sop{query="重い検索"}
-@retry /ene
-@validate /noe+
+# 記号構文
+C:{/dia+_/ene+}           # 診断→修正を収束まで
+R:{F:[/s,/dia]{...}}      # 各結果を累積融合
+M:{/pis_/dox}             # 確信+信念を記憶
+V:{/noe~/dia}             # 認識~判定を検証ゲートに
 
-# パラメータ付き
-@memoize(ttl="1h") /zet+
-@retry(max=5) /sop
-@validate(pre=L:{$x != null}) /noe+
-
-# 非同期
-@async /sop{query="バックグラウンド"}
+# 残存デコレータ (将来向け)
+@retry /ene               # 失敗時リトライ (Experimental)
+@async /sop{query="..."}  # 非同期実行 (マルチエージェント前提)
 ```
 
-### 9.7.3 複雑度
-
-| マクロ | pt |
-|:-------|:--:|
-| 単純 (`@memoize`, `@retry`) | 2 |
-| パラメータ付き | 3 |
-| 特殊 (`@scoped`, `@async`) | 4 |
-
-> **詳細**: [ccl/macros/README.md](macros/README.md)
+> **設計原則**: CCL ネイティブ演算子で表現可能なものは演算子に。
+> 記号構文は「意味的に新しい概念」(収束・累積・記憶・検証) にのみ使用。
 
 ---
 
@@ -645,86 +646,93 @@ F:[ALL]{ /sta }
 
 ---
 
-## 11. マクロ (@) — 3層アーキテクチャ (v2.0)
+## 11. マクロ (@) — 3層アーキテクチャ (v3.1)
 
 > **原則**: マクロは CCL 式の糖衣構文。複雑な CCL パターンに名前を付けて再利用する。
+> **v3.1 変更**: フラットリスト → 3層階層構造。記号構文 (C:/R:/M:/V:) 統合。
 > **Dendron 監査**: 2026-02-07 実施。58 → 44 マクロ (14 PHANTOM 削除)。
-> **出自系統** (v1.x → v2.0 で旧サブセクションを統合):
 
-| 出自 | 対応マクロ | 旧セクション |
-|:-----|:-----------|:-------------|
-| Python itertools | `@chain`, `@cycle`, `@repeat` | 11.1 |
-| Python functools | `@reduce`, `@partial` | 11.2 |
-| Python contextlib | `@scoped` | 11.14 |
-| Python decorator | `@memoize`, `@validate`, `@retry`, `@async` | 9.7 (Mixin) |
-| Context Engineering | `@ce`, `@optimize` | 11.3-11.4 |
-| Recoverable Autonomy | `@risk`, `@checkpoint`, `@cache`, `@compact`, `@fault_tolerant` | 11.5 |
-| Memory Architecture | `@memory` | 11.6 |
-| Graduated Supervision | `@supervise`, `@selfcheck`, `@premortem`, `@council` | 11.7 |
-| Zero-Trust | `@enforce` | 11.8 |
-| Identity Stack | `@identity`, `@reflect` | 11.9 |
-| X-series | `@next`, `@route` | 11.10 |
-| Tier 1 Specialists | `@tak`, `@u`, `@dig`, `@go`, `@ground`, `@fix`, `@kyc` | 11.12 |
-| Cognitive Science | `@think`, `@plan`, `@verify`, `@complete`, `@converge`, `@diverge` | 11.13 |
-| Multi-Agent | `@batch`, `@thread`, `@delegate` | 1.6 |
-| Proof/Evidence | `@proof` | — |
+### 11.1 Layer 1: ユーザーマクロ (12)
 
-### 11.1 Core — 使用中マクロ (26)
+> Creator が直接呼び出す複合 CCL パターン。
+> **正本**: `.agent/workflows/ccl-*.md`
+> **リファレンス**: [`docs/ccl_macro_reference.md`](../docs/ccl_macro_reference.md)
 
-実際に WF/CCL 式で使用されている、または明確な使用場面があるマクロ。
+| マクロ | 俗名 | CCL 定義 |
+|:-------|:-----|:---------|
+| `@dig` | 掘る | `/s+~(/p*/a)_/dia*/o+` |
+| `@plan` | 段取る | `/bou+_/s+~(/p*/k)_V:{/dia}` |
+| `@build` | 組む | `/bou-{goal:define}_/s+_/ene+_V:{/dia-}_I:[pass]{M:{/dox-}}` |
+| `@fix` | 直す | `C:{/dia+_/ene+}_I:[pass]{M:{/dox-}}` |
+| `@vet` | 確かめる | `/kho{git_diff}_C:{V:{/dia+}_/ene+}_/pra{test}_M:{/pis_/dox}` |
+| `@tak` | 捌く | `/s1_F:[×3]{/sta~/chr}_F:[×3]{/kho~/zet}_I:[gap]{/sop}_/euk_/bou` |
+| `@kyc` | 回す | `C:{/sop_/noe_/ene_/dia-}` |
+| `@learn` | 刻む | `/dox+_*^/u+_M:{/bye+}` |
+| `@nous` | 問う | `R:{F:[×2]{/u+*^/u^}}_M:{/dox-}` |
+| `@ground` | 落とす | `/tak-*/bou+{6w3h}~/p-_/ene-` |
+| `@osc` | 揺する | `R:{F:[/s,/dia,/noe]{L:[x]{x~x+}}, ~(/h*/k)}` |
+| `@proof` | 裁く | `V:{/noe~/dia}_I:[pass]{/ene{PROOF.md}}_E:{/ene{_limbo/}}` |
 
-#### 認知系 (Cognitive)
+> **演算子適用**: `@dig+`, `@tak-`, `@plan^`, `@fix~/ene` 等、通常の WF と同様に演算子を適用可能。
 
-| マクロ | CCL 展開 | 意味 | Dendron |
-|:-------|:---------|:-----|:-------:|
-| `@converge` | `F:[T1..T4]{@selfcheck} _ I:[V>θ]{/dia.root_@reduce(*)} _ /pis` | Limit深化 (C1→C2→C3) | 🟢 |
-| `@diverge` | `F:[C(4,2)]{E[tension]} _ F:[@top3]{/zet+_/noe-} _ /dox.sens` | Colimit深化 (D1→D2→D3) | 🟢 |
-| `@complete` | `{result} _ /x.trigonon _ ?confirm` | WF完了 (射提案+確信度) | 🟢 |
-| `@think` | `(/noe~\noe)*dia ^ /u+` | 深層思考 | 🔵 |
-| `@plan` | `lim[/ene+]{(/bou~zet)*(/s~\s)_/kho*hod}` | 計画立案 | 🔵 |
-| `@verify` | `lim[/epi]{(/dia~\dia)*(/sta^)}` | 厳密検証 | 🔵 |
+---
+
+### 11.2 Layer 2: システムマクロ (~8)
+
+> Hub WF や内部プロセスが使用する構造的マクロ。Creator が直接使うことは稀。
+> **正本**: この operators.md
+
+#### 認知系 (Hub WF 内部)
+
+| マクロ | CCL 展開 | 意味 |
+|:-------|:---------|:-----|
+| `@converge` | `F:[T1..T4]{@selfcheck} _ I:[V>θ]{/dia.root_R:(*)} _ /pis` | Limit深化 (C1→C2→C3) |
+| `@diverge` | `F:[C(4,2)]{E[tension]} _ F:[@top3]{/zet+_/noe-} _ /dox.sens` | Colimit深化 (D1→D2→D3) |
+| `@complete` | `{result} _ /x.trigonon _ ?confirm` | WF完了 (射提案+確信度) |
 
 > **`@complete` 使用義務**: 24定理WF完了時、暗黙的に発動。BC-8 連動。
 > **`@converge`/`@diverge`**: Hub WF で使用。詳細: `ccl/macros/converge.md`, `ccl/macros/diverge.md`
 
-#### Tier 1 標準
+#### 認知パターン
 
-| マクロ | CCL 展開 | 意味 | Dendron |
-|:-------|:---------|:-----|:-------:|
-| `@tak` | `/s1_F:3{/sta~/chr}_?gap{/sop}_/bou` | タスク構造化 | 🟢 |
-| `@u` | `/bou+*^zet+` | 主観的意志決定 | 🟢 |
-| `@dig` | `/s+~(/p*/a)_/dia*/o+` | 深掘り分析 | 🔵 |
-| `@go` | `/s+_/ene+` | 戦略即時実行 | 🔵 |
-| `@ground` | `/tak-*/bou_6w3h` | 現実接地 (6W3H) | 🔵 |
-| `@fix` | `/dia+_/ene+_/dia` | 修正サイクル | 🔵 |
-| `@kyc` | `~(/sop_/noe_/ene_/dia-)` | κύκλος | 🔵 |
+| マクロ | CCL 展開 | 意味 |
+|:-------|:---------|:-----|
+| `@think` | `(/noe~\noe)*dia ^ /u+` | 深層思考 |
+| `@verify` | `lim[/epi]{(/dia~\dia)*(/sta^)}` | 厳密検証 |
+| `@u` | `/bou+*^zet+` | 主観的意志決定 |
 
-#### 合成・制御系
+#### 監視系
 
-| マクロ | CCL 展開 | 意味 | Dendron |
-|:-------|:---------|:-----|:-------:|
-| `@reduce(op)` | `((A op B) op C)` | 累積融合 | 🟢 |
-| `@selfcheck` | `@supervise(low)` | 自己検証 | 🟢 |
-| `@chain` | `A_B_C` (continue) | 直列化 (エラー継続) | 🔵 |
-| `@cycle` | `~:cond{A~B}` | 収束まで無限ループ | 🔵 |
-| `@partial(p=v)` | `/kho{ctx}_WF` | 部分適用 | 🔵 |
-| `@scoped(s,t){}` | `/kho{s}_WF_t` | スコープ限定実行 | 🔵 |
-| `@memoize` | `Caching` Mixin | 結果キャッシュ | 🔵 |
-| `@validate` | `Validation` Mixin | 事前/事後検証 | 🔵 |
-| `@proof` | (証明パターン) | 証明 | 🔵 |
-
-#### 監視・X-series
-
-| マクロ | CCL 展開 | 意味 | Dendron |
-|:-------|:---------|:-----|:-------:|
-| `@supervise(lv)` | `/dia` / `/syn` | 監視レベル | 🔵 |
-| `@premortem` | `@supervise(mid)` | 失敗事前検討 | 🔵 |
-| `@council` | `@supervise(high)` | 外部評議会 | 🔵 |
-| `@next` | `/x{from=cur}` | 推奨次ステップ | 🔵 |
+| マクロ | CCL 展開 | 意味 |
+|:-------|:---------|:-----|
+| `@selfcheck` | `@supervise(low)` | 自己検証 |
+| `@supervise(lv)` | `/dia` / `/syn` | 監視レベル |
+| `@premortem` | `@supervise(mid)` | 失敗事前検討 |
+| `@council` | `@supervise(high)` | 外部評議会 |
+| `@next` | `/x{from=cur}` | 推奨次ステップ |
 
 ---
 
-### 11.2 Future — インフラ待ちマクロ (6)
+### 11.3 Layer 3: 構文プリミティブ (9)
+
+> マクロ定義の内部で使用する制御構文。
+> **正本**: §9.7 (記号構文) + §10 (制御構文)
+
+| 記号 | 意味 | 詳細 |
+|:-----|:-----|:-----|
+| `C:{X}` | 収束ループ | §9.7 |
+| `R:{X}` | 累積融合 | §9.7 |
+| `M:{X}` | 記憶 | §9.7 |
+| `V:{X}` | 検証ゲート | §9.7 |
+| `F:[]{X}` | 反復 | §10 |
+| `I:[]{X}` | 条件分岐 | §10 |
+| `E:{X}` | ELSE | §10 |
+| `W:[]{X}` | ループ | §10 |
+| `L:[x]{X}` | Lambda | §9.5 |
+
+---
+
+### 11.4 Future — インフラ待ちマクロ (6)
 
 > マルチエージェント環境・pt最適化が成熟したら**即座に活性化**するマクロ。
 > 削除しない。仕様を温存する。
@@ -740,14 +748,13 @@ F:[ALL]{ /sta }
 
 ---
 
-### 11.3 Experimental — 要検証マクロ (12)
+### 11.5 Experimental — 要検証マクロ (8)
 
 > 概念は正しいが使用実績なし。**6ヶ月後 (2026-08) に Dendron 再審査**。
 > 未使用なら PHANTOM 降格。
 
 | マクロ | CCL 展開 | 意味 | 課題 |
 |:-------|:---------|:-----|:-----|
-| `@repeat(n)` | `F:[×N]{A}` | N回反復 | `F:` で直接書ける |
 | `@ce` | `/mek{ctx>inst}` | 背景優先プロンプト | CE 体系化待ち |
 | `@optimize` | `/mek{metaprompt}` | 推論最適化 | 実装なし |
 | `@risk(lv)` | `/ene{risk=lv}` | リスクタグ | Safety Contract と重複 |
@@ -756,11 +763,26 @@ F:[ALL]{ /sta }
 | `@identity` | `/boot{out=id}` | Identity Stack | `/boot` で代替可 |
 | `@reflect` | `/noe.nous{self}` | メタ認知 | 直接呼び出し可 |
 | `@enforce(lv)` | Anti-Skip/Schema | 強制レベル | SEL と重複 |
-| `@route(name)` | Sacred Routes | 黄金経路 | 未使用 |
-| `@retry` | `Retry` Mixin | 失敗時リトライ | API 層の仕事 |
-| `@async` | (特殊) | 非同期実行 | マルチエージェント前提 |
 
 > ⚠️ **Sunset**: 2026-08-07 までに使用実績がなければ PHANTOM として削除予定
+
+### 11.6 除去済み・移行済みマクロ
+
+| 旧マクロ | 状態 | 移行先 |
+|:---------|:-----|:-------|
+| `@chain` | 除去 | `_` (CCL 演算子) |
+| `@repeat(N)` | 除去 | `F:[×N]{}` |
+| `@partial` | 除去 | `/wf{params}` (CCL 既存構文) |
+| `@scoped` | 除去 | `/wf{params}` (CCL 既存構文) |
+| `@cycle` | 移行 | `C:{}` (§9.7) |
+| `@reduce` | 移行 | `R:{}` (§9.7) |
+| `@memoize` | 移行 | `M:{}` (§9.7) |
+| `@validate` | 移行 | `V:{}` (§9.7) |
+| `@go` | アーカイブ | エイリアス — `/s+_/ene+` で直接書ける |
+| `@v` | リネーム | → `@vet` |
+| `@route` | 除去 | 未使用 |
+| `@retry` | 温存 | Experimental (API 層の仕事) |
+| `@async` | 温存 | Experimental (マルチエージェント前提) |
 
 ## 12. CCL 複雑度ポイント制 (Complexity Point System)
 

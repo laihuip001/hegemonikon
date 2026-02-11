@@ -16,6 +16,7 @@ from typing import Any
 logger = logging.getLogger(__name__)
 
 
+# PURPOSE: TransportType の機能を提供する
 class TransportType(Enum):
     """MCP トランスポート種別"""
     STDIO = "stdio"
@@ -23,6 +24,7 @@ class TransportType(Enum):
     SSE = "sse"
 
 
+# PURPOSE: ServerInfo の機能を提供する
 @dataclass
 class ServerInfo:
     """MCP サーバー情報"""
@@ -36,15 +38,18 @@ class ServerInfo:
     auth_type: str | None = None      # "oauth2", "api_key", None
     metadata: dict[str, Any] = field(default_factory=dict)
 
+    # PURPOSE: discovery の is local 処理を実行する
     @property
     def is_local(self) -> bool:
         return self.transport == TransportType.STDIO
 
+    # PURPOSE: discovery の is remote 処理を実行する
     @property
     def is_remote(self) -> bool:
         return self.transport in (TransportType.STREAMABLE_HTTP, TransportType.SSE)
 
 
+# PURPOSE: DiscoveryEngine の機能を提供する
 class DiscoveryEngine:
     """
     MCP サーバーの発見・登録を管理する。
@@ -70,6 +75,7 @@ class DiscoveryEngine:
     def __init__(self) -> None:
         self._servers: dict[str, ServerInfo] = {}
 
+    # PURPOSE: discovery の register 処理を実行する
     def register(self, server: ServerInfo) -> None:
         """ローカルサーバーを手動登録する"""
         if server.name in self._servers:
@@ -78,6 +84,7 @@ class DiscoveryEngine:
             logger.info("Registering server: %s (%s)", server.name, server.transport.value)
         self._servers[server.name] = server
 
+    # PURPOSE: discovery の unregister 処理を実行する
     def unregister(self, name: str) -> bool:
         """サーバー登録を解除する"""
         if name in self._servers:
@@ -86,6 +93,7 @@ class DiscoveryEngine:
             return True
         return False
 
+    # PURPOSE: discovery の discover 処理を実行する
     async def discover(self, base_url: str) -> ServerInfo | None:
         """
         SEP-1960 .well-known/mcp プローブでリモートサーバーを発見する。
@@ -144,19 +152,23 @@ class DiscoveryEngine:
             logger.warning("Discovery failed for %s: %s", base_url, e)
             return None
 
+    # PURPOSE: discovery の get 処理を実行する
     def get(self, name: str) -> ServerInfo | None:
         """名前でサーバー情報を取得"""
         return self._servers.get(name)
 
+    # PURPOSE: discovery の servers 処理を実行する
     @property
     def servers(self) -> dict[str, ServerInfo]:
         """全登録サーバーの辞書 (読取専用コピー)"""
         return dict(self._servers)
 
+    # PURPOSE: discovery の server count 処理を実行する
     @property
     def server_count(self) -> int:
         return len(self._servers)
 
+    # PURPOSE: local defaults を登録する
     def register_local_defaults(self) -> int:
         """
         HGK の標準ローカルサーバーを一括登録する。

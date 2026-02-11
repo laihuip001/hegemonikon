@@ -53,6 +53,7 @@ class ScaleLevel(Enum):
     MACRO = "macro"  # 広域
 
 
+# PURPOSE: MetronResult の機能を提供する
 @dataclass
 # PURPOSE: S1 Metron 評価結果
 class MetronResult:
@@ -143,6 +144,7 @@ class CriterionPriority(Enum):
     COULD = "could"  # 理想
 
 
+# PURPOSE: StathmosResult の機能を提供する
 @dataclass
 # PURPOSE: S3 Stathmos 評価結果
 class StathmosResult:
@@ -224,6 +226,7 @@ class PraxisDerivative(Enum):
     TEMPORAL = "temp"  # 時間構造 (いつ実行するか)
 
 
+# PURPOSE: PraxisResult の機能を提供する
 @dataclass
 # PURPOSE: S4 Praxis 評価結果
 class PraxisResult:

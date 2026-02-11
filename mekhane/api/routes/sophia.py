@@ -105,6 +105,7 @@ def _build_frontmatter(metadata: dict) -> str:
 
 # --- Pydantic Models ---
 
+# PURPOSE: KIListItem の機能を提供する
 class KIListItem(BaseModel):
     """KI 一覧の項目。"""
     id: str
@@ -115,6 +116,7 @@ class KIListItem(BaseModel):
     size_bytes: int = 0
 
 
+# PURPOSE: KIDetail の機能を提供する
 class KIDetail(BaseModel):
     """KI 詳細 (本文含む)。"""
     id: str
@@ -127,6 +129,7 @@ class KIDetail(BaseModel):
     backlinks: list[str] = Field(default_factory=list)
 
 
+# PURPOSE: KICreateRequest の機能を提供する
 class KICreateRequest(BaseModel):
     """KI 新規作成リクエスト。"""
     title: str = Field(min_length=1, max_length=200)
@@ -134,18 +137,21 @@ class KICreateRequest(BaseModel):
     source_type: str = Field(default="ki", description="ノードの種別")
 
 
+# PURPOSE: KIUpdateRequest の機能を提供する
 class KIUpdateRequest(BaseModel):
     """KI 編集リクエスト。"""
     title: Optional[str] = Field(None, min_length=1, max_length=200)
     content: Optional[str] = None
 
 
+# PURPOSE: KIListResponse の機能を提供する
 class KIListResponse(BaseModel):
     """KI 一覧レスポンス。"""
     items: list[KIListItem]
     total: int
 
 
+# PURPOSE: KISearchResult の機能を提供する
 class KISearchResult(BaseModel):
     """検索結果。"""
     id: str
@@ -154,6 +160,7 @@ class KISearchResult(BaseModel):
     line_number: int = 0
 
 
+# PURPOSE: KISearchResponse の機能を提供する
 class KISearchResponse(BaseModel):
     """検索レスポンス。"""
     query: str
@@ -163,6 +170,7 @@ class KISearchResponse(BaseModel):
 
 # --- Routes ---
 
+# PURPOSE: sophia の list ki 処理を実行する
 @router.get("/ki", response_model=KIListResponse)
 async def list_ki() -> KIListResponse:
     """KI 一覧を取得。"""
@@ -190,6 +198,7 @@ async def list_ki() -> KIListResponse:
     return KIListResponse(items=items, total=len(items))
 
 
+# PURPOSE: ki を取得する
 @router.get("/ki/{ki_id}", response_model=KIDetail)
 async def get_ki(ki_id: str) -> KIDetail:
     """KI 詳細を取得 (Markdown 本文含む)。"""
@@ -225,6 +234,7 @@ async def get_ki(ki_id: str) -> KIDetail:
     )
 
 
+# PURPOSE: ki を構築する
 @router.post("/ki", response_model=KIDetail, status_code=201)
 async def create_ki(req: KICreateRequest) -> KIDetail:
     """KI を新規作成。"""
@@ -264,6 +274,7 @@ async def create_ki(req: KICreateRequest) -> KIDetail:
     )
 
 
+# PURPOSE: ki を更新する
 @router.put("/ki/{ki_id}", response_model=KIDetail)
 async def update_ki(ki_id: str, req: KIUpdateRequest) -> KIDetail:
     """KI を編集。"""
@@ -296,6 +307,7 @@ async def update_ki(ki_id: str, req: KIUpdateRequest) -> KIDetail:
     )
 
 
+# PURPOSE: ki を削除する
 @router.delete("/ki/{ki_id}")
 async def delete_ki(ki_id: str) -> dict:
     """KI を削除 (.trash/ へ移動。安全な操作)。"""
@@ -315,6 +327,7 @@ async def delete_ki(ki_id: str) -> dict:
     return {"status": "deleted", "id": ki_id}
 
 
+# PURPOSE: ki を検索する
 @router.get("/search", response_model=KISearchResponse)
 async def search_ki(
     q: str = Query(..., min_length=1, description="検索クエリ"),

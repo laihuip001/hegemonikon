@@ -77,6 +77,7 @@ class PKSLLMClient:
             print(f"[PKSLLMClient] Error: {e}")
             return None
 
+    # PURPOSE: llm_client の model 処理を実行する
     @property
     def model(self) -> str:
         return self._model

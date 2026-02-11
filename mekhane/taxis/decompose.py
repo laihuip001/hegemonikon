@@ -42,6 +42,7 @@ _STRUCTURE_KEYS = [
 ]
 
 
+# PURPOSE: decompose の extract frontmatter 処理を実行する
 def extract_frontmatter(filepath: Path) -> dict[str, Any] | None:
     """Extract YAML frontmatter from a markdown file."""
     try:
@@ -56,6 +57,7 @@ def extract_frontmatter(filepath: Path) -> dict[str, Any] | None:
         return None
 
 
+# PURPOSE: decompose の extract body concepts 処理を実行する
 def extract_body_concepts(filepath: Path) -> list[str]:
     """
     Extract atomic concepts from markdown body (headings, bold terms).
@@ -82,6 +84,7 @@ def extract_body_concepts(filepath: Path) -> list[str]:
         return []
 
 
+# PURPOSE: decompose の decompose 処理を実行する
 def decompose(target: str) -> dict[str, Any]:
     """
     G(Y): Apply the forgetful functor to an HGK internal object.
@@ -171,6 +174,7 @@ def _resolve_target(target: str) -> Path | None:
 # --- CLI Commands ---
 
 
+# PURPOSE: decompose の cmd decompose 処理を実行する
 def cmd_decompose(args: argparse.Namespace) -> int:
     """G(Y): Decompose an HGK internal object into atomic chunks."""
     result = decompose(args.target)
@@ -209,6 +213,7 @@ def cmd_decompose(args: argparse.Namespace) -> int:
     return 0
 
 
+# PURPOSE: decompose の cmd compare 処理を実行する
 def cmd_compare(args: argparse.Namespace) -> int:
     """Compare G(A) and G(B) — find shared atomic chunks."""
     result_a = decompose(args.target_a)
@@ -257,6 +262,7 @@ def cmd_compare(args: argparse.Namespace) -> int:
     return 0
 
 
+# PURPOSE: decompose の main 処理を実行する
 def main() -> int:
     parser = argparse.ArgumentParser(
         prog="decompose",

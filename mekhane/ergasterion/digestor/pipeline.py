@@ -21,6 +21,7 @@ import numpy as np
 from .selector import DigestorSelector, DigestCandidate
 
 
+# PURPOSE: DigestResult の機能を提供する
 @dataclass
 # PURPOSE: 消化パイプライン実行結果
 class DigestResult:

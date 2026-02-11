@@ -21,6 +21,7 @@ from .guardrails.validators import CCLOutputValidator, ValidationResult
 from .learning.failure_db import get_failure_db, FailureDB
 
 
+# PURPOSE: ExecutionContext の機能を提供する
 @dataclass
 # PURPOSE: CCL 実行コンテキスト
 class ExecutionContext:
@@ -31,6 +32,7 @@ class ExecutionContext:
     warnings: List[str]
 
 
+# PURPOSE: ExecutionResult の機能を提供する
 @dataclass
 # PURPOSE: CCL 実行結果
 class ExecutionResult:

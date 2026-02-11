@@ -81,12 +81,14 @@ def _get_gateway():
 
 # --- Models ---
 
+# PURPOSE: CheckRequest の機能を提供する
 class CheckRequest(BaseModel):
     """ツール呼び出しの事前チェック"""
     server_name: str
     tool_name: str
 
 
+# PURPOSE: CheckResponse の機能を提供する
 class CheckResponse(BaseModel):
     """チェック結果"""
     allowed: bool
@@ -98,6 +100,7 @@ class CheckResponse(BaseModel):
 
 # --- Endpoints ---
 
+# PURPOSE: gateway の gateway status 処理を実行する
 @router.get("/gateway/status")
 async def gateway_status() -> dict[str, Any]:
     """Gateway 全体のステータスを返す"""
@@ -109,6 +112,7 @@ async def gateway_status() -> dict[str, Any]:
     }
 
 
+# PURPOSE: gateway の gateway servers 処理を実行する
 @router.get("/gateway/servers")
 async def gateway_servers() -> dict[str, Any]:
     """登録済みサーバーの一覧"""
@@ -126,6 +130,7 @@ async def gateway_servers() -> dict[str, Any]:
     return {"servers": servers, "total": len(servers)}
 
 
+# PURPOSE: gateway の gateway policies 処理を実行する
 @router.get("/gateway/policies")
 async def gateway_policies() -> dict[str, Any]:
     """ロード済みポリシーの一覧"""
@@ -137,6 +142,7 @@ async def gateway_policies() -> dict[str, Any]:
     }
 
 
+# PURPOSE: gateway の gateway check 処理を実行する
 @router.post("/gateway/check")
 async def gateway_check(req: CheckRequest) -> CheckResponse:
     """ツール呼び出しの事前ポリシーチェック"""

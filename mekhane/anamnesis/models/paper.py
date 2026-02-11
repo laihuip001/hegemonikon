@@ -20,6 +20,7 @@ from datetime import datetime
 from typing import Optional
 
 
+# PURPOSE: Paper の機能を提供する
 @dataclass
 # PURPOSE: 統一論文スキーマ
 class Paper:
@@ -52,6 +53,7 @@ class Paper:
     # Gnōsis metadata
     collected_at: str = field(default_factory=lambda: datetime.now().isoformat())
     
+    # PURPOSE: paper の primary key 処理を実行する
     @property
     # PURPOSE: 重複排除用プライマリキー (DOI > arXiv ID > source:id)
     def primary_key(self) -> str:
@@ -62,6 +64,7 @@ class Paper:
             return f"arxiv:{self.arxiv_id}"
         return f"{self.source}:{self.source_id}"
     
+    # PURPOSE: paper の embedding text 処理を実行する
     @property
     # PURPOSE: 埋め込み生成用テキスト
     def embedding_text(self) -> str:
@@ -90,6 +93,7 @@ class Paper:
             "collected_at": self.collected_at,
         }
     
+    # PURPOSE: paper の from dict 処理を実行する
     @classmethod
     # PURPOSE: 辞書から復元
     def from_dict(cls, data: dict) -> "Paper":
@@ -114,6 +118,7 @@ class Paper:
         )
 
 
+# PURPOSE: paper の merge papers 処理を実行する
 def merge_papers(existing: Paper, new: Paper) -> Paper:
     """
     同一primary_keyの論文をマージ。

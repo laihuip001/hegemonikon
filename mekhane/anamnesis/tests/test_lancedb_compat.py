@@ -4,15 +4,18 @@ import unittest
 from unittest.mock import MagicMock, patch
 
 
+# PURPOSE: Test suite validating get table names correctness
 class TestGetTableNames(unittest.TestCase):
     """Test get_table_names() compatibility wrapper."""
 
     def _call(self, db):
+        """Verify call behavior."""
         from mekhane.anamnesis.lancedb_compat import get_table_names
         return get_table_names(db)
 
     # --- New API path: list_tables().tables ---
 
+    # PURPOSE: Verify new api returns tables attribute behaves correctly
     def test_new_api_returns_tables_attribute(self):
         """list_tables() returns object with .tables attribute."""
         db = MagicMock()
@@ -22,6 +25,7 @@ class TestGetTableNames(unittest.TestCase):
         result = self._call(db)
         self.assertEqual(result, ["alpha", "beta"])
 
+    # PURPOSE: Verify new api returns list directly behaves correctly
     def test_new_api_returns_list_directly(self):
         """list_tables() returns a plain list (future API)."""
         db = MagicMock()
@@ -29,6 +33,7 @@ class TestGetTableNames(unittest.TestCase):
         result = self._call(db)
         self.assertEqual(result, ["one", "two"])
 
+    # PURPOSE: Verify new api empty tables behaves correctly
     def test_new_api_empty_tables(self):
         """list_tables().tables is empty list."""
         db = MagicMock()
@@ -38,6 +43,7 @@ class TestGetTableNames(unittest.TestCase):
         result = self._call(db)
         self.assertEqual(result, [])
 
+    # PURPOSE: Verify new api exception falls back behaves correctly
     def test_new_api_exception_falls_back(self):
         """If list_tables() raises, falls back to table_names()."""
         db = MagicMock()
@@ -48,6 +54,7 @@ class TestGetTableNames(unittest.TestCase):
 
     # --- Old API path: table_names() ---
 
+    # PURPOSE: Verify old api no list tables behaves correctly
     def test_old_api_no_list_tables(self):
         """DB has no list_tables method, uses table_names()."""
         db = MagicMock(spec=[])
@@ -55,12 +62,15 @@ class TestGetTableNames(unittest.TestCase):
         result = self._call(db)
         self.assertEqual(result, ["old_table"])
 
+    # PURPOSE: Verify deprecation warning suppressed behaves correctly
     def test_deprecation_warning_suppressed(self):
         """table_names() deprecation warnings are suppressed."""
         import warnings
         db = MagicMock(spec=[])
 
+        # PURPOSE: Verify warn table names behaves correctly
         def warn_table_names():
+            """Verify warn table names behavior."""
             warnings.warn("deprecated", DeprecationWarning)
             return ["warned"]
 
@@ -75,6 +85,7 @@ class TestGetTableNames(unittest.TestCase):
 
     # --- Membership checks (the actual use case) ---
 
+    # PURPOSE: Verify in operator works behaves correctly
     def test_in_operator_works(self):
         """'table_name' in get_table_names(db) works."""
         db = MagicMock()
@@ -85,6 +96,7 @@ class TestGetTableNames(unittest.TestCase):
         self.assertIn("knowledge", result)
         self.assertNotIn("nonexistent", result)
 
+    # PURPOSE: Verify return type is list behaves correctly
     def test_return_type_is_list(self):
         """Return value is always a plain list."""
         db = MagicMock()
@@ -95,9 +107,11 @@ class TestGetTableNames(unittest.TestCase):
         self.assertIsInstance(result, list)
 
 
+# PURPOSE: Test suite validating get table names integration correctness
 class TestGetTableNamesIntegration(unittest.TestCase):
     """Integration test with real lancedb (if available)."""
 
+    # PURPOSE: Verify real lancedb connection behaves correctly
     def test_real_lancedb_connection(self):
         """Test with actual lancedb.connect()."""
         try:

@@ -68,6 +68,7 @@ class WFCategoryInfo:
     # Common
     description: str = ""                   # 1行要約
 
+    # PURPOSE: wf_category_parser の is valid 処理を実行する
     @property
     def is_valid(self) -> bool:
         """最低限のフィールドが埋まっているか。"""
@@ -77,6 +78,7 @@ class WFCategoryInfo:
             return bool(self.core)
         return bool(self.raw)
 
+    # PURPOSE: wf_category_parser の coverage score 処理を実行する
     @property
     def coverage_score(self) -> float:
         """フロントマターの充実度 (0.0-1.0)。"""

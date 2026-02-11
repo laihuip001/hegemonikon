@@ -309,6 +309,7 @@ class TestStubOutputs:
 
     # PURPOSE: none_series_empty をテストする
     def test_none_series_empty(self):
+        """Verify none series empty behavior."""
         outputs = _generate_stub_outputs(None)
         assert outputs == {}
 

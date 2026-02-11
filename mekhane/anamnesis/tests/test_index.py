@@ -18,7 +18,10 @@ from mekhane.anamnesis.models.paper import Paper
 # PURPOSE: Test gnosis index の実装
 class TestGnosisIndex(unittest.TestCase):
     # PURPOSE: setUp をセットアップする
+    """Test suite for gnosis index."""
+    # PURPOSE: Verify set up behaves correctly
     def setUp(self):
+        """Verify set up behavior."""
         self.test_dir = tempfile.mkdtemp()
         self.lance_dir = Path(self.test_dir) / "lancedb"
 
@@ -38,12 +41,14 @@ class TestGnosisIndex(unittest.TestCase):
 
     # PURPOSE: tearDown の処理
     def tearDown(self):
+        """Verify tear down behavior."""
         self.embedder_patcher.stop()
         shutil.rmtree(self.test_dir)
 
     # PURPOSE: load_primary_keys をテストする
     def test_load_primary_keys(self):
         # Create dummy papers
+        """Verify load primary keys behavior."""
         papers = []
         for i in range(15):  # 15 to exceed default limit if it was 10
             p = Paper(
@@ -74,9 +79,11 @@ class TestGnosisIndex(unittest.TestCase):
         self.assertEqual(len(self.index._primary_key_cache), 15)
 
 
+# PURPOSE: Test suite validating embedder dimension correctness
 class TestEmbedderDimension(unittest.TestCase):
     """Embedder._dimension と _is_onnx_fallback の検証。"""
 
+    # PURPOSE: Verify dimension property exists after init behaves correctly
     @patch("mekhane.anamnesis.index.Embedder._instances", {})
     def test_dimension_property_exists_after_init(self):
         """Embedder 初期化後、_dimension が正の整数であること。"""
@@ -89,6 +96,7 @@ class TestEmbedderDimension(unittest.TestCase):
             self.assertEqual(e._dimension, 1024)
             self.assertFalse(e._is_onnx_fallback)
 
+    # PURPOSE: Verify model dimensions map behaves correctly
     def test_model_dimensions_map(self):
         """_MODEL_DIMENSIONS に既知モデルが登録されていること。"""
         from mekhane.anamnesis.index import Embedder
@@ -96,9 +104,11 @@ class TestEmbedderDimension(unittest.TestCase):
         self.assertEqual(Embedder._MODEL_DIMENSIONS["BAAI/bge-small-en-v1.5"], 384)
 
 
+# PURPOSE: Test suite validating get vector dimension correctness
 class TestGetVectorDimension(unittest.TestCase):
     """_get_vector_dimension() ヘルパーの検証。"""
 
+    # PURPOSE: Verify extracts dimension from schema behaves correctly
     def test_extracts_dimension_from_schema(self):
         """fixed_size_list<item: float>[1024] 形式から次元を抽出。"""
         from mekhane.anamnesis.index import _get_vector_dimension
@@ -109,6 +119,7 @@ class TestGetVectorDimension(unittest.TestCase):
         mock_table.schema = [mock_field]
         self.assertEqual(_get_vector_dimension(mock_table), 1024)
 
+    # PURPOSE: Verify returns none for no vector column behaves correctly
     def test_returns_none_for_no_vector_column(self):
         """vector カラムがない場合 None を返す。"""
         from mekhane.anamnesis.index import _get_vector_dimension
@@ -119,10 +130,13 @@ class TestGetVectorDimension(unittest.TestCase):
         self.assertIsNone(_get_vector_dimension(mock_table))
 
 
+# PURPOSE: Test suite validating dimension mismatch guard correctness
 class TestDimensionMismatchGuard(unittest.TestCase):
     """GnosisIndex.search() の次元不一致防御の検証。"""
 
+    # PURPOSE: Verify set up behaves correctly
     def setUp(self):
+        """Verify set up behavior."""
         self.test_dir = tempfile.mkdtemp()
         self.lance_dir = Path(self.test_dir) / "lancedb"
 
@@ -141,10 +155,13 @@ class TestDimensionMismatchGuard(unittest.TestCase):
         self.index = GnosisIndex(lance_dir=self.lance_dir)
         self.index._get_embedder = lambda: self.mock_embedder_instance
 
+    # PURPOSE: Verify tear down behaves correctly
     def tearDown(self):
+        """Verify tear down behavior."""
         self.embedder_patcher.stop()
         shutil.rmtree(self.test_dir)
 
+    # PURPOSE: Verify search returns empty on dimension mismatch behaves correctly
     def test_search_returns_empty_on_dimension_mismatch(self):
         """384-dim embedder で 1024-dim テーブルを検索 → 空リスト。"""
         # Create table with 1024-dim vectors to simulate bge-m3 index
@@ -162,6 +179,7 @@ class TestDimensionMismatchGuard(unittest.TestCase):
         results = self.index.search("test query")
         self.assertEqual(results, [])
 
+    # PURPOSE: Verify search succeeds on matching dimensions behaves correctly
     def test_search_succeeds_on_matching_dimensions(self):
         """384-dim embedder で 384-dim テーブルを検索 → 正常結果。"""
         papers = [Paper(

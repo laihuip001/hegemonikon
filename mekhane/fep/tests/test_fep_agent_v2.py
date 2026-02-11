@@ -25,6 +25,7 @@ class TestStateSpacesV2:
 
     # PURPOSE: dimensions をテストする
     def test_dimensions(self):
+        """Verify dimensions behavior."""
         from mekhane.fep.state_spaces_v2 import NUM_STATES_V2, NUM_OBS_V2, NUM_ACTIONS_V2
         assert NUM_STATES_V2 == 48
         assert NUM_OBS_V2 == 14
@@ -32,6 +33,7 @@ class TestStateSpacesV2:
 
     # PURPOSE: index_round_trip をテストする
     def test_index_round_trip(self):
+        """Verify index round trip behavior."""
         from mekhane.fep.state_spaces_v2 import (
             state_to_index_v2, index_to_state_v2, NUM_STATES_V2,
         )
@@ -42,6 +44,7 @@ class TestStateSpacesV2:
 
     # PURPOSE: all_series_covered をテストする
     def test_all_series_covered(self):
+        """Verify all series covered behavior."""
         from mekhane.fep.state_spaces_v2 import (
             index_to_state_v2, NUM_STATES_V2, SERIES_STATES,
         )
@@ -58,6 +61,7 @@ class TestFEPAgentV2:
 
     # PURPOSE: matrix_shapes をテストする
     def test_matrix_shapes(self):
+        """Verify matrix shapes behavior."""
         from mekhane.fep.fep_agent_v2 import HegemonikónFEPAgentV2
         agent = HegemonikónFEPAgentV2()
 
@@ -73,6 +77,7 @@ class TestFEPAgentV2:
 
     # PURPOSE: A_columns_normalized をテストする
     def test_A_columns_normalized(self):
+        """Verify a columns normalized behavior."""
         from mekhane.fep.fep_agent_v2 import HegemonikónFEPAgentV2
         agent = HegemonikónFEPAgentV2()
         A = agent._default_A()
@@ -81,6 +86,7 @@ class TestFEPAgentV2:
 
     # PURPOSE: B_columns_normalized をテストする
     def test_B_columns_normalized(self):
+        """Verify b columns normalized behavior."""
         from mekhane.fep.fep_agent_v2 import HegemonikónFEPAgentV2
         agent = HegemonikónFEPAgentV2()
         B = agent._default_B()
@@ -90,6 +96,7 @@ class TestFEPAgentV2:
 
     # PURPOSE: D_normalized をテストする
     def test_D_normalized(self):
+        """Verify d normalized behavior."""
         from mekhane.fep.fep_agent_v2 import HegemonikónFEPAgentV2
         agent = HegemonikónFEPAgentV2()
         D = agent._default_D()

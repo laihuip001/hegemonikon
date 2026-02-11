@@ -27,38 +27,45 @@ class TestParsePwSpec:
 
     # PURPOSE: single_plus をテストする
     def test_single_plus(self):
+        """Verify single plus behavior."""
         pw = parse_pw_spec("S1+", "S")
         assert pw["S1"] == 0.5
         assert pw["S2"] == 0.0
 
     # PURPOSE: single_minus をテストする
     def test_single_minus(self):
+        """Verify single minus behavior."""
         pw = parse_pw_spec("S3-", "S")
         assert pw["S3"] == -0.5
 
     # PURPOSE: double_plus をテストする
     def test_double_plus(self):
+        """Verify double plus behavior."""
         pw = parse_pw_spec("S1++", "S")
         assert pw["S1"] == 1.0
 
     # PURPOSE: double_minus をテストする
     def test_double_minus(self):
+        """Verify double minus behavior."""
         pw = parse_pw_spec("S3--", "S")
         assert pw["S3"] == -1.0
 
     # PURPOSE: equals_format をテストする
     def test_equals_format(self):
+        """Verify equals format behavior."""
         pw = parse_pw_spec("S1=0.3, S3=-0.7", "S")
         assert pw["S1"] == pytest.approx(0.3)
         assert pw["S3"] == pytest.approx(-0.7)
 
     # PURPOSE: bare_theorem_defaults_positive をテストする
     def test_bare_theorem_defaults_positive(self):
+        """Verify bare theorem defaults positive behavior."""
         pw = parse_pw_spec("S2", "S")
         assert pw["S2"] == 0.5
 
     # PURPOSE: multiple_specs をテストする
     def test_multiple_specs(self):
+        """Verify multiple specs behavior."""
         pw = parse_pw_spec("S1+, S3-, S4++", "S")
         assert pw["S1"] == 0.5
         assert pw["S2"] == 0.0
@@ -67,16 +74,19 @@ class TestParsePwSpec:
 
     # PURPOSE: clamps_to_range をテストする
     def test_clamps_to_range(self):
+        """Verify clamps to range behavior."""
         pw = parse_pw_spec("S1=1.5", "S")
         assert pw["S1"] == 1.0
 
     # PURPOSE: invalid_series_returns_empty をテストする
     def test_invalid_series_returns_empty(self):
+        """Verify invalid series returns empty behavior."""
         pw = parse_pw_spec("X1+", "X")
         assert pw == {}
 
     # PURPOSE: ignores_invalid_theorem_ids をテストする
     def test_ignores_invalid_theorem_ids(self):
+        """Verify ignores invalid theorem ids behavior."""
         pw = parse_pw_spec("Z9+", "S")
         assert all(v == 0.0 for v in pw.values())
 
@@ -101,45 +111,53 @@ class TestInferPw:
     # S-series
     # PURPOSE: s_new_design をテストする
     def test_s_new_design(self):
+        """Verify s new design behavior."""
         pw = infer_pw("S", "新規設計 フロントエンド")
         assert pw["S2"] > 0  # Mekhanē emphasized
 
     # PURPOSE: s_refactor をテストする
     def test_s_refactor(self):
+        """Verify s refactor behavior."""
         pw = infer_pw("S", "リファクタリング 整理")
         assert pw["S1"] > 0  # Metron
         assert pw["S3"] > 0  # Stathmos
 
     # PURPOSE: s_implement をテストする
     def test_s_implement(self):
+        """Verify s implement behavior."""
         pw = infer_pw("S", "実装フェーズ コーディング")
         assert pw["S4"] > 0  # Praxis
 
     # PURPOSE: s_default_uniform をテストする
     def test_s_default_uniform(self):
+        """Verify s default uniform behavior."""
         pw = infer_pw("S", "neutral test input")
         assert is_uniform(pw)
 
     # O-series
     # PURPOSE: o_uncertainty をテストする
     def test_o_uncertainty(self):
+        """Verify o uncertainty behavior."""
         pw = infer_pw("O", "不確実な状況 探求が必要")
         assert pw["O3"] > 0  # Zētēsis
 
     # PURPOSE: o_bias をテストする
     def test_o_bias(self):
+        """Verify o bias behavior."""
         pw = infer_pw("O", "バイアス警告が出ている")
         assert pw["O1"] < 0  # suppress bias source
 
     # K-series
     # PURPOSE: k_urgent をテストする
     def test_k_urgent(self):
+        """Verify k urgent behavior."""
         pw = infer_pw("K", "緊急の対応が必要")
         assert pw["K1"] > 0  # Eukairia
         assert pw["K2"] > 0  # Chronos
 
     # PURPOSE: k_strategy をテストする
     def test_k_strategy(self):
+        """Verify k strategy behavior."""
         pw = infer_pw("K", "長期戦略を検討")
         assert pw["K3"] > 0  # Telos
         assert pw["K4"] > 0  # Sophia
@@ -147,29 +165,34 @@ class TestInferPw:
     # H-series
     # PURPOSE: h_emotional をテストする
     def test_h_emotional(self):
+        """Verify h emotional behavior."""
         pw = infer_pw("H", "感情が強い文脈")
         assert pw["H1"] > 0  # Propatheia
 
     # P-series
     # PURPOSE: p_scoping をテストする
     def test_p_scoping(self):
+        """Verify p scoping behavior."""
         pw = infer_pw("P", "スコープを決定する")
         assert pw["P1"] > 0  # Khōra
 
     # A-series
     # PURPOSE: a_emotional をテストする
     def test_a_emotional(self):
+        """Verify a emotional behavior."""
         pw = infer_pw("A", "感情が判断を歪めている")
         assert pw["A1"] < 0  # suppress emotion
         assert pw["A2"] > 0  # emphasize judgment
 
     # PURPOSE: a_knowledge をテストする
     def test_a_knowledge(self):
+        """Verify a knowledge behavior."""
         pw = infer_pw("A", "知識の確定が必要")
         assert pw["A4"] > 0  # Epistēmē
 
     # PURPOSE: invalid_series をテストする
     def test_invalid_series(self):
+        """Verify invalid series behavior."""
         pw = infer_pw("X", "test")
         assert pw == {}
 
@@ -184,6 +207,7 @@ class TestDerivePw:
     """Agent-derived PW (L1→L2 natural transformation)."""
 
     def _make_agent(self, context=0.5, urgency=0.5, confidence=0.5):
+        """Verify make agent behavior."""
         agent = MagicMock()
         agent.precision_weights = {
             "context": context,
@@ -241,6 +265,7 @@ class TestDerivePw:
 
     # PURPOSE: invalid_series をテストする
     def test_invalid_series(self):
+        """Verify invalid series behavior."""
         agent = self._make_agent()
         pw = derive_pw("X", agent)
         assert pw == {}
@@ -287,6 +312,7 @@ class TestResolvePw:
 
     # PURPOSE: invalid_series をテストする
     def test_invalid_series(self):
+        """Verify invalid series behavior."""
         pw = resolve_pw("X")
         assert pw == {}
 
@@ -299,21 +325,27 @@ class TestResolvePw:
 # PURPOSE: Test utilities の実装
 class TestUtilities:
     # PURPOSE: describe_pw をテストする
+    """Test suite for utilities."""
+    # PURPOSE: Verify describe pw behaves correctly
     def test_describe_pw(self):
+        """Verify describe pw behavior."""
         desc = describe_pw({"S1": 0.5, "S2": 0.0, "S3": -0.3, "S4": 0.0})
         assert "S1=+0.5" in desc
         assert "S3=-0.3" in desc
 
     # PURPOSE: is_uniform_true をテストする
     def test_is_uniform_true(self):
+        """Verify is uniform true behavior."""
         assert is_uniform({"S1": 0.0, "S2": 0.0})
 
     # PURPOSE: is_uniform_false をテストする
     def test_is_uniform_false(self):
+        """Verify is uniform false behavior."""
         assert not is_uniform({"S1": 0.5, "S2": 0.0})
 
     # PURPOSE: is_uniform_empty をテストする
     def test_is_uniform_empty(self):
+        """Verify is uniform empty behavior."""
         assert is_uniform({})
 
 
@@ -370,11 +402,13 @@ class TestParsePwSpecEdgeCases:
 
     # PURPOSE: empty_string をテストする
     def test_empty_string(self):
+        """Verify empty string behavior."""
         pw = parse_pw_spec("", "S")
         assert is_uniform(pw)
 
     # PURPOSE: whitespace_only をテストする
     def test_whitespace_only(self):
+        """Verify whitespace only behavior."""
         pw = parse_pw_spec("   ", "S")
         assert is_uniform(pw)
 

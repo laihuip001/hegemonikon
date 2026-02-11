@@ -18,6 +18,7 @@ class TestBasinLogger:
 
     # PURPOSE: log_prediction をテストする
     def test_log_prediction(self):
+        """Verify log prediction behavior."""
         logger = BasinLogger(log_dir=Path(tempfile.mkdtemp()))
         entry = logger.log_prediction(
             user_input="Why does this exist?",
@@ -31,6 +32,7 @@ class TestBasinLogger:
 
     # PURPOSE: log_correction_correct をテストする
     def test_log_correction_correct(self):
+        """Verify log correction correct behavior."""
         logger = BasinLogger(log_dir=Path(tempfile.mkdtemp()))
         entry = logger.log_prediction(
             user_input="Design the architecture",
@@ -44,6 +46,7 @@ class TestBasinLogger:
 
     # PURPOSE: log_correction_wrong をテストする
     def test_log_correction_wrong(self):
+        """Verify log correction wrong behavior."""
         logger = BasinLogger(log_dir=Path(tempfile.mkdtemp()))
         entry = logger.log_prediction(
             user_input="Some ambiguous input",
@@ -56,6 +59,7 @@ class TestBasinLogger:
 
     # PURPOSE: bias_report をテストする
     def test_bias_report(self):
+        """Verify bias report behavior."""
         logger = BasinLogger(log_dir=Path(tempfile.mkdtemp()))
 
         # 3 correct predictions for O
@@ -76,6 +80,7 @@ class TestBasinLogger:
 
     # PURPOSE: save_and_load をテストする
     def test_save_and_load(self):
+        """Verify save and load behavior."""
         tmp = Path(tempfile.mkdtemp())
         logger = BasinLogger(log_dir=tmp)
 
@@ -91,6 +96,7 @@ class TestBasinLogger:
 
     # PURPOSE: suggestions_for_tuning をテストする
     def test_suggestions_for_tuning(self):
+        """Verify suggestions for tuning behavior."""
         logger = BasinLogger(log_dir=Path(tempfile.mkdtemp()))
 
         # P is over-predicted 6 times
@@ -109,26 +115,31 @@ class TestBasinBias:
 
     # PURPOSE: precision をテストする
     def test_precision(self):
+        """Verify precision behavior."""
         bias = BasinBias(series="O", correct_count=3, over_predict_count=1, total_count=4)
         assert bias.precision == 0.75
 
     # PURPOSE: recall をテストする
     def test_recall(self):
+        """Verify recall behavior."""
         bias = BasinBias(series="O", correct_count=3, under_predict_count=2, total_count=5)
         assert bias.recall == 0.6
 
     # PURPOSE: bias_direction_balanced をテストする
     def test_bias_direction_balanced(self):
+        """Verify bias direction balanced behavior."""
         bias = BasinBias(series="O", over_predict_count=2, under_predict_count=2, total_count=4)
         assert bias.bias_direction == "balanced"
 
     # PURPOSE: bias_direction_too_wide をテストする
     def test_bias_direction_too_wide(self):
+        """Verify bias direction too wide behavior."""
         bias = BasinBias(series="P", over_predict_count=5, under_predict_count=1, total_count=6)
         assert bias.bias_direction == "too_wide"
 
     # PURPOSE: bias_direction_too_narrow をテストする
     def test_bias_direction_too_narrow(self):
+        """Verify bias direction too narrow behavior."""
         bias = BasinBias(series="H", over_predict_count=1, under_predict_count=5, total_count=6)
         assert bias.bias_direction == "too_narrow"
 
@@ -138,6 +149,7 @@ class TestBasinBias:
 # PURPOSE: attractor の処理
 @pytest.fixture(scope="module")
 def attractor():
+    """Verify attractor behavior."""
     return SeriesAttractor(threshold=0.10, oscillation_margin=0.05)
 
 
@@ -262,6 +274,7 @@ class TestRecommendCompound:
     # PURPOSE: advisor の処理
     @pytest.fixture(scope="module")
     def advisor(self):
+        """Verify advisor behavior."""
         from mekhane.fep.attractor_advisor import AttractorAdvisor
         return AttractorAdvisor()
 

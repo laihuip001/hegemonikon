@@ -25,6 +25,7 @@ from mekhane.mcp.hgk_gateway import (
 )
 
 
+# PURPOSE: Verify c1 failsafe behaves correctly
 async def test_c1_failsafe():
     """C-1: TOKEN 未設定時の起動拒否はモジュールレベルで実施済み。
     ここでは TOKEN が設定済みの場合にプロバイダーが正常動作することを確認。"""
@@ -38,6 +39,7 @@ async def test_c1_failsafe():
     print("✅ C-1: トークン検証 — 正常トークン通過、不正トークン拒否")
 
 
+# PURPOSE: Verify c2 whitelist behaves correctly
 async def test_c2_whitelist():
     """C-2: ホワイトリスト外クライアントの拒否"""
     provider = HGKOAuthProvider("test_token")
@@ -57,6 +59,7 @@ async def test_c2_whitelist():
     print(f"✅ C-2: ホワイトリスト — {len(ALLOWED_CLIENT_IDS)} 件通過、2件拒否")
 
 
+# PURPOSE: Verify c3 size limit behaves correctly
 def test_c3_size_limit():
     """C-3: idea_capture サイズ制限"""
     # 正常サイズ
@@ -78,6 +81,7 @@ def test_c3_size_limit():
     print("✅ C-3: サイズ制限 — 正常通過、10K超過拒否、境界値通過")
 
 
+# PURPOSE: Verify c4 token expiry behaves correctly
 async def test_c4_token_expiry():
     """C-4: トークン有効期限"""
     provider = HGKOAuthProvider("test_token")
@@ -118,6 +122,7 @@ async def test_c4_token_expiry():
     print(f"✅ C-4: トークン有効期限 — {token.expires_in}s (24h) ✓")
 
 
+# PURPOSE: Verify auth code reuse behaves correctly
 async def test_auth_code_reuse():
     """追加検証: 認証コードの再利用防止"""
     provider = HGKOAuthProvider("test_token")
@@ -153,6 +158,7 @@ async def test_auth_code_reuse():
     print("✅ 追加: 認証コード再利用防止 — 使用済みコードを拒否")
 
 
+# PURPOSE: Verify refresh token rotation behaves correctly
 async def test_refresh_token_rotation():
     """追加検証: リフレッシュトークンのローテーション"""
     provider = HGKOAuthProvider("test_token")
@@ -195,7 +201,9 @@ async def test_refresh_token_rotation():
     print("✅ 追加: リフレッシュトークン・ローテーション — 旧トークン無効化確認")
 
 
+# PURPOSE: Verify main behaves correctly
 async def main():
+    """Verify main behavior."""
     print("=" * 60)
     print("  L1 動的セキュリティテスト — hgk_gateway")
     print("=" * 60)

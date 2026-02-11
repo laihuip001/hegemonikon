@@ -42,6 +42,7 @@ class BaseCollector(ABC):
                 time.sleep(min_interval - elapsed)
         self._last_request_time = time.time()
 
+    # PURPOSE: base の search 処理を実行する
     @abstractmethod
     # PURPOSE: クエリで論文検索
     def search(
@@ -63,6 +64,7 @@ class BaseCollector(ABC):
         """
         pass
 
+    # PURPOSE: by id を取得する
     @abstractmethod
     # PURPOSE: IDで論文取得
     def fetch_by_id(self, paper_id: str) -> Optional[Paper]:

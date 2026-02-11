@@ -25,13 +25,17 @@ def isolated_context(tmp_path, monkeypatch):
 # PURPOSE: Test w f step record の実装
 class TestWFStepRecord:
     # PURPOSE: auto_timestamp をテストする
+    """Test suite for w f step record."""
+    # PURPOSE: Verify auto timestamp behaves correctly
     def test_auto_timestamp(self):
+        """Verify auto timestamp behavior."""
         rec = WFStepRecord(theorem_id="O1", output="test")
         assert rec.timestamp  # auto-generated
         assert rec.pw == 0.0
 
     # PURPOSE: explicit_values をテストする
     def test_explicit_values(self):
+        """Verify explicit values behavior."""
         rec = WFStepRecord(
             theorem_id="S2", output="method",
             pw=0.5, metadata={"source": "test"}
@@ -43,13 +47,17 @@ class TestWFStepRecord:
 # PURPOSE: Test w f context の実装
 class TestWFContext:
     # PURPOSE: set_and_get をテストする
+    """Test suite for w f context."""
+    # PURPOSE: Verify set and get behaves correctly
     def test_set_and_get(self):
+        """Verify set and get behavior."""
         ctx = WFContext()
         ctx.set_output("O1", "深い認識の出力")
         assert ctx.get_output("O1") == "深い認識の出力"
 
     # PURPOSE: get_nonexistent をテストする
     def test_get_nonexistent(self):
+        """Verify get nonexistent behavior."""
         ctx = WFContext()
         assert ctx.get_output("X99") is None
 
@@ -67,6 +75,7 @@ class TestWFContext:
 
     # PURPOSE: series_outputs をテストする
     def test_series_outputs(self):
+        """Verify series outputs behavior."""
         ctx = WFContext()
         ctx.set_output("O1", "o1")
         ctx.set_output("O2", "o2")
@@ -81,6 +90,7 @@ class TestWFContext:
 
     # PURPOSE: series_pw をテストする
     def test_series_pw(self):
+        """Verify series pw behavior."""
         ctx = WFContext()
         ctx.set_output("O1", "o1", pw=0.5)
         ctx.set_output("O2", "o2", pw=-0.3)
@@ -90,6 +100,7 @@ class TestWFContext:
 
     # PURPOSE: clear をテストする
     def test_clear(self):
+        """Verify clear behavior."""
         ctx = WFContext()
         ctx.set_output("O1", "will be cleared")
         ctx.clear()
@@ -98,6 +109,7 @@ class TestWFContext:
 
     # PURPOSE: list_outputs をテストする
     def test_list_outputs(self):
+        """Verify list outputs behavior."""
         ctx = WFContext()
         ctx.set_output("O3", "x")
         ctx.set_output("O1", "y")
@@ -106,6 +118,7 @@ class TestWFContext:
 
     # PURPOSE: meta をテストする
     def test_meta(self):
+        """Verify meta behavior."""
         ctx = WFContext()
         ctx.set_meta("wf_name", "/o+")
         assert ctx.get_meta("wf_name") == "/o+"
@@ -113,6 +126,7 @@ class TestWFContext:
 
     # PURPOSE: overwrite_output をテストする
     def test_overwrite_output(self):
+        """Verify overwrite output behavior."""
         ctx = WFContext()
         ctx.set_output("O1", "first")
         ctx.set_output("O1", "second")
@@ -120,6 +134,7 @@ class TestWFContext:
 
     # PURPOSE: to_cone_input をテストする
     def test_to_cone_input(self):
+        """Verify to cone input behavior."""
         ctx = WFContext()
         ctx.set_output("O1", "o1")
         ctx.set_output("O2", "o2")
@@ -128,6 +143,7 @@ class TestWFContext:
 
     # PURPOSE: export_for_cone をテストする
     def test_export_for_cone(self):
+        """Verify export for cone behavior."""
         ctx = WFContext()
         ctx.set_output("O1", "o1", pw=0.5)
         ctx.set_output("O2", "o2")
@@ -139,6 +155,7 @@ class TestWFContext:
 
     # PURPOSE: get_record をテストする
     def test_get_record(self):
+        """Verify get record behavior."""
         ctx = WFContext()
         ctx.set_output("O1", "output", pw=0.7, metadata={"test": True})
         rec = ctx.get_record("O1")

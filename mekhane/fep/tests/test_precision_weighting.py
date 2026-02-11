@@ -24,6 +24,7 @@ class TestPrecisionWeighting:
     # PURPOSE: agent の処理
     @pytest.fixture
     def agent(self):
+        """Verify agent behavior."""
         return HegemonikónFEPAgent(use_defaults=True)
 
     # PURPOSE: 初期精度は全 modality で 1.0

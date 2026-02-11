@@ -29,6 +29,7 @@ import json
 TRACES_PATH = Path("/home/makaron8426/oikos/mneme/.hegemonikon/meaningful_traces.json")
 
 
+# PURPOSE: MeaningfulTrace の機能を提供する
 @dataclass
 # PURPOSE: A moment marked as meaningful by Claude.
 class MeaningfulTrace:
@@ -44,6 +45,7 @@ class MeaningfulTrace:
     def to_dict(self) -> dict:
         return asdict(self)
 
+    # PURPOSE: meaningful_traces の from dict 処理を実行する
     @classmethod
     # PURPOSE: JSONからトレースを復元（セッション間継続性）
     def from_dict(cls, data: dict) -> "MeaningfulTrace":

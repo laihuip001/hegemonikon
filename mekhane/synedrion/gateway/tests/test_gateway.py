@@ -19,44 +19,52 @@ from mekhane.synedrion.gateway.virtual_server import VirtualServer
 # PolicyEnforcer テスト
 # =============================================================================
 
+# PURPOSE: Test suite validating policy enforcer correctness
 class TestPolicyEnforcer:
     """Policy Enforcer のテスト"""
 
+    # PURPOSE: Verify load default policy behaves correctly
     def test_load_default_policy(self) -> None:
         """デフォルト policy.yaml が正しくロードされる"""
         enforcer = PolicyEnforcer()
         assert enforcer.policy_count > 0
 
+    # PURPOSE: Verify allowed server behaves correctly
     def test_allowed_server(self) -> None:
         """許可リストのサーバーは ALLOW"""
         enforcer = PolicyEnforcer()
         result = enforcer.check("gnosis", "search")
         assert result.decision == PolicyDecision.ALLOW
 
+    # PURPOSE: Verify denied server behaves correctly
     def test_denied_server(self) -> None:
         """未登録サーバーは DENY"""
         enforcer = PolicyEnforcer()
         result = enforcer.check("malicious_server", "steal_data")
         assert result.decision == PolicyDecision.DENY
 
+    # PURPOSE: Verify destructive operation requires approval behaves correctly
     def test_destructive_operation_requires_approval(self) -> None:
         """破壊的操作は REQUIRE_APPROVAL"""
         enforcer = PolicyEnforcer()
         result = enforcer.check("gnosis", "delete_paper")
         assert result.decision == PolicyDecision.REQUIRE_APPROVAL
 
+    # PURPOSE: Verify destructive wildcard suffix behaves correctly
     def test_destructive_wildcard_suffix(self) -> None:
         """*_destroy パターンがマッチする"""
         enforcer = PolicyEnforcer()
         result = enforcer.check("sophia", "index_destroy")
         assert result.decision == PolicyDecision.REQUIRE_APPROVAL
 
+    # PURPOSE: Verify normal tool allowed behaves correctly
     def test_normal_tool_allowed(self) -> None:
         """通常のツール呼び出しは ALLOW"""
         enforcer = PolicyEnforcer()
         result = enforcer.check("hermeneus", "dispatch")
         assert result.decision == PolicyDecision.ALLOW
 
+    # PURPOSE: Verify rate limit enforcement behaves correctly
     def test_rate_limit_enforcement(self) -> None:
         """レートリミットが発動する"""
         enforcer = PolicyEnforcer()
@@ -68,6 +76,7 @@ class TestPolicyEnforcer:
         assert result.decision == PolicyDecision.DENY
         assert "Rate limit" in result.reason
 
+    # PURPOSE: Verify get server list behaves correctly
     def test_get_server_list(self) -> None:
         """許可サーバーリストが取得できる"""
         enforcer = PolicyEnforcer()
@@ -81,9 +90,11 @@ class TestPolicyEnforcer:
 # DiscoveryEngine テスト
 # =============================================================================
 
+# PURPOSE: Test suite validating discovery engine correctness
 class TestDiscoveryEngine:
     """Discovery Engine のテスト"""
 
+    # PURPOSE: Verify register server behaves correctly
     def test_register_server(self) -> None:
         """サーバーを手動登録できる"""
         engine = DiscoveryEngine()
@@ -95,6 +106,7 @@ class TestDiscoveryEngine:
         assert engine.server_count == 1
         assert engine.get("test_server") is not None
 
+    # PURPOSE: Verify unregister server behaves correctly
     def test_unregister_server(self) -> None:
         """サーバー登録を解除できる"""
         engine = DiscoveryEngine()
@@ -103,6 +115,7 @@ class TestDiscoveryEngine:
         assert engine.server_count == 0
         assert engine.unregister("nonexistent") is False
 
+    # PURPOSE: Verify register local defaults behaves correctly
     def test_register_local_defaults(self) -> None:
         """HGK 標準サーバーが全て登録される"""
         engine = DiscoveryEngine()
@@ -111,6 +124,7 @@ class TestDiscoveryEngine:
         assert engine.get("gnosis") is not None
         assert engine.get("sophia") is not None
 
+    # PURPOSE: Verify server info properties behaves correctly
     def test_server_info_properties(self) -> None:
         """ServerInfo のプロパティが正しい"""
         local = ServerInfo(name="local", transport=TransportType.STDIO, command="python x.py")
@@ -126,9 +140,11 @@ class TestDiscoveryEngine:
 # AuthProxy テスト
 # =============================================================================
 
+# PURPOSE: Test suite validating auth proxy correctness
 class TestAuthProxy:
     """Auth Proxy のテスト"""
 
+    # PURPOSE: Verify passthrough default behaves correctly
     def test_passthrough_default(self) -> None:
         """未設定サーバーはパススルー"""
         proxy = AuthProxy()
@@ -137,6 +153,7 @@ class TestAuthProxy:
         assert ctx.authenticated is True
         assert len(ctx.headers) == 0
 
+    # PURPOSE: Verify api key auth behaves correctly
     def test_api_key_auth(self) -> None:
         """API キー認証が設定される"""
         proxy = AuthProxy()
@@ -151,6 +168,7 @@ class TestAuthProxy:
         assert "Authorization" in ctx.headers
         assert ctx.headers["Authorization"] == "Bearer test-key-123"
 
+    # PURPOSE: Verify api key missing behaves correctly
     def test_api_key_missing(self) -> None:
         """API キー未設定は認証失敗"""
         proxy = AuthProxy()
@@ -162,6 +180,7 @@ class TestAuthProxy:
         ctx = proxy.authenticate("broken")
         assert ctx.authenticated is False
 
+    # PURPOSE: Verify oauth2 not implemented behaves correctly
     def test_oauth2_not_implemented(self) -> None:
         """OAuth 2.1 は NotImplementedError"""
         proxy = AuthProxy()
@@ -172,6 +191,7 @@ class TestAuthProxy:
         with pytest.raises(NotImplementedError):
             proxy.authenticate("oauth_server")
 
+    # PURPOSE: Verify configured servers behaves correctly
     def test_configured_servers(self) -> None:
         """設定済みサーバーリスト"""
         proxy = AuthProxy()
@@ -184,9 +204,11 @@ class TestAuthProxy:
 # VirtualServer テスト
 # =============================================================================
 
+# PURPOSE: Test suite validating virtual server correctness
 class TestVirtualServer:
     """Virtual MCP Server のテスト"""
 
+    # PURPOSE: Verify gateway behaves correctly
     @pytest.fixture
     def gateway(self) -> VirtualServer:
         """テスト用 Gateway をセットアップ"""
@@ -199,6 +221,7 @@ class TestVirtualServer:
         vs.register_tool("sophia", "search", "KI検索")
         return vs
 
+    # PURPOSE: Verify route success behaves correctly
     def test_route_success(self, gateway: VirtualServer) -> None:
         """正常ルーティング"""
         result = gateway.route("gnosis.search")
@@ -207,6 +230,7 @@ class TestVirtualServer:
         assert result.server_info.name == "gnosis"
         assert result.tool_name == "search"
 
+    # PURPOSE: Verify route invalid namespace behaves correctly
     def test_route_invalid_namespace(self, gateway: VirtualServer) -> None:
         """無効な名前空間"""
         result = gateway.route("invalid_no_dot")
@@ -214,6 +238,7 @@ class TestVirtualServer:
         assert result.error is not None
         assert result.error.code == "INVALID_NAMESPACE"
 
+    # PURPOSE: Verify route unknown server behaves correctly
     def test_route_unknown_server(self, gateway: VirtualServer) -> None:
         """未登録サーバー"""
         result = gateway.route("unknown.tool")
@@ -221,6 +246,7 @@ class TestVirtualServer:
         assert result.error is not None
         assert result.error.code == "SERVER_NOT_FOUND"
 
+    # PURPOSE: Verify route destructive blocked behaves correctly
     def test_route_destructive_blocked(self, gateway: VirtualServer) -> None:
         """破壊的操作がブロックされる"""
         result = gateway.route("gnosis.delete_all")
@@ -228,6 +254,7 @@ class TestVirtualServer:
         assert result.error is not None
         assert result.error.code == "APPROVAL_REQUIRED"
 
+    # PURPOSE: Verify tool listing behaves correctly
     def test_tool_listing(self, gateway: VirtualServer) -> None:
         """ツール一覧"""
         tools = gateway.list_tools()
@@ -236,12 +263,14 @@ class TestVirtualServer:
         assert "gnosis.search" in names
         assert "sophia.search" in names
 
+    # PURPOSE: Verify tools by server behaves correctly
     def test_tools_by_server(self, gateway: VirtualServer) -> None:
         """サーバー別ツール一覧"""
         tools = gateway.list_tools_by_server("gnosis")
         assert len(tools) == 1
         assert tools[0].tool_name == "search"
 
+    # PURPOSE: Verify gateway status behaves correctly
     def test_gateway_status(self, gateway: VirtualServer) -> None:
         """ステータス表示"""
         status = gateway.get_status()
@@ -250,6 +279,7 @@ class TestVirtualServer:
         assert status["policies_loaded"] > 0
         assert "gnosis" in status["servers"]
 
+    # PURPOSE: Verify register server tools batch behaves correctly
     def test_register_server_tools_batch(self, gateway: VirtualServer) -> None:
         """一括ツール登録"""
         count = gateway.register_server_tools("hermeneus", ["dispatch", "compile", "execute"])
@@ -262,9 +292,11 @@ class TestVirtualServer:
 # 統合テスト
 # =============================================================================
 
+# PURPOSE: Test suite validating gateway integration correctness
 class TestGatewayIntegration:
     """4コンポーネント統合テスト"""
 
+    # PURPOSE: Verify full pipeline behaves correctly
     def test_full_pipeline(self) -> None:
         """Discovery → Register → Policy → Auth → Route の全パイプライン"""
         # 1. Discovery

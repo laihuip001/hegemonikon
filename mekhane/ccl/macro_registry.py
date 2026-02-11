@@ -12,6 +12,7 @@ from pathlib import Path
 import json
 
 
+# PURPOSE: Macro の機能を提供する
 @dataclass
 # PURPOSE: A CCL macro definition.
 class Macro:

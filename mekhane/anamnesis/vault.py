@@ -30,6 +30,7 @@ logger = logging.getLogger(__name__)
 class VaultManager:
     """Manages secure file operations for the Vault."""
 
+    # PURPOSE: safe を出力する
     @staticmethod
     # PURPOSE: Writes content to a file safely with backup and atomic constraints.
     def write_safe(
@@ -92,6 +93,7 @@ class VaultManager:
                     pass  # TODO: Add proper error handling
             raise IOError(f"Failed to write file safely: {e}")
 
+    # PURPOSE: vault の read safe 処理を実行する
     @staticmethod
     # PURPOSE: Reads content from a file safely.
     def read_safe(filepath: Union[str, Path], encoding: str = "utf-8") -> str:

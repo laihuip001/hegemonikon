@@ -41,6 +41,7 @@ class OperatorVerification(BaseModel):
         ..., min_length=20, description="自分の言葉での説明（省略禁止）"
     )
 
+    # PURPOSE: operator を検証する
     @validator("operator")
     # PURPOSE: 検証: validate_operator
     def validate_operator(cls, v):

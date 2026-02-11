@@ -26,27 +26,33 @@ from mekhane.peira.hgk_health import (
 
 # PURPOSE: HealthItem のデータ保持と emoji 変換をテスト
 class TestHealthItem(unittest.TestCase):
+    """Test suite for health item."""
     def test_ok_emoji(self):
+        """Verify ok emoji behavior."""
         item = HealthItem("Test", "ok", "detail")
         self.assertEqual(item.emoji, "🟢")
 
     # PURPOSE: error_emoji をテストする
     def test_error_emoji(self):
+        """Verify error emoji behavior."""
         item = HealthItem("Test", "error", "detail")
         self.assertEqual(item.emoji, "🔴")
 
     # PURPOSE: warn_emoji をテストする
     def test_warn_emoji(self):
+        """Verify warn emoji behavior."""
         item = HealthItem("Test", "warn", "detail")
         self.assertEqual(item.emoji, "🟡")
 
     # PURPOSE: unknown_emoji をテストする
     def test_unknown_emoji(self):
+        """Verify unknown emoji behavior."""
         item = HealthItem("Test", "unknown", "detail")
         self.assertEqual(item.emoji, "⚪")
 
     # PURPOSE: metric_optional をテストする
     def test_metric_optional(self):
+        """Verify metric optional behavior."""
         item = HealthItem("Test", "ok")
         self.assertIsNone(item.metric)
         item2 = HealthItem("Test", "ok", metric=42.0)
@@ -55,7 +61,9 @@ class TestHealthItem(unittest.TestCase):
 
 # PURPOSE: HealthReport の score 計算をテスト
 class TestHealthReport(unittest.TestCase):
+    """Test suite for health report."""
     def test_all_ok_score(self):
+        """Verify all ok score behavior."""
         report = HealthReport(
             timestamp="test",
             items=[HealthItem("A", "ok"), HealthItem("B", "ok"), HealthItem("C", "ok")],
@@ -64,6 +72,7 @@ class TestHealthReport(unittest.TestCase):
 
     # PURPOSE: all_error_score をテストする
     def test_all_error_score(self):
+        """Verify all error score behavior."""
         report = HealthReport(
             timestamp="test",
             items=[HealthItem("A", "error"), HealthItem("B", "error")],
@@ -72,6 +81,7 @@ class TestHealthReport(unittest.TestCase):
 
     # PURPOSE: mixed_score をテストする
     def test_mixed_score(self):
+        """Verify mixed score behavior."""
         report = HealthReport(
             timestamp="test",
             items=[HealthItem("A", "ok"), HealthItem("B", "error")],
@@ -80,6 +90,7 @@ class TestHealthReport(unittest.TestCase):
 
     # PURPOSE: warn_score をテストする
     def test_warn_score(self):
+        """Verify warn score behavior."""
         report = HealthReport(
             timestamp="test",
             items=[HealthItem("A", "warn")],
@@ -88,6 +99,7 @@ class TestHealthReport(unittest.TestCase):
 
     # PURPOSE: empty_score をテストする
     def test_empty_score(self):
+        """Verify empty score behavior."""
         report = HealthReport(timestamp="test", items=[])
         self.assertAlmostEqual(report.score, 0.0)
 
@@ -95,7 +107,9 @@ class TestHealthReport(unittest.TestCase):
 # PURPOSE: systemd サービスチェックのモックテスト
 class TestCheckSystemd(unittest.TestCase):
     @patch("subprocess.run")
+    """Test suite for check systemd."""
     def test_active_service(self, mock_run):
+        """Verify active service behavior."""
         mock_run.return_value = MagicMock(stdout="active\n")
         result = check_systemd_service("Test Service", "test.service")
         self.assertEqual(result.status, "ok")
@@ -104,6 +118,7 @@ class TestCheckSystemd(unittest.TestCase):
     # PURPOSE: inactive_service をテストする
     @patch("subprocess.run")
     def test_inactive_service(self, mock_run):
+        """Verify inactive service behavior."""
         mock_run.return_value = MagicMock(stdout="inactive\n")
         result = check_systemd_service("Test Service", "test.service")
         self.assertEqual(result.status, "error")
@@ -111,6 +126,7 @@ class TestCheckSystemd(unittest.TestCase):
     # PURPOSE: timeout をテストする
     @patch("subprocess.run", side_effect=Exception("timeout"))
     def test_timeout(self, mock_run):
+        """Verify timeout behavior."""
         result = check_systemd_service("Test Service", "test.service")
         self.assertEqual(result.status, "unknown")
 
@@ -118,7 +134,9 @@ class TestCheckSystemd(unittest.TestCase):
 # PURPOSE: Docker チェックのモックテスト
 class TestCheckDocker(unittest.TestCase):
     @patch("subprocess.run")
+    """Test suite for check docker."""
     def test_container_up(self, mock_run):
+        """Verify container up behavior."""
         mock_run.return_value = MagicMock(stdout="Up 5 hours\n")
         result = check_docker("n8n")
         self.assertEqual(result.status, "ok")
@@ -127,6 +145,7 @@ class TestCheckDocker(unittest.TestCase):
     # PURPOSE: container_not_running をテストする
     @patch("subprocess.run")
     def test_container_not_running(self, mock_run):
+        """Verify container not running behavior."""
         mock_run.return_value = MagicMock(stdout="\n")
         result = check_docker("n8n")
         self.assertEqual(result.status, "error")
@@ -135,7 +154,9 @@ class TestCheckDocker(unittest.TestCase):
 # PURPOSE: cron チェックのモックテスト
 class TestCheckCron(unittest.TestCase):
     @patch("subprocess.run")
+    """Test suite for check cron."""
     def test_cron_entry_exists(self, mock_run):
+        """Verify cron entry exists behavior."""
         mock_run.return_value = MagicMock(stdout="0 4 * * * tier1_daily.sh\n")
         result = check_cron("Tier 1", "tier1")
         self.assertEqual(result.status, "ok")
@@ -143,6 +164,7 @@ class TestCheckCron(unittest.TestCase):
     # PURPOSE: cron_entry_missing をテストする
     @patch("subprocess.run")
     def test_cron_entry_missing(self, mock_run):
+        """Verify cron entry missing behavior."""
         mock_run.return_value = MagicMock(stdout="0 0 * * * backup.sh\n")
         result = check_cron("Tier 1", "tier1")
         self.assertEqual(result.status, "error")
@@ -151,7 +173,9 @@ class TestCheckCron(unittest.TestCase):
 # PURPOSE: Handoff チェックのモックテスト
 class TestCheckHandoff(unittest.TestCase):
     @patch("mekhane.peira.hgk_health.Path")
+    """Test suite for check handoff."""
     def test_directory_not_exists(self, mock_path_cls):
+        """Verify directory not exists behavior."""
         mock_dir = MagicMock()
         mock_dir.exists.return_value = False
         mock_path_cls.home.return_value.__truediv__ = lambda *args: mock_dir
@@ -171,7 +195,9 @@ class TestCheckHandoff(unittest.TestCase):
 
 # PURPOSE: format_terminal の出力フォーマットをテスト
 class TestFormatTerminal(unittest.TestCase):
+    """Test suite for format terminal."""
     def test_output_contains_header(self):
+        """Verify output contains header behavior."""
         report = HealthReport(
             timestamp=datetime.now().isoformat(),
             items=[HealthItem("Test", "ok", "detail")],
@@ -183,6 +209,7 @@ class TestFormatTerminal(unittest.TestCase):
 
     # PURPOSE: empty_report をテストする
     def test_empty_report(self):
+        """Verify empty report behavior."""
         report = HealthReport(timestamp="test", items=[])
         output = format_terminal(report)
         self.assertIn("Score: 0%", output)

@@ -205,6 +205,7 @@ class TestContradictionPair:
 
     # PURPOSE: repr をテストする
     def test_repr(self):
+        """Verify repr behavior."""
         pair = ContradictionPair(
             theorem_a="O1",
             theorem_b="O2",

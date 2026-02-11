@@ -46,6 +46,7 @@ PROMOTION_MIN_EVIDENCE = 2  # PROVISIONAL: 最低2件の根拠
 # =============================================================================
 
 
+# PURPOSE: PromotionCandidate の機能を提供する
 @dataclass
 class PromotionCandidate:
     """Sophia 昇格候補。"""
@@ -55,6 +56,7 @@ class PromotionCandidate:
     score: float = 0.0
 
 
+# PURPOSE: DoxaBootResult の機能を提供する
 @dataclass
 class DoxaBootResult:
     """Doxa boot 読込結果。"""

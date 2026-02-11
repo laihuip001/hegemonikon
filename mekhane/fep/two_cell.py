@@ -35,6 +35,7 @@ from typing import Dict, List, Optional, Tuple
 # =============================================================================
 
 
+# PURPOSE: TwoCell の機能を提供する
 @dataclass
 class TwoCell:
     """A 2-cell: transition between two derivatives of the same theorem.
@@ -53,12 +54,14 @@ class TwoCell:
     target: str        # e.g., "phro"
     is_identity: bool = False
 
+    # PURPOSE: two_cell の label 処理を実行する
     @property
     def label(self) -> str:
         if self.is_identity:
             return f"id({self.source})"
         return f"{self.source} ⇒ {self.target}"
 
+    # PURPOSE: two_cell の compose 処理を実行する
     def compose(self, other: "TwoCell") -> Optional["TwoCell"]:
         """Vertical composition of 2-cells.
 
@@ -84,6 +87,7 @@ class TwoCell:
         )
 
 
+# PURPOSE: DerivativeSpace の機能を提供する
 @dataclass
 class DerivativeSpace:
     """Weak 2-category structure for a single theorem's derivatives.
@@ -97,6 +101,7 @@ class DerivativeSpace:
     derivatives: List[str]             # e.g., ["nous", "phro", "meta"]
     derivative_labels: Dict[str, str]  # e.g., {"nous": "本質直観", ...}
 
+    # PURPOSE: two_cell の two cells 処理を実行する
     @property
     def two_cells(self) -> List[TwoCell]:
         """All valid 2-cells (including identities).
@@ -113,11 +118,13 @@ class DerivativeSpace:
                     cells.append(TwoCell(self.theorem, src, tgt))
         return cells
 
+    # PURPOSE: two_cell の non identity cells 処理を実行する
     @property
     def non_identity_cells(self) -> List[TwoCell]:
         """Only non-identity 2-cells (transitions)."""
         return [c for c in self.two_cells if not c.is_identity]
 
+    # PURPOSE: cell を取得する
     def get_cell(self, source: str, target: str) -> Optional[TwoCell]:
         """Get a specific 2-cell by source and target."""
         if source not in self.derivatives or target not in self.derivatives:
@@ -127,6 +134,7 @@ class DerivativeSpace:
             is_identity=(source == target),
         )
 
+    # PURPOSE: composition を検証する
     def verify_composition(self) -> List[str]:
         """Verify weak associativity of 2-cell composition.
 
@@ -224,6 +232,7 @@ _THEOREM_DATA: List[Tuple[str, str, str, List[str], Dict[str, str]]] = [
 ]
 
 
+# PURPOSE: derivative space を取得する
 def get_derivative_space(theorem: str) -> Optional[DerivativeSpace]:
     """Get the DerivativeSpace for a theorem.
 
@@ -245,6 +254,7 @@ def get_derivative_space(theorem: str) -> Optional[DerivativeSpace]:
     return None
 
 
+# PURPOSE: all spaces を取得する
 def get_all_spaces() -> List[DerivativeSpace]:
     """Get DerivativeSpaces for all 24 theorems."""
     return [
@@ -253,6 +263,7 @@ def get_all_spaces() -> List[DerivativeSpace]:
     ]
 
 
+# PURPOSE: series spaces を取得する
 def get_series_spaces(series: str) -> List[DerivativeSpace]:
     """Get DerivativeSpaces for a specific series (O, S, H, P, K, A)."""
     return [
@@ -267,6 +278,7 @@ def get_series_spaces(series: str) -> List[DerivativeSpace]:
 # =============================================================================
 
 
+# PURPOSE: two_cell の count two cells 処理を実行する
 def count_two_cells() -> Dict[str, int]:
     """Count total 2-cells across the system.
 
@@ -288,6 +300,7 @@ def count_two_cells() -> Dict[str, int]:
     }
 
 
+# PURPOSE: all を検証する
 def verify_all() -> Dict[str, List[str]]:
     """Verify weak associativity for all theorem spaces.
 
@@ -307,6 +320,7 @@ def verify_all() -> Dict[str, List[str]]:
 # =============================================================================
 
 
+# PURPOSE: two_cell の describe space 処理を実行する
 def describe_space(space: DerivativeSpace) -> str:
     """Human-readable description of a derivative space."""
     lines = [
@@ -324,6 +338,7 @@ def describe_space(space: DerivativeSpace) -> str:
     return "\n".join(lines)
 
 
+# PURPOSE: two_cell の describe summary 処理を実行する
 def describe_summary() -> str:
     """Summary of the entire 2-cell structure."""
     counts = count_two_cells()

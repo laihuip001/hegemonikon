@@ -90,11 +90,13 @@ class TestMPHGKComponents:
 
     # PURPOSE: source_functor_is_mp をテストする
     def test_source_functor_is_mp(self):
+        """Verify source functor is mp behavior."""
         nt = NATURAL_TRANSFORMATIONS["mp_hgk"]
         assert nt.source_functor == "MP"
 
     # PURPOSE: target_functor_is_hgk をテストする
     def test_target_functor_is_hgk(self):
+        """Verify target functor is hgk behavior."""
         nt = NATURAL_TRANSFORMATIONS["mp_hgk"]
         assert nt.target_functor == "HGK"
 
@@ -360,18 +362,22 @@ class TestMPFunctor:
 
     # PURPOSE: mp_functor_exists をテストする
     def test_mp_functor_exists(self):
+        """Verify mp functor exists behavior."""
         assert "mp" in FUNCTORS
 
     # PURPOSE: mp_source_is_mp_category をテストする
     def test_mp_source_is_mp_category(self):
+        """Verify mp source is mp category behavior."""
         assert FUNCTORS["mp"].source_cat == "MP"
 
     # PURPOSE: mp_target_is_cog をテストする
     def test_mp_target_is_cog(self):
+        """Verify mp target is cog behavior."""
         assert FUNCTORS["mp"].target_cat == "Cog"
 
     # PURPOSE: mp_has_five_objects をテストする
     def test_mp_has_five_objects(self):
+        """Verify mp has five objects behavior."""
         assert len(FUNCTORS["mp"].object_map) == 5
 
     # PURPOSE: MP Functor に射のマッピングが存在する。

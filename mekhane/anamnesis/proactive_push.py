@@ -44,6 +44,7 @@ _HEGEMONIKON_ROOT = Path(__file__).parent.parent.parent
 LINK_GRAPH_PATH = _MNEME_ROOT / "indices" / "link_graph.json"
 
 
+# PURPOSE: Recommendation の機能を提供する
 @dataclass
 class Recommendation:
     """ユーザーへの知識推薦 1 件."""
@@ -60,6 +61,7 @@ class Recommendation:
     actions: list[str] = field(default_factory=lambda: ["/eat", "/jukudoku"])
 
 
+# PURPOSE: PushResult の機能を提供する
 @dataclass
 class PushResult:
     """推薦結果の集約."""
@@ -71,6 +73,7 @@ class PushResult:
     total_candidates: int
 
 
+# PURPOSE: ProactivePush の機能を提供する
 class ProactivePush:
     """「データが自ら語りかけてくる DB」の核心実装.
 
@@ -276,6 +279,7 @@ class ProactivePush:
     # Public API
     # ==========================================================
 
+    # PURPOSE: proactive_push の boot recommendations 処理を実行する
     def boot_recommendations(
         self, context: Optional[str] = None
     ) -> PushResult:
@@ -451,6 +455,7 @@ class ProactivePush:
             actions=["/jukudoku", "/eat"],
         )
 
+    # PURPOSE: proactive_push の context recommendations 処理を実行する
     def context_recommendations(
         self, user_message: str, max_recs: int = 2
     ) -> PushResult:
@@ -526,6 +531,7 @@ class ProactivePush:
             logger.warning(f"[ProactivePush] Failed to read handoff: {e}")
             return ""
 
+    # PURPOSE: proactive_push の reset session 処理を実行する
     def reset_session(self):
         """セッション内の重複除去キャッシュをリセット."""
         self._seen_keys.clear()
@@ -534,6 +540,7 @@ class ProactivePush:
     # Format
     # ==========================================================
 
+    # PURPOSE: recommendations を整形する
     @staticmethod
     def format_recommendations(result: PushResult) -> str:
         """推薦結果を人間向けフォーマットに変換.
@@ -580,6 +587,7 @@ class ProactivePush:
 
         return "\n".join(lines)
 
+    # PURPOSE: compact を整形する
     @staticmethod
     def format_compact(result: PushResult) -> str:
         """チャット中の控えめなフォーマット.
@@ -605,6 +613,7 @@ class ProactivePush:
 _push_instance: Optional[ProactivePush] = None
 
 
+# PURPOSE: push を取得する
 def get_push() -> ProactivePush:
     """シングルトン ProactivePush インスタンスを取得."""
     global _push_instance
@@ -613,6 +622,7 @@ def get_push() -> ProactivePush:
     return _push_instance
 
 
+# PURPOSE: proactive_push の boot push 処理を実行する
 def boot_push(context: Optional[str] = None) -> str:
     """/boot 時の推薦を実行し、フォーマット済み文字列を返す.
 
@@ -625,6 +635,7 @@ def boot_push(context: Optional[str] = None) -> str:
     return ProactivePush.format_recommendations(result)
 
 
+# PURPOSE: proactive_push の context push 処理を実行する
 def context_push(user_message: str) -> str:
     """チャット中のリアルタイム推薦を実行し、コンパクト文字列を返す.
 
@@ -641,6 +652,7 @@ def context_push(user_message: str) -> str:
 # CLI
 # ==========================================================
 
+# PURPOSE: proactive_push の main 処理を実行する
 def main():
     """CLI エントリーポイント."""
     import argparse

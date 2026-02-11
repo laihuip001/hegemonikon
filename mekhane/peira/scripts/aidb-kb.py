@@ -169,6 +169,7 @@ class Embedder:
         return [self.embed(t) for t in texts]
 
 
+# PURPOSE: frontmatter を解析する
 def parse_frontmatter(content: str) -> tuple[dict, str]:
     """Extract frontmatter and body from markdown."""
     if not content.startswith("---"):
@@ -188,6 +189,7 @@ def parse_frontmatter(content: str) -> tuple[dict, str]:
     return frontmatter, parts[2].strip()
 
 
+# PURPOSE: aidb-kb の chunk article 処理を実行する
 def chunk_article(article_id: str, content: str, meta: dict) -> list[dict]:
     """Split article into semantic chunks."""
     _, body = parse_frontmatter(content)
@@ -228,6 +230,7 @@ def chunk_article(article_id: str, content: str, meta: dict) -> list[dict]:
     return chunks
 
 
+# PURPOSE: index を構築する
 def build_index():
     """Build LanceDB index from markdown files."""
     if not check_dependencies():
@@ -299,6 +302,7 @@ def build_index():
     print(f"  Chunks: {len(all_data)}")
 
 
+# PURPOSE: aidb-kb の search 処理を実行する
 def search(query: str, n_results: int = 5):
     """Semantic search."""
     if not check_dependencies():
@@ -344,6 +348,7 @@ def search(query: str, n_results: int = 5):
     print("\n" + "-" * 60)
 
 
+# PURPOSE: aidb-kb の show article 処理を実行する
 def show_article(article_id: str):
     """Show full article content."""
     matches = list(ROOT_DIR.glob(f"**/{article_id}.md"))
@@ -368,6 +373,7 @@ def show_article(article_id: str):
         print(f"\n... (truncated, {len(body)} chars total)")
 
 
+# PURPOSE: aidb-kb の show stats 処理を実行する
 def show_stats():
     """Show KB statistics."""
     # Count files
@@ -418,6 +424,7 @@ def show_stats():
     print("=" * 40)
 
 
+# PURPOSE: aidb-kb の main 処理を実行する
 def main():
     if len(sys.argv) < 2:
         print(__doc__)

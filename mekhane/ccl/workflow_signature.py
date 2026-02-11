@@ -12,6 +12,7 @@ from pathlib import Path
 import yaml
 
 
+# PURPOSE: WorkflowSignature の機能を提供する
 @dataclass
 # PURPOSE: A workflow's CCL signature.
 class WorkflowSignature:

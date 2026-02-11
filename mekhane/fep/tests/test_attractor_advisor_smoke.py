@@ -8,6 +8,7 @@
 import pytest
 
 
+# PURPOSE: Verify import attractor advisor behaves correctly
 def test_import_attractor_advisor():
     """attractor_advisor モジュールが構文的に正しく import できること。"""
     from mekhane.fep import attractor_advisor
@@ -16,6 +17,7 @@ def test_import_attractor_advisor():
     assert hasattr(attractor_advisor, "CompoundRecommendation")
 
 
+# PURPOSE: Verify attractor advisor instantiation behaves correctly
 def test_attractor_advisor_instantiation():
     """AttractorAdvisor がインスタンス化できること (force_cpu=True で軽量)。"""
     from mekhane.fep.attractor_advisor import AttractorAdvisor
@@ -26,6 +28,7 @@ def test_attractor_advisor_instantiation():
     assert hasattr(advisor, "recommend_compound")
 
 
+# PURPOSE: Verify recommendation dataclass behaves correctly
 def test_recommendation_dataclass():
     """Recommendation dataclass のフィールドが期待通りであること。"""
     from mekhane.fep.attractor_advisor import Recommendation

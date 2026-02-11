@@ -47,6 +47,7 @@ class ResearchDepth(Enum):
     DEEP = "deep"  # 深層 (専門家レベル)
 
 
+# PURPOSE: ResearchQuery の機能を提供する
 @dataclass
 # PURPOSE: 調査クエリ
 class ResearchQuery:
@@ -65,6 +66,7 @@ class ResearchQuery:
     constraints: Dict[str, str] = field(default_factory=dict)
 
 
+# PURPOSE: SophiaResult の機能を提供する
 @dataclass
 # PURPOSE: K4 Sophia 調査結果
 class SophiaResult:

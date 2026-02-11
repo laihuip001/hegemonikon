@@ -52,6 +52,7 @@ class ScopeScale(Enum):
     MACRO = "macro"  # 広域的
 
 
+# PURPOSE: KhoraResult の機能を提供する
 @dataclass
 # PURPOSE: P1 Khōra 評価結果
 class KhoraResult:
@@ -75,6 +76,7 @@ class KhoraResult:
     included: List[str] = field(default_factory=list)
     excluded: List[str] = field(default_factory=list)
 
+    # PURPOSE: perigraphe_engine の scope label 処理を実行する
     @property
     # PURPOSE: スコープラベル (Micro×Micro 等)
     def scope_label(self) -> str:
@@ -174,6 +176,7 @@ class HodosResult:
     waypoints: List[str] = field(default_factory=list)
     estimated_steps: int = 1
 
+    # PURPOSE: perigraphe_engine の total nodes 処理を実行する
     @property
     # PURPOSE: 総ノード数
     def total_nodes(self) -> int:
@@ -265,6 +268,7 @@ class TrokhiaResult:
     iteration: int = 1
     max_iterations: Optional[int] = None
 
+    # PURPOSE: perigraphe_engine の current phase name 処理を実行する
     @property
     # PURPOSE: 現在フェーズ名
     def current_phase_name(self) -> str:
@@ -273,6 +277,7 @@ class TrokhiaResult:
             return self.phases[self.current_phase]
         return "unknown"
 
+    # PURPOSE: perigraphe_engine の is complete 処理を実行する
     @property
     # PURPOSE: 軌道完了か
     def is_complete(self) -> bool:
@@ -283,6 +288,7 @@ class TrokhiaResult:
         return self.iteration > self.max_iterations
 
 
+# PURPOSE: perigraphe_engine の define trajectory 処理を実行する
 def define_trajectory(
     trajectory_name: str,
     phases: List[str],
@@ -338,6 +344,7 @@ def format_khora_markdown(result: KhoraResult) -> str:
     return "\n".join(lines)
 
 
+# PURPOSE: hodos markdown を整形する
 def format_hodos_markdown(result: HodosResult) -> str:
     """P2 Hodos 結果をMarkdown形式でフォーマット"""
     path_str = f"{result.start}"
@@ -357,6 +364,7 @@ def format_hodos_markdown(result: HodosResult) -> str:
     return "\n".join(lines)
 
 
+# PURPOSE: trokhia markdown を整形する
 def format_trokhia_markdown(result: TrokhiaResult) -> str:
     """P3 Trokhia 結果をMarkdown形式でフォーマット"""
     phase_str = " → ".join(result.phases)

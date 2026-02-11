@@ -39,6 +39,7 @@ class DoxaCache:
         - 信頼度: エラー結果は「信念」として保存しない
     """
 
+    # PURPOSE: text hash を取得する
     @staticmethod
     # PURPOSE: テキストのハッシュを生成
     def get_text_hash(text: str) -> str:
@@ -50,6 +51,7 @@ class DoxaCache:
         """
         return hashlib.sha256(text.encode()).hexdigest()[:32]
 
+    # PURPOSE: doxa_cache の sanitize log 処理を実行する
     @staticmethod
     # PURPOSE: ログ用にテキストをサニタイズ（プライバシー保護）
     def sanitize_log(text: str) -> str:

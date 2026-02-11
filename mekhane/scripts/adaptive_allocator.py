@@ -27,6 +27,7 @@ PERSPECTIVES_FILE = (
 )
 
 
+# PURPOSE: AllocationPlan の機能を提供する
 @dataclass
 # PURPOSE: Daily allocation plan.
 class AllocationPlan:

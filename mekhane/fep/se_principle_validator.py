@@ -44,6 +44,7 @@ class Severity(Enum):
     WARNING = "warning"  # 警告のみ
 
 
+# PURPOSE: Violation の機能を提供する
 @dataclass
 # PURPOSE: クラス: Violation
 class Violation:
@@ -53,6 +54,7 @@ class Violation:
     message: str
 
 
+# PURPOSE: ValidationResult の機能を提供する
 @dataclass
 # PURPOSE: クラス: ValidationResult
 class ValidationResult:
@@ -224,6 +226,7 @@ class SEPrincipleValidator:
         )
 
 
+# PURPOSE: se_principle_validator の main 処理を実行する
 def main():
     if len(sys.argv) < 4:
         print(

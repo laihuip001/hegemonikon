@@ -48,6 +48,7 @@ class VerdictType(Enum):
     REVISE = "revise"  # 修正要求
 
 
+# PURPOSE: Objection の機能を提供する
 @dataclass
 # PURPOSE: 異議オブジェクト
 class Objection:
@@ -64,6 +65,7 @@ class Objection:
     severity: float
 
 
+# PURPOSE: KrisisResult の機能を提供する
 @dataclass
 # PURPOSE: A2 Krisis 判定結果
 class KrisisResult:
@@ -85,12 +87,14 @@ class KrisisResult:
     objections: List[Objection]
     recommendation: str
 
+    # PURPOSE: krisis_judge の has critical objection 処理を実行する
     @property
     # PURPOSE: クリティカルな異議があるか
     def has_critical_objection(self) -> bool:
         """クリティカルな異議があるか"""
         return any(o.severity >= 0.8 for o in self.objections)
 
+    # PURPOSE: krisis_judge の objection count 処理を実行する
     @property
     # PURPOSE: 異議の数
     def objection_count(self) -> int:

@@ -37,6 +37,7 @@ except ImportError:
     sys.exit(1)
 
 
+# PURPOSE: BranchInfo の機能を提供する
 @dataclass
 # PURPOSE: ブランチ情報
 class BranchInfo:

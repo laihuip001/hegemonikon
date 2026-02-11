@@ -17,6 +17,7 @@ from mekhane.fep.attractor_dispatcher import (
 # PURPOSE: dispatcher の処理
 @pytest.fixture(scope="module")
 def dispatcher():
+    """Verify dispatcher behavior."""
     return AttractorDispatcher()
 
 
@@ -30,26 +31,31 @@ class TestFrontmatterParser:
 
     # PURPOSE: extract_field_quoted をテストする
     def test_extract_field_quoted(self):
+        """Verify extract field quoted behavior."""
         content = '---\nversion: "4.6"\nskill_ref: ".agent/skills/ousia/o1-noesis/SKILL.md"\n---\n'
         assert _extract_field(content, "skill_ref") == ".agent/skills/ousia/o1-noesis/SKILL.md"
 
     # PURPOSE: extract_field_unquoted をテストする
     def test_extract_field_unquoted(self):
+        """Verify extract field unquoted behavior."""
         content = '---\nlcm_state: beta\n---\n'
         assert _extract_field(content, "lcm_state") == "beta"
 
     # PURPOSE: extract_field_missing をテストする
     def test_extract_field_missing(self):
+        """Verify extract field missing behavior."""
         content = '---\nversion: "1.0"\n---\n'
         assert _extract_field(content, "skill_ref") == ""
 
     # PURPOSE: extract_field_no_frontmatter をテストする
     def test_extract_field_no_frontmatter(self):
+        """Verify extract field no frontmatter behavior."""
         content = "# Just a heading\nSome text"
         assert _extract_field(content, "anything") == ""
 
     # PURPOSE: extract_multiline_inline をテストする
     def test_extract_multiline_inline(self):
+        """Verify extract multiline inline behavior."""
         content = '---\ndescription: "Short description"\n---\n'
         assert _extract_multiline_field(content, "description") == "Short description"
 

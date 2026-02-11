@@ -27,6 +27,7 @@ from mekhane.pks.narrator_formats import (
 )
 
 
+# PURPOSE: NarrativeSegment の機能を提供する
 @dataclass
 # PURPOSE: 対話の一セグメント
 class NarrativeSegment:
@@ -36,6 +37,7 @@ class NarrativeSegment:
     content: str
 
 
+# PURPOSE: Narrative の機能を提供する
 @dataclass
 # PURPOSE: 多フォーマット対応の対話形式サマリー
 class Narrative:
@@ -121,14 +123,17 @@ class PKSNarrator:
         self._llm = PKSLLMClient(model=model, enabled=use_llm)
         self._default_format = default_format
 
+    # PURPOSE: narrator の llm available 処理を実行する
     @property
     def llm_available(self) -> bool:
         return self._llm.available
 
+    # PURPOSE: narrator の default format 処理を実行する
     @property
     def default_format(self) -> NarratorFormat:
         return self._default_format
 
+    # PURPOSE: narrator の default format 処理を実行する
     @default_format.setter
     def default_format(self, fmt: NarratorFormat) -> None:
         self._default_format = fmt

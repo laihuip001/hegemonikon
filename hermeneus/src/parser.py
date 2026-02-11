@@ -14,7 +14,7 @@ from .ccl_ast import (
     OpType, Workflow, Condition, MacroRef,
     ConvergenceLoop, Sequence, Fusion, Oscillation, ColimitExpansion,
     Pipeline, Parallel,
-    ForLoop, IfCondition, WhileLoop, Lambda, LetBinding, Program
+    ForLoop, IfCondition, WhileLoop, Lambda, TaggedBlock, LetBinding, Program
 )
 
 
@@ -106,6 +106,13 @@ class CCLParser:
         if expr.startswith('lim['):
             return self._parse_lim(expr)
         
+        # CPL v2.0 意味タグ: V:{}, C:{}, R:{}, M:{}
+        if len(expr) >= 3 and expr[0] in 'VCRM' and expr[1] == ':' and expr[2] == '{':
+            return self._parse_tagged_block(expr)
+        # E:{} は I: のコンテキスト外では TaggedBlock として処理
+        if expr.startswith('E:{'):
+            return self._parse_tagged_block(expr)
+        
         # グループ振動: ~(...) — シーケンス全体を振動（反復実行）
         # 例: ~(/sop_/noe_/ene_/dia-) = 4WFシーケンスを反復
         # 二項演算子より先にチェック（括弧内の _ で分割されるのを防ぐ）
@@ -178,8 +185,8 @@ class CCLParser:
     def _handle_binary(self, op: str, parts: List[str]) -> Any:
         """二項演算子を処理"""
         if op == '_':
-            # シーケンス
-            steps = [self._parse_expression(p) for p in parts]
+            # シーケンス — 空パーツをフィルタリング
+            steps = [self._parse_expression(p) for p in parts if p]
             return Sequence(steps=steps)
         elif op == '~*':
             # 収束振動
@@ -198,6 +205,10 @@ class CCLParser:
             return Oscillation(left=left, right=right)
         elif op == '*^':
             # 融合 + メタ表示 (fusion with meta display)
+            # 空左辺の場合（_ 分割の結果 *^/u+ が独立パーツになったケース）
+            if not parts[0]:
+                right = self._parse_expression('*^'.join(parts[1:]))
+                return Fusion(left=right, right=right, meta_display=True)
             left = self._parse_expression(parts[0])
             right = self._parse_expression('*^'.join(parts[1:]))
             return Fusion(left=left, right=right, meta_display=True)
@@ -374,61 +385,79 @@ class CCLParser:
     
     def _parse_for(self, expr: str) -> ForLoop:
         """FOR ループをパース: F:[×N]{body} or F:[A,B]{body} or F:N{body}"""
-        # Pattern 1: F:[...]{body} (角括弧あり)
-        match = re.match(r'F:\[([^\]]+)\]\{(.+)\}$', expr)
-        if match:
-            iter_spec = match.group(1).strip()
-            body_str = match.group(2).strip()
-
-            # ×N 形式
-            if iter_spec.startswith('×'):
-                iterations = int(iter_spec[1:])
-            else:
-                # リスト形式
-                iterations = [i.strip() for i in iter_spec.split(',')]
-
-            body = self._parse_expression(body_str)
-            return ForLoop(iterations=iterations, body=body)
+        # Pattern 1: F:[...]{body} (角括弧あり、ネスト対応)
+        bracket_match = re.match(r'F:\[([^\]]+)\]', expr)
+        if bracket_match:
+            iter_spec = bracket_match.group(1).strip()
+            rest_after_bracket = expr[bracket_match.end():]
+            body_str, rest = self._extract_braced_body(rest_after_bracket)
+            if body_str is not None:
+                # ×N 形式
+                if iter_spec.startswith('×'):
+                    iterations = int(iter_spec[1:])
+                else:
+                    # リスト形式
+                    iterations = [i.strip() for i in iter_spec.split(',')]
+                
+                body = self._parse_expression(body_str)
+                
+                # body 後に続く式がある場合 (例: F:[...]{...}, ~(...))
+                if rest:
+                    for_node = ForLoop(iterations=iterations, body=body)
+                    if rest.startswith(','):
+                        rest = rest[1:].strip()
+                    if rest.startswith('_'):
+                        rest = rest[1:].strip()
+                    if rest:
+                        rest_node = self._parse_expression(rest)
+                        return Sequence(steps=[for_node, rest_node])
+                    return for_node
+                
+                return ForLoop(iterations=iterations, body=body)
 
         # Pattern 2: F:N{body} (角括弧なし、数値直接指定)
-        match2 = re.match(r'F:(\d+)\{(.+)\}$', expr)
-        if match2:
-            iterations = int(match2.group(1))
-            body_str = match2.group(2).strip()
-            body = self._parse_expression(body_str)
-            return ForLoop(iterations=iterations, body=body)
+        num_match = re.match(r'F:(\d+)', expr)
+        if num_match:
+            iterations = int(num_match.group(1))
+            rest_after_num = expr[num_match.end():]
+            body_str, _ = self._extract_braced_body(rest_after_num)
+            if body_str is not None:
+                body = self._parse_expression(body_str)
+                return ForLoop(iterations=iterations, body=body)
 
         raise ValueError(f"Invalid FOR loop: {expr}")
     
     def _parse_if(self, expr: str) -> IfCondition:
         """IF 条件分岐をパース: I:[cond]{then} EI:[cond]{elif} E:{else}"""
-        # Pattern 1: I:[cond]{then} に続く EI:/E: チェインを処理
-        # V[]/E[] を含む条件式と、E[/selector] 等の角括弧内内容にも対応
-        pattern = r'I:\[([^\]]*(?:\[[^\]]*\][^\]]*)*)\]\{([^}]+)\}(.*)$'
-        match = re.match(pattern, expr)
-        if match:
-            condition = self._parse_condition(match.group(1))
-            then_branch = self._parse_expression(match.group(2))
-            rest = match.group(3).strip()
-            else_branch = self._parse_else_chain(rest) if rest else None
-            return IfCondition(
-                condition=condition,
-                then_branch=then_branch,
-                else_branch=else_branch
-            )
+        # Pattern 1: I:[cond]{then} — ネストした {} に対応
+        cond_match = re.match(r'I:\[([^\]]*(?:\[[^\]]*\][^\]]*)*)\]', expr)
+        if cond_match:
+            condition = self._parse_condition(cond_match.group(1))
+            rest_after_cond = expr[cond_match.end():]
+            body_str, rest = self._extract_braced_body(rest_after_cond)
+            if body_str is not None:
+                then_branch = self._parse_expression(body_str)
+                else_branch = self._parse_else_chain(rest) if rest else None
+                return IfCondition(
+                    condition=condition,
+                    then_branch=then_branch,
+                    else_branch=else_branch
+                )
 
         # Pattern 2: I:cond{then} (角括弧なし、シンプル条件)
-        match2 = re.match(r'I:(\w+)\{([^}]+)\}(.*)$', expr)
+        match2 = re.match(r'I:(\w+)', expr)
         if match2:
             condition = Condition(var=match2.group(1), op=">", value=0)
-            then_branch = self._parse_expression(match2.group(2))
-            rest = match2.group(3).strip()
-            else_branch = self._parse_else_chain(rest) if rest else None
-            return IfCondition(
-                condition=condition,
-                then_branch=then_branch,
-                else_branch=else_branch
-            )
+            rest_after_cond = expr[match2.end():]
+            body_str, rest = self._extract_braced_body(rest_after_cond)
+            if body_str is not None:
+                then_branch = self._parse_expression(body_str)
+                else_branch = self._parse_else_chain(rest) if rest else None
+                return IfCondition(
+                    condition=condition,
+                    then_branch=then_branch,
+                    else_branch=else_branch
+                )
 
         raise ValueError(f"Invalid IF: {expr}")
 
@@ -443,12 +472,37 @@ class CCLParser:
             # EI: を I: に置換して再帰パース
             return self._parse_if('I:' + rest[3:])
         
-        # E:{body} → else ブランチ
-        match = re.match(r'E:\{([^}]+)\}(.*)$', rest)
-        if match:
-            return self._parse_expression(match.group(1))
+        # E:{body} → else ブランチ (ネスト対応)
+        if rest.startswith('E:'):
+            body_str, _ = self._extract_braced_body(rest[2:])
+            if body_str is not None:
+                return self._parse_expression(body_str)
         
         return None
+    
+    def _extract_braced_body(self, s: str) -> tuple:
+        """先頭の {body} を抽出 (ネスト対応)。
+        
+        Returns:
+            (body_str, rest) — body_str は {} 内の文字列、rest は残りの文字列。
+            body_str が None の場合は抽出失敗。
+        """
+        s = s.strip()
+        if not s or s[0] != '{':
+            return (None, s)
+        
+        depth = 0
+        for i, c in enumerate(s):
+            if c == '{':
+                depth += 1
+            elif c == '}':
+                depth -= 1
+                if depth == 0:
+                    body = s[1:i].strip()
+                    rest = s[i+1:].strip()
+                    return (body, rest)
+        
+        return (None, s)
     
     def _parse_while(self, expr: str) -> WhileLoop:
         """WHILE ループをパース: W:[cond]{body}"""
@@ -495,6 +549,44 @@ class CCLParser:
         body = self._parse_expression(match.group(2))
         
         return LetBinding(name=name, body=body)
+
+    def _parse_tagged_block(self, expr: str) -> 'TaggedBlock':
+        """意味タグ付きブロックをパース: V:{body}, C:{body}, R:{body}, M:{body}, E:{body}"""
+        tag = expr[0]  # V, C, R, M, or E
+        # tag:{ の後の body を抽出 (ネストしたブラケットを考慮)
+        if not expr[2] == '{':
+            raise ValueError(f"Invalid tagged block: {expr}")
+        
+        # ネストした {} を考慮して body を抽出
+        depth = 0
+        body_start = 2  # ':' の次の '{'
+        body_end = -1
+        for i in range(body_start, len(expr)):
+            if expr[i] == '{':
+                depth += 1
+            elif expr[i] == '}':
+                depth -= 1
+                if depth == 0:
+                    body_end = i
+                    break
+        
+        if body_end == -1:
+            raise ValueError(f"Unmatched braces in tagged block: {expr}")
+        
+        body_str = expr[body_start + 1:body_end].strip()
+        body = self._parse_expression(body_str)
+        
+        # タグブロック後に続く式がある場合（例: V:{/dia}_I:[pass]{...}）
+        rest = expr[body_end + 1:].strip()
+        if rest:
+            # 残りの部分（通常は _ で接続されている）を処理
+            if rest.startswith('_'):
+                rest = rest[1:].strip()
+            rest_node = self._parse_expression(rest)
+            tagged = TaggedBlock(tag=tag, body=body)
+            return Sequence(steps=[tagged, rest_node])
+        
+        return TaggedBlock(tag=tag, body=body)
 
 
 # =============================================================================

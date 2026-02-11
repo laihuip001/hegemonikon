@@ -21,6 +21,7 @@ from pathlib import Path
 from typing import Optional
 
 
+# PURPOSE: Perspective の機能を提供する
 @dataclass
 # PURPOSE: A single orthogonal review perspective = Domain × Axis.
 class Perspective:
@@ -36,12 +37,14 @@ class Perspective:
     axis_focus: str
     theorem: str
 
+    # PURPOSE: prompt_generator の id 処理を実行する
     @property
     # PURPOSE: Unique perspective ID.
     def id(self) -> str:
         """Unique perspective ID."""
         return f"{self.domain_id}-{self.axis_id}"
 
+    # PURPOSE: prompt_generator の name 処理を実行する
     @property
     # PURPOSE: Human-readable perspective name.
     def name(self) -> str:
@@ -67,6 +70,7 @@ class PerspectiveMatrix:
         self._axes = {a["id"]: a for a in config["axes"]}
         self._template = config["prompt_template"]
 
+    # PURPOSE: prompt_generator の load 処理を実行する
     @classmethod
     # PURPOSE: Load perspective matrix from YAML.
     def load(cls, path: Optional[Path] = None) -> "PerspectiveMatrix":
@@ -79,18 +83,21 @@ class PerspectiveMatrix:
 
         return cls(config)
 
+    # PURPOSE: prompt_generator の domains 処理を実行する
     @property
     # PURPOSE: List of domain IDs.
     def domains(self) -> list[str]:
         """List of domain IDs."""
         return list(self._domains.keys())
 
+    # PURPOSE: prompt_generator の axes 処理を実行する
     @property
     # PURPOSE: List of axis IDs.
     def axes(self) -> list[str]:
         """List of axis IDs."""
         return list(self._axes.keys())
 
+    # PURPOSE: prompt_generator の total perspectives 処理を実行する
     @property
     # PURPOSE: Total number of perspectives.
     def total_perspectives(self) -> int:

@@ -58,6 +58,7 @@ class AttractorAdvisor:
         self._force_cpu = force_cpu
         self._use_gnosis = use_gnosis
 
+    # PURPOSE: theorem attractor を取得する
     def get_theorem_attractor(self) -> TheoremAttractor:
         """TheoremAttractor インスタンスを取得 (lazy init + 共有用)."""
         if self._theorem_attractor is None:
@@ -338,6 +339,7 @@ class AttractorAdvisor:
             parts.append(f"  Inhibited: {inh}")
         return "\n".join(parts)
 
+    # PURPOSE: attractor_advisor の recommend compound 処理を実行する
     def recommend_compound(self, user_input: str) -> CompoundRecommendation:
         """複合入力を文分解し、各セグメントごとに推薦を生成する。
 

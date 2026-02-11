@@ -169,6 +169,7 @@ async def call_tool(name: str, arguments: dict):
         return [TextContent(type="text", text=f"Error: {str(e)}")]
 
 
+# PURPOSE: list candidates を処理する
 async def handle_list_candidates(arguments: dict):
     """消化候補をリスト"""
     if DigestorPipeline is None:
@@ -193,6 +194,7 @@ async def handle_list_candidates(arguments: dict):
     return [TextContent(type="text", text=output)]
 
 
+# PURPOSE: run digestor を処理する
 async def handle_run_digestor(arguments: dict):
     """消化パイプライン実行"""
     if DigestorPipeline is None:
@@ -224,6 +226,7 @@ async def handle_run_digestor(arguments: dict):
     return [TextContent(type="text", text=output)]
 
 
+# PURPOSE: get topics を処理する
 async def handle_get_topics(arguments: dict):
     """トピック一覧取得"""
     if DigestorSelector is None:
@@ -245,6 +248,7 @@ async def handle_get_topics(arguments: dict):
     return [TextContent(type="text", text=output)]
 
 
+# PURPOSE: digestor_mcp_server の main 処理を実行する
 async def main():
     """Run the MCP server."""
     log("Starting stdio server...")

@@ -105,6 +105,7 @@ log("Server initialized")
 _engine = None
 
 
+# PURPOSE: engine を取得する
 def get_engine():
     """Lazy initialization of SearchEngine."""
     global _engine

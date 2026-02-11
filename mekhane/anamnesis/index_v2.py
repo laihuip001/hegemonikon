@@ -174,6 +174,7 @@ class Embedder:
         return normalized.astype(np.float32)
 
 
+# PURPOSE: GnosisIndexV2 の機能を提供する
 class GnosisIndexV2:
     """
     Gnōsis論文インデックス V2
@@ -214,6 +215,7 @@ class GnosisIndexV2:
         self._primary_key_cache: set = set()
         self._title_cache: dict[str, str] = {}
 
+    # PURPOSE: index_v2 の embedder 処理を実行する
     @property
     # PURPOSE: embedder — 知識基盤の処理
     def embedder(self) -> Embedder:

@@ -54,6 +54,7 @@ from mekhane.ccl.sel_validator import (
 # =============================================================================
 
 
+# PURPOSE: UMLSELResult の機能を提供する
 @dataclass
 # PURPOSE: UML-SEL 統合検証の結果
 class UMLSELResult:

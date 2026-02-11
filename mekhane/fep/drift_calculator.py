@@ -38,6 +38,7 @@ from typing import Dict, List, Optional, Tuple
 # =============================================================================
 
 
+# PURPOSE: DriftResult の機能を提供する
 @dataclass
 class DriftResult:
     """Result of drift computation between source and compressed texts.
@@ -54,15 +55,18 @@ class DriftResult:
     preserved_chunks: List[str] = field(default_factory=list)
     chunk_scores: Dict[str, float] = field(default_factory=dict)  # chunk → similarity
 
+    # PURPOSE: drift_calculator の preservation rate 処理を実行する
     @property
     def preservation_rate(self) -> float:
         """Hom value = 1 - drift. How much was preserved."""
         return 1.0 - self.value
 
+    # PURPOSE: drift_calculator の lost count 処理を実行する
     @property
     def lost_count(self) -> int:
         return len(self.lost_chunks)
 
+    # PURPOSE: drift_calculator の preserved count 処理を実行する
     @property
     def preserved_count(self) -> int:
         return len(self.preserved_chunks)
@@ -209,6 +213,7 @@ def _split_into_chunks(text: str, min_length: int = 50) -> List[str]:
 # =============================================================================
 
 
+# PURPOSE: drift を計算する
 def compute_drift(
     source: str,
     compressed: str,
@@ -365,6 +370,7 @@ def _compute_coverage_drift(source: str, compressed: str) -> DriftResult:
 # =============================================================================
 
 
+# PURPOSE: drift_calculator の describe drift 処理を実行する
 def describe_drift(result: DriftResult) -> str:
     """Human-readable description of drift measurement.
 

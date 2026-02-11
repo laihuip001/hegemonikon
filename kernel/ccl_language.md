@@ -24,12 +24,17 @@ CCL = Cognitive Programming Language
 | 実行対象 | CPU | **認知エージェント** |
 | 関数 | `def f():` | `/wf` (ワークフロー) |
 | 変数 | `x = 1` | `$var` (WM変数) |
-| 条件分岐 | `if/else` | `?cond{}` |
-| ループ | `for/while` | `F:[]`, `~` (振動) |
-| 再帰 | `f(f(x))` | `*` (深化) |
+| 条件分岐 | `if/else` | `I:[cond]{} / E:{}` |
+| ループ | `for/while` | `F:[]{}`, `W:[]{}`, `~` (振動) |
+| 収束ループ | `while not converged:` | `C:{}` |
+| 累積 | `functools.reduce` | `R:{}` |
+| キャッシュ | `@cache` | `M:{}` |
+| 検証 | `assert` / `@validate` | `V:{}` |
+| 再帰 | `f(f(x))` | `*` (融合) |
 | マクロ | プリプロセッサ | `@macro` |
 | 型 | `int, str` | **定理型 (O, S, H, P, K, A)** |
 | ライブラリ | `import` | ワークフロー群 |
+| Lambda | `lambda x: ...` | `L:[x]{...}` |
 
 ---
 
@@ -42,15 +47,17 @@ CCL = Cognitive Programming Language
 | `/` | ワークフロー呼び出し | `/noe` |
 | `+` | 深化 | `/noe+` |
 | `-` | 簡略化 | `/noe-` |
-| `*` | 再帰 | `/noe*` |
+| `*` | 融合 | `/noe*dia` |
 | `^` | メタレベル | `/noe^` |
 | `_` | チェーン (then) | `/noe_/s` |
 | `~` | 振動 (oscillation) | `/noe~/s` |
-| `∃` | 存在演算子 | `∃x` |
-| `@` | マクロ参照 | `@proof` |
+| `~*` | 収束振動 | `/noe~*/s` |
+| `~!` | 発散振動 | `/noe~!/s` |
+| `>>` | 射 (構造変換) | `/noe >> /dia` |
+| `>*` | 変容 (射的融合) | `/noe >* /dia` |
 | `\` | 反転 | `\noe` |
 | `$` | WM変数定義/参照 | `$goal = /bou` |
-| `>>` | アーティファクト永続化 | `$x >> file.md` |
+| `@` | マクロ参照 | `@proof` |
 
 ### 制御構造 — メタ処理統一構文
 
@@ -59,12 +66,17 @@ CCL = Cognitive Programming Language
 | 構造 | 構文 | 意味 |
 |:-----|:-----|:-----|
 | 順次 | `A_B_C` | A → B → C |
-| 条件 (IF) | `I:cond{A}` | if cond then A |
+| 条件 (IF) | `I:[cond]{A}` | if cond then A |
 | 条件 (ELSE) | `E:{A}` | else A |
-| 条件 (ELIF) | `E:cond{A}` | else if cond then A |
 | 繰り返し (FOR) | `F:[items]{A}` | for item in items: A |
-| 繰り返し (N回) | `F:N{A}` | N 回繰り返し |
+| 繰り返し (N回) | `F:[×N]{A}` | N 回繰り返し |
+| ループ (WHILE) | `W:[cond]{A}` | while cond: A |
+| 収束ループ | `C:{A}` | converge(A) |
+| 累積融合 | `R:{A}` | reduce(A) |
+| 記憶 | `M:{A}` | memoize(A) |
+| 検証 | `V:{A}` | validate(A) |
 | 振動 | `A~B` | A ↔ B (収束まで) |
+| Lambda | `L:[x]{A}` | lambda x: A |
 | 再帰 | `A*` | A を再帰的に適用 |
 
 ### パラメータ
@@ -100,6 +112,16 @@ CCL の「型」は Hegemonikón の定理体系に対応:
 # 使用
 @name
 @name{override=value}
+```
+
+**3層構造** (詳細: `operators.md` §11):
+
+| 層 | 正本 | 内容 |
+|:---|:-----|:-----|
+| Layer 1: ユーザーマクロ (12) | `.agent/workflows/ccl-*.md` | Creator が直接使う |
+| Layer 2: システムマクロ (~8) | `operators.md` §11 | Hub WF 内部使用 |
+| Layer 3: 構文プリミティブ (9) | `operators.md` §9.7, §10 | C:/R:/M:/V: + F:/I:/E:/W:/L: |
+
 ---
 
 ## WM 変数（作業記憶）
@@ -143,10 +165,11 @@ $emotion = /pro    # 型: H (Hormē)
 
 | 要件 | 実現 |
 |:-----|:-----|
-| 条件分岐 | `I:cond{}` / `E:{}` |
-| ループ | `F:N{}`, `F:[]{}`, `~` |
+| 条件分岐 | `I:[cond]{}` / `E:{}` |
+| ループ | `F:[N]{}`, `W:[]{}`, `~` |
+| 収束 | `C:{}` |
 | 状態 | 認知コンテキスト |
-| メモリ | `/dox` (信念永続化) |
+| メモリ | `/dox` (信念永続化) / `M:{}` (キャッシュ) |
 
 **CCL はチューリング完全になりうる。**
 

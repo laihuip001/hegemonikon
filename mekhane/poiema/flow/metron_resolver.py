@@ -37,6 +37,7 @@ class MetronResolver:
         - get_system_prompt(): O1 Noēsis との連携（認識の深度を決定）
     """
 
+    # PURPOSE: system prompt を取得する
     @staticmethod
     # PURPOSE: システムプロンプト生成
     def get_system_prompt(level: int = METRON_LIGHT_MAX, user_prompt: str = "") -> str:
@@ -94,6 +95,7 @@ class MetronResolver:
             return f"{base}\n\n追加指示: {user_prompt}"
         return base
 
+    # PURPOSE: level label を取得する
     @staticmethod
     # PURPOSE: レベルの日本語ラベル
     def get_level_label(level: int) -> str:
@@ -106,6 +108,7 @@ class MetronResolver:
             return "Rich（濃いめ）"
         return "Deep（深い）"
 
+    # PURPOSE: metron_resolver の resolve level 処理を実行する
     @staticmethod
     # PURPOSE: S1 Metron 核心機能: 連続値を3段階に正規化
     def resolve_level(level: int) -> int:

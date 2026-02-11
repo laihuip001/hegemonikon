@@ -1,0 +1,33 @@
+{
+  "date": "2026-02-11",
+  "accounts": {
+    "account_01": {
+      "used": 1,
+      "sessions": [
+        "17385592654508566793"
+      ]
+    },
+    "account_02": {
+      "used": 0,
+      "sessions": []
+    },
+    "account_03": {
+      "used": 0,
+      "sessions": []
+    },
+    "account_04": {
+      "used": 0,
+      "sessions": []
+    },
+    "account_05": {
+      "used": 0,
+      "sessions": []
+    },
+    "account_06": {
+      "used": 0,
+      "sessions": []
+    }
+  },
+  "total_used": 1,
+  "prs": []
+}

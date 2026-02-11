@@ -36,20 +36,26 @@ from mekhane.pks.pks_engine import SessionContext
 # PURPOSE: Test series topics mapping の実装
 class TestSeriesTopicsMapping:
     # PURPOSE: all_6_series_defined をテストする
+    """Test suite for series topics mapping."""
+    # PURPOSE: Verify all 6 series defined behaves correctly
     def test_all_6_series_defined(self):
+        """Verify all 6 series defined behavior."""
         assert set(SERIES_TOPICS.keys()) == {"O", "S", "H", "P", "K", "A"}
 
     # PURPOSE: all_6_workflow_sets をテストする
     def test_all_6_workflow_sets(self):
+        """Verify all 6 workflow sets behavior."""
         assert set(SERIES_WORKFLOWS.keys()) == {"O", "S", "H", "P", "K", "A"}
 
     # PURPOSE: topics_non_empty をテストする
     def test_topics_non_empty(self):
+        """Verify topics non empty behavior."""
         for series, topics in SERIES_TOPICS.items():
             assert len(topics) >= 3, f"{series} has too few topics"
 
     # PURPOSE: workflows_non_empty をテストする
     def test_workflows_non_empty(self):
+        """Verify workflows non empty behavior."""
         for series, workflows in SERIES_WORKFLOWS.items():
             assert len(workflows) >= 2, f"{series} has too few workflows"
 
@@ -57,7 +63,10 @@ class TestSeriesTopicsMapping:
 # PURPOSE: Test attractor context bridge の実装
 class TestAttractorContextBridge:
     # PURPOSE: to_session_context_basic をテストする
+    """Test suite for attractor context bridge."""
+    # PURPOSE: Verify to session context basic behaves correctly
     def test_to_session_context_basic(self):
+        """Verify to session context basic behavior."""
         bridge = AttractorContextBridge()
         ctx = AttractorContext(
             series="K",
@@ -72,6 +81,7 @@ class TestAttractorContextBridge:
 
     # PURPOSE: to_session_context_oscillation_merges_topics をテストする
     def test_to_session_context_oscillation_merges_topics(self):
+        """Verify to session context oscillation merges topics behavior."""
         bridge = AttractorContextBridge()
         ctx = AttractorContext(
             series="K",
@@ -90,6 +100,7 @@ class TestAttractorContextBridge:
 
     # PURPOSE: to_session_context_no_duplicates をテストする
     def test_to_session_context_no_duplicates(self):
+        """Verify to session context no duplicates behavior."""
         bridge = AttractorContextBridge()
         ctx = AttractorContext(
             series="O",
@@ -111,6 +122,7 @@ class TestAttractorContextBridgeIntegration:
     # PURPOSE: bridge の処理
     @pytest.fixture
     def bridge(self):
+        """Verify bridge behavior."""
         try:
             b = AttractorContextBridge(force_cpu=True)
             b._get_attractor()  # force init
@@ -120,6 +132,7 @@ class TestAttractorContextBridgeIntegration:
 
     # PURPOSE: infer_context_returns_series をテストする
     def test_infer_context_returns_series(self, bridge):
+        """Verify infer context returns series behavior."""
         ctx = bridge.infer_context("アーキテクチャを設計する")
         assert ctx.series in ("O", "S", "H", "P", "K", "A")
         assert ctx.similarity > 0
@@ -127,6 +140,7 @@ class TestAttractorContextBridgeIntegration:
 
     # PURPOSE: infer_session_context_e2e をテストする
     def test_infer_session_context_e2e(self, bridge):
+        """Verify infer session context e2e behavior."""
         session = bridge.infer_session_context("調査して論文を読む")
         assert isinstance(session, SessionContext)
         assert len(session.topics) > 0
@@ -140,7 +154,10 @@ class TestAttractorContextBridgeIntegration:
 # PURPOSE: Test push feedback の実装
 class TestPushFeedback:
     # PURPOSE: auto_timestamp をテストする
+    """Test suite for push feedback."""
+    # PURPOSE: Verify auto timestamp behaves correctly
     def test_auto_timestamp(self):
+        """Verify auto timestamp behavior."""
         fb = PushFeedback(
             nugget_title="test", reaction="used", series="K"
         )
@@ -148,6 +165,7 @@ class TestPushFeedback:
 
     # PURPOSE: explicit_timestamp をテストする
     def test_explicit_timestamp(self):
+        """Verify explicit timestamp behavior."""
         fb = PushFeedback(
             nugget_title="test",
             reaction="used",
@@ -160,7 +178,10 @@ class TestPushFeedback:
 # PURPOSE: Test feedback collector の実装
 class TestFeedbackCollector:
     # PURPOSE: record_and_stats をテストする
+    """Test suite for feedback collector."""
+    # PURPOSE: Verify record and stats behaves correctly
     def test_record_and_stats(self):
+        """Verify record and stats behavior."""
         collector = FeedbackCollector(persist_path=Path("/tmp/test_fb.json"))
         collector.record(PushFeedback("paper1", "used", "K"))
         collector.record(PushFeedback("paper2", "dismissed", "K"))
@@ -171,6 +192,7 @@ class TestFeedbackCollector:
 
     # PURPOSE: adjust_threshold_positive_feedback をテストする
     def test_adjust_threshold_positive_feedback(self):
+        """Verify adjust threshold positive feedback behavior."""
         collector = FeedbackCollector(persist_path=Path("/tmp/test_fb2.json"))
         # All positive → threshold should decrease
         for i in range(5):
@@ -181,6 +203,7 @@ class TestFeedbackCollector:
 
     # PURPOSE: adjust_threshold_negative_feedback をテストする
     def test_adjust_threshold_negative_feedback(self):
+        """Verify adjust threshold negative feedback behavior."""
         collector = FeedbackCollector(persist_path=Path("/tmp/test_fb3.json"))
         # All negative → threshold should increase
         for i in range(5):
@@ -191,6 +214,7 @@ class TestFeedbackCollector:
 
     # PURPOSE: adjust_threshold_no_data をテストする
     def test_adjust_threshold_no_data(self):
+        """Verify adjust threshold no data behavior."""
         collector = FeedbackCollector(persist_path=Path("/tmp/test_fb4.json"))
         # No data → base threshold
         threshold = collector.adjust_threshold("X", base_threshold=0.65)
@@ -198,6 +222,7 @@ class TestFeedbackCollector:
 
     # PURPOSE: adjust_threshold_clamped をテストする
     def test_adjust_threshold_clamped(self):
+        """Verify adjust threshold clamped behavior."""
         collector = FeedbackCollector(persist_path=Path("/tmp/test_fb5.json"))
         # Extreme positive
         for i in range(100):
@@ -207,6 +232,7 @@ class TestFeedbackCollector:
 
     # PURPOSE: persist_and_reload をテストする
     def test_persist_and_reload(self, tmp_path):
+        """Verify persist and reload behavior."""
         fb_path = tmp_path / "feedback.json"
         collector = FeedbackCollector(persist_path=fb_path)
         collector.record(PushFeedback("paper1", "used", "K"))
@@ -220,6 +246,7 @@ class TestFeedbackCollector:
 
     # PURPOSE: reaction_weights_defined をテストする
     def test_reaction_weights_defined(self):
+        """Verify reaction weights defined behavior."""
         assert "used" in REACTION_WEIGHTS
         assert "dismissed" in REACTION_WEIGHTS
         assert "deepened" in REACTION_WEIGHTS

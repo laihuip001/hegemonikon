@@ -36,6 +36,7 @@ if str(_HEGEMONIKON_ROOT) not in sys.path:
 # --- Data Models ---
 
 
+# PURPOSE: KnowledgeNugget の機能を提供する
 @dataclass
 # PURPOSE: 知識の最小単位 — PKS がプッシュする情報の粒
 class KnowledgeNugget:
@@ -110,6 +111,7 @@ class ContextTracker:
     def __init__(self):
         self._context = SessionContext()
 
+    # PURPOSE: pks_engine の context 処理を実行する
     @property
     # PURPOSE: トピック更新
     def context(self) -> SessionContext:
@@ -754,6 +756,7 @@ class PKSEngine:
         if self._feedback is None:
             return None
 
+        # PURPOSE: pks_engine の callback 処理を実行する
         def callback(nugget_title: str, reaction: str, series: str = "") -> None:
             self.record_feedback(nugget_title, reaction, series)
 

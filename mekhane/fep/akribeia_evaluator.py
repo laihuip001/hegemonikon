@@ -44,6 +44,7 @@ class PathosDerivative(Enum):
     SOMATIC = "soma"  # 身体的 (感情の身体反応)
 
 
+# PURPOSE: PathosResult の機能を提供する
 @dataclass
 # PURPOSE: A1 Pathos 評価結果
 class PathosResult:
@@ -65,6 +66,7 @@ class PathosResult:
     intensity: float
     regulation_need: float
 
+    # PURPOSE: akribeia_evaluator の needs regulation 処理を実行する
     @property
     # PURPOSE: 調整が必要か
     def needs_regulation(self) -> bool:
@@ -156,6 +158,7 @@ class GnomeResult:
     generalizability: float
     examples: List[str] = field(default_factory=list)
 
+    # PURPOSE: akribeia_evaluator の is actionable 処理を実行する
     @property
     # PURPOSE: 行動可能な原則か
     def is_actionable(self) -> bool:
@@ -244,6 +247,7 @@ class EpistemeResult:
     jtb_score: float
     status: str
 
+    # PURPOSE: akribeia_evaluator の is knowledge 処理を実行する
     @property
     # PURPOSE: 知識として成立するか (JTB条件)
     def is_knowledge(self) -> bool:
@@ -252,6 +256,7 @@ class EpistemeResult:
         return self.is_justified and (self.is_true is True) and self.is_believed
 
 
+# PURPOSE: evaluate episteme を計算する
 def evaluate_episteme(
     proposition: str,
     justification: Optional[str] = None,
@@ -335,6 +340,7 @@ def format_pathos_markdown(result: PathosResult) -> str:
     return "\n".join(lines)
 
 
+# PURPOSE: gnome markdown を整形する
 def format_gnome_markdown(result: GnomeResult) -> str:
     """A3 Gnōmē 結果をMarkdown形式でフォーマット"""
     lines = [
@@ -350,6 +356,7 @@ def format_gnome_markdown(result: GnomeResult) -> str:
     return "\n".join(lines)
 
 
+# PURPOSE: episteme markdown を整形する
 def format_episteme_markdown(result: EpistemeResult) -> str:
     """A4 Epistēmē 結果をMarkdown形式でフォーマット"""
     j_emoji = "✅" if result.is_justified else "❌"

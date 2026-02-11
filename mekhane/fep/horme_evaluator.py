@@ -44,6 +44,7 @@ class PropatheiaDerivative(Enum):
     DRAW = "draw"  # 吸引傾向（引き寄せ）
 
 
+# PURPOSE: PropatheiaResult の機能を提供する
 @dataclass
 # PURPOSE: H1 Propatheia 評価結果
 class PropatheiaResult:
@@ -63,12 +64,14 @@ class PropatheiaResult:
     valence: float
     description: str
 
+    # PURPOSE: horme_evaluator の is positive 処理を実行する
     @property
     # PURPOSE: 正の情緒価か
     def is_positive(self) -> bool:
         """正の情緒価か"""
         return self.valence > 0
 
+    # PURPOSE: horme_evaluator の is significant 処理を実行する
     @property
     # PURPOSE: 有意な強度か
     def is_significant(self) -> bool:
@@ -176,12 +179,14 @@ class PistisResult:
     counter_evidence_count: int
     justification: str
 
+    # PURPOSE: horme_evaluator の net evidence 処理を実行する
     @property
     # PURPOSE: 正味の根拠数
     def net_evidence(self) -> int:
         """正味の根拠数"""
         return self.evidence_count - self.counter_evidence_count
 
+    # PURPOSE: horme_evaluator の should trust 処理を実行する
     @property
     # PURPOSE: 信頼すべきか
     def should_trust(self) -> bool:
@@ -190,6 +195,7 @@ class PistisResult:
         return self.confidence >= 0.6 and self.derivative != PistisDerivative.LOW
 
 
+# PURPOSE: evaluate pistis を計算する
 def evaluate_pistis(
     belief: str,
     evidence: Optional[List[str]] = None,
@@ -254,6 +260,7 @@ class OrexisDerivative(Enum):
     NEUTRAL = "neutral"  # 中立傾向
 
 
+# PURPOSE: OrexisResult の機能を提供する
 @dataclass
 class OrexisResult:
     """H3 Orexis 評価結果
@@ -274,6 +281,7 @@ class OrexisResult:
     net_tendency: float
     motivation: str
 
+    # PURPOSE: horme_evaluator の should pursue 処理を実行する
     @property
     # PURPOSE: 追求すべきか
 # PURPOSE: H3 Orexis: 欲求傾向を評価

@@ -37,6 +37,7 @@ _original_stdout = sys.stdout
 _stderr_wrapper = sys.stderr
 
 
+# PURPOSE: typos_mcp_server の log 処理を実行する
 def log(msg):
     print(f"[typos] {msg}", file=sys.stderr, flush=True)
 
@@ -51,6 +52,7 @@ log(f"Added to path: {Path(__file__).parent.parent}")
 
 
 # ============ Suppress stdout during imports ============
+# PURPOSE: StdoutSuppressor の機能を提供する
 class StdoutSuppressor:
     def __init__(self):
         self._null = io.StringIO()
@@ -139,6 +141,7 @@ DOMAIN_KEYWORDS = {
 }
 
 
+# PURPOSE: typos_mcp_server の detect domain 処理を実行する
 def detect_domain(text: str) -> str:
     """Detect domain from requirements text."""
     text_lower = text.lower()
@@ -155,6 +158,7 @@ def detect_domain(text: str) -> str:
 ALLOWED_DOMAINS = frozenset(["technical", "rag", "summarization", "research"])
 
 
+# PURPOSE: domain を検証する
 def validate_domain(domain: str) -> str:
     """Validate domain against whitelist. Defense-in-depth against path traversal."""
     if domain not in ALLOWED_DOMAINS:
@@ -189,6 +193,7 @@ DIVERGENT_KEYWORDS = [
 ]
 
 
+# PURPOSE: typos_mcp_server の classify task 処理を実行する
 def classify_task(description: str) -> dict:
     """Classify task as convergent, divergent, or ambiguous.
 
@@ -235,6 +240,7 @@ def classify_task(description: str) -> dict:
 
 
 # ============ Template Loading ============
+# PURPOSE: yaml file を読み込む
 def load_yaml_file(path: Path) -> dict:
     """Load YAML file as dict."""
     try:
@@ -250,6 +256,7 @@ def load_yaml_file(path: Path) -> dict:
 
 # --- Task Context Extraction (v3.0) ---
 
+# PURPOSE: typos_mcp_server の extract task context 処理を実行する
 def extract_task_context(requirements: str) -> dict:
     """requirements から動詞・対象・タスクタイプを抽出し、タスク固有化に使う。
 
@@ -403,6 +410,7 @@ ARCHETYPE_CONSTRAINTS = {
 }
 
 
+# PURPOSE: typos_mcp_server の generate typos 処理を実行する
 def generate_typos(requirements: str, domain: str, output_format: str) -> str:
     """Generate Týpos code from requirements.
 
@@ -684,6 +692,7 @@ server = Server(
 log("Server v2.0 initialized")
 
 
+# PURPOSE: typos_mcp_server の list tools 処理を実行する
 @server.list_tools()
 async def list_tools():
     """List available tools."""
@@ -820,6 +829,7 @@ def _get_content(arguments: dict) -> str:
         raise ValueError("Either 'content' or 'filepath' is required")
 
 
+# PURPOSE: typos_mcp_server の call tool 処理を実行する
 @server.call_tool(validate_input=True)
 async def call_tool(name: str, arguments: dict):
     """Handle tool calls."""
@@ -1088,6 +1098,7 @@ async def _handle_policy_check(arguments: dict):
     return [TextContent(type="text", text="\n".join(lines))]
 
 
+# PURPOSE: typos_mcp_server の main 処理を実行する
 async def main():
     """Run the MCP server."""
     log("Starting stdio server...")

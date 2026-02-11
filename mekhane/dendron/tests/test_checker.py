@@ -47,6 +47,7 @@ def checker_with_exemptions():
 def tmp_py_file(tmp_path):
     """一時 Python ファイルを生成するファクトリ"""
     def _create(content: str, name: str = "sample_module.py") -> Path:
+        """Verify create behavior."""
         f = tmp_path / name
         f.write_text(content, encoding="utf-8")
         return f
@@ -62,6 +63,7 @@ class TestFileProof:
 
     # PURPOSE: valid_proof_with_parent をテストする
     def test_valid_proof_with_parent(self, checker, tmp_py_file):
+        """Verify valid proof with parent behavior."""
         f = tmp_py_file('# PROOF: [L2/インフラ] <- mekhane/dendron/\n"Module docstring"\n')
         result = checker.check_file_proof(f)
         assert result.status == ProofStatus.OK
@@ -70,28 +72,33 @@ class TestFileProof:
 
     # PURPOSE: missing_proof をテストする
     def test_missing_proof(self, checker, tmp_py_file):
+        """Verify missing proof behavior."""
         f = tmp_py_file('"Module without proof"\ndef foo():\n    pass\n')
         result = checker.check_file_proof(f)
         assert result.status == ProofStatus.MISSING
 
     # PURPOSE: orphan_proof をテストする
     def test_orphan_proof(self, checker, tmp_py_file):
+        """Verify orphan proof behavior."""
         f = tmp_py_file('# PROOF: [L1/定理]\n"Module with proof but no parent"\n')
         result = checker.check_file_proof(f)
         assert result.status == ProofStatus.ORPHAN
 
     # PURPOSE: exempt_pycache をテストする
     def test_exempt_pycache(self, checker_with_exemptions):
+        """Verify exempt pycache behavior."""
         path = Path("__pycache__/something.pyc")
         assert checker_with_exemptions.is_exempt(path) is True
 
     # PURPOSE: exempt_venv をテストする
     def test_exempt_venv(self, checker_with_exemptions):
+        """Verify exempt venv behavior."""
         path = Path(".venv/lib/site-packages/foo.py")
         assert checker_with_exemptions.is_exempt(path) is True
 
     # PURPOSE: not_exempt_normal をテストする
     def test_not_exempt_normal(self, checker_with_exemptions):
+        """Verify not exempt normal behavior."""
         path = Path("mekhane/dendron/checker.py")
         assert checker_with_exemptions.is_exempt(path) is False
 
@@ -105,28 +112,33 @@ class TestParentValidation:
 
     # PURPOSE: special_parent_fep をテストする
     def test_special_parent_fep(self, checker):
+        """Verify special parent fep behavior."""
         valid, _ = checker.validate_parent("FEP")
         assert valid is True
 
     # PURPOSE: special_parent_external をテストする
     def test_special_parent_external(self, checker):
+        """Verify special parent external behavior."""
         valid, _ = checker.validate_parent("external")
         assert valid is True
 
     # PURPOSE: path_traversal_rejected をテストする
     def test_path_traversal_rejected(self, checker):
+        """Verify path traversal rejected behavior."""
         valid, reason = checker.validate_parent("../../etc/passwd")
         assert valid is False
         assert "パストラバーサル" in reason
 
     # PURPOSE: absolute_path_rejected をテストする
     def test_absolute_path_rejected(self, checker):
+        """Verify absolute path rejected behavior."""
         valid, reason = checker.validate_parent("/etc/passwd")
         assert valid is False
         assert "絶対パス" in reason
 
     # PURPOSE: too_long_path_rejected をテストする
     def test_too_long_path_rejected(self, checker):
+        """Verify too long path rejected behavior."""
         valid, reason = checker.validate_parent("a" * 300)
         assert valid is False
         assert "長すぎる" in reason
@@ -141,6 +153,7 @@ class TestPurposeCheck:
 
     # PURPOSE: function_with_purpose をテストする
     def test_function_with_purpose(self, checker, tmp_py_file):
+        """Verify function with purpose behavior."""
         content = (
             "# PROOF: [L2/テスト] <- sample/\n"
             "# PURPOSE: ユーザー認証を一元化する\n"
@@ -156,6 +169,7 @@ class TestPurposeCheck:
 
     # PURPOSE: function_without_purpose をテストする
     def test_function_without_purpose(self, checker, tmp_py_file):
+        """Verify function without purpose behavior."""
         content = (
             "# PROOF: [L2/テスト] <- sample/\n"
             "def authenticate(user, password):\n"
@@ -169,6 +183,7 @@ class TestPurposeCheck:
 
     # PURPOSE: class_with_purpose をテストする
     def test_class_with_purpose(self, checker, tmp_py_file):
+        """Verify class with purpose behavior."""
         content = (
             "# PROOF: [L2/テスト] <- sample/\n"
             "# PURPOSE: 認証ロジックをカプセル化する\n"
@@ -183,6 +198,7 @@ class TestPurposeCheck:
 
     # PURPOSE: private_function_exempt をテストする
     def test_private_function_exempt(self, checker, tmp_py_file):
+        """Verify private function exempt behavior."""
         content = (
             "# PROOF: [L2/テスト] <- sample/\n"
             "def _helper():\n"
@@ -196,6 +212,7 @@ class TestPurposeCheck:
 
     # PURPOSE: dunder_skipped をテストする
     def test_dunder_skipped(self, checker, tmp_py_file):
+        """Verify dunder skipped behavior."""
         content = (
             "# PROOF: [L2/テスト] <- sample/\n"
             "class Foo:\n"
@@ -211,6 +228,7 @@ class TestPurposeCheck:
 
     # PURPOSE: purpose_above_decorator をテストする
     def test_purpose_above_decorator(self, checker, tmp_py_file):
+        """Verify purpose above decorator behavior."""
         content = (
             "# PROOF: [L2/テスト] <- sample/\n"
             "# PURPOSE: プロパティとしてカバレッジを公開する\n"
@@ -318,20 +336,26 @@ class TestPurposePattern:
 
     # PURPOSE: basic_match をテストする
     def test_basic_match(self):
+        """Verify basic match behavior."""
         m = PURPOSE_PATTERN.search("# PURPOSE: テストする")
         assert m is not None
         assert m.group(1).strip() == "テストする"
 
+    # PURPOSE: Verify with extra spaces behaves correctly
     def test_with_extra_spaces(self):
+        """Verify with extra spaces behavior."""
         m = PURPOSE_PATTERN.search("#  PURPOSE:  テストする")
         assert m is not None
 
+    # PURPOSE: Verify no match without hash behaves correctly
     def test_no_match_without_hash(self):
+        """Verify no match without hash behavior."""
         m = PURPOSE_PATTERN.search("PURPOSE: テストする")
         assert m is None
 
     # PURPOSE: no_match_empty をテストする
     def test_no_match_empty(self):
+        """Verify no match empty behavior."""
         m = PURPOSE_PATTERN.search("# PURPOSE:")
         assert m is None
 
@@ -514,6 +538,7 @@ class TestEnglishWeakPurpose:
         weak = [r for r in results if r.status == ProofStatus.WEAK]
         assert len(weak) == 1
 
+    # PURPOSE: Verify english weak manages behaves correctly
     def test_english_weak_manages(self, checker, tmp_py_file):
         """'Manages X' は WHAT であり WEAK"""
         f = tmp_py_file('# PROOF: [L2/x] <- parent/\n# PURPOSE: Manages the connection pool\ndef manage(pool: list) -> None:\n    pass\n')
@@ -521,6 +546,7 @@ class TestEnglishWeakPurpose:
         weak = [r for r in results if r.status == ProofStatus.WEAK]
         assert len(weak) == 1
 
+    # PURPOSE: Verify english good purpose behaves correctly
     def test_english_good_purpose(self, checker, tmp_py_file):
         """良い英語 PURPOSE (WHY) → OK"""
         f = tmp_py_file('# PROOF: [L2/x] <- parent/\n# PURPOSE: Prevent memory leaks by closing idle connections after timeout\ndef cleanup(pool: list) -> None:\n    pass\n')

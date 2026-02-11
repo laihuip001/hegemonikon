@@ -51,6 +51,7 @@ _DEFAULT_LOG_DIR = Path.home() / "oikos/mneme/.hegemonikon/feedback"
 # Data Model
 # ─────────────────────────────────────────────────────────────────────
 
+# PURPOSE: FeedbackRecord の機能を提供する
 @dataclass
 class FeedbackRecord:
     """Creator の1回のフィードバックを表現する。
@@ -88,6 +89,7 @@ class FeedbackRecord:
                 f"Must be one of {_VALID_SERIES}"
             )
 
+    # PURPOSE: credit_assignment の effective series 処理を実行する
     @property
     def effective_series(self) -> str:
         """学習対象の Series: accept→推薦, reject+修正→正解, reject のみ→推薦."""
@@ -96,6 +98,7 @@ class FeedbackRecord:
         return self.correct_series or self.recommended_series
 
 
+# PURPOSE: FeedbackResult の機能を提供する
 @dataclass
 class FeedbackResult:
     """apply_feedback_to_agent() の結果。"""

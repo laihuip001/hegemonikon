@@ -25,6 +25,7 @@ class DendronFileResult(BaseModel):
     issues: list[str] = []
 
 
+# PURPOSE: DendronSummary の機能を提供する
 class DendronSummary(BaseModel):
     """Dendron レポートサマリー。"""
     total_files: int = 0
@@ -36,6 +37,7 @@ class DendronSummary(BaseModel):
     issues: list[str] = []
 
 
+# PURPOSE: DendronReportResponse の機能を提供する
 class DendronReportResponse(BaseModel):
     """Dendron レポート。"""
     summary: DendronSummary
@@ -45,11 +47,13 @@ class DendronReportResponse(BaseModel):
     )
 
 
+# PURPOSE: DendronCheckRequest の機能を提供する
 class DendronCheckRequest(BaseModel):
     """個別ファイルチェックリクエスト。"""
     path: str = Field(description="チェック対象のファイルパス")
 
 
+# PURPOSE: DendronCheckResponse の機能を提供する
 class DendronCheckResponse(BaseModel):
     """個別ファイルチェック結果。"""
     path: str
@@ -115,6 +119,7 @@ def _checker_to_summary(checker, target_dir: Path) -> tuple[DendronSummary, list
     return summary, file_results
 
 
+# PURPOSE: dendron の dendron report 処理を実行する
 @router.get("/report", response_model=DendronReportResponse)
 async def dendron_report(
     detail: str = Query("summary", description="summary | full"),
@@ -135,6 +140,7 @@ async def dendron_report(
     )
 
 
+# PURPOSE: dendron の dendron check 処理を実行する
 @router.post("/check", response_model=DendronCheckResponse)
 async def dendron_check(req: DendronCheckRequest) -> DendronCheckResponse:
     """個別ファイルの PROOF チェック。"""

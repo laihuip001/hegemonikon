@@ -20,16 +20,21 @@ from mekhane.anamnesis import night_review
 class TestNightReview(unittest.TestCase):
 
     # PURPOSE: setUp をセットアップする
+    """Test suite for night review."""
+    # PURPOSE: Verify set up behaves correctly
     def setUp(self):
+        """Verify set up behavior."""
         self.test_dir = tempfile.mkdtemp()
         self.brain_dir = Path(self.test_dir)
 
     # PURPOSE: tearDown の処理
     def tearDown(self):
+        """Verify tear down behavior."""
         shutil.rmtree(self.test_dir)
 
     # PURPOSE: session を生成する
     def create_session(self, session_id, files_data, is_hidden=False):
+        """Verify create session behavior."""
         dir_name = session_id if not is_hidden else f"_{session_id}"
         session_path = self.brain_dir / dir_name
         session_path.mkdir()
@@ -54,6 +59,7 @@ class TestNightReview(unittest.TestCase):
 
     # PURPOSE: get_sessions_basic をテストする
     def test_get_sessions_basic(self):
+        """Verify get sessions basic behavior."""
         files = [
             (
                 "plan.md",
@@ -77,6 +83,7 @@ class TestNightReview(unittest.TestCase):
 
     # PURPOSE: get_sessions_skip_hidden をテストする
     def test_get_sessions_skip_hidden(self):
+        """Verify get sessions skip hidden behavior."""
         files = [("C", {"updatedAt": "2023-01-01T12:00:00Z"})]
         self.create_session("session_hidden", files, is_hidden=True)
 
@@ -91,6 +98,7 @@ class TestNightReview(unittest.TestCase):
         # The code says: "if not meta_file.exists(): continue" inside the loop.
         # If no artifacts, "if not artifacts: continue" -> session skipped.
 
+        """Verify get sessions missing metadata behavior."""
         files = [("Content", None)]  # None means no metadata file created
         self.create_session("session_no_meta", files)
 
@@ -102,6 +110,7 @@ class TestNightReview(unittest.TestCase):
     # PURPOSE: get_sessions_date_filter をテストする
     def test_get_sessions_date_filter(self):
         # Session 1: 2023-10-27
+        """Verify get sessions date filter behavior."""
         files1 = [("C1", {"updatedAt": "2023-10-27T10:00:00Z"})]
         self.create_session("s1", files1)
 
@@ -120,6 +129,7 @@ class TestNightReview(unittest.TestCase):
     # PURPOSE: get_sessions_sorting をテストする
     def test_get_sessions_sorting(self):
         # s1: old
+        """Verify get sessions sorting behavior."""
         files1 = [("C1", {"updatedAt": "2023-01-01T10:00:00Z"})]
         self.create_session("s1", files1)
 

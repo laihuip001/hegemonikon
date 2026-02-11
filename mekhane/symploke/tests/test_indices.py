@@ -126,12 +126,14 @@ class TestChronosIndex:
 
     # PURPOSE: source_type をテストする
     def test_source_type(self):
+        """Verify source type behavior."""
         adapter = MockAdapter()
         chronos = ChronosIndex(adapter, "chronos", dimension=128)
         assert chronos.source_type == SourceType.CHRONOS
 
     # PURPOSE: ingest をテストする
     def test_ingest(self):
+        """Verify ingest behavior."""
         adapter = MockAdapter()
         chronos = ChronosIndex(adapter, "chronos", dimension=128)
 
@@ -146,6 +148,7 @@ class TestChronosIndex:
 
     # PURPOSE: search をテストする
     def test_search(self):
+        """Verify search behavior."""
         adapter = MockAdapter()
         chronos = ChronosIndex(adapter, "chronos", dimension=128)
 
@@ -163,12 +166,14 @@ class TestSophiaIndex:
 
     # PURPOSE: source_type をテストする
     def test_source_type(self):
+        """Verify source type behavior."""
         adapter = MockAdapter()
         sophia = SophiaIndex(adapter, "sophia", dimension=128)
         assert sophia.source_type == SourceType.SOPHIA
 
     # PURPOSE: ingest をテストする
     def test_ingest(self):
+        """Verify ingest behavior."""
         adapter = MockAdapter()
         sophia = SophiaIndex(adapter, "sophia", dimension=128)
 
@@ -188,12 +193,14 @@ class TestKairosIndex:
 
     # PURPOSE: source_type をテストする
     def test_source_type(self):
+        """Verify source type behavior."""
         adapter = MockAdapter()
         kairos = KairosIndex(adapter, "kairos", dimension=128)
         assert kairos.source_type == SourceType.KAIROS
 
     # PURPOSE: ingest をテストする
     def test_ingest(self):
+        """Verify ingest behavior."""
         adapter = MockAdapter()
         kairos = KairosIndex(adapter, "kairos", dimension=128)
 
@@ -208,6 +215,7 @@ class TestKairosIndex:
 
     # PURPOSE: get_pending_tasks をテストする
     def test_get_pending_tasks(self):
+        """Verify get pending tasks behavior."""
         adapter = MockAdapter()
         kairos = KairosIndex(adapter, "kairos", dimension=128)
 

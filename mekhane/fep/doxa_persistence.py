@@ -52,6 +52,7 @@ class BeliefStrength(Enum):
     CORE = "core"  # 核心 (アイデンティティ)
 
 
+# PURPOSE: Belief の機能を提供する
 @dataclass
 # PURPOSE: 信念オブジェクト
 class Belief:
@@ -75,12 +76,14 @@ class Belief:
     promoted_at: Optional[datetime] = None
     sophia_ki_id: Optional[str] = None
 
+    # PURPOSE: doxa_persistence の age days 処理を実行する
     @property
     # PURPOSE: 信念の年齢（日数）
     def age_days(self) -> float:
         """信念の年齢（日数）"""
         return (datetime.now() - self.created_at).total_seconds() / 86400
 
+    # PURPOSE: doxa_persistence の is promoted 処理を実行する
     @property
     def is_promoted(self) -> bool:
         """Sophia に昇格済みか"""
@@ -342,6 +345,7 @@ class DoxaStore:
 _global_store = DoxaStore()
 
 
+# PURPOSE: store を取得する
 def get_store() -> DoxaStore:
     """グローバルストアを取得"""
     return _global_store

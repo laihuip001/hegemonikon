@@ -18,6 +18,7 @@ from mekhane.synedrion.gateway.policy_enforcer import PolicyDecision, PolicyEnfo
 logger = logging.getLogger(__name__)
 
 
+# PURPOSE: ToolRoute の機能を提供する
 @dataclass
 class ToolRoute:
     """ツールのルーティング情報"""
@@ -27,6 +28,7 @@ class ToolRoute:
     description: str = ""
 
 
+# PURPOSE: GatewayError の機能を提供する
 @dataclass
 class GatewayError:
     """Gateway エラーの統一フォーマット"""
@@ -36,6 +38,7 @@ class GatewayError:
     tool_name: str = ""
     details: dict[str, Any] = field(default_factory=dict)
 
+    # PURPOSE: virtual_server の to dict 処理を実行する
     def to_dict(self) -> dict[str, Any]:
         return {
             "error": {
@@ -48,6 +51,7 @@ class GatewayError:
         }
 
 
+# PURPOSE: RouteResult の機能を提供する
 @dataclass
 class RouteResult:
     """ルーティング結果"""
@@ -59,6 +63,7 @@ class RouteResult:
     auth_headers: dict[str, str] = field(default_factory=dict)
 
 
+# PURPOSE: VirtualServer の機能を提供する
 class VirtualServer:
     """
     複数の MCP サーバーを束ねる仮想サーバー。
@@ -99,6 +104,7 @@ class VirtualServer:
         self._auth = auth
         self._tools: dict[str, ToolRoute] = {}
 
+    # PURPOSE: tool を登録する
     def register_tool(
         self,
         server_name: str,
@@ -126,12 +132,14 @@ class VirtualServer:
         logger.debug("Registered tool: %s", namespaced)
         return namespaced
 
+    # PURPOSE: server tools を登録する
     def register_server_tools(self, server_name: str, tools: list[str]) -> int:
         """サーバーの全ツールを一括登録"""
         for tool in tools:
             self.register_tool(server_name, tool)
         return len(tools)
 
+    # PURPOSE: virtual_server の route 処理を実行する
     def route(self, namespaced_tool: str) -> RouteResult:
         """
         名前空間付きツール名からルーティングを解決する。
@@ -222,18 +230,22 @@ class VirtualServer:
             auth_headers=auth_ctx.headers,
         )
 
+    # PURPOSE: virtual_server の list tools 処理を実行する
     def list_tools(self) -> list[ToolRoute]:
         """登録済みツールの一覧"""
         return list(self._tools.values())
 
+    # PURPOSE: virtual_server の list tools by server 処理を実行する
     def list_tools_by_server(self, server_name: str) -> list[ToolRoute]:
         """特定サーバーのツール一覧"""
         return [t for t in self._tools.values() if t.server_name == server_name]
 
+    # PURPOSE: virtual_server の tool count 処理を実行する
     @property
     def tool_count(self) -> int:
         return len(self._tools)
 
+    # PURPOSE: status を取得する
     def get_status(self) -> dict[str, Any]:
         """Gateway 全体のステータス"""
         return {

@@ -28,6 +28,7 @@ class CitationType(Enum):
     MENTIONS = "mentions"  # 単なる言及
 
 
+# PURPOSE: Citation の機能を提供する
 @dataclass
 # PURPOSE: 引用リレーション
 class Citation:
@@ -40,6 +41,7 @@ class Citation:
     confidence: float = 0.5  # 分類の確信度
 
 
+# PURPOSE: CitationStats の機能を提供する
 @dataclass
 # PURPOSE: 論文の引用統計
 class CitationStats:
@@ -51,11 +53,13 @@ class CitationStats:
     contrasting_count: int = 0
     mentioning_count: int = 0
 
+    # PURPOSE: citation_graph の total 処理を実行する
     @property
     # PURPOSE: 支持率
     def total(self) -> int:
         return self.supporting_count + self.contrasting_count + self.mentioning_count
 
+    # PURPOSE: citation_graph の support ratio 処理を実行する
     @property
     # PURPOSE: 支持率
     def support_ratio(self) -> float:

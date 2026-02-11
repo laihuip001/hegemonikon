@@ -33,6 +33,7 @@ from mekhane.fep.theorem_attractor import (
 # PURPOSE: attractor の処理
 @pytest.fixture(scope="session")
 def attractor() -> TheoremAttractor:
+    """Verify attractor behavior."""
     return TheoremAttractor()
 
 
@@ -46,39 +47,47 @@ class TestDefinitions:
 
     # PURPOSE: 24_theorems_defined をテストする
     def test_24_theorems_defined(self):
+        """Verify 24 theorems defined behavior."""
         assert len(THEOREM_DEFINITIONS) == 24
 
     # PURPOSE: 24_keys をテストする
     def test_24_keys(self):
+        """Verify 24 keys behavior."""
         assert len(THEOREM_KEYS) == 24
 
     # PURPOSE: all_keys_in_definitions をテストする
     def test_all_keys_in_definitions(self):
+        """Verify all keys in definitions behavior."""
         for key in THEOREM_KEYS:
             assert key in THEOREM_DEFINITIONS, f"{key} missing from definitions"
 
     # PURPOSE: all_series_covered をテストする
     def test_all_series_covered(self):
+        """Verify all series covered behavior."""
         series = {d["series"] for d in THEOREM_DEFINITIONS.values()}
         assert series == {"O", "S", "H", "P", "K", "A"}
 
     # PURPOSE: each_series_has_4_theorems をテストする
     def test_each_series_has_4_theorems(self):
+        """Verify each series has 4 theorems behavior."""
         for s in ("O", "S", "H", "P", "K", "A"):
             count = sum(1 for d in THEOREM_DEFINITIONS.values() if d["series"] == s)
             assert count == 4, f"Series {s} has {count} theorems, expected 4"
 
     # PURPOSE: morphism_map_complete をテストする
     def test_morphism_map_complete(self):
+        """Verify morphism map complete behavior."""
         assert len(MORPHISM_MAP) == 24
 
     # PURPOSE: morphisms_per_theorem をテストする
     def test_morphisms_per_theorem(self):
+        """Verify morphisms per theorem behavior."""
         for key, targets in MORPHISM_MAP.items():
             assert len(targets) == 8, f"{key} has {len(targets)} morphisms, expected 8"
 
     # PURPOSE: no_self_morphism をテストする
     def test_no_self_morphism(self):
+        """Verify no self morphism behavior."""
         for key, targets in MORPHISM_MAP.items():
             assert key not in targets, f"{key} has self-morphism"
 
@@ -93,44 +102,52 @@ class TestSuggest:
 
     # PURPOSE: returns_list をテストする
     def test_returns_list(self, attractor):
+        """Verify returns list behavior."""
         results = attractor.suggest("認識の本質を考える")
         assert isinstance(results, list)
 
     # PURPOSE: top_k_default_5 をテストする
     def test_top_k_default_5(self, attractor):
+        """Verify top k default 5 behavior."""
         results = attractor.suggest("認識の本質を考える")
         assert len(results) == 5
 
     # PURPOSE: top_k_custom をテストする
     def test_top_k_custom(self, attractor):
+        """Verify top k custom behavior."""
         results = attractor.suggest("認識の本質を考える", top_k=3)
         assert len(results) == 3
 
     # PURPOSE: all_24 をテストする
     def test_all_24(self, attractor):
+        """Verify all 24 behavior."""
         results = attractor.suggest("認識の本質を考える", top_k=24)
         assert len(results) == 24
 
     # PURPOSE: result_type をテストする
     def test_result_type(self, attractor):
+        """Verify result type behavior."""
         results = attractor.suggest("何を作るべきか")
         for r in results:
             assert isinstance(r, TheoremResult)
 
     # PURPOSE: similarity_range をテストする
     def test_similarity_range(self, attractor):
+        """Verify similarity range behavior."""
         results = attractor.suggest("何を作るべきか", top_k=24)
         for r in results:
             assert -1.0 <= r.similarity <= 1.0, f"{r.theorem}: sim={r.similarity}"
 
     # PURPOSE: sorted_descending をテストする
     def test_sorted_descending(self, attractor):
+        """Verify sorted descending behavior."""
         results = attractor.suggest("設計パターンの選択", top_k=24)
         for i in range(len(results) - 1):
             assert results[i].similarity >= results[i + 1].similarity
 
     # PURPOSE: each_result_has_fields をテストする
     def test_each_result_has_fields(self, attractor):
+        """Verify each result has fields behavior."""
         results = attractor.suggest("テスト", top_k=1)
         r = results[0]
         assert r.theorem in THEOREM_KEYS
@@ -164,21 +181,25 @@ class TestFlow:
 
     # PURPOSE: returns_flow_result をテストする
     def test_returns_flow_result(self, attractor):
+        """Verify returns flow result behavior."""
         result = attractor.simulate_flow("設計の本質")
         assert isinstance(result, FlowResult)
 
     # PURPOSE: states_list をテストする
     def test_states_list(self, attractor):
+        """Verify states list behavior."""
         result = attractor.simulate_flow("設計の本質", steps=5)
         assert len(result.states) >= 2  # at least step 0 + step 1
 
     # PURPOSE: step_0_is_initial をテストする
     def test_step_0_is_initial(self, attractor):
+        """Verify step 0 is initial behavior."""
         result = attractor.simulate_flow("何かを問う")
         assert result.states[0].step == 0
 
     # PURPOSE: activation_shape をテストする
     def test_activation_shape(self, attractor):
+        """Verify activation shape behavior."""
         result = attractor.simulate_flow("探求する")
         for state in result.states:
             assert state.activation.shape == (24,)
@@ -193,6 +214,7 @@ class TestFlow:
 
     # PURPOSE: top_theorems_not_empty をテストする
     def test_top_theorems_not_empty(self, attractor):
+        """Verify top theorems not empty behavior."""
         result = attractor.simulate_flow("基準を設定する")
         for state in result.states:
             assert len(state.top_theorems) > 0
@@ -205,11 +227,13 @@ class TestFlow:
 
     # PURPOSE: initial_similarities_present をテストする
     def test_initial_similarities_present(self, attractor):
+        """Verify initial similarities present behavior."""
         result = attractor.simulate_flow("テスト")
         assert len(result.initial_similarities) == 24
 
     # PURPOSE: final_theorems_present をテストする
     def test_final_theorems_present(self, attractor):
+        """Verify final theorems present behavior."""
         result = attractor.simulate_flow("テスト")
         assert len(result.final_theorems) > 0
 
@@ -224,11 +248,13 @@ class TestBasins:
 
     # PURPOSE: returns_basin_result をテストする
     def test_returns_basin_result(self, attractor):
+        """Verify returns basin result behavior."""
         result = attractor.detect_basins(n_samples=100)
         assert isinstance(result, BasinResult)
 
     # PURPOSE: fractions_sum_to_1 をテストする
     def test_fractions_sum_to_1(self, attractor):
+        """Verify fractions sum to 1 behavior."""
         result = attractor.detect_basins(n_samples=1000)
         total = sum(result.basin_fractions.values())
         assert abs(total - 1.0) < 0.01, f"Fractions sum to {total}"
@@ -249,11 +275,13 @@ class TestBasins:
 
     # PURPOSE: elapsed_recorded をテストする
     def test_elapsed_recorded(self, attractor):
+        """Verify elapsed recorded behavior."""
         result = attractor.detect_basins(n_samples=100)
         assert result.elapsed >= 0
 
     # PURPOSE: n_samples_correct をテストする
     def test_n_samples_correct(self, attractor):
+        """Verify n samples correct behavior."""
         result = attractor.detect_basins(n_samples=500)
         total = sum(result.basin_sizes.values())
         assert total == 500
@@ -275,17 +303,20 @@ class TestMixture:
 
     # PURPOSE: TheoremMixture が返ることを確認
     def test_returns_mixture(self, attractor):
+        """Verify returns mixture behavior."""
         m = attractor.diagnose_mixture("テスト")
         assert isinstance(m, TheoremMixture)
 
     # PURPOSE: 分布の合計が 1 になることを確認
     def test_distribution_sums_to_1(self, attractor):
+        """Verify distribution sums to 1 behavior."""
         m = attractor.diagnose_mixture("テスト")
         total = sum(m.distribution.values())
         assert abs(total - 1.0) < 0.01, f"Sum = {total}"
 
     # PURPOSE: 全 24 定理が分布に含まれることを確認
     def test_24_theorems_in_distribution(self, attractor):
+        """Verify 24 theorems in distribution behavior."""
         m = attractor.diagnose_mixture("テスト")
         assert len(m.distribution) == 24
         for k in THEOREM_KEYS:
@@ -293,17 +324,20 @@ class TestMixture:
 
     # PURPOSE: Series 分布の合計が 1 になることを確認
     def test_series_distribution_sums_to_1(self, attractor):
+        """Verify series distribution sums to 1 behavior."""
         m = attractor.diagnose_mixture("テスト")
         total = sum(m.series_distribution.values())
         assert abs(total - 1.0) < 0.01, f"Series sum = {total}"
 
     # PURPOSE: 正規化エントロピーが 0-1 範囲であることを確認
     def test_entropy_range(self, attractor):
+        """Verify entropy range behavior."""
         m = attractor.diagnose_mixture("テスト")
         assert 0 <= m.entropy <= 1.0, f"Entropy = {m.entropy}"
 
     # PURPOSE: 低温は集中、高温は分散
     def test_low_temperature_concentrates(self, attractor):
+        """Verify low temperature concentrates behavior."""
         m_low = attractor.diagnose_mixture("テスト", temperature=0.1)
         m_high = attractor.diagnose_mixture("テスト", temperature=2.0)
         assert m_low.entropy < m_high.entropy, \
@@ -311,6 +345,7 @@ class TestMixture:
 
     # PURPOSE: dominant_series が有効な Series であることを確認
     def test_dominant_series_valid(self, attractor):
+        """Verify dominant series valid behavior."""
         m = attractor.diagnose_mixture("テスト")
         assert m.dominant_series in ("O", "S", "H", "P", "K", "A")
 
@@ -325,6 +360,7 @@ class TestWeightedTransition:
 
     # PURPOSE: 遷移重みが均一でないことを確認
     def test_transition_weights_vary(self, attractor):
+        """Verify transition weights vary behavior."""
         attractor._ensure_initialized()
         T = attractor._transition_matrix
         if hasattr(T, 'cpu'):
@@ -335,6 +371,7 @@ class TestWeightedTransition:
 
     # PURPOSE: 遷移重みが非負であることを確認
     def test_transition_weights_nonneg(self, attractor):
+        """Verify transition weights nonneg behavior."""
         attractor._ensure_initialized()
         T = attractor._transition_matrix
         if hasattr(T, 'cpu'):
@@ -352,6 +389,7 @@ class TestBasinSeparation:
 
     # PURPOSE: basin_separation が dict を返す
     def test_returns_dict(self, attractor):
+        """Verify returns dict behavior."""
         sep = attractor.basin_separation()
         assert isinstance(sep, dict)
         assert "closest_pairs" in sep
@@ -359,6 +397,7 @@ class TestBasinSeparation:
 
     # PURPOSE: distance_matrix が (24, 24) で対角が 0
     def test_distance_matrix_shape(self, attractor):
+        """Verify distance matrix shape behavior."""
         import numpy as np
         sep = attractor.basin_separation()
         dm = sep["distance_matrix"]
@@ -368,6 +407,7 @@ class TestBasinSeparation:
 
     # PURPOSE: 最近ペアの距離が正
     def test_closest_pairs_positive(self, attractor):
+        """Verify closest pairs positive behavior."""
         sep = attractor.basin_separation()
         for t1, t2, dist in sep["closest_pairs"]:
             assert dist > 0, f"{t1}-{t2}: dist={dist} should be > 0"
@@ -375,6 +415,7 @@ class TestBasinSeparation:
 
     # PURPOSE: avg > min と max > avg の順序
     def test_separation_ordering(self, attractor):
+        """Verify separation ordering behavior."""
         sep = attractor.basin_separation()
         assert sep["min_separation"] <= sep["avg_separation"]
         assert sep["avg_separation"] <= sep["max_separation"]
@@ -413,6 +454,7 @@ class TestTheoremMemory:
 
     # PURPOSE: TheoremLogger.get_usage_counts() が dict を返す
     def test_logger_usage_counts(self):
+        """Verify logger usage counts behavior."""
         logger = TheoremLogger()
         counts = logger.get_usage_counts(days=1)
         assert isinstance(counts, dict)
@@ -420,6 +462,7 @@ class TestTheoremMemory:
 
     # PURPOSE: TheoremLogger.compute_novelty_boost() が全定理をカバー
     def test_novelty_boost_all_theorems(self):
+        """Verify novelty boost all theorems behavior."""
         logger = TheoremLogger()
         boost = logger.compute_novelty_boost(days=1)
         assert len(boost) == 24
@@ -428,6 +471,7 @@ class TestTheoremMemory:
 
     # PURPOSE: session_used が正しく追跡される
     def test_session_used_tracking(self):
+        """Verify session used tracking behavior."""
         ta = TheoremAttractor(enable_memory=True)
         ta.suggest("test query", top_k=1)
         assert len(ta._session_used) >= 1
@@ -443,12 +487,14 @@ class TestMultiview:
 
     # PURPOSE: suggest_multiview がリストを返す
     def test_returns_list(self, attractor):
+        """Verify returns list behavior."""
         r = attractor.suggest_multiview("テスト")
         assert isinstance(r, list)
         assert len(r) == 5
 
     # PURPOSE: multiview と通常の suggest で top-1 が異なりうる
     def test_differs_from_standard(self, attractor):
+        """Verify differs from standard behavior."""
         std = attractor.suggest("テスト", top_k=24)
         mv = attractor.suggest_multiview("テスト", top_k=24)
         # 少なくとも similarity 値は異なるはず
@@ -458,6 +504,7 @@ class TestMultiview:
 
     # PURPOSE: multiview proto が構築されている
     def test_multiview_proto_exists(self, attractor):
+        """Verify multiview proto exists behavior."""
         attractor._ensure_initialized()
         assert attractor._multiview_proto is not None
 
@@ -472,11 +519,13 @@ class TestInhibition:
 
     # PURPOSE: get_inhibited が list を返す
     def test_returns_list(self, attractor):
+        """Verify returns list behavior."""
         r = attractor.get_inhibited("O1")
         assert isinstance(r, list)
 
     # PURPOSE: 抑制強度が threshold 以上
     def test_above_threshold(self, attractor):
+        """Verify above threshold behavior."""
         r = attractor.get_inhibited("O1", threshold=0.5)
         for t, strength in r:
             assert strength > 0.5
@@ -484,6 +533,7 @@ class TestInhibition:
 
     # PURPOSE: 無効な定理名は空リスト
     def test_invalid_theorem(self, attractor):
+        """Verify invalid theorem behavior."""
         r = attractor.get_inhibited("INVALID")
         assert r == []
 
@@ -498,18 +548,21 @@ class TestDecomposition:
 
     # PURPOSE: 単一文は divergence=0
     def test_single_segment(self, attractor):
+        """Verify single segment behavior."""
         r = attractor.suggest_decomposed("テスト")
         assert r["divergence"] == 0.0
         assert len(r["segments"]) == 1
 
     # PURPOSE: 複数文は分解される
     def test_multi_segment(self, attractor):
+        """Verify multi segment behavior."""
         r = attractor.suggest_decomposed("設計の本質を問う。実装方法を選ぶ。品質を測る")
         assert len(r["segments"]) >= 2
         assert "full" in r
 
     # PURPOSE: divergence が 0-1 範囲
     def test_divergence_range(self, attractor):
+        """Verify divergence range behavior."""
         r = attractor.suggest_decomposed("設計の本質を問う。実装方法を選ぶ。品質を測る")
         assert 0.0 <= r["divergence"] <= 1.0
 
@@ -524,18 +577,21 @@ class TestEIFlow:
 
     # PURPOSE: simulate_flow_ei が FlowResult を返す
     def test_returns_flow_result(self, attractor):
+        """Verify returns flow result behavior."""
         r = attractor.simulate_flow_ei("テスト")
         assert isinstance(r, FlowResult)
         assert len(r.states) >= 2
 
     # PURPOSE: beta=0 は通常 flow に近い挙動
     def test_beta_zero_like_standard(self, attractor):
+        """Verify beta zero like standard behavior."""
         ei = attractor.simulate_flow_ei("Why does this exist?", beta=0.0, steps=5)
         # beta=0 means no inhibition, should still produce valid flow
         assert ei.states[-1].activation.sum() > 0.99
 
     # PURPOSE: 高い beta では活性化パターンが変わる
     def test_high_beta_changes_pattern(self, attractor):
+        """Verify high beta changes pattern behavior."""
         low = attractor.simulate_flow_ei("test", beta=0.1, steps=10)
         high = attractor.simulate_flow_ei("test", beta=0.5, steps=10)
         # 最終状態の top-1 が異なるか、少なくとも分布が変わる
@@ -546,6 +602,7 @@ class TestEIFlow:
 
     # PURPOSE: 収束する
     def test_converges(self, attractor):
+        """Verify converges behavior."""
         r = attractor.simulate_flow_ei("テスト", steps=20)
         # 収束するか、少なくとも全ステップ実行
         assert r.converged_at > 0 or len(r.states) == 21

@@ -51,6 +51,7 @@ _THEOREM_IDS = {
 
 # --- Pydantic Models ---
 
+# PURPOSE: LinkGraphNode の機能を提供する
 class LinkGraphNode(BaseModel):
     """知識ノード (射影情報付き)."""
     id: str
@@ -65,6 +66,7 @@ class LinkGraphNode(BaseModel):
     orbit_radius: float = Field(description="定理ノードからの軌道半径")
 
 
+# PURPOSE: LinkGraphEdge の機能を提供する
 class LinkGraphEdge(BaseModel):
     """知識ノード間のエッジ."""
     source: str
@@ -72,6 +74,7 @@ class LinkGraphEdge(BaseModel):
     type: str = Field(description="outlink or backlink")
 
 
+# PURPOSE: LinkGraphFullResponse の機能を提供する
 class LinkGraphFullResponse(BaseModel):
     """全データ一括レスポンス."""
     nodes: list[LinkGraphNode]
@@ -79,6 +82,7 @@ class LinkGraphFullResponse(BaseModel):
     meta: dict[str, Any]
 
 
+# PURPOSE: LinkGraphStatsResponse の機能を提供する
 class LinkGraphStatsResponse(BaseModel):
     """統計レスポンス."""
     total_nodes: int
@@ -201,6 +205,7 @@ def _build_response(graph) -> LinkGraphFullResponse:
 router = APIRouter(prefix="/link-graph", tags=["link-graph"])
 
 
+# PURPOSE: link graph full を取得する
 @router.get("/full", response_model=LinkGraphFullResponse)
 async def get_link_graph_full(
     source_type: Optional[str] = Query(None, description="カンマ区切りの source_type フィルタ"),
@@ -223,6 +228,7 @@ async def get_link_graph_full(
     return response
 
 
+# PURPOSE: link graph stats を取得する
 @router.get("/stats", response_model=LinkGraphStatsResponse)
 async def get_link_graph_stats() -> LinkGraphStatsResponse:
     """統計 + ブリッジノード."""
@@ -251,6 +257,7 @@ async def get_link_graph_stats() -> LinkGraphStatsResponse:
     )
 
 
+# PURPOSE: neighbors を取得する
 @router.get("/neighbors/{node_id}")
 async def get_neighbors(
     node_id: str,

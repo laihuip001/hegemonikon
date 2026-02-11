@@ -39,6 +39,7 @@ DEFAULT_LOG_DIR = Path.home() / "oikos" / "hegemonikon" / "mneme" / ".hegemoniko
 # Data Classes
 # ---------------------------------------------------------------------------
 
+# PURPOSE: AttractorLogEntry の機能を提供する
 @dataclass
 # PURPOSE: 1回の Attractor 推薦ログ
 class AttractorLogEntry:
@@ -66,6 +67,7 @@ class BasinBias:
     correct_count: int = 0          # 正しく推薦した回数
     total_count: int = 0
 
+    # PURPOSE: basin_logger の precision 処理を実行する
     @property
     # PURPOSE: 推薦の精度: 推薦した中で実際に選ばれた割合
     def precision(self) -> float:
@@ -73,6 +75,7 @@ class BasinBias:
         predicted = self.correct_count + self.over_predict_count
         return self.correct_count / predicted if predicted > 0 else 0.0
 
+    # PURPOSE: basin_logger の recall 処理を実行する
     @property
     # PURPOSE: 推薦の再現率: 実際に選ばれた中で推薦できた割合
     def recall(self) -> float:
@@ -80,6 +83,7 @@ class BasinBias:
         actual = self.correct_count + self.under_predict_count
         return self.correct_count / actual if actual > 0 else 0.0
 
+    # PURPOSE: basin_logger の bias direction 処理を実行する
     @property
     # PURPOSE: Basin の歪み方向
     def bias_direction(self) -> str:
@@ -222,6 +226,7 @@ class BasinLogger:
                         self._biases[actual].under_predict_count += 1
                         self._biases[actual].total_count += 1
 
+    # PURPOSE: basin_logger の suggestions for tuning 処理を実行する
     @property
     # PURPOSE: Bias データから、各 Series の定義テキスト改善の方向性を提案する。
     def suggestions_for_tuning(self) -> dict[str, str]:

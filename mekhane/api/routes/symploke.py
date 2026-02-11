@@ -79,6 +79,7 @@ class StatsResponse(BaseModel):
 # --- Routes ---
 
 
+# PURPOSE: symploke の search 処理を実行する
 @router.get("/search", response_model=SearchResponse)
 async def search(
     q: str = Query(..., min_length=1, description="検索クエリ"),
@@ -216,6 +217,7 @@ async def search(
     )
 
 
+# PURPOSE: persona を取得する
 @router.get("/persona", response_model=PersonaResponse)
 async def get_persona():
     """現在の Persona 状態と Creator プロファイルを取得。"""
@@ -232,6 +234,7 @@ async def get_persona():
     return PersonaResponse(persona=persona_data, creator=creator_data)
 
 
+# PURPOSE: boot context を取得する
 @router.get("/boot-context", response_model=BootContextResponse)
 async def get_boot_context(
     mode: str = Query("standard", description="fast | standard | detailed"),
@@ -255,6 +258,7 @@ async def get_boot_context(
         return BootContextResponse(mode=mode, axes={}, summary=f"Error: {exc}")
 
 
+# PURPOSE: stats を取得する
 @router.get("/stats", response_model=StatsResponse)
 async def get_stats():
     """知識統合層の統計情報を取得。"""

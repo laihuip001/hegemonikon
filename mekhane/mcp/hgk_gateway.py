@@ -128,6 +128,7 @@ def _wbc_log_security_event(
 # OAuth 2.1 Provider (auto-approve, single-user)
 # =============================================================================
 
+# PURPOSE: HGKOAuthProvider の機能を提供する
 class HGKOAuthProvider(OAuthAuthorizationServerProvider[AuthorizationCode, RefreshToken, AccessToken]):
     """
     最小 OAuth 2.1 プロバイダー。
@@ -142,6 +143,7 @@ class HGKOAuthProvider(OAuthAuthorizationServerProvider[AuthorizationCode, Refre
         self._auth_codes: dict[str, AuthorizationCode] = {}
         self._refresh_tokens: dict[str, RefreshToken] = {}
 
+    # PURPOSE: client を取得する
     async def get_client(self, client_id: str) -> OAuthClientInformationFull | None:
         client = self._clients.get(client_id)
         if client is None:
@@ -168,9 +170,11 @@ class HGKOAuthProvider(OAuthAuthorizationServerProvider[AuthorizationCode, Refre
             self._clients[client_id] = client
         return client
 
+    # PURPOSE: client を登録する
     async def register_client(self, client_info: OAuthClientInformationFull) -> None:
         self._clients[client_info.client_id] = client_info
 
+    # PURPOSE: hgk_gateway の authorize 処理を実行する
     async def authorize(
         self, client: OAuthClientInformationFull, params: AuthorizationParams
     ) -> str:
@@ -197,6 +201,7 @@ class HGKOAuthProvider(OAuthAuthorizationServerProvider[AuthorizationCode, Refre
             state=params.state,
         )
 
+    # PURPOSE: authorization code を読み込む
     async def load_authorization_code(
         self, client: OAuthClientInformationFull, authorization_code: str
     ) -> AuthorizationCode | None:
@@ -205,6 +210,7 @@ class HGKOAuthProvider(OAuthAuthorizationServerProvider[AuthorizationCode, Refre
             return ac
         return None
 
+    # PURPOSE: hgk_gateway の exchange authorization code 処理を実行する
     async def exchange_authorization_code(
         self, client: OAuthClientInformationFull, authorization_code: AuthorizationCode
     ) -> OAuthToken:
@@ -225,6 +231,7 @@ class HGKOAuthProvider(OAuthAuthorizationServerProvider[AuthorizationCode, Refre
             scope=" ".join(authorization_code.scopes) if authorization_code.scopes else None,
         )
 
+    # PURPOSE: refresh token を読み込む
     async def load_refresh_token(
         self, client: OAuthClientInformationFull, refresh_token: str
     ) -> RefreshToken | None:
@@ -233,6 +240,7 @@ class HGKOAuthProvider(OAuthAuthorizationServerProvider[AuthorizationCode, Refre
             return rt
         return None
 
+    # PURPOSE: hgk_gateway の exchange refresh token 処理を実行する
     async def exchange_refresh_token(
         self,
         client: OAuthClientInformationFull,
@@ -255,6 +263,7 @@ class HGKOAuthProvider(OAuthAuthorizationServerProvider[AuthorizationCode, Refre
             scope=" ".join(scopes) if scopes else None,
         )
 
+    # PURPOSE: access token を読み込む
     async def load_access_token(self, token: str) -> AccessToken | None:
         if token == self._access_token:
             return AccessToken(
@@ -270,6 +279,7 @@ class HGKOAuthProvider(OAuthAuthorizationServerProvider[AuthorizationCode, Refre
         )
         return None
 
+    # PURPOSE: hgk_gateway の revoke token 処理を実行する
     async def revoke_token(self, token: AccessToken | RefreshToken) -> None:
         if isinstance(token, RefreshToken):
             self._refresh_tokens.pop(token.token, None)
@@ -320,6 +330,7 @@ IDEA_DIR = MNEME_DIR / "ideas"
 # P1: /sop 調査依頼書テンプレート生成
 # =============================================================================
 
+# PURPOSE: hgk_gateway の hgk sop generate 処理を実行する
 @mcp.tool()
 def hgk_sop_generate(
     topic: str,
@@ -410,6 +421,7 @@ C. 将来展望
 # P1: KI / Gnōsis 検索
 # =============================================================================
 
+# PURPOSE: hgk_gateway の hgk search 処理を実行する
 @mcp.tool()
 def hgk_search(query: str, max_results: int = 5) -> str:
     """
@@ -476,6 +488,7 @@ def hgk_search(query: str, max_results: int = 5) -> str:
 # P2: CCL Dispatch
 # =============================================================================
 
+# PURPOSE: hgk_gateway の hgk ccl dispatch 処理を実行する
 @mcp.tool()
 def hgk_ccl_dispatch(ccl: str) -> str:
     """
@@ -514,6 +527,7 @@ def hgk_ccl_dispatch(ccl: str) -> str:
 # P2: Doxa 読み取り
 # =============================================================================
 
+# PURPOSE: hgk_gateway の hgk doxa read 処理を実行する
 @mcp.tool()
 def hgk_doxa_read() -> str:
     """
@@ -549,6 +563,7 @@ def hgk_doxa_read() -> str:
 # P3: Handoff 参照
 # =============================================================================
 
+# PURPOSE: hgk_gateway の hgk handoff read 処理を実行する
 @mcp.tool()
 def hgk_handoff_read(count: int = 1) -> str:
     """
@@ -583,6 +598,7 @@ def hgk_handoff_read(count: int = 1) -> str:
 # P3: アイデアメモ保存
 # =============================================================================
 
+# PURPOSE: hgk_gateway の hgk idea capture 処理を実行する
 @mcp.tool()
 def hgk_idea_capture(idea: str, tags: str = "") -> str:
     """
@@ -626,6 +642,7 @@ def hgk_idea_capture(idea: str, tags: str = "") -> str:
 # HGK Status (ヘルスチェック)
 # =============================================================================
 
+# PURPOSE: hgk_gateway の hgk status 処理を実行する
 @mcp.tool()
 def hgk_status() -> str:
     """

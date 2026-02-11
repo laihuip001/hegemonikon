@@ -64,6 +64,7 @@ class ExecutionStatus(Enum):
     ABORTED = "aborted"  # 中断
 
 
+# PURPOSE: ExecutionContext の機能を提供する
 @dataclass
 # PURPOSE: 実行コンテキスト
 class ExecutionContext:
@@ -141,6 +142,7 @@ class EnergеiaExecutor:
         self._max_retries = max_retries
         self._current_context: Optional[ExecutionContext] = None
 
+    # PURPOSE: energeia_executor の current context 処理を実行する
     @property
     # PURPOSE: 現在の実行コンテキスト
     def current_context(self) -> Optional[ExecutionContext]:

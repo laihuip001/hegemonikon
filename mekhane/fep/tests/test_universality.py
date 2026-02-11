@@ -19,6 +19,7 @@ from mekhane.fep.universality import (
 # Fixtures
 # ---------------------------------------------------------------------------
 
+# PURPOSE: Verify sample candidates behaves correctly
 @pytest.fixture
 def sample_candidates():
     """Standard 5-candidate set matching /noe PHASE 2 output."""
@@ -31,6 +32,7 @@ def sample_candidates():
     }
 
 
+# PURPOSE: Verify sample factorizations behaves correctly
 @pytest.fixture
 def sample_factorizations():
     """Factorization results where Synthesis generalizes V1, V2, V4 but not V3."""
@@ -50,29 +52,39 @@ def sample_factorizations():
 # TestBuildPrompt
 # ---------------------------------------------------------------------------
 
+# PURPOSE: Test suite validating build prompt correctness
 class TestBuildPrompt:
     """build_kalon_prompt: プロンプトに全候補ペアが含まれるか。"""
 
+    # PURPOSE: Verify contains all candidates behaves correctly
     def test_contains_all_candidates(self, sample_candidates):
+        """Verify contains all candidates behavior."""
         prompt = build_kalon_prompt(sample_candidates)
         for name in sample_candidates:
             assert name in prompt
 
+    # PURPOSE: Verify contains all candidate content behaves correctly
     def test_contains_all_candidate_content(self, sample_candidates):
+        """Verify contains all candidate content behavior."""
         prompt = build_kalon_prompt(sample_candidates)
         for content in sample_candidates.values():
             assert content in prompt
 
+    # PURPOSE: Verify pair count behaves correctly
     def test_pair_count(self, sample_candidates):
         """5 candidates → C(5,2) = 10 pairs."""
         prompt = build_kalon_prompt(sample_candidates)
         assert prompt.count("### ペア") == 10
 
+    # PURPOSE: Verify empty candidates behaves correctly
     def test_empty_candidates(self):
+        """Verify empty candidates behavior."""
         prompt = build_kalon_prompt({})
         assert "候補解一覧" in prompt
 
+    # PURPOSE: Verify single candidate behaves correctly
     def test_single_candidate(self):
+        """Verify single candidate behavior."""
         prompt = build_kalon_prompt({"only": "唯一の候補"})
         assert "only" in prompt
         # No pair headers
@@ -83,10 +95,13 @@ class TestBuildPrompt:
 # TestParseResponse
 # ---------------------------------------------------------------------------
 
+# PURPOSE: Test suite validating parse response correctness
 class TestParseResponse:
     """parse_kalon_response: JSON/パターンマッチのパース。"""
 
+    # PURPOSE: Verify json parse behaves correctly
     def test_json_parse(self, sample_candidates):
+        """Verify json parse behavior."""
         response = json.dumps([
             {"source": "V1", "target": "Synthesis",
              "factorizable": True, "reasoning": "V1 is specific", "confidence": 0.8},
@@ -98,7 +113,9 @@ class TestParseResponse:
         assert results[0].factorizable is True
         assert results[1].factorizable is False
 
+    # PURPOSE: Verify json with surrounding text behaves correctly
     def test_json_with_surrounding_text(self, sample_candidates):
+        """Verify json with surrounding text behavior."""
         response = 'Here is my analysis:\n' + json.dumps([
             {"source": "V2", "target": "Synthesis",
              "factorizable": True, "reasoning": "test", "confidence": 0.9},
@@ -107,13 +124,17 @@ class TestParseResponse:
         assert len(results) == 1
         assert results[0].source == "V2"
 
+    # PURPOSE: Verify fallback pattern match behaves correctly
     def test_fallback_pattern_match(self, sample_candidates):
+        """Verify fallback pattern match behavior."""
         response = "V1 は Synthesis の特殊ケース: YES\nV3 は Synthesis: NO"
         results = parse_kalon_response(response, sample_candidates)
         # Should find at least some matches
         assert len(results) >= 1
 
+    # PURPOSE: Verify empty response behaves correctly
     def test_empty_response(self, sample_candidates):
+        """Verify empty response behavior."""
         results = parse_kalon_response("", sample_candidates)
         assert len(results) == 0
 
@@ -122,10 +143,13 @@ class TestParseResponse:
 # TestFindUniversal
 # ---------------------------------------------------------------------------
 
+# PURPOSE: Test suite validating find universal correctness
 class TestFindUniversal:
     """find_universal_candidate: 普遍的候補の特定。"""
 
+    # PURPOSE: Verify synthesis is universal behaves correctly
     def test_synthesis_is_universal(self, sample_candidates, sample_factorizations):
+        """Verify synthesis is universal behavior."""
         universal, uniqueness, diagram = find_universal_candidate(
             sample_candidates, sample_factorizations
         )
@@ -136,6 +160,7 @@ class TestFindUniversal:
         assert "V4" in diagram["Synthesis"]
         assert "V3" not in diagram["Synthesis"]
 
+    # PURPOSE: Verify all generalized behaves correctly
     def test_all_generalized(self, sample_candidates):
         """If one candidate generalizes all others → HIGH uniqueness."""
         facs = [
@@ -148,11 +173,13 @@ class TestFindUniversal:
         assert universal == "Synthesis"
         assert uniqueness == "HIGH"
 
+    # PURPOSE: Verify no factorizations behaves correctly
     def test_no_factorizations(self, sample_candidates):
         """No factorizations → first candidate, LOW."""
         universal, uniqueness, _ = find_universal_candidate(sample_candidates, [])
         assert uniqueness == "LOW"
 
+    # PURPOSE: Verify low confidence ignored behaves correctly
     def test_low_confidence_ignored(self, sample_candidates):
         """Factorizations with confidence < 0.3 should be ignored."""
         facs = [
@@ -162,7 +189,9 @@ class TestFindUniversal:
         _, uniqueness, diagram = find_universal_candidate(sample_candidates, facs)
         assert len(diagram.get("Synthesis", [])) == 0
 
+    # PURPOSE: Verify single candidate behaves correctly
     def test_single_candidate(self):
+        """Verify single candidate behavior."""
         candidates = {"only": "唯一"}
         universal, uniqueness, _ = find_universal_candidate(candidates, [])
         assert universal == "only"
@@ -172,9 +201,11 @@ class TestFindUniversal:
 # TestKalonScore
 # ---------------------------------------------------------------------------
 
+# PURPOSE: Test suite validating kalon score correctness
 class TestKalonScore:
     """kalon_score: 経済性スコア。"""
 
+    # PURPOSE: Verify perfect score behaves correctly
     def test_perfect_score(self, sample_candidates):
         """All candidates covered → 1.0."""
         diagram = {
@@ -184,6 +215,7 @@ class TestKalonScore:
         score = kalon_score("Synthesis", sample_candidates, diagram)
         assert score == 1.0
 
+    # PURPOSE: Verify partial score behaves correctly
     def test_partial_score(self, sample_candidates):
         """3/4 candidates covered → 0.75."""
         diagram = {
@@ -193,6 +225,7 @@ class TestKalonScore:
         score = kalon_score("Synthesis", sample_candidates, diagram)
         assert score == 0.75
 
+    # PURPOSE: Verify zero score behaves correctly
     def test_zero_score(self, sample_candidates):
         """No candidates covered → 0.0."""
         diagram = {
@@ -202,6 +235,7 @@ class TestKalonScore:
         score = kalon_score("Synthesis", sample_candidates, diagram)
         assert score == 0.0
 
+    # PURPOSE: Verify single candidate behaves correctly
     def test_single_candidate(self):
         """Single candidate → 1.0 (trivially universal)."""
         score = kalon_score("only", {"only": "x"}, {"only": []})
@@ -212,10 +246,13 @@ class TestKalonScore:
 # TestKalonVerify
 # ---------------------------------------------------------------------------
 
+# PURPOSE: Test suite validating kalon verify correctness
 class TestKalonVerify:
     """kalon_verify: 統合テスト。"""
 
+    # PURPOSE: Verify full verification behaves correctly
     def test_full_verification(self, sample_candidates, sample_factorizations):
+        """Verify full verification behavior."""
         result = kalon_verify(sample_candidates, sample_factorizations)
         assert isinstance(result, KalonResult)
         assert result.universal_candidate == "Synthesis"
@@ -223,13 +260,17 @@ class TestKalonVerify:
         assert result.uniqueness == "MED"
         assert len(result.factorizations) == len(sample_factorizations)
 
+    # PURPOSE: Verify no factorizations behaves correctly
     def test_no_factorizations(self, sample_candidates):
+        """Verify no factorizations behavior."""
         result = kalon_verify(sample_candidates)
         assert isinstance(result, KalonResult)
         assert result.kalon_score == 0.0
         assert result.uniqueness == "LOW"
 
+    # PURPOSE: Verify beauty statement perfect behaves correctly
     def test_beauty_statement_perfect(self, sample_candidates):
+        """Verify beauty statement perfect behavior."""
         facs = [
             FactorizationResult("V1", "Synthesis", True, "", 0.9),
             FactorizationResult("V2", "Synthesis", True, "", 0.9),
@@ -239,7 +280,9 @@ class TestKalonVerify:
         result = kalon_verify(sample_candidates, facs)
         assert "完全な普遍解" in result.beauty_statement
 
+    # PURPOSE: Verify beauty statement partial behaves correctly
     def test_beauty_statement_partial(self, sample_candidates, sample_factorizations):
+        """Verify beauty statement partial behavior."""
         result = kalon_verify(sample_candidates, sample_factorizations)
         assert "独立" in result.beauty_statement
 
@@ -248,20 +291,27 @@ class TestKalonVerify:
 # TestFormatOutput
 # ---------------------------------------------------------------------------
 
+# PURPOSE: Test suite validating format output correctness
 class TestFormatOutput:
     """format_kalon_output: 出力フォーマット。"""
 
+    # PURPOSE: Verify contains phase header behaves correctly
     def test_contains_phase_header(self, sample_candidates, sample_factorizations):
+        """Verify contains phase header behavior."""
         result = kalon_verify(sample_candidates, sample_factorizations)
         output = format_kalon_output(result)
         assert "PHASE 3: Kalon" in output
 
+    # PURPOSE: Verify contains universal candidate behaves correctly
     def test_contains_universal_candidate(self, sample_candidates, sample_factorizations):
+        """Verify contains universal candidate behavior."""
         result = kalon_verify(sample_candidates, sample_factorizations)
         output = format_kalon_output(result)
         assert "Synthesis" in output
 
+    # PURPOSE: Verify contains kalon score behaves correctly
     def test_contains_kalon_score(self, sample_candidates, sample_factorizations):
+        """Verify contains kalon score behavior."""
         result = kalon_verify(sample_candidates, sample_factorizations)
         output = format_kalon_output(result)
         assert "0.75" in output

@@ -37,6 +37,7 @@ router = APIRouter(prefix="/sympatheia", tags=["sympatheia"])
 # ===========================================================================
 
 # --- WBC ---
+# PURPOSE: WBCRequest の機能を提供する
 class WBCRequest(BaseModel):
     source: str = "unknown"
     severity: str = "medium"
@@ -44,6 +45,7 @@ class WBCRequest(BaseModel):
     files: list[str] = Field(default_factory=list)
 
 
+# PURPOSE: WBCResponse の機能を提供する
 class WBCResponse(BaseModel):
     timestamp: str
     source: str
@@ -57,10 +59,12 @@ class WBCResponse(BaseModel):
 
 
 # --- Digest ---
+# PURPOSE: DigestRequest の機能を提供する
 class DigestRequest(BaseModel):
     pass  # webhook trigger, no payload needed
 
 
+# PURPOSE: DigestResponse の機能を提供する
 class DigestResponse(BaseModel):
     timestamp: str
     weekEnding: str
@@ -73,11 +77,13 @@ class DigestResponse(BaseModel):
 
 
 # --- Attractor ---
+# PURPOSE: AttractorRequest の機能を提供する
 class AttractorRequest(BaseModel):
     context: str = ""
     text: str = ""  # fallback
 
 
+# PURPOSE: AttractorResponse の機能を提供する
 class AttractorResponse(BaseModel):
     timestamp: str
     recommendation: dict | None = None
@@ -86,10 +92,12 @@ class AttractorResponse(BaseModel):
 
 
 # --- Feedback ---
+# PURPOSE: FeedbackRequest の機能を提供する
 class FeedbackRequest(BaseModel):
     pass
 
 
+# PURPOSE: FeedbackResponse の機能を提供する
 class FeedbackResponse(BaseModel):
     timestamp: str
     metrics: dict = Field(default_factory=dict)
@@ -99,12 +107,14 @@ class FeedbackResponse(BaseModel):
 
 
 # --- Route ---
+# PURPOSE: RouteRequest の機能を提供する
 class RouteRequest(BaseModel):
     type: str = ""
     source: str = "unknown"
     payload: dict = Field(default_factory=dict)
 
 
+# PURPOSE: RouteResponse の機能を提供する
 class RouteResponse(BaseModel):
     routed: bool = False
     target: str = ""
@@ -116,6 +126,7 @@ class RouteResponse(BaseModel):
 
 
 # --- Notification ---
+# PURPOSE: NotificationRequest の機能を提供する
 class NotificationRequest(BaseModel):
     source: str = "unknown"  # e.g. "WF-09", "WF-13"
     level: str = "INFO"  # INFO | HIGH | CRITICAL
@@ -124,6 +135,7 @@ class NotificationRequest(BaseModel):
     data: dict = Field(default_factory=dict)
 
 
+# PURPOSE: NotificationResponse の機能を提供する
 class NotificationResponse(BaseModel):
     id: str
     timestamp: str
@@ -207,6 +219,7 @@ THREAT_WEIGHTS: dict[str, int] = {
 }
 
 
+# PURPOSE: sympatheia の wbc analyze 処理を実行する
 @router.post("/wbc", response_model=WBCResponse)
 async def wbc_analyze(req: WBCRequest) -> WBCResponse:
     """白血球: 脅威分析 + エスカレーション。"""
@@ -284,6 +297,7 @@ async def wbc_analyze(req: WBCRequest) -> WBCResponse:
 # WF-10: Weekly Digest (記憶圧縮)
 # ===========================================================================
 
+# PURPOSE: sympatheia の weekly digest 処理を実行する
 @router.post("/digest", response_model=DigestResponse)
 async def weekly_digest(req: DigestRequest) -> DigestResponse:
     """記憶圧縮: 全メトリクス集約。"""
@@ -386,6 +400,7 @@ def _get_advisor():
     return _advisor
 
 
+# PURPOSE: sympatheia の attractor dispatch 処理を実行する
 @router.post("/attractor", response_model=AttractorResponse)
 async def attractor_dispatch(req: AttractorRequest) -> AttractorResponse:
     """反射弓: TheoremAttractor による定理推薦。"""
@@ -436,6 +451,7 @@ async def attractor_dispatch(req: AttractorRequest) -> AttractorResponse:
 # WF-12: Feedback Loop (恒常性)
 # ===========================================================================
 
+# PURPOSE: sympatheia の feedback loop 処理を実行する
 @router.post("/feedback", response_model=FeedbackResponse)
 async def feedback_loop(req: FeedbackRequest) -> FeedbackResponse:
     """恒常性: 閾値の動的調整。"""
@@ -530,6 +546,7 @@ ROUTES: dict[str, dict[str, str]] = {
 }
 
 
+# PURPOSE: sympatheia の incoming route 処理を実行する
 @router.post("/route", response_model=RouteResponse)
 async def incoming_route(req: RouteRequest) -> RouteResponse:
     """視床: 入力分類 + 実際に転送。"""
@@ -585,6 +602,7 @@ async def incoming_route(req: RouteRequest) -> RouteResponse:
 # Notifications（通知受信 + 一覧）
 # ===========================================================================
 
+# PURPOSE: sympatheia の receive notification 処理を実行する
 @router.post("/notifications", response_model=NotificationResponse, status_code=201)
 async def receive_notification(req: NotificationRequest) -> NotificationResponse:
     """通知受信: n8n WF や内部モジュールからの通知を JSONL に保存。"""
@@ -606,6 +624,7 @@ async def receive_notification(req: NotificationRequest) -> NotificationResponse
     )
 
 
+# PURPOSE: sympatheia の list notifications 処理を実行する
 @router.get("/notifications")
 async def list_notifications(
     limit: int = Query(50, ge=1, le=500),

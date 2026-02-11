@@ -23,6 +23,7 @@ logger = logging.getLogger(__name__)
 POLICY_FILE = Path(__file__).parent / "policy.yaml"
 
 
+# PURPOSE: PolicyDecision の機能を提供する
 class PolicyDecision(Enum):
     """ポリシー判定結果"""
     ALLOW = "allow"
@@ -30,6 +31,7 @@ class PolicyDecision(Enum):
     REQUIRE_APPROVAL = "require_approval"
 
 
+# PURPOSE: PolicyResult の機能を提供する
 @dataclass
 class PolicyResult:
     """ポリシー判定の詳細結果"""
@@ -40,6 +42,7 @@ class PolicyResult:
     message: str = ""
 
 
+# PURPOSE: RateLimitWindow の機能を提供する
 @dataclass
 class RateLimitWindow:
     """レートリミット管理用のスライディングウィンドウ"""
@@ -47,6 +50,7 @@ class RateLimitWindow:
     window_seconds: float = 60.0
     timestamps: deque[float] = field(default_factory=deque)
 
+    # PURPOSE: and record を検証する
     def check_and_record(self) -> bool:
         """リクエストが制限内かチェックし、記録する。True=許可"""
         now = time.monotonic()
@@ -58,6 +62,7 @@ class RateLimitWindow:
         self.timestamps.append(now)
         return True
 
+    # PURPOSE: policy_enforcer の remaining 処理を実行する
     @property
     def remaining(self) -> int:
         """残りリクエスト数"""
@@ -67,6 +72,7 @@ class RateLimitWindow:
         return max(0, self.max_requests - len(self.timestamps))
 
 
+# PURPOSE: PolicyEnforcer の機能を提供する
 class PolicyEnforcer:
     """
     MCP Gateway のポリシー強制エンジン。
@@ -121,6 +127,7 @@ class PolicyEnforcer:
             len(self._allowed_servers),
         )
 
+    # PURPOSE: policy_enforcer の check 処理を実行する
     def check(self, server_name: str, tool_name: str) -> PolicyResult:
         """
         ツール呼び出しをポリシーに照らしてチェックする。
@@ -196,10 +203,12 @@ class PolicyEnforcer:
                 )
         return None
 
+    # PURPOSE: server list を取得する
     def get_server_list(self) -> set[str]:
         """許可されたサーバーの一覧を返す"""
         return self._allowed_servers.copy()
 
+    # PURPOSE: policy_enforcer の policy count 処理を実行する
     @property
     def policy_count(self) -> int:
         """ロード済みポリシー数"""

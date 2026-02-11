@@ -23,6 +23,7 @@ import yaml
 import re
 
 
+# PURPOSE: SELRequirement の機能を提供する
 @dataclass
 # PURPOSE: SEL 要件
 class SELRequirement:
@@ -33,6 +34,7 @@ class SELRequirement:
     uml_requirements: Dict[str, str] = field(default_factory=dict)  # stage -> 要件テキスト
 
 
+# PURPOSE: SELValidationResult の機能を提供する
 @dataclass
 # PURPOSE: SEL 検証結果
 class SELValidationResult:
@@ -49,6 +51,7 @@ class SELValidationResult:
     uml_missing: List[str] = field(default_factory=list)
     details: str = ""
 
+    # PURPOSE: sel_validator の summary 処理を実行する
     @property
     # PURPOSE: SEL 遵守検証器
     def summary(self) -> str:

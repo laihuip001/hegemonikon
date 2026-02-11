@@ -64,6 +64,7 @@ VALID_WORKFLOWS = {
 }
 
 
+# PURPOSE: ValidationResult の機能を提供する
 @dataclass
 # PURPOSE: Result of CCL validation.
 class ValidationResult:

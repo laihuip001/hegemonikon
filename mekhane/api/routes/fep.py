@@ -22,6 +22,7 @@ class FEPStepRequest(BaseModel):
     observation: int = Field(ge=0, lt=48, description="観測インデックス (0-47)")
 
 
+# PURPOSE: FEPStepResponse の機能を提供する
 class FEPStepResponse(BaseModel):
     """FEP step 結果。"""
     action_name: str
@@ -31,6 +32,7 @@ class FEPStepResponse(BaseModel):
     beliefs_entropy: float | None = None
 
 
+# PURPOSE: FEPStateResponse の機能を提供する
 class FEPStateResponse(BaseModel):
     """Agent の内部状態。"""
     beliefs: list[float]
@@ -39,6 +41,7 @@ class FEPStateResponse(BaseModel):
     precision_weights: dict[str, float] | None = None
 
 
+# PURPOSE: FEPDashboardResponse の機能を提供する
 class FEPDashboardResponse(BaseModel):
     """ダッシュボード分析データ。"""
     total_steps: int = 0
@@ -68,6 +71,7 @@ def _get_agent():
     return _agent
 
 
+# PURPOSE: fep の fep step 処理を実行する
 @router.post("/step", response_model=FEPStepResponse)
 async def fep_step(req: FEPStepRequest) -> FEPStepResponse:
     """推論-行動サイクルを1ステップ実行。"""
@@ -99,6 +103,7 @@ async def fep_step(req: FEPStepRequest) -> FEPStepResponse:
     )
 
 
+# PURPOSE: fep の fep state 処理を実行する
 @router.get("/state", response_model=FEPStateResponse)
 async def fep_state() -> FEPStateResponse:
     """Agent の現在の内部状態を取得。"""
@@ -119,6 +124,7 @@ async def fep_state() -> FEPStateResponse:
     )
 
 
+# PURPOSE: fep の fep dashboard 処理を実行する
 @router.get("/dashboard", response_model=FEPDashboardResponse)
 async def fep_dashboard() -> FEPDashboardResponse:
     """FEP ダッシュボードデータを取得。"""
@@ -151,6 +157,7 @@ async def fep_dashboard() -> FEPDashboardResponse:
 # Convergence Tracker — E2E endpoint
 # =============================================================================
 
+# PURPOSE: ConvergenceRecordRequest の機能を提供する
 class ConvergenceRecordRequest(BaseModel):
     """Convergence 記録リクエスト。"""
     agent_series: str | None = None
@@ -161,6 +168,7 @@ class ConvergenceRecordRequest(BaseModel):
     attractor_similarity: float = 0.0
 
 
+# PURPOSE: convergence を取得する
 @router.get("/convergence")
 async def get_convergence():
     """現在の収束状態を取得。"""
@@ -172,6 +180,7 @@ async def get_convergence():
     }
 
 
+# PURPOSE: fep の post convergence 処理を実行する
 @router.post("/convergence")
 async def post_convergence(req: ConvergenceRecordRequest):
     """Agent/Attractor 統合を記録 (Pushout)。"""
@@ -195,6 +204,7 @@ async def post_convergence(req: ConvergenceRecordRequest):
 # =============================================================================
 
 
+# PURPOSE: enrichments を取得する
 @router.get("/enrichments")
 async def get_enrichments():
     """全 Series の Typed Enrichment 情報を返す。

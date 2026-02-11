@@ -74,6 +74,7 @@ class DispatchPlan:
     oscillation: OscillationType = OscillationType.CLEAR
     raw_recommendation: Optional[Recommendation] = None
 
+    # PURPOSE: attractor_dispatcher の all dispatches 処理を実行する
     @property
     # PURPOSE: 全 dispatch 対象を返す
     def all_dispatches(self) -> list[DispatchResult]:

@@ -31,6 +31,7 @@ class TestTechniqueQuadrant:
 
     # PURPOSE: all_quadrants_exist をテストする
     def test_all_quadrants_exist(self):
+        """Verify all quadrants exist behavior."""
         assert TechniqueQuadrant.EXPERIMENTAL.value == "experimental"
         assert TechniqueQuadrant.INNOVATIVE.value == "innovative"
         assert TechniqueQuadrant.APPLIED.value == "applied"
@@ -43,6 +44,7 @@ class TestActionCategory:
 
     # PURPOSE: all_categories_exist をテストする
     def test_all_categories_exist(self):
+        """Verify all categories exist behavior."""
         assert ActionCategory.COGNITIVE.value == "cognitive"
         assert ActionCategory.CREATIVE.value == "creative"
         assert ActionCategory.EVALUATIVE.value == "evaluative"
@@ -57,6 +59,7 @@ class TestTechnique:
 
     # PURPOSE: create_technique をテストする
     def test_create_technique(self):
+        """Verify create technique behavior."""
         tech = Technique(
             id="test",
             name="Test Technique",
@@ -71,6 +74,7 @@ class TestTechnique:
 
     # PURPOSE: to_dict をテストする
     def test_to_dict(self):
+        """Verify to dict behavior."""
         tech = Technique(
             id="test",
             name="Test",
@@ -92,10 +96,12 @@ class TestStandardTechniques:
 
     # PURPOSE: standard_techniques_populated をテストする
     def test_standard_techniques_populated(self):
+        """Verify standard techniques populated behavior."""
         assert len(STANDARD_TECHNIQUES) >= 10
 
     # PURPOSE: contains_core_techniques をテストする
     def test_contains_core_techniques(self):
+        """Verify contains core techniques behavior."""
         assert "noe" in STANDARD_TECHNIQUES
         assert "bou" in STANDARD_TECHNIQUES
         assert "zet" in STANDARD_TECHNIQUES
@@ -104,6 +110,7 @@ class TestStandardTechniques:
 
     # PURPOSE: all_techniques_have_required_fields をテストする
     def test_all_techniques_have_required_fields(self):
+        """Verify all techniques have required fields behavior."""
         for tid, tech in STANDARD_TECHNIQUES.items():
             assert tech.id == tid
             assert tech.name
@@ -118,11 +125,13 @@ class TestTekhnēRegistry:
 
     # PURPOSE: create_with_defaults をテストする
     def test_create_with_defaults(self):
+        """Verify create with defaults behavior."""
         registry = TekhnēRegistry()
         assert registry.size >= 10
 
     # PURPOSE: create_with_custom_techniques をテストする
     def test_create_with_custom_techniques(self):
+        """Verify create with custom techniques behavior."""
         custom = {
             "custom1": Technique(
                 id="custom1",
@@ -137,6 +146,7 @@ class TestTekhnēRegistry:
 
     # PURPOSE: get_technique をテストする
     def test_get_technique(self):
+        """Verify get technique behavior."""
         registry = TekhnēRegistry()
         tech = registry.get("noe")
         assert tech is not None
@@ -144,11 +154,13 @@ class TestTekhnēRegistry:
 
     # PURPOSE: get_nonexistent_returns_none をテストする
     def test_get_nonexistent_returns_none(self):
+        """Verify get nonexistent returns none behavior."""
         registry = TekhnēRegistry()
         assert registry.get("nonexistent") is None
 
     # PURPOSE: register_new_technique をテストする
     def test_register_new_technique(self):
+        """Verify register new technique behavior."""
         registry = TekhnēRegistry()
         initial_size = registry.size
         new_tech = Technique(
@@ -164,6 +176,7 @@ class TestTekhnēRegistry:
 
     # PURPOSE: search_by_keyword をテストする
     def test_search_by_keyword(self):
+        """Verify search by keyword behavior."""
         registry = TekhnēRegistry()
         results = registry.search(keyword="認識")
         assert len(results) >= 1
@@ -171,6 +184,7 @@ class TestTekhnēRegistry:
 
     # PURPOSE: search_by_category をテストする
     def test_search_by_category(self):
+        """Verify search by category behavior."""
         registry = TekhnēRegistry()
         results = registry.search(category=ActionCategory.COGNITIVE)
         assert len(results) >= 3
@@ -178,6 +192,7 @@ class TestTekhnēRegistry:
 
     # PURPOSE: search_by_quadrant をテストする
     def test_search_by_quadrant(self):
+        """Verify search by quadrant behavior."""
         registry = TekhnēRegistry()
         results = registry.search(quadrant=TechniqueQuadrant.ESTABLISHED)
         assert len(results) >= 3
@@ -185,18 +200,21 @@ class TestTekhnēRegistry:
 
     # PURPOSE: search_by_max_risk をテストする
     def test_search_by_max_risk(self):
+        """Verify search by max risk behavior."""
         registry = TekhnēRegistry()
         results = registry.search(max_risk=0.2)
         assert all(r.risk_level <= 0.2 for r in results)
 
     # PURPOSE: search_by_max_time をテストする
     def test_search_by_max_time(self):
+        """Verify search by max time behavior."""
         registry = TekhnēRegistry()
         results = registry.search(max_time=2)
         assert all(r.time_cost <= 2 for r in results)
 
     # PURPOSE: record_usage をテストする
     def test_record_usage(self):
+        """Verify record usage behavior."""
         registry = TekhnēRegistry()
         registry.record_usage("noe", True)
         registry.record_usage("noe", True)
@@ -206,11 +224,13 @@ class TestTekhnēRegistry:
 
     # PURPOSE: get_empirical_success_rate_no_history をテストする
     def test_get_empirical_success_rate_no_history(self):
+        """Verify get empirical success rate no history behavior."""
         registry = TekhnēRegistry()
         assert registry.get_empirical_success_rate("noe") is None
 
     # PURPOSE: get_statistics をテストする
     def test_get_statistics(self):
+        """Verify get statistics behavior."""
         registry = TekhnēRegistry()
         stats = registry.get_statistics()
         assert "total_techniques" in stats
@@ -220,6 +240,7 @@ class TestTekhnēRegistry:
 
     # PURPOSE: to_json_and_from_json をテストする
     def test_to_json_and_from_json(self):
+        """Verify to json and from json behavior."""
         registry = TekhnēRegistry()
         registry.record_usage("noe", True)
         json_str = registry.to_json()
@@ -235,6 +256,7 @@ class TestEncodeTechniqueAsBMatrixEntry:
 
     # PURPOSE: encode_high_success_low_risk をテストする
     def test_encode_high_success_low_risk(self):
+        """Verify encode high success low risk behavior."""
         tech = Technique(
             id="test",
             name="Test",
@@ -250,6 +272,7 @@ class TestEncodeTechniqueAsBMatrixEntry:
 
     # PURPOSE: encode_low_success_high_risk をテストする
     def test_encode_low_success_high_risk(self):
+        """Verify encode low success high risk behavior."""
         tech = Technique(
             id="test",
             name="Test",
@@ -269,6 +292,7 @@ class TestFormatRegistryMarkdown:
 
     # PURPOSE: formats_registry をテストする
     def test_formats_registry(self):
+        """Verify formats registry behavior."""
         registry = TekhnēRegistry()
         markdown = format_registry_markdown(registry)
         assert "P4 Tekhnē Registry" in markdown
@@ -281,11 +305,13 @@ class TestGlobalRegistry:
 
     # PURPOSE: get_registry_returns_singleton をテストする
     def test_get_registry_returns_singleton(self):
+        """Verify get registry returns singleton behavior."""
         r1 = get_registry()
         r2 = get_registry()
         assert r1 is r2
 
     # PURPOSE: search_techniques_convenience をテストする
     def test_search_techniques_convenience(self):
+        """Verify search techniques convenience behavior."""
         results = search_techniques("実行")
         assert len(results) >= 1

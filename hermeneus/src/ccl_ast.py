@@ -202,6 +202,24 @@ class Lambda:
     body: Any
 
 
+@dataclass
+class TaggedBlock:
+    """タグ付きブロック: V:{body}, C:{body}, R:{body}, M:{body}
+    
+    CPL v2.0 意味タグ。制御フローではなく意図を示す。
+    
+    Tags:
+        V = Validate (検証)
+        C = Cycle (反復サイクル)
+        R = Repeat (反復)
+        M = Memorize (記憶・永続化)
+    
+    例: V:{/dia+}, C:{/dia+_/ene+}, M:{/dox-}
+    """
+    tag: str      # "V", "C", "R", "M"
+    body: Any     # 内部の CCL 式
+
+
 # =============================================================================
 # AST Node: Program (Root)
 # =============================================================================
@@ -231,6 +249,6 @@ ASTNode = Union[
     Workflow, Condition, MacroRef,
     ConvergenceLoop, Sequence, Fusion, Oscillation, ColimitExpansion,
     Pipeline, Parallel,
-    ForLoop, IfCondition, WhileLoop, Lambda,
+    ForLoop, IfCondition, WhileLoop, Lambda, TaggedBlock,
     LetBinding, Program
 ]

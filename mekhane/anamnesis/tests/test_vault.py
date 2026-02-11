@@ -15,6 +15,7 @@ class TestVaultManager(unittest.TestCase):
 
     # PURPOSE: setUp をセットアップする
     def setUp(self):
+        """Verify set up behavior."""
         self.test_dir = tempfile.mkdtemp()
         self.file_path = Path(self.test_dir) / "test.txt"
         self.json_path = Path(self.test_dir) / "test.json"
@@ -22,6 +23,7 @@ class TestVaultManager(unittest.TestCase):
 
     # PURPOSE: tearDown の処理
     def tearDown(self):
+        """Verify tear down behavior."""
         shutil.rmtree(self.test_dir)
 
     # PURPOSE: write_safe and read_safe work correctly

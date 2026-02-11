@@ -38,6 +38,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
+# PURPOSE: SessionSummary の機能を提供する
 @dataclass
 # PURPOSE: Summary of a Jules session.
 class SessionSummary:

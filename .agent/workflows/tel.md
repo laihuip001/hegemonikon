@@ -37,6 +37,10 @@ category_theory:
   drift: "Drift = タイミング感覚の喪失。目的はあるが「いつ」を見失う = 手段の目的化前兆"
   tel_connection: "/tel = G の自問。「手段が目的化していないか？」"
   insight: "目的なき者に好機は来ない。好機なき目的は絵に描いた餅 — Creator, 2026-02-11"
+  mathematical_basis:
+    L1: "前順序圏のガロア接続 — F(X) ≤ Y ⟺ X ≤ G(Y)"
+    L2: "[0,1]-豊穣圏 — Drift ∈ [0,1] は Hom 値"
+    L3: "弱2-圏 (将来) — 派生は 2-cell"
 sel_enforcement:
   "+":
     description: "MUST analyze with 5 Whys, purpose hierarchy, and tradeoffs"

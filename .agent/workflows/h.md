@@ -26,6 +26,10 @@ category_theory:
       - "H1 の射に valence (+/-/0) = 確率分布"
       - "V[/h] = entropy-based bias 検出"
       - "/s の Met-enrichment と共通の上位概念: Typed Enrichment"
+  mathematical_basis:
+    L1: "前順序圏のガロア接続 — F(X) ≤ Y ⟺ X ≤ G(Y)"
+    L2: "[0,1]-豊穣圏 — Drift ∈ [0,1] は Hom 値"
+    L3: "弱2-圏 (将来) — 派生は 2-cell"
 derivatives: [pro, pis, ore, dox, bias]
 cognitive_algebra:
   generation: "L1 × L1.75"

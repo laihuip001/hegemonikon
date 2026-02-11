@@ -39,6 +39,10 @@ category_theory:
   counit: "ε: F(G(Judge)) → Judge — 判定を知識化して再判定 = 判例の確認"
   memory_analogy: "エピソード記憶（判定=具体）⇄ 意味記憶（知識=抽象）"
   insight: "判定=具体、知識=抽象。具体を忘れることで普遍性が残る — Creator, 2026-02-10"
+  mathematical_basis:
+    L1: "前順序圏のガロア接続 — F(X) ≤ Y ⟺ X ≤ G(Y)"
+    L2: "[0,1]-豊穣圏 — Drift ∈ [0,1] は Hom 値"
+    L3: "弱2-圏 (将来) — 派生は 2-cell"
 ---
 
 # /dia: A2 Krisis 発動コマンド

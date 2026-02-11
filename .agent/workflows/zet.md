@@ -36,6 +36,10 @@ category_theory:
     G_preserves: "不変量 = 問いの構造。確信を捨てても、何を知らないかの地図は保存される"
     precision_axis: "L1.75 Precision (C↔U) 上の操作。/noe = C寄り、/zet = U寄り"
     insight: "/noe は不確実性→確実性、/zet は確実性→不確実性の拡散 — Creator, 2026-02-10"
+  mathematical_basis:
+    L1: "前順序圏のガロア接続 — F(X) ≤ Y ⟺ X ≤ G(Y)"
+    L2: "[0,1]-豊穣圏 — Drift ∈ [0,1] は Hom 値"
+    L3: "弱2-圏 (将来) — 派生は 2-cell"
 derivatives: [anom, hypo, eval, abduction]
 trigonon:
   series: O

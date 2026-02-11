@@ -27,6 +27,10 @@ category_theory:
       - "Top (0.55, 棄却: 言い換え)"
       - "Op (0.55, 棄却: P2⊗P3転置のみ)"
       - "Presheaf (0.70, 棄却: 不均等な派生は全Series共通)"
+  mathematical_basis:
+    L1: "前順序圏のガロア接続 — F(X) ≤ Y ⟺ X ≤ G(Y)"
+    L2: "[0,1]-豊穣圏 — Drift ∈ [0,1] は Hom 値"
+    L3: "弱2-圏 (将来) — 派生は 2-cell"
 derivatives: [kho, hod, tro, tek]
 cognitive_algebra:
   generation: "L1.5 × L1.5"

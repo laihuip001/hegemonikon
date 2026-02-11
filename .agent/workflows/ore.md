@@ -54,6 +54,10 @@ category_theory:
   G_preserves: "不変量 = 価値の方向性 (±符号)。情動の鮮度を忘却しても、接近/回避の方向は保存される"
   affect_labeling: "感情に名前をつけると扁桃体活性が低下する（fMRI 研究）= G の神経科学的実体"
   insight: "瞬間的なエネルギー（熱量）が消える。知ってしまえば知る前には戻れない — Creator, 2026-02-10"
+  mathematical_basis:
+    L1: "前順序圏のガロア接続 — F(X) ≤ Y ⟺ X ≤ G(Y)"
+    L2: "[0,1]-豊穣圏 — Drift ∈ [0,1] は Hom 値"
+    L3: "弱2-圏 (将来) — 派生は 2-cell"
 ---
 
 # /ore: 価値傾向評価ワークフロー (Orexis)

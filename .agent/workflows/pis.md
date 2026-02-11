@@ -52,6 +52,10 @@ category_theory:
   counit: "ε: F(G(Trust)) → Trust — 確信を信念にして再検証 = ベイズ更新の再実行"
   bayes: "ベイズ更新(/pis.bayes) = F の反復適用。P(H|E) = 新しいエビデンスで確信度を更新"
   insight: "確信 = 結論 + 推論過程。信念 = 結論のみ — Creator, 2026-02-10"
+  mathematical_basis:
+    L1: "前順序圏のガロア接続 — F(X) ≤ Y ⟺ X ≤ G(Y)"
+    L2: "[0,1]-豊穣圏 — Drift ∈ [0,1] は Hom 値"
+    L3: "弱2-圏 (将来) — 派生は 2-cell"
 ---
 
 # /pis: 確信度評価ワークフロー (Pistis)

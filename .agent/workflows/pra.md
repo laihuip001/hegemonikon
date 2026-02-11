@@ -57,6 +57,10 @@ category_theory:
   explore_exploit: "Explore = F の自由度を広げる / Exploit = G の確実性を使う"
   fep_connection: "座学⇄実践の循環。知覚⇄運動とアナロジカルだが、スケールは異なる"
   insight: "IF-THENの集積 = 条件反射 = 無意識的技能 — Creator, 2026-02-10"
+  mathematical_basis:
+    L1: "前順序圏のガロア接続 — F(X) ≤ Y ⟺ X ≤ G(Y)"
+    L2: "[0,1]-豊穣圏 — Drift ∈ [0,1] は Hom 値"
+    L3: "弱2-圏 (将来) — 派生は 2-cell"
 ---
 
 # /pra: 実践配置ワークフロー (Praxis)

@@ -39,6 +39,10 @@ category_theory:
   counit: "ε: F(G(Measure)) → Measure — 尺度を基準にして再測定 = キャリブレーション"
   drift: "Drift = 「なぜその粒度か」のコンテキスト喪失。尺度が独り歩きする"
   insight: "測れないものは改善できない。だが基準なき測定はただの数字遊び — Creator, 2026-02-11"
+  mathematical_basis:
+    L1: "前順序圏のガロア接続 — F(X) ≤ Y ⟺ X ≤ G(Y)"
+    L2: "[0,1]-豊穣圏 — Drift ∈ [0,1] は Hom 値"
+    L3: "弱2-圏 (将来) — 派生は 2-cell"
 sel_enforcement:
   "+":
     description: "MUST analyze all layers with tradeoffs"

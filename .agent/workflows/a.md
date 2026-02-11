@@ -25,6 +25,10 @@ category_theory:
       - "A4 Epistēmē: tent/just/cert = 確信度のグレーディング"
       - "A2 Krisis: PASS/FAIL = 二値判定 (ファジィの値域)"
       - "PW が A-series の核心操作かつ研究対象 = 自己参照的 enrichment"
+  mathematical_basis:
+    L1: "前順序圏のガロア接続 — F(X) ≤ Y ⟺ X ≤ G(Y)"
+    L2: "[0,1]-豊穣圏 — Drift ∈ [0,1] は Hom 値"
+    L3: "弱2-圏 (将来) — 派生は 2-cell"
 lineage: "v4.2 + Limit演算復元 → v5.0 + C0 PW/加重融合 → v5.4 → v5.5 C3 Kalon化 → v5.6 固有層 Fuzzy-enrichment"
 cognitive_algebra:
   generation: "L1.75 × L1.75"

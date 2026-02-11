@@ -55,6 +55,10 @@ category_theory:
   scale_operation: "G = レンジを広げる（一般化）/ F = レンジを狭める（具体的適用）"
   generalize_mode: "/epi.generalize は G そのもの — 具体→抽象の操作"
   insight: "対象のレンジが広がることで知識になる — Creator, 2026-02-10"
+  mathematical_basis:
+    L1: "前順序圏のガロア接続 — F(X) ≤ Y ⟺ X ≤ G(Y)"
+    L2: "[0,1]-豊穣圏 — Drift ∈ [0,1] は Hom 値"
+    L3: "弱2-圏 (将来) — 派生は 2-cell"
 ---
 
 # /epi: 知識確立ワークフロー (Epistēmē)

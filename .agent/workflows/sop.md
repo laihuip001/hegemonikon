@@ -34,6 +34,10 @@ category_theory:
   G_preserves: "不変量 = 問うべき方向（何を知るべきかの指向性）。期限を忘却しても、調査の方向は保存される"
   k_series_pattern: "K-series 全体: euk⊣tel(+) と chr⊣sop(-) で Valence の表裏"
   insight: "問うべき対象のレイヤーが上下している — Creator, 2026-02-11"
+  mathematical_basis:
+    L1: "前順序圏のガロア接続 — F(X) ≤ Y ⟺ X ≤ G(Y)"
+    L2: "[0,1]-豊穣圏 — Drift ∈ [0,1] は Hom 値"
+    L3: "弱2-圏 (将来) — 派生は 2-cell"
 ---
 
 # /sop: 情報収集ワークフロー (Sophia)

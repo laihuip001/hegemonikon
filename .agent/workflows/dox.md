@@ -55,6 +55,10 @@ category_theory:
   G_preserves: "不変量 = 結論の命題構造 (P か ¬P)。推論過程を忘却しても、命題の真偽は保存される"
   bc6_connection: "BC-6 TAINT/SOURCE 追跡 = Drift 低減のための仕組み。推論過程を記録し信念化を防ぐ"
   insight: "信念は結果のみしか取り合わない。過程が忘れ去られる — Creator, 2026-02-10"
+  mathematical_basis:
+    L1: "前順序圏のガロア接続 — F(X) ≤ Y ⟺ X ≤ G(Y)"
+    L2: "[0,1]-豊穣圏 — Drift ∈ [0,1] は Hom 値"
+    L3: "弱2-圏 (将来) — 派生は 2-cell"
 ---
 
 # /dox: 信念定着ワークフロー (Doxa)

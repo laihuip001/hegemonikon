@@ -36,6 +36,10 @@ category_theory:
     手順の感覚: "どの順でやったか、どこでつまずいたか。技法化すると消える"
   drift: "Drift = 手順の感覚喪失量。技法だけ知って実践したことがない状態"
   insight: "試行が蒸留されて技法になる — Creator, 2026-02-11"
+  mathematical_basis:
+    L1: "前順序圏のガロア接続 — F(X) ≤ Y ⟺ X ≤ G(Y)"
+    L2: "[0,1]-豊穣圏 — Drift ∈ [0,1] は Hom 値"
+    L3: "弱2-圏 (将来) — 派生は 2-cell"
 sel_enforcement:
   "+":
     description: "MUST analyze with comparison table, tradeoffs, learning curve"

@@ -36,6 +36,10 @@ category_theory:
   counit: "ε: F(G(Timeline)) → Timeline — スケジュールを知恵にしてスケジュールに戻す = 期限の再設定"
   drift: "Drift = 時間圧力の忘却。調査に没頭して期限を忘れる"
   insight: "知恵は時間を忘れた経験の結晶。いつ学んだかは覚えていないが、学んだことは消えない — Creator, 2026-02-11"
+  mathematical_basis:
+    L1: "前順序圏のガロア接続 — F(X) ≤ Y ⟺ X ≤ G(Y)"
+    L2: "[0,1]-豊穣圏 — Drift ∈ [0,1] は Hom 値"
+    L3: "弱2-圏 (将来) — 派生は 2-cell"
 sel_enforcement:
   "+":
     description: "MUST analyze short/medium/long term with dependencies"

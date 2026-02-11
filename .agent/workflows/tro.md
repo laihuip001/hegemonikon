@@ -37,6 +37,10 @@ category_theory:
     場の文脈: "どの環境で、誰と、なぜその周期だったか。サイクル化すると消える"
   drift: "Drift = 場の文脈の喪失量。パターンが環境を超えて適用されるリスク"
   insight: "場が軌道を制約し、軌道が場を定義する。入れ物と動きは同時に決まる — Creator, 2026-02-11"
+  mathematical_basis:
+    L1: "前順序圏のガロア接続 — F(X) ≤ Y ⟺ X ≤ G(Y)"
+    L2: "[0,1]-豊穣圏 — Drift ∈ [0,1] は Hom 値"
+    L3: "弱2-圏 (将来) — 派生は 2-cell"
 sel_enforcement:
   "+":
     description: "MUST define cycle, pattern, and conditional branches"

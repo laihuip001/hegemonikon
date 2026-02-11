@@ -29,6 +29,10 @@ category_theory:
       - "6対の張力 = Hom の enrichment (Set → Met)"
       - "Devil's Advocate = enriched Hom 上のテスト射"
       - "PW 加重融合 = テスト射後の加重 colimit"
+  mathematical_basis:
+    L1: "前順序圏のガロア接続 — F(X) ≤ Y ⟺ X ≤ G(Y)"
+    L2: "[0,1]-豊穣圏 — Drift ∈ [0,1] は Hom 値"
+    L3: "弱2-圏 (将来) — 派生は 2-cell"
 lcm_state: stable
 layer: "Δ"
 lineage: "v5.8 + Limit演算復元 → v6.0 + C0 PW/加重融合 → v6.2 + v6.3 C3 Kalon化 → v6.4 固有層 Enrichment"

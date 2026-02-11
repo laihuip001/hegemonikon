@@ -36,6 +36,10 @@ category_theory:
     測定コンテキスト: "なぜその粒度を選んだか、どの環境で有効か。基準化すると消える"
   drift: "Drift = 測定コンテキストの喪失量。基準が環境非依存に見えて実は環境依存"
   insight: "測れないものは改善できない。だが基準なき測定はただの数字遊び — Creator, 2026-02-11"
+  mathematical_basis:
+    L1: "前順序圏のガロア接続 — F(X) ≤ Y ⟺ X ≤ G(Y)"
+    L2: "[0,1]-豊穣圏 — Drift ∈ [0,1] は Hom 値"
+    L3: "弱2-圏 (将来) — 派生は 2-cell"
 sel_enforcement:
   "+":
     description: "MUST set criteria with Must/Should/Could + rationale"

@@ -52,6 +52,10 @@ category_theory:
   counit: "ε: F(G(Gut)) → Gut — 直感を欲求にして再点火 = 再直感化"
   stoic: "Propatheia = 第一運動（first movement）。理性の判断の前に不随意的に生じる初期反応"
   insight: "直感 = シンプルなモデル + 高precision。速いが狭い — Creator, 2026-02-10"
+  mathematical_basis:
+    L1: "前順序圏のガロア接続 — F(X) ≤ Y ⟺ X ≤ G(Y)"
+    L2: "[0,1]-豊穣圏 — Drift ∈ [0,1] は Hom 値"
+    L3: "弱2-圏 (将来) — 派生は 2-cell"
 ---
 
 # /pro: 初期傾向評価ワークフロー (Propatheia)

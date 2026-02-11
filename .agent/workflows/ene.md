@@ -61,6 +61,10 @@ category_theory:
   counit: "ε: F(G(Act)) → Act — 行為からなぜを遡って再計画したら、同じ行為か？"
   drift: "ε 崩壊 = 手段が目的化 = /tel 発動条件"
   replan_as_adjunction: "PHASE 3.5 動的リプランニング = G∘F サイクルの再実行"
+  mathematical_basis:
+    L1: "前順序圏のガロア接続 — F(X) ≤ Y ⟺ X ≤ G(Y)"
+    L2: "[0,1]-豊穣圏 — Drift ∈ [0,1] は Hom 値"
+    L3: "弱2-圏 (将来) — 派生は 2-cell"
 ---
 
 # /ene: 行為ワークフロー (Energeia)

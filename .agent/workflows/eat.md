@@ -54,6 +54,10 @@ category_theory:
     phase_4: "三角恒等式検証 (/fit) — 随伴の健全性"
     phase_5: "統合実行 — パッチ適用"
     phase_6: "検証 — 動作確認"
+  mathematical_basis:
+    L1: "前順序圏のガロア接続 — F(X) ≤ Y ⟺ X ≤ G(Y)"
+    L2: "[0,1]-豊穣圏 — Drift ∈ [0,1] は Hom 値"
+    L3: "弱2-圏 (将来) — 派生は 2-cell"
 ---
 
 # /eat: 外部コンテンツ消化ワークフロー

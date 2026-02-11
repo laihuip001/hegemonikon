@@ -26,6 +26,10 @@ category_theory:
       - "Eisenhower Matrix = 2軸 (重要性 × 緊急性) の enrichment"
       - "Q2 保護 = enrichment 上のバイアス補正 (q2_boost)"
       - "/s Met, /h Prob と共通の上位概念: Typed Enrichment"
+  mathematical_basis:
+    L1: "前順序圏のガロア接続 — F(X) ≤ Y ⟺ X ≤ G(Y)"
+    L2: "[0,1]-豊穣圏 — Drift ∈ [0,1] は Hom 値"
+    L3: "弱2-圏 (将来) — 派生は 2-cell"
 lineage: "v5.2 + Limit演算復元 → v6.0 + C0 PW/加重融合 → v6.4 → v6.5 C3 Kalon化 → v6.6 固有層 Temporal-enrichment"
 cognitive_algebra:
   generation: "L1.5 × L1.75"

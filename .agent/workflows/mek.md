@@ -48,6 +48,10 @@ category_theory:
   counit: "ε: F(G(Method)) → Method — 方法を実践して方法に戻す = 実践の効果"
   cycle: "座学⇄実践の循環。理屈→身体でも身体→理屈でも技術は生まれる"
   insight: "知覚⇄運動とアナロジカルに循環するが、スケールは座学⇄実践レベル — Creator, 2026-02-10"
+  mathematical_basis:
+    L1: "前順序圏のガロア接続 — F(X) ≤ Y ⟺ X ≤ G(Y)"
+    L2: "[0,1]-豊穣圏 — Drift ∈ [0,1] は Hom 値"
+    L3: "弱2-圏 (将来) — 派生は 2-cell"
 ---
 
 # /mek — 方法配置ワークフロー (Mekhane)

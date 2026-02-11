@@ -24,6 +24,10 @@ category_theory:
       - "V[] > 0.5 → O3+: Cone 内部状態を PW にフィードバック (他WFは外部文脈ベース)"
       - "O1.meta = 認知の認知 (endomorphism)"
       - "/o* = 認知層が自分自身を問う (endomorphism の問い)"
+  mathematical_basis:
+    L1: "前順序圏のガロア接続 — F(X) ≤ Y ⟺ X ≤ G(Y)"
+    L2: "[0,1]-豊穣圏 — Drift ∈ [0,1] は Hom 値"
+    L3: "弱2-圏 (将来) — 派生は 2-cell"
 layer: "Δ"
 lineage: "v3.2 + Limit演算復元 → v4.0 → v5.0 + C0 PW/加重融合 → v5.1 → v5.2 C3 Kalon化 → v5.3 固有層 Ord-enrichment"
 derivatives:

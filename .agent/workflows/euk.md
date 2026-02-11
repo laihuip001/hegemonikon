@@ -36,6 +36,10 @@ category_theory:
   counit: "ε: F(G(Opportunity)) → Opportunity — 好機を目的にして好機に戻す = 好機の再評価"
   drift: "Drift = 緊急性の過剰忘却。目的はあるがタイミングを逃す"
   insight: "目的なき者に好機は来ない。好機なき目的は絵に描いた餅 — Creator, 2026-02-11"
+  mathematical_basis:
+    L1: "前順序圏のガロア接続 — F(X) ≤ Y ⟺ X ≤ G(Y)"
+    L2: "[0,1]-豊穣圏 — Drift ∈ [0,1] は Hom 値"
+    L3: "弱2-圏 (将来) — 派生は 2-cell"
 sel_enforcement:
   "+":
     description: "MUST analyze opportunity cost, competition, and time window"

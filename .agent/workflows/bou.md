@@ -63,6 +63,10 @@ category_theory:
     phase_3: "G の品質検証 — 衝動 vs 熟慮（本当に純粋か？）"
     phase_4: "F の開始 — 制約を導入"
     phase_5: "F の出力 — 制約付きの目標（行動計画）"
+  mathematical_basis:
+    L1: "前順序圏のガロア接続 — F(X) ≤ Y ⟺ X ≤ G(Y)"
+    L2: "[0,1]-豊穣圏 — Drift ∈ [0,1] は Hom 値"
+    L3: "弱2-圏 (将来) — 派生は 2-cell"
 ---
 
 # /bou: 意志明確化ワークフロー (Boulēsis)

@@ -20,6 +20,10 @@ category_theory:
     superficial: "F or G が well-defined でない"
     absorbed: "η は成立するが ε が不完全、または逆"
     naturalized: "両方の三角恒等式が成立 = 完全な随伴"
+  mathematical_basis:
+    L1: "前順序圏のガロア接続 — F(X) ≤ Y ⟺ X ≤ G(Y)"
+    L2: "[0,1]-豊穣圏 — Drift ∈ [0,1] は Hom 値"
+    L3: "弱2-圏 (将来) — 派生は 2-cell"
 lcm_state: beta
 ---
 

@@ -36,6 +36,10 @@ category_theory:
   counit: "ε: F(G(Passion)) → Passion — 情念を教訓にして再点火 = 情動の再体験"
   drift: "Drift = 感情の生の熱量の喪失。教訓は残るが痛みの鮮度は消える"
   insight: "痛みが教訓を生み、教訓は痛みを忘れた知恵。だから忘れた頃に繰り返す — Creator, 2026-02-11"
+  mathematical_basis:
+    L1: "前順序圏のガロア接続 — F(X) ≤ Y ⟺ X ≤ G(Y)"
+    L2: "[0,1]-豊穣圏 — Drift ∈ [0,1] は Hom 値"
+    L3: "弱2-圏 (将来) — 派生は 2-cell"
 sel_enforcement:
   "+":
     description: "MUST analyze double tendency with reasoning"

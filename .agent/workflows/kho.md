@@ -36,6 +36,10 @@ category_theory:
   counit: "ε: F(G(Scope)) → Scope — スコープをサイクルにしてスコープに戻す = 再スコーピング"
   drift: "Drift = 場の特殊性の喪失。スコープが環境非依存に見えて実は環境依存"
   insight: "場が軌道を制約し、軌道が場を定義する。入れ物と動きは同時に決まる — Creator, 2026-02-11"
+  mathematical_basis:
+    L1: "前順序圏のガロア接続 — F(X) ≤ Y ⟺ X ≤ G(Y)"
+    L2: "[0,1]-豊穣圏 — Drift ∈ [0,1] は Hom 値"
+    L3: "弱2-圏 (将来) — 派生は 2-cell"
 sel_enforcement:
   "+":
     description: "MUST enumerate boundary conditions completely"

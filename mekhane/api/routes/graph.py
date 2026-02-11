@@ -150,6 +150,7 @@ for series_id in SERIES:
 
 # --- Pydantic Models ---
 
+# PURPOSE: グラフノード (定理)
 class GraphNode(BaseModel):
     id: str
     series: str
@@ -161,6 +162,7 @@ class GraphNode(BaseModel):
     color: str
     position: dict[str, float]
 
+# PURPOSE: グラフエッジ (X-series)
 class GraphEdge(BaseModel):
     id: str
     pair: str
@@ -171,6 +173,7 @@ class GraphEdge(BaseModel):
     meaning: str
     type: str = Field(description="anchor, bridge, or identity")
 
+# PURPOSE: グラフ全データ
 class GraphFullResponse(BaseModel):
     nodes: list[GraphNode]
     edges: list[GraphEdge]
@@ -182,18 +185,21 @@ class GraphFullResponse(BaseModel):
 router = APIRouter(prefix="/graph", tags=["graph"])
 
 
+# PURPOSE: ノード一覧取得
 @router.get("/nodes", response_model=list[GraphNode])
 async def get_graph_nodes() -> list[GraphNode]:
     """24 定理ノードを返す。"""
     return [GraphNode(**t) for t in THEOREMS]
 
 
+# PURPOSE: エッジ一覧取得
 @router.get("/edges", response_model=list[GraphEdge])
 async def get_graph_edges() -> list[GraphEdge]:
     """78 X-series エッジを返す (72 relations + 6 identity morphisms)。"""
     return [GraphEdge(**e) for e in EDGES]
 
 
+# PURPOSE: 全グラフデータ取得
 @router.get("/full", response_model=GraphFullResponse)
 async def get_graph_full() -> GraphFullResponse:
     """ノード + エッジ + メタデータを一括で返す。"""

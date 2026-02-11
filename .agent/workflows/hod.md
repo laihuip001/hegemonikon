@@ -27,6 +27,15 @@ cognitive_algebra:
   "+": "詳細経路：代替経路とトレードオフを列挙"
   "-": "即経路：Explore/Exploit の一言のみ"
   "*": "メタ経路：経路選択自体を問う"
+category_theory:
+  core: "随伴 F⊣G の左随伴 F（自由関手）"
+  adjunction: "Hodos (F) ⊣ Tekhnē (G)"
+  role: "F: Technique → Route（抽象的技法に具体的手順・中間地点を載せて実行可能な経路を構成）"
+  F_definition: "「TDD」のような技法名に、具体的なステップ列（1→2→3）を付与してルートにする"
+  unit: "η: Technique → G(F(Technique)) — 技法を経路にして技法に戻す = 技法の実行可能性検証"
+  counit: "ε: F(G(Route)) → Route — 経路を技法にして経路に戻す = 経路の再設計"
+  drift: "Drift = 具体的道のりの感覚喪失。手順の曲がり角でつまずいた記憶が消える"
+  insight: "試行が蒸留されて技法になる — Creator, 2026-02-11"
 sel_enforcement:
   "+":
     description: "MUST enumerate alternative routes and tradeoffs"

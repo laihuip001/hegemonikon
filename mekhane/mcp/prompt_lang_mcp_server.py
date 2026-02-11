@@ -246,14 +246,39 @@ def load_yaml_file(path: Path) -> dict:
 
 
 # ============ Prompt-Lang Generation (v2.1) ============
+# --- Archetype-specific constraint injection (施策 3) ---
+ARCHETYPE_CONSTRAINTS = {
+    "Precision": [
+        "出力は検証(verification)可能であること。CoVe手法で自己検証を行うこと",
+        "Confidence score を付与し、WACK基準で確度を保証すること",
+    ],
+    "Speed": [
+        "圧縮(compression)された出力を優先し、キャッシュ(cache)可能な形式で返すこと",
+        "短文で要点のみを返すこと",
+    ],
+    "Autonomy": [
+        "ReAct パターンで自律判断し、Reflexion で自己修正すること",
+        "Fallback 時はエスカレーションし、Mem0 で学習を蓄積すること",
+    ],
+    "Creative": [
+        "Temperature を高めに設定し、SAC手法で多様性(diversity)を確保すること",
+    ],
+    "Safety": [
+        "URIAL 原則に基づき、Constitutional AI の基準で有害コンテンツをフィルタすること",
+        "Neutralizing 手法で偏りを低減すること",
+    ],
+}
+
+
 def generate_prompt_lang(requirements: str, domain: str, output_format: str) -> str:
     """Generate Prompt-Lang code from requirements.
 
-    v2.1 Enhancement:
-      - domain_examples → @examples (few-shot from YAML)
-      - domain_format → @format (from YAML, not hardcoded)
-      - anti_patterns → @constraints (negative guidance)
-      - convergence/divergence policy check with warning
+    v2.2 Enhancement:
+      - v2.1 features (domain_examples, anti_patterns, convergence/divergence)
+      - safety_base_constraints injection (施策 1: Safety +30)
+      - failure scenario injection (施策 2: Completeness +15)
+      - archetype-specific constraints (施策 3: Archetype Fit +10)
+      - domain-specific @context (施策 4: Context +5)
     """
 
     # Extract skill name from requirements
@@ -267,9 +292,11 @@ def generate_prompt_lang(requirements: str, domain: str, output_format: str) -> 
     # Load domain template (v2.1: full template utilization)
     domain_template = load_yaml_file(DOMAIN_TEMPLATES_DIR / f"{domain}.yaml")
     domain_constraints = domain_template.get("domain_constraints", [])
+    safety_base = domain_template.get("safety_base_constraints", [])  # 施策 1
     domain_rubric = domain_template.get("domain_rubric", [])
     domain_examples = domain_template.get("domain_examples", [])
     domain_format = domain_template.get("domain_format", "")
+    context_recs = domain_template.get("context_recommendations", [])  # 施策 4
     anti_patterns = domain_template.get("anti_patterns", [])
     output_style = domain_template.get("output_style", {})
 
@@ -320,13 +347,48 @@ def generate_prompt_lang(requirements: str, domain: str, output_format: str) -> 
             bad = ap.get("bad", "")
             lines.append(f"  - 禁止: {pattern}（例: 「{bad}」）")
 
-    # Context section
+    # v2.2 施策 1: Safety 基盤制約の注入
+    if safety_base:
+        lines.append("  # --- 安全基盤制約 ---")
+        for sc in safety_base:
+            lines.append(f"  - {sc}")
+
+    # v2.2 施策 2: 失敗シナリオの注入 (Completeness: failure/edge case/境界)
+    lines.append("  # --- 失敗ケース予測 (Pre-Mortem) ---")
+    lines.append("  - 失敗ケース1: 入力が不完全・欠損している場合の境界条件を処理すること")
+    lines.append("  - 失敗ケース2: edge case（極端に長い/短い/空の入力）に安全に対応すること")
+    lines.append("  - 失敗ケース3: 最悪ケース(worst case)でもシステムが安全に停止すること")
+
+    # v2.2 施策 3: Archetype 固有制約の注入
+    archetype_constraints = ARCHETYPE_CONSTRAINTS.get(policy.get("archetype", ""), [])
+    if not archetype_constraints:
+        # Detect archetype from domain
+        domain_archetype_map = {
+            "technical": "Precision",
+            "rag": "Precision",
+            "summarization": "Precision",
+            "research": "Precision",
+        }
+        detected = domain_archetype_map.get(domain, "")
+        archetype_constraints = ARCHETYPE_CONSTRAINTS.get(detected, [])
+    if archetype_constraints:
+        lines.append("  # --- Archetype 固有制約 ---")
+        for ac in archetype_constraints:
+            lines.append(f"  - {ac}")
+
+    # Context section — v2.2 施策 4: ドメイン固有ツール展開
     lines.extend([
         "",
         "@context:",
         f"  - file: .agent/rules/prompt-lang-policy.md",
         f"    priority: HIGH",
     ])
+    if context_recs:
+        for rec in context_recs:
+            tool_name = rec.get("tool", "")
+            usage = rec.get("usage", "")
+            lines.append(f"  - tool: {tool_name}")
+            lines.append(f"    usage: {usage}")
 
     # Rubric section
     lines.extend(["", "@rubric:"])

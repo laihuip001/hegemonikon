@@ -26,6 +26,16 @@ cognitive_algebra:
   "+": "詳細基準設定。Must/Should/Could + 根拠"
   "-": "即断基準。Pass/Fail の1点のみ"
   "*": "基準選択のメタ分析。なぜこの基準か"
+category_theory:
+  core: "随伴 F⊣G の右随伴 G（忘却関手）"
+  adjunction: "Metron (F) ⊣ Stathmos (G)"
+  role: "G: Measure → Standard（具体的尺度から粒度/スケールを忘却し、抽象的評価基準だけ残す）"
+  G_definition: "「何をどの細かさで測ったか」を捨て、「何が良いか/悪いか」の判断基準のみ保持"
+  G_two_layers:
+    判断基準: "Must/Should/Could の優先順位。well-defined"
+    測定コンテキスト: "なぜその粒度を選んだか、どの環境で有効か。基準化すると消える"
+  drift: "Drift = 測定コンテキストの喪失量。基準が環境非依存に見えて実は環境依存"
+  insight: "測れないものは改善できない。だが基準なき測定はただの数字遊び — Creator, 2026-02-11"
 sel_enforcement:
   "+":
     description: "MUST set criteria with Must/Should/Could + rationale"

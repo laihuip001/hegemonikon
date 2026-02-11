@@ -19,6 +19,7 @@ Architecture:
 """
 
 import json
+import os
 import sys
 from datetime import datetime
 from pathlib import Path
@@ -32,11 +33,20 @@ if str(PROJECT_ROOT) not in sys.path:
 from mcp.server.fastmcp import FastMCP
 
 # =============================================================================
+# Configuration
+# =============================================================================
+
+GATEWAY_HOST = os.getenv("HGK_GATEWAY_HOST", "127.0.0.1")
+GATEWAY_PORT = int(os.getenv("HGK_GATEWAY_PORT", "8765"))
+
+# =============================================================================
 # Gateway Server
 # =============================================================================
 
 mcp = FastMCP(
     "hgk-gateway",
+    host=GATEWAY_HOST,
+    port=GATEWAY_PORT,
     instructions=(
         "Hegemonikón 出張 MCP Gateway。"
         "モバイルから HGK の認知機能にアクセスする。"

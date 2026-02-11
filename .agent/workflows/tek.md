@@ -26,6 +26,16 @@ cognitive_algebra:
   "+": "詳細技法分析。比較表、トレードオフ、習得曲線"
   "-": "即断技法。manu/mech/auto の1行選択"
   "*": "技法選択のメタ分析。なぜこの方法か"
+category_theory:
+  core: "随伴 F⊣G の右随伴 G（忘却関手）"
+  adjunction: "Hodos (F) ⊣ Tekhnē (G)"
+  role: "G: Route → Technique（具体的経路から個別ステップを忘却し、再利用可能な技法名だけ残す）"
+  G_definition: "「1→2→3でやった」を「TDDと呼ぼう」に抽象化。具体的手順の感覚が消える"
+  G_two_layers:
+    技法名: "方法論の名前と原則。well-defined"
+    手順の感覚: "どの順でやったか、どこでつまずいたか。技法化すると消える"
+  drift: "Drift = 手順の感覚喪失量。技法だけ知って実践したことがない状態"
+  insight: "試行が蒸留されて技法になる — Creator, 2026-02-11"
 sel_enforcement:
   "+":
     description: "MUST analyze with comparison table, tradeoffs, learning curve"

@@ -30,6 +30,15 @@ cognitive_algebra:
   "-": "即断スケール。Micro/Meso/Macro の1行判定"
   "*": "スケール選択のメタ分析。なぜこの粒度か"
   fermi: "フェルミ推定。オーダー概算、10倍精度"
+category_theory:
+  core: "随伴 F⊣G の左随伴 F（自由関手）"
+  adjunction: "Metron (F) ⊣ Stathmos (G)"
+  role: "F: Standard → Measure（抽象的評価基準に具体的スケール/粒度を載せて測定方法を構成）"
+  F_definition: "「良い/悪い」という漠然とした基準に、Micro/Meso/Macroの具体的尺度を付与して測定可能にする"
+  unit: "η: Standard → G(F(Standard)) — 基準を尺度にして基準に戻す = 測定可能性の検証"
+  counit: "ε: F(G(Measure)) → Measure — 尺度を基準にして再測定 = キャリブレーション"
+  drift: "Drift = 「なぜその粒度か」のコンテキスト喪失。尺度が独り歩きする"
+  insight: "測れないものは改善できない。だが基準なき測定はただの数字遊び — Creator, 2026-02-11"
 sel_enforcement:
   "+":
     description: "MUST analyze all layers with tradeoffs"

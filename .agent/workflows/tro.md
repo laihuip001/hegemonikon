@@ -27,6 +27,16 @@ cognitive_algebra:
   "+": "詳細軌道：周期・パターン・条件分岐を完全定義"
   "-": "即軌道：一度/反復/継続 の一言のみ"
   "*": "メタ軌道：軌道設計自体を問う"
+category_theory:
+  core: "随伴 F⊣G の右随伴 G（忘却関手）"
+  adjunction: "Khōra (F) ⊣ Trokhia (G)"
+  role: "G: Scope → Cycle（スコープから場の特殊性を忘却し、再利用可能な反復パターンだけ残す）"
+  G_definition: "「このプロジェクトで週次レビューをやった」から環境依存性を落とし、「週次レビューのサイクル」だけ抽出"
+  G_two_layers:
+    反復パターン: "周期・頻度・条件分岐。well-defined"
+    場の文脈: "どの環境で、誰と、なぜその周期だったか。サイクル化すると消える"
+  drift: "Drift = 場の文脈の喪失量。パターンが環境を超えて適用されるリスク"
+  insight: "場が軌道を制約し、軌道が場を定義する。入れ物と動きは同時に決まる — Creator, 2026-02-11"
 sel_enforcement:
   "+":
     description: "MUST define cycle, pattern, and conditional branches"

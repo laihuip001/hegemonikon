@@ -27,6 +27,15 @@ cognitive_algebra:
   "+": "詳細好機分析。機会コスト、競合状況、時間窓"
   "-": "即断タイミング。今か/待つかの1行判定"
   "*": "好機判断のメタ分析。なぜ今が重要か"
+category_theory:
+  core: "随伴 F⊣G の左随伴 F（自由関手）"
+  adjunction: "Eukairia (F) ⊣ Telos (G)"
+  role: "F: Purpose → Opportunity（抽象的目的に「今か否か」のタイミング判断を載せて好機を構成）"
+  F_definition: "「何のために」に「いつ」を加えて、行動可能な機会に変換する"
+  unit: "η: Purpose → G(F(Purpose)) — 目的を好機にして目的に戻す = 機会が目的に合致するか検証"
+  counit: "ε: F(G(Opportunity)) → Opportunity — 好機を目的にして好機に戻す = 好機の再評価"
+  drift: "Drift = 緊急性の過剰忘却。目的はあるがタイミングを逃す"
+  insight: "目的なき者に好機は来ない。好機なき目的は絵に描いた餅 — Creator, 2026-02-11"
 sel_enforcement:
   "+":
     description: "MUST analyze opportunity cost, competition, and time window"

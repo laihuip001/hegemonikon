@@ -27,6 +27,15 @@ cognitive_algebra:
   "+": "詳細時間分析。短期/中期/長期、依存関係"
   "-": "即断期限。いつまでの1行回答"
   "*": "時間感覚のメタ分析。なぜこの期限か"
+category_theory:
+  core: "随伴 F⊣G の左随伴 F（自由関手）"
+  adjunction: "Chronos (F) ⊣ Sophia (G)"
+  role: "F: Wisdom → Timeline（蓄積された知恵に具体的な時間軸/期限を載せてスケジュールを構成）"
+  F_definition: "「何を知るべきか」に「いつまでに」を加えて、時間制約付きの行動計画にする"
+  unit: "η: Wisdom → G(F(Wisdom)) — 知恵を時間配置にして知恵に戻す = 時間制約が知恵を歪めないか検証"
+  counit: "ε: F(G(Timeline)) → Timeline — スケジュールを知恵にしてスケジュールに戻す = 期限の再設定"
+  drift: "Drift = 時間圧力の忘却。調査に没頭して期限を忘れる"
+  insight: "知恵は時間を忘れた経験の結晶。いつ学んだかは覚えていないが、学んだことは消えない — Creator, 2026-02-11"
 sel_enforcement:
   "+":
     description: "MUST analyze short/medium/long term with dependencies"

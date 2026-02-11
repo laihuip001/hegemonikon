@@ -27,6 +27,15 @@ cognitive_algebra:
   "+": "詳細スコープ：境界条件を完全列挙"
   "-": "即スコープ：Micro/Macro の一言のみ"
   "*": "メタスコープ：スコープ設定自体を問う"
+category_theory:
+  core: "随伴 F⊣G の左随伴 F（自由関手）"
+  adjunction: "Khōra (F) ⊣ Trokhia (G)"
+  role: "F: Cycle → Scope（反復パターンに場の制約/環境を載せてスコープを構成）"
+  F_definition: "抽象的な反復サイクルに、具体的な環境・領域・境界条件を付与して実行範囲を確定させる"
+  unit: "η: Cycle → G(F(Cycle)) — サイクルをスコープにしてサイクルに戻す = 適用範囲の検証"
+  counit: "ε: F(G(Scope)) → Scope — スコープをサイクルにしてスコープに戻す = 再スコーピング"
+  drift: "Drift = 場の特殊性の喪失。スコープが環境非依存に見えて実は環境依存"
+  insight: "場が軌道を制約し、軌道が場を定義する。入れ物と動きは同時に決まる — Creator, 2026-02-11"
 sel_enforcement:
   "+":
     description: "MUST enumerate boundary conditions completely"

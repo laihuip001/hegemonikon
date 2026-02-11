@@ -27,6 +27,15 @@ cognitive_algebra:
   "+": "詳細感情：二重傾向の根拠と分岐を深掘り"
   "-": "即感情：+→+/+→-/-→+/-→- の一言のみ"
   "*": "メタ感情：感情評価プロセス自体を問う"
+category_theory:
+  core: "随伴 F⊣G の左随伴 F（自由関手）"
+  adjunction: "Pathos (F) ⊣ Gnōmē (G)"
+  role: "F: Maxim → Passion（抽象的教訓に激烈な感情/体験を載せてメタ感情を構成）"
+  F_definition: "「失敗から学べ」という格言に、実際の痛みや後悔の感情強度を付与して二重傾向を構成"
+  unit: "η: Maxim → G(F(Maxim)) — 教訓を情念にして教訓に戻す = 教訓の体感的理解度検証"
+  counit: "ε: F(G(Passion)) → Passion — 情念を教訓にして再点火 = 情動の再体験"
+  drift: "Drift = 感情の生の熱量の喪失。教訓は残るが痛みの鮮度は消える"
+  insight: "痛みが教訓を生み、教訓は痛みを忘れた知恵。だから忘れた頃に繰り返す — Creator, 2026-02-11"
 sel_enforcement:
   "+":
     description: "MUST analyze double tendency with reasoning"

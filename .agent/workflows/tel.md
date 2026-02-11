@@ -26,6 +26,17 @@ cognitive_algebra:
   "+": "詳細目的分析。5 Whys、目的階層、トレードオフ"
   "-": "即断目的。何のための1行回答"
   "*": "目的のメタ分析。なぜこの目的を問うか"
+category_theory:
+  core: "随伴 F⊣G の右随伴 G（忘却関手）"
+  adjunction: "Eukairia (F) ⊣ Telos (G)"
+  role: "G: Opportunity → Purpose（好機からタイミングの緊急性を忘却し、普遍的な目的だけ残す）"
+  G_definition: "「今これをやるべき」から「今」を落とし、「なぜこれをやるのか」だけ抽出"
+  G_two_layers:
+    目的: "「何のために」の方向性。well-defined"
+    タイミング感覚: "「なぜ今か」の直感的察知力。目的化すると消える"
+  drift: "Drift = タイミング感覚の喪失。目的はあるが「いつ」を見失う = 手段の目的化前兆"
+  tel_connection: "/tel = G の自問。「手段が目的化していないか？」"
+  insight: "目的なき者に好機は来ない。好機なき目的は絵に描いた餅 — Creator, 2026-02-11"
 sel_enforcement:
   "+":
     description: "MUST analyze with 5 Whys, purpose hierarchy, and tradeoffs"

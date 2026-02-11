@@ -32,6 +32,16 @@ cognitive_algebra:
   "-": "即原則：1行格言のみ"
   "*": "メタ原則：原則抽出プロセス自体を問う"
   analogy: "アナロジー。既知→未知の写像、破綻点必須"
+category_theory:
+  core: "随伴 F⊣G の右随伴 G（忘却関手）"
+  adjunction: "Pathos (F) ⊣ Gnōmē (G)"
+  role: "G: Passion → Maxim（メタ感情から感情の激烈さを忘却し、再利用可能な教訓/格言だけ残す）"
+  G_definition: "「あの時死ぬほど悔しかった」から感情強度を落とし、「準備を怠るな」という原則だけ抽出"
+  G_two_layers:
+    格言: "教訓・原則・パターン。well-defined"
+    感情の鮮度: "痛みの生々しさ、喜びの高揚。格言化すると不可逆的に消える"
+  drift: "Drift = 感情の鮮度喪失量。「知っている」けど「感じない」状態"
+  insight: "痛みが教訓を生み、教訓は痛みを忘れた知恵。だから忘れた頃に繰り返す — Creator, 2026-02-11"
 sel_enforcement:
   "+":
     description: "MUST describe with conditions, exceptions, and basis"

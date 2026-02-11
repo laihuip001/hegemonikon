@@ -42,6 +42,16 @@ sel_enforcement:
     minimum_requirements:
       - "経路選択の根拠を問う"
 ccl_signature: "/hod+_/ene"
+category_theory:
+  core: "随伴 F⊣G の左随伴 F（自由関手）"
+  adjunction: "Hodos (F) ⊣ Tekhnē (G)"
+  role: "F: Technique → Path（技法に経路設計を載せて道を構成 = Micro化）"
+  F_definition: "大局的な技法選択に具体的な段階・順序を付与して、高解像度の道筋を構成する"
+  same_formula: "hod と tek は同じ式（Exploit/選択）の累乗（Scale）が違うだけ"
+  coordinates: "P2[Micro,Exploit] — Function(Exploit)を保存し Scale を Micro に設定"
+  unit: "η: Technique → G(F(Technique)) — 技法を道にして粗視化 = 経路の妥当性検証"
+  counit: "ε: F(G(Path)) → Path — 道を技法にして再展開 = 経路の実装詳細化"
+  insight: "どちらも根本的には選択。解像度が消えている — Creator, 2026-02-11"
 ---
 
 # /hod: 経路定義ワークフロー (Hodos)
@@ -298,7 +308,6 @@ view_file /home/makaron8426/oikos/hegemonikon/.agent/skills/perigraphe/p2-hodos/
 ```
 
 ---
-
 
 ---
 

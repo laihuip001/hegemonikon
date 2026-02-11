@@ -44,6 +44,19 @@ sel_enforcement:
 derivatives: [manu, mech, auto, template, formal, arch, api, interface]
 anti_skip: enabled
 ccl_signature: "/tek+_/dev"
+category_theory:
+  core: "随伴 F⊣G の右随伴 G（忘却関手）"
+  adjunction: "Hodos (F) ⊣ Tekhnē (G)"
+  role: "G: Path → Technique（道から経路の詳細を忘却し、技法選択に圧縮）"
+  G_definition: "具体的な段階・順序を粗視化して、大局的な技法選択に落とす"
+  same_formula: "hod と tek は同じ式（Exploit/選択）の累乗（Scale）が違うだけ"
+  coordinates: "P4[Macro,Exploit] — Function(Exploit)を保存し Scale を Macro に設定"
+  G_two_layers:
+    技法: "「Pythonで行く」「RESTで行く」という大局選択。well-defined"
+    経路詳細: "段階・順序・分岐条件。Macroでは見えない。忘却される"
+  drift: "Drift = Macroの技法選択で見えないMicroの経路詳細"
+  p_series_pattern: "P-series 全体: 同じ Function の Scale 違い。kho⊣tro(Explore) と hod⊣tek(Exploit)"
+  insight: "どちらも根本的には選択。解像度が消えている — Creator, 2026-02-11"
 ---
 
 # /tek: 技法選択ワークフロー (Tekhnē)
@@ -387,7 +400,6 @@ graph LR
 ```
 
 ---
-
 
 ---
 

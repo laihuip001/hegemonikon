@@ -12,6 +12,11 @@ triggers:
   - 構造の保存・忘却を問う時
   - Trigonon / X-series を参照する時
   - 「なぜこの変換は正当か」を問う時
+
+risk_tier: L1/Unsafe
+risks:
+  - 圏論的概念の乱用による認知負荷増大
+  - 厳密な数学的定義と実用的な直感の乖離
 ---
 
 # 🏛️ Category Theory Engine — 構造認識の言語

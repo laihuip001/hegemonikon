@@ -48,11 +48,11 @@ class TestBuiltinMacros:
 
     def test_tak_macro(self):
         assert "tak" in BUILTIN_MACROS
-        assert "/s+" in BUILTIN_MACROS["tak"]
+        assert "/s1" in BUILTIN_MACROS["tak"]
 
     def test_dig_macro(self):
         assert "dig" in BUILTIN_MACROS
-        assert "/zet+" in BUILTIN_MACROS["dig"]
+        assert "/s+" in BUILTIN_MACROS["dig"]
 
 
 class TestLoadStandardMacros:

@@ -21,6 +21,9 @@ from dataclasses import dataclass
 # ccl/macros/ の場所
 CCL_MACROS_DIR = Path(__file__).parent.parent.parent / "ccl" / "macros"
 
+# .agent/workflows/ccl-*.md の場所
+WF_MACROS_DIR = Path(__file__).parent.parent.parent / ".agent" / "workflows"
+
 
 @dataclass
 class MacroDefinition:
@@ -100,11 +103,53 @@ def load_standard_macros() -> Dict[str, MacroDefinition]:
     return macros
 
 
+def load_workflow_macros() -> Dict[str, str]:
+    """
+    .agent/workflows/ccl-*.md からマクロ展開形を読み込む
+    
+    各ファイルの以下のパターンを認識:
+        > **CCL**: `@name = CCL_EXPANSION`
+    
+    Returns:
+        {"macro_name": "CCL expansion string", ...}
+    """
+    macros = {}
+    
+    if not WF_MACROS_DIR.exists():
+        return macros
+    
+    for path in WF_MACROS_DIR.glob("ccl-*.md"):
+        # ファイル名からマクロ名を抽出: ccl-build.md → build
+        name = path.stem.replace("ccl-", "")
+        
+        try:
+            content = path.read_text(encoding="utf-8")
+        except Exception:
+            continue
+        
+        # パターン: `@name = CCL_EXPANSION`
+        match = re.search(r"`@\w+\s*=\s*(.+?)`", content)
+        if match:
+            expansion = match.group(1).strip()
+            macros[name] = expansion
+    
+    return macros
+
+
 def get_macro_expansion(name: str) -> Optional[str]:
-    """マクロ名から展開形を取得"""
-    macros = load_standard_macros()
-    if name in macros:
-        return macros[name].expansion
+    """マクロ名から展開形を取得 (全ソース検索)"""
+    # 優先順位: ccl-*.md > ccl/macros/*.md > BUILTIN
+    wf_macros = load_workflow_macros()
+    if name in wf_macros:
+        return wf_macros[name]
+    
+    std_macros = load_standard_macros()
+    if name in std_macros:
+        return std_macros[name].expansion
+    
+    if name in BUILTIN_MACROS:
+        return BUILTIN_MACROS[name]
+    
     return None
 
 
@@ -130,20 +175,45 @@ def get_macro_registry() -> Dict[str, str]:
     return registry
 
 
-# 標準マクロ (ハードコード版 - ccl/macros/ が見つからない場合のフォールバック)
+# 標準マクロ (ハードコード版 — ccl-*.md が見つからない場合のフォールバック)
+# ccl-*.md 由来の正規定義に同期 (2026-02-11)
 BUILTIN_MACROS = {
+    # O-series (認知)
+    "nous": 'R:{F:[×2]{/u+*^/u^}}_M:{/dox-}',
+    "dig": "/s+~(/p*/a)_/dia*/o+",
+    # S-series (設計)
+    "plan": "/bou+_/s+~(/p*/k)_V:{/dia}",
+    "build": "/bou-{goal:define}_/s+_/ene+_V:{/dia-}_I:[pass]{M:{/dox-}}",
+    "tak": "/s1_F:[×3]{/sta~/chr}_F:[×3]{/kho~/zet}_I:[gap]{/sop}_/euk_/bou",
+    # H-series (動機)
+    "osc": "R:{F:[/s,/dia,/noe]{L:[x]{x~x+}}, ~(/h*/k)}",
+    "learn": "/dox+_*^/u+_M:{/bye+}",
+    # A-series (精密)
+    "fix": "C:{/dia+_/ene+}_I:[pass]{M:{/dox-}}",
+    "vet": "/kho{git_diff}_C:{V:{/dia+}_/ene+}_/pra{test}_M:{/pis_/dox}",
+    "proof": 'V:{/noe~/dia}_I:[pass]{/ene{PROOF.md}}_E:{/ene{_limbo/}}',
+    # P-series (条件)
+    "ground": "/tak-*/bou+{6w3h}~/p-_/ene-",
+    # K-series (文脈)
+    "kyc": "C:{/sop_/noe_/ene_/dia-}",
+    # Legacy (互換用)
     "think": "/noe+ >> V[] < 0.3",
-    "tak": "/s+ _ /ene",
-    "dig": "/zet+ _ /noe+",
-    "plan": "/bou+ _ /s+ _ /sta.done",
     "review": "/dia+ _ /pre+ _ /sta.done",
 }
 
 
 def get_all_macros() -> Dict[str, str]:
-    """全マクロを取得 (ccl/macros/ + ビルトイン)"""
+    """
+    全マクロを取得 (統合)
+    
+    優先順位 (後勝ち):
+        1. BUILTIN_MACROS (フォールバック)
+        2. ccl/macros/*.md (ファイル定義)
+        3. .agent/workflows/ccl-*.md (正規定義 — 最優先)
+    """
     result = BUILTIN_MACROS.copy()
-    result.update(get_macro_registry())
+    result.update(get_macro_registry())  # ccl/macros/*.md
+    result.update(load_workflow_macros())  # ccl-*.md (最優先)
     return result
 
 

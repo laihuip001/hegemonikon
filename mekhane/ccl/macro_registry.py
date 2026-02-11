@@ -12,7 +12,7 @@ from pathlib import Path
 import json
 
 
-# PURPOSE: Macro の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 @dataclass
 # PURPOSE: A CCL macro definition.
 class Macro:
@@ -25,84 +25,98 @@ class Macro:
     is_builtin: bool = False
 
 
-# Built-in macros (complex patterns only, high expansion ratio)
+# Built-in macros — ccl-*.md の正規定義に同期 (2026-02-11)
 BUILTIN_MACROS: Dict[str, Macro] = {
-    # === Original Macros ===
+    # === Core Macros (ccl-*.md 由来) ===
+    "build": Macro(
+        name="build",
+        ccl="/bou-{goal:define}_/s+_/ene+_V:{/dia-}_I:[pass]{M:{/dox-}}",
+        description="構築: 目的定義→戦略→実行→判定→成功時記録",
+        is_builtin=True,
+    ),
     "dig": Macro(
         name="dig",
         ccl="/s+~(/p*/a)_/dia*/o+",
-        description="深掘り・思考: 戦略↔環境×判断の振動→判定×認識融合",
-        is_builtin=True,
-    ),
-    "go": Macro(
-        name="go",
-        ccl="/s+_/ene+",
-        description="実行: 詳細戦略から詳細実行へ",
-        is_builtin=True,
-    ),
-    "osc": Macro(
-        name="osc",
-        ccl="/s~/dia~/noe",
-        description="振動: 戦略↔判定↔認識のHub内往復",
+        description="深掘り: 戦略↔環境×判断の振動→判定×認識融合",
         is_builtin=True,
     ),
     "fix": Macro(
         name="fix",
-        ccl="/dia+_/ene+_/dia",
-        description="修正サイクル: 批判→実行→再批判",
+        ccl="C:{/dia+_/ene+}_I:[pass]{M:{/dox-}}",
+        description="修正: 判定+実行のチェック→成功時記録",
         is_builtin=True,
     ),
-    "plan": Macro(
-        name="plan",
-        ccl="/bou+_/s+_/dia",
-        description="計画策定: 意志→戦略→批判",
+    "ground": Macro(
+        name="ground",
+        ccl="/tak-*/bou+{6w3h}~/p-_/ene-",
+        description="落とす: 整理×意志の融合→条件縮小→実行縮小",
+        is_builtin=True,
+    ),
+    "kyc": Macro(
+        name="kyc",
+        ccl="C:{/sop_/noe_/ene_/dia-}",
+        description="κύκλος: 観察→推論→行動→判定のチェック",
         is_builtin=True,
     ),
     "learn": Macro(
         name="learn",
-        ccl="/dox+*^/u+_/bye+",
-        description="学習: 信念のメタ化→対話→永続化",
+        ccl="/dox+_*^/u+_M:{/bye+}",
+        description="学習: 信念記録→メモ化(対話のメタ化)→終了時記録",
         is_builtin=True,
     ),
     "nous": Macro(
         name="nous",
-        ccl="/u+*^/u^",
-        description="問いの深化: 対話×メタ→メタ対話 (νοῦς)",
+        ccl="R:{F:[×2]{/u+*^/u^}}_M:{/dox-}",
+        description="問いの深化: 再帰(2回対話のメタ化)→記録",
         is_builtin=True,
     ),
-    # === Prompt Library Digest (2026-01-29) ===
-    # 安直版を削除し、本質的マッピングのみ残す
-    # CoT/ToT/StepBack/Verifier → WF 派生として実装 (/noe --mode=cot 等)
-    # Reflection → 既存 /dia --mode=cold_mirror で表現可能
-    "kyc": Macro(
-        name="kyc",
-        ccl="~(/sop_/noe_/ene_/dia-)",
-        description="κύκλος: 観察→推論→行動→判定の振動サイクル + Focused ReAct (焦点維持・早期終了)",
+    "osc": Macro(
+        name="osc",
+        ccl="R:{F:[/s,/dia,/noe]{L:[x]{x~x+}}, ~(/h*/k)}",
+        description="振動: 各WFをλ振動→動機×文脈で検証",
+        is_builtin=True,
+    ),
+    "plan": Macro(
+        name="plan",
+        ccl="/bou+_/s+~(/p*/k)_V:{/dia}",
+        description="段取り: 意志→戦略↔環境×文脈の振動→判定検証",
+        is_builtin=True,
+    ),
+    "proof": Macro(
+        name="proof",
+        ccl="V:{/noe~/dia}_I:[pass]{/ene{PROOF.md}}_E:{/ene{_limbo/}}",
+        description="裁く: 認識↔判定の検証→成功時PROOF.md生成→失敗時limbo",
+        is_builtin=True,
+    ),
+    "tak": Macro(
+        name="tak",
+        ccl="/s1_F:[×3]{/sta~/chr}_F:[×3]{/kho~/zet}_I:[gap]{/sop}_/euk_/bou",
+        description="捌く: スケール→基準×時間→空間×探求→ギャップ調査→好機→意志",
+        is_builtin=True,
+    ),
+    "vet": Macro(
+        name="vet",
+        ccl="/kho{git_diff}_C:{V:{/dia+}_/ene+}_/pra{test}_M:{/pis_/dox}",
+        description="確かめる: diff確認→判定+実行チェック→テスト→確信度+信念記録",
+        is_builtin=True,
+    ),
+    # === Utility Macros ===
+    "go": Macro(
+        name="go",
+        ccl="/s+_/ene+",
+        description="即実行: 詳細戦略→詳細実行",
         is_builtin=True,
     ),
     "wake": Macro(
         name="wake",
         ccl="/boot+_@dig_@plan",
-        description="目覚め: 詳細ブート→深掘り→計画のセッション開始シーケンス",
-        is_builtin=True,
-    ),
-    # === v2.5 Macros ===
-    "tak": Macro(
-        name="tak",
-        ccl="/s1_F:3{/sta~/chr}_F:3{/kho~/zet}_I:gap{/sop}_/euk_/bou",
-        description="タスク整理: スケール→基準×時間→空間×探求→ギャップ調査→好機→意志",
-        is_builtin=True,
-    ),
-    "v": Macro(
-        name="v",
-        ccl="/kho{git_diff}_@fix_/pra{test}_/pis_/dox",
-        description="自己検証: スコープ検出→修正サイクル→テスト→確信度→Doxa永続化",
+        description="目覚め: ブート→深掘り→計画",
         is_builtin=True,
     ),
     "why": Macro(
         name="why",
         ccl="F:5{/zet{why}}_/noe{root_cause}",
-        description="Five Whys: 5回問い→深い認識で根本原因を発見",
+        description="Five Whys: 5回問い→根本原因認識",
         is_builtin=True,
     ),
     "eat": Macro(
@@ -121,12 +135,6 @@ BUILTIN_MACROS: Dict[str, Macro] = {
         name="lex",
         ccl="/dia{expression}_/gno{feedback}",
         description="表現分析: プロンプト表現の批判→フィードバック",
-        is_builtin=True,
-    ),
-    "vet": Macro(
-        name="vet",
-        ccl="/dia+{cross_model}_/epi{verify}_/pis",
-        description="Cross-Model監査: 敵対的検証→知識昇格→確信度",
         is_builtin=True,
     ),
 }
@@ -186,7 +194,7 @@ class MacroRegistry:
         # Then user macros
         return self.user_macros.get(name)
 
-    # PURPOSE: Define a new user macro.
+    # PURPOSE: a new user macro の概念を明確にする
     def define(self, name: str, ccl: str, description: str = "") -> Macro:
         """
         Define a new user macro.

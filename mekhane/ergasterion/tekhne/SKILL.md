@@ -1,5 +1,9 @@
 ---
 name: tekhne-maker
+risk_tier: L1
+risks:
+  - Over-engineering: 因果関係の解像度過剰による複雑化
+  - Complexity explosion: 再帰的生成による無限ループ
 description: |
   OMEGA SINGULARITY BUILD v6.1 — 認知拡張メタプロンプト生成システム。
   

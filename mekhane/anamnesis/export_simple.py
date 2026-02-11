@@ -39,12 +39,13 @@ async def main():
         for ctx in browser.contexts:
             for pg in ctx.pages:
                 if "jetski-agent" in pg.url:
+                    page_url = pg.url
                     try:
                         buttons = await pg.query_selector_all("button.select-none")
                         agent_pages.append((pg, len(buttons)))
                         print(f"[*] Found jetski-agent page: {len(buttons)} buttons")
-                    except Exception:
-                        pass  # TODO: Add proper error handling
+                    except Exception as e:
+                        print(f"[!] Error checking page {page_url}: {e}")
 
         if not agent_pages:
             print("[!] Agent Manager not found")

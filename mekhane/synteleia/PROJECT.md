@@ -1,9 +1,9 @@
 ---
 name: "Synteleia"
-status: planning
-phase: "設計中"
-updated: 2026-02-01
-next_action: "Poiēsis/Dokimasia 実装"
+status: active
+phase: "統合・接続中"
+updated: 2026-02-11
+next_action: "API エンドポイント + /dia 連携"
 ---
 
 # Synteleia Project Status
@@ -12,17 +12,23 @@ next_action: "Poiēsis/Dokimasia 実装"
 
 ## Current Phase
 
-**設計中**: Dual-Layer Orchestration (Poiēsis/Dokimasia) のアーキテクチャ設計
+**統合・接続中**: 実装済みの8エージェントを API/WF に接続
 
 ## Milestones
 
 - [x] コンセプト設計
 - [x] 18セルマトリックス定義
-- [/] Poiēsis (生成層) 実装
-- [ ] Dokimasia (評価層) 実装
-- [ ] 統合テスト
+- [x] Poiēsis (生成層) 実装 — OusiaAgent, SchemaAgent, HormeAgent
+- [x] Dokimasia (評価層) 実装 — PerigrapheAgent, KairosAgent, OperatorAgent, LogicAgent, CompletenessAgent
+- [x] SynteleiaOrchestrator (2層統合)
+- [x] テスト 39/39 passed
+- [x] Skill (SKILL.md v2.0) 修正
+- [/] REST API エンドポイント
+- [ ] /dia ワークフロー連携
+- [ ] Sympatheia WBC 統合
 
 ## Next Steps
 
-1. Poiēsis 3エージェント (O,S,H) 実装
-2. Dokimasia 3エージェント (P,K,A) 実装
+1. POST /api/synteleia/audit エンドポイント
+2. /dia 自動発動フック
+3. Sympatheia WBC 連携テスト

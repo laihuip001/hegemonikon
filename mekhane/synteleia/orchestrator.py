@@ -47,22 +47,22 @@ class SynteleiaOrchestrator:
         初期化。
 
         Args:
-            poiesis_agents: 生成層エージェント（省略時はデフォルト3エージェント）
-            dokimasia_agents: 審査層エージェント（省略時はデフォルト5エージェント）
+            poiesis_agents: 生成層エージェント（省略時はデフォルト3エージェント、空リストで0エージェント）
+            dokimasia_agents: 審査層エージェント（省略時はデフォルト5エージェント、空リストで0エージェント）
             parallel: 並列実行するか
         """
-        self.poiesis_agents = poiesis_agents or [
+        self.poiesis_agents = [
             OusiaAgent(),
             SchemaAgent(),
             HormeAgent(),
-        ]
-        self.dokimasia_agents = dokimasia_agents or [
+        ] if poiesis_agents is None else poiesis_agents
+        self.dokimasia_agents = [
             PerigrapheAgent(),
             KairosAgent(),
             OperatorAgent(),
             LogicAgent(),
             CompletenessAgent(),
-        ]
+        ] if dokimasia_agents is None else dokimasia_agents
         self.parallel = parallel
 
     # PURPOSE: 全エージェントを返す（互換性維持）
@@ -186,8 +186,9 @@ class SynteleiaOrchestrator:
 
         CCL: /audit-
         """
-        quick_orchestrator = AuditOrchestrator(
-            agents=[LogicAgent()],
+        quick_orchestrator = SynteleiaOrchestrator(
+            poiesis_agents=[],
+            dokimasia_agents=[LogicAgent()],
             parallel=False,
         )
         return quick_orchestrator.audit(target)

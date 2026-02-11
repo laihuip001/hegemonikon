@@ -150,6 +150,14 @@ def _register_routers(app: FastAPI) -> None:
     except Exception as exc:
         logger.warning("Symploke router skipped: %s", exc)
 
+    # Synteleia — 6視点認知アンサンブル監査 (外部依存なし)
+    try:
+        from mekhane.api.routes.synteleia import router as synteleia_router
+        app.include_router(synteleia_router, prefix=API_PREFIX)
+        logger.info("Synteleia router registered")
+    except Exception as exc:
+        logger.warning("Synteleia router skipped: %s", exc)
+
     # MCP Gateway — PolicyEnforcer + DiscoveryEngine に依存するため遅延ロード
     try:
         from mekhane.api.routes.gateway import router as gateway_router

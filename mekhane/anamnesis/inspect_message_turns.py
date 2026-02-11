@@ -8,6 +8,7 @@
 """
 
 import asyncio
+import logging
 from pathlib import Path
 
 CDP_PORT = 9222
@@ -16,6 +17,9 @@ OUTPUT_FILE = Path(r"M:\Hegemonikon\mekhane\anamnesis\message_turns.txt")
 
 # PURPOSE: CLI エントリポイント — 知識基盤の直接実行
 async def main():
+    logging.basicConfig(
+        level=logging.WARNING, format="%(asctime)s - %(levelname)s - %(message)s"
+    )
     from playwright.async_api import async_playwright
 
     async with async_playwright() as p:
@@ -29,8 +33,8 @@ async def main():
                     try:
                         buttons = await pg.query_selector_all("button.select-none")
                         agent_pages.append((pg, len(buttons)))
-                    except Exception:
-                        pass  # TODO: Add proper error handling
+                    except Exception as e:
+                        logging.warning(f"Error accessing page {pg.url}: {e}")
 
         if not agent_pages:
             print("[!] Agent Manager not found")
@@ -110,10 +114,12 @@ async def main():
                                     lines.append(
                                         f"        [{k}] <{gc_tag}> class='{gc_class[:50]}' text_len={gc_len}"
                                     )
-                                except Exception:
-                                    pass  # TODO: Add proper error handling
-                    except Exception:
-                        pass  # TODO: Add proper error handling
+                                except Exception as e:
+                                    logging.warning(
+                                        f"Error inspecting grandchild element {k}: {e}"
+                                    )
+                    except Exception as e:
+                        logging.warning(f"Error inspecting child element {j}: {e}")
 
                 break  # 最初の大きなコンテナのみ
 

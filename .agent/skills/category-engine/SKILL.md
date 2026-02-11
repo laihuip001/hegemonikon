@@ -12,6 +12,16 @@ triggers:
   - 構造の保存・忘却を問う時
   - Trigonon / X-series を参照する時
   - 「なぜこの変換は正当か」を問う時
+
+# Safety Contract
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks:
+  - "抽象概念の操作による認知負荷"
+  - "メタファの過剰適用による誤解"
+fallbacks:
+  - "manual"
 ---
 
 # 🏛️ Category Theory Engine — 構造認識の言語

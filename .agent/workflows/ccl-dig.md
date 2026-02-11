@@ -1,7 +1,11 @@
 ---
 description: "[CCL Macro] 深掘り — @dig = /s+~(/p*/a)_/dia*/o+"
+version: 1.0.0
+lcm_state: beta
 ---
 
+version: 1.0.0
+lcm_state: beta
 # /ccl-dig: 深掘りマクロ
 
 > **CCL**: `@dig = /s+~(/p*/a)_/dia*/o+`

@@ -1,7 +1,11 @@
 ---
 description: "[CCL Macro] 具体化 — @ground = /tak-*/bou_6w3h"
+version: 1.0.0
+lcm_state: beta
 ---
 
+version: 1.0.0
+lcm_state: beta
 # /ccl-ground: 具体化マクロ
 
 > **CCL**: `@ground = /tak- * /bou_6w3h`

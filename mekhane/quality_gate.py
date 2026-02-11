@@ -35,6 +35,7 @@ class MetrikaResult:
     @property
     # PURPOSE: passed — システムの処理
     def passed(self) -> bool:
+        """passed — システムの処理"""
         return all(
             [self.dokime, self.syntomia, self.prosbasimotes, self.atomos, self.katharos]
         )

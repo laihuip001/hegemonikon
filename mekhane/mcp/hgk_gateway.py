@@ -76,6 +76,55 @@ ALLOWED_HOSTS = os.getenv("HGK_GATEWAY_ALLOWED_HOSTS", _default_hosts).split(","
 
 
 # =============================================================================
+# [L2] WBC Security Event Logger — Sympatheia 統合
+# =============================================================================
+
+# Mneme パス（Sympatheia と共有）
+_MNEME_DIR = Path(os.getenv("HGK_MNEME", str(Path.home() / "oikos/mneme/.hegemonikon")))
+
+
+def _wbc_log_security_event(
+    event_type: str,
+    severity: str,
+    details: str,
+    source: str = "hgk_gateway",
+) -> None:
+    """セキュリティイベントを wbc_state.json に書き込む。
+
+    Sympatheia WBC と同じフォーマットでアラートを追加し、
+    /boot 時の sympatheia_status で検知される。
+    """
+    import json
+    from datetime import datetime, timezone
+
+    wbc_file = _MNEME_DIR / "wbc_state.json"
+    try:
+        _MNEME_DIR.mkdir(parents=True, exist_ok=True)
+        if wbc_file.exists():
+            state = json.loads(wbc_file.read_text("utf-8"))
+        else:
+            state = {"alerts": [], "totalAlerts": 0}
+
+        alert = {
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "source": source,
+            "severity": severity,
+            "eventType": event_type,
+            "details": details,
+            "threatScore": 5 if severity == "medium" else (10 if severity == "high" else 2),
+        }
+        state["alerts"].append(alert)
+        state["totalAlerts"] = state.get("totalAlerts", 0) + 1
+
+        # 直近100件のみ保持
+        state["alerts"] = state["alerts"][-100:]
+
+        wbc_file.write_text(json.dumps(state, ensure_ascii=False, indent=2), encoding="utf-8")
+    except Exception as e:
+        print(f"⚠️ WBC log failed: {e}", file=sys.stderr)
+
+
+# =============================================================================
 # OAuth 2.1 Provider (auto-approve, single-user)
 # =============================================================================
 
@@ -99,6 +148,11 @@ class HGKOAuthProvider(OAuthAuthorizationServerProvider[AuthorizationCode, Refre
             # [C-2] Only allow whitelisted clients
             if client_id not in ALLOWED_CLIENT_IDS:
                 print(f"⚠️ Rejected unknown client: {client_id[:32]}", file=sys.stderr)
+                _wbc_log_security_event(
+                    event_type="client_rejected",
+                    severity="medium",
+                    details=f"Unknown client_id rejected: {client_id[:32]}",
+                )
                 return None
             # Auto-register whitelisted clients (claude.ai skips /register)
             from pydantic import AnyHttpUrl
@@ -208,6 +262,12 @@ class HGKOAuthProvider(OAuthAuthorizationServerProvider[AuthorizationCode, Refre
                 client_id="hgk",
                 scopes=[],
             )
+        # [L2] Invalid token → WBC alert
+        _wbc_log_security_event(
+            event_type="invalid_token",
+            severity="high",
+            details=f"Invalid access token attempt (prefix: {token[:8]}...)",
+        )
         return None
 
     async def revoke_token(self, token: AccessToken | RefreshToken) -> None:

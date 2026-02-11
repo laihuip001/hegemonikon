@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 # PROOF: [L2/インフラ] <- mekhane/mcp/ A0→Prompt-Lang MCP統合が必要→prompt_lang_mcp_serverが担う
 """
-Prompt-Lang MCP Server v2.0 — Hegemonikón Skill Generator
+Týpos MCP Server v2.0 — Hegemonikón Skill Generator
 
-Model Context Protocol server for Prompt-Lang code generation,
+Model Context Protocol server for Týpos code generation,
 parsing, validation, compilation, and convergence/divergence policy.
 
 Tools:
@@ -38,10 +38,10 @@ _stderr_wrapper = sys.stderr
 
 
 def log(msg):
-    print(f"[prompt-lang-mcp] {msg}", file=sys.stderr, flush=True)
+    print(f"[typos] {msg}", file=sys.stderr, flush=True)
 
 
-log("Starting Prompt-Lang MCP Server v2.0...")
+log("Starting Týpos MCP Server v2.0...")
 log(f"Python: {sys.executable}")
 log(f"Platform: {sys.platform}")
 
@@ -78,11 +78,11 @@ except Exception as e:
     log(f"MCP import error: {e}")
     sys.exit(1)
 
-# Import prompt-lang parser
+# Import typos parser
 try:
-    # prompt-lang directory has a hyphen — use importlib for safe import
+    # typos directory has a hyphen — use importlib for safe import
     import importlib
-    _pl_path = Path(__file__).parent.parent / "ergasterion" / "prompt-lang"
+    _pl_path = Path(__file__).parent.parent / "ergasterion" / "typos"
     if str(_pl_path) not in sys.path:
         sys.path.insert(0, str(_pl_path))
     _pl_module = importlib.import_module("prompt_lang")
@@ -93,19 +93,19 @@ try:
     validate_file = _pl_module.validate_file
     Prompt = _pl_module.Prompt
     ParseError = _pl_module.ParseError
-    log("prompt_lang parser imported successfully")
+    log("typos parser imported successfully")
     PARSER_AVAILABLE = True
 except Exception as e:
-    log(f"prompt_lang import error: {e}, falling back to basic generation")
+    log(f"typos import error: {e}, falling back to basic generation")
     PARSER_AVAILABLE = False
 
 # ============ Paths ============
-SKILL_DIR = Path(__file__).parent.parent / ".agent/skills/utils/prompt-lang-generator"
+SKILL_DIR = Path(__file__).parent.parent / ".agent/skills/utils/typos-generator"
 TEMPLATES_DIR = SKILL_DIR / "templates"
 # v2.1: Use correct domain templates path
 DOMAIN_TEMPLATES_DIR = (
     Path(__file__).parent.parent / "ergasterion" / "tekhne" / "references"
-    / "prompt-lang-templates" / "domain_templates"
+    / "typos-templates" / "domain_templates"
 )
 
 log(f"SKILL_DIR: {SKILL_DIR}")
@@ -246,7 +246,7 @@ def load_yaml_file(path: Path) -> dict:
         return {}
 
 
-# ============ Prompt-Lang Generation (v2.1) ============
+# ============ Týpos Generation (v2.1) ============
 # --- Archetype-specific constraint injection (施策 3) ---
 ARCHETYPE_CONSTRAINTS = {
     "Precision": [
@@ -272,7 +272,7 @@ ARCHETYPE_CONSTRAINTS = {
 
 
 def generate_prompt_lang(requirements: str, domain: str, output_format: str) -> str:
-    """Generate Prompt-Lang code from requirements.
+    """Generate Týpos code from requirements.
 
     v2.2 Enhancement:
       - v2.1 features (domain_examples, anti_patterns, convergence/divergence)
@@ -311,7 +311,7 @@ def generate_prompt_lang(requirements: str, domain: str, output_format: str) -> 
             f"# Consider using natural language prompt instead of .prompt format\n\n"
         )
 
-    # Build improved Prompt-Lang code
+    # Build improved Týpos code
     lines = []
     if policy_warning:
         lines.append(policy_warning)
@@ -381,7 +381,7 @@ def generate_prompt_lang(requirements: str, domain: str, output_format: str) -> 
     lines.extend([
         "",
         "@context:",
-        f"  - file: .agent/rules/prompt-lang-policy.md",
+        f"  - file: .agent/rules/typos-policy.md",
         f"    priority: HIGH",
     ])
     if context_recs:
@@ -498,9 +498,9 @@ def generate_prompt_lang(requirements: str, domain: str, output_format: str) -> 
 
 # ============ Initialize MCP Server ============
 server = Server(
-    name="prompt-lang",
+    name="typos",
     version="2.0.0",
-    instructions="Prompt-Lang v2.0: generate, parse, validate, compile, expand, and policy_check for structured prompt definitions",
+    instructions="Týpos v2.3: generate, parse, validate, compile, expand, and policy_check for structured prompt definitions",
 )
 log("Server v2.0 initialized")
 
@@ -512,7 +512,7 @@ async def list_tools():
     tools = [
         Tool(
             name="generate",
-            description="Generate Prompt-Lang code from natural language requirements. Returns structured prompt definition (.prompt format).",
+            description="Generate Týpos code from natural language requirements. Returns structured prompt definition (.prompt format).",
             inputSchema={
                 "type": "object",
                 "properties": {
@@ -687,7 +687,7 @@ async def _handle_generate(arguments: dict):
     code = generate_prompt_lang(requirements, domain, output_format)
 
     output_lines = [
-        "# [Hegemonikon] Prompt-Lang Generator v2.0\n",
+        "# [Hegemonikon] Týpos Generator v2.3\n",
         f"- **Requirements**: {requirements[:200]}",
         f"- **Detected Domain**: {domain}",
         f"- **Task Classification**: {policy['classification']} (confidence: {policy['confidence']})",
@@ -695,7 +695,7 @@ async def _handle_generate(arguments: dict):
         "",
         "## Generated Code",
         "",
-        "```prompt-lang",
+        "```typos",
         code,
         "```",
         "",
@@ -720,7 +720,7 @@ async def _handle_generate(arguments: dict):
 async def _handle_parse(arguments: dict):
     """Handle parse tool call."""
     if not PARSER_AVAILABLE:
-        return [TextContent(type="text", text="Error: prompt_lang parser not available")]
+        return [TextContent(type="text", text="Error: typos parser not available")]
 
     content = _get_content(arguments)
 
@@ -833,7 +833,7 @@ async def _handle_validate(arguments: dict):
 async def _handle_compile(arguments: dict):
     """Handle compile tool call."""
     if not PARSER_AVAILABLE:
-        return [TextContent(type="text", text="Error: prompt_lang parser not available")]
+        return [TextContent(type="text", text="Error: typos parser not available")]
 
     content = _get_content(arguments)
     context = arguments.get("context", {})
@@ -854,7 +854,7 @@ async def _handle_compile(arguments: dict):
 async def _handle_expand(arguments: dict):
     """Handle expand tool call."""
     if not PARSER_AVAILABLE:
-        return [TextContent(type="text", text="Error: prompt_lang parser not available")]
+        return [TextContent(type="text", text="Error: typos parser not available")]
 
     content = _get_content(arguments)
 

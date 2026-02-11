@@ -127,7 +127,7 @@ projects:
     next_action: "成果の本体取込み判断"
 
   prompt_lang:
-    name: "Prompt-Lang"
+    name: "Týpos"
     description: "プロンプト言語 MCP サーバ"
     path: "(MCP server)"
     status: "active"

@@ -51,6 +51,14 @@ fn greet(name: &str) -> String {
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
+    // GBM/DMA-BUF フォールバック: NVIDIA 環境や RDP セッションで
+    // WebKitGTK の GPU バッファ作成が失敗し白画面になる問題を回避。
+    // 常に設定する (GBM が使える環境では無視されるため害なし)
+    if std::env::var("WEBKIT_DISABLE_DMABUF_RENDERER").is_err() {
+        println!("[HGK] Setting WEBKIT_DISABLE_DMABUF_RENDERER=1 (GBM fallback)");
+        std::env::set_var("WEBKIT_DISABLE_DMABUF_RENDERER", "1");
+    }
+
     let api_port: u16 = 9696;
 
     tauri::Builder::default()

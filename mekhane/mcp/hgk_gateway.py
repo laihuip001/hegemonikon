@@ -21,6 +21,7 @@ Architecture:
 import json
 import os
 import sys
+import time
 from datetime import datetime
 from pathlib import Path
 from typing import Any
@@ -32,6 +33,15 @@ if str(PROJECT_ROOT) not in sys.path:
 
 from mcp.server.fastmcp import FastMCP
 from mcp.server.transport_security import TransportSecuritySettings
+from mcp.server.auth.provider import (
+    OAuthAuthorizationServerProvider,
+    AuthorizationParams,
+    AuthorizationCode,
+    RefreshToken,
+    AccessToken,
+    construct_redirect_uri,
+)
+from mcp.shared.auth import OAuthClientInformationFull, OAuthToken
 
 # =============================================================================
 # Configuration
@@ -40,21 +50,175 @@ from mcp.server.transport_security import TransportSecuritySettings
 GATEWAY_HOST = os.getenv("HGK_GATEWAY_HOST", "127.0.0.1")
 GATEWAY_PORT = int(os.getenv("HGK_GATEWAY_PORT", "8765"))
 
-# Bearer Token authentication (required for Funnel/public exposure)
+# Bearer Token for OAuth access token (generated once, used as the access token)
 GATEWAY_TOKEN = os.getenv("HGK_GATEWAY_TOKEN", "")
 
 # Allowed hosts for DNS rebinding protection
-_default_hosts = "localhost,127.0.0.1,hegemonikon.tail3b6058.ts.net"
+_default_hosts = (
+    "localhost,localhost:8765,"
+    "127.0.0.1,127.0.0.1:8765,"
+    "hegemonikon.tail3b6058.ts.net"
+)
 ALLOWED_HOSTS = os.getenv("HGK_GATEWAY_ALLOWED_HOSTS", _default_hosts).split(",")
+
+
+# =============================================================================
+# OAuth 2.1 Provider (auto-approve, single-user)
+# =============================================================================
+
+class HGKOAuthProvider(OAuthAuthorizationServerProvider[AuthorizationCode, RefreshToken, AccessToken]):
+    """
+    最小 OAuth 2.1 プロバイダー。
+    - claude.ai Connector 用の /authorize → /token フローを処理
+    - 認証コードを自動承認 (単一ユーザー、GATEWAY_TOKEN で保護)
+    - インメモリストレージ
+    """
+
+    def __init__(self, access_token: str):
+        self._access_token = access_token
+        self._clients: dict[str, OAuthClientInformationFull] = {}
+        self._auth_codes: dict[str, AuthorizationCode] = {}
+        self._refresh_tokens: dict[str, RefreshToken] = {}
+
+    async def get_client(self, client_id: str) -> OAuthClientInformationFull | None:
+        client = self._clients.get(client_id)
+        if client is None:
+            # Auto-register unknown clients (claude.ai skips /register)
+            from pydantic import AnyHttpUrl
+            client = OAuthClientInformationFull(
+                client_id=client_id,
+                client_secret=None,
+                redirect_uris=[AnyHttpUrl("https://claude.ai/api/auth/callback")],
+                client_name=f"auto-{client_id[:16]}",
+                grant_types=["authorization_code", "refresh_token"],
+                response_types=["code"],
+                token_endpoint_auth_method="none",
+            )
+            self._clients[client_id] = client
+        return client
+
+    async def register_client(self, client_info: OAuthClientInformationFull) -> None:
+        self._clients[client_info.client_id] = client_info
+
+    async def authorize(
+        self, client: OAuthClientInformationFull, params: AuthorizationParams
+    ) -> str:
+        """Auto-approve: 認証コードを即発行し redirect_uri にリダイレクト。"""
+        import secrets
+        # Dynamically add redirect_uri to client's registered URIs
+        if client.redirect_uris is None:
+            client.redirect_uris = [params.redirect_uri]
+        elif params.redirect_uri not in client.redirect_uris:
+            client.redirect_uris.append(params.redirect_uri)
+        code = secrets.token_urlsafe(32)
+        self._auth_codes[code] = AuthorizationCode(
+            code=code,
+            scopes=params.scopes or [],
+            expires_at=time.time() + 600,  # 10 min
+            client_id=client.client_id,
+            code_challenge=params.code_challenge,
+            redirect_uri=params.redirect_uri,
+            redirect_uri_provided_explicitly=params.redirect_uri_provided_explicitly,
+        )
+        return construct_redirect_uri(
+            str(params.redirect_uri),
+            code=code,
+            state=params.state,
+        )
+
+    async def load_authorization_code(
+        self, client: OAuthClientInformationFull, authorization_code: str
+    ) -> AuthorizationCode | None:
+        ac = self._auth_codes.get(authorization_code)
+        if ac and ac.client_id == client.client_id and ac.expires_at > time.time():
+            return ac
+        return None
+
+    async def exchange_authorization_code(
+        self, client: OAuthClientInformationFull, authorization_code: AuthorizationCode
+    ) -> OAuthToken:
+        """認証コード → アクセストークン交換。固定トークンを返す。"""
+        self._auth_codes.pop(authorization_code.code, None)
+        import secrets
+        refresh = secrets.token_urlsafe(32)
+        self._refresh_tokens[refresh] = RefreshToken(
+            token=refresh,
+            client_id=client.client_id,
+            scopes=authorization_code.scopes,
+        )
+        return OAuthToken(
+            access_token=self._access_token,
+            token_type="bearer",
+            expires_in=86400 * 365,  # 1 year
+            refresh_token=refresh,
+            scope=" ".join(authorization_code.scopes) if authorization_code.scopes else None,
+        )
+
+    async def load_refresh_token(
+        self, client: OAuthClientInformationFull, refresh_token: str
+    ) -> RefreshToken | None:
+        rt = self._refresh_tokens.get(refresh_token)
+        if rt and rt.client_id == client.client_id:
+            return rt
+        return None
+
+    async def exchange_refresh_token(
+        self,
+        client: OAuthClientInformationFull,
+        refresh_token: RefreshToken,
+        scopes: list[str],
+    ) -> OAuthToken:
+        import secrets
+        new_refresh = secrets.token_urlsafe(32)
+        self._refresh_tokens.pop(refresh_token.token, None)
+        self._refresh_tokens[new_refresh] = RefreshToken(
+            token=new_refresh,
+            client_id=client.client_id,
+            scopes=scopes or refresh_token.scopes,
+        )
+        return OAuthToken(
+            access_token=self._access_token,
+            token_type="bearer",
+            expires_in=86400 * 365,
+            refresh_token=new_refresh,
+            scope=" ".join(scopes) if scopes else None,
+        )
+
+    async def load_access_token(self, token: str) -> AccessToken | None:
+        if token == self._access_token:
+            return AccessToken(
+                token=token,
+                client_id="hgk",
+                scopes=[],
+            )
+        return None
+
+    async def revoke_token(self, token: AccessToken | RefreshToken) -> None:
+        if isinstance(token, RefreshToken):
+            self._refresh_tokens.pop(token.token, None)
+
 
 # =============================================================================
 # Gateway Server
 # =============================================================================
 
+from mcp.server.auth.settings import AuthSettings, ClientRegistrationOptions
+
+_GATEWAY_URL = "https://hegemonikon.tail3b6058.ts.net"
+
+_oauth_provider = HGKOAuthProvider(GATEWAY_TOKEN) if GATEWAY_TOKEN else None
+_auth_settings = AuthSettings(
+    issuer_url=_GATEWAY_URL,
+    resource_server_url=_GATEWAY_URL,
+    client_registration_options=ClientRegistrationOptions(enabled=True),
+) if GATEWAY_TOKEN else None
+
 mcp = FastMCP(
     "hgk-gateway",
     host=GATEWAY_HOST,
     port=GATEWAY_PORT,
+    auth_server_provider=_oauth_provider,
+    auth=_auth_settings,
     transport_security=TransportSecuritySettings(
         enable_dns_rebinding_protection=True,
         allowed_hosts=ALLOWED_HOSTS,
@@ -421,43 +585,7 @@ def hgk_status() -> str:
 
 if __name__ == "__main__":
     if GATEWAY_TOKEN:
-        # Pure ASGI wrapper — does NOT break FastMCP's TaskGroup lifecycle
-        _original_run = mcp.run
-
-        class _AuthWrapper:
-            """Thin ASGI auth layer that wraps the MCP app at the ASGI level."""
-
-            def __init__(self, app):
-                self.app = app
-
-            async def __call__(self, scope, receive, send):
-                if scope["type"] == "http":
-                    headers = dict(scope.get("headers", []))
-                    auth = headers.get(b"authorization", b"").decode()
-                    if auth != f"Bearer {GATEWAY_TOKEN}":
-                        await send({
-                            "type": "http.response.start",
-                            "status": 401,
-                            "headers": [
-                                [b"content-type", b"text/plain"],
-                                [b"www-authenticate", b"Bearer"],
-                            ],
-                        })
-                        await send({
-                            "type": "http.response.body",
-                            "body": b"Unauthorized",
-                        })
-                        return
-                await self.app(scope, receive, send)
-
-        # Monkey-patch the ASGI app creation
-        _orig_http_app = mcp.streamable_http_app
-
-        def _authed_http_app():
-            return _AuthWrapper(_orig_http_app())
-
-        mcp.streamable_http_app = _authed_http_app
-        print("🔒 Bearer Token authentication ENABLED")
+        print("🔒 OAuth 2.1 authentication ENABLED")
     else:
         print("⚠️  No authentication (HGK_GATEWAY_TOKEN not set)")
 

@@ -11,9 +11,9 @@ risk_tier: L0             # L0(安全) | L1(低) | L2(中) | L3(高)
 reversible: true           # 出力が可逆か (true/false)
 requires_approval: false   # 実行前に Creator 承認が必要か
 risks:                     # 想定リスクのリスト (最低1つ記載)
-  - "<リスク1>"
+  - "Template placeholder risk"
 fallbacks:                 # 失敗時の代替 Skill
-  - "<代替skill名 or 空>"
+  - "None"
 ---
 
 # <Skill Name>

@@ -59,6 +59,15 @@ category_theory:
     L1: "前順序圏のガロア接続 — F(X) ≤ Y ⟺ X ≤ G(Y)"
     L2: "[0,1]-豊穣圏 — Drift ∈ [0,1] は Hom 値"
     L3: "弱2-圏 (将来) — 派生は 2-cell"
+  natural_transformation:
+    partner: "gno"
+    shared_axis: "Valence (-: 否定)"
+    varied_axis: "Precision (U→C)"
+    meaning: "不確かな知識→確かな教訓。「体系から実感へ」"
+  duality:
+    partner: "pat"
+    type: "transition"
+    meaning: "知識→情念。「学んだ→感じ直す」"
 ---
 
 # /epi: 知識確立ワークフロー (Epistēmē)

@@ -65,6 +65,15 @@ category_theory:
     L1: "前順序圏のガロア接続 — F(X) ≤ Y ⟺ X ≤ G(Y)"
     L2: "[0,1]-豊穣圏 — Drift ∈ [0,1] は Hom 値"
     L3: "弱2-圏 (将来) — 派生は 2-cell"
+  natural_transformation:
+    partner: "zet"
+    shared_axis: "Flow (A: 行為)"
+    varied_axis: "Value (P→E)"
+    meaning: "実用行為→認識行為。「やってみたが、何が起きた？」"
+  duality:
+    partner: "noe"
+    type: "transition"
+    meaning: "運動→認知。「やった→理解した」"
 ---
 
 # /ene: 行為ワークフロー (Energeia)

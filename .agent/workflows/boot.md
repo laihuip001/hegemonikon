@@ -191,7 +191,7 @@ ls ~/oikos/mneme/.hegemonikon/episodic_memory.md 2>/dev/null && echo "[episodic]
 | 条件 | 行動 |
 |:-----|:-----|
 | /boot- | スキップ可（高速起動優先） |
-| /boot | 通奏低音 (Section V) のみ読込 |
+| /boot | 通奏低音 (Section X) のみ読込 |
 | /boot+ | 全エピソード精読 + 最新セッションの新エピソード検討 |
 
 **読込後の自問**: 「今回のセッションで、Creator との関係性の文脈が必要になりそうか？」

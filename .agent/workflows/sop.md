@@ -38,6 +38,15 @@ category_theory:
     L1: "前順序圏のガロア接続 — F(X) ≤ Y ⟺ X ≤ G(Y)"
     L2: "[0,1]-豊穣圏 — Drift ∈ [0,1] は Hom 値"
     L3: "弱2-圏 (将来) — 派生は 2-cell"
+  natural_transformation:
+    partner: "tel"
+    shared_axis: "Scale (Ma: 巨視)"
+    varied_axis: "Valence (-→+)"
+    meaning: "知恵→目的。「何を知るべきか→何のために」"
+  duality:
+    partner: "euk"
+    type: "tension"
+    meaning: "知恵↔好機。「急がば回れ ↔ 今だ!」"
 ---
 
 # /sop: 情報収集ワークフロー (Sophia)

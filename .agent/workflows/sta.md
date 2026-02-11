@@ -40,6 +40,15 @@ category_theory:
     L1: "前順序圏のガロア接続 — F(X) ≤ Y ⟺ X ≤ G(Y)"
     L2: "[0,1]-豊穣圏 — Drift ∈ [0,1] は Hom 値"
     L3: "弱2-圏 (将来) — 派生は 2-cell"
+  natural_transformation:
+    partner: "pra"
+    shared_axis: "Flow (A: 行為)"
+    varied_axis: "Scale (Mi→Ma)"
+    meaning: "状態確認→大局実践。「今どこか→大きく動く」"
+  duality:
+    partner: "mek"
+    type: "tension"
+    meaning: "現状↔設計。「現実から理想への往復」"
 sel_enforcement:
   "+":
     description: "MUST set criteria with Must/Should/Could + rationale"

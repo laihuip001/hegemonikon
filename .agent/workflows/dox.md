@@ -59,6 +59,15 @@ category_theory:
     L1: "前順序圏のガロア接続 — F(X) ≤ Y ⟺ X ≤ G(Y)"
     L2: "[0,1]-豊穣圏 — Drift ∈ [0,1] は Hom 値"
     L3: "弱2-圏 (将来) — 派生は 2-cell"
+  natural_transformation:
+    partner: "ore"
+    shared_axis: "Flow (A: 行為)"
+    varied_axis: "Valence (-→+)"
+    meaning: "信念記録→欲求表出。「知ってる→でも欲しい」"
+  duality:
+    partner: "pro"
+    type: "tension"
+    meaning: "信念↔ひらめき。「安定と新しさの振動」"
 ---
 
 # /dox: 信念定着ワークフロー (Doxa)

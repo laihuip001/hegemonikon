@@ -43,6 +43,15 @@ category_theory:
     L1: "前順序圏のガロア接続 — F(X) ≤ Y ⟺ X ≤ G(Y)"
     L2: "[0,1]-豊穣圏 — Drift ∈ [0,1] は Hom 値"
     L3: "弱2-圏 (将来) — 派生は 2-cell"
+  natural_transformation:
+    partner: "pat"
+    shared_axis: "Valence (+: 肯定)"
+    varied_axis: "Precision (U→C)"
+    meaning: "不確かな判断→確かな情念。「判断する→感じ直す」"
+  duality:
+    partner: "gno"
+    type: "tension"
+    meaning: "判断↔教訓。「今の判断 ↔ 過去の知恵」"
 ---
 
 # /dia: A2 Krisis 発動コマンド

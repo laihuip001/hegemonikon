@@ -56,6 +56,15 @@ category_theory:
     L1: "前順序圏のガロア接続 — F(X) ≤ Y ⟺ X ≤ G(Y)"
     L2: "[0,1]-豊穣圏 — Drift ∈ [0,1] は Hom 値"
     L3: "弱2-圏 (将来) — 派生は 2-cell"
+  natural_transformation:
+    partner: "pro"
+    shared_axis: "Flow (I: 推論)"
+    varied_axis: "Valence (-→+)"
+    meaning: "懐疑的検証→直感的肯定。「検証した→信じていい」"
+  duality:
+    partner: "ore"
+    type: "tension"
+    meaning: "疑い↔渇望。「批判と欲望の振動」"
 ---
 
 # /pis: 確信度評価ワークフロー (Pistis)

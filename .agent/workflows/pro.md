@@ -56,6 +56,15 @@ category_theory:
     L1: "前順序圏のガロア接続 — F(X) ≤ Y ⟺ X ≤ G(Y)"
     L2: "[0,1]-豊穣圏 — Drift ∈ [0,1] は Hom 値"
     L3: "弱2-圏 (将来) — 派生は 2-cell"
+  natural_transformation:
+    partner: "pis"
+    shared_axis: "Flow (I: 推論)"
+    varied_axis: "Valence (+→-)"
+    meaning: "直感的肯定→懐疑的検証。「ひらめいた→本当か？」"
+  duality:
+    partner: "dox"
+    type: "tension"
+    meaning: "ひらめき↔信念記録。「新しさと安定の振動」"
 ---
 
 # /pro: 初期傾向評価ワークフロー (Propatheia)

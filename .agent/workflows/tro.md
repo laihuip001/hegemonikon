@@ -41,6 +41,15 @@ category_theory:
     L1: "前順序圏のガロア接続 — F(X) ≤ Y ⟺ X ≤ G(Y)"
     L2: "[0,1]-豊穣圏 — Drift ∈ [0,1] は Hom 値"
     L3: "弱2-圏 (将来) — 派生は 2-cell"
+  natural_transformation:
+    partner: "tek"
+    shared_axis: "Scale (Ma: 巨視)"
+    varied_axis: "Function (Ex→Exp)"
+    meaning: "大局探索→技法選択。「軌道を見た→何を使う」"
+  duality:
+    partner: "hod"
+    type: "tension"
+    meaning: "天空の軌道↔地上の経路。「星と地図の振動」"
 sel_enforcement:
   "+":
     description: "MUST define cycle, pattern, and conditional branches"

@@ -43,6 +43,15 @@ category_theory:
     L1: "前順序圏のガロア接続 — F(X) ≤ Y ⟺ X ≤ G(Y)"
     L2: "[0,1]-豊穣圏 — Drift ∈ [0,1] は Hom 値"
     L3: "弱2-圏 (将来) — 派生は 2-cell"
+  natural_transformation:
+    partner: "mek"
+    shared_axis: "Flow (I: 推論)"
+    varied_axis: "Scale (Mi→Ma)"
+    meaning: "精密基準→大局設計。「基準から方法論へ」"
+  duality:
+    partner: "pra"
+    type: "transition"
+    meaning: "基準→実践。「測る→やる」"
 sel_enforcement:
   "+":
     description: "MUST analyze all layers with tradeoffs"

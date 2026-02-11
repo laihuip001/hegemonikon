@@ -40,6 +40,15 @@ category_theory:
     L1: "前順序圏のガロア接続 — F(X) ≤ Y ⟺ X ≤ G(Y)"
     L2: "[0,1]-豊穣圏 — Drift ∈ [0,1] は Hom 値"
     L3: "弱2-圏 (将来) — 派生は 2-cell"
+  natural_transformation:
+    partner: "chr"
+    shared_axis: "Scale (Mi: 微視)"
+    varied_axis: "Valence (+→-)"
+    meaning: "好機判断→期限管理。「チャンスだ→いつまでに」"
+  duality:
+    partner: "sop"
+    type: "tension"
+    meaning: "好機↔知恵。「今だ! ↔ 急がば回れ」"
 sel_enforcement:
   "+":
     description: "MUST analyze opportunity cost, competition, and time window"

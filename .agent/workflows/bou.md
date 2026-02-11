@@ -67,6 +67,15 @@ category_theory:
     L1: "前順序圏のガロア接続 — F(X) ≤ Y ⟺ X ≤ G(Y)"
     L2: "[0,1]-豊穣圏 — Drift ∈ [0,1] は Hom 値"
     L3: "弱2-圏 (将来) — 派生は 2-cell"
+  natural_transformation:
+    partner: "noe"
+    shared_axis: "Flow (I: 推論)"
+    varied_axis: "Value (P→E)"
+    meaning: "実用→認識。「なぜそれを望むのか」"
+  duality:
+    partner: "zet"
+    type: "transition"
+    meaning: "意志→探求。「望む→探す」"
 ---
 
 # /bou: 意志明確化ワークフロー (Boulēsis)

@@ -40,6 +40,15 @@ category_theory:
     L1: "前順序圏のガロア接続 — F(X) ≤ Y ⟺ X ≤ G(Y)"
     L2: "[0,1]-豊穣圏 — Drift ∈ [0,1] は Hom 値"
     L3: "弱2-圏 (将来) — 派生は 2-cell"
+  natural_transformation:
+    partner: "dia"
+    shared_axis: "Valence (+: 肯定)"
+    varied_axis: "Precision (C→U)"
+    meaning: "確かな情念→不確かな判断。「感じる→判断する」"
+  duality:
+    partner: "epi"
+    type: "transition"
+    meaning: "情念→知識。「体験から体系へ」"
 sel_enforcement:
   "+":
     description: "MUST analyze double tendency with reasoning"

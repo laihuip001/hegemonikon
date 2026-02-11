@@ -52,6 +52,15 @@ category_theory:
     L1: "前順序圏のガロア接続 — F(X) ≤ Y ⟺ X ≤ G(Y)"
     L2: "[0,1]-豊穣圏 — Drift ∈ [0,1] は Hom 値"
     L3: "弱2-圏 (将来) — 派生は 2-cell"
+  natural_transformation:
+    partner: "met"
+    shared_axis: "Flow (I: 推論)"
+    varied_axis: "Scale (Ma→Mi)"
+    meaning: "大局設計→精密基準。「方法論から基準へ」"
+  duality:
+    partner: "sta"
+    type: "tension"
+    meaning: "設計↔現状。「理想と現実の振動」"
 ---
 
 # /mek — 方法配置ワークフロー (Mekhane)

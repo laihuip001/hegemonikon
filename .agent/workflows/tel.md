@@ -41,6 +41,15 @@ category_theory:
     L1: "前順序圏のガロア接続 — F(X) ≤ Y ⟺ X ≤ G(Y)"
     L2: "[0,1]-豊穣圏 — Drift ∈ [0,1] は Hom 値"
     L3: "弱2-圏 (将来) — 派生は 2-cell"
+  natural_transformation:
+    partner: "sop"
+    shared_axis: "Scale (Ma: 巨視)"
+    varied_axis: "Valence (+→-)"
+    meaning: "目的→知恵。「何のため→何を知るべきか」"
+  duality:
+    partner: "chr"
+    type: "tension"
+    meaning: "使命↔期限。「なぜ ↔ いつ」"
 sel_enforcement:
   "+":
     description: "MUST analyze with 5 Whys, purpose hierarchy, and tradeoffs"

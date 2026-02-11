@@ -61,6 +61,15 @@ category_theory:
     L1: "前順序圏のガロア接続 — F(X) ≤ Y ⟺ X ≤ G(Y)"
     L2: "[0,1]-豊穣圏 — Drift ∈ [0,1] は Hom 値"
     L3: "弱2-圏 (将来) — 派生は 2-cell"
+  natural_transformation:
+    partner: "sta"
+    shared_axis: "Flow (A: 行為)"
+    varied_axis: "Scale (Ma→Mi)"
+    meaning: "大局実践→状態確認。「大きく動いた→今どこ？」"
+  duality:
+    partner: "met"
+    type: "transition"
+    meaning: "実践→基準。「やった→何が測れる？」"
 ---
 
 # /pra: 実践配置ワークフロー (Praxis)

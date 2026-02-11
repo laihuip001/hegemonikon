@@ -40,6 +40,15 @@ category_theory:
     L1: "前順序圏のガロア接続 — F(X) ≤ Y ⟺ X ≤ G(Y)"
     L2: "[0,1]-豊穣圏 — Drift ∈ [0,1] は Hom 値"
     L3: "弱2-圏 (将来) — 派生は 2-cell"
+  natural_transformation:
+    partner: "hod"
+    shared_axis: "Scale (Mi: 微視)"
+    varied_axis: "Function (Ex→Exp)"
+    meaning: "場の探索→経路の選択。「どこで→どう行く」"
+  duality:
+    partner: "tek"
+    type: "transition"
+    meaning: "具体探索→技法選択。「探検から知恵へ」"
 sel_enforcement:
   "+":
     description: "MUST enumerate boundary conditions completely"

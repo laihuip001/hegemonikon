@@ -40,6 +40,15 @@ category_theory:
     L1: "前順序圏のガロア接続 — F(X) ≤ Y ⟺ X ≤ G(Y)"
     L2: "[0,1]-豊穣圏 — Drift ∈ [0,1] は Hom 値"
     L3: "弱2-圏 (将来) — 派生は 2-cell"
+  natural_transformation:
+    partner: "kho"
+    shared_axis: "Scale (Mi: 微視)"
+    varied_axis: "Function (Exp→Ex)"
+    meaning: "経路の選択→場の探索。「どう行く→もっと広く見る」"
+  duality:
+    partner: "tro"
+    type: "tension"
+    meaning: "地上の経路↔天空の軌道。「地図と星の振動」"
 sel_enforcement:
   "+":
     description: "MUST enumerate alternative routes and tradeoffs"

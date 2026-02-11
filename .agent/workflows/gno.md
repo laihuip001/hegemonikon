@@ -46,6 +46,15 @@ category_theory:
     L1: "前順序圏のガロア接続 — F(X) ≤ Y ⟺ X ≤ G(Y)"
     L2: "[0,1]-豊穣圏 — Drift ∈ [0,1] は Hom 値"
     L3: "弱2-圏 (将来) — 派生は 2-cell"
+  natural_transformation:
+    partner: "epi"
+    shared_axis: "Valence (-: 否定)"
+    varied_axis: "Precision (C→U)"
+    meaning: "確かな教訓→不確かな知識。「経験則→体系化の試み」"
+  duality:
+    partner: "dia"
+    type: "tension"
+    meaning: "教訓↔判断。「過去の知恵 ↔ 今の判断」"
 sel_enforcement:
   "+":
     description: "MUST describe with conditions, exceptions, and basis"

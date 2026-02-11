@@ -64,7 +64,7 @@ class SemanticMatcher:
     """
 
     # コサイン類似度の閾値: この値以上ならトピックマッチとみなす
-    SIMILARITY_THRESHOLD = 0.3
+    SIMILARITY_THRESHOLD = 0.55
 
     def __init__(self):
         self._adapter = None

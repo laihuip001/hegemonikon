@@ -63,8 +63,8 @@ async def main():
                             lines.append(
                                 f"    [{i}] {text[:50] if text else '(empty)'}"
                             )
-                        except Exception:
-                            pass  # TODO: Add proper error handling
+                        except Exception as e:
+                            lines.append(f"    [{i}] (Error: {e})")
 
         with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
             f.write("\n".join(lines))

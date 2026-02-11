@@ -192,6 +192,7 @@ BUILTIN_MACROS = {
     "fix": "C:{/dia+_/ene+}_I:[pass]{M:{/dox-}}",
     "vet": "/kho{git_diff}_C:{V:{/dia+}_/ene+}_/pra{test}_M:{/pis_/dox}",
     "proof": 'V:{/noe~/dia}_I:[pass]{/ene{PROOF.md}}_E:{/ene{_limbo/}}',
+    "syn": "/dia+{synteleia}_V:{/pis+}",
     # P-series (条件)
     "ground": "/tak-*/bou+{6w3h}~/p-_/ene-",
     # K-series (文脈)

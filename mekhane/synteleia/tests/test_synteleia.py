@@ -655,3 +655,130 @@ class TestOrchestratorWithL2:
         # StubBackend はクリーンなので alert は None のはず
         if result.passed:
             assert alert is None
+
+
+# ── WBC Alert Integration ────────────────
+
+# PURPOSE: Test suite validating WBC alert generation
+class TestWBCAlertIntegration:
+    """to_wbc_alert() のテスト — Synteleia→Sympatheia WBC 連携"""
+
+    @pytest.fixture
+    def target_with_source(self):
+        return AuditTarget(
+            content="test",
+            target_type=AuditTargetType.GENERIC,
+            source="test_file.py",
+        )
+
+    # PURPOSE: Verify no alert on clean result
+    def test_no_alert_on_clean(self):
+        """問題なし → アラートなし"""
+        o = SynteleiaOrchestrator()
+        target = AuditTarget(content="well-formed content")
+        result = o.audit(target)
+        alert = o.to_wbc_alert(result)
+        if result.critical_count == 0 and result.high_count == 0:
+            assert alert is None
+
+    # PURPOSE: Verify alert generated on high issues
+    def test_alert_generated_on_high_issues(self, target_with_source):
+        """HIGH issue → アラート生成"""
+        high_issue = AuditIssue(
+            agent="TestAgent",
+            code="TEST-001",
+            severity=AuditSeverity.HIGH,
+            message="test high issue",
+        )
+        result = AuditResult(
+            target=target_with_source,
+            agent_results=[
+                AgentResult(
+                    agent_name="TestAgent",
+                    passed=False,
+                    issues=[high_issue],
+                )
+            ],
+        )
+        o = SynteleiaOrchestrator()
+        alert = o.to_wbc_alert(result)
+
+        assert alert is not None
+        assert alert["severity"] == "high"
+        assert alert["source"] == "synteleia"
+        assert "test_file.py" in alert["files"]
+        assert "HIGH" in alert["details"]
+
+    # PURPOSE: Verify critical severity takes priority
+    def test_critical_severity_priority(self, target_with_source):
+        """CRITICAL + HIGH → severity は critical"""
+        issues = [
+            AuditIssue(
+                agent="A", code="C1", severity=AuditSeverity.CRITICAL,
+                message="critical issue",
+            ),
+            AuditIssue(
+                agent="A", code="C2", severity=AuditSeverity.HIGH,
+                message="high issue",
+            ),
+        ]
+        result = AuditResult(
+            target=target_with_source,
+            agent_results=[
+                AgentResult(agent_name="A", passed=False, issues=issues),
+            ],
+        )
+        o = SynteleiaOrchestrator()
+        alert = o.to_wbc_alert(result)
+
+        assert alert is not None
+        assert alert["severity"] == "critical"
+
+    # PURPOSE: Verify no source means empty files
+    def test_no_source_empty_files(self):
+        """source なし → files は空"""
+        target = AuditTarget(content="test")
+        high_issue = AuditIssue(
+            agent="A", code="C", severity=AuditSeverity.HIGH, message="m",
+        )
+        result = AuditResult(
+            target=target,
+            agent_results=[
+                AgentResult(agent_name="A", passed=False, issues=[high_issue]),
+            ],
+        )
+        o = SynteleiaOrchestrator()
+        alert = o.to_wbc_alert(result)
+        assert alert is not None
+        assert alert["files"] == []
+
+
+# ── @syn Macro Registration ──────────────
+
+# PURPOSE: Test suite validating @syn macro registration
+class TestSynMacroRegistration:
+    """@syn マクロが Hermēneus に正しく登録されているか"""
+
+    # PURPOSE: Verify syn in builtin macros
+    def test_syn_in_builtin_macros(self):
+        """BUILTIN_MACROS に syn が存在"""
+        from hermeneus.src.macros import BUILTIN_MACROS
+        assert "syn" in BUILTIN_MACROS
+        assert "synteleia" in BUILTIN_MACROS["syn"]
+
+    # PURPOSE: Verify syn expansion matches reference
+    def test_syn_expansion_matches_reference(self):
+        """@syn の展開形がリファレンスと一致"""
+        from hermeneus.src.macros import get_macro_expansion
+        expansion = get_macro_expansion("syn")
+        assert expansion is not None
+        assert "/dia+{synteleia}" in expansion
+        assert "/pis+" in expansion
+
+    # PURPOSE: Verify syn in all macros
+    def test_syn_in_all_macros(self):
+        """get_all_macros() に syn が含まれる"""
+        from hermeneus.src.macros import get_all_macros
+        all_macros = get_all_macros()
+        assert "syn" in all_macros
+

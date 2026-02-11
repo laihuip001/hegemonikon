@@ -14,6 +14,60 @@ from pathlib import Path
 import yaml
 import numpy as np
 
+
+# ═══════════════════════════════════════════════════════════
+# Domain Filters — 候補品質の3層防御
+# ═══════════════════════════════════════════════════════════
+
+# 層1: arXiv カテゴリフィルタ — cs.*, stat.ML 等のみ許可
+ALLOWED_CATEGORY_PREFIXES = frozenset({
+    "cs.",       # Computer Science 全般
+    "stat.ML",   # Machine Learning
+    "q-bio.NC",  # Neurons and Cognition
+    "eess.",     # Electrical Engineering and Systems Science
+})
+
+
+def _is_relevant_domain(paper) -> bool:
+    """arXiv カテゴリが許可リストに含まれるか判定
+
+    設計原則: 偽陽性 > 偽陰性
+    カテゴリ不明 → 通す。Semantic Scholar 等の非 arXiv ソースも通す。
+    """
+    categories = getattr(paper, "categories", None)
+    if not categories:
+        return True  # カテゴリ不明は通す
+    return any(
+        any(cat.startswith(prefix) for prefix in ALLOWED_CATEGORY_PREFIXES)
+        for cat in categories
+    )
+
+
+# 層3: ドメインキーワード — Hegemonikón が関心を持つ領域の語彙
+DOMAIN_KEYWORDS = frozenset({
+    "ai", "artificial intelligence", "machine learning", "deep learning",
+    "neural", "llm", "large language model", "agent", "autonomous",
+    "cognition", "cognitive", "reasoning", "inference", "attention",
+    "transformer", "language model", "reinforcement learning",
+    "metacognition", "self-awareness", "self-reflection",
+    "prompt", "prompting", "chain-of-thought", "in-context learning",
+    "planning", "decision making", "tool use",
+    "philosophy", "stoic", "epistemology", "phenomenology",
+    "free energy", "variational", "bayesian", "active inference",
+    "category theory", "type theory", "formal verification",
+    "knowledge graph", "retrieval", "rag",
+})
+
+
+def _domain_relevance(paper) -> float:
+    """ドメインキーワードの存在割合 (0.0 - 1.0)
+
+    3個以上ヒットで満点。0個なら 0.0。
+    """
+    text = f"{paper.title} {getattr(paper, 'abstract', '')[:500]}".lower()
+    hits = sum(1 for kw in DOMAIN_KEYWORDS if kw in text)
+    return min(hits / 3.0, 1.0)
+
 # Paper モデルのインポート
 try:
     from mekhane.anamnesis.models.paper import Paper
@@ -112,7 +166,7 @@ class SemanticMatcher:
         Args:
             paper: Paper オブジェクト
             topics: トピック定義リスト
-            threshold: 類似度閾値 (None = デフォルト 0.3)
+            threshold: 類似度閾値 (None = デフォルト 0.55)
 
         Returns:
             (topic_id, similarity_score) のリスト（スコア降順）
@@ -367,21 +421,25 @@ class DigestorSelector:
     ) -> float:
         """優先度スコアを計算
 
-        v2: セマンティック類似度の最大値を直接使う。
-        旧ロジック (マッチ数/全トピック数) は構造的にスコアが低くなる問題があった。
+        v3: 3層防御対応。ドメイン適合性を加味。
 
         スコア構成:
-        - semantic_sim * 0.6  — 最もマッチするトピックとの類似度
-        - abstract_quality * 0.2 — abstract の充実度
+        - semantic_sim * 0.5  — 最もマッチするトピックとの類似度
+        - domain_rel * 0.2   — ドメインキーワード適合度 (層3)
+        - abstract_quality * 0.1 — abstract の充実度
         - topic_breadth * 0.1 — 複数トピックへの広がり
         - source_bonus * 0.1 — ソース品質
         """
         score = 0.0
 
-        # セマンティック類似度 (0.0 - 0.6): 最大スコアを直接使う
+        # セマンティック類似度 (0.0 - 0.5): 最大スコアを直接使う
         if matched_topics:
             max_sim = max(sim for _, sim in matched_topics)
-            score += max_sim * 0.6
+            score += max_sim * 0.5
+
+        # ドメイン適合度 (0.0 - 0.2): 層3
+        domain_rel = _domain_relevance(paper)
+        score += domain_rel * 0.2
 
         # トピック広がりボーナス (0.0 - 0.1)
         if len(matched_topics) >= 3:
@@ -389,11 +447,11 @@ class DigestorSelector:
         elif len(matched_topics) >= 2:
             score += 0.05
 
-        # Abstract 充実度 (0.0 - 0.2)
+        # Abstract 充実度 (0.0 - 0.1)
         if paper.abstract and len(paper.abstract) > 500:
-            score += 0.2
-        elif paper.abstract and len(paper.abstract) > 200:
             score += 0.1
+        elif paper.abstract and len(paper.abstract) > 200:
+            score += 0.05
 
         # ソースボーナス (0.0 - 0.1)
         if paper.source == "arxiv":
@@ -425,6 +483,10 @@ class DigestorSelector:
         candidates = []
 
         for paper in papers:
+            # 層1: arXiv カテゴリフィルタ
+            if not _is_relevant_domain(paper):
+                continue
+
             # トピックマッチング (semantic or keyword) — (topic_id, score) ペア
             matched_topics = self._match_topics(paper)
 

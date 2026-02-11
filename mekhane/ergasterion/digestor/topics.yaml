@@ -7,7 +7,7 @@ updated: "2026-02-11"
 # 消化設定
 settings:
   max_candidates: 10       # 1回の消化で処理する最大候補数
-  min_score: 0.3           # 最小スコア閾値
+  min_score: 0.45          # 最小スコア閾値 (v3: 0.3→0.45 品質向上)
   auto_digest: false       # 自動消化（将来用）
   match_mode: semantic     # semantic or keyword
 

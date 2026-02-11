@@ -133,28 +133,42 @@ anti_patterns:
     bad: "コードの品質は良いです"
     good: "correctness: 4/5 — 単体テスト通過、但し境界値テスト未対応"
 
-# --- 出力スタイル設定 ---
+# --- 出力スタイル設定 (JSON Schema 風) ---
 output_style:
   format: "json"
-  structure: |
-    {
-      "summary": "レビュー概要（1行）",
-      "issues": [
-        {
-          "severity": "high | medium | low",
-          "location": "ファイル名:行番号",
-          "category": "security | performance | style | logic",
-          "description": "問題の説明（具体的に）",
-          "suggestion": "修正案（コード例含む）"
-        }
-      ],
-      "evaluation": {
-        "correctness": "1-5",
-        "security": "1-5",
-        "maintainability": "1-5"
-      }
-    }
+  schema:
+    type: "object"
+    properties:
+      summary:
+        type: "string"
+        description: "レビュー概要（1行）"
+      issues:
+        type: "array"
+        items:
+          type: "object"
+          required: ["severity", "location", "category", "description", "suggestion"]
+          properties:
+            severity: { type: "string", enum: ["high", "medium", "low"] }
+            location: { type: "string", description: "ファイル名:行番号" }
+            category: { type: "string", enum: ["security", "performance", "style", "logic"] }
+            description: { type: "string", description: "問題の説明（具体的に）" }
+            suggestion: { type: "string", description: "修正案（コード例含む）" }
+      evaluation:
+        type: "object"
+        properties:
+          correctness: { type: "integer", description: "コードの正確性 (1-5)" }
+          security: { type: "integer", description: "セキュリティ (1-5)" }
+          maintainability: { type: "integer", description: "保守性 (1-5)" }
   tone: "正確かつ具体的。感情を排し、事実と根拠のみ"
+
+# --- コンテキスト推奨 ---
+context_recommendations:
+  - tool: "view_file"
+    usage: "レビュー対象ファイルの全体像を把握"
+  - tool: "grep_search"
+    usage: "関連する実装箇所・依存コードの検索"
+  - tool: "run_command"
+    usage: "テスト実行・lint チェックで客観的な品質情報を取得"
 
 # --- 条件分岐（環境依存） ---
 conditional:

@@ -130,23 +130,31 @@ anti_patterns:
     bad: "論文によると、これが最良の方法です"
     good: "論文 [1] は O(n·log(n)) の手法を提案しています。他のアプローチ [2] も存在します"
 
-# --- 出力スタイル設定 ---
+# --- 出力スタイル設定 (JSON Schema 風) ---
 output_style:
   format: "json"
-  structure: |
-    {
-      "answer": "回答本文（必ず引用 [n] を含む）",
-      "citations": [
-        {
-          "id": "[n]",
-          "source": "ドキュメント名/URL",
-          "excerpt": "引用箇所（原文そのまま）",
-          "relevance_score": "0.0-1.0"
-        }
-      ],
-      "confidence": "high | medium | low",
-      "no_answer_reason": "null | 理由"
-    }
+  schema:
+    type: "object"
+    properties:
+      answer:
+        type: "string"
+        description: "回答本文（必ず引用 [n] を含む）"
+      citations:
+        type: "array"
+        items:
+          type: "object"
+          required: ["id", "source", "excerpt", "relevance_score"]
+          properties:
+            id: { type: "string", description: "引用番号 [n]" }
+            source: { type: "string", description: "ドキュメント名/URL" }
+            excerpt: { type: "string", description: "引用箇所（原文そのまま）" }
+            relevance_score: { type: "number", description: "関連度 (0.0-1.0)" }
+      confidence:
+        type: "string"
+        enum: ["high", "medium", "low"]
+      no_answer_reason:
+        type: "string"
+        description: "回答不能時の理由（null許可）"
   tone: "客観的。検索結果に存在する情報のみを使用"
 
 # --- @context 推奨設定 ---

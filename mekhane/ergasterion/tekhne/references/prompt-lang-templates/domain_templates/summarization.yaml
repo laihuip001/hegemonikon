@@ -129,22 +129,24 @@ anti_patterns:
     bad: "Q1は好調でした"
     good: "Q1売上は前年比120%。製造コスト15%上昇。マーケティング予算30%増額を承認"
 
-# --- 出力スタイル設定 ---
+# --- 出力スタイル設定 (JSON Schema 風) ---
 output_style:
   format: "json"
-  structure: |
-    {
-      "summary": "要約本文",
-      "key_points": [
-        "ポイント1",
-        "ポイント2"
-      ],
-      "metadata": {
-        "original_length": "int (文字数)",
-        "summary_length": "int (文字数)",
-        "compression_ratio": "float (0.0-1.0)"
-      }
-    }
+  schema:
+    type: "object"
+    properties:
+      summary:
+        type: "string"
+        description: "要約本文"
+      key_points:
+        type: "array"
+        description: "重要ポイントのリスト"
+      metadata:
+        type: "object"
+        properties:
+          original_length: { type: "integer", description: "原文の文字数" }
+          summary_length: { type: "integer", description: "要約の文字数" }
+          compression_ratio: { type: "number", description: "圧縮率 (0.0-1.0)" }
   tone: "客観的。原文の事実のみ。数値・固有名詞は正確に"
 
 # --- 要約タイプ別テンプレート ---

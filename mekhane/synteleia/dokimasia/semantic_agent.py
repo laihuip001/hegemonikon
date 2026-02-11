@@ -40,11 +40,13 @@ from ..base import (
 class LLMBackend(ABC):
     """LLM バックエンドの抽象インターフェース"""
 
+    # PURPOSE: LLM にクエリを送信し、テキスト応答を返す
     @abstractmethod
     def query(self, prompt: str, context: str) -> str:
         """LLM にクエリを送信し、テキスト応答を返す"""
         pass
 
+    # PURPOSE: バックエンドが利用可能か
     @abstractmethod
     def is_available(self) -> bool:
         """バックエンドが利用可能か"""
@@ -55,10 +57,12 @@ class LLMBackend(ABC):
 class LMQLBackend(LLMBackend):
     """Hermēneus LMQL パイプラインを使用するバックエンド"""
 
+    # PURPOSE: Initialize LMQL backend.
     def __init__(self, model: str = "openai/gpt-4o"):
         self.model = model
         self._available: Optional[bool] = None
 
+    # PURPOSE: LMQL 経由でクエリを実行
     def query(self, prompt: str, context: str) -> str:
         """LMQL 経由でクエリを実行"""
         try:
@@ -71,6 +75,7 @@ class LMQLBackend(LLMBackend):
         except Exception as e:
             return f"[LMQL Error] {e}"
 
+    # PURPOSE: LMQL パイプラインが利用可能か
     def is_available(self) -> bool:
         """LMQL パイプラインが利用可能か"""
         if self._available is None:
@@ -87,10 +92,12 @@ class LMQLBackend(LLMBackend):
 class OpenAIBackend(LLMBackend):
     """OpenAI API を直接呼出すバックエンド"""
 
+    # PURPOSE: Initialize OpenAI backend.
     def __init__(self, model: str = "gpt-4o-mini"):
         self.model = model
         self._available: Optional[bool] = None
 
+    # PURPOSE: OpenAI API でクエリを実行
     def query(self, prompt: str, context: str) -> str:
         """OpenAI API でクエリを実行"""
         import openai
@@ -109,6 +116,7 @@ class OpenAIBackend(LLMBackend):
         )
         return response.choices[0].message.content or "{}"
 
+    # PURPOSE: OpenAI API キーが設定されているか
     def is_available(self) -> bool:
         """OpenAI API キーが設定されているか"""
         if self._available is None:
@@ -120,9 +128,11 @@ class OpenAIBackend(LLMBackend):
 class StubBackend(LLMBackend):
     """テスト・フォールバック用のスタブバックエンド"""
 
+    # PURPOSE: Initialize Stub backend.
     def __init__(self, response: Optional[str] = None):
         self._response = response
 
+    # PURPOSE: 固定レスポンスを返す (テスト用)
     def query(self, prompt: str, context: str) -> str:
         """固定レスポンスを返す (テスト用)"""
         if self._response:
@@ -135,6 +145,7 @@ class StubBackend(LLMBackend):
             }
         )
 
+    # PURPOSE: Always available.
     def is_available(self) -> bool:
         return True
 

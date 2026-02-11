@@ -12,6 +12,12 @@ triggers:
   - 構造の保存・忘却を問う時
   - Trigonon / X-series を参照する時
   - 「なぜこの変換は正当か」を問う時
+
+risk_tier: L1
+risks:
+  - 圏論の誤用による認知的混乱
+  - 前順序圏の前提を無視した一般化
+  - 抽象化過剰による現場との乖離
 ---
 
 # 🏛️ Category Theory Engine — 構造認識の言語

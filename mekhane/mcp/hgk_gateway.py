@@ -128,7 +128,7 @@ def _wbc_log_security_event(
 # OAuth 2.1 Provider (auto-approve, single-user)
 # =============================================================================
 
-# PURPOSE: HGKOAuthProvider の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 class HGKOAuthProvider(OAuthAuthorizationServerProvider[AuthorizationCode, RefreshToken, AccessToken]):
     """
     最小 OAuth 2.1 プロバイダー。

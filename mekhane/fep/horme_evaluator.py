@@ -44,7 +44,7 @@ class PropatheiaDerivative(Enum):
     DRAW = "draw"  # 吸引傾向（引き寄せ）
 
 
-# PURPOSE: PropatheiaResult の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 @dataclass
 # PURPOSE: H1 Propatheia 評価結果
 class PropatheiaResult:
@@ -260,7 +260,7 @@ class OrexisDerivative(Enum):
     NEUTRAL = "neutral"  # 中立傾向
 
 
-# PURPOSE: OrexisResult の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 @dataclass
 class OrexisResult:
     """H3 Orexis 評価結果

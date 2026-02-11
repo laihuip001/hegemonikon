@@ -51,7 +51,7 @@ sys.path.insert(0, str(_PROJECT_ROOT))
 log(f"Project root: {_PROJECT_ROOT}")
 
 
-# PURPOSE: StdoutSuppressor の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 class StdoutSuppressor:
     def __init__(self):
         self._null = io.StringIO()

@@ -1020,7 +1020,7 @@ class HegemonikónFEPAgentV2:
         self.beliefs = self._default_D()
         self._history = []
 
-    # PURPOSE: Return inference history
+    # PURPOSE: inference history の利用を可能にする
     def get_history(self) -> List[Dict[str, Any]]:
         """Return inference history."""
         return self._history

@@ -30,7 +30,7 @@ import yaml
 PARAMETERS_PATH = Path(__file__).parent / "parameters.yaml"
 
 
-# PURPOSE: AMatrixParams の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 @dataclass
 # PURPOSE: Observation likelihood parameters P(o|s).
 class AMatrixParams:
@@ -41,7 +41,7 @@ class AMatrixParams:
     dirichlet_alpha: float = 1.0
 
 
-# PURPOSE: BMatrixParams の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 @dataclass
 # PURPOSE: State transition parameters P(s'|s,a).
 class BMatrixParams:
@@ -53,7 +53,7 @@ class BMatrixParams:
     observe_induces_epoche: float = 0.3
 
 
-# PURPOSE: CVectorParams の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 @dataclass
 # PURPOSE: Preference vector parameters.
 class CVectorParams:
@@ -66,7 +66,7 @@ class CVectorParams:
     high_negative: float = -2.0
 
 
-# PURPOSE: DVectorParams の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 @dataclass
 # PURPOSE: Initial belief parameters.
 class DVectorParams:
@@ -77,7 +77,7 @@ class DVectorParams:
     certain_bias: float = 0.4
 
 
-# PURPOSE: HyperParams の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 @dataclass
 # PURPOSE: Agent hyperparameters.
 class HyperParams:
@@ -90,7 +90,7 @@ class HyperParams:
     lr_pD: float = 0.5
 
 
-# PURPOSE: HegemonikónParams の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 @dataclass
 # PURPOSE: Hegemonikón-specific parameters.
 class HegemonikónParams:
@@ -99,7 +99,7 @@ class HegemonikónParams:
     epoche_entropy_threshold: float = 1.0
 
 
-# PURPOSE: FEPParameters の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 @dataclass
 # PURPOSE: Complete FEP parameter set.
 class FEPParameters:

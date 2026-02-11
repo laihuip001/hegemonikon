@@ -44,7 +44,7 @@ GRAPH_DIR = _MNEME_ROOT / "indices"
 GRAPH_PATH = GRAPH_DIR / "link_graph.json"
 
 
-# PURPOSE: GraphNode の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 @dataclass
 class GraphNode:
     """グラフ上のノード（1つの知識ファイル）."""
@@ -58,7 +58,7 @@ class GraphNode:
     community: int = -1  # コミュニティID（Louvainで設定）
 
 
-# PURPOSE: GraphStats の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 @dataclass
 class GraphStats:
     """グラフ統計情報."""
@@ -70,7 +70,7 @@ class GraphStats:
     top_connected: list[tuple[str, int]]  # 接続数上位
 
 
-# PURPOSE: LinkGraph の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 class LinkGraph:
     """Bidirectional Link Graph.
 

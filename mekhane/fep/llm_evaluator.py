@@ -41,7 +41,7 @@ except ImportError:
     pass  # TODO: Add proper error handling
 
 
-# PURPOSE: EvaluationResult の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 @dataclass
 # PURPOSE: Result from hierarchical evaluation.
 class EvaluationResult:

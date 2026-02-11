@@ -44,7 +44,7 @@ class Severity(Enum):
     WARNING = "warning"  # 警告のみ
 
 
-# PURPOSE: Violation の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 @dataclass
 # PURPOSE: クラス: Violation
 class Violation:
@@ -54,7 +54,7 @@ class Violation:
     message: str
 
 
-# PURPOSE: ValidationResult の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 @dataclass
 # PURPOSE: クラス: ValidationResult
 class ValidationResult:

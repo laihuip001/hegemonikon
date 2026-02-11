@@ -27,7 +27,7 @@ class GnosisSearchResult(BaseModel):
     score: float | None = None
 
 
-# PURPOSE: GnosisSearchResponse の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 class GnosisSearchResponse(BaseModel):
     """検索レスポンス。"""
     query: str
@@ -35,7 +35,7 @@ class GnosisSearchResponse(BaseModel):
     total: int
 
 
-# PURPOSE: GnosisStatsResponse の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 class GnosisStatsResponse(BaseModel):
     """インデックス統計。"""
     total: int = 0

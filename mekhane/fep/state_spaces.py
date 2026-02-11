@@ -83,13 +83,13 @@ PREFERENCES: Dict[str, Dict[str, float]] = {
 # =============================================================================
 
 
-# PURPOSE: Return the total number of hidden state factors.
+# PURPOSE: the total number of hidden state factors の利用を可能にする
 def get_state_dim() -> int:
     """Return the total number of hidden state factors."""
     return len(PHANTASIA_STATES) * len(ASSENT_STATES) * len(HORME_STATES)
 
 
-# PURPOSE: Return the dimension of each observation modality.
+# PURPOSE: the dimension of each observation modality の利用を可能にする
 def get_obs_dim() -> Dict[str, int]:
     """Return the dimension of each observation modality."""
     return {k: len(v) for k, v in OBSERVATION_MODALITIES.items()}

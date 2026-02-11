@@ -203,7 +203,7 @@ async def list_tools():
 
 # PURPOSE: jules_mcp_server の call tool 処理を実行する
 @server.call_tool(validate_input=True)
-# PURPOSE: Handle Jules tool calls.
+# PURPOSE: Jules tool calls の安全な処理を保証する
 async def call_tool(name: str, arguments: dict):
     """Handle Jules tool calls."""
     log(f"call_tool: {name} with {arguments}")

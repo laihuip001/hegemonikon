@@ -27,7 +27,7 @@ router = APIRouter(tags=["kalon"])
 _KALON_DIR = Path.home() / "oikos" / "mneme" / ".hegemonikon" / "kalon"
 
 
-# PURPOSE: KalonJudgeRequest の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 class KalonJudgeRequest(BaseModel):
     concept: str
     g_test: bool  # G テスト (蒸留): True = 不変

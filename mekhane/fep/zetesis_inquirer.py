@@ -52,7 +52,7 @@ class QuestionType(Enum):
     IF = "if"  # もし〜なら？
 
 
-# PURPOSE: ZetesisResult の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 @dataclass
 # PURPOSE: O3 Zētēsis 探求結果
 class ZetesisResult:

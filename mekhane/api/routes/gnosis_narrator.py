@@ -24,7 +24,7 @@ router = APIRouter(prefix="/gnosis", tags=["gnosis"])
 # Pydantic Models
 # ===========================================================================
 
-# PURPOSE: PaperCard の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 class PaperCard(BaseModel):
     """論文カード — kalon: カード + 問いの一行"""
     title: str
@@ -36,26 +36,26 @@ class PaperCard(BaseModel):
     question: str = ""   # kalon: この論文が投げかける問い
 
 
-# PURPOSE: PapersResponse の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 class PapersResponse(BaseModel):
     timestamp: str
     papers: list[PaperCard] = Field(default_factory=list)
     total: int = 0
 
 
-# PURPOSE: NarrateSegment の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 class NarrateSegment(BaseModel):
     speaker: str
     content: str
 
 
-# PURPOSE: NarrateRequest の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 class NarrateRequest(BaseModel):
     title: str
     fmt: str = "deep_dive"  # deep_dive / brief / critique / debate
 
 
-# PURPOSE: NarrateResponse の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 class NarrateResponse(BaseModel):
     timestamp: str
     title: str

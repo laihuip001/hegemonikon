@@ -119,7 +119,7 @@ def parse_state(state_str: str) -> SessionState:
 # ============ Data Types ============
 
 
-# PURPOSE: Represents a Jules API session
+# PURPOSE: a Jules API session を型安全に扱えるようにする
 @dataclass
 class JulesSession:
     """Represents a Jules API session."""

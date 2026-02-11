@@ -30,7 +30,7 @@ except ImportError:
     from mekhane.fep.fep_agent import HegemonikónFEPAgent, PYMDP_AVAILABLE
 
 
-# PURPOSE: NoesisResult の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 @dataclass
 # PURPOSE: Result from O1 Noēsis FEP analysis.
 class NoesisResult:
@@ -43,7 +43,7 @@ class NoesisResult:
     raw_beliefs: Optional[np.ndarray] = None
 
 
-# PURPOSE: BoulesisResult の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 @dataclass
 # PURPOSE: Result from O2 Boulēsis FEP analysis.
 class BoulesisResult:

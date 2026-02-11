@@ -26,7 +26,7 @@ router = APIRouter(prefix="/pks", tags=["pks"])
 # Pydantic Models
 # ===========================================================================
 
-# PURPOSE: NuggetResponse の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 class NuggetResponse(BaseModel):
     title: str
     abstract: str = ""
@@ -39,7 +39,7 @@ class NuggetResponse(BaseModel):
     suggested_questions: list[str] = Field(default_factory=list)
 
 
-# PURPOSE: PushResponse の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 class PushResponse(BaseModel):
     timestamp: str
     topics: list[str] = Field(default_factory=list)
@@ -47,14 +47,14 @@ class PushResponse(BaseModel):
     total: int = 0
 
 
-# PURPOSE: FeedbackRequest の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 class FeedbackRequest(BaseModel):
     title: str
     reaction: str  # used | dismissed | deepened | ignored
     series: str = ""
 
 
-# PURPOSE: FeedbackResponse の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 class FeedbackResponse(BaseModel):
     timestamp: str
     title: str
@@ -62,7 +62,7 @@ class FeedbackResponse(BaseModel):
     recorded: bool = True
 
 
-# PURPOSE: FeedbackStatsResponse の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 class FeedbackStatsResponse(BaseModel):
     timestamp: str
     series_stats: dict = Field(default_factory=dict)

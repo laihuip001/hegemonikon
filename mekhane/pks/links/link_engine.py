@@ -31,7 +31,7 @@ WIKILINK_PATTERN = re.compile(r"\[\[([^\]|]+)(?:\|([^\]]+))?\]\]")
 # --- Data Models ---
 
 
-# PURPOSE: Link の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 @dataclass
 # PURPOSE: ファイル間リンク
 class Link:
@@ -44,7 +44,7 @@ class Link:
     context: str = ""  # リンク前後のテキスト
 
 
-# PURPOSE: LinkIndex の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 @dataclass
 # PURPOSE: リンクインデックス — 全ファイル間リレーションの索引
 class LinkIndex:

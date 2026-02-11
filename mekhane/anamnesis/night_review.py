@@ -49,7 +49,7 @@ load_dotenv(ENV_FILE)
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 
 
-# PURPOSE: SessionInfo の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 @dataclass
 # PURPOSE: セッション情報
 class SessionInfo:
@@ -63,7 +63,7 @@ class SessionInfo:
     artifacts: List[Dict[str, Any]]
 
 
-# PURPOSE: NightReview の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 @dataclass
 # PURPOSE: ナイトレビュー構造体
 class NightReview:

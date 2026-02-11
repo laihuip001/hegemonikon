@@ -44,7 +44,7 @@ _HEGEMONIKON_ROOT = Path(__file__).parent.parent.parent
 LINK_GRAPH_PATH = _MNEME_ROOT / "indices" / "link_graph.json"
 
 
-# PURPOSE: Recommendation の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 @dataclass
 class Recommendation:
     """ユーザーへの知識推薦 1 件."""
@@ -61,7 +61,7 @@ class Recommendation:
     actions: list[str] = field(default_factory=lambda: ["/eat", "/jukudoku"])
 
 
-# PURPOSE: PushResult の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 @dataclass
 class PushResult:
     """推薦結果の集約."""
@@ -73,7 +73,7 @@ class PushResult:
     total_candidates: int
 
 
-# PURPOSE: ProactivePush の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 class ProactivePush:
     """「データが自ら語りかけてくる DB」の核心実装.
 

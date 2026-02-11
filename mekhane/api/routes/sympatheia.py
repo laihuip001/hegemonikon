@@ -37,7 +37,7 @@ router = APIRouter(prefix="/sympatheia", tags=["sympatheia"])
 # ===========================================================================
 
 # --- WBC ---
-# PURPOSE: WBCRequest の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 class WBCRequest(BaseModel):
     source: str = "unknown"
     severity: str = "medium"
@@ -45,7 +45,7 @@ class WBCRequest(BaseModel):
     files: list[str] = Field(default_factory=list)
 
 
-# PURPOSE: WBCResponse の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 class WBCResponse(BaseModel):
     timestamp: str
     source: str
@@ -59,12 +59,12 @@ class WBCResponse(BaseModel):
 
 
 # --- Digest ---
-# PURPOSE: DigestRequest の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 class DigestRequest(BaseModel):
     pass  # webhook trigger, no payload needed
 
 
-# PURPOSE: DigestResponse の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 class DigestResponse(BaseModel):
     timestamp: str
     weekEnding: str
@@ -77,13 +77,13 @@ class DigestResponse(BaseModel):
 
 
 # --- Attractor ---
-# PURPOSE: AttractorRequest の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 class AttractorRequest(BaseModel):
     context: str = ""
     text: str = ""  # fallback
 
 
-# PURPOSE: AttractorResponse の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 class AttractorResponse(BaseModel):
     timestamp: str
     recommendation: dict | None = None
@@ -92,12 +92,12 @@ class AttractorResponse(BaseModel):
 
 
 # --- Feedback ---
-# PURPOSE: FeedbackRequest の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 class FeedbackRequest(BaseModel):
     pass
 
 
-# PURPOSE: FeedbackResponse の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 class FeedbackResponse(BaseModel):
     timestamp: str
     metrics: dict = Field(default_factory=dict)
@@ -107,14 +107,14 @@ class FeedbackResponse(BaseModel):
 
 
 # --- Route ---
-# PURPOSE: RouteRequest の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 class RouteRequest(BaseModel):
     type: str = ""
     source: str = "unknown"
     payload: dict = Field(default_factory=dict)
 
 
-# PURPOSE: RouteResponse の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 class RouteResponse(BaseModel):
     routed: bool = False
     target: str = ""
@@ -126,7 +126,7 @@ class RouteResponse(BaseModel):
 
 
 # --- Notification ---
-# PURPOSE: NotificationRequest の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 class NotificationRequest(BaseModel):
     source: str = "unknown"  # e.g. "WF-09", "WF-13"
     level: str = "INFO"  # INFO | HIGH | CRITICAL
@@ -135,7 +135,7 @@ class NotificationRequest(BaseModel):
     data: dict = Field(default_factory=dict)
 
 
-# PURPOSE: NotificationResponse の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 class NotificationResponse(BaseModel):
     id: str
     timestamp: str

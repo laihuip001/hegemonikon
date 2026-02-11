@@ -32,7 +32,7 @@ from typing import Dict, List, Optional, Tuple
 # Data Types
 # ---------------------------------------------------------------------------
 
-# PURPOSE: FactorizationResult の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 @dataclass
 class FactorizationResult:
     """因子分解テストの結果: 候補 A は候補 B の特殊ケースか？
@@ -46,7 +46,7 @@ class FactorizationResult:
     confidence: float     # 0.0 - 1.0
 
 
-# PURPOSE: KalonResult の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 @dataclass
 class KalonResult:
     """Kalon 検証の最終結果

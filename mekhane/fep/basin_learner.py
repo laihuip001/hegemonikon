@@ -57,7 +57,7 @@ DEFAULT_ADJUSTMENTS_PATH = (
 # =============================================================================
 
 
-# PURPOSE: WeightAdjustment の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 @dataclass
 class WeightAdjustment:
     """1つの Series に対する重み補正。"""
@@ -69,7 +69,7 @@ class WeightAdjustment:
     applied_at: Optional[str] = None
 
 
-# PURPOSE: LearningEpoch の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 @dataclass
 class LearningEpoch:
     """1回の学習サイクルの結果。"""
@@ -87,7 +87,7 @@ class LearningEpoch:
 # =============================================================================
 
 
-# PURPOSE: BasinLearner の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 class BasinLearner:
     """Basin の bias から prototype weights を学習する。
 

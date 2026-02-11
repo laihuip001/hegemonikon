@@ -36,7 +36,7 @@ class AlignmentStatus(Enum):
     INVERTED = "inverted"  # 手段と目的が入れ替わっている
 
 
-# PURPOSE: TelосResult の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 @dataclass
 # PURPOSE: Telos評価結果
 class TelосResult:

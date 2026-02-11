@@ -16,7 +16,7 @@ from typing import Any
 logger = logging.getLogger(__name__)
 
 
-# PURPOSE: TransportType の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 class TransportType(Enum):
     """MCP トランスポート種別"""
     STDIO = "stdio"
@@ -24,7 +24,7 @@ class TransportType(Enum):
     SSE = "sse"
 
 
-# PURPOSE: ServerInfo の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 @dataclass
 class ServerInfo:
     """MCP サーバー情報"""
@@ -49,7 +49,7 @@ class ServerInfo:
         return self.transport in (TransportType.STREAMABLE_HTTP, TransportType.SSE)
 
 
-# PURPOSE: DiscoveryEngine の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 class DiscoveryEngine:
     """
     MCP サーバーの発見・登録を管理する。

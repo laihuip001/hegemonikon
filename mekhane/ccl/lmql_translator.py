@@ -41,7 +41,7 @@ class OpType(Enum):
     EXPAND = auto()  # !
 
 
-# PURPOSE: Workflow の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 @dataclass
 # PURPOSE: ワークフローノード
 class Workflow:
@@ -53,7 +53,7 @@ class Workflow:
     selector: Optional[str] = None
 
 
-# PURPOSE: Condition の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 @dataclass
 # PURPOSE: 条件ノード
 class Condition:
@@ -64,7 +64,7 @@ class Condition:
     value: float
 
 
-# PURPOSE: ConvergenceLoop の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 @dataclass
 # PURPOSE: 収束ループ: A >> cond
 class ConvergenceLoop:
@@ -74,7 +74,7 @@ class ConvergenceLoop:
     condition: Condition
 
 
-# PURPOSE: Sequence の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 @dataclass
 # PURPOSE: シーケンス: A _ B
 class Sequence:

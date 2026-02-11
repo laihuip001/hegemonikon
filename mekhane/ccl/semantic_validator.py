@@ -35,7 +35,7 @@ def _get_api_key() -> Optional[str]:
     )
 
 
-# PURPOSE: SemanticResult の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 @dataclass
 # PURPOSE: Result of semantic validation.
 class SemanticResult:

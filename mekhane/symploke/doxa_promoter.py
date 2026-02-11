@@ -43,7 +43,7 @@ DEFAULT_KI_BASE = _PROJECT_ROOT / "kernel" / "knowledge" / "doxa"
 # =============================================================================
 
 
-# PURPOSE: PromotionResult の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 @dataclass
 class PromotionResult:
     """昇格実行結果。"""

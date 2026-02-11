@@ -59,7 +59,7 @@ class SlackLevel(Enum):
     OVERDUE = "overdue"  # 超過: 0.5x 未満 or 期限超過
 
 
-# PURPOSE: ChronosResult の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 @dataclass
 # PURPOSE: 時間評価結果
 class ChronosResult:

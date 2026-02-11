@@ -54,7 +54,7 @@ class ActionCategory(Enum):
     PERSISTENCE = "persistence"  # 永続化行為 (/bye, /dox)
 
 
-# PURPOSE: Technique の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 @dataclass
 # PURPOSE: 単一技法の定義
 class Technique:

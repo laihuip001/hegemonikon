@@ -115,13 +115,13 @@ NUM_ACTIONS_V2 = len(ACTIONS_V2)  # 7
 # =============================================================================
 
 
-# PURPOSE: Return total hidden state dimension for v2 model
+# PURPOSE: total hidden state dimension for v2 model の利用を可能にする
 def get_state_dim_v2() -> int:
     """Return total hidden state dimension for v2 model."""
     return NUM_STATES_V2
 
 
-# PURPOSE: Return observation dimensions for v2 model
+# PURPOSE: observation dimensions for v2 model の利用を可能にする
 def get_obs_dim_v2() -> Dict[str, int]:
     """Return observation dimensions for v2 model."""
     return {k: len(v) for k, v in OBSERVATION_MODALITIES_V2.items()}

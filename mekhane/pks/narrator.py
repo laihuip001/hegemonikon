@@ -27,7 +27,7 @@ from mekhane.pks.narrator_formats import (
 )
 
 
-# PURPOSE: NarrativeSegment の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 @dataclass
 # PURPOSE: 対話の一セグメント
 class NarrativeSegment:
@@ -37,7 +37,7 @@ class NarrativeSegment:
     content: str
 
 
-# PURPOSE: Narrative の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 @dataclass
 # PURPOSE: 多フォーマット対応の対話形式サマリー
 class Narrative:

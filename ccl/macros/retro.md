@@ -2,7 +2,7 @@
 
 > **Origin**: Forge v2.0 "📖 Retrospect" + "💾 Archive" モジュール
 > **Category**: 反省マクロ (Reflect)
-> **CCL**: `/epo+ _ /dox _ M:{/bye}`
+> **CCL**: `/epo+ _ /pro~/noe _ /dox _ M:{/bye}`
 
 ---
 
@@ -12,7 +12,7 @@
 macro: @retro
 parameters: []
 expansion: |
-  /epo+ _ /dox _ M:{/bye}
+  /epo+ _ /pro~/noe _ /dox _ M:{/bye}
 ```
 
 ---
@@ -23,19 +23,32 @@ expansion: |
 Phase 1: /epo+ (時代認識・深化)
 ├─ 経験を振り返る
 ├─ 「何が起きたか」を時系列で整理
-├─ 感情的反応も含めて記録
 └─ 転換点を特定
 
-Phase 2: /dox (信念記録)
+Phase 2: /pro~/noe (前感情 ↔ 認識の振動)
+├─ /pro: 「あの時どう感じたか」— 直感的反応
+├─ /noe: 「なぜそう感じたか」— 深い認識
+├─ ~: 往復させることで感情に埋もれた洞察を浮き彫りにする
+└─ 感情と認識を分断しない — 混ざり合う
+
+Phase 3: /dox (信念記録)
 ├─ 振返りから得られた教訓を信念として記録
 ├─ 「次はこうする」を1つ選ぶ
 └─ パターンとして永続化
 
-Phase 3: M:{/bye} (記憶化 → 引継ぎ)
+Phase 4: M:{/bye} (記憶化 → 引継ぎ)
 ├─ 教訓をセッション引き継ぎに記録
-├─ Handoff に反映
 └─ 次セッションで自動参照可能にする
 ```
+
+---
+
+## 演算子の意味
+
+| 演算子 | 選択理由 |
+|:-------|:---------|
+| `~` (振動) | 感情と認識の往復。`_` だと分断、`*` だと混ざりすぎ。振動が最適 |
+| `M:{}` (記憶化) | Forge Archive の CCL エンコード。教訓を永続記憶に |
 
 ---
 
@@ -50,4 +63,4 @@ Phase 3: M:{/bye} (記憶化 → 引継ぎ)
 
 ---
 
-*Forge Retrospect + Archive → HGK CCL v1.0*
+*Forge Retrospect + Archive → HGK CCL v1.1 (emotional hook)*

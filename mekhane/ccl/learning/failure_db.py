@@ -17,7 +17,7 @@ from dataclasses import dataclass, asdict
 from typing import List, Dict, Optional
 
 
-# PURPOSE: FailureRecord の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 @dataclass
 # PURPOSE: 失敗記録
 class FailureRecord:
@@ -31,7 +31,7 @@ class FailureRecord:
     resolution: Optional[str] = None
 
 
-# PURPOSE: WarningRecord の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 @dataclass
 # PURPOSE: 警告記録
 class WarningRecord:

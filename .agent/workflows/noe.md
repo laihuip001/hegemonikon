@@ -130,14 +130,20 @@ sel_enforcement:
    > **目的**: 27,000件の Gnōsis から関連知見を引き出し、Phase 1 の前提に組み込む
    > **省略禁止**: このステップを飛ばした /noe は「自分の記憶だけで考える」に等しい
 
-3. **PHASE 0 — Prolegomena** (前限定): 図式 D の定義域 J を選ぶ
-4. **PHASE 1 — Excavation** (対象の列挙): 圏の対象（前提）を炙り出す
-5. **PHASE 2 — Genesis** (Cone の射を生成): 各仮説 = apex → 対象への射
-6. **PHASE 3 — Kalon** (普遍性検証): Limit の頂点を発見する ← **新設**
-7. **PHASE 4 — Synthesis** (射の合成と検証): 経路を辿り整合性を確認
-8. **PHASE 5 — Dokimasia** (忠実性テスト): 関手 F が射を保存するか
-9. **PHASE 6 — Theoria** (Yoneda 適用): Hom(-, 結論) で結論の完全性を検証
+3. **PHASE 0 — Prolegomena** (前限定): 図式 D の定義域 J を選ぶ — **必須**
+4. **PHASE 1 — Excavation** (対象の列挙): 圏の対象（前提）を炙り出す — **必須**
+5. **PHASE 2 — Genesis** (Cone の射を生成): 各仮説 = apex → 対象への射 — **必須**
+6. **PHASE 3 — Kalon** (普遍性検証): Limit の頂点を発見する — **L3 のみ**
+7. **PHASE 4 — Synthesis** (射の合成と検証): 経路を辿り整合性を確認 — **L3 のみ**
+8. **PHASE 5 — Dokimasia** (忠実性テスト): 関手 F が射を保存するか — **必須**
+9. **PHASE 6 — Theoria** (Yoneda 適用): Hom(-, 結論) で結論の完全性を検証 — **L3 のみ**
 10. 最終出力: 構造化知見 → ファイル保存
+
+> **深度レベル別の実行範囲** (DX-008 v6.3):
+>
+> - **L2 (Standard `/noe`)**: STEP 0 → 0.5 → Phase 0, 1, 2, 5 → 出力保存
+> - **L3 (Deep `/noe+`)**: STEP 0 → 0.5 → Phase 0〜6 全実行 → 出力保存
+> - **L1 (Quick `/noe-`)**: 結論 + 理由1つ、5行以内（従来通り）
 
 ---
 
@@ -263,7 +269,7 @@ result = select_derivative("O1", problem_context)
 |:-------|:---------|:-------|
 | O1 Noēsis | /noe | v6.1 Ready |
 
-> **制約リマインダ**: SKILL.md 読込 (STEP 0) → 全 Phase (0-6) を順序通り実行。PHASE 3 (Kalon) は省略不可。
+> **制約リマインダ**: SKILL.md 読込 (STEP 0) → 必須 Phase (0, 1, 2, 5) を順序通り実行。Phase 3/4/6 は `/noe+` (L3) 時のみ実行。
 
 ---
 
@@ -271,3 +277,4 @@ result = select_derivative("O1", problem_context)
 *v6.0 — Kalon V3: 圏論深層統合。全 Phase を圏論的操作として定義。Phase 3 Kalon (普遍性検証) 新設 (2026-02-10)*
 *v6.1 — 随伴対統合: η=Phase3, ε=Phase5 を発見・明記。Phase 6β (Theoria-G: 射出経路) 新設 (2026-02-10)*
 *v6.2 — scaffold 派生追加 (PGH型: 骨格固定→創発→整流)。GoT lineage に #20 参照追記 (2026-02-10)*
+*v6.3 — DX-008 三者対話: Phase 必須/オプション分離。P0/1/2/5=必須、P3/4/6=L3のみ (2026-02-11)*

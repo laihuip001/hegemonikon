@@ -323,7 +323,7 @@ def _build_diagnosis(
         )
 
 
-# PURPOSE: AttractorResult の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 @dataclass
 # PURPOSE: Attractor への収束結果
 class AttractorResult:

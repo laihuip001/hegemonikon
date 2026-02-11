@@ -51,7 +51,7 @@ _DEFAULT_LOG_DIR = Path.home() / "oikos/mneme/.hegemonikon/feedback"
 # Data Model
 # ─────────────────────────────────────────────────────────────────────
 
-# PURPOSE: FeedbackRecord の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 @dataclass
 class FeedbackRecord:
     """Creator の1回のフィードバックを表現する。
@@ -98,7 +98,7 @@ class FeedbackRecord:
         return self.correct_series or self.recommended_series
 
 
-# PURPOSE: FeedbackResult の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 @dataclass
 class FeedbackResult:
     """apply_feedback_to_agent() の結果。"""

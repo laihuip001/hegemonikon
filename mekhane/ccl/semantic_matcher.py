@@ -19,7 +19,7 @@ except ImportError:
     HAS_EMBEDDINGS = False
 
 
-# PURPOSE: MacroMatch の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 @dataclass
 # PURPOSE: A matched macro with similarity score.
 class MacroMatch:

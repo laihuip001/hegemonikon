@@ -52,7 +52,7 @@ class BeliefStrength(Enum):
     CORE = "core"  # 核心 (アイデンティティ)
 
 
-# PURPOSE: Belief の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 @dataclass
 # PURPOSE: 信念オブジェクト
 class Belief:
@@ -345,7 +345,7 @@ class DoxaStore:
 _global_store = DoxaStore()
 
 
-# PURPOSE: store を取得する
+# PURPOSE: を取得する を永続化し参照可能にする
 def get_store() -> DoxaStore:
     """グローバルストアを取得"""
     return _global_store

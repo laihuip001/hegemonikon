@@ -39,7 +39,7 @@ DEFAULT_LOG_DIR = Path.home() / "oikos" / "hegemonikon" / "mneme" / ".hegemoniko
 # Data Classes
 # ---------------------------------------------------------------------------
 
-# PURPOSE: AttractorLogEntry の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 @dataclass
 # PURPOSE: 1回の Attractor 推薦ログ
 class AttractorLogEntry:

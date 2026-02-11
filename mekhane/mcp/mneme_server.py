@@ -199,7 +199,7 @@ async def list_tools() -> list[Tool]:
             inputSchema={"type": "object", "properties": {}, "required": []},
         ),
     ]
-# PURPOSE: Handle tool calls.
+# PURPOSE: tool calls の安全な処理を保証する
 
 
 @server.call_tool()
@@ -218,7 +218,7 @@ async def call_tool(name: str, arguments: dict) -> list[TextContent]:
             return [TextContent(type="text", text=f"Unknown tool: {name}")]
     except Exception as e:
         log(f"Tool error: {e}")
-# PURPOSE: Handle search tool.
+# PURPOSE: search tool の安全な処理を保証する
         return [TextContent(type="text", text=f"Error: {str(e)}")]
 
 
@@ -246,7 +246,7 @@ async def _handle_search(arguments: dict) -> list[TextContent]:
             lines.append(f"Content: {r.content[:200]}...")
         lines.append("")
 
-# PURPOSE: Handle stats tool.
+# PURPOSE: stats tool の安全な処理を保証する
     return [TextContent(type="text", text="\n".join(lines))]
 
 
@@ -265,7 +265,7 @@ async def _handle_stats(arguments: dict) -> list[TextContent]:
         total += count
     lines.append(f"\n**Total**: {total} documents")
 
-# PURPOSE: Handle sources tool.
+# PURPOSE: sources tool の安全な処理を保証する
     return [TextContent(type="text", text="\n".join(lines))]
 
 

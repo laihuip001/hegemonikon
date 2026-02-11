@@ -29,7 +29,7 @@ import json
 TRACES_PATH = Path("/home/makaron8426/oikos/mneme/.hegemonikon/meaningful_traces.json")
 
 
-# PURPOSE: MeaningfulTrace の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 @dataclass
 # PURPOSE: A moment marked as meaningful by Claude.
 class MeaningfulTrace:

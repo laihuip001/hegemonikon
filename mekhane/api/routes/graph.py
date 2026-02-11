@@ -150,7 +150,7 @@ for series_id in SERIES:
 
 # --- Pydantic Models ---
 
-# PURPOSE: GraphNode の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 class GraphNode(BaseModel):
     id: str
     series: str
@@ -162,7 +162,7 @@ class GraphNode(BaseModel):
     color: str
     position: dict[str, float]
 
-# PURPOSE: GraphEdge の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 class GraphEdge(BaseModel):
     id: str
     pair: str
@@ -173,7 +173,7 @@ class GraphEdge(BaseModel):
     meaning: str
     type: str = Field(description="anchor, bridge, or identity")
 
-# PURPOSE: GraphFullResponse の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 class GraphFullResponse(BaseModel):
     nodes: list[GraphNode]
     edges: list[GraphEdge]

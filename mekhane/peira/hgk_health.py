@@ -20,7 +20,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Optional
 
-# PURPOSE: ヘルスチェック結果を保持するデータクラス
+# PURPOSE: ヘルスチェック結果を統一的に扱い、レポート生成と判定分岐を可能にする
 @dataclass
 class HealthItem:
     name: str

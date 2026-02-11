@@ -107,7 +107,7 @@ class EpocheScanner:
         return False, None
 
 
-# PURPOSE: EpocheShield の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 class EpocheShield:
     """
     A2 Krisis (Epochē) の防御機能: PIIマスキング

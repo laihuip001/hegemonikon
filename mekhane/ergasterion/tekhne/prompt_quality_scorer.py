@@ -28,7 +28,7 @@ from typing import Optional
 
 # === Score Data Structures ===
 
-# PURPOSE: DimensionScore の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 @dataclass
 class DimensionScore:
     """Individual dimension score with details."""
@@ -47,7 +47,7 @@ class DimensionScore:
         return min(100, int((self.score / self.max_score) * 100))
 
 
-# PURPOSE: QualityReport の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 @dataclass
 class QualityReport:
     """Complete quality assessment report."""

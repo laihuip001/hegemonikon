@@ -23,7 +23,7 @@ import yaml
 import re
 
 
-# PURPOSE: SELRequirement の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 @dataclass
 # PURPOSE: SEL 要件
 class SELRequirement:
@@ -34,7 +34,7 @@ class SELRequirement:
     uml_requirements: Dict[str, str] = field(default_factory=dict)  # stage -> 要件テキスト
 
 
-# PURPOSE: SELValidationResult の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 @dataclass
 # PURPOSE: SEL 検証結果
 class SELValidationResult:

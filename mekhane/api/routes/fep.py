@@ -22,7 +22,7 @@ class FEPStepRequest(BaseModel):
     observation: int = Field(ge=0, lt=48, description="観測インデックス (0-47)")
 
 
-# PURPOSE: FEPStepResponse の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 class FEPStepResponse(BaseModel):
     """FEP step 結果。"""
     action_name: str
@@ -32,7 +32,7 @@ class FEPStepResponse(BaseModel):
     beliefs_entropy: float | None = None
 
 
-# PURPOSE: FEPStateResponse の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 class FEPStateResponse(BaseModel):
     """Agent の内部状態。"""
     beliefs: list[float]
@@ -41,7 +41,7 @@ class FEPStateResponse(BaseModel):
     precision_weights: dict[str, float] | None = None
 
 
-# PURPOSE: FEPDashboardResponse の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 class FEPDashboardResponse(BaseModel):
     """ダッシュボード分析データ。"""
     total_steps: int = 0
@@ -157,7 +157,7 @@ async def fep_dashboard() -> FEPDashboardResponse:
 # Convergence Tracker — E2E endpoint
 # =============================================================================
 
-# PURPOSE: ConvergenceRecordRequest の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 class ConvergenceRecordRequest(BaseModel):
     """Convergence 記録リクエスト。"""
     agent_series: str | None = None

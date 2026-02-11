@@ -19,7 +19,7 @@ from .pattern_cache import PatternCache
 from .syntax_validator import CCLSyntaxValidator
 
 
-# PURPOSE: GenerationResult の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 @dataclass
 # PURPOSE: Result of CCL generation.
 class GenerationResult:

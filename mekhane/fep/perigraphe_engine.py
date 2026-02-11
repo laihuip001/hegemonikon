@@ -52,7 +52,7 @@ class ScopeScale(Enum):
     MACRO = "macro"  # 広域的
 
 
-# PURPOSE: KhoraResult の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 @dataclass
 # PURPOSE: P1 Khōra 評価結果
 class KhoraResult:

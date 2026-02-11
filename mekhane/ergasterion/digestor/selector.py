@@ -73,7 +73,7 @@ try:
     from mekhane.anamnesis.models.paper import Paper
 except ImportError:
     # フォールバック: 簡易 Paper dataclass
-    # PURPOSE: Paper の機能を提供する
+    # PURPOSE: の統一的インターフェースを実現する
     @dataclass
     # PURPOSE: クラス: Paper
     class Paper:

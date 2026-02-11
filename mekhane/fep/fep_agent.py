@@ -627,7 +627,7 @@ class HegemonikónFEPAgent:
             "confidence": confidence_idx,
         }
 
-    # PURPOSE: Return inference history for analysis.
+    # PURPOSE: inference history for analysis の利用を可能にする
     def get_history(self) -> List[Dict[str, Any]]:
         """Return inference history for analysis."""
         return self._history

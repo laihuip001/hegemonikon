@@ -25,7 +25,7 @@ from dataclasses import dataclass, asdict
 TRACES_BASE = Path("/home/makaron8426/oikos/mneme/.hegemonikon/ccl_traces")
 
 
-# PURPOSE: Step の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 @dataclass
 # PURPOSE: A single step in CCL execution.
 class Step:
@@ -37,7 +37,7 @@ class Step:
     note: str
 
 
-# PURPOSE: Session の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 @dataclass
 # PURPOSE: A CCL execution session.
 class Session:

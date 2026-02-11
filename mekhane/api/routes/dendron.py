@@ -25,7 +25,7 @@ class DendronFileResult(BaseModel):
     issues: list[str] = []
 
 
-# PURPOSE: DendronSummary の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 class DendronSummary(BaseModel):
     """Dendron レポートサマリー。"""
     total_files: int = 0
@@ -37,7 +37,7 @@ class DendronSummary(BaseModel):
     issues: list[str] = []
 
 
-# PURPOSE: DendronReportResponse の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 class DendronReportResponse(BaseModel):
     """Dendron レポート。"""
     summary: DendronSummary
@@ -47,13 +47,13 @@ class DendronReportResponse(BaseModel):
     )
 
 
-# PURPOSE: DendronCheckRequest の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 class DendronCheckRequest(BaseModel):
     """個別ファイルチェックリクエスト。"""
     path: str = Field(description="チェック対象のファイルパス")
 
 
-# PURPOSE: DendronCheckResponse の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 class DendronCheckResponse(BaseModel):
     """個別ファイルチェック結果。"""
     path: str

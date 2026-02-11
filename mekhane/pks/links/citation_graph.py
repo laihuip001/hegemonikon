@@ -28,7 +28,7 @@ class CitationType(Enum):
     MENTIONS = "mentions"  # 単なる言及
 
 
-# PURPOSE: Citation の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 @dataclass
 # PURPOSE: 引用リレーション
 class Citation:
@@ -41,7 +41,7 @@ class Citation:
     confidence: float = 0.5  # 分類の確信度
 
 
-# PURPOSE: CitationStats の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 @dataclass
 # PURPOSE: 論文の引用統計
 class CitationStats:

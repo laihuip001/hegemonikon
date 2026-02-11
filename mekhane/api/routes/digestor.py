@@ -22,7 +22,7 @@ DIGESTOR_DIR = Path.home() / ".hegemonikon" / "digestor"
 
 
 # ─── Models ───────────────────────────────────────────────
-# PURPOSE: DigestCandidate の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 class DigestCandidate(BaseModel):
     """候補1件"""
     title: str
@@ -34,7 +34,7 @@ class DigestCandidate(BaseModel):
     suggested_templates: list[dict] = []
 
 
-# PURPOSE: DigestReport の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 class DigestReport(BaseModel):
     """1つのレポート"""
     timestamp: str
@@ -46,7 +46,7 @@ class DigestReport(BaseModel):
     filename: str = ""
 
 
-# PURPOSE: DigestReportListResponse の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 class DigestReportListResponse(BaseModel):
     """レポート一覧"""
     reports: list[DigestReport]

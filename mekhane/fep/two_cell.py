@@ -35,7 +35,7 @@ from typing import Dict, List, Optional, Tuple
 # =============================================================================
 
 
-# PURPOSE: TwoCell の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 @dataclass
 class TwoCell:
     """A 2-cell: transition between two derivatives of the same theorem.
@@ -87,7 +87,7 @@ class TwoCell:
         )
 
 
-# PURPOSE: DerivativeSpace の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 @dataclass
 class DerivativeSpace:
     """Weak 2-category structure for a single theorem's derivatives.

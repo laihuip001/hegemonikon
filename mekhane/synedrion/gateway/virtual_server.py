@@ -18,7 +18,7 @@ from mekhane.synedrion.gateway.policy_enforcer import PolicyDecision, PolicyEnfo
 logger = logging.getLogger(__name__)
 
 
-# PURPOSE: ToolRoute の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 @dataclass
 class ToolRoute:
     """ツールのルーティング情報"""
@@ -28,7 +28,7 @@ class ToolRoute:
     description: str = ""
 
 
-# PURPOSE: GatewayError の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 @dataclass
 class GatewayError:
     """Gateway エラーの統一フォーマット"""
@@ -51,7 +51,7 @@ class GatewayError:
         }
 
 
-# PURPOSE: RouteResult の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 @dataclass
 class RouteResult:
     """ルーティング結果"""
@@ -63,7 +63,7 @@ class RouteResult:
     auth_headers: dict[str, str] = field(default_factory=dict)
 
 
-# PURPOSE: VirtualServer の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 class VirtualServer:
     """
     複数の MCP サーバーを束ねる仮想サーバー。

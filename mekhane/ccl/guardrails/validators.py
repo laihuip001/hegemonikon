@@ -15,7 +15,7 @@ from typing import List, Dict, Set, Optional
 import re
 
 
-# PURPOSE: ValidationError の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 @dataclass
 # PURPOSE: 検証エラー
 class ValidationError:
@@ -27,7 +27,7 @@ class ValidationError:
     suggestion: str
 
 
-# PURPOSE: ValidationResult の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 @dataclass
 # PURPOSE: 検証結果
 class ValidationResult:

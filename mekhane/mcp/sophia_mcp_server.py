@@ -150,7 +150,7 @@ async def list_tools():
             inputSchema={"type": "object", "properties": {}},
         ),
     ]
-# PURPOSE: Handle tool calls.
+# PURPOSE: tool calls の安全な処理を保証する
 
 
 @server.call_tool(validate_input=True)

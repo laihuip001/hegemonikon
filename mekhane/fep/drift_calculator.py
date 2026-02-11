@@ -38,7 +38,7 @@ from typing import Dict, List, Optional, Tuple
 # =============================================================================
 
 
-# PURPOSE: DriftResult の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 @dataclass
 class DriftResult:
     """Result of drift computation between source and compressed texts.

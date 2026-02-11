@@ -16,7 +16,7 @@ from typing import Any
 logger = logging.getLogger(__name__)
 
 
-# PURPOSE: AuthMode の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 class AuthMode(Enum):
     """認証モード"""
     PASSTHROUGH = "passthrough"    # 認証なし (デフォルト)
@@ -24,7 +24,7 @@ class AuthMode(Enum):
     OAUTH2 = "oauth2"            # OAuth 2.1 (将来)
 
 
-# PURPOSE: AuthContext の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 @dataclass
 class AuthContext:
     """認証コンテキスト — リクエストに付与される認証情報"""
@@ -39,7 +39,7 @@ class AuthContext:
         return self.mode == AuthMode.PASSTHROUGH
 
 
-# PURPOSE: ServerAuthConfig の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 @dataclass
 class ServerAuthConfig:
     """サーバーごとの認証設定"""
@@ -49,7 +49,7 @@ class ServerAuthConfig:
     oauth_config: dict[str, Any] | None = None
 
 
-# PURPOSE: AuthProxy の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 class AuthProxy:
     """
     MCP Gateway の認証プロキシ。

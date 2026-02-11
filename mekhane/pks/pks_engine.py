@@ -36,7 +36,7 @@ if str(_HEGEMONIKON_ROOT) not in sys.path:
 # --- Data Models ---
 
 
-# PURPOSE: KnowledgeNugget の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 @dataclass
 # PURPOSE: 知識の最小単位 — PKS がプッシュする情報の粒
 class KnowledgeNugget:

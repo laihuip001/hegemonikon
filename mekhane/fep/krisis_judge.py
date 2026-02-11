@@ -48,7 +48,7 @@ class VerdictType(Enum):
     REVISE = "revise"  # 修正要求
 
 
-# PURPOSE: Objection の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 @dataclass
 # PURPOSE: 異議オブジェクト
 class Objection:
@@ -65,7 +65,7 @@ class Objection:
     severity: float
 
 
-# PURPOSE: KrisisResult の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 @dataclass
 # PURPOSE: A2 Krisis 判定結果
 class KrisisResult:

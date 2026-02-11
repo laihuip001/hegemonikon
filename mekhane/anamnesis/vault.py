@@ -26,7 +26,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-# PURPOSE: Manages secure file operations for the Vault.
+# PURPOSE: secure file operations for the Vault を一元管理し整合性を保つ
 class VaultManager:
     """Manages secure file operations for the Vault."""
 

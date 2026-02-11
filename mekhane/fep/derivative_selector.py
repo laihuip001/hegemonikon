@@ -1081,7 +1081,7 @@ A4_PATTERNS: Dict[str, List[str]] = {
 # =============================================================================
 
 
-# PURPOSE: DerivativeRecommendation の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 @dataclass
 # PURPOSE: Result of derivative selection.
 class DerivativeRecommendation:

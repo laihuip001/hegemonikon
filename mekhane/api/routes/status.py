@@ -25,7 +25,7 @@ class HealthItemResponse(BaseModel):
     emoji: str = ""
 
 
-# PURPOSE: HealthReportResponse の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 class HealthReportResponse(BaseModel):
     """全体ヘルスレポート。"""
     timestamp: str
@@ -33,7 +33,7 @@ class HealthReportResponse(BaseModel):
     score: float = Field(ge=0.0, le=1.0, description="0.0-1.0 総合スコア")
 
 
-# PURPOSE: HealthCheckResponse の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 class HealthCheckResponse(BaseModel):
     """軽量ヘルスチェック。"""
     status: str = "ok"

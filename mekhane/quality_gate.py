@@ -19,7 +19,7 @@ from pathlib import Path
 from typing import Optional
 
 
-# PURPOSE: MetrikaResult の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 @dataclass
 # PURPOSE: Metrika 5門の検証結果
 class MetrikaResult:

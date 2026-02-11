@@ -174,7 +174,7 @@ class Embedder:
         return normalized.astype(np.float32)
 
 
-# PURPOSE: GnosisIndexV2 の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 class GnosisIndexV2:
     """
     Gnōsis論文インデックス V2

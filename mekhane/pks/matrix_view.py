@@ -22,7 +22,7 @@ from mekhane.pks.llm_client import PKSLLMClient
 from mekhane.pks.pks_engine import KnowledgeNugget
 
 
-# PURPOSE: MatrixColumn の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 @dataclass
 # PURPOSE: 比較表の列定義
 class MatrixColumn:
@@ -32,7 +32,7 @@ class MatrixColumn:
     extractor: str = ""  # Phase 2: LLM 抽出キー
 
 
-# PURPOSE: MatrixRow の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 @dataclass
 # PURPOSE: 比較表の行（1 nugget = 1 行）
 class MatrixRow:

@@ -48,7 +48,7 @@ W_VALUE_ALIGNMENT = 0.5
 W_COMPLEMENTARITY = 0.3
 
 
-# PURPOSE: ConvergenceScore の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 @dataclass
 class ConvergenceScore:
     """普遍的 Convergence スコア — Pushout として定義.

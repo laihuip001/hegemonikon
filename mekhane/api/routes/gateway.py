@@ -81,14 +81,14 @@ def _get_gateway():
 
 # --- Models ---
 
-# PURPOSE: CheckRequest の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 class CheckRequest(BaseModel):
     """ツール呼び出しの事前チェック"""
     server_name: str
     tool_name: str
 
 
-# PURPOSE: CheckResponse の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 class CheckResponse(BaseModel):
     """チェック結果"""
     allowed: bool

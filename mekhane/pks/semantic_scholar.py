@@ -33,7 +33,7 @@ from typing import Optional
 # Data Classes
 # ---------------------------------------------------------------------------
 
-# PURPOSE: Paper の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 @dataclass
 class Paper:
     """Semantic Scholar の論文メタデータ"""
@@ -90,7 +90,7 @@ UNAUTHENTICATED_DELAY = 1.0  # seconds between requests
 AUTHENTICATED_DELAY = 1.1    # 1 req/sec + margin
 
 
-# PURPOSE: SemanticScholarClient の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 class SemanticScholarClient:
     """Semantic Scholar Academic Graph API クライアント
 

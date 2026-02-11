@@ -33,7 +33,7 @@ from dataclasses import dataclass, field
 from typing import Optional
 
 
-# PURPOSE: LogEntry の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 @dataclass
 # PURPOSE: ログエントリ
 class LogEntry:
@@ -45,7 +45,7 @@ class LogEntry:
     raw: str
 
 
-# PURPOSE: LogSummary の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 @dataclass
 # PURPOSE: ログの要約
 class LogSummary:

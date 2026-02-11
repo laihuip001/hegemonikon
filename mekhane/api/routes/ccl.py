@@ -17,11 +17,11 @@ from pydantic import BaseModel, Field
 
 # --- Pydantic Models ---
 
-# PURPOSE: CCLParseRequest の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 class CCLParseRequest(BaseModel):
     ccl: str = Field(description="CCL 式 (例: '/noe+ >> /met')")
 
-# PURPOSE: CCLParseResponse の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 class CCLParseResponse(BaseModel):
     success: bool
     ccl: str
@@ -31,31 +31,31 @@ class CCLParseResponse(BaseModel):
     plan_template: Optional[str] = None
     error: Optional[str] = None
 
-# PURPOSE: CCLExecuteRequest の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 class CCLExecuteRequest(BaseModel):
     ccl: str = Field(description="CCL 式")
     context: str = Field(default="", description="実行コンテキスト")
 
-# PURPOSE: CCLExecuteResponse の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 class CCLExecuteResponse(BaseModel):
     success: bool
     ccl: str
     result: Optional[dict[str, Any]] = None
     error: Optional[str] = None
 
-# PURPOSE: WFSummary の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 class WFSummary(BaseModel):
     name: str
     description: str
     ccl: str = ""
     modes: list[str] = []
 
-# PURPOSE: WFListResponse の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 class WFListResponse(BaseModel):
     total: int
     workflows: list[WFSummary]
 
-# PURPOSE: WFDetailResponse の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 class WFDetailResponse(BaseModel):
     name: str
     description: str

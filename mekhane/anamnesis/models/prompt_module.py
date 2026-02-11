@@ -11,7 +11,7 @@ from datetime import datetime
 from typing import Optional
 
 
-# PURPOSE: PromptModule の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 @dataclass
 # PURPOSE: Library プロンプトモジュール統一スキーマ
 class PromptModule:

@@ -51,7 +51,7 @@ _THEOREM_IDS = {
 
 # --- Pydantic Models ---
 
-# PURPOSE: LinkGraphNode の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 class LinkGraphNode(BaseModel):
     """知識ノード (射影情報付き)."""
     id: str
@@ -66,7 +66,7 @@ class LinkGraphNode(BaseModel):
     orbit_radius: float = Field(description="定理ノードからの軌道半径")
 
 
-# PURPOSE: LinkGraphEdge の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 class LinkGraphEdge(BaseModel):
     """知識ノード間のエッジ."""
     source: str
@@ -74,7 +74,7 @@ class LinkGraphEdge(BaseModel):
     type: str = Field(description="outlink or backlink")
 
 
-# PURPOSE: LinkGraphFullResponse の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 class LinkGraphFullResponse(BaseModel):
     """全データ一括レスポンス."""
     nodes: list[LinkGraphNode]
@@ -82,7 +82,7 @@ class LinkGraphFullResponse(BaseModel):
     meta: dict[str, Any]
 
 
-# PURPOSE: LinkGraphStatsResponse の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 class LinkGraphStatsResponse(BaseModel):
     """統計レスポンス."""
     total_nodes: int

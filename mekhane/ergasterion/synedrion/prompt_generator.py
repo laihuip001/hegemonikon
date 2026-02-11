@@ -21,7 +21,7 @@ from pathlib import Path
 from typing import Optional
 
 
-# PURPOSE: Perspective の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 @dataclass
 # PURPOSE: A single orthogonal review perspective = Domain × Axis.
 class Perspective:

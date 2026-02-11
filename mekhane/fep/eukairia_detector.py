@@ -55,7 +55,7 @@ class OpportunityDecision(Enum):
     PASS = "pass"  # 見送り — この機会は取らない
 
 
-# PURPOSE: EukairiaResult の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 @dataclass
 # PURPOSE: 好機判定結果
 class EukairiaResult:

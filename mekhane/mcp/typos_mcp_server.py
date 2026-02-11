@@ -52,7 +52,7 @@ log(f"Added to path: {Path(__file__).parent.parent}")
 
 
 # ============ Suppress stdout during imports ============
-# PURPOSE: StdoutSuppressor の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 class StdoutSuppressor:
     def __init__(self):
         self._null = io.StringIO()

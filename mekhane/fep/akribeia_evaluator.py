@@ -44,7 +44,7 @@ class PathosDerivative(Enum):
     SOMATIC = "soma"  # 身体的 (感情の身体反応)
 
 
-# PURPOSE: PathosResult の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 @dataclass
 # PURPOSE: A1 Pathos 評価結果
 class PathosResult:

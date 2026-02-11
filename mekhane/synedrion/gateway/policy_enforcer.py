@@ -23,7 +23,7 @@ logger = logging.getLogger(__name__)
 POLICY_FILE = Path(__file__).parent / "policy.yaml"
 
 
-# PURPOSE: PolicyDecision の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 class PolicyDecision(Enum):
     """ポリシー判定結果"""
     ALLOW = "allow"
@@ -31,7 +31,7 @@ class PolicyDecision(Enum):
     REQUIRE_APPROVAL = "require_approval"
 
 
-# PURPOSE: PolicyResult の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 @dataclass
 class PolicyResult:
     """ポリシー判定の詳細結果"""
@@ -42,7 +42,7 @@ class PolicyResult:
     message: str = ""
 
 
-# PURPOSE: RateLimitWindow の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 @dataclass
 class RateLimitWindow:
     """レートリミット管理用のスライディングウィンドウ"""
@@ -72,7 +72,7 @@ class RateLimitWindow:
         return max(0, self.max_requests - len(self.timestamps))
 
 
-# PURPOSE: PolicyEnforcer の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 class PolicyEnforcer:
     """
     MCP Gateway のポリシー強制エンジン。

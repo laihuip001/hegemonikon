@@ -21,7 +21,7 @@ class PostcheckRequest(BaseModel):
     content: str = Field(description="チェック対象テキスト")
 
 
-# PURPOSE: PostcheckResult の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 class PostcheckResult(BaseModel):
     """個別チェック結果。"""
     requirement: str
@@ -29,7 +29,7 @@ class PostcheckResult(BaseModel):
     detail: str = ""
 
 
-# PURPOSE: PostcheckResponse の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 class PostcheckResponse(BaseModel):
     """ポストチェック結果。"""
     wf_name: str
@@ -39,14 +39,14 @@ class PostcheckResponse(BaseModel):
     formatted: str = ""
 
 
-# PURPOSE: SELItem の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 class SELItem(BaseModel):
     """SEL enforcement 項目。"""
     wf_name: str
     modes: dict[str, Any] = {}
 
 
-# PURPOSE: SELListResponse の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 class SELListResponse(BaseModel):
     """全WF の SEL enforcement 一覧。"""
     items: list[SELItem]

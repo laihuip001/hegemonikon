@@ -64,7 +64,7 @@ class ExecutionStatus(Enum):
     ABORTED = "aborted"  # 中断
 
 
-# PURPOSE: ExecutionContext の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 @dataclass
 # PURPOSE: 実行コンテキスト
 class ExecutionContext:

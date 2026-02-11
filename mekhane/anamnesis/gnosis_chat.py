@@ -96,7 +96,7 @@ class ConversationHistory:
         return len(self.turns) // 2
 
 
-# PURPOSE: Reranker の機能を提供する
+# PURPOSE: の統一的インターフェースを実現する
 class Reranker:
     """Cross-encoder Reranker for precision improvement.
 

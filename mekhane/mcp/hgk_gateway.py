@@ -31,6 +31,7 @@ if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
 from mcp.server.fastmcp import FastMCP
+from mcp.server.transport_security import TransportSecuritySettings
 
 # =============================================================================
 # Configuration
@@ -38,6 +39,10 @@ from mcp.server.fastmcp import FastMCP
 
 GATEWAY_HOST = os.getenv("HGK_GATEWAY_HOST", "127.0.0.1")
 GATEWAY_PORT = int(os.getenv("HGK_GATEWAY_PORT", "8765"))
+
+# Allowed hosts for DNS rebinding protection
+_default_hosts = "localhost,127.0.0.1,hegemonikon.tail3b6058.ts.net"
+ALLOWED_HOSTS = os.getenv("HGK_GATEWAY_ALLOWED_HOSTS", _default_hosts).split(",")
 
 # =============================================================================
 # Gateway Server
@@ -47,6 +52,10 @@ mcp = FastMCP(
     "hgk-gateway",
     host=GATEWAY_HOST,
     port=GATEWAY_PORT,
+    transport_security=TransportSecuritySettings(
+        enable_dns_rebinding_protection=True,
+        allowed_hosts=ALLOWED_HOSTS,
+    ),
     instructions=(
         "Hegemonikón 出張 MCP Gateway。"
         "モバイルから HGK の認知機能にアクセスする。"

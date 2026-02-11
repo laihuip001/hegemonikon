@@ -13,7 +13,7 @@ triggers:
   - Trigonon / X-series を参照する時
   - 「なぜこの変換は正当か」を問う時
 
-risk_tier: low
+risk_tier: L1
 risks:
   - 抽象的な概念操作による誤解の可能性
   - 数学的厳密性と実用性の乖離

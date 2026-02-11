@@ -59,6 +59,7 @@ class LMQLBackend(LLMBackend):
         self.model = model
         self._available: Optional[bool] = None
 
+    # PURPOSE: LMQL 経由でクエリを実行
     def query(self, prompt: str, context: str) -> str:
         """LMQL 経由でクエリを実行"""
         try:
@@ -71,6 +72,7 @@ class LMQLBackend(LLMBackend):
         except Exception as e:
             return f"[LMQL Error] {e}"
 
+    # PURPOSE: LMQL パイプラインが利用可能か
     def is_available(self) -> bool:
         """LMQL パイプラインが利用可能か"""
         if self._available is None:
@@ -91,6 +93,7 @@ class OpenAIBackend(LLMBackend):
         self.model = model
         self._available: Optional[bool] = None
 
+    # PURPOSE: OpenAI API でクエリを実行
     def query(self, prompt: str, context: str) -> str:
         """OpenAI API でクエリを実行"""
         import openai
@@ -109,6 +112,7 @@ class OpenAIBackend(LLMBackend):
         )
         return response.choices[0].message.content or "{}"
 
+    # PURPOSE: OpenAI API キーが設定されているか
     def is_available(self) -> bool:
         """OpenAI API キーが設定されているか"""
         if self._available is None:
@@ -123,6 +127,7 @@ class StubBackend(LLMBackend):
     def __init__(self, response: Optional[str] = None):
         self._response = response
 
+    # PURPOSE: 固定レスポンスを返す (テスト用)
     def query(self, prompt: str, context: str) -> str:
         """固定レスポンスを返す (テスト用)"""
         if self._response:
@@ -135,6 +140,7 @@ class StubBackend(LLMBackend):
             }
         )
 
+    # PURPOSE: バックエンドが利用可能か (常にTrue)
     def is_available(self) -> bool:
         return True
 

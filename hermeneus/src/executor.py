@@ -173,7 +173,7 @@ class WorkflowExecutor:
             
             # Phase 2: Execute
             pipeline.execute_result = await self._phase_execute(
-                ccl, context, model
+                ccl, context, model, lmql_code=pipeline.lmql_code
             )
             if not pipeline.execute_result.success:
                 pipeline.success = False
@@ -235,9 +235,13 @@ class WorkflowExecutor:
             from hermeneus.src import compile_ccl
             from hermeneus.src.macros import get_all_macros
 
-            # Auto-load all registered macros (builtin + ccl/macros/)
-            macros = get_all_macros()
-            lmql_code = compile_ccl(ccl, macros=macros, model=model)
+            # Wrap in thread to avoid blocking loop (file I/O + parsing)
+            def _compile_task():
+                # Auto-load all registered macros (builtin + ccl/macros/)
+                macros = get_all_macros()
+                return compile_ccl(ccl, macros=macros, model=model)
+
+            lmql_code = await asyncio.to_thread(_compile_task)
             
             return PhaseResult(
                 phase=ExecutionPhase.COMPILE,
@@ -257,7 +261,8 @@ class WorkflowExecutor:
         self,
         ccl: str,
         context: str,
-        model: str
+        model: str,
+        lmql_code: Optional[str] = None
     ) -> PhaseResult:
         """実行フェーズ
         
@@ -272,9 +277,14 @@ class WorkflowExecutor:
             from hermeneus.src.macros import get_all_macros
             from hermeneus.src.runtime import LMQLExecutor, ExecutionConfig
             
-            # Step 1: compile (LMQL コード生成)
-            macros = get_all_macros()
-            lmql_code = compile_ccl(ccl, macros=macros, model=model)
+            # Step 1: compile (LMQL コード生成) - provided or generated
+            if not lmql_code:
+                # Wrap in thread to avoid blocking loop (file I/O + parsing)
+                def _compile_task():
+                    macros = get_all_macros()
+                    return compile_ccl(ccl, macros=macros, model=model)
+
+                lmql_code = await asyncio.to_thread(_compile_task)
             
             # Step 2: LLM で実行 (非同期)
             config = ExecutionConfig(model=model)

@@ -124,23 +124,48 @@ class OperatorAgent(AuditAgent):
         """コード内の演算子使用をチェック"""
         issues = []
 
-        # 危険な演算子パターン
-        dangerous_patterns = [
-            (r"==\s*True\b", "OP-020", "== True は冗長。直接 if x: を使用"),
-            (r"==\s*False\b", "OP-021", "== False は冗長。if not x: を使用"),
-            (r"!=\s*None\b", "OP-022", "!= None より is not None を推奨"),
-            (r"==\s*None\b", "OP-023", "== None より is None を推奨"),
+        # 冗長な演算子パターン
+        style_patterns = [
+            (r"==\s*True\b", "OP-020", "== True は冗長。直接 if x: を使用", AuditSeverity.LOW),
+            (r"==\s*False\b", "OP-021", "== False は冗長。if not x: を使用", AuditSeverity.LOW),
+            (r"!=\s*None\b", "OP-022", "!= None より is not None を推奨", AuditSeverity.LOW),
+            (r"==\s*None\b", "OP-023", "== None より is None を推奨", AuditSeverity.LOW),
         ]
 
-        for pattern, code, message in dangerous_patterns:
+        for pattern, code, message, severity in style_patterns:
             for match in re.finditer(pattern, content):
                 issues.append(
                     AuditIssue(
                         agent=self.name,
                         code=code,
-                        severity=AuditSeverity.LOW,
+                        severity=severity,
                         message=message,
                         location=f"position {match.start()}",
+                    )
+                )
+
+        # セキュリティ危険パターン (HIGH/CRITICAL)
+        security_patterns = [
+            (r"\beval\s*\(", "SEC-001", "eval() は任意コード実行の脆弱性。ast.literal_eval() を検討", AuditSeverity.CRITICAL),
+            (r"\bexec\s*\(", "SEC-002", "exec() は任意コード実行の脆弱性", AuditSeverity.CRITICAL),
+            (r"\bos\.system\s*\(", "SEC-003", "os.system() は OS コマンドインジェクションの危険。subprocess.run() を推奨", AuditSeverity.HIGH),
+            (r"\bsubprocess\.\w+\(.*shell\s*=\s*True", "SEC-004", "shell=True はコマンドインジェクションの危険", AuditSeverity.HIGH),
+            (r"\b__import__\s*\(", "SEC-005", "__import__() は動的インポートの脆弱性。importlib を検討", AuditSeverity.MEDIUM),
+            (r"\bpickle\.loads?\s*\(", "SEC-006", "pickle は任意コード実行の脆弱性。信頼できないデータに使用禁止", AuditSeverity.HIGH),
+            (r"\byaml\.load\s*\((?!.*Loader\s*=)", "SEC-007", "yaml.load() は unsafe。yaml.safe_load() を使用", AuditSeverity.HIGH),
+            (r"\binput\s*\(.*\)", "SEC-008", "input() はサーバーサイドでは危険。Web フレームワーク経由を推奨", AuditSeverity.LOW),
+        ]
+
+        for pattern, code, message, severity in security_patterns:
+            for match in re.finditer(pattern, content, re.DOTALL):
+                issues.append(
+                    AuditIssue(
+                        agent=self.name,
+                        code=code,
+                        severity=severity,
+                        message=message,
+                        location=f"position {match.start()}",
+                        suggestion="セキュリティレビューを実施してください",
                     )
                 )
 

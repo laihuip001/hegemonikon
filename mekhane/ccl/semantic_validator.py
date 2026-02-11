@@ -11,6 +11,7 @@ Design decisions:
 - Graceful degradation if LLM unavailable
 """
 
+import logging
 import os
 from dataclasses import dataclass
 from typing import Optional, List
@@ -23,6 +24,9 @@ try:
     HAS_LLM = True
 except ImportError:
     HAS_LLM = False
+
+
+logger = logging.getLogger(__name__)
 
 
 # PURPOSE: Get API key from environment.
@@ -73,8 +77,8 @@ class CCLSemanticValidator:
             if api_key:
                 try:
                     self.client = genai.Client(api_key=api_key)
-                except Exception:
-                    pass  # TODO: Add proper error handling
+                except Exception as e:
+                    logger.warning("Failed to initialize Gemini client: %s", e)
 
     # PURPOSE: Load the semantic check prompt.
     def _load_prompt(self) -> str:

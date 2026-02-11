@@ -1,4 +1,6 @@
 ---
+lcm_state: beta
+version: 1.0
 description: "[CCL Macro] 3項振動 — @osc = /s~/dia~/noe"
 ---
 

@@ -104,14 +104,14 @@ cd ~/oikos/hegemonikon && python mekhane/anamnesis/cli.py search "query"
 
 > BC-5 (LBYL) と Python の EAFP は Function 公理 (Explore/Exploit) の二面性。
 
-| 状況 | 方針 | 根拠 |
-|:-----|:-----|:-----|
-| 破壊的操作 (rm, DELETE) | **LBYL** (BC-5) | 取り返しがつかない |
-| 探索的操作 (/zet, /poc) | **EAFP** | 失敗から学べる |
-| 新規作成 (write_to_file) | **EAFP** | 壊すものがない |
-| 既存変更 (replace) | **LBYL** (BC-5) | 既存の価値を守る |
-| 実験 (experiments/) | **EAFP** | 実験の目的は失敗から学ぶこと |
-| 本番 (kernel/) | **LBYL** (BC-5) | SACRED_TRUTH を守る |
+| 条件 | Khōra (場) | I-4 (Undo) | 方針 | 根拠 |
+|:-----|:-----------|:-----------|:-----|:-----|
+| kernel/, SACRED_TRUTH | 聖域 | 不可逆 | **LBYL** (BC-5) | 聖域 + Undo 不能 = 最大安全 |
+| experiments/, sandbox | 遊び場 | 可逆 (git) | **EAFP** | 遊び場 + Undo 可能 = 探索 |
+| pythosis/, designs/ | 作業場 | 可逆 (git) | **EAFP** | ただし commit 前レビュー |
+| 外部操作 (API, deploy) | 外界 | 不可逆 | **LBYL** (BC-5) | 外界 + Undo 不能 = 最大安全 |
+| 破壊的操作 (rm, DELETE) | 全域 | 条件次第 | **LBYL** (BC-5) | 取り返しがつかない |
+| 探索的操作 (/zet, /poc) | 全域 | git 前提 | **EAFP** | 失敗から学べる |
 
 ### BC-6: 確信度明示義務（Confidence Labels + TAINT 追跡）
 

@@ -4,7 +4,7 @@ description: "段取る — /bou+_/s+~(/p*/k)_V:{/dia}"
 
 # /ccl-plan: 計画策定マクロ
 
-> **CCL**: `@plan = /bou+_/s+~(/p*/k)_V:{/dia}`
+> **CCL**: `@plan = /bou+_/chr_/s+~(/p*/k)_V:{/dia}`
 > **用途**: 何かを始める前に計画を練りたいとき
 
 ## 展開

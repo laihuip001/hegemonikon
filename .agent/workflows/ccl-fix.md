@@ -4,7 +4,7 @@ description: "直す — C:{/dia+_/ene+}_I:[pass]{M:{/dox-}}"
 
 # /ccl-fix: 修正サイクルマクロ
 
-> **CCL**: `@fix = C:{/dia+_/ene+}_I:[pass]{M:{/dox-}}`
+> **CCL**: `@fix = /tel_C:{/dia+_/ene+}_I:[pass]{M:{/dox-}}`
 > **用途**: 問題を見つけて直すサイクルを収束まで回す
 
 ## 展開

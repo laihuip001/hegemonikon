@@ -35,6 +35,7 @@ class MacroDefinition:
     source_file: Path
 
 
+# PURPOSE: マクロ定義ファイル (.md) をパース
 def parse_macro_file(path: Path) -> Optional[MacroDefinition]:
     """
     マクロ定義ファイル (.md) をパース
@@ -88,6 +89,7 @@ def parse_macro_file(path: Path) -> Optional[MacroDefinition]:
     )
 
 
+# PURPOSE: ccl/macros/ から全マクロを読み込む
 def load_standard_macros() -> Dict[str, MacroDefinition]:
     """ccl/macros/ から全マクロを読み込む"""
     macros = {}
@@ -103,6 +105,7 @@ def load_standard_macros() -> Dict[str, MacroDefinition]:
     return macros
 
 
+# PURPOSE: .agent/workflows/ccl-*.md からマクロ展開形を読み込む
 def load_workflow_macros() -> Dict[str, str]:
     """
     .agent/workflows/ccl-*.md からマクロ展開形を読み込む
@@ -136,6 +139,7 @@ def load_workflow_macros() -> Dict[str, str]:
     return macros
 
 
+# PURPOSE: マクロ名から展開形を取得 (全ソース検索)
 def get_macro_expansion(name: str) -> Optional[str]:
     """マクロ名から展開形を取得 (全ソース検索)"""
     # 優先順位: ccl-*.md > ccl/macros/*.md > BUILTIN
@@ -153,6 +157,7 @@ def get_macro_expansion(name: str) -> Optional[str]:
     return None
 
 
+# PURPOSE: Expander 互換形式でマクロレジストリを返す
 def get_macro_registry() -> Dict[str, str]:
     """
     Expander 互換形式でマクロレジストリを返す
@@ -177,32 +182,38 @@ def get_macro_registry() -> Dict[str, str]:
 
 # 標準マクロ (ハードコード版 — ccl-*.md が見つからない場合のフォールバック)
 # ccl-*.md 由来の正規定義に同期 (2026-02-11)
+# v2: hub-only 9定理を既存+新規マクロに統合 (DX-008 対応)
 BUILTIN_MACROS = {
     # O-series (認知)
     "nous": 'R:{F:[×2]{/u+*^/u^}}_M:{/dox-}',
-    "dig": "/s+~(/p*/a)_/dia*/o+",
+    "dig": "/s+~(/p*/a)_/ana_/dia*/o+",  # +/ana (類推: 構造的類似性)
     # S-series (設計)
-    "plan": "/bou+_/s+~(/p*/k)_V:{/dia}",
-    "build": "/bou-{goal:define}_/s+_/ene+_V:{/dia-}_I:[pass]{M:{/dox-}}",
+    "plan": "/bou+_/chr_/s+~(/p*/k)_V:{/dia}",  # +/chr (活用: 手持ち資源確認)
+    "build": "/bou-{goal:define}_/chr_/kho_/s+_/ene+_V:{/dia-}_I:[pass]{M:{/dox-}}",  # +/chr,/kho
     "tak": "/s1_F:[×3]{/sta~/chr}_F:[×3]{/kho~/zet}_I:[gap]{/sop}_/euk_/bou",
     # H-series (動機)
     "osc": "R:{F:[/s,/dia,/noe]{L:[x]{x~x+}}, ~(/h*/k)}",
     "learn": "/dox+_*^/u+_M:{/bye+}",
     # A-series (精密)
-    "fix": "C:{/dia+_/ene+}_I:[pass]{M:{/dox-}}",
+    "fix": "/tel_C:{/dia+_/ene+}_I:[pass]{M:{/dox-}}",  # +/tel (目的適合)
     "vet": "/kho{git_diff}_C:{V:{/dia+}_/ene+}_/pra{test}_M:{/pis_/dox}",
-    "proof": 'V:{/noe~/dia}_I:[pass]{/ene{PROOF.md}}_E:{/ene{_limbo/}}',
+    "proof": '/kat_V:{/noe~/dia}_I:[pass]{/ene{PROOF.md}}_E:{/ene{_limbo/}}',  # +/kat (浄化)
     "syn": "/dia+{synteleia}_V:{/pis+}",
     # P-series (条件)
     "ground": "/tak-*/bou+{6w3h}~/p-_/ene-",
+    "ready": "/kho_/chr_/euk_/tak-",  # 新規: 見渡す (場・資源・好機・配列)
     # K-series (文脈)
     "kyc": "C:{/sop_/noe_/ene_/dia-}",
+    # Hub-only 統合 (DX-008)
+    "feel": "/pro_/ore~(/pis_/ana)",  # 新規: 感じる (前感情・欲求~確信・類推)
+    "clean": "/kat_/sym~(/tel_/dia-)",  # 新規: 絞る (浄化・結合~目的適合・判定)
     # Legacy (互換用)
     "think": "/noe+ >> V[] < 0.3",
     "review": "/dia+ _ /pre+ _ /sta.done",
 }
 
 
+# PURPOSE: 全マクロを取得 (統合)
 def get_all_macros() -> Dict[str, str]:
     """
     全マクロを取得 (統合)

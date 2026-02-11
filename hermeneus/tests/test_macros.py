@@ -240,30 +240,40 @@ class TestMacroE2E:
 
 
 # =============================================================================
-# E2E: 全12アクティブマクロ (CCL リファレンス v3.1)
+# E2E: 全16アクティブマクロ (CCL リファレンス v3.2 — DX-008 hub-only 統合)
 # =============================================================================
 
 
-# 全12マクロの定義 — ccl_macro_reference.md と同期
+# 全16マクロの定義 — BUILTIN_MACROS と同期
 ACTIVE_MACROS = {
-    "dig": "/s+~(/p*/a)_/dia*/o+",
-    "plan": "/bou+_/s+~(/p*/k)_V:{/dia}",
-    "build": "/bou-{goal:define}_/s+_/ene+_V:{/dia-}_I:[pass]{M:{/dox-}}",
-    "fix": "C:{/dia+_/ene+}_I:[pass]{M:{/dox-}}",
-    "vet": "/kho{git_diff}_C:{V:{/dia+}_/ene+}_/pra{test}_M:{/pis_/dox}",
-    "tak": "/s1_F:[×3]{/sta~/chr}_F:[×3]{/kho~/zet}_I:[gap]{/sop}_/euk_/bou",
-    "kyc": "C:{/sop_/noe_/ene_/dia-}",
-    "learn": "/dox+_*^/u+_M:{/bye+}",
+    # O-series
     "nous": 'R:{F:[×2]{/u+*^/u^}}_M:{/dox-}',
-    "ground": "/tak-*/bou+{6w3h}~/p-_/ene-",
+    "dig": "/s+~(/p*/a)_/ana_/dia*/o+",  # v2: +/ana
+    # S-series
+    "plan": "/bou+_/chr_/s+~(/p*/k)_V:{/dia}",  # v2: +/chr
+    "build": "/bou-{goal:define}_/chr_/kho_/s+_/ene+_V:{/dia-}_I:[pass]{M:{/dox-}}",  # v2: +/chr,/kho
+    "tak": "/s1_F:[×3]{/sta~/chr}_F:[×3]{/kho~/zet}_I:[gap]{/sop}_/euk_/bou",
+    # H-series
     "osc": "R:{F:[/s,/dia,/noe]{L:[x]{x~x+}}, ~(/h*/k)}",
-    "proof": 'V:{/noe~/dia}_I:[pass]{/ene{PROOF.md}}_E:{/ene{_limbo/}}',
+    "learn": "/dox+_*^/u+_M:{/bye+}",
+    # A-series
+    "fix": "/tel_C:{/dia+_/ene+}_I:[pass]{M:{/dox-}}",  # v2: +/tel
+    "vet": "/kho{git_diff}_C:{V:{/dia+}_/ene+}_/pra{test}_M:{/pis_/dox}",
+    "proof": '/kat_V:{/noe~/dia}_I:[pass]{/ene{PROOF.md}}_E:{/ene{_limbo/}}',  # v2: +/kat
     "syn": "/dia+{synteleia}_V:{/pis+}",
+    # P-series
+    "ground": "/tak-*/bou+{6w3h}~/p-_/ene-",
+    "ready": "/kho_/chr_/euk_/tak-",  # 新規: 見渡す
+    # K-series
+    "kyc": "C:{/sop_/noe_/ene_/dia-}",
+    # Hub-only 統合
+    "feel": "/pro_/ore~(/pis_/ana)",  # 新規: 感じる
+    "clean": "/kat_/sym~(/tel_/dia-)",  # 新規: 絞る
 }
 
 
 class TestAllMacrosE2E:
-    """全12アクティブマクロの E2E テスト (CCL リファレンス v3.1 準拠)"""
+    """全16アクティブマクロの E2E テスト (CCL リファレンス v3.2 準拠)"""
 
     @pytest.fixture
     def all_macros(self):
@@ -277,9 +287,14 @@ class TestAllMacrosE2E:
 
     @pytest.mark.parametrize("name,expected_fragment", [
         ("dig", "/s+"),
+        ("dig", "/ana"),  # hub-only 統合
         ("plan", "/bou+"),
+        ("plan", "/chr"),  # hub-only 統合
         ("build", "/ene+"),
+        ("build", "/chr"),  # hub-only 統合
+        ("build", "/kho"),  # hub-only 統合
         ("fix", "/dia+"),
+        ("fix", "/tel"),  # hub-only 統合
         ("vet", "git_diff"),
         ("tak", "/s1"),
         ("kyc", "/sop"),
@@ -288,7 +303,16 @@ class TestAllMacrosE2E:
         ("ground", "/bou+"),
         ("osc", "/s,/dia,/noe"),
         ("proof", "PROOF.md"),
+        ("proof", "/kat"),  # hub-only 統合
         ("syn", "synteleia"),
+        # 新規マクロ
+        ("ready", "/kho"),
+        ("ready", "/chr"),
+        ("ready", "/euk"),
+        ("feel", "/pro"),
+        ("feel", "/ore"),
+        ("clean", "/kat"),
+        ("clean", "/sym"),
     ])
     def test_macro_expands(self, all_macros, name, expected_fragment):
         """各マクロが正しいCCLに展開される"""
@@ -311,7 +335,7 @@ class TestAllMacrosE2E:
     # --- レジストリ整合性テスト ---
 
     def test_all_active_macros_in_registry(self, all_macros):
-        """全12マクロがレジストリに存在する"""
+        """全16マクロがレジストリに存在する"""
         for name in ACTIVE_MACROS:
             assert name in all_macros, f"@{name} missing from registry"
 
@@ -319,8 +343,6 @@ class TestAllMacrosE2E:
         """レジストリの展開形がリファレンスと一致"""
         for name, expected in ACTIVE_MACROS.items():
             actual = all_macros.get(name, "")
-            # WF ファイル由来の展開形が優先される場合があるので、
-            # BUILTIN_MACROS の定義と一致するか確認
             assert actual, f"@{name} has empty expansion"
 
     # --- AST ノード数テスト ---
@@ -331,7 +353,28 @@ class TestAllMacrosE2E:
         result = expand_ccl(f"@{name}", macros=all_macros)
         ast = parser.parse(result.expanded)
         if ast is not None:
-            # AST はリストまたはノード
             if isinstance(ast, list):
                 assert len(ast) >= 1, f"@{name} AST is empty"
+
+    # --- Hub-Only 定理カバレッジテスト ---
+
+    def test_hub_only_coverage(self, all_macros):
+        """hub-only 9定理が全てマクロ経由でアクセス可能"""
+        hub_only_theorems = {
+            "/sym": "clean",   # K1 Symplokē
+            "/ana": "dig",     # K3 Analogia (+ feel)
+            "/tak": "ready",   # P1 Taxis (既に @tak あり)
+            "/euk": "ready",   # P3 Eukairia
+            "/kat": "proof",   # A1 Katharsis (+ clean)
+            "/chr": "plan",    # S3 Chrēsis (+ build, ready)
+            "/kho": "build",   # P2 Khōra (+ ready, vet)
+            "/tel": "fix",     # P4 Telos (+ clean)
+            "/ore": "feel",    # H3 Orexis
+        }
+        for wf, macro_name in hub_only_theorems.items():
+            expansion = all_macros.get(macro_name, "")
+            assert wf.lstrip("/") in expansion or wf in expansion, (
+                f"{wf} not found in @{macro_name} expansion: {expansion}"
+            )
+
 

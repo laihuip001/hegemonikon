@@ -4,7 +4,7 @@ description: "掘る — /s+~(/p*/a)_/dia*/o+"
 
 # /ccl-dig: 深掘りマクロ
 
-> **CCL**: `@dig = /s+~(/p*/a)_/dia*/o+`
+> **CCL**: `@dig = /s+~(/p*/a)_/ana_/dia*/o+`
 > **用途**: 多面的に深く考えたいとき
 
 ## 展開

@@ -4,7 +4,7 @@ description: "組む — /bou-{goal:define}_/s+_/ene+_V:{/dia-}_I:[pass]{M:{/dox
 
 # /ccl-build: 構築マクロ
 
-> **CCL**: `@build = /bou-{goal:define}_/s+_/ene+_V:{/dia-}_I:[pass]{M:{/dox-}}`
+> **CCL**: `@build = /bou-{goal:define}_/chr_/kho_/s+_/ene+_V:{/dia-}_I:[pass]{M:{/dox-}}`
 > **用途**: 0から作る。設計→実装→検証→記録の一気通貫
 > **圏論**: @eat (外→内: 消化) の随伴。内→外の具現化 = 自然関手
 

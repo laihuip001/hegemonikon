@@ -4,7 +4,7 @@ description: "裁く — V:{/noe~/dia}_I:[pass]{/ene{PROOF.md}}_E:{/ene{_limbo/}
 
 # /ccl-proof: 存在証明マクロ
 
-> **CCL**: `@proof = V:{/noe~/dia}_I:[pass]{/ene{PROOF.md}}_E:{/ene{_limbo/}}`
+> **CCL**: `@proof = /kat_V:{/noe~/dia}_I:[pass]{/ene{PROOF.md}}_E:{/ene{_limbo/}}`
 > **用途**: ファイル/ディレクトリの存在理由を証明
 > **暗黙**: FEP 公理を前提。confidence=1 → pass
 

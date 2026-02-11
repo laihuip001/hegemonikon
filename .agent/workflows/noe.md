@@ -30,6 +30,10 @@ category_theory:
       G_role: "G: Insight → Question（認識から自信を忘却し問いだけを残す = precision ↓）"
       drift: "Drift = unknown unknowns — 問えない問い。疑うべきかすら気づけない前提"
       insight: "自信 = 既知への重み付け(precision)を捨てることで問いが生まれる — Creator, 2026-02-10"
+  mathematical_basis:
+    L1: "前順序圏のガロア接続 — F(X) ≤ Y ⟺ X ≤ G(Y)"
+    L2: "[0,1]-豊穣圏 — Drift ∈ [0,1] は Hom 値"
+    L3: "弱2-圏 (将来) — 派生(nous/phro/meta/...)は 2-cell"
 cognitive_algebra:
   "+": 詳細分析（各フェーズで3倍の出力）
   "-": 要点分析（結論+理由1つのみ、5行以内）

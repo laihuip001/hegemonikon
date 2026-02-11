@@ -10,6 +10,10 @@ category_theory:
   unit: "η: Id_Mem → R∘L (boot→bye の保存率)"
   counit: "ε: L∘R → Id_Ses (bye→boot の復元率)"
   insight: "セッションは独立した外部情報。boot = eat の特殊ケース"
+  mathematical_basis:
+    L1: "前順序圏のガロア接続 — L(M) ≤ Y ⟺ M ≤ R(Y)"
+    L2: "[0,1]-豊穣圏 — Drift ∈ [0,1] は Hom 値"
+    L3: "弱2-圏 (将来) — 派生(+/-)は 2-cell"
   boot_bye_meta: "全11ペアの随伴の随伴（メタ随伴）。他のペアがセッション内で動くのに対し、boot⊣bye はセッション自体を開閉する"
   F_role: "F: Handoff → Session（圧縮状態にコンテキスト・関係性・温度を載せて展開）"
   creator_insight: "生の声、生のやり取り、生のコンテキスト、生の関係性を復元する試み — Creator, 2026-02-11"

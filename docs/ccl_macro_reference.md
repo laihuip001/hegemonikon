@@ -20,7 +20,7 @@
 | `@nous` | 問う | `R:{F:[×2]{/u+*^/u^}}_M:{/dox-}` |
 | `@ground` | 落とす | `/tak-*/bou+{6w3h}~/p-_/ene-` |
 | `@osc` | 揺する | `R:{F:[/s,/dia,/noe]{L:[x]{x~x+}}, ~(/h*/k)}` |
-| `@proof` | 裁く | `V:{/noe{axiom:FEP}~/dia}_I:[confidence=1]{/ene{output:PROOF.md}}_E:{/ene{action:move, to:_limbo/}}` |
+| `@proof` | 裁く | `V:{/noe~/dia}_I:[pass]{/ene{PROOF.md}}_E:{/ene{_limbo/}}` |
 
 ---
 

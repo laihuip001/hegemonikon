@@ -66,6 +66,7 @@ ccl/
 
 ## 関連リソース
 
+- **[Python 実装 → `mekhane/ccl/`](../mekhane/ccl/)** — パーサ、バリデータ、マクロ展開器
 - [Hegemonikón README](../README.md)
 - [kernel/SACRED_TRUTH.md](../kernel/SACRED_TRUTH.md)
 - [KI: Cognitive Algebra System](../.gemini/antigravity/knowledge/cognitive_algebra_system/)

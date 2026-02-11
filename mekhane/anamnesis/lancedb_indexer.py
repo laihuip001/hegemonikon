@@ -30,6 +30,16 @@ SESSIONS_DIR = Path(r"M:\Brain\.hegemonikon\sessions")
 DB_PATH = Path(r"M:\Brain\.hegemonikon\lancedb")
 TABLE_NAME = "sessions"
 
+# Pre-compiled regular expressions
+RE_EXPORTED_AT = re.compile(r"\d{4}-\d{2}-\d{2}T[\d:.]+")
+RE_MESSAGE_COUNT = re.compile(r"(\d+)")
+RE_CSS_COMMENT = re.compile(r"/\*.*?\*/", flags=re.DOTALL)
+RE_MEDIA_QUERY = re.compile(r"@media\s*\([^)]*\)\s*\{[^}]*\}")
+RE_MARKDOWN_CSS = re.compile(r"\.markdown[-\w]*\s*\{[^}]*\}")
+RE_THOUGHT_DURATION = re.compile(r"Thought for \d+s\s*")
+RE_THOUGHT_LESS = re.compile(r"Thought for <\d+s\s*")
+RE_CONSECUTIVE_NEWLINES = re.compile(r"\n{3,}")
+
 
 # PURPOSE: セッションドキュメントのスキーマ
 class SessionDocument(BaseModel):
@@ -61,7 +71,7 @@ def parse_session_file(filepath: Path) -> Optional[SessionDocument]:
         exported_at = ""
         for line in lines[:10]:
             if "**Exported**" in line:
-                match = re.search(r"\d{4}-\d{2}-\d{2}T[\d:.]+", line)
+                match = RE_EXPORTED_AT.search(line)
                 if match:
                     exported_at = match.group()
                 break
@@ -70,7 +80,7 @@ def parse_session_file(filepath: Path) -> Optional[SessionDocument]:
         message_count = 0
         for line in lines[:10]:
             if "**Messages**" in line:
-                match = re.search(r"(\d+)", line)
+                match = RE_MESSAGE_COUNT.search(line)
                 if match:
                     message_count = int(match.group(1))
                 break
@@ -96,20 +106,20 @@ def parse_session_file(filepath: Path) -> Optional[SessionDocument]:
 
         # CSS ノイズを除去
         # /* ... */ コメントを除去
-        full_content = re.sub(r"/\*.*?\*/", "", full_content, flags=re.DOTALL)
+        full_content = RE_CSS_COMMENT.sub("", full_content)
 
         # @media { ... } ブロックを除去
-        full_content = re.sub(r"@media\s*\([^)]*\)\s*\{[^}]*\}", "", full_content)
+        full_content = RE_MEDIA_QUERY.sub("", full_content)
 
         # .markdown-alert などの CSS ルールを除去
-        full_content = re.sub(r"\.markdown[-\w]*\s*\{[^}]*\}", "", full_content)
+        full_content = RE_MARKDOWN_CSS.sub("", full_content)
 
         # "Thought for Xs" を除去
-        full_content = re.sub(r"Thought for \d+s\s*", "", full_content)
-        full_content = re.sub(r"Thought for <\d+s\s*", "", full_content)
+        full_content = RE_THOUGHT_DURATION.sub("", full_content)
+        full_content = RE_THOUGHT_LESS.sub("", full_content)
 
         # 連続する空行を除去
-        full_content = re.sub(r"\n{3,}", "\n\n", full_content).strip()
+        full_content = RE_CONSECUTIVE_NEWLINES.sub("\n\n", full_content).strip()
 
         # プレビュー（最初の 500 文字）
         preview = full_content[:500].replace("\n", " ")

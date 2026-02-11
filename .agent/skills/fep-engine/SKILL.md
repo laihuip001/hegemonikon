@@ -26,6 +26,11 @@ lineage: |
 risk_tier: "L1"
 risks:
   - "認知設計パラメータの誤解釈による判断偏り"
+
+reversible: true
+requires_approval: false
+fallbacks:
+  - "Manual intervention"
 ---
 
 # FEP Cognitive Engine v2.0

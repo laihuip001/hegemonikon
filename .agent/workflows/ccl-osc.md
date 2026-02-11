@@ -1,5 +1,8 @@
 ---
 description: "[CCL Macro] 3項振動 — @osc = /s~/dia~/noe"
+
+lcm_state: beta
+version: "1.0.0"
 ---
 
 # /ccl-osc: 3項振動マクロ

@@ -14,6 +14,11 @@ triggers:
 risk_tier: "L1"
 risks:
   - "分類ミスによる優先順位の歪み"
+
+reversible: true
+requires_approval: false
+fallbacks:
+  - "Manual intervention"
 ---
 
 # Taxis Classifier

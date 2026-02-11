@@ -17,6 +17,11 @@ risk_tier: "L1"
 risks:
   - "WBC 偽陽性によるアラート疲れ"
   - "偽陰性による脅威の見逃し"
+
+reversible: true
+requires_approval: false
+fallbacks:
+  - "Manual intervention"
 ---
 
 # Synteleia WBC (白血球)

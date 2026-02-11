@@ -13,6 +13,11 @@ triggers:
 risk_tier: "L1"
 risks:
   - "テンプレート不整合による出力品質低下"
+
+reversible: true
+requires_approval: false
+fallbacks:
+  - "Manual intervention"
 ---
 
 # Poiema Generator

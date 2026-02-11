@@ -51,6 +51,11 @@ version: "2.6.0"
 risk_tier: "L0"
 risks:
   - "IDE 設定情報の陳腐化"
+
+reversible: true
+requires_approval: false
+fallbacks:
+  - "Manual intervention"
 ---
 
 ## Overview

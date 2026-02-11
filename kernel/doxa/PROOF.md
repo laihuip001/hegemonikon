@@ -1,4 +1,4 @@
-# PROOF.md — DX-008_claude_desktop_agent_review.md
+# PROOF.md — DX-010_claude_desktop_agent_review.md
 
 > **判定**: ✅ PASS
 > **確信度**: 85%
@@ -28,8 +28,8 @@
 ## 注意事項
 
 > [!WARNING]
-> **DX-008 ID 衝突**: `kernel/knowledge/doxa/DX-008_multilingual_reasoning_pattern/` と同一 ID。
-> いずれかの DX 番号を変更すべき。本文書 (2026-02-11) が後発のため、DX-009 へのリナンバリングを推奨。
+> **DX ID 衝突 (解消済み)**: 旧 DX-008 → DX-010 にリナンバリング。
+> `kernel/knowledge/doxa/DX-008_multilingual_reasoning_pattern/` との衝突を解消。
 
 ---
 

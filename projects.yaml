@@ -1,189 +1,145 @@
-# Hegemonikón Named Projects Registry
-# 名前付きプロジェクトの一元管理
-#
-# フィールド説明:
-#   name: 表示名
-#   description: 一行説明
-#   path: ディレクトリパス (hegemonikon/ からの相対)
-#   status: planning | active | mvp_complete | stable | paused
-#   phase: 現在フェーズ（自由記述）
-#   priority: high (毎回表示) | medium (週1) | low (月1)
-#   updated: 最終更新日 (YYYY-MM-DD)
-#   next_action: 次のアクション (stable は null)
-
 projects:
-  # === 層1: 登録済み PJ (更新) ===
-
   dendron:
-    name: "Dendron"
-    description: "存在証明検証ツール (L0-L3 × 4 Meta Layer マトリクス)"
-    path: "mekhane/dendron/"
-    status: "active"
-    phase: "Phase 1: 表層 L2/L3"
+    name: Dendron
+    description: 存在証明検証ツール (L0-L3 × 4 Meta Layer マトリクス)
+    path: mekhane/dendron/
+    status: active
+    phase: 'Phase 1: 表層 L2/L3'
     priority: high
-    updated: "2026-02-11"
-    next_action: "L2 関数 docstring PROOF 実装"
-
+    updated: '2026-02-11'
+    next_action: L2 関数 docstring PROOF 実装
   hermeneus:
-    name: "Hermēneus"
-    description: "CCL→LMQL コンパイラ + MCP サーバ"
-    path: "hermeneus/"
-    status: "active"
-    phase: "MCP 全ツール稼働"
+    name: Hermēneus
+    description: CCL→LMQL コンパイラ + MCP サーバ
+    path: hermeneus/
+    status: active
+    phase: MCP 全ツール稼働
     priority: high
-    updated: "2026-02-11"
-    next_action: "Phase 3 LangGraph 深化"
-
+    updated: '2026-02-11'
+    next_action: Phase 3 LangGraph 深化
   synteleia:
-    name: "Synteleia"
-    description: "6視点認知アンサンブル (8エージェント監査)"
-    path: "mekhane/synteleia/"
-    status: "active"
-    phase: "MVP実装済み・LLM層設計中"
+    name: Synteleia
+    description: 6視点認知アンサンブル (8エージェント監査)
+    path: mekhane/synteleia/
+    status: active
+    phase: MVP実装済み・LLM層設計中
     priority: medium
-    updated: "2026-02-11"
-    next_action: "LLM 統合設計の実装着手"
-
+    updated: '2026-02-11'
+    next_action: LLM 統合設計の実装着手
   synedrion:
-    name: "Synedrion"
-    description: "AI監査・偉人評議会"
-    path: "mekhane/synedrion/"
-    status: "active"
-    phase: "MVP実装中"
+    name: Synedrion
+    description: AI監査・偉人評議会
+    path: mekhane/synedrion/
+    status: active
+    phase: MVP実装中
     priority: medium
-    updated: "2026-02-11"
-    next_action: "ai_auditor.py 統合テスト"
-
+    updated: '2026-02-11'
+    next_action: ai_auditor.py 統合テスト
   pythosis:
-    name: "Pythōsis"
-    description: "Python哲学消化 (/eat[python]+)"
-    path: "pythosis/"
-    status: "paused"
-    phase: "Phase 2 — 12日放置"
+    name: Pythōsis
+    description: Python哲学消化 (/eat[python]+)
+    path: pythosis/
+    status: paused
+    phase: Phase 2 — 12日放置
     priority: low
-    updated: "2026-02-11"
-    next_action: "ライブラリマッピング再開"
-
+    updated: '2026-02-11'
+    next_action: ライブラリマッピング再開
   synergeia:
-    name: "Synergeia"
-    description: "分散AI実行基盤 (Jules/Gemini 並列)"
-    path: "synergeia/"
-    status: "stable"
-    phase: "運用中"
+    name: Synergeia
+    description: 分散AI実行基盤 (Jules/Gemini 並列)
+    path: synergeia/
+    status: stable
+    phase: 運用中
     priority: medium
-    updated: "2026-02-11"
+    updated: '2026-02-11'
     next_action: null
-
-  # === 層2: 新規登録 PJ ===
-
   hgk_app:
-    name: "HGK App"
-    description: "Hegemonikón 初期 Desktop App (Tauri+Vanilla)"
-    path: "hgk-app/"
-    status: "paused"
-    phase: "初期プロトタイプ — hgk-desktop に移行？"
+    name: HGK App
+    description: Hegemonikón 初期 Desktop App (Tauri+Vanilla)
+    path: hgk-app/
+    status: paused
+    phase: 初期プロトタイプ — hgk-desktop に移行？
     priority: low
-    updated: "2026-02-11"
-    next_action: "hgk-desktop との統合判断 (/noe+)"
-
+    updated: '2026-02-11'
+    next_action: hgk-desktop との統合判断 (/noe+)
   hgk_desktop:
-    name: "HGK Desktop"
-    description: "Hegemonikón Desktop App (Tauri+Vite+TS+Three.js)"
-    path: "hgk-desktop/"
-    status: "active"
-    phase: "白画面問題で中断"
+    name: HGK Desktop
+    description: Hegemonikón Desktop App (Tauri+Vite+TS+Three.js)
+    path: hgk-desktop/
+    status: active
+    phase: 白画面問題で中断
     priority: high
-    updated: "2026-02-11"
-    next_action: "白画面の原因診断・修正"
-
+    updated: '2026-02-11'
+    next_action: 白画面の原因診断・修正
   ccl_docs:
-    name: "CCL Docs"
-    description: "CCL 言語仕様ドキュメント・マクロ定義"
-    path: "ccl/"
-    status: "active"
-    phase: "仕様整備中"
+    name: CCL Docs
+    description: CCL 言語仕様ドキュメント・マクロ定義
+    path: ccl/
+    status: active
+    phase: 仕様整備中
     priority: medium
-    updated: "2026-02-11"
-    next_action: "mekhane/ccl との責務分担明確化 (/noe+)"
-
-  hegemonikon_guide:
-    name: "Hegemonikón Guide"
-    description: "静的サイト (プロジェクト紹介)"
-    path: "hegemonikon-guide/"
-    status: "paused"
-    phase: "用途・対象者の再検討が必要"
-    priority: low
-    updated: "2026-02-11"
-    next_action: "必要性判断 (/noe+)"
-
+    updated: '2026-02-11'
+    next_action: mekhane/ccl との責務分担明確化 (/noe+)
   experiments:
-    name: "Experiments"
-    description: "実験コード (activation steering, GPU bench等)"
-    path: "experiments/"
-    status: "paused"
-    phase: "4日放置"
+    name: Experiments
+    description: 実験コード (activation steering, GPU bench等)
+    path: experiments/
+    status: paused
+    phase: 4日放置
     priority: low
-    updated: "2026-02-11"
-    next_action: "成果の本体取込み判断"
-
+    updated: '2026-02-11'
+    next_action: 成果の本体取込み判断
   typos:
-    name: "Týpos"
-    description: "プロンプト言語 MCP サーバ"
-    path: "mekhane/ergasterion/typos/"
-    status: "active"
-    phase: "v3.0 タスク固有化完了"
+    name: Týpos
+    description: プロンプト言語 MCP サーバ
+    path: mekhane/ergasterion/typos/
+    status: active
+    phase: v3.0 タスク固有化完了
     priority: medium
-    updated: "2026-02-11"
-    next_action: "スコア改善の検証"
-
+    updated: '2026-02-11'
+    next_action: スコア改善の検証
   digestor:
-    name: "Digestor"
-    description: "論文自動消化パイプライン (Gnōsis→/eat)"
-    path: "(MCP server)"
-    status: "active"
-    phase: "パイプライン構築済み・日常運用設計待ち"
+    name: Digestor
+    description: 論文自動消化パイプライン (Gnōsis→/eat)
+    path: (MCP server)
+    status: active
+    phase: パイプライン構築済み・日常運用設計待ち
     priority: medium
-    updated: "2026-02-11"
-    next_action: "日常運用の仕組み設計 (cron/手動)"
-
-  # === 層3: mekhane 内部 (主要のみ) ===
-
+    updated: '2026-02-11'
+    next_action: 日常運用の仕組み設計 (cron/手動)
   fep:
-    name: "FEP Engine"
-    description: "自由エネルギー原理に基づく認知エンジン"
-    path: "mekhane/fep/"
-    status: "active"
-    phase: "コア実装完了・Rule 整備中"
+    name: FEP Engine
+    description: 自由エネルギー原理に基づく認知エンジン
+    path: mekhane/fep/
+    status: active
+    phase: コア実装完了・Rule 整備中
     priority: high
-    updated: "2026-02-11"
+    updated: '2026-02-11'
     next_action: null
-
   anamnesis:
-    name: "Anamnēsis"
-    description: "知識ベース (LanceDB ベクトル検索)"
-    path: "mekhane/anamnesis/"
-    status: "stable"
-    phase: "運用中"
+    name: Anamnēsis
+    description: 知識ベース (LanceDB ベクトル検索)
+    path: mekhane/anamnesis/
+    status: stable
+    phase: 運用中
     priority: medium
-    updated: "2026-02-11"
+    updated: '2026-02-11'
     next_action: null
-
   pks:
-    name: "PKS"
-    description: "プロアクティブ知識表面化"
-    path: "mekhane/pks/"
-    status: "stable"
-    phase: "運用中"
+    name: PKS
+    description: プロアクティブ知識表面化
+    path: mekhane/pks/
+    status: stable
+    phase: 運用中
     priority: medium
-    updated: "2026-02-11"
+    updated: '2026-02-11'
     next_action: null
-
   symploke:
-    name: "Symplokē"
-    description: "統合ハブ (boot/bye/各種統合)"
-    path: "mekhane/symploke/"
-    status: "stable"
-    phase: "運用中"
+    name: Symplokē
+    description: 統合ハブ (boot/bye/各種統合)
+    path: mekhane/symploke/
+    status: stable
+    phase: 運用中
     priority: medium
-    updated: "2026-02-11"
+    updated: '2026-02-11'
     next_action: null

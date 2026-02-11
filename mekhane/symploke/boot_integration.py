@@ -146,7 +146,7 @@ def _load_projects(project_root: Path) -> dict:
                 categories["研究・概念"].append(p)
             elif p.get("id") in ("ccl", "kernel", "pythosis"):
                 categories["理論・言語基盤"].append(p)
-            elif p.get("id") in ("hegemonikon-guide",):
+            elif p.get("id") in ("hgk-desktop",):
                 categories["補助"].append(p)
             else:
                 categories["コアランタイム"].append(p)

@@ -9,8 +9,11 @@ Usage: python pb_parser.py [pb_file]
 
 import struct
 import re
+import logging
 from pathlib import Path
 from datetime import datetime
+
+logger = logging.getLogger(__name__)
 
 
 # PURPOSE: Varint デコード
@@ -67,8 +70,10 @@ def extract_text_from_pb(filepath: Path):
                     # (最低10文字、ASCII/日本語を含む)
                     if len(text) >= 10 and re.search(r"[\u3040-\u9fff\w]{3,}", text):
                         texts.append(text)
-                except Exception:
-                    pass  # TODO: Add proper error handling
+                except UnicodeDecodeError:
+                    pass
+                except Exception as e:
+                    logger.warning(f"Error processing text field at offset {pos}: {e}")
 
             elif wire_type == 5:  # 32-bit
                 pos += 4
@@ -78,10 +83,12 @@ def extract_text_from_pb(filepath: Path):
                 pos += 1
                 errors += 1
 
-        except Exception:
+        except Exception as e:
+            logger.debug(f"Parser error at offset {pos}: {e}")
             pos += 1
             errors += 1
             if errors > 1000:
+                logger.error("Too many parser errors, aborting.")
                 break
 
     return texts
@@ -109,6 +116,12 @@ def save_as_markdown(texts: list, output_path: Path, source_name: str):
 # PURPOSE: CLI エントリポイント — Varint デコード
 def main():
     import sys
+
+    # Set up logging
+    logging.basicConfig(
+        level=logging.INFO,
+        format='%(asctime)s - %(levelname)s - %(message)s'
+    )
 
     if len(sys.argv) > 1:
         pb_file = Path(sys.argv[1])

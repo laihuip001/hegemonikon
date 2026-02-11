@@ -62,7 +62,7 @@ sel_enforcement:
 
 | ファイル | 内容 |
 |----------|------|
-| [modes.md](noe/modes.md) | 派生モード (nous/phro/meta/separate/align/metalearning) |
+| [modes.md](../workflow-modules/noe/modes.md) | 派生モード (nous/phro/meta/separate/align/metalearning) |
 
 ---
 
@@ -81,7 +81,7 @@ sel_enforcement:
 
 ## 派生モード
 
-> 詳細: [noe/modes.md](noe/modes.md)
+> 詳細: [noe/modes.md](../workflow-modules/noe/modes.md)
 
 | 派生 | 適用場面 | 出力特性 |
 |:-----|:---------|:---------|

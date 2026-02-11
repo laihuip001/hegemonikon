@@ -128,18 +128,20 @@ def main():
     import argparse
     import lancedb
 
-    parser = argparse.ArgumentParser(description="FEP Papers → Gnōsis Indexer")
+    parser = argparse.ArgumentParser(description="Papers → Gnōsis Indexer")
     parser.add_argument("--dry-run", action="store_true", help="変換のみ、投入しない")
     parser.add_argument("--stats", action="store_true", help="投入後に統計表示")
+    parser.add_argument("--input", type=str, default=None, help="入力 JSON ファイルパス")
     args = parser.parse_args()
 
-    if not COLLECTED_FILE.exists():
-        print(f"❌ {COLLECTED_FILE} が見つかりません。先に collect_fep_papers.py を実行してください。")
+    input_file = Path(args.input) if args.input else COLLECTED_FILE
+    if not input_file.exists():
+        print(f"❌ {input_file} が見つかりません。先に collect スクリプトを実行してください。")
         sys.exit(1)
 
     # 読み込み
-    collected = json.loads(COLLECTED_FILE.read_text())
-    print(f"📂 読込: {len(collected)} papers from {COLLECTED_FILE.name}")
+    collected = json.loads(input_file.read_text())
+    print(f"📂 読込: {len(collected)} papers from {input_file.name}")
 
     # レコード構築
     records = build_records(collected)

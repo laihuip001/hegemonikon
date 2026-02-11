@@ -155,7 +155,7 @@ view_file /home/makaron8426/oikos/hegemonikon/.agent/skills/akribeia/a3-gnome/SK
 
 ### Spoke: analogy 拡張モード
 
-> 詳細は [analogy-modes.md](file:///home/makaron8426/oikos/hegemonikon/.agent/workflows/gno/analogy-modes.md)
+> 詳細は [analogy-modes.md](file:///home/makaron8426/oikos/hegemonikon/.agent/workflow-modules/gno/analogy-modes.md)
 
 | 派生 | CCL | 目的 | Scale |
 |:-----|:----|:-----|:------|
@@ -248,7 +248,7 @@ result = select_derivative("A3", problem_context)
 4. **Extract**: 操作可能なルールを導出 — 比喩で気持ちよくならず行動に落とす
 5. **Counter**: 反例アナロジーを1つ挙げる — 思い込みを割る
 
-> 特化モード(8種)は [analogy-modes.md](file:///home/makaron8426/oikos/hegemonikon/.agent/workflows/gno/analogy-modes.md)
+> 特化モード(8種)は [analogy-modes.md](file:///home/makaron8426/oikos/hegemonikon/.agent/workflow-modules/gno/analogy-modes.md)
 
 ---
 

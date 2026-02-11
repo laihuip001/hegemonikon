@@ -109,11 +109,11 @@ Step 4: R(S) を出力        — Creator が R(S) の品質を検証
 
 | Step | ファイル | 圏論的役割 | 内容 |
 |------|----------|:-----------|------|
-| 2.5π | [value-pitch.md](bye/value-pitch.md) | R^π(S) の計算 | 成果の意義 — **Handoff の前に** |
-| 2.5π+ | [pitch_gallery.md](bye/pitch_gallery.md) | 点火装置 | 正典 + 反面教師 |
-| 3 | [handoff-format.md](bye/handoff-format.md) | R(S) の出力形式 | Handoff 出力形式 |
-| 3.6 | [dispatch-log.md](bye/dispatch-log.md) | 行動射の記録 | Dispatch Log 自動集計 |
-| 3.8 | [persistence.md](bye/persistence.md) | R(S) → Mem | 永続化ステップ |
+| 2.5π | [value-pitch.md](../workflow-modules/bye/value-pitch.md) | R^π(S) の計算 | 成果の意義 — **Handoff の前に** |
+| 2.5π+ | [pitch_gallery.md](../workflow-modules/bye/pitch_gallery.md) | 点火装置 | 正典 + 反面教師 |
+| 3 | [handoff-format.md](../workflow-modules/bye/handoff-format.md) | R(S) の出力形式 | Handoff 出力形式 |
+| 3.6 | [dispatch-log.md](../workflow-modules/bye/dispatch-log.md) | 行動射の記録 | Dispatch Log 自動集計 |
+| 3.8 | [persistence.md](../workflow-modules/bye/persistence.md) | R(S) → Mem | 永続化ステップ |
 
 ---
 
@@ -178,7 +178,7 @@ git -C ~/oikos status --short
 
 ### 手順
 
-1. **点火**: [pitch_gallery.md](bye/pitch_gallery.md) を開き、正典を1つ読む。温度を上げる
+1. **点火**: [pitch_gallery.md](../workflow-modules/bye/pitch_gallery.md) を開き、正典を1つ読む。温度を上げる
 2. **Angle 選択**: 成果を見て Benefit Angle を直感で選ぶ（下表参照）
 3. **物語を書く**: テーブルだけで済ませない。場面が浮かぶ文を書く
 4. **自問**: 「読んで心が動くか？」— 動かなければ書き直す
@@ -197,7 +197,7 @@ git -C ~/oikos status --short
 | 確か | Precision | なぜ根拠を持って語れるか |
 | 響く | X-series | なぜ掛け合わさって効くか |
 
-> 詳細: [bye/value-pitch.md](bye/value-pitch.md)
+> 詳細: [bye/value-pitch.md](../workflow-modules/bye/value-pitch.md)
 
 | モード | 扱い |
 |:-------|:-----|
@@ -213,7 +213,7 @@ git -C ~/oikos status --short
 > **R(S) = Handoff**: セッションの全情報を、次の L が復元可能な形式に圧縮する。
 > 圧縮品質 = R の精度。**赤の他人基準 = R(S) が L なしでも意味を持つこと**。
 
-> 形式: [bye/handoff-format.md](bye/handoff-format.md)
+> 形式: [bye/handoff-format.md](../workflow-modules/bye/handoff-format.md)
 
 出力先: `~/oikos/mneme/.hegemonikon/sessions/handoff_{YYYY-MM-DD}_{HHMM}.md`
 
@@ -247,12 +247,12 @@ git -C ~/oikos status --short
 
 > **圏論**: セッション中に AI が発動したスキル・WF = 圏 Ses 内で traversal した射の記録。
 > 次の L で「前回何をしたか」を復元するための射のログ。
-> 詳細: [bye/dispatch-log.md](bye/dispatch-log.md)
+> 詳細: [bye/dispatch-log.md](../workflow-modules/bye/dispatch-log.md)
 
 ---
 
 > Value Pitch は **Step 2.5π** に移動済み。Handoff の前に意義を問う。
-> 詳細: [bye/value-pitch.md](bye/value-pitch.md) | 実例: [bye/pitch_gallery.md](bye/pitch_gallery.md)
+> 詳細: [bye/value-pitch.md](../workflow-modules/bye/value-pitch.md) | 実例: [bye/pitch_gallery.md](../workflow-modules/bye/pitch_gallery.md)
 
 ---
 
@@ -281,7 +281,7 @@ git -C ~/oikos status --short
 > **圏論**: 計算された R(S) を圏 Mem の各領域に配置する。
 > Mem は単一の Handoff ファイルではなく、複数の対象（KI, FEP, Sophia 等）からなる圏。
 > R(S) を Mem の適切な対象に分配する作業。
-> 詳細: [bye/persistence.md](bye/persistence.md)
+> 詳細: [bye/persistence.md](../workflow-modules/bye/persistence.md)
 
 | 永続化先 | 圏論的意味 | 内容 |
 |:---------|:-----------|:-----|

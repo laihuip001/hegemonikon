@@ -55,8 +55,8 @@ category_theory:
 
 | ファイル | 内容 |
 |----------|------|
-| [basic-modes.md](dia/basic-modes.md) | 基本モード (aff/neg/root/devil/steelman/counterfactual) |
-| [advanced-modes.md](dia/advanced-modes.md) | 高度モード (epochē/audit/panorama/cross-model/cold_mirror/deliberative) |
+| [basic-modes.md](../workflow-modules/dia/basic-modes.md) | 基本モード (aff/neg/root/devil/steelman/counterfactual) |
+| [advanced-modes.md](../workflow-modules/dia/advanced-modes.md) | 高度モード (epochē/audit/panorama/cross-model/cold_mirror/deliberative) |
 
 ---
 

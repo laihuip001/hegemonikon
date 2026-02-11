@@ -67,12 +67,12 @@ category_theory:
 
 | モジュール | 内容 |
 |:-----------|:-----|
-| [basic-modes.md](mek/basic-modes.md) | comp, inve, adap, model, simulation |
-| [engineering-modes.md](mek/engineering-modes.md) | yagni, dry, observability, substitute, nudge |
-| [advanced-modes.md](mek/advanced-modes.md) | reverse, constitutional, yaml, multi |
-| [output-modes.md](mek/output-modes.md) | visual, manual |
-| [ccl-generation.md](mek/ccl-generation.md) | CCL生成モード (4層フォールバック) |
-| [artifact-rules.md](mek/artifact-rules.md) | SE原則、計算コスト、使用例 |
+| [basic-modes.md](../workflow-modules/mek/basic-modes.md) | comp, inve, adap, model, simulation |
+| [engineering-modes.md](../workflow-modules/mek/engineering-modes.md) | yagni, dry, observability, substitute, nudge |
+| [advanced-modes.md](../workflow-modules/mek/advanced-modes.md) | reverse, constitutional, yaml, multi |
+| [output-modes.md](../workflow-modules/mek/output-modes.md) | visual, manual |
+| [ccl-generation.md](../workflow-modules/mek/ccl-generation.md) | CCL生成モード (4層フォールバック) |
+| [artifact-rules.md](../workflow-modules/mek/artifact-rules.md) | SE原則、計算コスト、使用例 |
 
 ---
 

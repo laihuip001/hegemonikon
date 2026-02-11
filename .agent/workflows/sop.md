@@ -51,8 +51,8 @@ category_theory:
 
 | ファイル | 内容 |
 |----------|------|
-| [modes.md](sop/modes.md) | 調査モード (surf/deep/prag/track) |
-| [templates.md](sop/templates.md) | 調査依頼書テンプレート集 |
+| [modes.md](../workflow-modules/sop/modes.md) | 調査モード (surf/deep/prag/track) |
+| [templates.md](../workflow-modules/sop/templates.md) | 調査依頼書テンプレート集 |
 
 ---
 
@@ -120,7 +120,7 @@ cd ~/oikos/hegemonikon && \
 
 ## PHASE 1: 調査依頼書生成
 
-> テンプレート: [sop/templates.md](sop/templates.md)
+> テンプレート: [sop/templates.md](../workflow-modules/sop/templates.md)
 
 ### Hybrid Model（冒頭最適化）
 
@@ -178,7 +178,7 @@ A. 認知科学における〇〇
 
 ## モード
 
-> 詳細: [sop/modes.md](sop/modes.md)
+> 詳細: [sop/modes.md](../workflow-modules/sop/modes.md)
 
 | モード | 目的 | Scale |
 |:-------|:-----|:------|

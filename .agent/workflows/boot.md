@@ -98,20 +98,20 @@ Phase 6: L(M) を出力        — 完成したセッション状態
 
 | Phase | ファイル | 圏論的役割 | 内容 |
 |-------|----------|:-----------|------|
-| 0 | [identity.md](boot/identity.md) | id_L の復元 | Identity Stack 読込 |
-| 0.5 | [change-tracking.md](boot/change-tracking.md) | Δ(Mem) の検出 | セッション間変化の追跡 |
-| 3 | [knowledge.md](boot/knowledge.md) | Mem の構造展開 | 知識読込 (Sophia/KI/FEP) |
+| 0 | [identity.md](../workflow-modules/boot/identity.md) | id_L の復元 | Identity Stack 読込 |
+| 0.5 | [change-tracking.md](../workflow-modules/boot/change-tracking.md) | Δ(Mem) の検出 | セッション間変化の追跡 |
+| 3 | [knowledge.md](../workflow-modules/boot/knowledge.md) | Mem の構造展開 | 知識読込 (Sophia/KI/FEP) |
 | 3.6 | PKS auto-push (inline) | Mem の能動的表面化 | Handoff → トピック抽出 → プッシュ |
-| 4 | [system.md](boot/system.md) | L の射構築 | システム更新 (Hexis/Gnōsis) |
-| 5 | [external.md](boot/external.md) | 外部射の導入 | 外部入力 (Perplexity/Jules) |
-| - | [templates.md](boot/templates.md) | L(M) の出力形式 | 出力テンプレート |
+| 4 | [system.md](../workflow-modules/boot/system.md) | L の射構築 | システム更新 (Hexis/Gnōsis) |
+| 5 | [external.md](../workflow-modules/boot/external.md) | 外部射の導入 | 外部入力 (Perplexity/Jules) |
+| - | [templates.md](../workflow-modules/boot/templates.md) | L(M) の出力形式 | 出力テンプレート |
 
 ---
 
 ## Phase 0: 恒等射の復元 (id_L) — Identity Stack
 
 > **圏論**: 関手 L 自身の恒等射を復元する。L が「何者か」を確認しなければ、正しく機能しない。
-> 詳細: [boot/identity.md](boot/identity.md)
+> 詳細: [boot/identity.md](../workflow-modules/boot/identity.md)
 
 ```bash
 cd ~/oikos/hegemonikon && \
@@ -231,7 +231,7 @@ intent_wal:
 
 > **圏論**: 圏 Mem の対象と射を展開する。Handoff (= R(S_prev)) だけでは不十分な場合、
 > Mem の他の対象（KI, Sophia, FEP行列）からも構造を読込み、L の入力を豊かにする。
-> 詳細: [boot/knowledge.md](boot/knowledge.md)
+> 詳細: [boot/knowledge.md](../workflow-modules/boot/knowledge.md)
 
 - H4 長期記憶 (patterns.yaml, values.json) — **Mem の恒常的対象**
 - Sophia 知識サマリー — **Mem の学術的対象**
@@ -274,7 +274,7 @@ cd ~/oikos/hegemonikon && PYTHONPATH=. .venv/bin/python -m mekhane.pks.pks_cli a
 
 > **圏論**: Mem の射を Ses の射に変換する関手 L の「射の部分」を構築する。
 > ツール設定、認知態勢、CCL パターンなど、記憶の関係性を作業状態の関係性に写像する。
-> 詳細: [boot/system.md](boot/system.md)
+> 詳細: [boot/system.md](../workflow-modules/boot/system.md)
 
 - プロファイル確認 (GEMINI.md) — **L の設定パラメータ**
 - コアモジュール有効化 (O1, O2) — **L の基底射を有効化**
@@ -301,7 +301,7 @@ Phase 0 の `boot_integration.py --mode` 実行で自動的にプリロードさ
 > **圏論**: 圏 Mem に、セッション間に発生した外部射を追加する。
 > Perplexity = 新しい知識対象、Jules = コードレビュー射、Dispatch Log = AI 行動の射。
 > これらは R(S_prev) には含まれない「新鮮な射」であり、L(M) を S_prev より豊かにする。
-> 詳細: [boot/external.md](boot/external.md)
+> 詳細: [boot/external.md](../workflow-modules/boot/external.md)
 
 - Dispatch Log — **他エージェントからの射**
 - Perplexity Inbox — **外部知識圏からの射**
@@ -313,7 +313,7 @@ Phase 0 の `boot_integration.py --mode` 実行で自動的にプリロードさ
 
 > **圏論**: 左随伴 L の計算が完了。出力 L(M) = 今回のセッション状態。
 > ε 精度 = L(R(S_prev)) と S_prev の近さ。Drift が低いほど良い随伴。
-> テンプレート: [boot/templates.md](boot/templates.md)
+> テンプレート: [boot/templates.md](../workflow-modules/boot/templates.md)
 
 ```
 HEGEMONIKON BOOT COMPLETE v5.0 — L(M) = Ses
@@ -331,7 +331,7 @@ HEGEMONIKON BOOT COMPLETE v5.0 — L(M) = Ses
 
 ### 6.1 開発中プロジェクト
 
-→ 詳細: [boot/templates.md](boot/templates.md)
+→ 詳細: [boot/templates.md](../workflow-modules/boot/templates.md)
 
 ### 6.2 タスク提案
 

@@ -40,6 +40,9 @@ from mcp.server.transport_security import TransportSecuritySettings
 GATEWAY_HOST = os.getenv("HGK_GATEWAY_HOST", "127.0.0.1")
 GATEWAY_PORT = int(os.getenv("HGK_GATEWAY_PORT", "8765"))
 
+# Bearer Token authentication (required for Funnel/public exposure)
+GATEWAY_TOKEN = os.getenv("HGK_GATEWAY_TOKEN", "")
+
 # Allowed hosts for DNS rebinding protection
 _default_hosts = "localhost,127.0.0.1,hegemonikon.tail3b6058.ts.net"
 ALLOWED_HOSTS = os.getenv("HGK_GATEWAY_ALLOWED_HOSTS", _default_hosts).split(",")
@@ -417,4 +420,47 @@ def hgk_status() -> str:
 # =============================================================================
 
 if __name__ == "__main__":
+    if GATEWAY_TOKEN:
+        # Pure ASGI wrapper — does NOT break FastMCP's TaskGroup lifecycle
+        _original_run = mcp.run
+
+        class _AuthWrapper:
+            """Thin ASGI auth layer that wraps the MCP app at the ASGI level."""
+
+            def __init__(self, app):
+                self.app = app
+
+            async def __call__(self, scope, receive, send):
+                if scope["type"] == "http":
+                    headers = dict(scope.get("headers", []))
+                    auth = headers.get(b"authorization", b"").decode()
+                    if auth != f"Bearer {GATEWAY_TOKEN}":
+                        await send({
+                            "type": "http.response.start",
+                            "status": 401,
+                            "headers": [
+                                [b"content-type", b"text/plain"],
+                                [b"www-authenticate", b"Bearer"],
+                            ],
+                        })
+                        await send({
+                            "type": "http.response.body",
+                            "body": b"Unauthorized",
+                        })
+                        return
+                await self.app(scope, receive, send)
+
+        # Monkey-patch the ASGI app creation
+        _orig_http_app = mcp.streamable_http_app
+
+        def _authed_http_app():
+            return _AuthWrapper(_orig_http_app())
+
+        mcp.streamable_http_app = _authed_http_app
+        print("🔒 Bearer Token authentication ENABLED")
+    else:
+        print("⚠️  No authentication (HGK_GATEWAY_TOKEN not set)")
+
+    print(f"🚀 HGK Gateway starting on {GATEWAY_HOST}:{GATEWAY_PORT}")
     mcp.run(transport="streamable-http")
+

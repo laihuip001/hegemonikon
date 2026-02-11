@@ -27,10 +27,11 @@ function createPaletteHTML(): string {
       <div class="cp-dialog">
         <div class="cp-input-wrapper">
           <span class="cp-icon">⌘</span>
-          <input type="text" id="cp-input" class="cp-input" placeholder="Type a workflow name or CCL expression..." autocomplete="off" />
+          <input type="text" id="cp-input" class="cp-input" placeholder="Type a workflow name or CCL expression..." autocomplete="off"
+            role="combobox" aria-autocomplete="list" aria-expanded="true" aria-controls="cp-results" aria-label="Command Palette" />
           <kbd class="cp-kbd">ESC</kbd>
         </div>
-        <div class="cp-results" id="cp-results"></div>
+        <div class="cp-results" id="cp-results" role="listbox"></div>
         <div class="cp-footer">
           <span>↑↓ Navigate</span>
           <span>↵ Execute</span>
@@ -48,7 +49,7 @@ function renderWFItems(items: WFSummary[]): string {
         return '<div class="cp-empty">No matching workflows</div>';
     }
     return items.map((wf, i) => `
-    <div class="cp-item ${i === 0 ? 'cp-item-active' : ''}" data-idx="${i}" data-name="${esc(wf.name)}" data-ccl="${esc(wf.ccl)}">
+    <div class="cp-item ${i === 0 ? 'cp-item-active' : ''}" id="cp-item-${i}" role="option" aria-selected="${i === 0}" data-idx="${i}" data-name="${esc(wf.name)}" data-ccl="${esc(wf.ccl)}">
       <div class="cp-item-header">
         <span class="cp-item-name">/${esc(wf.name)}</span>
         ${wf.ccl ? `<span class="cp-item-ccl">${esc(wf.ccl)}</span>` : ''}
@@ -105,13 +106,24 @@ function filterWorkflows(query: string): WFSummary[] {
 
 let activeIdx = 0;
 
-function updateActive(resultsEl: HTMLElement, delta: number): void {
+function updateActive(resultsEl: HTMLElement, input: HTMLInputElement, delta: number): void {
     const items = resultsEl.querySelectorAll('.cp-item');
     if (items.length === 0) return;
-    items[activeIdx]?.classList.remove('cp-item-active');
+
+    if (items[activeIdx]) {
+        items[activeIdx].classList.remove('cp-item-active');
+        items[activeIdx].setAttribute('aria-selected', 'false');
+    }
+
     activeIdx = Math.max(0, Math.min(items.length - 1, activeIdx + delta));
-    items[activeIdx]?.classList.add('cp-item-active');
-    (items[activeIdx] as HTMLElement)?.scrollIntoView({ block: 'nearest' });
+
+    const newItem = items[activeIdx] as HTMLElement;
+    if (newItem) {
+        newItem.classList.add('cp-item-active');
+        newItem.setAttribute('aria-selected', 'true');
+        newItem.scrollIntoView({ block: 'nearest' });
+        input.setAttribute('aria-activedescendant', newItem.id);
+    }
 }
 
 async function handleInput(input: HTMLInputElement, resultsEl: HTMLElement): Promise<void> {
@@ -119,6 +131,7 @@ async function handleInput(input: HTMLInputElement, resultsEl: HTMLElement): Pro
 
     // CCL expression (contains operators like +, >>, ~, etc.)
     if (val && /[+>~{(\\]/.test(val)) {
+        input.removeAttribute('aria-activedescendant');
         resultsEl.innerHTML = '<div class="cp-loading">Parsing CCL...</div>';
         try {
             const res: CCLParseResponse = await api.cclParse(val);
@@ -133,6 +146,14 @@ async function handleInput(input: HTMLInputElement, resultsEl: HTMLElement): Pro
     const filtered = filterWorkflows(val);
     activeIdx = 0;
     resultsEl.innerHTML = renderWFItems(filtered);
+
+    // Update ARIA
+    const firstItem = resultsEl.querySelector('.cp-item');
+    if (firstItem) {
+        input.setAttribute('aria-activedescendant', firstItem.id);
+    } else {
+        input.removeAttribute('aria-activedescendant');
+    }
 
     // Click handlers
     resultsEl.querySelectorAll('.cp-item').forEach(item => {
@@ -200,10 +221,10 @@ export function openPalette(): void {
             closePalette();
         } else if (e.key === 'ArrowDown') {
             e.preventDefault();
-            updateActive(resultsEl, 1);
+            updateActive(resultsEl, input, 1);
         } else if (e.key === 'ArrowUp') {
             e.preventDefault();
-            updateActive(resultsEl, -1);
+            updateActive(resultsEl, input, -1);
         } else if (e.key === 'Enter') {
             e.preventDefault();
             const activeItem = resultsEl.querySelector('.cp-item-active') as HTMLElement;

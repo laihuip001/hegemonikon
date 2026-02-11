@@ -340,6 +340,56 @@ class GnosisIndex:
         print(f"[GnosisIndex] Added {len(data)} papers")
         return len(data)
 
+    # PURPOSE: 単一ドキュメントを追加 (SyncWatcher互換)
+    def add_document(self, doc_id: str, content: str, source: str) -> int:
+        """
+        単一ドキュメントを追加 (SyncWatcher互換)
+
+        Args:
+            doc_id: ドキュメントID (ファイル名等)
+            content: 本文
+            source: ソース (ファイルパス等)
+        """
+        import hashlib
+        # Generate a unique ID
+        id_hash = hashlib.md5(f"{source}:{doc_id}".encode()).hexdigest()
+
+        paper = Paper(
+            id=f"gnosis_local_{id_hash}",
+            source=source,
+            source_id=doc_id,
+            title=doc_id,
+            abstract=content,
+            url=f"file://{source}" if source.startswith("/") else source,
+        )
+        return self.add_papers([paper], dedupe=True)
+
+    # PURPOSE: ドキュメントを削除
+    def delete_documents(self, source: str) -> int:
+        """
+        ドキュメントを削除
+
+        Args:
+            source: 削除対象のソース (ファイルパス等)
+
+        Returns:
+            削除成功なら1、失敗なら0
+        """
+        if not self._table_exists():
+            return 0
+
+        table = self.db.open_table(self.TABLE_NAME)
+        # Simple escape for single quotes to prevent SQL injection in filter
+        safe_source = source.replace("'", "''")
+
+        try:
+            table.delete(f"source = '{safe_source}'")
+            print(f"[GnosisIndex] Deleted documents with source='{source}'")
+            return 1
+        except Exception as e:
+            print(f"[GnosisIndex] Failed to delete documents: {e}")
+            return 0
+
     # PURPOSE: セマンティック検索
     def search(self, query: str, k: int = 10, source_filter: str | None = None) -> list[dict]:
         """

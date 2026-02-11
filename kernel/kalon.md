@@ -31,6 +31,16 @@ Kalon(x) ⟺ x = Fix(G ∘ F)    where F ⊣ G
 - **G** (右随伴): 忘却/蒸留。構造を剥いで核だけ残す。Limit 的。Exploit。
 - **Fix(G∘F)**: G∘F を繰り返し適用したとき、もはや変化しなくなる不動点。
 
+### 三属性 (@repeat[x3, /eat+] で発見)
+
+```
+Kalon = Fix(G∘F) ∧ Presheaf ∧ Self-referential
+
+1. Fix(G∘F)        — 不動点: 収束と展開の結節点
+2. Presheaf         — 多面性: 概念は数式を包含する（概念 ⊋ 数式）
+3. Self-referential — 自己参照: 定義のプロセスが定義を実証する
+```
+
 ### なぜ lim だけではないか
 
 ```

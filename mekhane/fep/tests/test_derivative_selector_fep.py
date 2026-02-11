@@ -1,3 +1,9 @@
+# PROOF: [L3/Test] <- mekhane/fep/tests/
+"""
+PROOF: [L3/Test] このファイルは存在しなければならない
+
+DerivativeFEPLearner の学習・推論・永続化ロジックを検証する。
+"""
 
 import pytest
 import json

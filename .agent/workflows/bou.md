@@ -55,6 +55,7 @@ category_theory:
   unit: "η: Will → G(F(Will)) — 望みを目標にして制約を外したら、元の望みか？"
   counit: "ε: F(G(Act)) → Act — 行為からなぜを遡って再計画したら、同じ行為か？"
   drift: "Drift = 望みと目的の距離。G が望み層に到達できない残差"
+  G_preserves: "不変量 = 意志の方向性。入力がどんな行為でも、望みの核にある方向ベクトルは保存される"
   epsilon_failure: "ε 崩壊 = 手段が目的化している = /tel (Telos 自問) の発動条件"
   insight: "「望みは選ぶものではなく湧くもの」— Creator, 2026-02-10。G の不完全性はバグではなく仕様"
   phases_as_G:

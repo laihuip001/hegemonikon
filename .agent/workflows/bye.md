@@ -16,6 +16,7 @@ category_theory:
     結論: "何を達成したか、何を学んだか。Handoff に残る。well-defined"
     対話の旅路: "往復の議論、温度、「知らんけど」の後の洞察、照れ。消える"
   drift: "Drift = Handoff に残らない対話の質。結論は同じでも、そこに至った旅路は再現不能"
+  G_preserves: "不変量 = 成果の命題構造（何をし、何を決め、何が残ったか）。対話の旅路を忘却しても、成果は保存される"
   boot_bye_meta: "全11ペアの随伴の随伴（メタ随伴）。セッション自体の開閉を司る"
   creator_insight: "Handoffでは結論は抽出できても過程は忘れ去られる。悲しいね — Creator, 2026-02-11"
   python_analog: "Generator パターン (Pythōsis 骨髄消化 M1)"

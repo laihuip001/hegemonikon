@@ -51,6 +51,7 @@ category_theory:
     言語化可能: "「なぜ好きか」を根拠として説明できる部分。well-defined"
     生の熱: "言語化すると消える情動強度（raw intensity）。不可逆。affect labeling 効果"
   drift: "Drift = 生の熱の量。言語化で不可逆的に失われる情動の鮮度"
+  G_preserves: "不変量 = 価値の方向性 (±符号)。情動の鮮度を忘却しても、接近/回避の方向は保存される"
   affect_labeling: "感情に名前をつけると扁桃体活性が低下する（fMRI 研究）= G の神経科学的実体"
   insight: "瞬間的なエネルギー（熱量）が消える。知ってしまえば知る前には戻れない — Creator, 2026-02-10"
 ---

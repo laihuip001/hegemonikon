@@ -55,6 +55,7 @@ category_theory:
     技法: "「Pythonで行く」「RESTで行く」という大局選択。well-defined"
     経路詳細: "段階・順序・分岐条件。Macroでは見えない。忘却される"
   drift: "Drift = Macroの技法選択で見えないMicroの経路詳細"
+  G_preserves: "不変量 = Exploit パターン（選択の型）。経路詳細を忘却しても、選択の仕方は保存される"
   p_series_pattern: "P-series 全体: 同じ Function の Scale 違い。kho⊣tro(Explore) と hod⊣tek(Exploit)"
   insight: "どちらも根本的には選択。解像度が消えている — Creator, 2026-02-11"
 ---

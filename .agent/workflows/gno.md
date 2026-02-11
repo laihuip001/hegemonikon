@@ -61,6 +61,7 @@ category_theory:
   qualia: "G はクオリア（体験の質）を忘却する側。主観→客観、一人称→三人称の変換"
   episodic_to_semantic: "格言 = エピソード記憶の意味記憶化（一般化/客体化）— dia⊣epi と同型だが感情レイヤー"
   drift_qualia: "Drift = 格言にならないクオリア。言葉にできない「あの感覚」の喪失量"
+  G_preserves: "不変量 = 経験の命題化可能部分。クオリアを忘却しても、言語化できた教訓は保存される"
   creator_insight: "主体感・主観・現象的意識が消える — Creator, 2026-02-11"
 ---
 

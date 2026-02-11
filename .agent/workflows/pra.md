@@ -53,6 +53,7 @@ category_theory:
     明示知: "IF-THEN に言語化できる部分。well-defined"
     暗黙知: "言語化できない部分（名人芸、勘、手触り）。ポラニーの暗黙知"
   drift: "Drift = 暗黙知の量。G が言語化できない残差"
+  G_preserves: "不変量 = 行為の文法 (IF-THEN パターン)。理論を忘却しても、実践の型は保存される"
   explore_exploit: "Explore = F の自由度を広げる / Exploit = G の確実性を使う"
   fep_connection: "座学⇄実践の循環。知覚⇄運動とアナロジカルだが、スケールは異なる"
   insight: "IF-THENの集積 = 条件反射 = 無意識的技能 — Creator, 2026-02-10"

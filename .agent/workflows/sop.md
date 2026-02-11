@@ -31,6 +31,7 @@ category_theory:
     知見: "「何を知るべきか」という調査対象。well-defined"
     時間文脈: "「いつまでに」「進捗はどうか」。調査に戻ると忘却される"
   drift: "Drift = 時間的文脈の喪失。調査に没頭して期限を忘れる"
+  G_preserves: "不変量 = 問うべき方向（何を知るべきかの指向性）。期限を忘却しても、調査の方向は保存される"
   k_series_pattern: "K-series 全体: euk⊣tel(+) と chr⊣sop(-) で Valence の表裏"
   insight: "問うべき対象のレイヤーが上下している — Creator, 2026-02-11"
 ---

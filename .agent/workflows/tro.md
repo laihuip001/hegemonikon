@@ -54,6 +54,7 @@ category_theory:
     構造: "周回できる大局パターン。well-defined"
     粒度: "Macroでは見えないMicroの細部。忘却される"
   drift: "Drift = Macroで見えないMicroの構造。サイクルで回しても見落とす細部"
+  G_preserves: "不変量 = Explore パターン（探索の型）。解像度を忘却しても、探索の仕方は保存される"
   skewness_kurtosis: "歪度(3乗)と尖度(4乗)の比喩 — 同じ中心モーメント式の次元違い"
   insight: "元の式は同じ。次元を忘却している — Creator, 2026-02-11"
 ---

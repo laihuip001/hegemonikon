@@ -33,6 +33,7 @@ category_theory:
       既知未知: "知っているが不確実なもの → 問いにできる。well-defined"
       未知未知: "知らないことすら知らないもの → 問えない。unknown unknowns"
     drift: "Drift = unknown unknowns の量。/pan (Panorama) は Drift 低減を試みる"
+    G_preserves: "不変量 = 問いの構造。確信を捨てても、何を知らないかの地図は保存される"
     precision_axis: "L1.75 Precision (C↔U) 上の操作。/noe = C寄り、/zet = U寄り"
     insight: "/noe は不確実性→確実性、/zet は確実性→不確実性の拡散 — Creator, 2026-02-10"
 derivatives: [anom, hypo, eval, abduction]

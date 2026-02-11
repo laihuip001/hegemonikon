@@ -91,6 +91,37 @@ export interface KalonHistoryResponse {
     total: number;
 }
 
+// --- Synteleia Types ---
+export interface SynteleiaIssue {
+    agent: string;
+    code: string;
+    severity: string;
+    message: string;
+    location?: string;
+    suggestion?: string;
+}
+export interface SynteleiaAgentResult {
+    agent_name: string;
+    passed: boolean;
+    confidence: number;
+    issues: SynteleiaIssue[];
+}
+export interface SynteleiaAuditResponse {
+    passed: boolean;
+    summary: string;
+    critical_count: number;
+    high_count: number;
+    total_issues: number;
+    agent_results: SynteleiaAgentResult[];
+    report: string;
+    wbc_alerted: boolean;
+}
+export interface SynteleiaAgentInfo {
+    name: string;
+    description: string;
+    layer: string;
+}
+
 export const api = {
     // Status
     health: () => apiFetch<HealthCheckResponse>('/api/status/health'),
@@ -202,6 +233,21 @@ export const api = {
         }),
     kalonHistory: (limit = 50) =>
         apiFetch<KalonHistoryResponse>(`/api/kalon/history?limit=${limit}`),
+
+    // Synteleia
+    synteleiaAudit: (content: string, targetType = 'generic', withL2 = false, source?: string) =>
+        apiFetch<SynteleiaAuditResponse>('/api/synteleia/audit', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ content, target_type: targetType, with_l2: withL2, source }),
+        }),
+    synteleiaQuick: (content: string, targetType = 'generic') =>
+        apiFetch<SynteleiaAuditResponse>('/api/synteleia/audit-quick', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ content, target_type: targetType }),
+        }),
+    synteleiaAgents: () => apiFetch<SynteleiaAgentInfo[]>('/api/synteleia/agents'),
 };
 
 // --- Notification Types ---

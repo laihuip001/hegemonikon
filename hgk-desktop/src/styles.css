@@ -2525,3 +2525,96 @@ main:has(#graph-container) {
 .tl-detail-content th {
   background: var(--card-bg);
 }
+
+/* ─── Synteleia Audit Result ───────────────────────────── */
+
+.syn-result {
+  padding: 0.5rem 0;
+}
+
+.syn-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.syn-badge {
+  padding: 0.15rem 0.5rem;
+  border-radius: 4px;
+  font-weight: 700;
+  font-size: 0.85rem;
+}
+
+.syn-pass {
+  background: rgba(63, 185, 80, 0.2);
+  color: #3fb950;
+}
+
+.syn-fail {
+  background: rgba(248, 81, 73, 0.2);
+  color: #f85149;
+}
+
+.syn-summary {
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+}
+
+.syn-stats {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-bottom: 0.5rem;
+}
+
+.syn-wbc-alert {
+  background: rgba(248, 81, 73, 0.15);
+  border: 1px solid rgba(248, 81, 73, 0.3);
+  border-radius: 6px;
+  padding: 0.3rem 0.6rem;
+  font-size: 0.8rem;
+  color: #f85149;
+  margin-bottom: 0.5rem;
+}
+
+.syn-agent {
+  margin-bottom: 0.4rem;
+}
+
+.syn-agent-header {
+  font-size: 0.8rem;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.syn-confidence {
+  color: var(--text-muted);
+  font-size: 0.75rem;
+}
+
+.syn-issue {
+  font-size: 0.75rem;
+  padding: 0.15rem 0 0.15rem 1.2rem;
+  border-left: 2px solid var(--border-color);
+  margin: 0.1rem 0;
+}
+
+.syn-sev-critical {
+  border-left-color: #f85149;
+  color: #f85149;
+}
+
+.syn-sev-high {
+  border-left-color: #d29922;
+  color: #d29922;
+}
+
+.syn-sev-medium {
+  border-left-color: #58a6ff;
+  color: #8b949e;
+}
+
+.syn-sev-low {
+  color: var(--text-muted);
+}

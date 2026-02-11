@@ -11,7 +11,7 @@
  */
 
 import { api } from './api/client';
-import type { WFSummary, CCLParseResponse } from './api/client';
+import type { WFSummary, CCLParseResponse, SynteleiaAuditResponse } from './api/client';
 
 // --- State ---
 
@@ -22,7 +22,7 @@ let wfCache: WFSummary[] = [];
 // --- HTML ---
 
 function createPaletteHTML(): string {
-    return `
+  return `
     <div class="cp-overlay" id="cp-overlay">
       <div class="cp-dialog">
         <div class="cp-input-wrapper">
@@ -44,10 +44,10 @@ function createPaletteHTML(): string {
 // --- Rendering ---
 
 function renderWFItems(items: WFSummary[]): string {
-    if (items.length === 0) {
-        return '<div class="cp-empty">No matching workflows</div>';
-    }
-    return items.map((wf, i) => `
+  if (items.length === 0) {
+    return '<div class="cp-empty">No matching workflows</div>';
+  }
+  return items.map((wf, i) => `
     <div class="cp-item ${i === 0 ? 'cp-item-active' : ''}" data-idx="${i}" data-name="${esc(wf.name)}" data-ccl="${esc(wf.ccl)}">
       <div class="cp-item-header">
         <span class="cp-item-name">/${esc(wf.name)}</span>
@@ -60,10 +60,10 @@ function renderWFItems(items: WFSummary[]): string {
 }
 
 function renderParseResult(res: CCLParseResponse): string {
-    if (!res.success) {
-        return `<div class="cp-parse-error">❌ ${esc(res.error ?? 'Parse failed')}</div>`;
-    }
-    return `
+  if (!res.success) {
+    return `<div class="cp-parse-error">❌ ${esc(res.error ?? 'Parse failed')}</div>`;
+  }
+  return `
     <div class="cp-parse-result">
       <div class="cp-parse-header">✅ Parsed: <code>${esc(res.ccl)}</code></div>
       ${res.tree ? `<pre class="cp-parse-tree">${esc(res.tree)}</pre>` : ''}
@@ -79,9 +79,42 @@ function renderParseResult(res: CCLParseResponse): string {
 
 // --- Kalon Judge ---
 
+function renderAuditResult(res: SynteleiaAuditResponse): string {
+  const badge = res.passed
+    ? '<span class="syn-badge syn-pass">✅ PASS</span>'
+    : '<span class="syn-badge syn-fail">❌ FAIL</span>';
+
+  const issueRows = res.agent_results.map(ar => {
+    const icon = ar.passed ? '✅' : '⚠️';
+    const issueList = ar.issues.length > 0
+      ? ar.issues.map(i =>
+        `<div class="syn-issue syn-sev-${esc(i.severity.toLowerCase())}">[${esc(i.severity)}] ${esc(i.message)}</div>`
+      ).join('')
+      : '';
+    return `<div class="syn-agent">
+            <div class="syn-agent-header">${icon} <strong>${esc(ar.agent_name)}</strong> <span class="syn-confidence">${(ar.confidence * 100).toFixed(0)}%</span></div>
+            ${issueList}
+        </div>`;
+  }).join('');
+
+  const wbcNote = res.wbc_alerted
+    ? '<div class="syn-wbc-alert">🚨 WBC アラート送信済み</div>'
+    : '';
+
+  return `<div class="syn-result">
+        <div class="syn-header">${badge} <span class="syn-summary">${esc(res.summary)}</span></div>
+        <div class="syn-stats">
+            問題: <strong>${res.total_issues}</strong>件
+            (CRITICAL: ${res.critical_count} / HIGH: ${res.high_count})
+        </div>
+        ${wbcNote}
+        <div class="syn-agents">${issueRows}</div>
+    </div>`;
+}
+
 function renderKalonJudge(concept: string): string {
-    const id = `kalon-${Date.now()}`;
-    return `
+  const id = `kalon-${Date.now()}`;
+  return `
     <div class="kalon-judge" id="${id}">
       <div class="kalon-header">
         <span class="kalon-icon">◆</span>
@@ -121,139 +154,154 @@ function renderKalonJudge(concept: string): string {
 }
 
 function initKalonButtons(resultsEl: HTMLElement): void {
-    const judge = resultsEl.querySelector('.kalon-judge') as HTMLElement;
-    if (!judge) return;
+  const judge = resultsEl.querySelector('.kalon-judge') as HTMLElement;
+  if (!judge) return;
 
-    let gAnswer: boolean | null = null;
-    let fAnswer: boolean | null = null;
+  let gAnswer: boolean | null = null;
+  let fAnswer: boolean | null = null;
 
-    judge.querySelectorAll('.kalon-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            const step = (btn.closest('.kalon-step') as HTMLElement)?.dataset.step;
-            const answer = (btn as HTMLElement).dataset.answer === 'yes';
+  judge.querySelectorAll('.kalon-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const step = (btn.closest('.kalon-step') as HTMLElement)?.dataset.step;
+      const answer = (btn as HTMLElement).dataset.answer === 'yes';
 
-            // Highlight selected button
-            const stepEl = btn.closest('.kalon-step')!;
-            stepEl.querySelectorAll('.kalon-btn').forEach(b => b.classList.remove('kalon-btn-selected'));
-            btn.classList.add('kalon-btn-selected');
+      // Highlight selected button
+      const stepEl = btn.closest('.kalon-step')!;
+      stepEl.querySelectorAll('.kalon-btn').forEach(b => b.classList.remove('kalon-btn-selected'));
+      btn.classList.add('kalon-btn-selected');
 
-            if (step === 'g') gAnswer = answer;
-            if (step === 'f') fAnswer = answer;
+      if (step === 'g') gAnswer = answer;
+      if (step === 'f') fAnswer = answer;
 
-            // Update result when both answered
-            if (gAnswer !== null && fAnswer !== null) {
-                const resultEl = judge.querySelector('.kalon-result')!;
-                if (gAnswer && fAnswer) {
-                    resultEl.innerHTML = `
+      // Update result when both answered
+      if (gAnswer !== null && fAnswer !== null) {
+        const resultEl = judge.querySelector('.kalon-result')!;
+        if (gAnswer && fAnswer) {
+          resultEl.innerHTML = `
                       <div class="kalon-result-kalon">
                         <span class="kalon-verdict-icon">◎</span>
                         <span class="kalon-verdict-text">kalon — Fix(G∘F) に到達</span>
                       </div>`;
-                } else if (gAnswer && !fAnswer) {
-                    resultEl.innerHTML = `
+        } else if (gAnswer && !fAnswer) {
+          resultEl.innerHTML = `
                       <div class="kalon-result-partial">
                         <span class="kalon-verdict-icon">✗</span>
                         <span class="kalon-verdict-text">自明 — lim だが colim なし (π パターン)</span>
                       </div>`;
-                } else if (!gAnswer && fAnswer) {
-                    resultEl.innerHTML = `
+        } else if (!gAnswer && fAnswer) {
+          resultEl.innerHTML = `
                       <div class="kalon-result-partial">
                         <span class="kalon-verdict-icon">◯</span>
                         <span class="kalon-verdict-text">許容 — もう一回 G∘F を回すと改善</span>
                       </div>`;
-                } else {
-                    resultEl.innerHTML = `
+        } else {
+          resultEl.innerHTML = `
                       <div class="kalon-result-fail">
                         <span class="kalon-verdict-icon">✗</span>
                         <span class="kalon-verdict-text">要蒸留 — Fix から遠い</span>
                       </div>`;
-                }
-            }
-        });
+        }
+      }
     });
+  });
 }
 
 // --- Logic ---
 
 function esc(s: string): string {
-    return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
 
 async function loadWorkflows(): Promise<void> {
-    if (wfCache.length > 0) return;
-    try {
-        const res = await api.wfList();
-        wfCache = res.workflows;
-    } catch {
-        wfCache = [];
-    }
+  if (wfCache.length > 0) return;
+  try {
+    const res = await api.wfList();
+    wfCache = res.workflows;
+  } catch {
+    wfCache = [];
+  }
 }
 
 function filterWorkflows(query: string): WFSummary[] {
-    const q = query.toLowerCase().replace(/^\//, '');
-    if (!q) return wfCache.slice(0, 15);
-    return wfCache.filter(wf =>
-        wf.name.toLowerCase().includes(q) ||
-        wf.description.toLowerCase().includes(q) ||
-        wf.ccl.toLowerCase().includes(q)
-    ).slice(0, 15);
+  const q = query.toLowerCase().replace(/^\//, '');
+  if (!q) return wfCache.slice(0, 15);
+  return wfCache.filter(wf =>
+    wf.name.toLowerCase().includes(q) ||
+    wf.description.toLowerCase().includes(q) ||
+    wf.ccl.toLowerCase().includes(q)
+  ).slice(0, 15);
 }
 
 let activeIdx = 0;
 
 function updateActive(resultsEl: HTMLElement, delta: number): void {
-    const items = resultsEl.querySelectorAll('.cp-item');
-    if (items.length === 0) return;
-    items[activeIdx]?.classList.remove('cp-item-active');
-    activeIdx = Math.max(0, Math.min(items.length - 1, activeIdx + delta));
-    items[activeIdx]?.classList.add('cp-item-active');
-    (items[activeIdx] as HTMLElement)?.scrollIntoView({ block: 'nearest' });
+  const items = resultsEl.querySelectorAll('.cp-item');
+  if (items.length === 0) return;
+  items[activeIdx]?.classList.remove('cp-item-active');
+  activeIdx = Math.max(0, Math.min(items.length - 1, activeIdx + delta));
+  items[activeIdx]?.classList.add('cp-item-active');
+  (items[activeIdx] as HTMLElement)?.scrollIntoView({ block: 'nearest' });
 }
 
 async function handleInput(input: HTMLInputElement, resultsEl: HTMLElement): Promise<void> {
-    const val = input.value.trim();
+  const val = input.value.trim();
 
-    // Kalon judge command
-    if (val.toLowerCase().startsWith('kalon ')) {
-        const concept = val.slice(6).trim();
-        if (concept) {
-            resultsEl.innerHTML = renderKalonJudge(concept);
-            initKalonButtons(resultsEl);
-            return;
-        }
+  // Synteleia audit command
+  if (val.toLowerCase().startsWith('audit ')) {
+    const content = val.slice(6).trim();
+    if (content) {
+      resultsEl.innerHTML = '<div class="cp-loading">🔍 Synteleia 監査中...</div>';
+      try {
+        const res: SynteleiaAuditResponse = await api.synteleiaAudit(content);
+        resultsEl.innerHTML = renderAuditResult(res);
+      } catch (e) {
+        resultsEl.innerHTML = `<div class="cp-parse-error">❌ 監査エラー: ${esc((e as Error).message)}</div>`;
+      }
+      return;
     }
+  }
 
-    // CCL expression (contains operators like +, >>, ~, etc.)
-    if (val && /[+>~{(\\]/.test(val)) {
-        resultsEl.innerHTML = '<div class="cp-loading">Parsing CCL...</div>';
-        try {
-            const res: CCLParseResponse = await api.cclParse(val);
-            resultsEl.innerHTML = renderParseResult(res);
-        } catch (e) {
-            resultsEl.innerHTML = `<div class="cp-parse-error">❌ ${esc((e as Error).message)}</div>`;
-        }
-        return;
+  // Kalon judge command
+  if (val.toLowerCase().startsWith('kalon ')) {
+    const concept = val.slice(6).trim();
+    if (concept) {
+      resultsEl.innerHTML = renderKalonJudge(concept);
+      initKalonButtons(resultsEl);
+      return;
     }
+  }
 
-    // Workflow filter
-    const filtered = filterWorkflows(val);
-    activeIdx = 0;
-    resultsEl.innerHTML = renderWFItems(filtered);
+  // CCL expression (contains operators like +, >>, ~, etc.)
+  if (val && /[+>~{(\\]/.test(val)) {
+    resultsEl.innerHTML = '<div class="cp-loading">Parsing CCL...</div>';
+    try {
+      const res: CCLParseResponse = await api.cclParse(val);
+      resultsEl.innerHTML = renderParseResult(res);
+    } catch (e) {
+      resultsEl.innerHTML = `<div class="cp-parse-error">❌ ${esc((e as Error).message)}</div>`;
+    }
+    return;
+  }
 
-    // Click handlers
-    resultsEl.querySelectorAll('.cp-item').forEach(item => {
-        item.addEventListener('click', () => {
-            const name = (item as HTMLElement).dataset.name ?? '';
-            selectWorkflow(name, resultsEl);
-        });
+  // Workflow filter
+  const filtered = filterWorkflows(val);
+  activeIdx = 0;
+  resultsEl.innerHTML = renderWFItems(filtered);
+
+  // Click handlers
+  resultsEl.querySelectorAll('.cp-item').forEach(item => {
+    item.addEventListener('click', () => {
+      const name = (item as HTMLElement).dataset.name ?? '';
+      selectWorkflow(name, resultsEl);
     });
+  });
 }
 
 async function selectWorkflow(name: string, resultsEl: HTMLElement): Promise<void> {
-    resultsEl.innerHTML = '<div class="cp-loading">Loading workflow...</div>';
-    try {
-        const detail = await api.wfDetail(name);
-        resultsEl.innerHTML = `
+  resultsEl.innerHTML = '<div class="cp-loading">Loading workflow...</div>';
+  try {
+    const detail = await api.wfDetail(name);
+    resultsEl.innerHTML = `
       <div class="cp-wf-detail">
         <h3>/${esc(detail.name)}</h3>
         <p>${esc(detail.description)}</p>
@@ -267,87 +315,87 @@ async function selectWorkflow(name: string, resultsEl: HTMLElement): Promise<voi
         ` : ''}
       </div>
     `;
-    } catch (e) {
-        resultsEl.innerHTML = `<div class="cp-parse-error">❌ ${esc((e as Error).message)}</div>`;
-    }
+  } catch (e) {
+    resultsEl.innerHTML = `<div class="cp-parse-error">❌ ${esc((e as Error).message)}</div>`;
+  }
 }
 
 // --- Open / Close ---
 
 export function openPalette(): void {
-    if (isOpen) return;
-    isOpen = true;
+  if (isOpen) return;
+  isOpen = true;
 
-    // Inject HTML
-    const container = document.createElement('div');
-    container.innerHTML = createPaletteHTML();
-    paletteEl = container.firstElementChild as HTMLElement;
-    document.body.appendChild(paletteEl);
+  // Inject HTML
+  const container = document.createElement('div');
+  container.innerHTML = createPaletteHTML();
+  paletteEl = container.firstElementChild as HTMLElement;
+  document.body.appendChild(paletteEl);
 
-    const input = document.getElementById('cp-input') as HTMLInputElement;
-    const resultsEl = document.getElementById('cp-results')!;
-    const overlay = document.getElementById('cp-overlay')!;
+  const input = document.getElementById('cp-input') as HTMLInputElement;
+  const resultsEl = document.getElementById('cp-results')!;
+  const overlay = document.getElementById('cp-overlay')!;
 
-    // Load WFs and show initial list
-    void loadWorkflows().then(() => {
-        void handleInput(input, resultsEl);
-    });
+  // Load WFs and show initial list
+  void loadWorkflows().then(() => {
+    void handleInput(input, resultsEl);
+  });
 
-    // Input handler (debounced)
-    let debounceTimer: ReturnType<typeof setTimeout> | null = null;
-    input.addEventListener('input', () => {
-        if (debounceTimer) clearTimeout(debounceTimer);
-        debounceTimer = setTimeout(() => void handleInput(input, resultsEl), 150);
-    });
+  // Input handler (debounced)
+  let debounceTimer: ReturnType<typeof setTimeout> | null = null;
+  input.addEventListener('input', () => {
+    if (debounceTimer) clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(() => void handleInput(input, resultsEl), 150);
+  });
 
-    // Keyboard navigation
-    input.addEventListener('keydown', (e: KeyboardEvent) => {
-        if (e.key === 'Escape') {
-            closePalette();
-        } else if (e.key === 'ArrowDown') {
-            e.preventDefault();
-            updateActive(resultsEl, 1);
-        } else if (e.key === 'ArrowUp') {
-            e.preventDefault();
-            updateActive(resultsEl, -1);
-        } else if (e.key === 'Enter') {
-            e.preventDefault();
-            const activeItem = resultsEl.querySelector('.cp-item-active') as HTMLElement;
-            if (activeItem) {
-                const name = activeItem.dataset.name ?? '';
-                void selectWorkflow(name, resultsEl);
-            }
-        }
-    });
+  // Keyboard navigation
+  input.addEventListener('keydown', (e: KeyboardEvent) => {
+    if (e.key === 'Escape') {
+      closePalette();
+    } else if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      updateActive(resultsEl, 1);
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      updateActive(resultsEl, -1);
+    } else if (e.key === 'Enter') {
+      e.preventDefault();
+      const activeItem = resultsEl.querySelector('.cp-item-active') as HTMLElement;
+      if (activeItem) {
+        const name = activeItem.dataset.name ?? '';
+        void selectWorkflow(name, resultsEl);
+      }
+    }
+  });
 
-    // Click outside to close
-    overlay.addEventListener('click', (e: MouseEvent) => {
-        if (e.target === overlay) closePalette();
-    });
+  // Click outside to close
+  overlay.addEventListener('click', (e: MouseEvent) => {
+    if (e.target === overlay) closePalette();
+  });
 
-    // Focus input
-    requestAnimationFrame(() => input.focus());
+  // Focus input
+  requestAnimationFrame(() => input.focus());
 }
 
 export function closePalette(): void {
-    if (!isOpen || !paletteEl) return;
-    isOpen = false;
-    paletteEl.remove();
-    paletteEl = null;
-    activeIdx = 0;
+  if (!isOpen || !paletteEl) return;
+  isOpen = false;
+  paletteEl.remove();
+  paletteEl = null;
+  activeIdx = 0;
 }
 
 export function togglePalette(): void {
-    isOpen ? closePalette() : openPalette();
+  isOpen ? closePalette() : openPalette();
 }
 
 // --- Global Keyboard Shortcut ---
 
 export function initCommandPalette(): void {
-    document.addEventListener('keydown', (e: KeyboardEvent) => {
-        if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
-            e.preventDefault();
-            togglePalette();
-        }
-    });
+  document.addEventListener('keydown', (e: KeyboardEvent) => {
+    if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+      e.preventDefault();
+      togglePalette();
+    }
+  });
 }

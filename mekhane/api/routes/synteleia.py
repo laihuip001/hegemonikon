@@ -33,6 +33,9 @@ class AuditRequest(BaseModel):
     source: Optional[str] = Field(
         default=None, description="ソース識別子（ファイルパス等）"
     )
+    with_l2: bool = Field(
+        default=False, description="L2 SemanticAgent (LLM) を含めるか"
+    )
 
 
 # PURPOSE: 検出された問題
@@ -65,6 +68,7 @@ class AuditResponse(BaseModel):
     total_issues: int = 0
     agent_results: list[AgentResultItem] = Field(default_factory=list)
     report: str = Field(default="", description="フォーマット済みレポート")
+    wbc_alerted: bool = Field(default=False, description="WBC アラートが送信されたか")
 
 
 # PURPOSE: エージェント情報
@@ -75,12 +79,43 @@ class AgentInfo(BaseModel):
     layer: str = Field(description="poiesis | dokimasia")
 
 
+# --- WBC 連携 ---
+
+
+def _notify_wbc(alert: dict) -> bool:
+    """
+    Sympatheia WBC にアラートを送信。
+
+    MCP サーバー経由で発火。利用不可の場合はログのみ。
+    Returns: True if alert was sent successfully.
+    """
+    try:
+        import httpx
+
+        # Sympatheia MCP は同一ホストの API サーバー経由で呼び出し
+        # POST /api/wbc/alert に転送
+        resp = httpx.post(
+            "http://127.0.0.1:8392/api/wbc/alert",
+            json=alert,
+            timeout=5.0,
+        )
+        if resp.status_code == 200:
+            logger.info("WBC alert sent: %s", alert.get("severity", "unknown"))
+            return True
+        else:
+            logger.warning("WBC alert failed (HTTP %d): %s", resp.status_code, resp.text)
+            return False
+    except Exception as exc:
+        logger.warning("WBC alert unavailable (non-critical): %s", exc)
+        return False
+
+
 # --- Routes ---
 
 
 @router.post("/audit", response_model=AuditResponse)
 async def audit(request: AuditRequest):
-    """統合監査を実行（全8エージェント）。"""
+    """統合監査を実行（全エージェント + オプション L2）。"""
     try:
         from mekhane.synteleia import (
             SynteleiaOrchestrator,
@@ -100,8 +135,20 @@ async def audit(request: AuditRequest):
             source=request.source,
         )
 
-        orchestrator = SynteleiaOrchestrator()
+        # L2 統合: SemanticAgent (LLM) を含めるか
+        if request.with_l2:
+            orchestrator = SynteleiaOrchestrator.with_l2()
+            logger.info("Synteleia audit: L1+L2 mode")
+        else:
+            orchestrator = SynteleiaOrchestrator()
+
         result = orchestrator.audit(target)
+
+        # WBC 自動連携: HIGH/CRITICAL 検出時に Sympatheia WBC へ通知
+        wbc_alerted = False
+        wbc_alert = orchestrator.to_wbc_alert(result)
+        if wbc_alert:
+            wbc_alerted = _notify_wbc(wbc_alert)
 
         # レスポンス構築
         agent_results = []
@@ -134,6 +181,7 @@ async def audit(request: AuditRequest):
             total_issues=len(result.all_issues),
             agent_results=agent_results,
             report=orchestrator.format_report(result),
+            wbc_alerted=wbc_alerted,
         )
     except Exception as exc:
         logger.error("Synteleia audit failed: %s", exc)

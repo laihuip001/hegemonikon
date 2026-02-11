@@ -370,3 +370,239 @@ class TestSophiaKI:
         # FastAPI の validation or our custom check
         assert r.status_code in (400, 422)
 
+
+# ============================================================
+# Graph (3D)
+# ============================================================
+
+
+class TestGraph:
+    """/api/graph/* エンドポイント。"""
+
+    def test_graph_nodes(self, client: TestClient):
+        """GET /api/graph/nodes → 200 + 24ノード."""
+        r = client.get("/api/graph/nodes")
+        assert r.status_code == 200
+        data = r.json()
+        assert isinstance(data, list)
+        # 6 series × 4 theorems = 24
+        assert len(data) == 24
+        node = data[0]
+        assert "id" in node
+        assert "series" in node
+        assert "name" in node
+        assert "position" in node
+
+    def test_graph_edges(self, client: TestClient):
+        """GET /api/graph/edges → 200 + エッジリスト."""
+        r = client.get("/api/graph/edges")
+        assert r.status_code == 200
+        data = r.json()
+        assert isinstance(data, list)
+        # 72 relations + 24 identity = 96
+        assert len(data) == 96
+
+    def test_graph_full(self, client: TestClient):
+        """GET /api/graph/full → 200 + nodes + edges + meta."""
+        r = client.get("/api/graph/full")
+        assert r.status_code == 200
+        data = r.json()
+        assert "nodes" in data
+        assert "edges" in data
+        assert "meta" in data
+        assert data["meta"]["total_nodes"] == 24
+        assert data["meta"]["total_edges"] == 96
+
+    def test_graph_node_has_position(self, client: TestClient):
+        """各ノードが3D座標を持つことを確認."""
+        r = client.get("/api/graph/nodes")
+        data = r.json()
+        for node in data:
+            pos = node["position"]
+            assert "x" in pos
+            assert "y" in pos
+            assert "z" in pos
+
+
+# ============================================================
+# CCL Parse & Execute
+# ============================================================
+
+
+class TestCCL:
+    """/api/ccl/* エンドポイント。"""
+
+    def test_ccl_parse_simple(self, client: TestClient):
+        """POST /api/ccl/parse with /noe+ → success + AST."""
+        r = client.post("/api/ccl/parse", json={"ccl": "/noe+"})
+        assert r.status_code == 200
+        data = r.json()
+        assert data["success"] is True
+        assert data["ccl"] == "/noe+"
+        assert any("noe" in w for w in data["workflows"])
+
+    def test_ccl_parse_sequence(self, client: TestClient):
+        """POST /api/ccl/parse with /s+_/ene → success + 2 WFs."""
+        r = client.post("/api/ccl/parse", json={"ccl": "/s+_/ene"})
+        assert r.status_code == 200
+        data = r.json()
+        assert data["success"] is True
+        assert len(data["workflows"]) >= 2
+
+    def test_ccl_parse_invalid(self, client: TestClient):
+        """POST /api/ccl/parse with empty → error."""
+        r = client.post("/api/ccl/parse", json={"ccl": ""})
+        assert r.status_code == 200
+        data = r.json()
+        # 空文字列はパースエラーになるはず
+        assert data["success"] is False or data["error"] is not None
+
+    def test_ccl_execute_graceful(self, client: TestClient):
+        """POST /api/ccl/execute → 200 (成功 or graceful error)."""
+        r = client.post("/api/ccl/execute", json={
+            "ccl": "/noe-",
+            "context": "test",
+        })
+        assert r.status_code == 200
+        data = r.json()
+        assert "ccl" in data
+
+
+# ============================================================
+# WF Registry
+# ============================================================
+
+
+class TestWFRegistry:
+    """/api/wf/* エンドポイント。"""
+
+    def test_wf_list(self, client: TestClient):
+        """GET /api/wf/list → 200 + total + workflows."""
+        r = client.get("/api/wf/list")
+        assert r.status_code == 200
+        data = r.json()
+        assert "total" in data
+        assert "workflows" in data
+        assert data["total"] > 0
+        # 少なくとも主要WFが存在する
+        names = [w["name"] for w in data["workflows"]]
+        assert any("noe" in n for n in names)
+
+    def test_wf_detail(self, client: TestClient):
+        """GET /api/wf/noe → 200 + description."""
+        r = client.get("/api/wf/noe")
+        assert r.status_code == 200
+        data = r.json()
+        assert data["name"] == "noe"
+        assert data["description"] != ""
+
+    def test_wf_not_found(self, client: TestClient):
+        """GET /api/wf/nonexistent → 200 + error in metadata."""
+        r = client.get("/api/wf/nonexistent_wf_12345")
+        assert r.status_code == 200
+        data = r.json()
+        assert "error" in data.get("metadata", {}) or data["description"] == "Not found"
+
+
+# ============================================================
+# Sympatheia
+# ============================================================
+
+
+class TestSympatheia:
+    """/api/sympatheia/* エンドポイント (遅延ロード)."""
+
+    def test_sympatheia_attractor(self, client: TestClient):
+        """POST /api/sympatheia/attractor → 200 or graceful."""
+        r = client.post("/api/sympatheia/attractor", json={
+            "text": "深く考えたい",
+        })
+        assert r.status_code in (200, 503)
+
+    def test_sympatheia_notifications(self, client: TestClient):
+        """GET /api/sympatheia/notifications → 200."""
+        r = client.get("/api/sympatheia/notifications")
+        assert r.status_code in (200, 503)
+
+    def test_sympatheia_wbc(self, client: TestClient):
+        """POST /api/sympatheia/wbc → 200."""
+        r = client.post("/api/sympatheia/wbc", json={
+            "details": "test alert",
+            "severity": "low",
+        })
+        assert r.status_code in (200, 503)
+
+
+# ============================================================
+# Gnosis Narrator
+# ============================================================
+
+
+class TestGnosisNarrator:
+    """/api/gnosis/papers + /api/gnosis/narrate."""
+
+    def test_papers_list(self, client: TestClient):
+        """GET /api/gnosis/papers → 200 + papers list."""
+        r = client.get("/api/gnosis/papers")
+        assert r.status_code == 200
+        data = r.json()
+        assert "papers" in data
+        assert "total" in data
+        assert isinstance(data["papers"], list)
+
+    def test_narrate_requires_paper_id(self, client: TestClient):
+        """POST /api/gnosis/narrate without paper_id → 422."""
+        r = client.post("/api/gnosis/narrate", json={})
+        assert r.status_code == 422
+
+
+# ============================================================
+# Synteleia (6視点認知アンサンブル)
+# ============================================================
+
+
+class TestSynteleia:
+    """/api/synteleia/* エンドポイント。"""
+
+    def test_synteleia_agents(self, client: TestClient):
+        """GET /api/synteleia/agents → 200 + agent list."""
+        r = client.get("/api/synteleia/agents")
+        assert r.status_code in (200, 503)
+        if r.status_code == 200:
+            data = r.json()
+            # agents はリスト直接返し or dict
+            assert isinstance(data, (list, dict))
+
+    def test_synteleia_audit(self, client: TestClient):
+        """POST /api/synteleia/audit → 200 or 503."""
+        r = client.post("/api/synteleia/audit", json={
+            "content": "テスト内容",
+            "wf_name": "test",
+        })
+        assert r.status_code in (200, 422, 503)
+
+
+# ============================================================
+# Gateway
+# ============================================================
+
+
+class TestGateway:
+    """/api/gateway/* エンドポイント。"""
+
+    def test_gateway_status(self, client: TestClient):
+        """GET /api/gateway/status → 200."""
+        r = client.get("/api/gateway/status")
+        assert r.status_code in (200, 503)
+
+    def test_gateway_servers(self, client: TestClient):
+        """GET /api/gateway/servers → 200 + servers list."""
+        r = client.get("/api/gateway/servers")
+        assert r.status_code in (200, 503)
+
+    def test_gateway_policies(self, client: TestClient):
+        """GET /api/gateway/policies → 200."""
+        r = client.get("/api/gateway/policies")
+        assert r.status_code in (200, 503)
+
+

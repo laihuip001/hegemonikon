@@ -1603,3 +1603,77 @@ main:has(#graph-container) {
 .btn-danger:hover {
   background: #f85149;
 }
+
+/* ─── Symploke 統合検索 ─────────────────────────────────── */
+
+.search-source-chip {
+  background: transparent;
+  border: 1px solid var(--chip-color, #8b949e);
+  color: var(--chip-color, #8b949e);
+  padding: 0.25rem 0.6rem;
+  border-radius: 16px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  opacity: 0.5;
+}
+
+.search-source-chip:hover {
+  opacity: 0.8;
+}
+
+.search-source-chip.active {
+  background: color-mix(in srgb, var(--chip-color, #8b949e) 15%, transparent);
+  opacity: 1;
+  font-weight: 600;
+}
+
+.search-result-card {
+  transition: border-color 0.15s, box-shadow 0.15s, transform 0.15s;
+}
+
+.search-result-card:hover {
+  box-shadow: 0 0 12px rgba(88, 166, 255, 0.08);
+  transform: translateX(2px);
+}
+
+.search-source-badge {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 0.1rem 0.45rem;
+  border-radius: 4px;
+}
+
+.search-score {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.78rem;
+  color: #8b949e;
+  font-family: monospace;
+  position: relative;
+  min-width: 80px;
+}
+
+.search-score-bar {
+  display: inline-block;
+  height: 4px;
+  border-radius: 2px;
+  transition: width 0.3s ease;
+}
+
+.search-result-title {
+  margin: 0.25rem 0 0.15rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-color);
+}
+
+.search-result-snippet {
+  margin: 0;
+  font-size: 0.82rem;
+  color: #8b949e;
+  line-height: 1.5;
+}

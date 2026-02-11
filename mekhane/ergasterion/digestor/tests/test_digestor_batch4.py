@@ -92,24 +92,26 @@ class TestDigestorSelector:
 
     def test_match_fep_paper(self, selector, papers):
         matched = selector._match_topics(papers[0])
-        assert "fep" in matched
+        topic_ids = [t for t, _ in matched]
+        assert "fep" in topic_ids
 
     def test_match_category_paper(self, selector, papers):
         matched = selector._match_topics(papers[1])
-        assert "category" in matched
+        topic_ids = [t for t, _ in matched]
+        assert "category" in topic_ids
 
     def test_no_match_irrelevant(self, selector, papers):
         matched = selector._match_topics(papers[2])
         assert len(matched) == 0
 
     def test_calculate_score(self, selector, papers):
-        score = selector._calculate_score(papers[0], ["fep"])
+        score = selector._calculate_score(papers[0], [("fep", 0.7)])
         assert 0.0 <= score <= 1.0
         assert score > 0.0
 
     def test_score_with_long_abstract(self, selector):
         paper = Paper(id="x", title="Test", abstract="a" * 600, source="arxiv", source_id="x")
-        score = selector._calculate_score(paper, ["fep"])
+        score = selector._calculate_score(paper, [("fep", 0.7)])
         assert score > 0.0
 
     def test_select_candidates(self, selector, papers):

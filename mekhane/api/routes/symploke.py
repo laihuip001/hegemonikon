@@ -84,14 +84,49 @@ async def search(
     q: str = Query(..., min_length=1, description="検索クエリ"),
     k: int = Query(5, ge=1, le=50, description="結果数"),
     sources: str = Query(
-        "handoff,sophia,kairos",
-        description="検索対象 (カンマ区切り: handoff, sophia, kairos)"
+        "handoff,sophia,kairos,gnosis,chronos",
+        description="検索対象 (カンマ区切り: handoff, sophia, kairos, gnosis, chronos)"
     ),
 ):
     """Handoff/Sophia/Kairos の統合セマンティック検索。"""
     source_list = [s.strip() for s in sources.split(",")]
     results: list[SearchResultItem] = []
     sources_searched = []
+
+    # Mnēmē SearchEngine 横断検索 (gnosis / chronos)
+    mneme_sources = [s for s in source_list if s in ("gnosis", "chronos")]
+    if mneme_sources:
+        try:
+            from mekhane.symploke.search.engine import SearchEngine
+            from mekhane.symploke.adapters.embedding_adapter import EmbeddingAdapter
+            from mekhane.symploke.indices import (
+                GnosisIndex, ChronosIndex, Document,
+            )
+
+            engine = SearchEngine()
+            for IndexClass, name in [
+                (GnosisIndex, "gnosis"),
+                (ChronosIndex, "chronos"),
+            ]:
+                if name in mneme_sources:
+                    adapter = EmbeddingAdapter()
+                    index = IndexClass(adapter, name, dimension=384)
+                    index.initialize()
+                    engine.register(index)
+
+            mneme_results = engine.search(q, sources=mneme_sources, k=k)
+            for r in mneme_results:
+                results.append(SearchResultItem(
+                    id=r.doc_id,
+                    source=r.source.value,
+                    score=r.score,
+                    title=r.doc_id,
+                    snippet=r.content[:200] if r.content else "",
+                    metadata={"mneme": True},
+                ))
+            sources_searched.extend(mneme_sources)
+        except Exception as exc:
+            logger.warning("Mnēmē search failed: %s", exc)
 
     # Handoff 検索
     if "handoff" in source_list:

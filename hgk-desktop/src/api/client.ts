@@ -128,6 +128,13 @@ export const api = {
         }),
     wfList: () => apiFetch<WFListResponse>('/api/wf/list'),
     wfDetail: (name: string) => apiFetch<WFDetailResponse>(`/api/wf/${encodeURIComponent(name)}`),
+
+    // Symploke 統合検索
+    symplokeSearch: (q: string, k = 10, sources = 'handoff,sophia,kairos,gnosis,chronos') =>
+        apiFetch<SymplokeSearchResponse>(
+            `/api/symploke/search?q=${encodeURIComponent(q)}&k=${k}&sources=${encodeURIComponent(sources)}`
+        ),
+    symplokeStats: () => apiFetch<SymplokeStatsResponse>('/api/symploke/stats'),
 };
 
 // --- Notification Types ---
@@ -379,6 +386,32 @@ export interface KISearchResponse {
     query: string;
     results: KISearchResult[];
     total: number;
+}
+
+// ─── Symploke 統合検索 Types ─────────────────────────────
+
+export interface SymplokeSearchResultItem {
+    id: string;
+    source: string; // "handoff" | "sophia" | "kairos" | "gnosis" | "chronos"
+    score: number;
+    title: string;
+    snippet: string;
+    metadata: Record<string, unknown>;
+}
+
+export interface SymplokeSearchResponse {
+    query: string;
+    results: SymplokeSearchResultItem[];
+    total: number;
+    sources_searched: string[];
+}
+
+export interface SymplokeStatsResponse {
+    handoff_count: number;
+    sophia_index_exists: boolean;
+    kairos_index_exists: boolean;
+    persona_exists: boolean;
+    boot_axes_available: string[];
 }
 
 // ─── Sophia KI API Methods ───────────────────────────────

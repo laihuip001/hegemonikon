@@ -330,23 +330,25 @@ class DigestorSelector:
         return matched
 
     # PURPOSE: トピックマッチング (セマンティック or キーワード)
-    def _match_topics(self, paper) -> list[str]:
+    def _match_topics(self, paper) -> list[tuple[str, float]]:
         """トピックマッチング (セマンティック or キーワード)
 
         mode="semantic": SemanticMatcher でベクトル類似度マッチ
         mode="keyword": 従来の 60% キーワードマッチ
+
+        Returns:
+            (topic_id, similarity_score) のリスト
         """
         if self.mode == "semantic" and self._semantic_matcher is not None:
             try:
                 topics_list = self.topics.get("topics", [])
-                matches = self._semantic_matcher.match_topics(paper, topics_list)
-                return [topic_id for topic_id, _ in matches]
+                return self._semantic_matcher.match_topics(paper, topics_list)
             except Exception as e:
                 print(f"[Digestor] Semantic match failed, falling back to keyword: {e}")
                 self.mode = "keyword"
-                return self._match_topics_keyword(paper)
+                return [(t, 0.7) for t in self._match_topics_keyword(paper)]
         else:
-            return self._match_topics_keyword(paper)
+            return [(t, 0.7) for t in self._match_topics_keyword(paper)]
 
     # PURPOSE: テンプレート分類 (セマンティック)
     def _classify_template(self, paper) -> list[tuple[str, float]]:
@@ -360,32 +362,44 @@ class DigestorSelector:
         return []
 
     # PURPOSE: 優先度スコアを計算
-    def _calculate_score(self, paper, matched_topics: list[str]) -> float:
+    def _calculate_score(
+        self, paper, matched_topics: list[tuple[str, float]]
+    ) -> float:
         """優先度スコアを計算
 
-        スコア要素:
-        - トピックマッチ数
-        - 新鮮さ（published date）
-        - 将来: citation count, relevance to Hegemonikón
+        v2: セマンティック類似度の最大値を直接使う。
+        旧ロジック (マッチ数/全トピック数) は構造的にスコアが低くなる問題があった。
+
+        スコア構成:
+        - semantic_sim * 0.6  — 最もマッチするトピックとの類似度
+        - abstract_quality * 0.2 — abstract の充実度
+        - topic_breadth * 0.1 — 複数トピックへの広がり
+        - source_bonus * 0.1 — ソース品質
         """
         score = 0.0
 
-        # トピックマッチ (0.0 - 0.6)
-        max_topics = len(self.topics.get("topics", []))
-        if max_topics > 0:
-            score += min(len(matched_topics) / max_topics, 1.0) * 0.6
+        # セマンティック類似度 (0.0 - 0.6): 最大スコアを直接使う
+        if matched_topics:
+            max_sim = max(sim for _, sim in matched_topics)
+            score += max_sim * 0.6
 
-        # Abstract 長さボーナス (長い = 消化しやすい)
+        # トピック広がりボーナス (0.0 - 0.1)
+        if len(matched_topics) >= 3:
+            score += 0.1
+        elif len(matched_topics) >= 2:
+            score += 0.05
+
+        # Abstract 充実度 (0.0 - 0.2)
         if paper.abstract and len(paper.abstract) > 500:
             score += 0.2
         elif paper.abstract and len(paper.abstract) > 200:
             score += 0.1
 
-        # ソースボーナス
+        # ソースボーナス (0.0 - 0.1)
         if paper.source == "arxiv":
-            score += 0.1  # arXiv は最新プレプリント
+            score += 0.1
         elif paper.source == "semantic_scholar":
-            score += 0.1  # 被引用情報あり
+            score += 0.1
 
         return min(score, 1.0)
 
@@ -411,12 +425,14 @@ class DigestorSelector:
         candidates = []
 
         for paper in papers:
-            # トピックマッチング (semantic or keyword)
+            # トピックマッチング (semantic or keyword) — (topic_id, score) ペア
             matched_topics = self._match_topics(paper)
 
             # トピックフィルタリング
             if topic_filter:
-                matched_topics = [t for t in matched_topics if t in topic_filter]
+                matched_topics = [
+                    (t, s) for t, s in matched_topics if t in topic_filter
+                ]
 
             # マッチなしはスキップ
             if not matched_topics:
@@ -432,18 +448,25 @@ class DigestorSelector:
             # C: テンプレート分類
             templates = self._classify_template(paper)
 
+            # トピックIDリスト抽出
+            topic_ids = [t for t, _ in matched_topics]
+
             # 選定理由生成
             mode_label = f"[{self.mode}]"
+            sim_label = ""
+            if matched_topics:
+                top_sim = max(s for _, s in matched_topics)
+                sim_label = f" | Similarity: {top_sim:.2f}"
             template_label = ""
             if templates:
                 template_label = f" | Template: {templates[0][0]} ({templates[0][1]:.2f})"
-            rationale = f"{mode_label} Topics: {', '.join(matched_topics)} | Score: {score:.2f}{template_label}"
+            rationale = f"{mode_label} Topics: {', '.join(topic_ids)} | Score: {score:.2f}{sim_label}{template_label}"
 
             candidates.append(
                 DigestCandidate(
                     paper=paper,
                     score=score,
-                    matched_topics=matched_topics,
+                    matched_topics=topic_ids,
                     rationale=rationale,
                     suggested_templates=templates,
                 )

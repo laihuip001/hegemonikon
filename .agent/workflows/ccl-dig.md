@@ -1,6 +1,6 @@
 ---
 description: "[CCL Macro] 深掘り — @dig = /s+~(/p*/a)_/dia*/o+"
-lcm_state: active
+lcm_state: stable
 version: 1.0.0
 ---
 

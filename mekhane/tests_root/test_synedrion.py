@@ -118,7 +118,7 @@ class TestPromptGeneration:
         """プロンプトに出力パスが含まれる"""
         spec = get_all_specialists()[0]
         prompt = generate_prompt(spec, "test.py")
-        assert "docs/reviews/" in prompt
+        assert "mekhane/symploke/reviews/" in prompt
 
 
 # PURPOSE: カテゴリ分布テスト

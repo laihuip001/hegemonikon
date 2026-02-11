@@ -746,7 +746,7 @@ def __getattr__(name):
 def generate_prompt(
     spec: Specialist,
     target_file: str,
-    output_dir: str = "docs/reviews",
+    output_dir: str = "mekhane/symploke/reviews",
 ) -> str:
     """
     専門家レビュープロンプトを生成。

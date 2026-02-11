@@ -758,7 +758,7 @@ ALL_SPECIALISTS = PHASE1_SPECIALISTS
 
 # PURPOSE: tekhne-maker 形式の専門家レビュープロンプトを生成
 def generate_prompt(
-    spec: SpecialistDefinition, target_file: str, output_dir: str = "docs/reviews"
+    spec: SpecialistDefinition, target_file: str, output_dir: str = "mekhane/symploke/reviews"
 ) -> str:
     """tekhne-maker 形式の専門家レビュープロンプトを生成"""
     archetype_emoji = {

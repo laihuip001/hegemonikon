@@ -245,7 +245,7 @@ async def main():
     parser.add_argument(
         "--output",
         "-o",
-        default="docs/specialist_run_results.json",
+        default="mekhane/symploke/specialist_run_results.json",
         help="Output file for results",
     )
     parser.add_argument(

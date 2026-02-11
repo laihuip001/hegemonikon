@@ -35,7 +35,7 @@ async def create_session(key, specialist_id, specialist_name, focus, file_path):
     headers = {"X-Goog-Api-Key": key, "Content-Type": "application/json"}
     prompt = f"""# 専門家レビュー: {specialist_name}
 ## タスク
-`{file_path}` を分析し、結果を `docs/reviews/{specialist_id.lower()}_review.md` に書き込んでください。
+`{file_path}` を分析し、結果を `mekhane/symploke/reviews/{specialist_id.lower()}_review.md` に書き込んでください。
 ## 分析観点
 {focus}
 **必ずファイルを作成してコミットしてください。**
@@ -84,7 +84,7 @@ async def main():
             print(f'  Error: {result.get("error")}')
         await asyncio.sleep(0.3)
     Path(
-        "/home/makaron8426/oikos/hegemonikon/docs/specialist_run_results_v3.json"
+        "/home/makaron8426/oikos/hegemonikon/mekhane/symploke/specialist_run_results_v3.json"
     ).write_text(
         json.dumps(
             {"timestamp": datetime.now().isoformat(), "results": results},

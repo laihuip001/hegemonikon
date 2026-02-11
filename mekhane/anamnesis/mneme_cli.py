@@ -98,10 +98,38 @@ def cmd_ingest(args):
         except Exception as e:
             print(f"[Kairos] Error: {e}")
 
-    # Chronos (Conversation History) - Not yet implemented
+    # Chronos (Conversation History)
     if args.all or args.chronos:
-        # TODO: Implement when conversation history indexing is ready
-        results["chronos"] = 0
+        try:
+            from mekhane.symploke.chronos_ingest import (
+                get_conversation_files,
+                parse_conversation_chunks,
+                ingest_to_chronos,
+                DEFAULT_INDEX_PATH,
+            )
+
+            files = get_conversation_files()
+            all_docs = []
+            if files:
+                for f in files:
+                    if not f.exists():
+                        continue
+                    chunks = parse_conversation_chunks(f)
+                    all_docs.extend(chunks)
+
+                if all_docs:
+                    # Ensure directory exists
+                    DEFAULT_INDEX_PATH.parent.mkdir(parents=True, exist_ok=True)
+                    count = ingest_to_chronos(all_docs, save_path=str(DEFAULT_INDEX_PATH))
+                    results["chronos"] = count
+                else:
+                    print("[Chronos] No documents found")
+            else:
+                print("[Chronos] No conversation files found")
+        except ImportError as e:
+            print(f"[Chronos] Import error: {e}")
+        except Exception as e:
+            print(f"[Chronos] Error: {e}")
 
     # Output in /boot expected format
     total = sum(results.values())
@@ -139,8 +167,18 @@ def cmd_stats(args):
     )
     print(f"Kairos: {handoff_count} handoff files")
 
-    # Chronos stats (placeholder)
-    print("Chronos: Not implemented")
+    # Chronos stats
+    from mekhane.symploke.chronos_ingest import DEFAULT_INDEX_PATH as CHRONOS_INDEX_PATH
+    from mekhane.symploke.chronos_ingest import load_chronos_index
+
+    if CHRONOS_INDEX_PATH.exists():
+        try:
+            adapter = load_chronos_index(str(CHRONOS_INDEX_PATH))
+            print(f"Chronos: {adapter.count()} vectors")
+        except Exception as e:
+            print(f"Chronos: Error - {e}")
+    else:
+        print("Chronos: Not indexed")
 
     print("=" * 40)
     return 0

@@ -2051,6 +2051,11 @@ main:has(#graph-container) {
   color: #3fb950;
 }
 
+.tl-type-kalon {
+  color: #f0c674;
+  text-shadow: 0 0 6px rgba(240, 198, 100, 0.4);
+}
+
 .tl-event-date {
   font-size: 0.75rem;
   color: #6e7681;

@@ -30,6 +30,7 @@ _MNEME_DIR = Path.home() / "oikos" / "mneme" / ".hegemonikon"
 _SESSIONS_DIR = _MNEME_DIR / "sessions"
 _DOXA_DIR = _MNEME_DIR / "doxa"
 _WORKFLOWS_DIR = _MNEME_DIR / "workflows"
+_KALON_DIR = _MNEME_DIR / "kalon"
 
 
 def _file_id(path: Path) -> str:
@@ -166,6 +167,26 @@ def _scan_events(event_type: str | None = None) -> list[dict[str, Any]]:
             except Exception as e:
                 logger.warning("Failed to read %s: %s", f, e)
 
+    # 4. Kalon judgments
+    if event_type in (None, "kalon") and _KALON_DIR.exists():
+        for f in sorted(_KALON_DIR.iterdir()):
+            if f.suffix in (".md", ".json"):
+                try:
+                    content = f.read_text(encoding="utf-8")
+                    date = _extract_date(f.name)
+                    events.append({
+                        "id": _file_id(f),
+                        "type": "kalon",
+                        "title": _extract_title(content, f.name),
+                        "date": date or "",
+                        "summary": _extract_summary(content),
+                        "filename": f.name,
+                        "size_bytes": f.stat().st_size,
+                        "mtime": datetime.fromtimestamp(f.stat().st_mtime).isoformat(),
+                    })
+                except Exception as e:
+                    logger.warning("Failed to read %s: %s", f, e)
+
     # mtime で降順ソート (最新が先)
     events.sort(key=lambda e: e.get("mtime", ""), reverse=True)
     return events
@@ -174,7 +195,7 @@ def _scan_events(event_type: str | None = None) -> list[dict[str, Any]]:
 # --- ID からファイルパスを逆引き ---
 def _find_file_by_id(event_id: str) -> Path | None:
     """event_id からファイルパスを逆引きする。"""
-    dirs = [_SESSIONS_DIR, _DOXA_DIR, _WORKFLOWS_DIR]
+    dirs = [_SESSIONS_DIR, _DOXA_DIR, _WORKFLOWS_DIR, _KALON_DIR]
     for d in dirs:
         if not d.exists():
             continue
@@ -190,7 +211,7 @@ def _find_file_by_id(event_id: str) -> Path | None:
 async def timeline_events(
     limit: int = Query(50, ge=1, le=200),
     offset: int = Query(0, ge=0),
-    event_type: str | None = Query(None, regex="^(handoff|doxa|workflow)$"),
+    event_type: str | None = Query(None, regex="^(handoff|doxa|workflow|kalon)$"),
 ) -> dict[str, Any]:
     """統合タイムラインイベントを返す。"""
     all_events = _scan_events(event_type)
@@ -221,6 +242,8 @@ async def timeline_event_detail(event_id: str) -> dict[str, Any]:
         event_type = "handoff"
     elif path.parent == _DOXA_DIR:
         event_type = "doxa"
+    elif path.parent == _KALON_DIR:
+        event_type = "kalon"
     else:
         event_type = "workflow"
 
@@ -243,6 +266,7 @@ async def timeline_stats() -> dict[str, Any]:
     handoff_count = len(list(_SESSIONS_DIR.glob("handoff_*.md"))) if _SESSIONS_DIR.exists() else 0
     doxa_count = len(list(_DOXA_DIR.iterdir())) if _DOXA_DIR.exists() else 0
     wf_count = len(list(_WORKFLOWS_DIR.glob("*.md"))) if _WORKFLOWS_DIR.exists() else 0
+    kalon_count = len([f for f in _KALON_DIR.iterdir() if f.suffix in (".md", ".json")]) if _KALON_DIR.exists() else 0
 
     # 最新の Handoff
     latest_handoff = None
@@ -252,11 +276,12 @@ async def timeline_stats() -> dict[str, Any]:
             latest_handoff = handoffs[0].name
 
     return {
-        "total": handoff_count + doxa_count + wf_count,
+        "total": handoff_count + doxa_count + wf_count + kalon_count,
         "by_type": {
             "handoff": handoff_count,
             "doxa": doxa_count,
             "workflow": wf_count,
+            "kalon": kalon_count,
         },
         "latest_handoff": latest_handoff,
     }

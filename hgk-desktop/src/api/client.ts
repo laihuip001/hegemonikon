@@ -46,7 +46,7 @@ export type SELListResponse = paths['/api/postcheck/list']['get']['responses']['
 // --- Timeline Types ---
 export interface TimelineEvent {
     id: string;
-    type: 'handoff' | 'doxa' | 'workflow';
+    type: 'handoff' | 'doxa' | 'workflow' | 'kalon';
     title: string;
     date: string;
     summary: string;
@@ -66,8 +66,29 @@ export interface TimelineEventDetail extends TimelineEvent {
 }
 export interface TimelineStatsResponse {
     total: number;
-    by_type: { handoff: number; doxa: number; workflow: number };
+    by_type: { handoff: number; doxa: number; workflow: number; kalon: number };
     latest_handoff: string | null;
+}
+
+// --- Kalon Types ---
+export interface KalonJudgeResponse {
+    concept: string;
+    verdict: string;
+    label: string;
+    g_test: boolean;
+    f_test: boolean;
+    timestamp: string;
+    filename: string;
+}
+export interface KalonJudgment {
+    concept: string;
+    verdict: string;
+    filename: string;
+    mtime: string;
+}
+export interface KalonHistoryResponse {
+    judgments: KalonJudgment[];
+    total: number;
 }
 
 export const api = {
@@ -171,6 +192,16 @@ export const api = {
     },
     timelineEvent: (id: string) => apiFetch<TimelineEventDetail>(`/api/timeline/event/${id}`),
     timelineStats: () => apiFetch<TimelineStatsResponse>('/api/timeline/stats'),
+
+    // Kalon
+    kalonJudge: (concept: string, g_test: boolean, f_test: boolean, notes = '') =>
+        apiFetch<KalonJudgeResponse>('/api/kalon/judge', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ concept, g_test, f_test, notes }),
+        }),
+    kalonHistory: (limit = 50) =>
+        apiFetch<KalonHistoryResponse>(`/api/kalon/history?limit=${limit}`),
 };
 
 // --- Notification Types ---

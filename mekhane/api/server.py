@@ -166,6 +166,14 @@ def _register_routers(app: FastAPI) -> None:
     except Exception as exc:
         logger.warning("Timeline router skipped: %s", exc)
 
+    # Kalon — Fix(G∘F) 判定の記録と参照
+    try:
+        from mekhane.api.routes.kalon import router as kalon_router
+        app.include_router(kalon_router, prefix=API_PREFIX)
+        logger.info("Kalon router registered")
+    except Exception as exc:
+        logger.warning("Kalon router skipped: %s", exc)
+
     # MCP Gateway — PolicyEnforcer + DiscoveryEngine に依存するため遅延ロード
     try:
         from mekhane.api.routes.gateway import router as gateway_router

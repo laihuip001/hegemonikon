@@ -1303,6 +1303,7 @@ async function renderTimelineView(): Promise<void> {
         <span class="tl-stat">📋 Handoff: <strong>${stats.by_type.handoff}</strong></span>
         <span class="tl-stat">💡 Doxa: <strong>${stats.by_type.doxa}</strong></span>
         <span class="tl-stat">⚙️ WF: <strong>${stats.by_type.workflow}</strong></span>
+        <span class="tl-stat">◆ Kalon: <strong>${stats.by_type.kalon || 0}</strong></span>
         <span class="tl-stat tl-stat-total">合計: <strong>${stats.total}</strong></span>
       </div>`;
   } catch { /* ignore */ }
@@ -1317,6 +1318,7 @@ async function renderTimelineView(): Promise<void> {
           <button class="tl-filter" data-type="handoff">📋 Handoff</button>
           <button class="tl-filter" data-type="doxa">💡 Doxa</button>
           <button class="tl-filter" data-type="workflow">⚙️ Workflow</button>
+          <button class="tl-filter" data-type="kalon">◆ Kalon</button>
         </div>
       </div>
       <div class="tl-body">
@@ -1347,7 +1349,7 @@ async function loadTimelineEvents(): Promise<void> {
       listEl.innerHTML = '<div class="tl-empty">イベントがありません</div>';
       return;
     }
-    const typeIcon = (t: string) => t === 'handoff' ? '📋' : t === 'doxa' ? '💡' : '⚙️';
+    const typeIcon = (t: string) => t === 'handoff' ? '📋' : t === 'doxa' ? '💡' : t === 'kalon' ? '◆' : '⚙️';
     const typeClass = (t: string) => `tl-type-${t}`;
     const eventsHtml = data.events.map((e: TimelineEvent) => `
       <div class="tl-event-card" data-event-id="${esc(e.id)}">
@@ -1396,7 +1398,7 @@ async function loadTimelineDetail(eventId: string): Promise<void> {
   detailEl.innerHTML = '<div class="loading">読み込み中...</div>';
   try {
     const event: TimelineEventDetail = await api.timelineEvent(eventId);
-    const typeIcon = event.type === 'handoff' ? '📋' : event.type === 'doxa' ? '💡' : '⚙️';
+    const typeIcon = event.type === 'handoff' ? '📋' : event.type === 'doxa' ? '💡' : event.type === 'kalon' ? '◆' : '⚙️';
     const htmlContent = marked.parse(event.content || '') as string;
     detailEl.innerHTML = `
       <div class="tl-detail-header">

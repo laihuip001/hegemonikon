@@ -678,8 +678,24 @@ def postcheck_boot_report(report_path: str, mode: str = "detailed") -> dict:
         "detail": f"Checklist: {checked}/{total_checks} completed"
             + ("" if all_checked else f" ({unchecked} remaining)"),
     })
+    # Check 6: Intent-WAL 空チェック (Plan Object 案D — 環境強制)
+    # /boot- (fast) では省略可、/boot, /boot+ では必須
+    if mode != "fast":
+        has_intent_wal = bool(re.search(
+            r"intent_wal:|session_goal:", content, re.IGNORECASE
+        ))
+        # WAL が存在する場合、session_goal がプレースホルダーのままでないか確認
+        wal_filled = has_intent_wal and not bool(re.search(
+            r'session_goal:\s*["\']?\{', content
+        ))
+        checks.append({
+            "name": "intent_wal",
+            "passed": wal_filled,
+            "detail": "Intent-WAL: "
+                + ("✅ declared" if wal_filled else "❌ missing or unfilled")
+                + (" (required for /boot and /boot+)" if not wal_filled else ""),
+        })
 
-    # Check 6: 随伴メトリクス (Adjunction L⊣R)
     # Drift = 1 - ε (失われた文脈の量)
     # ε precision: Handoff への言及 + Self-Profile 参照 + 意味ある瞬間の記述
     # BS-3b fix: FILL 残存率で ε を割り引く

@@ -53,6 +53,19 @@ GATEWAY_PORT = int(os.getenv("HGK_GATEWAY_PORT", "8765"))
 # Bearer Token for OAuth access token (generated once, used as the access token)
 GATEWAY_TOKEN = os.getenv("HGK_GATEWAY_TOKEN", "")
 
+# [C-1] Fail-safe: TOKEN 未設定時はサーバー起動拒否
+if not GATEWAY_TOKEN:
+    print("❌ FATAL: HGK_GATEWAY_TOKEN is not set. Refusing to start.", file=sys.stderr)
+    print("   Set HGK_GATEWAY_TOKEN in .env or environment.", file=sys.stderr)
+    sys.exit(1)
+
+# [C-2] 許可されたクライアントIDのホワイトリスト
+ALLOWED_CLIENT_IDS: set[str] = {
+    "claude.ai",
+    "chatgpt.com",
+    "hgk-mobile",
+}
+
 # Allowed hosts for DNS rebinding protection
 _default_hosts = (
     "localhost,localhost:8765,"
@@ -83,7 +96,11 @@ class HGKOAuthProvider(OAuthAuthorizationServerProvider[AuthorizationCode, Refre
     async def get_client(self, client_id: str) -> OAuthClientInformationFull | None:
         client = self._clients.get(client_id)
         if client is None:
-            # Auto-register unknown clients (claude.ai skips /register)
+            # [C-2] Only allow whitelisted clients
+            if client_id not in ALLOWED_CLIENT_IDS:
+                print(f"⚠️ Rejected unknown client: {client_id[:32]}", file=sys.stderr)
+                return None
+            # Auto-register whitelisted clients (claude.ai skips /register)
             from pydantic import AnyHttpUrl
             client = OAuthClientInformationFull(
                 client_id=client_id,
@@ -149,7 +166,7 @@ class HGKOAuthProvider(OAuthAuthorizationServerProvider[AuthorizationCode, Refre
         return OAuthToken(
             access_token=self._access_token,
             token_type="bearer",
-            expires_in=86400 * 365,  # 1 year
+            expires_in=86400,  # [C-4] 24 hours (was 1 year)
             refresh_token=refresh,
             scope=" ".join(authorization_code.scopes) if authorization_code.scopes else None,
         )
@@ -179,7 +196,7 @@ class HGKOAuthProvider(OAuthAuthorizationServerProvider[AuthorizationCode, Refre
         return OAuthToken(
             access_token=self._access_token,
             token_type="bearer",
-            expires_in=86400 * 365,
+            expires_in=86400,  # [C-4] 24 hours
             refresh_token=new_refresh,
             scope=" ".join(scopes) if scopes else None,
         )
@@ -513,9 +530,13 @@ def hgk_idea_capture(idea: str, tags: str = "") -> str:
     次回 /boot で自動的に読み込まれる。
 
     Args:
-        idea: アイデアの内容
+        idea: アイデアの内容 (最大10,000文字)
         tags: タグ (カンマ区切り、例: "FEP, 設計, 実験")
     """
+    # [C-3] Content size limit
+    MAX_IDEA_SIZE = 10_000
+    if len(idea) > MAX_IDEA_SIZE:
+        return f"❌ エラー: アイデアが長すぎます ({len(idea)} 文字)。上限は {MAX_IDEA_SIZE} 文字です。"
     IDEA_DIR.mkdir(parents=True, exist_ok=True)
 
     now = datetime.now()
@@ -584,11 +605,8 @@ def hgk_status() -> str:
 # =============================================================================
 
 if __name__ == "__main__":
-    if GATEWAY_TOKEN:
-        print("🔒 OAuth 2.1 authentication ENABLED")
-    else:
-        print("⚠️  No authentication (HGK_GATEWAY_TOKEN not set)")
-
+    # C-1 fail-safe ensures GATEWAY_TOKEN is always set at this point
+    print("🔒 OAuth 2.1 authentication ENABLED")
     print(f"🚀 HGK Gateway starting on {GATEWAY_HOST}:{GATEWAY_PORT}")
     mcp.run(transport="streamable-http")
 

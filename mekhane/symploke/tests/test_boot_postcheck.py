@@ -147,6 +147,8 @@ class TestPostcheckBootReport:
         content = content.replace("<!-- FILL -->", "This section has been filled with meaningful content.")
         # Mark all checklist items as done
         content = content.replace("- [ ]", "- [x]")
+        # Add Intent-WAL section (required for /boot and /boot+ postcheck)
+        content += "\n## Intent-WAL\nintent_wal:\n  session_goal: Test implementation of security fixes\n"
         # Pad to meet min_chars
         while len(content) < MODE_REQUIREMENTS["detailed"]["min_chars"]:
             content += "\nAdditional content to meet minimum character requirements."
@@ -180,7 +182,7 @@ class TestPostcheckBootReport:
 
             result = postcheck_boot_report(f.name, mode="standard")
             # Standard should check fewer requirements
-            assert len(result["checks"]) == 6
+            assert len(result["checks"]) == 7  # +1 for intent_wal check
             Path(f.name).unlink()
 
     # PURPOSE: Fast mode has minimal requirements

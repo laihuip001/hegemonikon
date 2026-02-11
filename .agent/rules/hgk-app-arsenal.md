@@ -1,10 +1,7 @@
 ---
-trigger: always_on
-glob:
-description: HGK Desktop App 開発: 既存 PJ を使え（臨時ルール）
+description: HGK Desktop App / Tauri / Three.js 開発時に参照する臨時ルール（既存PJの道具を使え）
 lifecycle: temporary
 expires: 2026-06-01
-reason: Desktop App 開発期間中。開発完了後 model_decision に降格
 ---
 
 # 🔴 HGK Desktop App 開発: 既存 PJ を使え

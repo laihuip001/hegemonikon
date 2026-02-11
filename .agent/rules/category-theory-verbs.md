@@ -1,7 +1,5 @@
 ---
-trigger: always_on
-glob:
-description: 圏論概念を HGK 操作言語として使うための動詞辞書
+description: 圏論用語（随伴、関手、η、ε、Drift、忘却、合流、合致、pushout、pullback等）が会話に現れたときに参照する動詞辞書
 ---
 # 🏛️ 順序・圏論動詞辞書 — HGK 操作言語
 

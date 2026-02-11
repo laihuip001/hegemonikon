@@ -14,7 +14,7 @@ from .ccl_ast import (
     OpType, Workflow, Condition, MacroRef,
     ConvergenceLoop, Sequence, Fusion, Oscillation, ColimitExpansion,
     Pipeline, Parallel,
-    ForLoop, IfCondition, WhileLoop, Lambda, Program
+    ForLoop, IfCondition, WhileLoop, Lambda, LetBinding, Program
 )
 
 
@@ -89,6 +89,10 @@ class CCLParser:
             if isinstance(body, Workflow):
                 operators = body.operators
             return ColimitExpansion(body=body, operators=operators)
+        
+        # let マクロ定義: let @name = CCL
+        if expr.startswith('let '):
+            return self._parse_let(expr)
         
         # CPL 制御構文チェック
         if expr.startswith('F:'):
@@ -260,8 +264,9 @@ class CCLParser:
         """条件式をパース"""
         expr = expr.strip()
         
-        # V[] < 0.3 形式
-        pattern = r'(V\[\]|E\[\]|\w+)\s*(<|>|<=|>=|=)\s*([\d.]+)'
+        # 拡張パターン: V[] < 0.3, E[] > 0.5, E[/growth] > 0.8
+        # 関数呼び出し形式を許容: VAR[任意の中身] OP VALUE
+        pattern = r'(V\[[^\]]*\]|E\[[^\]]*\]|\w+)\s*(<|>|<=|>=|=)\s*([\d.]+)'
         match = re.match(pattern, expr)
         
         if match:
@@ -330,14 +335,16 @@ class CCLParser:
         raise ValueError(f"Invalid FOR loop: {expr}")
     
     def _parse_if(self, expr: str) -> IfCondition:
-        """IF 条件分岐をパース: I:[cond]{then} E:{else} or I:cond{then}"""
-        # Pattern 1: I:[cond]{then} E:{else} (角括弧あり, V[] 含む条件式対応)
-        pattern = r'I:\[([^\]]*(?:\[\][^\]]*)*)\]\{([^}]+)\}(?:\s*E:\{([^}]+)\})?'
+        """IF 条件分岐をパース: I:[cond]{then} EI:[cond]{elif} E:{else}"""
+        # Pattern 1: I:[cond]{then} に続く EI:/E: チェインを処理
+        # V[]/E[] を含む条件式と、E[/selector] 等の角括弧内内容にも対応
+        pattern = r'I:\[([^\]]*(?:\[[^\]]*\][^\]]*)*)\]\{([^}]+)\}(.*)$'
         match = re.match(pattern, expr)
         if match:
             condition = self._parse_condition(match.group(1))
             then_branch = self._parse_expression(match.group(2))
-            else_branch = self._parse_expression(match.group(3)) if match.group(3) else None
+            rest = match.group(3).strip()
+            else_branch = self._parse_else_chain(rest) if rest else None
             return IfCondition(
                 condition=condition,
                 then_branch=then_branch,
@@ -345,12 +352,12 @@ class CCLParser:
             )
 
         # Pattern 2: I:cond{then} (角括弧なし、シンプル条件)
-        match2 = re.match(r'I:(\w+)\{(.+)\}(?:\s*E:\{(.+)\})?$', expr)
+        match2 = re.match(r'I:(\w+)\{([^}]+)\}(.*)$', expr)
         if match2:
-            # シンプル条件: 変数名のみ (e.g., "gap")
             condition = Condition(var=match2.group(1), op=">", value=0)
             then_branch = self._parse_expression(match2.group(2))
-            else_branch = self._parse_expression(match2.group(3)) if match2.group(3) else None
+            rest = match2.group(3).strip()
+            else_branch = self._parse_else_chain(rest) if rest else None
             return IfCondition(
                 condition=condition,
                 then_branch=then_branch,
@@ -358,6 +365,24 @@ class CCLParser:
             )
 
         raise ValueError(f"Invalid IF: {expr}")
+
+    def _parse_else_chain(self, rest: str) -> Any:
+        """EI:/E: チェインをパース → ネストされた IfCondition に変換"""
+        rest = rest.strip()
+        if not rest:
+            return None
+        
+        # EI:[cond]{body}... → 再帰的に IfCondition をネスト
+        if rest.startswith('EI:'):
+            # EI: を I: に置換して再帰パース
+            return self._parse_if('I:' + rest[3:])
+        
+        # E:{body} → else ブランチ
+        match = re.match(r'E:\{([^}]+)\}(.*)$', rest)
+        if match:
+            return self._parse_expression(match.group(1))
+        
+        return None
     
     def _parse_while(self, expr: str) -> WhileLoop:
         """WHILE ループをパース: W:[cond]{body}"""
@@ -384,8 +409,8 @@ class CCLParser:
     
     def _parse_lim(self, expr: str) -> ConvergenceLoop:
         """lim 正式形をパース: lim[cond]{body}"""
-        # V[] を含む条件式を許容するパターン
-        match = re.match(r'lim\[([^\]]*(?:\[\][^\]]*)*)\]\{(.+)\}$', expr)
+        # E[/growth] 等の角括弧内に内容がある関数呼び出しにも対応
+        match = re.match(r'lim\[([^\]]*(?:\[[^\]]*\][^\]]*)*)\]\{(.+)\}$', expr)
         if not match:
             raise ValueError(f"Invalid lim: {expr}")
         
@@ -393,6 +418,17 @@ class CCLParser:
         body = self._parse_expression(match.group(2))
         
         return ConvergenceLoop(body=body, condition=condition)
+
+    def _parse_let(self, expr: str) -> LetBinding:
+        """let マクロ定義をパース: let @name = CCL"""
+        match = re.match(r'let\s+@(\w+)\s*=\s*(.+)$', expr)
+        if not match:
+            raise ValueError(f"Invalid let: {expr}")
+        
+        name = match.group(1)
+        body = self._parse_expression(match.group(2))
+        
+        return LetBinding(name=name, body=body)
 
 
 # =============================================================================
@@ -419,9 +455,12 @@ if __name__ == "__main__":
         "/noe * /dia",
         "F:[×3]{/dia}",
         "I:[V[] > 0.5]{/noe+} E:{/noe-}",
+        "I:[V[]<0.3]{/ene+} EI:[V[]>0.7]{/pra+} E:{/zet}",  # EI: チェイン
         "W:[E[] > 0.3]{/dia}",
         "L:[wf]{wf+}",
         "lim[V[] < 0.3]{/noe+}",
+        "lim[E[/growth]>0.8]{/noe+ _ /dia}",  # E[/growth] 拡張条件
+        "let @think = /noe+ _ /dia",  # let マクロ定義
         "/noe+ |> /dia+",
         "/noe+ |> /dia+ |> /ene",
         "/noe+ || /dia+",

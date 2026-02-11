@@ -212,6 +212,16 @@ class Program:
     macros: Dict[str, Any] = field(default_factory=dict)  # let 定義
 
 
+@dataclass
+class LetBinding:
+    """マクロ定義: let @name = CCL 式
+    
+    例: let @think = /noe+ _ /dia
+    """
+    name: str                            # マクロ名 (@ なし)
+    body: Any                            # 束縛される CCL 式
+
+
 # =============================================================================
 # Type Aliases
 # =============================================================================
@@ -221,5 +231,5 @@ ASTNode = Union[
     ConvergenceLoop, Sequence, Fusion, Oscillation, ColimitExpansion,
     Pipeline, Parallel,
     ForLoop, IfCondition, WhileLoop, Lambda,
-    Program
+    LetBinding, Program
 ]

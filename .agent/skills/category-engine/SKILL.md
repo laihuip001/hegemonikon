@@ -13,7 +13,7 @@ triggers:
   - Trigonon / X-series を参照する時
   - 「なぜこの変換は正当か」を問う時
 
-risk_tier: low
+risk_tier: L1
 risks:
   - 抽象化による詳細の喪失
   - 圏論的概念の誤用による混乱

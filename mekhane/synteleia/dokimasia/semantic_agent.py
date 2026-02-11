@@ -40,11 +40,13 @@ from ..base import (
 class LLMBackend(ABC):
     """LLM バックエンドの抽象インターフェース"""
 
+    # PURPOSE: LLM にクエリを送信
     @abstractmethod
     def query(self, prompt: str, context: str) -> str:
         """LLM にクエリを送信し、テキスト応答を返す"""
         pass
 
+    # PURPOSE: バックエンド利用可能判定
     @abstractmethod
     def is_available(self) -> bool:
         """バックエンドが利用可能か"""
@@ -59,6 +61,7 @@ class LMQLBackend(LLMBackend):
         self.model = model
         self._available: Optional[bool] = None
 
+    # PURPOSE: LMQL 経由でクエリを実行
     def query(self, prompt: str, context: str) -> str:
         """LMQL 経由でクエリを実行"""
         try:

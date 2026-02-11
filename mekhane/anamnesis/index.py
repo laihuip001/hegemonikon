@@ -50,8 +50,11 @@ def _get_vector_dimension(table) -> int | None:
 if sys.platform == "win32":
     try:
         sys.stdout.reconfigure(encoding="utf-8")
-    except Exception:
-        pass  # TODO: Add proper error handling
+    except AttributeError:
+        # Expected if stdout is redirected/mocked (e.g. in tests)
+        pass
+    except Exception as e:
+        print(f"Warning: Failed to set console encoding: {e}", file=sys.stderr)
 
 
 # PURPOSE: Text embedding with automatic GPU acceleration.

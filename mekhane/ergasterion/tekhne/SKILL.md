@@ -16,6 +16,11 @@ description: |
   - 「PE」
   - 「生成」
   - 「製作」
+
+risk_tier: L1
+risks:
+  - 複雑性によるトークン消費
+  - 過剰な人格装飾によるノイズ
 ---
 
 # Tekhne-Maker v6.7 「OMEGA SINGULARITY BUILD + TARGET_AGENT」

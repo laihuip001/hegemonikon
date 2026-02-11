@@ -1,3 +1,4 @@
+# PROOF: [L3/Test] <- mekhane/anamnesis/pb_parser.py P3→信頼性確保→回帰テスト
 import unittest
 import sys
 import os

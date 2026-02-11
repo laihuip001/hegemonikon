@@ -12,6 +12,16 @@ triggers:
   - 構造の保存・忘却を問う時
   - Trigonon / X-series を参照する時
   - 「なぜこの変換は正当か」を問う時
+
+# Safety Contract (v1.0)
+risk_tier: L2             # L2(中) - 理論的なリスク
+reversible: true          # 出力は解釈であり可逆
+requires_approval: false  # 思考スキルなので承認不要
+risks:
+  - "圏論的概念の乱用による過度な抽象化"
+  - "前順序圏の限界を超えた誤った同一視"
+fallbacks:
+  - "fep-engine"
 ---
 
 # 🏛️ Category Theory Engine — 構造認識の言語

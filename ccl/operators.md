@@ -656,7 +656,7 @@ F:[ALL]{ /sta }
 
 > Creator が直接呼び出す複合 CCL パターン。
 > **正本**: `.agent/workflows/ccl-*.md`
-> **リファレンス**: [`docs/ccl_macro_reference.md`](../docs/ccl_macro_reference.md)
+> **リファレンス**: [`ccl_macro_reference.md`](ccl_macro_reference.md)
 
 | マクロ | 俗名 | CCL 定義 |
 |:-------|:-----|:---------|

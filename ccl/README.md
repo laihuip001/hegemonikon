@@ -94,7 +94,7 @@ ccl/
 ```
 
 > ユーザーマクロ(12) は `.agent/workflows/ccl-*.md` で定義
-> マクロリファレンス: [`docs/ccl_macro_reference.md`](../docs/ccl_macro_reference.md)
+> マクロリファレンス: [`ccl_macro_reference.md`](ccl_macro_reference.md)
 
 ## 関連リソース
 

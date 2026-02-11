@@ -14,7 +14,7 @@ from datetime import datetime
 
 # 設定
 USER_URLNAME = "tasty_dunlin998"
-OUTPUT_DIR = Path("/home/makaron8426/oikos/hegemonikon/mekhane/peira/raw/note")
+OUTPUT_DIR = Path("/home/makaron8426/oikos/mneme/.hegemonikon/raw/note")
 API_BASE = "https://note.com/api/v2"
 
 # PURPOSE: CLI エントリポイント — データパイプラインの直接実行

@@ -60,6 +60,8 @@ class CCLParser:
     
     def parse(self, ccl: str) -> Any:
         """CCL 式をパース"""
+        # コメント削除 (# 以降を行末まで)
+        ccl = re.sub(r'#.*$', '', ccl, flags=re.MULTILINE)
         ccl = ccl.strip()
         self.errors = []
         
@@ -81,6 +83,21 @@ class CCLParser:
                 self._is_balanced_group(expr, '{', '}')):
             return self._parse_expression(expr[1:-1])
         
+        # マクロ参照 (二項演算子より先にチェック、完全一致のみ)
+        if expr.startswith('@'):
+            try:
+                return self._parse_macro(expr)
+            except ValueError:
+                pass  # マクロとしてパースできなければ二項演算子チェックへ
+
+        # 二項演算子を優先順位順にチェック
+        for op in self.BINARY_OPS_PRIORITY:
+            if op in expr:
+                # 最も外側の演算子を見つける
+                parts = self._split_binary(expr, op)
+                if len(parts) > 1:
+                    return self._handle_binary(op, parts)
+
         # Colimit 前置演算子: \WF
         if expr.startswith('\\'):
             inner = expr[1:]
@@ -103,24 +120,10 @@ class CCLParser:
             return self._parse_lim(expr)
         
         # グループ振動: ~(...) — シーケンス全体を振動（反復実行）
-        # 例: ~(/sop_/noe_/ene_/dia-) = 4WFシーケンスを反復
-        # 二項演算子より先にチェック（括弧内の _ で分割されるのを防ぐ）
         if expr.startswith('~(') and expr.endswith(')') and self._is_balanced_group(expr[1:], '(', ')'):
             inner = expr[2:-1]  # ~( と ) を除去
             body = self._parse_expression(inner)
             return Oscillation(left=body, right=body)
-        
-        # 二項演算子を優先順位順にチェック
-        for op in self.BINARY_OPS_PRIORITY:
-            if op in expr:
-                # 最も外側の演算子を見つける
-                parts = self._split_binary(expr, op)
-                if len(parts) > 1:
-                    return self._handle_binary(op, parts)
-        
-        # マクロ参照
-        if expr.startswith('@'):
-            return self._parse_macro(expr)
         
         # ワークフロー
         return self._parse_workflow(expr)
@@ -276,35 +279,86 @@ class CCLParser:
     
     def _parse_macro(self, expr: str) -> MacroRef:
         """マクロ参照をパース"""
-        # 拡張パターン: @name[·×+-]? または @name{...} または @name(...)
-        # 1. @syn· @syn× など演算子付き
-        # 2. @S{O,A,K} などセレクタ付き
-        # 3. @think(param) など引数付き
-        match = re.match(r'@(\w+)([·×\+\-]?)(?:\{([^}]*)\}|\(([^)]*)\))?', expr)
-        if match:
-            name = match.group(1)
-            operator = match.group(2)
-            selector = match.group(3)  # {} 内
-            args_str = match.group(4)  # () 内
+        # regex for name part only
+        match = re.match(r'^@(\w+)([·×\+\-]?)', expr)
+        if not match:
+             raise ValueError(f"Invalid macro name: {expr}")
+
+        name = match.group(1)
+        operator = match.group(2)
+        if operator:
+            name = name + operator
             
-            # 演算子があれば名前に付加
-            if operator:
-                name = name + operator
+        rest = expr[match.end():]
+        args = []
+
+        if not rest:
+            return MacroRef(name=name, args=[])
             
-            # 引数解析
-            args = []
-            if selector:
-                args = [selector]  # セレクタは1つの引数として扱う
-            elif args_str:
-                args = [a.strip() for a in args_str.split(',')]
+        # Parse (...) if present
+        if rest.startswith('('):
+            arg_str, end_idx = self._read_balanced(rest, 0, '(', ')')
+            args.extend(self._split_args(arg_str))
+            rest = rest[end_idx:]
             
-            return MacroRef(name=name, args=args)
-        raise ValueError(f"Invalid macro: {expr}")
+        # Parse {...} if present
+        if rest.startswith('{'):
+             content, end_idx = self._read_balanced(rest, 0, '{', '}')
+             # Treat selector content as one arg
+             args.append(content)
+             rest = rest[end_idx:]
+
+        if rest:
+             raise ValueError(f"Invalid macro args or trailing chars: {rest}")
+
+        return MacroRef(name=name, args=args)
+
+    def _split_args(self, args_str: str) -> List[str]:
+        """引数リストを分割 (ネストした括弧を考慮)"""
+        args = []
+        current = ""
+        depth = 0
+
+        for c in args_str:
+            if c == '(':
+                depth += 1
+                current += c
+            elif c == ')':
+                depth -= 1
+                current += c
+            elif c == ',' and depth == 0:
+                args.append(current.strip())
+                current = ""
+            else:
+                current += c
+
+        if current.strip():
+            args.append(current.strip())
+
+        return args
+
+    def _read_balanced(self, expr: str, start_idx: int, open_char: str, close_char: str) -> tuple[str, int]:
+        """バランスした括弧の中身を読み取る"""
+        if start_idx >= len(expr) or expr[start_idx] != open_char:
+            raise ValueError(f"Expected '{open_char}' at {start_idx}")
+
+        depth = 0
+        for i in range(start_idx, len(expr)):
+            c = expr[i]
+            if c == open_char:
+                depth += 1
+            elif c == close_char:
+                depth -= 1
+                if depth == 0:
+                    # Found matching close char
+                    return expr[start_idx+1:i], i+1
+
+        raise ValueError(f"Unbalanced '{open_char}' starting at {start_idx}")
     
     def _parse_for(self, expr: str) -> ForLoop:
         """FOR ループをパース: F:[×N]{body} or F:[A,B]{body} or F:N{body}"""
         # Pattern 1: F:[...]{body} (角括弧あり)
-        match = re.match(r'F:\[([^\]]+)\]\{(.+)\}$', expr)
+        match = re.match(r'F:\[([^\]]+)\]\{(.+)\}$', expr, re.DOTALL)
         if match:
             iter_spec = match.group(1).strip()
             body_str = match.group(2).strip()
@@ -320,7 +374,7 @@ class CCLParser:
             return ForLoop(iterations=iterations, body=body)
 
         # Pattern 2: F:N{body} (角括弧なし、数値直接指定)
-        match2 = re.match(r'F:(\d+)\{(.+)\}$', expr)
+        match2 = re.match(r'F:(\d+)\{(.+)\}$', expr, re.DOTALL)
         if match2:
             iterations = int(match2.group(1))
             body_str = match2.group(2).strip()
@@ -330,39 +384,70 @@ class CCLParser:
         raise ValueError(f"Invalid FOR loop: {expr}")
     
     def _parse_if(self, expr: str) -> IfCondition:
-        """IF 条件分岐をパース: I:[cond]{then} E:{else} or I:cond{then}"""
-        # Pattern 1: I:[cond]{then} E:{else} (角括弧あり, V[] 含む条件式対応)
-        pattern = r'I:\[([^\]]*(?:\[\][^\]]*)*)\]\{([^}]+)\}(?:\s*E:\{([^}]+)\})?'
-        match = re.match(pattern, expr)
-        if match:
-            condition = self._parse_condition(match.group(1))
-            then_branch = self._parse_expression(match.group(2))
-            else_branch = self._parse_expression(match.group(3)) if match.group(3) else None
-            return IfCondition(
-                condition=condition,
-                then_branch=then_branch,
-                else_branch=else_branch
-            )
+        """IF 条件分岐をパース: I:[cond]{then} E:{else} or I:cond{then}
+        Supports EI:[cond]{then} by recursion.
+        """
+        expr = expr.strip()
 
-        # Pattern 2: I:cond{then} (角括弧なし、シンプル条件)
-        match2 = re.match(r'I:(\w+)\{(.+)\}(?:\s*E:\{(.+)\})?$', expr)
-        if match2:
-            # シンプル条件: 変数名のみ (e.g., "gap")
-            condition = Condition(var=match2.group(1), op=">", value=0)
-            then_branch = self._parse_expression(match2.group(2))
-            else_branch = self._parse_expression(match2.group(3)) if match2.group(3) else None
-            return IfCondition(
-                condition=condition,
-                then_branch=then_branch,
-                else_branch=else_branch
-            )
+        # Match "I:" or "EI:"
+        prefix = "I:"
+        if expr.startswith("EI:"):
+            prefix = "EI:"
+        elif not expr.startswith("I:"):
+            raise ValueError(f"Invalid IF: {expr}")
 
-        raise ValueError(f"Invalid IF: {expr}")
+        pos = len(prefix)
+        # Check for [condition] or condition
+        if pos < len(expr) and expr[pos] == '[':
+            cond_str, pos = self._read_balanced(expr, pos, '[', ']')
+            # V[outputs] > 0.8 comes as is
+            condition = self._parse_condition(cond_str)
+        else:
+             # simple condition? e.g. I:cond{...}
+             # Scan until {
+             brace_idx = expr.find('{', pos)
+             if brace_idx == -1:
+                 raise ValueError("Missing '{' for IF body")
+             cond_str = expr[pos:brace_idx].strip()
+             pos = brace_idx
+             condition = self._parse_condition(cond_str)
+
+        # Read body
+        # Skip optional whitespace?
+        while pos < len(expr) and expr[pos].isspace():
+            pos += 1
+
+        if pos >= len(expr) or expr[pos] != '{':
+             raise ValueError("Expected '{' after condition")
+
+        then_body_str, pos = self._read_balanced(expr, pos, '{', '}')
+        then_branch = self._parse_expression(then_body_str)
+
+        # Check for Else/ElseIf
+        rest = expr[pos:].strip()
+        else_branch = None
+
+        if rest.startswith('EI:'):
+             # Recursively parse as IfCondition
+             else_branch = self._parse_if(rest)
+        elif rest.startswith('E:'):
+             # Else block
+             pos_e = rest.find('{')
+             if pos_e == -1:
+                 raise ValueError("Missing '{' for ELSE body")
+             else_body_str, _ = self._read_balanced(rest, pos_e, '{', '}')
+             else_branch = self._parse_expression(else_body_str)
+
+        return IfCondition(
+            condition=condition,
+            then_branch=then_branch,
+            else_branch=else_branch
+        )
     
     def _parse_while(self, expr: str) -> WhileLoop:
         """WHILE ループをパース: W:[cond]{body}"""
         # V[] を含む条件式を許容するパターン
-        match = re.match(r'W:\[([^\]]*(?:\[\][^\]]*)*)\]\{(.+)\}$', expr)
+        match = re.match(r'W:\[([^\]]*(?:\[\][^\]]*)*)\]\{(.+)\}$', expr, re.DOTALL)
         if not match:
             raise ValueError(f"Invalid WHILE: {expr}")
         
@@ -373,7 +458,7 @@ class CCLParser:
     
     def _parse_lambda(self, expr: str) -> Lambda:
         """Lambda をパース: L:[x]{body}"""
-        match = re.match(r'L:\[([^\]]+)\]\{(.+)\}$', expr)
+        match = re.match(r'L:\[([^\]]+)\]\{(.+)\}$', expr, re.DOTALL)
         if not match:
             raise ValueError(f"Invalid Lambda: {expr}")
         
@@ -385,7 +470,7 @@ class CCLParser:
     def _parse_lim(self, expr: str) -> ConvergenceLoop:
         """lim 正式形をパース: lim[cond]{body}"""
         # V[] を含む条件式を許容するパターン
-        match = re.match(r'lim\[([^\]]*(?:\[\][^\]]*)*)\]\{(.+)\}$', expr)
+        match = re.match(r'lim\[([^\]]*(?:\[\][^\]]*)*)\]\{(.+)\}$', expr, re.DOTALL)
         if not match:
             raise ValueError(f"Invalid lim: {expr}")
         

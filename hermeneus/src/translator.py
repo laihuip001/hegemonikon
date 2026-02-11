@@ -14,6 +14,8 @@ from .ccl_ast import (
     ConvergenceLoop, Sequence, Fusion, Oscillation,
     ForLoop, IfCondition, WhileLoop, Lambda
 )
+from .macros import expand_macro
+from .parser import CCLParser
 
 
 # =============================================================================
@@ -107,7 +109,7 @@ class LMQLTranslator:
             raise ValueError(f"Unknown AST node: {type(ast)}")
     
     def _translate_macro(self, macro: MacroRef) -> str:
-        """マクロ参照を LMQL に変換（Synteleia 統合）"""
+        """マクロ参照を LMQL に変換（Synteleia 統合または展開）"""
         name = macro.name
         args = macro.args
         
@@ -115,9 +117,44 @@ class LMQLTranslator:
         if name in ("syn", "syn·", "poiesis", "dokimasia", "S"):
             return self._translate_synteleia_macro(name, args)
         
-        # 一般マクロ: ビルトインまたはユーザー定義
+        # 引数解析 (位置引数とキーワード引数の分離)
+        pos_args = []
+        kw_args = {}
+        for arg in args:
+            if "=" in arg:
+                key, val = arg.split("=", 1)
+                kw_args[key.strip()] = val.strip()
+            else:
+                pos_args.append(arg)
+
+        # マクロ展開
+        expanded_ccl = expand_macro(name, pos_args, kw_args)
+
+        if expanded_ccl:
+            try:
+                # 展開された CCL をパースして AST に変換
+                parser = CCLParser()
+                expanded_ast = parser.parse(expanded_ccl)
+
+                # 再帰的に翻訳
+                return self.translate(expanded_ast)
+            except Exception as e:
+                # 展開失敗時 (パースエラーなど) はフォールバック
+                # またはエラーメッセージを含む LMQL を返す
+                return f'''
+# Error expanding macro @{name}: {str(e)}
+@lmql.query
+def macro_error(context: str):
+    """マクロ展開エラー"""
+    argmax
+        "Error: {str(e)}"
+        "[RESULT]"
+    from "{self.model}"
+'''
+
+        # 未定義マクロの場合 (フォールバック)
         return f'''
-# CCL マクロ: @{name}
+# CCL マクロ: @{name} (未定義または展開不可)
 # TODO: マクロ展開 → 他の CCL 式に変換
 @lmql.query
 def macro_{name}(context: str):

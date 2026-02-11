@@ -36,7 +36,7 @@ parameters:
 ```ccl
 @repeat(A, N)
 →
-F:1_N{A}
+F:N{A}
 ```
 
 ## 適用例

@@ -1,5 +1,5 @@
 ---
-description: 基本派生モード。comp (組立), inve (創出), adap (適応), model (モデル), simulation (シミュレーション)。
+summary: 基本派生モード。comp (組立), inve (創出), adap (適応), model (モデル), simulation (シミュレーション)。
 hegemonikon: S2 Mekhanē
 parent: ../mek.md
 ---

@@ -1,5 +1,5 @@
 ---
-description: O3 Zētēsis 派生モード (anom/hypo/eval/abduction)
+summary: O3 Zētēsis 派生モード (anom/hypo/eval/abduction)
 parent: zet.md
 ---
 

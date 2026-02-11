@@ -1,5 +1,5 @@
 ---
-description: Phase 0 — Identity Stack 読込。「私」の連続性を確保。
+summary: Phase 0 — Identity Stack 読込。「私」の連続性を確保。
 parent: /boot
 origin: 2026-01-31 Continuing Me Identity パターン
 ---

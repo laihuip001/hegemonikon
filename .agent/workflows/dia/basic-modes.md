@@ -1,5 +1,5 @@
 ---
-description: 基本モード。aff, neg, root, devil, steelman, counterfactual。
+summary: 基本モード。aff, neg, root, devil, steelman, counterfactual。
 parent: /dia
 ---
 

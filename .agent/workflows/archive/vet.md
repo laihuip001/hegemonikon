@@ -1,5 +1,5 @@
 ---
-description: Gemini の作業を Claude が監査する。Cross-Model Verification による品質保証。
+
 hegemonikon: Akribeia
 modules: [A2, A4]
 skill_ref: ".agent/skills/akribeia/a2-krisis/SKILL.md"

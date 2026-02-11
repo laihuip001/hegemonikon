@@ -1,5 +1,5 @@
 ---
-description: Phase 4 — システム更新。プロファイル, ツール, Gnōsis, 白血球。
+summary: Phase 4 — システム更新。プロファイル, ツール, Gnōsis, 白血球。
 parent: /boot
 ---
 

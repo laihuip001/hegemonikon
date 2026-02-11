@@ -1,5 +1,5 @@
 ---
-description: A2 Krisis の Epochē モード。判断停止プロトコルを発動し、LLM の過信を低減する。
+
 hegemonikon: Akribeia
 modules: [A2]
 skill_ref: ".agent/skills/akribeia/a2-krisis/SKILL.md"

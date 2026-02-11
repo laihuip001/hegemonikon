@@ -1,5 +1,5 @@
 ---
-description: Phase 5 — 外部入力。Dispatch Log, Perplexity, Jules。
+summary: Phase 5 — 外部入力。Dispatch Log, Perplexity, Jules。
 parent: /boot
 ---
 

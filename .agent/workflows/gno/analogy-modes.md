@@ -1,5 +1,5 @@
 ---
-description: A3 Gnōmē analogy 拡張モード。アナロジーの深度・領域別8派生モード。
+summary: A3 Gnōmē analogy 拡張モード。アナロジーの深度・領域別8派生モード。
 parent: "../gno.md"
 hegemonikon: Akribeia
 modules: [A3]

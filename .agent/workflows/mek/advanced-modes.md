@@ -1,5 +1,5 @@
 ---
-description: 高度モード。reverse (逆生成), constitutional (原則優先度), yaml (ハイブリッド), multi (並列専門家)。
+summary: 高度モード。reverse (逆生成), constitutional (原則優先度), yaml (ハイブリッド), multi (並列専門家)。
 hegemonikon: S2 Mekhanē
 parent: ../mek.md
 origin: 2026-02-01 Perplexity Task 4

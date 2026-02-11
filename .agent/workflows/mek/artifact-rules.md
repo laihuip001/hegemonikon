@@ -1,5 +1,5 @@
 ---
-description: Artifact保存ルール、SE原則強制、計算コスト試算、使用例。
+summary: Artifact保存ルール、SE原則強制、計算コスト試算、使用例。
 hegemonikon: S2 Mekhanē
 parent: ../mek.md
 ---

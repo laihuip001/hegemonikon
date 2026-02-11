@@ -1,5 +1,5 @@
 ---
-description: Phase 0.5 — セッション間変化の追跡。CEP-001 FEP記号拡張。
+summary: Phase 0.5 — セッション間変化の追跡。CEP-001 FEP記号拡張。
 parent: /boot
 ccl_signature: "/boot'"
 ---

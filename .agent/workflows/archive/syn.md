@@ -1,5 +1,5 @@
 ---
-description: Synedrion（偉人評議会）を召喚し、多角的批評を実行する。拡張モード付き。
+
 hegemonikon: Akribeia
 modules: [A2]
 skill_ref: ".agent/skills/akribeia/a2-krisis/SKILL.md"

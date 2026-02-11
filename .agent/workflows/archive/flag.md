@@ -1,5 +1,5 @@
 ---
-description: O4 Energeia 派生。Feature Flags で段階的リリースとリスク制御。
+
 hegemonikon: Ousia
 modules: [O4]
 parent: "/ene"

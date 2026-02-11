@@ -1,5 +1,5 @@
 ---
-description: 高度モード。epochē, audit, panorama, cross-model, cold_mirror, deliberative。
+summary: 高度モード。epochē, audit, panorama, cross-model, cold_mirror, deliberative。
 parent: /dia
 ---
 

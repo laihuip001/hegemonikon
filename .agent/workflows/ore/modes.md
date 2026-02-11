@@ -1,5 +1,5 @@
 ---
-description: H3 Orexis 派生モード (targ/acti/stat + 選抜)
+summary: H3 Orexis 派生モード (targ/acti/stat + 選抜)
 parent: ore.md
 ---
 

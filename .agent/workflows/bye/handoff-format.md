@@ -1,5 +1,5 @@
 ---
-description: Handoff 出力形式。SBAR + ADR + Context Engineering。
+summary: Handoff 出力形式。SBAR + ADR + Context Engineering。
 parent: /bye
 ---
 

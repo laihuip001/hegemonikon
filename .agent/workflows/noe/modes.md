@@ -1,5 +1,5 @@
 ---
-description: 派生モード集。nous, phro, meta, separate, align, metalearning, 推論チェーン変種。
+summary: 派生モード集。nous, phro, meta, separate, align, metalearning, 推論チェーン変種。
 parent: /noe
 ---
 

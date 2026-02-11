@@ -1,5 +1,5 @@
 ---
-description: CCL生成モード。自然言語をCCL v2.0に変換する4層フォールバック実装。
+summary: CCL生成モード。自然言語をCCL v2.0に変換する4層フォールバック実装。
 hegemonikon: S2 Mekhanē
 parent: ../mek.md
 ---

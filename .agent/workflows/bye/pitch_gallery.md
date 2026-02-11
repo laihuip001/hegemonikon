@@ -1,5 +1,5 @@
 ---
-description: Value Pitch Gallery — 正典と反面教師。書く前に読め、温度を上げろ。
+summary: Value Pitch Gallery — 正典と反面教師。書く前に読め、温度を上げろ。
 parent: /bye
 version: "1.0"
 purpose: "点火装置 — 品質のチェックリストではなく、熱意のインスピレーション"

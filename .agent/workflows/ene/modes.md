@@ -1,5 +1,5 @@
 ---
-description: O4 Energeia 派生モード (flow/prax/pois/constructive)
+summary: O4 Energeia 派生モード (flow/prax/pois/constructive)
 parent: ene.md
 ---
 

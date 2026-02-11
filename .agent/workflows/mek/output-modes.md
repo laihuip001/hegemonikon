@@ -1,5 +1,5 @@
 ---
-description: 出力モード。visual (画像生成), manual (マニュアル生成)。
+summary: 出力モード。visual (画像生成), manual (マニュアル生成)。
 hegemonikon: S2 Mekhanē
 parent: ../mek.md
 ---

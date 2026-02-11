@@ -1,5 +1,5 @@
 ---
-description: 消化品質診断（Digestion Audit）。モジュール統合が Naturalized 状態に達しているか検証する。
+
 hegemonikon: Akribeia
 modules: [A2]
 skill_ref: ".agent/skills/akribeia/a2-krisis/SKILL.md"

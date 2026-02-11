@@ -1,5 +1,5 @@
 ---
-description: O3 Zētēsis 派生。Timeboxed 探索で不確実性を下げる。Spike/PoC 手法。
+
 hegemonikon: Ousia
 modules: [O3]
 parent: "/zet"

@@ -1,5 +1,5 @@
 ---
-description: O2 Boulēsis 派生モード (desir/voli/akra)
+summary: O2 Boulēsis 派生モード (desir/voli/akra)
 parent: bou.md
 ---
 

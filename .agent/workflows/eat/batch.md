@@ -1,5 +1,5 @@
 ---
-description: /eat に batch 変換 + Library 自動配置パイプラインを追加
+summary: /eat に batch 変換 + Library 自動配置パイプラインを追加
 hegemonikon: S2 Mekhanē
 version: "1.5"
 lcm_state: beta

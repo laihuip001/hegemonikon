@@ -1,5 +1,5 @@
 ---
-description: O2 Boulēsis 派生。Premortem で失敗を事前想定し、目標を強化する。
+
 hegemonikon: Ousia
 modules: [O2]
 parent: "/bou"

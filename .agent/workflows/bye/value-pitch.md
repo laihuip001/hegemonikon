@@ -1,5 +1,5 @@
 ---
-description: Value Pitch — 今日の成果の意義とベネフィットを売り込む。行為可能性の増加を感覚的に示す。
+summary: Value Pitch — 今日の成果の意義とベネフィットを売り込む。行為可能性の増加を感覚的に示す。
 parent: /bye
 version: "2.0"
 category_theory:

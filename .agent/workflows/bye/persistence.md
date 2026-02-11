@@ -1,5 +1,5 @@
 ---
-description: 永続化ステップ集。FEP, Doxa, Sophia, X-series。
+summary: 永続化ステップ集。FEP, Doxa, Sophia, X-series。
 parent: /bye
 ---
 

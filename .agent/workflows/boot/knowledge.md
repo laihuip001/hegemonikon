@@ -1,5 +1,5 @@
 ---
-description: Phase 3 — 知識読込。Sophia, KI, FEP A行列。
+summary: Phase 3 — 知識読込。Sophia, KI, FEP A行列。
 parent: /boot
 ---
 

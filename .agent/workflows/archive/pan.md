@@ -1,5 +1,5 @@
 ---
-description: Panorama（メタ認知レーダー）全モード実行。盲点発見・反転・10th Man・墓場歩き・ユーザー視点を一括実行。
+
 hegemonikon: Akribeia
 modules: [A2]
 skill_ref: ".agent/skills/akribeia/a2-krisis/SKILL.md"

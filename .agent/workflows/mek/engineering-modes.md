@@ -1,5 +1,5 @@
 ---
-description: エンジニアリングモード。yagni (不要排除), dry (重複排除), observability (可観測性), substitute (代替), nudge (行動誘導)。
+summary: エンジニアリングモード。yagni (不要排除), dry (重複排除), observability (可観測性), substitute (代替), nudge (行動誘導)。
 hegemonikon: S2 Mekhanē
 parent: ../mek.md
 ---

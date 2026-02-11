@@ -1,5 +1,5 @@
 ---
-description: H1 Propatheia 派生モード (appr/avoi/arre/random/forecast)
+summary: H1 Propatheia 派生モード (appr/avoi/arre/random/forecast)
 parent: pro.md
 ---
 

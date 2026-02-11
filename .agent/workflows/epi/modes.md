@@ -1,5 +1,5 @@
 ---
-description: A4 Epistēmē 派生モード (prac/theo/tech + 選抜)
+summary: A4 Epistēmē 派生モード (prac/theo/tech + 選抜)
 parent: epi.md
 ---
 

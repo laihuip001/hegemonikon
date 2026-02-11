@@ -1,5 +1,5 @@
 ---
-description: 調査モード集。surf (表層), deep (深層), prag (実践), track (進捗)。
+summary: 調査モード集。surf (表層), deep (深層), prag (実践), track (進捗)。
 parent: /sop
 ---
 

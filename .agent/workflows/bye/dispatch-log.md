@@ -1,5 +1,5 @@
 ---
-description: Dispatch Log 自動集計。スキル発動の可視化。
+summary: Dispatch Log 自動集計。スキル発動の可視化。
 parent: /bye
 ---
 

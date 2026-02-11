@@ -4,6 +4,11 @@ Digestor Pipeline - Gnosis → /eat 連携パイプライン
 
 収集された論文を消化候補として選定し、
 Hegemonikón 形式に変換して /eat ワークフローに渡す。
+
+改善:
+- B: 既存インデックスとの重複排除（偽陽性 > 偽陰性）
+- D: 出力フォーマット強化（/eat Phase 0 対応）
+- E: Exponential backoff 付きリトライ
 """
 
 from dataclasses import dataclass, field
@@ -11,6 +16,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Optional
 import json
+import numpy as np
 
 from .selector import DigestorSelector, DigestCandidate
 
@@ -134,6 +140,165 @@ class DigestorPipeline:
 
         return papers
 
+    # ═══ B: 既存インデックスとの重複排除 ═══════════════════
+
+    # 設計原則: 偽陽性 > 偽陰性
+    # 候補が多すぎるのは減らせるが、候補がないのは増やせない
+    DEDUP_SIMILARITY_THRESHOLD = 0.92  # 高閾値 = ほぼ同一論文のみ除外
+
+    # PURPOSE: 既存インデックスとの重複排除
+    def _deduplicate_against_indices(self, papers: list) -> list:
+        """既存インデックスとの重複排除
+
+        2段階フィルタ:
+        1. primary_key 完全一致 → 確実に除外
+        2. ベクトル類似度 > 0.92 → ほぼ同一論文のみ除外 (WARNING 付き)
+
+        設計原則: 偽陽性 > 偽陰性
+        高い閾値 = 「似てるけど違う」論文は通す
+        """
+        if not papers:
+            return papers
+
+        original_count = len(papers)
+
+        # === Stage 1: primary_key 完全一致 ===
+        existing_keys = self._load_existing_keys()
+        if existing_keys:
+            before = len(papers)
+            papers = [
+                p for p in papers
+                if getattr(p, 'primary_key', p.id) not in existing_keys
+            ]
+            removed = before - len(papers)
+            if removed > 0:
+                print(f"[Digestor]   → Stage 1 (primary_key): {removed} duplicates removed")
+
+        # === Stage 2: ベクトル類似度 ===
+        try:
+            papers = self._deduplicate_by_similarity(papers)
+        except Exception as e:
+            print(f"[Digestor]   → Stage 2 (similarity) skipped: {e}")
+
+        total_removed = original_count - len(papers)
+        if total_removed > 0:
+            print(f"[Digestor]   → Total dedup: {original_count} → {len(papers)} papers")
+
+        return papers
+
+    # PURPOSE: 既存インデックスから primary_key を収集
+    def _load_existing_keys(self) -> set[str]:
+        """既存インデックスから primary_key を収集"""
+        keys: set[str] = set()
+
+        # Gnōsis LanceDB index
+        try:
+            gnosis_path = Path.home() / ".hegemonikon" / "gnosis"
+            if gnosis_path.exists():
+                for json_file in gnosis_path.glob("*.json"):
+                    try:
+                        with open(json_file, "r") as f:
+                            data = json.load(f)
+                        if isinstance(data, list):
+                            for item in data:
+                                if isinstance(item, dict):
+                                    pk = item.get("primary_key") or item.get("id", "")
+                                    if pk:
+                                        keys.add(pk)
+                        elif isinstance(data, dict):
+                            pk = data.get("primary_key") or data.get("id", "")
+                            if pk:
+                                keys.add(pk)
+                    except Exception:
+                        continue
+        except Exception as e:
+            print(f"[Digestor]   → Gnōsis keys load failed: {e}")
+
+        # Sophia pkl index — メタデータから title を取得
+        try:
+            sophia_path = Path.home() / ".hegemonikon" / "sophia" / "sophia.pkl"
+            if sophia_path.exists():
+                import pickle
+                with open(sophia_path, "rb") as f:
+                    data = pickle.load(f)
+                metadata = data.get("metadata", {})
+                for _id, meta in metadata.items():
+                    if isinstance(meta, dict):
+                        title = meta.get("title", "")
+                        if title:
+                            keys.add(f"title:{title}")
+        except Exception as e:
+            print(f"[Digestor]   → Sophia keys load failed: {e}")
+
+        if keys:
+            print(f"[Digestor]   → Loaded {len(keys)} existing keys for dedup")
+
+        return keys
+
+    # PURPOSE: ベクトル類似度による重複検出
+    def _deduplicate_by_similarity(self, papers: list) -> list:
+        """ベクトル類似度による重複検出
+
+        Sophia index のベクトルと比較し、
+        cosine > 0.92 の論文を「ほぼ同一」として除外する。
+        """
+        sophia_path = Path.home() / ".hegemonikon" / "sophia" / "sophia.pkl"
+        if not sophia_path.exists():
+            return papers
+
+        try:
+            from mekhane.symploke.adapters.embedding_adapter import EmbeddingAdapter
+            adapter = EmbeddingAdapter()
+
+            # Sophia index のベクトルをロード
+            import pickle
+            with open(sophia_path, "rb") as f:
+                data = pickle.load(f)
+            existing_vectors = data.get("vectors", [])
+
+            if not existing_vectors:
+                return papers
+
+            # 各論文のベクトルを計算して既存と比較
+            filtered = []
+            for paper in papers:
+                text = f"{paper.title} {paper.abstract[:500]}"
+                paper_vec = adapter.encode([text])[0]
+                norm = np.linalg.norm(paper_vec)
+                if norm > 0:
+                    paper_vec = paper_vec / norm
+
+                # 最大類似度を計算
+                max_sim = 0.0
+                for existing_vec in existing_vectors:
+                    ev = np.array(existing_vec)
+                    ev_norm = np.linalg.norm(ev)
+                    if ev_norm > 0:
+                        ev = ev / ev_norm
+                    sim = float(np.dot(paper_vec, ev))
+                    if sim > max_sim:
+                        max_sim = sim
+
+                if max_sim >= self.DEDUP_SIMILARITY_THRESHOLD:
+                    print(
+                        f"[Digestor]   ⚠ Stage 2: '{paper.title[:40]}...' "
+                        f"(sim={max_sim:.3f}) — dedup as near-duplicate"
+                    )
+                else:
+                    filtered.append(paper)
+
+            removed = len(papers) - len(filtered)
+            if removed > 0:
+                print(f"[Digestor]   → Stage 2 (similarity): {removed} near-duplicates removed")
+            return filtered
+
+        except ImportError:
+            print("[Digestor]   → Stage 2 skipped: EmbeddingAdapter not available")
+            return papers
+        except Exception as e:
+            print(f"[Digestor]   → Stage 2 failed: {e}")
+            return papers
+
     # PURPOSE: /eat ワークフロー用の入力を生成
     def _generate_eat_input(self, candidate: DigestCandidate) -> dict:
         """
@@ -142,6 +307,13 @@ class DigestorPipeline:
         Returns:
             /eat が処理できる形式の辞書
         """
+        templates = []
+        if hasattr(candidate, 'suggested_templates') and candidate.suggested_templates:
+            templates = [
+                {"id": tid, "score": round(score, 3)}
+                for tid, score in candidate.suggested_templates
+            ]
+
         return {
             "素材名": candidate.paper.title,
             "ソース": candidate.paper.source,
@@ -150,6 +322,7 @@ class DigestorPipeline:
             "マッチトピック": candidate.matched_topics,
             "スコア": candidate.score,
             "消化先候補": self._suggest_digest_targets(candidate),
+            "推奨テンプレート": templates,
         }
 
     # PURPOSE: 消化先ワークフローを推薦
@@ -193,6 +366,11 @@ class DigestorPipeline:
         print("[Digestor] Phase 1: Fetching from Gnosis...")
         papers = self._fetch_from_gnosis(topics, max_papers)
         print(f"[Digestor]   → {len(papers)} papers fetched")
+
+        # 1.5 B: 既存インデックスとの重複排除
+        print("[Digestor] Phase 1.5: Deduplicating against existing indices...")
+        papers = self._deduplicate_against_indices(papers)
+        print(f"[Digestor]   → {len(papers)} papers after dedup")
 
         # 2. 消化候補選定
         print("[Digestor] Phase 2: Selecting candidates...")
@@ -243,6 +421,10 @@ class DigestorPipeline:
                     "score": c.score,
                     "matched_topics": c.matched_topics,
                     "rationale": c.rationale,
+                    "suggested_templates": [
+                        {"id": tid, "score": round(s, 3)}
+                        for tid, s in (c.suggested_templates or [])
+                    ],
                 }
                 for c in result.candidates
             ],
@@ -287,20 +469,62 @@ class DigestorPipeline:
             targets = self._suggest_digest_targets(c)
             targets_str = ", ".join(targets) if targets else "未定"
 
-            content = f"""# /eat 候補: {c.paper.title}
+            # C: テンプレート推奨情報
+            template_info = ""
+            if hasattr(c, 'suggested_templates') and c.suggested_templates:
+                template_info = "\n".join(
+                    f"  - {tid}: {score:.2f}"
+                    for tid, score in c.suggested_templates
+                )
+            else:
+                template_info = "  - (未分析)"
+
+            # D: /eat Phase 0 対応の強化テンプレート
+            content = f"""---
+title: "{c.paper.title}"
+source: {c.paper.source}
+url: {c.paper.url or 'N/A'}
+score: {c.score:.2f}
+matched_topics: [{', '.join(c.matched_topics)}]
+digest_to: [{targets_str}]
+generated: {timestamp}
+---
+
+# /eat 候補: {c.paper.title}
 
 > **Score**: {c.score:.2f} | **Topics**: {', '.join(c.matched_topics)}
 > **Source**: {c.paper.source} | **URL**: {c.paper.url or 'N/A'}
 > **消化先候補**: {targets_str}
 
+## 推奨テンプレート
+
+{template_info}
+
 ## Abstract
 
 {abstract}
 
+## Phase 0: 圏の特定 (テンプレート)
+
+| 項目 | 内容 |
+|:-----|:-----|
+| 圏 Ext (外部構造) | <!-- 論文の属する学問圏 --> |
+| 圏 Int (内部構造) | <!-- HGK 内の対応する圏 --> |
+| 関手 F (取込) | <!-- Ext → Int へのマッピング --> |
+| 関手 G (忘却) | <!-- Int → Ext への写像 --> |
+| η (情報保存) | <!-- 取り込んで忘却→元情報をどの程度復元できるか --> |
+| ε (構造保存) | <!-- 忘却して取込→HGK構造がどの程度維持されるか --> |
+
+## /fit チェックリスト
+
+- [ ] η 検証: 原論文の主張が HGK 内で再現可能
+- [ ] ε 検証: HGK 既存構造との整合性確認
+- [ ] Drift 測定: 1-ε の許容範囲内
+
 ---
 
 *Auto-generated by Digestor Pipeline ({timestamp})*
-*消化するには: `/eat` で読み込み、上記の消化先候補へ統合*
+*消化するには: `/eat` で読み込み、上記のテンプレートに従って統合*
 """
             filepath.write_text(content, encoding="utf-8")
             print(f"[Digestor]   → incoming/{filename}")

@@ -31,14 +31,14 @@ class TestDigestorSelector:
     # PURPOSE: 空のリストを渡した場合
     def test_select_candidates_empty(self):
         """空のリストを渡した場合"""
-        selector = DigestorSelector()
+        selector = DigestorSelector(mode="keyword")
         candidates = selector.select_candidates([])
         assert candidates == []
 
     # PURPOSE: マッチする論文がある場合
     def test_select_candidates_with_matching_paper(self):
         """マッチする論文がある場合"""
-        selector = DigestorSelector()
+        selector = DigestorSelector(mode="keyword")
 
         papers = [
             MockPaper(

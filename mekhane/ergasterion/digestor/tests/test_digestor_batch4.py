@@ -55,7 +55,7 @@ class TestDigestorSelector:
 
     @pytest.fixture
     def selector(self, topics_file):
-        return DigestorSelector(topics_file=topics_file)
+        return DigestorSelector(topics_file=topics_file, mode="keyword")
 
     @pytest.fixture
     def papers(self):

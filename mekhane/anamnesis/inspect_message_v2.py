@@ -8,6 +8,7 @@ CSS がどこから混入しているか特定し、
 """
 
 import asyncio
+import sys
 from pathlib import Path
 
 CDP_PORT = 9222
@@ -29,8 +30,8 @@ async def main():
                     try:
                         buttons = await pg.query_selector_all("button.select-none")
                         agent_pages.append((pg, len(buttons)))
-                    except Exception:
-                        pass  # TODO: Add proper error handling
+                    except Exception as e:
+                        print(f"[!] Error accessing page {pg.url}: {e}", file=sys.stderr)
 
         if not agent_pages:
             print("[!] Agent Manager not found")
@@ -78,8 +79,8 @@ async def main():
                     text = await child.text_content()
                     if text and len(text.strip()) > 50:
                         text_children.append((i, child, classes, len(text.strip())))
-                except Exception:
-                    pass  # TODO: Add proper error handling
+                except Exception as e:
+                    print(f"[!] Error processing child {i}: {e}", file=sys.stderr)
 
             lines.append(f"\nChildren with text > 50 chars: {len(text_children)}")
 
@@ -134,8 +135,8 @@ async def main():
                         lines.append(
                             f"    [{j}] <{gc_tag}> class='{gc_class[:40]}' text_len={gc_len}"
                         )
-                    except Exception:
-                        pass  # TODO: Add proper error handling
+                    except Exception as e:
+                        print(f"[!] Error processing grandchild {j}: {e}", file=sys.stderr)
 
         with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
             f.write("\n".join(lines))

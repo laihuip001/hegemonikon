@@ -1,302 +1,78 @@
 # CCL マクロリファレンス
 
-> **バージョン**: v2.5 (2026-01-30)
+> **バージョン**: v3.0 (2026-02-11)
 > **目的**: 認知の再利用性 — 複雑な CCL パターンを短い名前で呼び出す
+> **設計原則**: CPL v2.0 構文をフル活用。最低 2 種の制御構文を使用。
 
 ---
 
 ## クイックリファレンス
 
-| マクロ | 一言説明 | CCL 定義 |
-|:-------|:---------|:---------|
-| `@dig` | 深掘り | `/s+~(/p*/a)_/dia*/o+` |
-| `@go` | 即実行 | `/s+_/ene+` |
-| `@plan` | 計画策定 | `/bou+_/s+_/dia` |
-| `@fix` | 修正サイクル | `/dia+_/ene+_/dia` |
-| `@osc` | 3項振動 | `/s~/dia~/noe` |
-| `@kyc` | 認知循環 | `~(/sop_/noe_/ene_/dia-)` |
-| `@wake` | 起動 | `/boot+_@dig_@plan` |
-| `@nous` | 問いの深化 | `/u+*^/u^` |
-| `@learn` | 学習永続化 | `/dox+*^/u+_/bye+` |
-| `@tak` | タスク整理 | `/s1_/sta_/kho_/zet_/chr_/euk_/bou` |
-| `@switch` | 目的切替 (H) | 自然変換: 同Series内で深い軸を切替 |
-| `@polar` | 対極対話 (X) | 双対: 遷移型(>>)か緊張型(~)で対極へ |
+| マクロ | 一言説明 | CCL 定義 | CPL 構文 |
+|:-------|:---------|:---------|:---------|
+| `@dig` | 深掘り | `/s+~(/p*/a)_/dia*/o+` | ~, *, _ |
+| `@plan` | 計画策定 | `/bou+_/s+~(/p*/k)_@validate{/dia}` | @validate |
+| `@build` | 構築 | `@partial{/bou-, goal:define}_/s+_@scoped{/ene+}_@validate{/dia-}_I:[pass]{@memoize{/dox-}}` | @partial, @scoped, @validate, I:, @memoize |
+| `@fix` | 修正サイクル | `@cycle{/dia+_/ene+}_I:[pass]{@memoize{/dox-}}` | @cycle, I:, @memoize |
+| `@v` | 自己検証 | `@scoped{/kho{git_diff}}_@cycle{@validate{/dia+}_/ene+}_/pra{test}_@memoize{/pis_/dox}` | @scoped, @cycle, @validate, @memoize |
+| `@tak` | タスク整理 | `/s1_F:[×3]{/sta~/chr}_F:[×3]{/kho~/zet}_I:[gap]{/sop}_/euk_/bou` | F:, I:, ~ |
+| `@kyc` | 認知循環 | `@cycle{/sop_/noe_/ene_/dia-}` | @cycle |
+| `@learn` | 学習永続化 | `/dox+_*^/u+_@memoize{/bye+}` | @memoize |
+| `@nous` | 問いの深化 | `@reduce{F:[×2]{/u+*^/u^}}_@memoize{/dox-}` | @reduce, F:, @memoize |
+| `@ground` | 具体化 | `@scoped{/tak-}*@partial{/bou+, mode:6w3h}~/p-_/ene-` | @scoped, @partial, ~ |
+| `@osc` | 多角振動 | `@reduce{F:[/s,/dia,/noe]{L:[x]{x~x+}}, ~(/h*/k)}` | @reduce, F:[], L:[], ~ |
+| `@proof` | 存在証明 | `@validate{/noe{axiom:FEP}~/dia}_I:[confidence=1]{/ene{output:PROOF.md}}_E:{/ene{action:move, to:_limbo/}}` | @validate, I:, E: |
 
 ---
 
-## ビルトインマクロ詳細
+## MECE 分類（複数軸）
 
-### @dig — 深掘り・思考
+### 軸1: Flow × Value (I/A × E/P)
 
-```ccl
-@dig = /s+~(/p*/a)_/dia*/o+
+```
+              E (認識的)          P (実用的)
+           ┌──────────────┬──────────────┐
+I (推論)   │  @dig @nous  │ @plan @tak   │
+           │  @osc        │ @ground      │
+           ├──────────────┼──────────────┤
+A (行為)   │  @v @learn   │ @fix @build  │
+           │  @proof      │              │
+           └──────────────┴──────────────┘
 ```
 
-**用途**: 多面的に深く考えたいとき
+### 軸2: 時間
 
-**解説**:
+| 前方 (計画) | 現在 (実行) | 後方 (振返) |
+|:-----------|:-----------|:-----------|
+| @plan, @tak, @ground | @build, @fix, @dig, @osc | @v, @learn, @proof |
+| | @kyc (全フェーズ横断) | @nous (全フェーズ横断) |
 
-1. `/s+` — 戦略を詳細化
-2. `~(/p*/a)` — 環境×判断と振動
-3. `_/dia*/o+` — 判定×認識を融合
+### 軸3: FEP 予測誤差処理
 
-**使用例**:
-
-```ccl
-@dig              # 標準的深掘り
-@dig+             # さらに深く（全WFを+で展開）
-@dig _ /ene       # 深掘り後、実行へ
-```
+| 検出 | 修正 | 防止 |
+|:-----|:-----|:-----|
+| @dig, @v, @osc | @fix, @build | @plan, @tak |
+| @nous | @ground | @learn, @proof |
 
 ---
 
-### @go — 即実行
-
-```ccl
-@go = /s+_/ene+
-```
-
-**用途**: 考えすぎず、すぐ動きたいとき
-
-**解説**:
-
-1. `/s+` — 戦略を詳細化（計画）
-2. `_/ene+` — 即座に詳細実行
-
-**使用例**:
-
-```ccl
-@go               # シンプルに実行へ
-@plan _ @go       # 計画後に実行
-```
-
----
-
-### @plan — 計画策定
-
-```ccl
-@plan = /bou+_/s+_/dia
-```
-
-**用途**: 何かを始める前に計画を練りたいとき
-
-**解説**:
-
-1. `/bou+` — 意志を詳細化（何がしたい？）
-2. `_/s+` — 戦略を詳細化（どうやる？）
-3. `_/dia` — 批判で妥当性チェック
-
-**使用例**:
-
-```ccl
-@plan             # 標準計画
-@plan^            # 計画自体をメタ分析
-```
-
----
-
-### @fix — 修正サイクル
-
-```ccl
-@fix = /dia+_/ene+_/dia
-```
-
-**用途**: 問題を見つけて直すサイクル
-
-**解説**:
-
-1. `/dia+` — 詳細な批判（問題発見）
-2. `_/ene+` — 詳細な修正実行
-3. `_/dia` — 再批判（修正確認）
-
-**使用例**:
-
-```ccl
-@fix              # 1回修正
-F:3{@fix}         # 3回繰り返し修正
-```
-
----
-
-### @osc — 3項振動
-
-```ccl
-@osc = /s~/dia~/noe
-```
-
-**用途**: Hub 内を往復して認識を深めたいとき
-
-**解説**:
-
-- 戦略 ↔ 判定 ↔ 認識 を振動
-- `/a~/h~/o~/s` の軽量版
-
-**使用例**:
-
-```ccl
-@osc              # S-Hub内振動
-@osc+             # 詳細振動
-```
-
-> **意味論注釈** (Prompt R&D Lab #16 Oscillation Synesthesia 参照):
->
-> - `~` (非収束振動) = 探索的 (Explore)。2対象間を行き来し差分から知見を得る
-> - `~*` (収束振動) = 活用的 (Exploit)。2対象間を行き来し一意解に収束する
-> - FEP Explore-Exploit 公理 (L1.5 Function) の2表現
-
----
-
-### @kyc — κύκλος (認知循環)
-
-```ccl
-@kyc = ~(/sop_/noe_/ene_/dia-)
-```
-
-**用途**: 反復的な認知サイクルを回したいとき
-
-**解説**:
-
-1. `/sop` — 観察（情報収集）
-2. `_/noe` — 認識（理解）
-3. `_/ene` — 行動（実行）
-4. `_/dia-` — 軽量判定
-5. `~(...)` — 全体を振動（反復）
-
-**由来**: γκύκλος（円環）— Focused ReAct パターン統合
-
----
-
-### @wake — セッション開始
-
-```ccl
-@wake = /boot+_@dig_@plan
-```
-
-**用途**: セッション開始時の完全シーケンス
-
-**解説**:
-
-1. `/boot+` — 詳細ブート
-2. `_@dig` — 深掘り（状況把握）
-3. `_@plan` — 計画策定
-
-**使用例**:
-
-```ccl
-@wake             # 朝の完全起動
-/boot _ @plan     # 軽量版起動
-```
-
----
-
-### @nous — 問いの深化
-
-```ccl
-@nous = /u+*^/u^
-```
-
-**用途**: 再帰的に深く問いたいとき (νοῦς = 知性)
-
-**解説**:
-
-1. `/u+` — 詳細な主観意見
-2. `*^` — メタ融合
-3. `/u^` — メタ主観意見
-
-**特徴**: 「問いを問う」再帰構造
-
----
-
-### @learn — 学習永続化
-
-```ccl
-@learn = /dox+*^/u+_/bye+
-```
-
-**用途**: 今の学びを次のセッションに残したいとき
-
-**解説**:
-
-1. `/dox+` — 信念を詳細化
-2. `*^/u+` — 対話とメタ融合
-3. `_/bye+` — 詳細ハンドオフで永続化
-
----
-
-### @tak — タスク整理 (v2.0)
-
-```ccl
-@tak = /s1 _ F:3{/sta~/chr} _ F:3{/kho~/zet} _ I:gap{/sop} _ /euk _ /bou
-```
-
-**用途**: TODO/タスク/アイデアを整理・分類
-
-**解説**:
-
-1. `/s1` — スケール設定
-2. `F:3{/sta~/chr}` — 基準×時間を3回振動
-3. `F:3{/kho~/zet}` — 空間×探求を3回振動
-4. `I:gap{/sop}` — ギャップあれば調査
-5. `/euk_/bou` — 好機判定→意志確認
-
----
-
-## 追加マクロ
-
-### @v — 自己検証 (v2.0 → macro)
-
-```ccl
-@v = /kho{git_diff} _ @fix _ /pra{test} _ /pis _ /dox
-```
-
-**用途**: 実装完了後の構造的自己検証
-
-**解説**:
-
-1. `/kho{git_diff}` — スコープ検出 (P1 Khōra)
-2. `@fix` — 5角度スキャン→修正→再批判 (A2 Krisis + O4 Energeia)
-3. `/pra{test}` — テスト実行 (S4 Praxis)
-4. `/pis` — 確信度検証 (H2 Pistis)
-5. `/dox` — 発見パターンの永続化 (H4 Doxa)
-
-**使用例**:
-
-```ccl
-@v               # 標準検証
-@v+              # 詳細検証 (全WFを+)
-F:3{@v}          # 3回ループ検証
-@v _ /dia+       # 検証後に敵対的レビュー
-```
-
----
-
-## 追加候補マクロ
-
-### @proof — 存在証明
-
-```ccl
-@proof = /noe{axiom:FEP}~/dia _
-  I:confidence=1{/ene{output:PROOF.md}} _
-  E:{/ene{action:move, to:_limbo/}}
-```
-
-**用途**: ファイル/ディレクトリの存在理由を証明
-
-### @ground — 具体化
-
-```ccl
-@ground = /tak- * /bou_6w3h
-```
-
-**用途**: 抽象概念を具体的タスクに落とす
-
-### @考 (旧)
-
-```ccl
-@考 = /noe- _ /zet- _ /dia-
-```
-
-**用途**: 軽量な思考プロセス
+## CPL 構文カバレッジ
+
+| 構文 | 使用マクロ |
+|:-----|:----------|
+| ~~`@chain`~~ | CCL 演算子 `_` で代替 → 除去 |
+| `@cycle` | @fix, @kyc, @v |
+| `@reduce` | @osc, @nous |
+| `@partial` | @build, @ground |
+| `@scoped` | @build, @ground, @v |
+| `@memoize` | @fix, @nous, @learn, @v, @build |
+| `@validate` | @plan, @proof, @v, @build |
+| `L:[x]{}` | @osc |
+| `F:[×N]{}` | @tak, @nous |
+| `F:[A,B]{}` | @osc |
+| `I:/E:` | @fix, @proof, @build |
+
+**11/14 構文をカバー** (未使用: W:[], @retry (Sunset), @async (将来))
 
 ---
 
@@ -314,12 +90,21 @@ F:3{@v}          # 3回ループ検証
 
 ---
 
+## アーカイブ済みマクロ
+
+| マクロ | 旧 CCL 定義 | 理由 |
+|:-------|:-----------|:-----|
+| `@go` | `/s+_/ene+` | エイリアス — 直接書ける |
+| `@wake` | `/boot+_@dig_@plan` | `/boot` で代替 |
+
+---
+
 ## ユーザー定義マクロ
 
 `let` 構文で新しいマクロを定義・永続化できる:
 
 ```ccl
-let @morning = /boot+_@dig_@plan_@go
+let @morning = /boot+_@dig_@plan_@build
 ```
 
 **永続化先**: `~/.hegemonikon/ccl_macros.json`
@@ -336,4 +121,5 @@ let @morning = /boot+_@dig_@plan_@go
 
 ---
 
-*Generated: 2026-01-30 | Hegemonikón CCL v2.5*
+*v3.0 — CPL v2.0 フル活用リファクタ (2026-02-11)*
+*変更履歴: v2.5 (2026-01-30) → v3.0: @build 新設, @go/@wake アーカイブ, @tak/@v 復活, 全マクロ CPL 進化, MECE 分類追加*

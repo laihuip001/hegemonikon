@@ -1,21 +1,25 @@
 ---
-description: "[CCL Macro] 修正サイクル — @fix = /dia+_/ene+_/dia"
+description: "[CCL Macro] 修正サイクル — @fix = @cycle{/dia+_/ene+}_I:[pass]{@memoize{/dox-}}"
 ---
 
 # /ccl-fix: 修正サイクルマクロ
 
-> **CCL**: `@fix = /dia+_/ene+_/dia`
-> **用途**: 問題を見つけて直すサイクル
+> **CCL**: `@fix = @cycle{/dia+_/ene+}_I:[pass]{@memoize{/dox-}}`
+> **用途**: 問題を見つけて直すサイクルを収束まで回す
 
 ## 展開
 
-1. `/dia+` — 詳細な批判（問題発見）
-2. `_/ene+` — 詳細な修正実行
-3. `_/dia` — 再批判（修正確認）
+1. `@cycle{/dia+_/ene+}` — 診断→修正を収束するまでループ
+2. `_I:[pass]{@memoize{/dox-}}` — 収束（PASS）したら Doxa に軽量記録
 
 ## 使用例
 
 ```ccl
-@fix              # 1回修正
-F:3{@fix}         # 3回繰り返し修正
+@fix                       # 収束まで修正
+@fix+                      # 全WFを+で詳細展開
+@fix _ @v                  # 修正後に自己検証
 ```
+
+## CPL 構文
+
+`@cycle`, `I:`, `@memoize`

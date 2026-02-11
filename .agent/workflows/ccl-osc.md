@@ -1,20 +1,25 @@
 ---
-description: "[CCL Macro] 3項振動 — @osc = /s~/dia~/noe"
+description: "[CCL Macro] 3項振動 — @osc = @reduce{F:[/s,/dia,/noe]{L:[x]{x~x+}}, ~(/h*/k)}"
 ---
 
-# /ccl-osc: 3項振動マクロ
+# /ccl-osc: 多角振動マクロ
 
-> **CCL**: `@osc = /s~/dia~/noe`
-> **用途**: Hub 内を往復して認識を深めたいとき
+> **CCL**: `@osc = @reduce{F:[/s,/dia,/noe]{L:[x]{x~x+}}, ~(/h*/k)}`
+> **用途**: 複数の認知 Series を巡回し、結果を累積融合
 
 ## 展開
 
-- 戦略 ↔ 判定 ↔ 認識 を振動
-- `/a~/h~/o~/s` の軽量版
+1. `F:[/s,/dia,/noe]{L:[x]{x~x+}}` — S, A, O の各WFに Lambda（振動+深化）を適用
+2. `@reduce{..., ~(/h*/k)}` — 結果を累積融合し、H×K の振動と統合
 
 ## 使用例
 
 ```ccl
-@osc              # S-Hub内振動
-@osc+             # 詳細振動
+@osc                       # 標準振動 (S-A-O + H×K)
+@osc+                      # 詳細振動
+@osc _ /dia                # 振動後に判定
 ```
+
+## CPL 構文
+
+`@reduce`, `F:[A,B]{}`, `L:[x]{}`, `~`, `*`

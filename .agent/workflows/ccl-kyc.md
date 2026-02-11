@@ -1,16 +1,24 @@
 ---
-description: "[CCL Macro] 認知循環 — @kyc = ~(/sop_/noe_/ene_/dia-)"
+description: "[CCL Macro] 認知循環 — @kyc = @cycle{/sop_/noe_/ene_/dia-}"
 ---
 
 # /ccl-kyc: 認知循環マクロ (κύκλος)
 
-> **CCL**: `@kyc = ~(/sop_/noe_/ene_/dia-)`
-> **用途**: 反復的な認知サイクルを回したいとき
+> **CCL**: `@kyc = @cycle{/sop_/noe_/ene_/dia-}`
+> **用途**: OODA ライクな認知サイクルを収束まで回す
 
 ## 展開
 
-1. `/sop` — 観察（情報収集）
-2. `_/noe` — 認識（理解）
-3. `_/ene` — 行動（実行）
-4. `_/dia-` — 軽量判定
-5. `~(...)` — 全体を振動（反復）
+1. `@cycle{/sop_/noe_/ene_/dia-}` — 観察→認識→行動→判定を収束ループ
+
+## 使用例
+
+```ccl
+@kyc                       # 標準循環
+@kyc+                      # 詳細循環（全WFを+）
+@kyc _ /dox                # 循環後に信念記録
+```
+
+## CPL 構文
+
+`@cycle`

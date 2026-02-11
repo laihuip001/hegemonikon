@@ -24,6 +24,7 @@ from typing import Optional
 class MetrikaResult:
     """Metrika 5門の検証結果"""
 
+    # PURPOSE: MetrikaResultの初期化
     dokime: bool = True  # テスト先行
     syntomia: bool = True  # 複雑度制限
     prosbasimotes: bool = True  # アクセシビリティ

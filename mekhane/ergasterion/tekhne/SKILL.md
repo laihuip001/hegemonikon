@@ -16,6 +16,11 @@ description: |
   - 「PE」
   - 「生成」
   - 「製作」
+
+risk_tier: L1
+risks:
+  - 過剰な複雑化による認知負荷
+  - 目的と手段の転倒 (手段の目的化)
 ---
 
 # Tekhne-Maker v6.7 「OMEGA SINGULARITY BUILD + TARGET_AGENT」

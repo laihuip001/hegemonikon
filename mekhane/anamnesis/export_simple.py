@@ -43,8 +43,8 @@ async def main():
                         buttons = await pg.query_selector_all("button.select-none")
                         agent_pages.append((pg, len(buttons)))
                         print(f"[*] Found jetski-agent page: {len(buttons)} buttons")
-                    except Exception:
-                        pass  # TODO: Add proper error handling
+                    except Exception as e:
+                        print(f"[!] Error processing page {pg.url}: {e}")
 
         if not agent_pages:
             print("[!] Agent Manager not found")

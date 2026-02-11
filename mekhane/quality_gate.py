@@ -19,8 +19,8 @@ from pathlib import Path
 from typing import Optional
 
 
+# PURPOSE: Metrika 5門の検証結果を保持する
 @dataclass
-# PURPOSE: Metrika 5門の検証結果
 class MetrikaResult:
     """Metrika 5門の検証結果"""
 
@@ -33,7 +33,7 @@ class MetrikaResult:
     violations: list[str] = field(default_factory=list)
 
     @property
-    # PURPOSE: passed — システムの処理
+    # PURPOSE: すべての基準を満たしているか判定する
     def passed(self) -> bool:
         return all(
             [self.dokime, self.syntomia, self.prosbasimotes, self.atomos, self.katharos]

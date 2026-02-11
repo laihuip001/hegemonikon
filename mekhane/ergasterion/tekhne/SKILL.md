@@ -16,6 +16,12 @@ description: |
   - 「PE」
   - 「生成」
   - 「製作」
+
+risk_tier: "L2"
+risks:
+  - "生成コードのセキュリティ脆弱性"
+  - "既存コードとの不整合"
+  - "テスト不十分なコードの混入"
 ---
 
 # Tekhne-Maker v6.7 「OMEGA SINGULARITY BUILD + TARGET_AGENT」

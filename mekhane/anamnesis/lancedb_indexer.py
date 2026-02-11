@@ -17,11 +17,13 @@ M:\Brain\.hegemonikon\sessions\ に保存されたセッションファイルを
 LanceDB にインデックスし、全文検索・ベクトル検索を可能にする。
 """
 
+import itertools
 import re
 from pathlib import Path
-from typing import List, Optional
+from typing import Iterator, List, Optional
 
 import lancedb
+from lancedb.pydantic import pydantic_to_schema
 from pydantic import BaseModel
 from mekhane.anamnesis.lancedb_compat import get_table_names
 
@@ -128,6 +130,18 @@ def parse_session_file(filepath: Path) -> Optional[SessionDocument]:
         return None
 
 
+def batch_generator(iterator: Iterator[SessionDocument], batch_size: int = 1000) -> Iterator[List[dict]]:
+    """バッチごとにドキュメントを生成"""
+    batch = []
+    for doc in iterator:
+        batch.append(doc.model_dump())
+        if len(batch) >= batch_size:
+            yield batch
+            batch = []
+    if batch:
+        yield batch
+
+
 # PURPOSE: 全セッションファイルをインデックス
 def index_sessions():
     """全セッションファイルをインデックス"""
@@ -143,31 +157,49 @@ def index_sessions():
     session_files = list(SESSIONS_DIR.glob("*.md"))
     print(f"[*] Found {len(session_files)} session files")
 
-    # ドキュメントを作成
-    documents: List[SessionDocument] = []
+    # ジェネレータを作成
+    def doc_generator():
+        for filepath in session_files:
+            doc = parse_session_file(filepath)
+            if doc and len(doc.content) > 50:
+                yield doc
 
-    for filepath in session_files:
-        doc = parse_session_file(filepath)
-        if doc and len(doc.content) > 50:
-            documents.append(doc)
+    doc_iter = doc_generator()
 
-    print(f"[*] Parsed {len(documents)} valid documents")
+    # 最初の1件を確認して、ドキュメントが存在するかチェック
+    first_doc = next(doc_iter, None)
 
-    if not documents:
+    if first_doc is None:
+        print(f"[*] Parsed 0 valid documents")
         print("[!] No documents to index")
         return
+
+    # ドキュメントが存在する場合
+    # イテレータを再構築
+    full_iter = itertools.chain([first_doc], doc_iter)
+
+    # カウント用のラッパー
+    doc_count = 0
+    def counting_iter(iterator):
+        nonlocal doc_count
+        for item in iterator:
+            doc_count += 1
+            yield item
 
     # テーブルが存在する場合は削除して再作成
     if TABLE_NAME in get_table_names(db):
         db.drop_table(TABLE_NAME)
         print(f"[*] Dropped existing table: {TABLE_NAME}")
 
-    # ドキュメントを辞書に変換
-    data = [doc.model_dump() for doc in documents]
+    # テーブル作成 (スキーマを指定してバッチ処理)
+    # data argument can take an iterator of batches (list of dicts)
+    schema = pydantic_to_schema(SessionDocument)
+    batched_data = batch_generator(counting_iter(full_iter))
 
-    # テーブル作成
-    table = db.create_table(TABLE_NAME, data)
-    print(f"[✓] Created table: {TABLE_NAME} ({len(documents)} rows)")
+    table = db.create_table(TABLE_NAME, data=batched_data, schema=schema)
+
+    print(f"[*] Parsed {doc_count} valid documents")
+    print(f"[✓] Created table: {TABLE_NAME} ({doc_count} rows)")
 
     # Full-Text Search インデックスを作成
     try:

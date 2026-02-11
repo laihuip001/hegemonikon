@@ -9,6 +9,7 @@ Origin: 2026-01-31 CCL Execution Guarantee Architecture
 """
 
 import asyncio
+import concurrent.futures
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
@@ -457,6 +458,23 @@ def verify_execution(
     min_confidence: float = 0.7
 ) -> ConsensusResult:
     """CCL 実行結果を同期検証"""
+    try:
+        loop = asyncio.get_running_loop()
+    except RuntimeError:
+        loop = None
+
+    if loop and loop.is_running():
+        # 既存のイベントループがある場合、別スレッドで実行して結果を待つ
+        with concurrent.futures.ThreadPoolExecutor(max_workers=1) as executor:
+            future = executor.submit(
+                asyncio.run,
+                verify_execution_async(
+                    ccl, execution_output, context, debate_rounds, min_confidence
+                )
+            )
+            return future.result()
+
+    # イベントループがない場合、新規に作成して実行
     return asyncio.run(verify_execution_async(
         ccl, execution_output, context, debate_rounds, min_confidence
     ))

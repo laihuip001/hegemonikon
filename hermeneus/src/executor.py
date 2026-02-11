@@ -346,8 +346,8 @@ class WorkflowExecutor:
                 audit_id = record_verification(ccl, output, consensus)
             else:
                 # 検証なしの場合はダミー記録
-                from .audit import AuditStore, AuditRecord
-                store = AuditStore()
+                from .audit import AuditRecord, get_audit_store
+                store = get_audit_store()
                 record = AuditRecord(
                     record_id="",
                     ccl_expression=ccl,

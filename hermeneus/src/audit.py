@@ -61,8 +61,17 @@ class AuditStore:
     def __init__(self, db_path: Optional[Path] = None):
         self.db_path = db_path or self.DEFAULT_PATH
         self.db_path.parent.mkdir(parents=True, exist_ok=True)
+        # 永続接続を確立 (スレッド間共有を許容)
+        self._conn = sqlite3.connect(str(self.db_path), check_same_thread=False)
+        self._conn.row_factory = sqlite3.Row
         self._init_db()
     
+    def close(self):
+        """データベース接続を閉じる"""
+        if self._conn:
+            self._conn.close()
+            self._conn = None
+
     def _init_db(self):
         """データベースを初期化"""
         with self._connect() as conn:
@@ -92,12 +101,8 @@ class AuditStore:
     @contextmanager
     def _connect(self):
         """データベース接続を取得"""
-        conn = sqlite3.connect(str(self.db_path))
-        conn.row_factory = sqlite3.Row
-        try:
-            yield conn
-        finally:
-            conn.close()
+        # 既存の接続を使用
+        yield self._conn
     
     def _generate_id(self) -> str:
         """一意の ID を生成"""
@@ -358,6 +363,16 @@ class AuditReporter:
 # Integration with Verifier
 # =============================================================================
 
+_store_cache: Dict[Path, AuditStore] = {}
+
+def get_audit_store(db_path: Optional[Path] = None) -> AuditStore:
+    """監査ストアのインスタンスを取得 (キャッシュ付き)"""
+    path = db_path or AuditStore.DEFAULT_PATH
+    if path not in _store_cache:
+        _store_cache[path] = AuditStore(path)
+    return _store_cache[path]
+
+
 def record_verification(
     ccl: str,
     execution_result: str,
@@ -371,7 +386,7 @@ def record_verification(
         >>> result = verify_execution("/noe+", "分析結果")
         >>> audit_id = record_verification("/noe+", "分析結果", result)
     """
-    store = AuditStore(db_path)
+    store = get_audit_store(db_path)
     
     # ディベートサマリーを作成
     debate_summary = f"ラウンド数: {len(consensus_result.rounds)}, "
@@ -402,7 +417,7 @@ def query_audits(
     db_path: Optional[Path] = None
 ) -> List[AuditRecord]:
     """監査レコードをクエリ (便利関数)"""
-    store = AuditStore(db_path)
+    store = get_audit_store(db_path)
     reporter = AuditReporter(store)
     since = reporter._parse_period(period)
     
@@ -419,6 +434,6 @@ def get_audit_report(
     db_path: Optional[Path] = None
 ) -> str:
     """監査レポートを取得 (便利関数)"""
-    store = AuditStore(db_path)
+    store = get_audit_store(db_path)
     reporter = AuditReporter(store)
     return reporter.generate_summary(period)

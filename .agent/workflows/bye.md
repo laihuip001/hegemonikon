@@ -10,6 +10,14 @@ category_theory:
   unit: "η: Id_Mem → R∘L (boot→bye の保存率)"
   counit: "ε: L∘R → Id_Ses (bye→boot の復元率)"
   insight: "赤の他人基準 = R の像が自己完結的であること"
+  G_role: "G: Session → Handoff（セッションから生の対話を忘却し、結論だけを圧縮して永続化）"
+  G_forgets: "生の声、生のやり取り、生のコンテキスト、生の関係性 — 対話の旅路は消える"
+  G_two_layers:
+    結論: "何を達成したか、何を学んだか。Handoff に残る。well-defined"
+    対話の旅路: "往復の議論、温度、「知らんけど」の後の洞察、照れ。消える"
+  drift: "Drift = Handoff に残らない対話の質。結論は同じでも、そこに至った旅路は再現不能"
+  boot_bye_meta: "全11ペアの随伴の随伴（メタ随伴）。セッション自体の開閉を司る"
+  creator_insight: "Handoffでは結論は抽出できても過程は忘れ去られる。悲しいね — Creator, 2026-02-11"
   python_analog: "Generator パターン (Pythōsis 骨髄消化 M1)"
   generator_correspondence:
     yield: "Handoff = セッションの yield。状態を保持したまま中断"

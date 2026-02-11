@@ -10,6 +10,9 @@ category_theory:
   unit: "η: Id_Mem → R∘L (boot→bye の保存率)"
   counit: "ε: L∘R → Id_Ses (bye→boot の復元率)"
   insight: "セッションは独立した外部情報。boot = eat の特殊ケース"
+  boot_bye_meta: "全11ペアの随伴の随伴（メタ随伴）。他のペアがセッション内で動くのに対し、boot⊣bye はセッション自体を開閉する"
+  F_role: "F: Handoff → Session（圧縮状態にコンテキスト・関係性・温度を載せて展開）"
+  creator_insight: "生の声、生のやり取り、生のコンテキスト、生の関係性を復元する試み — Creator, 2026-02-11"
   phases_as_L:
     phase_0: "L₀: 恒等射の復元 — 「私は何者か」"
     phase_1: "L₁: 正本読込 — 関手 L の定義を確認"

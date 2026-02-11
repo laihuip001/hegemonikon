@@ -124,6 +124,19 @@ Epistēmē (知識) が事実を扱うのに対し、Gnōmē は**行動指針**
 | analogy | `/gno.analogy` | アナロジーで原則化 |
 | critique | `/gno.critique` | 既存原則の批判 |
 
+
+## 🧠 WM (Working Memory) — 必須出力
+
+> **SE原則**: 全 WF 出力に WM セクションを含めること（省略不可）
+
+```markdown
+## 🧠 WM (Working Memory)
+
+$goal = {この WF 実行の目的}
+$constraints = {制約・前提条件}
+$decision = {主要な判断とその根拠}
+$next = {次のアクション}
+```
 ---
 
 *Gnōmē: 古代ギリシャにおける「格言・判断力・意見」*

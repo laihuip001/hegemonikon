@@ -132,6 +132,19 @@ O1/O2 (認識) → [X-OS1/3] → S1 Metron → [X-SP1/2]  → P (適用のズー
 | macro | `/met.macro` | マクロスケール固定 |
 | zoom | `/met.zoom` | スケール切替 |
 
+
+## 🧠 WM (Working Memory) — 必須出力
+
+> **SE原則**: 全 WF 出力に WM セクションを含めること（省略不可）
+
+```markdown
+## 🧠 WM (Working Memory)
+
+$goal = {この WF 実行の目的}
+$constraints = {制約・前提条件}
+$decision = {主要な判断とその根拠}
+$next = {次のアクション}
+```
 ---
 
 *Metron: 古代ギリシャにおける「尺度・測定・節度」*

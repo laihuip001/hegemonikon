@@ -241,6 +241,22 @@ TT-SI は既存の永続化アーティファクトと連携:
 *Doxa: プラトン認識論における「意見・信念」— Epistēmē（知識）に対置*
 *v2.3.0 — Palimpsest 考古学統合 (2026-01-29)*
 
+
+## 🧠 WM (Working Memory) — 必須出力
+
+> **SE原則**: 全 WF 出力に WM セクションを含めること（省略不可）
+
+```markdown
+## 🧠 WM (Working Memory)
+
+$goal = {この WF 実行の目的}
+$constraints = {制約・前提条件}
+$decision = {主要な判断とその根拠}
+$next = {次のアクション}
+```
+
+---
+
 ---
 
 ## Related Modes

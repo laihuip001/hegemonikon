@@ -133,6 +133,19 @@ fallbacks: ["manual execution"]
 | inve | `/mek.inve` | 方法の逆転 (反対のアプローチ) |
 | adap | `/mek.adap` | 方法の適応 (文脈に合わせる) |
 
+
+## 🧠 WM (Working Memory) — 必須出力
+
+> **SE原則**: 全 WF 出力に WM セクションを含めること（省略不可）
+
+```markdown
+## 🧠 WM (Working Memory)
+
+$goal = {この WF 実行の目的}
+$constraints = {制約・前提条件}
+$decision = {主要な判断とその根拠}
+$next = {次のアクション}
+```
 ---
 
 *Mekhanē: 古代ギリシャにおける「機械・仕掛け・手段」*

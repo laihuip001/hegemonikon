@@ -131,6 +131,19 @@ fallbacks: ["manual execution"]
 | deadline | `/chr.deadline` | 期限設定 |
 | buffer | `/chr.buffer` | バッファ計算 |
 
+
+## 🧠 WM (Working Memory) — 必須出力
+
+> **SE原則**: 全 WF 出力に WM セクションを含めること（省略不可）
+
+```markdown
+## 🧠 WM (Working Memory)
+
+$goal = {この WF 実行の目的}
+$constraints = {制約・前提条件}
+$decision = {主要な判断とその根拠}
+$next = {次のアクション}
+```
 ---
 
 *Chronos: 古代ギリシャにおける「時間」— 量的な時間 (cf. Kairos: 質的な時間)*

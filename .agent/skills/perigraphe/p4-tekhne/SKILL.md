@@ -126,6 +126,19 @@ S2 Mekhanē → [X-SP6] → P4 Tekhnē → [X-PK7] → K3 Telos
 | compare | `/tek.compare` | 技法比較評価 |
 | learn | `/tek.learn` | 新技法の習得計画 |
 
+
+## 🧠 WM (Working Memory) — 必須出力
+
+> **SE原則**: 全 WF 出力に WM セクションを含めること（省略不可）
+
+```markdown
+## 🧠 WM (Working Memory)
+
+$goal = {この WF 実行の目的}
+$constraints = {制約・前提条件}
+$decision = {主要な判断とその根拠}
+$next = {次のアクション}
+```
 ---
 
 *Tekhnē: 古代ギリシャにおける「技術・技法・芸術」*

@@ -171,6 +171,19 @@ graph LR
 | probabilistic | `/pis.probabilistic` | 確率表現で確信を宣言 |
 | uncertainty | `/pis.uncertainty` | 不確実性の構造分析 |
 
+
+## 🧠 WM (Working Memory) — 必須出力
+
+> **SE原則**: 全 WF 出力に WM セクションを含めること（省略不可）
+
+```markdown
+## 🧠 WM (Working Memory)
+
+$goal = {この WF 実行の目的}
+$constraints = {制約・前提条件}
+$decision = {主要な判断とその根拠}
+$next = {次のアクション}
+```
 ---
 
 *Pistis: 古代ギリシャにおける「信頼・確信・信仰」*

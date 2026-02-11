@@ -147,6 +147,19 @@ S (方法のズーム) → [X-SP5/7] → P3 (軌道のズーム) → [X-PK5/6] �
 | daily | `/tro.daily` | 日次ルーチン設計 |
 | feedback | `/tro.feedback` | フィードバックループ設計 |
 
+
+## 🧠 WM (Working Memory) — 必須出力
+
+> **SE原則**: 全 WF 出力に WM セクションを含めること（省略不可）
+
+```markdown
+## 🧠 WM (Working Memory)
+
+$goal = {この WF 実行の目的}
+$constraints = {制約・前提条件}
+$decision = {主要な判断とその根拠}
+$next = {次のアクション}
+```
 ---
 
 *Trokhia: 古代ギリシャにおける「軌道・車輪の跡・周回軌道」*

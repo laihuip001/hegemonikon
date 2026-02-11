@@ -137,6 +137,19 @@ fallbacks: ["manual execution"]
 | pattern | `/pro.pattern` | パターンマッチベースの直感 |
 | aggregate | `/pro.aggregate` | 複数直感の集約 |
 
+
+## 🧠 WM (Working Memory) — 必須出力
+
+> **SE原則**: 全 WF 出力に WM セクションを含めること（省略不可）
+
+```markdown
+## 🧠 WM (Working Memory)
+
+$goal = {この WF 実行の目的}
+$constraints = {制約・前提条件}
+$decision = {主要な判断とその根拠}
+$next = {次のアクション}
+```
 ---
 
 *Propatheia: 古代ストア派における「前感情」— 意志に先行する身体的反応*

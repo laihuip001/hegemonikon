@@ -288,6 +288,22 @@ P1 Khōra は以下でコンテキストを定義:
 *Khōra: プラトン『ティマイオス』における「場所・受容器」*
 *v2.2.0 — Context Engineering 統合 (2026-01-29)*
 
+
+## 🧠 WM (Working Memory) — 必須出力
+
+> **SE原則**: 全 WF 出力に WM セクションを含めること（省略不可）
+
+```markdown
+## 🧠 WM (Working Memory)
+
+$goal = {この WF 実行の目的}
+$constraints = {制約・前提条件}
+$decision = {主要な判断とその根拠}
+$next = {次のアクション}
+```
+
+---
+
 ---
 
 ## Related Modes

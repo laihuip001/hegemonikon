@@ -139,6 +139,19 @@ fallbacks: ["manual execution"]
 | deep | `/ore.deep` | 深層欲求の掘削 |
 | conflict | `/ore.conflict` | 相反する欲求の検出 |
 
+
+## 🧠 WM (Working Memory) — 必須出力
+
+> **SE原則**: 全 WF 出力に WM セクションを含めること（省略不可）
+
+```markdown
+## 🧠 WM (Working Memory)
+
+$goal = {この WF 実行の目的}
+$constraints = {制約・前提条件}
+$decision = {主要な判断とその根拠}
+$next = {次のアクション}
+```
 ---
 
 *Orexis: アリストテレスにおける「欲求」— 理性的欲求 (boulēsis) と感覚的欲求を含む*

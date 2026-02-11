@@ -56,8 +56,8 @@ MODELS_DIR = Path(__file__).parent.parent / "models" / "bge-small"
 if sys.platform == "win32":
     try:
         sys.stdout.reconfigure(encoding="utf-8")
-    except Exception:
-        pass  # TODO: Add proper error handling
+    except Exception as e:
+        print(f"Warning: Failed to set stdout encoding to utf-8: {e}", file=sys.stderr)
 
 
 # PURPOSE: ONNX-based text embedding (BGE-small)

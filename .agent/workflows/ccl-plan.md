@@ -1,4 +1,9 @@
 ---
+version: v1.0
+lcm_state: beta
+---
+
+---
 description: "[CCL Macro] 計画策定 — @plan = /bou+_/s+_/dia"
 ---
 

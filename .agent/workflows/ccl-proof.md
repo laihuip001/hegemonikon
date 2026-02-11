@@ -1,4 +1,9 @@
 ---
+version: v1.0
+lcm_state: beta
+---
+
+---
 description: "[CCL Macro] 存在証明 — @proof = /noe{axiom:FEP}~/dia_I:confidence=1{/ene{output:PROOF.md}}"
 ---
 

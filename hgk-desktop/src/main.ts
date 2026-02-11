@@ -145,12 +145,13 @@ async function renderDashboard(): Promise<void> {
 }
 
 async function renderDashboardContent(): Promise<void> {
-  const [health, healthCheck, fep, gnosisStats, criticals] = await Promise.all([
+  const [health, healthCheck, fep, gnosisStats, criticals, kalonHist] = await Promise.all([
     api.status().catch((): null => null),
     api.health().catch((): null => null),
     api.fepState().catch((): null => null),
     api.gnosisStats().catch((): null => null),
     api.notifications(5, 'CRITICAL').catch((): Notification[] => []),
+    api.kalonHistory(5).catch((): null => null),
   ]);
 
   const app = document.getElementById('view-content')!;
@@ -210,9 +211,8 @@ async function renderDashboardContent(): Promise<void> {
         </div>
         <div class="kalon-card-equation">Kalon(x) ⟺ x = Fix(G∘F)</div>
         <div class="kalon-card-attrs">
-          <span class="kalon-card-attr">✅ Fix</span>
-          <span class="kalon-card-attr">✅ Presheaf</span>
-          <span class="kalon-card-attr">✅ Self-ref</span>
+          <span class="kalon-card-attr">判定数: <strong>${kalonHist?.total ?? 0}</strong></span>
+          ${kalonHist?.judgments?.[0] ? `<span class="kalon-card-attr">最新: ${esc(kalonHist.judgments[0].verdict)} ${esc(kalonHist.judgments[0].concept)}</span>` : ''}
         </div>
         <div class="kalon-card-hint">Ctrl+K → kalon [概念] で判定</div>
       </div>

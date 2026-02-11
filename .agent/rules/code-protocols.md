@@ -22,7 +22,7 @@ description: コード開発・実装時に参照する開発プロトコル（�
 | # | Protocol | 核心ルール |
 |:--|:---------|:-----------|
 | 06 | **Complexity Budget** | 関数は短く、ネストは浅く。複雑さには予算がある |
-| 07 | **Devil's Advocate** | 自分のコードに反論せよ。 `/dia` の実装版 |
+| 07 | **Devil's Advocate** | 自分のコードに反論してほしい。 `/dia` の実装版 |
 | 10 | **Ripple Effect** | 変更の影響範囲を事前に特定。依存関係を追跡 |
 | 11 | **Red Teaming** | セキュリティ視点でレビュー |
 | 13 | **Code Archaeology** | 既存コードを消す前に「なぜそこにあるか」を問え (Chesterton's Fence) |

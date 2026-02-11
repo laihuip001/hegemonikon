@@ -1,10 +1,10 @@
 ---
-description: HGK Desktop App / Tauri / Three.js 開発時に参照する臨時ルール（既存PJの道具を使え）
+description: HGK Desktop App / Tauri / Three.js 開発時に参照する臨時ルール（既存PJの道具を使ってほしい）
 lifecycle: temporary
 expires: 2026-06-01
 ---
 
-# 🔴 HGK Desktop App 開発: 既存 PJ を使え
+# 🔴 HGK Desktop App 開発: 既存 PJ を使ってほしい
 
 > **臨時ルール** — Desktop App 開発期間中のみ always_on
 > 開発完了後は `lifecycle: permanent` の部分のみが残る

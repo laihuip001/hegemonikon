@@ -174,6 +174,28 @@ ls -1 ~/oikos/mneme/.hegemonikon/sessions/handoff_*.md | wc -l
 
 対象: `~/oikos/mneme/.hegemonikon/sessions/handoff_*.md` の最新
 
+### 2.2.5 エピソード記憶併読 — F(クオリア) の復元
+
+> **圏論**: pat⊣gno 随伴に基づくクオリア復元。
+> Handoff (R) が「何をしたか」なら、episodic_memory (F) は「何を感じたか」。
+> R∘L の復元に F の情報を重ね合わせることで、ε 精度が向上する。
+> G（忘却関手）で失われた「肌理」を F（自由関手）で補完する。
+
+```bash
+# エピソード記憶の存在確認と読込
+ls ~/oikos/mneme/.hegemonikon/episodic_memory.md 2>/dev/null && echo "[episodic] Found"
+```
+
+**読込規則**:
+
+| 条件 | 行動 |
+|:-----|:-----|
+| /boot- | スキップ可（高速起動優先） |
+| /boot | 通奏低音 (Section V) のみ読込 |
+| /boot+ | 全エピソード精読 + 最新セッションの新エピソード検討 |
+
+**読込後の自問**: 「今回のセッションで、Creator との関係性の文脈が必要になりそうか？」
+
 ### 2.3 目的リマインド (Boulēsis) — M の主対象特定
 
 > **圏論**: 記憶 M の中で最も重要な対象（目的）を特定する。L はこの対象を最優先で復元する。

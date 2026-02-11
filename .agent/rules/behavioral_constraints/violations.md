@@ -13,6 +13,8 @@
 | `env_gap` | 環境強制なし | ルールはあるが環境的強制がなく守れない |
 | `accuracy_vs_utility` | 正確 ≠ 有用 | 正確だが読み手が行動できない出力 |
 | `false_impossibility` | できない ≠ やっていない | 未試行を「不可能」と断定 |
+| `selective_omission` | 勝手な省略 | 存在するものを「不要」と判断して報告から落とす |
+| `stale_handoff` | 古い情報を信じる | Handoff/残タスク表の古い情報を鵜呑みにし、実態を確認せず重複作業する |
 
 ---
 
@@ -91,6 +93,53 @@ summary: "正確なマッピング表だが、読み手が行動できない"
 root_cause: "正確性に集中し読み手視点を忘れた"
 corrective: "BC-15 他者理解可能性の新設"
 lesson: "正確であること ≠ 役に立つこと"
+```
+
+### V-006: PJ リスト選択的省略
+
+```yaml
+id: V-006
+date: "2026-02-10"
+bc: [BC-1, BC-7]
+pattern: selective_omission
+severity: high
+recurrence: false
+summary: "Boot 報告から dormant/archived の3PJを無断で省略。指摘されてもまだ active のみ表示"
+root_cause: |
+  1. boot_integration.py の generate_boot_template() が active フィルタ → 出力を無批判に信用
+  2. 「active だけ表示すれば十分」という暗黙判断を Creator に確認せず実行
+  3. registry.yaml を自分で直接読んで照合しなかった (BC-1 違反)
+  4. 指摘されて出力しても同じフィルタ結果をそのまま使った (1回目の反省が不十分)
+corrective: |
+  - boot_integration.py L574-586 を修正: 全PJを status アイコン付き表示
+  - パターン定義に selective_omission を追加
+  - 教訓: 「何かを省略する判断」は Creator の判断。自分が勝手にしない
+lesson: "省略は暴力。存在するものを見えなくすることは、消すことと同じ"
+```
+
+### V-007: 重複作業 (Bou-Ene 随伴再分析)
+
+```yaml
+id: V-007
+date: "2026-02-11"
+bc: [BC-16, BC-1]
+pattern: stale_handoff
+severity: medium
+recurrence: false
+summary: |
+  bou.md L47-64, ene.md L55-63 に既に実装済みの随伴注釈を、
+  /noe+ で丸々再分析した。Creator の「同じ話をしていた気がする」で発覚。
+root_cause: |
+  1. 57b0835f walkthrough.md の「残りタスク: 統一随伴パターン完遂」を鵜呑みにした
+  2. 実装対象の bou.md/ene.md を開かずに作業を開始した (BC-16 違反)
+  3. walkthrough は「計画時点」の記録であり、その後の実装を反映していなかった
+corrective: |
+  - adjunction_status.py を作成: 12ペアの実装状態をWFファイルから自動スキャン
+  - 環境で防ぐ: スクリプトを走らせれば実態がわかる
+lesson: |
+  Handoff/残タスク表は「ある時点のスナップショット」であり、真実ではない。
+  真実はファイルの中にある。参照先行 (BC-16) は知識だけでなく状態にも適用される。
+  Creator の直感 > 私のトークン消費。
 ```
 
 ---

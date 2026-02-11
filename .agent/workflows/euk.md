@@ -44,6 +44,16 @@ sel_enforcement:
       - "好機判断プロセスを問う"
 anti_skip: enabled
 ccl_signature: "/euk?k1"
+category_theory:
+  core: "随伴 F⊣G の左随伴 F（自由関手）"
+  adjunction: "Eukairia (F) ⊣ Telos (G)"
+  role: "F: Purpose → Timing（目的に進捗の文脈を載せて好機判定を構成 = Micro化）"
+  F_definition: "大局的な目的に「今ここ」の状況を付与して、タイミング判定を構成する"
+  same_formula: "euk と tel は同じ判定（+, 正しさの評価）の Scale 違い"
+  coordinates: "K1[Micro,+] — Valence(+)を保存し Scale を Micro に設定"
+  unit: "η: Purpose → G(F(Purpose)) — 目的を好機判定にして前提に戻す = 目的の安定性検証"
+  counit: "ε: F(G(Timing)) → Timing — 好機を目的で見直して再判定 = タイミング再評価"
+  insight: "どちらも判定。タイミングは具体（進行中）、目的は前提に戻る — Creator, 2026-02-11"
 ---
 
 # /euk: 好機判定ワークフロー (Eukairia)
@@ -238,7 +248,6 @@ view_file /home/makaron8426/oikos/hegemonikon/.agent/skills/kairos/k1-eukairia/S
 ```
 
 ---
-
 
 ---
 

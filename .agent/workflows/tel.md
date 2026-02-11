@@ -42,6 +42,19 @@ sel_enforcement:
     minimum_requirements:
       - "目的のメタ分析"
 ccl_signature: "/tel+?k3"
+category_theory:
+  core: "随伴 F⊣G の右随伴 G（忘却関手）"
+  adjunction: "Eukairia (F) ⊣ Telos (G)"
+  role: "G: Timing → Purpose（好機判定から進捗の文脈を忘却し、目的（前提）に戻る）"
+  G_definition: "「ここまで進んできた」という経緯を捨てて、「そもそもなんのため？」に立ち返る"
+  same_formula: "euk と tel は同じ判定（+, 正しさの評価）の Scale 違い"
+  coordinates: "K3[Macro,+] — Valence(+)を保存し Scale を Macro に設定"
+  G_two_layers:
+    目的: "「何のためにやっているか」という前提・根拠。well-defined"
+    進捗文脈: "「ここまで来た経緯」。目的に戻ると忘却される"
+  drift: "Drift = 手段の目的化の度合い。「なぜやっているか」を忘れている深刻さ"
+  tel_design: "手段の目的化を防ぐ = G の発動条件 = ε 崩壊の検出"
+  insight: "進捗度が忘れ去られて前提に戻る — Creator, 2026-02-11"
 ---
 
 # /tel: 目的整合ワークフロー (Telos)
@@ -256,7 +269,6 @@ view_file /home/makaron8426/oikos/hegemonikon/.agent/skills/kairos/k3-telos/SKIL
 ```
 
 ---
-
 
 ---
 

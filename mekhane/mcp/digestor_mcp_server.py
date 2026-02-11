@@ -29,11 +29,16 @@ log("Starting Digestor MCP Server...")
 # ============ Import path setup ============
 from pathlib import Path
 
-# プロジェクトルート (hegemonikon/) を追加 — from mekhane.* を解決
-_project_root = str(Path(__file__).parent.parent.parent)
-if _project_root not in sys.path:
-    sys.path.insert(0, _project_root)
-log(f"Added to path: {_project_root}")
+# mekhane/mcp/ → mekhane/ → hegemonikon/ (project root)
+_mekhane_dir = Path(__file__).parent.parent
+_project_root = _mekhane_dir.parent
+
+# Both paths needed: project root for `from mekhane.xxx` imports,
+# mekhane dir for any relative imports within mekhane
+for _p in [str(_project_root), str(_mekhane_dir)]:
+    if _p not in sys.path:
+        sys.path.insert(0, _p)
+log(f"Added to path: {_project_root} + {_mekhane_dir}")
 
 
 # ============ Suppress stdout during imports ============

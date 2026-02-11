@@ -21,8 +21,12 @@ import signal
 from datetime import datetime
 from pathlib import Path
 
-# PYTHONPATH 設定
-sys.path.insert(0, str(Path(__file__).parent.parent.parent))
+# Import path setup — project root + mekhane dir
+_mekhane_dir = Path(__file__).parent.parent.parent
+_project_root = _mekhane_dir.parent
+for _p in [str(_project_root), str(_mekhane_dir)]:
+    if _p not in sys.path:
+        sys.path.insert(0, _p)
 
 import schedule
 

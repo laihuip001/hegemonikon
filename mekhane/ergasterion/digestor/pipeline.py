@@ -84,20 +84,33 @@ class DigestorPipeline:
                 # 全トピックから上位3つ
                 queries = [t.get("query", "") for t in topics_list[:3]]
 
-            # 各クエリで検索 (arXiv rate limit 対策: 3秒間隔)
+            # 各クエリで検索 (exponential backoff 付き)
             import time as _time
+
             for i, query in enumerate(queries):
-                if query:
-                    if i > 0:
-                        _time.sleep(3)  # arXiv API rate limit 回避
+                if not query:
+                    continue
+                if i > 0:
+                    _time.sleep(3)  # arXiv API rate limit: クエリ間 3秒
+
+                # Exponential backoff: 3s → 6s → 12s (max 3 retries)
+                max_retries = 3
+                for attempt in range(max_retries):
                     try:
                         results = collector.search(
                             query, max_results=max_papers // len(queries)
                         )
                         papers.extend(results)
+                        break  # 成功したらリトライループを抜ける
                     except Exception as e:
-                        print(f"[Digestor] Query '{query[:30]}...' failed: {e}")
-                        continue
+                        wait = 3 * (2 ** attempt)  # 3s, 6s, 12s
+                        if attempt < max_retries - 1:
+                            print(f"[Digestor] Query '{query[:30]}...' failed (attempt {attempt + 1}/{max_retries}): {e}")
+                            print(f"[Digestor]   → Retrying in {wait}s...")
+                            _time.sleep(wait)
+                        else:
+                            print(f"[Digestor] Query '{query[:30]}...' failed after {max_retries} attempts: {e}")
+                            # 最終リトライも失敗 → このクエリをスキップ
 
             # 重複除去 (arXiv ID or URL ベース)
             seen_ids = set()

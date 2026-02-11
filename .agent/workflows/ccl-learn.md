@@ -1,26 +1,21 @@
 ---
-description: "[CCL Macro] 刻む — 学びを次のセッションに残す"
+description: "刻む — /dox+_*^/u+_M:{/bye+}"
 ---
 
 # /ccl-learn: 学習永続化マクロ
 
-> **CCL**: `@learn = /dox+_*^/u+_@memoize{/bye+}`
+> **CCL**: `@learn = /dox+_*^/u+_M:{/bye+}`
 > **用途**: 今の学びを次のセッションに残したいとき
 
 ## 展開
 
 1. `/dox+` — 信念を詳細化
 2. `_*^/u+` — 対話のメタ融合
-3. `_@memoize{/bye+}` — 詳細ハンドオフで永続化（キャッシュ/セッション横断）
+3. `_M:{/bye+}` — 詳細ハンドオフで記憶
 
 ## 使用例
 
 ```ccl
 @learn                     # 標準学習永続化
-@learn+                    # 全WFを+で展開
-@learn _ @v                # 永続化した内容を自己検証
+@learn _ @vet              # 永続化した内容を検証
 ```
-
-## CPL 構文
-
-`@memoize`, `*^`

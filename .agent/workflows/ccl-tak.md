@@ -1,5 +1,5 @@
 ---
-description: "[CCL Macro] 捌く — TODO/タスクの整理・分類"
+description: "捌く — /s1_F:[×3]{/sta~/chr}_F:[×3]{/kho~/zet}_I:[gap]{/sop}_/euk_/bou"
 ---
 
 # /ccl-tak: タスク整理マクロ
@@ -22,7 +22,3 @@ description: "[CCL Macro] 捌く — TODO/タスクの整理・分類"
 @tak-                      # 高速分類（Must/Shouldのみ）
 @tak _ @plan               # 整理後に計画策定
 ```
-
-## CPL 構文
-
-`F:[×N]{}`, `I:[]{}`, `~`, `_`

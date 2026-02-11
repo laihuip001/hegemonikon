@@ -1,5 +1,5 @@
 ---
-description: "[CCL Macro] 掘る — 多面的な深掘り分析"
+description: "掘る — /s+~(/p*/a)_/dia*/o+"
 ---
 
 # /ccl-dig: 深掘りマクロ

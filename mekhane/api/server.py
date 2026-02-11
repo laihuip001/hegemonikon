@@ -158,6 +158,14 @@ def _register_routers(app: FastAPI) -> None:
     except Exception as exc:
         logger.warning("Synteleia router skipped: %s", exc)
 
+    # Timeline — セッション・タイムライン (ファイルシステム IO のみ)
+    try:
+        from mekhane.api.routes.timeline import router as timeline_router
+        app.include_router(timeline_router, prefix=API_PREFIX)
+        logger.info("Timeline router registered")
+    except Exception as exc:
+        logger.warning("Timeline router skipped: %s", exc)
+
     # MCP Gateway — PolicyEnforcer + DiscoveryEngine に依存するため遅延ロード
     try:
         from mekhane.api.routes.gateway import router as gateway_router

@@ -246,7 +246,139 @@ def load_yaml_file(path: Path) -> dict:
         return {}
 
 
-# ============ Týpos Generation (v2.1) ============
+# ============ Týpos Generation (v3.0) ============
+
+# --- Task Context Extraction (v3.0) ---
+
+def extract_task_context(requirements: str) -> dict:
+    """requirements から動詞・対象・タスクタイプを抽出し、タスク固有化に使う。
+
+    Returns:
+        dict: task_type, subject, role_suffix, output_keys
+    """
+    req_lower = requirements.lower()
+
+    # 動詞パターン → タスクタイプ
+    verb_patterns = [
+        (r"解説|説明|解析|意味を|段階的に", "explain"),
+        (r"監査|レビュー|検査|チェック|脆弱性|品質", "audit"),
+        (r"消化|抽出|分析|調査|動向|論文", "digest"),
+        (r"要約|圧縮|まとめ|サマリ|レポート", "summarize"),
+        (r"生成|作成|構築|設計|実装", "generate"),
+    ]
+
+    task_type = "general"
+    for pattern, ttype in verb_patterns:
+        if re.search(pattern, requirements):
+            task_type = ttype
+            break
+
+    # 対象語の抽出 (「〜を」の前, 括弧内, 主要名詞)
+    subject = ""
+    # パターン1: 括弧内 (例: "CCL(Cognitive Control Language)")
+    paren_match = re.search(r'(\S+?\([^)]+\))', requirements)
+    if paren_match:
+        subject = paren_match.group(1)
+    else:
+        # パターン2: 「〜を」の前の名詞句
+        wo_match = re.search(r'(.{2,20}?)を', requirements)
+        if wo_match:
+            subject = wo_match.group(1).strip()
+        else:
+            # パターン3: 最初の名詞的フレーズ
+            subject = requirements.split("、")[0][:30]
+
+    # ロール名
+    role_map = {
+        "explain": "解説者",
+        "audit": "監査官",
+        "digest": "分析者",
+        "summarize": "要約者",
+        "generate": "設計者",
+        "general": "専門家",
+    }
+    role_suffix = role_map.get(task_type, "専門家")
+
+    return {
+        "task_type": task_type,
+        "subject": subject,
+        "role_suffix": role_suffix,
+    }
+
+
+# --- タスク固有制約テンプレート (v3.0) ---
+TASK_CONSTRAINTS = {
+    "explain": [
+        "段階的に構造を分解し、各要素の意味を丁寧に解説すること",
+        "専門用語には初出時に平易な定義を添えること",
+        "具体例を最低2つ含めること",
+        "「なぜそうなるか」の理由を明示すること",
+    ],
+    "audit": [
+        "指摘には必ず根拠と Severity (high/medium/low) を付与すること",
+        "問題箇所の位置を特定すること (ファイル名:行番号)",
+        "修正案を具体的なコード例で示すること",
+        "優先度順にソートして出力すること",
+    ],
+    "digest": [
+        "核心的主張 (thesis) を1文で抽出すること",
+        "方法論・結果・限界を構造的に分離すること",
+        "既存知識との差分 (新規性) を明示すること",
+        "情報源の信頼度を評価すること",
+    ],
+    "summarize": [
+        "原文にない情報を追加しないこと (hallucination 禁止)",
+        "要約率を明示すること (元文の30%以下を目標)",
+        "固有名詞・数値・日付は正確に保持すること",
+        "重要度に基づき情報を取捨選択すること",
+    ],
+    "generate": [
+        "出力は即座に実行/利用可能な形式であること",
+        "入力パラメータの型と制約を明示すること",
+        "エラーハンドリングを含めること",
+        "テスト可能な出力を提供すること",
+    ],
+    "general": [
+        "具体的かつ実行可能な出力を提供すること",
+        "曖昧な表現を避けること",
+        "エラーハンドリングを明示すること",
+        "出力は再現可能であること",
+    ],
+}
+
+# --- タスク固有出力フォーマット (v3.0) ---
+TASK_FORMATS = {
+    "explain": {
+        "overview": {"type": "string", "description": "全体像の要約（1-2文）"},
+        "structure": {"type": "object", "description": "構造分解（各要素の説明）"},
+        "examples": {"type": "array", "description": "具体例のリスト"},
+        "key_insight": {"type": "string", "description": "最も重要な洞察"},
+    },
+    "audit": {
+        "summary": {"type": "string", "description": "監査結果の要約"},
+        "issues": {"type": "array", "description": "検出された問題のリスト"},
+        "evaluation": {"type": "object", "description": "総合評価スコア"},
+    },
+    "digest": {
+        "thesis": {"type": "string", "description": "核心的主張（1文）"},
+        "methodology": {"type": "string", "description": "方法論の要約"},
+        "findings": {"type": "array", "description": "主要な発見"},
+        "limitations": {"type": "string", "description": "限界・制約"},
+        "novelty": {"type": "string", "description": "既存知識との差分"},
+        "confidence": {"type": "string", "description": "情報の確信度"},
+    },
+    "summarize": {
+        "summary": {"type": "string", "description": "要約本文"},
+        "key_points": {"type": "array", "description": "重要ポイント"},
+        "metadata": {"type": "object", "description": "メタ情報（文字数、圧縮率等）"},
+    },
+    "generate": {
+        "output": {"type": "string", "description": "生成物本体"},
+        "parameters": {"type": "object", "description": "使用したパラメータ"},
+        "validation": {"type": "object", "description": "検証結果"},
+    },
+}
+
 # --- Archetype-specific constraint injection (施策 3) ---
 ARCHETYPE_CONSTRAINTS = {
     "Precision": [
@@ -274,12 +406,12 @@ ARCHETYPE_CONSTRAINTS = {
 def generate_prompt_lang(requirements: str, domain: str, output_format: str) -> str:
     """Generate Týpos code from requirements.
 
-    v2.2 Enhancement:
-      - v2.1 features (domain_examples, anti_patterns, convergence/divergence)
-      - safety_base_constraints injection (施策 1: Safety +30)
-      - failure scenario injection (施策 2: Completeness +15)
-      - archetype-specific constraints (施策 3: Archetype Fit +10)
-      - domain-specific @context (施策 4: Context +5)
+    v3.0: Task-Specific Dynamic Generation
+      - extract_task_context(): requirements から動詞・対象を抽出
+      - @role: タスク対象に特化した専門家名
+      - @constraints: タスク固有制約を最優先 + ドメイン安全網
+      - @format: タスク固有出力フォーマット
+      - @examples: タスク文脈に合わせた動的例
     """
 
     # Extract skill name from requirements
@@ -301,6 +433,12 @@ def generate_prompt_lang(requirements: str, domain: str, output_format: str) -> 
     anti_patterns = domain_template.get("anti_patterns", [])
     output_style = domain_template.get("output_style", {})
 
+    # v3.0: タスクコンテキスト抽出
+    task_ctx = extract_task_context(requirements)
+    task_type = task_ctx["task_type"]
+    subject = task_ctx["subject"]
+    role_suffix = task_ctx["role_suffix"]
+
     # Convergence/divergence policy check
     policy = classify_task(requirements)
     policy_warning = ""
@@ -316,11 +454,13 @@ def generate_prompt_lang(requirements: str, domain: str, output_format: str) -> 
     if policy_warning:
         lines.append(policy_warning)
 
+    # v3.0: @role をタスク固有化
+    role_label = f"{subject} の {role_suffix}" if subject else f"{domain} ドメインの専門家"
     lines.extend([
         f"#prompt {skill_name}",
         "",
         "@role:",
-        f"  {domain} ドメインの専門家",
+        f"  {role_label}",
         "",
         "@goal:",
         f"  {requirements}",
@@ -328,17 +468,17 @@ def generate_prompt_lang(requirements: str, domain: str, output_format: str) -> 
         "@constraints:",
     ])
 
-    # Add domain-specific constraints
+    # v3.0: タスク固有制約を最優先で注入
+    task_constraints = TASK_CONSTRAINTS.get(task_type, TASK_CONSTRAINTS["general"])
+    lines.append(f"  # --- タスク固有制約 ({task_type}) ---")
+    for tc in task_constraints:
+        lines.append(f"  - {tc}")
+
+    # ドメイン制約は安全網として追加 (タスクと重複しないもののみ)
     if domain_constraints:
-        for c in domain_constraints[:6]:
+        lines.append(f"  # --- ドメイン安全網 ({domain}) ---")
+        for c in domain_constraints[:4]:
             lines.append(f"  - {c}")
-    else:
-        lines.extend([
-            "  - 具体的かつ実行可能な出力を提供すること",
-            "  - 曖昧な表現（「適切に」「うまく」）を避けること",
-            "  - エラーハンドリングを明示すること",
-            "  - 出力は再現可能であること",
-        ])
 
     # v2.1: Add anti-pattern constraints from template
     if anti_patterns:
@@ -419,10 +559,29 @@ def generate_prompt_lang(requirements: str, domain: str, output_format: str) -> 
             "      scale: 1-5",
         ])
 
-    # Format section — v2.3: schema 展開 + structure + domain_format
+    # Format section — v3.0: タスク固有フォーマット優先
     lines.extend(["", "@format:"])
-    if output_style and output_style.get("schema"):
-        # v2.3: JSON Schema を @format に展開
+    task_format = TASK_FORMATS.get(task_type)
+    if task_format:
+        # v3.0: タスク固有の出力フォーマット
+        lines.append("  ```json")
+        lines.append("  {")
+        fmt_items = list(task_format.items())
+        for i, (key, val) in enumerate(fmt_items):
+            ptype = val.get("type", "string")
+            desc = val.get("description", "")
+            comma = "," if i < len(fmt_items) - 1 else ""
+            if ptype == "array":
+                lines.append(f'    "{key}": [...]  // {desc}')
+            else:
+                lines.append(f'    "{key}": "{ptype}"{comma}  // {desc}')
+        lines.append("  }")
+        lines.append("  ```")
+        tone = (output_style or {}).get("tone", "")
+        if tone:
+            lines.append(f"  tone: {tone}")
+    elif output_style and output_style.get("schema"):
+        # fallback: ドメインの JSON Schema 展開
         schema = output_style["schema"]
         lines.append("  ```json")
         lines.append("  {")
@@ -462,10 +621,30 @@ def generate_prompt_lang(requirements: str, domain: str, output_format: str) -> 
             "  ```",
         ])
 
-    # Examples section — v2.1: use domain_examples from YAML (few-shot)
+    # Examples section — v3.0: タスク文脈例を動的生成、ドメイン例はフォールバック
     lines.extend(["", "@examples:"])
+    # v3.0: タスク文脈に合わせた動的例を最初に追加
+    lines.extend([
+        "  - input: |",
+        f"      {requirements}",
+        "    output: |",
+        "      {{",
+    ])
+    # タスク固有フォーマットのキーを例として埋める
+    if task_format:
+        fmt_keys = list(task_format.keys())
+        for i, key in enumerate(fmt_keys):
+            desc = task_format[key].get("description", "")
+            comma = "," if i < len(fmt_keys) - 1 else ""
+            lines.append(f'        "{key}": "(ここに{desc})"{comma}')
+    else:
+        lines.append('        "result": "(具体的な出力)"')
+    lines.extend([
+        "      }}",
+    ])
+    # ドメイン例はフォールバックとして残す (2件目以降)
     if domain_examples:
-        for ex in domain_examples[:3]:  # v2.3: 3件目 (edge/error) も出力
+        for ex in domain_examples[1:3]:  # 2件目と3件目 (edge/error)
             ex_input = ex.get("input", "").strip()
             ex_output = ex.get("output", "").strip()
             # Truncate long inputs for .prompt format

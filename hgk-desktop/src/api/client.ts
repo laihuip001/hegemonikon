@@ -43,6 +43,33 @@ export type DendronReportResponse = paths['/api/dendron/report']['get']['respons
 export type PostcheckResponse = paths['/api/postcheck/run']['post']['responses']['200']['content']['application/json'];
 export type SELListResponse = paths['/api/postcheck/list']['get']['responses']['200']['content']['application/json'];
 
+// --- Timeline Types ---
+export interface TimelineEvent {
+    id: string;
+    type: 'handoff' | 'doxa' | 'workflow';
+    title: string;
+    date: string;
+    summary: string;
+    filename: string;
+    size_bytes: number;
+    mtime: string;
+}
+export interface TimelineEventsResponse {
+    events: TimelineEvent[];
+    total: number;
+    offset: number;
+    limit: number;
+    has_more: boolean;
+}
+export interface TimelineEventDetail extends TimelineEvent {
+    content: string;
+}
+export interface TimelineStatsResponse {
+    total: number;
+    by_type: { handoff: number; doxa: number; workflow: number };
+    latest_handoff: string | null;
+}
+
 export const api = {
     // Status
     health: () => apiFetch<HealthCheckResponse>('/api/status/health'),
@@ -135,6 +162,15 @@ export const api = {
             `/api/symploke/search?q=${encodeURIComponent(q)}&k=${k}&sources=${encodeURIComponent(sources)}`
         ),
     symplokeStats: () => apiFetch<SymplokeStatsResponse>('/api/symploke/stats'),
+
+    // Timeline
+    timelineEvents: (limit = 50, offset = 0, type?: string) => {
+        let url = `/api/timeline/events?limit=${limit}&offset=${offset}`;
+        if (type) url += `&event_type=${type}`;
+        return apiFetch<TimelineEventsResponse>(url);
+    },
+    timelineEvent: (id: string) => apiFetch<TimelineEventDetail>(`/api/timeline/event/${id}`),
+    timelineStats: () => apiFetch<TimelineStatsResponse>('/api/timeline/stats'),
 };
 
 // --- Notification Types ---

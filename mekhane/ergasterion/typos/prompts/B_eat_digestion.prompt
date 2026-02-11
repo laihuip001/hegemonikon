@@ -1,18 +1,22 @@
 #prompt generated_skill
 
 @role:
-  research ドメインの専門家
+  学術論文 の 分析者
 
 @goal:
   学術論文を消化し、核心的主張・方法論・結果・限界をJSON構造で抽出し、既存知識ベースとの差分を明示する
 
 @constraints:
+  # --- タスク固有制約 (digest) ---
+  - 核心的主張 (thesis) を1文で抽出すること
+  - 方法論・結果・限界を構造的に分離すること
+  - 既存知識との差分 (新規性) を明示すること
+  - 情報源の信頼度を評価すること
+  # --- ドメイン安全網 (research) ---
   - 情報源（URL, 論文名, 著者）を必ず明記すること
   - 調査年・時期を明示し、最新情報を優先すること（デフォルト: 過去6ヶ月）
   - 比較対象がある場合は必ず表形式で提示すること
   - 「不明」「情報なし」は正当な回答とする — 憶測で埋めないこと
-  - 技術的な主張には根拠（論文, ベンチマーク, 実測値）を添えること
-  - 結論は「示唆」「推奨」「未確定」を明確に区別すること
   # --- 避けるべきパターン ---
   - 禁止: 情報源なしの断言（例: 「LLM-as-a-Judgeは2025年の主流手法です」）
   - 禁止: 古い情報の無断使用（例: 「BERT は最先端の手法です」）
@@ -71,39 +75,28 @@
 @format:
   ```json
   {
-    "topic": "string",  // 調査トピック（1行）
-    "findings": [...]  // findings の配列
-    "recommendations": [...]  // recommendations の配列
-    "limitations": "string",  // 調査の制約・限界
-    "confidence": "high | medium | low",  // 
-    "sources_count": "integer"  // 
+    "thesis": "string",  // 核心的主張（1文）
+    "methodology": "string",  // 方法論の要約
+    "findings": [...]  // 主要な発見
+    "limitations": "string",  // 限界・制約
+    "novelty": "string",  // 既存知識との差分
+    "confidence": "string"  // 情報の確信度
   }
   ```
   tone: 客観的かつ構造的。推測と事実を明確に区別。確信度ラベルを使用
 
 @examples:
   - input: |
-      2025年のLLMプロンプト評価フレームワークの動向を調査してください。
-      特に: (1) 主要ツール/ライブラリ (2) 評価メトリクス (3) 業界での採用状況
+      学術論文を消化し、核心的主張・方法論・結果・限界をJSON構造で抽出し、既存知識ベースとの差分を明示する
     output: |
-      {
-        "topic": "LLMプロンプト評価フレームワーク動向 (2025)",
-        "findings": [
-          {
-            "aspect": "主要ツール",
-            "items": [
-              {"name": "DeepEval", "description": "14+メトリクス、RAG対応", "source": "deepeval.ai", "year": 2025},
-              {"name": "LangSmith", "description": "LangChain統合、トレーシング", "source": "langsmith.com", "year": 2025}
-            ]
-          }
-        ],
-        "recommendations": [
-          {"priority": "high", "action": "DeepEvalのRAGメトリクスを自社scorerに統合", "rationale": "既存のRAGテンプレートとの親和性が高い"}
-        ],
-        "limitations": "調査は英語圏のツールに限定。日本語対応状況は別途調査が必要",
-        "confidence": "high",
-        "sources_count": 12
-      }
+      {{
+        "thesis": "(ここに核心的主張（1文）)",
+        "methodology": "(ここに方法論の要約)",
+        "findings": "(ここに主要な発見)",
+        "limitations": "(ここに限界・制約)",
+        "novelty": "(ここに既存知識との差分)",
+        "confidence": "(ここに情報の確信度)"
+      }}
   - input: |
       2026年のConstraint Decodingの最新動向を調査してください。
       商用LLMでの採用状況も含めてください。

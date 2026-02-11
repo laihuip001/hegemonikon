@@ -35,6 +35,7 @@ class MetrikaResult:
     @property
     # PURPOSE: passed — システムの処理
     def passed(self) -> bool:
+        """passed — システムの処理"""
         return all(
             [self.dokime, self.syntomia, self.prosbasimotes, self.atomos, self.katharos]
         )
@@ -62,8 +63,8 @@ class PalimpsestItem:
     content: str
     hypothesis: str
 
-# PURPOSE: 品質門 - Hegemonikón品質体系の実装
 
+# PURPOSE: 品質門 - Hegemonikón品質体系の実装
 class QualityGate:
     """品質門 - Hegemonikón品質体系の実装"""
 

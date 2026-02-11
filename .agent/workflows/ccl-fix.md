@@ -1,4 +1,9 @@
 ---
+lcm_state: beta
+version: 1.0
+---
+
+---
 description: "[CCL Macro] 修正サイクル — @fix = /dia+_/ene+_/dia"
 ---
 

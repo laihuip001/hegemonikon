@@ -1,4 +1,9 @@
 ---
+lcm_state: beta
+version: 1.0
+---
+
+---
 description: "[CCL Macro] 認知循環 — @kyc = ~(/sop_/noe_/ene_/dia-)"
 ---
 

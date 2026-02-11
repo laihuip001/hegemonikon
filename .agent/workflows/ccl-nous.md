@@ -1,4 +1,9 @@
 ---
+lcm_state: beta
+version: 1.0
+---
+
+---
 description: "[CCL Macro] 問いの深化 — @nous = /u+*^/u^"
 ---
 

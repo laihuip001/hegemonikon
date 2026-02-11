@@ -1,4 +1,9 @@
 ---
+lcm_state: beta
+version: 1.0
+---
+
+---
 description: "[CCL Macro] 深掘り — @dig = /s+~(/p*/a)_/dia*/o+"
 ---
 

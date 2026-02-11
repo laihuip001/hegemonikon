@@ -171,7 +171,11 @@ def check_dendron() -> HealthItem:
 
 # PURPOSE: 定理活性度チェック (Theorem Activity Report)
 def check_theorem_activity() -> HealthItem:
-    """24定理の活性度を集計し、体系の健全性を判定"""
+    """24定理の活性度を集計し、体系の健全性を判定
+
+    DX-008 R4: 直接発動と間接発動(ハブ経由)を分離し、
+    「真の需要」と「ハブ依存生存」を区別する。
+    """
     try:
         from mekhane.peira.theorem_activity import (
             scan_handoffs, classify_activity, THEOREM_WORKFLOWS
@@ -181,6 +185,8 @@ def check_theorem_activity() -> HealthItem:
         months_span = max(len(months), 1)
 
         alive = dormant = dead = 0
+        direct_alive = 0   # 直接発動で alive
+        hub_only = 0        # ハブ経由のみで alive
         for wf_id in THEOREM_WORKFLOWS:
             direct = data["wf_counts"].get(wf_id, 0)
             via_hub = data["hub_counts"].get(wf_id, 0)
@@ -188,6 +194,12 @@ def check_theorem_activity() -> HealthItem:
             status = classify_activity(wf_id, total, months_span)
             if "alive" in status:
                 alive += 1
+                # 直接発動だけで alive 基準を満たすか判定
+                direct_status = classify_activity(wf_id, direct, months_span)
+                if "alive" in direct_status:
+                    direct_alive += 1
+                else:
+                    hub_only += 1
             elif "death" in status:
                 dead += 1
             else:
@@ -196,6 +208,8 @@ def check_theorem_activity() -> HealthItem:
         total_theorems = len(THEOREM_WORKFLOWS)
         alive_rate = alive / total_theorems if total_theorems else 0
         detail = f"{alive}/{total_theorems} alive"
+        if hub_only:
+            detail += f" ({direct_alive} direct, {hub_only} hub-only)"
         if dormant:
             detail += f", {dormant} dormant"
         if dead:

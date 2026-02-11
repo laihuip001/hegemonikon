@@ -273,6 +273,33 @@ class TestCheckTheoremActivity(unittest.TestCase):
         result = check_theorem_activity()
         self.assertEqual(result.status, "warn")
         self.assertIn("16/24 alive", result.detail)
+    @patch("mekhane.peira.theorem_activity.scan_handoffs")
+    def test_hub_only_alive(self, mock_scan):
+        """一部がハブ経由のみで alive の場合 — DX-008 R4"""
+        from collections import Counter
+        # O-series: 直接発動 10回 (direct alive)
+        direct = Counter({wf: 10 for wf in [
+            "noe", "bou", "zet", "ene",
+            "sta", "mek", "chr", "pra",
+            "pro", "pis", "ore", "dox",
+            "tak", "kho", "euk", "tel",
+            "sym", "met", "ana", "sop",
+        ]})
+        # A-series: 直接 0回, ハブ経由 10回 (hub-only alive)
+        hub = Counter({wf: 10 for wf in ["kat", "dia", "syn", "epi"]})
+        mock_scan.return_value = {
+            "total_files": 50,
+            "skipped": 0,
+            "wf_counts": direct,
+            "hub_counts": hub,
+            "wf_by_month": {"2026-01": Counter(), "2026-02": Counter()},
+        }
+        result = check_theorem_activity()
+        self.assertEqual(result.status, "ok")
+        self.assertIn("24/24 alive", result.detail)
+        self.assertIn("hub-only", result.detail)
+        self.assertIn("20 direct", result.detail)
+        self.assertIn("4 hub-only", result.detail)
 
 
 if __name__ == "__main__":

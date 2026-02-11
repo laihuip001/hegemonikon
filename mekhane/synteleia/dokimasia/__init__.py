@@ -2,12 +2,13 @@
 """
 Dokimasia (δοκιμασία) — 審査層
 
-「範囲・時期・精度」を問う5エージェント:
+「範囲・時期・精度」を問う5エージェント + L2 意味監査:
 - PerigrapheAgent: 境界画定 (P)
 - KairosAgent: 時宜判断 (K)
 - OperatorAgent: 記号/演算子 (A)
 - LogicAgent: 論理矛盾 (A)
 - CompletenessAgent: 欠落要素 (A)
+- SemanticAgent: LLM セマンティック監査 (L2)
 """
 
 from .perigraphe_agent import PerigrapheAgent
@@ -15,6 +16,7 @@ from .kairos_agent import KairosAgent
 from .operator_agent import OperatorAgent
 from .logic_agent import LogicAgent
 from .completeness_agent import CompletenessAgent
+from .semantic_agent import SemanticAgent
 
 __all__ = [
     "PerigrapheAgent",
@@ -22,4 +24,5 @@ __all__ = [
     "OperatorAgent",
     "LogicAgent",
     "CompletenessAgent",
+    "SemanticAgent",
 ]

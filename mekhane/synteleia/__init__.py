@@ -38,6 +38,7 @@ from .dokimasia import (
     OperatorAgent,
     LogicAgent,
     CompletenessAgent,
+    SemanticAgent,
 )
 
 __all__ = [
@@ -61,4 +62,6 @@ __all__ = [
     "OperatorAgent",
     "LogicAgent",
     "CompletenessAgent",
+    # L2
+    "SemanticAgent",
 ]

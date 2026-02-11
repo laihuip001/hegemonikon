@@ -1,5 +1,7 @@
 ---
 description: "[CCL Macro] 計画策定 — @plan = /bou+_/s+_/dia"
+lcm_state: stable
+version: "1.0"
 ---
 
 # /ccl-plan: 計画策定マクロ

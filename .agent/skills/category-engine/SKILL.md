@@ -12,6 +12,12 @@ triggers:
   - 構造の保存・忘却を問う時
   - Trigonon / X-series を参照する時
   - 「なぜこの変換は正当か」を問う時
+
+risk_tier: L2
+risks:
+  - Mathematical Inaccuracy: 圏論の概念を厳密でない方法で適用するリスク
+  - Over-abstraction: 具体的な問題を過度に抽象化して解決不能にするリスク
+  - Cognitive Overload: 複雑な概念体系によりユーザーを混乱させるリスク
 ---
 
 # 🏛️ Category Theory Engine — 構造認識の言語

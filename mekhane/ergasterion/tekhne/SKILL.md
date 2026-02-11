@@ -16,6 +16,12 @@ description: |
   - 「PE」
   - 「生成」
   - 「製作」
+
+risk_tier: L1
+risks:
+  - Recursive Prompt Injection: 自己参照による無限ループの可能性
+  - Hallucination Amplification: 存在しないライブラリの推奨
+  - Resource Exhaustion: 複雑なメタプロンプトによるトークン枯渇
 ---
 
 # Tekhne-Maker v6.7 「OMEGA SINGULARITY BUILD + TARGET_AGENT」

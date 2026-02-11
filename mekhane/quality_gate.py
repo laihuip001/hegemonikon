@@ -24,17 +24,24 @@ from typing import Optional
 class MetrikaResult:
     """Metrika 5門の検証結果"""
 
+    # PURPOSE: テスト先行
     dokime: bool = True  # テスト先行
+    # PURPOSE: 複雑度制限
     syntomia: bool = True  # 複雑度制限
+    # PURPOSE: アクセシビリティ
     prosbasimotes: bool = True  # アクセシビリティ
+    # PURPOSE: 単一責任
     atomos: bool = True  # 単一責任
+    # PURPOSE: 死コードなし
     katharos: bool = True  # 死コードなし
 
+    # PURPOSE: 違反内容リスト
     violations: list[str] = field(default_factory=list)
 
     @property
     # PURPOSE: passed — システムの処理
     def passed(self) -> bool:
+        """passed — システムの処理"""
         return all(
             [self.dokime, self.syntomia, self.prosbasimotes, self.atomos, self.katharos]
         )

@@ -46,6 +46,7 @@ class MacroExpander:
         result = ccl
 
         # Find all @name patterns
+        # PURPOSE: マクロを展開するヘルパー関数
         def replace(match):
             nonlocal expanded
             name = match.group(1)

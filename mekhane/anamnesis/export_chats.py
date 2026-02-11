@@ -406,8 +406,8 @@ class AntigravityChatExporter:
                 try:
                     idx_num = int(section_idx)
                     role = "user" if idx_num % 2 == 0 else "assistant"
-                except Exception:
-                    pass  # TODO: Add proper error handling
+                except Exception as e:
+                    print(f"    [!] Warning: Invalid section_idx '{section_idx}': {e}")
 
             messages.append(
                 {"role": role, "content": content[:10000], "section_index": section_idx}
@@ -594,8 +594,8 @@ class AntigravityChatExporter:
                         try:
                             idx_num = int(section_idx)
                             role = "user" if idx_num % 2 == 0 else "assistant"
-                        except Exception:
-                            pass  # TODO: Add proper error handling
+                        except Exception as e:
+                            print(f"    [!] Warning: Invalid section_idx '{section_idx}': {e}")
 
                     messages.append(
                         {

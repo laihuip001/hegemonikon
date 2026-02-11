@@ -1,4 +1,10 @@
 ---
+lcm_state: stable
+version: 1.0
+lcm_state: stable
+version: "1.0"
+lcm_state: stable
+version: "1.0"
 description: "[CCL Macro] 3項振動 — @osc = /s~/dia~/noe"
 ---
 

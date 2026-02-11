@@ -1,4 +1,6 @@
 ---
+lcm_state: stable
+version: 1.0
 description: "[CCL Macro] 即実行 — @go = /s+_/ene+"
 ---
 

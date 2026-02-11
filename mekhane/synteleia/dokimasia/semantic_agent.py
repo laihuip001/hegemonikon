@@ -144,8 +144,6 @@ class StubBackend(LLMBackend):
 # =============================================================================
 
 # PURPOSE: LLM レスポンスを AuditIssue にパースする
-
-
 @dataclass
 class ParsedIssue:
     """パース済みの問題"""

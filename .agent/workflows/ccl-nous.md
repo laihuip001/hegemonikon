@@ -1,4 +1,10 @@
 ---
+lcm_state: stable
+version: 1.0
+lcm_state: stable
+version: "1.0"
+lcm_state: stable
+version: "1.0"
 description: "[CCL Macro] 問いの深化 — @nous = /u+*^/u^"
 ---
 

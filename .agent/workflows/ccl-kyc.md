@@ -1,4 +1,10 @@
 ---
+lcm_state: stable
+version: 1.0
+lcm_state: stable
+version: "1.0"
+lcm_state: stable
+version: "1.0"
 description: "[CCL Macro] 認知循環 — @kyc = ~(/sop_/noe_/ene_/dia-)"
 ---
 

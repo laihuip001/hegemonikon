@@ -29,10 +29,24 @@ HEGEMONIKON_ROOT = Path(__file__).parent.parent
 sys.path.insert(0, str(HEGEMONIKON_ROOT))
 
 # Import Perplexity API
-PERPLEXITY_SCRIPT = Path("/home/makaron8426/oikos/hegemonikon/mekhane/peira/scripts")
-sys.path.insert(0, str(PERPLEXITY_SCRIPT))
-
-from perplexity_api import search as perplexity_search
+# Use relative import if available, otherwise try to add path
+try:
+    from mekhane.peira.scripts.perplexity_api import search as perplexity_search
+except ImportError:
+    # Fallback to sys.path hack for standalone execution
+    PERPLEXITY_SCRIPT = Path(__file__).parent.parent / "mekhane" / "peira" / "scripts"
+    if PERPLEXITY_SCRIPT.exists():
+        sys.path.insert(0, str(PERPLEXITY_SCRIPT))
+        try:
+            from perplexity_api import search as perplexity_search
+        except ImportError:
+            # Mock if not available
+            def perplexity_search(*args, **kwargs):
+                return {"error": "Perplexity API not available"}
+    else:
+        # Mock if script not found
+        def perplexity_search(*args, **kwargs):
+            return {"error": "Perplexity API script not found"}
 
 # Import Hermeneus CCL Compiler
 try:

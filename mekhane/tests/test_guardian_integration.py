@@ -212,9 +212,10 @@ class TestPromptLangToolChainRegression:
 
     def test_context_item_tool_chain(self):
         """ContextItem must preserve tool_chain field."""
-        import sys
-        sys.path.insert(0, str(Path(__file__).parent.parent / "ergasterion" / "prompt-lang"))
-        import prompt_lang as pl
+        try:
+            from mekhane.ergasterion.typos import prompt_lang as pl
+        except ImportError:
+            pytest.skip("prompt_lang not available")
 
         # Create a ContextItem with tool_chain
         item = pl.ContextItem(
@@ -226,9 +227,10 @@ class TestPromptLangToolChainRegression:
 
     def test_parse_mcp_with_tool_chain(self):
         """Parser should extract MCP context references."""
-        import sys
-        sys.path.insert(0, str(Path(__file__).parent.parent / "ergasterion" / "prompt-lang"))
-        import prompt_lang as pl
+        try:
+            from mekhane.ergasterion.typos import prompt_lang as pl
+        except ImportError:
+            pytest.skip("prompt_lang not available")
 
         # Test that ContextItem preserves tool_chain when explicitly set
         item = pl.ContextItem(

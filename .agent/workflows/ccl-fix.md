@@ -1,4 +1,10 @@
 ---
+lcm_state: stable
+version: 1.0
+lcm_state: stable
+version: "1.0"
+lcm_state: stable
+version: "1.0"
 description: "[CCL Macro] 修正サイクル — @fix = /dia+_/ene+_/dia"
 ---
 

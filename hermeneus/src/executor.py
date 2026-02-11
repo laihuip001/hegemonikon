@@ -173,7 +173,7 @@ class WorkflowExecutor:
             
             # Phase 2: Execute
             pipeline.execute_result = await self._phase_execute(
-                ccl, context, model
+                ccl, context, model, lmql_code=pipeline.lmql_code
             )
             if not pipeline.execute_result.success:
                 pipeline.success = False
@@ -236,8 +236,9 @@ class WorkflowExecutor:
             from hermeneus.src.macros import get_all_macros
 
             # Auto-load all registered macros (builtin + ccl/macros/)
-            macros = get_all_macros()
-            lmql_code = compile_ccl(ccl, macros=macros, model=model)
+            # Run in thread to avoid blocking loop (file I/O in get_all_macros, CPU in compile_ccl)
+            macros = await asyncio.to_thread(get_all_macros)
+            lmql_code = await asyncio.to_thread(compile_ccl, ccl, macros=macros, model=model)
             
             return PhaseResult(
                 phase=ExecutionPhase.COMPILE,
@@ -257,7 +258,8 @@ class WorkflowExecutor:
         self,
         ccl: str,
         context: str,
-        model: str
+        model: str,
+        lmql_code: Optional[str] = None
     ) -> PhaseResult:
         """実行フェーズ
         
@@ -273,8 +275,11 @@ class WorkflowExecutor:
             from hermeneus.src.runtime import LMQLExecutor, ExecutionConfig
             
             # Step 1: compile (LMQL コード生成)
-            macros = get_all_macros()
-            lmql_code = compile_ccl(ccl, macros=macros, model=model)
+            # If lmql_code is provided (from _phase_compile), use it.
+            if lmql_code is None:
+                # Run in thread to avoid blocking loop (fallback compilation)
+                macros = await asyncio.to_thread(get_all_macros)
+                lmql_code = await asyncio.to_thread(compile_ccl, ccl, macros=macros, model=model)
             
             # Step 2: LLM で実行 (非同期)
             config = ExecutionConfig(model=model)

@@ -98,10 +98,31 @@ def cmd_ingest(args):
         except Exception as e:
             print(f"[Kairos] Error: {e}")
 
-    # Chronos (Conversation History) - Not yet implemented
+    # Chronos (Conversation History)
     if args.all or args.chronos:
-        # TODO: Implement when conversation history indexing is ready
-        results["chronos"] = 0
+        try:
+            from mekhane.symploke.chronos_ingest import (
+                parse_chronos_logs,
+                ingest_to_chronos,
+                CHRONOS_LOGS_DIR,
+                DEFAULT_INDEX_PATH as CHRONOS_INDEX_PATH,
+            )
+
+            print(f"[Chronos] Scanning logs from: {CHRONOS_LOGS_DIR}")
+            docs = parse_chronos_logs(CHRONOS_LOGS_DIR)
+
+            if docs:
+                # Ensure directory exists
+                CHRONOS_INDEX_PATH.parent.mkdir(parents=True, exist_ok=True)
+                count = ingest_to_chronos(docs, save_path=str(CHRONOS_INDEX_PATH))
+                results["chronos"] = count
+            else:
+                print("[Chronos] No logs found")
+
+        except ImportError as e:
+            print(f"[Chronos] Import error: {e}")
+        except Exception as e:
+            print(f"[Chronos] Error: {e}")
 
     # Output in /boot expected format
     total = sum(results.values())
@@ -139,8 +160,20 @@ def cmd_stats(args):
     )
     print(f"Kairos: {handoff_count} handoff files")
 
-    # Chronos stats (placeholder)
-    print("Chronos: Not implemented")
+    # Chronos stats
+    try:
+        from mekhane.symploke.chronos_ingest import (
+            DEFAULT_INDEX_PATH as CHRONOS_INDEX_PATH,
+            load_chronos_index,
+        )
+
+        if CHRONOS_INDEX_PATH.exists():
+            adapter = load_chronos_index(str(CHRONOS_INDEX_PATH))
+            print(f"Chronos: {adapter.count()} vectors")
+        else:
+            print("Chronos: Not indexed")
+    except Exception as e:
+        print(f"Chronos: Error - {e}")
 
     print("=" * 40)
     return 0

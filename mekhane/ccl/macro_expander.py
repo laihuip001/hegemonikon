@@ -43,22 +43,23 @@ class MacroExpander:
             Tuple of (expanded CCL, whether any expansion occurred)
         """
         expanded = False
-        result = ccl
 
-        # Find all @name patterns
-        for match in self.MACRO_PATTERN.finditer(ccl):
+        def replace(match):
+            nonlocal expanded
             name = match.group(1)
 
             # Skip if it's a number (that's a level, not a macro)
             if name.isdigit():
-                continue
+                return match.group(0)
 
             macro = self.registry.get(name)
             if macro:
-                result = result.replace(f"@{name}", macro.ccl)
-                self.registry.record_usage(name)
                 expanded = True
+                self.registry.record_usage(name)
+                return macro.ccl
+            return match.group(0)
 
+        result = self.MACRO_PATTERN.sub(replace, ccl)
         return result, expanded
 
     # PURPOSE: Migrate old @N level syntax to new :N syntax.

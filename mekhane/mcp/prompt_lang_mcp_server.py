@@ -1,10 +1,17 @@
-# PROOF: [L2/インフラ] <- mekhane/mcp/ A0→MCP経由のアクセスが必要→prompt_lang_mcp_server が担う
 #!/usr/bin/env python3
 """
-Prompt-Lang MCP Server - Hegemonikón Skill Generator
+Prompt-Lang MCP Server v2.0 — Hegemonikón Skill Generator
 
-Model Context Protocol server for Prompt-Lang code generation.
-Exposes generate tool via stdio transport.
+Model Context Protocol server for Prompt-Lang code generation,
+parsing, validation, compilation, and convergence/divergence policy.
+
+Tools:
+  - generate: Natural language → .prompt code (domain-aware)
+  - parse: .prompt file → JSON AST
+  - validate: .prompt file syntax check
+  - compile: .prompt file → system prompt (markdown/xml/plain)
+  - expand: .prompt file → natural language prompt
+  - policy_check: Convergence/divergence task classification
 
 CRITICAL: This file follows MCP stdio protocol rules:
 - stdout: JSON-RPC messages ONLY
@@ -20,7 +27,6 @@ from typing import Optional
 # ============ CRITICAL: Platform-specific asyncio setup ============
 if sys.platform == "win32":
     import asyncio
-
     asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
 # ============ CRITICAL: Redirect ALL stdout to stderr ============
@@ -30,12 +36,11 @@ _original_stdout = sys.stdout
 _stderr_wrapper = sys.stderr
 
 
-# PURPOSE: log — MCPサービスの処理
 def log(msg):
     print(f"[prompt-lang-mcp] {msg}", file=sys.stderr, flush=True)
 
 
-log("Starting Prompt-Lang MCP Server...")
+log("Starting Prompt-Lang MCP Server v2.0...")
 log(f"Python: {sys.executable}")
 log(f"Platform: {sys.platform}")
 
@@ -45,20 +50,16 @@ log(f"Added to path: {Path(__file__).parent.parent}")
 
 
 # ============ Suppress stdout during imports ============
-# PURPOSE: クラス: StdoutSuppressor
 class StdoutSuppressor:
-    # PURPOSE: StdoutSuppressor の構成と依存関係の初期化
     def __init__(self):
         self._null = io.StringIO()
         self._old_stdout = None
 
-    # PURPOSE: enter__ — MCPサービスの内部処理
     def __enter__(self):
         self._old_stdout = sys.stdout
         sys.stdout = self._null
         return self
 
-    # PURPOSE: exit__ — MCPサービスの内部処理
     def __exit__(self, *args):
         sys.stdout = self._old_stdout
         captured = self._null.getvalue()
@@ -71,11 +72,31 @@ try:
     from mcp.server import Server
     from mcp.server.stdio import stdio_server
     from mcp.types import Tool, TextContent
-
     log("MCP imports successful")
 except Exception as e:
     log(f"MCP import error: {e}")
     sys.exit(1)
+
+# Import prompt-lang parser
+try:
+    # prompt-lang directory has a hyphen — use importlib for safe import
+    import importlib
+    _pl_path = Path(__file__).parent.parent / "ergasterion" / "prompt-lang"
+    if str(_pl_path) not in sys.path:
+        sys.path.insert(0, str(_pl_path))
+    _pl_module = importlib.import_module("prompt_lang")
+    PromptLangParser = _pl_module.PromptLangParser
+    parse_file = _pl_module.parse_file
+    parse_all = _pl_module.parse_all
+    resolve = _pl_module.resolve
+    validate_file = _pl_module.validate_file
+    Prompt = _pl_module.Prompt
+    ParseError = _pl_module.ParseError
+    log("prompt_lang parser imported successfully")
+    PARSER_AVAILABLE = True
+except Exception as e:
+    log(f"prompt_lang import error: {e}, falling back to basic generation")
+    PARSER_AVAILABLE = False
 
 # ============ Paths ============
 SKILL_DIR = Path(__file__).parent.parent / ".agent/skills/utils/prompt-lang-generator"
@@ -87,86 +108,117 @@ log(f"SKILL_DIR: {SKILL_DIR}")
 # ============ Domain Detection ============
 DOMAIN_KEYWORDS = {
     "technical": [
-        "コードレビュー",
-        "code review",
-        "セキュリティ",
-        "security",
-        "api",
-        "endpoint",
-        "バグ",
-        "bug",
-        "デバッグ",
-        "debug",
-        "リファクタリング",
-        "refactor",
-        "テスト",
-        "test",
+        "コードレビュー", "code review", "セキュリティ", "security",
+        "api", "endpoint", "バグ", "bug", "デバッグ", "debug",
+        "リファクタリング", "refactor", "テスト", "test",
+        "実装", "implementation", "アーキテクチャ", "architecture",
     ],
     "rag": [
-        "検索",
-        "search",
-        "rag",
-        "ドキュメント",
-        "document",
-        "知識ベース",
-        "knowledge base",
-        "引用",
-        "citation",
-        "qa",
-        "質問応答",
+        "検索", "search", "rag", "ドキュメント", "document",
+        "知識ベース", "knowledge base", "引用", "citation",
+        "qa", "質問応答", "retrieval", "embedding",
     ],
     "summarization": [
-        "要約",
-        "summary",
-        "summarize",
-        "抽出",
-        "extract",
-        "圧縮",
-        "compress",
-        "ポイント",
-        "key points",
-        "議事録",
-        "meeting notes",
+        "要約", "summary", "summarize", "抽出", "extract",
+        "圧縮", "compress", "ポイント", "key points",
+        "議事録", "meeting notes", "condensation",
     ],
-# PURPOSE: Detect domain from requirements text.
 }
 
 
 def detect_domain(text: str) -> str:
     """Detect domain from requirements text."""
     text_lower = text.lower()
-
     for domain, keywords in DOMAIN_KEYWORDS.items():
         for kw in keywords:
             if kw.lower() in text_lower:
                 log(f"Detected domain: {domain} (keyword: {kw})")
                 return domain
-
     log("No domain detected, defaulting to 'technical'")
     return "technical"
 
 
 # ============ Security: Domain Validation (Defense-in-Depth) ============
-# PURPOSE: Validate domain against whitelist.
 ALLOWED_DOMAINS = frozenset(["technical", "rag", "summarization"])
 
 
 def validate_domain(domain: str) -> str:
-    """
-    Validate domain against whitelist.
-
-    Defense-in-depth: Even though MCP SDK enforces enum constraint,
-    we explicitly validate to prevent path traversal if validation is disabled.
-
-    Security Note (from Synedrion v2 review):
-    - Line 130 uses domain directly in file path construction
-    - This validation prevents ../../ traversal attacks
-    """
+    """Validate domain against whitelist. Defense-in-depth against path traversal."""
     if domain not in ALLOWED_DOMAINS:
         log(f"SECURITY: Invalid domain '{domain}' rejected. Defaulting to 'technical'")
         return "technical"
     return domain
-# PURPOSE: Load YAML file as dict.
+
+
+# ============ Convergence/Divergence Policy ============
+# FEP Function axiom: Explore ↔ Exploit
+CONVERGENT_TASKS = frozenset([
+    "data_extraction", "spec_generation", "test_generation",
+    "code_formatting", "translation", "schema_validation",
+    "jules_coding", "api_integration", "config_generation",
+])
+
+DIVERGENT_TASKS = frozenset([
+    "brainstorming", "ideation", "exploration",
+    "creative_writing", "design_review", "concept_art",
+])
+
+CONVERGENT_KEYWORDS = [
+    "抽出", "extract", "仕様", "spec", "テスト", "test",
+    "整形", "format", "翻訳", "translate", "検証", "validate",
+    "Jules", "コーディング", "coding", "API", "設定", "config",
+]
+
+DIVERGENT_KEYWORDS = [
+    "ブレスト", "brainstorm", "アイデア", "idea", "探索", "explore",
+    "創造", "creative", "デザイン", "design", "コンセプト", "concept",
+    "発想", "想像", "自由に", "多様", "diversity",
+]
+
+
+def classify_task(description: str) -> dict:
+    """Classify task as convergent, divergent, or ambiguous.
+
+    Returns:
+        dict with keys: classification, confidence, keywords_found, recommendation
+    """
+    desc_lower = description.lower()
+
+    conv_hits = [kw for kw in CONVERGENT_KEYWORDS if kw.lower() in desc_lower]
+    div_hits = [kw for kw in DIVERGENT_KEYWORDS if kw.lower() in desc_lower]
+
+    conv_score = len(conv_hits)
+    div_score = len(div_hits)
+
+    if conv_score > 0 and div_score == 0:
+        classification = "convergent"
+        confidence = min(0.95, 0.6 + conv_score * 0.1)
+        recommendation = "✅ .prompt 推奨: 構造化により精度・再現性が向上"
+    elif div_score > 0 and conv_score == 0:
+        classification = "divergent"
+        confidence = min(0.95, 0.6 + div_score * 0.1)
+        recommendation = "❌ .prompt 非推奨: 構造化が多様性を阻害する可能性"
+    elif conv_score > div_score:
+        classification = "convergent-leaning"
+        confidence = 0.5 + (conv_score - div_score) * 0.1
+        recommendation = "⚠️ .prompt 条件付き推奨: 收束要素が優勢だが拡散要素も存在"
+    elif div_score > conv_score:
+        classification = "divergent-leaning"
+        confidence = 0.5 + (div_score - conv_score) * 0.1
+        recommendation = "⚠️ .prompt 条件付き非推奨: 拡散要素が優勢だが收束要素も存在"
+    else:
+        classification = "ambiguous"
+        confidence = 0.3
+        recommendation = "❓ 判断困難: Creator に確認してください"
+
+    return {
+        "classification": classification,
+        "confidence": round(confidence, 2),
+        "convergent_keywords": conv_hits,
+        "divergent_keywords": div_hits,
+        "recommendation": recommendation,
+        "fep_basis": "Function axiom (Explore ↔ Exploit): .prompt = precision weighting ↑",
+    }
 
 
 # ============ Template Loading ============
@@ -174,18 +226,16 @@ def load_yaml_file(path: Path) -> dict:
     """Load YAML file as dict."""
     try:
         import yaml
-
         with open(path, "r", encoding="utf-8") as f:
             return yaml.safe_load(f)
     except Exception as e:
         log(f"Error loading {path}: {e}")
         return {}
-# PURPOSE: Generate Prompt-Lang code from requirements.
 
 
 # ============ Prompt-Lang Generation ============
 def generate_prompt_lang(requirements: str, domain: str, output_format: str) -> str:
-    """Generate Prompt-Lang code from requirements."""
+    """Generate Prompt-Lang code from requirements (enhanced v2.0)."""
 
     # Extract skill name from requirements
     name_match = re.search(r'「(.+?)」|"(.+?)"|を作|スキル', requirements)
@@ -200,7 +250,7 @@ def generate_prompt_lang(requirements: str, domain: str, output_format: str) -> 
     domain_constraints = domain_template.get("domain_constraints", [])
     domain_rubric = domain_template.get("domain_rubric", [])
 
-    # Build Prompt-Lang code
+    # Build improved Prompt-Lang code
     lines = [
         f"#prompt {skill_name}",
         "",
@@ -215,59 +265,78 @@ def generate_prompt_lang(requirements: str, domain: str, output_format: str) -> 
 
     # Add domain-specific constraints
     if domain_constraints:
-        for c in domain_constraints[:3]:
+        for c in domain_constraints[:5]:
             lines.append(f"  - {c}")
     else:
-        lines.extend(
-            [
-                "  - 具体的かつ実行可能な出力を提供すること",
-                "  - 曖昧な表現（「適切に」「うまく」）を避けること",
-                "  - エラーハンドリングを明示すること",
-            ]
-        )
+        lines.extend([
+            "  - 具体的かつ実行可能な出力を提供すること",
+            "  - 曖昧な表現（「適切に」「うまく」）を避けること",
+            "  - エラーハンドリングを明示すること",
+            "  - 出力は再現可能であること",
+        ])
 
-    lines.extend(
-        [
-            "",
-            "@rubric:",
-        ]
-    )
+    # Context section (v2.0 enhancement)
+    lines.extend([
+        "",
+        "@context:",
+        f"  - file: .agent/rules/prompt-lang-policy.md",
+        f"    priority: HIGH",
+    ])
 
-    # Add rubric from domain template or default
+    # Rubric section
+    lines.extend(["", "@rubric:"])
     if domain_rubric:
-        rubric = domain_rubric[0]
-        lines.extend(
-            [
+        for rubric in domain_rubric[:3]:
+            lines.extend([
                 f"  - {rubric.get('name', 'quality')}:",
                 f"      description: {rubric.get('description', '品質評価')}",
                 f"      scale: {rubric.get('scale', '1-5')}",
-            ]
-        )
+            ])
     else:
-        lines.extend(
-            ["  - quality:", "      description: 出力の品質", "      scale: 1-5"]
-        )
+        lines.extend([
+            "  - correctness:",
+            "      description: 出力の正確性",
+            "      scale: 1-5",
+            "  - completeness:",
+            "      description: 要件の充足度",
+            "      scale: 1-5",
+        ])
 
-    lines.extend(
-        [
-            "",
-            "@format:",
-            "  ```json",
-            "  {",
-            '    "result": "string",',
-            '    "confidence": "high | medium | low"',
-            "  }",
-            "  ```",
-            "",
-            "@examples:",
-            '  - input: "サンプル入力"',
-            "    output: |",
-            "      {",
-            '        "result": "サンプル出力",',
-            '        "confidence": "high"',
-            "      }",
-        ]
-    )
+    # Format section
+    lines.extend([
+        "",
+        "@format:",
+        "  ```json",
+        "  {",
+        '    "result": "string",',
+        '    "confidence": "high | medium | low",',
+        '    "reasoning": "string"',
+        "  }",
+        "  ```",
+    ])
+
+    # Examples section
+    lines.extend([
+        "",
+        "@examples:",
+        '  - input: "サンプル入力（実際のユースケースに置き換えてください）"',
+        "    output: |",
+        "      {",
+        '        "result": "具体的な出力例",',
+        '        "confidence": "high",',
+        '        "reasoning": "判断の根拠"',
+        "      }",
+    ])
+
+    # Activation section (v2.0 enhancement)
+    lines.extend([
+        "",
+        "@activation:",
+        "  mode: model_decision",
+        "  conditions:",
+        f'    - input_contains: ["{domain}"]',
+        "  priority: 3",
+    ])
 
     return "\n".join(lines)
 
@@ -275,18 +344,17 @@ def generate_prompt_lang(requirements: str, domain: str, output_format: str) -> 
 # ============ Initialize MCP Server ============
 server = Server(
     name="prompt-lang",
-    version="1.0.0",
-    instructions="Prompt-Lang code generator for structured prompt definitions",
+    version="2.0.0",
+    instructions="Prompt-Lang v2.0: generate, parse, validate, compile, expand, and policy_check for structured prompt definitions",
 )
-log("Server initialized")
-# PURPOSE: List available tools.
+log("Server v2.0 initialized")
 
 
 @server.list_tools()
 async def list_tools():
     """List available tools."""
     log("list_tools called")
-    return [
+    tools = [
         Tool(
             name="generate",
             description="Generate Prompt-Lang code from natural language requirements. Returns structured prompt definition (.prompt format).",
@@ -310,63 +378,380 @@ async def list_tools():
                 },
                 "required": ["requirements"],
             },
-        )
+        ),
+        Tool(
+            name="parse",
+            description="Parse a .prompt file into JSON AST. Supports v2.1 features: @rubric, @context, @if/@else, @extends, @mixin.",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "content": {
+                        "type": "string",
+                        "description": ".prompt file content to parse",
+                    },
+                    "filepath": {
+                        "type": "string",
+                        "description": "Path to .prompt file (alternative to content)",
+                    },
+                },
+            },
+        ),
+        Tool(
+            name="validate",
+            description="Validate .prompt file syntax. Returns errors and warnings.",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "content": {
+                        "type": "string",
+                        "description": ".prompt file content to validate",
+                    },
+                    "filepath": {
+                        "type": "string",
+                        "description": "Path to .prompt file (alternative to content)",
+                    },
+                },
+            },
+        ),
+        Tool(
+            name="compile",
+            description="Compile .prompt file to system prompt string (markdown format). Resolves @context, @if/@else, @extends, @mixin.",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "content": {
+                        "type": "string",
+                        "description": ".prompt file content to compile",
+                    },
+                    "filepath": {
+                        "type": "string",
+                        "description": "Path to .prompt file (alternative to content)",
+                    },
+                    "context": {
+                        "type": "object",
+                        "description": "Variables for @if evaluation (e.g., {\"env\": \"prod\"})",
+                    },
+                },
+            },
+        ),
+        Tool(
+            name="expand",
+            description="Expand .prompt file to natural language prompt for human readability.",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "content": {
+                        "type": "string",
+                        "description": ".prompt file content to expand",
+                    },
+                    "filepath": {
+                        "type": "string",
+                        "description": "Path to .prompt file (alternative to content)",
+                    },
+                },
+            },
+        ),
+        Tool(
+            name="policy_check",
+            description="Check if a task is convergent (precision-oriented) or divergent (creativity-oriented). Based on FEP Function axiom (Explore ↔ Exploit). Convergent tasks benefit from .prompt, divergent tasks don't.",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "task_description": {
+                        "type": "string",
+                        "description": "Description of the task to classify",
+                    },
+                },
+                "required": ["task_description"],
+            },
+        ),
     ]
-# PURPOSE: Handle tool calls.
+    return tools
+
+
+def _get_content(arguments: dict) -> str:
+    """Extract content from arguments (content or filepath)."""
+    content = arguments.get("content", "")
+    filepath = arguments.get("filepath", "")
+
+    if content:
+        return content
+    elif filepath:
+        path = Path(filepath)
+        if path.exists():
+            return path.read_text(encoding="utf-8")
+        else:
+            raise FileNotFoundError(f"File not found: {filepath}")
+    else:
+        raise ValueError("Either 'content' or 'filepath' is required")
 
 
 @server.call_tool(validate_input=True)
 async def call_tool(name: str, arguments: dict):
     """Handle tool calls."""
-    log(f"call_tool: {name} with {arguments}")
+    log(f"call_tool: {name} with {list(arguments.keys())}")
 
-    if name == "generate":
-        requirements = arguments.get("requirements", "")
-        domain = arguments.get("domain")
-        output_format = arguments.get("output_format", ".prompt")
+    try:
+        if name == "generate":
+            return await _handle_generate(arguments)
+        elif name == "parse":
+            return await _handle_parse(arguments)
+        elif name == "validate":
+            return await _handle_validate(arguments)
+        elif name == "compile":
+            return await _handle_compile(arguments)
+        elif name == "expand":
+            return await _handle_expand(arguments)
+        elif name == "policy_check":
+            return await _handle_policy_check(arguments)
+        else:
+            return [TextContent(type="text", text=f"Unknown tool: {name}")]
+    except Exception as e:
+        log(f"Tool {name} error: {e}")
+        return [TextContent(type="text", text=f"Error in {name}: {str(e)}")]
 
-        if not requirements:
-            return [TextContent(type="text", text="Error: requirements is required")]
 
+async def _handle_generate(arguments: dict):
+    """Handle generate tool call."""
+    requirements = arguments.get("requirements", "")
+    domain = arguments.get("domain")
+    output_format = arguments.get("output_format", ".prompt")
+
+    if not requirements:
+        return [TextContent(type="text", text="Error: requirements is required")]
+
+    if not domain:
+        domain = detect_domain(requirements)
+    domain = validate_domain(domain)
+
+    # Run policy check on the requirements
+    policy = classify_task(requirements)
+
+    log(f"Generating for domain: {domain}, policy: {policy['classification']}")
+
+    code = generate_prompt_lang(requirements, domain, output_format)
+
+    output_lines = [
+        "# [Hegemonikon] Prompt-Lang Generator v2.0\n",
+        f"- **Requirements**: {requirements[:200]}",
+        f"- **Detected Domain**: {domain}",
+        f"- **Task Classification**: {policy['classification']} (confidence: {policy['confidence']})",
+        f"- **Recommendation**: {policy['recommendation']}",
+        "",
+        "## Generated Code",
+        "",
+        "```prompt-lang",
+        code,
+        "```",
+        "",
+    ]
+
+    if policy["classification"].startswith("divergent"):
+        output_lines.extend([
+            "> ⚠️ **警告**: このタスクは拡散的です。.prompt による構造化は多様性を阻害する可能性があります。",
+            "> 自然言語での指示を検討してください。",
+            "",
+        ])
+
+    output_lines.extend([
+        "> ℹ️ このコードは基本テンプレートから生成されました。",
+        "> `parse` で構文確認、`compile` で実行用プロンプトに変換できます。",
+    ])
+
+    log(f"Generation completed for: {requirements[:50]}...")
+    return [TextContent(type="text", text="\n".join(output_lines))]
+
+
+async def _handle_parse(arguments: dict):
+    """Handle parse tool call."""
+    if not PARSER_AVAILABLE:
+        return [TextContent(type="text", text="Error: prompt_lang parser not available")]
+
+    content = _get_content(arguments)
+
+    try:
+        # Try multi-definition parse first
+        result = parse_all(content)
+        if result.prompts:
+            import json
+            output = {
+                "prompts": {k: v.to_dict() for k, v in result.prompts.items()},
+                "mixins": {k: {"name": v.name, "role": v.role, "goal": v.goal,
+                               "constraints": v.constraints}
+                           for k, v in result.mixins.items()},
+            }
+            return [TextContent(
+                type="text",
+                text=f"# Parse Result\n\n```json\n{json.dumps(output, indent=2, ensure_ascii=False)}\n```"
+            )]
+        else:
+            # Single prompt parse
+            parser = PromptLangParser(content)
+            prompt = parser.parse()
+            import json
+            return [TextContent(
+                type="text",
+                text=f"# Parse Result\n\n```json\n{json.dumps(prompt.to_dict(), indent=2, ensure_ascii=False)}\n```"
+            )]
+    except ParseError as e:
+        return [TextContent(type="text", text=f"# Parse Error\n\n❌ {str(e)}")]
+
+
+async def _handle_validate(arguments: dict):
+    """Handle validate tool call."""
+    content = _get_content(arguments)
+
+    errors = []
+    warnings = []
+
+    # Basic structure checks
+    if not content.strip():
+        errors.append("Empty content")
+        return [TextContent(type="text", text="# Validation Result\n\n❌ Empty content")]
+
+    has_header = bool(re.search(r"^#prompt\s+\w+", content, re.MULTILINE))
+    has_mixin = bool(re.search(r"^#mixin\s+\w+", content, re.MULTILINE))
+
+    if not has_header and not has_mixin:
+        errors.append("Missing #prompt or #mixin header")
+
+    # Check core directives
+    directives_found = re.findall(r"^(@\w+):", content, re.MULTILINE)
+    core_directives = {"@role", "@goal", "@constraints"}
+    found_set = set(directives_found)
+
+    for directive in core_directives:
+        if directive not in found_set:
+            warnings.append(f"Missing recommended directive: {directive}")
+
+    # Check for anti-patterns
+    anti_patterns = [
+        (r"適切に|うまく|いい感じ|できるだけ", "曖昧語の使用を検出"),
+        (r"@format:\s*JSON形式で出力", "@format が抽象的（具体的なスキーマを指定してください）"),
+    ]
+    for pattern, msg in anti_patterns:
+        if re.search(pattern, content):
+            warnings.append(f"Anti-pattern: {msg}")
+
+    # Full parser validation if available
+    if PARSER_AVAILABLE and has_header:
         try:
-            # Auto-detect domain if not specified
-            if not domain:
-                domain = detect_domain(requirements)
+            parser = PromptLangParser(content)
+            prompt = parser.parse()
 
-            # Security: Validate domain (defense-in-depth)
-            domain = validate_domain(domain)
+            if not prompt.constraints:
+                warnings.append("No constraints defined")
+            if not prompt.examples:
+                warnings.append("No examples provided (few-shot recommended)")
+            if not prompt.rubric:
+                warnings.append("No rubric defined (self-evaluation recommended)")
+        except ParseError as e:
+            errors.append(f"Parse error: {str(e)}")
 
-            log(f"Generating for domain: {domain}")
+    # Format result
+    status = "✅ PASS" if not errors else "❌ FAIL"
+    lines = [f"# Validation Result: {status}", ""]
 
-            # Generate Prompt-Lang code
-            code = generate_prompt_lang(requirements, domain, output_format)
+    if errors:
+        lines.append("## Errors")
+        for e in errors:
+            lines.append(f"- ❌ {e}")
+        lines.append("")
 
-            output_lines = [
-                "# [Hegemonikon] Prompt-Lang Generator\n",
-                f"- **Requirements**: {requirements[:100]}...",
-                f"- **Detected Domain**: {domain}",
-                f"- **Output Format**: {output_format}",
-                "",
-                "## Generated Code",
-                "",
-                "```prompt-lang",
-                code,
-                "```",
-                "",
-                "> ℹ️ このコードは基本テンプレートから生成されました。",
-                "> 必要に応じて @constraints, @examples を調整してください。",
-            ]
+    if warnings:
+        lines.append("## Warnings")
+        for w in warnings:
+            lines.append(f"- ⚠️ {w}")
+        lines.append("")
 
-            log(f"Generation completed for: {requirements[:50]}...")
-            return [TextContent(type="text", text="\n".join(output_lines))]
+    if not errors and not warnings:
+        lines.append("No issues found. ✨")
 
-        except Exception as e:
-            log(f"Generate error: {e}")
-            return [TextContent(type="text", text=f"Error generating: {str(e)}")]
+    lines.extend([
+        "",
+        f"**Directives found**: {', '.join(directives_found) if directives_found else 'none'}",
+    ])
 
-    else:
-# PURPOSE: Run the MCP server.
-        return [TextContent(type="text", text=f"Unknown tool: {name}")]
+    return [TextContent(type="text", text="\n".join(lines))]
+
+
+async def _handle_compile(arguments: dict):
+    """Handle compile tool call."""
+    if not PARSER_AVAILABLE:
+        return [TextContent(type="text", text="Error: prompt_lang parser not available")]
+
+    content = _get_content(arguments)
+    context = arguments.get("context", {})
+
+    try:
+        parser = PromptLangParser(content)
+        prompt = parser.parse()
+        compiled = prompt.compile(context=context)
+
+        return [TextContent(
+            type="text",
+            text=f"# Compiled System Prompt\n\n{compiled}"
+        )]
+    except ParseError as e:
+        return [TextContent(type="text", text=f"# Compile Error\n\n❌ {str(e)}")]
+
+
+async def _handle_expand(arguments: dict):
+    """Handle expand tool call."""
+    if not PARSER_AVAILABLE:
+        return [TextContent(type="text", text="Error: prompt_lang parser not available")]
+
+    content = _get_content(arguments)
+
+    try:
+        parser = PromptLangParser(content)
+        prompt = parser.parse()
+        expanded = prompt.expand()
+
+        return [TextContent(
+            type="text",
+            text=f"# Expanded Prompt (Natural Language)\n\n{expanded}"
+        )]
+    except ParseError as e:
+        return [TextContent(type="text", text=f"# Expand Error\n\n❌ {str(e)}")]
+
+
+async def _handle_policy_check(arguments: dict):
+    """Handle policy_check tool call."""
+    task_description = arguments.get("task_description", "")
+    if not task_description:
+        return [TextContent(type="text", text="Error: task_description is required")]
+
+    policy = classify_task(task_description)
+
+    lines = [
+        "# Convergence/Divergence Policy Check",
+        f"## FEP Basis: {policy['fep_basis']}",
+        "",
+        f"**Task**: {task_description[:200]}",
+        "",
+        f"**Classification**: {policy['classification']}",
+        f"**Confidence**: {policy['confidence']}",
+        f"**Recommendation**: {policy['recommendation']}",
+        "",
+    ]
+
+    if policy["convergent_keywords"]:
+        lines.append(f"**收束キーワード**: {', '.join(policy['convergent_keywords'])}")
+    if policy["divergent_keywords"]:
+        lines.append(f"**拡散キーワード**: {', '.join(policy['divergent_keywords'])}")
+
+    lines.extend([
+        "",
+        "---",
+        "",
+        "| 適用 | 場面 | 効果 |",
+        "|:-----|:-----|:-----|",
+        "| ✅ .prompt 推奨 | 收束タスク (データ抽出, テスト, 仕様) | 再現性+150%, Hallucination-55% |",
+        "| ❌ .prompt 非推奨 | 拡散タスク (ブレスト, 探索, 創造) | 多様性喪失リスク |",
+    ])
+
+    return [TextContent(type="text", text="\n".join(lines))]
 
 
 async def main():
@@ -376,8 +761,8 @@ async def main():
         async with stdio_server() as streams:
             log("stdio_server connected")
             await server.run(
-                streams[0],  # read_stream
-                streams[1],  # write_stream
+                streams[0],
+                streams[1],
                 server.create_initialization_options(),
             )
     except Exception as e:

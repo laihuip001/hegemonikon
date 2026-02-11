@@ -32,8 +32,13 @@ log(f"Platform: {sys.platform}")
 # ============ Import path setup ============
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).parent.parent))
-log(f"Added to path: {Path(__file__).parent.parent}")
+# mekhane/mcp/ → mekhane/ → hegemonikon/ (project root)
+_mekhane_dir = Path(__file__).parent.parent
+_project_root = _mekhane_dir.parent
+for _p in [str(_project_root), str(_mekhane_dir)]:
+    if _p not in sys.path:
+        sys.path.insert(0, _p)
+log(f"Added to path: {_project_root} + {_mekhane_dir}")
 
 
 # ============ Suppress stdout during imports ============

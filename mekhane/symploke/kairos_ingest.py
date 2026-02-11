@@ -195,7 +195,10 @@ def ingest_to_kairos(docs: list[Document], save_path: str = None) -> int:
     from mekhane.symploke.adapters.embedding_adapter import EmbeddingAdapter
 
     adapter = EmbeddingAdapter()
-    index = KairosIndex(adapter, "kairos", dimension=384)  # MiniLM = 384 dims
+    # Auto-detect dimension from the model (bge-m3 = 1024d, MiniLM = 384d)
+    sample_vec = adapter.encode(["test"])
+    dim = sample_vec.shape[1] if sample_vec.ndim == 2 else len(sample_vec[0])
+    index = KairosIndex(adapter, "kairos", dimension=dim)
     index.initialize()
 
     count = index.ingest(docs)

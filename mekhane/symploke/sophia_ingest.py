@@ -19,14 +19,24 @@ sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 from mekhane.symploke.indices import Document
 
-# Configurable via env — defaults to project's kernel/knowledge
+# Multiple KI source directories (scanned in order)
 _PROJECT_ROOT = Path(__file__).parent.parent.parent
-KNOWLEDGE_DIR = Path(
-    os.environ.get(
-        "HGK_KNOWLEDGE_DIR",
-        str(_PROJECT_ROOT / "kernel" / "knowledge"),
-    )
-)
+_HOME = Path.home()
+
+# Default directories to scan for KI data
+# Priority: env override > Antigravity KI > mneme KI > kernel/knowledge
+DEFAULT_KNOWLEDGE_DIRS: list[Path] = [
+    _HOME / ".gemini" / "antigravity" / "knowledge",          # Antigravity IDE KIs
+    _HOME / "oikos" / "mneme" / ".hegemonikon" / "knowledge",  # mneme KIs
+    _PROJECT_ROOT / "kernel" / "knowledge",                    # legacy kernel KIs
+]
+
+# If HGK_KNOWLEDGE_DIR is set, use ONLY that directory (backwards compat)
+_env_knowledge_dir = os.environ.get("HGK_KNOWLEDGE_DIR")
+if _env_knowledge_dir:
+    KNOWLEDGE_DIRS = [Path(_env_knowledge_dir)]
+else:
+    KNOWLEDGE_DIRS = [d for d in DEFAULT_KNOWLEDGE_DIRS if d.exists()]
 
 
 # PURPOSE: Parse a KI directory into Documents
@@ -93,15 +103,26 @@ def parse_ki_directory(ki_path: Path) -> list[Document]:
     return docs
 
 
-# PURPOSE: Get all KI directories
+# PURPOSE: Get all KI directories from all configured sources
 def get_ki_directories() -> list[Path]:
-    """Get all KI directories.
+    """Get all KI directories from all configured knowledge sources.
 
-    Returns empty list if KNOWLEDGE_DIR doesn't exist (graceful degradation).
+    Scans KNOWLEDGE_DIRS (multiple paths) and returns all subdirectories
+    that could contain KI data. Deduplicates by resolved path.
     """
-    if not KNOWLEDGE_DIR.exists():
-        return []
-    dirs = [d for d in KNOWLEDGE_DIR.iterdir() if d.is_dir()]
+    seen: set[Path] = set()
+    dirs: list[Path] = []
+
+    for knowledge_dir in KNOWLEDGE_DIRS:
+        if not knowledge_dir.exists():
+            continue
+        for d in knowledge_dir.iterdir():
+            if d.is_dir():
+                resolved = d.resolve()
+                if resolved not in seen:
+                    seen.add(resolved)
+                    dirs.append(d)
+
     return sorted(dirs)
 
 

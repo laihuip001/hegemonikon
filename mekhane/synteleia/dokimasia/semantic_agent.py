@@ -59,6 +59,7 @@ class LMQLBackend(LLMBackend):
         self.model = model
         self._available: Optional[bool] = None
 
+    # PURPOSE: LMQL 経由でクエリを実行
     def query(self, prompt: str, context: str) -> str:
         """LMQL 経由でクエリを実行"""
         try:
@@ -71,6 +72,7 @@ class LMQLBackend(LLMBackend):
         except Exception as e:
             return f"[LMQL Error] {e}"
 
+    # PURPOSE: LMQL パイプラインが利用可能か
     def is_available(self) -> bool:
         """LMQL パイプラインが利用可能か"""
         if self._available is None:
@@ -91,6 +93,7 @@ class OpenAIBackend(LLMBackend):
         self.model = model
         self._available: Optional[bool] = None
 
+    # PURPOSE: OpenAI API でクエリを実行
     def query(self, prompt: str, context: str) -> str:
         """OpenAI API でクエリを実行"""
         import openai

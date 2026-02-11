@@ -13,6 +13,7 @@ Q.E.D.
 Gnōsis arXiv Collector - arXiv API経由で論文収集
 """
 
+import logging
 import re
 from typing import Optional
 from datetime import datetime
@@ -24,6 +25,9 @@ except ImportError:
 
 from mekhane.anamnesis.collectors.base import BaseCollector
 from mekhane.anamnesis.models.paper import Paper
+
+
+logger = logging.getLogger(__name__)
 
 
 # PURPOSE: arXiv論文コレクター
@@ -113,8 +117,8 @@ class ArxivCollector(BaseCollector):
             result = next(self.client.results(search), None)
             if result:
                 return self._to_paper(result)
-        except Exception:
-            pass  # TODO: Add proper error handling
+        except Exception as e:
+            logger.error("Failed to fetch paper %s: %s", paper_id, e, exc_info=True)
 
         return None
 

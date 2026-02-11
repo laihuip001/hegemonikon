@@ -227,3 +227,42 @@ class SynteleiaOrchestrator:
             lines.append("")
 
         return "\n".join(lines)
+
+    # PURPOSE: 監査結果から Sympatheia WBC アラートを生成
+    def to_wbc_alert(self, result: AuditResult) -> Optional[dict]:
+        """
+        監査結果を Sympatheia WBC アラート形式に変換。
+
+        HIGH/CRITICAL が検出された場合のみアラートを生成。
+        それ以外は None を返す。
+
+        Returns:
+            dict | None: WBC アラートパラメータ or None
+        """
+        if result.critical_count == 0 and result.high_count == 0:
+            return None
+
+        # severity 決定: CRITICAL > HIGH
+        severity = "critical" if result.critical_count > 0 else "high"
+
+        # 問題サマリー
+        issue_lines = []
+        for ar in result.agent_results:
+            for issue in ar.issues:
+                if issue.severity in (AuditSeverity.CRITICAL, AuditSeverity.HIGH):
+                    issue_lines.append(
+                        f"[{issue.severity.value}] {ar.agent_name}: {issue.message}"
+                    )
+
+        details = (
+            f"Synteleia 監査: {result.critical_count} CRITICAL, "
+            f"{result.high_count} HIGH 検出\n"
+            + "\n".join(issue_lines[:10])  # 最大10件
+        )
+
+        return {
+            "details": details,
+            "severity": severity,
+            "source": "synteleia",
+            "files": [result.target.source] if result.target.source else [],
+        }

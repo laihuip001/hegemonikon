@@ -23,7 +23,7 @@
 | [`validate.md`](validate.md) | `@validate` | Core 🔵 | 事前/事後検証 |
 | [`proof.md`](proof.md) | `@proof` | Core 🔵 | 証明 |
 | [`ground.md`](ground.md) | `@ground` | Core 🔵 | 6W3H 接地 |
-| [`syn.md`](syn.md) | `@council` | Core 🔵 | 外部評議会 |
+| [`syn.md`](syn.md) | `@syn` | Core 🔵 | Synteleia 多角監査 |
 
 > 定義ファイルがないマクロは `operators.md` Section 11 のみで定義。
 

@@ -194,6 +194,64 @@ default:
 
 ---
 
+## Synteleia 監査フック (自動発動)
+
+> **CCL**: `@syn·` — 内積モード（全8エージェント統合監査）
+> **発動条件**: `/dia+` モード時に自動発動。`/dia-` では省略。
+>
+> `/dia` 完了後、判定対象を Synteleia に渡して多角監査を実施する。
+> 静的解析 (regex/パターンマッチ) による高速チェック。
+
+### 手順
+
+1. `/dia` の判定が完了した出力テキストを対象として `orchestrator.audit()` を実行
+
+```python
+from mekhane.synteleia import SynteleiaOrchestrator, AuditTarget, AuditTargetType
+
+target = AuditTarget(
+    content=dia_output_text,
+    target_type=AuditTargetType.GENERIC,
+    source="/dia+ output",
+)
+orchestrator = SynteleiaOrchestrator()
+result = orchestrator.audit(target)
+```
+
+1. 結果をレポートに統合
+
+```
+📋 Synteleia 監査結果: {result.summary}
+├─ エージェント: 8/8 実行
+├─ 問題検出: {len(result.all_issues)} 件
+└─ 詳細: orchestrator.format_report(result)
+```
+
+1. **HIGH/CRITICAL 検出時**: Sympatheia WBC に自動通知
+
+```python
+# HIGH/CRITICAL 検出時のみ発動
+if result.critical_count > 0 or result.high_count > 0:
+    # Sympatheia WBC alert (MCP tool 経由)
+    sympatheia_wbc(
+        details=f"/dia+ 監査で {result.critical_count} CRITICAL, {result.high_count} HIGH 検出",
+        severity="high" if result.high_count > 0 else "critical",
+        source="synteleia-dia-hook",
+        files=[target.source] if target.source else [],
+    )
+```
+
+### スキップ条件
+
+| 条件 | 動作 |
+|:-----|:-----|
+| `/dia-` (要約モード) | Synteleia **スキップ** — 腐食リスク > 改善効果 |
+| `/dia` (通常モード) | Synteleia **任意** — コンテキスト次第 |
+| `/dia+` (詳細モード) | Synteleia **必須** — 自動発動 |
+| `/dia*` (メタ判定) | Synteleia **任意** |
+
+---
+
 ## Post-Check (環境強制)
 
 > **`+` モード時のみ自動発動。** 出力が sel_enforcement の minimum_requirements を満たすか検証。

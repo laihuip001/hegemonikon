@@ -1,5 +1,5 @@
 ---
-description: "[CCL Macro] 存在証明 — @proof = @validate{/noe{axiom:FEP}~/dia}_I:[confidence=1]{/ene{output:PROOF.md}}_E:{/ene{action:move, to:_limbo/}}"
+description: "[CCL Macro] 裁く — FEPからの存在証明"
 ---
 
 # /ccl-proof: 存在証明マクロ

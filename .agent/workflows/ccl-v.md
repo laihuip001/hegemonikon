@@ -1,5 +1,5 @@
 ---
-description: "[CCL Macro] 自己検証 — @v = @scoped{/kho{git_diff}}_@cycle{@validate{/dia+}_/ene+}_/pra{test}_@memoize{/pis_/dox}"
+description: "[CCL Macro] 確かめる — 実装後の構造的自己検証"
 ---
 
 # /ccl-v: 自己検証マクロ

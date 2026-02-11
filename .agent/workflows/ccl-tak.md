@@ -1,5 +1,5 @@
 ---
-description: "[CCL Macro] タスク整理 — @tak = /s1_F:[×3]{/sta~/chr}_F:[×3]{/kho~/zet}_I:[gap]{/sop}_/euk_/bou"
+description: "[CCL Macro] 捌く — TODO/タスクの整理・分類"
 ---
 
 # /ccl-tak: タスク整理マクロ

@@ -1,5 +1,5 @@
 ---
-description: "[CCL Macro] 3項振動 — @osc = @reduce{F:[/s,/dia,/noe]{L:[x]{x~x+}}, ~(/h*/k)}"
+description: "[CCL Macro] 揺する — 全Series多角振動"
 ---
 
 # /ccl-osc: 多角振動マクロ

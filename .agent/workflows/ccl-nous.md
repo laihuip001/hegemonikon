@@ -1,5 +1,5 @@
 ---
-description: "[CCL Macro] 問いの深化 — @nous = @reduce{F:[×2]{/u+*^/u^}}_@memoize{/dox-}"
+description: "[CCL Macro] 問う — 再帰的な問いの深化"
 ---
 
 # /ccl-nous: 問いの深化マクロ (νοῦς)

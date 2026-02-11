@@ -1,5 +1,5 @@
 ---
-description: "[CCL Macro] 計画策定 — @plan = /bou+_/s+~(/p*/k)_@validate{/dia}"
+description: "[CCL Macro] 段取る — 目的→戦略→検証"
 ---
 
 # /ccl-plan: 計画策定マクロ

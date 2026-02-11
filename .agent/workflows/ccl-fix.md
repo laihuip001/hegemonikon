@@ -1,5 +1,5 @@
 ---
-description: "[CCL Macro] 修正サイクル — @fix = @cycle{/dia+_/ene+}_I:[pass]{@memoize{/dox-}}"
+description: "[CCL Macro] 直す — 診断→修正の収束ループ"
 ---
 
 # /ccl-fix: 修正サイクルマクロ

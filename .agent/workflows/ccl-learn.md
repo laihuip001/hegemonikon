@@ -1,5 +1,5 @@
 ---
-description: "[CCL Macro] 学習永続化 — @learn = /dox+_*^/u+_@memoize{/bye+}"
+description: "[CCL Macro] 刻む — 学びを次のセッションに残す"
 ---
 
 # /ccl-learn: 学習永続化マクロ

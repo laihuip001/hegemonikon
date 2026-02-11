@@ -1,5 +1,5 @@
 ---
-description: "[CCL Macro] 組む — @build = @partial{/bou-, goal:define}_/s+_@scoped{/ene+}_@validate{/dia-}_I:[pass]{@memoize{/dox-}}"
+description: "[CCL Macro] 組む — 設計→実装→検証→記録の一気通貫"
 ---
 
 # /ccl-build: 構築マクロ

@@ -1,5 +1,5 @@
 ---
-description: "[CCL Macro] 認知循環 — @kyc = @cycle{/sop_/noe_/ene_/dia-}"
+description: "[CCL Macro] 回す — OODAライクな認知サイクル"
 ---
 
 # /ccl-kyc: 認知循環マクロ (κύκλος)

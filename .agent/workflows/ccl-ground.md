@@ -1,5 +1,5 @@
 ---
-description: "[CCL Macro] 具体化 — @ground = @scoped{/tak-}*@partial{/bou+, mode:6w3h}~/p-_/ene-"
+description: "[CCL Macro] 落とす — 抽象を6W3Hで具体化"
 ---
 
 # /ccl-ground: 具体化マクロ

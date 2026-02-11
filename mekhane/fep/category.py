@@ -356,6 +356,8 @@ class Adjunction:
     target_category: str = "Ses"  # Session category
     eta_quality: float = 0.0  # η: preservation rate (0-1)
     epsilon_precision: float = 0.0  # ε: restoration rate (0-1)
+    # Semantic drift measurement (G2: [0,1]-enriched Hom value)
+    drift_details: Optional[object] = None  # DriftResult from drift_calculator
 
     # PURPOSE: Context lost in the boot→bye→boot cycle
     @property

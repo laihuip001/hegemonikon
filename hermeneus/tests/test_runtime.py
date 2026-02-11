@@ -67,6 +67,21 @@ def ccl_noe(context: str):
         assert prompt is not None
         assert "深い認識" in prompt
 
+    def test_extract_prompt_with_escapes(self):
+        """エスケープ文字を含むプロンプトの抽出"""
+        executor = LMQLExecutor()
+        lmql_code = '''
+@lmql.query
+def ccl_noe(context: str):
+    argmax
+        "Line 1\\nLine 2"
+        "Tab\\tSeparated"
+'''
+        prompt = executor._extract_prompt_from_lmql(lmql_code)
+        assert prompt is not None
+        assert "Line 1\\nLine 2" in prompt
+        assert "Tab\\tSeparated" in prompt
+
 
 class TestConvergenceExecutor:
     """ConvergenceExecutor のテスト"""

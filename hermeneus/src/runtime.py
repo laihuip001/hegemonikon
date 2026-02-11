@@ -175,6 +175,9 @@ class LMQLExecutor:
     _adc_token: Optional[str] = None
     _adc_token_expiry: float = 0.0
     
+    # プリコンパイルされた正規表現 (クラス変数)
+    _PROMPT_REGEX = re.compile(r'"([^"]+)"')
+
     def __init__(self, config: Optional[ExecutionConfig] = None):
         self.config = config or ExecutionConfig()
         self._lmql_available = self._check_lmql()
@@ -763,7 +766,7 @@ class LMQLExecutor:
         prompts = []
         
         # "..." パターンを抽出
-        for match in re.finditer(r'"([^"]+)"', lmql_code):
+        for match in self._PROMPT_REGEX.finditer(lmql_code):
             text = match.group(1)
             # コード的な文字列は除外
             if not text.startswith("@") and not "import" in text:

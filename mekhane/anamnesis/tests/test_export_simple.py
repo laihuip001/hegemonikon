@@ -1,3 +1,5 @@
+# PROOF: [L3/テスト] <- mekhane/anamnesis/tests/ 対象モジュール export_simple が存在→その検証が必要
+
 import pytest
 import asyncio
 import sys

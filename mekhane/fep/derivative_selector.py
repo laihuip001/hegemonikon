@@ -59,6 +59,11 @@ SELECTION_LOG_PATH = Path(
     "/home/makaron8426/oikos/mneme/.hegemonikon/derivative_selections.yaml"
 )
 
+# v3.3: Learned Derivatives Persistence Path
+LEARNED_DERIVATIVES_PATH = Path(
+    "/home/makaron8426/oikos/mneme/.hegemonikon/learned_derivatives.json"
+)
+
 logger = logging.getLogger(__name__)
 
 try:
@@ -1352,6 +1357,137 @@ def _log_selection(
 
 
 # =============================================================================
+# FEP Learning Module (v3.3)
+# =============================================================================
+
+
+class DerivativeFEPLearner:
+    """
+    Lightweight FEP Learner for Derivative Selection.
+
+    Implements a simple Dirichlet-based learning mechanism to refine derivative
+    selection based on feedback.
+
+    State Space: 3 derivatives per theorem.
+    Observation Space: 27 contexts (Abstraction x Context x Reflection).
+    A-Matrix: Counts of successful outcomes for (Observation, State) pairs.
+    """
+
+    def __init__(self, path: Path = LEARNED_DERIVATIVES_PATH):
+        self.path = path
+        # Structure: {theorem: {obs_index (str): [count_deriv_0, count_deriv_1, count_deriv_2]}}
+        # Using string keys for obs_index because JSON requires string keys.
+        self.matrices: Dict[str, Dict[str, List[float]]] = {}
+        self.load()
+
+    def _get_obs_index(
+        self, problem_context: str, theorem: Literal["O1", "O2", "O3", "O4"]
+    ) -> int:
+        """Encode problem context into a flat observation index (0-26)."""
+        # Note: theorem type hint is limited but function handles strings
+        # We need to cast theorem to the Literal if strictly type checking, but runtime is fine.
+        obs = encode_for_derivative_selection(problem_context, theorem)  # type: ignore
+        # obs is (abstraction, context, reflection), each 0-2
+        # Base 3 encoding
+        return obs[0] * 9 + obs[1] * 3 + obs[2]
+
+    def _get_state_index(self, derivative: str, theorem: str) -> Optional[int]:
+        """Map derivative string to state index (0-2)."""
+        derivatives = THEOREM_DERIVATIVES.get(theorem)
+        if not derivatives:
+            return None
+        try:
+            return derivatives.index(derivative)
+        except ValueError:
+            return None
+
+    def learn(
+        self, theorem: str, derivative: str, problem_context: str, success: bool
+    ) -> None:
+        """Update learned preferences based on feedback."""
+        if not success:
+            # Currently only positive reinforcement
+            return
+
+        obs_idx = self._get_obs_index(problem_context, theorem)  # type: ignore
+        state_idx = self._get_state_index(derivative, theorem)
+
+        if state_idx is None:
+            logger.warning(f"Unknown derivative {derivative} for theorem {theorem}")
+            return
+
+        # Initialize theorem matrix if missing
+        if theorem not in self.matrices:
+            self.matrices[theorem] = {}
+
+        # Initialize observation row if missing (str key for JSON compatibility)
+        obs_key = str(obs_idx)
+        if obs_key not in self.matrices[theorem]:
+            # Uniform prior (Dirichlet alpha=1.0)
+            self.matrices[theorem][obs_key] = [1.0, 1.0, 1.0]
+
+        # Dirichlet update: increment count
+        # Learning rate is effectively 1.0 here (one success = +1 count)
+        self.matrices[theorem][obs_key][state_idx] += 1.0
+
+        self.save()
+
+    def infer(
+        self, theorem: str, problem_context: str
+    ) -> Optional[Dict[str, float]]:
+        """
+        Infer derivative probabilities given context.
+
+        Returns:
+            Dict {derivative: probability} or None if no data.
+        """
+        if theorem not in self.matrices:
+            return None
+
+        obs_idx = self._get_obs_index(problem_context, theorem)  # type: ignore
+        obs_key = str(obs_idx)
+
+        if obs_key not in self.matrices[theorem]:
+            return None  # Fallback to uniform/keyword
+
+        counts = self.matrices[theorem][obs_key]
+        total = sum(counts)
+        if total == 0:
+            return None
+
+        probabilities = [c / total for c in counts]
+        derivatives = THEOREM_DERIVATIVES.get(theorem, [])
+
+        if len(derivatives) != len(probabilities):
+            return None
+
+        return dict(zip(derivatives, probabilities))
+
+    def save(self) -> None:
+        """Save learned matrices to disk."""
+        try:
+            self.path.parent.mkdir(parents=True, exist_ok=True)
+            with open(self.path, "w", encoding="utf-8") as f:
+                json.dump(self.matrices, f, indent=2)
+        except Exception as e:
+            logger.error(f"Failed to save learned derivatives: {e}")
+
+    def load(self) -> None:
+        """Load learned matrices from disk."""
+        if not self.path.exists():
+            return
+        try:
+            with open(self.path, "r", encoding="utf-8") as f:
+                self.matrices = json.load(f)
+        except Exception as e:
+            logger.error(f"Failed to load learned derivatives: {e}")
+
+
+# Singleton instance
+_FEP_LEARNER = DerivativeFEPLearner()
+
+
+# =============================================================================
 # Selection Functions
 # =============================================================================
 
@@ -1453,18 +1589,36 @@ def select_derivative(
             f"Unknown theorem: {theorem}. Expected O1-O4, S1-S4, H1-H4, P1-P4, K1-K4, or A1-A4."
         )
 
+    # Determine the base result
+    final_result = keyword_result
+
     # v3.1: Apply Hybrid selection (LLM fallback for low confidence)
     if use_llm_fallback and keyword_result is not None:
-        result = _hybrid_select(theorem, problem_context, keyword_result)
-        method = "llm" if "LLM" in result.rationale else "keyword"
-        _log_selection(theorem, problem_context, result, method)
-        return result
-
-    # v3.2: Log keyword selection
-    if keyword_result is not None:
+        final_result = _hybrid_select(theorem, problem_context, keyword_result)
+        method = "llm" if "LLM" in final_result.rationale else "keyword"
+        _log_selection(theorem, problem_context, final_result, method)
+    elif keyword_result is not None:
+        # v3.2: Log keyword selection (only if fallback didn't handle it)
         _log_selection(theorem, problem_context, keyword_result, "keyword")
 
-    return keyword_result
+    # v3.3: FEP-based adjustment (Consult learned preferences)
+    if use_fep and final_result is not None:
+        fep_probs = _FEP_LEARNER.infer(theorem, problem_context)
+        if fep_probs:
+            # Find max probability derivative
+            fep_best = max(fep_probs, key=fep_probs.get)
+            fep_conf = fep_probs[fep_best]
+
+            # Append to rationale
+            fep_info = f" [FEP: {fep_best} ({fep_conf:.0%})]"
+            final_result.rationale += fep_info
+
+            # If FEP is highly confident and disagrees, we might want to flag it
+            # For now, we treat it as supplementary info to avoid breaking changes
+            if fep_best != final_result.derivative and fep_conf > 0.7:
+                final_result.alternatives.append(f"{fep_best} (FEP recommended)")
+
+    return final_result
 
 
 # PURPOSE: Select O1 Noēsis derivative: nous, phro, or meta.
@@ -2722,8 +2876,8 @@ def update_derivative_selector(
     """
     Record feedback for derivative selection learning.
 
-    Future enhancement: integrate with Dirichlet learning in FEP agent
-    to improve derivative selection based on outcomes.
+    Integrated with DerivativeFEPLearner to update Dirichlet priors
+    based on outcomes.
 
     Args:
         theorem: O-series theorem
@@ -2731,9 +2885,4 @@ def update_derivative_selector(
         problem_context: Problem description
         success: Whether the derivative was effective
     """
-    # TODO: Integrate with HegemonikónFEPAgent.update_A_dirichlet()
-    # This will require:
-    # 1. Derivative-specific state space in FEP
-    # 2. Observation encoding for derivative context
-    # 3. Persistence of learned derivative preferences
-    pass
+    _FEP_LEARNER.learn(theorem, derivative, problem_context, success)

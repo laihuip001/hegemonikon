@@ -98,7 +98,7 @@
 | **Input Isolation** | ユーザー入力は `<user_input_zone>` で隔離 (XML Sandwich) |
 | **Constraint-Last** | 制約はプロンプト末尾に配置 (recency bias 活用) |
 | **Split-Step Verification** | 高リスクタスクでは検証フェーズを強制 |
-| **Injection Regression** | 6種攻撃ベクタの回帰テスト (`.agent/workflows/security/`) |
+| **Injection Regression** | 6種攻撃ベクタの回帰テスト (`.agent/workflow-modules/security/`) |
 | **Destructive Guard** | 破壊的操作は human-in-the-loop 必須 |
 | **Thought Signature** | Gemini 3 マルチターンでは thought_signature を自動管理 |
 

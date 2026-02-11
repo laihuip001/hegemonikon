@@ -168,8 +168,20 @@ class SyncWatcher:
 
         for change in changes:
             if change.change_type == "deleted":
-                # TODO: LanceDB からの削除は将来実装
-                print(f"  [deleted] {change.path.name} (index removal pending)")
+                print(f"  [deleted] {change.path.name}", end="")
+                if index is not None:
+                    # GnosisIndex.delete_document(doc_id, source)
+                    # source must match what was used in add_document: str(change.path)
+                    success = index.delete_document(
+                        doc_id=change.path.stem,
+                        source=str(change.path),
+                    )
+                    if success:
+                        print(" → removed from index ✅")
+                    else:
+                        print(" → removal failed (or not indexed)")
+                else:
+                    print(" (no index)")
                 continue
 
             if change.path.suffix not in self.extensions:

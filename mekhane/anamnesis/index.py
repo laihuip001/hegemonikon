@@ -340,6 +340,75 @@ class GnosisIndex:
         print(f"[GnosisIndex] Added {len(data)} papers")
         return len(data)
 
+    # PURPOSE: 汎用ドキュメントを削除
+    def delete_document(self, doc_id: str, source: str) -> bool:
+        """
+        汎用ドキュメントを削除
+
+        Args:
+            doc_id: ドキュメントID (change.path.stem)
+            source: ソース識別子 (change.path)
+
+        Returns:
+            削除成功なら True
+        """
+        if not self._table_exists():
+            return False
+
+        # Paper.primary_key logic simulation: {source}:{source_id}
+        # source may contain special chars, so we construct key carefully
+        primary_key = f"{source}:{doc_id}"
+
+        # Escape single quotes for SQL string
+        safe_pk = primary_key.replace("'", "''")
+
+        try:
+            table = self.db.open_table(self.TABLE_NAME)
+            table.delete(f"primary_key = '{safe_pk}'")
+
+            # Update cache
+            if primary_key in self._primary_key_cache:
+                self._primary_key_cache.remove(primary_key)
+                # Note: title_cache is hard to update without knowing title,
+                # but it's just a cache for dedup.
+
+            return True
+        except Exception as e:
+            print(f"[GnosisIndex] Failed to delete document: {e}")
+            return False
+
+    # PURPOSE: 汎用ドキュメントを追加 (Paperとしてラップ)
+    def add_document(self, doc_id: str, content: str, source: str) -> int:
+        """
+        汎用ドキュメントを追加 (Paperとしてラップ)
+
+        Args:
+            doc_id: ドキュメントID
+            content: テキストコンテンツ
+            source: ソース識別子
+
+        Returns:
+            追加された件数 (0 or 1)
+        """
+        # 1. Update: Delete existing first
+        self.delete_document(doc_id, source)
+
+        # 2. Add as Paper
+        import uuid
+        from datetime import datetime
+
+        paper = Paper(
+            id=str(uuid.uuid4()),
+            source=source,
+            source_id=doc_id,
+            title=doc_id,
+            abstract=content,
+            collected_at=datetime.now().isoformat()
+        )
+
+        # dedupe=False because we already deleted (and we want to force update)
+        return self.add_papers([paper], dedupe=False)
+
     # PURPOSE: セマンティック検索
     def search(self, query: str, k: int = 10, source_filter: str | None = None) -> list[dict]:
         """

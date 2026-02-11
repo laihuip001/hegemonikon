@@ -16,6 +16,16 @@ description: |
   - 「PE」
   - 「生成」
   - 「製作」
+
+# Safety Contract
+risk_tier: L1 # Low risk, automated prompt generation
+risks:
+  - Generation of harmful or unethical prompts (mitigated by policy)
+  - Loss of user intent during abstraction (mitigated by iterative refinement)
+reversible: true
+requires_approval: false
+fallbacks:
+  - Manual prompt engineering
 ---
 
 # Tekhne-Maker v6.7 「OMEGA SINGULARITY BUILD + TARGET_AGENT」

@@ -38,8 +38,8 @@ def _get_api_key() -> Optional[str]:
     )
 
 
-@dataclass
 # PURPOSE: Result of semantic validation.
+@dataclass
 class SemanticResult:
     """Result of semantic validation."""
 
@@ -48,12 +48,12 @@ class SemanticResult:
     reasoning: str
     suggestions: List[str]
 
-    # PURPOSE: LLM-based semantic validation for CCL expressions. Validates whether a CCL expre
+    # PURPOSE: Return True if the result is aligned.
     def __bool__(self) -> bool:
         return self.aligned
 
-# PURPOSE: LLM-based semantic validation for CCL expressions.
 
+# PURPOSE: LLM-based semantic validation for CCL expressions.
 class CCLSemanticValidator:
     """
     LLM-based semantic validation for CCL expressions.

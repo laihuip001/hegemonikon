@@ -12,9 +12,12 @@ Design decisions:
 """
 
 import os
+import logging
 from dataclasses import dataclass
 from typing import Optional, List
 from pathlib import Path
+
+logger = logging.getLogger(__name__)
 
 # Try to import LLM client
 try:
@@ -73,8 +76,8 @@ class CCLSemanticValidator:
             if api_key:
                 try:
                     self.client = genai.Client(api_key=api_key)
-                except Exception:
-                    pass  # TODO: Add proper error handling
+                except Exception as e:
+                    logger.error("Failed to initialize GenAI client: %s", e)
 
     # PURPOSE: Load the semantic check prompt.
     def _load_prompt(self) -> str:

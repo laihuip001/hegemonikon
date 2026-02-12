@@ -376,6 +376,125 @@ class Adjunction:
 
 
 # =============================================================================
+# Galois Connection (前順序圏の随伴 = ガロア接続)            [Layer C: Operational]
+# =============================================================================
+
+
+# PURPOSE: A Galois connection between two preordered sets
+@dataclass(frozen=True)
+class GaloisConnection:
+    """A Galois connection F ⊣ G between preordered sets.
+
+    In Hegemonikón's [0,1]-enriched Cog category:
+    - Every series Hom-set carries a preorder (confidence ≤)
+    - The D-type relations (.d suffix) form Galois connections
+    - F (left adjoint) = "free construction" (expand/generate)
+    - G (right adjoint) = "forgetful functor" (compress/forget)
+
+    Galois connection law:
+        F(a) ≤ b  ⟺  a ≤ G(b)
+
+    This is weaker than a full adjunction: it holds in preordered
+    categories where Hom-sets are truth values {0, 1} or [0, 1].
+
+    圏論的意味:
+    - Cog を [0,1]-enriched category として見ると、
+      Hom(X,Y) ∈ [0,1] は "X から Y への信頼度"
+    - ガロア接続は "構成 ⊣ 忘却" の最も一般的な形
+    - 12 随伴対はすべてこの構造のインスタンス
+    """
+
+    left: str           # L (free/expand), e.g. "O1" or "noe"
+    right: str          # R (forgetful/compress), e.g. "O3" or "zet"
+    series: Series      # Which series this belongs to
+    description: str = ""  # Human-readable meaning
+
+    @property
+    def notation(self) -> str:
+        """Standard notation: L ⊣ R."""
+        return f"{self.left} ⊣ {self.right}"
+
+
+# PURPOSE: A concrete adjoint pair within a series (D-type relation)
+@dataclass(frozen=True)
+class AdjointPair:
+    """An adjoint pair within a series (D-type relation: .d suffix).
+
+    D-type = 対角: T1⊣T3, T2⊣T4 within each series.
+    "忘却と構成": left forgets detail, right constructs structure.
+
+    The 12 adjoint pairs (2 per series × 6 series):
+      O: noe⊣zet, bou⊣ene   (認識⊣探求, 意志⊣行為)
+      S: met⊣sta, mek⊣pra   (尺度⊣基準, 方法⊣実践)
+      H: pro⊣ore, pis⊣dox   (前感情⊣欲求, 確信⊣信念)
+      P: kho⊣tro, hod⊣tek   (場⊣軌道, 道⊣技術)
+      K: euk⊣tel, chr⊣sop   (好機⊣目的, 時間⊣知恵)
+      A: pat⊣gno, dia⊣epi   (感情⊣見識, 判定⊣知識)
+
+    Each pair has:
+    - unit η: Id → R∘L (how well right-then-left preserves)
+    - counit ε: L∘R → Id (how well left-then-right restores)
+    """
+
+    left_wf: str         # Left adjoint workflow id (e.g. "noe")
+    right_wf: str        # Right adjoint workflow id (e.g. "zet")
+    left_theorem: str    # Left theorem id (e.g. "O1")
+    right_theorem: str   # Right theorem id (e.g. "O3")
+    series: Series
+    meaning: str = ""    # What this pair represents
+
+    @property
+    def galois(self) -> GaloisConnection:
+        """View this adjoint pair as a Galois connection."""
+        return GaloisConnection(
+            left=self.left_theorem,
+            right=self.right_theorem,
+            series=self.series,
+            description=self.meaning,
+        )
+
+    @property
+    def notation(self) -> str:
+        """Standard notation: L ⊣ R."""
+        return f"{self.left_wf} ⊣ {self.right_wf}"
+
+
+# The 12 D-type adjoint pairs (2 per series)
+ADJOINT_PAIRS_D: Dict[str, AdjointPair] = {
+    # O-series: T1⊣T3 (noe⊣zet), T2⊣T4 (bou⊣ene)
+    "O-D1": AdjointPair("noe", "zet", "O1", "O3", Series.O,
+                         "認識⊣探求: 認識が問いを生み、問いが認識を深める"),
+    "O-D2": AdjointPair("bou", "ene", "O2", "O4", Series.O,
+                         "意志⊣行為: 意志が行為を生み、行為が意志を確認する"),
+    # S-series
+    "S-D1": AdjointPair("met", "sta", "S1", "S3", Series.S,
+                         "尺度⊣基準: スケールが基準を定め、基準がスケールを測る"),
+    "S-D2": AdjointPair("mek", "pra", "S2", "S4", Series.S,
+                         "方法⊣実践: 方法が実践を導き、実践が方法を検証する"),
+    # H-series
+    "H-D1": AdjointPair("pro", "ore", "H1", "H3", Series.H,
+                         "前感情⊣欲求: 直感が欲求を感知し、欲求が直感を方向づける"),
+    "H-D2": AdjointPair("pis", "dox", "H2", "H4", Series.H,
+                         "確信⊣信念: 確信が信念を裏付け、信念が確信を安定させる"),
+    # P-series
+    "P-D1": AdjointPair("kho", "tro", "P1", "P3", Series.P,
+                         "場⊣軌道: 場が軌道を規定し、軌道が場を形成する"),
+    "P-D2": AdjointPair("hod", "tek", "P2", "P4", Series.P,
+                         "道⊣技術: 経路が技術を必要とし、技術が経路を拡張する"),
+    # K-series
+    "K-D1": AdjointPair("euk", "tel", "K1", "K3", Series.K,
+                         "好機⊣目的: 好機が目的を招き、目的が好機を認識させる"),
+    "K-D2": AdjointPair("chr", "sop", "K2", "K4", Series.K,
+                         "時間⊣知恵: 時間が知恵を要求し、知恵が時間を最適化する"),
+    # A-series
+    "A-D1": AdjointPair("pat", "gno", "A1", "A3", Series.A,
+                         "感情⊣見識: 感情が見識を触発し、見識が感情を制御する"),
+    "A-D2": AdjointPair("dia", "epi", "A2", "A4", Series.A,
+                         "判定⊣知識: 判定が知識を確定し、知識が判定基準を更新する"),
+}
+
+
+# =============================================================================
 # EpsilonMixture (ε-Architecture)                            [Layer B: Constraint]
 # =============================================================================
 

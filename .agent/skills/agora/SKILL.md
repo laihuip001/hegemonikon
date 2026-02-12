@@ -1,4 +1,9 @@
 ---
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks: []
+fallbacks: []
 name: Agora
 description: HGK 収益化プロジェクト — ディープインパクト戦略
 triggers:

@@ -1,4 +1,9 @@
 ---
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks: []
+fallbacks: []
 name: Category Theory Engine
 description: |
   圏論に基づく構造認識エンジン。

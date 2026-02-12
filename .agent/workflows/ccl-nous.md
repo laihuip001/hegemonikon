@@ -1,6 +1,6 @@
 ---
 description: "問う — R:{F:[×2]{/u+*^/u^}}_/dox-"
-lcm_state: "configured"
+lcm_state: "beta"
 version: "1.0.0"
 ---
 

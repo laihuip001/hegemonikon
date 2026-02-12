@@ -1,6 +1,6 @@
 ---
 description: "刻む — /dox+_*^/u+_/bye+"
-lcm_state: "configured"
+lcm_state: "beta"
 version: "1.0.0"
 ---
 

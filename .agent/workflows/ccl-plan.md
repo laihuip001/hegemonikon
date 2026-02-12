@@ -1,6 +1,6 @@
 ---
 description: "段取る — /bou+_/s+~(/p*/k)_V:{/dia}"
-lcm_state: "configured"
+lcm_state: "beta"
 version: "1.0.0"
 ---
 

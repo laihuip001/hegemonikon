@@ -1,6 +1,6 @@
 ---
 description: "確かめる — /kho{git_diff}_C:{V:{/dia+}_/ene+}_/pra{test}_/pis_/dox"
-lcm_state: "configured"
+lcm_state: "beta"
 version: "1.0.0"
 ---
 

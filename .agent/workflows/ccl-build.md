@@ -1,6 +1,6 @@
 ---
 description: "組む — /bou-_/s+_/ene+_V:{/dia-}_I:[✓]{/dox-}"
-lcm_state: "configured"
+lcm_state: "beta"
 version: "1.0.0"
 ---
 

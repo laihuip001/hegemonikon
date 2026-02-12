@@ -1,6 +1,6 @@
 ---
 description: 感じる — /pro_/ore~(/pis_/ana)
-lcm_state: "configured"
+lcm_state: "beta"
 version: "1.0.0"
 ---
 

@@ -1,6 +1,6 @@
 ---
 description: 絞る — /kat_/sym~(/tel_/dia-)
-lcm_state: "configured"
+lcm_state: "beta"
 version: "1.0.0"
 ---
 

@@ -1,6 +1,6 @@
 ---
 description: 見渡す — /kho_/chr_/euk_/tak-
-lcm_state: "configured"
+lcm_state: "beta"
 version: "1.0.0"
 ---
 

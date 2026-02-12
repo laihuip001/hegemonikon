@@ -1,6 +1,6 @@
 ---
 description: "落とす — /tak-*/bou+{6w3h}~/p-_/ene-"
-lcm_state: "configured"
+lcm_state: "beta"
 version: "1.0.0"
 ---
 

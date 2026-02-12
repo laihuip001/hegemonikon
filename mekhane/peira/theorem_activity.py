@@ -140,6 +140,7 @@ WF_PATTERN = re.compile(
 )
 
 
+# PURPOSE: Parse date from handoff filename with multiple format support
 def parse_date_from_filename(path: Path) -> Optional[datetime]:
     """Handoff ファイル名から日付を抽出"""
     patterns = [
@@ -162,6 +163,7 @@ def parse_date_from_filename(path: Path) -> Optional[datetime]:
     return None
 
 
+# PURPOSE: Scan handoff files to aggregate theorem usage statistics
 def scan_handoffs(days: Optional[int] = None) -> dict:
     """Handoff ファイルを走査し、WF 発動を集計"""
     cutoff = None
@@ -207,6 +209,7 @@ def scan_handoffs(days: Optional[int] = None) -> dict:
     }
 
 
+# PURPOSE: Classify theorem health based on usage frequency thresholds
 def classify_activity(wf_id: str, count: int, months_span: int) -> str:
     """活性度を3段階で分類"""
     if months_span == 0:
@@ -220,6 +223,7 @@ def classify_activity(wf_id: str, count: int, months_span: int) -> str:
         return "🟡 dormant"
 
 
+# PURPOSE: Generate comprehensive theorem activity report in text or JSON
 def generate_report(days: Optional[int] = None, as_json: bool = False) -> str:
     """活性度レポートを生成"""
     data = scan_handoffs(days)
@@ -332,6 +336,7 @@ def generate_report(days: Optional[int] = None, as_json: bool = False) -> str:
     return "\n".join(lines)
 
 
+# PURPOSE: CLI entry point for theorem activity reporting
 def main():
     parser = argparse.ArgumentParser(
         description="定理活性度レポート — Handoff からWF発動頻度を集計"

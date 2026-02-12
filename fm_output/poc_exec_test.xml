@@ -1,0 +1,21 @@
+<fmxmlsnippet type="FMObjectList">
+  <!-- Step 1: Set Variable -->
+  <Step enable="True" id="141" name="変数を設定">
+    <Value>
+      <Calculation><![CDATA["テスト太郎"]]></Calculation>
+    </Value>
+    <Repetition>
+      <Calculation><![CDATA[1]]></Calculation>
+    </Repetition>
+    <Name>$_フリガナ</Name>
+  </Step>
+  <!-- Step 2: Show Custom Dialog -->
+  <Step enable="True" id="87" name="カスタムダイアログを表示">
+    <Title>
+      <Calculation><![CDATA["Forge Execution Test"]]></Calculation>
+    </Title>
+    <Message>
+      <Calculation><![CDATA["Variable value: " & $_フリガナ]]></Calculation>
+    </Message>
+  </Step>
+</fmxmlsnippet>

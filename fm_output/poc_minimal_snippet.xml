@@ -1,0 +1,11 @@
+<fmxmlsnippet type="FMObjectList">
+  <Step enable="True" id="141" name="変数を設定">
+    <Value>
+      <Calculation><![CDATA["Hello from Forge"]]></Calculation>
+    </Value>
+    <Repetition>
+      <Calculation><![CDATA[1]]></Calculation>
+    </Repetition>
+    <Name>$テスト</Name>
+  </Step>
+</fmxmlsnippet>

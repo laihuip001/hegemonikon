@@ -1,0 +1,17 @@
+<fmxmlsnippet type="FMObjectList">
+  <!-- Set Variable -->
+  <Step enable="True" id="141" name="変数を設定">
+    <Value>
+      <Calculation><![CDATA["テスト太郎"]]></Calculation>
+    </Value>
+    <Repetition>
+      <Calculation><![CDATA[1]]></Calculation>
+    </Repetition>
+    <Name>$_フリガナ</Name>
+  </Step>
+  <!-- Set Field: real TO + field name, FAKE id -->
+  <Step enable="True" id="76" name="フィールド設定">
+    <Field table="腎生検2012.01～" id="99999" name="フリガナ"/>
+    <Calculation><![CDATA[$_フリガナ]]></Calculation>
+  </Step>
+</fmxmlsnippet>

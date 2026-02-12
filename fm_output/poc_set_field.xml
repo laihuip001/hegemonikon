@@ -1,0 +1,17 @@
+<fmxmlsnippet type="FMObjectList">
+  <!-- Step 1: Set Variable (confirmed working) -->
+  <Step enable="True" id="141" name="変数を設定">
+    <Value>
+      <Calculation><![CDATA["Forge Set Field Test"]]></Calculation>
+    </Value>
+    <Repetition>
+      <Calculation><![CDATA[1]]></Calculation>
+    </Repetition>
+    <Name>$_test_value</Name>
+  </Step>
+  <!-- Step 2: Set Field (testing) -->
+  <Step enable="True" id="76" name="フィールド設定">
+    <Field table="TestTable" id="1" name="TestField"/>
+    <Calculation><![CDATA[$_test_value]]></Calculation>
+  </Step>
+</fmxmlsnippet>

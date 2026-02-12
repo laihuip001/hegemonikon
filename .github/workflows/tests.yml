@@ -44,10 +44,10 @@ jobs:
                   # Install torch CPU-only first
                   pip install torch --index-url https://download.pytorch.org/whl/cpu
                   # Install other dependencies
-                  # Added aiohttp and opentelemetry-api as they are required by jules_client.py
+                  # Added aiohttp, opentelemetry-api, and python-dotenv as they are required by modules
                   pip install pytest pytest-asyncio pytest-timeout pyyaml pydantic lancedb numpy scipy \
                               networkx pandas tabulate requests httpx schedule \
-                              sentence-transformers aiohttp opentelemetry-api
+                              sentence-transformers aiohttp opentelemetry-api python-dotenv
                   # Install project in development mode if setup exists
                   pip install -e ".[test]" 2>/dev/null || true
 

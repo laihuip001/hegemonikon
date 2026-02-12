@@ -1,5 +1,7 @@
 ---
 description: "落とす — /tak-*/bou+{6w3h}~/p-_/ene-"
+lcm_state: "configured"
+version: "1.0.0"
 ---
 
 # /ccl-ground: 具体化マクロ

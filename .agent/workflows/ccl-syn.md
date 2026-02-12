@@ -1,5 +1,7 @@
 ---
 description: "監る — /dia+{synteleia}_V:{/pis+}"
+lcm_state: "configured"
+version: "1.0.0"
 ---
 
 # /ccl-syn: Synteleia 監査マクロ

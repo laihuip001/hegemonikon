@@ -1,5 +1,7 @@
 ---
 description: "問う — R:{F:[×2]{/u+*^/u^}}_/dox-"
+lcm_state: "configured"
+version: "1.0.0"
 ---
 
 # /ccl-nous: 問いの深化マクロ (νοῦς)

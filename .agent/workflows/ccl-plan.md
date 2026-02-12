@@ -1,5 +1,7 @@
 ---
 description: "段取る — /bou+_/s+~(/p*/k)_V:{/dia}"
+lcm_state: "configured"
+version: "1.0.0"
 ---
 
 # /ccl-plan: 計画策定マクロ

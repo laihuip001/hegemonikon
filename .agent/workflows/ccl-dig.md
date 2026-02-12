@@ -1,5 +1,7 @@
 ---
 description: "掘る — /s+~(/p*/a)_/dia*/o+"
+lcm_state: "configured"
+version: "1.0.0"
 ---
 
 # /ccl-dig: 深掘りマクロ

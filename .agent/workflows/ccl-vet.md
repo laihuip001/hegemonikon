@@ -1,5 +1,7 @@
 ---
 description: "確かめる — /kho{git_diff}_C:{V:{/dia+}_/ene+}_/pra{test}_/pis_/dox"
+lcm_state: "configured"
+version: "1.0.0"
 ---
 
 # /ccl-vet: 自己検証マクロ

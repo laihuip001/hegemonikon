@@ -1,5 +1,7 @@
 ---
 description: "回す — C:{/sop_/noe_/ene_/dia-}"
+lcm_state: "configured"
+version: "1.0.0"
 ---
 
 # /ccl-kyc: 認知循環マクロ (κύκλος)

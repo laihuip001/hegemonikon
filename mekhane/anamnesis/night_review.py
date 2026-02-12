@@ -39,7 +39,7 @@ from mekhane.anamnesis.vault import VaultManager
 try:
     from dotenv import load_dotenv
 except ImportError:
-    # Handle missing dotenv in CI/test environments
+    # PURPOSE: Handle missing dotenv in CI/test environments
     def load_dotenv(*args, **kwargs):
         pass
 

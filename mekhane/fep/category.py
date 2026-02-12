@@ -928,6 +928,7 @@ def hom_sources(target: str) -> FrozenSet[str]:
 # =============================================================================
 
 
+# PURPOSE: Shorthand for Morphism creation
 def _m(xid: str, src: str, tgt: str) -> Morphism:
     """Shorthand for Morphism creation."""
     return Morphism(id=xid, source=src, target=tgt)

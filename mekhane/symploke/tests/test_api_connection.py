@@ -9,9 +9,7 @@ import asyncio
 import os
 import sys
 import pytest
-
-# Add parent to path
-sys.path.insert(0, "/home/makaron8426/oikos/hegemonikon")
+import aiohttp
 
 from mekhane.symploke.jules_client import JulesClient
 
@@ -30,8 +28,6 @@ async def test_connection():
     print("-" * 50)
 
     try:
-        import aiohttp
-
         headers = {"X-Goog-Api-Key": api_key, "Content-Type": "application/json"}
 
         async with aiohttp.ClientSession() as session:

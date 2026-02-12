@@ -1,14 +1,15 @@
-# @diverge — Colimit 深化マクロ
+# Peras 発散パターン — `~!` 演算子の実装仕様
 
-> **Origin**: Hub WF Convergence/Divergence 深化 (2026-02-07)
-> **Category**: 認知マクロ (Cognitive)
+> **帰属先**: CCL 演算子 `~!` (divergent oscillation) の内部アルゴリズム
+> **元分類**: ccl/macros/diverge.md → 再帰属 (2026-02-12)
+> **理由**: マクロではなく演算子の実装仕様であるため。公理から演繹されるべき
 
 ---
 
 ## 定義
 
 ```yaml
-macro: @diverge
+operator: ~! (divergent oscillation)
 parameters:
   top_n: int (default: 3)
 expansion: |

@@ -1,14 +1,15 @@
-# @converge — Limit 深化マクロ
+# Peras 収束パターン — `~*` 演算子の実装仕様
 
-> **Origin**: Hub WF Convergence/Divergence 深化 (2026-02-07)
-> **Category**: 認知マクロ (Cognitive)
+> **帰属先**: CCL 演算子 `~*` (convergent oscillation) の内部アルゴリズム
+> **元分類**: ccl/macros/converge.md → 再帰属 (2026-02-12)
+> **理由**: マクロではなく演算子の実装仕様であるため。公理から演繹されるべき
 
 ---
 
 ## 定義
 
 ```yaml
-macro: @converge
+operator: ~* (convergent oscillation)
 parameters:
   threshold_high: float (default: 0.3)
   threshold_low: float (default: 0.1)

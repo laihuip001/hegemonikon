@@ -250,3 +250,12 @@ projects:
   entry_point:
     dev: cd hgk-app && npm run tauri dev
   usage_trigger: デスクトップアプリの開発・ビルド時。
+
+  - id: agora
+    name: "Agora"
+    path: "/home/makaron8426/oikos/agora"
+    summary: "HGK 収益化プロジェクト — ディープインパクト戦略"
+    status: "active"
+    phase: "design"
+    entry_point: null
+    usage_trigger: null

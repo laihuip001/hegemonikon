@@ -36,7 +36,12 @@ from dataclasses import dataclass, asdict
 from mekhane.anamnesis.vault import VaultManager
 
 # Load environment
-from dotenv import load_dotenv
+try:
+    from dotenv import load_dotenv
+except ImportError:
+    # Handle missing dotenv in CI/test environments
+    def load_dotenv(*args, **kwargs):
+        pass
 
 # Paths
 PROJECT_ROOT = Path(__file__).parent.parent.parent

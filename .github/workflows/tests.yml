@@ -44,7 +44,7 @@ jobs:
                   # Install core test dependencies (CPU-only)
                   # Split install to avoid index issues with PyTorch CPU
                   pip install pytest pytest-asyncio pytest-timeout pyyaml pydantic lancedb numpy scipy \
-                              networkx pandas tabulate requests httpx schedule aiohttp \
+                              networkx pandas tabulate requests httpx schedule aiohttp python-dotenv \
                               sentence-transformers
                   pip install torch --index-url https://download.pytorch.org/whl/cpu
                   # Install project in development mode if setup exists

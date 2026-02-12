@@ -10,10 +10,20 @@ import os
 import sys
 import pytest
 
-# Add parent to path
-sys.path.insert(0, "/home/makaron8426/oikos/hegemonikon")
+# Add repo root to path dynamically
+repo_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+if repo_root not in sys.path:
+    sys.path.insert(0, repo_root)
 
-from mekhane.symploke.jules_client import JulesClient
+# NOTE: Moved import inside try-except to handle optional dependency in some envs,
+# or ensure it's installed in CI.
+try:
+    from mekhane.symploke.jules_client import JulesClient
+    import aiohttp
+except ImportError:
+    # If dependencies are missing, we might be in a minimal env.
+    # But for tests, they should be present.
+    pass
 
 
 # PURPOSE: Test API connection by listing sources
@@ -34,12 +44,11 @@ async def test_connection():
 
         headers = {"X-Goog-Api-Key": api_key, "Content-Type": "application/json"}
 
-        async with aiohttp.ClientSession() as session:
+        async with aiohttp.ClientSession(headers=headers) as session:
             # Test 1: Get sources (repos)
             print("\n[Test 1] Getting sources...")
             async with session.get(
                 "https://jules.googleapis.com/v1alpha/sources",
-                # NOTE: Removed self-assignment: headers = headers
             ) as resp:
                 print(f"  Status: {resp.status}")
                 if resp.status == 200:
@@ -56,7 +65,6 @@ async def test_connection():
             print("\n[Test 2] Getting sessions...")
             async with session.get(
                 "https://jules.googleapis.com/v1alpha/sessions",
-                # NOTE: Removed self-assignment: headers = headers
             ) as resp:
                 print(f"  Status: {resp.status}")
                 if resp.status == 200:
@@ -75,5 +83,9 @@ async def test_connection():
 
 
 if __name__ == "__main__":
-    result = asyncio.run(test_connection())
-    sys.exit(0 if result else 1)
+    try:
+        result = asyncio.run(test_connection())
+        sys.exit(0 if result else 1)
+    except NameError:
+        print("❌ asyncio or test_connection not defined (import error?)")
+        sys.exit(1)

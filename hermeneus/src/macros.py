@@ -189,15 +189,15 @@ BUILTIN_MACROS = {
     "dig": "/s+~(/p*/a)_/ana_/dia*/o+",  # +/ana (類推: 構造的類似性)
     # S-series (設計)
     "plan": "/bou+_/chr_/s+~(/p*/k)_V:{/dia}",  # +/chr (活用: 手持ち資源確認)
-    "build": "/bou-{goal:define}_/chr_/kho_/s+_/ene+_V:{/dia-}_I:[pass]{M:{/dox-}}",  # +/chr,/kho
-    "tak": "/s1_F:[×3]{/sta~/chr}_F:[×3]{/kho~/zet}_I:[gap]{/sop}_/euk_/bou",
+    "build": "/bou-_/chr_/kho_/s+_/ene+_V:{/dia-}_I:[✓]{M:{/dox-}}",  # +/chr,/kho
+    "tak": "/s1_F:[×3]{/sta~/chr}_F:[×3]{/kho~/zet}_I:[∅]{/sop}_/euk_/bou",
     # H-series (動機)
     "osc": "R:{F:[/s,/dia,/noe]{L:[x]{x~x+}}, ~(/h*/k)}",
     "learn": "/dox+_*^/u+_M:{/bye+}",
     # A-series (精密)
-    "fix": "/tel_C:{/dia+_/ene+}_I:[pass]{M:{/dox-}}",  # +/tel (目的適合)
+    "fix": "/tel_C:{/dia+_/ene+}_I:[✓]{M:{/dox-}}",  # +/tel (目的適合)
     "vet": "/kho{git_diff}_C:{V:{/dia+}_/ene+}_/pra{test}_M:{/pis_/dox}",
-    "proof": '/kat_V:{/noe~/dia}_I:[pass]{/ene{PROOF.md}}_E:{/ene{_limbo/}}',  # +/kat (浄化)
+    "proof": '/kat_V:{/noe~/dia}_I:[✓]{/ene{PROOF.md}}_E:{/ene{_limbo/}}',  # +/kat (浄化)
     "syn": "/dia+{synteleia}_V:{/pis+}",
     # P-series (条件)
     "ground": "/tak-*/bou+{6w3h}~/p-_/ene-",

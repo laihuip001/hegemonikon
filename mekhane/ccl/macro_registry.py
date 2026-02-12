@@ -30,8 +30,8 @@ BUILTIN_MACROS: Dict[str, Macro] = {
     # === Core Macros (ccl-*.md 由来) ===
     "build": Macro(
         name="build",
-        ccl="/bou-{goal:define}_/s+_/ene+_V:{/dia-}_I:[pass]{M:{/dox-}}",
-        description="構築: 目的定義→戦略→実行→判定→成功時記録",
+        ccl="/bou-_/chr_/kho_/s+_/ene+_V:{/dia-}_I:[✓]{M:{/dox-}}",
+        description="構築: 目的簡略→資源→場→戦略→実行→判定→✓時記録",
         is_builtin=True,
     ),
     "dig": Macro(
@@ -42,7 +42,7 @@ BUILTIN_MACROS: Dict[str, Macro] = {
     ),
     "fix": Macro(
         name="fix",
-        ccl="C:{/dia+_/ene+}_I:[pass]{M:{/dox-}}",
+        ccl="/tel_C:{/dia+_/ene+}_I:[✓]{M:{/dox-}}",
         description="修正: 判定+実行のチェック→成功時記録",
         is_builtin=True,
     ),
@@ -84,14 +84,14 @@ BUILTIN_MACROS: Dict[str, Macro] = {
     ),
     "proof": Macro(
         name="proof",
-        ccl="V:{/noe~/dia}_I:[pass]{/ene{PROOF.md}}_E:{/ene{_limbo/}}",
+        ccl="/kat_V:{/noe~/dia}_I:[✓]{/ene{PROOF.md}}_E:{/ene{_limbo/}}",
         description="裁く: 認識↔判定の検証→成功時PROOF.md生成→失敗時limbo",
         is_builtin=True,
     ),
     "tak": Macro(
         name="tak",
-        ccl="/s1_F:[×3]{/sta~/chr}_F:[×3]{/kho~/zet}_I:[gap]{/sop}_/euk_/bou",
-        description="捌く: スケール→基準×時間→空間×探求→ギャップ調査→好機→意志",
+        ccl="/s1_F:[×3]{/sta~/chr}_F:[×3]{/kho~/zet}_I:[∅]{/sop}_/euk_/bou",
+        description="捌く: スケール→基準×活用→場×探求→∅時調査→好機→意志",
         is_builtin=True,
     ),
     "vet": Macro(

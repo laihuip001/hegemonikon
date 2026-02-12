@@ -1,20 +1,20 @@
 ---
-description: "組む — /bou-{goal:define}_/s+_/ene+_V:{/dia-}_I:[pass]{M:{/dox-}}"
+description: "組む — /bou-_/s+_/ene+_V:{/dia-}_I:[✓]{M:{/dox-}}"
 ---
 
 # /ccl-build: 構築マクロ
 
-> **CCL**: `@build = /bou-{goal:define}_/chr_/kho_/s+_/ene+_V:{/dia-}_I:[pass]{M:{/dox-}}`
+> **CCL**: `@build = /bou-_/chr_/kho_/s+_/ene+_V:{/dia-}_I:[✓]{M:{/dox-}}`
 > **用途**: 0から作る。設計→実装→検証→記録の一気通貫
 > **圏論**: @eat (外→内: 消化) の随伴。内→外の具現化 = 自然関手
 
 ## 展開
 
-1. `/bou-{goal:define}` — 目的を軽量定義
+1. `/bou-` — 目的を軽量定義
 2. `_/s+` — 戦略を詳細化
 3. `_/ene+` — 詳細実行
 4. `_V:{/dia-}` — 軽量判定で検証
-5. `_I:[pass]{M:{/dox-}}` — 成功時のみ Doxa を記憶
+5. `_I:[✓]{M:{/dox-}}` — 成功時のみ Doxa を記憶
 
 ## 使用例
 

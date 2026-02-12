@@ -99,7 +99,7 @@ def load_standard_macros() -> Dict[str, MacroDefinition]:
     
     for path in CCL_MACROS_DIR.glob("*.md"):
         macro = parse_macro_file(path)
-        if macro:
+        if macro and macro.expansion:  # 空展開は除外 (YAML multiline 未対応)
             macros[macro.name] = macro
     
     return macros

@@ -25,6 +25,7 @@ DIGESTOR_DIR = Path.home() / ".hegemonikon" / "digestor"
 
 
 # ─── Models ───────────────────────────────────────────────
+# PURPOSE: Represents a single candidate paper for the digest report
 class DigestCandidate(BaseModel):
     """Digestor 候補1件"""
     title: str
@@ -36,6 +37,7 @@ class DigestCandidate(BaseModel):
     suggested_templates: list[dict] = []
 
 
+# PURPOSE: Represents a complete digest report containing multiple candidates
 class DigestReport(BaseModel):
     """Digestor レポート1件"""
     timestamp: str
@@ -47,6 +49,7 @@ class DigestReport(BaseModel):
     filename: str = ""
 
 
+# PURPOSE: Response model for a list of digest reports with pagination
 class DigestReportListResponse(BaseModel):
     """レポート一覧レスポンス"""
     reports: list[DigestReport]
@@ -54,6 +57,7 @@ class DigestReportListResponse(BaseModel):
 
 
 # ─── Helpers ──────────────────────────────────────────────
+# PURPOSE: Loads and validates a DigestReport from a JSON file
 def _load_report(fpath: str) -> Optional[DigestReport]:
     """JSON ファイルから DigestReport を生成。失敗時は None。"""
     try:
@@ -75,6 +79,7 @@ def _load_report(fpath: str) -> Optional[DigestReport]:
         return None
 
 
+# PURPOSE: Retrieves a list of digest report file paths sorted by date
 def _list_report_files() -> list[str]:
     """digest_report_*.json を新しい順に返す。"""
     pattern = str(DIGESTOR_DIR / "digest_report_*.json")
@@ -82,6 +87,7 @@ def _list_report_files() -> list[str]:
 
 
 # ─── Endpoints ────────────────────────────────────────────
+# PURPOSE: API endpoint to retrieve a paginated list of digest reports
 @router.get("/reports", response_model=DigestReportListResponse)
 async def list_reports(
     limit: int = Query(default=10, ge=1, le=50),
@@ -101,6 +107,7 @@ async def list_reports(
     return DigestReportListResponse(reports=reports, total=total)
 
 
+# PURPOSE: API endpoint to retrieve the most recent digest report
 @router.get("/latest", response_model=Optional[DigestReport])
 async def latest_report() -> Optional[DigestReport]:
     """最新のレポートを取得"""

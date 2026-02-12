@@ -44,7 +44,7 @@ jobs:
                   # Install core test dependencies (CPU-only)
                   pip install pytest pytest-asyncio pytest-timeout pyyaml pydantic lancedb numpy scipy \
                               networkx pandas tabulate requests httpx schedule aiohttp \
-                              opentelemetry-api opentelemetry-sdk \
+                              opentelemetry-api opentelemetry-sdk python-dotenv google-genai \
                               sentence-transformers torch --extra-index-url https://download.pytorch.org/whl/cpu
                   # Install project in development mode if setup exists
                   pip install -e ".[test]" 2>/dev/null || true

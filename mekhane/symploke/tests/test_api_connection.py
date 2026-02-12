@@ -10,8 +10,8 @@ import os
 import sys
 import pytest
 
-# Add parent to path
-sys.path.insert(0, "/home/makaron8426/oikos/hegemonikon")
+# Add repo root to path
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../")))
 
 from mekhane.symploke.jules_client import JulesClient
 

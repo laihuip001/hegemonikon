@@ -41,10 +41,14 @@ jobs:
             - name: Install dependencies
               run: |
                   python -m pip install --upgrade pip
-                  # Install core test dependencies (CPU-only)
+                  # Install PyTorch CPU-only first (from PyTorch index)
+                  pip install torch --index-url https://download.pytorch.org/whl/cpu
+                  # Install sentence-transformers (depends on torch, so do it separately or after if needed, but here with standard index or PyTorch if it's there)
+                  # sentence-transformers is on PyPI, but might need torch first.
+                  # Install other core test dependencies (from PyPI)
                   pip install pytest pytest-asyncio pytest-timeout pyyaml pydantic lancedb numpy scipy \
                               networkx pandas tabulate requests httpx schedule \
-                              sentence-transformers torch --index-url https://download.pytorch.org/whl/cpu
+                              sentence-transformers
                   # Install project in development mode if setup exists
                   pip install -e ".[test]" 2>/dev/null || true
 

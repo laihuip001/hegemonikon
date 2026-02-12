@@ -81,7 +81,6 @@ gcloud*/
 Downloads/
 
 # Temporary / generated files
-fm_paste.ps1
 dashboard_current.png
 .playwright-mcp/
 腎生検_*.xml

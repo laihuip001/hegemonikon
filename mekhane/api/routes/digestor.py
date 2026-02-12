@@ -26,7 +26,19 @@ DIGESTOR_DIR = Path.home() / ".hegemonikon" / "digestor"
 
 # ─── Models ───────────────────────────────────────────────
 class DigestCandidate(BaseModel):
-    """Digestor 候補1件"""
+    """
+    Represents a single digest candidate.
+
+    Attributes:
+        title: The title of the digest item.
+        source: The source origin (e.g., 'gnosis').
+        url: The URL to the original content.
+        score: The relevance score of the candidate.
+        matched_topics: List of topics that matched this candidate.
+        rationale: Explanation for why this candidate was selected.
+        suggested_templates: List of suggested templates for processing.
+    """
+
     title: str
     source: str = ""
     url: str = ""
@@ -37,7 +49,19 @@ class DigestCandidate(BaseModel):
 
 
 class DigestReport(BaseModel):
-    """Digestor レポート1件"""
+    """
+    Represents a full digest report containing multiple candidates.
+
+    Attributes:
+        timestamp: The creation timestamp of the report.
+        source: The source origin of the report.
+        total_papers: Total number of papers processed.
+        candidates_selected: Number of candidates selected for the report.
+        dry_run: Whether the report was generated in dry-run mode.
+        candidates: List of selected candidates.
+        filename: The filename of the report source.
+    """
+
     timestamp: str
     source: str = "gnosis"
     total_papers: int = 0
@@ -48,7 +72,14 @@ class DigestReport(BaseModel):
 
 
 class DigestReportListResponse(BaseModel):
-    """レポート一覧レスポンス"""
+    """
+    Response model for listing digest reports.
+
+    Attributes:
+        reports: List of digest reports in the current page.
+        total: Total number of reports available.
+    """
+
     reports: list[DigestReport]
     total: int
 
@@ -87,7 +118,18 @@ async def list_reports(
     limit: int = Query(default=10, ge=1, le=50),
     offset: int = Query(default=0, ge=0),
 ) -> DigestReportListResponse:
-    """digest_report 一覧を取得（新しい順）"""
+    """
+    Retrieve a list of digest reports.
+
+    Fetches the list of available digest reports, sorted by creation date (newest first).
+
+    Args:
+        limit: Maximum number of reports to return (default: 10).
+        offset: Number of reports to skip (default: 0).
+
+    Returns:
+        DigestReportListResponse containing the list of reports and total count.
+    """
     files = _list_report_files()
     total = len(files)
     page = files[offset:offset + limit]
@@ -103,7 +145,14 @@ async def list_reports(
 
 @router.get("/latest", response_model=Optional[DigestReport])
 async def latest_report() -> Optional[DigestReport]:
-    """最新のレポートを取得"""
+    """
+    Retrieve the latest digest report.
+
+    Fetches the most recently created digest report.
+
+    Returns:
+        The latest DigestReport if available, or None if no reports exist.
+    """
     files = _list_report_files()
     if not files:
         return None

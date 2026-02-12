@@ -238,14 +238,19 @@ class TestCheckTheoremActivity(unittest.TestCase):
         """全24定理が alive の場合"""
         from collections import Counter
         # 全定理が direct 10回 + hub 0回 → alive
+        # THEOREM_WORKFLOWS の全24キーに一致させる
+        all_24 = [
+            "noe", "bou", "zet", "ene",  # O-series
+            "met", "mek", "sta", "pra",  # S-series
+            "pro", "pis", "ore", "dox",  # H-series
+            "kho", "hod", "tro", "tek",  # P-series
+            "euk", "chr", "tel", "sop",  # K-series
+            "pat", "dia", "gno", "epi",  # A-series
+        ]
         mock_scan.return_value = {
             "total_files": 50,
             "skipped": 0,
-            "wf_counts": Counter({wf: 10 for wf in [
-                "noe", "bou", "zet", "ene", "sta", "mek", "chr", "pra",
-                "pro", "pis", "ore", "dox", "tak", "kho", "euk", "tel",
-                "sym", "met", "ana", "sop", "kat", "dia", "syn", "epi",
-            ]}),
+            "wf_counts": Counter({wf: 10 for wf in all_24}),
             "hub_counts": Counter(),
             "wf_by_month": {"2026-01": Counter(), "2026-02": Counter()},
         }
@@ -258,11 +263,12 @@ class TestCheckTheoremActivity(unittest.TestCase):
     def test_some_dormant(self, mock_scan):
         """一部 dormant (0回) がある場合"""
         from collections import Counter
+        # 16定理は直接10回 alive、残り8定理は0回 → dead
         counts = Counter({wf: 10 for wf in [
-            "noe", "bou", "zet", "ene", "sta", "mek", "chr", "pra",
-            "pro", "pis", "ore", "dox", "tak", "kho", "euk", "tel",
+            "noe", "bou", "zet", "ene", "met", "mek", "sta", "pra",
+            "pro", "pis", "ore", "dox", "kho", "hod", "tro", "tek",
         ]})
-        # sym, met, ana, sop, kat, dia, syn, epi は 0回 → 8 dead
+        # euk, chr, tel, sop, pat, dia, gno, epi は 0回 → 8 dead
         mock_scan.return_value = {
             "total_files": 50,
             "skipped": 0,
@@ -273,20 +279,21 @@ class TestCheckTheoremActivity(unittest.TestCase):
         result = check_theorem_activity()
         self.assertEqual(result.status, "warn")
         self.assertIn("16/24 alive", result.detail)
+
     @patch("mekhane.peira.theorem_activity.scan_handoffs")
     def test_hub_only_alive(self, mock_scan):
         """一部がハブ経由のみで alive の場合 — DX-008 R4"""
         from collections import Counter
-        # O-series: 直接発動 10回 (direct alive)
+        # 20定理: 直接発動 10回 (direct alive)
         direct = Counter({wf: 10 for wf in [
-            "noe", "bou", "zet", "ene",
-            "sta", "mek", "chr", "pra",
-            "pro", "pis", "ore", "dox",
-            "tak", "kho", "euk", "tel",
-            "sym", "met", "ana", "sop",
+            "noe", "bou", "zet", "ene",  # O-series
+            "met", "mek", "sta", "pra",  # S-series
+            "pro", "pis", "ore", "dox",  # H-series
+            "kho", "hod", "tro", "tek",  # P-series
+            "euk", "chr", "tel", "sop",  # K-series
         ]})
-        # A-series: 直接 0回, ハブ経由 10回 (hub-only alive)
-        hub = Counter({wf: 10 for wf in ["kat", "dia", "syn", "epi"]})
+        # A-series 4定理: 直接 0回, ハブ経由 10回 (hub-only alive)
+        hub = Counter({wf: 10 for wf in ["pat", "dia", "gno", "epi"]})
         mock_scan.return_value = {
             "total_files": 50,
             "skipped": 0,

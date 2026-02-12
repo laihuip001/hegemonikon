@@ -117,6 +117,7 @@ Step 4: R(S) を出力        — Creator が R(S) の品質を検証
 | 2.5π+ | [pitch_gallery.md](../workflow-modules/bye/pitch_gallery.md) | 点火装置 | 正典 + 反面教師 |
 | 3 | [handoff-format.md](../workflow-modules/bye/handoff-format.md) | R(S) の出力形式 | Handoff 出力形式 |
 | 3.6 | [dispatch-log.md](../workflow-modules/bye/dispatch-log.md) | 行動射の記録 | Dispatch Log 自動集計 |
+| 3.6.5 | (inline) | R(S) のコスト射 | Session Metrics — BOOT→BYE デルタ |
 | 3.8 | [persistence.md](../workflow-modules/bye/persistence.md) | R(S) → Mem | 永続化ステップ |
 
 ---
@@ -260,6 +261,60 @@ git -C ~/oikos status --short
 
 ---
 
+## Step 3.6.5: Session Metrics — BOOT→BYE デルタ計測
+
+> **圏論**: R(S) にセッション S の「計算資源消費」を記録する。
+> S の射の数 (WF 使用回数) と、S が消費した環境資源 (PC/FC/Claude quota) のデルタ。
+> Agora (収益化) と Self-Profile (自己改善) の両方に供給するデータ源。
+
+### 手順
+
+1. **Bye スナップショット保存**:
+
+// turbo
+
+```bash
+bash ~/oikos/hegemonikon/scripts/agq-check.sh --snapshot bye 2>/dev/null
+```
+
+1. **デルタ計算** (boot スナップショットとの差分):
+
+// turbo
+
+```bash
+bash ~/oikos/hegemonikon/scripts/agq-check.sh --delta 2>/dev/null
+```
+
+1. **WF 使用回数の集計**: このセッションで実行した WF をリストアップ
+
+| 集計項目 | 方法 | 出力先 |
+|:---------|:-----|:-------|
+| PC/FC デルタ | `--delta` コマンド | Handoff Session Metrics |
+| Claude Opus 消費率 | `--delta` コマンド | Handoff Session Metrics |
+| WF 使用回数 | セッション振り返り | Handoff Session Metrics |
+| セッション時間 | boot.json ↔ bye.json の timestamp 差分 | Handoff Session Metrics |
+
+1. **Handoff に Session Metrics セクションを追加**:
+
+```markdown
+## 📊 Session Metrics
+
+| 項目 | Boot | Bye | Δ |
+|:-----|:-----|:----|:--|
+| Prompt Credits | {boot_pc} | {bye_pc} | -{delta_pc} |
+| Flow Credits | {boot_fc} | {bye_fc} | -{delta_fc} |
+| Claude Opus | {boot_claude}% | {bye_claude}% | -{delta}% |
+
+**WF 使用**: /noe×N, /dia×N, /ene×N, ...
+**セッション時間**: {duration}
+```
+
+> [!NOTE]
+> Boot スナップショットが存在しない場合 (/boot v5.2 以前のセッション)、
+> デルタ計算はスキップし、Bye 時点のスナップショットのみ記録する。
+
+---
+
 ## Step 3.7: id_R の更新 — Self-Profile 更新
 
 > **圏論**: 関手 R 自身の恒等射 id_R を更新する。R がどこで精度を落とすか（忘却パターン）、
@@ -389,3 +444,4 @@ graph LR
 *v6.0 — 随伴深層統合。各Step を右随伴 R の計算ステップとして再定義 (2026-02-08)*
 *v6.1 — Step 3.6π Value Pitch 追加。R^π: Ses→Sig (意味抽出関手)。HGK 7公理から演繹した8次元 Benefit Angle (2026-02-08)*
 *v7.1 — Step 3.5 を export_chats.py から IDE ネイティブ Export に変更。保存先: chat_export_YYYY-MM-DD.md (2026-02-09)*
+*v7.2 — Step 3.6.5 Session Metrics 追加。BOOT→BYE のデルタ計測 (PC/FC/Claude Opus) + WF 使用ログを Handoff に統合 (2026-02-12)*

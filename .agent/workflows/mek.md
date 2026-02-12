@@ -180,11 +180,24 @@ SKILL.md を必ず読み込んでから処理を開始する:
 
 | ファイル | 目的 |
 |:---------|:-----|
-| references/archetypes.md | Archetype 選択根拠 |
+| references/archetypes.md | Archetype 選択根拠 (5型: Precision/Speed/Autonomy/Creative/Safety) |
 | references/quality-checklist.md | 品質基準 |
-| references/wargame-db.md | 失敗シナリオ |
+| references/wargame-db.md | 失敗シナリオ (W01-W10 + W11-W14 HGK固有) |
+| references/logic-gates.md | 判断決定木 (G01-G10 + G11-G13 HGK固有) |
+| references/codex-languages.md | 言語別規約 (Python/Rust/Go/TS) |
+| references/codex-infra.md | インフラ規約 (Docker/K8s/Terraform/OWASP) |
 
 パス: `/home/makaron8426/oikos/hegemonikon/mekhane/ergasterion/tekhne/references/`
+
+> **Archetype 5型** (`/mek+` STEP 4 で参照):
+>
+> | 型 | 勝利条件 | 適用場面 |
+> |:---|:---------|:---------|
+> | **Precision** | 正確性・再現性 | データ処理、科学計算 |
+> | **Speed** | 応答速度・即時性 | リアルタイム、CI/CD |
+> | **Autonomy** | 自律実行・無人化 | バッチ処理、エージェント |
+> | **Creative** | 創造性・発散 | デザイン、ブレスト |
+> | **Safety** | 安全性・検証 | 金融、医療、セキュリティ |
 
 ---
 

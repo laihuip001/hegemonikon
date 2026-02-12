@@ -27,6 +27,7 @@ sel_enforcement:
       - "論拠セクション: 推論の連鎖を明示"
       - "反論セクション: 最も強い反論を提示"
       - "確信度: [確信/推定/仮説] を明示"
+      - "CoVe: CONFLICT-Q/A/S 3サブフェーズ実行"
   "-":
     minimum_requirements:
       - "PASS/FAIL + 1行理由のみ"
@@ -155,7 +156,19 @@ cd ~/oikos/hegemonikon && python mekhane/anamnesis/cli.py search "{レビュー�
 
 ---
 
-## 発動条件
+## STEP 0.8: Pre-Mortem 参照 (失敗シナリオ + 判断決定木)
+
+> **消化元**: SKILL v4.0 + /eat 消化 (2026-02-12)
+> **発動**: `/dia` または `/dia+` 実行時（`/dia-` は省略可）
+
+レビュー対象の設計/実装が既知の失敗パターンに該当しないか検証する:
+
+| 参照 | パス | 内容 |
+|:-----|:-----|:-----|
+| Wargame DB | [wargame-db.md](file:///home/makaron8426/oikos/hegemonikon/mekhane/ergasterion/tekhne/references/wargame-db.md) | W01-W10 汎用失敗 + W11-W14 HGK固有 |
+| Logic Gates | [logic-gates.md](file:///home/makaron8426/oikos/hegemonikon/mekhane/ergasterion/tekhne/references/logic-gates.md) | G01-G10 判断決定木 + G11-G13 HGK固有 |
+
+> **最低限**: Wargame DB の10シナリオ見出しを走査し、該当するものがあれば深堀り
 
 | トリガー | 動作 |
 |:---------|:-----|
@@ -219,6 +232,46 @@ default:
 ---
 
 *v7.1 — FBR 適用 (2026-02-07)*
+
+---
+
+## CoVe: Chain-of-Verification (`/dia+` 専用)
+
+> **起源**: 2026-02-12 /eat 消化 — プロンプト技法最前線 (CoVe)
+> **発動**: `/dia+` モード時のみ。`/dia` `/dia-` では省略。
+> **目的**: ドラフト判定の自己検証ループにより精度を高める
+
+### 3サブフェーズ
+
+| Phase | 名称 | 内容 |
+|:------|:-----|:-----|
+| **CONFLICT-Q** | 検証質問生成 | ドラフト判定に対し、事実確認・論理検証・前提確認の質問を3-5個生成 |
+| **CONFLICT-A** | 検証回答 | 各質問に独立して回答（ドラフトに引きずられない） |
+| **CONFLICT-S** | 統合修正 | 検証回答をドラフトに統合し、矛盾点を修正して最終判定を確定 |
+
+### 実行フロー
+
+```
+1. ドラフト判定を生成 (通常の /dia+ フロー)
+2. [CONFLICT-Q] 「この判定の弱点は？ 前提に誤りは？ 見落としは？」
+   → 検証質問 3-5個をリスト化
+3. [CONFLICT-A] 各質問に対し、判定とは独立に回答
+   → ドラフトを参照しない「白紙回答」
+4. [CONFLICT-S] ドラフト + 検証回答を突き合わせ
+   → 矛盾があれば修正、なければドラフトを確定
+```
+
+### 出力形式
+
+```markdown
+### CoVe 検証結果
+
+| Q# | 検証質問 | 回答 | ドラフトとの整合性 |
+|:---|:--------|:-----|:-------------------|
+| Q1 | ... | ... | ✅ 整合 / ⚠️ 矛盾 |
+
+**修正箇所**: {修正した点、または「修正なし」}
+```
 
 ---
 

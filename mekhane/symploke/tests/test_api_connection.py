@@ -8,10 +8,13 @@ Tests if the API key is valid and can connect to Jules.
 import asyncio
 import os
 import sys
+from pathlib import Path
 import pytest
 
-# Add parent to path
-sys.path.insert(0, "/home/makaron8426/oikos/hegemonikon")
+# Add project root to path (works in any environment)
+project_root = Path(__file__).resolve().parent.parent.parent.parent
+if str(project_root) not in sys.path:
+    sys.path.insert(0, str(project_root))
 
 from mekhane.symploke.jules_client import JulesClient
 

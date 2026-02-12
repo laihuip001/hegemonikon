@@ -1,4 +1,6 @@
 ---
+lcm_state: beta
+version: "1.0.0"
 description: "監る — /dia+{synteleia}_V:{/pis+}"
 ---
 

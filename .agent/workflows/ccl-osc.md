@@ -1,4 +1,6 @@
 ---
+lcm_state: beta
+version: "1.0.0"
 description: "揺する — R:{F:[/s,/dia,/noe]{L:[x]{x~x+}}, ~(/h*/k)}"
 ---
 

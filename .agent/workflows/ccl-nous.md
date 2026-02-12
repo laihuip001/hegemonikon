@@ -1,4 +1,6 @@
 ---
+lcm_state: beta
+version: "1.0.0"
 description: "問う — R:{F:[×2]{/u+*^/u^}}_/dox-"
 ---
 

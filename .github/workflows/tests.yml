@@ -43,7 +43,7 @@ jobs:
                   python -m pip install --upgrade pip
                   # Install core test dependencies (CPU-only)
                   pip install pytest pytest-asyncio pytest-timeout pyyaml pydantic lancedb numpy scipy \
-                              networkx pandas tabulate requests httpx schedule sentence-transformers aiohttp
+                              networkx pandas tabulate requests httpx schedule sentence-transformers aiohttp python-dotenv
                   # Install PyTorch CPU specifically
                   pip install torch --index-url https://download.pytorch.org/whl/cpu
                   # Install project in development mode if setup exists

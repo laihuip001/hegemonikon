@@ -4,6 +4,16 @@ description: HGK 収益化プロジェクト — ディープインパクト戦�
 triggers:
   - "agora"
   - "agora"
+
+# Safety Contract (v1.0)
+# Anti-Confidence 原則: リスクを宣言しないスキルは信頼できない
+risk_tier: L1             # L1(低) - 標準的な運用
+reversible: true           # 出力が可逆か
+requires_approval: false   # 実行前に Creator 承認が必要か
+risks:                     # 想定リスクのリスト
+  - "Execution of arbitrary code if import paths are incorrect"
+fallbacks:                 # 失敗時の代替 Skill
+  - ""
 ---
 
 # Agora

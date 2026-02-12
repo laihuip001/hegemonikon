@@ -25,8 +25,14 @@ DIGESTOR_DIR = Path.home() / ".hegemonikon" / "digestor"
 
 
 # ─── Models ───────────────────────────────────────────────
+# PURPOSE: Digestor 候補1件
 class DigestCandidate(BaseModel):
-    """Digestor 候補1件"""
+    """
+    Digestor 候補1件.
+
+    Represents a single candidate paper or article for digestion.
+    """
+
     title: str
     source: str = ""
     url: str = ""
@@ -36,8 +42,14 @@ class DigestCandidate(BaseModel):
     suggested_templates: list[dict] = []
 
 
+# PURPOSE: Digestor レポート1件
 class DigestReport(BaseModel):
-    """Digestor レポート1件"""
+    """
+    Digestor レポート1件.
+
+    Represents a generated report containing multiple candidates.
+    """
+
     timestamp: str
     source: str = "gnosis"
     total_papers: int = 0
@@ -47,15 +59,25 @@ class DigestReport(BaseModel):
     filename: str = ""
 
 
+# PURPOSE: レポート一覧レスポンス
 class DigestReportListResponse(BaseModel):
-    """レポート一覧レスポンス"""
+    """
+    レポート一覧レスポンス.
+
+    Response model for listing digest reports with pagination.
+    """
+
     reports: list[DigestReport]
     total: int
 
 
 # ─── Helpers ──────────────────────────────────────────────
 def _load_report(fpath: str) -> Optional[DigestReport]:
-    """JSON ファイルから DigestReport を生成。失敗時は None。"""
+    """
+    JSON ファイルから DigestReport を生成。失敗時は None。.
+
+    Loads a digest report from a JSON file.
+    """
     try:
         with open(fpath) as f:
             data = json.load(f)
@@ -76,18 +98,27 @@ def _load_report(fpath: str) -> Optional[DigestReport]:
 
 
 def _list_report_files() -> list[str]:
-    """digest_report_*.json を新しい順に返す。"""
+    """
+    digest_report_*.json を新しい順に返す。.
+
+    Lists all digest report files sorted by modification time (newest first).
+    """
     pattern = str(DIGESTOR_DIR / "digest_report_*.json")
     return sorted(glob.glob(pattern), reverse=True)
 
 
 # ─── Endpoints ────────────────────────────────────────────
+# PURPOSE: digest_report 一覧を取得（新しい順）
 @router.get("/reports", response_model=DigestReportListResponse)
 async def list_reports(
     limit: int = Query(default=10, ge=1, le=50),
     offset: int = Query(default=0, ge=0),
 ) -> DigestReportListResponse:
-    """digest_report 一覧を取得（新しい順）"""
+    """
+    digest_report 一覧を取得（新しい順）.
+
+    Retrieves a paginated list of digest reports.
+    """
     files = _list_report_files()
     total = len(files)
     page = files[offset:offset + limit]
@@ -101,9 +132,14 @@ async def list_reports(
     return DigestReportListResponse(reports=reports, total=total)
 
 
+# PURPOSE: 最新のレポートを取得
 @router.get("/latest", response_model=Optional[DigestReport])
 async def latest_report() -> Optional[DigestReport]:
-    """最新のレポートを取得"""
+    """
+    最新のレポートを取得.
+
+    Retrieves the most recently generated digest report.
+    """
     files = _list_report_files()
     if not files:
         return None

@@ -11,13 +11,13 @@
 |:-------|:-----|:---------|
 | `@dig` | 掘る | `/s+~(/p*/a)_/dia*/o+` |
 | `@plan` | 段取る | `/bou+_/s+~(/p*/k)_V:{/dia}` |
-| `@build` | 組む | `/bou-_/s+_/ene+_V:{/dia-}_I:[✓]{M:{/dox-}}` |
-| `@fix` | 直す | `C:{/dia+_/ene+}_I:[✓]{M:{/dox-}}` |
-| `@vet` | 確かめる | `/kho{git_diff}_C:{V:{/dia+}_/ene+}_/pra{test}_M:{/pis_/dox}` |
+| `@build` | 組む | `/bou-_/s+_/ene+_V:{/dia-}_I:[✓]{/dox-}` |
+| `@fix` | 直す | `C:{/dia+_/ene+}_I:[✓]{/dox-}` |
+| `@vet` | 確かめる | `/kho{git_diff}_C:{V:{/dia+}_/ene+}_/pra{test}_/pis_/dox` |
 | `@tak` | 捌く | `/s1_F:[×3]{/sta~/chr}_F:[×3]{/kho~/zet}_I:[∅]{/sop}_/euk_/bou` |
 | `@kyc` | 回す | `C:{/sop_/noe_/ene_/dia-}` |
-| `@learn` | 刻む | `/dox+_*^/u+_M:{/bye+}` |
-| `@nous` | 問う | `R:{F:[×2]{/u+*^/u^}}_M:{/dox-}` |
+| `@learn` | 刻む | `/dox+_*^/u+_/bye+` |
+| `@nous` | 問う | `R:{F:[×2]{/u+*^/u^}}_/dox-` |
 | `@ground` | 落とす | `/tak-*/bou+{6w3h}~/p-_/ene-` |
 | `@osc` | 揺する | `R:{F:[/s,/dia,/noe]{L:[x]{x~x+}}, ~(/h*/k)}` |
 | `@proof` | 裁く | `V:{/noe~/dia}_I:[✓]{/ene{PROOF.md}}_E:{/ene{_limbo/}}` |
@@ -56,7 +56,7 @@
 |:-----|:-----|:---------|
 | `C:{X}` | 収束ループ | @cycle |
 | `R:{X}` | 累積融合 | @reduce |
-| `M:{X}` | 記憶 | @memoize |
+| ~~`M:{X}`~~ | ~~記憶~~ (廃止) | ~~@memoize~~ |
 | `V:{X}` | 検証ゲート | @validate |
 
 ---

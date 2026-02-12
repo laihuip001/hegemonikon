@@ -30,7 +30,7 @@ BUILTIN_MACROS: Dict[str, Macro] = {
     # === Core Macros (ccl-*.md 由来) ===
     "build": Macro(
         name="build",
-        ccl="/bou-_/chr_/kho_/s+_/ene+_V:{/dia-}_I:[✓]{M:{/dox-}}",
+        ccl="/bou-_/chr_/kho_/s+_/ene+_V:{/dia-}_I:[✓]{/dox-}",
         description="構築: 目的簡略→資源→場→戦略→実行→判定→✓時記録",
         is_builtin=True,
     ),
@@ -42,7 +42,7 @@ BUILTIN_MACROS: Dict[str, Macro] = {
     ),
     "fix": Macro(
         name="fix",
-        ccl="/tel_C:{/dia+_/ene+}_I:[✓]{M:{/dox-}}",
+        ccl="/tel_C:{/dia+_/ene+}_I:[✓]{/dox-}",
         description="修正: 判定+実行のチェック→成功時記録",
         is_builtin=True,
     ),
@@ -60,13 +60,13 @@ BUILTIN_MACROS: Dict[str, Macro] = {
     ),
     "learn": Macro(
         name="learn",
-        ccl="/dox+_*^/u+_M:{/bye+}",
+        ccl="/dox+_*^/u+_/bye+",
         description="学習: 信念記録→メモ化(対話のメタ化)→終了時記録",
         is_builtin=True,
     ),
     "nous": Macro(
         name="nous",
-        ccl="R:{F:[×2]{/u+*^/u^}}_M:{/dox-}",
+        ccl="R:{F:[×2]{/u+*^/u^}}_/dox-",
         description="問いの深化: 再帰(2回対話のメタ化)→記録",
         is_builtin=True,
     ),
@@ -96,7 +96,7 @@ BUILTIN_MACROS: Dict[str, Macro] = {
     ),
     "vet": Macro(
         name="vet",
-        ccl="/kho{git_diff}_C:{V:{/dia+}_/ene+}_/pra{test}_M:{/pis_/dox}",
+        ccl="/kho{git_diff}_C:{V:{/dia+}_/ene+}_/pra{test}_/pis_/dox",
         description="確かめる: diff確認→判定+実行チェック→テスト→確信度+信念記録",
         is_builtin=True,
     ),

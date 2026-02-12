@@ -185,18 +185,18 @@ def get_macro_registry() -> Dict[str, str]:
 # v2: hub-only 9定理を既存+新規マクロに統合 (DX-008 対応)
 BUILTIN_MACROS = {
     # O-series (認知)
-    "nous": 'R:{F:[×2]{/u+*^/u^}}_M:{/dox-}',
+    "nous": 'R:{F:[×2]{/u+*^/u^}}_/dox-',
     "dig": "/s+~(/p*/a)_/ana_/dia*/o+",  # +/ana (類推: 構造的類似性)
     # S-series (設計)
     "plan": "/bou+_/chr_/s+~(/p*/k)_V:{/dia}",  # +/chr (活用: 手持ち資源確認)
-    "build": "/bou-_/chr_/kho_/s+_/ene+_V:{/dia-}_I:[✓]{M:{/dox-}}",  # +/chr,/kho
+    "build": "/bou-_/chr_/kho_/s+_/ene+_V:{/dia-}_I:[✓]{/dox-}",  # +/chr,/kho
     "tak": "/s1_F:[×3]{/sta~/chr}_F:[×3]{/kho~/zet}_I:[∅]{/sop}_/euk_/bou",
     # H-series (動機)
     "osc": "R:{F:[/s,/dia,/noe]{L:[x]{x~x+}}, ~(/h*/k)}",
-    "learn": "/dox+_*^/u+_M:{/bye+}",
+    "learn": "/dox+_*^/u+_/bye+",
     # A-series (精密)
-    "fix": "/tel_C:{/dia+_/ene+}_I:[✓]{M:{/dox-}}",  # +/tel (目的適合)
-    "vet": "/kho{git_diff}_C:{V:{/dia+}_/ene+}_/pra{test}_M:{/pis_/dox}",
+    "fix": "/tel_C:{/dia+_/ene+}_I:[✓]{/dox-}",  # +/tel (目的適合)
+    "vet": "/kho{git_diff}_C:{V:{/dia+}_/ene+}_/pra{test}_/pis_/dox",
     "proof": '/kat_V:{/noe~/dia}_I:[✓]{/ene{PROOF.md}}_E:{/ene{_limbo/}}',  # +/kat (浄化)
     "syn": "/dia+{synteleia}_V:{/pis+}",
     # P-series (条件)

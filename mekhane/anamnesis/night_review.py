@@ -40,6 +40,7 @@ try:
     from dotenv import load_dotenv
 except ImportError:
     # Optional dependency for local dev
+    # PURPOSE: Dummy load_dotenv for environments without python-dotenv
     def load_dotenv(*args, **kwargs):
         pass
 

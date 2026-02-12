@@ -1,6 +1,10 @@
 ---
+lcm_state: "beta"
+version: "1.0"
 description: "問う — R:{F:[×2]{/u+*^/u^}}_/dox-"
 ---
+lcm_state: "beta"
+version: "1.0"
 
 # /ccl-nous: 問いの深化マクロ (νοῦς)
 

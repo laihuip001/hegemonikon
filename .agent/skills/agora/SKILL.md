@@ -1,10 +1,20 @@
 ---
+risk_tier: "L1"
+risks: ["Data consistency", "External API failure"]
+reversible: true
+requires_approval: false
+fallbacks: ["Use local cache"]
 name: Agora
 description: HGK 収益化プロジェクト — ディープインパクト戦略
 triggers:
   - "agora"
   - "agora"
 ---
+risk_tier: "L1"
+risks: ["Data consistency", "External API failure"]
+reversible: true
+requires_approval: false
+fallbacks: ["Use local cache"]
 
 # Agora
 
@@ -36,5 +46,10 @@ print('TODO: agora の実行コマンドを定義')
 ```
 
 ---
+risk_tier: "L1"
+risks: ["Data consistency", "External API failure"]
+reversible: true
+requires_approval: false
+fallbacks: ["Use local cache"]
 
 *v1.0 — 自動生成 (2026-02-12)*

@@ -1,6 +1,10 @@
 ---
+lcm_state: "beta"
+version: "1.0"
 description: "回す — C:{/sop_/noe_/ene_/dia-}"
 ---
+lcm_state: "beta"
+version: "1.0"
 
 # /ccl-kyc: 認知循環マクロ (κύκλος)
 

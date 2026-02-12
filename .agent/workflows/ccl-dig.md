@@ -1,6 +1,10 @@
 ---
+lcm_state: "beta"
+version: "1.0"
 description: "掘る — /s+~(/p*/a)_/dia*/o+"
 ---
+lcm_state: "beta"
+version: "1.0"
 
 # /ccl-dig: 深掘りマクロ
 

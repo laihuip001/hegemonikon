@@ -1,6 +1,10 @@
 ---
+lcm_state: "beta"
+version: "1.0"
 description: "捌く — /s1_F:[×3]{/sta~/chr}_F:[×3]{/kho~/zet}_I:[∅]{/sop}_/euk_/bou"
 ---
+lcm_state: "beta"
+version: "1.0"
 
 # /ccl-tak: タスク整理マクロ
 

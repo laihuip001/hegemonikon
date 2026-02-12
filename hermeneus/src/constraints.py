@@ -62,6 +62,7 @@ class SchemaGenerator:
         type(None): {"type": "null"},
     }
     
+    # PURPOSE: dataclass から JSON Schema を生成
     @classmethod
     def from_dataclass(cls, dataclass_type: Type) -> Dict[str, Any]:
         """dataclass から JSON Schema を生成"""
@@ -96,6 +97,7 @@ class SchemaGenerator:
             "additionalProperties": False
         }
     
+    # PURPOSE: Python 型を JSON Schema に変換
     @classmethod
     def _type_to_schema(cls, python_type: Type) -> Dict[str, Any]:
         """Python 型を JSON Schema に変換"""
@@ -141,10 +143,12 @@ class ConstrainedDecoder:
     なければ正規表現ベースのフォールバックを使用。
     """
     
+    # PURPOSE: Initialize instance
     def __init__(self, model: str = "openai/gpt-4o"):
         self.model = model
         self._outlines_available = self._check_outlines()
     
+    # PURPOSE: Outlines がインストールされているか確認
     def _check_outlines(self) -> bool:
         """Outlines がインストールされているか確認"""
         try:
@@ -153,6 +157,7 @@ class ConstrainedDecoder:
         except ImportError:
             return False
     
+    # PURPOSE: JSON Schema に従った出力を生成
     def generate_with_schema(
         self,
         prompt: str,
@@ -165,6 +170,7 @@ class ConstrainedDecoder:
         else:
             return self._generate_with_fallback(prompt, schema, **kwargs)
     
+    # PURPOSE: dataclass 型に従った出力を生成
     def generate_with_dataclass(
         self,
         prompt: str,
@@ -176,6 +182,7 @@ class ConstrainedDecoder:
         result = self.generate_with_schema(prompt, schema, **kwargs)
         return dataclass_type(**result)
     
+    # PURPOSE: Outlines を使用して生成
     def _generate_with_outlines(
         self,
         prompt: str,
@@ -195,6 +202,7 @@ class ConstrainedDecoder:
         result = generator(prompt)
         return result
     
+    # PURPOSE: フォールバック: プロンプトに Schema を含めて生成
     def _generate_with_fallback(
         self,
         prompt: str,
@@ -258,6 +266,7 @@ JSON 出力:
         
         raise ValueError("Failed to generate valid JSON output")
     
+    # PURPOSE: 出力から JSON を抽出してパース
     def _extract_and_parse_json(self, content: str) -> Dict[str, Any]:
         """出力から JSON を抽出してパース"""
         # コードブロックを除去
@@ -268,6 +277,7 @@ JSON 出力:
         # JSON パース
         return json.loads(content)
     
+    # PURPOSE: 簡易スキーマ検証
     def _validate_against_schema(
         self,
         data: Dict[str, Any],
@@ -307,6 +317,7 @@ JSON 出力:
 # Convenience Functions
 # =============================================================================
 
+# PURPOSE: 型安全な出力生成 (便利関数)
 def generate_constrained(
     prompt: str,
     output_type: Type,
@@ -334,6 +345,7 @@ def generate_constrained(
     return decoder.generate_with_dataclass(prompt, output_type, **kwargs)
 
 
+# PURPOSE: JSON Schema に従った出力生成 (便利関数)
 def generate_json(
     prompt: str,
     schema: Dict[str, Any],

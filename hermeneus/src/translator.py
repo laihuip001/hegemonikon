@@ -78,9 +78,11 @@ OPERATOR_CONSTRAINTS = {
 class LMQLTranslator:
     """CCL AST → LMQL プログラム変換"""
     
+    # PURPOSE: Initialize instance
     def __init__(self, model: str = "openai/gpt-4o"):
         self.model = model
     
+    # PURPOSE: AST を LMQL プログラムに変換
     def translate(self, ast: Any) -> str:
         """AST を LMQL プログラムに変換"""
         if isinstance(ast, ConvergenceLoop):
@@ -106,6 +108,7 @@ class LMQLTranslator:
         else:
             raise ValueError(f"Unknown AST node: {type(ast)}")
     
+    # PURPOSE: マクロ参照を LMQL に変換（Synteleia 統合）
     def _translate_macro(self, macro: MacroRef) -> str:
         """マクロ参照を LMQL に変換（Synteleia 統合）"""
         name = macro.name
@@ -129,6 +132,7 @@ def macro_{name}(context: str):
         "{self.model}"
 '''
     
+    # PURPOSE: Synteleia マクロを LMQL + Python に変換
     def _translate_synteleia_macro(self, name: str, args: list) -> str:
         """Synteleia マクロを LMQL + Python に変換"""
         # 層選択を決定
@@ -181,6 +185,7 @@ def synteleia_integrated(context: str):
         "{self.model}"
 '''
     
+    # PURPOSE: Lambda を LMQL に変換
     def _translate_lambda(self, node: Lambda) -> str:
         """Lambda を LMQL に変換"""
         params = ", ".join(node.params)
@@ -197,6 +202,7 @@ def lambda_execution({params}, context: str):
         "{self.model}"
 '''
     
+    # PURPOSE: ワークフローを LMQL に変換
     def _translate_workflow(self, wf: Workflow) -> str:
         """ワークフローを LMQL に変換"""
         prompt = WORKFLOW_PROMPTS.get(wf.id, f"/{wf.id} を実行:")
@@ -232,6 +238,7 @@ def ccl_{wf.id}(context: str):
         "{self.model}"
 '''
     
+    # PURPOSE: 収束ループを LMQL に変換
     def _translate_convergence(self, node: ConvergenceLoop) -> str:
         """収束ループを LMQL に変換"""
         cond = node.condition
@@ -269,6 +276,7 @@ def convergence_loop(context: str):
         "{self.model}"
 '''
     
+    # PURPOSE: シーケンスを LMQL に変換
     def _translate_sequence(self, node: Sequence) -> str:
         """シーケンスを LMQL に変換"""
         steps = []
@@ -292,6 +300,7 @@ def sequence_execution(context: str):
         "{self.model}"
 '''
     
+    # PURPOSE: 融合を LMQL に変換
     def _translate_fusion(self, node: Fusion) -> str:
         """融合を LMQL に変換"""
         left_id = node.left.id if isinstance(node.left, Workflow) else "A"
@@ -316,6 +325,7 @@ def fusion_execution(context: str):
         "{self.model}"
 '''
     
+    # PURPOSE: 振動を LMQL に変換
     def _translate_oscillation(self, node: Oscillation) -> str:
         """振動を LMQL に変換"""
         left_id = node.left.id if isinstance(node.left, Workflow) else "A"
@@ -342,6 +352,7 @@ def oscillation_execution(context: str):
         "{self.model}"
 '''
     
+    # PURPOSE: FOR ループを LMQL に変換
     def _translate_for(self, node: ForLoop) -> str:
         """FOR ループを LMQL に変換"""
         if isinstance(node.iterations, int):
@@ -365,6 +376,7 @@ def for_loop_execution(context: str):
         "{self.model}"
 '''
     
+    # PURPOSE: IF 条件分岐を LMQL に変換
     def _translate_if(self, node: IfCondition) -> str:
         """IF 条件分岐を LMQL に変換"""
         cond = node.condition
@@ -386,6 +398,7 @@ def if_condition_execution(context: str, {cond.var.replace("[]", "")}: float):
         "{self.model}"
 '''
     
+    # PURPOSE: WHILE ループを LMQL に変換
     def _translate_while(self, node: WhileLoop) -> str:
         """WHILE ループを LMQL に変換"""
         cond = node.condition
@@ -417,6 +430,7 @@ def while_loop_execution(context: str):
 # Convenience Function
 # =============================================================================
 
+# PURPOSE: AST を LMQL に変換 (便利関数)
 def translate_to_lmql(ast: Any, model: str = "openai/gpt-4o") -> str:
     """AST を LMQL に変換 (便利関数)"""
     translator = LMQLTranslator(model=model)

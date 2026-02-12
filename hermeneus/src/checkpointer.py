@@ -53,11 +53,13 @@ class CCLCheckpointer:
     
     DEFAULT_PATH = Path.home() / ".hermeneus" / "checkpoints" / "state.db"
     
+    # PURPOSE: Initialize instance
     def __init__(self, db_path: Optional[Path] = None):
         self.db_path = db_path or self.DEFAULT_PATH
         self.db_path.parent.mkdir(parents=True, exist_ok=True)
         self._init_db()
     
+    # PURPOSE: データベースを初期化
     def _init_db(self):
         """データベースを初期化"""
         with self._connect() as conn:
@@ -78,6 +80,7 @@ class CCLCheckpointer:
             """)
             conn.commit()
     
+    # PURPOSE: データベース接続を取得
     @contextmanager
     def _connect(self):
         """データベース接続を取得"""
@@ -88,13 +91,16 @@ class CCLCheckpointer:
         finally:
             conn.close()
     
+    # PURPOSE: 一意の ID を生成
     def _generate_id(self) -> str:
         """一意の ID を生成"""
         import uuid
         return str(uuid.uuid4())[:8]
     
+    # PURPOSE: 状態を JSON にシリアライズ
     def _serialize_state(self, state: Dict[str, Any]) -> str:
         """状態を JSON にシリアライズ"""
+        # PURPOSE: Default serializer
         def default_serializer(obj):
             if hasattr(obj, "__dict__"):
                 return obj.__dict__
@@ -105,10 +111,12 @@ class CCLCheckpointer:
         
         return json.dumps(state, default=default_serializer, ensure_ascii=False)
     
+    # PURPOSE: JSON から状態をデシリアライズ
     def _deserialize_state(self, state_json: str) -> Dict[str, Any]:
         """JSON から状態をデシリアライズ"""
         return json.loads(state_json)
     
+    # PURPOSE: チェックポイントを保存
     def put(self, write: CheckpointWrite) -> Checkpoint:
         """チェックポイントを保存"""
         checkpoint_id = self._generate_id()
@@ -138,6 +146,7 @@ class CCLCheckpointer:
             metadata=write.metadata
         )
     
+    # PURPOSE: チェックポイントを取得
     def get(self, thread_id: str, checkpoint_id: Optional[str] = None) -> Optional[Checkpoint]:
         """チェックポイントを取得"""
         with self._connect() as conn:
@@ -166,6 +175,7 @@ class CCLCheckpointer:
                 )
             return None
     
+    # PURPOSE: チェックポイント履歴を取得
     def list(
         self,
         thread_id: str,
@@ -203,6 +213,7 @@ class CCLCheckpointer:
                 for row in rows
             ]
     
+    # PURPOSE: チェックポイントを削除
     def delete(self, thread_id: str, checkpoint_id: Optional[str] = None):
         """チェックポイントを削除"""
         with self._connect() as conn:
@@ -218,6 +229,7 @@ class CCLCheckpointer:
                 """, (thread_id,))
             conn.commit()
     
+    # PURPOSE: LangGraph 互換: チェックポイントをタプルで取得
     def get_tuple(self, config: Dict[str, Any]) -> Optional[Tuple]:
         """LangGraph 互換: チェックポイントをタプルで取得"""
         thread_id = config.get("configurable", {}).get("thread_id")
@@ -229,6 +241,7 @@ class CCLCheckpointer:
             return (checkpoint.state, {"checkpoint_id": checkpoint.checkpoint_id})
         return None
     
+    # PURPOSE: LangGraph 互換: チェックポイントを保存
     def put_tuple(self, config: Dict[str, Any], state: Dict[str, Any]) -> Dict[str, Any]:
         """LangGraph 互換: チェックポイントを保存"""
         thread_id = config.get("configurable", {}).get("thread_id")
@@ -253,14 +266,17 @@ class CCLCheckpointer:
 class MemoryCheckpointer:
     """メモリベースのチェックポインター (テスト用)"""
     
+    # PURPOSE: Initialize instance
     def __init__(self):
         self._storage: Dict[str, List[Checkpoint]] = {}
         self._counter = 0
     
+    # PURPOSE: Generate id
     def _generate_id(self) -> str:
         self._counter += 1
         return f"mem_{self._counter:04d}"
     
+    # PURPOSE: Put
     def put(self, write: CheckpointWrite) -> Checkpoint:
         checkpoint_id = self._generate_id()
         checkpoint = Checkpoint(
@@ -278,6 +294,7 @@ class MemoryCheckpointer:
         
         return checkpoint
     
+    # PURPOSE: Get
     def get(self, thread_id: str, checkpoint_id: Optional[str] = None) -> Optional[Checkpoint]:
         if thread_id not in self._storage:
             return None
@@ -294,6 +311,7 @@ class MemoryCheckpointer:
         
         return checkpoints[-1]  # 最新
     
+    # PURPOSE: List
     def list(self, thread_id: str, limit: int = 10, before: Optional[str] = None) -> List[Checkpoint]:
         if thread_id not in self._storage:
             return []
@@ -307,6 +325,7 @@ class MemoryCheckpointer:
         
         return checkpoints[:limit]
     
+    # PURPOSE: Delete
     def delete(self, thread_id: str, checkpoint_id: Optional[str] = None):
         if thread_id not in self._storage:
             return
@@ -324,6 +343,7 @@ class MemoryCheckpointer:
 # Convenience Functions
 # =============================================================================
 
+# PURPOSE: 状態を保存 (便利関数)
 def save_state(
     thread_id: str,
     state: Dict[str, Any],
@@ -338,6 +358,7 @@ def save_state(
     return checkpointer.put(CheckpointWrite(thread_id=thread_id, state=state))
 
 
+# PURPOSE: 状態を読み込み (便利関数)
 def load_state(
     thread_id: str,
     checkpoint_id: Optional[str] = None,
@@ -353,6 +374,7 @@ def load_state(
     return checkpoint.state if checkpoint else None
 
 
+# PURPOSE: チェックポイント履歴を取得 (便利関数)
 def list_checkpoints(
     thread_id: str,
     limit: int = 10,

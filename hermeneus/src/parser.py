@@ -56,9 +56,11 @@ class CCLParser:
     # ~* と ~! は ~ より先にマッチさせる（長いトークン優先）
     BINARY_OPS_PRIORITY = ['||', '|>', '_', '~*', '~!', '~', '*^', '*', '>>']
     
+    # PURPOSE: Initialize instance
     def __init__(self):
         self.errors: List[str] = []
     
+    # PURPOSE: Parse a CCL expression and return an AST node
     def parse(self, ccl: str) -> Any:
         """CCL 式をパース"""
         ccl = ccl.strip()
@@ -70,6 +72,7 @@ class CCLParser:
             self.errors.append(str(e))
             raise ValueError(f"Parse error: {e}")
     
+    # PURPOSE: Dispatch expression to appropriate parser
     def _parse_expression(self, expr: str) -> Any:
         """式をパース (優先順位に従う)"""
         expr = expr.strip()
@@ -100,6 +103,9 @@ class CCLParser:
             return self._parse_for(expr)
         if expr.startswith('I:'):
             return self._parse_if(expr)
+        if expr.startswith('EI:'):
+            # EI: がトップレベルで出現した場合も IF チェインとして処理
+            return self._parse_if('I:' + expr[3:])
         if expr.startswith('W:'):
             return self._parse_while(expr)
         if expr.startswith('L:'):
@@ -137,6 +143,7 @@ class CCLParser:
         # ワークフロー
         return self._parse_workflow(expr)
     
+    # PURPOSE: 式全体がバランスしたグループかを判定する。
     def _is_balanced_group(self, expr: str, open_ch: str, close_ch: str) -> bool:
         """式全体がバランスしたグループかを判定する。
         例: (A~*B) -> True, (A)~*(B) -> False
@@ -153,6 +160,7 @@ class CCLParser:
                 return False  # 途中で閉じた = 全体を囲んでいない
         return True
     
+    # PURPOSE: 二項演算子で分割 (ネストを考慮)
     def _split_binary(self, expr: str, op: str) -> List[str]:
         """二項演算子で分割 (ネストを考慮)"""
         parts = []
@@ -183,6 +191,7 @@ class CCLParser:
         
         return parts
     
+    # PURPOSE: 二項演算子を処理
     def _handle_binary(self, op: str, parts: List[str]) -> Any:
         """二項演算子を処理"""
         if op == '_':
@@ -271,6 +280,7 @@ class CCLParser:
         "epi": {"d": "dia", "h": "gno", "x": ("pat", "transition")},
     }
 
+    # PURPOSE: Parse a workflow expression like /noe+
     def _parse_workflow(self, expr: str) -> Workflow:
         """ワークフロー式をパース"""
         # /wf.h+- 形式: relation suffix (.d/.h/.x) を認識
@@ -338,6 +348,7 @@ class CCLParser:
             relation=relation
         )
     
+    # PURPOSE: Parse a comparison condition
     def _parse_condition(self, expr: str) -> Condition:
         """条件式をパース"""
         expr = expr.strip()
@@ -357,6 +368,7 @@ class CCLParser:
         # デフォルト
         return Condition(var="V[]", op="<", value=0.5)
     
+    # PURPOSE: マクロ参照をパース
     def _parse_macro(self, expr: str) -> MacroRef:
         """マクロ参照をパース"""
         # 拡張パターン: @name[·×+-]? または @name{...} または @name(...)
@@ -384,6 +396,7 @@ class CCLParser:
             return MacroRef(name=name, args=args)
         raise ValueError(f"Invalid macro: {expr}")
     
+    # PURPOSE: Parse a FOR loop expression
     def _parse_for(self, expr: str) -> ForLoop:
         """FOR ループをパース: F:[×N]{body} or F:[A,B]{body} or F:N{body}"""
         # Pattern 1: F:[...]{body} (角括弧あり、ネスト対応)
@@ -428,6 +441,7 @@ class CCLParser:
 
         raise ValueError(f"Invalid FOR loop: {expr}")
     
+    # PURPOSE: Parse an IF conditional expression
     def _parse_if(self, expr: str) -> IfCondition:
         """IF 条件分岐をパース: I:[cond]{then} EI:[cond]{elif} E:{else}"""
         # Pattern 1: I:[cond]{then} — ネストした [] と {} に対応
@@ -479,6 +493,7 @@ class CCLParser:
 
         raise ValueError(f"Invalid IF: {expr}")
 
+    # PURPOSE: Parse EI:/E: chain after IF body
     def _parse_else_chain(self, rest: str) -> Any:
         """EI:/E: チェインをパース → ネストされた IfCondition に変換"""
         rest = rest.strip()
@@ -498,6 +513,7 @@ class CCLParser:
         
         return None
     
+    # PURPOSE: Extract content from balanced braces
     def _extract_braced_body(self, s: str) -> tuple:
         """先頭の {body} を抽出 (ネスト対応)。
         
@@ -522,6 +538,7 @@ class CCLParser:
         
         return (None, s)
     
+    # PURPOSE: Parse a WHILE loop expression
     def _parse_while(self, expr: str) -> WhileLoop:
         """WHILE ループをパース: W:[cond]{body}"""
         # V[] を含む条件式を許容するパターン
@@ -534,6 +551,7 @@ class CCLParser:
         
         return WhileLoop(condition=condition, body=body)
     
+    # PURPOSE: Parse a lambda expression
     def _parse_lambda(self, expr: str) -> Lambda:
         """Lambda をパース: L:[x]{body}"""
         match = re.match(r'L:\[([^\]]+)\]\{(.+)\}$', expr)
@@ -545,6 +563,7 @@ class CCLParser:
         
         return Lambda(params=params, body=body)
     
+    # PURPOSE: Parse a lim convergence expression
     def _parse_lim(self, expr: str) -> ConvergenceLoop:
         """lim 正式形をパース: lim[cond]{body}"""
         # E[/growth] 等の角括弧内に内容がある関数呼び出しにも対応
@@ -557,9 +576,14 @@ class CCLParser:
         
         return ConvergenceLoop(body=body, condition=condition)
 
+    # PURPOSE: Parse a let binding (macro or variable)
     def _parse_let(self, expr: str) -> LetBinding:
-        """let マクロ定義をパース: let @name = CCL"""
+        """let マクロ定義をパース: let @name = CCL or let name = CCL"""
+        # Pattern 1: let @name = CCL (マクロ定義)
         match = re.match(r'let\s+@(\w+)\s*=\s*(.+)$', expr)
+        if not match:
+            # Pattern 2: let name = CCL (変数束縛)
+            match = re.match(r'let\s+(\w+)\s*=\s*(.+)$', expr)
         if not match:
             raise ValueError(f"Invalid let: {expr}")
         
@@ -568,6 +592,7 @@ class CCLParser:
         
         return LetBinding(name=name, body=body)
 
+    # PURPOSE: Parse tagged block (V:/C:/R:/M:/E:)
     def _parse_tagged_block(self, expr: str) -> 'TaggedBlock':
         """意味タグ付きブロックをパース: V:{body}, C:{body}, R:{body}, M:{body}, E:{body}"""
         tag = expr[0]  # V, C, R, M, or E
@@ -611,6 +636,7 @@ class CCLParser:
 # Convenience Function
 # =============================================================================
 
+# PURPOSE: Parse a CCL expression string into an AST
 def parse_ccl(ccl: str) -> Any:
     """CCL 式をパース (便利関数)"""
     parser = CCLParser()

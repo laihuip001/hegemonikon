@@ -82,6 +82,7 @@ class DebateAgent:
     役割に応じて主張生成、批判、判定を行う。
     """
     
+    # PURPOSE: Initialize instance
     def __init__(
         self,
         role: AgentRole,
@@ -93,6 +94,7 @@ class DebateAgent:
         self.temperature = temperature
         self._llm_available = self._check_llm()
     
+    # PURPOSE: LLM が利用可能か確認
     def _check_llm(self) -> bool:
         """LLM が利用可能か確認"""
         try:
@@ -101,6 +103,7 @@ class DebateAgent:
         except ImportError:
             return False
     
+    # PURPOSE: 主張を支持する論拠を生成
     async def propose(self, claim: str, context: str = "") -> DebateArgument:
         """主張を支持する論拠を生成"""
         prompt = f"""
@@ -119,6 +122,7 @@ class DebateAgent:
             confidence=self._estimate_confidence(response)
         )
     
+    # PURPOSE: 批判・反論を生成
     async def critique(
         self,
         claim: str,
@@ -149,6 +153,7 @@ class DebateAgent:
             confidence=self._estimate_confidence(response)
         )
     
+    # PURPOSE: 最終判定を下す
     async def arbitrate(
         self,
         claim: str,
@@ -188,6 +193,7 @@ class DebateAgent:
             arbiter_notes=response
         )
     
+    # PURPOSE: 反論を生成
     async def rebut(
         self,
         claim: str,
@@ -215,6 +221,7 @@ class DebateAgent:
             confidence=self._estimate_confidence(response)
         )
     
+    # PURPOSE: LLM で生成
     async def _generate(self, prompt: str) -> str:
         """LLM で生成"""
         if not self._llm_available:
@@ -239,6 +246,7 @@ class DebateAgent:
         except Exception as e:
             return f"[Error: {e}] " + self._fallback_generate(prompt)
     
+    # PURPOSE: フォールバック生成 (LLM なし)
     def _fallback_generate(self, prompt: str) -> str:
         """フォールバック生成 (LLM なし)"""
         if self.role == AgentRole.PROPOSER:
@@ -248,6 +256,7 @@ class DebateAgent:
         else:
             return "判定: UNCERTAIN\n確信度: 50%\n理由: 十分な情報がない。"
     
+    # PURPOSE: テキストから確信度を推定
     def _estimate_confidence(self, text: str) -> float:
         """テキストから確信度を推定"""
         high_conf = ["確実", "明確", "definitely", "certainly", "clearly"]
@@ -264,6 +273,7 @@ class DebateAgent:
             return max(0.3, 0.5 - low_count * 0.05)
         return 0.6
     
+    # PURPOSE: 判定テキストをパース
     def _parse_verdict(self, text: str) -> tuple:
         """判定テキストをパース"""
         text_lower = text.lower()
@@ -304,6 +314,7 @@ class DebateEngine:
     複数エージェント間のディベートを管理し、合意形成を行う。
     """
     
+    # PURPOSE: Initialize instance
     def __init__(
         self,
         proposer_model: str = "openai/gpt-4o",
@@ -318,6 +329,7 @@ class DebateEngine:
         ]
         self.arbiter = DebateAgent(AgentRole.ARBITER, arbiter_model)
     
+    # PURPOSE: ディベートを実行
     async def debate(
         self,
         claim: str,
@@ -377,6 +389,7 @@ class DebateEngine:
         # 6. 合意結果を構築
         return self._build_consensus(claim, rounds, verdict)
     
+    # PURPOSE: 合意結果を構築
     def _build_consensus(
         self,
         claim: str,
@@ -418,6 +431,7 @@ class DebateEngine:
 # Convenience Functions
 # =============================================================================
 
+# PURPOSE: CCL 実行結果を非同期検証
 async def verify_execution_async(
     ccl: str,
     execution_output: str,
@@ -449,6 +463,7 @@ async def verify_execution_async(
     return result
 
 
+# PURPOSE: CCL 実行結果を同期検証
 def verify_execution(
     ccl: str,
     execution_output: str,
@@ -462,6 +477,7 @@ def verify_execution(
     ))
 
 
+# PURPOSE: クイック検証 (単純な受理/拒否)
 def quick_verify(claim: str, context: str = "") -> bool:
     """クイック検証 (単純な受理/拒否)"""
     result = asyncio.run(verify_execution_async(

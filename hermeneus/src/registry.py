@@ -41,6 +41,7 @@ class WorkflowDefinition:
     raw_content: str = ""               # 生のマークダウン内容
     metadata: Dict[str, Any] = field(default_factory=dict)
     
+    # PURPOSE: プロンプトテンプレートを生成
     def get_prompt_template(self) -> str:
         """プロンプトテンプレートを生成"""
         template = f"# {self.description}\n\n"
@@ -70,6 +71,7 @@ class WorkflowParser:
     STAGE_PATTERN = re.compile(r"^##\s+(.+)$", re.MULTILINE)
     MODE_PATTERN = re.compile(r"^###\s+--mode=(\w+)", re.MULTILINE)
     
+    # PURPOSE: Parse a CCL expression and return an AST node
     def parse(self, path: Path) -> WorkflowDefinition:
         """ワークフローファイルをパース"""
         content = path.read_text(encoding="utf-8")
@@ -115,6 +117,7 @@ class WorkflowParser:
             metadata=metadata
         )
     
+    # PURPOSE: ステージをパース
     def _parse_stages(self, content: str) -> List[WorkflowStage]:
         """ステージをパース"""
         stages = []
@@ -165,6 +168,7 @@ class WorkflowRegistry:
         Path.home() / "oikos" / "hegemonikon" / ".agent" / "workflows",
     ]
     
+    # PURPOSE: Initialize instance
     def __init__(
         self,
         workflows_dir: Optional[Path] = None,
@@ -183,6 +187,7 @@ class WorkflowRegistry:
         self.parser = WorkflowParser()
         self._cache: Dict[str, WorkflowDefinition] = {}
     
+    # PURPOSE: ワークフロー定義を取得
     def get(self, name: str) -> Optional[WorkflowDefinition]:
         """ワークフロー定義を取得
         
@@ -209,6 +214,7 @@ class WorkflowRegistry:
         
         return None
     
+    # PURPOSE: 全ワークフローをロード
     def load_all(self) -> Dict[str, WorkflowDefinition]:
         """全ワークフローをロード"""
         result = {}
@@ -231,6 +237,7 @@ class WorkflowRegistry:
         self._cache.update(result)
         return result
     
+    # PURPOSE: ワークフロー名一覧を取得
     def list_names(self) -> List[str]:
         """ワークフロー名一覧を取得"""
         names = set()
@@ -243,6 +250,7 @@ class WorkflowRegistry:
         
         return sorted(names)
     
+    # PURPOSE: 名前を正規化
     def _normalize_name(self, name: str) -> str:
         """名前を正規化"""
         # /noe+ → noe
@@ -252,6 +260,7 @@ class WorkflowRegistry:
         name = name.rstrip("-")
         return name
     
+    # PURPOSE: キャッシュをクリア
     def clear_cache(self):
         """キャッシュをクリア"""
         self._cache.clear()
@@ -261,17 +270,20 @@ class WorkflowRegistry:
 # Convenience Functions
 # =============================================================================
 
+# PURPOSE: デフォルトレジストリを取得
 @lru_cache(maxsize=1)
 def get_default_registry() -> WorkflowRegistry:
     """デフォルトレジストリを取得"""
     return WorkflowRegistry()
 
 
+# PURPOSE: ワークフロー定義を取得 (便利関数)
 def get_workflow(name: str) -> Optional[WorkflowDefinition]:
     """ワークフロー定義を取得 (便利関数)"""
     return get_default_registry().get(name)
 
 
+# PURPOSE: ワークフロー一覧を取得 (便利関数)
 def list_workflows() -> List[str]:
     """ワークフロー一覧を取得 (便利関数)"""
     return get_default_registry().list_names()

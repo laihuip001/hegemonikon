@@ -20,6 +20,7 @@ from pathlib import Path
 from typing import Optional
 
 
+# PURPOSE: CLI パーサーを作成
 def create_parser() -> argparse.ArgumentParser:
     """CLI パーサーを作成"""
     parser = argparse.ArgumentParser(
@@ -155,6 +156,7 @@ Examples:
     return parser
 
 
+# PURPOSE: compile コマンド
 def cmd_compile(args) -> int:
     """compile コマンド"""
     from . import compile_ccl
@@ -174,6 +176,7 @@ def cmd_compile(args) -> int:
         return 1
 
 
+# PURPOSE: execute コマンド
 def cmd_execute(args) -> int:
     """execute コマンド"""
     from . import execute_ccl
@@ -207,6 +210,7 @@ def cmd_execute(args) -> int:
         return 1
 
 
+# PURPOSE: verify コマンド
 def cmd_verify(args) -> int:
     """verify コマンド"""
     from . import execute_ccl, verify_execution, record_verification
@@ -255,6 +259,7 @@ def cmd_verify(args) -> int:
         return 1
 
 
+# PURPOSE: audit コマンド
 def cmd_audit(args) -> int:
     """audit コマンド"""
     from . import query_audits, get_audit_report
@@ -283,6 +288,7 @@ def cmd_audit(args) -> int:
         return 1
 
 
+# PURPOSE: typecheck コマンド
 def cmd_typecheck(args) -> int:
     """typecheck コマンド"""
     from . import verify_code, MypyProver
@@ -315,6 +321,7 @@ def cmd_typecheck(args) -> int:
         return 1
 
 
+# PURPOSE: CLI メイン
 def main(argv: Optional[list] = None) -> int:
     """CLI メイン"""
     parser = create_parser()

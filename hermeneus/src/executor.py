@@ -74,6 +74,7 @@ class ExecutionPipeline:
     completed_at: Optional[datetime] = None
     model: str = ""
     
+    # PURPOSE: 辞書に変換
     def to_dict(self) -> Dict[str, Any]:
         """辞書に変換"""
         return {
@@ -104,6 +105,7 @@ class WorkflowExecutor:
         print(result.output)
     """
     
+    # PURPOSE: Initialize instance
     def __init__(
         self,
         registry: Optional["WorkflowRegistry"] = None,
@@ -118,6 +120,7 @@ class WorkflowExecutor:
         self.audit_by_default = audit_by_default
         self.min_confidence = min_confidence
     
+    # PURPOSE: レジストリを取得 (遅延初期化)
     @property
     def registry(self):
         """レジストリを取得 (遅延初期化)"""
@@ -126,6 +129,7 @@ class WorkflowExecutor:
             self._registry = WorkflowRegistry()
         return self._registry
     
+    # PURPOSE: CCL ワークフローを実行
     async def execute(
         self,
         ccl: str,
@@ -214,6 +218,7 @@ class WorkflowExecutor:
         
         return self._finalize(pipeline, start_time)
     
+    # PURPOSE: 同期版の実行
     def execute_sync(
         self,
         ccl: str,
@@ -223,6 +228,7 @@ class WorkflowExecutor:
         """同期版の実行"""
         return asyncio.run(self.execute(ccl, context, **kwargs))
     
+    # PURPOSE: コンパイルフェーズ
     async def _phase_compile(
         self,
         ccl: str,
@@ -253,6 +259,7 @@ class WorkflowExecutor:
                 duration_ms=(time.time() - start) * 1000
             )
     
+    # PURPOSE: 実行フェーズ
     async def _phase_execute(
         self,
         ccl: str,
@@ -296,6 +303,7 @@ class WorkflowExecutor:
                 duration_ms=(time.time() - start) * 1000
             )
     
+    # PURPOSE: 検証フェーズ
     async def _phase_verify(
         self,
         ccl: str,
@@ -328,6 +336,7 @@ class WorkflowExecutor:
                 duration_ms=(time.time() - start) * 1000
             )
     
+    # PURPOSE: 監査フェーズ
     async def _phase_audit(
         self,
         ccl: str,
@@ -373,6 +382,7 @@ class WorkflowExecutor:
                 duration_ms=(time.time() - start) * 1000
             )
     
+    # PURPOSE: CCL からワークフロー名を抽出
     def _extract_workflow_name(self, ccl: str) -> str:
         """CCL からワークフロー名を抽出"""
         # /noe+ → noe, /bou+ >> /ene+ → bou
@@ -380,6 +390,7 @@ class WorkflowExecutor:
         match = re.search(r"/(\w+)[+\-]?", ccl)
         return match.group(1) if match else ""
     
+    # PURPOSE: パイプラインを完了
     def _finalize(
         self,
         pipeline: ExecutionPipeline,
@@ -398,9 +409,11 @@ class WorkflowExecutor:
 class BatchExecutor:
     """バッチ実行エンジン"""
     
+    # PURPOSE: Initialize instance
     def __init__(self, executor: Optional[WorkflowExecutor] = None):
         self.executor = executor or WorkflowExecutor()
     
+    # PURPOSE: 複数タスクをバッチ実行
     async def execute_batch(
         self,
         tasks: List[Dict[str, Any]],
@@ -420,6 +433,7 @@ class BatchExecutor:
         if parallel:
             semaphore = asyncio.Semaphore(max_concurrent)
             
+            # PURPOSE: Execute with semaphore
             async def execute_with_semaphore(task):
                 async with semaphore:
                     return await self.executor.execute(**task)
@@ -443,6 +457,7 @@ class BatchExecutor:
 _default_executor: Optional[WorkflowExecutor] = None
 
 
+# PURPOSE: デフォルトエグゼキューターを取得
 def get_executor() -> WorkflowExecutor:
     """デフォルトエグゼキューターを取得"""
     global _default_executor
@@ -451,6 +466,7 @@ def get_executor() -> WorkflowExecutor:
     return _default_executor
 
 
+# PURPOSE: ワークフローを実行 (便利関数)
 async def run_workflow(
     ccl: str,
     context: str = "",
@@ -471,6 +487,7 @@ async def run_workflow(
     )
 
 
+# PURPOSE: ワークフローを同期実行 (便利関数)
 def run_workflow_sync(
     ccl: str,
     context: str = "",

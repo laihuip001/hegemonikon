@@ -39,6 +39,7 @@ except ImportError:
 if MCP_AVAILABLE:
     server = Server("hermeneus")
     
+    # PURPOSE: 利用可能なツール一覧を返す
     @server.list_tools()
     async def list_tools() -> List[Tool]:
         """利用可能なツール一覧を返す"""
@@ -161,6 +162,7 @@ if MCP_AVAILABLE:
             )
         ]
     
+    # PURPOSE: ツールを実行
     @server.call_tool()
     async def call_tool(name: str, arguments: Dict[str, Any]) -> Sequence[TextContent]:
         """ツールを実行"""
@@ -189,6 +191,7 @@ if MCP_AVAILABLE:
             )]
 
 
+# PURPOSE: hermeneus_execute の処理
 async def _handle_execute(args: Dict[str, Any]) -> Sequence[TextContent]:
     """hermeneus_execute の処理"""
     from .executor import run_workflow
@@ -224,6 +227,7 @@ async def _handle_execute(args: Dict[str, Any]) -> Sequence[TextContent]:
     return [TextContent(type="text", text=text)]
 
 
+# PURPOSE: hermeneus_compile の処理
 async def _handle_compile(args: Dict[str, Any]) -> Sequence[TextContent]:
     """hermeneus_compile の処理"""
     from . import compile_ccl
@@ -246,6 +250,7 @@ async def _handle_compile(args: Dict[str, Any]) -> Sequence[TextContent]:
     return [TextContent(type="text", text=text)]
 
 
+# PURPOSE: hermeneus_audit の処理
 async def _handle_audit(args: Dict[str, Any]) -> Sequence[TextContent]:
     """hermeneus_audit の処理"""
     from .audit import get_audit_report, query_audits
@@ -258,6 +263,7 @@ async def _handle_audit(args: Dict[str, Any]) -> Sequence[TextContent]:
     return [TextContent(type="text", text=f"## 監査レポート\n\n{report}")]
 
 
+# PURPOSE: hermeneus_list_workflows の処理
 async def _handle_list_workflows(args: Dict[str, Any]) -> Sequence[TextContent]:
     """hermeneus_list_workflows の処理"""
     from .registry import list_workflows, get_workflow
@@ -279,6 +285,7 @@ async def _handle_list_workflows(args: Dict[str, Any]) -> Sequence[TextContent]:
     return [TextContent(type="text", text="\n".join(lines))]
 
 
+# PURPOSE: hermeneus_export_session の処理 — セッション記録・Handoff 補助
 async def _handle_export_session(args: Dict[str, Any]) -> Sequence[TextContent]:
     """hermeneus_export_session の処理 — セッション記録・Handoff 補助"""
     from datetime import datetime
@@ -328,6 +335,7 @@ Handoff ファイルが見つかりません。`/bye` でセッションを終�
     return [TextContent(type="text", text=text)]
 
 
+# PURPOSE: hermeneus_dispatch の処理 — CCL パース + AST 表示 + 実行計画テンプレート
 async def _handle_dispatch(args: Dict[str, Any]) -> Sequence[TextContent]:
     """hermeneus_dispatch の処理 — CCL パース + AST 表示 + 実行計画テンプレート"""
     from .dispatch import dispatch
@@ -368,6 +376,7 @@ async def _handle_dispatch(args: Dict[str, Any]) -> Sequence[TextContent]:
 class FallbackServer:
     """MCP SDK がない場合のフォールバック"""
     
+    # PURPOSE: CCL を実行
     async def execute(self, ccl: str, context: str = "") -> Dict[str, Any]:
         """CCL を実行"""
         from .executor import run_workflow
@@ -375,6 +384,7 @@ class FallbackServer:
         result = await run_workflow(ccl=ccl, context=context)
         return result.to_dict()
     
+    # PURPOSE: CCL をコンパイル
     async def compile(self, ccl: str, model: str = "openai/gpt-4o") -> str:
         """CCL をコンパイル"""
         from . import compile_ccl
@@ -385,6 +395,7 @@ class FallbackServer:
 # Entry Point
 # =============================================================================
 
+# PURPOSE: MCP サーバーを起動
 async def main():
     """MCP サーバーを起動"""
     if not MCP_AVAILABLE:
@@ -414,6 +425,7 @@ async def main():
         )
 
 
+# PURPOSE: エントリーポイント
 def run_server():
     """エントリーポイント"""
     asyncio.run(main())

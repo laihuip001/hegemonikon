@@ -64,12 +64,14 @@ class ProofResult:
 class ProverInterface(ABC):
     """Prover 抽象インターフェース"""
     
+    # PURPOSE: 証明タイプ
     @property
     @abstractmethod
     def proof_type(self) -> ProofType:
         """証明タイプ"""
         pass
     
+    # PURPOSE: コード/主張を検証
     @abstractmethod
     def verify(
         self,
@@ -80,6 +82,7 @@ class ProverInterface(ABC):
         """コード/主張を検証"""
         pass
     
+    # PURPOSE: Prover が利用可能か
     def is_available(self) -> bool:
         """Prover が利用可能か"""
         return True
@@ -95,6 +98,7 @@ class MypyProver(ProverInterface):
     Python コードの型安全性を検証する。
     """
     
+    # PURPOSE: Initialize instance
     def __init__(
         self,
         strict: bool = True,
@@ -106,10 +110,12 @@ class MypyProver(ProverInterface):
         self.ignore_missing_imports = ignore_missing_imports
         self._mypy_available = self._check_mypy()
     
+    # PURPOSE: Proof type
     @property
     def proof_type(self) -> ProofType:
         return ProofType.TYPE
     
+    # PURPOSE: mypy が利用可能か確認
     def _check_mypy(self) -> bool:
         """mypy が利用可能か確認"""
         try:
@@ -122,9 +128,11 @@ class MypyProver(ProverInterface):
         except (subprocess.TimeoutExpired, FileNotFoundError):
             return False
     
+    # PURPOSE: Is available
     def is_available(self) -> bool:
         return self._mypy_available
     
+    # PURPOSE: Python コードの型チェック
     def verify(
         self,
         code: str,
@@ -183,6 +191,7 @@ class MypyProver(ProverInterface):
         finally:
             temp_path.unlink(missing_ok=True)
     
+    # PURPOSE: mypy を実行
     def _run_mypy(self, path: Path) -> Tuple[int, str, str]:
         """mypy を実行"""
         cmd = ["python", "-m", "mypy"]
@@ -208,6 +217,7 @@ class MypyProver(ProverInterface):
         except subprocess.TimeoutExpired:
             return 1, "", "mypy timed out"
     
+    # PURPOSE: 出力をパース
     def _parse_output(self, output: str) -> Tuple[List[str], List[str]]:
         """出力をパース"""
         errors = []
@@ -239,13 +249,16 @@ class SchemaProver(ProverInterface):
     JSON 出力がスキーマに準拠しているか検証する。
     """
     
+    # PURPOSE: Initialize instance
     def __init__(self):
         self._jsonschema_available = self._check_jsonschema()
     
+    # PURPOSE: Proof type
     @property
     def proof_type(self) -> ProofType:
         return ProofType.SCHEMA
     
+    # PURPOSE: jsonschema が利用可能か確認
     def _check_jsonschema(self) -> bool:
         """jsonschema が利用可能か確認"""
         try:
@@ -254,9 +267,11 @@ class SchemaProver(ProverInterface):
         except ImportError:
             return False
     
+    # PURPOSE: Is available
     def is_available(self) -> bool:
         return self._jsonschema_available
     
+    # PURPOSE: JSON をスキーマで検証
     def verify(
         self,
         code: str,
@@ -315,6 +330,7 @@ class SchemaProver(ProverInterface):
                 execution_time_ms=(time.time() - start) * 1000
             )
     
+    # PURPOSE: フォールバック検証
     def _fallback_validate(
         self,
         data: Dict,
@@ -357,14 +373,17 @@ class Lean4Prover(ProverInterface):
     
     DEFAULT_LEAN_PATH = Path.home() / ".elan" / "bin" / "lean"
     
+    # PURPOSE: Initialize instance
     def __init__(self, lean_path: Optional[Path] = None):
         self.lean_path = lean_path or self.DEFAULT_LEAN_PATH
         self._lean_available = self._check_lean()
     
+    # PURPOSE: Proof type
     @property
     def proof_type(self) -> ProofType:
         return ProofType.FORMAL
     
+    # PURPOSE: Lean 4 が利用可能か確認
     def _check_lean(self) -> bool:
         """Lean 4 が利用可能か確認"""
         if not self.lean_path.exists():
@@ -380,9 +399,11 @@ class Lean4Prover(ProverInterface):
         except (subprocess.TimeoutExpired, FileNotFoundError):
             return False
     
+    # PURPOSE: Is available
     def is_available(self) -> bool:
         return self._lean_available
     
+    # PURPOSE: 形式証明
     def verify(
         self,
         code: str,
@@ -465,6 +486,7 @@ class ProofCache:
     DEFAULT_PATH = Path.home() / ".hermeneus" / "proof_cache.db"
     DEFAULT_TTL = 86400  # 24時間
     
+    # PURPOSE: Initialize instance
     def __init__(
         self,
         db_path: Optional[Path] = None,
@@ -475,6 +497,7 @@ class ProofCache:
         self.ttl_seconds = ttl_seconds
         self._init_db()
     
+    # PURPOSE: データベースを初期化
     def _init_db(self):
         """データベースを初期化"""
         with self._connect() as conn:
@@ -492,6 +515,7 @@ class ProofCache:
             """)
             conn.commit()
     
+    # PURPOSE: データベース接続
     @contextmanager
     def _connect(self):
         """データベース接続"""
@@ -502,10 +526,12 @@ class ProofCache:
         finally:
             conn.close()
     
+    # PURPOSE: コードのハッシュ
     def _hash_code(self, code: str) -> str:
         """コードのハッシュ"""
         return hashlib.sha256(code.encode()).hexdigest()[:16]
     
+    # PURPOSE: キャッシュから取得
     def get(
         self,
         code: str,
@@ -539,6 +565,7 @@ class ProofCache:
                 cached=True
             )
     
+    # PURPOSE: キャッシュに保存
     def put(self, code: str, result: ProofResult):
         """キャッシュに保存"""
         code_hash = self._hash_code(code)
@@ -559,6 +586,7 @@ class ProofCache:
             ))
             conn.commit()
     
+    # PURPOSE: キャッシュを無効化
     def invalidate(self, code: str, proof_type: Optional[ProofType] = None):
         """キャッシュを無効化"""
         code_hash = self._hash_code(code)
@@ -575,6 +603,7 @@ class ProofCache:
                 """, (code_hash,))
             conn.commit()
     
+    # PURPOSE: 期限切れを削除
     def clean_expired(self):
         """期限切れを削除"""
         threshold = datetime.now() - timedelta(seconds=self.ttl_seconds)
@@ -590,6 +619,7 @@ class ProofCache:
 # Convenience Functions
 # =============================================================================
 
+# PURPOSE: コードを検証 (便利関数)
 def verify_code(
     code: str,
     prover: Optional[ProverInterface] = None,
@@ -631,6 +661,7 @@ def verify_code(
     return result
 
 
+# PURPOSE: スキーマ検証 (便利関数)
 def verify_schema(
     data: str,
     schema: Dict[str, Any],
@@ -641,6 +672,7 @@ def verify_schema(
     return verify_code(data, prover=prover, use_cache=use_cache, schema=schema)
 
 
+# PURPOSE: Prover を取得
 def get_prover(proof_type: ProofType) -> ProverInterface:
     """Prover を取得"""
     if proof_type == ProofType.TYPE:

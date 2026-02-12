@@ -20,6 +20,7 @@ from enum import Enum
 from pathlib import Path
 
 # .env ファイルから環境変数を読み込む
+# PURPOSE: hermeneus/.env から API キーを読み込む
 def _load_env():
     """hermeneus/.env から API キーを読み込む"""
     env_paths = [
@@ -175,10 +176,12 @@ class LMQLExecutor:
     _adc_token: Optional[str] = None
     _adc_token_expiry: float = 0.0
     
+    # PURPOSE: Initialize instance
     def __init__(self, config: Optional[ExecutionConfig] = None):
         self.config = config or ExecutionConfig()
         self._lmql_available = self._check_lmql()
     
+    # PURPOSE: LMQL がインストールされているか確認
     def _check_lmql(self) -> bool:
         """LMQL がインストールされているか確認"""
         try:
@@ -187,6 +190,7 @@ class LMQLExecutor:
         except ImportError:
             return False
     
+    # PURPOSE: LMQL プログラムを非同期実行
     async def execute_async(
         self,
         lmql_code: str,
@@ -218,6 +222,7 @@ class LMQLExecutor:
                 error=str(e)
             )
     
+    # PURPOSE: LMQL プログラムを同期実行
     def execute(
         self,
         lmql_code: str,
@@ -227,6 +232,7 @@ class LMQLExecutor:
         """LMQL プログラムを同期実行"""
         return asyncio.run(self.execute_async(lmql_code, context, variables))
     
+    # PURPOSE: LMQL ライブラリを使用して実行
     async def _execute_with_lmql(
         self,
         lmql_code: str,
@@ -265,6 +271,7 @@ class LMQLExecutor:
                 error=f"LMQL execution error: {e}"
             )
     
+    # PURPOSE: config.model を MODEL_REGISTRY で解決する
     def _resolve_model(self) -> Dict[str, str]:
         """config.model を MODEL_REGISTRY で解決する"""
         model = self.config.model
@@ -280,6 +287,7 @@ class LMQLExecutor:
         # デフォルト: openai
         return {"provider": "openai", "model_id": model.replace("openai/", "")}
     
+    # PURPOSE: ADC トークンを取得 (キャッシュ付き、有効期限 50分)
     @classmethod
     def _get_adc_token(cls) -> Optional[str]:
         """ADC トークンを取得 (キャッシュ付き、有効期限 50分)"""
@@ -297,6 +305,7 @@ class LMQLExecutor:
             cls._adc_token = None
             return None
     
+    # PURPOSE: フォールバック: 複数プロバイダー対応の LLM 呼び出し
     async def _execute_fallback(
         self,
         lmql_code: str,
@@ -392,6 +401,7 @@ class LMQLExecutor:
             error=f"All providers failed: {'; '.join(errors)}"
         )
     
+    # PURPOSE: Anthropic Claude API 呼び出し (直接 API key)
     async def _execute_anthropic(
         self, prompt: str, api_key: str, model_id: Optional[str] = None
     ) -> ExecutionResult:
@@ -451,6 +461,7 @@ class LMQLExecutor:
             error="Anthropic API call failed after retries"
         )
     
+    # PURPOSE: Google Gemini API 呼び出し (google.genai SDK)
     async def _execute_google(
         self, prompt: str, api_key: str, model_id: Optional[str] = None
     ) -> ExecutionResult:
@@ -510,6 +521,7 @@ class LMQLExecutor:
             error="Google API call failed after retries"
         )
     
+    # PURPOSE: OpenAI API 呼び出し
     async def _execute_openai(
         self, prompt: str, api_key: str, model_id: Optional[str] = None
     ) -> ExecutionResult:
@@ -571,6 +583,7 @@ class LMQLExecutor:
             error="Max retries exceeded"
         )
     
+    # PURPOSE: Vertex AI 経由 Claude 呼び出し (AnthropicVertex SDK, ADC 認証)
     async def _execute_vertex_anthropic(
         self, prompt: str, model_info: Dict[str, str]
     ) -> ExecutionResult:
@@ -655,6 +668,7 @@ class LMQLExecutor:
             error="Vertex Anthropic API call failed after retries"
         )
     
+    # PURPOSE: Vertex AI 経由 Open Models (OpenAI互換 SDK, ADC 認証)
     async def _execute_vertex_openai(
         self, prompt: str, model_info: Dict[str, str]
     ) -> ExecutionResult:
@@ -757,6 +771,7 @@ class LMQLExecutor:
             error="Vertex OpenAI-compat API call failed after retries"
         )
     
+    # PURPOSE: LMQL コードからプロンプト部分を抽出
     def _extract_prompt_from_lmql(self, lmql_code: str) -> Optional[str]:
         """LMQL コードからプロンプト部分を抽出"""
         # 文字列リテラルを探す
@@ -785,9 +800,11 @@ class ConvergenceExecutor:
     条件を満たすまで反復する。
     """
     
+    # PURPOSE: Initialize instance
     def __init__(self, executor: LMQLExecutor):
         self.executor = executor
     
+    # PURPOSE: 収束ループを実行
     async def execute_convergence(
         self,
         lmql_code: str,
@@ -842,6 +859,7 @@ class ConvergenceExecutor:
             metadata={"converged": False, "final_uncertainty": current_value}
         )
     
+    # PURPOSE: 出力から不確実性を推定 (簡易ヒューリスティック)
     def _estimate_uncertainty(self, output: str) -> float:
         """出力から不確実性を推定 (簡易ヒューリスティック)"""
         uncertainty_indicators = [
@@ -868,6 +886,7 @@ class ConvergenceExecutor:
         else:
             return 0.4  # デフォルト
     
+    # PURPOSE: 条件をチェック
     def _check_condition(self, value: float, op: str, threshold: float) -> bool:
         """条件をチェック"""
         if op == "<":
@@ -887,6 +906,7 @@ class ConvergenceExecutor:
 # High-Level API
 # =============================================================================
 
+# PURPOSE: CCL 式をコンパイルして実行
 def execute_ccl(
     ccl: str,
     context: str = "",

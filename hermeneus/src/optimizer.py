@@ -74,6 +74,7 @@ class CCLExample:
     context: str
     expected_output: str
     
+    # PURPOSE: DSPy Example に変換
     def to_dspy_example(self) -> Any:
         """DSPy Example に変換"""
         if not DSPY_AVAILABLE:
@@ -89,6 +90,7 @@ class CCLExample:
 # CCL Signature (DSPy)
 # =============================================================================
 
+# PURPOSE: CCL 実行用の DSPy Signature を生成
 def create_ccl_signature():
     """CCL 実行用の DSPy Signature を生成"""
     if not DSPY_AVAILABLE:
@@ -110,6 +112,7 @@ def create_ccl_signature():
 class CCLModule:
     """CCL 実行モジュール (DSPy Module ラッパー)"""
     
+    # PURPOSE: Initialize instance
     def __init__(self, signature=None, model: str = "openai/gpt-4o-mini"):
         if not DSPY_AVAILABLE:
             raise RuntimeError("DSPy not installed. Run: pip install dspy-ai")
@@ -119,6 +122,7 @@ class CCLModule:
         self._configure_lm()
         self._build_module()
     
+    # PURPOSE: LM を設定
     def _configure_lm(self):
         """LM を設定"""
         api_key = os.environ.get("OPENAI_API_KEY")
@@ -129,16 +133,19 @@ class CCLModule:
         lm = dspy.LM(self.model, api_key=api_key)
         dspy.configure(lm=lm)
     
+    # PURPOSE: モジュールを構築
     def _build_module(self):
         """モジュールを構築"""
         # ChainOfThought で推論を強化
         self.predictor = dspy.ChainOfThought(self.signature)
     
+    # PURPOSE: CCL を実行
     def forward(self, ccl: str, context: str) -> str:
         """CCL を実行"""
         result = self.predictor(ccl=ccl, context=context)
         return result.output
     
+    # PURPOSE: Call  
     def __call__(self, ccl: str, context: str) -> str:
         return self.forward(ccl, context)
 
@@ -150,6 +157,7 @@ class CCLModule:
 class CCLOptimizer:
     """CCL ワークフロー最適化器"""
     
+    # PURPOSE: Initialize instance
     def __init__(self, config: Optional[OptimizationConfig] = None):
         if not DSPY_AVAILABLE:
             raise RuntimeError("DSPy not installed. Run: pip install dspy-ai")
@@ -157,6 +165,7 @@ class CCLOptimizer:
         self.config = config or OptimizationConfig()
         self._compiled_module = None
     
+    # PURPOSE: CCL ワークフローを最適化
     def optimize(
         self,
         ccl: str,
@@ -220,6 +229,7 @@ class CCLOptimizer:
                 error=str(e)
             )
     
+    # PURPOSE: オプティマイザを作成
     def _create_optimizer(self):
         """オプティマイザを作成"""
         opt_type = self.config.optimizer_type
@@ -235,6 +245,7 @@ class CCLOptimizer:
                 max_bootstrapped_demos=self.config.max_bootstrapped_demos,
             )
     
+    # PURPOSE: デフォルトメトリクス: 出力の類似度
     def _default_metric(self, example, prediction, trace=None) -> float:
         """デフォルトメトリクス: 出力の類似度"""
         expected = getattr(example, 'output', '')
@@ -258,6 +269,7 @@ class CCLOptimizer:
             total = len(expected_words | predicted_words)
             return overlap / total if total > 0 else 0.0
     
+    # PURPOSE: 最適化結果を評価
     def _evaluate(
         self,
         compiled,
@@ -280,6 +292,7 @@ class CCLOptimizer:
         
         return sum(scores) / len(scores) if scores else 0.0
     
+    # PURPOSE: 最適化されたプロンプトを抽出
     def _extract_optimized_prompt(self, compiled) -> str:
         """最適化されたプロンプトを抽出"""
         try:
@@ -302,11 +315,13 @@ class CCLOptimizer:
 # Convenience Functions
 # =============================================================================
 
+# PURPOSE: DSPy が利用可能か
 def is_dspy_available() -> bool:
     """DSPy が利用可能か"""
     return DSPY_AVAILABLE
 
 
+# PURPOSE: CCL を最適化 (便利関数)
 def optimize_ccl(
     ccl: str,
     examples: List[CCLExample],
@@ -325,9 +340,11 @@ def optimize_ccl(
 class MockOptimizer:
     """テスト用モック最適化器"""
     
+    # PURPOSE: Initialize instance
     def __init__(self, config: Optional[OptimizationConfig] = None):
         self.config = config or OptimizationConfig()
     
+    # PURPOSE: モック最適化
     def optimize(
         self,
         ccl: str,
@@ -345,6 +362,7 @@ class MockOptimizer:
         )
 
 
+# PURPOSE: オプティマイザを取得
 def get_optimizer(use_mock: bool = False) -> Union[CCLOptimizer, MockOptimizer]:
     """オプティマイザを取得"""
     if use_mock or not DSPY_AVAILABLE:

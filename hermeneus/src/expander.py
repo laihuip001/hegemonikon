@@ -102,6 +102,7 @@ class Expander:
     SEQUENCE_PATTERN = re.compile(r'(.+)\s*_\s*(.+)')
     MACRO_PATTERN = re.compile(r'@(\w+)')
     
+    # PURPOSE: Initialize instance
     def __init__(self, macro_registry: Optional[Dict[str, str]] = None):
         """
         Args:
@@ -110,6 +111,7 @@ class Expander:
         self.macro_registry = macro_registry or {}
         self.expansions: List[str] = []
     
+    # PURPOSE: CCL 式を展開
     def expand(self, ccl: str) -> ExpansionResult:
         """CCL 式を展開"""
         self.expansions = []
@@ -128,6 +130,7 @@ class Expander:
             expansions=self.expansions.copy()
         )
     
+    # PURPOSE: @macro を展開
     def _expand_macros(self, ccl: str) -> str:
         """@macro を展開"""
         result = ccl
@@ -139,6 +142,7 @@ class Expander:
                 self.expansions.append(f"@{name} → {replacement}")
         return result
     
+    # PURPOSE: 省略形を正式形に変換
     def _to_formal(self, ccl: str) -> str:
         """省略形を正式形に変換"""
         # 収束ループ: A >> cond → lim[cond]{A}
@@ -166,6 +170,7 @@ class Expander:
         
         return ccl
     
+    # PURPOSE: CCL 式から SEL 義務を抽出
     def get_sel_requirements(self, ccl: str) -> Dict[str, any]:
         """CCL 式から SEL 義務を抽出"""
         requirements = {
@@ -189,6 +194,7 @@ class Expander:
 # Convenience Function
 # =============================================================================
 
+# PURPOSE: CCL 式を展開 (便利関数)
 def expand_ccl(ccl: str, macros: Optional[Dict[str, str]] = None) -> ExpansionResult:
     """CCL 式を展開 (便利関数)"""
     expander = Expander(macro_registry=macros)

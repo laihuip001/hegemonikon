@@ -26,6 +26,7 @@ __version__ = "0.8.1"  # Phase 8.1: 後方互換 re-export (MCP キャッシュ�
 # MCP サーバープロセスが古い import パスを使っている場合に対応。
 # =============================================================================
 
+# PURPOSE: 後方互換: from hermeneus.src import X をサポート
 def __getattr__(name: str):
     """後方互換: from hermeneus.src import X をサポート"""
     _lazy_imports = {
@@ -44,6 +45,7 @@ def __getattr__(name: str):
     raise AttributeError(f"module 'hermeneus.src' has no attribute {name!r}")
 
 
+# PURPOSE: CCL 式を LMQL プログラムにコンパイル
 def compile_ccl(
     ccl: str,
     macros: dict = None,
@@ -86,6 +88,7 @@ def compile_ccl(
 # CLI Entry Point
 # =============================================================================
 
+# PURPOSE: CLI エントリーポイント
 def main():
     """CLI エントリーポイント"""
     import sys

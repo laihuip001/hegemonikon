@@ -54,6 +54,7 @@ class ExecutionContext:
     step_outputs: List[str] = field(default_factory=list)
     depth: int = 0  # ネスト深度
 
+    # PURPOSE: ステップ出力を記録し、current を更新
     def push(self, output: str, step_name: str = ""):
         """ステップ出力を記録し、current を更新"""
         self.step_outputs.append(output)
@@ -61,6 +62,7 @@ class ExecutionContext:
         if step_name:
             self.variables[f"${step_name}"] = output
 
+    # PURPOSE: 子コンテキストを生成 (ループ/条件の内部用)
     def fork(self) -> "ExecutionContext":
         """子コンテキストを生成 (ループ/条件の内部用)"""
         return ExecutionContext(
@@ -85,6 +87,7 @@ class StepResult:
     children: List["StepResult"] = field(default_factory=list)
     metadata: Dict[str, Any] = field(default_factory=dict)
 
+    # PURPOSE: エントロピー削減量 (denoising 量)
     @property
     def entropy_reduction(self) -> float:
         """エントロピー削減量 (denoising 量)"""
@@ -106,6 +109,7 @@ class ExecutionResult:
     bottleneck_step: Optional[str] = None  # gradient 最大のステップ
     gradient_map: Dict[str, float] = field(default_factory=dict)
 
+    # PURPOSE: 人間可読なサマリー
     def summary(self) -> str:
         """人間可読なサマリー"""
         lines = [
@@ -154,6 +158,7 @@ class EntropyEstimator:
         "confirmed", "verified", "passed", "success", "done",
     ]
 
+    # PURPOSE: テキストからエントロピーを推定 (0.0=確実, 1.0=完全不確実)
     @classmethod
     def estimate(cls, text: str, context: Optional[ExecutionContext] = None) -> float:
         """テキストからエントロピーを推定 (0.0=確実, 1.0=完全不確実)
@@ -213,12 +218,14 @@ class WFResolver:
 
     WF_DIR = Path.home() / "oikos" / "hegemonikon" / ".agent" / "workflows"
 
+    # PURPOSE: WF ID からファイルパスを解決
     @classmethod
     def resolve(cls, wf_id: str) -> Optional[Path]:
         """WF ID からファイルパスを解決"""
         path = cls.WF_DIR / f"{wf_id}.md"
         return path if path.exists() else None
 
+    # PURPOSE: WF 定義テキストを読み込む
     @classmethod
     def load_definition(cls, wf_id: str) -> Optional[str]:
         """WF 定義テキストを読み込む"""
@@ -230,6 +237,7 @@ class WFResolver:
                 return None
         return None
 
+    # PURPOSE: WF の description (frontmatter) を抽出
     @classmethod
     def extract_description(cls, wf_id: str) -> str:
         """WF の description (frontmatter) を抽出"""
@@ -251,6 +259,7 @@ class ASTWalker:
     各ステップでエントロピーを計測し、StepResult を生成。
     """
 
+    # PURPOSE: Initialize instance
     def __init__(
         self,
         step_handler: Optional[Callable] = None,
@@ -266,6 +275,7 @@ class ASTWalker:
         self.step_handler = step_handler or self._default_handler
         self.estimator = entropy_estimator or EntropyEstimator()
 
+    # PURPOSE: AST ノードを実行 (forward pass)
     def walk(self, node: Any, ctx: ExecutionContext) -> StepResult:
         """AST ノードを実行 (forward pass)"""
         from hermeneus.src.ccl_ast import (
@@ -309,6 +319,7 @@ class ASTWalker:
                 entropy_after=0.5,
             )
 
+    # PURPOSE: Program ノード: 全式を順次実行
     def _walk_program(self, node, ctx: ExecutionContext) -> StepResult:
         """Program ノード: 全式を順次実行"""
         children = []
@@ -326,6 +337,7 @@ class ASTWalker:
             children=children,
         )
 
+    # PURPOSE: Sequence (_ チェイン): ステップを順次実行
     def _walk_sequence(self, node, ctx: ExecutionContext) -> StepResult:
         """Sequence (_ チェイン): ステップを順次実行"""
         children = []
@@ -345,6 +357,7 @@ class ASTWalker:
             children=children,
         )
 
+    # PURPOSE: Workflow ノード: 単一 WF を実行
     def _walk_workflow(self, node, ctx: ExecutionContext) -> StepResult:
         """Workflow ノード: 単一 WF を実行"""
         start = time.monotonic()
@@ -371,6 +384,7 @@ class ASTWalker:
             metadata={"params": params},
         )
 
+    # PURPOSE: MacroRef: マクロを展開して再帰実行
     def _walk_macro(self, node, ctx: ExecutionContext) -> StepResult:
         """MacroRef: マクロを展開して再帰実行"""
         from mekhane.ccl.macro_registry import MacroRegistry
@@ -408,6 +422,7 @@ class ASTWalker:
             metadata={"expanded_ccl": macro.ccl},
         )
 
+    # PURPOSE: ForLoop: N回繰り返し
     def _walk_for(self, node, ctx: ExecutionContext) -> StepResult:
         """ForLoop: N回繰り返し"""
         children = []
@@ -434,6 +449,7 @@ class ASTWalker:
             children=children,
         )
 
+    # PURPOSE: IfCondition: 条件分岐
     def _walk_if(self, node, ctx: ExecutionContext) -> StepResult:
         """IfCondition: 条件分岐"""
         initial_entropy = self.estimator.estimate(ctx.current_output)
@@ -464,6 +480,7 @@ class ASTWalker:
             children=[child],
         )
 
+    # PURPOSE: Oscillation (A~B): 2つのノードを交互実行 (収束まで)
     def _walk_oscillation(self, node, ctx: ExecutionContext) -> StepResult:
         """Oscillation (A~B): 2つのノードを交互実行 (収束まで)"""
         children = []
@@ -492,6 +509,7 @@ class ASTWalker:
             children=children,
         )
 
+    # PURPOSE: Fusion (A*B): 2つのノードの出力を統合
     def _walk_fusion(self, node, ctx: ExecutionContext) -> StepResult:
         """Fusion (A*B): 2つのノードの出力を統合"""
         initial_entropy = self.estimator.estimate(ctx.current_output)
@@ -512,6 +530,7 @@ class ASTWalker:
             children=[left, right],
         )
 
+    # PURPOSE: Pipeline (A |> B |> C): 前段の出力を次段の入力にチェイン
     def _walk_pipeline(self, node, ctx: ExecutionContext) -> StepResult:
         """Pipeline (A |> B |> C): 前段の出力を次段の入力にチェイン
 
@@ -537,6 +556,7 @@ class ASTWalker:
             children=children,
         )
 
+    # PURPOSE: Parallel (A || B || C): 全ブランチを独立実行し、結果を統合
     def _walk_parallel(self, node, ctx: ExecutionContext) -> StepResult:
         """Parallel (A || B || C): 全ブランチを独立実行し、結果を統合
 
@@ -578,6 +598,7 @@ class ASTWalker:
             children=children,
         )
 
+    # PURPOSE: ColimitExpansion (\A): Colimit 展開 — 全派生を列挙し統合
     def _walk_colimit(self, node, ctx: ExecutionContext) -> StepResult:
         """ColimitExpansion (\\A): Colimit 展開 — 全派生を列挙し統合
 
@@ -607,6 +628,7 @@ class ASTWalker:
             children=[child],
         )
 
+    # PURPOSE: WhileLoop (W:[cond]{body}): 条件が真の間ループ
     def _walk_while(self, node, ctx: ExecutionContext) -> StepResult:
         """WhileLoop (W:[cond]{body}): 条件が真の間ループ
 
@@ -653,6 +675,7 @@ class ASTWalker:
             children=children,
         )
 
+    # PURPOSE: ConvergenceLoop (A >> cond / lim[cond]{A}): 収束するまで反復
     def _walk_convergence(self, node, ctx: ExecutionContext) -> StepResult:
         """ConvergenceLoop (A >> cond / lim[cond]{A}): 収束するまで反復
 
@@ -689,6 +712,7 @@ class ASTWalker:
             children=children,
         )
 
+    # PURPOSE: デフォルト WF ハンドラ: CognitiveStepHandler に委譲
     @staticmethod
     def _default_handler(wf_id: str, params: dict, ctx: ExecutionContext) -> str:
         """デフォルト WF ハンドラ: CognitiveStepHandler に委譲"""
@@ -791,6 +815,7 @@ class CognitiveStepHandler:
         },
     }
 
+    # PURPOSE: WF の認知効果をシミュレートした出力を生成
     @classmethod
     def handle(cls, wf_id: str, params: dict, ctx: ExecutionContext) -> str:
         """WF の認知効果をシミュレートした出力を生成"""
@@ -831,6 +856,7 @@ class BackwardPass:
     各ステップの gradient = そのステップのエントロピー削減の寄与率。
     """
 
+    # PURPOSE: 逆伝播を実行
     @staticmethod
     def compute(steps: List[StepResult], final_confidence: float) -> Dict[str, float]:
         """逆伝播を実行
@@ -861,6 +887,7 @@ class BackwardPass:
 
         return gradient_map
 
+    # PURPOSE: ネストされたステップをフラット化
     @staticmethod
     def _flatten(steps: List[StepResult]) -> List[StepResult]:
         """ネストされたステップをフラット化"""
@@ -889,6 +916,7 @@ class MacroExecutor:
         executor = MacroExecutor(step_handler=my_llm_handler)
     """
 
+    # PURPOSE: Initialize instance
     def __init__(
         self,
         step_handler: Optional[Callable] = None,
@@ -899,6 +927,7 @@ class MacroExecutor:
             entropy_estimator=estimator,
         )
 
+    # PURPOSE: CCL 式 (マクロ含む) を実行
     def execute(self, ccl: str, context: str = "") -> ExecutionResult:
         """CCL 式 (マクロ含む) を実行
 
@@ -958,6 +987,7 @@ class MacroExecutor:
             gradient_map=gradient_map,
         )
 
+    # PURPOSE: 実行 + 確信度が低ければボトルネックを再実行
     def execute_and_retry(
         self,
         ccl: str,
@@ -993,11 +1023,13 @@ class MacroExecutor:
 # Convenience Functions
 # =============================================================================
 
+# PURPOSE: マクロを実行 (便利関数)
 def execute_macro(ccl: str, context: str = "") -> ExecutionResult:
     """マクロを実行 (便利関数)"""
     return MacroExecutor().execute(ccl, context)
 
 
+# PURPOSE: マクロを実行し、人間可読な説明を返す
 def execute_and_explain(ccl: str, context: str = "") -> str:
     """マクロを実行し、人間可読な説明を返す"""
     result = execute_macro(ccl, context)

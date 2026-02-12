@@ -22,6 +22,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 
+# PURPOSE: AST をインデント付きで木構造表示
 def format_ast_tree(node, indent=0) -> str:
     """AST をインデント付きで木構造表示"""
     from hermeneus.src.ccl_ast import (
@@ -77,6 +78,7 @@ def format_ast_tree(node, indent=0) -> str:
     return "\n".join(lines)
 
 
+# PURPOSE: AST から全ワークフロー ID を再帰的に抽出
 def extract_workflows(node) -> list:
     """AST から全ワークフロー ID を再帰的に抽出"""
     from hermeneus.src.ccl_ast import (
@@ -102,6 +104,7 @@ def extract_workflows(node) -> list:
     return wfs
 
 
+# PURPOSE: WF ID → .agent/workflows/*.md の絶対パスに解決。
 def resolve_wf_paths(wf_ids: list[str]) -> dict[str, str]:
     """WF ID → .agent/workflows/*.md の絶対パスに解決。
 
@@ -129,6 +132,7 @@ def resolve_wf_paths(wf_ids: list[str]) -> dict[str, str]:
     return paths
 
 
+# PURPOSE: WF 定義ファイルからサブモジュールのパスを抽出。
 def resolve_submodules(wf_paths: dict[str, str]) -> dict[str, list[str]]:
     """WF 定義ファイルからサブモジュールのパスを抽出。
 
@@ -175,6 +179,7 @@ def resolve_submodules(wf_paths: dict[str, str]) -> dict[str, list[str]]:
     return submodules
 
 
+# PURPOSE: CCL 式をディスパッチ: パース → 構造表示 → 実行計画テンプレート
 def dispatch(ccl_expr: str) -> dict:
     """CCL 式をディスパッチ: パース → 構造表示 → 実行計画テンプレート
 
@@ -305,6 +310,7 @@ def dispatch(ccl_expr: str) -> dict:
     return result
 
 
+# PURPOSE: CLI エントリポイント
 def main():
     """CLI エントリポイント"""
     if len(sys.argv) < 2:

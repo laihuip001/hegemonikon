@@ -58,11 +58,13 @@ class AuditStore:
     
     DEFAULT_PATH = Path.home() / ".hermeneus" / "audit" / "audit.db"
     
+    # PURPOSE: Initialize instance
     def __init__(self, db_path: Optional[Path] = None):
         self.db_path = db_path or self.DEFAULT_PATH
         self.db_path.parent.mkdir(parents=True, exist_ok=True)
         self._init_db()
     
+    # PURPOSE: データベースを初期化
     def _init_db(self):
         """データベースを初期化"""
         with self._connect() as conn:
@@ -89,6 +91,7 @@ class AuditStore:
             """)
             conn.commit()
     
+    # PURPOSE: データベース接続を取得
     @contextmanager
     def _connect(self):
         """データベース接続を取得"""
@@ -99,11 +102,13 @@ class AuditStore:
         finally:
             conn.close()
     
+    # PURPOSE: 一意の ID を生成
     def _generate_id(self) -> str:
         """一意の ID を生成"""
         import uuid
         return f"audit_{uuid.uuid4().hex[:12]}"
     
+    # PURPOSE: 監査レコードを記録
     def record(self, audit: AuditRecord) -> str:
         """監査レコードを記録"""
         if not audit.record_id:
@@ -130,6 +135,7 @@ class AuditStore:
         
         return audit.record_id
     
+    # PURPOSE: レコードを取得
     def get(self, record_id: str) -> Optional[AuditRecord]:
         """レコードを取得"""
         with self._connect() as conn:
@@ -142,6 +148,7 @@ class AuditStore:
                 return self._row_to_record(row)
             return None
     
+    # PURPOSE: レコードをクエリ
     def query(
         self,
         ccl_pattern: Optional[str] = None,
@@ -192,6 +199,7 @@ class AuditStore:
             
             return [self._row_to_record(row) for row in rows]
     
+    # PURPOSE: 統計を取得
     def get_stats(
         self,
         since: Optional[datetime] = None,
@@ -235,12 +243,14 @@ class AuditStore:
                 period_end=until
             )
     
+    # PURPOSE: レコードを削除
     def delete(self, record_id: str):
         """レコードを削除"""
         with self._connect() as conn:
             conn.execute("DELETE FROM audits WHERE record_id = ?", (record_id,))
             conn.commit()
     
+    # PURPOSE: 指定日時より前のレコードを削除
     def clear_before(self, before: datetime):
         """指定日時より前のレコードを削除"""
         with self._connect() as conn:
@@ -250,6 +260,7 @@ class AuditStore:
             )
             conn.commit()
     
+    # PURPOSE: 行をレコードに変換
     def _row_to_record(self, row) -> AuditRecord:
         """行をレコードに変換"""
         return AuditRecord(
@@ -272,9 +283,11 @@ class AuditStore:
 class AuditReporter:
     """監査レポート生成器"""
     
+    # PURPOSE: Initialize instance
     def __init__(self, store: AuditStore):
         self.store = store
     
+    # PURPOSE: サマリーレポートを生成
     def generate_summary(
         self,
         period: str = "last_7_days"
@@ -305,6 +318,7 @@ class AuditReporter:
 """
         return report.strip()
     
+    # PURPOSE: 詳細レポートを生成
     def generate_detail(
         self,
         limit: int = 10,
@@ -336,6 +350,7 @@ class AuditReporter:
         
         return "\n".join(lines)
     
+    # PURPOSE: 期間文字列をパース
     def _parse_period(self, period: str) -> datetime:
         """期間文字列をパース"""
         now = datetime.now()
@@ -358,6 +373,7 @@ class AuditReporter:
 # Integration with Verifier
 # =============================================================================
 
+# PURPOSE: 検証結果を記録 (便利関数)
 def record_verification(
     ccl: str,
     execution_result: str,
@@ -394,6 +410,7 @@ def record_verification(
     return store.record(record)
 
 
+# PURPOSE: 監査レコードをクエリ (便利関数)
 def query_audits(
     ccl_pattern: Optional[str] = None,
     min_confidence: Optional[float] = None,
@@ -414,6 +431,7 @@ def query_audits(
     )
 
 
+# PURPOSE: 監査レポートを取得 (便利関数)
 def get_audit_report(
     period: str = "last_7_days",
     db_path: Optional[Path] = None

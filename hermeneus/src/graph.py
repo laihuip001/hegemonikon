@@ -73,12 +73,14 @@ class CCLGraphBuilder:
     シンプルなステートマシン実装を使用。
     """
     
+    # PURPOSE: Initialize instance
     def __init__(self):
         self._langgraph_available = self._check_langgraph()
         self.nodes: Dict[str, GraphNode] = {}
         self.edges: List[GraphEdge] = []
         self._node_counter = 0
     
+    # PURPOSE: LangGraph がインストールされているか確認
     def _check_langgraph(self) -> bool:
         """LangGraph がインストールされているか確認"""
         try:
@@ -87,6 +89,7 @@ class CCLGraphBuilder:
         except ImportError:
             return False
     
+    # PURPOSE: AST からグラフを構築
     def build(self, ast: Any) -> "CompiledGraph":
         """AST からグラフを構築"""
         # 遅延インポート
@@ -103,11 +106,13 @@ class CCLGraphBuilder:
         else:
             return self._compile_fallback(entry_node)
     
+    # PURPOSE: 新しいノード ID を生成
     def _new_node_id(self, prefix: str = "node") -> str:
         """新しいノード ID を生成"""
         self._node_counter += 1
         return f"{prefix}_{self._node_counter}"
     
+    # PURPOSE: AST ノードからグラフノードを構築
     def _build_node(self, ast: Any) -> str:
         """AST ノードからグラフノードを構築"""
         from .ccl_ast import (
@@ -134,6 +139,7 @@ class CCLGraphBuilder:
         else:
             raise ValueError(f"Unknown AST type: {type(ast)}")
     
+    # PURPOSE: Workflow ノードを構築
     def _build_workflow(self, wf: Any) -> str:
         """Workflow ノードを構築"""
         node_id = self._new_node_id(f"wf_{wf.id}")
@@ -145,6 +151,7 @@ class CCLGraphBuilder:
         )
         return node_id
     
+    # PURPOSE: Sequence を直列エッジで構築
     def _build_sequence(self, seq: Any) -> str:
         """Sequence を直列エッジで構築"""
         if not seq.steps:
@@ -164,6 +171,7 @@ class CCLGraphBuilder:
         # 最初のノード ID を返す (エントリーポイント)
         return step_ids[0]
     
+    # PURPOSE: ConvergenceLoop を条件付きサイクルで構築
     def _build_convergence(self, conv: Any) -> str:
         """ConvergenceLoop を条件付きサイクルで構築"""
         # 本体ノード
@@ -189,6 +197,7 @@ class CCLGraphBuilder:
         self.edges.append(GraphEdge(source=body_id, target=check_id))
         
         # 条件付きエッジ: check → end (収束) or check → body (継続)
+        # PURPOSE: Check converged
         def check_converged(state: CCLState) -> bool:
             uncertainty = state.get("uncertainty", 1.0)
             op = conv.condition.op
@@ -221,6 +230,7 @@ class CCLGraphBuilder:
         
         return body_id
     
+    # PURPOSE: Fusion を並列ノードで構築
     def _build_fusion(self, fusion: Any) -> str:
         """Fusion を並列ノードで構築"""
         node_id = self._new_node_id("fusion")
@@ -236,6 +246,7 @@ class CCLGraphBuilder:
         
         return node_id
     
+    # PURPOSE: Oscillation を双方向サイクルで構築
     def _build_oscillation(self, osc: Any) -> str:
         """Oscillation を双方向サイクルで構築"""
         left_id = self._build_node(osc.left)
@@ -247,6 +258,7 @@ class CCLGraphBuilder:
         
         return left_id
     
+    # PURPOSE: ForLoop を反復構造で構築
     def _build_for_loop(self, for_loop: Any) -> str:
         """ForLoop を反復構造で構築"""
         body_id = self._build_node(for_loop.body)
@@ -261,6 +273,7 @@ class CCLGraphBuilder:
         
         return node_id
     
+    # PURPOSE: IfCondition を分岐で構築
     def _build_if_condition(self, if_cond: Any) -> str:
         """IfCondition を分岐で構築"""
         then_id = self._build_node(if_cond.then_branch)
@@ -286,6 +299,7 @@ class CCLGraphBuilder:
         
         return node_id
     
+    # PURPOSE: WhileLoop を条件付きループで構築
     def _build_while_loop(self, while_loop: Any) -> str:
         """WhileLoop を条件付きループで構築"""
         body_id = self._build_node(while_loop.body)
@@ -306,6 +320,7 @@ class CCLGraphBuilder:
         
         return node_id
     
+    # PURPOSE: LangGraph を使用してコンパイル
     def _compile_with_langgraph(self, entry_node: str) -> "CompiledGraph":
         """LangGraph を使用してコンパイル"""
         from langgraph.graph import StateGraph, END
@@ -346,12 +361,15 @@ class CCLGraphBuilder:
         
         return CompiledGraph(graph.compile(), entry_node, self.nodes, self.edges)
     
+    # PURPOSE: フォールバック: シンプルなステートマシン
     def _compile_fallback(self, entry_node: str) -> "CompiledGraph":
         """フォールバック: シンプルなステートマシン"""
         return CompiledGraph(None, entry_node, self.nodes, self.edges)
     
+    # PURPOSE: ワークフロー実行関数を作成
     def _create_workflow_executor(self, node: GraphNode) -> Callable:
         """ワークフロー実行関数を作成"""
+        # PURPOSE: Execute
         def execute(state: CCLState) -> CCLState:
             from .runtime import execute_ccl
             
@@ -369,8 +387,10 @@ class CCLGraphBuilder:
             }
         return execute
     
+    # PURPOSE: 収束チェック関数を作成
     def _create_convergence_checker(self, node: GraphNode) -> Callable:
         """収束チェック関数を作成"""
+        # PURPOSE: Check
         def check(state: CCLState) -> CCLState:
             uncertainty = state.get("uncertainty", 1.0)
             iteration = state.get("iteration", 0)
@@ -391,8 +411,10 @@ class CCLGraphBuilder:
             }
         return check
     
+    # PURPOSE: 汎用実行関数を作成
     def _create_generic_executor(self, node: GraphNode) -> Callable:
         """汎用実行関数を作成"""
+        # PURPOSE: Execute
         def execute(state: CCLState) -> CCLState:
             return {"current_node": node.id}
         return execute
@@ -410,6 +432,7 @@ class CompiledGraph:
     nodes: Dict[str, GraphNode]
     edges: List[GraphEdge]
     
+    # PURPOSE: グラフを実行
     def invoke(
         self,
         context: str,
@@ -435,6 +458,7 @@ class CompiledGraph:
         else:
             return self._fallback_execute(initial_state)
     
+    # PURPOSE: フォールバック実行
     def _fallback_execute(self, state: CCLState) -> CCLState:
         """フォールバック実行"""
         from .runtime import execute_ccl
@@ -483,6 +507,7 @@ class CompiledGraph:
 # Convenience Functions
 # =============================================================================
 
+# PURPOSE: CCL 式からグラフを構築
 def build_graph(ccl: str, macros: Optional[Dict[str, str]] = None) -> CompiledGraph:
     """CCL 式からグラフを構築
     
@@ -512,6 +537,7 @@ def build_graph(ccl: str, macros: Optional[Dict[str, str]] = None) -> CompiledGr
     return builder.build(ast)
 
 
+# PURPOSE: グラフを実行
 def execute_graph(
     graph: CompiledGraph,
     context: str,

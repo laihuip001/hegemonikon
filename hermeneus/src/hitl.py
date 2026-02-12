@@ -76,17 +76,20 @@ class HITLController:
     ワークフロー実行中に人間の介入を可能にする。
     """
     
+    # PURPOSE: Initialize instance
     def __init__(self):
         self._interrupt_points: Dict[str, List[InterruptPoint]] = {}
         self._pending_requests: Dict[str, HITLRequest] = {}
         self._callbacks: Dict[str, Callable[[HITLRequest], HITLResponse]] = {}
         self._request_counter = 0
     
+    # PURPOSE: リクエスト ID を生成
     def _generate_request_id(self) -> str:
         """リクエスト ID を生成"""
         self._request_counter += 1
         return f"hitl_{self._request_counter:06d}"
     
+    # PURPOSE: 割り込みポイントを登録
     def register_interrupt(
         self,
         node_id: str,
@@ -105,6 +108,7 @@ class HITLController:
             condition=condition
         ))
     
+    # PURPOSE: コールバックを登録
     def register_callback(
         self,
         name: str,
@@ -113,6 +117,7 @@ class HITLController:
         """コールバックを登録"""
         self._callbacks[name] = callback
     
+    # PURPOSE: 割り込みが必要かチェック
     def should_interrupt(
         self,
         node_id: str,
@@ -135,6 +140,7 @@ class HITLController:
         
         return None
     
+    # PURPOSE: HITL リクエストを作成
     def create_request(
         self,
         thread_id: str,
@@ -154,10 +160,12 @@ class HITLController:
         self._pending_requests[request.request_id] = request
         return request
     
+    # PURPOSE: 保留中のリクエストを取得
     def get_pending_request(self, request_id: str) -> Optional[HITLRequest]:
         """保留中のリクエストを取得"""
         return self._pending_requests.get(request_id)
     
+    # PURPOSE: 保留中のリクエストをリスト
     def list_pending_requests(self, thread_id: Optional[str] = None) -> List[HITLRequest]:
         """保留中のリクエストをリスト"""
         requests = list(self._pending_requests.values())
@@ -165,6 +173,7 @@ class HITLController:
             requests = [r for r in requests if r.thread_id == thread_id]
         return sorted(requests, key=lambda r: r.created_at)
     
+    # PURPOSE: リクエストに応答
     def respond(
         self,
         request_id: str,
@@ -188,6 +197,7 @@ class HITLController:
         
         return response
     
+    # PURPOSE: レスポンスを状態に適用
     def apply_response(
         self,
         response: HITLResponse,
@@ -206,6 +216,7 @@ class HITLController:
         
         return new_state
     
+    # PURPOSE: 応答を待機 (同期)
     def wait_for_response(
         self,
         request: HITLRequest,
@@ -219,6 +230,7 @@ class HITLController:
         # デフォルト: 標準入力から読み取り
         return self._default_prompt(request)
     
+    # PURPOSE: デフォルトのコンソールプロンプト
     def _default_prompt(self, request: HITLRequest) -> HITLResponse:
         """デフォルトのコンソールプロンプト"""
         print(f"\n{'='*60}")
@@ -255,6 +267,7 @@ class HITLController:
 # Decorator for HITL
 # =============================================================================
 
+# PURPOSE: HITL 承認を要求するデコレータ
 def requires_approval(
     reason: str = "承認が必要です",
     before: bool = True,
@@ -262,6 +275,7 @@ def requires_approval(
     condition: Optional[Callable[[Dict[str, Any]], bool]] = None
 ):
     """HITL 承認を要求するデコレータ"""
+    # PURPOSE: Decorator
     def decorator(func: Callable) -> Callable:
         func._hitl_config = {
             "reason": reason,
@@ -277,11 +291,13 @@ def requires_approval(
 # Convenience Functions
 # =============================================================================
 
+# PURPOSE: HITL コントローラーを作成
 def create_hitl_controller() -> HITLController:
     """HITL コントローラーを作成"""
     return HITLController()
 
 
+# PURPOSE: 高リスクノードを一括登録
 def register_high_risk_nodes(
     controller: HITLController,
     node_ids: List[str],

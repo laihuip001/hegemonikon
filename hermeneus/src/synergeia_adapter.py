@@ -58,6 +58,7 @@ class ThreadResult:
     started_at: Optional[datetime] = None
     completed_at: Optional[datetime] = None
     
+    # PURPOSE: 辞書に変換
     def to_dict(self) -> Dict[str, Any]:
         """辞書に変換"""
         return {
@@ -96,9 +97,11 @@ class SynergeiaAdapter:
         result = await adapter.execute_thread(thread_config)
     """
     
+    # PURPOSE: Initialize instance
     def __init__(self, executor: Optional["WorkflowExecutor"] = None):
         self._executor = executor
     
+    # PURPOSE: エグゼキューターを取得 (遅延初期化)
     @property
     def executor(self):
         """エグゼキューターを取得 (遅延初期化)"""
@@ -107,6 +110,7 @@ class SynergeiaAdapter:
             self._executor = WorkflowExecutor()
         return self._executor
     
+    # PURPOSE: 単一スレッドを実行
     async def execute_thread(
         self,
         config: ThreadConfig
@@ -165,6 +169,7 @@ class SynergeiaAdapter:
                 completed_at=datetime.now()
             )
     
+    # PURPOSE: 実行プランを実行
     async def execute_plan(
         self,
         plan: ExecutionPlan
@@ -189,6 +194,7 @@ class SynergeiaAdapter:
                 plan.total_timeout_seconds
             )
     
+    # PURPOSE: 並列実行
     async def _execute_parallel(
         self,
         threads: List[ThreadConfig],
@@ -198,6 +204,7 @@ class SynergeiaAdapter:
         """並列実行"""
         semaphore = asyncio.Semaphore(max_concurrent)
         
+        # PURPOSE: Execute with semaphore
         async def execute_with_semaphore(config):
             async with semaphore:
                 return await self.execute_thread(config)
@@ -237,6 +244,7 @@ class SynergeiaAdapter:
                 for t in threads
             ]
     
+    # PURPOSE: 順次実行
     async def _execute_sequential(
         self,
         threads: List[ThreadConfig],
@@ -270,6 +278,7 @@ class SynergeiaAdapter:
         
         return results
     
+    # PURPOSE: Synergeia 形式に変換
     def to_synergeia_format(
         self,
         results: List[ThreadResult]
@@ -293,6 +302,7 @@ class SynergeiaAdapter:
             "summary": self._generate_summary(results)
         }
     
+    # PURPOSE: サマリーを生成
     def _generate_summary(self, results: List[ThreadResult]) -> str:
         """サマリーを生成"""
         completed = [r for r in results if r.status == ThreadStatus.COMPLETED]
@@ -320,12 +330,14 @@ class SynergeiaAdapter:
 class PlanBuilder:
     """実行プラン構築器"""
     
+    # PURPOSE: Initialize instance
     def __init__(self):
         self.threads: List[ThreadConfig] = []
         self.parallel = True
         self.max_concurrent = 5
         self.timeout = 600
     
+    # PURPOSE: スレッドを追加
     def add_thread(
         self,
         name: str,
@@ -342,21 +354,25 @@ class PlanBuilder:
         ))
         return self
     
+    # PURPOSE: 並列実行を設定
     def set_parallel(self, parallel: bool) -> "PlanBuilder":
         """並列実行を設定"""
         self.parallel = parallel
         return self
     
+    # PURPOSE: 最大並列数を設定
     def set_concurrency(self, max_concurrent: int) -> "PlanBuilder":
         """最大並列数を設定"""
         self.max_concurrent = max_concurrent
         return self
     
+    # PURPOSE: タイムアウトを設定
     def set_timeout(self, seconds: int) -> "PlanBuilder":
         """タイムアウトを設定"""
         self.timeout = seconds
         return self
     
+    # PURPOSE: プランを構築
     def build(self) -> ExecutionPlan:
         """プランを構築"""
         return ExecutionPlan(
@@ -374,6 +390,7 @@ class PlanBuilder:
 _default_adapter: Optional[SynergeiaAdapter] = None
 
 
+# PURPOSE: デフォルトアダプターを取得
 def get_adapter() -> SynergeiaAdapter:
     """デフォルトアダプターを取得"""
     global _default_adapter
@@ -382,6 +399,7 @@ def get_adapter() -> SynergeiaAdapter:
     return _default_adapter
 
 
+# PURPOSE: Synergeia スレッドを実行 (便利関数)
 async def execute_synergeia_thread(
     name: str,
     ccl: str,
@@ -398,6 +416,7 @@ async def execute_synergeia_thread(
     return await get_adapter().execute_thread(config)
 
 
+# PURPOSE: プランビルダーを作成 (便利関数)
 def create_plan() -> PlanBuilder:
     """プランビルダーを作成 (便利関数)"""
     return PlanBuilder()

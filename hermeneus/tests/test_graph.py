@@ -23,6 +23,7 @@ from hermeneus.src.parser import parse_ccl
 class TestCCLState:
     """CCLState のテスト"""
     
+    # PURPOSE: 状態作成
     def test_state_creation(self):
         """状態作成"""
         state: CCLState = {
@@ -38,6 +39,7 @@ class TestCCLState:
 class TestGraphNode:
     """GraphNode のテスト"""
     
+    # PURPOSE: ワークフローノード
     def test_workflow_node(self):
         """ワークフローノード"""
         node = GraphNode(
@@ -48,6 +50,7 @@ class TestGraphNode:
         assert node.type == NodeType.WORKFLOW
         assert node.workflow_id == "noe"
     
+    # PURPOSE: 収束チェックノード
     def test_convergence_check_node(self):
         """収束チェックノード"""
         node = GraphNode(
@@ -62,6 +65,7 @@ class TestGraphNode:
 class TestCCLGraphBuilder:
     """CCLGraphBuilder のテスト"""
     
+    # PURPOSE: 単純なワークフローからグラフ構築
     def test_build_simple_workflow(self):
         """単純なワークフローからグラフ構築"""
         ast = parse_ccl("/noe+")
@@ -71,6 +75,7 @@ class TestCCLGraphBuilder:
         assert isinstance(graph, CompiledGraph)
         assert len(graph.nodes) >= 1
     
+    # PURPOSE: シーケンスからグラフ構築
     def test_build_sequence(self):
         """シーケンスからグラフ構築"""
         ast = parse_ccl("/s+_/ene")
@@ -81,6 +86,7 @@ class TestCCLGraphBuilder:
         assert len(graph.nodes) >= 2
         assert len(graph.edges) >= 1
     
+    # PURPOSE: 収束ループからグラフ構築
     def test_build_convergence(self):
         """収束ループからグラフ構築"""
         ast = parse_ccl("/noe+ >> V[] < 0.3")
@@ -96,6 +102,7 @@ class TestCCLGraphBuilder:
 class TestMemoryCheckpointer:
     """MemoryCheckpointer のテスト"""
     
+    # PURPOSE: 保存と取得
     def test_put_and_get(self):
         """保存と取得"""
         cp = MemoryCheckpointer()
@@ -113,6 +120,7 @@ class TestMemoryCheckpointer:
         assert retrieved is not None
         assert retrieved.state["context"] == "test"
     
+    # PURPOSE: 履歴取得
     def test_list_checkpoints(self):
         """履歴取得"""
         cp = MemoryCheckpointer()
@@ -126,6 +134,7 @@ class TestMemoryCheckpointer:
         history = cp.list("test-002")
         assert len(history) == 3
     
+    # PURPOSE: 削除
     def test_delete(self):
         """削除"""
         cp = MemoryCheckpointer()
@@ -144,6 +153,7 @@ class TestMemoryCheckpointer:
 class TestHITLController:
     """HITLController のテスト"""
     
+    # PURPOSE: 割り込み登録
     def test_register_interrupt(self):
         """割り込み登録"""
         controller = HITLController()
@@ -163,6 +173,7 @@ class TestHITLController:
         assert point is not None
         assert point.reason == "高リスク操作"
     
+    # PURPOSE: 未登録ノードは割り込まない
     def test_should_not_interrupt_unregistered(self):
         """未登録ノードは割り込まない"""
         controller = HITLController()
@@ -175,6 +186,7 @@ class TestHITLController:
         
         assert point is None
     
+    # PURPOSE: リクエスト作成と応答
     def test_create_and_respond(self):
         """リクエスト作成と応答"""
         controller = HITLController()
@@ -199,6 +211,7 @@ class TestHITLController:
         assert response.command == HITLCommand.PROCEED
         assert len(controller.list_pending_requests()) == 0
     
+    # PURPOSE: 状態修正の適用
     def test_apply_response_with_modifications(self):
         """状態修正の適用"""
         controller = HITLController()
@@ -219,6 +232,7 @@ class TestHITLController:
 class TestBuildGraph:
     """build_graph 関数のテスト"""
     
+    # PURPOSE: CCL 文字列からグラフ構築
     def test_build_from_ccl_string(self):
         """CCL 文字列からグラフ構築"""
         graph = build_graph("/noe+")
@@ -226,6 +240,7 @@ class TestBuildGraph:
         assert isinstance(graph, CompiledGraph)
         assert graph.entry_node is not None
     
+    # PURPOSE: 複雑な CCL からグラフ構築
     def test_build_complex_graph(self):
         """複雑な CCL からグラフ構築"""
         graph = build_graph("/s+_/bou_/ene")

@@ -33,6 +33,7 @@ from mekhane.synteleia.base import AuditTarget, AuditTargetType
 class TestSynteleiaOrchestrator:
     """SynteleiaOrchestrator の基本機能テスト"""
 
+    # PURPOSE: デフォルトエージェント構成
     def test_init_default_agents(self):
         """デフォルトエージェント構成"""
         orch = SynteleiaOrchestrator()
@@ -46,6 +47,7 @@ class TestSynteleiaOrchestrator:
         # 合計 8 エージェント
         assert len(orch.agents) == 8
 
+    # PURPOSE: シンプルなコード監査
     def test_audit_simple_code(self):
         """シンプルなコード監査"""
         orch = SynteleiaOrchestrator()
@@ -61,6 +63,7 @@ class TestSynteleiaOrchestrator:
         assert hasattr(result, "summary")
         assert hasattr(result, "agent_results")
 
+    # PURPOSE: 計画ドキュメント監査
     def test_audit_plan_document(self):
         """計画ドキュメント監査"""
         orch = SynteleiaOrchestrator()
@@ -74,6 +77,7 @@ class TestSynteleiaOrchestrator:
         # 並列実行時、supports() でフィルタリングされるため結果数は変動
         assert len(result.agent_results) >= 7  # 最低7エージェント
 
+    # PURPOSE: レポートフォーマット
     def test_format_report(self):
         """レポートフォーマット"""
         orch = SynteleiaOrchestrator()
@@ -95,6 +99,7 @@ class TestSynteleiaOrchestrator:
 class TestSynMacroParsing:
     """@syn マクロのパーサー認識テスト"""
 
+    # PURPOSE: @syn· (内積) パース
     def test_parse_syn_inner(self):
         """@syn· (内積) パース"""
         from hermeneus.src.parser import CCLParser
@@ -107,6 +112,7 @@ class TestSynMacroParsing:
         assert ast.__class__.__name__ == "MacroRef"
         assert ast.name == "syn·"
 
+    # PURPOSE: @syn× (外積) パース
     def test_parse_syn_outer(self):
         """@syn× (外積) パース"""
         from hermeneus.src.parser import CCLParser
@@ -118,6 +124,7 @@ class TestSynMacroParsing:
         assert ast.__class__.__name__ == "MacroRef"
         assert ast.name == "syn×"
 
+    # PURPOSE: @poiesis パース
     def test_parse_poiesis(self):
         """@poiesis パース"""
         from hermeneus.src.parser import CCLParser
@@ -129,6 +136,7 @@ class TestSynMacroParsing:
         assert ast.__class__.__name__ == "MacroRef"
         assert ast.name == "poiesis"
 
+    # PURPOSE: @dokimasia パース
     def test_parse_dokimasia(self):
         """@dokimasia パース"""
         from hermeneus.src.parser import CCLParser
@@ -140,6 +148,7 @@ class TestSynMacroParsing:
         assert ast.__class__.__name__ == "MacroRef"
         assert ast.name == "dokimasia"
 
+    # PURPOSE: @S{O,A,K} セレクタ付きパース
     def test_parse_syn_with_selector(self):
         """@S{O,A,K} セレクタ付きパース"""
         from hermeneus.src.parser import CCLParser
@@ -152,6 +161,7 @@ class TestSynMacroParsing:
         assert ast.name == "S"
         assert ast.args == ["O,A,K"]  # セレクタは引数として認識
 
+    # PURPOSE: @S- (最小選択) パース
     def test_parse_syn_minimal(self):
         """@S- (最小選択) パース"""
         from hermeneus.src.parser import CCLParser
@@ -170,6 +180,7 @@ class TestSynMacroParsing:
 class TestHermeneusIntegration:
     """Hermeneus → Synteleia 統合テスト"""
 
+    # PURPOSE: @syn マクロ実行 → SynteleiaOrchestrator 呼び出し
     def test_syn_macro_execution(self):
         """@syn マクロ実行 → SynteleiaOrchestrator 呼び出し"""
         from hermeneus.src import compile_ccl
@@ -182,6 +193,7 @@ class TestHermeneusIntegration:
         # 期待: Synteleia 関連のコードが生成される
         assert "synteleia" in lmql.lower() or "audit" in lmql.lower()
 
+    # PURPOSE: Synteleia 付き CCL 実行
     def test_execute_with_synteleia(self):
         """Synteleia 付き CCL 実行"""
         from hermeneus.src.runtime import execute_ccl
@@ -196,6 +208,7 @@ class TestHermeneusIntegration:
         assert result is not None
         assert hasattr(result, "output")
 
+    # PURPOSE: @poiesis のみ実行（生成層）
     def test_poiesis_only_execution(self):
         """@poiesis のみ実行（生成層）"""
         from hermeneus.src.runtime import execute_ccl
@@ -208,6 +221,7 @@ class TestHermeneusIntegration:
         # 結果が返る（具体的内容は実装依存）
         assert result is not None
 
+    # PURPOSE: @dokimasia のみ実行（審査層）
     def test_dokimasia_only_execution(self):
         """@dokimasia のみ実行（審査層）"""
         from hermeneus.src.runtime import execute_ccl
@@ -227,6 +241,7 @@ class TestHermeneusIntegration:
 class TestEdgeCases:
     """エッジケースと境界条件"""
 
+    # PURPOSE: 空コンテンツ監査
     def test_empty_content_audit(self):
         """空コンテンツ監査"""
         orch = SynteleiaOrchestrator()
@@ -239,6 +254,7 @@ class TestEdgeCases:
         # 空でもエラーにならない
         assert result is not None
 
+    # PURPOSE: 大規模コンテンツ監査
     def test_large_content_audit(self):
         """大規模コンテンツ監査"""
         orch = SynteleiaOrchestrator()
@@ -251,6 +267,7 @@ class TestEdgeCases:
         
         assert result is not None
 
+    # PURPOSE: 逐次 vs 並列実行の結果一致
     def test_sequential_vs_parallel(self):
         """逐次 vs 並列実行の結果一致"""
         target = AuditTarget(

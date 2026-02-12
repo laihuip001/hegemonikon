@@ -20,6 +20,7 @@ from hermeneus.src.prover import ProofType, ProofStatus, ProofResult, MypyProver
 class TestProofType:
     """ProofType のテスト"""
     
+    # PURPOSE: タイプ列挙
     def test_types(self):
         """タイプ列挙"""
         assert ProofType.TYPE.value == "type"
@@ -30,6 +31,7 @@ class TestProofType:
 class TestProofStatus:
     """ProofStatus のテスト"""
     
+    # PURPOSE: ステータス列挙
     def test_statuses(self):
         """ステータス列挙"""
         assert ProofStatus.VERIFIED.value == "verified"
@@ -40,6 +42,7 @@ class TestProofStatus:
 class TestProofResult:
     """ProofResult のテスト"""
     
+    # PURPOSE: 結果作成
     def test_create_result(self):
         """結果作成"""
         result = ProofResult(
@@ -55,11 +58,13 @@ class TestProofResult:
 class TestMypyProver:
     """MypyProver のテスト"""
     
+    # PURPOSE: Prover 作成
     def test_create_prover(self):
         """Prover 作成"""
         prover = MypyProver()
         assert prover.proof_type == ProofType.TYPE
     
+    # PURPOSE: 有効なコードの検証
     def test_verify_valid_code(self):
         """有効なコードの検証"""
         prover = MypyProver(strict=False)
@@ -75,6 +80,7 @@ def add(x: int, y: int) -> int:
         assert result.verified is True
         assert result.proof_type == ProofType.TYPE
     
+    # PURPOSE: 無効なコードの検証
     def test_verify_invalid_code(self):
         """無効なコードの検証"""
         prover = MypyProver(strict=True)
@@ -94,11 +100,13 @@ def add(x: int, y: int) -> int:
 class TestSchemaProver:
     """SchemaProver のテスト"""
     
+    # PURPOSE: Prover 作成
     def test_create_prover(self):
         """Prover 作成"""
         prover = SchemaProver()
         assert prover.proof_type == ProofType.SCHEMA
     
+    # PURPOSE: 有効な JSON の検証
     def test_verify_valid_json(self):
         """有効な JSON の検証"""
         prover = SchemaProver()
@@ -117,6 +125,7 @@ class TestSchemaProver:
         
         assert result.verified is True
     
+    # PURPOSE: 無効な JSON の検証
     def test_verify_invalid_json(self):
         """無効な JSON の検証"""
         prover = SchemaProver()
@@ -126,6 +135,7 @@ class TestSchemaProver:
         assert result.verified is False
         assert "Invalid JSON" in result.details
     
+    # PURPOSE: 必須フィールド欠落
     def test_verify_missing_required(self):
         """必須フィールド欠落"""
         prover = SchemaProver()
@@ -146,11 +156,13 @@ class TestSchemaProver:
 class TestLean4Prover:
     """Lean4Prover のテスト"""
     
+    # PURPOSE: Prover 作成
     def test_create_prover(self):
         """Prover 作成"""
         prover = Lean4Prover()
         assert prover.proof_type == ProofType.FORMAL
     
+    # PURPOSE: Lean4 が利用不可の場合
     def test_not_available(self):
         """Lean4 が利用不可の場合"""
         prover = Lean4Prover(lean_path=Path("/nonexistent/lean"))
@@ -163,12 +175,14 @@ class TestLean4Prover:
 class TestProofCache:
     """ProofCache のテスト"""
     
+    # PURPOSE: 一時キャッシュ
     @pytest.fixture
     def temp_cache(self, tmp_path):
         """一時キャッシュ"""
         db_path = tmp_path / "test_proof.db"
         return ProofCache(db_path=db_path)
     
+    # PURPOSE: 保存と取得
     def test_put_and_get(self, temp_cache):
         """保存と取得"""
         code = "def test(): pass"
@@ -187,11 +201,13 @@ class TestProofCache:
         assert cached.verified is True
         assert cached.cached is True
     
+    # PURPOSE: キャッシュミス
     def test_cache_miss(self, temp_cache):
         """キャッシュミス"""
         cached = temp_cache.get("unknown code", ProofType.TYPE)
         assert cached is None
     
+    # PURPOSE: 無効化
     def test_invalidate(self, temp_cache):
         """無効化"""
         code = "def test(): pass"
@@ -211,6 +227,7 @@ class TestProofCache:
 class TestVerifyCode:
     """verify_code 関数のテスト"""
     
+    # PURPOSE: デフォルト Prover で検証
     def test_verify_with_default_prover(self):
         """デフォルト Prover で検証"""
         code = '''
@@ -226,6 +243,7 @@ def greet(name: str) -> str:
 class TestVerifySchema:
     """verify_schema 関数のテスト"""
     
+    # PURPOSE: 有効なスキーマで検証
     def test_verify_valid_schema(self):
         """有効なスキーマで検証"""
         data = json.dumps({"id": 1, "name": "test"})

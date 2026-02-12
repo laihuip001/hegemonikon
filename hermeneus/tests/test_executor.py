@@ -21,6 +21,7 @@ from hermeneus.src.synergeia_adapter import ThreadStatus, ThreadConfig, ThreadRe
 class TestWorkflowStage:
     """WorkflowStage のテスト"""
     
+    # PURPOSE: ステージ作成
     def test_create_stage(self):
         """ステージ作成"""
         stage = WorkflowStage(
@@ -35,6 +36,7 @@ class TestWorkflowStage:
 class TestWorkflowDefinition:
     """WorkflowDefinition のテスト"""
     
+    # PURPOSE: 定義作成
     def test_create_definition(self):
         """定義作成"""
         wf = WorkflowDefinition(
@@ -47,6 +49,7 @@ class TestWorkflowDefinition:
         assert wf.name == "noe"
         assert wf.ccl == "/noe+"
     
+    # PURPOSE: プロンプトテンプレート生成
     def test_get_prompt_template(self):
         """プロンプトテンプレート生成"""
         wf = WorkflowDefinition(
@@ -65,6 +68,7 @@ class TestWorkflowDefinition:
 class TestWorkflowParser:
     """WorkflowParser のテスト"""
     
+    # PURPOSE: シンプルなパース
     def test_parse_simple(self, tmp_path):
         """シンプルなパース"""
         content = """---
@@ -94,6 +98,7 @@ description: テストワークフロー
 class TestWorkflowRegistry:
     """WorkflowRegistry のテスト"""
     
+    # PURPOSE: 名前正規化
     def test_normalize_name(self):
         """名前正規化"""
         registry = WorkflowRegistry()
@@ -102,6 +107,7 @@ class TestWorkflowRegistry:
         assert registry._normalize_name("/bou-") == "bou"
         assert registry._normalize_name("ene") == "ene"
     
+    # PURPOSE: 存在しないワークフロー
     def test_get_nonexistent(self):
         """存在しないワークフロー"""
         registry = WorkflowRegistry(workflows_dir=Path("/nonexistent"))
@@ -112,6 +118,7 @@ class TestWorkflowRegistry:
 class TestExecutionPhase:
     """ExecutionPhase のテスト"""
     
+    # PURPOSE: フェーズ列挙
     def test_phases(self):
         """フェーズ列挙"""
         assert ExecutionPhase.INIT.value == "init"
@@ -124,6 +131,7 @@ class TestExecutionPhase:
 class TestPhaseResult:
     """PhaseResult のテスト"""
     
+    # PURPOSE: 結果作成
     def test_create_result(self):
         """結果作成"""
         result = PhaseResult(
@@ -139,6 +147,7 @@ class TestPhaseResult:
 class TestExecutionPipeline:
     """ExecutionPipeline のテスト"""
     
+    # PURPOSE: パイプライン作成
     def test_create_pipeline(self):
         """パイプライン作成"""
         pipeline = ExecutionPipeline(
@@ -150,6 +159,7 @@ class TestExecutionPipeline:
         assert pipeline.ccl == "/noe+"
         assert pipeline.success is True
     
+    # PURPOSE: 辞書変換
     def test_to_dict(self):
         """辞書変換"""
         pipeline = ExecutionPipeline(
@@ -170,12 +180,14 @@ class TestExecutionPipeline:
 class TestWorkflowExecutor:
     """WorkflowExecutor のテスト"""
     
+    # PURPOSE: エグゼキューター作成
     def test_create_executor(self):
         """エグゼキューター作成"""
         executor = WorkflowExecutor()
         assert executor.model == "openai/gpt-4o"
         assert executor.verify_by_default is True
     
+    # PURPOSE: ワークフロー名抽出
     def test_extract_workflow_name(self):
         """ワークフロー名抽出"""
         executor = WorkflowExecutor()
@@ -188,6 +200,7 @@ class TestWorkflowExecutor:
 class TestThreadStatus:
     """ThreadStatus のテスト"""
     
+    # PURPOSE: ステータス列挙
     def test_statuses(self):
         """ステータス列挙"""
         assert ThreadStatus.PENDING.value == "pending"
@@ -198,6 +211,7 @@ class TestThreadStatus:
 class TestThreadConfig:
     """ThreadConfig のテスト"""
     
+    # PURPOSE: 設定作成
     def test_create_config(self):
         """設定作成"""
         config = ThreadConfig(
@@ -213,6 +227,7 @@ class TestThreadConfig:
 class TestThreadResult:
     """ThreadResult のテスト"""
     
+    # PURPOSE: 結果作成
     def test_create_result(self):
         """結果作成"""
         result = ThreadResult(
@@ -224,6 +239,7 @@ class TestThreadResult:
         )
         assert result.status == ThreadStatus.COMPLETED
     
+    # PURPOSE: 辞書変換
     def test_to_dict(self):
         """辞書変換"""
         result = ThreadResult(
@@ -242,6 +258,7 @@ class TestThreadResult:
 class TestPlanBuilder:
     """PlanBuilder のテスト"""
     
+    # PURPOSE: プラン構築
     def test_build_plan(self):
         """プラン構築"""
         plan = (
@@ -263,11 +280,13 @@ class TestPlanBuilder:
 class TestSynergeiaAdapter:
     """SynergeiaAdapter のテスト"""
     
+    # PURPOSE: アダプター作成
     def test_create_adapter(self):
         """アダプター作成"""
         adapter = SynergeiaAdapter()
         assert adapter._executor is None  # 遅延初期化
     
+    # PURPOSE: サマリー生成
     def test_generate_summary(self):
         """サマリー生成"""
         adapter = SynergeiaAdapter()

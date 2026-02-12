@@ -21,6 +21,7 @@ from hermeneus.src.runtime import ExecutionStatus, ExecutionResult, ExecutionCon
 class TestExecutionConfig:
     """ExecutionConfig のテスト"""
     
+    # PURPOSE: デフォルト設定
     def test_default_config(self):
         """デフォルト設定"""
         config = ExecutionConfig()
@@ -28,6 +29,7 @@ class TestExecutionConfig:
         assert config.timeout == 300
         assert config.max_retries == 3
     
+    # PURPOSE: カスタム設定
     def test_custom_config(self):
         """カスタム設定"""
         config = ExecutionConfig(
@@ -42,17 +44,20 @@ class TestExecutionConfig:
 class TestLMQLExecutor:
     """LMQLExecutor のテスト"""
     
+    # PURPOSE: Executor 作成
     def test_executor_creation(self):
         """Executor 作成"""
         executor = LMQLExecutor()
         assert executor.config.model == "auto"
     
+    # PURPOSE: カスタム設定で Executor 作成
     def test_executor_with_config(self):
         """カスタム設定で Executor 作成"""
         config = ExecutionConfig(model="openai/gpt-3.5-turbo")
         executor = LMQLExecutor(config)
         assert executor.config.model == "openai/gpt-3.5-turbo"
     
+    # PURPOSE: LMQL からプロンプト抽出
     def test_extract_prompt_from_lmql(self):
         """LMQL からプロンプト抽出"""
         executor = LMQLExecutor()
@@ -71,6 +76,7 @@ def ccl_noe(context: str):
 class TestConvergenceExecutor:
     """ConvergenceExecutor のテスト"""
     
+    # PURPOSE: 高不確実性の推定
     def test_estimate_uncertainty_high(self):
         """高不確実性の推定"""
         executor = LMQLExecutor()
@@ -80,6 +86,7 @@ class TestConvergenceExecutor:
         uncertainty = conv_executor._estimate_uncertainty(output)
         assert uncertainty > 0.5
     
+    # PURPOSE: 低不確実性の推定
     def test_estimate_uncertainty_low(self):
         """低不確実性の推定"""
         executor = LMQLExecutor()
@@ -89,6 +96,7 @@ class TestConvergenceExecutor:
         uncertainty = conv_executor._estimate_uncertainty(output)
         assert uncertainty < 0.5
     
+    # PURPOSE: 条件チェック: <
     def test_check_condition_less_than(self):
         """条件チェック: <"""
         executor = LMQLExecutor()
@@ -97,6 +105,7 @@ class TestConvergenceExecutor:
         assert conv_executor._check_condition(0.2, "<", 0.3) is True
         assert conv_executor._check_condition(0.4, "<", 0.3) is False
     
+    # PURPOSE: 条件チェック: >
     def test_check_condition_greater_than(self):
         """条件チェック: >"""
         executor = LMQLExecutor()
@@ -109,6 +118,7 @@ class TestConvergenceExecutor:
 class TestSchemaGenerator:
     """SchemaGenerator のテスト"""
     
+    # PURPOSE: CCLOutputSchema から JSON Schema 生成
     def test_generate_from_ccl_output_schema(self):
         """CCLOutputSchema から JSON Schema 生成"""
         schema = SchemaGenerator.from_dataclass(CCLOutputSchema)
@@ -119,6 +129,7 @@ class TestSchemaGenerator:
         assert "result" in schema["required"]
         assert "confidence" in schema["required"]
     
+    # PURPOSE: Optional フィールドは required に含まれない
     def test_optional_fields_not_required(self):
         """Optional フィールドは required に含まれない"""
         schema = SchemaGenerator.from_dataclass(CCLOutputSchema)
@@ -130,11 +141,13 @@ class TestSchemaGenerator:
 class TestConstrainedDecoder:
     """ConstrainedDecoder のテスト"""
     
+    # PURPOSE: Decoder 作成
     def test_decoder_creation(self):
         """Decoder 作成"""
         decoder = ConstrainedDecoder()
         assert decoder.model == "openai/gpt-4o"
     
+    # PURPOSE: スキーマ検証: 有効
     def test_validate_against_schema_valid(self):
         """スキーマ検証: 有効"""
         decoder = ConstrainedDecoder()
@@ -151,6 +164,7 @@ class TestConstrainedDecoder:
         data = {"result": "test", "confidence": 0.9}
         assert decoder._validate_against_schema(data, schema) is True
     
+    # PURPOSE: スキーマ検証: 必須フィールド欠落
     def test_validate_against_schema_missing_required(self):
         """スキーマ検証: 必須フィールド欠落"""
         decoder = ConstrainedDecoder()
@@ -167,6 +181,7 @@ class TestConstrainedDecoder:
         data = {"result": "test"}  # confidence が欠落
         assert decoder._validate_against_schema(data, schema) is False
     
+    # PURPOSE: JSON 抽出とパース
     def test_extract_and_parse_json(self):
         """JSON 抽出とパース"""
         decoder = ConstrainedDecoder()
@@ -179,6 +194,7 @@ class TestConstrainedDecoder:
 class TestIntegration:
     """統合テスト"""
     
+    # PURPOSE: コンパイル結果の構造
     def test_compile_and_structure(self):
         """コンパイル結果の構造"""
         lmql_code = compile_ccl("/noe+")

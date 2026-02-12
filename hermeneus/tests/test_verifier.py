@@ -21,6 +21,7 @@ from hermeneus.src.verifier import AgentRole, VerdictType, DebateArgument, Verdi
 class TestAgentRole:
     """AgentRole のテスト"""
     
+    # PURPOSE: 役割の列挙
     def test_roles(self):
         """役割の列挙"""
         assert AgentRole.PROPOSER.value == "proposer"
@@ -31,6 +32,7 @@ class TestAgentRole:
 class TestVerdictType:
     """VerdictType のテスト"""
     
+    # PURPOSE: 判定タイプ
     def test_verdict_types(self):
         """判定タイプ"""
         assert VerdictType.ACCEPT.value == "accept"
@@ -41,6 +43,7 @@ class TestVerdictType:
 class TestDebateArgument:
     """DebateArgument のテスト"""
     
+    # PURPOSE: 引数作成
     def test_create_argument(self):
         """引数作成"""
         arg = DebateArgument(
@@ -55,16 +58,19 @@ class TestDebateArgument:
 class TestDebateAgent:
     """DebateAgent のテスト"""
     
+    # PURPOSE: Proposer 作成
     def test_create_proposer(self):
         """Proposer 作成"""
         agent = DebateAgent(AgentRole.PROPOSER)
         assert agent.role == AgentRole.PROPOSER
     
+    # PURPOSE: Critic 作成
     def test_create_critic(self):
         """Critic 作成"""
         agent = DebateAgent(AgentRole.CRITIC)
         assert agent.role == AgentRole.CRITIC
     
+    # PURPOSE: 高確信度推定
     def test_estimate_confidence_high(self):
         """高確信度推定"""
         agent = DebateAgent(AgentRole.PROPOSER)
@@ -72,6 +78,7 @@ class TestDebateAgent:
         confidence = agent._estimate_confidence(text)
         assert confidence > 0.7
     
+    # PURPOSE: 低確信度推定
     def test_estimate_confidence_low(self):
         """低確信度推定"""
         agent = DebateAgent(AgentRole.PROPOSER)
@@ -79,6 +86,7 @@ class TestDebateAgent:
         confidence = agent._estimate_confidence(text)
         assert confidence < 0.6
     
+    # PURPOSE: 判定パース: ACCEPT
     def test_parse_verdict_accept(self):
         """判定パース: ACCEPT"""
         agent = DebateAgent(AgentRole.ARBITER)
@@ -89,6 +97,7 @@ class TestDebateAgent:
         assert confidence == 0.85
         assert "論拠" in reasoning
     
+    # PURPOSE: 判定パース: REJECT
     def test_parse_verdict_reject(self):
         """判定パース: REJECT"""
         agent = DebateAgent(AgentRole.ARBITER)
@@ -102,6 +111,7 @@ class TestDebateAgent:
 class TestDebateEngine:
     """DebateEngine のテスト"""
     
+    # PURPOSE: エンジン作成
     def test_create_engine(self):
         """エンジン作成"""
         engine = DebateEngine()
@@ -109,6 +119,7 @@ class TestDebateEngine:
         assert len(engine.critics) == 2
         assert engine.arbiter.role == AgentRole.ARBITER
     
+    # PURPOSE: 合意構築
     def test_build_consensus(self):
         """合意構築"""
         engine = DebateEngine()
@@ -145,6 +156,7 @@ class TestDebateEngine:
 class TestAuditRecord:
     """AuditRecord のテスト"""
     
+    # PURPOSE: レコード作成
     def test_create_record(self):
         """レコード作成"""
         record = AuditRecord(
@@ -163,12 +175,14 @@ class TestAuditRecord:
 class TestAuditStore:
     """AuditStore のテスト"""
     
+    # PURPOSE: 一時ストア
     @pytest.fixture
     def temp_store(self, tmp_path):
         """一時ストア"""
         db_path = tmp_path / "test_audit.db"
         return AuditStore(db_path)
     
+    # PURPOSE: 記録と取得
     def test_record_and_get(self, temp_store):
         """記録と取得"""
         record = AuditRecord(
@@ -189,6 +203,7 @@ class TestAuditStore:
         assert retrieved.ccl_expression == "/s+"
         assert retrieved.confidence == 0.9
     
+    # PURPOSE: クエリ
     def test_query(self, temp_store):
         """クエリ"""
         # 複数レコードを挿入
@@ -211,6 +226,7 @@ class TestAuditStore:
         high_conf = temp_store.query(min_confidence=0.7)
         assert len(high_conf) == 3
     
+    # PURPOSE: 統計取得
     def test_get_stats(self, temp_store):
         """統計取得"""
         for i in range(4):
@@ -233,6 +249,7 @@ class TestAuditStore:
 class TestAuditReporter:
     """AuditReporter のテスト"""
     
+    # PURPOSE: 期間パース
     def test_parse_period(self, tmp_path):
         """期間パース"""
         store = AuditStore(tmp_path / "test.db")

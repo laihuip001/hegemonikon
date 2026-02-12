@@ -12,6 +12,7 @@ from hermeneus.src.optimizer import (
 class TestOptimizationConfig:
     """OptimizationConfig のテスト"""
     
+    # PURPOSE: デフォルト設定
     def test_default_config(self):
         """デフォルト設定"""
         config = OptimizationConfig()
@@ -19,6 +20,7 @@ class TestOptimizationConfig:
         assert config.max_bootstrapped_demos == 4
         assert config.metric_threshold == 0.8
     
+    # PURPOSE: カスタム設定
     def test_custom_config(self):
         """カスタム設定"""
         config = OptimizationConfig(
@@ -33,6 +35,7 @@ class TestOptimizationConfig:
 class TestCCLExample:
     """CCLExample のテスト"""
     
+    # PURPOSE: 例の作成
     def test_example_creation(self):
         """例の作成"""
         ex = CCLExample(
@@ -47,6 +50,7 @@ class TestCCLExample:
 class TestMockOptimizer:
     """MockOptimizer のテスト"""
     
+    # PURPOSE: モック最適化
     def test_mock_optimize(self):
         """モック最適化"""
         opt = MockOptimizer()
@@ -65,6 +69,7 @@ class TestMockOptimizer:
 class TestGetOptimizer:
     """get_optimizer のテスト"""
     
+    # PURPOSE: モックオプティマイザ取得
     def test_get_mock_optimizer(self):
         """モックオプティマイザ取得"""
         opt = get_optimizer(use_mock=True)
@@ -74,6 +79,7 @@ class TestGetOptimizer:
 class TestDSPyAvailability:
     """DSPy 利用可能性のテスト"""
     
+    # PURPOSE: DSPy 利用可能性チェック
     def test_is_dspy_available(self):
         """DSPy 利用可能性チェック"""
         # DSPy インストール済みなら True
@@ -84,6 +90,7 @@ class TestDSPyAvailability:
 class TestOptimizationResult:
     """OptimizationResult のテスト"""
     
+    # PURPOSE: 成功結果
     def test_success_result(self):
         """成功結果"""
         config = OptimizationConfig()
@@ -98,6 +105,7 @@ class TestOptimizationResult:
         assert result.accuracy == 0.9
         assert result.error is None
     
+    # PURPOSE: エラー結果
     def test_error_result(self):
         """エラー結果"""
         config = OptimizationConfig()

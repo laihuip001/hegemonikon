@@ -12,6 +12,11 @@ triggers:
   - 構造の保存・忘却を問う時
   - Trigonon / X-series を参照する時
   - 「なぜこの変換は正当か」を問う時
+
+# Safety Contract
+risk_tier: L1
+risks:
+  - "過度な抽象化による具体性の喪失"
 ---
 
 # 🏛️ Category Theory Engine — 構造認識の言語

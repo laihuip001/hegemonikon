@@ -1,5 +1,7 @@
 ---
 description: "裁く — V:{/noe~/dia}_I:[✓]{/ene{PROOF.md}}_E:{/ene{_limbo/}}"
+lcm_state: beta
+version: 1.0
 ---
 
 # /ccl-proof: 存在証明マクロ

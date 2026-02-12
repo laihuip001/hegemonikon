@@ -1,5 +1,7 @@
 ---
 description: "直す — C:{/dia+_/ene+}_I:[✓]{/dox-}"
+lcm_state: beta
+version: 1.0
 ---
 
 # /ccl-fix: 修正サイクルマクロ

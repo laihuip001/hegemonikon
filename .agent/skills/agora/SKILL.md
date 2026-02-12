@@ -4,6 +4,11 @@ description: HGK 収益化プロジェクト — ディープインパクト戦�
 triggers:
   - "agora"
   - "agora"
+
+# Safety Contract
+risk_tier: L1
+risks:
+  - "戦略の陳腐化による機会損失"
 ---
 
 # Agora

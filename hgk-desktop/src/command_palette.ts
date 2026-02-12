@@ -18,19 +18,32 @@ import type { WFSummary, CCLParseResponse, SynteleiaAuditResponse } from './api/
 let paletteEl: HTMLElement | null = null;
 let isOpen = false;
 let wfCache: WFSummary[] = [];
+let lastFocusedElement: HTMLElement | null = null;
 
 // --- HTML ---
 
 function createPaletteHTML(): string {
   return `
-    <div class="cp-overlay" id="cp-overlay">
+    <div class="cp-overlay" id="cp-overlay" role="dialog" aria-modal="true" aria-label="Command Palette">
       <div class="cp-dialog">
         <div class="cp-input-wrapper">
-          <span class="cp-icon">⌘</span>
-          <input type="text" id="cp-input" class="cp-input" placeholder="Type a workflow name or CCL expression..." autocomplete="off" />
+          <span class="cp-icon" aria-hidden="true">⌘</span>
+          <input
+            type="text"
+            id="cp-input"
+            class="cp-input"
+            placeholder="Type a workflow name or CCL expression..."
+            autocomplete="off"
+            role="combobox"
+            aria-autocomplete="list"
+            aria-expanded="true"
+            aria-haspopup="listbox"
+            aria-controls="cp-results"
+            aria-activedescendant=""
+          />
           <kbd class="cp-kbd">ESC</kbd>
         </div>
-        <div class="cp-results" id="cp-results"></div>
+        <div class="cp-results" id="cp-results" role="listbox" aria-label="Search results"></div>
         <div class="cp-footer">
           <span>↑↓ Navigate</span>
           <span>↵ Execute</span>
@@ -48,7 +61,15 @@ function renderWFItems(items: WFSummary[]): string {
     return '<div class="cp-empty">No matching workflows</div>';
   }
   return items.map((wf, i) => `
-    <div class="cp-item ${i === 0 ? 'cp-item-active' : ''}" data-idx="${i}" data-name="${esc(wf.name)}" data-ccl="${esc(wf.ccl)}">
+    <div
+      class="cp-item ${i === 0 ? 'cp-item-active' : ''}"
+      id="cp-item-${i}"
+      role="option"
+      aria-selected="${i === 0}"
+      data-idx="${i}"
+      data-name="${esc(wf.name)}"
+      data-ccl="${esc(wf.ccl)}"
+    >
       <div class="cp-item-header">
         <span class="cp-item-name">/${esc(wf.name)}</span>
         ${wf.ccl ? `<span class="cp-item-ccl">${esc(wf.ccl)}</span>` : ''}
@@ -238,9 +259,20 @@ function updateActive(resultsEl: HTMLElement, delta: number): void {
   const items = resultsEl.querySelectorAll('.cp-item');
   if (items.length === 0) return;
   items[activeIdx]?.classList.remove('cp-item-active');
+  items[activeIdx]?.setAttribute('aria-selected', 'false');
+
   activeIdx = Math.max(0, Math.min(items.length - 1, activeIdx + delta));
-  items[activeIdx]?.classList.add('cp-item-active');
-  (items[activeIdx] as HTMLElement)?.scrollIntoView({ block: 'nearest' });
+
+  const newItem = items[activeIdx] as HTMLElement;
+  newItem?.classList.add('cp-item-active');
+  newItem?.setAttribute('aria-selected', 'true');
+  newItem?.scrollIntoView({ block: 'nearest' });
+
+  // Update input active descendant
+  const input = document.getElementById('cp-input') as HTMLInputElement;
+  if (input && newItem) {
+    input.setAttribute('aria-activedescendant', newItem.id);
+  }
 }
 
 async function handleInput(input: HTMLInputElement, resultsEl: HTMLElement): Promise<void> {
@@ -288,6 +320,16 @@ async function handleInput(input: HTMLInputElement, resultsEl: HTMLElement): Pro
   activeIdx = 0;
   resultsEl.innerHTML = renderWFItems(filtered);
 
+  // Set initial aria-activedescendant
+  if (filtered.length > 0) {
+    const firstItem = resultsEl.querySelector('.cp-item-active');
+    if (firstItem) {
+      input.setAttribute('aria-activedescendant', firstItem.id);
+    }
+  } else {
+    input.setAttribute('aria-activedescendant', '');
+  }
+
   // Click handlers
   resultsEl.querySelectorAll('.cp-item').forEach(item => {
     item.addEventListener('click', () => {
@@ -325,6 +367,7 @@ async function selectWorkflow(name: string, resultsEl: HTMLElement): Promise<voi
 export function openPalette(): void {
   if (isOpen) return;
   isOpen = true;
+  lastFocusedElement = document.activeElement as HTMLElement;
 
   // Inject HTML
   const container = document.createElement('div');
@@ -383,6 +426,11 @@ export function closePalette(): void {
   paletteEl.remove();
   paletteEl = null;
   activeIdx = 0;
+
+  if (lastFocusedElement) {
+    lastFocusedElement.focus();
+    lastFocusedElement = null;
+  }
 }
 
 export function togglePalette(): void {

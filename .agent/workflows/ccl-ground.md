@@ -1,7 +1,11 @@
 ---
 description: "落とす — /pro_/tak-*/bou+{6w3h}~/p-_/ene-_/pis"
+version: 1.0.0
+lcm_state: beta
 ---
 
+version: 1.0.0
+lcm_state: beta
 # /ccl-ground: 具体化マクロ
 
 > **CCL**: `@ground = /pro_/tak-*/bou+{6w3h}~/p-_/ene-_/pis`
@@ -13,6 +17,8 @@ description: "落とす — /pro_/tak-*/bou+{6w3h}~/p-_/ene-_/pis"
 | 相 | ステップ | 意味 |
 |:---|:---------|:-----|
 | Prior | `/pro` | 何を具体化したいかの直感 (前感情) |
+version: 1.0.0
+lcm_state: beta
 | Likelihood | `/tak-` | 軽量タスク整理 |
 | Likelihood | `*/bou+{6w3h}` | 意志に6W3Hモードで融合 |
 | Likelihood | `~/p-` | 環境条件と振動 |

@@ -1,7 +1,11 @@
 ---
 description: "直す — /kho_/tel_C:{/dia+_/ene+}_I:[✓]{/pis_/dox-}"
+version: 1.0.0
+lcm_state: beta
 ---
 
+version: 1.0.0
+lcm_state: beta
 # /ccl-fix: 修正サイクルマクロ
 
 > **CCL**: `@fix = /kho_/tel_C:{/dia+_/ene+}_I:[✓]{/pis_/dox-}`
@@ -13,6 +17,8 @@ description: "直す — /kho_/tel_C:{/dia+_/ene+}_I:[✓]{/pis_/dox-}"
 | 相 | ステップ | 意味 |
 |:---|:---------|:-----|
 | Prior | `/kho` | 場の把握: 何が壊れているかの全体像 |
+version: 1.0.0
+lcm_state: beta
 | Prior | `/tel` | 目標設定: どこに戻したいか |
 | Likelihood | `C:{/dia+_/ene+}` | 診断→修正の収束ループ |
 | Posterior | `I:[✓]{/pis_/dox-}` | 収束したら確信度を測定し記録 |

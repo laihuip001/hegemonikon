@@ -1,7 +1,11 @@
 ---
 description: "掘る — /pro_/s+~(/p*/a)_/ana_/dia*/o+_/pis"
+version: 1.0.0
+lcm_state: beta
 ---
 
+version: 1.0.0
+lcm_state: beta
 # /ccl-dig: 深掘りマクロ
 
 > **CCL**: `@dig = /pro_/s+~(/p*/a)_/ana_/dia*/o+_/pis`
@@ -13,6 +17,8 @@ description: "掘る — /pro_/s+~(/p*/a)_/ana_/dia*/o+_/pis"
 | 相 | ステップ | 意味 |
 |:---|:---------|:-----|
 | Prior | `/pro` | 何に引っかかるかを感じ取る (前感情) |
+version: 1.0.0
+lcm_state: beta
 | Likelihood | `/s+` | 戦略を詳細化して掘る方向を定める |
 | Likelihood | `~(/p*/a)` | 環境×精密と振動させて多面的に掘る |
 | Likelihood | `_/ana` | 記憶想起: 過去の類似パターンを思い出す |

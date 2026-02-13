@@ -1,7 +1,11 @@
 ---
 description: "刻む — /pro_/dox+_F:[×2]{/u+~(/noe*/dia)}_~(/h*/k)_/pis_/bye+"
+version: 1.0.0
+lcm_state: beta
 ---
 
+version: 1.0.0
+lcm_state: beta
 # /ccl-learn: 学習永続化マクロ
 
 > **CCL**: `@learn = /pro_/dox+_F:[×2]{/u+~(/noe*/dia)}_~(/h*/k)_/pis_/bye+`
@@ -13,6 +17,8 @@ description: "刻む — /pro_/dox+_F:[×2]{/u+~(/noe*/dia)}_~(/h*/k)_/pis_/bye+
 | 相 | ステップ | 意味 |
 |:---|:---------|:-----|
 | Prior | `/pro` | 何を学んだかの直感的振返り (前感情) |
+version: 1.0.0
+lcm_state: beta
 | Likelihood | `/dox+` | 信念を詳細化して言語化 |
 | Likelihood | `F:[×2]{/u+~(/noe*/dia)}` | 自問を2回、各回で直観×判定と振動させて深化 |
 | Posterior | `~(/h*/k)` | 学びを動機×文脈の全体像に統合 |

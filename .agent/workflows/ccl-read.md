@@ -1,7 +1,11 @@
 ---
 description: "読む — /s-_/pro_F:[×3]{/m.read~(/noe*/dia)}_/ore_~(/h*/k)_/pis_/dox-"
+version: 1.0.0
+lcm_state: beta
 ---
 
+version: 1.0.0
+lcm_state: beta
 # /ccl-read: 反復熟読マクロ
 
 > **CCL**: `@read = /s-_/pro_F:[×3]{/m.read~(/noe*/dia)}_/ore_~(/h*/k)_/pis_/dox-`
@@ -13,6 +17,8 @@ description: "読む — /s-_/pro_F:[×3]{/m.read~(/noe*/dia)}_/ore_~(/h*/k)_/pi
 | # | CCL | 認知機能 | Series | なぜ必要か |
 |:--|:----|:---------|:-------|:----------|
 | 1 | `/s-` | 方向性決定 | S-series | 何を、どの粒度で読むか |
+version: 1.0.0
+lcm_state: beta
 | 2 | `/pro` | 前感情 | H1 | 読む前の直感的反応 |
 | 3 | `F:[×3]{/m.read~(/noe*/dia)}` | 3回本気熟読 × 直観・判定融合 | O1,A2 | L1→L2→L3 の各層を反復 |
 | 4 | `/ore` | 欲求 | H3 | 「これを使いたい」という引力の評価 |
@@ -25,6 +31,8 @@ description: "読む — /s-_/pro_F:[×3]{/m.read~(/noe*/dia)}_/ore_~(/h*/k)_/pi
 | 回 | 層 | 角度 | 問い |
 |:---|:---|:-----|:-----|
 | 1回目 | L1 精読 (Akribeia) | 何が書いてあるか | 事実確認 |
+version: 1.0.0
+lcm_state: beta
 | 2回目 | L2 沈潜 (Bathys) | 「待って、これは…」 | 主張との対話 |
 | 3回目 | L3 摩擦 (Tribē) | 既知との衝突 | 予測誤差の言語化 |
 

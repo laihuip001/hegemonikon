@@ -1,7 +1,11 @@
 ---
 description: "感じる — /pro_/ore~(/pis_/ana)_/dox-"
+version: 1.0.0
+lcm_state: beta
 ---
 
+version: 1.0.0
+lcm_state: beta
 # /ccl-feel: 直感マクロ
 
 > **CCL**: `@feel = /pro_/ore~(/pis_/ana)_/dox-`
@@ -14,6 +18,8 @@ description: "感じる — /pro_/ore~(/pis_/ana)_/dox-"
 | 相 | ステップ | 意味 |
 |:---|:---------|:-----|
 | Prior | `/pro` (H1 Propatheia) | 前感情: 第一印象・直感を言語化 |
+version: 1.0.0
+lcm_state: beta
 | Likelihood | `/ore` (H3 Orexis) | 欲求: 何を望んでいるか |
 | Likelihood | `~(/pis_/ana)` | 振動: 確信度と類推を行き来 |
 |   | `/pis` (H2 Pistis) | 確信: その直感にどれだけ自信があるか |

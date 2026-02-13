@@ -45,7 +45,7 @@ jobs:
                   # Use --extra-index-url to allow resolving PyTorch CPU wheels from the specific index
                   # AND standard packages (like pytest) from PyPI in a single command.
                   pip install pytest pytest-asyncio pytest-timeout pyyaml pydantic lancedb numpy scipy \
-                              networkx pandas tabulate requests httpx schedule \
+                              networkx pandas tabulate requests httpx schedule aiohttp python-dotenv \
                               sentence-transformers torch --index-url https://download.pytorch.org/whl/cpu --extra-index-url https://pypi.org/simple
                   # Install project in development mode if setup exists
                   pip install -e ".[test]" 2>/dev/null || true

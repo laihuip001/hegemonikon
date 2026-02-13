@@ -1,6 +1,18 @@
-# PURPOSE: Ochēma パッケージ — Antigravity LS クライアント
-"""Ochēma (ὄχημα) — Antigravity Language Server Client Package."""
+# PROOF: [L2/Transport] <- mekhane/ochema/ Ochema LLM Transport
+# PURPOSE: LLM (Antigravity LS) との低レイヤー通信クライアント群
+"""
+Ochēma (The Vehicle) — Antigravity Language Server Client
 
-from mekhane.ochema.antigravity_client import AntigravityClient, LLMResponse
+Provides a standard interface to connect to local/remote LLM servers
+(specifically Antigravity LS) via SSE, WebSocket, or HTTP.
+"""
 
-__all__ = ["AntigravityClient", "LLMResponse"]
+from .antigravity_client import AntigravityClient
+from .proto import ChatMessage, CompletionRequest, CompletionResponse
+
+__all__ = [
+    "AntigravityClient",
+    "ChatMessage",
+    "CompletionRequest",
+    "CompletionResponse",
+]

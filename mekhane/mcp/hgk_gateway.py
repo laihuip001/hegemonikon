@@ -197,6 +197,7 @@ def _traced(fn):
     """
     import functools
 
+    # PURPOSE: [L2-auto] wrapper
     @functools.wraps(fn)
     def wrapper(*args: Any, **kwargs: Any) -> Any:
         _start = time.time()
@@ -1807,7 +1808,7 @@ def hgk_proactive_push(
         return f"❌ プッシュエラー: {e}"
 
 
-# PURPOSE: 最新 Handoff からトピックを自動抽出
+# PURPOSE: [L2-auto] 最新 Handoff からトピックを自動抽出
 def _auto_extract_topics() -> list[str]:
     """最新の Handoff ファイルからトピックを自動抽出"""
     handoff_dir = _MNEME_DIR / "sessions"

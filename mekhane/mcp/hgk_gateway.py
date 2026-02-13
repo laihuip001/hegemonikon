@@ -81,6 +81,137 @@ _default_hosts = (
 ALLOWED_HOSTS = os.getenv("HGK_GATEWAY_ALLOWED_HOSTS", _default_hosts).split(",")
 
 
+
+# =============================================================================
+# [L2] Policy Loader — 宣言的ポリシー管理
+# =============================================================================
+
+# PURPOSE: gateway_policy.yaml から宣言的ポリシーを読み込む
+def _load_policy() -> dict:
+    """gateway_policy.yaml を読み込み、ポリシー辞書を返す。
+
+    ファイルが見つからない場合はデフォルト値を返す。
+    起動時に1回だけ呼ばれ、グローバル変数に格納される。
+    """
+    import yaml
+
+    policy_path = Path(__file__).parent / "gateway_policy.yaml"
+    if not policy_path.exists():
+        print(f"⚠️ Policy file not found: {policy_path}. Using defaults.", file=sys.stderr)
+        return {"version": "0.0", "defaults": {"max_input_size": 10000}, "tools": {}, "security": {}, "trace": {"enabled": False}}
+
+    try:
+        with open(policy_path, "r", encoding="utf-8") as f:
+            policy = yaml.safe_load(f)
+        print(f"✅ Policy loaded: v{policy.get('version', '?')} ({len(policy.get('tools', {}))} tools)", file=sys.stderr)
+        return policy
+    except Exception as e:
+        print(f"⚠️ Policy load failed: {e}. Using defaults.", file=sys.stderr)
+        return {"version": "0.0", "defaults": {"max_input_size": 10000}, "tools": {}, "security": {}, "trace": {"enabled": False}}
+
+
+# PURPOSE: ポリシーからツール固有の制約値を取得する
+def _get_policy(tool_name: str, key: str, default=None):
+    """ポリシーからツール固有の値を取得。なければ defaults → default の順。"""
+    tool_policy = POLICY.get("tools", {}).get(tool_name, {})
+    if key in tool_policy:
+        return tool_policy[key]
+    defaults = POLICY.get("defaults", {})
+    if key in defaults:
+        return defaults[key]
+    return default
+
+
+POLICY = _load_policy()
+
+
+# =============================================================================
+# [L2] Trace Logger — ツール呼び出し監査ログ
+# =============================================================================
+
+# PURPOSE: ツール呼び出しをJSONL形式で監査ログに記録する
+def _trace_tool_call(
+    tool_name: str,
+    input_size: int,
+    duration_ms: float,
+    success: bool,
+) -> None:
+    """ツール呼び出しをトレースログに記録する。
+
+    gateway_policy.yaml の trace.enabled が true の場合のみ記録。
+    出力先: MNEME_DIR / gateway_trace.jsonl (JSON Lines 形式)。
+    """
+    trace_config = POLICY.get("trace", {})
+    if not trace_config.get("enabled", False):
+        return
+
+    from datetime import timezone
+
+    entry = {
+        "ts": datetime.now(timezone.utc).isoformat(),
+        "tool": tool_name,
+        "input_size": input_size,
+        "duration_ms": round(duration_ms, 1),
+        "success": success,
+    }
+
+    trace_filename = trace_config.get("output", "gateway_trace.jsonl")
+    # _MNEME_DIR is defined below; use a lazy reference
+    mneme = Path(os.getenv("HGK_MNEME", str(Path.home() / "oikos/mneme/.hegemonikon")))
+    trace_path = mneme / trace_filename
+
+    try:
+        mneme.mkdir(parents=True, exist_ok=True)
+
+        # ローテーション: 最大サイズ超過時にリネーム
+        max_mb = trace_config.get("max_file_size_mb", 10)
+        if trace_path.exists() and trace_path.stat().st_size > max_mb * 1024 * 1024:
+            rotated = trace_path.with_suffix(f".{datetime.now().strftime('%Y%m%d_%H%M%S')}.jsonl")
+            trace_path.rename(rotated)
+
+        with open(trace_path, "a", encoding="utf-8") as f:
+            f.write(json.dumps(entry, ensure_ascii=False) + "\n")
+    except Exception as e:
+        print(f"⚠️ Trace log failed: {e}", file=sys.stderr)
+
+
+# PURPOSE: 引数から入力サイズを推定する
+def _estimate_input_size(*args: Any, **kwargs: Any) -> int:
+    """ツール引数から入力サイズ (文字数) を推定する。"""
+    total = 0
+    for a in args:
+        if isinstance(a, str):
+            total += len(a)
+    for v in kwargs.values():
+        if isinstance(v, str):
+            total += len(v)
+    return total
+
+
+# PURPOSE: ツール関数にトレースを自動付与するデコレータ
+def _traced(fn):
+    """ツール関数にトレースを自動付与するデコレータ。
+
+    関数の引数から入力サイズを推定し、実行時間と成否を記録する。
+    手動で _start / _trace_tool_call を書く必要がなくなる。
+    """
+    import functools
+
+    @functools.wraps(fn)
+    def wrapper(*args: Any, **kwargs: Any) -> Any:
+        _start = time.time()
+        input_size = _estimate_input_size(*args, **kwargs)
+        try:
+            result = fn(*args, **kwargs)
+            _trace_tool_call(fn.__name__, input_size, (time.time() - _start) * 1000, True)
+            return result
+        except Exception as e:
+            _trace_tool_call(fn.__name__, input_size, (time.time() - _start) * 1000, False)
+            raise
+
+    return wrapper
+
+
 # =============================================================================
 # [L2] WBC Security Event Logger — Sympatheia 統合
 # =============================================================================
@@ -346,6 +477,7 @@ IDEA_DIR = MNEME_DIR / "ideas"
 
 # PURPOSE: hgk_gateway の hgk sop generate 処理を実行する
 @mcp.tool()
+@_traced
 def hgk_sop_generate(
     topic: str,
     decision: str = "",
@@ -437,6 +569,7 @@ C. 将来展望
 
 # PURPOSE: hgk_gateway の hgk search 処理を実行する
 @mcp.tool()
+@_traced
 def hgk_search(query: str, max_results: int = 5, mode: str = "hybrid") -> str:
     """
     HGK の知識ベース (KI / Gnōsis / Sophia) を検索する。
@@ -531,6 +664,7 @@ def hgk_search(query: str, max_results: int = 5, mode: str = "hybrid") -> str:
 
 # PURPOSE: hgk_gateway の hgk ccl dispatch 処理を実行する
 @mcp.tool()
+@_traced
 def hgk_ccl_dispatch(ccl: str) -> str:
     """
     CCL (Cognitive Control Language) 式をパースし、構造を解析する。
@@ -570,6 +704,7 @@ def hgk_ccl_dispatch(ccl: str) -> str:
 
 # PURPOSE: hgk_gateway の hgk doxa read 処理を実行する
 @mcp.tool()
+@_traced
 def hgk_doxa_read() -> str:
     """
     Doxa (信念ストア) の内容を一覧表示する。
@@ -606,6 +741,7 @@ def hgk_doxa_read() -> str:
 
 # PURPOSE: hgk_gateway の hgk handoff read 処理を実行する
 @mcp.tool()
+@_traced
 def hgk_handoff_read(count: int = 1) -> str:
     """
     最新の Handoff (セッション引き継ぎ書) を読む。
@@ -650,9 +786,11 @@ def hgk_idea_capture(idea: str, tags: str = "") -> str:
         idea: アイデアの内容 (最大10,000文字)
         tags: タグ (カンマ区切り、例: "FEP, 設計, 実験")
     """
-    # [C-3] Content size limit
-    MAX_IDEA_SIZE = 10_000
+    # [C-3] Content size limit (policy-driven)
+    _start = time.time()
+    MAX_IDEA_SIZE = _get_policy("hgk_idea_capture", "max_input_size", 10_000)
     if len(idea) > MAX_IDEA_SIZE:
+        _trace_tool_call("hgk_idea_capture", len(idea), (time.time() - _start) * 1000, False)
         return f"❌ エラー: アイデアが長すぎます ({len(idea)} 文字)。上限は {MAX_IDEA_SIZE} 文字です。"
     IDEA_DIR.mkdir(parents=True, exist_ok=True)
 
@@ -675,6 +813,7 @@ def hgk_idea_capture(idea: str, tags: str = "") -> str:
 *Captured via HGK Gateway*
 """
     filepath.write_text(content, encoding="utf-8")
+    _trace_tool_call("hgk_idea_capture", len(idea), (time.time() - _start) * 1000, True)
 
     return f"## ✅ アイデア保存完了\n\n保存先: `{filepath}`\nタグ: {tags if tags else '未分類'}\n\n次回 `/boot` で自動的に確認されます。"
 
@@ -685,6 +824,7 @@ def hgk_idea_capture(idea: str, tags: str = "") -> str:
 
 # PURPOSE: hgk_gateway の hgk status 処理を実行する
 @mcp.tool()
+@_traced
 def hgk_status() -> str:
     """
     HGK システムの概要ステータスを表示する。
@@ -744,6 +884,53 @@ def hgk_status() -> str:
 
 
 # =============================================================================
+# PKS: Knowledge Stats & Health (Autophōnos)
+# =============================================================================
+
+# PURPOSE: PKS 知識基盤の統計を表示する MCP ツール
+@mcp.tool()
+@_traced
+def hgk_pks_stats() -> str:
+    """
+    PKS (Proactive Knowledge Surface) の知識基盤統計を表示する。
+    Gnōsis, Kairos, Sophia の各インデックスのドキュメント数と
+    Handoff/KI ファイル数を返す。
+    """
+    import io, contextlib
+    f = io.StringIO()
+    with contextlib.redirect_stdout(f):
+        import subprocess
+        result = subprocess.run(
+            [sys.executable, "-m", "mekhane.pks.pks_cli", "stats"],
+            capture_output=True, text=True,
+            cwd=str(PROJECT_ROOT),
+            env={**os.environ, "HF_HUB_OFFLINE": "1", "TRANSFORMERS_OFFLINE": "1"},
+            timeout=30,
+        )
+    return result.stdout if result.returncode == 0 else f"❌ Error: {result.stderr[:200]}"
+
+
+# PURPOSE: PKS ヘルスチェックを実行する MCP ツール
+@mcp.tool()
+@_traced
+def hgk_pks_health() -> str:
+    """
+    Autophōnos 全スタック (8コンポーネント) のヘルスチェックを実行する。
+    Gnōsis, Kairos, Sophia, Embedder, GnosisLanceBridge, PKSEngine,
+    TopicExtractor, SelfAdvocate の各コンポーネントの OK/FAIL を返す。
+    """
+    import subprocess
+    result = subprocess.run(
+        [sys.executable, "-m", "mekhane.pks.pks_cli", "health"],
+        capture_output=True, text=True,
+        cwd=str(PROJECT_ROOT),
+        env={**os.environ, "HF_HUB_OFFLINE": "1", "TRANSFORMERS_OFFLINE": "1"},
+        timeout=60,
+    )
+    return result.stdout if result.returncode == 0 else f"❌ Error: {result.stderr[:200]}"
+
+
+# =============================================================================
 # CCL Execute (CCL 式の実行)
 # =============================================================================
 
@@ -758,11 +945,16 @@ def hgk_ccl_execute(ccl: str, context: str = "") -> str:
         ccl: CCL 式 (例: "/noe+", "/dia+~*/noe")。最大 500 文字。
         context: 実行コンテキスト (分析対象など)。最大 2000 文字。
     """
-    # Input validation
-    if len(ccl) > 500:
-        return "❌ CCL 式が長すぎます (最大 500 文字)"
-    if len(context) > 2000:
-        return "❌ コンテキストが長すぎます (最大 2000 文字)"
+    # Input validation (policy-driven)
+    _start = time.time()
+    max_ccl = _get_policy("hgk_ccl_execute", "max_ccl_size", 500)
+    max_ctx = _get_policy("hgk_ccl_execute", "max_context_size", 2000)
+    if len(ccl) > max_ccl:
+        _trace_tool_call("hgk_ccl_execute", len(ccl), (time.time() - _start) * 1000, False)
+        return f"❌ CCL 式が長すぎます (最大 {max_ccl} 文字)"
+    if len(context) > max_ctx:
+        _trace_tool_call("hgk_ccl_execute", len(context), (time.time() - _start) * 1000, False)
+        return f"❌ コンテキストが長すぎます (最大 {max_ctx} 文字)"
 
     try:
         from hermeneus.src.macro_executor import execute_and_explain
@@ -770,6 +962,7 @@ def hgk_ccl_execute(ccl: str, context: str = "") -> str:
         # W12 Token Explosion 対策: 出力を最大 5000 文字に制限
         if len(result) > 5000:
             result = result[:5000] + "\n\n... (出力が 5000 文字を超えたため切り詰めました)"
+        _trace_tool_call("hgk_ccl_execute", len(ccl) + len(context), (time.time() - _start) * 1000, True)
         return result
     except ImportError:
         return "❌ Hermēneus が利用できません (import エラー)"
@@ -792,10 +985,14 @@ def hgk_paper_search(query: str, limit: int = 5) -> str:
         query: 検索クエリ (例: "active inference free energy")。最大 200 文字。
         limit: 最大結果数 (1-20、デフォルト 5)。
     """
-    # Input validation
-    if len(query) > 200:
-        return "❌ クエリが長すぎます (最大 200 文字)"
-    limit = max(1, min(20, limit))
+    # Input validation (policy-driven)
+    _start = time.time()
+    max_q = _get_policy("hgk_paper_search", "max_query_size", 200)
+    max_r = _get_policy("hgk_paper_search", "max_results", 20)
+    if len(query) > max_q:
+        _trace_tool_call("hgk_paper_search", len(query), (time.time() - _start) * 1000, False)
+        return f"❌ クエリが長すぎます (最大 {max_q} 文字)"
+    limit = max(1, min(max_r, limit))
 
     try:
         import signal
@@ -842,10 +1039,13 @@ def hgk_paper_search(query: str, limit: int = 5) -> str:
                 lines.append(f"- **要旨**: {abstract}")
             lines.append("")
 
+        _trace_tool_call("hgk_paper_search", len(query), (time.time() - _start) * 1000, True)
         return "\n".join(lines)
     except TimeoutError as e:
+        _trace_tool_call("hgk_paper_search", len(query), (time.time() - _start) * 1000, False)
         return f"⏱️ {e}"
     except ImportError:
+        _trace_tool_call("hgk_paper_search", len(query), (time.time() - _start) * 1000, False)
         return "❌ SemanticScholarClient が利用できません (import エラー)"
     except Exception as e:
         return f"❌ 論文検索エラー: {e}"
@@ -862,6 +1062,7 @@ PROCESSED_DIR = MNEME_DIR / "processed"
 # PURPOSE: [L2-auto] incoming/ の未消化ファイルを確認する。
 
 @mcp.tool()
+@_traced
 def hgk_digest_check() -> str:
     """
     incoming/ の未消化ファイルを確認する。
@@ -920,6 +1121,7 @@ def hgk_digest_check() -> str:
 
 # PURPOSE: 消化完了ファイルを processed/ に移動する
 @mcp.tool()
+@_traced
 def hgk_digest_mark(filenames: str = "") -> str:
     """
     消化完了したファイルを incoming/ → processed/ に移動する。
@@ -954,6 +1156,7 @@ def hgk_digest_mark(filenames: str = "") -> str:
 
 # PURPOSE: Digestor selector で候補を評価する
 @mcp.tool()
+@_traced
 def hgk_digest_list(
     topics: str = "",
     max_candidates: int = 10,
@@ -1006,6 +1209,7 @@ def hgk_digest_list(
 
 # PURPOSE: 消化対象トピック一覧を表示する
 @mcp.tool()
+@_traced
 def hgk_digest_topics() -> str:
     """
     消化対象トピック一覧を表示する。
@@ -1048,6 +1252,7 @@ def hgk_digest_topics() -> str:
 
 # PURPOSE: Digestor パイプラインを実行し、消化候補を生成する
 @mcp.tool()
+@_traced
 def hgk_digest_run(
     topics: str = "",
     max_papers: int = 20,
@@ -1124,6 +1329,7 @@ def _check_rate_limit() -> bool:
 
 # PURPOSE: IDE セッション一覧を取得する
 @mcp.tool()
+@_traced
 def hgk_sessions() -> str:
     """
     IDE のセッション (cascade) 一覧を取得する。
@@ -1159,6 +1365,7 @@ def hgk_sessions() -> str:
 
 # PURPOSE: IDE セッションの会話内容を読み取る
 @mcp.tool()
+@_traced
 def hgk_session_read(
     cascade_id: str,
     max_turns: int = 10,
@@ -1236,6 +1443,7 @@ def hgk_session_read(
 
 # PURPOSE: LLM にメッセージを送り応答を取得する (Antigravity LS 経由)
 @mcp.tool()
+@_traced
 def hgk_ask(
     message: str,
     model: str = "MODEL_CLAUDE_4_5_SONNET_THINKING",
@@ -1300,6 +1508,7 @@ def hgk_ask(
 
 # PURPOSE: 利用可能な LLM モデル一覧を取得する
 @mcp.tool()
+@_traced
 def hgk_models() -> str:
     """
     利用可能な LLM モデル一覧を取得する。
@@ -1334,6 +1543,7 @@ def hgk_models() -> str:
 
 # PURPOSE: Antigravity LS の接続状況を確認する
 @mcp.tool()
+@_traced
 def hgk_ls_status() -> str:
     """
     Antigravity LS の接続状況を確認する。
@@ -1366,6 +1576,7 @@ def hgk_ls_status() -> str:
 
 # PURPOSE: HGK システムの健全性チェック (Sympatheia 読取り)
 @mcp.tool()
+@_traced
 def hgk_health() -> str:
     """
     HGK システムの詳細な健全性レポートを表示する。
@@ -1445,6 +1656,7 @@ def hgk_health() -> str:
 
 # PURPOSE: 未読通知の確認 (Sympatheia notifications)
 @mcp.tool()
+@_traced
 def hgk_notifications(limit: int = 10) -> str:
     """
     未読通知を確認する。
@@ -1493,10 +1705,108 @@ def hgk_notifications(limit: int = 10) -> str:
     except Exception as e:
         return f"❌ 通知読取りエラー: {e}"
 
+# =============================================================================
+# Autophōnos / PKS (Proactive Knowledge Surface)
+# =============================================================================
 
-# =============================================================================
-# Entry Point
-# =============================================================================
+_pks_engine = None
+
+
+# PURPOSE: PKSEngine を遅延初期化
+def _get_pks_engine():
+    """PKSEngine を遅延初期化"""
+    global _pks_engine
+    if _pks_engine is None:
+        try:
+            from mekhane.pks.pks_engine import PKSEngine
+            _pks_engine = PKSEngine(
+                enable_questions=True,
+                enable_serendipity=True,
+                enable_feedback=True,
+                enable_advocacy=True,
+            )
+        except Exception as e:
+            print(f"[Gateway] PKSEngine init error: {e}")
+    return _pks_engine
+
+
+
+# PURPOSE: Autophōnos 能動的知識プッシュ — トピックに基づく知識表面化
+@mcp.tool()
+@_traced
+def hgk_proactive_push(
+    topics: str = "",
+    max_results: int = 5,
+    use_advocacy: bool = True,
+) -> str:
+    """
+    論文が自ら語りかける — Autophōnos 能動的知識プッシュ。
+    コンテキスト (トピック) に基づき、関連する知識を能動的に表面化する。
+    use_advocacy=True で論文が一人称で語りかける (Autophōnos モード)。
+
+    トピック未指定時は最新の Handoff から自動抽出する。
+
+    Args:
+        topics: カンマ区切りのトピック (例: "FEP,Active Inference,CCL")。
+                省略時は最新 Handoff から自動抽出。
+        max_results: 最大結果数 (デフォルト: 5)
+        use_advocacy: 一人称モード (デフォルト: True)
+    """
+    engine = _get_pks_engine()
+    if engine is None:
+        return "❌ PKSEngine を初期化できませんでした"
+
+    topic_list = [t.strip() for t in topics.split(",") if t.strip()] if topics else []
+
+    # トピック未指定時: 最新 Handoff から自動抽出
+    if not topic_list:
+        topic_list = _auto_extract_topics()
+
+    if topic_list:
+        engine.set_context(topics=topic_list)
+
+    try:
+        nuggets = engine.proactive_push(k=max_results)
+        if not nuggets:
+            ctx_info = ", ".join(topic_list[:5]) if topic_list else "(未設定)"
+            return (
+                f"📭 現在のコンテキスト ({ctx_info}) に関連する"
+                " 知識は見つかりませんでした。\n\n"
+                "💡 別のトピックを試してみてください。"
+            )
+        return engine.format_push_report(nuggets, use_advocacy=use_advocacy)
+    except Exception as e:
+        return f"❌ プッシュエラー: {e}"
+
+
+# PURPOSE: 最新 Handoff からトピックを自動抽出
+def _auto_extract_topics() -> list[str]:
+    """最新の Handoff ファイルからトピックを自動抽出"""
+    handoff_dir = _MNEME_DIR / "sessions"
+    if not handoff_dir.exists():
+        return []
+
+    # 最新の handoff_*.md を検索
+    handoffs = sorted(handoff_dir.glob("handoff_*.md"), key=lambda p: p.stat().st_mtime)
+    if not handoffs:
+        return []
+
+    latest = handoffs[-1]
+    try:
+        from mekhane.pks.pks_engine import AutoTopicExtractor
+
+        extractor = AutoTopicExtractor()
+        text = latest.read_text(encoding="utf-8", errors="replace")
+        topics = extractor.extract(text, max_topics=8)
+        if topics:
+            print(f"[Autophōnos] Handoff '{latest.name}' から {len(topics)} トピック抽出")
+        return topics
+    except Exception as e:
+        print(f"[Autophōnos] トピック自動抽出エラー: {e}")
+        return []
+
+
+
 
 if __name__ == "__main__":
     # C-1 fail-safe ensures GATEWAY_TOKEN is always set at this point

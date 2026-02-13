@@ -63,13 +63,6 @@ def ensure_traces_dir() -> None:
     except PermissionError:
         # Fallback for environments where home is not writable
         pass
-        # Handle case where parent exists but is a file
-        return
-    try:
-        TRACES_PATH.parent.mkdir(parents=True, exist_ok=True)
-    except PermissionError:
-        # Fallback for environments where home is not writable
-        pass
 # PURPOSE: Mark a moment as meaningful.
 
 

@@ -1,5 +1,4 @@
 # PROOF: [L2/Anamnesis] Session Indexer
-# PROOF: [L2/Anamnesis] Session Indexer
 # PURPOSE: セッション履歴を GnosisIndex (LanceDB) にインデックスする
 """
 PROOF: [L2/インフラ] <- mekhane/anamnesis/

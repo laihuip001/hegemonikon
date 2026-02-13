@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/ochema/ A0→オケマモジュール定義→__init__ が担う
 # PURPOSE: Ochēma パッケージ — Antigravity LS クライアント
 """Ochēma (ὄχημα) — Antigravity Language Server Client Package."""
 

@@ -409,6 +409,7 @@ class GaloisConnection:
     series: Series      # Which series this belongs to
     description: str = ""  # Human-readable meaning
 
+    # PURPOSE: Get notation string.
     @property
     def notation(self) -> str:
         """Standard notation: L ⊣ R."""
@@ -443,6 +444,7 @@ class AdjointPair:
     series: Series
     meaning: str = ""    # What this pair represents
 
+    # PURPOSE: Create Galois connection.
     @property
     def galois(self) -> GaloisConnection:
         """View this adjoint pair as a Galois connection."""

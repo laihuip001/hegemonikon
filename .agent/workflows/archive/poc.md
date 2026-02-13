@@ -1,4 +1,6 @@
 ---
+lcm_state: beta
+version: 1.0.0
 
 hegemonikon: Ousia
 modules: [O3]

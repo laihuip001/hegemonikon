@@ -1,4 +1,6 @@
 ---
+lcm_state: beta
+version: 1.0.0
 description: "[CCL Macro] セッション開始 — @wake = /boot+_@dig_@plan"
 ---
 

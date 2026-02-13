@@ -198,6 +198,7 @@ def _traced(fn):
     import functools
 
     @functools.wraps(fn)
+    # PURPOSE: [L2-auto] トレースラッパー関数
     def wrapper(*args: Any, **kwargs: Any) -> Any:
         _start = time.time()
         input_size = _estimate_input_size(*args, **kwargs)
@@ -1343,9 +1344,9 @@ def hgk_digest_run(
 _ask_timestamps: list[float] = []
 _ASK_RATE_LIMIT = 5
 _ASK_RATE_WINDOW = 60  # seconds
+
+
 # PURPOSE: [L2-auto] レートリミットチェック。True = 許可、False = 拒否。
-
-
 def _check_rate_limit() -> bool:
     """レートリミットチェック。True = 許可、False = 拒否。"""
     now = time.time()

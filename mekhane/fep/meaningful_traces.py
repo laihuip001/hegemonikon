@@ -24,9 +24,12 @@ from datetime import datetime
 from pathlib import Path
 from typing import Optional, List
 import json
+import os
 
 # Default persistence path
-TRACES_PATH = Path("/home/makaron8426/oikos/mneme/.hegemonikon/meaningful_traces.json")
+# Use environment variable or default to user home directory for portability
+_default_root = os.environ.get("HEGEMONIKON_ROOT", str(Path.home() / ".hegemonikon"))
+TRACES_PATH = Path(_default_root) / "meaningful_traces.json"
 
 
 # PURPOSE: の統一的インターフェースを実現する

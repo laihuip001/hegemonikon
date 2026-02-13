@@ -44,7 +44,7 @@ jobs:
                   # Install core test dependencies (CPU-only)
                   # Use PyTorch CPU index but also specify PyPI as extra index to find standard packages like pytest
                   pip install pytest pytest-asyncio pytest-timeout pyyaml pydantic lancedb numpy scipy \
-                              networkx pandas tabulate requests httpx schedule \
+                              networkx pandas tabulate requests httpx schedule aiohttp \
                               sentence-transformers torch --index-url https://download.pytorch.org/whl/cpu \
                               --extra-index-url https://pypi.org/simple
                   # Install project in development mode if setup exists

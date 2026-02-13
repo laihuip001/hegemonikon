@@ -26,7 +26,7 @@ from typing import Optional, List
 import json
 
 # Default persistence path
-TRACES_PATH = Path("/home/makaron8426/oikos/mneme/.hegemonikon/meaningful_traces.json")
+TRACES_PATH = Path.home() / ".hegemonikon" / "meaningful_traces.json"
 
 
 # PURPOSE: の統一的インターフェースを実現する
@@ -55,7 +55,14 @@ class MeaningfulTrace:
 
 def ensure_traces_dir() -> None:
     """Ensure the persistence directory exists."""
-    TRACES_PATH.parent.mkdir(parents=True, exist_ok=True)
+    if TRACES_PATH.parent.exists() and not TRACES_PATH.parent.is_dir():
+        # Handle case where parent exists but is a file
+        return
+    try:
+        TRACES_PATH.parent.mkdir(parents=True, exist_ok=True)
+    except PermissionError:
+        # Fallback for environments where home is not writable
+        pass
 # PURPOSE: Mark a moment as meaningful.
 
 

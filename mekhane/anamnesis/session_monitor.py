@@ -2,8 +2,6 @@
 # PROOF: [L2/Infra] <- mekhane/anamnesis/session_monitor.py Session State Monitor
 # PURPOSE: LS API ポーリングでアクティブセッションをリアルタイムにモニターし MD 保存する
 """
-PROOF: [L2/Infra] <- mekhane/anamnesis/
-
 Session Monitor — リアルタイムセッションログ保存
 
 AntigravityClient を使って LS API をポーリングし、

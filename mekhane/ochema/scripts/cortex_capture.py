@@ -1,4 +1,5 @@
 # PROOF: [L2/Infra] <- mekhane/ochema/scripts/cortex_capture.py Cortex Memory Capture Script
+# PURPOSE: Cortex メモリダンプスクリプト
 """
 Cortex API MITM Capture Script for mitmproxy.
 

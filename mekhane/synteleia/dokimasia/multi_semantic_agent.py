@@ -72,6 +72,7 @@ PERSONAS: Dict[str, str] = {
 # =============================================================================
 
 
+# PURPOSE: アンサンブルの1メンバー
 @dataclass
 class EnsembleMember:
     """アンサンブルの1メンバー。"""
@@ -79,6 +80,7 @@ class EnsembleMember:
     backend: LLMBackend
     persona: str  # PERSONAS のキー
 
+    # PURPOSE: persona 付きプロンプトを生成
     @property
     def persona_prompt(self) -> str:
         """persona 付きプロンプトを生成。"""
@@ -104,6 +106,7 @@ class MultiSemanticAgent(AuditAgent):
     def __init__(self, members: List[EnsembleMember]):
         self.members = members
 
+    # PURPOSE: デフォルト構成: Gemini Pro + Claude Opus + GPT-OSS
     @classmethod
     def default(cls) -> "MultiSemanticAgent":
         """デフォルト構成: Gemini Pro + Claude Opus + GPT-OSS。"""
@@ -145,6 +148,7 @@ class MultiSemanticAgent(AuditAgent):
 
         return cls(members=members)
 
+    # PURPOSE: テスト用: StubBackend でアンサンブルを構成
     @classmethod
     def with_stubs(cls, responses: Optional[Dict[str, str]] = None) -> "MultiSemanticAgent":
         """テスト用: StubBackend でアンサンブルを構成。"""
@@ -246,7 +250,7 @@ class MultiSemanticAgent(AuditAgent):
 
         return member.persona, response_text, issues, confidence
 
-    # PURPOSE: confidence-weighted majority voting
+    # PURPOSE: Confidence-weighted majority voting
     def _majority_vote(
         self, member_results: List[Tuple[str, str, List[AuditIssue], float]]
     ) -> List[AuditIssue]:
@@ -296,7 +300,7 @@ class MultiSemanticAgent(AuditAgent):
 
         return unified
 
-    # PURPOSE: レスポンスから confidence を抽出
+    # PURPOSE: LLM レスポンスから confidence を抽出
     def _extract_confidence(self, response: str) -> float:
         """LLM レスポンスから confidence を抽出。"""
         try:
@@ -322,6 +326,7 @@ class MultiSemanticAgent(AuditAgent):
 # Utilities
 # =============================================================================
 
+# PURPOSE: Severity の厳しさ順序
 def _severity_rank(severity: AuditSeverity) -> int:
     """Severity の厳しさ順序。"""
     return {

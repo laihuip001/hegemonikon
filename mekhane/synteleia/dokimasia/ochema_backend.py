@@ -78,5 +78,6 @@ class OchemaBackend(LLMBackend):
             self._client = AntigravityClient(workspace="synteleia-sandbox")
         return self._client
 
+    # PURPOSE: 文字列表現
     def __repr__(self) -> str:
         return f"OchemaBackend(model={self.model!r}, label={self.label!r})"

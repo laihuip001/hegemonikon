@@ -23,6 +23,26 @@ if str(_HEGEMONIKON_ROOT) not in sys.path:
     sys.path.insert(0, str(_HEGEMONIKON_ROOT))
 
 
+# PURPOSE: SelfAdvocate 一人称メッセージを出力するヘルパー
+def _print_advocacy(nuggets, engine) -> None:
+    """SelfAdvocate で論文一人称メッセージを生成・出力"""
+    try:
+        from mekhane.pks.self_advocate import SelfAdvocate
+    except ImportError:
+        print("\n⚠️ SelfAdvocate が利用できません。")
+        return
+
+    advocate = SelfAdvocate()
+    context = engine.tracker.context if hasattr(engine, 'tracker') else None
+
+    advocacies = advocate.generate_batch(nuggets, context)
+    if advocacies:
+        report = advocate.format_report(advocacies)
+        print("\n" + report)
+    else:
+        print("\n📭 Advocacy メッセージの生成に失敗しました。")
+
+
 # PURPOSE: `pks push` — コンテキストに基づく能動的プッシュ
 def cmd_push(args: argparse.Namespace) -> None:
     """コンテキストに基づく能動的プッシュ"""
@@ -69,6 +89,10 @@ def cmd_push(args: argparse.Namespace) -> None:
     # レポート出力
     report = engine.format_push_report(nuggets)
     print(report)
+
+    # Advocacy: 論文一人称メッセージ
+    if getattr(args, 'advocacy', False):
+        _print_advocacy(nuggets, engine)
 
 
 # PURPOSE: `pks suggest` — トピック指定で「聞くべき質問」を生成
@@ -175,6 +199,10 @@ def cmd_auto(args: argparse.Namespace) -> None:
 
     report = engine.format_push_report(nuggets)
     print(report)
+
+    # Advocacy: 論文一人称メッセージ
+    if getattr(args, 'advocacy', False):
+        _print_advocacy(nuggets, engine)
 
 
 # PURPOSE: `pks infer` — Attractor ベースのコンテキスト推論 + プッシュ
@@ -317,6 +345,7 @@ def main() -> None:
     p_push.add_argument("--max", "-m", type=int, default=5, help="最大プッシュ件数 (default: 5)")
     p_push.add_argument("--k", type=int, default=20, help="検索候補数 (default: 20)")
     p_push.add_argument("--no-questions", action="store_true", help="質問生成を無効化")
+    p_push.add_argument("--advocacy", action="store_true", help="論文一人称メッセージを生成 (Autophōnos)")
     p_push.set_defaults(func=cmd_push)
 
     # --- suggest ---
@@ -337,6 +366,7 @@ def main() -> None:
     p_auto.add_argument("--k", type=int, default=20, help="検索候補数 (default: 20)")
     p_auto.add_argument("--no-questions", action="store_true", help="質問生成を無効化")
     p_auto.add_argument("--verbose", "-v", action="store_true", help="検索結果のスコア詳細を表示")
+    p_auto.add_argument("--advocacy", action="store_true", help="論文一人称メッセージを生成 (Autophōnos)")
     p_auto.set_defaults(func=cmd_auto)
 
     # --- infer ---

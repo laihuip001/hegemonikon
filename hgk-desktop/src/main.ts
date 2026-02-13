@@ -177,6 +177,19 @@ async function updateNotifBadge(): Promise<void> {
   } catch { /* silent */ }
 }
 
+/** Skeleton loader HTML for page transitions */
+function skeletonHTML(): string {
+  return `<div class="skeleton">
+    <div class="skeleton-line h-lg w-30"></div>
+    <div class="skeleton-grid">
+      <div class="skeleton-card"><div class="skeleton-line w-50"></div><div class="skeleton-line w-75"></div><div class="skeleton-line w-30"></div></div>
+      <div class="skeleton-card"><div class="skeleton-line w-75"></div><div class="skeleton-line w-50"></div><div class="skeleton-line w-30"></div></div>
+      <div class="skeleton-card"><div class="skeleton-line w-50"></div><div class="skeleton-line w-75"></div></div>
+    </div>
+    <div class="skeleton-card"><div class="skeleton-line w-75"></div><div class="skeleton-line"></div><div class="skeleton-line w-50"></div></div>
+  </div>`;
+}
+
 function navigate(route: string): void {
   if (route === currentRoute) return;
   currentRoute = route;
@@ -189,14 +202,29 @@ function navigate(route: string): void {
 
   const app = document.getElementById('view-content');
   if (!app) return;
-  app.innerHTML = '<div class="loading">読み込み中...</div>';
 
-  const renderer = routes[route];
-  if (renderer) {
-    renderer().catch((err: Error) => {
-      app.innerHTML = `<div class="card status-error">Error: ${esc(err.message)}</div>`;
-    });
-  }
+  // Sprint 4: Animated page transition
+  app.classList.remove('view-enter');
+  app.classList.add('view-exit');
+
+  // Short exit fade, then swap content
+  setTimeout(() => {
+    app.classList.remove('view-exit');
+    app.innerHTML = skeletonHTML();
+    app.classList.add('view-enter');
+
+    const renderer = routes[route];
+    if (renderer) {
+      renderer().then(() => {
+        // Re-trigger enter animation after content renders
+        app.classList.remove('view-enter');
+        void app.offsetWidth; // force reflow
+        app.classList.add('view-enter');
+      }).catch((err: Error) => {
+        app.innerHTML = `<div class="card status-error">Error: ${esc(err.message)}</div>`;
+      });
+    }
+  }, 120); // matches view-exit transition duration
 }
 
 // ─── Dashboard ───────────────────────────────────────────────

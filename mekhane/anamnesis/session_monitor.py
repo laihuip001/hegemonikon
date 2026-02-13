@@ -1,3 +1,4 @@
+# PROOF: [L2/Index] <- mekhane/anamnesis/ Session Monitoring Daemon
 #!/usr/bin/env python3
 # PURPOSE: LS API ポーリングでアクティブセッションをリアルタイムにモニターし MD 保存する
 """

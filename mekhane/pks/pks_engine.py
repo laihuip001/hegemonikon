@@ -524,7 +524,9 @@ class PushController:
     """
 
     # PURPOSE: PushController の初期化 — プッシュ対象をフィルタリング
-    def __init__(self, max_push: int = 5, cooldown_hours: float = 24.0):
+    def __init__(self, max_push: int = 5, cooldown_hours: float = None):
+        if cooldown_hours is None:
+            cooldown_hours = float(os.environ.get("PKS_COOLDOWN_HOURS", "24.0"))
         self.max_push = max_push
         self.cooldown_hours = cooldown_hours
         self._push_history: dict[str, str] = {}  # title -> last_pushed_at ISO
@@ -600,6 +602,7 @@ class PKSEngine:
         enable_questions: bool = True,
         enable_serendipity: bool = True,
         enable_feedback: bool = True,
+        enable_advocacy: bool = True,
     ):
         self.tracker = ContextTracker()
         self.detector = RelevanceDetector(threshold=threshold)
@@ -607,6 +610,15 @@ class PKSEngine:
         self.topic_extractor = AutoTopicExtractor()
         self.serendipity_scorer = SerendipityScorer() if enable_serendipity else None
         self.question_gen = SuggestedQuestionGenerator() if enable_questions else None
+
+        # v3: SelfAdvocate (Autophōnos 核心)
+        self._advocate = None
+        if enable_advocacy:
+            try:
+                from mekhane.pks.self_advocate import SelfAdvocate
+                self._advocate = SelfAdvocate()
+            except ImportError:
+                pass
 
         # v2: Feedback loop
         self._feedback = None
@@ -855,11 +867,33 @@ class PKSEngine:
             return self.question_gen.enrich_batch(nuggets)
         return nuggets
 
+    # PURPOSE: v3: 論文一人称メッセージを生成 (Autophōnos 核心)
+    def advocate(self, nuggets: list[KnowledgeNugget]) -> list:
+        """ナゲットに一人称メッセージを生成
+
+        Returns:
+            Advocacy リスト (SelfAdvocate 不可時は空リスト)
+        """
+        if self._advocate is None:
+            return []
+        return self._advocate.generate_batch(nuggets, self.tracker.context)
+
     # PURPOSE: プッシュ結果を Markdown レポートに整形
-    def format_push_report(self, nuggets: list[KnowledgeNugget]) -> str:
-        """プッシュ結果を Markdown レポートに整形"""
+    def format_push_report(self, nuggets: list[KnowledgeNugget], use_advocacy: bool = False) -> str:
+        """プッシュ結果を Markdown レポートに整形
+
+        Args:
+            nuggets: プッシュ対象
+            use_advocacy: True の場合、論文一人称メッセージを使用
+        """
         if not nuggets:
             return "📭 プッシュ対象の知識はありません。"
+
+        # v3: Autophōnos モード — 論文一人称レポート
+        if use_advocacy and self._advocate:
+            advocacies = self.advocate(nuggets)
+            if advocacies:
+                return self._advocate.format_report(advocacies)
 
         lines = [
             "## 📡 PKS — 知識が語りかけています",

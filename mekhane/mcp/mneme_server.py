@@ -84,11 +84,13 @@ try:
             KairosIndex,
             Document,
         )
-    log("Symplokē imports successful (EmbeddingAdapter mode)")
+        from mekhane.symploke.indices.gnosis_lance_bridge import GnosisLanceBridge
+    log("Symplokē imports successful (EmbeddingAdapter + LanceBridge mode)")
 except Exception as e:
     log(f"Symplokē import error: {e}")
     # Continue without Symplokē - stub mode
     SearchEngine = None
+    GnosisLanceBridge = None
 
 
 # ============ Initialize MCP server ============
@@ -139,9 +141,32 @@ def get_engine():
         except ImportError:
             log("No seed data available")
 
-        # --- Register indices: real .pkl first, seed fallback ---
+        # --- Register gnosis: LanceBridge (27,432 papers) or seed fallback ---
+        if GnosisLanceBridge is not None:
+            try:
+                bridge = GnosisLanceBridge()
+                count = bridge.count()
+                _engine.register(bridge)
+                log(f"Loaded gnosis via LanceBridge ({count} docs)")
+            except Exception as e:
+                log(f"LanceBridge failed: {e}, falling back to seed")
+                adapter = EmbeddingAdapter()
+                index = GnosisIndex(adapter, "gnosis", dimension=384)
+                index.initialize()
+                if "gnosis" in seed_data:
+                    index.ingest(seed_data["gnosis"])
+                _engine.register(index)
+        else:
+            adapter = EmbeddingAdapter()
+            index = GnosisIndex(adapter, "gnosis", dimension=384)
+            index.initialize()
+            if "gnosis" in seed_data:
+                index.ingest(seed_data["gnosis"])
+            _engine.register(index)
+            log("Registered gnosis from seed")
+
+        # --- Register chronos, sophia, kairos: .pkl first, seed fallback ---
         for IndexClass, name in [
-            (GnosisIndex, "gnosis"),
             (ChronosIndex, "chronos"),
             (SophiaIndex, "sophia"),
             (KairosIndex, "kairos"),
@@ -149,14 +174,12 @@ def get_engine():
             pkl_path = _real_indices.get(name)
 
             if pkl_path and pkl_path.exists():
-                # Load from real pre-built index
                 adapter = EmbeddingAdapter()
                 index = IndexClass(adapter, name, dimension=1024)
                 index.load(str(pkl_path))
                 count = index.count()
                 log(f"Loaded {name} from {pkl_path.name} ({count} docs)")
             else:
-                # Fallback to seed data
                 adapter = EmbeddingAdapter()
                 index = IndexClass(adapter, name, dimension=384)
                 index.initialize()

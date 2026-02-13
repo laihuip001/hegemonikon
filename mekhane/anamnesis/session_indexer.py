@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 # PROOF: [P3/Memory] <- mekhane/anamnesis/
 # PURPOSE: セッション履歴を GnosisIndex (LanceDB) にインデックスする
 """

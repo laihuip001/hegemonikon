@@ -624,14 +624,51 @@ async def receive_notification(req: NotificationRequest) -> NotificationResponse
     )
 
 
+# PURPOSE: Digestor 最新候補を仮想通知に変換する
+def _digestor_virtual_notifications(max_candidates: int = 5) -> list[dict]:
+    """最新 Digestor レポートの上位候補を仮想通知に変換。"""
+    try:
+        from mekhane.api.routes.digestor import _list_report_files, _load_report
+        files = _list_report_files()
+        if not files:
+            return []
+        report = _load_report(files[0])
+        if not report or not report.candidates:
+            return []
+        virtuals = []
+        for c in report.candidates[:max_candidates]:
+            topics_str = ", ".join(c.matched_topics[:3]) if c.matched_topics else ""
+            body_parts = [f"スコア: {c.score:.0%}"]
+            if c.rationale:
+                body_parts.append(c.rationale[:200])
+            if topics_str:
+                body_parts.append(f"トピック: {topics_str}")
+            if c.url:
+                body_parts.append(f"URL: {c.url}")
+            virtuals.append({
+                "id": f"digestor-{hash(c.title) & 0xFFFF:04x}",
+                "timestamp": report.timestamp,
+                "source": "🧬 Digestor",
+                "level": "INFO",
+                "title": f"📰 {c.title}",
+                "body": "\n".join(body_parts),
+                "data": {"digestor": True, "score": c.score, "url": c.url or ""},
+            })
+        return virtuals
+    except Exception as e:
+        logger.debug("Digestor virtual notifications skipped: %s", e)
+        return []
+
+
 # PURPOSE: sympatheia の list notifications 処理を実行する
 @router.get("/notifications")
 async def list_notifications(
     limit: int = Query(50, ge=1, le=500),
     since: Optional[str] = Query(None, description="ISO8601 timestamp filter"),
     level: Optional[str] = Query(None, description="Filter by level: INFO|HIGH|CRITICAL"),
+    include_digestor: bool = Query(True, description="Include Digestor candidates as virtual notifications"),
 ) -> list[NotificationResponse]:
-    """通知一覧: JSONL から読み込み、最新順で返す。"""
+    """通知一覧: JSONL から読み込み、最新順で返す。Digestor 候補も仮想通知としてマージ可能。"""
     notif_file = MNEME / "notifications.jsonl"
     results: list[dict] = []
     try:
@@ -652,6 +689,14 @@ async def list_notifications(
     except Exception as e:
         logger.warning("Notification read failed: %s", e)
 
+    # Digestor 仮想通知をマージ
+    if include_digestor and (not level or level.upper() == "INFO"):
+        digestor_notifs = _digestor_virtual_notifications()
+        for dn in digestor_notifs:
+            if since and dn.get("timestamp", "") < since:
+                continue
+            results.append(dn)
+
     # 最新順、limit 適用
-    results.reverse()
+    results.sort(key=lambda r: r.get("timestamp", ""), reverse=True)
     return [NotificationResponse(**r) for r in results[:limit]]

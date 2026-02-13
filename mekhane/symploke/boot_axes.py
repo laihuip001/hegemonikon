@@ -1,7 +1,7 @@
 # PROOF: [L2/インフラ] <- mekhane/symploke/
 # PURPOSE: Boot 軸ローダー群 — boot_integration.py から抽出された個別軸ロード関数
 """
-Boot Axes — get_boot_context() から抽出された 13 軸ローダー.
+Boot Axes — get_boot_context() から抽出された 16 軸ローダー.
 
 各関数は同じパターン:
     1. デフォルト結果を定義
@@ -703,6 +703,72 @@ def load_gnosis_advice(mode: str, context: Optional[str] = None, **kw) -> dict:
 
 
 # ─────────────────────────────────────────────────────────────────────
+# 軸 P: Ideas (HGK Gateway アイデア)
+# ─────────────────────────────────────────────────────────────────────
+
+# PURPOSE: HGK Gateway で捕捉されたアイデアメモを読み込む
+def load_ideas(mode: str, context: Optional[str] = None, **kw) -> dict:
+    """Ideas 軸: HGK Gateway で捕捉された未処理アイデアを /boot に表示."""
+    result: dict = {"ideas": [], "count": 0, "formatted": ""}
+    print(" [16/16] 💡 Loading Gateway Ideas...", file=sys.stderr, end="", flush=True)
+    try:
+        idea_dir = Path.home() / "oikos" / "mneme" / ".hegemonikon" / "ideas"
+        if not idea_dir.exists():
+            print(" No ideas dir.", file=sys.stderr)
+            return result
+
+        idea_files = sorted(idea_dir.glob("idea_*.md"), reverse=True)
+        if not idea_files:
+            print(" No ideas.", file=sys.stderr)
+            return result
+
+        ideas = []
+        for fp in idea_files:
+            content = fp.read_text(encoding="utf-8")
+            # Parse metadata from markdown
+            tags = ""
+            date_str = ""
+            body_lines = []
+            in_body = False
+            for line in content.split("\n"):
+                if line.startswith("> **タグ**:"):
+                    tags = line.split(":", 1)[1].strip()
+                elif line.startswith("> **日時**:"):
+                    date_str = line.split(":", 1)[1].strip()
+                elif line.strip() == "---":
+                    if in_body:
+                        break  # End of body
+                    in_body = True
+                elif in_body and line.strip():
+                    body_lines.append(line.strip())
+
+            # First non-empty body line as title (truncated)
+            title = body_lines[0][:80] if body_lines else fp.stem
+            ideas.append({
+                "file": fp.name,
+                "title": title,
+                "tags": tags,
+                "date": date_str,
+            })
+
+        lines = [f"💡 **Gateway Ideas** ({len(ideas)}件 — 未処理アイデア)"]
+        for i, idea in enumerate(ideas, 1):
+            tag_str = f" [{idea['tags']}]" if idea["tags"] and idea["tags"] != "未分類" else ""
+            lines.append(f"  {i}. {idea['title']}{tag_str}")
+        lines.append(f"  📂 `~/oikos/mneme/.hegemonikon/ideas/`")
+
+        result = {
+            "ideas": ideas,
+            "count": len(ideas),
+            "formatted": "\n".join(lines),
+        }
+        print(f" Done ({len(ideas)} ideas).", file=sys.stderr)
+    except Exception as e:
+        print(f" Failed ({e}).", file=sys.stderr)
+    return result
+
+
+# ─────────────────────────────────────────────────────────────────────
 # Axis Registry — 統合フォーマット用の順序定義
 # ─────────────────────────────────────────────────────────────────────
 
@@ -723,4 +789,5 @@ AXIS_REGISTRY: list[tuple[str, Any, int]] = [
     ("proactive_push",  load_proactive_push,  13),
     ("violations",      load_violations,      14),
     ("gnosis_advice",   load_gnosis_advice,   15),
+    ("ideas",           load_ideas,            16),
 ]

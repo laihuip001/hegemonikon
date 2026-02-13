@@ -145,6 +145,11 @@ async def list_tools():
             description="消化対象トピック一覧を取得。",
             inputSchema={"type": "object", "properties": {}},
         ),
+        Tool(
+            name="check_incoming",
+            description="incoming/ の未消化ファイルを確認。消化待ちの論文候補一覧を返す。",
+            inputSchema={"type": "object", "properties": {}},
+        ),
     ]
 # PURPOSE: tool calls の安全な処理を保証する
 
@@ -161,6 +166,8 @@ async def call_tool(name: str, arguments: dict):
             return await handle_run_digestor(arguments)
         elif name == "get_topics":
             return await handle_get_topics(arguments)
+        elif name == "check_incoming":
+            return await handle_check_incoming(arguments)
         else:
             return [TextContent(type="text", text=f"Unknown tool: {name}")]
     except Exception as e:
@@ -245,6 +252,55 @@ async def handle_get_topics(arguments: dict):
         output += "\n"
 
 # PURPOSE: Run the MCP server.
+    return [TextContent(type="text", text=output)]
+
+
+# PURPOSE: incoming/ の未消化ファイルを確認する
+async def handle_check_incoming(arguments: dict):
+    """incoming/ の未消化ファイルを確認"""
+    incoming_dir = Path.home() / "oikos" / "mneme" / ".hegemonikon" / "incoming"
+
+    if not incoming_dir.exists():
+        return [TextContent(type="text", text="incoming/ ディレクトリが見つかりません")]
+
+    files = sorted(incoming_dir.glob("eat_*.md"))
+    if not files:
+        return [TextContent(type="text", text="消化待ちの候補はありません (0 件)")]
+
+    output = f"=== 消化待ち候補: {len(files)} 件 ===\n\n"
+
+    for i, f in enumerate(files, 1):
+        # YAML frontmatter からメタデータを抽出
+        try:
+            content = f.read_text(encoding="utf-8")
+            title = "(タイトル不明)"
+            score = ""
+            topics = ""
+
+            in_frontmatter = False
+            for line in content.split("\n"):
+                if line.strip() == "---":
+                    if in_frontmatter:
+                        break
+                    in_frontmatter = True
+                    continue
+                if in_frontmatter:
+                    if line.startswith("title:"):
+                        title = line.split(":", 1)[1].strip().strip('"\'')
+                    elif line.startswith("score:"):
+                        score = line.split(":", 1)[1].strip()
+                    elif line.startswith("topics:"):
+                        topics = line.split(":", 1)[1].strip()
+
+            output += f"{i}. {title}\n"
+            if score:
+                output += f"   Score: {score}\n"
+            if topics:
+                output += f"   Topics: {topics}\n"
+            output += f"   File: {f.name}\n\n"
+        except Exception as e:
+            output += f"{i}. {f.name} (読取エラー: {e})\n\n"
+
     return [TextContent(type="text", text=output)]
 
 

@@ -7,7 +7,7 @@ Axes:
   A. Handoff   B. Sophia/KI   C. Persona   D. PKS
   E. Safety    F. Attractor   G. GPU       H. EPT
   I. Projects  J. Skills      K. Doxa      L. Credit
-  M. Explanation Stack
+  M. Explanation Stack  N. Ideas (HGK Gateway)
 
 Theorem Coverage:
   全24定理 (O1-O4, S1-S4, H1-H4, P1-P4, K1-K4, A1-A4) を
@@ -293,7 +293,7 @@ def get_boot_context(mode: str = "standard", context: Optional[str] = None) -> d
         load_handoffs, load_sophia, load_persona, load_pks,
         load_safety, load_ept, load_digestor, load_attractor,
         load_projects, load_skills, load_doxa, load_feedback,
-        load_proactive_push,
+        load_proactive_push, load_ideas,
     )
 
     # GPU プリフライトチェック
@@ -325,6 +325,7 @@ def get_boot_context(mode: str = "standard", context: Optional[str] = None) -> d
     doxa_result = load_doxa(mode, context)
     feedback_result = load_feedback(mode, context)
     proactive_push_result = load_proactive_push(mode, context)
+    ideas_result = load_ideas(mode, context)
 
     # ── 統合フォーマット ──
     lines: list[str] = []
@@ -346,11 +347,24 @@ def get_boot_context(mode: str = "standard", context: Optional[str] = None) -> d
 
     for axis_result in [pks_result, safety_result, ept_result, digestor_result,
                         attractor_result, projects_result, skills_result,
-                        doxa_result, feedback_result, proactive_push_result]:
+                        doxa_result, feedback_result, proactive_push_result,
+                        ideas_result]:
         fmt = axis_result.get("formatted", "")
         if fmt:
             lines.append("")
             lines.append(fmt)
+
+    # incoming/ チェック — Digestor 消化候補の通知
+    incoming_dir = Path.home() / "oikos" / "mneme" / ".hegemonikon" / "incoming"
+    incoming_files = sorted(incoming_dir.glob("eat_*.md")) if incoming_dir.exists() else []
+    incoming_result = {"count": len(incoming_files), "files": [f.name for f in incoming_files]}
+    if incoming_files:
+        lines.append("")
+        lines.append(f"📥 Digestor: {len(incoming_files)} 件の消化候補待ち")
+        for f in incoming_files[:5]:
+            lines.append(f"   → {f.name}")
+        if len(incoming_files) > 5:
+            lines.append(f"   ... +{len(incoming_files) - 5} 件")
 
     # n8n WF-06: Session Start 通知
     try:
@@ -387,6 +401,8 @@ def get_boot_context(mode: str = "standard", context: Optional[str] = None) -> d
         "doxa": doxa_result,
         "feedback": feedback_result,
         "proactive_push": proactive_push_result,
+        "ideas": ideas_result,
+        "incoming": incoming_result,
         "formatted": "\n".join(lines),
     }
 

@@ -287,6 +287,14 @@ bash ~/oikos/hegemonikon/scripts/agq-check.sh
 bash ~/oikos/hegemonikon/scripts/agq-check.sh --snapshot boot 2>/dev/null
 ```
 
+環境スナップショットを保存 (ポート・PID・cloud endpoint):
+
+// turbo
+
+```bash
+bash ~/oikos/hegemonikon/scripts/agq-log-harvest.sh --env 2>/dev/null
+```
+
 **出力の読み方**:
 
 | フィールド | 意味 | boot での用途 |

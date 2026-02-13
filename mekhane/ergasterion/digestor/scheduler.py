@@ -18,6 +18,7 @@ import os
 import sys
 import time
 import signal
+import subprocess
 from datetime import datetime
 from pathlib import Path
 
@@ -35,7 +36,7 @@ from mekhane.ergasterion.digestor.pipeline import DigestorPipeline
 # 設定
 SCHEDULE_TIME = "06:00"  # 毎日実行時刻
 MAX_PAPERS = 30  # 取得論文数
-DRY_RUN = True  # Dry-run mode — 候補リスト生成のみ（/eat は Creator 承認後に手動実行）
+DRY_RUN = False  # Live mode — 候補リスト生成 + /eat バッチ入力も生成
 LOG_DIR = Path.home() / ".hegemonikon" / "digestor"
 PID_FILE = LOG_DIR / "scheduler.pid"
 LOG_FILE = LOG_DIR / "scheduler.log"
@@ -54,6 +55,24 @@ def log(msg: str):
         f.write(line + "\n")
 
 
+# PURPOSE: GNOME デスクトップ通知
+def notify_desktop(title: str, body: str):
+    """GNOME デスクトップ通知を送信"""
+    try:
+        env = os.environ.copy()
+        env["DISPLAY"] = ":0"
+        subprocess.run(
+            ["notify-send", "--urgency=normal",
+             "--icon=dialog-information", title, body],
+            env=env,
+            timeout=5,
+            check=False,
+        )
+        log(f"Desktop notification sent: {title}")
+    except Exception as e:
+        log(f"Desktop notification failed: {e}")
+
+
 # PURPOSE: 消化パイプライン実行
 def run_digestor():
     """消化パイプライン実行"""
@@ -70,6 +89,14 @@ def run_digestor():
         # 候補サマリー
         for i, c in enumerate(result.candidates[:5], 1):
             log(f"  {i}. [{c.score:.2f}] {c.paper.title[:50]}...")
+
+        # デスクトップ通知
+        if result.candidates_selected > 0:
+            titles = [c.paper.title[:40] for c in result.candidates[:3]]
+            body = f"{result.candidates_selected} 件の消化候補\n" + "\n".join(
+                f"• {t}..." for t in titles
+            )
+            notify_desktop("📥 Digestor", body)
 
     except Exception as e:
         log(f"Digestor error: {e}")

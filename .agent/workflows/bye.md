@@ -277,6 +277,14 @@ git -C ~/oikos status --short
 bash ~/oikos/hegemonikon/scripts/agq-check.sh --snapshot bye 2>/dev/null
 ```
 
+1. **ログメトリクス収穫** (API呼出し数・コンテキスト推移・ブラウザ操作):
+
+// turbo
+
+```bash
+bash ~/oikos/hegemonikon/scripts/agq-log-harvest.sh --summary 2>/dev/null
+```
+
 1. **デルタ計算** (boot スナップショットとの差分):
 
 // turbo
@@ -293,6 +301,9 @@ bash ~/oikos/hegemonikon/scripts/agq-check.sh --delta 2>/dev/null
 | Claude Opus 消費率 | `--delta` コマンド | Handoff Session Metrics |
 | WF 使用回数 | セッション振り返り | Handoff Session Metrics |
 | セッション時間 | boot.json ↔ bye.json の timestamp 差分 | Handoff Session Metrics |
+| API 呼出し数 | `--summary` コマンド | Handoff Session Metrics |
+| Context Peak | `--summary` コマンド | Handoff Session Metrics |
+| Browser Ops | `--summary` コマンド | Handoff Session Metrics |
 
 1. **Handoff に Session Metrics セクションを追加**:
 
@@ -304,6 +315,13 @@ bash ~/oikos/hegemonikon/scripts/agq-check.sh --delta 2>/dev/null
 | Prompt Credits | {boot_pc} | {bye_pc} | -{delta_pc} |
 | Flow Credits | {boot_fc} | {bye_fc} | -{delta_fc} |
 | Claude Opus | {boot_claude}% | {bye_claude}% | -{delta}% |
+
+| ログメトリクス | 値 |
+|:---------------|:---|
+| API Calls | {api_calls} |
+| Context Peak | {ctx_max} msgs |
+| Browser Ops | {browser_ops} |
+| Errors | {errors} |
 
 **WF 使用**: /noe×N, /dia×N, /ene×N, ...
 **セッション時間**: {duration}

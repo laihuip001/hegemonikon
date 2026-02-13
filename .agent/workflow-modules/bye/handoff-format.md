@@ -58,6 +58,12 @@ session_handoff:
     branch: "{git_branch}"
     python: "{version}"
     test_command: "{pytest ...}"
+    
+  # CEP-001: FEP 認知メトリクス
+  fep_metrics:
+    convergence: "{V[session] — 0.0=完全収束, 1.0=完全不確実}"
+    will_delta: "{|/bou'| — 意志の変化率. 0.0=不動, 1.0=完全転換}"
+    accumulated: "{∫/dox — 蓄積された信念の要約 (1行)}"
 ```
 
 ---

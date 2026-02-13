@@ -21,6 +21,7 @@ from functools import lru_cache
 # =============================================================================
 
 @dataclass
+# PURPOSE: [L2-auto] ワークフローステージ
 class WorkflowStage:
     """ワークフローステージ"""
     name: str
@@ -29,6 +30,7 @@ class WorkflowStage:
 
 
 @dataclass
+# PURPOSE: [L2-auto] ワークフロー定義
 class WorkflowDefinition:
     """ワークフロー定義"""
     name: str                           # 例: "noe", "bou", "ene"
@@ -61,6 +63,7 @@ class WorkflowDefinition:
 # Parser
 # =============================================================================
 
+# PURPOSE: [L2-auto] ワークフロー Markdown パーサー
 class WorkflowParser:
     """ワークフロー Markdown パーサー"""
     
@@ -157,6 +160,7 @@ class WorkflowParser:
 # Registry
 # =============================================================================
 
+# PURPOSE: [L2-auto] ワークフローレジストリ
 class WorkflowRegistry:
     """ワークフローレジストリ
     

@@ -20,6 +20,7 @@ from typing import Any, Dict, List, Optional
 # Types
 # =============================================================================
 
+# PURPOSE: [L2-auto] スレッドステータス
 class ThreadStatus(Enum):
     """スレッドステータス"""
     PENDING = "pending"
@@ -30,6 +31,7 @@ class ThreadStatus(Enum):
 
 
 @dataclass
+# PURPOSE: [L2-auto] スレッド設定
 class ThreadConfig:
     """スレッド設定"""
     name: str
@@ -44,6 +46,7 @@ class ThreadConfig:
 
 
 @dataclass
+# PURPOSE: [L2-auto] スレッド実行結果
 class ThreadResult:
     """スレッド実行結果"""
     thread_name: str
@@ -75,6 +78,7 @@ class ThreadResult:
 
 
 @dataclass
+# PURPOSE: [L2-auto] 実行プラン
 class ExecutionPlan:
     """実行プラン"""
     threads: List[ThreadConfig]
@@ -87,6 +91,7 @@ class ExecutionPlan:
 # Synergeia Adapter
 # =============================================================================
 
+# PURPOSE: [L2-auto] Synergeia 統合アダプター
 class SynergeiaAdapter:
     """Synergeia 統合アダプター
     
@@ -327,6 +332,7 @@ class SynergeiaAdapter:
 # Plan Builder
 # =============================================================================
 
+# PURPOSE: [L2-auto] 実行プラン構築器
 class PlanBuilder:
     """実行プラン構築器"""
     

@@ -19,6 +19,7 @@ from .ccl_ast import (
 )
 
 
+# PURPOSE: [L2-auto] CCL パーサー
 class CCLParser:
     """CCL パーサー"""
     

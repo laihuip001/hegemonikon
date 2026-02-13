@@ -14,6 +14,7 @@ from dataclasses import dataclass
 
 
 @dataclass
+# PURPOSE: [L2-auto] 展開結果
 class ExpansionResult:
     """展開結果"""
     original: str          # 元の式
@@ -93,6 +94,7 @@ OPERATOR_SEL = {
 }
 
 
+# PURPOSE: [L2-auto] CCL 省略形展開器
 class Expander:
     """CCL 省略形展開器"""
     

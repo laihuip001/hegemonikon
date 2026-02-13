@@ -22,6 +22,7 @@ from contextlib import contextmanager
 # =============================================================================
 
 @dataclass
+# PURPOSE: [L2-auto] チェックポイント
 class Checkpoint:
     """チェックポイント"""
     checkpoint_id: str
@@ -33,6 +34,7 @@ class Checkpoint:
 
 
 @dataclass
+# PURPOSE: [L2-auto] チェックポイント書き込みリクエスト
 class CheckpointWrite:
     """チェックポイント書き込みリクエスト"""
     thread_id: str
@@ -45,6 +47,7 @@ class CheckpointWrite:
 # SQLite Checkpointer
 # =============================================================================
 
+# PURPOSE: [L2-auto] SQLite ベースのチェックポインター
 class CCLCheckpointer:
     """SQLite ベースのチェックポインター
     
@@ -263,6 +266,7 @@ class CCLCheckpointer:
 # Memory Checkpointer (テスト用)
 # =============================================================================
 
+# PURPOSE: [L2-auto] メモリベースのチェックポインター (テスト用)
 class MemoryCheckpointer:
     """メモリベースのチェックポインター (テスト用)"""
     

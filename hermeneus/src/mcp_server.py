@@ -373,6 +373,7 @@ async def _handle_dispatch(args: Dict[str, Any]) -> Sequence[TextContent]:
 # Fallback (MCP なしの場合)
 # =============================================================================
 
+# PURPOSE: [L2-auto] MCP SDK がない場合のフォールバック
 class FallbackServer:
     """MCP SDK がない場合のフォールバック"""
     

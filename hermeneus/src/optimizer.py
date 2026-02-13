@@ -35,6 +35,7 @@ except ImportError:
 # Types
 # =============================================================================
 
+# PURPOSE: [L2-auto] 最適化手法
 class OptimizerType(Enum):
     """最適化手法"""
     BOOTSTRAP_FEWSHOT = "bootstrap_fewshot"
@@ -44,6 +45,7 @@ class OptimizerType(Enum):
 
 
 @dataclass
+# PURPOSE: [L2-auto] 最適化設定
 class OptimizationConfig:
     """最適化設定"""
     optimizer_type: OptimizerType = OptimizerType.BOOTSTRAP_FEWSHOT
@@ -56,6 +58,7 @@ class OptimizationConfig:
 
 
 @dataclass
+# PURPOSE: [L2-auto] 最適化結果
 class OptimizationResult:
     """最適化結果"""
     success: bool
@@ -68,6 +71,7 @@ class OptimizationResult:
 
 
 @dataclass
+# PURPOSE: [L2-auto] CCL 最適化用の例
 class CCLExample:
     """CCL 最適化用の例"""
     ccl: str
@@ -96,6 +100,7 @@ def create_ccl_signature():
     if not DSPY_AVAILABLE:
         return None
     
+    # PURPOSE: [L2-auto] CCL ワークフローを実行して結果を生成
     class CCLExecutionSignature(dspy.Signature):
         """CCL ワークフローを実行して結果を生成"""
         ccl: str = dspy.InputField(desc="CCL expression (e.g., /noe+)")
@@ -108,6 +113,7 @@ def create_ccl_signature():
 # =============================================================================
 # CCL Module (DSPy)
 # =============================================================================
+# PURPOSE: [L2-auto] CCL 実行モジュール (DSPy Module ラッパー)
 
 class CCLModule:
     """CCL 実行モジュール (DSPy Module ラッパー)"""
@@ -153,6 +159,7 @@ class CCLModule:
 # =============================================================================
 # CCL Optimizer
 # =============================================================================
+# PURPOSE: [L2-auto] CCL ワークフロー最適化器
 
 class CCLOptimizer:
     """CCL ワークフロー最適化器"""
@@ -336,6 +343,7 @@ def optimize_ccl(
 # =============================================================================
 # Mock Optimizer (for testing)
 # =============================================================================
+# PURPOSE: [L2-auto] テスト用モック最適化器
 
 class MockOptimizer:
     """テスト用モック最適化器"""

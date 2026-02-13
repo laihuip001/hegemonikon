@@ -20,6 +20,7 @@ from enum import Enum
 # =============================================================================
 
 @dataclass
+# PURPOSE: [L2-auto] CCL 出力スキーマ
 class CCLOutputSchema:
     """CCL 出力スキーマ"""
     result: str                              # 主要な出力
@@ -30,6 +31,7 @@ class CCLOutputSchema:
 
 
 @dataclass
+# PURPOSE: [L2-auto] 収束ループ出力スキーマ
 class ConvergenceOutputSchema:
     """収束ループ出力スキーマ"""
     final_result: str
@@ -40,6 +42,7 @@ class ConvergenceOutputSchema:
 
 
 @dataclass
+# PURPOSE: [L2-auto] シーケンス出力スキーマ
 class SequenceOutputSchema:
     """シーケンス出力スキーマ"""
     steps: List[Dict[str, str]]
@@ -51,6 +54,7 @@ class SequenceOutputSchema:
 # JSON Schema Generator
 # =============================================================================
 
+# PURPOSE: [L2-auto] Python dataclass から JSON Schema を生成
 class SchemaGenerator:
     """Python dataclass から JSON Schema を生成"""
     
@@ -136,6 +140,7 @@ class SchemaGenerator:
 # Constrained Decoder
 # =============================================================================
 
+# PURPOSE: [L2-auto] Constrained Decoding を使用した出力生成
 class ConstrainedDecoder:
     """Constrained Decoding を使用した出力生成
     

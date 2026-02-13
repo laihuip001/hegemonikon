@@ -26,6 +26,7 @@ from contextlib import contextmanager
 # Types
 # =============================================================================
 
+# PURPOSE: [L2-auto] 証明タイプ
 class ProofType(Enum):
     """証明タイプ"""
     TYPE = "type"       # 型チェック (mypy)
@@ -33,6 +34,7 @@ class ProofType(Enum):
     FORMAL = "formal"   # 形式証明 (Lean4)
 
 
+# PURPOSE: [L2-auto] 証明ステータス
 class ProofStatus(Enum):
     """証明ステータス"""
     VERIFIED = "verified"     # 検証成功
@@ -43,6 +45,7 @@ class ProofStatus(Enum):
 
 
 @dataclass
+# PURPOSE: [L2-auto] 証明結果
 class ProofResult:
     """証明結果"""
     verified: bool
@@ -61,12 +64,14 @@ class ProofResult:
 # Prover Interface
 # =============================================================================
 
+# PURPOSE: [L2-auto] Prover 抽象インターフェース
 class ProverInterface(ABC):
     """Prover 抽象インターフェース"""
     
     # PURPOSE: 証明タイプ
     @property
     @abstractmethod
+    # PURPOSE: [L2-auto] 証明タイプ
     def proof_type(self) -> ProofType:
         """証明タイプ"""
         pass
@@ -91,6 +96,7 @@ class ProverInterface(ABC):
 # =============================================================================
 # Mypy Prover
 # =============================================================================
+# PURPOSE: [L2-auto] Mypy 型チェッカー
 
 class MypyProver(ProverInterface):
     """Mypy 型チェッカー
@@ -242,6 +248,7 @@ class MypyProver(ProverInterface):
 # =============================================================================
 # Schema Prover
 # =============================================================================
+# PURPOSE: [L2-auto] スキーマ検証
 
 class SchemaProver(ProverInterface):
     """スキーマ検証
@@ -364,6 +371,7 @@ class SchemaProver(ProverInterface):
 # =============================================================================
 # Lean4 Prover (オプション)
 # =============================================================================
+# PURPOSE: [L2-auto] Lean 4 形式証明
 
 class Lean4Prover(ProverInterface):
     """Lean 4 形式証明
@@ -479,6 +487,7 @@ class Lean4Prover(ProverInterface):
 # =============================================================================
 # Proof Cache
 # =============================================================================
+# PURPOSE: [L2-auto] 証明結果キャッシュ
 
 class ProofCache:
     """証明結果キャッシュ"""

@@ -17,6 +17,7 @@ from typing import Optional, List, Dict, Any, Union
 # Operator Types
 # =============================================================================
 
+# PURPOSE: [L2-auto] CCL 演算子タイプ (v6.50)
 class OpType(Enum):
     """CCL 演算子タイプ (v6.50)"""
     # Tier 1: 単項演算子 (強度・次元)
@@ -48,6 +49,7 @@ class OpType(Enum):
 # =============================================================================
 
 @dataclass
+# PURPOSE: [L2-auto] ワークフローノード
 class Workflow:
     """ワークフローノード
     
@@ -62,6 +64,7 @@ class Workflow:
 
 
 @dataclass
+# PURPOSE: [L2-auto] 条件ノード
 class Condition:
     """条件ノード
     
@@ -73,6 +76,7 @@ class Condition:
 
 
 @dataclass
+# PURPOSE: [L2-auto] マクロ参照ノード
 class MacroRef:
     """マクロ参照ノード
     
@@ -87,6 +91,7 @@ class MacroRef:
 # =============================================================================
 
 @dataclass
+# PURPOSE: [L2-auto] 収束ループ: A >> cond または lim[cond]{A}
 class ConvergenceLoop:
     """収束ループ: A >> cond または lim[cond]{A}
     
@@ -98,6 +103,7 @@ class ConvergenceLoop:
 
 
 @dataclass
+# PURPOSE: [L2-auto] シーケンス: A _ B _ C
 class Sequence:
     """シーケンス: A _ B _ C
     
@@ -107,6 +113,7 @@ class Sequence:
 
 
 @dataclass
+# PURPOSE: [L2-auto] 融合: A * B, A % B (外積), A *% B (内積+外積)
 class Fusion:
     """融合: A * B, A % B (外積), A *% B (内積+外積)
     
@@ -125,6 +132,7 @@ class Fusion:
 
 
 @dataclass
+# PURPOSE: [L2-auto] 振動: A ~ B, A ~* B (収束), A ~! B (発散)
 class Oscillation:
     """振動: A ~ B, A ~* B (収束), A ~! B (発散)
     
@@ -138,6 +146,7 @@ class Oscillation:
 
 
 @dataclass
+# PURPOSE: [L2-auto] Colimit 展開: \A
 class ColimitExpansion:
     """Colimit 展開: \\A
     
@@ -149,6 +158,7 @@ class ColimitExpansion:
 
 
 @dataclass
+# PURPOSE: [L2-auto] パイプライン: A |> B |> C
 class Pipeline:
     """パイプライン: A |> B |> C
     
@@ -158,6 +168,7 @@ class Pipeline:
 
 
 @dataclass
+# PURPOSE: [L2-auto] 並列実行: A || B || C
 class Parallel:
     """並列実行: A || B || C
     
@@ -171,6 +182,7 @@ class Parallel:
 # =============================================================================
 
 @dataclass
+# PURPOSE: [L2-auto] FOR ループ: F:[×N]{body} または F:[A,B,C]{body}
 class ForLoop:
     """FOR ループ: F:[×N]{body} または F:[A,B,C]{body}
     
@@ -181,6 +193,7 @@ class ForLoop:
 
 
 @dataclass
+# PURPOSE: [L2-auto] IF 条件分岐: I:[cond]{then} E:{else}
 class IfCondition:
     """IF 条件分岐: I:[cond]{then} E:{else}
     
@@ -192,6 +205,7 @@ class IfCondition:
 
 
 @dataclass
+# PURPOSE: [L2-auto] WHILE ループ: W:[cond]{body}
 class WhileLoop:
     """WHILE ループ: W:[cond]{body}
     
@@ -202,6 +216,7 @@ class WhileLoop:
 
 
 @dataclass
+# PURPOSE: [L2-auto] Lambda 関数: L:[x]{body}
 class Lambda:
     """Lambda 関数: L:[x]{body}
     
@@ -212,6 +227,7 @@ class Lambda:
 
 
 @dataclass
+# PURPOSE: [L2-auto] タグ付きブロック: V:{body}, C:{body}, R:{body}, M:{body}
 class TaggedBlock:
     """タグ付きブロック: V:{body}, C:{body}, R:{body}, M:{body}
     
@@ -234,6 +250,7 @@ class TaggedBlock:
 # =============================================================================
 
 @dataclass
+# PURPOSE: [L2-auto] CCL プログラム (ルートノード)
 class Program:
     """CCL プログラム (ルートノード)"""
     expressions: List[Any] = field(default_factory=list)
@@ -241,6 +258,7 @@ class Program:
 
 
 @dataclass
+# PURPOSE: [L2-auto] マクロ定義: let @name = CCL 式
 class LetBinding:
     """マクロ定義: let @name = CCL 式
     

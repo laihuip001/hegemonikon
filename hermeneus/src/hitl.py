@@ -18,6 +18,7 @@ from datetime import datetime
 # HITL Types
 # =============================================================================
 
+# PURPOSE: [L2-auto] 割り込みタイプ
 class InterruptType(Enum):
     """割り込みタイプ"""
     BEFORE = "before"           # ノード実行前
@@ -25,6 +26,7 @@ class InterruptType(Enum):
     ON_CONDITION = "condition"  # 条件付き
 
 
+# PURPOSE: [L2-auto] HITL コマンド
 class HITLCommand(Enum):
     """HITL コマンド"""
     PROCEED = "proceed"         # 続行
@@ -35,6 +37,7 @@ class HITLCommand(Enum):
 
 
 @dataclass
+# PURPOSE: [L2-auto] 割り込みポイント
 class InterruptPoint:
     """割り込みポイント"""
     node_id: str
@@ -44,6 +47,7 @@ class InterruptPoint:
 
 
 @dataclass
+# PURPOSE: [L2-auto] HITL リクエスト
 class HITLRequest:
     """HITL リクエスト"""
     request_id: str
@@ -57,6 +61,7 @@ class HITLRequest:
 
 
 @dataclass
+# PURPOSE: [L2-auto] HITL レスポンス
 class HITLResponse:
     """HITL レスポンス"""
     request_id: str
@@ -70,6 +75,7 @@ class HITLResponse:
 # HITL Controller
 # =============================================================================
 
+# PURPOSE: [L2-auto] Human-in-the-Loop コントローラー
 class HITLController:
     """Human-in-the-Loop コントローラー
     

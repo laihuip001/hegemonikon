@@ -19,6 +19,7 @@ from typing import Any, Callable, Dict, List, Optional
 # Types
 # =============================================================================
 
+# PURPOSE: [L2-auto] エージェントの役割
 class AgentRole(Enum):
     """エージェントの役割"""
     PROPOSER = "proposer"    # 主張を支持
@@ -26,6 +27,7 @@ class AgentRole(Enum):
     ARBITER = "arbiter"      # 最終判定
 
 
+# PURPOSE: [L2-auto] 判定タイプ
 class VerdictType(Enum):
     """判定タイプ"""
     ACCEPT = "accept"        # 受理
@@ -34,6 +36,7 @@ class VerdictType(Enum):
 
 
 @dataclass
+# PURPOSE: [L2-auto] ディベート引数
 class DebateArgument:
     """ディベート引数"""
     agent_role: AgentRole
@@ -43,6 +46,7 @@ class DebateArgument:
 
 
 @dataclass
+# PURPOSE: [L2-auto] 判定結果
 class Verdict:
     """判定結果"""
     type: VerdictType
@@ -52,6 +56,7 @@ class Verdict:
 
 
 @dataclass
+# PURPOSE: [L2-auto] ディベートラウンド
 class DebateRound:
     """ディベートラウンド"""
     round_number: int
@@ -61,6 +66,7 @@ class DebateRound:
 
 
 @dataclass
+# PURPOSE: [L2-auto] 合意結果
 class ConsensusResult:
     """合意結果"""
     accepted: bool
@@ -76,6 +82,7 @@ class ConsensusResult:
 # Debate Agent
 # =============================================================================
 
+# PURPOSE: [L2-auto] ディベートエージェント
 class DebateAgent:
     """ディベートエージェント
     
@@ -308,6 +315,7 @@ class DebateAgent:
 # Debate Engine
 # =============================================================================
 
+# PURPOSE: [L2-auto] ディベートエンジン
 class DebateEngine:
     """ディベートエンジン
     

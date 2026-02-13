@@ -54,6 +54,14 @@ class TestBuiltinMacros:
         assert "dig" in BUILTIN_MACROS
         assert "/s+" in BUILTIN_MACROS["dig"]
 
+    def test_chew_macro(self):
+        assert "chew" in BUILTIN_MACROS
+        assert "/eat+" in BUILTIN_MACROS["chew"]
+
+    def test_read_macro(self):
+        assert "read" in BUILTIN_MACROS
+        assert "/m.read" in BUILTIN_MACROS["read"]
+
 
 class TestLoadStandardMacros:
     """ccl/macros/ からのマクロ読み込みテスト"""
@@ -240,35 +248,40 @@ class TestMacroE2E:
 
 
 # =============================================================================
-# E2E: 全16アクティブマクロ (CCL リファレンス v3.2 — DX-008 hub-only 統合)
+# E2E: 全18アクティブマクロ (認知昇華版 — Prior→Likelihood→Posterior)
 # =============================================================================
 
 
-# 全16マクロの定義 — BUILTIN_MACROS と同期
+# 全18マクロの定義 — BUILTIN_MACROS と同期
 ACTIVE_MACROS = {
-    # O-series
-    "nous": 'R:{F:[×2]{/u+*^/u^}}_/dox-',
-    "dig": "/s+~(/p*/a)_/ana_/dia*/o+",  # v2: +/ana
+    # O-series — 認知昇華版
+    "nous": "/pro_/s-_R:{F:[×2]{/u+*^/u^}}_~(/noe*/dia)_/pis_/dox-",
+    "dig": "/pro_/s+~(/p*/a)_/ana_/dia*/o+_/pis",
     # S-series
-    "plan": "/bou+_/chr_/s+~(/p*/k)_V:{/dia}",  # v2: +/chr
-    "build": "/bou-_/chr_/kho_/s+_/ene+_V:{/dia-}_I:[✓]{/dox-}",  # v2: +/chr,/kho
+    "plan": "/bou+_/chr_/s+~(/p*/k)_V:{/dia}_/pis_/dox-",
+    "build": "/bou-_/chr_/kho_/s+_/ene+_V:{/dia-}_I:[✓]{/dox-}",
     "tak": "/s1_F:[×3]{/sta~/chr}_F:[×3]{/kho~/zet}_I:[∅]{/sop}_/euk_/bou",
     # H-series
     "osc": "R:{F:[/s,/dia,/noe]{L:[x]{x~x+}}, ~(/h*/k)}",
-    "learn": "/dox+_*^/u+_/bye+",
+    "learn": "/pro_/dox+_F:[×2]{/u+~(/noe*/dia)}_~(/h*/k)_/pis_/bye+",
     # A-series
-    "fix": "/tel_C:{/dia+_/ene+}_I:[✓]{/dox-}",  # v2: +/tel
+    "fix": "/kho_/tel_C:{/dia+_/ene+}_I:[✓]{/pis_/dox-}",
     "vet": "/kho{git_diff}_C:{V:{/dia+}_/ene+}_/pra{test}_/pis_/dox",
-    "proof": '/kat_V:{/noe~/dia}_I:[✓]{/ene{PROOF.md}}_E:{/ene{_limbo/}}',  # v2: +/kat
-    "syn": "/dia+{synteleia}_V:{/pis+}",
+    "proof": '/kat_V:{/noe~/dia}_I:[✓]{/ene{PROOF.md}}_E:{/ene{_limbo/}}',
+    "syn": "/kho_/s-_/pro_/dia+{synteleia}_~(/noe*/dia)_V:{/pis+}_/dox-",
     # P-series
-    "ground": "/tak-*/bou+{6w3h}~/p-_/ene-",
-    "ready": "/kho_/chr_/euk_/tak-",  # 新規: 見渡す
+    "ground": "/pro_/tak-*/bou+{6w3h}~/p-_/ene-_/pis",
+    "ready": "/bou-_/pro_/kho_/chr_/euk_/tak-_~(/h*/k)_/pis",
     # K-series
-    "kyc": "C:{/sop_/noe_/ene_/dia-}",
+    "kyc": "/pro_C:{/sop_/noe_/ene_/dia-}_/pis_/dox-",
     # Hub-only 統合
-    "feel": "/pro_/ore~(/pis_/ana)",  # 新規: 感じる
-    "clean": "/kat_/sym~(/tel_/dia-)",  # 新規: 絞る
+    "feel": "/pro_/ore~(/pis_/ana)_/dox-",
+    "clean": "/s-_/kat_/sym~(/tel_/dia-)_/pis",
+    # 反復マクロ (Repetition Principle)
+    "chew": "/s-_/pro_F:[×3]{/eat+~(/noe*/dia)}_~(/h*/k)_@proof_/pis_/dox-",
+    "read": "/s-_/pro_F:[×3]{/m.read~(/noe*/dia)}_/ore_~(/h*/k)_/pis_/dox-",
+    # 方向性 (FuseOuter + Pipeline)
+    "helm": "/pro_/kho_/bou+*%/zet+|>/u++_~(/h*/k)_/pis_/dox-",
 }
 
 
@@ -286,33 +299,75 @@ class TestAllMacrosE2E:
     # --- 展開テスト: 全マクロが正しく展開される ---
 
     @pytest.mark.parametrize("name,expected_fragment", [
+        # 認知昇華: Prior (前感情/方向性)
+        ("nous", "/pro"),
+        ("nous", "/u+"),
+        ("nous", "/pis"),  # Posterior: 確信度
+        ("dig", "/pro"),
         ("dig", "/s+"),
-        ("dig", "/ana"),  # hub-only 統合
+        ("dig", "/ana"),
+        ("dig", "/pis"),
         ("plan", "/bou+"),
-        ("plan", "/chr"),  # hub-only 統合
+        ("plan", "/chr"),
+        ("plan", "/pis"),
+        ("plan", "/dox-"),
         ("build", "/ene+"),
-        ("build", "/chr"),  # hub-only 統合
-        ("build", "/kho"),  # hub-only 統合
+        ("build", "/chr"),
+        ("build", "/kho"),
+        ("fix", "/kho"),  # Prior: 場の把握
         ("fix", "/dia+"),
-        ("fix", "/tel"),  # hub-only 統合
+        ("fix", "/tel"),
+        ("fix", "/pis"),
         ("vet", "git_diff"),
         ("tak", "/s1"),
+        ("kyc", "/pro"),  # Prior: 前感情
         ("kyc", "/sop"),
+        ("kyc", "/pis"),
+        ("kyc", "/dox-"),
+        ("learn", "/pro"),  # Prior: 前感情
         ("learn", "/dox+"),
-        ("nous", "/u+"),
+        ("learn", "/pis"),
+        ("learn", "/bye+"),
+        ("nous", "/dox-"),
+        ("ground", "/pro"),
         ("ground", "/bou+"),
+        ("ground", "/pis"),
         ("osc", "/s,/dia,/noe"),
         ("proof", "PROOF.md"),
-        ("proof", "/kat"),  # hub-only 統合
+        ("proof", "/kat"),
+        ("syn", "/kho"),  # Prior: 場の把握
+        ("syn", "/pro"),
         ("syn", "synteleia"),
-        # 新規マクロ
+        ("syn", "/dox-"),
+        # 見渡す — 認知昇華版
+        ("ready", "/bou-"),  # Prior: 目的確認
+        ("ready", "/pro"),
         ("ready", "/kho"),
         ("ready", "/chr"),
         ("ready", "/euk"),
+        ("ready", "/pis"),
         ("feel", "/pro"),
         ("feel", "/ore"),
+        ("feel", "/dox-"),
+        ("clean", "/s-"),  # Prior: 方向性
         ("clean", "/kat"),
         ("clean", "/sym"),
+        ("clean", "/pis"),
+        # 反復マクロ
+        ("chew", "/eat+"),
+        ("chew", "/pro"),
+        ("chew", "@proof"),
+        ("read", "/m.read"),
+        ("read", "/pro"),
+        ("read", "/ore"),
+        # 方向性 (FuseOuter + Pipeline)
+        ("helm", "/pro"),     # Prior: 前感情
+        ("helm", "/kho"),     # Prior: 場の把握
+        ("helm", "/bou+"),    # Likelihood: 意志(深)
+        ("helm", "/zet+"),    # Likelihood: 探求(深)
+        ("helm", "/u++"),     # Likelihood: 主観二重深化
+        ("helm", "/pis"),     # Posterior: 確信度
+        ("helm", "/dox-"),    # Posterior: 記録
     ])
     def test_macro_expands(self, all_macros, name, expected_fragment):
         """各マクロが正しいCCLに展開される"""

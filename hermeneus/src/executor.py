@@ -22,6 +22,7 @@ from contextlib import asynccontextmanager
 # Types
 # =============================================================================
 
+# PURPOSE: [L2-auto] 実行フェーズ
 class ExecutionPhase(Enum):
     """実行フェーズ"""
     INIT = "init"
@@ -34,6 +35,7 @@ class ExecutionPhase(Enum):
 
 
 @dataclass
+# PURPOSE: [L2-auto] フェーズ結果
 class PhaseResult:
     """フェーズ結果"""
     phase: ExecutionPhase
@@ -44,6 +46,7 @@ class PhaseResult:
 
 
 @dataclass
+# PURPOSE: [L2-auto] 実行パイプライン結果
 class ExecutionPipeline:
     """実行パイプライン結果"""
     ccl: str
@@ -94,6 +97,7 @@ class ExecutionPipeline:
 # Executor
 # =============================================================================
 
+# PURPOSE: [L2-auto] ワークフロー実行エンジン
 class WorkflowExecutor:
     """ワークフロー実行エンジン
     
@@ -406,6 +410,7 @@ class WorkflowExecutor:
 # Batch Executor
 # =============================================================================
 
+# PURPOSE: [L2-auto] バッチ実行エンジン
 class BatchExecutor:
     """バッチ実行エンジン"""
     

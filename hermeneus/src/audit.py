@@ -22,6 +22,7 @@ from contextlib import contextmanager
 # =============================================================================
 
 @dataclass
+# PURPOSE: [L2-auto] 監査レコード
 class AuditRecord:
     """監査レコード"""
     record_id: str
@@ -36,6 +37,7 @@ class AuditRecord:
 
 
 @dataclass
+# PURPOSE: [L2-auto] 監査統計
 class AuditStats:
     """監査統計"""
     total_records: int
@@ -50,6 +52,7 @@ class AuditStats:
 # Audit Store
 # =============================================================================
 
+# PURPOSE: [L2-auto] 監査ストア
 class AuditStore:
     """監査ストア
     
@@ -280,6 +283,7 @@ class AuditStore:
 # Report Generator
 # =============================================================================
 
+# PURPOSE: [L2-auto] 監査レポート生成器
 class AuditReporter:
     """監査レポート生成器"""
     

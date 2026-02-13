@@ -75,6 +75,7 @@ OPERATOR_CONSTRAINTS = {
 }
 
 
+# PURPOSE: [L2-auto] CCL AST → LMQL プログラム変換
 class LMQLTranslator:
     """CCL AST → LMQL プログラム変換"""
     

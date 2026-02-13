@@ -25,6 +25,7 @@ import re
 # Types
 # =============================================================================
 
+# PURPOSE: [L2-auto] 実行ステップのタイプ
 class StepType(Enum):
     """実行ステップのタイプ"""
     WORKFLOW = "workflow"       # 定理 WF 実行
@@ -42,6 +43,7 @@ class StepType(Enum):
 
 
 @dataclass
+# PURPOSE: [L2-auto] ステップ間のコンテキスト (作業記憶)
 class ExecutionContext:
     """ステップ間のコンテキスト (作業記憶)
 
@@ -75,6 +77,7 @@ class ExecutionContext:
 
 
 @dataclass
+# PURPOSE: [L2-auto] 個別ステップの実行結果 (forward pass の出力)
 class StepResult:
     """個別ステップの実行結果 (forward pass の出力)"""
     step_type: StepType
@@ -95,6 +98,7 @@ class StepResult:
 
 
 @dataclass
+# PURPOSE: [L2-auto] マクロ実行全体の結果
 class ExecutionResult:
     """マクロ実行全体の結果"""
     ccl: str                   # 元の CCL 式
@@ -139,6 +143,7 @@ class ExecutionResult:
 # Entropy Estimator
 # =============================================================================
 
+# PURPOSE: [L2-auto] エントロピー推定器
 class EntropyEstimator:
     """エントロピー推定器
 
@@ -213,6 +218,7 @@ class EntropyEstimator:
 # WF Resolver
 # =============================================================================
 
+# PURPOSE: [L2-auto] WF 名からファイルパスと定義テキストを解決
 class WFResolver:
     """WF 名からファイルパスと定義テキストを解決"""
 
@@ -252,6 +258,7 @@ class WFResolver:
 # AST Walker (Forward Pass)
 # =============================================================================
 
+# PURPOSE: [L2-auto] AST を再帰的に辿り、各ノードを実行する
 class ASTWalker:
     """AST を再帰的に辿り、各ノードを実行する
 
@@ -723,6 +730,7 @@ class ASTWalker:
 # Cognitive Step Handler (認知シミュレーター)
 # =============================================================================
 
+# PURPOSE: [L2-auto] 各定理 WF の認知効果をシミュレートするハンドラ
 class CognitiveStepHandler:
     """各定理 WF の認知効果をシミュレートするハンドラ
 
@@ -848,6 +856,7 @@ class CognitiveStepHandler:
 # Backward Pass (Credit Assignment)
 # =============================================================================
 
+# PURPOSE: [L2-auto] 逆伝播: 確信度スコアから各ステップの帰責値を計算
 class BackwardPass:
     """逆伝播: 確信度スコアから各ステップの帰責値を計算
 
@@ -904,6 +913,7 @@ class BackwardPass:
 # Macro Executor (統合エントリーポイント)
 # =============================================================================
 
+# PURPOSE: [L2-auto] CCL マクロ自動実行エンジン
 class MacroExecutor:
     """CCL マクロ自動実行エンジン
 

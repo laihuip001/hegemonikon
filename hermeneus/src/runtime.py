@@ -40,6 +40,7 @@ def _load_env():
 _load_env()
 
 
+# PURPOSE: [L2-auto] Secret アクセスの一元化 (W08 Secret Sprawl 対策)
 def _get_secret(key: str) -> Optional[str]:
     """Secret アクセスの一元化 (W08 Secret Sprawl 対策)
     
@@ -51,6 +52,7 @@ def _get_secret(key: str) -> Optional[str]:
     return os.environ.get(key)
 
 
+# PURPOSE: [L2-auto] メモリ内 Circuit Breaker (W06 Cascade Failure 対策)
 class _ProviderCircuitBreaker:
     """メモリ内 Circuit Breaker (W06 Cascade Failure 対策)
     
@@ -59,12 +61,14 @@ class _ProviderCircuitBreaker:
     3連試行の無駄を排除。
     """
     
+    # PURPOSE: [L2-auto] 初期化: init__
     def __init__(self, failure_threshold: int = 3, cooldown_seconds: float = 60.0):
         self._failures: Dict[str, int] = {}
         self._open_until: Dict[str, float] = {}
         self._threshold = failure_threshold
         self._cooldown = cooldown_seconds
     
+    # PURPOSE: [L2-auto] Circuit が開いている (= スキップすべき) か
     def is_open(self, provider: str) -> bool:
         """Circuit が開いている (= スキップすべき) か"""
         until = self._open_until.get(provider, 0)
@@ -76,12 +80,14 @@ class _ProviderCircuitBreaker:
             self._open_until.pop(provider, None)
         return False
     
+    # PURPOSE: [L2-auto] 失敗を記録。閾値超過で Circuit を開く
     def record_failure(self, provider: str) -> None:
         """失敗を記録。閾値超過で Circuit を開く"""
         self._failures[provider] = self._failures.get(provider, 0) + 1
         if self._failures[provider] >= self._threshold:
             self._open_until[provider] = time.time() + self._cooldown
     
+    # PURPOSE: [L2-auto] 成功で Circuit をリセット
     def record_success(self, provider: str) -> None:
         """成功で Circuit をリセット"""
         self._failures[provider] = 0
@@ -166,9 +172,27 @@ MODEL_REGISTRY: Dict[str, Dict[str, str]] = {
         "publisher": "meta",
         "region": "us-east5",
     },
+    # --- Antigravity LS (ローカル LS 経由、API key 不要) ---
+    "agq/claude-sonnet": {
+        "provider": "antigravity",
+        "model_id": "MODEL_CLAUDE_4_5_SONNET_THINKING",
+    },
+    "agq/gemini-pro": {
+        "provider": "antigravity",
+        "model_id": "MODEL_GEMINI_2_5_PRO",
+    },
+    "agq/gemini-flash": {
+        "provider": "antigravity",
+        "model_id": "MODEL_GEMINI_2_5_FLASH",
+    },
+    "agq/gpt-4.1": {
+        "provider": "antigravity",
+        "model_id": "MODEL_GPT_4_1",
+    },
 }
 
 
+# PURPOSE: [L2-auto] 実行ステータス
 # =============================================================================
 # Execution Result Types
 # =============================================================================
@@ -179,6 +203,7 @@ class ExecutionStatus(Enum):
     PARTIAL = "partial"       # 一部成功
     TIMEOUT = "timeout"
     ERROR = "error"
+# PURPOSE: [L2-auto] CCL 実行結果
     RATE_LIMITED = "rate_limited"
 
 
@@ -191,6 +216,7 @@ class ExecutionResult:
     confidence: float = 1.0                  # 確信度 (0.0-1.0)
     intermediate_results: List[str] = field(default_factory=list)
     metadata: Dict[str, Any] = field(default_factory=dict)
+# PURPOSE: [L2-auto] 実行設定
     error: Optional[str] = None
 
 
@@ -198,7 +224,7 @@ class ExecutionResult:
 class ExecutionConfig:
     """実行設定"""
     model: str = "auto"                      # MODEL_REGISTRY のキー or "auto"
-    provider: str = "auto"                   # auto | anthropic | google | vertex-anthropic | vertex-openai | openai
+    provider: str = "auto"                   # auto | antigravity | anthropic | google | vertex-anthropic | vertex-openai | openai
     timeout: int = 300                       # 秒
     max_retries: int = 3
     max_iterations: int = 5                  # 収束ループの最大反復
@@ -206,6 +232,7 @@ class ExecutionConfig:
     api_key: Optional[str] = None
 
 
+# PURPOSE: [L2-auto] LMQL プログラム実行器
 # =============================================================================
 # LMQL Executor
 # =============================================================================
@@ -357,6 +384,8 @@ class LMQLExecutor:
         if model in MODEL_REGISTRY:
             return MODEL_REGISTRY[model]
         # レジストリ未登録 → provider/model_id を推測
+        if model.startswith("agq/"):
+            return {"provider": "antigravity", "model_id": model.replace("agq/", "")}
         if "/" in model and model.startswith("vertex/"):
             return {"provider": "vertex-anthropic", "model_id": model.replace("vertex/", "")}
         if model.startswith("claude"):
@@ -428,7 +457,9 @@ class LMQLExecutor:
             model_info = self._resolve_model()
             provider = model_info["provider"]
             
-            if provider == "vertex-anthropic":
+            if provider == "antigravity":
+                return await self._execute_antigravity(full_prompt, model_info.get("model_id"))
+            elif provider == "vertex-anthropic":
                 return await self._execute_vertex_anthropic(full_prompt, model_info)
             elif provider == "vertex-openai":
                 return await self._execute_vertex_openai(full_prompt, model_info)
@@ -448,6 +479,11 @@ class LMQLExecutor:
         
         # --- Auto モード: 順に試行 ---
         providers = []
+        
+        # Antigravity LS を最優先 (API key 不要、コスト 0)
+        if self._is_antigravity_available():
+            providers.append(("antigravity", None, self._execute_antigravity_auto))
+        
         anthropic_key = _get_secret("ANTHROPIC_API_KEY")
         google_key = _get_secret("GOOGLE_API_KEY")
         openai_key = self.config.api_key or _get_secret("OPENAI_API_KEY")
@@ -857,6 +893,81 @@ class LMQLExecutor:
             error="Vertex OpenAI-compat API call failed after retries"
         )
     
+    # PURPOSE: Antigravity LS が利用可能か確認
+    def _is_antigravity_available(self) -> bool:
+        """Antigravity LS が起動しているか確認 (軽量チェック)"""
+        try:
+            from mekhane.ochema.antigravity_client import AntigravityClient
+            client = AntigravityClient()
+            # _detect_ls() は PID/CSRF/Port を検出。失敗時は RuntimeError
+            client._detect_ls()
+            return True
+        except Exception:
+            return False
+    
+    # PURPOSE: Antigravity LS 経由の LLM 呼び出し (モデル指定)
+    async def _execute_antigravity(
+        self, prompt: str, model_id: Optional[str] = None
+    ) -> ExecutionResult:
+        """Antigravity LS 経由の LLM 呼び出し
+        
+        ローカルの Language Server API を経由して LLM を呼び出す。
+        API key 不要、追加コスト 0。
+        """
+        try:
+            from mekhane.ochema.antigravity_client import AntigravityClient
+        except ImportError:
+            return ExecutionResult(
+                status=ExecutionStatus.ERROR,
+                output="",
+                error="mekhane.ochema.antigravity_client not found"
+            )
+        
+        agq_model = model_id or "MODEL_CLAUDE_4_5_SONNET_THINKING"
+        
+        try:
+            client = AntigravityClient()
+            # asyncio.to_thread で同期の client.ask() をラップ
+            result = await asyncio.wait_for(
+                asyncio.to_thread(
+                    client.ask,
+                    prompt,
+                    model=agq_model,
+                    timeout=float(self.config.timeout),
+                ),
+                timeout=self.config.timeout
+            )
+            
+            return ExecutionResult(
+                status=ExecutionStatus.SUCCESS,
+                output=result.text,
+                metadata={
+                    "provider": "antigravity",
+                    "model": result.model or agq_model,
+                    "cascade_id": result.cascade_id,
+                    "thinking": result.thinking,
+                }
+            )
+        except TimeoutError:
+            return ExecutionResult(
+                status=ExecutionStatus.TIMEOUT,
+                output="",
+                error=f"Antigravity LS timed out after {self.config.timeout}s"
+            )
+        except Exception as e:
+            return ExecutionResult(
+                status=ExecutionStatus.ERROR,
+                output="",
+                error=f"Antigravity error: {str(e)[:200]}"
+            )
+    
+    # PURPOSE: Auto モード用 Antigravity LS 呼び出し (キーなしアダプター)
+    async def _execute_antigravity_auto(
+        self, prompt: str, _key: Optional[str] = None, model_id: Optional[str] = None
+    ) -> ExecutionResult:
+        """Auto モード用アダプター (provider チェーンの署名に合わせる)"""
+        return await self._execute_antigravity(prompt, model_id)
+    
     # PURPOSE: LMQL コードからプロンプト部分を抽出
     def _extract_prompt_from_lmql(self, lmql_code: str) -> Optional[str]:
         """LMQL コードからプロンプト部分を抽出"""
@@ -875,6 +986,7 @@ class LMQLExecutor:
         return None
 
 
+# PURPOSE: [L2-auto] 収束ループ実行器
 # =============================================================================
 # Convergence Loop Executor
 # =============================================================================

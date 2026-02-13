@@ -18,6 +18,7 @@ import operator
 # State Definition
 # =============================================================================
 
+# PURPOSE: [L2-auto] CCL 実行状態
 class CCLState(TypedDict, total=False):
     """CCL 実行状態"""
     context: str                             # 入力コンテキスト
@@ -33,6 +34,7 @@ class CCLState(TypedDict, total=False):
     metadata: Dict[str, Any]                 # メタデータ
 
 
+# PURPOSE: [L2-auto] ノードタイプ
 class NodeType(Enum):
     """ノードタイプ"""
     WORKFLOW = "workflow"
@@ -44,6 +46,7 @@ class NodeType(Enum):
 
 
 @dataclass
+# PURPOSE: [L2-auto] グラフノード
 class GraphNode:
     """グラフノード"""
     id: str
@@ -54,6 +57,7 @@ class GraphNode:
 
 
 @dataclass
+# PURPOSE: [L2-auto] グラフエッジ
 class GraphEdge:
     """グラフエッジ"""
     source: str
@@ -66,6 +70,7 @@ class GraphEdge:
 # Graph Builder
 # =============================================================================
 
+# PURPOSE: [L2-auto] CCL AST → LangGraph StateGraph 変換器
 class CCLGraphBuilder:
     """CCL AST → LangGraph StateGraph 変換器
     
@@ -425,6 +430,7 @@ class CCLGraphBuilder:
 # =============================================================================
 
 @dataclass
+# PURPOSE: [L2-auto] コンパイル済みグラフ
 class CompiledGraph:
     """コンパイル済みグラフ"""
     langgraph: Any  # LangGraph StateGraph (なければ None)

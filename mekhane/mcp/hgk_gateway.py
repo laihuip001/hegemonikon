@@ -197,9 +197,9 @@ def _traced(fn):
     """
     import functools
 
+    # PURPOSE: [L2-auto] 内部処理: _wrapper
     @functools.wraps(fn)
-    # PURPOSE: [L2-auto] 内部処理: wrapper
-    def wrapper(*args: Any, **kwargs: Any) -> Any:
+    def _wrapper(*args: Any, **kwargs: Any) -> Any:
         _start = time.time()
         input_size = _estimate_input_size(*args, **kwargs)
         try:
@@ -210,7 +210,7 @@ def _traced(fn):
             _trace_tool_call(fn.__name__, input_size, (time.time() - _start) * 1000, False)
             raise
 
-    return wrapper
+    return _wrapper
 
 
 # =============================================================================

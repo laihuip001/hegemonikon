@@ -399,12 +399,13 @@ def main():
     parser = argparse.ArgumentParser(
         description="Synergeia v2 — n8n Distributed CCL Executor"
     )
-    parser.add_argument("ccl", help="CCL expression (e.g. '/noe+ || /sop+')")
+    parser.add_argument("ccl", nargs="?", default=None, help="CCL expression (e.g. '/noe+ || /sop+')")
     parser.add_argument("--context", "-c", default="", help="Execution context")
     parser.add_argument("--timeout", "-t", type=int, default=DEFAULT_TIMEOUT)
     parser.add_argument("--no-save", action="store_true", help="Don't save result")
     parser.add_argument("--compile-only", action="store_true", help="Compile only")
     parser.add_argument("--health", action="store_true", help="Health check")
+    parser.add_argument("--json", action="store_true", help="JSON output")
 
     args = parser.parse_args()
 
@@ -414,6 +415,9 @@ def main():
         result = health_check()
         print(json.dumps(result, indent=2))
         return
+
+    if not args.ccl:
+        parser.error("CCL expression is required (unless --health is used)")
 
     if args.compile_only:
         result = dispatch_compile_only(args.ccl)

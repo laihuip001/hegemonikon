@@ -1,0 +1,80 @@
+#!/usr/bin/env bash
+# PURPOSE: Synergeia v2 CLI — 日常の CCL 実行ラッパー
+# USAGE:
+#   syn "/noe+"              — CCL 実行
+#   syn "/noe+" -c "テーマ"  — コンテキスト付き実行
+#   syn --compile "/noe+"    — パースのみ (実行しない)
+#   syn --health             — n8n 疎通確認
+#   syn --help               — ヘルプ表示
+
+set -euo pipefail
+
+HGK_ROOT="${HGK_ROOT:-$HOME/oikos/hegemonikon}"
+PYTHON="${HGK_ROOT}/.venv/bin/python"
+
+# Color constants
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[0;33m'
+CYAN='\033[0;36m'
+BOLD='\033[1m'
+NC='\033[0m'  # No Color
+
+# Ensure Python venv exists
+if [[ ! -x "$PYTHON" ]]; then
+    echo -e "${RED}Error: Python venv not found at ${PYTHON}${NC}" >&2
+    exit 1
+fi
+
+# Header
+echo -e "${CYAN}${BOLD}┌─[Synergeia v2]────────────────────┐${NC}"
+
+# Detect mode
+if [[ "${1:-}" == "--health" ]]; then
+    echo -e "${CYAN}│ Mode: Health Check${NC}"
+    echo -e "${CYAN}└───────────────────────────────────┘${NC}"
+    cd "$HGK_ROOT" && PYTHONPATH="$HGK_ROOT" "$PYTHON" synergeia/bridge.py --health
+    exit $?
+fi
+
+if [[ "${1:-}" == "--compile" ]]; then
+    shift
+    echo -e "${CYAN}│ Mode: Compile Only${NC}"
+    echo -e "${CYAN}│ CCL:  ${BOLD}${1:-}${NC}"
+    echo -e "${CYAN}└───────────────────────────────────┘${NC}"
+    cd "$HGK_ROOT" && PYTHONPATH="$HGK_ROOT" "$PYTHON" synergeia/bridge.py --compile-only "$@"
+    exit $?
+fi
+
+if [[ "${1:-}" == "--help" || -z "${1:-}" ]]; then
+    echo -e "${CYAN}│ Synergeia v2 — CCL 実行ツール${NC}"
+    echo -e "${CYAN}└───────────────────────────────────┘${NC}"
+    echo ""
+    echo "Usage:"
+    echo "  syn \"/noe+\"              — CCL 実行"
+    echo "  syn \"/noe+\" -c \"テーマ\"  — コンテキスト付き"
+    echo "  syn --compile \"/noe+\"    — パースのみ"
+    echo "  syn --health             — 疎通確認"
+    echo ""
+    exit 0
+fi
+
+# Main dispatch
+CCL="${1}"
+shift
+echo -e "${CYAN}│ Mode: Dispatch${NC}"
+echo -e "${CYAN}│ CCL:  ${BOLD}${CCL}${NC}"
+echo -e "${CYAN}└───────────────────────────────────┘${NC}"
+echo ""
+
+cd "$HGK_ROOT" && PYTHONPATH="$HGK_ROOT" "$PYTHON" synergeia/bridge.py "$CCL" "$@"
+EXIT_CODE=$?
+
+# Status indicator
+if [[ $EXIT_CODE -eq 0 ]]; then
+    echo -e "\n${GREEN}${BOLD}✅ 完了${NC}"
+else
+    echo -e "\n${RED}${BOLD}❌ 失敗 (exit: ${EXIT_CODE})${NC}"
+fi
+
+exit $EXIT_CODE

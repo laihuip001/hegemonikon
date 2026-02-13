@@ -1,3 +1,4 @@
+# PROOF: [P3/Trokhia] <- mekhane/anamnesis/ 履歴検索インデクサ
 # PURPOSE: セッション履歴を GnosisIndex (LanceDB) にインデックスする
 """
 PROOF: [L2/インフラ] <- mekhane/anamnesis/

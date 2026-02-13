@@ -1,4 +1,4 @@
-# PROOF: P2 (Hodos) mekhane/ochema/scripts/cortex_capture.py
+# PROOF: [L2/インフラ] <- mekhane/ochema/
 """
 Cortex API MITM Capture Script for mitmproxy.
 

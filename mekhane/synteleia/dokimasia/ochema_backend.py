@@ -1,7 +1,6 @@
+# PROOF: [L2/Integration] <- mekhane/synteleia/dokimasia/
 # PURPOSE: Ochēma (AntigravityClient) 経由の LLM バックエンド
 """
-PROOF: [L2/Integration] <- mekhane/synteleia/dokimasia/
-
 OchemaBackend — Antigravity Language Server Bridge for Synteleia
 
 AntigravityClient を使い、Ultra プランの LLM を Synteleia 監査に利用する。

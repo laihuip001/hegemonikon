@@ -165,7 +165,7 @@ class MultiSemanticAgent(AuditAgent):
 
     # PURPOSE: Multi-LLM アンサンブル監査を実行
     def audit(self, target: AuditTarget) -> AgentResult:
-        """全メンバーに並列 query → majority voting → 統合結果。"""
+        """全メンバーに並列 query → majority voting →統合結果。"""
 
         # 1. 各メンバーに並列 query
         member_results: List[Tuple[str, str, List[AuditIssue], float]] = []

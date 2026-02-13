@@ -1,4 +1,8 @@
 ---
+lcm_state: beta
+version: 1.0
+---
+---
 description: "噛む — /s-_/pro_F:[×3]{/eat+~(/noe*/dia)}_~(/h*/k)_@proof_/pis_/dox-"
 ---
 

@@ -1,4 +1,8 @@
 ---
+lcm_state: beta
+version: 1.0
+---
+---
 description: 見る — /s*%/dia
 ---
 

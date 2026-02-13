@@ -1,4 +1,8 @@
 ---
+lcm_state: beta
+version: 1.0
+---
+---
 description: "絞る — /s-_/kat_/sym~(/tel_/dia-)_/pis"
 ---
 

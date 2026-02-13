@@ -1,4 +1,8 @@
 ---
+lcm_state: beta
+version: 1.0
+---
+---
 description: "問う — /pro_/s-_R:{F:[×2]{/u+*^/u^}}_~(/noe*/dia)_/pis_/dox-"
 ---
 

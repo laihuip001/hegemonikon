@@ -1,4 +1,8 @@
 ---
+lcm_state: beta
+version: 1.0
+---
+---
 description: "落とす — /pro_/tak-*/bou+{6w3h}~/p-_/ene-_/pis"
 ---
 

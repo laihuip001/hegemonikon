@@ -11,7 +11,7 @@
  */
 
 import { api } from './api/client';
-import type { WFSummary, CCLParseResponse, SynteleiaAuditResponse } from './api/client';
+import type { WFSummary, CCLParseResponse, CCLExecuteResponse, SynteleiaAuditResponse } from './api/client';
 
 // --- State ---
 
@@ -73,8 +73,38 @@ function renderParseResult(res: CCLParseResponse): string {
         </div>
       ` : ''}
       ${res.plan_template ? `<pre class="cp-parse-plan">${esc(res.plan_template)}</pre>` : ''}
+      <div class="cp-execute-bar">
+        <button class="cp-execute-btn" data-ccl="${esc(res.ccl)}">▶ Synergeia 実行</button>
+        <div class="cp-execute-result" id="cp-exec-result"></div>
+      </div>
     </div>
   `;
+}
+
+/** Bind execute button's click event */
+function initExecuteButton(resultsEl: HTMLElement): void {
+  const btn = resultsEl.querySelector('.cp-execute-btn') as HTMLButtonElement | null;
+  if (!btn) return;
+  btn.addEventListener('click', async () => {
+    const ccl = btn.dataset.ccl ?? '';
+    const resultDiv = resultsEl.querySelector('#cp-exec-result')!;
+    btn.disabled = true;
+    btn.textContent = '⏳ 実行中...';
+    resultDiv.innerHTML = '';
+    try {
+      const res: CCLExecuteResponse = await api.cclExecute(ccl);
+      if (res.success) {
+        const detail = res.result ? JSON.stringify(res.result, null, 2) : 'OK';
+        resultDiv.innerHTML = `<div class="cp-exec-ok">✅ 実行成功<pre>${esc(detail.substring(0, 500))}</pre></div>`;
+      } else {
+        resultDiv.innerHTML = `<div class="cp-parse-error">❌ ${esc(res.error ?? '実行失敗')}</div>`;
+      }
+    } catch (e) {
+      resultDiv.innerHTML = `<div class="cp-parse-error">❌ ${esc((e as Error).message)}</div>`;
+    }
+    btn.disabled = false;
+    btn.textContent = '▶ Synergeia 実行';
+  });
 }
 
 // --- Kalon Judge ---
@@ -277,6 +307,7 @@ async function handleInput(input: HTMLInputElement, resultsEl: HTMLElement): Pro
     try {
       const res: CCLParseResponse = await api.cclParse(val);
       resultsEl.innerHTML = renderParseResult(res);
+      initExecuteButton(resultsEl);
     } catch (e) {
       resultsEl.innerHTML = `<div class="cp-parse-error">❌ ${esc((e as Error).message)}</div>`;
     }

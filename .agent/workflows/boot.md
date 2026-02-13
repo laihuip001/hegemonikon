@@ -248,6 +248,10 @@ ls ~/oikos/mneme/.hegemonikon/episodic_memory.md 2>/dev/null && echo "[episodic]
 ```yaml
 intent_wal:
   session_goal: "{今日のセッションで達成したいこと}"
+  scope_boundary:         # Context Rot 予防 (BC-18)
+    max_steps: 40          # 自動 /bye 提案トリガー
+    max_topics: 2          # トピック数制限 (脱線防止)
+    checkpoint_interval: 20  # 中間セーブ間隔 (ステップ)
   invariants:          # 壊してはならないもの
     - "{不変条件1}"
     - "{不変条件2}"
@@ -315,6 +319,21 @@ bash ~/oikos/hegemonikon/scripts/agq-check.sh --snapshot boot 2>/dev/null
 ```bash
 bash ~/oikos/hegemonikon/scripts/agq-log-harvest.sh --env 2>/dev/null
 ```
+
+### Context Sentinel (v5.6 追加)
+
+> **導出**: 2026-02-13 @build 四望 — BC-18 環境強制化。
+> N chat messages を LS ログから自動検出し、前回セッションの Context Rot 傾向を可視化。
+> DX-010: 「意志より環境」は BC 自体にも適用される。
+
+// turbo
+
+```bash
+cd ~/oikos/hegemonikon && .venv/bin/python scripts/context_sentinel.py 2>/dev/null || true
+```
+
+結果を boot レポートの Context Budget セクションに含める。
+🟡 以上の場合は「前回セッションで Context Rot の兆候がありました」と報告。
 
 ### セッション履歴サマリー (v5.3 追加)
 

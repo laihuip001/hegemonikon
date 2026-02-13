@@ -229,6 +229,12 @@ export const api = {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ ccl }),
         }),
+    cclExecute: (ccl: string, context = '') =>
+        apiFetch<CCLExecuteResponse>('/api/ccl/execute', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ ccl, context }),
+        }),
     wfList: () => apiFetch<WFListResponse>('/api/wf/list'),
     wfDetail: (name: string) => apiFetch<WFDetailResponse>(`/api/wf/${encodeURIComponent(name)}`),
 
@@ -399,6 +405,13 @@ export interface CCLParseResponse {
     workflows: string[];
     wf_paths: Record<string, string>;
     plan_template: string | null;
+    error: string | null;
+}
+
+export interface CCLExecuteResponse {
+    success: boolean;
+    ccl: string;
+    result: Record<string, unknown> | null;
     error: string | null;
 }
 

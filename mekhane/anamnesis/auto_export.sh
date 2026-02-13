@@ -25,9 +25,9 @@ log() {
 
 log "=== Auto Export Started ==="
 
-# Antigravity が起動しているか確認 (CDP ポート 9333; mozc が 9222 を使用)
-if ! curl -s http://localhost:9333/json/version > /dev/null 2>&1; then
-    log "Antigravity not running (CDP port 9333 not available). Skipping."
+# Antigravity Agent Manager (Chrome) が起動しているか確認 (CDP ポート 9222)
+if ! curl -s http://localhost:9222/json/version > /dev/null 2>&1; then
+    log "Antigravity not running (CDP port 9222 not available). Skipping."
     exit 0
 fi
 

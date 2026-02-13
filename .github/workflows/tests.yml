@@ -46,6 +46,7 @@ jobs:
                   # Install core test dependencies from PyPI
                   pip install pytest "pytest-asyncio>=0.23.0" pytest-timeout pyyaml pydantic lancedb numpy scipy \
                               networkx pandas tabulate requests httpx schedule \
+                              aiohttp aioresponses python-dotenv \
                               sentence-transformers
                   # Install project in development mode if setup exists
                   pip install -e ".[test]" 2>/dev/null || true

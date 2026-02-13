@@ -1,3 +1,5 @@
+# PROOF: [L2/モジュール] <- mekhane/ochema/ Module definition
+# PURPOSE: Ochema module definition
 # PURPOSE: Ochēma パッケージ — Antigravity LS クライアント
 """Ochēma (ὄχημα) — Antigravity Language Server Client Package."""
 

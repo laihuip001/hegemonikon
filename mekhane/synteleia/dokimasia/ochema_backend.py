@@ -1,3 +1,5 @@
+# PROOF: [L2/インフラ] <- mekhane/synteleia/dokimasia/ Ochema Backend
+# PURPOSE: Ochema backend implementation
 # PURPOSE: Ochēma (AntigravityClient) 経由の LLM バックエンド
 """
 OchemaBackend — Antigravity Language Server Bridge for Synteleia

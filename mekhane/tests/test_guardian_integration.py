@@ -94,23 +94,36 @@ class TestMeaningfulTraceContextRegression:
         with tempfile.TemporaryDirectory() as tmpdir:
             path = Path(tmpdir) / "traces.json"
 
-            # Write a trace with context
-            clear_session_traces()
-            mark_meaningful(
-                reason="persist context",
-                intensity=2,
-                context="must persist to disk",
-            )
-            save_traces(path)
+            # Patch TRACES_PATH in the module to avoid PermissionError in CI
+            with patch("mekhane.fep.meaningful_traces.TRACES_PATH", path):
+                # Write a trace with context
+                clear_session_traces()
+                mark_meaningful(
+                    reason="persist context",
+                    intensity=2,
+                    context="must persist to disk",
+                )
 
-            # Load and verify
-            loaded = load_traces(path)
-            assert len(loaded) >= 1
-            found = [t for t in loaded if t.reason == "persist context"]
-            assert len(found) == 1
-            assert found[0].context == "must persist to disk"
+                # save_traces uses TRACES_PATH by default if no path given,
+                # or ensures directory exists even if path is given.
+                # Here we pass path explicitly, but ensure_traces_dir() inside
+                # save_traces might still use the module-level TRACES_PATH if not patched.
+                # Wait, save_traces(path) uses the argument.
+                # But looking at the traceback:
+                # mekhane/fep/meaningful_traces.py:58: in ensure_traces_dir
+                # TRACES_PATH.parent.mkdir(parents=True, exist_ok=True)
+                # It uses the global TRACES_PATH! So we MUST patch it.
 
-            clear_session_traces()
+                save_traces(path)
+
+                # Load and verify
+                loaded = load_traces(path)
+                assert len(loaded) >= 1
+                found = [t for t in loaded if t.reason == "persist context"]
+                assert len(found) == 1
+                assert found[0].context == "must persist to disk"
+
+                clear_session_traces()
 
 
 # ============ 2. FailureDB — resolution regression ============
@@ -228,7 +241,8 @@ class TestTyposToolChainRegression:
         """ContextItem must preserve tool_chain field."""
         import sys
         sys.path.insert(0, str(Path(__file__).parent.parent / "ergasterion" / "typos"))
-        import typos_lang as pl
+        # Fix: Module name is 'typos', not 'typos_lang'
+        import typos as pl
 
         # Create a ContextItem with tool_chain
         item = pl.ContextItem(
@@ -243,7 +257,8 @@ class TestTyposToolChainRegression:
         """Parser should extract MCP context references."""
         import sys
         sys.path.insert(0, str(Path(__file__).parent.parent / "ergasterion" / "typos"))
-        import typos_lang as pl
+        # Fix: Module name is 'typos', not 'typos_lang'
+        import typos as pl
 
         # Test that ContextItem preserves tool_chain when explicitly set
         item = pl.ContextItem(

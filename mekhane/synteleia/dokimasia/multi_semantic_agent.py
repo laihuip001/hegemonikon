@@ -6,5 +6,6 @@ Multi-Semantic Agent for Dokimasia.
 from typing import Dict, Any
 
 class MultiSemanticAgent:
+    # PURPOSE: MultiSemanticAgent
     """Multi-Semantic Agent."""
     pass

@@ -6,5 +6,6 @@ Ochēma Protocol Definitions.
 from typing import Dict, Any
 
 class Protocol:
+    # PURPOSE: Protocol
     """Protocol."""
     pass

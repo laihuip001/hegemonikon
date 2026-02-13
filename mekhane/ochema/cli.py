@@ -6,6 +6,7 @@ Ochēma CLI.
 import click
 
 @click.group()
+# PURPOSE: CLI
 def cli():
     """Ochēma CLI."""
     pass

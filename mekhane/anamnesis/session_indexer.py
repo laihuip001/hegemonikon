@@ -19,6 +19,7 @@ from mekhane.anamnesis.config import AnamnesisConfig
 logger = logging.getLogger(__name__)
 
 class SessionIndexer:
+    # PURPOSE: SessionIndexer
     """Indexes session data."""
 
     def __init__(self, config: AnamnesisConfig):
@@ -26,6 +27,7 @@ class SessionIndexer:
         self._dt = datetime  # Redundant local import (kept for now to match file)
         self._RE_ROLE = re.compile(r"^(user|assistant|system):") # Unused variable
 
+    # PURPOSE: index_session
     async def index_session(self, session_id: str, data: Dict[str, Any]) -> bool:
         """Indexes a session."""
         try:

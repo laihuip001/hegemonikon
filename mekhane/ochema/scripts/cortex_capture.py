@@ -5,6 +5,7 @@ Cortex Capture Script.
 """
 import sys
 
+# PURPOSE: main
 def main():
     """Main function."""
     print("Capturing cortex...")

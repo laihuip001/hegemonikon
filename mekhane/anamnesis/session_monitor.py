@@ -13,15 +13,18 @@ from typing import Dict, Any
 logger = logging.getLogger(__name__)
 
 class SessionMonitor:
+    # PURPOSE: SessionMonitor
     """Monitors sessions."""
 
     def __init__(self):
         self.active_sessions: Dict[str, Any] = {}
 
+    # PURPOSE: start_monitoring
     async def start_monitoring(self):
         """Starts monitoring."""
         logger.info("Started session monitoring")
 
+    # PURPOSE: stop_monitoring
     async def stop_monitoring(self):
         """Stops monitoring."""
         logger.info("Stopped session monitoring")

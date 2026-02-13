@@ -113,6 +113,7 @@ def get_client():
 
 
 @server.list_tools()
+# PURPOSE: List available tools
 async def list_tools():
     """List available tools."""
     log("list_tools called")
@@ -181,6 +182,7 @@ async def list_tools():
 
 
 @server.call_tool(validate_input=True)
+# PURPOSE: Handle tool calls
 async def call_tool(name: str, arguments: dict):
     """Handle tool calls."""
     log(f"call_tool: {name} with {arguments}")
@@ -341,6 +343,7 @@ async def call_tool(name: str, arguments: dict):
 
 
 # PURPOSE: ochema_mcp_server の main 処理を実行する
+# PURPOSE: Run the MCP server
 async def main():
     """Run the MCP server."""
     log("Starting stdio server...")

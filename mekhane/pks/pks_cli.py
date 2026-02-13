@@ -68,18 +68,22 @@ def cmd_stats(args: argparse.Namespace) -> None:
     indices_dir = Path.home() / "oikos" / "mneme" / ".hegemonikon" / "indices"
     kairos_count = 0
     sophia_count = 0
+    chronos_count = 0
     if indices_dir.exists():
-        for name, var_ref in [("kairos", "kairos_count"), ("sophia", "sophia_count")]:
+        for name in ["kairos", "sophia", "chronos"]:
             pkl = indices_dir / f"{name}.pkl"
             if pkl.exists():
                 try:
                     from mekhane.symploke.adapters.embedding_adapter import EmbeddingAdapter
                     adapter = EmbeddingAdapter()
                     adapter.load(str(pkl))
+                    count = adapter.count()
                     if name == "kairos":
-                        kairos_count = adapter.count()
+                        kairos_count = count
+                    elif name == "sophia":
+                        sophia_count = count
                     else:
-                        sophia_count = adapter.count()
+                        chronos_count = count
                 except Exception:
                     pass
 
@@ -95,14 +99,14 @@ def cmd_stats(args: argparse.Namespace) -> None:
     cooldown = os.environ.get("PKS_COOLDOWN_HOURS", "24.0")
 
     # --- Output ---
-    total = gnosis_count + kairos_count + sophia_count
+    total = gnosis_count + kairos_count + sophia_count + chronos_count
     print("| ソース | 件数 | 備考 |")
     print("|:-------|-----:|:-----|")
     print(f"| 🔬 Gnōsis (LanceDB) | **{gnosis_count:,}** | 論文・外部知識 |")
     print(f"| 📋 Kairos (.pkl) | **{kairos_count:,}** | Handoff + 会話ログ |")
     print(f"| 📖 Sophia (.pkl) | **{sophia_count:,}** | Knowledge Items |")
-    print(f"| 🕐 Chronos (seed) | **2** | チャット履歴 (seed) |")
-    print(f"| **合計** | **{total + 2:,}** | |")
+    print(f"| 🕐 Chronos (.pkl) | **{chronos_count:,}** | 時系列チャット履歴 |")
+    print(f"| **合計** | **{total:,}** | |")
     print()
     print(f"📁 Handoff ファイル: **{handoff_count}** 件")
     print(f"📁 KI ファイル: **{ki_count}** 件")

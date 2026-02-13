@@ -1,3 +1,6 @@
+#!/usr/bin/env python3
+# PROOF: [X1/Exagoge] <- mekhane/ochema/scripts/cortex_capture.py
+# PURPOSE: Cortex gRPC トラフィックをキャプチャしログに記録する (mitmproxy script)
 """
 Cortex API MITM Capture Script for mitmproxy.
 

@@ -112,6 +112,7 @@ def get_client():
     return _client
 
 
+# PURPOSE: List available MCP tools
 @server.list_tools()
 async def list_tools():
     """List available tools."""
@@ -180,6 +181,7 @@ async def list_tools():
     ]
 
 
+# PURPOSE: Handle MCP tool execution
 @server.call_tool(validate_input=True)
 async def call_tool(name: str, arguments: dict):
     """Handle tool calls."""

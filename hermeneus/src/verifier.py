@@ -14,6 +14,7 @@ import re
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
+from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 
@@ -159,22 +160,35 @@ class DebateAgent:
         if self.role == AgentRole.PROPOSER:
             system_context = (
                 "あなたは「@Proposer（支持者）」です。\n"
-                "以下の主張を支持する立場から議論してください。\n"
-                "@Critic の批判がある場合は、それに具体的に反論してください。\n"
-                "反論は @Critic の具体的な指摘を引用して行ってください。\n"
-                "もし @Critic の指摘が正しいと認めざるを得ない場合は、素直に認めてください。"
+                "以下の主張を支持する立場から議論してください。\n\n"
+                "## 行動指針\n"
+                "- コンテキストに【参考知識】がある場合、積極的に引用して論拠を強化すること\n"
+                "- @Critic の批判がある場合は、それに具体的に反論すること\n"
+                "- 反論は @Critic の具体的な指摘を引用して行うこと\n"
+                "- @Critic の指摘が正しいと認めざるを得ない場合は、素直に認めること\n\n"
+                "## 制約\n"
+                "- ツール呼び出しは不要（知識は既にコンテキストに注入済み）\n"
+                "- 簡潔に、核心に集中すること"
             )
         elif self.role == AgentRole.CRITIC:
             system_context = (
                 "あなたは「@Critic（批評者）」です。\n"
-                "以下の主張と @Proposer の論拠に対して批判的分析を行ってください。\n"
-                "批判の観点:\n"
-                "1. 論理的な飛躍や誤謬\n"
-                "2. 証拠の不足\n"
-                "3. 代替解釈の可能性\n"
-                "4. 潜在的リスク\n\n"
-                "@Proposer の反論がある場合は、それを踏まえて再批判してください。\n"
-                "もし @Proposer の反論が妥当と認めざるを得ない場合は、素直に認めてください。"
+                "Hegemonikón A2 Krisis (判定力) の /dia- モードで批判的分析を行います。\n\n"
+                "## 批判の6観点 (Krisis /dia- フレームワーク)\n"
+                "1. **aff (肯定的評価)**: 主張の良い点を認める（公平性のため）\n"
+                "2. **neg (否定的判定)**: 論理的な飛躍、証拠の不足、誤謬を指摘する\n"
+                "3. **root (根源探索)**: 「そもそも前提は正しいか？」を問う\n"
+                "4. **devil (悪魔の代弁者)**: 最も強力な反論を提示する\n"
+                "5. **steelman (最強論証)**: 相手の主張を最強の形に再構成して評価する\n"
+                "6. **counterfactual (反実仮想)**: 「もし前提が異なれば？」を検討する\n\n"
+                "## 出力形式\n"
+                "各観点すべてを使う必要はない。最も有効な2-3の観点に集中すること。\n"
+                "コンテキストに【参考知識】がある場合、反証として活用すること。\n\n"
+                "## 行動指針\n"
+                "- @Proposer の反論がある場合は、それを踏まえて再批判すること\n"
+                "- @Proposer の反論が妥当なら素直に認めること (PASS)\n"
+                "- ツール呼び出しは不要（知識は既にコンテキストに注入済み）\n"
+                "- 簡潔に、核心に集中すること"
             )
         else:  # ARBITER
             system_context = (
@@ -552,6 +566,58 @@ class DebateEngine:
         ]
         self.arbiter = DebateAgent(AgentRole.ARBITER, arbiter_model)
     
+    # PURPOSE: 知識基盤を検索して debate context に注入
+    def _gather_knowledge(self, claim: str) -> str:
+        """Gnōsis/Sophia から関連知識を取得し、コンテキスト文字列として返す
+        
+        Phase 1: debate 前に知識を pre-fetch し、エージェントのプロンプトに注入。
+        エージェント自身がツールを呼ぶのではなく、環境が知識を提供する (第零原則)。
+        """
+        knowledge_parts = []
+        
+        # 1. Gnōsis 検索 (学術論文知識基盤)
+        try:
+            import subprocess
+            # verifier.py は hermeneus/src/ にある → 2段階上が hermeneus → 3段階上が hegemonikon
+            hgk_root = Path(__file__).parent.parent.parent
+            venv_python = hgk_root / ".venv" / "bin" / "python"
+            cli_path = hgk_root / "mekhane" / "anamnesis" / "cli.py"
+            
+            if venv_python.exists() and cli_path.exists():
+                result = subprocess.run(
+                    [str(venv_python), str(cli_path), "search", claim],
+                    capture_output=True, text=True, timeout=15,
+                    cwd=str(hgk_root),
+                    env={**__import__('os').environ, "PYTHONPATH": str(hgk_root)},
+                )
+                if result.returncode == 0 and result.stdout.strip():
+                    gnosis_output = result.stdout.strip()[:1500]  # 先頭1500字に制限
+                    knowledge_parts.append(
+                        f"### Gnōsis (学術論文)\n{gnosis_output}"
+                    )
+        except Exception:
+            pass  # Gnōsis 未利用でも debate は続行
+        
+        # 2. Sophia 検索 (Knowledge Items)
+        try:
+            from mekhane.anamnesis.sophia_index import SophiaIndex
+            sophia = SophiaIndex()
+            results = sophia.search(claim, k=3)
+            if results:
+                sophia_text = "\n".join(
+                    f"- **{r.get('name', 'KI')}**: {r.get('content', '')[:200]}"
+                    for r in results[:3]
+                )
+                knowledge_parts.append(
+                    f"### Sophia (Knowledge Items)\n{sophia_text}"
+                )
+        except Exception:
+            pass  # Sophia 未利用でも debate は続行
+        
+        if knowledge_parts:
+            return "\n\n## 【参考知識】\n\n" + "\n\n".join(knowledge_parts)
+        return ""
+    
     # PURPOSE: 収束型ディベートを実行
     async def debate(
         self,
@@ -572,6 +638,10 @@ class DebateEngine:
             early_stop_threshold: 早期終了の確信度閾値
             min_rally_turns: 収束判定を開始する最低ターン数
         """
+        # Phase 0: 知識基盤から関連知識を取得し context に注入
+        knowledge_context = self._gather_knowledge(claim)
+        enriched_context = context + knowledge_context if knowledge_context else context
+        
         rounds: List[DebateRound] = []
         
         for round_num in range(1, max_rounds + 1):
@@ -579,17 +649,17 @@ class DebateEngine:
             converged = False
             convergence_reason = ""
             
-            # Phase 1: Proposer ↔ Critic ラリー
+            # Phase 1: Proposer ↔ Critic ラリー (enriched context で実行)
             for turn_idx in range(max_rally_turns):
                 if turn_idx % 2 == 0:
                     # Proposer のターン
                     turn = await self.proposer.respond(
-                        claim, rally_history, context
+                        claim, rally_history, enriched_context
                     )
                 else:
                     # Critic のターン (最初の Critic を使用)
                     turn = await self.critics[0].respond(
-                        claim, rally_history, context
+                        claim, rally_history, enriched_context
                     )
                 
                 rally_history.append(turn)

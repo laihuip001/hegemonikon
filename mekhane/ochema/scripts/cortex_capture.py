@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+# PROOF: [H4] <- mekhane/ochema/scripts/
 """
 Cortex API MITM Capture Script for mitmproxy.
 

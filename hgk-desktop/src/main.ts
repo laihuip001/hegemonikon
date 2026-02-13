@@ -1,4 +1,5 @@
 import { api } from './api/client';
+import { isPermissionGranted, requestPermission, sendNotification } from '@tauri-apps/plugin-notification';
 import { renderGraph3D } from './views/graph3d';
 import type {
   HealthReportResponse,
@@ -29,6 +30,35 @@ import { marked } from 'marked';
 import { recordView, renderUsageCard } from './telemetry';
 import { initCommandPalette } from './command_palette';
 import './styles.css';
+
+// ─── OS Notification ─────────────────────────────────────────
+
+/** OS通知を発火済みの通知IDを追跡 */
+const sentOsNotifIds = new Set<string>();
+
+/** CRITICAL/HIGH 通知を OS ネイティブ通知として送る */
+async function fireOsNotifications(notifications: Notification[]): Promise<void> {
+  try {
+    let granted = await isPermissionGranted();
+    if (!granted) {
+      const perm = await requestPermission();
+      granted = perm === 'granted';
+    }
+    if (!granted) return;
+
+    for (const n of notifications) {
+      if (n.level !== 'CRITICAL' && n.level !== 'HIGH') continue;
+      if (sentOsNotifIds.has(n.id)) continue;
+      sentOsNotifIds.add(n.id);
+      sendNotification({
+        title: `${n.level === 'CRITICAL' ? '🚨' : '⚠️'} ${n.title}`,
+        body: n.body.substring(0, 200),
+      });
+    }
+  } catch {
+    // OS通知が利用できない環境では静かに無視
+  }
+}
 
 // ─── Utilities ───────────────────────────────────────────────
 
@@ -87,7 +117,36 @@ document.addEventListener('DOMContentLoaded', () => {
   void api.pksTriggerPush().catch(() => { /* silent */ });
   // CCL Command Palette — Ctrl+K
   initCommandPalette();
+  initKeyboardNav();
 });
+
+// ─── Keyboard Navigation (Ctrl+1‑9,0) ───────────────────────
+
+function initKeyboardNav(): void {
+  const keyRouteMap: Record<string, string> = {
+    '1': 'dashboard',
+    '2': 'notifications',
+    '3': 'digestor',
+    '4': 'search',
+    '5': 'gnosis',
+    '6': 'sophia',
+    '7': 'pks',
+    '8': 'timeline',
+    '9': 'fep',
+    '0': 'graph',
+  };
+  document.addEventListener('keydown', (e: KeyboardEvent) => {
+    // Skip when typing in input/textarea/contenteditable
+    const el = e.target as HTMLElement;
+    if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.isContentEditable) return;
+    if (!e.ctrlKey || e.shiftKey || e.altKey || e.metaKey) return;
+    const route = keyRouteMap[e.key];
+    if (route) {
+      e.preventDefault();
+      navigate(route);
+    }
+  });
+}
 
 function setupNavigation(): void {
   document.querySelectorAll('nav button').forEach(btn => {
@@ -754,15 +813,24 @@ async function renderNotificationsContent(): Promise<void> {
     : notifications.map((n: Notification) => {
       const levelClass = n.level.toLowerCase();
       const levelLabel = LEVEL_LABELS[n.level] ?? n.level;
+      const isDigestor = n.data?.digestor === true;
+      const digestorUrl = isDigestor && n.data?.url ? String(n.data.url) : '';
+      const digestorScore = isDigestor && n.data?.score ? Number(n.data.score) : 0;
       return `
-          <div class="card notif-card level-${levelClass}">
+          <div class="card notif-card level-${levelClass}${isDigestor ? ' notif-digestor' : ''}">
             <div class="notif-top">
               <span class="notif-source">${esc(n.source)}</span>
               <span class="notif-level ${levelClass}">${esc(levelLabel)}</span>
+              ${isDigestor && digestorScore > 0
+          ? `<span class="notif-score" title="関連度スコア">${(digestorScore * 100).toFixed(0)}%</span>`
+          : ''}
               <span class="notif-time">${esc(relativeTime(n.timestamp))}</span>
             </div>
             <div class="notif-title">${esc(n.title)}</div>
             <div class="notif-body">${formatNotifBody(n.body)}</div>
+            ${digestorUrl
+          ? `<a href="${esc(digestorUrl)}" target="_blank" rel="noopener" class="btn btn-sm notif-link-btn">📎 論文を開く</a>`
+          : ''}
           </div>`;
     }).join('');
 
@@ -779,6 +847,9 @@ async function renderNotificationsContent(): Promise<void> {
     </div>
     ${cardsHtml}
   `;
+
+  // OS ネイティブ通知を発火 (CRITICAL/HIGH のみ)
+  void fireOsNotifications(notifications);
 
   // Filter change handler
   document.getElementById('notif-level-filter')?.addEventListener('change', (e) => {
@@ -1580,7 +1651,7 @@ function renderCandidateCard(c: DigestCandidate, idx: number): string {
 
 async function renderDigestorView(): Promise<void> {
   const app = document.getElementById('view-content')!;
-  app.innerHTML = '<div class="loading">Digestor レポート読み込み中...</div>';
+  app.innerHTML = '<div class="loading">Digestor 読み込み中...</div>';
 
   try {
     const data = await api.digestorReports(10);
@@ -1594,73 +1665,137 @@ async function renderDigestorView(): Promise<void> {
       return;
     }
 
-    // Stats summary
     const totalReports = data.total;
     const latest = data.reports[0]!;
     const latestDate = latest.timestamp ? new Date(latest.timestamp).toLocaleString('ja-JP') : '-';
 
-    // Report selector
-    const reportOptions = data.reports.map((r, i) => {
-      const dt = r.timestamp ? new Date(r.timestamp).toLocaleDateString('ja-JP') : r.filename;
-      const label = `${dt} — ${r.candidates_selected}件 ${r.dry_run ? '(DRY)' : ''}`;
-      return `<option value="${i}">${esc(label)}</option>`;
-    }).join('');
+    // Tab state
+    let activeTab: 'reports' | 'news' = 'news';
 
-    app.innerHTML = `
-      <h1>🧬 Digestor</h1>
-      <div class="grid" style="margin-bottom:1rem;">
-        <div class="card">
-          <h3>レポート数</h3>
-          <div class="metric">${totalReports}</div>
+    function render() {
+      // Report selector options
+      const reportOptions = data.reports.map((r, i) => {
+        const dt = r.timestamp ? new Date(r.timestamp).toLocaleDateString('ja-JP') : r.filename;
+        const label = `${dt} — ${r.candidates_selected}件 ${r.dry_run ? '(DRY)' : ''}`;
+        return `<option value="${i}">${esc(label)}</option>`;
+      }).join('');
+
+      app.innerHTML = `
+        <h1>🧬 Digestor</h1>
+
+        <div class="dg-tabs">
+          <button class="dg-tab${activeTab === 'news' ? ' dg-tab-active' : ''}" data-tab="news">📰 AI ニュース</button>
+          <button class="dg-tab${activeTab === 'reports' ? ' dg-tab-active' : ''}" data-tab="reports">📊 レポート</button>
         </div>
-        <div class="card">
-          <h3>最新レポート</h3>
-          <div class="metric" style="font-size:1.2rem;">${esc(latestDate)}</div>
-          <p>${latest.total_papers} 論文 → ${latest.candidates_selected} 候補</p>
-        </div>
-        <div class="card">
-          <h3>ステータス</h3>
-          <div class="metric ${latest.dry_run ? 'status-warn' : 'status-ok'}">
-            ${latest.dry_run ? 'DRY RUN' : 'LIVE'}
+
+        <div class="grid" style="margin-bottom:1rem;">
+          <div class="card">
+            <h3>レポート数</h3>
+            <div class="metric">${totalReports}</div>
+          </div>
+          <div class="card">
+            <h3>最新レポート</h3>
+            <div class="metric" style="font-size:1.2rem;">${esc(latestDate)}</div>
+            <p>${latest.total_papers} 論文 → ${latest.candidates_selected} 候補</p>
+          </div>
+          <div class="card">
+            <h3>ステータス</h3>
+            <div class="metric ${latest.dry_run ? 'status-warn' : 'status-ok'}">
+              ${latest.dry_run ? 'DRY RUN' : 'LIVE'}
+            </div>
           </div>
         </div>
-      </div>
 
-      <div class="card" style="margin-bottom:1rem;">
-        <div style="display:flex; gap:0.5rem; align-items:center;">
-          <label>レポート選択:</label>
-          <select id="dg-report-select" class="input" style="flex:1;">${reportOptions}</select>
-        </div>
-      </div>
-
-      <div id="dg-candidates"></div>
-    `;
-
-    // Render candidates for selected report
-    function showReport(idx: number) {
-      const report = data.reports[idx];
-      const candidatesDiv = document.getElementById('dg-candidates')!;
-      if (!report || report.candidates.length === 0) {
-        candidatesDiv.innerHTML = '<div class="card"><p>候補なし</p></div>';
-        return;
-      }
-      candidatesDiv.innerHTML = `
-        <div class="dg-report-header">
-          <span>${esc(report.filename)}</span>
-          <span>${report.candidates.length} 候補 / ${report.total_papers} 論文</span>
-        </div>
-        ${report.candidates.map((c: DigestCandidate, i: number) => renderCandidateCard(c, i)).join('')}
+        ${activeTab === 'news' ? renderNewsTab(data) : renderReportsTab(data, reportOptions)}
       `;
+
+      // Tab click handlers
+      app.querySelectorAll('.dg-tab').forEach(btn => {
+        btn.addEventListener('click', () => {
+          activeTab = (btn as HTMLElement).dataset.tab as 'reports' | 'news';
+          render();
+        });
+      });
+
+      // Report selector handler (reports tab)
+      if (activeTab === 'reports') {
+        document.getElementById('dg-report-select')?.addEventListener('change', (e) => {
+          const idx = parseInt((e.target as HTMLSelectElement).value, 10);
+          showReportCandidates(data, idx);
+        });
+        showReportCandidates(data, 0);
+      }
     }
 
-    showReport(0);
-
-    document.getElementById('dg-report-select')?.addEventListener('change', (e) => {
-      const idx = parseInt((e.target as HTMLSelectElement).value, 10);
-      showReport(idx);
-    });
+    render();
 
   } catch (e) {
     app.innerHTML = `<div class="card status-error">Digestor エラー: ${esc((e as Error).message)}</div>`;
   }
 }
+
+function renderNewsTab(data: { reports: Array<{ timestamp: string; candidates: DigestCandidate[] }> }): string {
+  // Collect candidates from latest report(s)
+  const latest = data.reports[0];
+  if (!latest || latest.candidates.length === 0) {
+    return '<div class="dg-empty-state"><div class="dg-empty-icon">📰</div><p>ニュースはまだありません。<br>Digestor が論文を収集すると、ここに表示されます。</p></div>';
+  }
+
+  const reportDate = latest.timestamp ? new Date(latest.timestamp).toLocaleDateString('ja-JP') : '';
+
+  const newsCards = latest.candidates.map((c, i) => {
+    const scorePercent = Math.min(c.score * 100, 100);
+    const topicTags = c.matched_topics
+      .slice(0, 4)
+      .map(t => `<span class="dg-news-tag">${esc(t)}</span>`).join('');
+
+    return `
+      <div class="card dg-news-card">
+        <div class="dg-news-header">
+          <span class="dg-news-rank">#${i + 1}</span>
+          <span class="dg-news-score">${scorePercent.toFixed(0)}%</span>
+        </div>
+        <h3 class="dg-news-title">
+          ${c.url ? `<a href="${esc(c.url)}" target="_blank" rel="noopener">${esc(c.title)}</a>` : esc(c.title)}
+        </h3>
+        ${c.rationale ? `<p class="dg-news-rationale">${esc(c.rationale)}</p>` : ''}
+        <div class="dg-news-topics">${topicTags}</div>
+        ${c.url ? `<a href="${esc(c.url)}" target="_blank" rel="noopener" class="dg-news-link">📎 論文を開く</a>` : ''}
+      </div>`;
+  }).join('');
+
+  return `
+    <div class="dg-news-date">📅 ${esc(reportDate)} の AI ニュース</div>
+    ${newsCards}
+  `;
+}
+
+function renderReportsTab(_data: { reports: Array<{ timestamp: string; candidates_selected: number; dry_run: boolean; filename: string; candidates: DigestCandidate[] }> }, reportOptions: string): string {
+  return `
+    <div class="card" style="margin-bottom:1rem;">
+      <div style="display:flex; gap:0.5rem; align-items:center;">
+        <label>レポート選択:</label>
+        <select id="dg-report-select" class="input" style="flex:1;">${reportOptions}</select>
+      </div>
+    </div>
+    <div id="dg-candidates"></div>
+  `;
+}
+
+function showReportCandidates(data: { reports: Array<{ filename: string; total_papers: number; candidates: DigestCandidate[] }> }, idx: number): void {
+  const report = data.reports[idx];
+  const candidatesDiv = document.getElementById('dg-candidates');
+  if (!candidatesDiv) return;
+  if (!report || report.candidates.length === 0) {
+    candidatesDiv.innerHTML = '<div class="card"><p>候補なし</p></div>';
+    return;
+  }
+  candidatesDiv.innerHTML = `
+    <div class="dg-report-header">
+      <span>${esc(report.filename)}</span>
+      <span>${report.candidates.length} 候補 / ${report.total_papers} 論文</span>
+    </div>
+    ${report.candidates.map((c: DigestCandidate, i: number) => renderCandidateCard(c, i)).join('')}
+  `;
+}
+

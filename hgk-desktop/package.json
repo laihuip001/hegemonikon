@@ -17,6 +17,7 @@
   },
   "dependencies": {
     "@tauri-apps/plugin-http": "^2.5.7",
+    "@tauri-apps/plugin-notification": "^2.3.3",
     "@types/three": "^0.182.0",
     "d3-force-3d": "^3.0.6",
     "marked": "^17.0.1",

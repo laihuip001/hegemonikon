@@ -26,7 +26,9 @@ from typing import Optional, List
 import json
 
 # Default persistence path
-TRACES_PATH = Path("/home/makaron8426/oikos/mneme/.hegemonikon/meaningful_traces.json")
+import os
+MNEME_PATH = os.environ.get("MNEME_PATH", "/home/makaron8426/oikos/mneme")
+TRACES_PATH = Path(MNEME_PATH) / ".hegemonikon/meaningful_traces.json"
 
 
 # PURPOSE: の統一的インターフェースを実現する

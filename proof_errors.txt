@@ -1,0 +1,6 @@
+❌ Purpose: 2311/2379 OK (97.1%), 0 weak, 68 missing
+  ❌ mekhane/synteleia/orchestrator.py:97 with_multi_l2
+  ❌ mekhane/peira/theorem_activity.py:143 parse_date_from_filename
+  ❌ mekhane/peira/theorem_activity.py:165 scan_handoffs
+  ❌ mekhane/peira/theorem_activity.py:210 classify_activity
+  ❌ mekhane/peira/theorem_activity.py:223 generate_report

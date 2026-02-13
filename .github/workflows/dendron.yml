@@ -38,7 +38,7 @@ jobs:
           python-version: "3.11"
 
       - name: Install dependencies
-        run: pip install pyyaml
+        run: pip install pyyaml requests
 
       # L1: PROOF Header Check (blocking)
       - name: "L1: PROOF Header Check"

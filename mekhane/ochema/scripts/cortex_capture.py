@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # PROOF: [H4] <- mekhane/ochema/scripts/
+# PURPOSE: Cortex API MITM Capture Script for mitmproxy.
 """
 Cortex API MITM Capture Script for mitmproxy.
 

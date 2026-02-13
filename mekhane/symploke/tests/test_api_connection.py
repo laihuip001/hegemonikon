@@ -10,10 +10,19 @@ import os
 import sys
 import pytest
 
-# Add parent to path
-sys.path.insert(0, "/home/makaron8426/oikos/hegemonikon")
+# Add repo root to path for relative imports if not running as a package
+# This assumes the test file is at mekhane/symploke/tests/
+REPO_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../"))
+if REPO_ROOT not in sys.path:
+    sys.path.insert(0, REPO_ROOT)
 
-from mekhane.symploke.jules_client import JulesClient
+try:
+    from mekhane.symploke.jules_client import JulesClient
+except ImportError:
+    # If the import still fails, it might be due to PYTHONPATH issues.
+    # Try importing directly relative to the symploke package if possible,
+    # but the above sys.path insertion should cover it.
+    raise
 
 
 # PURPOSE: Test API connection by listing sources

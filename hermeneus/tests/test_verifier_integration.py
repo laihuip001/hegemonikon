@@ -11,6 +11,7 @@ Hermēneus Verifier Integration Tests — Convergent Debate
 import asyncio
 import sys
 import time
+import pytest
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
@@ -36,12 +37,17 @@ def check_ls_available() -> bool:
         return False
 
 
+@pytest.mark.asyncio
 async def test_single_agent_generate():
     """単一エージェントの LLM 生成テスト"""
     print("\n" + "=" * 60)
     print("Test 1: 単一エージェント LLM 生成")
     print("=" * 60)
     
+    # LS チェック
+    if not check_ls_available():
+        pytest.skip("Antigravity LS が利用できません")
+
     agent = DebateAgent(AgentRole.PROPOSER)
     
     start = time.time()
@@ -65,11 +71,16 @@ async def test_single_agent_generate():
     return turn
 
 
+@pytest.mark.asyncio
 async def test_two_agent_rally():
     """Proposer ↔ Critic のラリーテスト (3ターン)"""
     print("\n" + "=" * 60)
     print("Test 2: Proposer ↔ Critic ラリー (3ターン)")
     print("=" * 60)
+
+    # LS チェック
+    if not check_ls_available():
+        pytest.skip("Antigravity LS が利用できません")
     
     proposer = DebateAgent(AgentRole.PROPOSER)
     critic = DebateAgent(AgentRole.CRITIC)
@@ -120,11 +131,16 @@ async def test_two_agent_rally():
     return rally_history
 
 
+@pytest.mark.asyncio
 async def test_full_debate():
     """フル debate エンジンテスト (ラリー + Arbiter)"""
     print("\n" + "=" * 60)
     print("Test 3: フル Debate エンジン (ラリー + Arbiter)")
     print("=" * 60)
+
+    # LS チェック
+    if not check_ls_available():
+        pytest.skip("Antigravity LS が利用できません")
     
     engine = DebateEngine()
     

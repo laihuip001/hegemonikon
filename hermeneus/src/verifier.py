@@ -110,6 +110,7 @@ class DebateAgent:
             config = ExecutionConfig(
                 model=self.model,
                 temperature=self.temperature,
+                workspace="synteleia-sandbox",  # verifier はサンドボックス WS で実行
             )
             return LMQLExecutor(config)
         except Exception:

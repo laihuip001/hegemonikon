@@ -230,6 +230,7 @@ class ExecutionConfig:
     max_iterations: int = 5                  # 収束ループの最大反復
     temperature: float = 0.7
     api_key: Optional[str] = None
+    workspace: str = "hegemonikon"           # Antigravity LS ワークスペース名
 
 
 # PURPOSE: [L2-auto] LMQL プログラム実行器
@@ -898,7 +899,7 @@ class LMQLExecutor:
         """Antigravity LS が起動しているか確認 (軽量チェック)"""
         try:
             from mekhane.ochema.antigravity_client import AntigravityClient
-            client = AntigravityClient()
+            client = AntigravityClient(workspace=self.config.workspace)
             # _detect_ls() は PID/CSRF/Port を検出。失敗時は RuntimeError
             client._detect_ls()
             return True
@@ -926,7 +927,7 @@ class LMQLExecutor:
         agq_model = model_id or "MODEL_CLAUDE_4_5_SONNET_THINKING"
         
         try:
-            client = AntigravityClient()
+            client = AntigravityClient(workspace=self.config.workspace)
             # asyncio.to_thread で同期の client.ask() をラップ
             result = await asyncio.wait_for(
                 asyncio.to_thread(

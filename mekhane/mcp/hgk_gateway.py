@@ -314,7 +314,8 @@ mcp = FastMCP(
         "Hegemonikón 出張 MCP Gateway。"
         "モバイルから HGK の認知機能にアクセスする。"
         "/sop 調査依頼書の生成、KI/Gnōsis 検索、"
-        "CCL パース、Doxa/Handoff 参照、アイデアメモ保存が可能。"
+        "CCL パース、Doxa/Handoff 参照、アイデアメモ保存、"
+        "Digestor (消化パイプライン実行・候補一覧・消化済マーク・トピック管理) が可能。"
     ),
 )
 
@@ -675,6 +676,361 @@ def hgk_status() -> str:
             status_items.append(f"📅 最新 Handoff: `{handoffs[0].name}`")
 
     return f"## 🏠 HGK ステータス\n\n" + "\n".join(status_items)
+
+
+# =============================================================================
+# CCL Execute (CCL 式の実行)
+# =============================================================================
+
+# PURPOSE: CCL 式を Hermēneus 経由で実行し、結果を返す
+@mcp.tool()
+def hgk_ccl_execute(ccl: str, context: str = "") -> str:
+    """
+    CCL 式を実行し、結果を返す。
+    dispatch (構文解析のみ) とは異なり、ワークフローを実際に実行する。
+
+    Args:
+        ccl: CCL 式 (例: "/noe+", "/dia+~*/noe")。最大 500 文字。
+        context: 実行コンテキスト (分析対象など)。最大 2000 文字。
+    """
+    # Input validation
+    if len(ccl) > 500:
+        return "❌ CCL 式が長すぎます (最大 500 文字)"
+    if len(context) > 2000:
+        return "❌ コンテキストが長すぎます (最大 2000 文字)"
+
+    try:
+        from hermeneus.src.macro_executor import execute_and_explain
+        result = execute_and_explain(ccl, context)
+        # W12 Token Explosion 対策: 出力を最大 5000 文字に制限
+        if len(result) > 5000:
+            result = result[:5000] + "\n\n... (出力が 5000 文字を超えたため切り詰めました)"
+        return result
+    except ImportError:
+        return "❌ Hermēneus が利用できません (import エラー)"
+    except Exception as e:
+        return f"❌ CCL 実行エラー: {e}"
+
+
+# =============================================================================
+# Paper Search (論文検索)
+# =============================================================================
+
+# PURPOSE: Semantic Scholar 経由で学術論文を検索する
+@mcp.tool()
+def hgk_paper_search(query: str, limit: int = 5) -> str:
+    """
+    学術論文を検索する (Semantic Scholar 経由)。
+    Gnōsis 知識ベースの拡充や調査依頼に使用。
+
+    Args:
+        query: 検索クエリ (例: "active inference free energy")。最大 200 文字。
+        limit: 最大結果数 (1-20、デフォルト 5)。
+    """
+    # Input validation
+    if len(query) > 200:
+        return "❌ クエリが長すぎます (最大 200 文字)"
+    limit = max(1, min(20, limit))
+
+    try:
+        import signal
+
+        # Anarkhia 対策: 30 秒タイムアウト
+        def _timeout_handler(signum, frame):
+            raise TimeoutError("API タイムアウト (30秒)")
+
+        old_handler = signal.signal(signal.SIGALRM, _timeout_handler)
+        signal.alarm(30)
+
+        try:
+            from mekhane.pks.semantic_scholar import SemanticScholarClient
+            client = SemanticScholarClient()
+            results = client.search(query, limit=limit)
+        finally:
+            signal.alarm(0)
+            signal.signal(signal.SIGALRM, old_handler)
+
+        if not results:
+            return f"🔍 '{query}' の検索結果: 0 件"
+
+        lines = [f"## 🔍 論文検索: '{query}' ({len(results)} 件)\n"]
+        for i, paper in enumerate(results, 1):
+            title = paper.get("title", "不明")
+            year = paper.get("year", "?")
+            citations = paper.get("citationCount", 0)
+            authors = ", ".join(
+                a.get("name", "?") for a in paper.get("authors", [])[:3]
+            )
+            if len(paper.get("authors", [])) > 3:
+                authors += " et al."
+            lines.append(f"### {i}. {title} ({year})")
+            lines.append(f"- **著者**: {authors}")
+            lines.append(f"- **被引用数**: {citations}")
+            abstract = paper.get("abstract", "")
+            if abstract:
+                # Abstract を 200 文字に制限
+                if len(abstract) > 200:
+                    abstract = abstract[:200] + "..."
+                lines.append(f"- **要旨**: {abstract}")
+            lines.append("")
+
+        return "\n".join(lines)
+    except TimeoutError as e:
+        return f"⏱️ {e}"
+    except ImportError:
+        return "❌ SemanticScholarClient が利用できません (import エラー)"
+    except Exception as e:
+        return f"❌ 論文検索エラー: {e}"
+
+
+# =============================================================================
+# Digestor: Incoming Check (消化候補一覧)
+# =============================================================================
+
+# PURPOSE: incoming/ の消化候補を確認する
+INCOMING_DIR = MNEME_DIR / "incoming"
+PROCESSED_DIR = MNEME_DIR / "processed"
+
+
+@mcp.tool()
+def hgk_digest_check() -> str:
+    """
+    incoming/ の未消化ファイルを確認する。
+    消化待ちの論文候補一覧を返す。
+    """
+    if not INCOMING_DIR.exists():
+        return "## ⚠️ incoming/ ディレクトリが見つかりません"
+
+    files = sorted(INCOMING_DIR.glob("eat_*.md"))
+    if not files:
+        return "## 📭 消化待ちの候補はありません (0 件)"
+
+    lines = [f"## 📥 消化待ち候補: {len(files)} 件\n"]
+
+    for i, f in enumerate(files, 1):
+        try:
+            content = f.read_text(encoding="utf-8")
+            title = "(タイトル不明)"
+            score = ""
+            topics_str = ""
+
+            in_frontmatter = False
+            for line in content.split("\n"):
+                if line.strip() == "---":
+                    if in_frontmatter:
+                        break
+                    in_frontmatter = True
+                    continue
+                if in_frontmatter:
+                    if line.startswith("title:"):
+                        title = line.split(":", 1)[1].strip().strip("\"'")
+                    elif line.startswith("score:"):
+                        score = line.split(":", 1)[1].strip()
+                    elif line.startswith("topics:"):
+                        topics_str = line.split(":", 1)[1].strip()
+
+            lines.append(f"### {i}. {title}")
+            if score:
+                lines.append(f"- **Score**: {score}")
+            if topics_str:
+                lines.append(f"- **Topics**: {topics_str}")
+            lines.append(f"- **File**: `{f.name}`\n")
+        except Exception as e:
+            lines.append(f"### {i}. {f.name} (読取エラー: {e})\n")
+
+    # processed 件数も表示
+    processed_count = len(list(PROCESSED_DIR.glob("eat_*.md"))) if PROCESSED_DIR.exists() else 0
+    lines.append(f"---\n📦 processed/: {processed_count} 件 消化済")
+
+    return "\n".join(lines)
+
+
+# =============================================================================
+# Digestor: Mark Processed (消化完了マーク)
+# =============================================================================
+
+# PURPOSE: 消化完了ファイルを processed/ に移動する
+@mcp.tool()
+def hgk_digest_mark(filenames: str = "") -> str:
+    """
+    消化完了したファイルを incoming/ → processed/ に移動する。
+
+    Args:
+        filenames: 移動するファイル名 (カンマ区切り)。空の場合は全 eat_*.md を移動。
+    """
+    try:
+        from mekhane.ergasterion.digestor.pipeline import mark_as_processed
+
+        file_list = [f.strip() for f in filenames.split(",") if f.strip()] if filenames else None
+        result = mark_as_processed(filenames=file_list)
+
+        lines = [f"## ✅ processed/ 移動結果\n"]
+        lines.append(f"**移動成功**: {result['count']} 件\n")
+
+        for f in result["moved"]:
+            lines.append(f"- ✅ `{f}`")
+        for e in result["errors"]:
+            lines.append(f"- ❌ `{e['file']}`: {e['error']}")
+
+        return "\n".join(lines)
+    except ImportError:
+        return "❌ DigestorPipeline が利用できません"
+    except Exception as e:
+        return f"❌ エラー: {e}"
+
+
+# =============================================================================
+# Digestor: List Candidates (候補評価)
+# =============================================================================
+
+# PURPOSE: Digestor selector で候補を評価する
+@mcp.tool()
+def hgk_digest_list(
+    topics: str = "",
+    max_candidates: int = 10,
+) -> str:
+    """
+    Digestor の selector で論文候補を評価する (dry-run)。
+    incoming/ には書き込まず、評価結果のみ返す。
+
+    Args:
+        topics: 対象トピック (カンマ区切り)。最大 500 文字。空=全トピック。
+        max_candidates: 最大候補数 (1-20、デフォルト 10)。
+    """
+    if len(topics) > 500:
+        return "❌ トピックが長すぎます (最大 500 文字)"
+    max_candidates = max(1, min(20, max_candidates))
+
+    try:
+        from mekhane.ergasterion.digestor.pipeline import DigestorPipeline
+
+        topic_list = [t.strip() for t in topics.split(",") if t.strip()] if topics else None
+        pipeline = DigestorPipeline()
+        result = pipeline.run(
+            topics=topic_list,
+            max_papers=30,
+            max_candidates=max_candidates,
+            dry_run=True,
+        )
+
+        lines = [f"## 🔍 消化候補リスト (dry-run)\n"]
+        lines.append(f"- **取得論文数**: {result.total_papers}")
+        lines.append(f"- **選定候補数**: {result.candidates_selected}\n")
+
+        for i, c in enumerate(result.candidates[:max_candidates], 1):
+            lines.append(f"### {i}. [{c.score:.2f}] {c.paper.title[:80]}")
+            if hasattr(c.paper, 'authors') and c.paper.authors:
+                authors = ", ".join(c.paper.authors[:3])
+                lines.append(f"- **著者**: {authors}")
+            lines.append("")
+
+        return "\n".join(lines)
+    except ImportError:
+        return "❌ DigestorPipeline が利用できません"
+    except Exception as e:
+        return f"❌ 候補リストエラー: {e}"
+
+
+# =============================================================================
+# Digestor: Topics (トピック一覧)
+# =============================================================================
+
+# PURPOSE: 消化対象トピック一覧を表示する
+@mcp.tool()
+def hgk_digest_topics() -> str:
+    """
+    消化対象トピック一覧を表示する。
+    topics.yaml に定義されたテーマと設定を返す。
+    """
+    try:
+        import yaml
+
+        topics_file = PROJECT_ROOT / "mekhane" / "ergasterion" / "digestor" / "topics.yaml"
+        if not topics_file.exists():
+            return "## ⚠️ topics.yaml が見つかりません"
+
+        data = yaml.safe_load(topics_file.read_text(encoding="utf-8"))
+        settings = data.get("settings", {})
+        topics_list = data.get("topics", [])
+
+        lines = [f"## 📋 消化対象トピック ({len(topics_list)} テーマ)\n"]
+        lines.append(f"- **最大候補数**: {settings.get('max_candidates', '?')}")
+        lines.append(f"- **最小スコア**: {settings.get('min_score', '?')}")
+        lines.append(f"- **マッチモード**: {settings.get('match_mode', '?')}\n")
+
+        for t in topics_list:
+            tid = t.get("id", "?")
+            desc = t.get("description", "")
+            digest_to = ", ".join(t.get("digest_to", []))
+            lines.append(f"### `{tid}`")
+            lines.append(f"- {desc}")
+            lines.append(f"- → {digest_to}\n")
+
+        return "\n".join(lines)
+    except ImportError:
+        return "❌ PyYAML が利用できません"
+    except Exception as e:
+        return f"❌ トピック読取エラー: {e}"
+
+
+# =============================================================================
+# Digest Run (消化パイプライン)
+# =============================================================================
+
+# PURPOSE: Digestor パイプラインを実行し、消化候補を生成する
+@mcp.tool()
+def hgk_digest_run(
+    topics: str = "",
+    max_papers: int = 20,
+    dry_run: bool = True,
+) -> str:
+    """
+    Digestor パイプラインを実行する。
+    デフォルトは dry_run (レポートのみ)。dry_run=False で .md ファイルを生成。
+
+    Args:
+        topics: 対象トピック (カンマ区切り)。最大 500 文字。空の場合は全トピック。
+        max_papers: 取得する最大論文数 (1-50、デフォルト 20)。
+        dry_run: True=レポートのみ、False=.md ファイル生成 (incoming/ に出力)。
+    """
+    # Input validation
+    if len(topics) > 500:
+        return "❌ トピックが長すぎます (最大 500 文字)"
+    max_papers = max(1, min(50, max_papers))
+
+    try:
+        from mekhane.ergasterion.digestor.pipeline import DigestorPipeline
+
+        topic_list = [t.strip() for t in topics.split(",") if t.strip()] if topics else None
+        pipeline = DigestorPipeline()
+        report = pipeline.run(
+            topics=topic_list,
+            max_papers=max_papers,
+            dry_run=dry_run,
+        )
+
+        mode_label = "🧪 DRY RUN" if dry_run else "🚀 LIVE"
+        result = f"## {mode_label} 消化パイプライン実行結果\n\n"
+
+        if isinstance(report, dict):
+            result += f"- **取得論文数**: {report.get('fetched', 0)}\n"
+            result += f"- **候補数**: {report.get('candidates', 0)}\n"
+            result += f"- **重複排除**: {report.get('deduplicated', 0)}\n"
+            if not dry_run:
+                result += f"- **生成ファイル**: {report.get('generated_files', 0)} 件\n"
+        elif isinstance(report, str):
+            # Report が文字列の場合はそのまま返す (5000 文字制限)
+            if len(report) > 5000:
+                report = report[:5000] + "\n\n... (出力切り詰め)"
+            result += report
+        else:
+            result += str(report)
+
+        return result
+    except ImportError:
+        return "❌ DigestorPipeline が利用できません (import エラー)"
+    except Exception as e:
+        return f"❌ 消化パイプラインエラー: {e}"
 
 
 # =============================================================================

@@ -253,6 +253,10 @@ test_webhooks() {
     R=$(curl -s -X POST "${N8N_URL}/webhook/heartbeat" -H 'Content-Type: application/json' -d '{}' 2>&1)
     if echo "$R" | grep -q "heartbeat\|timestamp\|ok"; then ok "OK"; ((pass++)) || true; else warn "SKIP: $R"; fi
 
+    echo -n "WF-17 synergeia: "
+    R=$(curl -s -X POST "${N8N_URL}/webhook/synergeia" -H 'Content-Type: application/json' -d '{"ccl":"/health","mode":"ping"}' 2>&1)
+    if echo "$R" | grep -q "synergeia-v2\|ok"; then ok "OK"; ((pass++)) || true; else warn "SKIP: $R"; fi
+
     echo ""
     echo "Results: ${pass} passed, ${fail} failed"
     return "${fail}"

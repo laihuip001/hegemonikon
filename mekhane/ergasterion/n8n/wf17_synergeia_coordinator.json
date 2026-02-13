@@ -1,0 +1,362 @@
+{
+    "name": "WF-17 Synergeia Coordinator",
+    "nodes": [
+        {
+            "parameters": {
+                "httpMethod": "POST",
+                "path": "synergeia",
+                "responseMode": "responseNode",
+                "options": {}
+            },
+            "id": "synergeia-webhook",
+            "name": "Webhook",
+            "type": "n8n-nodes-base.webhook",
+            "typeVersion": 2,
+            "position": [
+                200,
+                300
+            ],
+            "webhookId": "synergeia"
+        },
+        {
+            "parameters": {
+                "jsCode": "// CCL Parser — CCL式を解析し、スレッドを決定\nconst input = $input.item.json;\nconst ccl = (input.body?.ccl || input.ccl || '').trim();\nconst context = input.body?.context || input.context || '';\nconst mode = input.body?.mode || input.mode || 'execute';\n\n// Health check\nif (ccl === '/health' || mode === 'ping') {\n  return [{ json: { status: 'ok', service: 'synergeia-v2', timestamp: new Date().toISOString() } }];\n}\n\n// CCL prefix → thread mapping\nconst THREAD_MAP = {\n  '/noe': 'ochema',   // Deep cognition → Ochēma LLM\n  '/dia': 'ochema',   // Critical analysis → Ochēma LLM\n  '/bou': 'ochema',   // Will → Ochēma LLM\n  '/zet': 'ochema',   // Inquiry → Ochēma LLM\n  '/u':   'ochema',   // Opinion → Ochēma LLM\n  '/sop': 'perplexity', // Research → Perplexity\n  '/s':   'jules',     // Design → Jules\n  '/mek': 'jules',     // Method → Jules\n  '/ene': 'jules',     // Execution → Jules\n  '/pra': 'jules',     // Praxis → Jules\n};\n\n// Parse CCL: || (parallel) or |> (pipeline) or single\nlet plan;\nif (ccl.includes('||')) {\n  plan = { type: 'parallel', elements: ccl.split('||').map(e => e.trim()) };\n} else if (ccl.includes('|>')) {\n  plan = { type: 'pipeline', elements: ccl.split('|>').map(e => e.trim()) };\n} else {\n  plan = { type: 'single', elements: [ccl] };\n}\n\n// Determine thread for each element\nconst tasks = plan.elements.map(elem => {\n  const match = elem.match(/^\\/([a-z]+)/);\n  const prefix = match ? `/${match[1]}` : '';\n  const thread = THREAD_MAP[prefix] || 'hermeneus';\n  return { ccl: elem, thread, prefix };\n});\n\nreturn [{ json: { ccl, context, mode, plan, tasks, timestamp: new Date().toISOString() } }];"
+            },
+            "id": "ccl-parser",
+            "name": "CCL Parser",
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                420,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "rules": {
+                    "rules": [
+                        {
+                            "outputKey": "ochema",
+                            "value": "ochema",
+                            "operation": {
+                                "type": "string",
+                                "operation": "equals"
+                            }
+                        },
+                        {
+                            "outputKey": "jules",
+                            "value": "jules",
+                            "operation": {
+                                "type": "string",
+                                "operation": "equals"
+                            }
+                        },
+                        {
+                            "outputKey": "perplexity",
+                            "value": "perplexity",
+                            "operation": {
+                                "type": "string",
+                                "operation": "equals"
+                            }
+                        },
+                        {
+                            "outputKey": "hermeneus",
+                            "value": "hermeneus",
+                            "operation": {
+                                "type": "string",
+                                "operation": "equals"
+                            }
+                        }
+                    ]
+                },
+                "dataPropertyName": "={{ $json.tasks[0].thread }}"
+            },
+            "id": "thread-switch",
+            "name": "Thread Switch",
+            "type": "n8n-nodes-base.switch",
+            "typeVersion": 3,
+            "position": [
+                640,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "http://localhost:8765/api/ochema/ask",
+                "sendBody": true,
+                "bodyParameters": {
+                    "parameters": [
+                        {
+                            "name": "message",
+                            "value": "={{ $('CCL Parser').item.json.context + '\\n\\nCCL: ' + $('CCL Parser').item.json.ccl }}"
+                        },
+                        {
+                            "name": "model",
+                            "value": "MODEL_CLAUDE_4_5_SONNET_THINKING"
+                        }
+                    ]
+                },
+                "options": {
+                    "timeout": 120000
+                }
+            },
+            "id": "ochema-request",
+            "name": "Ochēma LLM",
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.2,
+            "position": [
+                880,
+                140
+            ]
+        },
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "http://localhost:8765/api/jules/create",
+                "sendBody": true,
+                "bodyParameters": {
+                    "parameters": [
+                        {
+                            "name": "prompt",
+                            "value": "={{ $('CCL Parser').item.json.context + '\\n\\nCCL: ' + $('CCL Parser').item.json.ccl }}"
+                        },
+                        {
+                            "name": "repo",
+                            "value": "laihuip001/hegemonikon"
+                        }
+                    ]
+                },
+                "options": {
+                    "timeout": 120000
+                }
+            },
+            "id": "jules-request",
+            "name": "Jules Pool",
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.2,
+            "position": [
+                880,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "https://api.perplexity.ai/chat/completions",
+                "authentication": "genericCredentialType",
+                "genericAuthType": "httpHeaderAuth",
+                "sendBody": true,
+                "specifyBody": "json",
+                "jsonBody": "={{ JSON.stringify({ model: 'sonar', messages: [{ role: 'user', content: $('CCL Parser').item.json.context + ' ' + $('CCL Parser').item.json.ccl }] }) }}",
+                "options": {
+                    "timeout": 60000
+                }
+            },
+            "id": "perplexity-request",
+            "name": "Perplexity",
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.2,
+            "position": [
+                880,
+                460
+            ]
+        },
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "http://localhost:8765/api/hermeneus/dispatch",
+                "sendBody": true,
+                "bodyParameters": {
+                    "parameters": [
+                        {
+                            "name": "ccl",
+                            "value": "={{ $('CCL Parser').item.json.ccl }}"
+                        }
+                    ]
+                },
+                "options": {
+                    "timeout": 30000
+                }
+            },
+            "id": "hermeneus-request",
+            "name": "Hermēneus",
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.2,
+            "position": [
+                880,
+                620
+            ]
+        },
+        {
+            "parameters": {
+                "mode": "chooseBranch",
+                "output": "empty"
+            },
+            "id": "result-merge",
+            "name": "Merge Results",
+            "type": "n8n-nodes-base.merge",
+            "typeVersion": 3,
+            "position": [
+                1120,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "jsCode": "// 結果を統合して返す\nconst parser = $('CCL Parser').item.json;\nconst results = $input.all().map(item => item.json);\n\nconst output = {\n  status: 'success',\n  ccl: parser.ccl,\n  plan: parser.plan,\n  results: results,\n  thread: parser.tasks?.[0]?.thread || 'unknown',\n  timestamp: new Date().toISOString(),\n};\n\nreturn [{ json: output }];"
+            },
+            "id": "result-formatter",
+            "name": "Format Result",
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                1340,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "respondWith": "json",
+                "responseBody": "={{ JSON.stringify($json) }}"
+            },
+            "id": "respond-webhook",
+            "name": "Respond",
+            "type": "n8n-nodes-base.respondToWebhook",
+            "typeVersion": 1.1,
+            "position": [
+                1560,
+                300
+            ]
+        }
+    ],
+    "connections": {
+        "Webhook": {
+            "main": [
+                [
+                    {
+                        "node": "CCL Parser",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "CCL Parser": {
+            "main": [
+                [
+                    {
+                        "node": "Thread Switch",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Thread Switch": {
+            "main": [
+                [
+                    {
+                        "node": "Ochēma LLM",
+                        "type": "main",
+                        "index": 0
+                    }
+                ],
+                [
+                    {
+                        "node": "Jules Pool",
+                        "type": "main",
+                        "index": 0
+                    }
+                ],
+                [
+                    {
+                        "node": "Perplexity",
+                        "type": "main",
+                        "index": 0
+                    }
+                ],
+                [
+                    {
+                        "node": "Hermēneus",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Ochēma LLM": {
+            "main": [
+                [
+                    {
+                        "node": "Merge Results",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Jules Pool": {
+            "main": [
+                [
+                    {
+                        "node": "Merge Results",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Perplexity": {
+            "main": [
+                [
+                    {
+                        "node": "Merge Results",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Hermēneus": {
+            "main": [
+                [
+                    {
+                        "node": "Merge Results",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Merge Results": {
+            "main": [
+                [
+                    {
+                        "node": "Format Result",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Format Result": {
+            "main": [
+                [
+                    {
+                        "node": "Respond",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        }
+    },
+    "settings": {
+        "executionOrder": "v1"
+    },
+    "staticData": null,
+    "tags": [],
+    "triggerCount": 0,
+    "pinData": {}
+}

@@ -4,6 +4,13 @@ description: HGK 収益化プロジェクト — ディープインパクト戦�
 triggers:
   - "agora"
   - "agora"
+risk_tier: L1
+risks:
+  - business_logic_impact
+reversible: true
+requires_approval: true
+fallbacks:
+  - manual_review
 ---
 
 # Agora
@@ -34,7 +41,5 @@ cd ~/oikos/hegemonikon && PYTHONPATH=. .venv/bin/python -c "
 print('TODO: agora の実行コマンドを定義')
 "
 ```
-
----
 
 *v1.0 — 自動生成 (2026-02-12)*

@@ -12,14 +12,19 @@ triggers:
   - 構造の保存・忘却を問う時
   - Trigonon / X-series を参照する時
   - 「なぜこの変換は正当か」を問う時
+risk_tier: L2
+risks:
+  - theoretical_ambiguity
+reversible: true
+requires_approval: false
+fallbacks:
+  - manual_fallback
 ---
 
 # 🏛️ Category Theory Engine — 構造認識の言語
 
 > **圏論は「対象が何であるか」ではなく「対象間の関係がどう保存されるか」で世界を記述する。**
 > **HGK において、これは「正しさ」ではなく「構造の整合性」を問う言語である。**
-
----
 
 ## Layer 0: なぜ圏論か — 哲学的基盤
 
@@ -45,8 +50,6 @@ HGK の 96要素体系（7公理→24定理→72関係）は圏論的構造を�
 - Hom(A,B) ∈ [0,1] → A から B への変換の「質」
 - Drift = 1 - ε → 構造の非冗長性の欠損
 - 完全忠実 (ε = 1.0) は理想。現実では ε ∈ [0.7, 0.95]
-
----
 
 ## Layer 1: 操作的定義 — 使えるレベルで
 
@@ -88,8 +91,6 @@ HGK の 96要素体系（7公理→24定理→72関係）は圏論的構造を�
 完全随伴: η = Id かつ ε = Id → 完全な可逆変換（理想）
 現実: η ≈ 0.9, ε ≈ 0.8 → Drift = 0.2
 ```
-
----
 
 ## Layer 2: HGK 対応
 
@@ -146,8 +147,6 @@ HGK の 96要素体系（7公理→24定理→72関係）は圏論的構造を�
 > meet/join = 詳細/要点 は同一操作の L1/CCL 両面。
 > 2-cell は派生間の遷移 (nous⇒phro) であり、`two_cell.py` で実装。
 
----
-
 ## Layer 3: 実装手順
 
 ### 既存ツール
@@ -188,8 +187,6 @@ cd ~/oikos/hegemonikon && PYTHONPATH=. .venv/bin/python mekhane/anamnesis/cli.py
 "string diagram monoidal category"                 # ストリング図
 "category theory cognitive science"                # 圏論×認知
 ```
-
----
 
 ## Layer 4: 判断支援 — 5つの問い
 
@@ -272,8 +269,6 @@ cd ~/oikos/hegemonikon && PYTHONPATH=. .venv/bin/python mekhane/anamnesis/cli.py
 | Presheaf | 概念は数式を包含する（多面性） | 抽象1+具体3 を満たすか |
 | Self-referential | 定義が定義を実証する | 定義プロセスが内容と一致するか |
 
----
-
 ## Layer 5: 理論的基盤
 
 ### 推奨文献
@@ -300,8 +295,6 @@ cd ~/oikos/hegemonikon && PYTHONPATH=. .venv/bin/python mekhane/anamnesis/cli.py
 | 自然変換の多義性 | L1 では ≤ に退化するが、L2/L3 では豊かな構造。層を明示する |
 | 数学的厳密性 vs 実用性 | Level B（精密な比喩）を目標。Level A（厳密な証明）は個別に追求 |
 
----
-
 ## 発動条件
 
 | キーワード | 発動する Layer |
@@ -318,8 +311,6 @@ cd ~/oikos/hegemonikon && PYTHONPATH=. .venv/bin/python mekhane/anamnesis/cli.py
 | Kan 拡張、最良近似 | L1 + L3 |
 | 圏論 × AI、Gnōsis 論文 | L5 (検索) |
 
----
-
 ## FEP Skill との関係
 
 | FEP Skill | Category Skill | 関係 |
@@ -330,8 +321,6 @@ cd ~/oikos/hegemonikon && PYTHONPATH=. .venv/bin/python mekhane/anamnesis/cli.py
 | Markov blanket = 観測境界 | 忘却関手 = 何が見えないか | 盲点への自覚 |
 
 > **FEP が「なぜそう行動すべきか」を問い、圏論が「その行動は構造を保存しているか」を問う。**
-
----
 
 *Category Theory Engine v3.2 — CCL多層定義 + two_cell/drift_calculator 統合 (2026-02-11)*
 *v1.0 (291行) → v2.0 (F/G統一+Q1/Q3具体化+Kan拡張) → v3.0 (Kalon認定) → v3.1 (Q6 Kalon判定統合) → v3.2 (CCL修飾子のL1/L2/L3統一)*

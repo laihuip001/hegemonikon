@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/anamnesis/ A0→知識管理→セッションインデックス
 # PURPOSE: セッション履歴を GnosisIndex (LanceDB) にインデックスする
 """
 PROOF: [L2/インフラ] <- mekhane/anamnesis/

@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/インフラ] <- mekhane/anamnesis/ A0→知識管理→セッションモニター
 # PURPOSE: LS API ポーリングでアクティブセッションをリアルタイムにモニターし MD 保存する
 """
 PROOF: [L2/インフラ] <- mekhane/anamnesis/

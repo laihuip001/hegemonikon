@@ -24,9 +24,11 @@ from datetime import datetime
 from pathlib import Path
 from typing import Optional, List
 import json
+import os
 
 # Default persistence path
-TRACES_PATH = Path("/home/makaron8426/oikos/mneme/.hegemonikon/meaningful_traces.json")
+# Use home directory dynamically to avoid permission errors in CI/other environments
+TRACES_PATH = Path(os.environ.get("HOME", "/tmp")) / "oikos/mneme/.hegemonikon/meaningful_traces.json"
 
 
 # PURPOSE: の統一的インターフェースを実現する

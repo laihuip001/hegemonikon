@@ -1,4 +1,4 @@
-# PURPOSE: Ochēma — Antigravity Language Server クライアント
+# PROOF: [L2/クライアント] <- mekhane/ochema/ Antigravityクライアント
 # REASON: Ultra プランの LLM + セッション管理 + Quota 監視を HGK から利用する橋渡し
 """Ochēma (ὄχημα, 乗り物) — Antigravity Language Server Client.
 
@@ -30,6 +30,7 @@ from typing import Optional
 
 # --- Data Classes ---
 
+# PURPOSE: LLM 応答データクラス
 @dataclass
 class LLMResponse:
     """LLM からの応答を保持する。"""
@@ -42,6 +43,7 @@ class LLMResponse:
     raw_steps: list = field(default_factory=list)
 
 
+# PURPOSE: LS 接続情報データクラス
 @dataclass
 class LSInfo:
     """Language Server の接続情報。"""
@@ -76,6 +78,7 @@ BRAIN_DIR = os.path.expanduser("~/.gemini/antigravity/brain")
 
 # --- Client ---
 
+# PURPOSE: Antigravity Language Server クライアント
 class AntigravityClient:
     """Antigravity Language Server の非公式クライアント。
 
@@ -85,6 +88,7 @@ class AntigravityClient:
         print(response.text)
     """
 
+    # PURPOSE: Initialize instance
     def __init__(self, workspace: str = "hegemonikon"):
         """LS を自動検出して接続する。
 
@@ -95,20 +99,24 @@ class AntigravityClient:
         self._ssl_ctx = self._make_ssl_context()
         self.ls = self._detect_ls()
 
+    # PURPOSE: LS PID
     @property
     def pid(self) -> int:
         return self.ls.pid
 
+    # PURPOSE: LS Port
     @property
     def port(self) -> int:
         return self.ls.port
 
+    # PURPOSE: LS CSRF Token
     @property
     def csrf(self) -> str:
         return self.ls.csrf
 
     # --- Public API ---
 
+    # PURPOSE: LLM にメッセージを送信
     def ask(
         self,
         message: str,
@@ -140,6 +148,7 @@ class AntigravityClient:
         # Step 3-4: Poll for response
         return self._poll_response(cascade_id, timeout)
 
+    # PURPOSE: LS ステータスを取得
     def get_status(self) -> dict:
         """LS のユーザーステータスを取得する。接続確認にも使用。"""
         return self._rpc(RPC_GET_STATUS, {
@@ -150,6 +159,7 @@ class AntigravityClient:
             }
         })
 
+    # PURPOSE: 利用可能なモデル一覧を取得
     def list_models(self) -> list[dict]:
         """利用可能なモデル一覧を取得する。"""
         status = self.get_status()
@@ -170,6 +180,7 @@ class AntigravityClient:
             if c.get("quotaInfo")
         ]
 
+    # PURPOSE: Quota ステータスを取得
     def quota_status(self) -> dict:
         """全モデルの Quota 残量と設定をリアルタイムで取得する。
 
@@ -221,6 +232,7 @@ class AntigravityClient:
             "total_models": len(models),
         }
 
+    # PURPOSE: セッション情報を取得
     def session_info(self, cascade_id: Optional[str] = None) -> dict:
         """セッション情報を取得する。
 
@@ -271,6 +283,7 @@ class AntigravityClient:
             "sessions": sessions[:20],  # 最新20件
         }
 
+    # PURPOSE: セッション内容を読み取り
     def session_read(
         self,
         cascade_id: str,
@@ -374,6 +387,7 @@ class AntigravityClient:
             "conversation": conversation,
         }
 
+    # PURPOSE: エピソード記憶にアクセス
     def session_episodes(self, brain_id: Optional[str] = None) -> dict:
         """過去セッションのエピソード記憶 (.system_generated/steps/) にアクセスする。
 
@@ -443,6 +457,7 @@ class AntigravityClient:
 
     # --- Internal: LS Detection ---
 
+    # PURPOSE: LS プロセスを検出
     def _detect_ls(self) -> LSInfo:
         """Language Server プロセスを検出し、接続情報を返す。
 
@@ -532,6 +547,7 @@ class AntigravityClient:
     #   12=INTERACTIVE_CASCADE (IDE 標準), 15=SDK
     SOURCE_INTERACTIVE_CASCADE = 12
 
+    # PURPOSE: StartCascade RPC
     def _start_cascade(self) -> str:
         """Step 1: StartCascade → cascade_id を取得。"""
         result = self._rpc(RPC_START_CASCADE, {
@@ -542,6 +558,7 @@ class AntigravityClient:
             raise RuntimeError(f"StartCascade returned no cascadeId: {result}")
         return cascade_id
 
+    # PURPOSE: SendUserCascadeMessage RPC
     def _send_message(self, cascade_id: str, message: str, model: str) -> None:
         """Step 2: SendUserCascadeMessage → メッセージ送信。
 
@@ -560,6 +577,7 @@ class AntigravityClient:
             },
         })
 
+    # PURPOSE: ポーリングで応答を取得
     def _poll_response(
         self, cascade_id: str, timeout: float
     ) -> LLMResponse:
@@ -621,6 +639,7 @@ class AntigravityClient:
             f"(cascade_id={cascade_id})"
         )
 
+    # PURPOSE: ステップリストをパース
     def _parse_steps(
         self,
         steps: list,
@@ -656,10 +675,12 @@ class AntigravityClient:
 
     # --- Internal: HTTP/RPC ---
 
+    # PURPOSE: High-level RPC 呼び出し
     def _rpc(self, endpoint: str, payload: dict) -> dict:
         """ConnectRPC JSON で RPC を呼び出す。"""
         return self._raw_rpc(self.ls.port, self.ls.csrf, endpoint, payload)
 
+    # PURPOSE: Low-level RPC 呼び出し
     def _raw_rpc(
         self, port: int, csrf: str, endpoint: str, payload: dict
     ) -> dict:
@@ -687,6 +708,7 @@ class AntigravityClient:
 
     # --- Internal: Utilities ---
 
+    # PURPOSE: SSL コンテキスト生成
     @staticmethod
     def _make_ssl_context() -> ssl.SSLContext:
         """自己署名証明書を許可する SSL コンテキスト。"""
@@ -695,6 +717,7 @@ class AntigravityClient:
         ctx.verify_mode = ssl.CERT_NONE
         return ctx
 
+    # PURPOSE: ユーザー名取得
     @staticmethod
     def _get_user() -> str:
         """現在のユーザー名を取得。"""

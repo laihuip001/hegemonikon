@@ -1,4 +1,4 @@
-# PURPOSE: Ochēma (AntigravityClient) 経由の LLM バックエンド
+# PROOF: [L2/バックエンド] <- mekhane/synteleia/dokimasia/ Ochēmaバックエンド
 """
 OchemaBackend — Antigravity Language Server Bridge for Synteleia
 
@@ -31,6 +31,7 @@ class OchemaBackend(LLMBackend):
         - MODEL_PLACEHOLDER_M18: Gemini 3 Flash (100%)
     """
 
+    # PURPOSE: Initialize instance
     def __init__(
         self,
         model: str = "MODEL_PLACEHOLDER_M8",  # Gemini 3 Pro

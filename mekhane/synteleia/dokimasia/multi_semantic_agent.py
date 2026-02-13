@@ -1,4 +1,4 @@
-# PURPOSE: Multi-LLM アンサンブル監査エージェント (Layer B: Nous)
+# PROOF: [L2/エージェント] <- mekhane/synteleia/dokimasia/ Multi-LLM監査エージェント
 """
 MultiSemanticAgent — Multi-LLM Cognitive Ensemble
 
@@ -71,6 +71,7 @@ PERSONAS: Dict[str, str] = {
 # =============================================================================
 
 
+# PURPOSE: アンサンブルの1メンバー
 @dataclass
 class EnsembleMember:
     """アンサンブルの1メンバー。"""
@@ -103,6 +104,7 @@ class MultiSemanticAgent(AuditAgent):
     def __init__(self, members: List[EnsembleMember]):
         self.members = members
 
+    # PURPOSE: デフォルト構成
     @classmethod
     def default(cls) -> "MultiSemanticAgent":
         """デフォルト構成: Gemini Pro + Claude Opus + GPT-OSS。"""
@@ -144,6 +146,7 @@ class MultiSemanticAgent(AuditAgent):
 
         return cls(members=members)
 
+    # PURPOSE: Stub で構成 (テスト用)
     @classmethod
     def with_stubs(cls, responses: Optional[Dict[str, str]] = None) -> "MultiSemanticAgent":
         """テスト用: StubBackend でアンサンブルを構成。"""

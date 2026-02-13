@@ -1,3 +1,4 @@
+# PROOF: [L2/品質] <- mekhane/synteleia/dokimasia/ Ochema経由のLLM利用が必要→ochema_backend.py が担う
 # PURPOSE: Ochēma (AntigravityClient) 経由の LLM バックエンド
 """
 OchemaBackend — Antigravity Language Server Bridge for Synteleia

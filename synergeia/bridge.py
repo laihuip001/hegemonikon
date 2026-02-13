@@ -45,6 +45,7 @@ DEFAULT_TIMEOUT = 120  # seconds
 
 @dataclass
 class SynergeiaResult:
+    # PURPOSE: n8n Synergeia webhook の実行結果を構造化して保持する
     """Synergeia の実行結果"""
     ccl: str
     status: str  # "success" | "error" | "manual" | "timeout"
@@ -59,9 +60,11 @@ class SynergeiaResult:
 
     @property
     def is_success(self) -> bool:
+        # PURPOSE: 結果が成功かどうかを判定する
         return self.status == "success"
 
     def to_dict(self) -> Dict[str, Any]:
+        # PURPOSE: dataclass を辞書に変換して JSON シリアライズ可能にする
         return asdict(self)
 
 
@@ -70,19 +73,25 @@ class SynergeiaResult:
 # =============================================================================
 
 def dispatch(
+    # PURPOSE: n8n CCL ルーターでパース後、bridge.py 側でバックエンドを実行する 2段階アーキテクチャ
     ccl: str,
     context: str = "",
     timeout: int = DEFAULT_TIMEOUT,
     save: bool = True,
+    execute: bool = True,
 ) -> SynergeiaResult:
     """
-    n8n Synergeia webhook に CCL 式を送信し、分散実行結果を取得。
+    Synergeia v2 — 2段階分散 CCL 実行。
+
+    Stage 1: n8n WF-17 → CCL パース + ルーティング判定
+    Stage 2: bridge.py → バックエンド呼出し (ochema/hermeneus/jules/perplexity)
 
     Args:
         ccl: CCL 式 (e.g. "/noe+ || /sop+")
         context: 実行コンテキスト
         timeout: タイムアウト (秒)
         save: True の場合は experiments/ に結果を保存
+        execute: True の場合はバックエンドも実行 (False=ルーティングのみ)
 
     Returns:
         SynergeiaResult
@@ -94,35 +103,66 @@ def dispatch(
     }
 
     try:
-        logger.info(f"[Synergeia] Dispatching: {ccl}")
+        # ── Stage 1: n8n CCL Router ──
+        logger.info(f"[Synergeia] Stage 1 — Routing: {ccl}")
         resp = requests.post(
             SYNERGEIA_WEBHOOK,
             json=payload,
-            timeout=timeout,
+            timeout=min(timeout, 10),  # ルーティングは軽い
             headers={"Content-Type": "application/json"},
         )
         resp.raise_for_status()
         data = resp.json()
 
+        # ルーティングのみの場合はここで終了
+        if not execute or data.get("status") == "ok":
+            return SynergeiaResult(
+                ccl=ccl,
+                status=data.get("status", "routed"),
+                results=data.get("tasks", []),
+                plan=data.get("plan", {}),
+                timestamp=data.get("timestamp", datetime.now().isoformat()),
+            )
+
+        # ── Stage 2: バックエンド実行 ──
+        logger.info(f"[Synergeia] Stage 2 — Executing threads")
+        tasks = data.get("tasks", [])
+        results = []
+
+        for task in tasks:
+            thread = task.get("thread", "hermeneus")
+            task_ccl = task.get("ccl", ccl)
+            try:
+                result = _execute_thread(thread, task_ccl, context, timeout)
+                results.append(result)
+            except Exception as e:
+                results.append({
+                    "thread": thread,
+                    "ccl": task_ccl,
+                    "status": "error",
+                    "error": str(e),
+                })
+
         result = SynergeiaResult(
             ccl=ccl,
-            status=data.get("status", "success"),
-            results=data.get("results", []),
+            status="success" if all(
+                r.get("status") == "success" for r in results
+            ) else "partial",
+            results=results,
             plan=data.get("plan", {}),
-            timestamp=data.get("timestamp", datetime.now().isoformat()),
+            timestamp=datetime.now().isoformat(),
         )
+
+    except requests.exceptions.ConnectionError:
+        # n8n 不通時: ローカルフォールバック
+        logger.warning("[Synergeia] n8n unreachable, using local fallback")
+        result = _local_fallback(ccl, context, timeout)
 
     except requests.exceptions.Timeout:
         result = SynergeiaResult(
             ccl=ccl,
             status="timeout",
             error=f"Timed out after {timeout}s",
-        )
-    except requests.exceptions.ConnectionError:
-        result = SynergeiaResult(
-            ccl=ccl,
-            status="error",
-            error=f"Cannot connect to n8n at {SYNERGEIA_WEBHOOK}. Is n8n running?",
         )
     except Exception as e:
         result = SynergeiaResult(
@@ -137,7 +177,130 @@ def dispatch(
     return result
 
 
+# =============================================================================
+# Stage 2: Thread Execution
+# =============================================================================
+
+def _execute_thread(
+    # PURPOSE: CCL のスレッド種別に応じて対応するバックエンドを呼び出す
+    thread: str,
+    ccl: str,
+    context: str,
+    timeout: int,
+) -> Dict[str, Any]:
+    """スレッドに応じたバックエンドを呼び出す"""
+    logger.info(f"[Synergeia] Executing {ccl} → {thread}")
+
+    if thread == "ochema":
+        return _exec_ochema(ccl, context, timeout)
+    elif thread == "jules":
+        return _exec_jules(ccl, context)
+    elif thread == "perplexity":
+        return _exec_perplexity(ccl, context)
+    else:  # hermeneus (default)
+        return _exec_hermeneus(ccl, context)
+
+
+def _exec_ochema(ccl: str, context: str, timeout: int) -> Dict[str, Any]:
+    # PURPOSE: Ochēma MCP 経由で LLM を呼び出す
+    """Ochēma → Antigravity LS → LLM"""
+    try:
+        from mekhane.ochema.antigravity_client import AntigravityClient
+        client = AntigravityClient()
+        msg = f"{context}\nCCL: {ccl}" if context else f"CCL: {ccl}"
+        response = client.ask(msg, timeout=float(timeout))
+        return {
+            "thread": "ochema",
+            "ccl": ccl,
+            "status": "success",
+            "answer": response.text[:3000],
+            "model": response.model,
+        }
+    except Exception as e:
+        return {"thread": "ochema", "ccl": ccl, "status": "error", "error": str(e)}
+
+
+def _exec_hermeneus(ccl: str, context: str) -> Dict[str, Any]:
+    # PURPOSE: Hermēneus CCL パーサーで構造解析する
+    """Hermēneus → CCL dispatch"""
+    try:
+        from hermeneus.src.dispatch import dispatch as herm_dispatch
+        result = herm_dispatch(ccl)
+        return {
+            "thread": "hermeneus",
+            "ccl": ccl,
+            "status": "success",
+            "answer": json.dumps(result, ensure_ascii=False, default=str)[:3000],
+        }
+    except Exception as e:
+        return {"thread": "hermeneus", "ccl": ccl, "status": "error", "error": str(e)}
+
+
+def _exec_jules(ccl: str, context: str) -> Dict[str, Any]:
+    # PURPOSE: Jules MCP でコーディングタスクを作成する (非同期)
+    """Jules → タスク作成 (非同期)"""
+    return {
+        "thread": "jules",
+        "ccl": ccl,
+        "status": "deferred",
+        "answer": f"Jules タスク '{ccl}' — jules MCP create_task を使用してください",
+        "note": "Jules は非同期実行。jules_create_task MCP ツールで直接投入推奨",
+    }
+
+
+def _exec_perplexity(ccl: str, context: str) -> Dict[str, Any]:
+    # PURPOSE: /sop 調査を HGK Gateway の SOP 生成経由で実行する
+    """/sop → 調査依頼書生成"""
+    try:
+        # HGK Gateway の hgk_sop_generate を直接呼ぶ
+        sys.path.insert(0, str(Path(__file__).parent.parent))
+        from mekhane.mcp.hgk_gateway import hgk_sop_generate
+        result = hgk_sop_generate(context or ccl)
+        return {
+            "thread": "perplexity",
+            "ccl": ccl,
+            "status": "success",
+            "answer": str(result)[:3000],
+        }
+    except Exception as e:
+        return {"thread": "perplexity", "ccl": ccl, "status": "error", "error": str(e)}
+
+
+def _local_fallback(ccl: str, context: str, timeout: int) -> SynergeiaResult:
+    # PURPOSE: n8n 不通時にローカルで CCL をパースし実行するフォールバック
+    """n8n 不通時のローカルフォールバック"""
+    import re
+
+    # 簡易 CCL パーサー (n8n の JS ロジックの Python 版)
+    THREAD_MAP = {
+        "/noe": "ochema", "/dia": "ochema", "/bou": "ochema",
+        "/zet": "ochema", "/u": "ochema",
+        "/sop": "perplexity",
+        "/s": "jules", "/mek": "jules", "/ene": "jules", "/pra": "jules",
+    }
+
+    match = re.match(r"^/([a-z]+)", ccl)
+    prefix = f"/{match.group(1)}" if match else ""
+    thread = THREAD_MAP.get(prefix, "hermeneus")
+
+    try:
+        result_data = _execute_thread(thread, ccl, context, timeout)
+        return SynergeiaResult(
+            ccl=ccl,
+            status=result_data.get("status", "error"),
+            results=[result_data],
+            plan={"type": "single", "elements": [ccl], "fallback": True},
+        )
+    except Exception as e:
+        return SynergeiaResult(
+            ccl=ccl,
+            status="error",
+            error=f"Local fallback failed: {e}",
+        )
+
+
 def dispatch_compile_only(ccl: str) -> SynergeiaResult:
+    # PURPOSE: CCL をコンパイルのみ行い、実行せずに LMQL コードを取得する
     """CCL をコンパイルのみ (Hermēneus 経由、実行しない)"""
     payload = {
         "ccl": ccl,
@@ -173,6 +336,7 @@ def dispatch_compile_only(ccl: str) -> SynergeiaResult:
 # =============================================================================
 
 def _save_result(result: SynergeiaResult) -> Optional[Path]:
+    # PURPOSE: 実行結果を experiments/ ディレクトリに JSON として永続化する
     """結果を experiments/ に保存"""
     try:
         EXPERIMENTS_DIR.mkdir(exist_ok=True)
@@ -189,6 +353,7 @@ def _save_result(result: SynergeiaResult) -> Optional[Path]:
 
 
 def health_check() -> Dict[str, Any]:
+    # PURPOSE: n8n Synergeia webhook の疎通を確認して稼働状態を返す
     """n8n Synergeia webhook の疎通確認"""
     try:
         resp = requests.post(
@@ -213,6 +378,7 @@ def health_check() -> Dict[str, Any]:
 # =============================================================================
 
 def main():
+    # PURPOSE: Synergeia v2 の CLI エントリーポイント
     """CLI エントリーポイント"""
     import argparse
 

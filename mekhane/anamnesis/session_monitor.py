@@ -1,3 +1,4 @@
+# PROOF: [P3/Trokhia] <- mekhane/anamnesis
 #!/usr/bin/env python3
 # PURPOSE: LS API ポーリングでアクティブセッションをリアルタイムにモニターし MD 保存する
 """

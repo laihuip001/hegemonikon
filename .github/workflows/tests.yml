@@ -48,7 +48,8 @@ jobs:
                   # pinned pytest-asyncio for asyncio_mode="strict" support
                   pip install "pytest-asyncio>=0.23.0" pytest pytest-timeout pyyaml pydantic lancedb numpy scipy \
                               networkx pandas tabulate requests httpx schedule \
-                              sentence-transformers
+                              sentence-transformers \
+                              aiohttp aioresponses python-dotenv
                   # Install project in development mode if setup exists
                   pip install -e ".[test]" 2>/dev/null || true
 

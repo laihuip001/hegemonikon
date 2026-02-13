@@ -24,9 +24,11 @@ from datetime import datetime
 from pathlib import Path
 from typing import Optional, List
 import json
+import os
 
 # Default persistence path
-TRACES_PATH = Path("/home/makaron8426/oikos/mneme/.hegemonikon/meaningful_traces.json")
+# Use home directory instead of hardcoded path for portability
+TRACES_PATH = Path(os.environ.get("HOME", "/tmp")) / "oikos/mneme/.hegemonikon/meaningful_traces.json"
 
 
 # PURPOSE: の統一的インターフェースを実現する
@@ -125,7 +127,9 @@ def save_traces(path: Optional[Path] = None) -> Path:
         Path where traces were saved
     """
     target_path = path or TRACES_PATH
-    ensure_traces_dir()
+
+    # Ensure parent directory exists before writing
+    target_path.parent.mkdir(parents=True, exist_ok=True)
 
     # Load existing traces
     existing = load_traces(target_path)

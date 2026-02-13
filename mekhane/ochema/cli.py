@@ -11,6 +11,7 @@ Usage:
 from __future__ import annotations
 
 import argparse
+import os
 import sys
 
 from mekhane.ochema.antigravity_client import AntigravityClient, DEFAULT_MODEL
@@ -121,6 +122,81 @@ def cmd_quota(args: argparse.Namespace) -> None:
     print("└─────────────────────────────────────────────────────────┘")
 
 
+def cmd_health(args: argparse.Namespace) -> None:
+    """コンテキスト健全性を表示。"""
+    client = AntigravityClient(workspace=args.workspace)
+    data = client.context_health(
+        cascade_id=getattr(args, "cascade_id", None)
+    )
+
+    if "error" in data:
+        print(f"❌ {data['error']}")
+        return
+
+    print(f"┌─────────────────────────────────────────────────────────┐")
+    print(f"│ 🧠 Context Health")
+    print(f"├─────────────────────────────────────────────────────────┤")
+    print(f"│ {data['icon']} Level:    {data['level'].upper()}")
+    print(f"│   Steps:    {data['step_count']}")
+    print(f"│   Message:  {data['message']}")
+    if data.get('recommendation'):
+        print(f"│ ⚠️  {data['recommendation']}")
+    if data.get('low_quota_models'):
+        print(f"│ 🔴 Low quota: {', '.join(data['low_quota_models'])}")
+    print(f"│   Session:  {data.get('cascade_id', '')[:12]}...")
+    print(f"│   Summary:  {data.get('summary', '')[:40]}")
+    print(f"└─────────────────────────────────────────────────────────┘")
+
+
+def cmd_smart_ask(args: argparse.Namespace) -> None:
+    """スマートモデル選択で LLM に問い合わせ。"""
+    client = AntigravityClient(workspace=args.workspace)
+    message = " ".join(args.message)
+
+    # モデル選択ロジックの結果を表示
+    selected = client._select_model(message)
+    print(f"🎯 Auto-selected: {selected}")
+    print(f"📤 Sending...")
+    print()
+
+    try:
+        response = client.smart_ask(message, timeout=args.timeout)
+        print("💬 Response:")
+        print(response.text)
+        print()
+        print(f"───────────────────────────────────────────")
+        print(f"  Model: {response.model}")
+    except TimeoutError as e:
+        print(f"⏰ {e}", file=sys.stderr)
+        sys.exit(1)
+    except RuntimeError as e:
+        print(f"❌ {e}", file=sys.stderr)
+        sys.exit(1)
+
+
+def cmd_archive(args: argparse.Namespace) -> None:
+    """セッションをアーカイブ。"""
+    client = AntigravityClient(workspace=args.workspace)
+    max_sessions = 100 if getattr(args, "all", False) else 5
+
+    data = client.archive_sessions(
+        max_sessions=max_sessions,
+        since=getattr(args, "since", None),
+    )
+
+    if "error" in data:
+        print(f"❌ {data['error']}")
+        return
+
+    print(f"📦 Archive Results")
+    print(f"   Output: {data['output_dir']}")
+    print(f"   Exported: {len(data['exported'])}")
+    print(f"   Skipped:  {data['skipped']}")
+    for p in data.get('exported', []):
+        print(f"   ✅ {os.path.basename(p)}")
+
+
+
 def cmd_sessions(args: argparse.Namespace) -> None:
     """セッション一覧/詳細を表示。"""
     import json
@@ -215,22 +291,34 @@ def main() -> None:
     ep_parser = subparsers.add_parser("episodes", help="Access episode memory (.system_generated)")
     ep_parser.add_argument("brain_id", nargs="?", help="Specific brain ID for details")
 
+    # health (Proposal A)
+    health_parser = subparsers.add_parser("health", help="Check context health (Context Rot detection)")
+    health_parser.add_argument("cascade_id", nargs="?", help="Specific cascade ID")
+
+    # smart (Proposal C)
+    smart_parser = subparsers.add_parser("smart", help="Smart model selection + ask")
+    smart_parser.add_argument("message", nargs="+", help="Message to send")
+
+    # archive (Proposal D)
+    archive_parser = subparsers.add_parser("archive", help="Archive sessions to Markdown")
+    archive_parser.add_argument("--all", action="store_true", help="Export all sessions")
+    archive_parser.add_argument("--since", help="Export sessions since date (ISO format)")
+
     args = parser.parse_args()
 
-    if args.command == "status":
-        cmd_status(args)
-    elif args.command == "models":
-        cmd_models(args)
-    elif args.command == "ask":
-        cmd_ask(args)
-    elif args.command == "chat":
-        cmd_chat(args)
-    elif args.command == "quota":
-        cmd_quota(args)
-    elif args.command == "sessions":
-        cmd_sessions(args)
-    elif args.command == "episodes":
-        cmd_episodes(args)
+    cmd_map = {
+        "status": cmd_status,
+        "models": cmd_models,
+        "ask": cmd_ask,
+        "chat": cmd_chat,
+        "quota": cmd_quota,
+        "sessions": cmd_sessions,
+        "episodes": cmd_episodes,
+        "health": cmd_health,
+        "smart": cmd_smart_ask,
+        "archive": cmd_archive,
+    }
+    cmd_map[args.command](args)
 
 
 if __name__ == "__main__":

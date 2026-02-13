@@ -441,6 +441,266 @@ class AntigravityClient:
             "brains": brains,
         }
 
+    # --- Proposal A: Context Rot Detection ---
+
+    def context_health(self, cascade_id: Optional[str] = None) -> dict:
+        """コンテキスト健全性を評価する。
+
+        tool-mastery.md §5.5 の N chat messages 閾値に基づく:
+            ≤30: 🟢 HEALTHY
+            31-50: 🟡 WARNING
+            >50: 🔴 DANGER
+
+        Args:
+            cascade_id: 特定セッション (省略時は最新の RUNNING セッション)
+
+        Returns:
+            dict with level, message, step_count, recommendation
+        """
+        sessions = self.session_info()
+        if "error" in sessions:
+            return sessions
+
+        target = None
+        if cascade_id:
+            for s in sessions.get("sessions", []):
+                if s["cascade_id"] == cascade_id:
+                    target = s
+                    break
+        else:
+            # 最新の RUNNING セッション
+            for s in sessions.get("sessions", []):
+                if "RUNNING" in s.get("status", ""):
+                    target = s
+                    break
+            # なければ最新セッション
+            if not target and sessions.get("sessions"):
+                target = sessions["sessions"][0]
+
+        if not target:
+            return {"level": "unknown", "message": "No sessions found"}
+
+        step_count = target.get("step_count", 0)
+
+        if step_count <= 30:
+            level = "healthy"
+            icon = "🟢"
+            message = "Context is healthy"
+            recommendation = None
+        elif step_count <= 50:
+            level = "warning"
+            icon = "🟡"
+            message = "Context pressure rising"
+            recommendation = "Consider /bye soon"
+        else:
+            level = "danger"
+            icon = "🔴"
+            message = "Context Rot risk HIGH"
+            recommendation = "/bye recommended — context degradation likely"
+
+        # Quota も統合
+        try:
+            quota = self.quota_status()
+            low_quota_models = [
+                m["label"] for m in quota.get("models", [])
+                if m["remaining_pct"] < 20
+            ]
+        except Exception:
+            low_quota_models = []
+
+        return {
+            "level": level,
+            "icon": icon,
+            "message": message,
+            "step_count": step_count,
+            "cascade_id": target.get("cascade_id", ""),
+            "summary": target.get("summary", ""),
+            "recommendation": recommendation,
+            "low_quota_models": low_quota_models,
+        }
+
+    # --- Proposal C: Multi-Model Orchestration ---
+
+    # Model routing table: task keywords → preferred model
+    _MODEL_ROUTES = {
+        # Claude Thinking — deep analysis, security, architecture
+        "MODEL_CLAUDE_4_5_SONNET_THINKING": [
+            "security", "audit", "architecture", "design", "review",
+            "analyze", "explain", "why", "philosophy", "proof",
+        ],
+        # Gemini Flash — speed, simple tasks
+        "MODEL_PLACEHOLDER_M18": [
+            "translate", "format", "list", "simple", "quick",
+            "calculate", "convert", "summarize",
+        ],
+        # Gemini Pro — general purpose, multimodal
+        "MODEL_PLACEHOLDER_M8": [
+            "image", "video", "multimodal", "diagram", "chart",
+        ],
+    }
+
+    # Fallback chain
+    _MODEL_FALLBACK = {
+        "MODEL_CLAUDE_4_5_SONNET_THINKING": "MODEL_PLACEHOLDER_M26",
+        "MODEL_PLACEHOLDER_M26": "MODEL_CLAUDE_4_5_SONNET",
+        "MODEL_CLAUDE_4_5_SONNET": "MODEL_PLACEHOLDER_M18",
+        "MODEL_PLACEHOLDER_M8": "MODEL_PLACEHOLDER_M18",
+        "MODEL_PLACEHOLDER_M18": "MODEL_CLAUDE_4_5_SONNET",
+    }
+
+    def smart_ask(
+        self,
+        message: str,
+        timeout: float = DEFAULT_TIMEOUT,
+    ) -> LLMResponse:
+        """タスク内容に応じて最適モデルを自動選択し、LLM に問い合わせる。
+
+        T2 Krisis priority rules を内部で再現:
+            1. キーワードマッチでモデルを選択
+            2. Quota 残量チェック (20%未満ならフォールバック)
+            3. デフォルトは Claude Sonnet 4.5 Thinking
+
+        Args:
+            message: LLM に送るテキスト
+            timeout: 最大待機秒数
+
+        Returns:
+            LLMResponse (model フィールドに実際に使用されたモデル名)
+        """
+        selected = self._select_model(message)
+        return self.ask(message, model=selected, timeout=timeout)
+
+    def _select_model(self, message: str) -> str:
+        """メッセージ内容と Quota に基づいてモデルを選択する。"""
+        msg_lower = message.lower()
+
+        # Step 1: キーワードマッチ
+        best_model = DEFAULT_MODEL
+        best_score = 0
+        for model, keywords in self._MODEL_ROUTES.items():
+            score = sum(1 for kw in keywords if kw in msg_lower)
+            if score > best_score:
+                best_score = score
+                best_model = model
+
+        # Step 2: Quota チェック → フォールバック
+        try:
+            quota = self.quota_status()
+            model_quota = {
+                m["model"]: m["remaining_pct"]
+                for m in quota.get("models", [])
+            }
+
+            current = best_model
+            attempts = 0
+            while attempts < 3:
+                remaining = model_quota.get(current, 100)
+                if remaining >= 20:
+                    return current
+                # Quota 不足 → フォールバック
+                fallback = self._MODEL_FALLBACK.get(current)
+                if not fallback:
+                    break
+                current = fallback
+                attempts += 1
+        except Exception:
+            pass
+
+        return best_model
+
+    # --- Proposal D: Session Archive ---
+
+    def archive_sessions(
+        self,
+        output_dir: Optional[str] = None,
+        max_sessions: int = 5,
+        since: Optional[str] = None,
+    ) -> dict:
+        """セッションを Markdown でアーカイブする。
+
+        Args:
+            output_dir: 出力ディレクトリ (デフォルト: ~/oikos/mneme/.ochema/sessions/)
+            max_sessions: 最大エクスポート数
+            since: この日時以降のセッションのみ (ISO format)
+
+        Returns:
+            dict with exported (list of paths), skipped (int)
+        """
+        if output_dir is None:
+            output_dir = os.path.expanduser(
+                "~/oikos/mneme/.ochema/sessions"
+            )
+        os.makedirs(output_dir, exist_ok=True)
+
+        sessions = self.session_info()
+        if "error" in sessions:
+            return sessions
+
+        exported: list[str] = []
+        skipped = 0
+
+        for s in sessions.get("sessions", [])[:max_sessions]:
+            cid = s["cascade_id"]
+            modified = s.get("modified", "")
+
+            # since フィルタ
+            if since and modified < since:
+                skipped += 1
+                continue
+
+            # 既にエクスポート済みか確認
+            filename = f"session_{cid[:12]}_{modified[:10]}.md"
+            filepath = os.path.join(output_dir, filename)
+            if os.path.exists(filepath):
+                skipped += 1
+                continue
+
+            # 会話を取得
+            try:
+                conv = self.session_read(cid, max_turns=50, full=True)
+            except Exception:
+                skipped += 1
+                continue
+
+            # Markdown 生成
+            lines = [
+                f"# Session {cid[:12]}",
+                f"",
+                f"- **Cascade ID**: `{cid}`",
+                f"- **Modified**: {modified}",
+                f"- **Steps**: {conv.get('total_steps', 0)}",
+                f"- **Summary**: {conv.get('summary', '(none)')}",
+                f"",
+                f"---",
+                f"",
+            ]
+
+            for turn in conv.get("conversation", []):
+                role = turn.get("role", "")
+                if role == "user":
+                    lines.append(f"## 👤 User\n")
+                    lines.append(turn.get("content", ""))
+                    lines.append("")
+                elif role == "assistant":
+                    model = turn.get("model", "")
+                    lines.append(f"## 🤖 Assistant ({model})\n")
+                    lines.append(turn.get("content", ""))
+                    lines.append("")
+                elif role == "tool":
+                    tool = turn.get("tool", "")
+                    lines.append(f"- 🔧 `{tool}` ({turn.get('status', '')})")
+
+            # ファイル書き出し
+            with open(filepath, "w", encoding="utf-8") as f:
+                f.write("\n".join(lines))
+            exported.append(filepath)
+
+        return {
+            "exported": exported,
+            "skipped": skipped,
+            "output_dir": output_dir,
+        }
+
     # --- Internal: LS Detection ---
 
     def _detect_ls(self) -> LSInfo:

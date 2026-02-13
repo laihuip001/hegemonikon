@@ -53,6 +53,7 @@ class GnosisLanceBridge(DomainIndex):
 
     @property
     # PURPOSE: [L2-auto] Define source type
+    # PURPOSE: [L2-auto] Define source type
     def source_type(self) -> SourceType:
         return SourceType.GNOSIS
 

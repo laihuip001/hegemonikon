@@ -1,13 +1,10 @@
-# PURPOSE: Ochēma (AntigravityClient) 経由の LLM バックエンド
+# PROOF: [L2/Nous] <- mekhane/synteleia/dokimasia/
+# PURPOSE: 抽象化された Ochema Backend Interface (LLM, Stub, Mock) を提供する
 """
-OchemaBackend — Antigravity Language Server Bridge for Synteleia
+Ochema Backend Abstraction
 
-AntigravityClient を使い、Ultra プランの LLM を Synteleia 監査に利用する。
-Strategy Pattern: LLMBackend の具象実装。
-
-Usage:
-    backend = OchemaBackend(model="MODEL_PLACEHOLDER_M8")  # Gemini 3 Pro
-    response = backend.query(prompt, context)
+Semantic Agent が使用するバックエンドを抽象化する。
+実際の LLM (AntigravityClient) だけでなく、テスト用の Stub や Mock も提供。
 """
 
 import json
@@ -21,7 +18,7 @@ class OchemaBackend(LLMBackend):
     """Ochēma (AntigravityClient) 経由の LLM バックエンド。
 
     Antigravity IDE の Language Server に接続し、
-    Ultra プランで利用可能な LLM にクエリを送信する。
+    Ultra プランの LLM にクエリを送信する。
 
     Available models:
         - MODEL_PLACEHOLDER_M8: Gemini 3 Pro (100%)

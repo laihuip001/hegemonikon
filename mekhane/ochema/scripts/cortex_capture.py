@@ -1,12 +1,10 @@
+# PROOF: [L2/Nous] <- mekhane/ochema/scripts/
+# PURPOSE: Cortex State (Steps/Trajectories) をキャプチャし、JSON/Markdown にダンプする
 """
-Cortex API MITM Capture Script for mitmproxy.
+Cortex Capture Tool
 
-LS → Cortex (daily-cloudcode-pa.googleapis.com) 間の gRPC 通信をキャプチャし、
-Project ID やリクエスト構造を解析する。
-
-Usage:
-    /tmp/mitm-env/bin/mitmdump -s cortex_capture.py --listen-port 8888 \
-        --set upstream_cert=false --ssl-insecure
+Antigravity IDE の内部状態 (Cortex) をスナップショットとして保存する。
+セッション履歴の分析や、コンテキストの健全性診断に使用。
 """
 
 import json

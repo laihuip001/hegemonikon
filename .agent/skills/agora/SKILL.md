@@ -4,6 +4,11 @@ description: HGK 収益化プロジェクト — ディープインパクト戦�
 triggers:
   - "agora"
   - "agora"
+
+risk_tier: L1
+risks:
+  - 議論の空転
+  - コンセンサス形成の失敗
 ---
 
 # Agora

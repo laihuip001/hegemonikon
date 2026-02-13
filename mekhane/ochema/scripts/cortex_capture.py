@@ -1,3 +1,4 @@
+# PROOF: [L2/ツール] <- mekhane/ochema/scripts/ Cortex Capture
 """
 Cortex API MITM Capture Script for mitmproxy.
 

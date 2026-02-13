@@ -94,23 +94,28 @@ class TestMeaningfulTraceContextRegression:
         with tempfile.TemporaryDirectory() as tmpdir:
             path = Path(tmpdir) / "traces.json"
 
-            # Write a trace with context
-            clear_session_traces()
-            mark_meaningful(
-                reason="persist context",
-                intensity=2,
-                context="must persist to disk",
-            )
-            save_traces(path)
+            # Mock TRACES_PATH in meaningful_traces to point to our temp file
+            # This prevents permission errors when trying to create directories in /home/makaron8426
+            with patch("mekhane.fep.meaningful_traces.TRACES_PATH", path):
+                # Write a trace with context
+                clear_session_traces()
+                mark_meaningful(
+                    reason="persist context",
+                    intensity=2,
+                    context="must persist to disk",
+                )
 
-            # Load and verify
-            loaded = load_traces(path)
-            assert len(loaded) >= 1
-            found = [t for t in loaded if t.reason == "persist context"]
-            assert len(found) == 1
-            assert found[0].context == "must persist to disk"
+                # save_traces() calls ensure_traces_dir() which uses TRACES_PATH
+                save_traces()
 
-            clear_session_traces()
+                # Load and verify
+                loaded = load_traces(path)
+                assert len(loaded) >= 1
+                found = [t for t in loaded if t.reason == "persist context"]
+                assert len(found) == 1
+                assert found[0].context == "must persist to disk"
+
+                clear_session_traces()
 
 
 # ============ 2. FailureDB — resolution regression ============
@@ -228,7 +233,7 @@ class TestTyposToolChainRegression:
         """ContextItem must preserve tool_chain field."""
         import sys
         sys.path.insert(0, str(Path(__file__).parent.parent / "ergasterion" / "typos"))
-        import typos_lang as pl
+        import typos as pl
 
         # Create a ContextItem with tool_chain
         item = pl.ContextItem(
@@ -243,7 +248,7 @@ class TestTyposToolChainRegression:
         """Parser should extract MCP context references."""
         import sys
         sys.path.insert(0, str(Path(__file__).parent.parent / "ergasterion" / "typos"))
-        import typos_lang as pl
+        import typos as pl
 
         # Test that ContextItem preserves tool_chain when explicitly set
         item = pl.ContextItem(

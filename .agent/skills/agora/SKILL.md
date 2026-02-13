@@ -4,6 +4,13 @@ description: HGK 収益化プロジェクト — ディープインパクト戦�
 triggers:
   - "agora"
   - "agora"
+
+risk_tier: L1
+risks:
+  - "Premature monetization strategy execution"
+reversible: true
+requires_approval: false
+fallbacks: "Standard business planning"
 ---
 
 # Agora

@@ -136,8 +136,8 @@ def cmd_health(args: argparse.Namespace) -> None:
             elapsed = time.time() - t0
             checks.append((name, "❌", str(e)[:60], f"{elapsed:.1f}s"))
 
-    # 1. LanceDB (Gnōsis)
     # PURPOSE: [L2-auto] ヘルスチェック: Gnōsis
+    # 1. LanceDB (Gnōsis)
     def check_gnosis():
         from mekhane.anamnesis.index import GnosisIndex as AI
         gi = AI()
@@ -145,8 +145,8 @@ def cmd_health(args: argparse.Namespace) -> None:
         return f"{s.get('total', 0):,} docs"
     _check("Gnōsis (LanceDB)", check_gnosis)
 
-    # 2. Kairos index
     # PURPOSE: [L2-auto] ヘルスチェック: Kairos
+    # 2. Kairos index
     def check_kairos():
         pkl = Path.home() / "oikos" / "mneme" / ".hegemonikon" / "indices" / "kairos.pkl"
         if not pkl.exists():
@@ -156,8 +156,8 @@ def cmd_health(args: argparse.Namespace) -> None:
         return f"{a.count():,} docs"
     _check("Kairos (.pkl)", check_kairos)
 
-    # 3. Sophia index
     # PURPOSE: [L2-auto] ヘルスチェック: Sophia
+    # 3. Sophia index
     def check_sophia():
         pkl = Path.home() / "oikos" / "mneme" / ".hegemonikon" / "indices" / "sophia.pkl"
         if not pkl.exists():
@@ -167,8 +167,8 @@ def cmd_health(args: argparse.Namespace) -> None:
         return f"{a.count():,} docs"
     _check("Sophia (.pkl)", check_sophia)
 
-    # 4. Embedder
     # PURPOSE: [L2-auto] ヘルスチェック: Embedder
+    # 4. Embedder
     def check_embedder():
         from mekhane.symploke.adapters.embedding_adapter import EmbeddingAdapter
         a = EmbeddingAdapter()
@@ -176,8 +176,8 @@ def cmd_health(args: argparse.Namespace) -> None:
         return f"dim={len(v)}"
     _check("Embedder (BGE-M3)", check_embedder)
 
-    # 5. GnosisLanceBridge
     # PURPOSE: [L2-auto] ヘルスチェック: GnosisLanceBridge
+    # 5. GnosisLanceBridge
     def check_bridge():
         from mekhane.symploke.indices.gnosis_lance_bridge import GnosisLanceBridge
         b = GnosisLanceBridge()
@@ -185,8 +185,8 @@ def cmd_health(args: argparse.Namespace) -> None:
         return f"{len(r)} results, score={r[0].score:.3f}" if r else "0 results"
     _check("GnosisLanceBridge", check_bridge)
 
-    # 6. PKSEngine
     # PURPOSE: [L2-auto] ヘルスチェック: PKSEngine
+    # 6. PKSEngine
     def check_engine():
         from mekhane.pks.pks_engine import PKSEngine
         e = PKSEngine(enable_questions=False, enable_serendipity=False)
@@ -195,8 +195,8 @@ def cmd_health(args: argparse.Namespace) -> None:
         return f"{len(n)} nuggets"
     _check("PKSEngine", check_engine)
 
-    # 7. TopicExtractor
     # PURPOSE: [L2-auto] ヘルスチェック: TopicExtractor
+    # 7. TopicExtractor
     def check_topics():
         from mekhane.pks.pks_engine import PKSEngine
         e = PKSEngine(enable_questions=False)
@@ -204,16 +204,16 @@ def cmd_health(args: argparse.Namespace) -> None:
         return f"{len(t)} topics: {', '.join(t[:3])}"
     _check("TopicExtractor", check_topics)
 
-    # 8. SelfAdvocate
     # PURPOSE: [L2-auto] ヘルスチェック: SelfAdvocate
+    # 8. SelfAdvocate
     def check_advocate():
         from mekhane.pks.self_advocate import SelfAdvocate
         a = SelfAdvocate()
         return f"LLM={'ok' if a.llm_available else 'template mode'}"
     _check("SelfAdvocate", check_advocate)
 
-    # 9. Chronos index
     # PURPOSE: [L2-auto] ヘルスチェック: Chronos
+    # 9. Chronos index
     def check_chronos():
         pkl = Path.home() / "oikos" / "mneme" / ".hegemonikon" / "indices" / "chronos.pkl"
         if not pkl.exists():

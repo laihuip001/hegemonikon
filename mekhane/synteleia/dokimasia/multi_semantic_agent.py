@@ -1,4 +1,4 @@
-# PURPOSE: Multi-LLM アンサンブル監査エージェント (Layer B: Nous)
+# PROOF: [L2/推論] <- Multi-LLM アンサンブル監査エージェント (Layer B: Nous)
 """
 MultiSemanticAgent — Multi-LLM Cognitive Ensemble
 

@@ -1,3 +1,4 @@
+# PROOF: [L2/品質] <- mekhane/symploke/reviews/ SC-006
 # 入力検証推進者 レビュー
 
 ## 対象ファイル

@@ -1,3 +1,4 @@
+# PROOF: [L2/Dokimasia] <- mekhane/synteleia/dokimasia/ Multi-Agent Semantic Testing
 # PURPOSE: Multi-LLM アンサンブル監査エージェント (Layer B: Nous)
 """
 MultiSemanticAgent — Multi-LLM Cognitive Ensemble

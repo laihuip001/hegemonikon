@@ -1,3 +1,5 @@
+# PROOF: [L2/ツール] <- mekhane/ochema/scripts/ Cortex Traffic Capture
+# PURPOSE: Cortex の通信内容をキャプチャしてファイルに保存するスクリプト
 """
 Cortex API MITM Capture Script for mitmproxy.
 

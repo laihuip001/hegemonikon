@@ -1,3 +1,4 @@
+# PROOF: [L2/Dokimasia] <- mekhane/synteleia/dokimasia/ Ochema Backend Test
 # PURPOSE: Ochēma (AntigravityClient) 経由の LLM バックエンド
 """
 OchemaBackend — Antigravity Language Server Bridge for Synteleia

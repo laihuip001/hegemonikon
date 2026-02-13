@@ -9,9 +9,12 @@ import asyncio
 import os
 import sys
 import pytest
+from pathlib import Path
 
-# Add parent to path
-sys.path.insert(0, "/home/makaron8426/oikos/hegemonikon")
+# Add project root to path (works in both local and CI environments)
+project_root = str(Path(__file__).parent.parent.parent.parent)
+if project_root not in sys.path:
+    sys.path.insert(0, project_root)
 
 from mekhane.symploke.jules_client import JulesClient
 

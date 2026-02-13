@@ -7,6 +7,7 @@ Script to capture LLM reasoning steps from Antigravity logs.
 import sys
 from mekhane.ochema.antigravity_client import AntigravityClient
 
+# PURPOSE: [L2-auto] Main entry point.
 def main():
     """Main entry point."""
     if len(sys.argv) < 2:

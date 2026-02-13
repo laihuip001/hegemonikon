@@ -7,11 +7,13 @@ Command-line interface for Antigravity operations.
 import click
 from mekhane.ochema.antigravity_client import AntigravityClient
 
+# PURPOSE: [L2-auto] CLI Group.
 @click.group()
 def cli():
     """Ochēma CLI."""
     pass
 
+# PURPOSE: [L2-auto] Ask a question to the LLM.
 @cli.command()
 @click.argument("message")
 def ask(message: str):

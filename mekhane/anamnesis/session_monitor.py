@@ -8,6 +8,7 @@ import time
 import logging
 from mekhane.ochema.antigravity_client import AntigravityClient
 
+# PURPOSE: [L2-auto] Monitor for new sessions.
 def monitor_sessions(interval: int = 60):
     """Monitor for new sessions."""
     client = AntigravityClient()

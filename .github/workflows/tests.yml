@@ -47,9 +47,11 @@ jobs:
 
                   # Install core test dependencies from PyPI
                   # aiohttp and opentelemetry are needed for jules_client tests
+                  # python-dotenv is needed for anamnesis/night_review.py
                   pip install pytest pytest-asyncio pytest-timeout pyyaml pydantic lancedb numpy scipy \
                               networkx pandas tabulate requests httpx schedule \
-                              sentence-transformers aiohttp opentelemetry-api opentelemetry-sdk
+                              sentence-transformers aiohttp opentelemetry-api opentelemetry-sdk \
+                              python-dotenv
 
                   # Install project in development mode if setup exists
                   pip install -e ".[test]" 2>/dev/null || true

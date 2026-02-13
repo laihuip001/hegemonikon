@@ -67,6 +67,7 @@ POLL_INTERVAL = 1.0  # seconds
 
 # --- Payload Builders (v8) ---
 
+    # PURPOSE: Build start cascade request
 def build_start_cascade() -> dict:
     """StartCascade ペイロードを構築する。
 
@@ -79,6 +80,7 @@ def build_start_cascade() -> dict:
         "trajectoryType": TRAJECTORY_TYPE,
     }
 
+    # PURPOSE: Build send message request
 
 def build_send_message(cascade_id: str, text: str, model: str) -> dict:
     """SendUserCascadeMessage ペイロードを構築する。
@@ -98,6 +100,7 @@ def build_send_message(cascade_id: str, text: str, model: str) -> dict:
             },
         },
     }
+    # PURPOSE: Build get status request
 
 
 def build_get_status() -> dict:
@@ -108,9 +111,11 @@ def build_get_status() -> dict:
             "extensionName": "antigravity",
             "locale": "en",
         },
+    # PURPOSE: Build get steps request
     }
 
 
+# PURPOSE: Build get steps request
 def build_get_steps(cascade_id: str, trajectory_id: str) -> dict:
     """GetCascadeTrajectorySteps ペイロードを構築する。"""
     return {
@@ -129,6 +134,7 @@ STEP_STATUS_DONE = "CORTEX_STEP_STATUS_DONE"
 TURN_STATES_DONE = ("", "TURN_STATE_WAITING_FOR_USER")
 
 
+    # PURPOSE: Extract planner response
 def extract_planner_response(step: dict) -> dict:
     """PLANNER_RESPONSE ステップからテキスト・thinking・model を抽出する。
 
@@ -153,6 +159,7 @@ def extract_planner_response(step: dict) -> dict:
         "status": step.get("status", ""),
     }
 
+    # PURPOSE: Resolve model
 
 def resolve_model(name: str) -> str:
     """モデルエイリアスを proto enum に解決する。"""

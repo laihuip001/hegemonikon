@@ -137,6 +137,7 @@ def cmd_health(args: argparse.Namespace) -> None:
             checks.append((name, "❌", str(e)[:60], f"{elapsed:.1f}s"))
 
     # 1. LanceDB (Gnōsis)
+    # PURPOSE: Check Gnosis status
     def check_gnosis():
         from mekhane.anamnesis.index import GnosisIndex as AI
         gi = AI()
@@ -145,6 +146,7 @@ def cmd_health(args: argparse.Namespace) -> None:
     _check("Gnōsis (LanceDB)", check_gnosis)
 
     # 2. Kairos index
+    # PURPOSE: Check Kairos status
     def check_kairos():
         pkl = Path.home() / "oikos" / "mneme" / ".hegemonikon" / "indices" / "kairos.pkl"
         if not pkl.exists():
@@ -154,6 +156,7 @@ def cmd_health(args: argparse.Namespace) -> None:
         return f"{a.count():,} docs"
     _check("Kairos (.pkl)", check_kairos)
 
+    # PURPOSE: Check Sophia status
     # 3. Sophia index
     def check_sophia():
         pkl = Path.home() / "oikos" / "mneme" / ".hegemonikon" / "indices" / "sophia.pkl"
@@ -163,6 +166,7 @@ def cmd_health(args: argparse.Namespace) -> None:
         a = EmbeddingAdapter(); a.load(str(pkl))
         return f"{a.count():,} docs"
     _check("Sophia (.pkl)", check_sophia)
+    # PURPOSE: Check Embedder status
 
     # 4. Embedder
     def check_embedder():
@@ -173,6 +177,7 @@ def cmd_health(args: argparse.Namespace) -> None:
     _check("Embedder (BGE-M3)", check_embedder)
 
     # 5. GnosisLanceBridge
+    # PURPOSE: Check Bridge status
     def check_bridge():
         from mekhane.symploke.indices.gnosis_lance_bridge import GnosisLanceBridge
         b = GnosisLanceBridge()
@@ -180,6 +185,7 @@ def cmd_health(args: argparse.Namespace) -> None:
         return f"{len(r)} results, score={r[0].score:.3f}" if r else "0 results"
     _check("GnosisLanceBridge", check_bridge)
 
+    # PURPOSE: Check Engine status
     # 6. PKSEngine
     def check_engine():
         from mekhane.pks.pks_engine import PKSEngine
@@ -188,6 +194,7 @@ def cmd_health(args: argparse.Namespace) -> None:
         n = e.proactive_push(k=3)
         return f"{len(n)} nuggets"
     _check("PKSEngine", check_engine)
+    # PURPOSE: Check Topics status
 
     # 7. TopicExtractor
     def check_topics():
@@ -198,12 +205,14 @@ def cmd_health(args: argparse.Namespace) -> None:
     _check("TopicExtractor", check_topics)
 
     # 8. SelfAdvocate
+    # PURPOSE: Check Advocate status
     def check_advocate():
         from mekhane.pks.self_advocate import SelfAdvocate
         a = SelfAdvocate()
         return f"LLM={'ok' if a.llm_available else 'template mode'}"
     _check("SelfAdvocate", check_advocate)
 
+    # PURPOSE: Check Chronos status
     # 9. Chronos index
     def check_chronos():
         pkl = Path.home() / "oikos" / "mneme" / ".hegemonikon" / "indices" / "chronos.pkl"

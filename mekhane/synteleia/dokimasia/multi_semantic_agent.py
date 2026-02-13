@@ -1,3 +1,4 @@
+# PROOF: [L3/Integration] <- Multi-LLM Agent
 # PURPOSE: Multi-LLM アンサンブル監査エージェント (Layer B: Nous)
 """
 MultiSemanticAgent — Multi-LLM Cognitive Ensemble

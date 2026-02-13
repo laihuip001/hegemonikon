@@ -80,6 +80,7 @@ class EnsembleMember:
     persona: str  # PERSONAS のキー
 
     @property
+    # PURPOSE: エージェントのペルソナプロンプトを取得
     def persona_prompt(self) -> str:
         """persona 付きプロンプトを生成。"""
         return PERSONAS.get(self.persona, "") + "\n" + SEMANTIC_AUDIT_PROMPT
@@ -101,10 +102,12 @@ class MultiSemanticAgent(AuditAgent):
     name = "MultiSemanticAgent"
     description = "Multi-LLM アンサンブル監査 (Layer B: Nous)"
 
+    # PURPOSE: インスタンスを初期化
     def __init__(self, members: List[EnsembleMember]):
         self.members = members
 
     @classmethod
+    # PURPOSE: デフォルト設定のインスタンスを生成
     def default(cls) -> "MultiSemanticAgent":
         """デフォルト構成: Gemini Pro + Claude Opus + GPT-OSS。"""
         try:
@@ -146,6 +149,7 @@ class MultiSemanticAgent(AuditAgent):
         return cls(members=members)
 
     @classmethod
+    # PURPOSE: テスト用スタブを持つインスタンスを生成
     def with_stubs(cls, responses: Optional[Dict[str, str]] = None) -> "MultiSemanticAgent":
         """テスト用: StubBackend でアンサンブルを構成。"""
         members = []
@@ -161,6 +165,7 @@ class MultiSemanticAgent(AuditAgent):
         return cls(members=members)
 
     # PURPOSE: Multi-LLM アンサンブル監査を実行
+    # PURPOSE: ターゲットに対する監査を実行
     def audit(self, target: AuditTarget) -> AgentResult:
         """全メンバーに並列 query → majority voting → 統合結果。"""
 
@@ -232,6 +237,7 @@ class MultiSemanticAgent(AuditAgent):
         )
 
     # PURPOSE: 個別メンバーに query
+    # PURPOSE: 個別のメンバーにクエリを実行
     def _query_member(
         self, member: EnsembleMember, target: AuditTarget
     ) -> Tuple[str, str, List[AuditIssue], float]:
@@ -247,6 +253,7 @@ class MultiSemanticAgent(AuditAgent):
         return member.persona, response_text, issues, confidence
 
     # PURPOSE: confidence-weighted majority voting
+    # PURPOSE: メンバーの判定結果から多数決を行う
     def _majority_vote(
         self, member_results: List[Tuple[str, str, List[AuditIssue], float]]
     ) -> List[AuditIssue]:
@@ -297,6 +304,7 @@ class MultiSemanticAgent(AuditAgent):
         return unified
 
     # PURPOSE: レスポンスから confidence を抽出
+    # PURPOSE: レスポンスから確信度を抽出
     def _extract_confidence(self, response: str) -> float:
         """LLM レスポンスから confidence を抽出。"""
         try:
@@ -308,6 +316,7 @@ class MultiSemanticAgent(AuditAgent):
         return 0.7
 
     # PURPOSE: L2 はテキスト系のターゲットのみサポート
+    # PURPOSE: 指定されたターゲットタイプをサポートしているか判定
     def supports(self, target_type: AuditTargetType) -> bool:
         """L2 はテキスト系のターゲットのみサポート。"""
         return target_type in (
@@ -322,6 +331,7 @@ class MultiSemanticAgent(AuditAgent):
 # Utilities
 # =============================================================================
 
+# PURPOSE: 重大度のランクを取得
 def _severity_rank(severity: AuditSeverity) -> int:
     """Severity の厳しさ順序。"""
     return {

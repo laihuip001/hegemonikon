@@ -32,6 +32,7 @@ class OchemaBackend(LLMBackend):
         - MODEL_PLACEHOLDER_M18: Gemini 3 Flash (100%)
     """
 
+    # PURPOSE: インスタンスを初期化
     def __init__(
         self,
         model: str = "MODEL_PLACEHOLDER_M8",  # Gemini 3 Pro
@@ -44,6 +45,7 @@ class OchemaBackend(LLMBackend):
         self._client = None
         self._available: Optional[bool] = None
 
+    # PURPOSE: LLM にクエリを送信
     # PURPOSE: LLM にクエリを送信
     def query(self, prompt: str, context: str) -> str:
         """Ochēma 経由で LLM にクエリを送信し、テキスト応答を返す。"""
@@ -59,6 +61,7 @@ class OchemaBackend(LLMBackend):
         return response.text
 
     # PURPOSE: バックエンドが利用可能か
+    # PURPOSE: バックエンドが利用可能か判定
     def is_available(self) -> bool:
         """AntigravityClient が接続可能かチェック。"""
         if self._available is None:
@@ -71,6 +74,7 @@ class OchemaBackend(LLMBackend):
         return self._available
 
     # PURPOSE: AntigravityClient のシングルトン取得
+    # PURPOSE: AntigravityClient インスタンスを取得
     def _get_client(self):
         """AntigravityClient をシングルトンで取得。synteleia-sandbox WS に接続。"""
         if self._client is None:
@@ -78,5 +82,6 @@ class OchemaBackend(LLMBackend):
             self._client = AntigravityClient(workspace="synteleia-sandbox")
         return self._client
 
+    # PURPOSE: オブジェクトの文字列表現を取得
     def __repr__(self) -> str:
         return f"OchemaBackend(model={self.model!r}, label={self.label!r})"

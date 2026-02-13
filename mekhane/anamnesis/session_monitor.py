@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
 # PURPOSE: LS API ポーリングでアクティブセッションをリアルタイムにモニターし MD 保存する
+# PROOF: [L2-auto] <- mekhane/anamnesis/session_monitor.py
 """
-PROOF: [L2/インフラ] <- mekhane/anamnesis/
-
 Session Monitor — リアルタイムセッションログ保存
 
 AntigravityClient を使って LS API をポーリングし、

@@ -228,6 +228,100 @@ def cmd_health(args: argparse.Namespace) -> None:
     print()
 
 
+# PURPOSE: `pks search` — 全インデックス横断検索
+def cmd_search(args: argparse.Namespace) -> None:
+    """Gnōsis, Kairos, Sophia, Chronos を横断検索"""
+    import os, time
+    for key in ['HTTP_PROXY', 'HTTPS_PROXY', 'http_proxy', 'https_proxy']:
+        os.environ.pop(key, None)
+    os.environ.setdefault('HF_HUB_OFFLINE', '1')
+    os.environ.setdefault('TRANSFORMERS_OFFLINE', '1')
+
+    query = args.query
+    k = args.k
+    sources = args.sources.split(",") if args.sources else ["gnosis", "kairos", "sophia", "chronos"]
+
+    print(f"## 🔎 PKS Search: \"{query}\"\n")
+    t0 = time.time()
+    all_results = []
+
+    # Source icons
+    icons = {"gnosis": "🔬", "kairos": "📋", "sophia": "📖", "chronos": "🕐"}
+
+    # 1. Gnōsis (LanceDB)
+    if "gnosis" in sources:
+        try:
+            from mekhane.anamnesis.index import GnosisIndex as AI
+            gi = AI()
+            results = gi.search(query, k=k)
+            for r in results:
+                title = r.get("title", r.get("primary_key", "?"))
+                dist = float(r.get("_distance", 1.0))
+                # LanceDB distance → similarity (lower distance = higher similarity)
+                score = max(0, 1 - dist / 2)
+                snippet = r.get("abstract", r.get("content", ""))[:120]
+                all_results.append(("gnosis", score, title, snippet))
+        except Exception as e:
+            print(f"  ⚠️ Gnōsis: {e}")
+
+    # 2-4. pkl indices (Kairos, Sophia, Chronos)
+    indices_dir = Path.home() / "oikos" / "mneme" / ".hegemonikon" / "indices"
+    pkl_names = [n for n in ["kairos", "sophia", "chronos"] if n in sources]
+
+    if pkl_names:
+        try:
+            from mekhane.symploke.adapters.embedding_adapter import EmbeddingAdapter
+            adapter = EmbeddingAdapter()
+            query_vec = adapter.encode(query)
+
+            for name in pkl_names:
+                pkl = indices_dir / f"{name}.pkl"
+                if not pkl.exists():
+                    continue
+                try:
+                    idx = EmbeddingAdapter()
+                    idx.load(str(pkl))
+                    hits = idx.search(query_vec, k=k)
+                    for hit in hits:
+                        # SearchResult object: .id, .score, .metadata
+                        meta = hit.metadata if hasattr(hit, 'metadata') else {}
+                        doc_id = meta.get("doc_id", meta.get("title", str(hit.id)))
+                        score = hit.score if hasattr(hit, 'score') else 0
+                        title = meta.get("title", doc_id)
+                        all_results.append((name, score, title, ""))
+                except Exception as e:
+                    print(f"  ⚠️ {name}: {e}")
+        except Exception as e:
+            print(f"  ⚠️ Embedder: {e}")
+
+    elapsed = time.time() - t0
+
+    # Sort by score descending
+    all_results.sort(key=lambda x: x[1], reverse=True)
+
+    if not all_results:
+        print("📭 結果が見つかりませんでした。")
+        return
+
+    # Display top results
+    top = all_results[:k]
+    print(f"| # | ソース | スコア | タイトル / ID | スニペット |")
+    print(f"|--:|:-------|-------:|:--------------|:-----------|")
+    for i, (src, score, title, snippet) in enumerate(top, 1):
+        icon = icons.get(src, "📦")
+        title_short = title[:40] + "…" if len(title) > 40 else title
+        snippet_short = snippet.replace("\n", " ")[:60]
+        print(f"| {i} | {icon} {src} | {score:.3f} | {title_short} | {snippet_short} |")
+
+    # Summary
+    src_counts = {}
+    for src, _, _, _ in top:
+        src_counts[src] = src_counts.get(src, 0) + 1
+    breakdown = ", ".join(f"{icons.get(s, '📦')}{c}" for s, c in sorted(src_counts.items()))
+    print(f"\n**{len(top)} 件** ({breakdown}) — {elapsed:.1f}s")
+    print()
+
+
 # PURPOSE: `pks push` — コンテキストに基づく能動的プッシュ
 def cmd_push(args: argparse.Namespace) -> None:
     """コンテキストに基づく能動的プッシュ"""
@@ -519,6 +613,8 @@ def main() -> None:
             "  pks feedback --stats              # 統計表示\n"
             "  pks stats                         # 知識基盤統計\n"
             "  pks health                        # 全スタックヘルスチェック\n"
+            "  pks search 'FEP precision'        # 全インデックス横断検索\n"
+            "  pks search 'active inference' -s gnosis,chronos  # ソース限定\n"
         ),
     )
     subparsers = parser.add_subparsers(dest="command", help="サブコマンド")
@@ -530,6 +626,14 @@ def main() -> None:
     # --- health ---
     p_health = subparsers.add_parser("health", help="Autophōnos 全スタックのヘルスチェック")
     p_health.set_defaults(func=cmd_health)
+
+    # --- search ---
+    p_search = subparsers.add_parser("search", help="全インデックス横断検索")
+    p_search.add_argument("query", help="検索クエリ")
+    p_search.add_argument("--k", type=int, default=10, help="取得件数 (default: 10)")
+    p_search.add_argument("--sources", "-s", default=None,
+                          help="検索ソース (カンマ区切り: gnosis,kairos,sophia,chronos)")
+    p_search.set_defaults(func=cmd_search)
 
     # --- push ---
     p_push = subparsers.add_parser("push", help="能動的プッシュを実行")

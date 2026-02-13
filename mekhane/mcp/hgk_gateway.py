@@ -930,6 +930,34 @@ def hgk_pks_health() -> str:
     return result.stdout if result.returncode == 0 else f"❌ Error: {result.stderr[:200]}"
 
 
+# PURPOSE: PKS 全インデックス横断検索 MCP ツール
+@mcp.tool()
+@_traced
+def hgk_pks_search(query: str, k: int = 10, sources: str = "") -> str:
+    """
+    全知識基盤 (34K+ docs) を横断検索する。
+    Gnōsis (論文), Kairos (会話ログ), Sophia (KI), Chronos (時系列履歴) を
+    同時にベクトル検索し、スコア順に統一結果を返す。
+
+    Args:
+        query: 検索クエリ (自然言語)
+        k: 取得件数 (デフォルト: 10)
+        sources: 検索ソースのカンマ区切り (例: "gnosis,chronos")。空=全ソース
+    """
+    import subprocess
+    cmd = [sys.executable, "-m", "mekhane.pks.pks_cli", "search", query, "--k", str(k)]
+    if sources:
+        cmd.extend(["-s", sources])
+    result = subprocess.run(
+        cmd,
+        capture_output=True, text=True,
+        cwd=str(PROJECT_ROOT),
+        env={**os.environ, "HF_HUB_OFFLINE": "1", "TRANSFORMERS_OFFLINE": "1"},
+        timeout=120,
+    )
+    return result.stdout if result.returncode == 0 else f"❌ Error: {result.stderr[:200]}"
+
+
 # =============================================================================
 # CCL Execute (CCL 式の実行)
 # =============================================================================

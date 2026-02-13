@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # PURPOSE: LS API ポーリングでアクティブセッションをリアルタイムにモニターし MD 保存する
 """
-PROOF: [L2/インフラ] <- mekhane/anamnesis/
+PROOF: [P3/Anamnesis] <- mekhane/anamnesis/session_monitor.py
 
 Session Monitor — リアルタイムセッションログ保存
 

@@ -65,11 +65,11 @@ async function fireOsNotifications(notifications: Notification[]): Promise<void>
 /** Escape HTML to prevent XSS */
 function esc(s: string | undefined | null): string {
   if (!s) return '';
-  return s.replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#039;');
+  return s.replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#039;');
 }
 
 // ─── Polling Manager (S5) ────────────────────────────────────
@@ -775,11 +775,15 @@ async function renderNotifications(): Promise<void> {
 
 async function renderNotificationsContent(): Promise<void> {
   let notifications: Notification[] = [];
+  let pksNuggets: PKSPushResponse | null = null;
+
   try {
-    notifications = await api.notifications(
-      50,
-      notifLevelFilter || undefined,
-    );
+    const [notifRes, pksRes] = await Promise.all([
+      api.notifications(50, notifLevelFilter || undefined),
+      api.pksPush().catch((): null => null),
+    ]);
+    notifications = notifRes;
+    pksNuggets = pksRes;
   } catch (err) {
     const app = document.getElementById('view-content')!;
     if (currentRoute !== 'notifications') return;
@@ -788,7 +792,6 @@ async function renderNotificationsContent(): Promise<void> {
   }
 
   // Merge PKS nuggets as virtual notifications
-  const pksNuggets = await api.pksPush().catch((): null => null);
   if (pksNuggets && pksNuggets.nuggets.length > 0) {
     const pksAsNotifs: Notification[] = pksNuggets.nuggets.map((n) => ({
       id: `pks-${n.title.slice(0, 20)}`,

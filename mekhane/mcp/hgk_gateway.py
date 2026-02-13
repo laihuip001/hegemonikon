@@ -197,6 +197,7 @@ def _traced(fn):
     """
     import functools
 
+    # PURPOSE: 実行時間を計測しログに記録するラッパー
     @functools.wraps(fn)
     def wrapper(*args: Any, **kwargs: Any) -> Any:
         _start = time.time()

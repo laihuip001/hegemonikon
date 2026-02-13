@@ -1,4 +1,4 @@
-# PROOF: [L2/インフラ] <- mekhane/anamnesis/ P3→記憶の永続化が必要
+# PROOF: [L2/インフラ] <- mekhane/anamnesis/
 # PURPOSE: セッション履歴を GnosisIndex (LanceDB) にインデックスする
 """
 PROOF: [L2/インフラ] <- mekhane/anamnesis/

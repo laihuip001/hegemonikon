@@ -17,6 +17,8 @@ import sys
 from mekhane.ochema.antigravity_client import AntigravityClient, DEFAULT_MODEL
 
 
+# PURPOSE: LS 接続ステータスを表示
+# PROOF: [L2/CLI] <- mekhane/ochema/cli.py
 def cmd_status(args: argparse.Namespace) -> None:
     """LS 接続ステータスを表示。"""
     client = AntigravityClient(workspace=args.workspace)
@@ -31,6 +33,8 @@ def cmd_status(args: argparse.Namespace) -> None:
     print(f"└─────────────────────────────────────────┘")
 
 
+# PURPOSE: 利用可能なモデル一覧を表示
+# PROOF: [L2/CLI] <- mekhane/ochema/cli.py
 def cmd_models(args: argparse.Namespace) -> None:
     """利用可能なモデル一覧を表示。"""
     client = AntigravityClient(workspace=args.workspace)
@@ -45,6 +49,8 @@ def cmd_models(args: argparse.Namespace) -> None:
     print(f"└─────────────────────────────────────────────────┘")
 
 
+# PURPOSE: LLM にメッセージを送信し、応答を表示
+# PROOF: [L2/CLI] <- mekhane/ochema/cli.py
 def cmd_ask(args: argparse.Namespace) -> None:
     """LLM にメッセージを送信し、応答を表示。"""
     client = AntigravityClient(workspace=args.workspace)
@@ -76,6 +82,8 @@ def cmd_ask(args: argparse.Namespace) -> None:
         sys.exit(1)
 
 
+# PURPOSE: 対話モード
+# PROOF: [L2/CLI] <- mekhane/ochema/cli.py
 def cmd_chat(args: argparse.Namespace) -> None:
     """対話モード。"""
     client = AntigravityClient(workspace=args.workspace)
@@ -100,6 +108,8 @@ def cmd_chat(args: argparse.Namespace) -> None:
             print(f"❌ Error: {e}")
 
 
+# PURPOSE: Quota + Experiment フラグ状態を表示
+# PROOF: [L2/CLI] <- mekhane/ochema/cli.py
 def cmd_quota(args: argparse.Namespace) -> None:
     """Quota + Experiment フラグ状態を表示。"""
     import json
@@ -122,6 +132,8 @@ def cmd_quota(args: argparse.Namespace) -> None:
     print("└─────────────────────────────────────────────────────────┘")
 
 
+# PURPOSE: セッション一覧/詳細を表示
+# PROOF: [L2/CLI] <- mekhane/ochema/cli.py
 def cmd_sessions(args: argparse.Namespace) -> None:
     """セッション一覧/詳細を表示。"""
     import json
@@ -145,6 +157,8 @@ def cmd_sessions(args: argparse.Namespace) -> None:
         print(json.dumps(data, indent=2, ensure_ascii=False))
 
 
+# PURPOSE: エピソード記憶一覧/詳細を表示
+# PROOF: [L2/CLI] <- mekhane/ochema/cli.py
 def cmd_episodes(args: argparse.Namespace) -> None:
     """エピソード記憶一覧/詳細を表示。"""
     import json
@@ -171,6 +185,7 @@ def cmd_episodes(args: argparse.Namespace) -> None:
             print(f"    {ep['preview'][:80]}...")
 
 
+# PURPOSE: CLI エントリーポイント
 def main() -> None:
     """CLI エントリーポイント。"""
     parser = argparse.ArgumentParser(

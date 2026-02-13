@@ -140,6 +140,8 @@ WF_PATTERN = re.compile(
 )
 
 
+# PURPOSE: Handoff ファイル名から日付を抽出
+# PROOF: [L2/ユーティリティ] <- mekhane/peira/theorem_activity.py
 def parse_date_from_filename(path: Path) -> Optional[datetime]:
     """Handoff ファイル名から日付を抽出"""
     patterns = [
@@ -162,6 +164,8 @@ def parse_date_from_filename(path: Path) -> Optional[datetime]:
     return None
 
 
+# PURPOSE: Handoff ファイルを走査し、WF 発動を集計
+# PROOF: [L2/集計] <- mekhane/peira/theorem_activity.py
 def scan_handoffs(days: Optional[int] = None) -> dict:
     """Handoff ファイルを走査し、WF 発動を集計"""
     cutoff = None
@@ -207,6 +211,8 @@ def scan_handoffs(days: Optional[int] = None) -> dict:
     }
 
 
+# PURPOSE: 活性度を3段階で分類
+# PROOF: [L2/判定] <- mekhane/peira/theorem_activity.py
 def classify_activity(wf_id: str, count: int, months_span: int) -> str:
     """活性度を3段階で分類"""
     if months_span == 0:
@@ -220,6 +226,8 @@ def classify_activity(wf_id: str, count: int, months_span: int) -> str:
         return "🟡 dormant"
 
 
+# PURPOSE: 活性度レポートを生成
+# PROOF: [L2/レポート] <- mekhane/peira/theorem_activity.py
 def generate_report(days: Optional[int] = None, as_json: bool = False) -> str:
     """活性度レポートを生成"""
     data = scan_handoffs(days)
@@ -332,6 +340,7 @@ def generate_report(days: Optional[int] = None, as_json: bool = False) -> str:
     return "\n".join(lines)
 
 
+# PURPOSE: CLI エントリーポイント
 def main():
     parser = argparse.ArgumentParser(
         description="定理活性度レポート — Handoff からWF発動頻度を集計"

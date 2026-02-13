@@ -1,19 +1,22 @@
 ---
-name: Dendron EPT Checker
 description: コード品質・存在証明 (PROOF.md) の検証を実行する
-triggers:
-  - "品質"
-  - "PROOF"
-  - "存在証明"
-  - "EPT"
-  - "dendron"
-  - "checker"
-  - "なぜ存在する"
-
-risk_tier: "L1"
+fallbacks: []
+name: Dendron EPT Checker
+requires_approval: false
+reversible: true
+risk_tier: L1
 risks:
-  - "検証漏れによる品質ゲート形骸化"
+- 検証漏れによる品質ゲート形骸化
+triggers:
+- 品質
+- PROOF
+- 存在証明
+- EPT
+- dendron
+- checker
+- なぜ存在する
 ---
+
 
 # Dendron EPT Checker
 

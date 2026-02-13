@@ -73,6 +73,7 @@ class SynteleiaOrchestrator:
 
     # PURPOSE: L1 + L2 統合監査 (/dia+ 用ファクトリ)
     @classmethod
+    # PROOF: [L2/ファクトリ] <- mekhane/synteleia/orchestrator.py
     def with_l2(cls, backend=None) -> "SynteleiaOrchestrator":
         """
         L1 全エージェント + L2 SemanticAgent を含むオーケストレータを生成。
@@ -93,7 +94,9 @@ class SynteleiaOrchestrator:
         orchestrator.dokimasia_agents.append(semantic)
         return orchestrator
 
+    # PURPOSE: L1 + Multi-L2 統合オーケストレータ
     @classmethod
+    # PROOF: [L2/ファクトリ] <- mekhane/synteleia/orchestrator.py
     def with_multi_l2(cls) -> "SynteleiaOrchestrator":
         """
         L1 全エージェント + Layer B Multi-LLM アンサンブルを含むオーケストレータ。

@@ -112,7 +112,9 @@ def get_client():
     return _client
 
 
+# PURPOSE: ツール一覧を返す
 @server.list_tools()
+# PROOF: [L2/ツール] <- mekhane/mcp/ochema_mcp_server.py
 async def list_tools():
     """List available tools."""
     log("list_tools called")
@@ -180,7 +182,9 @@ async def list_tools():
     ]
 
 
+# PURPOSE: ツールを実行する
 @server.call_tool(validate_input=True)
+# PROOF: [L2/ツール] <- mekhane/mcp/ochema_mcp_server.py
 async def call_tool(name: str, arguments: dict):
     """Handle tool calls."""
     log(f"call_tool: {name} with {arguments}")

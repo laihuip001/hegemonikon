@@ -1,32 +1,37 @@
 ---
-name: FEP Cognitive Engine
-description: |
-  FEP (自由エネルギー原理) に基づく認知設計原理。
+description: 'FEP (自由エネルギー原理) に基づく認知設計原理。
+
   「全てを説明する理論」ではなく「行動選択の objective」として FEP を使う。
+
   VFE/EFE の数学的分解、精度加重の操作的定義、HGK 体系との対応を含む。
 
-triggers:
-  - "FEP"
-  - "自由エネルギー"
-  - "認知"
-  - "意思決定"
-  - "予測誤差"
-  - "能動推論"
-  - "active inference"
-  - "EFE"
-  - "precision"
-  - "精度加重"
-  - "attractor"
-  - "series"
+  '
+fallbacks: []
+lineage: 'v1.1 (手順のみ) → /sop deep 15論点50論文調査 (2026-02-10) → /noe+ 3命題抽出 → v2.0
 
-version: "2.0.0"
-lineage: |
-  v1.1 (手順のみ) → /sop deep 15論点50論文調査 (2026-02-10) → /noe+ 3命題抽出 → v2.0
-
-risk_tier: "L1"
+  '
+name: FEP Cognitive Engine
+requires_approval: false
+reversible: true
+risk_tier: L1
 risks:
-  - "認知設計パラメータの誤解釈による判断偏り"
+- 認知設計パラメータの誤解釈による判断偏り
+triggers:
+- FEP
+- 自由エネルギー
+- 認知
+- 意思決定
+- 予測誤差
+- 能動推論
+- active inference
+- EFE
+- precision
+- 精度加重
+- attractor
+- series
+version: 2.0.0
 ---
+
 
 # FEP Cognitive Engine v2.0
 

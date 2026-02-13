@@ -1,20 +1,23 @@
 ---
-name: Taxis Classifier
 description: タスク/入力の自動分類・優先順位付け
-triggers:
-  - "分類"
-  - "優先"
-  - "タスク"
-  - "taxis"
-  - "振り分け"
-  - "TODO"
-  - "整理"
-  - "morphism"
-
-risk_tier: "L1"
+fallbacks: []
+name: Taxis Classifier
+requires_approval: false
+reversible: true
+risk_tier: L1
 risks:
-  - "分類ミスによる優先順位の歪み"
+- 分類ミスによる優先順位の歪み
+triggers:
+- 分類
+- 優先
+- タスク
+- taxis
+- 振り分け
+- TODO
+- 整理
+- morphism
 ---
+
 
 # Taxis Classifier
 

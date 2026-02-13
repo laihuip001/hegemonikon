@@ -857,7 +857,9 @@ INCOMING_DIR = MNEME_DIR / "incoming"
 PROCESSED_DIR = MNEME_DIR / "processed"
 
 
+# PURPOSE: hgk_digest_check を実行する
 @mcp.tool()
+# PROOF: [L2/検証] <- mekhane/mcp/hgk_gateway.py
 def hgk_digest_check() -> str:
     """
     incoming/ の未消化ファイルを確認する。

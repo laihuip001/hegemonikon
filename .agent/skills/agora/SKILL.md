@@ -1,10 +1,16 @@
 ---
-name: Agora
 description: HGK 収益化プロジェクト — ディープインパクト戦略
+fallbacks: []
+name: Agora
+requires_approval: false
+reversible: true
+risk_tier: L1
+risks: []
 triggers:
-  - "agora"
-  - "agora"
+- agora
+- agora
 ---
+
 
 # Agora
 

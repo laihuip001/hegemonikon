@@ -1,18 +1,27 @@
 ---
-name: Category Theory Engine
-description: |
-  圏論に基づく構造認識エンジン。
+description: '圏論に基づく構造認識エンジン。
+
   FEP Skill が「行動選択の objective」なら、本 Skill は「構造認識の言語」。
+
   前順序圏のガロア接続 + [0,1]-豊穣圏として HGK の圏論を正当化し、
+
   12随伴対・Trigonon・CCL の圏論的意味を日常の認知に統合する。
 
+  '
+fallbacks: []
+name: Category Theory Engine
+requires_approval: false
+reversible: true
+risk_tier: L1
+risks: []
 triggers:
-  - 圏論的な分析を行う時
-  - 随伴対/関手/η/ε を扱う時
-  - 構造の保存・忘却を問う時
-  - Trigonon / X-series を参照する時
-  - 「なぜこの変換は正当か」を問う時
+- 圏論的な分析を行う時
+- 随伴対/関手/η/ε を扱う時
+- 構造の保存・忘却を問う時
+- Trigonon / X-series を参照する時
+- 「なぜこの変換は正当か」を問う時
 ---
+
 
 # 🏛️ Category Theory Engine — 構造認識の言語
 

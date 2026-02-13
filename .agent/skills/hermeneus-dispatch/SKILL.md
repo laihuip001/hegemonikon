@@ -1,25 +1,28 @@
 ---
-name: Hermēneus CCL Dispatch
 description: CCL 式を検出したら Hermēneus パーサーで構造解析し、AST に基づいて実行する
-triggers:
-  - "/"
-  - "~"
-  - "~*"
-  - "~!"
-  - ">>"
-  - "@"
-  - "CCL"
-  - "ccl"
-  - "マクロ"
-  - "ワークフロー式"
-  - "演算子"
-version: "3.0"
-
-risk_tier: "L2"
+fallbacks: []
+name: Hermēneus CCL Dispatch
+requires_approval: false
+reversible: true
+risk_tier: L2
 risks:
-  - "CCL パースエラーによるワークフロー誤実行"
-  - "LLM API 呼出コスト"
+- CCL パースエラーによるワークフロー誤実行
+- LLM API 呼出コスト
+triggers:
+- /
+- '~'
+- ~*
+- ~!
+- '>>'
+- '@'
+- CCL
+- ccl
+- マクロ
+- ワークフロー式
+- 演算子
+version: '3.0'
 ---
+
 
 # Hermēneus CCL Dispatch v3.0
 

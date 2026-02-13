@@ -1,19 +1,22 @@
 ---
-name: Peira Health Check
 description: システム全体のヘルスチェック・健全性確認
-triggers:
-  - "ヘルス"
-  - "健全"
-  - "health"
-  - "状態"
-  - "peira"
-  - "動作確認"
-  - "テスト"
-
-risk_tier: "L1"
+fallbacks: []
+name: Peira Health Check
+requires_approval: false
+reversible: true
+risk_tier: L1
 risks:
-  - "ヘルスチェック偽陽性による不要な修正作業"
+- ヘルスチェック偽陽性による不要な修正作業
+triggers:
+- ヘルス
+- 健全
+- health
+- 状態
+- peira
+- 動作確認
+- テスト
 ---
+
 
 # Peira Health Check
 

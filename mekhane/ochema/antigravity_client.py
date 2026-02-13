@@ -31,6 +31,7 @@ from typing import Optional
 
 # --- Data Classes ---
 
+# PURPOSE: LLM からの応答を保持する
 @dataclass
 class LLMResponse:
     """LLM からの応答を保持する。"""
@@ -43,6 +44,7 @@ class LLMResponse:
     raw_steps: list = field(default_factory=list)
 
 
+# PURPOSE: Language Server の接続情報
 @dataclass
 class LSInfo:
     """Language Server の接続情報。"""
@@ -77,6 +79,7 @@ BRAIN_DIR = os.path.expanduser("~/.gemini/antigravity/brain")
 
 # --- Client ---
 
+# PURPOSE: Antigravity Language Server の非公式クライアント
 class AntigravityClient:
     """Antigravity Language Server の非公式クライアント。
 
@@ -96,20 +99,27 @@ class AntigravityClient:
         self._ssl_ctx = self._make_ssl_context()
         self.ls = self._detect_ls()
 
+    # PURPOSE: 接続中の LS プロセス ID
     @property
     def pid(self) -> int:
+        """接続中の LS プロセス ID。"""
         return self.ls.pid
 
+    # PURPOSE: 接続中の LS ポート番号
     @property
     def port(self) -> int:
+        """接続中の LS ポート番号。"""
         return self.ls.port
 
+    # PURPOSE: CSRF トークン
     @property
     def csrf(self) -> str:
+        """CSRF トークン。"""
         return self.ls.csrf
 
     # --- Public API ---
 
+    # PURPOSE: LLM にメッセージを送り、応答を取得する
     def ask(
         self,
         message: str,
@@ -141,6 +151,7 @@ class AntigravityClient:
         # Step 3-4: Poll for response
         return self._poll_response(cascade_id, timeout)
 
+    # PURPOSE: LS のユーザーステータスを取得する
     def get_status(self) -> dict:
         """LS のユーザーステータスを取得する。接続確認にも使用。"""
         return self._rpc(RPC_GET_STATUS, {
@@ -151,6 +162,7 @@ class AntigravityClient:
             }
         })
 
+    # PURPOSE: 利用可能なモデル一覧を取得する
     def list_models(self) -> list[dict]:
         """利用可能なモデル一覧を取得する。"""
         status = self.get_status()
@@ -171,6 +183,7 @@ class AntigravityClient:
             if c.get("quotaInfo")
         ]
 
+    # PURPOSE: 全モデルの Quota 残量と設定を取得する
     def quota_status(self) -> dict:
         """全モデルの Quota 残量と設定をリアルタイムで取得する。
 
@@ -222,6 +235,7 @@ class AntigravityClient:
             "total_models": len(models),
         }
 
+    # PURPOSE: セッション情報を取得する
     def session_info(self, cascade_id: Optional[str] = None) -> dict:
         """セッション情報を取得する。
 
@@ -272,6 +286,7 @@ class AntigravityClient:
             "sessions": sessions[:20],  # 最新20件
         }
 
+    # PURPOSE: セッションの会話内容を読み取る
     def session_read(
         self,
         cascade_id: str,
@@ -375,6 +390,7 @@ class AntigravityClient:
             "conversation": conversation,
         }
 
+    # PURPOSE: 過去セッションのエピソード記憶にアクセスする
     def session_episodes(self, brain_id: Optional[str] = None) -> dict:
         """過去セッションのエピソード記憶 (.system_generated/steps/) にアクセスする。
 

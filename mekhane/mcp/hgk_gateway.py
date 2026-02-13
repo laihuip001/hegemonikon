@@ -188,7 +188,7 @@ def _estimate_input_size(*args: Any, **kwargs: Any) -> int:
     return total
 
 
-# PURPOSE: ツール関数にトレースを自動付与するデコレータ
+# PURPOSE: [L2-auto] ツール関数にトレースを自動付与するデコレータ
 def _traced(fn):
     """ツール関数にトレースを自動付与するデコレータ。
 
@@ -197,6 +197,7 @@ def _traced(fn):
     """
     import functools
 
+    # PURPOSE: [L2-auto] wrapper
     @functools.wraps(fn)
     def wrapper(*args: Any, **kwargs: Any) -> Any:
         _start = time.time()

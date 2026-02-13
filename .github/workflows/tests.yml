@@ -47,7 +47,7 @@ jobs:
                   # 2. Install other dependencies from PyPI (to avoid index shadowing)
                   # Explicitly added aiohttp for jules_client.py
                   pip install pytest pytest-asyncio pytest-timeout pyyaml pydantic lancedb numpy scipy \
-                              networkx pandas tabulate requests httpx schedule aiohttp \
+                              networkx pandas tabulate requests httpx schedule aiohttp python-dotenv \
                               sentence-transformers
                   # Install project in development mode if setup exists
                   pip install -e ".[test]" 2>/dev/null || true

@@ -11,9 +11,13 @@ import sys
 import pytest
 
 # Add parent to path
-sys.path.insert(0, "/home/makaron8426/oikos/hegemonikon")
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../")))
 
-from mekhane.symploke.jules_client import JulesClient
+try:
+    from mekhane.symploke.jules_client import JulesClient
+except ImportError:
+    # Fallback for environments where package is installed
+    from mekhane.symploke.jules_client import JulesClient
 
 
 # PURPOSE: Test API connection by listing sources

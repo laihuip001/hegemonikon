@@ -1,3 +1,4 @@
+# PROOF: [L2/クライアント] <- mekhane/ochema/ CLI
 # PURPOSE: Ochēma CLI — Antigravity LS とのインタラクション
 """Ochēma CLI — Antigravity Language Server Client.
 

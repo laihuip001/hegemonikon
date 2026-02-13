@@ -8,8 +8,12 @@ Creates a minimal PR to test the full workflow.
 import asyncio
 import os
 import sys
+import pytest
 
 sys.path.insert(0, "/home/makaron8426/oikos/hegemonikon")
+
+# Skip module if aiohttp is not installed (e.g. CPU-only tests)
+pytest.importorskip("aiohttp")
 
 from mekhane.symploke.jules_client import JulesClient, SessionState
 

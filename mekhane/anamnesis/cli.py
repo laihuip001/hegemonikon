@@ -315,6 +315,29 @@ def cmd_links(args):
     return 0
 
 
+# PURPOSE: session-index (Session History Vector Search)
+def cmd_session_index(args):
+    """セッション履歴をインデックス"""
+    from mekhane.anamnesis.session_indexer import index_from_api, index_from_json
+    if args.json_path:
+        return index_from_json(args.json_path)
+    return index_from_api()
+
+
+# PURPOSE: handoff-index (Handoff VSearch)
+def cmd_handoff_index(args):
+    """Handoff ファイルをインデックス"""
+    from mekhane.anamnesis.session_indexer import index_handoffs
+    return index_handoffs(args.handoff_dir)
+
+
+# PURPOSE: conversation-index (Full Conversation Content VSearch)
+def cmd_conversation_index(args):
+    """全セッション会話をインデックス"""
+    from mekhane.anamnesis.session_indexer import index_conversations
+    return index_conversations(args.max_sessions)
+
+
 # PURPOSE: CLI エントリポイント — 知識基盤の直接実行
 def main():
     parser = argparse.ArgumentParser(
@@ -451,14 +474,6 @@ def main():
     )
     p_chat.set_defaults(func=cmd_chat)
 
-    # session-index (Session History Vector Search)
-    def cmd_session_index(args):
-        """セッション履歴をインデックス"""
-        from mekhane.anamnesis.session_indexer import index_from_api, index_from_json
-        if args.json_path:
-            return index_from_json(args.json_path)
-        return index_from_api()
-
     p_session = subparsers.add_parser(
         "session-index", help="Index session history into LanceDB"
     )
@@ -468,12 +483,6 @@ def main():
     )
     p_session.set_defaults(func=cmd_session_index)
 
-    # handoff-index (Handoff VSearch)
-    def cmd_handoff_index(args):
-        """Handoff ファイルをインデックス"""
-        from mekhane.anamnesis.session_indexer import index_handoffs
-        return index_handoffs(args.handoff_dir)
-
     p_handoff = subparsers.add_parser(
         "handoff-index", help="Index handoff_*.md files into LanceDB"
     )
@@ -482,12 +491,6 @@ def main():
         help="Custom handoff directory (default: ~/oikos/mneme/.hegemonikon/sessions)"
     )
     p_handoff.set_defaults(func=cmd_handoff_index)
-
-    # conversation-index (Full Conversation Content VSearch)
-    def cmd_conversation_index(args):
-        """全セッション会話をインデックス"""
-        from mekhane.anamnesis.session_indexer import index_conversations
-        return index_conversations(args.max_sessions)
 
     p_conv = subparsers.add_parser(
         "conversation-index", help="Index full conversation content from LS API"

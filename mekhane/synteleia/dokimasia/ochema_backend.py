@@ -1,3 +1,4 @@
+# PROOF: [L3/Synteleia] Ochema Backend Adapter
 # PURPOSE: Ochēma (AntigravityClient) 経由の LLM バックエンド
 """
 OchemaBackend — Antigravity Language Server Bridge for Synteleia

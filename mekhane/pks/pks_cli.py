@@ -157,6 +157,7 @@ def cmd_health(args: argparse.Namespace) -> None:
     _check("Kairos (.pkl)", check_kairos)
 
     # 3. Sophia index
+    # PURPOSE: Sophia index ヘルスチェック
     def check_sophia():
         pkl = Path.home() / "oikos" / "mneme" / ".hegemonikon" / "indices" / "sophia.pkl"
         if not pkl.exists():
@@ -167,6 +168,7 @@ def cmd_health(args: argparse.Namespace) -> None:
     _check("Sophia (.pkl)", check_sophia)
 
     # 4. Embedder
+    # PURPOSE: Embedder ヘルスチェック
     def check_embedder():
         from mekhane.symploke.adapters.embedding_adapter import EmbeddingAdapter
         a = EmbeddingAdapter()
@@ -175,6 +177,7 @@ def cmd_health(args: argparse.Namespace) -> None:
     _check("Embedder (BGE-M3)", check_embedder)
 
     # 5. GnosisLanceBridge
+    # PURPOSE: GnosisLanceBridge ヘルスチェック
     def check_bridge():
         from mekhane.symploke.indices.gnosis_lance_bridge import GnosisLanceBridge
         b = GnosisLanceBridge()
@@ -183,6 +186,7 @@ def cmd_health(args: argparse.Namespace) -> None:
     _check("GnosisLanceBridge", check_bridge)
 
     # 6. PKSEngine
+    # PURPOSE: PKSEngine ヘルスチェック
     def check_engine():
         from mekhane.pks.pks_engine import PKSEngine
         e = PKSEngine(enable_questions=False, enable_serendipity=False)
@@ -192,6 +196,7 @@ def cmd_health(args: argparse.Namespace) -> None:
     _check("PKSEngine", check_engine)
 
     # 7. TopicExtractor
+    # PURPOSE: TopicExtractor ヘルスチェック
     def check_topics():
         from mekhane.pks.pks_engine import PKSEngine
         e = PKSEngine(enable_questions=False)
@@ -200,6 +205,7 @@ def cmd_health(args: argparse.Namespace) -> None:
     _check("TopicExtractor", check_topics)
 
     # 8. SelfAdvocate
+    # PURPOSE: SelfAdvocate ヘルスチェック
     def check_advocate():
         from mekhane.pks.self_advocate import SelfAdvocate
         a = SelfAdvocate()
@@ -207,6 +213,7 @@ def cmd_health(args: argparse.Namespace) -> None:
     _check("SelfAdvocate", check_advocate)
 
     # 9. Chronos index
+    # PURPOSE: Chronos index ヘルスチェック
     def check_chronos():
         pkl = Path.home() / "oikos" / "mneme" / ".hegemonikon" / "indices" / "chronos.pkl"
         if not pkl.exists():

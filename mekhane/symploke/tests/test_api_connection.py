@@ -13,6 +13,10 @@ import pytest
 # Add parent to path
 sys.path.insert(0, "/home/makaron8426/oikos/hegemonikon")
 
+# Skip test if aiohttp is not installed
+aiohttp = pytest.importorskip("aiohttp")
+
+# Now it is safe to import JulesClient which depends on aiohttp
 from mekhane.symploke.jules_client import JulesClient
 
 
@@ -30,8 +34,6 @@ async def test_connection():
     print("-" * 50)
 
     try:
-        import aiohttp
-
         headers = {"X-Goog-Api-Key": api_key, "Content-Type": "application/json"}
 
         async with aiohttp.ClientSession() as session:

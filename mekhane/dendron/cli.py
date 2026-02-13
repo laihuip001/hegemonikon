@@ -14,6 +14,15 @@ import argparse
 import sys
 from pathlib import Path
 
+# Fix: Ensure PyYAML is imported correctly or handled if missing
+try:
+    import yaml
+except ImportError:
+    # If PyYAML is missing, we might want to warn but not fail immediately
+    # unless a command that requires it is run.
+    # However, 'skill-audit' definitely needs it.
+    yaml = None
+
 from .checker import DendronChecker, ProofStatus, VariableProof
 from .reporter import DendronReporter, ReportFormat
 
@@ -277,6 +286,11 @@ def cmd_variables(args: argparse.Namespace) -> int:  # noqa: AI-005
 # PURPOSE: Safety Contract (risk_tier/lcm_state) の検証を実行し、レポートを出力する
 def cmd_skill_audit(args: argparse.Namespace) -> int:  # noqa: AI-005
     """skill-audit コマンドの実行 (v3.1: Safety Contract)"""
+
+    if yaml is None:
+        print("Error: PyYAML がインストールされていません。'pip install pyyaml' を実行してください。", file=sys.stderr)
+        return 1
+
     from .skill_checker import run_audit, format_report
 
     agent_dir = Path(args.agent_dir)

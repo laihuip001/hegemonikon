@@ -675,6 +675,31 @@ def hgk_status() -> str:
         if handoffs:
             status_items.append(f"📅 最新 Handoff: `{handoffs[0].name}`")
 
+    # Digestor status
+    incoming_count = len(list(INCOMING_DIR.glob("eat_*.md"))) if INCOMING_DIR.exists() else 0
+    processed_count = len(list(PROCESSED_DIR.glob("eat_*.md"))) if PROCESSED_DIR.exists() else 0
+    status_items.append(f"\n### Digestor")
+    status_items.append(f"📥 incoming: {incoming_count} 件")
+    status_items.append(f"📦 processed: {processed_count} 件")
+
+    try:
+        from mekhane.ergasterion.digestor.state import get_status_summary
+        status_items.append(get_status_summary())
+    except Exception:
+        status_items.append("🔄 Digestor: 状態不明")
+
+    # Scheduler PID check
+    pid_file = Path.home() / ".hegemonikon" / "digestor" / "scheduler.pid"
+    if pid_file.exists():
+        try:
+            pid = int(pid_file.read_text().strip())
+            os.kill(pid, 0)  # Check if process exists
+            status_items.append("⚡ Scheduler: 稼働中")
+        except (ProcessLookupError, ValueError):
+            status_items.append("💤 Scheduler: 停止中 (PID stale)")
+    else:
+        status_items.append("💤 Scheduler: 停止中")
+
     return f"## 🏠 HGK ステータス\n\n" + "\n".join(status_items)
 
 

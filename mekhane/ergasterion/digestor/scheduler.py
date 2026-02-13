@@ -32,6 +32,7 @@ for _p in [str(_project_root), str(_mekhane_dir)]:
 import schedule
 
 from mekhane.ergasterion.digestor.pipeline import DigestorPipeline
+from mekhane.ergasterion.digestor.state import record_run
 
 # 設定
 SCHEDULE_TIME = "06:00"  # 毎日実行時刻
@@ -86,6 +87,12 @@ def run_digestor():
             f"Digestor complete: {result.total_papers} papers, {result.candidates_selected} candidates"
         )
 
+        # 状態記録
+        record_run(
+            total_papers=result.total_papers,
+            candidates_selected=result.candidates_selected,
+        )
+
         # 候補サマリー
         for i, c in enumerate(result.candidates[:5], 1):
             log(f"  {i}. [{c.score:.2f}] {c.paper.title[:50]}...")
@@ -100,6 +107,32 @@ def run_digestor():
 
     except Exception as e:
         log(f"Digestor error: {e}")
+        record_run(total_papers=0, candidates_selected=0, errors=[str(e)])
+
+
+# PURPOSE: 古い候補の自動クリーンアップ
+def cleanup_expired(max_age_days: int = 30):
+    """30日以上 incoming/ に放置された候補を expired/ に移動する。"""
+    incoming = Path.home() / "oikos" / "mneme" / ".hegemonikon" / "incoming"
+    expired = Path.home() / "oikos" / "mneme" / ".hegemonikon" / "expired"
+
+    if not incoming.exists():
+        return
+
+    now = time.time()
+    threshold = max_age_days * 86400  # seconds
+    moved = 0
+
+    for f in incoming.glob("eat_*.md"):
+        age = now - f.stat().st_mtime
+        if age > threshold:
+            expired.mkdir(parents=True, exist_ok=True)
+            f.rename(expired / f.name)
+            log(f"Expired: {f.name} ({int(age / 86400)}d old) → expired/")
+            moved += 1
+
+    if moved:
+        log(f"Cleanup: {moved} expired candidates moved")
 
 
 # PURPOSE: PID ファイル保存
@@ -139,6 +172,9 @@ def main():
 
     # スケジュール設定
     schedule.every().day.at(SCHEDULE_TIME).do(run_digestor)
+
+    # 古い候補のクリーンアップ
+    cleanup_expired()
 
     # 初回実行（確認用）
     log("Running initial check...")

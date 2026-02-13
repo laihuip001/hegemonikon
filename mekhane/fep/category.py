@@ -410,6 +410,7 @@ class GaloisConnection:
     description: str = ""  # Human-readable meaning
 
     @property
+    # PURPOSE: Standard notation: L ⊣ R
     def notation(self) -> str:
         """Standard notation: L ⊣ R."""
         return f"{self.left} ⊣ {self.right}"
@@ -444,6 +445,7 @@ class AdjointPair:
     meaning: str = ""    # What this pair represents
 
     @property
+    # PURPOSE: View this adjoint pair as a Galois connection
     def galois(self) -> GaloisConnection:
         """View this adjoint pair as a Galois connection."""
         return GaloisConnection(
@@ -454,6 +456,7 @@ class AdjointPair:
         )
 
     @property
+    # PURPOSE: Standard notation: L ⊣ R
     def notation(self) -> str:
         """Standard notation: L ⊣ R."""
         return f"{self.left_wf} ⊣ {self.right_wf}"

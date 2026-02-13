@@ -858,6 +858,7 @@ PROCESSED_DIR = MNEME_DIR / "processed"
 
 
 @mcp.tool()
+# PURPOSE: hgk_gateway の hgk digest check 処理を実行する
 def hgk_digest_check() -> str:
     """
     incoming/ の未消化ファイルを確認する。

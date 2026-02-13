@@ -1,3 +1,4 @@
+# PROOF: [L3/Synteleia] <- mekhane/synteleia/ Multi-semantic agent
 # PURPOSE: Multi-LLM アンサンブル監査エージェント (Layer B: Nous)
 """
 MultiSemanticAgent — Multi-LLM Cognitive Ensemble

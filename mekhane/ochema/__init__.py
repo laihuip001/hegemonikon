@@ -1,6 +1,4 @@
-# PURPOSE: Ochēma パッケージ — Antigravity LS クライアント
-"""Ochēma (ὄχημα) — Antigravity Language Server Client Package."""
-
-from mekhane.ochema.antigravity_client import AntigravityClient, LLMResponse
-
-__all__ = ["AntigravityClient", "LLMResponse"]
+# PROOF: [L2/Infra] <- mekhane/ochema/ Ochema module init
+"""
+Ochema - Antigravity Compute Backend Interface.
+"""

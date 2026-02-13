@@ -23,7 +23,8 @@ testpaths = [
     "kernel/constitution/tests",
     "mneme/.hegemonikon/tests",
 ]
-asyncio_mode = "strict"
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
 filterwarnings = [
     "ignore::DeprecationWarning:lmql",
     "ignore:module 'sre_parse':DeprecationWarning",

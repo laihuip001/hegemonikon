@@ -1,7 +1,11 @@
 ---
 description: "段取る — /bou+_/chr_/s+~(/p*/k)_V:{/dia}_/pis_/dox-"
+lcm_state: beta
+version: 1.0.0
 ---
 
+lcm_state: beta
+version: 1.0.0
 # /ccl-plan: 計画策定マクロ
 
 > **CCL**: `@plan = /bou+_/chr_/s+~(/p*/k)_V:{/dia}_/pis_/dox-`
@@ -13,6 +17,8 @@ description: "段取る — /bou+_/chr_/s+~(/p*/k)_V:{/dia}_/pis_/dox-"
 | 相 | ステップ | 意味 |
 |:---|:---------|:-----|
 | Prior | `/bou+` | 意志を詳細化: 何を達成したいか |
+lcm_state: beta
+version: 1.0.0
 | Prior | `/chr` | 資源確認: 手持ちで使えるものは何か |
 | Likelihood | `/s+~(/p*/k)` | 戦略を環境×文脈と振動させて練る |
 | Likelihood | `V:{/dia}` | 判定で検証ゲート: 計画は妥当か |

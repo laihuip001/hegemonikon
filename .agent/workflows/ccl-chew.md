@@ -1,7 +1,11 @@
 ---
 description: "噛む — /s-_/pro_F:[×3]{/eat+~(/noe*/dia)}_~(/h*/k)_@proof_/pis_/dox-"
+lcm_state: beta
+version: 1.0.0
 ---
 
+lcm_state: beta
+version: 1.0.0
 # /ccl-chew: 反復消化マクロ
 
 > **CCL**: `@chew = /s-_/pro_F:[×3]{/eat+~(/noe*/dia)}_~(/h*/k)_@proof_/pis_/dox-`
@@ -13,6 +17,8 @@ description: "噛む — /s-_/pro_F:[×3]{/eat+~(/noe*/dia)}_~(/h*/k)_@proof_/pi
 | # | CCL | 認知機能 | Series | なぜ必要か |
 |:--|:----|:---------|:-------|:----------|
 | 1 | `/s-` | 方向性決定 | S-series | 3回の消化角度を事前に決める |
+lcm_state: beta
+version: 1.0.0
 | 2 | `/pro` | 前感情 | H1 | 消化前の第一印象を記録 |
 | 3 | `F:[×3]{/eat+~(/noe*/dia)}` | 3回本気消化 × 直観・判定融合 | O1,A2 | 反復の核心。各回で角度を変える |
 | 4 | `~(/h*/k)` | 動機×文脈の振動融合 | H,K | 消化結果を全体像に統合 |
@@ -25,6 +31,8 @@ description: "噛む — /s-_/pro_F:[×3]{/eat+~(/noe*/dia)}_~(/h*/k)_@proof_/pi
 | 回 | テンプレート | 角度 |
 |:---|:-----------|:-----|
 | 1回目 | T2 (哲学抽出) | 原則・思想を抜く |
+lcm_state: beta
+version: 1.0.0
 | 2回目 | T1 (対応表) | HGK との射を張る |
 | 3回目 | T3/T4 (機能消化/概念輸入) | 新構造の検討 |
 

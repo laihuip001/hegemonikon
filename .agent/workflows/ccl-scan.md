@@ -1,7 +1,11 @@
 ---
 description: 見る — /s*%/dia
+lcm_state: beta
+version: 1.0.0
 ---
 
+lcm_state: beta
+version: 1.0.0
 # @scan — 見る
 
 > **CCL**: `@scan = /s*%/dia`
@@ -10,6 +14,8 @@ description: 見る — /s*%/dia
 
 ---
 
+lcm_state: beta
+version: 1.0.0
 ## 本質
 
 > 「森と木を同時に見る」
@@ -19,6 +25,8 @@ description: 見る — /s*%/dia
 
 ---
 
+lcm_state: beta
+version: 1.0.0
 ## CCL 展開
 
 ```ccl
@@ -33,6 +41,8 @@ description: 見る — /s*%/dia
   | s\dia      | PASS     | WARN     | FAIL     |
   |------------|----------|----------|----------|
   | 構造設計   | ...      | ...      | ...      |
+lcm_state: beta
+version: 1.0.0
   | 実装方針   | ...      | ...      | ...      |
   | テスト戦略 | ...      | ...      | ...      |
   | リソース   | ...      | ...      | ...      |
@@ -40,16 +50,22 @@ description: 見る — /s*%/dia
 
 ---
 
+lcm_state: beta
+version: 1.0.0
 ## 使用場面
 
 | トリガー | 説明 |
 |:---------|:-----|
 | PJ の現状を素早く把握したい | `/now` より深く、`/dia` より広く |
+lcm_state: beta
+version: 1.0.0
 | レビュー前の全体確認 | 一撃で問題点と全体像を把握 |
 | セッション冒頭の状況確認 | Boot 後の追加分析として |
 
 ---
 
+lcm_state: beta
+version: 1.0.0
 ## 演算子適用
 
 ```ccl
@@ -60,14 +76,20 @@ description: 見る — /s*%/dia
 
 ---
 
+lcm_state: beta
+version: 1.0.0
 ## 複雑度
 
 | 演算子 | pt |
 |:-------|:--:|
 | `@scan` | 6 |
+lcm_state: beta
+version: 1.0.0
 
 > `*%` の基本コスト。
 
 ---
 
+lcm_state: beta
+version: 1.0.0
 *v1.0 — FuseOuter マクロ初版 (2026-02-13)*

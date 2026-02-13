@@ -1,7 +1,11 @@
 ---
 description: "回す — /pro_C:{/sop_/noe_/ene_/dia-}_/pis_/dox-"
+lcm_state: beta
+version: 1.0.0
 ---
 
+lcm_state: beta
+version: 1.0.0
 # /ccl-kyc: 認知循環マクロ (κύκλος)
 
 > **CCL**: `@kyc = /pro_C:{/sop_/noe_/ene_/dia-}_/pis_/dox-`
@@ -13,6 +17,8 @@ description: "回す — /pro_C:{/sop_/noe_/ene_/dia-}_/pis_/dox-"
 | 相 | ステップ | 意味 |
 |:---|:---------|:-----|
 | Prior | `/pro` | サイクルの入口: 何を回したいかの直感 (前感情) |
+lcm_state: beta
+version: 1.0.0
 | Likelihood | `C:{/sop_/noe_/ene_/dia-}` | 観察→認識→行動→判定の収束ループ |
 | Posterior | `/pis` | サイクルの収束度の確信度を測定 |
 | Posterior | `/dox-` | 循環結果を軽量記録 |

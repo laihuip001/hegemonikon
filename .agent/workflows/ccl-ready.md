@@ -1,7 +1,11 @@
 ---
 description: "見渡す — /bou-_/pro_/kho_/chr_/euk_/tak-_~(/h*/k)_/pis"
+lcm_state: beta
+version: 1.0.0
 ---
 
+lcm_state: beta
+version: 1.0.0
 # /ccl-ready: 見渡しマクロ
 
 > **CCL**: `@ready = /bou-_/pro_/kho_/chr_/euk_/tak-_~(/h*/k)_/pis`
@@ -14,6 +18,8 @@ description: "見渡す — /bou-_/pro_/kho_/chr_/euk_/tak-_~(/h*/k)_/pis"
 | 相 | ステップ | 意味 |
 |:---|:---------|:-----|
 | Prior | `/bou-` | なぜ見渡すのか、軽く目的を確認 |
+lcm_state: beta
+version: 1.0.0
 | Prior | `/pro` | 全体の直感的印象を感じ取る (前感情) |
 | Likelihood | `/kho` (P2 Khōra) | 場の分析: いまどこにいるか、何が見えるか |
 | Likelihood | `/chr` (S3 Chrēsis) | 資源確認: 手持ちで使えるものは何か |

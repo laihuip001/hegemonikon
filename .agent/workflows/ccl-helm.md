@@ -1,7 +1,11 @@
 ---
 description: "舵 — /pro_/kho_/bou+*%/zet+|>/u++_~(/h*/k)_/pis_/dox-"
+lcm_state: beta
+version: 1.0.0
 ---
 
+lcm_state: beta
+version: 1.0.0
 # @helm — 舵
 
 > **CCL**: `@helm = /pro_/kho_/bou+*%/zet+|>/u++_~(/h*/k)_/pis_/dox-`
@@ -11,6 +15,8 @@ description: "舵 — /pro_/kho_/bou+*%/zet+|>/u++_~(/h*/k)_/pis_/dox-"
 
 ---
 
+lcm_state: beta
+version: 1.0.0
 ## 本質
 
 > 「どこに向かうべきか」を、望みの深層と問いの深層を同時に量り、
@@ -20,6 +26,8 @@ description: "舵 — /pro_/kho_/bou+*%/zet+|>/u++_~(/h*/k)_/pis_/dox-"
 
 ---
 
+lcm_state: beta
+version: 1.0.0
 ## CCL 展開
 
 ```ccl
@@ -29,6 +37,8 @@ description: "舵 — /pro_/kho_/bou+*%/zet+|>/u++_~(/h*/k)_/pis_/dox-"
 | 相 | ステップ | 意味 |
 |:---|:---------|:-----|
 | Prior | `/pro` | 前感情: 今の直感的な方向感覚を感じ取る |
+lcm_state: beta
+version: 1.0.0
 | Prior | `/kho` | 場の把握: 現在の開発状況・全体地形を確認する |
 | Likelihood | `/bou+*%/zet+` | **核**: 意志(深)×探求(深) の融合外積 |
 | Likelihood | `\|>/u++` | Pipeline: 融合結果を主観の二重深化にパイプ |
@@ -38,6 +48,8 @@ description: "舵 — /pro_/kho_/bou+*%/zet+|>/u++_~(/h*/k)_/pis_/dox-"
 
 ---
 
+lcm_state: beta
+version: 1.0.0
 ## 核の詳細: `/bou+*%/zet+|>/u++`
 
 ### FuseOuter: `/bou+*%/zet+`
@@ -50,6 +62,8 @@ description: "舵 — /pro_/kho_/bou+*%/zet+|>/u++_~(/h*/k)_/pis_/dox-"
   | bou+\zet+   | 摩擦点      | 成功の裏    | 前提の棚卸し | メタ問い    |
   |-------------|------------|------------|-------------|------------|
   | 純粋な望み   | ...        | ...        | ...         | ...        |
+lcm_state: beta
+version: 1.0.0
   | 実用目標     | ...        | ...        | ...         | ...        |
   | 長期ビジョン | ...        | ...        | ...         | ...        |
   | 熟慮された意志| ...       | ...        | ...         | ...        |
@@ -82,22 +96,30 @@ FuseOuter の結果を入力として、Claude が二重に深化した主観意
 
 ---
 
+lcm_state: beta
+version: 1.0.0
 ## 使用場面
 
 | トリガー | 説明 |
 |:---------|:-----|
 | PJ の方向性を定めたい | 複数 PJ の優先順位、今後の開発戦略 |
+lcm_state: beta
+version: 1.0.0
 | 大局観を更新したい | セッション開始後、全体を見渡して舵を取る |
 | 迷ったとき | 何から手をつけるか、何を優先するか |
 | 定期的な方向確認 | 週次レビューの一部として |
 
 ---
 
+lcm_state: beta
+version: 1.0.0
 ## 既存マクロとの関係
 
 | マクロ | CCL | 違い |
 |:-------|:----|:-----|
 | `@weigh` | `/bou*%/noe` | 意志×認識。閉じた計量 |
+lcm_state: beta
+version: 1.0.0
 | `@ready` | `/bou-_/pro_..._/pis` | 場の見渡し。実行前の地形把握 |
 | `@plan` | `/bou+_/chr_/s+~(/p*/k)_/pis_/dox-` | 戦略の段取り。具体的な計画 |
 | **`@helm`** | **`/pro_/kho_/bou+*%/zet+\|>/u++_~(/h*/k)_/pis_/dox-`** | **方向性の決定。意志×探求の融合 + 主観的判断** |
@@ -107,6 +129,8 @@ FuseOuter の結果を入力として、Claude が二重に深化した主観意
 
 ---
 
+lcm_state: beta
+version: 1.0.0
 ## 演算子適用
 
 ```ccl
@@ -117,14 +141,20 @@ FuseOuter の結果を入力として、Claude が二重に深化した主観意
 
 ---
 
+lcm_state: beta
+version: 1.0.0
 ## 複雑度
 
 | 演算子 | pt |
 |:-------|:--:|
 | `@helm` | 10 |
+lcm_state: beta
+version: 1.0.0
 
 > `*%` (6pt) + Pipeline `|>` + Prior/Posterior。最も認知資源を使うマクロの一つ。
 
 ---
 
+lcm_state: beta
+version: 1.0.0
 *v1.0 — FuseOuter+Pipeline 複合マクロ初版 (2026-02-13)*

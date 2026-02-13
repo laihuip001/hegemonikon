@@ -1,7 +1,11 @@
 ---
 description: "揺する — R:{F:[/s,/dia,/noe]{L:[x]{x~x+}}, ~(/h*/k)}"
+lcm_state: beta
+version: 1.0.0
 ---
 
+lcm_state: beta
+version: 1.0.0
 # /ccl-osc: 多角振動マクロ
 
 > **CCL**: `@osc = R:{F:[/s,/dia,/noe]{L:[x]{x~x+}}, ~(/h*/k)}`

@@ -1,7 +1,11 @@
 ---
 description: "監る — /kho_/s-_/pro_/dia+{synteleia}_~(/noe*/dia)_V:{/pis+}_/dox-"
+lcm_state: beta
+version: 1.0.0
 ---
 
+lcm_state: beta
+version: 1.0.0
 # /ccl-syn: Synteleia 監査マクロ
 
 > **CCL**: `@syn = /kho_/s-_/pro_/dia+{synteleia}_~(/noe*/dia)_V:{/pis+}_/dox-`
@@ -14,6 +18,8 @@ description: "監る — /kho_/s-_/pro_/dia+{synteleia}_~(/noe*/dia)_V:{/pis+}_/
 | 相 | ステップ | 意味 |
 |:---|:---------|:-----|
 | Prior | `/kho` | 監視対象の場を把握する |
+lcm_state: beta
+version: 1.0.0
 | Prior | `/s-` | 何を監視するかの焦点を定める (方向性) |
 | Prior | `/pro` | 「何かおかしい」直感を感じ取る (前感情) |
 | Likelihood | `/dia+{synteleia}` | Synteleia 多角監査を発動 (L1静的 + L2セマンティック) |
@@ -35,5 +41,7 @@ C:{@build _ @syn}          # 監査合格まで収束ループ
 | WF | 接続 | 発動条件 |
 |:---|:-----|:---------|
 | `/dia+` | 自動発動 | `{synteleia}` パラメータ指定時 |
+lcm_state: beta
+version: 1.0.0
 | `@vet` | 手動接続 | `@vet _ @syn` で検証強化 |
 | `@build` | 手動接続 | `@build _ @syn` で品質保証 |

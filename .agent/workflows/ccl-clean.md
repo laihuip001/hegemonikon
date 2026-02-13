@@ -1,7 +1,11 @@
 ---
 description: "絞る — /s-_/kat_/sym~(/tel_/dia-)_/pis"
+lcm_state: beta
+version: 1.0.0
 ---
 
+lcm_state: beta
+version: 1.0.0
 # /ccl-clean: 絞りマクロ
 
 > **CCL**: `@clean = /s-_/kat_/sym~(/tel_/dia-)_/pis`
@@ -14,6 +18,8 @@ description: "絞る — /s-_/kat_/sym~(/tel_/dia-)_/pis"
 | 相 | ステップ | 意味 |
 |:---|:---------|:-----|
 | Prior | `/s-` | 絞る方向を軽く定める (方向性) |
+lcm_state: beta
+version: 1.0.0
 | Likelihood | `/kat` (A1 Katharsis) | 浄化: ノイズを除去し本質を抽出 |
 | Likelihood | `/sym` (K1 Symplokē) | 結合: 残った要素の接点を発見 |
 | Likelihood | `~(/tel_/dia-)` | 振動: 目的適合と軽量判定を行き来 |

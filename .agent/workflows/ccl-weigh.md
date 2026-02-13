@@ -1,7 +1,11 @@
 ---
 description: 量る — /bou*%/noe
+lcm_state: beta
+version: 1.0.0
 ---
 
+lcm_state: beta
+version: 1.0.0
 # @weigh — 量る
 
 > **CCL**: `@weigh = /bou*%/noe`
@@ -10,6 +14,8 @@ description: 量る — /bou*%/noe
 
 ---
 
+lcm_state: beta
+version: 1.0.0
 ## 本質
 
 > 「何を望むか (意志)」と「何を知っているか (認識)」の同時分析。
@@ -17,6 +23,8 @@ description: 量る — /bou*%/noe
 
 ---
 
+lcm_state: beta
+version: 1.0.0
 ## CCL 展開
 
 ```ccl
@@ -31,27 +39,37 @@ description: 量る — /bou*%/noe
   | bou\noe    | 深層認識  | 表層認識  | 直感     |
   |------------|----------|----------|----------|
   | 純粋な望み | ...      | ...      | ...      |
+lcm_state: beta
+version: 1.0.0
   | 実用目標   | ...      | ...      | ...      |
   | 衝動的欲求 | ...      | ...      | ...      |
 ```
 
 ---
 
+lcm_state: beta
+version: 1.0.0
 ## 使用場面
 
 | トリガー | 説明 |
 |:---------|:-----|
 | 方向性を決めたい | `/bou` の高速版。対話なしで一撃判断 |
+lcm_state: beta
+version: 1.0.0
 | 複数の選択肢を比較したい | 展開マトリクスで全候補を可視化 |
 | `/bou` の前処理 | `@weigh` で仮判断 → `/bou` で深掘り |
 
 ---
 
+lcm_state: beta
+version: 1.0.0
 ## `/bou` との違い
 
 | 観点 | `/bou` | `@weigh` |
 |:-----|:-------|:---------|
 | **対話** | Creator との対話が核心 | 対話なし (閉じた分析) |
+lcm_state: beta
+version: 1.0.0
 | **時間** | 5 PHASE (複数ターン) | 1ターン |
 | **出力** | 優先順位 + 次のアクション | 収束判断 + 全展開マトリクス |
 | **用途** | 意志の「確立」 | 意志の「計量」 |
@@ -61,6 +79,8 @@ description: 量る — /bou*%/noe
 
 ---
 
+lcm_state: beta
+version: 1.0.0
 ## 演算子適用
 
 ```ccl
@@ -71,12 +91,18 @@ description: 量る — /bou*%/noe
 
 ---
 
+lcm_state: beta
+version: 1.0.0
 ## 複雑度
 
 | 演算子 | pt |
 |:-------|:--:|
 | `@weigh` | 6 |
+lcm_state: beta
+version: 1.0.0
 
 ---
 
+lcm_state: beta
+version: 1.0.0
 *v1.0 — FuseOuter マクロ初版 (2026-02-13)*

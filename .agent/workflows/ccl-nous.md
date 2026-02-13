@@ -1,7 +1,11 @@
 ---
 description: "問う — /pro_/s-_R:{F:[×2]{/u+*^/u^}}_~(/noe*/dia)_/pis_/dox-"
+lcm_state: beta
+version: 1.0.0
 ---
 
+lcm_state: beta
+version: 1.0.0
 # /ccl-nous: 問いの深化マクロ (νοῦς)
 
 > **CCL**: `@nous = /pro_/s-_R:{F:[×2]{/u+*^/u^}}_~(/noe*/dia)_/pis_/dox-`
@@ -13,6 +17,8 @@ description: "問う — /pro_/s-_R:{F:[×2]{/u+*^/u^}}_~(/noe*/dia)_/pis_/dox-"
 | 相 | ステップ | 意味 |
 |:---|:---------|:-----|
 | Prior | `/pro` | 何が引っかかるかを感じる (前感情) |
+lcm_state: beta
+version: 1.0.0
 | Prior | `/s-` | 問いの方向を軽く定める (方向性) |
 | Likelihood | `R:{F:[×2]{/u+*^/u^}}` | 主観→メタ融合→メタ主観を2回再帰 |
 | Posterior | `~(/noe*/dia)` | 問いの質を直観×判定で振動検証 |

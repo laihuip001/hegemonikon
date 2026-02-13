@@ -1,6 +1,6 @@
 # PURPOSE: セッション履歴を GnosisIndex (LanceDB) にインデックスする
 """
-PROOF: [L2/インフラ] <- mekhane/anamnesis/
+PROOF: [P3/記憶] <- mekhane/anamnesis/
 
 P3 → 記憶の永続化が必要
    → セッション履歴のセマンティック検索が必要

@@ -1,6 +1,9 @@
 ---
 name: Agora
 description: HGK 収益化プロジェクト — ディープインパクト戦略
+risk_tier: L2
+risks:
+  - Financial risk (monetization strategy)
 triggers:
   - "agora"
   - "agora"

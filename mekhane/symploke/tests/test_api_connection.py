@@ -10,9 +10,6 @@ import os
 import sys
 import pytest
 
-# Add parent to path
-sys.path.insert(0, "/home/makaron8426/oikos/hegemonikon")
-
 from mekhane.symploke.jules_client import JulesClient
 
 
@@ -39,7 +36,7 @@ async def test_connection():
             print("\n[Test 1] Getting sources...")
             async with session.get(
                 "https://jules.googleapis.com/v1alpha/sources",
-                # NOTE: Removed self-assignment: headers = headers
+                headers=headers
             ) as resp:
                 print(f"  Status: {resp.status}")
                 if resp.status == 200:
@@ -56,7 +53,7 @@ async def test_connection():
             print("\n[Test 2] Getting sessions...")
             async with session.get(
                 "https://jules.googleapis.com/v1alpha/sessions",
-                # NOTE: Removed self-assignment: headers = headers
+                headers=headers
             ) as resp:
                 print(f"  Status: {resp.status}")
                 if resp.status == 200:

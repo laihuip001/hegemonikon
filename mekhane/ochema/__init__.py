@@ -1,3 +1,4 @@
+# PROOF: [L2/Infra] <- mekhane/ochema/__init__.py Ochēma Package
 # PURPOSE: Ochēma パッケージ — Antigravity LS クライアント
 """Ochēma (ὄχημα) — Antigravity Language Server Client Package."""
 

@@ -1,5 +1,7 @@
+# PROOF: [L2/Nous] <- mekhane/synteleia/dokimasia/
 # PURPOSE: Multi-LLM アンサンブル監査エージェント (Layer B: Nous)
 """
+PROOF: [L2/Nous] <- mekhane/synteleia/dokimasia/
 MultiSemanticAgent — Multi-LLM Cognitive Ensemble
 
 複数の LLM に異なる persona を付与し、合議で品質を判定する。

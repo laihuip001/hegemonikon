@@ -1,4 +1,5 @@
-# PROOF: [L3/テスト] <- mekhane/dendron/
+# PROOF: [L3/テスト] <- mekhane/dendron/tests/
+# PURPOSE: Dendron レポーターテスト
 """
 Dendron Reporter テスト
 

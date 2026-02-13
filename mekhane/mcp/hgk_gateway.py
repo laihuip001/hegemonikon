@@ -199,6 +199,7 @@ def _traced(fn):
     import functools
 
     @functools.wraps(fn)
+    # PURPOSE: デコレータ用ラッパー関数
     def wrapper(*args: Any, **kwargs: Any) -> Any:
         # PURPOSE: デコレータ用ラッパー関数
         _start = time.time()

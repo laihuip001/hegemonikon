@@ -12,6 +12,7 @@ Usage:
 
 import argparse
 import sys
+import yaml
 from pathlib import Path
 
 from .checker import DendronChecker, ProofStatus, VariableProof

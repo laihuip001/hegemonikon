@@ -5,6 +5,10 @@ description: |
   FEP Skill が「行動選択の objective」なら、本 Skill は「構造認識の言語」。
   前順序圏のガロア接続 + [0,1]-豊穣圏として HGK の圏論を正当化し、
   12随伴対・Trigonon・CCL の圏論的意味を日常の認知に統合する。
+risk_tier: L1
+risks:
+  - "誤った抽象化による詳細の喪失"
+  - "数学的厳密性の欠如による誤解"
 
 triggers:
   - 圏論的な分析を行う時

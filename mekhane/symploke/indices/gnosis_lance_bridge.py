@@ -52,7 +52,7 @@ class GnosisLanceBridge(DomainIndex):
         self._initialized = True  # LanceDB は initialize 不要
 
     @property
-    def source_type(self) -> SourceType:
+    def source_type(self) -> SourceType:  # PURPOSE: [L2-auto] ソースタイプを返す
         return SourceType.GNOSIS
 
     # PURPOSE: LanceDB GnosisIndex を遅延初期化
@@ -129,5 +129,5 @@ class GnosisLanceBridge(DomainIndex):
     def save(self, path: str) -> None:
         pass
 
-    def load(self, path: str) -> None:
+    def load(self, path: str) -> None:  # PURPOSE: [L2-auto] ブリッジは load 不要
         self._initialized = True

@@ -1,4 +1,4 @@
-# PURPOSE: Ochēma CLI — Antigravity LS とのインタラクション
+# PROOF: [P2/Hodos] Ochēma CLI — Antigravity LS とのインタラクション
 """Ochēma CLI — Antigravity Language Server Client.
 
 Usage:

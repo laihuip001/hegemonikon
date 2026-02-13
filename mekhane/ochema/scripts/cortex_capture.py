@@ -1,3 +1,4 @@
+# PROOF: [X1/Exagoge] Cortex API MITM Capture Script for mitmproxy.
 """
 Cortex API MITM Capture Script for mitmproxy.
 

@@ -1,3 +1,4 @@
+# PROOF: [L3/スクリプト] <- mekhane/ochema/scripts/ REASON→対話ログの取得が必要→cortex_capture が担う
 """
 Cortex API MITM Capture Script for mitmproxy.
 

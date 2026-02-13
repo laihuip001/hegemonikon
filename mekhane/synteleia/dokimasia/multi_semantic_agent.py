@@ -1,3 +1,4 @@
+# PROOF: [L2/品質] <- mekhane/synteleia/dokimasia/ REASON→品質の統合的検証が必要→multi_semantic_agent が担う
 # PURPOSE: Multi-LLM アンサンブル監査エージェント (Layer B: Nous)
 """
 MultiSemanticAgent — Multi-LLM Cognitive Ensemble

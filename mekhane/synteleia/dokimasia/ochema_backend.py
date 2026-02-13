@@ -1,3 +1,4 @@
+# PROOF: [L2/品質] <- mekhane/synteleia/dokimasia/ REASON→外部APIの品質検証が必要→ochema_backend が担う
 # PURPOSE: Ochēma (AntigravityClient) 経由の LLM バックエンド
 """
 OchemaBackend — Antigravity Language Server Bridge for Synteleia

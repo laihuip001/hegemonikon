@@ -1,3 +1,4 @@
+# PROOF: [L2/クライアント] <- mekhane/ochema/ A0→パッケージインターフェース定義
 # PURPOSE: Ochēma パッケージ — Antigravity LS クライアント
 """Ochēma (ὄχημα) — Antigravity Language Server Client Package."""
 

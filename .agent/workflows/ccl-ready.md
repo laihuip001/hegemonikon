@@ -1,6 +1,10 @@
 ---
+lcm_state: beta
+version: "1.0"
+
 description: "見渡す — /bou-_/pro_/kho_/chr_/euk_/tak-_~(/h*/k)_/pis"
 ---
+
 
 # /ccl-ready: 見渡しマクロ
 

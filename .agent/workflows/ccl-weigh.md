@@ -1,6 +1,10 @@
 ---
+lcm_state: beta
+version: "1.0"
+
 description: 量る — /bou*%/noe
 ---
+
 
 # @weigh — 量る
 

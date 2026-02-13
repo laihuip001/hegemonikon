@@ -1,6 +1,10 @@
 ---
+lcm_state: beta
+version: "1.0"
+
 description: "確かめる — /kho{git_diff}_C:{V:{/dia+}_/ene+}_/pra{test}_/pra{dendron_guard}_/pis_/dox"
 ---
+
 
 # /ccl-vet: 自己検証マクロ
 

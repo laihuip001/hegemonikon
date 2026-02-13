@@ -1,6 +1,10 @@
 ---
+lcm_state: beta
+version: "1.0"
+
 description: "刻む — /pro_/dox+_F:[×2]{/u+~(/noe*/dia)}_~(/h*/k)_/pis_/bye+"
 ---
+
 
 # /ccl-learn: 学習永続化マクロ
 

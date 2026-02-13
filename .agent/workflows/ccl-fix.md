@@ -1,6 +1,10 @@
 ---
+lcm_state: beta
+version: "1.0"
+
 description: "直す — /kho_/tel_C:{/dia+_/ene+}_I:[✓]{/pis_/dox-}"
 ---
+
 
 # /ccl-fix: 修正サイクルマクロ
 

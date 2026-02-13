@@ -1,6 +1,10 @@
 ---
+lcm_state: beta
+version: "1.0"
+
 description: "舵 — /pro_/kho_/bou+*%/zet+|>/u++_~(/h*/k)_/pis_/dox-"
 ---
+
 
 # @helm — 舵
 

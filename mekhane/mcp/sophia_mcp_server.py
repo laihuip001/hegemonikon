@@ -1,4 +1,4 @@
-# PROOF: [L2/インフラ] <- mekhane/mcp/ A0→MCP経由のアクセスが必要→sophia_mcp_server が担う
+# PROOF: [O3/Zētēsis] <- mekhane/mcp/sophia_mcp_server.py: MCP経由でのKnowledge ItemおよびHandoff検索機能の提供
 #!/usr/bin/env python3
 """
 Sophia MCP Server - Hegemonikón Knowledge Items Search

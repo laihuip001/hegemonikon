@@ -45,7 +45,8 @@ jobs:
                   # 1. Install torch CPU version explicitly
                   pip install torch --index-url https://download.pytorch.org/whl/cpu
                   # 2. Install other dependencies from PyPI
-                  pip install pytest pytest-asyncio pytest-timeout pyyaml pydantic lancedb numpy scipy \
+                  # Pin pytest-asyncio to ensure compatibility with asyncio_mode="strict"
+                  pip install pytest "pytest-asyncio>=0.23.0" pytest-timeout pyyaml pydantic lancedb numpy scipy \
                               networkx pandas tabulate requests httpx schedule \
                               aiohttp aioresponses python-dotenv \
                               sentence-transformers

@@ -1,3 +1,4 @@
+# PROOF: [L2/目的] Antigravity LS client package
 # PURPOSE: Ochēma パッケージ — Antigravity LS クライアント
 """Ochēma (ὄχημα) — Antigravity Language Server Client Package."""
 

@@ -1,3 +1,4 @@
+# PROOF: [L2/認知] Multi-semantic agent implementation
 # PURPOSE: Multi-LLM アンサンブル監査エージェント (Layer B: Nous)
 """
 MultiSemanticAgent — Multi-LLM Cognitive Ensemble

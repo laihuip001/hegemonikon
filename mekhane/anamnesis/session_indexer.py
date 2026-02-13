@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+# PROOF: [L2/インフラ] <- mekhane/anamnesis/ A0→知識の永続化→session_indexerが担う
 # PURPOSE: セッション履歴を GnosisIndex (LanceDB) にインデックスする
 """
 PROOF: [L2/インフラ] <- mekhane/anamnesis/

@@ -1,4 +1,4 @@
-# PROOF: [L2/インフラ] <- mekhane/anamnesis/
+# PROOF: [L2/インフラ] <- mekhane/anamnesis/ A0→セッション検索が必要→session_indexer が担う
 # PURPOSE: セッション履歴を GnosisIndex (LanceDB) にインデックスする
 """
 PROOF: [L2/インフラ] <- mekhane/anamnesis/

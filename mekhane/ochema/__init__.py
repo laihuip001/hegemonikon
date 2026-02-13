@@ -1,4 +1,4 @@
-# PROOF: [L2/インフラ] <- mekhane/ochema/
+# PROOF: [L2/インフラ] <- mekhane/ochema/ A0→パッケージ定義が必要→init が担う
 # PURPOSE: Ochēma パッケージ — Antigravity LS クライアント
 """Ochēma (ὄχημα) — Antigravity Language Server Client Package."""
 

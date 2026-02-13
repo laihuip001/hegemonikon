@@ -1,3 +1,4 @@
+# PROOF: [L2/Ochema] CLI Entrypoint
 # PURPOSE: Ochēma CLI — Antigravity LS とのインタラクション
 """Ochēma CLI — Antigravity Language Server Client.
 

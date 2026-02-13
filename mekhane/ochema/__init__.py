@@ -1,3 +1,4 @@
+# PROOF: [L2/Module] <- Ochema Module
 # PURPOSE: Ochēma パッケージ — Antigravity LS クライアント
 """Ochēma (ὄχημα) — Antigravity Language Server Client Package."""
 

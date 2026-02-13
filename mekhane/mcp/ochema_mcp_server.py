@@ -31,6 +31,7 @@ _stderr_wrapper = sys.stderr
 
 # Debug logging to stderr
 # PURPOSE: log — MCP サービスの処理
+# PURPOSE: Log message
 def log(msg):
     print(f"[ochema-mcp] {msg}", file=sys.stderr, flush=True)
 
@@ -53,15 +54,18 @@ log(f"Added to path: {_project_root}")
 # ============ Suppress stdout during imports ============
 # PURPOSE: クラス: StdoutSuppressor
 class StdoutSuppressor:
+# PURPOSE: Initialize context
     def __init__(self):
         self._null = io.StringIO()
         self._old_stdout = None
 
+# PURPOSE: Enter context
     def __enter__(self):
         self._old_stdout = sys.stdout
         sys.stdout = self._null
         return self
 
+# PURPOSE: Exit context
     def __exit__(self, *args):
         sys.stdout = self._old_stdout
         captured = self._null.getvalue()
@@ -97,6 +101,7 @@ _client = None
 
 
 # PURPOSE: get_client — AntigravityClient のシングルトン取得
+# PURPOSE: Get Ochema client
 def get_client():
     """AntigravityClient をシングルトンで取得。"""
     global _client
@@ -113,6 +118,7 @@ def get_client():
 
 
 @server.list_tools()
+# PURPOSE: List available tools
 async def list_tools():
     """List available tools."""
     log("list_tools called")
@@ -181,6 +187,7 @@ async def list_tools():
 
 
 @server.call_tool(validate_input=True)
+# PURPOSE: Call tool
 async def call_tool(name: str, arguments: dict):
     """Handle tool calls."""
     log(f"call_tool: {name} with {arguments}")
@@ -341,6 +348,7 @@ async def call_tool(name: str, arguments: dict):
 
 
 # PURPOSE: ochema_mcp_server の main 処理を実行する
+# PURPOSE: Main entry point
 async def main():
     """Run the MCP server."""
     log("Starting stdio server...")

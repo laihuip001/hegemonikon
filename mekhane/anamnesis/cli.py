@@ -40,6 +40,7 @@ STATE_FILE = DATA_DIR / "state.json"
 
 
 # PURPOSE: Update last collected timestamp.
+# PURPOSE: Update state
 def update_state():
     """Update last collected timestamp."""
     try:
@@ -58,6 +59,7 @@ def update_state():
 
 
 # PURPOSE: Check if collection is needed based on threshold days.
+# PURPOSE: Check freshness
 def cmd_check_freshness(args):
     """
     Check if collection is needed based on threshold days.
@@ -88,6 +90,7 @@ def cmd_check_freshness(args):
 
 
 # PURPOSE: 論文収集
+# PURPOSE: Collect session
 def cmd_collect(args):
     """論文収集"""
     from mekhane.anamnesis.collectors.arxiv import ArxivCollector
@@ -133,6 +136,7 @@ def cmd_collect(args):
 
 
 # PURPOSE: 全ソースから収集
+# PURPOSE: Collect all sessions
 def cmd_collect_all(args):  # noqa: AI-ALL
     """全ソースから収集"""
     from mekhane.anamnesis.collectors.arxiv import ArxivCollector
@@ -168,6 +172,7 @@ def cmd_collect_all(args):  # noqa: AI-ALL
 
 
 # PURPOSE: 論文検索
+# PURPOSE: Search index
 def cmd_search(args):
     """論文検索"""
     from mekhane.anamnesis.index import GnosisIndex
@@ -199,6 +204,7 @@ def cmd_search(args):
 
 
 # PURPOSE: インデックス統計
+# PURPOSE: Show stats
 def cmd_stats(args):
     """インデックス統計"""
     from mekhane.anamnesis.index import GnosisIndex
@@ -229,6 +235,7 @@ def cmd_stats(args):
 
 
 # PURPOSE: PKS 能動的プッシュ
+# PURPOSE: Proactive indexing
 def cmd_proactive(args):
     """PKS 能動的プッシュ"""
     from mekhane.pks.pks_engine import PKSEngine
@@ -275,6 +282,7 @@ def cmd_proactive(args):
 
 
 # PURPOSE: Link Engine — ファイル間リレーション解析
+# PURPOSE: Show links
 def cmd_links(args):
     """Link Engine — ファイル間リレーション解析"""
     from mekhane.pks.links.link_engine import LinkEngine
@@ -316,6 +324,7 @@ def cmd_links(args):
 
 
 # PURPOSE: CLI エントリポイント — 知識基盤の直接実行
+# PURPOSE: Main entry point
 def main():
     parser = argparse.ArgumentParser(
         description="Gnōsis - Knowledge Foundation CLI",
@@ -452,6 +461,7 @@ def main():
     p_chat.set_defaults(func=cmd_chat)
 
     # session-index (Session History Vector Search)
+# PURPOSE: Index sessions command
     def cmd_session_index(args):
         """セッション履歴をインデックス"""
         from mekhane.anamnesis.session_indexer import index_from_api, index_from_json
@@ -469,6 +479,7 @@ def main():
     p_session.set_defaults(func=cmd_session_index)
 
     # handoff-index (Handoff VSearch)
+# PURPOSE: Index handoffs command
     def cmd_handoff_index(args):
         """Handoff ファイルをインデックス"""
         from mekhane.anamnesis.session_indexer import index_handoffs
@@ -484,6 +495,7 @@ def main():
     p_handoff.set_defaults(func=cmd_handoff_index)
 
     # conversation-index (Full Conversation Content VSearch)
+# PURPOSE: Index conversations command
     def cmd_conversation_index(args):
         """全セッション会話をインデックス"""
         from mekhane.anamnesis.session_indexer import index_conversations

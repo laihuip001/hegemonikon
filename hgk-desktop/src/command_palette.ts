@@ -24,13 +24,24 @@ let wfCache: WFSummary[] = [];
 function createPaletteHTML(): string {
   return `
     <div class="cp-overlay" id="cp-overlay">
-      <div class="cp-dialog">
+      <div class="cp-dialog" role="dialog" aria-modal="true" aria-label="Command Palette">
         <div class="cp-input-wrapper">
           <span class="cp-icon">⌘</span>
-          <input type="text" id="cp-input" class="cp-input" placeholder="Type a workflow name or CCL expression..." autocomplete="off" />
+          <input
+            type="text"
+            id="cp-input"
+            class="cp-input"
+            placeholder="Type a workflow name or CCL expression..."
+            autocomplete="off"
+            role="combobox"
+            aria-autocomplete="list"
+            aria-expanded="true"
+            aria-controls="cp-results"
+            aria-activedescendant="cp-item-0"
+          />
           <kbd class="cp-kbd">ESC</kbd>
         </div>
-        <div class="cp-results" id="cp-results"></div>
+        <div class="cp-results" id="cp-results" role="listbox"></div>
         <div class="cp-footer">
           <span>↑↓ Navigate</span>
           <span>↵ Execute</span>
@@ -45,10 +56,18 @@ function createPaletteHTML(): string {
 
 function renderWFItems(items: WFSummary[]): string {
   if (items.length === 0) {
-    return '<div class="cp-empty">No matching workflows</div>';
+    return '<div class="cp-empty" role="option" aria-selected="false">No matching workflows</div>';
   }
   return items.map((wf, i) => `
-    <div class="cp-item ${i === 0 ? 'cp-item-active' : ''}" data-idx="${i}" data-name="${esc(wf.name)}" data-ccl="${esc(wf.ccl)}">
+    <div
+      class="cp-item ${i === 0 ? 'cp-item-active' : ''}"
+      id="cp-item-${i}"
+      role="option"
+      aria-selected="${i === 0}"
+      data-idx="${i}"
+      data-name="${esc(wf.name)}"
+      data-ccl="${esc(wf.ccl)}"
+    >
       <div class="cp-item-header">
         <span class="cp-item-name">/${esc(wf.name)}</span>
         ${wf.ccl ? `<span class="cp-item-ccl">${esc(wf.ccl)}</span>` : ''}
@@ -237,10 +256,30 @@ let activeIdx = 0;
 function updateActive(resultsEl: HTMLElement, delta: number): void {
   const items = resultsEl.querySelectorAll('.cp-item');
   if (items.length === 0) return;
-  items[activeIdx]?.classList.remove('cp-item-active');
+
+  // Update old item
+  const oldItem = items[activeIdx];
+  if (oldItem) {
+    oldItem.classList.remove('cp-item-active');
+    oldItem.setAttribute('aria-selected', 'false');
+  }
+
+  // Update index
   activeIdx = Math.max(0, Math.min(items.length - 1, activeIdx + delta));
-  items[activeIdx]?.classList.add('cp-item-active');
-  (items[activeIdx] as HTMLElement)?.scrollIntoView({ block: 'nearest' });
+
+  // Update new item
+  const newItem = items[activeIdx];
+  if (newItem) {
+    newItem.classList.add('cp-item-active');
+    newItem.setAttribute('aria-selected', 'true');
+    (newItem as HTMLElement)?.scrollIntoView({ block: 'nearest' });
+
+    // Update input aria-activedescendant
+    const input = document.getElementById('cp-input');
+    if (input) {
+      input.setAttribute('aria-activedescendant', newItem.id);
+    }
+  }
 }
 
 async function handleInput(input: HTMLInputElement, resultsEl: HTMLElement): Promise<void> {
@@ -287,6 +326,13 @@ async function handleInput(input: HTMLInputElement, resultsEl: HTMLElement): Pro
   const filtered = filterWorkflows(val);
   activeIdx = 0;
   resultsEl.innerHTML = renderWFItems(filtered);
+
+  // Update aria-activedescendant
+  if (filtered.length > 0) {
+    input.setAttribute('aria-activedescendant', 'cp-item-0');
+  } else {
+    input.removeAttribute('aria-activedescendant');
+  }
 
   // Click handlers
   resultsEl.querySelectorAll('.cp-item').forEach(item => {

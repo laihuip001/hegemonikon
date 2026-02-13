@@ -197,6 +197,7 @@ def _traced(fn):
     """
     import functools
 
+    # PURPOSE: [L2-auto] デコレータのラッパー関数
     @functools.wraps(fn)
     def wrapper(*args: Any, **kwargs: Any) -> Any:
         _start = time.time()
@@ -1836,6 +1837,7 @@ def _auto_extract_topics() -> list[str]:
 
 
 
+# PURPOSE: [L2-auto] デコレータのラッパー関数 (wrapper)
 if __name__ == "__main__":
     # C-1 fail-safe ensures GATEWAY_TOKEN is always set at this point
     print("🔒 OAuth 2.1 authentication ENABLED")

@@ -326,6 +326,7 @@ def index_handoffs(handoff_dir: Optional[str] = None) -> int:
     return 0
 
 
+# PURPOSE: AntigravityClient で全セッションの会話を取得
 def fetch_all_conversations(max_sessions: int = 100) -> list[dict]:
     """AntigravityClient で全セッションの会話を取得"""
     from mekhane.ochema.antigravity_client import AntigravityClient
@@ -396,6 +397,7 @@ def fetch_all_conversations(max_sessions: int = 100) -> list[dict]:
     return conversations
 
 
+# PURPOSE: 会話データを LanceDB レコードに変換
 def conversations_to_records(conversations: list[dict]) -> list[dict]:
     """会話データを LanceDB レコードに変換"""
     records = []
@@ -439,6 +441,7 @@ def conversations_to_records(conversations: list[dict]) -> list[dict]:
     return records
 
 
+# PURPOSE: 全セッション会話を LanceDB にインデックス
 def index_conversations(max_sessions: int = 100) -> int:
     """全セッション会話を LanceDB にインデックス"""
     conversations = fetch_all_conversations(max_sessions)
@@ -509,6 +512,7 @@ def index_conversations(max_sessions: int = 100) -> int:
 _BRAIN_DIR = Path.home() / ".gemini" / "antigravity" / "brain"
 
 
+# PURPOSE: Parse .system_generated/steps/*/output.txt files into records.
 def parse_step_outputs(brain_dir: Optional[str] = None, max_per_session: int = 20) -> list[dict]:
     """Parse .system_generated/steps/*/output.txt files into records."""
     directory = Path(brain_dir) if brain_dir else _BRAIN_DIR
@@ -552,6 +556,7 @@ def parse_step_outputs(brain_dir: Optional[str] = None, max_per_session: int = 2
     return steps
 
 
+# PURPOSE: Step outputs -> LanceDB-compatible records.
 def steps_to_records(steps: list[dict]) -> list[dict]:
     """Step outputs -> LanceDB-compatible records."""
     records = []

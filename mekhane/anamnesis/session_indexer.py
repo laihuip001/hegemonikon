@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+# PROOF: [L2/インフラ] <- mekhane/anamnesis/ Session Indexer
 # PURPOSE: セッション履歴を GnosisIndex (LanceDB) にインデックスする
 """
 PROOF: [L2/インフラ] <- mekhane/anamnesis/
@@ -35,6 +37,7 @@ if str(_HEGEMONIKON_ROOT) not in sys.path:
     sys.path.insert(0, str(_HEGEMONIKON_ROOT))
 
 
+# PURPOSE: Parse trajectorySummaries JSON into session info
 def parse_sessions_from_json(data: dict) -> list[dict]:
     """trajectorySummaries JSON からセッション情報を抽出"""
     summaries = data.get("trajectorySummaries", {})
@@ -69,6 +72,7 @@ def parse_sessions_from_json(data: dict) -> list[dict]:
     return sessions
 
 
+# PURPOSE: Convert session info to LanceDB records
 def sessions_to_records(sessions: list[dict]) -> list[dict]:
     """セッション情報を LanceDB レコード (既存スキーマ準拠) に変換
 
@@ -175,6 +179,7 @@ _RE_SESSION_ID = re.compile(
 _RE_SECTION = re.compile(r"^##\s+(.+)$", re.MULTILINE)
 
 
+# PURPOSE: Parse single handoff .md file into structured dict
 def parse_handoff_md(path: Path) -> dict:
     """Single handoff .md file -> structured dict"""
     text = path.read_text(encoding="utf-8", errors="replace")
@@ -212,6 +217,7 @@ def parse_handoff_md(path: Path) -> dict:
     }
 
 
+# PURPOSE: Convert handoff dicts to LanceDB records
 def handoffs_to_records(handoffs: list[dict]) -> list[dict]:
     """Parsed handoff dicts -> LanceDB-compatible records"""
     records = []
@@ -250,6 +256,7 @@ def handoffs_to_records(handoffs: list[dict]) -> list[dict]:
     return records
 
 
+# PURPOSE: Index handoff_*.md files into LanceDB
 def index_handoffs(handoff_dir: Optional[str] = None) -> int:
     """handoff_*.md を LanceDB にインデックス"""
     directory = Path(handoff_dir) if handoff_dir else _HANDOFF_DIR
@@ -320,6 +327,7 @@ def index_handoffs(handoff_dir: Optional[str] = None) -> int:
     return 0
 
 
+# PURPOSE: Fetch all conversations using AntigravityClient
 def fetch_all_conversations(max_sessions: int = 100) -> list[dict]:
     """AntigravityClient で全セッションの会話を取得"""
     from mekhane.ochema.antigravity_client import AntigravityClient
@@ -390,6 +398,7 @@ def fetch_all_conversations(max_sessions: int = 100) -> list[dict]:
     return conversations
 
 
+# PURPOSE: Convert conversation data to LanceDB records
 def conversations_to_records(conversations: list[dict]) -> list[dict]:
     """会話データを LanceDB レコードに変換"""
     records = []
@@ -433,6 +442,7 @@ def conversations_to_records(conversations: list[dict]) -> list[dict]:
     return records
 
 
+# PURPOSE: Index all sessions' conversations into LanceDB
 def index_conversations(max_sessions: int = 100) -> int:
     """全セッション会話を LanceDB にインデックス"""
     conversations = fetch_all_conversations(max_sessions)
@@ -503,6 +513,7 @@ def index_conversations(max_sessions: int = 100) -> int:
 _BRAIN_DIR = Path.home() / ".gemini" / "antigravity" / "brain"
 
 
+# PURPOSE: Parse .system_generated/steps/*/output.txt files into records
 def parse_step_outputs(brain_dir: Optional[str] = None, max_per_session: int = 20) -> list[dict]:
     """Parse .system_generated/steps/*/output.txt files into records."""
     directory = Path(brain_dir) if brain_dir else _BRAIN_DIR
@@ -546,6 +557,7 @@ def parse_step_outputs(brain_dir: Optional[str] = None, max_per_session: int = 2
     return steps
 
 
+# PURPOSE: Step outputs to LanceDB-compatible records
 def steps_to_records(steps: list[dict]) -> list[dict]:
     """Step outputs -> LanceDB-compatible records."""
     records = []
@@ -576,6 +588,7 @@ def steps_to_records(steps: list[dict]) -> list[dict]:
     return records
 
 
+# PURPOSE: Index .system_generated/steps/ output files into LanceDB
 def index_steps(brain_dir: Optional[str] = None, max_per_session: int = 20) -> int:
     """Index .system_generated/steps/ output files into LanceDB."""
     steps = parse_step_outputs(brain_dir, max_per_session)
@@ -641,6 +654,7 @@ def index_steps(brain_dir: Optional[str] = None, max_per_session: int = 20) -> i
     return 0
 
 
+# PURPOSE: Index session from JSON file
 def index_from_json(json_path: str) -> int:
     """JSON ファイルからセッションをインデックス"""
     path = Path(json_path)
@@ -710,6 +724,7 @@ def index_from_json(json_path: str) -> int:
     return 0
 
 
+# PURPOSE: Index session from API directly
 def index_from_api() -> int:
     """API から直接取得してインデックス"""
     script = _HEGEMONIKON_ROOT / "scripts" / "agq-sessions.sh"
@@ -737,6 +752,7 @@ def index_from_api() -> int:
         return index_from_json(str(json_path))
 
 
+# PURPOSE: Main entry point
 def main() -> int:
     import argparse
 

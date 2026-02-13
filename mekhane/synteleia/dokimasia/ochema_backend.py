@@ -1,3 +1,4 @@
+# PROOF: [L2/Nous] <- mekhane/synteleia/dokimasia/ Ochema Backend
 # PURPOSE: Ochēma (AntigravityClient) 経由の LLM バックエンド
 """
 OchemaBackend — Antigravity Language Server Bridge for Synteleia
@@ -46,16 +47,34 @@ class OchemaBackend(LLMBackend):
     # PURPOSE: LLM にクエリを送信
     def query(self, prompt: str, context: str) -> str:
         """Ochēma 経由で LLM にクエリを送信し、テキスト応答を返す。"""
+        # クライアントは遅延初期化
         client = self._get_client()
+        if not client:
+            return "Error: AntigravityClient unavailable"
+
         combined = f"{prompt}\n\n---\n\n## 監査対象\n\n{context}"
 
-        response = client.ask(
-            message=combined,
-            model=self.model,
-            timeout=self.timeout,
-        )
+        try:
+            # AntigravityClient 経由で質問
+            # Note: 実際の実装に合わせてメソッド呼び出しを調整
+            response = client.ask(
+                message=combined,
+                model=self.model,
+                timeout=self.timeout,
+            )
 
-        return response.text
+            # レスポンス形式に応じてテキスト抽出
+            if hasattr(response, "text"):
+                return response.text
+            elif isinstance(response, str):
+                return response
+            elif isinstance(response, dict) and "text" in response:
+                return response["text"]
+            else:
+                return str(response)
+
+        except Exception as e:
+            return f"Error querying OchemaBackend: {e}"
 
     # PURPOSE: バックエンドが利用可能か
     def is_available(self) -> bool:
@@ -63,8 +82,12 @@ class OchemaBackend(LLMBackend):
         if self._available is None:
             try:
                 client = self._get_client()
-                client.get_status()
-                self._available = True
+                # 簡易接続チェック (get_status は RPC コールを含む)
+                if client:
+                    client.get_status()
+                    self._available = True
+                else:
+                    self._available = False
             except Exception:
                 self._available = False
         return self._available
@@ -73,8 +96,11 @@ class OchemaBackend(LLMBackend):
     def _get_client(self):
         """AntigravityClient をシングルトンで取得。synteleia-sandbox WS に接続。"""
         if self._client is None:
-            from mekhane.ochema.antigravity_client import AntigravityClient
-            self._client = AntigravityClient(workspace="synteleia-sandbox")
+            try:
+                from mekhane.ochema.antigravity_client import AntigravityClient
+                self._client = AntigravityClient(workspace="synteleia-sandbox")
+            except ImportError:
+                return None
         return self._client
 
     def __repr__(self) -> str:

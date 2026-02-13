@@ -36,7 +36,7 @@ if str(_HEGEMONIKON_ROOT) not in sys.path:
     sys.path.insert(0, str(_HEGEMONIKON_ROOT))
 
 
-# PURPOSE: trajectorySummaries JSON からセッション情報を抽出
+# PURPOSE: Extract session info from trajectorySummaries JSON
 def parse_sessions_from_json(data: dict) -> list[dict]:
     """trajectorySummaries JSON からセッション情報を抽出"""
     summaries = data.get("trajectorySummaries", {})
@@ -71,7 +71,7 @@ def parse_sessions_from_json(data: dict) -> list[dict]:
     return sessions
 
 
-# PURPOSE: セッション情報を LanceDB レコード (既存スキーマ準拠) に変換
+# PURPOSE: Convert session info to LanceDB records
 def sessions_to_records(sessions: list[dict]) -> list[dict]:
     """セッション情報を LanceDB レコード (既存スキーマ準拠) に変換
 
@@ -255,7 +255,7 @@ def handoffs_to_records(handoffs: list[dict]) -> list[dict]:
     return records
 
 
-# PURPOSE: handoff_*.md を LanceDB にインデックス
+# PURPOSE: Index handoff_*.md files into LanceDB
 def index_handoffs(handoff_dir: Optional[str] = None) -> int:
     """handoff_*.md を LanceDB にインデックス"""
     directory = Path(handoff_dir) if handoff_dir else _HANDOFF_DIR
@@ -326,7 +326,7 @@ def index_handoffs(handoff_dir: Optional[str] = None) -> int:
     return 0
 
 
-# PURPOSE: AntigravityClient で全セッションの会話を取得
+# PURPOSE: Fetch all session conversations via AntigravityClient
 def fetch_all_conversations(max_sessions: int = 100) -> list[dict]:
     """AntigravityClient で全セッションの会話を取得"""
     from mekhane.ochema.antigravity_client import AntigravityClient
@@ -397,7 +397,7 @@ def fetch_all_conversations(max_sessions: int = 100) -> list[dict]:
     return conversations
 
 
-# PURPOSE: 会話データを LanceDB レコードに変換
+# PURPOSE: Convert conversation data to LanceDB records
 def conversations_to_records(conversations: list[dict]) -> list[dict]:
     """会話データを LanceDB レコードに変換"""
     records = []
@@ -441,7 +441,7 @@ def conversations_to_records(conversations: list[dict]) -> list[dict]:
     return records
 
 
-# PURPOSE: 全セッション会話を LanceDB にインデックス
+# PURPOSE: Index all session conversations into LanceDB
 def index_conversations(max_sessions: int = 100) -> int:
     """全セッション会話を LanceDB にインデックス"""
     conversations = fetch_all_conversations(max_sessions)
@@ -653,7 +653,7 @@ def index_steps(brain_dir: Optional[str] = None, max_per_session: int = 20) -> i
     return 0
 
 
-# PURPOSE: JSON ファイルからセッションをインデックス
+# PURPOSE: Index sessions from JSON file
 def index_from_json(json_path: str) -> int:
     """JSON ファイルからセッションをインデックス"""
     path = Path(json_path)
@@ -723,7 +723,7 @@ def index_from_json(json_path: str) -> int:
     return 0
 
 
-# PURPOSE: API から直接取得してインデックス
+# PURPOSE: Fetch from API and index
 def index_from_api() -> int:
     """API から直接取得してインデックス"""
     script = _HEGEMONIKON_ROOT / "scripts" / "agq-sessions.sh"

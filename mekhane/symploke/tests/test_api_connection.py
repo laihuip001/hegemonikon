@@ -10,15 +10,25 @@ import os
 import sys
 import pytest
 
-# Add parent to path
-sys.path.insert(0, "/home/makaron8426/oikos/hegemonikon")
+# Add project root to path if needed (though pytest usually handles this)
+current_dir = os.path.dirname(os.path.abspath(__file__))
+project_root = os.path.abspath(os.path.join(current_dir, "../../../"))
+if project_root not in sys.path:
+    sys.path.insert(0, project_root)
 
-from mekhane.symploke.jules_client import JulesClient
+# Import moved inside try/except to gracefully handle missing dependencies
+# This prevents pytest collection errors if dependencies aren't installed
+try:
+    from mekhane.symploke.jules_client import JulesClient
+    JULES_CLIENT_AVAILABLE = True
+except ImportError:
+    JULES_CLIENT_AVAILABLE = False
 
 
 # PURPOSE: Test API connection by listing sources
 @pytest.mark.asyncio
 @pytest.mark.skipif(not os.environ.get("JULES_API_KEY"), reason="JULES_API_KEY not set")
+@pytest.mark.skipif(not JULES_CLIENT_AVAILABLE, reason="JulesClient dependencies not available")
 async def test_connection():
     """Test API connection by listing sources."""
     api_key = os.environ.get("JULES_API_KEY")

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# PROOF: [H4] <- mekhane/ochema/
+# PROOF: [L2/System] <- mekhane/ochema/
 # PURPOSE: Ochēma CLI — Antigravity LS とのインタラクション
 """Ochēma CLI — Antigravity Language Server Client.
 

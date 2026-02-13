@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# PROOF: [O4] <- mekhane/anamnesis/ Session Indexer
+# PROOF: [L2/System] <- mekhane/anamnesis/ Session Indexer
 # PURPOSE: セッション履歴を GnosisIndex (LanceDB) にインデックスする
 """
 PROOF: [L2/インフラ] <- mekhane/anamnesis/

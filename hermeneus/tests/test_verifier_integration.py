@@ -13,6 +13,8 @@ import sys
 import time
 from pathlib import Path
 
+import pytest
+
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 from hermeneus.src.verifier import (
@@ -36,8 +38,12 @@ def check_ls_available() -> bool:
         return False
 
 
+@pytest.mark.asyncio
 async def test_single_agent_generate():
     """単一エージェントの LLM 生成テスト"""
+    if not check_ls_available():
+        pytest.skip("Antigravity LS not available")
+
     print("\n" + "=" * 60)
     print("Test 1: 単一エージェント LLM 生成")
     print("=" * 60)
@@ -65,8 +71,12 @@ async def test_single_agent_generate():
     return turn
 
 
+@pytest.mark.asyncio
 async def test_two_agent_rally():
     """Proposer ↔ Critic のラリーテスト (3ターン)"""
+    if not check_ls_available():
+        pytest.skip("Antigravity LS not available")
+
     print("\n" + "=" * 60)
     print("Test 2: Proposer ↔ Critic ラリー (3ターン)")
     print("=" * 60)
@@ -120,8 +130,12 @@ async def test_two_agent_rally():
     return rally_history
 
 
+@pytest.mark.asyncio
 async def test_full_debate():
     """フル debate エンジンテスト (ラリー + Arbiter)"""
+    if not check_ls_available():
+        pytest.skip("Antigravity LS not available")
+
     print("\n" + "=" * 60)
     print("Test 3: フル Debate エンジン (ラリー + Arbiter)")
     print("=" * 60)

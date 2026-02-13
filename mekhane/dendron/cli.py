@@ -119,9 +119,13 @@ def cmd_check(args: argparse.Namespace) -> int:  # noqa: AI-005 # noqa: AI-ALL
         return 1
 
     # チェッカー設定
+    # CI フォーマットかつ CI モードの場合は L1 ファイルチェックのみに限定する (誤検知防止)
+    # format=ci は L1 PROOF Header Check で使用される
+    is_l1_ci = args.ci and args.format == "ci"
     checker = DendronChecker(
         check_dirs=not args.no_dirs,
         check_files=True,
+        check_functions=not is_l1_ci,  # CI モード (L1) では関数チェックをスキップ
         check_structure=getattr(args, 'ept', False),
         check_function_nf=getattr(args, 'ept', False),
         check_verification=getattr(args, 'ept', False),

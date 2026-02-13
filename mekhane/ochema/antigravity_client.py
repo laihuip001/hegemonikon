@@ -96,14 +96,17 @@ class AntigravityClient:
         self._ssl_ctx = self._make_ssl_context()
         self.ls = self._detect_ls()
 
+    # PURPOSE: Language Server PID
     @property
     def pid(self) -> int:
         return self.ls.pid
 
+    # PURPOSE: Language Server Port
     @property
     def port(self) -> int:
         return self.ls.port
 
+    # PURPOSE: Language Server CSRF Token
     @property
     def csrf(self) -> str:
         return self.ls.csrf
@@ -688,6 +691,7 @@ class AntigravityClient:
 
     # --- Internal: Utilities ---
 
+    # PURPOSE: 自己署名証明書を許可する SSL コンテキスト
     @staticmethod
     def _make_ssl_context() -> ssl.SSLContext:
         """自己署名証明書を許可する SSL コンテキスト。"""
@@ -696,6 +700,7 @@ class AntigravityClient:
         ctx.verify_mode = ssl.CERT_NONE
         return ctx
 
+    # PURPOSE: 現在のユーザー名を取得
     @staticmethod
     def _get_user() -> str:
         """現在のユーザー名を取得。"""

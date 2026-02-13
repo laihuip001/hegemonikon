@@ -101,9 +101,11 @@ class MultiSemanticAgent(AuditAgent):
     name = "MultiSemanticAgent"
     description = "Multi-LLM アンサンブル監査 (Layer B: Nous)"
 
+    # PURPOSE: Initialize MultiSemanticAgent
     def __init__(self, members: List[EnsembleMember]):
         self.members = members
 
+    # PURPOSE: デフォルト構成でエージェントを作成
     @classmethod
     def default(cls) -> "MultiSemanticAgent":
         """デフォルト構成: Gemini Pro + Claude Opus + GPT-OSS。"""
@@ -145,6 +147,7 @@ class MultiSemanticAgent(AuditAgent):
 
         return cls(members=members)
 
+    # PURPOSE: テスト用スタブ構成でエージェントを作成
     @classmethod
     def with_stubs(cls, responses: Optional[Dict[str, str]] = None) -> "MultiSemanticAgent":
         """テスト用: StubBackend でアンサンブルを構成。"""
@@ -322,6 +325,7 @@ class MultiSemanticAgent(AuditAgent):
 # Utilities
 # =============================================================================
 
+# PURPOSE: Severity の厳しさ順序を返す
 def _severity_rank(severity: AuditSeverity) -> int:
     """Severity の厳しさ順序。"""
     return {

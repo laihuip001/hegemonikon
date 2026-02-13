@@ -6,6 +6,18 @@ description: |
   前順序圏のガロア接続 + [0,1]-豊穣圏として HGK の圏論を正当化し、
   12随伴対・Trigonon・CCL の圏論的意味を日常の認知に統合する。
 
+risk_tier: L1
+risks:
+  - 誤った圏論の適用による混乱
+  - 前順序圏と一般圏の混同
+  - 数学的厳密性と実用性のバランス崩壊
+
+reversible: true
+requires_approval: false
+fallbacks:
+  - 圏論用語を使わず平易な言葉で説明する
+  - 具体例を用いた類推に切り替える
+
 triggers:
   - 圏論的な分析を行う時
   - 随伴対/関手/η/ε を扱う時

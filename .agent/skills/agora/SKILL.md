@@ -1,6 +1,17 @@
 ---
 name: Agora
 description: HGK 収益化プロジェクト — ディープインパクト戦略
+
+risk_tier: L1
+risks:
+  - 自動生成テンプレートのまま放置されるリスク
+  - 不適切なimportパスによる実行エラー
+
+reversible: true
+requires_approval: false
+fallbacks:
+  - 手動でコマンドを実行する
+
 triggers:
   - "agora"
   - "agora"

@@ -444,6 +444,7 @@ class AntigravityClient:
 
     # --- Internal: LS Detection ---
 
+    # PURPOSE: Language Server プロセスを検出し、接続情報を返す
     def _detect_ls(self) -> LSInfo:
         """Language Server プロセスを検出し、接続情報を返す。
 
@@ -533,6 +534,7 @@ class AntigravityClient:
     #   12=INTERACTIVE_CASCADE (IDE 標準), 15=SDK
     SOURCE_INTERACTIVE_CASCADE = 12
 
+    # PURPOSE: Step 1: StartCascade → cascade_id を取得
     def _start_cascade(self) -> str:
         """Step 1: StartCascade → cascade_id を取得。"""
         result = self._rpc(RPC_START_CASCADE, {
@@ -543,6 +545,7 @@ class AntigravityClient:
             raise RuntimeError(f"StartCascade returned no cascadeId: {result}")
         return cascade_id
 
+    # PURPOSE: Step 2: SendUserCascadeMessage → メッセージ送信
     def _send_message(self, cascade_id: str, message: str, model: str) -> None:
         """Step 2: SendUserCascadeMessage → メッセージ送信。
 
@@ -561,6 +564,7 @@ class AntigravityClient:
             },
         })
 
+    # PURPOSE: Step 3-4: ポーリングで LLM 応答を取得
     def _poll_response(
         self, cascade_id: str, timeout: float
     ) -> LLMResponse:
@@ -622,6 +626,7 @@ class AntigravityClient:
             f"(cascade_id={cascade_id})"
         )
 
+    # PURPOSE: ステップから LLM 応答をパースする
     def _parse_steps(
         self,
         steps: list,
@@ -657,10 +662,12 @@ class AntigravityClient:
 
     # --- Internal: HTTP/RPC ---
 
+    # PURPOSE: ConnectRPC JSON で RPC を呼び出す
     def _rpc(self, endpoint: str, payload: dict) -> dict:
         """ConnectRPC JSON で RPC を呼び出す。"""
         return self._raw_rpc(self.ls.port, self.ls.csrf, endpoint, payload)
 
+    # PURPOSE: 低レベル RPC 呼び出し
     def _raw_rpc(
         self, port: int, csrf: str, endpoint: str, payload: dict
     ) -> dict:
@@ -688,6 +695,7 @@ class AntigravityClient:
 
     # --- Internal: Utilities ---
 
+    # PURPOSE: 自己署名証明書を許可する SSL コンテキスト
     @staticmethod
     def _make_ssl_context() -> ssl.SSLContext:
         """自己署名証明書を許可する SSL コンテキスト。"""
@@ -696,6 +704,7 @@ class AntigravityClient:
         ctx.verify_mode = ssl.CERT_NONE
         return ctx
 
+    # PURPOSE: 現在のユーザー名を取得
     @staticmethod
     def _get_user() -> str:
         """現在のユーザー名を取得。"""

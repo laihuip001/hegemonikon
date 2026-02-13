@@ -1,3 +1,4 @@
+# PROOF: [L2/Verification] <- mekhane/synteleia/dokimasia/ A0→意味論的エージェント検証
 # PURPOSE: Multi-LLM アンサンブル監査エージェント (Layer B: Nous)
 """
 MultiSemanticAgent — Multi-LLM Cognitive Ensemble

@@ -1,3 +1,4 @@
+# PROOF: [L2/Infrastructure] <- mekhane/anamnesis/ A0→セッションの自動監視と記録
 #!/usr/bin/env python3
 # PURPOSE: LS API ポーリングでアクティブセッションをリアルタイムにモニターし MD 保存する
 """

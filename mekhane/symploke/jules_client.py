@@ -173,7 +173,7 @@ def with_retry(
     backoff_factor: float = 2.0,
     initial_delay: float = 1.0,
     max_delay: float = 60.0,
-    retryable_exceptions: tuple = (RateLimitError, httpx.RequestError),
+    retryable_exceptions: tuple = (RateLimitError, httpx.RequestError, httpx.HTTPStatusError),
 ):
     """
     Decorator for async functions with exponential backoff retry.
@@ -296,7 +296,7 @@ class JulesClient:
                 max_keepalive_connections=self.MAX_CONCURRENT,
                 keepalive_expiry=30
             )
-            self._owned_client = httpx.AsyncClient(limits=limits)
+            self._owned_client = httpx.AsyncClient(limits=limits, timeout=self.DEFAULT_TIMEOUT)
         return self
 
     async def __aexit__(self, exc_type, exc_val, exc_tb):
@@ -308,7 +308,7 @@ class JulesClient:
     @property
     def _client(self) -> httpx.AsyncClient:
         """Get the active client (shared or owned)."""
-        return self._shared_client or self._owned_client or httpx.AsyncClient()
+        return self._shared_client or self._owned_client or httpx.AsyncClient(timeout=self.DEFAULT_TIMEOUT)
 
     async def _request(
         self,
@@ -341,7 +341,7 @@ class JulesClient:
         client = self._shared_client or self._owned_client
         close_after = False
         if client is None:
-            client = httpx.AsyncClient()
+            client = httpx.AsyncClient(timeout=self.DEFAULT_TIMEOUT)
             close_after = True
 
         try:
@@ -367,7 +367,7 @@ class JulesClient:
 
             # Include response body in error for debugging
             if response.is_error:
-                await response.read()  # Ensure content is read
+                await response.aread()  # Ensure content is read
                 logger.error(f"API error {response.status_code}: {response.text[:200]}")
 
             response.raise_for_status()
@@ -378,7 +378,7 @@ class JulesClient:
 
     # PURPOSE: Create a new Jules session
     @with_retry(
-        max_attempts=3, retryable_exceptions=(RateLimitError, httpx.RequestError)
+        max_attempts=3, retryable_exceptions=(RateLimitError, httpx.RequestError, httpx.HTTPStatusError)
     )
     async def create_session(
         self,
@@ -423,7 +423,7 @@ class JulesClient:
 
     # PURPOSE: Get session status
     @with_retry(
-        max_attempts=3, retryable_exceptions=(RateLimitError, httpx.RequestError)
+        max_attempts=3, retryable_exceptions=(RateLimitError, httpx.RequestError, httpx.HTTPStatusError)
     )
     async def get_session(self, session_id: str) -> JulesSession:
         """

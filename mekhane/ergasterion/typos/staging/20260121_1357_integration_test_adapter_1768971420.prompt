@@ -1,7 +1,0 @@
-#prompt integration_test_adapter_1768971420
-
-@role:
-  Tester
-
-@goal:
-  Verify adapter

@@ -89,6 +89,7 @@ ALLOWED_HOSTS = os.getenv("HGK_GATEWAY_ALLOWED_HOSTS", _default_hosts).split(","
 _MNEME_DIR = Path(os.getenv("HGK_MNEME", str(Path.home() / "oikos/mneme/.hegemonikon")))
 
 
+# PURPOSE:  wbc log security event
 def _wbc_log_security_event(
     event_type: str,
     severity: str,
@@ -143,6 +144,7 @@ class HGKOAuthProvider(OAuthAuthorizationServerProvider[AuthorizationCode, Refre
     - インメモリストレージ
     """
 
+    # PURPOSE:   init
     def __init__(self, access_token: str):
         self._access_token = access_token
         self._clients: dict[str, OAuthClientInformationFull] = {}
@@ -857,6 +859,7 @@ INCOMING_DIR = MNEME_DIR / "incoming"
 PROCESSED_DIR = MNEME_DIR / "processed"
 
 
+# PURPOSE: Hgk digest check
 @mcp.tool()
 def hgk_digest_check() -> str:
     """
@@ -1108,6 +1111,7 @@ _ASK_RATE_LIMIT = 5
 _ASK_RATE_WINDOW = 60  # seconds
 
 
+# PURPOSE:  check rate limit
 def _check_rate_limit() -> bool:
     """レートリミットチェック。True = 許可、False = 拒否。"""
     now = time.time()

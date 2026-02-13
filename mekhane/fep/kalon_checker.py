@@ -71,6 +71,7 @@ class KalonResult:
     details: str = ""
     issues: List[str] = field(default_factory=list)
 
+    # PURPOSE: Is kalon
     @property
     def is_kalon(self) -> bool:
         """Whether this check passes Kalon quality."""
@@ -88,6 +89,7 @@ class KalonReport:
     results: List[KalonResult] = field(default_factory=list)
     timestamp: str = ""
 
+    # PURPOSE: Overall score
     @property
     def overall_score(self) -> float:
         """Weighted average of all check scores."""
@@ -95,6 +97,7 @@ class KalonReport:
             return 0.0
         return sum(r.score for r in self.results) / len(self.results)
 
+    # PURPOSE: Overall level
     @property
     def overall_level(self) -> KalonLevel:
         """Overall Kalon level based on individual results."""
@@ -110,6 +113,7 @@ class KalonReport:
             return KalonLevel.APPROACHING
         return KalonLevel.INCOMPLETE
 
+    # PURPOSE: All issues
     @property
     def all_issues(self) -> List[str]:
         """Collect all issues from all results."""
@@ -119,6 +123,7 @@ class KalonReport:
                 issues.append(f"[{r.name}] {issue}")
         return issues
 
+    # PURPOSE: Summary
     def summary(self) -> str:
         """One-line summary of the report."""
         passed = sum(1 for r in self.results if r.is_kalon)
@@ -130,6 +135,7 @@ class KalonReport:
         )
 
 
+# PURPOSE: Kalonchecker
 class KalonChecker:
     """Kalon (καλόν) Checker — 圏論的構造の品質検証.
 
@@ -152,6 +158,7 @@ class KalonChecker:
     # PURPOSE: Expected number of structures (evidence items) per enrichment
     MIN_STRUCTURES: int = 2
 
+    # PURPOSE:   init
     def __init__(
         self,
         enrichments: Optional[Dict[Series, Enrichment]] = None,

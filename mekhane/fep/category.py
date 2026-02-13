@@ -409,6 +409,7 @@ class GaloisConnection:
     series: Series      # Which series this belongs to
     description: str = ""  # Human-readable meaning
 
+    # PURPOSE: Notation
     @property
     def notation(self) -> str:
         """Standard notation: L ⊣ R."""
@@ -443,6 +444,7 @@ class AdjointPair:
     series: Series
     meaning: str = ""    # What this pair represents
 
+    # PURPOSE: Galois
     @property
     def galois(self) -> GaloisConnection:
         """View this adjoint pair as a Galois connection."""
@@ -453,6 +455,7 @@ class AdjointPair:
             description=self.meaning,
         )
 
+    # PURPOSE: Notation
     @property
     def notation(self) -> str:
         """Standard notation: L ⊣ R."""
@@ -928,6 +931,7 @@ def hom_sources(target: str) -> FrozenSet[str]:
 # =============================================================================
 
 
+# PURPOSE:  m
 def _m(xid: str, src: str, tgt: str) -> Morphism:
     """Shorthand for Morphism creation."""
     return Morphism(id=xid, source=src, target=tgt)

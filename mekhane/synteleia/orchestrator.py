@@ -37,6 +37,7 @@ from .dokimasia import (
 class SynteleiaOrchestrator:
     """Synteleia 2層オーケストレーター"""
 
+    # PURPOSE:   init
     def __init__(
         self,
         poiesis_agents: Optional[List[AuditAgent]] = None,
@@ -72,6 +73,7 @@ class SynteleiaOrchestrator:
         return self.poiesis_agents + self.dokimasia_agents
 
     # PURPOSE: L1 + L2 統合監査 (/dia+ 用ファクトリ)
+    # PURPOSE: With multi l2
     @classmethod
     def with_l2(cls, backend=None) -> "SynteleiaOrchestrator":
         """
@@ -93,6 +95,7 @@ class SynteleiaOrchestrator:
         orchestrator.dokimasia_agents.append(semantic)
         return orchestrator
 
+    # PURPOSE: With multi l2
     @classmethod
     def with_multi_l2(cls) -> "SynteleiaOrchestrator":
         """
@@ -136,6 +139,7 @@ class SynteleiaOrchestrator:
         # 結果を統合
         return self._aggregate_results(target, agent_results)
 
+    # PURPOSE:  audit parallel
     def _audit_parallel(self, target: AuditTarget) -> List[AgentResult]:
         """並列監査"""
         results = []
@@ -165,6 +169,7 @@ class SynteleiaOrchestrator:
 
         return results
 
+    # PURPOSE:  audit sequential
     def _audit_sequential(self, target: AuditTarget) -> List[AgentResult]:
         """逐次監査"""
         results = []
@@ -187,6 +192,7 @@ class SynteleiaOrchestrator:
 
         return results
 
+    # PURPOSE:  aggregate results
     def _aggregate_results(
         self, target: AuditTarget, agent_results: List[AgentResult]
     ) -> AuditResult:

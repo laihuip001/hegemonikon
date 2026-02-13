@@ -53,15 +53,18 @@ log(f"Added to path: {_project_root}")
 # ============ Suppress stdout during imports ============
 # PURPOSE: クラス: StdoutSuppressor
 class StdoutSuppressor:
+    # PURPOSE:   init
     def __init__(self):
         self._null = io.StringIO()
         self._old_stdout = None
 
+    # PURPOSE:   enter
     def __enter__(self):
         self._old_stdout = sys.stdout
         sys.stdout = self._null
         return self
 
+    # PURPOSE:   exit
     def __exit__(self, *args):
         sys.stdout = self._old_stdout
         captured = self._null.getvalue()
@@ -112,6 +115,7 @@ def get_client():
     return _client
 
 
+# PURPOSE: List tools
 @server.list_tools()
 async def list_tools():
     """List available tools."""
@@ -180,6 +184,7 @@ async def list_tools():
     ]
 
 
+# PURPOSE: Call tool
 @server.call_tool(validate_input=True)
 async def call_tool(name: str, arguments: dict):
     """Handle tool calls."""

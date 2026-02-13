@@ -1,4 +1,4 @@
-# PROOF: [L2/Exagoge] <- mekhane/ochema/scripts/
+# PROOF: [L2/Infrastructure] <- mekhane/ochema/scripts/
 """
 Cortex API MITM Capture Script for mitmproxy.
 

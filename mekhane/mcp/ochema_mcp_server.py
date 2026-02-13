@@ -113,6 +113,7 @@ def get_client():
 
 
 @server.list_tools()
+# PURPOSE: 利用可能なツール一覧を返す
 async def list_tools():
     """List available tools."""
     log("list_tools called")
@@ -181,6 +182,7 @@ async def list_tools():
 
 
 @server.call_tool(validate_input=True)
+# PURPOSE: ツール呼び出しを処理する
 async def call_tool(name: str, arguments: dict):
     """Handle tool calls."""
     log(f"call_tool: {name} with {arguments}")

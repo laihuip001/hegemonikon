@@ -337,28 +337,86 @@ token = json.loads(row[0])['apiKey']  # ya29.a0AUMWg_... (258 chars)
 
 ---
 
-## 16. 次のステップ
+## 16. 別モデルテスト結果 (2026-02-13)
 
-### 確定 (LS 経由ルート)
+| API モデル名 | ラベル | enum ID | 結果 | 自称 |
+|:-------------|:-------|:--------|:-----|:-----|
+| `MODEL_CLAUDE_4_5_SONNET_THINKING` | Claude Sonnet 4.5 (T) | 334 | ✅ | — (前回テスト) |
+| `MODEL_CLAUDE_4_5_SONNET` | Claude Sonnet 4.5 | 333 | ✅ | "Claude Sonnet 4.5 (Anthropic)" |
+| `MODEL_PLACEHOLDER_M26` | Claude Opus 4.6 (T) | 1026 | ✅ | "Claude (Anthropic)" |
+| `MODEL_PLACEHOLDER_M12` | Claude Opus 4.5 (T) | 1012 | ⚠️ | "no longer available, switch to 4.6" |
+| `MODEL_PLACEHOLDER_M8` | Gemini 3 Pro (High) | 1007 | ✅ | "Gemini 2.0 Flash" |
+| `MODEL_PLACEHOLDER_M18` | Gemini 3 Flash | 1018 | ✅ | "Claude 3.5 Sonnet" |
+| `MODEL_OPENAI_GPT_OSS_120B_MEDIUM` | GPT-OSS 120B | — | ❌ 500 | — |
 
-1. ~~LS API 経由で LLM テキスト生成~~ → **✅ 完了** (antigravity_client.py)
-2. ~~Python ラッパースクリプト化~~ → **✅ 完了** (AntigravityClient)
-3. ~~Ochēma MCP Backend 統合~~ → **✅ 完了** (cli.py → MCP Server)
+> enum ID は `userStatusProtoBinaryBase64` のデコードで取得。
 
-### 未着手
+---
 
-1. **別モデルテスト**: Opus 4.6 (`MODEL_PLACEHOLDER_M26`), Gemini 3 Pro で動作確認
-2. **ストリーミング対応**: `StreamCascadeReactiveUpdates` でリアルタイム応答取得
-3. **Extension Server モック**: 最小 HTTP OAuth → Standalone LS の認証解決
-4. **project ID 特定**: LS の OAuth フローを strace/mitmproxy で傍受し、project ID を抽出
+## 17. ストリーミング調査結果
 
-### Cortex 直叩き (未解決)
+### StreamCascadePanelReactiveUpdates
 
-- **project ID 問題**: LS 内部でしか取得できない。`OnboardUserResponse` の傍受が必要
-- **proto descriptor**: LS バイナリから FileDescriptorSet を抽出すれば grpcurl で正式な呼び出しが可能
+- **ConnectRPC binary envelope** (5-byte header + protobuf payload)
+- `application/connect+json` → `"protocol error: promised 576938355 bytes"` (protobuf 形式を要求)
+- `application/grpc-web+json` → 空レスポンス
+- **curl からの直接利用は困難**
+
+### 実用的代替: ポーリング
+
+`antigravity_client.py` の `_poll_response()` が既に実装済み:
+
+- Step 4 (`GetCascadeTrajectorySteps`) を 1 秒間隔でポーリング
+- `CORTEX_STEP_STATUS_DONE` + `TURN_STATE_WAITING_FOR_USER` で完了判定
+
+真の SSE ストリーミングは ConnectRPC Python ライブラリが必要 → 低優先度。
+
+---
+
+## 18. Project ID 傍受結果
+
+### 試行と結果
+
+| 方法 | 結果 |
+|:-----|:-----|
+| `state.vscdb` 全キー検索 | project/companion キーなし |
+| `userStatusProtoBinaryBase64` デコード | モデル enum + プラン情報のみ |
+| `GetUserStatus` API | project フィールドなし |
+| `GetUserDefinedCloudaicompanionProject` 呼出 | 404 (LS 内部関数、非公開) |
+| `GetSubscriptionStatus` / `OnboardUser` | エンドポイント不在 |
+| LS プロセスメモリスキャン (226MB) | `projects/` パターン 0 件 |
+| LLM 呼出中メモリスキャン | `cloudaicompanion` パターン 0 件 |
+
+### 結論
+
+Project ID は **Go ランタイムの GC 管理下のメモリ**にのみ存在。
+文字列検索では捕捉不可能 (protobuf バイナリエンコード + Go 内部構造体)。
+
+**LS 経由 4-Step フローが唯一の実用ルート** — Cortex 直叩きは **永久に不可能** ではないが、
+proto descriptor の抽出 + mitmproxy による TLS 復号が必要で、投資対効果が低い。
+
+---
+
+## 19. 次のステップ
+
+### 完了済み
+
+1. ~~LS API 経由 LLM テキスト生成~~ → ✅
+2. ~~Python ラッパー~~ → ✅ (antigravity_client.py)
+3. ~~MCP 統合~~ → ✅ (cli.py → Ochēma MCP Server)
+4. ~~別モデルテスト~~ → ✅ (5/8 成功)
+5. ~~ストリーミング調査~~ → ✅ (ポーリング方式で実質完了)
+6. ~~project ID 傍受~~ → ❌ (Go GC 管理下、断念)
+
+### 残課題 (低優先度)
+
+- **Extension Server モック**: 最小 HTTP OAuth → Standalone LS の認証解決
+- **proto descriptor 抽出**: LS バイナリから FileDescriptorSet → grpcurl 正式呼出
+- **ConnectRPC Python ライブラリ**: 真の SSE ストリーミング実装
 
 ---
 
 *Created 2026-02-13 — Ochēma IDE Hack Series*
-*v2 — Cloud Backend 認証フロー解明 + LS API 141メソッド + 三層認証構造 追加 (2026-02-13)*
+*v2 — Cloud Backend 認証フロー + LS API 141メソッド + 三層認証構造 (2026-02-13)*
 *v3 — 4-Step LLM フルフロー成功 + Cortex API 直叩き結果 + Python 実装完了 (2026-02-13)*
+*v4 — 別モデルテスト + ストリーミング調査 + project ID 傍受 + enum ID マッピング (2026-02-13)*

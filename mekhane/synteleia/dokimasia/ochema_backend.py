@@ -1,71 +1,84 @@
 # PROOF: [L2/Dokimasia] <- mekhane/synteleia/dokimasia/ Ochema Backend Test
-# PURPOSE: [L2-auto] Ochema Backend のモックおよびテスト用ユーティリティ
+# PURPOSE: Ochēma (AntigravityClient) 経由の LLM バックエンド
 """
-Ochema Backend Mock Module.
+OchemaBackend — Antigravity Language Server Bridge for Synteleia
 
-Ochema (Antigravity LS) との通信をシミュレートするバックエンドモック。
-本番環境での接続を行わずに統合テストを実行するために使用。
+AntigravityClient を使い、Ultra プランの LLM を Synteleia 監査に利用する。
+Strategy Pattern: LLMBackend の具象実装。
+
+Usage:
+    backend = OchemaBackend(model="MODEL_PLACEHOLDER_M8")  # Gemini 3 Pro
+    response = backend.query(prompt, context)
 """
 
-from typing import Dict, Any, Optional, List
 import json
-import uuid
-import time
-from dataclasses import dataclass, field
+from typing import Optional
 
-@dataclass
-class MockResponse:
-    """モックレスポンス"""
-    text: str
-    delay_ms: int = 100
-    error: Optional[str] = None
+from .semantic_agent import LLMBackend
 
-class OchemaBackendMock:
-    """Ochema Backend (Mock)"""
 
-    def __init__(self):
-        self._responses: Dict[str, MockResponse] = {}
-        self._history: List[Dict[str, Any]] = []
-        self._connected = False
+# PURPOSE: Ochēma (AntigravityClient) 経由の LLM バックエンド
+class OchemaBackend(LLMBackend):
+    """Ochēma (AntigravityClient) 経由の LLM バックエンド。
 
-    def connect(self) -> bool:
-        """接続シミュレーション"""
-        self._connected = True
-        return True
+    Antigravity IDE の Language Server に接続し、
+    Ultra プランで利用可能な LLM にクエリを送信する。
 
-    def disconnect(self):
-        """切断シミュレーション"""
-        self._connected = False
+    Available models:
+        - MODEL_PLACEHOLDER_M8: Gemini 3 Pro (100%)
+        - MODEL_PLACEHOLDER_M26: Claude Opus 4.6 Thinking (40%)
+        - MODEL_OPENAI_GPT_OSS_120B_MEDIUM: GPT-OSS 120B (40%)
+        - MODEL_CLAUDE_4_5_SONNET: Claude Sonnet 4.5 (40%)
+        - MODEL_PLACEHOLDER_M18: Gemini 3 Flash (100%)
+    """
 
-    def send_message(self, message: str, model: str = "default") -> Dict[str, Any]:
-        """メッセージ送信 (同期的に応答)"""
-        if not self._connected:
-            raise ConnectionError("Not connected to Ochema backend")
+    # PURPOSE: [L2-auto] 初期化: init__
+    def __init__(
+        self,
+        model: str = "MODEL_PLACEHOLDER_M8",  # Gemini 3 Pro
+        timeout: float = 60.0,
+        label: str = "",
+    ):
+        self.model = model
+        self.timeout = timeout
+        self.label = label or model
+        self._client = None
+        self._available: Optional[bool] = None
 
-        req_id = str(uuid.uuid4())
-        self._history.append({
-            "id": req_id,
-            "role": "user",
-            "content": message,
-            "timestamp": time.time()
-        })
+    # PURPOSE: LLM にクエリを送信
+    def query(self, prompt: str, context: str) -> str:
+        """Ochēma 経由で LLM にクエリを送信し、テキスト応答を返す。"""
+        client = self._get_client()
+        combined = f"{prompt}\n\n---\n\n## 監査対象\n\n{context}"
 
-        # 定義済み応答があれば返す、なければエコー
-        response = self._responses.get(message, MockResponse(text=f"Echo: {message}"))
+        response = client.ask(
+            message=combined,
+            model=self.model,
+            timeout=self.timeout,
+        )
 
-        if response.error:
-            raise RuntimeError(response.error)
+        return response.text
 
-        time.sleep(response.delay_ms / 1000.0)
+    # PURPOSE: バックエンドが利用可能か
+    def is_available(self) -> bool:
+        """AntigravityClient が接続可能かチェック。"""
+        if self._available is None:
+            try:
+                client = self._get_client()
+                client.get_status()
+                self._available = True
+            except Exception:
+                self._available = False
+        return self._available
 
-        return {
-            "id": str(uuid.uuid4()),
-            "reply_to": req_id,
-            "role": "assistant",
-            "content": response.text,
-            "model": model
-        }
+    # PURPOSE: AntigravityClient のシングルトン取得
+    def _get_client(self):
+        """AntigravityClient をシングルトンで取得。synteleia-sandbox WS に接続。"""
+        if self._client is None:
+            from mekhane.ochema.antigravity_client import AntigravityClient
+            self._client = AntigravityClient(workspace="synteleia-sandbox")
+        return self._client
 
-    def register_response(self, trigger: str, response: MockResponse):
-        """特定のメッセージに対する応答を登録"""
-        self._responses[trigger] = response
+    # PURPOSE: [L2-auto] 文字列表現: repr__
+    def __repr__(self) -> str:
+        return f"OchemaBackend(model={self.model!r}, label={self.label!r})"

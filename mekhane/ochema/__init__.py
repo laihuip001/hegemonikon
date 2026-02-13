@@ -1,33 +1,7 @@
 # PROOF: [L2/Antigravity] <- mekhane/ochema/ Antigravity Client Package
-# PURPOSE: Antigravity LS との連携クライアントパッケージ
-"""
-Mekhane Ochema — Antigravity Language Server Client.
+# PURPOSE: Ochēma パッケージ — Antigravity LS クライアント
+"""Ochēma (ὄχημα) — Antigravity Language Server Client Package."""
 
-AI-driven development platform 'Antigravity' (Codeium) の
-Language Server に対して非公式に接続し、LLM 推論能力を活用する
-ためのクライアントライブラリ。
+from mekhane.ochema.antigravity_client import AntigravityClient, LLMResponse
 
-Modules:
-    - antigravity_client: メインクライアント実装
-    - proto: プロトコル定数とヘルパー
-    - cli: コマンドラインインターフェース
-
-Disclaimer: Experimental.
-"""
-
-from .antigravity_client import AntigravityClient, LLMResponse
-from .proto import (
-    DEFAULT_MODEL,
-    DEFAULT_TIMEOUT,
-    RPC_START_CASCADE,
-    RPC_SEND_MESSAGE,
-)
-
-__all__ = [
-    "AntigravityClient",
-    "LLMResponse",
-    "DEFAULT_MODEL",
-    "DEFAULT_TIMEOUT",
-    "RPC_START_CASCADE",
-    "RPC_SEND_MESSAGE",
-]
+__all__ = ["AntigravityClient", "LLMResponse"]

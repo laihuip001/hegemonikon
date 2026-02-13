@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: K1 (Eukairia) <- mekhane/pks/tests/test_pks_e2e.py
 # PURPOSE: PKS v2 E2E シナリオテスト
 """
 PKS v2 End-to-End シナリオテスト

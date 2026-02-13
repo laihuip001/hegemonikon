@@ -84,6 +84,12 @@ tools:
     description: "Autophōnos ヘルスチェック"
     timeout_seconds: 60     # Embedder ロードに時間がかかる
 
+  hgk_pks_search:
+    description: "全インデックス横断検索 (34K+ docs)"
+    max_query_size: 500
+    max_results: 20
+    timeout_seconds: 120    # Embedder + 横断検索
+
 # セキュリティポリシー
 security:
   token_expiry_seconds: 86400   # C-4: 24 hours

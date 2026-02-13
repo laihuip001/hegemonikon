@@ -40,6 +40,58 @@ def _load_env():
 _load_env()
 
 
+def _get_secret(key: str) -> Optional[str]:
+    """Secret アクセスの一元化 (W08 Secret Sprawl 対策)
+    
+    全ての API キー・認証情報はこの関数経由で取得する。
+    散在する os.environ.get を排除し、将来的な Secret Manager
+    統合のフックポイントとする。
+    """
+    # TODO: Secret Manager (GCP/AWS) 統合時はここを変更
+    return os.environ.get(key)
+
+
+class _ProviderCircuitBreaker:
+    """メモリ内 Circuit Breaker (W06 Cascade Failure 対策)
+    
+    プロバイダーの連続失敗を追跡し、閾値を超えたら
+    一定期間スキップする。全プロバイダー不調時の
+    3連試行の無駄を排除。
+    """
+    
+    def __init__(self, failure_threshold: int = 3, cooldown_seconds: float = 60.0):
+        self._failures: Dict[str, int] = {}
+        self._open_until: Dict[str, float] = {}
+        self._threshold = failure_threshold
+        self._cooldown = cooldown_seconds
+    
+    def is_open(self, provider: str) -> bool:
+        """Circuit が開いている (= スキップすべき) か"""
+        until = self._open_until.get(provider, 0)
+        if time.time() < until:
+            return True
+        # cooldown 経過 → リセット
+        if provider in self._open_until and time.time() >= until:
+            self._failures[provider] = 0
+            self._open_until.pop(provider, None)
+        return False
+    
+    def record_failure(self, provider: str) -> None:
+        """失敗を記録。閾値超過で Circuit を開く"""
+        self._failures[provider] = self._failures.get(provider, 0) + 1
+        if self._failures[provider] >= self._threshold:
+            self._open_until[provider] = time.time() + self._cooldown
+    
+    def record_success(self, provider: str) -> None:
+        """成功で Circuit をリセット"""
+        self._failures[provider] = 0
+        self._open_until.pop(provider, None)
+
+
+# Module-level circuit breaker instance
+_circuit_breaker = _ProviderCircuitBreaker()
+
+
 # =============================================================================
 # Model Registry — 設定駆動のモデルカタログ
 # =============================================================================
@@ -239,30 +291,57 @@ class LMQLExecutor:
         context: str,
         variables: Dict[str, Any]
     ) -> ExecutionResult:
-        """LMQL ライブラリを使用して実行"""
+        """LMQL ライブラリを使用して実行
+        
+        G07 安全化: exec() を compile() + 制限された名前空間で実行。
+        __builtins__ を制限し、危険な操作 (os, subprocess, sys) を
+        名前空間から排除する。
+        """
         import lmql
         
-        # LMQL コードを実行可能な形式に変換
-        # (compile_ccl の出力は文字列なので、exec で実行)
-        local_vars = {"lmql": lmql, "context": context, **variables}
+        # 制限された名前空間 — 必要最小限のみ許可
+        _SAFE_BUILTINS = {
+            "True": True, "False": False, "None": None,
+            "str": str, "int": int, "float": float, "bool": bool,
+            "list": list, "dict": dict, "tuple": tuple, "set": set,
+            "len": len, "range": range, "enumerate": enumerate,
+            "zip": zip, "map": map, "filter": filter,
+            "isinstance": isinstance, "print": print,
+            "min": min, "max": max, "sum": sum, "abs": abs,
+        }
+        
+        safe_globals = {
+            "__builtins__": _SAFE_BUILTINS,
+            "lmql": lmql,
+            "context": context,
+        }
+        safe_locals = {**variables}
         
         try:
-            exec(lmql_code, local_vars)
+            # compile() で構文チェック → 制限された名前空間で実行
+            compiled = compile(lmql_code, "<ccl_lmql>", "exec")
+            exec(compiled, safe_globals, safe_locals)  # noqa: S102
             
             # 関数を探して実行
-            for name, obj in local_vars.items():
+            for name, obj in safe_locals.items():
                 if callable(obj) and name.startswith("ccl_"):
                     result = await obj(context)
                     return ExecutionResult(
                         status=ExecutionStatus.SUCCESS,
                         output=str(result),
-                        metadata={"function": name}
+                        metadata={"function": name, "sandbox": True}
                     )
             
             return ExecutionResult(
                 status=ExecutionStatus.ERROR,
                 output="",
                 error="No executable CCL function found in LMQL code"
+            )
+        except SyntaxError as e:
+            return ExecutionResult(
+                status=ExecutionStatus.ERROR,
+                output="",
+                error=f"LMQL syntax error: {e}"
             )
         except Exception as e:
             return ExecutionResult(
@@ -354,24 +433,24 @@ class LMQLExecutor:
             elif provider == "vertex-openai":
                 return await self._execute_vertex_openai(full_prompt, model_info)
             elif provider == "anthropic":
-                key = os.environ.get("ANTHROPIC_API_KEY")
+                key = _get_secret("ANTHROPIC_API_KEY")
                 if key:
                     return await self._execute_anthropic(full_prompt, key, model_info.get("model_id"))
             elif provider == "google":
-                key = os.environ.get("GOOGLE_API_KEY")
+                key = _get_secret("GOOGLE_API_KEY")
                 if key:
                     return await self._execute_google(full_prompt, key, model_info.get("model_id"))
             elif provider == "openai":
-                key = self.config.api_key or os.environ.get("OPENAI_API_KEY")
+                key = self.config.api_key or _get_secret("OPENAI_API_KEY")
                 if key:
                     return await self._execute_openai(full_prompt, key, model_info.get("model_id"))
             # 指定プロバイダー失敗 → auto フォールバックへ
         
         # --- Auto モード: 順に試行 ---
         providers = []
-        anthropic_key = os.environ.get("ANTHROPIC_API_KEY")
-        google_key = os.environ.get("GOOGLE_API_KEY")
-        openai_key = self.config.api_key or os.environ.get("OPENAI_API_KEY")
+        anthropic_key = _get_secret("ANTHROPIC_API_KEY")
+        google_key = _get_secret("GOOGLE_API_KEY")
+        openai_key = self.config.api_key or _get_secret("OPENAI_API_KEY")
         
         if anthropic_key:
             providers.append(("anthropic", anthropic_key, self._execute_anthropic))
@@ -389,9 +468,16 @@ class LMQLExecutor:
         
         errors = []
         for provider_name, key, executor_fn in providers:
+            # W06: Circuit Breaker — 連続失敗中のプロバイダーをスキップ
+            if _circuit_breaker.is_open(provider_name):
+                errors.append(f"{provider_name}: circuit open (cooldown)")
+                continue
+            
             result = await executor_fn(full_prompt, key)
             if result.status == ExecutionStatus.SUCCESS:
+                _circuit_breaker.record_success(provider_name)
                 return result
+            _circuit_breaker.record_failure(provider_name)
             errors.append(f"{provider_name}: {result.error}")
         
         # 全プロバイダー失敗
@@ -597,7 +683,7 @@ class LMQLExecutor:
                 error="anthropic[vertex] not installed. Run: pip install 'anthropic[vertex]'"
             )
         
-        project_id = os.environ.get("GOOGLE_CLOUD_PROJECT")
+        project_id = _get_secret("GOOGLE_CLOUD_PROJECT")
         if not project_id:
             return ExecutionResult(
                 status=ExecutionStatus.ERROR,

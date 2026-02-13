@@ -54,7 +54,8 @@ class CCLParser:
     
     # 二項演算子優先順位 (低い方が先に処理)
     # ~* と ~! は ~ より先にマッチさせる（長いトークン優先）
-    BINARY_OPS_PRIORITY = ['||', '|>', '_', '~*', '~!', '~', '*^', '*', '>>']
+    # *% は * より先にマッチさせる（長いトークン優先）
+    BINARY_OPS_PRIORITY = ['||', '|>', '_', '~*', '~!', '~', '*^', '*%', '*', '%', '>>']
     
     # PURPOSE: Initialize instance
     def __init__(self):
@@ -222,11 +223,21 @@ class CCLParser:
             left = self._parse_expression(parts[0])
             right = self._parse_expression('*^'.join(parts[1:]))
             return Fusion(left=left, right=right, meta_display=True)
+        elif op == '*%':
+            # 内積+外積 (fuse_outer)
+            left = self._parse_expression(parts[0])
+            right = self._parse_expression('*%'.join(parts[1:]))
+            return Fusion(left=left, right=right, fuse_outer=True)
         elif op == '*':
-            # 融合
+            # 融合 (内積)
             left = self._parse_expression(parts[0])
             right = self._parse_expression('*'.join(parts[1:]))
             return Fusion(left=left, right=right, meta_display=False)
+        elif op == '%':
+            # 外積 (テンソル展開)
+            left = self._parse_expression(parts[0])
+            right = self._parse_expression('%'.join(parts[1:]))
+            return Fusion(left=left, right=right, outer_product=True)
         elif op == '>>':
             # 収束ループ
             body = self._parse_expression(parts[0])
@@ -667,6 +678,10 @@ if __name__ == "__main__":
         "/noe+ |> /dia+ |> /ene",
         "/noe+ || /dia+",
         "/noe+ || /dia+ || /ene",
+        # % / *% 演算子
+        "/noe+*%/dia+",
+        "/noe % /dia",
+        "/noe+*%/dia+_/ene",
         "(/noe+ || /dia+) |> /ene",
     ]
     

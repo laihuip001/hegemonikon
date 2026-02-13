@@ -30,7 +30,9 @@ class OpType(Enum):
     EXPAND = auto()      # ! 全展開
     
     # Tier 2: 二項演算子 (合成)
-    FUSE = auto()        # * 融合
+    FUSE = auto()        # * 融合 (内積)
+    OUTER = auto()       # % 外積 (テンソル展開)
+    FUSE_OUTER = auto()  # *% 内積+外積
     OSC = auto()         # ~ 振動
     SEQ = auto()         # _ シーケンス
     COLIMIT = auto()     # \ Colimit (展開・発散)
@@ -106,13 +108,20 @@ class Sequence:
 
 @dataclass
 class Fusion:
-    """融合: A * B
+    """融合: A * B, A % B (外積), A *% B (内積+外積)
     
-    例: /noe * /dia
+    例: /noe * /dia, /noe % /dia, /noe+*%/dia+
+    
+    Markov圏対応:
+        * = inner product (⟨−,−⟩)
+        % = outer product (⊗ tensor expansion, copy morphism)
+        *% = inner+outer product (収束+展開の同時操作)
     """
     left: Any
     right: Any
     meta_display: bool = False           # *^ のメタ表示フラグ
+    outer_product: bool = False          # % の外積フラグ
+    fuse_outer: bool = False             # *% の内積+外積フラグ
 
 
 @dataclass

@@ -4,14 +4,14 @@ version: "6.0.0"
 tier: "KERNEL"
 status: "CANONICAL"
 created: "2026-01-22"
-updated: "2026-02-07"
+updated: "2026-02-12"
 ---
 
 > **Kernel Doc Index**: [SACRED_TRUTH](SACRED_TRUTH.md) | [axiom_hierarchy](axiom_hierarchy.md) ← 📍 | [naming_conventions](naming_conventions.md)
 
-# 📐 公理階層構造 (Axiom Hierarchy) v2.1
+# 📐 公理階層構造 (Axiom Hierarchy) v3.0
 
-> **「予測誤差最小化から導出される認知の全体系」**
+> **「ひとつの原理から、不規則な真実が展開する」**
 
 ![Hegemonikón 公理階層構造](axiom_hierarchy_structure.png)
 
@@ -21,37 +21,71 @@ updated: "2026-02-07"
 
 | 項目 | 数 | 生成 |
 |------|---|------|
-| 公理 | **7** | 1+2+2+2 |
-| 定理 | **24** | 6×4 |
+| 公理 | **1** | FEP |
+| 定理¹ (座標) | **6** | 1+2+3 |
+| 定理² (認知機能) | **24** | 6×4 |
 | 関係 (Series内) | **36** | 6×6 (12D+12H+12X) |
 | 関係 (Series間) | **72** | 9×8 |
-| **体系核** | **96** | 7+24+72 (不変) |
+| **体系核** | **103** | 1+6+24+72 |
 | **関係総計** | **108** | 36+72 |
 
 ---
 
-## 公理体系（7軸）
+## 公理 (1)
+
+| Level | Question | 公理 | 意味 |
+|-------|----------|------|------|
+| **L0** | **What** | **FEP** | 予測誤差最小化 — 唯一の公理 |
+
+---
+
+## 定理¹: 座標 (6 = 1+2+3)
+
+> **導出原理**: FEP から導かれる認知の座標軸。
+> **配分 1-2-3**: FEP からの導出距離による。不規則だが真実。
+
+### 導出距離の操作的定義
+
+> **距離 d = FEP に対する追加仮定の個数**
+
+| 距離 | 意味 | 追加仮定 |
+|:-----|:-----|:---------|
+| **d=0** | FEP を定式化した時点で既に含まれる構造 | なし (Markov blanket partition に内在) |
+| **d=1** | FEP + 1つの追加仮定で導出 | EFE の分解 (行動選択策の存在) |
+| **d=2** | FEP + 2つ以上の追加仮定で導出 | 階層性、感覚的偏好、実装詳細など |
+
+> **注**: 距離は厳密な公理的距離ではなく、導出の「近さ」を表す序数的指標。
+> `d=0` は FEP の**定義**から分離不能な構造、`d=1` は FEP から**1ステップ**で到達可能な構造。
 
 ```mermaid
 graph TD
-    subgraph "公理体系"
-        L0["L0: What — FEP"]
-        L1["L1: Who/Why — Flow, Value"]
-        L15["L1.5: Where-When/How — Scale, Function"]
-        L175["L1.75: Which/How much — Valence, Precision"]
-        L0 --> L1 --> L15 --> L175
+    subgraph "1 公理"
+        L0["L0: FEP — 唯一の公理"]
     end
+    subgraph "定理¹ (6 = 1+2+3)"
+        D0["距離0: Flow"]
+        D1a["距離1: Value"]
+        D1b["距離1: Function"]
+        D2a["距離2: Scale"]
+        D2b["距離2: Valence"]
+        D2c["距離2: Precision"]
+    end
+    L0 -->|"内在"| D0
+    L0 -->|"EFE分解"| D1a
+    L0 -->|"EFE分解"| D1b
+    D0 -->|"階層仮定"| D2a
+    D1a -->|"勾配符号"| D2b
+    D1b -->|"逆分散"| D2c
 ```
 
-| Level | Question | Axiom | Opposition |
-|-------|----------|-------|------------|
-| L0 | What | FEP | 予測誤差最小化 |
-| L1 | Who | Flow | I (推論) ↔ A (行為) |
-| L1 | Why | Value | E (認識) ↔ P (実用) |
-| L1.5 | Where/When | Scale | Micro ↔ Macro |
-| L1.5 | How | Function | Explore ↔ Exploit |
-| L1.75 | Which | Valence | + ↔ - |
-| L1.75 | How much | Precision | C ↔ U |
+| 距離 | Question | 定理¹ | Opposition | 導出 |
+|:-----|----------|-------|------------|------|
+| **0** | Who | Flow | I (推論) ↔ A (行為) | Markov blanket の partition に内在 |
+| **1** | Why | Value | E (認識) ↔ P (実用) | EFE の分解 |
+| **1** | How | Function | Explore ↔ Exploit | EFE による行動選択 |
+| **2** | Where/When | Scale | Micro ↔ Macro | 階層的生成モデルの仮定 |
+| **2** | Which | Valence | + ↔ - | 自由エネルギー勾配の符号 |
+| **2** | How much | Precision | C ↔ U | 予測誤差の逆分散 π = V[ε]⁻¹ |
 
 ### L0 (FEP) の理論的含意
 
@@ -71,7 +105,33 @@ graph TD
 
 ---
 
-## 定理群（24 = 6×4）
+## なぜ 6 Series か — 定理²の生成規則
+
+> **原則**: 定理¹の6座標から2つを選んで「テンソル積」をとる。
+> ただし **距離0 (Flow) は全 Series の暗黙的基底** であり、ペア対象に含めない。
+
+### ペアリング規則
+
+残り5座標 (Value, Function, Scale, Valence, Precision) から、**同一距離または隣接距離の座標ペア** = 6通り:
+
+| Series | ペア | 距離 | 4定理 |
+|:-------|:-----|:-----|:------|
+| O (Ousia) | Value × Function | d1 × d1 | 2×2 = 4 |
+| S (Schema) | Value × Scale | d1 × d2 | 2×2 = 4 |
+| H (Hormē) | Value × Valence | d1 × d2 | 2×2 = 4 |
+| P (Perigraphē) | Scale × Function | d2 × d1 | 2×2 = 4 |
+| K (Kairos) | Scale × Valence | d2 × d2 | 2×2 = 4 |
+| A (Akribeia) | Valence × Precision | d2 × d2 | 2×2 = 4 |
+
+> **なぜ C(5,2)=10 ではなく 6 か**: 距離差 ≤ 1 のペアのみ。
+> Value×Precision (d1×d2=1), Function×Valence (d1×d2=1) は距離1で許容されるが、
+> 歴史的に Flow の Opposition (I/A) が各 Series の「行」を決定するため、
+> L1 側の座標 = 列の決定子として設計されている。
+> → 結果として6通りに収束する。
+
+---
+
+## 定理²: 認知機能（24 = 6×4）
 
 ### Poiēsis: 内容の具現化（生成層12）
 
@@ -219,6 +279,14 @@ graph TD
 | ネストした MB | Kirchhoff et al. 2018 (J.R.Soc.Interface 15:20170792) | P₁ (Khōra) = blankets of blankets |
 | mere vs adaptive AI | Kirchhoff et al. 2018 | temporal depth = 自律性の必要条件 |
 | Replay と forgetting 耐性 | Spisak & Friston 2025 | /boot replay ≈ resting state attractor replay |
+| **Valence の独立座標性** | **Seth & Critchley 2013 (BBS)** | **Valence = 内受容予測誤差の符号。Value の属性ではなく身体の独立信号** |
+
+> **Valence が独立座標である根拠** (Seth & Critchley 2013, 152 citations):
+> 情動 (emotion) は内受容的予測符号化 (interoceptive predictive coding) の産物。
+> 即ち、内臓・自律神経系からの予測誤差の**方向** (+接近 / -回避) が Valence を構成する。
+> これは Value (認識的/実用的目的) とは独立した生理的信号であり、
+> FEP の枠組みでは内受容的生成モデルの**勾配の符号**として形式化される。
+> → Valence は Value の「属性」ではなく、身体からの独立した座標軸。
 
 ---
 
@@ -231,4 +299,4 @@ graph TD
 
 ---
 
-*Hegemonikón v3.1 — 96要素体系 + 36 Series内関係 + 理論的基盤 (2026-02-11)*
+*Hegemonikón v3.1-axiom — 1公理+6定理¹(1-2-3) + 24定理² + 108関係。導出距離の操作的定義・Valence根拠(Seth 2013)・6 Series生成規則を明文化 (2026-02-12)*

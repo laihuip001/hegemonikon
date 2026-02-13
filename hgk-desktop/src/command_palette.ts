@@ -24,13 +24,13 @@ let wfCache: WFSummary[] = [];
 function createPaletteHTML(): string {
   return `
     <div class="cp-overlay" id="cp-overlay">
-      <div class="cp-dialog">
+      <div class="cp-dialog" role="dialog" aria-modal="true" aria-label="Command Palette">
         <div class="cp-input-wrapper">
           <span class="cp-icon">⌘</span>
-          <input type="text" id="cp-input" class="cp-input" placeholder="Type a workflow name or CCL expression..." autocomplete="off" />
+          <input type="text" id="cp-input" class="cp-input" placeholder="Type a workflow name or CCL expression..." autocomplete="off" role="combobox" aria-expanded="true" aria-haspopup="listbox" aria-controls="cp-results" />
           <kbd class="cp-kbd">ESC</kbd>
         </div>
-        <div class="cp-results" id="cp-results"></div>
+        <div class="cp-results" id="cp-results" role="listbox"></div>
         <div class="cp-footer">
           <span>↑↓ Navigate</span>
           <span>↵ Execute</span>
@@ -48,7 +48,13 @@ function renderWFItems(items: WFSummary[]): string {
     return '<div class="cp-empty">No matching workflows</div>';
   }
   return items.map((wf, i) => `
-    <div class="cp-item ${i === 0 ? 'cp-item-active' : ''}" data-idx="${i}" data-name="${esc(wf.name)}" data-ccl="${esc(wf.ccl)}">
+    <div class="cp-item ${i === 0 ? 'cp-item-active' : ''}"
+         id="cp-item-${i}"
+         role="option"
+         aria-selected="${i === 0}"
+         data-idx="${i}"
+         data-name="${esc(wf.name)}"
+         data-ccl="${esc(wf.ccl)}">
       <div class="cp-item-header">
         <span class="cp-item-name">/${esc(wf.name)}</span>
         ${wf.ccl ? `<span class="cp-item-ccl">${esc(wf.ccl)}</span>` : ''}
@@ -237,10 +243,26 @@ let activeIdx = 0;
 function updateActive(resultsEl: HTMLElement, delta: number): void {
   const items = resultsEl.querySelectorAll('.cp-item');
   if (items.length === 0) return;
-  items[activeIdx]?.classList.remove('cp-item-active');
+
+  const current = items[activeIdx] as HTMLElement;
+  if (current) {
+    current.classList.remove('cp-item-active');
+    current.setAttribute('aria-selected', 'false');
+  }
+
   activeIdx = Math.max(0, Math.min(items.length - 1, activeIdx + delta));
-  items[activeIdx]?.classList.add('cp-item-active');
-  (items[activeIdx] as HTMLElement)?.scrollIntoView({ block: 'nearest' });
+
+  const next = items[activeIdx] as HTMLElement;
+  if (next) {
+    next.classList.add('cp-item-active');
+    next.setAttribute('aria-selected', 'true');
+    next.scrollIntoView({ block: 'nearest' });
+
+    const input = document.getElementById('cp-input');
+    if (input) {
+      input.setAttribute('aria-activedescendant', next.id);
+    }
+  }
 }
 
 async function handleInput(input: HTMLInputElement, resultsEl: HTMLElement): Promise<void> {
@@ -287,6 +309,12 @@ async function handleInput(input: HTMLInputElement, resultsEl: HTMLElement): Pro
   const filtered = filterWorkflows(val);
   activeIdx = 0;
   resultsEl.innerHTML = renderWFItems(filtered);
+
+  if (filtered.length > 0) {
+    input.setAttribute('aria-activedescendant', 'cp-item-0');
+  } else {
+    input.removeAttribute('aria-activedescendant');
+  }
 
   // Click handlers
   resultsEl.querySelectorAll('.cp-item').forEach(item => {

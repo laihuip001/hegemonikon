@@ -14,6 +14,15 @@ CRITICAL: This file follows MCP stdio protocol rules:
 import sys
 import os
 
+# ============ CRITICAL: Network isolation for MCP server ============
+# Prevent Embedder from reaching HuggingFace through dead proxies.
+# Models are cached locally in ~/.cache/huggingface/hub/
+os.environ["HF_HUB_OFFLINE"] = "1"
+os.environ["TRANSFORMERS_OFFLINE"] = "1"
+# Clear proxy env vars that may point to dead mitmdump instances
+for _proxy_var in ("HTTP_PROXY", "HTTPS_PROXY", "http_proxy", "https_proxy"):
+    os.environ.pop(_proxy_var, None)
+
 # ============ CRITICAL: Platform-specific asyncio setup ============
 # Must be done BEFORE any other imports that might use asyncio
 if sys.platform == "win32":
@@ -157,13 +166,14 @@ async def call_tool(name: str, arguments: dict):
             return [TextContent(type="text", text="Error: query is required")]
 
         try:
-            # Lazy import with stdout suppression
+            # Suppress stdout during import, init, AND search
+            # Embedder prints to stdout during model loading
             with StdoutSuppressor():
                 from mekhane.anamnesis.index import GnosisIndex
 
-            log(f"Searching for: {query}")
-            index = GnosisIndex()
-            results = index.search(query, k=limit)
+                log(f"Searching for: {query}")
+                index = GnosisIndex()
+                results = index.search(query, k=limit)
 
             if not results:
                 return [TextContent(type="text", text=f"No results found for: {query}")]
@@ -176,10 +186,14 @@ async def call_tool(name: str, arguments: dict):
                 output_lines.append(f"## [{i}] {r.get('title', 'Untitled')}")
                 output_lines.append(f"- **Source**: {r.get('source', 'Unknown')}")
                 output_lines.append(f"- **Citations**: {r.get('citations', 'N/A')}")
-                output_lines.append(
-                    f"- **Authors**: {r.get('authors', 'Unknown')[:100]}..."
-                )
-                output_lines.append(f"- **Abstract**: {r.get('abstract', '')[:300]}...")
+                authors = r.get('authors', 'Unknown')
+                if isinstance(authors, str):
+                    authors = authors[:100]
+                output_lines.append(f"- **Authors**: {authors}")
+                abstract = r.get('abstract', '')
+                if isinstance(abstract, str):
+                    abstract = abstract[:300]
+                output_lines.append(f"- **Abstract**: {abstract}...")
                 if r.get("url"):
                     output_lines.append(f"- **URL**: {r.get('url')}")
                 output_lines.append("")
@@ -196,9 +210,9 @@ async def call_tool(name: str, arguments: dict):
             with StdoutSuppressor():
                 from mekhane.anamnesis.index import GnosisIndex
 
-            log("Getting stats...")
-            index = GnosisIndex()
-            stats = index.stats()
+                log("Getting stats...")
+                index = GnosisIndex()
+                stats = index.stats()
 
             output_lines = ["# Gnōsis Knowledge Base Statistics\n"]
             output_lines.append(f"- **Total Papers**: {stats.get('total', 0)}")

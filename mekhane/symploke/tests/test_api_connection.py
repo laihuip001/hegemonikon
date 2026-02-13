@@ -1,5 +1,4 @@
 # PROOF: [L3/テスト] <- mekhane/symploke/tests/ 対象モジュールが存在→検証が必要→test_api_connection が担う
-#!/usr/bin/env python3
 """
 Quick API connection test for Jules API.
 Tests if the API key is valid and can connect to Jules.
@@ -7,11 +6,8 @@ Tests if the API key is valid and can connect to Jules.
 
 import asyncio
 import os
-import sys
 import pytest
-
-# Add parent to path
-sys.path.insert(0, "/home/makaron8426/oikos/hegemonikon")
+import aiohttp
 
 from mekhane.symploke.jules_client import JulesClient
 
@@ -30,17 +26,12 @@ async def test_connection():
     print("-" * 50)
 
     try:
-        import aiohttp
-
         headers = {"X-Goog-Api-Key": api_key, "Content-Type": "application/json"}
 
-        async with aiohttp.ClientSession() as session:
+        async with aiohttp.ClientSession(headers=headers) as session:
             # Test 1: Get sources (repos)
             print("\n[Test 1] Getting sources...")
-            async with session.get(
-                "https://jules.googleapis.com/v1alpha/sources",
-                # NOTE: Removed self-assignment: headers = headers
-            ) as resp:
+            async with session.get("https://jules.googleapis.com/v1alpha/sources") as resp:
                 print(f"  Status: {resp.status}")
                 if resp.status == 200:
                     data = await resp.json()
@@ -54,10 +45,7 @@ async def test_connection():
 
             # Test 2: Get sessions (should work even if empty)
             print("\n[Test 2] Getting sessions...")
-            async with session.get(
-                "https://jules.googleapis.com/v1alpha/sessions",
-                # NOTE: Removed self-assignment: headers = headers
-            ) as resp:
+            async with session.get("https://jules.googleapis.com/v1alpha/sessions") as resp:
                 print(f"  Status: {resp.status}")
                 if resp.status == 200:
                     data = await resp.json()
@@ -72,8 +60,3 @@ async def test_connection():
     except Exception as e:
         print(f"❌ Error: {e}")
         return False
-
-
-if __name__ == "__main__":
-    result = asyncio.run(test_connection())
-    sys.exit(0 if result else 1)

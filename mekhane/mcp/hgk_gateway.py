@@ -189,6 +189,7 @@ def _estimate_input_size(*args: Any, **kwargs: Any) -> int:
 
 
 # PURPOSE: ツール関数にトレースを自動付与するデコレータ
+# PURPOSE: [L2-auto] ツール関数にトレースを自動付与するデコレータ
 def _traced(fn):
     """ツール関数にトレースを自動付与するデコレータ。
 

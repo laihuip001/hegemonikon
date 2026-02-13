@@ -45,7 +45,7 @@ jobs:
                   # 1. Install standard dependencies from PyPI
                   pip install pytest pytest-asyncio pytest-timeout pyyaml pydantic lancedb numpy scipy \
                               networkx pandas tabulate requests httpx schedule \
-                              sentence-transformers aiohttp
+                              sentence-transformers aiohttp python-dotenv
                   # 2. Install PyTorch CPU wheels from PyTorch index
                   pip install torch --index-url https://download.pytorch.org/whl/cpu
                   # Install project in development mode if setup exists

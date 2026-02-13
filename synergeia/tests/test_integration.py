@@ -12,14 +12,17 @@ import pytest
 from pathlib import Path
 
 
+# PURPOSE: [L2-auto] Hermeneus 統合テスト
 class TestHermeneusIntegration:
     """Hermeneus 統合テスト"""
     
+    # PURPOSE: [L2-auto] Hermeneus がインポート可能
     def test_hermeneus_available(self):
         """Hermeneus がインポート可能"""
         from synergeia.coordinator import HERMENEUS_AVAILABLE
         assert HERMENEUS_AVAILABLE is True
     
+    # PURPOSE: [L2-auto] 標準マクロがロードされている
     def test_standard_macros_loaded(self):
         """標準マクロがロードされている"""
         from synergeia.coordinator import STANDARD_MACROS
@@ -27,6 +30,7 @@ class TestHermeneusIntegration:
         assert "think" in STANDARD_MACROS
         assert "scoped" in STANDARD_MACROS
     
+    # PURPOSE: [L2-auto] CCL を LMQL にコンパイル
     def test_execute_hermeneus_compile(self):
         """CCL を LMQL にコンパイル"""
         from synergeia.coordinator import execute_hermeneus
@@ -35,6 +39,7 @@ class TestHermeneusIntegration:
         assert "lmql" in result
         assert "macros_available" in result
     
+    # PURPOSE: [L2-auto] 収束ループをコンパイル
     def test_execute_hermeneus_with_convergence(self):
         """収束ループをコンパイル"""
         from synergeia.coordinator import execute_hermeneus
@@ -43,14 +48,17 @@ class TestHermeneusIntegration:
         assert result["ast_type"] == "ConvergenceLoop"
 
 
+# PURPOSE: [L2-auto] FEP Selector 統合テスト
 class TestFEPSelectorIntegration:
     """FEP Selector 統合テスト"""
     
+    # PURPOSE: [L2-auto] FEP Selector がインポート可能
     def test_fep_selector_available(self):
         """FEP Selector がインポート可能"""
         from synergeia.coordinator import FEP_SELECTOR_AVAILABLE
         assert FEP_SELECTOR_AVAILABLE is True
     
+    # PURPOSE: [L2-auto] FEP ベースのスレッド選択
     def test_select_thread_with_fep(self):
         """FEP ベースのスレッド選択"""
         from synergeia.coordinator import select_thread
@@ -63,6 +71,7 @@ class TestFEPSelectorIntegration:
         thread = select_thread("/s+ _ /ene")
         assert thread == "claude"
     
+    # PURPOSE: [L2-auto] FEP 無効時はルールベースにフォールバック
     def test_select_thread_fallback(self):
         """FEP 無効時はルールベースにフォールバック"""
         from synergeia.coordinator import select_thread
@@ -70,9 +79,11 @@ class TestFEPSelectorIntegration:
         assert thread == "antigravity"
 
 
+# PURPOSE: [L2-auto] マクロローダーテスト
 class TestMacroLoader:
     """マクロローダーテスト"""
     
+    # PURPOSE: [L2-auto] ccl/macros/ からマクロをロード
     def test_load_standard_macros(self):
         """ccl/macros/ からマクロをロード"""
         from hermeneus.src.macros import load_standard_macros
@@ -81,6 +92,7 @@ class TestMacroLoader:
         assert "scoped" in macros
         assert "validate" in macros
     
+    # PURPOSE: [L2-auto] ビルトイン + 標準マクロを結合
     def test_get_all_macros(self):
         """ビルトイン + 標準マクロを結合"""
         from hermeneus.src.macros import get_all_macros
@@ -91,6 +103,7 @@ class TestMacroLoader:
         # 標準
         assert "scoped" in macros
     
+    # PURPOSE: [L2-auto] マクロ定義の構造
     def test_macro_definition_structure(self):
         """マクロ定義の構造"""
         from hermeneus.src.macros import load_standard_macros, MacroDefinition
@@ -101,9 +114,11 @@ class TestMacroLoader:
             assert isinstance(macro.parameters, dict)
 
 
+# PURPOSE: [L2-auto] エンドツーエンドテスト
 class TestEndToEnd:
     """エンドツーエンドテスト"""
     
+    # PURPOSE: [L2-auto] CCL → FEP選択 → Hermeneus コンパイル
     def test_full_pipeline(self):
         """CCL → FEP選択 → Hermeneus コンパイル"""
         from synergeia.coordinator import select_thread, execute_hermeneus

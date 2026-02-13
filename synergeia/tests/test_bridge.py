@@ -22,19 +22,23 @@ from synergeia.bridge import (
 )
 
 
+# PURPOSE: [L2-auto] SynergeiaResult dataclass のテスト
 class TestSynergeiaResult:
     """SynergeiaResult dataclass のテスト"""
 
+    # PURPOSE: [L2-auto] test_success_result
     def test_success_result(self):
         r = SynergeiaResult(ccl="/noe+", status="success")
         assert r.is_success
         assert r.timestamp != ""
 
+    # PURPOSE: [L2-auto] test_error_result
     def test_error_result(self):
         r = SynergeiaResult(ccl="/noe+", status="error", error="fail")
         assert not r.is_success
         assert r.error == "fail"
 
+    # PURPOSE: [L2-auto] test_to_dict
     def test_to_dict(self):
         r = SynergeiaResult(ccl="/noe+", status="success", results=[{"a": 1}])
         d = r.to_dict()
@@ -43,11 +47,13 @@ class TestSynergeiaResult:
         assert len(d["results"]) == 1
 
 
+# PURPOSE: [L2-auto] dispatch() のテスト — 2段階アーキテクチャ
 class TestDispatch:
     """dispatch() のテスト — 2段階アーキテクチャ"""
 
     @patch("synergeia.bridge._execute_thread")
     @patch("synergeia.bridge.requests.post")
+    # PURPOSE: [L2-auto] Stage 1 (n8n routing) + Stage 2 (backend execution)
     def test_success_with_execution(self, mock_post, mock_exec):
         """Stage 1 (n8n routing) + Stage 2 (backend execution)"""
         # Stage 1: n8n returns routing info
@@ -78,6 +84,7 @@ class TestDispatch:
         mock_exec.assert_called_once_with("ochema", "/noe+", "", 120)
 
     @patch("synergeia.bridge.requests.post")
+    # PURPOSE: [L2-auto] execute=False でルーティングのみ
     def test_routing_only(self, mock_post):
         """execute=False でルーティングのみ"""
         mock_resp = MagicMock()
@@ -95,6 +102,7 @@ class TestDispatch:
 
     @patch("synergeia.bridge._local_fallback")
     @patch("synergeia.bridge.requests.post")
+    # PURPOSE: [L2-auto] n8n 不通時 → ローカルフォールバック
     def test_connection_error_fallback(self, mock_post, mock_fallback):
         """n8n 不通時 → ローカルフォールバック"""
         import requests as req
@@ -111,6 +119,7 @@ class TestDispatch:
         assert result.status == "error"
 
     @patch("synergeia.bridge.requests.post")
+    # PURPOSE: [L2-auto] test_timeout
     def test_timeout(self, mock_post):
         import requests as req
         mock_post.side_effect = req.exceptions.Timeout()
@@ -120,10 +129,12 @@ class TestDispatch:
         assert result.status == "timeout"
 
 
+# PURPOSE: [L2-auto] Stage 2: スレッド実行のテスト
 class TestThreadExecution:
     """Stage 2: スレッド実行のテスト"""
 
     @patch("synergeia.bridge._exec_hermeneus")
+    # PURPOSE: [L2-auto] test_hermeneus_thread
     def test_hermeneus_thread(self, mock_herm):
         from synergeia.bridge import _execute_thread
         mock_herm.return_value = {"thread": "hermeneus", "status": "success"}
@@ -133,6 +144,7 @@ class TestThreadExecution:
         assert result["thread"] == "hermeneus"
         mock_herm.assert_called_once()
 
+    # PURPOSE: [L2-auto] test_jules_deferred
     def test_jules_deferred(self):
         from synergeia.bridge import _exec_jules
 
@@ -142,10 +154,12 @@ class TestThreadExecution:
         assert result["status"] == "deferred"
 
 
+# PURPOSE: [L2-auto] dispatch_compile_only() のテスト
 class TestDispatchCompileOnly:
     """dispatch_compile_only() のテスト"""
 
     @patch("synergeia.bridge.requests.post")
+    # PURPOSE: [L2-auto] test_compile_only
     def test_compile_only(self, mock_post):
         mock_resp = MagicMock()
         mock_resp.ok = True
@@ -159,10 +173,12 @@ class TestDispatchCompileOnly:
         assert payload["mode"] == "compile_only"
 
 
+# PURPOSE: [L2-auto] health_check() のテスト
 class TestHealthCheck:
     """health_check() のテスト"""
 
     @patch("synergeia.bridge.requests.post")
+    # PURPOSE: [L2-auto] test_healthy
     def test_healthy(self, mock_post):
         mock_resp = MagicMock()
         mock_resp.ok = True
@@ -173,6 +189,7 @@ class TestHealthCheck:
         assert result["status"] == "ok"
 
     @patch("synergeia.bridge.requests.post")
+    # PURPOSE: [L2-auto] test_unreachable
     def test_unreachable(self, mock_post):
         import requests as req
         mock_post.side_effect = req.exceptions.ConnectionError()

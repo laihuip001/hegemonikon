@@ -103,6 +103,7 @@ THREAD_REGISTRY = {
 }
 
 
+# PURPOSE: [L2-auto] CCL要素から最適なスレッドを選択。
 def select_thread(ccl: str, use_fep: bool = True) -> str:
     """
     CCL要素から最適なスレッドを選択。
@@ -150,6 +151,7 @@ CODEX_CLI = "/home/makaron8426/oikos/hegemonikon/synergeia/node_modules/.bin/cod
 # Executors
 # =============================================================================
 
+# PURPOSE: [L2-auto] Perplexity API でCCLを実行。
 def execute_perplexity(ccl: str, context: str) -> Dict[str, Any]:
     """Perplexity API でCCLを実行。"""
     # CCLを検索クエリに変換
@@ -170,6 +172,7 @@ def execute_perplexity(ccl: str, context: str) -> Dict[str, Any]:
     }
 
 
+# PURPOSE: [L2-auto] Jules Pool でCCLを実行。
 def execute_jules(ccl: str, context: str) -> Dict[str, Any]:
     """Jules Pool でCCLを実行。"""
     try:
@@ -197,6 +200,7 @@ def execute_jules(ccl: str, context: str) -> Dict[str, Any]:
         return {"status": "error", "error": str(e), "ccl": ccl}
 
 
+# PURPOSE: [L2-auto] Gemini CLI でCCLを実行。
 def execute_gemini(ccl: str, context: str) -> Dict[str, Any]:
     """Gemini CLI でCCLを実行。"""
     import subprocess
@@ -241,6 +245,7 @@ Provide a detailed conceptual response without executing any tools."""
     }
 
 
+# PURPOSE: [L2-auto] OpenAI Codex CLI でCCLを実行。
 def execute_codex(ccl: str, context: str) -> Dict[str, Any]:
     """OpenAI Codex CLI でCCLを実行。"""
     import subprocess
@@ -274,6 +279,7 @@ def execute_codex(ccl: str, context: str) -> Dict[str, Any]:
     }
 
 
+# PURPOSE: [L2-auto] 手動実行 (Antigravity)。
 def execute_manual(ccl: str, context: str) -> Dict[str, Any]:
     """手動実行 (Antigravity)。"""
     return {
@@ -284,6 +290,7 @@ def execute_manual(ccl: str, context: str) -> Dict[str, Any]:
     }
 
 
+# PURPOSE: [L2-auto] Hermeneus CCL Compiler で実行。
 def execute_hermeneus(ccl: str, context: str, compile_only: bool = False) -> Dict[str, Any]:
     """
     Hermeneus CCL Compiler で実行。
@@ -383,6 +390,7 @@ Issues: {len(audit_result.all_issues)}
         }
 
 
+# PURPOSE: [L2-auto] CCL要素を適切なスレッドで実行。
 def execute_ccl(ccl: str, context: str, use_hermeneus: bool = True) -> Dict[str, Any]:
     """
     CCL要素を適切なスレッドで実行。
@@ -420,6 +428,7 @@ def execute_ccl(ccl: str, context: str, use_hermeneus: bool = True) -> Dict[str,
 # CCL Parser
 # =============================================================================
 
+# PURPOSE: [L2-auto] CCL式をパースして実行計画を生成。
 def parse_ccl(ccl_expr: str) -> Dict[str, Any]:
     """
     CCL式をパースして実行計画を生成。
@@ -450,6 +459,7 @@ def parse_ccl(ccl_expr: str) -> Dict[str, Any]:
 # Coordinator
 # =============================================================================
 
+# PURPOSE: [L2-auto] CCL式を解析し、分散実行を調整。
 def coordinate(ccl_expr: str, context: str = "") -> Dict[str, Any]:
     """
     CCL式を解析し、分散実行を調整。
@@ -496,6 +506,7 @@ def coordinate(ccl_expr: str, context: str = "") -> Dict[str, Any]:
     }
 
 
+# PURPOSE: [L2-auto] 結果を保存。
 def save_result(result: Dict[str, Any]):
     """結果を保存。"""
     EXPERIMENTS_DIR.mkdir(exist_ok=True)
@@ -508,6 +519,7 @@ def save_result(result: Dict[str, Any]):
     return log_file
 
 
+# PURPOSE: [L2-auto] main
 def main():
     if len(sys.argv) < 2:
         print(__doc__)

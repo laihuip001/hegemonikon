@@ -34,6 +34,7 @@ from coordinator import (
 )
 
 
+# PURPOSE: [L2-auto] 手動スレッドの結果を対話的に入力。
 def prompt_manual_input(ccl: str, context: str) -> Dict[str, Any]:
     """手動スレッドの結果を対話的に入力。"""
     print(f"\n{'='*60}")
@@ -68,6 +69,7 @@ def prompt_manual_input(ccl: str, context: str) -> Dict[str, Any]:
     }
 
 
+# PURPOSE: [L2-auto] CCLを実行 (自動または対話的手動)。
 def execute_ccl_interactive(ccl: str, context: str) -> Dict[str, Any]:
     """CCLを実行 (自動または対話的手動)。"""
     thread = select_thread(ccl)
@@ -84,6 +86,7 @@ def execute_ccl_interactive(ccl: str, context: str) -> Dict[str, Any]:
         return prompt_manual_input(ccl, context)
 
 
+# PURPOSE: [L2-auto] 対話的にCCLを分散実行。
 def coordinate_interactive(ccl_expr: str, context: str = "") -> Dict[str, Any]:
     """対話的にCCLを分散実行。"""
     plan = parse_ccl(ccl_expr)
@@ -135,6 +138,7 @@ def coordinate_interactive(ccl_expr: str, context: str = "") -> Dict[str, Any]:
     }
 
 
+# PURPOSE: [L2-auto] 結果を保存。
 def save_result(result: Dict[str, Any]) -> Path:
     """結果を保存。"""
     EXPERIMENTS_DIR.mkdir(exist_ok=True)
@@ -147,6 +151,7 @@ def save_result(result: Dict[str, Any]) -> Path:
     return log_file
 
 
+# PURPOSE: [L2-auto] main
 def main():
     if len(sys.argv) < 2:
         print(__doc__)

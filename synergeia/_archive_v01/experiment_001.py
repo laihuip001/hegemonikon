@@ -27,6 +27,7 @@ from perplexity_api import search
 EXPERIMENTS_DIR = Path(__file__).parent / "experiments"
 
 
+# PURPOSE: [L2-auto] /sop+ スレッドを実行。
 def run_sop_thread(query: str) -> dict:
     """
     /sop+ スレッドを実行。
@@ -54,6 +55,7 @@ def run_sop_thread(query: str) -> dict:
     }
 
 
+# PURPOSE: [L2-auto] 実験結果をログに保存。
 def save_experiment_log(experiment_id: str, results: dict):
     """実験結果をログに保存。"""
     EXPERIMENTS_DIR.mkdir(exist_ok=True)
@@ -64,6 +66,7 @@ def save_experiment_log(experiment_id: str, results: dict):
     print(f"[Synergeia] Experiment log saved: {log_file}")
 
 
+# PURPOSE: [L2-auto] Experiment 001: 並列実行テスト
 def main():
     """
     Experiment 001: 並列実行テスト

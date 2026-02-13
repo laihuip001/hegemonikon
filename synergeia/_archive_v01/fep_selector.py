@@ -27,6 +27,7 @@ except ImportError:
 
 
 @dataclass
+# PURPOSE: [L2-auto] スレッド推奨結果
 class ThreadRecommendation:
     """スレッド推奨結果"""
     thread: str
@@ -55,6 +56,7 @@ COMPLEXITY_THREAD_MAP = {
 }
 
 
+# PURPOSE: [L2-auto] CCL 式の認知的複雑度を推定 (0-1)
 def estimate_ccl_complexity(ccl: str) -> float:
     """
     CCL 式の認知的複雑度を推定 (0-1)
@@ -101,6 +103,7 @@ def estimate_ccl_complexity(ccl: str) -> float:
     return min(score, 1.0)
 
 
+# PURPOSE: [L2-auto] FEP ベースで最適なスレッドを選択
 def select_thread_by_fep(ccl: str) -> ThreadRecommendation:
     """
     FEP ベースで最適なスレッドを選択
@@ -143,6 +146,7 @@ def select_thread_by_fep(ccl: str) -> ThreadRecommendation:
     )
 
 
+# PURPOSE: [L2-auto] シンプルなスレッド選択 (文字列のみ返す)
 def get_optimal_thread(ccl: str, fallback: str = "antigravity") -> str:
     """シンプルなスレッド選択 (文字列のみ返す)"""
     try:

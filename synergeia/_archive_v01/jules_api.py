@@ -37,6 +37,7 @@ JULES_CLI = "jules"
 
 
 @dataclass
+# PURPOSE: [L2-auto] Jules アカウント
 class JulesAccount:
     """Jules アカウント"""
     id: str
@@ -49,6 +50,7 @@ class JulesAccount:
 
 
 @dataclass
+# PURPOSE: [L2-auto] Jules セッション
 class JulesSession:
     """Jules セッション"""
     session_id: str
@@ -61,12 +63,14 @@ class JulesSession:
     result: Optional[Dict] = None
 
 
+# PURPOSE: [L2-auto] Jules アカウントプール管理。
 class JulesPool:
     """
     Jules アカウントプール管理。
     6アカウント、最大3同時、ラウンドロビン。
     """
     
+    # PURPOSE: [L2-auto] __init__
     def __init__(self, config_path: Path = CONFIG_FILE):
         self.config_path = config_path
         self.config = self._load_config()
@@ -76,12 +80,14 @@ class JulesPool:
         self._init_accounts()
         self._load_state()
     
+    # PURPOSE: [L2-auto] 設定ファイル読み込み
     def _load_config(self) -> dict:
         """設定ファイル読み込み"""
         if not self.config_path.exists():
             raise FileNotFoundError(f"Config not found: {self.config_path}")
         return yaml.safe_load(self.config_path.read_text())
     
+    # PURPOSE: [L2-auto] アカウント初期化
     def _init_accounts(self):
         """アカウント初期化"""
         for acc in self.config.get("accounts", []):
@@ -95,6 +101,7 @@ class JulesPool:
                 config_dir=config_dir,
             ))
     
+    # PURPOSE: [L2-auto] プール状態を読み込み
     def _load_state(self):
         """プール状態を読み込み"""
         if POOL_STATE_FILE.exists():
@@ -107,6 +114,7 @@ class JulesPool:
                     if acc_state.get("last_used"):
                         acc.last_used = datetime.fromisoformat(acc_state["last_used"])
     
+    # PURPOSE: [L2-auto] プール状態を保存
     def _save_state(self):
         """プール状態を保存"""
         state = {
@@ -122,6 +130,7 @@ class JulesPool:
         }
         POOL_STATE_FILE.write_text(json.dumps(state, indent=2, ensure_ascii=False))
     
+    # PURPOSE: [L2-auto] 利用可能なアカウントを取得（ラウンドロビン）。
     def get_available_account(self) -> Optional[JulesAccount]:
         """
         利用可能なアカウントを取得（ラウンドロビン）。
@@ -156,6 +165,7 @@ class JulesPool:
             available.sort(key=lambda a: a.last_used or datetime.min)
             return available[0]
     
+    # PURPOSE: [L2-auto] 特定のアカウントでJules CLIを実行。
     def _run_jules_cli(self, account: JulesAccount, args: List[str]) -> Dict[str, Any]:
         """
         特定のアカウントでJules CLIを実行。
@@ -182,6 +192,7 @@ class JulesPool:
         except Exception as e:
             return {"error": str(e), "returncode": -1}
     
+    # PURPOSE: [L2-auto] 指定アカウントでログイン。
     def login_account(self, account_id: str) -> Dict[str, Any]:
         """
         指定アカウントでログイン。
@@ -211,6 +222,7 @@ class JulesPool:
         
         return {"error": "Login failed", "returncode": result.returncode}
     
+    # PURPOSE: [L2-auto] 新しいセッションを作成。
     def create_session(
         self,
         task: str,
@@ -277,6 +289,7 @@ class JulesPool:
             return {"error": str(e)}
     
     @staticmethod
+    # PURPOSE: [L2-auto] 出力からセッションIDを抽出。見つからなければタイムスタンプで生成。
     def _extract_session_id(output: str, account_id: str) -> str:
         """出力からセッションIDを抽出。見つからなければタイムスタンプで生成。"""
         import re
@@ -286,6 +299,7 @@ class JulesPool:
             return match.group(1)
         return f"{account_id}_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
     
+    # PURPOSE: [L2-auto] セッション一覧を取得。
     def list_sessions(self, account_id: Optional[str] = None) -> Dict[str, Any]:
         """
         セッション一覧を取得。
@@ -306,6 +320,7 @@ class JulesPool:
         
         return {"sessions": all_sessions}
     
+    # PURPOSE: [L2-auto] プール状態を取得。
     def get_status(self) -> Dict[str, Any]:
         """
         プール状態を取得。
@@ -326,6 +341,7 @@ class JulesPool:
         }
 
 
+# PURPOSE: [L2-auto] main
 def main():
     if len(sys.argv) < 2:
         print(__doc__)

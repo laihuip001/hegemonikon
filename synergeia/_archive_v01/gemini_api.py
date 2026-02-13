@@ -31,6 +31,7 @@ USAGE_FILE = Path(__file__).parent / "gemini_usage.json"
 DEFAULT_MODEL = "gemini-2.0-flash-exp"
 
 
+# PURPOSE: [L2-auto] Get API key from environment or config file.
 def get_api_key() -> str:
     """Get API key from environment or config file."""
     key = os.environ.get("GOOGLE_API_KEY")
@@ -54,6 +55,7 @@ def get_api_key() -> str:
     return key
 
 
+# PURPOSE: [L2-auto] Load usage data.
 def load_usage() -> dict:
     """Load usage data."""
     if USAGE_FILE.exists():
@@ -61,11 +63,13 @@ def load_usage() -> dict:
     return {"calls": 0, "history": []}
 
 
+# PURPOSE: [L2-auto] Save usage data.
 def save_usage(usage: dict):
     """Save usage data."""
     USAGE_FILE.write_text(json.dumps(usage, indent=2, ensure_ascii=False))
 
 
+# PURPOSE: [L2-auto] Execute query via Gemini API.
 def query(
     prompt: str, 
     model: str = DEFAULT_MODEL,
@@ -136,6 +140,7 @@ def query(
     return result
 
 
+# PURPOSE: [L2-auto] main
 def main():
     if len(sys.argv) < 2:
         print(__doc__)

@@ -44,6 +44,7 @@ DEFAULT_TIMEOUT = 120  # seconds
 
 
 @dataclass
+# PURPOSE: [L2-auto] Synergeia の実行結果
 class SynergeiaResult:
     # PURPOSE: n8n Synergeia webhook の実行結果を構造化して保持する
     """Synergeia の実行結果"""
@@ -54,11 +55,13 @@ class SynergeiaResult:
     timestamp: str = ""
     error: Optional[str] = None
 
+    # PURPOSE: [L2-auto] __post_init__
     def __post_init__(self):
         if not self.timestamp:
             self.timestamp = datetime.now().isoformat()
 
     @property
+    # PURPOSE: [L2-auto] is_success
     def is_success(self) -> bool:
         # PURPOSE: 結果が成功かどうかを判定する
         return self.status == "success"
@@ -72,6 +75,7 @@ class SynergeiaResult:
 # Core API
 # =============================================================================
 
+# PURPOSE: [L2-auto] Synergeia v2 — 2段階分散 CCL 実行。
 def dispatch(
     # PURPOSE: n8n CCL ルーターでパース後、bridge.py 側でバックエンドを実行する 2段階アーキテクチャ
     ccl: str,
@@ -181,6 +185,7 @@ def dispatch(
 # Stage 2: Thread Execution
 # =============================================================================
 
+# PURPOSE: [L2-auto] スレッドに応じたバックエンドを呼び出す
 def _execute_thread(
     # PURPOSE: CCL のスレッド種別に応じて対応するバックエンドを呼び出す
     thread: str,
@@ -201,6 +206,7 @@ def _execute_thread(
         return _exec_hermeneus(ccl, context)
 
 
+# PURPOSE: [L2-auto] Ochēma → Antigravity LS → LLM
 def _exec_ochema(ccl: str, context: str, timeout: int) -> Dict[str, Any]:
     # PURPOSE: Ochēma MCP 経由で LLM を呼び出す
     """Ochēma → Antigravity LS → LLM"""
@@ -220,6 +226,7 @@ def _exec_ochema(ccl: str, context: str, timeout: int) -> Dict[str, Any]:
         return {"thread": "ochema", "ccl": ccl, "status": "error", "error": str(e)}
 
 
+# PURPOSE: [L2-auto] Hermēneus → CCL dispatch
 def _exec_hermeneus(ccl: str, context: str) -> Dict[str, Any]:
     # PURPOSE: Hermēneus CCL パーサーで構造解析する
     """Hermēneus → CCL dispatch"""
@@ -236,6 +243,7 @@ def _exec_hermeneus(ccl: str, context: str) -> Dict[str, Any]:
         return {"thread": "hermeneus", "ccl": ccl, "status": "error", "error": str(e)}
 
 
+# PURPOSE: [L2-auto] Jules → タスク作成 (非同期)
 def _exec_jules(ccl: str, context: str) -> Dict[str, Any]:
     # PURPOSE: Jules MCP でコーディングタスクを作成する (非同期)
     """Jules → タスク作成 (非同期)"""
@@ -248,6 +256,7 @@ def _exec_jules(ccl: str, context: str) -> Dict[str, Any]:
     }
 
 
+# PURPOSE: [L2-auto] /sop → 調査依頼書生成
 def _exec_perplexity(ccl: str, context: str) -> Dict[str, Any]:
     # PURPOSE: /sop 調査を HGK Gateway の SOP 生成経由で実行する
     """/sop → 調査依頼書生成"""
@@ -266,6 +275,7 @@ def _exec_perplexity(ccl: str, context: str) -> Dict[str, Any]:
         return {"thread": "perplexity", "ccl": ccl, "status": "error", "error": str(e)}
 
 
+# PURPOSE: [L2-auto] n8n 不通時のローカルフォールバック
 def _local_fallback(ccl: str, context: str, timeout: int) -> SynergeiaResult:
     # PURPOSE: n8n 不通時にローカルで CCL をパースし実行するフォールバック
     """n8n 不通時のローカルフォールバック"""
@@ -299,6 +309,7 @@ def _local_fallback(ccl: str, context: str, timeout: int) -> SynergeiaResult:
         )
 
 
+# PURPOSE: [L2-auto] CCL をコンパイルのみ (Hermēneus 経由、実行しない)
 def dispatch_compile_only(ccl: str) -> SynergeiaResult:
     # PURPOSE: CCL をコンパイルのみ行い、実行せずに LMQL コードを取得する
     """CCL をコンパイルのみ (Hermēneus 経由、実行しない)"""
@@ -335,6 +346,7 @@ def dispatch_compile_only(ccl: str) -> SynergeiaResult:
 # Utilities
 # =============================================================================
 
+# PURPOSE: [L2-auto] 結果を experiments/ に保存
 def _save_result(result: SynergeiaResult) -> Optional[Path]:
     # PURPOSE: 実行結果を experiments/ ディレクトリに JSON として永続化する
     """結果を experiments/ に保存"""
@@ -352,6 +364,7 @@ def _save_result(result: SynergeiaResult) -> Optional[Path]:
         return None
 
 
+# PURPOSE: [L2-auto] n8n Synergeia webhook の疎通確認
 def health_check() -> Dict[str, Any]:
     # PURPOSE: n8n Synergeia webhook の疎通を確認して稼働状態を返す
     """n8n Synergeia webhook の疎通確認"""
@@ -377,6 +390,7 @@ def health_check() -> Dict[str, Any]:
 # CLI
 # =============================================================================
 
+# PURPOSE: [L2-auto] CLI エントリーポイント
 def main():
     # PURPOSE: Synergeia v2 の CLI エントリーポイント
     """CLI エントリーポイント"""

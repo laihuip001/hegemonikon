@@ -57,6 +57,7 @@ ACCOUNT_KEY_MAPPING = {
 
 
 @dataclass
+# PURPOSE: [L2-auto] アカウント使用状況
 class AccountUsage:
     """アカウント使用状況"""
     account_id: str
@@ -67,6 +68,7 @@ class AccountUsage:
 
 
 @dataclass
+# PURPOSE: [L2-auto] PR情報
 class PRInfo:
     """PR情報"""
     session_id: str
@@ -76,14 +78,17 @@ class PRInfo:
     created_at: str
 
 
+# PURPOSE: [L2-auto] Jules 使用量ダッシュボード。
 class JulesDashboard:
     """
     Jules 使用量ダッシュボード。
     """
     
+    # PURPOSE: [L2-auto] __init__
     def __init__(self):
         self.usage_data = self._load_usage()
     
+    # PURPOSE: [L2-auto] 使用データを読み込み
     def _load_usage(self) -> dict:
         """使用データを読み込み"""
         if USAGE_FILE.exists():
@@ -96,6 +101,7 @@ class JulesDashboard:
             return data
         return self._create_empty_usage()
     
+    # PURPOSE: [L2-auto] 空の使用データを作成
     def _create_empty_usage(self) -> dict:
         """空の使用データを作成"""
         today = datetime.now().strftime("%Y-%m-%d")
@@ -112,16 +118,19 @@ class JulesDashboard:
             "prs": [],
         }
     
+    # PURPOSE: [L2-auto] 使用データを保存
     def _save_usage(self):
         """使用データを保存"""
         USAGE_FILE.write_text(json.dumps(self.usage_data, indent=2, ensure_ascii=False))
     
+    # PURPOSE: [L2-auto] API Key インデックスからアカウントIDを取得
     def get_account_for_key(self, key_index: int) -> str:
         """API Key インデックスからアカウントIDを取得"""
         # 1-18 → account_01-06
         account_num = ((key_index - 1) // 3) + 1
         return f"account_{account_num:02d}"
     
+    # PURPOSE: [L2-auto] 使用を記録
     def record_usage(self, key_index: int, session_id: str):
         """使用を記録"""
         account_id = self.get_account_for_key(key_index)
@@ -130,6 +139,7 @@ class JulesDashboard:
         self.usage_data["total_used"] += 1
         self._save_usage()
     
+    # PURPOSE: [L2-auto] PR情報を記録
     def record_pr(self, session_id: str, pr_url: str, prompt: str, state: str):
         """PR情報を記録"""
         self.usage_data["prs"].append({
@@ -141,6 +151,7 @@ class JulesDashboard:
         })
         self._save_usage()
     
+    # PURPOSE: [L2-auto] 使用状況を取得
     def get_status(self) -> Dict[str, Any]:
         """使用状況を取得"""
         accounts = []
@@ -162,10 +173,12 @@ class JulesDashboard:
             "prs_count": len(self.usage_data.get("prs", [])),
         }
     
+    # PURPOSE: [L2-auto] PR一覧を取得
     def get_prs(self) -> List[Dict]:
         """PR一覧を取得"""
         return self.usage_data.get("prs", [])
     
+    # PURPOSE: [L2-auto] 最も残り回数が多いアカウントを取得。
     def get_best_account(self) -> tuple[str, int]:
         """
         最も残り回数が多いアカウントを取得。
@@ -190,6 +203,7 @@ class JulesDashboard:
         return "account_01", 1
 
 
+# PURPOSE: [L2-auto] セッションからPR情報を取得
 async def fetch_session_pr(session_id: str, api_key: str) -> Optional[PRInfo]:
     """セッションからPR情報を取得"""
     if not JULES_CLIENT_AVAILABLE:
@@ -212,6 +226,7 @@ async def fetch_session_pr(session_id: str, api_key: str) -> Optional[PRInfo]:
     return None
 
 
+# PURPOSE: [L2-auto] 使用状況を表示
 def print_status(dashboard: JulesDashboard):
     """使用状況を表示"""
     status = dashboard.get_status()
@@ -236,6 +251,7 @@ def print_status(dashboard: JulesDashboard):
     print(f"{'='*60}\n")
 
 
+# PURPOSE: [L2-auto] PR一覧を表示
 def print_prs(dashboard: JulesDashboard):
     """PR一覧を表示"""
     prs = dashboard.get_prs()
@@ -256,6 +272,7 @@ def print_prs(dashboard: JulesDashboard):
         print()
 
 
+# PURPOSE: [L2-auto] main
 def main():
     if len(sys.argv) < 2:
         print(__doc__)

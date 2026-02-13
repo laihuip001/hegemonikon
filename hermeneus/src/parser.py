@@ -197,8 +197,34 @@ class CCLParser:
     def _handle_binary(self, op: str, parts: List[str]) -> Any:
         """二項演算子を処理"""
         if op == '_':
-            # シーケンス — 空パーツをフィルタリング
-            steps = [self._parse_expression(p) for p in parts if p]
+            # シーケンス — I:/EI: + E:/EI: チェインの再結合
+            # `_` 分割で I:[cond]{then}_E:{else} が分離されるのを防ぐ
+            merged_parts = []
+            i = 0
+            while i < len(parts):
+                p = parts[i].strip()
+                if not p:
+                    i += 1
+                    continue
+                
+                # I: または EI: で始まるパーツの場合、後続の E:/EI: を結合
+                if p.startswith('I:') or p.startswith('EI:'):
+                    combined = p
+                    j = i + 1
+                    while j < len(parts):
+                        next_p = parts[j].strip()
+                        if next_p.startswith('E:{') or next_p.startswith('EI:'):
+                            combined += '_' + next_p
+                            j += 1
+                        else:
+                            break
+                    merged_parts.append(combined)
+                    i = j
+                else:
+                    merged_parts.append(p)
+                    i += 1
+            
+            steps = [self._parse_expression(p) for p in merged_parts if p]
             return Sequence(steps=steps)
         elif op == '~*':
             # 収束振動
@@ -511,6 +537,11 @@ class CCLParser:
         rest = rest.strip()
         if not rest:
             return None
+        
+        # シーケンス結合後の `_` プレフィクスを除去
+        # (例: _E:{...} → E:{...}, _EI:{...} → EI:{...})
+        if rest.startswith('_'):
+            rest = rest[1:].strip()
         
         # EI:[cond]{body}... → 再帰的に IfCondition をネスト
         if rest.startswith('EI:'):

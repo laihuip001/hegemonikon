@@ -1,3 +1,4 @@
+# PROOF: [L2/インターフェース] <- mekhane/ochema/ CLI Entry Point
 # PURPOSE: Ochēma CLI — Antigravity LS とのインタラクション
 """Ochēma CLI — Antigravity Language Server Client.
 

@@ -1,3 +1,4 @@
+# PROOF: [L2/推論] <- mekhane/synteleia/dokimasia/ Nous→合議判定
 # PURPOSE: Multi-LLM アンサンブル監査エージェント (Layer B: Nous)
 """
 MultiSemanticAgent — Multi-LLM Cognitive Ensemble

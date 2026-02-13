@@ -1,4 +1,5 @@
 # PROOF: [L2/Infra] <- mekhane/ochema/scripts/ Cortex APIキャプチャ
+# PURPOSE: Cortex API MITM Capture Script for mitmproxy
 """
 Cortex API MITM Capture Script for mitmproxy.
 

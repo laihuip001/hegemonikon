@@ -1,4 +1,6 @@
 ---
+lcm_state: beta
+version: "1.0.0"
 description: "掘る — /pro_/s+~(/p*/a)_/ana_/dia*/o+_/pis"
 ---
 

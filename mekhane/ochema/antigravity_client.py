@@ -110,6 +110,7 @@ class AntigravityClient:
 
     # --- Public API ---
 
+    # PURPOSE: LLM にメッセージを送り、応答を取得する
     def ask(
         self,
         message: str,
@@ -141,6 +142,7 @@ class AntigravityClient:
         # Step 3-4: Poll for response
         return self._poll_response(cascade_id, timeout)
 
+    # PURPOSE: LS のユーザーステータスを取得する
     def get_status(self) -> dict:
         """LS のユーザーステータスを取得する。接続確認にも使用。"""
         return self._rpc(RPC_GET_STATUS, {
@@ -151,6 +153,7 @@ class AntigravityClient:
             }
         })
 
+    # PURPOSE: 利用可能なモデル一覧を取得する
     def list_models(self) -> list[dict]:
         """利用可能なモデル一覧を取得する。"""
         status = self.get_status()
@@ -171,6 +174,7 @@ class AntigravityClient:
             if c.get("quotaInfo")
         ]
 
+    # PURPOSE: 全モデルの Quota 残量と設定をリアルタイムで取得する
     def quota_status(self) -> dict:
         """全モデルの Quota 残量と設定をリアルタイムで取得する。
 
@@ -222,6 +226,7 @@ class AntigravityClient:
             "total_models": len(models),
         }
 
+    # PURPOSE: セッション情報を取得する
     def session_info(self, cascade_id: Optional[str] = None) -> dict:
         """セッション情報を取得する。
 
@@ -272,6 +277,7 @@ class AntigravityClient:
             "sessions": sessions[:20],  # 最新20件
         }
 
+    # PURPOSE: セッションの会話内容を読み取る
     def session_read(
         self,
         cascade_id: str,
@@ -375,6 +381,7 @@ class AntigravityClient:
             "conversation": conversation,
         }
 
+    # PURPOSE: 過去セッションのエピソード記憶にアクセスする
     def session_episodes(self, brain_id: Optional[str] = None) -> dict:
         """過去セッションのエピソード記憶 (.system_generated/steps/) にアクセスする。
 

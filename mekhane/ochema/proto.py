@@ -1,7 +1,11 @@
+# PROOF: [O4] <- mekhane/ochema/ Practical Proto Definition
 # PURPOSE: Antigravity LS の ConnectRPC proto 定義を一元管理する
 # REASON: scripts/ (実験) と ochema/ (正式) が同じ v8 proto 知識を共有し、
 #         Creator が proto を更新するとき 1 箇所だけ変えれば済むようにする
-"""Antigravity Language Server — Proto Definitions (v8).
+"""
+PROOF: [O4] <- mekhane/ochema/ Practical Proto Definition
+
+Antigravity Language Server — Proto Definitions (v8).
 
 LS の ConnectRPC JSON エンドポイント、ペイロード構造、モデル定数を定義。
 Cortex API リバースエンジニアリングの成果を集約する単一ソース。

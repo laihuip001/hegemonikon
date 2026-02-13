@@ -1,6 +1,8 @@
+#!/usr/bin/env python3
+# PROOF: [O4] <- mekhane/anamnesis/ Practical Session Indexing
 # PURPOSE: セッション履歴を GnosisIndex (LanceDB) にインデックスする
 """
-PROOF: [L2/インフラ] <- mekhane/anamnesis/
+PROOF: [O4] <- mekhane/anamnesis/ Practical Session Indexing
 
 P3 → 記憶の永続化が必要
    → セッション履歴のセマンティック検索が必要

@@ -1,4 +1,7 @@
+# PROOF: [Z3] <- mekhane/ochema/scripts/ Practical Network Analysis
 """
+PROOF: [Z3] <- mekhane/ochema/scripts/ Practical Network Analysis
+
 Cortex API MITM Capture Script for mitmproxy.
 
 LS → Cortex (daily-cloudcode-pa.googleapis.com) 間の gRPC 通信をキャプチャし、

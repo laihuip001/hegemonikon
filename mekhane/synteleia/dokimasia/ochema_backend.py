@@ -1,5 +1,8 @@
+# PROOF: [O4] <- mekhane/synteleia/ Practical LLM Backend
 # PURPOSE: Ochēma (AntigravityClient) 経由の LLM バックエンド
 """
+PROOF: [O4] <- mekhane/synteleia/ Practical LLM Backend
+
 OchemaBackend — Antigravity Language Server Bridge for Synteleia
 
 AntigravityClient を使い、Ultra プランの LLM を Synteleia 監査に利用する。

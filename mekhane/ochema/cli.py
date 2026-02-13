@@ -1,3 +1,4 @@
+# PROOF: [L2/Ochema] <- CLI Interface
 # PURPOSE: Ochēma CLI — Antigravity LS とのインタラクション
 """Ochēma CLI — Antigravity Language Server Client.
 

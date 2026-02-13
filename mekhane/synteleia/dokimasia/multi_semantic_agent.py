@@ -81,6 +81,7 @@ class EnsembleMember:
     persona: str  # PERSONAS のキー
 
     @property
+    # PURPOSE: Define persona_prompt
     def persona_prompt(self) -> str:
         """persona 付きプロンプトを生成。"""
         return PERSONAS.get(self.persona, "") + "\n" + SEMANTIC_AUDIT_PROMPT
@@ -102,10 +103,12 @@ class MultiSemanticAgent(AuditAgent):
     name = "MultiSemanticAgent"
     description = "Multi-LLM アンサンブル監査 (Layer B: Nous)"
 
+    # PURPOSE: Define __init__
     def __init__(self, members: List[EnsembleMember]):
         self.members = members
 
     @classmethod
+    # PURPOSE: Define default
     def default(cls) -> "MultiSemanticAgent":
         """デフォルト構成: Gemini Pro + Claude Opus + GPT-OSS。"""
         try:
@@ -147,6 +150,7 @@ class MultiSemanticAgent(AuditAgent):
         return cls(members=members)
 
     @classmethod
+    # PURPOSE: Define with_stubs
     def with_stubs(cls, responses: Optional[Dict[str, str]] = None) -> "MultiSemanticAgent":
         """テスト用: StubBackend でアンサンブルを構成。"""
         members = []

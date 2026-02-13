@@ -1,3 +1,4 @@
+# PROOF: [L2/品質] <- mekhane/symploke/reviews/ AS-005
 # async/sync混在警察 レビュー
 
 ## 対象ファイル

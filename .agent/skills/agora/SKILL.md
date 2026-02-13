@@ -38,3 +38,11 @@ print('TODO: agora の実行コマンドを定義')
 ---
 
 *v1.0 — 自動生成 (2026-02-12)*
+
+## Safety
+
+- **risk_tier**: L1 (Low Risk)
+- **risks**: None identified for this skill.
+- **reversible**: true
+- **requires_approval**: false
+- **fallbacks**: None

@@ -1,6 +1,5 @@
+# PROOF: [L2/Infra] <- mekhane/ochema/scripts/cortex_capture.py Cortex API MITM Capture Script
 """
-PROOF: [L2/Infra] <- mekhane/ochema/scripts/cortex_capture.py Cortex API MITM Capture Script
-
 Cortex API MITM Capture Script for mitmproxy.
 
 LS → Cortex (daily-cloudcode-pa.googleapis.com) 間の gRPC 通信をキャプチャし、

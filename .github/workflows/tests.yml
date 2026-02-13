@@ -45,6 +45,7 @@ jobs:
                   # Use --extra-index-url to allow fallback to PyPI for non-torch packages
                   pip install pytest pytest-asyncio pytest-timeout pyyaml pydantic lancedb numpy scipy \
                               networkx pandas tabulate requests httpx schedule \
+                              aiohttp aioresponses opentelemetry-api opentelemetry-sdk python-dotenv \
                               sentence-transformers torch --index-url https://download.pytorch.org/whl/cpu \
                               --extra-index-url https://pypi.org/simple
                   # Install project in development mode if setup exists

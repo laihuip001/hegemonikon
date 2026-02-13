@@ -101,7 +101,14 @@ class TestMeaningfulTraceContextRegression:
                 intensity=2,
                 context="must persist to disk",
             )
-            save_traces(path)
+
+            # Mock ensure_traces_dir to prevent it from trying to create real directories
+            # The test passes the path explicitly to save_traces, so ensure_traces_dir is redundant here
+            # but called internally if no path is provided, or always called.
+            # Let's inspect save_traces implementation. It calls ensure_traces_dir().
+            # We must mock it out.
+            with patch("mekhane.fep.meaningful_traces.ensure_traces_dir"):
+                save_traces(path)
 
             # Load and verify
             loaded = load_traces(path)

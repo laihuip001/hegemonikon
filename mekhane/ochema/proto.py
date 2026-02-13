@@ -1,3 +1,4 @@
+# PROOF: [L2/Infra] <- mekhane/ochema/proto.py Antigravity LS Protocol
 # PURPOSE: Antigravity LS の ConnectRPC proto 定義を一元管理する
 # REASON: scripts/ (実験) と ochema/ (正式) が同じ v8 proto 知識を共有し、
 #         Creator が proto を更新するとき 1 箇所だけ変えれば済むようにする

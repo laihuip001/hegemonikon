@@ -20,8 +20,8 @@ RUNNER="$PROJECT_DIR/mekhane/symploke/run_specialists.py"
 DATE=$(date +%Y%m%d)
 TIMESTAMP=$(date +%Y%m%d_%H%M)
 MAX_FILES=20          # API枠飽和防止
-MAX_CONCURRENT=5      # 並列数
-TIMEOUT_PER_FILE=900  # 15分/ファイル (180派生に十分)
+MAX_CONCURRENT=2      # 並列数 (5→2: FAILED_PRECONDITION 対策)
+TIMEOUT_PER_FILE=1800 # 30分/ファイル (並列数減に伴い増加)
 DRY_RUN=""
 FIXED_TARGET=""
 
@@ -38,8 +38,12 @@ done
 cd "$PROJECT_DIR"
 set -a && source "$PROJECT_DIR/.env" 2>/dev/null && set +a
 
+# スロットリング設定 (.env で上書き可能)
+export JULES_REQUEST_DELAY="${JULES_REQUEST_DELAY:-3.0}"      # リクエスト間隔 (1.5→3.0s)
+export JULES_RETRY_BASE_DELAY="${JULES_RETRY_BASE_DELAY:-5.0}" # リトライ基底遅延 (3.0→5.0s)
+
 # API キー数を確認
-KEY_COUNT=$(env | grep -c JULIUS_API_KEY || true)
+KEY_COUNT=$(env | grep -c JULES_API_KEY || true)
 if [ "$KEY_COUNT" -eq 0 ] && [ -z "$DRY_RUN" ]; then
     echo "[$TIMESTAMP] ERROR: No API keys found. Aborting." | tee -a "$LOG_DIR/error.log"
     notify-send "⚠️ Tier 1 Daily" "API keys not found. Aborted." 2>/dev/null || true
@@ -144,6 +148,14 @@ echo "============================================================"
 
 # ログ記録
 echo "$TIMESTAMP: targets=$TARGET_COUNT started=$TOTAL_STARTED failed=$TOTAL_FAILED" >> "$LOG_DIR/daily_summary.log"
+
+# === 結果収集 ===
+if [ -z "$DRY_RUN" ]; then
+    echo ""
+    echo "--- Collecting results ---"
+    "$VENV" "$PROJECT_DIR/mekhane/symploke/collect_results.py" \
+        --dir "$LOG_DIR" --days 1 2>&1 | tee -a "$LOG_DIR/${DATE}.log" || true
+fi
 
 # === 通知 ===
 if [ "$TOTAL_FAILED" -gt 0 ] || [ -n "$ERRORS" ]; then

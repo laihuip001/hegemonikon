@@ -1,12 +1,16 @@
-# Jules Daily Specialist Reviews for Hegemonikón
+# Jules Daily Specialist Reviews for Hegemonikón (v4.0)
 #
 # tekhne-maker v5.0 アーキタイプ駆動設計に基づく
 # 専門家レビューの**毎日**定時実行
 #
+# v4.0 拡張:
+#   - 動的ターゲット選択 (git-diff / priority / fixed)
+#   - 結果統合パイプライン (collect_results.py)
+#   - n8n webhook 通知対応
+#
 # スケジュール:
-# - 毎日 08:00 JST (前日 23:00 UTC)
+# - 毎日 10:00 UTC (19:00 JST)
 # - 9 API キー × 80 タスク = 720 専門家/日
-# - /boot で結果を統合
 
 name: Jules Daily Specialist Reviews
 
@@ -27,14 +31,37 @@ on:
           - ai_risk
           - async
           - theory
+          - aesthetics
+          - naming
+          - type_safety
+          - error_handling
+          - security
+          - testing
+          - documentation
+          - function_design
+          - class_design
+          - hegemonikon
+      target_mode:
+        description: "ターゲット選択モード"
+        required: true
+        default: "git-diff"
+        type: choice
+        options:
+          - git-diff
+          - fixed
+          - priority
       target_file:
-        description: "レビュー対象ファイル"
+        description: "レビュー対象ファイル (fixed モード用)"
         required: false
         default: "mekhane/symploke/jules_client.py"
-      max_specialists:
-        description: "最大専門家数 (720/日まで)"
+      max_files:
+        description: "最大ファイル数 (git-diff/priority モード)"
         required: false
-        default: "100"
+        default: "10"
+      sample:
+        description: "ファイルあたりの専門家サンプル数 (0 = 全員)"
+        required: false
+        default: "0"
       dry_run:
         description: "ドライラン（実行せずプロンプト確認）"
         type: boolean
@@ -43,80 +70,136 @@ on:
 env:
   JULES_REPO_SOURCE: "sources/github/${{ github.repository }}"
   JULES_BRANCH: "master"
+  JULES_REQUEST_DELAY: "1.5"
+  JULES_RETRY_BASE_DELAY: "3.0"
 
 jobs:
   daily-specialist-review:
     name: "🔍 Daily Specialist Review (720/day capacity)"
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-      
+        with:
+          fetch-depth: 2 # git diff HEAD~1 に必要
+
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
           cache: "pip"
-      
+
       - name: Install dependencies
         run: |
           pip install aiohttp
-      
+
       - name: Run Specialist Batch
         env:
-          # 9 API キー = 720 タスク/日
-          JULIUS_API_KEY_1: ${{ secrets.JULIUS_API_KEY_1 }}
-          JULIUS_API_KEY_2: ${{ secrets.JULIUS_API_KEY_2 }}
-          JULIUS_API_KEY_3: ${{ secrets.JULIUS_API_KEY_3 }}
-          JULIUS_API_KEY_4: ${{ secrets.JULIUS_API_KEY_4 }}
-          JULIUS_API_KEY_5: ${{ secrets.JULIUS_API_KEY_5 }}
-          JULIUS_API_KEY_6: ${{ secrets.JULIUS_API_KEY_6 }}
-          JULIUS_API_KEY_7: ${{ secrets.JULIUS_API_KEY_7 }}
-          JULIUS_API_KEY_8: ${{ secrets.JULIUS_API_KEY_8 }}
-          JULIUS_API_KEY_9: ${{ secrets.JULIUS_API_KEY_9 }}
+          # Secrets: JULIUS_API_KEY_1~18 → コード: JULES_API_KEY_01~18
+          JULES_API_KEY_01: ${{ secrets.JULIUS_API_KEY_1 }}
+          JULES_API_KEY_02: ${{ secrets.JULIUS_API_KEY_2 }}
+          JULES_API_KEY_03: ${{ secrets.JULIUS_API_KEY_3 }}
+          JULES_API_KEY_04: ${{ secrets.JULIUS_API_KEY_4 }}
+          JULES_API_KEY_05: ${{ secrets.JULIUS_API_KEY_5 }}
+          JULES_API_KEY_06: ${{ secrets.JULIUS_API_KEY_6 }}
+          JULES_API_KEY_07: ${{ secrets.JULIUS_API_KEY_7 }}
+          JULES_API_KEY_08: ${{ secrets.JULIUS_API_KEY_8 }}
+          JULES_API_KEY_09: ${{ secrets.JULIUS_API_KEY_9 }}
+          JULES_API_KEY_10: ${{ secrets.JULIUS_API_KEY_10 }}
+          JULES_API_KEY_11: ${{ secrets.JULIUS_API_KEY_11 }}
+          JULES_API_KEY_12: ${{ secrets.JULIUS_API_KEY_12 }}
+          JULES_API_KEY_13: ${{ secrets.JULIUS_API_KEY_13 }}
+          JULES_API_KEY_14: ${{ secrets.JULIUS_API_KEY_14 }}
+          JULES_API_KEY_15: ${{ secrets.JULIUS_API_KEY_15 }}
+          JULES_API_KEY_16: ${{ secrets.JULIUS_API_KEY_16 }}
+          JULES_API_KEY_17: ${{ secrets.JULIUS_API_KEY_17 }}
+          JULES_API_KEY_18: ${{ secrets.JULIUS_API_KEY_18 }}
         run: |
           cd mekhane/symploke
-          
+
           # パラメータ設定
           CATEGORY="${{ github.event.inputs.category || 'all' }}"
+          TARGET_MODE="${{ github.event.inputs.target_mode || 'git-diff' }}"
           TARGET="${{ github.event.inputs.target_file || 'mekhane/symploke/jules_client.py' }}"
+          MAX_FILES="${{ github.event.inputs.max_files || '10' }}"
+          SAMPLE="${{ github.event.inputs.sample || '0' }}"
           DRY_RUN="${{ github.event.inputs.dry_run || 'false' }}"
-          
-          echo "=== Jules Daily Specialist Review (720/day) ==="
+
+          echo "=== Jules Daily Specialist Review v4.0 (720/day) ==="
           echo "Date: $(date -u +%Y-%m-%d)"
           echo "Category: $CATEGORY"
+          echo "Target Mode: $TARGET_MODE"
           echo "Target: $TARGET"
-          echo "Dry Run: $DRY_RUN"
           echo ""
-          
-          if [ "$DRY_RUN" = "true" ]; then
-            python run_specialists.py --category "$CATEGORY" --target "$TARGET" --dry-run
-          else
-            python run_specialists.py \
-              --category "$CATEGORY" \
-              --target "$TARGET" \
-              --output "../../docs/specialist_run_$(date -u +%Y%m%d).json"
+
+          # 実行コマンド構築
+          CMD="python run_specialists.py"
+          CMD="$CMD --category $CATEGORY"
+          CMD="$CMD --target-mode $TARGET_MODE"
+          CMD="$CMD --target $TARGET"
+          CMD="$CMD --max-files $MAX_FILES"
+          CMD="$CMD --output ../../logs/specialist_daily/run_$(date -u +%Y%m%d_%H%M).json"
+
+          if [ "$SAMPLE" != "0" ]; then
+            CMD="$CMD --sample $SAMPLE"
           fi
-      
+
+          if [ "$DRY_RUN" = "true" ]; then
+            CMD="$CMD --dry-run"
+          fi
+
+          echo "Executing: $CMD"
+          eval $CMD
+
+      - name: Collect Results
+        if: ${{ github.event.inputs.dry_run != 'true' }}
+        run: |
+          cd mekhane/symploke
+          python collect_results.py --dir ../../logs/specialist_daily --days 1
+
       - name: Upload Results
         if: ${{ github.event.inputs.dry_run != 'true' }}
         uses: actions/upload-artifact@v4
         with:
           name: specialist-results-${{ github.run_number }}
-          path: docs/specialist_run_*.json
+          path: |
+            logs/specialist_daily/run_*.json
+            logs/specialist_daily/digest_*.md
+            logs/specialist_daily/digest_*.json
           retention-days: 30
-      
+
+      - name: Notify n8n (optional)
+        if: ${{ github.event.inputs.dry_run != 'true' }}
+        continue-on-error: true
+        run: |
+          # n8n webhook 通知 (設定されている場合のみ)
+          if [ -n "${{ secrets.N8N_WEBHOOK_URL }}" ]; then
+            DIGEST_FILE=$(ls -t logs/specialist_daily/digest_*.json 2>/dev/null | head -1)
+            if [ -n "$DIGEST_FILE" ]; then
+              curl -s -X POST "${{ secrets.N8N_WEBHOOK_URL }}" \
+                -H "Content-Type: application/json" \
+                -d @"$DIGEST_FILE" \
+                --max-time 10 || true
+            fi
+          fi
+
       - name: Summary
         run: |
-          echo "## 🔍 Daily Specialist Review Results" >> $GITHUB_STEP_SUMMARY
+          echo "## 🔍 Daily Specialist Review Results (v4.0)" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "**Date:** $(date -u +%Y-%m-%d)" >> $GITHUB_STEP_SUMMARY
+          echo "**Target Mode:** ${{ github.event.inputs.target_mode || 'git-diff' }}" >> $GITHUB_STEP_SUMMARY
           echo "**Capacity:** 9 keys × 80 tasks = 720 specialists/day" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          if ls docs/specialist_run_*.json 1> /dev/null 2>&1; then
+
+          # ダイジェスト表示
+          DIGEST_MD=$(ls -t logs/specialist_daily/digest_*.md 2>/dev/null | head -1)
+          if [ -n "$DIGEST_MD" ]; then
+            cat "$DIGEST_MD" >> $GITHUB_STEP_SUMMARY
+          elif ls logs/specialist_daily/run_*.json 1> /dev/null 2>&1; then
             echo '```json' >> $GITHUB_STEP_SUMMARY
-            cat docs/specialist_run_*.json | head -100 >> $GITHUB_STEP_SUMMARY
+            cat logs/specialist_daily/run_*.json | head -100 >> $GITHUB_STEP_SUMMARY
             echo '```' >> $GITHUB_STEP_SUMMARY
           else
             echo "結果ファイルが見つかりません" >> $GITHUB_STEP_SUMMARY

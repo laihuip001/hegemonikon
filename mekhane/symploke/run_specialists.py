@@ -1,16 +1,22 @@
 #!/usr/bin/env python3
 # PROOF: [L3/ユーティリティ] <- mekhane/symploke/ O4→実行スクリプトが必要→run_specialists が担う
 """
-Jules 専門家バッチ実行スクリプト v3.0
+Jules 専門家バッチ実行スクリプト v4.0
 
 Specialist v2（純化された知性）統合版。
 140人の専門家、21カテゴリ対応。
+
+v4.0 拡張:
+  - 動的ターゲット選択 (git-diff / priority / fixed)
+  - 複数ファイル一括バッチ
+  - 結果統合パイプライン対応
 """
 
 import asyncio
 import aiohttp
 import os
 import json
+import subprocess
 import sys
 from datetime import datetime
 from pathlib import Path
@@ -33,6 +39,7 @@ try:
         Scope,
         Intent,
     )
+    from specialist_bridge import get_unified_specialists
 except ImportError:
     sys.path.insert(0, str(Path(__file__).parent))
     from specialist_v2 import (
@@ -51,6 +58,7 @@ except ImportError:
         Scope,
         Intent,
     )
+    from specialist_bridge import get_unified_specialists
 
 
 # === 設定 ===
@@ -59,21 +67,114 @@ BRANCH = os.getenv("JULES_BRANCH", "master")
 TASKS_PER_KEY = int(os.getenv("JULES_TASKS_PER_KEY", "80"))
 
 # Rate limiting: burst 防止のためリクエスト間ディレイ (秒)
-REQUEST_DELAY = float(os.getenv("JULES_REQUEST_DELAY", "1.0"))
+REQUEST_DELAY = float(os.getenv("JULES_REQUEST_DELAY", "1.5"))
 # リトライ: FAILED_PRECONDITION (400) / RATE_LIMIT (429) 時の最大リトライ数
 MAX_RETRIES = int(os.getenv("JULES_MAX_RETRIES", "3"))
 # リトライ基底遅延 (秒) — 指数バックオフ: base * 2^retry
-RETRY_BASE_DELAY = float(os.getenv("JULES_RETRY_BASE_DELAY", "2.0"))
+RETRY_BASE_DELAY = float(os.getenv("JULES_RETRY_BASE_DELAY", "3.0"))
 
 # API キー（環境変数から取得）
+# .env の命名規則: JULES_API_KEY_01, JULES_API_KEY_02, ..., JULES_API_KEY_17
 API_KEYS = [
-    os.getenv(f"JULIUS_API_KEY_{i}")
-    for i in range(1, 19)
-    if os.getenv(f"JULIUS_API_KEY_{i}")
+    os.getenv(f"JULES_API_KEY_{i:02d}")
+    for i in range(1, 20)
+    if os.getenv(f"JULES_API_KEY_{i:02d}")
 ]
 
 # RETRYABLE エラーコード
 _RETRYABLE_CODES = {400, 429, 500, 503}
+
+# ファイル拡張子→カテゴリ マッピング (動的ターゲット選択用)
+_FILE_CATEGORY_HINTS = {
+    "test_": ["testing", "edge_case"],
+    "mcp_": ["api_design", "async", "error_handling"],
+    "specialist": ["hegemonikon", "naming", "aesthetics"],
+    "kernel/": ["hegemonikon", "documentation"],
+    "security": ["security"],
+}
+
+
+# PURPOSE: 動的ターゲット選択 — git diff / priority file / fixed
+def select_targets(
+    mode: str = "fixed",
+    fixed_target: str = "",
+    priority_file: str = "",
+    max_files: int = 10,
+) -> list[str]:
+    """ターゲットファイルを選択する
+
+    Modes:
+      - fixed: 単一ファイル指定 (従来互換)
+      - git-diff: git diff で変更ファイルを自動取得
+      - priority: 優先度ファイルから読み込み
+    """
+    if mode == "fixed":
+        return [fixed_target] if fixed_target else []
+
+    elif mode == "git-diff":
+        try:
+            # 直近コミットの変更ファイル
+            result = subprocess.run(
+                ["git", "diff", "--name-only", "HEAD~1..HEAD", "--", "*.py"],
+                capture_output=True, text=True, timeout=10,
+            )
+            files = [f.strip() for f in result.stdout.strip().split("\n") if f.strip()]
+
+            if not files:
+                # HEAD~1 が存在しない場合、直近の変更ファイルを取得
+                result = subprocess.run(
+                    ["git", "diff", "--name-only", "--cached", "--", "*.py"],
+                    capture_output=True, text=True, timeout=10,
+                )
+                files = [f.strip() for f in result.stdout.strip().split("\n") if f.strip()]
+
+            # テスト/設定ファイルを除外し、実体ファイルを優先
+            scored = []
+            for f in files:
+                score = 1
+                if "test_" in f or "conftest" in f:
+                    score = 0.3
+                elif "__init__" in f:
+                    score = 0.1
+                elif f.endswith(".py"):
+                    # 大きいファイル = レビュー価値が高い
+                    try:
+                        size = Path(f).stat().st_size
+                        score = min(5.0, size / 1000)
+                    except (FileNotFoundError, OSError):
+                        score = 1.0
+                scored.append((score, f))
+
+            scored.sort(key=lambda x: x[0], reverse=True)
+            return [f for _, f in scored[:max_files]]
+
+        except (subprocess.TimeoutExpired, FileNotFoundError) as e:
+            print(f"WARNING: git-diff failed: {e}, falling back to fixed")
+            return [fixed_target] if fixed_target else []
+
+    elif mode == "priority":
+        if not priority_file or not Path(priority_file).exists():
+            print(f"WARNING: priority file '{priority_file}' not found")
+            return [fixed_target] if fixed_target else []
+
+        with open(priority_file) as f:
+            lines = [line.strip() for line in f if line.strip() and not line.startswith("#")]
+        return lines[:max_files]
+
+    else:
+        print(f"WARNING: unknown target mode '{mode}', using fixed")
+        return [fixed_target] if fixed_target else []
+
+
+# PURPOSE: ファイルパスからカテゴリヒントを推定
+def suggest_categories(filepath: str) -> list[str]:
+    """ファイルパスから関連カテゴリを推定する"""
+    hints = []
+    for pattern, cats in _FILE_CATEGORY_HINTS.items():
+        if pattern in filepath:
+            hints.extend(cats)
+    # ヒントがなければ全カテゴリ
+    return list(set(hints)) if hints else []
 
 
 # PURPOSE: Jules セッションを作成 (リトライ付き)
@@ -225,12 +326,29 @@ async def main():
     # 利用可能なカテゴリを動的に取得
     available_categories = ["all"] + get_all_categories()
 
-    parser = argparse.ArgumentParser(description="Jules Specialist Batch Runner v3.0")
+    parser = argparse.ArgumentParser(description="Jules Specialist Batch Runner v4.0")
     parser.add_argument(
         "--target",
         "-t",
         default="mekhane/symploke/jules_client.py",
-        help="Target file to review",
+        help="Target file to review (used with --target-mode fixed)",
+    )
+    parser.add_argument(
+        "--target-mode",
+        choices=["fixed", "git-diff", "priority"],
+        default="fixed",
+        help="Target selection mode: fixed (single file), git-diff (changed files), priority (from file)",
+    )
+    parser.add_argument(
+        "--priority-file",
+        default="",
+        help="Priority file path (one file per line, used with --target-mode priority)",
+    )
+    parser.add_argument(
+        "--max-files",
+        type=int,
+        default=10,
+        help="Maximum number of target files (used with git-diff/priority)",
     )
     parser.add_argument(
         "--category",
@@ -245,8 +363,8 @@ async def main():
     parser.add_argument(
         "--output",
         "-o",
-        default="mekhane/symploke/specialist_run_results.json",
-        help="Output file for results",
+        default="",
+        help="Output file for results (auto-generated if empty)",
     )
     parser.add_argument(
         "--dry-run", action="store_true", help="Print prompts without executing"
@@ -255,7 +373,10 @@ async def main():
         "--list-categories", action="store_true", help="List available categories"
     )
     parser.add_argument(
-        "--sample", "-s", type=int, help="Random sample N specialists"
+        "--list-targets", action="store_true", help="List target files (for git-diff/priority mode)"
+    )
+    parser.add_argument(
+        "--sample", "-s", type=int, help="Random sample N specialists per file"
     )
     parser.add_argument(
         "--tier",
@@ -280,6 +401,11 @@ async def main():
         choices=["detect", "fix", "prevent"],
         help="Derivative intent filter (use with --derive)",
     )
+    parser.add_argument(
+        "--all-phases",
+        action="store_true",
+        help="Use ALL specialists (v2 + Phase 0-3, ~1000 specialists)",
+    )
 
     args = parser.parse_args()
 
@@ -292,102 +418,167 @@ async def main():
         print(f"\n  all: {len(ALL_SPECIALISTS)}人")
         return
 
-    # 専門家フィルタリング
-    if args.tier == 1:
-        # Tier 1: 進化専門家のみ
-        if args.category == "all":
-            specialists = list(TIER1_SPECIALISTS)
-        else:
-            specialists = get_tier1_by_category(args.category)
-    elif args.tier == 2:
-        # Tier 2: 衛生専門家のみ (Tier 1 を除外)
-        tier1_ids = {s.id for s in TIER1_SPECIALISTS}
-        if args.category == "all":
-            specialists = [s for s in ALL_SPECIALISTS if s.id not in tier1_ids]
-        else:
-            specialists = [s for s in get_specialists_by_category(args.category) if s.id not in tier1_ids]
-    else:
-        # 全専門家
-        if args.category == "all":
-            specialists = list(ALL_SPECIALISTS)
-        else:
-            specialists = get_specialists_by_category(args.category)
+    # ターゲットファイル選択
+    targets = select_targets(
+        mode=args.target_mode,
+        fixed_target=args.target,
+        priority_file=args.priority_file,
+        max_files=args.max_files,
+    )
 
-    # ランダムサンプリング
-    if args.sample:
-        import random
-        specialists = random.sample(specialists, min(args.sample, len(specialists)))
-
-    # 派生適用
-    if args.derive:
-        scope_map = {"micro": Scope.MICRO, "meso": Scope.MESO, "macro": Scope.MACRO}
-        intent_map = {"detect": Intent.DETECT, "fix": Intent.FIX, "prevent": Intent.PREVENT}
-        
-        if args.derive == "all" and not args.scope and not args.intent:
-            # 全派生: 各基本専門家から8派生を生成
-            derived = []
-            for base in specialists:
-                derived.extend(get_all_derivatives(base))
-            specialists = derived
-        else:
-            # 特定派生: scope/intent を指定
-            scope = scope_map.get(args.scope) if args.scope else None
-            intent = intent_map.get(args.intent) if args.intent else None
-            specialists = [derive_specialist(s, scope=scope, intent=intent) for s in specialists]
-
-    print(f"=== Jules Specialist Batch Runner v3.0 ===")
-    print(f"Target: {args.target}")
-    print(f"Category: {args.category}")
-    print(f"Specialists: {len(specialists)}")
-    print(f"API Keys: {len(API_KEYS)}")
-    print()
-
-    if args.dry_run:
-        for spec in specialists:
-            print(f"--- {spec.id} {spec.name} ({spec.category}) ---")
-            print(generate_prompt(spec, args.target))
-            print()
+    if args.list_targets:
+        print("=== Target Files ===")
+        for i, t in enumerate(targets, 1):
+            hints = suggest_categories(t)
+            hint_str = f" → {', '.join(hints)}" if hints else ""
+            print(f"  [{i}] {t}{hint_str}")
+        print(f"\n  Total: {len(targets)} files")
         return
 
-    # バッチ実行
-    results = await run_batch(specialists, args.target, args.max_concurrent)
+    if not targets:
+        print("ERROR: No target files found. Use --target or --target-mode git-diff")
+        return
+
+    # 全ファイル分の結果を蓄積
+    all_results = []
+    total_started = 0
+    total_failed = 0
+
+    for file_idx, target_file in enumerate(targets, 1):
+        print(f"\n{'='*60}")
+        print(f"[{file_idx}/{len(targets)}] Target: {target_file}")
+        print(f"{'='*60}")
+
+        # 専門家フィルタリング
+        file_hints = suggest_categories(target_file)
+
+        if args.tier == 1:
+            if args.category == "all":
+                specialists = list(TIER1_SPECIALISTS)
+            else:
+                specialists = get_tier1_by_category(args.category)
+        elif args.tier == 2:
+            tier1_ids = {s.id for s in TIER1_SPECIALISTS}
+            if args.category == "all":
+                specialists = [s for s in ALL_SPECIALISTS if s.id not in tier1_ids]
+            else:
+                specialists = [s for s in get_specialists_by_category(args.category) if s.id not in tier1_ids]
+        else:
+            # 基本プール選択
+            base_pool = get_unified_specialists() if args.all_phases else list(ALL_SPECIALISTS)
+
+            if args.category == "all":
+                # git-diff モードではカテゴリヒントで絞り込み
+                if args.target_mode == "git-diff" and file_hints:
+                    specialists = []
+                    cat_pool = {s.category: [] for s in base_pool}
+                    for s in base_pool:
+                        cat_pool.setdefault(s.category, []).append(s)
+                    for hint_cat in file_hints:
+                        if hint_cat in cat_pool:
+                            specialists.extend(cat_pool[hint_cat])
+                    # 重複除去 (id ベース)
+                    seen = set()
+                    unique = []
+                    for s in specialists:
+                        if s.id not in seen:
+                            seen.add(s.id)
+                            unique.append(s)
+                    specialists = unique
+                else:
+                    specialists = base_pool
+            else:
+                specialists = [s for s in base_pool if s.category == args.category]
+
+        # ランダムサンプリング
+        if args.sample:
+            import random
+            specialists = random.sample(specialists, min(args.sample, len(specialists)))
+
+        # 派生適用
+        if args.derive:
+            scope_map = {"micro": Scope.MICRO, "meso": Scope.MESO, "macro": Scope.MACRO}
+            intent_map = {"detect": Intent.DETECT, "fix": Intent.FIX, "prevent": Intent.PREVENT}
+
+            if args.derive == "all" and not args.scope and not args.intent:
+                derived = []
+                for base in specialists:
+                    derived.extend(get_all_derivatives(base))
+                specialists = derived
+            else:
+                scope = scope_map.get(args.scope) if args.scope else None
+                intent = intent_map.get(args.intent) if args.intent else None
+                specialists = [derive_specialist(s, scope=scope, intent=intent) for s in specialists]
+
+        print(f"Specialists: {len(specialists)}")
+        if file_hints:
+            print(f"Category hints: {', '.join(file_hints)}")
+        print(f"API Keys: {len(API_KEYS)}")
+        print()
+
+        if args.dry_run:
+            for spec in specialists[:3]:  # dry-run ではサンプル3つ
+                print(f"--- {spec.id} {spec.name} ({spec.category}) ---")
+                print(generate_prompt(spec, target_file))
+                print()
+            if len(specialists) > 3:
+                print(f"  ... and {len(specialists) - 3} more specialists")
+            continue
+
+        # バッチ実行
+        results = await run_batch(specialists, target_file, args.max_concurrent)
+
+        # ファイル単位のサマリー
+        started = sum(1 for r in results if "session_id" in r)
+        failed = sum(1 for r in results if "error" in r)
+        total_started += started
+        total_failed += failed
+
+        print(f"\n  → Started: {started}/{len(specialists)}, Failed: {failed}")
+
+        all_results.append({
+            "target_file": target_file,
+            "specialists_count": len(specialists),
+            "started": started,
+            "failed": failed,
+            "results": results,
+        })
+
+    if args.dry_run:
+        return
 
     # 結果保存
-    output_path = Path(args.output)
+    output_path = Path(
+        args.output if args.output
+        else f"logs/specialist_daily/run_{datetime.now().strftime('%Y%m%d_%H%M')}.json"
+    )
     output_path.parent.mkdir(parents=True, exist_ok=True)
 
     output_data = {
+        "version": "4.0",
         "timestamp": datetime.now().isoformat(),
-        "target_file": args.target,
-        "category": args.category,
-        "total_specialists": len(specialists),
+        "target_mode": args.target_mode,
+        "total_files": len(targets),
+        "total_specialists": sum(r["specialists_count"] for r in all_results),
+        "total_started": total_started,
+        "total_failed": total_failed,
         "api_keys_used": len(API_KEYS),
-        "results": results,
+        "files": all_results,
     }
 
     output_path.write_text(json.dumps(output_data, indent=2, ensure_ascii=False))
 
-    # サマリー
-    started = sum(1 for r in results if "session_id" in r)
-    failed = sum(1 for r in results if "error" in r)
-
-    print()
-    print(f"=== Summary ===")
-    print(f"Started: {started}/{len(specialists)}")
-    print(f"Failed: {failed}/{len(specialists)}")
+    # グローバルサマリー
+    total_specs = sum(r["specialists_count"] for r in all_results)
+    print(f"\n{'='*60}")
+    print(f"=== Global Summary ===")
+    print(f"Files: {len(targets)}")
+    print(f"Started: {total_started}/{total_specs}")
+    print(f"Failed: {total_failed}/{total_specs}")
+    success_rate = (total_started / total_specs * 100) if total_specs else 0
+    print(f"Success Rate: {success_rate:.1f}%")
     print(f"Results: {output_path}")
-
-    # カテゴリ別サマリー
-    categories_started = {}
-    for r in results:
-        cat = r.get("category", "unknown")
-        if "session_id" in r:
-            categories_started[cat] = categories_started.get(cat, 0) + 1
-    
-    if categories_started:
-        print("\nBy Category:")
-        for cat, count in sorted(categories_started.items()):
-            print(f"  {cat}: {count}")
+    print(f"{'='*60}")
 
 
 if __name__ == "__main__":

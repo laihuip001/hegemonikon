@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # PROOF: [L2/インフラ] <- mekhane/mcp/ 出張 HGK MCP Gateway
+# PURPOSE: 出張 HGK MCP Gateway — モバイルからの HGK アクセス
 """
 出張 HGK MCP Gateway — モバイルからの HGK アクセス
 
@@ -89,6 +90,7 @@ ALLOWED_HOSTS = os.getenv("HGK_GATEWAY_ALLOWED_HOSTS", _default_hosts).split(","
 _MNEME_DIR = Path(os.getenv("HGK_MNEME", str(Path.home() / "oikos/mneme/.hegemonikon")))
 
 
+# PURPOSE: セキュリティイベントを wbc_state.json に書き込む
 def _wbc_log_security_event(
     event_type: str,
     severity: str,
@@ -134,7 +136,7 @@ def _wbc_log_security_event(
 # OAuth 2.1 Provider (auto-approve, single-user)
 # =============================================================================
 
-# PURPOSE: の統一的インターフェースを実現する
+# PURPOSE: 最小 OAuth 2.1 プロバイダー
 class HGKOAuthProvider(OAuthAuthorizationServerProvider[AuthorizationCode, RefreshToken, AccessToken]):
     """
     最小 OAuth 2.1 プロバイダー。
@@ -185,7 +187,7 @@ class HGKOAuthProvider(OAuthAuthorizationServerProvider[AuthorizationCode, Refre
     async def register_client(self, client_info: OAuthClientInformationFull) -> None:
         self._clients[client_info.client_id] = client_info
 
-    # PURPOSE: hgk_gateway の authorize 処理を実行する
+    # PURPOSE: 認証コード発行
     async def authorize(
         self, client: OAuthClientInformationFull, params: AuthorizationParams
     ) -> str:
@@ -221,7 +223,7 @@ class HGKOAuthProvider(OAuthAuthorizationServerProvider[AuthorizationCode, Refre
             return ac
         return None
 
-    # PURPOSE: hgk_gateway の exchange authorization code 処理を実行する
+    # PURPOSE: 認証コード交換
     async def exchange_authorization_code(
         self, client: OAuthClientInformationFull, authorization_code: AuthorizationCode
     ) -> OAuthToken:
@@ -251,7 +253,7 @@ class HGKOAuthProvider(OAuthAuthorizationServerProvider[AuthorizationCode, Refre
             return rt
         return None
 
-    # PURPOSE: hgk_gateway の exchange refresh token 処理を実行する
+    # PURPOSE: リフレッシュトークン交換
     async def exchange_refresh_token(
         self,
         client: OAuthClientInformationFull,
@@ -290,7 +292,7 @@ class HGKOAuthProvider(OAuthAuthorizationServerProvider[AuthorizationCode, Refre
         )
         return None
 
-    # PURPOSE: hgk_gateway の revoke token 処理を実行する
+    # PURPOSE: revoke token
     async def revoke_token(self, token: AccessToken | RefreshToken) -> None:
         if isinstance(token, RefreshToken):
             self._refresh_tokens.pop(token.token, None)
@@ -342,7 +344,7 @@ IDEA_DIR = MNEME_DIR / "ideas"
 # P1: /sop 調査依頼書テンプレート生成
 # =============================================================================
 
-# PURPOSE: hgk_gateway の hgk sop generate 処理を実行する
+# PURPOSE: 調査依頼書テンプレート生成
 @mcp.tool()
 def hgk_sop_generate(
     topic: str,
@@ -433,7 +435,7 @@ C. 将来展望
 # P1: KI / Gnōsis 検索
 # =============================================================================
 
-# PURPOSE: hgk_gateway の hgk search 処理を実行する
+# PURPOSE: KI / Gnōsis 検索
 @mcp.tool()
 def hgk_search(query: str, max_results: int = 5, mode: str = "hybrid") -> str:
     """
@@ -527,7 +529,7 @@ def hgk_search(query: str, max_results: int = 5, mode: str = "hybrid") -> str:
 # P2: CCL Dispatch
 # =============================================================================
 
-# PURPOSE: hgk_gateway の hgk ccl dispatch 処理を実行する
+# PURPOSE: CCL パースと構造解析
 @mcp.tool()
 def hgk_ccl_dispatch(ccl: str) -> str:
     """
@@ -566,7 +568,7 @@ def hgk_ccl_dispatch(ccl: str) -> str:
 # P2: Doxa 読み取り
 # =============================================================================
 
-# PURPOSE: hgk_gateway の hgk doxa read 処理を実行する
+# PURPOSE: Doxa (信念ストア) の内容を一覧表示
 @mcp.tool()
 def hgk_doxa_read() -> str:
     """
@@ -602,7 +604,7 @@ def hgk_doxa_read() -> str:
 # P3: Handoff 参照
 # =============================================================================
 
-# PURPOSE: hgk_gateway の hgk handoff read 処理を実行する
+# PURPOSE: 最新の Handoff を読む
 @mcp.tool()
 def hgk_handoff_read(count: int = 1) -> str:
     """
@@ -637,7 +639,7 @@ def hgk_handoff_read(count: int = 1) -> str:
 # P3: アイデアメモ保存
 # =============================================================================
 
-# PURPOSE: hgk_gateway の hgk idea capture 処理を実行する
+# PURPOSE: アイデアメモを保存する
 @mcp.tool()
 def hgk_idea_capture(idea: str, tags: str = "") -> str:
     """
@@ -681,7 +683,7 @@ def hgk_idea_capture(idea: str, tags: str = "") -> str:
 # HGK Status (ヘルスチェック)
 # =============================================================================
 
-# PURPOSE: hgk_gateway の hgk status 処理を実行する
+# PURPOSE: HGK システムの概要ステータスを表示
 @mcp.tool()
 def hgk_status() -> str:
     """
@@ -745,7 +747,7 @@ def hgk_status() -> str:
 # CCL Execute (CCL 式の実行)
 # =============================================================================
 
-# PURPOSE: CCL 式を Hermēneus 経由で実行し、結果を返す
+# PURPOSE: CCL 式を実行し、結果を返す
 @mcp.tool()
 def hgk_ccl_execute(ccl: str, context: str = "") -> str:
     """
@@ -779,7 +781,7 @@ def hgk_ccl_execute(ccl: str, context: str = "") -> str:
 # Paper Search (論文検索)
 # =============================================================================
 
-# PURPOSE: Semantic Scholar 経由で学術論文を検索する
+# PURPOSE: 学術論文を検索する
 @mcp.tool()
 def hgk_paper_search(query: str, limit: int = 5) -> str:
     """
@@ -852,7 +854,7 @@ def hgk_paper_search(query: str, limit: int = 5) -> str:
 # Digestor: Incoming Check (消化候補一覧)
 # =============================================================================
 
-# PURPOSE: incoming/ の消化候補を確認する
+# PURPOSE: Digestor: 消化候補を確認する
 INCOMING_DIR = MNEME_DIR / "incoming"
 PROCESSED_DIR = MNEME_DIR / "processed"
 
@@ -914,7 +916,7 @@ def hgk_digest_check() -> str:
 # Digestor: Mark Processed (消化完了マーク)
 # =============================================================================
 
-# PURPOSE: 消化完了ファイルを processed/ に移動する
+# PURPOSE: Digestor: 消化完了ファイルを processed/ に移動する
 @mcp.tool()
 def hgk_digest_mark(filenames: str = "") -> str:
     """
@@ -948,7 +950,7 @@ def hgk_digest_mark(filenames: str = "") -> str:
 # Digestor: List Candidates (候補評価)
 # =============================================================================
 
-# PURPOSE: Digestor selector で候補を評価する
+# PURPOSE: Digestor: 候補を評価する (dry-run)
 @mcp.tool()
 def hgk_digest_list(
     topics: str = "",
@@ -1000,7 +1002,7 @@ def hgk_digest_list(
 # Digestor: Topics (トピック一覧)
 # =============================================================================
 
-# PURPOSE: 消化対象トピック一覧を表示する
+# PURPOSE: Digestor: 消化対象トピック一覧を表示する
 @mcp.tool()
 def hgk_digest_topics() -> str:
     """
@@ -1042,7 +1044,7 @@ def hgk_digest_topics() -> str:
 # Digest Run (消化パイプライン)
 # =============================================================================
 
-# PURPOSE: Digestor パイプラインを実行し、消化候補を生成する
+# PURPOSE: Digestor: 消化パイプラインを実行する
 @mcp.tool()
 def hgk_digest_run(
     topics: str = "",
@@ -1108,6 +1110,7 @@ _ASK_RATE_LIMIT = 5
 _ASK_RATE_WINDOW = 60  # seconds
 
 
+# PURPOSE: レートリミットチェック
 def _check_rate_limit() -> bool:
     """レートリミットチェック。True = 許可、False = 拒否。"""
     now = time.time()
@@ -1498,4 +1501,3 @@ if __name__ == "__main__":
     print("🔒 OAuth 2.1 authentication ENABLED")
     print(f"🚀 HGK Gateway starting on {GATEWAY_HOST}:{GATEWAY_PORT}")
     mcp.run(transport="streamable-http")
-

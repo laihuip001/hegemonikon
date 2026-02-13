@@ -101,10 +101,12 @@ class MultiSemanticAgent(AuditAgent):
     name = "MultiSemanticAgent"
     description = "Multi-LLM アンサンブル監査 (Layer B: Nous)"
 
+# PURPOSE: Initialize instance
     def __init__(self, members: List[EnsembleMember]):
         self.members = members
 
     @classmethod
+# PURPOSE: Factory method for default agent
     def default(cls) -> "MultiSemanticAgent":
         """デフォルト構成: Gemini Pro + Claude Opus + GPT-OSS。"""
         try:
@@ -146,6 +148,7 @@ class MultiSemanticAgent(AuditAgent):
         return cls(members=members)
 
     @classmethod
+# PURPOSE: Factory method with stubs
     def with_stubs(cls, responses: Optional[Dict[str, str]] = None) -> "MultiSemanticAgent":
         """テスト用: StubBackend でアンサンブルを構成。"""
         members = []
@@ -322,6 +325,7 @@ class MultiSemanticAgent(AuditAgent):
 # Utilities
 # =============================================================================
 
+# PURPOSE: Severity rank utility
 def _severity_rank(severity: AuditSeverity) -> int:
     """Severity の厳しさ順序。"""
     return {

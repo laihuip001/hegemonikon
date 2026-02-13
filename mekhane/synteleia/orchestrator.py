@@ -94,6 +94,7 @@ class SynteleiaOrchestrator:
         return orchestrator
 
     @classmethod
+# PURPOSE: L1 + L2 統合監査 (Multi-LLM アンサンブル)
     def with_multi_l2(cls) -> "SynteleiaOrchestrator":
         """
         L1 全エージェント + Layer B Multi-LLM アンサンブルを含むオーケストレータ。
@@ -136,6 +137,7 @@ class SynteleiaOrchestrator:
         # 結果を統合
         return self._aggregate_results(target, agent_results)
 
+# PURPOSE: 並列監査
     def _audit_parallel(self, target: AuditTarget) -> List[AgentResult]:
         """並列監査"""
         results = []
@@ -165,6 +167,7 @@ class SynteleiaOrchestrator:
 
         return results
 
+# PURPOSE: 逐次監査
     def _audit_sequential(self, target: AuditTarget) -> List[AgentResult]:
         """逐次監査"""
         results = []
@@ -187,6 +190,7 @@ class SynteleiaOrchestrator:
 
         return results
 
+# PURPOSE: 結果を統合
     def _aggregate_results(
         self, target: AuditTarget, agent_results: List[AgentResult]
     ) -> AuditResult:

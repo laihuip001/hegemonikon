@@ -21,12 +21,19 @@ Origin: 2026-01-29 "自由と信頼についての対話"
 
 from dataclasses import dataclass, asdict
 from datetime import datetime
+import os
 from pathlib import Path
 from typing import Optional, List
 import json
 
 # Default persistence path
-TRACES_PATH = Path("/home/makaron8426/oikos/mneme/.hegemonikon/meaningful_traces.json")
+# Use relative path in CI/Test environments if global path is not accessible
+_DEFAULT_PATH = Path("/home/makaron8426/oikos/mneme/.hegemonikon/meaningful_traces.json")
+if os.environ.get("HEGEMONIKON_ROOT") or not _DEFAULT_PATH.parent.parent.parent.exists():
+    # Fallback to local .hegemonikon directory if global one is not available
+    TRACES_PATH = Path.home() / ".hegemonikon" / "meaningful_traces.json"
+else:
+    TRACES_PATH = _DEFAULT_PATH
 
 
 # PURPOSE: の統一的インターフェースを実現する
@@ -55,7 +62,8 @@ class MeaningfulTrace:
 
 def ensure_traces_dir() -> None:
     """Ensure the persistence directory exists."""
-    TRACES_PATH.parent.mkdir(parents=True, exist_ok=True)
+    if TRACES_PATH.parent.exists() or os.access(TRACES_PATH.parent.parent, os.W_OK):
+        TRACES_PATH.parent.mkdir(parents=True, exist_ok=True)
 # PURPOSE: Mark a moment as meaningful.
 
 

@@ -36,6 +36,7 @@ if str(_HEGEMONIKON_ROOT) not in sys.path:
     sys.path.insert(0, str(_HEGEMONIKON_ROOT))
 
 
+# PURPOSE: Parse session info from JSON dump
 def parse_sessions_from_json(data: dict) -> list[dict]:
     """trajectorySummaries JSON からセッション情報を抽出"""
     summaries = data.get("trajectorySummaries", {})
@@ -70,6 +71,7 @@ def parse_sessions_from_json(data: dict) -> list[dict]:
     return sessions
 
 
+# PURPOSE: Convert sessions to LanceDB records
 def sessions_to_records(sessions: list[dict]) -> list[dict]:
     """セッション情報を LanceDB レコード (既存スキーマ準拠) に変換
 
@@ -176,6 +178,7 @@ _RE_SESSION_ID = re.compile(
 _RE_SECTION = re.compile(r"^##\s+(.+)$", re.MULTILINE)
 
 
+# PURPOSE: Parse a handoff markdown file
 def parse_handoff_md(path: Path) -> dict:
     """Single handoff .md file -> structured dict"""
     text = path.read_text(encoding="utf-8", errors="replace")
@@ -213,6 +216,7 @@ def parse_handoff_md(path: Path) -> dict:
     }
 
 
+# PURPOSE: Convert handoffs to LanceDB records
 def handoffs_to_records(handoffs: list[dict]) -> list[dict]:
     """Parsed handoff dicts -> LanceDB-compatible records"""
     records = []
@@ -251,6 +255,7 @@ def handoffs_to_records(handoffs: list[dict]) -> list[dict]:
     return records
 
 
+# PURPOSE: Index handoff files
 def index_handoffs(handoff_dir: Optional[str] = None) -> int:
     """handoff_*.md を LanceDB にインデックス"""
     directory = Path(handoff_dir) if handoff_dir else _HANDOFF_DIR

@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/インフラ] <- mekhane/anamnesis/
 # PURPOSE: LS API ポーリングでアクティブセッションをリアルタイムにモニターし MD 保存する
 """
 PROOF: [L2/インフラ] <- mekhane/anamnesis/
@@ -32,7 +33,7 @@ _HEGEMONIKON_ROOT = Path(__file__).parent.parent.parent
 if str(_HEGEMONIKON_ROOT) not in sys.path:
     sys.path.insert(0, str(_HEGEMONIKON_ROOT))
 
-from mekhane.ochema.antigravity_client import AntigravityClient
+from mekhane.ochema.antigravity_client import AntigravityClient  # noqa: E402
 
 # --- Constants ---
 
@@ -103,8 +104,9 @@ def sanitize_filename(title: str) -> str:
     """タイトルをファイル名に変換"""
     # Remove or replace problematic chars
     import re
-    name = re.sub(r'[<>:"/\\|?*\n\r]', '_', title)
-    name = re.sub(r'_+', '_', name).strip('_')
+
+    name = re.sub(r'[<>:"/\\|?*\n\r]', "_", title)
+    name = re.sub(r"_+", "_", name).strip("_")
     return name[:80] if name else "untitled"
 
 
@@ -200,7 +202,9 @@ def daemon_loop(client: AntigravityClient, interval: int) -> None:
     signal.signal(signal.SIGINT, signal_handler)
     signal.signal(signal.SIGTERM, signal_handler)
 
-    print(f"[Monitor] 🚀 Daemon started (interval={interval}s, max_sessions={MAX_SESSIONS})")
+    print(
+        f"[Monitor] 🚀 Daemon started (interval={interval}s, max_sessions={MAX_SESSIONS})"
+    )
     print(f"[Monitor]    Output: {OUTPUT_DIR}")
     print(f"[Monitor]    State:  {STATE_FILE}")
 
@@ -223,7 +227,9 @@ def daemon_loop(client: AntigravityClient, interval: int) -> None:
 
     print("[Monitor] 👋 Daemon stopped")
 
+
 # PURPOSE: [L2-auto] 関数: main
+
 
 def main() -> int:
     parser = argparse.ArgumentParser(
@@ -231,19 +237,24 @@ def main() -> int:
     )
     mode = parser.add_mutually_exclusive_group(required=True)
     mode.add_argument(
-        "--once", action="store_true",
+        "--once",
+        action="store_true",
         help="One-shot: capture current state and exit",
     )
     mode.add_argument(
-        "--daemon", action="store_true",
+        "--daemon",
+        action="store_true",
         help="Daemon: poll continuously",
     )
     parser.add_argument(
-        "--interval", type=int, default=DEFAULT_INTERVAL,
+        "--interval",
+        type=int,
+        default=DEFAULT_INTERVAL,
         help=f"Polling interval in seconds (default: {DEFAULT_INTERVAL})",
     )
     parser.add_argument(
-        "--workspace", default="hegemonikon",
+        "--workspace",
+        default="hegemonikon",
         help="Workspace name for LS detection (default: hegemonikon)",
     )
 

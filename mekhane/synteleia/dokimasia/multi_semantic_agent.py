@@ -1,3 +1,4 @@
+# PROOF: [E3/Dokimasia] <- Multi Semantic Agent Test
 # PURPOSE: Multi-LLM アンサンブル監査エージェント (Layer B: Nous)
 """
 MultiSemanticAgent — Multi-LLM Cognitive Ensemble

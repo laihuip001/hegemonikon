@@ -1,3 +1,4 @@
+# PROOF: [P2/Hodos] <- CLI Interface
 # PURPOSE: Ochēma CLI — Antigravity LS とのインタラクション
 """Ochēma CLI — Antigravity Language Server Client.
 

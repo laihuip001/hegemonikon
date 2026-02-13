@@ -1,3 +1,4 @@
+# PROOF: [P2/Hodos] <- Cortex Capture Script
 """
 Cortex API MITM Capture Script for mitmproxy.
 

@@ -451,7 +451,7 @@ def main():
     )
     p_chat.set_defaults(func=cmd_chat)
 
-    # session-index (Session History Vector Search)
+    # PURPOSE: session-index (Session History Vector Search)
     def cmd_session_index(args):
         """セッション履歴をインデックス"""
         from mekhane.anamnesis.session_indexer import index_from_api, index_from_json
@@ -468,7 +468,7 @@ def main():
     )
     p_session.set_defaults(func=cmd_session_index)
 
-    # handoff-index (Handoff VSearch)
+    # PURPOSE: handoff-index (Handoff VSearch)
     def cmd_handoff_index(args):
         """Handoff ファイルをインデックス"""
         from mekhane.anamnesis.session_indexer import index_handoffs
@@ -483,7 +483,7 @@ def main():
     )
     p_handoff.set_defaults(func=cmd_handoff_index)
 
-    # conversation-index (Full Conversation Content VSearch)
+    # PURPOSE: conversation-index (Full Conversation Content VSearch)
     def cmd_conversation_index(args):
         """全セッション会話をインデックス"""
         from mekhane.anamnesis.session_indexer import index_conversations

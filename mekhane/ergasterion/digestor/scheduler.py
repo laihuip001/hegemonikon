@@ -22,12 +22,11 @@ import subprocess
 from datetime import datetime
 from pathlib import Path
 
-# Import path setup — project root + mekhane dir
+# Import path setup — project root
 _mekhane_dir = Path(__file__).parent.parent.parent
 _project_root = _mekhane_dir.parent
-for _p in [str(_project_root), str(_mekhane_dir)]:
-    if _p not in sys.path:
-        sys.path.insert(0, _p)
+if str(_project_root) not in sys.path:
+    sys.path.insert(0, str(_project_root))
 
 import schedule
 

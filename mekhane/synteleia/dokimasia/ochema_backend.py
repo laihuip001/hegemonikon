@@ -34,6 +34,7 @@ class OchemaBackend(LLMBackend):
         - MODEL_PLACEHOLDER_M18: Gemini 3 Flash (100%)
     """
 
+    # PURPOSE: Initialize OchemaBackend
     def __init__(
         self,
         model: str = "MODEL_PLACEHOLDER_M8",  # Gemini 3 Pro
@@ -80,5 +81,6 @@ class OchemaBackend(LLMBackend):
             self._client = AntigravityClient(workspace="synteleia-sandbox")
         return self._client
 
+    # PURPOSE: String representation
     def __repr__(self) -> str:
         return f"OchemaBackend(model={self.model!r}, label={self.label!r})"

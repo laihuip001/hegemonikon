@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+# PROOF: [L2/品質] <- mekhane/synteleia/dokimasia/ O2→LLM監査が必要→OchemaBackend が担う
 # PURPOSE: Ochēma (AntigravityClient) 経由の LLM バックエンド
 """
 OchemaBackend — Antigravity Language Server Bridge for Synteleia

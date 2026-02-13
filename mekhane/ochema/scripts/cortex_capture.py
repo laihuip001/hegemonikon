@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+# PROOF: [L2/分析] <- mekhane/ochema/scripts/ O3→通信解析が必要→cortex_capture.py が担う
 """
 Cortex API MITM Capture Script for mitmproxy.
 

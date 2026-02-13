@@ -1,3 +1,4 @@
+# PROOF: [L3/モジュール定義] <- mekhane/ochema/ O4→パッケージ定義が必要→__init__.py が担う
 # PURPOSE: Ochēma パッケージ — Antigravity LS クライアント
 """Ochēma (ὄχημα) — Antigravity Language Server Client Package."""
 

@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+# PROOF: [L2/品質] <- mekhane/synteleia/dokimasia/ O2→複数LLMの合議が必要→MultiSemanticAgent が担う
 # PURPOSE: Multi-LLM アンサンブル監査エージェント (Layer B: Nous)
 """
 MultiSemanticAgent — Multi-LLM Cognitive Ensemble

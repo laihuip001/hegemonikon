@@ -499,7 +499,7 @@ class DendronChecker:  # noqa: AI-007
             return ProofLevel.L0
         elif level_str_upper.startswith("L1"):
             return ProofLevel.L1
-        elif level_str_upper.startswith("L2"):
+        elif level_str_upper.startswith("L2") or level_str_upper.startswith("P"):
             return ProofLevel.L2
         elif level_str_upper.startswith("L3"):
             return ProofLevel.L3

@@ -30,7 +30,6 @@ from typing import Optional
 
 # --- Data Classes ---
 
-# PURPOSE: LLM からの応答を保持する
 @dataclass
 class LLMResponse:
     """LLM からの応答を保持する。"""
@@ -43,7 +42,6 @@ class LLMResponse:
     raw_steps: list = field(default_factory=list)
 
 
-# PURPOSE: Language Server の接続情報
 @dataclass
 class LSInfo:
     """Language Server の接続情報。"""
@@ -78,7 +76,6 @@ BRAIN_DIR = os.path.expanduser("~/.gemini/antigravity/brain")
 
 # --- Client ---
 
-# PURPOSE: Antigravity Language Server の非公式クライアント
 class AntigravityClient:
     """Antigravity Language Server の非公式クライアント。
 

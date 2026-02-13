@@ -17,7 +17,7 @@ Usage:
 """
 
 import asyncio
-import aiohttp
+import httpx
 import functools
 import logging
 import os
@@ -173,7 +173,7 @@ def with_retry(
     backoff_factor: float = 2.0,
     initial_delay: float = 1.0,
     max_delay: float = 60.0,
-    retryable_exceptions: tuple = (RateLimitError, aiohttp.ClientError),
+    retryable_exceptions: tuple = (RateLimitError, httpx.RequestError),
 ):
     """
     Decorator for async functions with exponential backoff retry.
@@ -255,7 +255,7 @@ class JulesClient:
     def __init__(
         self,
         api_key: Optional[str] = None,
-        session: Optional[aiohttp.ClientSession] = None,
+        client: Optional[httpx.AsyncClient] = None,
         max_concurrent: Optional[int] = None,
         base_url: Optional[str] = None,
     ):
@@ -264,7 +264,7 @@ class JulesClient:
 
         Args:
             api_key: Jules API key. If None, reads from JULES_API_KEY env var.
-            session: Optional shared aiohttp session for connection reuse.
+            client: Optional shared httpx AsyncClient for connection reuse.
             max_concurrent: Global concurrency limit. Defaults to MAX_CONCURRENT.
             base_url: Override API base URL. Also reads JULES_BASE_URL env var.
         """
@@ -279,8 +279,8 @@ class JulesClient:
             "X-Goog-Api-Key": self.api_key,
             "Content-Type": "application/json",
         }
-        self._shared_session = session
-        self._owned_session: Optional[aiohttp.ClientSession] = None
+        self._shared_client = client
+        self._owned_client: Optional[httpx.AsyncClient] = None
 
         # Global semaphore for cross-batch rate limiting (th-003 fix)
         self._global_semaphore = asyncio.Semaphore(
@@ -288,27 +288,27 @@ class JulesClient:
         )
 
     async def __aenter__(self):
-        """Context manager entry - creates pooled session for connection reuse."""
-        if self._shared_session is None:
-            # Connection pooling: reuse TCP connections (cl-004, as-008 fix)
-            connector = aiohttp.TCPConnector(
-                limit=self.MAX_CONCURRENT,  # Max concurrent connections
-                keepalive_timeout=30,  # Keep connections alive for reuse
-                enable_cleanup_closed=True,  # Clean up closed connections
+        """Context manager entry - creates pooled client for connection reuse."""
+        if self._shared_client is None:
+            # Connection pooling: reuse TCP connections
+            limits = httpx.Limits(
+                max_connections=self.MAX_CONCURRENT,
+                max_keepalive_connections=self.MAX_CONCURRENT,
+                keepalive_expiry=30
             )
-            self._owned_session = aiohttp.ClientSession(connector=connector)
+            self._owned_client = httpx.AsyncClient(limits=limits)
         return self
 
     async def __aexit__(self, exc_type, exc_val, exc_tb):
-        """Context manager exit - closes owned session."""
-        if self._owned_session:
-            await self._owned_session.close()
-            self._owned_session = None
+        """Context manager exit - closes owned client."""
+        if self._owned_client:
+            await self._owned_client.aclose()
+            self._owned_client = None
 
     @property
-    def _session(self) -> aiohttp.ClientSession:
-        """Get the active session (shared or owned)."""
-        return self._shared_session or self._owned_session or aiohttp.ClientSession()
+    def _client(self) -> httpx.AsyncClient:
+        """Get the active client (shared or owned)."""
+        return self._shared_client or self._owned_client or httpx.AsyncClient()
 
     async def _request(
         self,
@@ -333,15 +333,15 @@ class JulesClient:
 
         Raises:
             RateLimitError: If rate limited
-            aiohttp.ClientResponseError: For other HTTP errors
+            httpx.HTTPStatusError: For other HTTP errors
         """
         url = f"{self.base_url}/{endpoint}"
 
-        # Create session if not in context manager
-        session = self._shared_session or self._owned_session
+        # Create client if not in context manager
+        client = self._shared_client or self._owned_client
         close_after = False
-        if session is None:
-            session = aiohttp.ClientSession()
+        if client is None:
+            client = httpx.AsyncClient()
             close_after = True
 
         try:
@@ -351,33 +351,34 @@ class JulesClient:
                 # Inject W3C trace context into headers
                 inject(request_headers)
 
-            async with session.request(
+            response = await client.request(
                 method,
                 url,
                 headers=request_headers,
                 json=json,
-            ) as resp:
-                if resp.status == 429:
-                    retry_after = resp.headers.get("Retry-After")
-                    raise RateLimitError(
-                        f"Rate limit exceeded for {endpoint}",
-                        retry_after=int(retry_after) if retry_after else None,
-                    )
+            )
 
-                # Include response body in error for debugging
-                if not resp.ok:
-                    body = await resp.text()
-                    logger.error(f"API error {resp.status}: {body[:200]}")
+            if response.status_code == 429:
+                retry_after = response.headers.get("Retry-After")
+                raise RateLimitError(
+                    f"Rate limit exceeded for {endpoint}",
+                    retry_after=int(retry_after) if retry_after else None,
+                )
 
-                resp.raise_for_status()
-                return await resp.json()
+            # Include response body in error for debugging
+            if response.is_error:
+                await response.read()  # Ensure content is read
+                logger.error(f"API error {response.status_code}: {response.text[:200]}")
+
+            response.raise_for_status()
+            return response.json()
         finally:
             if close_after:
-                await session.close()
+                await client.aclose()
 
     # PURPOSE: Create a new Jules session
     @with_retry(
-        max_attempts=3, retryable_exceptions=(RateLimitError, aiohttp.ClientError)
+        max_attempts=3, retryable_exceptions=(RateLimitError, httpx.RequestError)
     )
     async def create_session(
         self,
@@ -422,7 +423,7 @@ class JulesClient:
 
     # PURPOSE: Get session status
     @with_retry(
-        max_attempts=3, retryable_exceptions=(RateLimitError, aiohttp.ClientError)
+        max_attempts=3, retryable_exceptions=(RateLimitError, httpx.RequestError)
     )
     async def get_session(self, session_id: str) -> JulesSession:
         """

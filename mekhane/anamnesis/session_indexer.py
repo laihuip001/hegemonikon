@@ -1,4 +1,4 @@
-# PURPOSE: セッション履歴を GnosisIndex (LanceDB) にインデックスする
+# PROOF: [L2/Anamnesis] <- mekhane/anamnesis/ Index Session History
 """
 PROOF: [L2/インフラ] <- mekhane/anamnesis/
 

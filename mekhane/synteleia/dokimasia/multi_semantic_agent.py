@@ -1,4 +1,4 @@
-# PURPOSE: Multi-LLM アンサンブル監査エージェント (Layer B: Nous)
+# PROOF: [L2/Synteleia] <- mekhane/synteleia/ Multi-LLM Ensemble Audit Agent
 """
 MultiSemanticAgent — Multi-LLM Cognitive Ensemble
 

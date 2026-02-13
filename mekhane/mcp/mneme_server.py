@@ -113,7 +113,15 @@ def get_engine():
         log("Initializing SearchEngine...")
         _engine = SearchEngine()
 
-        # Load seed data for MVP testing
+        # --- Real index paths (built by kairos_ingest.py / sophia_ingest.py) ---
+        _indices_dir = _project_root.parent / "mneme" / ".hegemonikon" / "indices"
+        _real_indices = {
+            "kairos": _indices_dir / "kairos.pkl",
+            "sophia": _indices_dir / "sophia.pkl",
+        }
+
+        # --- Seed data fallback ---
+        seed_data = {}
         try:
             from mekhane.symploke.seed_data import (
                 GNOSIS_SEED,
@@ -121,39 +129,42 @@ def get_engine():
                 SOPHIA_SEED,
                 KAIROS_SEED,
             )
-
             seed_data = {
                 "gnosis": GNOSIS_SEED,
                 "chronos": CHRONOS_SEED,
                 "sophia": SOPHIA_SEED,
                 "kairos": KAIROS_SEED,
             }
-            log("Seed data loaded")
+            log("Seed data loaded (fallback)")
         except ImportError:
-            seed_data = {}
             log("No seed data available")
 
-        # Register all indices with EmbeddingAdapter (semantic search mode)
-        # Using MiniLM-L6-v2: 384 dimensions
-        embedding_adapter = EmbeddingAdapter()
-        log("EmbeddingAdapter initialized")
-
+        # --- Register indices: real .pkl first, seed fallback ---
         for IndexClass, name in [
             (GnosisIndex, "gnosis"),
             (ChronosIndex, "chronos"),
             (SophiaIndex, "sophia"),
             (KairosIndex, "kairos"),
         ]:
-            adapter = EmbeddingAdapter()
-            index = IndexClass(adapter, name, dimension=384)
-            index.initialize()
+            pkl_path = _real_indices.get(name)
 
-            # Ingest seed data if available
-            if name in seed_data:
-                count = index.ingest(seed_data[name])
-                log(f"Registered {name} index ({count} docs)")
+            if pkl_path and pkl_path.exists():
+                # Load from real pre-built index
+                adapter = EmbeddingAdapter()
+                index = IndexClass(adapter, name, dimension=1024)
+                index.load(str(pkl_path))
+                count = index.count()
+                log(f"Loaded {name} from {pkl_path.name} ({count} docs)")
             else:
-                log(f"Registered {name} index (empty)")
+                # Fallback to seed data
+                adapter = EmbeddingAdapter()
+                index = IndexClass(adapter, name, dimension=384)
+                index.initialize()
+                if name in seed_data:
+                    count = index.ingest(seed_data[name])
+                    log(f"Registered {name} from seed ({count} docs)")
+                else:
+                    log(f"Registered {name} (empty)")
 
             _engine.register(index)
 

@@ -59,11 +59,17 @@ if not GATEWAY_TOKEN:
     print("   Set HGK_GATEWAY_TOKEN in .env or environment.", file=sys.stderr)
     sys.exit(1)
 
-# [C-2] 許可されたクライアントIDのホワイトリスト
+# [C-2] 許可されたクライアントID (名前付き) + 許可された redirect_uri ドメイン
+# claude.ai は毎セッション新しい UUID client_id を生成するため、
+# ドメインベースで許可する (redirect_uri に含まれるドメインで判定)
 ALLOWED_CLIENT_IDS: set[str] = {
     "claude.ai",
     "chatgpt.com",
     "hgk-mobile",
+}
+ALLOWED_REDIRECT_DOMAINS: set[str] = {
+    "claude.ai",
+    "chatgpt.com",
 }
 
 # Allowed hosts for DNS rebinding protection
@@ -147,8 +153,13 @@ class HGKOAuthProvider(OAuthAuthorizationServerProvider[AuthorizationCode, Refre
     async def get_client(self, client_id: str) -> OAuthClientInformationFull | None:
         client = self._clients.get(client_id)
         if client is None:
-            # [C-2] Only allow whitelisted clients
-            if client_id not in ALLOWED_CLIENT_IDS:
+            # [C-2] Check: named whitelist OR UUID format (claude.ai dynamic IDs)
+            import re
+            is_uuid = bool(re.match(
+                r'^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$',
+                client_id
+            ))
+            if client_id not in ALLOWED_CLIENT_IDS and not is_uuid:
                 print(f"⚠️ Rejected unknown client: {client_id[:32]}", file=sys.stderr)
                 _wbc_log_security_event(
                     event_type="client_rejected",
@@ -156,12 +167,12 @@ class HGKOAuthProvider(OAuthAuthorizationServerProvider[AuthorizationCode, Refre
                     details=f"Unknown client_id rejected: {client_id[:32]}",
                 )
                 return None
-            # Auto-register whitelisted clients (claude.ai skips /register)
+            # Auto-register: whitelisted names or UUID clients (claude.ai dynamic)
             from pydantic import AnyHttpUrl
             client = OAuthClientInformationFull(
                 client_id=client_id,
                 client_secret=None,
-                redirect_uris=[AnyHttpUrl("https://claude.ai/api/auth/callback")],
+                redirect_uris=[AnyHttpUrl("https://claude.ai/api/mcp/auth_callback")],
                 client_name=f"auto-{client_id[:16]}",
                 grant_types=["authorization_code", "refresh_token"],
                 response_types=["code"],
@@ -424,64 +435,91 @@ C. 将来展望
 
 # PURPOSE: hgk_gateway の hgk search 処理を実行する
 @mcp.tool()
-def hgk_search(query: str, max_results: int = 5) -> str:
+def hgk_search(query: str, max_results: int = 5, mode: str = "hybrid") -> str:
     """
     HGK の知識ベース (KI / Gnōsis / Sophia) を検索する。
 
     Args:
         query: 検索クエリ (例: "FEP 精度加重", "認知バイアス")
         max_results: 最大結果数
+        mode: 検索モード — "hybrid" (ベクトル+キーワード), "vector" (ベクトルのみ), "keyword" (キーワードのみ)
     """
     results = []
 
-    # 1. KI (Knowledge Items) — ファイル名検索
-    ki_base = Path.home() / ".gemini" / "antigravity" / "knowledge"
-    if ki_base.exists():
-        ki_dirs = sorted(ki_base.iterdir())
-        query_lower = query.lower()
-        for ki_dir in ki_dirs:
-            if ki_dir.is_dir():
-                metadata_path = ki_dir / "metadata.json"
-                if metadata_path.exists():
-                    try:
-                        meta = json.loads(metadata_path.read_text(encoding="utf-8"))
-                        summary = meta.get("summary", "")
-                        title = meta.get("title", ki_dir.name)
-                        if query_lower in title.lower() or query_lower in summary.lower():
-                            results.append(f"📚 **KI: {title}**\n   {summary[:150]}...")
-                    except Exception:
-                        pass
+    # --- ベクトル検索 (GnosisIndex) ---
+    if mode in ("hybrid", "vector"):
+        try:
+            from mekhane.anamnesis.index import GnosisIndex
 
-    # 2. Doxa (信念)
-    if DOXA_DIR.exists():
-        for doxa_file in sorted(DOXA_DIR.glob("*.json")):
-            try:
-                doxa = json.loads(doxa_file.read_text(encoding="utf-8"))
-                content = json.dumps(doxa, ensure_ascii=False)
-                if query.lower() in content.lower():
-                    results.append(f"💡 **Doxa: {doxa_file.stem}**\n   {content[:150]}...")
-            except Exception:
-                pass
+            idx = GnosisIndex()
+            vector_results = idx.search(query, k=max_results)
+            for r in vector_results:
+                title = r.get("title", "不明")
+                authors = r.get("authors", "")
+                abstract = r.get("abstract", "")[:200]
+                source = r.get("source", "")
+                score = r.get("_distance", None)
+                score_str = f" (score: {score:.3f})" if score is not None else ""
+                results.append(
+                    f"🔬 **{title}**{score_str}\n"
+                    f"   著者: {authors[:80]}\n"
+                    f"   {abstract}..."
+                )
+        except ImportError:
+            results.append("⚠️ ベクトル検索モジュール未インストール (lancedb/sentence-transformers)")
+        except Exception as e:
+            results.append(f"⚠️ ベクトル検索エラー: {e}")
 
-    # 3. Handoff — 最新3件を検索
-    if SESSIONS_DIR.exists():
-        handoffs = sorted(SESSIONS_DIR.glob("handoff_*.md"), reverse=True)[:3]
-        for hf in handoffs:
-            try:
-                content = hf.read_text(encoding="utf-8")
-                if query.lower() in content.lower():
-                    # Find matching context
-                    lines = content.split("\n")
-                    matches = [l.strip() for l in lines if query.lower() in l.lower()][:3]
-                    match_text = " / ".join(matches) if matches else "(マッチ箇所省略)"
-                    results.append(f"📋 **Handoff: {hf.stem}**\n   {match_text[:150]}")
-            except Exception:
-                pass
+    # --- キーワード検索 ---
+    if mode in ("hybrid", "keyword"):
+        # 1. KI (Knowledge Items) — ファイル名検索
+        ki_base = Path.home() / ".gemini" / "antigravity" / "knowledge"
+        if ki_base.exists():
+            ki_dirs = sorted(ki_base.iterdir())
+            query_lower = query.lower()
+            for ki_dir in ki_dirs:
+                if ki_dir.is_dir():
+                    metadata_path = ki_dir / "metadata.json"
+                    if metadata_path.exists():
+                        try:
+                            meta = json.loads(metadata_path.read_text(encoding="utf-8"))
+                            summary = meta.get("summary", "")
+                            title = meta.get("title", ki_dir.name)
+                            if query_lower in title.lower() or query_lower in summary.lower():
+                                results.append(f"📚 **KI: {title}**\n   {summary[:150]}...")
+                        except Exception:
+                            pass
+
+        # 2. Doxa (信念)
+        if DOXA_DIR.exists():
+            for doxa_file in sorted(DOXA_DIR.glob("*.json")):
+                try:
+                    doxa = json.loads(doxa_file.read_text(encoding="utf-8"))
+                    content = json.dumps(doxa, ensure_ascii=False)
+                    if query.lower() in content.lower():
+                        results.append(f"💡 **Doxa: {doxa_file.stem}**\n   {content[:150]}...")
+                except Exception:
+                    pass
+
+        # 3. Handoff — 最新3件を検索
+        if SESSIONS_DIR.exists():
+            handoffs = sorted(SESSIONS_DIR.glob("handoff_*.md"), reverse=True)[:3]
+            for hf in handoffs:
+                try:
+                    content = hf.read_text(encoding="utf-8")
+                    if query.lower() in content.lower():
+                        lines = content.split("\n")
+                        matches = [l.strip() for l in lines if query.lower() in l.lower()][:3]
+                        match_text = " / ".join(matches) if matches else "(マッチ箇所省略)"
+                        results.append(f"📋 **Handoff: {hf.stem}**\n   {match_text[:150]}")
+                except Exception:
+                    pass
 
     if not results:
-        return f"🔍 `{query}` に一致する結果はありませんでした。\n\n> ヒント: ベクトル検索 (Gnōsis) は PC でのみ利用可能です。"
+        return f"🔍 `{query}` に一致する結果はありませんでした。"
 
-    header = f"## 🔍 HGK 検索結果: `{query}`\n\n**{len(results)} 件**\n\n"
+    mode_label = {"hybrid": "ハイブリッド", "vector": "ベクトル", "keyword": "キーワード"}.get(mode, mode)
+    header = f"## 🔍 HGK 検索結果: `{query}` ({mode_label})\n\n**{len(results)} 件**\n\n"
     return header + "\n\n".join(results[:max_results])
 
 
@@ -780,18 +818,20 @@ def hgk_paper_search(query: str, limit: int = 5) -> str:
 
         lines = [f"## 🔍 論文検索: '{query}' ({len(results)} 件)\n"]
         for i, paper in enumerate(results, 1):
-            title = paper.get("title", "不明")
-            year = paper.get("year", "?")
-            citations = paper.get("citationCount", 0)
+            # Paper は dataclass — 属性アクセスを使用 (.get() は使えない)
+            title = getattr(paper, "title", "不明")
+            year = getattr(paper, "year", None) or "?"
+            citations = getattr(paper, "citation_count", 0)
+            paper_authors = getattr(paper, "authors", []) or []
             authors = ", ".join(
-                a.get("name", "?") for a in paper.get("authors", [])[:3]
+                a if isinstance(a, str) else str(a) for a in paper_authors[:3]
             )
-            if len(paper.get("authors", [])) > 3:
+            if len(paper_authors) > 3:
                 authors += " et al."
             lines.append(f"### {i}. {title} ({year})")
             lines.append(f"- **著者**: {authors}")
             lines.append(f"- **被引用数**: {citations}")
-            abstract = paper.get("abstract", "")
+            abstract = getattr(paper, "abstract", "") or ""
             if abstract:
                 # Abstract を 200 文字に制限
                 if len(abstract) > 200:
@@ -1056,6 +1096,397 @@ def hgk_digest_run(
         return "❌ DigestorPipeline が利用できません (import エラー)"
     except Exception as e:
         return f"❌ 消化パイプラインエラー: {e}"
+
+
+# =============================================================================
+# Ochēma: LLM 呼出し (Antigravity LS 経由)
+# =============================================================================
+
+# Rate limiter: 5 req/min
+_ask_timestamps: list[float] = []
+_ASK_RATE_LIMIT = 5
+_ASK_RATE_WINDOW = 60  # seconds
+
+
+def _check_rate_limit() -> bool:
+    """レートリミットチェック。True = 許可、False = 拒否。"""
+    now = time.time()
+    _ask_timestamps[:] = [t for t in _ask_timestamps if now - t < _ASK_RATE_WINDOW]
+    if len(_ask_timestamps) >= _ASK_RATE_LIMIT:
+        return False
+    _ask_timestamps.append(now)
+    return True
+
+# PURPOSE: IDE セッション一覧を取得する
+@mcp.tool()
+def hgk_sessions() -> str:
+    """
+    IDE のセッション (cascade) 一覧を取得する。
+
+    各セッションには cascade_id, ステップ数, サマリ, 最終更新日時が含まれる。
+    hgk_session_read や hgk_ask (cascade_id 指定) と組み合わせて使用する。
+    """
+    try:
+        from mekhane.ochema.antigravity_client import AntigravityClient
+
+        client = AntigravityClient()
+        data = client.session_info()
+
+        sessions = data.get("sessions", [])
+        if not sessions:
+            return "📭 セッションがありません"
+
+        lines = [f"## 📋 IDE セッション一覧 ({data.get('total', 0)} 件)\n"]
+        for s in sessions:
+            status_icon = "🟢" if s.get("status") == "active" else "⚪"
+            summary = s.get("summary", "")[:80] or "(サマリなし)"
+            lines.append(
+                f"- {status_icon} `{s['cascade_id'][:12]}...` "
+                f"| {s.get('step_count', 0)} steps "
+                f"| {summary}"
+            )
+        return "\n".join(lines)
+    except RuntimeError as e:
+        return f"❌ LS 未検出: {e}"
+    except Exception as e:
+        return f"❌ エラー: {e}"
+
+
+# PURPOSE: IDE セッションの会話内容を読み取る
+@mcp.tool()
+def hgk_session_read(
+    cascade_id: str,
+    max_turns: int = 10,
+    full: bool = False,
+) -> str:
+    """
+    IDE セッションの会話内容を読み取る。
+
+    user/assistant/tool の全ターンを時系列で返す。
+    claude.ai ↔ IDE のセッション同期に使用する。
+
+    Args:
+        cascade_id: セッションの cascade_id (hgk_sessions で取得)
+        max_turns: 返す最大ターン数 (デフォルト: 10)
+        full: True → フル取得 (上限 30000 文字)
+    """
+    if not cascade_id or not cascade_id.strip():
+        return "❌ cascade_id が空です"
+
+    try:
+        from mekhane.ochema.antigravity_client import AntigravityClient
+
+        client = AntigravityClient()
+        data = client.session_read(
+            cascade_id.strip(),
+            max_turns=max(1, min(50, max_turns)),
+            full=full,
+        )
+
+        if "error" in data:
+            return f"❌ {data['error']}"
+
+        conversation = data.get("conversation", [])
+        if not conversation:
+            return f"📭 セッション `{cascade_id[:12]}...` に会話がありません"
+
+        lines = [
+            f"## 💬 セッション会話ログ\n",
+            f"**Cascade**: `{data['cascade_id']}`",
+            f"**Summary**: {data.get('summary', 'N/A')}",
+            f"**Total Steps**: {data.get('total_steps', 0)} | "
+            f"**Turns shown**: {len(conversation)}\n",
+            "---\n",
+        ]
+
+        for turn in conversation:
+            role = turn.get("role", "")
+            if role == "user":
+                content = turn.get("content", "")
+                trunc = " ✂️" if turn.get("truncated") else ""
+                lines.append(f"### 👤 User{trunc}\n{content}\n")
+            elif role == "assistant":
+                content = turn.get("content", "")
+                model = turn.get("model", "")
+                trunc = " ✂️" if turn.get("truncated") else ""
+                model_label = f" ({model})" if model else ""
+                lines.append(f"### 🤖 Assistant{model_label}{trunc}\n{content}\n")
+            elif role == "tool":
+                tool_name = turn.get("tool", "unknown")
+                lines.append(f"- 🔧 `{tool_name}`\n")
+
+        result = "\n".join(lines)
+
+        # サイズ制御
+        max_size = 30000 if full else 15000
+        if len(result) > max_size:
+            result = result[:max_size] + f"\n\n... (出力が {max_size} 文字を超えたため切り詰め)"
+
+        return result
+    except RuntimeError as e:
+        return f"❌ LS 未検出: {e}"
+    except Exception as e:
+        return f"❌ エラー: {e}"
+
+
+# PURPOSE: LLM にメッセージを送り応答を取得する (Antigravity LS 経由)
+@mcp.tool()
+def hgk_ask(
+    message: str,
+    model: str = "MODEL_CLAUDE_4_5_SONNET_THINKING",
+    timeout: int = 120,
+    cascade_id: str = "",
+) -> str:
+    """
+    LLM にメッセージを送り応答を取得する (Antigravity LS 経由)。
+
+    コスト0、API key 不要。IDE の Language Server を経由して
+    Claude, Gemini, GPT 等を呼び出す。
+
+    cascade_id を指定すると、既存セッションの文脈を引き継いで質問できる。
+    省略時は新規セッションを作成する。
+
+    Args:
+        message: LLM に送るメッセージ (最大 5000 文字)
+        model: 使用モデル (デフォルト: Claude Sonnet)
+        timeout: タイムアウト秒数 (最大 300)
+        cascade_id: 既存セッションの cascade_id (省略時は新規)
+    """
+    # [C-3] Input validation
+    if not message or not message.strip():
+        return "❌ メッセージが空です"
+    if len(message) > 5000:
+        return f"❌ メッセージが長すぎます ({len(message)} 文字、上限 5000)"
+    timeout = max(10, min(300, timeout))
+
+    # Rate limit
+    if not _check_rate_limit():
+        return "⚠️ レートリミット超過 (5 回/分)。少し待ってから再試行してください。"
+
+    try:
+        from mekhane.ochema.antigravity_client import AntigravityClient
+
+        client = AntigravityClient()
+
+        if cascade_id and cascade_id.strip():
+            # 既存セッションにメッセージ追加
+            cid = cascade_id.strip()
+            client._send_message(cid, message, model)
+            response = client._poll_response(cid, float(timeout))
+        else:
+            # 新規セッション
+            response = client.ask(message, model=model, timeout=float(timeout))
+
+        result = f"## 🤖 LLM 応答\n\n**モデル**: `{response.model}`\n\n---\n\n{response.text}"
+
+        if response.thinking:
+            result += f"\n\n---\n\n<details><summary>💭 思考プロセス</summary>\n\n{response.thinking[:2000]}\n\n</details>"
+
+        # W12 Token Explosion 対策
+        if len(result) > 8000:
+            result = result[:8000] + "\n\n... (出力が 8000 文字を超えたため切り詰めました)"
+
+        return result
+    except RuntimeError as e:
+        return f"❌ LS 未検出: {e}\n\n> Antigravity IDE が起動しているか確認してください"
+    except Exception as e:
+        return f"❌ LLM エラー: {e}"
+
+
+# PURPOSE: 利用可能な LLM モデル一覧を取得する
+@mcp.tool()
+def hgk_models() -> str:
+    """
+    利用可能な LLM モデル一覧を取得する。
+    Antigravity LS が提供するモデルとクォータ残量を確認できる。
+    """
+    try:
+        from mekhane.ochema.antigravity_client import AntigravityClient
+
+        client = AntigravityClient()
+        models = client.list_models()
+
+        if not models:
+            return "📭 モデル情報を取得できませんでした"
+
+        lines = ["## 🤖 利用可能モデル\n"]
+        lines.append("| モデル | ラベル | 残量 |")
+        lines.append("|:-------|:-------|-----:|")
+        for m in models:
+            remaining = m.get("remaining", 0)
+            icon = "🟢" if remaining > 50 else "🟡" if remaining > 10 else "🔴"
+            lines.append(
+                f"| `{m.get('name', 'unknown')}` "
+                f"| {m.get('label', '')} "
+                f"| {icon} {remaining}% |"
+            )
+        return "\n".join(lines)
+    except RuntimeError as e:
+        return f"❌ LS 未検出: {e}"
+    except Exception as e:
+        return f"❌ エラー: {e}"
+
+
+# PURPOSE: Antigravity LS の接続状況を確認する
+@mcp.tool()
+def hgk_ls_status() -> str:
+    """
+    Antigravity LS の接続状況を確認する。
+    LS が稼働しているか、PID, ポート, ワークスペースを表示する。
+    """
+    try:
+        from mekhane.ochema.antigravity_client import AntigravityClient
+
+        client = AntigravityClient()
+        status = client.get_status()
+
+        return f"""## 🔌 Language Server ステータス
+
+**状態**: ✅ 接続済み
+**PID**: {client.pid}
+**Port**: {client.port}
+
+---
+
+{status}"""
+    except RuntimeError as e:
+        return f"## 🔌 Language Server ステータス\n\n**状態**: ❌ 未検出\n**エラー**: {e}"
+    except Exception as e:
+        return f"❌ エラー: {e}"
+
+
+# =============================================================================
+# Sympatheia: システム健全性
+# =============================================================================
+
+# PURPOSE: HGK システムの健全性チェック (Sympatheia 読取り)
+@mcp.tool()
+def hgk_health() -> str:
+    """
+    HGK システムの詳細な健全性レポートを表示する。
+    Heartbeat, WBC アラート, Health スコアを確認。
+    """
+    lines = ["## 🩺 HGK Health Report\n"]
+
+    # 1. Heartbeat
+    hb_file = _MNEME_DIR / "heartbeat.json"
+    if hb_file.exists():
+        try:
+            hb = json.loads(hb_file.read_text("utf-8"))
+            beats = hb.get("totalBeats", 0)
+            last = hb.get("lastBeat", "不明")
+            lines.append(f"### 💓 Heartbeat\n- **総拍動数**: {beats}\n- **最終拍動**: {last}\n")
+        except Exception:
+            lines.append("### 💓 Heartbeat\n- ⚠️ 読取りエラー\n")
+    else:
+        lines.append("### 💓 Heartbeat\n- 未検出\n")
+
+    # 2. WBC Alerts
+    wbc_file = _MNEME_DIR / "wbc_state.json"
+    if wbc_file.exists():
+        try:
+            wbc = json.loads(wbc_file.read_text("utf-8"))
+            total = wbc.get("totalAlerts", 0)
+            alerts = wbc.get("alerts", [])
+            recent = alerts[-5:] if alerts else []
+
+            lines.append(f"### 🛡️ WBC Alerts\n- **総アラート数**: {total}\n")
+            if recent:
+                lines.append("**直近5件:**\n")
+                for a in reversed(recent):
+                    sev = a.get("severity", "?")
+                    ts = a.get("timestamp", "?")[:19]
+                    details = a.get("details", "")[:80]
+                    icon = "🔴" if sev == "high" else ("🟡" if sev == "medium" else "🟢")
+                    lines.append(f"- {icon} [{sev}] {ts} — {details}")
+                lines.append("")
+            else:
+                lines.append("- ✅ アラートなし\n")
+        except Exception:
+            lines.append("### 🛡️ WBC\n- ⚠️ 読取りエラー\n")
+    else:
+        lines.append("### 🛡️ WBC\n- 未検出\n")
+
+    # 3. Health Metrics (latest entry)
+    health_file = _MNEME_DIR / "health_metrics.jsonl"
+    if health_file.exists():
+        try:
+            last_line = ""
+            with open(health_file, "r", encoding="utf-8") as f:
+                for line in f:
+                    if line.strip():
+                        last_line = line
+            if last_line:
+                metric = json.loads(last_line)
+                score = metric.get("score", "?")
+                lines.append(f"### 📊 Health Score\n- **最新スコア**: {score}\n")
+        except Exception:
+            lines.append("### 📊 Health Score\n- ⚠️ 読取りエラー\n")
+
+    # 4. Git Status
+    git_file = _MNEME_DIR / "git_sentinel_state.json"
+    if git_file.exists():
+        try:
+            git = json.loads(git_file.read_text("utf-8"))
+            dirty = git.get("isDirty", False)
+            modified = len(git.get("modifiedFiles", []))
+            icon = "🟡" if dirty else "🟢"
+            lines.append(f"### {icon} Git\n- **Dirty**: {dirty}\n- **変更ファイル**: {modified}\n")
+        except Exception:
+            pass
+
+    return "\n".join(lines)
+
+
+# PURPOSE: 未読通知の確認 (Sympatheia notifications)
+@mcp.tool()
+def hgk_notifications(limit: int = 10) -> str:
+    """
+    未読通知を確認する。
+    HGK システムからの通知 (INFO/HIGH/CRITICAL) を表示。
+
+    Args:
+        limit: 表示件数 (デフォルト: 10)
+    """
+    notif_file = _MNEME_DIR / "notifications.jsonl"
+    if not notif_file.exists():
+        return "## 🔔 通知\n\n📭 通知ファイルが見つかりません"
+
+    try:
+        notifications = []
+        with open(notif_file, "r", encoding="utf-8") as f:
+            for line in f:
+                line = line.strip()
+                if line:
+                    try:
+                        notifications.append(json.loads(line))
+                    except json.JSONDecodeError:
+                        pass
+
+        if not notifications:
+            return "## 🔔 通知\n\n✅ 通知はありません"
+
+        limit = max(1, min(50, limit))
+        recent = notifications[-limit:]
+
+        lines = [f"## 🔔 通知 ({len(recent)}/{len(notifications)} 件)\n"]
+
+        for n in reversed(recent):
+            level = n.get("level", n.get("notification_level", "INFO"))
+            title = n.get("title", "無題")
+            body = n.get("body", "")[:100]
+            ts = n.get("timestamp", "?")[:19]
+
+            icon = {"CRITICAL": "🔴", "HIGH": "🟠", "INFO": "🔵"}.get(level, "⚪")
+            lines.append(f"- {icon} **[{level}]** {title}")
+            if body:
+                lines.append(f"  {body}")
+            lines.append(f"  *{ts}*")
+            lines.append("")
+
+        return "\n".join(lines)
+    except Exception as e:
+        return f"❌ 通知読取りエラー: {e}"
 
 
 # =============================================================================

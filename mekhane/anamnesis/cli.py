@@ -451,6 +451,53 @@ def main():
     )
     p_chat.set_defaults(func=cmd_chat)
 
+    # session-index (Session History Vector Search)
+    def cmd_session_index(args):
+        """セッション履歴をインデックス"""
+        from mekhane.anamnesis.session_indexer import index_from_api, index_from_json
+        if args.json_path:
+            return index_from_json(args.json_path)
+        return index_from_api()
+
+    p_session = subparsers.add_parser(
+        "session-index", help="Index session history into LanceDB"
+    )
+    p_session.add_argument(
+        "json_path", nargs="?", default=None,
+        help="Path to trajectories_raw.json (omit to fetch from API)"
+    )
+    p_session.set_defaults(func=cmd_session_index)
+
+    # handoff-index (Handoff VSearch)
+    def cmd_handoff_index(args):
+        """Handoff ファイルをインデックス"""
+        from mekhane.anamnesis.session_indexer import index_handoffs
+        return index_handoffs(args.handoff_dir)
+
+    p_handoff = subparsers.add_parser(
+        "handoff-index", help="Index handoff_*.md files into LanceDB"
+    )
+    p_handoff.add_argument(
+        "--handoff-dir", default=None,
+        help="Custom handoff directory (default: ~/oikos/mneme/.hegemonikon/sessions)"
+    )
+    p_handoff.set_defaults(func=cmd_handoff_index)
+
+    # conversation-index (Full Conversation Content VSearch)
+    def cmd_conversation_index(args):
+        """全セッション会話をインデックス"""
+        from mekhane.anamnesis.session_indexer import index_conversations
+        return index_conversations(args.max_sessions)
+
+    p_conv = subparsers.add_parser(
+        "conversation-index", help="Index full conversation content from LS API"
+    )
+    p_conv.add_argument(
+        "--max-sessions", type=int, default=100,
+        help="Max sessions to index (default: 100)"
+    )
+    p_conv.set_defaults(func=cmd_conversation_index)
+
     # retrieve (LLM 不使用 — 検索結果のみ返す)
     from mekhane.anamnesis.gnosis_chat import cmd_retrieve
 

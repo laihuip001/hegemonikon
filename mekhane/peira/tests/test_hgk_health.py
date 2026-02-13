@@ -19,6 +19,7 @@ from mekhane.peira.hgk_health import (
     check_handoff,
     check_digestor_log,
     check_digest_reports,
+    check_kalon,
     check_theorem_activity,
     format_terminal,
     run_health_check,
@@ -307,6 +308,30 @@ class TestCheckTheoremActivity(unittest.TestCase):
         self.assertIn("hub-only", result.detail)
         self.assertIn("20 direct", result.detail)
         self.assertIn("4 hub-only", result.detail)
+
+# PURPOSE: Kalon 品質チェックのテスト
+class TestCheckKalon(unittest.TestCase):
+    """Test suite for check_kalon."""
+
+    # PURPOSE: 実データで check_kalon() が正常に動作するか検証
+    def test_kalon_with_real_data(self):
+        """Integration: category.py の実データで検証"""
+        result = check_kalon()
+        self.assertEqual(result.name, "Kalon Quality")
+        self.assertIn(result.status, ["ok", "warn", "error", "unknown"])
+        # Real data should pass (all enrichments and adjoints defined)
+        self.assertEqual(result.status, "ok")
+        self.assertIn("KALON", result.detail)
+        self.assertIsNotNone(result.metric)
+        self.assertGreaterEqual(result.metric, 0.70)
+
+    # PURPOSE: run_health_check() の結果に Kalon が含まれるか検証
+    def test_kalon_in_health_report(self):
+        """Kalon Quality が run_health_check() に含まれること"""
+        report = run_health_check()
+        kalon_items = [i for i in report.items if i.name == "Kalon Quality"]
+        self.assertEqual(len(kalon_items), 1)
+        self.assertIn(kalon_items[0].status, ["ok", "warn", "error", "unknown"])
 
 
 if __name__ == "__main__":

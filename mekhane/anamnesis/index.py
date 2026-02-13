@@ -265,7 +265,7 @@ class GnosisIndex:
                 if norm:
                     self._title_cache[norm] = row["primary_key"]
         except Exception:
-            pass
+            pass  # Intentional: table may be empty or have no primary_key column
 
     @staticmethod
     def _normalize_title(title: str) -> str:
@@ -330,10 +330,16 @@ class GnosisIndex:
 
             print(f"  Processed {min(i + BATCH_SIZE, len(papers))}/{len(papers)}...")
 
-        # LanceDBに追加
+        # LanceDBに追加 (スキーマフィルタリング付き)
         if self._table_exists():
             table = self.db.open_table(self.TABLE_NAME)
-            table.add(data)
+            # P4: テーブルスキーマに合わせてフィールドをフィルタ
+            schema_fields = {f.name for f in table.schema}
+            filtered_data = [
+                {k: v for k, v in record.items() if k in schema_fields}
+                for record in data
+            ]
+            table.add(filtered_data)
         else:
             self.db.create_table(self.TABLE_NAME, data=data)
 
@@ -420,4 +426,4 @@ class GnosisIndex:
             )
             return results[0] if results else None
         except Exception:
-            return None
+            return None  # Intentional: query may fail on malformed key or empty table

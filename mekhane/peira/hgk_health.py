@@ -251,6 +251,36 @@ def check_digest_reports() -> HealthItem:
         return HealthItem("Digest Reports", "error", detail, metric=age_hours)
 
 
+# PURPOSE: Kalon (圏論的構造) 品質チェック
+def check_kalon() -> HealthItem:
+    """category.py の圏論的構造が Fix(G∘F) 品質基準を満たすか検証"""
+    try:
+        from mekhane.fep.kalon_checker import KalonChecker, KalonLevel
+
+        checker = KalonChecker()
+        report = checker.check_all()
+
+        # KalonLevel → HealthItem status mapping
+        level_map = {
+            KalonLevel.KALON: "ok",
+            KalonLevel.APPROACHING: "warn",
+            KalonLevel.INCOMPLETE: "error",
+            KalonLevel.ABSENT: "error",
+        }
+        status = level_map.get(report.overall_level, "unknown")
+
+        kalon_count = sum(1 for r in report.results if r.level == KalonLevel.KALON)
+        total = len(report.results)
+        detail = f"{kalon_count}/{total} KALON ({report.overall_score:.2f})"
+
+        if report.all_issues:
+            detail += f", {len(report.all_issues)} issues"
+
+        return HealthItem("Kalon Quality", status, detail, metric=report.overall_score)
+    except Exception as e:
+        return HealthItem("Kalon Quality", "unknown", str(e))
+
+
 # PURPOSE: 全ヘルスチェックを実行してレポートを生成
 def run_health_check() -> HealthReport:
     report = HealthReport(timestamp=datetime.now().isoformat())
@@ -270,6 +300,7 @@ def run_health_check() -> HealthReport:
     # Quality checks (optional, slower)
     report.items.append(check_dendron())
     report.items.append(check_theorem_activity())
+    report.items.append(check_kalon())
 
     return report
 

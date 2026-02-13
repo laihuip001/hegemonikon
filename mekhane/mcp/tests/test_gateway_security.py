@@ -24,6 +24,9 @@ from mekhane.mcp.hgk_gateway import (
     HGKOAuthProvider,
     ALLOWED_CLIENT_IDS,
     hgk_idea_capture,
+    hgk_ccl_execute,
+    hgk_paper_search,
+    hgk_digest_run,
 )
 
 
@@ -208,6 +211,43 @@ async def test_refresh_token_rotation():
     print("✅ 追加: リフレッシュトークン・ローテーション — 旧トークン無効化確認")
 
 
+# PURPOSE: Verify CCL execute size limits
+def test_ccl_execute_size_limit():
+    """C-5: hgk_ccl_execute のサイズ制限テスト"""
+    # CCL 式が 500 文字を超える場合
+    long_ccl = "a" * 501
+    result = hgk_ccl_execute(long_ccl)
+    assert "最大 500 文字" in result, f"CCL サイズ制限が効いていない: {result}"
+
+    # Context が 2000 文字を超える場合
+    result = hgk_ccl_execute("/noe+", context="x" * 2001)
+    assert "最大 2000 文字" in result, f"Context サイズ制限が効いていない: {result}"
+
+    print("✅ C-5: hgk_ccl_execute サイズ制限 — 正常拒否")
+
+
+# PURPOSE: Verify paper search size limits
+def test_paper_search_size_limit():
+    """C-6: hgk_paper_search のサイズ制限テスト"""
+    # クエリが 200 文字を超える場合
+    long_query = "a" * 201
+    result = hgk_paper_search(long_query)
+    assert "最大 200 文字" in result, f"クエリサイズ制限が効いていない: {result}"
+
+    print("✅ C-6: hgk_paper_search サイズ制限 — 正常拒否")
+
+
+# PURPOSE: Verify digest run size limits
+def test_digest_run_size_limit():
+    """C-7: hgk_digest_run のサイズ制限テスト"""
+    # トピックが 500 文字を超える場合
+    long_topics = "a" * 501
+    result = hgk_digest_run(topics=long_topics)
+    assert "最大 500 文字" in result, f"トピックサイズ制限が効いていない: {result}"
+
+    print("✅ C-7: hgk_digest_run サイズ制限 — 正常拒否")
+
+
 # PURPOSE: Verify main behaves correctly
 async def main():
     """Verify main behavior."""
@@ -226,6 +266,9 @@ async def main():
         ("C-4: トークン有効期限", test_c4_token_expiry),
         ("追加: 認証コード再利用防止", test_auth_code_reuse),
         ("追加: リフレッシュトークン・ローテーション", test_refresh_token_rotation),
+        ("C-5: CCL Execute サイズ制限", test_ccl_execute_size_limit),
+        ("C-6: Paper Search サイズ制限", test_paper_search_size_limit),
+        ("C-7: Digest Run サイズ制限", test_digest_run_size_limit),
     ]
 
     for name, test_fn in tests:

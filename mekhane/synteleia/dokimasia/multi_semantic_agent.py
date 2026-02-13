@@ -73,6 +73,7 @@ PERSONAS: Dict[str, str] = {
 
 
 @dataclass
+# PURPOSE: EnsembleMember
 class EnsembleMember:
     """アンサンブルの1メンバー。"""
     name: str
@@ -322,6 +323,7 @@ class MultiSemanticAgent(AuditAgent):
 # Utilities
 # =============================================================================
 
+# PURPOSE: _severity_rank
 def _severity_rank(severity: AuditSeverity) -> int:
     """Severity の厳しさ順序。"""
     return {

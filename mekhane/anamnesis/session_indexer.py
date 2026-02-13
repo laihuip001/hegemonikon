@@ -36,7 +36,7 @@ if str(_HEGEMONIKON_ROOT) not in sys.path:
 
 
 def parse_sessions_from_json(data: dict) -> list[dict]:
-    """trajectorySummaries JSON からセッション情報を抽出"""
+    """PURPOSE: LS API の trajectorySummaries JSON からセッション情報を構造化 dict に抽出する"""
     summaries = data.get("trajectorySummaries", {})
     sessions = []
 
@@ -70,7 +70,7 @@ def parse_sessions_from_json(data: dict) -> list[dict]:
 
 
 def sessions_to_records(sessions: list[dict]) -> list[dict]:
-    """セッション情報を LanceDB レコード (既存スキーマ準拠) に変換
+    """PURPOSE: セッション情報を LanceDB レコード (既存スキーマ準拠) に変換する
 
     既存テーブルスキーマ:
       primary_key, title, source, abstract, content,
@@ -176,7 +176,7 @@ _RE_SECTION = re.compile(r"^##\s+(.+)$", re.MULTILINE)
 
 
 def parse_handoff_md(path: Path) -> dict:
-    """Single handoff .md file -> structured dict"""
+    """PURPOSE: Handoff マークダウンファイルをパースし構造化 dict に変換する"""
     text = path.read_text(encoding="utf-8", errors="replace")
 
     # Title: first H1 line
@@ -213,7 +213,7 @@ def parse_handoff_md(path: Path) -> dict:
 
 
 def handoffs_to_records(handoffs: list[dict]) -> list[dict]:
-    """Parsed handoff dicts -> LanceDB-compatible records"""
+    """PURPOSE: パース済み Handoff dict を LanceDB 互換レコードに変換する"""
     records = []
     for h in handoffs:
         # Build abstract from title + date + section list
@@ -251,7 +251,7 @@ def handoffs_to_records(handoffs: list[dict]) -> list[dict]:
 
 
 def index_handoffs(handoff_dir: Optional[str] = None) -> int:
-    """handoff_*.md を LanceDB にインデックス"""
+    """PURPOSE: handoff_*.md ファイル群を LanceDB にセマンティックインデックスする"""
     directory = Path(handoff_dir) if handoff_dir else _HANDOFF_DIR
 
     if not directory.exists():
@@ -321,7 +321,7 @@ def index_handoffs(handoff_dir: Optional[str] = None) -> int:
 
 
 def fetch_all_conversations(max_sessions: int = 100) -> list[dict]:
-    """AntigravityClient で全セッションの会話を取得"""
+    """PURPOSE: AntigravityClient 経由で LS API から全セッション会話データを取得する"""
     from mekhane.ochema.antigravity_client import AntigravityClient
 
     client = AntigravityClient()
@@ -391,7 +391,7 @@ def fetch_all_conversations(max_sessions: int = 100) -> list[dict]:
 
 
 def conversations_to_records(conversations: list[dict]) -> list[dict]:
-    """会話データを LanceDB レコードに変換"""
+    """PURPOSE: 会話データを LanceDB セマンティック検索用レコードに変換する"""
     records = []
 
     for conv in conversations:
@@ -434,7 +434,7 @@ def conversations_to_records(conversations: list[dict]) -> list[dict]:
 
 
 def index_conversations(max_sessions: int = 100) -> int:
-    """全セッション会話を LanceDB にインデックス"""
+    """PURPOSE: 全セッション会話を取得し LanceDB にセマンティックインデックスする"""
     conversations = fetch_all_conversations(max_sessions)
     if not conversations:
         print("[ConvIndexer] No conversations to index")
@@ -504,7 +504,7 @@ _BRAIN_DIR = Path.home() / ".gemini" / "antigravity" / "brain"
 
 
 def parse_step_outputs(brain_dir: Optional[str] = None, max_per_session: int = 20) -> list[dict]:
-    """Parse .system_generated/steps/*/output.txt files into records."""
+    """PURPOSE: .system_generated/steps/ 配下の output.txt をパースしレコード化する"""
     directory = Path(brain_dir) if brain_dir else _BRAIN_DIR
     if not directory.exists():
         return []
@@ -547,7 +547,7 @@ def parse_step_outputs(brain_dir: Optional[str] = None, max_per_session: int = 2
 
 
 def steps_to_records(steps: list[dict]) -> list[dict]:
-    """Step outputs -> LanceDB-compatible records."""
+    """PURPOSE: ステップ出力データを LanceDB 互換レコードに変換する"""
     records = []
     for s in steps:
         conv_id = s["conversation_id"]
@@ -577,7 +577,7 @@ def steps_to_records(steps: list[dict]) -> list[dict]:
 
 
 def index_steps(brain_dir: Optional[str] = None, max_per_session: int = 20) -> int:
-    """Index .system_generated/steps/ output files into LanceDB."""
+    """PURPOSE: .system_generated/steps/ の出力ファイルを LanceDB にインデックスする"""
     steps = parse_step_outputs(brain_dir, max_per_session)
     if not steps:
         print("[StepsIndexer] No step outputs found")
@@ -641,8 +641,157 @@ def index_steps(brain_dir: Optional[str] = None, max_per_session: int = 20) -> i
     return 0
 
 
+# ==============================================================
+# Export MD Indexer — export_chats.py 出力の MD をインデックス
+# ==============================================================
+
+_EXPORT_DIR = Path.home() / "oikos" / "mneme" / ".hegemonikon" / "sessions"
+_RE_EXPORT_ID = re.compile(r"\*\*ID\*\*:\s*`([^`]+)`")
+_RE_EXPORT_DATE = re.compile(r"\*\*エクスポート日時\*\*:\s*(.+)")
+_RE_ROLE = re.compile(r"^##\s+(👤 User|🤖 Claude)", re.MULTILINE)
+
+
+def parse_export_md(path: Path) -> dict:
+    """PURPOSE: export_chats.py 出力の MD ファイルを構造化 dict にパースする"""
+    text = path.read_text(encoding="utf-8", errors="replace")
+    lines = text.split("\n")
+
+    # Title: first H1
+    title = path.stem
+    for line in lines[:5]:
+        if line.startswith("# "):
+            title = line[2:].strip()
+            break
+
+    # ID
+    id_match = _RE_EXPORT_ID.search(text)
+    conv_id = id_match.group(1) if id_match else ""
+
+    # Export date
+    date_match = _RE_EXPORT_DATE.search(text)
+    exported_at = date_match.group(1).strip() if date_match else ""
+
+    # Extract body (after first ---)
+    body_start = 0
+    for i, line in enumerate(lines):
+        if line.strip() == "---":
+            body_start = i + 1
+            break
+
+    # Count messages by role markers
+    user_count = len(re.findall(r"^## 👤 User", text, re.MULTILINE))
+    assistant_count = len(re.findall(r"^## 🤖 Claude", text, re.MULTILINE))
+
+    body = "\n".join(lines[body_start:])
+    # Clean noise
+    body = re.sub(r"Thought for \d+s\s*", "", body)
+    body = re.sub(r"Thought for <\d+s\s*", "", body)
+    body = re.sub(r"\n{3,}", "\n\n", body).strip()
+
+    return {
+        "title": title,
+        "conv_id": conv_id,
+        "exported_at": exported_at,
+        "user_count": user_count,
+        "assistant_count": assistant_count,
+        "content": body[:4000],
+        "filename": path.name,
+    }
+
+
+def exports_to_records(exports: list[dict]) -> list[dict]:
+    """PURPOSE: パース済みエクスポート dict を LanceDB 互換レコードに変換する"""
+    records = []
+    for e in exports:
+        abstract = f"{e['title']} ({e['user_count']} user, {e['assistant_count']} assistant messages)"
+        if e["exported_at"]:
+            abstract += f" — exported {e['exported_at'][:10]}"
+
+        records.append({
+            "primary_key": f"export:{e['filename']}",
+            "title": e["title"],
+            "source": "export",
+            "abstract": abstract[:500],
+            "content": e["content"],
+            "authors": "IDE Export",
+            "doi": "",
+            "arxiv_id": "",
+            "url": f"session://{e['conv_id']}" if e["conv_id"] else "",
+            "citations": e["user_count"] + e["assistant_count"],
+        })
+    return records
+
+
+def index_exports(export_dir: Optional[str] = None) -> int:
+    """PURPOSE: export_chats.py 出力 MD を LanceDB にセマンティックインデックスする"""
+    directory = Path(export_dir) if export_dir else _EXPORT_DIR
+    if not directory.exists():
+        print(f"[ExportIndexer] Directory not found: {directory}")
+        return 1
+
+    # export_chats.py output: YYYY-MM-DD_conv_N_Title.md
+    md_files = sorted(directory.glob("*_conv_*.md"))
+    if not md_files:
+        print("[ExportIndexer] No export MD files found")
+        return 1
+
+    print(f"[ExportIndexer] Found {len(md_files)} export files")
+
+    exports = [parse_export_md(f) for f in md_files]
+    records = exports_to_records(exports)
+
+    from mekhane.anamnesis.index import GnosisIndex, Embedder
+    index = GnosisIndex()
+    embedder = Embedder()
+
+    # Dedupe
+    if index._table_exists():
+        table = index.db.open_table(index.TABLE_NAME)
+        try:
+            existing = table.to_pandas()
+            existing_keys = set(existing["primary_key"].tolist())
+            before = len(records)
+            records = [r for r in records if r["primary_key"] not in existing_keys]
+            skipped = before - len(records)
+            if skipped:
+                print(f"[ExportIndexer] Skipped {skipped} duplicates")
+        except Exception:
+            pass
+
+    if not records:
+        print("[ExportIndexer] No new exports to add (all duplicates)")
+        return 0
+
+    # Embed
+    BATCH_SIZE = 16
+    data_with_vectors = []
+    for i in range(0, len(records), BATCH_SIZE):
+        batch = records[i : i + BATCH_SIZE]
+        texts = [f"{r['title']} {r['abstract']}" for r in batch]
+        vectors = embedder.embed_batch(texts)
+        for record, vector in zip(batch, vectors):
+            record["vector"] = vector
+            data_with_vectors.append(record)
+        print(f"  Embedded {min(i + BATCH_SIZE, len(records))}/{len(records)}...")
+
+    # Add to LanceDB
+    if index._table_exists():
+        table = index.db.open_table(index.TABLE_NAME)
+        schema_fields = {f.name for f in table.schema}
+        filtered_data = [
+            {k: v for k, v in record.items() if k in schema_fields}
+            for record in data_with_vectors
+        ]
+        table.add(filtered_data)
+    else:
+        index.db.create_table(index.TABLE_NAME, data=data_with_vectors)
+
+    print(f"[ExportIndexer] ✅ Indexed {len(data_with_vectors)} exports")
+    return 0
+
+
 def index_from_json(json_path: str) -> int:
-    """JSON ファイルからセッションをインデックス"""
+    """PURPOSE: trajectorySummaries JSON からセッション情報を LanceDB にインデックスする"""
     path = Path(json_path)
     if not path.exists():
         print(f"[Error] File not found: {json_path}")
@@ -711,7 +860,7 @@ def index_from_json(json_path: str) -> int:
 
 
 def index_from_api() -> int:
-    """API から直接取得してインデックス"""
+    """PURPOSE: LS API から直接セッション情報を取得し LanceDB にインデックスする"""
     script = _HEGEMONIKON_ROOT / "scripts" / "agq-sessions.sh"
     if not script.exists():
         print(f"[Error] Script not found: {script}")
@@ -737,7 +886,7 @@ def index_from_api() -> int:
         return index_from_json(str(json_path))
 
 
-def main() -> int:
+def main() -> int:  # PURPOSE: CLI エントリポイント — サブコマンド (sessions/handoffs/conversations/steps/exports) をディスパッチする
     import argparse
 
     parser = argparse.ArgumentParser(
@@ -785,10 +934,22 @@ def main() -> int:
         default=20,
         help="Max step outputs per session to index (default: 20)",
     )
+    parser.add_argument(
+        "--exports",
+        action="store_true",
+        help="Index export_chats.py output MD files",
+    )
+    parser.add_argument(
+        "--export-dir",
+        default=None,
+        help="Custom export directory (default: ~/oikos/mneme/.hegemonikon/sessions)",
+    )
 
     args = parser.parse_args()
 
-    if args.steps:
+    if args.exports:
+        return index_exports(args.export_dir)
+    elif args.steps:
         return index_steps(max_per_session=args.max_steps_per_session)
     elif args.conversations:
         return index_conversations(args.max_sessions)
@@ -799,7 +960,7 @@ def main() -> int:
     elif args.json_path:
         return index_from_json(args.json_path)
     else:
-        print("Usage: session_indexer.py <json_path> | --from-api | --handoffs | --steps")
+        print("Usage: session_indexer.py <json_path> | --from-api | --handoffs | --steps | --exports")
         return 1
 
 

@@ -39,7 +39,7 @@ class VerdictType(Enum):
 
 
 @dataclass
-# PURPOSE: ラリーの1ターン
+# PURPOSE: ラリーの1ターン — debate の最小単位
 class RallyTurn:
     """ラリーの1ターン — debate の最小単位"""
     speaker: AgentRole
@@ -50,7 +50,7 @@ class RallyTurn:
 
 
 @dataclass
-# PURPOSE: [L2-auto] ディベート引数 (後方互換)
+# PURPOSE: ディベート引数 — 後方互換のためのエージェント主張データ型
 class DebateArgument:
     """ディベート引数"""
     agent_role: AgentRole
@@ -60,7 +60,7 @@ class DebateArgument:
 
 
 @dataclass
-# PURPOSE: [L2-auto] 判定結果
+# PURPOSE: エージェントの最終判定結果 (ACCEPT/REJECT/UNCERTAIN + 確信度)
 class Verdict:
     """判定結果"""
     type: VerdictType
@@ -70,7 +70,7 @@ class Verdict:
 
 
 @dataclass
-# PURPOSE: [L2-auto] ディベートラウンド (ラリー履歴付き)
+# PURPOSE: ディベートラウンド — ラリー全履歴と収束状態を保持するデータ型
 class DebateRound:
     """ディベートラウンド — ラリーの全履歴を保持"""
     round_number: int
@@ -83,7 +83,7 @@ class DebateRound:
 
 
 @dataclass
-# PURPOSE: [L2-auto] 合意結果
+# PURPOSE: マルチエージェント合意形成の最終結果 — 受理判定・確信度・反対意見を含む
 class ConsensusResult:
     """合意結果"""
     accepted: bool
@@ -484,7 +484,7 @@ class ConvergenceDetector:
         history: List[RallyTurn],
         min_turns: int = 3,
     ) -> tuple:
-        """収束判定
+        """PURPOSE: ラリー履歴から収束判定を行い (converged, reason) を返す
         
         Returns:
             (converged: bool, reason: str)
@@ -855,6 +855,7 @@ def quick_verify(claim: str, context: str = "") -> bool:
 # =============================================================================
 
 @dataclass
+# PURPOSE: CCL 実行の監査記録 — 入出力ハッシュと合意結果を保持
 class AuditRecord:
     """監査記録"""
     id: str
@@ -866,17 +867,18 @@ class AuditRecord:
     metadata: Dict[str, Any] = field(default_factory=dict)
 
 
+# PURPOSE: 監査記録のインメモリストア — CRUD + クエリを提供
 class AuditStore:
     """監査記録のストア"""
     
     def __init__(self):
         self._records: List[AuditRecord] = []
     
-    def record(self, audit: AuditRecord):
+    def record(self, audit: AuditRecord):  # PURPOSE: 監査記録をストアに追加する
         """記録を追加"""
         self._records.append(audit)
     
-    def get(self, audit_id: str) -> Optional[AuditRecord]:
+    def get(self, audit_id: str) -> Optional[AuditRecord]:  # PURPOSE: ID で監査記録を取得する
         """ID で取得"""
         for r in self._records:
             if r.id == audit_id:
@@ -889,7 +891,7 @@ class AuditStore:
         since: Optional[datetime] = None,
         limit: int = 10
     ) -> List[AuditRecord]:
-        """クエリ"""
+        """PURPOSE: CCL 式・日時条件で監査記録をクエリする"""
         results = self._records
         if ccl:
             results = [r for r in results if r.ccl == ccl]
@@ -897,7 +899,7 @@ class AuditStore:
             results = [r for r in results if r.timestamp >= since]
         return results[-limit:]
     
-    def get_stats(self) -> Dict[str, Any]:
+    def get_stats(self) -> Dict[str, Any]:  # PURPOSE: 監査統計 (総数・受理率) を返す
         """統計"""
         if not self._records:
             return {"total": 0, "accept_rate": 0.0}
@@ -909,11 +911,12 @@ class AuditStore:
         }
 
 
+# PURPOSE: 監査レポート生成 — 期間指定 + マークダウン出力
 class AuditReporter:
     """監査レポーター"""
     
     @staticmethod
-    def parse_period(period_str: str) -> Optional[datetime]:
+    def parse_period(period_str: str) -> Optional[datetime]:  # PURPOSE: 期間文字列 (today/week/month) を datetime に変換する
         """期間文字列をパース"""
         now = datetime.now()
         if period_str == "today":

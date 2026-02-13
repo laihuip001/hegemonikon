@@ -1,4 +1,5 @@
 # PROOF: [L2/インフラ] <- hermeneus/src/ CCL ディスパッチャ
+# PURPOSE: CCL Dispatch — CCL 式の検知・パース・構造表示を環境強制するエントリポイント
 """
 CCL Dispatch — CCL 式の検知・パース・構造表示を環境強制するエントリポイント
 

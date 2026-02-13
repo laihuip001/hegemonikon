@@ -1,4 +1,5 @@
 # PROOF: [L1/定理] <- hermeneus/src/ マクロ自動実行エンジン
+# PURPOSE: Hermēneus Macro Executor — CCL マクロを AST walk で自動実行
 """
 Hermēneus Macro Executor — CCL マクロを AST walk で自動実行
 

@@ -101,7 +101,11 @@ class TestMeaningfulTraceContextRegression:
                 intensity=2,
                 context="must persist to disk",
             )
-            save_traces(path)
+
+            # Patch TRACES_PATH to avoid PermissionError in CI environments
+            # where it tries to write to home directory
+            with patch("mekhane.fep.meaningful_traces.TRACES_PATH", path):
+                save_traces(path)
 
             # Load and verify
             loaded = load_traces(path)

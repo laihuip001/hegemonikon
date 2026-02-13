@@ -1,4 +1,6 @@
+# PROOF: [L2/インフラ] <- mekhane/ochema/ A0→外部LLM接続→CLIツール
 # PURPOSE: Ochēma CLI — Antigravity LS とのインタラクション
+# REASON: 開発者がコマンドラインから直接LLM機能を利用・検証できるようにするため
 """Ochēma CLI — Antigravity Language Server Client.
 
 Usage:

@@ -1,4 +1,6 @@
+# PROOF: [L2/インフラ] <- mekhane/synteleia/dokimasia/ A0→外部LLM接続→Ochemaバックエンド実装
 # PURPOSE: Ochēma (AntigravityClient) 経由の LLM バックエンド
+# REASON: Synteleia 監査システムが LS API 経由で LLM を利用するためのアダプタ
 """
 OchemaBackend — Antigravity Language Server Bridge for Synteleia
 

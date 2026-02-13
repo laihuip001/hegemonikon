@@ -1,4 +1,6 @@
+# PROOF: [L2/インフラ] <- mekhane/anamnesis/ A0→外部LLM接続→セッションインデクサ実装
 # PURPOSE: セッション履歴を GnosisIndex (LanceDB) にインデックスする
+# REASON: 記憶の永続化とセマンティック検索を実現するため
 """
 PROOF: [L2/インフラ] <- mekhane/anamnesis/
 

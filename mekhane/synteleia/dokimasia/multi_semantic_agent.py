@@ -1,4 +1,6 @@
+# PROOF: [L2/インフラ] <- mekhane/synteleia/dokimasia/ A0→外部LLM接続→マルチエージェント監査実装
 # PURPOSE: Multi-LLM アンサンブル監査エージェント (Layer B: Nous)
+# REASON: 複数のLLM視点による合議制で、より確度の高いコード品質監査を実現するため
 """
 MultiSemanticAgent — Multi-LLM Cognitive Ensemble
 

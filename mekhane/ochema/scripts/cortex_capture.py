@@ -1,3 +1,6 @@
+# PROOF: [L2/インフラ] <- mekhane/ochema/scripts/ A0→外部LLM接続→通信解析スクリプト
+# PURPOSE: Cortex API MITM Capture Script for mitmproxy.
+# REASON: LS → Cortex 間の gRPC 通信を解析し、API構造やProject IDを特定するため
 """
 Cortex API MITM Capture Script for mitmproxy.
 

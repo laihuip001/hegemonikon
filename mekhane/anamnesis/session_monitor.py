@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
+# PROOF: [L2/インフラ] <- mekhane/anamnesis/ A0→外部LLM接続→セッションモニター実装
 # PURPOSE: LS API ポーリングでアクティブセッションをリアルタイムにモニターし MD 保存する
+# REASON: リアルタイムな会話ログの保全と可視化のため
 """
 PROOF: [L2/インフラ] <- mekhane/anamnesis/
 

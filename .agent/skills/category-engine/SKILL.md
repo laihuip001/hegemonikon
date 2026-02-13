@@ -1,4 +1,6 @@
 ---
+risk_tier: L1
+risks: []
 name: Category Theory Engine
 description: |
   圏論に基づく構造認識エンジン。
@@ -13,6 +15,8 @@ triggers:
   - Trigonon / X-series を参照する時
   - 「なぜこの変換は正当か」を問う時
 ---
+risk_tier: L1
+risks: []
 
 # 🏛️ Category Theory Engine — 構造認識の言語
 
@@ -20,6 +24,8 @@ triggers:
 > **HGK において、これは「正しさ」ではなく「構造の整合性」を問う言語である。**
 
 ---
+risk_tier: L1
+risks: []
 
 ## Layer 0: なぜ圏論か — 哲学的基盤
 
@@ -47,6 +53,8 @@ HGK の 96要素体系（7公理→24定理→72関係）は圏論的構造を�
 - 完全忠実 (ε = 1.0) は理想。現実では ε ∈ [0.7, 0.95]
 
 ---
+risk_tier: L1
+risks: []
 
 ## Layer 1: 操作的定義 — 使えるレベルで
 
@@ -90,6 +98,8 @@ HGK の 96要素体系（7公理→24定理→72関係）は圏論的構造を�
 ```
 
 ---
+risk_tier: L1
+risks: []
 
 ## Layer 2: HGK 対応
 
@@ -147,6 +157,8 @@ HGK の 96要素体系（7公理→24定理→72関係）は圏論的構造を�
 > 2-cell は派生間の遷移 (nous⇒phro) であり、`two_cell.py` で実装。
 
 ---
+risk_tier: L1
+risks: []
 
 ## Layer 3: 実装手順
 
@@ -190,6 +202,8 @@ cd ~/oikos/hegemonikon && PYTHONPATH=. .venv/bin/python mekhane/anamnesis/cli.py
 ```
 
 ---
+risk_tier: L1
+risks: []
 
 ## Layer 4: 判断支援 — 5つの問い
 
@@ -273,6 +287,8 @@ cd ~/oikos/hegemonikon && PYTHONPATH=. .venv/bin/python mekhane/anamnesis/cli.py
 | Self-referential | 定義が定義を実証する | 定義プロセスが内容と一致するか |
 
 ---
+risk_tier: L1
+risks: []
 
 ## Layer 5: 理論的基盤
 
@@ -301,6 +317,8 @@ cd ~/oikos/hegemonikon && PYTHONPATH=. .venv/bin/python mekhane/anamnesis/cli.py
 | 数学的厳密性 vs 実用性 | Level B（精密な比喩）を目標。Level A（厳密な証明）は個別に追求 |
 
 ---
+risk_tier: L1
+risks: []
 
 ## 発動条件
 
@@ -319,6 +337,8 @@ cd ~/oikos/hegemonikon && PYTHONPATH=. .venv/bin/python mekhane/anamnesis/cli.py
 | 圏論 × AI、Gnōsis 論文 | L5 (検索) |
 
 ---
+risk_tier: L1
+risks: []
 
 ## FEP Skill との関係
 
@@ -332,6 +352,8 @@ cd ~/oikos/hegemonikon && PYTHONPATH=. .venv/bin/python mekhane/anamnesis/cli.py
 > **FEP が「なぜそう行動すべきか」を問い、圏論が「その行動は構造を保存しているか」を問う。**
 
 ---
+risk_tier: L1
+risks: []
 
 *Category Theory Engine v3.2 — CCL多層定義 + two_cell/drift_calculator 統合 (2026-02-11)*
 *v1.0 (291行) → v2.0 (F/G統一+Q1/Q3具体化+Kan拡張) → v3.0 (Kalon認定) → v3.1 (Q6 Kalon判定統合) → v3.2 (CCL修飾子のL1/L2/L3統一)*

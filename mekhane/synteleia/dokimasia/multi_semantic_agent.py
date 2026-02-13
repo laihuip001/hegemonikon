@@ -101,10 +101,12 @@ class MultiSemanticAgent(AuditAgent):
     name = "MultiSemanticAgent"
     description = "Multi-LLM アンサンブル監査 (Layer B: Nous)"
 
+    # PURPOSE: Initialize instance
     def __init__(self, members: List[EnsembleMember]):
         self.members = members
 
     @classmethod
+    # PURPOSE: デフォルト構成
     def default(cls) -> "MultiSemanticAgent":
         """デフォルト構成: Gemini Pro + Claude Opus + GPT-OSS。"""
         try:
@@ -146,6 +148,7 @@ class MultiSemanticAgent(AuditAgent):
         return cls(members=members)
 
     @classmethod
+    # PURPOSE: テスト用スタブ構成
     def with_stubs(cls, responses: Optional[Dict[str, str]] = None) -> "MultiSemanticAgent":
         """テスト用: StubBackend でアンサンブルを構成。"""
         members = []

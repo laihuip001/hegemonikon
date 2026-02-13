@@ -31,6 +31,7 @@ from typing import Optional
 # --- Data Classes ---
 
 @dataclass
+# PURPOSE: [L2-auto] LLM からの応答を保持する。
 class LLMResponse:
     """LLM からの応答を保持する。"""
     text: str = ""
@@ -43,6 +44,7 @@ class LLMResponse:
 
 
 @dataclass
+# PURPOSE: [L2-auto] Language Server の接続情報。
 class LSInfo:
     """Language Server の接続情報。"""
     pid: int = 0
@@ -76,6 +78,7 @@ BRAIN_DIR = os.path.expanduser("~/.gemini/antigravity/brain")
 
 # --- Client ---
 
+# PURPOSE: [L2-auto] Antigravity Language Server の非公式クライアント。
 class AntigravityClient:
     """Antigravity Language Server の非公式クライアント。
 
@@ -85,6 +88,7 @@ class AntigravityClient:
         print(response.text)
     """
 
+    # PURPOSE: [L2-auto] LS を自動検出して接続する。
     def __init__(self, workspace: str = "hegemonikon"):
         """LS を自動検出して接続する。
 
@@ -96,19 +100,23 @@ class AntigravityClient:
         self.ls = self._detect_ls()
 
     @property
+    # PURPOSE: [L2-auto] 関数: pid
     def pid(self) -> int:
         return self.ls.pid
 
     @property
+    # PURPOSE: [L2-auto] 関数: port
     def port(self) -> int:
         return self.ls.port
 
     @property
+    # PURPOSE: [L2-auto] 関数: csrf
     def csrf(self) -> str:
         return self.ls.csrf
 
     # --- Public API ---
 
+    # PURPOSE: [L2-auto] LLM にメッセージを送り、応答を取得する。
     def ask(
         self,
         message: str,
@@ -140,6 +148,7 @@ class AntigravityClient:
         # Step 3-4: Poll for response
         return self._poll_response(cascade_id, timeout)
 
+    # PURPOSE: [L2-auto] LS のユーザーステータスを取得する。接続確認にも使用。
     def get_status(self) -> dict:
         """LS のユーザーステータスを取得する。接続確認にも使用。"""
         return self._rpc(RPC_GET_STATUS, {
@@ -150,6 +159,7 @@ class AntigravityClient:
             }
         })
 
+    # PURPOSE: [L2-auto] 利用可能なモデル一覧を取得する。
     def list_models(self) -> list[dict]:
         """利用可能なモデル一覧を取得する。"""
         status = self.get_status()
@@ -170,6 +180,7 @@ class AntigravityClient:
             if c.get("quotaInfo")
         ]
 
+    # PURPOSE: [L2-auto] 全モデルの Quota 残量と設定をリアルタイムで取得する。
     def quota_status(self) -> dict:
         """全モデルの Quota 残量と設定をリアルタイムで取得する。
 
@@ -221,6 +232,7 @@ class AntigravityClient:
             "total_models": len(models),
         }
 
+    # PURPOSE: [L2-auto] セッション情報を取得する。
     def session_info(self, cascade_id: Optional[str] = None) -> dict:
         """セッション情報を取得する。
 
@@ -271,6 +283,7 @@ class AntigravityClient:
             "sessions": sessions[:20],  # 最新20件
         }
 
+    # PURPOSE: [L2-auto] セッションの会話内容を読み取る。
     def session_read(
         self,
         cascade_id: str,
@@ -374,6 +387,7 @@ class AntigravityClient:
             "conversation": conversation,
         }
 
+    # PURPOSE: [L2-auto] 過去セッションのエピソード記憶 (.system_generated/steps/) にアクセスする。
     def session_episodes(self, brain_id: Optional[str] = None) -> dict:
         """過去セッションのエピソード記憶 (.system_generated/steps/) にアクセスする。
 
@@ -443,6 +457,7 @@ class AntigravityClient:
 
     # --- Proposal A: Context Rot Detection ---
 
+    # PURPOSE: [L2-auto] コンテキスト健全性を評価する。
     def context_health(self, cascade_id: Optional[str] = None) -> dict:
         """コンテキスト健全性を評価する。
 
@@ -548,6 +563,7 @@ class AntigravityClient:
         "MODEL_PLACEHOLDER_M18": "MODEL_CLAUDE_4_5_SONNET",
     }
 
+    # PURPOSE: [L2-auto] タスク内容に応じて最適モデルを自動選択し、LLM に問い合わせる。
     def smart_ask(
         self,
         message: str,
@@ -570,6 +586,7 @@ class AntigravityClient:
         selected = self._select_model(message)
         return self.ask(message, model=selected, timeout=timeout)
 
+    # PURPOSE: [L2-auto] メッセージ内容と Quota に基づいてモデルを選択する。
     def _select_model(self, message: str) -> str:
         """メッセージ内容と Quota に基づいてモデルを選択する。"""
         msg_lower = message.lower()
@@ -610,6 +627,7 @@ class AntigravityClient:
 
     # --- Proposal D: Session Archive ---
 
+    # PURPOSE: [L2-auto] セッションを Markdown でアーカイブする。
     def archive_sessions(
         self,
         output_dir: Optional[str] = None,
@@ -703,6 +721,7 @@ class AntigravityClient:
 
     # --- Internal: LS Detection ---
 
+    # PURPOSE: [L2-auto] Language Server プロセスを検出し、接続情報を返す。
     def _detect_ls(self) -> LSInfo:
         """Language Server プロセスを検出し、接続情報を返す。
 
@@ -792,6 +811,7 @@ class AntigravityClient:
     #   12=INTERACTIVE_CASCADE (IDE 標準), 15=SDK
     SOURCE_INTERACTIVE_CASCADE = 12
 
+    # PURPOSE: [L2-auto] Step 1: StartCascade → cascade_id を取得。
     def _start_cascade(self) -> str:
         """Step 1: StartCascade → cascade_id を取得。"""
         result = self._rpc(RPC_START_CASCADE, {
@@ -802,6 +822,7 @@ class AntigravityClient:
             raise RuntimeError(f"StartCascade returned no cascadeId: {result}")
         return cascade_id
 
+    # PURPOSE: [L2-auto] Step 2: SendUserCascadeMessage → メッセージ送信。
     def _send_message(self, cascade_id: str, message: str, model: str) -> None:
         """Step 2: SendUserCascadeMessage → メッセージ送信。
 
@@ -820,6 +841,7 @@ class AntigravityClient:
             },
         })
 
+    # PURPOSE: [L2-auto] Step 3-4: ポーリングで LLM 応答を取得。
     def _poll_response(
         self, cascade_id: str, timeout: float
     ) -> LLMResponse:
@@ -881,6 +903,7 @@ class AntigravityClient:
             f"(cascade_id={cascade_id})"
         )
 
+    # PURPOSE: [L2-auto] ステップから LLM 応答をパースする。
     def _parse_steps(
         self,
         steps: list,
@@ -916,10 +939,12 @@ class AntigravityClient:
 
     # --- Internal: HTTP/RPC ---
 
+    # PURPOSE: [L2-auto] ConnectRPC JSON で RPC を呼び出す。
     def _rpc(self, endpoint: str, payload: dict) -> dict:
         """ConnectRPC JSON で RPC を呼び出す。"""
         return self._raw_rpc(self.ls.port, self.ls.csrf, endpoint, payload)
 
+    # PURPOSE: [L2-auto] 低レベル RPC 呼び出し。
     def _raw_rpc(
         self, port: int, csrf: str, endpoint: str, payload: dict
     ) -> dict:
@@ -948,6 +973,7 @@ class AntigravityClient:
     # --- Internal: Utilities ---
 
     @staticmethod
+    # PURPOSE: [L2-auto] 自己署名証明書を許可する SSL コンテキスト。
     def _make_ssl_context() -> ssl.SSLContext:
         """自己署名証明書を許可する SSL コンテキスト。"""
         ctx = ssl.create_default_context()
@@ -956,6 +982,7 @@ class AntigravityClient:
         return ctx
 
     @staticmethod
+    # PURPOSE: [L2-auto] 現在のユーザー名を取得。
     def _get_user() -> str:
         """現在のユーザー名を取得。"""
         import os

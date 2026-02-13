@@ -94,6 +94,7 @@ class LinkGraphStatsResponse(BaseModel):
 
 # --- Projection Logic ---
 
+# PURPOSE: [L2-auto] ノードの射影先 (Series, Theorem) を決定.
 def _project_node(node, graph) -> tuple[str, str]:
     """ノードの射影先 (Series, Theorem) を決定.
 
@@ -121,6 +122,7 @@ def _project_node(node, graph) -> tuple[str, str]:
     return series, theorem
 
 
+# PURPOSE: [L2-auto] 軌道上の角度と半径を計算.
 def _compute_orbit(
     node_index: int,
     total_in_group: int,
@@ -138,6 +140,7 @@ def _compute_orbit(
     return round(angle, 4), round(radius, 2)
 
 
+# PURPOSE: [L2-auto] LinkGraph から API レスポンスを構築.
 def _build_response(graph) -> LinkGraphFullResponse:
     """LinkGraph から API レスポンスを構築."""
     from collections import defaultdict

@@ -35,6 +35,7 @@ class KalonJudgeRequest(BaseModel):
     notes: str = ""
 
 
+# PURPOSE: [L2-auto] G/F テスト結果から判定を返す。
 def _verdict(g: bool, f: bool) -> str:
     """G/F テスト結果から判定を返す。"""
     if g and f:
@@ -44,6 +45,7 @@ def _verdict(g: bool, f: bool) -> str:
     return "✗"  # 自明 or 要蒸留
 
 
+# PURPOSE: [L2-auto] 内部処理: verdict_label
 def _verdict_label(g: bool, f: bool) -> str:
     if g and f:
         return "kalon — Fix(G∘F) に到達"

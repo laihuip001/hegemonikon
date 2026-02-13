@@ -94,6 +94,7 @@ log("Server initialized")
 
 
 @server.list_tools()
+# PURPOSE: [L2-auto] List available tools.
 async def list_tools():
     """List available tools."""
     return [
@@ -169,6 +170,7 @@ async def list_tools():
 
 
 @server.call_tool()
+# PURPOSE: [L2-auto] Handle tool calls.
 async def call_tool(name: str, arguments: dict):
     """Handle tool calls."""
     log(f"Tool call: {name} with args: {arguments}")

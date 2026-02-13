@@ -83,6 +83,7 @@ class OperatorAgent(AuditAgent):
             confidence=0.85,
         )
 
+    # PURPOSE: [L2-auto] CCL 演算子の使用をチェック
     def _check_ccl_operators(self, content: str) -> List[AuditIssue]:
         """CCL 演算子の使用をチェック"""
         issues = []
@@ -120,6 +121,7 @@ class OperatorAgent(AuditAgent):
 
         return issues
 
+    # PURPOSE: [L2-auto] コード内の演算子使用をチェック
     def _check_code_operators(self, content: str) -> List[AuditIssue]:
         """コード内の演算子使用をチェック"""
         issues = []

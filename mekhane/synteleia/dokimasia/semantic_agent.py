@@ -58,6 +58,7 @@ class LLMBackend(ABC):
 class LMQLBackend(LLMBackend):
     """Hermēneus LMQL パイプラインを使用するバックエンド"""
 
+    # PURPOSE: [L2-auto] 初期化: init__
     def __init__(self, model: str = "openai/gpt-4o"):
         self.model = model
         self._available: Optional[bool] = None
@@ -92,6 +93,7 @@ class LMQLBackend(LLMBackend):
 class OpenAIBackend(LLMBackend):
     """OpenAI API を直接呼出すバックエンド"""
 
+    # PURPOSE: [L2-auto] 初期化: init__
     def __init__(self, model: str = "gpt-4o-mini"):
         self.model = model
         self._available: Optional[bool] = None
@@ -127,6 +129,7 @@ class OpenAIBackend(LLMBackend):
 class StubBackend(LLMBackend):
     """テスト・フォールバック用のスタブバックエンド"""
 
+    # PURPOSE: [L2-auto] 初期化: init__
     def __init__(self, response: Optional[str] = None):
         self._response = response
 
@@ -153,6 +156,7 @@ class StubBackend(LLMBackend):
 # =============================================================================
 
 # PURPOSE: LLM レスポンスを AuditIssue にパースする
+# PURPOSE: [L2-auto] パース済みの問題
 
 
 @dataclass
@@ -266,6 +270,7 @@ JSON で回答してください:
 ```
 
 問題がない場合は `"issues": []` を返してください。
+# PURPOSE: [L2-auto] 外部 .prompt ファイルからプロンプトをロード。失敗時はフォールバック。
 """
 
 
@@ -304,6 +309,7 @@ class SemanticAgent(AuditAgent):
     name = "SemanticAgent"
     description = "LLM ベースのセマンティック監査 (L2)"
 
+    # PURPOSE: [L2-auto] 初期化: init__
     def __init__(self, backend: Optional[LLMBackend] = None):
         if backend is not None:
             self.backend = backend

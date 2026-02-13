@@ -89,6 +89,7 @@ class KairosAgent(AuditAgent):
             confidence=0.70,  # タイミング判定は文脈依存
         )
 
+    # PURPOSE: [L2-auto] タイミング問題パターンを検出
     def _check_timing_problems(self, content: str) -> List[AuditIssue]:
         """タイミング問題パターンを検出"""
         issues = []
@@ -108,6 +109,7 @@ class KairosAgent(AuditAgent):
 
         return issues
 
+    # PURPOSE: [L2-auto] 早すぎる最適化を検出
     def _check_premature_optimization(self, content: str) -> List[AuditIssue]:
         """早すぎる最適化を検出"""
         issues = []
@@ -127,6 +129,7 @@ class KairosAgent(AuditAgent):
 
         return issues
 
+    # PURPOSE: [L2-auto] 時間的コンテキストの存在を検出（計画向け）
     def _check_temporal_context(self, content: str) -> List[AuditIssue]:
         """時間的コンテキストの存在を検出（計画向け）"""
         issues = []

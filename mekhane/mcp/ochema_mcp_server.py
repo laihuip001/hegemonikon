@@ -57,11 +57,13 @@ class StdoutSuppressor:
         self._null = io.StringIO()
         self._old_stdout = None
 
+    # PURPOSE: [L2-auto] 内部処理: enter__
     def __enter__(self):
         self._old_stdout = sys.stdout
         sys.stdout = self._null
         return self
 
+    # PURPOSE: [L2-auto] 内部処理: exit__
     def __exit__(self, *args):
         sys.stdout = self._old_stdout
         captured = self._null.getvalue()
@@ -111,6 +113,7 @@ def get_client():
             raise
     return _client
 
+# PURPOSE: [L2-auto] List available tools.
 
 @server.list_tools()
 async def list_tools():
@@ -179,6 +182,7 @@ async def list_tools():
         ),
     ]
 
+# PURPOSE: [L2-auto] Handle tool calls.
 
 @server.call_tool(validate_input=True)
 async def call_tool(name: str, arguments: dict):

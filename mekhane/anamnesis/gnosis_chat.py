@@ -389,6 +389,7 @@ class KnowledgeIndexer:
         return [c for c in chunks if c and len(c) > 20]
 
     @staticmethod
+    # PURPOSE: [L2-auto] フォールバック: 改行で切る固定サイズ分割.
     def _split_long_text(text: str, chunk_size: int, overlap: int) -> list[str]:
         """フォールバック: 改行で切る固定サイズ分割."""
         chunks = []
@@ -409,6 +410,7 @@ class KnowledgeIndexer:
         return [c for c in chunks if c]
 
     @staticmethod
+    # PURPOSE: [L2-auto] embedding 用テキストを構築 (タイトル + ソース + コンテンツ).
     def _build_embedding_text(title: str, source: str, content: str) -> str:
         """embedding 用テキストを構築 (タイトル + ソース + コンテンツ).
 

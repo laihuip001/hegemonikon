@@ -71,6 +71,7 @@ class SchemaAgent(AuditAgent):
             confidence=0.80,
         )
 
+    # PURPOSE: [L2-auto] 構造的問題を検出
     def _check_structure_problems(self, content: str) -> List[AuditIssue]:
         """構造的問題を検出"""
         issues = []
@@ -89,6 +90,7 @@ class SchemaAgent(AuditAgent):
 
         return issues
 
+    # PURPOSE: [L2-auto] マークダウンの階層構造をチェック
     def _check_markdown_hierarchy(self, content: str) -> List[AuditIssue]:
         """マークダウンの階層構造をチェック"""
         issues = []
@@ -115,6 +117,7 @@ class SchemaAgent(AuditAgent):
 
         return issues
 
+    # PURPOSE: [L2-auto] コードの構造をチェック
     def _check_code_structure(self, content: str) -> List[AuditIssue]:
         """コードの構造をチェック"""
         issues = []

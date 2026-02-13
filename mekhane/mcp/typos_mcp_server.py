@@ -58,11 +58,13 @@ class StdoutSuppressor:
         self._null = io.StringIO()
         self._old_stdout = None
 
+    # PURPOSE: [L2-auto] 内部処理: enter__
     def __enter__(self):
         self._old_stdout = sys.stdout
         sys.stdout = self._null
         return self
 
+    # PURPOSE: [L2-auto] 内部処理: exit__
     def __exit__(self, *args):
         sys.stdout = self._old_stdout
         captured = self._null.getvalue()
@@ -810,6 +812,7 @@ async def list_tools():
         ),
     ]
     return tools
+# PURPOSE: [L2-auto] Extract content from arguments (content or filepath).
 
 
 def _get_content(arguments: dict) -> str:
@@ -853,6 +856,7 @@ async def call_tool(name: str, arguments: dict):
     except Exception as e:
         log(f"Tool {name} error: {e}")
         return [TextContent(type="text", text=f"Error in {name}: {str(e)}")]
+# PURPOSE: [L2-auto] Handle generate tool call.
 
 
 async def _handle_generate(arguments: dict):
@@ -904,6 +908,7 @@ async def _handle_generate(arguments: dict):
 
     log(f"Generation completed for: {requirements[:50]}...")
     return [TextContent(type="text", text="\n".join(output_lines))]
+# PURPOSE: [L2-auto] Handle parse tool call.
 
 
 async def _handle_parse(arguments: dict):
@@ -939,6 +944,7 @@ async def _handle_parse(arguments: dict):
             )]
     except ParseError as e:
         return [TextContent(type="text", text=f"# Parse Error\n\n❌ {str(e)}")]
+# PURPOSE: [L2-auto] Handle validate tool call.
 
 
 async def _handle_validate(arguments: dict):
@@ -1017,6 +1023,7 @@ async def _handle_validate(arguments: dict):
     ])
 
     return [TextContent(type="text", text="\n".join(lines))]
+# PURPOSE: [L2-auto] Handle compile tool call.
 
 
 async def _handle_compile(arguments: dict):
@@ -1038,6 +1045,7 @@ async def _handle_compile(arguments: dict):
         )]
     except ParseError as e:
         return [TextContent(type="text", text=f"# Compile Error\n\n❌ {str(e)}")]
+# PURPOSE: [L2-auto] Handle expand tool call.
 
 
 async def _handle_expand(arguments: dict):
@@ -1058,6 +1066,7 @@ async def _handle_expand(arguments: dict):
         )]
     except ParseError as e:
         return [TextContent(type="text", text=f"# Expand Error\n\n❌ {str(e)}")]
+# PURPOSE: [L2-auto] Handle policy_check tool call.
 
 
 async def _handle_policy_check(arguments: dict):

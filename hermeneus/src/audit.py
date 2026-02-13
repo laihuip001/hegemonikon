@@ -21,8 +21,8 @@ from contextlib import contextmanager
 # Audit Types
 # =============================================================================
 
-@dataclass
 # PURPOSE: [L2-auto] 監査レコード
+@dataclass
 class AuditRecord:
     """監査レコード"""
     record_id: str
@@ -36,8 +36,8 @@ class AuditRecord:
     metadata: Dict[str, Any] = field(default_factory=dict)
 
 
-@dataclass
 # PURPOSE: [L2-auto] 監査統計
+@dataclass
 class AuditStats:
     """監査統計"""
     total_records: int

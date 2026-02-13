@@ -72,6 +72,7 @@ PERSONAS: Dict[str, str] = {
 
 
 @dataclass
+# PURPOSE: [L2-auto] アンサンブルの1メンバー。
 class EnsembleMember:
     """アンサンブルの1メンバー。"""
     name: str
@@ -79,6 +80,7 @@ class EnsembleMember:
     persona: str  # PERSONAS のキー
 
     @property
+    # PURPOSE: [L2-auto] persona 付きプロンプトを生成。
     def persona_prompt(self) -> str:
         """persona 付きプロンプトを生成。"""
         return PERSONAS.get(self.persona, "") + "\n" + SEMANTIC_AUDIT_PROMPT
@@ -100,10 +102,12 @@ class MultiSemanticAgent(AuditAgent):
     name = "MultiSemanticAgent"
     description = "Multi-LLM アンサンブル監査 (Layer B: Nous)"
 
+    # PURPOSE: [L2-auto] 初期化: init__
     def __init__(self, members: List[EnsembleMember]):
         self.members = members
 
     @classmethod
+    # PURPOSE: [L2-auto] デフォルト構成: Gemini Pro + Claude Opus + GPT-OSS。
     def default(cls) -> "MultiSemanticAgent":
         """デフォルト構成: Gemini Pro + Claude Opus + GPT-OSS。"""
         try:
@@ -145,6 +149,7 @@ class MultiSemanticAgent(AuditAgent):
         return cls(members=members)
 
     @classmethod
+    # PURPOSE: [L2-auto] テスト用: StubBackend でアンサンブルを構成。
     def with_stubs(cls, responses: Optional[Dict[str, str]] = None) -> "MultiSemanticAgent":
         """テスト用: StubBackend でアンサンブルを構成。"""
         members = []
@@ -317,6 +322,7 @@ class MultiSemanticAgent(AuditAgent):
         )
 
 
+# PURPOSE: [L2-auto] Severity の厳しさ順序。
 # =============================================================================
 # Utilities
 # =============================================================================

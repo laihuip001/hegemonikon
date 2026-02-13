@@ -32,6 +32,7 @@ KNOWLEDGE_DIR = _PROJECT_ROOT / "kernel" / "knowledge"
 
 
 # --- Security: Path Traversal 防御 ---
+# PURPOSE: [L2-auto] ki_id をサニタイズ。パストラバーサル攻撃を防止。
 def _sanitize_ki_id(ki_id: str) -> str:
     """ki_id をサニタイズ。パストラバーサル攻撃を防止。
 
@@ -49,6 +50,7 @@ def _sanitize_ki_id(ki_id: str) -> str:
     return ki_id.strip()
 
 
+# PURPOSE: [L2-auto] タイトルから URL 安全な slug を生成。日本語対応。
 def _slugify(title: str) -> str:
     """タイトルから URL 安全な slug を生成。日本語対応。"""
     # 英数字以外をハイフンに変換
@@ -60,6 +62,7 @@ def _slugify(title: str) -> str:
     return slug[:80]  # 80文字制限
 
 
+# PURPOSE: [L2-auto] ki_id から安全なファイルパスを解決。
 def _resolve_ki_path(ki_id: str) -> Path:
     """ki_id から安全なファイルパスを解決。"""
     ki_id = _sanitize_ki_id(ki_id)
@@ -70,12 +73,14 @@ def _resolve_ki_path(ki_id: str) -> Path:
     return path
 
 
+# PURPOSE: [L2-auto] knowledge ディレクトリが存在しなければ作成。
 def _ensure_knowledge_dir():
     """knowledge ディレクトリが存在しなければ作成。"""
     KNOWLEDGE_DIR.mkdir(parents=True, exist_ok=True)
 
 
 # --- Frontmatter Parser ---
+# PURPOSE: [L2-auto] YAML frontmatter を解析。(metadata, body) を返す。
 def _parse_frontmatter(content: str) -> tuple[dict, str]:
     """YAML frontmatter を解析。(metadata, body) を返す。"""
     metadata = {}
@@ -94,6 +99,7 @@ def _parse_frontmatter(content: str) -> tuple[dict, str]:
     return metadata, body
 
 
+# PURPOSE: [L2-auto] メタデータから YAML frontmatter 文字列を生成。
 def _build_frontmatter(metadata: dict) -> str:
     """メタデータから YAML frontmatter 文字列を生成。"""
     lines = ["---"]

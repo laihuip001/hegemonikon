@@ -116,6 +116,7 @@ class CCLGenerator:
 # PURPOSE: Generate CCL from intent (simple interface).
 
 # Convenience function for backward compatibility
+# PURPOSE: [L2-auto] Generate CCL from intent (simple interface).
 def generate_ccl(intent: str) -> str:
     """
     Generate CCL from intent (simple interface).

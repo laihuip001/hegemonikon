@@ -76,6 +76,7 @@ class HormeAgent(AuditAgent):
             confidence=0.70,  # 動機判定は主観的
         )
 
+    # PURPOSE: [L2-auto] 動機が不明確なパターンを検出
     def _check_unclear_motivation(self, content: str) -> List[AuditIssue]:
         """動機が不明確なパターンを検出"""
         issues = []
@@ -95,6 +96,7 @@ class HormeAgent(AuditAgent):
 
         return issues
 
+    # PURPOSE: [L2-auto] 目的の存在を検出（計画向け）
     def _check_purpose_presence(self, content: str) -> List[AuditIssue]:
         """目的の存在を検出（計画向け）"""
         issues = []

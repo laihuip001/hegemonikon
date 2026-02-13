@@ -1,0 +1,164 @@
+{
+    "name": "HGK Session Export",
+    "nodes": [
+        {
+            "parameters": {
+                "rule": {
+                    "interval": [
+                        {
+                            "triggerAtHour": 3,
+                            "triggerAtMinute": 30
+                        }
+                    ]
+                }
+            },
+            "id": "cron-trigger",
+            "name": "Daily 03:30",
+            "type": "n8n-nodes-base.scheduleTrigger",
+            "typeVersion": 1.2,
+            "position": [
+                240,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "command": "cd /oikos/hegemonikon && /oikos/hegemonikon/.venv/bin/python mekhane/anamnesis/session_monitor.py --once 2>&1",
+                "cwd": "/oikos/hegemonikon"
+            },
+            "id": "session-monitor",
+            "name": "Session Monitor",
+            "type": "n8n-nodes-base.executeCommand",
+            "typeVersion": 1,
+            "position": [
+                480,
+                200
+            ]
+        },
+        {
+            "parameters": {
+                "command": "cd /oikos/hegemonikon && PYTHONPATH=/oikos/hegemonikon /oikos/hegemonikon/.venv/bin/python mekhane/anamnesis/session_indexer.py --exports 2>&1 && PYTHONPATH=/oikos/hegemonikon /oikos/hegemonikon/.venv/bin/python mekhane/anamnesis/session_indexer.py --steps --max-steps-per-session 10 2>&1 && PYTHONPATH=/oikos/hegemonikon /oikos/hegemonikon/.venv/bin/python mekhane/anamnesis/session_indexer.py --handoffs 2>&1",
+                "cwd": "/oikos/hegemonikon"
+            },
+            "id": "run-indexers",
+            "name": "Index Sessions",
+            "type": "n8n-nodes-base.executeCommand",
+            "typeVersion": 1,
+            "position": [
+                480,
+                400
+            ]
+        },
+        {
+            "parameters": {
+                "conditions": {
+                    "options": {
+                        "caseSensitive": true,
+                        "leftValue": "",
+                        "typeValidation": "strict"
+                    },
+                    "conditions": [
+                        {
+                            "id": "check-exit-code",
+                            "leftValue": "={{ $json.exitCode }}",
+                            "rightValue": 0,
+                            "operator": {
+                                "type": "number",
+                                "operation": "equals"
+                            }
+                        }
+                    ],
+                    "combinator": "and"
+                }
+            },
+            "id": "check-result",
+            "name": "Success?",
+            "type": "n8n-nodes-base.if",
+            "typeVersion": 2.2,
+            "position": [
+                720,
+                300
+            ]
+        },
+        {
+            "parameters": {},
+            "id": "success-noop",
+            "name": "Done",
+            "type": "n8n-nodes-base.noOp",
+            "typeVersion": 1,
+            "position": [
+                940,
+                200
+            ]
+        },
+        {
+            "parameters": {},
+            "id": "fail-noop",
+            "name": "Failed",
+            "type": "n8n-nodes-base.noOp",
+            "typeVersion": 1,
+            "position": [
+                940,
+                400
+            ]
+        }
+    ],
+    "connections": {
+        "Daily 03:30": {
+            "main": [
+                [
+                    {
+                        "node": "Session Monitor",
+                        "type": "main",
+                        "index": 0
+                    },
+                    {
+                        "node": "Index Sessions",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Index Sessions": {
+            "main": [
+                [
+                    {
+                        "node": "Success?",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Success?": {
+            "main": [
+                [
+                    {
+                        "node": "Done",
+                        "type": "main",
+                        "index": 0
+                    }
+                ],
+                [
+                    {
+                        "node": "Failed",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        }
+    },
+    "settings": {
+        "executionOrder": "v1"
+    },
+    "tags": [
+        {
+            "name": "hegemonikon"
+        },
+        {
+            "name": "automation"
+        }
+    ]
+}

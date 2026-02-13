@@ -99,6 +99,7 @@ class ProactivePush:
     # 重複除去: 推薦済みのキーを記録 (セッション内のみ)
     _seen_keys: set[str] = set()
 
+    # PURPOSE: [L2-auto] 初期化: init__
     def __init__(
         self,
         max_recommendations: int = 3,
@@ -115,6 +116,7 @@ class ProactivePush:
         self._reranker = None
         self._seen_keys: set[str] = set()
 
+    # PURPOSE: [L2-auto] GnosisIndex をロード.
     def _load_index(self):
         """GnosisIndex をロード."""
         if self._index is not None:
@@ -124,6 +126,7 @@ class ProactivePush:
         self._index = GnosisIndex()
         logger.info("[ProactivePush] Index loaded")
 
+    # PURPOSE: [L2-auto] Reranker をロード (optional).
     def _load_reranker(self):
         """Reranker をロード (optional)."""
         if not self.use_reranker or self._reranker is not None:
@@ -133,6 +136,7 @@ class ProactivePush:
         self._reranker = Reranker()
         logger.info("[ProactivePush] Reranker loaded")
 
+    # PURPOSE: [L2-auto] LanceDB からセマンティック検索 + 閾値フィルタ + Rerank.
     def _retrieve(self, query: str, k: int = 10) -> list[dict]:
         """LanceDB からセマンティック検索 + 閾値フィルタ + Rerank.
 
@@ -206,6 +210,7 @@ class ProactivePush:
 
         return results
 
+    # PURPOSE: [L2-auto] 検索結果からベネフィット説明を生成.
     def _generate_benefit(self, result: dict, query: str) -> str:
         """検索結果からベネフィット説明を生成.
 
@@ -235,6 +240,7 @@ class ProactivePush:
             f"'{title}' が現在のコンテキストに {relevance:.0%} の関連性",
         )
 
+    # PURPOSE: [L2-auto] 検索結果を Recommendation に変換.
     def _to_recommendation(
         self, result: dict, query: str, trigger: str
     ) -> Recommendation:
@@ -265,6 +271,7 @@ class ProactivePush:
             actions=actions,
         )
 
+    # PURPOSE: [L2-auto] セッション内の重複除去.
     def _deduplicate(self, recs: list[Recommendation]) -> list[Recommendation]:
         """セッション内の重複除去."""
         unique = []
@@ -338,6 +345,7 @@ class ProactivePush:
             total_candidates=total_candidates,
         )
 
+    # PURPOSE: [L2-auto] Graph-Triggered 推薦: リンクグラフ上の構造的関連を推薦.
     def _graph_recommendations(
         self, context: str, max_recs: int = 2
     ) -> list[Recommendation]:
@@ -408,6 +416,7 @@ class ProactivePush:
             logger.warning(f"[ProactivePush] Graph recommendations failed: {e}")
             return []
 
+    # PURPOSE: [L2-auto] LinkGraph ノードを Recommendation に変換.
     def _graph_node_to_recommendation(
         self, graph, node_id: str, trigger: str
     ) -> Recommendation:
@@ -501,6 +510,7 @@ class ProactivePush:
             total_candidates=len(results),
         )
 
+    # PURPOSE: [L2-auto] 直近の Handoff から primary_task を抽出.
     def _extract_latest_context(self) -> str:
         """直近の Handoff から primary_task を抽出."""
         sessions_dir = _MNEME_ROOT / "sessions"

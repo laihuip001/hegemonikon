@@ -28,6 +28,7 @@ class Macro:
 # Built-in macros — Single Source of Truth: hermeneus/src/macros.py + ccl-*.md
 # 正規定義: .agent/workflows/ccl-*.md → hermeneus/src/macros.py BUILTIN_MACROS
 # この変数は上記から自動生成される (二重定義の解消)
+# PURPOSE: [L2-auto] hermeneus の get_all_macros() (全ソース統合) から Macro dict を生成
 def _build_macro_dict() -> Dict[str, "Macro"]:
     """hermeneus の get_all_macros() (全ソース統合) から Macro dict を生成"""
     try:

@@ -103,6 +103,7 @@ class CompletenessAgent(AuditAgent):
             confidence=0.90,
         )
 
+    # PURPOSE: [L2-auto] 未完了マーカーを検出
     def _check_incomplete_markers(self, content: str) -> List[AuditIssue]:
         """未完了マーカーを検出"""
         issues = []
@@ -130,6 +131,7 @@ class CompletenessAgent(AuditAgent):
 
         return issues
 
+    # PURPOSE: [L2-auto] 空のブロックを検出
     def _check_empty_blocks(self, content: str) -> List[AuditIssue]:
         """空のブロックを検出"""
         issues = []
@@ -149,6 +151,7 @@ class CompletenessAgent(AuditAgent):
 
         return issues
 
+    # PURPOSE: [L2-auto] 必須要素の存在をチェック
     def _check_required_elements(
         self, content: str, target_type: AuditTargetType
     ) -> List[AuditIssue]:
@@ -175,6 +178,7 @@ class CompletenessAgent(AuditAgent):
 
         return issues
 
+    # PURPOSE: [L2-auto] 構造的完全性をチェック
     def _check_structural_completeness(
         self, content: str, target_type: AuditTargetType
     ) -> List[AuditIssue]:

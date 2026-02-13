@@ -73,6 +73,7 @@ _engine = None
 _narrator = None
 
 
+# PURPOSE: [L2-auto] PKSEngine — 遅延初期化 (ベクトル検索用)
 def _get_engine():
     """PKSEngine — 遅延初期化 (ベクトル検索用)"""
     global _engine
@@ -86,6 +87,7 @@ def _get_engine():
     return _engine
 
 
+# PURPOSE: [L2-auto] PKSNarrator — 遅延初期化
 def _get_narrator():
     """PKSNarrator — 遅延初期化"""
     global _narrator
@@ -99,6 +101,7 @@ def _get_narrator():
     return _narrator
 
 
+# PURPOSE: [L2-auto] kalon: 論文から問いを生成（テンプレート）
 def _generate_question(title: str, abstract: str, topics: list[str]) -> str:
     """kalon: 論文から問いを生成（テンプレート）"""
     if topics:

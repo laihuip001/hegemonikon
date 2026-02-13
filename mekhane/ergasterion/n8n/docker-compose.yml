@@ -9,6 +9,7 @@ services:
       - N8N_HOST=localhost
       - N8N_PORT=5678
       - N8N_PROTOCOL=http
+      - N8N_API_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhYjA4NmZhZi1lYWQzLTRhMmQtYmZiNy1iNDhjOTRlNzQxZjMiLCJpc3MiOiJuOG4iLCJhdWQiOiJwdWJsaWMtYXBpIiwianRpIjoiYmM0MDhjNmQtNjdiYS00MzUyLWJhYmEtNjQ5MWI4MzBiMTFkIiwiaWF0IjoxNzcwOTcwMzA1fQ.9xi7IGmW6FkqWEXeT3nUs0KQfB5iiIziU6YVfcy3RyU
       - WEBHOOK_URL=http://localhost:5678/
       - TZ=Asia/Tokyo
       - NODE_FUNCTION_ALLOW_BUILTIN=child_process,fs,path,https,url
@@ -17,4 +18,6 @@ services:
       - ./data:/home/node/.n8n
       - /home/makaron8426/oikos/hegemonikon:/oikos/hegemonikon:ro
       - /home/makaron8426/oikos/mneme:/oikos/mneme:rw
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     user: "1000:1000"

@@ -25,9 +25,9 @@ log() {
 
 log "=== Auto Export Started ==="
 
-# Antigravity Agent Manager (Chrome) が起動しているか確認 (CDP ポート 9222)
-if ! curl -s http://localhost:9222/json/version > /dev/null 2>&1; then
-    log "Antigravity not running (CDP port 9222 not available). Skipping."
+# Antigravity IDE (Electron) が起動しているか確認 (CDP ポート 9334)
+if ! curl -s http://localhost:9334/json/version > /dev/null 2>&1; then
+    log "Antigravity not running (CDP port 9334 not available). Skipping."
     exit 0
 fi
 
@@ -37,6 +37,13 @@ log "Antigravity detected. Running export..."
 cd "$HEGEMONIKON_DIR"
 if "$VENV_PYTHON" "$EXPORT_SCRIPT" --all >> "$LOG_FILE" 2>&1; then
     log "Export successful"
+
+    # インデックス更新 (exports + steps + handoffs)
+    INDEXER="$SCRIPT_DIR/session_indexer.py"
+    log "Running indexers..."
+    PYTHONPATH="$HEGEMONIKON_DIR" "$VENV_PYTHON" "$INDEXER" --exports >> "$LOG_FILE" 2>&1 && log "Export index OK" || log "Export index failed"
+    PYTHONPATH="$HEGEMONIKON_DIR" "$VENV_PYTHON" "$INDEXER" --steps >> "$LOG_FILE" 2>&1 && log "Steps index OK" || log "Steps index failed"
+    PYTHONPATH="$HEGEMONIKON_DIR" "$VENV_PYTHON" "$INDEXER" --handoffs >> "$LOG_FILE" 2>&1 && log "Handoffs index OK" || log "Handoffs index failed"
 else
     log "Export failed with exit code $?"
 fi

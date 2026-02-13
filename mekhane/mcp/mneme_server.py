@@ -164,6 +164,7 @@ def get_engine():
 
 # ============ Tool definitions ============
 @server.list_tools()
+# PURPOSE: [L2-auto] List available tools.
 async def list_tools() -> list[Tool]:
     """List available tools."""
     return [
@@ -203,6 +204,7 @@ async def list_tools() -> list[Tool]:
 
 
 @server.call_tool()
+# PURPOSE: [L2-auto] Handle tool calls.
 async def call_tool(name: str, arguments: dict) -> list[TextContent]:
     """Handle tool calls."""
     log(f"Tool call: {name} with args: {arguments}")
@@ -222,6 +224,7 @@ async def call_tool(name: str, arguments: dict) -> list[TextContent]:
         return [TextContent(type="text", text=f"Error: {str(e)}")]
 
 
+# PURPOSE: [L2-auto] Handle search tool.
 async def _handle_search(arguments: dict) -> list[TextContent]:
     """Handle search tool."""
     query = arguments.get("query", "")
@@ -250,6 +253,7 @@ async def _handle_search(arguments: dict) -> list[TextContent]:
     return [TextContent(type="text", text="\n".join(lines))]
 
 
+# PURPOSE: [L2-auto] Handle stats tool.
 async def _handle_stats(arguments: dict) -> list[TextContent]:
     """Handle stats tool."""
     engine = get_engine()
@@ -269,6 +273,7 @@ async def _handle_stats(arguments: dict) -> list[TextContent]:
     return [TextContent(type="text", text="\n".join(lines))]
 
 
+# PURPOSE: [L2-auto] Handle sources tool.
 async def _handle_sources(arguments: dict) -> list[TextContent]:
     """Handle sources tool."""
     engine = get_engine()
@@ -294,6 +299,7 @@ async def _handle_sources(arguments: dict) -> list[TextContent]:
 
 
 # ============ Main ============
+# PURPOSE: [L2-auto] Run the MCP server.
 async def main():
     """Run the MCP server."""
     log("Starting stdio server...")

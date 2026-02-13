@@ -197,6 +197,7 @@ MODEL_REGISTRY: Dict[str, Dict[str, str]] = {
 # Execution Result Types
 # =============================================================================
 
+# PURPOSE: [L2-auto] 実行ステータス
 class ExecutionStatus(Enum):
     """実行ステータス"""
     SUCCESS = "success"
@@ -207,6 +208,7 @@ class ExecutionStatus(Enum):
     RATE_LIMITED = "rate_limited"
 
 
+# PURPOSE: [L2-auto] CCL 実行結果
 @dataclass
 class ExecutionResult:
     """CCL 実行結果"""
@@ -220,6 +222,7 @@ class ExecutionResult:
     error: Optional[str] = None
 
 
+# PURPOSE: [L2-auto] 実行設定
 @dataclass
 class ExecutionConfig:
     """実行設定"""
@@ -238,6 +241,7 @@ class ExecutionConfig:
 # LMQL Executor
 # =============================================================================
 
+# PURPOSE: [L2-auto] LMQL プログラム実行器
 class LMQLExecutor:
     """LMQL プログラム実行器
     
@@ -1098,6 +1102,7 @@ class LMQLExecutor:
 # Convergence Loop Executor
 # =============================================================================
 
+# PURPOSE: [L2-auto] 収束ループ実行器
 class ConvergenceExecutor:
     """収束ループ実行器
     

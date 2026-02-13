@@ -70,6 +70,7 @@ class OusiaAgent(AuditAgent):
             confidence=0.75,  # 本質判定は主観的要素が大きい
         )
 
+    # PURPOSE: [L2-auto] 曖昧な参照を検出
     def _check_vague_references(self, content: str) -> List[AuditIssue]:
         """曖昧な参照を検出"""
         issues = []
@@ -91,6 +92,7 @@ class OusiaAgent(AuditAgent):
 
         return issues
 
+    # PURPOSE: [L2-auto] 概念の定義有無を検出
     def _check_concept_definition(self, content: str) -> List[AuditIssue]:
         """概念の定義有無を検出"""
         issues = []

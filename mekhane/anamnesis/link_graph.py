@@ -85,6 +85,7 @@ class LinkGraph:
         r"(?:参照|see|ref|cf\.?):\s*`?([a-zA-Z0-9_\-./]+\.md)`?"
     )
 
+    # PURPOSE: [L2-auto] 初期化: init__
     def __init__(self):
         self.nodes: dict[str, GraphNode] = {}
         self._file_map: dict[str, str] = {}  # stem -> node_id
@@ -148,6 +149,7 @@ class LinkGraph:
         )
         return len(self.nodes)
 
+    # PURPOSE: [L2-auto] Markdown 内のリンクを全パターンで抽出.
     def _extract_links(self, content: str) -> list[str]:
         """Markdown 内のリンクを全パターンで抽出."""
         links = []
@@ -170,6 +172,7 @@ class LinkGraph:
 
         return links
 
+    # PURPOSE: [L2-auto] リンクテキストをノード ID に解決.
     def _resolve_link(self, link_text: str) -> Optional[str]:
         """リンクテキストをノード ID に解決.
 
@@ -191,6 +194,7 @@ class LinkGraph:
 
         return None
 
+    # PURPOSE: [L2-auto] ファイルパスからソースタイプを推定.
     def _detect_source_type(self, filepath: Path) -> str:
         """ファイルパスからソースタイプを推定."""
         name = filepath.name.lower()
@@ -216,6 +220,7 @@ class LinkGraph:
             return "xseries"
         return "knowledge"
 
+    # PURPOSE: [L2-auto] ファイルからタイトルを抽出.
     def _extract_title(self, filepath: Path) -> str:
         """ファイルからタイトルを抽出."""
         try:

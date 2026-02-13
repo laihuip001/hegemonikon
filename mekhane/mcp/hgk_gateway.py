@@ -89,6 +89,7 @@ ALLOWED_HOSTS = os.getenv("HGK_GATEWAY_ALLOWED_HOSTS", _default_hosts).split(","
 _MNEME_DIR = Path(os.getenv("HGK_MNEME", str(Path.home() / "oikos/mneme/.hegemonikon")))
 
 
+# PURPOSE: [L2-auto] セキュリティイベントを wbc_state.json に書き込む。
 def _wbc_log_security_event(
     event_type: str,
     severity: str,
@@ -143,6 +144,7 @@ class HGKOAuthProvider(OAuthAuthorizationServerProvider[AuthorizationCode, Refre
     - インメモリストレージ
     """
 
+    # PURPOSE: [L2-auto] 初期化: init__
     def __init__(self, access_token: str):
         self._access_token = access_token
         self._clients: dict[str, OAuthClientInformationFull] = {}
@@ -799,6 +801,7 @@ def hgk_paper_search(query: str, limit: int = 5) -> str:
         import signal
 
         # Anarkhia 対策: 30 秒タイムアウト
+        # PURPOSE: [L2-auto] 内部処理: timeout_handler
         def _timeout_handler(signum, frame):
             raise TimeoutError("API タイムアウト (30秒)")
 
@@ -856,6 +859,7 @@ def hgk_paper_search(query: str, limit: int = 5) -> str:
 INCOMING_DIR = MNEME_DIR / "incoming"
 PROCESSED_DIR = MNEME_DIR / "processed"
 
+# PURPOSE: [L2-auto] incoming/ の未消化ファイルを確認する。
 
 @mcp.tool()
 def hgk_digest_check() -> str:
@@ -1106,6 +1110,7 @@ def hgk_digest_run(
 _ask_timestamps: list[float] = []
 _ASK_RATE_LIMIT = 5
 _ASK_RATE_WINDOW = 60  # seconds
+# PURPOSE: [L2-auto] レートリミットチェック。True = 許可、False = 拒否。
 
 
 def _check_rate_limit() -> bool:

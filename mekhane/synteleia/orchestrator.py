@@ -37,6 +37,7 @@ from .dokimasia import (
 class SynteleiaOrchestrator:
     """Synteleia 2層オーケストレーター"""
 
+    # PURPOSE: [L2-auto] 初期化。
     def __init__(
         self,
         poiesis_agents: Optional[List[AuditAgent]] = None,
@@ -94,6 +95,7 @@ class SynteleiaOrchestrator:
         return orchestrator
 
     @classmethod
+    # PURPOSE: [L2-auto] L1 全エージェント + Layer B Multi-LLM アンサンブルを含むオーケストレータ。
     def with_multi_l2(cls) -> "SynteleiaOrchestrator":
         """
         L1 全エージェント + Layer B Multi-LLM アンサンブルを含むオーケストレータ。
@@ -136,6 +138,7 @@ class SynteleiaOrchestrator:
         # 結果を統合
         return self._aggregate_results(target, agent_results)
 
+    # PURPOSE: [L2-auto] 並列監査
     def _audit_parallel(self, target: AuditTarget) -> List[AgentResult]:
         """並列監査"""
         results = []
@@ -165,6 +168,7 @@ class SynteleiaOrchestrator:
 
         return results
 
+    # PURPOSE: [L2-auto] 逐次監査
     def _audit_sequential(self, target: AuditTarget) -> List[AgentResult]:
         """逐次監査"""
         results = []
@@ -187,6 +191,7 @@ class SynteleiaOrchestrator:
 
         return results
 
+    # PURPOSE: [L2-auto] 結果を統合
     def _aggregate_results(
         self, target: AuditTarget, agent_results: List[AgentResult]
     ) -> AuditResult:

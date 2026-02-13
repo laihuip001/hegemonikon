@@ -33,11 +33,13 @@ _WORKFLOWS_DIR = _MNEME_DIR / "workflows"
 _KALON_DIR = _MNEME_DIR / "kalon"
 
 
+# PURPOSE: [L2-auto] ファイルパスから安定した短い ID を生成する。
 def _file_id(path: Path) -> str:
     """ファイルパスから安定した短い ID を生成する。"""
     return hashlib.md5(str(path).encode()).hexdigest()[:12]
 
 
+# PURPOSE: [L2-auto] ファイル名から日付を抽出する。複数フォーマットに対応。
 def _extract_date(filename: str) -> str | None:
     """ファイル名から日付を抽出する。複数フォーマットに対応。"""
     # handoff_2026-02-11_0940.md → 2026-02-11
@@ -58,6 +60,7 @@ def _extract_date(filename: str) -> str | None:
     return None
 
 
+# PURPOSE: [L2-auto] Markdown コンテンツからタイトルを抽出する。
 def _extract_title(content: str, filename: str) -> str:
     """Markdown コンテンツからタイトルを抽出する。"""
     for line in content.split("\n")[:10]:
@@ -68,6 +71,7 @@ def _extract_title(content: str, filename: str) -> str:
     return filename.replace("_", " ").replace(".md", "").replace(".yaml", "")
 
 
+# PURPOSE: [L2-auto] 最初の意味のある段落をサマリーとして抽出する。
 def _extract_summary(content: str, max_length: int = 250) -> str:
     """最初の意味のある段落をサマリーとして抽出する。"""
     lines = content.split("\n")
@@ -105,6 +109,7 @@ def _extract_summary(content: str, max_length: int = 250) -> str:
     return summary
 
 
+# PURPOSE: [L2-auto] mneme/ ディレクトリをスキャンしてイベントリストを構築する。
 def _scan_events(event_type: str | None = None) -> list[dict[str, Any]]:
     """mneme/ ディレクトリをスキャンしてイベントリストを構築する。"""
     events: list[dict[str, Any]] = []
@@ -193,6 +198,7 @@ def _scan_events(event_type: str | None = None) -> list[dict[str, Any]]:
 
 
 # --- ID からファイルパスを逆引き ---
+# PURPOSE: [L2-auto] event_id からファイルパスを逆引きする。
 def _find_file_by_id(event_id: str) -> Path | None:
     """event_id からファイルパスを逆引きする。"""
     dirs = [_SESSIONS_DIR, _DOXA_DIR, _WORKFLOWS_DIR, _KALON_DIR]

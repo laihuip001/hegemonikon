@@ -25,8 +25,8 @@ CCL_MACROS_DIR = Path(__file__).parent.parent.parent / "ccl" / "macros"
 WF_MACROS_DIR = Path(__file__).parent.parent.parent / ".agent" / "workflows"
 
 
-@dataclass
 # PURPOSE: [L2-auto] マクロ定義
+@dataclass
 class MacroDefinition:
     """マクロ定義"""
     name: str

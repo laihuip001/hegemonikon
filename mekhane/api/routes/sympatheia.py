@@ -150,6 +150,7 @@ class NotificationResponse(BaseModel):
 # Helpers
 # ===========================================================================
 
+# PURPOSE: [L2-auto] JSON ファイルを安全に読む。
 def _read_json(path: Path, default: Any = None) -> Any:
     """JSON ファイルを安全に読む。"""
     try:
@@ -158,6 +159,7 @@ def _read_json(path: Path, default: Any = None) -> Any:
         return default if default is not None else {}
 
 
+# PURPOSE: [L2-auto] JSON ファイルを安全に書く。
 def _write_json(path: Path, data: Any) -> None:
     """JSON ファイルを安全に書く。"""
     try:
@@ -167,6 +169,7 @@ def _write_json(path: Path, data: Any) -> None:
         logger.warning("Failed to write %s: %s", path, e)
 
 
+# PURPOSE: [L2-auto] sympatheia_config.json を読み込む（WF-12 の出力を WF-09 が読む = 閉ループ）。
 def _load_config() -> dict:
     """sympatheia_config.json を読み込む（WF-12 の出力を WF-09 が読む = 閉ループ）。"""
     default = {
@@ -178,6 +181,7 @@ def _load_config() -> dict:
     return _read_json(MNEME / "sympatheia_config.json", default)
 
 
+# PURPOSE: [L2-auto] ローカル通知を JSONL に保存する。Slack 代替。
 def _send_notification(source: str, level: str, title: str, body: str, data: Optional[dict] = None) -> str:
     """ローカル通知を JSONL に保存する。Slack 代替。"""
     notif_id = str(uuid.uuid4())[:8]
@@ -387,6 +391,7 @@ async def weekly_digest(req: DigestRequest) -> DigestResponse:
 _advisor = None
 
 
+# PURPOSE: [L2-auto] AttractorAdvisor の遅延初期化。
 def _get_advisor():
     """AttractorAdvisor の遅延初期化。"""
     global _advisor

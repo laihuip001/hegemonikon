@@ -74,6 +74,7 @@ class PerigrapheAgent(AuditAgent):
             confidence=0.75,
         )
 
+    # PURPOSE: [L2-auto] スコープ逸脱パターンを検出
     def _check_scope_creep(self, content: str) -> List[AuditIssue]:
         """スコープ逸脱パターンを検出"""
         issues = []
@@ -93,6 +94,7 @@ class PerigrapheAgent(AuditAgent):
 
         return issues
 
+    # PURPOSE: [L2-auto] 境界定義の存在を検出（計画向け）
     def _check_boundary_definition(self, content: str) -> List[AuditIssue]:
         """境界定義の存在を検出（計画向け）"""
         issues = []

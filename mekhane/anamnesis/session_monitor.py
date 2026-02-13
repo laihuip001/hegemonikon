@@ -42,6 +42,7 @@ DEFAULT_INTERVAL = 30  # seconds
 MAX_SESSIONS = 20  # monitor top N recent sessions
 
 
+# PURPOSE: 前回のモニター状態 (各セッションの最終 step_count) を JSON から復元する
 def load_state() -> dict:
     """PURPOSE: 前回のモニター状態 (各セッションの最終 step_count) を JSON から復元する"""
     if STATE_FILE.exists():
@@ -52,12 +53,14 @@ def load_state() -> dict:
     return {}
 
 
+# PURPOSE: モニター状態を JSON ファイルに永続化する
 def save_state(state: dict) -> None:
     """PURPOSE: モニター状態を JSON ファイルに永続化する"""
     STATE_FILE.parent.mkdir(parents=True, exist_ok=True)
     STATE_FILE.write_text(json.dumps(state, indent=2, ensure_ascii=False))
 
 
+# PURPOSE: 会話データをセッション記録用マークダウン形式にフォーマットする
 def format_session_md(conv: dict, summary: str, cascade_id: str) -> str:
     """PURPOSE: 会話データをセッション記録用マークダウン形式にフォーマットする"""
     lines = [
@@ -95,6 +98,7 @@ def format_session_md(conv: dict, summary: str, cascade_id: str) -> str:
     return "\n".join(lines)
 
 
+# PURPOSE: [L2-auto] タイトルをファイル名に変換
 def sanitize_filename(title: str) -> str:
     """タイトルをファイル名に変換"""
     # Remove or replace problematic chars
@@ -104,6 +108,7 @@ def sanitize_filename(title: str) -> str:
     return name[:80] if name else "untitled"
 
 
+# PURPOSE: [L2-auto] 1回のモニタリングサイクル
 def monitor_once(client: AntigravityClient, state: dict) -> dict:
     """1回のモニタリングサイクル"""
     # 全セッション一覧を取得
@@ -179,11 +184,13 @@ def monitor_once(client: AntigravityClient, state: dict) -> dict:
     return state
 
 
+# PURPOSE: [L2-auto] デーモンモード: 定期ポーリング
 def daemon_loop(client: AntigravityClient, interval: int) -> None:
     """デーモンモード: 定期ポーリング"""
     state = load_state()
     running = True
 
+    # PURPOSE: [L2-auto] 関数: signal_handler
     def signal_handler(sig, frame):
         nonlocal running
         print("\n[Monitor] 🛑 Shutting down...")
@@ -216,6 +223,7 @@ def daemon_loop(client: AntigravityClient, interval: int) -> None:
 
     print("[Monitor] 👋 Daemon stopped")
 
+# PURPOSE: [L2-auto] 関数: main
 
 def main() -> int:
     parser = argparse.ArgumentParser(

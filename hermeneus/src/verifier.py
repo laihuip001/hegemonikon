@@ -38,8 +38,8 @@ class VerdictType(Enum):
     UNCERTAIN = "uncertain"  # 不確定
 
 
-@dataclass
 # PURPOSE: ラリーの1ターン — debate の最小単位
+@dataclass
 class RallyTurn:
     """ラリーの1ターン — debate の最小単位"""
     speaker: AgentRole
@@ -49,8 +49,8 @@ class RallyTurn:
     timestamp: datetime = field(default_factory=datetime.now)
 
 
-@dataclass
 # PURPOSE: ディベート引数 — 後方互換のためのエージェント主張データ型
+@dataclass
 class DebateArgument:
     """ディベート引数"""
     agent_role: AgentRole
@@ -59,8 +59,8 @@ class DebateArgument:
     timestamp: datetime = field(default_factory=datetime.now)
 
 
-@dataclass
 # PURPOSE: エージェントの最終判定結果 (ACCEPT/REJECT/UNCERTAIN + 確信度)
+@dataclass
 class Verdict:
     """判定結果"""
     type: VerdictType
@@ -69,8 +69,8 @@ class Verdict:
     arbiter_notes: Optional[str] = None
 
 
-@dataclass
 # PURPOSE: ディベートラウンド — ラリー全履歴と収束状態を保持するデータ型
+@dataclass
 class DebateRound:
     """ディベートラウンド — ラリーの全履歴を保持"""
     round_number: int
@@ -82,8 +82,8 @@ class DebateRound:
     rebuttal: Optional[DebateArgument] = None
 
 
-@dataclass
 # PURPOSE: マルチエージェント合意形成の最終結果 — 受理判定・確信度・反対意見を含む
+@dataclass
 class ConsensusResult:
     """合意結果"""
     accepted: bool
@@ -478,6 +478,7 @@ class ConvergenceDetector:
         "however", "still", "disagree", "認められない",
     ]
     
+    # PURPOSE: ラリー履歴から収束判定を行い (converged, reason) を返す
     @classmethod
     def check(
         cls,
@@ -524,12 +525,14 @@ class ConvergenceDetector:
         
         return False, "未収束"
     
+    # PURPOSE: [L2-auto] 同意系キーワードを含むか
     @classmethod
     def _has_agreement(cls, text: str) -> bool:
         """同意系キーワードを含むか"""
         text_lower = text.lower()
         return any(m in text_lower for m in cls.AGREEMENT_MARKERS)
     
+    # PURPOSE: [L2-auto] 固執系キーワードを含むか
     @classmethod
     def _has_insistence(cls, text: str) -> bool:
         """固執系キーワードを含むか"""
@@ -854,8 +857,8 @@ def quick_verify(claim: str, context: str = "") -> bool:
 # Audit (unchanged)
 # =============================================================================
 
-@dataclass
 # PURPOSE: CCL 実行の監査記録 — 入出力ハッシュと合意結果を保持
+@dataclass
 class AuditRecord:
     """監査記録"""
     id: str
@@ -871,13 +874,16 @@ class AuditRecord:
 class AuditStore:
     """監査記録のストア"""
     
+    # PURPOSE: [L2-auto] 初期化: init__
     def __init__(self):
         self._records: List[AuditRecord] = []
     
+    # PURPOSE: [L2-auto] 記録を追加
     def record(self, audit: AuditRecord):  # PURPOSE: 監査記録をストアに追加する
         """記録を追加"""
         self._records.append(audit)
     
+    # PURPOSE: [L2-auto] ID で取得
     def get(self, audit_id: str) -> Optional[AuditRecord]:  # PURPOSE: ID で監査記録を取得する
         """ID で取得"""
         for r in self._records:
@@ -885,6 +891,7 @@ class AuditStore:
                 return r
         return None
     
+    # PURPOSE: CCL 式・日時条件で監査記録をクエリする
     def query(
         self,
         ccl: Optional[str] = None,
@@ -899,6 +906,7 @@ class AuditStore:
             results = [r for r in results if r.timestamp >= since]
         return results[-limit:]
     
+    # PURPOSE: [L2-auto] 統計
     def get_stats(self) -> Dict[str, Any]:  # PURPOSE: 監査統計 (総数・受理率) を返す
         """統計"""
         if not self._records:
@@ -915,8 +923,9 @@ class AuditStore:
 class AuditReporter:
     """監査レポーター"""
     
+    # PURPOSE: 期間文字列をパース
     @staticmethod
-    def parse_period(period_str: str) -> Optional[datetime]:  # PURPOSE: 期間文字列 (today/week/month) を datetime に変換する
+    def parse_period(period_str: str) -> Optional[datetime]:
         """期間文字列をパース"""
         now = datetime.now()
         if period_str == "today":

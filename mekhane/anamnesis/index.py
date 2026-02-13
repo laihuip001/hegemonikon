@@ -33,6 +33,7 @@ MODELS_DIR = (
 )  # forge/models/bge-small
 
 
+# PURPOSE: [L2-auto] LanceDB テーブルの vector カラムの次元数を取得.
 def _get_vector_dimension(table) -> int | None:
     """LanceDB テーブルの vector カラムの次元数を取得.
 
@@ -69,6 +70,7 @@ class Embedder:
 
     _instances: dict[tuple, "Embedder"] = {}
 
+    # PURPOSE: [L2-auto] 内部処理: new__
     def __new__(cls, force_cpu: bool = False, model_name: str = "BAAI/bge-m3"):
         key = (model_name, force_cpu)
         if key in cls._instances:
@@ -85,6 +87,7 @@ class Embedder:
         "BAAI/bge-small-en-v1.5": 384,
     }
 
+    # PURPOSE: [L2-auto] 初期化: init__
     def __init__(self, force_cpu: bool = False, model_name: str = "BAAI/bge-m3"):
         if self._initialized:
             return
@@ -268,6 +271,7 @@ class GnosisIndex:
             pass  # Intentional: table may be empty or have no primary_key column
 
     @staticmethod
+    # PURPOSE: [L2-auto] タイトルの正規化: 小文字化 + 非英数字除去でファジーマッチ。
     def _normalize_title(title: str) -> str:
         """タイトルの正規化: 小文字化 + 非英数字除去でファジーマッチ。"""
         import re

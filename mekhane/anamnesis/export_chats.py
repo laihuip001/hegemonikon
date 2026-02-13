@@ -42,7 +42,7 @@ import argparse
 
 # GCP/Linux 環境に対応
 DEFAULT_OUTPUT_DIR = Path("/home/makaron8426/oikos/mneme/.hegemonikon/sessions")
-CDP_PORT = 9222  # Chrome DevTools Protocol ポート (Agent Manager の Chrome が使用)
+CDP_PORT = 9334  # Chrome DevTools Protocol ポート (Electron IDE; 9222=内蔵Chrome, 9333=mozc占拠)
 
 # メッセージ抽出の閾値
 MIN_MESSAGE_LENGTH = 1  # 短い User 入力（y, /boot）も抽出

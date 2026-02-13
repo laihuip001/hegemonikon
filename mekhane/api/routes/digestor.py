@@ -25,6 +25,7 @@ DIGESTOR_DIR = Path.home() / ".hegemonikon" / "digestor"
 
 
 # ─── Models ───────────────────────────────────────────────
+# PURPOSE: [L2-auto] Digestor 候補1件
 class DigestCandidate(BaseModel):
     """Digestor 候補1件"""
     title: str
@@ -36,6 +37,7 @@ class DigestCandidate(BaseModel):
     suggested_templates: list[dict] = []
 
 
+# PURPOSE: [L2-auto] Digestor レポート1件
 class DigestReport(BaseModel):
     """Digestor レポート1件"""
     timestamp: str
@@ -47,6 +49,7 @@ class DigestReport(BaseModel):
     filename: str = ""
 
 
+# PURPOSE: [L2-auto] レポート一覧レスポンス
 class DigestReportListResponse(BaseModel):
     """レポート一覧レスポンス"""
     reports: list[DigestReport]
@@ -54,6 +57,7 @@ class DigestReportListResponse(BaseModel):
 
 
 # ─── Helpers ──────────────────────────────────────────────
+# PURPOSE: [L2-auto] JSON ファイルから DigestReport を生成。失敗時は None。
 def _load_report(fpath: str) -> Optional[DigestReport]:
     """JSON ファイルから DigestReport を生成。失敗時は None。"""
     try:
@@ -75,6 +79,7 @@ def _load_report(fpath: str) -> Optional[DigestReport]:
         return None
 
 
+# PURPOSE: [L2-auto] digest_report_*.json を新しい順に返す。
 def _list_report_files() -> list[str]:
     """digest_report_*.json を新しい順に返す。"""
     pattern = str(DIGESTOR_DIR / "digest_report_*.json")
@@ -82,6 +87,7 @@ def _list_report_files() -> list[str]:
 
 
 # ─── Endpoints ────────────────────────────────────────────
+# PURPOSE: [L2-auto] digest_report 一覧を取得（新しい順）
 @router.get("/reports", response_model=DigestReportListResponse)
 async def list_reports(
     limit: int = Query(default=10, ge=1, le=50),
@@ -101,6 +107,7 @@ async def list_reports(
     return DigestReportListResponse(reports=reports, total=total)
 
 
+# PURPOSE: [L2-auto] 最新のレポートを取得
 @router.get("/latest", response_model=Optional[DigestReport])
 async def latest_report() -> Optional[DigestReport]:
     """最新のレポートを取得"""
@@ -111,6 +118,7 @@ async def latest_report() -> Optional[DigestReport]:
 
 
 # ─── Run Pipeline ─────────────────────────────────────────
+# PURPOSE: [L2-auto] パイプライン実行リクエスト
 class RunRequest(BaseModel):
     """パイプライン実行リクエスト"""
     max_papers: int = 30
@@ -119,6 +127,7 @@ class RunRequest(BaseModel):
     topics: Optional[list[str]] = None
 
 
+# PURPOSE: [L2-auto] パイプライン実行レスポンス
 class RunResponse(BaseModel):
     """パイプライン実行レスポンス"""
     success: bool
@@ -129,6 +138,7 @@ class RunResponse(BaseModel):
     error: str = ""
 
 
+# PURPOSE: [L2-auto] Digestor パイプラインを実行（n8n Schedule Trigger 用）
 @router.post("/run", response_model=RunResponse)
 async def run_pipeline(req: RunRequest = RunRequest()) -> RunResponse:
     """Digestor パイプラインを実行（n8n Schedule Trigger 用）"""

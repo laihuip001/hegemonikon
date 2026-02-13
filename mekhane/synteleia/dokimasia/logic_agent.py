@@ -77,6 +77,7 @@ class LogicAgent(AuditAgent):
             confidence=0.80,
         )
 
+    # PURPOSE: [L2-auto] 対立キーワードの共存を検出
     def _check_contradictions(self, content: str) -> List[AuditIssue]:
         """対立キーワードの共存を検出"""
         issues = []
@@ -102,6 +103,7 @@ class LogicAgent(AuditAgent):
 
         return issues
 
+    # PURPOSE: [L2-auto] 論理パターンをチェック
     def _check_logic_patterns(self, content: str) -> List[AuditIssue]:
         """論理パターンをチェック"""
         issues = []
@@ -128,6 +130,7 @@ class LogicAgent(AuditAgent):
 
         return issues
 
+    # PURPOSE: [L2-auto] 自己否定パターンを検出
     def _check_self_negation(self, content: str) -> List[AuditIssue]:
         """自己否定パターンを検出"""
         issues = []

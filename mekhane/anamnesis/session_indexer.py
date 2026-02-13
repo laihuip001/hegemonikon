@@ -35,6 +35,7 @@ if str(_HEGEMONIKON_ROOT) not in sys.path:
     sys.path.insert(0, str(_HEGEMONIKON_ROOT))
 
 
+# PURPOSE: LS API の trajectorySummaries JSON からセッション情報を構造化 dict に抽出する
 def parse_sessions_from_json(data: dict) -> list[dict]:
     """PURPOSE: LS API の trajectorySummaries JSON からセッション情報を構造化 dict に抽出する"""
     summaries = data.get("trajectorySummaries", {})
@@ -69,6 +70,7 @@ def parse_sessions_from_json(data: dict) -> list[dict]:
     return sessions
 
 
+# PURPOSE: セッション情報を LanceDB レコード (既存スキーマ準拠) に変換する
 def sessions_to_records(sessions: list[dict]) -> list[dict]:
     """PURPOSE: セッション情報を LanceDB レコード (既存スキーマ準拠) に変換する
 
@@ -175,6 +177,7 @@ _RE_SESSION_ID = re.compile(
 _RE_SECTION = re.compile(r"^##\s+(.+)$", re.MULTILINE)
 
 
+# PURPOSE: Handoff マークダウンファイルをパースし構造化 dict に変換する
 def parse_handoff_md(path: Path) -> dict:
     """PURPOSE: Handoff マークダウンファイルをパースし構造化 dict に変換する"""
     text = path.read_text(encoding="utf-8", errors="replace")
@@ -212,6 +215,7 @@ def parse_handoff_md(path: Path) -> dict:
     }
 
 
+# PURPOSE: パース済み Handoff dict を LanceDB 互換レコードに変換する
 def handoffs_to_records(handoffs: list[dict]) -> list[dict]:
     """PURPOSE: パース済み Handoff dict を LanceDB 互換レコードに変換する"""
     records = []
@@ -250,6 +254,7 @@ def handoffs_to_records(handoffs: list[dict]) -> list[dict]:
     return records
 
 
+# PURPOSE: handoff_*.md ファイル群を LanceDB にセマンティックインデックスする
 def index_handoffs(handoff_dir: Optional[str] = None) -> int:
     """PURPOSE: handoff_*.md ファイル群を LanceDB にセマンティックインデックスする"""
     directory = Path(handoff_dir) if handoff_dir else _HANDOFF_DIR
@@ -320,6 +325,7 @@ def index_handoffs(handoff_dir: Optional[str] = None) -> int:
     return 0
 
 
+# PURPOSE: AntigravityClient 経由で LS API から全セッション会話データを取得する
 def fetch_all_conversations(max_sessions: int = 100) -> list[dict]:
     """PURPOSE: AntigravityClient 経由で LS API から全セッション会話データを取得する"""
     from mekhane.ochema.antigravity_client import AntigravityClient
@@ -390,6 +396,7 @@ def fetch_all_conversations(max_sessions: int = 100) -> list[dict]:
     return conversations
 
 
+# PURPOSE: 会話データを LanceDB セマンティック検索用レコードに変換する
 def conversations_to_records(conversations: list[dict]) -> list[dict]:
     """PURPOSE: 会話データを LanceDB セマンティック検索用レコードに変換する"""
     records = []
@@ -433,6 +440,7 @@ def conversations_to_records(conversations: list[dict]) -> list[dict]:
     return records
 
 
+# PURPOSE: 全セッション会話を取得し LanceDB にセマンティックインデックスする
 def index_conversations(max_sessions: int = 100) -> int:
     """PURPOSE: 全セッション会話を取得し LanceDB にセマンティックインデックスする"""
     conversations = fetch_all_conversations(max_sessions)
@@ -503,6 +511,7 @@ def index_conversations(max_sessions: int = 100) -> int:
 _BRAIN_DIR = Path.home() / ".gemini" / "antigravity" / "brain"
 
 
+# PURPOSE: .system_generated/steps/ 配下の output.txt をパースしレコード化する
 def parse_step_outputs(brain_dir: Optional[str] = None, max_per_session: int = 20) -> list[dict]:
     """PURPOSE: .system_generated/steps/ 配下の output.txt をパースしレコード化する"""
     directory = Path(brain_dir) if brain_dir else _BRAIN_DIR
@@ -546,6 +555,7 @@ def parse_step_outputs(brain_dir: Optional[str] = None, max_per_session: int = 2
     return steps
 
 
+# PURPOSE: ステップ出力データを LanceDB 互換レコードに変換する
 def steps_to_records(steps: list[dict]) -> list[dict]:
     """PURPOSE: ステップ出力データを LanceDB 互換レコードに変換する"""
     records = []
@@ -576,6 +586,7 @@ def steps_to_records(steps: list[dict]) -> list[dict]:
     return records
 
 
+# PURPOSE: .system_generated/steps/ の出力ファイルを LanceDB にインデックスする
 def index_steps(brain_dir: Optional[str] = None, max_per_session: int = 20) -> int:
     """PURPOSE: .system_generated/steps/ の出力ファイルを LanceDB にインデックスする"""
     steps = parse_step_outputs(brain_dir, max_per_session)
@@ -651,6 +662,7 @@ _RE_EXPORT_DATE = re.compile(r"\*\*エクスポート日時\*\*:\s*(.+)")
 _RE_ROLE = re.compile(r"^##\s+(👤 User|🤖 Claude)", re.MULTILINE)
 
 
+# PURPOSE: export_chats.py 出力の MD ファイルを構造化 dict にパースする
 def parse_export_md(path: Path) -> dict:
     """PURPOSE: export_chats.py 出力の MD ファイルを構造化 dict にパースする"""
     text = path.read_text(encoding="utf-8", errors="replace")
@@ -699,6 +711,7 @@ def parse_export_md(path: Path) -> dict:
     }
 
 
+# PURPOSE: パース済みエクスポート dict を LanceDB 互換レコードに変換する
 def exports_to_records(exports: list[dict]) -> list[dict]:
     """PURPOSE: パース済みエクスポート dict を LanceDB 互換レコードに変換する"""
     records = []
@@ -722,6 +735,7 @@ def exports_to_records(exports: list[dict]) -> list[dict]:
     return records
 
 
+# PURPOSE: export_chats.py 出力 MD を LanceDB にセマンティックインデックスする
 def index_exports(export_dir: Optional[str] = None) -> int:
     """PURPOSE: export_chats.py 出力 MD を LanceDB にセマンティックインデックスする"""
     directory = Path(export_dir) if export_dir else _EXPORT_DIR
@@ -790,6 +804,7 @@ def index_exports(export_dir: Optional[str] = None) -> int:
     return 0
 
 
+# PURPOSE: trajectorySummaries JSON からセッション情報を LanceDB にインデックスする
 def index_from_json(json_path: str) -> int:
     """PURPOSE: trajectorySummaries JSON からセッション情報を LanceDB にインデックスする"""
     path = Path(json_path)
@@ -859,6 +874,7 @@ def index_from_json(json_path: str) -> int:
     return 0
 
 
+# PURPOSE: LS API から直接セッション情報を取得し LanceDB にインデックスする
 def index_from_api() -> int:
     """PURPOSE: LS API から直接セッション情報を取得し LanceDB にインデックスする"""
     script = _HEGEMONIKON_ROOT / "scripts" / "agq-sessions.sh"
@@ -886,6 +902,7 @@ def index_from_api() -> int:
         return index_from_json(str(json_path))
 
 
+# PURPOSE: [L2-auto] 関数: main
 def main() -> int:  # PURPOSE: CLI エントリポイント — サブコマンド (sessions/handoffs/conversations/steps/exports) をディスパッチする
     import argparse
 

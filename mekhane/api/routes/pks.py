@@ -76,6 +76,7 @@ class FeedbackStatsResponse(BaseModel):
 _engine = None
 
 
+# PURPOSE: [L2-auto] PKSEngine の遅延初期化。埋め込みモデルのロードが重いため。
 def _get_engine():
     """PKSEngine の遅延初期化。埋め込みモデルのロードが重いため。"""
     global _engine

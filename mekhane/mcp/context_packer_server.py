@@ -52,6 +52,7 @@ SAFE_ENV_KEYS = frozenset({
 })
 
 
+# PURPOSE: [L2-auto] コマンドを実行して stdout を返す。失敗時は空文字列。
 def _run_cmd(cmd: str, cwd: str | None = None) -> str:
     """コマンドを実行して stdout を返す。失敗時は空文字列。"""
     try:

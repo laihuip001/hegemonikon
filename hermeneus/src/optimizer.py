@@ -44,8 +44,8 @@ class OptimizerType(Enum):
     RANDOM_SEARCH = "random_search"
 
 
-@dataclass
 # PURPOSE: [L2-auto] 最適化設定
+@dataclass
 class OptimizationConfig:
     """最適化設定"""
     optimizer_type: OptimizerType = OptimizerType.BOOTSTRAP_FEWSHOT
@@ -57,8 +57,8 @@ class OptimizationConfig:
     api_key: Optional[str] = None
 
 
-@dataclass
 # PURPOSE: [L2-auto] 最適化結果
+@dataclass
 class OptimizationResult:
     """最適化結果"""
     success: bool
@@ -70,8 +70,8 @@ class OptimizationResult:
     error: Optional[str] = None
 
 
-@dataclass
 # PURPOSE: [L2-auto] CCL 最適化用の例
+@dataclass
 class CCLExample:
     """CCL 最適化用の例"""
     ccl: str

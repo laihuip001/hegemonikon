@@ -55,6 +55,7 @@ _index = None
 _index_error: str | None = None
 
 
+# PURPOSE: [L2-auto] GnosisIndex を遅延初期化。失敗時は例外メッセージを保持。
 def _get_index():
     """GnosisIndex を遅延初期化。失敗時は例外メッセージを保持。"""
     global _index, _index_error

@@ -28,6 +28,7 @@ router = APIRouter(tags=["gateway"])
 _gateway = None
 
 
+# PURPOSE: [L2-auto] Gateway コンポーネントを遅延初期化する
 def _get_gateway():
     """Gateway コンポーネントを遅延初期化する"""
     global _gateway

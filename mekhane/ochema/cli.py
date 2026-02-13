@@ -17,6 +17,7 @@ import sys
 from mekhane.ochema.antigravity_client import AntigravityClient, DEFAULT_MODEL
 
 
+# PURPOSE: [L2-auto] LS 接続ステータスを表示。
 def cmd_status(args: argparse.Namespace) -> None:
     """LS 接続ステータスを表示。"""
     client = AntigravityClient(workspace=args.workspace)
@@ -31,6 +32,7 @@ def cmd_status(args: argparse.Namespace) -> None:
     print(f"└─────────────────────────────────────────┘")
 
 
+# PURPOSE: [L2-auto] 利用可能なモデル一覧を表示。
 def cmd_models(args: argparse.Namespace) -> None:
     """利用可能なモデル一覧を表示。"""
     client = AntigravityClient(workspace=args.workspace)
@@ -45,6 +47,7 @@ def cmd_models(args: argparse.Namespace) -> None:
     print(f"└─────────────────────────────────────────────────┘")
 
 
+# PURPOSE: [L2-auto] LLM にメッセージを送信し、応答を表示。
 def cmd_ask(args: argparse.Namespace) -> None:
     """LLM にメッセージを送信し、応答を表示。"""
     client = AntigravityClient(workspace=args.workspace)
@@ -76,6 +79,7 @@ def cmd_ask(args: argparse.Namespace) -> None:
         sys.exit(1)
 
 
+# PURPOSE: [L2-auto] 対話モード。
 def cmd_chat(args: argparse.Namespace) -> None:
     """対話モード。"""
     client = AntigravityClient(workspace=args.workspace)
@@ -100,6 +104,7 @@ def cmd_chat(args: argparse.Namespace) -> None:
             print(f"❌ Error: {e}")
 
 
+# PURPOSE: [L2-auto] Quota + Experiment フラグ状態を表示。
 def cmd_quota(args: argparse.Namespace) -> None:
     """Quota + Experiment フラグ状態を表示。"""
     import json
@@ -122,6 +127,7 @@ def cmd_quota(args: argparse.Namespace) -> None:
     print("└─────────────────────────────────────────────────────────┘")
 
 
+# PURPOSE: [L2-auto] コンテキスト健全性を表示。
 def cmd_health(args: argparse.Namespace) -> None:
     """コンテキスト健全性を表示。"""
     client = AntigravityClient(workspace=args.workspace)
@@ -148,6 +154,7 @@ def cmd_health(args: argparse.Namespace) -> None:
     print(f"└─────────────────────────────────────────────────────────┘")
 
 
+# PURPOSE: [L2-auto] スマートモデル選択で LLM に問い合わせ。
 def cmd_smart_ask(args: argparse.Namespace) -> None:
     """スマートモデル選択で LLM に問い合わせ。"""
     client = AntigravityClient(workspace=args.workspace)
@@ -174,6 +181,7 @@ def cmd_smart_ask(args: argparse.Namespace) -> None:
         sys.exit(1)
 
 
+# PURPOSE: [L2-auto] セッションをアーカイブ。
 def cmd_archive(args: argparse.Namespace) -> None:
     """セッションをアーカイブ。"""
     client = AntigravityClient(workspace=args.workspace)
@@ -197,6 +205,7 @@ def cmd_archive(args: argparse.Namespace) -> None:
 
 
 
+# PURPOSE: [L2-auto] セッション一覧/詳細を表示。
 def cmd_sessions(args: argparse.Namespace) -> None:
     """セッション一覧/詳細を表示。"""
     import json
@@ -220,6 +229,7 @@ def cmd_sessions(args: argparse.Namespace) -> None:
         print(json.dumps(data, indent=2, ensure_ascii=False))
 
 
+# PURPOSE: [L2-auto] エピソード記憶一覧/詳細を表示。
 def cmd_episodes(args: argparse.Namespace) -> None:
     """エピソード記憶一覧/詳細を表示。"""
     import json
@@ -246,6 +256,7 @@ def cmd_episodes(args: argparse.Namespace) -> None:
             print(f"    {ep['preview'][:80]}...")
 
 
+# PURPOSE: [L2-auto] CLI エントリーポイント。
 def main() -> None:
     """CLI エントリーポイント。"""
     parser = argparse.ArgumentParser(

@@ -242,6 +242,7 @@ class GnosisIndexV2:
         )
 
     @staticmethod
+    # PURPOSE: [L2-auto] タイトルの正規化: 小文字化 + 非英数字除去でファジーマッチ。
     def _normalize_title(title: str) -> str:
         """タイトルの正規化: 小文字化 + 非英数字除去でファジーマッチ。"""
         import re

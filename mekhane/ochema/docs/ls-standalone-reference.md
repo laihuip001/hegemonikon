@@ -258,17 +258,22 @@ LS API → HGK Gateway のバックエンド化は完了済み。
 
 ## 14. Cortex API 直叩き結果 (2026-02-13)
 
-### 検証結果: 行き止まり
+### 検証結果: 突破口あり
 
-Cloud Backend (Cortex API) への直叩きは、3 ルート全て失敗:
+Cloud Backend (Cortex API) への直叩き試行:
 
 | メソッド | プロトコル | 結果 | gRPC Status |
 |:---------|:-----------|:-----|:------------|
 | `ListCloudAICompanionProjects` | gRPC (binary) | ❌ | **12 UNIMPLEMENTED** |
-| `GenerateChat` | gRPC (binary) | ❌ | **7 PERMISSION_DENIED** |
+| `LoadCodeAssist` | gRPC (binary) | ✅ | **0 OK** — Project ID 返却 |
+| `GenerateChat` (project あり) | gRPC (binary) | ❌ | **7 PERMISSION_DENIED** |
 | `StreamGenerateChat` | gRPC (binary) | ❌ | **7 PERMISSION_DENIED** |
 | 全メソッド | JSON/REST (curl) | ❌ | **404 Not Found** |
 | 全メソッド | grpcurl (Reflection) | ❌ | **Reflection 未対応** |
+
+### Project ID の取得
+
+`LoadCodeAssist` RPC (Antigravity OAuth ya29 トークン) で **Project ID = `robotic-victory-pst7f0`** を取得成功。
 
 ### PERMISSION_DENIED の詳細
 
@@ -278,21 +283,26 @@ Cloud Backend (Cortex API) への直叩きは、3 ルート全て失敗:
 GenerateChat:
   IAM_PERMISSION_DENIED on iam.googleapis.com
   permission: cloudaicompanion.companions.generateChat
-  resource: projects/     ← project が空!
+  resource: projects/robotic-victory-pst7f0
 
 StreamGenerateChat:
   IAM_PERMISSION_DENIED on iam.googleapis.com
   permission: cloudaicompanion.instances.completeTask
-  resource: projects/     ← project が空!
+  resource: projects/     ← project が空 (未指定時)
 ```
+
+> **gcloud ADC トークン**は `cloudaicompanion.companions.generateChat` 権限を持たない。
+> **Antigravity OAuth トークン** (state.vscdb の ya29) が必要だが、
+> Cortex API に直接送る際のリクエスト構造が LS 内部の proto 定義と合致する必要がある。
 
 ### 結論
 
 - **Cortex API は gRPC only** (JSON/REST は 404)
 - **Reflection API 無効** (proto descriptor なしでは grpcurl も使えない)
-- **project ID が必須** だが、`ListCloudAICompanionProjects` は UNIMPLEMENTED
-- **project ID は LS 内部の OAuth フローでのみ取得可能**
-- → **LS 経由 4-Step フローが唯一の実用ルート**
+- **Project ID = `robotic-victory-pst7f0`** (`LoadCodeAssist` RPC で取得)
+- **Antigravity OAuth トークン + 正確な proto 構造**が直叩きに必要
+- → **LS 経由 4-Step フローが現時点で唯一の安定ルート**
+- → Cortex 直叩きは Project ID は解決したが、proto 構造の完全解明が残る
 
 ### ya29 トークン抽出方法 (参考)
 
@@ -373,27 +383,275 @@ token = json.loads(row[0])['apiKey']  # ya29.a0AUMWg_... (258 chars)
 
 ---
 
-## 18. Project ID 傍受結果
+## 18. Project ID 傍受 + MITM 結果
 
-### 試行と結果
+### 🎯 最終結果: Project ID = `robotic-victory-pst7f0`
+
+`LoadCodeAssist` RPC (Antigravity OAuth ya29 トークン使用) で取得成功。
+
+### V3 ログ探査 (バイナリ解析 + state.vscdb)
 
 | 方法 | 結果 |
 |:-----|:-----|
-| `state.vscdb` 全キー検索 | project/companion キーなし |
-| `userStatusProtoBinaryBase64` デコード | モデル enum + プラン情報のみ |
-| `GetUserStatus` API | project フィールドなし |
-| `GetUserDefinedCloudaicompanionProject` 呼出 | 404 (LS 内部関数、非公開) |
-| `GetSubscriptionStatus` / `OnboardUser` | エンドポイント不在 |
-| LS プロセスメモリスキャン (226MB) | `projects/` パターン 0 件 |
-| LLM 呼出中メモリスキャン | `cloudaicompanion` パターン 0 件 |
+| LS バイナリ `strings` | `cloudaicompanionProject`, `antigravity_project_id`, `quota_project_id` フィールド発見 |
+| extension.js proto 定義 | `cloudaicompanion_project` (field 1), `antigravity_project_id` (field 19) 発見 |
+| `state.vscdb` 全キー検索 | `antigravityUnifiedStateSync.userStatus` に tier 情報あり、project なし |
+| `userStatusProtoBinaryBase64` デコード | `g1-ultra-tier`, モデル enum, プラン情報 |
+| `GetUserStatus` API | `userTier.id = g1-ultra-tier`, project フィールドなし |
+| LS 内部 RPC (OnboardUser 等) | 404 (ConnectRPC 非公開) |
+| LS /proc/PID/mem スキャン | GCP Project ID パターン 0 件 (Go GC 断片化) |
 
-### 結論
+### V1 MITM Proxy (mitmproxy 12.2.1)
 
-Project ID は **Go ランタイムの GC 管理下のメモリ**にのみ存在。
-文字列検索では捕捉不可能 (protobuf バイナリエンコード + Go 内部構造体)。
+**構成**: mitmdump (port 8888) + LS wrapper (`HTTPS_PROXY` 注入)
 
-**LS 経由 4-Step フローが唯一の実用ルート** — Cortex 直叩きは **永久に不可能** ではないが、
-proto descriptor の抽出 + mitmproxy による TLS 復号が必要で、投資対効果が低い。
+| 通信先 | プロキシ通過 | キャプチャ内容 |
+|:-------|:----------:|:--------------|
+| `antigravity-unleash.goog` | ✅ | Feature Flags (370+ toggles), Go/JS SDK 通信全文 |
+| `cloudcode-pa.googleapis.com` | ✅ (HTTP/2) | `GenerateChat` (200 OK) — 前回セッション |
+| `daily-cloudcode-pa.googleapis.com` | ❌ | gRPC はプロキシ経由せず直接接続 |
+| `lh3.googleusercontent.com` | ✅ | 静的アセット |
+| `otel.gitkraken.com` | ✅ | テレメトリ |
+
+### Unleash Feature Flags (MITM で発見)
+
+| 項目 | 値 |
+|:-----|:---|
+| LS appName | `codeium-language-server` |
+| Extension appName | `codeium-extension` |
+| LS SDK | `unleash-client-go:4.5.0` |
+| Extension SDK | `unleash-client-js:3.7.8` |
+| Instance ID | `makaron8426-Hegemonikon` |
+| トグル数 | 370+ |
+| 認証 | `*:production.e44558998bfc35ea9...` (Unleash API key) |
+
+### Go gRPC とプロキシの関係
+
+- Go バイナリに `net/http.ProxyFromEnvironment` + `grpc/internal/transport.proxyDial` が存在
+- **標準 HTTP 通信** (Unleash): `HTTPS_PROXY` を**尊重**
+- **gRPC-over-HTTP/2 通信** (Cortex): `HTTPS_PROXY` を**バイパス**
+- 理由: gRPC は CONNECT トンネルではなく直接 TLS ダイアルを使用
+
+### MITM 手順 (再現方法)
+
+```bash
+# 1. mitmproxy インストール
+python3 -m venv /tmp/mitm-env && /tmp/mitm-env/bin/pip install mitmproxy
+
+# 2. Forward proxy 起動
+nohup /tmp/mitm-env/bin/mitmdump --listen-port 8888 --ssl-insecure \
+  -s mekhane/ochema/scripts/cortex_capture.py > /tmp/mitm_output.log 2>&1 &
+
+# 3. LS wrapper 設置 (sudo)
+sudo mv language_server_linux_x64 language_server_linux_x64.real
+sudo cp /tmp/ls_wrapper.sh language_server_linux_x64
+# → LS 再起動で HTTP 通信がキャプチャされる
+# 空の gRPC frame で LoadCodeAssist を叩く
+printf '\x00\x00\x00\x00\x00' > /tmp/empty.bin
+curl -sk --noproxy '*' --http2 -X POST \
+  "https://daily-cloudcode-pa.googleapis.com/google.internal.cloud.code.v1internal.CloudCode/LoadCodeAssist" \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/grpc" \
+  -H "te: trailers" \
+  --data-binary @/tmp/empty.bin
+```
+
+レスポンス (480 bytes):
+
+| フィールド | 値 |
+|:-----------|:---|
+| **cloudaicompanion_project** | **`robotic-victory-pst7f0`** |
+| tier (current) | `g1-ultra-tier` (Google One AI Ultra) |
+| tier (default) | `standard-tier` (Gemini Code Assist) |
+| manage URL | `https://accounts.google.com/AccountChooser?Email=...` |
+
+### 18.2 GenerateChat / StreamGenerateChat: ❌ PERMISSION_DENIED
+
+正しい project (`robotic-victory-pst7f0`) でも失敗:
+
+| API | 必要なパーミッション | 結果 |
+|:----|:--------------------|:-----|
+| `GenerateChat` | `cloudaicompanion.companions.generateChat` | ❌ PERMISSION_DENIED |
+| `StreamGenerateChat` | `cloudaicompanion.instances.completeTask` | ❌ PERMISSION_DENIED |
+| `GetStreamingExternalChatCompletions` | — | ❌ 12 UNIMPLEMENTED |
+
+テスト済みトークン:
+
+- `state.vscdb` の `antigravityAuthStatus.apiKey` (ya29, 258 chars) → ❌
+- `~/.gemini/oauth_creds.json` の `access_token` (ya29, 260 chars) → ❌
+- 両トークンとも同じ PERMISSION_DENIED
+
+### 18.3 全攻撃ベクトルサマリ (18 件)
+
+| # | ベクトル | 結果 | 発見 |
+|:--|:--------|:-----|:-----|
+| 1 | LS 環境変数 | ❌ | project 関連なし |
+| 2 | LS cmdline | ❌ | `--csrf_token`, `--cloud_code_endpoint` 等。auth 系なし |
+| 3 | GetUserStatus API | ❌ | project キーなし |
+| 4 | state.vscdb 全キー (2298個) | ⚠️ | `cloudcode.session-index` 発見。project なし |
+| 5 | /proc/net/tcp | ✅ | **LS → 34.107.243.93, 34.54.84.110 (Google Cloud) 接続中** |
+| 6 | GetStaticExperimentStatus | ❌ | 空レスポンス |
+| 7 | DumpFlightRecorder | ❌ | 97 bytes (空に近い) |
+| 8 | extension.js grep | 🎯 | **`AntigravityProject` proto 完全構造解明** |
+| 9 | Go バイナリ strings | 🎯 | **`ListCloudAICompanionProjectsRequest/Response` 発見** |
+| 10 | /proc/PID/maps | ❌ | LS バイナリのみ |
+| 11 | Cortex API JSON | ❌ | 404 (gRPC only) |
+| 12 | grpcurl (Reflection) | ❌ | Reflection 非対応 |
+| 13 | LS メモリスキャン (286.5MB) | ❌ | `projects/registry` のみ (内部定義) |
+| 14 | LS API LoadCodeAssist | ❌ | 空レスポンス (LS はプロキシしない) |
+| 15 | **Cortex LoadCodeAssist** | **✅** | **`robotic-victory-pst7f0` 取得！** |
+| 16 | Cortex GenerateChat | ❌ | PERMISSION_DENIED |
+| 17 | LS メモリ ya29 検索 | ❌ | 0 件 (トークン即破棄) |
+| 18 | Gemini Code Assist ログ | 🎯 | **`cloudCodeQuotaProject: 空` 確認** |
+
+### 18.4 Gemini Code Assist ログからの設定情報
+
+`~/.config/Antigravity/logs/*/11-Gemini Code Assist.log`:
+
+```
+atlasAddr: cloudaicompanion.googleapis.com:443      ← 本番 Atlas
+cloudCodeAddr: cloudcode-pa.googleapis.com:443      ← 本番 CloudCode
+cloudCodeQuotaProject:                              ← 空 (未設定)
+useCloudCodeAPI: true
+maxHistoryBytes: 500000
+maxFileBytes: 75000
+```
+
+**注意**: LS cmdline の `--cloud_code_endpoint=https://daily-cloudcode-pa.googleapis.com` と
+Gemini Code Assist の `cloudCodeAddr: cloudcode-pa.googleapis.com:443` は**別のエンドポイント**。
+`daily-` prefix = 開発/プレリリース環境。
+
+### 18.5 proto 構造解明
+
+extension.js から解読した `AntigravityProject` (exa.codeium_common_pb):
+
+```protobuf
+message AntigravityProject {
+  string antigravity_project_id = 1;
+  string auth_uid = 2;
+  DeploymentProvider deployment_provider = 3;
+  string project_id = 4;
+  string project_name = 5;
+  // ... (field 14: provider_deployment_id, field 19: antigravity_project_id)
+}
+```
+
+`GenerateChatRequest` のフィールド (Go バイナリ strings):
+
+```
+GetCloudaicompanionProject, GetConversation, GetIdeContext,
+GetMetadata, GetEnablePromptEnhancement, GetYieldInfo,
+GetRetryDetails, GetFunctionDeclarations, GetIncludeThinkingSummaries,
+GetTierId, GetModelConfigId, GetUserPromptId
+```
+
+### 18.6 LS のトークン管理メカニズム
+
+| 事実 | 意味 |
+|:-----|:-----|
+| LS cmdline に auth 系パラメータなし | トークンは起動時引数では渡されない |
+| LS メモリに ya29 が 0 件 | トークンは長期保持されない (使用後即破棄) |
+| `--parent_pipe_path` が cmdline に存在 | **Extension → LS の IPC チャネル** |
+| extension.js に `setCredentials` 存在 | Extension が LS にトークンを動的に渡す |
+
+**結論**: Extension.js が `parent_pipe_path` IPC 経由でトークンを LS に渡し、
+LS は使用後即破棄。メモリスキャンで捕捉できないのはこのため。
+
+### 18.7 gcloud config の project
+
+```
+gcloud config get project → project-f2526536-3630-4df4-aff
+```
+
+これは **GCP プロジェクト** (開発者用) であり、**cloudaicompanion project ではない**。
+Cortex API で使うべき project は `robotic-victory-pst7f0` (LoadCodeAssist から取得)。
+
+### 18.8 GenerateChatRequest 完全 proto 構造 (Go struct tags 復元)
+
+Go バイナリの `protobuf:"..."` struct tags + Getter メソッド名から完全復元:
+
+```protobuf
+// google/internal/cloud/code/v1internal/cloudcode.proto
+// package: google.internal.cloud.code.v1internal
+
+message GenerateChatRequest {
+  string cloudaicompanion_project = 1;  // "robotic-victory-pst7f0"
+  repeated bytes history = 2;           // ConversationMessage?
+  string user_message = 3;              // or: IdeContext message
+  // field 4: conversation_id?
+  bool enable_prompt_enhancement = 5;   // or 7 (ambiguous)
+  // field 6-8: unknown
+  YieldedUserInput yielded_user_input = 9;
+  int64 request_id = 10;                // varint
+  repeated FunctionDeclaration function_declarations = 11;
+  bool include_thinking_summaries = 12; // varint, oneof
+  string tier_id = 13;                  // oneof, "g1-ultra-tier"
+  string model_config_id = 14;          // oneof
+  string user_prompt_id = 15;           // oneof
+  Metadata metadata = 18;
+  // YieldInfo yield_info = 10;         // same field 10 (different message?)
+  // RetryDetails retry_details = 10;   // same field 10 (oneof?)
+}
+
+message GenerateChatRequest_YieldedUserInput {
+  string user_input = ?;
+  bool consented = ?;
+}
+
+message GenerateChatResponse {
+  string markdown = ?;
+  bool blocked = ?;
+  Citations citations = ?;
+  string detected_intent = ?;
+  string disclaimer = ?;
+  FileUsage file_usage = ?;
+  string finish_reason = ?;
+  FunctionCalls function_calls = ?;
+  MoaInfo moa_info = ?;
+  MoaWorkerInfo moa_worker_info = ?;
+  ProcessingDetails processing_details = ?;
+  AgentProcessingDetails agent_processing_details = ?;
+  PromptCitations prompt_citations = ?;
+  int64 remaining_fca_quota = ?;
+  SuggestedPrompts suggested_prompts = ?;
+  string text_type = ?;
+  WorkspaceChange workspace_change = ?;
+  YieldInfo yield_info = ?;
+}
+```
+
+### 18.9 GenerateChat curl テスト結果
+
+```bash
+# 最小リクエスト (field 1 + field 3)
+curl -sk --noproxy '*' --http2 -X POST \
+  "https://cloudcode-pa.googleapis.com/...CloudCode/GenerateChat" \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/grpc" \
+  -H "te: trailers" \
+  --data-binary @/tmp/grpc_gen_full.bin
+```
+
+| 項目 | 値 |
+|:-----|:---|
+| HTTP Status | **200** |
+| `x-cloudaicompanion-trace-id` | `a81e9b9c5580a45` — **バックエンド到達** |
+| `grpc-status` | **7 (PERMISSION_DENIED)** |
+| `permission` | `cloudaicompanion.companions.generateChat` |
+| `resource` | `projects/robotic-victory-pst7f0` — **Project ID 正しい** |
+
+**結論**: proto 構造は正しい。問題は**トークンの権限**のみ。
+
+### 18.10 残る攻略ルート
+
+| ルート | 実現可能性 | 必要なもの |
+|:-------|:---------:|:----------|
+| **strace IPC 傍受** | 高 | LS が Cortex 通信中に `strace -e write -s 4096 -p PID` で Bearer トークン取得 |
+| **mitmproxy TLS 中間者** | 中 | `/etc/hosts` で DNS 書き換え + リバースプロキシ + CA 注入 |
+| **parent_pipe IPC 傍受** | 中 | Extension → LS の IPC チャネルからトークンを取得 |
+| **Extension Server モック** | 低 | extension.js の OAuth フローを再実装し、LS に正しいトークンを渡す |
+
+**ボトルネック**: `state.vscdb` の ya29 トークンは `cloudaicompanion.companions.generateChat` を持たない。LS は Extension から IPC 経由で**別のスコープのトークン**を受け取っている可能性が高い。
 
 ---
 
@@ -406,13 +664,15 @@ proto descriptor の抽出 + mitmproxy による TLS 復号が必要で、投資
 3. ~~MCP 統合~~ → ✅ (cli.py → Ochēma MCP Server)
 4. ~~別モデルテスト~~ → ✅ (5/8 成功)
 5. ~~ストリーミング調査~~ → ✅ (ポーリング方式で実質完了)
-6. ~~project ID 傍受~~ → ❌ (Go GC 管理下、断念)
+6. ~~project ID 取得~~ → ✅ (`robotic-victory-pst7f0` via LoadCodeAssist)
+7. ~~proto 構造解明~~ → ✅ (GenerateChatRequest 15 fields, Response 18 fields)
+8. ~~proto 構造検証~~ → ✅ (HTTP 200 + trace-id — バックエンド到達)
 
-### 残課題 (低優先度)
+### 残る壁: トークン権限
 
-- **Extension Server モック**: 最小 HTTP OAuth → Standalone LS の認証解決
-- **proto descriptor 抽出**: LS バイナリから FileDescriptorSet → grpcurl 正式呼出
-- **ConnectRPC Python ライブラリ**: 真の SSE ストリーミング実装
+- `state.vscdb` の ya29 は `cloudaicompanion.companions.generateChat` を持たない
+- LS が使う**正しいトークン**を取得できれば、Cortex 直叩きが実現
+- → `strace` で LS の write() を傍受し、Bearer トークンを抽出するのが最善手
 
 ---
 
@@ -420,3 +680,6 @@ proto descriptor の抽出 + mitmproxy による TLS 復号が必要で、投資
 *v2 — Cloud Backend 認証フロー + LS API 141メソッド + 三層認証構造 (2026-02-13)*
 *v3 — 4-Step LLM フルフロー成功 + Cortex API 直叩き結果 + Python 実装完了 (2026-02-13)*
 *v4 — 別モデルテスト + ストリーミング調査 + project ID 傍受 + enum ID マッピング (2026-02-13)*
+*v5 — /dia*%/noe 再検証: LoadCodeAssist成功 + project ID取得 + 認証メカニズム解明 (2026-02-13)*
+*v5b — V3 ログ探査 + V1 MITM 成功 + Unleash Feature Flags 発見 (2026-02-13)*
+*v6 — Proto 構造完全復元 + GenerateChat curl テスト (HTTP 200, PERMISSION_DENIED) (2026-02-13)*

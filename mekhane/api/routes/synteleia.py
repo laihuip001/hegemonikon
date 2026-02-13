@@ -92,6 +92,7 @@ class AgentInfo(BaseModel):
 # --- WBC 連携 ---
 
 
+# PURPOSE: [L2-auto] Sympatheia WBC にアラートを送信。
 def _notify_wbc(alert: dict) -> bool:
     """
     Sympatheia WBC にアラートを送信。

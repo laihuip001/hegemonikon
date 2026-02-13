@@ -95,6 +95,7 @@ KAIROS_INDEX = Path("/home/makaron8426/oikos/mneme/.hegemonikon/indices/kairos.p
 
 
 @server.list_tools()
+# PURPOSE: [L2-auto] List available tools.
 async def list_tools():
     """List available tools."""
     log("list_tools called")
@@ -154,6 +155,7 @@ async def list_tools():
 
 
 @server.call_tool(validate_input=True)
+# PURPOSE: [L2-auto] Handle tool calls.
 async def call_tool(name: str, arguments: dict):
     """Handle tool calls."""
     log(f"call_tool: {name} with {arguments}")

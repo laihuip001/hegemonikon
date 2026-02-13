@@ -48,8 +48,8 @@ class OpType(Enum):
 # AST Nodes: Basic
 # =============================================================================
 
-@dataclass
 # PURPOSE: [L2-auto] ワークフローノード
+@dataclass
 class Workflow:
     """ワークフローノード
     
@@ -63,8 +63,8 @@ class Workflow:
     relation: Optional[str] = None       # .d/.h/.x 関係サフィックス (v7.2)
 
 
-@dataclass
 # PURPOSE: [L2-auto] 条件ノード
+@dataclass
 class Condition:
     """条件ノード
     
@@ -75,8 +75,8 @@ class Condition:
     value: float  # 閾値
 
 
-@dataclass
 # PURPOSE: [L2-auto] マクロ参照ノード
+@dataclass
 class MacroRef:
     """マクロ参照ノード
     
@@ -90,8 +90,8 @@ class MacroRef:
 # AST Nodes: Compound
 # =============================================================================
 
-@dataclass
 # PURPOSE: [L2-auto] 収束ループ: A >> cond または lim[cond]{A}
+@dataclass
 class ConvergenceLoop:
     """収束ループ: A >> cond または lim[cond]{A}
     
@@ -102,8 +102,8 @@ class ConvergenceLoop:
     max_iterations: int = 5              # 最大反復回数
 
 
-@dataclass
 # PURPOSE: [L2-auto] シーケンス: A _ B _ C
+@dataclass
 class Sequence:
     """シーケンス: A _ B _ C
     
@@ -112,8 +112,8 @@ class Sequence:
     steps: List[Any] = field(default_factory=list)
 
 
-@dataclass
 # PURPOSE: [L2-auto] 融合: A * B, A % B (外積), A *% B (内積+外積)
+@dataclass
 class Fusion:
     """融合: A * B, A % B (外積), A *% B (内積+外積)
     
@@ -131,8 +131,8 @@ class Fusion:
     fuse_outer: bool = False             # *% の内積+外積フラグ
 
 
-@dataclass
 # PURPOSE: [L2-auto] 振動: A ~ B, A ~* B (収束), A ~! B (発散)
+@dataclass
 class Oscillation:
     """振動: A ~ B, A ~* B (収束), A ~! B (発散)
     
@@ -145,8 +145,8 @@ class Oscillation:
     max_iterations: int = 5               # 収束時の最大反復回数
 
 
-@dataclass
 # PURPOSE: [L2-auto] Colimit 展開: \A
+@dataclass
 class ColimitExpansion:
     """Colimit 展開: \\A
     
@@ -157,8 +157,8 @@ class ColimitExpansion:
     operators: List[OpType] = field(default_factory=list)  # 追加演算子
 
 
-@dataclass
 # PURPOSE: [L2-auto] パイプライン: A |> B |> C
+@dataclass
 class Pipeline:
     """パイプライン: A |> B |> C
     
@@ -167,8 +167,8 @@ class Pipeline:
     steps: List[Any] = field(default_factory=list)
 
 
-@dataclass
 # PURPOSE: [L2-auto] 並列実行: A || B || C
+@dataclass
 class Parallel:
     """並列実行: A || B || C
     
@@ -181,8 +181,8 @@ class Parallel:
 # AST Nodes: CPL v2.0 Control Structures
 # =============================================================================
 
-@dataclass
 # PURPOSE: [L2-auto] FOR ループ: F:[×N]{body} または F:[A,B,C]{body}
+@dataclass
 class ForLoop:
     """FOR ループ: F:[×N]{body} または F:[A,B,C]{body}
     
@@ -192,8 +192,8 @@ class ForLoop:
     body: Any
 
 
-@dataclass
 # PURPOSE: [L2-auto] IF 条件分岐: I:[cond]{then} E:{else}
+@dataclass
 class IfCondition:
     """IF 条件分岐: I:[cond]{then} E:{else}
     
@@ -204,8 +204,8 @@ class IfCondition:
     else_branch: Optional[Any] = None
 
 
-@dataclass
 # PURPOSE: [L2-auto] WHILE ループ: W:[cond]{body}
+@dataclass
 class WhileLoop:
     """WHILE ループ: W:[cond]{body}
     
@@ -215,8 +215,8 @@ class WhileLoop:
     body: Any
 
 
-@dataclass
 # PURPOSE: [L2-auto] Lambda 関数: L:[x]{body}
+@dataclass
 class Lambda:
     """Lambda 関数: L:[x]{body}
     
@@ -226,8 +226,8 @@ class Lambda:
     body: Any
 
 
-@dataclass
 # PURPOSE: [L2-auto] タグ付きブロック: V:{body}, C:{body}, R:{body}, M:{body}
+@dataclass
 class TaggedBlock:
     """タグ付きブロック: V:{body}, C:{body}, R:{body}, M:{body}
     
@@ -249,16 +249,16 @@ class TaggedBlock:
 # AST Node: Program (Root)
 # =============================================================================
 
-@dataclass
 # PURPOSE: [L2-auto] CCL プログラム (ルートノード)
+@dataclass
 class Program:
     """CCL プログラム (ルートノード)"""
     expressions: List[Any] = field(default_factory=list)
     macros: Dict[str, Any] = field(default_factory=dict)  # let 定義
 
 
-@dataclass
 # PURPOSE: [L2-auto] マクロ定義: let @name = CCL 式
+@dataclass
 class LetBinding:
     """マクロ定義: let @name = CCL 式
     

@@ -92,7 +92,7 @@ class EnsembleMember:
 # =============================================================================
 
 
-# PURPOSE: Multi-LLM アンサンブル監査エージェント
+# PURPOSE: [S3/Stathmos] Multi-LLM アンサンブル監査エージェント
 class MultiSemanticAgent(AuditAgent):
     """Multi-LLM アンサンブル監査エージェント (Layer B: Nous)。
 
@@ -103,11 +103,11 @@ class MultiSemanticAgent(AuditAgent):
     name = "MultiSemanticAgent"
     description = "Multi-LLM アンサンブル監査 (Layer B: Nous)"
 
-    # PURPOSE: [L2-auto] 初期化: init__
+    # PURPOSE: [S3/Stathmos] 初期化: init__
     def __init__(self, members: List[EnsembleMember]):
         self.members = members
 
-    # PURPOSE: [L2-auto] デフォルト構成: Gemini Pro + Claude Opus + GPT-OSS。
+    # PURPOSE: [S3/Stathmos] デフォルト構成: Gemini Pro + Claude Opus + GPT-OSS。
     @classmethod
     def default(cls) -> "MultiSemanticAgent":
         """デフォルト構成: Gemini Pro + Claude Opus + GPT-OSS。"""
@@ -149,7 +149,7 @@ class MultiSemanticAgent(AuditAgent):
 
         return cls(members=members)
 
-    # PURPOSE: [L2-auto] テスト用: StubBackend でアンサンブルを構成。
+    # PURPOSE: [S3/Stathmos] テスト用: StubBackend でアンサンブルを構成。
     @classmethod
     def with_stubs(cls, responses: Optional[Dict[str, str]] = None) -> "MultiSemanticAgent":
         """テスト用: StubBackend でアンサンブルを構成。"""
@@ -165,7 +165,7 @@ class MultiSemanticAgent(AuditAgent):
             )
         return cls(members=members)
 
-    # PURPOSE: Multi-LLM アンサンブル監査を実行
+    # PURPOSE: [S3/Stathmos] Multi-LLM アンサンブル監査を実行
     def audit(self, target: AuditTarget) -> AgentResult:
         """全メンバーに並列 query → majority voting → 統合結果。"""
 
@@ -236,7 +236,7 @@ class MultiSemanticAgent(AuditAgent):
             },
         )
 
-    # PURPOSE: 個別メンバーに query
+    # PURPOSE: [S3/Stathmos] 個別メンバーに query
     def _query_member(
         self, member: EnsembleMember, target: AuditTarget
     ) -> Tuple[str, str, List[AuditIssue], float]:
@@ -251,7 +251,7 @@ class MultiSemanticAgent(AuditAgent):
 
         return member.persona, response_text, issues, confidence
 
-    # PURPOSE: confidence-weighted majority voting
+    # PURPOSE: [S3/Stathmos] confidence-weighted majority voting
     def _majority_vote(
         self, member_results: List[Tuple[str, str, List[AuditIssue], float]]
     ) -> List[AuditIssue]:
@@ -301,7 +301,7 @@ class MultiSemanticAgent(AuditAgent):
 
         return unified
 
-    # PURPOSE: レスポンスから confidence を抽出
+    # PURPOSE: [S3/Stathmos] レスポンスから confidence を抽出
     def _extract_confidence(self, response: str) -> float:
         """LLM レスポンスから confidence を抽出。"""
         try:
@@ -312,7 +312,7 @@ class MultiSemanticAgent(AuditAgent):
             pass
         return 0.7
 
-    # PURPOSE: L2 はテキスト系のターゲットのみサポート
+    # PURPOSE: [S3/Stathmos] L2 はテキスト系のターゲットのみサポート
     def supports(self, target_type: AuditTargetType) -> bool:
         """L2 はテキスト系のターゲットのみサポート。"""
         return target_type in (
@@ -323,11 +323,11 @@ class MultiSemanticAgent(AuditAgent):
         )
 
 
-# PURPOSE: [L2-auto] Severity の厳しさ順序。
 # =============================================================================
 # Utilities
 # =============================================================================
 
+# PURPOSE: [S3/Stathmos] Severity の厳しさ順序。
 def _severity_rank(severity: AuditSeverity) -> int:
     """Severity の厳しさ順序。"""
     return {

@@ -28,7 +28,7 @@ TARGET_HOSTS = [
 LOG_FILE = "/tmp/cortex_capture.log"
 
 
-# PURPOSE: [L2-auto] Write to both mitmproxy log and file.
+# PURPOSE: [S2/Mekhane] Write to both mitmproxy log and file.
 def log(msg: str) -> None:
     """Write to both mitmproxy log and file."""
     ts = datetime.now().strftime("%H:%M:%S.%f")[:-3]
@@ -38,7 +38,7 @@ def log(msg: str) -> None:
         f.write(line + "\n")
 
 
-# PURPOSE: [L2-auto] Capture outgoing requests to Cortex.
+# PURPOSE: [S2/Mekhane] Capture outgoing requests to Cortex.
 def request(flow: http.HTTPFlow) -> None:
     """Capture outgoing requests to Cortex."""
     host = flow.request.pretty_host
@@ -78,7 +78,7 @@ def request(flow: http.HTTPFlow) -> None:
             _find_project_in_bytes(body, "request")
 
 
-# PURPOSE: [L2-auto] Capture responses from Cortex.
+# PURPOSE: [S2/Mekhane] Capture responses from Cortex.
 def response(flow: http.HTTPFlow) -> None:
     """Capture responses from Cortex."""
     host = flow.request.pretty_host
@@ -106,7 +106,7 @@ def response(flow: http.HTTPFlow) -> None:
             _find_project_in_bytes(body, "response")
 
 
-# PURPOSE: [L2-auto] Recursively search for project-related fields in JSON.
+# PURPOSE: [S2/Mekhane] Recursively search for project-related fields in JSON.
 def _find_project_fields(obj, context: str, path: str = "") -> None:
     """Recursively search for project-related fields in JSON."""
     if isinstance(obj, dict):
@@ -122,7 +122,7 @@ def _find_project_fields(obj, context: str, path: str = "") -> None:
             _find_project_fields(item, context, f"{path}[{i}]")
 
 
-# PURPOSE: [L2-auto] Search for project ID patterns in raw bytes.
+# PURPOSE: [S2/Mekhane] Search for project ID patterns in raw bytes.
 def _find_project_in_bytes(data: bytes, context: str) -> None:
     """Search for project ID patterns in raw bytes."""
     patterns = [
@@ -134,7 +134,7 @@ def _find_project_in_bytes(data: bytes, context: str) -> None:
             log(f"    🎯 PROJECT PATTERN ({context}): {match.group().decode('ascii', errors='replace')}")
 
 
-# PURPOSE: [L2-auto] Extract readable ASCII strings from binary data.
+# PURPOSE: [S2/Mekhane] Extract readable ASCII strings from binary data.
 def _extract_strings(data: bytes, min_len: int = 6) -> list[str]:
     """Extract readable ASCII strings from binary data."""
     strings = []

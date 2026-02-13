@@ -161,6 +161,22 @@ async def list_tools():
             description="List available LLM models with remaining quota percentages.",
             inputSchema={"type": "object", "properties": {}},
         ),
+        Tool(
+            name="session_info",
+            description=(
+                "Get current session info: step count, Context Rot risk score, "
+                "and session metadata. Use to monitor context health."
+            ),
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "conversation_id": {
+                        "type": "string",
+                        "description": "Optional: specific conversation ID to inspect. If omitted, shows all active sessions.",
+                    },
+                },
+            },
+        ),
     ]
 
 
@@ -255,6 +271,69 @@ async def call_tool(name: str, arguments: dict):
 
         except Exception as e:
             log(f"Models error: {e}")
+            return [TextContent(type="text", text=f"Error: {str(e)}")]
+
+    elif name == "session_info":
+        try:
+            client = get_client()
+            conv_id = arguments.get("conversation_id")
+
+            # Fetch all trajectories
+            all_data = client._rpc(
+                "exa.language_server_pb.LanguageServerService/GetAllCascadeTrajectories", {}
+            )
+            summaries = all_data.get("trajectorySummaries", {})
+
+            if conv_id and conv_id in summaries:
+                # Show specific session
+                info = summaries[conv_id]
+                step_count = info.get("stepCount", 0)
+                status = info.get("status", "unknown")
+                rot_level = (
+                    "🔴 CRITICAL" if step_count > 50
+                    else "🟡 WARNING" if step_count > 30
+                    else "🟢 HEALTHY"
+                )
+                output_lines = [
+                    "# Session Info\n",
+                    f"- **ID**: `{conv_id[:16]}...`",
+                    f"- **Summary**: {info.get('summary', 'N/A')}",
+                    f"- **Steps**: {step_count}",
+                    f"- **Status**: {status}",
+                    f"- **Context Rot**: {rot_level}",
+                ]
+            else:
+                # Show overview of all sessions sorted by step count
+                sessions = []
+                for cid, info in summaries.items():
+                    sessions.append({
+                        "id": cid[:12],
+                        "summary": info.get("summary", "")[:40],
+                        "steps": info.get("stepCount", 0),
+                        "status": info.get("status", "unknown"),
+                    })
+                sessions.sort(key=lambda x: x["steps"], reverse=True)
+
+                output_lines = [
+                    f"# Session Overview ({len(sessions)} total)\n",
+                    "| ID | Summary | Steps | Rot Risk |",
+                    "|:---|:--------|------:|:--------|",
+                ]
+                for s in sessions[:15]:
+                    rot = (
+                        "🔴" if s["steps"] > 50
+                        else "🟡" if s["steps"] > 30
+                        else "🟢"
+                    )
+                    output_lines.append(
+                        f"| `{s['id']}` | {s['summary']} | {s['steps']} | {rot} |"
+                    )
+
+            log(f"Session info returned: {len(summaries)} sessions")
+            return [TextContent(type="text", text="\n".join(output_lines))]
+
+        except Exception as e:
+            log(f"Session info error: {e}")
             return [TextContent(type="text", text=f"Error: {str(e)}")]
 
     else:

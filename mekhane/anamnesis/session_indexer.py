@@ -496,6 +496,151 @@ def index_conversations(max_sessions: int = 100) -> int:
     return 0
 
 
+# ==============================================================
+# Steps Indexer — .system_generated/steps/*/output.txt をインデックス
+# ==============================================================
+
+_BRAIN_DIR = Path.home() / ".gemini" / "antigravity" / "brain"
+
+
+def parse_step_outputs(brain_dir: Optional[str] = None, max_per_session: int = 20) -> list[dict]:
+    """Parse .system_generated/steps/*/output.txt files into records."""
+    directory = Path(brain_dir) if brain_dir else _BRAIN_DIR
+    if not directory.exists():
+        return []
+
+    steps = []
+    # Each conversation has its own brain dir
+    for conv_dir in directory.iterdir():
+        if not conv_dir.is_dir():
+            continue
+        conv_id = conv_dir.name
+        steps_dir = conv_dir / ".system_generated" / "steps"
+        if not steps_dir.exists():
+            continue
+
+        # Find output.txt files, sorted by step number descending (newer first)
+        output_files = sorted(
+            steps_dir.glob("*/output.txt"),
+            key=lambda p: int(p.parent.name) if p.parent.name.isdigit() else 0,
+            reverse=True,
+        )
+
+        for i, out_file in enumerate(output_files[:max_per_session]):
+            step_num = out_file.parent.name
+            try:
+                text = out_file.read_text(encoding="utf-8", errors="replace")[:4000]
+            except Exception:
+                continue
+
+            if not text.strip():
+                continue
+
+            steps.append({
+                "conversation_id": conv_id,
+                "step_number": step_num,
+                "content": text,
+                "size": out_file.stat().st_size,
+            })
+
+    return steps
+
+
+def steps_to_records(steps: list[dict]) -> list[dict]:
+    """Step outputs -> LanceDB-compatible records."""
+    records = []
+    for s in steps:
+        conv_id = s["conversation_id"]
+        step_num = s["step_number"]
+        content = s["content"]
+
+        # First line as title (often contains tool name or command)
+        first_line = content.split("\n", 1)[0][:120].strip()
+        title = f"[Step {step_num}] {first_line}" if first_line else f"Step {step_num}"
+
+        abstract = f"Step {step_num} in session {conv_id[:8]}. Size: {s['size']} bytes. {first_line}"
+
+        records.append({
+            "primary_key": f"step:{conv_id}:{step_num}",
+            "title": title,
+            "source": "step",
+            "abstract": abstract[:500],
+            "content": content,
+            "authors": "IDE Step Output",
+            "doi": "",
+            "arxiv_id": "",
+            "url": f"session://{conv_id}#step-{step_num}",
+            "citations": 0,
+        })
+
+    return records
+
+
+def index_steps(brain_dir: Optional[str] = None, max_per_session: int = 20) -> int:
+    """Index .system_generated/steps/ output files into LanceDB."""
+    steps = parse_step_outputs(brain_dir, max_per_session)
+    if not steps:
+        print("[StepsIndexer] No step outputs found")
+        return 1
+
+    print(f"[StepsIndexer] Found {len(steps)} step outputs")
+
+    records = steps_to_records(steps)
+
+    from mekhane.anamnesis.index import GnosisIndex, Embedder
+
+    index = GnosisIndex()
+    embedder = Embedder()
+
+    # Dedupe
+    if index._table_exists():
+        table = index.db.open_table(index.TABLE_NAME)
+        try:
+            existing = table.to_pandas()
+            existing_keys = set(existing["primary_key"].tolist())
+            before = len(records)
+            records = [r for r in records if r["primary_key"] not in existing_keys]
+            skipped = before - len(records)
+            if skipped:
+                print(f"[StepsIndexer] Skipped {skipped} duplicates")
+        except Exception:
+            pass
+
+    if not records:
+        print("[StepsIndexer] No new steps to add (all duplicates)")
+        return 0
+
+    # Embed in batches
+    BATCH_SIZE = 16
+    data_with_vectors = []
+
+    for i in range(0, len(records), BATCH_SIZE):
+        batch = records[i : i + BATCH_SIZE]
+        texts = [f"{r['title']} {r['abstract']}" for r in batch]
+        vectors = embedder.embed_batch(texts)
+
+        for record, vector in zip(batch, vectors):
+            record["vector"] = vector
+            data_with_vectors.append(record)
+
+        print(f"  Embedded {min(i + BATCH_SIZE, len(records))}/{len(records)}...")
+
+    # Add to LanceDB
+    if index._table_exists():
+        table = index.db.open_table(index.TABLE_NAME)
+        schema_fields = {f.name for f in table.schema}
+        filtered_data = [
+            {k: v for k, v in record.items() if k in schema_fields}
+            for record in data_with_vectors
+        ]
+        table.add(filtered_data)
+    else:
+        index.db.create_table(index.TABLE_NAME, data=data_with_vectors)
+
+    print(f"[StepsIndexer] ✅ Indexed {len(data_with_vectors)} steps")
+    return 0
+
+
 def index_from_json(json_path: str) -> int:
     """JSON ファイルからセッションをインデックス"""
     path = Path(json_path)
@@ -629,10 +774,23 @@ def main() -> int:
         default=100,
         help="Max sessions to index for --conversations (default: 100)",
     )
+    parser.add_argument(
+        "--steps",
+        action="store_true",
+        help="Index .system_generated/steps/ output files from brain dirs",
+    )
+    parser.add_argument(
+        "--max-steps-per-session",
+        type=int,
+        default=20,
+        help="Max step outputs per session to index (default: 20)",
+    )
 
     args = parser.parse_args()
 
-    if args.conversations:
+    if args.steps:
+        return index_steps(max_per_session=args.max_steps_per_session)
+    elif args.conversations:
         return index_conversations(args.max_sessions)
     elif args.handoffs:
         return index_handoffs(args.handoff_dir)
@@ -641,7 +799,7 @@ def main() -> int:
     elif args.json_path:
         return index_from_json(args.json_path)
     else:
-        print("Usage: session_indexer.py <json_path> | --from-api | --handoffs")
+        print("Usage: session_indexer.py <json_path> | --from-api | --handoffs | --steps")
         return 1
 
 

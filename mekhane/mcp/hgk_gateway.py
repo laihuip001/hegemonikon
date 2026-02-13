@@ -1314,12 +1314,9 @@ def hgk_digest_run(
         mode_label = "🧪 DRY RUN" if dry_run else "🚀 LIVE"
         result = f"## {mode_label} 消化パイプライン実行結果\n\n"
 
-        if isinstance(report, dict):
-            result += f"- **取得論文数**: {report.get('fetched', 0)}\n"
-            result += f"- **候補数**: {report.get('candidates', 0)}\n"
-            result += f"- **重複排除**: {report.get('deduplicated', 0)}\n"
-            if not dry_run:
-                result += f"- **生成ファイル**: {report.get('generated_files', 0)} 件\n"
+        if hasattr(report, 'total_papers'):
+            result += f"- **取得論文数**: {report.total_papers}\n"
+            result += f"- **候補数**: {report.candidates_selected}\n"
         elif isinstance(report, str):
             # Report が文字列の場合はそのまま返す (5000 文字制限)
             if len(report) > 5000:

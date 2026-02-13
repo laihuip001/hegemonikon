@@ -1,0 +1,247 @@
+{
+    "name": "WF-16: Synteleia Immunitas (自動監査)",
+    "nodes": [
+        {
+            "parameters": {
+                "rule": {
+                    "interval": [
+                        {
+                            "field": "cronExpression",
+                            "expression": "0 */6 * * *"
+                        }
+                    ]
+                }
+            },
+            "id": "immunitas-cron",
+            "name": "6h補助巡回 (メインはgit hook)",
+            "type": "n8n-nodes-base.scheduleTrigger",
+            "typeVersion": 1.2,
+            "position": [
+                250,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "httpMethod": "POST",
+                "path": "synteleia-audit",
+                "responseMode": "lastNode",
+                "options": {}
+            },
+            "id": "immunitas-webhook",
+            "name": "手動監査トリガー",
+            "type": "n8n-nodes-base.webhook",
+            "typeVersion": 2,
+            "position": [
+                250,
+                500
+            ],
+            "webhookId": "synteleia-audit"
+        },
+        {
+            "parameters": {
+                "jsCode": "// Synteleia Immunitas — git diff 取得 + 監査リクエスト生成\nconst { execSync } = require('child_process');\nconst fs = require('fs');\n\nconst HGK_DIR = '/home/makaron8426/oikos/hegemonikon';\nconst LOG_DIR = '/oikos/mneme/.hegemonikon/synteleia_logs';\nconst now = new Date();\n\ntry {\n  // ログディレクトリ作成\n  if (!fs.existsSync(LOG_DIR)) fs.mkdirSync(LOG_DIR, { recursive: true });\n\n  // git diff 取得 (staged + unstaged)\n  let diff = '';\n  try {\n    diff = execSync('git diff --stat && echo \"---\" && git diff --cached --stat', {\n      cwd: HGK_DIR, encoding: 'utf-8', timeout: 10000\n    });\n  } catch(e) {\n    diff = 'git diff failed: ' + e.message;\n  }\n\n  // 最新コミットの内容を取得\n  let lastCommitDiff = '';\n  try {\n    lastCommitDiff = execSync('git log -1 --format=\"%H %s\" && git diff HEAD~1..HEAD --stat', {\n      cwd: HGK_DIR, encoding: 'utf-8', timeout: 10000\n    });\n  } catch(e) {\n    lastCommitDiff = 'no recent commit diff';\n  }\n\n  // 変更がなければスキップ\n  const hasDiff = diff.trim().length > 10 || lastCommitDiff.trim().length > 10;\n  if (!hasDiff) {\n    return [{ json: {\n      timestamp: now.toISOString(),\n      skipped: true,\n      reason: 'no changes detected',\n      auditNeeded: false\n    }}];\n  }\n\n  // 監査対象テキストを構成\n  const auditContent = [\n    '## Git Changes (Uncommitted)',\n    diff,\n    '',\n    '## Last Commit',\n    lastCommitDiff\n  ].join('\\n');\n\n  return [{ json: {\n    timestamp: now.toISOString(),\n    skipped: false,\n    auditNeeded: true,\n    auditContent: auditContent,\n    diffLength: diff.length,\n    source: 'wf16-immunitas-cron'\n  }}];\n\n} catch(e) {\n  return [{ json: {\n    timestamp: now.toISOString(),\n    skipped: true,\n    error: e.message,\n    auditNeeded: false\n  }}];\n}"
+            },
+            "id": "git-diff",
+            "name": "変異検出 (git diff)",
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                480,
+                400
+            ]
+        },
+        {
+            "parameters": {
+                "conditions": {
+                    "boolean": [
+                        {
+                            "value1": "={{$json.auditNeeded}}",
+                            "value2": true
+                        }
+                    ]
+                }
+            },
+            "id": "if-audit-needed",
+            "name": "変異あり?",
+            "type": "n8n-nodes-base.if",
+            "typeVersion": 1,
+            "position": [
+                700,
+                400
+            ]
+        },
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "http://localhost:9696/api/synteleia/audit",
+                "sendBody": true,
+                "specifyBody": "json",
+                "jsonBody": "={\"content\": \"{{ $json.auditContent }}\", \"target_type\": \"code\", \"source\": \"{{ $json.source }}\", \"with_l2\": false, \"auto_escalate\": true}",
+                "options": {
+                    "timeout": 30000
+                }
+            },
+            "id": "synteleia-audit",
+            "name": "Synteleia 監査",
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.2,
+            "position": [
+                920,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "jsCode": "// 監査結果を解析し、アラート要否を判定\nconst fs = require('fs');\nconst LOG_DIR = '/oikos/mneme/.hegemonikon/synteleia_logs';\nconst now = new Date();\nconst result = $input.first().json;\n\n// 監査ログを保存 (Layer C: Pronoia のためのデータ蓄積)\nconst logFile = LOG_DIR + '/audit_' + now.toISOString().replace(/[:.]/g, '-') + '.json';\ntry {\n  if (!fs.existsSync(LOG_DIR)) fs.mkdirSync(LOG_DIR, { recursive: true });\n  fs.writeFileSync(logFile, JSON.stringify(result, null, 2), 'utf-8');\n} catch(e) {\n  // ログ保存失敗はアラートに影響しない\n}\n\nconst criticalCount = result.critical_count || 0;\nconst highCount = result.high_count || 0;\nconst totalIssues = result.total_issues || 0;\nconst passed = result.passed !== false;\n\nconst shouldAlert = criticalCount > 0 || highCount > 0;\n\nlet notifPayload = '';\nif (shouldAlert) {\n  const emoji = criticalCount > 0 ? '🚨🛡️' : '⚠️🛡️';\n  const lines = [\n    emoji + ' Synteleia Immunitas: ' + totalIssues + ' issues detected',\n    '',\n    '🔴 Critical: ' + criticalCount,\n    '🟠 High: ' + highCount,\n    '📊 Total: ' + totalIssues,\n    '',\n    '📋 Summary: ' + (result.summary || 'N/A'),\n  ];\n\n  // エージェント別の結果\n  if (result.agent_results) {\n    lines.push('');\n    lines.push('--- Agent Results ---');\n    for (const ar of result.agent_results) {\n      const icon = ar.passed ? '✅' : '❌';\n      lines.push(icon + ' ' + ar.agent_name + ' (' + Math.round(ar.confidence * 100) + '%)');\n      if (ar.issues && ar.issues.length > 0) {\n        for (const iss of ar.issues.slice(0, 3)) {\n          lines.push('  → [' + iss.severity + '] ' + iss.message);\n        }\n      }\n    }\n  }\n\n  notifPayload = lines.join('\\n');\n}\n\nreturn [{ json: {\n  timestamp: now.toISOString(),\n  passed,\n  shouldAlert,\n  criticalCount,\n  highCount,\n  totalIssues,\n  notifPayload,\n  logFile,\n  report: result.report || ''\n}}];"
+            },
+            "id": "result-analyzer",
+            "name": "免疫応答判定",
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                1140,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "conditions": {
+                    "boolean": [
+                        {
+                            "value1": "={{$json.shouldAlert}}",
+                            "value2": true
+                        }
+                    ]
+                }
+            },
+            "id": "if-alert",
+            "name": "免疫反応?",
+            "type": "n8n-nodes-base.if",
+            "typeVersion": 1,
+            "position": [
+                1360,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "http://localhost:9696/api/sympatheia/notifications",
+                "sendBody": true,
+                "specifyBody": "json",
+                "jsonBody": "={\"title\": \"Synteleia Immunitas Alert\", \"body\": \"{{ $json.notifPayload }}\", \"level\": \"HIGH\", \"source\": \"wf16-immunitas\"}",
+                "options": {
+                    "timeout": 10000
+                }
+            },
+            "id": "wbc-notify",
+            "name": "WBC 通知",
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.2,
+            "position": [
+                1580,
+                200
+            ]
+        }
+    ],
+    "connections": {
+        "30分毎の免疫巡回": {
+            "main": [
+                [
+                    {
+                        "node": "変異検出 (git diff)",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "手動監査トリガー": {
+            "main": [
+                [
+                    {
+                        "node": "変異検出 (git diff)",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "変異検出 (git diff)": {
+            "main": [
+                [
+                    {
+                        "node": "変異あり?",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "変異あり?": {
+            "main": [
+                [
+                    {
+                        "node": "Synteleia 監査",
+                        "type": "main",
+                        "index": 0
+                    }
+                ],
+                []
+            ]
+        },
+        "Synteleia 監査": {
+            "main": [
+                [
+                    {
+                        "node": "免疫応答判定",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "免疫応答判定": {
+            "main": [
+                [
+                    {
+                        "node": "免疫反応?",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "免疫反応?": {
+            "main": [
+                [
+                    {
+                        "node": "WBC 通知",
+                        "type": "main",
+                        "index": 0
+                    }
+                ],
+                []
+            ]
+        }
+    },
+    "settings": {
+        "executionOrder": "v1"
+    },
+    "tags": [
+        {
+            "name": "hegemonikon"
+        },
+        {
+            "name": "sympatheia"
+        },
+        {
+            "name": "synteleia"
+        },
+        {
+            "name": "immunitas"
+        }
+    ],
+    "active": true
+}

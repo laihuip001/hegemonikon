@@ -31,22 +31,27 @@ from dataclasses import dataclass, field
 from typing import Any
 
 
-# -- Constants --
+# -- Constants (from proto.py) --
 
-DEFAULT_MODEL = "MODEL_CLAUDE_4_5_SONNET_THINKING"
-BASE_PATH = "/exa.language_server_pb.LanguageServerService"
-POLL_INTERVAL = 1.0  # seconds
-POLL_TIMEOUT = 120.0  # seconds
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
+from mekhane.ochema.proto import (  # noqa: E402
+    DEFAULT_MODEL,
+    DEFAULT_TIMEOUT as POLL_TIMEOUT,
+    POLL_INTERVAL,
+    RPC_BASE,
+    MODEL_ALIASES as MODELS,
+    STEP_TYPE_PLANNER,
+    STEP_STATUS_DONE,
+    build_start_cascade,
+    build_send_message,
+    build_get_status,
+    build_get_steps,
+    extract_planner_response,
+    resolve_model,
+)
+
+BASE_PATH = f"/{RPC_BASE}"
 WS_FILTER = os.environ.get("AGQ_WORKSPACE", "hegemonikon")
-
-# Known models (from walkthrough)
-MODELS = {
-    "claude-sonnet": "MODEL_CLAUDE_4_5_SONNET_THINKING",
-    "claude-opus": "MODEL_PLACEHOLDER_M26",
-    "gemini-pro": "MODEL_GEMINI_2_5_PRO",
-    "gemini-flash": "MODEL_GEMINI_2_5_FLASH",
-    "gpt-4.1": "MODEL_GPT_4_1",
-}
 
 
 @dataclass
@@ -241,11 +246,8 @@ class AntigravityClient:
     # -- 4-Step Flow --
 
     def start_cascade(self) -> str:
-        """Step 1: Start a new cascade session.
-
-        Returns: cascadeId
-        """
-        result = self._call("/StartCascade", {"source": 1})
+        """Step 1: Start a new cascade session (v8 proto via proto.py)."""
+        result = self._call("/StartCascade", build_start_cascade())
         cascade_id = result.get("cascadeId", "")
         if not cascade_id:
             raise RuntimeError(f"StartCascade failed: {result}")
@@ -258,20 +260,8 @@ class AntigravityClient:
         prompt: str,
         model: str = DEFAULT_MODEL,
     ) -> dict:
-        """Step 2: Send a user message to the cascade.
-
-        Returns: {} (async acknowledgement)
-        """
-        payload = {
-            "cascadeId": cascade_id,
-            "items": [{"text": prompt}],
-            "cascadeConfig": {
-                "plannerConfig": {
-                    "conversational": {},
-                    "planModel": model,
-                }
-            },
-        }
+        """Step 2: Send a user message (v8 proto via proto.py)."""
+        payload = build_send_message(cascade_id, prompt, model)
         return self._call("/SendUserCascadeMessage", payload)
 
     def get_trajectory(self, cascade_id: str) -> str:
@@ -306,13 +296,7 @@ class AntigravityClient:
     def _parse_response(
         self, steps_result: dict, cascade_id: str, trajectory_id: str
     ) -> LLMResponse:
-        """Parse the steps result into an LLMResponse.
-
-        Response structure (from live API analysis):
-        - status is at STEP level: step["status"] = "CORTEX_STEP_STATUS_DONE"
-        - generatorModel is at step["metadata"]["generatorModel"]
-        - response text is at step["plannerResponse"]["response"]
-        """
+        """Parse steps into LLMResponse (v8 proto via proto.py)."""
         steps = steps_result.get("steps", [])
 
         resp = LLMResponse(
@@ -321,18 +305,13 @@ class AntigravityClient:
             raw_steps=steps,
         )
 
-        # Find the PLANNER_RESPONSE step
         for step in steps:
-            if step.get("type") == "CORTEX_STEP_TYPE_PLANNER_RESPONSE":
-                # Status is at step level
+            if step.get("type") == STEP_TYPE_PLANNER:
+                parsed = extract_planner_response(step)
                 resp.status = step.get("status", "")
-                # Model is in step.metadata
-                metadata = step.get("metadata", {})
-                resp.model = metadata.get("generatorModel", "")
-                # Response text is in plannerResponse
-                pr = step.get("plannerResponse", {})
-                resp.response = pr.get("response", "") or pr.get("modifiedResponse", "")
-                resp.thinking = pr.get("thinking", "")
+                resp.model = parsed["model"]
+                resp.response = parsed["text"]
+                resp.thinking = parsed["thinking"]
                 break
 
         return resp
@@ -416,18 +395,6 @@ class AntigravityClient:
         )
 
 
-def resolve_model(name: str) -> str:
-    """Resolve a model alias or validate a model enum string."""
-    if name in MODELS:
-        return MODELS[name]
-    if name.startswith("MODEL_"):
-        return name
-    # Fuzzy match
-    lower = name.lower()
-    for alias, model_id in MODELS.items():
-        if lower in alias:
-            return model_id
-    return name  # Pass through, let the API validate
 
 
 def main() -> None:

@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/ochema/ A0→外部LLM接続→LS ConnectRPC クライアント実装
 # PURPOSE: Ochēma — Antigravity Language Server クライアント
 # REASON: Ultra プランの LLM + セッション管理 + Quota 監視を HGK から利用する橋渡し
 """Ochēma (ὄχημα, 乗り物) — Antigravity Language Server Client.
@@ -54,23 +55,31 @@ class LSInfo:
     all_ports: list = field(default_factory=list)
 
 
-# --- Constants ---
+# --- Constants (from proto.py) ---
 
-DEFAULT_MODEL = "MODEL_CLAUDE_4_5_SONNET_THINKING"
-DEFAULT_TIMEOUT = 120  # seconds
-POLL_INTERVAL = 1.0  # seconds
+from mekhane.ochema.proto import (  # noqa: E402
+    DEFAULT_MODEL,
+    DEFAULT_TIMEOUT,
+    POLL_INTERVAL,
+    RPC_START_CASCADE,
+    RPC_SEND_MESSAGE,
+    RPC_GET_TRAJECTORIES,
+    RPC_GET_STEPS,
+    RPC_GET_STATUS,
+    RPC_MODEL_CONFIG,
+    RPC_EXPERIMENT_STATUS,
+    RPC_USER_MEMORIES,
+    STEP_TYPE_PLANNER,
+    STEP_STATUS_DONE,
+    TURN_STATES_DONE,
+    build_start_cascade,
+    build_send_message,
+    build_get_status,
+    build_get_steps,
+    extract_planner_response,
+)
+
 USER_AGENT = "ochema/0.1"
-
-# RPC endpoints
-RPC_BASE = "exa.language_server_pb.LanguageServerService"
-RPC_GET_STATUS = f"{RPC_BASE}/GetUserStatus"
-RPC_START_CASCADE = f"{RPC_BASE}/StartCascade"
-RPC_SEND_MESSAGE = f"{RPC_BASE}/SendUserCascadeMessage"
-RPC_GET_TRAJECTORIES = f"{RPC_BASE}/GetAllCascadeTrajectories"
-RPC_GET_STEPS = f"{RPC_BASE}/GetCascadeTrajectorySteps"
-RPC_MODEL_CONFIG = f"{RPC_BASE}/GetCascadeModelConfigData"
-RPC_EXPERIMENT_STATUS = f"{RPC_BASE}/GetStaticExperimentStatus"
-RPC_USER_MEMORIES = f"{RPC_BASE}/GetUserMemories"
 
 # Episode memory
 BRAIN_DIR = os.path.expanduser("~/.gemini/antigravity/brain")
@@ -813,10 +822,8 @@ class AntigravityClient:
 
     # PURPOSE: [L2-auto] Step 1: StartCascade → cascade_id を取得。
     def _start_cascade(self) -> str:
-        """Step 1: StartCascade → cascade_id を取得。"""
-        result = self._rpc(RPC_START_CASCADE, {
-            "source": self.SOURCE_INTERACTIVE_CASCADE,
-        })
+        """Step 1: StartCascade → cascade_id を取得 (v8 proto via proto.py)."""
+        result = self._rpc(RPC_START_CASCADE, build_start_cascade())
         cascade_id = result.get("cascadeId", "")
         if not cascade_id:
             raise RuntimeError(f"StartCascade returned no cascadeId: {result}")
@@ -824,22 +831,8 @@ class AntigravityClient:
 
     # PURPOSE: [L2-auto] Step 2: SendUserCascadeMessage → メッセージ送信。
     def _send_message(self, cascade_id: str, message: str, model: str) -> None:
-        """Step 2: SendUserCascadeMessage → メッセージ送信。
-
-        walkthrough.md の実証済み curl 構造に準拠:
-        - items: トップレベルに直接配置
-        - cascadeConfig.plannerConfig: conversational + planModel
-        """
-        self._rpc(RPC_SEND_MESSAGE, {
-            "cascadeId": cascade_id,
-            "items": [{"text": message}],
-            "cascadeConfig": {
-                "plannerConfig": {
-                    "conversational": {},
-                    "planModel": model,
-                },
-            },
-        })
+        """Step 2: SendUserCascadeMessage → メッセージ送信 (v8 proto via proto.py)."""
+        self._rpc(RPC_SEND_MESSAGE, build_send_message(cascade_id, message, model))
 
     # PURPOSE: [L2-auto] Step 3-4: ポーリングで LLM 応答を取得。
     def _poll_response(
@@ -881,14 +874,11 @@ class AntigravityClient:
 
                     # PLANNER_RESPONSE ステップが存在し、状態が完了を示す
                     has_response = any(
-                        s.get("type") == "CORTEX_STEP_TYPE_PLANNER_RESPONSE"
-                        and s.get("status") == "CORTEX_STEP_STATUS_DONE"
+                        s.get("type") == STEP_TYPE_PLANNER
+                        and s.get("status") == STEP_STATUS_DONE
                         for s in steps
                     )
-                    # turnState: "" (空) or "TURN_STATE_WAITING_FOR_USER"
-                    is_done = turn_state in (
-                        "", "TURN_STATE_WAITING_FOR_USER",
-                    )
+                    is_done = turn_state in TURN_STATES_DONE
                     if has_response and is_done:
                         return self._parse_steps(
                             steps, cascade_id, trajectory_id
@@ -924,16 +914,16 @@ class AntigravityClient:
 
         for step in steps:
             step_type = step.get("type", "")
-            if step_type == "CORTEX_STEP_TYPE_PLANNER_RESPONSE":
-                pr = step.get("plannerResponse", {})
-                if "response" in pr:
-                    response.text += pr["response"]
-                if "thinking" in pr:
-                    response.thinking += pr["thinking"]
-                if "generatorModel" in pr:
-                    response.model = pr["generatorModel"]
-                if "tokenUsage" in pr:
-                    response.token_usage = pr["tokenUsage"]
+            if step_type == STEP_TYPE_PLANNER:
+                parsed = extract_planner_response(step)
+                if parsed["text"]:
+                    response.text += parsed["text"]
+                if parsed["thinking"]:
+                    response.thinking += parsed["thinking"]
+                if parsed["model"]:
+                    response.model = parsed["model"]
+                if parsed["token_usage"]:
+                    response.token_usage = parsed["token_usage"]
 
         return response
 

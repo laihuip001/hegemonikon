@@ -15,7 +15,17 @@ echo "━━━━━━━━━━━━━━━━━━━━━━━━�
 echo "🔬 Hegemonikón Pre-commit Tests"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 
-# Integration tests + Kalon tests + Peira tests
+# Phase 1: Dendron Guard — 変更ファイルの PROOF/PURPOSE チェック
+echo ""
+echo "🛡️  Dendron Guard (staged files)..."
+PYTHONPATH=. .venv/bin/python -m mekhane.dendron guard 2>&1
+DENDRON_EXIT=$?
+if [ $DENDRON_EXIT -ne 0 ]; then
+    echo "⚠️  Dendron guard warnings detected (non-blocking)"
+fi
+echo ""
+
+# Phase 2: Test Suite
 PYTHONPATH=. .venv/bin/python -m pytest \
     mekhane/tests/ \
     mekhane/peira/tests/ \

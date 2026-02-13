@@ -1,5 +1,8 @@
-# PURPOSE: Ochēma パッケージ — Antigravity LS クライアント
-"""Ochēma (ὄχημα) — Antigravity Language Server Client Package."""
+# PROOF: [L2/Infra] <- mekhane/ochema/ Package Initializer
+"""Ochēma — Antigravity Language Server Client.
+
+Exposes the `AntigravityClient` for interacting with local LLMs.
+"""
 
 from mekhane.ochema.antigravity_client import AntigravityClient, LLMResponse
 

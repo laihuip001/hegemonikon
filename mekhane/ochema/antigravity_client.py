@@ -1,4 +1,4 @@
-# PROOF: [L2/インフラ] <- mekhane/ochema/ A0→外部LLM接続→LS ConnectRPC クライアント実装
+# PROOF: P2 (Hodos) mekhane/ochema/antigravity_client.py
 # PURPOSE: Ochēma — Antigravity Language Server クライアント
 # REASON: Ultra プランの LLM + セッション管理 + Quota 監視を HGK から利用する橋渡し
 """Ochēma (ὄχημα, 乗り物) — Antigravity Language Server Client.

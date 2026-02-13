@@ -1,4 +1,4 @@
-# PROOF: [L2/品質] <- mekhane/synteleia/dokimasia/ B3→品質の多面的評価が必要→multi_semantic_agent.py が担う
+# PROOF: [L2/Quality] <- mekhane/synteleia/dokimasia/
 # PURPOSE: Multi-LLM アンサンブル監査エージェント (Layer B: Nous)
 """
 MultiSemanticAgent — Multi-LLM Cognitive Ensemble

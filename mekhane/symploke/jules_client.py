@@ -119,7 +119,7 @@ def parse_state(state_str: str) -> SessionState:
 # ============ Data Types ============
 
 
-# PURPOSE: a Jules API session を型安全に扱えるようにする
+# PURPOSE: Type-safe Jules API session representation
 @dataclass
 class JulesSession:
     """Represents a Jules API session."""
@@ -158,9 +158,10 @@ class JulesResult:
         # ES-018: Check actual session state, not just error absence
         return self.session.state == SessionState.COMPLETED
 
-    # PURPOSE: is_failed の処理
+    # PURPOSE: Check if session failed
     @property
     def is_failed(self) -> bool:
+        """Check if session failed."""
         return not self.is_success
 
 
@@ -186,9 +187,7 @@ def with_retry(
         retryable_exceptions: Tuple of exceptions to retry on
     """
 
-    # PURPOSE: decorator の処理
     def decorator(func):
-        # PURPOSE: wrapper の処理
         @functools.wraps(func)
         async def wrapper(*args, **kwargs):
             delay = initial_delay
@@ -592,7 +591,6 @@ class JulesClient:
             )
             semaphore = asyncio.Semaphore(limit)
 
-        # PURPOSE: bounded_execute の処理
         async def bounded_execute(task: dict) -> JulesResult:
             # AI-022 fix: Track session ID before polling to prevent zombie sessions
             created_session_id: str | None = None
@@ -635,7 +633,6 @@ class JulesClient:
         # won't receive unhandled exceptions from tasks.
         results: list[JulesResult] = []
 
-        # PURPOSE: tracked_execute の処理
         async def tracked_execute(task: dict) -> None:
             result = await bounded_execute(task)
             results.append(result)

@@ -198,6 +198,7 @@ def _traced(fn):
     import functools
 
     @functools.wraps(fn)
+    # PURPOSE: [L2-auto] 内部関数: wrapper
     def wrapper(*args: Any, **kwargs: Any) -> Any:
         _start = time.time()
         input_size = _estimate_input_size(*args, **kwargs)
@@ -210,6 +211,12 @@ def _traced(fn):
             raise
 
     return wrapper
+
+
+# PURPOSE: hgk_gateway の wrapper 処理を実行する
+def wrapper(*args: Any, **kwargs: Any) -> Any:
+    """Wrapper function for traced decorator type hinting"""
+    pass
 
 
 # =============================================================================

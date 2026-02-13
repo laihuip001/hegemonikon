@@ -30,7 +30,7 @@ jobs:
       
       - name: Install tools
         run: |
-          pip install ruff bandit vulture pip-audit
+          pip install ruff bandit vulture pip-audit pyyaml
       
       # Stage 1: 保守性 (Maintainability)
       - name: "📊 Complexity Check (CC ≤ 15)"

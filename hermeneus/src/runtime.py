@@ -968,6 +968,112 @@ class LMQLExecutor:
         """Auto モード用アダプター (provider チェーンの署名に合わせる)"""
         return await self._execute_antigravity(prompt, model_id)
     
+    # PURPOSE: プレーンテキストプロンプトから直接 LLM を呼び出す (LMQL 不使用)
+    async def generate_text_async(
+        self,
+        prompt: str,
+        context: str = "",
+    ) -> ExecutionResult:
+        """プレーンテキストプロンプトを直接 LLM に送信
+        
+        LMQL パーサーを迂回し、プロバイダーチェーンの自動フォールバックを直接使用。
+        verifier の Multi-Agent Debate 等、LMQL 不要の LLM 呼び出し用。
+        
+        Args:
+            prompt: プレーンテキストプロンプト
+            context: 追加コンテキスト (オプション)
+            
+        Returns:
+            ExecutionResult
+        """
+        # コンテキストをプロンプトに統合
+        if context and context.strip():
+            full_prompt = f"""## コンテキスト
+{context}
+
+## タスク
+{prompt}
+
+上記のコンテキストに基づいて、タスクを実行してください。"""
+        else:
+            full_prompt = prompt
+        
+        # --- モデル指定モード ---
+        if self.config.model != "auto":
+            model_info = self._resolve_model()
+            provider = model_info["provider"]
+            
+            if provider == "antigravity":
+                return await self._execute_antigravity(full_prompt, model_info.get("model_id"))
+            elif provider == "vertex-anthropic":
+                return await self._execute_vertex_anthropic(full_prompt, model_info)
+            elif provider == "vertex-openai":
+                return await self._execute_vertex_openai(full_prompt, model_info)
+            elif provider == "anthropic":
+                key = _get_secret("ANTHROPIC_API_KEY")
+                if key:
+                    return await self._execute_anthropic(full_prompt, key, model_info.get("model_id"))
+            elif provider == "google":
+                key = _get_secret("GOOGLE_API_KEY")
+                if key:
+                    return await self._execute_google(full_prompt, key, model_info.get("model_id"))
+            elif provider == "openai":
+                key = self.config.api_key or _get_secret("OPENAI_API_KEY")
+                if key:
+                    return await self._execute_openai(full_prompt, key, model_info.get("model_id"))
+        
+        # --- Auto モード: 順に試行 ---
+        providers = []
+        
+        if self._is_antigravity_available():
+            providers.append(("antigravity", None, self._execute_antigravity_auto))
+        
+        anthropic_key = _get_secret("ANTHROPIC_API_KEY")
+        google_key = _get_secret("GOOGLE_API_KEY")
+        openai_key = self.config.api_key or _get_secret("OPENAI_API_KEY")
+        
+        if anthropic_key:
+            providers.append(("anthropic", anthropic_key, self._execute_anthropic))
+        if google_key:
+            providers.append(("google", google_key, self._execute_google))
+        if openai_key:
+            providers.append(("openai", openai_key, self._execute_openai))
+        
+        if not providers:
+            return ExecutionResult(
+                status=ExecutionStatus.ERROR,
+                output="",
+                error="No LLM provider available (no API keys, no Antigravity LS)"
+            )
+        
+        errors = []
+        for provider_name, key, executor_fn in providers:
+            if _circuit_breaker.is_open(provider_name):
+                errors.append(f"{provider_name}: circuit open (cooldown)")
+                continue
+            
+            result = await executor_fn(full_prompt, key)
+            if result.status == ExecutionStatus.SUCCESS:
+                _circuit_breaker.record_success(provider_name)
+                return result
+            _circuit_breaker.record_failure(provider_name)
+            errors.append(f"{provider_name}: {result.error}")
+        
+        return ExecutionResult(
+            status=ExecutionStatus.ERROR,
+            output="",
+            error=f"All providers failed: {'; '.join(errors)}"
+        )
+    
+    # PURPOSE: generate_text の同期版
+    def generate_text(
+        self,
+        prompt: str,
+        context: str = "",
+    ) -> ExecutionResult:
+        """generate_text_async の同期ラッパー"""
+        return asyncio.run(self.generate_text_async(prompt, context))
+    
     # PURPOSE: LMQL コードからプロンプト部分を抽出
     def _extract_prompt_from_lmql(self, lmql_code: str) -> Optional[str]:
         """LMQL コードからプロンプト部分を抽出"""

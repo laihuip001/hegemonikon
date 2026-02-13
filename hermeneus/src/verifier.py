@@ -93,22 +93,32 @@ class DebateAgent:
     def __init__(
         self,
         role: AgentRole,
-        model: str = "openai/gpt-4o",
+        model: str = "auto",
         temperature: float = 0.7
     ):
         self.role = role
         self.model = model
         self.temperature = temperature
-        self._llm_available = self._check_llm()
+        self._executor = self._create_executor()
+        self._llm_available = self._executor is not None
     
-    # PURPOSE: LLM が利用可能か確認
+    # PURPOSE: LMQLExecutor を作成 (5プロバイダー自動フォールバック)
+    def _create_executor(self):
+        """LMQLExecutor を作成。失敗時は None を返す。"""
+        try:
+            from hermeneus.src.runtime import LMQLExecutor, ExecutionConfig
+            config = ExecutionConfig(
+                model=self.model,
+                temperature=self.temperature,
+            )
+            return LMQLExecutor(config)
+        except Exception:
+            return None
+    
+    # PURPOSE: LLM が利用可能か確認 (後方互換)
     def _check_llm(self) -> bool:
         """LLM が利用可能か確認"""
-        try:
-            from openai import OpenAI  # noqa: F401
-            return True
-        except ImportError:
-            return False
+        return self._executor is not None
     
     # PURPOSE: 主張を支持する論拠を生成
     async def propose(self, claim: str, context: str = "") -> DebateArgument:
@@ -228,28 +238,25 @@ class DebateAgent:
             confidence=self._estimate_confidence(response)
         )
     
-    # PURPOSE: LLM で生成
+    # PURPOSE: LLM で生成 (LMQLExecutor 経由、5プロバイダー自動フォールバック)
     async def _generate(self, prompt: str) -> str:
-        """LLM で生成"""
-        if not self._llm_available:
+        """LLM で生成
+        
+        LMQLExecutor を使用して対応プロバイダー順に試行:
+        1. Antigravity LS (API key 不要)
+        2. Anthropic Claude
+        3. Google Gemini
+        4. OpenAI
+        5. Vertex AI
+        """
+        if not self._llm_available or self._executor is None:
             return self._fallback_generate(prompt)
-        
-        import os
-        from openai import AsyncOpenAI
-        
-        api_key = os.environ.get("OPENAI_API_KEY")
-        if not api_key:
-            return self._fallback_generate(prompt)
-        
-        client = AsyncOpenAI(api_key=api_key)
         
         try:
-            response = await client.chat.completions.create(
-                model=self.model.replace("openai/", ""),
-                messages=[{"role": "user", "content": prompt}],
-                temperature=self.temperature
-            )
-            return response.choices[0].message.content
+            result = await self._executor.generate_text_async(prompt)
+            if result and result.output:
+                return result.output
+            return self._fallback_generate(prompt)
         except Exception as e:
             return f"[Error: {e}] " + self._fallback_generate(prompt)
     
@@ -325,9 +332,9 @@ class DebateEngine:
     # PURPOSE: Initialize instance
     def __init__(
         self,
-        proposer_model: str = "openai/gpt-4o",
-        critic_model: str = "openai/gpt-4o",
-        arbiter_model: str = "openai/gpt-4o",
+        proposer_model: str = "auto",
+        critic_model: str = "auto",
+        arbiter_model: str = "auto",
         num_critics: int = 2
     ):
         self.proposer = DebateAgent(AgentRole.PROPOSER, proposer_model)

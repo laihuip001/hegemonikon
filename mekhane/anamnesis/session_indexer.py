@@ -325,6 +325,7 @@ def index_handoffs(handoff_dir: Optional[str] = None) -> int:
     return 0
 
 
+# PURPOSE: Fetch all conversations from Antigravity
 def fetch_all_conversations(max_sessions: int = 100) -> list[dict]:
     """AntigravityClient で全セッションの会話を取得"""
     from mekhane.ochema.antigravity_client import AntigravityClient
@@ -395,6 +396,7 @@ def fetch_all_conversations(max_sessions: int = 100) -> list[dict]:
     return conversations
 
 
+# PURPOSE: Convert conversations to records
 def conversations_to_records(conversations: list[dict]) -> list[dict]:
     """会話データを LanceDB レコードに変換"""
     records = []
@@ -438,6 +440,7 @@ def conversations_to_records(conversations: list[dict]) -> list[dict]:
     return records
 
 
+# PURPOSE: Index all conversations
 def index_conversations(max_sessions: int = 100) -> int:
     """全セッション会話を LanceDB にインデックス"""
     conversations = fetch_all_conversations(max_sessions)
@@ -508,6 +511,7 @@ def index_conversations(max_sessions: int = 100) -> int:
 _BRAIN_DIR = Path.home() / ".gemini" / "antigravity" / "brain"
 
 
+# PURPOSE: Parse step output files
 def parse_step_outputs(brain_dir: Optional[str] = None, max_per_session: int = 20) -> list[dict]:
     """Parse .system_generated/steps/*/output.txt files into records."""
     directory = Path(brain_dir) if brain_dir else _BRAIN_DIR
@@ -551,6 +555,7 @@ def parse_step_outputs(brain_dir: Optional[str] = None, max_per_session: int = 2
     return steps
 
 
+# PURPOSE: Convert step outputs to records
 def steps_to_records(steps: list[dict]) -> list[dict]:
     """Step outputs -> LanceDB-compatible records."""
     records = []
@@ -581,6 +586,7 @@ def steps_to_records(steps: list[dict]) -> list[dict]:
     return records
 
 
+# PURPOSE: Index step outputs
 def index_steps(brain_dir: Optional[str] = None, max_per_session: int = 20) -> int:
     """Index .system_generated/steps/ output files into LanceDB."""
     steps = parse_step_outputs(brain_dir, max_per_session)
@@ -646,6 +652,7 @@ def index_steps(brain_dir: Optional[str] = None, max_per_session: int = 20) -> i
     return 0
 
 
+# PURPOSE: Index from JSON file
 def index_from_json(json_path: str) -> int:
     """JSON ファイルからセッションをインデックス"""
     path = Path(json_path)
@@ -715,6 +722,7 @@ def index_from_json(json_path: str) -> int:
     return 0
 
 
+# PURPOSE: Index directly from API
 def index_from_api() -> int:
     """API から直接取得してインデックス"""
     script = _HEGEMONIKON_ROOT / "scripts" / "agq-sessions.sh"
@@ -742,6 +750,7 @@ def index_from_api() -> int:
         return index_from_json(str(json_path))
 
 
+# PURPOSE: Main entry point
 def main() -> int:
     import argparse
 

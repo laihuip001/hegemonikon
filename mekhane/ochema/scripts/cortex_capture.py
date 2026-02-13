@@ -60,7 +60,7 @@ def request(flow: http.HTTPFlow) -> None:
             log(f"    Header {k}: {v}")
 
     # Try to decode body
-    body = flow.request.get_content()
+    body = flow.request.content
     if body:
         log(f"    Body size: {len(body)} bytes")
         # Try JSON decode
@@ -92,7 +92,7 @@ def response(flow: http.HTTPFlow) -> None:
     log(f"<<< RESPONSE {status} {host}{path}")
     log(f"    Content-Type: {content_type}")
 
-    body = flow.response.get_content()
+    body = flow.response.content
     if body:
         log(f"    Body size: {len(body)} bytes")
         try:

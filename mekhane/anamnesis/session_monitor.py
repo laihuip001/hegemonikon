@@ -21,6 +21,7 @@ Usage:
 
 import argparse
 import json
+# PROOF: [L2/Infrastructure] <- mekhane/anamnesis/ A0→セッションの自動監視と記録
 import signal
 import sys
 import time

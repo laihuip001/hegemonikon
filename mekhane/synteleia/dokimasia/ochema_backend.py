@@ -10,6 +10,7 @@ Usage:
     response = backend.query(prompt, context)
 """
 
+# PROOF: [L2/Verification] <- mekhane/synteleia/dokimasia/ A0→Ochemaバックエンド検証
 import json
 from typing import Optional
 

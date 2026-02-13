@@ -20,6 +20,7 @@ Usage:
     python mekhane/anamnesis/session_indexer.py --from-api
 """
 
+# PROOF: [L2/Infrastructure] <- mekhane/anamnesis/ A0→セッションログのインデックス作成
 import json
 import re
 import sys

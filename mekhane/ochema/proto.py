@@ -9,6 +9,7 @@ Cortex API リバースエンジニアリングの成果を集約する単一ソ
 WARNING: ToS グレーゾーン。実験用途限定。公開禁止。
 """
 
+# PROOF: [L2/Infrastructure] <- mekhane/ochema/ A0→型定義とプロトコル
 from __future__ import annotations
 
 

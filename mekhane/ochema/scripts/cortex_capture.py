@@ -9,6 +9,7 @@ Usage:
         --set upstream_cert=false --ssl-insecure
 """
 
+# PROOF: [L2/Infrastructure] <- mekhane/ochema/scripts/ A0→皮質キャプチャスクリプト
 import json
 import re
 from datetime import datetime

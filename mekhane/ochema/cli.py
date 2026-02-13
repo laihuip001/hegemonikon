@@ -10,6 +10,7 @@ Usage:
 
 from __future__ import annotations
 
+# PROOF: [L2/Infrastructure] <- mekhane/ochema/ A0→CLIインターフェース
 import argparse
 import os
 import sys

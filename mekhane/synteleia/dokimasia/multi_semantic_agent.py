@@ -18,6 +18,7 @@ Synedrion との差異:
     Multi-LLM Synteleia = 機能的 persona (コード/ドキュメント品質)
 """
 
+# PROOF: [L2/Verification] <- mekhane/synteleia/dokimasia/ A0→意味論的エージェント検証
 import json
 from collections import Counter
 from concurrent.futures import ThreadPoolExecutor, as_completed

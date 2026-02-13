@@ -2,7 +2,7 @@
 
 > **Etymology**: syn (共に) + telos (完成) = 「共に完成へ向かう」
 > **Position**: Hegemonikón 認知アーキテクチャの上位層
-> **Status**: 設計完了 / 実装検討中
+> **Status**: 実装完了 / 統合運用フェーズ
 
 ---
 
@@ -37,6 +37,7 @@ Hegemonikón の6カテゴリ (O/H/A/S/P/K) は **FEP に基づく AI 認知ハ�
 複数の認知軸で同時処理し、結果を統合する。
 
 **これは FEP 的に言えば:**
+
 - 各エージェント = 世界モデルの異なる射影
 - 統合器 = メタ予測（モデルのモデル）
 - 相互参照 = 社会的認知（他者モデル）
@@ -175,26 +176,30 @@ def integrate(outputs: Dict[str, Output]) -> Output:
 
 ## 実装ロードマップ
 
-| Phase | 内容 | 状態 |
-|-------|------|------|
-| 0 | 設計ドキュメント | ✅ 完了 |
-| 1 | 3Agent 監査基盤 (A軸のみ) | ✅ 完了 |
-| 2 | @S マクロ定義 | 🔲 未着手 |
-| 3 | 動的Agent選択 | 🔲 未着手 |
-| 4 | 統合アルゴリズム | 🔲 未着手 |
-| 5 | 全6Agent 実装 | 🔲 未着手 |
+| Phase | 内容 | 状態 | 備考 |
+|-------|------|------|------|
+| 0 | 設計ドキュメント | ✅ 完了 | |
+| 1 | 3Agent 監査基盤 (A軸のみ) | ✅ 完了 | OperatorAgent, LogicAgent, CompletenessAgent |
+| 2 | @S マクロ定義 | ✅ 完了 | `@syn·` 内積モード + `SynteleiaOrchestrator` |
+| 3 | 動的Agent選択 | ✅ 完了 | `with_l2()` class method, `audit_quick()` |
+| 4 | 統合アルゴリズム | ✅ 完了 | `_aggregate_results()` + `ThreadPoolExecutor` 並列 |
+| 5 | 全6+Agent 実装 | ✅ 完了 | 8 L1 (regex) + 1 L2 (SemanticAgent/LLM) = 9 agent |
 
 ---
 
 ## 関連ファイル
 
-- `mekhane/audit/` — Phase 1 実装（A軸3Agent）
-- `mekhane/synteleia/` — Phase 2+ 実装予定
+- `mekhane/synteleia/` — 全 Agent + Orchestrator 実装
+- `mekhane/synteleia/poiesis/` — Poiēsis 層: OusiaAgent, SchemaAgent, HormeAgent
+- `mekhane/synteleia/dokimasia/` — Dokimasia 層: 5 L1 Agent + SemanticAgent (L2)
+- `mekhane/api/routes/synteleia.py` — REST API (POST /audit, /audit-quick, GET /agents)
+- `mekhane/api/tests/test_synteleia_api.py` — API テスト (10 tests)
 
 ---
 
 *Design: 2026-02-01*
-*Status: Ideal Design Complete*
+*Implementation Complete: 2026-02-13*
+*Status: 統合運用フェーズ — 外積モード (@syn×) は将来検討*
 
 ---
 
@@ -229,4 +234,3 @@ Stoic 心理学に由来する **FEP 的に閉じた分類体系**であり、
 - Perplexity 調査 (2026-02-01): 6カテゴリの哲学的・科学的妥当性検証
 - HEXACO 人格モデル: 6次元が言語分析で一貫して出現
 - CHC 知能理論: 10+ 因子（ただし Hegemonikón 対象外）
-

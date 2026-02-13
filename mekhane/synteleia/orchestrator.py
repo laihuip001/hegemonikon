@@ -93,6 +93,26 @@ class SynteleiaOrchestrator:
         orchestrator.dokimasia_agents.append(semantic)
         return orchestrator
 
+    @classmethod
+    def with_multi_l2(cls) -> "SynteleiaOrchestrator":
+        """
+        L1 全エージェント + Layer B Multi-LLM アンサンブルを含むオーケストレータ。
+
+        3 LLM (Gemini Pro / Claude Opus / GPT-OSS) に異なる persona を付与し、
+        confidence-weighted majority voting で統合判断する。
+
+        CRITICAL/HIGH 検出時に自動発動される想定。
+
+        Returns:
+            SynteleiaOrchestrator: L1 + Multi-L2 統合オーケストレータ
+        """
+        from .dokimasia.multi_semantic_agent import MultiSemanticAgent
+
+        orchestrator = cls()  # L1 デフォルト構成
+        multi_agent = MultiSemanticAgent.default()
+        orchestrator.dokimasia_agents.append(multi_agent)
+        return orchestrator
+
     # PURPOSE: 監査を実行。
     def audit(self, target: AuditTarget) -> AuditResult:
         """

@@ -36,6 +36,13 @@ class AuditRequest(BaseModel):
     with_l2: bool = Field(
         default=False, description="L2 SemanticAgent (LLM) を含めるか"
     )
+    with_multi_l2: bool = Field(
+        default=False, description="Layer B: Multi-LLM アンサンブルを含めるか"
+    )
+    auto_escalate: bool = Field(
+        default=True,
+        description="CRITICAL/HIGH 検出時に自動で multi-L2 にエスカレーションするか",
+    )
 
 
 # PURPOSE: 検出された問題
@@ -69,6 +76,9 @@ class AuditResponse(BaseModel):
     agent_results: list[AgentResultItem] = Field(default_factory=list)
     report: str = Field(default="", description="フォーマット済みレポート")
     wbc_alerted: bool = Field(default=False, description="WBC アラートが送信されたか")
+    multi_l2_escalated: bool = Field(
+        default=False, description="CRITICAL/HIGH 検出により Multi-L2 にエスカレーションしたか"
+    )
 
 
 # PURPOSE: エージェント情報
@@ -136,14 +146,33 @@ async def audit(request: AuditRequest):
             source=request.source,
         )
 
-        # L2 統合: SemanticAgent (LLM) を含めるか
-        if request.with_l2:
+        # L2 / Multi-L2 統合
+        if request.with_multi_l2:
+            orchestrator = SynteleiaOrchestrator.with_multi_l2()
+            logger.info("Synteleia audit: L1+Multi-L2 mode (Layer B: Nous)")
+        elif request.with_l2:
             orchestrator = SynteleiaOrchestrator.with_l2()
             logger.info("Synteleia audit: L1+L2 mode")
         else:
             orchestrator = SynteleiaOrchestrator()
 
         result = orchestrator.audit(target)
+
+        # Auto-escalation: CRITICAL/HIGH 検出→自動で multi-L2 再監査
+        multi_l2_escalated = False
+        if (
+            request.auto_escalate
+            and not request.with_multi_l2
+            and (result.critical_count > 0 or result.high_count > 0)
+        ):
+            logger.info(
+                "Auto-escalating to Multi-L2: %d critical, %d high",
+                result.critical_count, result.high_count,
+            )
+            multi_l2_orchestrator = SynteleiaOrchestrator.with_multi_l2()
+            result = multi_l2_orchestrator.audit(target)
+            orchestrator = multi_l2_orchestrator
+            multi_l2_escalated = True
 
         # WBC 自動連携: HIGH/CRITICAL 検出時に Sympatheia WBC へ通知
         wbc_alerted = False
@@ -183,6 +212,7 @@ async def audit(request: AuditRequest):
             agent_results=agent_results,
             report=orchestrator.format_report(result),
             wbc_alerted=wbc_alerted,
+            multi_l2_escalated=multi_l2_escalated,
         )
     except Exception as exc:
         logger.error("Synteleia audit failed: %s", exc)

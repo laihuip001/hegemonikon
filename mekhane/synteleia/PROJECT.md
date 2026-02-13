@@ -1,9 +1,9 @@
 ---
 name: "Synteleia"
 status: active
-phase: "統合・接続中"
-updated: 2026-02-11
-next_action: "API エンドポイント + /dia 連携"
+phase: "統合運用フェーズ"
+updated: 2026-02-13
+next_action: "外積モード (@syn×) の検討 — 現時点では保留"
 ---
 
 # Synteleia Project Status
@@ -12,7 +12,7 @@ next_action: "API エンドポイント + /dia 連携"
 
 ## Current Phase
 
-**統合・接続中**: 実装済みの8エージェントを API/WF に接続
+**統合運用フェーズ**: 全実装完了。`/dia+` から自動発動、REST API 経由で n8n 連携可能。
 
 ## Milestones
 
@@ -21,14 +21,14 @@ next_action: "API エンドポイント + /dia 連携"
 - [x] Poiēsis (生成層) 実装 — OusiaAgent, SchemaAgent, HormeAgent
 - [x] Dokimasia (評価層) 実装 — PerigrapheAgent, KairosAgent, OperatorAgent, LogicAgent, CompletenessAgent
 - [x] SynteleiaOrchestrator (2層統合)
-- [x] テスト 39/39 passed
+- [x] テスト 94 passed (L1: 59, L2: 15, API: 10, L2 live: 5 skipped)
 - [x] Skill (SKILL.md v2.0) 修正
-- [/] REST API エンドポイント
-- [ ] /dia ワークフロー連携
-- [ ] Sympatheia WBC 統合
+- [x] REST API エンドポイント (POST /audit, /audit-quick, GET /agents)
+- [x] /dia ワークフロー連携 (dia.md Synteleia 監査フック)
+- [x] Sympatheia WBC 統合 (_notify_wbc → POST /api/wbc/alert)
+- [x] SemanticAgent (L2 LLM) — LMQL/OpenAI/Stub 3 backend
 
-## Next Steps
+## Future Considerations
 
-1. POST /api/synteleia/audit エンドポイント
-2. /dia 自動発動フック
-3. Sympatheia WBC 連携テスト
+1. 外積モード (`@syn×`) — 3×5 交差検証。ROI 要検討
+2. SemanticAgent プロンプト拡張 — cross-cutting 検証を LLM で実現

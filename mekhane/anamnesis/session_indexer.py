@@ -1,3 +1,4 @@
+# PROOF: [P3/記憶] <- mekhane/anamnesis/
 # PURPOSE: セッション履歴を GnosisIndex (LanceDB) にインデックスする
 """
 PROOF: [P3/記憶] <- mekhane/anamnesis/

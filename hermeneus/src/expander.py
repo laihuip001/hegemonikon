@@ -13,8 +13,8 @@ from typing import Tuple, Optional, Dict, List
 from dataclasses import dataclass
 
 
-@dataclass
 # PURPOSE: [L2-auto] 展開結果
+@dataclass
 class ExpansionResult:
     """展開結果"""
     original: str          # 元の式

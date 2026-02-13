@@ -30,8 +30,8 @@ class ThreadStatus(Enum):
     CANCELLED = "cancelled"
 
 
-@dataclass
 # PURPOSE: [L2-auto] スレッド設定
+@dataclass
 class ThreadConfig:
     """スレッド設定"""
     name: str
@@ -45,8 +45,8 @@ class ThreadConfig:
     metadata: Dict[str, Any] = field(default_factory=dict)
 
 
-@dataclass
 # PURPOSE: [L2-auto] スレッド実行結果
+@dataclass
 class ThreadResult:
     """スレッド実行結果"""
     thread_name: str
@@ -77,8 +77,8 @@ class ThreadResult:
         }
 
 
-@dataclass
 # PURPOSE: [L2-auto] 実行プラン
+@dataclass
 class ExecutionPlan:
     """実行プラン"""
     threads: List[ThreadConfig]

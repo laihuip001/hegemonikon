@@ -42,8 +42,8 @@ class StepType(Enum):
     CONVERGENCE = "convergence" # A >> cond / lim[cond]{A}
 
 
-@dataclass
 # PURPOSE: [L2-auto] ステップ間のコンテキスト (作業記憶)
+@dataclass
 class ExecutionContext:
     """ステップ間のコンテキスト (作業記憶)
 
@@ -76,8 +76,8 @@ class ExecutionContext:
         )
 
 
-@dataclass
 # PURPOSE: [L2-auto] 個別ステップの実行結果 (forward pass の出力)
+@dataclass
 class StepResult:
     """個別ステップの実行結果 (forward pass の出力)"""
     step_type: StepType
@@ -97,8 +97,8 @@ class StepResult:
         return max(0, self.entropy_before - self.entropy_after)
 
 
-@dataclass
 # PURPOSE: [L2-auto] マクロ実行全体の結果
+@dataclass
 class ExecutionResult:
     """マクロ実行全体の結果"""
     ccl: str                   # 元の CCL 式

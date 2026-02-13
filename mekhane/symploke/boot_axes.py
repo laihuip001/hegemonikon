@@ -53,10 +53,14 @@ def gpu_preflight() -> tuple[bool, str]:
 
 # PURPOSE: handoffs を読み込む
 def load_handoffs(mode: str, context: Optional[str] = None, **kw) -> dict:
+    result: dict = {"latest": None, "related": [], "conversations": [], "count": 0}
     print(" [1/13] 📋 Searching Handoffs...", file=sys.stderr, end="", flush=True)
-    from mekhane.symploke.handoff_search import get_boot_handoffs
-    result = get_boot_handoffs(mode=mode, context=context)
-    print(" Done.", file=sys.stderr)
+    try:
+        from mekhane.symploke.handoff_search import get_boot_handoffs
+        result = get_boot_handoffs(mode=mode, context=context)
+        print(" Done.", file=sys.stderr)
+    except Exception as e:
+        print(f" Failed ({e}).", file=sys.stderr)
     return result
 
 

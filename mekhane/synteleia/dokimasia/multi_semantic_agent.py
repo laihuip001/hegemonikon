@@ -71,16 +71,16 @@ PERSONAS: Dict[str, str] = {
 # =============================================================================
 
 
-@dataclass
 # PURPOSE: [L2-auto] アンサンブルの1メンバー。
+@dataclass
 class EnsembleMember:
     """アンサンブルの1メンバー。"""
     name: str
     backend: LLMBackend
     persona: str  # PERSONAS のキー
 
-    @property
     # PURPOSE: [L2-auto] persona 付きプロンプトを生成。
+    @property
     def persona_prompt(self) -> str:
         """persona 付きプロンプトを生成。"""
         return PERSONAS.get(self.persona, "") + "\n" + SEMANTIC_AUDIT_PROMPT
@@ -106,8 +106,8 @@ class MultiSemanticAgent(AuditAgent):
     def __init__(self, members: List[EnsembleMember]):
         self.members = members
 
-    @classmethod
     # PURPOSE: [L2-auto] デフォルト構成: Gemini Pro + Claude Opus + GPT-OSS。
+    @classmethod
     def default(cls) -> "MultiSemanticAgent":
         """デフォルト構成: Gemini Pro + Claude Opus + GPT-OSS。"""
         try:
@@ -148,8 +148,8 @@ class MultiSemanticAgent(AuditAgent):
 
         return cls(members=members)
 
-    @classmethod
     # PURPOSE: [L2-auto] テスト用: StubBackend でアンサンブルを構成。
+    @classmethod
     def with_stubs(cls, responses: Optional[Dict[str, str]] = None) -> "MultiSemanticAgent":
         """テスト用: StubBackend でアンサンブルを構成。"""
         members = []

@@ -19,8 +19,8 @@ from enum import Enum
 # Output Schema Definitions
 # =============================================================================
 
-@dataclass
 # PURPOSE: [L2-auto] CCL 出力スキーマ
+@dataclass
 class CCLOutputSchema:
     """CCL 出力スキーマ"""
     result: str                              # 主要な出力
@@ -30,8 +30,8 @@ class CCLOutputSchema:
     metadata: Optional[Dict[str, Any]] = None
 
 
-@dataclass
 # PURPOSE: [L2-auto] 収束ループ出力スキーマ
+@dataclass
 class ConvergenceOutputSchema:
     """収束ループ出力スキーマ"""
     final_result: str
@@ -41,8 +41,8 @@ class ConvergenceOutputSchema:
     intermediate_steps: List[str]
 
 
-@dataclass
 # PURPOSE: [L2-auto] シーケンス出力スキーマ
+@dataclass
 class SequenceOutputSchema:
     """シーケンス出力スキーマ"""
     steps: List[Dict[str, str]]

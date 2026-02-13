@@ -198,14 +198,18 @@ async def call_tool(name: str, arguments: dict):
 
             log("Getting stats...")
             index = GnosisIndex()
-            stats = index.get_stats()
+            stats = index.stats()
 
             output_lines = ["# Gnōsis Knowledge Base Statistics\n"]
-            output_lines.append(f"- **Total Papers**: {stats.get('total_papers', 0)}")
-            output_lines.append(f"- **Sources**: {', '.join(stats.get('sources', []))}")
-            output_lines.append(
-                f"- **Last Updated**: {stats.get('last_updated', 'Never')}"
-            )
+            output_lines.append(f"- **Total Papers**: {stats.get('total', 0)}")
+            sources = stats.get('sources', {})
+            if isinstance(sources, dict):
+                sources_str = ', '.join(f"{k}: {v}" for k, v in sources.items())
+            else:
+                sources_str = str(sources)
+            output_lines.append(f"- **Sources**: {sources_str}")
+            output_lines.append(f"- **Unique DOIs**: {stats.get('unique_dois', 0)}")
+            output_lines.append(f"- **Unique ArXiv**: {stats.get('unique_arxiv', 0)}")
 
             log("Stats completed")
             return [TextContent(type="text", text="\n".join(output_lines))]

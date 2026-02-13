@@ -134,26 +134,31 @@ def search_handoffs(query: str, top_k: int = 5) -> List[Tuple[Document, float]]:
     if not docs:
         return []
 
-    # 永続化インデックスを使用（なければビルド）
-    if HANDOFF_INDEX_PATH.exists():
-        adapter = load_handoff_index()
-    else:
-        adapter = build_handoff_index(docs)
-        if adapter is None:
-            return []
+    try:
+        # 永続化インデックスを使用（なければビルド）
+        if HANDOFF_INDEX_PATH.exists():
+            adapter = load_handoff_index()
+        else:
+            adapter = build_handoff_index(docs)
+            if adapter is None:
+                # Embedder 初期化失敗 — 日付順フォールバック
+                return [(d, 0.5) for d in docs[:top_k]]
 
-    # Search
-    query_vector = adapter.encode([query])[0]
-    results = adapter.search(query_vector, k=top_k)
+        # Search
+        query_vector = adapter.encode([query])[0]
+        results = adapter.search(query_vector, k=top_k)
 
-    # Match results to docs (using idx from metadata)
-    matched = []
-    for r in results:
-        idx = r.metadata.get("idx", r.id)
-        if idx < len(docs):
-            matched.append((docs[idx], r.score))
+        # Match results to docs (using idx from metadata)
+        matched = []
+        for r in results:
+            idx = r.metadata.get("idx", r.id)
+            if idx < len(docs):
+                matched.append((docs[idx], r.score))
 
-    return matched
+        return matched
+    except Exception:
+        # Embedder/ベクトル検索が使えない場合は日付順で返す
+        return [(d, 0.5) for d in docs[:top_k]]
 
 
 # PURPOSE: /boot 統合 API: モードに応じた Handoff と会話ログを返す

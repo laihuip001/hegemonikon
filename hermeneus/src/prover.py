@@ -44,8 +44,8 @@ class ProofStatus(Enum):
     CACHED = "cached"         # キャッシュヒット
 
 
-@dataclass
 # PURPOSE: [L2-auto] 証明結果
+@dataclass
 class ProofResult:
     """証明結果"""
     verified: bool
@@ -70,8 +70,8 @@ class ProverInterface(ABC):
     
     # PURPOSE: 証明タイプ
     @property
-    @abstractmethod
     # PURPOSE: [L2-auto] 証明タイプ
+    @abstractmethod
     def proof_type(self) -> ProofType:
         """証明タイプ"""
         pass

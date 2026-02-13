@@ -36,8 +36,8 @@ class HITLCommand(Enum):
     RETRY = "retry"             # リトライ
 
 
-@dataclass
 # PURPOSE: [L2-auto] 割り込みポイント
+@dataclass
 class InterruptPoint:
     """割り込みポイント"""
     node_id: str
@@ -46,8 +46,8 @@ class InterruptPoint:
     condition: Optional[Callable[[Dict[str, Any]], bool]] = None
 
 
-@dataclass
 # PURPOSE: [L2-auto] HITL リクエスト
+@dataclass
 class HITLRequest:
     """HITL リクエスト"""
     request_id: str
@@ -60,8 +60,8 @@ class HITLRequest:
     options: List[HITLCommand] = field(default_factory=lambda: list(HITLCommand))
 
 
-@dataclass
 # PURPOSE: [L2-auto] HITL レスポンス
+@dataclass
 class HITLResponse:
     """HITL レスポンス"""
     request_id: str

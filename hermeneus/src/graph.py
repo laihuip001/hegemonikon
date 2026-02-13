@@ -45,8 +45,8 @@ class NodeType(Enum):
     END = "end"
 
 
-@dataclass
 # PURPOSE: [L2-auto] グラフノード
+@dataclass
 class GraphNode:
     """グラフノード"""
     id: str
@@ -56,8 +56,8 @@ class GraphNode:
     metadata: Dict[str, Any] = field(default_factory=dict)
 
 
-@dataclass
 # PURPOSE: [L2-auto] グラフエッジ
+@dataclass
 class GraphEdge:
     """グラフエッジ"""
     source: str
@@ -429,8 +429,8 @@ class CCLGraphBuilder:
 # Compiled Graph
 # =============================================================================
 
-@dataclass
 # PURPOSE: [L2-auto] コンパイル済みグラフ
+@dataclass
 class CompiledGraph:
     """コンパイル済みグラフ"""
     langgraph: Any  # LangGraph StateGraph (なければ None)

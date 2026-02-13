@@ -34,8 +34,8 @@ class ExecutionPhase(Enum):
     FAILED = "failed"
 
 
-@dataclass
 # PURPOSE: [L2-auto] フェーズ結果
+@dataclass
 class PhaseResult:
     """フェーズ結果"""
     phase: ExecutionPhase
@@ -45,8 +45,8 @@ class PhaseResult:
     duration_ms: float = 0.0
 
 
-@dataclass
 # PURPOSE: [L2-auto] 実行パイプライン結果
+@dataclass
 class ExecutionPipeline:
     """実行パイプライン結果"""
     ccl: str

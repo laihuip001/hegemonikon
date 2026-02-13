@@ -71,6 +71,7 @@ class KalonResult:
     details: str = ""
     issues: List[str] = field(default_factory=list)
 
+    # PURPOSE: [L2-auto] Whether this check passes Kalon quality.
     @property
     def is_kalon(self) -> bool:
         """Whether this check passes Kalon quality."""
@@ -88,6 +89,7 @@ class KalonReport:
     results: List[KalonResult] = field(default_factory=list)
     timestamp: str = ""
 
+    # PURPOSE: [L2-auto] Weighted average of all check scores.
     @property
     def overall_score(self) -> float:
         """Weighted average of all check scores."""
@@ -95,6 +97,7 @@ class KalonReport:
             return 0.0
         return sum(r.score for r in self.results) / len(self.results)
 
+    # PURPOSE: [L2-auto] Overall Kalon level based on individual results.
     @property
     def overall_level(self) -> KalonLevel:
         """Overall Kalon level based on individual results."""
@@ -110,6 +113,7 @@ class KalonReport:
             return KalonLevel.APPROACHING
         return KalonLevel.INCOMPLETE
 
+    # PURPOSE: [L2-auto] Collect all issues from all results.
     @property
     def all_issues(self) -> List[str]:
         """Collect all issues from all results."""
@@ -119,6 +123,7 @@ class KalonReport:
                 issues.append(f"[{r.name}] {issue}")
         return issues
 
+    # PURPOSE: [L2-auto] One-line summary of the report.
     def summary(self) -> str:
         """One-line summary of the report."""
         passed = sum(1 for r in self.results if r.is_kalon)
@@ -130,6 +135,7 @@ class KalonReport:
         )
 
 
+# PURPOSE: 圏論的構造の品質 (Kalon) を検証し、Fix(G∘F) 不動点到達を判定する
 class KalonChecker:
     """Kalon (καλόν) Checker — 圏論的構造の品質検証.
 
@@ -152,6 +158,7 @@ class KalonChecker:
     # PURPOSE: Expected number of structures (evidence items) per enrichment
     MIN_STRUCTURES: int = 2
 
+    # PURPOSE: [L2-auto] Initialize the Kalon checker.
     def __init__(
         self,
         enrichments: Optional[Dict[Series, Enrichment]] = None,

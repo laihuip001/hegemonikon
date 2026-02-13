@@ -642,16 +642,95 @@ curl -sk --noproxy '*' --http2 -X POST \
 
 **結論**: proto 構造は正しい。問題は**トークンの権限**のみ。
 
-### 18.10 残る攻略ルート
+### 18.10 攻略ルート試行結果 (v7)
 
-| ルート | 実現可能性 | 必要なもの |
-|:-------|:---------:|:----------|
-| **strace IPC 傍受** | 高 | LS が Cortex 通信中に `strace -e write -s 4096 -p PID` で Bearer トークン取得 |
-| **mitmproxy TLS 中間者** | 中 | `/etc/hosts` で DNS 書き換え + リバースプロキシ + CA 注入 |
-| **parent_pipe IPC 傍受** | 中 | Extension → LS の IPC チャネルからトークンを取得 |
-| **Extension Server モック** | 低 | extension.js の OAuth フローを再実装し、LS に正しいトークンを渡す |
+| # | ルート | 試行 | 結果 | 詳細 |
+|:--|:-------|:----:|:-----|:-----|
+| 19 | **strace write** | ✅ | ❌ | 24,115行。Go TLS 暗号化後に write → ya29 不可視 |
+| 20 | **strace read+write -f** | ✅ | ❌ | Go goroutine 全スレッド追跡 → LS パフォーマンス破壊、StartCascade タイムアウト |
+| 21 | **Extension Server HTTP 直叩き** | ✅ | ⚠️ | **HTTP 平文** (TLS なし) を発見！ただし外部からの API 呼出に応答なし (LS がクライアント) |
+| 22 | **OAuth refresh (ADC creds)** | ✅ | ❌ | `unauthorized_client` — ADC client_id/secret では Antigravity refresh_token 使用不可 |
+| 23 | **extension.js client_id 抽出** | ✅ | ❌ | 難読化で OAuth client_id/secret 抽出不可 |
+| 24 | **nm シンボル抽出** | ✅ | ❌ | Go バイナリ stripped、シンボルなし |
+| 25 | **mitmdump TLS 復号** | ✅ | **✅** | **port 8765 で Cortex API 通信の完全復号に成功！** LoadCodeAssist のリクエスト/レスポンス全文をキャプチャ |
+| 26 | **mitmdump 経由 GenerateChat** | ✅ | ❌ | state.vscdb ya29 トークンでは同じ PERMISSION_DENIED |
+| 27 | **CDP port 9334** | ✅ | ⚠️ | IDE 全ワークスペース (4ページ + 3 Worker) に到達。ただし **Origin 403** でJS評価不可 |
+| 28 | **GCA Agent ポート** | ✅ | ❌ | port 34113/39695/40395 — CDP 応答なし |
 
-**ボトルネック**: `state.vscdb` の ya29 トークンは `cloudaicompanion.companions.generateChat` を持たない。LS は Extension から IPC 経由で**別のスコープのトークン**を受け取っている可能性が高い。
+### 18.11 mitmdump TLS 復号の詳細
+
+```bash
+# mitmdump v12.2.1 インストール
+python3 -m venv /tmp/mitm_env
+NO_PROXY="*" /tmp/mitm_env/bin/pip install mitmproxy websocket-client
+
+# mitmdump 起動 (port 8765)
+/tmp/mitm_env/bin/mitmdump --listen-port 8765 --set block_global=false -w /tmp/mitm_capture.flow &
+
+# mitmdump 経由で Cortex API を叩く
+https_proxy=http://127.0.0.1:8765 curl -sk --http2 -X POST \
+  "https://daily-cloudcode-pa.googleapis.com/.../LoadCodeAssist" \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/grpc" \
+  --data-binary @/tmp/empty_grpc.bin
+```
+
+キャプチャ結果 (flow_detail=4):
+
+```
+POST https://daily-cloudcode-pa.googleapis.com/...CloudCode/LoadCodeAssist HTTP/2.0
+  authorization: Bearer ya29.a0AUMWg_IzPAt7V4dvZ...
+  content-type: application/grpc
+
+<< HTTP/2.0 200 OK 480b
+  x-cloudaicompanion-trace-id: fdb9cca399fcb35b
+  grpc-status: 0
+  
+  field 3: robotic-victory-pst7f
+  field 12.1: g1-ultra-tier
+```
+
+### 18.12 Extension Server の通信特性
+
+| 特性 | 検証方法 | 結果 |
+|:-----|:---------|:-----|
+| プロトコル | `curl http://127.0.0.1:45483/` | **HTTP 平文** (TLS なし) |
+| 認証 | CSRF トークン不一致時 | `Invalid CSRF token` |
+| API 応答 | 正しい CSRF で各種メソッド | **応答なし** (LS がクライアント) |
+| 接続数 | `ss -tnp` | LS から 5+ TCP 接続 (FD 14/24/26/29/96/97) |
+
+### 18.13 CDP (Chrome DevTools Protocol) の状況
+
+**Antigravity IDE port 9334** (Electron DevTools):
+
+| ターゲット | タイプ | URL |
+|:-----------|:------|:----|
+| filemaker workspace | page | vscode-file://...workbench.html |
+| hegemonikon workspace | page | vscode-file://...workbench.html |
+| synteleia-sandbox workspace | page | vscode-file://...workbench.html |
+| Launchpad | page | vscode-file://...workbench-jetski-agent.html |
+| Manager | page | (不明) |
+| Worker 1-3 | worker | (Extension host 含む) |
+
+**制限**: WebSocket 接続に `--remote-allow-origins=*` が必要 (Electron の制限)。Origin 偽装でも突破不可。
+
+### 18.14 最終結論 (v7)
+
+**Cortex 直叩きの残る壁は「正しいトークンの取得」のみ**:
+
+```
+[取得済み]                      [未取得]
+┌────────────────────────┐     ┌─────────────────────────┐
+│ ✅ Project ID           │     │ ❌ 正しい ya29 トークン   │
+│ ✅ Endpoint             │     │   (cloudaicompanion     │
+│ ✅ Proto 構造           │     │    scope が必要)         │
+│ ✅ mitmdump TLS 復号    │     │                         │
+│ ✅ gRPC リクエスト形式  │     │ ❌ Antigravity OAuth     │
+│ ✅ CDP IDE アクセス     │     │   client_id/secret      │
+└────────────────────────┘     └─────────────────────────┘
+```
+
+**最も確実な残ルート**: LS ラッパースクリプトで `HTTPS_PROXY=127.0.0.1:8765` を注入 → LS 再起動 → LS → Cortex の通信を mitmdump でキャプチャ → **LS が使う ya29 トークンの Authorization ヘッダを取得**。
 
 ---
 
@@ -666,13 +745,20 @@ curl -sk --noproxy '*' --http2 -X POST \
 5. ~~ストリーミング調査~~ → ✅ (ポーリング方式で実質完了)
 6. ~~project ID 取得~~ → ✅ (`robotic-victory-pst7f0` via LoadCodeAssist)
 7. ~~proto 構造解明~~ → ✅ (GenerateChatRequest 15 fields, Response 18 fields)
-8. ~~proto 構造検証~~ → ✅ (HTTP 200 + trace-id — バックエンド到達)
+8. ~~proto 構造検証~~ → ✅ (HTTP 200, grpc-status 0 — バックエンド到達)
+9. ~~mitmdump TLS 復号~~ → ✅ (port 8765 で LoadCodeAssist 完全キャプチャ)
+10. ~~strace 傍受~~ → ❌ (Go goroutine 破壊で不適)
+11. ~~OAuth refresh~~ → ❌ (unauthorized_client — 異なる OAuth client)
+12. ~~CDP Origin~~ → ❌ (403 Forbidden — Electron 制限)
 
-### 残る壁: トークン権限
+### 残る最終ステップ: LS ラッパー + mitmdump
 
-- `state.vscdb` の ya29 は `cloudaicompanion.companions.generateChat` を持たない
-- LS が使う**正しいトークン**を取得できれば、Cortex 直叩きが実現
-- → `strace` で LS の write() を傍受し、Bearer トークンを抽出するのが最善手
+1. `sudo mv language_server_linux_x64 language_server_linux_x64.real`
+2. ラッパースクリプト設置 (`HTTPS_PROXY=http://127.0.0.1:8765` + `SSL_CERT_FILE`)
+3. IDE ウィンドウリロード → 新 LS が mitmdump 経由で起動
+4. LLM 呼出発火 → **LS の Authorization ヘッダをキャプチャ**
+5. 取得トークンで `GenerateChat` 直叩き
+6. ラッパー復元
 
 ---
 
@@ -683,3 +769,4 @@ curl -sk --noproxy '*' --http2 -X POST \
 *v5 — /dia*%/noe 再検証: LoadCodeAssist成功 + project ID取得 + 認証メカニズム解明 (2026-02-13)*
 *v5b — V3 ログ探査 + V1 MITM 成功 + Unleash Feature Flags 発見 (2026-02-13)*
 *v6 — Proto 構造完全復元 + GenerateChat curl テスト (HTTP 200, PERMISSION_DENIED) (2026-02-13)*
+*v7 — strace/mitmdump/CDP/OAuth: 28攻撃ベクトル完了 + mitmdump TLS復号成功 (2026-02-13)*

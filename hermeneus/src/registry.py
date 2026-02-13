@@ -20,8 +20,8 @@ from functools import lru_cache
 # Types
 # =============================================================================
 
-@dataclass
 # PURPOSE: [L2-auto] ワークフローステージ
+@dataclass
 class WorkflowStage:
     """ワークフローステージ"""
     name: str
@@ -29,8 +29,8 @@ class WorkflowStage:
     substages: List[str] = field(default_factory=list)
 
 
-@dataclass
 # PURPOSE: [L2-auto] ワークフロー定義
+@dataclass
 class WorkflowDefinition:
     """ワークフロー定義"""
     name: str                           # 例: "noe", "bou", "ene"

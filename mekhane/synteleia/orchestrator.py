@@ -94,8 +94,8 @@ class SynteleiaOrchestrator:
         orchestrator.dokimasia_agents.append(semantic)
         return orchestrator
 
-    @classmethod
     # PURPOSE: [L2-auto] L1 全エージェント + Layer B Multi-LLM アンサンブルを含むオーケストレータ。
+    @classmethod
     def with_multi_l2(cls) -> "SynteleiaOrchestrator":
         """
         L1 全エージェント + Layer B Multi-LLM アンサンブルを含むオーケストレータ。

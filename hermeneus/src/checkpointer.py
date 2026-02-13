@@ -21,8 +21,8 @@ from contextlib import contextmanager
 # Checkpoint Types
 # =============================================================================
 
-@dataclass
 # PURPOSE: [L2-auto] チェックポイント
+@dataclass
 class Checkpoint:
     """チェックポイント"""
     checkpoint_id: str
@@ -33,8 +33,8 @@ class Checkpoint:
     metadata: Optional[Dict[str, Any]] = None
 
 
-@dataclass
 # PURPOSE: [L2-auto] チェックポイント書き込みリクエスト
+@dataclass
 class CheckpointWrite:
     """チェックポイント書き込みリクエスト"""
     thread_id: str

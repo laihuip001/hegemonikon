@@ -30,8 +30,8 @@ from typing import Optional
 
 # --- Data Classes ---
 
-@dataclass
 # PURPOSE: [L2-auto] LLM からの応答を保持する。
+@dataclass
 class LLMResponse:
     """LLM からの応答を保持する。"""
     text: str = ""
@@ -43,8 +43,8 @@ class LLMResponse:
     raw_steps: list = field(default_factory=list)
 
 
-@dataclass
 # PURPOSE: [L2-auto] Language Server の接続情報。
+@dataclass
 class LSInfo:
     """Language Server の接続情報。"""
     pid: int = 0
@@ -99,18 +99,18 @@ class AntigravityClient:
         self._ssl_ctx = self._make_ssl_context()
         self.ls = self._detect_ls()
 
-    @property
     # PURPOSE: [L2-auto] 関数: pid
+    @property
     def pid(self) -> int:
         return self.ls.pid
 
-    @property
     # PURPOSE: [L2-auto] 関数: port
+    @property
     def port(self) -> int:
         return self.ls.port
 
-    @property
     # PURPOSE: [L2-auto] 関数: csrf
+    @property
     def csrf(self) -> str:
         return self.ls.csrf
 
@@ -972,8 +972,8 @@ class AntigravityClient:
 
     # --- Internal: Utilities ---
 
-    @staticmethod
     # PURPOSE: [L2-auto] 自己署名証明書を許可する SSL コンテキスト。
+    @staticmethod
     def _make_ssl_context() -> ssl.SSLContext:
         """自己署名証明書を許可する SSL コンテキスト。"""
         ctx = ssl.create_default_context()
@@ -981,8 +981,8 @@ class AntigravityClient:
         ctx.verify_mode = ssl.CERT_NONE
         return ctx
 
-    @staticmethod
     # PURPOSE: [L2-auto] 現在のユーザー名を取得。
+    @staticmethod
     def _get_user() -> str:
         """現在のユーザー名を取得。"""
         import os

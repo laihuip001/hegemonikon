@@ -1,22 +1,24 @@
 ---
-description: 感じる — /pro_/ore~(/pis_/ana)
+description: "感じる — /pro_/ore~(/pis_/ana)_/dox-"
 ---
 
 # /ccl-feel: 直感マクロ
 
-> **CCL**: `@feel = /pro_/ore~(/pis_/ana)`
+> **CCL**: `@feel = /pro_/ore~(/pis_/ana)_/dox-`
 > **用途**: 直感的判断。「何を望むか、何が似ているか、確信度は」
 > **起源**: DX-008 hub-only 9定理統合 — H1/H3/H2/K3 を活用
+> **認知骨格**: Prior → Likelihood → Posterior
 
 ## 展開
 
-| ステップ | WF | 意味 |
-|:--------|:---|:-----|
-| 1 | `/pro` (H1 Propatheia) | 前感情: 第一印象・直感を言語化 |
-| 2 | `/ore` (H3 Orexis) | 欲求: 何を望んでいるか |
-| 3 | `~(/pis_/ana)` | 振動: 確信度と類推を行き来 |
+| 相 | ステップ | 意味 |
+|:---|:---------|:-----|
+| Prior | `/pro` (H1 Propatheia) | 前感情: 第一印象・直感を言語化 |
+| Likelihood | `/ore` (H3 Orexis) | 欲求: 何を望んでいるか |
+| Likelihood | `~(/pis_/ana)` | 振動: 確信度と類推を行き来 |
 |   | `/pis` (H2 Pistis) | 確信: その直感にどれだけ自信があるか |
 |   | `/ana` (K3 Analogia) | 類推: 過去に似た状況はあったか |
+| Posterior | `/dox-` | 直感の結果を軽量記録 |
 
 ## いつ使うか
 

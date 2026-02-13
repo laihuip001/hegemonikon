@@ -25,119 +25,31 @@ class Macro:
     is_builtin: bool = False
 
 
-# Built-in macros — ccl-*.md の正規定義に同期 (2026-02-11)
-BUILTIN_MACROS: Dict[str, Macro] = {
-    # === Core Macros (ccl-*.md 由来) ===
-    "build": Macro(
-        name="build",
-        ccl="/bou-_/chr_/kho_/s+_/ene+_V:{/dia-}_I:[✓]{/dox-}",
-        description="構築: 目的簡略→資源→場→戦略→実行→判定→✓時記録",
-        is_builtin=True,
-    ),
-    "dig": Macro(
-        name="dig",
-        ccl="/s+~(/p*/a)_/dia*/o+",
-        description="深掘り: 戦略↔環境×判断の振動→判定×認識融合",
-        is_builtin=True,
-    ),
-    "fix": Macro(
-        name="fix",
-        ccl="/tel_C:{/dia+_/ene+}_I:[✓]{/dox-}",
-        description="修正: 判定+実行のチェック→成功時記録",
-        is_builtin=True,
-    ),
-    "ground": Macro(
-        name="ground",
-        ccl="/tak-*/bou+{6w3h}~/p-_/ene-",
-        description="落とす: 整理×意志の融合→条件縮小→実行縮小",
-        is_builtin=True,
-    ),
-    "kyc": Macro(
-        name="kyc",
-        ccl="C:{/sop_/noe_/ene_/dia-}",
-        description="κύκλος: 観察→推論→行動→判定のチェック",
-        is_builtin=True,
-    ),
-    "learn": Macro(
-        name="learn",
-        ccl="/dox+_*^/u+_/bye+",
-        description="学習: 信念記録→メモ化(対話のメタ化)→終了時記録",
-        is_builtin=True,
-    ),
-    "nous": Macro(
-        name="nous",
-        ccl="R:{F:[×2]{/u+*^/u^}}_/dox-",
-        description="問いの深化: 再帰(2回対話のメタ化)→記録",
-        is_builtin=True,
-    ),
-    "osc": Macro(
-        name="osc",
-        ccl="R:{F:[/s,/dia,/noe]{L:[x]{x~x+}}, ~(/h*/k)}",
-        description="振動: 各WFをλ振動→動機×文脈で検証",
-        is_builtin=True,
-    ),
-    "plan": Macro(
-        name="plan",
-        ccl="/bou+_/s+~(/p*/k)_V:{/dia}",
-        description="段取り: 意志→戦略↔環境×文脈の振動→判定検証",
-        is_builtin=True,
-    ),
-    "proof": Macro(
-        name="proof",
-        ccl="/kat_V:{/noe~/dia}_I:[✓]{/ene{PROOF.md}}_E:{/ene{_limbo/}}",
-        description="裁く: 認識↔判定の検証→成功時PROOF.md生成→失敗時limbo",
-        is_builtin=True,
-    ),
-    "tak": Macro(
-        name="tak",
-        ccl="/s1_F:[×3]{/sta~/chr}_F:[×3]{/kho~/zet}_I:[∅]{/sop}_/euk_/bou",
-        description="捌く: スケール→基準×活用→場×探求→∅時調査→好機→意志",
-        is_builtin=True,
-    ),
-    "vet": Macro(
-        name="vet",
-        ccl="/kho{git_diff}_C:{V:{/dia+}_/ene+}_/pra{test}_/pis_/dox",
-        description="確かめる: diff確認→判定+実行チェック→テスト→確信度+信念記録",
-        is_builtin=True,
-    ),
-    # === Utility Macros ===
-    "go": Macro(
-        name="go",
-        ccl="/s+_/ene+",
-        description="即実行: 詳細戦略→詳細実行",
-        is_builtin=True,
-    ),
-    "wake": Macro(
-        name="wake",
-        ccl="/boot+_@dig_@plan",
-        description="目覚め: ブート→深掘り→計画",
-        is_builtin=True,
-    ),
-    "why": Macro(
-        name="why",
-        ccl="F:5{/zet{why}}_/noe{root_cause}",
-        description="Five Whys: 5回問い→根本原因認識",
-        is_builtin=True,
-    ),
-    "eat": Macro(
-        name="eat",
-        ccl="/mek{digest}_/ene{mapping}_/dia{quality}_/dox",
-        description="消化: 調理→マッピング→品質判定→永続化",
-        is_builtin=True,
-    ),
-    "fit": Macro(
-        name="fit",
-        ccl="/dia{naturality}_/pis{integration}",
-        description="消化品質診断: 可換性検証→統合確認",
-        is_builtin=True,
-    ),
-    "lex": Macro(
-        name="lex",
-        ccl="/dia{expression}_/gno{feedback}",
-        description="表現分析: プロンプト表現の批判→フィードバック",
-        is_builtin=True,
-    ),
-}
+# Built-in macros — Single Source of Truth: hermeneus/src/macros.py + ccl-*.md
+# 正規定義: .agent/workflows/ccl-*.md → hermeneus/src/macros.py BUILTIN_MACROS
+# この変数は上記から自動生成される (二重定義の解消)
+def _build_macro_dict() -> Dict[str, "Macro"]:
+    """hermeneus の get_all_macros() (全ソース統合) から Macro dict を生成"""
+    try:
+        from hermeneus.src.macros import get_all_macros
+        all_macros = get_all_macros()
+    except ImportError:
+        # hermeneus が利用不可の場合は空辞書 (graceful degradation)
+        return {}
+
+    result: Dict[str, "Macro"] = {}
+    for name, ccl in all_macros.items():
+        result[name] = Macro(
+            name=name,
+            ccl=ccl,
+            description=f"@{name} macro (auto-synced from hermeneus)",
+            is_builtin=True,
+        )
+    return result
+
+
+BUILTIN_MACROS: Dict[str, Macro] = _build_macro_dict()
+
 
 
 # PURPOSE: Registry for CCL macros.

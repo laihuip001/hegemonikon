@@ -1,17 +1,25 @@
 ---
-description: "監る — /dia+{synteleia}_V:{/pis+}"
+description: "監る — /kho_/s-_/pro_/dia+{synteleia}_~(/noe*/dia)_V:{/pis+}_/dox-"
 ---
 
 # /ccl-syn: Synteleia 監査マクロ
 
-> **CCL**: `@syn = /dia+{synteleia}_V:{/pis+}`
+> **CCL**: `@syn = /kho_/s-_/pro_/dia+{synteleia}_~(/noe*/dia)_V:{/pis+}_/dox-`
 > **用途**: Synteleia 監査 (L1+L2) を発動し、確信度を検証する
 > **圏論**: 免疫系 = 恒等的自然変換 (同一性の検証)
+> **認知骨格**: Prior → Likelihood → Posterior
 
 ## 展開
 
-1. `/dia+{synteleia}` — Synteleia 多角監査を発動 (L1静的 + L2セマンティック)
-2. `_V:{/pis+}` — 確信度を検証ゲートで評価
+| 相 | ステップ | 意味 |
+|:---|:---------|:-----|
+| Prior | `/kho` | 監視対象の場を把握する |
+| Prior | `/s-` | 何を監視するかの焦点を定める (方向性) |
+| Prior | `/pro` | 「何かおかしい」直感を感じ取る (前感情) |
+| Likelihood | `/dia+{synteleia}` | Synteleia 多角監査を発動 (L1静的 + L2セマンティック) |
+| Posterior | `~(/noe*/dia)` | 監査結果を直観×判定で振動検証 |
+| Posterior | `V:{/pis+}` | 確信度を検証ゲートで評価 |
+| Posterior | `/dox-` | 監査結果を軽量記録 |
 
 ## 使用例
 

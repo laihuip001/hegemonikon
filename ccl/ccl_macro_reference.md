@@ -22,6 +22,8 @@
 | `@osc` | 揺する | `R:{F:[/s,/dia,/noe]{L:[x]{x~x+}}, ~(/h*/k)}` |
 | `@proof` | 裁く | `V:{/noe~/dia}_I:[✓]{/ene{PROOF.md}}_E:{/ene{_limbo/}}` |
 | `@syn` | 監る | `/dia+{synteleia}_V:{/pis+}` |
+| `@scan` | 見る | `/s*%/dia` |
+| `@weigh` | 量る | `/bou*%/noe` |
 
 ---
 

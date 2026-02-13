@@ -1,15 +1,6 @@
+# PROOF: [L2/Infra] <- mekhane/anamnesis/ A0→セッション履歴→ベクトル検索インデクサ
 # PURPOSE: セッション履歴を GnosisIndex (LanceDB) にインデックスする
 """
-PROOF: [L2/インフラ] <- mekhane/anamnesis/
-
-P3 → 記憶の永続化が必要
-   → セッション履歴のセマンティック検索が必要
-   → session_indexer.py が担う
-
-Q.E.D.
-
----
-
 Session Indexer — セッション履歴ベクトル検索
 
 agq-sessions.sh --dump で取得した JSON を Paper モデルに変換し、

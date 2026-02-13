@@ -1,3 +1,4 @@
+# PROOF: [L2/Infra] <- mekhane/synteleia/dokimasia/ A0→セマンティック監査→Multi-LLMアンサンブル
 # PURPOSE: Multi-LLM アンサンブル監査エージェント (Layer B: Nous)
 """
 MultiSemanticAgent — Multi-LLM Cognitive Ensemble

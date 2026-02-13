@@ -1,3 +1,4 @@
+# PROOF: [L2/Infra] <- mekhane/ochema/ A0→外部LLM接続→Antigravityクライアントパッケージ
 # PURPOSE: Ochēma パッケージ — Antigravity LS クライアント
 """Ochēma (ὄχημα) — Antigravity Language Server Client Package."""
 

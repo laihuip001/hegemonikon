@@ -72,6 +72,7 @@ PERSONAS: Dict[str, str] = {
 
 
 @dataclass
+# PURPOSE: アンサンブルの1メンバー
 class EnsembleMember:
     """アンサンブルの1メンバー。"""
     name: str
@@ -104,6 +105,7 @@ class MultiSemanticAgent(AuditAgent):
         self.members = members
 
     @classmethod
+    # PURPOSE: デフォルト構成
     def default(cls) -> "MultiSemanticAgent":
         """デフォルト構成: Gemini Pro + Claude Opus + GPT-OSS。"""
         try:
@@ -145,6 +147,7 @@ class MultiSemanticAgent(AuditAgent):
         return cls(members=members)
 
     @classmethod
+    # PURPOSE: テスト用スタブ構成
     def with_stubs(cls, responses: Optional[Dict[str, str]] = None) -> "MultiSemanticAgent":
         """テスト用: StubBackend でアンサンブルを構成。"""
         members = []
@@ -321,6 +324,7 @@ class MultiSemanticAgent(AuditAgent):
 # Utilities
 # =============================================================================
 
+# PURPOSE: Severity のランク付け
 def _severity_rank(severity: AuditSeverity) -> int:
     """Severity の厳しさ順序。"""
     return {

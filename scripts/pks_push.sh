@@ -29,6 +29,7 @@ MAX="${PKS_MAX:-5}"
 COOLDOWN="${PKS_COOLDOWN_HOURS:-24}"
 TOPICS="${PKS_TOPICS:-}"
 OUTPUT="${PKS_OUTPUT:-}"
+ADVOCACY="${PKS_ADVOCACY:-false}"
 
 export PKS_COOLDOWN_HOURS="${COOLDOWN}"
 
@@ -51,6 +52,11 @@ case "${MODE}" in
     exit 1
     ;;
 esac
+
+# Optional flags
+if [[ "${ADVOCACY}" == "true" ]]; then
+  CMD+=(--advocacy)
+fi
 
 # Execute
 cd "${PROJECT_ROOT}"

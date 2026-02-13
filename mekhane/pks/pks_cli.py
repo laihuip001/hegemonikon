@@ -110,6 +110,110 @@ def cmd_stats(args: argparse.Namespace) -> None:
     print()
 
 
+# PURPOSE: `pks health` — Autophōnos 全スタックのヘルスチェック
+def cmd_health(args: argparse.Namespace) -> None:
+    """Autophōnos 全コンポーネントの一括検証"""
+    import os, time
+    for key in ['HTTP_PROXY', 'HTTPS_PROXY', 'http_proxy', 'https_proxy']:
+        os.environ.pop(key, None)
+    os.environ.setdefault('HF_HUB_OFFLINE', '1')
+    os.environ.setdefault('TRANSFORMERS_OFFLINE', '1')
+
+    print("## 🏥 Autophōnos Health Check\n")
+    checks = []
+
+    def _check(name: str, fn):
+        t0 = time.time()
+        try:
+            result = fn()
+            elapsed = time.time() - t0
+            checks.append((name, "✅", result, f"{elapsed:.1f}s"))
+        except Exception as e:
+            elapsed = time.time() - t0
+            checks.append((name, "❌", str(e)[:60], f"{elapsed:.1f}s"))
+
+    # 1. LanceDB (Gnōsis)
+    def check_gnosis():
+        from mekhane.anamnesis.index import GnosisIndex as AI
+        gi = AI()
+        s = gi.stats()
+        return f"{s.get('total', 0):,} docs"
+    _check("Gnōsis (LanceDB)", check_gnosis)
+
+    # 2. Kairos index
+    def check_kairos():
+        pkl = Path.home() / "oikos" / "mneme" / ".hegemonikon" / "indices" / "kairos.pkl"
+        if not pkl.exists():
+            raise FileNotFoundError("kairos.pkl not found")
+        from mekhane.symploke.adapters.embedding_adapter import EmbeddingAdapter
+        a = EmbeddingAdapter(); a.load(str(pkl))
+        return f"{a.count():,} docs"
+    _check("Kairos (.pkl)", check_kairos)
+
+    # 3. Sophia index
+    def check_sophia():
+        pkl = Path.home() / "oikos" / "mneme" / ".hegemonikon" / "indices" / "sophia.pkl"
+        if not pkl.exists():
+            raise FileNotFoundError("sophia.pkl not found")
+        from mekhane.symploke.adapters.embedding_adapter import EmbeddingAdapter
+        a = EmbeddingAdapter(); a.load(str(pkl))
+        return f"{a.count():,} docs"
+    _check("Sophia (.pkl)", check_sophia)
+
+    # 4. Embedder
+    def check_embedder():
+        from mekhane.symploke.adapters.embedding_adapter import EmbeddingAdapter
+        a = EmbeddingAdapter()
+        v = a.encode("test query")
+        return f"dim={len(v)}"
+    _check("Embedder (BGE-M3)", check_embedder)
+
+    # 5. GnosisLanceBridge
+    def check_bridge():
+        from mekhane.symploke.indices.gnosis_lance_bridge import GnosisLanceBridge
+        b = GnosisLanceBridge()
+        r = b.search("active inference", k=1)
+        return f"{len(r)} results, score={r[0].score:.3f}" if r else "0 results"
+    _check("GnosisLanceBridge", check_bridge)
+
+    # 6. PKSEngine
+    def check_engine():
+        from mekhane.pks.pks_engine import PKSEngine
+        e = PKSEngine(enable_questions=False, enable_serendipity=False)
+        e.set_context(topics=["FEP"])
+        n = e.proactive_push(k=3)
+        return f"{len(n)} nuggets"
+    _check("PKSEngine", check_engine)
+
+    # 7. TopicExtractor
+    def check_topics():
+        from mekhane.pks.pks_engine import PKSEngine
+        e = PKSEngine(enable_questions=False)
+        t = e.auto_context_from_handoff()
+        return f"{len(t)} topics: {', '.join(t[:3])}"
+    _check("TopicExtractor", check_topics)
+
+    # 8. SelfAdvocate
+    def check_advocate():
+        from mekhane.pks.self_advocate import SelfAdvocate
+        a = SelfAdvocate()
+        return f"LLM={'ok' if a.llm_available else 'template mode'}"
+    _check("SelfAdvocate", check_advocate)
+
+    # Output
+    print("| コンポーネント | 状態 | 詳細 | 時間 |")
+    print("|:--------------|:----:|:-----|-----:|")
+    ok = 0
+    for name, status, detail, elapsed in checks:
+        print(f"| {name} | {status} | {detail} | {elapsed} |")
+        if status == "✅":
+            ok += 1
+    print()
+    total = len(checks)
+    print(f"**結果: {ok}/{total} OK** {'🎉' if ok == total else '⚠️'}")
+    print()
+
+
 # PURPOSE: `pks push` — コンテキストに基づく能動的プッシュ
 def cmd_push(args: argparse.Namespace) -> None:
     """コンテキストに基づく能動的プッシュ"""
@@ -400,6 +504,7 @@ def main() -> None:
             "  pks feedback -t 'paper' -r used   # 反応記録\n"
             "  pks feedback --stats              # 統計表示\n"
             "  pks stats                         # 知識基盤統計\n"
+            "  pks health                        # 全スタックヘルスチェック\n"
         ),
     )
     subparsers = parser.add_subparsers(dest="command", help="サブコマンド")
@@ -407,6 +512,10 @@ def main() -> None:
     # --- stats ---
     p_stats = subparsers.add_parser("stats", help="知識基盤の統計ダッシュボード")
     p_stats.set_defaults(func=cmd_stats)
+
+    # --- health ---
+    p_health = subparsers.add_parser("health", help="Autophōnos 全スタックのヘルスチェック")
+    p_health.set_defaults(func=cmd_health)
 
     # --- push ---
     p_push = subparsers.add_parser("push", help="能動的プッシュを実行")

@@ -100,14 +100,17 @@ class AntigravityClient:
         self.ls = self._detect_ls()
 
     @property
+    # PURPOSE: プロセスID
     def pid(self) -> int:
         return self.ls.pid
 
     @property
+    # PURPOSE: ポート番号
     def port(self) -> int:
         return self.ls.port
 
     @property
+    # PURPOSE: CSRFトークン
     def csrf(self) -> str:
         return self.ls.csrf
 

@@ -80,6 +80,7 @@ class EnsembleMember:
     persona: str  # PERSONAS のキー
 
     @property
+    # PURPOSE: Persona付きプロンプト
     def persona_prompt(self) -> str:
         """persona 付きプロンプトを生成。"""
         return PERSONAS.get(self.persona, "") + "\n" + SEMANTIC_AUDIT_PROMPT

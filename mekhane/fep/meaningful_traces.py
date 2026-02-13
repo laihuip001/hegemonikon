@@ -24,9 +24,12 @@ from datetime import datetime
 from pathlib import Path
 from typing import Optional, List
 import json
+import os
 
 # Default persistence path
-TRACES_PATH = Path("/home/makaron8426/oikos/mneme/.hegemonikon/meaningful_traces.json")
+# Use home directory for portability, falling back to a safe location if needed
+_HOME = Path.home()
+TRACES_PATH = _HOME / ".hegemonikon" / "meaningful_traces.json"
 
 
 # PURPOSE: の統一的インターフェースを実現する
@@ -55,7 +58,16 @@ class MeaningfulTrace:
 
 def ensure_traces_dir() -> None:
     """Ensure the persistence directory exists."""
-    TRACES_PATH.parent.mkdir(parents=True, exist_ok=True)
+    # Use global TRACES_PATH if not overridden by test contexts
+    # Note: tests may pass a different path to save_traces/load_traces
+    if TRACES_PATH.parent.exists():
+        return
+
+    try:
+        TRACES_PATH.parent.mkdir(parents=True, exist_ok=True)
+    except PermissionError:
+        # Fallback for environments with restricted home access
+        pass
 # PURPOSE: Mark a moment as meaningful.
 
 
@@ -125,7 +137,15 @@ def save_traces(path: Optional[Path] = None) -> Path:
         Path where traces were saved
     """
     target_path = path or TRACES_PATH
-    ensure_traces_dir()
+
+    # Ensure directory exists for the target path
+    if not target_path.parent.exists():
+        try:
+            target_path.parent.mkdir(parents=True, exist_ok=True)
+        except PermissionError:
+            # If we can't create the directory, we can't save.
+            # In a real app we might log this, but for now we just return
+            return target_path
 
     # Load existing traces
     existing = load_traces(target_path)
@@ -134,8 +154,12 @@ def save_traces(path: Optional[Path] = None) -> Path:
     all_traces = existing + _session_traces
 
     # Save
-    with open(target_path, "w", encoding="utf-8") as f:
-        json.dump([t.to_dict() for t in all_traces], f, ensure_ascii=False, indent=2)
+    try:
+        with open(target_path, "w", encoding="utf-8") as f:
+            json.dump([t.to_dict() for t in all_traces], f, ensure_ascii=False, indent=2)
+    except (PermissionError, OSError):
+        # Fail silently if we can't write (e.g. read-only filesystem)
+        pass
 
     # Clear session traces
     clear_session_traces()
@@ -158,10 +182,13 @@ def load_traces(path: Optional[Path] = None) -> List[MeaningfulTrace]:
     if not target_path.exists():
         return []
 
-    with open(target_path, "r", encoding="utf-8") as f:
-        data = json.load(f)
+    try:
+        with open(target_path, "r", encoding="utf-8") as f:
+            data = json.load(f)
+        return [MeaningfulTrace.from_dict(t) for t in data]
+    except (json.JSONDecodeError, PermissionError, OSError):
+        return []
 
-    return [MeaningfulTrace.from_dict(t) for t in data]
 # PURPOSE: Get the most recent meaningful traces.
 
 

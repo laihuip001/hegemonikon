@@ -1,3 +1,4 @@
+# PROOF: [L2/Trokhia] <- mekhane/anamnesis/session_indexer.py Incremental Session Log Indexer
 # PURPOSE: セッション履歴を GnosisIndex (LanceDB) にインデックスする
 """
 PROOF: [L2/インフラ] <- mekhane/anamnesis/

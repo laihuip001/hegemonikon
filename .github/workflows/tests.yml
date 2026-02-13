@@ -44,9 +44,10 @@ jobs:
                   # Install torch CPU first to avoid downloading huge CUDA wheels
                   pip install torch --index-url https://download.pytorch.org/whl/cpu
                   # Install other dependencies
+                  # Note: aiohttp, python-dotenv, aioresponses required for mekhane/symploke tests
                   pip install pytest pytest-asyncio pytest-timeout pyyaml pydantic lancedb numpy scipy \
                               networkx pandas tabulate requests httpx schedule \
-                              sentence-transformers
+                              sentence-transformers aiohttp python-dotenv aioresponses
                   # Install project in development mode if setup exists
                   pip install -e ".[test]" 2>/dev/null || true
 

@@ -1,0 +1,2 @@
+.agent/skills/category-engine/SKILL.md
+.agent/skills/agora/SKILL.md

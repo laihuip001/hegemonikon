@@ -1,5 +1,7 @@
 ---
 description: "落とす — /pro_/tak-*/bou+{6w3h}~/p-_/ene-_/pis"
+lcm_state: beta
+version: "1.0.0"
 ---
 
 # /ccl-ground: 具体化マクロ

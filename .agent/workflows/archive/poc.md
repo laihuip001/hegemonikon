@@ -15,6 +15,8 @@ triggers:
 version: "1.0"
 lineage: "O3 Zētēsis 派生 + SE Spike/PoC 手法統合 → v1.0 (2026-01-29)"
 anti_skip: enabled
+lcm_state: beta
+version: "1.0.0"
 ---
 
 # /poc: Timeboxed 探索ワークフロー

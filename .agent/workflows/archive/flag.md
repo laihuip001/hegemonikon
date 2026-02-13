@@ -14,6 +14,8 @@ triggers:
 version: "1.0"
 lineage: "O4 Energeia 派生 + SE Feature Flags 手法統合 → v1.0 (2026-01-29)"
 anti_skip: enabled
+lcm_state: beta
+version: "1.0.0"
 ---
 
 # /flag: Feature Flags ワークフロー

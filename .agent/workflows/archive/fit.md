@@ -8,6 +8,8 @@ layer: "τ"
 parent: "/dia"
 lineage: "Digestion Principle (A2 SKILL.md) + 階層的消化プロトコル + 具体例 + 3層アーキテクチャ → /fit v3.1"
 anti_skip: enabled
+lcm_state: beta
+version: "1.0.0"
 ---
 
 # /fit: 消化品質診断 (Digestion Audit)

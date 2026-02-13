@@ -8,6 +8,8 @@ layer: "τ"
 parent: "/dia"
 lineage: "A2 Krisis → Panorama 6層スキャン + Anti-Skip + Artifact出力 + 3層アーキテクチャ → /pan v3.0"
 anti_skip: enabled
+lcm_state: beta
+version: "1.0.0"
 ---
 
 # /pan: Panorama (メタ認知レーダー)

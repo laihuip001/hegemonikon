@@ -137,7 +137,9 @@ def cmd_health(args: argparse.Namespace) -> None:
             checks.append((name, "❌", str(e)[:60], f"{elapsed:.1f}s"))
 
     # 1. LanceDB (Gnōsis)
+    # PURPOSE: [L2-auto] Gnōsis (LanceDB) の状態を確認する
     def check_gnosis():
+        """Gnōsis (LanceDB) の状態を確認する"""
         from mekhane.anamnesis.index import GnosisIndex as AI
         gi = AI()
         s = gi.stats()
@@ -145,7 +147,9 @@ def cmd_health(args: argparse.Namespace) -> None:
     _check("Gnōsis (LanceDB)", check_gnosis)
 
     # 2. Kairos index
+    # PURPOSE: [L2-auto] Kairos インデックスの状態を確認する
     def check_kairos():
+        """Kairos インデックスの状態を確認する"""
         pkl = Path.home() / "oikos" / "mneme" / ".hegemonikon" / "indices" / "kairos.pkl"
         if not pkl.exists():
             raise FileNotFoundError("kairos.pkl not found")

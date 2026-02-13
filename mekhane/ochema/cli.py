@@ -1,3 +1,4 @@
+# PROOF: [L2/目的] <- mekhane/ochema/cli.py A0→予測誤差最小化→CLIが必要→cliが担う
 # PURPOSE: Ochēma CLI — Antigravity LS とのインタラクション
 """Ochēma CLI — Antigravity Language Server Client.
 

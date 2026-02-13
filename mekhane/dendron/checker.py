@@ -490,7 +490,7 @@ class DendronChecker:  # noqa: AI-007
         )
 
     # PURPOSE: レベル文字列 (L0-L3) を解析して Enum に変換する
-    def _parse_level(self, level_str: str) -> ProofLevel:  # noqa: AI-007
+    def _parse_level(self, level_str: str) -> "ProofLevel":  # noqa: AI-007
         """レベル文字列をパース (v3.0: L0追加)"""
         level_str_upper = level_str.upper()
         

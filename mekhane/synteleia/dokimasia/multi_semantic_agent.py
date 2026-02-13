@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+# PROOF: [L2/インフラ] <- mekhane/synteleia/dokimasia/ Multi-Semantic Agent
 # PURPOSE: Multi-LLM アンサンブル監査エージェント (Layer B: Nous)
 """
 MultiSemanticAgent — Multi-LLM Cognitive Ensemble
@@ -72,6 +74,7 @@ PERSONAS: Dict[str, str] = {
 
 
 @dataclass
+# PURPOSE: アンサンブルの1メンバー
 class EnsembleMember:
     """アンサンブルの1メンバー。"""
     name: str
@@ -100,9 +103,11 @@ class MultiSemanticAgent(AuditAgent):
     name = "MultiSemanticAgent"
     description = "Multi-LLM アンサンブル監査 (Layer B: Nous)"
 
+    # PURPOSE: 初期化
     def __init__(self, members: List[EnsembleMember]):
         self.members = members
 
+    # PURPOSE: デフォルト構成
     @classmethod
     def default(cls) -> "MultiSemanticAgent":
         """デフォルト構成: Gemini Pro + Claude Opus + GPT-OSS。"""
@@ -144,6 +149,7 @@ class MultiSemanticAgent(AuditAgent):
 
         return cls(members=members)
 
+    # PURPOSE: テスト用スタブ構成
     @classmethod
     def with_stubs(cls, responses: Optional[Dict[str, str]] = None) -> "MultiSemanticAgent":
         """テスト用: StubBackend でアンサンブルを構成。"""
@@ -321,6 +327,7 @@ class MultiSemanticAgent(AuditAgent):
 # Utilities
 # =============================================================================
 
+# PURPOSE: Severity の厳しさ順序
 def _severity_rank(severity: AuditSeverity) -> int:
     """Severity の厳しさ順序。"""
     return {

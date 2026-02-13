@@ -70,6 +70,8 @@ class FileProof:
     parent: Optional[str] = None
     reason: Optional[str] = None
     line_number: Optional[int] = None
+    has_reason: bool = False            # v3.5: REASON: フィールドの有無
+    reason_text: Optional[str] = None   # v3.5: REASON: テキスト (過去の経緯)
 
 
 # PURPOSE: 関数単位のチェック結果を統一的に扱い、品質評価を可能にする
@@ -86,6 +88,8 @@ class FunctionProof:
     is_private: bool = False
     is_dunder: bool = False
     quality_issue: Optional[str] = None  # v2.6: WEAK の理由
+    has_reason: bool = False             # v3.5: REASON: フィールドの有無
+    reason_text: Optional[str] = None    # v3.5: REASON: テキスト (過去の経緯)
 
 
 # PURPOSE: 変数・字句レベル (L3) のチェック結果を統一的に扱い、精密性の表層検証を行う
@@ -206,6 +210,18 @@ class CheckResult:
     verification_weak: int = 0
     verification_proofs: List[VerificationProof] = field(default_factory=list)
 
+    # v3.5 R-axis Reason 統計
+    dirs_with_reason: int = 0
+    dirs_total_checkable: int = 0
+    files_with_reason: int = 0
+    files_total_checkable: int = 0
+    functions_with_reason: int = 0
+    functions_total_checkable: int = 0
+
+    # v3.5 R-axis NF3/BCNF セマンティック品質
+    reason_nf3_issues: int = 0   # 親子 REASON 重複 (推移的従属)
+    reason_bcnf_issues: int = 0  # REASON ≈ PURPOSE (トートロジー)
+
     # PURPOSE: チェック対象ファイル全体に対する証明カバレッジ率を計算する
     @property
     def coverage(self) -> float:
@@ -233,12 +249,25 @@ EXEMPT_PATTERNS = [
     r"\.pyc$",
     r"\.git",
     r"\.egg-info",
-    r"\.venv",          # 仮想環境を除外
-    r"tests/",          # テストコードは Purpose 対象外
-    r"test_",           # テストファイル
-    r"\.codex/",        # Codex 自動生成スクリプト
-    r"\.agent/scripts/", # エージェント補助スクリプト
-    r"experiments/",    # 実験コード (PROOF 不要)
+    r"\.venv",              # 仮想環境を除外
+    r"tests/",              # テストコードは Purpose 対象外
+    r"test_",               # テストファイル
+    r"\.codex/",            # Codex 自動生成スクリプト
+    r"\.agent/scripts/",    # エージェント補助スクリプト
+    r"experiments/",        # 実験コード (PROOF 不要)
+    # v3.4: データ/キャッシュ/モデルディレクトリの除外
+    r"\.pytest_cache",      # pytest キャッシュ
+    r"\.mypy_cache",        # mypy キャッシュ
+    r"\.lance",             # LanceDB ベクトルストア
+    r"\.ruff_cache",        # ruff キャッシュ
+    r"node_modules",        # Node.js
+    r"__snapshots__",       # テストスナップショット
+    r"/models/bge-",        # Embedding モデルバイナリ
+    r"/models/reranker-",   # Reranker モデルバイナリ
+    r"\.ipynb_checkpoints", # Jupyter チェックポイント
+    r"dist/",               # ビルド成果物
+    r"build/",              # ビルド成果物
+    r"docs/",               # ドキュメント (PROOF 不要)
 ]
 
 # PROOF ヘッダーパターン (v2: 親参照付き、任意の後続テキスト許容)

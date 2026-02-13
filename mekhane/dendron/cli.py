@@ -81,6 +81,16 @@ def main() -> int:
         "--since", default="HEAD~1", help="比較起点 (default: HEAD~1)"
     )
 
+    # guard コマンド (v3.6: アンチウイルス — 変更ファイルのみチェック)
+    guard_parser = subparsers.add_parser("guard", help="変更ファイルのみ PROOF/PURPOSE/REASON をチェック")
+    guard_parser.add_argument(
+        "path", nargs="?", default=".", help="プロジェクトルート (default: .)"
+    )
+    guard_parser.add_argument(
+        "--since", default=None,
+        help="比較起点 (default: ステージ済み + 未コミット変更)"
+    )
+
     args = parser.parse_args()
 
     if args.command == "check":
@@ -93,6 +103,8 @@ def main() -> int:
         return cmd_skill_audit(args)
     elif args.command == "diff":
         return cmd_diff(args)
+    elif args.command == "guard":
+        return cmd_guard(args)
 
     return 0
 
@@ -306,6 +318,92 @@ def cmd_diff(args: argparse.Namespace) -> int:
     result = diff_check(root, since=args.since)
     print(format_diff_result(result))
     return 0
+
+
+# PURPOSE: 変更ファイルのみ PROOF/PURPOSE/REASON をチェックする (v3.6 アンチウイルス)
+def cmd_guard(args: argparse.Namespace) -> int:
+    """guard コマンドの実行 — 変更ファイルのみ高速チェック"""
+    import subprocess as _sp
+
+    root = Path(args.path).resolve()
+    if not root.exists():
+        print(f"Error: {root} が存在しません", file=sys.stderr)
+        return 1
+
+    # 1. 変更ファイルを取得
+    since = args.since
+    if since:
+        # 明示的な比較起点
+        cmd = ["git", "diff", "--name-only", since, "--"]
+    else:
+        # デフォルト: ステージ済み + 未コミット (working tree)
+        cmd = ["git", "diff", "--name-only", "HEAD", "--"]
+
+    try:
+        result = _sp.run(cmd, cwd=str(root), capture_output=True, text=True, timeout=10)
+        changed = [l.strip() for l in result.stdout.splitlines() if l.strip()]
+    except (FileNotFoundError, _sp.TimeoutExpired):
+        print("⚠️ git が利用できません", file=sys.stderr)
+        return 1
+
+    if not changed:
+        print("✅ 変更ファイルなし — guard pass")
+        return 0
+
+    # 2. .py と PROOF.md をフィルタ
+    py_files = [Path(f) for f in changed if f.endswith(".py")]
+    proof_files = [Path(f) for f in changed if f.endswith("PROOF.md")]
+
+    if not py_files and not proof_files:
+        print(f"✅ PROOF 関連の変更なし ({len(changed)} files changed) — guard pass")
+        return 0
+
+    # 3. 変更ファイルのみチェック
+    checker = DendronChecker(check_dirs=True, check_files=True, check_functions=True)
+    issues = []
+    checked = 0
+
+    for py in py_files:
+        full = root / py
+        if not full.exists():
+            continue
+        # ファイルの PURPOSE/REASON チェック
+        file_proofs = checker.check_file_proof(full)
+        if file_proofs and file_proofs.status == ProofStatus.MISSING:
+            issues.append(f"  ❌ {py} — PROOF コメントなし")
+        # 関数チェック
+        func_proofs = checker.check_functions_in_file(full)
+        for fp in func_proofs:
+            if fp.status == ProofStatus.MISSING and not fp.is_private:
+                issues.append(f"  ❌ {py}:{fp.line_number} {fp.name} — PURPOSE なし")
+            elif fp.status == ProofStatus.WEAK:
+                issues.append(f"  ⚠️ {py}:{fp.line_number} {fp.name} — {fp.quality_issue}")
+        checked += 1
+
+    for pf in proof_files:
+        full = root / pf
+        if not full.exists():
+            continue
+        dir_path = full.parent
+        dir_proof = checker.check_dir_proof(dir_path)
+        if dir_proof.status == ProofStatus.MISSING:
+            issues.append(f"  ❌ {pf} — PURPOSE 未定義")
+        elif dir_proof.status == ProofStatus.WEAK:
+            issues.append(f"  ⚠️ {pf} — {dir_proof.reason}")
+        checked += 1
+
+    # 4. レポート出力
+    print(f"🔍 Dendron Guard — {checked} files checked ({len(py_files)} .py, {len(proof_files)} PROOF.md)")
+
+    if issues:
+        print()
+        for iss in issues:
+            print(iss)
+        print(f"\n❌ {len(issues)} issues found")
+        return 1
+    else:
+        print("✅ Guard pass — all changed files OK")
+        return 0
 
 
 if __name__ == "__main__":

@@ -149,8 +149,17 @@ class DendronChecker:  # noqa: AI-007
                 reason="バイナリファイル検出 (NULL バイト含む)"
             )
 
-        # 最初の 10 行を検索
+        # v3.5: REASON: 検出 (R10) — 先頭 10 行をスキャン
         lines = content.split("\n")[:10]
+        file_reason_text: Optional[str] = None
+        for line in lines:
+            if self._is_code_comment(line):
+                rm = REASON_PATTERN.search(line)
+                if rm:
+                    file_reason_text = rm.group(1).strip()
+                    break
+
+        # 最初の 10 行を検索
         for i, line in enumerate(lines, 1):
             # v2.2: コードコメント行のみをチェック (docstring内を除外)
             if not self._is_code_comment(line):
@@ -169,7 +178,9 @@ class DendronChecker:  # noqa: AI-007
                     return FileProof(
                         path=path, status=ProofStatus.INVALID,
                         level=level, line_number=i,
-                        reason=f"{level_reason} (入力: {level_str})"
+                        reason=f"{level_reason} (入力: {level_str})",
+                        has_reason=file_reason_text is not None,
+                        reason_text=file_reason_text,
                     )
                 
                 if parent:
@@ -181,22 +192,32 @@ class DendronChecker:  # noqa: AI-007
                         return FileProof(
                             path=path, status=ProofStatus.INVALID, 
                             level=level, parent=parent, line_number=i,
-                            reason=reason
+                            reason=reason,
+                            has_reason=file_reason_text is not None,
+                            reason_text=file_reason_text,
                         )
                     
                     return FileProof(
                         path=path, status=ProofStatus.OK, 
-                        level=level, parent=parent, line_number=i
+                        level=level, parent=parent, line_number=i,
+                        has_reason=file_reason_text is not None,
+                        reason_text=file_reason_text,
                     )
                 else:
                     # 親参照なし → ORPHAN (v2 警告)
                     return FileProof(
                         path=path, status=ProofStatus.ORPHAN, 
                         level=level, line_number=i,
-                        reason="親参照なし (v2: <- parent 必須)"
+                        reason="親参照なし (v2: <- parent 必須)",
+                        has_reason=file_reason_text is not None,
+                        reason_text=file_reason_text,
                     )
 
-        return FileProof(path=path, status=ProofStatus.MISSING, reason="PROOF ヘッダーなし")
+        return FileProof(
+            path=path, status=ProofStatus.MISSING, reason="PROOF ヘッダーなし",
+            has_reason=file_reason_text is not None,
+            reason_text=file_reason_text,
+        )
     
     # PURPOSE: ファイル内の関数・クラス定義から Purpose コメントを抽出・検証する
     def check_functions_in_file(self, path: Path) -> List[FunctionProof]:
@@ -238,6 +259,7 @@ class DendronChecker:  # noqa: AI-007
                 
                 # 直前行から遡って検索 (0-indexed に変換)
                 found_purpose = None
+                found_reason = None  # v3.5: R20 REASON 検出
                 scan_idx = start_scan_line - 2  # 1行上 (0-indexed)
                 
                 while scan_idx >= 0 and scan_idx >= start_scan_line - 10:
@@ -248,36 +270,63 @@ class DendronChecker:  # noqa: AI-007
                     
                     if line.startswith("#"):
                         match = PURPOSE_PATTERN.search(line)
-                        if match:
+                        if match and not found_purpose:
                             found_purpose = match.group(1).strip()
-                            break
+                        # v3.5: REASON パターンも検出
+                        rm = REASON_PATTERN.search(line)
+                        if rm and not found_reason:
+                            found_reason = rm.group(1).strip()
                         scan_idx -= 1
                     else:
                         break
                 
                 if found_purpose:
                     quality_issue = self._validate_purpose_quality(found_purpose)
+                    # v3.5 R23: BCNF — REASON ≈ PURPOSE トートロジー検出
+                    if not quality_issue and found_reason:
+                        sim = self._text_similarity(found_reason, found_purpose)
+                        if sim >= 0.6:
+                            quality_issue = f"REASON ≈ PURPOSE トートロジー (類似度 {sim:.0%})"
                     if quality_issue:
                         results.append(FunctionProof(
                             name=name, path=path, line_number=line_no,
                             status=ProofStatus.WEAK, purpose_text=found_purpose,
                             is_private=is_private, is_dunder=is_dunder,
-                            quality_issue=quality_issue
+                            quality_issue=quality_issue,
+                            has_reason=found_reason is not None,
+                            reason_text=found_reason,
                         ))
                     else:
                         results.append(FunctionProof(
                             name=name, path=path, line_number=line_no,
                             status=ProofStatus.OK, purpose_text=found_purpose,
-                            is_private=is_private, is_dunder=is_dunder
+                            is_private=is_private, is_dunder=is_dunder,
+                            has_reason=found_reason is not None,
+                            reason_text=found_reason,
                         ))
                 else:
-                    status = ProofStatus.EXEMPT if is_private else ProofStatus.MISSING
-                    reason = "Private method" if is_private else "No # PURPOSE comment found"
-                    results.append(FunctionProof(
-                        name=name, path=path, line_number=line_no,
-                        status=status, purpose_text=None, reason=reason,
-                        is_private=is_private, is_dunder=is_dunder
-                    ))
+                    # v3.5 R21: REASON→PURPOSE NF2 従属チェック
+                    if found_reason and not is_private:
+                        # REASON はあるが PURPOSE がない → NF2 従属違反
+                        results.append(FunctionProof(
+                            name=name, path=path, line_number=line_no,
+                            status=ProofStatus.WEAK, purpose_text=None,
+                            reason="REASON ありだが PURPOSE なし (NF2 従属違反)",
+                            is_private=is_private, is_dunder=is_dunder,
+                            quality_issue="REASON→PURPOSE 従属違反",
+                            has_reason=True,
+                            reason_text=found_reason,
+                        ))
+                    else:
+                        status = ProofStatus.EXEMPT if is_private else ProofStatus.MISSING
+                        reason = "Private method" if is_private else "No # PURPOSE comment found"
+                        results.append(FunctionProof(
+                            name=name, path=path, line_number=line_no,
+                            status=status, purpose_text=None, reason=reason,
+                            is_private=is_private, is_dunder=is_dunder,
+                            has_reason=found_reason is not None,
+                            reason_text=found_reason,
+                        ))
                     
         return results
 
@@ -416,11 +465,24 @@ class DendronChecker:  # noqa: AI-007
                 if rm and not reason_text:
                     reason_text = rm.group(1).strip()
             
+            # v3.5 R01: REASON→PURPOSE 従属チェック (NF2)
+            reason_dep_issue = None
+            if reason_text and not purpose_text:
+                reason_dep_issue = "REASON ありだが PURPOSE なし (NF2 従属違反)"
+
+            # v3.5 R03: BCNF — REASON ≈ PURPOSE トートロジー検出
+            if not reason_dep_issue and reason_text and purpose_text:
+                sim = self._text_similarity(reason_text, purpose_text)
+                if sim >= 0.6:
+                    reason_dep_issue = f"REASON ≈ PURPOSE トートロジー (類似度 {sim:.0%})"
+
             return DirProof(
-                path=path, status=ProofStatus.OK, has_proof_md=True,
+                path=path, status=ProofStatus.OK if not reason_dep_issue else ProofStatus.WEAK,
+                has_proof_md=True,
                 has_reason=reason_text is not None,
                 purpose_text=purpose_text,
                 reason_text=reason_text,
+                reason=reason_dep_issue,
             )
 
         return DirProof(
@@ -453,6 +515,36 @@ class DendronChecker:  # noqa: AI-007
         stripped = line.strip()
         return stripped.startswith("#")
     
+    # PURPOSE: 2つのテキスト間の単語レベル Jaccard 類似度を計算する
+    @staticmethod
+    def _text_similarity(a: str, b: str) -> float:
+        """Jaccard 類似度 (単語レベル + CJK 文字 bigram フォールバック)
+        
+        v3.5 Wave 3: NF3 (親子重複) と BCNF (トートロジー) の検出に使用。
+        閾値 0.6 で「類似度が高い」と判定する。
+        日本語テキストは空白で分割されないため、文字 bigram を使用。
+        """
+        if not a or not b:
+            return 0.0
+        # Normalize
+        a_lower, b_lower = a.lower(), b.lower()
+        words_a = set(a_lower.split())
+        words_b = set(b_lower.split())
+        # CJK fallback: if either side has only 1 "word", use character bigrams
+        if len(words_a) <= 1 or len(words_b) <= 1:
+            bigrams_a = {a_lower[i:i+2] for i in range(len(a_lower) - 1)}
+            bigrams_b = {b_lower[i:i+2] for i in range(len(b_lower) - 1)}
+            if not bigrams_a or not bigrams_b:
+                return 1.0 if a_lower == b_lower else 0.0
+            intersection = bigrams_a & bigrams_b
+            union = bigrams_a | bigrams_b
+            return len(intersection) / len(union) if union else 0.0
+        if not words_a or not words_b:
+            return 0.0
+        intersection = words_a & words_b
+        union = words_a | words_b
+        return len(intersection) / len(union) if union else 0.0
+
     # PURPOSE: 解析されたレベルが有効範囲内であることを検証する
     def _validate_level(self, level: ProofLevel) -> tuple[bool, str]:
         """レベルを検証 (v3.0: L0追加)"""
@@ -1138,6 +1230,51 @@ class DendronChecker:  # noqa: AI-007
             if fp.status in (ProofStatus.OK, ProofStatus.ORPHAN) and fp.level:
                 level_counter[fp.level.value] += 1
 
+        # v3.5: R-axis Reason 集計
+        checkable_dirs = [d for d in dir_proofs if d.status not in (ProofStatus.EXEMPT,)]
+        checkable_files = [f for f in file_proofs if f.status not in (ProofStatus.EXEMPT,)]
+        checkable_funcs = [f for f in function_proofs if f.status not in (ProofStatus.EXEMPT,) and not f.is_dunder]
+
+        # v3.5 NF3: 親子 REASON 重複検出
+        dir_reason_map = {str(d.path): d.reason_text for d in dir_proofs if d.reason_text}
+        file_reason_map = {str(f.path): f.reason_text for f in file_proofs if f.reason_text and f.path}
+        nf3_count = 0
+
+        # R02: Dir REASON ≠ Parent Dir REASON
+        for dp in dir_proofs:
+            if dp.reason_text and dp.path:
+                parent_dir = str(dp.path.parent)
+                parent_reason = dir_reason_map.get(parent_dir)
+                if parent_reason and parent_dir != str(dp.path):
+                    sim = self._text_similarity(dp.reason_text, parent_reason)
+                    if sim >= 0.6:
+                        nf3_count += 1
+
+        # R12: File REASON ≠ Parent Dir REASON
+        for fp in file_proofs:
+            if fp.reason_text and fp.path:
+                parent_dir = str(fp.path.parent)
+                parent_reason = dir_reason_map.get(parent_dir)
+                if parent_reason:
+                    sim = self._text_similarity(fp.reason_text, parent_reason)
+                    if sim >= 0.6:
+                        nf3_count += 1
+
+        # R22: Function REASON ≠ File REASON
+        for fn in function_proofs:
+            if fn.reason_text and fn.path:
+                file_reason = file_reason_map.get(str(fn.path))
+                if file_reason:
+                    sim = self._text_similarity(fn.reason_text, file_reason)
+                    if sim >= 0.6:
+                        nf3_count += 1
+
+        # v3.5 BCNF: トートロジー集計
+        bcnf_count = (
+            sum(1 for d in dir_proofs if d.reason and "トートロジー" in str(d.reason))
+            + sum(1 for f in function_proofs if f.quality_issue and "トートロジー" in str(f.quality_issue))
+        )
+
         return CheckResult(
             total_files=total_files,
             files_with_proof=ok,
@@ -1170,6 +1307,16 @@ class DendronChecker:  # noqa: AI-007
             verification_ok=sum(1 for v in verification_proofs if v.status == ProofStatus.OK),
             verification_weak=sum(1 for v in verification_proofs if v.status == ProofStatus.WEAK),
             verification_proofs=verification_proofs,
+            # v3.5: R-axis
+            dirs_with_reason=sum(1 for d in checkable_dirs if d.has_reason),
+            dirs_total_checkable=len(checkable_dirs),
+            files_with_reason=sum(1 for f in checkable_files if f.has_reason),
+            files_total_checkable=len(checkable_files),
+            functions_with_reason=sum(1 for f in checkable_funcs if f.has_reason),
+            functions_total_checkable=len(checkable_funcs),
+            # v3.5: R-axis NF3/BCNF セマンティック品質
+            reason_bcnf_issues=bcnf_count,
+            reason_nf3_issues=nf3_count,
         )
 
 

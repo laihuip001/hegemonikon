@@ -123,6 +123,22 @@ class DendronReporter:  # noqa: AI-007
             self._print(f"  EPT Score:         {ok_ept}/{total_ept} ({pct:.0f}%)")
             self._print()
 
+        # R-axis Reason Coverage (v3.5)
+        r_total = result.dirs_total_checkable + result.files_total_checkable + result.functions_total_checkable
+        if r_total > 0:
+            r_with = result.dirs_with_reason + result.files_with_reason + result.functions_with_reason
+            r_pct = (r_with / r_total * 100) if r_total else 0
+            self._print("-" * 40)
+            self._print("R-axis Reason:")
+            self._print(f"  Dirs:      {result.dirs_with_reason}/{result.dirs_total_checkable}")
+            self._print(f"  Files:     {result.files_with_reason}/{result.files_total_checkable}")
+            self._print(f"  Functions: {result.functions_with_reason}/{result.functions_total_checkable}")
+            self._print(f"  Coverage:  {r_pct:.1f}%")
+            if result.reason_nf3_issues or result.reason_bcnf_issues:
+                self._print(f"  NF3 issues (親子重複):     {result.reason_nf3_issues}")
+                self._print(f"  BCNF issues (トートロジー): {result.reason_bcnf_issues}")
+            self._print()
+
         if result.is_passing:
             self._print("✅ PASS")
         else:
@@ -230,6 +246,12 @@ class DendronReporter:  # noqa: AI-007
             nf3_str = f"NF3:{result.function_nf_ok}/{result.total_function_nf_checks}"
             bcnf_str = f"BCNF:{result.verification_ok}/{result.total_verification_checks}"
             self._print(f"   EPT: {ok_ept}/{total_ept} ({pct:.0f}%) [{nf2_str} {nf3_str} {bcnf_str}]")
+        # R-axis Reason summary (v3.5)
+        r_total = result.dirs_total_checkable + result.files_total_checkable + result.functions_total_checkable
+        if r_total > 0:
+            r_with = result.dirs_with_reason + result.files_with_reason + result.functions_with_reason
+            r_pct = (r_with / r_total * 100) if r_total else 0
+            self._print(f"   Reason: {r_with}/{r_total} ({r_pct:.0f}%) [Dir:{result.dirs_with_reason}/{result.dirs_total_checkable} File:{result.files_with_reason}/{result.files_total_checkable} Func:{result.functions_with_reason}/{result.functions_total_checkable}]")
 
     # PURPOSE: JSON 形式
     def _report_json(self, result: CheckResult):
@@ -268,6 +290,12 @@ class DendronReporter:  # noqa: AI-007
                 "bcnf": {"ok": result.verification_ok, "total": result.total_verification_checks},
                 "score": result.structure_ok + result.function_nf_ok + result.verification_ok,
                 "total": result.total_structure_checks + result.total_function_nf_checks + result.total_verification_checks,
+            },
+            # v3.5: R-axis Reason
+            "reason": {
+                "dirs": {"with_reason": result.dirs_with_reason, "total": result.dirs_total_checkable},
+                "files": {"with_reason": result.files_with_reason, "total": result.files_total_checkable},
+                "functions": {"with_reason": result.functions_with_reason, "total": result.functions_total_checkable},
             },
         }
 

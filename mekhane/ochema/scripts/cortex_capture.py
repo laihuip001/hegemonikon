@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/ochema/scripts/ A0→外部LLM接続→MITMキャプチャ
 """
 Cortex API MITM Capture Script for mitmproxy.
 

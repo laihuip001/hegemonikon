@@ -4,6 +4,11 @@ description: HGK 収益化プロジェクト — ディープインパクト戦�
 triggers:
   - "agora"
   - "agora"
+
+risk_tier: L2
+risks:
+  - 収益化戦略の不適切な実行によるリソース浪費
+  - 市場分析の誤りによる戦略的失敗
 ---
 
 # Agora

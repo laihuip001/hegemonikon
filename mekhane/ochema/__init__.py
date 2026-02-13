@@ -1,6 +1,7 @@
-# PURPOSE: Ochēma パッケージ — Antigravity LS クライアント
-"""Ochēma (ὄχημα) — Antigravity Language Server Client Package."""
+# PROOF: [L2/Infrastructure] <- mekhane/ochema/ Ochema Package
+# PURPOSE: Ochema (Vehicle) package for Transport/Protocol layer
+"""
+Ochema — Vehicle/Transport Layer
 
-from mekhane.ochema.antigravity_client import AntigravityClient, LLMResponse
-
-__all__ = ["AntigravityClient", "LLMResponse"]
+Handles protocol definitions (Proto), CLI interfaces, and transport mechanisms.
+"""

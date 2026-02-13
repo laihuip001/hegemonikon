@@ -1,7 +1,6 @@
 # PURPOSE: セッション履歴を GnosisIndex (LanceDB) にインデックスする
+# PROOF: [L2-auto] <- mekhane/anamnesis/session_indexer.py
 """
-PROOF: [L2/インフラ] <- mekhane/anamnesis/
-
 P3 → 記憶の永続化が必要
    → セッション履歴のセマンティック検索が必要
    → session_indexer.py が担う

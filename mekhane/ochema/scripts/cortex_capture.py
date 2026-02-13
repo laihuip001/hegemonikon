@@ -1,3 +1,4 @@
+# PROOF: [S2/Mekhanē] <- mekhane/ochema/scripts/cortex_capture.py Cortex API MITM Capture
 """
 Cortex API MITM Capture Script for mitmproxy.
 

@@ -15,10 +15,10 @@ repos:
         pass_filenames: false
         always_run: true
 
-  # Python formatting (optional - uncomment if ruff is installed)
-  # - repo: https://github.com/astral-sh/ruff-pre-commit
-  #   rev: v0.1.6
-  #   hooks:
-  #     - id: ruff
-  #       args: [--fix]
-  #     - id: ruff-format
+  # Python formatting (ruff)
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.1.6
+    hooks:
+      - id: ruff
+        args: [--fix]
+      - id: ruff-format

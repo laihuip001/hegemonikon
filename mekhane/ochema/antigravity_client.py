@@ -1,4 +1,5 @@
 # PROOF: [L2/Ochema] Antigravity Client
+# PROOF: [L2/Ochema] Antigravity Client
 # PURPOSE: Ochēma — Antigravity Language Server クライアント
 # REASON: Ultra プランの LLM + セッション管理 + Quota 監視を HGK から利用する橋渡し
 """Ochēma (ὄχημα, 乗り物) — Antigravity Language Server Client.

@@ -1,4 +1,5 @@
 # PROOF: [L2/Synteleia] Ochema Backend Test
+# PROOF: [L2/Synteleia] Ochema Backend Test
 # PURPOSE: Ochēma (AntigravityClient) 経由の LLM バックエンド
 """
 OchemaBackend — Antigravity Language Server Bridge for Synteleia

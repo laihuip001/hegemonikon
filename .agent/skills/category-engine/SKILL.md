@@ -336,3 +336,6 @@ cd ~/oikos/hegemonikon && PYTHONPATH=. .venv/bin/python mekhane/anamnesis/cli.py
 *Category Theory Engine v3.2 — CCL多層定義 + two_cell/drift_calculator 統合 (2026-02-11)*
 *v1.0 (291行) → v2.0 (F/G統一+Q1/Q3具体化+Kan拡張) → v3.0 (Kalon認定) → v3.1 (Q6 Kalon判定統合) → v3.2 (CCL修飾子のL1/L2/L3統一)*
 *対称: FEP Skill v2.1 と同じ6層構造*
+
+risk_tier: L1
+risks: 中程度の解釈的誤り

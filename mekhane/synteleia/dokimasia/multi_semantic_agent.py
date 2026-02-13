@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+# PROOF: [L2/推論] <- mekhane/synteleia/dokimasia/ A0→品質監査が必要→multi_semantic_agent が担う
 # PURPOSE: Multi-LLM アンサンブル監査エージェント (Layer B: Nous)
 """
 MultiSemanticAgent — Multi-LLM Cognitive Ensemble

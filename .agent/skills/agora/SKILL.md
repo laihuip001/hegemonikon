@@ -4,6 +4,14 @@ description: HGK 収益化プロジェクト — ディープインパクト戦�
 triggers:
   - "agora"
   - "agora"
+
+# Safety Contract (v1.0)
+risk_tier: L1
+reversible: false
+requires_approval: true
+risks:
+  - "戦略決定による不可逆な影響"
+fallbacks: []
 ---
 
 # Agora

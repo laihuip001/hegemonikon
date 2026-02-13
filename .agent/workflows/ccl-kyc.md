@@ -1,4 +1,6 @@
 ---
+lcm_state: beta
+version: "1.0"
 description: "回す — /pro_C:{/sop_/noe_/ene_/dia-}_/pis_/dox-"
 ---
 

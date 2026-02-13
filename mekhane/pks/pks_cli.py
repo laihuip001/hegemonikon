@@ -43,6 +43,73 @@ def _print_advocacy(nuggets, engine) -> None:
         print("\n📭 Advocacy メッセージの生成に失敗しました。")
 
 
+# PURPOSE: `pks stats` — 知識基盤の全体統計を表示
+def cmd_stats(args: argparse.Namespace) -> None:
+    """知識基盤 (Mnēmē + Gnōsis + PKS) の統計ダッシュボード"""
+    import os
+    for key in ['HTTP_PROXY', 'HTTPS_PROXY', 'http_proxy', 'https_proxy']:
+        os.environ.pop(key, None)
+    os.environ.setdefault('HF_HUB_OFFLINE', '1')
+    os.environ.setdefault('TRANSFORMERS_OFFLINE', '1')
+
+    print("## 📊 PKS Knowledge Stats\n")
+
+    # --- Gnōsis (LanceDB) ---
+    gnosis_count = 0
+    try:
+        from mekhane.anamnesis.index import GnosisIndex as AnamnesisGnosisIndex
+        gi = AnamnesisGnosisIndex()
+        stats = gi.stats()
+        gnosis_count = stats.get('total', stats.get('total_papers', 0))
+    except Exception:
+        pass
+
+    # --- Mnēmē indices ---
+    indices_dir = Path.home() / "oikos" / "mneme" / ".hegemonikon" / "indices"
+    kairos_count = 0
+    sophia_count = 0
+    if indices_dir.exists():
+        for name, var_ref in [("kairos", "kairos_count"), ("sophia", "sophia_count")]:
+            pkl = indices_dir / f"{name}.pkl"
+            if pkl.exists():
+                try:
+                    from mekhane.symploke.adapters.embedding_adapter import EmbeddingAdapter
+                    adapter = EmbeddingAdapter()
+                    adapter.load(str(pkl))
+                    if name == "kairos":
+                        kairos_count = adapter.count()
+                    else:
+                        sophia_count = adapter.count()
+                except Exception:
+                    pass
+
+    # --- Handoffs ---
+    handoff_dir = Path.home() / "oikos" / "mneme" / ".hegemonikon" / "sessions"
+    handoff_count = len(list(handoff_dir.glob("handoff_20??-??-??_????.md"))) if handoff_dir.exists() else 0
+
+    # --- KI (Knowledge Items) ---
+    ki_dir = Path.home() / ".gemini" / "antigravity" / "knowledge"
+    ki_count = len(list(ki_dir.glob("*.md"))) if ki_dir.exists() else 0
+
+    # --- Cooldown ---
+    cooldown = os.environ.get("PKS_COOLDOWN_HOURS", "24.0")
+
+    # --- Output ---
+    total = gnosis_count + kairos_count + sophia_count
+    print("| ソース | 件数 | 備考 |")
+    print("|:-------|-----:|:-----|")
+    print(f"| 🔬 Gnōsis (LanceDB) | **{gnosis_count:,}** | 論文・外部知識 |")
+    print(f"| 📋 Kairos (.pkl) | **{kairos_count:,}** | Handoff + 会話ログ |")
+    print(f"| 📖 Sophia (.pkl) | **{sophia_count:,}** | Knowledge Items |")
+    print(f"| 🕐 Chronos (seed) | **2** | チャット履歴 (seed) |")
+    print(f"| **合計** | **{total + 2:,}** | |")
+    print()
+    print(f"📁 Handoff ファイル: **{handoff_count}** 件")
+    print(f"📁 KI ファイル: **{ki_count}** 件")
+    print(f"⏱️ クールダウン: **{cooldown}** 時間 (`PKS_COOLDOWN_HOURS`)")
+    print()
+
+
 # PURPOSE: `pks push` — コンテキストに基づく能動的プッシュ
 def cmd_push(args: argparse.Namespace) -> None:
     """コンテキストに基づく能動的プッシュ"""
@@ -332,9 +399,14 @@ def main() -> None:
             "  pks auto                         # 全自動プッシュ\n"
             "  pks feedback -t 'paper' -r used   # 反応記録\n"
             "  pks feedback --stats              # 統計表示\n"
+            "  pks stats                         # 知識基盤統計\n"
         ),
     )
     subparsers = parser.add_subparsers(dest="command", help="サブコマンド")
+
+    # --- stats ---
+    p_stats = subparsers.add_parser("stats", help="知識基盤の統計ダッシュボード")
+    p_stats.set_defaults(func=cmd_stats)
 
     # --- push ---
     p_push = subparsers.add_parser("push", help="能動的プッシュを実行")

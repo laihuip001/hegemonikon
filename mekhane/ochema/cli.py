@@ -1,3 +1,4 @@
+# PROOF: [S4/Praxis] Ochēma CLI
 # PURPOSE: Ochēma CLI — Antigravity LS とのインタラクション
 """Ochēma CLI — Antigravity Language Server Client.
 

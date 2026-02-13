@@ -1,3 +1,4 @@
+# PROOF: [S4/Praxis] Cortex Capture
 """
 Cortex API MITM Capture Script for mitmproxy.
 

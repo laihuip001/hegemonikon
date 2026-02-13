@@ -150,6 +150,20 @@ async def list_tools():
             description="incoming/ の未消化ファイルを確認。消化待ちの論文候補一覧を返す。",
             inputSchema={"type": "object", "properties": {}},
         ),
+        Tool(
+            name="mark_processed",
+            description="消化完了したファイルを incoming/ → processed/ に移動。",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "filenames": {
+                        "type": "array",
+                        "items": {"type": "string"},
+                        "description": "移動するファイル名のリスト。省略時は全 eat_*.md を移動",
+                    },
+                },
+            },
+        ),
     ]
 # PURPOSE: tool calls の安全な処理を保証する
 
@@ -168,6 +182,8 @@ async def call_tool(name: str, arguments: dict):
             return await handle_get_topics(arguments)
         elif name == "check_incoming":
             return await handle_check_incoming(arguments)
+        elif name == "mark_processed":
+            return await handle_mark_processed(arguments)
         else:
             return [TextContent(type="text", text=f"Unknown tool: {name}")]
     except Exception as e:
@@ -300,6 +316,28 @@ async def handle_check_incoming(arguments: dict):
             output += f"   File: {f.name}\n\n"
         except Exception as e:
             output += f"{i}. {f.name} (読取エラー: {e})\n\n"
+
+    return [TextContent(type="text", text=output)]
+
+
+# PURPOSE: 消化完了ファイルを processed/ に移動する
+async def handle_mark_processed(arguments: dict):
+    """消化完了ファイルを incoming/ → processed/ に移動"""
+    if DigestorPipeline is None:
+        return [TextContent(type="text", text="Digestor module not available")]
+
+    from mekhane.ergasterion.digestor.pipeline import mark_as_processed
+
+    filenames = arguments.get("filenames")
+    result = mark_as_processed(filenames=filenames)
+
+    output = f"=== processed/ 移動結果 ===\n"
+    output += f"移動成功: {result['count']} 件\n\n"
+
+    for f in result["moved"]:
+        output += f"  ✅ {f}\n"
+    for e in result["errors"]:
+        output += f"  ❌ {e['file']}: {e['error']}\n"
 
     return [TextContent(type="text", text=output)]
 

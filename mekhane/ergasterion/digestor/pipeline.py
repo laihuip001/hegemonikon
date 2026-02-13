@@ -533,6 +533,41 @@ generated: {timestamp}
         print(f"[Digestor] {min(len(candidates), 5)} files placed in incoming/")
 
 
+# PURPOSE: 消化完了ファイルを processed/ に移動
+def mark_as_processed(filenames: list[str] | None = None) -> dict:
+    """消化完了した incoming/ のファイルを processed/ に移動する。
+
+    Args:
+        filenames: 移動するファイル名のリスト。None の場合は全 eat_*.md を移動。
+
+    Returns:
+        {"moved": [...], "errors": [...], "count": int}
+    """
+    incoming_dir = Path.home() / "oikos" / "mneme" / ".hegemonikon" / "incoming"
+    processed_dir = Path.home() / "oikos" / "mneme" / ".hegemonikon" / "processed"
+    processed_dir.mkdir(parents=True, exist_ok=True)
+
+    if filenames is None:
+        targets = sorted(incoming_dir.glob("eat_*.md"))
+    else:
+        targets = [incoming_dir / f for f in filenames if (incoming_dir / f).exists()]
+
+    moved = []
+    errors = []
+
+    for src in targets:
+        dst = processed_dir / src.name
+        try:
+            src.rename(dst)
+            moved.append(src.name)
+            print(f"[Digestor] ✅ {src.name} → processed/")
+        except Exception as e:
+            errors.append({"file": src.name, "error": str(e)})
+            print(f"[Digestor] ❌ {src.name}: {e}")
+
+    return {"moved": moved, "errors": errors, "count": len(moved)}
+
+
 # CLI エントリポイント
 # PURPOSE: CLI エントリポイント
 def main():

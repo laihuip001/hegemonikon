@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/anamnesis/session_indexer.py Session history semantic search indexer
 # PURPOSE: セッション履歴を GnosisIndex (LanceDB) にインデックスする
 """
 PROOF: [L2/インフラ] <- mekhane/anamnesis/
@@ -136,7 +137,7 @@ def sessions_to_records(sessions: list[dict]) -> list[dict]:
             content_parts.append(f"Workspaces: {', '.join(workspaces)}")
         content = " | ".join(content_parts)
 
-        # P3: authors — ワークスペース名 (プロジェクト文脈として活用)
+        # P3: authors — ワークスペース名 (プロジェクト文脈)
         authors = ", ".join(workspaces) if workspaces else ""
 
         # P3: url — conversation_id (逆引き・リンク用)

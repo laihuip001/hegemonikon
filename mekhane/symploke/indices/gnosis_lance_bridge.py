@@ -51,9 +51,8 @@ class GnosisLanceBridge(DomainIndex):
         self._lance_index = None
         self._initialized = True  # LanceDB は initialize 不要
 
+    # PURPOSE: [L2-auto] Get source type
     @property
-    # PURPOSE: [L2-auto] Get source type
-    # PURPOSE: [L2-auto] Get source type
     def source_type(self) -> SourceType:
         return SourceType.GNOSIS
 

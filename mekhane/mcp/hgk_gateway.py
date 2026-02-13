@@ -197,9 +197,8 @@ def _traced(fn):
     """
     import functools
 
+    # PURPOSE: [L2-auto] Wrapper function
     @functools.wraps(fn)
-    # PURPOSE: [L2-auto] Wrapper function
-    # PURPOSE: [L2-auto] Wrapper function
     def wrapper(*args: Any, **kwargs: Any) -> Any:
         _start = time.time()
         input_size = _estimate_input_size(*args, **kwargs)

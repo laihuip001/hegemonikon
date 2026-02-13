@@ -322,6 +322,74 @@ def cmd_search(args: argparse.Namespace) -> None:
     print()
 
 
+# PURPOSE: `pks rebuild` — Chronos インデックスの再構築
+def cmd_rebuild(args: argparse.Namespace) -> None:
+    """Chronos インデックスを Handoff ファイルから再構築する"""
+    import os, re, time
+    for key in ['HTTP_PROXY', 'HTTPS_PROXY', 'http_proxy', 'https_proxy']:
+        os.environ.pop(key, None)
+    os.environ.setdefault('HF_HUB_OFFLINE', '1')
+    os.environ.setdefault('TRANSFORMERS_OFFLINE', '1')
+
+    target = args.target
+    if target != "chronos":
+        print(f"❌ 未対応のターゲット: {target} (現在は 'chronos' のみ対応)")
+        return
+
+    print("## 🔄 Chronos Index Rebuild\n")
+    t0 = time.time()
+
+    handoff_dir = Path.home() / "oikos" / "mneme" / ".hegemonikon" / "sessions"
+    handoffs = sorted(handoff_dir.glob("handoff_20??-??-??_????.md"))
+    print(f"📁 Handoff ファイル: {len(handoffs)} 件")
+
+    if not handoffs:
+        print("📭 Handoff ファイルが見つかりません。")
+        return
+
+    # Split into chunks by ## headers
+    chunks = []
+    for hf in handoffs:
+        content = hf.read_text(encoding='utf-8', errors='ignore')
+        session_id = hf.stem
+        sections = re.split(r'\n(?=## )', content)
+        for i, section in enumerate(sections):
+            section = section.strip()
+            if len(section) < 50:
+                continue
+            if len(section) > 2000:
+                section = section[:2000]
+            chunks.append((f"{session_id}_s{i}", section,
+                          {"session_id": session_id, "chunk": i}))
+
+    print(f"📝 チャンク: {len(chunks)} 件")
+
+    # Encode and index
+    import numpy as np
+    from mekhane.symploke.adapters.embedding_adapter import EmbeddingAdapter
+    adapter = EmbeddingAdapter()
+    adapter.create_index(dimension=1024)
+
+    batch_size = 32
+    for start in range(0, len(chunks), batch_size):
+        batch = chunks[start:start + batch_size]
+        texts = [c[1] for c in batch]
+        vecs = np.array([adapter.encode(t) for t in texts], dtype=np.float32)
+        metas = [{"doc_id": c[0], **c[2]} for c in batch]
+        adapter.add_vectors(vecs, metadata=metas)
+        done = start + len(batch)
+        if done % 128 == 0 or done == len(chunks):
+            print(f"  進捗: {done}/{len(chunks)}")
+
+    out_path = Path.home() / "oikos" / "mneme" / ".hegemonikon" / "indices" / "chronos.pkl"
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    adapter.save(str(out_path))
+
+    elapsed = time.time() - t0
+    print(f"\n✅ chronos.pkl 保存完了: **{adapter.count():,}** docs ({elapsed:.1f}s)")
+    print()
+
+
 # PURPOSE: `pks push` — コンテキストに基づく能動的プッシュ
 def cmd_push(args: argparse.Namespace) -> None:
     """コンテキストに基づく能動的プッシュ"""
@@ -615,6 +683,7 @@ def main() -> None:
             "  pks health                        # 全スタックヘルスチェック\n"
             "  pks search 'FEP precision'        # 全インデックス横断検索\n"
             "  pks search 'active inference' -s gnosis,chronos  # ソース限定\n"
+            "  pks rebuild chronos               # Chronos インデックス再構築\n"
         ),
     )
     subparsers = parser.add_subparsers(dest="command", help="サブコマンド")
@@ -634,6 +703,11 @@ def main() -> None:
     p_search.add_argument("--sources", "-s", default=None,
                           help="検索ソース (カンマ区切り: gnosis,kairos,sophia,chronos)")
     p_search.set_defaults(func=cmd_search)
+
+    # --- rebuild ---
+    p_rebuild = subparsers.add_parser("rebuild", help="インデックスの再構築")
+    p_rebuild.add_argument("target", choices=["chronos"], help="再構築対象")
+    p_rebuild.set_defaults(func=cmd_rebuild)
 
     # --- push ---
     p_push = subparsers.add_parser("push", help="能動的プッシュを実行")

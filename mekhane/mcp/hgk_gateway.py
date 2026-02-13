@@ -915,9 +915,9 @@ def hgk_pks_stats() -> str:
 @_traced
 def hgk_pks_health() -> str:
     """
-    Autophōnos 全スタック (8コンポーネント) のヘルスチェックを実行する。
+    Autophōnos 全スタック (9コンポーネント) のヘルスチェックを実行する。
     Gnōsis, Kairos, Sophia, Embedder, GnosisLanceBridge, PKSEngine,
-    TopicExtractor, SelfAdvocate の各コンポーネントの OK/FAIL を返す。
+    TopicExtractor, SelfAdvocate, Chronos の各コンポーネントの OK/FAIL を返す。
     """
     import subprocess
     result = subprocess.run(

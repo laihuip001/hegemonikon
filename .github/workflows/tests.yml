@@ -45,9 +45,11 @@ jobs:
                   # 1. Install PyTorch first (from specific index)
                   pip install torch --index-url https://download.pytorch.org/whl/cpu
                   # 2. Install PyPI packages (from default index)
+                  # aiohttp: required by jules_client.py
+                  # aioresponses: required by test_api_connection.py
                   pip install pytest pytest-asyncio pytest-timeout pyyaml pydantic lancedb numpy scipy \
                               networkx pandas tabulate requests httpx schedule \
-                              sentence-transformers
+                              sentence-transformers aiohttp aioresponses
                   # Install project in development mode if setup exists
                   pip install -e ".[test]" 2>/dev/null || true
 

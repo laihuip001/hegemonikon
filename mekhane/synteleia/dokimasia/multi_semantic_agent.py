@@ -1,3 +1,4 @@
+# PROOF: [L2/監視] <- mekhane/synteleia/dokimasia/ P3→多角的視点が必要→multi_semantic_agent が担う
 # PURPOSE: Multi-LLM アンサンブル監査エージェント (Layer B: Nous)
 """
 MultiSemanticAgent — Multi-LLM Cognitive Ensemble

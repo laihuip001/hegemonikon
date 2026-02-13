@@ -1,5 +1,7 @@
 ---
 description: "回す — /pro_C:{/sop_/noe_/ene_/dia-}_/pis_/dox-"
+version: 1.0.0
+lcm_state: beta
 ---
 
 # /ccl-kyc: 認知循環マクロ (κύκλος)

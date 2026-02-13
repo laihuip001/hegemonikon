@@ -1,5 +1,7 @@
 ---
 description: "組む — /bou-_/s+_/ene+_V:{/dia-}_I:[✓]{/dox-}"
+version: 1.0.0
+lcm_state: beta
 ---
 
 # /ccl-build: 構築マクロ

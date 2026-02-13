@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
-# PROOF: [L2/インフラ] <- mekhane/mcp/ 出張 HGK MCP Gateway
+# PROOF: [L2/インフラ] <- mekhane/mcp/ HGK Gateway Service
+# PURPOSE: HGK (Hegemonikon GateKeeper) — AIエージェントのための統合ゲートウェイ
 """
-出張 HGK MCP Gateway — モバイルからの HGK アクセス
+HGK Gateway — 統合ゲートウェイサービス
 
 FastMCP + Streamable HTTP で、Claude/ChatGPT のモバイルアプリから
 MCP 経由で HGK の認知機能にアクセスするリモートサーバー。

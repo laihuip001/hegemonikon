@@ -1,6 +1,8 @@
 ---
 name: Category Theory Engine
 description: |
+risk_tier: L1
+risks: none
   圏論に基づく構造認識エンジン。
   FEP Skill が「行動選択の objective」なら、本 Skill は「構造認識の言語」。
   前順序圏のガロア接続 + [0,1]-豊穣圏として HGK の圏論を正当化し、

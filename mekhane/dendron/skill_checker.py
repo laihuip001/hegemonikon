@@ -319,13 +319,13 @@ def format_report(result: AuditResult, verbose: bool = False) -> str:
     if errors:
         lines.append("## ❌ Errors")
         for f in errors:
-            lines.append(f"  - [{f.file_type}] {f.path.name}: {f.field} — {f.message}")
+            lines.append(f"  - [{f.file_type}] {f.path}: {f.field} — {f.message}")
         lines.append("")
 
     if warnings:
         lines.append("## ⚠️ Warnings")
         for f in warnings:
-            lines.append(f"  - [{f.file_type}] {f.path.name}: {f.field} — {f.message}")
+            lines.append(f"  - [{f.file_type}] {f.path}: {f.field} — {f.message}")
         lines.append("")
 
     if verbose:
@@ -333,7 +333,7 @@ def format_report(result: AuditResult, verbose: bool = False) -> str:
         if oks:
             lines.append("## ✅ OK")
             for f in oks:
-                lines.append(f"  - [{f.file_type}] {f.path.name}: {f.field} — {f.message}")
+                lines.append(f"  - [{f.file_type}] {f.path}: {f.field} — {f.message}")
             lines.append("")
 
     return "\n".join(lines)

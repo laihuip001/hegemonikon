@@ -1,5 +1,7 @@
 ---
 description: "感じる — /pro_/ore~(/pis_/ana)_/dox-"
+version: 1.0
+lcm_state: beta
 ---
 
 # /ccl-feel: 直感マクロ

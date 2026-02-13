@@ -1,5 +1,7 @@
 ---
 description: "段取る — /bou+_/chr_/s+~(/p*/k)_V:{/dia}_/pis_/dox-"
+version: 1.0
+lcm_state: beta
 ---
 
 # /ccl-plan: 計画策定マクロ

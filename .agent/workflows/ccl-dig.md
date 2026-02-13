@@ -1,5 +1,7 @@
 ---
 description: "掘る — /pro_/s+~(/p*/a)_/ana_/dia*/o+_/pis"
+version: 1.0
+lcm_state: beta
 ---
 
 # /ccl-dig: 深掘りマクロ

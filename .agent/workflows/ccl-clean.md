@@ -1,5 +1,7 @@
 ---
 description: "絞る — /s-_/kat_/sym~(/tel_/dia-)_/pis"
+version: 1.0
+lcm_state: beta
 ---
 
 # /ccl-clean: 絞りマクロ

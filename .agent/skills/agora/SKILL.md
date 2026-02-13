@@ -1,6 +1,10 @@
 ---
 name: Agora
 description: HGK 収益化プロジェクト — ディープインパクト戦略
+risk_tier: L1
+risks:
+  - 収益化戦略における倫理的リスク
+  - 自動生成コードの未検証実行
 triggers:
   - "agora"
   - "agora"

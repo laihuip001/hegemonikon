@@ -1,15 +1,6 @@
+# PROOF: [O3/Zētēsis] <- mekhane/anamnesis/session_indexer.py: セッション履歴のセマンティック検索用インデックス構築
 # PURPOSE: セッション履歴を GnosisIndex (LanceDB) にインデックスする
 """
-PROOF: [L2/インフラ] <- mekhane/anamnesis/
-
-P3 → 記憶の永続化が必要
-   → セッション履歴のセマンティック検索が必要
-   → session_indexer.py が担う
-
-Q.E.D.
-
----
-
 Session Indexer — セッション履歴ベクトル検索
 
 agq-sessions.sh --dump で取得した JSON を Paper モデルに変換し、

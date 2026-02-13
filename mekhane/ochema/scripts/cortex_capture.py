@@ -1,3 +1,4 @@
+# PROOF: [O3/Zētēsis] <- mekhane/ochema/scripts/cortex_capture.py: Cortex API通信のMITMキャプチャと解析
 """
 Cortex API MITM Capture Script for mitmproxy.
 

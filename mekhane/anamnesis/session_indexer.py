@@ -1,3 +1,4 @@
+# PROOF: [S3.Stathmos] <- mekhane/anamnesis/session_indexer.py Session Semantic Indexer
 # PURPOSE: セッション履歴を GnosisIndex (LanceDB) にインデックスする
 """
 PROOF: [L2/インフラ] <- mekhane/anamnesis/

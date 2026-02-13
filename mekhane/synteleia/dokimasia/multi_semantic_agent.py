@@ -1,4 +1,4 @@
-# PROOF: [L2/Stathmos] <- mekhane/synteleia/dokimasia/multi_semantic_agent.py
+# PROOF: [L1/Stathmos] <- mekhane/synteleia/dokimasia/
 # PURPOSE: マルチエージェントによる意味論的検証 (Dokimasia)
 """
 Dokimasia Multi-Semantic Agent — 意味論的検証エージェント

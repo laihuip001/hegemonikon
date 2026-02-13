@@ -1,4 +1,4 @@
-# PROOF: [L2/Exagoge] <- mekhane/ochema/scripts/cortex_capture.py
+# PROOF: [L1/Exagoge] <- mekhane/ochema/scripts/
 # PURPOSE: Cortex Capture Script (mitmproxy)
 """
 mitmproxy script to capture Antigravity LS traffic and reverse engineer

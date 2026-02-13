@@ -1,4 +1,4 @@
-# PROOF: [L2/Hodos] <- mekhane/ochema/proto.py
+# PROOF: [L1/Hodos] <- mekhane/ochema/
 # PURPOSE: Antigravity LS Protocol Definitions
 """Antigravity Language Server Protocol Definitions (v8).
 

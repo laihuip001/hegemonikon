@@ -1,4 +1,4 @@
-# PROOF: [L2/Trokhia] <- mekhane/anamnesis/session_monitor.py
+# PROOF: [L1/Trokhia] <- mekhane/anamnesis/
 # PURPOSE: 起動中の Antigravity LS セッションを監視し、更新があればインデックスする
 """
 PROOF: [L2/インフラ] <- mekhane/anamnesis/

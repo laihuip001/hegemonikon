@@ -1,4 +1,4 @@
-# PROOF: [L2/Hodos] <- mekhane/ochema/
+# PROOF: [L1/Hodos] <- mekhane/ochema/
 # PURPOSE: Ochēma Package Initialization
 """Ochēma (ὄχημα, 乗り物) — Antigravity Language Server Client.
 

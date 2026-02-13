@@ -1,4 +1,4 @@
-# PROOF: [L2/Hodos] <- mekhane/synteleia/dokimasia/ochema_backend.py
+# PROOF: [L1/Hodos] <- mekhane/synteleia/dokimasia/
 # PURPOSE: Dokimasia 用の Ochēma バックエンドアダプタ
 """
 Ochēma Backend for Dokimasia

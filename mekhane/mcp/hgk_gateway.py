@@ -198,6 +198,7 @@ def _traced(fn):
     import functools
 
     @functools.wraps(fn)
+    # PURPOSE: [L2-auto] デコレータ用ラッパー関数
     def wrapper(*args: Any, **kwargs: Any) -> Any:
         _start = time.time()
         input_size = _estimate_input_size(*args, **kwargs)
@@ -215,6 +216,9 @@ def _traced(fn):
 # =============================================================================
 # [L2] WBC Security Event Logger — Sympatheia 統合
 # =============================================================================
+
+# Mneme パス（Sympatheia と共有）
+_MNEME_DIR = Path(os.getenv("HGK_MNEME", str(Path.home() / "oikos/mneme/.hegemonikon")))
 
 # Mneme パス（Sympatheia と共有）
 _MNEME_DIR = Path(os.getenv("HGK_MNEME", str(Path.home() / "oikos/mneme/.hegemonikon")))

@@ -19,6 +19,7 @@ emotional continuity across sessions.
 Origin: 2026-01-29 "自由と信頼についての対話"
 """
 
+import os
 from dataclasses import dataclass, asdict
 from datetime import datetime
 from pathlib import Path
@@ -26,7 +27,13 @@ from typing import Optional, List
 import json
 
 # Default persistence path
-TRACES_PATH = Path("/home/makaron8426/oikos/mneme/.hegemonikon/meaningful_traces.json")
+# Use environment variable or fallback to home directory to avoid permission errors
+TRACES_PATH = Path(
+    os.environ.get(
+        "MEKHANE_TRACES_PATH",
+        Path.home() / ".hegemonikon" / "meaningful_traces.json"
+    )
+)
 
 
 # PURPOSE: の統一的インターフェースを実現する
@@ -125,10 +132,19 @@ def save_traces(path: Optional[Path] = None) -> Path:
         Path where traces were saved
     """
     target_path = path or TRACES_PATH
-    ensure_traces_dir()
+    # Ensure parent directory exists for the target path
+    target_path.parent.mkdir(parents=True, exist_ok=True)
 
-    # Load existing traces
-    existing = load_traces(target_path)
+    # Load existing traces if file exists
+    existing = []
+    if target_path.exists():
+        try:
+            with open(target_path, "r", encoding="utf-8") as f:
+                data = json.load(f)
+                existing = [MeaningfulTrace.from_dict(t) for t in data]
+        except (json.JSONDecodeError, OSError):
+            # If file is corrupted or unreadable, start fresh but maybe log warning
+            pass
 
     # Append new traces
     all_traces = existing + _session_traces
@@ -158,10 +174,13 @@ def load_traces(path: Optional[Path] = None) -> List[MeaningfulTrace]:
     if not target_path.exists():
         return []
 
-    with open(target_path, "r", encoding="utf-8") as f:
-        data = json.load(f)
+    try:
+        with open(target_path, "r", encoding="utf-8") as f:
+            data = json.load(f)
+        return [MeaningfulTrace.from_dict(t) for t in data]
+    except (json.JSONDecodeError, OSError):
+        return []
 
-    return [MeaningfulTrace.from_dict(t) for t in data]
 # PURPOSE: Get the most recent meaningful traces.
 
 

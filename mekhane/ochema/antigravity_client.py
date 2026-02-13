@@ -30,7 +30,7 @@ from typing import Optional
 
 # --- Data Classes ---
 
-# PURPOSE: [L2-auto] LLM からの応答を保持する。
+# PURPOSE: 応答テキスト・思考過程・Quota 消費を統一的に返し、呼び出し側の分岐を不要にする
 @dataclass
 class LLMResponse:
     """LLM からの応答を保持する。"""

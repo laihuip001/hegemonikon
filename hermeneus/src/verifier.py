@@ -69,7 +69,7 @@ class Verdict:
     arbiter_notes: Optional[str] = None
 
 
-# PURPOSE: ディベートラウンド — ラリー全履歴と収束状態を保持するデータ型
+# PURPOSE: ディベートのラリー進行と収束判定を1単位で追跡し、検証ループの打切り判断に使う
 @dataclass
 class DebateRound:
     """ディベートラウンド — ラリーの全履歴を保持"""
@@ -425,7 +425,14 @@ class DebateAgent:
     
     # PURPOSE: 判定テキストをパース
     def _parse_verdict(self, text: str) -> tuple:
-        """判定テキストをパース"""
+        """判定テキストをパース
+        
+        確信度のパース順序:
+        1. パーセント形式: 85%, 85 %
+        2. 小数形式: 0.85, .85
+        3. 分数形式: 85/100
+        4. フォールバック: _estimate_confidence() に委譲
+        """
         text_lower = text.lower()
         
         # 判定タイプ
@@ -436,12 +443,34 @@ class DebateAgent:
         else:
             verdict_type = VerdictType.UNCERTAIN
         
-        # 確信度
+        # 確信度 — 複数パターンで抽出
+        confidence = None
+        
+        # Pattern 1: パーセント形式 (85%, 85 %)
         conf_match = re.search(r'(\d+)\s*%', text)
         if conf_match:
             confidence = int(conf_match.group(1)) / 100.0
-        else:
-            confidence = 0.5
+        
+        # Pattern 2: 小数形式 (確信度: 0.85, confidence: 0.85, confidence: .75)
+        if confidence is None:
+            conf_match = re.search(
+                r'(?:確信度|confidence)[:\s]+([01]?\.\d+)', text_lower
+            )
+            if conf_match:
+                confidence = float(conf_match.group(1))
+        
+        # Pattern 3: 分数形式 (85/100)
+        if confidence is None:
+            conf_match = re.search(r'(\d+)\s*/\s*100', text)
+            if conf_match:
+                confidence = int(conf_match.group(1)) / 100.0
+        
+        # Fallback: キーワードベースの推定
+        if confidence is None:
+            confidence = self._estimate_confidence(text)
+        
+        # Clamp to [0.0, 1.0]
+        confidence = max(0.0, min(1.0, confidence))
         
         # 理由
         reason_match = re.search(r'理由[:：]\s*(.+)', text, re.DOTALL)

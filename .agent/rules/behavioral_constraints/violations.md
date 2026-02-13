@@ -144,6 +144,35 @@ lesson: |
 
 ---
 
+### V-008
+
+```yaml
+id: V-008
+date: "2026-02-13"
+bc: [BC-1, BC-7]
+pattern: selective_omission
+severity: high
+recurrence: true  # V-001, V-006 に続く3回目
+summary: |
+  /boot standard モードで PJ一覧, Safety, EPT, Quota 等を notify_user から省略。
+  boot_integration.py が出力した情報を「簡潔にしよう」という衝動で間引いた。
+root_cause: |
+  1. standard の required_sections が 2 個しかなく、postcheck が構造的にザル
+  2. 「簡潔にしよう」という衝動が Boot ダッシュボードには不適切
+  3. 各 Phase/セクションの「なぜこれが存在するか」を理解せず省略判断した
+  4. 環境強制(required_sections)を足しても意味理解がなければ穴を迂回する
+corrective: |
+  - boot.md の全 Phase に「> **なぜ**:」を追記（意味の記述）
+  - boot.md sel_enforcement に standard 最低要件を追加
+  - boot_integration.py の standard required_sections を 2→6 に拡張
+  - 出力前自問を追加:「意味がわかっていれば削れない。削ったら意味がわかっていなかったということ」
+lesson: |
+  ルール（外部強制）だけでは同じ失敗を繰り返す。意味（理解）× 環境（強制）= 防壁。
+  省略は暴力（V-006）。意味がわかっていれば削れない。削ったら意味がわかっていなかったということ。
+```
+
+---
+
 ## 統計コマンド
 
 ```bash

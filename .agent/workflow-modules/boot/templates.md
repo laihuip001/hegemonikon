@@ -41,10 +41,27 @@ Phase サマリー:
 
 ---
 
-## 開発中プロジェクト表示
+## 開発中プロジェクト表示 (全件出力 — 省略禁止)
 
 > **自動生成**: `boot_integration.py` が `.agent/projects/registry.yaml` を軸 I として自動読込する。
 > 手動スクリプトは不要。
+>
+> **⚠️ 環境強制**: Boot Report で PJ 一覧を出力する際、**全件をテーブル形式で個別に表示**する。
+> Agent が「重要そうなもの」を選別して出力することは **禁止**。選別は Creator が行う。
+
+### 出力形式 (Boot Report 用)
+
+```markdown
+| PJ | Phase | Status | Summary |
+|:---|:------|:-------|:--------|
+| {name} | {phase} | 🟢/💤/🗄️ | {summary — 全文} |
+```
+
+- **全 PJ** を出力 (active, dormant, archived, planned)
+- summary は **切り捨てない** (boot_integration.py の50文字制限はコンソール用)
+- 直近の Handoff から補足情報があれば「次アクション」列を追加可
+
+### 手動確認コマンド
 
 ```bash
 # 手動確認が必要な場合:
@@ -55,14 +72,11 @@ pf = Path('~/oikos/hegemonikon/.agent/projects/registry.yaml').expanduser()
 if pf.exists():
     data = yaml.safe_load(pf.read_text())
     projects = data.get('projects', [])
-    active = [p for p in projects if p.get('status') == 'active']
-    print(f'Projects: {len(projects)}件 (Active: {len(active)})')
-    for p in active:
-        print(f\"  {p['name']} [{p.get('phase','')}] — {p.get('summary','')[:60]}\")
-"
+    for p in projects:
+        print(f\"  {p.get('status','?'):8s} {p['name']} [{p.get('phase','')}] — {p.get('summary','')}\")\n"
 ```
 
-鮮度アラート:
+### 鮮度アラート
 
 | 経過日数 | 表示 | 意味 |
 |----------|------|------|

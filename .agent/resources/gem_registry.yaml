@@ -1,0 +1,73 @@
+# GEM Registry — Gemini カスタム GEM の URL と仕様
+# 管理者: Claude (Antigravity)
+# 最終更新: 2026-02-13
+# 用途: /sop PHASE 1a 経路選択、GEM 連携
+
+gems:
+  deep_researcher:
+    name: "Deep Researcher"
+    url: "https://gemini.google.com/gems/view"  # サイドバーから選択
+    version: "2.0"
+    model: "Gemini 3"
+    capabilities:
+      - 構造化テーブル出力
+      - エビデンス階層 ([確信]/[推定]/[仮説])
+      - 学術調査
+      - 思考モード対応
+    best_for:
+      - "/sop 経路 B (学術調査)"
+      - "計算論的分析"
+      - "体系的レビュー"
+    custom_instruction_chars: 2655
+    tested: "2026-02-12"
+    test_result: "優秀"
+
+  fep_scholar:
+    name: "FEP Scholar"
+    url: "https://gemini.google.com/gems/view"
+    version: "2.0"
+    model: "Gemini 3"
+    capabilities:
+      - VFE/EFE 数式分解
+      - Active Inference 分析
+      - FEP 正当性検証
+    best_for:
+      - "HGK 公理体系の FEP 検証"
+      - "変分推論の分析"
+    custom_instruction_chars: 2449
+    tested: "2026-02-12"
+    test_result: "優秀"
+
+  category_theorist:
+    name: "Category Theorist"
+    url: "https://gemini.google.com/gems/view"
+    version: "2.0"
+    model: "Gemini 3"
+    capabilities:
+      - 圏論的モデリング
+      - 可換図式生成
+      - 随伴・関手の構成
+    best_for:
+      - "認知構造の圏論的分析"
+      - "HGK 圏論的正当化"
+    custom_instruction_chars: 2300
+    tested: "2026-02-12"
+    test_result: "優秀"
+
+  cognitive_scientist:
+    name: "Cognitive Scientist"
+    url: "https://gemini.google.com/gems/view"
+    version: "2.0"
+    model: "Gemini 3"
+    capabilities:
+      - Marr 3層分析
+      - 多理論多角照射 (3理論以上)
+      - エビデンス階層付記
+      - AuDHD 専門分析
+    best_for:
+      - "認知科学的分析"
+      - "AuDHD 計算論的理解"
+      - "Predictive Processing 応用"
+    custom_instruction_chars: 3200
+    tested: "2026-02-12"
+    test_result: "優秀"

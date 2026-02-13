@@ -172,12 +172,20 @@ class TestPostcheckBootReport:
     def test_standard_mode_has_lower_requirements(self):
         """Standard mode should have lower requirements than detailed."""
         with tempfile.NamedTemporaryFile(mode="w", suffix=".md", delete=False, encoding="utf-8") as f:
-            # Minimal content that passes standard but not detailed
+            # Content that passes standard (6 required sections)
             content = "# Boot Report\n\n"
             content += "## Handoff サマリー\n<!-- REQUIRED: Handoff -->\n\n"
             content += "### Handoff 1: Task A\n> Summary of task A.\n\n"
             content += "### Handoff 2: Task B\n> Summary of task B.\n\n"
             content += "### Handoff 3: Task C\n> Summary of task C.\n\n"
+            content += "## 開発中プロジェクト\n<!-- REQUIRED: Projects -->\n\n"
+            content += "| PJ | Status |\n|---|---|\n| Agora | 🟢 |\n\n"
+            content += "## Safety\n<!-- REQUIRED: Safety -->\n\n"
+            content += "Errors: 4, Warnings: 65\n\n"
+            content += "## EPT\n<!-- REQUIRED: EPT -->\n\n"
+            content += "Coverage: 83%\n\n"
+            content += "## Quota\n<!-- REQUIRED: Quota -->\n\n"
+            content += "Prompt: 100%, Flow: 100%\n\n"
             content += "## タスク提案\n<!-- REQUIRED: tasks -->\n\n"
             content += "1. Do task X\n2. Do task Y\n"
             # Pad to 1000+ chars

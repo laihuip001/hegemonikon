@@ -1,9 +1,9 @@
 ---
 description: セッション終了時に引き継ぎドキュメントを生成し、経験を法則化する。次回セッションの/bootで読み込まれる。
 hegemonikon: H4 Doxa
-version: "7.1"
+version: "7.3"
 lcm_state: stable
-lineage: "v7.0 + Step 3.5 IDE ネイティブ Export → v7.1"
+lineage: "v7.0 + Step 3.5 IDE ネイティブ Export → v7.1 → v7.3 gRPC Auto-Export"
 category_theory:
   core: "随伴の右関手 R: Ses → Mem"
   adjunction: "L (Boot) ⊣ R (Bye)"
@@ -233,18 +233,32 @@ git -C ~/oikos status --short
 > Handoff は圧縮 (R) なので情報ロスがある。生チャットデータは ε 精度の上限を決める。
 > ker(R) を保存しなければ、ε は原理的に 1 に近づけない。
 
-### 手順: IDE ネイティブ Export
+### 手順 A: gRPC 自動エクスポート (推奨)
+
+> **v7.3 追加**: Language Server API から全セッション一覧を自動取得し、Markdown に保存する。
+> 手動の IDE Export よりも確実・完全・自動化可能。
+
+// turbo
+
+```bash
+bash ~/oikos/hegemonikon/scripts/agq-sessions.sh --export-current
+```
+
+保存先: `~/oikos/mneme/.hegemonikon/sessions/chat_export_YYYY-MM-DD.md`
+同日に複数セッションがある場合は自動でサフィックス追加 (`_2.md`, `_3.md`...)
+
+### 手順 B: IDE ネイティブ Export (フォールバック)
+
+> gRPC 自動エクスポートが失敗した場合のみ、手動で実行する。
 
 1. **Antigravity IDE のエディタビュー**で現在のチャットを開く
 2. チャットパネル右上の **`...`** (メニュー) をクリック
 3. **Export → Markdown (.md)** を選択
 4. 保存先: `~/oikos/mneme/.hegemonikon/sessions/chat_export_YYYY-MM-DD.md`
-   - 例: `chat_export_2026-02-09.md`
-   - 同日に複数セッションがある場合: `chat_export_2026-02-09_2.md`
 
 > [!NOTE]
-> 以前は `export_chats.py` スクリプトを使用していたが、IDE ネイティブの Export 機能の方が
-> 確実かつ完全な会話データを出力するため、v7.1 よりこちらを正式手順とする。
+> v7.1 で IDE ネイティブ Export を正式手順としたが、v7.3 で gRPC 自動エクスポートを
+> 第一選択に昇格。手動手順はフォールバックとして維持する。
 
 ---
 
@@ -463,3 +477,4 @@ graph LR
 *v6.1 — Step 3.6π Value Pitch 追加。R^π: Ses→Sig (意味抽出関手)。HGK 7公理から演繹した8次元 Benefit Angle (2026-02-08)*
 *v7.1 — Step 3.5 を export_chats.py から IDE ネイティブ Export に変更。保存先: chat_export_YYYY-MM-DD.md (2026-02-09)*
 *v7.2 — Step 3.6.5 Session Metrics 追加。BOOT→BYE のデルタ計測 (PC/FC/Claude Opus) + WF 使用ログを Handoff に統合 (2026-02-12)*
+*v7.3 — Step 3.5 を gRPC 自動エクスポート (agq-sessions.sh --export-current) に変更。IDE ネイティブ Export はフォールバックに格下げ (2026-02-13)*

@@ -1,7 +1,7 @@
 ---
 description: K4 Sophia（知恵）を発動し、Perplexityに調査を依頼する。深掘り版調査依頼書を生成。
 hegemonikon: K4 Sophia
-version: "7.0"
+version: "7.1"
 skill_ref: ".agent/skills/kairos/k4-sophia/SKILL.md"
 lcm_state: stable
 triggers: ["調べて", "教えて", "Perplexityに聞いて", "パプ君に聞いて", "リサーチ"]
@@ -144,6 +144,37 @@ cd ~/oikos/hegemonikon && \
 
 ---
 
+## PHASE 1a: 経路選択（v7.1 新規）
+
+> **起源**: 2026-02-12 GEM 試し打ち — Deep Researcher が /sop 品質に匹敵することを検証済み
+> **原則**: 最適な経路を選択し、認知コストを最小化する
+
+| 経路 | エンジン | 特徴 | 最適な場面 |
+|:-----|:---------|:-----|:----------|
+| **A: Perplexity** | Perplexity Pro | 実リアルタイム検索、URL 付き | 最新情報、ファクトチェック、速報 |
+| **B: Deep Researcher** | Gemini GEM (Deep Researcher v2.0) | 構造化テーブル出力、エビデンス階層付き | 学術調査、計算論的分析、体系的レビュー |
+| **C: 両方** | A + B | 相互補完 | 重要テーマ、網羅的調査 |
+
+### 経路判定基準
+
+```
+IF リアルタイム性が重要 → A (Perplexity)
+IF 構造化・学術性が重要 → B (Deep Researcher)
+IF 重要テーマ AND 時間余裕あり → C (両方)
+DEFAULT → A (Perplexity) — 従来と同じ
+```
+
+### 経路 B の使用方法
+
+1. Gemini で「Deep Researcher」GEM を開く
+2. 調査依頼をそのまま入力（PHASE 2 の論点設計は共通で使用可能）
+3. 「思考モード」を選択して送信
+4. 結果をこのセッションに共有する or `/eat` で消化
+
+> **GEM レジストリ**: [gem_registry.yaml](file:///home/makaron8426/oikos/hegemonikon/.agent/resources/gem_registry.yaml)
+
+---
+
 ## PHASE 1: 調査依頼書生成
 
 > テンプレート: [sop/templates.md](../workflow-modules/sop/templates.md)
@@ -274,13 +305,14 @@ A. 認知科学における〇〇
 
 | Module | Workflow | Status |
 |:-------|:---------|:-------|
-| K4 Sophia | /sop | v7.0 Ready |
+| K4 Sophia | /sop | v7.1 Ready |
 
 > **制約リマインダ**: 目的確認 (PHASE 0) → 内部KB検索 (PHASE 0.5) → 調査依頼 (PHASE 1)。順序を守ること。
 
 ---
 
 *v7.0 — FBR 適用 (2026-02-07)*
+*v7.1 — PHASE 1a 経路選択追加: Deep Researcher GEM 代替パス (2026-02-13)*
 
 ---
 

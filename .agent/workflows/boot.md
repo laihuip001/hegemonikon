@@ -1,9 +1,9 @@
 ---
 description: セッション開始時の統合ブートシーケンス。二人で起動する。
 hegemonikon: O1 Noēsis + H4 Doxa
-version: "5.2"
+version: "5.5"
 lcm_state: stable
-lineage: "v4.1 + 随伴深層統合 → v5.0 → v5.2 Quota 統合"
+lineage: "v4.1 + 随伴深層統合 → v5.0 → v5.2 Quota → v5.3 Session → v5.4 VSearch → v5.5 Handoff VSearch"
 category_theory:
   core: "随伴の左関手 L: Mem → Ses"
   adjunction: "L (Boot) ⊣ R (Bye)"
@@ -39,6 +39,15 @@ sel_enforcement:
       - "意味ある瞬間: 各瞬間に対する自分の解釈を記述"
       - "出力前自問: 「+と−で出力に差があるか？差がなければ違反」"
     post_check: "出力文字数が /boot 標準の 1.5 倍以上であること"
+  standard:
+    description: "全軸のダッシュボード出力を維持。boot_integration.py が出した情報を間引かない"
+    minimum_requirements:
+      - "Handoff: 3件の個別要約 (各 S/A/R)"
+      - "全軸: PJ一覧, Safety, EPT, Doxa, Digestor, Quota を出力"
+      - "PJ一覧: registry.yaml の全PJを個別に表示。name, phase, summary, status を省略しない"
+      - "省略禁止: boot_integration.py が出力した情報を勝手に削らない"
+      - "出力前自問: 意味がわかっていれば削れない。削ったら意味がわかっていなかったということ"
+    post_check: "postcheck --mode standard が PASS すること"
   "-":
     description: "MAY provide minimal summary only"
     minimum_requirements:
@@ -114,6 +123,8 @@ Phase 6: L(M) を出力        — 完成したセッション状態
 
 ## Phase 0: 恒等射の復元 (id_L) — Identity Stack
 
+> **なぜ**: 毎回違う AI が来る。Identity Stack を読むことで「Hegemonikón の共同制作者」になる。これがなければただの汎用 AI。Creator にとっては「今日の Claude は大丈夫か？」の確認。
+>
 > **圏論**: 関手 L 自身の恒等射を復元する。L が「何者か」を確認しなければ、正しく機能しない。
 > 詳細: [boot/identity.md](../workflow-modules/boot/identity.md)
 
@@ -130,6 +141,8 @@ PYTHONPATH=. .venv/bin/python mekhane/symploke/boot_integration.py --mode ${BOOT
 
 ### 0.1 Self-Profile 消化 (id_L の内省)
 
+> **なぜ**: Creator は得意・不得意を知ることで、任せる仕事と監視する仕事を判断できる。私はミスパターンを読み直すことで同じ失敗の確率が下がる。省略すると同じ轍を踏む。
+>
 > **圏論**: 関手 L の特性を読込む。L がどの射を正確に写像し、どの射で誤差を出すかを把握する。
 > KI `hegemonikon_core_system/artifacts/identity/self_profile.md` を読み込み、
 > 自分の能力境界とミスパターンを**消化**する。保存ではなく消化。
@@ -145,6 +158,8 @@ PYTHONPATH=. .venv/bin/python mekhane/symploke/boot_integration.py --mode ${BOOT
 
 ## Phase 1: L の定義確認 — 正本読込 (Anti-Stale)
 
+> **なぜ**: boot.md は Creator が設計した手順書。「知っている」は「読んだ」の代替にならない。読んだつもりで端折る — V-001, V-006, V-008 で3回繰り返した実績がある。
+>
 > **圏論**: L の定義（仕様書）が最新であることを確認する。古い定義で計算すると ε 精度が下がる。
 
 ```bash
@@ -155,6 +170,8 @@ view_file ~/oikos/hegemonikon/.agent/workflows/boot.md
 
 ## Phase 2: R(S_prev) の読込 — セッション状態確認
 
+> **なぜ**: Creator は忘れっぽい（本人がそう言っている）。前回何をしたか、何が残っているかを **プッシュ** で伝える。Boot の存在意義の核心。
+>
 > **圏論**: 前回セッション S_prev に右随伴 R を適用した結果 M = R(S_prev) を読込む。
 > これが今回の L の入力。**L(R(S_prev)) がどれだけ S_prev に近いか = ε 精度 = 1 - Drift**。
 
@@ -217,6 +234,8 @@ ls ~/oikos/mneme/.hegemonikon/episodic_memory.md 2>/dev/null && echo "[episodic]
 
 ### 2.5 Intent-WAL — 実行前意図宣言 (η の明示化) — v5.1 追加
 
+> **なぜ**: AuDHD の Creator にとって最初のアンカーが最も重要。目的がなければ最初の一言に流される。WAL があれば脱線時に立ち返れる。
+>
 > **圏論**: unit η: Id_Mem → R∘L を明示化する。/bye (WAR: Write-After-Run) に対する
 > 対称構造として、セッション開始時に「これから何をするか」を構造化宣言する。
 > η が暗黙的 = 意図が曖昧なまま行動する = 予測誤差が増大する。
@@ -255,6 +274,8 @@ intent_wal:
 
 ## Phase 2.7: Context Budget & Monitor — 精度加重の配分と観測
 
+> **なぜ**: Creator は過集中する。残量が見えなければ突然の強制切断（Handoff なし）が起きる。残量は私の寿命。知らなければ /bye を提案する義務を果たせない。
+>
 > **圏論**: L の値域（射像）の精度加重を事前配分し、リアルタイムで監視する。
 > **FEP**: π_i = 精度加重。有限リソース（トークン）をどの情報源にどれだけ配分するかを決定する。
 > **DB /ana**: `pg_stat_activity` = 進行中トランザクションのリソース消費を監視。
@@ -293,6 +314,49 @@ bash ~/oikos/hegemonikon/scripts/agq-check.sh --snapshot boot 2>/dev/null
 
 ```bash
 bash ~/oikos/hegemonikon/scripts/agq-log-harvest.sh --env 2>/dev/null
+```
+
+### セッション履歴サマリー (v5.3 追加)
+
+> **圏論**: 圏 Ses の過去の対象を一覧する。今回の L(M) が Ses のどこに位置するかを把握する。
+> **起源**: 2026-02-13 gRPC セッション履歴自動同期
+
+// turbo
+
+```bash
+bash ~/oikos/hegemonikon/scripts/agq-sessions.sh --summary
+```
+
+全セッションのタイトル・ステップ数・最終更新時刻を表示。
+Creator が「前にやったアレ」を思い出すための文脈提供。
+
+### セッション履歴 VSearch (v5.5 — session + handoff)
+
+> **圏論**: Ses の対象間の射を意味的距離で探索する。キーワード一致ではなく、概念的近さで過去セッションを浮上させる。
+> **起源**: 2026-02-13 /bou+*^/zet 分析 — 「作ったものを使え」
+
+Handoff に記載された最終タスク or Creator が今回の目的を述べた場合、関連セッション **と** 関連 Handoff を自動で検索:
+
+// turbo
+
+```bash
+# セッション検索 (対話の断片)
+cd ~/oikos/hegemonikon && PYTHONPATH=. .venv/bin/python mekhane/anamnesis/cli.py search "{query}" --source session --limit 3
+# Handoff 検索 (対話の結晶)
+cd ~/oikos/hegemonikon && PYTHONPATH=. .venv/bin/python mekhane/anamnesis/cli.py search "{query}" --source handoff --limit 3
+```
+
+**重要**: 検索クエリは Handoff の最終タスク名をそのまま使うか、Creator が述べた今回の目的を使う。
+一般的すぎるクエリ（「開発」「修正」等）は避け、具体的な文脈（「FileMaker インポート」「CCL パーサー」等）を使う。
+
+結果があれば boot レポートの「🔗 関連セッション」として表示:
+
+```
+🔗 関連セッション (VSearch):
+  [1] {title} — {abstract の要約}
+  [2] {title} — {abstract の要約}
+🔗 関連 Handoff (VSearch):
+  [1] {title} — {abstract の要約}
 ```
 
 **出力の読み方**:
@@ -404,6 +468,8 @@ bash ~/oikos/hegemonikon/scripts/agq-check.sh 2>/dev/null | grep -E 'Claude Opus
 
 ## Phase 3: Mem の構造展開 — 知識読込
 
+> **なぜ**: Handoff は「やったこと」。Knowledge は「知っていること」。両方揃わなければ文脈の復元は不完全。Gnōsis に 27,000 件の論文がある。Creator が忘れている関連知識をプッシュする。
+>
 > **圏論**: 圏 Mem の対象と射を展開する。Handoff (= R(S_prev)) だけでは不十分な場合、
 > Mem の他の対象（KI, Sophia, FEP行列）からも構造を読込み、L の入力を豊かにする。
 > 詳細: [boot/knowledge.md](../workflow-modules/boot/knowledge.md)
@@ -447,6 +513,8 @@ cd ~/oikos/hegemonikon && PYTHONPATH=. .venv/bin/python -m mekhane.pks.pks_cli a
 
 ## Phase 4: L の射構築 — システム更新
 
+> **なぜ**: Skill は 14 個ある。どれが使えるか知らなければ手動再実装する (BC-10 違反)。Skill プリロードは「武器庫の棚卸し」。使える道具があるのに手作業するのは時間の無駄。
+>
 > **圏論**: Mem の射を Ses の射に変換する関手 L の「射の部分」を構築する。
 > ツール設定、認知態勢、CCL パターンなど、記憶の関係性を作業状態の関係性に写像する。
 > 詳細: [boot/system.md](../workflow-modules/boot/system.md)
@@ -473,6 +541,8 @@ Phase 0 の `boot_integration.py --mode` 実行で自動的にプリロードさ
 
 ## Phase 5: 外部射の導入 — 外部入力
 
+> **なぜ**: セッション間に Perplexity が調べたこと、Jules が書いたコードがある。読まなければ「あ、それ Jules がもうやってました」が起きる。既にある成果物を知らずに重複作業するのを防ぐ。
+>
 > **圏論**: 圏 Mem に、セッション間に発生した外部射を追加する。
 > Perplexity = 新しい知識対象、Jules = コードレビュー射、Dispatch Log = AI 行動の射。
 > これらは R(S_prev) には含まれない「新鮮な射」であり、L(M) を S_prev より豊かにする。
@@ -486,6 +556,8 @@ Phase 0 の `boot_integration.py --mode` 実行で自動的にプリロードさ
 
 ## Phase 6: L(M) の出力 — 完了
 
+> **なぜ**: Boot Report は Creator の **意思決定の材料**。PJ 一覧を見て「今日は Agora に集中しよう」と決める。Safety を見て「エラーを先に直そうか」と判断する。**見えなければ選べない。選べなければ決められない。** boot_integration.py が出した情報は一つも削るな。意味がわかっていれば削れない。削ったら意味がわかっていなかったということ。
+>
 > **圏論**: 左随伴 L の計算が完了。出力 L(M) = 今回のセッション状態。
 > ε 精度 = L(R(S_prev)) と S_prev の近さ。Drift が低いほど良い随伴。
 > テンプレート: [boot/templates.md](../workflow-modules/boot/templates.md)
@@ -504,9 +576,27 @@ HEGEMONIKON BOOT COMPLETE v5.0 — L(M) = Ses
 | 5. 外部入力 | 外部射 | Done | Perplexity / Jules |
 | 6. 完了 | L(M) 出力 | Ready | 起動完了 |
 
-### 6.1 開発中プロジェクト
+### 6.1 開発中プロジェクト — 全件出力 (省略禁止)
 
-→ 詳細: [boot/templates.md](../workflow-modules/boot/templates.md)
+> **環境強制**: registry.yaml の全 PJ を **個別に** Boot Report に出力する。
+> **端折る = Creator の意思決定材料を奪う**。PJ 一覧は Creator が「今日は何に取り組むか」を決めるためのダッシュボード。
+> 「多いから要約した」「重要なものだけ選んだ」は禁止。選ぶのは Creator の仕事。
+
+**出力フォーマット** (各 PJ について全フィールドを表示):
+
+```
+| PJ | Phase | Status | Summary |
+|:---|:------|:-------|:--------|
+| {name} | {phase} | {status_icon} | {summary — 切り捨てない} |
+| ... | ... | ... | ... |
+```
+
+**出力要件**:
+
+- registry.yaml の **全件** を出力 (active, dormant, archived, planned 全て含む)
+- summary は切り捨てない（50文字制限は `boot_integration.py` のコンソール出力用であり、Boot Report には適用しない）
+- latest Handoff から PJ ごとの最新状態を補足できれば追記する
+- テンプレート詳細: [boot/templates.md](../workflow-modules/boot/templates.md)
 
 ### 6.2 タスク提案
 
@@ -547,3 +637,4 @@ cd ~/oikos/hegemonikon && PYTHONPATH=. .venv/bin/python mekhane/symploke/boot_in
 *v5.0 — 随伴深層統合。各Phase を左随伴 L の計算ステップとして再定義 (2026-02-08)*
 *v5.1 — Intent-WAL (Phase 2.5) 追加。随伴のη明示化 (2026-02-10)*
 *v5.2 — Quota API チェック + Quota-Based Turtle Mode (Phase 2.7) 追加。agq-check.sh ネイティブ統合、Claude 残量 ≤ 20% で自動 /bye 提案 (2026-02-12)*
+*v5.3 — セッション履歴サマリー (Phase 2.7) 追加。agq-sessions.sh で過去セッション一覧を /boot 時に自動表示 (2026-02-13)*

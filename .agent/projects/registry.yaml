@@ -1,8 +1,9 @@
-version: 1.1.0
+version: 1.2.0
 projects:
 - id: hegemonikon
   name: Hegemonikón (ἡγεμονικόν)
   path: /
+  tier: core
   summary: FEP に基づく認知ハイパーバイザーフレームワーク
   status: active
   phase: operational
@@ -12,6 +13,7 @@ projects:
 - id: hermeneus
   name: Hermēneus (ἑρμηνεύς)
   path: hermeneus/
+  tier: core
   summary: CCL 実行保証コンパイラ — LMQL/LangGraph による >96% 実行保証
   status: active
   phase: implementation
@@ -25,6 +27,7 @@ projects:
 - id: synergeia
   name: Synergeia (συνέργεια)
   path: synergeia/
+  tier: product
   summary: マルチエージェント協調 — Jules Pool, SynedrionReviewer
   status: active
   phase: operational
@@ -37,6 +40,7 @@ projects:
 - id: mekhane
   name: Mekhane (μηχανή)
   path: mekhane/
+  tier: core
   summary: 機器全体 — 全操作モジュールの親
   status: active
   phase: operational
@@ -47,6 +51,7 @@ projects:
 - id: dendron
   name: Dendron (δένδρον)
   path: mekhane/dendron/
+  tier: module
   summary: 存在目的テンソル (EPT) — 存在誤差最小化エンジン
   status: active
   phase: implementation
@@ -60,6 +65,7 @@ projects:
 - id: symploke
   name: Symploke (συμπλοκή)
   path: mekhane/symploke/
+  tier: engine
   summary: 編組・統合 — Boot統合, スペシャリスト, Jules Client
   status: active
   phase: operational
@@ -72,6 +78,7 @@ projects:
 - id: anamnesis
   name: Anamnesis (ἀνάμνησις)
   path: mekhane/anamnesis/
+  tier: engine
   summary: 想起 — Gnōsis CLI, LanceDB ベクトル検索
   status: active
   phase: operational
@@ -84,16 +91,21 @@ projects:
 - id: synteleia
   name: Synteleia (συντέλεια)
   path: mekhane/synteleia/
-  summary: 監視・免疫系 — システムの白血球
+  tier: module
+  summary: 6視点認知アンサンブル — 9 agent (8 L1 + 1 L2) による多角監査
   status: active
-  phase: design
+  phase: operational
   etymology: 完成・終末 — 全てを見届ける監視者
+  proof: true
   entry_point:
-    python: from mekhane.synteleia.wbc import WhiteBloodCell
-  usage_trigger: 安全性チェック時。WF/Skill のリスク検証、不正操作検知。
+    cli: PYTHONPATH=. .venv/bin/python -c "from mekhane.synteleia import SynteleiaOrchestrator; print(SynteleiaOrchestrator().agents)"
+    python: from mekhane.synteleia import SynteleiaOrchestrator, AuditTarget, AuditTargetType
+    api: POST /api/synteleia/audit, POST /api/synteleia/audit-quick, GET /api/synteleia/agents
+  usage_trigger: /dia+ 自動発動。コード/計画/CCL出力の多角監査。REST API 経由で n8n 連携可能。
 - id: ergasterion
   name: Ergasterion (ἐργαστήριον)
   path: mekhane/ergasterion/
+  tier: module
   summary: 工房 — 実験と鍛造の場
   status: active
   phase: implementation
@@ -105,6 +117,7 @@ projects:
 - id: peira
   name: Peira (πείρα)
   path: mekhane/peira/
+  tier: module
   summary: 試行 — テスト, note-collector, 検証スクリプト
   status: active
   phase: operational
@@ -116,6 +129,7 @@ projects:
 - id: poiema
   name: Poiema (ποίημα)
   path: mekhane/poiema/
+  tier: module
   summary: 生成・創造 — 出力生成エンジン
   status: active
   phase: implementation
@@ -127,6 +141,7 @@ projects:
 - id: exagoge
   name: Exagōgē (ἐξαγωγή)
   path: mekhane/exagoge/
+  tier: module
   summary: 抽出 — データ/知識の抽出機構
   status: active
   phase: design
@@ -136,6 +151,7 @@ projects:
 - id: ccl
   name: CCL (Cognitive Control Language)
   path: ccl/
+  tier: engine
   summary: 認知代数言語 — 演算子, マクロ, WF 分類
   status: active
   phase: operational
@@ -147,6 +163,7 @@ projects:
 - id: kernel
   name: Kernel
   path: kernel/
+  tier: core
   summary: 公理・定理・憲法 — 96要素体系の根幹
   status: active
   phase: operational
@@ -157,6 +174,7 @@ projects:
 - id: pythosis
   name: Pythōsis (Πύθων + ὄσις)
   path: pythosis/
+  tier: concept
   summary: Python の設計哲学を消化し CCL として再解釈
   status: dormant
   phase: implementation
@@ -167,6 +185,7 @@ projects:
 - id: kalon
   name: Kalon (τὸ καλόν)
   path: .agent/projects/kalon/
+  tier: concept
   summary: 美の体系 — FEP/圏論/CCL演算子の数学的基盤
   status: active
   phase: theory
@@ -178,6 +197,7 @@ projects:
 - id: aristos
   name: Aristos (ἄριστος)
   path: .agent/projects/aristos/
+  tier: concept
   summary: 最適化数学 — グラフ理論, 遺伝的アルゴリズム, ゲーム理論
   status: active
   phase: theory
@@ -188,6 +208,7 @@ projects:
 - id: autophonos
   name: Autophōnos (αὐτόφωνος)
   path: .agent/projects/autophonos/
+  tier: concept
   summary: 自律提案 — データが主体的に価値を Push する機構
   status: active
   phase: design
@@ -198,6 +219,7 @@ projects:
 - id: gnosis
   name: Gnōsis (γνῶσις)
   path: mekhane/gnosis/
+  tier: engine
   summary: 知識基盤 (legacy パス) — Anamnesis に統合済み
   status: archived
   phase: maintenance
@@ -208,6 +230,7 @@ projects:
 - id: mcp
   name: MCP Server
   path: mekhane/mcp/
+  tier: engine
   summary: Gnōsis MCP サーバー — Model Context Protocol
   status: active
   phase: operational
@@ -218,6 +241,7 @@ projects:
 - id: sympatheia
   name: Sympatheia (συμπάθεια)
   path: mekhane/ergasterion/n8n/
+  tier: product
   summary: 自律神経系 — n8n による感覚運動ループ・恒常性制御
   status: active
   phase: implementation
@@ -232,6 +256,7 @@ projects:
 - id: hgk-api
   name: Hegemonikón API
   path: mekhane/api/
+  tier: product
   summary: FastAPI backend — UDS (/tmp/hgk.sock) for Tauri, TCP (:9696) for n8n/dev
   status: active
   phase: operational
@@ -242,6 +267,7 @@ projects:
 - id: hgk-app
   name: Hegemonikón Desktop App
   path: hgk-app/
+  tier: product
   summary: サイバーパンク 3D デスクトップアプリ — Tauri v2 + Three.js
   status: active
   phase: design
@@ -250,12 +276,12 @@ projects:
   entry_point:
     dev: cd hgk-app && npm run tauri dev
   usage_trigger: デスクトップアプリの開発・ビルド時。
-
-  - id: agora
-    name: "Agora"
-    path: "/home/makaron8426/oikos/agora"
-    summary: "HGK 収益化プロジェクト — ディープインパクト戦略"
-    status: "active"
-    phase: "design"
-    entry_point: null
-    usage_trigger: null
+- id: agora
+  name: Agora
+  path: /home/makaron8426/oikos/agora
+  tier: product
+  summary: HGK 収益化プロジェクト — ディープインパクト戦略
+  status: active
+  phase: design
+  entry_point: null
+  usage_trigger: null

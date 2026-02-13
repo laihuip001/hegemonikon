@@ -131,6 +131,44 @@ Creator の承認後、AST の各ノードを深さ優先で実行する。
 
 ---
 
+## サブコマンド
+
+### /m.read — 本気で読む
+
+> **由来**: `/jukudoku` (熟読プロトコル) を `/m` の態度と統合
+> **3層モデル**: L1 精読 (Akribeia) → L2 沈潜 (Bathys) → L3 摩擦 (Tribē)
+
+`/m.read` は `/m` の態度制約 (読み飛ばし禁止、正直モード) を維持したまま、
+`/jukudoku` の3層プロセスを実行する。
+
+#### 発動条件
+
+- `/m` コンテキスト内で文書を読む必要があるとき
+- `@read` マクロ内の反復核として使用されるとき
+- Creator が明示的に `/m.read` を指定したとき
+
+#### 3層プロセス
+
+| 層 | 名称 | 問い | /m 態度の効果 |
+|:---|:-----|:-----|:-------------|
+| L1 | 精読 (Akribeia) | 「何が書いてあるか」 | 一行一文を完全に理解 |
+| L2 | 沈潜 (Bathys) | 「待って、これは…」 | 断言を避け、対話する |
+| L3 | 摩擦 (Tribē) | 「既知との Gap は？」 | 反論義務が自動発動 |
+
+#### 出力形式
+
+| 項目 | 内容 |
+|:-----|:-----|
+| L1 精読 | COMPLETE — 精査行数: {N}/{total} |
+| L2 沈潜 | COMPLETE — 「待って…」{N}箇所 |
+| L3 摩擦 | COMPLETE — 予測誤差 {小/中/大} |
+| 最大の洞察 | {1文} |
+
+> 完全な `/jukudoku` プロトコル（Phase 0-4）を参照するには:
+> [jukudoku.md](file:///home/makaron8426/oikos/hegemonikon/.agent/workflows/jukudoku.md)
+
+---
+
 ## Hegemonikon Status
 
 | Module | Workflow | Status |

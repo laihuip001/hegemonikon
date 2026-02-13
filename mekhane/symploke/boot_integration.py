@@ -468,6 +468,10 @@ MODE_REQUIREMENTS = {
         "min_chars": 1000,
         "required_sections": [
             "Handoff サマリー",
+            "開発中プロジェクト",
+            "Safety",
+            "EPT",
+            "Quota",
             "タスク提案",
         ],
     },

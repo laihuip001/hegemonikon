@@ -1,4 +1,4 @@
-# PROOF: [L2/運用] <- mekhane/ochema/scripts/ Cortex キャプチャスクリプト
+# PROOF: [L2/Operation] <- mekhane/ochema/scripts/ Cortex キャプチャスクリプト
 """
 Cortex API MITM Capture Script for mitmproxy.
 

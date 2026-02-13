@@ -1,8 +1,8 @@
-# PROOF: [L2/インフラ] <- mekhane/anamnesis/ セッション監視モニタ
+# PROOF: [L2/Infrastructure] <- mekhane/anamnesis/ セッション監視モニタ
 #!/usr/bin/env python3
 # PURPOSE: LS API ポーリングでアクティブセッションをリアルタイムにモニターし MD 保存する
 """
-PROOF: [L2/インフラ] <- mekhane/anamnesis/
+PROOF: [L2/Infrastructure] <- mekhane/anamnesis/
 
 Session Monitor — リアルタイムセッションログ保存
 

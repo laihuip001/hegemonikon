@@ -1,3 +1,4 @@
+# PROOF: [L3/ユーティリティ] <- mekhane/
 #!/usr/bin/env python3
 # PURPOSE: LS API ポーリングでアクティブセッションをリアルタイムにモニターし MD 保存する
 """

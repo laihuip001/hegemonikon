@@ -1,3 +1,4 @@
+# PROOF: [L3/ユーティリティ] <- mekhane/
 # PURPOSE: セッション履歴を GnosisIndex (LanceDB) にインデックスする
 """
 PROOF: [L2/インフラ] <- mekhane/anamnesis/

@@ -1,0 +1,107 @@
+# HGK Gateway Policy — 宣言的ポリシー定義
+# このファイルで各ツールの制約・セキュリティパラメータを一元管理する。
+# hgk_gateway.py が起動時に読込み、ツール制約に適用する。
+#
+# 変更履歴:
+#   v1.0 (2026-02-13) — 初版。既存ハードコード制約を抽出・集約。
+
+version: "1.0"
+
+# デフォルト値 (個別指定がなければこの値を適用)
+defaults:
+  max_input_size: 10000    # chars
+  rate_limit_per_min: 60   # calls/min per tool
+  require_auth: true
+
+# ツール別ポリシー
+tools:
+  hgk_sop_generate:
+    description: "調査依頼書テンプレート生成"
+    # 入力制約なし (topic は自然言語、短い)
+
+  hgk_search:
+    description: "KI / Gnōsis 検索"
+    max_results: 20
+
+  hgk_ccl_dispatch:
+    description: "CCL 構文解析"
+    # dispatch は解析のみ、制約は ccl_execute と共有
+
+  hgk_ccl_execute:
+    description: "CCL 実行"
+    max_ccl_size: 500       # C-5
+    max_context_size: 2000  # C-5
+
+  hgk_doxa_read:
+    description: "Doxa 信念ストア読取"
+    # 読取専用、入力制約なし
+
+  hgk_handoff_read:
+    description: "Handoff 参照"
+    max_count: 10
+
+  hgk_idea_capture:
+    description: "アイデアメモ保存"
+    max_input_size: 10000   # C-3
+
+  hgk_status:
+    description: "システムステータス"
+    # 読取専用
+
+  hgk_paper_search:
+    description: "論文検索 (Semantic Scholar)"
+    max_query_size: 200     # C-6
+    max_results: 20
+    timeout_seconds: 30
+
+  hgk_digest_check:
+    description: "消化候補一覧"
+    # 読取専用
+
+  hgk_digest_mark:
+    description: "消化完了マーク"
+    # 書込み操作
+
+  hgk_digest_list:
+    description: "候補評価 (dry-run)"
+    max_topics_size: 500    # C-7
+    max_candidates: 20
+
+  hgk_digest_run:
+    description: "消化パイプライン実行"
+    max_topics_size: 500    # C-7
+    max_papers: 50
+
+  hgk_proactive_push:
+    description: "PKS 能動的プッシュ"
+    max_topics: 5
+
+  hgk_pks_stats:
+    description: "PKS 知識基盤統計"
+    # 読取専用、subprocess 経由
+
+  hgk_pks_health:
+    description: "Autophōnos ヘルスチェック"
+    timeout_seconds: 60     # Embedder ロードに時間がかかる
+
+# セキュリティポリシー
+security:
+  token_expiry_seconds: 86400   # C-4: 24 hours
+  max_auth_codes: 100
+  wbc_alert_retention: 100      # 直近 N 件のみ保持
+  wbc_alert_events:
+    - invalid_token
+    - client_rejected
+    - rate_limit_exceeded
+
+# トレースポリシー
+trace:
+  enabled: true
+  output: "gateway_trace.jsonl"   # relative to MNEME_DIR
+  max_file_size_mb: 10            # ローテーション閾値
+  fields:
+    - timestamp
+    - tool_name
+    - input_size
+    - duration_ms
+    - success

@@ -204,6 +204,16 @@ def cmd_health(args: argparse.Namespace) -> None:
         return f"LLM={'ok' if a.llm_available else 'template mode'}"
     _check("SelfAdvocate", check_advocate)
 
+    # 9. Chronos index
+    def check_chronos():
+        pkl = Path.home() / "oikos" / "mneme" / ".hegemonikon" / "indices" / "chronos.pkl"
+        if not pkl.exists():
+            raise FileNotFoundError("chronos.pkl not found")
+        from mekhane.symploke.adapters.embedding_adapter import EmbeddingAdapter
+        a = EmbeddingAdapter(); a.load(str(pkl))
+        return f"{a.count():,} docs"
+    _check("Chronos (.pkl)", check_chronos)
+
     # Output
     print("| コンポーネント | 状態 | 詳細 | 時間 |")
     print("|:--------------|:----:|:-----|-----:|")

@@ -1,3 +1,6 @@
+reversible: true
+requires_approval: false
+fallbacks: []
 ---
 name: Peira Health Check
 description: システム全体のヘルスチェック・健全性確認
@@ -13,6 +16,9 @@ triggers:
 risk_tier: "L1"
 risks:
   - "ヘルスチェック偽陽性による不要な修正作業"
+reversible: true
+requires_approval: false
+fallbacks: []
 ---
 
 # Peira Health Check
@@ -83,6 +89,9 @@ Tests: 42 passed, 0 failed
 ⚠️ 修復手順: pip install -e hermeneus/
 ```
 
+reversible: true
+requires_approval: false
+fallbacks: []
 ---
 
 *v1.1 — Quality Scorer 対応セクション追加 (2026-02-11)*

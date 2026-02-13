@@ -1,3 +1,4 @@
+lcm_state: beta
 ---
 
 hegemonikon: Akribeia
@@ -8,6 +9,7 @@ layer: "τ"
 parent: "/dia"
 lineage: "A2 Krisis → Synedrion 6評議員 + Anti-Skip + Artifact出力 + 3層アーキテクチャ → /syn v3.0"
 anti_skip: enabled
+lcm_state: beta
 ---
 
 # /syn: Synedrion (偉人評議会)
@@ -16,6 +18,7 @@ anti_skip: enabled
 > **目的**: 多角的批評 — 偉人評議会 + 拡張モード
 > **親コマンド**: /dia
 
+lcm_state: beta
 ---
 
 ## 発動条件
@@ -30,6 +33,7 @@ anti_skip: enabled
 
 > **全のせが欲しい場合**: `/pan` を使用
 
+lcm_state: beta
 ---
 
 ## ⚠️ 実行前必須: 正本読み込み
@@ -45,6 +49,7 @@ anti_skip: enabled
 4. 確認後、処理を開始
 ```
 
+lcm_state: beta
 ---
 
 ## 処理フロー
@@ -65,6 +70,7 @@ anti_skip: enabled
 Artifact 保存
 ```
 
+lcm_state: beta
 ---
 
 ## コマンド
@@ -76,6 +82,7 @@ Artifact 保存
 | `/syn 10m` | 10th Man Rule (悪魔の代弁者) |
 | `/syn grv` | Graveyard Walk (墓場歩き) |
 
+lcm_state: beta
 ---
 
 ## Artifact 出力保存規則
@@ -91,6 +98,7 @@ Artifact 保存
 1. **偉人たちの議論は資産** — 同じ議論を再度生成するのは無駄
 2. **判断の追跡性** — 誰が何を言ったか後から確認
 
+lcm_state: beta
 ---
 
 ## Hegemonikon Status
@@ -99,6 +107,7 @@ Artifact 保存
 | :------- |:---------|--------------| :------- |
 | A2 Krisis | /syn | [SKILL.md](file:///home/makaron8426/oikos/.agent/skills/akribeia/a2-krisis/SKILL.md) | v3.0 Ready |
 
+lcm_state: beta
 ---
 
 *v3.0 — 3層アーキテクチャ対応 (Skill = 正本)*

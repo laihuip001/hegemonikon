@@ -1,3 +1,6 @@
+reversible: true
+requires_approval: false
+fallbacks: []
 ---
 name: Synedrion Council
 description: 偉人評議会 (Synedrion) による多角的レビュー・監査
@@ -14,6 +17,9 @@ triggers:
 risk_tier: "L1"
 risks:
   - "評議会の意見が合意バイアスに陥る"
+reversible: true
+requires_approval: false
+fallbacks: []
 ---
 
 # Synedrion Council
@@ -89,6 +95,9 @@ print(result)
   異論: P, A — "範囲が広すぎる、テスト先行すべき"
 ```
 
+reversible: true
+requires_approval: false
+fallbacks: []
 ---
 
 *v1.1 — Quality Scorer 対応セクション追加 (2026-02-11)*

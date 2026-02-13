@@ -1,3 +1,4 @@
+lcm_state: beta
 ---
 
 hegemonikon: Akribeia
@@ -8,6 +9,7 @@ layer: "τ"
 parent: "/dia"
 lineage: "A2 Krisis → Panorama 6層スキャン + Anti-Skip + Artifact出力 + 3層アーキテクチャ → /pan v3.0"
 anti_skip: enabled
+lcm_state: beta
 ---
 
 # /pan: Panorama (メタ認知レーダー)
@@ -16,6 +18,7 @@ anti_skip: enabled
 > **目的**: 「我々が見ていないもの」を可視化する全のせ盲点発見
 > **Override**: 忖度（Sycophancy）完全無効化
 
+lcm_state: beta
 ---
 
 ## 発動条件
@@ -27,6 +30,7 @@ anti_skip: enabled
 | `/pan user` | ユーザー視点パネルのみ実行 |
 | 「盲点は？」 | 自然言語トリガー |
 
+lcm_state: beta
 ---
 
 ## ⚠️ 実行前必須: 正本読み込み
@@ -42,6 +46,7 @@ anti_skip: enabled
 4. 確認後、6層スキャンを開始
 ```
 
+lcm_state: beta
 ---
 
 ## 処理フロー
@@ -66,6 +71,7 @@ anti_skip: enabled
 Synthesis: 盲点統合レポート → Artifact 保存
 ```
 
+lcm_state: beta
 ---
 
 ## Artifact 出力保存規則
@@ -81,6 +87,7 @@ Synthesis: 盲点統合レポート → Artifact 保存
 1. **6層スキャンの結果は大きい** — チャットで流れると参照困難
 2. **盲点発見は価値が高い** — 後から検証・追跡可能
 
+lcm_state: beta
 ---
 
 ## 使用タイミング
@@ -93,6 +100,7 @@ Synthesis: 盲点統合レポート → Artifact 保存
 | 全員が同意 | `/syn 10m` で強制異論 |
 | 成功確信あり | `/syn grv` で墓場歩き |
 
+lcm_state: beta
 ---
 
 ## Hegemonikon Status
@@ -101,6 +109,7 @@ Synthesis: 盲点統合レポート → Artifact 保存
 | :------- |:---------|--------------| :------- |
 | A2 Krisis | /pan | [SKILL.md](file:///home/makaron8426/oikos/.agent/skills/akribeia/a2-krisis/SKILL.md) | v3.0 Ready |
 
+lcm_state: beta
 ---
 
 *v3.0 — 3層アーキテクチャ対応 (Skill = 正本)*

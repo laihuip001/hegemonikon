@@ -1,3 +1,4 @@
+lcm_state: beta
 ---
 
 hegemonikon: Akribeia
@@ -8,6 +9,7 @@ layer: "τ"
 parent: "/dia"
 lineage: "Digestion Principle (A2 SKILL.md) + 階層的消化プロトコル + 具体例 + 3層アーキテクチャ → /fit v3.1"
 anti_skip: enabled
+lcm_state: beta
 ---
 
 # /fit: 消化品質診断 (Digestion Audit)
@@ -16,6 +18,7 @@ anti_skip: enabled
 > **目的**: モジュール統合が Naturalized 状態に達しているか検証する
 > **親コマンド**: /dia
 
+lcm_state: beta
 ---
 
 ## ⚠️ 実行前必須: 親クラス読み込み
@@ -31,6 +34,7 @@ anti_skip: enabled
 4. 確認後、以下の具体的手順を実行
 ```
 
+lcm_state: beta
 ---
 
 ## 第一原理
@@ -63,6 +67,7 @@ naturalized_state:
     naturalized: 境界が消えている（意味統合＝消化完了）
 ```
 
+lcm_state: beta
 ---
 
 ## Hegemonikón 哲学
@@ -99,6 +104,7 @@ naturalized_state:
       吸収に「逃げる」のは、なるべく減らす
 ```
 
+lcm_state: beta
 ---
 
 ## 発動条件
@@ -110,6 +116,7 @@ naturalized_state:
 | 「馴染んでる？」 | 自然言語トリガー |
 | 「消化されてる？」 | 消化原則を意識したトリガー |
 
+lcm_state: beta
 ---
 
 ## 実行手順
@@ -128,6 +135,7 @@ naturalized_state:
   - 統合先が「最初からそうだった」かのように強化されている
 ```
 
+lcm_state: beta
 ---
 
 ## 階層的消化プロトコル (具体的手順)
@@ -202,6 +210,7 @@ failure_handling:
     3. 「付加」（新コマンド）は最後の手段
 ```
 
+lcm_state: beta
 ---
 
 ## 診断ステップ (6-Step Process)
@@ -370,6 +379,7 @@ empowerment_score = capability + coherence + cognitive
 ══════════════════════════════════════════════════════════════════
 ```
 
+lcm_state: beta
 ---
 
 ## 消化失敗時の対応フローチャート
@@ -393,6 +403,7 @@ empowerment_score = capability + coherence + cognitive
                                     └───────────────┘
 ```
 
+lcm_state: beta
 ---
 
 ## 使用例
@@ -442,6 +453,7 @@ empowerment_score = capability + coherence + cognitive
 📌 結論: 部分消化。機能は動くが、用語の境界が残っている。
 ```
 
+lcm_state: beta
 ---
 
 ## Artifact 出力保存規則
@@ -458,6 +470,7 @@ empowerment_score = capability + coherence + cognitive
 2. **改善アクションの記録** — 何をすべきか明確化
 3. **セッション跨ぎで継続** — 消化未完のタスクを引き継ぎ
 
+lcm_state: beta
 ---
 
 ## Hegemonikon Status
@@ -466,6 +479,7 @@ empowerment_score = capability + coherence + cognitive
 | :------- |:---------|------------------| :------- |
 | A2 Krisis | /fit | [消化原則](file:///home/makaron8426/oikos/.agent/skills/akribeia/a2-krisis/SKILL.md) | v3.1 Ready |
 
+lcm_state: beta
 ---
 
 *v3.1 — 親子アーキテクチャ適用 (SKILL.md = 抽象、Workflow = 具体)*

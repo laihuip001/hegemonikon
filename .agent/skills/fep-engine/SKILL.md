@@ -1,3 +1,6 @@
+reversible: true
+requires_approval: false
+fallbacks: []
 ---
 name: FEP Cognitive Engine
 description: |
@@ -26,6 +29,9 @@ lineage: |
 risk_tier: "L1"
 risks:
   - "認知設計パラメータの誤解釈による判断偏り"
+reversible: true
+requires_approval: false
+fallbacks: []
 ---
 
 # FEP Cognitive Engine v2.0
@@ -35,6 +41,9 @@ risks:
 > FEP は「全てを説明する魔法」ではない。
 > FEP は「行動選択の objective function」として最も力を発揮する設計原理である。
 
+reversible: true
+requires_approval: false
+fallbacks: []
 ---
 
 ## Layer 0: 哲学的基盤 — なぜ FEP か
@@ -59,6 +68,9 @@ risks:
 > **Aguilera 2021 の警告**: Markov blanket + ソレノイダルフロー制約が成り立つパラメータ領域は極めて狭い。
 > 「任意のシステムに MB を仮定する」強い読みは不適切。[arXiv:2105.11203](https://arxiv.org/abs/2105.11203)
 
+reversible: true
+requires_approval: false
+fallbacks: []
 ---
 
 ## Layer 1: 操作的定義 — 概念を「使える」レベルで
@@ -136,6 +148,9 @@ LLM エージェントにおける Markov Blanket:
 > **注意**: この定義は Prakki 2024 のアーキテクチャに基づく概念的対応。
 > 厳密な Markov blanket の数学的条件（Aguilera 2021）を満たすかは未検証。[推定: 60%]
 
+reversible: true
+requires_approval: false
+fallbacks: []
 ---
 
 ## Layer 2: HGK 対応 — 定理体系との接続
@@ -171,6 +186,9 @@ A4 Epistēmē → 精度の確立（知識として正当化された高精度�
 | O3 Zētēsis | **Epistemic value** | 情報利得を最大化する行動。探索 |
 | O4 Energeia | **Pragmatic value** | 報酬を最大化する行動。実行 |
 
+reversible: true
+requires_approval: false
+fallbacks: []
 ---
 
 ## Layer 3: 実装手順
@@ -241,6 +259,9 @@ print(llm_fmt)
 | **ζ** (習慣率) | 0.0–1.0 | 習慣 vs 計画の比率 | 同上 |
 | **λ** (選好精度) | 4.0–8.0 | C ベクトルへの依存度 | 推奨値（文献明記なし） |
 
+reversible: true
+requires_approval: false
+fallbacks: []
 ---
 
 ## Layer 4: 判断支援 — 問いとチェックリスト
@@ -268,6 +289,9 @@ print(llm_fmt)
 - [ ] Markov blanket を具体的な I/O で定義できるか？
 - [ ] 「FEP だから正しい」ではなく「FEP に基づいてこの具体的予測を立てる」と言えるか？
 
+reversible: true
+requires_approval: false
+fallbacks: []
 ---
 
 ## Layer 5: 理論的基盤
@@ -300,6 +324,9 @@ print(llm_fmt)
 | Multi-signal precision estimator | 設計案のみ | 実装は将来 (C1-4) |
 | LLM トークン生成の FEP 直接モデル | 概念的対応のみ | 数理的な同一視は時期尚早 (A1-4) |
 
+reversible: true
+requires_approval: false
+fallbacks: []
 ---
 
 ## 参照実装
@@ -310,6 +337,9 @@ print(llm_fmt)
 | AIF_Meeting_EEC | Deep AIF for industrial control | [GitHub](https://github.com/YavarYeganeh/AIF_Meeting_EEC) |
 | pymdp | Active Inference の Python 実装 | [GitHub](https://github.com/infer-actively/pymdp) |
 
+reversible: true
+requires_approval: false
+fallbacks: []
 ---
 
 ## 結語
@@ -327,6 +357,9 @@ print(llm_fmt)
 >
 > その一瞬の停止こそが、精度（precision）の正体である。
 
+reversible: true
+requires_approval: false
+fallbacks: []
 ---
 
 *v2.1 — /dia+ 敵対的レビュー反映 + Layer 3 実証テスト済み (2026-02-10)*

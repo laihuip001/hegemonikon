@@ -1,3 +1,4 @@
+lcm_state: beta
 ---
 
 hegemonikon: Akribeia
@@ -8,6 +9,7 @@ layer: "τ"
 parent: "/dia"
 lineage: "A2 Krisis → Epochē 4層プロトコル + Anti-Skip + 3層アーキテクチャ → /epo v2.0"
 anti_skip: enabled
+lcm_state: beta
 ---
 
 # /epo: 判断停止ワークフロー (Epochē)
@@ -16,6 +18,7 @@ anti_skip: enabled
 > **目的**: LLM の過信 (Overconfidence) を低減し、認識限界で判断を停止する
 > **本質**: ἐποχή = 判断保留
 
+lcm_state: beta
 ---
 
 ## 発動条件
@@ -26,6 +29,7 @@ anti_skip: enabled
 | `/dia epo` | /dia から委譲 |
 | 自動発動 | 確信度 LOW 検出時に自動適用 |
 
+lcm_state: beta
 ---
 
 ## ⚠️ 実行前必須: 正本読み込み
@@ -41,6 +45,7 @@ anti_skip: enabled
 4. 確認後、処理を開始
 ```
 
+lcm_state: beta
 ---
 
 ## 処理フロー
@@ -61,6 +66,7 @@ anti_skip: enabled
 Hollow Detection（形骸化防止チェック）
 ```
 
+lcm_state: beta
 ---
 
 ## 出力マーカー例
@@ -72,6 +78,7 @@ Hollow Detection（形骸化防止チェック）
 【判断停止: 是 | 原因: ~の限界に到達】
 ```
 
+lcm_state: beta
 ---
 
 ## 哲学
@@ -80,6 +87,7 @@ Hollow Detection（形骸化防止チェック）
 > 過信は知識の敵である。
 > Epochē は謙虚さの制度化である。
 
+lcm_state: beta
 ---
 
 ## Hegemonikon Status
@@ -88,6 +96,7 @@ Hollow Detection（形骸化防止チェック）
 | :------- |:---------|--------------| :------- |
 | A2 Krisis | /epo | [SKILL.md](file:///home/makaron8426/oikos/.agent/skills/akribeia/a2-krisis/SKILL.md) | v2.0 Ready |
 
+lcm_state: beta
 ---
 
 *v2.0 — 3層アーキテクチャ対応 (Skill = 正本)*

@@ -1,3 +1,6 @@
+reversible: true
+requires_approval: false
+fallbacks: []
 ---
 name: Synteleia WBC
 description: 安全性チェック・白血球 (WBC) による不正操作検知
@@ -17,6 +20,9 @@ risk_tier: "L1"
 risks:
   - "WBC 偽陽性によるアラート疲れ"
   - "偽陰性による脅威の見逃し"
+reversible: true
+requires_approval: false
+fallbacks: []
 ---
 
 # Synteleia WBC (白血球)
@@ -186,6 +192,9 @@ Issues (1):
 → アクション: 停止。Creator に確認要求。
 ```
 
+reversible: true
+requires_approval: false
+fallbacks: []
 ---
 
 *v2.0 — API 例を実コードに修正、/dia 連携・WBC 連携追加 (2026-02-11)*

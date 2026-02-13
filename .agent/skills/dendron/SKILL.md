@@ -1,3 +1,6 @@
+reversible: true
+requires_approval: false
+fallbacks: []
 ---
 name: Dendron EPT Checker
 description: コード品質・存在証明 (PROOF.md) の検証を実行する
@@ -13,6 +16,9 @@ triggers:
 risk_tier: "L1"
 risks:
   - "検証漏れによる品質ゲート形骸化"
+reversible: true
+requires_approval: false
+fallbacks: []
 ---
 
 # Dendron EPT Checker
@@ -68,6 +74,9 @@ for p in scan_missing('TARGET_DIR'):
 "
 ```
 
+reversible: true
+requires_approval: false
+fallbacks: []
 ---
 
 *v1.0 — 全PJ IDE配線 (2026-02-08)*

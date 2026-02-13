@@ -1,3 +1,6 @@
+reversible: true
+requires_approval: false
+fallbacks: []
 ---
 name: Taxis Classifier
 description: タスク/入力の自動分類・優先順位付け
@@ -14,6 +17,9 @@ triggers:
 risk_tier: "L1"
 risks:
   - "分類ミスによる優先順位の歪み"
+reversible: true
+requires_approval: false
+fallbacks: []
 ---
 
 # Taxis Classifier
@@ -96,6 +102,9 @@ WF: /mek (S2 Mekhanē)
   Anchor: O, P
 ```
 
+reversible: true
+requires_approval: false
+fallbacks: []
 ---
 
 *v1.2 — Quality Scorer 対応セクション追加 (2026-02-11)*

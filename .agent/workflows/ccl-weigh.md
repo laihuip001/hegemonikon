@@ -1,5 +1,9 @@
+lcm_state: beta
+version: 1.0.0
 ---
 description: 量る — /bou*%/noe
+lcm_state: beta
+version: 1.0.0
 ---
 
 # @weigh — 量る
@@ -8,6 +12,8 @@ description: 量る — /bou*%/noe
 > **俗名**: 量る
 > **目的**: 意志と認識を同時に収束+展開し、目標の確信度と全選択肢を一撃で得る
 
+lcm_state: beta
+version: 1.0.0
 ---
 
 ## 本質
@@ -15,6 +21,8 @@ description: 量る — /bou*%/noe
 > 「何を望むか (意志)」と「何を知っているか (認識)」の同時分析。
 > 望みの優先度 (収束) と、望み×認識の全組み合わせ (展開) を一発で出す。
 
+lcm_state: beta
+version: 1.0.0
 ---
 
 ## CCL 展開
@@ -35,6 +43,8 @@ description: 量る — /bou*%/noe
   | 衝動的欲求 | ...      | ...      | ...      |
 ```
 
+lcm_state: beta
+version: 1.0.0
 ---
 
 ## 使用場面
@@ -45,6 +55,8 @@ description: 量る — /bou*%/noe
 | 複数の選択肢を比較したい | 展開マトリクスで全候補を可視化 |
 | `/bou` の前処理 | `@weigh` で仮判断 → `/bou` で深掘り |
 
+lcm_state: beta
+version: 1.0.0
 ---
 
 ## `/bou` との違い
@@ -59,6 +71,8 @@ description: 量る — /bou*%/noe
 > `/bou` は開いた系 (`~` 的)。`@weigh` は閉じた系 (`*%` 的)。
 > `/bou` は意志を **作る**。`@weigh` は既にある意志を **量る**。
 
+lcm_state: beta
+version: 1.0.0
 ---
 
 ## 演算子適用
@@ -69,6 +83,8 @@ description: 量る — /bou*%/noe
 @weigh{scope="HGK開発"}  # スコープ限定
 ```
 
+lcm_state: beta
+version: 1.0.0
 ---
 
 ## 複雑度
@@ -77,6 +93,8 @@ description: 量る — /bou*%/noe
 |:-------|:--:|
 | `@weigh` | 6 |
 
+lcm_state: beta
+version: 1.0.0
 ---
 
 *v1.0 — FuseOuter マクロ初版 (2026-02-13)*

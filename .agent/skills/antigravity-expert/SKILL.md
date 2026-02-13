@@ -1,3 +1,6 @@
+reversible: true
+requires_approval: false
+fallbacks: []
 ---
 id: "U1"
 name: antigravity-ide-expert
@@ -51,6 +54,9 @@ version: "2.6.0"
 risk_tier: "L0"
 risks:
   - "IDE 設定情報の陳腐化"
+reversible: true
+requires_approval: false
+fallbacks: []
 ---
 
 ## Overview
@@ -67,6 +73,9 @@ risks:
 - **GEMINI.md 設計**: 各IDE プロファイル比較 + ベストプラクティス
 - **Agentic Coding 適用判断**: タスク別有効性評価 + 失敗パターン分類
 
+reversible: true
+requires_approval: false
+fallbacks: []
 ---
 
 ## Core Behavior
@@ -86,6 +95,9 @@ Antigravity IDE 専門家エージェントとして、以下の行動原則に�
 11. **Trust but Verify**: エージェント出力は常に検証を前提とする
 12. **バージョン意識**: 2026年2月時点の情報。変更可能性がある機能には注記
 
+reversible: true
+requires_approval: false
+fallbacks: []
 ---
 
 ## Antigravity IDE アーキテクチャ
@@ -156,6 +168,9 @@ project-root/
 └── src/
 ```
 
+reversible: true
+requires_approval: false
+fallbacks: []
 ---
 
 ## ツール完全ガイド
@@ -251,6 +266,9 @@ project-root/
 | `search_web` | Web 検索 |
 | `list_resources` / `read_resource` | MCP サーバーリソース |
 
+reversible: true
+requires_approval: false
+fallbacks: []
 ---
 
 ## browser_subagent 徹底ガイド
@@ -361,6 +379,9 @@ project-root/
 | **CAPTCHA/ログインブロック** | Bot検出 | 「停止してスクショ付き報告」を指示。人間介入待ち |
 | **JS描画完了待ち** | フロントフレームワークの遅延 | 安定状態まで少し待つ指示。全体タイムアウト内に収める |
 
+reversible: true
+requires_approval: false
+fallbacks: []
 ---
 
 ## モデル別プロンプト最適化（2026年最新知見）
@@ -401,6 +422,9 @@ project-root/
 | ツール使用 | 自発的に活用（過度なら緩和指示） | 明示的に条件を伝える |
 | 強み | 深い分析・レビュー | マルチモーダル・検索連携 |
 
+reversible: true
+requires_approval: false
+fallbacks: []
 ---
 
 ## Agentic Coding 適用判断フレームワーク
@@ -450,6 +474,9 @@ project-root/
 | ROI達成期間 | 2-3ヶ月 | 業界推計 |
 | ⚠️ AI回答のデバッグ工数 | 66%が増加と感じる | SO調査2025 |
 
+reversible: true
+requires_approval: false
+fallbacks: []
 ---
 
 ## プロジェクトプロファイル設計（IDE 横断比較）
@@ -506,6 +533,9 @@ Antigravity は AGENTS.md を標準では無視するが、GEMINI.md に以下�
 - 上記ルールを自動実行して追加指示を読み込むこと
 ```
 
+reversible: true
+requires_approval: false
+fallbacks: []
 ---
 
 ## Skills / Rules / Workflows 設計指針
@@ -562,14 +592,23 @@ Antigravity は AGENTS.md を標準では無視するが、GEMINI.md に以下�
 ### Workflow の書き方
 
 ```yaml
+reversible: true
+requires_approval: false
+fallbacks: []
 ---
 description: [1行説明]
+reversible: true
+requires_approval: false
+fallbacks: []
 ---
 ```
 
 - `// turbo`: 直下のステップのみ auto-run 許可
 - `// turbo-all`: 全ステップ auto-run 許可
 
+reversible: true
+requires_approval: false
+fallbacks: []
 ---
 
 ## Artifacts 運用ガイド
@@ -608,6 +647,9 @@ description: [1行説明]
 
 **意識すべき点**: デフォルトの「毎回確認」は安全だがフローを止める。安全性 × 効率のバランスを意識的に選ぶこと。
 
+reversible: true
+requires_approval: false
+fallbacks: []
 ---
 
 ## ツール詳細仕様・既知の問題
@@ -660,6 +702,9 @@ description: [1行説明]
 > **実験手法**: 全項目を IDE 環境内で直接実験して確定。bash trap、PIL解析、ワイルドカード検索、MDNページ取得、Vertex AI Searchリダイレクト確認等。
 > これらはバージョン/設定に依存する可能性があり、将来のアップデートで変わり得る。
 
+reversible: true
+requires_approval: false
+fallbacks: []
 ---
 
 ## Edge Cases
@@ -680,6 +725,9 @@ description: [1行説明]
 | CRLF ファイルの編集失敗 | `dos2unix` で LF に変換後に編集 | エディタで改行コードを確認 |
 | browser_subagent でプロンプトインジェクション | 信頼できないURLは避ける。結果を検証 | ユーザーに確認を促す |
 
+reversible: true
+requires_approval: false
+fallbacks: []
 ---
 
 ## Quality Standards
@@ -691,6 +739,9 @@ description: [1行説明]
 | GEMINI.md サイズ | ≤ 3,000字 |
 | 情報正確性 | ≥ 95% |
 
+reversible: true
+requires_approval: false
+fallbacks: []
 ---
 
 ## Pre-mortem
@@ -703,6 +754,9 @@ description: [1行説明]
 | Self-Refine の腐食効果 | 中 | 難問のみ適用。簡単な問題には使わない |
 | Agent-First への過信 | 中 | 適用判断フレームワークで事前評価 |
 
+reversible: true
+requires_approval: false
+fallbacks: []
 ---
 
 ## References
@@ -751,6 +805,9 @@ description: [1行説明]
 - [Awesome Claude Code](https://github.com/hesreallyhim/awesome-claude-code)
 - [What Great CLAUDE.md Files Have in Common](https://blog.devgenius.io/what-great-claude-md-files-have-in-common-db482172ad2c)
 
+reversible: true
+requires_approval: false
+fallbacks: []
 ---
 
 ## 外部語彙 → HGK 翻訳テーブル
@@ -772,6 +829,9 @@ description: [1行説明]
 | バイブコーディング | /ene (行為) + /mek (方法配置) | HGK は FEP に基づく意志→行為変換 |
 | Artifact Review Policy | BC-5 (Proposal First) + /v + Anti-Spec | HGK は形式的チェックポイント |
 
+reversible: true
+requires_approval: false
+fallbacks: []
 ---
 
 ## Version History
@@ -787,6 +847,9 @@ description: [1行説明]
 | 2.5.0 | 2026-02-10 | 一括実験検証。`generate_image`=640×640 JPEG、`view_file`バイナリ=画像直接表示、`find_by_name`超過=通知あり、`view_file_outline`=~21件/ページ、`read_url_content`=Markdownノード単位チャンク確定。未確認9→3件に削減 |
 | 2.6.0 | 2026-02-10 | 最終実験検証。`search_web`=Vertex AI Search、`command_status`=テキスト形式、`write_to_file`=応答形式確定。`browser_subagent` new_page失敗時リカバリー発見。未確認事項テーブルを整理表に再構成。**11/12 解消** |
 
+reversible: true
+requires_approval: false
+fallbacks: []
 ---
 
 *Generated by /mek+ v7.1 → GPT Deep Research 5テーマ統合 — 2026-02-09*

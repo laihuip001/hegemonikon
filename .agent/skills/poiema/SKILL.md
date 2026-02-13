@@ -1,3 +1,6 @@
+reversible: true
+requires_approval: false
+fallbacks: []
 ---
 name: Poiema Generator
 description: 構造化出力の生成 (Boot レポート, Handoff, 定型ドキュメント)
@@ -13,6 +16,9 @@ triggers:
 risk_tier: "L1"
 risks:
   - "テンプレート不整合による出力品質低下"
+reversible: true
+requires_approval: false
+fallbacks: []
 ---
 
 # Poiema Generator
@@ -114,6 +120,9 @@ Mapping: 2 entries
   PHONE_1 → 03-1234-5678
 ```
 
+reversible: true
+requires_approval: false
+fallbacks: []
 ---
 
 *v1.2 — Quality Scorer 対応セクション追加 (2026-02-11)*

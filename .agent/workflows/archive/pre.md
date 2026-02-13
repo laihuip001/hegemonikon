@@ -1,3 +1,4 @@
+lcm_state: beta
 ---
 
 hegemonikon: Ousia
@@ -14,6 +15,7 @@ triggers:
 version: "1.0"
 lineage: "O2 Boulēsis 派生 + SE Premortem 手法統合 → v1.0 (2026-01-29)"
 anti_skip: enabled
+lcm_state: beta
 ---
 
 # /pre: Premortem ワークフロー
@@ -22,6 +24,7 @@ anti_skip: enabled
 > **目的**: 失敗を事前に想定し、目標の堅牢性を検証する
 > **SE手法**: Premortem (McKinsey prospective hindsight)
 
+lcm_state: beta
 ---
 
 ## 本質
@@ -36,6 +39,7 @@ anti_skip: enabled
 
 > **重要**: 実行前に行う。実行後は Postmortem。
 
+lcm_state: beta
 ---
 
 ## 発動条件
@@ -46,6 +50,7 @@ anti_skip: enabled
 | `/pre [目標]` | 特定の目標に対して Premortem |
 | `/pre 1m` | 1ヶ月後の失敗を想定 |
 
+lcm_state: beta
 ---
 
 ## PHASE 0: 対象の明確化（スキップ禁止）
@@ -73,6 +78,7 @@ anti_skip: enabled
 → `何の失敗を想定するか` に答えてから続行してください。
 ```
 
+lcm_state: beta
 ---
 
 ## PHASE 1: 失敗宣言
@@ -112,6 +118,7 @@ anti_skip: enabled
   「プロジェクトが失敗した」
 ```
 
+lcm_state: beta
 ---
 
 ## PHASE 2: 原因列挙
@@ -163,6 +170,7 @@ anti_skip: enabled
 | 影響度 | 壊滅的 / 深刻 / 中程度 / 軽微 |
 | 制御可能性 | 自分で制御可 / 影響可 / 制御不可 |
 
+lcm_state: beta
 ---
 
 ## PHASE 3: 対策立案
@@ -195,6 +203,7 @@ anti_skip: enabled
 | **緩和** | 発生時の影響を最小化する |
 | **回復** | 発生後の復旧手順 |
 
+lcm_state: beta
 ---
 
 ## PHASE 4: 目標強化
@@ -228,6 +237,7 @@ Premortem 後の判定:
   ❌ No-Go: リスクが高すぎる、計画見直し
 ```
 
+lcm_state: beta
 ---
 
 ## Artifact 出力保存規則
@@ -279,6 +289,7 @@ Premortem 後の判定:
 [Go / Go with Caution / No-Go]
 ```
 
+lcm_state: beta
 ---
 
 ## X-series 推奨次ステップ
@@ -291,6 +302,7 @@ Premortem 後の判定:
 → /ene (X-OO): 実行 — Go 判定後に実行開始
 ```
 
+lcm_state: beta
 ---
 
 ## Hegemonikon Status
@@ -299,6 +311,7 @@ Premortem 後の判定:
 |:-------|:---------|:-------|:-------|
 | O2 Boulēsis | /pre | /bou | v1.0 Ready |
 
+lcm_state: beta
 ---
 
 *v1.0 — O2 Boulēsis 派生 + SE Premortem 手法統合 (2026-01-29)*

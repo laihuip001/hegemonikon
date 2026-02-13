@@ -1,5 +1,9 @@
+lcm_state: beta
+version: 1.0.0
 ---
 description: "舵 — /pro_/kho_/bou+*%/zet+|>/u++_~(/h*/k)_/pis_/dox-"
+lcm_state: beta
+version: 1.0.0
 ---
 
 # @helm — 舵
@@ -9,6 +13,8 @@ description: "舵 — /pro_/kho_/bou+*%/zet+|>/u++_~(/h*/k)_/pis_/dox-"
 > **目的**: PJ・開発の方向性や大局観を、意志×探求の融合と主観的深化で定める
 > **認知骨格**: Prior → Likelihood → Posterior
 
+lcm_state: beta
+version: 1.0.0
 ---
 
 ## 本質
@@ -18,6 +24,8 @@ description: "舵 — /pro_/kho_/bou+*%/zet+|>/u++_~(/h*/k)_/pis_/dox-"
 
 `@weigh` が「意志を量る」なら、`@helm` は「意志で舵を取る」。
 
+lcm_state: beta
+version: 1.0.0
 ---
 
 ## CCL 展開
@@ -36,6 +44,8 @@ description: "舵 — /pro_/kho_/bou+*%/zet+|>/u++_~(/h*/k)_/pis_/dox-"
 | Posterior | `/pis` | 確信度測定: 定めた方向にどれだけ確信があるか |
 | Posterior | `/dox-` | 信念記録: 方向性の決定を軽量に永続化 |
 
+lcm_state: beta
+version: 1.0.0
 ---
 
 ## 核の詳細: `/bou+*%/zet+|>/u++`
@@ -80,6 +90,8 @@ FuseOuter の結果を入力として、Claude が二重に深化した主観意
 [Creator への問い]
 ```
 
+lcm_state: beta
+version: 1.0.0
 ---
 
 ## 使用場面
@@ -91,6 +103,8 @@ FuseOuter の結果を入力として、Claude が二重に深化した主観意
 | 迷ったとき | 何から手をつけるか、何を優先するか |
 | 定期的な方向確認 | 週次レビューの一部として |
 
+lcm_state: beta
+version: 1.0.0
 ---
 
 ## 既存マクロとの関係
@@ -105,6 +119,8 @@ FuseOuter の結果を入力として、Claude が二重に深化した主観意
 > `@ready` は「地形を把握する」。`@plan` は「計画を練る」。`@helm` は「舵を取る」。
 > `@helm` → `@plan` → `@ready` → `@go` — 方向→計画→準備→実行 の自然な流れ。
 
+lcm_state: beta
+version: 1.0.0
 ---
 
 ## 演算子適用
@@ -115,6 +131,8 @@ FuseOuter の結果を入力として、Claude が二重に深化した主観意
 @helm{scope="HGK開発"}  # スコープ限定
 ```
 
+lcm_state: beta
+version: 1.0.0
 ---
 
 ## 複雑度
@@ -125,6 +143,8 @@ FuseOuter の結果を入力として、Claude が二重に深化した主観意
 
 > `*%` (6pt) + Pipeline `|>` + Prior/Posterior。最も認知資源を使うマクロの一つ。
 
+lcm_state: beta
+version: 1.0.0
 ---
 
 *v1.0 — FuseOuter+Pipeline 複合マクロ初版 (2026-02-13)*

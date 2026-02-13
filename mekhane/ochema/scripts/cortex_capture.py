@@ -1,5 +1,7 @@
+#!/usr/bin/env python3
+# PROOF: [L2/インフラ] <- mekhane/ochema/ Cortex API MITM Capture Script
 """
-Cortex API MITM Capture Script for mitmproxy.
+Cortex Capture — MITM Capture Script
 
 LS → Cortex (daily-cloudcode-pa.googleapis.com) 間の gRPC 通信をキャプチャし、
 Project ID やリクエスト構造を解析する。

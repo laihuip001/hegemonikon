@@ -79,6 +79,7 @@ class EnsembleMember:
     backend: LLMBackend
     persona: str  # PERSONAS のキー
 
+    # PURPOSE: persona 付きプロンプトを生成
     @property
     def persona_prompt(self) -> str:
         """persona 付きプロンプトを生成。"""
@@ -104,6 +105,7 @@ class MultiSemanticAgent(AuditAgent):
     def __init__(self, members: List[EnsembleMember]):
         self.members = members
 
+    # PURPOSE: デフォルト構成のファクトリメソッド
     @classmethod
     def default(cls) -> "MultiSemanticAgent":
         """デフォルト構成: Gemini Pro + Claude Opus + GPT-OSS。"""
@@ -145,6 +147,7 @@ class MultiSemanticAgent(AuditAgent):
 
         return cls(members=members)
 
+    # PURPOSE: テスト用スタブ構成のファクトリメソッド
     @classmethod
     def with_stubs(cls, responses: Optional[Dict[str, str]] = None) -> "MultiSemanticAgent":
         """テスト用: StubBackend でアンサンブルを構成。"""
@@ -322,6 +325,7 @@ class MultiSemanticAgent(AuditAgent):
 # Utilities
 # =============================================================================
 
+# PURPOSE: Severity の厳しさ順序を返す
 def _severity_rank(severity: AuditSeverity) -> int:
     """Severity の厳しさ順序。"""
     return {

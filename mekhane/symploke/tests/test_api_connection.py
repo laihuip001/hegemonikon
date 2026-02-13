@@ -11,7 +11,7 @@ import sys
 import pytest
 
 # Add parent to path
-sys.path.insert(0, "/home/makaron8426/oikos/hegemonikon")
+# sys.path.insert(0, "/home/makaron8426/oikos/hegemonikon")  # Removed hardcoded path causing CI failure
 
 from mekhane.symploke.jules_client import JulesClient
 

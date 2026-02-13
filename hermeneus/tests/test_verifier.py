@@ -15,7 +15,11 @@ from unittest.mock import patch, MagicMock
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 from hermeneus.src.audit import AuditRecord, AuditStats, AuditStore, AuditReporter
-from hermeneus.src.verifier import AgentRole, VerdictType, DebateArgument, Verdict, DebateRound, ConsensusResult, DebateAgent, DebateEngine
+from hermeneus.src.verifier import (
+    AgentRole, VerdictType, DebateArgument, Verdict, DebateRound,
+    ConsensusResult, DebateAgent, DebateEngine,
+    RallyTurn, ConvergenceDetector,
+)
 
 
 class TestAgentRole:
@@ -116,27 +120,38 @@ class TestDebateEngine:
         """エンジン作成"""
         engine = DebateEngine()
         assert engine.proposer.role == AgentRole.PROPOSER
-        assert len(engine.critics) == 2
+        assert len(engine.critics) == 1  # ラリー型では1対1がデフォルト
         assert engine.arbiter.role == AgentRole.ARBITER
+    
+    # PURPOSE: エンジン作成 (カスタム critics 数)
+    def test_create_engine_multi_critics(self):
+        """カスタム critics 数"""
+        engine = DebateEngine(num_critics=3)
+        assert len(engine.critics) == 3
     
     # PURPOSE: 合意構築
     def test_build_consensus(self):
         """合意構築"""
         engine = DebateEngine()
         
-        # モックラウンド
+        # モックラリー履歴
+        rally = [
+            RallyTurn(AgentRole.PROPOSER, "支持論拠", 0.8, 1),
+            RallyTurn(AgentRole.CRITIC, "批判1", 0.6, 2),
+            RallyTurn(AgentRole.PROPOSER, "反論", 0.85, 3),
+            RallyTurn(AgentRole.CRITIC, "同意する、妥当だ", 0.5, 4),
+        ]
+        
         rounds = [
             DebateRound(
                 round_number=1,
-                proposition=DebateArgument(
-                    AgentRole.PROPOSER,
-                    "支持論拠",
-                    0.8
-                ),
+                rally=rally,
+                converged=True,
+                convergence_reason="@Critic が同意",
+                proposition=DebateArgument(AgentRole.PROPOSER, "支持論拠", 0.8),
                 critiques=[
                     DebateArgument(AgentRole.CRITIC, "批判1", 0.6),
-                    DebateArgument(AgentRole.CRITIC, "批判2", 0.5)
-                ]
+                ],
             )
         ]
         
@@ -151,6 +166,8 @@ class TestDebateEngine:
         assert result.accepted is True
         assert result.confidence == 0.75
         assert len(result.rounds) == 1
+        assert result.metadata["total_rally_turns"] == 4
+        assert result.metadata["converged"] is True
 
 
 class TestAuditRecord:
@@ -262,6 +279,103 @@ class TestAuditReporter:
         
         since_30d = reporter._parse_period("last_30_days")
         assert (now - since_30d).days <= 30
+
+
+class TestRallyTurn:
+    """RallyTurn のテスト"""
+    
+    def test_create_turn(self):
+        """ターン作成"""
+        turn = RallyTurn(
+            speaker=AgentRole.PROPOSER,
+            content="FEP は有望だ",
+            confidence=0.8,
+            turn_number=1,
+        )
+        assert turn.speaker == AgentRole.PROPOSER
+        assert turn.turn_number == 1
+
+
+class TestConvergenceDetector:
+    """ConvergenceDetector のテスト"""
+    
+    def test_not_converged_too_few_turns(self):
+        """最低ターン数未達では収束しない"""
+        history = [
+            RallyTurn(AgentRole.PROPOSER, "支持する", 0.8, 1),
+            RallyTurn(AgentRole.CRITIC, "同意する", 0.7, 2),
+        ]
+        converged, reason = ConvergenceDetector.check(history, min_turns=3)
+        assert converged is False
+    
+    def test_converged_mutual_agreement(self):
+        """相互同意で収束"""
+        history = [
+            RallyTurn(AgentRole.PROPOSER, "論拠A", 0.8, 1),
+            RallyTurn(AgentRole.CRITIC, "批判B", 0.6, 2),
+            RallyTurn(AgentRole.PROPOSER, "確かに妥当な指摘。同意する", 0.7, 3),
+            RallyTurn(AgentRole.CRITIC, "修正案に同意する。妥当だ", 0.7, 4),
+        ]
+        converged, reason = ConvergenceDetector.check(history, min_turns=3)
+        assert converged is True
+        assert "同意" in reason
+    
+    def test_converged_critic_concedes(self):
+        """Critic が認めて収束"""
+        history = [
+            RallyTurn(AgentRole.PROPOSER, "論拠A", 0.8, 1),
+            RallyTurn(AgentRole.CRITIC, "批判B", 0.6, 2),
+            RallyTurn(AgentRole.PROPOSER, "反論C", 0.85, 3),
+            RallyTurn(AgentRole.CRITIC, "認めざるを得ない。妥当だ", 0.5, 4),
+        ]
+        converged, reason = ConvergenceDetector.check(history, min_turns=3)
+        assert converged is True
+    
+    def test_not_converged_insistence(self):
+        """固執している場合は収束しない"""
+        history = [
+            RallyTurn(AgentRole.PROPOSER, "論拠A", 0.8, 1),
+            RallyTurn(AgentRole.CRITIC, "批判B", 0.6, 2),
+            RallyTurn(AgentRole.PROPOSER, "反論C", 0.85, 3),
+            RallyTurn(AgentRole.CRITIC, "しかし認められない。だが同意はできない", 0.7, 4),
+        ]
+        converged, reason = ConvergenceDetector.check(history, min_turns=3)
+        assert converged is False
+    
+    def test_converged_confidence_stable(self):
+        """確信度が安定して収束"""
+        history = [
+            RallyTurn(AgentRole.PROPOSER, "論拠A", 0.75, 1),
+            RallyTurn(AgentRole.CRITIC, "批判B", 0.74, 2),
+            RallyTurn(AgentRole.PROPOSER, "反論C", 0.76, 3),
+            RallyTurn(AgentRole.CRITIC, "再批判D", 0.75, 4),
+        ]
+        converged, reason = ConvergenceDetector.check(history, min_turns=3)
+        assert converged is True
+        assert "収束" in reason
+
+
+class TestRallyHistory:
+    """ラリー履歴フォーマットのテスト"""
+    
+    def test_format_empty(self):
+        """空履歴"""
+        agent = DebateAgent(AgentRole.PROPOSER)
+        result = agent._format_rally_history([])
+        assert result == ""
+    
+    def test_format_with_mentions(self):
+        """@メンション付きフォーマット"""
+        agent = DebateAgent(AgentRole.PROPOSER)
+        history = [
+            RallyTurn(AgentRole.PROPOSER, "支持する", 0.8, 1),
+            RallyTurn(AgentRole.CRITIC, "批判する", 0.6, 2),
+        ]
+        result = agent._format_rally_history(history)
+        assert "@Proposer" in result
+        assert "@Critic" in result
+        assert "Turn 1" in result
+        assert "Turn 2" in result
 
 
 # =============================================================================

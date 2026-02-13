@@ -4,6 +4,11 @@ description: HGK 収益化プロジェクト — ディープインパクト戦�
 triggers:
   - "agora"
   - "agora"
+
+risk_tier: L1
+risks:
+  - 収益化戦略の失敗
+  - ブランド価値の毀損
 ---
 
 # Agora

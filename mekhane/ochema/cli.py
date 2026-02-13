@@ -1,3 +1,4 @@
+# PROOF: [L2/Infrastructure] <- mekhane/ochema/ A0→mekhane実装層が必要→__init__ が担う
 # PURPOSE: Ochēma CLI — Antigravity LS とのインタラクション
 """Ochēma CLI — Antigravity Language Server Client.
 

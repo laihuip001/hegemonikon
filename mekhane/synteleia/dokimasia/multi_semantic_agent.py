@@ -1,4 +1,4 @@
-# PROOF: A2 (Krisis) mekhane/synteleia/dokimasia/multi_semantic_agent.py
+# PROOF: [L2/Krisis] <- mekhane/synteleia/dokimasia/
 # PURPOSE: Multi-LLM アンサンブル監査エージェント (Layer B: Nous)
 """
 MultiSemanticAgent — Multi-LLM Cognitive Ensemble

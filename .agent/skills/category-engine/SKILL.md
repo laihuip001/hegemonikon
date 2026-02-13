@@ -1,4 +1,6 @@
 ---
+risk_tier: L1
+risks: none
 name: Category Theory Engine
 description: |
   圏論に基づく構造認識エンジン。
@@ -12,6 +14,10 @@ triggers:
   - 構造の保存・忘却を問う時
   - Trigonon / X-series を参照する時
   - 「なぜこの変換は正当か」を問う時
+
+reversible: true
+requires_approval: false
+fallbacks: []
 ---
 
 # 🏛️ Category Theory Engine — 構造認識の言語

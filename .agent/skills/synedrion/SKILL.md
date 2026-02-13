@@ -14,6 +14,10 @@ triggers:
 risk_tier: "L1"
 risks:
   - "評議会の意見が合意バイアスに陥る"
+
+reversible: true
+requires_approval: false
+fallbacks: []
 ---
 
 # Synedrion Council

@@ -1,5 +1,8 @@
 ---
 description: "監る — /kho_/s-_/pro_/dia+{synteleia}_~(/noe*/dia)_V:{/pis+}_/dox-"
+
+lcm_state: beta
+version: 1.0.0
 ---
 
 # /ccl-syn: Synteleia 監査マクロ

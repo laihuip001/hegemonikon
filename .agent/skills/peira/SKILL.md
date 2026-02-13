@@ -13,6 +13,10 @@ triggers:
 risk_tier: "L1"
 risks:
   - "ヘルスチェック偽陽性による不要な修正作業"
+
+reversible: true
+requires_approval: false
+fallbacks: []
 ---
 
 # Peira Health Check

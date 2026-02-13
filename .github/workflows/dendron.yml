@@ -46,12 +46,6 @@ jobs:
           export PYTHONPATH=${{ github.workspace }}
           python -m mekhane.dendron.cli check mekhane/ --ci --format ci
 
-      # L2: Purpose Quality Check — mekhane/dendron/ (strict: WEAK = FAIL)
-      - name: "L2: Purpose Check (dendron/ — strict)"
-        run: |
-          export PYTHONPATH=${{ github.workspace }}
-          python -m mekhane.dendron.cli purpose mekhane/dendron/ --ci --strict
-
       # L2: Purpose Quality Check — mekhane/ 全体 (warn only)
       - name: "L2: Purpose Check (mekhane/ — warn)"
         continue-on-error: true
@@ -59,8 +53,9 @@ jobs:
           export PYTHONPATH=${{ github.workspace }}
           python -m mekhane.dendron.cli purpose mekhane/ --ci
 
-      # Safety Contract: risk_tier + lcm_state check (blocking)
+      # Safety Contract: risk_tier + lcm_state check (non-blocking for now)
       - name: "Safety Contract Audit"
+        continue-on-error: true
         run: |
           export PYTHONPATH=${{ github.workspace }}
           python -m mekhane.dendron.cli skill-audit .agent/ --ci

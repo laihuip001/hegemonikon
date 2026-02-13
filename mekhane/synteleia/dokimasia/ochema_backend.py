@@ -1,5 +1,8 @@
+# PROOF: [S3/Stathmos] <- mekhane/synteleia/dokimasia/ochema_backend.py Ochema Backend
 # PURPOSE: Ochēma (AntigravityClient) 経由の LLM バックエンド
 """
+PROOF: [S3/Stathmos] <- mekhane/synteleia/dokimasia/ochema_backend.py
+
 OchemaBackend — Antigravity Language Server Bridge for Synteleia
 
 AntigravityClient を使い、Ultra プランの LLM を Synteleia 監査に利用する。

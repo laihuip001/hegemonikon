@@ -1,10 +1,14 @@
 ---
+risk_tier: L1
+risks: []
 name: Agora
 description: HGK 収益化プロジェクト — ディープインパクト戦略
 triggers:
   - "agora"
   - "agora"
 ---
+risk_tier: L1
+risks: []
 
 # Agora
 
@@ -36,5 +40,7 @@ print('TODO: agora の実行コマンドを定義')
 ```
 
 ---
+risk_tier: L1
+risks: []
 
 *v1.0 — 自動生成 (2026-02-12)*

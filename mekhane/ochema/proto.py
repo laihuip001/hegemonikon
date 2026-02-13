@@ -67,6 +67,7 @@ POLL_INTERVAL = 1.0  # seconds
 
 # --- Payload Builders (v8) ---
 
+# PURPOSE: [L2-auto] StartCascade ペイロードを構築
 def build_start_cascade() -> dict:
     """StartCascade ペイロードを構築する。
 
@@ -80,6 +81,7 @@ def build_start_cascade() -> dict:
     }
 
 
+# PURPOSE: [L2-auto] SendUserCascadeMessage ペイロードを構築
 def build_send_message(cascade_id: str, text: str, model: str) -> dict:
     """SendUserCascadeMessage ペイロードを構築する。
 
@@ -100,6 +102,7 @@ def build_send_message(cascade_id: str, text: str, model: str) -> dict:
     }
 
 
+# PURPOSE: [L2-auto] GetUserStatus ペイロードを構築
 def build_get_status() -> dict:
     """GetUserStatus ペイロードを構築する。"""
     return {
@@ -111,6 +114,7 @@ def build_get_status() -> dict:
     }
 
 
+# PURPOSE: [L2-auto] GetCascadeTrajectorySteps ペイロードを構築
 def build_get_steps(cascade_id: str, trajectory_id: str) -> dict:
     """GetCascadeTrajectorySteps ペイロードを構築する。"""
     return {
@@ -129,6 +133,7 @@ STEP_STATUS_DONE = "CORTEX_STEP_STATUS_DONE"
 TURN_STATES_DONE = ("", "TURN_STATE_WAITING_FOR_USER")
 
 
+# PURPOSE: [L2-auto] PLANNER_RESPONSE ステップからテキスト等を抽出
 def extract_planner_response(step: dict) -> dict:
     """PLANNER_RESPONSE ステップからテキスト・thinking・model を抽出する。
 
@@ -154,6 +159,7 @@ def extract_planner_response(step: dict) -> dict:
     }
 
 
+# PURPOSE: [L2-auto] モデルエイリアスを解決
 def resolve_model(name: str) -> str:
     """モデルエイリアスを proto enum に解決する。"""
     if name in MODEL_ALIASES:

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# PROOF: [L2/インフラ] <- mekhane/mcp/ 出張 HGK MCP Gateway
+# PROOF: [L2/Infrastructure] <- mekhane/mcp
 """
 出張 HGK MCP Gateway — モバイルからの HGK アクセス
 

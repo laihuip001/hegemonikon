@@ -197,6 +197,7 @@ def _traced(fn):
     """
     import functools
 
+    # PURPOSE: [L2-auto] トレースラッパー
     @functools.wraps(fn)
     def wrapper(*args: Any, **kwargs: Any) -> Any:
         _start = time.time()

@@ -1,3 +1,4 @@
+# PROOF: [L2/Nous] <- mekhane/synteleia/dokimasia/ochema_backend.py A0→予測誤差最小化→LLMが必要→ochema_backend.pyが担う
 # PURPOSE: Ochēma (AntigravityClient) 経由の LLM バックエンド
 """
 OchemaBackend — Antigravity Language Server Bridge for Synteleia

@@ -1,3 +1,4 @@
+# PROOF: [L2/Nous] <- mekhane/synteleia/dokimasia/multi_semantic_agent.py A0→予測誤差最小化→合議制が必要→multi_semantic_agent.pyが担う
 # PURPOSE: Multi-LLM アンサンブル監査エージェント (Layer B: Nous)
 """
 MultiSemanticAgent — Multi-LLM Cognitive Ensemble

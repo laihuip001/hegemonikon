@@ -14,7 +14,8 @@ from unittest.mock import AsyncMock, MagicMock, patch
 import sys
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent))
+# Ensure aiohttp is available
+aiohttp = pytest.importorskip("aiohttp")
 
 from mekhane.symploke.jules_client import (
     JulesClient,

@@ -1,9 +1,13 @@
 ---
+description: "HGK \u53CE\u76CA\u5316\u30D7\u30ED\u30B8\u30A7\u30AF\u30C8 \u2014 \u30C7\
+  \u30A3\u30FC\u30D7\u30A4\u30F3\u30D1\u30AF\u30C8\u6226\u7565"
 name: Agora
-description: HGK 収益化プロジェクト — ディープインパクト戦略
+risk_tier: L1
+risks:
+- general_execution_risk
 triggers:
-  - "agora"
-  - "agora"
+- agora
+- agora
 ---
 
 # Agora

@@ -1,6 +1,0 @@
-❌ Purpose: 2536/2550 OK (99.5%), 0 weak, 14 missing
-  ❌ mekhane/mcp/hgk_gateway.py:201 wrapper
-  ❌ mekhane/ochema/proto.py:136 extract_planner_response
-  ❌ mekhane/ochema/proto.py:161 resolve_model
-  ❌ mekhane/pks/pks_cli.py:140 check_gnosis
-  ❌ mekhane/pks/pks_cli.py:148 check_kairos

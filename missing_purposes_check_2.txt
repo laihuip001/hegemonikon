@@ -1,3 +1,0 @@
-❌ Purpose: 2548/2550 OK (99.9%), 0 weak, 2 missing
-  ❌ mekhane/mcp/hgk_gateway.py:201 wrapper
-  ❌ mekhane/symploke/indices/gnosis_lance_bridge.py:55 source_type

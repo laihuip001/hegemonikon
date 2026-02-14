@@ -1,6 +1,0 @@
-❌ Purpose: 2532/2550 OK (99.3%), 0 weak, 18 missing
-  ❌ mekhane/mcp/hgk_gateway.py:201 wrapper
-  ❌ mekhane/ochema/proto.py:70 build_start_cascade
-  ❌ mekhane/ochema/proto.py:83 build_send_message
-  ❌ mekhane/ochema/proto.py:103 build_get_status
-  ❌ mekhane/ochema/proto.py:114 build_get_steps

@@ -1,5 +1,9 @@
 ---
 name: tekhne-maker
+risk_tier: L1
+risks:
+  - メタプロンプトの過剰最適化による実用性低下
+  - Phantom Timeline プロトコルによるユーザーへの精神的負荷
 description: |
   OMEGA SINGULARITY BUILD v6.1 — 認知拡張メタプロンプト生成システム。
   

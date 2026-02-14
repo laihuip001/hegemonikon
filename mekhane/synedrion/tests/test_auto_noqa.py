@@ -5,6 +5,7 @@
 
 import pytest
 from pathlib import Path
+from unittest.mock import MagicMock
 from mekhane.synedrion.auto_noqa import parse_audit_file, find_file, insert_noqa
 
 
@@ -48,7 +49,7 @@ class TestParseAuditFile:
     def test_parse_line_numbers(self, audit_file):
         """Verify parse line numbers behavior."""
         result = parse_audit_file(audit_file)
-        lines = [ln for ln, _ in result["validators.py"]]
+        lines = [i.line for i in result["validators.py"]]
         assert 42 in lines
         assert 55 in lines
 
@@ -56,7 +57,7 @@ class TestParseAuditFile:
     def test_parse_issue_codes(self, audit_file):
         """Verify parse issue codes behavior."""
         result = parse_audit_file(audit_file)
-        codes = [code for _, code in result["validators.py"]]
+        codes = [i.code for i in result["validators.py"]]
         assert "AI-001" in codes
         assert "AI-002" in codes
 
@@ -125,7 +126,8 @@ class TestInsertNoqa:
     # PURPOSE: Verify insert single behaves correctly
     def test_insert_single(self, source_file):
         """Verify insert single behavior."""
-        count = insert_noqa(source_file, [(1, "AI-001")])
+        issues = [MagicMock(line=1, code="AI-001")]
+        count = insert_noqa(source_file, issues)
         assert count == 1
         content = source_file.read_text()
         assert "# noqa: AI-001" in content
@@ -133,13 +135,15 @@ class TestInsertNoqa:
     # PURPOSE: Verify insert multiple lines behaves correctly
     def test_insert_multiple_lines(self, source_file):
         """Verify insert multiple lines behavior."""
-        count = insert_noqa(source_file, [(1, "AI-001"), (2, "AI-002")])
+        issues = [MagicMock(line=1, code="AI-001"), MagicMock(line=2, code="AI-002")]
+        count = insert_noqa(source_file, issues)
         assert count == 2
 
     # PURPOSE: Verify insert same line multiple codes behaves correctly
     def test_insert_same_line_multiple_codes(self, source_file):
         """Verify insert same line multiple codes behavior."""
-        count = insert_noqa(source_file, [(1, "AI-001"), (1, "AI-002")])
+        issues = [MagicMock(line=1, code="AI-001"), MagicMock(line=1, code="AI-002")]
+        count = insert_noqa(source_file, issues)
         assert count == 1
         content = source_file.read_text()
         assert "AI-001" in content and "AI-002" in content
@@ -149,25 +153,29 @@ class TestInsertNoqa:
         """Verify skip existing noqa behavior."""
         f = tmp_path / "already.py"
         f.write_text("import os  # noqa: AI-001\n")
-        count = insert_noqa(f, [(1, "AI-002")])
+        issues = [MagicMock(line=1, code="AI-002")]
+        count = insert_noqa(f, issues)
         assert count == 0
 
     # PURPOSE: Verify skip nonexistent file behaves correctly
     def test_skip_nonexistent_file(self, tmp_path):
         """Verify skip nonexistent file behavior."""
-        count = insert_noqa(tmp_path / "nope.py", [(1, "AI-001")])
+        issues = [MagicMock(line=1, code="AI-001")]
+        count = insert_noqa(tmp_path / "nope.py", issues)
         assert count == 0
 
     # PURPOSE: Verify out of range behaves correctly
     def test_out_of_range(self, source_file):
         """Verify out of range behavior."""
-        count = insert_noqa(source_file, [(999, "AI-001")])
+        issues = [MagicMock(line=999, code="AI-001")]
+        count = insert_noqa(source_file, issues)
         assert count == 0
 
     # PURPOSE: Verify preserves content behaves correctly
     def test_preserves_content(self, source_file):
         """Verify preserves content behavior."""
-        insert_noqa(source_file, [(3, "AI-001")])
+        issues = [MagicMock(line=3, code="AI-001")]
+        insert_noqa(source_file, issues)
         content = source_file.read_text()
         assert "def foo():" in content
         assert "# noqa: AI-001" in content

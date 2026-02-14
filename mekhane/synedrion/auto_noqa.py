@@ -4,18 +4,27 @@
 
 import re
 from pathlib import Path
+from mekhane.synedrion.ai_auditor import Issue, Severity
 
 
 # PURPOSE: Parse auditor output file
-def parse_audit_file(audit_file: Path) -> dict[str, list[tuple[int, str]]]:
+def parse_audit_file(audit_file: Path) -> dict[str, list[Issue]]:
     """Parse auditor output file.
 
-    Returns: dict mapping file name to list of (line_number, issue_code)
+    Returns: dict mapping file name to list of Issue objects
     """
-    findings: dict[str, list[tuple[int, str]]] = {}
+    findings: dict[str, list[Issue]] = {}
     current_file = None
 
     content = audit_file.read_text(encoding="utf-8")
+
+    # Icon to Severity mapping
+    icon_map = {
+        "🔴": Severity.CRITICAL,
+        "🟠": Severity.HIGH,
+        "🟡": Severity.MEDIUM,
+        "⚪": Severity.LOW,
+    }
 
     for line in content.splitlines():
         # Detect file header (## filename.py)
@@ -23,13 +32,27 @@ def parse_audit_file(audit_file: Path) -> dict[str, list[tuple[int, str]]]:
             current_file = line[3:].strip()
         # Detect issue line (- ⚪ **AI-XXX** LNNN: ...)
         elif current_file and "**AI-" in line:
-            match = re.search(r"\*\*AI-(\d+)\*\* L(\d+):", line)
+            match = re.search(r"- (.) \*\*AI-(\d+)\*\* L(\d+): (.*)", line)
             if match:
-                code = f"AI-{match.group(1)}"
-                line_num = int(match.group(2))
+                icon = match.group(1)
+                code = f"AI-{match.group(2)}"
+                line_num = int(match.group(3))
+                message = match.group(4)
+
+                severity = icon_map.get(icon, Severity.LOW)
+
                 if current_file not in findings:
                     findings[current_file] = []
-                findings[current_file].append((line_num, code))
+
+                findings[current_file].append(
+                    Issue(
+                        code=code,
+                        name="Parsed Issue",  # Name is not preserved in summary format
+                        severity=severity,
+                        line=line_num,
+                        message=message
+                    )
+                )
 
     return findings
 
@@ -49,7 +72,7 @@ def find_file(file_name: str, base_dir: Path) -> Path | None:
 
 
 # PURPOSE: Insert # noqa comments for the given issues
-def insert_noqa(file_path: Path, issues: list[tuple[int, str]]):
+def insert_noqa(file_path: Path, issues: list[Issue]):
     """Insert # noqa comments for the given issues."""
     if not file_path.exists():
         print(f"  [SKIP] {file_path} not found")
@@ -61,10 +84,10 @@ def insert_noqa(file_path: Path, issues: list[tuple[int, str]]):
 
     # Group issues by line
     by_line: dict[int, set[str]] = {}
-    for line_num, code in issues:
-        if line_num not in by_line:
-            by_line[line_num] = set()
-        by_line[line_num].add(code)
+    for issue in issues:
+        if issue.line not in by_line:
+            by_line[issue.line] = set()
+        by_line[issue.line].add(issue.code)
 
     for line_num, codes in by_line.items():
         if line_num < 1 or line_num > len(lines):

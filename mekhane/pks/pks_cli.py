@@ -22,6 +22,11 @@ _HEGEMONIKON_ROOT = _MEKHANE_DIR.parent
 if str(_HEGEMONIKON_ROOT) not in sys.path:
     sys.path.insert(0, str(_HEGEMONIKON_ROOT))
 
+# --- Path constants (一元管理) ---
+MNEME_ROOT = Path.home() / "oikos" / "mneme" / ".hegemonikon"
+INDICES_DIR = MNEME_ROOT / "indices"
+SESSIONS_DIR = MNEME_ROOT / "sessions"
+
 
 # PURPOSE: SelfAdvocate 一人称メッセージを出力するヘルパー
 def _print_advocacy(nuggets, engine) -> None:
@@ -65,7 +70,7 @@ def cmd_stats(args: argparse.Namespace) -> None:
         pass
 
     # --- Mnēmē indices ---
-    indices_dir = Path.home() / "oikos" / "mneme" / ".hegemonikon" / "indices"
+    indices_dir = INDICES_DIR
     kairos_count = 0
     sophia_count = 0
     chronos_count = 0
@@ -88,7 +93,7 @@ def cmd_stats(args: argparse.Namespace) -> None:
                     pass
 
     # --- Handoffs ---
-    handoff_dir = Path.home() / "oikos" / "mneme" / ".hegemonikon" / "sessions"
+    handoff_dir = SESSIONS_DIR
     handoff_count = len(list(handoff_dir.glob("handoff_20??-??-??_????.md"))) if handoff_dir.exists() else 0
 
     # --- KI (Knowledge Items) ---
@@ -146,7 +151,7 @@ def cmd_health(args: argparse.Namespace) -> None:
 
     # 2. Kairos index
     def check_kairos():
-        pkl = Path.home() / "oikos" / "mneme" / ".hegemonikon" / "indices" / "kairos.pkl"
+        pkl = INDICES_DIR / "kairos.pkl"
         if not pkl.exists():
             raise FileNotFoundError("kairos.pkl not found")
         from mekhane.symploke.adapters.embedding_adapter import EmbeddingAdapter
@@ -156,7 +161,7 @@ def cmd_health(args: argparse.Namespace) -> None:
 
     # 3. Sophia index
     def check_sophia():
-        pkl = Path.home() / "oikos" / "mneme" / ".hegemonikon" / "indices" / "sophia.pkl"
+        pkl = INDICES_DIR / "sophia.pkl"
         if not pkl.exists():
             raise FileNotFoundError("sophia.pkl not found")
         from mekhane.symploke.adapters.embedding_adapter import EmbeddingAdapter
@@ -206,7 +211,7 @@ def cmd_health(args: argparse.Namespace) -> None:
 
     # 9. Chronos index
     def check_chronos():
-        pkl = Path.home() / "oikos" / "mneme" / ".hegemonikon" / "indices" / "chronos.pkl"
+        pkl = INDICES_DIR / "chronos.pkl"
         if not pkl.exists():
             raise FileNotFoundError("chronos.pkl not found")
         from mekhane.symploke.adapters.embedding_adapter import EmbeddingAdapter
@@ -257,15 +262,15 @@ def cmd_search(args: argparse.Namespace) -> None:
             for r in results:
                 title = r.get("title", r.get("primary_key", "?"))
                 dist = float(r.get("_distance", 1.0))
-                # LanceDB distance → similarity (lower distance = higher similarity)
-                score = max(0, 1 - dist / 2)
+                # LanceDB L2 distance → [0,1] similarity (clamp to valid range)
+                score = max(0.0, min(1.0, 1.0 - dist / 2.0))
                 snippet = r.get("abstract", r.get("content", ""))[:120]
                 all_results.append(("gnosis", score, title, snippet))
         except Exception as e:
             print(f"  ⚠️ Gnōsis: {e}")
 
     # 2-4. pkl indices (Kairos, Sophia, Chronos)
-    indices_dir = Path.home() / "oikos" / "mneme" / ".hegemonikon" / "indices"
+    indices_dir = INDICES_DIR
     pkl_names = [n for n in ["kairos", "sophia", "chronos"] if n in sources]
 
     if pkl_names:
@@ -339,7 +344,7 @@ def cmd_rebuild(args: argparse.Namespace) -> None:
     print("## 🔄 Chronos Index Rebuild\n")
     t0 = time.time()
 
-    handoff_dir = Path.home() / "oikos" / "mneme" / ".hegemonikon" / "sessions"
+    handoff_dir = SESSIONS_DIR
     handoffs = sorted(handoff_dir.glob("handoff_20??-??-??_????.md"))
     print(f"📁 Handoff ファイル: {len(handoffs)} 件")
 
@@ -381,7 +386,7 @@ def cmd_rebuild(args: argparse.Namespace) -> None:
         if done % 128 == 0 or done == len(chunks):
             print(f"  進捗: {done}/{len(chunks)}")
 
-    out_path = Path.home() / "oikos" / "mneme" / ".hegemonikon" / "indices" / "chronos.pkl"
+    out_path = INDICES_DIR / "chronos.pkl"
     out_path.parent.mkdir(parents=True, exist_ok=True)
     adapter.save(str(out_path))
 

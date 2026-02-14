@@ -39,6 +39,8 @@ class GnosisSearchResponse(BaseModel):
 class GnosisStatsResponse(BaseModel):
     """インデックス統計。"""
     total: int = 0
+    paper_count: int = 0  # 外部論文のみのカウント
+    chunk_count: int = 0  # 全チャンク数 (= total)
     unique_dois: int = 0
     unique_arxiv: int = 0
     sources: dict[str, int] = {}
@@ -127,10 +129,18 @@ async def gnosis_stats() -> GnosisStatsResponse:
 
     stats = index.stats()
 
+    # 外部論文ソースのみをカウント
+    sources = stats.get("sources", {})
+    EXTERNAL_SOURCES = {"semantic_scholar", "arxiv", "openalex", "research"}
+    paper_count = sum(v for k, v in sources.items() if k in EXTERNAL_SOURCES)
+    chunk_count = stats.get("total", 0)
+
     return GnosisStatsResponse(
-        total=stats.get("total", 0),
+        total=paper_count,  # ダッシュボード向け: 論文数を返す
+        paper_count=paper_count,
+        chunk_count=chunk_count,
         unique_dois=stats.get("unique_dois", 0),
         unique_arxiv=stats.get("unique_arxiv", 0),
-        sources=stats.get("sources", {}),
+        sources=sources,
         last_collected=stats.get("last_collected_at", ""),
     )

@@ -88,10 +88,13 @@ class DigestorPipeline:
             ]
 
         # === Phase A: Gnōsis LanceDB ベクトル検索 ===
+        # papers テーブル + knowledge テーブル内の外部論文を取得
+        # 内部ドキュメント (session/workflow/handoff/kernel 等) は除外
+        EXTERNAL_SOURCES = {"semantic_scholar", "arxiv", "openalex", "research"}
         gnosis_count = 0
         try:
             from mekhane.anamnesis.gnosis_chat import GnosisChat
-            gc = GnosisChat(use_reranker=False)  # Reranker は CUDA 問題があるため無効化
+            gc = GnosisChat(use_reranker=False, top_k=15)  # Digestor 用: top_k を増やして外部論文の取得範囲を拡大
             per_topic = max(max_papers // max(len(queries), 1), 5)
 
             for topic_id, query in queries:
@@ -100,8 +103,15 @@ class DigestorPipeline:
                 try:
                     result = gc.retrieve_only(query)
                     for src in result.get("sources", [])[:per_topic]:
-                        # papers テーブルの結果のみ使用（knowledge テーブルは論文ではない）
-                        if src.get("table") not in ("papers",):
+                        table = src.get("table", "unknown")
+                        source = src.get("source", "unknown")
+                        # papers テーブル → 全て通過
+                        # knowledge テーブル → 外部論文ソースのみ通過
+                        if table == "papers":
+                            pass
+                        elif table == "knowledge" and source in EXTERNAL_SOURCES:
+                            pass
+                        else:
                             continue
                         # Paper オブジェクトに変換
                         paper = self._source_to_paper(src, topic_id)
@@ -188,7 +198,7 @@ class DigestorPipeline:
         return Paper(
             id=f"gnosis_{src.get('source', 'unknown')}_{title[:40]}",
             title=title,
-            abstract="",  # retrieve_only は abstract を返さない
+            abstract=src.get("abstract", ""),
             source=src.get("source", "unknown"),
             url=src.get("url", ""),
         )

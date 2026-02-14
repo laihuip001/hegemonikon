@@ -203,8 +203,10 @@ async def handle_list_candidates(arguments: dict):
     topics = arguments.get("topics")
     max_candidates = arguments.get("max_candidates", 10)
 
-    pipeline = DigestorPipeline()
-    result = pipeline.run(topics=topics, max_candidates=max_candidates, dry_run=True)
+    # pipeline.run() は print() で stdout に出力する → MCP stdio を汚染するため抑制
+    with StdoutSuppressor():
+        pipeline = DigestorPipeline()
+        result = pipeline.run(topics=topics, max_candidates=max_candidates, dry_run=True)
 
     output = f"=== 消化候補リスト ===\n"
     output += f"総論文数: {result.total_papers}\n"
@@ -229,12 +231,14 @@ async def handle_run_digestor(arguments: dict):
     dry_run = arguments.get("dry_run", True)
     max_papers = arguments.get("max_papers", 50)
 
-    pipeline = DigestorPipeline()
-    result = pipeline.run(
-        topics=topics,
-        max_papers=max_papers,
-        dry_run=dry_run,
-    )
+    # pipeline.run() は print() で stdout に出力する → MCP stdio を汚染するため抑制
+    with StdoutSuppressor():
+        pipeline = DigestorPipeline()
+        result = pipeline.run(
+            topics=topics,
+            max_papers=max_papers,
+            dry_run=dry_run,
+        )
 
     output = f"=== Digestor パイプライン {'(Dry Run)' if dry_run else ''} ===\n"
     output += f"Timestamp: {result.timestamp}\n"
@@ -257,8 +261,10 @@ async def handle_get_topics(arguments: dict):
     if DigestorSelector is None:
         return [TextContent(type="text", text="Digestor module not available")]
 
-    selector = DigestorSelector()
-    topics = selector.get_topics()
+    # DigestorSelector の初期化でも stdout に出力される可能性があるため抑制
+    with StdoutSuppressor():
+        selector = DigestorSelector()
+        topics = selector.get_topics()
 
     output = "=== 消化対象トピック ===\n\n"
     for t in topics:

@@ -838,7 +838,7 @@ def generate_prompt(
 Critical / High / Medium / Low / None
 ```
 
-**重要**: 上記ファイルを作成してコミットしてください。
+**重要**: 上記フォーマットで分析結果を出力してください。コミットやPull Requestの作成は不要です。
 """
     return prompt.strip()
 

@@ -1,0 +1,6 @@
+❌ Purpose: 165/174 OK (94.8%), 0 weak, 9 missing
+  ❌ mekhane/pks/pks_cli.py:140 check_gnosis
+  ❌ mekhane/pks/pks_cli.py:148 check_kairos
+  ❌ mekhane/pks/pks_cli.py:158 check_sophia
+  ❌ mekhane/pks/pks_cli.py:168 check_embedder
+  ❌ mekhane/pks/pks_cli.py:176 check_bridge

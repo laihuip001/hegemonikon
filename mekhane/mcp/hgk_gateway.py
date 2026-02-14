@@ -429,6 +429,12 @@ class HGKOAuthProvider(OAuthAuthorizationServerProvider[AuthorizationCode, Refre
             self._refresh_tokens.pop(token.token, None)
 
 
+# PURPOSE: [L2-auto] MCP ツール定義のためのラッパー関数
+def wrapper(*args, **kwargs):
+    """MCP ツール定義のためのラッパー関数"""
+    pass
+
+
 # =============================================================================
 # Gateway Server
 # =============================================================================

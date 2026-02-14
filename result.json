@@ -1,0 +1,56 @@
+{
+  "total_files": 465,
+  "files_with_proof": 320,
+  "files_missing_proof": 0,
+  "files_invalid_proof": 4,
+  "coverage": 98.76543209876543,
+  "is_passing": false,
+  "level_stats": {
+    "L1": 44,
+    "L2": 221,
+    "L3": 55
+  },
+  "missing_files": [],
+  "purpose": {
+    "total": 2725,
+    "ok": 2532,
+    "weak": 0,
+    "missing": 18
+  },
+  "type_hints": {
+    "total": 3560,
+    "ok": 3143,
+    "missing": 417
+  },
+  "short_name_violations": 3,
+  "ept": {
+    "nf2": {
+      "ok": 0,
+      "total": 0
+    },
+    "nf3": {
+      "ok": 0,
+      "total": 0
+    },
+    "bcnf": {
+      "ok": 0,
+      "total": 0
+    },
+    "score": 0,
+    "total": 0
+  },
+  "reason": {
+    "dirs": {
+      "with_reason": 39,
+      "total": 110
+    },
+    "files": {
+      "with_reason": 2,
+      "total": 324
+    },
+    "functions": {
+      "with_reason": 0,
+      "total": 2550
+    }
+  }
+}

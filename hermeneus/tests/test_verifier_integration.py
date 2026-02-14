@@ -12,6 +12,7 @@ import asyncio
 import sys
 import time
 from pathlib import Path
+import pytest
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
@@ -36,6 +37,7 @@ def check_ls_available() -> bool:
         return False
 
 
+@pytest.mark.asyncio
 async def test_single_agent_generate():
     """単一エージェントの LLM 生成テスト"""
     print("\n" + "=" * 60)
@@ -65,6 +67,7 @@ async def test_single_agent_generate():
     return turn
 
 
+@pytest.mark.asyncio
 async def test_two_agent_rally():
     """Proposer ↔ Critic のラリーテスト (3ターン)"""
     print("\n" + "=" * 60)
@@ -120,6 +123,7 @@ async def test_two_agent_rally():
     return rally_history
 
 
+@pytest.mark.asyncio
 async def test_full_debate():
     """フル debate エンジンテスト (ラリー + Arbiter)"""
     print("\n" + "=" * 60)

@@ -198,6 +198,7 @@ def _traced(fn):
     import functools
 
     @functools.wraps(fn)
+    # PURPOSE: [L2-auto] 実行時間を計測・記録するラッパー
     def wrapper(*args: Any, **kwargs: Any) -> Any:
         _start = time.time()
         input_size = _estimate_input_size(*args, **kwargs)

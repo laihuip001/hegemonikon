@@ -1,6 +1,7 @@
+# PROOF: [L2/Session] <- mekhane/anamnesis/
 # PURPOSE: セッション履歴を GnosisIndex (LanceDB) にインデックスする
 """
-PROOF: [L2/インフラ] <- mekhane/anamnesis/
+Session Indexer — セッション履歴ベクトル検索
 
 P3 → 記憶の永続化が必要
    → セッション履歴のセマンティック検索が必要

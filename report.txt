@@ -1,0 +1,36 @@
+============================================================
+Dendron PROOF Check Report
+============================================================
+
+Total files: 465
+With proof:  322
+Orphan:      0
+Missing:     0
+Invalid:     2
+Exempt:      141
+Coverage:    99.4%
+Levels:      L1:44 | L2:223 | L3:55
+
+Directories: 110 total, 83 with PROOF.md, 27 missing
+
+
+----------------------------------------
+L2 Purpose:
+  OK:      2532
+  Weak:    0
+  Missing: 18
+  Coverage: 99.3%
+
+----------------------------------------
+L3 Variable:
+  Type hints: 3143/3560
+  Short names: 3 violations
+
+----------------------------------------
+R-axis Reason:
+  Dirs:      39/110
+  Files:     2/324
+  Functions: 0/2550
+  Coverage:  1.4%
+
+❌ FAIL

@@ -4,6 +4,15 @@ description: HGK 収益化プロジェクト — ディープインパクト戦�
 triggers:
   - "agora"
   - "agora"
+
+# Safety Contract (v1.0)
+risk_tier: L3
+reversible: false
+requires_approval: true
+risks:
+  - "収益化戦略の失敗によるリソース損失"
+fallbacks:
+  - "Synedrion (戦略的再考)"
 ---
 
 # Agora

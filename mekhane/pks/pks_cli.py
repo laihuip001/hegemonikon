@@ -138,6 +138,7 @@ def cmd_health(args: argparse.Namespace) -> None:
 
     # 1. LanceDB (Gnōsis)
     def check_gnosis():
+        """LanceDB (Gnōsis) のヘルスチェック"""
         from mekhane.anamnesis.index import GnosisIndex as AI
         gi = AI()
         s = gi.stats()
@@ -146,6 +147,7 @@ def cmd_health(args: argparse.Namespace) -> None:
 
     # 2. Kairos index
     def check_kairos():
+        """Kairos index のヘルスチェック"""
         pkl = Path.home() / "oikos" / "mneme" / ".hegemonikon" / "indices" / "kairos.pkl"
         if not pkl.exists():
             raise FileNotFoundError("kairos.pkl not found")
@@ -156,6 +158,7 @@ def cmd_health(args: argparse.Namespace) -> None:
 
     # 3. Sophia index
     def check_sophia():
+        """Sophia index のヘルスチェック"""
         pkl = Path.home() / "oikos" / "mneme" / ".hegemonikon" / "indices" / "sophia.pkl"
         if not pkl.exists():
             raise FileNotFoundError("sophia.pkl not found")
@@ -166,6 +169,7 @@ def cmd_health(args: argparse.Namespace) -> None:
 
     # 4. Embedder
     def check_embedder():
+        """Embedder のヘルスチェック"""
         from mekhane.symploke.adapters.embedding_adapter import EmbeddingAdapter
         a = EmbeddingAdapter()
         v = a.encode("test query")
@@ -174,6 +178,7 @@ def cmd_health(args: argparse.Namespace) -> None:
 
     # 5. GnosisLanceBridge
     def check_bridge():
+        """GnosisLanceBridge のヘルスチェック"""
         from mekhane.symploke.indices.gnosis_lance_bridge import GnosisLanceBridge
         b = GnosisLanceBridge()
         r = b.search("active inference", k=1)
@@ -182,6 +187,7 @@ def cmd_health(args: argparse.Namespace) -> None:
 
     # 6. PKSEngine
     def check_engine():
+        """PKSEngine のヘルスチェック"""
         from mekhane.pks.pks_engine import PKSEngine
         e = PKSEngine(enable_questions=False, enable_serendipity=False)
         e.set_context(topics=["FEP"])
@@ -191,6 +197,7 @@ def cmd_health(args: argparse.Namespace) -> None:
 
     # 7. TopicExtractor
     def check_topics():
+        """TopicExtractor のヘルスチェック"""
         from mekhane.pks.pks_engine import PKSEngine
         e = PKSEngine(enable_questions=False)
         t = e.auto_context_from_handoff()
@@ -199,6 +206,7 @@ def cmd_health(args: argparse.Namespace) -> None:
 
     # 8. SelfAdvocate
     def check_advocate():
+        """SelfAdvocate のヘルスチェック"""
         from mekhane.pks.self_advocate import SelfAdvocate
         a = SelfAdvocate()
         return f"LLM={'ok' if a.llm_available else 'template mode'}"
@@ -206,6 +214,7 @@ def cmd_health(args: argparse.Namespace) -> None:
 
     # 9. Chronos index
     def check_chronos():
+        """Chronos index のヘルスチェック"""
         pkl = Path.home() / "oikos" / "mneme" / ".hegemonikon" / "indices" / "chronos.pkl"
         if not pkl.exists():
             raise FileNotFoundError("chronos.pkl not found")

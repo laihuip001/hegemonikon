@@ -53,6 +53,7 @@ class GnosisLanceBridge(DomainIndex):
 
     @property
     def source_type(self) -> SourceType:
+        """ソースタイプを返す"""
         return SourceType.GNOSIS
 
     # PURPOSE: LanceDB GnosisIndex を遅延初期化
@@ -127,7 +128,10 @@ class GnosisLanceBridge(DomainIndex):
 
     # PURPOSE: ブリッジは save/load 不要
     def save(self, path: str) -> None:
+        """保存処理（何もしない）"""
         pass
 
+    # PURPOSE: ロード処理（何もしない）
     def load(self, path: str) -> None:
+        """ロード処理（何もしない）"""
         self._initialized = True

@@ -1,3 +1,4 @@
+import './css/interactive.css';
 /**
  * Chat View — Gemini API via Backend Proxy
  * HGK Desktop Chat UI: LLM との対話パネル

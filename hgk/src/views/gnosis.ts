@@ -1,3 +1,4 @@
+import './css/content.css';
 import { api } from '../api/client';
 import type { GnosisSearchResponse, GnosisStatsResponse, PaperCard, GnosisPapersResponse, GnosisNarrateResponse } from '../api/client';
 import { esc } from '../utils';

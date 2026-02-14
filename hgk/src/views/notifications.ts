@@ -1,19 +1,7 @@
+import './css/notifications.css';
 import { api } from '../api/client';
 import type { Notification } from '../api/client';
-import { getCurrentRoute, esc, applyStaggeredFadeIn, startPolling, fireOsNotifications } from '../utils';
-
-function relativeTime(isoTimestamp: string): string {
-    const now = Date.now();
-    const then = new Date(isoTimestamp).getTime();
-    const diffSec = Math.floor((now - then) / 1000);
-    if (diffSec < 60) return `${diffSec}秒前`;
-    const diffMin = Math.floor(diffSec / 60);
-    if (diffMin < 60) return `${diffMin}分前`;
-    const diffHour = Math.floor(diffMin / 60);
-    if (diffHour < 24) return `${diffHour}時間前`;
-    const diffDay = Math.floor(diffHour / 24);
-    return `${diffDay}日前`;
-}
+import { getCurrentRoute, esc, applyStaggeredFadeIn, startPolling, fireOsNotifications, relativeTime } from '../utils';
 
 const LEVEL_LABELS: Record<string, string> = {
     CRITICAL: '🚨 緊急',

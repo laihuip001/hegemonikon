@@ -1,7 +1,9 @@
+import './css/desktop-dom.css';
 // Desktop DOM View — AT-SPI2 Accessibility Tree Browser
 // Displays desktop applications and their accessible element trees
 
 import { invoke } from '@tauri-apps/api/core';
+import { executeCCL } from '../desktop-ccl';
 
 interface DesktopElement {
     app_name: string;
@@ -67,9 +69,20 @@ export async function renderDesktopDomView(): Promise<void> {
         </div>
       </div>
 
+      </div>
+
       <div class="dd-panel dd-search-results" id="dd-search-results" style="display:none">
         <h3>🔍 検索結果</h3>
         <div id="dd-search-result-list"></div>
+      </div>
+
+      <div class="dd-panel dd-ccl-console">
+        <h3>⚡ CCL コンソール</h3>
+        <div class="dd-ccl-input">
+          <input type="text" id="dd-ccl-expr" placeholder='@desktop{list} / @desktop{find, role="button"}' class="input-field" />
+          <button class="btn btn-primary btn-sm" id="dd-ccl-run">▶ 実行</button>
+        </div>
+        <pre id="dd-ccl-output" class="dd-ccl-result">結果がここに表示されます</pre>
       </div>
     </div>
   `;
@@ -82,6 +95,24 @@ export async function renderDesktopDomView(): Promise<void> {
 
     // Search button
     document.getElementById('dd-search-btn')?.addEventListener('click', searchElements);
+
+    // CCL console
+    const cclRun = document.getElementById('dd-ccl-run');
+    const cclInput = document.getElementById('dd-ccl-expr') as HTMLInputElement;
+    const cclOutput = document.getElementById('dd-ccl-output');
+    if (cclRun && cclInput && cclOutput) {
+        cclRun.addEventListener('click', async () => {
+            const expr = cclInput.value.trim();
+            if (!expr) return;
+            cclOutput.textContent = '実行中...';
+            const result = await executeCCL(expr);
+            cclOutput.textContent = JSON.stringify(result, null, 2);
+            cclOutput.className = `dd-ccl-result ${result.success ? 'dd-ccl-ok' : 'dd-ccl-err'}`;
+        });
+        cclInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') cclRun.click();
+        });
+    }
 }
 
 async function loadApps(): Promise<void> {
@@ -116,7 +147,7 @@ async function loadApps(): Promise<void> {
             });
         });
     } catch (e) {
-        list.innerHTML = `<div class="dd-error">❌ AT-SPI2 接続エラー: ${e}</div>`;
+        list.innerHTML = `<div class="dd-error">❌ AT-SPI2 接続エラー: ${escHtml(String(e))}</div>`;
     }
 }
 
@@ -145,7 +176,7 @@ async function loadTree(busName: string, objectPath: string): Promise<void> {
             });
         });
     } catch (e) {
-        content.innerHTML = `<div class="dd-error">❌ ツリー取得エラー: ${e}</div>`;
+        content.innerHTML = `<div class="dd-error">❌ ツリー取得エラー: ${escHtml(String(e))}</div>`;
     }
 }
 
@@ -271,7 +302,7 @@ async function searchElements(): Promise<void> {
         </div>
       `).join('');
     } catch (e) {
-        resultList.innerHTML = `<div class="dd-error">❌ 検索エラー: ${e}</div>`;
+        resultList.innerHTML = `<div class="dd-error">❌ 検索エラー: ${escHtml(String(e))}</div>`;
     }
 }
 

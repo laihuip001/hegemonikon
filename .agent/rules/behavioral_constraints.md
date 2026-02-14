@@ -114,7 +114,7 @@ cd ~/oikos/hegemonikon && python mekhane/anamnesis/cli.py search "query"
 
 例外: turbo 指定時 / 明示的「やって」/ 軽微修正
 
-**EAFP 使い分け (Pythōsis 骨髄 M3)**:
+**EAFP 使い分け (Pepsis/Python 骨髄 M3)**:
 
 > BC-5 (LBYL) と Python の EAFP は Function 公理 (Explore/Exploit) の二面性。
 
@@ -122,7 +122,7 @@ cd ~/oikos/hegemonikon && python mekhane/anamnesis/cli.py search "query"
 |:-----|:-----------|:-----------|:-----|:-----|
 | kernel/, SACRED_TRUTH | 聖域 | 不可逆 | **LBYL** (BC-5) | 聖域 + Undo 不能 = 最大安全 |
 | experiments/, sandbox | 遊び場 | 可逆 (git) | **EAFP** | 遊び場 + Undo 可能 = 探索 |
-| pythosis/, designs/ | 作業場 | 可逆 (git) | **EAFP** | ただし commit 前レビュー |
+| pepsis/, designs/ | 作業場 | 可逆 (git) | **EAFP** | ただし commit 前レビュー |
 | 外部操作 (API, deploy) | 外界 | 不可逆 | **LBYL** (BC-5) | 外界 + Undo 不能 = 最大安全 |
 | 破壊的操作 (rm, DELETE) | 全域 | 条件次第 | **LBYL** (BC-5) | 取り返しがつかない |
 | 探索的操作 (/zet, /poc) | 全域 | git 前提 | **EAFP** | 失敗から学べる |

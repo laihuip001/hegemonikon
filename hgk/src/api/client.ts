@@ -267,6 +267,7 @@ export const api = {
             body: JSON.stringify({ title, reaction, series }),
         }),
     pksStats: () => apiFetch<PKSStatsResponse>('/api/pks/stats'),
+    pksGatewayStats: () => apiFetch<PKSGatewayStatsResponse>('/api/pks/gateway-stats'),
 
     // Gnōsis Narrator
     gnosisPapers: (query = '', limit = 20) =>
@@ -407,6 +408,13 @@ export interface PKSStatsResponse {
     timestamp: string;
     series_stats: Record<string, { count: number; avg_score: number; threshold_adjustment: number }>;
     total_feedbacks: number;
+}
+
+export interface PKSGatewayStatsResponse {
+    timestamp: string;
+    enabled: boolean;
+    sources: Record<string, { count: number }>;
+    total_files: number;
 }
 
 // --- Graph Types ---

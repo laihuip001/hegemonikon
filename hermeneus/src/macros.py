@@ -2,7 +2,7 @@
 """
 Hermēneus Macro Loader — ccl/macros/ から標準マクロを読み込む
 
-Synergeia/Pythosis など他プロジェクトが共通マクロを参照するための
+Synergeia/Pepsis など他プロジェクトが共通マクロを参照するための
 統一ローダー。
 
 Usage:

@@ -70,7 +70,7 @@ fn greet(name: &str) -> String {
 #[cfg(target_os = "linux")]
 #[tauri::command]
 async fn list_windows() -> Result<Vec<a11y::A11yWindow>, String> {
-    a11y::list_accessible_windows().await
+    a11y::list_accessible_windows().await.map_err(|e| e.to_string())
 }
 
 /// AT-SPI2: Get the accessibility tree for a specific application
@@ -81,7 +81,7 @@ async fn get_element_tree(
     path: String,
     max_depth: Option<u32>,
 ) -> Result<Vec<a11y::A11yNode>, String> {
-    a11y::get_accessible_tree(&bus_name, &path, max_depth.unwrap_or(3)).await
+    a11y::get_accessible_tree(&bus_name, &path, max_depth.unwrap_or(3)).await.map_err(|e| e.to_string())
 }
 
 /// Unified: List all desktop elements (A/B routed)
@@ -129,7 +129,7 @@ async fn desktop_do_action(
     object_path: String,
     action_index: Option<i32>,
 ) -> Result<a11y::ActionResult, String> {
-    let (success, action_name) = a11y::perform_action(&bus_name, &object_path, action_index.unwrap_or(0)).await?;
+    let (success, action_name) = a11y::perform_action(&bus_name, &object_path, action_index.unwrap_or(0)).await.map_err(|e| e.to_string())?;
     Ok(a11y::ActionResult {
         success,
         route: a11y::RoutePath::Atspi,
@@ -145,7 +145,7 @@ async fn desktop_list_actions(
     bus_name: String,
     object_path: String,
 ) -> Result<Vec<String>, String> {
-    a11y::list_actions(&bus_name, &object_path).await
+    a11y::list_actions(&bus_name, &object_path).await.map_err(|e| e.to_string())
 }
 
 /// AT-SPI: Set text on an editable element (A-path only)
@@ -156,7 +156,7 @@ async fn desktop_set_text(
     object_path: String,
     text: String,
 ) -> Result<a11y::ActionResult, String> {
-    let success = a11y::set_text(&bus_name, &object_path, &text).await?;
+    let success = a11y::set_text(&bus_name, &object_path, &text).await.map_err(|e| e.to_string())?;
     Ok(a11y::ActionResult {
         success,
         route: a11y::RoutePath::Atspi,
@@ -172,7 +172,7 @@ async fn desktop_get_extents(
     bus_name: String,
     object_path: String,
 ) -> Result<a11y::ElementExtents, String> {
-    a11y::get_element_extents(&bus_name, &object_path).await
+    a11y::get_element_extents(&bus_name, &object_path).await.map_err(|e| e.to_string())
 }
 
 /// AT-SPI: Focus an element
@@ -182,7 +182,7 @@ async fn desktop_focus(
     bus_name: String,
     object_path: String,
 ) -> Result<bool, String> {
-    a11y::focus_element(&bus_name, &object_path).await
+    a11y::focus_element(&bus_name, &object_path).await.map_err(|e| e.to_string())
 }
 
 /// AT-SPI: Find elements by role/name in a subtree
@@ -195,7 +195,7 @@ async fn desktop_find_elements(
     name: Option<String>,
     max_depth: Option<u32>,
 ) -> Result<Vec<FoundElement>, String> {
-    let tree = a11y::get_accessible_tree(&bus_name, &object_path, max_depth.unwrap_or(4)).await?;
+    let tree = a11y::get_accessible_tree(&bus_name, &object_path, max_depth.unwrap_or(4)).await.map_err(|e| e.to_string())?;
     let mut matches = Vec::new();
     collect_matching_sync(&tree, role.as_deref(), name.as_deref(), &mut matches);
 

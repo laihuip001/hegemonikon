@@ -21,7 +21,7 @@ projects:
   proof: true
   entry_point:
     cli: python -m hermeneus.src compile '{CCL式}'
-    python: from hermeneus.src import compile_ccl, execute_ccl
+    python: from hermeneus.src import compile_ccl
     mcp: hermeneus_execute, hermeneus_compile
   usage_trigger: CCL 式の解析・コンパイル・実行時。手動で CCL を分析するな。
 - id: synergeia
@@ -34,8 +34,8 @@ projects:
   etymology: 共同作業・協力
   proof: true
   entry_point:
-    cli: python synergeia/coordinator.py
-    python: from synergeia.coordinator import Coordinator
+    cli: python synergeia/bridge.py
+    python: from synergeia.bridge import dispatch
   usage_trigger: 複数エージェント連携時。Jules への委任、並列実行、結果統合。
 - id: mekhane
   name: Mekhane (μηχανή)
@@ -86,7 +86,7 @@ projects:
   proof: true
   entry_point:
     cli: python mekhane/anamnesis/cli.py search '{query}'
-    python: from mekhane.anamnesis.cli import search
+    python: from mekhane.anamnesis.cli import cmd_search
   usage_trigger: 知識検索時。grep/キーワード検索ではなく、必ずベクトル検索を使え。
 - id: synteleia
   name: Synteleia (συντέλεια)
@@ -112,7 +112,7 @@ projects:
   etymology: 工房・作業場
   proof: true
   entry_point:
-    python: from mekhane.ergasterion.forge import ForgeEngine
+    python: from mekhane.ergasterion.tekhne.pipeline import TekhnePipeline
   usage_trigger: 新しい WF/Skill の鍛造時。実験的実装はここで。
 - id: peira
   name: Peira (πείρα)
@@ -142,12 +142,15 @@ projects:
   name: Exagōgē (ἐξαγωγή)
   path: mekhane/exagoge/
   tier: module
-  summary: 抽出 — データ/知識の抽出機構
+  summary: 抽出 — Handoff/Doxa/KI/Ideas のエクスポート機構
   status: active
-  phase: design
+  phase: implementation
   etymology: 引き出し・輸出
-  entry_point: null
-  usage_trigger: 外部データからの知識抽出時。CDP エクスポート等。
+  proof: true
+  entry_point:
+    cli: PYTHONPATH=. .venv/bin/python -m mekhane.exagoge.cli --type all --format json
+    python: from mekhane.exagoge import HandoffExporter, DoxaExporter, KIExporter, IdeasExporter
+  usage_trigger: HGK データの外部エクスポート時。Agora 連携、バックアップ、分析。
 - id: ccl
   name: CCL (Cognitive Control Language)
   path: ccl/
@@ -171,14 +174,14 @@ projects:
   entry_point:
     reference: kernel/SACRED_TRUTH.md
   usage_trigger: 公理・定理の参照時。96要素体系の正本。
-- id: pythosis
-  name: Pythōsis (Πύθων + ὄσις)
-  path: pythosis/
+- id: pepsis
+  name: Pepsis (Πέψις)
+  path: pepsis/
   tier: concept
-  summary: Python の設計哲学を消化し CCL として再解釈
-  status: dormant
-  phase: implementation
-  etymology: Python + 吸収/消化
+  summary: 外部設計哲学を消化し HGK に統合する汎用フレームワーク (Python 完食, Rust 消化中)
+  status: active
+  phase: operational
+  etymology: Πέψις = 消化。旧 Pythōsis を汎用化。
   proof: true
   entry_point: null
   usage_trigger: null
@@ -198,13 +201,15 @@ projects:
   name: Aristos (ἄριστος)
   path: .agent/projects/aristos/
   tier: concept
-  summary: 最適化数学 — グラフ理論, 遺伝的アルゴリズム, ゲーム理論
+  summary: 最適化数学 — L1 グラフ理論 (WF ルーティング) 実装済み
   status: active
-  phase: theory
+  phase: implementation
   etymology: 最善・最良 — アリストクラシーの語源
   note: core_architecture.md に構造柱として明記
-  entry_point: null
-  usage_trigger: 最適化問題、グラフ理論的分析が必要な時。
+  proof: true
+  entry_point:
+    test: PYTHONPATH=. .venv/bin/python -m pytest .agent/projects/aristos/test_router.py -v
+  usage_trigger: 最適化問題、WFルーティング、グラフ理論的分析が必要な時。
 - id: autophonos
   name: Autophōnos (αὐτόφωνος)
   path: .agent/projects/autophonos/
@@ -266,16 +271,17 @@ projects:
   usage_trigger: デスクトップアプリのバックエンド起動時。
 - id: hgk-app
   name: Hegemonikón Desktop App
-  path: hgk-app/
+  path: hgk/
   tier: product
-  summary: サイバーパンク 3D デスクトップアプリ — Tauri v2 + Three.js
+  summary: 認知ハイパーバイザー GUI — Tauri v2 + Vite + TypeScript + Three.js (17 views, Rust a11y backend)
   status: active
-  phase: design
+  phase: implementation
   etymology: null
-  proof: false
+  proof: true
   entry_point:
-    dev: cd hgk-app && npm run tauri dev
-  usage_trigger: デスクトップアプリの開発・ビルド時。
+    dev: cd hgk && npm run tauri dev
+    api: python -m mekhane.api.server --uds /tmp/hgk.sock
+  usage_trigger: デスクトップアプリの開発・ビルド時。API バックエンドも必要。
 - id: agora
   name: Agora
   path: /home/makaron8426/oikos/agora

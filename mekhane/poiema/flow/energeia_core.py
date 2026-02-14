@@ -23,6 +23,7 @@ from dataclasses import dataclass
 # Hegemonikón imports (internal references)
 from .metron_resolver import MetronResolver, METRON_RICH
 from .epoche_shield import EpocheShield
+from .noesis_client import NoesisClient
 
 # Thresholds (K1 Eukairia: timing decisions)
 NOUS_COMPLEXITY_THRESHOLD = 1000  # Characters threshold for model selection
@@ -179,15 +180,30 @@ class EnergeiaCoreResolver:
         """
         O1 Noēsis への委譲: AI生成
 
-        Note: This is a placeholder. In production, this would call
-        the actual Gemini API via a dedicated client.
+        NoesisClient 経由で Gemini API を呼び出す。
+        API キー未設定時はプレースホルダーにフォールバック。
         """
-        # Placeholder implementation
-        # In production: return await self.gemini_client.generate(...)
-        return {
-            "success": True,
-            "result": f"[Processed with {model}]: {text[:100]}...",
-        }
+        # Lazy-init NoesisClient
+        if self._gemini_client is None:
+            self._gemini_client = NoesisClient(settings=self.settings)
+
+        if self._gemini_client.is_configured:
+            config = {
+                "system": system_prompt,
+                "params": {
+                    "temperature": self.settings.get("TEMPERATURE", 0.3),
+                },
+            }
+            return await self._gemini_client.generate_content(
+                text, config, model=model,
+            )
+        else:
+            # Fallback: API key not configured
+            logger.warning("O1 Noēsis: API未設定 — プレースホルダーで応答")
+            return {
+                "success": True,
+                "result": f"[Processed with {model}]: {text[:100]}...",
+            }
 
     # PURPOSE: 同期版の process メソッド
     def process_sync(self, text: str, metron_level: int = 60) -> Dict:

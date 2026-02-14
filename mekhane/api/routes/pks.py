@@ -4,10 +4,11 @@
 """
 PKS Routes — 能動的知識表面化 API
 
-GET  /api/pks/push        — 最新の PKS auto-push 結果を取得
-POST /api/pks/push        — PKS auto-push を実行
-POST /api/pks/feedback    — フィードバック記録 (used/dismissed/deepened)
-GET  /api/pks/stats       — フィードバック統計
+GET  /api/pks/push           — 最新の PKS auto-push 結果を取得
+POST /api/pks/push           — PKS auto-push を実行
+POST /api/pks/feedback       — フィードバック記録 (used/dismissed/deepened)
+GET  /api/pks/stats          — フィードバック統計
+GET  /api/pks/gateway-stats  — Gateway ソース統計
 """
 
 import logging
@@ -69,6 +70,14 @@ class FeedbackStatsResponse(BaseModel):
     total_feedbacks: int = 0
 
 
+# PURPOSE: Gateway ソース統計のレスポンスモデル
+class GatewayStatsResponse(BaseModel):
+    timestamp: str
+    enabled: bool = False
+    sources: dict = Field(default_factory=dict)
+    total_files: int = 0
+
+
 # ===========================================================================
 # Lazy PKSEngine
 # ===========================================================================
@@ -87,6 +96,7 @@ def _get_engine():
                 enable_questions=False,
                 enable_serendipity=True,
                 enable_feedback=True,
+                enable_gateway=True,
             )
             logger.info("PKSEngine initialized")
         except Exception as e:
@@ -226,3 +236,39 @@ async def feedback_stats() -> FeedbackStatsResponse:
             logger.warning("Feedback stats failed: %s", e)
 
     return FeedbackStatsResponse(timestamp=now.isoformat())
+
+
+# ===========================================================================
+# Gateway Stats
+# ===========================================================================
+
+# PURPOSE: Gateway ソースの統計を返す
+@router.get("/gateway-stats", response_model=GatewayStatsResponse)
+async def gateway_stats() -> GatewayStatsResponse:
+    """Gateway ソース (Ideas/Doxa/Handoff/KI) の統計を返す。"""
+    now = datetime.now(timezone.utc)
+    engine = _get_engine()
+
+    if not engine:
+        return GatewayStatsResponse(timestamp=now.isoformat())
+
+    try:
+        stats = engine.gateway_stats()
+        # directory/exists を除去し count のみ公開 (F6a: 情報衛生)
+        clean_sources: dict = {}
+        total_files = 0
+        for k, v in stats.items():
+            if k == "enabled" or not isinstance(v, dict):
+                continue
+            count = v.get("count", 0)
+            clean_sources[k] = {"count": count}
+            total_files += count
+        return GatewayStatsResponse(
+            timestamp=now.isoformat(),
+            enabled=stats.get("enabled", False),
+            sources=clean_sources,
+            total_files=total_files,
+        )
+    except Exception as e:
+        logger.warning("Gateway stats failed: %s", e)
+        return GatewayStatsResponse(timestamp=now.isoformat())

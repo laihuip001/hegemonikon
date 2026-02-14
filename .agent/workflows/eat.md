@@ -120,7 +120,7 @@ Ext ←────────────────────────�
 | ファイル | 内容 |
 |----------|------|
 | [batch.md](../workflow-modules/eat/batch.md) | 大量ファイル一括変換パイプライン (10+ファイル用) |
-| [digestion_templates.md](../pythosis/designs/digestion_templates.md) | **消化テンプレート (T1-T4)** — Phase 1 での F 構築パターン選択ガイド |
+| [digestion_templates.md](../pepsis/templates/digestion_templates.md) | **消化テンプレート (T1-T4)** — Phase 1 での F 構築パターン選択ガイド |
 
 ---
 
@@ -183,7 +183,7 @@ graph TD
 
 > **F: Ext → Int — 「第一原理から自由に構成する」**
 
-1. **消化テンプレート選択**: [digestion_templates.md](../pythosis/designs/digestion_templates.md) を参照し、T1-T4 のどのパターンか判断:
+1. **消化テンプレート選択**: [digestion_templates.md](../pepsis/templates/digestion_templates.md) を参照し、T1-T4 のどのパターンか判断:
    - T1 対応表: 既存対象への射を張る
    - T2 哲学抽出: 既存対象の属性を豊かにする
    - T3 機能消化: 新しい WF/マクロ/演算子を生む

@@ -1,54 +1,16 @@
+import { ROUTES, ROUTE_MAP, DEFAULT_ROUTE } from './route-config';
 import { api } from './api/client';
-import { renderGraph3D } from './views/graph3d';
-import { renderAgentManagerView } from './views/agent-manager';
-import { renderChatView } from './views/chat';
-import { renderDesktopDomView } from './views/desktop-dom';
-import { renderDashboard } from './views/dashboard';
-import { renderFep } from './views/fep';
-import { renderGnosis } from './views/gnosis';
-import { renderQuality } from './views/quality';
-import { renderPostcheck } from './views/postcheck';
-import { renderNotifications } from './views/notifications';
-import { renderPKS } from './views/pks';
-import { renderSophiaView } from './views/sophia';
-import { renderSearch } from './views/search';
-import { renderTimelineView } from './views/timeline';
-import { renderSynteleiaView } from './views/synteleia';
-import { renderSynedrionView } from './views/synedrion';
-import { renderDigestorView } from './views/digestor';
 import { recordView } from './telemetry';
-import { initCommandPalette } from './command_palette';
-import { clearPolling, setCurrentRoute, skeletonHTML, esc } from './utils';
+import { initCommandPalette, setNavigateCallback } from './command_palette';
+import { clearPolling, setCurrentRoute, getCurrentRoute, skeletonHTML, esc } from './utils';
 import './styles.css';
 
-// ─── Router ──────────────────────────────────────────────────
-
-type ViewRenderer = () => Promise<void>;
-const routes: Record<string, ViewRenderer> = {
-  'dashboard': renderDashboard,
-  'agents': renderAgentManagerView,
-  'search': renderSearch,
-  'fep': renderFep,
-  'gnosis': renderGnosis,
-  'quality': renderQuality,
-  'postcheck': renderPostcheck,
-  'graph': renderGraph3D,
-  'notifications': renderNotifications,
-  'pks': renderPKS,
-  'sophia': renderSophiaView,
-  'timeline': renderTimelineView,
-  'synteleia': renderSynteleiaView,
-  'synedrion': renderSynedrionView,
-  'digestor': renderDigestorView,
-  'chat': renderChatView,
-  'desktop': renderDesktopDomView,
-};
-
-let currentRoute = '';
+// ─── Bootstrap ───────────────────────────────────────────────
 
 document.addEventListener('DOMContentLoaded', () => {
+  buildSidebar();
   setupNavigation();
-  navigate('dashboard');
+  navigate(DEFAULT_ROUTE);
   // Start global badge polling
   void updateNotifBadge();
   setInterval(() => { void updateNotifBadge(); }, 60_000);
@@ -56,9 +18,20 @@ document.addEventListener('DOMContentLoaded', () => {
   void api.pksTriggerPush().catch(() => { /* silent */ });
   // CCL Command Palette — Ctrl+K
   initCommandPalette();
+  setNavigateCallback(navigate);
   initKeyboardNav();
   initThemeToggle();
 });
+
+// ─── Dynamic Sidebar ─────────────────────────────────────────
+
+function buildSidebar(): void {
+  const nav = document.querySelector('nav');
+  if (!nav) return;
+  nav.innerHTML = ROUTES.map(r =>
+    `<button data-route="${r.key}">${r.icon} ${r.label}</button>`
+  ).join('');
+}
 
 // ─── Theme Toggle ────────────────────────────────────────────
 
@@ -152,8 +125,7 @@ async function updateNotifBadge(): Promise<void> {
 // ─── Navigation ──────────────────────────────────────────────
 
 function navigate(route: string): void {
-  if (route === currentRoute) return;
-  currentRoute = route;
+  if (route === getCurrentRoute()) return;
   setCurrentRoute(route);
   clearPolling();
   recordView(route);
@@ -173,7 +145,7 @@ function navigate(route: string): void {
     app.innerHTML = skeletonHTML();
     app.classList.add('view-enter');
 
-    const renderer = routes[route];
+    const renderer = ROUTE_MAP[route];
     if (renderer) {
       renderer().then(() => {
         app.classList.remove('view-enter');

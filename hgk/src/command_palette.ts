@@ -1,3 +1,4 @@
+import './views/css/interactive.css';
 /**
  * CCL Command Palette — Ctrl+K で起動するコマンドパレット
  *
@@ -12,11 +13,19 @@
 
 import { api } from './api/client';
 import type { WFSummary, CCLParseResponse, CCLExecuteResponse, SynteleiaAuditResponse } from './api/client';
+import { esc } from './utils';
+import { ROUTES } from './route-config';
 
 // --- State ---
 
 let paletteEl: HTMLElement | null = null;
 let isOpen = false;
+let navigateFn: ((route: string) => void) | null = null;
+
+/** Register navigate callback from main.ts */
+export function setNavigateCallback(fn: (route: string) => void): void {
+  navigateFn = fn;
+}
 let wfCache: WFSummary[] = [];
 
 // --- HTML ---
@@ -236,11 +245,87 @@ function initKalonButtons(resultsEl: HTMLElement): void {
   });
 }
 
+// --- Quick Actions ---
+
+interface QuickAction {
+  label: string;
+  icon: string;
+  description: string;
+  action: (arg: string) => void;
+}
+
+function getQuickActions(): QuickAction[] {
+  return [
+    {
+      label: 'nav',
+      icon: '🧭',
+      description: 'ビュー遷移 (例: >nav dashboard)',
+      action: (arg: string) => {
+        if (!navigateFn) return;
+        const match = ROUTES.find(r => r.key === arg || r.label.toLowerCase() === arg.toLowerCase());
+        if (match) {
+          navigateFn(match.key);
+          closePalette();
+        }
+      },
+    },
+    {
+      label: 'theme',
+      icon: '🎨',
+      description: 'テーマ切替 (dark/light)',
+      action: (arg: string) => {
+        const next = arg === 'light' ? 'light' : arg === 'dark' ? 'dark'
+          : document.documentElement.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+        document.documentElement.setAttribute('data-theme', next);
+        localStorage.setItem('hgk-theme', next);
+        const btn = document.querySelector('.theme-toggle');
+        if (btn) btn.textContent = next === 'dark' ? '☀️' : '🌙';
+        closePalette();
+      },
+    },
+    {
+      label: 'pks',
+      icon: '📡',
+      description: 'PKS プッシュ実行',
+      action: () => {
+        void api.pksTriggerPush().then(() => {
+          if (navigateFn) { navigateFn('pks'); closePalette(); }
+        });
+      },
+    },
+    {
+      label: 'postcheck',
+      icon: '🔄',
+      description: 'ポストチェック実行 (例: >postcheck /noe)',
+      action: (arg: string) => {
+        if (arg && navigateFn) {
+          navigateFn('postcheck');
+          closePalette();
+        }
+      },
+    },
+  ];
+}
+
+function renderQuickActions(filter: string): string {
+  const actions = getQuickActions().filter(a =>
+    !filter || a.label.includes(filter) || a.description.includes(filter)
+  );
+  if (actions.length === 0) return '';
+  return `<div class="cp-section-label">Quick Actions</div>` +
+    actions.map((a, i) => `
+      <div class="cp-item cp-quick-action ${i === 0 ? 'cp-item-active' : ''}" data-idx="${i}" data-action="${esc(a.label)}">
+        <div class="cp-item-header">
+          <span class="cp-item-name">${a.icon} >${esc(a.label)}</span>
+        </div>
+        <div class="cp-item-desc">${esc(a.description)}</div>
+      </div>
+    `).join('');
+}
+
 // --- Logic ---
 
-function esc(s: string): string {
-  return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-}
+
 
 async function loadWorkflows(): Promise<void> {
   if (wfCache.length > 0) return;
@@ -275,6 +360,41 @@ function updateActive(resultsEl: HTMLElement, delta: number): void {
 
 async function handleInput(input: HTMLInputElement, resultsEl: HTMLElement): Promise<void> {
   const val = input.value.trim();
+
+  // Quick action commands (>nav, >theme, >pks, >postcheck)
+  if (val.startsWith('>')) {
+    const parts = val.slice(1).split(/\s+/);
+    const cmd = parts[0]?.toLowerCase() ?? '';
+    const arg = parts.slice(1).join(' ');
+    const actions = getQuickActions();
+    const match = actions.find(a => a.label === cmd);
+    if (match) {
+      // Show confirmation then execute on Enter
+      resultsEl.innerHTML = `
+        <div class="cp-parse-result">
+          <div class="cp-parse-header">${match.icon} <strong>>${esc(match.label)}</strong> ${arg ? esc(arg) : ''}</div>
+          <div class="cp-item-desc">${esc(match.description)}</div>
+          <div class="cp-execute-bar">
+            <button class="cp-execute-btn" id="cp-quick-exec">▶ 実行</button>
+          </div>
+        </div>`;
+      const btn = resultsEl.querySelector('#cp-quick-exec');
+      btn?.addEventListener('click', () => match.action(arg));
+      return;
+    }
+    // Show filtered quick actions
+    resultsEl.innerHTML = renderQuickActions(cmd);
+    activeIdx = 0;
+    // Click handlers for quick action items
+    resultsEl.querySelectorAll('.cp-quick-action').forEach(item => {
+      item.addEventListener('click', () => {
+        const actionLabel = (item as HTMLElement).dataset.action ?? '';
+        input.value = `>${actionLabel} `;
+        void handleInput(input, resultsEl);
+      });
+    });
+    return;
+  }
 
   // Synteleia audit command
   if (val.toLowerCase().startsWith('audit ')) {

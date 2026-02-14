@@ -35,15 +35,15 @@ projects:
     priority: medium
     updated: '2026-02-11'
     next_action: ai_auditor.py 統合テスト
-  pythosis:
-    name: Pythōsis
-    description: Python哲学消化 (/eat[python]+)
-    path: pythosis/
-    status: paused
-    phase: Phase 2 — 12日放置
-    priority: low
-    updated: '2026-02-11'
-    next_action: ライブラリマッピング再開
+  pepsis:
+    name: Pepsis (Πέψις)
+    description: 設計哲学消化フレームワーク (Python 完食, Rust 消化中)
+    path: pepsis/
+    status: active
+    phase: Operational — Rust 消化開始
+    priority: medium
+    updated: '2026-02-14'
+    next_action: Rust Phase 1 対応表作成
   synergeia:
     name: Synergeia
     description: 分散AI実行基盤 (Jules/Gemini 並列)

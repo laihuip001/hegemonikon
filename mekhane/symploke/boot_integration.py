@@ -144,7 +144,7 @@ def _load_projects(project_root: Path) -> dict:
                 categories["Mekhane モジュール"].append(p)
             elif path.startswith(".") or p.get("id") in ("kalon", "aristos", "autophonos"):
                 categories["研究・概念"].append(p)
-            elif p.get("id") in ("ccl", "kernel", "pythosis"):
+            elif p.get("id") in ("ccl", "kernel", "pepsis"):
                 categories["理論・言語基盤"].append(p)
             elif p.get("id") in ("hgk",):
                 categories["補助"].append(p)

@@ -1,4 +1,4 @@
-# Pythōsis 開発「備え」マトリックス
+# Pepsis 開発「備え」マトリックス
 
 > **目的**: 大規模開発に必要な「備え」を Hegemonikón の定理群から洗い出す
 > **CCL**: `/tak+*^/noe+`
@@ -84,9 +84,9 @@
 
 ---
 
-## 3. Pythōsis 専用「備え」ワークフロー提案
+## 3. Pepsis 専用「備え」ワークフロー提案
 
-### 3.1 `/pythosis.pre` — Premortem Protocol
+### 3.1 `/pepsis.pre` — Premortem Protocol
 
 ```ccl
 @chain(
@@ -97,7 +97,7 @@
 )
 ```
 
-### 3.2 `/pythosis.vet` — Success Vetting
+### 3.2 `/pepsis.vet` — Success Vetting
 
 ```ccl
 @chain(
@@ -108,7 +108,7 @@
 )
 ```
 
-### 3.3 `/pythosis.scope` — Scope Anchoring
+### 3.3 `/pepsis.scope` — Scope Anchoring
 
 ```ccl
 @chain(
@@ -140,8 +140,8 @@
 ## 5. 「備え」思考の CCL プログラム
 
 ```ccl
-# Pythōsis 開発準備プログラム
-@program pythosis_sonae
+# Pepsis 開発準備プログラム
+@program pepsis_sonae
 
 # Phase 1: リスク分析
 /bou.akra+ _/dia.worst_case _/why+
@@ -162,4 +162,4 @@
 
 ---
 
-*Pythōsis Foundation Catalog | `/tak+*^/noe+`*
+*Pepsis Foundation Catalog | `/tak+*^/noe+`*

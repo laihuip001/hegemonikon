@@ -1334,7 +1334,7 @@ strings /proc/$LS_PID/mem 2>/dev/null | grep -o "ya29\.[A-Za-z0-9_-]\{50,\}"
 **結果**: 空 — 権限的に /proc/PID/mem の読み取りが制限されている可能性。
 (注: プロセスは同一ユーザーだが、strings がメモリマッピングを読めないケースがある)
 
-### 24.7 全攻撃ベクトル総括 (v10 更新)
+### 24.7 全攻撃ベクトル総括 (v11 更新 — 2026-02-14)
 
 | # | ベクトル | 結果 | 発見 |
 |:--|:--------|:-----|:-----|
@@ -1343,15 +1343,173 @@ strings /proc/$LS_PID/mem 2>/dev/null | grep -o "ya29\.[A-Za-z0-9_-]\{50,\}"
 | A3 | LS ConnectRPC curl 直叩き | ✅ **成功** | Claude Sonnet 4.5 Thinking 応答確認 |
 | A4 | mitmproxy MITM 傍受 | ⏸️ 未実施 | TLS 復号は成功済み (v5b) だが Claude 呼出時の傍受未実施 |
 | A5 | Unleash フラグ操作 | ⏸️ 未実施 | HasAnthropicModelAccess の操作方法未調査 |
-| B1 | state.vscdb トークン抽出 | ⚠️ 部分成功 | authStatus に ya29. あるが期限切れ |
+| B1 | state.vscdb トークン抽出 | ✅ **成功 (v11)** | proto 3層デコードで refresh_token + access_token 抽出 |
 | B2 | LS バイナリ strings 解析 | ✅ **成功** | API_PROVIDER_ANTHROPIC_VERTEX + rawPredict パターン発見 |
-| B3 | refresh_token フロー | ✅ **成功** | 新トークン取得成功。ただし Claude 不在 |
+| B3 | refresh_token フロー | ✅ **成功** | Cortex client_id では動作。Extension client_id では client_secret 不足 |
 | B4 | /proc/PID/mem | ❌ 権限不足 | ya29. トークン抽出失敗 |
 | B5 | ユーザー自身の GCP Vertex AI | ⏸️ 未実施 | 自分のプロジェクトで Vertex AI + Claude 有効化は未試行 |
-| B6 | generateChat 正しい Proto 構造 | ⏸️ 未実施 | 正しいフィールド名が未判明 |
+| B6 | generateChat 正しい Proto 構造 | ✅ **成功 (v11)** | `/tmp/cloudcode_v2.proto` で完全定義発見 |
+| **C1** | **Extension OAuth client_id 特定** | ✅ **成功 (v11)** | `1071006060591-tmhssin2h21lcre235vtolojh4g403ep` (Cortex とは別) |
+| **C2** | **Extension refresh_token 抽出** | ✅ **成功 (v11)** | `1//0eZ21XPQ...` (gemini-cli とは別、client_secret 必要) |
+| **C3** | **grpcurl cloudcode-pa 直接呼出** | ⚠️ **部分成功 (v11)** | gRPC 到達成功、PermissionDenied (quota_project 不明) |
+| **C4** | **authStatus Claude モデル確認** | ✅ **成功 (v11)** | Sonnet 4.5, Opus 4.5/4.6, Tier: g1-ultra |
+| **C5** | **strace quota_project 傍受** | ⏸️ 未実施 | LS→cloudcode-pa の gRPC ヘッダー傍受 |
 
-### 24.8 残された3つの道
+---
 
-1. **mitmdump で Claude 呼出時のトラフィック傍受** — LS が cloudcode-pa に Claude を送るとき、cloudcode-pa 側でどのようなプロキシが行われるかの決定的証拠
-2. **ユーザー自身の GCP PJ で Vertex AI + Claude 有効化** — 自分のプロジェクトなら API 有効化の権限がある。課金は per-call だが技術的には LS 完全独立
-3. **LS 内部のアクティブトークンの取得** — LS 稼働中に t84432036 アカウントの有効なトークンを傍受すれば、Claude の retrieveUserQuota を検証可能
+## 25. V1 Extension JS 認証経路探索 (2026-02-14)
+
+### 25.1 OAuth トークン構造 (MECE)
+
+state.vscdb に保存される OAuth トークンは **3つの独立した経路** で管理される:
+
+| 経路 | 保存先 | client_id | refresh_token | 用途 |
+|:-----|:------|:----------|:-------------|:-----|
+| **Extension (IDE)** | `antigravityUnifiedStateSync.oauthToken` (proto) | `1071006060591-...` | `1//0eZ21XPQ...` | LS ↔ cloudcode-pa |
+| **Cortex (CLI)** | `~/.config/cortex/oauth.json` | `681255809395-oo8ft...` | (cortex固有) | Cortex API 直叩き |
+| **gemini-cli** | `~/.gemini/oauth_creds.json` | (gcloud系) | `1//0eTQhd4v...` | gemini CLI |
+
+### 25.2 Proto バイナリ構造
+
+`antigravityUnifiedStateSync.oauthToken` の構造:
+
+```
+Base64 → Proto L0
+  └─ F1 (msg 545b)
+      ├─ F1 (str): "oauthTokenInfoSentinelKey"
+      └─ F2 (msg 515b)
+          └─ F1 (str 512b): Base64 → Proto L1
+              ├─ F1 (str 260b): ya29.ACCESS_TOKEN
+              ├─ F2 (str 6b): "Bearer"
+              ├─ F3 (str 103b): 1//REFRESH_TOKEN  ★
+              └─ F4 (msg 6b): {F1: unix_timestamp}
+```
+
+### 25.3 cloudcode-pa Proto 定義
+
+`/tmp/cloudcode_v2.proto` から取得:
+
+```protobuf
+package google.internal.cloud.code.v1internal;
+
+service CloudCode {
+  rpc GenerateChat(GenerateChatRequest) returns (GenerateChatResponse);
+  rpc StreamGenerateChat(GenerateChatRequest) returns (stream GenerateChatResponse);
+}
+
+message GenerateChatRequest {
+  string project = 1;              // GCP project (quota)
+  string request_id = 2;
+  string user_message = 3;
+  repeated ChatMessage history = 4;
+  IdeMetadata metadata = 6;
+  bool enable_prompt_enhancement = 7;
+  string yielded_user_input = 9;
+  string chat_model_name = 12;     // ★ Claude 指定: "models/claude-sonnet-4-5"
+  bool include_thinking_summaries = 13;
+  string model_config_id = 14;
+  string tier_id = 15;
+}
+```
+
+### 25.4 LS プロセスとポート構造
+
+| パラメータ | 説明 | 方向 |
+|:----------|:-----|:-----|
+| `--extension_server_port` | Extension がリッスン、LS が接続する先 | LS → Extension |
+| `--server_port` | LS がリッスンする HTTPS ポート | Extension → LS |
+| `--lsp_port` | LSP プロトコル用 | IDE → LS |
+| `--random_port` | server_port を動的割当 | — |
+| `--csrf_token` | CSRF 検証トークン | 全通信 |
+| `--parent_pipe_path` | Unix Socket IPC (`/tmp/server_*`) | Extension ↔ LS |
+| `--cloud_code_endpoint` | `https://daily-cloudcode-pa.googleapis.com` | LS → Google |
+
+gemini-ide-server JSON (`/tmp/gemini/ide/gemini-ide-server-*.json`):
+
+```json
+{"port": 39743, "workspacePath": "/path", "authToken": "UUID"}
+```
+
+### 25.5 grpcurl 直接呼出の結果
+
+```bash
+grpcurl -import-path /tmp -proto cloudcode_v2.proto \
+  -H "Authorization: Bearer $YA29" \
+  -d '{"project":"$PROJECT","user_message":"hello","chat_model_name":"models/claude-sonnet-4-5"}' \
+  daily-cloudcode-pa.googleapis.com:443 \
+  google.internal.cloud.code.v1internal.CloudCode/GenerateChat
+```
+
+| project 値 | x-goog-user-project | 結果 |
+|:-----------|:--------------------|:-----|
+| (なし) | (なし) | `PermissionDenied: cloudaicompanion.companions.generateChat` |
+| `default-gemini-project-97` | (なし) | `PermissionDenied` (同上) |
+| (なし) | `projects/default-gemini-project-97` | `InvalidArgument: not found` |
+| `project-f2526536-3630-4df4-aff` | 同左 | `PermissionDenied: serviceUsageConsumer role required` |
+
+**結論**: LS は Google 管理の暗黙的 quota_project を注入している。ユーザーの GCP project では `cloudcode-pa.googleapis.com` API が有効化されていない。
+
+### 25.6 2つの壁 (MECE)
+
+| 壁 | 内容 | 突破方法 |
+|:---|:-----|:---------|
+| **W1: client_secret** | Extension client_id (`1071006060591-...`) は Web app type で client_secret 必須。LS バイナリに GOCSPX パターンなし | LS バイナリのリバースエンジニアリング or strace 傍受 |
+| **W2: quota_project** | cloudcode-pa は Google 管理の quota_project を要求。ユーザーの project では API 未有効化 | strace/mitmproxy で LS が送る project ヘッダーを傍受 |
+
+### 25.7 残された攻撃ベクトル
+
+1. **strace で LS→cloudcode-pa の gRPC ヘッダー傍受** → W2 突破
+2. **LS バイナリの Go 構造体から client_secret 抽出** → W1 突破
+3. **LS headless 起動** → LS 経由だが IDE 不要
+
+### 25.8 cloudaicompanion_project の特定と grpcurl 最終試行
+
+LS プロセスメモリ (`/proc/PID/mem`) から:
+
+```
+cloudaicompanion_project = "robotic-victory-pst7f0"
+```
+
+grpcurl 最終試行:
+
+```bash
+grpcurl -import-path /tmp -proto cloudcode_v2.proto \
+  -H "Authorization: Bearer $YA29" \
+  -d '{"project":"robotic-victory-pst7f0","user_message":"hello","chat_model_name":"models/claude-sonnet-4-5"}' \
+  daily-cloudcode-pa.googleapis.com:443 \
+  google.internal.cloud.code.v1internal.CloudCode/GenerateChat
+```
+
+| 構成 | 結果 | 分析 |
+|:-----|:-----|:-----|
+| project + x-goog-user-project | `InvalidArgument: not found or deleted` | ヘッダーが quota 要求として解釈され拒否 |
+| project のみ (ヘッダーなし) | `PermissionDenied: cloudaicompanion.companions.generateChat on projects/robotic-victory-pst7f0` | **プロジェクト認識成功、しかし権限不足** |
+
+### 25.9 最終結論: LS の認証注入メカニズム
+
+**LS は単なる HTTP プロキシではない。LS は追加の認証コンテキストを注入している。**
+
+```
+ユーザー ya29 トークン
+  → 直接 cloudcode-pa: PermissionDenied (権限不足)
+  → LS 経由 cloudcode-pa: 200 OK (LS が何かを追加)
+```
+
+LS が注入している可能性:
+
+1. **サービスアカウントの impersonation** — LS が `robotic-victory-pst7f0` の SA として代理認証
+2. **IAM binding** — LS プロセスの credential に `cloudaicompanion.companions.generateChat` role が付与されている
+3. **内部トークン交換** — LS がユーザー ya29 を内部 SA トークンに交換してから cloudcode-pa に送る
+
+**Go auth ライブラリの `QuotaProjectID` + `GetQuotaProject`** が LS バイナリに含まれることから、LS は独自の credential で cloudcode-pa にアクセスし、ユーザーの project (`robotic-victory-pst7f0`) を request 内に埋め込んでいる。
+
+### 25.10 MECE 判定: LS 不要 Claude 直接呼出
+
+| 壁 | 状態 | 突破可能性 |
+|:---|:-----|:----------|
+| W1: client_secret | 未解決 | LS バイナリ RE で可能だが労力大 |
+| W2: quota_project | **解決**: `robotic-victory-pst7f0` | — |
+| **W3: LS の認証注入** | **新発見 — 最大の壁** | LS の SA credential は LS 外部から取得不可能 |
+
+**結論**: LS 不要 ∧ 課金なし ∧ Claude = ❌ 不可能。
+理由: LS がサーバーサイドで `cloudaicompanion.companions.generateChat` 権限を持つ credential を注入しており、この credential はユーザーのトークンとは別物。

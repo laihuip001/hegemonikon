@@ -1,3 +1,4 @@
+import './css/graph3d.css';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { CSS2DRenderer, CSS2DObject } from 'three/examples/jsm/renderers/CSS2DRenderer.js';
@@ -6,6 +7,7 @@ import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
 import { api } from '../api/client';
 import type { GraphNode, GraphEdge, GraphFullResponse, LinkGraphNode, LinkGraphFullResponse } from '../api/client';
+import { esc } from '../utils';
 // @ts-ignore — d3-force-3d has no types
 import { forceSimulation, forceLink, forceManyBody, forceCenter } from 'd3-force-3d';
 
@@ -95,7 +97,7 @@ export async function renderGraph3D(): Promise<void> {
     let data: GraphFullResponse;
     try { data = await api.graphFull(); }
     catch (err) {
-        container.innerHTML = `<div class="card status-error">Graph data unavailable: ${(err as Error).message}</div>`;
+        container.innerHTML = `<div class="card status-error">Graph data unavailable: ${esc((err as Error).message)}</div>`;
         return;
     }
 

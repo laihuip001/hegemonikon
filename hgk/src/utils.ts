@@ -3,7 +3,6 @@
  * Extracted from main.ts for modularity.
  */
 
-import { api } from './api/client';
 import type { Notification } from './api/client';
 import { isPermissionGranted, requestPermission, sendNotification } from '@tauri-apps/plugin-notification';
 
@@ -112,6 +111,34 @@ export async function fireOsNotifications(notifications: Notification[]): Promis
         sendNotification({ title: n.title, body: n.body.substring(0, 200) });
         sentOsNotifIds.add(n.id);
     }
+}
+
+// ─── Relative Time ───────────────────────────────────────────
+
+/** Convert ISO timestamp to Japanese relative time string */
+export function relativeTime(isoTimestamp: string): string {
+    const now = Date.now();
+    const then = new Date(isoTimestamp).getTime();
+    const diffSec = Math.floor((now - then) / 1000);
+    if (diffSec < 60) return `${diffSec}秒前`;
+    const diffMin = Math.floor(diffSec / 60);
+    if (diffMin < 60) return `${diffMin}分前`;
+    const diffHour = Math.floor(diffMin / 60);
+    if (diffHour < 24) return `${diffHour}時間前`;
+    const diffDay = Math.floor(diffHour / 24);
+    return `${diffDay}日前`;
+}
+
+/** Convert Date object to Japanese relative time string */
+export function formatTimeAgo(date: Date): string {
+    const now = Date.now();
+    const diffSec = Math.floor((now - date.getTime()) / 1000);
+    if (diffSec < 60) return `${diffSec}秒前`;
+    const diffMin = Math.floor(diffSec / 60);
+    if (diffMin < 60) return `${diffMin}分前`;
+    const diffHour = Math.floor(diffMin / 60);
+    if (diffHour < 24) return `${diffHour}時間前`;
+    return date.toLocaleDateString('ja-JP');
 }
 
 // ─── Skeleton Loader ─────────────────────────────────────────

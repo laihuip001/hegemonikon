@@ -603,6 +603,7 @@ class PKSEngine:
         enable_serendipity: bool = True,
         enable_feedback: bool = True,
         enable_advocacy: bool = True,
+        enable_gateway: bool = True,
     ):
         self.tracker = ContextTracker()
         self.detector = RelevanceDetector(threshold=threshold)
@@ -631,6 +632,15 @@ class PKSEngine:
 
         # v2: Attractor bridge (lazy)
         self._attractor_bridge = None
+
+        # v4: Gateway bridge (Phase 3 — Ideas/Doxa/Handoff/KI 統合)
+        self._gateway = None
+        if enable_gateway:
+            try:
+                from mekhane.pks.gateway_bridge import GatewayBridge
+                self._gateway = GatewayBridge()
+            except ImportError:
+                pass
 
         # 遅延インポート (GnosisIndex は重い)
         self._index = None
@@ -775,14 +785,23 @@ class PKSEngine:
         return callback
 
     # PURPOSE: 能動的プッシュ: コンテキストに基づいて知識を表面化
-    def proactive_push(self, k: int = 20) -> list[KnowledgeNugget]:
+    def proactive_push(
+        self,
+        k: int = 20,
+        sources: Optional[list[str]] = None,
+    ) -> list[KnowledgeNugget]:
         """能動的プッシュ: コンテキストに基づいて知識を表面化
 
         1. コンテキストをクエリに変換
         2. GnosisIndex でセマンティック検索
-        3. RelevanceDetector でスコアリング
-        4. PushController でフィルタリング
-        5. プッシュ履歴を記録
+        3. v4: Gateway ソースからナゲット収集
+        4. RelevanceDetector でスコアリング
+        5. PushController でフィルタリング
+        6. プッシュ履歴を記録
+
+        Args:
+            k: Gnōsis 検索の最大結果数
+            sources: データソース指定 (None=全ソース, ["gnosis"], ["gateway"], ["gnosis","gateway"])
 
         Returns:
             プッシュ対象の KnowledgeNugget リスト
@@ -794,30 +813,52 @@ class PKSEngine:
             print("[PKS] コンテキスト未設定。topics を指定してください。")
             return []
 
-        # Gnōsis 検索
-        self.tracker.add_query(query_text)
-        index = self._get_index()
-        results = index.search(query_text, k=k)
+        use_gnosis = sources is None or "gnosis" in sources
+        use_gateway = sources is None or "gateway" in sources
 
-        if not results:
+        nuggets: list[KnowledgeNugget] = []
+
+        # Gnōsis 検索 (論文ベクトルDB)
+        if use_gnosis:
+            self.tracker.add_query(query_text)
+            index = self._get_index()
+            results = index.search(query_text, k=k)
+
+            if results:
+                gnosis_nuggets = self.detector.score(context, results)
+
+                # v2: セレンディピティスコア付与
+                if self.serendipity_scorer and gnosis_nuggets:
+                    distance_map = {
+                        r.get("title", ""): r.get("_distance", 0.5)
+                        for r in results
+                    }
+                    raw_distances = [
+                        distance_map.get(n.title, 0.5) for n in gnosis_nuggets
+                    ]
+                    self.serendipity_scorer.enrich(gnosis_nuggets, raw_distances)
+
+                nuggets.extend(gnosis_nuggets)
+
+        # v4: Gateway ソース (Ideas/Doxa/Handoff/KI)
+        if use_gateway and self._gateway:
+            gateway_sources = None
+            if sources and "gateway" not in sources:
+                # e.g. sources=["ideas", "doxa"] → gateway_sources=["ideas", "doxa"]
+                gateway_sources = [s for s in sources if s in {"ideas", "doxa", "handoff", "ki"}]
+            gateway_nuggets = self._gateway.scan(
+                context=context,
+                sources=gateway_sources,
+                max_results=k,
+            )
+            nuggets.extend(gateway_nuggets)
+
+        if not nuggets:
             print("[PKS] 検索結果なし")
             return []
 
-        # スコアリング + フィルタリング
-        nuggets = self.detector.score(context, results)
-
-        # v2: セレンディピティスコア付与
-        if self.serendipity_scorer and nuggets:
-            # results と nuggets は順序が違う (nuggets はソート済み)
-            # nuggets の title → result の _distance マッピングを構築
-            distance_map = {
-                r.get("title", ""): r.get("_distance", 0.5)
-                for r in results
-            }
-            raw_distances = [
-                distance_map.get(n.title, 0.5) for n in nuggets
-            ]
-            self.serendipity_scorer.enrich(nuggets, raw_distances)
+        # 統合ソートし直す
+        nuggets.sort(key=lambda n: n.relevance_score, reverse=True)
 
         pushable = self.controller.filter_pushable(nuggets)
 
@@ -837,6 +878,15 @@ class PKSEngine:
             self.controller.save_history(_PKS_DIR / self.HISTORY_FILE)
 
         return pushable
+
+    # PURPOSE: v4: Gateway ソースの統計を取得
+    def gateway_stats(self) -> dict:
+        """Gateway ソースの統計を返す。"""
+        if self._gateway is None:
+            return {"enabled": False}
+        stats = self._gateway.stats()
+        stats["enabled"] = True
+        return stats
 
     # PURPOSE: 明示的クエリでプッシュ: 通常検索 + PKS フィルタリング
     def search_and_push(self, query: str, k: int = 10) -> list[KnowledgeNugget]:

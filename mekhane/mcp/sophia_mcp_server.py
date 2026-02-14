@@ -1,4 +1,4 @@
-# PROOF: [L2/インフラ] <- mekhane/mcp/ A0→MCP経由のアクセスが必要→sophia_mcp_server が担う
+# PROOF: [P2.Hodos] <- mekhane/mcp/ A0→MCP経由のアクセスが必要→sophia_mcp_server が担う
 #!/usr/bin/env python3
 """
 Sophia MCP Server - Hegemonikón Knowledge Items Search
@@ -26,7 +26,7 @@ _original_stdout = sys.stdout
 _stderr_wrapper = sys.stderr
 
 
-# PURPOSE: log — MCPサービスの処理
+# PURPOSE: [P2.Hodos] log — MCPサービスの処理
 def log(msg):
     print(f"[sophia-mcp] {msg}", file=sys.stderr, flush=True)
 
@@ -50,20 +50,20 @@ log(f"Added to path: {_project_root} + {_mekhane_dir}")
 
 
 # Suppress stdout during imports
-# PURPOSE: クラス: StdoutSuppressor
+# PURPOSE: [P2.Hodos] クラス: StdoutSuppressor
 class StdoutSuppressor:
-    # PURPOSE: StdoutSuppressor の構成と依存関係の初期化
+    # PURPOSE: [P2.Hodos] StdoutSuppressor の構成と依存関係の初期化
     def __init__(self):
         self._null = io.StringIO()
         self._old_stdout = None
 
-    # PURPOSE: enter__ — MCPサービスの内部処理
+    # PURPOSE: [P2.Hodos] enter__ — MCPサービスの内部処理
     def __enter__(self):
         self._old_stdout = sys.stdout
         sys.stdout = self._null
         return self
 
-    # PURPOSE: exit__ — MCPサービスの内部処理
+    # PURPOSE: [P2.Hodos] exit__ — MCPサービスの内部処理
     def __exit__(self, *args):
         sys.stdout = self._old_stdout
 
@@ -95,7 +95,7 @@ KAIROS_INDEX = Path("/home/makaron8426/oikos/mneme/.hegemonikon/indices/kairos.p
 
 
 @server.list_tools()
-# PURPOSE: [L2-auto] List available tools.
+# PURPOSE: [P2.Hodos] List available tools.
 async def list_tools():
     """List available tools."""
     log("list_tools called")
@@ -155,7 +155,7 @@ async def list_tools():
 
 
 @server.call_tool(validate_input=True)
-# PURPOSE: [L2-auto] Handle tool calls.
+# PURPOSE: [P2.Hodos] Handle tool calls.
 async def call_tool(name: str, arguments: dict):
     """Handle tool calls."""
     log(f"call_tool: {name} with {arguments}")
@@ -368,7 +368,7 @@ async def call_tool(name: str, arguments: dict):
         return [TextContent(type="text", text=f"Unknown tool: {name}")]
 
 
-# PURPOSE: sophia_mcp_server の main 処理を実行する
+# PURPOSE: [P2.Hodos] sophia_mcp_server の main 処理を実行する
 async def main():
     """Run the MCP server."""
     log("Starting stdio server...")

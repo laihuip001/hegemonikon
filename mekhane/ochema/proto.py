@@ -133,6 +133,7 @@ STEP_STATUS_DONE = "CORTEX_STEP_STATUS_DONE"
 TURN_STATES_DONE = ("", "TURN_STATE_WAITING_FOR_USER")
 
 
+# PURPOSE: [L2-auto] PLANNER_RESPONSE ステップからテキスト・thinking・model を抽出する。
 def extract_planner_response(step: dict) -> dict:
     """PLANNER_RESPONSE ステップからテキスト・thinking・model を抽出する。
 
@@ -158,6 +159,7 @@ def extract_planner_response(step: dict) -> dict:
     }
 
 
+# PURPOSE: [L2-auto] モデルエイリアスを proto enum に解決する。
 def resolve_model(name: str) -> str:
     """モデルエイリアスを proto enum に解決する。"""
     if name in MODEL_ALIASES:

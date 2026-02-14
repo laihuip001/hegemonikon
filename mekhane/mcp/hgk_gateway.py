@@ -198,7 +198,7 @@ def _traced(fn):
     import functools
 
     @functools.wraps(fn)
-    # PURPOSE: [L2-auto] wrapper
+    # PURPOSE: [L2-auto] ツール関数にトレースを自動付与するデコレータのラッパー
     def wrapper(*args: Any, **kwargs: Any) -> Any:
         _start = time.time()
         input_size = _estimate_input_size(*args, **kwargs)

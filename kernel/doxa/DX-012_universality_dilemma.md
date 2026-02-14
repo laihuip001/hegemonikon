@@ -286,6 +286,29 @@ R(D) 曲線       = 最小 R を達成する理論のフロンティア
 > ただし、「説明力」を「モデル複雑性の低さ」(Kolmogorov simplicity) と
 > 同一視することの妥当性はさらなる検証が必要。[推定: 72%]
 
+### R(D) 曲線概念図
+
+```mermaid
+quadrantChart
+    title R(D) 曲線 — パラダイム内 vs パラダイムシフト
+    x-axis "低 Distortion (高精度)" --> "高 Distortion (低精度)"
+    y-axis "低 Rate (単純)" --> "高 Rate (複雑)"
+    quadrant-1 "過剰複雑 + 低精度"
+    quadrant-2 "過剰複雑 + 高精度"
+    quadrant-3 "単純 + 低精度 (FEP)"
+    quadrant-4 "単純 + 高精度 (理想)"
+    "旧パラダイム: 天動説": [0.3, 0.85]
+    "旧パラダイム: 微修正": [0.45, 0.7]
+    "パラダイムシフト: Newton": [0.25, 0.4]
+    "パラダイムシフト: GR": [0.15, 0.45]
+    "FEP (α≈1)": [0.8, 0.15]
+    "WF実行 (α≈0)": [0.2, 0.75]
+```
+
+> **読み方**: 旧パラダイム (天動説→微修正) は右上の曲線上を移動。
+> Newton/GR はパラダイムシフトにより曲線自体が左下にシフト。
+> FEP (α≈1) は最も単純だが歪みが大、WF実行 (α≈0) は複雑だが精密。
+
 ---
 
 ## Levins のトレードオフとの接続 {#sec_11_levins}
@@ -327,6 +350,34 @@ Levins は生物学モデルの文脈で、DX-012 は認知理論の文脈で、
 > - G (一般性) ≈ 低 R (単純なモデルが広く適用可能)
 > - P (精密性) ≈ 低 D (歪みが小さい)
 > - R (現実性) → §12 参照
+
+### GRP 三軸と情報理論的対応
+
+```mermaid
+flowchart TD
+    GRP["Levins GRP Budget"]
+    G["G: Generality\n(一般性)\n≈ 低 R (単純なモデル)"]
+    R["R: Realism\n(現実性)\n≈ P(Y|do(X)) (Pearl)"]
+    P["P: Precision\n(精密性)\n≈ 低 D (歪み最小)"]
+    
+    GRP --> G
+    GRP --> R
+    GRP --> P
+    
+    G ---|"Rate-Distortion"| P
+    R ---|"Do-Calculus"| G
+    R ---|"Interventional\nInvariance"| P
+    
+    RDT["📐 Rate-Distortion Theory\n(§10: 圧縮のトレードオフ)"]
+    PEARL["⚖️ Pearl Causal Calculus\n(§12: 因果的妥当性)"]
+    
+    G -.- RDT
+    P -.- RDT
+    R -.- PEARL
+```
+
+> **読み方**: G×P はRate-Distortion で形式化可能。R は Pearl で形式化。
+> HGK の compile path は G↔P 軸上の移動、/dia は R 軸の検証。
 
 ---
 

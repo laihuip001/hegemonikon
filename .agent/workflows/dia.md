@@ -118,6 +118,7 @@ causal_inference:
 | `cold_mirror` | 冷徹な鏡 | 「厳しく」 |
 | `deliberative` | 三視点反復改善 | 「反復改善」 |
 | `explore` | 探索的テスト (UI) | 「触って壊して」「UIテスト」 |
+| `interventional` | 介入不変性テスト | 「条件を変えても」「介入しても」 |
 
 ---
 

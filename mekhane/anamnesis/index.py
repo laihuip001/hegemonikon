@@ -13,6 +13,7 @@ Q.E.D.
 Gnōsis Index - LanceDB統合 + 重複排除
 """
 
+import os
 import sys
 from pathlib import Path
 from typing import Optional
@@ -87,6 +88,18 @@ class Embedder:
         "BAAI/bge-small-en-v1.5": 384,
     }
 
+    # PURPOSE: HuggingFace キャッシュにモデルが存在するか確認
+    @staticmethod
+    def _is_model_cached(model_name: str) -> bool:
+        """HuggingFace キャッシュにモデルが存在するか確認"""
+        cache_dir = Path.home() / ".cache" / "huggingface" / "hub"
+        model_dir = cache_dir / f"models--{model_name.replace('/', '--')}"
+        if not model_dir.exists():
+            return False
+        snapshots = model_dir / "snapshots"
+        # snapshots/ 内に少なくとも1つのディレクトリがあること
+        return snapshots.exists() and any(snapshots.iterdir())
+
     # PURPOSE: [L2-auto] 初期化: init__
     def __init__(self, force_cpu: bool = False, model_name: str = "BAAI/bge-m3"):
         if self._initialized:
@@ -103,6 +116,14 @@ class Embedder:
         self._dimension: int = self._MODEL_DIMENSIONS.get(model_name, 0)
         self._is_onnx_fallback = False
 
+        # Cache-first strategy: avoid HuggingFace network access when model is cached
+        _cached = self._is_model_cached(model_name)
+        _prev_hf_offline = os.environ.get("HF_HUB_OFFLINE")
+        if _cached:
+            # Block ALL HuggingFace network access (including transformers internals)
+            os.environ["HF_HUB_OFFLINE"] = "1"
+            print(f"[Embedder] Model '{model_name}' found in cache, using offline mode")
+
         # GPU detection with fp16
         if not force_cpu:
             try:
@@ -110,20 +131,39 @@ class Embedder:
                 if torch.cuda.is_available():
                     from sentence_transformers import SentenceTransformer
                     try:
+                        st_kwargs = {'torch_dtype': torch.float16}
                         self._st_model = SentenceTransformer(
                             model_name, device='cuda',
-                            model_kwargs={'torch_dtype': torch.float16},
+                            model_kwargs=st_kwargs,
+                            local_files_only=_cached,
                         )
                         self._use_gpu = True
                         self._dimension = self._st_model.get_sentence_embedding_dimension()
                         vram_mb = torch.cuda.memory_allocated() / 1e6
                         print(f"[Embedder] GPU mode (CUDA fp16, {vram_mb:.0f}MB VRAM, dim={self._dimension})")
                         return
-                    except RuntimeError as e:
-                        # CUDA OOM — fall through to CPU
-                        if "out of memory" in str(e).lower():
+                    except (RuntimeError, OSError) as e:
+                        err_msg = str(e).lower()
+                        if "out of memory" in err_msg:
                             print(f"[Embedder] CUDA OOM, falling back to CPU")
                             torch.cuda.empty_cache()
+                        elif _cached and ("does not appear to have" in err_msg or "connection" in err_msg):
+                            # local_files_only failed — retry with network
+                            print(f"[Embedder] Cache load failed, retrying with network access")
+                            _cached = False
+                            os.environ.pop("HF_HUB_OFFLINE", None)
+                            try:
+                                self._st_model = SentenceTransformer(
+                                    model_name, device='cuda',
+                                    model_kwargs=st_kwargs,
+                                )
+                                self._use_gpu = True
+                                self._dimension = self._st_model.get_sentence_embedding_dimension()
+                                vram_mb = torch.cuda.memory_allocated() / 1e6
+                                print(f"[Embedder] GPU mode (CUDA fp16, {vram_mb:.0f}MB VRAM, dim={self._dimension}) [network]")
+                                return
+                            except Exception:
+                                pass  # fall through to CPU
                         else:
                             raise
             except ImportError:
@@ -132,10 +172,23 @@ class Embedder:
         # CPU with sentence-transformers
         try:
             from sentence_transformers import SentenceTransformer
-            self._st_model = SentenceTransformer(model_name, device='cpu')
+            try:
+                self._st_model = SentenceTransformer(
+                    model_name, device='cpu',
+                    local_files_only=_cached,
+                )
+            except OSError:
+                if _cached:
+                    # Cache miss or corrupt — retry with network
+                    print(f"[Embedder] CPU cache load failed, retrying with network")
+                    os.environ.pop("HF_HUB_OFFLINE", None)
+                    self._st_model = SentenceTransformer(model_name, device='cpu')
+                else:
+                    raise
             self._use_gpu = False
             self._dimension = self._st_model.get_sentence_embedding_dimension()
-            print(f"[Embedder] CPU mode (sentence-transformers: {model_name}, dim={self._dimension})")
+            cache_label = " [cached]" if _cached else ""
+            print(f"[Embedder] CPU mode (sentence-transformers: {model_name}, dim={self._dimension}){cache_label}")
             return
         except ImportError:
             pass
@@ -145,6 +198,12 @@ class Embedder:
         self._is_onnx_fallback = True
         self._dimension = 384  # BGE-small ONNX model
         print(f"[Embedder] CPU mode (ONNX bge-small, dim=384) ⚠️ 次元が bge-m3 (1024) と異なります")
+
+        # Restore HF_HUB_OFFLINE to original state
+        if _prev_hf_offline is None:
+            os.environ.pop("HF_HUB_OFFLINE", None)
+        else:
+            os.environ["HF_HUB_OFFLINE"] = _prev_hf_offline
 
     # PURPOSE: Initialize ONNX Runtime session (original implementation).
     def _init_onnx(self):

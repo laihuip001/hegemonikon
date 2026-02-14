@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L1/スクリプト] <- scripts/
 # PURPOSE: [L2/インフラ] GetAllCascadeTrajectories JSON レスポンスの解析・整形
 """
 agq-sessions-parser — Antigravity Sessions Parser v2

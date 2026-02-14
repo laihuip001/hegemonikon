@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L1/スクリプト] <- scripts/
 """adjunction_status.py — 12随伴ペアの実装状態をWFファイルからスキャン
 
 Context Rot 対策スクリプト。V-007 (stale_handoff) の教訓から生まれた。

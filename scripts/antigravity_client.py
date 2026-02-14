@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L1/スクリプト] <- scripts/
 """Antigravity LLM Client — 4-Step API Wrapper.
 
 PURPOSE: Antigravity IDE の Language Server API を外部から呼び出し、

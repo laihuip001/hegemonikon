@@ -111,6 +111,53 @@ class TestDebateAgent:
         assert verdict_type == VerdictType.REJECT
         assert confidence == 0.7
 
+    # PURPOSE: 小数形式の確信度パース
+    def test_parse_verdict_decimal_confidence(self):
+        """判定パース: 小数形式 (0.85)"""
+        agent = DebateAgent(AgentRole.ARBITER)
+        text = "判定: ACCEPT\n確信度: 0.85\n理由: 論拠が十分。"
+        verdict_type, confidence, reasoning = agent._parse_verdict(text)
+        
+        assert verdict_type == VerdictType.ACCEPT
+        assert confidence == 0.85
+        assert "論拠" in reasoning
+
+    # PURPOSE: 分数形式の確信度パース
+    def test_parse_verdict_fraction_confidence(self):
+        """判定パース: 分数形式 (75/100)"""
+        agent = DebateAgent(AgentRole.ARBITER)
+        text = "判定: REJECT\n確信度: 75/100\n理由: 証拠が不十分。"
+        verdict_type, confidence, reasoning = agent._parse_verdict(text)
+        
+        assert verdict_type == VerdictType.REJECT
+        assert confidence == 0.75
+
+    # PURPOSE: 確信度なしのフォールバック
+    def test_parse_verdict_no_confidence_uses_estimate(self):
+        """判定パース: 確信度なし → _estimate_confidence にフォールバック"""
+        agent = DebateAgent(AgentRole.ARBITER)
+        text = "判定: ACCEPT\n理由: 確実に正しい。明確な根拠がある。"
+        verdict_type, confidence, reasoning = agent._parse_verdict(text)
+        
+        assert verdict_type == VerdictType.ACCEPT
+        # _estimate_confidence は高確信キーワード (確実, 明確) で 0.7+ を返す
+        assert confidence >= 0.7
+        # フォールバック 0.5 ではないことを確認
+        assert confidence != 0.5
+
+    # PURPOSE: 確信度の範囲クランプ
+    def test_parse_verdict_confidence_clamp(self):
+        """判定パース: 範囲外確信度のクランプ (150% → 1.0)"""
+        agent = DebateAgent(AgentRole.ARBITER)
+        text = "判定: ACCEPT\n確信度: 150%\n理由: テスト。"
+        verdict_type, confidence, reasoning = agent._parse_verdict(text)
+        
+        assert confidence == 1.0
+
+        text2 = "判定: REJECT\n確信度: 0%\n理由: テスト。"
+        _, confidence2, _ = agent._parse_verdict(text2)
+        assert confidence2 == 0.0
+
 
 class TestDebateEngine:
     """DebateEngine のテスト"""

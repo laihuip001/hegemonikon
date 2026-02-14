@@ -22,6 +22,7 @@ from mekhane.pks.attractor_context import (
 )
 from mekhane.pks.feedback import FeedbackCollector, PushFeedback
 from mekhane.pks.narrator import PKSNarrator
+from mekhane.pks.narrator_formats import NarratorFormat
 from mekhane.pks.matrix_view import PKSMatrixView
 from mekhane.pks.pks_engine import (
     KnowledgeNugget,
@@ -309,9 +310,9 @@ class TestScenario4_NarratorFallback:
 
         nugget = _make_nugget()
         narrative = narrator.narrate(nugget)
-        assert len(narrative.segments) == 3
+        assert len(narrative.segments) >= 3
         assert narrative.segments[0].speaker == "Advocate"
-        assert narrative.segments[1].speaker == "Critic"
+        assert any(s.speaker == "Critic" for s in narrative.segments)
 
     # PURPOSE: Verify narrator batch consistency behaves correctly
     def test_narrator_batch_consistency(self):
@@ -342,7 +343,7 @@ class TestScenario4_NarratorFallback:
         """LLM レスポンスの正常パース"""
         narrator = PKSNarrator(use_llm=False)
         text = "ADVOCATE: この研究は重要です。\nCRITIC: しかし限界があります。\nADVOCATE: その通りですが参考になります。"
-        result = narrator._parse_llm_response(text, _make_nugget())
+        result = narrator._parse_llm_response(text, NarratorFormat.DEEP_DIVE, nugget=_make_nugget())
         assert result is not None
         assert len(result.segments) == 3
 
@@ -351,7 +352,7 @@ class TestScenario4_NarratorFallback:
         """不正な LLM レスポンス → None (テンプレートにフォールバック)"""
         narrator = PKSNarrator(use_llm=False)
         text = "This is not in the expected format at all."
-        result = narrator._parse_llm_response(text, _make_nugget())
+        result = narrator._parse_llm_response(text, NarratorFormat.DEEP_DIVE, nugget=_make_nugget())
         assert result is None
 
 

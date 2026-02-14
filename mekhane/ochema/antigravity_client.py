@@ -466,20 +466,21 @@ class AntigravityClient:
 
     # --- Proposal A: Context Rot Detection ---
 
-    # PURPOSE: [L2-auto] コンテキスト健全性を評価する。
+    # PURPOSE: [L2-auto] コンテキスト健全性を評価する (v2 積極介入型)。
     def context_health(self, cascade_id: Optional[str] = None) -> dict:
-        """コンテキスト健全性を評価する。
+        """コンテキスト健全性を評価する (v2 積極介入型)。
 
-        tool-mastery.md §5.5 の N chat messages 閾値に基づく:
-            ≤30: 🟢 HEALTHY
-            31-50: 🟡 WARNING
-            >50: 🔴 DANGER
+        tool-mastery.md §5.5 v2 の N chat messages 閾値に基づく:
+            ≤30:  🟢 HEALTHY
+            31-40: 🟡 WARNING     — 中間セーブ強制
+            41-50: 🟠 PRE_DANGER  — 新規タスク受付停止
+            >50:  🔴 DANGER      — /bye 強制
 
         Args:
             cascade_id: 特定セッション (省略時は最新の RUNNING セッション)
 
         Returns:
-            dict with level, message, step_count, recommendation
+            dict with level, message, step_count, recommendation, actions
         """
         sessions = self.session_info()
         if "error" in sessions:
@@ -511,16 +512,25 @@ class AntigravityClient:
             icon = "🟢"
             message = "Context is healthy"
             recommendation = None
-        elif step_count <= 50:
+            actions = []
+        elif step_count <= 40:
             level = "warning"
             icon = "🟡"
-            message = "Context pressure rising"
-            recommendation = "Consider /bye soon"
+            message = "Context pressure rising — savepoint recommended"
+            recommendation = "Generate savepoint NOW. Consider /bye soon"
+            actions = ["savepoint", "wm_record"]
+        elif step_count <= 50:
+            level = "pre_danger"
+            icon = "🟠"
+            message = "Context Rot imminent — no new tasks"
+            recommendation = "Stop accepting new tasks. Complete current work and /bye"
+            actions = ["no_new_tasks", "propose_bye"]
         else:
             level = "danger"
             icon = "🔴"
-            message = "Context Rot risk HIGH"
-            recommendation = "/bye recommended — context degradation likely"
+            message = "Context Rot risk HIGH — /bye mandatory"
+            recommendation = "/bye NOW — generate Handoff immediately"
+            actions = ["force_bye", "auto_handoff"]
 
         # Quota も統合
         try:
@@ -540,7 +550,97 @@ class AntigravityClient:
             "cascade_id": target.get("cascade_id", ""),
             "summary": target.get("summary", ""),
             "recommendation": recommendation,
+            "actions": actions,
             "low_quota_models": low_quota_models,
+        }
+
+    # PURPOSE: [L2-auto] コンテキスト圧縮の提案を生成する (BC-18 連携)。
+    def suggest_compression(self, cascade_id: Optional[str] = None) -> dict:
+        """コンテキスト圧縮の提案を生成する。
+
+        BC-18 (コンテキスト予算意識) と連携し、セッションの健全性に基づいて
+        圧縮戦略を提案する。
+
+        分析:
+        1. context_health() でセッション状態を取得
+        2. ステップ数に応じた圧縮戦略を決定
+        3. Chroma Research の知見を適用した提案を生成
+
+        Args:
+            cascade_id: 特定セッション (省略時は最新)
+
+        Returns:
+            dict with health, strategies, academic_insights
+        """
+        health = self.context_health(cascade_id)
+        if health.get("level") == "unknown":
+            return {"error": "No session found for compression analysis"}
+
+        step_count = health.get("step_count", 0)
+        strategies = []
+
+        # --- 段階別圧縮戦略 ---
+        if step_count > 20:
+            strategies.append({
+                "type": "savepoint",
+                "priority": "medium",
+                "description": "中間セーブを生成し、現在の作業状態を永続化",
+                "path": "~/oikos/mneme/.hegemonikon/sessions/savepoint_*.md",
+            })
+
+        if step_count > 30:
+            strategies.append({
+                "type": "topic_pruning",
+                "priority": "high",
+                "description": "完了済みトピックの要約化。詳細をドロップし要約のみ保持",
+                "estimated_savings": "30-50% of completed topic tokens",
+            })
+
+        if step_count > 40:
+            strategies.append({
+                "type": "tool_output_summary",
+                "priority": "critical",
+                "description": "過去のツール出力を要約に置換。view_file 結果等の大量テキストを圧縮",
+                "estimated_savings": "up to 90% of tool output tokens",
+            })
+            strategies.append({
+                "type": "session_split",
+                "priority": "critical",
+                "description": "/bye → Handoff → 新セッション。コンテキストを完全リセット",
+                "estimated_savings": "100% (fresh context)",
+            })
+
+        # --- Chroma Research 知見の運用化 ---
+        academic_insights = [
+            {
+                "finding": "importance_over_category",
+                "description": "情報は論理的カテゴリ順ではなく重要度順に配置すべき",
+                "action": "Handoff 内の情報を重要度降順に再配置",
+                "source": "Chroma Research: shuffled > logically ordered",
+            },
+            {
+                "finding": "assembly_phase",
+                "description": "検索結果はそのまま注入せず組立フェーズを挟むべき",
+                "action": "PKS/Mneme の検索結果を要約してからコンテキストに注入",
+                "source": "Chroma Research: small-grain search → large-grain assembly",
+            },
+            {
+                "finding": "noise_filter",
+                "description": "無関連情報は性能を急速に劣化させる",
+                "action": "コンテキストに含める情報を現タスクとの関連度でフィルタ",
+                "source": "Chroma Research: low-similarity needles → rapid degradation",
+            },
+        ]
+
+        return {
+            "health": health,
+            "strategies": strategies,
+            "strategy_count": len(strategies),
+            "academic_insights": academic_insights,
+            "summary": (
+                f"{health['icon']} Step {step_count}: "
+                f"{len(strategies)} compression strategies available"
+            ),
         }
 
     # --- Proposal C: Multi-Model Orchestration ---

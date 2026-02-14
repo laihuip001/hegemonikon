@@ -5,7 +5,7 @@
 # 変更履歴:
 #   v1.0 (2026-02-13) — 初版。既存ハードコード制約を抽出・集約。
 
-version: "1.0"
+version: "1.1"
 
 # デフォルト値 (個別指定がなければこの値を適用)
 defaults:
@@ -67,6 +67,10 @@ tools:
     max_topics_size: 500    # C-7
     max_candidates: 20
 
+  hgk_digest_topics:
+    description: "消化対象トピック一覧"
+    # 読取専用
+
   hgk_digest_run:
     description: "消化パイプライン実行"
     max_topics_size: 500    # C-7
@@ -89,6 +93,36 @@ tools:
     max_query_size: 500
     max_results: 20
     timeout_seconds: 120    # Embedder + 横断検索
+
+  hgk_sessions:
+    description: "IDE セッション一覧取得"
+    # 読取専用
+
+  hgk_session_read:
+    description: "IDE セッション会話ログ読取"
+    max_turns: 50
+
+  hgk_ask:
+    description: "LLM 呼出し (Antigravity LS 経由)"
+    max_input_size: 5000
+    rate_limit_per_min: 5   # 明示的レート制限
+
+  hgk_models:
+    description: "利用可能モデル一覧"
+    # 読取専用
+
+  hgk_ls_status:
+    description: "Language Server 接続状況"
+    # 読取専用
+
+  hgk_health:
+    description: "HGK システム健全性レポート"
+    # 読取専用
+
+  hgk_notifications:
+    description: "未読通知確認"
+    max_results: 50
+
 
 # セキュリティポリシー
 security:

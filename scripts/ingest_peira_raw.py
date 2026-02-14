@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L1/スクリプト] <- scripts/
 """
 Ingest peira/Raw + raw markdown files from git history into Gnōsis.
 

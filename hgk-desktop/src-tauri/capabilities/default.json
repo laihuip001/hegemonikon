@@ -8,7 +8,17 @@
   "permissions": [
     "core:default",
     "opener:default",
-    "http:default",
+    {
+      "identifier": "http:default",
+      "allow": [
+        {
+          "url": "http://127.0.0.1:9696/*"
+        },
+        {
+          "url": "http://localhost:9696/*"
+        }
+      ]
+    },
     "notification:default"
   ]
 }

@@ -1,3 +1,5 @@
+# PROOF: [L3/実験] <- mekhane/ochema/scripts/ A0→Cortex API解析→MITM通信キャプチャ
+# PURPOSE: mitmproxy 用 Cortex API MITM キャプチャスクリプト
 """
 Cortex API MITM Capture Script for mitmproxy.
 

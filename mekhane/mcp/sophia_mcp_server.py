@@ -91,6 +91,110 @@ log("Server initialized")
 # Index paths
 SOPHIA_INDEX = Path("/home/makaron8426/oikos/mneme/.hegemonikon/indices/sophia.pkl")
 KAIROS_INDEX = Path("/home/makaron8426/oikos/mneme/.hegemonikon/indices/kairos.pkl")
+KI_DIR = Path("/home/makaron8426/.gemini/antigravity/knowledge")
+STEPS_ROOT = Path("/home/makaron8426/.gemini/antigravity/brain")
+
+
+# PURPOSE: 検索対象ドキュメントの収集（KI + Steps）
+def _collect_searchable_docs() -> list:
+    """KI ファイルと Steps output.txt を検索対象として収集
+    
+    Returns:
+        list of (name, content, file_path, artifact_type) tuples
+    """
+    docs = []
+    
+    # 1. Knowledge Items (.md)
+    if KI_DIR.exists():
+        for ki_file in KI_DIR.glob("*.md"):
+            try:
+                content = ki_file.read_text(encoding='utf-8')
+                if content.strip():
+                    docs.append((ki_file.stem, content, str(ki_file), "KI"))
+            except Exception:
+                continue
+    
+    # 2. Steps output.txt (session artifacts)
+    if STEPS_ROOT.exists():
+        for steps_dir in STEPS_ROOT.glob("*/.system_generated/steps/*/"):
+            output_file = steps_dir / "output.txt"
+            if output_file.exists():
+                try:
+                    content = output_file.read_text(encoding='utf-8')
+                    if content.strip() and len(content) > 20:  # skip empty/trivial
+                        conv_id = steps_dir.parents[2].name[:8]  # first 8 chars
+                        step_num = steps_dir.name
+                        name = f"step_{conv_id}_{step_num}"
+                        docs.append((name, content, str(output_file), "Step"))
+                except Exception:
+                    continue
+    
+    return docs
+
+
+# PURPOSE: TF-IDF ベースの KI + Steps 軽量検索（ベクトル検索フォールバック用）
+def _tfidf_search_ki(query: str, k: int = 5) -> list:
+    """KI ファイルと Steps output.txt を TF-IDF ベースで検索
+    
+    EmbeddingAdapter が使えない場合のフォールバック。
+    """
+    import re
+    import math
+    
+    docs = _collect_searchable_docs()
+    if not docs:
+        return []
+    
+    # クエリをトークン化（簡易）
+    query_tokens = set(re.findall(r'[a-zA-Z\u3040-\u9fff]+', query.lower()))
+    if not query_tokens:
+        return []
+    
+    n_docs = len(docs)
+    
+    # 各ドキュメントのスコアリング
+    scored = []
+    for name, content, file_path, artifact_type in docs:
+        try:
+            content_lower = content.lower()
+            
+            # TF-IDF 簡易スコア
+            score = 0.0
+            total_words = max(len(content_lower.split()), 1)
+            for token in query_tokens:
+                count = content_lower.count(token)
+                if count > 0:
+                    tf = count / total_words
+                    idf = math.log(1 + n_docs / (1 + count))
+                    score += tf * idf * 100  # スケーリング
+            
+            # タイトルマッチボーナス（KI は名前が意味を持つ）
+            if artifact_type == "KI":
+                for token in query_tokens:
+                    if token in name.lower():
+                        score += 0.3
+            
+            if score > 0:
+                # サマリ抽出（最初の3行）
+                lines = content.strip().split('\n')
+                summary = ' '.join(
+                    l.strip('# ').strip() for l in lines[:3] if l.strip()
+                )
+                
+                scored.append({
+                    "source": "sophia",
+                    "score": round(min(score, 1.0), 3),
+                    "ki_name": name,
+                    "artifact": artifact_type,
+                    "summary": summary[:150],
+                    "file_path": file_path,
+                })
+        except Exception:
+            continue
+    
+    # スコア降順でソート
+    scored.sort(key=lambda x: x["score"], reverse=True)
+    return scored[:k]
 # PURPOSE: List available tools.
 
 
@@ -176,24 +280,39 @@ async def call_tool(name: str, arguments: dict):
             log(f"Searching for: {query}")
             results = []
 
-            # Search Sophia
-            if source in ("sophia", "both") and SOPHIA_INDEX.exists():
-                adapter = EmbeddingAdapter()
-                adapter.load(str(SOPHIA_INDEX))
-                query_vec = adapter.encode([query])[0]
-                sophia_results = adapter.search(query_vec, k=limit)
+            # Search Sophia (vector → TF-IDF fallback)
+            if source in ("sophia", "both"):
+                sophia_searched = False
+                
+                # Try vector search first
+                if SOPHIA_INDEX.exists():
+                    try:
+                        adapter = EmbeddingAdapter()
+                        adapter.load(str(SOPHIA_INDEX))
+                        query_vec = adapter.encode([query])[0]
+                        sophia_results = adapter.search(query_vec, k=limit)
+                        sophia_searched = True
 
-                for r in sophia_results:
-                    results.append(
-                        {
-                            "source": "sophia",
-                            "score": r.score,
-                            "ki_name": r.metadata.get("ki_name", "N/A"),
-                            "artifact": r.metadata.get("artifact", ""),
-                            "summary": r.metadata.get("summary", "")[:150],
-                            "file_path": r.metadata.get("file_path", ""),
-                        }
-                    )
+                        for r in sophia_results:
+                            results.append(
+                                {
+                                    "source": "sophia",
+                                    "score": r.score,
+                                    "ki_name": r.metadata.get("ki_name", "N/A"),
+                                    "artifact": r.metadata.get("artifact", ""),
+                                    "summary": r.metadata.get("summary", "")[:150],
+                                    "file_path": r.metadata.get("file_path", ""),
+                                }
+                            )
+                    except Exception as vec_err:
+                        log(f"Vector search failed, using TF-IDF fallback: {vec_err}")
+                
+                # TF-IDF fallback if vector search failed or unavailable
+                if not sophia_searched or not results:
+                    tfidf_results = _tfidf_search_ki(query, k=limit)
+                    if tfidf_results:
+                        log(f"TF-IDF fallback: {len(tfidf_results)} results")
+                        results.extend(tfidf_results)
 
             # Search Kairos
             if source in ("kairos", "both") and KAIROS_INDEX.exists():

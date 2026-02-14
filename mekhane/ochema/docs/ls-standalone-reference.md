@@ -730,7 +730,156 @@ POST https://daily-cloudcode-pa.googleapis.com/...CloudCode/LoadCodeAssist HTTP/
 └────────────────────────┘     └─────────────────────────┘
 ```
 
-**最も確実な残ルート**: LS ラッパースクリプトで `HTTPS_PROXY=127.0.0.1:8765` を注入 → LS 再起動 → LS → Cortex の通信を mitmdump でキャプチャ → **LS が使う ya29 トークンの Authorization ヘッダを取得**。
+> **v8 で解決**: Cortex 直叩きではなく、**LS API をプロキシとして使う代替ルート**が成功。
+> トークン傍受は不要になった。
+
+### 18.15 LS プロキシ経由 LLM 呼び出し: ✅ 完全成功 (v8)
+
+**発想の転換**: Cortex API のトークンを傍受する代わりに、**LS 自体をプロキシとして使う**。
+LS は自前のトークンで Cortex に接続するため、外部からは CSRF トークンのみで制御可能。
+
+| 項目 | 結果 |
+|:-----|:-----|
+| Trajectory サイズ | **620,779 bytes** / 25 steps |
+| 使用モデル | `MODEL_PLACEHOLDER_M7` (Gemini 3 Pro) |
+| Thinking 取得 | ✅ 7.6 秒の推論過程をテキストで完全キャプチャ |
+| Step Types 取得 | USER_INPUT → PLANNER_RESPONSE → VIEW_FILE → CODE_ACTION → RUN_COMMAND → NOTIFY_USER |
+| 自律エージェント動作 | ✅ Cascade が自律的にファイル閲覧・コード編集・コマンド実行まで実行 |
+
+### 18.16 v8 攻略過程: 9 回の試行錯誤
+
+| # | 試行 | 結果 | エラー内容 |
+|:--|:-----|:-----|:----------|
+| 29 | LS API: CSRF `x-csrf-token` | ❌ | `missing CSRF token` — ヘッダー名が違う |
+| 30 | LS API: CSRF `X-Codeium-Csrf-Token` | ✅ | **認証パス！** |
+| 31 | `StartCascade` (metadata なし) | ⚠️ | cascadeId 取得するも `trajectory not found` |
+| 32 | `GetCascade` メソッド呼出 | ❌ | **404** — メソッド名が存在しない |
+| 33 | `GetCascadeTrajectory` メソッド呼出 | ✅ | trajectory 構造返却 |
+| 34 | `StartCascade` + `metadata` + `trajectoryType:17` | ✅ | Trajectory + `CASCADE_RUN_STATUS_IDLE` |
+| 35 | `SendMessage` (model なし) | ❌ | `neither PlanModel nor RequestedModel specified` |
+| 36 | `SendMessage` + `requestedModel: "gemini-2.5-pro"` | ❌ | proto unmarshal error (文字列不可) |
+| 37 | `SendMessage` + `requestedModel: {model: "MODEL_PLACEHOLDER_M7"}` | 🎯 | **LLM 呼び出し成功！** |
+
+### 18.17 確立した LS プロキシ 4-Step フロー
+
+```bash
+# 0. LS 自動検出
+LS_PID=$(pgrep -f 'language_server_linux.*hegemonikon' | head -1)
+CSRF=$(cat /proc/$LS_PID/cmdline | tr '\0' '\n' | grep -A1 csrf_token | tail -1)
+PORT=$(ss -tlnp 2>/dev/null | grep "pid=$LS_PID" | head -1 | grep -oP ':\K\d+' | head -1)
+
+call() {
+  curl -sk --noproxy '*' --http2 --max-time ${2:-10} -X POST \
+    "https://127.0.0.1:$PORT/exa.language_server_pb.LanguageServerService/$1" \
+    -H "Content-Type: application/json" \
+    -H "Connect-Protocol-Version: 1" \
+    -H "X-Codeium-Csrf-Token: $CSRF" \
+    -d "$3" 2>/dev/null
+}
+
+# Step 1: モデル一覧取得
+call GetCascadeModelConfigData 10 '{}'
+
+# Step 2: カスケード開始
+CID=$(call StartCascade 10 '{
+  "metadata": {"ideName":"antigravity","ideVersion":"1.98.0","extensionVersion":"2.23.0"},
+  "source": 12,
+  "trajectoryType": 17
+}' | python3 -c "import json,sys; print(json.load(sys.stdin)['cascadeId'])")
+
+# Step 3: メッセージ送信 (ストリーミング — バックグラウンド実行)
+call SendUserCascadeMessage 60 "{
+  \"cascadeId\": \"$CID\",
+  \"items\": [{\"text\": \"質問内容\"}],
+  \"cascadeConfig\": {
+    \"plannerConfig\": {
+      \"plannerTypeConfig\": {\"conversational\": {}},
+      \"requestedModel\": {\"model\": \"MODEL_PLACEHOLDER_M7\"}
+    }
+  }
+}" &
+
+# Step 4: ポーリングで結果取得
+sleep 15
+call GetCascadeTrajectory 10 "{\"cascadeId\": \"$CID\"}"
+```
+
+### 18.18 利用可能モデル (GetCascadeModelConfigData)
+
+| Label | Proto Enum | Quota | Images | Tier |
+|:------|:-----------|:-----:|:------:|:-----|
+| Gemini 3 Pro (Low) | `MODEL_PLACEHOLDER_M7` | 100% | ✅ | PRO, TEAMS, ENTERPRISE |
+| Gemini 3 Flash | `MODEL_PLACEHOLDER_M18` | 100% | ✅ | PRO, TEAMS, ENTERPRISE |
+
+**サポート MIME Types** (両モデル共通):
+PDF, JSON, HTML, CSS, JS, TS, Python, Markdown, CSV, XML, RTF, PNG, JPEG, WebP, HEIC, MP4, WebM, Audio/WAV
+
+### 18.19 Trajectory 構造解析
+
+`GetCascadeTrajectory` レスポンスの構造:
+
+```json
+{
+  "trajectory": {
+    "trajectoryId": "310032d5-...",
+    "cascadeId": "edc6894a-...",
+    "trajectoryType": "CORTEX_TRAJECTORY_TYPE_INTERACTIVE_CASCADE",
+    "source": "CORTEX_TRAJECTORY_SOURCE_INTERACTIVE_CASCADE",
+    "metadata": {
+      "workspaces": [{"workspaceFolderAbsoluteUri": "file:///...", "repository": {...}}],
+      "createdAt": "2026-02-13T10:59:36Z"
+    }
+  },
+  "status": "CASCADE_RUN_STATUS_IDLE"   // IDLE = 完了, RUNNING = 実行中
+}
+```
+
+**Step Types** (25 ステップの構成):
+
+| Type | 説明 | 出現数 |
+|:-----|:-----|:------:|
+| `USER_INPUT` | ユーザー入力 | 2 |
+| `CONVERSATION_HISTORY` | 会話履歴 | 1 |
+| `EPHEMERAL_MESSAGE` | 一時メッセージ (IDE 表示用) | 5 |
+| `PLANNER_RESPONSE` | **LLM 応答** (thinking + messageId) | 5 |
+| `VIEW_FILE` | ファイル閲覧 | 2 |
+| `CODE_ACTION` | コード編集 | 3 |
+| `RUN_COMMAND` | コマンド実行 | 2 |
+| `COMMAND_STATUS` | コマンド結果 | 1 |
+| `CHECKPOINT` | チェックポイント | 1 |
+| `TASK_BOUNDARY` | タスク境界 | 2 |
+| `NOTIFY_USER` | ユーザー通知 | 1 |
+
+**PLANNER_RESPONSE 構造**:
+
+```json
+{
+  "type": "CORTEX_STEP_TYPE_PLANNER_RESPONSE",
+  "status": "CORTEX_STEP_STATUS_DONE",
+  "metadata": {
+    "generatorModel": "MODEL_PLACEHOLDER_M7",
+    "requestedModel": {"model": "MODEL_PLACEHOLDER_M7"},
+    "source": "CORTEX_STEP_SOURCE_MODEL"
+  },
+  "plannerResponse": {
+    "thinking": "推論テキスト全文...",
+    "messageId": "bot-9db2841c-...",
+    "thinkingDuration": "7.605317513s",
+    "stopReason": "STOP_REASON_CLIENT_CANCELED"
+  }
+}
+```
+
+### 18.20 重要な技術的制約
+
+| 制約 | 詳細 |
+|:-----|:-----|
+| **外部ターミナル必須** | IDE 内ターミナルからの呼出しは LS デッドロックを引き起こす |
+| **SendMessage はストリーミング** | curl の `--max-time` でタイムアウトするが、応答は `{}` (正常) |
+| **ポーリング方式** | `GetCascadeTrajectory` で定期的に状態確認 (5-30秒間隔) |
+| **requestedModel は proto enum** | 文字列 (`"gemini-2.5-pro"`) ではなく `{model: "MODEL_PLACEHOLDER_M7"}` 形式 |
+| **metadata 必須** | StartCascade に `metadata` + `trajectoryType: 17` がないと Trajectory が生成されない |
+| **Cascade は自律エージェント** | 単純な質問でも VIEW_FILE, CODE_ACTION, RUN_COMMAND を自律実行する |
 
 ---
 
@@ -750,15 +899,14 @@ POST https://daily-cloudcode-pa.googleapis.com/...CloudCode/LoadCodeAssist HTTP/
 10. ~~strace 傍受~~ → ❌ (Go goroutine 破壊で不適)
 11. ~~OAuth refresh~~ → ❌ (unauthorized_client — 異なる OAuth client)
 12. ~~CDP Origin~~ → ❌ (403 Forbidden — Electron 制限)
+13. ~~LS プロキシ 4-Step フロー~~ → ✅ (v8: 620KB trajectory, 25 steps, thinking 完全取得)
 
-### 残る最終ステップ: LS ラッパー + mitmdump
+### 残ステップ
 
-1. `sudo mv language_server_linux_x64 language_server_linux_x64.real`
-2. ラッパースクリプト設置 (`HTTPS_PROXY=http://127.0.0.1:8765` + `SSL_CERT_FILE`)
-3. IDE ウィンドウリロード → 新 LS が mitmdump 経由で起動
-4. LLM 呼出発火 → **LS の Authorization ヘッダをキャプチャ**
-5. 取得トークンで `GenerateChat` 直叩き
-6. ラッパー復元
+1. **antigravity_client.py に v8 フロー統合**: 正しい metadata + requestedModel を反映
+2. **Ochēma MCP Server 更新**: model 選択 (M7/M18) をパラメータ化
+3. **ストリーミング取得**: `StreamCascadeReactiveUpdates` でリアルタイム応答受信
+4. **Cortex 直叩き (optional)**: LS ラッパー + mitmdump で LS 内部トークンを傍受 → GenerateChat 直叩き
 
 ---
 
@@ -770,3 +918,4 @@ POST https://daily-cloudcode-pa.googleapis.com/...CloudCode/LoadCodeAssist HTTP/
 *v5b — V3 ログ探査 + V1 MITM 成功 + Unleash Feature Flags 発見 (2026-02-13)*
 *v6 — Proto 構造完全復元 + GenerateChat curl テスト (HTTP 200, PERMISSION_DENIED) (2026-02-13)*
 *v7 — strace/mitmdump/CDP/OAuth: 28攻撃ベクトル完了 + mitmdump TLS復号成功 (2026-02-13)*
+*v8 — LS プロキシ経由 LLM 呼び出し完全成功: 4-Step フロー確立 + Gemini 3 Pro thinking 取得 (2026-02-13)*

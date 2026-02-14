@@ -79,18 +79,22 @@ class CompletenessAgent(AuditAgent):
         issues: List[AuditIssue] = []
 
         content = target.content
+        is_diff = self._is_diff_content(content)
 
-        # 未完了マーカー検出
-        issues.extend(self._check_incomplete_markers(content))
+        # diff 入力の場合、追加行のみに正規化
+        normalized = self._normalize_diff_content(content) if is_diff else content
 
-        # 空のブロック検出
-        issues.extend(self._check_empty_blocks(content))
+        # 未完了マーカー検出 (diff の場合は追加行のみ)
+        issues.extend(self._check_incomplete_markers(normalized))
 
-        # タイプ固有の必須要素チェック
+        # 空のブロック検出 (diff の場合は追加行のみ)
+        issues.extend(self._check_empty_blocks(normalized))
+
+        # タイプ固有の必須要素チェック (全文を使う)
         issues.extend(self._check_required_elements(content, target.target_type))
 
-        # 構造的完全性チェック
-        issues.extend(self._check_structural_completeness(content, target.target_type))
+        # 構造的完全性チェック (diff の場合は追加行のみ)
+        issues.extend(self._check_structural_completeness(normalized, target.target_type))
 
         passed = not any(
             i.severity in (AuditSeverity.CRITICAL, AuditSeverity.HIGH) for i in issues
@@ -102,6 +106,56 @@ class CompletenessAgent(AuditAgent):
             issues=issues,
             confidence=0.90,
         )
+
+    # PURPOSE: diff 形式のコンテンツかどうかを判定
+    @staticmethod
+    def _is_diff_content(content: str) -> bool:
+        """diff 形式のコンテンツかどうかを判定
+
+        unified diff の特徴的なパターンを検出:
+        - `+++ ` / `--- ` ヘッダー行
+        - `@@ ... @@` ハンクヘッダー
+        - `+` / `-` で始まる変更行の割合
+        """
+        lines = content.split("\n")
+        if len(lines) < 3:
+            return False
+
+        # unified diff ヘッダー検出
+        has_diff_header = any(
+            line.startswith("--- ") or line.startswith("+++ ") or line.startswith("@@ ")
+            for line in lines[:20]
+        )
+        if has_diff_header:
+            return True
+
+        # +/- 行の割合で判定 (50% 以上なら diff)
+        diff_lines = sum(1 for line in lines if line.startswith("+") or line.startswith("-"))
+        return len(lines) > 5 and diff_lines / len(lines) > 0.5
+
+    # PURPOSE: diff コンテンツから追加行のみを抽出して正規化
+    @staticmethod
+    def _normalize_diff_content(content: str) -> str:
+        """diff コンテンツから追加行 (+) とコンテキスト行のみを抽出
+
+        削除行 (-) を除外することで、括弧バランスチェック等の
+        偽陽性を防ぐ。
+        """
+        normalized_lines = []
+        for line in content.split("\n"):
+            # diff メタ行をスキップ
+            if line.startswith("--- ") or line.startswith("+++ ") or line.startswith("@@ "):
+                continue
+            # 削除行をスキップ
+            if line.startswith("-"):
+                continue
+            # 追加行は + プレフィックスを除去
+            if line.startswith("+"):
+                normalized_lines.append(line[1:])
+            else:
+                # コンテキスト行はそのまま
+                normalized_lines.append(line)
+        return "\n".join(normalized_lines)
 
     # PURPOSE: [L2-auto] 未完了マーカーを検出
     def _check_incomplete_markers(self, content: str) -> List[AuditIssue]:
@@ -206,3 +260,4 @@ class CompletenessAgent(AuditAgent):
     def supports(self, target_type: AuditTargetType) -> bool:
         """全タイプをサポート"""
         return True
+

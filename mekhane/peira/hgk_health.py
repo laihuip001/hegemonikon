@@ -67,7 +67,7 @@ def check_systemd_service(name: str, unit: str, is_user: bool = False) -> Health
 def check_docker(name: str, container_name: str = "n8n") -> HealthItem:
     try:
         result = subprocess.run(
-            ["sudo", "docker", "ps", "--filter", f"name={container_name}", "--format", "{{.Status}}"],
+            ["docker", "ps", "--filter", f"name={container_name}", "--format", "{{.Status}}"],
             capture_output=True, text=True, timeout=10
         )
         status = result.stdout.strip()
@@ -290,7 +290,7 @@ def run_health_check() -> HealthReport:
     report.items.append(check_docker("n8n Container"))
     report.items.append(check_systemd_service("Gnosis Index Timer", "gnosis-index.timer", is_user=True))
     report.items.append(check_systemd_service("HGK Sync Timer", "hegemonikon-sync.timer", is_user=True))
-    report.items.append(check_cron("Tier 1 Daily Cron", "tier1"))
+    report.items.append(check_cron("Tier 1 Daily Cron", "run_tier1"))
 
     # Data checks
     report.items.append(check_handoff())

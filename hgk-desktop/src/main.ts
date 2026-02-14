@@ -72,6 +72,49 @@ function esc(s: string | undefined | null): string {
     .replace(/'/g, '&#039;');
 }
 
+// ─── Phase 3: Animations ────────────────────────────────────
+
+/** Animate a number counting up from 0 to target */
+function animateCountUp(el: HTMLElement, target: number, duration = 800): void {
+  const isFloat = !Number.isInteger(target);
+  const start = performance.now();
+  const update = (now: number) => {
+    const elapsed = now - start;
+    const progress = Math.min(elapsed / duration, 1);
+    // Ease-out cubic for natural deceleration
+    const eased = 1 - Math.pow(1 - progress, 3);
+    const current = target * eased;
+    el.textContent = isFloat ? current.toFixed(2) : String(Math.round(current));
+    if (progress < 1) requestAnimationFrame(update);
+  };
+  requestAnimationFrame(update);
+}
+
+/** Apply count-up animation to all [data-count-target] elements within a container */
+function applyCountUpAnimations(container: HTMLElement): void {
+  container.querySelectorAll<HTMLElement>('[data-count-target]').forEach((el, i) => {
+    const target = parseFloat(el.dataset.countTarget ?? '0');
+    if (isNaN(target) || target === 0) return;
+    el.textContent = '0';
+    // Stagger animation start for visual effect
+    setTimeout(() => animateCountUp(el, target, 700), i * 80);
+  });
+}
+
+/** Apply staggered fade-in to cards within a container */
+function applyStaggeredFadeIn(container: HTMLElement): void {
+  container.querySelectorAll<HTMLElement>('.card').forEach((card, i) => {
+    card.style.opacity = '0';
+    card.style.transform = 'translateY(8px)';
+    card.style.transition = `opacity 0.35s cubic-bezier(0.4, 0, 0.2, 1) ${i * 50}ms, transform 0.35s cubic-bezier(0.4, 0, 0.2, 1) ${i * 50}ms`;
+    // Trigger animation on next frame
+    requestAnimationFrame(() => {
+      card.style.opacity = '1';
+      card.style.transform = 'translateY(0)';
+    });
+  });
+}
+
 // ─── Polling Manager (S5) ────────────────────────────────────
 
 let pollingTimers: ReturnType<typeof setInterval>[] = [];
@@ -118,7 +161,45 @@ document.addEventListener('DOMContentLoaded', () => {
   // CCL Command Palette — Ctrl+K
   initCommandPalette();
   initKeyboardNav();
+  initThemeToggle();
 });
+
+// ─── Theme Toggle ────────────────────────────────────────────
+
+function initThemeToggle(): void {
+  // Restore saved theme
+  const saved = localStorage.getItem('hgk-theme');
+  if (saved === 'light' || saved === 'dark') {
+    document.documentElement.setAttribute('data-theme', saved);
+  }
+
+  const isDark = () => document.documentElement.getAttribute('data-theme') !== 'light';
+
+  // Create toggle button
+  const btn = document.createElement('button');
+  btn.className = 'theme-toggle';
+  btn.setAttribute('aria-label', 'Toggle theme');
+  btn.setAttribute('title', 'テーマ切替 (Ctrl+Shift+T)');
+  btn.textContent = isDark() ? '☀️' : '🌙';
+  document.body.appendChild(btn);
+
+  const toggle = () => {
+    const next = isDark() ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', next);
+    localStorage.setItem('hgk-theme', next);
+    btn.textContent = next === 'dark' ? '☀️' : '🌙';
+  };
+
+  btn.addEventListener('click', toggle);
+
+  // Ctrl+Shift+T shortcut
+  document.addEventListener('keydown', (e: KeyboardEvent) => {
+    if (e.ctrlKey && e.shiftKey && e.key === 'T') {
+      e.preventDefault();
+      toggle();
+    }
+  });
+}
 
 // ─── Keyboard Navigation (Ctrl+1‑9,0) ───────────────────────
 
@@ -263,36 +344,42 @@ async function renderDashboardContent(): Promise<void> {
 
   // CRITICAL alert widget
   const alertHtml = criticals.length > 0 ? `
-    <div class="card dashboard-alert">
-      <div class="dashboard-alert-title">🚨 緊急通知 ${criticals.length}件</div>
+    <div class="alert-banner fade-in">
+      <div style="display:flex; align-items:center; gap:0.5rem; margin-bottom:0.5rem;">
+        <span class="status-dot error"></span>
+        <strong style="color:var(--error-color);">緊急通知 ${criticals.length}件</strong>
+      </div>
       ${criticals.slice(0, 3).map((n: Notification) => `
-        <div class="dashboard-alert-item">
-          <strong>${esc(n.title)}</strong>
-          <span class="notif-time"> — ${esc(relativeTime(n.timestamp))}</span>
+        <div style="padding:0.2rem 0; font-size:0.875rem;">
+          ${esc(n.title)}
+          <span style="color:var(--text-secondary); font-size:0.75rem;"> — ${esc(relativeTime(n.timestamp))}</span>
         </div>
       `).join('')}
-      ${criticals.length > 3 ? `<div class="dashboard-alert-item" style="color:#8b949e;">他 ${criticals.length - 3}件...</div>` : ''}
+      ${criticals.length > 3 ? `<div style="color:var(--text-secondary); font-size:0.8rem;">他 ${criticals.length - 3}件...</div>` : ''}
     </div>
   ` : '';
 
   app.innerHTML = `
     <h1>ダッシュボード <small class="poll-badge">自動更新 60秒</small></h1>
     ${alertHtml}
-    <div class="grid">
+    <div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
       <div class="card">
-        <h3>システム状態</h3>
-        <div class="metric">${healthStatus}</div>
-        <p>稼働時間: ${esc(uptimeDisplay)}</p>
+        <div class="metric-label">システム状態</div>
+        <div class="metric">
+          <span class="status-dot ${score >= 0.8 ? 'ok' : score >= 0.5 ? 'warn' : 'error'}"></span>
+          ${healthStatus}
+        </div>
+        <p style="color:var(--text-secondary); font-size:0.8rem; margin:0.25rem 0 0;">稼働時間: ${esc(uptimeDisplay)}</p>
       </div>
       <div class="card">
-        <h3>FEP エージェント</h3>
-        <div class="metric">${String(historyLen)} <small>ステップ</small></div>
-        <p>能動推論の履歴</p>
+        <div class="metric-label">FEP エージェント</div>
+        <div class="metric"><span data-count-target="${typeof historyLen === 'number' ? historyLen : 0}">${String(historyLen)}</span></div>
+        <p style="color:var(--text-secondary); font-size:0.8rem; margin:0.25rem 0 0;">推論ステップ数</p>
       </div>
       <div class="card">
-        <h3>Gnōsis</h3>
-        <div class="metric">${String(gnosisCount)} <small>論文</small></div>
-        <p>知識基盤</p>
+        <div class="metric-label">Gnōsis</div>
+        <div class="metric"><span data-count-target="${typeof gnosisCount === 'number' ? gnosisCount : 0}">${String(gnosisCount)}</span></div>
+        <p style="color:var(--text-secondary); font-size:0.8rem; margin:0.25rem 0 0;">収集済み論文</p>
       </div>
       <div class="card kalon-card">
         <div class="kalon-card-header">
@@ -310,6 +397,10 @@ async function renderDashboardContent(): Promise<void> {
     ${renderHealthItems(health)}
     ${renderUsageCard()}
   `;
+
+  // Phase 3: Apply animations
+  applyCountUpAnimations(app);
+  applyStaggeredFadeIn(app);
 }
 
 function renderHealthItems(health: HealthReportResponse | null): string {
@@ -321,12 +412,13 @@ function renderHealthItems(health: HealthReportResponse | null): string {
         <thead><tr><th>サービス</th><th>状態</th><th>詳細</th></tr></thead>
         <tbody>
           ${health.items.map((item: HealthReportResponse['items'][number]) => {
-    const cls = item.status === 'ok' ? 'status-ok' : item.status === 'warn' ? 'status-warn' : 'status-error';
+    const dotCls = item.status === 'ok' ? 'ok' : item.status === 'warn' ? 'warn' : 'error';
+    const tagCls = item.status === 'ok' ? 'tag-success' : item.status === 'warn' ? 'tag-warning' : 'tag-error';
     const statusJa = item.status === 'ok' ? '正常' : item.status === 'warn' ? '注意' : 'エラー';
     return `<tr>
               <td>${esc(item.emoji)} ${esc(item.name)}</td>
-              <td class="${cls}">${esc(statusJa)}</td>
-              <td>${esc(item.detail)}</td>
+              <td><span class="status-dot ${dotCls}"></span><span class="tag ${tagCls}">${esc(statusJa)}</span></td>
+              <td style="color:var(--text-secondary);">${esc(item.detail)}</td>
             </tr>`;
   }).join('')}
         </tbody>
@@ -368,28 +460,34 @@ async function renderFepContent(): Promise<void> {
     .map(([k, v]) => `<tr><td>${esc(k)}</td><td>${(v as number).toFixed(4)}</td></tr>`)
     .join('');
 
-  // Dashboard distribution
-  const actionDist = dashboard ? Object.entries(dashboard.action_distribution)
-    .sort(([, a], [, b]) => (b as number) - (a as number))
-    .map(([k, v]) => `<tr><td>${esc(k)}</td><td>${String(v)}</td></tr>`)
-    .join('') : '';
+  // Dashboard distribution with progress bars
+  const actionEntries = dashboard ? Object.entries(dashboard.action_distribution)
+    .sort(([, a], [, b]) => (b as number) - (a as number)) : [];
+  const actionMax = actionEntries.length > 0 ? Math.max(...actionEntries.map(([, v]) => v as number), 1) : 1;
+  const actionDist = actionEntries.map(([k, v]) => {
+    const pct = ((v as number) / actionMax * 100).toFixed(0);
+    return `<tr><td>${esc(k)}</td><td><div class="dist-bar-wrap"><div class="dist-bar"><div class="dist-bar-fill" style="width:${pct}%"></div></div><span class="dist-bar-value">${String(v)}</span></div></td></tr>`;
+  }).join('');
 
-  const seriesDist = dashboard ? Object.entries(dashboard.series_distribution)
-    .sort(([, a], [, b]) => (b as number) - (a as number))
-    .map(([k, v]) => `<tr><td>${esc(k)}</td><td>${String(v)}</td></tr>`)
-    .join('') : '';
+  const seriesEntries = dashboard ? Object.entries(dashboard.series_distribution)
+    .sort(([, a], [, b]) => (b as number) - (a as number)) : [];
+  const seriesMax = seriesEntries.length > 0 ? Math.max(...seriesEntries.map(([, v]) => v as number), 1) : 1;
+  const seriesDist = seriesEntries.map(([k, v]) => {
+    const pct = ((v as number) / seriesMax * 100).toFixed(0);
+    return `<tr><td>${esc(k)}</td><td><div class="dist-bar-wrap"><div class="dist-bar"><div class="dist-bar-fill" style="width:${pct}%"></div></div><span class="dist-bar-value">${String(v)}</span></div></td></tr>`;
+  }).join('');
 
   app.innerHTML = `
     <h1>FEP エージェント <small class="poll-badge">自動更新 30秒</small></h1>
 
     <div class="card">
-      <h3>信念分布 (${state.beliefs.length} 次元)</h3>
+      <div class="metric-label">信念分布 (${state.beliefs.length} 次元)</div>
       <div class="beliefs-chart">${beliefsHtml}</div>
-      <small style="color:#8b949e;">ホバーで値表示。最大値 = ${maxBelief.toFixed(4)}</small>
+      <small style="color:var(--text-secondary);">ホバーで値表示。最大値 = ${maxBelief.toFixed(4)}</small>
     </div>
 
     <div class="card step-panel">
-      <h3>推論ステップ実行</h3>
+      <div class="metric-label">推論ステップ実行</div>
       <div style="display:flex; gap:0.5rem; align-items:center;">
         <label for="obs-input">観測値 (0-47):</label>
         <input type="number" id="obs-input" class="input" min="0" max="47" value="0" style="width:80px;" />
@@ -400,26 +498,30 @@ async function renderFepContent(): Promise<void> {
 
     <div class="grid">
       <div class="card">
-        <h3>Epsilon</h3>
+        <div class="metric-label">Epsilon</div>
         <table class="data-table">${epsilonEntries}</table>
       </div>
       <div class="card">
-        <h3>履歴</h3>
-        <div class="metric">${state.history_length}</div>
-        <p>推論ステップ</p>
+        <div class="metric-label">履歴</div>
+        <div class="metric"><span data-count-target="${state.history_length}">${state.history_length}</span></div>
+        <p style="color:var(--text-secondary); font-size:0.8rem; margin:0.25rem 0 0;">推論ステップ</p>
       </div>
       ${dashboard ? `
       <div class="card">
-        <h3>行動分布</h3>
+        <div class="metric-label">行動分布</div>
         <table class="data-table">${actionDist || '<tr><td colspan="2">データなし</td></tr>'}</table>
       </div>
       <div class="card">
-        <h3>シリーズ分布</h3>
+        <div class="metric-label">シリーズ分布</div>
         <table class="data-table">${seriesDist || '<tr><td colspan="2">データなし</td></tr>'}</table>
       </div>
       ` : ''}
     </div>
   `;
+
+  // Phase 3+5: Apply animations
+  applyCountUpAnimations(app);
+  applyStaggeredFadeIn(app);
 
   // S6: FEP Step event handler
   document.getElementById('step-btn')?.addEventListener('click', async () => {
@@ -634,14 +736,14 @@ async function renderQuality(): Promise<void> {
     <h1>コード品質 (Dendron)</h1>
     <div class="grid">
       <div class="card">
-        <h3>カバレッジ</h3>
-        <div class="metric ${coverageClass}">${displayPct}%</div>
-        <p>${s.files_with_proof} / ${s.total_files} ファイル検証済み</p>
+        <div class="metric-label">カバレッジ</div>
+        <div class="metric ${coverageClass}"><span data-count-target="${parseFloat(displayPct)}">${displayPct}</span>%</div>
+        <p style="color:var(--text-secondary); font-size:0.8rem; margin:0.25rem 0 0;">${s.files_with_proof} / ${s.total_files} ファイル検証済み</p>
       </div>
       <div class="card">
-        <h3>構造</h3>
-        <div class="metric">${s.total_dirs}</div>
-        <p>${s.dirs_with_proof} / ${s.total_dirs} ディレクトリ検証済み</p>
+        <div class="metric-label">構造</div>
+        <div class="metric"><span data-count-target="${s.total_dirs}">${s.total_dirs}</span></div>
+        <p style="color:var(--text-secondary); font-size:0.8rem; margin:0.25rem 0 0;">${s.dirs_with_proof} / ${s.total_dirs} ディレクトリ検証済み</p>
       </div>
     </div>
     ${s.issues.length > 0 ? `
@@ -651,6 +753,10 @@ async function renderQuality(): Promise<void> {
       </div>
     ` : ''}
   `;
+
+  // Phase 3: Apply animations
+  applyCountUpAnimations(app);
+  applyStaggeredFadeIn(app);
 }
 
 // ─── Postcheck (S7) ──────────────────────────────────────────
@@ -667,23 +773,30 @@ async function renderPostcheck(): Promise<void> {
 
   const app = document.getElementById('view-content')!;
 
-  const wfRows = selList.items.map(item => {
-    const modes = Object.keys(item.modes).join(', ') || '-';
-    return `<tr>
-      <td>${esc(item.wf_name)}</td>
-      <td>${esc(modes)}</td>
-      <td><button class="btn btn-sm run-postcheck-btn" data-wf="${esc(item.wf_name)}">実行</button></td>
-    </tr>`;
+  const wfCards = selList.items.map(item => {
+    const modes = Object.keys(item.modes);
+    const modeTags = modes.map(m => `<span class="tag tag-info">${esc(m)}</span>`).join(' ');
+    return `<div class="card postcheck-wf-card" style="margin-bottom:0;">
+      <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+        <div>
+          <div style="font-weight:600; font-size:0.95rem; margin-bottom:0.35rem;">/${esc(item.wf_name)}</div>
+          <div style="display:flex; gap:0.3rem; flex-wrap:wrap;">${modeTags || '<span class="tag" style="opacity:0.4;">default</span>'}</div>
+        </div>
+        <button class="btn btn-sm run-postcheck-btn" data-wf="${esc(item.wf_name)}">実行</button>
+      </div>
+    </div>`;
   }).join('');
 
   app.innerHTML = `
     <h1>ポストチェック</h1>
-    <div class="card">
-      <h3>ワークフロー登録 (${selList.total} 件)</h3>
-      <table class="data-table">
-        <thead><tr><th>ワークフロー</th><th>モード</th><th>アクション</th></tr></thead>
-        <tbody>${wfRows}</tbody>
-      </table>
+    <div class="card" style="margin-bottom:1.5rem;">
+      <div style="display:flex; align-items:center; gap:0.75rem; margin-bottom:0.75rem;">
+        <h3 style="margin:0;">ワークフロー登録</h3>
+        <span class="tag tag-info">${selList.total} 件</span>
+      </div>
+      <div class="grid" style="grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap:0.75rem;">
+        ${wfCards}
+      </div>
     </div>
     <div class="card">
       <h3>手動ポストチェック</h3>
@@ -829,24 +942,35 @@ async function renderNotificationsContent(): Promise<void> {
         (n.relevance_score ? `\nRelevance: ${(n.relevance_score * 100).toFixed(0)}%` : ''),
       data: { pks: true, relevance_score: n.relevance_score },
     }));
-    // Prepend PKS notifications (most recent first)
     notifications = [...pksAsNotifs, ...notifications];
   }
 
   const app = document.getElementById('view-content')!;
   if (currentRoute !== 'notifications') return;
 
-  const cardsHtml = notifications.length === 0
-    ? '<div class="notif-empty">📭 通知はありません</div>'
-    : notifications.map((n: Notification) => {
+  // Count by level (before client-side filter, so tabs show total counts)
+  const critCount = notifications.filter(n => n.level === 'CRITICAL').length;
+  const highCount = notifications.filter(n => n.level === 'HIGH').length;
+  const infoCount = notifications.filter(n => n.level === 'INFO').length;
+
+  // Client-side filter for PKS (which bypasses API filter)
+  const filtered = notifLevelFilter
+    ? notifications.filter(n => n.level === notifLevelFilter)
+    : notifications;
+
+  const cardsHtml = filtered.length === 0
+    ? `<div class="empty-state"><div style="font-size:2.5rem; margin-bottom:0.5rem;">📭</div><p>通知はありません</p></div>`
+    : filtered.map((n: Notification) => {
       const levelClass = n.level.toLowerCase();
       const levelLabel = LEVEL_LABELS[n.level] ?? n.level;
+      const dotCls = n.level === 'CRITICAL' ? 'error' : n.level === 'HIGH' ? 'warn' : 'ok';
       const isDigestor = n.data?.digestor === true;
       const digestorUrl = isDigestor && n.data?.url ? String(n.data.url) : '';
       const digestorScore = isDigestor && n.data?.score ? Number(n.data.score) : 0;
       return `
           <div class="card notif-card level-${levelClass}${isDigestor ? ' notif-digestor' : ''}">
             <div class="notif-top">
+              <span class="status-dot ${dotCls}"></span>
               <span class="notif-source">${esc(n.source)}</span>
               <span class="notif-level ${levelClass}">${esc(levelLabel)}</span>
               ${isDigestor && digestorScore > 0
@@ -862,33 +986,48 @@ async function renderNotificationsContent(): Promise<void> {
           </div>`;
     }).join('');
 
+  const tabData = [
+    { value: '', label: 'すべて', count: notifications.length },
+    { value: 'CRITICAL', label: '🚨 緊急', count: critCount },
+    { value: 'HIGH', label: '⚠️ 重要', count: highCount },
+    { value: 'INFO', label: 'ℹ️ 情報', count: infoCount },
+  ];
+
+  const tabsHtml = tabData.map(t =>
+    `<button class="notif-tab ${notifLevelFilter === t.value ? 'active' : ''}" data-level="${esc(t.value)}">
+      ${t.label}
+      <span class="notif-tab-count">${t.count}</span>
+    </button>`
+  ).join('');
+
   app.innerHTML = `
     <div class="notif-header">
-      <h1>🔔 通知 <small class="poll-badge">自動更新 30秒</small></h1>
-      <select id="notif-level-filter" class="input" style="width:130px;">
-        <option value="">すべて</option>
-        <option value="CRITICAL" ${notifLevelFilter === 'CRITICAL' ? 'selected' : ''}>🚨 緊急</option>
-        <option value="HIGH" ${notifLevelFilter === 'HIGH' ? 'selected' : ''}>⚠️ 重要</option>
-        <option value="INFO" ${notifLevelFilter === 'INFO' ? 'selected' : ''}>ℹ️ 情報</option>
-      </select>
+      <h1>通知</h1>
+      <div class="metric-label" style="margin-left:auto;">${notifications.length} 件</div>
       <button id="notif-refresh-btn" class="btn btn-sm">更新</button>
     </div>
+    <div class="notif-tab-bar">${tabsHtml}</div>
     ${cardsHtml}
   `;
 
   // OS ネイティブ通知を発火 (CRITICAL/HIGH のみ)
   void fireOsNotifications(notifications);
 
-  // Filter change handler
-  document.getElementById('notif-level-filter')?.addEventListener('change', (e) => {
-    notifLevelFilter = (e.target as HTMLSelectElement).value;
-    void renderNotificationsContent();
+  // Tab click handlers
+  document.querySelectorAll('.notif-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      notifLevelFilter = tab.getAttribute('data-level') ?? '';
+      void renderNotificationsContent();
+    });
   });
 
   // Manual refresh
   document.getElementById('notif-refresh-btn')?.addEventListener('click', () => {
     void renderNotificationsContent();
   });
+
+  // Phase 3: staggered fade-in
+  applyStaggeredFadeIn(app);
 }
 
 // ─── PKS (Proactive Knowledge Surface) ───────────────────────
@@ -1292,7 +1431,7 @@ async function renderSearch(): Promise<void> {
   }).join('');
 
   app.innerHTML = `
-    <h1>🔍 統合検索</h1>
+    <h1>統合検索</h1>
     <div class="card">
       <div style="display:flex; gap:0.5rem; margin-bottom:0.75rem;">
         <input type="text" id="symploke-search-input" class="input"
@@ -1337,10 +1476,10 @@ async function renderSearch(): Promise<void> {
 
       if (res.results.length === 0) {
         resultsDiv.innerHTML = `
-          <div class="card" style="text-align:center; padding:2rem;">
-            <div style="font-size:2rem; margin-bottom:0.5rem;">📭</div>
+          <div class="empty-state">
+            <div style="font-size:2.5rem; margin-bottom:0.5rem;">🔍</div>
             <p>「${esc(query)}」に一致する結果がありません</p>
-            <small style="color:#8b949e;">検索対象: ${res.sources_searched.map(s => SOURCE_LABELS[s] ?? s).join(', ')}</small>
+            <small style="color:var(--text-secondary);">検索対象: ${res.sources_searched.map(s => SOURCE_LABELS[s] ?? s).join(', ')}</small>
           </div>`;
         return;
       }
@@ -1350,8 +1489,8 @@ async function renderSearch(): Promise<void> {
         .join(' · ');
 
       resultsDiv.innerHTML = `
-        <div class="search-summary" style="margin:0.75rem 0; color:#8b949e; font-size:0.85rem;">
-          ${res.total} 件の結果 — ${sourceSummary}
+        <div class="search-summary" style="margin:0.75rem 0; color:var(--text-secondary); font-size:0.85rem;">
+          <span class="metric-label" style="display:inline;">${res.total} 件</span> — ${sourceSummary}
         </div>
         ${res.results.map((r: SymplokeSearchResultItem) => {
         const color = SOURCE_COLORS[r.source] ?? '#8b949e';
@@ -1372,6 +1511,9 @@ async function renderSearch(): Promise<void> {
             </div>`;
       }).join('')}
       `;
+
+      // Phase 6: staggered fade-in for search results
+      applyStaggeredFadeIn(resultsDiv);
     } catch (e) {
       resultsDiv.innerHTML = `<div class="card status-error">検索失敗: ${esc((e as Error).message)}</div>`;
     }

@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L1/スクリプト] <- scripts/
 """Týpos v2.3 品質検証スクリプト"""
 import sys
 import io

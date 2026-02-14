@@ -61,85 +61,137 @@ class DigestorPipeline:
         """デフォルトの出力ディレクトリ"""
         return Path.home() / ".hegemonikon" / "digestor"
 
-    # PURPOSE: Gnosis から論文を取得
+    # PURPOSE: Gnōsis LanceDB + arXiv API から論文を取得
     def _fetch_from_gnosis(
         self, topics: Optional[list[str]] = None, max_papers: int = 50
     ) -> list:
         """
-        Gnosis から論文を取得
+        Gnōsis LanceDB インデックス + arXiv API から論文を取得
 
-        現時点では arXiv/Semantic Scholar から直接取得
-        将来: Gnosis インデックスから取得
+        Phase A: Gnōsis LanceDB ベクトル検索 (27k+ papers)
+        Phase B: arXiv API 新着取得 (fallback + 新着)
         """
         papers = []
 
+        # トピック定義からクエリを取得
+        topics_list = self.selector.get_topics()
+        if topics:
+            queries = [
+                (t.get("id", ""), t.get("query", ""))
+                for t in topics_list if t.get("id") in topics
+            ]
+        else:
+            # 全トピックを使う（上位3に限定しない）
+            queries = [
+                (t.get("id", ""), t.get("query", ""))
+                for t in topics_list
+            ]
+
+        # === Phase A: Gnōsis LanceDB ベクトル検索 ===
+        gnosis_count = 0
+        try:
+            from mekhane.anamnesis.gnosis_chat import GnosisChat
+            gc = GnosisChat(use_reranker=False)  # Reranker は CUDA 問題があるため無効化
+            per_topic = max(max_papers // max(len(queries), 1), 5)
+
+            for topic_id, query in queries:
+                if not query:
+                    continue
+                try:
+                    result = gc.retrieve_only(query)
+                    for src in result.get("sources", [])[:per_topic]:
+                        # papers テーブルの結果のみ使用（knowledge テーブルは論文ではない）
+                        if src.get("table") not in ("papers",):
+                            continue
+                        # Paper オブジェクトに変換
+                        paper = self._source_to_paper(src, topic_id)
+                        if paper is not None:
+                            papers.append(paper)
+                            gnosis_count += 1
+                except Exception as e:
+                    print(f"[Digestor]   → Gnōsis search for '{topic_id}' failed: {e}")
+
+            print(f"[Digestor]   → Phase A (Gnōsis LanceDB): {gnosis_count} papers")
+        except ImportError:
+            print("[Digestor]   → Phase A skipped: GnosisChat not available")
+        except Exception as e:
+            print(f"[Digestor]   → Phase A error: {e}")
+
+        # === Phase B: arXiv API 新着取得 (fallback) ===
+        arxiv_count = 0
         try:
             from mekhane.anamnesis.collectors.arxiv import ArxivCollector
-
-            collector = ArxivCollector()
-
-            # トピック定義からクエリを取得
-            topics_list = self.selector.get_topics()
-            queries = []
-
-            if topics:
-                # 指定トピックのクエリのみ
-                queries = [
-                    t.get("query", "") for t in topics_list if t.get("id") in topics
-                ]
-            else:
-                # 全トピックから上位3つ
-                queries = [t.get("query", "") for t in topics_list[:3]]
-
-            # 各クエリで検索 (exponential backoff 付き)
             import time as _time
 
-            for i, query in enumerate(queries):
+            collector = ArxivCollector()
+            # Phase A で十分な候補がある場合、arXiv は上位3トピックに限定
+            arxiv_queries = queries[:3] if gnosis_count >= 10 else queries
+
+            for i, (topic_id, query) in enumerate(arxiv_queries):
                 if not query:
                     continue
                 if i > 0:
-                    _time.sleep(3)  # arXiv API rate limit: クエリ間 3秒
+                    _time.sleep(3)  # arXiv API rate limit
 
-                # Exponential backoff: 3s → 6s → 12s (max 3 retries)
                 max_retries = 3
                 for attempt in range(max_retries):
                     try:
                         results = collector.search(
-                            query, max_results=max_papers // len(queries)
+                            query, max_results=max_papers // max(len(arxiv_queries), 1)
                         )
                         papers.extend(results)
-                        break  # 成功したらリトライループを抜ける
+                        arxiv_count += len(results)
+                        break
                     except Exception as e:
-                        wait = 3 * (2 ** attempt)  # 3s, 6s, 12s
+                        wait = 3 * (2 ** attempt)
                         if attempt < max_retries - 1:
-                            print(f"[Digestor] Query '{query[:30]}...' failed (attempt {attempt + 1}/{max_retries}): {e}")
-                            print(f"[Digestor]   → Retrying in {wait}s...")
+                            print(f"[Digestor]   → arXiv '{topic_id}' failed (attempt {attempt + 1}): {e}")
                             _time.sleep(wait)
                         else:
-                            print(f"[Digestor] Query '{query[:30]}...' failed after {max_retries} attempts: {e}")
-                            # 最終リトライも失敗 → このクエリをスキップ
+                            print(f"[Digestor]   → arXiv '{topic_id}' failed after {max_retries} attempts: {e}")
 
-            # 重複除去 (arXiv ID or URL ベース)
-            seen_ids = set()
-            unique_papers = []
-            for paper in papers:
-                paper_id = (
-                    getattr(paper, "arxiv_id", None)
-                    or getattr(paper, "url", None)
-                    or paper.id
-                )
-                if paper_id not in seen_ids:
-                    seen_ids.add(paper_id)
-                    unique_papers.append(paper)
-            papers = unique_papers
-            print(f"[Digestor]   → Deduplicated: {len(papers)} unique papers")
-
+            print(f"[Digestor]   → Phase B (arXiv API): {arxiv_count} papers")
         except ImportError:
-            print("[Digestor] Warning: Gnosis collectors not available")
+            print("[Digestor]   → Phase B skipped: ArxivCollector not available")
         except Exception as e:
-            print(f"[Digestor] Error fetching from Gnosis: {e}")
+            print(f"[Digestor]   → Phase B error: {e}")
+
+        # === 重複除去 (title or arXiv ID ベース) ===
+        seen = set()
+        unique_papers = []
+        for paper in papers:
+            paper_id = (
+                getattr(paper, "arxiv_id", None)
+                or getattr(paper, "url", None)
+                or getattr(paper, "title", paper.id)
+            )
+            if paper_id not in seen:
+                seen.add(paper_id)
+                unique_papers.append(paper)
+        papers = unique_papers
+        print(f"[Digestor]   → Deduplicated: {len(papers)} unique papers (Gnōsis: {gnosis_count}, arXiv: {arxiv_count})")
 
         return papers
+
+    # PURPOSE: retrieve_only の source 辞書を Paper オブジェクトに変換
+    def _source_to_paper(self, src: dict, topic_id: str):
+        """retrieve_only の source 辞書を Paper オブジェクトに変換"""
+        try:
+            from mekhane.anamnesis.models.paper import Paper
+        except ImportError:
+            from .selector import Paper
+
+        title = src.get("title", "").strip()
+        if not title:
+            return None
+
+        return Paper(
+            id=f"gnosis_{src.get('source', 'unknown')}_{title[:40]}",
+            title=title,
+            abstract="",  # retrieve_only は abstract を返さない
+            source=src.get("source", "unknown"),
+            url=src.get("url", ""),
+        )
 
     # ═══ B: 既存インデックスとの重複排除 ═══════════════════
 

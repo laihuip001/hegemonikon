@@ -145,7 +145,7 @@ class TestAPICalls:
         body = json.loads(req.data)
         assert body["cascadeId"] == "c1"
         assert body["items"][0]["text"] == "hello"
-        assert body["cascadeConfig"]["plannerConfig"]["planModel"] == "MODEL_X"
+        assert body["cascadeConfig"]["plannerConfig"]["requestedModel"]["model"] == "MODEL_X"
 
     @patch("antigravity_client.urllib.request.urlopen")
     def test_get_trajectory(self, mock_urlopen):

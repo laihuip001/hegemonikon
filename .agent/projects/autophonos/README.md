@@ -4,71 +4,105 @@
 
 ---
 
+## ステータス
+
+| フェーズ | 状態 |
+|:---------|:-----|
+| Phase 0: 立ち上げ | ✅ 完了 |
+| Phase 1: PKS (Pull→Push 反転) | ✅ 完了 (v2.1) |
+| Phase 2: SelfAdvocate (一人称語りかけ) | ✅ 完了 (v3) |
+| Phase 3: Gateway 統合 | 🔄 進行中 |
+
+---
+
 ## 概要
 
 従来の知識ベースは **Pull 型** — ユーザーが問いかけない限り沈黙する。
-
-Autophōnos は **Push 型** — データ（論文）が自らの価値を認識し、適切なタイミングでユーザーに提案する。
+Autophōnos は **Push 型** — データが自らの価値を認識し、一人称で語りかける。
 
 ```
-従来: User → Query → DB → Result
-Autophōnos: DB → Context Detection → Benefit Proposal → User
+従来:       User → Query → DB → Result
+PKS:        DB → Context Detection → Benefit Proposal → User
+Autophōnos: DB → Context Detection → 📄「私があなたを助けられます」 → User
 ```
 
 ---
 
 ## 思想的基盤
 
-| 概念 | 説明 |
-|:-----|:-----|
-| **文鎮問題** | 論文を集めても使われなければ「文鎮」に過ぎない |
-| **FEP 整合** | システムがユーザーの予測誤差を先回りして最小化 |
-| **擬人化された知識** | 論文が「私を使ってください」と主張する |
+- **FEP (Active Inference)**: 認知システムは受動的に刺激を待つのでなく、能動的に環境をサンプリングする
+- **Autophōnos の具現化**: 知識ベースが Active Inference エージェントとして振る舞う
+- **文鎮問題の解決**: 762件の論文が「呼ばれるまで沈黙」→「必要なタイミングで語りかける」
+
+詳細: [philosophy.md](docs/philosophy.md)
 
 ---
 
-## 核心機構
+## アーキテクチャ
 
-### Proactive Benefit Push Engine
-
-1. **Context Detection**: 現在の Handoff / コンテキストから「ユーザーが何に困っているか」を検出
-2. **Benefit Estimation**: 各論文に対して「今この瞬間の有用性スコア」を計算
-3. **Self-Advocacy Generation**: 論文が自分の価値を主張するメッセージを生成
-4. **Push Timing**: 適切なタイミングで割り込む（/boot, 明示的な呼び出し等）
-
----
-
-## ディレクトリ構造
+実装は `mekhane/pks/` に配置。16ファイル、4,100行超。
 
 ```
-.agent/projects/autophonos/
-├── README.md           # このファイル
-├── docs/
-│   ├── design.md       # 詳細設計
-│   └── philosophy.md   # 思想的背景
-└── src/                # 将来の実装（mekhane にシンボリックリンク予定）
+┌─────────────────── Autophōnos / PKS ───────────────────┐
+│                                                         │
+│  ┌─────────────────┐   ┌────────────────────────────┐  │
+│  │  ContextTracker  │──▶│    RelevanceDetector       │  │
+│  │  (文脈検出)       │   │    (関連度評価)             │  │
+│  └─────────────────┘   └────────────┬───────────────┘  │
+│                                      │                   │
+│  ┌─────────────────┐   ┌────────────▼───────────────┐  │
+│  │  GnosisIndex     │──▶│    PushController          │  │
+│  │  (ベクトル検索)   │   │    (プッシュ制御)           │  │
+│  └─────────────────┘   └────────────┬───────────────┘  │
+│                                      │                   │
+│  ┌─────────────────┐   ┌────────────▼───────────────┐  │
+│  │  SelfAdvocate 🆕 │──▶│    PKSNarrator            │  │
+│  │  (一人称語り)     │   │    (対話形式変換)           │  │
+│  └─────────────────┘   └───────────────────────────┘  │
+│                                                         │
+│  補助: SerendipityScorer, FeedbackCollector,            │
+│        LinkEngine, SyncWatcher, MatrixView               │
+└─────────────────────────────────────────────────────────┘
+```
+
+### 主要ファイル
+
+| ファイル | 行数 | 役割 |
+|:---------|-----:|:-----|
+| `pks_engine.py` | 900 | コアエンジン: Nugget/Context/Push |
+| `narrator.py` | 585 | 多フォーマット対話生成 |
+| `self_advocate.py` | 210 | 🆕 一人称メッセージ生成 |
+| `pks_cli.py` | 380 | CLIインターフェース |
+| `links/link_engine.py` | 318 | 引用グラフ |
+| `sync_watcher.py` | 290 | ファイル変更監視 |
+| `matrix_view.py` | 279 | マトリクスビュー |
+| `llm_client.py` | 84 | Gemini共通クライアント |
+| `feedback.py` | 138 | フィードバック学習 |
+
+---
+
+## 使い方
+
+```bash
+# 能動的プッシュ
+cd ~/oikos/hegemonikon
+.venv/bin/python mekhane/pks/pks_cli.py push --topics FEP,CCL
+
+# 一人称モード (Autophōnos)
+.venv/bin/python -c "
+from mekhane.pks.pks_engine import PKSEngine
+engine = PKSEngine()
+engine.set_context(topics=['FEP'])
+nuggets = engine.proactive_push()
+print(engine.format_push_report(nuggets, use_advocacy=True))
+"
 ```
 
 ---
 
-## ステータス
+## 関連
 
-| Phase | 内容 | Status |
-|:------|:-----|:-------|
-| 0 | プロジェクト立ち上げ | 🔄 In Progress |
-| 1 | Proactive Push Engine 設計 | 📋 Planned |
-| 2 | Context Detection 実装 | 📋 Planned |
-| 3 | Benefit Estimation 実装 | 📋 Planned |
-| 4 | /boot 統合 | 📋 Planned |
-
----
-
-## 関連プロジェクト
-
-- **Gnōsis**: 論文ベクトル検索（Autophōnos の基盤）
-- **White Blood Cell**: 未消化サジェスト検出（Autophōnos と共有する Context Detection）
-- **Sophia**: 調査ワークフロー（Autophōnos の入力ソース）
-
----
-
-*Created: 2026-02-06*
+- [設計詳細](docs/design.md)
+- [思想的背景](docs/philosophy.md)
+- `mekhane/pks/` — 実装
+- `mekhane/anamnesis/` — GnosisIndex (ベクトル検索基盤)

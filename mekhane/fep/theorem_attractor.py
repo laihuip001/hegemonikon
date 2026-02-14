@@ -1115,18 +1115,19 @@ class TheoremAttractor:
         from mekhane.fep.gpu import to_tensor
         state = to_tensor(initial, self._device)
         T = self._transition_matrix
-        I = to_tensor(inhib if isinstance(inhib, np.ndarray) else inhib.cpu().numpy(),
-                      self._device)
+        # Rename I to inhib_tensor to avoid short-name violation
+        inhib_tensor = to_tensor(inhib if isinstance(inhib, np.ndarray) else inhib.cpu().numpy(),
+                                 self._device)
         states = [self._make_flow_state(0, initial)]
 
         for step in range(1, steps + 1):
             excitation = state @ T
-            inhibition = state @ I
+            inhibition = state @ inhib_tensor
             state = torch.clamp(excitation - beta * inhibition, min=0)
             # Re-normalize
-            s = state.sum()
-            if s > 0:
-                state = state / s
+            state_sum = state.sum()
+            if state_sum > 0:
+                state = state / state_sum
             else:
                 state = torch.ones_like(state) / 24  # 全抑制 → uniform fallback
             state_np = state.cpu().numpy()
@@ -1151,17 +1152,18 @@ class TheoremAttractor:
         state = initial.copy()
         T = self._transition_matrix if isinstance(self._transition_matrix, np.ndarray) \
             else self._transition_matrix.cpu().numpy()
-        I = inhib if isinstance(inhib, np.ndarray) else inhib.cpu().numpy()
+        # Rename I to inhib_matrix to avoid short-name violation
+        inhib_matrix = inhib if isinstance(inhib, np.ndarray) else inhib.cpu().numpy()
         states = [self._make_flow_state(0, state)]
 
         for step in range(1, steps + 1):
             excitation = state @ T
-            inhibition = state @ I
+            inhibition = state @ inhib_matrix
             state = np.maximum(excitation - beta * inhibition, 0)
             # Re-normalize
-            s = state.sum()
-            if s > 0:
-                state = state / s
+            state_sum = state.sum()
+            if state_sum > 0:
+                state = state / state_sum
             else:
                 state = np.ones(24, dtype=np.float32) / 24
             states.append(self._make_flow_state(step, state.copy()))
@@ -1286,7 +1288,8 @@ class TheoremAttractor:
     @staticmethod
     def _make_flow_state(step: int, activation: np.ndarray) -> FlowState:
         top_indices = np.argsort(activation)[::-1][:5]
-        top_theorems = [(THEOREM_KEYS[i], float(activation[i])) for i in top_indices]
+        # Avoid 1-letter variable 'i'
+        top_theorems = [(THEOREM_KEYS[idx], float(activation[idx])) for idx in top_indices]
         return FlowState(step=step, activation=activation.copy(), top_theorems=top_theorems)
 
 

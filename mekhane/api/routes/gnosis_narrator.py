@@ -149,7 +149,7 @@ async def list_papers(
         papers = []
         for n in nuggets:
             topics = getattr(n, "topics", []) or []
-            q = _generate_question(n.title, n.abstract or "", topics)
+            question = _generate_question(n.title, n.abstract or "", topics)
             papers.append(PaperCard(
                 title=n.title,
                 authors=getattr(n, "authors", "") or "",
@@ -157,7 +157,7 @@ async def list_papers(
                 source=getattr(n, "source", "") or "",
                 topics=topics,
                 relevance_score=getattr(n, "relevance_score", 0.0) or 0.0,
-                question=q,
+                question=question,
             ))
 
         return PapersResponse(

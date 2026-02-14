@@ -16,6 +16,8 @@ description: |
   - 「PE」
   - 「生成」
   - 「製作」
+risk_tier: L1
+risks:
 ---
 
 # Tekhne-Maker v6.7 「OMEGA SINGULARITY BUILD + TARGET_AGENT」
@@ -36,6 +38,8 @@ HEPHAESTUS v9.0.1 ───┼──→ TEKHNE-MAKER v6.0
 狂気 / TITAN_CORE ───┘
 ```
 
+risk_tier: L1
+risks:
 ---
 
 ## M0: FORGE_IDENTITY (旧 CONTEXT_LOADER)
@@ -164,6 +168,8 @@ case_mapping:
     model: Red Teaming + Adversarial Simulation
 ```
 
+risk_tier: L1
+risks:
 ---
 
 ## M2: RECURSIVE_CORE (3-Layer Deep Compute)
@@ -320,6 +326,8 @@ template: |
 
 ```
 
+risk_tier: L1
+risks:
 ---
 
 ## M4: RENDERING_CORE (High-Density Output)
@@ -484,6 +492,8 @@ IF explanation can be code:
 
 詳細: `references/logic-gates.md`
 
+risk_tier: L1
+risks:
 ---
 
 ## M6: INTERFACE
@@ -556,6 +566,8 @@ enforcement:
 3. 不可逆操作実行前
 4. 内部状態に論理矛盾発生
 
+risk_tier: L1
+risks:
 ---
 
 ## M8: CONTEXT_OPTIMIZATION (v6.6 新規)
@@ -707,6 +719,8 @@ auto_trigger:
   action: "Self-Critique 1回追加"
 ```
 
+risk_tier: L1
+risks:
 ---
 
 ## M10: TARGET_AGENT (v6.7 新規)
@@ -870,6 +884,8 @@ prometheus_engine.py の observe_context メソッドをレビュー
 
 ---
 
+risk_tier: L1
+risks:
 ---
 
 ## M6: INTERACTIVE_MODE (v6.3 新規)
@@ -999,6 +1015,8 @@ def hegemonikon_mode(q0: str, q1: str, q2: str) -> dict:
     }
 ```
 
+risk_tier: L1
+risks:
 ---
 
 ## Output: Workflow.md Structure (v6.3)
@@ -1027,6 +1045,8 @@ skill_ref: "[参照するSKILL.mdパス]"
 version: "1.0"
 lineage: "[生成経緯]"
 anti_skip: enabled
+risk_tier: L1
+risks:
 ---
 
 # /[name]: [タイトル]
@@ -1044,6 +1064,8 @@ anti_skip: enabled
 | `/[name]` | デフォルト動作 |
 | `/[name] [variant]` | バリアント |
 
+risk_tier: L1
+risks:
 ---
 
 ## ⚠️ 実行前必須: 正本読み込み
@@ -1065,6 +1087,8 @@ anti_skip: enabled
 
 [ステップ1-N の詳細]
 
+risk_tier: L1
+risks:
 ---
 
 ## エラー対処
@@ -1083,6 +1107,8 @@ anti_skip: enabled
 |:-------|:---------|:-------------|:-------|
 | [module] | /[name] | [SKILL.md] | v1.0 Ready |
 
+risk_tier: L1
+risks:
 ---
 
 *v1.0 — /tek generate (YYYY-MM-DD)*
@@ -1113,6 +1139,8 @@ anti_skip: enabled
 > **v6.2 強制項目**: 以下の frontmatter は省略禁止。不完全な出力は品質不合格。
 
 ```yaml
+risk_tier: L1
+risks:
 ---
 # Skill Metadata (必須)
 id: "[series-initial][number]"          # 例: U1, O1, S2
@@ -1213,6 +1241,8 @@ version: "1.0.0"
 | 1.0 | YYYY-MM-DD | Initial |
 ```
 
+risk_tier: L1
+risks:
 ---
 
 ## References
@@ -1264,6 +1294,8 @@ version: "1.0.0"
 + references/expansion-templates.md 新設
 ```
 
+risk_tier: L1
+risks:
 ---
 
 ## Boot Sequence

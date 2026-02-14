@@ -198,6 +198,7 @@ def _traced(fn):
     import functools
 
     @functools.wraps(fn)
+    # PURPOSE: [L2-auto] デコレータのラッパー関数
     def wrapper(*args: Any, **kwargs: Any) -> Any:
         _start = time.time()
         input_size = _estimate_input_size(*args, **kwargs)
@@ -344,6 +345,11 @@ class HGKOAuthProvider(OAuthAuthorizationServerProvider[AuthorizationCode, Refre
             code=code,
             state=params.state,
         )
+
+    # PURPOSE: [L2-auto] デコレータのラッパー関数
+    def wrapper(self, *args, **kwargs):
+        """デコレータのラッパー関数"""
+        pass
 
     # PURPOSE: authorization code を読み込む
     async def load_authorization_code(

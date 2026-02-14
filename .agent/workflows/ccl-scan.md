@@ -1,5 +1,7 @@
 ---
 description: 見る — /s*%/dia
+lcm_state: beta
+version: 1.0
 ---
 
 # @scan — 見る
@@ -17,6 +19,8 @@ description: 見る — /s*%/dia
 - **収束 (`*`)**: 設計と判定を融合 → 1つの状況判断
 - **展開 (`%`)**: 設計の全次元 × 判定の全次元 → マトリクス
 
+lcm_state: beta
+version: 1.0
 ---
 
 ## CCL 展開
@@ -48,6 +52,8 @@ description: 見る — /s*%/dia
 | レビュー前の全体確認 | 一撃で問題点と全体像を把握 |
 | セッション冒頭の状況確認 | Boot 後の追加分析として |
 
+lcm_state: beta
+version: 1.0
 ---
 
 ## 演算子適用
@@ -68,6 +74,8 @@ description: 見る — /s*%/dia
 
 > `*%` の基本コスト。
 
+lcm_state: beta
+version: 1.0
 ---
 
 *v1.0 — FuseOuter マクロ初版 (2026-02-13)*

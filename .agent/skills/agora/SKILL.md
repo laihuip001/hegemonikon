@@ -1,4 +1,7 @@
 ---
+risks:
+  - General operational risk
+risk_tier: L1
 name: Agora
 description: HGK 収益化プロジェクト — ディープインパクト戦略
 triggers:

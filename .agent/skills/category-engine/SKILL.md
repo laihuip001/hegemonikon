@@ -1,4 +1,7 @@
 ---
+risks:
+  - General operational risk
+risk_tier: L1
 name: Category Theory Engine
 description: |
   圏論に基づく構造認識エンジン。

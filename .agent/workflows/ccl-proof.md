@@ -1,4 +1,6 @@
 ---
+version: 1.0.0
+lcm_state: beta
 description: "裁く — V:{/noe~/dia}_I:[✓]{/ene{PROOF.md}}_E:{/ene{_limbo/}}"
 ---
 

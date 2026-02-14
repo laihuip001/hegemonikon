@@ -1,4 +1,6 @@
 ---
+version: 1.0.0
+lcm_state: beta
 description: "舵 — /pro_/kho_/bou+*%/zet+|>/u++_~(/h*/k)_/pis_/dox-"
 ---
 

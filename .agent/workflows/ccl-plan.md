@@ -1,4 +1,6 @@
 ---
+version: 1.0.0
+lcm_state: beta
 description: "段取る — /bou+_/chr_/s+~(/p*/k)_V:{/dia}_/pis_/dox-"
 ---
 

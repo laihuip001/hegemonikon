@@ -1,3 +1,5 @@
+# PROOF: [L2/Krisis] <- mekhane/synteleia/dokimasia/ Multi Semantic Agent
+
 # PURPOSE: Multi-LLM アンサンブル監査エージェント (Layer B: Nous)
 """
 MultiSemanticAgent — Multi-LLM Cognitive Ensemble

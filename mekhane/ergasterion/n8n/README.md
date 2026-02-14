@@ -37,6 +37,7 @@
 | WF-08 | 触覚 | File Monitor (7ファイル監視) | v1 |
 | WF-13 | DNA修復 | Git Sentinel (未コミット検出) | v1 |
 | WF-15 | 心拍 | Heartbeat (自己生存証明) | v3 |
+| WF-18 | 神経伝達 | Cortex Gemini Bridge (LLM 直叩き) | v1 |
 
 ### ロードマップ
 

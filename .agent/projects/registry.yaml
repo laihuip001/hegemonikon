@@ -285,3 +285,12 @@ projects:
   phase: design
   entry_point: null
   usage_trigger: null
+
+  - id: jules-daily-pipeline
+    name: "Jules Daily Pipeline"
+    path: "mekhane/symploke/"
+    summary: "720 tasks/day 6垢分散スケジューラー。Specialist Reviews を日次自動実行"
+    status: "active"
+    phase: "operational"
+    entry_point: null
+    usage_trigger: null

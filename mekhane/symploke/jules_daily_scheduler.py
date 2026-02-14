@@ -2,11 +2,11 @@
 # PROOF: [L3/ユーティリティ] <- mekhane/symploke/ O4→日次バッチ消化→scheduler が担う
 # PURPOSE: Jules 720 tasks/day スケジューラー — 6垢分散 + 自動ローテーション
 """
-Jules Daily Scheduler v1.0
+Jules Daily Scheduler v1.1
 
-6アカウント × 120 tasks = 720 tasks/day。
-cron から 3 スロット (06:00/12:00/18:00) で呼ばれ、
-各スロットで 2 アカウントを使って 240 tasks を実行。
+有効キープール方式。起動時に全 API キーを検証し、
+有効なキーだけを使ってバッチを実行する。
+cron から 3 スロット (06:00/12:00/18:00) で呼ばれる。
 
 Architecture:
     cron → jules_daily_scheduler.py --slot morning
@@ -60,18 +60,8 @@ USAGE_FILE = _PROJECT_ROOT / "synergeia" / "jules_usage.json"
 ROTATION_STATE_FILE = _PROJECT_ROOT / "synergeia" / "jules_rotation_state.json"
 LOG_DIR = _PROJECT_ROOT / "logs" / "specialist_daily"
 
-# Slot → Account mapping (2 accounts per slot, rotating daily)
-SLOT_CONFIG = {
-    "morning": {"base_accounts": [0, 1], "tasks_per_account": 120},
-    "midday":  {"base_accounts": [2, 3], "tasks_per_account": 120},
-    "evening": {"base_accounts": [4, 5], "tasks_per_account": 120},
-}
-
-# Account IDs (0-indexed)
-ALL_ACCOUNT_IDS = [f"jules_{i:02d}" for i in range(1, 7)]
-
-# Files per slot per account (120 tasks ÷ 15 specialists = 8 files/account → 16 files/slot)
-DEFAULT_FILES_PER_ACCOUNT = 8
+# Default settings
+DEFAULT_FILES_PER_SLOT = 16
 DEFAULT_SPECIALISTS_PER_FILE = 15
 MAX_ERROR_RATE = 0.20  # 20% エラーで slot 自動停止
 
@@ -210,17 +200,11 @@ def select_daily_files(count: int, rotation_state: dict) -> list[str]:
     return selected
 
 
-# PURPOSE: アカウント用 API キーを取得
-def get_account_keys(account_idx: int) -> list[str]:
-    """指定アカウントの API キー (最大 3) を取得。
-
-    命名規則: JULES_API_KEY_01 ~ JULES_API_KEY_03 (account 0)
-              JULES_API_KEY_04 ~ JULES_API_KEY_06 (account 1)
-              ...
-    """
-    base = account_idx * 3 + 1  # 0 → 1,2,3 / 1 → 4,5,6 / ...
+# PURPOSE: 全 API キーを環境変数から収集
+def collect_all_keys() -> list[str]:
+    """全 JULES_API_KEY_xx を環境変数から収集。キー値のリストを返す。"""
     keys = []
-    for i in range(base, base + 3):
+    for i in range(1, 30):  # 最大 30 キー
         key = os.getenv(f"JULES_API_KEY_{i:02d}")
         if key:
             keys.append(key)
@@ -262,17 +246,17 @@ async def run_slot_batch(
     dry_run: bool = False,
 ) -> dict:
     """1 アカウント分のバッチを実行。"""
-    from run_specialists import (
-        create_session,
-        run_batch,
-        API_KEYS as _orig_keys,
-        suggest_categories,
-    )
+    import run_specialists as rs_short
+    from run_specialists import create_session, run_batch, suggest_categories
 
     # API キーを一時差替え
-    import mekhane.symploke.run_specialists as rs_module
-    original_keys = rs_module.API_KEYS
-    rs_module.API_KEYS = api_keys
+    # NOTE: sys.path に mekhane/symploke を追加しているため、
+    #   `run_specialists` と `mekhane.symploke.run_specialists` は
+    #   別モジュールオブジェクトとして Python に登録される。
+    #   run_batch はショートパスモジュールの API_KEYS を参照するため、
+    #   ショートパス側を差し替える必要がある。
+    original_keys = rs_short.API_KEYS
+    rs_short.API_KEYS = api_keys
 
     total_started = 0
     total_failed = 0
@@ -320,7 +304,7 @@ async def run_slot_batch(
 
     finally:
         # API キー復元
-        rs_module.API_KEYS = original_keys
+        rs_short.API_KEYS = original_keys
 
     return {
         "files": all_results,
@@ -332,14 +316,14 @@ async def run_slot_batch(
 
 # PURPOSE: メイン
 async def main():
-    parser = argparse.ArgumentParser(description="Jules Daily Scheduler v1.0")
+    parser = argparse.ArgumentParser(description="Jules Daily Scheduler v1.1")
     parser.add_argument(
         "--slot", choices=["morning", "midday", "evening"], required=True,
         help="Time slot to execute",
     )
     parser.add_argument(
         "--max-files", type=int, default=None,
-        help=f"Max files per account (default: {DEFAULT_FILES_PER_ACCOUNT})",
+        help=f"Max total files for this slot (default: {DEFAULT_FILES_PER_SLOT})",
     )
     parser.add_argument(
         "--sample", "-s", type=int, default=None,
@@ -347,7 +331,7 @@ async def main():
     )
     parser.add_argument(
         "--max-concurrent", "-m", type=int, default=6,
-        help="Max concurrent sessions per account (default: 6)",
+        help="Max concurrent sessions (default: 6)",
     )
     parser.add_argument(
         "--dry-run", action="store_true",
@@ -356,29 +340,32 @@ async def main():
 
     args = parser.parse_args()
 
-    slot_config = SLOT_CONFIG[args.slot]
-    files_per_account = args.max_files or DEFAULT_FILES_PER_ACCOUNT
+    total_files = args.max_files or DEFAULT_FILES_PER_SLOT
     specs_per_file = args.sample or DEFAULT_SPECIALISTS_PER_FILE
-    account_indices = slot_config["base_accounts"]
-
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M")
-    tasks_per_account = files_per_account * specs_per_file
-    total_tasks = tasks_per_account * len(account_indices)
 
     print(f"\n{'='*60}")
-    print(f"Jules Daily Scheduler — {args.slot} slot")
+    print(f"Jules Daily Scheduler v1.1 (EAFP) — {args.slot} slot")
     print(f"{'='*60}")
     print(f"Time:     {timestamp}")
-    print(f"Accounts: {', '.join(ALL_ACCOUNT_IDS[i] for i in account_indices)}")
-    print(f"Files:    {files_per_account}/account × {len(account_indices)} accounts = {files_per_account * len(account_indices)}")
+
+    # 全キー収集 (検証なし — EAFP: 使ってみて壊れたらブラックリスト)
+    all_keys = collect_all_keys()
+    if not all_keys:
+        print("ERROR: No API keys found. Check JULES_API_KEY_xx env vars.")
+        return
+
+    total_tasks = total_files * specs_per_file
+
+    print(f"Keys:     {len(all_keys)} loaded (EAFP: validated at runtime)")
+    print(f"Files:    {total_files}")
     print(f"Specs:    {specs_per_file}/file")
-    print(f"Tasks:    {total_tasks} (= {files_per_account} × {specs_per_file} × {len(account_indices)})")
+    print(f"Tasks:    {total_tasks} (= {total_files} × {specs_per_file})")
     print()
 
     # ファイル選択
     rotation_state = load_rotation_state()
-    total_files_needed = files_per_account * len(account_indices)
-    all_selected_files = select_daily_files(total_files_needed, rotation_state)
+    all_selected_files = select_daily_files(total_files, rotation_state)
 
     if not all_selected_files:
         print("ERROR: No target files found.")
@@ -394,51 +381,30 @@ async def main():
     # 使用量読込
     usage = load_usage()
 
-    # アカウントごとにバッチ実行
+    # バッチ実行 (EAFP: 全キーを渡し、run_batch 内で壊れたキーを自動除外)
     slot_result = {
-        "accounts": {},
+        "total_keys": len(all_keys),
         "total_tasks": 0,
         "total_started": 0,
         "total_failed": 0,
         "files_reviewed": 0,
     }
 
-    for acc_offset, acc_idx in enumerate(account_indices):
-        acc_id = ALL_ACCOUNT_IDS[acc_idx]
-        acc_files = all_selected_files[
-            acc_offset * files_per_account: (acc_offset + 1) * files_per_account
-        ]
+    print(f"--- Batch ({len(all_keys)} keys, {len(all_selected_files)} files) ---")
 
-        if not acc_files:
-            print(f"  {acc_id}: no files remaining, skipping")
-            continue
+    result = await run_slot_batch(
+        files=all_selected_files,
+        specialists_per_file=specs_per_file,
+        api_keys=all_keys,
+        max_concurrent=args.max_concurrent,
+        dry_run=args.dry_run,
+    )
 
-        api_keys = get_account_keys(acc_idx)
-        if not api_keys:
-            print(f"  {acc_id}: no API keys found (JULES_API_KEY_{acc_idx*3+1:02d}~{acc_idx*3+3:02d}), skipping")
-            continue
-
-        print(f"--- {acc_id} ({len(api_keys)} keys, {len(acc_files)} files) ---")
-
-        result = await run_slot_batch(
-            files=acc_files,
-            specialists_per_file=specs_per_file,
-            api_keys=api_keys,
-            max_concurrent=args.max_concurrent,
-            dry_run=args.dry_run,
-        )
-
-        slot_result["accounts"][acc_id] = {
-            "tasks": result["total_tasks"],
-            "started": result["total_started"],
-            "failed": result["total_failed"],
-            "files": len(acc_files),
-        }
-        slot_result["total_tasks"] += result["total_tasks"]
-        slot_result["total_started"] += result["total_started"]
-        slot_result["total_failed"] += result["total_failed"]
-        slot_result["files_reviewed"] += len(acc_files)
-        print()
+    slot_result["total_tasks"] = result["total_tasks"]
+    slot_result["total_started"] = result["total_started"]
+    slot_result["total_failed"] = result["total_failed"]
+    slot_result["files_reviewed"] = len(all_selected_files)
+    print()
 
     # 使用量更新
     usage["slots"][args.slot] = slot_result

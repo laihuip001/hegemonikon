@@ -82,7 +82,8 @@ API_KEYS = [
 ]
 
 # RETRYABLE エラーコード
-_RETRYABLE_CODES = {400, 429, 500, 503}
+_RETRYABLE_CODES = {429, 500, 503}
+_NON_RETRYABLE_STATUSES = {"FAILED_PRECONDITION", "PERMISSION_DENIED"}
 
 # ファイル拡張子→カテゴリ マッピング (動的ターゲット選択用)
 _FILE_CATEGORY_HINTS = {
@@ -221,6 +222,26 @@ async def create_session(
                     }
                 else:
                     error_text = await resp.text()
+
+                    # FAILED_PRECONDITION = キー/GitHub連携の問題 → リトライ不可
+                    try:
+                        error_data = json.loads(error_text)
+                        error_status = error_data.get("error", {}).get("status", "")
+                    except (json.JSONDecodeError, AttributeError):
+                        error_status = ""
+
+                    if error_status in _NON_RETRYABLE_STATUSES:
+                        return {
+                            "id": spec.id,
+                            "name": spec.name,
+                            "category": spec.category,
+                            "error": resp.status,
+                            "error_text": error_text[:200],
+                            "error_status": error_status,
+                            "key_broken": True,
+                            "retries": retries,
+                        }
+
                     # リトライ判定
                     if resp.status in _RETRYABLE_CODES and retries < MAX_RETRIES:
                         delay = RETRY_BASE_DELAY * (2 ** retries)
@@ -266,9 +287,13 @@ async def run_batch(
         print("ERROR: No API keys found in environment")
         return []
 
+    # EAFP キーブラックリスト (FAILED_PRECONDITION で壊れたキーを除外)
+    broken_keys: set[str] = set()
+    active_keys = list(API_KEYS)  # 作業コピー
+
     # キーあたりの同時リクエストを制限 (1キー2並列まで)
-    max_per_key = max(1, max_concurrent // len(API_KEYS) + 1)
-    key_semaphores = {i: asyncio.Semaphore(max_per_key) for i in range(len(API_KEYS))}
+    max_per_key = max(1, max_concurrent // len(active_keys) + 1)
+    key_semaphores = {i: asyncio.Semaphore(max_per_key) for i in range(len(active_keys))}
     global_semaphore = asyncio.Semaphore(max_concurrent)
     # 順番にリクエストを発行するための排他ロック
     dispatch_lock = asyncio.Lock()
@@ -276,8 +301,19 @@ async def run_batch(
 
     # PURPOSE: bounded_create の処理
     async def bounded_create(i: int, spec: Specialist):
-        key_idx = i % len(API_KEYS)
-        key = API_KEYS[key_idx]
+        # ブラックリストを避けてキー選択
+        available = [k for k in active_keys if k not in broken_keys]
+        if not available:
+            return {
+                "id": spec.id,
+                "name": spec.name,
+                "category": spec.category,
+                "error": "all_keys_broken",
+                "error_text": "All API keys are broken (FAILED_PRECONDITION)",
+            }
+
+        key_idx = i % len(available)
+        key = available[key_idx]
 
         # dispatch_lock で順番にリクエスト発行 (burst 防止)
         async with dispatch_lock:
@@ -286,16 +322,21 @@ async def run_batch(
                 await asyncio.sleep(REQUEST_DELAY)
 
         async with global_semaphore:
-            async with key_semaphores[key_idx]:
-                print(f"[{i+1}/{len(specialists)}] {spec.id} {spec.name[:20]}...")
-                result = await create_session(key, spec, target_file)
-                if "session_id" in result:
-                    retries = result.get("retries", 0)
-                    retry_info = f" (retried {retries}x)" if retries else ""
-                    print(f"  ✓ Started ({spec.category}){retry_info}")
-                else:
-                    print(f"  ✗ Error: {result.get('error')}")
-                return result
+            print(f"[{i+1}/{len(specialists)}] {spec.id} {spec.name[:20]}...")
+            result = await create_session(key, spec, target_file)
+
+            if "session_id" in result:
+                retries = result.get("retries", 0)
+                retry_info = f" (retried {retries}x)" if retries else ""
+                print(f"  ✓ Started ({spec.category}){retry_info}")
+            elif result.get("key_broken"):
+                broken_keys.add(key)
+                remaining = len(active_keys) - len(broken_keys)
+                print(f"  ✗ Key broken ({result.get('error_status')}), "
+                      f"blacklisted. {remaining} keys remaining")
+            else:
+                print(f"  ✗ Error: {result.get('error')}")
+            return result
 
     tasks = [bounded_create(i, spec) for i, spec in enumerate(specialists)]
     results = await asyncio.gather(*tasks)

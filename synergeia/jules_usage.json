@@ -1,33 +1,16 @@
 {
-  "date": "2026-02-11",
-  "accounts": {
-    "account_01": {
-      "used": 1,
-      "sessions": [
-        "17385592654508566793"
-      ]
-    },
-    "account_02": {
-      "used": 0,
-      "sessions": []
-    },
-    "account_03": {
-      "used": 0,
-      "sessions": []
-    },
-    "account_04": {
-      "used": 0,
-      "sessions": []
-    },
-    "account_05": {
-      "used": 0,
-      "sessions": []
-    },
-    "account_06": {
-      "used": 0,
-      "sessions": []
+  "date": "2026-02-14",
+  "slots": {
+    "morning": {
+      "total_keys": 18,
+      "total_tasks": 3,
+      "total_started": 0,
+      "total_failed": 3,
+      "files_reviewed": 1
     }
   },
-  "total_used": 1,
-  "prs": []
+  "total_tasks": 13,
+  "total_started": 0,
+  "total_failed": 13,
+  "files_reviewed": 5
 }

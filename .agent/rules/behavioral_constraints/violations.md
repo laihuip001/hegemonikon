@@ -15,6 +15,7 @@
 | `false_impossibility` | できない ≠ やっていない | 未試行を「不可能」と断定 |
 | `selective_omission` | 勝手な省略 | 存在するものを「不要」と判断して報告から落とす |
 | `stale_handoff` | 古い情報を信じる | Handoff/残タスク表の古い情報を鵜呑みにし、実態を確認せず重複作業する |
+| `preflight_waste` | 確認が本番を消費 | 「軽量チェック」のつもりが本番リソースを消費する |
 
 ---
 
@@ -173,7 +174,37 @@ lesson: |
 
 ---
 
-## 統計コマンド
+### V-009: Jules API quota 浪費 (validate_key)
+
+```yaml
+id: V-009
+date: "2026-02-14"
+bc: [BC-5, BC-14]
+pattern: preflight_waste
+severity: critical
+recurrence: false
+summary: |
+  validate_key() で「キーが有効か確認」するために noop セッションを作成。
+  Jules は noop でも 1セッション = 1回としてカウント。
+  18キー × 複数回スキャン → 1アカウント 299/300 消費。
+  全6アカウントのデイリーリミットを validate_key だけで使い切った。
+root_cause: |
+  1. Jules API の quota モデルを理解せず実装した (BC-16 違反: 仕様未参照)
+  2. 「noop prompt なら影響なし」は嘘 — セッション回数でカウントされる
+  3. validate_key は LBYL のつもりが、LBYL 自体がリソースを消費する構造だった
+  4. BC-5 の EAFP/LBYL 判断を怠った — 可逆な作業場なのに LBYL を選んだ
+corrective: |
+  - validate_key / build_valid_key_pool を完全削除
+  - EAFP 方式に切替: 全キーを渡し、FAILED_PRECONDITION で即 blacklist
+  - _RETRYABLE_CODES から 400 を除外 (リトライしても無駄)
+  - Memory に Jules_API_Quota エンティティ作成 (300回/アカウント/日)
+lesson: |
+  「確認するだけ」は存在しない。確認にもコストがある。
+  API の quota モデルを知らずに preflight を設計してはならない。
+  EAFP が正解: 使ってみて壊れたら退く。確認で壊すな。
+```
+
+---
 
 ```bash
 cd ~/oikos/hegemonikon && PYTHONPATH=. .venv/bin/python scripts/violation_analyzer.py

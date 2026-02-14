@@ -1,0 +1,118 @@
+// Reverse-engineered proto for cloudcode-pa.googleapis.com
+// Source: LS binary string analysis (field numbers from protobuf struct tags)
+// WARNING: Incomplete/approximate - field numbers may not be exact for GenerateChatRequest
+syntax = "proto3";
+
+package google.internal.cloud.code.v1internal;
+
+option go_package = "google/internal/cloud/code/v1internal";
+
+// CloudCode service - main service for code assistance
+service CloudCode {
+  // Unary chat generation
+  rpc GenerateChat(GenerateChatRequest) returns (GenerateChatResponse);
+  
+  // Server-streaming chat generation
+  rpc StreamGenerateChat(GenerateChatRequest) returns (stream GenerateChatResponse);
+  
+  // Load user settings and project info
+  rpc LoadCodeAssist(LoadCodeAssistRequest) returns (LoadCodeAssistResponse);
+  
+  // List available model configurations
+  rpc ListModelConfigs(ListModelConfigsRequest) returns (ListModelConfigsResponse);
+  
+  // Fetch available models
+  rpc FetchAvailableModels(FetchAvailableModelsRequest) returns (FetchAvailableModelsResponse);
+}
+
+// Chat message entity type
+enum EntityType {
+  ENTITY_TYPE_UNSPECIFIED = 0;
+  USER = 1;
+  MODEL = 2;
+}
+
+// Individual chat message in history
+message ChatMessage {
+  EntityType author = 1;
+  string content = 4;  // field 4 based on REST API behavior
+}
+
+// Metadata about the IDE
+message IdeMetadata {
+  string ideType = 3;
+}
+
+// Main request for GenerateChat / StreamGenerateChat
+// Field numbers from LS binary protobuf struct tags
+message GenerateChatRequest {
+  string project = 1;
+  string request_id = 2;
+  string user_message = 3;
+  repeated ChatMessage history = 4;
+  // ide_context = 5 (complex, omitted)
+  IdeMetadata metadata = 6;
+  bool enable_prompt_enhancement = 7;
+  // yield_info = 8 (complex, omitted)
+  string yielded_user_input = 9;
+  // retry_details = 10 (oneof, complex)
+  // function_declarations = 11 (repeated, complex)
+
+  bool include_thinking_summaries = 13;
+  
+  // Model routing - oneof
+  oneof model_selection {
+    string model_config_id = 14;
+    string tier_id = 15;
+  }
+}
+
+// Model config info in response
+message ModelConfig {
+  string id = 1;
+  string displayName = 2;
+}
+
+// Processing details in response
+message ProcessingDetails {
+  string exp = 1;
+  string r = 2;   // RAG status
+  string cm = 3;  // chat mode
+  string cid = 4; // conversation id
+  string re = 5;  // ?
+  string tid = 6; // trajectory id
+  ModelConfig modelConfig = 7;
+}
+
+// Response from GenerateChat
+message GenerateChatResponse {
+  string markdown = 1;
+  ProcessingDetails processingDetails = 2;
+  // fileUsage = 3
+}
+
+// LoadCodeAssist
+message LoadCodeAssistRequest {
+  IdeMetadata metadata = 1;
+}
+
+message LoadCodeAssistResponse {
+  string project = 1;
+  string tier_id = 3;
+}
+
+// ListModelConfigs
+message ListModelConfigsRequest {
+  string tier_id = 1;
+}
+
+message ListModelConfigsResponse {
+  repeated ModelConfig allowed_model_configs = 1;
+}
+
+// FetchAvailableModels
+message FetchAvailableModelsRequest {}
+
+message FetchAvailableModelsResponse {
+  repeated ModelConfig models = 1;
+}

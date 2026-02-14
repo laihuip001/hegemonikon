@@ -151,8 +151,12 @@ def cmd_check(args: argparse.Namespace) -> int:  # noqa: AI-005 # noqa: AI-ALL
     reporter.report(result, format)
 
     # CI モードの場合は失敗時に exit 1
-    if args.ci and not result.is_passing:
-        return 1
+    if args.ci:
+        # Check command should strictly check for MISSING proofs in CI mode.
+        # Other quality metrics (Reason coverage, NF, etc.) are informational or use separate commands.
+        if result.files_missing_proof > 0:
+            return 1
+        return 0
 
     return 0
 

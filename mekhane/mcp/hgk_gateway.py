@@ -197,6 +197,7 @@ def _traced(fn):
     """
     import functools
 
+    # PURPOSE: [L2-auto] ツール実行のトレース記録
     @functools.wraps(fn)
     def wrapper(*args: Any, **kwargs: Any) -> Any:
         _start = time.time()
@@ -1841,4 +1842,3 @@ if __name__ == "__main__":
     print("🔒 OAuth 2.1 authentication ENABLED")
     print(f"🚀 HGK Gateway starting on {GATEWAY_HOST}:{GATEWAY_PORT}")
     mcp.run(transport="streamable-http")
-

@@ -1,5 +1,7 @@
 ---
-description: 見る — /s*%/dia
+description: "\u898B\u308B \u2014 /s*%/dia"
+lcm_state: beta
+version: '1.0'
 ---
 
 # @scan — 見る

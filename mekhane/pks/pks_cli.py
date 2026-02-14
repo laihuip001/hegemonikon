@@ -137,6 +137,7 @@ def cmd_health(args: argparse.Namespace) -> None:
             checks.append((name, "❌", str(e)[:60], f"{elapsed:.1f}s"))
 
     # 1. LanceDB (Gnōsis)
+    # PURPOSE: [L2-auto] Gnosis (LanceDB) の接続確認。
     def check_gnosis():
         from mekhane.anamnesis.index import GnosisIndex as AI
         gi = AI()
@@ -145,6 +146,7 @@ def cmd_health(args: argparse.Namespace) -> None:
     _check("Gnōsis (LanceDB)", check_gnosis)
 
     # 2. Kairos index
+    # PURPOSE: [L2-auto] Kairos (ChromaDB) の接続確認。
     def check_kairos():
         pkl = Path.home() / "oikos" / "mneme" / ".hegemonikon" / "indices" / "kairos.pkl"
         if not pkl.exists():
@@ -205,6 +207,7 @@ def cmd_health(args: argparse.Namespace) -> None:
     _check("SelfAdvocate", check_advocate)
 
     # 9. Chronos index
+    # PURPOSE: [L2-auto] Chronos (SQLite) の接続確認。
     def check_chronos():
         pkl = Path.home() / "oikos" / "mneme" / ".hegemonikon" / "indices" / "chronos.pkl"
         if not pkl.exists():

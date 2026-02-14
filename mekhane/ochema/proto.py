@@ -100,6 +100,7 @@ def build_send_message(cascade_id: str, text: str, model: str) -> dict:
     }
 
 
+    # PURPOSE: [L2-auto] get_status リクエストを構築する。
 def build_get_status() -> dict:
     """GetUserStatus ペイロードを構築する。"""
     return {
@@ -111,6 +112,7 @@ def build_get_status() -> dict:
     }
 
 
+    # PURPOSE: [L2-auto] get_steps リクエストを構築する。
 def build_get_steps(cascade_id: str, trajectory_id: str) -> dict:
     """GetCascadeTrajectorySteps ペイロードを構築する。"""
     return {

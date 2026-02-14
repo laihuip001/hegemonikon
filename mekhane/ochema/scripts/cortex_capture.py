@@ -29,6 +29,7 @@ LOG_FILE = "/tmp/cortex_capture.log"
 
 
 # PURPOSE: [L2-auto] Write to both mitmproxy log and file.
+    # PURPOSE: [L2-auto] ログメッセージをファイルに追記する。
 def log(msg: str) -> None:
     """Write to both mitmproxy log and file."""
     ts = datetime.now().strftime("%H:%M:%S.%f")[:-3]

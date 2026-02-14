@@ -220,65 +220,71 @@ P_e(α) ≈ f(scope(α))      ← 存在的予測力は scope に比例
 
 ---
 
-## 情報理論的形式化 {#sec_10_information_theory}
+## Rate-Distortion による再形式化 {#sec_10_rate_distortion}
 
-> **E×P≈const を Shannon 情報量で正当化する**
+> **E×P≈const を rate-distortion theory で再定式化する**
+> 旧版 (Shannon チャネル容量への直接マッピング) は @nous 再帰検証で致命的欠陥が発見された。
+> 以下は rate-distortion theory による修正版。[推定: 72%]
 
-### 定式化
+### 旧形式化の問題点 (Shannon 版, 破棄)
 
-理論 T を抽象度 α で記述するとき:
+| 問題 | 詳細 |
+|:-----|:-----|
+| E ≈ log\|Ω\| は矛盾 | Newton が統一すると \|Ω\|↓ → E↓ という不合理。説明力は「数え上げ」ではなく「統一」 |
+| E×P≈const に反例 | Newton→Kepler、GR→Newton は E と P を同時に増加させた (パラダイム交替) |
+| P_s ≈ 1/H(Y\|X) は発散 | 完全理論で H→0, 1/H→∞。相互情報量 I(X;Y) が数学的に自然 |
 
-```
-I(T; α) = 理論が持つ情報量 (Shannon)
-I(A; α) = 補助仮定 (auxiliary assumptions) の情報量
-I(P; α) = 予測が持つ情報量
+### Rate-Distortion Framework
 
-データ処理不等式より:
-  I(P; α) ≤ I(T; α) + I(A; α)
-
-α → 1 のとき:
-  I(T; 1) → 0  (メタ原理は具体的情報を持たない)
-  ∴ I(P; 1) ≤ I(A; 1)  (予測の情報は選択から来る)
-
-α → 0 のとき:
-  I(T; 0) → max  (具体理論は豊富な情報を持つ)
-  ∴ I(P; 0) ≤ I(T; 0) + I(A; 0)  (理論自体が予測を供給)
-```
-
-### E と I の対応
-
-| 概念 | 情報理論的対応 |
-|:-----|:-------------|
-| 説明力 E(α) | scope の広さ ∝ 受信可能なメッセージ集合の大きさ |
-| 予測力 P_s(α) | メッセージの一意特定能力 ∝ 条件付きエントロピーの逆数 |
-| const | チャネル容量 C (理論体系の情報処理限界) |
+理論 T を抽象度 α で記述するとき、「世界の圧縮」として定式化する:
 
 ```
-E(α) ≈ log |Ω(α)|      (説明可能な現象の集合の対数)
-P_s(α) ≈ 1/H(Y|X; α)   (観測 Y の条件付きエントロピーの逆数)
+Rate R(α)       = モデル複雑性 (Kolmogorov complexity K(T_α))
+                  理論 T_α を記述するのに必要なビット数
 
-E(α) × P_s(α) ≈ C      (チャネル容量)
+Distortion D(α) = 予測誤差 (データと予測の不一致)
+                  D(α) = E[d(Y, Ŷ_α)] (平均歪み)
+
+R(D) 曲線       = 最小 R を達成する理論のフロンティア
+                  R(D) = min_{p(ŷ|y): E[d]≤D} I(Y; Ŷ)
 ```
 
-> [!CAUTION]
-> **@nous 再帰検証 (2026-02-14 21:27)**: この形式化には **致命的欠陥** がある。
+### E×P≈const の再解釈
+
+```
+旧:  E(α) × P_s(α) ≈ C      (チャネル容量 — 不適切)
+
+新:  R(α) と D(α) は R(D) 曲線上でトレードオフ
+     - 大きい α → 低 R (単純なモデル), 高 D (曖昧な予測)
+     - 小さい α → 高 R (複雑なモデル), 低 D (精密な予測)
+
+     パラダイム内: R(D) 曲線は固定 → E×P≈const が近似的に成立
+     パラダイム交替: R(D) 曲線自体がシフト → E と P が同時に改善可能
+```
+
+### HGK コンパイルパスとの対応
+
+| compile path 段階 | R (複雑性) | D (歪み) | 解釈 |
+|:-----------------|:----------|:---------|:-----|
+| FEP (α≈1) | 最小 | 最大 | 原理は単純だが、具体的予測はできない |
+| 座標選択 (d=1) | 中 | 中 | 方向性が定まり、予測が絞られる |
+| WF 実行 (d=2) | 大 | 小 | 具体的操作、精密な出力 |
+| 行為 (α≈0) | 最大 | 最小 | 完全に具体的、一意の行動 |
+
+### 先行研究
+
+- De Llanza Varona, Buckley & Millidge (2024): "Exploring Action-Centric Representations Through the Lens of Rate-Distortion Theory" — FEP/Active Inference における知覚のrate-distortion最適化
+- Friston et al. (2024): "From pixels to planning: scale-free active inference" — RGM (renormalising generative models) による階層的圧縮
+
+> [!NOTE]
+> Rate-distortion framework は旧 Shannon 版の3問題を解消する:
 >
-> 1. **E ≈ log|Ω| は不適切**: 「現象」の定義が恣意的。Newton が統一すると |Ω| が減り E も減るという矛盾。
->    説明力は「数え上げ」ではなく「統一」であり、log|Ω| はそれを捉えない。
-> 2. **P_s ≈ 1/H(Y|X)** は方向として妥当だが、完全理論で発散する (H→0 で 1/H→∞)。
->    I(X;Y) = H(Y) - H(Y|X) (相互情報量) の方が数学的に自然。
-> 3. **E×P≈const は反例が存在**: Newton→Kepler、GR→Newton はいずれも E と P が同時に増加した例。
->    この関係はパラダイム内のモデルフィッティングには成立するが、パラダイム交替には適用不可。
+> 1. E を「説明可能な現象数」から「モデル複雑性 R」に置換 → 統一の矛盾が消える
+> 2. P を「1/H」から「歪み D の逆数」に置換 → 発散問題が消える
+> 3. パラダイム交替 = R(D) 曲線シフト → Newton/GR の反例を説明可能
 >
-> **代替方向**: **Rate-distortion theory** (Shannon-Kolmogorov) が自然な枠組み:
->
-> - Rate R = モデル複雑性 (Kolmogorov complexity)
-> - Distortion D = 予測誤差
-> - R(D) 曲線 = 理論体系の最適トレードオフフロンティア
-> - 科学革命 = R(D) 曲線自体のシフト
->
-> **ステータス**: 以下の定式化は ~~形式化~~ **仮説スケッチ** として保持する。
-> [仮説: 45%] (Gemini 2.5 Pro クロス検証により 65% → 45% に下方修正)
+> ただし、「説明力」を「モデル複雑性の低さ」(Kolmogorov simplicity) と
+> 同一視することの妥当性はさらなる検証が必要。[推定: 72%]
 
 ---
 
@@ -314,9 +320,69 @@ Levins は生物学モデルの文脈で、DX-012 は認知理論の文脈で、
 > [!IMPORTANT]
 > Levins のトレードオフには批判もある (Orzack & Sober 1993 "A Critical Assessment")。
 > 3性質の独立性、トレードオフの不可避性、Levins の3つの戦略の排他性に疑問が呈されている。
-> DX-012 の E×P≈const も同じ批判が適用可能: E と P が本当に反比例するのか、
-> const が本当に一定なのかは、さらなる検証が必要。
+> DX-012 の E×P≈const も同じ批判が適用可能。
+>
+> **Rate-distortion 版での再解釈**:
+>
+> - G (一般性) ≈ 低 R (単純なモデルが広く適用可能)
+> - P (精密性) ≈ 低 D (歪みが小さい)
+> - R (現実性) → §12 参照
 
 ---
 
-*DX-012 v1.5.0 — 情報理論的形式化 (§10) + Levins GRP トレードオフとの接続 (§11) 追加 (2026-02-14)*
+## Realism の情報理論的限界 {#sec_12_realism}
+
+> **Levins の「Realism」は Shannon 情報理論で捉えられない**
+
+### 問題
+
+Shannon 情報理論は**構文的 (syntactic)** かつ**統計的 (statistical)** である。
+「不確実性の低減」を扱うが、「意味」や「真理」を扱わない。
+
+Levins の Realism = モデルの因果構造が世界の因果構造を反映する度合い。
+これは**意味論的 (semantic)** かつ**形而上学的 (metaphysical)** な概念。
+
+```
+情報理論が区別できないもの:
+  - 天動説 (Ptolemy): 精密な予測、因果構造は誤り
+  - 地動説 (Copernicus): 精密な予測、因果構造は正しい
+  両者は同じ D (歪み) を達成し得る。しかし Realism は根本的に異なる。
+```
+
+### Pearl の因果モデルによる Realism の形式化
+
+| 概念 | 形式化 | 検証方法 |
+|:-----|:-------|:--------|
+| **Realism** | SCM (Structural Causal Model) の介入不変性 | do-calculus: P(Y \| do(X)) |
+| **相関 vs 因果** | 観測分布 P(Y\|X) vs 介入分布 P(Y\|do(X)) | 両者が一致するか |
+| **反事実** | 「Xがなかったら Yはどうなったか」 | SCM の counterfactual query |
+
+```
+拡張 GRP トレードオフ:
+
+  G (一般性) × P (精密性) × R (現実性) ≤ Budget
+
+  情報理論で形式化可能:
+    G → 低 Rate (R) in rate-distortion
+    P → 低 Distortion (D) in rate-distortion
+
+  情報理論で形式化不可:
+    R → 介入不変性 (Pearl do-calculus)
+       = P(Y|do(X)) が実世界と一致する度合い
+
+  つまり: Levins の完全な形式化には
+  Shannon + Pearl = 統計的圧縮 + 因果構造
+  の両方が必要。
+```
+
+> [!NOTE]
+> これは HGK の compile path にも示唆を与える。
+> FEP → 具体的行為のコンパイルは rate-distortion (R→D の最適化) だが、
+> コンパイルされた行為が **世界の因果構造に対して正しいか** は
+> 別の検証 (Realism check = do-calculus 相当) が必要。
+> HGK の /dia (Krisis) がこの Realism check に対応する可能性がある。
+> [仮説: 55%]
+
+---
+
+*DX-012 v2.0.0 — Rate-distortion 再形式化 (§10), Levins 再解釈 (§11), Realism の限界 (§12) (2026-02-14)*

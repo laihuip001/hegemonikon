@@ -10,6 +10,7 @@ FEP: 時間的文脈での精密化
 """
 
 import re
+from pathlib import Path
 from typing import List
 
 from ..base import (
@@ -20,6 +21,9 @@ from ..base import (
     AuditTarget,
     AuditTargetType,
 )
+from ..pattern_loader import load_patterns, parse_pattern_list, parse_keyword_list
+
+_PATTERNS_YAML = Path(__file__).parent / "patterns.yaml"
 
 
 # PURPOSE: 時宜判断エージェント (K-Agent)
@@ -29,8 +33,8 @@ class KairosAgent(AuditAgent):
     name = "KairosAgent"
     description = "タイミングの妥当性を検証 — 「今か」"
 
-    # タイミング問題パターン
-    TIMING_PROBLEMS = [
+    # Fallback values
+    _FALLBACK_TIMING = [
         (r"\b後で\b", "K-001", "「後で」は先延ばしの兆候"),
         (r"\bいつか\b", "K-002", "「いつか」は時宜が不明確"),
         (r"\bそのうち\b", "K-003", "「そのうち」は時宜が不明確"),
@@ -39,28 +43,28 @@ class KairosAgent(AuditAgent):
         (r"\beventually\b", "K-006", "「eventually」は時宜が曖昧"),
     ]
 
-    # 時間的コンテキストキーワード
-    TEMPORAL_KEYWORDS = [
-        "期限",
-        "deadline",
-        "due",
-        "by",
-        "until",
-        "before",
-        "after",
-        "when",
-        "今日",
-        "明日",
-        "今週",
-        "今月",
+    _FALLBACK_TEMPORAL_KEYWORDS = [
+        "期限", "deadline", "due", "by", "until", "before",
+        "after", "when", "今日", "明日", "今週", "今月",
     ]
 
-    # 早すぎる最適化パターン
-    PREMATURE_PATTERNS = [
+    _FALLBACK_PREMATURE = [
         (r"\b最適化\b.*\bまず\b", "K-010", "早すぎる最適化の兆候"),
         (r"\boptimiz\w*\b.*\bfirst\b", "K-011", "Premature optimization detected"),
         (r"\bパフォーマンス\b.*\b前に\b", "K-012", "機能完成前のパフォーマンス議論"),
     ]
+
+    def __init__(self):
+        loaded = load_patterns(_PATTERNS_YAML, "kairos")
+        self.TIMING_PROBLEMS = parse_pattern_list(
+            loaded.get("timing_problems"), self._FALLBACK_TIMING
+        )
+        self.TEMPORAL_KEYWORDS = parse_keyword_list(
+            loaded.get("temporal_keywords"), self._FALLBACK_TEMPORAL_KEYWORDS
+        )
+        self.PREMATURE_PATTERNS = parse_pattern_list(
+            loaded.get("premature_patterns"), self._FALLBACK_PREMATURE
+        )
 
     # PURPOSE: タイミングの妥当性を監査
     def audit(self, target: AuditTarget) -> AgentResult:

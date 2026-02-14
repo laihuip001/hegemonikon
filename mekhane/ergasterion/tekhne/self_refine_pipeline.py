@@ -3,19 +3,23 @@
 """
 Self-Refine Pipeline — プロンプトの品質を自動改善
 
-2つのモード:
+6つのモード:
   1. 静的解析 (--mode static): prompt_quality_scorer による改善提案
   2. LLM Self-Refine (--mode llm): Hermēneus execute /dia- で批評→改善
+  3. 両方 (--mode full): 静的 → LLM
+  4. Sweep (--mode sweep): Flash × 480次元広域スキャン [NEW]
+  5. Deep (--mode deep): Pro × 20次元深掘り分析 [NEW]
+  6. Auto (--mode auto): Sweep → Deep → 改善案 [NEW]
 
 Usage:
   # 静的解析のみ
   python self_refine_pipeline.py --input prompt.skill.md --mode static
 
-  # LLM Self-Refine (Hermēneus 経由)
-  python self_refine_pipeline.py --input prompt.skill.md --mode llm
+  # Flash 480次元 Sweep
+  python self_refine_pipeline.py --input prompt.skill.md --mode sweep
 
-  # 両方 (静的 → LLM)
-  python self_refine_pipeline.py --input prompt.skill.md --mode full
+  # Auto (Sweep → Deep → 改善案)
+  python self_refine_pipeline.py --input prompt.skill.md --mode auto
 """
 
 from __future__ import annotations
@@ -205,16 +209,115 @@ def full_refine(filepath: str, threshold: int = 80, max_iter: int = 3) -> dict:
     }
 
 
+# PURPOSE: Sweep モード (Flash × 480次元) を実行する
+def sweep_refine(filepath: str, **kwargs) -> dict:
+    """Run Flash × 480 dimension sweep scan."""
+    from sweep_engine import SweepEngine
+
+    model = kwargs.get("model", "gemini-2.0-flash")
+    max_perspectives = kwargs.get("max_perspectives")
+    domains = kwargs.get("domains")
+    axes = kwargs.get("axes")
+
+    engine = SweepEngine(model=model)
+    report = engine.sweep(
+        filepath,
+        max_perspectives=max_perspectives,
+        domains=domains,
+        axes=axes,
+    )
+
+    print(report.summary())
+    return report.to_dict()
+
+
+# PURPOSE: Deep モード (Pro × 20次元) を実行する
+def deep_refine(filepath: str, **kwargs) -> dict:
+    """Run Pro × 20 core deep analysis."""
+    from deep_engine import DeepEngine
+    from sweep_engine import SweepEngine
+
+    sweep_model = kwargs.get("sweep_model", "gemini-2.0-flash")
+    deep_model = kwargs.get("deep_model", "gemini-2.5-pro")
+    top_n = kwargs.get("top_n", 20)
+
+    # Sweep first
+    print("🔍 Phase 1: Sweep (Flash × 480)")
+    sweep = SweepEngine(model=sweep_model)
+    sweep_report = sweep.sweep(filepath)
+    print(sweep_report.summary())
+
+    # Deep analysis
+    print(f"\n🔬 Phase 2: Deep (Pro × {top_n})")
+    issues = sweep_report.top_issues(n=top_n)
+    if not issues:
+        print("  No issues found in sweep. Skip deep analysis.")
+        return {"sweep": sweep_report.to_dict(), "deep": None, "status": "clean"}
+
+    deep = DeepEngine(model=deep_model)
+    deep_report = deep.analyze(issues, filepath, max_issues=top_n)
+    print(deep_report.summary())
+
+    return {
+        "sweep": sweep_report.to_dict(),
+        "deep": deep_report.to_dict(),
+        "status": "deep_done",
+    }
+
+
+# PURPOSE: Auto モード (Sweep → Deep → 改善案) を実行する
+def auto_refine(filepath: str, **kwargs) -> dict:
+    """Full automatic pipeline: Sweep → Deep → Fixes."""
+    result = deep_refine(filepath, **kwargs)
+
+    if result.get("status") == "clean":
+        return result
+
+    deep_data = result.get("deep", {})
+    if not deep_data:
+        return result
+
+    actionable = [
+        a for a in deep_data.get("analyses", [])
+        if any(f.get("replacement") for f in a.get("fixes", []))
+    ]
+
+    if actionable:
+        print(f"\n🔧 Actionable Fixes: {len(actionable)}")
+        print("-" * 60)
+        for i, a in enumerate(actionable[:10], 1):
+            print(f"  {i}. [{a['issue_id']}] P={a['priority_score']:.2f}")
+            for fix in a.get("fixes", [])[:2]:
+                if fix.get("replacement"):
+                    print(f"     ✏️  '{fix['original'][:40]}' → '{fix['replacement'][:40]}'")
+
+    result["actionable_count"] = len(actionable)
+    result["status"] = "auto_done"
+    return result
+
+
 # PURPOSE: self_refine_pipeline の main 処理を実行する
 def main():
     parser = argparse.ArgumentParser(description="Self-Refine Pipeline")
     parser.add_argument("--input", required=True, help="Input prompt file")
-    parser.add_argument("--mode", choices=["static", "llm", "full"], default="full",
-                        help="Refinement mode (default: full)")
+    parser.add_argument(
+        "--mode",
+        choices=["static", "llm", "full", "sweep", "deep", "auto"],
+        default="full",
+        help="Refinement mode (default: full)",
+    )
     parser.add_argument("--threshold", type=int, default=80,
                         help="Quality threshold (default: 80)")
     parser.add_argument("--max-iterations", type=int, default=3,
                         help="Max static refinement iterations (default: 3)")
+    parser.add_argument("--max-perspectives", type=int, default=None,
+                        help="Max perspectives for sweep (for testing)")
+    parser.add_argument("--top-n", type=int, default=20,
+                        help="Top N issues for deep analysis (default: 20)")
+    parser.add_argument("--sweep-model", default="gemini-2.0-flash",
+                        help="Model for sweep (default: gemini-2.0-flash)")
+    parser.add_argument("--deep-model", default="gemini-2.5-pro",
+                        help="Model for deep (default: gemini-2.5-pro)")
     parser.add_argument("--json", action="store_true", help="Output as JSON")
     args = parser.parse_args()
 
@@ -222,10 +325,26 @@ def main():
         print(f"Error: {args.input} not found", file=sys.stderr)
         sys.exit(1)
 
+    kwargs = {
+        "model": args.sweep_model,
+        "sweep_model": args.sweep_model,
+        "deep_model": args.deep_model,
+        "max_perspectives": args.max_perspectives,
+        "top_n": args.top_n,
+    }
+
     if args.mode == "static":
         result = static_refine(args.input, args.threshold, args.max_iterations)
     elif args.mode == "llm":
         result = llm_refine(args.input, args.threshold)
+    elif args.mode == "full":
+        result = full_refine(args.input, args.threshold, args.max_iterations)
+    elif args.mode == "sweep":
+        result = sweep_refine(args.input, **kwargs)
+    elif args.mode == "deep":
+        result = deep_refine(args.input, **kwargs)
+    elif args.mode == "auto":
+        result = auto_refine(args.input, **kwargs)
     else:
         result = full_refine(args.input, args.threshold, args.max_iterations)
 

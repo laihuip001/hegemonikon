@@ -1,0 +1,832 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hegemonikón WF Explorer</title>
+    <style>
+        :root {
+            --bg: #0a0e14;
+            --surface: #111820;
+            --card: #161d27;
+            --border: #1e2a3a;
+            --text: #c5cdd8;
+            --text2: #6b7a8d;
+            --accent: #58a6ff;
+            --accent2: #f0883e;
+            --green: #3fb950;
+            --purple: #d2a8ff;
+            --pink: #f97583;
+            --white: #e6edf3;
+            --radius: 8px;
+            --shadow: 0 4px 20px rgba(0, 0, 0, .4)
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+            font-size: 13px;
+            line-height: 1.5;
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+            flex-direction: column
+        }
+
+        /* Header */
+        header {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            flex-shrink: 0
+        }
+
+        header h1 {
+            font-size: 18px;
+            color: var(--white);
+            letter-spacing: -0.5px
+        }
+
+        header .subtitle {
+            color: var(--text2);
+            font-size: 11px
+        }
+
+        .search-box {
+            margin-left: auto;
+            position: relative
+        }
+
+        .search-box input {
+            background: var(--card);
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 6px 12px 6px 30px;
+            border-radius: var(--radius);
+            width: 220px;
+            font-size: 12px;
+            outline: none;
+            transition: border-color .2s
+        }
+
+        .search-box input:focus {
+            border-color: var(--accent)
+        }
+
+        .search-box::before {
+            content: '🔍';
+            position: absolute;
+            left: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 12px
+        }
+
+        /* Main layout */
+        .main {
+            display: flex;
+            flex: 1;
+            overflow: hidden
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 280px;
+            border-right: 1px solid var(--border);
+            overflow-y: auto;
+            flex-shrink: 0;
+            background: var(--surface)
+        }
+
+        .sidebar::-webkit-scrollbar {
+            width: 4px
+        }
+
+        .sidebar::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 2px
+        }
+
+        .series-group {
+            margin-bottom: 2px
+        }
+
+        .series-header {
+            padding: 8px 14px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            user-select: none;
+            transition: background .15s
+        }
+
+        .series-header:hover {
+            background: rgba(255, 255, 255, .03)
+        }
+
+        .series-header .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            flex-shrink: 0
+        }
+
+        .series-header .arrow {
+            margin-left: auto;
+            font-size: 10px;
+            transition: transform .2s
+        }
+
+        .series-header.open .arrow {
+            transform: rotate(90deg)
+        }
+
+        .wf-list {
+            display: none;
+            padding: 0 6px 4px
+        }
+
+        .wf-list.open {
+            display: block
+        }
+
+        .wf-item {
+            padding: 6px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all .15s;
+            font-size: 12px
+        }
+
+        .wf-item:hover {
+            background: rgba(88, 166, 255, .08)
+        }
+
+        .wf-item.active {
+            background: rgba(88, 166, 255, .15);
+            color: var(--accent)
+        }
+
+        .wf-item .cmd {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700;
+            color: var(--accent);
+            min-width: 42px;
+            font-size: 12px
+        }
+
+        .wf-item .label {
+            color: var(--text2);
+            font-size: 11px
+        }
+
+        .section-label {
+            padding: 10px 14px 4px;
+            font-size: 10px;
+            color: var(--text2);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            font-weight: 600
+        }
+
+        /* Detail panel */
+        .detail {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px 28px
+        }
+
+        .detail::-webkit-scrollbar {
+            width: 6px
+        }
+
+        .detail::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 3px
+        }
+
+        .detail-empty {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: var(--text2);
+            font-size: 14px;
+            flex-direction: column;
+            gap: 8px
+        }
+
+        .detail-empty .icon {
+            font-size: 40px;
+            opacity: .3
+        }
+
+        /* Detail content */
+        .d-header {
+            margin-bottom: 16px
+        }
+
+        .d-header h2 {
+            font-size: 22px;
+            color: var(--white);
+            display: flex;
+            align-items: center;
+            gap: 10px
+        }
+
+        .d-header h2 .series-badge {
+            font-size: 10px;
+            padding: 2px 8px;
+            border-radius: 3px;
+            font-weight: 600
+        }
+
+        .d-header .d-desc {
+            color: var(--text);
+            margin-top: 6px;
+            font-size: 13px;
+            line-height: 1.6
+        }
+
+        .d-section {
+            margin-bottom: 16px
+        }
+
+        .d-section h3 {
+            font-size: 13px;
+            color: var(--accent2);
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 6px
+        }
+
+        .d-section h3::before {
+            content: '';
+            width: 3px;
+            height: 14px;
+            border-radius: 2px;
+            background: var(--accent2)
+        }
+
+        /* Phases */
+        .phase-list {
+            list-style: none
+        }
+
+        .phase-list li {
+            padding: 4px 0 4px 12px;
+            border-left: 2px solid var(--border);
+            margin-left: 6px;
+            font-size: 12px;
+            transition: border-color .15s
+        }
+
+        .phase-list li:hover {
+            border-left-color: var(--green)
+        }
+
+        .phase-list li .ph-name {
+            color: var(--green);
+            font-weight: 600
+        }
+
+        /* Derivatives */
+        .der-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px
+        }
+
+        .der-tag {
+            background: rgba(210, 168, 255, .1);
+            color: var(--purple);
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            border: 1px solid rgba(210, 168, 255, .2);
+            transition: all .15s
+        }
+
+        .der-tag:hover {
+            background: rgba(210, 168, 255, .2);
+            transform: translateY(-1px)
+        }
+
+        .der-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 5px;
+            padding: 8px 12px;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: baseline;
+            gap: 8px
+        }
+
+        .der-card .der-name {
+            color: var(--purple);
+            font-weight: 600;
+            font-size: 12px;
+            min-width: 60px
+        }
+
+        .der-card .der-desc {
+            color: var(--text);
+            font-size: 11px
+        }
+
+        .der-card-rich {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 10px 14px;
+            margin-bottom: 8px;
+            transition: border-color .15s
+        }
+
+        .der-card-rich:hover {
+            border-color: var(--purple)
+        }
+
+        .der-card-rich .der-name {
+            color: var(--purple);
+            font-weight: 700;
+            font-size: 13px;
+            margin-bottom: 6px
+        }
+
+        .der-card-rich .der-when,
+        .der-card-rich .der-output,
+        .der-card-rich .der-example {
+            font-size: 11px;
+            color: var(--text);
+            padding: 2px 0;
+            line-height: 1.5
+        }
+
+        .der-card-rich .der-example {
+            color: var(--text2);
+            font-style: italic;
+            border-top: 1px solid var(--border);
+            margin-top: 4px;
+            padding-top: 4px
+        }
+
+        .ph-detail {
+            color: var(--text2);
+            font-size: 11px;
+            margin-top: 2px;
+            line-height: 1.5;
+            padding-left: 4px
+        }
+
+        .uc-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 10px 14px;
+            margin-bottom: 8px;
+            transition: border-color .15s
+        }
+
+        .uc-card:hover {
+            border-color: var(--accent)
+        }
+
+        .uc-situation {
+            color: var(--accent);
+            font-weight: 600;
+            font-size: 12px;
+            margin-bottom: 6px
+        }
+
+        .uc-trigger,
+        .uc-action,
+        .uc-result {
+            font-size: 11px;
+            color: var(--text);
+            padding: 2px 0;
+            line-height: 1.5
+        }
+
+        .uc-result {
+            color: #4ade80;
+            font-weight: 500
+        }
+
+        /* Algebra */
+        .alg-table {
+            width: 100%;
+            border-collapse: collapse
+        }
+
+        .alg-table td {
+            padding: 4px 8px;
+            border: 1px solid var(--border);
+            font-size: 11px
+        }
+
+        .alg-table td:first-child {
+            width: 30px;
+            text-align: center;
+            font-family: monospace;
+            font-weight: 700;
+            font-size: 14px;
+            color: var(--green)
+        }
+
+        /* Adjunction */
+        .adj-card {
+            background: linear-gradient(135deg, rgba(88, 166, 255, .08), rgba(210, 168, 255, .08));
+            border: 1px solid rgba(88, 166, 255, .2);
+            border-radius: var(--radius);
+            padding: 10px 14px
+        }
+
+        .adj-label {
+            font-size: 14px;
+            font-family: monospace;
+            color: var(--accent);
+            font-weight: 700;
+            margin-bottom: 4px
+        }
+
+        .adj-meaning {
+            font-size: 11px;
+            color: var(--text2)
+        }
+
+        .adj-pair {
+            margin-top: 6px
+        }
+
+        .adj-pair a {
+            color: var(--accent);
+            cursor: pointer;
+            text-decoration: underline;
+            font-size: 12px
+        }
+
+        /* X-series */
+        .x-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 5px;
+            padding: 6px 10px;
+            margin-bottom: 4px;
+            font-size: 11px;
+            display: flex;
+            gap: 8px;
+            align-items: center
+        }
+
+        .x-shared {
+            color: var(--accent2);
+            font-weight: 600;
+            min-width: 55px
+        }
+
+        .x-pairs {
+            color: var(--text2)
+        }
+
+        /* Usecases */
+        .uc-item {
+            background: rgba(88, 166, 255, .05);
+            border-left: 3px solid var(--accent);
+            padding: 5px 10px;
+            margin-bottom: 4px;
+            border-radius: 0 4px 4px 0;
+            font-size: 12px
+        }
+
+        /* CCL */
+        .ccl-expr {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            color: var(--pink);
+            background: rgba(249, 117, 131, .08);
+            padding: 6px 10px;
+            border-radius: 5px;
+            border: 1px solid rgba(249, 117, 131, .15);
+            word-break: break-all;
+            margin-top: 4px
+        }
+
+        /* Tabs */
+        .tab-bar {
+            display: flex;
+            gap: 2px;
+            margin-bottom: 12px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 0
+        }
+
+        .tab {
+            padding: 6px 14px;
+            font-size: 11px;
+            color: var(--text2);
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all .15s;
+            font-weight: 500
+        }
+
+        .tab:hover {
+            color: var(--text)
+        }
+
+        .tab.active {
+            color: var(--accent);
+            border-bottom-color: var(--accent)
+        }
+
+        .tab-content {
+            display: none
+        }
+
+        .tab-content.active {
+            display: block
+        }
+
+        /* Responsive */
+        @media(max-width:768px) {
+            .sidebar {
+                width: 200px
+            }
+
+            .detail {
+                padding: 12px
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>⚡ Hegemonikón WF Explorer</h1>
+        <span class="subtitle">1公理 + 6座標 + 24定理 + 72関係 = 103要素体系</span>
+        <div class="search-box"><input id="search" type="text" placeholder="WF を検索..."></div>
+    </header>
+    <div class="main">
+        <nav class="sidebar" id="sidebar"></nav>
+        <main class="detail" id="detail">
+            <div class="detail-empty"><span class="icon">☰</span><span>左のリストからWFを選択</span></div>
+        </main>
+    </div>
+    <script src="wf-data.js"></script>
+    <script>
+        const $ = s => document.querySelector(s);
+        const $$ = s => document.querySelectorAll(s);
+
+        // Build sidebar
+        function buildSidebar() {
+            const sb = $('#sidebar');
+            let html = '';
+            // Ω layer
+            html += '<div class="section-label">Ω層 Series Peras</div>';
+            for (const [k, v] of Object.entries(OMEGA_DATA)) {
+                html += `<div class="wf-item" data-type="omega" data-id="${k}"><span class="cmd">/${k}</span><span class="label">${v.name}</span></div>`;
+            }
+            // Δ layer - 24 theorems by series
+            for (const [sk, sm] of Object.entries(SERIES_META)) {
+                html += `<div class="series-group"><div class="series-header open" data-series="${sk}" style="color:${sm.color}"><span class="dot" style="background:${sm.color}"></span>${sk} ${sm.name} (${sm.jp})<span class="arrow">▶</span></div><div class="wf-list open">`;
+                for (const [k, v] of Object.entries(WF_DATA)) {
+                    if (v.series === sk) html += `<div class="wf-item" data-type="wf" data-id="${k}"><span class="cmd">/${k}</span><span>${v.name}</span><span class="label">${v.pos}</span></div>`;
+                }
+                html += '</div></div>';
+            }
+            // τ layer
+            html += '<div class="section-label">τ層 タスク実行</div>';
+            for (const [k, v] of Object.entries(TAU_DATA)) {
+                html += `<div class="wf-item" data-type="tau" data-id="${k}"><span class="cmd">/${k}</span><span class="label">${v.jp}</span></div>`;
+            }
+            // CCL macros
+            html += '<div class="section-label">CCL マクロ</div>';
+            for (const [k, v] of Object.entries(CCL_DATA)) {
+                html += `<div class="wf-item" data-type="ccl" data-id="${k}"><span class="cmd">/${k.replace('ccl-', '')}</span><span class="label">${v.jp}</span></div>`;
+            }
+            sb.innerHTML = html;
+            // Event listeners
+            sb.querySelectorAll('.series-header').forEach(h => {
+                h.onclick = () => { h.classList.toggle('open'); h.nextElementSibling.classList.toggle('open'); };
+            });
+            sb.querySelectorAll('.wf-item').forEach(item => {
+                item.onclick = () => {
+                    $$('.wf-item.active').forEach(i => i.classList.remove('active'));
+                    item.classList.add('active');
+                    showDetail(item.dataset.type, item.dataset.id);
+                };
+            });
+        }
+
+        function showDetail(type, id) {
+            const d = $('#detail');
+            if (type === 'wf') showWF(id, d);
+            else if (type === 'tau') showTau(id, d);
+            else if (type === 'ccl') showCCL(id, d);
+            else if (type === 'omega') showOmega(id, d);
+        }
+
+        function showWF(id, d) {
+            const w = WF_DATA[id];
+            const sm = SERIES_META[w.series];
+            const xrels = X_SERIES.filter(x => x.pairs.includes(id));
+            d.innerHTML = `
+  <div class="d-header">
+    <h2><span class="series-badge" style="background:${sm.bg};color:${sm.color}">${w.series}${w.pos.replace('T', '')}</span>
+    /${id} — ${w.name} (${w.jp}) <span style="color:var(--text2);font-size:12px">v${w.ver}</span></h2>
+    <p class="d-desc">${w.desc}</p>
+  </div>
+  <div class="tab-bar">
+    <div class="tab active" data-tab="phases">フェーズ</div>
+    <div class="tab" data-tab="derivatives">派生</div>
+    <div class="tab" data-tab="relations">射・関係</div>
+    <div class="tab" data-tab="usecases">ユースケース</div>
+  </div>
+  <div class="tab-content active" data-tab="phases">
+    <div class="d-section"><h3>処理フェーズ (${w.phases.length})</h3>
+    <ul class="phase-list">${w.phases.map(p => {
+                if (typeof p === 'object' && p.id) {
+                    return `<li><span class="ph-name">${p.id}: ${p.name}</span><div class="ph-detail">${p.detail}</div></li>`;
+                }
+                const parts = (typeof p === 'string' ? p : '').split(/[:：—]/);
+                return `<li><span class="ph-name">${parts[0]}</span>${parts.length > 1 ? '—' + parts.slice(1).join(':') : ''}</li>`;
+            }).join('')}</ul></div>
+    <div class="d-section"><h3>Cognitive Algebra (認知代数)</h3>
+    <table class="alg-table">
+    <tr><td>+</td><td>${w.algebra['+']}</td></tr>
+    <tr><td>−</td><td>${w.algebra['-']}</td></tr>
+    <tr><td>*</td><td>${w.algebra['*']}</td></tr>
+    </table></div>
+  </div>
+  <div class="tab-content" data-tab="derivatives">
+    <div class="d-section"><h3>派生モード (${w.derivatives.length})</h3>
+    ${w.derivatives.map(d => {
+                if (typeof d === 'object' && d.name) {
+                    const when = d.when ? `<div class="der-when"><strong>いつ:</strong> ${d.when}</div>` : '';
+                    const out = d.output ? `<div class="der-output"><strong>出力:</strong> ${d.output}</div>` : (d.desc ? `<div class="der-output">${d.desc}</div>` : '');
+                    const ex = d.example ? `<div class="der-example"><strong>例:</strong> ${d.example}</div>` : '';
+                    return `<div class="der-card-rich"><div class="der-name">${d.name}</div>${when}${out}${ex}</div>`;
+                }
+                return `<span class="der-tag">${d}</span>`;
+            }).join('')}</div>
+  </div>
+  <div class="tab-content" data-tab="relations">
+    <div class="d-section"><h3>随伴対 (Adjunction)</h3>
+    <div class="adj-card">
+      <div class="adj-label">${w.adj.label}</div>
+      <div class="adj-meaning">${w.adj.meaning}</div>
+      <div class="adj-pair">随伴相手: <a onclick="navigate('wf','${w.adj.pair}')">/${w.adj.pair}</a> — ${w.adj.role === 'F' ? '自分がF(左随伴/自由関手)' : '自分がG(右随伴/忘却関手)'}</div>
+    </div></div>
+    ${xrels.length ? `<div class="d-section"><h3>X-series (Series間関係)</h3>
+    ${xrels.map(x => `<div class="x-card"><span class="x-shared">${x.shared}</span><span>${x.from}↔${x.to}</span><span class="x-pairs">${x.pairs}</span></div>`).join('')}</div>` : ''}
+    <div class="d-section"><h3>Series内関係 (D/H/X型)</h3>
+    <table class="alg-table">
+    <tr><td style="color:var(--accent)">D</td><td>随伴: ${w.pos === 'T1' || w.pos === 'T2' ? w.pos + '⊣' + (w.pos === 'T1' ? 'T3' : 'T4') : w.pos + '⊣' + (w.pos === 'T3' ? 'T1' : 'T2')} — 忘却と構成</td></tr>
+    <tr><td style="color:var(--accent2)">H</td><td>自然変換: ${w.pos === 'T1' || w.pos === 'T3' ? w.pos + '↔' + (w.pos === 'T1' ? 'T2' : 'T4') : w.pos + '↔' + (w.pos === 'T2' ? 'T1' : 'T3')} — 目的切替</td></tr>
+    <tr><td style="color:var(--pink)">X</td><td>双対: ${w.pos === 'T1' || w.pos === 'T2' ? w.pos + '↔' + (w.pos === 'T1' ? 'T4' : 'T3') : w.pos + '↔' + (w.pos === 'T3' ? 'T2' : 'T1')} — 対極の対話</td></tr>
+    </table></div>
+  </div>
+  <div class="tab-content" data-tab="usecases">
+    <div class="d-section"><h3>HGKユースケース (${w.usecases.length})</h3>
+    ${w.usecases.map(u => {
+                if (typeof u === 'object' && u.situation) {
+                    return `<div class="uc-card"><div class="uc-situation">📋 ${u.situation}</div><div class="uc-trigger"><strong>発動:</strong> ${u.trigger}</div><div class="uc-action"><strong>行動:</strong> ${u.action}</div><div class="uc-result"><strong>結果:</strong> ${u.result}</div></div>`;
+                }
+                return `<div class="uc-item">💡 ${u}</div>`;
+            }).join('')}</div>
+  </div>`;
+            bindTabs();
+        }
+
+        function showTau(id, d) {
+            const w = TAU_DATA[id];
+            const hasTabs = w.phases || w.usecases;
+            d.innerHTML = `
+  <div class="d-header">
+    <h2><span class="series-badge" style="background:#1a3a3a;color:#56d4dd">τ</span>/${id} — ${w.name} (${w.jp})</h2>
+    <p class="d-desc">${w.desc}</p>
+  </div>
+  ${hasTabs ? `<div class="tab-bar">
+    ${w.phases ? '<div class="tab active" data-tab="phases">フェーズ</div>' : ''}
+    ${w.usecases && w.usecases.length ? '<div class="tab" data-tab="usecases">ユースケース</div>' : ''}
+  </div>` : ''}
+  ${w.phases ? `<div class="tab-content active" data-tab="phases"><div class="d-section"><h3>処理フェーズ</h3><ul class="phase-list">${w.phases.map(p => {
+                if (typeof p === 'object' && p.id) {
+                    return `<li><span class="ph-name">${p.id}: ${p.name}</span><div class="ph-detail">${p.detail}</div></li>`;
+                }
+                const parts = (typeof p === 'string' ? p : '').split(/[:：—]/);
+                return `<li><span class="ph-name">${parts[0]}</span>${parts.length > 1 ? '—' + parts.slice(1).join(':') : ''}</li>`;
+            }).join('')}</ul></div></div>` : ''}
+  ${w.usecases && w.usecases.length ? `<div class="tab-content" data-tab="usecases"><div class="d-section"><h3>ユースケース</h3>
+    ${w.usecases.map(u => {
+                if (typeof u === 'object' && u.situation) {
+                    return `<div class="uc-card"><div class="uc-situation">📋 ${u.situation}</div><div class="uc-trigger"><strong>発動:</strong> ${u.trigger}</div><div class="uc-action"><strong>行動:</strong> ${u.action}</div><div class="uc-result"><strong>結果:</strong> ${u.result}</div></div>`;
+                }
+                return `<div class="uc-item">💡 ${u}</div>`;
+            }).join('')}</div></div>` : ''}
+  ${w.adj ? `<div class="d-section"><h3>随伴対</h3><div class="adj-card"><div class="adj-label">${w.adj.label}</div>
+  <div class="adj-pair">随伴相手: <a onclick="navigate('tau','${w.adj.pair}')">/${w.adj.pair}</a></div></div></div>` : ''}`;
+            if (hasTabs) bindTabs();
+        }
+
+        function showCCL(id, d) {
+            const w = CCL_DATA[id];
+            const refs = (w.ccl.match(/\/[a-z]+/g) || []).map(r => r.replace('/', ''));
+            d.innerHTML = `
+  <div class="d-header">
+    <h2><span class="series-badge" style="background:#3a1a2a;color:#f97583">CCL</span>/${id.replace('ccl-', '')} — ${w.jp}</h2>
+    <p class="d-desc">${w.desc}</p>
+  </div>
+  <div class="d-section"><h3>CCL式</h3><div class="ccl-expr">${w.ccl}</div></div>
+  <div class="d-section"><h3>参照WF</h3><div class="der-grid">
+  ${[...new Set(refs)].map(r => {
+                const exists = WF_DATA[r] || TAU_DATA[r];
+                return exists ? `<span class="der-tag" style="cursor:pointer" onclick="navigate('${WF_DATA[r] ? 'wf' : 'tau'}','${r}')">/${r}</span>` : `<span class="der-tag">/${r}</span>`;
+            }).join('')}
+  </div></div>`;
+        }
+
+        function showOmega(id, d) {
+            const w = OMEGA_DATA[id];
+            d.innerHTML = `
+  <div class="d-header">
+    <h2><span class="series-badge" style="background:#1a1a3a;color:#79c0ff">Ω</span>/${id} — ${w.name}</h2>
+    <p class="d-desc">${w.desc}</p>
+  </div>
+  <div class="d-section"><h3>統合対象 (${w.targets.length})</h3><div class="der-grid">
+  ${w.targets.map(t => {
+                const wf = WF_DATA[t] || OMEGA_DATA[t];
+                const type = WF_DATA[t] ? 'wf' : 'omega';
+                return `<span class="der-tag" style="cursor:pointer" onclick="navigate('${type}','${t}')">/${t}${wf && wf.name ? ' ' + wf.name : ''}</span>`;
+            }).join('')}
+  </div></div>
+  ${id !== 'ax' && id !== 'x' ? `<div class="d-section"><h3>X-series接続</h3>
+  ${X_SERIES.filter(x => x.from === (SERIES_META[id.toUpperCase()] ? id.toUpperCase() : '') || x.to === (SERIES_META[id.toUpperCase()] ? id.toUpperCase() : '')).map(x => `<div class="x-card"><span class="x-shared">${x.shared}</span><span>${x.from}↔${x.to}</span><span class="x-pairs">${x.pairs}</span></div>`).join('') || '<span style="color:var(--text2)">—</span>'}
+  </div>` : ''}`;
+        }
+
+        function navigate(type, id) {
+            const items = $$('.wf-item');
+            items.forEach(i => {
+                if (i.dataset.id === id && i.dataset.type === type) {
+                    i.click();
+                    i.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            });
+        }
+
+        function bindTabs() {
+            $$('.tab').forEach(tab => {
+                tab.onclick = () => {
+                    $$('.tab').forEach(t => t.classList.remove('active'));
+                    $$('.tab-content').forEach(c => c.classList.remove('active'));
+                    tab.classList.add('active');
+                    document.querySelector(`.tab-content[data-tab="${tab.dataset.tab}"]`).classList.add('active');
+                };
+            });
+        }
+
+        // Search
+        $('#search').addEventListener('input', e => {
+            const q = e.target.value.toLowerCase();
+            $$('.wf-item').forEach(item => {
+                const id = item.dataset.id;
+                const text = item.textContent.toLowerCase();
+                item.style.display = (!q || text.includes(q) || id.includes(q)) ? '' : 'none';
+            });
+            // Auto-open series groups that have visible items
+            $$('.series-group').forEach(g => {
+                const visible = g.querySelectorAll('.wf-item:not([style*="display: none"])');
+                const header = g.querySelector('.series-header');
+                const list = g.querySelector('.wf-list');
+                if (q && visible.length > 0) { header.classList.add('open'); list.classList.add('open'); }
+            });
+        });
+
+        buildSidebar();
+    </script>
+</body>
+
+</html>

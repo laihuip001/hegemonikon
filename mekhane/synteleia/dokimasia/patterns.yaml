@@ -1,0 +1,268 @@
+# Synteleia Dokimasia L1 Agent Patterns
+#
+# 各エージェントのパターン辞書。コード変更なしで追加・修正可能。
+# フォーマット: agent_key → pattern_group → entries
+
+operator:
+  # CCL 演算子辞書
+  ccl_operators:
+    "+": "深化 (deepening)"
+    "-": "簡略化 (reduction)"
+    "*": "拡張 (expansion)"
+    "^": "メタ化 (meta)"
+    "~": "振動 (oscillation)"
+    ">>": "シーケンス (sequence)"
+    "_": "暗黙連結 (implicit)"
+    "!": "否定/警告 (negation)"
+    "'": "変化追跡 (change tracking)"
+    "∂": "偏微分/部分分析 (partial)"
+    "√": "収束 (convergence)"
+    "∫": "統合 (integration)"
+    "Σ": "並列 (parallel)"
+    "@": "マクロ呼出 (macro invocation)"
+
+  # 演算子誤用パターン
+  misuse_patterns:
+    - pattern: '/\w+\+\+'
+      code: "OP-001"
+      message: "++ は無効な演算子。+ を使用してください"
+    - pattern: '/\w+--'
+      code: "OP-002"
+      message: "-- は無効な演算子。- を使用してください"
+    - pattern: '\*\*\*'
+      code: "OP-003"
+      message: "*** は過剰なメタ化。** 以下を推奨"
+    - pattern: '~~'
+      code: "OP-004"
+      message: "~~ は無効。振動は ~ 1つで表現"
+    - pattern: '/\w+\s+/\w+'
+      code: "OP-005"
+      message: "ワークフロー間にスペース。>> または _ を使用"
+
+  # コードスタイルパターン (severity 付き)
+  style_patterns:
+    - pattern: '==\s*True\b'
+      code: "OP-020"
+      message: "== True は冗長。直接 if x: を使用"
+      severity: "low"
+    - pattern: '==\s*False\b'
+      code: "OP-021"
+      message: "== False は冗長。if not x: を使用"
+      severity: "low"
+    - pattern: '!=\s*None\b'
+      code: "OP-022"
+      message: "!= None より is not None を推奨"
+      severity: "low"
+    - pattern: '==\s*None\b'
+      code: "OP-023"
+      message: "== None より is None を推奨"
+      severity: "low"
+
+  # セキュリティ危険パターン
+  security_patterns:
+    - pattern: '\beval\s*\('
+      code: "SEC-001"
+      message: "eval() は任意コード実行の脆弱性。ast.literal_eval() を検討"
+      severity: "critical"
+    - pattern: '\bexec\s*\('
+      code: "SEC-002"
+      message: "exec() は任意コード実行の脆弱性"
+      severity: "critical"
+    - pattern: '\bos\.system\s*\('
+      code: "SEC-003"
+      message: "os.system() は OS コマンドインジェクションの危険。subprocess.run() を推奨"
+      severity: "high"
+    - pattern: '\bsubprocess\.\w+\(.*shell\s*=\s*True'
+      code: "SEC-004"
+      message: "shell=True はコマンドインジェクションの危険"
+      severity: "high"
+    - pattern: '\b__import__\s*\('
+      code: "SEC-005"
+      message: "__import__() は動的インポートの脆弱性。importlib を検討"
+      severity: "medium"
+    - pattern: '\bpickle\.loads?\s*\('
+      code: "SEC-006"
+      message: "pickle は任意コード実行の脆弱性。信頼できないデータに使用禁止"
+      severity: "high"
+    - pattern: '\byaml\.load\s*\((?!.*Loader\s*=)'
+      code: "SEC-007"
+      message: "yaml.load() は unsafe。yaml.safe_load() を使用"
+      severity: "high"
+    - pattern: '\binput\s*\(.*\)'
+      code: "SEC-008"
+      message: "input() はサーバーサイドでは危険。Web フレームワーク経由を推奨"
+      severity: "low"
+
+logic:
+  # 対立キーワードペア
+  contradiction_pairs:
+    - ["必須", "任意"]
+    - ["常に", "決して"]
+    - ["全て", "一部"]
+    - ["must", "may"]
+    - ["always", "never"]
+    - ["required", "optional"]
+    - ["all", "none"]
+    - ["enable", "disable"]
+    - ["true", "false"]
+
+  # 論理的に危険なパターン
+  logic_patterns:
+    - pattern: '\bif\s+True\b'
+      code: "LOG-001"
+      message: "if True は常に実行される無意味な条件"
+    - pattern: '\bif\s+False\b'
+      code: "LOG-002"
+      message: "if False は決して実行されない"
+    - pattern: '\bwhile\s+True\b.*\bbreak\b'
+      code: null
+      message: null
+    - pattern: '\bwhile\s+True\b(?!.*\bbreak\b)'
+      code: "LOG-003"
+      message: "無限ループの可能性"
+    - pattern: '\breturn\b.*\n.*\breturn\b'
+      code: "LOG-004"
+      message: "到達不能な return 文の可能性"
+
+perigraphe:
+  # スコープ逸脱パターン
+  scope_creep_patterns:
+    - pattern: '\bついでに\b'
+      code: "P-001"
+      message: "「ついでに」はスコープ逸脱の兆候"
+    - pattern: "\bwhile\\s+(?:we're|I'm)\\s+at\\s+it\b"
+      code: "P-002"
+      message: "スコープ逸脱の兆候"
+    - pattern: '\bまた(?:は|も)\b.*\bも\b'
+      code: "P-003"
+      message: "複数の目的が混在"
+    - pattern: '\band\s+also\b'
+      code: "P-004"
+      message: "範囲が曖昧に拡大"
+
+  # 境界明示キーワード
+  boundary_keywords:
+    - "スコープ"
+    - "範囲"
+    - "対象外"
+    - "対象内"
+    - "scope"
+    - "out of scope"
+    - "in scope"
+    - "boundary"
+    - "limit"
+
+kairos:
+  # タイミング問題パターン
+  timing_problems:
+    - pattern: '\b後で\b'
+      code: "K-001"
+      message: "「後で」は先延ばしの兆候"
+    - pattern: '\bいつか\b'
+      code: "K-002"
+      message: "「いつか」は時宜が不明確"
+    - pattern: '\bそのうち\b'
+      code: "K-003"
+      message: "「そのうち」は時宜が不明確"
+    - pattern: '\blater\b(?!\s+than)'
+      code: "K-004"
+      message: "「later」は先延ばしの兆候"
+    - pattern: '\bsomeday\b'
+      code: "K-005"
+      message: "「someday」は時宜が不明確"
+    - pattern: '\beventually\b'
+      code: "K-006"
+      message: "「eventually」は時宜が曖昧"
+
+  # 時間的コンテキストキーワード
+  temporal_keywords:
+    - "期限"
+    - "deadline"
+    - "due"
+    - "by"
+    - "until"
+    - "before"
+    - "after"
+    - "when"
+    - "今日"
+    - "明日"
+    - "今週"
+    - "今月"
+
+  # 早すぎる最適化パターン
+  premature_patterns:
+    - pattern: '\b最適化\b.*\bまず\b'
+      code: "K-010"
+      message: "早すぎる最適化の兆候"
+    - pattern: '\boptimiz\w*\b.*\bfirst\b'
+      code: "K-011"
+      message: "Premature optimization detected"
+    - pattern: '\bパフォーマンス\b.*\b前に\b'
+      code: "K-012"
+      message: "機能完成前のパフォーマンス議論"
+
+completeness:
+  # 未完了マーカー
+  incomplete_markers:
+    - pattern: '\bTODO\b'
+      code: "COMP-001"
+      message: "TODO マーカーが残っています"
+    - pattern: '\bFIXME\b'
+      code: "COMP-002"
+      message: "FIXME マーカーが残っています"
+    - pattern: '\bXXX\b'
+      code: "COMP-003"
+      message: "XXX マーカーが残っています"
+    - pattern: '\bHACK\b'
+      code: "COMP-004"
+      message: "HACK マーカーが残っています"
+    - pattern: '\.\.\.(?!\s*\]|\s*\))'
+      code: "COMP-005"
+      message: "省略記号 ... が残っています"
+    - pattern: '\bpass\s*$'
+      code: "COMP-006"
+      message: "空の pass 文があります"
+    - pattern: 'raise\s+NotImplementedError'
+      code: "COMP-007"
+      message: "NotImplementedError が残っています"
+    - pattern: '\?\?\?'
+      code: "COMP-008"
+      message: "??? プレースホルダーが残っています"
+
+  # 空のブロックパターン
+  empty_patterns:
+    - pattern: 'def\s+\w+\([^)]*\):\s*\n\s*pass\s*$'
+      code: "COMP-010"
+      message: "空の関数定義"
+    - pattern: 'class\s+\w+[^:]*:\s*\n\s*pass\s*$'
+      code: "COMP-011"
+      message: "空のクラス定義"
+    - pattern: 'if\s+[^:]+:\s*\n\s*pass\s*$'
+      code: "COMP-012"
+      message: "空の if ブロック"
+    - pattern: 'try:\s*\n\s*pass\s*$'
+      code: "COMP-013"
+      message: "空の try ブロック"
+    - pattern: 'except[^:]*:\s*\n\s*pass\s*$'
+      code: "COMP-014"
+      message: "空の except ブロック"
+
+  # ターゲットタイプごとの必須要素
+  required_elements:
+    ccl_output:
+      - "結論"
+      - "conclusion"
+      - "summary"
+      - "result"
+    plan:
+      - "目的"
+      - "goal"
+      - "objective"
+      - "ステップ"
+      - "step"
+      - "action"
+    proof:
+      - "PROOF:"
+      - "理由"
+      - "reason"
+      - "why"

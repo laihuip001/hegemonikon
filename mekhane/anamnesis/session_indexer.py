@@ -805,6 +805,198 @@ def index_exports(export_dir: Optional[str] = None) -> int:
     return 0
 
 
+# ==============================================================
+# ROM Indexer — /rom WF で蒸留されたコンテキストをインデックス
+# ==============================================================
+
+_ROM_DIR = Path.home() / "oikos" / "mneme" / ".hegemonikon" / "rom"
+
+# Regex patterns for ROM parsing
+_RE_ROM_TITLE = re.compile(r"^#\s+(.+)$", re.MULTILINE)
+_RE_ROM_FRONTMATTER = re.compile(r"^---\s*\n(.*?)\n---", re.DOTALL)
+_RE_ROM_SEMANTIC_TAG = re.compile(
+    r">\s*\*\*\[(DEF|FACT|RULE|CONFLICT|OPINION)\]\*\*", re.MULTILINE
+)
+
+
+# PURPOSE: ROM マークダウンファイルをパースし構造化 dict に変換する
+def parse_rom_md(path: Path) -> dict:
+    """PURPOSE: ROM マークダウンファイルをパースし構造化 dict に変換する"""
+    text = path.read_text(encoding="utf-8", errors="replace")
+
+    # Title: first H1 line
+    title_match = _RE_ROM_TITLE.search(text)
+    title = title_match.group(1).strip() if title_match else path.stem
+
+    # Try to extract YAML frontmatter
+    topics = []
+    exec_summary = ""
+    reliability = ""
+    source_date = ""
+    fm_match = _RE_ROM_FRONTMATTER.match(text)
+    if fm_match:
+        try:
+            import yaml
+            fm = yaml.safe_load(fm_match.group(1))
+            if isinstance(fm, dict):
+                topics = fm.get("topics", [])
+                exec_summary = fm.get("exec_summary", "")
+                reliability = fm.get("reliability", "")
+                source_date = fm.get("source_date", "")
+        except Exception:
+            pass  # Intentional: frontmatter may be malformed
+
+    # Date from filename: rom_YYYY-MM-DD_HHMM_slug.md
+    date_str = ""
+    fname_match = re.search(r"(\d{4}-\d{2}-\d{2})_(\d{2})(\d{2})", path.stem)
+    if fname_match:
+        date_str = f"{fname_match.group(1)} {fname_match.group(2)}:{fname_match.group(3)}"
+    elif source_date and source_date != "Unknown":
+        date_str = source_date
+
+    # Derivative level from filename
+    derivative = "standard"
+    if "_snapshot_" in path.stem or path.stem.endswith("_snapshot"):
+        derivative = "rom-"
+    elif "_rag_" in path.stem or path.stem.endswith("_rag"):
+        derivative = "rom+"
+
+    # Semantic tags count
+    semantic_tags = _RE_ROM_SEMANTIC_TAG.findall(text)
+
+    # Section headers for content summary
+    sections = _RE_SECTION.findall(text)
+    sections = [re.sub(r"^[^\w]+", "", s).strip() for s in sections]
+
+    return {
+        "title": title,
+        "date": date_str,
+        "derivative": derivative,
+        "topics": topics,
+        "exec_summary": exec_summary,
+        "reliability": reliability,
+        "semantic_tags": semantic_tags,
+        "sections": sections,
+        "text": text,
+        "filename": path.name,
+    }
+
+
+# PURPOSE: パース済み ROM dict を LanceDB 互換レコードに変換する
+def roms_to_records(roms: list[dict]) -> list[dict]:
+    """PURPOSE: パース済み ROM dict を LanceDB 互換レコードに変換する"""
+    records = []
+    for r in roms:
+        # Build abstract from title + date + topics + exec_summary
+        abstract_parts = [f"[ROM/{r['derivative']}] {r['title']}"]
+        if r["date"]:
+            abstract_parts.append(f"({r['date']})")
+        if r["exec_summary"]:
+            abstract_parts.append(f"— {r['exec_summary'][:200]}")
+        elif r["sections"]:
+            abstract_parts.append("— " + ", ".join(r["sections"][:6]))
+        if r["topics"]:
+            abstract_parts.append(f"Topics: {', '.join(r['topics'][:5])}")
+        abstract = " ".join(abstract_parts)
+
+        # Content: full text truncated for embedding
+        content = r["text"][:4000]
+
+        # Primary key from filename for dedup
+        primary_key = f"rom:{r['filename']}"
+
+        # URL: file path for retrieval
+        url = str(_ROM_DIR / r["filename"])
+
+        record = {
+            "primary_key": primary_key,
+            "title": f"[ROM] {r['title']}",
+            "source": "rom",
+            "abstract": abstract[:500],
+            "content": content,
+            "authors": f"derivative:{r['derivative']}",
+            "doi": "",
+            "arxiv_id": "",
+            "url": url,
+            "citations": len(r.get("semantic_tags", [])),
+        }
+        records.append(record)
+
+    return records
+
+
+# PURPOSE: ROM ファイル群を LanceDB にセマンティックインデックスする
+def index_roms(rom_dir: Optional[str] = None) -> int:
+    """PURPOSE: ROM ファイル群を LanceDB にセマンティックインデックスする"""
+    directory = Path(rom_dir) if rom_dir else _ROM_DIR
+
+    if not directory.exists():
+        print(f"[ROMIndexer] ROM directory not found: {directory}")
+        print("[ROMIndexer] Run /rom to generate ROM files first")
+        return 1
+
+    md_files = sorted(directory.glob("rom_*.md"))
+    if not md_files:
+        print("[ROMIndexer] No rom_*.md files found")
+        return 1
+
+    print(f"[ROMIndexer] Found {len(md_files)} ROM files")
+
+    # Parse all
+    roms = [parse_rom_md(f) for f in md_files]
+    records = roms_to_records(roms)
+
+    # Embed and add to LanceDB
+    from mekhane.anamnesis.index import GnosisIndex, Embedder
+
+    index = GnosisIndex()
+    embedder = Embedder()
+
+    # Dedupe against existing records
+    if index._table_exists():
+        table = index.db.open_table(index.TABLE_NAME)
+        try:
+            existing = table.to_pandas()
+            existing_keys = set(existing["primary_key"].tolist())
+            before = len(records)
+            records = [r for r in records if r["primary_key"] not in existing_keys]
+            skipped = before - len(records)
+            if skipped:
+                print(f"[ROMIndexer] Skipped {skipped} duplicates")
+        except Exception:
+            pass  # Intentional: table may be empty or have incompatible schema
+
+    if not records:
+        print("[ROMIndexer] No new ROMs to add (all duplicates)")
+        return 0
+
+    # Generate embeddings (title + abstract for embedding text)
+    texts = [f"{r['title']} {r['abstract']}" for r in records]
+    vectors = embedder.embed_batch(texts)
+
+    # Attach vectors
+    data_with_vectors = []
+    for rec, vec in zip(records, vectors):
+        rec["vector"] = vec
+        data_with_vectors.append(rec)
+
+    # Add to LanceDB
+    if index._table_exists():
+        table = index.db.open_table(index.TABLE_NAME)
+        # Schema filtering (P4 pattern)
+        schema_fields = {f.name for f in table.schema}
+        filtered_data = [
+            {k: v for k, v in record.items() if k in schema_fields}
+            for record in data_with_vectors
+        ]
+        table.add(filtered_data)
+    else:
+        index.db.create_table(index.TABLE_NAME, data=data_with_vectors)
+
+    print(f"[ROMIndexer] ✅ Indexed {len(data_with_vectors)} ROMs")
+    return 0
+
+
 # PURPOSE: trajectorySummaries JSON からセッション情報を LanceDB にインデックスする
 def index_from_json(json_path: str) -> int:
     """PURPOSE: trajectorySummaries JSON からセッション情報を LanceDB にインデックスする"""
@@ -962,11 +1154,23 @@ def main() -> int:  # PURPOSE: CLI エントリポイント — サブコマン�
         default=None,
         help="Custom export directory (default: ~/oikos/mneme/.hegemonikon/sessions)",
     )
+    parser.add_argument(
+        "--roms",
+        action="store_true",
+        help="Index rom_*.md files from mneme ROM directory",
+    )
+    parser.add_argument(
+        "--rom-dir",
+        default=None,
+        help="Custom ROM directory (default: ~/oikos/mneme/.hegemonikon/rom)",
+    )
 
     args = parser.parse_args()
 
     if args.exports:
         return index_exports(args.export_dir)
+    elif args.roms:
+        return index_roms(args.rom_dir)
     elif args.steps:
         return index_steps(max_per_session=args.max_steps_per_session)
     elif args.conversations:
@@ -978,7 +1182,7 @@ def main() -> int:  # PURPOSE: CLI エントリポイント — サブコマン�
     elif args.json_path:
         return index_from_json(args.json_path)
     else:
-        print("Usage: session_indexer.py <json_path> | --from-api | --handoffs | --steps | --exports")
+        print("Usage: session_indexer.py <json_path> | --from-api | --handoffs | --roms | --steps | --exports")
         return 1
 
 

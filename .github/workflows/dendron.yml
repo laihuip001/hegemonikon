@@ -1,6 +1,6 @@
 # Dendron — Existence Proof Check
 # Validates that all Python files have PROOF headers
-# v3.1: Safety Contract audit added
+# v3.2: EPT (NF2/NF3/BCNF) check added
 name: Dendron
 
 on:
@@ -65,6 +65,13 @@ jobs:
           export PYTHONPATH=${{ github.workspace }}
           python -m mekhane.dendron.cli skill-audit .agent/ --ci
 
+      # EPT: NF2/NF3/BCNF checks (warn only — informational)
+      - name: "EPT: NF2/NF3/BCNF Check"
+        continue-on-error: true
+        run: |
+          export PYTHONPATH=${{ github.workspace }}
+          python -m mekhane.dendron.cli check mekhane/ --ept --format ci
+
       - name: Upload Coverage Report
         if: always()
         run: |
@@ -80,4 +87,7 @@ jobs:
           echo "" >> proof-coverage.md
           echo "## Safety Contract" >> proof-coverage.md
           python -m mekhane.dendron.cli skill-audit .agent/ --verbose >> proof-coverage.md 2>&1 || true
+          echo "" >> proof-coverage.md
+          echo "## EPT (NF2/NF3/BCNF)" >> proof-coverage.md
+          python -m mekhane.dendron.cli check mekhane/ --ept --format markdown >> proof-coverage.md 2>&1 || true
           cat proof-coverage.md >> $GITHUB_STEP_SUMMARY

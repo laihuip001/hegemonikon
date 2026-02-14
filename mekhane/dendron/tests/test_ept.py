@@ -110,11 +110,11 @@ class TestNF3Function:
             if c.name == "short_func":
                 assert c.status == ProofStatus.OK
 
-    # PURPOSE: 50行超の関数は WEAK
+    # PURPOSE: 75行超の関数は WEAK (v3.7: 閾値50→75)
     def test_complexity_long_function_weak(self, ept_checker, tmp_project):
-        """50行超の関数は WEAK"""
+        """75行超の関数は WEAK"""
         lines = ["# PROOF: [L1/コア]", "def long_func():"]
-        for i in range(55):
+        for i in range(80):
             lines.append(f"    x_{i} = {i}")
         lines.append("    return x_0")
         root = tmp_project({"long.py": "\n".join(lines)})
@@ -283,3 +283,36 @@ class TestEPTIntegration:
         assert result.total_structure_checks == 0
         assert result.total_function_nf_checks == 0
         assert result.total_verification_checks == 0
+
+
+class TestFileSimilarity:
+    """ファイル間類似度検出 (F5: L1×NF3)"""
+
+    @pytest.fixture
+    def sim_checker(self):
+        return DendronChecker(
+            exempt_patterns=[],
+            check_function_nf=True,
+        )
+
+    # PURPOSE: 同一関数名セットのファイルペアを検出する
+    def test_similar_files_detected(self, sim_checker, tmp_project):
+        """同一関数名セットの2ファイルで類似検出"""
+        file_a = "# PROOF: [L1/コア]\ndef foo():\n    pass\ndef bar():\n    pass\ndef baz():\n    pass\n"
+        file_b = "# PROOF: [L1/コア]\ndef foo():\n    return 1\ndef bar():\n    return 2\ndef baz():\n    return 3\n"
+        root = tmp_project({"a.py": file_a, "b.py": file_b})
+        result = sim_checker.check(root)
+        file_sim = [f for f in result.function_nf_proofs if f.check_type == "file_similarity"]
+        assert len(file_sim) >= 1
+        assert file_sim[0].status == ProofStatus.WEAK
+
+    # PURPOSE: 異なる関数名セットのファイルでは検出しない
+    def test_different_files_not_flagged(self, sim_checker, tmp_project):
+        """異なる関数名セットのファイルでは検出なし"""
+        file_a = "# PROOF: [L1/コア]\ndef alpha():\n    pass\ndef beta():\n    pass\n"
+        file_b = "# PROOF: [L1/コア]\ndef gamma():\n    pass\ndef delta():\n    pass\n"
+        root = tmp_project({"a.py": file_a, "b.py": file_b})
+        result = sim_checker.check(root)
+        file_sim = [f for f in result.function_nf_proofs if f.check_type == "file_similarity"]
+        assert len(file_sim) == 0
+

@@ -225,13 +225,14 @@ class Prompt:
         return "\n".join(parts)
 
     # PURPOSE: Compile AST to system prompt string.
-    def compile(self, context: dict = None, format: str = "markdown") -> str:
+    def compile(self, context: dict = None, format: str = "markdown", quality: bool = False) -> str:
         """
         Compile AST to system prompt string.
 
         Args:
             context: Variables for @if evaluation (e.g., {"env": "prod"})
             format: Output format ("markdown", "xml", "plain")
+            quality: If True, append quality score block at the end
 
         Returns:
             Compiled system prompt string
@@ -321,7 +322,38 @@ class Prompt:
             for dim in self.rubric.dimensions:
                 sections.append(f"| {dim.name} | {dim.description} | {dim.scale} |")
 
+        # Quality score (opt-in)
+        if quality:
+            score_info = self.quality_score()
+            if score_info:
+                sections.append(f"\n<!-- Quality: {score_info['total']}/100 -->")
+
         return "\n".join(sections)
+
+    # PURPOSE: Calculate prompt quality score.
+    def quality_score(self) -> Optional[dict]:
+        """Calculate prompt quality score using prompt_quality_scorer.
+
+        Lazy-imports the scorer to avoid circular dependencies.
+
+        Returns:
+            dict with 'total', 'grade', 'dimensions' or None if scorer unavailable
+        """
+        try:
+            from mekhane.ergasterion.tekhne.prompt_quality_scorer import score_prompt_text
+            report = score_prompt_text(self.expand(), name=self.name)
+            return {
+                "total": report.total,
+                "grade": report.grade,
+                "structure": report.structure.normalized,
+                "safety": report.safety.normalized,
+                "completeness": report.completeness.normalized,
+                "archetype_fit": report.archetype_fit.normalized,
+            }
+        except ImportError:
+            return None
+        except Exception:
+            return None
 
     # PURPOSE: Async compile AST to system prompt string.
     async def compile_async(

@@ -146,6 +146,30 @@ export interface DigestReportListResponse {
     total: number;
 }
 
+// --- Quota Types ---
+export interface QuotaModel {
+    label: string;
+    remaining_pct: number;
+    reset_time: string;
+    status: 'green' | 'yellow' | 'orange' | 'red';
+}
+
+export interface QuotaCredits {
+    available: number;
+    monthly: number;
+}
+
+export interface QuotaResponse {
+    name: string;
+    plan: string;
+    prompt_credits: QuotaCredits;
+    flow_credits: QuotaCredits;
+    models: QuotaModel[];
+    overall_status: 'green' | 'yellow' | 'orange' | 'red' | 'unknown';
+    timestamp: string;
+    error: string | null;
+}
+
 export const api = {
     // Status
     health: () => apiFetch<HealthCheckResponse>('/api/status/health'),
@@ -284,6 +308,9 @@ export const api = {
         apiFetch<DigestReportListResponse>(`/api/digestor/reports?limit=${limit}`),
     digestorLatest: () =>
         apiFetch<DigestReport | null>('/api/digestor/latest'),
+
+    // Quota
+    quota: () => apiFetch<QuotaResponse>('/api/quota'),
 };
 
 // --- Notification Types ---

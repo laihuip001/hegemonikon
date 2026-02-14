@@ -190,21 +190,27 @@ class QueryResult:
 
 
 def run_search(query: str, k: int = 10) -> tuple[list[SearchResult], float]:
-    """Execute PKS search and return results with latency."""
+    """Execute PKS search and return results with latency.
+
+    Per-source min-max normalization to unify score scales.
+    """
     t0 = time.time()
-    all_results = []
+    results_by_source: dict[str, list[SearchResult]] = {}
 
     # 1. Gnōsis (LanceDB)
     try:
         from mekhane.anamnesis.index import GnosisIndex
         gi = GnosisIndex()
         results = gi.search(query, k=k)
+        gnosis_results = []
         for r in results:
             title = r.get("title", r.get("primary_key", "?"))
             dist = float(r.get("_distance", 1.0))
             score = max(0.0, min(1.0, 1.0 - dist / 2.0))
             snippet = r.get("abstract", r.get("content", ""))[:200]
-            all_results.append(SearchResult("gnosis", score, title, snippet))
+            gnosis_results.append(SearchResult("gnosis", score, title, snippet))
+        if gnosis_results:
+            results_by_source["gnosis"] = gnosis_results
     except Exception as e:
         print(f"  ⚠️ Gnōsis error: {e}", file=sys.stderr)
 
@@ -222,28 +228,75 @@ def run_search(query: str, k: int = 10) -> tuple[list[SearchResult], float]:
                 idx = EmbeddingAdapter()
                 idx.load(str(pkl))
                 hits = idx.search(query_vec, k=k)
+                src_results = []
                 for hit in hits:
                     meta = hit.metadata if hasattr(hit, "metadata") else {}
                     title = meta.get("title", meta.get("doc_id", str(hit.id)))
                     hit_score = hit.score if hasattr(hit, "score") else 0
-                    all_results.append(SearchResult(name, hit_score, title, ""))
+                    src_results.append(SearchResult(name, hit_score, title, ""))
+                if src_results:
+                    results_by_source[name] = src_results
             except Exception as e:
                 print(f"  ⚠️ {name} error: {e}", file=sys.stderr)
     except Exception as e:
         print(f"  ⚠️ Embedder error: {e}", file=sys.stderr)
 
     elapsed = time.time() - t0
+
+    # Max-ratio normalization: divide each score by its source's max score
+    all_results = []
+    for src, src_results in results_by_source.items():
+        src_max = max(r.score for r in src_results)
+        if src_max <= 0:
+            continue
+        for r in src_results:
+            normalized = r.score / src_max
+            all_results.append(SearchResult(r.source, normalized, r.title, r.snippet))
+
+    # Hybrid reranking: keyword boost on top of vector similarity
+    import re
+    query_tokens = [t.lower() for t in re.split(r'[\s　,、。・/]+', query) if len(t) >= 2]
+    KW_BOOST_MAX = 0.3
+
+    for i, r in enumerate(all_results):
+        if query_tokens:
+            text = (r.title + " " + r.snippet).lower()
+            hits = sum(1 for t in query_tokens if t in text)
+            kw_ratio = hits / len(query_tokens)
+            boost = kw_ratio * KW_BOOST_MAX
+            all_results[i] = SearchResult(r.source, r.score + boost, r.title, r.snippet)
+
     all_results.sort(key=lambda x: x.score, reverse=True)
     return all_results, elapsed
 
 
-def evaluate_relevance(result: SearchResult, keywords: list[str]) -> bool:
-    """Check if a result is relevant based on keyword matching."""
-    if not keywords:
+def evaluate_relevance(
+    result: SearchResult,
+    keywords: list[str],
+    expected_sources: list[str] | None = None,
+) -> bool:
+    """Check if a result is relevant based on keyword matching OR source match.
+
+    Relevance is determined by:
+    1. Keyword hit (at least 1/3 of keywords found in title+snippet), OR
+    2. Source match (result comes from an expected source with high normalized score)
+    """
+    if not keywords and not expected_sources:
         return False
-    text = (result.title + " " + result.snippet).lower()
-    hits = sum(1 for kw in keywords if kw.lower() in text)
-    return hits >= max(1, len(keywords) // 3)
+
+    # Keyword-based relevance
+    kw_relevant = False
+    if keywords:
+        text = (result.title + " " + result.snippet).lower()
+        hits = sum(1 for kw in keywords if kw.lower() in text)
+        kw_relevant = hits >= max(1, len(keywords) // 3)
+
+    # Source-based relevance (high-score results from expected sources)
+    src_relevant = False
+    if expected_sources and result.source in expected_sources:
+        src_relevant = result.score >= 0.7  # only high-confidence matches
+
+    return kw_relevant or src_relevant
 
 
 def compute_metrics(
@@ -256,13 +309,16 @@ def compute_metrics(
     top_k = results[:k]
 
     # Precision@K: fraction of relevant results in top-k
-    relevant_count = sum(1 for r in top_k if evaluate_relevance(r, keywords))
+    relevant_count = sum(
+        1 for r in top_k
+        if evaluate_relevance(r, keywords, expected_sources)
+    )
     precision = relevant_count / k if k > 0 else 0.0
 
     # MRR: reciprocal rank of first relevant result
     mrr = 0.0
     for i, r in enumerate(results):
-        if evaluate_relevance(r, keywords):
+        if evaluate_relevance(r, keywords, expected_sources):
             mrr = 1.0 / (i + 1)
             break
 

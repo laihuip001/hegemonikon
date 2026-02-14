@@ -1,11 +1,11 @@
-# PROOF: [L2/インフラ] <- mekhane/ergasterion/synedrion/ A2→評議会システムが必要→__init__ が担う
-# Synedrion v2: Orthogonal Perspective Review System
+# PROOF: [L2/インフラ] <- mekhane/ergasterion/synedrion/ 後方互換 re-export ラッパー
 """
-Jules Synedrion v2 - 直交視点レビューシステム
+Backward compatibility shim.
 
-20 Domains × 6 Axes = 120 structurally orthogonal review perspectives.
+Canonical location: mekhane.synedrion
+This module re-exports PerspectiveMatrix for existing imports.
 """
 
-from .prompt_generator import PerspectiveMatrix, Perspective
+from mekhane.synedrion.prompt_generator import PerspectiveMatrix, Perspective  # noqa: F401
 
 __all__ = ["PerspectiveMatrix", "Perspective"]

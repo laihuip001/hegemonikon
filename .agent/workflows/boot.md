@@ -1,7 +1,7 @@
 ---
 description: セッション開始時の統合ブートシーケンス。二人で起動する。
 hegemonikon: O1 Noēsis + H4 Doxa
-version: "5.5"
+version: "5.6"
 lcm_state: stable
 lineage: "v4.1 + 随伴深層統合 → v5.0 → v5.2 Quota → v5.3 Session → v5.4 VSearch → v5.5 Handoff VSearch"
 category_theory:
@@ -28,6 +28,7 @@ category_theory:
 derivatives:
   "+": 詳細起動（全ステップ展開、Handoff 10件、KI 5件）→ boot/identity.md 参照
   "-": 高速起動（最小情報のみ、1分で開始）
+  "focus": タスク駆動起動（/boot タスク名 で発動。タスクに必要な Phase のみ実行）
 sel_enforcement:
   "+":
     description: "MUST expand ALL steps, show detailed output for each Phase"
@@ -97,13 +98,36 @@ Phase 6: L(M) を出力        — 完成したセッション状態
 | 概念 | 圏論 | 実践的意味 |
 |:-----|:-----|:-----------|
 | セッション | 圏 Ses の対象 | 作業中のコンテキスト全体 |
-| 記憶 | 圏 Mem の対象 | Handoff + KI + patterns.yaml |
+| 記憶 | 圏 Mem の対象 | Handoff + KI + ROM + patterns.yaml |
 | /boot | 左随伴 L | 圧縮記憶を展開し作業状態を構築 |
 | /bye | 右随伴 R | 作業状態を圧縮し記憶に永続化 |
+| /rom | Mem への中間射影 | セッション中にコンテキストを外部化 |
 | Drift | 1 - ε 精度 | bye→boot で失われた文脈の量 |
 | Self-Profile | L の id | 関手 L 自身の特性（能力境界・ミスパターン） |
 
 // turbo-all
+
+---
+
+## Focus モード判定 (Phase 0 前に実行)
+
+> **検出**: `/boot` の後ろにタスクテキストが続いているか？
+> **既存派生との関係**: `+/-` は「深度」。Focus は「方向」。直交する次元。
+
+```
+if /boot の後にタスクテキストあり:
+  → Focus モード発動 (本セクション「Focus モード実行フロー」へジャンプ)
+else:
+  → 従来通り Phase 0 から全実行
+```
+
+| 入力例 | モード | 挙動 |
+|:-------|:-------|:-----|
+| `/boot` | 通常 | Phase 0-6 全実行 |
+| `/boot+` | 詳細 | Phase 0-6 超詳細実行 |
+| `/boot-` | 高速 | Phase 0-6 最小実行 |
+| `/boot WFの整理` | **Focus** | タスク関連 Phase のみ |
+| `/boot CCLマクロを作る` | **Focus** | タスク関連 Phase のみ |
 
 ---
 
@@ -363,6 +387,8 @@ Handoff に記載された最終タスク or Creator が今回の目的を述べ
 cd ~/oikos/hegemonikon && PYTHONPATH=. .venv/bin/python mekhane/anamnesis/cli.py search "{query}" --source session --limit 3
 # Handoff 検索 (対話の結晶)
 cd ~/oikos/hegemonikon && PYTHONPATH=. .venv/bin/python mekhane/anamnesis/cli.py search "{query}" --source handoff --limit 3
+# ROM 検索 (蒸留されたコンテキスト)
+cd ~/oikos/hegemonikon && PYTHONPATH=. .venv/bin/python mekhane/anamnesis/cli.py search "{query}" --source rom --limit 3
 ```
 
 **重要**: 検索クエリは Handoff の最終タスク名をそのまま使うか、Creator が述べた今回の目的を使う。
@@ -375,6 +401,8 @@ cd ~/oikos/hegemonikon && PYTHONPATH=. .venv/bin/python mekhane/anamnesis/cli.py
   [1] {title} — {abstract の要約}
   [2] {title} — {abstract の要約}
 🔗 関連 Handoff (VSearch):
+  [1] {title} — {abstract の要約}
+🔗 関連 ROM (VSearch):
   [1] {title} — {abstract の要約}
 ```
 
@@ -414,29 +442,38 @@ else:
 
 > これは厳密なトークン計測ではなく、注意配分のガイドライン。
 
-### 中間セーブ (Savepoint)
+### 中間セーブ (/rom- Snapshot)
 
-**トリガー**: 🟡→🟠 遷移時 / 大規模ファイル読込後 / Creator 指示
+> **統合**: 旧 Savepoint を `/rom-` に吸収 (v5.7)。「保存したいなら全部 /rom」— 派生で深度を選ぶ。
+> **圏論**: 中間射影 π: Ses → Mem|_partial — セッション状態の部分写像を即座に外部化。
 
-**フォーマット** (自由記述 — 軽量であること):
+**トリガー**: 🟡→🟠 遷移時 / 大規模ファイル読込後 / Creator 指示 / BC-18 自動提案
+
+**実行**: `/rom-` を発動（WF 定義は [rom.md](rom.md) 参照）
+
+**フォーマット** (軽量 Snapshot — rom- テンプレート):
 
 ```markdown
-## 中間セーブ (Step XX, ⚡ ~XX%)
+# ROM Snapshot: {slug}
 
-### 今やっていること
+**Date**: {YYYY-MM-DD HH:MM}
+**Step**: {step_number}
+**Fuel**: ⚡ ~{XX}%
+
+## 今やっていること
 {1-2文}
 
-### Creator がこう決めた
+## Creator がこう決めた
 - {判断1}
 
-### 試して失敗 / 却下されたもの
+## 試して失敗 / 却下されたもの
 - {失敗1: 理由}
 
-### 次にやること
+## 次にやること
 {1文}
 ```
 
-保存先: `~/oikos/mneme/.hegemonikon/sessions/savepoint_<date>_<short-id>.md`
+保存先: `~/oikos/mneme/.hegemonikon/rom/rom_<date>_<HHMM>_snapshot_<slug>.md`
 
 ### Context Rot 検知 (Deadlock Detection)
 
@@ -497,6 +534,45 @@ bash ~/oikos/hegemonikon/scripts/agq-check.sh 2>/dev/null | grep -E 'Claude Opus
 - Sophia 知識サマリー — **Mem の学術的対象**
 - FEP A行列読込 — **Mem の構造的射**
 - KI ランダム想起 — **Mem の忘れられた対象の想起**
+- ROM 蒸留コンテキスト — **Mem の中間射影** (v5.7 追加)
+
+### 3.45 ROM 自動読込 — 中間射影の復元 (v5.7 追加)
+
+> **圏論**: /rom WF が生成した中間射影 π(Ses) を L の入力に追加する。
+> なぜ: /rom で焼いたコンテキストは、/boot で復元されないなら書いた意味がない。
+> このフェーズが /rom のフィードバックループを完成させる。
+
+// turbo
+
+```bash
+# ROM ファイルの存在確認と一覧
+ls -1t ~/oikos/mneme/.hegemonikon/rom/rom_*.md 2>/dev/null | head -5
+```
+
+**読込規則**:
+
+| 条件 | 行動 |
+|:-----|:-----|
+| /boot- | スキップ可（高速起動優先） |
+| /boot | 最新 2-3 件の exec_summary のみ読込 |
+| /boot+ | 最新 5 件を精読。ROM VSearch も実行 |
+| Focus モード | intent に関連する ROM のみVSearch で引く |
+
+**ROM VSearch** (ROM が多い場合):
+
+// turbo
+
+```bash
+cd ~/oikos/hegemonikon && PYTHONPATH=. .venv/bin/python mekhane/anamnesis/cli.py search "{query}" --source rom --limit 3
+```
+
+結果があれば boot レポートの「📼 ROM」セクションとして表示:
+
+```
+📼 ROM (蒸留コンテキスト):
+  [1] {title} — {exec_summary}
+  [2] {title} — {exec_summary}
+```
 
 ### 3.5 Gnōsis Boot Recall — ベクトル検索による Mem 探索
 
@@ -642,13 +718,92 @@ cd ~/oikos/hegemonikon && PYTHONPATH=. .venv/bin/python mekhane/symploke/boot_in
 
 ---
 
+## Focus モード実行フロー
+
+> **発動条件**: `/boot タスク名` と入力された場合
+> **FEP 的意味**: intent あり = Exploit モード = π をタスクに集中配分
+> **圏論**: L の定義域を Mem 全体ではなく Mem|_intent (intent に関連する部分圏) に制限する
+
+// turbo-all
+
+### Step 1: Quota チェック (燃料は常に確認)
+
+```bash
+bash ~/oikos/hegemonikon/scripts/agq-check.sh 2>/dev/null | grep -E 'Claude Opus|Prompt Credits'
+```
+
+### Step 2: タスク関連 Handoff 検索 (VSearch)
+
+> 全 Handoff を読む代わりに、intent に関連するものだけをベクトル検索で引く。
+
+```bash
+cd ~/oikos/hegemonikon && PYTHONPATH=. .venv/bin/python mekhane/anamnesis/cli.py search "{タスクテキスト}" --source handoff --limit 3
+```
+
+関連 Handoff があれば内容を確認し、前回の文脈を最小限で復元する。
+
+### Step 3: 簡易 Intent-WAL 生成
+
+```yaml
+intent_wal:
+  session_goal: "{タスクテキストをそのまま使用}"
+  scope_boundary:
+    max_steps: 30
+    max_topics: 1        # Focus = 単一トピック
+    checkpoint_interval: 20
+  focus_mode: true       # Focus モードフラグ
+```
+
+### Step 4: Focus レポート出力
+
+```
+🎯 BOOT FOCUS: {タスク名}
+⚡ Quota: ~{remain}%
+🔗 関連 Handoff: {VSearch 結果 0-3件の要約}
+📋 Intent-WAL: session_goal = {タスク名}
+→ 作業開始
+```
+
+### Phase スキップ表
+
+| Phase | Focus での扱い | 理由 |
+|:------|:--------------|:-----|
+| 0: Identity | ⛔ 省略 | Rules/GEMINI.md で既にロード済み |
+| 0.1: Self-Profile | ⛔ 省略 | 短いタスクでは不要 |
+| 1: 正本読込 | ⛔ 省略 | Focus モード自体が boot.md 機能 |
+| 2.1: 週次レビュー | ⛔ 省略 | タスク focused |
+| 2.2: Handoff | 🔍 **VSearch のみ** | intent 関連だけ引く (Step 2) |
+| 2.3: 目的リマインド | ⛔ 省略 | intent 自体が目的 |
+| 2.4: Drift 診断 | ⛔ 省略 | |
+| 2.5: Intent-WAL | ✅ **簡易版** | Step 3 で生成 |
+| 2.7: Quota | ✅ **実行** | Step 1 で実行 |
+| 2.7: Sentinel/Sessions | ⛔ 省略 | タスク focused |
+| 3: 知識読込 | ⛔ 省略 | タスクに不要 |
+| 3.5-3.6: Gnōsis/PKS | ⛔ 省略 | タスクに不要 |
+| 4: システム更新 | ⛔ 省略 | Skill は必要時に読む |
+| 5: 外部入力 | ⛔ 省略 | タスクに不要 |
+| 6: 出力 | 📋 **最小レポート** | Step 4 で出力 |
+
+> **省略の根拠**: Focus モードは「目的が明確な短いセッション」を想定。
+> 長時間の探索的セッションでは従来の `/boot` を使うべき。
+
+### Focus + 既存派生の組み合わせ
+
+| 入力 | Focus | 深度 | 結果 |
+|:-----|:------|:-----|:-----|
+| `/boot タスク名` | ✅ | standard | Focus 標準 |
+| `/boot- タスク名` | ✅ | fast | Focus + 最小 (VSearch も省略) |
+| `/boot+ タスク名` | ✅ | detailed | Focus + Handoff 精読 (VSearch 結果を深読み) |
+
+---
+
 ## Hegemonikón Status
 
 | Module | Workflow | Status |
 |:-------|:---------|:-------|
-| O1, H4 | /boot | v5.0 Ready |
+| O1, H4 | /boot | v5.6 Ready |
 
-> **制約リマインダ**: Phase 0→6 を順序通り実行すること。スキップ禁止。
+> **制約リマインダ**: 通常モードでは Phase 0→6 を順序通り実行すること。Focus モードでは Step 1→4 を実行。
 
 ---
 
@@ -657,3 +812,5 @@ cd ~/oikos/hegemonikon && PYTHONPATH=. .venv/bin/python mekhane/symploke/boot_in
 *v5.1 — Intent-WAL (Phase 2.5) 追加。随伴のη明示化 (2026-02-10)*
 *v5.2 — Quota API チェック + Quota-Based Turtle Mode (Phase 2.7) 追加。agq-check.sh ネイティブ統合、Claude 残量 ≤ 20% で自動 /bye 提案 (2026-02-12)*
 *v5.3 — セッション履歴サマリー (Phase 2.7) 追加。agq-sessions.sh で過去セッション一覧を /boot 時に自動表示 (2026-02-13)*
+*v5.6 — Focus モード追加。`/boot タスク名` でタスク駆動の選択的起動。π配分の最適化 (2026-02-14)*
+*v5.7 — ROM 統合: Savepoint→/rom- 吸収、Phase 3.45 ROM自動読込追加、VSearch に ROM 検索追加 (2026-02-14)*

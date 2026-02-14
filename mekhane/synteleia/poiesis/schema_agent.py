@@ -10,7 +10,8 @@ FEP: 世界モデルの構造化
 """
 
 import re
-from typing import List, Dict
+from pathlib import Path
+from typing import Dict, List
 
 from ..base import (
     AgentResult,
@@ -20,6 +21,11 @@ from ..base import (
     AuditTarget,
     AuditTargetType,
 )
+from ..pattern_loader import (
+    load_patterns, parse_pattern_list,
+)
+
+_PATTERNS_YAML = Path(__file__).parent / "patterns.yaml"
 
 
 # PURPOSE: 構造設計エージェント (S-Agent)
@@ -29,28 +35,37 @@ class SchemaAgent(AuditAgent):
     name = "SchemaAgent"
     description = "構造の妥当性を検証 — 「どう組むか」"
 
-    # 構造的問題パターン
-    STRUCTURE_PROBLEMS = [
-        (r"(?:^|\n)#{1,6}\s+.+\n(?:^|\n)#{1,6}\s+.+\n(?:^|\n)#{1,6}\s+", 
+    # Fallback values
+    _FALLBACK_STRUCTURE = [
+        (r"(?:^|\n)#{1,6}\s+.+\n(?:^|\n)#{1,6}\s+.+\n(?:^|\n)#{1,6}\s+",
          "S-001", "見出しが連続 — 本文が欠落している可能性"),
         (r"\n{4,}", "S-002", "過剰な空行 — 構造を見直してください"),
         (r"(?:^|\n)-\s+.{200,}", "S-003", "リスト項目が長すぎる — 分割を検討"),
     ]
 
-    # 階層構造の問題
-    HIERARCHY_PROBLEMS = [
+    _FALLBACK_HIERARCHY = [
         (r"(?:^|\n)###\s+(?!.*\n##\s+)", "S-010", "h3 が h2 なしに出現"),
         (r"(?:^|\n)####\s+(?!.*\n###\s+)", "S-011", "h4 が h3 なしに出現"),
     ]
+
+    def __init__(self):
+        loaded = load_patterns(_PATTERNS_YAML, "schema")
+        self.STRUCTURE_PROBLEMS = parse_pattern_list(
+            loaded.get("structure_problems"), self._FALLBACK_STRUCTURE
+        )
+        self.HIERARCHY_PROBLEMS = parse_pattern_list(
+            loaded.get("hierarchy_problems"), self._FALLBACK_HIERARCHY
+        )
 
     # PURPOSE: 構造の妥当性を監査
     def audit(self, target: AuditTarget) -> AgentResult:
         """構造の妥当性を監査"""
         issues: List[AuditIssue] = []
         content = target.content
+        stripped = target.stripped_content
 
-        # 構造的問題を検出
-        issues.extend(self._check_structure_problems(content))
+        # 構造的問題を検出 (stripped で文字列/コメント内パターン除外)
+        issues.extend(self._check_structure_problems(stripped))
 
         # マークダウンの階層をチェック
         if target.target_type in (AuditTargetType.PLAN, AuditTargetType.GENERIC):
@@ -75,6 +90,7 @@ class SchemaAgent(AuditAgent):
     def _check_structure_problems(self, content: str) -> List[AuditIssue]:
         """構造的問題を検出"""
         issues = []
+        # content はすでに stripped_content 経由で文字列/コメント除去済み
 
         for pattern, code, message in self.STRUCTURE_PROBLEMS:
             for match in re.finditer(pattern, content, re.MULTILINE):

@@ -10,6 +10,7 @@ FEP: 世界モデルの構築・認識
 """
 
 import re
+from pathlib import Path
 from typing import List
 
 from ..base import (
@@ -20,6 +21,9 @@ from ..base import (
     AuditTarget,
     AuditTargetType,
 )
+from ..pattern_loader import load_patterns, parse_pattern_list
+
+_PATTERNS_YAML = Path(__file__).parent / "patterns.yaml"
 
 
 # PURPOSE: 本質洞察エージェント (O-Agent)
@@ -29,8 +33,8 @@ class OusiaAgent(AuditAgent):
     name = "OusiaAgent"
     description = "本質の明確さを検証 — 「これは何か」"
 
-    # 本質が不明確なパターン
-    VAGUE_PATTERNS = [
+    # Fallback patterns (used when YAML unavailable)
+    _FALLBACK_VAGUE = [
         (r"\bこれ\b(?!は)", "O-001", "「これ」の指示対象が不明確"),
         (r"\bそれ\b(?!は)", "O-002", "「それ」の指示対象が不明確"),
         (r"\bあれ\b", "O-003", "「あれ」の指示対象が不明確"),
@@ -39,12 +43,20 @@ class OusiaAgent(AuditAgent):
         (r"\.\.\.(?!\s*\])", "O-006", "省略記号は本質を隠す"),
     ]
 
-    # 定義の欠如パターン
-    UNDEFINED_PATTERNS = [
-        (r"\b\w+\s+(?:とは|is|means)\b", None, None),  # 定義あり = OK
-        (r"def\s+\w+\([^)]*\):", None, None),  # 関数定義あり = OK
-        (r"class\s+\w+[^:]*:", None, None),  # クラス定義あり = OK
+    _FALLBACK_UNDEFINED = [
+        (r"\b\w+\s+(?:とは|is|means)\b", None, None),
+        (r"def\s+\w+\([^)]*\):", None, None),
+        (r"class\s+\w+[^:]*:", None, None),
     ]
+
+    def __init__(self):
+        loaded = load_patterns(_PATTERNS_YAML, "ousia")
+        self.VAGUE_PATTERNS = parse_pattern_list(
+            loaded.get("vague_patterns"), self._FALLBACK_VAGUE
+        )
+        self.UNDEFINED_PATTERNS = parse_pattern_list(
+            loaded.get("undefined_patterns"), self._FALLBACK_UNDEFINED
+        )
 
     # PURPOSE: 本質の明確さを監査
     def audit(self, target: AuditTarget) -> AgentResult:

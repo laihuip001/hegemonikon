@@ -176,10 +176,7 @@ async def audit(request: AuditRequest):
             multi_l2_escalated = True
 
         # WBC 自動連携: HIGH/CRITICAL 検出時に Sympatheia WBC へ通知
-        wbc_alerted = False
-        wbc_alert = orchestrator.to_wbc_alert(result)
-        if wbc_alert:
-            wbc_alerted = _notify_wbc(wbc_alert)
+        wbc_alerted = orchestrator.notify_wbc(result)
 
         # レスポンス構築
         agent_results = []

@@ -9,6 +9,7 @@ CCL: /dia.lex
 """
 
 import re
+from pathlib import Path
 from typing import Dict, List, Set
 
 from ..base import (
@@ -19,6 +20,22 @@ from ..base import (
     AuditTarget,
     AuditTargetType,
 )
+from ..pattern_loader import (
+    load_patterns,
+    parse_pattern_list,
+    parse_pattern_list_with_severity,
+    parse_string_dict,
+)
+
+_PATTERNS_YAML = Path(__file__).parent / "patterns.yaml"
+
+_SEVERITY_MAP = {
+    "critical": AuditSeverity.CRITICAL,
+    "high": AuditSeverity.HIGH,
+    "medium": AuditSeverity.MEDIUM,
+    "low": AuditSeverity.LOW,
+    "info": AuditSeverity.INFO,
+}
 
 
 # PURPOSE: 演算子理解検証エージェント
@@ -28,8 +45,8 @@ class OperatorAgent(AuditAgent):
     name = "OperatorAgent"
     description = "記号・演算子が正しく使用されているかを検証"
 
-    # CCL 演算子とその意味
-    CCL_OPERATORS: Dict[str, str] = {
+    # Fallback values
+    _FALLBACK_CCL_OPERATORS: Dict[str, str] = {
         "+": "深化 (deepening)",
         "-": "簡略化 (reduction)",
         "*": "拡張 (expansion)",
@@ -43,16 +60,49 @@ class OperatorAgent(AuditAgent):
         "√": "収束 (convergence)",
         "∫": "統合 (integration)",
         "Σ": "並列 (parallel)",
+        "@": "マクロ呼出 (macro invocation)",
     }
 
-    # よくある誤用パターン
-    MISUSE_PATTERNS = [
+    _FALLBACK_MISUSE = [
         (r"/\w+\+\+", "OP-001", "++ は無効な演算子。+ を使用してください"),
         (r"/\w+--", "OP-002", "-- は無効な演算子。- を使用してください"),
         (r"\*\*\*", "OP-003", "*** は過剰なメタ化。** 以下を推奨"),
         (r"~~", "OP-004", "~~ は無効。振動は ~ 1つで表現"),
         (r"/\w+\s+/\w+", "OP-005", "ワークフロー間にスペース。>> または _ を使用"),
     ]
+
+    _FALLBACK_STYLE = [
+        (r"==\s*True\b", "OP-020", "== True は冗長。直接 if x: を使用", "low"),
+        (r"==\s*False\b", "OP-021", "== False は冗長。if not x: を使用", "low"),
+        (r"!=\s*None\b", "OP-022", "!= None より is not None を推奨", "low"),
+        (r"==\s*None\b", "OP-023", "== None より is None を推奨", "low"),
+    ]
+
+    _FALLBACK_SECURITY = [
+        (r"\beval\s*\(", "SEC-001", "eval() は任意コード実行の脆弱性。ast.literal_eval() を検討", "critical"),
+        (r"\bexec\s*\(", "SEC-002", "exec() は任意コード実行の脆弱性", "critical"),
+        (r"\bos\.system\s*\(", "SEC-003", "os.system() は OS コマンドインジェクションの危険。subprocess.run() を推奨", "high"),
+        (r"\bsubprocess\.\w+\(.*shell\s*=\s*True", "SEC-004", "shell=True はコマンドインジェクションの危険", "high"),
+        (r"\b__import__\s*\(", "SEC-005", "__import__() は動的インポートの脆弱性。importlib を検討", "medium"),
+        (r"\bpickle\.loads?\s*\(", "SEC-006", "pickle は任意コード実行の脆弱性。信頼できないデータに使用禁止", "high"),
+        (r"\byaml\.load\s*\((?!.*Loader\s*=)", "SEC-007", "yaml.load() は unsafe。yaml.safe_load() を使用", "high"),
+        (r"\binput\s*\(.*\)", "SEC-008", "input() はサーバーサイドでは危険。Web フレームワーク経由を推奨", "low"),
+    ]
+
+    def __init__(self):
+        loaded = load_patterns(_PATTERNS_YAML, "operator")
+        self.CCL_OPERATORS = parse_string_dict(
+            loaded.get("ccl_operators"), self._FALLBACK_CCL_OPERATORS
+        )
+        self.MISUSE_PATTERNS = parse_pattern_list(
+            loaded.get("misuse_patterns"), self._FALLBACK_MISUSE
+        )
+        self.STYLE_PATTERNS = parse_pattern_list_with_severity(
+            loaded.get("style_patterns"), self._FALLBACK_STYLE
+        )
+        self.SECURITY_PATTERNS = parse_pattern_list_with_severity(
+            loaded.get("security_patterns"), self._FALLBACK_SECURITY
+        )
 
     # PURPOSE: 演算子理解を監査
     def audit(self, target: AuditTarget) -> AgentResult:
@@ -63,9 +113,9 @@ class OperatorAgent(AuditAgent):
         if target.target_type == AuditTargetType.CCL_OUTPUT:
             issues.extend(self._check_ccl_operators(target.content))
 
-        # コードの場合は構文チェック
+        # コードの場合は構文チェック (stripped で文字列/コメント内パターン除外)
         elif target.target_type == AuditTargetType.CODE:
-            issues.extend(self._check_code_operators(target.content))
+            issues.extend(self._check_code_operators(target.stripped_content))
 
         # 汎用の場合は両方
         else:
@@ -126,15 +176,8 @@ class OperatorAgent(AuditAgent):
         """コード内の演算子使用をチェック"""
         issues = []
 
-        # 冗長な演算子パターン
-        style_patterns = [
-            (r"==\s*True\b", "OP-020", "== True は冗長。直接 if x: を使用", AuditSeverity.LOW),
-            (r"==\s*False\b", "OP-021", "== False は冗長。if not x: を使用", AuditSeverity.LOW),
-            (r"!=\s*None\b", "OP-022", "!= None より is not None を推奨", AuditSeverity.LOW),
-            (r"==\s*None\b", "OP-023", "== None より is None を推奨", AuditSeverity.LOW),
-        ]
-
-        for pattern, code, message, severity in style_patterns:
+        for pattern, code, message, severity_str in self.STYLE_PATTERNS:
+            severity = _SEVERITY_MAP.get(severity_str, AuditSeverity.LOW)
             for match in re.finditer(pattern, content):
                 issues.append(
                     AuditIssue(
@@ -146,19 +189,8 @@ class OperatorAgent(AuditAgent):
                     )
                 )
 
-        # セキュリティ危険パターン (HIGH/CRITICAL)
-        security_patterns = [
-            (r"\beval\s*\(", "SEC-001", "eval() は任意コード実行の脆弱性。ast.literal_eval() を検討", AuditSeverity.CRITICAL),
-            (r"\bexec\s*\(", "SEC-002", "exec() は任意コード実行の脆弱性", AuditSeverity.CRITICAL),
-            (r"\bos\.system\s*\(", "SEC-003", "os.system() は OS コマンドインジェクションの危険。subprocess.run() を推奨", AuditSeverity.HIGH),
-            (r"\bsubprocess\.\w+\(.*shell\s*=\s*True", "SEC-004", "shell=True はコマンドインジェクションの危険", AuditSeverity.HIGH),
-            (r"\b__import__\s*\(", "SEC-005", "__import__() は動的インポートの脆弱性。importlib を検討", AuditSeverity.MEDIUM),
-            (r"\bpickle\.loads?\s*\(", "SEC-006", "pickle は任意コード実行の脆弱性。信頼できないデータに使用禁止", AuditSeverity.HIGH),
-            (r"\byaml\.load\s*\((?!.*Loader\s*=)", "SEC-007", "yaml.load() は unsafe。yaml.safe_load() を使用", AuditSeverity.HIGH),
-            (r"\binput\s*\(.*\)", "SEC-008", "input() はサーバーサイドでは危険。Web フレームワーク経由を推奨", AuditSeverity.LOW),
-        ]
-
-        for pattern, code, message, severity in security_patterns:
+        for pattern, code, message, severity_str in self.SECURITY_PATTERNS:
+            severity = _SEVERITY_MAP.get(severity_str, AuditSeverity.HIGH)
             for match in re.finditer(pattern, content, re.DOTALL):
                 issues.append(
                     AuditIssue(

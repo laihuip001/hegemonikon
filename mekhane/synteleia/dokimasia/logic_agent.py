@@ -9,6 +9,7 @@ CCL: /dia-
 """
 
 import re
+from pathlib import Path
 from typing import List, Set, Tuple
 
 from ..base import (
@@ -19,6 +20,11 @@ from ..base import (
     AuditTarget,
     AuditTargetType,
 )
+from ..pattern_loader import (
+    load_patterns, parse_pattern_list, parse_pair_list,
+)
+
+_PATTERNS_YAML = Path(__file__).parent / "patterns.yaml"
 
 
 # PURPOSE: 論理矛盾検出エージェント
@@ -28,8 +34,8 @@ class LogicAgent(AuditAgent):
     name = "LogicAgent"
     description = "論理的矛盾を高速検出"
 
-    # 対立キーワードペア
-    CONTRADICTION_PAIRS = [
+    # Fallback values
+    _FALLBACK_CONTRADICTIONS = [
         ("必須", "任意"),
         ("常に", "決して"),
         ("全て", "一部"),
@@ -41,14 +47,22 @@ class LogicAgent(AuditAgent):
         ("true", "false"),
     ]
 
-    # 論理的に危険なパターン
-    LOGIC_PATTERNS = [
+    _FALLBACK_LOGIC = [
         (r"\bif\s+True\b", "LOG-001", "if True は常に実行される無意味な条件"),
         (r"\bif\s+False\b", "LOG-002", "if False は決して実行されない"),
-        (r"\bwhile\s+True\b.*\bbreak\b", None, None),  # OK パターン（breakあり）
+        (r"\bwhile\s+True\b.*\bbreak\b", None, None),
         (r"\bwhile\s+True\b(?!.*\bbreak\b)", "LOG-003", "無限ループの可能性"),
-        (r"\breturn\b.*\n.*\breturn\b", "LOG-004", "到達不能な return 文の可能性"),
+        (r"^([ \t]+)return\b.*\n\1return\b", "LOG-004", "到達不能な return 文の可能性"),
     ]
+
+    def __init__(self):
+        loaded = load_patterns(_PATTERNS_YAML, "logic")
+        self.CONTRADICTION_PAIRS = parse_pair_list(
+            loaded.get("contradiction_pairs"), self._FALLBACK_CONTRADICTIONS
+        )
+        self.LOGIC_PATTERNS = parse_pattern_list(
+            loaded.get("logic_patterns"), self._FALLBACK_LOGIC
+        )
 
     # PURPOSE: 論理矛盾を監査
     def audit(self, target: AuditTarget) -> AgentResult:
@@ -56,15 +70,16 @@ class LogicAgent(AuditAgent):
         issues: List[AuditIssue] = []
 
         content = target.content
+        stripped = target.stripped_content
 
         # 対立キーワードの共存検出
-        issues.extend(self._check_contradictions(content))
+        issues.extend(self._check_contradictions(stripped))
 
         # 論理パターンチェック
-        issues.extend(self._check_logic_patterns(content))
+        issues.extend(self._check_logic_patterns(stripped))
 
         # 自己否定チェック
-        issues.extend(self._check_self_negation(content))
+        issues.extend(self._check_self_negation(stripped))
 
         passed = not any(
             i.severity in (AuditSeverity.CRITICAL, AuditSeverity.HIGH) for i in issues
@@ -81,6 +96,7 @@ class LogicAgent(AuditAgent):
     def _check_contradictions(self, content: str) -> List[AuditIssue]:
         """対立キーワードの共存を検出"""
         issues = []
+        # stripped_content はすでに文字列/コメント除去済み
         content_lower = content.lower()
 
         for word1, word2 in self.CONTRADICTION_PAIRS:

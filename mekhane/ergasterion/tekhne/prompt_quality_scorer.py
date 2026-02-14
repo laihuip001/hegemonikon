@@ -580,6 +580,24 @@ def check_convergence_policy(archetype: Optional[str], fmt: str) -> list[str]:
 def score_prompt(filepath: str) -> QualityReport:
     """Score a prompt file and return a QualityReport."""
     content = Path(filepath).read_text(encoding="utf-8")
+    return _score_content(content, filepath=filepath)
+
+
+def score_prompt_text(content: str, name: str = "<inline>") -> QualityReport:
+    """Score prompt content directly (without reading from file).
+
+    Args:
+        content: The prompt text to score
+        name: Display name for the report
+
+    Returns:
+        QualityReport with scoring results
+    """
+    return _score_content(content, filepath=name)
+
+
+def _score_content(content: str, filepath: str = "<inline>") -> QualityReport:
+    """Internal scoring logic shared by score_prompt and score_prompt_text."""
     fmt = detect_format(content)
     archetype = detect_archetype(content)
 

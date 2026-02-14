@@ -1,13 +1,36 @@
-# AGENTS.md - Hegemonikon v4.0
+# AGENTS.md - Hegemonikon v5.0
 
 > **FEP (Free Energy Principle) に基づく認知ハイパーバイザーフレームワーク**
 > Jules が自動読み込みするプロジェクト情報ファイル
 
-## 体系
+## 認知フレームワーク概要
 
-| 公理 | 定理 | 関係 | 総数 |
-|:----:|:----:|:----:|:----:|
-| 1 | 6+24 | 108 | **103 (核)** |
+Hegemonikón は**唯一の公理 (FEP: 予測誤差最小化)** から全体系を導出する:
+
+```
+1 公理 (FEP) → 6 座標 → 24 定理 (6 Series × 4) → 108 関係
+```
+
+| Series | 名称 | 役割 | 例 |
+|:-------|:-----|:-----|:---|
+| **O** | Ousia (本質) | 認識・意志・探求・行為 | `/noe` = 深い認識 |
+| **S** | Schema (様態) | 解釈・方法・計画・実践 | `/mek` = 方法配置 |
+| **H** | Hormē (傾向) | 直感・確信・欲求・信念 | `/pis` = 確信度評価 |
+| **P** | Perigraphē (条件) | 文脈・資源・制約・時間 | 環境条件の配置 |
+| **K** | Kairos (文脈) | 機会・知恵・統合・精度 | `/sop` = 知恵の調査 |
+| **A** | Akribeia (精密) | 厳密性・判定・知識・検証 | `/dia` = 判定力 |
+
+---
+
+## 設計5原則
+
+| # | 原則 | 意味 | コード上の判定基準 |
+|:--|:-----|:-----|:-----------------|
+| 1 | **Reduced Complexity** | 10倍→1/10に圧縮 | 不要な抽象化がない |
+| 2 | **Intuitive Logic** | 説明不要の構造 | 関数名だけで動作が分かる |
+| 3 | **Obsessive Detail** | 細部に神が宿る | エッジケースが処理されている |
+| 4 | **Form Follows Function** | 機能→美 | 装飾的なコードがない |
+| 5 | **Consistency Over Cleverness** | パターン優先 | 既存パターンに従っている |
 
 ---
 
@@ -102,12 +125,71 @@ hegemonikon/
 
 ---
 
+## モジュール依存フロー
+
+```
+kernel/ (理論) → hermeneus/ (CCL) → mekhane/ (実装)
+                                      ├── symploke/ ← specialist review
+                                      ├── dendron/  ← 品質チェック
+                                      ├── peira/    ← 健全性監視
+                                      ├── ochema/   ← LLM ルーティング
+                                      └── ergasterion/ ← 論文分析
+```
+
+---
+
 ## Specialist Review の目的
 
 Jules の specialist review は **ニッチな知的発見** を目的としている。
 一般的な lint (ruff, mypy) が検出する問題は対象外。
 既存ツールでは見つけられない **設計・構造・美学** の問題を発見することが期待される。
 
+**良いフィードバックとは**:
+
+1. 設計レベルの洞察 — 隠れた結合、責務の肥大化
+2. 美的判断 — 視覚的リズム、命名の調和
+3. パターン逸脱 — 確立された設計哲学からの偏差
+4. 問題がなければ **SILENCE** — 問題を製造しない
+
 ---
 
-*Hegemonikón v4.0 — specialist review 対応 (2026-02-14)*
+## Knowledge Base CLI
+
+プロジェクトの知識基盤 (34K+ ドキュメント) を検索するための CLI が利用可能:
+
+```bash
+# 知識検索
+./scripts/hegemonikon-kb search "free energy principle prediction"
+
+# 論文検索
+./scripts/hegemonikon-kb paper "attention mechanism"
+
+# CCL 構文解析
+./scripts/hegemonikon-kb ccl "/noe+_/dia"
+
+# システム状態
+./scripts/hegemonikon-kb status
+```
+
+> **Note**: Gateway への接続が必要 (`HGK_GATEWAY_URL`, `HGK_GATEWAY_TOKEN`)。
+> オフラインの場合は `mekhane/symploke/context/*.md` にプリ生成されたドメイン知識がある。
+
+---
+
+## ドメイン知識 (context/)
+
+`mekhane/symploke/context/` にテーマ別のドメイン知識ファイルがある:
+
+| ファイル | 内容 |
+|:---------|:-----|
+| `hgk_knowledge.md` | FEP 概要、6 Series、設計原則、アーキテクチャパターン |
+| `fep_foundation.md` | FEP 理論基盤の詳細 |
+| `design_patterns.md` | 設計パターンとアーキテクチャ |
+| `ccl_language.md` | CCL 言語の構文と使い方 |
+| `quality_assurance.md` | 品質保証パターン (PROOF.md, Dendron) |
+
+レビュー時に対象ファイルのドメインに応じてこれらを参照すること。
+
+---
+
+*Hegemonikón v6.0 — KB Bridge 統合 (2026-02-14)*

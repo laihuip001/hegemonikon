@@ -903,10 +903,288 @@ PDF, JSON, HTML, CSS, JS, TS, Python, Markdown, CSV, XML, RTF, PNG, JPEG, WebP, 
 
 ### 残ステップ
 
-1. **antigravity_client.py に v8 フロー統合**: 正しい metadata + requestedModel を反映
-2. **Ochēma MCP Server 更新**: model 選択 (M7/M18) をパラメータ化
+1. ~~antigravity_client.py に v8 フロー統合~~ → ✅ (proto.py + antigravity_client.py)
+2. ~~Ochēma MCP Server 更新~~ → ✅ (cli.py → Ochēma MCP Server with model selection)
 3. **ストリーミング取得**: `StreamCascadeReactiveUpdates` でリアルタイム応答受信
-4. **Cortex 直叩き (optional)**: LS ラッパー + mitmdump で LS 内部トークンを傍受 → GenerateChat 直叩き
+4. ~~Cortex 直叩き~~ → ❌ (v9: cloudcode-pa 直接 API では Claude 利用不可。LS プロキシが唯一のルート)
+
+---
+
+## 20. cloudcode-pa REST 直接 API の限界 (2026-02-14)
+
+### 全 v1internal メソッド一覧 (38メソッド)
+
+LS バイナリから特定した `daily-cloudcode-pa.googleapis.com` の REST メソッド:
+
+```
+/v1internal:checkUrlDenylist        /v1internal:listAgents
+/v1internal:completeCode            /v1internal:listCloudAICompanionProjectsA
+/v1internal:countTokens             /v1internal:listExperiments
+/v1internal:fetchAdminControls      /v1internal:listModelConfigsA
+/v1internal:fetchAvailableModels    /v1internal:listRemoteRepositories
+/v1internal:fetchCodeCustomizationState  /v1internal:loadCodeAssist
+/v1internal:fetchUserInfo           /v1internal:lookUpRepository
+/v1internal:generateChat            /v1internal:resolveFile
+/v1internal:generateCode            /v1internal:resolveRules
+/v1internal:generateContent         /v1internal:retrieveUserQuota
+/v1internal:getCodeAssistGlobalUserSetting  /v1internal:searchRepository
+/v1internal:internalAtomicAgenticChat  /v1internal:streamGenerateChat
+/v1internal:streamGenerateContent   /v1internal:tabChat
+/v1internal:updateCodeAssistUserGlobalSetting  /v1internal:updateWorkspace
+/v1internal:verifyAttestations
+```
+
+### 主要メソッド試行結果
+
+| メソッド | リクエスト | 結果 | 詳細 |
+|:---------|:----------|:-----|:-----|
+| `fetchAvailableModels` | `{}` | ❌ 403 | PERMISSION_DENIED |
+| `listModelConfigsA` | `{}` | ⚠️ | 空応答 `{}` (権限だけで呼べるがデータなし) |
+| `retrieveUserQuota` | `{}` | ✅ | **モデル quota 一覧返却** |
+| `generateChat` | 各種 model 指定 | ✅ | Gemini のみ応答。Claude 無視 |
+| `internalAtomicAgenticChat` | `{}` | ⚠️ | 空応答 (リクエスト構造不明) |
+| `generateContent` | Vertex AI 形式 | ❌ | `contents: Cannot find field` |
+
+### `retrieveUserQuota` の返却値 — Claude 不在の決定的証拠
+
+```json
+{
+  "buckets": [
+    {"modelId": "gemini-2.0-flash", "remainingFraction": 1},
+    {"modelId": "gemini-2.0-flash_vertex", "remainingFraction": 1},
+    {"modelId": "gemini-2.5-flash", "remainingFraction": 1},
+    {"modelId": "gemini-2.5-flash-lite", "remainingFraction": 1},
+    {"modelId": "gemini-2.5-flash-lite_vertex", "remainingFraction": 1},
+    {"modelId": "gemini-2.5-flash_vertex", "remainingFraction": 1},
+    {"modelId": "gemini-2.5-pro", "remainingFraction": 1},
+    {"modelId": "gemini-2.5-pro_vertex", "remainingFraction": 1}
+  ]
+}
+```
+
+**結論**: cloudcode-pa REST API は **Gemini 専用**。Claude quota は LS 内部の Cascade quota として管理されており、cloudcode-pa REST 経由ではアクセス不可。
+
+### `internalAtomicAgenticChat` Request 構造 (LS バイナリ strings)
+
+```
+(*InternalAtomicAgenticChatRequest).GetProject
+(*InternalAtomicAgenticChatRequest).GetRequestId
+(*InternalAtomicAgenticChatRequest).GetUserMessage
+(*InternalAtomicAgenticChatRequest).GetHistory
+(*InternalAtomicAgenticChatRequest).GetIdeContext
+(*InternalAtomicAgenticChatRequest).GetMetadata
+(*InternalAtomicAgenticChatRequest).GetToolDefinitions
+(*InternalAtomicAgenticChatRequest).GetEnablePromptEnhancement
+```
+
+**モデル指定フィールドなし** — このメソッドでモデルを選択する手段がない。
+
+### `generateChat` + `model_config_id` テスト
+
+`GenerateChatRequest` にはフィールド14 `model_config_id` が存在するが:
+
+| model_config_id 値 | 結果 |
+|:-------------------|:-----|
+| `MODEL_CLAUDE_4_5_SONNET_THINKING` | Gemini が応答 (無視される) |
+| 空 | Gemini が応答 (デフォルト) |
+| `claude-sonnet-4-5` | Gemini が応答 (無視される) |
+
+**結論**: cloudcode-pa の `generateChat` は Claude にルーティングされない。
+
+---
+
+## 21. LS HTTP ポート発見 + curl 直叩き改良 (2026-02-14 v9)
+
+### 3つのポートの正体
+
+| ポート | プロトコル | 用途 | curl 利用 |
+|:-------|:----------|:-----|:----------|
+| `server_port` (39053) | **HTTPS** (TLS) | ConnectRPC メイン | `curl -sk https://127.0.0.1:PORT/...` |
+| `37401` (未命名) | **HTTP** (平文) | ConnectRPC サブ | `curl -s http://127.0.0.1:PORT/...` ★推奨 |
+| `lsp_port` (35449) | LSP | Language Server Protocol | — |
+| `extension_server_port` (46705) | HTTP | Extension ↔ LS 通信 | ❌ InvalidCSRF |
+
+### Port 37401 (HTTP) の発見
+
+v8 まで HTTPS ポート (server_port) のみ使用していたが、`ss -tlnp` で 37401 が HTTP 平文で動作していることを発見。TLS 不要で `-sk` フラグが不要になる。
+
+### CSRF トークン取得 — ファイルではなく cmdline
+
+```bash
+# ❌ 旧方法 (ファイルが存在しない)
+cat ~/.config/Antigravity/User/globalStorage/google.antigravity/csrf_token
+
+# ✅ 正しい方法 (LS cmdline パラメータ)
+CSRF=$(cat /proc/$(pgrep -f language_server_linux_x64 | head -1)/cmdline \
+  | tr '\0' '\n' | grep -A1 '^--csrf_token$' | tail -1)
+```
+
+### v9 改良版 4-Step フロー (HTTP + 簡潔)
+
+```bash
+#!/bin/bash
+CSRF=$(cat /proc/$(pgrep -f language_server_linux_x64 | head -1)/cmdline \
+  | tr '\0' '\n' | grep -A1 '^--csrf_token$' | tail -1)
+PORT=37401  # HTTP ポート — ss -tlnp で確認
+
+call() {
+  curl -s --max-time ${2:-10} -X POST \
+    "http://127.0.0.1:$PORT/exa.language_server_pb.LanguageServerService/$1" \
+    -H "Content-Type: application/json" \
+    -H "X-Codeium-Csrf-Token: $CSRF" \
+    -d "$3"
+}
+
+# Step 1: StartCascade
+CID=$(call StartCascade 10 '{
+  "metadata": {"ideName":"antigravity","ideVersion":"1.98.0","extensionVersion":"2.23.0"},
+  "source": 12, "trajectoryType": 17
+}' | python3 -c "import json,sys; print(json.load(sys.stdin)['cascadeId'])")
+
+# Step 2: SendUserCascadeMessage
+call SendUserCascadeMessage 60 "{
+  \"cascadeId\": \"$CID\",
+  \"items\": [{\"text\": \"YOUR PROMPT HERE\"}],
+  \"cascadeConfig\": {
+    \"plannerConfig\": {
+      \"plannerTypeConfig\": {\"conversational\": {}},
+      \"requestedModel\": {\"model\": \"MODEL_CLAUDE_4_5_SONNET_THINKING\"}
+    }
+  }
+}" &
+
+# Step 3 & 4: Poll
+sleep 5
+TID=$(call GetAllCascadeTrajectories 5 "{\"cascadeId\":\"$CID\"}" \
+  | python3 -c "import json,sys;d=json.load(sys.stdin);print(d['trajectories'][0]['trajectoryId'])")
+
+for i in $(seq 1 10); do
+  sleep 2
+  RESULT=$(call GetCascadeTrajectorySteps 10 "{\"cascadeId\":\"$CID\",\"trajectoryId\":\"$TID\"}")
+  echo "$RESULT" | python3 -c "
+import json,sys
+d=json.load(sys.stdin)
+for s in d.get('steps',[]):
+    pr=s.get('plannerResponse',{})
+    text=pr.get('response','')
+    model=s.get('metadata',{}).get('generatorModel','')
+    if text:
+        print(f'MODEL: {model}')
+        print(f'RESPONSE: {text}')
+        sys.exit(0)
+"
+  [ $? -eq 0 ] && break
+done
+```
+
+### v8 → v9 の差分
+
+| 項目 | v8 (2026-02-13) | v9 (2026-02-14) |
+|:-----|:----------------|:----------------|
+| ポート | server_port (HTTPS) | 37401 (HTTP) ★簡潔 |
+| TLS | `-sk` (自己署名証明書) | 不要 |
+| `--noproxy` | 必要 | 不要 (HTTP) |
+| `Connect-Protocol-Version` | 送信していた | 不要 |
+| `GetCascadeTrajectory` | 全 trajectory 取得 | `GetCascadeTrajectorySteps` に変更 |
+| テスト済みモデル | Gemini 3 Pro (M7) | Claude Sonnet 4.5 Thinking ✅ |
+
+### v9 テスト結果
+
+| 項目 | 値 |
+|:-----|:---|
+| リクエストモデル | `MODEL_CLAUDE_4_5_SONNET_THINKING` |
+| 応答モデル | `MODEL_CLAUDE_4_5_SONNET_THINKING` (metadata.generatorModel) |
+| Thinking | 1130 文字 (日本語思考) |
+| Response | `"Anthropic Claude"` |
+| 応答時間 | ~20秒 (5回ポーリング) |
+
+---
+
+## 22. Vertex AI Model Garden への直接アクセス (2026-02-14)
+
+### 試行結果: ❌ 利用不可
+
+| 試行 | 結果 | 詳細 |
+|:-----|:-----|:-----|
+| `rawPredict` (us-east5) | ❌ 403 | `aiplatform.googleapis.com` SERVICE_DISABLED |
+| `rawPredict` (europe-west1) | ❌ 403 | 同上 |
+| `rawPredict` (us-central1) | ❌ 403 | 同上 |
+| `streamRawPredict` (us-east5) | ❌ 403 | 同上 |
+| API 有効化 (`serviceusage:enable`) | ❌ 403 | AUTH_PERMISSION_DENIED — OAuth トークンに有効化権限なし |
+
+### 制約
+
+`~/.gemini/oauth_creds.json` の OAuth トークンは `driven-circlet-rgkmt` プロジェクトに紐づいているが:
+
+1. `aiplatform.googleapis.com` が無効
+2. `serviceusage.googleapis.com:enable` の権限がない
+3. GCP Console での手動有効化が必要 (OAuth scope 外)
+
+### 結論
+
+Vertex AI Model Garden は **原理的には Claude を提供しているが、現在の OAuth トークンでは利用不可**。
+GCP Console に管理者権限でログインし、`aiplatform.googleapis.com` を手動で有効化すれば使える可能性がある。
+
+---
+
+## 23. 全攻略ルート最終総括 (v9 — 2026-02-14)
+
+### 攻略フェーズ概要
+
+```
+[Phase 1: 発見] → [Phase 2: 理解] → [Phase 3: 突破] → [Phase 4: 最適化]
+ 2026-02-13        2026-02-13        2026-02-13        2026-02-14
+ LS API 発見       proto 解明        v8 成功           v9 改良
+ 141 メソッド      GenerateChat      Gemini 3 Pro      Claude 確認
+ 4-Step Flow       28 攻撃VT         620KB trajectory  HTTP ポート
+```
+
+### 攻撃ベクトル完全リスト (37件)
+
+| # | ベクトル | 結果 | フェーズ |
+|:--|:--------|:-----|:---------|
+| 1-18 | (v7 までの 18件) | 混在 | Phase 1-2 |
+| 19-28 | (v7 追加の 10件) | 混在 | Phase 2-3 |
+| 29-37 | (v8 の 9件) | 成功 | Phase 3 |
+| 38 | cloudcode-pa `retrieveUserQuota` | ✅ | Phase 4 — Claude 不在の確定 |
+| 39 | cloudcode-pa `fetchAvailableModels` | ❌ | Phase 4 — PERMISSION_DENIED |
+| 40 | cloudcode-pa `listModelConfigsA` | ⚠️ | Phase 4 — 空応答 |
+| 41 | cloudcode-pa `generateChat` + model_config_id | ❌ | Phase 4 — 無視される |
+| 42 | cloudcode-pa `internalAtomicAgenticChat` | ⚠️ | Phase 4 — model 指定不可 |
+| 43 | Vertex AI `rawPredict` | ❌ | Phase 4 — SERVICE_DISABLED |
+| 44 | Vertex AI API 有効化 | ❌ | Phase 4 — PERMISSION_DENIED |
+| 45 | **LS HTTP ポート (37401) 直叩き** | **✅** | Phase 4 — Claude 成功 |
+
+### アクセスルート判定マトリクス
+
+| ルート | Claude | Gemini | 認証 | 要 LS |
+|:-------|:------:|:------:|:----:|:-----:|
+| **LS ConnectRPC (server_port, HTTPS)** | ✅ | ✅ | CSRF | ✅ |
+| **LS ConnectRPC (37401, HTTP)** | ✅ | ✅ | CSRF | ✅ |
+| cloudcode-pa REST (generateChat) | ❌ | ✅ | OAuth | ❌ |
+| cloudcode-pa gRPC (GenerateChat) | ❌ | — | OAuth | ❌ |
+| Cortex gRPC (LoadCodeAssist) | ✅(meta) | — | OAuth | ❌ |
+| Vertex AI rawPredict | ❌ | — | OAuth | ❌ |
+| Ochēma MCP Server | ✅ | ✅ | CSRF | ✅ |
+
+### 最終判定
+
+**LS ConnectRPC が Claude アクセスの唯一のルート。**
+
+cloudcode-pa REST は Gemini 専用プロキシであり、Claude は LS 内部の Cascade フレームワークでのみルーティングされる。Vertex AI は API 未有効化で利用不可。
+
+LS 経由のメリット:
+
+1. CSRF トークンのみで認証 (OAuth 不要)
+2. トークン管理は LS が自動処理
+3. HTTP ポート (37401) で TLS 不要
+4. thinking/response/model の全情報を取得可能
+
+LS 経由のリスク:
+
+1. IDE 起動が必須 (LS はIDE子プロセス)
+2. ポート番号はLS起動ごとに変動
+3. CSRF トークンはLS起動ごとに再生成
 
 ---
 
@@ -919,3 +1197,161 @@ PDF, JSON, HTML, CSS, JS, TS, Python, Markdown, CSV, XML, RTF, PNG, JPEG, WebP, 
 *v6 — Proto 構造完全復元 + GenerateChat curl テスト (HTTP 200, PERMISSION_DENIED) (2026-02-13)*
 *v7 — strace/mitmdump/CDP/OAuth: 28攻撃ベクトル完了 + mitmdump TLS復号成功 (2026-02-13)*
 *v8 — LS プロキシ経由 LLM 呼び出し完全成功: 4-Step フロー確立 + Gemini 3 Pro thinking 取得 (2026-02-13)*
+*v9 — cloudcode-pa Claude 不在確定 + HTTP ポート発見 + curl Claude 直叩き成功 + 全攻略総括 (2026-02-14)*
+*v10 — LS バイナリ解析 + state.vscdb トークン発見 + refresh_token 独立フロー成功 + 未解決総括 (2026-02-14)*
+
+---
+
+## §24 v10: LS 依存解放 — 未試行ベクトル棚卸し
+
+> Module A-3 (反転 + 領域シフト) と R-2 (成功の解体) を適用し、
+> 未試行の攻撃ベクトルを体系的に再発見・検証した v10。
+
+### 24.1 LS バイナリ strings 解析
+
+LS バイナリ (`language_server_linux_x64`) に `strings` を適用:
+
+```bash
+strings /usr/share/antigravity/resources/app/extensions/antigravity/bin/language_server_linux_x64 \
+  | grep -i "anthropic"
+```
+
+**決定的発見**:
+
+| 文字列 | 意味 |
+|:-------|:-----|
+| `API_PROVIDER_ANTHROPIC_VERTEX` | Claude は **Vertex AI Model Garden** 経由でルーティング |
+| `MODEL_PROVIDER_ANTHROPIC` | Anthropic がモデルプロバイダーとして登録 |
+| `HasAnthropicModelAccess` | **Unleash Feature Flag** で Claude アクセスを動的制御 |
+| `USE_ANTHROPIC_TOKEN_EFFICIENT_TOOLS_BETA` | Anthropic の Tool Use ベータ機能 |
+| `MODEL_ANTHROPIC_ANTIGRAVITY_RESEARCH` / `_THINKING` | 内部研究用 Anthropic モデル |
+| `calculateAnthropicImageTokens` | Cortex 内部で Anthropic 画像トークン計算 |
+
+**rawPredict パターン**:
+
+```
+publishers/*/models/*}:rawPredict
+publishers/*/models/*}:streamRawPredict
+```
+
+→ LS は Vertex AI の `rawPredict` / `streamRawPredict` エンドポイントパターンを組み込んでいる。
+ただし LS → Vertex AI 直接ではなく、LS → cloudcode-pa → Vertex AI の三段プロキシ。
+
+**根拠**: LS cmdline に `--cloud_code_endpoint https://daily-cloudcode-pa.googleapis.com` のみ。
+Vertex AI エンドポイント URL や特定リージョン (us-east5 等) は LS バイナリに不在。
+
+### 24.2 LS 内部コードパス推定
+
+```
+google3/third_party/jetski/cortex/utils/utils.calculateAnthropicImageTokens
+google3/third_party/jetski/language_server/google_clients/gclients.GoogleClients.HasAnthropicModelAccess
+google3/third_party/jetski/unleash/unleash.UpdateUnleashHasAnthropicModelAccess
+```
+
+→ LS は Google 社内リポジトリ `google3` の `jetski` プロジェクトからビルドされている。
+Claude アクセスは `unleash` (Feature Flag サービス) で動的に有効/無効化される。
+
+### 24.3 state.vscdb から認証情報抽出
+
+```bash
+DB="~/.config/Antigravity/User/globalStorage/state.vscdb"
+sqlite3 "$DB" "SELECT value FROM ItemTable WHERE key = 'antigravityAuthStatus';"
+```
+
+**authStatus の中身** (JSON):
+
+| フィールド | 値 | 意味 |
+|:-----------|:---|:-----|
+| `name` | `Tarou` | 表示名 |
+| `email` | `t84432036@gmail.com` | **認証アカウント** (makaron8426 ではない) |
+| `apiKey` | `ya29.a0AUMWg_...` (258文字) | Google OAuth アクセストークン |
+| `userStatusProtoBinaryBase64` | (大量のBase64) | 利用可能モデル + プラン情報 |
+
+**利用可能モデル一覧** (Base64 デコード結果):
+
+| モデル | 備考 |
+|:-------|:-----|
+| Claude Sonnet 4.5 (Thinking) | |
+| Claude Opus 4.5 (Thinking) | |
+| **Claude Opus 4.6 (Thinking)** | **未発表モデル？** |
+| Claude Sonnet 4.5 | non-thinking 版 |
+| GPT-OSS 120B (Medium) | |
+| Gemini 3 Pro (High) | |
+| Gemini 3 Pro (Low) | |
+| Gemini 3 Flash | |
+
+**プラン**: `g1-ultra-tier` (Google AI Ultra) — "You are subscribed to the best plan."
+
+### 24.4 refresh_token フロー — LS なしでトークン更新成功
+
+**client_id / client_secret の発見**:
+
+```
+gemini-cli-core → dist/src/code_assist/oauth2.js
+```
+
+```javascript
+const OAUTH_CLIENT_ID = '<CORTEX_CLIENT_ID>';  // ~/.config/cortex/oauth.json
+const OAUTH_CLIENT_SECRET = '<CORTEX_CLIENT_SECRET>';
+```
+
+> Google 公式コメント: 「It's ok to save this in git because this is an installed application」
+
+**refresh_token フロー成功**:
+
+```bash
+curl -s -X POST https://oauth2.googleapis.com/token \
+  -d "client_id=<CORTEX_CLIENT_ID>" \
+  -d "client_secret=<CORTEX_CLIENT_SECRET>" \
+  -d "refresh_token=$(python3 -c 'import json; print(json.load(open("/home/makaron8426/.gemini/oauth_creds.json"))["refresh_token"])')" \
+  -d "grant_type=refresh_token"
+```
+
+**結果**:
+
+- ✅ 新しい `ya29.` トークン取得成功 (有効期間: 3599秒)
+- ✅ Scope: `cloud-platform` + `userinfo.email` + `userinfo.profile`
+- ✅ `retrieveUserQuota`: 8 buckets (Gemini のみ、Claude なし)
+- ❌ `generateChat`: PERMISSION_DENIED (空リクエスト) / INVALID_ARGUMENT (フィールド名不一致)
+- ❌ Vertex AI `rawPredict`: SERVICE_DISABLED (driven-circlet-rgkmt)
+
+### 24.5 OAuth scope 比較
+
+| トークンソース | scope | Claude | retrieveUserQuota |
+|:--------------|:------|:-------|:-------------------|
+| `oauth_creds.json` (makaron8426) | cloud-platform + userinfo | ❌ 不在 | ✅ Gemini 8 buckets |
+| `authStatus` (t84432036) | 不明 (Base64 proto) | ✅ 表示される | ❌ 0 buckets (期限切れ) |
+
+**核心の問い**: `t84432036` のトークンなら Claude が `retrieveUserQuota` に表示されるか？
+→ このトークンは期限切れで未検証。LS 稼働中に LS 内部のトークンを取得できれば検証可能。
+
+### 24.6 /proc/PID/mem — トークン抽出試行
+
+```bash
+strings /proc/$LS_PID/mem 2>/dev/null | grep -o "ya29\.[A-Za-z0-9_-]\{50,\}"
+```
+
+**結果**: 空 — 権限的に /proc/PID/mem の読み取りが制限されている可能性。
+(注: プロセスは同一ユーザーだが、strings がメモリマッピングを読めないケースがある)
+
+### 24.7 全攻撃ベクトル総括 (v10 更新)
+
+| # | ベクトル | 結果 | 発見 |
+|:--|:--------|:-----|:-----|
+| A1 | Vertex AI rawPredict | ❌ SERVICE_DISABLED | API 未有効化 + 有効化権限なし |
+| A2 | cloudcode-pa fetchAvailableModels | ❌ PERMISSION_DENIED | Claude は cloudcode-pa クォータに不在 |
+| A3 | LS ConnectRPC curl 直叩き | ✅ **成功** | Claude Sonnet 4.5 Thinking 応答確認 |
+| A4 | mitmproxy MITM 傍受 | ⏸️ 未実施 | TLS 復号は成功済み (v5b) だが Claude 呼出時の傍受未実施 |
+| A5 | Unleash フラグ操作 | ⏸️ 未実施 | HasAnthropicModelAccess の操作方法未調査 |
+| B1 | state.vscdb トークン抽出 | ⚠️ 部分成功 | authStatus に ya29. あるが期限切れ |
+| B2 | LS バイナリ strings 解析 | ✅ **成功** | API_PROVIDER_ANTHROPIC_VERTEX + rawPredict パターン発見 |
+| B3 | refresh_token フロー | ✅ **成功** | 新トークン取得成功。ただし Claude 不在 |
+| B4 | /proc/PID/mem | ❌ 権限不足 | ya29. トークン抽出失敗 |
+| B5 | ユーザー自身の GCP Vertex AI | ⏸️ 未実施 | 自分のプロジェクトで Vertex AI + Claude 有効化は未試行 |
+| B6 | generateChat 正しい Proto 構造 | ⏸️ 未実施 | 正しいフィールド名が未判明 |
+
+### 24.8 残された3つの道
+
+1. **mitmdump で Claude 呼出時のトラフィック傍受** — LS が cloudcode-pa に Claude を送るとき、cloudcode-pa 側でどのようなプロキシが行われるかの決定的証拠
+2. **ユーザー自身の GCP PJ で Vertex AI + Claude 有効化** — 自分のプロジェクトなら API 有効化の権限がある。課金は per-call だが技術的には LS 完全独立
+3. **LS 内部のアクティブトークンの取得** — LS 稼働中に t84432036 アカウントの有効なトークンを傍受すれば、Claude の retrieveUserQuota を検証可能

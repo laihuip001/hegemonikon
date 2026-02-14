@@ -5,7 +5,7 @@ version: "7.0"
 skill_ref: ".agent/skills/akribeia/a2-krisis/SKILL.md"
 lcm_state: stable       # draft | beta | stable | deprecated
 layer: "Δ"
-derivatives: [aff, neg, epo, root, devil, steelman, counterfactual, cold_mirror, deliberative, explore]
+derivatives: [aff, neg, epo, root, devil, steelman, counterfactual, cold_mirror, deliberative, explore, fit]
 trigonon:
   series: A
   type: Pure
@@ -104,7 +104,7 @@ category_theory:
 | `epochē` | 判断停止 | 「確信度を宣言」 |
 | `audit` | 消化品質診断 | 「消化できてる？」 |
 | `panorama` | 6層メタ認知スキャン | 「盲点」「見落とし」 |
-| `cross-model` | Cross-Model Verification | 「別のAI」 |
+| `cross-model` | Cross-Model Verification (Cortex Auto) | 「別のAI」「セカンドオピニオン」 |
 | `cold_mirror` | 冷徹な鏡 | 「厳しく」 |
 | `deliberative` | 三視点反復改善 | 「反復改善」 |
 | `explore` | 探索的テスト (UI) | 「触って壊して」「UIテスト」 |
@@ -186,8 +186,8 @@ cd ~/oikos/hegemonikon && python mekhane/anamnesis/cli.py search "{レビュー�
 if 統合・マージ・吸収 の話題:
   → --mode=audit (消化品質診断)
 
-if Gemini/Jules の成果物:
-  → --mode=cross-model (Cross-Model 監査)
+if Gemini/Jules の成果物 or セカンドオピニオン要求:
+  → --mode=cross-model (Cross-Model 監査 + Cortex Auto)
 
 if 空虚語・抽象論 を検出:
   → Buzzword Guillotine 発動
@@ -233,6 +233,7 @@ default:
 
 *v7.1 — FBR 適用 (2026-02-07)*
 *v7.2 — 三角検証方法論 明文化 (2026-02-13)*
+*v7.3 — Cross-Model Cortex Auto 統合 (2026-02-14)*
 
 ---
 

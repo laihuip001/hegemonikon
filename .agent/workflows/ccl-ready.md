@@ -1,5 +1,5 @@
 ---
-description: "見渡す — /bou-_/pro_/kho_/chr_/euk_/tak-_~(/h*/k)_/pis"
+description: "見渡す — /bou-_/pro_/kho_/chr_/euk_/tak-_~(/h*/k)_/pis_/dox-"
 ---
 
 # /ccl-ready: 見渡しマクロ

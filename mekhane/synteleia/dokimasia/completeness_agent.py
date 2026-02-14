@@ -9,7 +9,8 @@ CCL: /dia.epo
 """
 
 import re
-from typing import Dict, List, Set
+from pathlib import Path
+from typing import Any, Dict, List, Set
 
 from ..base import (
     AgentResult,
@@ -19,6 +20,19 @@ from ..base import (
     AuditTarget,
     AuditTargetType,
 )
+from ..pattern_loader import (
+    load_patterns, parse_pattern_list,
+)
+
+_PATTERNS_YAML = Path(__file__).parent / "patterns.yaml"
+
+_TARGET_TYPE_MAP = {
+    "ccl_output": AuditTargetType.CCL_OUTPUT,
+    "plan": AuditTargetType.PLAN,
+    "proof": AuditTargetType.PROOF,
+    "code": AuditTargetType.CODE,
+    "generic": AuditTargetType.GENERIC,
+}
 
 
 # PURPOSE: 完全性検証エージェント
@@ -28,44 +42,25 @@ class CompletenessAgent(AuditAgent):
     name = "CompletenessAgent"
     description = "欠落要素を検出（判断停止モード）"
 
-    # ターゲットタイプごとの必須要素
-    REQUIRED_ELEMENTS: Dict[AuditTargetType, List[str]] = {
-        AuditTargetType.CCL_OUTPUT: [
-            "結論",
-            "conclusion",
-            "summary",
-            "result",
-        ],
-        AuditTargetType.PLAN: [
-            "目的",
-            "goal",
-            "objective",
-            "ステップ",
-            "step",
-            "action",
-        ],
-        AuditTargetType.PROOF: [
-            "PROOF:",
-            "理由",
-            "reason",
-            "why",
-        ],
+    # Fallback values
+    _FALLBACK_REQUIRED: Dict[AuditTargetType, List[str]] = {
+        AuditTargetType.CCL_OUTPUT: ["結論", "conclusion", "summary", "result"],
+        AuditTargetType.PLAN: ["目的", "goal", "objective", "ステップ", "step", "action"],
+        AuditTargetType.PROOF: ["PROOF:", "理由", "reason", "why"],
     }
 
-    # 未完了マーカー
-    INCOMPLETE_MARKERS = [
+    _FALLBACK_INCOMPLETE = [
         (r"\bTODO\b", "COMP-001", "TODO マーカーが残っています"),
         (r"\bFIXME\b", "COMP-002", "FIXME マーカーが残っています"),
         (r"\bXXX\b", "COMP-003", "XXX マーカーが残っています"),
         (r"\bHACK\b", "COMP-004", "HACK マーカーが残っています"),
         (r"\.\.\.(?!\s*\]|\s*\))", "COMP-005", "省略記号 ... が残っています"),
-        (r"\bpass\s*$", "COMP-006", "空の pass 文があります"),
+        (r"(?<!@abstractmethod\n)\s+pass\s*$", "COMP-006", "空の pass 文があります"),
         (r'raise\s+NotImplementedError', "COMP-007", "NotImplementedError が残っています"),
         (r"\?\?\?", "COMP-008", "??? プレースホルダーが残っています"),
     ]
 
-    # 空のブロックパターン
-    EMPTY_PATTERNS = [
+    _FALLBACK_EMPTY = [
         (r"def\s+\w+\([^)]*\):\s*\n\s*pass\s*$", "COMP-010", "空の関数定義"),
         (r"class\s+\w+[^:]*:\s*\n\s*pass\s*$", "COMP-011", "空のクラス定義"),
         (r"if\s+[^:]+:\s*\n\s*pass\s*$", "COMP-012", "空の if ブロック"),
@@ -73,28 +68,56 @@ class CompletenessAgent(AuditAgent):
         (r"except[^:]*:\s*\n\s*pass\s*$", "COMP-014", "空の except ブロック"),
     ]
 
+    def __init__(self):
+        loaded = load_patterns(_PATTERNS_YAML, "completeness")
+        self.INCOMPLETE_MARKERS = parse_pattern_list(
+            loaded.get("incomplete_markers"), self._FALLBACK_INCOMPLETE
+        )
+        self.EMPTY_PATTERNS = parse_pattern_list(
+            loaded.get("empty_patterns"), self._FALLBACK_EMPTY
+        )
+        self.REQUIRED_ELEMENTS = self._parse_required_elements(
+            loaded.get("required_elements"), self._FALLBACK_REQUIRED
+        )
+
+    @staticmethod
+    def _parse_required_elements(
+        raw: Any, default: Dict[AuditTargetType, List[str]]
+    ) -> Dict[AuditTargetType, List[str]]:
+        """YAML の required_elements を Dict[AuditTargetType, List[str]] に変換。"""
+        if not isinstance(raw, dict):
+            return default
+        result: Dict[AuditTargetType, List[str]] = {}
+        for key, values in raw.items():
+            target_type = _TARGET_TYPE_MAP.get(str(key))
+            if target_type and isinstance(values, list):
+                result[target_type] = [str(v) for v in values]
+        return result or default
+
     # PURPOSE: 完全性を監査
     def audit(self, target: AuditTarget) -> AgentResult:
         """完全性を監査"""
         issues: List[AuditIssue] = []
 
         content = target.content
+        stripped = target.stripped_content
         is_diff = self._is_diff_content(content)
 
         # diff 入力の場合、追加行のみに正規化
         normalized = self._normalize_diff_content(content) if is_diff else content
+        normalized_stripped = self._normalize_diff_content(stripped) if is_diff else stripped
 
-        # 未完了マーカー検出 (diff の場合は追加行のみ)
-        issues.extend(self._check_incomplete_markers(normalized))
+        # 未完了マーカー検出 (stripped で文字列/コメント内のマーカー除外)
+        issues.extend(self._check_incomplete_markers(normalized_stripped))
 
-        # 空のブロック検出 (diff の場合は追加行のみ)
-        issues.extend(self._check_empty_blocks(normalized))
+        # 空のブロック検出 (stripped で文字列/コメント内のパターン除外)
+        issues.extend(self._check_empty_blocks(normalized_stripped))
 
         # タイプ固有の必須要素チェック (全文を使う)
         issues.extend(self._check_required_elements(content, target.target_type))
 
-        # 構造的完全性チェック (diff の場合は追加行のみ)
-        issues.extend(self._check_structural_completeness(normalized, target.target_type))
+        # 構造的完全性チェック (stripped で括弧バランスが正確)
+        issues.extend(self._check_structural_completeness(normalized_stripped, target.target_type))
 
         passed = not any(
             i.severity in (AuditSeverity.CRITICAL, AuditSeverity.HIGH) for i in issues
@@ -238,6 +261,8 @@ class CompletenessAgent(AuditAgent):
     ) -> List[AuditIssue]:
         """構造的完全性をチェック"""
         issues = []
+
+        # content はすでに stripped_content 経由で文字列/コメント除去済み
 
         # 括弧のバランスチェック
         brackets = [("(", ")"), ("[", "]"), ("{", "}")]

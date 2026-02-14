@@ -24,8 +24,10 @@ set -euo pipefail
 unset HTTPS_PROXY HTTP_PROXY https_proxy http_proxy 2>/dev/null || true
 
 # ─── Constants ───
-readonly CLIENT_ID="REDACTED_CLIENT_ID"
-readonly CLIENT_SECRET="REDACTED_CLIENT_SECRET"
+readonly OAUTH_CONFIG="$HOME/.config/cortex/oauth.json"
+[[ -f "$OAUTH_CONFIG" ]] || die "OAuth 設定ファイルがありません: $OAUTH_CONFIG"
+readonly CLIENT_ID=$(python3 -c "import json; print(json.load(open('$OAUTH_CONFIG'))['client_id'])")
+readonly CLIENT_SECRET=$(python3 -c "import json; print(json.load(open('$OAUTH_CONFIG'))['client_secret'])")
 readonly CREDS_FILE="$HOME/.gemini/oauth_creds.json"
 readonly BASE_URL="https://cloudcode-pa.googleapis.com/v1internal"
 readonly TOKEN_CACHE="/tmp/.cortex_token_cache"

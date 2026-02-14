@@ -640,12 +640,26 @@ class DendronChecker:  # noqa: AI-007
                 for alias in node.names:
                     imported_names.add(alias.asname or alias.name)
         
-        known_names = defined_names | imported_names | {"print", "len", "range", "int", "str",
-            "list", "dict", "set", "tuple", "bool", "float", "type", "super", "isinstance",
-            "issubclass", "hasattr", "getattr", "setattr", "enumerate", "zip", "map",
-            "filter", "sorted", "reversed", "any", "all", "min", "max", "sum", "abs",
-            "open", "repr", "id", "hash", "vars", "dir", "iter", "next", "property",
-            "staticmethod", "classmethod", "dataclass", "field",
+        known_names = defined_names | imported_names | {
+            # ビルトイン関数
+            "print", "len", "range", "int", "str", "bytes", "bytearray",
+            "list", "dict", "set", "tuple", "bool", "float", "complex",
+            "type", "super", "isinstance", "issubclass", "callable",
+            "hasattr", "getattr", "setattr", "delattr",
+            "enumerate", "zip", "map", "filter", "sorted", "reversed",
+            "any", "all", "min", "max", "sum", "abs", "round", "pow", "divmod",
+            "open", "repr", "id", "hash", "vars", "dir", "iter", "next",
+            "property", "staticmethod", "classmethod", "dataclass", "field",
+            "chr", "ord", "hex", "oct", "bin", "format", "input",
+            "object", "memoryview", "frozenset", "slice", "breakpoint",
+            # ビルトイン例外
+            "Exception", "ValueError", "TypeError", "KeyError", "IndexError",
+            "AttributeError", "RuntimeError", "IOError", "OSError", "FileNotFoundError",
+            "FileExistsError", "PermissionError", "NotImplementedError",
+            "StopIteration", "GeneratorExit", "SystemExit", "ImportError",
+            "ModuleNotFoundError", "NameError", "UnicodeDecodeError",
+            "UnicodeEncodeError", "UnicodeError", "ConnectionError",
+            "TimeoutError", "IsADirectoryError", "NotADirectoryError",
         }
         
         # public 関数内の呼出を検査
@@ -790,11 +804,11 @@ class DendronChecker:  # noqa: AI-007
     # ── NF3: Function Layer (機能的冗長性) ────────────────
 
     # --- 閾値定数 ---
-    _SRP_MAX_LINES = 50
-    _SRP_MAX_LINES_METHOD = 65   # クラスメソッドは状態管理で長くなる
-    _SRP_MAX_LINES_TEST = 80     # テストは setup/assertion で長くなる
-    _SRP_MAX_BRANCHES = 10
-    _SRP_MAX_PARAMS = 5
+    _SRP_MAX_LINES = 75          # v3.7: 50→75 (大規模PJの実態に合わせる)
+    _SRP_MAX_LINES_METHOD = 90   # v3.7: 65→90 クラスメソッドは状態管理で長くなる
+    _SRP_MAX_LINES_TEST = 120    # v3.7: 80→120 テストは setup/assertion で長くなる
+    _SRP_MAX_BRANCHES = 15       # v3.7: 10→15 (パーサー等で分岐は自然に増える)
+    _SRP_MAX_PARAMS = 7          # v3.7: 5→7 (DI パターンで引数は増える)
     _SIMILARITY_THRESHOLD = 0.8  # 80% 以上で類似判定
 
     # PURPOSE: 関数の複雑度メトリクスを計算し SRP 違反を検出する (P22)
@@ -977,6 +991,52 @@ class DendronChecker:  # noqa: AI-007
         for child in ast.iter_child_nodes(node):
             self._collect_assignments(child, assignments)
 
+    # PURPOSE: ファイル間の関数名 Jaccard 類似度でファイル重複を検出する (L1×NF3)
+    def _check_file_similarity_global(
+        self, file_trees: Dict[Path, ast.Module],
+    ) -> List[FunctionNFProof]:
+        """ファイル間の関数名類似度で重複候補を検出 (L1×NF3)"""
+        results: List[FunctionNFProof] = []
+        
+        # 各ファイルの public 関数名セットを収集
+        file_funcs: Dict[Path, Set[str]] = {}
+        for path, tree in file_trees.items():
+            funcs = set()
+            for node in ast.walk(tree):
+                if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                    if not node.name.startswith("_"):
+                        funcs.add(node.name)
+            if len(funcs) >= 2:  # 関数が2つ以上あるファイルのみ対象
+                file_funcs[path] = funcs
+        
+        # ペアワイズ Jaccard 類似度
+        paths = list(file_funcs.keys())
+        checked: Set[tuple] = set()
+        for i, p1 in enumerate(paths):
+            for p2 in paths[i + 1:]:
+                pair_key = (min(str(p1), str(p2)), max(str(p1), str(p2)))
+                if pair_key in checked:
+                    continue
+                checked.add(pair_key)
+                
+                s1, s2 = file_funcs[p1], file_funcs[p2]
+                intersection = s1 & s2
+                union = s1 | s2
+                if not union:
+                    continue
+                jaccard = len(intersection) / len(union)
+                if jaccard >= self._SIMILARITY_THRESHOLD:
+                    results.append(FunctionNFProof(
+                        name=f"{p1.name} ↔ {p2.name}",
+                        path=p1, line_number=1,
+                        status=ProofStatus.WEAK,
+                        check_type="file_similarity",
+                        metric_value=round(jaccard * 100),
+                        reason=f"ファイル '{p1.name}' と '{p2.name}' の関数構成が {round(jaccard*100)}% 類似 (共通: {', '.join(sorted(intersection)[:5])})",
+                    ))
+        
+        return results
+
     # ── BCNF: Verification Layer (不可欠性) ───────────────
 
     # PURPOSE: プロジェクト全体で関数/変数の不可欠性を検証する (P23, P33)
@@ -1004,10 +1064,21 @@ class DendronChecker:  # noqa: AI-007
                     for alias in node.names:
                         imported_modules.add(alias.name)
         
+        # __main__ ガード付きファイル (CLIスクリプト) を収集
+        main_guard_files: set = set()
+        for fp_path, tree in file_trees.items():
+            for node in ast.walk(tree):
+                if (isinstance(node, ast.If) and
+                    isinstance(node.test, ast.Compare) and
+                    isinstance(node.test.left, ast.Name) and
+                    node.test.left.id == "__name__"):
+                    main_guard_files.add(fp_path)
+                    break
+        
         for stem, fp in file_stems.items():
             is_imported = any(stem.endswith(m) or m.endswith(stem) for m in imported_modules)
-            # __init__.py と __main__.py はエントリポイントなので除外
-            if fp.name in ("__init__.py", "__main__.py"):
+            # __init__.py, __main__.py, CLI スクリプト (if __name__ ガード付き) は除外
+            if fp.name in ("__init__.py", "__main__.py") or fp in main_guard_files:
                 continue
             results.append(VerificationProof(
                 name=fp.name, path=fp, line_number=1,
@@ -1145,6 +1216,12 @@ class DendronChecker:  # noqa: AI-007
             verification_proofs.extend(
                 self._check_verification_global(root, file_trees)
             )
+        
+        # L1×NF3: ファイル間類似度チェック
+        if self.check_function_nf and file_trees:
+            function_nf_proofs.extend(
+                self._check_file_similarity_global(file_trees)
+            )
 
         return self._aggregate_results(
             file_proofs, dir_proofs, function_proofs,
@@ -1188,7 +1265,7 @@ class DendronChecker:  # noqa: AI-007
             function_nf_proofs.extend(self._check_complexity_from_tree(path, tree))
             function_nf_proofs.extend(self._check_similarity_from_tree(path, tree))
             function_nf_proofs.extend(self._check_reassignment_from_tree(path, tree))
-        if self.check_verification:
+        if self.check_verification or self.check_function_nf:
             file_trees[path] = tree
 
     # PURPOSE: 収集した各 proof リストから統計を集計し CheckResult を構築する

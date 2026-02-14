@@ -44,6 +44,24 @@ class AuditTarget:
     target_type: AuditTargetType = AuditTargetType.GENERIC
     metadata: Dict[str, Any] = field(default_factory=dict)
     source: Optional[str] = None  # ファイルパスや識別子
+    exclude_patterns: List[str] = field(default_factory=list)  # 除外 glob パターン
+    _stripped_cache: Optional[str] = field(default=None, repr=False, compare=False)
+
+    @property
+    def stripped_content(self) -> str:
+        """文字列リテラル・コメント除去済みコンテンツ。
+
+        CODE ターゲットの場合は strip_strings_and_comments() を適用。
+        それ以外は原文を返却。結果はキャッシュされる。
+        """
+        if self._stripped_cache is not None:
+            return self._stripped_cache
+        if self.target_type == AuditTargetType.CODE:
+            from .pattern_loader import strip_strings_and_comments
+            self._stripped_cache = strip_strings_and_comments(self.content)
+        else:
+            self._stripped_cache = self.content
+        return self._stripped_cache
 
 
 # PURPOSE: 監査で検出された問題

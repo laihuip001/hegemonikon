@@ -233,9 +233,13 @@ def cmd_health(args: argparse.Namespace) -> None:
     print()
 
 
-# PURPOSE: `pks search` — 全インデックス横断検索
+# PURPOSE: `pks search` — 全インデックス横断検索 (ソース間スコア正規化付き)
 def cmd_search(args: argparse.Namespace) -> None:
-    """Gnōsis, Kairos, Sophia, Chronos を横断検索"""
+    """Gnōsis, Kairos, Sophia, Chronos を横断検索
+
+    各ソースの生スコアをソース内 min-max 正規化で [0,1] に統一し、
+    異なるスコアスケール (L2距離 vs cosine) の問題を解消する。
+    """
     import os, time
     for key in ['HTTP_PROXY', 'HTTPS_PROXY', 'http_proxy', 'https_proxy']:
         os.environ.pop(key, None)
@@ -248,10 +252,12 @@ def cmd_search(args: argparse.Namespace) -> None:
 
     print(f"## 🔎 PKS Search: \"{query}\"\n")
     t0 = time.time()
-    all_results = []
 
     # Source icons
     icons = {"gnosis": "🔬", "kairos": "📋", "sophia": "📖", "chronos": "🕐"}
+
+    # Collect results per source (for per-source normalization)
+    results_by_source: dict[str, list[tuple[str, float, str, str]]] = {}
 
     # 1. Gnōsis (LanceDB)
     if "gnosis" in sources:
@@ -259,13 +265,16 @@ def cmd_search(args: argparse.Namespace) -> None:
             from mekhane.anamnesis.index import GnosisIndex as AI
             gi = AI()
             results = gi.search(query, k=k)
+            gnosis_results = []
             for r in results:
                 title = r.get("title", r.get("primary_key", "?"))
                 dist = float(r.get("_distance", 1.0))
-                # LanceDB L2 distance → [0,1] similarity (clamp to valid range)
+                # LanceDB L2 distance → raw similarity
                 score = max(0.0, min(1.0, 1.0 - dist / 2.0))
                 snippet = r.get("abstract", r.get("content", ""))[:120]
-                all_results.append(("gnosis", score, title, snippet))
+                gnosis_results.append(("gnosis", score, title, snippet))
+            if gnosis_results:
+                results_by_source["gnosis"] = gnosis_results
         except Exception as e:
             print(f"  ⚠️ Gnōsis: {e}")
 
@@ -287,13 +296,15 @@ def cmd_search(args: argparse.Namespace) -> None:
                     idx = EmbeddingAdapter()
                     idx.load(str(pkl))
                     hits = idx.search(query_vec, k=k)
+                    src_results = []
                     for hit in hits:
-                        # SearchResult object: .id, .score, .metadata
                         meta = hit.metadata if hasattr(hit, 'metadata') else {}
                         doc_id = meta.get("doc_id", meta.get("title", str(hit.id)))
                         score = hit.score if hasattr(hit, 'score') else 0
                         title = meta.get("title", doc_id)
-                        all_results.append((name, score, title, ""))
+                        src_results.append((name, score, title, ""))
+                    if src_results:
+                        results_by_source[name] = src_results
                 except Exception as e:
                     print(f"  ⚠️ {name}: {e}")
         except Exception as e:
@@ -301,7 +312,33 @@ def cmd_search(args: argparse.Namespace) -> None:
 
     elapsed = time.time() - t0
 
-    # Sort by score descending
+    # Max-ratio normalization: divide each score by its source's max score
+    # This preserves relative ordering within sources while scaling across sources
+    # gnosis max ~0.75 → 1.0, kairos max ~0.11 → 1.0, etc.
+    all_results = []
+    for src, src_results in results_by_source.items():
+        src_max = max(s for _, s, _, _ in src_results)
+        if src_max <= 0:
+            continue
+        for src_name, raw_score, title, snippet in src_results:
+            normalized = raw_score / src_max
+            all_results.append((src_name, normalized, raw_score, title, snippet))
+
+    # Hybrid reranking: keyword boost on top of vector similarity
+    # Tokenize query into keywords (min 2 chars), compute hit ratio, add bonus
+    import re
+    query_tokens = [t.lower() for t in re.split(r'[\s　,、。・/]+', query) if len(t) >= 2]
+    KW_BOOST_MAX = 0.3  # max boost for 100% keyword match
+
+    for i, (src, norm_score, raw_score, title, snippet) in enumerate(all_results):
+        if query_tokens:
+            text = (title + " " + snippet).lower()
+            hits = sum(1 for t in query_tokens if t in text)
+            kw_ratio = hits / len(query_tokens)
+            boost = kw_ratio * KW_BOOST_MAX
+            all_results[i] = (src, norm_score + boost, raw_score, title, snippet)
+
+    # Sort by boosted score descending
     all_results.sort(key=lambda x: x[1], reverse=True)
 
     if not all_results:
@@ -310,17 +347,17 @@ def cmd_search(args: argparse.Namespace) -> None:
 
     # Display top results
     top = all_results[:k]
-    print(f"| # | ソース | スコア | タイトル / ID | スニペット |")
-    print(f"|--:|:-------|-------:|:--------------|:-----------|")
-    for i, (src, score, title, snippet) in enumerate(top, 1):
+    print(f"| # | ソース | スコア | 生スコア | タイトル / ID | スニペット |")
+    print(f"|--:|:-------|-------:|--------:|:--------------|:-----------|")
+    for i, (src, norm_score, raw_score, title, snippet) in enumerate(top, 1):
         icon = icons.get(src, "📦")
         title_short = title[:40] + "…" if len(title) > 40 else title
         snippet_short = snippet.replace("\n", " ")[:60]
-        print(f"| {i} | {icon} {src} | {score:.3f} | {title_short} | {snippet_short} |")
+        print(f"| {i} | {icon} {src} | {norm_score:.3f} | {raw_score:.3f} | {title_short} | {snippet_short} |")
 
     # Summary
-    src_counts = {}
-    for src, _, _, _ in top:
+    src_counts: dict[str, int] = {}
+    for src, _, _, _, _ in top:
         src_counts[src] = src_counts.get(src, 0) + 1
     breakdown = ", ".join(f"{icons.get(s, '📦')}{c}" for s, c in sorted(src_counts.items()))
     print(f"\n**{len(top)} 件** ({breakdown}) — {elapsed:.1f}s")

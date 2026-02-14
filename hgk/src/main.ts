@@ -1,6 +1,8 @@
 import { api } from './api/client';
 import { isPermissionGranted, requestPermission, sendNotification } from '@tauri-apps/plugin-notification';
 import { renderGraph3D } from './views/graph3d';
+import { renderAgentManagerView } from './views/agent-manager';
+import { renderChatView } from './views/chat';
 import type {
   HealthReportResponse,
   FEPStateResponse,
@@ -24,6 +26,9 @@ import type {
   TimelineEvent,
   TimelineEventDetail,
   DigestCandidate,
+  DigestReport,
+  QuotaResponse,
+  QuotaModel,
 } from './api/client';
 import { kiList, kiGet, kiCreate, kiUpdate, kiDelete, kiSearch } from './api/client';
 import { marked } from 'marked';
@@ -134,6 +139,7 @@ function startPolling(fn: () => Promise<void>, intervalMs: number): void {
 type ViewRenderer = () => Promise<void>;
 const routes: Record<string, ViewRenderer> = {
   'dashboard': renderDashboard,
+  'agents': renderAgentManagerView,
   'search': renderSearch,
   'fep': renderFep,
   'gnosis': renderGnosis,
@@ -146,6 +152,7 @@ const routes: Record<string, ViewRenderer> = {
   'timeline': renderTimelineView,
   'synteleia': renderSynteleiaView,
   'digestor': renderDigestorView,
+  'chat': renderChatView,
 };
 
 let currentRoute = '';
@@ -316,13 +323,15 @@ async function renderDashboard(): Promise<void> {
 }
 
 async function renderDashboardContent(): Promise<void> {
-  const [health, healthCheck, fep, gnosisStats, criticals, kalonHist] = await Promise.all([
+  const [health, healthCheck, fep, gnosisStats, criticals, kalonHist, quota, digestLatest] = await Promise.all([
     api.status().catch((): null => null),
     api.health().catch((): null => null),
     api.fepState().catch((): null => null),
     api.gnosisStats().catch((): null => null),
     api.notifications(5, 'CRITICAL').catch((): Notification[] => []),
     api.kalonHistory(5).catch((): null => null),
+    api.quota().catch((): null => null),
+    api.digestorLatest().catch((): null => null),
   ]);
 
   const app = document.getElementById('view-content')!;
@@ -394,6 +403,8 @@ async function renderDashboardContent(): Promise<void> {
         <div class="kalon-card-hint">Ctrl+K → kalon [概念] で判定</div>
       </div>
     </div>
+    ${renderQuotaCard(quota)}
+    ${renderDigestCard(digestLatest)}
     ${renderHealthItems(health)}
     ${renderUsageCard()}
   `;
@@ -401,6 +412,153 @@ async function renderDashboardContent(): Promise<void> {
   // Phase 3: Apply animations
   applyCountUpAnimations(app);
   applyStaggeredFadeIn(app);
+}
+function renderQuotaCard(quota: QuotaResponse | null): string {
+  if (!quota) return '';
+  if (quota.error) {
+    // LS 不在は正常運用モード — パニック的な赤いエラーを出さない
+    const isLsError = quota.error.includes('Language Server') || quota.error.includes('agq-check');
+    if (isLsError) {
+      return `
+        <div class="card quota-card" style="margin-top:1rem;">
+          <div class="quota-header">
+            <span class="metric-label">⚡ Quota</span>
+            <span class="quota-plan" style="color: var(--text-secondary);">スタンドアロン</span>
+          </div>
+          <div style="color: var(--text-secondary); font-size: 0.85rem; padding: 0.5rem 0;">
+            📡 Language Server 未接続 — Quota 追跡は LS 起動後に有効になります
+          </div>
+        </div>
+      `;
+    }
+    return `
+      <div class="card quota-card" style="margin-top:1rem;">
+        <div class="metric-label">⚡ Quota</div>
+        <div class="status-error" style="font-size:0.85rem;">Quota 情報取得不可: ${esc(quota.error)}</div>
+      </div>
+    `;
+  }
+
+  const statusIcon: Record<string, string> = {
+    green: '🟢', yellow: '🟡', orange: '🟠', red: '🔴', unknown: '⚪',
+  };
+  const statusColor: Record<string, string> = {
+    green: 'var(--success-color, #22c55e)',
+    yellow: 'var(--warning-color, #eab308)',
+    orange: 'var(--quota-orange, #f97316)',
+    red: 'var(--error-color, #ef4444)',
+    unknown: 'var(--text-secondary)',
+  };
+
+  const modelsHtml = quota.models.map((m: QuotaModel) => `
+    <div class="quota-model">
+      <div class="quota-model-header">
+        <span class="quota-model-icon">${statusIcon[m.status] ?? '⚪'}</span>
+        <span class="quota-model-label">${esc(m.label)}</span>
+        <span class="quota-model-pct" style="color:${statusColor[m.status] ?? ''}">${m.remaining_pct}%</span>
+      </div>
+      <div class="quota-bar">
+        <div class="quota-bar-fill" style="width:${m.remaining_pct}%; background:${statusColor[m.status] ?? ''}"></div>
+      </div>
+      ${m.reset_time ? `<div class="quota-model-reset">↻ ${esc(m.reset_time)} UTC</div>` : ''}
+    </div>
+  `).join('');
+
+  const alertHtml = (quota.overall_status === 'orange' || quota.overall_status === 'red')
+    ? `<div class="alert-banner quota-alert fade-in" style="margin-bottom:0.75rem;">
+         <span class="status-dot ${quota.overall_status === 'red' ? 'error' : 'warn'}"></span>
+         <strong style="color:${quota.overall_status === 'red' ? 'var(--error-color)' : 'var(--quota-orange, #f97316)'}">
+           ${quota.overall_status === 'red' ? '🔴 Quota 残量危険 — Turtle Mode 推奨' : '🟠 Quota 残量低下'}
+         </strong>
+       </div>`
+    : '';
+
+  const pc = quota.prompt_credits;
+  const fc = quota.flow_credits;
+
+  return `
+    <div class="card quota-card" style="margin-top:1rem;">
+      ${alertHtml}
+      <div class="quota-header">
+        <span class="metric-label">⚡ Quota</span>
+        <span class="quota-plan">${esc(quota.plan)}</span>
+      </div>
+      ${modelsHtml}
+      <div class="quota-credits">
+        <span>💳 Prompt: <strong>${pc.available}</strong>/${pc.monthly}</span>
+        <span>🌊 Flow: <strong>${fc.available}</strong>/${fc.monthly}</span>
+      </div>
+    </div>
+  `;
+}
+
+function renderDigestCard(digest: DigestReport | null): string {
+  if (!digest) return '';
+
+  const timeStr = digest.timestamp
+    ? (() => {
+      try {
+        const d = new Date(digest.timestamp);
+        return `${d.getMonth() + 1}/${d.getDate()} ${d.getHours()}:${String(d.getMinutes()).padStart(2, '0')}`;
+      } catch { return digest.timestamp; }
+    })()
+    : '';
+
+  if (digest.candidates.length === 0) {
+    return `
+      <div class="card digest-card" style="margin-top:1rem;">
+        <div class="digest-header">
+          <span class="metric-label">🔬 最新消化</span>
+          <span class="digest-timestamp">${esc(timeStr)}</span>
+        </div>
+        <div style="color:var(--text-secondary); font-size:0.85rem; padding:0.5rem 0;">
+          消化候補なし — <code>digest_to_ki.py</code> を実行してください
+        </div>
+      </div>
+    `;
+  }
+
+  const candidatesHtml = digest.candidates.slice(0, 5).map((c: DigestCandidate) => {
+    const scoreWidth = Math.round(c.score * 100);
+    const scoreColor = c.score >= 0.7 ? 'var(--success-color, #22c55e)'
+      : c.score >= 0.4 ? 'var(--warning-color, #eab308)'
+        : 'var(--text-secondary)';
+    const topicTags = c.matched_topics.map(t =>
+      `<span class="digest-topic-tag">${esc(t)}</span>`
+    ).join('');
+
+    return `
+      <div class="digest-candidate">
+        <div class="digest-candidate-header">
+          <span class="digest-candidate-title">${c.url
+        ? `<a href="${esc(c.url)}" target="_blank" rel="noopener" class="digest-link">${esc(c.title)}</a>`
+        : esc(c.title)
+      }</span>
+          <span class="digest-candidate-score" style="color:${scoreColor}">${c.score.toFixed(2)}</span>
+        </div>
+        <div class="quota-bar" style="margin:0.2rem 0;">
+          <div class="quota-bar-fill" style="width:${scoreWidth}%; background:${scoreColor}"></div>
+        </div>
+        <div class="digest-candidate-meta">
+          <span class="digest-source">${esc(c.source)}</span>
+          ${topicTags}
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  return `
+    <div class="card digest-card" style="margin-top:1rem;">
+      <div class="digest-header">
+        <span class="metric-label">🔬 最新消化</span>
+        <span class="digest-meta">
+          ${digest.total_papers}件中 ${digest.candidates_selected}件選出
+          <span class="digest-timestamp">${esc(timeStr)}</span>
+        </span>
+      </div>
+      ${candidatesHtml}
+    </div>
+  `;
 }
 
 function renderHealthItems(health: HealthReportResponse | null): string {

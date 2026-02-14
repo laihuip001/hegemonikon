@@ -1,44 +1,207 @@
 {
-    "workflows": [
-        {
-            "command": "/boot",
-            "description": "セッション開始 (System Boot)",
-            "category": "System"
-        },
-        {
-            "command": "/bye",
-            "description": "セッション終了 (Handoff生成)",
-            "category": "System"
-        },
-        {
-            "command": "/noe",
-            "description": "深い認識 (O1: Noēsis)",
-            "category": "Cognitive"
-        },
-        {
-            "command": "/bou",
-            "description": "意志確認 (O2: Boulēsis)",
-            "category": "Cognitive"
-        },
-        {
-            "command": "/s",
-            "description": "計画策定 (S-Series Analysis)",
-            "category": "Planning"
-        },
-        {
-            "command": "/ene",
-            "description": "実行 (O4: Energeia)",
-            "category": "Action"
-        },
-        {
-            "command": "/dia",
-            "description": "敵対的レビュー (Devil's Advocate)",
-            "category": "QA"
-        },
-        {
-            "command": "/mek",
-            "description": "方法配置 (S2: Mekhanē)",
-            "category": "Planning"
-        }
-    ]
+  "workflows": [
+    {
+      "command": "/noe",
+      "description": "O1 Noēsis（深い認識・直観）を発動する最深層思考ワークフロー。7フェーズ (0-6) で圏論的普遍性を追求。",
+      "category": "Cognitive",
+      "series": "O",
+      "pos": "T1"
+    },
+    {
+      "command": "/bou",
+      "description": "O2 Boulēsis（意志・目的）を発動し、「何を望むか」を明確化するワークフロー。純粋な理想から実用的な目標へ。",
+      "category": "Cognitive",
+      "series": "O",
+      "pos": "T2"
+    },
+    {
+      "command": "/zet",
+      "description": "O3 Zētēsis（探求）を発動し、「何を問うべきか」を発見する。問いの種を見つける認知ツール。",
+      "category": "Cognitive",
+      "series": "O",
+      "pos": "T3"
+    },
+    {
+      "command": "/ene",
+      "description": "O4 Energeia（行為）を発動し、意志を現実に具現化する。6段階実行フレームワーク。",
+      "category": "Cognitive",
+      "series": "O",
+      "pos": "T4"
+    },
+    {
+      "command": "/met",
+      "description": "S1 Metron（尺度）を発動し、スケール・粒度を決定する。スケール配置ワークフロー。",
+      "category": "Planning",
+      "series": "S",
+      "pos": "T1"
+    },
+    {
+      "command": "/mek",
+      "description": "S2 Mekhanē（方法配置）を発動し、スキル/ワークフローを生成・診断する。tekhne-maker 統合。",
+      "category": "Planning",
+      "series": "S",
+      "pos": "T2"
+    },
+    {
+      "command": "/sta",
+      "description": "S3 Stathmos（基準）を発動し、評価基準・ベンチマークを設定する。基準配置ワークフロー。",
+      "category": "Planning",
+      "series": "S",
+      "pos": "T3"
+    },
+    {
+      "command": "/pra",
+      "description": "S4 Praxis（実践）を発動し、価値実現の方法を選択する。実践配置ワークフロー。",
+      "category": "Planning",
+      "series": "S",
+      "pos": "T4"
+    },
+    {
+      "command": "/pro",
+      "description": "H1 Propatheia（前感情）を発動し、初期傾向・直感を評価する。3派生対応版。",
+      "category": "Motivation",
+      "series": "H",
+      "pos": "T1"
+    },
+    {
+      "command": "/pis",
+      "description": "H2 Pistis（確信）を発動し、確信度・信頼性を評価する。3派生対応版。",
+      "category": "Motivation",
+      "series": "H",
+      "pos": "T2"
+    },
+    {
+      "command": "/ore",
+      "description": "H3 Orexis（欲求）を発動し、価値傾向・欲求を評価する。3派生対応版。",
+      "category": "Motivation",
+      "series": "H",
+      "pos": "T3"
+    },
+    {
+      "command": "/dox",
+      "description": "H4 Doxa（信念）を発動し、信念を記録・永続化する。3派生対応版。",
+      "category": "Motivation",
+      "series": "H",
+      "pos": "T4"
+    },
+    {
+      "command": "/kho",
+      "description": "P1 Khōra（場）を発動し、スコープ・領域を定義する。3派生対応版。",
+      "category": "Environment",
+      "series": "P",
+      "pos": "T1"
+    },
+    {
+      "command": "/hod",
+      "description": "P2 Hodos（道）を発動し、経路・道筋を定義する。3派生対応版。",
+      "category": "Environment",
+      "series": "P",
+      "pos": "T2"
+    },
+    {
+      "command": "/tro",
+      "description": "P3 Trokhia（軌道）を発動し、適用範囲・サイクルを定義する。3派生対応版。",
+      "category": "Environment",
+      "series": "P",
+      "pos": "T3"
+    },
+    {
+      "command": "/tek",
+      "description": "P4 Tekhnē（技法）を発動し、「どの技法で」を決定する。3派生対応版。",
+      "category": "Environment",
+      "series": "P",
+      "pos": "T4"
+    },
+    {
+      "command": "/euk",
+      "description": "K1 Eukairia（好機）を発動し、「今がチャンスか」を判定する。タイミング評価ワークフロー。",
+      "category": "Context",
+      "series": "K",
+      "pos": "T1"
+    },
+    {
+      "command": "/chr",
+      "description": "K2 Chronos（時間）を発動し、時間制約と期限を評価する。時間配置ワークフロー。",
+      "category": "Context",
+      "series": "K",
+      "pos": "T2"
+    },
+    {
+      "command": "/tel",
+      "description": "K3 Telos 自問ワークフロー。Why（目的）を問い、手段と目的の入れ替わりを防ぐ。",
+      "category": "Context",
+      "series": "K",
+      "pos": "T3"
+    },
+    {
+      "command": "/sop",
+      "description": "K4 Sophia（知恵）を発動し、Perplexityに調査を依頼する。深掘り版調査依頼書を生成。",
+      "category": "Context",
+      "series": "K",
+      "pos": "T4"
+    },
+    {
+      "command": "/pat",
+      "description": "A1 Pathos（情念）を発動し、メタ感情・二重傾向を評価する。メタ感情評価ワークフロー。",
+      "category": "Precision",
+      "series": "A",
+      "pos": "T1"
+    },
+    {
+      "command": "/dia",
+      "description": "A2 Krisis（判定力）を発動する抽象コマンド。敵対的レビュー機能統合。",
+      "category": "Precision",
+      "series": "A",
+      "pos": "T2"
+    },
+    {
+      "command": "/gno",
+      "description": "A3 Gnōmē（格言）を発動し、原則・教訓を抽出する。原則抽出ワークフロー。",
+      "category": "Precision",
+      "series": "A",
+      "pos": "T3"
+    },
+    {
+      "command": "/epi",
+      "description": "A4 Epistēmē（知識）を発動し、信念を知識に昇格させる。知識確立ワークフロー。",
+      "category": "Precision",
+      "series": "A",
+      "pos": "T4"
+    },
+    {
+      "command": "/boot",
+      "description": "セッション開始時の統合ブートシーケンス。二人で起動する。",
+      "category": "System"
+    },
+    {
+      "command": "/bye",
+      "description": "セッション終了時に引き継ぎドキュメントを生成し、経験を法則化する。次回セッションの/bootで読み込まれる。",
+      "category": "System"
+    },
+    {
+      "command": "/eat",
+      "description": "外部コンテンツを Hegemonikón に消化するワークフロー。/mek で調理し、/fit で消化品質を検証する。",
+      "category": "System"
+    },
+    {
+      "command": "/u",
+      "description": "Claudeの主観・考え・意見を引き出す。AIを「パートナー/主体」として扱う。",
+      "category": "System"
+    },
+    {
+      "command": "/m",
+      "description": "本気モード。Creatorが真剣度を示すときに発動。効率ではなく信頼を選べ。",
+      "category": "System"
+    },
+    {
+      "command": "/vet",
+      "description": "Gemini の作業を Claude が監査する。Cross-Model Verification による品質保証。",
+      "category": "System"
+    },
+    {
+      "command": "/dendron",
+      "description": "Dendron 存在証明チェック。粒度・スコープを自由に指定可能。",
+      "category": "System"
+    }
+  ]
 }

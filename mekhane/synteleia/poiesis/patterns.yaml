@@ -1,0 +1,92 @@
+# Synteleia Poiēsis L1 Agent Patterns
+# 
+# 各エージェントのパターン辞書。コード変更なしで追加・修正可能。
+# フォーマット: agent_key → pattern_group → entries
+
+ousia:
+  # 本質が不明確なパターン (regex, code, message)
+  vague_patterns:
+    - pattern: '\bこれ\b(?!は)'
+      code: "O-001"
+      message: "「これ」の指示対象が不明確"
+    - pattern: '\bそれ\b(?!は)'
+      code: "O-002"
+      message: "「それ」の指示対象が不明確"
+    - pattern: '\bあれ\b'
+      code: "O-003"
+      message: "「あれ」の指示対象が不明確"
+    - pattern: '\b(?:something|anything|nothing)\b'
+      code: "O-004"
+      message: "不定代名詞の使用"
+    - pattern: '\betc\.?\b'
+      code: "O-005"
+      message: "etc. は本質を曖昧にする"
+    - pattern: '\.\.\.(?!\s*\])'
+      code: "O-006"
+      message: "省略記号は本質を隠す"
+
+  # 定義の欠如パターン (code=null は OK パターン)
+  undefined_patterns:
+    - pattern: '\b\w+\s+(?:とは|is|means)\b'
+      code: null
+      message: null
+    - pattern: 'def\s+\w+\([^)]*\):'
+      code: null
+      message: null
+    - pattern: 'class\s+\w+[^:]*:'
+      code: null
+      message: null
+
+schema:
+  # 構造的問題パターン
+  structure_problems:
+    - pattern: '(?:^|\n)#{1,6}\s+.+\n(?:^|\n)#{1,6}\s+.+\n(?:^|\n)#{1,6}\s+'
+      code: "S-001"
+      message: "見出しが連続 — 本文が欠落している可能性"
+    - pattern: '\n{4,}'
+      code: "S-002"
+      message: "過剰な空行 — 構造を見直してください"
+    - pattern: '(?:^|\n)-\s+.{200,}'
+      code: "S-003"
+      message: "リスト項目が長すぎる — 分割を検討"
+
+  # 階層構造の問題
+  hierarchy_problems:
+    - pattern: '(?:^|\n)###\s+(?!.*\n##\s+)'
+      code: "S-010"
+      message: "h3 が h2 なしに出現"
+    - pattern: '(?:^|\n)####\s+(?!.*\n###\s+)'
+      code: "S-011"
+      message: "h4 が h3 なしに出現"
+
+horme:
+  # 動機・目的キーワード
+  purpose_keywords:
+    - "目的"
+    - "理由"
+    - "なぜ"
+    - "ために"
+    - "purpose"
+    - "goal"
+    - "objective"
+    - "why"
+    - "because"
+    - "in order to"
+
+  # 動機が不明確なパターン
+  unclear_motivation_patterns:
+    - pattern: '\bとりあえず\b'
+      code: "H-001"
+      message: "「とりあえず」は動機が不明確"
+    - pattern: '\b一応\b'
+      code: "H-002"
+      message: "「一応」は動機が弱い"
+    - pattern: '\bなんとなく\b'
+      code: "H-003"
+      message: "「なんとなく」は動機が欠如"
+    - pattern: '\bjust\s+(?:do|try|make)\b'
+      code: "H-004"
+      message: "目的なき行動"
+    - pattern: '\bmaybe\s+we\s+should\b'
+      code: "H-005"
+      message: "動機が曖昧"

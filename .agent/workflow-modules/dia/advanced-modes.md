@@ -67,16 +67,65 @@ parent: /dia
 
 ---
 
-## cross-model (Cross-Model Verification)
+## cross-model (Cross-Model Verification + Cortex Auto)
 
-> `/dia.cross-model` — 異なるモデルによる相互検証
+> `/dia.cross-model` — 異なるモデルによる相互検証 (Cortex API 自動統合)
+>
+> **起源**: BOU #3 "Debate Partner — 対等な批判者"
+> **手段**: `mcp_ochema_ask_cortex` で Gemini 3 Pro に同じ問題を投げ、差分を検出
 
-発動: `/dia cross-model` または「Claude に聞く」「別のAI」
+発動: `/dia cross-model` または「Claude に聞く」「別のAI」「セカンドオピニオン」
+
+### 自動セカンドオピニオン (3フェーズ)
+
+| Phase | 名称 | 内容 |
+|:------|:-----|:-----|
+| **P1** | 問い投射 | Claude の判定/分析結果を要約し、Gemini に同じ問題を独立で問う |
+| **P2** | 応答取得 | `mcp_ochema_ask_cortex` で Gemini 3 Pro の回答を取得 |
+| **P3** | 差分分析 | Claude vs Gemini の一致点・相違点・盲点を構造化 |
+
+#### P1: 問い投射テンプレート
+
+```
+以下の問題について、独立した分析を行ってください。
+他のAIの分析結果は見ないでください。
+
+## 問題
+{対象の問題/設計/コード}
+
+## 求める分析
+1. 主要な論点の特定
+2. リスク/問題点の指摘
+3. 改善提案
+4. 確信度 (0-100%)
+```
+
+#### P2: Cortex 呼び出し
+
+```
+mcp_ochema_ask_cortex(
+  message="{P1 のプロンプト}",
+  model="gemini-2.5-pro",   # デフォルト。gemini-3-pro-preview も可
+  system_instruction="あなたは独立した技術レビュアーです。他のAIの意見は参照せず、自分の分析を行ってください。"
+)
+```
+
+#### P3: 差分分析テーブル
+
+| 項目 | Claude | Gemini | 差分 |
+|:-----|:-------|:-------|:-----|
+| 主要論点 | ... | ... | 一致/相違 |
+| リスク指摘 | ... | ... | 一致/相違 |
+| 改善提案 | ... | ... | 一致/相違 |
+| 確信度 | ...% | ...% | Δ |
+| **盲点** | Gemini が指摘し Claude が見落とした点 | Claude が指摘し Gemini が見落とした点 | — |
+
+### 手動チェックリスト (従来互換)
 
 | 項目 | 内容 |
 |:-----|:-----|
 | 対象 | {検証対象} |
-| 検証モデル | Claude/GPT/etc |
+| 検証モデル | Claude/Gemini/GPT |
 | L1 成果物正確性 | Pass/Warn/Fail |
 | L2 プロセス遵守 | Pass/Warn/Fail |
 | L3 計画一致 | Pass/Warn/Fail |

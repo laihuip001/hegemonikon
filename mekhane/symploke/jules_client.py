@@ -691,7 +691,7 @@ class JulesClient:
         """
         # Import perspective matrix
         try:
-            from mekhane.ergasterion.synedrion import PerspectiveMatrix
+            from mekhane.synedrion import PerspectiveMatrix
         except ImportError:
             raise ImportError(
                 "Synedrion module not found. Ensure mekhane.ergasterion.synedrion is installed."

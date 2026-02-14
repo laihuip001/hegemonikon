@@ -190,6 +190,22 @@ def _register_routers(app: FastAPI) -> None:
     except Exception as exc:
         logger.warning("Digestor router skipped: %s", exc)
 
+    # Chat — Gemini API SSE プロキシ (httpx に依存するため遅延ロード)
+    try:
+        from mekhane.api.routes.chat import router as chat_router
+        app.include_router(chat_router, prefix=API_PREFIX)
+        logger.info("Chat router registered")
+    except Exception as exc:
+        logger.warning("Chat router skipped: %s", exc)
+
+    # Quota — agq-check.sh (subprocess) に依存するため遅延ロード
+    try:
+        from mekhane.api.routes.quota import router as quota_router
+        app.include_router(quota_router, prefix=API_PREFIX)
+        logger.info("Quota router registered")
+    except Exception as exc:
+        logger.warning("Quota router skipped: %s", exc)
+
 
 # PURPOSE: アプリケーションインスタンス（uvicorn 用）
 app = create_app()

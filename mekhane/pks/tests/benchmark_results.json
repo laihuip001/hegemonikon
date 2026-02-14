@@ -1,0 +1,587 @@
+[
+  {
+    "query_id": "T1",
+    "query": "FEP variational free energy minimization",
+    "category": "theoretical_core",
+    "description": "FEP の基礎理論",
+    "precision_at_5": 1.0,
+    "mrr": 1.0,
+    "source_coverage": 1.0,
+    "latency_seconds": 8.333852291107178,
+    "keyword_hits": 4,
+    "total_keywords": 5,
+    "top_results": [
+      {
+        "source": "gnosis",
+        "score": 1.24,
+        "title": "Improving the Minimum Free Energy Principle to the Maximum Information Efficiency Principle"
+      },
+      {
+        "source": "gnosis",
+        "score": 1.1816502784947347,
+        "title": "Unifying Message Passing Algorithms Under the Framework of Constrained Bethe Free Energy Minimization"
+      },
+      {
+        "source": "gnosis",
+        "score": 1.1671304286432396,
+        "title": "A Message Passing Realization of Expected Free Energy Minimization"
+      },
+      {
+        "source": "gnosis",
+        "score": 1.1605371306088272,
+        "title": "A Neural Network Implementation for Free Energy Principle"
+      },
+      {
+        "source": "gnosis",
+        "score": 1.1342544772988272,
+        "title": "A Mathematical Walkthrough and Discussion of the Free Energy Principle"
+      }
+    ]
+  },
+  {
+    "query_id": "T2",
+    "query": "active inference expected free energy planning",
+    "category": "theoretical_core",
+    "description": "能動的推論と計画",
+    "precision_at_5": 1.0,
+    "mrr": 1.0,
+    "source_coverage": 1.0,
+    "latency_seconds": 2.2441461086273193,
+    "keyword_hits": 4,
+    "total_keywords": 4,
+    "top_results": [
+      {
+        "source": "gnosis",
+        "score": 1.25,
+        "title": "Expected Free Energy-based Planning as Variational Inference"
+      },
+      {
+        "source": "gnosis",
+        "score": 1.1964513159648367,
+        "title": "Whence the Expected Free Energy?"
+      },
+      {
+        "source": "gnosis",
+        "score": 1.1404431634575074,
+        "title": "Retrospective surprise: A computational component for active inference"
+      },
+      {
+        "source": "gnosis",
+        "score": 1.1222916811422838,
+        "title": "The Free Energy Principle for Perception and Action: A Deep Learning Perspective"
+      },
+      {
+        "source": "gnosis",
+        "score": 1.0645042959624789,
+        "title": "Active Inference for Energy Control and Planning in Smart Buildings and Communities"
+      }
+    ]
+  },
+  {
+    "query_id": "T3",
+    "query": "Markov blanket self organization biological systems",
+    "category": "theoretical_core",
+    "description": "マルコフ毛布と自己組織化",
+    "precision_at_5": 0.4,
+    "mrr": 1.0,
+    "source_coverage": 1.0,
+    "latency_seconds": 2.2967844009399414,
+    "keyword_hits": 2,
+    "total_keywords": 4,
+    "top_results": [
+      {
+        "source": "gnosis",
+        "score": 1.25,
+        "title": "The Markov blankets of life: autonomy, active inference and the free energy principle"
+      },
+      {
+        "source": "gnosis",
+        "score": 1.0699425929405335,
+        "title": "Attractor Engine Deep Dive"
+      },
+      {
+        "source": "kairos",
+        "score": 1.0,
+        "title": "Bye Session Finalization"
+      },
+      {
+        "source": "sophia",
+        "score": 1.0,
+        "title": "ki-hegemonikon_knowledge_infrastructure-maintenance-workflow_hygiene"
+      },
+      {
+        "source": "chronos",
+        "score": 1.0,
+        "title": "handoff_2026-02-13_2344_s3"
+      }
+    ]
+  },
+  {
+    "query_id": "H1",
+    "query": "CCL cognitive control language workflow",
+    "category": "hgk_concepts",
+    "description": "CCL ワークフロー言語",
+    "precision_at_5": 1.0,
+    "mrr": 1.0,
+    "source_coverage": 0.0,
+    "latency_seconds": 2.231358289718628,
+    "keyword_hits": 5,
+    "total_keywords": 5,
+    "top_results": [
+      {
+        "source": "gnosis",
+        "score": 1.2736342404749537,
+        "title": "Implementing EPT Structure Layer"
+      },
+      {
+        "source": "gnosis",
+        "score": 1.240914934608878,
+        "title": "Enhancing Hegemonik n Documentation"
+      },
+      {
+        "source": "gnosis",
+        "score": 1.24,
+        "title": "Bou Ccl Meta Verification 20260129"
+      },
+      {
+        "source": "gnosis",
+        "score": 1.1949374760774927,
+        "title": "Implement CCL Debug & Generate"
+      },
+      {
+        "source": "gnosis",
+        "score": 1.1369239327606884,
+        "title": "Ccl Language"
+      }
+    ]
+  },
+  {
+    "query_id": "H2",
+    "query": "Noēsis Boulēsis Zētēsis ousia series theorem",
+    "category": "hgk_concepts",
+    "description": "O-series 定理群",
+    "precision_at_5": 1.0,
+    "mrr": 1.0,
+    "source_coverage": 0.3333333333333333,
+    "latency_seconds": 2.24916410446167,
+    "keyword_hits": 5,
+    "total_keywords": 6,
+    "top_results": [
+      {
+        "source": "gnosis",
+        "score": 1.25,
+        "title": "Axiom Hierarchy V2.1 Backup"
+      },
+      {
+        "source": "gnosis",
+        "score": 1.2476169563639132,
+        "title": "Axiom Hierarchy"
+      },
+      {
+        "source": "gnosis",
+        "score": 1.2455208474114623,
+        "title": "Axiom Hierarchy V3 Experimental"
+      },
+      {
+        "source": "gnosis",
+        "score": 1.2236979172579687,
+        "title": "Ousia"
+      },
+      {
+        "source": "gnosis",
+        "score": 1.1666901558549434,
+        "title": "Naming Conventions"
+      }
+    ]
+  },
+  {
+    "query_id": "H3",
+    "query": "二層フィルター criterion cognitive novelty tensor product",
+    "category": "hgk_concepts",
+    "description": "二層フィルター理論",
+    "precision_at_5": 0.8,
+    "mrr": 1.0,
+    "source_coverage": 1.0,
+    "latency_seconds": 2.1740591526031494,
+    "keyword_hits": 1,
+    "total_keywords": 5,
+    "top_results": [
+      {
+        "source": "gnosis",
+        "score": 1.0220243113319463,
+        "title": "Implementing Morphism Enforcement"
+      },
+      {
+        "source": "gnosis",
+        "score": 1.0,
+        "title": "Dendron Project Creation"
+      },
+      {
+        "source": "kairos",
+        "score": 1.0,
+        "title": "Dendron Package Audit"
+      },
+      {
+        "source": "sophia",
+        "score": 1.0,
+        "title": "ki-hegemonikon_multi_agent_orchestration-overview"
+      },
+      {
+        "source": "chronos",
+        "score": 1.0,
+        "title": "handoff_2026-01-31_1400_s4"
+      }
+    ]
+  },
+  {
+    "query_id": "I1",
+    "query": "PKS proactive knowledge surface push embedding",
+    "category": "implementation",
+    "description": "PKS 実装",
+    "precision_at_5": 1.0,
+    "mrr": 1.0,
+    "source_coverage": 0.5,
+    "latency_seconds": 2.187647581100464,
+    "keyword_hits": 5,
+    "total_keywords": 5,
+    "top_results": [
+      {
+        "source": "gnosis",
+        "score": 1.15,
+        "title": "Jukudoku Spisak Friston2025 20260207"
+      },
+      {
+        "source": "gnosis",
+        "score": 1.1183106086629184,
+        "title": "Attractor Engine Deep Dive"
+      },
+      {
+        "source": "sophia",
+        "score": 1.05,
+        "title": "ki-hegemonikon_knowledge_infrastructure-maintenance-workflow_hygiene"
+      },
+      {
+        "source": "gnosis",
+        "score": 1.0095870839049095,
+        "title": "Quantum embedding method with transformer neural network quantum states for strongly correlated materials"
+      },
+      {
+        "source": "kairos",
+        "score": 1.0,
+        "title": "Implementing O-Series Derivatives"
+      }
+    ]
+  },
+  {
+    "query_id": "I2",
+    "query": "Dendron PROOF existence proof verification",
+    "category": "implementation",
+    "description": "Dendron 存在証明",
+    "precision_at_5": 1.0,
+    "mrr": 1.0,
+    "source_coverage": 0.0,
+    "latency_seconds": 2.302114486694336,
+    "keyword_hits": 3,
+    "total_keywords": 5,
+    "top_results": [
+      {
+        "source": "gnosis",
+        "score": 1.18,
+        "title": "Dendron Project Creation"
+      },
+      {
+        "source": "gnosis",
+        "score": 1.1746128740096444,
+        "title": "Dendron Package Audit"
+      },
+      {
+        "source": "gnosis",
+        "score": 1.1315108480135774,
+        "title": "Dendron Automation and Workflow"
+      },
+      {
+        "source": "gnosis",
+        "score": 1.1117298889496317,
+        "title": "Dendron Automation and Workflow"
+      },
+      {
+        "source": "gnosis",
+        "score": 1.0248240818557897,
+        "title": "Dendron Project Creation"
+      }
+    ]
+  },
+  {
+    "query_id": "I3",
+    "query": "Hermēneus parser CCL AST dispatch runtime",
+    "category": "implementation",
+    "description": "Hermēneus パーサー",
+    "precision_at_5": 1.0,
+    "mrr": 1.0,
+    "source_coverage": 0.0,
+    "latency_seconds": 2.1524107456207275,
+    "keyword_hits": 4,
+    "total_keywords": 6,
+    "top_results": [
+      {
+        "source": "gnosis",
+        "score": 1.2,
+        "title": "Hermeneus Development Planning"
+      },
+      {
+        "source": "gnosis",
+        "score": 1.0927925376851098,
+        "title": "CCL Execution Guarantee Architecture"
+      },
+      {
+        "source": "gnosis",
+        "score": 1.0927925376851098,
+        "title": "CCL Execution Guarantee Architecture"
+      },
+      {
+        "source": "gnosis",
+        "score": 1.035046057730763,
+        "title": "Tak Hermeneus Roadmap 20260131"
+      },
+      {
+        "source": "gnosis",
+        "score": 1.0263136714499381,
+        "title": "Hermeneus Development Planning"
+      }
+    ]
+  },
+  {
+    "query_id": "X1",
+    "query": "category theory adjunction cognitive framework",
+    "category": "cross_domain",
+    "description": "圏論と認知の接続",
+    "precision_at_5": 1.0,
+    "mrr": 1.0,
+    "source_coverage": 0.5,
+    "latency_seconds": 2.2118330001831055,
+    "keyword_hits": 3,
+    "total_keywords": 5,
+    "top_results": [
+      {
+        "source": "gnosis",
+        "score": 1.18,
+        "title": "Categorial Compositionality: A Category Theory Explanation for the Systematicity of Human Cognition"
+      },
+      {
+        "source": "gnosis",
+        "score": 1.17181258045545,
+        "title": "Category Theory Ccl Report 20260203"
+      },
+      {
+        "source": "gnosis",
+        "score": 1.1242298614297646,
+        "title": "Token Space: A Category Theory Framework for AI Computations"
+      },
+      {
+        "source": "gnosis",
+        "score": 1.1187463505547952,
+        "title": "Refining CCL Operators"
+      },
+      {
+        "source": "gnosis",
+        "score": 1.111702694228935,
+        "title": "What is category theory to cognitive science? Compositional representation and comparison"
+      }
+    ]
+  },
+  {
+    "query_id": "X2",
+    "query": "precision weighting attention interoception prediction error",
+    "category": "cross_domain",
+    "description": "精度加重と注意",
+    "precision_at_5": 1.0,
+    "mrr": 1.0,
+    "source_coverage": 1.0,
+    "latency_seconds": 2.3310608863830566,
+    "keyword_hits": 5,
+    "total_keywords": 5,
+    "top_results": [
+      {
+        "source": "gnosis",
+        "score": 1.1165279030226993,
+        "title": "No evidence for increased precision-weighting of prediction errors in autistic adolescents' ERPs or behaviour during adaptation to gaze direction"
+      },
+      {
+        "source": "gnosis",
+        "score": 1.1072305070069,
+        "title": "Evidence for implicit and adaptive deployment of precision weighting during passive listening: a simultaneous EEG/MEG study"
+      },
+      {
+        "source": "gnosis",
+        "score": 1.1,
+        "title": "Transdiagnostic failure to adapt interoceptive precision estimates across affective, substance use, and eating disorders: A replication study"
+      },
+      {
+        "source": "gnosis",
+        "score": 1.0234811146116451,
+        "title": "Selection history and task predictability determine the precision expectations in attentional control."
+      },
+      {
+        "source": "gnosis",
+        "score": 1.0213640362914462,
+        "title": "Implicit learning in 3‐year‐olds with high and low likelihood of autism shows no evidence of precision weighting differences"
+      }
+    ]
+  },
+  {
+    "query_id": "X3",
+    "query": "Cortex API direct access bypass language server",
+    "category": "cross_domain",
+    "description": "Cortex API 直接アクセス",
+    "precision_at_5": 1.0,
+    "mrr": 1.0,
+    "source_coverage": 0.5,
+    "latency_seconds": 2.4243521690368652,
+    "keyword_hits": 1,
+    "total_keywords": 5,
+    "top_results": [
+      {
+        "source": "gnosis",
+        "score": 1.042857142857143,
+        "title": "Synergeia API Optimization"
+      },
+      {
+        "source": "gnosis",
+        "score": 1.0355753497225746,
+        "title": "Tier 1 Specialist Expansion"
+      },
+      {
+        "source": "gnosis",
+        "score": 1.0346086775657648,
+        "title": "Implementing MCP Server Stub"
+      },
+      {
+        "source": "gnosis",
+        "score": 1.0136008291751504,
+        "title": "Tier 1 Specialist Expansion"
+      },
+      {
+        "source": "kairos",
+        "score": 1.0010150851591495,
+        "title": "Implementing MCP Server Stub"
+      }
+    ]
+  },
+  {
+    "query_id": "E1",
+    "query": "xylophone quantum teleportation recipe cooking",
+    "category": "edge_case",
+    "description": "完全無関係クエリ (ノイズ検出)",
+    "precision_at_5": 0.0,
+    "mrr": 0.0,
+    "source_coverage": 0.0,
+    "latency_seconds": 2.262748956680298,
+    "keyword_hits": 0,
+    "total_keywords": 0,
+    "top_results": [
+      {
+        "source": "gnosis",
+        "score": 1.06,
+        "title": "Digestor Automation Setup"
+      },
+      {
+        "source": "kairos",
+        "score": 1.0,
+        "title": "Defining Specialist Archetypes"
+      },
+      {
+        "source": "sophia",
+        "score": 1.0,
+        "title": "ki-hegemonikon_multi_agent_orchestration-overview"
+      },
+      {
+        "source": "chronos",
+        "score": 1.0,
+        "title": "handoff_2026-02-09_0936_s3"
+      },
+      {
+        "source": "chronos",
+        "score": 0.9947817517660933,
+        "title": "handoff_2026-02-11_2153_s7"
+      }
+    ]
+  },
+  {
+    "query_id": "E2",
+    "query": "日本語だけのクエリ 自由エネルギー原理 予測誤差最小化",
+    "category": "edge_case",
+    "description": "日本語クエリの精度",
+    "precision_at_5": 1.0,
+    "mrr": 1.0,
+    "source_coverage": 0.5,
+    "latency_seconds": 2.353787422180176,
+    "keyword_hits": 3,
+    "total_keywords": 3,
+    "top_results": [
+      {
+        "source": "gnosis",
+        "score": 1.2,
+        "title": "Axiom Hierarchy V3 Experimental"
+      },
+      {
+        "source": "gnosis",
+        "score": 1.0987844387735801,
+        "title": "Implement CCL Debug & Generate"
+      },
+      {
+        "source": "gnosis",
+        "score": 1.0704175133873923,
+        "title": "The Free-energy Principle: A Unified Theory of Brain Functions"
+      },
+      {
+        "source": "gnosis",
+        "score": 1.0701401855547805,
+        "title": "Naming Conventions"
+      },
+      {
+        "source": "gnosis",
+        "score": 1.0478339963352061,
+        "title": "U Ccl Symbol Expansion 20260131"
+      }
+    ]
+  },
+  {
+    "query_id": "E3",
+    "query": "boot handoff session bye workflow",
+    "category": "edge_case",
+    "description": "運用系キーワード",
+    "precision_at_5": 1.0,
+    "mrr": 1.0,
+    "source_coverage": 0.0,
+    "latency_seconds": 2.481076955795288,
+    "keyword_hits": 5,
+    "total_keywords": 5,
+    "top_results": [
+      {
+        "source": "gnosis",
+        "score": 1.2982688446536554,
+        "title": "Session Handoff and Workflow Update"
+      },
+      {
+        "source": "gnosis",
+        "score": 1.24,
+        "title": "Workflow Update and Cleanup"
+      },
+      {
+        "source": "gnosis",
+        "score": 1.234425239365693,
+        "title": "Workflow Update and Cleanup"
+      },
+      {
+        "source": "gnosis",
+        "score": 1.2331437542694013,
+        "title": "Sophia MCP & Linting Fixes"
+      },
+      {
+        "source": "gnosis",
+        "score": 1.2055146129883578,
+        "title": "Session Handoff and Closure"
+      }
+    ]
+  }
+]

@@ -15,6 +15,7 @@ CCL: @syn· (内積モード) の L2 層
 """
 
 import json
+import logging
 import os
 import re
 from abc import ABC, abstractmethod
@@ -30,6 +31,8 @@ from ..base import (
     AuditTarget,
     AuditTargetType,
 )
+
+logger = logging.getLogger(__name__)
 
 
 # =============================================================================
@@ -197,7 +200,7 @@ def parse_llm_response(response: str, agent_name: str) -> List[AuditIssue]:
                 )
             return issues
     except (json.JSONDecodeError, TypeError):
-        pass
+        logger.debug("JSON parse failed, falling back to markdown parser")
 
     # 2. Markdown リスト形式のフォールバックパース
     # "- [SEVERITY] CODE: message" パターン
@@ -280,7 +283,7 @@ def _load_prompt() -> str:
         if _PROMPT_FILE.exists():
             return _PROMPT_FILE.read_text(encoding="utf-8")
     except Exception:
-        pass
+        logger.debug("Failed to load prompt file, using fallback")
     return _FALLBACK_PROMPT
 
 
@@ -314,13 +317,22 @@ class SemanticAgent(AuditAgent):
         if backend is not None:
             self.backend = backend
         else:
-            # 自動選択: OpenAI > LMQL > Stub
+            # 自動選択: OpenAI > Cortex > LMQL > Stub
             openai_be = OpenAIBackend()
             if openai_be.is_available():
                 self.backend = openai_be
             else:
-                lmql = LMQLBackend()
-                self.backend = lmql if lmql.is_available() else StubBackend()
+                try:
+                    from .cortex_backend import CortexBackend
+
+                    cortex_be = CortexBackend()
+                    if cortex_be.is_available():
+                        self.backend = cortex_be
+                    else:
+                        raise ImportError("Cortex unavailable")
+                except (ImportError, Exception):
+                    lmql = LMQLBackend()
+                    self.backend = lmql if lmql.is_available() else StubBackend()
 
     # PURPOSE: セマンティック監査を実行
     def audit(self, target: AuditTarget) -> AgentResult:
@@ -387,7 +399,7 @@ class SemanticAgent(AuditAgent):
             if isinstance(data, dict) and "confidence" in data:
                 return float(data["confidence"])
         except (json.JSONDecodeError, TypeError, ValueError):
-            pass
+            logger.debug("Failed to extract confidence from response")
         return 0.7  # デフォルト
 
     # PURPOSE: L2 はテキスト系のターゲットのみサポート

@@ -41,6 +41,17 @@ from .dokimasia import (
     SemanticAgent,
 )
 
+# L3 (コンセンサス監査)
+from .dokimasia.consensus_agent import ConsensusAgent
+
+# Pattern utilities (F4/F5)
+from .pattern_loader import (
+    load_merged_patterns,
+    record_hit,
+    get_stats,
+    reset_stats,
+)
+
 __all__ = [
     # Base
     "AuditSeverity",
@@ -52,6 +63,7 @@ __all__ = [
     "AuditAgent",
     # Orchestrator
     "AuditOrchestrator",
+    "SynteleiaOrchestrator",
     # Poiēsis
     "OusiaAgent",
     "SchemaAgent",
@@ -64,4 +76,11 @@ __all__ = [
     "CompletenessAgent",
     # L2
     "SemanticAgent",
+    # L3
+    "ConsensusAgent",
+    # Pattern utilities
+    "load_merged_patterns",
+    "record_hit",
+    "get_stats",
+    "reset_stats",
 ]

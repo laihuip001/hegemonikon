@@ -22,6 +22,7 @@ Usage:
 
 from dataclasses import dataclass, field
 from enum import Enum
+from pathlib import Path
 from typing import Optional
 
 
@@ -740,6 +741,70 @@ def __getattr__(name):
     raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
 
 
+# ============ プロジェクトコンテキスト ============
+
+# PURPOSE: AGENTS.md + context/*.md からプロジェクトコンテキストを動的にロード
+def _load_project_context(
+    context_dir: str = "mekhane/symploke/context",
+) -> str:
+    """
+    Load project context from AGENTS.md and optional domain-specific files.
+
+    Search order:
+        1. AGENTS.md at repository root
+        2. All .md files in context_dir
+
+    Falls back to a minimal static context if files are not found.
+    """
+    # Find repository root (walk up from this file)
+    repo_root = Path(__file__).parent.parent.parent
+    sections: list[str] = []
+
+    # 1. Load AGENTS.md
+    agents_md = repo_root / "AGENTS.md"
+    if agents_md.exists():
+        try:
+            content = agents_md.read_text(encoding="utf-8")
+            # Extract key sections (skip YAML-style headers)
+            sections.append(content)
+        except (OSError, UnicodeDecodeError):
+            pass
+
+    # 2. Load domain-specific context files
+    ctx_path = repo_root / context_dir
+    if ctx_path.is_dir():
+        for md_file in sorted(ctx_path.glob("*.md")):
+            try:
+                sections.append(md_file.read_text(encoding="utf-8"))
+            except (OSError, UnicodeDecodeError):
+                pass
+
+    if sections:
+        return "\n\n---\n\n".join(sections)
+
+    # Fallback: minimal static context
+    return """このプロジェクト (Hegemonikon) の規約:
+
+- **`# PURPOSE:` コメント**: 全 .py ファイルの先頭にある意図的な規約。削除不要。内容と実装の乖離のみ指摘可
+- **命名**: snake_case (関数/変数), PascalCase (クラス), SCREAMING_SNAKE_CASE (定数)
+- **コメント言語**: コードコメントは英語、ドキュメントは日本語
+- **型アノテーション**: 全新規関数に必須
+- **目的**: 一般的な lint ではなく、**設計・構造・美学のニッチな知的発見** が期待される"""
+
+
+# Cache for project context (loaded once per process)
+_PROJECT_CONTEXT_CACHE: str | None = None
+
+
+# PURPOSE: Get cached project context
+def _get_project_context() -> str:
+    """Get cached project context."""
+    global _PROJECT_CONTEXT_CACHE
+    if _PROJECT_CONTEXT_CACHE is None:
+        _PROJECT_CONTEXT_CACHE = _load_project_context()
+    return _PROJECT_CONTEXT_CACHE
+
+
 # ============ プロンプト生成 ============
 
 # PURPOSE: 専門家レビュープロンプトを生成。
@@ -792,14 +857,7 @@ def generate_prompt(
 
 ## Project Context (重要 — 必ず理解してから分析すること)
 
-このプロジェクト (Hegemonikon) の規約:
-
-- **`# PURPOSE:` コメント**: 全 .py ファイルの先頭にある意図的な規約。削除不要。内容と実装の乖離のみ指摘可
-- **命名**: snake_case (関数/変数), PascalCase (クラス), SCREAMING_SNAKE_CASE (定数)
-- **コメント言語**: コードコメントは英語、ドキュメントは日本語
-- **型アノテーション**: 全新規関数に必須
-- **既存 lint ツール**: Dendron PROOF check (pre-commit)。ruff/mypy は未設定
-- **目的**: 一般的な lint (PEP8 違反、import 順序等) ではなく、**設計・構造・美学のニッチな知的発見** が期待される
+{_get_project_context()}
 
 上記の規約に沿った内容を「問題」として指摘しないでください。
 

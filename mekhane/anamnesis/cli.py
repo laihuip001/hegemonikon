@@ -485,6 +485,22 @@ def main():
     )
     p_handoff.set_defaults(func=cmd_handoff_index)
 
+    # rom-index (ROM VSearch)
+    # PURPOSE: [L2-auto] ROM ファイルをインデックス
+    def cmd_rom_index(args):
+        """ROM ファイルをインデックス"""
+        from mekhane.anamnesis.session_indexer import index_roms
+        return index_roms(args.rom_dir)
+
+    p_rom = subparsers.add_parser(
+        "rom-index", help="Index rom_*.md files into LanceDB"
+    )
+    p_rom.add_argument(
+        "--rom-dir", default=None,
+        help="Custom ROM directory (default: ~/oikos/mneme/.hegemonikon/rom)"
+    )
+    p_rom.set_defaults(func=cmd_rom_index)
+
     # conversation-index (Full Conversation Content VSearch)
     # PURPOSE: [L2-auto] 全セッション会話をインデックス
     def cmd_conversation_index(args):

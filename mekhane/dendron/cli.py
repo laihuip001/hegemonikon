@@ -7,6 +7,7 @@ Usage:
     python -m mekhane.dendron.cli check [PATH] [--coverage] [--ci] [--format FORMAT]
     python -m mekhane.dendron.cli purpose [PATH] [--ci] [--strict]
     python -m mekhane.dendron.cli variables [PATH] [--ci]
+    python -m mekhane.dendron.cli reason [PATH] [--dry-run] [--apply]
     python -m mekhane.dendron.cli skill-audit [AGENT_DIR] [--ci] [--boot-summary]
 """
 
@@ -81,6 +82,18 @@ def main() -> int:
         "--since", default="HEAD~1", help="比較起点 (default: HEAD~1)"
     )
 
+    # reason コマンド (v3.7: REASON 自動推定)
+    reason_parser = subparsers.add_parser("reason", help="REASON コメントを自動推定")
+    reason_parser.add_argument(
+        "path", nargs="?", default=".", help="チェック対象ディレクトリ (default: .)"
+    )
+    reason_parser.add_argument(
+        "--apply", action="store_true", help="実際に書き込む (デフォルトは dry-run)"
+    )
+    reason_parser.add_argument(
+        "--limit", type=int, default=50, help="最大処理ファイル数 (default: 50)"
+    )
+
     # guard コマンド (v3.6: アンチウイルス — 変更ファイルのみチェック)
     guard_parser = subparsers.add_parser("guard", help="変更ファイルのみ PROOF/PURPOSE/REASON をチェック")
     guard_parser.add_argument(
@@ -103,6 +116,8 @@ def main() -> int:
         return cmd_skill_audit(args)
     elif args.command == "diff":
         return cmd_diff(args)
+    elif args.command == "reason":
+        return cmd_reason(args)
     elif args.command == "guard":
         return cmd_guard(args)
 
@@ -119,12 +134,14 @@ def cmd_check(args: argparse.Namespace) -> int:  # noqa: AI-005 # noqa: AI-ALL
         return 1
 
     # チェッカー設定
+    # CI モードでは EPT フルマトリクスを自動有効化 (v3.7)
+    enable_ept = getattr(args, 'ept', False) or getattr(args, 'ci', False)
     checker = DendronChecker(
         check_dirs=not args.no_dirs,
         check_files=True,
-        check_structure=getattr(args, 'ept', False),
-        check_function_nf=getattr(args, 'ept', False),
-        check_verification=getattr(args, 'ept', False),
+        check_structure=enable_ept,
+        check_function_nf=enable_ept,
+        check_verification=enable_ept,
     )
 
     # チェック実行
@@ -317,6 +334,44 @@ def cmd_diff(args: argparse.Namespace) -> int:
     root = Path(args.path).resolve()
     result = diff_check(root, since=args.since)
     print(format_diff_result(result))
+    return 0
+
+
+# PURPOSE: REASON コメントを自動推定して表示または付与する (v3.7)
+def cmd_reason(args: argparse.Namespace) -> int:
+    """reason コマンドの実行 — REASON 自動推定"""
+    from .reason_infer import add_reason_comments
+
+    path = Path(args.path)
+    if not path.exists():
+        print(f"Error: {path} が存在しません", file=sys.stderr)
+        return 1
+
+    dry_run = not args.apply
+    limit = args.limit
+
+    if dry_run:
+        print("🔍 DRY RUN — showing proposed REASON additions (use --apply to write)")
+    else:
+        print("✏️  APPLYING REASON comments...")
+
+    files = sorted(path.rglob("*.py")) if path.is_dir() else [path]
+    total_file = 0
+    total_func = 0
+    files_modified = 0
+
+    for f in files[:limit]:
+        if "__pycache__" in str(f) or "test" in f.name.lower():
+            continue
+        file_count, func_count = add_reason_comments(f, dry_run=dry_run)
+        if file_count + func_count > 0:
+            print(f"📄 {f}: +{file_count} file REASON, +{func_count} func REASON")
+            total_file += file_count
+            total_func += func_count
+            files_modified += 1
+
+    verb = "Would add" if dry_run else "Added"
+    print(f"\n{verb}: {total_file} file + {total_func} func REASON in {files_modified} files")
     return 0
 
 

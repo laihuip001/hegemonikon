@@ -189,8 +189,8 @@ npx @google/gemini-cli --prompt "hello" --output-format json
 ```bash
 REFRESH_TOKEN=$(python3 -c "import json; print(json.load(open('$HOME/.gemini/oauth_creds.json'))['refresh_token'])")
 TOKEN=$(curl -s -X POST "https://oauth2.googleapis.com/token" \
-  -d "client_id=REDACTED_CLIENT_ID" \
-  -d "client_secret=REDACTED_CLIENT_SECRET" \
+  -d "client_id=<CORTEX_CLIENT_ID>" \
+  -d "client_secret=<CORTEX_CLIENT_SECRET>" \
   -d "refresh_token=$REFRESH_TOKEN" \
   -d "grant_type=refresh_token" | python3 -c "import sys,json; print(json.load(sys.stdin)['access_token'])")
 ```
@@ -247,8 +247,8 @@ curl -s -X POST \
 
 | 要素 | 値 | 出典 |
 |:-----|:---|:-----|
-| **Client ID** | `REDACTED_CLIENT_ID` | `oauth2.ts` L70-71 |
-| **Client Secret** | `REDACTED_CLIENT_SECRET` | `oauth2.ts` L79 (installed app, 公開安全) |
+| **Client ID** | `<REDACTED — ~/.config/cortex/oauth.json>` | `oauth2.ts` L70-71 |
+| **Client Secret** | `<REDACTED — ~/.config/cortex/oauth.json>` | `oauth2.ts` L79 (installed app) |
 | **Scopes** | `cloud-platform`, `userinfo.email`, `userinfo.profile` | `oauth2.ts` L82-86 |
 | **キャッシュ場所** | `~/.gemini/oauth_creds.json` | `oauth2.ts` + `storage.ts` |
 

@@ -182,50 +182,35 @@ def get_macro_registry() -> Dict[str, str]:
 
 
 # 標準マクロ (ハードコード版 — ccl-*.md が見つからない場合のフォールバック)
-# ccl-*.md 由来の正規定義に同期 (2026-02-11)
-# v2: hub-only 9定理を既存+新規マクロに統合 (DX-008 対応)
+# ccl-*.md 由来の正規定義に同期 (2026-02-14)
+# v4: 非Kalon マクロ削除 (@clean, @feel, @osc) + WF正本同期21→15 に間引き
 BUILTIN_MACROS = {
     # 問いの深化 — 認知昇華: Prior→Likelihood→Posterior
     "nous": "/pro_/s-_R:{F:[×2]{/u+*^/u^}}_~(/noe*/dia)_/pis_/dox-",
-    "dig": "/pro_/s+~(/p*/a)_/ana_/dia*/o+_/pis",
+    "dig": "/pro_/s+~(/p*/a)_/ana_/dia*/o+_/pis_/dox-",
     # S-series (設計)
     "plan": "/bou+_/chr_/s+~(/p*/k)_V:{/dia}_/pis_/dox-",
-    "build": "/bou-_/chr_/kho_/s+_/ene+_V:{/dia-}_I:[✓]{/dox-}",  # ✅ 十分
-    "tak": "/s1_F:[×3]{/sta~/chr}_F:[×3]{/kho~/zet}_I:[∅]{/sop}_/euk_/bou",  # ✅ 十分
+    "build": "/bou-_/s+_/ene+_V:{/dia-}_I:[✓]{/dox-}",
+    "tak": "/s1_F:[×3]{/sta~/chr}_F:[×3]{/kho~/zet}_I:[∅]{/sop}_/euk_/bou",
     # H-series (動機)
-    "osc": "R:{F:[/s,/dia,/noe]{L:[x]{x~x+}}, ~(/h*/k)}",  # ✅ 十分
     "learn": "/pro_/dox+_F:[×2]{/u+~(/noe*/dia)}_~(/h*/k)_/pis_/bye+",
     # A-series (精密)
     "fix": "/kho_/tel_C:{/dia+_/ene+}_I:[✓]{/pis_/dox-}",
-    "vet": "/kho{git_diff}_C:{V:{/dia+}_/ene+}_/pra{test}_/pis_/dox",  # ✅ 十分
-    "proof": '/kat_V:{/noe~/dia}_I:[✓]{/ene{PROOF.md}}_E:{/ene{_limbo/}}',  # ✅ 十分
+    "vet": "/kho{git_diff}_C:{V:{/dia+}_/ene+}_/pra{test}_/pra{dendron_guard}_/pis_/dox",
+    "proof": "V:{/noe~/dia}_I:[✓]{/ene{PROOF.md}}_E:{/ene{_limbo/}}",
     "syn": "/kho_/s-_/pro_/dia+{synteleia}_~(/noe*/dia)_V:{/pis+}_/dox-",
     # P-series (条件)
-    "ground": "/pro_/tak-*/bou+{6w3h}~/p-_/ene-_/pis",
-    "ready": "/bou-_/pro_/kho_/chr_/euk_/tak-_~(/h*/k)_/pis",
+    "ready": "/bou-_/pro_/kho_/chr_/euk_/tak-_~(/h*/k)_/pis_/dox-",
     # K-series (文脈)
     "kyc": "/pro_C:{/sop_/noe_/ene_/dia-}_/pis_/dox-",
-    # Hub-only 統合 (DX-008)
-    "feel": "/pro_/ore~(/pis_/ana)_/dox-",
-    "clean": "/s-_/kat_/sym~(/tel_/dia-)_/pis",
     # 反復マクロ (Repetition Principle — 認知の絡み合い再現)
     "chew": "/s-_/pro_F:[×3]{/eat+~(/noe*/dia)}_~(/h*/k)_@proof_/pis_/dox-",
     "read": "/s-_/pro_F:[×3]{/m.read~(/noe*/dia)}_/ore_~(/h*/k)_/pis_/dox-",
     # 方向性マクロ (FuseOuter + Pipeline)
     "helm": "/pro_/kho_/bou+*%/zet+|>/u++_~(/h*/k)_/pis_/dox-",
-    # FuseOuter マクロ
-    "weigh": "/bou*%/noe",
-    "scan": "/s*%/dia",
-    # Utility マクロ
+    # Archive (ccl-*.md が archive/ に移動済み — 展開テスト用に残す)
     "go": "/s+_/ene+",
     "wake": "/boot+_@dig_@plan",
-    "why": "F:5{/zet{why}}_/noe{root_cause}",
-    "eat": "/mek{digest}_/ene{mapping}_/dia{quality}_/dox",
-    "fit": "/dia{naturality}_/pis{integration}",
-    "lex": "/dia{expression}_/gno{feedback}",
-    # Legacy (互換用)
-    "think": "/noe+ >> V[] < 0.3",
-    "review": "/dia+ _ /pre+ _ /sta.done",
 }
 
 

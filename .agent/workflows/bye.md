@@ -1,9 +1,9 @@
 ---
 description: セッション終了時に引き継ぎドキュメントを生成し、経験を法則化する。次回セッションの/bootで読み込まれる。
 hegemonikon: H4 Doxa
-version: "7.3"
+version: "7.4"
 lcm_state: stable
-lineage: "v7.0 + Step 3.5 IDE ネイティブ Export → v7.1 → v7.3 gRPC Auto-Export"
+lineage: "v7.0 + Step 3.5 IDE ネイティブ Export → v7.1 → v7.3 gRPC Auto-Export → v7.4 Step 3.7.5 共進化記録"
 category_theory:
   core: "随伴の右関手 R: Ses → Mem"
   adjunction: "L (Boot) ⊣ R (Bye)"
@@ -364,6 +364,24 @@ bash ~/oikos/hegemonikon/scripts/agq-check.sh --delta 2>/dev/null
 | 能力境界の更新 | R の定義域を修正 | 得意/苦手の発見 |
 | 比喩の自己評価 | R の表現力 | 自発的比喩の数と質 |
 | 同意/反論比率 | R の偏り | 同意N / 反論N / 確認N |
+
+---
+
+## Step 3.7.5: Creator 側変化の記録 — 共進化の対側
+
+> **圏論**: HGK のブートストラップは人間-AI 結合系の共進化 (iGRPO /noe+ 分析, 2026-02-14)。
+> Step 3.7 (id_R) が AI 側の自己反省なら、本ステップは Creator 側の変化を記録する。
+> 正のループの駆動力は AI 単独ではなく、Creator の BC 改良 + AI の Handoff 蓄積の結合にある。
+
+> **発動条件**: `/bye+` 時のみ。`/bye` `/bye-` ではスキップ可。
+
+| 項目 | 問い | 記録対象 |
+|:-----|:-----|:---------|
+| BC 変更 | 今日 BC を追加/修正/削除したか？ | 変更した BC 番号と理由 |
+| WF 変更 | 今日 WF を修正したか？ | 変更した WF 名と理由 |
+| 方向修正 | Creator が途中で判断を変えた場面は？ | 旧方針 → 新方針 + 理由 |
+| 新しい問い | Creator から新たに提起された問いは？ | 問いの内容と背景 |
+| フィードバック品質 | Creator のフィードバックは行動可能だったか？ | 具体 / 曖昧 / なし |
 
 ---
 

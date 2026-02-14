@@ -1,6 +1,9 @@
 // Hegemonikón Desktop — Tauri Application
 // Python API サーバーの自動起動/終了を管理
 
+#[cfg(target_os = "linux")]
+pub mod a11y;
+
 use std::net::TcpStream;
 use std::process::{Child, Command};
 use std::sync::Mutex;
@@ -49,6 +52,105 @@ fn greet(name: &str) -> String {
     format!("Hello, {}! You've been greeted from Rust!", name)
 }
 
+/// AT-SPI2: List all accessible windows on the desktop
+#[cfg(target_os = "linux")]
+#[tauri::command]
+async fn list_windows() -> Result<Vec<a11y::A11yWindow>, String> {
+    a11y::list_accessible_windows().await
+}
+
+/// AT-SPI2: Get the accessibility tree for a specific application
+#[cfg(target_os = "linux")]
+#[tauri::command]
+async fn get_element_tree(
+    bus_name: String,
+    path: String,
+    max_depth: Option<u32>,
+) -> Result<Vec<a11y::A11yNode>, String> {
+    a11y::get_accessible_tree(&bus_name, &path, max_depth.unwrap_or(3)).await
+}
+
+/// Unified: List all desktop elements (A/B routed)
+#[cfg(target_os = "linux")]
+#[tauri::command]
+async fn list_desktop() -> Result<Vec<a11y::DesktopElement>, String> {
+    a11y::router::list_desktop_elements().await
+}
+
+/// Unified: Take a desktop screenshot (B-path)
+#[cfg(target_os = "linux")]
+#[tauri::command]
+async fn desktop_screenshot() -> Result<a11y::ActionResult, String> {
+    a11y::router::screenshot_desktop().await
+}
+
+/// Unified: Click on a desktop element (A/B routed)
+#[cfg(target_os = "linux")]
+#[tauri::command]
+async fn desktop_click(
+    bus_name: Option<String>,
+    object_path: Option<String>,
+    x: Option<i32>,
+    y: Option<i32>,
+) -> Result<a11y::ActionResult, String> {
+    a11y::router::click_element(bus_name, object_path, x, y).await
+}
+
+/// Unified: Type text into a desktop element (A/B routed)
+#[cfg(target_os = "linux")]
+#[tauri::command]
+async fn desktop_type(
+    bus_name: Option<String>,
+    object_path: Option<String>,
+    text: String,
+) -> Result<a11y::ActionResult, String> {
+    a11y::router::type_into_element(bus_name, object_path, &text).await
+}
+
+/// AT-SPI: Perform an action on an element (A-path only)
+#[cfg(target_os = "linux")]
+#[tauri::command]
+async fn desktop_do_action(
+    bus_name: String,
+    object_path: String,
+    action_index: Option<i32>,
+) -> Result<a11y::ActionResult, String> {
+    let (success, action_name) = a11y::perform_action(&bus_name, &object_path, action_index.unwrap_or(0)).await?;
+    Ok(a11y::ActionResult {
+        success,
+        route: a11y::RoutePath::Atspi,
+        message: format!("Action '{}' performed", action_name),
+        screenshot: None,
+    })
+}
+
+/// AT-SPI: List available actions for an element (A-path only)
+#[cfg(target_os = "linux")]
+#[tauri::command]
+async fn desktop_list_actions(
+    bus_name: String,
+    object_path: String,
+) -> Result<Vec<String>, String> {
+    a11y::list_actions(&bus_name, &object_path).await
+}
+
+/// AT-SPI: Set text on an editable element (A-path only)
+#[cfg(target_os = "linux")]
+#[tauri::command]
+async fn desktop_set_text(
+    bus_name: String,
+    object_path: String,
+    text: String,
+) -> Result<a11y::ActionResult, String> {
+    let success = a11y::set_text(&bus_name, &object_path, &text).await?;
+    Ok(a11y::ActionResult {
+        success,
+        route: a11y::RoutePath::Atspi,
+        message: format!("Text set to '{}'", text),
+        screenshot: None,
+    })
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     // GBM/DMA-BUF フォールバック: NVIDIA 環境や RDP セッションで
@@ -65,7 +167,27 @@ pub fn run() {
         .plugin(tauri_plugin_http::init())
         .plugin(tauri_plugin_notification::init())
         .plugin(tauri_plugin_opener::init())
-        .invoke_handler(tauri::generate_handler![greet])
+        .invoke_handler(tauri::generate_handler![
+            greet,
+            #[cfg(target_os = "linux")]
+            list_windows,
+            #[cfg(target_os = "linux")]
+            get_element_tree,
+            #[cfg(target_os = "linux")]
+            list_desktop,
+            #[cfg(target_os = "linux")]
+            desktop_screenshot,
+            #[cfg(target_os = "linux")]
+            desktop_click,
+            #[cfg(target_os = "linux")]
+            desktop_type,
+            #[cfg(target_os = "linux")]
+            desktop_do_action,
+            #[cfg(target_os = "linux")]
+            desktop_list_actions,
+            #[cfg(target_os = "linux")]
+            desktop_set_text,
+        ])
         .setup(move |app| {
             // dev モードならスキップ (既に手動でサーバーが起動している想定)
             if std::env::var("TAURI_ENV").unwrap_or_default() == "dev" {

@@ -42,10 +42,10 @@ from .semantic_agent import (
 
 
 # =============================================================================
-# Persona Definitions
+# Persona Definitions (loaded from personas.yaml, with fallback)
 # =============================================================================
 
-PERSONAS: Dict[str, str] = {
+_PERSONAS_FALLBACK: Dict[str, str] = {
     "critic": (
         "あなたは **批判者** (Critic) です。最も厳しい目で問題を見つけてください。\n"
         "- 潜在的なリスクを過小評価しないでください\n"
@@ -65,6 +65,31 @@ PERSONAS: Dict[str, str] = {
         "- severity は運用上の実害に基づいて判断してください\n"
     ),
 }
+
+
+def _load_personas() -> Dict[str, str]:
+    """personas.yaml から persona 定義をロード。失敗時はフォールバック。"""
+    import pathlib
+
+    yaml_path = pathlib.Path(__file__).parent / "personas.yaml"
+    if yaml_path.exists():
+        try:
+            import yaml
+
+            with open(yaml_path, encoding="utf-8") as f:
+                data = yaml.safe_load(f)
+            if isinstance(data, dict):
+                return {
+                    key: entry.get("prompt", "")
+                    for key, entry in data.items()
+                    if isinstance(entry, dict) and "prompt" in entry
+                }
+        except Exception:
+            pass
+    return _PERSONAS_FALLBACK
+
+
+PERSONAS: Dict[str, str] = _load_personas()
 
 
 # =============================================================================

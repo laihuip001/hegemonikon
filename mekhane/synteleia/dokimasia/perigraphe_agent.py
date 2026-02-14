@@ -10,6 +10,7 @@ FEP: モデルの境界条件
 """
 
 import re
+from pathlib import Path
 from typing import List
 
 from ..base import (
@@ -20,6 +21,9 @@ from ..base import (
     AuditTarget,
     AuditTargetType,
 )
+from ..pattern_loader import load_patterns, parse_pattern_list, parse_keyword_list
+
+_PATTERNS_YAML = Path(__file__).parent / "patterns.yaml"
 
 
 # PURPOSE: 境界画定エージェント (P-Agent)
@@ -29,26 +33,27 @@ class PerigrapheAgent(AuditAgent):
     name = "PerigrapheAgent"
     description = "スコープの妥当性を検証 — 「どこまでか」"
 
-    # スコープ逸脱パターン
-    SCOPE_CREEP_PATTERNS = [
+    # Fallback values
+    _FALLBACK_SCOPE_CREEP = [
         (r"\bついでに\b", "P-001", "「ついでに」はスコープ逸脱の兆候"),
         (r"\bwhile\s+(?:we're|I'm)\s+at\s+it\b", "P-002", "スコープ逸脱の兆候"),
         (r"\bまた(?:は|も)\b.*\bも\b", "P-003", "複数の目的が混在"),
         (r"\band\s+also\b", "P-004", "範囲が曖昧に拡大"),
     ]
 
-    # 境界明示キーワード
-    BOUNDARY_KEYWORDS = [
-        "スコープ",
-        "範囲",
-        "対象外",
-        "対象内",
-        "scope",
-        "out of scope",
-        "in scope",
-        "boundary",
-        "limit",
+    _FALLBACK_BOUNDARY_KEYWORDS = [
+        "スコープ", "範囲", "対象外", "対象内",
+        "scope", "out of scope", "in scope", "boundary", "limit",
     ]
+
+    def __init__(self):
+        loaded = load_patterns(_PATTERNS_YAML, "perigraphe")
+        self.SCOPE_CREEP_PATTERNS = parse_pattern_list(
+            loaded.get("scope_creep_patterns"), self._FALLBACK_SCOPE_CREEP
+        )
+        self.BOUNDARY_KEYWORDS = parse_keyword_list(
+            loaded.get("boundary_keywords"), self._FALLBACK_BOUNDARY_KEYWORDS
+        )
 
     # PURPOSE: スコープの妥当性を監査
     def audit(self, target: AuditTarget) -> AgentResult:

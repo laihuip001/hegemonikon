@@ -10,7 +10,7 @@ CCL:
 """
 
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from typing import List, Optional
+from typing import Dict, List, Optional
 
 from .base import (
     AgentResult,
@@ -33,6 +33,15 @@ from .dokimasia import (
 )
 
 
+# デフォルト除外パターン — パターン定義ファイル等の自動除外
+DEFAULT_EXCLUDES = [
+    "**/patterns.yaml",
+    "**/persona.yaml",
+    "**/*.prompt",
+    "**/__pycache__/**",
+]
+
+
 # PURPOSE: Synteleia 2層オーケストレーター
 class SynteleiaOrchestrator:
     """Synteleia 2層オーケストレーター"""
@@ -43,6 +52,7 @@ class SynteleiaOrchestrator:
         poiesis_agents: Optional[List[AuditAgent]] = None,
         dokimasia_agents: Optional[List[AuditAgent]] = None,
         parallel: bool = True,
+        default_excludes: Optional[List[str]] = None,
     ):
         """
         初期化。
@@ -51,6 +61,7 @@ class SynteleiaOrchestrator:
             poiesis_agents: 生成層エージェント（省略時はデフォルト3エージェント、空リストで0エージェント）
             dokimasia_agents: 審査層エージェント（省略時はデフォルト5エージェント、空リストで0エージェント）
             parallel: 並列実行するか
+            default_excludes: デフォルト除外パターン（省略時は DEFAULT_EXCLUDES）
         """
         self.poiesis_agents = [
             OusiaAgent(),
@@ -65,6 +76,7 @@ class SynteleiaOrchestrator:
             CompletenessAgent(),
         ] if dokimasia_agents is None else dokimasia_agents
         self.parallel = parallel
+        self.default_excludes = default_excludes if default_excludes is not None else DEFAULT_EXCLUDES
 
     # PURPOSE: 全エージェントを返す（互換性維持）
     @property
@@ -115,6 +127,33 @@ class SynteleiaOrchestrator:
         orchestrator.dokimasia_agents.append(multi_agent)
         return orchestrator
 
+    # PURPOSE: L3 コンセンサス監査
+    @classmethod
+    def with_l3(
+        cls,
+        backends: Optional[list] = None,
+    ) -> "SynteleiaOrchestrator":
+        """
+        L1 + L2 + L3 (ConsensusAgent) 統合オーケストレータ。
+
+        複数 LLM の majority voting で確信度を計算する最上位監査層。
+
+        Args:
+            backends: LLM バックエンドリスト (省略時は空)
+
+        Returns:
+            SynteleiaOrchestrator: L1 + L2 + L3 統合
+        """
+        from .dokimasia.consensus_agent import ConsensusAgent
+        from .dokimasia.multi_semantic_agent import MultiSemanticAgent
+
+        orchestrator = cls()
+        multi_agent = MultiSemanticAgent.default()
+        consensus_agent = ConsensusAgent(backends=backends)
+        orchestrator.dokimasia_agents.append(multi_agent)
+        orchestrator.dokimasia_agents.append(consensus_agent)
+        return orchestrator
+
     # PURPOSE: 監査を実行。
     def audit(self, target: AuditTarget) -> AuditResult:
         """
@@ -126,6 +165,22 @@ class SynteleiaOrchestrator:
         Returns:
             AuditResult: 統合監査結果
         """
+        # F1 + P4: デフォルト除外 + ターゲット除外パターンをマージ
+        all_excludes = list(self.default_excludes)
+        if target.exclude_patterns:
+            all_excludes.extend(target.exclude_patterns)
+
+        if target.source and all_excludes:
+            from fnmatch import fnmatch
+
+            for pat in all_excludes:
+                if fnmatch(target.source, pat):
+                    return AuditResult(
+                        target=target,
+                        passed=True,
+                        summary=f"Excluded by pattern: {pat}",
+                    )
+
         agent_results: List[AgentResult] = []
 
         if self.parallel and len(self.agents) > 1:
@@ -214,6 +269,13 @@ class SynteleiaOrchestrator:
             if i.severity == AuditSeverity.HIGH
         )
 
+        # F5: ヒットカウンター記録
+        from .pattern_loader import record_hit
+
+        for ar in agent_results:
+            for issue in ar.issues:
+                record_hit(issue.code)
+
         if all_passed:
             summary = f"✅ PASS — {len(agent_results)} agents, {total_issues} issues (none critical/high)"
         else:
@@ -225,6 +287,14 @@ class SynteleiaOrchestrator:
             passed=all_passed,
             summary=summary,
         )
+
+    # PURPOSE: パターン統計取得
+    @staticmethod
+    def get_pattern_stats() -> Dict[str, int]:
+        """パターンヒット統計を取得。"""
+        from .pattern_loader import get_stats
+
+        return get_stats()
 
     # PURPOSE: 高速監査（LogicAgent のみ）。
     def audit_quick(self, target: AuditTarget) -> AuditResult:
@@ -313,3 +383,31 @@ class SynteleiaOrchestrator:
             "source": "synteleia",
             "files": [result.target.source] if result.target.source else [],
         }
+
+    # PURPOSE: WBC アラートを生成し Sympatheia に送信
+    def notify_wbc(self, result: AuditResult) -> bool:
+        """WBC アラートを生成・送信する統合メソッド。
+
+        to_wbc_alert() でアラートを生成し、Sympatheia WBC に HTTP 送信する。
+        アラート不要 (LOW/MEDIUM のみ) の場合は何もせず False を返す。
+
+        Returns:
+            True if alert was sent successfully, False otherwise.
+        """
+        alert = self.to_wbc_alert(result)
+        if alert is None:
+            return False
+
+        try:
+            import httpx
+
+            resp = httpx.post(
+                "http://127.0.0.1:8392/api/wbc/alert",
+                json=alert,
+                timeout=5.0,
+            )
+            if resp.status_code == 200:
+                return True
+        except Exception:
+            pass
+        return False

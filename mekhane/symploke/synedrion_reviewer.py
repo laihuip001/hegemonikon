@@ -75,7 +75,7 @@ class SynedrionReviewer:
         """
         # Import perspective matrix (application layer dependency)
         try:
-            from mekhane.ergasterion.synedrion import PerspectiveMatrix
+            from mekhane.synedrion import PerspectiveMatrix
         except ImportError:
             raise ImportError(
                 "Synedrion module not found. Ensure mekhane.ergasterion.synedrion is installed."

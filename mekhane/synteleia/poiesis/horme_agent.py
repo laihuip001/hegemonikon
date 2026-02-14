@@ -10,6 +10,7 @@ FEP: 行動選択の駆動力（精密化の方向）
 """
 
 import re
+from pathlib import Path
 from typing import List
 
 from ..base import (
@@ -20,6 +21,9 @@ from ..base import (
     AuditTarget,
     AuditTargetType,
 )
+from ..pattern_loader import load_patterns, parse_pattern_list, parse_keyword_list
+
+_PATTERNS_YAML = Path(__file__).parent / "patterns.yaml"
 
 
 # PURPOSE: 動機評価エージェント (H-Agent)
@@ -29,28 +33,28 @@ class HormeAgent(AuditAgent):
     name = "HormeAgent"
     description = "動機の明確さを検証 — 「なぜこれを望むか」"
 
-    # 動機・目的キーワード
-    PURPOSE_KEYWORDS = [
-        "目的",
-        "理由",
-        "なぜ",
-        "ために",
-        "purpose",
-        "goal",
-        "objective",
-        "why",
-        "because",
-        "in order to",
+    # Fallback values
+    _FALLBACK_KEYWORDS = [
+        "目的", "理由", "なぜ", "ために",
+        "purpose", "goal", "objective", "why", "because", "in order to",
     ]
 
-    # 動機が不明確なパターン
-    UNCLEAR_MOTIVATION_PATTERNS = [
+    _FALLBACK_PATTERNS = [
         (r"\bとりあえず\b", "H-001", "「とりあえず」は動機が不明確"),
         (r"\b一応\b", "H-002", "「一応」は動機が弱い"),
         (r"\bなんとなく\b", "H-003", "「なんとなく」は動機が欠如"),
         (r"\bjust\s+(?:do|try|make)\b", "H-004", "目的なき行動"),
         (r"\bmaybe\s+we\s+should\b", "H-005", "動機が曖昧"),
     ]
+
+    def __init__(self):
+        loaded = load_patterns(_PATTERNS_YAML, "horme")
+        self.PURPOSE_KEYWORDS = parse_keyword_list(
+            loaded.get("purpose_keywords"), self._FALLBACK_KEYWORDS
+        )
+        self.UNCLEAR_MOTIVATION_PATTERNS = parse_pattern_list(
+            loaded.get("unclear_motivation_patterns"), self._FALLBACK_PATTERNS
+        )
 
     # PURPOSE: 動機の明確さを監査
     def audit(self, target: AuditTarget) -> AgentResult:

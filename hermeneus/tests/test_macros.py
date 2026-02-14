@@ -34,17 +34,13 @@ class TestBuiltinMacros:
     def test_builtin_macros_exist(self):
         assert len(BUILTIN_MACROS) >= 5
 
-    def test_think_macro(self):
-        assert "think" in BUILTIN_MACROS
-        assert "/noe+" in BUILTIN_MACROS["think"]
-
     def test_plan_macro(self):
         assert "plan" in BUILTIN_MACROS
         assert "/bou+" in BUILTIN_MACROS["plan"]
 
-    def test_review_macro(self):
-        assert "review" in BUILTIN_MACROS
-        assert "/dia+" in BUILTIN_MACROS["review"]
+    def test_build_macro(self):
+        assert "build" in BUILTIN_MACROS
+        assert "/ene+" in BUILTIN_MACROS["build"]
 
     def test_tak_macro(self):
         assert "tak" in BUILTIN_MACROS
@@ -95,8 +91,8 @@ class TestGetAllMacros:
     def test_includes_builtin(self):
         all_macros = get_all_macros()
         # Builtin macros should always be present
-        assert "think" in all_macros
         assert "plan" in all_macros
+        assert "build" in all_macros
 
     def test_includes_file_macros(self):
         all_macros = get_all_macros()
@@ -186,8 +182,8 @@ class TestExpandCCL:
 
     def test_with_all_macros(self):
         all_macros = get_all_macros()
-        result = expand_ccl("@think", macros=all_macros)
-        assert "/noe+" in result.expanded
+        result = expand_ccl("@plan", macros=all_macros)
+        assert "/bou+" in result.expanded
 
     def test_convergence_notation(self):
         result = expand_ccl("/noe+ >> V[] < 0.3")
@@ -203,17 +199,8 @@ class TestExpandCCL:
 class TestMacroE2E:
     """マクロ → 展開 → パースの E2E テスト"""
 
-    def test_think_macro_e2e(self):
-        """@think → /noe+ >> V[] < 0.3 → parse"""
-        all_macros = get_all_macros()
-        expanded = expand_ccl("@think", macros=all_macros)
-        
-        parser = CCLParser()
-        ast = parser.parse(expanded.expanded)
-        assert ast is not None
-
     def test_plan_macro_e2e(self):
-        """@plan → /bou+ _ /s+ _ /sta.done → parse"""
+        """@plan → /bou+_/chr_/s+~(/p*/k)_V:{/dia}_/pis_/dox- → parse"""
         all_macros = get_all_macros()
         expanded = expand_ccl("@plan", macros=all_macros)
         
@@ -221,10 +208,10 @@ class TestMacroE2E:
         ast = parser.parse(expanded.expanded)
         assert ast is not None
 
-    def test_review_macro_e2e(self):
-        """@review → /dia+ _ /pre+ _ /sta.done → parse"""
+    def test_build_macro_e2e(self):
+        """@build → /bou-_/s+_/ene+_V:{/dia-}_I:[✓]{/dox-} → parse"""
         all_macros = get_all_macros()
-        expanded = expand_ccl("@review", macros=all_macros)
+        expanded = expand_ccl("@build", macros=all_macros)
         
         parser = CCLParser()
         ast = parser.parse(expanded.expanded)
@@ -248,35 +235,30 @@ class TestMacroE2E:
 
 
 # =============================================================================
-# E2E: 全18アクティブマクロ (認知昇華版 — Prior→Likelihood→Posterior)
+# E2E: 全21アクティブマクロ (認知昇華版 — Prior→Likelihood→Posterior)
 # =============================================================================
 
 
-# 全18マクロの定義 — BUILTIN_MACROS と同期
+# 全15マクロの定義 — BUILTIN_MACROS v4 / ccl_macro_reference v4.1 と同期
 ACTIVE_MACROS = {
     # O-series — 認知昇華版
     "nous": "/pro_/s-_R:{F:[×2]{/u+*^/u^}}_~(/noe*/dia)_/pis_/dox-",
-    "dig": "/pro_/s+~(/p*/a)_/ana_/dia*/o+_/pis",
+    "dig": "/pro_/s+~(/p*/a)_/ana_/dia*/o+_/pis_/dox-",
     # S-series
     "plan": "/bou+_/chr_/s+~(/p*/k)_V:{/dia}_/pis_/dox-",
-    "build": "/bou-_/chr_/kho_/s+_/ene+_V:{/dia-}_I:[✓]{/dox-}",
+    "build": "/bou-_/s+_/ene+_V:{/dia-}_I:[✓]{/dox-}",
     "tak": "/s1_F:[×3]{/sta~/chr}_F:[×3]{/kho~/zet}_I:[∅]{/sop}_/euk_/bou",
     # H-series
-    "osc": "R:{F:[/s,/dia,/noe]{L:[x]{x~x+}}, ~(/h*/k)}",
     "learn": "/pro_/dox+_F:[×2]{/u+~(/noe*/dia)}_~(/h*/k)_/pis_/bye+",
     # A-series
     "fix": "/kho_/tel_C:{/dia+_/ene+}_I:[✓]{/pis_/dox-}",
-    "vet": "/kho{git_diff}_C:{V:{/dia+}_/ene+}_/pra{test}_/pis_/dox",
-    "proof": '/kat_V:{/noe~/dia}_I:[✓]{/ene{PROOF.md}}_E:{/ene{_limbo/}}',
+    "vet": "/kho{git_diff}_C:{V:{/dia+}_/ene+}_/pra{test}_/pra{dendron_guard}_/pis_/dox",
+    "proof": "V:{/noe~/dia}_I:[✓]{/ene{PROOF.md}}_E:{/ene{_limbo/}}",
     "syn": "/kho_/s-_/pro_/dia+{synteleia}_~(/noe*/dia)_V:{/pis+}_/dox-",
     # P-series
-    "ground": "/pro_/tak-*/bou+{6w3h}~/p-_/ene-_/pis",
-    "ready": "/bou-_/pro_/kho_/chr_/euk_/tak-_~(/h*/k)_/pis",
+    "ready": "/bou-_/pro_/kho_/chr_/euk_/tak-_~(/h*/k)_/pis_/dox-",
     # K-series
     "kyc": "/pro_C:{/sop_/noe_/ene_/dia-}_/pis_/dox-",
-    # Hub-only 統合
-    "feel": "/pro_/ore~(/pis_/ana)_/dox-",
-    "clean": "/s-_/kat_/sym~(/tel_/dia-)_/pis",
     # 反復マクロ (Repetition Principle)
     "chew": "/s-_/pro_F:[×3]{/eat+~(/noe*/dia)}_~(/h*/k)_@proof_/pis_/dox-",
     "read": "/s-_/pro_F:[×3]{/m.read~(/noe*/dia)}_/ore_~(/h*/k)_/pis_/dox-",
@@ -286,7 +268,7 @@ ACTIVE_MACROS = {
 
 
 class TestAllMacrosE2E:
-    """全16アクティブマクロの E2E テスト (CCL リファレンス v3.2 準拠)"""
+    """全15アクティブマクロの E2E テスト (CCL リファレンス v4.1 準拠)"""
 
     @pytest.fixture
     def all_macros(self):
@@ -312,8 +294,7 @@ class TestAllMacrosE2E:
         ("plan", "/pis"),
         ("plan", "/dox-"),
         ("build", "/ene+"),
-        ("build", "/chr"),
-        ("build", "/kho"),
+        ("build", "/s+"),
         ("fix", "/kho"),  # Prior: 場の把握
         ("fix", "/dia+"),
         ("fix", "/tel"),
@@ -329,12 +310,7 @@ class TestAllMacrosE2E:
         ("learn", "/pis"),
         ("learn", "/bye+"),
         ("nous", "/dox-"),
-        ("ground", "/pro"),
-        ("ground", "/bou+"),
-        ("ground", "/pis"),
-        ("osc", "/s,/dia,/noe"),
         ("proof", "PROOF.md"),
-        ("proof", "/kat"),
         ("syn", "/kho"),  # Prior: 場の把握
         ("syn", "/pro"),
         ("syn", "synteleia"),
@@ -346,13 +322,6 @@ class TestAllMacrosE2E:
         ("ready", "/chr"),
         ("ready", "/euk"),
         ("ready", "/pis"),
-        ("feel", "/pro"),
-        ("feel", "/ore"),
-        ("feel", "/dox-"),
-        ("clean", "/s-"),  # Prior: 方向性
-        ("clean", "/kat"),
-        ("clean", "/sym"),
-        ("clean", "/pis"),
         # 反復マクロ
         ("chew", "/eat+"),
         ("chew", "/pro"),
@@ -390,7 +359,7 @@ class TestAllMacrosE2E:
     # --- レジストリ整合性テスト ---
 
     def test_all_active_macros_in_registry(self, all_macros):
-        """全16マクロがレジストリに存在する"""
+        """全15マクロがレジストリに存在する"""
         for name in ACTIVE_MACROS:
             assert name in all_macros, f"@{name} missing from registry"
 
@@ -414,17 +383,15 @@ class TestAllMacrosE2E:
     # --- Hub-Only 定理カバレッジテスト ---
 
     def test_hub_only_coverage(self, all_macros):
-        """hub-only 9定理が全てマクロ経由でアクセス可能"""
+        """hub-only 定理がマクロ経由でアクセス可能"""
+        # 削減後も主要定理はマクロ経由で到達可能
         hub_only_theorems = {
-            "/sym": "clean",   # K1 Symplokē
-            "/ana": "dig",     # K3 Analogia (+ feel)
-            "/tak": "ready",   # P1 Taxis (既に @tak あり)
+            "/ana": "dig",     # K3 Analogia
             "/euk": "ready",   # P3 Eukairia
-            "/kat": "proof",   # A1 Katharsis (+ clean)
-            "/chr": "plan",    # S3 Chrēsis (+ build, ready)
-            "/kho": "build",   # P2 Khōra (+ ready, vet)
-            "/tel": "fix",     # P4 Telos (+ clean)
-            "/ore": "feel",    # H3 Orexis
+            "/chr": "plan",    # S3 Chrēsis (+ ready)
+            "/kho": "vet",     # P2 Khōra (+ ready, fix, syn, helm)
+            "/tel": "fix",     # P4 Telos
+            "/ore": "read",    # H3 Orexis
         }
         for wf, macro_name in hub_only_theorems.items():
             expansion = all_macros.get(macro_name, "")

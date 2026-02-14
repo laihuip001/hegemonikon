@@ -40,11 +40,23 @@ logger = logging.getLogger(__name__)
 
 # --- Constants ---
 
-# OAuth credentials (gemini-cli — installed app, public-safe)
-# Source: gemini-cli oauth2.ts L70-86
-_CLIENT_ID = "REDACTED_CLIENT_ID"
-_CLIENT_SECRET = "REDACTED_CLIENT_SECRET"
+# OAuth credentials loaded from external config (not in source)
+# Setup: ~/.config/cortex/oauth.json with client_id + client_secret
+# Source of values: gemini-cli oauth2.ts L70-86
+_OAUTH_CONFIG = Path.home() / ".config" / "cortex" / "oauth.json"
 _CREDS_FILE = Path.home() / ".gemini" / "oauth_creds.json"
+
+
+def _load_oauth_config() -> tuple[str, str]:
+    """Load OAuth client_id and client_secret from external config."""
+    if not _OAUTH_CONFIG.exists():
+        raise FileNotFoundError(
+            f"OAuth 設定ファイルが見つかりません: {_OAUTH_CONFIG}\n"
+            "作成方法: mkdir -p ~/.config/cortex && "
+            'echo \'{"client_id":"...","client_secret":"..."}\' > ~/.config/cortex/oauth.json'
+        )
+    data = json.loads(_OAUTH_CONFIG.read_text())
+    return data["client_id"], data["client_secret"]
 _TOKEN_CACHE = Path("/tmp/.cortex_token_cache")
 _TOKEN_TTL = 3300  # 55 minutes (access_token expires in 60 min)
 
@@ -230,6 +242,96 @@ class CortexClient:
 
         return results
 
+    # PURPOSE: 非同期版の ask() — asyncio イベントループから呼び出し可能
+    async def ask_async(
+        self,
+        message: str,
+        model: Optional[str] = None,
+        system_instruction: Optional[str] = None,
+        temperature: Optional[float] = None,
+        max_tokens: Optional[int] = None,
+        thinking_budget: Optional[int] = None,
+        timeout: float = 120.0,
+    ) -> LLMResponse:
+        """Async version of ask() — runs sync code in thread pool.
+
+        Thread-safe: each call runs in its own thread via ThreadPoolExecutor.
+
+        Args:
+            (same as ask())
+
+        Returns:
+            LLMResponse
+        """
+        import asyncio
+        import concurrent.futures
+
+        loop = asyncio.get_running_loop()
+        with concurrent.futures.ThreadPoolExecutor(max_workers=1) as pool:
+            return await loop.run_in_executor(
+                pool,
+                lambda: self.ask(
+                    message=message,
+                    model=model,
+                    system_instruction=system_instruction,
+                    temperature=temperature,
+                    max_tokens=max_tokens,
+                    thinking_budget=thinking_budget,
+                    timeout=timeout,
+                ),
+            )
+
+    # PURPOSE: 複数プロンプトを並行処理し、逐次版 ask_batch() 比で大幅高速化する
+    async def ask_batch_async(
+        self,
+        tasks: list[dict[str, Any]],
+        default_model: Optional[str] = None,
+        default_system_instruction: Optional[str] = None,
+        max_concurrency: int = 5,
+    ) -> list[LLMResponse]:
+        """Process multiple prompts concurrently.
+
+        Uses asyncio.Semaphore for rate-limit-safe concurrency control.
+        Default max_concurrency=5 keeps well within Cortex rate limits.
+
+        Args:
+            tasks: List of dicts with 'prompt' (required) and optional
+                   'model', 'system_instruction', 'temperature',
+                   'max_tokens', 'thinking_budget'
+            default_model: Default model for all tasks
+            default_system_instruction: Default system instruction
+            max_concurrency: Max concurrent requests (default: 5)
+
+        Returns:
+            List of LLMResponse in same order as tasks
+        """
+        import asyncio
+
+        model = default_model or self.model
+        semaphore = asyncio.Semaphore(max_concurrency)
+
+        async def _run_one(task: dict[str, Any]) -> LLMResponse:
+            async with semaphore:
+                try:
+                    return await self.ask_async(
+                        message=task["prompt"],
+                        model=task.get("model", model),
+                        system_instruction=task.get(
+                            "system_instruction", default_system_instruction
+                        ),
+                        temperature=task.get("temperature"),
+                        max_tokens=task.get("max_tokens"),
+                        thinking_budget=task.get("thinking_budget"),
+                    )
+                except CortexError as e:
+                    logger.error("Async batch task failed: %s", e)
+                    return LLMResponse(
+                        text=f"[ERROR] {e}",
+                        model=task.get("model", model),
+                    )
+
+        return list(await asyncio.gather(*[_run_one(t) for t in tasks]))
+
     # PURPOSE: ストリーミング応答を yield で返し、対話的 CLI やリアルタイム表示に対応する
     def ask_stream(
         self,
@@ -374,10 +476,11 @@ class CortexClient:
         except (json.JSONDecodeError, KeyError) as e:
             raise CortexAuthError(f"oauth_creds.json の解析に失敗: {e}")
 
+        client_id, client_secret = _load_oauth_config()
         data = urllib.parse.urlencode(
             {
-                "client_id": _CLIENT_ID,
-                "client_secret": _CLIENT_SECRET,
+                "client_id": client_id,
+                "client_secret": client_secret,
                 "refresh_token": refresh_token,
                 "grant_type": "refresh_token",
             }

@@ -104,7 +104,6 @@ class Embedder:
     def __init__(self, force_cpu: bool = False, model_name: str = "BAAI/bge-m3"):
         if self._initialized:
             return
-        self._initialized = True
 
         import numpy as np
         self.np = np
@@ -141,6 +140,7 @@ class Embedder:
                         self._dimension = self._st_model.get_sentence_embedding_dimension()
                         vram_mb = torch.cuda.memory_allocated() / 1e6
                         print(f"[Embedder] GPU mode (CUDA fp16, {vram_mb:.0f}MB VRAM, dim={self._dimension})")
+                        self._initialized = True
                         return
                     except (RuntimeError, OSError) as e:
                         err_msg = str(e).lower()
@@ -161,6 +161,7 @@ class Embedder:
                                 self._dimension = self._st_model.get_sentence_embedding_dimension()
                                 vram_mb = torch.cuda.memory_allocated() / 1e6
                                 print(f"[Embedder] GPU mode (CUDA fp16, {vram_mb:.0f}MB VRAM, dim={self._dimension}) [network]")
+                                self._initialized = True
                                 return
                             except Exception:
                                 pass  # fall through to CPU
@@ -189,6 +190,7 @@ class Embedder:
             self._dimension = self._st_model.get_sentence_embedding_dimension()
             cache_label = " [cached]" if _cached else ""
             print(f"[Embedder] CPU mode (sentence-transformers: {model_name}, dim={self._dimension}){cache_label}")
+            self._initialized = True
             return
         except ImportError:
             pass
@@ -198,6 +200,7 @@ class Embedder:
         self._is_onnx_fallback = True
         self._dimension = 384  # BGE-small ONNX model
         print(f"[Embedder] CPU mode (ONNX bge-small, dim=384) ⚠️ 次元が bge-m3 (1024) と異なります")
+        self._initialized = True
 
         # Restore HF_HUB_OFFLINE to original state
         if _prev_hf_offline is None:

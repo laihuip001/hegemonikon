@@ -30,6 +30,15 @@ SESSIONS_DIR = Path(r"M:\Brain\.hegemonikon\sessions")
 DB_PATH = Path(r"M:\Brain\.hegemonikon\lancedb")
 TABLE_NAME = "sessions"
 
+# Compiled Regexes
+RE_COMMENT = re.compile(r"/\*.*?\*/", re.DOTALL)
+RE_MEDIA = re.compile(r"@media\s*\([^)]*\)\s*\{[^}]*\}")
+RE_MARKDOWN_CSS = re.compile(r"\.markdown[-\w]*\s*\{[^}]*\}")
+RE_THOUGHT = re.compile(r"Thought for <?\d+s\s*")
+RE_NEWLINES = re.compile(r"\n{3,}")
+RE_EXPORTED = re.compile(r"\d{4}-\d{2}-\d{2}T[\d:.]+")
+RE_MESSAGES = re.compile(r"(\d+)")
+
 
 # PURPOSE: セッションドキュメントのスキーマ
 class SessionDocument(BaseModel):
@@ -47,69 +56,60 @@ class SessionDocument(BaseModel):
 def parse_session_file(filepath: Path) -> Optional[SessionDocument]:
     """セッション md ファイルをパースしてドキュメントに変換"""
     try:
-        content = filepath.read_text(encoding="utf-8")
-        lines = content.split("\n")
+        # Optimized single-pass streaming parser
+        with filepath.open(encoding="utf-8") as f:
+            title = "Untitled"
+            exported_at = ""
+            message_count = 0
 
-        # タイトル抽出（# で始まる行）
-        title = "Untitled"
-        for line in lines[:5]:
-            if line.startswith("# "):
-                title = line[2:].strip()
-                break
+            body_lines = []
+            in_body = False
+            line_count = 0
 
-        # エクスポート日時抽出
-        exported_at = ""
-        for line in lines[:10]:
-            if "**Exported**" in line:
-                match = re.search(r"\d{4}-\d{2}-\d{2}T[\d:.]+", line)
-                if match:
-                    exported_at = match.group()
-                break
+            for line in f:
+                stripped = line.strip()
 
-        # メッセージ数抽出
-        message_count = 0
-        for line in lines[:10]:
-            if "**Messages**" in line:
-                match = re.search(r"(\d+)", line)
-                if match:
-                    message_count = int(match.group(1))
-                break
+                if not in_body:
+                    line_count += 1
 
-        # メッセージ本文抽出（--- 以降）
-        body_start = 0
-        for i, line in enumerate(lines):
-            if line.strip() == "---":
-                body_start = i + 1
-                break
+                    # Metadata extraction (limited to first few lines)
+                    if line_count <= 5:
+                        if line.startswith("# "):
+                            title = line[2:].strip()
 
-        body_lines = []
-        for line in lines[body_start:]:
-            # ヘッダーとセパレータをスキップ
-            if line.startswith("## 🤖") or line.startswith("## 👤"):
-                continue
-            if line.strip() == "---":
-                continue
-            if line.strip():
-                body_lines.append(line.strip())
+                    if line_count <= 10:
+                        if "**Exported**" in line and not exported_at:
+                            match = RE_EXPORTED.search(line)
+                            if match:
+                                exported_at = match.group()
+
+                        if "**Messages**" in line and message_count == 0:
+                            match = RE_MESSAGES.search(line)
+                            if match:
+                                message_count = int(match.group(1))
+
+                    if stripped == "---":
+                        in_body = True
+                    continue
+
+                # In body
+                if line.startswith("## 🤖") or line.startswith("## 👤"):
+                    continue
+                if stripped == "---":
+                    continue
+                if stripped:
+                    body_lines.append(stripped)
 
         full_content = "\n".join(body_lines)
 
         # CSS ノイズを除去
-        # /* ... */ コメントを除去
-        full_content = re.sub(r"/\*.*?\*/", "", full_content, flags=re.DOTALL)
-
-        # @media { ... } ブロックを除去
-        full_content = re.sub(r"@media\s*\([^)]*\)\s*\{[^}]*\}", "", full_content)
-
-        # .markdown-alert などの CSS ルールを除去
-        full_content = re.sub(r"\.markdown[-\w]*\s*\{[^}]*\}", "", full_content)
-
-        # "Thought for Xs" を除去
-        full_content = re.sub(r"Thought for \d+s\s*", "", full_content)
-        full_content = re.sub(r"Thought for <\d+s\s*", "", full_content)
+        full_content = RE_COMMENT.sub("", full_content)
+        full_content = RE_MEDIA.sub("", full_content)
+        full_content = RE_MARKDOWN_CSS.sub("", full_content)
+        full_content = RE_THOUGHT.sub("", full_content)
 
         # 連続する空行を除去
-        full_content = re.sub(r"\n{3,}", "\n\n", full_content).strip()
+        full_content = RE_NEWLINES.sub("\n\n", full_content).strip()
 
         # プレビュー（最初の 500 文字）
         preview = full_content[:500].replace("\n", " ")

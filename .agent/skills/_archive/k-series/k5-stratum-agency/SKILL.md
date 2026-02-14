@@ -1,34 +1,33 @@
 ---
-id: "K5"
-name: "Stratum→Agency"
-category: "abstraction-reasoning"
-description: "処理レベルが主体選択を決定する文脈定理"
-
+id: K5
+name: Stratum→Agency
+category: abstraction-reasoning
+description: 処理レベルが主体選択を決定する文脈定理
 triggers:
-  - level-to-control mapping
-  - abstraction-based delegation
-  - self vs environment design
-
+- level-to-control mapping
+- abstraction-based delegation
+- self vs environment design
 keywords:
-  - stratum
-  - agency
-  - abstraction
-  - delegation-depth
+- stratum
+- agency
+- abstraction
+- delegation-depth
+when_to_use: '低次/高次の処理に応じて自己/環境を選ぶ場合。
 
-when_to_use: |
-  低次/高次の処理に応じて自己/環境を選ぶ場合。
   例：日常ルーティン（低次）は自己で、組織改革（高次）は環境で。
 
-when_not_to_use: |
-  - 主体が既に決まっている場合
+  '
+when_not_to_use: '- 主体が既に決まっている場合
+
   - 処理レベルが未定の場合
 
-version: "2.0"
+  '
+version: '2.0'
 risk_tier: L0
 reversible: true
 requires_approval: false
 risks:
-  - "アーカイブ済みスキルの誤参照による古い手法の適用"
+- アーカイブ済みスキルの誤参照による古い手法の適用
 fallbacks: []
 ---
 

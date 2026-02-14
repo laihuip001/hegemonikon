@@ -1,36 +1,33 @@
 ---
-# === Metadata Layer ===
-id: "K1"
-name: "Tempo→Stratum"
-category: "temporal-reasoning"
-description: "時間制約が処理レベルを決定する文脈定理"
-
-# 早期判定（検証ファースト）
+id: K1
+name: Tempo→Stratum
+category: temporal-reasoning
+description: 時間制約が処理レベルを決定する文脈定理
 triggers:
-  - time-constrained tasks
-  - deadline-driven decisions
-  - processing-level optimization
-
+- time-constrained tasks
+- deadline-driven decisions
+- processing-level optimization
 keywords:
-  - tempo
-  - temporal constraint
-  - stratum level
-  - deadline
+- tempo
+- temporal constraint
+- stratum level
+- deadline
+when_to_use: 'タスク実行の時間余裕が処理詳細度を決定する場合。
 
-when_to_use: |
-  タスク実行の時間余裕が処理詳細度を決定する場合。
   例：企画会議（3時間）vs 通常検討（2週間）で同じ問題を異なる深さで分析。
 
-when_not_to_use: |
-  - 時間制約のない理論的分析
+  '
+when_not_to_use: '- 時間制約のない理論的分析
+
   - 人員/ツール制約が支配的な場合
 
-version: "2.0"
+  '
+version: '2.0'
 risk_tier: L0
 reversible: true
 requires_approval: false
 risks:
-  - "アーカイブ済みスキルの誤参照による古い手法の適用"
+- アーカイブ済みスキルの誤参照による古い手法の適用
 fallbacks: []
 ---
 

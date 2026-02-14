@@ -1,5 +1,5 @@
 ---
-description: "\u76F4\u3059 \u2014 /kho_/tel_C:{/dia+_/ene+}_I:[\u2713]{/pis_/dox-}"
+description: 直す — /kho_/tel_C:{/dia+_/ene+}_I:[✓]{/pis_/dox-}
 lcm_state: beta
 version: '1.0'
 ---

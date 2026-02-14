@@ -1,66 +1,98 @@
 ---
 description: S2 Mekhanē（方法配置）を発動し、スキル/ワークフローを生成・診断する。tekhne-maker 統合。
 hegemonikon: Schema
-modules: [S2]
-skill_ref: ".agent/skills/schema/s2-mekhane/SKILL.md"
-triggers: ["スキルを作る", "ワークフローを作る", "プロンプト", "mekhane", "ccl"]
-version: "7.1"
-lcm_state: stable       # draft | beta | stable | deprecated
-lineage: "v7.0 + Functional Beauty Redesign → v7.1"
-derivatives: [comp, inve, adap, model, simulation, observability, substitute, yagni, dry, nudge, visual, manual]
+modules:
+- S2
+skill_ref: .agent/skills/schema/s2-mekhane/SKILL.md
+triggers:
+- スキルを作る
+- ワークフローを作る
+- プロンプト
+- mekhane
+- ccl
+version: '7.1'
+lcm_state: stable
+lineage: v7.0 + Functional Beauty Redesign → v7.1
+derivatives:
+- comp
+- inve
+- adap
+- model
+- simulation
+- observability
+- substitute
+- yagni
+- dry
+- nudge
+- visual
+- manual
 trigonon:
   series: S
   type: Mixed
   theorem: S2
-  coordinates: [I, Function]
-  bridge: [H, K]
-  anchor_via: [O, P]
+  coordinates:
+  - I
+  - Function
+  bridge:
+  - H
+  - K
+  anchor_via:
+  - O
+  - P
   morphisms:
-    ">>H": [/pro, /pis, /ore, /dox]
-    ">>K": [/euk, /chr, /tel, /sop]
+    '>>H':
+    - /pro
+    - /pis
+    - /ore
+    - /dox
+    '>>K':
+    - /euk
+    - /chr
+    - /tel
+    - /sop
 cognitive_algebra:
-  "+": "詳細生成：全ステップ展開、設計根拠記載"
-  "-": "高速生成：最小限の構造、すぐ使える形"
-  "*": "メタ生成：生成プロセス自体を問う"
+  +: 詳細生成：全ステップ展開、設計根拠記載
+  '-': 高速生成：最小限の構造、すぐ使える形
+  '*': メタ生成：生成プロセス自体を問う
 sel_enforcement:
-  "+":
+  +:
     minimum_requirements:
-      - "全 STEP (0-7) を展開して出力"
-      - "設計根拠: 各選択の WHY を記載"
-      - "Pre-Mortem: 失敗シナリオを1つ以上"
-      - "CCL 複雑度: ポイント計算を明示"
-  "-":
+    - 全 STEP (0-7) を展開して出力
+    - '設計根拠: 各選択の WHY を記載'
+    - 'Pre-Mortem: 失敗シナリオを1つ以上'
+    - 'CCL 複雑度: ポイント計算を明示'
+  '-':
     minimum_requirements:
-      - "最小構造のみ、即座に使える形で出力"
+    - 最小構造のみ、即座に使える形で出力
 submodules:
-  - basic-modes.md
-  - engineering-modes.md
-  - advanced-modes.md
-  - output-modes.md
-  - ccl-generation.md
-  - artifact-rules.md
+- basic-modes.md
+- engineering-modes.md
+- advanced-modes.md
+- output-modes.md
+- ccl-generation.md
+- artifact-rules.md
 category_theory:
-  core: "随伴 F⊣G の左随伴 F（自由関手）"
-  adjunction: "Mekhanē (F) ⊣ Praxis (G)"
-  role: "F: Practice → Method（IF-THENチャンクを束ねて方法論に構造化）"
-  F_definition: "実践知・事例・パターンに理論的構造を載せて体系化する"
-  unit: "η: Practice → G(F(Practice)) — 体で覚えたことを理論化して体に戻す = 座学の効果"
-  counit: "ε: F(G(Method)) → Method — 方法を実践して方法に戻す = 実践の効果"
-  cycle: "座学⇄実践の循環。理屈→身体でも身体→理屈でも技術は生まれる"
-  insight: "知覚⇄運動とアナロジカルに循環するが、スケールは座学⇄実践レベル — Creator, 2026-02-10"
+  core: 随伴 F⊣G の左随伴 F（自由関手）
+  adjunction: Mekhanē (F) ⊣ Praxis (G)
+  role: 'F: Practice → Method（IF-THENチャンクを束ねて方法論に構造化）'
+  F_definition: 実践知・事例・パターンに理論的構造を載せて体系化する
+  unit: 'η: Practice → G(F(Practice)) — 体で覚えたことを理論化して体に戻す = 座学の効果'
+  counit: 'ε: F(G(Method)) → Method — 方法を実践して方法に戻す = 実践の効果'
+  cycle: 座学⇄実践の循環。理屈→身体でも身体→理屈でも技術は生まれる
+  insight: 知覚⇄運動とアナロジカルに循環するが、スケールは座学⇄実践レベル — Creator, 2026-02-10
   mathematical_basis:
-    L1: "前順序圏のガロア接続 — F(X) ≤ Y ⟺ X ≤ G(Y)"
-    L2: "[0,1]-豊穣圏 — Drift ∈ [0,1] は Hom 値"
-    L3: "弱2-圏 (将来) — 派生は 2-cell"
+    L1: 前順序圏のガロア接続 — F(X) ≤ Y ⟺ X ≤ G(Y)
+    L2: '[0,1]-豊穣圏 — Drift ∈ [0,1] は Hom 値'
+    L3: 弱2-圏 (将来) — 派生は 2-cell
   natural_transformation:
-    partner: "met"
-    shared_axis: "Flow (I: 推論)"
-    varied_axis: "Scale (Ma→Mi)"
-    meaning: "大局設計→精密基準。「方法論から基準へ」"
+    partner: met
+    shared_axis: 'Flow (I: 推論)'
+    varied_axis: Scale (Ma→Mi)
+    meaning: 大局設計→精密基準。「方法論から基準へ」
   duality:
-    partner: "sta"
-    type: "tension"
-    meaning: "設計↔現状。「理想と現実の振動」"
+    partner: sta
+    type: tension
+    meaning: 設計↔現状。「理想と現実の振動」
 ---
 
 # /mek — 方法配置ワークフロー (Mekhane)

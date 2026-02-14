@@ -2,27 +2,31 @@
 id: hegemonikon-ki
 name: Hegemonikón Knowledge Item
 version: v1.0
-description: |
-  Use this skill when you need to understand the Hegemonikón framework structure,
+description: 'Use this skill when you need to understand the Hegemonikón framework
+  structure,
+
   theorem architecture (O/S/H/P/K/A series), or workflow-skill relationships.
+
   Triggers: /boot, フレームワーク, 定理, 24定理, τ-layer, v2.1, v2.2
+
+  '
 triggers:
   explicit:
-    - /hgk-ki
+  - /hgk-ki
   keywords:
-    - hegemonikon
-    - 定理
-    - スキル
-    - ワークフロー
-    - 24定理
-    - τ-layer
-    - v2.1
-    - v2.2
+  - hegemonikon
+  - 定理
+  - スキル
+  - ワークフロー
+  - 24定理
+  - τ-layer
+  - v2.1
+  - v2.2
 risk_tier: L1
 reversible: true
 requires_approval: false
 risks:
-  - "ユーティリティの誤用による品質基準の逸脱"
+- ユーティリティの誤用による品質基準の逸脱
 fallbacks: []
 ---
 

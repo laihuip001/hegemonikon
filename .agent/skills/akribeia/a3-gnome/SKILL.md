@@ -1,42 +1,45 @@
 ---
-# Theorem Metadata (v3.0)
-id: "A3"
-name: "Gnōmē"
-greek: "Γνώμη"
-series: "Akribeia"
+id: A3
+name: Gnōmē
+greek: Γνώμη
+series: Akribeia
 generation:
-  formula: "Explore × Valence"
-  result: "探索傾向 — 原則・教訓の抽出"
+  formula: Explore × Valence
+  result: 探索傾向 — 原則・教訓の抽出
+description: '教訓は何か？・原則を抽出したい・格言として定式化したい時に発動。 Principle extraction, lesson learned,
+  maxim formulation. Use for: 教訓, 原則, 格言, principle, lesson. NOT for: raw knowledge
+  (知識 → Epistēmē A4), desire (欲求 → Orexis H3).
 
-description: >
-  教訓は何か？・原則を抽出したい・格言として定式化したい時に発動。
-  Principle extraction, lesson learned, maxim formulation.
-  Use for: 教訓, 原則, 格言, principle, lesson.
-  NOT for: raw knowledge (知識 → Epistēmē A4), desire (欲求 → Orexis H3).
-
+  '
 triggers:
-  - 原則の抽出
-  - 教訓の言語化
-  - 「この経験から学んだことは」
-  - /gno コマンド
-
-keywords: [gnome, maxim, principle, lesson, 格言, 原則, 教訓]
-
+- 原則の抽出
+- 教訓の言語化
+- 「この経験から学んだことは」
+- /gno コマンド
+keywords:
+- gnome
+- maxim
+- principle
+- lesson
+- 格言
+- 原則
+- 教訓
 related:
   upstream:
-    - "H2 Pistis (X-HA5: 確信→原則抽出)"
-    - "H4 Doxa (X-HA7: 信念→教訓を引き出す)"
-    - "K3 Telos (X-KA5: 目的→原則演繹)"
-    - "K4 Sophia (X-KA7: 知恵→格言抽出)"
+  - 'H2 Pistis (X-HA5: 確信→原則抽出)'
+  - 'H4 Doxa (X-HA7: 信念→教訓を引き出す)'
+  - 'K3 Telos (X-KA5: 目的→原則演繹)'
+  - 'K4 Sophia (X-KA7: 知恵→格言抽出)'
   downstream: []
-
-version: "3.0.0"
-workflow_ref: ".agent/workflows/gno.md"
+version: 3.0.0
+workflow_ref: .agent/workflows/gno.md
 risk_tier: L1
 reversible: true
 requires_approval: false
-risks: ["none identified"]
-fallbacks: ["manual execution"]
+risks:
+- none identified
+fallbacks:
+- manual execution
 ---
 
 # A3: Gnōmē (Γνώμη)

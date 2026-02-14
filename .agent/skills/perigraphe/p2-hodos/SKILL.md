@@ -1,42 +1,44 @@
 ---
-# Theorem Metadata (v3.0)
-id: "P2"
-name: "Hodos"
-greek: "Ὁδός"
-series: "Perigraphē"
+id: P2
+name: Hodos
+greek: Ὁδός
+series: Perigraphē
 generation:
-  formula: "Scale × Explore"
-  result: "スケール探索 — 到達経路の定義"
+  formula: Scale × Explore
+  result: スケール探索 — 到達経路の定義
+description: 'どのルートで進む？・道筋を決めたい・経路を定義したい時に発動。 Path definition, route planning, journey
+  mapping. Use for: 道筋, 経路, route, path, ルート. NOT for: 反復的なサイクル (→ Trokhia P3).
 
-description: >
-  どのルートで進む？・道筋を決めたい・経路を定義したい時に発動。
-  Path definition, route planning, journey mapping.
-  Use for: 道筋, 経路, route, path, ルート.
-  NOT for: 反復的なサイクル (→ Trokhia P3).
-
+  '
 triggers:
-  - 到達経路の定義
-  - ルート計画
-  - 段階的ステップの設計
-  - /hod コマンド
-
-keywords: [hodos, path, route, way, journey, 道, 経路]
-
+- 到達経路の定義
+- ルート計画
+- 段階的ステップの設計
+- /hod コマンド
+keywords:
+- hodos
+- path
+- route
+- way
+- journey
+- 道
+- 経路
 related:
   upstream:
-    - "S1 Metron (X-SP2: 測定基準→到達経路を制約)"
-    - "S3 Stathmos (X-SP4: 評価基準→達成への道筋)"
+  - 'S1 Metron (X-SP2: 測定基準→到達経路を制約)'
+  - 'S3 Stathmos (X-SP4: 評価基準→達成への道筋)'
   downstream:
-    - "K1 Eukairia (X-PK3: 経路→今この道を進むべきか)"
-    - "K2 Chronos (X-PK4: 経路→この道にかかる時間)"
-
-version: "3.0.0"
-workflow_ref: ".agent/workflows/hod.md"
+  - 'K1 Eukairia (X-PK3: 経路→今この道を進むべきか)'
+  - 'K2 Chronos (X-PK4: 経路→この道にかかる時間)'
+version: 3.0.0
+workflow_ref: .agent/workflows/hod.md
 risk_tier: L1
 reversible: true
 requires_approval: false
-risks: ["none identified"]
-fallbacks: ["manual execution"]
+risks:
+- none identified
+fallbacks:
+- manual execution
 ---
 
 # P2: Hodos (Ὁδός)

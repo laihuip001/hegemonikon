@@ -1,35 +1,34 @@
 ---
-id: "X-T"
-name: "Tropos Relations"
-category: "relation-layer"
-description: "T-series（拡張定理）間の従属関係を定義する。"
-
+id: X-T
+name: Tropos Relations
+category: relation-layer
+description: T-series（拡張定理）間の従属関係を定義する。
 triggers:
-  - extended theorem chain visualization
-  - tropos dependency analysis
-  - workflow flow design
-
+- extended theorem chain visualization
+- tropos dependency analysis
+- workflow flow design
 keywords:
-  - tropos-relations
-  - extended-theorem-dependencies
-  - t-series-chain
-  - core-loop
+- tropos-relations
+- extended-theorem-dependencies
+- t-series-chain
+- core-loop
+when_to_use: '拡張定理間の処理フローを可視化したいとき。
 
-when_to_use: |
-  拡張定理間の処理フローを可視化したいとき。
   Workflow 設計時に T-series の連鎖を確認する場合。
 
-when_not_to_use: |
-  - 純粋定理間の関係を見る時（→ X-O）
+  '
+when_not_to_use: '- 純粋定理間の関係を見る時（→ X-O）
+
   - K-series の相互制約を見る時（→ X-K）
 
-layer: "Level 2' 関係層"
-version: "2.0"
+  '
+layer: Level 2' 関係層
+version: '2.0'
 risk_tier: L1
 reversible: true
 requires_approval: false
 risks:
-  - "定理間関係の誤推論による不適切な遷移提案"
+- 定理間関係の誤推論による不適切な遷移提案
 fallbacks: []
 ---
 

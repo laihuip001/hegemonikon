@@ -1,74 +1,90 @@
 ---
 description: K-series Peras。L1.5×L1.75 の極限演算で文脈判断の統合を生成。
 hegemonikon: Kairos
-modules: [K1, K2, K3, K4]
+modules:
+- K1
+- K2
+- K3
+- K4
 skill_ref:
-  - ".agent/skills/kairos/k1-eukairia/SKILL.md"
-  - ".agent/skills/kairos/k2-chronos/SKILL.md"
-  - ".agent/skills/kairos/k3-telos/SKILL.md"
-  - ".agent/skills/kairos/k4-sophia/SKILL.md"
-version: "6.6"
+- .agent/skills/kairos/k1-eukairia/SKILL.md
+- .agent/skills/kairos/k2-chronos/SKILL.md
+- .agent/skills/kairos/k3-telos/SKILL.md
+- .agent/skills/kairos/k4-sophia/SKILL.md
+version: '6.6'
 lcm_state: beta
-layer: "Δ"
+layer: Δ
 category_theory:
-  yoneda: "Hom(-, Tn) ≅ F(Tn) — 各定理はその射の集合で完全に決まる"
-  limit: "Cone の頂点 — 全ての文脈射が一致する点"
-  converge_as_cone: "C0=PW決定, C1=文脈射の列挙, C2=PW加重融合, C3=Kalon+普遍性検証"
-  cone_builder: "mekhane/fep/cone_builder.py"
-  kalon: "mekhane/fep/universality.py — C3で使用"
-  adjunction: "F ⊣ G — 圏論を付与する (F) と 構造を発見する (G) の随伴対"
+  yoneda: Hom(-, Tn) ≅ F(Tn) — 各定理はその射の集合で完全に決まる
+  limit: Cone の頂点 — 全ての文脈射が一致する点
+  converge_as_cone: C0=PW決定, C1=文脈射の列挙, C2=PW加重融合, C3=Kalon+普遍性検証
+  cone_builder: mekhane/fep/cone_builder.py
+  kalon: mekhane/fep/universality.py — C3で使用
+  adjunction: F ⊣ G — 圏論を付与する (F) と 構造を発見する (G) の随伴対
   enrichment:
-    concept: "Hom(task,K) に時間的重み (urgency) と Eisenhower 2軸 を入れる — /k 固有"
+    concept: Hom(task,K) に時間的重み (urgency) と Eisenhower 2軸 を入れる — /k 固有
     mode: conceptual
-    variant: "Temporal-enrichment (Hom → ([0,1], decay) × ℝ²)"
+    variant: Temporal-enrichment (Hom → ([0,1], decay) × ℝ²)
     structures:
-      - "K2 Urgency マッピング = 時間 → [0,1] の非線形スケール"
-      - "Eisenhower Matrix = 2軸 (重要性 × 緊急性) の enrichment"
-      - "Q2 保護 = enrichment 上のバイアス補正 (q2_boost)"
-      - "/s Met, /h Prob と共通の上位概念: Typed Enrichment"
+    - K2 Urgency マッピング = 時間 → [0,1] の非線形スケール
+    - Eisenhower Matrix = 2軸 (重要性 × 緊急性) の enrichment
+    - Q2 保護 = enrichment 上のバイアス補正 (q2_boost)
+    - '/s Met, /h Prob と共通の上位概念: Typed Enrichment'
   mathematical_basis:
-    L1: "前順序圏のガロア接続 — F(X) ≤ Y ⟺ X ≤ G(Y)"
-    L2: "[0,1]-豊穣圏 — Drift ∈ [0,1] は Hom 値"
-    L3: "弱2-圏 (将来) — 派生は 2-cell"
-lineage: "v5.2 + Limit演算復元 → v6.0 + C0 PW/加重融合 → v6.4 → v6.5 C3 Kalon化 → v6.6 固有層 Temporal-enrichment"
+    L1: 前順序圏のガロア接続 — F(X) ≤ Y ⟺ X ≤ G(Y)
+    L2: '[0,1]-豊穣圏 — Drift ∈ [0,1] は Hom 値'
+    L3: 弱2-圏 (将来) — 派生は 2-cell
+lineage: v5.2 + Limit演算復元 → v6.0 + C0 PW/加重融合 → v6.4 → v6.5 C3 Kalon化 → v6.6 固有層 Temporal-enrichment
 cognitive_algebra:
-  generation: "L1.5 × L1.75"
+  generation: L1.5 × L1.75
   coordinates:
-    axis_1: "Scale/Function"
-    axis_2: "Valence/Precision"
-  definition: "/k = lim(K1·K2·K3·K4)"
+    axis_1: Scale/Function
+    axis_2: Valence/Precision
+  definition: /k = lim(K1·K2·K3·K4)
   interpretation:
-    strict: "テンソル積 (Scale/Function⊗Valence/Precision) の Limit 射影"
-    short: "4定理の内積 → 最適収束点"
+    strict: テンソル積 (Scale/Function⊗Valence/Precision) の Limit 射影
+    short: 4定理の内積 → 最適収束点
   operators:
-    "+": "Limit強度↑ — 全4定理を詳細に収束"
-    "-": "Limit強度↓ — 縮約収束"
-    "*": "Limit対象自体を問う: なぜ文脈を問うか"
+    +: Limit強度↑ — 全4定理を詳細に収束
+    '-': Limit強度↓ — 縮約収束
+    '*': 'Limit対象自体を問う: なぜ文脈を問うか'
 sel_enforcement:
-  "+":
-    description: "MUST execute ALL 4 theorems with deep convergence"
+  +:
+    description: MUST execute ALL 4 theorems with deep convergence
     minimum_requirements:
-      - "全4定理実行"
-      - "各定理詳細モード"
-      - "融合ステップ必須"
-  "-":
-    description: "MAY execute with condensed convergence"
+    - 全4定理実行
+    - 各定理詳細モード
+    - 融合ステップ必須
+  '-':
+    description: MAY execute with condensed convergence
     minimum_requirements:
-      - "サマリーのみ"
-  "*":
-    description: "MUST meta-analyze: why question context?"
+    - サマリーのみ
+  '*':
+    description: 'MUST meta-analyze: why question context?'
     minimum_requirements:
-      - "文脈層選択の理由を問う"
-derivatives: [urge, opti, miss, shor, medi, long, intr, inst, ulti, taci, expl, meta]
+    - 文脈層選択の理由を問う
+derivatives:
+- urge
+- opti
+- miss
+- shor
+- medi
+- long
+- intr
+- inst
+- ulti
+- taci
+- expl
+- meta
 absorbed:
-  - "/pri.md v3.0 (2026-01-28)"
+- /pri.md v3.0 (2026-01-28)
 children:
-  - "/euk"   # K1 Eukairia (好機)
-  - "/chr"   # K2 Chronos (時間)
-  - "/tel"   # K3 Telos (目的)
-  - "/sop"   # K4 Sophia (情報収集)
+- /euk
+- /chr
+- /tel
+- /sop
 anti_skip: enabled
-ccl_signature: "/k+?k1"
+ccl_signature: /k+?k1
 ---
 
 # /k: 文脈 Peras (Kairos)

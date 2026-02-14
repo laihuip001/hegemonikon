@@ -1,73 +1,98 @@
 ---
 description: A4 Epistēmē（知識）を発動し、信念を知識に昇格させる。知識確立ワークフロー。
 hegemonikon: Akribeia
-modules: [A4]
-skill_ref: ".agent/skills/akribeia/a4-episteme/SKILL.md"
+modules:
+- A4
+skill_ref: .agent/skills/akribeia/a4-episteme/SKILL.md
 triggers:
-  - "これは確実な知識か"
-  - "知識に昇格"
-  - "真理"
-  - "episteme"
-  - "knowledge"
-version: "1.4"
+- これは確実な知識か
+- 知識に昇格
+- 真理
+- episteme
+- knowledge
+version: '1.4'
 lcm_state: beta
-lineage: "v1.3 + FBR変換 → v1.4"
-derivatives: [prac, theo, tech, case, transfer, pattern, statistical, base_rate, reuse, triz40, generalize, typed]
+lineage: v1.3 + FBR変換 → v1.4
+derivatives:
+- prac
+- theo
+- tech
+- case
+- transfer
+- pattern
+- statistical
+- base_rate
+- reuse
+- triz40
+- generalize
+- typed
 trigonon:
   series: A
   type: Pure
   theorem: A4
-  coordinates: [U, U]
+  coordinates:
+  - U
+  - U
   bridge: []
-  anchor_via: [H, K]
+  anchor_via:
+  - H
+  - K
   morphisms:
-    ">>H": [/pro, /pis, /ore, /dox]
-    ">>K": [/euk, /chr, /tel, /sop]
+    '>>H':
+    - /pro
+    - /pis
+    - /ore
+    - /dox
+    '>>K':
+    - /euk
+    - /chr
+    - /tel
+    - /sop
 cognitive_algebra:
-  "+": "詳細検証：確信度・根拠・反証可能性を完全評価"
-  "-": "即検証：Epistēmē/Doxa/Hypo の一言のみ"
-  "*": "メタ検証：知識検証プロセス自体を問う"
+  +: 詳細検証：確信度・根拠・反証可能性を完全評価
+  '-': 即検証：Epistēmē/Doxa/Hypo の一言のみ
+  '*': メタ検証：知識検証プロセス自体を問う
 sel_enforcement:
-  "+":
-    description: "MUST evaluate with full confidence, evidence, and falsifiability"
+  +:
+    description: MUST evaluate with full confidence, evidence, and falsifiability
     minimum_requirements:
-      - "確信度評価 必須"
-      - "根拠 必須"
-      - "反証可能性 必須"
-  "-":
-    description: "MAY provide single word status only"
+    - 確信度評価 必須
+    - 根拠 必須
+    - 反証可能性 必須
+  '-':
+    description: MAY provide single word status only
     minimum_requirements:
-      - "Epistēmē/Doxa/Hypo の一言"
-  "*":
-    description: "MUST meta-analyze: why is this knowledge?"
+    - Epistēmē/Doxa/Hypo の一言
+  '*':
+    description: 'MUST meta-analyze: why is this knowledge?'
     minimum_requirements:
-      - "知識検証プロセスを問う"
-ccl_signature: "/epi+"
+    - 知識検証プロセスを問う
+ccl_signature: /epi+
 category_theory:
-  core: "随伴 F⊣G の右随伴 G（忘却関手）"
-  adjunction: "Krisis (F) ⊣ Epistēmē (G)"
-  role: "G: Judgement → Knowledge（判定から具体を忘却し、抽象的知識を抽出）"
-  G_definition: "具体的文脈（誰が、いつ、何を判定したか）を忘却し、普遍的知識だけを残す"
+  core: 随伴 F⊣G の右随伴 G（忘却関手）
+  adjunction: Krisis (F) ⊣ Epistēmē (G)
+  role: 'G: Judgement → Knowledge（判定から具体を忘却し、抽象的知識を抽出）'
+  G_definition: 具体的文脈（誰が、いつ、何を判定したか）を忘却し、普遍的知識だけを残す
   G_two_layers:
-    意味記憶: "普遍化・抽象化できる部分。レンジが広がる。well-defined"
-    エピソード記憶: "抽象化に耐えない具体。特殊すぎてルール化できない"
-  drift: "Drift = 普遍化できないエピソードの量。その文脈でしか成立しない判定"
-  scale_operation: "G = レンジを広げる（一般化）/ F = レンジを狭める（具体的適用）"
-  generalize_mode: "/epi.generalize は G そのもの — 具体→抽象の操作"
-  insight: "対象のレンジが広がることで知識になる — Creator, 2026-02-10"
+    意味記憶: 普遍化・抽象化できる部分。レンジが広がる。well-defined
+    エピソード記憶: 抽象化に耐えない具体。特殊すぎてルール化できない
+  drift: Drift = 普遍化できないエピソードの量。その文脈でしか成立しない判定
+  scale_operation: G = レンジを広げる（一般化）/ F = レンジを狭める（具体的適用）
+  generalize_mode: /epi.generalize は G そのもの — 具体→抽象の操作
+  insight: 対象のレンジが広がることで知識になる — Creator, 2026-02-10
   mathematical_basis:
-    L1: "前順序圏のガロア接続 — F(X) ≤ Y ⟺ X ≤ G(Y)"
-    L2: "[0,1]-豊穣圏 — Drift ∈ [0,1] は Hom 値"
-    L3: "弱2-圏 (将来) — 派生は 2-cell"
+    L1: 前順序圏のガロア接続 — F(X) ≤ Y ⟺ X ≤ G(Y)
+    L2: '[0,1]-豊穣圏 — Drift ∈ [0,1] は Hom 値'
+    L3: 弱2-圏 (将来) — 派生は 2-cell
   natural_transformation:
-    partner: "gno"
-    shared_axis: "Valence (-: 否定)"
-    varied_axis: "Precision (U→C)"
-    meaning: "不確かな知識→確かな教訓。「体系から実感へ」"
+    partner: gno
+    shared_axis: 'Valence (-: 否定)'
+    varied_axis: Precision (U→C)
+    meaning: 不確かな知識→確かな教訓。「体系から実感へ」
   duality:
-    partner: "pat"
-    type: "transition"
-    meaning: "知識→情念。「学んだ→感じ直す」"
+    partner: pat
+    type: transition
+    meaning: 知識→情念。「学んだ→感じ直す」
 ---
 
 # /epi: 知識確立ワークフロー (Epistēmē)

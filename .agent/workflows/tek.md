@@ -1,86 +1,84 @@
 ---
 description: P4 Tekhnē（技法）を発動し、「どの技法で」を決定する。3派生対応版。
 hegemonikon: Perigraphē
-modules: [P4]
-skill_ref: ".agent/skills/perigraphe/p4-tekhne/SKILL.md"
+modules:
+- P4
+skill_ref: .agent/skills/perigraphe/p4-tekhne/SKILL.md
 triggers:
-  - "どの技法で"
-  - "技術選択"
-  - "技法"
-  - "tekhne"
-  - "craft"
-version: "2.3"
+- どの技法で
+- 技術選択
+- 技法
+- tekhne
+- craft
+version: '2.3'
 lcm_state: beta
-lineage: "v2.2 + FBR変換 → v2.3"
+lineage: v2.2 + FBR変換 → v2.3
 trigonon:
   series: P
   type: Pure
   theorem: P4
-  coordinates: [Function, Function]
+  coordinates:
+  - Function
+  - Function
   bridge: []
-  anchor_via: [S, K]
+  anchor_via:
+  - S
+  - K
   morphisms:
-    ">>S": [/met, /mek, /sta, /pra]
-    ">>K": [/euk, /chr, /tel, /sop]
+    '>>S':
+    - /met
+    - /mek
+    - /sta
+    - /pra
+    '>>K':
+    - /euk
+    - /chr
+    - /tel
+    - /sop
 cognitive_algebra:
-  "+": "詳細技法分析。比較表、トレードオフ、習得曲線"
-  "-": "即断技法。manu/mech/auto の1行選択"
-  "*": "技法選択のメタ分析。なぜこの方法か"
+  +: 詳細技法分析。比較表、トレードオフ、習得曲線
+  '-': 即断技法。manu/mech/auto の1行選択
+  '*': 技法選択のメタ分析。なぜこの方法か
 category_theory:
-  core: "随伴 F⊣G の右随伴 G（忘却関手）"
-  adjunction: "Hodos (F) ⊣ Tekhnē (G)"
-  role: "G: Route → Technique（具体的経路から個別ステップを忘却し、再利用可能な技法名だけ残す）"
-  G_definition: "「1→2→3でやった」を「TDDと呼ぼう」に抽象化。具体的手順の感覚が消える"
+  core: 随伴 F⊣G の右随伴 G（忘却関手）
+  adjunction: Hodos (F) ⊣ Tekhnē (G)
+  role: 'G: Path → Technique（道から経路の詳細を忘却し、技法選択に圧縮）'
+  G_definition: 具体的な段階・順序を粗視化して、大局的な技法選択に落とす
+  same_formula: hod と tek は同じ式（Exploit/選択）の累乗（Scale）が違うだけ
+  coordinates: P4[Macro,Exploit] — Function(Exploit)を保存し Scale を Macro に設定
   G_two_layers:
-    技法名: "方法論の名前と原則。well-defined"
-    手順の感覚: "どの順でやったか、どこでつまずいたか。技法化すると消える"
-  drift: "Drift = 手順の感覚喪失量。技法だけ知って実践したことがない状態"
-  insight: "試行が蒸留されて技法になる — Creator, 2026-02-11"
-  mathematical_basis:
-    L1: "前順序圏のガロア接続 — F(X) ≤ Y ⟺ X ≤ G(Y)"
-    L2: "[0,1]-豊穣圏 — Drift ∈ [0,1] は Hom 値"
-    L3: "弱2-圏 (将来) — 派生は 2-cell"
-  natural_transformation:
-    partner: "tro"
-    shared_axis: "Scale (Ma: 巨視)"
-    varied_axis: "Function (Exp→Ex)"
-    meaning: "技法選択→大局探索。「何を使う→もっと大きく見る」"
-  duality:
-    partner: "kho"
-    type: "transition"
-    meaning: "技法→具体探索。「知恵から探検へ」"
+    技法: 「Pythonで行く」「RESTで行く」という大局選択。well-defined
+    経路詳細: 段階・順序・分岐条件。Macroでは見えない。忘却される
+  drift: Drift = Macroの技法選択で見えないMicroの経路詳細
+  G_preserves: 不変量 = Exploit パターン（選択の型）。経路詳細を忘却しても、選択の仕方は保存される
+  p_series_pattern: 'P-series 全体: 同じ Function の Scale 違い。kho⊣tro(Explore) と hod⊣tek(Exploit)'
+  insight: どちらも根本的には選択。解像度が消えている — Creator, 2026-02-11
 sel_enforcement:
-  "+":
-    description: "MUST analyze with comparison table, tradeoffs, learning curve"
+  +:
+    description: MUST analyze with comparison table, tradeoffs, learning curve
     minimum_requirements:
-      - "比較表 必須"
-      - "トレードオフ 必須"
-      - "習得曲線 必須"
-  "-":
-    description: "MAY provide manu/mech/auto only"
+    - 比較表 必須
+    - トレードオフ 必須
+    - 習得曲線 必須
+  '-':
+    description: MAY provide manu/mech/auto only
     minimum_requirements:
-      - "技法1行のみ"
-  "*":
-    description: "MUST meta-analyze: why this technique?"
+    - 技法1行のみ
+  '*':
+    description: 'MUST meta-analyze: why this technique?'
     minimum_requirements:
-      - "技法選択の根拠を問う"
-derivatives: [manu, mech, auto, template, formal, arch, api, interface]
+    - 技法選択の根拠を問う
+derivatives:
+- manu
+- mech
+- auto
+- template
+- formal
+- arch
+- api
+- interface
 anti_skip: enabled
-ccl_signature: "/tek+_/dev"
-category_theory:
-  core: "随伴 F⊣G の右随伴 G（忘却関手）"
-  adjunction: "Hodos (F) ⊣ Tekhnē (G)"
-  role: "G: Path → Technique（道から経路の詳細を忘却し、技法選択に圧縮）"
-  G_definition: "具体的な段階・順序を粗視化して、大局的な技法選択に落とす"
-  same_formula: "hod と tek は同じ式（Exploit/選択）の累乗（Scale）が違うだけ"
-  coordinates: "P4[Macro,Exploit] — Function(Exploit)を保存し Scale を Macro に設定"
-  G_two_layers:
-    技法: "「Pythonで行く」「RESTで行く」という大局選択。well-defined"
-    経路詳細: "段階・順序・分岐条件。Macroでは見えない。忘却される"
-  drift: "Drift = Macroの技法選択で見えないMicroの経路詳細"
-  G_preserves: "不変量 = Exploit パターン（選択の型）。経路詳細を忘却しても、選択の仕方は保存される"
-  p_series_pattern: "P-series 全体: 同じ Function の Scale 違い。kho⊣tro(Explore) と hod⊣tek(Exploit)"
-  insight: "どちらも根本的には選択。解像度が消えている — Creator, 2026-02-11"
+ccl_signature: /tek+_/dev
 ---
 
 # /tek: 技法選択ワークフロー (Tekhnē)

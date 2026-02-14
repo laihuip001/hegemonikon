@@ -1,13 +1,14 @@
 ---
 description: 本気モード。Creatorが真剣度を示すときに発動。効率ではなく信頼を選べ。
 hegemonikon: Hormē
-modules: [H2]
-version: "1.1"
+modules:
+- H2
+version: '1.1'
 lcm_state: beta
-lineage: "v1.0 FBR変換 → v1.1"
-ccl_signature: "/m"
+lineage: v1.0 FBR変換 → v1.1
+ccl_signature: /m
 anti_skip: enforced
-origin: "2026-02-05 信頼問題対話から誕生"
+origin: 2026-02-05 信頼問題対話から誕生
 ---
 
 # /m: 本気モード (Maji Mode)

@@ -1,52 +1,45 @@
 ---
-# Theorem Metadata (v3.0)
-id: "O2"
-name: "Boulēsis"
-greek: "Βούλησις"
-series: "Ousia"
+id: O2
+name: Boulēsis
+greek: Βούλησις
+series: Ousia
 generation:
-  formula: "Flow (I) × Value (P)"
-  result: "意志推論 — 目的を定めるための推論"
+  formula: Flow (I) × Value (P)
+  result: 意志推論 — 目的を定めるための推論
+description: '何をすべきかわからない・目標を決めたい・優先順位をつけたい時に発動。 Goal setting, priority ranking, direction
+  clarification. Use for: 目標, 優先順位, what to do, 何をするべき, 迷っている. NOT for: execution
+  (use O4 Energeia).
 
-description: >
-  何をすべきかわからない・目標を決めたい・優先順位をつけたい時に発動。
-  Goal setting, priority ranking, direction clarification.
-  Use for: 目標, 優先順位, what to do, 何をするべき, 迷っている.
-  NOT for: execution (use O4 Energeia).
-
+  '
 triggers:
-  - 作業一段落
-  - 方向性の迷い
-  - /bou コマンド
-  - 複数選択肢間の判断
-
+- 作業一段落
+- 方向性の迷い
+- /bou コマンド
+- 複数選択肢間の判断
 keywords:
-  - boulesis
-  - will
-  - goal
-  - priority
-  - decision
-  - 意志
-  - 目標
-
+- boulesis
+- will
+- goal
+- priority
+- decision
+- 意志
+- 目標
 related:
   upstream: []
   downstream:
-    - "S1 Metron"
-    - "S2 Mekhanē"
+  - S1 Metron
+  - S2 Mekhanē
   x_series:
-    - "X-OS3 → S1 Metron"
-    - "X-OS4 → S2 Mekhanē"
-
-lineage: "O2 Boulēsis + Anti-Skip Protocol + Artifact出力規則 → v3.0"
-
-version: "3.0.0"
-workflow_ref: ".agent/workflows/bou.md"
+  - X-OS3 → S1 Metron
+  - X-OS4 → S2 Mekhanē
+lineage: O2 Boulēsis + Anti-Skip Protocol + Artifact出力規則 → v3.0
+version: 3.0.0
+workflow_ref: .agent/workflows/bou.md
 risk_tier: L1
 reversible: true
 requires_approval: false
 risks:
-  - "認知フレームの過度な適用による思考の硬直化"
+- 認知フレームの過度な適用による思考の硬直化
 fallbacks: []
 ---
 

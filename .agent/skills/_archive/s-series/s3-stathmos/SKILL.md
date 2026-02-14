@@ -1,67 +1,63 @@
 ---
-# === Metadata Layer (v2.1) ===
-id: "S3"
-name: "Stathmos"
-greek: "Σταθμός"
-category: "modal-theorem"
-description: >
-  Applies the S3 Stathmos schema from the Hegemonikón framework for value baseline selection.
-  Use this skill when the user needs to set evaluation criteria, establish reference points,
-  or determine the scale for value judgments (Micro detail vs Macro strategic).
-  Triggers: 基準, baseline, reference point, evaluation criteria, benchmark, anchor.
+id: S3
+name: Stathmos
+greek: Σταθμός
+category: modal-theorem
+description: 'Applies the S3 Stathmos schema from the Hegemonikón framework for value
+  baseline selection. Use this skill when the user needs to set evaluation criteria,
+  establish reference points, or determine the scale for value judgments (Micro detail
+  vs Macro strategic). Triggers: 基準, baseline, reference point, evaluation criteria,
+  benchmark, anchor.
 
-# v2.1 生成規則
+  '
 generation:
-  layer: "L2 S-series (Schema)"
-  formula: "Value (E/P) × Scale (M/M)"
-  result: "スケール価値 — 基点での配置"
+  layer: L2 S-series (Schema)
+  formula: Value (E/P) × Scale (M/M)
+  result: スケール価値 — 基点での配置
   axioms:
-    - L1.2 Value (E/P): 認識/実用の選択
-    - L1.5.1 Scale (M/M): Micro/Macro の選択
-
-# 発動条件
+  - L1.2 Value (E/P): 認識/実用の選択
+  - L1.5.1 Scale (M/M): Micro/Macro の選択
 triggers:
-  - value scale decision
-  - evaluation granularity
-  - reference point selection
-  - baseline setting
-
-# キーワード
+- value scale decision
+- evaluation granularity
+- reference point selection
+- baseline setting
 keywords:
-  - baseline
-  - reference
-  - anchor
-  - standard
-  - criterion
-  - benchmark
+- baseline
+- reference
+- anchor
+- standard
+- criterion
+- benchmark
+when_to_use: '価値判断の「粒度」を決定する必要がある時。
 
-# 使用条件
-when_to_use: |
-  価値判断の「粒度」を決定する必要がある時。
   詳細な価値分析（Micro）か大局的価値判断（Macro）かを選ぶ時。
 
-when_not_to_use: |
-  - 基準が既に決まっている場合
+  '
+when_not_to_use: '- 基準が既に決まっている場合
+
   - 行動の粒度選択が必要な時（→ S1 Metron）
 
-# 関連 (v2.1)
+  '
 related:
   upstream:
-    - "O1 Noēsis"
-    - "O3 Zētēsis"
+  - O1 Noēsis
+  - O3 Zētēsis
   downstream:
-    - "H3 Orexis"
-    - "P3 Trokhia"
-  x_series: ["X-OS", "X-SH", "X-SP"]
+  - H3 Orexis
+  - P3 Trokhia
+  x_series:
+  - X-OS
+  - X-SH
+  - X-SP
   micro: null
   macro: null
-
-version: "2.1.0"
+version: 2.1.0
 risk_tier: L0
 reversible: true
 requires_approval: false
 risks:
-  - "アーカイブ済みスキルの誤参照による古い手法の適用"
+- アーカイブ済みスキルの誤参照による古い手法の適用
 fallbacks: []
 ---
 

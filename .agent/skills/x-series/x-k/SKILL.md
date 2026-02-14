@@ -1,35 +1,34 @@
 ---
-id: "X-K"
-name: "Kairos Relations"
-category: "relation-layer"
-description: "K-series（文脈定理）間の従属関係を定義する。"
-
+id: X-K
+name: Kairos Relations
+category: relation-layer
+description: K-series（文脈定理）間の従属関係を定義する。
 triggers:
-  - context theorem symmetry check
-  - kairos dependency analysis
-  - constraint conflict detection
-
+- context theorem symmetry check
+- kairos dependency analysis
+- constraint conflict detection
 keywords:
-  - kairos-relations
-  - context-theorem-dependencies
-  - k-series-chain
-  - symmetry
+- kairos-relations
+- context-theorem-dependencies
+- k-series-chain
+- symmetry
+when_to_use: '文脈定理間の相互制約を可視化したいとき。
 
-when_to_use: |
-  文脈定理間の相互制約を可視化したいとき。
   K-series を複数適用する際に矛盾検出する場合。
 
-when_not_to_use: |
-  - 純粋定理間の関係を見る時（→ X-O）
+  '
+when_not_to_use: '- 純粋定理間の関係を見る時（→ X-O）
+
   - T-series の処理フローを見る時（→ X-T）
 
-layer: "Level 2' 関係層"
-version: "2.0"
+  '
+layer: Level 2' 関係層
+version: '2.0'
 risk_tier: L1
 reversible: true
 requires_approval: false
 risks:
-  - "定理間関係の誤推論による不適切な遷移提案"
+- 定理間関係の誤推論による不適切な遷移提案
 fallbacks: []
 ---
 

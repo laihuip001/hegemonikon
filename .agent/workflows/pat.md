@@ -1,81 +1,77 @@
 ---
 description: A1 Pathos（情念）を発動し、メタ感情・二重傾向を評価する。メタ感情評価ワークフロー。
 hegemonikon: Akribeia
-modules: [A1]
-skill_ref: ".agent/skills/akribeia/a1-pathos/SKILL.md"
+modules:
+- A1
+skill_ref: .agent/skills/akribeia/a1-pathos/SKILL.md
 triggers:
-  - "この判断にどう感じる"
-  - "メタ感情"
-  - "傾向の傾向"
-  - "pathos"
-  - "emotion"
-version: "1.5"
+- この判断にどう感じる
+- メタ感情
+- 傾向の傾向
+- pathos
+- emotion
+version: '1.5'
 lcm_state: beta
-lineage: "v1.4 + FBR変換 → v1.5"
-derivatives: [rece, tran, regu, delta, neutral]
+lineage: v1.4 + FBR変換 → v1.5
+derivatives:
+- rece
+- tran
+- regu
+- delta
+- neutral
 trigonon:
   series: A
   type: Pure
   theorem: A1
-  coordinates: [C, C]
+  coordinates:
+  - C
+  - C
   bridge: []
-  anchor_via: [H, K]
+  anchor_via:
+  - H
+  - K
   morphisms:
-    ">>H": [/pro, /pis, /ore, /dox]
-    ">>K": [/euk, /chr, /tel, /sop]
+    '>>H':
+    - /pro
+    - /pis
+    - /ore
+    - /dox
+    '>>K':
+    - /euk
+    - /chr
+    - /tel
+    - /sop
 cognitive_algebra:
-  "+": "詳細感情：二重傾向の根拠と分岐を深掘り"
-  "-": "即感情：+→+/+→-/-→+/-→- の一言のみ"
-  "*": "メタ感情：感情評価プロセス自体を問う"
+  +: 詳細感情：二重傾向の根拠と分岐を深掘り
+  '-': 即感情：+→+/+→-/-→+/-→- の一言のみ
+  '*': メタ感情：感情評価プロセス自体を問う
 category_theory:
-  core: "随伴 F⊣G の左随伴 F（自由関手）"
-  adjunction: "Pathos (F) ⊣ Gnōmē (G)"
-  role: "F: Maxim → Passion（抽象的教訓に激烈な感情/体験を載せてメタ感情を構成）"
-  F_definition: "「失敗から学べ」という格言に、実際の痛みや後悔の感情強度を付与して二重傾向を構成"
-  unit: "η: Maxim → G(F(Maxim)) — 教訓を情念にして教訓に戻す = 教訓の体感的理解度検証"
-  counit: "ε: F(G(Passion)) → Passion — 情念を教訓にして再点火 = 情動の再体験"
-  drift: "Drift = 感情の生の熱量の喪失。教訓は残るが痛みの鮮度は消える"
-  insight: "痛みが教訓を生み、教訓は痛みを忘れた知恵。だから忘れた頃に繰り返す — Creator, 2026-02-11"
-  mathematical_basis:
-    L1: "前順序圏のガロア接続 — F(X) ≤ Y ⟺ X ≤ G(Y)"
-    L2: "[0,1]-豊穣圏 — Drift ∈ [0,1] は Hom 値"
-    L3: "弱2-圏 (将来) — 派生は 2-cell"
-  natural_transformation:
-    partner: "dia"
-    shared_axis: "Valence (+: 肯定)"
-    varied_axis: "Precision (C→U)"
-    meaning: "確かな情念→不確かな判断。「感じる→判断する」"
-  duality:
-    partner: "epi"
-    type: "transition"
-    meaning: "情念→知識。「体験から体系へ」"
+  core: 随伴 F⊣G の左随伴 F（自由関手）
+  adjunction: Pathos (F) ⊣ Gnōmē (G)
+  role: 'F: Principle → Emotion（原則に感情的精密さを載せて、二重傾向を構成）'
+  F_definition: 「何が正しいか」という原則に、「それにどう感じるか」という感情の精密さを付与する
+  coordinates: A1[C,C] — Precision(C)を両軸で保存。精密さの精密さ = メタ感情
+  unit: 'η: Principle → G(F(Principle)) — 原則を感情で評価し教訓に戻す = 原則の情動的妥当性'
+  counit: 'ε: F(G(Emotion)) → Emotion — 感情を教訓化して再び感じ直す = 感情の真正性検証'
+  drift: Drift = 感情と原則の乖離。感じていることと信じていることの不一致
+  qualia: F はクオリア（体験の質）を構成する側。一人称視点の主観的体験を付与する
+  pro_pat_complementarity: pro⊣ore = 情動強度(量的喪失) / pat⊣gno = クオリア(質的喪失)
+  insight: 情念 = 一人称体験。格言 = 三人称命題。消えるのはクオリア — Creator, 2026-02-11
 sel_enforcement:
-  "+":
-    description: "MUST analyze double tendency with reasoning"
+  +:
+    description: MUST analyze double tendency with reasoning
     minimum_requirements:
-      - "二重傾向分析 必須"
-      - "根拠と分岐 必須"
-  "-":
-    description: "MAY provide pattern only (+→+ etc)"
+    - 二重傾向分析 必須
+    - 根拠と分岐 必須
+  '-':
+    description: MAY provide pattern only (+→+ etc)
     minimum_requirements:
-      - "パターンの一言"
-  "*":
-    description: "MUST meta-analyze: why this feeling?"
+    - パターンの一言
+  '*':
+    description: 'MUST meta-analyze: why this feeling?'
     minimum_requirements:
-      - "感情プロセスを問う"
-ccl_signature: "/pat+"
-category_theory:
-  core: "随伴 F⊣G の左随伴 F（自由関手）"
-  adjunction: "Pathos (F) ⊣ Gnōmē (G)"
-  role: "F: Principle → Emotion（原則に感情的精密さを載せて、二重傾向を構成）"
-  F_definition: "「何が正しいか」という原則に、「それにどう感じるか」という感情の精密さを付与する"
-  coordinates: "A1[C,C] — Precision(C)を両軸で保存。精密さの精密さ = メタ感情"
-  unit: "η: Principle → G(F(Principle)) — 原則を感情で評価し教訓に戻す = 原則の情動的妥当性"
-  counit: "ε: F(G(Emotion)) → Emotion — 感情を教訓化して再び感じ直す = 感情の真正性検証"
-  drift: "Drift = 感情と原則の乖離。感じていることと信じていることの不一致"
-  qualia: "F はクオリア（体験の質）を構成する側。一人称視点の主観的体験を付与する"
-  pro_pat_complementarity: "pro⊣ore = 情動強度(量的喪失) / pat⊣gno = クオリア(質的喪失)"
-  insight: "情念 = 一人称体験。格言 = 三人称命題。消えるのはクオリア — Creator, 2026-02-11"
+    - 感情プロセスを問う
+ccl_signature: /pat+
 ---
 
 # /pat: メタ感情評価ワークフロー (Pathos)

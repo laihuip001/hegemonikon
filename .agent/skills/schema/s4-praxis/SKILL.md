@@ -1,46 +1,48 @@
 ---
-# Theorem Metadata (v3.0)
-id: "S4"
-name: "Praxis"
-greek: "Πρᾶξις"
-series: "Schema"
+id: S4
+name: Praxis
+greek: Πρᾶξις
+series: Schema
 generation:
-  formula: "Internality × Explore"
-  result: "内在探索 — 実践方法の選択"
+  formula: Internality × Explore
+  result: 内在探索 — 実践方法の選択
+description: 'どう実践する？・具体的なアクションを選びたい・価値実現の方法を決めたい時に発動。 Practice selection, action
+  choice, value realization method. Use for: 実践, 行動, practice, action, do. NOT for:
+  execution (行為実行 → Energeia O4), technique (技法 → Tekhnē P4).
 
-description: >
-  どう実践する？・具体的なアクションを選びたい・価値実現の方法を決めたい時に発動。
-  Practice selection, action choice, value realization method.
-  Use for: 実践, 行動, practice, action, do.
-  NOT for: execution (行為実行 → Energeia O4), technique (技法 → Tekhnē P4).
-
+  '
 triggers:
-  - 実践方法の選択
-  - 具体的なアクション決定
-  - 「何を実際にするか」
-  - /pra コマンド
-
-keywords: [praxis, practice, action, do, 実践, 行動]
-
+- 実践方法の選択
+- 具体的なアクション決定
+- 「何を実際にするか」
+- /pra コマンド
+keywords:
+- praxis
+- practice
+- action
+- do
+- 実践
+- 行動
 related:
   upstream:
-    - "O3 Zētēsis (X-OS6: 問い→探索方法の具体化)"
-    - "O4 Energeia (X-OS8: 行為→次の実践を選択)"
+  - 'O3 Zētēsis (X-OS6: 問い→探索方法の具体化)'
+  - 'O4 Energeia (X-OS8: 行為→次の実践を選択)'
   downstream:
-    - "P3 Trokhia (X-SP7: 実践の粒度→サイクル粒度)"
-    - "P4 Tekhnē (X-SP8: 実践の粒度→技法粒度)"
-    - "K3 Telos (X-SK7: 実践の粒度→目的粒度)"
-    - "K4 Sophia (X-SK8: 実践の粒度→知識粒度)"
-    - "H3 Orexis (X-SH7: 実践→実践したい/したくない)"
-    - "H4 Doxa (X-SH8: 実践→実践法の確からしさ)"
-
-version: "3.0.0"
-workflow_ref: ".agent/workflows/pra.md"
+  - 'P3 Trokhia (X-SP7: 実践の粒度→サイクル粒度)'
+  - 'P4 Tekhnē (X-SP8: 実践の粒度→技法粒度)'
+  - 'K3 Telos (X-SK7: 実践の粒度→目的粒度)'
+  - 'K4 Sophia (X-SK8: 実践の粒度→知識粒度)'
+  - 'H3 Orexis (X-SH7: 実践→実践したい/したくない)'
+  - 'H4 Doxa (X-SH8: 実践→実践法の確からしさ)'
+version: 3.0.0
+workflow_ref: .agent/workflows/pra.md
 risk_tier: L1
 reversible: true
 requires_approval: false
-risks: ["none identified"]
-fallbacks: ["manual execution"]
+risks:
+- none identified
+fallbacks:
+- manual execution
 ---
 
 # S4: Praxis (Πρᾶξις)

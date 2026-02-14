@@ -1,80 +1,89 @@
 ---
 description: P1 Khōra（場）を発動し、スコープ・領域を定義する。3派生対応版。
 hegemonikon: Perigraphē
-modules: [P1]
-skill_ref: ".agent/skills/perigraphe/p1-khora/SKILL.md"
+modules:
+- P1
+skill_ref: .agent/skills/perigraphe/p1-khora/SKILL.md
 triggers:
-  - "どの範囲で考える"
-  - "スコープ"
-  - "領域"
-  - "khora"
-  - "scope"
-version: "2.3"
+- どの範囲で考える
+- スコープ
+- 領域
+- khora
+- scope
+version: '2.3'
 lcm_state: beta
-lineage: "v2.2 + FBR変換 → v2.3"
-derivatives: [phys, conc, rela, mece, problem, constraint, scope, boundary, module, io, edge, frame, a3, datamodel, platform, segment, positioning, blue_ocean]
+lineage: v2.2 + FBR変換 → v2.3
+derivatives:
+- phys
+- conc
+- rela
+- mece
+- problem
+- constraint
+- scope
+- boundary
+- module
+- io
+- edge
+- frame
+- a3
+- datamodel
+- platform
+- segment
+- positioning
+- blue_ocean
 trigonon:
   series: P
   type: Pure
   theorem: P1
-  coordinates: [Scale, Scale]
+  coordinates:
+  - Scale
+  - Scale
   bridge: []
-  anchor_via: [S, K]
+  anchor_via:
+  - S
+  - K
   morphisms:
-    ">>S": [/met, /mek, /sta, /pra]
-    ">>K": [/euk, /chr, /tel, /sop]
+    '>>S':
+    - /met
+    - /mek
+    - /sta
+    - /pra
+    '>>K':
+    - /euk
+    - /chr
+    - /tel
+    - /sop
 cognitive_algebra:
-  "+": "詳細スコープ：境界条件を完全列挙"
-  "-": "即スコープ：Micro/Macro の一言のみ"
-  "*": "メタスコープ：スコープ設定自体を問う"
+  +: 詳細スコープ：境界条件を完全列挙
+  '-': 即スコープ：Micro/Macro の一言のみ
+  '*': メタスコープ：スコープ設定自体を問う
 category_theory:
-  core: "随伴 F⊣G の左随伴 F（自由関手）"
-  adjunction: "Khōra (F) ⊣ Trokhia (G)"
-  role: "F: Cycle → Scope（反復パターンに場の制約/環境を載せてスコープを構成）"
-  F_definition: "抽象的な反復サイクルに、具体的な環境・領域・境界条件を付与して実行範囲を確定させる"
-  unit: "η: Cycle → G(F(Cycle)) — サイクルをスコープにしてサイクルに戻す = 適用範囲の検証"
-  counit: "ε: F(G(Scope)) → Scope — スコープをサイクルにしてスコープに戻す = 再スコーピング"
-  drift: "Drift = 場の特殊性の喪失。スコープが環境非依存に見えて実は環境依存"
-  insight: "場が軌道を制約し、軌道が場を定義する。入れ物と動きは同時に決まる — Creator, 2026-02-11"
-  mathematical_basis:
-    L1: "前順序圏のガロア接続 — F(X) ≤ Y ⟺ X ≤ G(Y)"
-    L2: "[0,1]-豊穣圏 — Drift ∈ [0,1] は Hom 値"
-    L3: "弱2-圏 (将来) — 派生は 2-cell"
-  natural_transformation:
-    partner: "hod"
-    shared_axis: "Scale (Mi: 微視)"
-    varied_axis: "Function (Ex→Exp)"
-    meaning: "場の探索→経路の選択。「どこで→どう行く」"
-  duality:
-    partner: "tek"
-    type: "transition"
-    meaning: "具体探索→技法選択。「探検から知恵へ」"
+  core: 随伴 F⊣G の左随伴 F（自由関手）
+  adjunction: Khōra (F) ⊣ Trokhia (G)
+  role: 'F: Orbit → Space（軌道に解像度を載せて場を構成 = Micro化）'
+  F_definition: 大局的サイクルに細部の空間構造を付与して、高解像度の場を構成する
+  same_formula: kho と tro は同じ式（Explore）の累乗（Scale）が違うだけ
+  coordinates: P1[Micro,Explore] — Function(Explore)を保存し Scale を Micro に設定
+  unit: 'η: Orbit → G(F(Orbit)) — 軌道を場にして粗視化して軌道に戻す = サイクル検証'
+  counit: 'ε: F(G(Space)) → Space — 場を軌道にして再展開 = ズームイン'
+  insight: 空間と時間は同じ式。累乗（次元数）が違えば全く違う意味になる — Creator, 2026-02-11
 sel_enforcement:
-  "+":
-    description: "MUST enumerate boundary conditions completely"
+  +:
+    description: MUST enumerate boundary conditions completely
     minimum_requirements:
-      - "境界条件 必須"
-      - "In/Out 定義 必須"
-  "-":
-    description: "MAY provide Micro/Macro only"
+    - 境界条件 必須
+    - In/Out 定義 必須
+  '-':
+    description: MAY provide Micro/Macro only
     minimum_requirements:
-      - "スケール1行のみ"
-  "*":
-    description: "MUST meta-analyze: why this scope?"
+    - スケール1行のみ
+  '*':
+    description: 'MUST meta-analyze: why this scope?'
     minimum_requirements:
-      - "スコープ設定の根拠を問う"
-ccl_signature: "/kho+"
+    - スコープ設定の根拠を問う
+ccl_signature: /kho+
 anti_skip: enabled
-category_theory:
-  core: "随伴 F⊣G の左随伴 F（自由関手）"
-  adjunction: "Khōra (F) ⊣ Trokhia (G)"
-  role: "F: Orbit → Space（軌道に解像度を載せて場を構成 = Micro化）"
-  F_definition: "大局的サイクルに細部の空間構造を付与して、高解像度の場を構成する"
-  same_formula: "kho と tro は同じ式（Explore）の累乗（Scale）が違うだけ"
-  coordinates: "P1[Micro,Explore] — Function(Explore)を保存し Scale を Micro に設定"
-  unit: "η: Orbit → G(F(Orbit)) — 軌道を場にして粗視化して軌道に戻す = サイクル検証"
-  counit: "ε: F(G(Space)) → Space — 場を軌道にして再展開 = ズームイン"
-  insight: "空間と時間は同じ式。累乗（次元数）が違えば全く違う意味になる — Creator, 2026-02-11"
 ---
 
 # /kho: 条件空間定義ワークフロー (Khōra)

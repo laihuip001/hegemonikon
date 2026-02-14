@@ -1,61 +1,61 @@
 ---
 description: セッション終了時に引き継ぎドキュメントを生成し、経験を法則化する。次回セッションの/bootで読み込まれる。
 hegemonikon: H4 Doxa
-version: "7.3"
+version: '7.3'
 lcm_state: stable
-lineage: "v7.0 + Step 3.5 IDE ネイティブ Export → v7.1 → v7.3 gRPC Auto-Export"
+lineage: v7.0 + Step 3.5 IDE ネイティブ Export → v7.1 → v7.3 gRPC Auto-Export
 category_theory:
-  core: "随伴の右関手 R: Ses → Mem"
-  adjunction: "L (Boot) ⊣ R (Bye)"
-  unit: "η: Id_Mem → R∘L (boot→bye の保存率)"
-  counit: "ε: L∘R → Id_Ses (bye→boot の復元率)"
-  insight: "赤の他人基準 = R の像が自己完結的であること"
-  G_role: "G: Session → Handoff（セッションから生の対話を忘却し、結論だけを圧縮して永続化）"
-  G_forgets: "生の声、生のやり取り、生のコンテキスト、生の関係性 — 対話の旅路は消える"
+  core: '随伴の右関手 R: Ses → Mem'
+  adjunction: L (Boot) ⊣ R (Bye)
+  unit: 'η: Id_Mem → R∘L (boot→bye の保存率)'
+  counit: 'ε: L∘R → Id_Ses (bye→boot の復元率)'
+  insight: 赤の他人基準 = R の像が自己完結的であること
+  G_role: 'G: Session → Handoff（セッションから生の対話を忘却し、結論だけを圧縮して永続化）'
+  G_forgets: 生の声、生のやり取り、生のコンテキスト、生の関係性 — 対話の旅路は消える
   G_two_layers:
-    結論: "何を達成したか、何を学んだか。Handoff に残る。well-defined"
-    対話の旅路: "往復の議論、温度、「知らんけど」の後の洞察、照れ。消える"
-  drift: "Drift = Handoff に残らない対話の質。結論は同じでも、そこに至った旅路は再現不能"
-  G_preserves: "不変量 = 成果の命題構造（何をし、何を決め、何が残ったか）。対話の旅路を忘却しても、成果は保存される"
-  boot_bye_meta: "全11ペアの随伴の随伴（メタ随伴）。セッション自体の開閉を司る"
+    結論: 何を達成したか、何を学んだか。Handoff に残る。well-defined
+    対話の旅路: 往復の議論、温度、「知らんけど」の後の洞察、照れ。消える
+  drift: Drift = Handoff に残らない対話の質。結論は同じでも、そこに至った旅路は再現不能
+  G_preserves: 不変量 = 成果の命題構造（何をし、何を決め、何が残ったか）。対話の旅路を忘却しても、成果は保存される
+  boot_bye_meta: 全11ペアの随伴の随伴（メタ随伴）。セッション自体の開閉を司る
   mathematical_basis:
-    L1: "前順序圏のガロア接続 — L(M) ≤ Y ⟺ M ≤ R(Y)"
-    L2: "[0,1]-豊穣圏 — Drift ∈ [0,1] は Hom 値"
-    L3: "弱2-圏 (将来) — 派生(+/-/*)は 2-cell。R は lax 2-functor"
-  creator_insight: "Handoffでは結論は抽出できても過程は忘れ去られる。悲しいね — Creator, 2026-02-11"
-  python_analog: "Generator パターン (Pythōsis 骨髄消化 M1)"
+    L1: 前順序圏のガロア接続 — L(M) ≤ Y ⟺ M ≤ R(Y)
+    L2: '[0,1]-豊穣圏 — Drift ∈ [0,1] は Hom 値'
+    L3: 弱2-圏 (将来) — 派生(+/-/*)は 2-cell。R は lax 2-functor
+  creator_insight: Handoffでは結論は抽出できても過程は忘れ去られる。悲しいね — Creator, 2026-02-11
+  python_analog: Generator パターン (Pythōsis 骨髄消化 M1)
   generator_correspondence:
-    yield: "Handoff = セッションの yield。状態を保持したまま中断"
-    next: "/boot = next(gen)。前回の状態から再開"
-    send: "Creatorの新指示 = send(value)。Handoff + 新コンテキスト"
-    close: "/bye final = close()。finally ブロック（永続化）が走る"
-    yield_from: "CCL >> = yield from。子WFに制御を委譲"
+    yield: Handoff = セッションの yield。状態を保持したまま中断
+    next: /boot = next(gen)。前回の状態から再開
+    send: Creatorの新指示 = send(value)。Handoff + 新コンテキスト
+    close: /bye final = close()。finally ブロック（永続化）が走る
+    yield_from: CCL >> = yield from。子WFに制御を委譲
   steps_as_R:
-    step_0: "R₀: Ses の状態評価 — 圧縮前の品質チェック"
-    step_1: "R₁: Ses の射を取得 — Git = コード圏の射の記録"
-    step_2: "R₂: Ses の対象列挙 — セッション中の全対象を収集"
-    step_2.5π: "R₂.₅π: R^π(S) の計算 — 成果の意義を抽出 (R^π: Ses → Sig)。Handoff の前に熱意を込める"
-    step_3: "R₃: R(S) の計算 — 対象と射を Handoff に圧縮"
-    step_3.5: "R₃.₅: 生データ保存 — R の核 (kernel) を計算前に保存"
-    step_3.7: "R₃.₇: id_R の更新 — 関手 R 自身の特性を更新"
-    step_3.8: "R₃.₈: Mem への永続化 — R(S) を圏 Mem に配置"
-    step_4: "R₄: R(S) の出力 — Creator による検証"
+    step_0: 'R₀: Ses の状態評価 — 圧縮前の品質チェック'
+    step_1: 'R₁: Ses の射を取得 — Git = コード圏の射の記録'
+    step_2: 'R₂: Ses の対象列挙 — セッション中の全対象を収集'
+    step_2.5π: 'R₂.₅π: R^π(S) の計算 — 成果の意義を抽出 (R^π: Ses → Sig)。Handoff の前に熱意を込める'
+    step_3: 'R₃: R(S) の計算 — 対象と射を Handoff に圧縮'
+    step_3.5: 'R₃.₅: 生データ保存 — R の核 (kernel) を計算前に保存'
+    step_3.7: 'R₃.₇: id_R の更新 — 関手 R 自身の特性を更新'
+    step_3.8: 'R₃.₈: Mem への永続化 — R(S) を圏 Mem に配置'
+    step_4: 'R₄: R(S) の出力 — Creator による検証'
 derivatives:
-  "+": 詳細終了（全ステップ展開、法則化、KI生成）
-  "-": 高速終了（Handoff最小限、1分で退出）
-  "*": 終了のメタ分析（なぜ今終わるか）
+  +: 詳細終了（全ステップ展開、法則化、KI生成）
+  '-': 高速終了（Handoff最小限、1分で退出）
+  '*': 終了のメタ分析（なぜ今終わるか）
 sel_enforcement:
-  "+":
+  +:
     minimum_requirements:
-      - "Handoff: SBAR形式 + 全変更ファイルリスト"
-      - "法則化: 今日学んだことを法則として記述"
-      - "KI生成: 新しい知識項目を1つ以上生成"
-      - "Self-Profile: id_R の更新内容を明記"
-      - "ker(R): チャット履歴エクスポート実行済み"
-      - "Value Pitch: 成果ごとの売り込み文 + 5W1H接地 + 数字テーブル + 比喩結論"
-  "-":
+    - 'Handoff: SBAR形式 + 全変更ファイルリスト'
+    - '法則化: 今日学んだことを法則として記述'
+    - 'KI生成: 新しい知識項目を1つ以上生成'
+    - 'Self-Profile: id_R の更新内容を明記'
+    - 'ker(R): チャット履歴エクスポート実行済み'
+    - 'Value Pitch: 成果ごとの売り込み文 + 5W1H接地 + 数字テーブル + 比喩結論'
+  '-':
     minimum_requirements:
-      - "Handoff 最小限（タスク名 + 残タスク）"
+    - Handoff 最小限（タスク名 + 残タスク）
 ---
 
 # /bye ワークフロー

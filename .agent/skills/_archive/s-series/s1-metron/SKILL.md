@@ -1,67 +1,62 @@
 ---
-# === Metadata Layer (v2.1) ===
-id: "S1"
-name: "Metron"
-greek: "Μέτρον"
-category: "modal-theorem"
-description: >
-  Applies the S1 Metron schema from the Hegemonikón framework for scale selection.
-  Use this skill when the user needs to choose between Micro (detailed) or Macro (holistic) 
-  perspectives, adjust granularity, or decide zoom level for analysis.
-  Triggers: スケール, granularity, micro vs macro, zoom, 粒度, level of detail.
+id: S1
+name: Metron
+greek: Μέτρον
+category: modal-theorem
+description: 'Applies the S1 Metron schema from the Hegemonikón framework for scale
+  selection. Use this skill when the user needs to choose between Micro (detailed)
+  or Macro (holistic)  perspectives, adjust granularity, or decide zoom level for
+  analysis. Triggers: スケール, granularity, micro vs macro, zoom, 粒度, level of detail.
 
-# v2.1 生成規則
+  '
 generation:
-  layer: "L2 S-series (Schema)"
-  formula: "Flow (I/A) × Scale (M/M)"
-  result: "スケール流動 — 尺度での配置"
+  layer: L2 S-series (Schema)
+  formula: Flow (I/A) × Scale (M/M)
+  result: スケール流動 — 尺度での配置
   axioms:
-    - L1.1 Flow (I/A): 推論/行為の選択
-    - L1.5.1 Scale (M/M): Micro/Macro の選択
-
-# 発動条件
+  - L1.1 Flow (I/A): 推論/行為の選択
+  - L1.5.1 Scale (M/M): Micro/Macro の選択
 triggers:
-  - scale decision required
-  - micro vs macro choice
-  - granularity selection
-  - zoom level change
-
-# キーワード
+- scale decision required
+- micro vs macro choice
+- granularity selection
+- zoom level change
 keywords:
-  - scale
-  - granularity
-  - micro
-  - macro
-  - zoom
-  - level
+- scale
+- granularity
+- micro
+- macro
+- zoom
+- level
+when_to_use: '認知の「粒度」を決定する必要がある時。
 
-# 使用条件
-when_to_use: |
-  認知の「粒度」を決定する必要がある時。
   詳細分析（Micro）か全体把握（Macro）かを選ぶ時。
 
-when_not_to_use: |
-  - スケールが既に決まっている場合
+  '
+when_not_to_use: '- スケールが既に決まっている場合
+
   - 方法選択が必要な時（→ S2 Mekhanē）
 
-# 関連 (v2.1)
+  '
 related:
   upstream:
-    - "O1 Noēsis"
-    - "O3 Zētēsis"
+  - O1 Noēsis
+  - O3 Zētēsis
   downstream:
-    - "H1 Propatheia"
-    - "P1 Khora"
-  x_series: ["X-OS", "X-SH", "X-SP"]
-  micro: null  # 個別 workflow なし
-  macro: null  # 個別 mekhane なし
-
-version: "2.1.0"
+  - H1 Propatheia
+  - P1 Khora
+  x_series:
+  - X-OS
+  - X-SH
+  - X-SP
+  micro: null
+  macro: null
+version: 2.1.0
 risk_tier: L0
 reversible: true
 requires_approval: false
 risks:
-  - "アーカイブ済みスキルの誤参照による古い手法の適用"
+- アーカイブ済みスキルの誤参照による古い手法の適用
 fallbacks: []
 ---
 

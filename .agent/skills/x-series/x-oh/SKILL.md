@@ -1,32 +1,35 @@
 ---
-id: "X-OH"
-name: "Ousia → Hormē"
-category: "relation-layer"
-pair: "O → H"
-shared_coordinate: "C1 (Flow)"
+id: X-OH
+name: Ousia → Hormē
+category: relation-layer
+pair: O → H
+shared_coordinate: C1 (Flow)
 relation_count: 8
-type: "Anchor"
-description: "本質 (Ousia) が傾向 (Hormē) を生む8つの射"
-
+type: Anchor
+description: 本質 (Ousia) が傾向 (Hormē) を生む8つの射
 activation_conditions:
-  - context: "認識・意志の完了後、感情的反応や確信が自然に生じるとき"
-  - trigger: "「理解して、自分がどう感じるか気づいた」の遷移"
-  - confidence_threshold: 0.5
-  - priority: "medium"
-
+- context: 認識・意志の完了後、感情的反応や確信が自然に生じるとき
+- trigger: 「理解して、自分がどう感じるか気づいた」の遷移
+- confidence_threshold: 0.5
+- priority: medium
 triggers:
-  - "認識の後に感情反応"
-  - "/noe >> /pro"
-  - "/bou >> /pis"
-  - "本質→傾向"
-  - "理解→欲求"
-
-keywords: [ousia-horme, essence-to-drive, x-oh, understanding-to-motivation]
+- 認識の後に感情反応
+- /noe >> /pro
+- /bou >> /pis
+- 本質→傾向
+- 理解→欲求
+keywords:
+- ousia-horme
+- essence-to-drive
+- x-oh
+- understanding-to-motivation
 risk_tier: L0
-risks: ["none identified"]
+risks:
+- none identified
 reversible: true
 requires_approval: false
-fallbacks: ["manual execution"]
+fallbacks:
+- manual execution
 ---
 
 # X-OH: Ousia → Hormē (本質→傾向)

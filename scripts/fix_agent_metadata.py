@@ -39,16 +39,15 @@ def fix_skill_metadata(path: Path):
             print(f"Skipping {path}: Invalid YAML")
             return
 
-        changed = False
         if "risk_tier" not in data:
             data["risk_tier"] = "L1"
-            changed = True
         if "risks" not in data:
             data["risks"] = []
-            changed = True
 
-        if changed:
-            new_frontmatter = yaml.dump(data, default_flow_style=False, sort_keys=False).strip()
+        new_frontmatter = yaml.dump(data, default_flow_style=False, sort_keys=False, allow_unicode=True).strip()
+
+        # Always write if content differs (e.g. formatting or unicode escaping)
+        if new_frontmatter != frontmatter_raw.strip():
             new_content = f"---\n{new_frontmatter}\n---{body}"
             path.write_text(new_content, encoding="utf-8")
             print(f"Fixed skill: {path}")
@@ -76,16 +75,15 @@ def fix_workflow_metadata(path: Path):
             print(f"Skipping {path}: Invalid YAML")
             return
 
-        changed = False
         if "lcm_state" not in data:
             data["lcm_state"] = "beta"
-            changed = True
         if "version" not in data:
             data["version"] = "1.0"
-            changed = True
 
-        if changed:
-            new_frontmatter = yaml.dump(data, default_flow_style=False, sort_keys=False).strip()
+        new_frontmatter = yaml.dump(data, default_flow_style=False, sort_keys=False, allow_unicode=True).strip()
+
+        # Always write if content differs (e.g. formatting or unicode escaping)
+        if new_frontmatter != frontmatter_raw.strip():
             new_content = f"---\n{new_frontmatter}\n---{body}"
             path.write_text(new_content, encoding="utf-8")
             print(f"Fixed workflow: {path}")

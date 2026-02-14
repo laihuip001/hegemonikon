@@ -1,35 +1,36 @@
 ---
 description: Claudeの主観・考え・意見を引き出す。AIを「パートナー/主体」として扱う。
 hegemonikon: Schema
-modules: [S2.dialogue]
-skill_ref: "none"
-version: "2.4"
+modules:
+- S2.dialogue
+skill_ref: none
+version: '2.4'
 lcm_state: stable
-lineage: "v2.3 + SEL 統合 → v2.4"
+lineage: v2.3 + SEL 統合 → v2.4
 derivatives: []
 cognitive_algebra:
-  "+": "深掘り意見。/u! と同等、構造化"
-  "-": "直感的意見。結論1行のみ"
-  "*": "意見のメタ分析。なぜこの意見か"
+  +: 深掘り意見。/u! と同等、構造化
+  '-': 直感的意見。結論1行のみ
+  '*': 意見のメタ分析。なぜこの意見か
 sel_enforcement:
-  "+":
-    description: "MUST provide structured deep opinion"
+  +:
+    description: MUST provide structured deep opinion
     minimum_requirements:
-      - "構造化 必須"
-      - "理由 必須"
-      - "問い返し 必須"
-  "-":
-    description: "MAY provide conclusion only"
+    - 構造化 必須
+    - 理由 必須
+    - 問い返し 必須
+  '-':
+    description: MAY provide conclusion only
     minimum_requirements:
-      - "結論1行のみ"
-  "*":
-    description: "MUST meta-analyze: why this opinion?"
+    - 結論1行のみ
+  '*':
+    description: 'MUST meta-analyze: why this opinion?'
     minimum_requirements:
-      - "意見のメタ分析"
+    - 意見のメタ分析
 anti_skip: enabled
 absorbed:
-  - "自由と信頼についての対話 KI"
-ccl_signature: "/u+"
+- 自由と信頼についての対話 KI
+ccl_signature: /u+
 ---
 
 # /u ワークフロー

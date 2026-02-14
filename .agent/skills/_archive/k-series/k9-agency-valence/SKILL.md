@@ -1,34 +1,33 @@
 ---
-id: "K9"
-name: "Agency→Valence"
-category: "agency-reasoning"
-description: "主体選択が動機方向を決定する文脈定理"
-
+id: K9
+name: Agency→Valence
+category: agency-reasoning
+description: 主体選択が動機方向を決定する文脈定理
 triggers:
-  - control-to-motivation mapping
-  - self-improvement vs environment-change
-  - approach-avoid for self/environment
-
+- control-to-motivation mapping
+- self-improvement vs environment-change
+- approach-avoid for self/environment
 keywords:
-  - agency
-  - valence
-  - self-motivation
-  - environment-attitude
+- agency
+- valence
+- self-motivation
+- environment-attitude
+when_to_use: '自己/環境に対して接近/回避を選ぶ場合。
 
-when_to_use: |
-  自己/環境に対して接近/回避を選ぶ場合。
   例：スキル習得（自己接近）、有害環境からの離脱（環境回避）。
 
-when_not_to_use: |
-  - 動機方向が既に明確な場合
+  '
+when_not_to_use: '- 動機方向が既に明確な場合
+
   - 主体が未定の場合
 
-version: "2.0"
+  '
+version: '2.0'
 risk_tier: L0
 reversible: true
 requires_approval: false
 risks:
-  - "アーカイブ済みスキルの誤参照による古い手法の適用"
+- アーカイブ済みスキルの誤参照による古い手法の適用
 fallbacks: []
 ---
 

@@ -1,70 +1,90 @@
 ---
 description: H1 Propatheia（前感情）を発動し、初期傾向・直感を評価する。3派生対応版。
 hegemonikon: Hormē
-modules: [H1]
-skill_ref: ".agent/skills/horme/h1-propatheia/SKILL.md"
+modules:
+- H1
+skill_ref: .agent/skills/horme/h1-propatheia/SKILL.md
 triggers:
-  - "直感的にどう感じる"
-  - "第一印象"
-  - "接近か回避か"
-  - "propatheia"
-  - "intuition"
-version: "2.4"
+- 直感的にどう感じる
+- 第一印象
+- 接近か回避か
+- propatheia
+- intuition
+version: '2.4'
 lcm_state: beta
-lineage: "v2.3 + FBR変換 → v2.4"
-derivatives: [appr, avoi, arre, random, forecast]
+lineage: v2.3 + FBR変換 → v2.4
+derivatives:
+- appr
+- avoi
+- arre
+- random
+- forecast
 trigonon:
   series: H
   type: Mixed
   theorem: H1
-  coordinates: [I, C]
-  bridge: [S, K]
-  anchor_via: [O, A]
+  coordinates:
+  - I
+  - C
+  bridge:
+  - S
+  - K
+  anchor_via:
+  - O
+  - A
   morphisms:
-    ">>S": [/met, /mek, /sta, /pra]
-    ">>K": [/euk, /chr, /tel, /sop]
+    '>>S':
+    - /met
+    - /mek
+    - /sta
+    - /pra
+    '>>K':
+    - /euk
+    - /chr
+    - /tel
+    - /sop
 cognitive_algebra:
-  "+": "詳細直感：傾向の根拠を深掘り、神経科学的解釈"
-  "-": "即断直感：接近/回避の一言判定のみ"
-  "*": "メタ直感：直感プロセス自体を問う"
+  +: 詳細直感：傾向の根拠を深掘り、神経科学的解釈
+  '-': 即断直感：接近/回避の一言判定のみ
+  '*': メタ直感：直感プロセス自体を問う
 sel_enforcement:
-  "+":
-    description: "MUST analyze tendency with deep reasoning"
+  +:
+    description: MUST analyze tendency with deep reasoning
     minimum_requirements:
-      - "傾向根拠 必須"
-      - "強度評価 必須"
-      - "神経科学的解釈"
-  "-":
-    description: "MAY provide single +/- judgment only"
+    - 傾向根拠 必須
+    - 強度評価 必須
+    - 神経科学的解釈
+  '-':
+    description: MAY provide single +/- judgment only
     minimum_requirements:
-      - "接近/回避の一言"
-  "*":
-    description: "MUST meta-analyze: why this intuition?"
+    - 接近/回避の一言
+  '*':
+    description: 'MUST meta-analyze: why this intuition?'
     minimum_requirements:
-      - "直感プロセスを問う"
-ccl_signature: "/pro+"
+    - 直感プロセスを問う
+ccl_signature: /pro+
 category_theory:
-  core: "随伴 F⊣G の左随伴 F（自由関手）"
-  adjunction: "Propatheia (F) ⊣ Orexis (G)"
-  role: "F: Desire → Gut（欲求に生の熱を載せて直感的判定に構成 = System 1）"
-  F_definition: "価値判断に即時性・情動強度を付与して、瞬間的な接近/回避を構成する"
-  unit: "η: Desire → G(F(Desire)) — 欲求を直感にして冷まして欲求に戻す = 検証"
-  counit: "ε: F(G(Gut)) → Gut — 直感を欲求にして再点火 = 再直感化"
-  stoic: "Propatheia = 第一運動（first movement）。理性の判断の前に不随意的に生じる初期反応"
-  insight: "直感 = シンプルなモデル + 高precision。速いが狭い — Creator, 2026-02-10"
+  core: 随伴 F⊣G の左随伴 F（自由関手）
+  adjunction: Propatheia (F) ⊣ Orexis (G)
+  role: 'F: Desire → Gut（欲求に生の熱を載せて直感的判定に構成 = System 1）'
+  F_definition: 価値判断に即時性・情動強度を付与して、瞬間的な接近/回避を構成する
+  unit: 'η: Desire → G(F(Desire)) — 欲求を直感にして冷まして欲求に戻す = 検証'
+  counit: 'ε: F(G(Gut)) → Gut — 直感を欲求にして再点火 = 再直感化'
+  stoic: Propatheia = 第一運動（first movement）。理性の判断の前に不随意的に生じる初期反応
+  insight: 直感 = シンプルなモデル + 高precision。速いが狭い — Creator, 2026-02-10
   mathematical_basis:
-    L1: "前順序圏のガロア接続 — F(X) ≤ Y ⟺ X ≤ G(Y)"
-    L2: "[0,1]-豊穣圏 — Drift ∈ [0,1] は Hom 値"
-    L3: "弱2-圏 (将来) — 派生は 2-cell"
+    L1: 前順序圏のガロア接続 — F(X) ≤ Y ⟺ X ≤ G(Y)
+    L2: '[0,1]-豊穣圏 — Drift ∈ [0,1] は Hom 値'
+    L3: 弱2-圏 (将来) — 派生は 2-cell
   natural_transformation:
-    partner: "pis"
-    shared_axis: "Flow (I: 推論)"
-    varied_axis: "Valence (+→-)"
-    meaning: "直感的肯定→懐疑的検証。「ひらめいた→本当か？」"
+    partner: pis
+    shared_axis: 'Flow (I: 推論)'
+    varied_axis: Valence (+→-)
+    meaning: 直感的肯定→懐疑的検証。「ひらめいた→本当か？」
   duality:
-    partner: "dox"
-    type: "tension"
-    meaning: "ひらめき↔信念記録。「新しさと安定の振動」"
+    partner: dox
+    type: tension
+    meaning: ひらめき↔信念記録。「新しさと安定の振動」
 ---
 
 # /pro: 初期傾向評価ワークフロー (Propatheia)

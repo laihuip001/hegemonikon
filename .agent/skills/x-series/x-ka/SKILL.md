@@ -1,26 +1,35 @@
 ---
-id: "X-KA"
-name: "Kairos → Akribeia"
-category: "relation-layer"
-pair: "K → A"
-shared_coordinate: "C5 (Valence)"
+id: X-KA
+name: Kairos → Akribeia
+category: relation-layer
+pair: K → A
+shared_coordinate: C5 (Valence)
 relation_count: 8
-type: "Anchor"
-description: "文脈 (Kairos) が精密判断 (Akribeia) を確定させる8つの射"
-
+type: Anchor
+description: 文脈 (Kairos) が精密判断 (Akribeia) を確定させる8つの射
 activation_conditions:
-  - context: "タイミング・目的・知恵が明確になった後、精密な判断が求められるとき"
-  - trigger: "「文脈はわかった。では精密にどう判定するか」の遷移"
-  - confidence_threshold: 0.7
-  - priority: "high"
-
-triggers: ["文脈→精密", "/euk >> /dia", "/tel >> /gno", "/sop >> /epi", "文脈→判断"]
-keywords: [kairos-akribeia, context-to-precision, x-ka, timing-to-judgment]
+- context: タイミング・目的・知恵が明確になった後、精密な判断が求められるとき
+- trigger: 「文脈はわかった。では精密にどう判定するか」の遷移
+- confidence_threshold: 0.7
+- priority: high
+triggers:
+- 文脈→精密
+- /euk >> /dia
+- /tel >> /gno
+- /sop >> /epi
+- 文脈→判断
+keywords:
+- kairos-akribeia
+- context-to-precision
+- x-ka
+- timing-to-judgment
 risk_tier: L0
-risks: ["none identified"]
+risks:
+- none identified
 reversible: true
 requires_approval: false
-fallbacks: ["manual execution"]
+fallbacks:
+- manual execution
 ---
 
 # X-KA: Kairos → Akribeia (文脈→精密)

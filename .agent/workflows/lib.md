@@ -1,26 +1,27 @@
 ---
 description: Library (112プロンプト) をキーワード検索し、関連モジュールを表示。
 hegemonikon: S2 Mekhanē
-modules: [S2]
-version: "1.0"
+modules:
+- S2
+version: '1.0'
 lcm_state: beta
 triggers:
-  - "Library"
-  - "プロンプト検索"
-  - "モジュール検索"
-  - "テンプレート"
+- Library
+- プロンプト検索
+- モジュール検索
+- テンプレート
 cognitive_algebra:
-  "+": "詳細検索 — 全マッチ + essence + 原文リンク"
-  "-": "簡易検索 — ファイル名リストのみ"
+  +: 詳細検索 — 全マッチ + essence + 原文リンク
+  '-': 簡易検索 — ファイル名リストのみ
 sel_enforcement:
-  "+":
+  +:
     minimum_requirements:
-      - "全マッチを表示（数制限なし）"
-      - "各モジュールの essence を引用"
-      - "原文への view_file リンクを付与"
-  "-":
+    - 全マッチを表示（数制限なし）
+    - 各モジュールの essence を引用
+    - 原文への view_file リンクを付与
+  '-':
     minimum_requirements:
-      - "ファイル名リストのみ"
+    - ファイル名リストのみ
 ---
 
 # /lib: Library 検索ワークフロー

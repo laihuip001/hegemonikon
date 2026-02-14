@@ -1,35 +1,34 @@
 ---
-id: "K10"
-name: "Valence→Tempo"
-category: "valence-reasoning"
-description: "動機方向が時間スコープを決定する文脈定理"
-
+id: K10
+name: Valence→Tempo
+category: valence-reasoning
+description: 動機方向が時間スコープを決定する文脈定理
 triggers:
-  - motivation-to-time mapping
-  - approach-avoid timing
-  - reward-risk horizon
-
+- motivation-to-time mapping
+- approach-avoid timing
+- reward-risk horizon
 keywords:
-  - valence
-  - tempo
-  - approach
-  - avoid
-  - timing
+- valence
+- tempo
+- approach
+- avoid
+- timing
+when_to_use: '接近/回避に応じて時間枠を導出する場合。
 
-when_to_use: |
-  接近/回避に応じて時間枠を導出する場合。
   例：欲しいものは今すぐ、危険は計画的に避ける。
 
-when_not_to_use: |
-  - 時間枠が既に決まっている場合
+  '
+when_not_to_use: '- 時間枠が既に決まっている場合
+
   - 動機方向が未定の場合
 
-version: "2.0"
+  '
+version: '2.0'
 risk_tier: L0
 reversible: true
 requires_approval: false
 risks:
-  - "アーカイブ済みスキルの誤参照による古い手法の適用"
+- アーカイブ済みスキルの誤参照による古い手法の適用
 fallbacks: []
 ---
 

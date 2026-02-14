@@ -1,7 +1,5 @@
 ---
-description: "T-series\uFF08\u62E1\u5F35\u5B9A\u7406 T1-T8\uFF09\u3092\u99C6\u52D5\
-  \u3057\u3001\u5177\u4F53\u7684\u306A\u69D8\u614B\u6A5F\u80FD\u3092\u547C\u3073\u51FA\
-  \u3059\u3002"
+description: T-series（拡張定理 T1-T8）を駆動し、具体的な様態機能を呼び出す。
 hegemonikon: Tropos
 modules:
 - T1

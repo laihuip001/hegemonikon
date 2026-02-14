@@ -1,81 +1,78 @@
 ---
 description: K1 Eukairia（好機）を発動し、「今がチャンスか」を判定する。タイミング評価ワークフロー。
 hegemonikon: Kairos
-modules: [K1]
-skill_ref: ".agent/skills/kairos/k1-eukairia/SKILL.md"
+modules:
+- K1
+skill_ref: .agent/skills/kairos/k1-eukairia/SKILL.md
 triggers:
-  - "今がチャンス"
-  - "好機"
-  - "タイミング"
-  - "機会"
-  - "eukairia"
-version: "1.4"
+- 今がチャンス
+- 好機
+- タイミング
+- 機会
+- eukairia
+version: '1.4'
 lcm_state: beta
-lineage: "v1.3 + FBR変換 → v1.4"
-derivatives: [dete, crea, main, stage]
+lineage: v1.3 + FBR変換 → v1.4
+derivatives:
+- dete
+- crea
+- main
+- stage
 trigonon:
   series: K
   type: Mixed
   theorem: K1
-  coordinates: [Scale, C]
-  bridge: [S, H]
-  anchor_via: [P, A]
+  coordinates:
+  - Scale
+  - C
+  bridge:
+  - S
+  - H
+  anchor_via:
+  - P
+  - A
   morphisms:
-    ">>S": [/met, /mek, /sta, /pra]
-    ">>H": [/pro, /pis, /ore, /dox]
+    '>>S':
+    - /met
+    - /mek
+    - /sta
+    - /pra
+    '>>H':
+    - /pro
+    - /pis
+    - /ore
+    - /dox
 cognitive_algebra:
-  "+": "詳細好機分析。機会コスト、競合状況、時間窓"
-  "-": "即断タイミング。今か/待つかの1行判定"
-  "*": "好機判断のメタ分析。なぜ今が重要か"
+  +: 詳細好機分析。機会コスト、競合状況、時間窓
+  '-': 即断タイミング。今か/待つかの1行判定
+  '*': 好機判断のメタ分析。なぜ今が重要か
 category_theory:
-  core: "随伴 F⊣G の左随伴 F（自由関手）"
-  adjunction: "Eukairia (F) ⊣ Telos (G)"
-  role: "F: Purpose → Opportunity（抽象的目的に「今か否か」のタイミング判断を載せて好機を構成）"
-  F_definition: "「何のために」に「いつ」を加えて、行動可能な機会に変換する"
-  unit: "η: Purpose → G(F(Purpose)) — 目的を好機にして目的に戻す = 機会が目的に合致するか検証"
-  counit: "ε: F(G(Opportunity)) → Opportunity — 好機を目的にして好機に戻す = 好機の再評価"
-  drift: "Drift = 緊急性の過剰忘却。目的はあるがタイミングを逃す"
-  insight: "目的なき者に好機は来ない。好機なき目的は絵に描いた餅 — Creator, 2026-02-11"
-  mathematical_basis:
-    L1: "前順序圏のガロア接続 — F(X) ≤ Y ⟺ X ≤ G(Y)"
-    L2: "[0,1]-豊穣圏 — Drift ∈ [0,1] は Hom 値"
-    L3: "弱2-圏 (将来) — 派生は 2-cell"
-  natural_transformation:
-    partner: "chr"
-    shared_axis: "Scale (Mi: 微視)"
-    varied_axis: "Valence (+→-)"
-    meaning: "好機判断→期限管理。「チャンスだ→いつまでに」"
-  duality:
-    partner: "sop"
-    type: "tension"
-    meaning: "好機↔知恵。「今だ! ↔ 急がば回れ」"
+  core: 随伴 F⊣G の左随伴 F（自由関手）
+  adjunction: Eukairia (F) ⊣ Telos (G)
+  role: 'F: Purpose → Timing（目的に進捗の文脈を載せて好機判定を構成 = Micro化）'
+  F_definition: 大局的な目的に「今ここ」の状況を付与して、タイミング判定を構成する
+  same_formula: euk と tel は同じ判定（+, 正しさの評価）の Scale 違い
+  coordinates: K1[Micro,+] — Valence(+)を保存し Scale を Micro に設定
+  unit: 'η: Purpose → G(F(Purpose)) — 目的を好機判定にして前提に戻す = 目的の安定性検証'
+  counit: 'ε: F(G(Timing)) → Timing — 好機を目的で見直して再判定 = タイミング再評価'
+  insight: どちらも判定。タイミングは具体（進行中）、目的は前提に戻る — Creator, 2026-02-11
 sel_enforcement:
-  "+":
-    description: "MUST analyze opportunity cost, competition, and time window"
+  +:
+    description: MUST analyze opportunity cost, competition, and time window
     minimum_requirements:
-      - "機会コスト 必須"
-      - "競合状況 必須"
-      - "時間窓 必須"
-  "-":
-    description: "MAY provide Go/Wait/Pass only"
+    - 機会コスト 必須
+    - 競合状況 必須
+    - 時間窓 必須
+  '-':
+    description: MAY provide Go/Wait/Pass only
     minimum_requirements:
-      - "今か/待つかの1行"
-  "*":
-    description: "MUST meta-analyze: why is timing important?"
+    - 今か/待つかの1行
+  '*':
+    description: 'MUST meta-analyze: why is timing important?'
     minimum_requirements:
-      - "好機判断プロセスを問う"
+    - 好機判断プロセスを問う
 anti_skip: enabled
-ccl_signature: "/euk?k1"
-category_theory:
-  core: "随伴 F⊣G の左随伴 F（自由関手）"
-  adjunction: "Eukairia (F) ⊣ Telos (G)"
-  role: "F: Purpose → Timing（目的に進捗の文脈を載せて好機判定を構成 = Micro化）"
-  F_definition: "大局的な目的に「今ここ」の状況を付与して、タイミング判定を構成する"
-  same_formula: "euk と tel は同じ判定（+, 正しさの評価）の Scale 違い"
-  coordinates: "K1[Micro,+] — Valence(+)を保存し Scale を Micro に設定"
-  unit: "η: Purpose → G(F(Purpose)) — 目的を好機判定にして前提に戻す = 目的の安定性検証"
-  counit: "ε: F(G(Timing)) → Timing — 好機を目的で見直して再判定 = タイミング再評価"
-  insight: "どちらも判定。タイミングは具体（進行中）、目的は前提に戻る — Creator, 2026-02-11"
+ccl_signature: /euk?k1
 ---
 
 # /euk: 好機判定ワークフロー (Eukairia)

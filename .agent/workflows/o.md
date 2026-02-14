@@ -1,69 +1,86 @@
 ---
 description: O-series Peras。L1×L1 の極限演算で純粋認知の統合判断を生成。
 hegemonikon: Ousia
-modules: [O1, O2, O3, O4]
+modules:
+- O1
+- O2
+- O3
+- O4
 skill_ref:
-  - ".agent/skills/ousia/o1-noesis/SKILL.md"
-  - ".agent/skills/ousia/o2-boulesis/SKILL.md"
-  - ".agent/skills/ousia/o3-zetesis/SKILL.md"
-  - ".agent/skills/ousia/o4-energeia/SKILL.md"
-version: "5.3"
+- .agent/skills/ousia/o1-noesis/SKILL.md
+- .agent/skills/ousia/o2-boulesis/SKILL.md
+- .agent/skills/ousia/o3-zetesis/SKILL.md
+- .agent/skills/ousia/o4-energeia/SKILL.md
+version: '5.3'
 lcm_state: stable
 category_theory:
-  yoneda: "Hom(-, Tn) ≅ F(Tn) — 各定理はその射の集合で完全に決まる"
-  limit: "Cone の頂点 — 全ての射が一致する点"
-  converge_as_cone: "C0=PW決定, C1=射の列挙, C2=PW加重融合, C3=Kalon+普遍性検証"
-  cone_builder: "mekhane/fep/cone_builder.py"
-  kalon: "mekhane/fep/universality.py — C3で使用"
-  adjunction: "F ⊣ G — 圏論を付与する (F) と 構造を発見する (G) の随伴対"
+  yoneda: Hom(-, Tn) ≅ F(Tn) — 各定理はその射の集合で完全に決まる
+  limit: Cone の頂点 — 全ての射が一致する点
+  converge_as_cone: C0=PW決定, C1=射の列挙, C2=PW加重融合, C3=Kalon+普遍性検証
+  cone_builder: mekhane/fep/cone_builder.py
+  kalon: mekhane/fep/universality.py — C3で使用
+  adjunction: F ⊣ G — 圏論を付与する (F) と 構造を発見する (G) の随伴対
   enrichment:
-    concept: "Hom(O,O) 自己射で enrich — V→PW フィードバック + meta 自己参照 + /o* — /o 固有"
+    concept: Hom(O,O) 自己射で enrich — V→PW フィードバック + meta 自己参照 + /o* — /o 固有
     mode: conceptual
-    variant: "End-enrichment (Hom → End)"
+    variant: End-enrichment (Hom → End)
     structures:
-      - "V[] > 0.5 → O3+: Cone 内部状態を PW にフィードバック (他WFは外部文脈ベース)"
-      - "O1.meta = 認知の認知 (endomorphism)"
-      - "/o* = 認知層が自分自身を問う (endomorphism の問い)"
+    - 'V[] > 0.5 → O3+: Cone 内部状態を PW にフィードバック (他WFは外部文脈ベース)'
+    - O1.meta = 認知の認知 (endomorphism)
+    - /o* = 認知層が自分自身を問う (endomorphism の問い)
   mathematical_basis:
-    L1: "前順序圏のガロア接続 — F(X) ≤ Y ⟺ X ≤ G(Y)"
-    L2: "[0,1]-豊穣圏 — Drift ∈ [0,1] は Hom 値"
-    L3: "弱2-圏 (将来) — 派生は 2-cell"
-layer: "Δ"
-lineage: "v3.2 + Limit演算復元 → v4.0 → v5.0 + C0 PW/加重融合 → v5.1 → v5.2 C3 Kalon化 → v5.3 固有層 Ord-enrichment"
+    L1: 前順序圏のガロア接続 — F(X) ≤ Y ⟺ X ≤ G(Y)
+    L2: '[0,1]-豊穣圏 — Drift ∈ [0,1] は Hom 値'
+    L3: 弱2-圏 (将来) — 派生は 2-cell
+layer: Δ
+lineage: v3.2 + Limit演算復元 → v4.0 → v5.0 + C0 PW/加重融合 → v5.1 → v5.2 C3 Kalon化 → v5.3
+  固有層 Ord-enrichment
 derivatives:
-  O1: [nous, phro, meta]
-  O2: [desir, voli, akra]
-  O3: [anom, hypo, eval]
-  O4: [flow, prax, pois]
+  O1:
+  - nous
+  - phro
+  - meta
+  O2:
+  - desir
+  - voli
+  - akra
+  O3:
+  - anom
+  - hypo
+  - eval
+  O4:
+  - flow
+  - prax
+  - pois
 cognitive_algebra:
-  generation: "L1 × L1"
+  generation: L1 × L1
   coordinates:
-    axis_1: "Flow (I/A)"
-    axis_2: "Value (E/P)"
-  definition: "/o = lim(O1·O2·O3·O4)"
+    axis_1: Flow (I/A)
+    axis_2: Value (E/P)
+  definition: /o = lim(O1·O2·O3·O4)
   interpretation:
-    strict: "テンソル積 (Flow⊗Value) の Limit 射影"
-    short: "4定理の内積 → 最適収束点"
+    strict: テンソル積 (Flow⊗Value) の Limit 射影
+    short: 4定理の内積 → 最適収束点
   operators:
-    "+": "Limit強度↑ — 全4定理を詳細に収束"
-    "-": "Limit強度↓ — 縮約収束"
-    "*": "Limit対象自体を問う: なぜ純粋認知層か"
+    +: Limit強度↑ — 全4定理を詳細に収束
+    '-': Limit強度↓ — 縮約収束
+    '*': 'Limit対象自体を問う: なぜ純粋認知層か'
 sel_enforcement:
-  "+":
-    description: "MUST execute ALL 4 theorems with deep convergence"
+  +:
+    description: MUST execute ALL 4 theorems with deep convergence
     minimum_requirements:
-      - "全4定理実行"
-      - "各定理詳細モード"
-      - "融合ステップ必須"
-  "-":
-    description: "MAY execute with condensed convergence"
+    - 全4定理実行
+    - 各定理詳細モード
+    - 融合ステップ必須
+  '-':
+    description: MAY execute with condensed convergence
     minimum_requirements:
-      - "サマリーのみ"
-  "*":
-    description: "MUST meta-analyze: why use pure cognition layer?"
+    - サマリーのみ
+  '*':
+    description: 'MUST meta-analyze: why use pure cognition layer?'
     minimum_requirements:
-      - "認知層選択の理由を問う"
-ccl_signature: "/o+*dia"
+    - 認知層選択の理由を問う
+ccl_signature: /o+*dia
 anti_skip: enabled
 ---
 

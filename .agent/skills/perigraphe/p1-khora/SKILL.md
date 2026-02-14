@@ -1,56 +1,49 @@
 ---
-# Theorem Metadata (v2.1)
-id: "P1"
-name: "Khōra"
-greek: "Χώρα"
-series: "Perigraphē"
+id: P1
+name: Khōra
+greek: Χώρα
+series: Perigraphē
 generation:
-  formula: "Scale × Scale"
-  result: "スケール場 — 条件空間の広がり"
+  formula: Scale × Scale
+  result: スケール場 — 条件空間の広がり
+description: 'どの範囲で考える？・スコープを決めたい・領域を定義したい時に発動。 Domain definition, scope establishment,
+  contextual container. Use for: 領域, 範囲, scope, domain, 場. NOT for: domain already
+  clear (proceed directly).
 
-description: >
-  どの範囲で考える？・スコープを決めたい・領域を定義したい時に発動。
-  Domain definition, scope establishment, contextual container.
-  Use for: 領域, 範囲, scope, domain, 場.
-  NOT for: domain already clear (proceed directly).
-
+  '
 triggers:
-  - 分析領域の定義
-  - スコープの設定
-  - 条件空間の確定
-
+- 分析領域の定義
+- スコープの設定
+- 条件空間の確定
 keywords:
-  - khora
-  - space
-  - domain
-  - scope
-  - field
-  - 領域
-  - 場
-
+- khora
+- space
+- domain
+- scope
+- field
+- 領域
+- 場
 related:
   upstream:
-    - "S1 Metron"
+  - S1 Metron
   downstream:
-    - "K1 Eukairia"
-    - "K2 Chronos"
+  - K1 Eukairia
+  - K2 Chronos
   x_series:
-    - "← X-SP1 ← S1 Metron"
-    - "X-PK1 → K1 Eukairia"
-    - "X-PK2 → K2 Chronos"
-
+  - ← X-SP1 ← S1 Metron
+  - X-PK1 → K1 Eukairia
+  - X-PK2 → K2 Chronos
 implementation:
-  micro: "(implicit)"
-  macro: "(future)"
+  micro: (implicit)
+  macro: (future)
   templates: []
-
-version: "2.1.0"
-workflow_ref: ".agent/workflows/kho.md"
+version: 2.1.0
+workflow_ref: .agent/workflows/kho.md
 risk_tier: L1
 reversible: true
 requires_approval: false
 risks:
-  - "環境設計の偏りによるスコープ逸脱"
+- 環境設計の偏りによるスコープ逸脱
 fallbacks: []
 ---
 

@@ -1,26 +1,35 @@
 ---
-id: "X-HK"
-name: "Hormē → Kairos"
-category: "relation-layer"
-pair: "H → K"
-shared_coordinate: "C5 (Valence)"
+id: X-HK
+name: Hormē → Kairos
+category: relation-layer
+pair: H → K
+shared_coordinate: C5 (Valence)
 relation_count: 8
-type: "Bridge"
-description: "傾向 (Hormē) が文脈 (Kairos) を歪める/活性化する8つの射"
-
+type: Bridge
+description: 傾向 (Hormē) が文脈 (Kairos) を歪める/活性化する8つの射
 activation_conditions:
-  - context: "欲求・確信が強い状態で、タイミングや目的の判断が求められるとき"
-  - trigger: "「これが欲しい → 今がチャンスだ」の認知バイアスを検出するとき"
-  - confidence_threshold: 0.4
-  - priority: "high"
-
-triggers: ["傾向→文脈歪み", "/ore >> /euk", "/pis >> /chr", "欲求がタイミング認識を歪める"]
-keywords: [horme-kairos, drive-to-context, x-hk, bias-detection, wishful-timing]
+- context: 欲求・確信が強い状態で、タイミングや目的の判断が求められるとき
+- trigger: 「これが欲しい → 今がチャンスだ」の認知バイアスを検出するとき
+- confidence_threshold: 0.4
+- priority: high
+triggers:
+- 傾向→文脈歪み
+- /ore >> /euk
+- /pis >> /chr
+- 欲求がタイミング認識を歪める
+keywords:
+- horme-kairos
+- drive-to-context
+- x-hk
+- bias-detection
+- wishful-timing
 risk_tier: L0
-risks: ["none identified"]
+risks:
+- none identified
 reversible: true
 requires_approval: false
-fallbacks: ["manual execution"]
+fallbacks:
+- manual execution
 ---
 
 # X-HK: Hormē → Kairos (傾向→文脈)

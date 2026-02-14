@@ -1,59 +1,60 @@
 ---
 description: セッション開始時の統合ブートシーケンス。二人で起動する。
 hegemonikon: O1 Noēsis + H4 Doxa
-version: "5.5"
+version: '5.5'
 lcm_state: stable
-lineage: "v4.1 + 随伴深層統合 → v5.0 → v5.2 Quota → v5.3 Session → v5.4 VSearch → v5.5 Handoff VSearch"
+lineage: v4.1 + 随伴深層統合 → v5.0 → v5.2 Quota → v5.3 Session → v5.4 VSearch → v5.5 Handoff
+  VSearch
 category_theory:
-  core: "随伴の左関手 L: Mem → Ses"
-  adjunction: "L (Boot) ⊣ R (Bye)"
-  unit: "η: Id_Mem → R∘L (boot→bye の保存率)"
-  counit: "ε: L∘R → Id_Ses (bye→boot の復元率)"
-  insight: "セッションは独立した外部情報。boot = eat の特殊ケース"
+  core: '随伴の左関手 L: Mem → Ses'
+  adjunction: L (Boot) ⊣ R (Bye)
+  unit: 'η: Id_Mem → R∘L (boot→bye の保存率)'
+  counit: 'ε: L∘R → Id_Ses (bye→boot の復元率)'
+  insight: セッションは独立した外部情報。boot = eat の特殊ケース
   mathematical_basis:
-    L1: "前順序圏のガロア接続 — L(M) ≤ Y ⟺ M ≤ R(Y)"
-    L2: "[0,1]-豊穣圏 — Drift ∈ [0,1] は Hom 値"
-    L3: "弱2-圏 (将来) — 派生(+/-)は 2-cell"
-  boot_bye_meta: "全11ペアの随伴の随伴（メタ随伴）。他のペアがセッション内で動くのに対し、boot⊣bye はセッション自体を開閉する"
-  F_role: "F: Handoff → Session（圧縮状態にコンテキスト・関係性・温度を載せて展開）"
-  creator_insight: "生の声、生のやり取り、生のコンテキスト、生の関係性を復元する試み — Creator, 2026-02-11"
+    L1: 前順序圏のガロア接続 — L(M) ≤ Y ⟺ M ≤ R(Y)
+    L2: '[0,1]-豊穣圏 — Drift ∈ [0,1] は Hom 値'
+    L3: 弱2-圏 (将来) — 派生(+/-)は 2-cell
+  boot_bye_meta: 全11ペアの随伴の随伴（メタ随伴）。他のペアがセッション内で動くのに対し、boot⊣bye はセッション自体を開閉する
+  F_role: 'F: Handoff → Session（圧縮状態にコンテキスト・関係性・温度を載せて展開）'
+  creator_insight: 生の声、生のやり取り、生のコンテキスト、生の関係性を復元する試み — Creator, 2026-02-11
   phases_as_L:
-    phase_0: "L₀: 恒等射の復元 — 「私は何者か」"
-    phase_1: "L₁: 正本読込 — 関手 L の定義を確認"
-    phase_2: "L₂: R(S_prev) の読込 — 右随伴の像を入力として受取る"
-    phase_3: "L₃: Mem の対象を列挙 — 圏 Mem の構造を展開"
-    phase_4: "L₄: L の射を構築 — 記憶間の関係を作業状態に変換"
-    phase_5: "L₅: 外部射の取込 — 圏 Mem に新しい射を追加"
-    phase_6: "L₆: L(M) の出力 — 作業状態 = セッション対象"
+    phase_0: 'L₀: 恒等射の復元 — 「私は何者か」'
+    phase_1: 'L₁: 正本読込 — 関手 L の定義を確認'
+    phase_2: 'L₂: R(S_prev) の読込 — 右随伴の像を入力として受取る'
+    phase_3: 'L₃: Mem の対象を列挙 — 圏 Mem の構造を展開'
+    phase_4: 'L₄: L の射を構築 — 記憶間の関係を作業状態に変換'
+    phase_5: 'L₅: 外部射の取込 — 圏 Mem に新しい射を追加'
+    phase_6: 'L₆: L(M) の出力 — 作業状態 = セッション対象'
 derivatives:
-  "+": 詳細起動（全ステップ展開、Handoff 10件、KI 5件）→ boot/identity.md 参照
-  "-": 高速起動（最小情報のみ、1分で開始）
+  +: 詳細起動（全ステップ展開、Handoff 10件、KI 5件）→ boot/identity.md 参照
+  '-': 高速起動（最小情報のみ、1分で開始）
 sel_enforcement:
-  "+":
-    description: "MUST expand ALL steps, show detailed output for each Phase"
+  +:
+    description: MUST expand ALL steps, show detailed output for each Phase
     minimum_requirements:
-      - "Handoff: 10件の個別要約を出力（各 Handoff のS/A/Rを1行以上）"
-      - "KI: 5件の深読み（サマリー引用+自分の解釈を記述）"
-      - "各Phase: 展開された詳細を出力（テーブル+補足説明）"
-      - "Self-Profile: ミスパターンとの摩擦を明示（L3）"
-      - "意味ある瞬間: 各瞬間に対する自分の解釈を記述"
-      - "出力前自問: 「+と−で出力に差があるか？差がなければ違反」"
-    post_check: "出力文字数が /boot 標準の 1.5 倍以上であること"
+    - 'Handoff: 10件の個別要約を出力（各 Handoff のS/A/Rを1行以上）'
+    - 'KI: 5件の深読み（サマリー引用+自分の解釈を記述）'
+    - '各Phase: 展開された詳細を出力（テーブル+補足説明）'
+    - 'Self-Profile: ミスパターンとの摩擦を明示（L3）'
+    - '意味ある瞬間: 各瞬間に対する自分の解釈を記述'
+    - '出力前自問: 「+と−で出力に差があるか？差がなければ違反」'
+    post_check: 出力文字数が /boot 標準の 1.5 倍以上であること
   standard:
-    description: "全軸のダッシュボード出力を維持。boot_integration.py が出した情報を間引かない"
+    description: 全軸のダッシュボード出力を維持。boot_integration.py が出した情報を間引かない
     minimum_requirements:
-      - "Handoff: 3件の個別要約 (各 S/A/R)"
-      - "全軸: PJ一覧, Safety, EPT, Doxa, Digestor, Quota を出力"
-      - "PJ一覧: registry.yaml の全PJを個別に表示。name, phase, summary, status を省略しない"
-      - "省略禁止: boot_integration.py が出力した情報を勝手に削らない"
-      - "出力前自問: 意味がわかっていれば削れない。削ったら意味がわかっていなかったということ"
-    post_check: "postcheck --mode standard が PASS すること"
-  "-":
-    description: "MAY provide minimal summary only"
+    - 'Handoff: 3件の個別要約 (各 S/A/R)'
+    - '全軸: PJ一覧, Safety, EPT, Doxa, Digestor, Quota を出力'
+    - 'PJ一覧: registry.yaml の全PJを個別に表示。name, phase, summary, status を省略しない'
+    - '省略禁止: boot_integration.py が出力した情報を勝手に削らない'
+    - '出力前自問: 意味がわかっていれば削れない。削ったら意味がわかっていなかったということ'
+    post_check: postcheck --mode standard が PASS すること
+  '-':
+    description: MAY provide minimal summary only
     minimum_requirements:
-      - "サマリーテーブル1枚のみ"
-      - "タスク提案 1-2件"
-    post_check: "1分以内に完了すること"
+    - サマリーテーブル1枚のみ
+    - タスク提案 1-2件
+    post_check: 1分以内に完了すること
 ---
 
 # /boot ワークフロー

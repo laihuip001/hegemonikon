@@ -3,16 +3,15 @@ name: Code Protocols
 description: 開発プロトコル（旧資産Module 01-25）への自動参照
 activation: auto
 triggers:
-  - /do
-  - /plan (implementation phase)
+- /do
+- /plan (implementation phase)
 hegemonikon: M6-Praxis
-# Safety Contract (v1.0 — /eat 消化洞察 2026-02-07)
 risk_tier: L1
 reversible: true
 requires_approval: false
 risks:
-  - "古いプロトコルの適用による設計判断の誤誘導"
-  - "原典パスが Windows 依存（移植時に破損）"
+- 古いプロトコルの適用による設計判断の誤誘導
+- 原典パスが Windows 依存（移植時に破損）
 fallbacks: []
 ---
 

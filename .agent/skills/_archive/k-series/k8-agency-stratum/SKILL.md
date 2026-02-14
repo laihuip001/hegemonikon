@@ -1,34 +1,33 @@
 ---
-id: "K8"
-name: "Agency→Stratum"
-category: "agency-reasoning"
-description: "主体選択が処理レベルを決定する文脈定理"
-
+id: K8
+name: Agency→Stratum
+category: agency-reasoning
+description: 主体選択が処理レベルを決定する文脈定理
 triggers:
-  - control-to-depth mapping
-  - self-skill training
-  - environment design decisions
-
+- control-to-depth mapping
+- self-skill training
+- environment design decisions
 keywords:
-  - agency
-  - stratum
-  - skill-training
-  - policy-design
+- agency
+- stratum
+- skill-training
+- policy-design
+when_to_use: '自己/環境に応じて処理の深さを導出する場合。
 
-when_to_use: |
-  自己/環境に応じて処理の深さを導出する場合。
   例：身体スキル（低次）、組織設計（高次）。
 
-when_not_to_use: |
-  - 処理レベルが既に決まっている場合
+  '
+when_not_to_use: '- 処理レベルが既に決まっている場合
+
   - 主体が未定の場合
 
-version: "2.0"
+  '
+version: '2.0'
 risk_tier: L0
 reversible: true
 requires_approval: false
 risks:
-  - "アーカイブ済みスキルの誤参照による古い手法の適用"
+- アーカイブ済みスキルの誤参照による古い手法の適用
 fallbacks: []
 ---
 

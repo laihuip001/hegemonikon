@@ -1,5 +1,5 @@
 ---
-description: "\u843D\u3068\u3059 \u2014 /pro_/tak-*/bou+{6w3h}~/p-_/ene-_/pis"
+description: 落とす — /pro_/tak-*/bou+{6w3h}~/p-_/ene-_/pis
 lcm_state: beta
 version: '1.0'
 ---

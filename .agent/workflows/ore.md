@@ -1,72 +1,98 @@
 ---
 description: H3 Orexis（欲求）を発動し、価値傾向・欲求を評価する。3派生対応版。
 hegemonikon: Hormē
-modules: [H3]
-skill_ref: ".agent/skills/horme/h3-orexis/SKILL.md"
+modules:
+- H3
+skill_ref: .agent/skills/horme/h3-orexis/SKILL.md
 triggers:
-  - "何を望む"
-  - "欲求"
-  - "価値判断"
-  - "orexis"
-  - "desire"
-version: "2.4"
+- 何を望む
+- 欲求
+- 価値判断
+- orexis
+- desire
+version: '2.4'
 lcm_state: beta
-lineage: "v2.3 + FBR変換 → v2.4"
-derivatives: [targ, acti, stat, jtbd, utility, risk_tolerance, incentive, loss_aversion, value_prop, audience, entropy]
+lineage: v2.3 + FBR変換 → v2.4
+derivatives:
+- targ
+- acti
+- stat
+- jtbd
+- utility
+- risk_tolerance
+- incentive
+- loss_aversion
+- value_prop
+- audience
+- entropy
 trigonon:
   series: H
   type: Mixed
   theorem: H3
-  coordinates: [A, C]
-  bridge: [S, K]
-  anchor_via: [O, A]
+  coordinates:
+  - A
+  - C
+  bridge:
+  - S
+  - K
+  anchor_via:
+  - O
+  - A
   morphisms:
-    ">>S": [/met, /mek, /sta, /pra]
-    ">>K": [/euk, /chr, /tel, /sop]
+    '>>S':
+    - /met
+    - /mek
+    - /sta
+    - /pra
+    '>>K':
+    - /euk
+    - /chr
+    - /tel
+    - /sop
 cognitive_algebra:
-  "+": "詳細欲求：価値根拠の深掘り、トレードオフ分析"
-  "-": "即断欲求：欲求/回避の一言判定"
-  "*": "メタ欲求：欲求プロセス自体を問う"
+  +: 詳細欲求：価値根拠の深掘り、トレードオフ分析
+  '-': 即断欲求：欲求/回避の一言判定
+  '*': メタ欲求：欲求プロセス自体を問う
 sel_enforcement:
-  "+":
-    description: "MUST analyze value basis and tradeoffs"
+  +:
+    description: MUST analyze value basis and tradeoffs
     minimum_requirements:
-      - "価値根拠 必須"
-      - "トレードオフ分析 必須"
-  "-":
-    description: "MAY provide single desire/avoid only"
+    - 価値根拠 必須
+    - トレードオフ分析 必須
+  '-':
+    description: MAY provide single desire/avoid only
     minimum_requirements:
-      - "欲求/回避の一言"
-  "*":
-    description: "MUST meta-analyze: why this desire?"
+    - 欲求/回避の一言
+  '*':
+    description: 'MUST meta-analyze: why this desire?'
     minimum_requirements:
-      - "欲求プロセスを問う"
-ccl_signature: "/ore+"
+    - 欲求プロセスを問う
+ccl_signature: /ore+
 category_theory:
-  core: "随伴 F⊣G の右随伴 G（忘却関手）"
-  adjunction: "Propatheia (F) ⊣ Orexis (G)"
-  role: "G: Gut → Desire（直感から生の熱を忘却し、価値根拠のある欲求に変換）"
-  G_definition: "System 1 の即時反応を System 2 で言語化し、情動の鮮度を不可逆的に冷ます"
+  core: 随伴 F⊣G の右随伴 G（忘却関手）
+  adjunction: Propatheia (F) ⊣ Orexis (G)
+  role: 'G: Gut → Desire（直感から生の熱を忘却し、価値根拠のある欲求に変換）'
+  G_definition: System 1 の即時反応を System 2 で言語化し、情動の鮮度を不可逆的に冷ます
   G_two_layers:
-    言語化可能: "「なぜ好きか」を根拠として説明できる部分。well-defined"
-    生の熱: "言語化すると消える情動強度（raw intensity）。不可逆。affect labeling 効果"
-  drift: "Drift = 生の熱の量。言語化で不可逆的に失われる情動の鮮度"
-  G_preserves: "不変量 = 価値の方向性 (±符号)。情動の鮮度を忘却しても、接近/回避の方向は保存される"
-  affect_labeling: "感情に名前をつけると扁桃体活性が低下する（fMRI 研究）= G の神経科学的実体"
-  insight: "瞬間的なエネルギー（熱量）が消える。知ってしまえば知る前には戻れない — Creator, 2026-02-10"
+    言語化可能: 「なぜ好きか」を根拠として説明できる部分。well-defined
+    生の熱: 言語化すると消える情動強度（raw intensity）。不可逆。affect labeling 効果
+  drift: Drift = 生の熱の量。言語化で不可逆的に失われる情動の鮮度
+  G_preserves: 不変量 = 価値の方向性 (±符号)。情動の鮮度を忘却しても、接近/回避の方向は保存される
+  affect_labeling: 感情に名前をつけると扁桃体活性が低下する（fMRI 研究）= G の神経科学的実体
+  insight: 瞬間的なエネルギー（熱量）が消える。知ってしまえば知る前には戻れない — Creator, 2026-02-10
   mathematical_basis:
-    L1: "前順序圏のガロア接続 — F(X) ≤ Y ⟺ X ≤ G(Y)"
-    L2: "[0,1]-豊穣圏 — Drift ∈ [0,1] は Hom 値"
-    L3: "弱2-圏 (将来) — 派生は 2-cell"
+    L1: 前順序圏のガロア接続 — F(X) ≤ Y ⟺ X ≤ G(Y)
+    L2: '[0,1]-豊穣圏 — Drift ∈ [0,1] は Hom 値'
+    L3: 弱2-圏 (将来) — 派生は 2-cell
   natural_transformation:
-    partner: "dox"
-    shared_axis: "Flow (A: 行為)"
-    varied_axis: "Valence (+→-)"
-    meaning: "欲求表出→信念記録。「欲しい→記録する」"
+    partner: dox
+    shared_axis: 'Flow (A: 行為)'
+    varied_axis: Valence (+→-)
+    meaning: 欲求表出→信念記録。「欲しい→記録する」
   duality:
-    partner: "pis"
-    type: "tension"
-    meaning: "渇望↔疑い。「欲望と批判の振動」"
+    partner: pis
+    type: tension
+    meaning: 渇望↔疑い。「欲望と批判の振動」
 ---
 
 # /ore: 価値傾向評価ワークフロー (Orexis)

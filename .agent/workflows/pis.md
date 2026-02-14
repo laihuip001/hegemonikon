@@ -1,70 +1,92 @@
 ---
 description: H2 Pistis（確信）を発動し、確信度・信頼性を評価する。3派生対応版。
 hegemonikon: Hormē
-modules: [H2]
-skill_ref: ".agent/skills/horme/h2-pistis/SKILL.md"
+modules:
+- H2
+skill_ref: .agent/skills/horme/h2-pistis/SKILL.md
 triggers:
-  - "どのくらい確か"
-  - "確信度"
-  - "信頼できる"
-  - "pistis"
-  - "confidence"
-version: "2.3"
+- どのくらい確か
+- 確信度
+- 信頼できる
+- pistis
+- confidence
+version: '2.3'
 lcm_state: beta
-lineage: "v2.2 + FBR変換 → v2.3"
-derivatives: [subj, inte, obje, bayes, probabilistic, uncertainty, calibrate]
+lineage: v2.2 + FBR変換 → v2.3
+derivatives:
+- subj
+- inte
+- obje
+- bayes
+- probabilistic
+- uncertainty
+- calibrate
 trigonon:
   series: H
   type: Mixed
   theorem: H2
-  coordinates: [I, U]
-  bridge: [S, K]
-  anchor_via: [O, A]
+  coordinates:
+  - I
+  - U
+  bridge:
+  - S
+  - K
+  anchor_via:
+  - O
+  - A
   morphisms:
-    ">>S": [/met, /mek, /sta, /pra]
-    ">>K": [/euk, /chr, /tel, /sop]
+    '>>S':
+    - /met
+    - /mek
+    - /sta
+    - /pra
+    '>>K':
+    - /euk
+    - /chr
+    - /tel
+    - /sop
 cognitive_algebra:
-  "+": "詳細確信：根拠列挙、信頼区間、反証可能性"
-  "-": "即断確信：HIGH/MEDIUM/LOW のみ"
-  "*": "メタ確信：確信プロセス自体を問う"
+  +: 詳細確信：根拠列挙、信頼区間、反証可能性
+  '-': 即断確信：HIGH/MEDIUM/LOW のみ
+  '*': メタ確信：確信プロセス自体を問う
 sel_enforcement:
-  "+":
-    description: "MUST list evidence, confidence interval, falsifiability"
+  +:
+    description: MUST list evidence, confidence interval, falsifiability
     minimum_requirements:
-      - "根拠列挙 必須"
-      - "信頼区間 必須"
-      - "反証可能性 必須"
-  "-":
-    description: "MAY provide HIGH/MEDIUM/LOW only"
+    - 根拠列挙 必須
+    - 信頼区間 必須
+    - 反証可能性 必須
+  '-':
+    description: MAY provide HIGH/MEDIUM/LOW only
     minimum_requirements:
-      - "3段階評価のみ"
-  "*":
-    description: "MUST meta-analyze: why confident?"
+    - 3段階評価のみ
+  '*':
+    description: 'MUST meta-analyze: why confident?'
     minimum_requirements:
-      - "確信プロセスを問う"
-ccl_signature: "/pis+?h2"
+    - 確信プロセスを問う
+ccl_signature: /pis+?h2
 category_theory:
-  core: "随伴 F⊣G の左随伴 F（自由関手）"
-  adjunction: "Pistis (F) ⊣ Doxa (G)"
-  role: "F: Belief → Trust（信念にエビデンス・推論過程を載せて確信度に構成）"
-  F_definition: "結論に根拠列挙・反証検討・信頼区間の推論過程を付与して確信度を構成する"
-  unit: "η: Belief → G(F(Belief)) — 信念を確信にして結論だけ残す = 信念の安定性検証"
-  counit: "ε: F(G(Trust)) → Trust — 確信を信念にして再検証 = ベイズ更新の再実行"
-  bayes: "ベイズ更新(/pis.bayes) = F の反復適用。P(H|E) = 新しいエビデンスで確信度を更新"
-  insight: "確信 = 結論 + 推論過程。信念 = 結論のみ — Creator, 2026-02-10"
+  core: 随伴 F⊣G の左随伴 F（自由関手）
+  adjunction: Pistis (F) ⊣ Doxa (G)
+  role: 'F: Belief → Trust（信念にエビデンス・推論過程を載せて確信度に構成）'
+  F_definition: 結論に根拠列挙・反証検討・信頼区間の推論過程を付与して確信度を構成する
+  unit: 'η: Belief → G(F(Belief)) — 信念を確信にして結論だけ残す = 信念の安定性検証'
+  counit: 'ε: F(G(Trust)) → Trust — 確信を信念にして再検証 = ベイズ更新の再実行'
+  bayes: ベイズ更新(/pis.bayes) = F の反復適用。P(H|E) = 新しいエビデンスで確信度を更新
+  insight: 確信 = 結論 + 推論過程。信念 = 結論のみ — Creator, 2026-02-10
   mathematical_basis:
-    L1: "前順序圏のガロア接続 — F(X) ≤ Y ⟺ X ≤ G(Y)"
-    L2: "[0,1]-豊穣圏 — Drift ∈ [0,1] は Hom 値"
-    L3: "弱2-圏 (将来) — 派生は 2-cell"
+    L1: 前順序圏のガロア接続 — F(X) ≤ Y ⟺ X ≤ G(Y)
+    L2: '[0,1]-豊穣圏 — Drift ∈ [0,1] は Hom 値'
+    L3: 弱2-圏 (将来) — 派生は 2-cell
   natural_transformation:
-    partner: "pro"
-    shared_axis: "Flow (I: 推論)"
-    varied_axis: "Valence (-→+)"
-    meaning: "懐疑的検証→直感的肯定。「検証した→信じていい」"
+    partner: pro
+    shared_axis: 'Flow (I: 推論)'
+    varied_axis: Valence (-→+)
+    meaning: 懐疑的検証→直感的肯定。「検証した→信じていい」
   duality:
-    partner: "ore"
-    type: "tension"
-    meaning: "疑い↔渇望。「批判と欲望の振動」"
+    partner: ore
+    type: tension
+    meaning: 疑い↔渇望。「批判と欲望の振動」
 ---
 
 # /pis: 確信度評価ワークフロー (Pistis)

@@ -1,28 +1,37 @@
 ---
-id: "X-SK"
-name: "Schema → Kairos"
-category: "relation-layer"
-pair: "S → K"
-shared_coordinate: "C3 (Scale)"
+id: X-SK
+name: Schema → Kairos
+category: relation-layer
+pair: S → K
+shared_coordinate: C3 (Scale)
 relation_count: 8
-type: "Bridge"
-naturality: "構造"
-zoom_chain: "設計のズーム → タイミングのズーム (X-SP + X-PK のショートカット)"
-description: "設計 (Schema) のズームレベルが文脈 (Kairos) のズームレベルを直接規定する8つの射"
-
+type: Bridge
+naturality: 構造
+zoom_chain: 設計のズーム → タイミングのズーム (X-SP + X-PK のショートカット)
+description: 設計 (Schema) のズームレベルが文脈 (Kairos) のズームレベルを直接規定する8つの射
 activation_conditions:
-  - context: "設計の方法が決まった後、タイミングや目的のスケールが問われるとき"
-  - trigger: "「この粒度で設計した。どのタイムスケールで実行するか」"
-  - confidence_threshold: 0.5
-  - priority: "medium"
-
-triggers: ["設計→タイミング粒度", "/mek >> /tel", "/met >> /euk", "ズーム直接伝播"]
-keywords: [schema-kairos, design-to-context, x-sk, zoom-propagation, shortcut]
+- context: 設計の方法が決まった後、タイミングや目的のスケールが問われるとき
+- trigger: 「この粒度で設計した。どのタイムスケールで実行するか」
+- confidence_threshold: 0.5
+- priority: medium
+triggers:
+- 設計→タイミング粒度
+- /mek >> /tel
+- /met >> /euk
+- ズーム直接伝播
+keywords:
+- schema-kairos
+- design-to-context
+- x-sk
+- zoom-propagation
+- shortcut
 risk_tier: L0
-risks: ["none identified"]
+risks:
+- none identified
 reversible: true
 requires_approval: false
-fallbacks: ["manual execution"]
+fallbacks:
+- manual execution
 ---
 
 # X-SK: Schema → Kairos (様態→文脈)

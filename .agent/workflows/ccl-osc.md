@@ -1,5 +1,5 @@
 ---
-description: "\u63FA\u3059\u308B \u2014 R:{F:[/s,/dia,/noe]{L:[x]{x~x+}}, ~(/h*/k)}"
+description: 揺する — R:{F:[/s,/dia,/noe]{L:[x]{x~x+}}, ~(/h*/k)}
 lcm_state: beta
 version: '1.0'
 ---

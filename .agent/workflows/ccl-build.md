@@ -1,5 +1,5 @@
 ---
-description: "\u7D44\u3080 \u2014 /bou-_/s+_/ene+_V:{/dia-}_I:[\u2713]{/dox-}"
+description: 組む — /bou-_/s+_/ene+_V:{/dia-}_I:[✓]{/dox-}
 lcm_state: beta
 version: '1.0'
 ---

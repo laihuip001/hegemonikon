@@ -1,54 +1,49 @@
 ---
-# Theorem Metadata (v3.0)
-id: "P3"
-name: "Trokhia"
-greek: "Τροχιά"
-series: "Perigraphē"
+id: P3
+name: Trokhia
+greek: Τροχιά
+series: Perigraphē
 generation:
-  formula: "Function × Scale"
-  result: "機能スケール — 反復サイクルの軌道"
+  formula: Function × Scale
+  result: 機能スケール — 反復サイクルの軌道
+description: 'どの周期で繰り返す？・イテレーションサイクルを設計したい時に発動。 Iteration cycle design, orbit planning,
+  repetitive pattern definition. Use for: サイクル, 反復, iteration, orbit, 周期. NOT for:
+  one-shot tasks (直線的な実行).
 
-description: >
-  どの周期で繰り返す？・イテレーションサイクルを設計したい時に発動。
-  Iteration cycle design, orbit planning, repetitive pattern definition.
-  Use for: サイクル, 反復, iteration, orbit, 周期.
-  NOT for: one-shot tasks (直線的な実行).
-
+  '
 triggers:
-  - 反復パターンの定義
-  - イテレーションサイクルの設計
-  - 軌道・周期の計画
-  - /tro コマンド
-
+- 反復パターンの定義
+- イテレーションサイクルの設計
+- 軌道・周期の計画
+- /tro コマンド
 keywords:
-  - trokhia
-  - orbit
-  - cycle
-  - iteration
-  - trajectory
-  - 軌道
-  - 周期
-  - サイクル
-
+- trokhia
+- orbit
+- cycle
+- iteration
+- trajectory
+- 軌道
+- 周期
+- サイクル
 related:
   upstream:
-    - "S2 Mekhanē (X-SP5: 方法→反復サイクル設計)"
-    - "S4 Praxis (X-SP7: 実践→反復パターン)"
+  - 'S2 Mekhanē (X-SP5: 方法→反復サイクル設計)'
+  - 'S4 Praxis (X-SP7: 実践→反復パターン)'
   downstream:
-    - "K3 Telos (X-PK5: サイクル→反復の目的)"
-    - "K4 Sophia (X-PK6: サイクル→反復に必要な知恵)"
-
+  - 'K3 Telos (X-PK5: サイクル→反復の目的)'
+  - 'K4 Sophia (X-PK6: サイクル→反復に必要な知恵)'
 implementation:
-  micro: ".agent/workflows/tro.md"
-  macro: "(future)"
-
-version: "3.0.0"
-workflow_ref: ".agent/workflows/tro.md"
+  micro: .agent/workflows/tro.md
+  macro: (future)
+version: 3.0.0
+workflow_ref: .agent/workflows/tro.md
 risk_tier: L1
 reversible: true
 requires_approval: false
-risks: ["none identified"]
-fallbacks: ["manual execution"]
+risks:
+- none identified
+fallbacks:
+- manual execution
 ---
 
 # P3: Trokhia (Τροχιά)

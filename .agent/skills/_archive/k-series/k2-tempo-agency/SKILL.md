@@ -1,35 +1,33 @@
 ---
-# === Metadata Layer ===
-id: "K2"
-name: "Tempo→Agency"
-category: "temporal-reasoning"
-description: "時間制約が主体選択を決定する文脈定理"
-
+id: K2
+name: Tempo→Agency
+category: temporal-reasoning
+description: 時間制約が主体選択を決定する文脈定理
 triggers:
-  - resource allocation decisions
-  - self vs environment intervention
-  - delegation timing
-
+- resource allocation decisions
+- self vs environment intervention
+- delegation timing
 keywords:
-  - tempo
-  - agency
-  - self-regulation
-  - environment-intervention
+- tempo
+- agency
+- self-regulation
+- environment-intervention
+when_to_use: '時間がないとき自己を変えるか環境を変えるかを決める場合。
 
-when_to_use: |
-  時間がないとき自己を変えるか環境を変えるかを決める場合。
   例：ストレス下で自分を落ち着かせるか、環境（他者）に働きかけるか。
 
-when_not_to_use: |
-  - 主体が既に決まっている場合
+  '
+when_not_to_use: '- 主体が既に決まっている場合
+
   - 時間制約がない場合
 
-version: "2.0"
+  '
+version: '2.0'
 risk_tier: L0
 reversible: true
 requires_approval: false
 risks:
-  - "アーカイブ済みスキルの誤参照による古い手法の適用"
+- アーカイブ済みスキルの誤参照による古い手法の適用
 fallbacks: []
 ---
 

@@ -1,51 +1,44 @@
 ---
-# Theorem Metadata (v3.0)
-id: "O1"
-name: "Noēsis"
-greek: "Νόησις"
-series: "Ousia"
+id: O1
+name: Noēsis
+greek: Νόησις
+series: Ousia
 generation:
-  formula: "Flow (I) × Value (E)"
-  result: "認識推論 — 世界を理解するための推論"
+  formula: Flow (I) × Value (E)
+  result: 認識推論 — 世界を理解するための推論
+description: '本質を教えて・なぜ・根本的に考えて・深く理解したい時に発動。 Deep understanding, root cause analysis,
+  paradigm examination. Use for: 本質, essence, why, 根本的な問い, understand deeply. NOT
+  for: simple lookups, known solutions.
 
-description: >
-  本質を教えて・なぜ・根本的に考えて・深く理解したい時に発動。
-  Deep understanding, root cause analysis, paradigm examination.
-  Use for: 本質, essence, why, 根本的な問い, understand deeply.
-  NOT for: simple lookups, known solutions.
-
+  '
 triggers:
-  - 根本的な行き詰まり
-  - パラダイム転換が必要
-  - /noe コマンド
-  - 「なぜ」を問う根源的疑問
-
+- 根本的な行き詰まり
+- パラダイム転換が必要
+- /noe コマンド
+- 「なぜ」を問う根源的疑問
 keywords:
-  - noesis
-  - understanding
-  - insight
-  - essence
-  - deep-thinking
-  - 本質
-
+- noesis
+- understanding
+- insight
+- essence
+- deep-thinking
+- 本質
 related:
   upstream: []
   downstream:
-    - "S1 Metron"
-    - "S2 Mekhanē"
+  - S1 Metron
+  - S2 Mekhanē
   x_series:
-    - "X-OS1 → S1 Metron"
-    - "X-OS2 → S2 Mekhanē"
-
-lineage: "A-9 + X-1/X-2 + Anti-Skip Protocol + 出力保存規則 + Kalon V3 圏論深層統合 → v4.0"
-
-version: "4.0.0"
-workflow_ref: ".agent/workflows/noe.md"
+  - X-OS1 → S1 Metron
+  - X-OS2 → S2 Mekhanē
+lineage: A-9 + X-1/X-2 + Anti-Skip Protocol + 出力保存規則 + Kalon V3 圏論深層統合 → v4.0
+version: 4.0.0
+workflow_ref: .agent/workflows/noe.md
 risk_tier: L1
 reversible: true
 requires_approval: false
 risks:
-  - "認知フレームの過度な適用による思考の硬直化"
+- 認知フレームの過度な適用による思考の硬直化
 fallbacks: []
 ---
 

@@ -1,48 +1,50 @@
 ---
-# Theorem Metadata (v3.0)
-id: "K1"
-name: "Eukairia"
-greek: "Εὐκαιρία"
-series: "Kairos"
+id: K1
+name: Eukairia
+greek: Εὐκαιρία
+series: Kairos
 generation:
-  formula: "Scale × Valence"
-  result: "スケール傾向 — 好機の認識"
+  formula: Scale × Valence
+  result: スケール傾向 — 好機の認識
+description: '今がチャンスか？・タイミングは正しいか？・好機の判定時に発動。 Opportunity recognition, timing assessment,
+  kairos moment detection. Use for: 好機, タイミング, 今か, opportunity. NOT for: 時間の見積もり (→
+  Chronos K2).
 
-description: >
-  今がチャンスか？・タイミングは正しいか？・好機の判定時に発動。
-  Opportunity recognition, timing assessment, kairos moment detection.
-  Use for: 好機, タイミング, 今か, opportunity.
-  NOT for: 時間の見積もり (→ Chronos K2).
-
+  '
 triggers:
-  - 好機の判定
-  - タイミング評価
-  - 「今やるべきか」の問い
-  - /euk コマンド
-
-keywords: [eukairia, opportunity, timing, moment, kairos, 好機, タイミング]
-
+- 好機の判定
+- タイミング評価
+- 「今やるべきか」の問い
+- /euk コマンド
+keywords:
+- eukairia
+- opportunity
+- timing
+- moment
+- kairos
+- 好機
+- タイミング
 related:
   upstream:
-    - "P1 Khōra (X-PK1: 場の範囲→行動すべき好機)"
-    - "P2 Hodos (X-PK3: 経路→今この道を進むべきか)"
-    - "H1 Propatheia (X-HK1: 直感→今がチャンスだの認識 ⚠️)"
-    - "H3 Orexis (X-HK3: 欲求→欲しいものに好機を見出す ⚠️)"
-    - "S1 Metron (X-SK1: 測定基準→今が測定の好機か)"
-    - "S3 Stathmos (X-SK3: 評価基準→今が評価の好機か)"
+  - 'P1 Khōra (X-PK1: 場の範囲→行動すべき好機)'
+  - 'P2 Hodos (X-PK3: 経路→今この道を進むべきか)'
+  - 'H1 Propatheia (X-HK1: 直感→今がチャンスだの認識 ⚠️)'
+  - 'H3 Orexis (X-HK3: 欲求→欲しいものに好機を見出す ⚠️)'
+  - 'S1 Metron (X-SK1: 測定基準→今が測定の好機か)'
+  - 'S3 Stathmos (X-SK3: 評価基準→今が評価の好機か)'
   downstream:
-    - "A1 Pathos (X-KA1: 好機→機会への感情的反応)"
-    - "A2 Krisis (X-KA2: 好機→今行動すべきかの批判的判定)"
-
-version: "3.0.0"
-workflow_ref: ".agent/workflows/euk.md"
+  - 'A1 Pathos (X-KA1: 好機→機会への感情的反応)'
+  - 'A2 Krisis (X-KA2: 好機→今行動すべきかの批判的判定)'
+version: 3.0.0
+workflow_ref: .agent/workflows/euk.md
 risk_tier: L2
 reversible: true
 requires_approval: false
 risks:
-  - "直感/欲求による好機バイアス (X-HK1, X-HK3)"
-  - "好機の見逃し (false negative)"
-fallbacks: ["manual execution"]
+- 直感/欲求による好機バイアス (X-HK1, X-HK3)
+- 好機の見逃し (false negative)
+fallbacks:
+- manual execution
 ---
 
 # K1: Eukairia (Εὐκαιρία)

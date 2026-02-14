@@ -1,36 +1,34 @@
 ---
-# === Metadata Layer ===
-id: "K3"
-name: "Tempo→Valence"
-category: "temporal-reasoning"
-description: "時間制約が動機方向を決定する文脈定理"
-
+id: K3
+name: Tempo→Valence
+category: temporal-reasoning
+description: 時間制約が動機方向を決定する文脈定理
 triggers:
-  - risk assessment under time pressure
-  - approach vs avoid decisions
-  - opportunity vs threat evaluation
-
+- risk assessment under time pressure
+- approach vs avoid decisions
+- opportunity vs threat evaluation
 keywords:
-  - tempo
-  - valence
-  - approach
-  - avoid
-  - risk-reward
+- tempo
+- valence
+- approach
+- avoid
+- risk-reward
+when_to_use: '短期的な接近/回避か、長期的な戦略かを決める場合。
 
-when_to_use: |
-  短期的な接近/回避か、長期的な戦略かを決める場合。
   例：危険察知時に逃げるか、機会発見時に掴むか。
 
-when_not_to_use: |
-  - 動機方向が既に明確な場合
+  '
+when_not_to_use: '- 動機方向が既に明確な場合
+
   - リスク/リターンの評価が不要な場合
 
-version: "2.0"
+  '
+version: '2.0'
 risk_tier: L0
 reversible: true
 requires_approval: false
 risks:
-  - "アーカイブ済みスキルの誤参照による古い手法の適用"
+- アーカイブ済みスキルの誤参照による古い手法の適用
 fallbacks: []
 ---
 

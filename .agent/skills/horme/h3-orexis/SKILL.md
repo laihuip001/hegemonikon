@@ -1,48 +1,50 @@
 ---
-# Theorem Metadata (v3.0)
-id: "H3"
-name: "Orexis"
-greek: "Ὄρεξις"
-series: "Hormē"
+id: H3
+name: Orexis
+greek: Ὄρεξις
+series: Hormē
 generation:
-  formula: "Value × Valence"
-  result: "価値傾向 — 何を望み、何を避けるか"
+  formula: Value × Valence
+  result: 価値傾向 — 何を望み、何を避けるか
+description: '何を望んでいる？・欲求を明確にしたい・本当に欲しいものは何？時に発動。 Desire identification, want clarification,
+  appetitive drive analysis. Use for: 欲求, 望み, want, desire, 欲しい. NOT for: purpose
+  (目的 → Telos K3), confidence (確信 → Pistis H2).
 
-description: >
-  何を望んでいる？・欲求を明確にしたい・本当に欲しいものは何？時に発動。
-  Desire identification, want clarification, appetitive drive analysis.
-  Use for: 欲求, 望み, want, desire, 欲しい.
-  NOT for: purpose (目的 → Telos K3), confidence (確信 → Pistis H2).
-
+  '
 triggers:
-  - 欲求の同定
-  - 価値選好の明確化
-  - 「何が欲しいのか」の問い
-  - /ore コマンド
-
-keywords: [orexis, desire, appetite, want, drive, 欲求, 望み]
-
+- 欲求の同定
+- 価値選好の明確化
+- 「何が欲しいのか」の問い
+- /ore コマンド
+keywords:
+- orexis
+- desire
+- appetite
+- want
+- drive
+- 欲求
+- 望み
 related:
   upstream:
-    - "O3 Zētēsis (X-OH5: 問いの探求→これが欲しいの発生)"
-    - "O4 Energeia (X-OH7: 行為の完了→次に何を望むか)"
-    - "S3 Stathmos (X-SH5: 基準設定→基準を満たしたい欲求)"
-    - "S4 Praxis (X-SH7: 実践選択→実践したい/したくない)"
+  - 'O3 Zētēsis (X-OH5: 問いの探求→これが欲しいの発生)'
+  - 'O4 Energeia (X-OH7: 行為の完了→次に何を望むか)'
+  - 'S3 Stathmos (X-SH5: 基準設定→基準を満たしたい欲求)'
+  - 'S4 Praxis (X-SH7: 実践選択→実践したい/したくない)'
   downstream:
-    - "A1 Pathos (X-HA3: 欲求→欲求の正体を感じ取る)"
-    - "A2 Krisis (X-HA4: 欲求→欲求の妥当性を判定)"
-    - "K1 Eukairia (X-HK3: 欲求→欲しいものに好機を見出す ⚠️)"
-    - "K3 Telos (X-HK4: 欲求→欲求が目的を書き換える ⚠️)"
-
-version: "3.0.0"
-workflow_ref: ".agent/workflows/ore.md"
+  - 'A1 Pathos (X-HA3: 欲求→欲求の正体を感じ取る)'
+  - 'A2 Krisis (X-HA4: 欲求→欲求の妥当性を判定)'
+  - 'K1 Eukairia (X-HK3: 欲求→欲しいものに好機を見出す ⚠️)'
+  - 'K3 Telos (X-HK4: 欲求→欲求が目的を書き換える ⚠️)'
+version: 3.0.0
+workflow_ref: .agent/workflows/ore.md
 risk_tier: L1
 reversible: true
 requires_approval: false
 risks:
-  - "欲求による好機歪曲 (X-HK3)"
-  - "欲求による目的上書き (X-HK4)"
-fallbacks: ["manual execution"]
+- 欲求による好機歪曲 (X-HK3)
+- 欲求による目的上書き (X-HK4)
+fallbacks:
+- manual execution
 ---
 
 # H3: Orexis (Ὄρεξις)

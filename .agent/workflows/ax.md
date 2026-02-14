@@ -1,37 +1,38 @@
 ---
 description: Peras の Peras。6 Series 極限を多層的に収束させ、X-series関係で接続する全体分析。
 hegemonikon: Taxis
-modules: [X-series]
-parent: "/x"
-layer: "τ"
+modules:
+- X-series
+parent: /x
+layer: τ
 skill_ref:
-  - ".agent/skills/taxis/x-series/SKILL.md"
-version: "4.0"
+- .agent/skills/taxis/x-series/SKILL.md
+version: '4.0'
 lcm_state: beta
-lineage: "v3.3 + Limit整合 → v4.0"
+lineage: v3.3 + Limit整合 → v4.0
 derivatives: []
 cognitive_algebra:
-  definition: "/ax = lim(/o · /s · /h · /p · /k · /a) × X"
-  interpretation: "6 Series Limit ⊗ 72関係マトリクス"
+  definition: /ax = lim(/o · /s · /h · /p · /k · /a) × X
+  interpretation: 6 Series Limit ⊗ 72関係マトリクス
   operators:
-    "+": "全7層を詳細モードで完全展開"
-    "-": "全7層を縮約モードで即断サマリー"
-    "*": "多層分析手法自体のメタ検証"
+    +: 全7層を詳細モードで完全展開
+    '-': 全7層を縮約モードで即断サマリー
+    '*': 多層分析手法自体のメタ検証
 sel_enforcement:
-  "+":
-    description: "MUST expand all 7 layers in detail mode"
+  +:
+    description: MUST expand all 7 layers in detail mode
     minimum_requirements:
-      - "全7層展開 必須"
-      - "各層の根拠 必須"
-  "-":
-    description: "MAY provide summary only"
+    - 全7層展開 必須
+    - 各層の根拠 必須
+  '-':
+    description: MAY provide summary only
     minimum_requirements:
-      - "サマリーのみ"
-  "*":
-    description: "MUST meta-verify: why this multi-layer analysis?"
+    - サマリーのみ
+  '*':
+    description: 'MUST meta-verify: why this multi-layer analysis?'
     minimum_requirements:
-      - "分析手法のメタ検証"
-ccl_signature: "/ax+"
+    - 分析手法のメタ検証
+ccl_signature: /ax+
 anti_skip: enabled
 ---
 

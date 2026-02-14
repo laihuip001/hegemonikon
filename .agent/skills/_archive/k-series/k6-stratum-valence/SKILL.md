@@ -1,34 +1,33 @@
 ---
-id: "K6"
-name: "Stratum→Valence"
-category: "abstraction-reasoning"
-description: "処理レベルが動機方向を決定する文脈定理"
-
+id: K6
+name: Stratum→Valence
+category: abstraction-reasoning
+description: 処理レベルが動機方向を決定する文脈定理
 triggers:
-  - instinct vs ethics decisions
-  - level-based motivation
-  - pleasure vs actualization
-
+- instinct vs ethics decisions
+- level-based motivation
+- pleasure vs actualization
 keywords:
-  - stratum
-  - valence
-  - instinct
-  - ethics
+- stratum
+- valence
+- instinct
+- ethics
+when_to_use: '低次/高次の処理に応じて接近/回避を選ぶ場合。
 
-when_to_use: |
-  低次/高次の処理に応じて接近/回避を選ぶ場合。
   例：低次は本能的（快楽/恐怖）、高次は倫理的（自己実現/非倫理回避）。
 
-when_not_to_use: |
-  - 動機方向が既に明確な場合
+  '
+when_not_to_use: '- 動機方向が既に明確な場合
+
   - 処理レベルが未定の場合
 
-version: "2.0"
+  '
+version: '2.0'
 risk_tier: L0
 reversible: true
 requires_approval: false
 risks:
-  - "アーカイブ済みスキルの誤参照による古い手法の適用"
+- アーカイブ済みスキルの誤参照による古い手法の適用
 fallbacks: []
 ---
 

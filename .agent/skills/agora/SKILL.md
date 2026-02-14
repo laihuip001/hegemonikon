@@ -1,40 +1,33 @@
 ---
 name: Agora
-description: HGK 収益化プロジェクト — ディープインパクト戦略
-triggers:
-  - "agora"
-  - "agora"
+description: 公開広場・議論・共有
+risk_tier: L1
+risks:
+  - 議論の発散
+  - コンテキストの喪失
 ---
 
 # Agora
 
-> **目的**: HGK 収益化プロジェクト — ディープインパクト戦略
+> **目的**: 議論と共有の場を提供する。
 
-> [!CAUTION]
-> このテンプレートは自動生成です。
-> **以下の import パスを実際のコードと照合して検証してください。**
-> 存在しないクラス名・関数名を書くと、Skill が機能しません。
-> 検証コマンド: `PYTHONPATH=. .venv/bin/python -c "from .home.makaron8426.oikos.agora import YOUR_CLASS"`
+## Overview
+
+Agora は、プロジェクトメンバーやステークホルダーが集まり、アイデアを共有し、議論を行うための公開広場である。
+
+## Core Behavior
+
+- アイデアの共有
+- オープンな議論
+- フィードバックの収集
 
 ## 発動条件
 
-- TODO: トリガー条件を定義
+- アイデアを公開したい時
+- 議論が必要な時
 
 ## 手順
 
-### Step 1: TODO — import パスを検証して書き換えること
-
-// turbo
-
-```bash
-# FIXME: 以下は仮のコマンド。実際のモジュールに合わせて書き換えること
-cd ~/oikos/hegemonikon && PYTHONPATH=. .venv/bin/python -c "
-# TODO: import パスを実際のコードと照合
-# from .home.makaron8426.oikos.agora import MAIN_CLASS
-print('TODO: agora の実行コマンドを定義')
-"
-```
-
----
-
-*v1.0 — 自動生成 (2026-02-12)*
+1. トピックを提示する。
+2. 参加者からの意見を募る。
+3. 議論をまとめる。

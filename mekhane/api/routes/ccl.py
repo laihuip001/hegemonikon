@@ -101,12 +101,16 @@ async def parse_ccl(request: CCLParseRequest) -> CCLParseResponse:
 async def execute_ccl(request: CCLExecuteRequest) -> CCLExecuteResponse:
     """CCL 式を Synergeia Coordinator 経由で実行する。"""
     try:
-        from synergeia.coordinator import coordinate
-        result = coordinate(request.ccl, context=request.context)
+        from synergeia.bridge import dispatch as synergeia_dispatch
+        result = synergeia_dispatch(
+            ccl=request.ccl,
+            context=request.context,
+            execute=True,
+        )
         return CCLExecuteResponse(
             success=True,
             ccl=request.ccl,
-            result=result,
+            result=result.to_dict() if hasattr(result, 'to_dict') else {"status": str(result)},
         )
     except Exception as e:
         return CCLExecuteResponse(

@@ -166,7 +166,7 @@ class TestParseModuleFile:
 
 # ═══ Perspective ═══════════════════════
 
-from mekhane.ergasterion.synedrion.prompt_generator import Perspective
+from mekhane.synedrion.prompt_generator import Perspective
 
 
 # PURPOSE: Test suite validating perspective correctness

@@ -1,0 +1,6 @@
+❌ Purpose: 2540/2550 OK (99.6%), 0 weak, 10 missing
+  ❌ mekhane/mcp/hgk_gateway.py:201 wrapper
+  ❌ mekhane/pks/pks_cli.py:160 check_sophia
+  ❌ mekhane/pks/pks_cli.py:170 check_embedder
+  ❌ mekhane/pks/pks_cli.py:178 check_bridge
+  ❌ mekhane/pks/pks_cli.py:186 check_engine

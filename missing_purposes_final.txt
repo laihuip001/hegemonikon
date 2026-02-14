@@ -1,0 +1,6 @@
+❌ Purpose: 2544/2550 OK (99.8%), 0 weak, 6 missing
+  ❌ mekhane/mcp/hgk_gateway.py:201 wrapper
+  ❌ mekhane/pks/pks_cli.py:199 check_topics
+  ❌ mekhane/pks/pks_cli.py:207 check_advocate
+  ❌ mekhane/pks/pks_cli.py:214 check_chronos
+  ❌ mekhane/symploke/indices/gnosis_lance_bridge.py:55 source_type

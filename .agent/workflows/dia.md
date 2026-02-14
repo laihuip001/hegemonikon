@@ -54,15 +54,14 @@ category_theory:
     type: "tension"
     meaning: "判断↔教訓。「今の判断 ↔ 過去の知恵」"
 causal_inference:
-  analogy: "Judea Pearl's Do-Calculus (Functional Analogy)"
-  role: "Realism Check (因果的妥当性の検証)"
-  correspondence:
-    intervention: "counterfactual mode ≈ P(Y|do(X))"
-    backdoor: "Pre-Mortem (Wargame) ≈ blocking backdoor paths"
-    independence: "CoVe CONFLICT-A ≈ d-separation of verification"
-  significance:
-    - "Compile Path (R→D): 抽象→具体の圧縮 (Rate-Distortion)"
-    - "/dia (Krisis): 具体の因果性検証 (Realism)"
+  inspiration: "Judea Pearl's Do-Calculus — 因果推論の原則に触発"
+  role: "因果的妥当性を問う認知的ベストプラクティス"
+  heuristics:
+    counterfactual: "P(Y|do(X)) 的介入思考の近似 (形式的等価ではない)"
+    pre_mortem: "交絡・隠れた仮定の発見ヒューリスティック (形式的バックドア遮断ではない)"
+    cove: "検証と判定の独立性を保つ手続き的安全装置"
+  note: "/dia ≠ do-calculus。do-calculus が形式的に解決する問題を認知レベルで回避する実践"
+  gemini_review: "2026-02-15 Gemini 2.5 Pro (7/10): 直接マッピングはオーバーリーチ → リフレーム済"
 
 ---
 

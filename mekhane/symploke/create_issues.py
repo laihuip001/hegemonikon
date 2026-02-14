@@ -32,7 +32,7 @@ except ImportError:
 
 # === 定数 ===
 JULES_API_BASE = "https://jules.googleapis.com/v1alpha/sessions"
-MAX_ISSUES_PER_RUN = 3  # 1回の実行で作る Issue の上限
+MIN_QUALITY_SCORE = 4  # この閾値以上の品質スコアで Issue を作成
 REPO = os.getenv("JULES_REPO_SOURCE", "laihuip001/hegemonikon")
 
 
@@ -108,6 +108,88 @@ def extract_sessions(result_file: Path) -> list[dict]:
     return sessions
 
 
+# PURPOSE: diff の品質をスコアリング
+def score_quality(changed_files: list[str], patch_text: str) -> tuple[int, list[str]]:
+    """品質スコアを計算し、理由を返す
+
+    スコア基準:
+        +3: ソースコード (.py, .ts, .yml) を修正
+        +2: バグ修正キーワード (fix, bug, missing, error)
+        +2: セキュリティ関連 (security, vulnerability, injection)
+        +1: 2ファイル以上の変更 (波及あり)
+        +1: テスト関連の変更
+        -2: reviews/*.md のみの変更 (レビュー出力のみ)
+        -1: コメント/空白のみの変更
+
+    Returns:
+        (score, reasons)
+    """
+    score = 0
+    reasons = []
+
+    # ボイラープレート除外: Jules が定型的に変更するファイル
+    boilerplate_patterns = (
+        'reviews/',          # レビュー出力
+        '_review.md',        # レビュー出力
+        '.github/workflows', # CI 設定 (Jules が依存関係を追加する定型修正)
+    )
+    meaningful_files = [f for f in changed_files
+                        if not any(bp in f for bp in boilerplate_patterns)]
+    boilerplate_files = [f for f in changed_files if f not in meaningful_files]
+
+    # 実ソースコード変更?
+    source_exts = ('.py', '.ts', '.js', '.yml', '.yaml', '.toml', '.cfg')
+    has_meaningful_source = any(f.endswith(source_exts) for f in meaningful_files)
+
+    if not meaningful_files:
+        # ボイラープレートのみ = 実質的な発見なし
+        score -= 2
+        reasons.append(f'boilerplate only ({len(boilerplate_files)} files)')
+    elif has_meaningful_source:
+        score += 4
+        reasons.append(f'meaningful source change: {", ".join(meaningful_files[:3])}')
+
+    # キーワード検出 (実コード部分のみ)
+    # ボイラープレート部分の diff を除外
+    patch_lower = patch_text.lower()
+    bug_keywords = ['fix', 'bug', 'missing', 'error', 'broken', 'incorrect', 'wrong']
+    security_keywords = ['security', 'vulnerability', 'injection', 'xss', 'csrf', 'auth']
+
+    for kw in bug_keywords:
+        if kw in patch_lower:
+            score += 2
+            reasons.append(f'bug keyword: {kw}')
+            break
+
+    for kw in security_keywords:
+        if kw in patch_lower:
+            score += 2
+            reasons.append(f'security keyword: {kw}')
+            break
+
+    # 波及範囲 (ボイラープレート除外)
+    if len(meaningful_files) >= 2:
+        score += 1
+        reasons.append(f'{len(meaningful_files)} meaningful files affected')
+
+    # テスト関連
+    if any('test' in f.lower() for f in meaningful_files):
+        score += 1
+        reasons.append('test-related')
+
+    # コメント/空白のみ?
+    meaningful_lines = [l for l in patch_text.split('\n')
+                        if l.startswith('+') or l.startswith('-')]
+    content_lines = [l for l in meaningful_lines
+                     if l.strip() not in ('+', '-', '+ ', '- ')
+                     and not l.strip().startswith(('+#', '-#', '+ #', '- #'))]
+    if meaningful_lines and not content_lines:
+        score -= 1
+        reasons.append('comments/whitespace only')
+
+    return score, reasons
+
+
 # PURPOSE: セッション結果から Issue 本文を生成
 def format_issue(session_info: dict, session_data: dict) -> dict | None:
     """セッション結果を GitHub Issue の title/body に変換
@@ -177,8 +259,20 @@ def format_issue(session_info: dict, session_data: dict) -> dict | None:
             body_lines.append(f"- ... and {len(changed_files) - 15} more")
         body_lines.append("")
 
-    # diff (最大2000文字まで)
+    # 品質スコア
     full_patch = "\n".join(patches)
+    quality_score, quality_reasons = score_quality(changed_files, full_patch)
+
+    # 品質スコアを表示
+    body_lines.extend([
+        "## Quality",
+        "",
+        f"Score: **{quality_score}** (threshold: {MIN_QUALITY_SCORE})",
+        f"Reasons: {', '.join(quality_reasons)}",
+        "",
+    ])
+
+    # diff (最大2000文字まで)
     if len(full_patch) > 2000:
         full_patch = full_patch[:2000] + "\n... (truncated)"
     body_lines.extend([
@@ -200,6 +294,8 @@ def format_issue(session_info: dict, session_data: dict) -> dict | None:
         "title": title,
         "body": "\n".join(body_lines),
         "labels": labels,
+        "quality_score": quality_score,
+        "quality_reasons": quality_reasons,
     }
 
 
@@ -247,9 +343,10 @@ async def main():
     parser.add_argument("--dir", "-d", default="", help="Results directory")
     parser.add_argument("--days", type=int, default=1, help="Days back to scan")
     parser.add_argument("--repo", default=REPO, help=f"GitHub repo (default: {REPO})")
-    parser.add_argument("--max-issues", type=int, default=MAX_ISSUES_PER_RUN, help="Max issues per run")
+    parser.add_argument("--min-score", type=int, default=MIN_QUALITY_SCORE, help="Minimum quality score for Issue creation")
     parser.add_argument("--dry-run", action="store_true", help="Print issues without creating")
     parser.add_argument("--status-only", action="store_true", help="Only check session statuses")
+    parser.add_argument("--show-all", action="store_true", help="Show all issues including low-quality ones")
 
     args = parser.parse_args()
 
@@ -305,16 +402,22 @@ async def main():
     if args.status_only:
         return
 
-    # Issue 作成
+    # Issue 作成 (品質フィルタ)
     issues_created = 0
+    issues_skipped = 0
     for session_info, session_data in zip(all_sessions, session_results):
-        if issues_created >= args.max_issues:
-            remaining = len(all_sessions) - issues_created
-            print(f"\n⚠️ Max issues reached ({args.max_issues}). {remaining} sessions remaining.")
-            break
-
         issue = format_issue(session_info, session_data)
         if not issue:
+            continue
+
+        score = issue["quality_score"]
+        reasons = issue["quality_reasons"]
+
+        if score < args.min_score:
+            issues_skipped += 1
+            if args.show_all:
+                print(f"  ⏭ Skip (score={score}): {issue['title']}")
+                print(f"    Reasons: {', '.join(reasons)}")
             continue
 
         url = create_github_issue(
@@ -329,6 +432,7 @@ async def main():
 
     print(f"\n{'='*40}")
     print(f"Issues {'previewed' if args.dry_run else 'created'}: {issues_created}")
+    print(f"Issues skipped (score < {args.min_score}): {issues_skipped}")
     print(f"{'='*40}")
 
 

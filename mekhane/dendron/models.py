@@ -272,6 +272,7 @@ EXEMPT_PATTERNS = [
 
 # PROOF ヘッダーパターン (v2: 親参照付き、任意の後続テキスト許容)
 # 形式: # PROOF: [レベル] または # PROOF: [レベル] <- 親
+# v3.5: [P2 (Hodos)] のような丸括弧付きも許容
 PROOF_PATTERN_V2 = re.compile(r"#\s*PROOF:\s*\[([^\]]+)\](?:\s*<-\s*([^\s#]+))?")
 
 # PURPOSE ヘッダーパターン (v2.5: 関数直前コメント)
@@ -305,8 +306,16 @@ WEAK_PURPOSE_PATTERNS = [
 # 特殊親参照 (バリデーションをスキップ)
 SPECIAL_PARENTS = {"FEP", "external", "legacy"}
 
-# 有効なレベルプレフィックス (v2.2: 厳密検証, v3.0: L0追加)
-VALID_LEVEL_PREFIXES = {"L0", "L1", "L2", "L3"}
+# 有効なレベルプレフィックス (v2.2: 厳密検証, v3.0: L0追加, v3.5: Theorem追加)
+VALID_LEVEL_PREFIXES = {
+    "L0", "L1", "L2", "L3",
+    "O1", "O2", "O3",
+    "S1", "S2", "S3",
+    "H1", "H2", "H3",
+    "P1", "P2", "P3",
+    "K1", "K2", "K3",
+    "A1", "A2", "A3",
+}
 
 # 最大ファイルサイズ (v2.2: リソース枯渇防止)
 MAX_FILE_SIZE = 10 * 1024 * 1024  # 10MB

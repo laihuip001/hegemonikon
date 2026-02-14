@@ -35,18 +35,22 @@ from dataclasses import dataclass, asdict
 
 from mekhane.anamnesis.vault import VaultManager
 
-# Load environment
-from dotenv import load_dotenv
-
 # Paths
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 BRAIN_DIR = Path(r"C:\Users\makar\.gemini\antigravity\brain")
 OUTPUT_DIR = Path(r"M:\Brain\.hegemonikon\session_summaries")
 ENV_FILE = PROJECT_ROOT / ".env.local"
 
-# Load API key
-load_dotenv(ENV_FILE)
+# Load API key (lazy)
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+if not GEMINI_API_KEY:
+    try:
+        from dotenv import load_dotenv
+
+        load_dotenv(ENV_FILE)
+        GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+    except ImportError:
+        pass
 
 
 # PURPOSE: の統一的インターフェースを実現する

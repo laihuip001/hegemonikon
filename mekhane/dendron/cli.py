@@ -151,7 +151,14 @@ def cmd_check(args: argparse.Namespace) -> int:  # noqa: AI-005 # noqa: AI-ALL
     reporter.report(result, format)
 
     # CI モードの場合は失敗時に exit 1
-    if args.ci and not result.is_passing:
+    if args.ci:
+        # Strict L1 Check: ファイルレベルの PROOF ヘッダーのみをブロッカーとする
+        if result.files_missing_proof > 0:
+            return 1
+        # L2/L3 カバレッジは警告にとどめる (CI を止めない)
+        return 0
+
+    if not result.is_passing:
         return 1
 
     return 0

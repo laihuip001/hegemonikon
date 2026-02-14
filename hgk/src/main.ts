@@ -285,7 +285,13 @@ function navigate(route: string): void {
   recordView(route);
 
   document.querySelectorAll('nav button').forEach(btn => {
-    btn.classList.toggle('active', btn.getAttribute('data-route') === route);
+    const isActive = btn.getAttribute('data-route') === route;
+    btn.classList.toggle('active', isActive);
+    if (isActive) {
+      btn.setAttribute('aria-current', 'page');
+    } else {
+      btn.removeAttribute('aria-current');
+    }
   });
 
   const app = document.getElementById('view-content');

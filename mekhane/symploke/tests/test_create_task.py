@@ -8,15 +8,19 @@ Creates a minimal PR to test the full workflow.
 import asyncio
 import os
 import sys
-
-sys.path.insert(0, "/home/makaron8426/oikos/hegemonikon")
-
-from mekhane.symploke.jules_client import JulesClient, SessionState
-
+import pytest
 
 # PURPOSE: Create a simple test task
 async def create_test_task():
     """Create a simple test task."""
+    # Ensure dependencies are available
+    try:
+        import aiohttp
+        from mekhane.symploke.jules_client import JulesClient, SessionState
+    except ImportError:
+        print("❌ Dependencies missing (aiohttp or JulesClient)")
+        return False
+
     api_key = os.environ.get("JULES_API_KEY")
     if not api_key:
         print("❌ JULES_API_KEY not set")

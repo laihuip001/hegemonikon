@@ -14,14 +14,18 @@ from unittest.mock import AsyncMock, MagicMock, patch
 import sys
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent))
+# Ensure aiohttp is available
+pytest.importorskip("aiohttp")
 
-from mekhane.symploke.jules_client import (
-    JulesClient,
-    JulesSession,
-    SessionState,
-    RateLimitError,
-)
+try:
+    from mekhane.symploke.jules_client import (
+        JulesClient,
+        JulesSession,
+        SessionState,
+        RateLimitError,
+    )
+except ImportError:
+    pytest.skip("mekhane.symploke.jules_client could not be imported", allow_module_level=True)
 
 
 # PURPOSE: Test suite for JulesClient

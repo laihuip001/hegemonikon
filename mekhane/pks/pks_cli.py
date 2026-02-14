@@ -1,4 +1,5 @@
 # noqa: AI-ALL
+# PROOF: [L2/Infra] <- mekhane/pks/pks_cli.py PKS CLI
 # PROOF: [L2/インフラ] <- mekhane/pks/
 """
 PROOF: [L2/インフラ] このファイルは存在しなければならない

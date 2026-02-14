@@ -1,119 +1,113 @@
-# AGENTS.md - Hegemonikon v3.0
+# AGENTS.md - Hegemonikon v4.0
 
-> **6ペルソナによる認知フレームワーク開発**
-> FEP (Free Energy Principle) + Stoic Philosophy
+> **FEP (Free Energy Principle) に基づく認知ハイパーバイザーフレームワーク**
+> Jules が自動読み込みするプロジェクト情報ファイル
 
 ## 体系
 
 | 公理 | 定理 | 関係 | 総数 |
 |:----:|:----:|:----:|:----:|
-| 7 | 24 | 72 | **96** |
+| 1 | 6+24 | 108 | **103 (核)** |
 
 ---
 
-## 6ペルソナ
+## コード規約 (必須遵守)
 
-| # | 名称 | 推論 | 責務 | 禁止 |
-|:-:|:-----|:-----|:-----|:-----|
-| P1 | 数学者 | 演繹的・証明志向 | 数学的一貫性、形式検証 | 哲学的判断、アーキ決定 |
-| P2 | FEP理論家 | システマティック | 理論実装、Active Inference | 純粋数学、LLM詳細 |
-| P3 | ストア派哲学者 | 規範中心 | 倫理的レビュー、規範監査 | 技術実装、数学証明 |
-| P4 | アーキテクト | 帰納的・プラグマティック | 構造設計、リファクタリング | 理論的議論、倫理判断 |
-| P5 | LLM専門家 | データ駆動・パターン認識 | プロンプト最適化、RAG | 低レベルアーキ、純粋理論 |
-| P6 | 統合者 | 仮説生成的・メタ的 | 全ペルソナ統合、矛盾検出 | 個別専門領域への深入り |
+### 命名規則
+
+| 対象 | スタイル | 例 |
+|:-----|:---------|:---|
+| 関数・変数 | snake_case | `generate_prompt`, `score_quality` |
+| クラス | PascalCase | `Specialist`, `VerdictFormat` |
+| 定数 | SCREAMING_SNAKE_CASE | `MAX_RETRIES`, `DEFAULT_MODEL` |
+| ファイル | snake_case | `specialist_v2.py` |
+
+### `# PURPOSE:` コメント規約
+
+**全ての Python ファイルの先頭には `# PURPOSE:` コメントがある。これはプロジェクト固有の意図的な規約である。**
+
+```python
+# PURPOSE: このファイルの目的を1行で説明
+```
+
+- 削除しないこと
+- 「不要」と指摘しないこと
+- 内容が実装と乖離している場合のみ指摘してよい
+
+### コメント言語
+
+- **コードコメント**: 英語
+- **ドキュメント、Issue、説明**: 日本語
+- **変数名・関数名**: 英語
+
+### 型アノテーション
+
+- **全ての新規関数に型アノテーション必須**
+- `-> None` を含め省略禁止
+- `Any` の使用は最小限に
 
 ---
 
-## 指示優先度
+## 既存の品質ツール
+
+### pre-commit
+
+| Hook | 内容 |
+|:-----|:-----|
+| `dendron-check` | PROOF ヘッダの存在チェック (全 .py ファイル) |
+
+### pytest
+
+- テストパス: `hermeneus/tests/`, `mekhane/tests/`, `scripts/tests/` 等 (14ディレクトリ)
+- asyncio_mode: strict
+- コマンド: `python -m pytest`
+
+### ruff (未設定だが使用推奨)
+
+現時点で ruff の設定はない。ruff 関連の指摘は有効。
+
+---
+
+## 禁止事項
+
+| 禁止 | 理由 |
+|:-----|:-----|
+| `kernel/SACRED_TRUTH.md` の変更 | 不変ドキュメント |
+| テストなしのコミット | 品質保証 |
+| 型アノテーションなしの新規関数 | 保守性 |
+| 100行超の単一関数 | 可読性 |
+| `# PURPOSE:` の削除 | プロジェクト規約 |
+
+---
+
+## ディレクトリ構造
 
 ```
-タスク固有指示 → ペルソナ固有指示 → ディレクトリ別指示 → 本ファイル
+hegemonikon/
+├── kernel/          # 理論的基盤 (公理、定理の定義)
+├── hermeneus/       # CCL パーサー・ランタイム
+├── mekhane/         # 実装層
+│   ├── symploke/    # Jules specialist review エンジン
+│   ├── dendron/     # 存在証明 (PROOF.md) チェッカー
+│   ├── peira/       # ヘルスチェック・統計
+│   ├── pks/         # 統合検索 (PKS)
+│   ├── ccl/         # CCL マクロ展開
+│   ├── ochema/      # LLM ルーティング
+│   └── ergasterion/ # 論文消化、プロンプト最適化
+├── synergeia/       # デスクトップアプリ (Tauri)
+├── mneme/           # 外部記憶 (Handoff, KI)
+├── scripts/         # ユーティリティ
+└── docs/            # ドキュメント
 ```
 
-| 競合タイプ | 解決者 |
-|:-----------|:-------|
-| 理論的衝突 | P1 判断 |
-| 実装衝突 | P4 提案 → P2 承認 |
-| 倫理的衝突 | P3 判断 |
-| 統合判断 | P6 調整 |
+---
+
+## Specialist Review の目的
+
+Jules の specialist review は **ニッチな知的発見** を目的としている。
+一般的な lint (ruff, mypy) が検出する問題は対象外。
+既存ツールでは見つけられない **設計・構造・美学** の問題を発見することが期待される。
 
 ---
 
-## 絶対禁止
-
-| 禁止事項 |
-|:---------|
-| `kernel/SACRED_TRUTH.md` の変更 |
-| テストなしのコミット |
-| 型アノテーションなしの新規関数 |
-| ペルソナ責務境界を超えた判断 |
-| 100行超の単一関数 |
-
----
-
-## フェーズ別責務
-
-| Phase | Owner | 参加 |
-|:------|:------|:-----|
-| Design | P1, P2 | P3, P6 |
-| Implementation | P4, P5 | P1, P2 |
-| Testing | P4 | P5 |
-| Review | P6 | 全員 |
-
----
-
-## Scheduled Tasks (Jules)
-
-| タスク | 頻度 | Owner |
-|:-------|:-----|:------|
-| 数学的一貫性 | 週次 | P1 |
-| FEP実装レビュー | 週次 | P2 |
-| 規範的監査 | 月次 | P3 |
-| アーキテクチャ健全性 | 週次 | P4 |
-| プロンプト最適化 | 週次 | P5 |
-| 統合レビュー | 週次 | P6 |
-
----
-
-## MCP サーバー (2026-02-10 追加)
-
-| サーバー | 目的 | Transport |
-|:---------|:-----|:----------|
-| **gnosis** | 論文知識ベース検索 (Gnōsis) | stdio |
-| **sophia** | Knowledge Item / Kairos 検索 | stdio |
-| **hermeneus** | CCL パース・実行・監査 | stdio |
-| **sympatheia** | システム状態監視・WBC | stdio |
-| **mneme** | 統合記憶検索 | stdio |
-| **digestor** | 論文消化パイプライン | stdio |
-| **typos** | Týpos コード生成 | stdio |
-| **jules** | Jules (Gemini) タスク管理 | stdio |
-| **context-packer** | デバッグコンテキスト集約 | stdio (PoC) |
-
----
-
-## セキュリティポリシー (2026-02-10 追加)
-
-| ポリシー | 内容 |
-|:---------|:-----|
-| **Input Isolation** | ユーザー入力は `<user_input_zone>` で隔離 (XML Sandwich) |
-| **Constraint-Last** | 制約はプロンプト末尾に配置 (recency bias 活用) |
-| **Split-Step Verification** | 高リスクタスクでは検証フェーズを強制 |
-| **Injection Regression** | 6種攻撃ベクタの回帰テスト (`.agent/workflow-modules/security/`) |
-| **Destructive Guard** | 破壊的操作は human-in-the-loop 必須 |
-| **Thought Signature** | Gemini 3 マルチターンでは thought_signature を自動管理 |
-
----
-
-## プロンプトエンジニアリング標準 (2026-02-10 追加)
-
-| 標準 | 参照先 |
-|:-----|:-------|
-| SAGE Mode テンプレート | `mekhane/ergasterion/tekhne/references/sage-blueprint.md` |
-| 5 Archetypes | `mekhane/ergasterion/tekhne/references/archetypes.md` |
-| Self-Optimization | `mekhane/ergasterion/tekhne/references/self-optimization.md` |
-| thought_signature | `mekhane/ergasterion/tekhne/references/thought-signature.md` |
-| Gateway 設計 | `mekhane/synedrion/gateway_design.md` |
-
----
-
-*Hegemonikón v3.1 — 6ペルソナ × 96要素体系 + AAIF 準拠拡張 (2026-02-10)*
+*Hegemonikón v4.0 — specialist review 対応 (2026-02-14)*

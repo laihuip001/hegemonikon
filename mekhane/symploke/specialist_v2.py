@@ -790,6 +790,21 @@ def generate_prompt(
 
 ---
 
+## Project Context (重要 — 必ず理解してから分析すること)
+
+このプロジェクト (Hegemonikon) の規約:
+
+- **`# PURPOSE:` コメント**: 全 .py ファイルの先頭にある意図的な規約。削除不要。内容と実装の乖離のみ指摘可
+- **命名**: snake_case (関数/変数), PascalCase (クラス), SCREAMING_SNAKE_CASE (定数)
+- **コメント言語**: コードコメントは英語、ドキュメントは日本語
+- **型アノテーション**: 全新規関数に必須
+- **既存 lint ツール**: Dendron PROOF check (pre-commit)。ruff/mypy は未設定
+- **目的**: 一般的な lint (PEP8 違反、import 順序等) ではなく、**設計・構造・美学のニッチな知的発見** が期待される
+
+上記の規約に沿った内容を「問題」として指摘しないでください。
+
+---
+
 ## Task
 
 `{target_file}` を分析し、結果を `{output_file}` に出力してください。

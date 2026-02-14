@@ -1,6 +1,15 @@
 ---
 name: Agora
 description: HGK 収益化プロジェクト — ディープインパクト戦略
+
+# Safety Contract
+risk_tier: L1
+reversible: true
+requires_approval: false
+risks:
+  - "Low impact"
+fallbacks: []
+
 triggers:
   - "agora"
   - "agora"

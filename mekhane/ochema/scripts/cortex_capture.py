@@ -1,3 +1,5 @@
+# PROOF: [L2/Tool] <- mekhane/ochema/
+# PURPOSE: Antigravity LS トラフィックをキャプチャし、JSON/Proto にダンプする mitmproxy スクリプト
 """
 Cortex API MITM Capture Script for mitmproxy.
 

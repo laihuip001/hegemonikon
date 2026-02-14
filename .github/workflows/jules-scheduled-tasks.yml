@@ -158,6 +158,22 @@ jobs:
           cd mekhane/symploke
           python collect_results.py --dir ../../logs/specialist_daily --days 1
 
+      - name: Create Issues (Quality Filtered)
+        if: ${{ github.event.inputs.dry_run != 'true' }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          JULES_API_KEY_01: ${{ secrets.JULIUS_API_KEY_1 }}
+          JULES_REPO_SOURCE: ${{ github.repository }}
+        run: |
+          cd mekhane/symploke
+          echo "=== Creating Issues from quality findings ==="
+          python create_issues.py \
+            --dir ../../logs/specialist_daily \
+            --days 1 \
+            --min-score 4 \
+            --repo ${{ github.repository }} \
+            || echo "⚠️ Issue creation failed (non-fatal)"
+
       - name: Upload Results
         if: ${{ github.event.inputs.dry_run != 'true' }}
         uses: actions/upload-artifact@v4

@@ -1,8 +1,7 @@
 # noqa: AI-ALL
 # PROOF: [L2/Infra] <- mekhane/pks/pks_cli.py PKS CLI
-# PROOF: [L2/インフラ] <- mekhane/pks/
 """
-PROOF: [L2/インフラ] このファイルは存在しなければならない
+PROOF: [L2/Infra] このファイルは存在しなければならない
 
 A0 (FEP) → 能動的知識表面化には操作インターフェースが必要
 → pks_cli.py が担う

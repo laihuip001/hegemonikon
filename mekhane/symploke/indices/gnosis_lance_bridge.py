@@ -69,7 +69,52 @@ class GnosisLanceBridge(DomainIndex):
             self._lance_index = AnamnesisGnosisIndex(lance_dir=self._lance_dir)
         return self._lance_index
 
-    # PURPOSE: LanceDB 検索 → Symplokē IndexedResult 変換
+    # PURPOSE: [L2-auto] LanceDB 検索 → Symplokē IndexedResult 変換
+    def search_vectors(self, query: str, k: int = 10, **kwargs) -> List[IndexedResult]:
+        """LanceDB 検索 → Symplokē IndexedResult 変換 (Alias for search)"""
+        return self.search(query, k, **kwargs)
+
+    # PURPOSE: [L2-auto] ベクトル追加 (Unsupported)
+    def add_vectors(self, vectors, metadata=None):
+        """Not supported"""
+        raise NotImplementedError
+
+    # PURPOSE: [L2-auto] ベクトル一覧 (Unsupported)
+    def list_vectors(self, limit=10):
+        """Not supported"""
+        raise NotImplementedError
+
+    # PURPOSE: [L2-auto] ベクトル削除 (Unsupported)
+    def delete_vectors(self, ids):
+        """Not supported"""
+        raise NotImplementedError
+
+    # PURPOSE: [L2-auto] ベクトル更新 (Unsupported)
+    def update_vectors(self, ids, vectors):
+        """Not supported"""
+        raise NotImplementedError
+
+    # PURPOSE: [L2-auto] ベクトル取得 (Unsupported)
+    def get_vector(self, id):
+        """Not supported"""
+        raise NotImplementedError
+
+    # PURPOSE: [L2-auto] ベクトル数取得 (Unsupported)
+    def count_vectors(self):
+        """Not supported"""
+        return self.count()
+
+    # PURPOSE: [L2-auto] インデックス最適化 (Unsupported)
+    def optimize_index(self):
+        """Not supported"""
+        pass
+
+    # PURPOSE: [L2-auto] ヘルスチェック
+    def health_check(self):
+        """Simple health check"""
+        return {"status": "ok", "count": self.count()}
+
+    # PURPOSE: [L2-auto] LanceDB 検索 → Symplokē IndexedResult 変換
     def search(self, query: str, k: int = 10, **kwargs) -> List[IndexedResult]:
         """LanceDB 検索 → Symplokē IndexedResult 変換"""
         try:

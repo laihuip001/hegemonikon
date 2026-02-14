@@ -8,6 +8,7 @@ layer: "τ"
 parent: "/dia"
 lineage: "A2 Krisis → Epochē 4層プロトコル + Anti-Skip + 3層アーキテクチャ → /epo v2.0"
 anti_skip: enabled
+lcm_state: beta
 ---
 
 # /epo: 判断停止ワークフロー (Epochē)

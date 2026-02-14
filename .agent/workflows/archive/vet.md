@@ -9,6 +9,7 @@ parent: "/dia"
 version: "2.1"
 lineage: "C-4 + Anti-Skip Protocol → /vet v2.1"
 anti_skip: enabled
+lcm_state: beta
 ---
 
 # /v: 監査ワークフロー（Verification）

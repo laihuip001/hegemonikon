@@ -8,6 +8,7 @@ layer: "τ"
 parent: "/dia"
 lineage: "A2 Krisis → Synedrion 6評議員 + Anti-Skip + Artifact出力 + 3層アーキテクチャ → /syn v3.0"
 anti_skip: enabled
+lcm_state: beta
 ---
 
 # /syn: Synedrion (偉人評議会)

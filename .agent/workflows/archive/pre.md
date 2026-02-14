@@ -14,6 +14,7 @@ triggers:
 version: "1.0"
 lineage: "O2 Boulēsis 派生 + SE Premortem 手法統合 → v1.0 (2026-01-29)"
 anti_skip: enabled
+lcm_state: beta
 ---
 
 # /pre: Premortem ワークフロー

@@ -24,14 +24,26 @@ let wfCache: WFSummary[] = [];
 function createPaletteHTML(): string {
   return `
     <div class="cp-overlay" id="cp-overlay">
-      <div class="cp-dialog">
+      <div class="cp-dialog" role="dialog" aria-modal="true" aria-label="Command Palette">
         <div class="cp-input-wrapper">
-          <span class="cp-icon">⌘</span>
-          <input type="text" id="cp-input" class="cp-input" placeholder="Type a workflow name or CCL expression..." autocomplete="off" />
-          <kbd class="cp-kbd">ESC</kbd>
+          <span class="cp-icon" aria-hidden="true">⌘</span>
+          <input
+            type="text"
+            id="cp-input"
+            class="cp-input"
+            placeholder="Type a workflow name or CCL expression..."
+            autocomplete="off"
+            role="combobox"
+            aria-autocomplete="list"
+            aria-expanded="true"
+            aria-haspopup="listbox"
+            aria-controls="cp-results"
+            aria-activedescendant="cp-item-0"
+          />
+          <kbd class="cp-kbd" aria-hidden="true">ESC</kbd>
         </div>
-        <div class="cp-results" id="cp-results"></div>
-        <div class="cp-footer">
+        <div class="cp-results" id="cp-results" role="listbox" aria-label="Search results"></div>
+        <div class="cp-footer" aria-hidden="true">
           <span>↑↓ Navigate</span>
           <span>↵ Execute</span>
           <span>ESC Close</span>
@@ -45,10 +57,18 @@ function createPaletteHTML(): string {
 
 function renderWFItems(items: WFSummary[]): string {
   if (items.length === 0) {
-    return '<div class="cp-empty">No matching workflows</div>';
+    return '<div class="cp-empty" role="status">No matching workflows</div>';
   }
   return items.map((wf, i) => `
-    <div class="cp-item ${i === 0 ? 'cp-item-active' : ''}" data-idx="${i}" data-name="${esc(wf.name)}" data-ccl="${esc(wf.ccl)}">
+    <div
+      class="cp-item ${i === 0 ? 'cp-item-active' : ''}"
+      data-idx="${i}"
+      data-name="${esc(wf.name)}"
+      data-ccl="${esc(wf.ccl)}"
+      role="option"
+      id="cp-item-${i}"
+      aria-selected="${i === 0 ? 'true' : 'false'}"
+    >
       <div class="cp-item-header">
         <span class="cp-item-name">/${esc(wf.name)}</span>
         ${wf.ccl ? `<span class="cp-item-ccl">${esc(wf.ccl)}</span>` : ''}
@@ -267,10 +287,25 @@ let activeIdx = 0;
 function updateActive(resultsEl: HTMLElement, delta: number): void {
   const items = resultsEl.querySelectorAll('.cp-item');
   if (items.length === 0) return;
-  items[activeIdx]?.classList.remove('cp-item-active');
+
+  if (items[activeIdx]) {
+    items[activeIdx].classList.remove('cp-item-active');
+    items[activeIdx].setAttribute('aria-selected', 'false');
+  }
+
   activeIdx = Math.max(0, Math.min(items.length - 1, activeIdx + delta));
-  items[activeIdx]?.classList.add('cp-item-active');
-  (items[activeIdx] as HTMLElement)?.scrollIntoView({ block: 'nearest' });
+
+  const newItem = items[activeIdx] as HTMLElement;
+  if (newItem) {
+    newItem.classList.add('cp-item-active');
+    newItem.setAttribute('aria-selected', 'true');
+    newItem.scrollIntoView({ block: 'nearest' });
+
+    const input = document.getElementById('cp-input');
+    if (input) {
+      input.setAttribute('aria-activedescendant', newItem.id);
+    }
+  }
 }
 
 async function handleInput(input: HTMLInputElement, resultsEl: HTMLElement): Promise<void> {
@@ -318,6 +353,17 @@ async function handleInput(input: HTMLInputElement, resultsEl: HTMLElement): Pro
   const filtered = filterWorkflows(val);
   activeIdx = 0;
   resultsEl.innerHTML = renderWFItems(filtered);
+
+  // Update aria-activedescendant for initial selection
+  const firstItem = resultsEl.querySelector('#cp-item-0');
+  const inputEl = document.getElementById('cp-input');
+  if (inputEl) {
+    if (firstItem) {
+      inputEl.setAttribute('aria-activedescendant', firstItem.id);
+    } else {
+      inputEl.removeAttribute('aria-activedescendant');
+    }
+  }
 
   // Click handlers
   resultsEl.querySelectorAll('.cp-item').forEach(item => {

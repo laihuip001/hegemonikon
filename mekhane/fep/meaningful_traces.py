@@ -26,7 +26,7 @@ from typing import Optional, List
 import json
 
 # Default persistence path
-TRACES_PATH = Path("/home/makaron8426/oikos/mneme/.hegemonikon/meaningful_traces.json")
+TRACES_PATH = Path("~/.hegemonikon/meaningful_traces.json").expanduser()
 
 
 # PURPOSE: の統一的インターフェースを実現する

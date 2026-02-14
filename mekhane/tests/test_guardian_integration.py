@@ -227,33 +227,56 @@ class TestTyposToolChainRegression:
     def test_context_item_tool_chain(self):
         """ContextItem must preserve tool_chain field."""
         import sys
-        sys.path.insert(0, str(Path(__file__).parent.parent / "ergasterion" / "typos"))
-        import typos_lang as pl
+        # sys.path.insert(0, str(Path(__file__).parent.parent / "ergasterion" / "typos"))
+        try:
+            from mekhane.ergasterion.typos.typos import ContextItem
 
-        # Create a ContextItem with tool_chain
-        item = pl.ContextItem(
-            ref_type="mcp",
-            path="gnosis",
-            tool_chain="gnosis.tool(search)",
-        )
-        assert item.tool_chain == "gnosis.tool(search)"
+            # Create a ContextItem with tool_chain
+            item = ContextItem(
+                ref_type="mcp",
+                path="gnosis",
+                tool_chain="gnosis.tool(search)",
+            )
+            assert item.tool_chain == "gnosis.tool(search)"
+        except ImportError:
+            # Fallback for when package structure is not installed
+            sys.path.insert(0, str(Path(__file__).parent.parent / "ergasterion" / "typos"))
+            import typos as pl
+            item = pl.ContextItem(
+                ref_type="mcp",
+                path="gnosis",
+                tool_chain="gnosis.tool(search)",
+            )
+            assert item.tool_chain == "gnosis.tool(search)"
 
     # PURPOSE: Verify parse mcp with tool chain behaves correctly
     def test_parse_mcp_with_tool_chain(self):
         """Parser should extract MCP context references."""
-        import sys
-        sys.path.insert(0, str(Path(__file__).parent.parent / "ergasterion" / "typos"))
-        import typos_lang as pl
+        try:
+            from mekhane.ergasterion.typos.typos import ContextItem
 
-        # Test that ContextItem preserves tool_chain when explicitly set
-        item = pl.ContextItem(
-            ref_type="mcp",
-            path="gnosis",
-            tool_chain="gnosis.tool(search)",
-        )
-        assert item.tool_chain == "gnosis.tool(search)"
-        assert item.ref_type == "mcp"
-        assert item.path == "gnosis"
+            # Test that ContextItem preserves tool_chain when explicitly set
+            item = ContextItem(
+                ref_type="mcp",
+                path="gnosis",
+                tool_chain="gnosis.tool(search)",
+            )
+            assert item.tool_chain == "gnosis.tool(search)"
+            assert item.ref_type == "mcp"
+            assert item.path == "gnosis"
+        except ImportError:
+             # Fallback
+            import sys
+            sys.path.insert(0, str(Path(__file__).parent.parent / "ergasterion" / "typos"))
+            import typos as pl
+            item = pl.ContextItem(
+                ref_type="mcp",
+                path="gnosis",
+                tool_chain="gnosis.tool(search)",
+            )
+            assert item.tool_chain == "gnosis.tool(search)"
+            assert item.ref_type == "mcp"
+            assert item.path == "gnosis"
 
 
 # ============ 5. Cross-module integration ============

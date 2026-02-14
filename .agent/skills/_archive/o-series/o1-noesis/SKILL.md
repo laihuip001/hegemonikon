@@ -24,7 +24,7 @@ triggers:
   - "/noe コマンド"
   - meta-cognition questions
   - knowledge boundary check
-  - "何を知っているか" inquiry
+  - "'何を知っているか' inquiry"
   - paradigm shift required
 
 # キーワード

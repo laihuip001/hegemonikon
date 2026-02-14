@@ -25,7 +25,7 @@ triggers:
   - goal clarification
   - what-do-we-want inquiry
   - value alignment check
-  - "何を望むか" inquiry
+  - "'何を望むか' inquiry"
 
 # キーワード
 keywords:

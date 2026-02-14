@@ -199,6 +199,7 @@ def _traced(fn):
 
     @functools.wraps(fn)
     def wrapper(*args: Any, **kwargs: Any) -> Any:
+        # PURPOSE: [L2-auto] リクエスト処理時間を計測するラッパー
         _start = time.time()
         input_size = _estimate_input_size(*args, **kwargs)
         try:

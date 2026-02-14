@@ -40,6 +40,7 @@ _shutdown = False
 
 
 def signal_handler(sig, frame):
+    # PURPOSE: [L2-auto] シグナルハンドラ
     """PURPOSE: [L2-auto] シグナルハンドラ"""
     global _shutdown
     print("\n[Monitor] Shutting down...")

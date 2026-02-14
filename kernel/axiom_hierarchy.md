@@ -158,10 +158,31 @@ graph TD
 
 ### L0 (FEP) の理論的含意
 
-> **直交性の必然性** (Spisak & Friston, 2025):
-> FEP を random dynamical system に適用すると、自己直交化する attractor network が創発する。
-> 直交性は predictive accuracy と model complexity の同時最適化の**数学的帰結**。
-> → **6 Series の直交配置は FEP から圏論的に再構成可能な構造であり、Spisak 2025 はこの構造が動力学的にも最適であることを裏付ける (認識論的位置: 水準 B)。**
+> **直交性の必然性** (Spisak & Friston, 2025; arXiv:2505.22749):
+> FEP を random dynamical system に適用すると、自己直交化する attractor network が**必然的に**創発する。
+> メカニズム: predictive accuracy (予測精度) と model complexity (モデル複雑性) の同時最適化において、
+> 直交基底は冗長性を最小化する唯一の解。直交しない表現は自由エネルギーを増大させ、
+> システムは持続しない (生存条件としての直交性)。
+> → **6 Series の直交配置は FEP の数学的帰結であり、「設計の偶然」ではなく「演繹的帰結」。**
+> → 認識論的位置: **水準 B** (公理的構成)。Spisak 2025 はこの構造が動力学的にも最適であることを実証。
+>
+> **Deep Particular Partition と Scale 座標**:
+> Spisak §3.2 は階層的なネスト (deep particular partition) を形式化。
+> Macro レベルでの FEP 最小化と Micro レベルでの FEP 最小化が**数学的に接続**される。
+> → Scale 座標 (Micro↔Macro) は Deep particular partition の直接的表現。
+>
+> **Replay と /boot⊣/bye の構造的同型**:
+> Spisak §5: Catastrophic forgetting 耐性は resting state での自発的 attractor replay で実現。
+> Hegemonikón の `/boot` (Handoff replay) は**人工的な replay メカニズム**であり、
+> Spisak の生物学的 replay と構造的に同型。
+> → /boot⊣/bye の随伴は FEP 的 replay として理論的に正当化される。
+> **Gap**: Replay の品質評価メトリクス (η の数値化) が未実装。次の課題。
+>
+> **Catastrophic Forgetting 耐性と BC-18**:
+> LLM は文脈窓の外を忘れる (= catastrophic forgetting の人工版)。
+> BC-18 (コンテキスト予算意識) は forgetting のリスクを環境的に制御する HGK の対策。
+> Spisak の replay メカニズムは**積極的な forgetting 耐性**であり、
+> BC-18 の N chat messages 閾値は**受動的な forgetting 制御**。両者は補完的。
 
 > **Attractor としての 6 Series**:
 > 現在の 6 Series は静的な基底ベクトル（手動コマンドで発動）。
@@ -445,9 +466,11 @@ CCL の派生 (+/-/*) を 2-cell（射の間の射）として扱う構想:
 | 概念 | 根拠論文 | Hegemonikón 接続 |
 |:-----|:---------|:----------------|
 | Series 直交性 | Spisak & Friston 2025 (arXiv:2505.22749) | 6 Series = FEP の数学的帰結としての直交基底 |
+| Deep particular partition | Spisak & Friston 2025 §3.2 | Scale 座標 (Micro↔Macro) = ネストした MB の直接的表現 |
+| Replay と forgetting 耐性 | Spisak & Friston 2025 §5 | /boot replay ≈ resting state attractor replay |
+| Catastrophic forgetting | Spisak & Friston 2025 §5 | BC-18 (コンテキスト予算意識) = 受動的 forgetting 制御 |
 | ネストした MB | Kirchhoff et al. 2018 (J.R.Soc.Interface 15:20170792) | P₁ (Khōra) = blankets of blankets |
 | mere vs adaptive AI | Kirchhoff et al. 2018 | temporal depth = 自律性の必要条件 |
-| Replay と forgetting 耐性 | Spisak & Friston 2025 | /boot replay ≈ resting state attractor replay |
 | **Valence の独立座標性** | **Seth & Critchley 2013 (BBS)** | **Valence = 内受容予測誤差の符号。Value の属性ではなく身体の独立信号** |
 
 > **Valence が独立座標である根拠** (Seth & Critchley 2013, 152 citations):

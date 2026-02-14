@@ -39,12 +39,14 @@ class QuotaModel(BaseModel):
     status: str = Field(description="green | yellow | orange | red")
 
 
+# PURPOSE: [L2-auto] Credits info
 class QuotaCredits(BaseModel):
     """クレジット情報。"""
     available: int
     monthly: int
 
 
+# PURPOSE: [L2-auto] Quota response
 class QuotaResponse(BaseModel):
     """Quota 全体レスポンス。"""
     name: str = ""

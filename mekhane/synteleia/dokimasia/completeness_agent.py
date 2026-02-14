@@ -19,6 +19,7 @@ from ..base import (
     AuditSeverity,
     AuditTarget,
     AuditTargetType,
+    SourceLanguage,
 )
 from ..pattern_loader import (
     load_patterns, parse_pattern_list,
@@ -118,6 +119,10 @@ class CompletenessAgent(AuditAgent):
 
         # 構造的完全性チェック (stripped で括弧バランスが正確)
         issues.extend(self._check_structural_completeness(normalized_stripped, target.target_type))
+
+        # 言語固有チェック
+        if target.target_type == AuditTargetType.CODE:
+            issues.extend(self._check_language_specific(normalized_stripped, target))
 
         passed = not any(
             i.severity in (AuditSeverity.CRITICAL, AuditSeverity.HIGH) for i in issues
@@ -290,6 +295,57 @@ class CompletenessAgent(AuditAgent):
                     message=f"括弧のバランスが不正: '{open_b}' = {open_count}, '{close_b}' = {close_count} (差: {diff})",
                 )
             )
+
+        return issues
+
+    # PURPOSE: 言語固有の品質チェック
+    def _check_language_specific(
+        self, content: str, target: AuditTarget
+    ) -> List[AuditIssue]:
+        """言語に基づく固有チェック"""
+        issues = []
+        lang = target.language
+
+        if lang == SourceLanguage.PYTHON:
+            # NotImplementedError が残っている = 未実装
+            for m in re.finditer(r'raise\s+NotImplementedError', content):
+                issues.append(
+                    AuditIssue(
+                        agent=self.name,
+                        code="COMP-040",
+                        severity=AuditSeverity.MEDIUM,
+                        message="NotImplementedError — 未実装のメソッドが残っています",
+                        location=f"position {m.start()}",
+                    )
+                )
+
+        elif lang in (SourceLanguage.TYPESCRIPT, SourceLanguage.JAVASCRIPT):
+            # == / != (非厳密等価) → === / !== を推奨
+            for m in re.finditer(r'(?<!=)(?<!!)==(?!=)', content):
+                issues.append(
+                    AuditIssue(
+                        agent=self.name,
+                        code="COMP-041",
+                        severity=AuditSeverity.LOW,
+                        message="非厳密等価 (==) — === の使用を推奨",
+                        location=f"position {m.start()}",
+                        suggestion="=== を使用してください",
+                    )
+                )
+
+        elif lang == SourceLanguage.RUST:
+            # .unwrap() / .expect() は panic 源
+            for m in re.finditer(r'\.(unwrap|expect)\s*\(', content):
+                issues.append(
+                    AuditIssue(
+                        agent=self.name,
+                        code="COMP-042",
+                        severity=AuditSeverity.LOW,
+                        message=f".{m.group(1)}() — panic の原因になる可能性",
+                        location=f"position {m.start()}",
+                        suggestion="? 演算子または match での処理を検討",
+                    )
+                )
 
         return issues
 

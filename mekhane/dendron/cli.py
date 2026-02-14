@@ -151,7 +151,14 @@ def cmd_check(args: argparse.Namespace) -> int:  # noqa: AI-005 # noqa: AI-ALL
     reporter.report(result, format)
 
     # CI モードの場合は失敗時に exit 1
-    if args.ci and not result.is_passing:
+    # NOTE: L2/L3 (Purpose/TypeHints) はまだ必須ではないため、
+    #       files_missing_proof (L1) が 0 ならば成功とする。
+    if args.ci:
+        if result.files_missing_proof > 0:
+            return 1
+        return 0
+
+    if not result.is_passing:
         return 1
 
     return 0

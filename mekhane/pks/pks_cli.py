@@ -103,6 +103,15 @@ def cmd_stats(args: argparse.Namespace) -> None:
     # --- Cooldown ---
     cooldown = os.environ.get("PKS_COOLDOWN_HOURS", "24.0")
 
+    # --- Gateway (v4) ---
+    gw_stats = {}
+    try:
+        from mekhane.pks.gateway_bridge import GatewayBridge
+        gw = GatewayBridge()
+        gw_stats = gw.stats()
+    except Exception:
+        pass
+
     # --- Output ---
     total = gnosis_count + kairos_count + sophia_count + chronos_count
     print("| ソース | 件数 | 備考 |")
@@ -116,6 +125,19 @@ def cmd_stats(args: argparse.Namespace) -> None:
     print(f"📁 Handoff ファイル: **{handoff_count}** 件")
     print(f"📁 KI ファイル: **{ki_count}** 件")
     print(f"⏱️ クールダウン: **{cooldown}** 時間 (`PKS_COOLDOWN_HOURS`)")
+
+    # v4: Gateway ソース統計
+    if gw_stats:
+        print()
+        print("### 🌉 Gateway ソース (v4)")
+        print("| ソース | 件数 | ディレクトリ |")
+        print("|:-------|-----:|:------------|")
+        for name in ["ideas", "doxa", "handoff", "ki"]:
+            info = gw_stats.get(name, {})
+            cnt = info.get("count", 0)
+            directory = info.get("directory", "N/A")
+            exists = "✅" if info.get("exists", False) else "❌"
+            print(f"| {exists} {name} | **{cnt}** | `{directory}` |")
     print()
 
 
@@ -142,6 +164,7 @@ def cmd_health(args: argparse.Namespace) -> None:
             checks.append((name, "❌", str(e)[:60], f"{elapsed:.1f}s"))
 
     # 1. LanceDB (Gnōsis)
+    # PURPOSE: Gnōsis LanceDB の疎通を確認
     def check_gnosis():
         from mekhane.anamnesis.index import GnosisIndex as AI
         gi = AI()
@@ -150,6 +173,7 @@ def cmd_health(args: argparse.Namespace) -> None:
     _check("Gnōsis (LanceDB)", check_gnosis)
 
     # 2. Kairos index
+    # PURPOSE: Kairos .pkl インデックスの存在と読込を確認
     def check_kairos():
         pkl = INDICES_DIR / "kairos.pkl"
         if not pkl.exists():
@@ -160,6 +184,7 @@ def cmd_health(args: argparse.Namespace) -> None:
     _check("Kairos (.pkl)", check_kairos)
 
     # 3. Sophia index
+    # PURPOSE: Sophia .pkl インデックスの存在と読込を確認
     def check_sophia():
         pkl = INDICES_DIR / "sophia.pkl"
         if not pkl.exists():
@@ -170,6 +195,7 @@ def cmd_health(args: argparse.Namespace) -> None:
     _check("Sophia (.pkl)", check_sophia)
 
     # 4. Embedder
+    # PURPOSE: BGE-M3 埋め込みモデルの動作を確認
     def check_embedder():
         from mekhane.symploke.adapters.embedding_adapter import EmbeddingAdapter
         a = EmbeddingAdapter()
@@ -178,6 +204,7 @@ def cmd_health(args: argparse.Namespace) -> None:
     _check("Embedder (BGE-M3)", check_embedder)
 
     # 5. GnosisLanceBridge
+    # PURPOSE: Gnōsis-Lance 間のブリッジ検索を確認
     def check_bridge():
         from mekhane.symploke.indices.gnosis_lance_bridge import GnosisLanceBridge
         b = GnosisLanceBridge()
@@ -186,6 +213,7 @@ def cmd_health(args: argparse.Namespace) -> None:
     _check("GnosisLanceBridge", check_bridge)
 
     # 6. PKSEngine
+    # PURPOSE: PKSEngine の基本プッシュ機能を確認
     def check_engine():
         from mekhane.pks.pks_engine import PKSEngine
         e = PKSEngine(enable_questions=False, enable_serendipity=False)
@@ -195,6 +223,7 @@ def cmd_health(args: argparse.Namespace) -> None:
     _check("PKSEngine", check_engine)
 
     # 7. TopicExtractor
+    # PURPOSE: Handoff からのトピック自動抽出を確認
     def check_topics():
         from mekhane.pks.pks_engine import PKSEngine
         e = PKSEngine(enable_questions=False)
@@ -203,6 +232,7 @@ def cmd_health(args: argparse.Namespace) -> None:
     _check("TopicExtractor", check_topics)
 
     # 8. SelfAdvocate
+    # PURPOSE: SelfAdvocate の初期化と LLM 状態を確認
     def check_advocate():
         from mekhane.pks.self_advocate import SelfAdvocate
         a = SelfAdvocate()
@@ -210,6 +240,7 @@ def cmd_health(args: argparse.Namespace) -> None:
     _check("SelfAdvocate", check_advocate)
 
     # 9. Chronos index
+    # PURPOSE: Chronos .pkl インデックスの存在と読込を確認
     def check_chronos():
         pkl = INDICES_DIR / "chronos.pkl"
         if not pkl.exists():
@@ -463,8 +494,14 @@ def cmd_push(args: argparse.Namespace) -> None:
         print("[PKS] --topics / --auto / --infer を指定してください。")
         return
 
-    print("[PKS] Gnōsis 検索中...")
-    nuggets = engine.proactive_push(k=args.k)
+    # v4: ソース指定
+    sources = None
+    if hasattr(args, 'sources') and args.sources:
+        sources = [s.strip() for s in args.sources.split(",")]
+
+    src_label = ", ".join(sources) if sources else "gnosis + gateway"
+    print(f"[PKS] {src_label} 検索中...")
+    nuggets = engine.proactive_push(k=args.k, sources=sources)
 
     if not nuggets:
         print("📭 プッシュ対象の知識はありません。")
@@ -760,6 +797,8 @@ def main() -> None:
     p_push.add_argument("--max", "-m", type=int, default=5, help="最大プッシュ件数 (default: 5)")
     p_push.add_argument("--k", type=int, default=20, help="検索候補数 (default: 20)")
     p_push.add_argument("--no-questions", action="store_true", help="質問生成を無効化")
+    p_push.add_argument("--sources", "-s", default=None,
+                        help="データソース (カンマ区切り: gnosis,gateway,ideas,doxa,handoff,ki)")
     p_push.add_argument("--advocacy", action="store_true", help="論文一人称メッセージを生成 (Autophōnos)")
     p_push.set_defaults(func=cmd_push)
 

@@ -1,3 +1,4 @@
+# PROOF: [X1/Exagoge] <- mekhane/ochema/scripts/ A0→知識管理が必要→cortex_capture.py が担う
 """
 Cortex API MITM Capture Script for mitmproxy.
 

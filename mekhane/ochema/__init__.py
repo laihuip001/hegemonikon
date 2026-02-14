@@ -1,3 +1,4 @@
+# PROOF: [P2/Hodos] <- mekhane/ochema/ A0→知識管理が必要→__init__.py が担う
 # PURPOSE: Ochēma パッケージ — Antigravity LS クライアント
 """Ochēma (ὄχημα) — Antigravity Language Server Client Package."""
 

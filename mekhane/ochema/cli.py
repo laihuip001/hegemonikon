@@ -1,3 +1,4 @@
+# PROOF: [P2/Hodos] <- mekhane/ochema/ A0→知識管理が必要→cli.py が担う
 # PURPOSE: Ochēma CLI — Antigravity LS とのインタラクション
 """Ochēma CLI — Antigravity Language Server Client.
 

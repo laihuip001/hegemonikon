@@ -1,6 +1,9 @@
+# PROOF: [P3/Trokhia] <- mekhane/anamnesis/ A0→知識管理が必要→session_indexer.py が担う
 # PURPOSE: セッション履歴を GnosisIndex (LanceDB) にインデックスする
 """
-PROOF: [L2/インフラ] <- mekhane/anamnesis/
+Session Indexer - Anamnesis
+
+Indices semantic sessions using LanceDB for vector search.
 
 P3 → 記憶の永続化が必要
    → セッション履歴のセマンティック検索が必要

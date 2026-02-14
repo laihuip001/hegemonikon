@@ -156,7 +156,7 @@ graph TD
 
 ### ペアリング規則
 
-残り5座標 (Value, Function, Scale, Valence, Precision) から、**同一距離または隣接距離の座標ペア** = 6通り:
+残り5座標 (Value, Function, Scale, Valence, Precision) の全ペア C(5,2)=10 のうち、**直接的認知操作に対応する6ペア**を Series として採用する。残り4ペアは X-series 合成射で到達可能であり、独立した Series を必要としない (詳細は下記の基底論証を参照):
 
 | Series | ペア | 距離 | 4定理 |
 |:-------|:-----|:-----|:------|
@@ -167,21 +167,36 @@ graph TD
 | K (Kairos) | Scale × Valence | d2 × d2 | 2×2 = 4 |
 | A (Akribeia) | Valence × Precision | d2 × d2 | 2×2 = 4 |
 
-> **なぜ C(5,2)=10 ではなく 6 か — 基底論証**:
+> **なぜ C(5,2)=10 ではなく 6 か — 二層フィルター**:
 >
-> 5座標の全ペア C(5,2)=10 のうち、6 Series が**直接的射** (direct morphism) を持つ。
-> 残り4ペア (Value×Precision, Function×Valence, Function×Precision, Scale×Precision) は
-> **X-series の射の合成**として到達可能であり、独立した Series を必要としない:
+> 5座標の全ペア C(5,2)=10 は、隣接距離制約 $|d_i - d_j| \leq 1$ を**全て満たす** ($d \in \{1,2\}$ のみ)。
+> 距離制約は弁別力を持たない。6 Series は以下の**二層フィルター**で選択される:
 >
-> | Missing Pair | X-series 経路 | 中継座標 |
-> |:-------------|:-------------|:---------|
-> | Value×Precision | H(Val×Val+) → X-HA → A(Val+×Prec) | Valence |
-> | Function×Valence | O(Val×Func) → X-OH → H(Val×Val+) | Value |
-> | Function×Precision | O → X-OH → H → X-HA → A (2-hop) | Value, Valence |
-> | Scale×Precision | K(Scale×Val+) → X-KA → A(Val+×Prec) | Valence |
+> **Criterion 1: 認知的共線性の排除** (Cognitive Collinearity)
 >
-> **6 Series は10次元ペア空間の基底**であり、X-series 72関係が残り4次元を張る。
-> 103素数の体系核 (1+6+24+72) は分解不能な最小完全体系を示す。
+> Function (Explore/Exploit) と Precision (Certainty/Uncertainty) は FEP において**操作的に同一**:
+> 精度加重 π が高い → Exploit、低い → Explore。テンソル積は自明な対角線
+> (Explore×Uncertainty, Exploit×Certainty) と認知的に稀な例外を生成し、
+> 4つの独立した認知操作を生まない。→ **1ペア排除 (10→9)**
+>
+> Spisak & Friston (2025) の自己直交化 attractor network では、
+> 共線的な次元は自然に融合する。Function×Precision の共線性はその具体例。
+>
+> **Criterion 2: 認知的アクセシビリティ** (Cognitive Accessibility)
+>
+> 残り3ペア (Value×Precision, Function×Valence, Scale×Precision) の認知操作は、
+> **Valence (情動) を経由しないと認知的にアクセスできない** (Damasio ソマティック・マーカー 1994):
+>
+> | Missing Pair | 認知メカニズム | X-series 合成経路 |
+> |:-------------|:-------------|:----------------|
+> | Value×Precision | 認識の確実性は情動を**経由して**評価 | H → X-HA → A |
+> | Function×Valence | 方法の情動評価は認識的価値を**介して** | O → X-OH → H |
+> | Scale×Precision | スケールの精度は情動的に**評価** | K → X-KA → A |
+>
+> → **3ペア排除 (9→6)**
+>
+> **X-series 合成は数学的便宜ではなく認知的事実を反映している**:
+> 合成射が認知メカニズムそのもの (情動を中継とする精度評価) なら、直接射は不要。
 >
 > **独立性分析**: 6 Series のうち A (Akribeia) のみ真に独立（Precision は A にのみ存在）。
 > 他の5つは2-hop合成で到達可能（例: O ≈ S+P, H ≈ S+K）。
@@ -189,12 +204,6 @@ graph TD
 > しかし**直接射 ≠ 合成射** — O(Value×Function)「認識→行動」は
 > S→P の合成「認識→スケーリング→行動」とは認知的に異なる操作である。
 > **6 は最小ではないが最適 (optimal)**: 全ての直接的認知操作をカバーし、冗長な合成射を含まない。
->
-> **10 vs 6 の認知的豊かさ**: missing 4 pairs を直接 Series に昇格させると、
-> 中継座標を飛ばした「近道」モデルになり認知メカニズムの正確性が下がる。
-> 例: M1 (Value×Precision) の直接射は Valence (情動) を経由しないが、
-> 実際の認知では目的の確実さは情動的体験を**経由して**判断される (Damasio ソマティック・マーカー)。
-> **X-series 合成は数学的便宜ではなく認知的事実を反映している** — 合成射が認知メカニズムそのものなら、直接射は不要である。
 >
 > **⚠️ 認知空間の次元について (v3.4 外部レビュー反映)**:
 > 上記の基底論証は「認知空間の次元が6である」ことを**証明していない**。
@@ -377,3 +386,4 @@ graph TD
 *v3.3-axiom — 「公理は選ぶ。定理は生まれる。」追加。d=2 残余カテゴリ明示。各座標の2値性根拠追加。基底論証（なぜ10ではなく6か）+ 独立性分析 + 10 vs 6 認知的豊かさ比較。/dia+ BS-1〜5 検証 + /noe++ 結論反映 (2026-02-13)*
 *v3.4-axiom — 外部レビュー反映: 生成規則の認識論的位置を正直に追記 (motivated choice)。定理²に「認知モジュール」の別称追加。CCL チューリング完全性主張を下方修正 (ccl_language.md)。108象徴性に「偶然の一致」明記 (hegemonikon.md) (2026-02-14)*
 *v3.5-axiom — 外部レビュー5ラウンド・ディベート結論反映: 「導出」→「構成」用語統一。水準B を Axiomatic Construction に修正。ZFC との構造的同型 (Beall & Restall 2000, Logical Pluralism) を明記。スケール差≠質的差異。B 評価確定 (2026-02-14)*
+*v3.6-axiom — 二層フィルター: 隣接距離制約は弁別力ゼロ (全10ペア通過) と判明。Criterion 1 (認知的共線性: Function≈Precision → 1排除) + Criterion 2 (認知的アクセシビリティ: Valence 経由 → 3排除) で10→6を再正当化。Damasio 1994, Seth 2013, Barrett 2017, Spisak & Friston 2025 を根拠として統合 (2026-02-14)*

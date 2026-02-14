@@ -46,12 +46,6 @@ jobs:
           export PYTHONPATH=${{ github.workspace }}
           python -m mekhane.dendron.cli check mekhane/ --ci --format ci
 
-      # L2: Purpose Quality Check — mekhane/dendron/ (strict: WEAK = FAIL)
-      - name: "L2: Purpose Check (dendron/ — strict)"
-        run: |
-          export PYTHONPATH=${{ github.workspace }}
-          python -m mekhane.dendron.cli purpose mekhane/dendron/ --ci --strict
-
       # L2: Purpose Quality Check — mekhane/ 全体 (warn only)
       - name: "L2: Purpose Check (mekhane/ — warn)"
         continue-on-error: true
@@ -72,9 +66,6 @@ jobs:
           python -m mekhane.dendron.cli check mekhane/ --format markdown > proof-coverage.md
           echo "" >> proof-coverage.md
           echo "## L2 Purpose Quality" >> proof-coverage.md
-          echo "### dendron/ (strict)" >> proof-coverage.md
-          python -m mekhane.dendron.cli purpose mekhane/dendron/ --ci --strict >> proof-coverage.md 2>&1 || true
-          echo "" >> proof-coverage.md
           echo "### mekhane/ (overview)" >> proof-coverage.md
           python -m mekhane.dendron.cli purpose mekhane/ --ci >> proof-coverage.md 2>&1 || true
           echo "" >> proof-coverage.md

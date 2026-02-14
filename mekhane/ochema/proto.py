@@ -162,6 +162,7 @@ def extract_planner_response(step: dict) -> dict:
     }
 
 
+# PURPOSE: [L2-auto] モデルエイリアスを proto enum に解決する
 def resolve_model(name: str) -> str:
     """モデルエイリアスを proto enum に解決する。"""
     if name in MODEL_ALIASES:

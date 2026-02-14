@@ -76,13 +76,25 @@ class ResponseCache:
         max_size_mb: float = MAX_CACHE_SIZE_MB,
     ):
         self.cache_dir = cache_dir or DEFAULT_CACHE_DIR
-        self.ttl = ttl
+        # HGK_CACHE_TTL 環境変数で TTL を override 可能
+        import os
+        env_ttl = os.getenv("HGK_CACHE_TTL")
+        self.ttl = int(env_ttl) if env_ttl else ttl
         self.max_size_mb = max_size_mb
         self._hits = 0
         self._misses = 0
 
         # Ensure cache directory exists
         self.cache_dir.mkdir(parents=True, exist_ok=True)
+
+    def to_config_dict(self) -> dict:
+        """Return current cache configuration as a dict."""
+        return {
+            "cache_dir": str(self.cache_dir),
+            "ttl_seconds": self.ttl,
+            "ttl_days": self.ttl / 86400,
+            "max_size_mb": self.max_size_mb,
+        }
 
     def _make_key(
         self,

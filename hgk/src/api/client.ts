@@ -122,6 +122,47 @@ export interface SynteleiaAgentInfo {
     layer: string;
 }
 
+// --- Synedrion Types ---
+export interface SynedrionSweepIssue {
+    perspective_id: string;
+    domain: string;
+    axis: string;
+    severity: string;
+    description: string;
+    recommendation: string;
+}
+export interface SynedrionSweepResult {
+    filepath: string;
+    issue_count: number;
+    issues: SynedrionSweepIssue[];
+    severity: Record<string, number>;
+    silences: number;
+    errors: number;
+    total_perspectives: number;
+    coverage: number;
+    elapsed_seconds: number;
+}
+export interface SynedrionPerspective {
+    id: string;
+    domain: string;
+    axis: string;
+    system_instruction: string;
+}
+export interface SynedrionCacheStats {
+    total_entries: number;
+    size_mb: number;
+    hits: number;
+    misses: number;
+    hit_rate: number;
+    oldest_age_hours: number;
+    ttl_seconds: number;
+    max_size_mb: number;
+}
+export interface SynedrionCacheClear {
+    cleared: number;
+    message: string;
+}
+
 // --- Digestor Types ---
 export interface DigestCandidate {
     title: string;
@@ -302,6 +343,17 @@ export const api = {
             body: JSON.stringify({ content, target_type: targetType }),
         }),
     synteleiaAgents: () => apiFetch<SynteleiaAgentInfo[]>('/api/synteleia/agents'),
+
+    // Synedrion
+    synedrionSweep: (filepath: string, domains?: string[], axes?: string[], maxPerspectives = 10, model = 'gemini-2.0-flash') =>
+        apiFetch<SynedrionSweepResult>('/api/synedrion/sweep', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ filepath, domains, axes, max_perspectives: maxPerspectives, model }),
+        }),
+    synedrionPerspectives: () => apiFetch<SynedrionPerspective[]>('/api/synedrion/perspectives'),
+    synedrionCacheStats: () => apiFetch<SynedrionCacheStats>('/api/synedrion/cache/stats'),
+    synedrionCacheClear: () => apiFetch<SynedrionCacheClear>('/api/synedrion/cache/clear', { method: 'POST' }),
 
     // Digestor
     digestorReports: (limit = 10) =>

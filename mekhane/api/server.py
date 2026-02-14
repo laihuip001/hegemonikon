@@ -158,6 +158,14 @@ def _register_routers(app: FastAPI) -> None:
     except Exception as exc:
         logger.warning("Synteleia router skipped: %s", exc)
 
+    # Synedrion — SweepEngine 多視点スキャン + ResponseCache
+    try:
+        from mekhane.api.routes.synedrion import router as synedrion_router
+        app.include_router(synedrion_router, prefix=API_PREFIX)
+        logger.info("Synedrion router registered")
+    except Exception as exc:
+        logger.warning("Synedrion router skipped: %s", exc)
+
     # Timeline — セッション・タイムライン (ファイルシステム IO のみ)
     try:
         from mekhane.api.routes.timeline import router as timeline_router

@@ -322,6 +322,7 @@ class AIAuditor:
         self._check_ai_003_type_confusion()
         self._check_ai_004_logic_hallucination()
         # self._check_ai_005_incomplete_code()  # Disabled: TODOs are intentional metadata
+        self._check_ai_005_code_comment_contradiction()
         self._check_ai_006_context_drift()
         # self._check_ai_007_pattern_inconsistency()  # Disabled: Quote style is not a risk
         self._check_ai_008_self_contradiction()
@@ -670,6 +671,144 @@ class AIAuditor:
                         message="Found TODO/FIXME marker",
                     )
                 )
+
+    # ─────────────────────────────────────────────────────────────
+    # AI-005.μ: Code/Comment Contradiction
+    # ─────────────────────────────────────────────────────────────
+    def _check_ai_005_code_comment_contradiction(self):
+        """Check for contradictions between code and docstrings."""
+        # Skip test files
+        if self.file_path and (
+            "test" in self.file_path.name or "tests" in self.file_path.parts
+        ):
+            return
+
+        for node in ast.walk(self.tree):
+            if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                docstring = ast.get_docstring(node)
+                if not docstring:
+                    continue  # Handled by AI-022 (Test Coverage Gap / Missing Docstring)
+
+                # Check Args mismatch
+                args = [a.arg for a in node.args.args if a.arg not in ("self", "cls")]
+                has_args_section = (
+                    "Args:" in docstring
+                    or "Arguments:" in docstring
+                    or "Parameters:" in docstring
+                )
+
+                if args and not has_args_section:
+                    # Check if args are mentioned inline (e.g. "param x: ...")
+                    has_inline_args = any(f":param {arg}" in docstring for arg in args)
+                    if not has_inline_args:
+                        self.issues.append(
+                            Issue(
+                                code="AI-005",
+                                name="Code/Comment Contradiction",
+                                severity=Severity.HIGH,
+                                line=node.lineno,
+                                message=f"Function '{node.name}' has arguments {args} but docstring lacks Args/Parameters section",
+                                suggestion="Add Args: section to docstring",
+                            )
+                        )
+
+                # Check Returns mismatch
+                if self._has_return_value(node):
+                    has_returns_section = (
+                        "Returns:" in docstring
+                        or "Yields:" in docstring
+                        or ":return:" in docstring
+                    )
+                    if not has_returns_section:
+                        self.issues.append(
+                            Issue(
+                                code="AI-005",
+                                name="Code/Comment Contradiction",
+                                severity=Severity.HIGH,
+                                line=node.lineno,
+                                message=f"Function '{node.name}' returns value but docstring lacks Returns section",
+                                suggestion="Add Returns: section to docstring",
+                            )
+                        )
+
+                # Check Raises mismatch
+                if self._has_raise(node):
+                    has_raises_section = "Raises:" in docstring or ":raise" in docstring
+                    if not has_raises_section:
+                        self.issues.append(
+                            Issue(
+                                code="AI-005",
+                                name="Code/Comment Contradiction",
+                                severity=Severity.MEDIUM,
+                                line=node.lineno,
+                                message=f"Function '{node.name}' raises exception but docstring lacks Raises section",
+                                suggestion="Add Raises: section to docstring",
+                            )
+                        )
+
+    def _has_return_value(self, node: ast.FunctionDef | ast.AsyncFunctionDef) -> bool:
+        """Check if function node returns a value (not None)."""
+        nodes_to_check = list(node.body)
+        while nodes_to_check:
+            curr = nodes_to_check.pop(0)
+            if isinstance(curr, ast.Return) and curr.value is not None:
+                if isinstance(curr.value, ast.Constant) and curr.value.value is None:
+                    continue
+                return True
+
+            # Add children if they are control flow, but NOT new scopes
+            if isinstance(
+                curr,
+                (
+                    ast.If,
+                    ast.For,
+                    ast.AsyncFor,
+                    ast.While,
+                    ast.Try,
+                    ast.With,
+                    ast.AsyncWith,
+                    ast.ExceptHandler,
+                ),
+            ):
+                for _, value in ast.iter_fields(curr):
+                    if isinstance(value, list):
+                        for item in value:
+                            if isinstance(item, ast.AST):
+                                nodes_to_check.append(item)
+                    elif isinstance(value, ast.AST):
+                        nodes_to_check.append(value)
+            # Do NOT add FunctionDef, AsyncFunctionDef, ClassDef
+        return False
+
+    def _has_raise(self, node: ast.FunctionDef | ast.AsyncFunctionDef) -> bool:
+        """Check if function node raises exception."""
+        nodes_to_check = list(node.body)
+        while nodes_to_check:
+            curr = nodes_to_check.pop(0)
+            if isinstance(curr, ast.Raise):
+                return True
+
+            if isinstance(
+                curr,
+                (
+                    ast.If,
+                    ast.For,
+                    ast.AsyncFor,
+                    ast.While,
+                    ast.Try,
+                    ast.With,
+                    ast.AsyncWith,
+                    ast.ExceptHandler,
+                ),
+            ):
+                for _, value in ast.iter_fields(curr):
+                    if isinstance(value, list):
+                        for item in value:
+                            if isinstance(item, ast.AST):
+                                nodes_to_check.append(item)
+                    elif isinstance(value, ast.AST):
+                        nodes_to_check.append(value)
+        return False
 
     # ─────────────────────────────────────────────────────────────
     # AI-006: Context Drift

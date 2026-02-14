@@ -30,6 +30,7 @@ logger = logging.getLogger("hegemonikon.api.quota")
 
 # --- Response Models ---
 
+# PURPOSE: [L2-auto] Individual model quota info
 class QuotaModel(BaseModel):
     """個別モデルの Quota 情報。"""
     label: str

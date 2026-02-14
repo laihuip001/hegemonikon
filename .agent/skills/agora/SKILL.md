@@ -4,6 +4,11 @@ description: HGK 収益化プロジェクト — ディープインパクト戦�
 triggers:
   - "agora"
   - "agora"
+risk_tier: L1
+risks:
+  - description: No significant risks identified
+    severity: low
+    mitigation: Standard review
 ---
 
 # Agora

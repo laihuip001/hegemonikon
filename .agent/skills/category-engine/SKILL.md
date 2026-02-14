@@ -12,6 +12,11 @@ triggers:
   - 構造の保存・忘却を問う時
   - Trigonon / X-series を参照する時
   - 「なぜこの変換は正当か」を問う時
+risk_tier: L1
+risks:
+  - description: No significant risks identified
+    severity: low
+    mitigation: Standard review
 ---
 
 # 🏛️ Category Theory Engine — 構造認識の言語

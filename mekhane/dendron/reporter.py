@@ -219,6 +219,10 @@ class DendronReporter:  # noqa: AI-007
     # PURPOSE: CI 向け最小出力 (v3: L2 Purpose 対応)
     def _report_ci(self, result: CheckResult):
         """CI 向け最小出力 (v3: L2 Purpose 対応)"""
+        # L1 Mode check: if only files_missing/invalid are counted, use that for status icon
+        # result.is_passing is strict (based on models.py), so we assume CLI logic handles exit code.
+        # But for the visual output, we trust result.is_passing unless overridden.
+
         if result.is_passing:
             stats = result.level_stats
             level_str = f" (L1:{stats.get('L1', 0)}/L2:{stats.get('L2', 0)}/L3:{stats.get('L3', 0)})" if stats else ""

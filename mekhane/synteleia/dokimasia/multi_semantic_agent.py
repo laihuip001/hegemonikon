@@ -1,8 +1,6 @@
 # PROOF: [S3/Stathmos] <- mekhane/synteleia/dokimasia/multi_semantic_agent.py Multi Semantic Agent
 # PURPOSE: Multi-LLM アンサンブル監査エージェント (Layer B: Nous)
 """
-PROOF: [S3/Stathmos] <- mekhane/synteleia/dokimasia/multi_semantic_agent.py
-
 MultiSemanticAgent — Multi-LLM Cognitive Ensemble
 
 複数の LLM に異なる persona を付与し、合議で品質を判定する。

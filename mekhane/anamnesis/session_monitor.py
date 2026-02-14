@@ -2,8 +2,6 @@
 # PROOF: [P3/Anamnesis] <- mekhane/anamnesis/session_monitor.py Session Monitor
 # PURPOSE: LS API ポーリングでアクティブセッションをリアルタイムにモニターし MD 保存する
 """
-PROOF: [P3/Anamnesis] <- mekhane/anamnesis/session_monitor.py
-
 Session Monitor — リアルタイムセッションログ保存
 
 AntigravityClient を使って LS API をポーリングし、

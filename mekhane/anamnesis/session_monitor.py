@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/インフラ] <- mekhane/anamnesis/ セッション状態を監視→人間介入を促す→session_monitor が担う
 # PURPOSE: LS API ポーリングでアクティブセッションをリアルタイムにモニターし MD 保存する
 """
 PROOF: [L2/インフラ] <- mekhane/anamnesis/

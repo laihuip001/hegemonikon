@@ -1,3 +1,4 @@
+# PROOF: [L3/ドメイン] <- mekhane/synteleia/dokimasia/ 多角的レビューを実行→合意形成を図る→multi_semantic_agent が担う
 # PURPOSE: Multi-LLM アンサンブル監査エージェント (Layer B: Nous)
 """
 MultiSemanticAgent — Multi-LLM Cognitive Ensemble

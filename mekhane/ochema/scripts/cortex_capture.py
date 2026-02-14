@@ -1,3 +1,4 @@
+# PROOF: [L2/Tool] <- mekhane/ochema/scripts/ トラフィックを捕捉→分析可能にする→cortex_capture が担う
 """
 Cortex API MITM Capture Script for mitmproxy.
 

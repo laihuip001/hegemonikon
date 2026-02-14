@@ -1,11 +1,12 @@
 ---
 doc_id: "FEP_EPISTEMIC_STATUS"
-version: "1.0.0"
+version: "1.1.0"
 tier: "KERNEL"
 status: "CANONICAL"
 created: "2026-02-14"
 updated: "2026-02-14"
 origin: "/ccl-nous × 2 + /sop (Deep Researcher) + Creator dialogue"
+related: ["axiom_hierarchy.md", "DX-012_universality_dilemma.md", "DX-013_limit_test_principle.md"]
 ---
 
 > **Kernel Doc Index**: [SACRED_TRUTH](SACRED_TRUTH.md) | [axiom_hierarchy](axiom_hierarchy.md) | [fep_epistemic_status](fep_epistemic_status.md) ← 📍
@@ -135,8 +136,11 @@ FEP は **Cog** の **終対象** (terminal object) の候補:
 
 ### 批判の核心
 
-> 「FEP は反証不能でトートロジー的」「あらゆる結果を後付けで説明する」「何も説明しない」
-> — Mangalam et al. (2025), "The myth of the Bayesian brain"
+> **「FEP は反証不能でトートロジー的」「あらゆる結果を後付けで説明する」「何も説明しない」**
+> — Mangalam M (2025), "The myth of the Bayesian brain", Eur J Appl Physiol 125(10):2643-2677, doi:10.1007/s00421-025-05855-6
+>
+> **追加論点**: Mangalam は FEP/Bayesian brain が "mathematical mystique" と "institutional momentum" によって維持されていると主張。
+> 代替枠組みとして dynamic systems theory, ecological psychology, embodied cognition を提示。
 
 ### 応答: カテゴリーの混同
 
@@ -171,11 +175,16 @@ Mangalam の批判は FEP を**科学的仮説**として評価している。�
 
 ### axiom_hierarchy との整合
 
+> **統合判断 (2026-02-14)**: 本ドキュメントと `axiom_hierarchy.md` は**独立文書として維持**する。
+> 理由: (1) 本文書は FEP の認識論的地位に特化、axiom_hierarchy は体系構造に特化。
+> (2) 統合すると 700+ 行になり可読性が低下する。(3) 相互参照で十分に文脈が通る。
+
 `axiom_hierarchy.md` v3.6 は既に以下を明記している:
 
-- L99-101: 水準B (公理的構成) を主張、水準A (形式的導出) は主張しない
-- L113-116: 生成規則は motivated choice
-- L81-83: ZFC の公理選択との構造的同型
+- [L99-101](axiom_hierarchy.md): 水準B (公理的構成) を主張、水準A (形式的導出) は主張しない
+- [L113-116](axiom_hierarchy.md): 生成規則は motivated choice
+- [L81-83](axiom_hierarchy.md): ZFC の公理選択との構造的同型
+- [L159-186](axiom_hierarchy.md): Spisak & Friston (2025) による直交性の必然性
 
 本ドキュメントは、これらの記述を**認識論的に補完**する:
 
@@ -232,10 +241,11 @@ FEP は数学と科学の**中間**にある。数学のように公理的であ
 
 | 文献 | 関連 |
 |:-----|:-----|
-| Mangalam et al. (2025), "The myth of the Bayesian brain" | FEP への最新批判 |
+| Mangalam M (2025), "The myth of the Bayesian brain" | Bayesian brain / FEP への包括的批判。Eur J Appl Physiol 125(10):2643-2677. doi:10.1007/s00421-025-05855-6 |
 | Biehl et al. (2021), "A Technical Critique of FEP" | FEP の技術的誤謬 |
 | Hossenfelder (2018), "Lost in Math" | 美しさバイアスの教訓 |
 | Shen et al. (2025), "Alignment between Brains and AI" | 構造的収束の大規模実証 |
+| Levins R (1966), "The Strategy of Model Building in Population Biology" | GRP トレードオフ (Generality-Realism-Precision)。E×P≈const の先行研究 |
 | [axiom_hierarchy.md](axiom_hierarchy.md) | HGK の公理構造 (v3.6) |
 | Deep Researcher 調査 (2026-02-14) | 96+文献の体系的調査 |
 | Creator 対話 (2026-02-14 19:15) | 「1」の比喩、メタ原理の弁証法 |

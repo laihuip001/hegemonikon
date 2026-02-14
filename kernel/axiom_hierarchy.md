@@ -484,7 +484,8 @@ CCL の派生 (+/-/*) を 2-cell（射の間の射）として扱う構想:
 
 ## 参照
 
-- **FEP の認識論的地位**: [fep_epistemic_status.md](fep_epistemic_status.md)
+- **FEP の認識論的地位**: [fep_epistemic_status.md](fep_epistemic_status.md) — FEP はメタ原理 (α≈1)。予測力の欠如は普遍性の代償であり欠陥ではない。Friston 自身は GUT を主張せず、進化論と同型のパラダイム (Sánchez-Cañizares 2021)
+- **普遍性のジレンマ**: [DX-012](doxa/DX-012_universality_dilemma.md) — E(α)×P(α)≈const。HGK はメタ原理 (α≈1) から具体的操作 (α≈0.1) への**コンパイラ**
 - **三角形構造**: [trigonon.md](trigonon.md)
 - **関係層**: [taxis.md](taxis.md)
 - **命名規則**: [naming_conventions.md](naming_conventions.md)

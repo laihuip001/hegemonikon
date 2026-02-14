@@ -1,6 +1,6 @@
 # Hegemonikón (HGK) — Identity Document
 
-> **Version**: v3.5 | **Last updated**: 2026-02-13
+> **Version**: v3.6 | **Last updated**: 2026-02-14
 > **Creator**: makaron8426 | **Primary Agent**: Claude (Antigravity)
 
 ## HGK とは何か
@@ -33,12 +33,12 @@ Hegemonikón はストア哲学の「指導理性」に基づく**認知ハイ�
 
 | Series | T1 | T2 | T3 | T4 |
 |:-------|:---|:---|:---|:---|
-| O | Noēsis (直観) | Boulēsis (意志) | Zētēsis (探求) | Energeia (行為) |
-| S | Logos (言語) | Mekhanē (方法) | Tekhnē (技術) | Praxis (実践) |
-| H | Propatheia (前感情) | Pistis (確信) | Orexis (欲求) | Doxa (信念) |
-| P | Topos (場所) | Chronos (時間) | Kairos (機会) | Horizōn (境界) |
-| K | Sympatheia (共感) | Synesis (理解) | Phronēsis (判断) | Sophia (知恵) |
-| A | Metron (測定) | Krisis (判定) | Elenchus (論駁) | Epistēmē (知識) |
+| O | Noēsis (認識推論) | Boulēsis (意志推論) | Zētēsis (探索行動) | Energeia (実用行動) |
+| S | Metron (スケール流動) | Mekhanē (方法流動) | Stathmos (スケール価値) | Praxis (方法価値) |
+| H | Propatheia (流動傾向) | Pistis (流動確信) | Orexis (価値傾向) | Doxa (価値確信) |
+| P | Khōra (スケール場) | Hodos (スケール方法) | Trokhia (方法スケール) | Tekhnē (方法場) |
+| K | Eukairia (スケール傾向) | Chronos (スケール確信) | Telos (方法傾向) | Sophia (方法確信) |
+| A | Pathos (二重傾向) | Krisis (傾向確信) | Gnōmē (確信傾向) | Epistēmē (二重確信) |
 
 ## 核心ルール
 

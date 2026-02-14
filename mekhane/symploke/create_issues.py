@@ -20,6 +20,7 @@ import json
 import os
 import subprocess
 import sys
+from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
 
@@ -28,6 +29,16 @@ try:
 except ImportError:
     print("ERROR: aiohttp not installed. Run: pip install aiohttp")
     sys.exit(1)
+
+
+# PURPOSE: Issue モデル
+@dataclass
+class Issue:
+    """GitHub Issue を表すデータクラス。"""
+    title: str
+    body: str
+    labels: list[str] = field(default_factory=list)
+    assignees: list[str] = field(default_factory=list)
 
 
 # === 定数 ===
@@ -109,11 +120,11 @@ def extract_sessions(result_file: Path) -> list[dict]:
 
 
 # PURPOSE: セッション結果から Issue 本文を生成
-def format_issue(session_info: dict, session_data: dict) -> dict | None:
-    """セッション結果を GitHub Issue の title/body に変換
+def format_issue(session_info: dict, session_data: dict) -> Issue | None:
+    """セッション結果を Issue オブジェクトに変換
 
     Returns:
-        {"title": ..., "body": ..., "labels": [...]} or None (Issue 不要)
+        Issue オブジェクト or None (Issue 不要)
     """
     state = session_data.get("state", "UNKNOWN")
 
@@ -170,32 +181,28 @@ def format_issue(session_info: dict, session_data: dict) -> dict | None:
     if pr_url:
         labels.append("has-pr")
 
-    return {
-        "title": title,
-        "body": "\n".join(body_lines),
-        "labels": labels,
-    }
+    return Issue(title=title, body="\n".join(body_lines), labels=labels)
 
 
 # PURPOSE: gh CLI で Issue を作成
-def create_github_issue(title: str, body: str, labels: list[str], repo: str, dry_run: bool = False) -> str | None:
+def create_github_issue(issue: Issue, repo: str, dry_run: bool = False) -> str | None:
     """gh CLI で GitHub Issue を作成"""
     if dry_run:
         print(f"\n{'='*60}")
-        print(f"[DRY RUN] Issue: {title}")
-        print(f"Labels: {', '.join(labels)}")
+        print(f"[DRY RUN] Issue: {issue.title}")
+        print(f"Labels: {', '.join(issue.labels)}")
         print(f"{'='*60}")
-        print(body)
+        print(issue.body)
         print(f"{'='*60}\n")
         return None
 
     cmd = [
         "gh", "issue", "create",
         "--repo", repo,
-        "--title", title,
-        "--body", body,
+        "--title", issue.title,
+        "--body", issue.body,
     ]
-    for label in labels:
+    for label in issue.labels:
         cmd.extend(["--label", label])
 
     try:
@@ -292,9 +299,7 @@ async def main():
             continue
 
         url = create_github_issue(
-            title=issue["title"],
-            body=issue["body"],
-            labels=issue["labels"],
+            issue=issue,
             repo=args.repo,
             dry_run=args.dry_run,
         )

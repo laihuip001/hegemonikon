@@ -1,4 +1,5 @@
 # PROOF: [S2/Mekhanē] <- mekhane/ochema/scripts/cortex_capture.py API Capture
+# REASON: Cortex API 通信のキャプチャによる解析支援
 """
 Cortex API MITM Capture Script for mitmproxy.
 

@@ -1,5 +1,6 @@
 # PROOF: [S3/Stathmos] <- mekhane/synteleia/dokimasia/multi_semantic_agent.py Ensemble Audit
 # PURPOSE: Multi-LLM アンサンブル監査エージェント (Layer B: Nous)
+# REASON: 複数LLMによる合議制監査の実現
 """
 MultiSemanticAgent — Multi-LLM Cognitive Ensemble
 

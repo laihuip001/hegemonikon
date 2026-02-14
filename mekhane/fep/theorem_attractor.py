@@ -1115,13 +1115,13 @@ class TheoremAttractor:
         from mekhane.fep.gpu import to_tensor
         state = to_tensor(initial, self._device)
         T = self._transition_matrix
-        I = to_tensor(inhib if isinstance(inhib, np.ndarray) else inhib.cpu().numpy(),
-                      self._device)
+        inhib_matrix = to_tensor(inhib if isinstance(inhib, np.ndarray) else inhib.cpu().numpy(),
+                                 self._device)
         states = [self._make_flow_state(0, initial)]
 
         for step in range(1, steps + 1):
             excitation = state @ T
-            inhibition = state @ I
+            inhibition = state @ inhib_matrix
             state = torch.clamp(excitation - beta * inhibition, min=0)
             # Re-normalize
             s = state.sum()
@@ -1151,12 +1151,12 @@ class TheoremAttractor:
         state = initial.copy()
         T = self._transition_matrix if isinstance(self._transition_matrix, np.ndarray) \
             else self._transition_matrix.cpu().numpy()
-        I = inhib if isinstance(inhib, np.ndarray) else inhib.cpu().numpy()
+        inhib_matrix = inhib if isinstance(inhib, np.ndarray) else inhib.cpu().numpy()
         states = [self._make_flow_state(0, state)]
 
         for step in range(1, steps + 1):
             excitation = state @ T
-            inhibition = state @ I
+            inhibition = state @ inhib_matrix
             state = np.maximum(excitation - beta * inhibition, 0)
             # Re-normalize
             s = state.sum()

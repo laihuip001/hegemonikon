@@ -9,13 +9,16 @@ import asyncio
 import os
 import sys
 import pytest
+from unittest.mock import MagicMock
 
 # Add parent to path
 sys.path.insert(0, "/home/makaron8426/oikos/hegemonikon")
 
+# Mock aiohttp if not available to allow JulesClient import
 try:
     import aiohttp
 except ImportError:
+    sys.modules["aiohttp"] = MagicMock()
     aiohttp = None
 
 from mekhane.symploke.jules_client import JulesClient

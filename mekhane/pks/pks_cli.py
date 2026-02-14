@@ -137,6 +137,7 @@ def cmd_health(args: argparse.Namespace) -> None:
             checks.append((name, "❌", str(e)[:60], f"{elapsed:.1f}s"))
 
     # 1. LanceDB (Gnōsis)
+    # PURPOSE: [L2-auto] check_gnosis
     def check_gnosis():
         from mekhane.anamnesis.index import GnosisIndex as AI
         gi = AI()
@@ -144,6 +145,7 @@ def cmd_health(args: argparse.Namespace) -> None:
         return f"{s.get('total', 0):,} docs"
     _check("Gnōsis (LanceDB)", check_gnosis)
 
+    # PURPOSE: [L2-auto] check_kairos
     # 2. Kairos index
     def check_kairos():
         pkl = Path.home() / "oikos" / "mneme" / ".hegemonikon" / "indices" / "kairos.pkl"

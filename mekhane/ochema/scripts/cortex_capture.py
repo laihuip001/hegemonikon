@@ -1,4 +1,8 @@
+# PROOF: [L2/Hodos] <- mekhane/ochema/scripts/
+# PURPOSE: Antigravity LS 通信を mitmproxy でキャプチャするスクリプト
 """
+PROOF: [L2/インフラ] <- mekhane/ochema/scripts/
+
 Cortex API MITM Capture Script for mitmproxy.
 
 LS → Cortex (daily-cloudcode-pa.googleapis.com) 間の gRPC 通信をキャプチャし、

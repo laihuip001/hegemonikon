@@ -1,6 +1,9 @@
+# PROOF: [E3/Dokimasia] <- mekhane/synteleia/dokimasia/
 # PURPOSE: Multi-LLM アンサンブル監査エージェント (Layer B: Nous)
 """
-MultiSemanticAgent — Multi-LLM Cognitive Ensemble
+PROOF: [L3/ドメイン] <- mekhane/synteleia/dokimasia/
+
+Multi-Semantic Agent — Multi-LLM Cognitive Ensemble
 
 複数の LLM に異なる persona を付与し、合議で品質を判定する。
 「三人寄れば文殊の知恵」の実装。

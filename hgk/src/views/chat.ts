@@ -41,6 +41,7 @@ let apiKey = '';
 let systemInstruction = 'あなたは Hegemonikón の認知支援AIです。日本語で応答してください。簡潔かつ正確に。';
 
 const MODELS: Record<string, string> = {
+    'cortex-gemini': '🆓 Cortex Gemini (無課金 2MB)',
     'gemini-3-pro-preview': 'Gemini 3 Pro Preview',
     'gemini-3-flash-preview': 'Gemini 3 Flash Preview',
     'gemini-2.5-pro': 'Gemini 2.5 Pro',

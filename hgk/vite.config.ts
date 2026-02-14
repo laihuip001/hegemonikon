@@ -21,8 +21,15 @@ export default defineConfig(async () => ({
             }
             : undefined,
         watch: {
-            // 3. tell vite to ignore watching `src-tauri`
-            ignored: ["**/src-tauri/**"],
+            // Avoid inotify watchers entirely — Firefox ESR consumes 90K+ FDs,
+            // leaving none for chokidar. Polling is slower but stable.
+            usePolling: true,
+            interval: 1000,
+            ignored: [
+                "**/src-tauri/**",
+                "**/node_modules/**",
+                "**/.git/**",
+            ],
         },
     },
 }));

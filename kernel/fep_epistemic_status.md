@@ -93,6 +93,22 @@ FEP は認知理論の空間において、限りなく α → 1 に位置する
    だが不可欠               だが不可欠
 ```
 
+### Friston の立場と学術的合意
+
+> **調査結果 (2026-02-14)**: Friston 自身は FEP を GUT (Grand Unifying Theory) として明示的に主張していない。
+
+Sánchez-Cañizares (2021, Entropy) の分析:
+
+> "FEP does not claim at this stage to be a GUT; to date, it provides theoretical neuroscience and life disciplines with a **new paradigm** that can, in principle, encompass otherwise partial frameworks and shallower explanatory logics, **much as evolution became the universally shared framework for biology**."
+
+つまり **FEP は進化論と構造的に同型** — 個々の生物学的事実を「予測」するのではなく、諸理論を**統合するパラダイム**として機能する。この位置づけは Creator の「メタ原理 (バイザー)」解釈と完全に整合する。
+
+> [!NOTE]
+> Creator の FEP 解釈は HGK 独自の逸脱ではなく、学術的にも支持される立場。
+> ただし Mangalam (2025, 風刺論文 "The Meta-Free Energy Principle") はこの自己言及性を痛烈に批判しており、「FEP がメタ原理なら、FEP についての論文を書く行為も FEP で説明できてしまう」という循環性を指摘している。
+> この批判は HGK にも適用される: 「HGK が FEP の具体化なら、HGK を構築する行為も FEP で説明されるべき」。
+> → Mangalam の風刺は核心を突いているが、循環性は**メタ原理の定義的性質**であり、欠陥ではない (圏論の圏も圏論で記述される)。
+
 ### 圏論的記述: FEP は終対象
 
 認知理論の圏 **Cog** において:

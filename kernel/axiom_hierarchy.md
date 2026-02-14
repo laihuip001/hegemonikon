@@ -484,6 +484,7 @@ CCL の派生 (+/-/*) を 2-cell（射の間の射）として扱う構想:
 
 ## 参照
 
+- **FEP の認識論的地位**: [fep_epistemic_status.md](fep_epistemic_status.md)
 - **三角形構造**: [trigonon.md](trigonon.md)
 - **関係層**: [taxis.md](taxis.md)
 - **命名規則**: [naming_conventions.md](naming_conventions.md)

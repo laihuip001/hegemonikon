@@ -33,7 +33,10 @@ import time
 from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
-from typing import Optional
+from typing import Any, Optional, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from mekhane.ergasterion.tekhne.sweep_engine import SweepEngine
 
 logger = logging.getLogger(__name__)
 
@@ -74,7 +77,7 @@ class AggregatedReport:
     """Aggregated results across multiple files."""
 
     files: list[str] = field(default_factory=list)
-    file_reports: dict = field(default_factory=dict)  # filepath -> SweepReport.to_dict()
+    file_reports: dict[str, dict[str, Any]] = field(default_factory=dict)
     total_issues: int = 0
     total_critical: int = 0
     total_major: int = 0
@@ -113,12 +116,12 @@ class AggregatedReport:
             f"| Cache misses | {self.cache_misses} |",
         ]
 
-        # Top issues across all files
+        # Top issues across all files (copy to avoid mutating internal state)
         all_issues = []
         for fp, report_dict in self.file_reports.items():
             for issue in report_dict.get("issues", []):
-                issue["_file"] = fp
-                all_issues.append(issue)
+                enriched = {**issue, "_file": fp}
+                all_issues.append(enriched)
 
         severity_order = {"critical": 4, "major": 3, "minor": 2, "info": 1}
         all_issues.sort(
@@ -214,7 +217,7 @@ class TekhnePipeline:
 
     def __init__(self, config: Optional[PipelineConfig] = None):
         self.config = config or PipelineConfig()
-        self._engine = None
+        self._engine: Optional[SweepEngine] = None
 
     def _get_engine(self):
         """Lazy-load SweepEngine."""
@@ -227,26 +230,63 @@ class TekhnePipeline:
         return self._engine
 
     def _collect_targets(self, path: str) -> list[str]:
-        """Collect target files from a path (file or directory)."""
-        p = Path(path)
+        """Collect target files from a path (file or directory).
+
+        Resolves symlinks and validates paths to prevent traversal attacks.
+        """
+        p = Path(path).resolve()
         if p.is_file():
             return [str(p)]
         elif p.is_dir():
+            base = p
             targets = []
             for f in sorted(p.rglob("*")):
+                resolved = f.resolve()
+                # Path traversal guard: ensure resolved path is under base
+                if not str(resolved).startswith(str(base)):
+                    logger.warning("Skipping symlink escape: %s -> %s", f, resolved)
+                    continue
                 if (
-                    f.is_file()
-                    and f.suffix in SUPPORTED_EXTENSIONS
+                    resolved.is_file()
+                    and resolved.suffix in SUPPORTED_EXTENSIONS
                     and not any(
                         part.startswith(".")
-                        for part in f.relative_to(p).parts
+                        for part in resolved.relative_to(base).parts
                     )
-                    and "__pycache__" not in str(f)
+                    and "__pycache__" not in str(resolved)
                 ):
-                    targets.append(str(f))
+                    targets.append(str(resolved))
             return targets
         else:
             raise FileNotFoundError(f"Target not found: {path}")
+
+    def _aggregate_sweep(
+        self,
+        report: AggregatedReport,
+        sweep_report: Any,
+        filepath: str,
+    ) -> None:
+        """Aggregate a single sweep result into the report (DRY helper)."""
+        report_dict = sweep_report.to_dict()
+        report.file_reports[filepath] = report_dict
+
+        sev = sweep_report.by_severity()
+        report.total_issues += sweep_report.issue_count
+        report.total_critical += sev.get("critical", 0)
+        report.total_major += sev.get("major", 0)
+        report.total_minor += sev.get("minor", 0)
+        report.total_info += sev.get("info", 0)
+        report.total_perspectives += sweep_report.total_perspectives
+        report.total_silences += sweep_report.silences
+        report.total_errors += sweep_report.errors
+
+    def _finalize_cache_stats(self, report: AggregatedReport) -> None:
+        """Populate cache statistics from engine."""
+        engine = self._engine
+        if engine and engine.use_cache and engine._cache:
+            cache_stats = engine._cache.stats()
+            report.cache_hits = cache_stats.hits
+            report.cache_misses = cache_stats.misses
 
     def run(
         self,
@@ -271,7 +311,6 @@ class TekhnePipeline:
         domains = domains or self.config.domains
         axes = axes or self.config.axes
         max_perspectives = max_perspectives or self.config.max_perspectives
-        top_n = top_n or self.config.top_n
 
         start = time.time()
         files = self._collect_targets(target)
@@ -293,29 +332,12 @@ class TekhnePipeline:
                     domains=domains,
                     axes=axes,
                 )
-                report_dict = sweep_report.to_dict()
-                report.file_reports[filepath] = report_dict
-
-                sev = sweep_report.by_severity()
-                report.total_issues += sweep_report.issue_count
-                report.total_critical += sev.get("critical", 0)
-                report.total_major += sev.get("major", 0)
-                report.total_minor += sev.get("minor", 0)
-                report.total_info += sev.get("info", 0)
-                report.total_perspectives += sweep_report.total_perspectives
-                report.total_silences += sweep_report.silences
-                report.total_errors += sweep_report.errors
-
+                self._aggregate_sweep(report, sweep_report, filepath)
             except Exception as e:
                 logger.error("Failed to scan %s: %s", filepath, e)
                 report.file_reports[filepath] = {"error": str(e)}
 
-        # Cache stats
-        if engine.use_cache and engine._cache:
-            cache_stats = engine._cache.stats()
-            report.cache_hits = cache_stats.hits
-            report.cache_misses = cache_stats.misses
-
+        self._finalize_cache_stats(report)
         report.elapsed_seconds = time.time() - start
         return report
 
@@ -335,7 +357,6 @@ class TekhnePipeline:
         domains = domains or self.config.domains
         axes = axes or self.config.axes
         max_perspectives = max_perspectives or self.config.max_perspectives
-        top_n = top_n or self.config.top_n
 
         start = time.time()
         files = self._collect_targets(target)
@@ -358,29 +379,12 @@ class TekhnePipeline:
                     axes=axes,
                     max_concurrency=self.config.max_concurrency,
                 )
-                report_dict = sweep_report.to_dict()
-                report.file_reports[filepath] = report_dict
-
-                sev = sweep_report.by_severity()
-                report.total_issues += sweep_report.issue_count
-                report.total_critical += sev.get("critical", 0)
-                report.total_major += sev.get("major", 0)
-                report.total_minor += sev.get("minor", 0)
-                report.total_info += sev.get("info", 0)
-                report.total_perspectives += sweep_report.total_perspectives
-                report.total_silences += sweep_report.silences
-                report.total_errors += sweep_report.errors
-
+                self._aggregate_sweep(report, sweep_report, filepath)
             except Exception as e:
                 logger.error("Failed to scan %s: %s", filepath, e)
                 report.file_reports[filepath] = {"error": str(e)}
 
-        # Cache stats
-        if engine.use_cache and engine._cache:
-            cache_stats = engine._cache.stats()
-            report.cache_hits = cache_stats.hits
-            report.cache_misses = cache_stats.misses
-
+        self._finalize_cache_stats(report)
         report.elapsed_seconds = time.time() - start
         return report
 
@@ -399,7 +403,7 @@ class TekhnePipeline:
             Path to saved report file
         """
         if output_path:
-            path = Path(output_path)
+            path = Path(output_path).resolve()
         else:
             out_dir = self.config.output_dir or Path.home() / ".cache" / "hegemonikon" / "tekhne" / "reports"
             out_dir.mkdir(parents=True, exist_ok=True)

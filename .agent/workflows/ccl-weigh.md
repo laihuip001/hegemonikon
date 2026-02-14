@@ -1,3 +1,5 @@
+version: 1.0.0
+lcm_state: beta
 ---
 description: 量る — /bou*%/noe
 ---

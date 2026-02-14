@@ -1,3 +1,5 @@
+version: 1.0.0
+lcm_state: beta
 ---
 description: "捌く — /s1_F:[×3]{/sta~/chr}_F:[×3]{/kho~/zet}_I:[∅]{/sop}_/euk_/bou"
 ---

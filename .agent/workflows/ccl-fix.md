@@ -1,3 +1,5 @@
+version: 1.0.0
+lcm_state: beta
 ---
 description: "直す — /kho_/tel_C:{/dia+_/ene+}_I:[✓]{/pis_/dox-}"
 ---

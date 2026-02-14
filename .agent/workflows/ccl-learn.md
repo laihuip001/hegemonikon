@@ -1,3 +1,5 @@
+version: 1.0.0
+lcm_state: beta
 ---
 description: "刻む — /pro_/dox+_F:[×2]{/u+~(/noe*/dia)}_~(/h*/k)_/pis_/bye+"
 ---

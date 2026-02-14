@@ -1,3 +1,4 @@
+lcm_state: beta
 ---
 
 hegemonikon: Akribeia

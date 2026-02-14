@@ -138,6 +138,7 @@ def cmd_health(args: argparse.Namespace) -> None:
 
     # 1. LanceDB (Gnōsis)
     def check_gnosis():
+        # PURPOSE: [L2-auto] GnosisIndex ヘルスチェック
         from mekhane.anamnesis.index import GnosisIndex as AI
         gi = AI()
         s = gi.stats()
@@ -146,6 +147,7 @@ def cmd_health(args: argparse.Namespace) -> None:
 
     # 2. Kairos index
     def check_kairos():
+        # PURPOSE: [L2-auto] KairosIndex ヘルスチェック
         pkl = Path.home() / "oikos" / "mneme" / ".hegemonikon" / "indices" / "kairos.pkl"
         if not pkl.exists():
             raise FileNotFoundError("kairos.pkl not found")

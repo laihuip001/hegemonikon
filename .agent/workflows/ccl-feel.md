@@ -1,3 +1,5 @@
+version: 1.0.0
+lcm_state: beta
 ---
 description: "感じる — /pro_/ore~(/pis_/ana)_/dox-"
 ---

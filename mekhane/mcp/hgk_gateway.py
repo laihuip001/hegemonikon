@@ -384,7 +384,7 @@ class HGKOAuthProvider(OAuthAuthorizationServerProvider[AuthorizationCode, Refre
             return rt
         return None
 
-    # PURPOSE: hgk_gateway の exchange refresh token 処理を実行する
+# PURPOSE: [L2-auto] hgk_gateway の exchange refresh token 処理を実行する
     async def exchange_refresh_token(
         self,
         client: OAuthClientInformationFull,

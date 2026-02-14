@@ -23,7 +23,7 @@ if str(_HEGEMONIKON_ROOT) not in sys.path:
     sys.path.insert(0, str(_HEGEMONIKON_ROOT))
 
 
-# PURPOSE: SelfAdvocate 一人称メッセージを出力するヘルパー
+# PURPOSE: [L2-auto] SelfAdvocate 一人称メッセージを出力するヘルパー
 def _print_advocacy(nuggets, engine) -> None:
     """SelfAdvocate で論文一人称メッセージを生成・出力"""
     try:
@@ -43,7 +43,7 @@ def _print_advocacy(nuggets, engine) -> None:
         print("\n📭 Advocacy メッセージの生成に失敗しました。")
 
 
-# PURPOSE: `pks stats` — 知識基盤の全体統計を表示
+# PURPOSE: [L2-auto] `pks stats` — 知識基盤の全体統計を表示
 def cmd_stats(args: argparse.Namespace) -> None:
     """知識基盤 (Mnēmē + Gnōsis + PKS) の統計ダッシュボード"""
     import os
@@ -114,7 +114,7 @@ def cmd_stats(args: argparse.Namespace) -> None:
     print()
 
 
-# PURPOSE: `pks health` — Autophōnos 全スタックのヘルスチェック
+# PURPOSE: [L2-auto] `pks health` — Autophōnos 全スタックのヘルスチェック
 def cmd_health(args: argparse.Namespace) -> None:
     """Autophōnos 全コンポーネントの一括検証"""
     import os, time
@@ -228,7 +228,7 @@ def cmd_health(args: argparse.Namespace) -> None:
     print()
 
 
-# PURPOSE: `pks search` — 全インデックス横断検索
+# PURPOSE: [L2-auto] `pks search` — 全インデックス横断検索
 def cmd_search(args: argparse.Namespace) -> None:
     """Gnōsis, Kairos, Sophia, Chronos を横断検索"""
     import os, time
@@ -322,7 +322,7 @@ def cmd_search(args: argparse.Namespace) -> None:
     print()
 
 
-# PURPOSE: `pks rebuild` — Chronos インデックスの再構築
+# PURPOSE: [L2-auto] `pks rebuild` — Chronos インデックスの再構築
 def cmd_rebuild(args: argparse.Namespace) -> None:
     """Chronos インデックスを Handoff ファイルから再構築する"""
     import os, re, time
@@ -390,7 +390,7 @@ def cmd_rebuild(args: argparse.Namespace) -> None:
     print()
 
 
-# PURPOSE: `pks push` — コンテキストに基づく能動的プッシュ
+# PURPOSE: [L2-auto] `pks push` — コンテキストに基づく能動的プッシュ
 def cmd_push(args: argparse.Namespace) -> None:
     """コンテキストに基づく能動的プッシュ"""
     from mekhane.pks.pks_engine import PKSEngine
@@ -442,7 +442,7 @@ def cmd_push(args: argparse.Namespace) -> None:
         _print_advocacy(nuggets, engine)
 
 
-# PURPOSE: `pks suggest` — トピック指定で「聞くべき質問」を生成
+# PURPOSE: [L2-auto] `pks suggest` — トピック指定で「聞くべき質問」を生成
 def cmd_suggest(args: argparse.Namespace) -> None:
     """トピック指定で「聞くべき質問」を生成"""
     from mekhane.pks.pks_engine import PKSEngine
@@ -473,7 +473,7 @@ def cmd_suggest(args: argparse.Namespace) -> None:
     print()
 
 
-# PURPOSE: `pks backlinks` — 擬似バックリンクを表示
+# PURPOSE: [L2-auto] `pks backlinks` — 擬似バックリンクを表示
 def cmd_backlinks(args: argparse.Namespace) -> None:
     """指定トピックの擬似バックリンクを表示"""
     from mekhane.pks.matrix_view import PKSBacklinks
@@ -495,7 +495,7 @@ def cmd_backlinks(args: argparse.Namespace) -> None:
     print(report)
 
 
-# PURPOSE: `pks auto` — Handoff から自動でプッシュ
+# PURPOSE: [L2-auto] `pks auto` — Handoff から自動でプッシュ
 def cmd_auto(args: argparse.Namespace) -> None:
     """Handoff から自動的にトピック抽出してプッシュ"""
     from mekhane.pks.pks_engine import PKSEngine
@@ -552,7 +552,7 @@ def cmd_auto(args: argparse.Namespace) -> None:
         _print_advocacy(nuggets, engine)
 
 
-# PURPOSE: `pks infer` — Attractor ベースのコンテキスト推論 + プッシュ
+# PURPOSE: [L2-auto] `pks infer` — Attractor ベースのコンテキスト推論 + プッシュ
 def cmd_infer(args: argparse.Namespace) -> None:
     """ユーザー入力から Attractor でコンテキスト推論してプッシュ"""
     from mekhane.pks.pks_engine import PKSEngine
@@ -585,7 +585,7 @@ def cmd_infer(args: argparse.Namespace) -> None:
     print(report)
 
 
-# PURPOSE: `pks feedback` — プッシュ反応を記録
+# PURPOSE: [L2-auto] `pks feedback` — プッシュ反応を記録
 def cmd_feedback(args: argparse.Namespace) -> None:
     """プッシュされた知識へのリアクションを記録"""
     from mekhane.pks.pks_engine import PKSEngine
@@ -621,7 +621,7 @@ def cmd_feedback(args: argparse.Namespace) -> None:
     print(f"✅ Feedback recorded: '{args.title}' → {args.reaction}")
 
 
-# PURPOSE: `pks dialog` — プッシュされた知識への対話
+# PURPOSE: [L2-auto] `pks dialog` — プッシュされた知識への対話
 def cmd_dialog(args: argparse.Namespace) -> None:
     """プッシュされた知識に対して対話的に探索"""
     from mekhane.pks.pks_engine import PKSEngine
@@ -662,7 +662,7 @@ def cmd_dialog(args: argparse.Namespace) -> None:
         print(f"不明なアクション: {action}")
 
 
-# PURPOSE: メインエントリポイント
+# PURPOSE: [L2-auto] メインエントリポイント
 def main() -> None:
     """PKS CLI メインエントリポイント"""
     parser = argparse.ArgumentParser(

@@ -55,7 +55,7 @@ class GnosisLanceBridge(DomainIndex):
     def source_type(self) -> SourceType:
         return SourceType.GNOSIS
 
-    # PURPOSE: LanceDB GnosisIndex を遅延初期化
+    # PURPOSE: [L2-auto] LanceDB GnosisIndex を遅延初期化
     def _get_lance_index(self):
         """LanceDB GnosisIndex を遅延初期化"""
         if self._lance_index is None:
@@ -69,7 +69,7 @@ class GnosisLanceBridge(DomainIndex):
             self._lance_index = AnamnesisGnosisIndex(lance_dir=self._lance_dir)
         return self._lance_index
 
-    # PURPOSE: LanceDB 検索 → Symplokē IndexedResult 変換
+    # PURPOSE: [L2-auto] LanceDB 検索 → Symplokē IndexedResult 変換
     def search(self, query: str, k: int = 10, **kwargs) -> List[IndexedResult]:
         """LanceDB 検索 → Symplokē IndexedResult 変換"""
         try:
@@ -103,7 +103,7 @@ class GnosisLanceBridge(DomainIndex):
 
         return results
 
-    # PURPOSE: LanceDB の論文数を返す
+    # PURPOSE: [L2-auto] LanceDB の論文数を返す
     def count(self) -> int:
         """LanceDB の論文数を返す"""
         try:
@@ -112,7 +112,7 @@ class GnosisLanceBridge(DomainIndex):
         except Exception:
             return 0
 
-    # PURPOSE: ブリッジは ingest をサポートしない
+    # PURPOSE: [L2-auto] ブリッジは ingest をサポートしない
     def ingest(self, documents: List[Document]) -> int:
         """ブリッジは ingest をサポートしない (Anamnesis 経由で追加)"""
         raise NotImplementedError(
@@ -120,14 +120,15 @@ class GnosisLanceBridge(DomainIndex):
             "Use Anamnesis GnosisIndex directly."
         )
 
-    # PURPOSE: ブリッジは initialize 不要
+    # PURPOSE: [L2-auto] ブリッジは initialize 不要
     def initialize(self) -> None:
         """ブリッジは initialize 不要 (LanceDB は自己管理)"""
         self._initialized = True
 
-    # PURPOSE: ブリッジは save/load 不要
+    # PURPOSE: [L2-auto] ブリッジは save/load 不要
     def save(self, path: str) -> None:
         pass
 
+    # PURPOSE: [L2-auto] ロード
     def load(self, path: str) -> None:
         self._initialized = True

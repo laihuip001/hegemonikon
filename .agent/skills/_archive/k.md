@@ -1,7 +1,23 @@
 ---
-description: K-series（文脈定理 K1-K12）を駆動し、状況に応じた文脈フィルターを適用する。
+description: "K-series\uFF08\u6587\u8108\u5B9A\u7406 K1-K12\uFF09\u3092\u99C6\u52D5\
+  \u3057\u3001\u72B6\u6CC1\u306B\u5FDC\u3058\u305F\u6587\u8108\u30D5\u30A3\u30EB\u30BF\
+  \u30FC\u3092\u9069\u7528\u3059\u308B\u3002"
 hegemonikon: Kairos
-modules: [K1, K2, K3, K4, K5, K6, K7, K8, K9, K10, K11, K12]
+modules:
+- K1
+- K2
+- K3
+- K4
+- K5
+- K6
+- K7
+- K8
+- K9
+- K10
+- K11
+- K12
+risk_tier: L1
+risks: []
 ---
 
 # /k: 文脈定理ワークフロー

@@ -8,19 +8,27 @@ Creates a minimal PR to test the full workflow.
 import asyncio
 import os
 import sys
+import pytest
 
-sys.path.insert(0, "/home/makaron8426/oikos/hegemonikon")
+# sys.path.insert(0, "/home/makaron8426/oikos/hegemonikon")
 
-from mekhane.symploke.jules_client import JulesClient, SessionState
+# from mekhane.symploke.jules_client import JulesClient, SessionState
 
 
 # PURPOSE: Create a simple test task
-async def create_test_task():
+@pytest.mark.asyncio
+async def test_create_task():
     """Create a simple test task."""
+    # Ensure aiohttp is installed before importing JulesClient
+    pytest.importorskip("aiohttp")
+
+    # Import inside test function to avoid collection error if dependencies missing
+    from mekhane.symploke.jules_client import JulesClient, SessionState
+
     api_key = os.environ.get("JULES_API_KEY")
     if not api_key:
-        print("❌ JULES_API_KEY not set")
-        return False
+        pytest.skip("JULES_API_KEY not set")
+        return
 
     print("=" * 60)
     print("Jules API - Create Test Task")
@@ -59,18 +67,16 @@ async def create_test_task():
         elif final.error:
             print(f"❌ Error: {final.error}")
 
-        return final.state == SessionState.COMPLETED
+        assert final.state == SessionState.COMPLETED
 
     except Exception as e:
         print(f"\n❌ Exception: {e}")
         import traceback
 
         traceback.print_exc()
-        return False
+        raise e
 
 
 if __name__ == "__main__":
-    result = asyncio.run(create_test_task())
-    print(f"\n{'='*60}")
-    print(f"Result: {'SUCCESS' if result else 'FAILED'}")
-    sys.exit(0 if result else 1)
+    # If run as script, execute the test function
+    asyncio.run(test_create_task())

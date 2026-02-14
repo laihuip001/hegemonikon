@@ -2,18 +2,20 @@
 name: Synedrion Council
 description: 偉人評議会 (Synedrion) による多角的レビュー・監査
 triggers:
-  - "評議会"
-  - "レビュー"
-  - "監査"
-  - "synedrion"
-  - "偉人"
-  - "多角"
-  - "批評"
-  - "/syn"
-
-risk_tier: "L1"
+- 評議会
+- レビュー
+- 監査
+- synedrion
+- 偉人
+- 多角
+- 批評
+- /syn
+risk_tier: L1
 risks:
-  - "評議会の意見が合意バイアスに陥る"
+- 評議会の意見が合意バイアスに陥る
+reversible: true
+requires_approval: false
+fallbacks: []
 ---
 
 # Synedrion Council

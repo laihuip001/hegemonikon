@@ -2,8 +2,14 @@
 name: Agora
 description: HGK 収益化プロジェクト — ディープインパクト戦略
 triggers:
-  - "agora"
-  - "agora"
+- agora
+- agora
+risk_tier: L1
+risks:
+- Unknown risks (auto-migrated)
+reversible: true
+requires_approval: false
+fallbacks: []
 ---
 
 # Agora

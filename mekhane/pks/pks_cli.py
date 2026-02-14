@@ -157,6 +157,7 @@ def cmd_health(args: argparse.Namespace) -> None:
     _check("Kairos (.pkl)", check_kairos)
 
     # 3. Sophia index
+    # PURPOSE: [L2-auto] check_sophia
     def check_sophia():
         pkl = Path.home() / "oikos" / "mneme" / ".hegemonikon" / "indices" / "sophia.pkl"
         if not pkl.exists():
@@ -167,6 +168,7 @@ def cmd_health(args: argparse.Namespace) -> None:
     _check("Sophia (.pkl)", check_sophia)
 
     # 4. Embedder
+    # PURPOSE: [L2-auto] check_embedder
     def check_embedder():
         from mekhane.symploke.adapters.embedding_adapter import EmbeddingAdapter
         a = EmbeddingAdapter()
@@ -175,6 +177,7 @@ def cmd_health(args: argparse.Namespace) -> None:
     _check("Embedder (BGE-M3)", check_embedder)
 
     # 5. GnosisLanceBridge
+    # PURPOSE: [L2-auto] check_bridge
     def check_bridge():
         from mekhane.symploke.indices.gnosis_lance_bridge import GnosisLanceBridge
         b = GnosisLanceBridge()
@@ -183,6 +186,7 @@ def cmd_health(args: argparse.Namespace) -> None:
     _check("GnosisLanceBridge", check_bridge)
 
     # 6. PKSEngine
+    # PURPOSE: [L2-auto] check_engine
     def check_engine():
         from mekhane.pks.pks_engine import PKSEngine
         e = PKSEngine(enable_questions=False, enable_serendipity=False)

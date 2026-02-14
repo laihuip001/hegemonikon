@@ -53,6 +53,17 @@ category_theory:
     partner: "gno"
     type: "tension"
     meaning: "判断↔教訓。「今の判断 ↔ 過去の知恵」"
+causal_inference:
+  analogy: "Judea Pearl's Do-Calculus (Functional Analogy)"
+  role: "Realism Check (因果的妥当性の検証)"
+  correspondence:
+    intervention: "counterfactual mode ≈ P(Y|do(X))"
+    backdoor: "Pre-Mortem (Wargame) ≈ blocking backdoor paths"
+    independence: "CoVe CONFLICT-A ≈ d-separation of verification"
+  significance:
+    - "Compile Path (R→D): 抽象→具体の圧縮 (Rate-Distortion)"
+    - "/dia (Krisis): 具体の因果性検証 (Realism)"
+
 ---
 
 # /dia: A2 Krisis 発動コマンド

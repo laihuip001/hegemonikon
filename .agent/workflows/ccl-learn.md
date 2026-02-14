@@ -1,5 +1,6 @@
 ---
-description: "刻む — /pro_/dox+_F:[×2]{/u+~(/noe*/dia)}_~(/h*/k)_/pis_/bye+"
+{description: "\u523B\u3080 \u2014 /pro_/dox+_F:[\xD72]{/u+~(/noe*/dia)}_~(/h*/k)_/pis_/bye+",
+  lcm_state: beta, version: '1.0'}
 ---
 
 # /ccl-learn: 学習永続化マクロ

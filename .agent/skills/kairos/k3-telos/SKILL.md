@@ -1,48 +1,50 @@
 ---
-# Theorem Metadata (v3.0)
-id: "K3"
-name: "Telos"
-greek: "Τέλος"
-series: "Kairos"
+id: K3
+name: Telos
+greek: Τέλος
+series: Kairos
 generation:
-  formula: "Function × Explore"
-  result: "機能探索 — 目的の確認と自問"
+  formula: Function × Explore
+  result: 機能探索 — 目的の確認と自問
+description: '何のためにやっている？・目的を自問したい・手段と目的が入れ替わっていないか？時に発動。 Purpose verification, means-ends
+  check, goal alignment. Use for: 目的, 何のため, why, purpose. NOT for: desire (欲求 → Orexis
+  H3), knowledge (知識 → Sophia K4).
 
-description: >
-  何のためにやっている？・目的を自問したい・手段と目的が入れ替わっていないか？時に発動。
-  Purpose verification, means-ends check, goal alignment.
-  Use for: 目的, 何のため, why, purpose.
-  NOT for: desire (欲求 → Orexis H3), knowledge (知識 → Sophia K4).
-
+  '
 triggers:
-  - 目的の自問
-  - 手段と目的の入れ替わり防止
-  - Why の連鎖
-  - /tel コマンド
-
-keywords: [telos, purpose, goal, end, finality, 目的, 何のため]
-
+- 目的の自問
+- 手段と目的の入れ替わり防止
+- Why の連鎖
+- /tel コマンド
+keywords:
+- telos
+- purpose
+- goal
+- end
+- finality
+- 目的
+- 何のため
 related:
   upstream:
-    - "S2 Mekhanē (X-SK5: 方法→目的整合性)"
-    - "S4 Praxis (X-SK7: 実践→目的整合性)"
-    - "P3 Trokhia (X-PK5: サイクル→反復の目的)"
-    - "P4 Tekhnē (X-PK7: 技法→目的整合性)"
-    - "H1 Propatheia (X-HK2: 直感→目的修正)"
-    - "H3 Orexis (X-HK4: 欲求→目的書き換え ⚠️)"
+  - 'S2 Mekhanē (X-SK5: 方法→目的整合性)'
+  - 'S4 Praxis (X-SK7: 実践→目的整合性)'
+  - 'P3 Trokhia (X-PK5: サイクル→反復の目的)'
+  - 'P4 Tekhnē (X-PK7: 技法→目的整合性)'
+  - 'H1 Propatheia (X-HK2: 直感→目的修正)'
+  - 'H3 Orexis (X-HK4: 欲求→目的書き換え ⚠️)'
   downstream:
-    - "A3 Gnōmē (X-KA5: 目的→原則演繹)"
-    - "A4 Epistēmē (X-KA6: 目的→必要知識確定)"
-
-version: "3.0.0"
-workflow_ref: ".agent/workflows/tel.md"
+  - 'A3 Gnōmē (X-KA5: 目的→原則演繹)'
+  - 'A4 Epistēmē (X-KA6: 目的→必要知識確定)'
+version: 3.0.0
+workflow_ref: .agent/workflows/tel.md
 risk_tier: L1
 reversible: true
 requires_approval: false
 risks:
-  - "欲求による目的上書き (X-HK4)"
-  - "手段の目的化"
-fallbacks: ["manual execution"]
+- 欲求による目的上書き (X-HK4)
+- 手段の目的化
+fallbacks:
+- manual execution
 ---
 
 # K3: Telos (Τέλος)

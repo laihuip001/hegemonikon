@@ -1,73 +1,93 @@
 ---
 description: H4 Doxa（信念）を発動し、信念を記録・永続化する。3派生対応版。
 hegemonikon: Hormē
-modules: [H4]
-skill_ref: ".agent/skills/horme/h4-doxa/SKILL.md"
+modules:
+- H4
+skill_ref: .agent/skills/horme/h4-doxa/SKILL.md
 triggers:
-  - "記録して"
-  - "覚えておいて"
-  - "信念"
-  - "doxa"
-  - "belief"
-version: "2.4"
+- 記録して
+- 覚えておいて
+- 信念
+- doxa
+- belief
+version: '2.4'
 lcm_state: beta
-lineage: "v2.3 + FBR変換 → v2.4"
-derivatives: [sens, conc, form, delta, structured]
+lineage: v2.3 + FBR変換 → v2.4
+derivatives:
+- sens
+- conc
+- form
+- delta
+- structured
 trigonon:
   series: H
   type: Mixed
   theorem: H4
-  coordinates: [A, U]
-  bridge: [S, K]
-  anchor_via: [O, A]
+  coordinates:
+  - A
+  - U
+  bridge:
+  - S
+  - K
+  anchor_via:
+  - O
+  - A
   morphisms:
-    ">>S": [/met, /mek, /sta, /pra]
-    ">>K": [/euk, /chr, /tel, /sop]
+    '>>S':
+    - /met
+    - /mek
+    - /sta
+    - /pra
+    '>>K':
+    - /euk
+    - /chr
+    - /tel
+    - /sop
 cognitive_algebra:
-  "+": "詳細記録：文脈・根拠・関連を完全記録"
-  "-": "即記録：要点のみ1行で記録"
-  "*": "メタ記録：記録プロセス自体を問う"
+  +: 詳細記録：文脈・根拠・関連を完全記録
+  '-': 即記録：要点のみ1行で記録
+  '*': メタ記録：記録プロセス自体を問う
 sel_enforcement:
-  "+":
-    description: "MUST record with full context, basis, and relations"
+  +:
+    description: MUST record with full context, basis, and relations
     minimum_requirements:
-      - "文脈 必須"
-      - "根拠 必須"
-      - "関連 必須"
-  "-":
-    description: "MAY record single line only"
+    - 文脈 必須
+    - 根拠 必須
+    - 関連 必須
+  '-':
+    description: MAY record single line only
     minimum_requirements:
-      - "要点1行のみ"
-  "*":
-    description: "MUST meta-analyze: why record this?"
+    - 要点1行のみ
+  '*':
+    description: 'MUST meta-analyze: why record this?'
     minimum_requirements:
-      - "記録プロセスを問う"
-ccl_signature: "/dox+_/bye"
+    - 記録プロセスを問う
+ccl_signature: /dox+_/bye
 category_theory:
-  core: "随伴 F⊣G の右随伴 G（忘却関手）"
-  adjunction: "Pistis (F) ⊣ Doxa (G)"
-  role: "G: Trust → Belief（確信から推論過程を忘却し、結論だけを信念として保存）"
-  G_definition: "エビデンスの取捨選択・重み付け・比較検討の過程を捨てて、結果のみ保持"
+  core: 随伴 F⊣G の右随伴 G（忘却関手）
+  adjunction: Pistis (F) ⊣ Doxa (G)
+  role: 'G: Trust → Belief（確信から推論過程を忘却し、結論だけを信念として保存）'
+  G_definition: エビデンスの取捨選択・重み付け・比較検討の過程を捨てて、結果のみ保持
   G_two_layers:
-    結論: "「○○は正しい」という判断結果。well-defined"
-    導出文脈: "「なぜそう信じるか」の推論過程。信念化すると消える"
-  drift: "Drift = 導出文脈の喪失量。「なぜそう信じるか」を再構成できない度合い"
-  G_preserves: "不変量 = 結論の命題構造 (P か ¬P)。推論過程を忘却しても、命題の真偽は保存される"
-  bc6_connection: "BC-6 TAINT/SOURCE 追跡 = Drift 低減のための仕組み。推論過程を記録し信念化を防ぐ"
-  insight: "信念は結果のみしか取り合わない。過程が忘れ去られる — Creator, 2026-02-10"
+    結論: 「○○は正しい」という判断結果。well-defined
+    導出文脈: 「なぜそう信じるか」の推論過程。信念化すると消える
+  drift: Drift = 導出文脈の喪失量。「なぜそう信じるか」を再構成できない度合い
+  G_preserves: 不変量 = 結論の命題構造 (P か ¬P)。推論過程を忘却しても、命題の真偽は保存される
+  bc6_connection: BC-6 TAINT/SOURCE 追跡 = Drift 低減のための仕組み。推論過程を記録し信念化を防ぐ
+  insight: 信念は結果のみしか取り合わない。過程が忘れ去られる — Creator, 2026-02-10
   mathematical_basis:
-    L1: "前順序圏のガロア接続 — F(X) ≤ Y ⟺ X ≤ G(Y)"
-    L2: "[0,1]-豊穣圏 — Drift ∈ [0,1] は Hom 値"
-    L3: "弱2-圏 (将来) — 派生は 2-cell"
+    L1: 前順序圏のガロア接続 — F(X) ≤ Y ⟺ X ≤ G(Y)
+    L2: '[0,1]-豊穣圏 — Drift ∈ [0,1] は Hom 値'
+    L3: 弱2-圏 (将来) — 派生は 2-cell
   natural_transformation:
-    partner: "ore"
-    shared_axis: "Flow (A: 行為)"
-    varied_axis: "Valence (-→+)"
-    meaning: "信念記録→欲求表出。「知ってる→でも欲しい」"
+    partner: ore
+    shared_axis: 'Flow (A: 行為)'
+    varied_axis: Valence (-→+)
+    meaning: 信念記録→欲求表出。「知ってる→でも欲しい」
   duality:
-    partner: "pro"
-    type: "tension"
-    meaning: "信念↔ひらめき。「安定と新しさの振動」"
+    partner: pro
+    type: tension
+    meaning: 信念↔ひらめき。「安定と新しさの振動」
 ---
 
 # /dox: 信念定着ワークフロー (Doxa)

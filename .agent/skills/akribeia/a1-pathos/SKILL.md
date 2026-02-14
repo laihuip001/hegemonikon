@@ -1,53 +1,48 @@
 ---
-# Theorem Metadata (v3.0)
-id: "A1"
-name: "Pathos"
-greek: "Πάθος"
-series: "Akribeia"
+id: A1
+name: Pathos
+greek: Πάθος
+series: Akribeia
 generation:
-  formula: "Valence × Precision"
-  result: "傾向精密 — 感情の精緻な認識"
+  formula: Valence × Precision
+  result: 傾向精密 — 感情の精緻な認識
+description: '何を感じている？・感情の正体を知りたい・メタ感情を把握したい時に発動。 Precise emotional awareness, meta-emotion
+  recognition, affect labeling. Use for: 感情, emotion, 何を感じている, affect. NOT for: simple
+  sentiment (positive/negative判定のみ).
 
-description: >
-  何を感じている？・感情の正体を知りたい・メタ感情を把握したい時に発動。
-  Precise emotional awareness, meta-emotion recognition, affect labeling.
-  Use for: 感情, emotion, 何を感じている, affect.
-  NOT for: simple sentiment (positive/negative判定のみ).
-
+  '
 triggers:
-  - メタ感情の検出
-  - 感情の精緻な言語化
-  - 二重傾向の認識
-  - /pat コマンド
-
+- メタ感情の検出
+- 感情の精緻な言語化
+- 二重傾向の認識
+- /pat コマンド
 keywords:
-  - pathos
-  - emotion
-  - affect
-  - feeling
-  - meta-emotion
-  - 感情
-  - 情念
-
+- pathos
+- emotion
+- affect
+- feeling
+- meta-emotion
+- 感情
+- 情念
 related:
   upstream:
-    - "H1 Propatheia (X-HA1: 直感→感情の精緻化)"
-    - "H3 Orexis (X-HA3: 欲求→欲求の正体)"
-    - "K1 Eukairia (X-KA1: 好機→感情的反応)"
-    - "K2 Chronos (X-KA3: 時間圧→時間制約下の感情)"
+  - 'H1 Propatheia (X-HA1: 直感→感情の精緻化)'
+  - 'H3 Orexis (X-HA3: 欲求→欲求の正体)'
+  - 'K1 Eukairia (X-KA1: 好機→感情的反応)'
+  - 'K2 Chronos (X-KA3: 時間圧→時間制約下の感情)'
   downstream: []
-
 implementation:
-  micro: ".agent/workflows/pat.md"
-  macro: "(future)"
-
-version: "3.0.0"
-workflow_ref: ".agent/workflows/pat.md"
+  micro: .agent/workflows/pat.md
+  macro: (future)
+version: 3.0.0
+workflow_ref: .agent/workflows/pat.md
 risk_tier: L1
 reversible: true
 requires_approval: false
-risks: ["none identified"]
-fallbacks: ["manual execution"]
+risks:
+- none identified
+fallbacks:
+- manual execution
 ---
 
 # A1: Pathos (Πάθος)

@@ -1,74 +1,83 @@
 ---
 description: H-series Peras。L1×L1.75 の極限演算で動機の統合判断を生成。
 hegemonikon: Hormē
-modules: [H1, H2, H3, H4]
+modules:
+- H1
+- H2
+- H3
+- H4
 skill_ref:
-  - ".agent/skills/horme/h1-propatheia/SKILL.md"
-  - ".agent/skills/horme/h2-pistis/SKILL.md"
-  - ".agent/skills/horme/h3-orexis/SKILL.md"
-  - ".agent/skills/horme/h4-doxa/SKILL.md"
-version: "5.4"
+- .agent/skills/horme/h1-propatheia/SKILL.md
+- .agent/skills/horme/h2-pistis/SKILL.md
+- .agent/skills/horme/h3-orexis/SKILL.md
+- .agent/skills/horme/h4-doxa/SKILL.md
+version: '5.4'
 lcm_state: beta
-layer: "Δ"
-lineage: "v4.4 + Limit演算復元 → v5.0 + C0 PW/加重融合 → v5.2 → v5.3 C3 Kalon化 → v5.4 固有層 Prob-enrichment"
+layer: Δ
+lineage: v4.4 + Limit演算復元 → v5.0 + C0 PW/加重融合 → v5.2 → v5.3 C3 Kalon化 → v5.4 固有層 Prob-enrichment
 category_theory:
-  yoneda: "Hom(-, Tn) ≅ F(Tn) — 各定理はその射の集合で完全に決まる"
-  limit: "Cone の頂点 — 全ての動機的射が一致する点"
-  converge_as_cone: "C0=PW決定, C1=動機的射の列挙, C2=PW加重融合, C3=Kalon+普遍性検証"
-  cone_builder: "mekhane/fep/cone_builder.py"
-  kalon: "mekhane/fep/universality.py — C3で使用"
-  adjunction: "F ⊣ G — 圏論を付与する (F) と 構造を発見する (G) の随伴対"
+  yoneda: Hom(-, Tn) ≅ F(Tn) — 各定理はその射の集合で完全に決まる
+  limit: Cone の頂点 — 全ての動機的射が一致する点
+  converge_as_cone: C0=PW決定, C1=動機的射の列挙, C2=PW加重融合, C3=Kalon+普遍性検証
+  cone_builder: mekhane/fep/cone_builder.py
+  kalon: mekhane/fep/universality.py — C3で使用
+  adjunction: F ⊣ G — 圏論を付与する (F) と 構造を発見する (G) の随伴対
   enrichment:
-    concept: "Hom(X,H1) に確率測度 (接近/回避/保留) を入れ、entropy で bias を検出 — /h 固有"
+    concept: Hom(X,H1) に確率測度 (接近/回避/保留) を入れ、entropy で bias を検出 — /h 固有
     mode: conceptual
-    variant: "Prob-enrichment (Hom → Prob)"
+    variant: Prob-enrichment (Hom → Prob)
     structures:
-      - "H1 の射に valence (+/-/0) = 確率分布"
-      - "V[/h] = entropy-based bias 検出"
-      - "/s の Met-enrichment と共通の上位概念: Typed Enrichment"
+    - H1 の射に valence (+/-/0) = 確率分布
+    - V[/h] = entropy-based bias 検出
+    - '/s の Met-enrichment と共通の上位概念: Typed Enrichment'
   mathematical_basis:
-    L1: "前順序圏のガロア接続 — F(X) ≤ Y ⟺ X ≤ G(Y)"
-    L2: "[0,1]-豊穣圏 — Drift ∈ [0,1] は Hom 値"
-    L3: "弱2-圏 (将来) — 派生は 2-cell"
-derivatives: [pro, pis, ore, dox, bias]
+    L1: 前順序圏のガロア接続 — F(X) ≤ Y ⟺ X ≤ G(Y)
+    L2: '[0,1]-豊穣圏 — Drift ∈ [0,1] は Hom 値'
+    L3: 弱2-圏 (将来) — 派生は 2-cell
+derivatives:
+- pro
+- pis
+- ore
+- dox
+- bias
 cognitive_algebra:
-  generation: "L1 × L1.75"
+  generation: L1 × L1.75
   coordinates:
-    axis_1: "Flow/Value"
-    axis_2: "Valence/Precision"
-  definition: "/h = lim(H1·H2·H3·H4)"
+    axis_1: Flow/Value
+    axis_2: Valence/Precision
+  definition: /h = lim(H1·H2·H3·H4)
   interpretation:
-    strict: "テンソル積 (Flow/Value⊗Valence/Precision) の Limit 射影"
-    short: "4定理の内積 → 最適収束点"
+    strict: テンソル積 (Flow/Value⊗Valence/Precision) の Limit 射影
+    short: 4定理の内積 → 最適収束点
   operators:
-    "+": "Limit強度↑ — 全4定理を詳細に収束"
-    "-": "Limit強度↓ — 縮約収束"
-    "*": "Limit対象自体を問う: なぜ動機を問うか"
+    +: Limit強度↑ — 全4定理を詳細に収束
+    '-': Limit強度↓ — 縮約収束
+    '*': 'Limit対象自体を問う: なぜ動機を問うか'
 sel_enforcement:
-  "+":
-    description: "MUST execute ALL 4 theorems with deep convergence"
+  +:
+    description: MUST execute ALL 4 theorems with deep convergence
     minimum_requirements:
-      - "全4定理実行"
-      - "各定理詳細モード"
-      - "融合ステップ必須"
-  "-":
-    description: "MAY execute with condensed convergence"
+    - 全4定理実行
+    - 各定理詳細モード
+    - 融合ステップ必須
+  '-':
+    description: MAY execute with condensed convergence
     minimum_requirements:
-      - "サマリーのみ"
-  "*":
-    description: "MUST meta-analyze: why question motivation?"
+    - サマリーのみ
+  '*':
+    description: 'MUST meta-analyze: why question motivation?'
     minimum_requirements:
-      - "動機層選択の理由を問う"
+    - 動機層選択の理由を問う
 absorbed:
-  - "H-Series派生調査レポート v1.0 (2026-01-29)"
+- H-Series派生調査レポート v1.0 (2026-01-29)
 children:
-  - "/pro"   # H1 Propatheia (初期傾向) → appr/avoi/arre
-  - "/pis"   # H2 Pistis (確信度) → subj/inte/obje
-  - "/ore"   # H3 Orexis (価値傾向) → targ/acti/stat
-  - "/dox"   # H4 Doxa (信念) → sens/conc/form
-  - "/boot"  # H4 派生
-  - "/bye"   # H4 派生
-ccl_signature: "/h+_/dia"
+- /pro
+- /pis
+- /ore
+- /dox
+- /boot
+- /bye
+ccl_signature: /h+_/dia
 anti_skip: enabled
 ---
 

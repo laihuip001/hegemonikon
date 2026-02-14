@@ -1,79 +1,96 @@
 ---
 description: O4 Energeia（行為）を発動し、意志を現実に具現化する。6段階実行フレームワーク。
 hegemonikon: Ousia
-modules: [O4]
-skill_ref: ".agent/skills/ousia/o4-energeia/SKILL.md"
-version: "5.0"
+modules:
+- O4
+skill_ref: .agent/skills/ousia/o4-energeia/SKILL.md
+version: '5.0'
 lcm_state: beta
-lineage: "v4.9 + FBR変換 → v5.0"
+lineage: v4.9 + FBR変換 → v5.0
 anti_skip: enabled
-ccl_signature: "/ene+"
+ccl_signature: /ene+
 triggers:
-  - "行為"
-  - "実行"
-  - "やる"
-  - "energeia"
-  - "execute"
-derivatives: [flow, prax, pois, constructive]
+- 行為
+- 実行
+- やる
+- energeia
+- execute
+derivatives:
+- flow
+- prax
+- pois
+- constructive
 absorbed:
-  - "/flag (Feature Flags) → --mode=feature-flag"
+- /flag (Feature Flags) → --mode=feature-flag
 modes:
-  parallel: "ReWOO: Reasoning Without Observation — 全アクション先行計画後、並列実行"
+  parallel: 'ReWOO: Reasoning Without Observation — 全アクション先行計画後、並列実行'
 trigonon:
   series: O
   type: Pure
   theorem: O4
-  coordinates: [A, P]
-  bridge: [S, H]
+  coordinates:
+  - A
+  - P
+  bridge:
+  - S
+  - H
   anchor_via: []
   morphisms:
-    ">>S": [/met, /mek, /sta, /pra]
-    ">>H": [/pro, /pis, /ore, /dox]
+    '>>S':
+    - /met
+    - /mek
+    - /sta
+    - /pra
+    '>>H':
+    - /pro
+    - /pis
+    - /ore
+    - /dox
 cognitive_algebra:
-  "+": "詳細実行：全PHASEを完全展開、詳細ログ"
-  "-": "高速実行：確認なし、サマリーのみ"
-  "*": "メタ実行：実行プロセス自体を問う"
+  +: 詳細実行：全PHASEを完全展開、詳細ログ
+  '-': 高速実行：確認なし、サマリーのみ
+  '*': メタ実行：実行プロセス自体を問う
 sel_enforcement:
-  "+":
-    description: "MUST execute ALL phases with detailed logs, skip NOTHING"
+  +:
+    description: MUST execute ALL phases with detailed logs, skip NOTHING
     minimum_requirements:
-      - "全6 PHASE 実行"
-      - "詳細ログ 必須"
-      - "Risk Tag 評価 必須"
-      - "Graduated Supervision 必須"
-      - "Quality Gate 必須"
-  "-":
-    description: "MAY skip confirmations, summary output only"
+    - 全6 PHASE 実行
+    - 詳細ログ 必須
+    - Risk Tag 評価 必須
+    - Graduated Supervision 必須
+    - Quality Gate 必須
+  '-':
+    description: MAY skip confirmations, summary output only
     minimum_requirements:
-      - "サマリーのみ"
-      - "確認省略可"
-  "*":
-    description: "MUST meta-analyze: is this action correct?"
+    - サマリーのみ
+    - 確認省略可
+  '*':
+    description: 'MUST meta-analyze: is this action correct?'
     minimum_requirements:
-      - "行為の正当性を問う"
-      - "代替行為の検討"
+    - 行為の正当性を問う
+    - 代替行為の検討
 category_theory:
-  core: "随伴 F⊣G の左随伴 F（自由関手）"
-  adjunction: "Energeia (F) ⊣ Boulēsis (G)"
-  role: "F: Will → Act（純粋な望みに制約を載せて、行為計画を自由構成）"
-  F_definition: "理想（願望）に現実制約を付与して、実行可能な目標を組み立てる"
-  unit: "η: Will → G(F(Will)) — 望みを目標にして制約を外したら、元の望みか？"
-  counit: "ε: F(G(Act)) → Act — 行為からなぜを遡って再計画したら、同じ行為か？"
-  drift: "ε 崩壊 = 手段が目的化 = /tel 発動条件"
-  replan_as_adjunction: "PHASE 3.5 動的リプランニング = G∘F サイクルの再実行"
+  core: 随伴 F⊣G の左随伴 F（自由関手）
+  adjunction: Energeia (F) ⊣ Boulēsis (G)
+  role: 'F: Will → Act（純粋な望みに制約を載せて、行為計画を自由構成）'
+  F_definition: 理想（願望）に現実制約を付与して、実行可能な目標を組み立てる
+  unit: 'η: Will → G(F(Will)) — 望みを目標にして制約を外したら、元の望みか？'
+  counit: 'ε: F(G(Act)) → Act — 行為からなぜを遡って再計画したら、同じ行為か？'
+  drift: ε 崩壊 = 手段が目的化 = /tel 発動条件
+  replan_as_adjunction: PHASE 3.5 動的リプランニング = G∘F サイクルの再実行
   mathematical_basis:
-    L1: "前順序圏のガロア接続 — F(X) ≤ Y ⟺ X ≤ G(Y)"
-    L2: "[0,1]-豊穣圏 — Drift ∈ [0,1] は Hom 値"
-    L3: "弱2-圏 (将来) — 派生は 2-cell"
+    L1: 前順序圏のガロア接続 — F(X) ≤ Y ⟺ X ≤ G(Y)
+    L2: '[0,1]-豊穣圏 — Drift ∈ [0,1] は Hom 値'
+    L3: 弱2-圏 (将来) — 派生は 2-cell
   natural_transformation:
-    partner: "zet"
-    shared_axis: "Flow (A: 行為)"
-    varied_axis: "Value (P→E)"
-    meaning: "実用行為→認識行為。「やってみたが、何が起きた？」"
+    partner: zet
+    shared_axis: 'Flow (A: 行為)'
+    varied_axis: Value (P→E)
+    meaning: 実用行為→認識行為。「やってみたが、何が起きた？」
   duality:
-    partner: "noe"
-    type: "transition"
-    meaning: "運動→認知。「やった→理解した」"
+    partner: noe
+    type: transition
+    meaning: 運動→認知。「やった→理解した」
 ---
 
 # /ene: 行為ワークフロー (Energeia)

@@ -1,5 +1,5 @@
 ---
-description: "\u7D5E\u308B \u2014 /s-_/kat_/sym~(/tel_/dia-)_/pis"
+description: 絞る — /s-_/kat_/sym~(/tel_/dia-)_/pis
 lcm_state: beta
 version: '1.0'
 ---

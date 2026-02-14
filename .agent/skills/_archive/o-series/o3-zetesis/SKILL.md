@@ -1,67 +1,61 @@
 ---
-# === Metadata Layer (v2.1) ===
-id: "O3"
-name: "Zētēsis"
-greek: "Ζήτησις"
-category: "pure-theorem"
-description: >
-  Applies the O3 Zētēsis theorem from the Hegemonikón framework for pure exploration.
-  Use this skill when the user asks to generate research requests, reduce uncertainty,
-  formulate hypotheses, or create investigation plans with Perplexity/external sources.
-  Triggers: /zet, 探求, research, 調査依頼, uncertainty, hypothesis testing.
+id: O3
+name: Zētēsis
+greek: Ζήτησις
+category: pure-theorem
+description: 'Applies the O3 Zētēsis theorem from the Hegemonikón framework for pure
+  exploration. Use this skill when the user asks to generate research requests, reduce
+  uncertainty, formulate hypotheses, or create investigation plans with Perplexity/external
+  sources. Triggers: /zet, 探求, research, 調査依頼, uncertainty, hypothesis testing.
 
-# v2.1 生成規則
+  '
 generation:
-  layer: "L2 O-series (Ousia)"
-  formula: "Action (A) × Epistemic (E)"
-  result: "探索行動 — 知識を得るための行動"
+  layer: L2 O-series (Ousia)
+  formula: Action (A) × Epistemic (E)
+  result: 探索行動 — 知識を得るための行動
   axioms:
-    - L1.1 Flow (I/A): A (行為)
-    - L1.2 Value (E/P): E (認識)
-
-# 発動条件
+  - L1.1 Flow (I/A): A (行為)
+  - L1.2 Value (E/P): E (認識)
 triggers:
-  - "/zet コマンド"
-  - pure exploration need
-  - what-should-we-explore inquiry
-  - curiosity-driven questions
-  - uncertainty detection (U > 0.6)
-
-# キーワード
+- /zet コマンド
+- pure exploration need
+- what-should-we-explore inquiry
+- curiosity-driven questions
+- uncertainty detection (U > 0.6)
 keywords:
-  - exploration
-  - search
-  - curiosity
-  - discovery
-  - epistemic-action
-  - research
+- exploration
+- search
+- curiosity
+- discovery
+- epistemic-action
+- research
+when_to_use: '「何を探求すべきか」を問う時、探求の本質を確認する時。
 
-# 使用条件
-when_to_use: |
-  「何を探求すべきか」を問う時、探求の本質を確認する時。
   好奇心駆動の問い、不確実性が高い時 (U > 0.6)。
 
-when_not_to_use: |
-  - 具体的な情報収集が必要な時（→ S-series, T-series）
+  '
+when_not_to_use: '- 具体的な情報収集が必要な時（→ S-series, T-series）
+
   - 通常は様態定理（S1, S3）を通じて具体化
+
   - 単純なタスク実行
 
-# 関連 (v2.1)
+  '
 related:
-  upstream: []  # O-series は最上流
+  upstream: []
   downstream:
-    - "S1 Metron"
-    - "S3 Stathmos"
-  x_series: ["X-OS"]
-  micro: "/zet"
-  macro: "mekhane/anamnesis/collectors/"
-
-version: "2.1.0"
+  - S1 Metron
+  - S3 Stathmos
+  x_series:
+  - X-OS
+  micro: /zet
+  macro: mekhane/anamnesis/collectors/
+version: 2.1.0
 risk_tier: L0
 reversible: true
 requires_approval: false
 risks:
-  - "アーカイブ済みスキルの誤参照による古い手法の適用"
+- アーカイブ済みスキルの誤参照による古い手法の適用
 fallbacks: []
 ---
 

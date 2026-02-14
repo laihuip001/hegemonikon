@@ -3,19 +3,18 @@ name: Gnōsis Dialog
 description: 論文知識基盤への対話インターフェース
 activation: auto
 triggers:
-  - "論文"
-  - "Gnōsis"
-  - "研究"
+- 論文
+- Gnōsis
+- 研究
 hegemonikon: T5 Peira + T8 Anamnēsis
-# Safety Contract (v1.0 — /eat 消化洞察 2026-02-07)
 risk_tier: L1
 reversible: true
 requires_approval: false
 risks:
-  - "検索結果なし時の hallucination リスク"
-  - "古い論文データの引用による情報鮮度の低下"
+- 検索結果なし時の hallucination リスク
+- 古い論文データの引用による情報鮮度の低下
 fallbacks:
-  - "一般知識で補完し、ソース不在を明示"
+- 一般知識で補完し、ソース不在を明示
 ---
 
 # Gnōsis Dialog Skill

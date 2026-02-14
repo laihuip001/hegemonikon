@@ -1,65 +1,59 @@
 ---
-# Theorem Metadata (v3.0)
-id: "A2"
-name: "Krisis"
-greek: "Κρίσις"
-series: "Akribeia"
+id: A2
+name: Krisis
+greek: Κρίσις
+series: Akribeia
 generation:
-  formula: "Valence × Precision"
-  result: "傾向確信 — 傾向判断の確実性"
+  formula: Valence × Precision
+  result: 傾向確信 — 傾向判断の確実性
+description: '検証して・批評して・本当にこれでいい？・盲点はある？時に発動。 Critical evaluation, blind spot detection,
+  judgment suspension. Use for: 検証, 批評, validate, 盲点, blind spot, 確認して. NOT for: simple
+  yes/no decisions.
 
-description: >
-  検証して・批評して・本当にこれでいい？・盲点はある？時に発動。
-  Critical evaluation, blind spot detection, judgment suspension.
-  Use for: 検証, 批評, validate, 盲点, blind spot, 確認して.
-  NOT for: simple yes/no decisions.
-
+  '
 triggers:
-  - 検証の実行
-  - 判断の確認
-  - /dia コマンド
-  - 品質保証
-  - 盲点発見
-  - 判断停止
-  - 言葉遣い
-  - 表現の違い
-  - プロンプトの書き方
-
+- 検証の実行
+- 判断の確認
+- /dia コマンド
+- 品質保証
+- 盲点発見
+- 判断停止
+- 言葉遣い
+- 表現の違い
+- プロンプトの書き方
 keywords:
-  - krisis
-  - judgment
-  - verification
-  - validation
-  - critique
-  - panorama
-  - synedrion
-  - epoche
-  - lexis
-  - 検証
-  - 判断
-  - 表現
-  - 言葉遣い
-
+- krisis
+- judgment
+- verification
+- validation
+- critique
+- panorama
+- synedrion
+- epoche
+- lexis
+- 検証
+- 判断
+- 表現
+- 言葉遣い
 related:
   upstream:
-    - "K1 Eukairia"
-    - "K2 Chronos"
-    - "H2 Pistis"
+  - K1 Eukairia
+  - K2 Chronos
+  - H2 Pistis
   downstream: []
   x_series:
-    - "← X-KA2 ← K1 Eukairia"
-    - "← X-KA4 ← K2 Chronos"
-    - "← X-HA2 ← H2 Pistis"
-
-lineage: "A2 Krisis + C-1 Adversarial + M-1 User Perspective + Epochē + Anti-Skip + Artifact出力 + lex派生 → v3.1"
-
-version: "3.1.0"
-workflow_ref: ".agent/workflows/dia.md"
+  - ← X-KA2 ← K1 Eukairia
+  - ← X-KA4 ← K2 Chronos
+  - ← X-HA2 ← H2 Pistis
+lineage: A2 Krisis + C-1 Adversarial + M-1 User Perspective + Epochē + Anti-Skip +
+  Artifact出力 + lex派生 → v3.1
+version: 3.1.0
+workflow_ref: .agent/workflows/dia.md
 risk_tier: L1
 reversible: true
 requires_approval: false
 risks:
-  - "判断基準の誤適用による過信・過少評価"
+- 判断基準の誤適用による過信・過少評価
 fallbacks: []
 ---
 

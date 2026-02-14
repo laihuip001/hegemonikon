@@ -1,67 +1,62 @@
 ---
-# === Metadata Layer (v2.1) ===
-id: "S2"
-name: "Mekhanē"
-greek: "Μηχανή"
-category: "modal-theorem"
-description: >
-  Applies the S2 Mekhanē schema from the Hegemonikón framework for method selection.
-  Use this skill when the user needs to choose between Explore (new approaches) or Exploit
-  (proven methods), select strategy, or decide approach for problem-solving.
+id: S2
+name: Mekhanē
+greek: Μηχανή
+category: modal-theorem
+description: 'Applies the S2 Mekhanē schema from the Hegemonikón framework for method
+  selection. Use this skill when the user needs to choose between Explore (new approaches)
+  or Exploit (proven methods), select strategy, or decide approach for problem-solving.
   Triggers: 方法, strategy, explore vs exploit, どうやって, /plan, approach.
 
-# v2.1 生成規則
+  '
 generation:
-  layer: "L2 S-series (Schema)"
-  formula: "Flow (I/A) × Function (P/E)"
-  result: "方法流動 — 機構での配置"
+  layer: L2 S-series (Schema)
+  formula: Flow (I/A) × Function (P/E)
+  result: 方法流動 — 機構での配置
   axioms:
-    - L1.1 Flow (I/A): 推論/行為の選択
-    - L1.5.2 Function (P/E): Explore/Exploit の選択
-
-# 発動条件
+  - L1.1 Flow (I/A): 推論/行為の選択
+  - L1.5.2 Function (P/E): Explore/Exploit の選択
 triggers:
-  - method selection required
-  - explore vs exploit choice
-  - strategy selection
-  - approach decision
-
-# キーワード
+- method selection required
+- explore vs exploit choice
+- strategy selection
+- approach decision
 keywords:
-  - method
-  - mechanism
-  - explore
-  - exploit
-  - strategy
-  - approach
+- method
+- mechanism
+- explore
+- exploit
+- strategy
+- approach
+when_to_use: '認知の「戦略」を決定する必要がある時。
 
-# 使用条件
-when_to_use: |
-  認知の「戦略」を決定する必要がある時。
   新しい手法の探索（Explore）か既知の手法の活用（Exploit）かを選ぶ時。
 
-when_not_to_use: |
-  - 方法が既に決まっている場合
+  '
+when_not_to_use: '- 方法が既に決まっている場合
+
   - スケール選択が必要な時（→ S1 Metron）
 
-# 関連 (v2.1)
+  '
 related:
   upstream:
-    - "O2 Boulēsis"
-    - "O4 Energeia"
+  - O2 Boulēsis
+  - O4 Energeia
   downstream:
-    - "H2 Pistis"
-    - "P2 Hodos"
-  x_series: ["X-OS", "X-SH", "X-SP"]
-  micro: "/plan"  # 戦略設計 workflow
+  - H2 Pistis
+  - P2 Hodos
+  x_series:
+  - X-OS
+  - X-SH
+  - X-SP
+  micro: /plan
   macro: null
-
-version: "2.1.0"
+version: 2.1.0
 risk_tier: L0
 reversible: true
 requires_approval: false
 risks:
-  - "アーカイブ済みスキルの誤参照による古い手法の適用"
+- アーカイブ済みスキルの誤参照による古い手法の適用
 fallbacks: []
 ---
 

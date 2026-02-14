@@ -1,81 +1,97 @@
 ---
 description: O2 Boulēsis（意志・目的）を発動し、「何を望むか」を明確化するワークフロー。純粋な理想から実用的な目標へ。
 hegemonikon: Ousia
-modules: [O2]
-skill_ref: ".agent/skills/ousia/o2-boulesis/SKILL.md"
-version: "4.6"
+modules:
+- O2
+skill_ref: .agent/skills/ousia/o2-boulesis/SKILL.md
+version: '4.6'
 lcm_state: beta
-lineage: "v4.5 + FBR変換 → v4.6"
+lineage: v4.5 + FBR変換 → v4.6
 anti_skip: enabled
-ccl_signature: "/bou*"
-derivatives: [desir, voli, akra]
+ccl_signature: /bou*
+derivatives:
+- desir
+- voli
+- akra
 trigonon:
   series: O
   type: Pure
   theorem: O2
-  coordinates: [I, P]
-  bridge: [S, H]
+  coordinates:
+  - I
+  - P
+  bridge:
+  - S
+  - H
   anchor_via: []
   morphisms:
-    ">>S": [/met, /mek, /sta, /pra]
-    ">>H": [/pro, /pis, /ore, /dox]
+    '>>S':
+    - /met
+    - /mek
+    - /sta
+    - /pra
+    '>>H':
+    - /pro
+    - /pis
+    - /ore
+    - /dox
 cognitive_algebra:
-  "+": "詳細な意志分析。優先度 + 理由 + トレードオフ"
-  "-": "端的な意志。最優先1つのみ"
-  "*": "意志のメタ分析。なぜこれを望むのか"
+  +: 詳細な意志分析。優先度 + 理由 + トレードオフ
+  '-': 端的な意志。最優先1つのみ
+  '*': 意志のメタ分析。なぜこれを望むのか
 sel_enforcement:
-  "+":
-    description: "MUST analyze will with priorities, reasons, and tradeoffs"
+  +:
+    description: MUST analyze will with priorities, reasons, and tradeoffs
     minimum_requirements:
-      - "優先度リスト 必須"
-      - "各望みの理由 必須"
-      - "トレードオフ分析 必須"
-      - "5 Whys 完全実行"
-      - "6W3H 具体化 必須"
-  "-":
-    description: "MAY provide single top priority only"
+    - 優先度リスト 必須
+    - 各望みの理由 必須
+    - トレードオフ分析 必須
+    - 5 Whys 完全実行
+    - 6W3H 具体化 必須
+  '-':
+    description: MAY provide single top priority only
     minimum_requirements:
-      - "最優先 1つのみ"
-  "*":
-    description: "MUST meta-analyze: why do you want this?"
+    - 最優先 1つのみ
+  '*':
+    description: 'MUST meta-analyze: why do you want this?'
     minimum_requirements:
-      - "Frankfurt 階層分析"
-      - "欲望の欲望を問う"
+    - Frankfurt 階層分析
+    - 欲望の欲望を問う
 absorbed:
-  - "AI Zen 技法25: 6W3H 具体化フレームワーク"
-  - "/pre (Premortem) → --mode=premortem"
+- 'AI Zen 技法25: 6W3H 具体化フレームワーク'
+- /pre (Premortem) → --mode=premortem
 category_theory:
-  core: "随伴 F⊣G の右随伴 G（忘却関手）"
-  adjunction: "Energeia (F) ⊣ Boulēsis (G)"
-  role: "G: Act → Will（行為から制約を忘却し、純粋な望みを抽出）"
-  G_definition: "制約（時間, コスト, 他者の期待）を剥いで、純粋な望みだけを残す"
+  core: 随伴 F⊣G の右随伴 G（忘却関手）
+  adjunction: Energeia (F) ⊣ Boulēsis (G)
+  role: 'G: Act → Will（行為から制約を忘却し、純粋な望みを抽出）'
+  G_definition: 制約（時間, コスト, 他者の期待）を剥いで、純粋な望みだけを残す
   G_two_layers:
-    目的層: "5-WHY で遡れる。「なんのために」を問い続ける。well-defined"
-    望み層: "到達不能。望みは湧くもの、選ぶものではない。ill-defined"
-  unit: "η: Will → G(F(Will)) — 望みを目標にして制約を外したら、元の望みか？"
-  counit: "ε: F(G(Act)) → Act — 行為からなぜを遡って再計画したら、同じ行為か？"
-  drift: "Drift = 望みと目的の距離。G が望み層に到達できない残差"
-  G_preserves: "不変量 = 意志の方向性。入力がどんな行為でも、望みの核にある方向ベクトルは保存される"
-  epsilon_failure: "ε 崩壊 = 手段が目的化している = /tel (Telos 自問) の発動条件"
-  insight: "「望みは選ぶものではなく湧くもの」— Creator, 2026-02-10。G の不完全性はバグではなく仕様"
+    目的層: 5-WHY で遡れる。「なんのために」を問い続ける。well-defined
+    望み層: 到達不能。望みは湧くもの、選ぶものではない。ill-defined
+  unit: 'η: Will → G(F(Will)) — 望みを目標にして制約を外したら、元の望みか？'
+  counit: 'ε: F(G(Act)) → Act — 行為からなぜを遡って再計画したら、同じ行為か？'
+  drift: Drift = 望みと目的の距離。G が望み層に到達できない残差
+  G_preserves: 不変量 = 意志の方向性。入力がどんな行為でも、望みの核にある方向ベクトルは保存される
+  epsilon_failure: ε 崩壊 = 手段が目的化している = /tel (Telos 自問) の発動条件
+  insight: 「望みは選ぶものではなく湧くもの」— Creator, 2026-02-10。G の不完全性はバグではなく仕様
   phases_as_G:
-    phase_0: "G の出力 — 制約なしの純粋な望み"
-    phase_3: "G の品質検証 — 衝動 vs 熟慮（本当に純粋か？）"
-    phase_4: "F の開始 — 制約を導入"
-    phase_5: "F の出力 — 制約付きの目標（行動計画）"
+    phase_0: G の出力 — 制約なしの純粋な望み
+    phase_3: G の品質検証 — 衝動 vs 熟慮（本当に純粋か？）
+    phase_4: F の開始 — 制約を導入
+    phase_5: F の出力 — 制約付きの目標（行動計画）
   mathematical_basis:
-    L1: "前順序圏のガロア接続 — F(X) ≤ Y ⟺ X ≤ G(Y)"
-    L2: "[0,1]-豊穣圏 — Drift ∈ [0,1] は Hom 値"
-    L3: "弱2-圏 (将来) — 派生は 2-cell"
+    L1: 前順序圏のガロア接続 — F(X) ≤ Y ⟺ X ≤ G(Y)
+    L2: '[0,1]-豊穣圏 — Drift ∈ [0,1] は Hom 値'
+    L3: 弱2-圏 (将来) — 派生は 2-cell
   natural_transformation:
-    partner: "noe"
-    shared_axis: "Flow (I: 推論)"
-    varied_axis: "Value (P→E)"
-    meaning: "実用→認識。「なぜそれを望むのか」"
+    partner: noe
+    shared_axis: 'Flow (I: 推論)'
+    varied_axis: Value (P→E)
+    meaning: 実用→認識。「なぜそれを望むのか」
   duality:
-    partner: "zet"
-    type: "transition"
-    meaning: "意志→探求。「望む→探す」"
+    partner: zet
+    type: transition
+    meaning: 意志→探求。「望む→探す」
 ---
 
 # /bou: 意志明確化ワークフロー (Boulēsis)

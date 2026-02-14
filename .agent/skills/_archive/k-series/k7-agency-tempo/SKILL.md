@@ -1,34 +1,33 @@
 ---
-id: "K7"
-name: "Agency→Tempo"
-category: "agency-reasoning"
-description: "主体選択が時間スコープを決定する文脈定理"
-
+id: K7
+name: Agency→Tempo
+category: agency-reasoning
+description: 主体選択が時間スコープを決定する文脈定理
 triggers:
-  - control-to-time mapping
-  - self-recovery timing
-  - environment-building horizon
-
+- control-to-time mapping
+- self-recovery timing
+- environment-building horizon
 keywords:
-  - agency
-  - tempo
-  - self-recovery
-  - infrastructure
+- agency
+- tempo
+- self-recovery
+- infrastructure
+when_to_use: '自己/環境に応じて適切な時間枠を導出する場合。
 
-when_to_use: |
-  自己/環境に応じて適切な時間枠を導出する場合。
   例：自己回復は短期、インフラ構築は長期。
 
-when_not_to_use: |
-  - 時間枠が既に決まっている場合
+  '
+when_not_to_use: '- 時間枠が既に決まっている場合
+
   - 主体が未定の場合
 
-version: "2.0"
+  '
+version: '2.0'
 risk_tier: L0
 reversible: true
 requires_approval: false
 risks:
-  - "アーカイブ済みスキルの誤参照による古い手法の適用"
+- アーカイブ済みスキルの誤参照による古い手法の適用
 fallbacks: []
 ---
 

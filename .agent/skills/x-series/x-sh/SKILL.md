@@ -1,31 +1,34 @@
 ---
-id: "X-SH"
-name: "Schema → Hormē"
-category: "relation-layer"
-pair: "S → H"
-shared_coordinate: "C1 (Flow)"
+id: X-SH
+name: Schema → Hormē
+category: relation-layer
+pair: S → H
+shared_coordinate: C1 (Flow)
 relation_count: 8
-type: "Bridge"
-description: "設計 (Schema) が傾向 (Hormē) を方向づける8つの射"
-
+type: Bridge
+description: 設計 (Schema) が傾向 (Hormē) を方向づける8つの射
 activation_conditions:
-  - context: "設計・計画の確定後、実行への意欲や確信が問われるとき"
-  - trigger: "「計画はできた。でも踏み出せるか」の遷移"
-  - confidence_threshold: 0.5
-  - priority: "medium"
-
+- context: 設計・計画の確定後、実行への意欲や確信が問われるとき
+- trigger: 「計画はできた。でも踏み出せるか」の遷移
+- confidence_threshold: 0.5
+- priority: medium
 triggers:
-  - "設計後の確信評価"
-  - "/mek >> /pis"
-  - "/met >> /pro"
-  - "様態→傾向"
-
-keywords: [schema-horme, design-to-drive, x-sh, plan-to-confidence]
+- 設計後の確信評価
+- /mek >> /pis
+- /met >> /pro
+- 様態→傾向
+keywords:
+- schema-horme
+- design-to-drive
+- x-sh
+- plan-to-confidence
 risk_tier: L0
-risks: ["none identified"]
+risks:
+- none identified
 reversible: true
 requires_approval: false
-fallbacks: ["manual execution"]
+fallbacks:
+- manual execution
 ---
 
 # X-SH: Schema → Hormē (様態→傾向)

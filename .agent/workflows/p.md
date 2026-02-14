@@ -1,74 +1,82 @@
 ---
 description: P-series Peras。L1.5×L1.5 の極限演算で環境配置の統合判断を生成。
 hegemonikon: Perigraphē
-modules: [P1, P2, P3, P4]
+modules:
+- P1
+- P2
+- P3
+- P4
 skill_ref:
-  - ".agent/skills/perigraphē/p1-khora/SKILL.md"
-  - ".agent/skills/perigraphē/p2-hodos/SKILL.md"
-  - ".agent/skills/perigraphē/p3-trokhia/SKILL.md"
-  - ".agent/skills/perigraphē/p4-tekhne/SKILL.md"
-version: "5.6"
+- .agent/skills/perigraphē/p1-khora/SKILL.md
+- .agent/skills/perigraphē/p2-hodos/SKILL.md
+- .agent/skills/perigraphē/p3-trokhia/SKILL.md
+- .agent/skills/perigraphē/p4-tekhne/SKILL.md
+version: '5.6'
 lcm_state: beta
-layer: "Δ"
-lineage: "v4.3 + Limit演算復元 → v5.0 + C0 PW/加重融合 → v5.4 → v5.5 C3 Kalon化 → v5.6 固有層 Top-enrichment"
+layer: Δ
+lineage: v4.3 + Limit演算復元 → v5.0 + C0 PW/加重融合 → v5.4 → v5.5 C3 Kalon化 → v5.6 固有層 Top-enrichment
 category_theory:
-  yoneda: "Hom(-, Tn) ≅ F(Tn) — 各定理はその射の集合で完全に決まる"
-  limit: "Cone の頂点 — 全ての環境配置射が一致する点"
-  converge_as_cone: "C0=PW決定, C1=環境射の列挙, C2=PW加重融合, C3=Kalon+普遍性検証"
-  cone_builder: "mekhane/fep/cone_builder.py"
-  kalon: "mekhane/fep/universality.py — C3で使用"
-  adjunction: "F ⊣ G — 圏論を付与する (F) と 構造を発見する (G) の随伴対"
+  yoneda: Hom(-, Tn) ≅ F(Tn) — 各定理はその射の集合で完全に決まる
+  limit: Cone の頂点 — 全ての環境配置射が一致する点
+  converge_as_cone: C0=PW決定, C1=環境射の列挙, C2=PW加重融合, C3=Kalon+普遍性検証
+  cone_builder: mekhane/fep/cone_builder.py
+  kalon: mekhane/fep/universality.py — C3で使用
+  adjunction: F ⊣ G — 圏論を付与する (F) と 構造を発見する (G) の随伴対
   enrichment:
-    concept: "/p は「器」— Hom が Set に値を取る = enrichment 不要。これが /p の本質"
+    concept: /p は「器」— Hom が Set に値を取る = enrichment 不要。これが /p の本質
     mode: resolved
-    variant: "Set (enrichment なし = 通常の圏)"
-    note: "3回試行し3回棄却。「ない」ことが正しい結論"
+    variant: Set (enrichment なし = 通常の圏)
+    note: 3回試行し3回棄却。「ない」ことが正しい結論
     history:
-      - "Top (0.55, 棄却: 言い換え)"
-      - "Op (0.55, 棄却: P2⊗P3転置のみ)"
-      - "Presheaf (0.70, 棄却: 不均等な派生は全Series共通)"
+    - 'Top (0.55, 棄却: 言い換え)'
+    - 'Op (0.55, 棄却: P2⊗P3転置のみ)'
+    - 'Presheaf (0.70, 棄却: 不均等な派生は全Series共通)'
   mathematical_basis:
-    L1: "前順序圏のガロア接続 — F(X) ≤ Y ⟺ X ≤ G(Y)"
-    L2: "[0,1]-豊穣圏 — Drift ∈ [0,1] は Hom 値"
-    L3: "弱2-圏 (将来) — 派生は 2-cell"
-derivatives: [kho, hod, tro, tek]
+    L1: 前順序圏のガロア接続 — F(X) ≤ Y ⟺ X ≤ G(Y)
+    L2: '[0,1]-豊穣圏 — Drift ∈ [0,1] は Hom 値'
+    L3: 弱2-圏 (将来) — 派生は 2-cell
+derivatives:
+- kho
+- hod
+- tro
+- tek
 cognitive_algebra:
-  generation: "L1.5 × L1.5"
+  generation: L1.5 × L1.5
   coordinates:
-    axis_1: "Scale (Micro/Macro)"
-    axis_2: "Function (Explore/Exploit)"
-  definition: "/p = lim(P1·P2·P3·P4)"
+    axis_1: Scale (Micro/Macro)
+    axis_2: Function (Explore/Exploit)
+  definition: /p = lim(P1·P2·P3·P4)
   interpretation:
-    strict: "テンソル積 (Scale⊗Function) の Limit 射影"
-    short: "4定理の内積 → 最適収束点"
+    strict: テンソル積 (Scale⊗Function) の Limit 射影
+    short: 4定理の内積 → 最適収束点
   operators:
-    "+": "Limit強度↑ — 全4定理を詳細に収束"
-    "-": "Limit強度↓ — 縮約収束"
-    "*": "Limit対象自体を問う: なぜ環境を問うか"
+    +: Limit強度↑ — 全4定理を詳細に収束
+    '-': Limit強度↓ — 縮約収束
+    '*': 'Limit対象自体を問う: なぜ環境を問うか'
 sel_enforcement:
-  "+":
-    description: "MUST execute ALL 4 theorems with deep convergence"
+  +:
+    description: MUST execute ALL 4 theorems with deep convergence
     minimum_requirements:
-      - "全4定理実行"
-      - "各定理詳細モード"
-      - "融合ステップ必須"
-  "-":
-    description: "MAY execute with condensed convergence"
+    - 全4定理実行
+    - 各定理詳細モード
+    - 融合ステップ必須
+  '-':
+    description: MAY execute with condensed convergence
     minimum_requirements:
-      - "サマリーのみ"
-  "*":
-    description: "MUST meta-analyze: why question environment?"
+    - サマリーのみ
+  '*':
+    description: 'MUST meta-analyze: why question environment?'
     minimum_requirements:
-      - "環境層選択の理由を問う"
+    - 環境層選択の理由を問う
 absorbed:
-  - "P-Series派生レポート v1.0 (2026-01-29)"
+- P-Series派生レポート v1.0 (2026-01-29)
 children:
-  - "/kho"  # P1 Khōra (条件空間) → phys/conc/rela
-  - "/hod"  # P2 Hodos (経路) → line/bran/cycl
-  - "/tro"  # P3 Trokhia (軌道) → fixe/adap/emer
-  - "/tek"  # P4 Tekhnē (技法) → manu/mech/auto
-  - "/dev"  # P4 派生
-ccl_signature: "/p+_/ene"
+- /kho
+- /hod
+- /tro
+- /tek
+- /dev
+ccl_signature: /p+_/ene
 anti_skip: enabled
 ---
 

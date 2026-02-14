@@ -1,29 +1,30 @@
 ---
 description: 消化品質診断（三角恒等式検証）。随伴 F⊣G の三角恒等式が成立しているか検証する。
 hegemonikon: Akribeia
-modules: [A2]
-skill_ref: ".agent/skills/akribeia/a2-krisis/SKILL.md"
-version: "5.0"
-parent: "/dia"
-lineage: "v4.0 + 随伴昇格 (可換性→三角恒等式) → v5.0"
+modules:
+- A2
+skill_ref: .agent/skills/akribeia/a2-krisis/SKILL.md
+version: '5.0'
+parent: /dia
+lineage: v4.0 + 随伴昇格 (可換性→三角恒等式) → v5.0
 anti_skip: enabled
 category_theory:
-  core: "随伴 F⊣G の三角恒等式検証"
-  adjunction: "F (取り込み=自由構成) ⊣ G (忘却=第一原理分解)"
+  core: 随伴 F⊣G の三角恒等式検証
+  adjunction: F (取り込み=自由構成) ⊣ G (忘却=第一原理分解)
   triangle_identities:
-    left: "ε_F ∘ F(η) = id_F"
-    right: "G(ε) ∘ η_G = id_G"
-  eta: "η: Id_Ext → G∘F — 情報保存率"
-  epsilon: "ε: F∘G → Id_Int — 構造の非冗長性"
-  drift: "Drift = 1 - ε"
+    left: ε_F ∘ F(η) = id_F
+    right: G(ε) ∘ η_G = id_G
+  eta: 'η: Id_Ext → G∘F — 情報保存率'
+  epsilon: 'ε: F∘G → Id_Int — 構造の非冗長性'
+  drift: Drift = 1 - ε
   levels:
-    superficial: "F or G が well-defined でない"
-    absorbed: "η は成立するが ε が不完全、または逆"
-    naturalized: "両方の三角恒等式が成立 = 完全な随伴"
+    superficial: F or G が well-defined でない
+    absorbed: η は成立するが ε が不完全、または逆
+    naturalized: 両方の三角恒等式が成立 = 完全な随伴
   mathematical_basis:
-    L1: "前順序圏のガロア接続 — F(X) ≤ Y ⟺ X ≤ G(Y)"
-    L2: "[0,1]-豊穣圏 — Drift ∈ [0,1] は Hom 値"
-    L3: "弱2-圏 (将来) — 派生は 2-cell"
+    L1: 前順序圏のガロア接続 — F(X) ≤ Y ⟺ X ≤ G(Y)
+    L2: '[0,1]-豊穣圏 — Drift ∈ [0,1] は Hom 値'
+    L3: 弱2-圏 (将来) — 派生は 2-cell
 lcm_state: beta
 ---
 

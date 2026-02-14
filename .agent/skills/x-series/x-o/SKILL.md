@@ -1,34 +1,33 @@
 ---
-id: "X-O"
-name: "Ousia Relations"
-category: "relation-layer"
-description: "O-series（純粋定理）間の従属関係を定義する。"
-
+id: X-O
+name: Ousia Relations
+category: relation-layer
+description: O-series（純粋定理）間の従属関係を定義する。
 triggers:
-  - pure theorem chain visualization
-  - ousia dependency analysis
-
+- pure theorem chain visualization
+- ousia dependency analysis
 keywords:
-  - ousia-relations
-  - pure-theorem-dependencies
-  - o-series-chain
-  - cyclic-structure
+- ousia-relations
+- pure-theorem-dependencies
+- o-series-chain
+- cyclic-structure
+when_to_use: '純粋定理間の因果連鎖を可視化したいとき。
 
-when_to_use: |
-  純粋定理間の因果連鎖を可視化したいとき。
   O-series の相互関係を理解する必要がある場合。
 
-when_not_to_use: |
-  - 具体的な T-series の処理フローを見る時（→ X-T）
+  '
+when_not_to_use: '- 具体的な T-series の処理フローを見る時（→ X-T）
+
   - K-series の相互制約を見る時（→ X-K）
 
-layer: "Level 2' 関係層"
-version: "2.0"
+  '
+layer: Level 2' 関係層
+version: '2.0'
 risk_tier: L1
 reversible: true
 requires_approval: false
 risks:
-  - "定理間関係の誤推論による不適切な遷移提案"
+- 定理間関係の誤推論による不適切な遷移提案
 fallbacks: []
 ---
 

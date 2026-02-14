@@ -1,48 +1,49 @@
 ---
-# Theorem Metadata (v3.0)
-id: "K2"
-name: "Chronos"
-greek: "Χρόνος"
-series: "Kairos"
+id: K2
+name: Chronos
+greek: Χρόνος
+series: Kairos
 generation:
-  formula: "Scale × Explore"
-  result: "スケール探索 — 時間スケールの評価"
+  formula: Scale × Explore
+  result: スケール探索 — 時間スケールの評価
+description: 'どのくらいかかる？・時間軸を設定したい・期限と所要時間を評価したい時に発動。 Time assessment, duration estimation,
+  temporal scale setting. Use for: 時間, 期限, 所要時間, deadline, duration. NOT for: timing/opportunity
+  (→ Eukairia K1).
 
-description: >
-  どのくらいかかる？・時間軸を設定したい・期限と所要時間を評価したい時に発動。
-  Time assessment, duration estimation, temporal scale setting.
-  Use for: 時間, 期限, 所要時間, deadline, duration.
-  NOT for: timing/opportunity (→ Eukairia K1).
-
+  '
 triggers:
-  - 時間の見積もり
-  - 期限の設定
-  - タイムスケールの評価
-  - /chr コマンド
-
-keywords: [chronos, time, duration, deadline, 時間, 期限]
-
+- 時間の見積もり
+- 期限の設定
+- タイムスケールの評価
+- /chr コマンド
+keywords:
+- chronos
+- time
+- duration
+- deadline
+- 時間
+- 期限
 related:
   upstream:
-    - "P1 Khōra (X-PK2: 場の範囲→必要な時間軸)"
-    - "P2 Hodos (X-PK4: 経路→この道にかかる時間)"
-    - "S1 Metron (X-SK2: 測定基準→時間スケール)"
-    - "S3 Stathmos (X-SK4: 評価基準→評価に必要な時間枠)"
-    - "H2 Pistis (X-HK5: 確信→時間感覚支配 ⚠️)"
-    - "H4 Doxa (X-HK7: 信念→時間感覚拡張/圧縮 ⚠️)"
+  - 'P1 Khōra (X-PK2: 場の範囲→必要な時間軸)'
+  - 'P2 Hodos (X-PK4: 経路→この道にかかる時間)'
+  - 'S1 Metron (X-SK2: 測定基準→時間スケール)'
+  - 'S3 Stathmos (X-SK4: 評価基準→評価に必要な時間枠)'
+  - 'H2 Pistis (X-HK5: 確信→時間感覚支配 ⚠️)'
+  - 'H4 Doxa (X-HK7: 信念→時間感覚拡張/圧縮 ⚠️)'
   downstream:
-    - "A1 Pathos (X-KA3: 時間圧→制約下の感情)"
-    - "A2 Krisis (X-KA4: 時間圧→制約下の判断精度)"
-
-version: "3.0.0"
-workflow_ref: ".agent/workflows/chr.md"
+  - 'A1 Pathos (X-KA3: 時間圧→制約下の感情)'
+  - 'A2 Krisis (X-KA4: 時間圧→制約下の判断精度)'
+version: 3.0.0
+workflow_ref: .agent/workflows/chr.md
 risk_tier: L2
 reversible: true
 requires_approval: false
 risks:
-  - "確信/信念による時間感覚歪曲 (X-HK5, X-HK7)"
-  - "楽観バイアスによる過小見積もり"
-fallbacks: ["manual execution"]
+- 確信/信念による時間感覚歪曲 (X-HK5, X-HK7)
+- 楽観バイアスによる過小見積もり
+fallbacks:
+- manual execution
 ---
 
 # K2: Chronos (Χρόνος)

@@ -1,52 +1,75 @@
 ---
 description: K4 Sophia（知恵）を発動し、Perplexityに調査を依頼する。深掘り版調査依頼書を生成。
 hegemonikon: K4 Sophia
-version: "7.1"
-skill_ref: ".agent/skills/kairos/k4-sophia/SKILL.md"
+version: '7.1'
+skill_ref: .agent/skills/kairos/k4-sophia/SKILL.md
 lcm_state: stable
-triggers: ["調べて", "教えて", "Perplexityに聞いて", "パプ君に聞いて", "リサーチ"]
+triggers:
+- 調べて
+- 教えて
+- Perplexityに聞いて
+- パプ君に聞いて
+- リサーチ
 derivatives:
-  "+": 詳細調査（完全リサーチ依頼書、複数視点）
-  "-": 即調査（1質問のみ、簡潔）
-  "*": メタ調査（調査方針自体を問う）
+  +: 詳細調査（完全リサーチ依頼書、複数視点）
+  '-': 即調査（1質問のみ、簡潔）
+  '*': メタ調査（調査方針自体を問う）
 trigonon:
   series: K
   type: Mixed
   theorem: K4
-  coordinates: [Function, U]
-  bridge: [S, H]
-  anchor_via: [P, A]
+  coordinates:
+  - Function
+  - U
+  bridge:
+  - S
+  - H
+  anchor_via:
+  - P
+  - A
   morphisms:
-    ">>S": [/met, /mek, /sta, /pra]
-    ">>H": [/pro, /pis, /ore, /dox]
-modes: [surf, deep, prag, track]
+    '>>S':
+    - /met
+    - /mek
+    - /sta
+    - /pra
+    '>>H':
+    - /pro
+    - /pis
+    - /ore
+    - /dox
+modes:
+- surf
+- deep
+- prag
+- track
 category_theory:
-  core: "随伴 F⊣G の右随伴 G（忘却関手）"
-  adjunction: "Chronos (F) ⊣ Sophia (G)"
-  role: "G: Time → Wisdom（時間判定から進捗・期限の文脈を忘却し、大局の知見に戻る）"
-  G_definition: "「いつまでに」の時間圧力を捨てて、「そもそも何を知るべきか」に立ち返る"
-  same_formula: "chr と sop は同じ Valence(-) の Scale 違い"
-  coordinates: "K4[Macro,-] — Valence(-)を保存し Scale を Macro に設定"
+  core: 随伴 F⊣G の右随伴 G（忘却関手）
+  adjunction: Chronos (F) ⊣ Sophia (G)
+  role: 'G: Time → Wisdom（時間判定から進捗・期限の文脈を忘却し、大局の知見に戻る）'
+  G_definition: 「いつまでに」の時間圧力を捨てて、「そもそも何を知るべきか」に立ち返る
+  same_formula: chr と sop は同じ Valence(-) の Scale 違い
+  coordinates: K4[Macro,-] — Valence(-)を保存し Scale を Macro に設定
   G_two_layers:
-    知見: "「何を知るべきか」という調査対象。well-defined"
-    時間文脈: "「いつまでに」「進捗はどうか」。調査に戻ると忘却される"
-  drift: "Drift = 時間的文脈の喪失。調査に没頭して期限を忘れる"
-  G_preserves: "不変量 = 問うべき方向（何を知るべきかの指向性）。期限を忘却しても、調査の方向は保存される"
-  k_series_pattern: "K-series 全体: euk⊣tel(+) と chr⊣sop(-) で Valence の表裏"
-  insight: "問うべき対象のレイヤーが上下している — Creator, 2026-02-11"
+    知見: 「何を知るべきか」という調査対象。well-defined
+    時間文脈: 「いつまでに」「進捗はどうか」。調査に戻ると忘却される
+  drift: Drift = 時間的文脈の喪失。調査に没頭して期限を忘れる
+  G_preserves: 不変量 = 問うべき方向（何を知るべきかの指向性）。期限を忘却しても、調査の方向は保存される
+  k_series_pattern: 'K-series 全体: euk⊣tel(+) と chr⊣sop(-) で Valence の表裏'
+  insight: 問うべき対象のレイヤーが上下している — Creator, 2026-02-11
   mathematical_basis:
-    L1: "前順序圏のガロア接続 — F(X) ≤ Y ⟺ X ≤ G(Y)"
-    L2: "[0,1]-豊穣圏 — Drift ∈ [0,1] は Hom 値"
-    L3: "弱2-圏 (将来) — 派生は 2-cell"
+    L1: 前順序圏のガロア接続 — F(X) ≤ Y ⟺ X ≤ G(Y)
+    L2: '[0,1]-豊穣圏 — Drift ∈ [0,1] は Hom 値'
+    L3: 弱2-圏 (将来) — 派生は 2-cell
   natural_transformation:
-    partner: "tel"
-    shared_axis: "Scale (Ma: 巨視)"
-    varied_axis: "Valence (-→+)"
-    meaning: "知恵→目的。「何を知るべきか→何のために」"
+    partner: tel
+    shared_axis: 'Scale (Ma: 巨視)'
+    varied_axis: Valence (-→+)
+    meaning: 知恵→目的。「何を知るべきか→何のために」
   duality:
-    partner: "euk"
-    type: "tension"
-    meaning: "知恵↔好機。「急がば回れ ↔ 今だ!」"
+    partner: euk
+    type: tension
+    meaning: 知恵↔好機。「急がば回れ ↔ 今だ!」
 ---
 
 # /sop: 情報収集ワークフロー (Sophia)

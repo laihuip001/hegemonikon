@@ -1,63 +1,82 @@
 ---
 description: O1 Noēsis（深い認識・直観）を発動する最深層思考ワークフロー。7フェーズ (0-6) で圏論的普遍性を追求。
 hegemonikon: O1 Noēsis
-version: "6.1"
-skill_ref: ".agent/skills/ousia/o1-noesis/SKILL.md"
+version: '6.1'
+skill_ref: .agent/skills/ousia/o1-noesis/SKILL.md
 lcm_state: stable
-derivatives: [nous, phro, meta, separate, align, metalearning, scaffold]
+derivatives:
+- nous
+- phro
+- meta
+- separate
+- align
+- metalearning
+- scaffold
 trigonon:
   series: O
   type: Pure
   theorem: O1
-  coordinates: [I, E]  # Flow=Internality, Value=Epistemic
-  bridge: [S, H]       # via C1 Flow
-  anchor_via: []        # Pure has no anchor (is the anchor)
+  coordinates:
+  - I
+  - E
+  bridge:
+  - S
+  - H
+  anchor_via: []
   morphisms:
-    ">>S": [/met, /mek, /sta, /pra]
-    ">>H": [/pro, /pis, /ore, /dox]
+    '>>S':
+    - /met
+    - /mek
+    - /sta
+    - /pra
+    '>>H':
+    - /pro
+    - /pis
+    - /ore
+    - /dox
 category_theory:
-  functor: "F: Cat → Noe — 圏論の圏から /noe の圏への完全な関手"
-  kalon: "Kalon する = 候補解の普遍性を検証する。余分がなく不足もない = 美"
-  universal_property: "全ての候補解への一意的射を持つ解"
-  precedent: "/boot v5.0 随伴深層統合 — 同パターンで成功"
+  functor: 'F: Cat → Noe — 圏論の圏から /noe の圏への完全な関手'
+  kalon: Kalon する = 候補解の普遍性を検証する。余分がなく不足もない = 美
+  universal_property: 全ての候補解への一意的射を持つ解
+  precedent: /boot v5.0 随伴深層統合 — 同パターンで成功
   adjunction:
-    notation: "F ⊣ G — 圏論を付与する (F) と 構造を発見する (G) の随伴対"
-    unit: "η: Id → GF = Phase 3 (Kalon) — 付与→発見→元の問いと比較"
-    counit: "ε: FG → Id = Phase 5 (Dokimasia) — 発見→付与→元に戻す"
+    notation: F ⊣ G — 圏論を付与する (F) と 構造を発見する (G) の随伴対
+    unit: 'η: Id → GF = Phase 3 (Kalon) — 付与→発見→元の問いと比較'
+    counit: 'ε: FG → Id = Phase 5 (Dokimasia) — 発見→付与→元に戻す'
     noe_zet_pair:
-      adjunction: "Noēsis (F) ⊣ Zētēsis (G)"
-      F_role: "F: Question → Insight（問いから確実性を構成する = precision ↑）"
-      G_role: "G: Insight → Question（認識から自信を忘却し問いだけを残す = precision ↓）"
-      drift: "Drift = unknown unknowns — 問えない問い。疑うべきかすら気づけない前提"
-      insight: "自信 = 既知への重み付け(precision)を捨てることで問いが生まれる — Creator, 2026-02-10"
+      adjunction: Noēsis (F) ⊣ Zētēsis (G)
+      F_role: 'F: Question → Insight（問いから確実性を構成する = precision ↑）'
+      G_role: 'G: Insight → Question（認識から自信を忘却し問いだけを残す = precision ↓）'
+      drift: Drift = unknown unknowns — 問えない問い。疑うべきかすら気づけない前提
+      insight: 自信 = 既知への重み付け(precision)を捨てることで問いが生まれる — Creator, 2026-02-10
   mathematical_basis:
-    L1: "前順序圏のガロア接続 — F(X) ≤ Y ⟺ X ≤ G(Y)"
-    L2: "[0,1]-豊穣圏 — Drift ∈ [0,1] は Hom 値"
-    L3: "弱2-圏 (将来) — 派生(nous/phro/meta/...)は 2-cell"
+    L1: 前順序圏のガロア接続 — F(X) ≤ Y ⟺ X ≤ G(Y)
+    L2: '[0,1]-豊穣圏 — Drift ∈ [0,1] は Hom 値'
+    L3: 弱2-圏 (将来) — 派生(nous/phro/meta/...)は 2-cell
   natural_transformation:
-    partner: "bou"
-    shared_axis: "Flow (I: 推論)"
-    varied_axis: "Value (E→P)"
-    meaning: "認識→実用。「で、結局何をすべきか」"
+    partner: bou
+    shared_axis: 'Flow (I: 推論)'
+    varied_axis: Value (E→P)
+    meaning: 認識→実用。「で、結局何をすべきか」
   duality:
-    partner: "ene"
-    type: "transition"
-    meaning: "認知→運動。「理解した、やろう」"
+    partner: ene
+    type: transition
+    meaning: 認知→運動。「理解した、やろう」
 cognitive_algebra:
-  "+": 詳細分析（各フェーズで3倍の出力）
-  "-": 要点分析（結論+理由1つのみ、5行以内）
-  "*": メタ分析（分析の前提を問い直す）
+  +: 詳細分析（各フェーズで3倍の出力）
+  '-': 要点分析（結論+理由1つのみ、5行以内）
+  '*': メタ分析（分析の前提を問い直す）
 sel_enforcement:
-  "+":
+  +:
     minimum_requirements:
-      - "各 PHASE の出力が標準の3倍以上（文字数）"
-      - "GoT (Graph of Thought) 分岐: 3つ以上の経路を探索"
-      - "PHASE 3 (Kalon): 普遍性検証を実行"
-      - "発想モード: Analogy/10x/Gap 等を最低1つ実行"
-      - "最終出力: ファイル保存必須"
-  "-":
+    - 各 PHASE の出力が標準の3倍以上（文字数）
+    - 'GoT (Graph of Thought) 分岐: 3つ以上の経路を探索'
+    - 'PHASE 3 (Kalon): 普遍性検証を実行'
+    - '発想モード: Analogy/10x/Gap 等を最低1つ実行'
+    - '最終出力: ファイル保存必須'
+  '-':
     minimum_requirements:
-      - "結論 + 理由1つのみ、5行以内"
+    - 結論 + 理由1つのみ、5行以内
 ---
 
 # /noe: 最深層思考ワークフロー (Noēsis)

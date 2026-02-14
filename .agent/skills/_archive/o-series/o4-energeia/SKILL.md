@@ -1,67 +1,61 @@
 ---
-# === Metadata Layer (v2.1) ===
-id: "O4"
-name: "Energeia"
-greek: "Ἐνέργεια"
-category: "pure-theorem"
-description: >
-  Applies the O4 Energeia theorem from the Hegemonikón framework for pure action execution.
-  Use this skill when a plan is approved, the user says 'y' or 'do it', or when
-  transforming will into concrete implementation with pre/post-condition verification.
-  Triggers: /ene, 実行, execute, do it, y (approval), implement, action.
+id: O4
+name: Energeia
+greek: Ἐνέργεια
+category: pure-theorem
+description: 'Applies the O4 Energeia theorem from the Hegemonikón framework for pure
+  action execution. Use this skill when a plan is approved, the user says ''y'' or
+  ''do it'', or when transforming will into concrete implementation with pre/post-condition
+  verification. Triggers: /ene, 実行, execute, do it, y (approval), implement, action.
 
-# v2.1 生成規則
+  '
 generation:
-  layer: "L2 O-series (Ousia)"
-  formula: "Action (A) × Pragmatic (P)"
-  result: "実用行動 — 目的を達成するための行動"
+  layer: L2 O-series (Ousia)
+  formula: Action (A) × Pragmatic (P)
+  result: 実用行動 — 目的を達成するための行動
   axioms:
-    - L1.1 Flow (I/A): A (行為)
-    - L1.2 Value (E/P): P (実用)
-
-# 発動条件
+  - L1.1 Flow (I/A): A (行為)
+  - L1.2 Value (E/P): P (実用)
 triggers:
-  - "/ene コマンド"
-  - "y (計画承認)"
-  - action clarification
-  - what-should-we-do inquiry
-  - "/bou 完了後"
-
-# キーワード
+- /ene コマンド
+- y (計画承認)
+- action clarification
+- what-should-we-do inquiry
+- /bou 完了後
 keywords:
-  - action
-  - doing
-  - execution
-  - pragmatic-action
-  - implementation
-  - realization
+- action
+- doing
+- execution
+- pragmatic-action
+- implementation
+- realization
+when_to_use: '「何をすべきか」を問う時、行為の本質を確認する時。
 
-# 使用条件
-when_to_use: |
-  「何をすべきか」を問う時、行為の本質を確認する時。
   計画が承認された時、意志が明確になった時。
 
-when_not_to_use: |
-  - まだ判断フェーズ中（→ T2 Krisis）
+  '
+when_not_to_use: '- まだ判断フェーズ中（→ T2 Krisis）
+
   - 情報収集が必要（→ T5 Peira）
+
   - 戦略設計が必要（→ T4 Phronēsis）
 
-# 関連 (v2.1)
+  '
 related:
-  upstream: []  # O-series は最上流
+  upstream: []
   downstream:
-    - "S2 Mekhanē"
-    - "S4 Praxis"
-  x_series: ["X-OS"]
-  micro: "/ene"
-  macro: "mekhane/ergasterion/"
-
-version: "2.1.0"
+  - S2 Mekhanē
+  - S4 Praxis
+  x_series:
+  - X-OS
+  micro: /ene
+  macro: mekhane/ergasterion/
+version: 2.1.0
 risk_tier: L0
 reversible: true
 requires_approval: false
 risks:
-  - "アーカイブ済みスキルの誤参照による古い手法の適用"
+- アーカイブ済みスキルの誤参照による古い手法の適用
 fallbacks: []
 ---
 

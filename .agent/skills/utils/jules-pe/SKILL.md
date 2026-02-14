@@ -3,14 +3,14 @@ name: jules-pe
 description: Jules（Gemini エージェント）にプロンプト生成を委譲するためのスキル
 hegemonikon: Praxis-H
 trigger:
-  - プロンプト生成を Jules に
-  - Jules でプロンプト
-  - PE を Jules で
+- プロンプト生成を Jules に
+- Jules でプロンプト
+- PE を Jules で
 risk_tier: L1
 reversible: true
 requires_approval: false
 risks:
-  - "ユーティリティの誤用による品質基準の逸脱"
+- ユーティリティの誤用による品質基準の逸脱
 fallbacks: []
 ---
 

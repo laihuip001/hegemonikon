@@ -1,34 +1,33 @@
 ---
-id: "K11"
-name: "Valence→Stratum"
-category: "valence-reasoning"
-description: "動機方向が処理レベルを決定する文脈定理"
-
+id: K11
+name: Valence→Stratum
+category: valence-reasoning
+description: 動機方向が処理レベルを決定する文脈定理
 triggers:
-  - motivation-to-depth mapping
-  - pleasure vs actualization
-  - fear vs ethics decisions
-
+- motivation-to-depth mapping
+- pleasure vs actualization
+- fear vs ethics decisions
 keywords:
-  - valence
-  - stratum
-  - pleasure
-  - ethics
+- valence
+- stratum
+- pleasure
+- ethics
+when_to_use: '接近/回避に応じて処理の深さを導出する場合。
 
-when_to_use: |
-  接近/回避に応じて処理の深さを導出する場合。
   例：低次は快楽/恐怖、高次は自己実現/倫理。
 
-when_not_to_use: |
-  - 処理レベルが既に決まっている場合
+  '
+when_not_to_use: '- 処理レベルが既に決まっている場合
+
   - 動機方向が未定の場合
 
-version: "2.0"
+  '
+version: '2.0'
 risk_tier: L0
 reversible: true
 requires_approval: false
 risks:
-  - "アーカイブ済みスキルの誤参照による古い手法の適用"
+- アーカイブ済みスキルの誤参照による古い手法の適用
 fallbacks: []
 ---
 

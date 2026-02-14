@@ -1,5 +1,5 @@
 ---
-description: "\u88C1\u304F \u2014 V:{/noe~/dia}_I:[\u2713]{/ene{PROOF.md}}_E:{/ene{_limbo/}}"
+description: 裁く — V:{/noe~/dia}_I:[✓]{/ene{PROOF.md}}_E:{/ene{_limbo/}}
 lcm_state: beta
 version: '1.0'
 ---

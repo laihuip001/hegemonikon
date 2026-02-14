@@ -1,67 +1,63 @@
 ---
-# === Metadata Layer (v2.1) ===
-id: "S4"
-name: "Praxis"
-greek: "Πρᾶξις"
-category: "modal-theorem"
-description: >
-  Applies the S4 Praxis schema from the Hegemonikón framework for value realization.
-  Use this skill when the user needs to decide how to deliver value - via exploratory
-  creation (Explore) or reliable delivery (Exploit). Connects will to implementation.
-  Triggers: 実践, value delivery, implementation, realization, /ene, 成果物.
+id: S4
+name: Praxis
+greek: Πρᾶξις
+category: modal-theorem
+description: 'Applies the S4 Praxis schema from the Hegemonikón framework for value
+  realization. Use this skill when the user needs to decide how to deliver value -
+  via exploratory creation (Explore) or reliable delivery (Exploit). Connects will
+  to implementation. Triggers: 実践, value delivery, implementation, realization, /ene,
+  成果物.
 
-# v2.1 生成規則
+  '
 generation:
-  layer: "L2 S-series (Schema)"
-  formula: "Value (E/P) × Function (P/E)"
-  result: "方法価値 — 実践での配置"
+  layer: L2 S-series (Schema)
+  formula: Value (E/P) × Function (P/E)
+  result: 方法価値 — 実践での配置
   axioms:
-    - L1.2 Value (E/P): 認識/実用の選択
-    - L1.5.2 Function (P/E): Explore/Exploit の選択
-
-# 発動条件
+  - L1.2 Value (E/P): 認識/実用の選択
+  - L1.5.2 Function (P/E): Explore/Exploit の選択
 triggers:
-  - value realization method
-  - practical implementation
-  - value delivery choice
-  - outcome strategy
-
-# キーワード
+- value realization method
+- practical implementation
+- value delivery choice
+- outcome strategy
 keywords:
-  - practice
-  - implementation
-  - realization
-  - delivery
-  - outcome
-  - actualization
+- practice
+- implementation
+- realization
+- delivery
+- outcome
+- actualization
+when_to_use: '価値実現の「方法」を決定する必要がある時。
 
-# 使用条件
-when_to_use: |
-  価値実現の「方法」を決定する必要がある時。
   価値の探索的追求（Explore）か確実な実現（Exploit）かを選ぶ時。
 
-when_not_to_use: |
-  - 実現方法が既に決まっている場合
+  '
+when_not_to_use: '- 実現方法が既に決まっている場合
+
   - 行動の方法選択が必要な時（→ S2 Mekhanē）
 
-# 関連 (v2.1)
+  '
 related:
   upstream:
-    - "O2 Boulēsis"
-    - "O4 Energeia"
+  - O2 Boulēsis
+  - O4 Energeia
   downstream:
-    - "H4 Doxa"
-    - "P4 Tekhne"
-  x_series: ["X-OS", "X-SH", "X-SP"]
-  micro: "/ene"  # 行為 workflow
-  macro: "mekhane/ergasterion/"
-
-version: "2.1.0"
+  - H4 Doxa
+  - P4 Tekhne
+  x_series:
+  - X-OS
+  - X-SH
+  - X-SP
+  micro: /ene
+  macro: mekhane/ergasterion/
+version: 2.1.0
 risk_tier: L0
 reversible: true
 requires_approval: false
 risks:
-  - "アーカイブ済みスキルの誤参照による古い手法の適用"
+- アーカイブ済みスキルの誤参照による古い手法の適用
 fallbacks: []
 ---
 

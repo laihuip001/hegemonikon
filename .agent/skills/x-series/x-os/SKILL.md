@@ -1,32 +1,35 @@
 ---
-id: "X-OS"
-name: "Ousia → Schema"
-category: "relation-layer"
-pair: "O → S"
-shared_coordinate: "C1 (Flow)"
+id: X-OS
+name: Ousia → Schema
+category: relation-layer
+pair: O → S
+shared_coordinate: C1 (Flow)
 relation_count: 8
-type: "Anchor"
-description: "本質 (Ousia) が設計 (Schema) を規定する8つの射"
-
+type: Anchor
+description: 本質 (Ousia) が設計 (Schema) を規定する8つの射
 activation_conditions:
-  - context: "認識・探求・意志・行為の完了後、設計の問いが自然に生じるとき"
-  - trigger: "「理解した。次はどう実装するか」の遷移"
-  - confidence_threshold: 0.6
-  - priority: "high"
-
+- context: 認識・探求・意志・行為の完了後、設計の問いが自然に生じるとき
+- trigger: 「理解した。次はどう実装するか」の遷移
+- confidence_threshold: 0.6
+- priority: high
 triggers:
-  - "認識結果を設計に変換"
-  - "/noe >> /met"
-  - "/bou >> /mek"
-  - "本質→様態"
-  - "理解→実装"
-
-keywords: [ousia-schema, essence-to-design, x-os, understanding-to-implementation]
+- 認識結果を設計に変換
+- /noe >> /met
+- /bou >> /mek
+- 本質→様態
+- 理解→実装
+keywords:
+- ousia-schema
+- essence-to-design
+- x-os
+- understanding-to-implementation
 risk_tier: L0
-risks: ["none identified"]
+risks:
+- none identified
 reversible: true
 requires_approval: false
-fallbacks: ["manual execution"]
+fallbacks:
+- manual execution
 ---
 
 # X-OS: Ousia → Schema (本質→様態)

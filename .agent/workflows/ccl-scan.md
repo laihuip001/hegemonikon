@@ -1,5 +1,5 @@
 ---
-description: "\u898B\u308B \u2014 /s*%/dia"
+description: 見る — /s*%/dia
 lcm_state: beta
 version: '1.0'
 ---

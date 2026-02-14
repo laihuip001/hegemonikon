@@ -1,58 +1,80 @@
 ---
 description: A2 Krisis（判定力）を発動する抽象コマンド。敵対的レビュー機能統合。
 hegemonikon: A2 Krisis
-version: "7.0"
-skill_ref: ".agent/skills/akribeia/a2-krisis/SKILL.md"
-lcm_state: stable       # draft | beta | stable | deprecated
-layer: "Δ"
-derivatives: [aff, neg, epo, root, devil, steelman, counterfactual, cold_mirror, deliberative, explore]
+version: '7.0'
+skill_ref: .agent/skills/akribeia/a2-krisis/SKILL.md
+lcm_state: stable
+layer: Δ
+derivatives:
+- aff
+- neg
+- epo
+- root
+- devil
+- steelman
+- counterfactual
+- cold_mirror
+- deliberative
+- explore
 trigonon:
   series: A
   type: Pure
   theorem: A2
-  coordinates: [C, U]
+  coordinates:
+  - C
+  - U
   bridge: []
-  anchor_via: [H, K]
+  anchor_via:
+  - H
+  - K
   morphisms:
-    ">>H": [/pro, /pis, /ore, /dox]
-    ">>K": [/euk, /chr, /tel, /sop]
+    '>>H':
+    - /pro
+    - /pis
+    - /ore
+    - /dox
+    '>>K':
+    - /euk
+    - /chr
+    - /tel
+    - /sop
 cognitive_algebra:
-  "+": 詳細判定（証拠/論拠/反論を完全展開）
-  "-": 判定要約（PASS/FAIL + 1行理由）
-  "*": メタ判定（判定プロセス自体を判定）
+  +: 詳細判定（証拠/論拠/反論を完全展開）
+  '-': 判定要約（PASS/FAIL + 1行理由）
+  '*': メタ判定（判定プロセス自体を判定）
 sel_enforcement:
-  "+":
+  +:
     minimum_requirements:
-      - "証拠セクション: 具体的データ/事実を引用"
-      - "論拠セクション: 推論の連鎖を明示"
-      - "反論セクション: 最も強い反論を提示"
-      - "確信度: [確信/推定/仮説] を明示"
-      - "CoVe: CONFLICT-Q/A/S 3サブフェーズ実行"
-  "-":
+    - '証拠セクション: 具体的データ/事実を引用'
+    - '論拠セクション: 推論の連鎖を明示'
+    - '反論セクション: 最も強い反論を提示'
+    - '確信度: [確信/推定/仮説] を明示'
+    - 'CoVe: CONFLICT-Q/A/S 3サブフェーズ実行'
+  '-':
     minimum_requirements:
-      - "PASS/FAIL + 1行理由のみ"
+    - PASS/FAIL + 1行理由のみ
 category_theory:
-  core: "随伴 F⊣G の左随伴 F（自由関手）"
-  adjunction: "Krisis (F) ⊣ Epistēmē (G)"
-  role: "F: Knowledge → Judgement（抽象的知識に具体的文脈を載せて判定に）"
-  F_definition: "普遍的知識（意味記憶）に具体的状況を適用して判定を構成する"
-  unit: "η: Know → G(F(Know)) — 知識を判定に適用して再び知識に戻す = 検証の効果"
-  counit: "ε: F(G(Judge)) → Judge — 判定を知識化して再判定 = 判例の確認"
-  memory_analogy: "エピソード記憶（判定=具体）⇄ 意味記憶（知識=抽象）"
-  insight: "判定=具体、知識=抽象。具体を忘れることで普遍性が残る — Creator, 2026-02-10"
+  core: 随伴 F⊣G の左随伴 F（自由関手）
+  adjunction: Krisis (F) ⊣ Epistēmē (G)
+  role: 'F: Knowledge → Judgement（抽象的知識に具体的文脈を載せて判定に）'
+  F_definition: 普遍的知識（意味記憶）に具体的状況を適用して判定を構成する
+  unit: 'η: Know → G(F(Know)) — 知識を判定に適用して再び知識に戻す = 検証の効果'
+  counit: 'ε: F(G(Judge)) → Judge — 判定を知識化して再判定 = 判例の確認'
+  memory_analogy: エピソード記憶（判定=具体）⇄ 意味記憶（知識=抽象）
+  insight: 判定=具体、知識=抽象。具体を忘れることで普遍性が残る — Creator, 2026-02-10
   mathematical_basis:
-    L1: "前順序圏のガロア接続 — F(X) ≤ Y ⟺ X ≤ G(Y)"
-    L2: "[0,1]-豊穣圏 — Drift ∈ [0,1] は Hom 値"
-    L3: "弱2-圏 (将来) — 派生は 2-cell"
+    L1: 前順序圏のガロア接続 — F(X) ≤ Y ⟺ X ≤ G(Y)
+    L2: '[0,1]-豊穣圏 — Drift ∈ [0,1] は Hom 値'
+    L3: 弱2-圏 (将来) — 派生は 2-cell
   natural_transformation:
-    partner: "pat"
-    shared_axis: "Valence (+: 肯定)"
-    varied_axis: "Precision (U→C)"
-    meaning: "不確かな判断→確かな情念。「判断する→感じ直す」"
+    partner: pat
+    shared_axis: 'Valence (+: 肯定)'
+    varied_axis: Precision (U→C)
+    meaning: 不確かな判断→確かな情念。「判断する→感じ直す」
   duality:
-    partner: "gno"
-    type: "tension"
-    meaning: "判断↔教訓。「今の判断 ↔ 過去の知恵」"
+    partner: gno
+    type: tension
+    meaning: 判断↔教訓。「今の判断 ↔ 過去の知恵」
 ---
 
 # /dia: A2 Krisis 発動コマンド

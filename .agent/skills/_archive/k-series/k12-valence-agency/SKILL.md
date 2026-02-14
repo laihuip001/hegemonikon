@@ -1,34 +1,33 @@
 ---
-id: "K12"
-name: "Valence→Agency"
-category: "valence-reasoning"
-description: "動機方向が主体選択を決定する文脈定理"
-
+id: K12
+name: Valence→Agency
+category: valence-reasoning
+description: 動機方向が主体選択を決定する文脈定理
 triggers:
-  - motivation-to-control mapping
-  - approach-avoid target selection
-  - self vs environment motivation
-
+- motivation-to-control mapping
+- approach-avoid target selection
+- self vs environment motivation
 keywords:
-  - valence
-  - agency
-  - motivation
-  - target-selection
+- valence
+- agency
+- motivation
+- target-selection
+when_to_use: '接近/回避に応じて自己/環境を選ぶ場合。
 
-when_to_use: |
-  接近/回避に応じて自己/環境を選ぶ場合。
   例：学習意欲（自己接近）、有害環境排除（環境回避）。
 
-when_not_to_use: |
-  - 主体が既に決まっている場合
+  '
+when_not_to_use: '- 主体が既に決まっている場合
+
   - 動機方向が未定の場合
 
-version: "2.0"
+  '
+version: '2.0'
 risk_tier: L0
 reversible: true
 requires_approval: false
 risks:
-  - "アーカイブ済みスキルの誤参照による古い手法の適用"
+- アーカイブ済みスキルの誤参照による古い手法の適用
 fallbacks: []
 ---
 

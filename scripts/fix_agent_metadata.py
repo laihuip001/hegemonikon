@@ -42,9 +42,15 @@ def fix_skills():
                 data["risks"] = []
                 changed = True
 
-            if changed:
-                new_frontmatter = yaml.dump(data, default_flow_style=False, sort_keys=False).strip()
-                new_content = f"---\n{new_frontmatter}\n---{body}"
+            # Always re-dump to fix unicode escaping if present
+            new_frontmatter = yaml.dump(data, default_flow_style=False, sort_keys=False, allow_unicode=True).strip()
+            # Normalize line endings in original frontmatter for comparison? No, just rewrite if different
+            # But frontmatter_raw might have comments or different formatting.
+            # Ideally we only write if the content changes or if we detect escape sequences.
+            # Simple approach: write if 'changed' is True OR if we suspect encoding issues (always safe to normalize).
+            # Let's force write for now to ensure fix.
+            new_content = f"---\n{new_frontmatter}\n---{body}"
+            if new_content != content:
                 skill_file.write_text(new_content, encoding="utf-8")
                 print(f"Fixed skill: {skill_file}")
 
@@ -83,9 +89,10 @@ def fix_workflows():
                 data["version"] = "1.0"
                 changed = True
 
-            if changed:
-                new_frontmatter = yaml.dump(data, default_flow_style=False, sort_keys=False).strip()
-                new_content = f"---\n{new_frontmatter}\n---{body}"
+            # Always re-dump to fix unicode escaping if present
+            new_frontmatter = yaml.dump(data, default_flow_style=False, sort_keys=False, allow_unicode=True).strip()
+            new_content = f"---\n{new_frontmatter}\n---{body}"
+            if new_content != content:
                 wf_file.write_text(new_content, encoding="utf-8")
                 print(f"Fixed workflow: {wf_file}")
 

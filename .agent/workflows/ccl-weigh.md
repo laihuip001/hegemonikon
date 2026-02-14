@@ -1,5 +1,5 @@
 ---
-description: "\u91CF\u308B \u2014 /bou*%/noe"
+description: 量る — /bou*%/noe
 lcm_state: beta
 version: '1.0'
 ---

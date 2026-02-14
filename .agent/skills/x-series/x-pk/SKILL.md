@@ -1,28 +1,37 @@
 ---
-id: "X-PK"
-name: "Perigraphē → Kairos"
-category: "relation-layer"
-pair: "P → K"
-shared_coordinate: "C3 (Scale)"
+id: X-PK
+name: Perigraphē → Kairos
+category: relation-layer
+pair: P → K
+shared_coordinate: C3 (Scale)
 relation_count: 8
-type: "Anchor"
-naturality: "構造"
-zoom_chain: "適用のズーム → タイミングのズーム (チェーン第2段)"
-description: "条件空間 (Perigraphē) のズームレベルが文脈 (Kairos) のズームレベルを規定する8つの射"
-
+type: Anchor
+naturality: 構造
+zoom_chain: 適用のズーム → タイミングのズーム (チェーン第2段)
+description: 条件空間 (Perigraphē) のズームレベルが文脈 (Kairos) のズームレベルを規定する8つの射
 activation_conditions:
-  - context: "領域・経路・軌道が定まった後、タイミングや目的のスケール評価が必要なとき"
-  - trigger: "「このスケールの場を設定した。どのタイムスケールで動くか」"
-  - confidence_threshold: 0.6
-  - priority: "high"
-
-triggers: ["適用→タイミング粒度", "/kho >> /euk", "/tro >> /tel", "ズームチェーン第2段"]
-keywords: [perigraphe-kairos, scope-to-timing, x-pk, zoom-propagation, chain-stage-2]
+- context: 領域・経路・軌道が定まった後、タイミングや目的のスケール評価が必要なとき
+- trigger: 「このスケールの場を設定した。どのタイムスケールで動くか」
+- confidence_threshold: 0.6
+- priority: high
+triggers:
+- 適用→タイミング粒度
+- /kho >> /euk
+- /tro >> /tel
+- ズームチェーン第2段
+keywords:
+- perigraphe-kairos
+- scope-to-timing
+- x-pk
+- zoom-propagation
+- chain-stage-2
 risk_tier: L0
-risks: ["none identified"]
+risks:
+- none identified
 reversible: true
 requires_approval: false
-fallbacks: ["manual execution"]
+fallbacks:
+- manual execution
 ---
 
 # X-PK: Perigraphē → Kairos (条件→文脈)

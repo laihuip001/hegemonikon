@@ -1,40 +1,49 @@
 ---
 description: X-series（関係層）を駆動し、定理間の従属関係を可視化・活用する。
 hegemonikon: Taxis
-modules: [X]
-skill_ref: ".agent/skills/taxis/SKILL.md"
+modules:
+- X
+skill_ref: .agent/skills/taxis/SKILL.md
 triggers:
-  - "関係"
-  - "接続"
-  - "次は何"
-  - "X-series"
-version: "6.0"
+- 関係
+- 接続
+- 次は何
+- X-series
+version: '6.0'
 lcm_state: stable
-lineage: "v5.5 + 暗黙発動プロトコル L0-L3 → v6.0"
-derivatives: [chain, toc, dependency, network, leverage, path_dep, separate, second_order]
+lineage: v5.5 + 暗黙発動プロトコル L0-L3 → v6.0
+derivatives:
+- chain
+- toc
+- dependency
+- network
+- leverage
+- path_dep
+- separate
+- second_order
 cognitive_algebra:
-  "+": "詳細関係分析。72関係全展開、経路詳述"
-  "-": "即断接続。推奨次WF 1つのみ"
-  "*": "関係のメタ分析。なぜこの接続か"
+  +: 詳細関係分析。72関係全展開、経路詳述
+  '-': 即断接続。推奨次WF 1つのみ
+  '*': 関係のメタ分析。なぜこの接続か
 sel_enforcement:
-  "+":
-    description: "MUST analyze all 72 relations with detailed paths"
+  +:
+    description: MUST analyze all 72 relations with detailed paths
     minimum_requirements:
-      - "72関係全展開"
-      - "経路詳述"
-      - "ハブ・クラスタ分析"
-  "-":
-    description: "MAY provide single next WF recommendation only"
+    - 72関係全展開
+    - 経路詳述
+    - ハブ・クラスタ分析
+  '-':
+    description: MAY provide single next WF recommendation only
     minimum_requirements:
-      - "推奨WF 1つのみ"
-  "*":
-    description: "MUST meta-analyze: why this connection?"
+    - 推奨WF 1つのみ
+  '*':
+    description: 'MUST meta-analyze: why this connection?'
     minimum_requirements:
-      - "接続理由を問う"
+    - 接続理由を問う
 anti_skip: enabled
 children:
-  - "/ax"  # X-series 派生（全定理統合分析）
-ccl_signature: "/x+"
+- /ax
+ccl_signature: /x+
 ---
 
 # /x: 関係層ワークフロー (Taxis)

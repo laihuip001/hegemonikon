@@ -1,43 +1,45 @@
 ---
-# Theorem Metadata (v3.0)
-id: "A4"
-name: "Epistēmē"
-greek: "Ἐπιστήμη"
-series: "Akribeia"
+id: A4
+name: Epistēmē
+greek: Ἐπιστήμη
+series: Akribeia
 generation:
-  formula: "Explore × Precision"
-  result: "探索精密 — 検証済み知識"
+  formula: Explore × Precision
+  result: 探索精密 — 検証済み知識
+description: '知識として確立できるか？・信念を検証したい・確信→知識昇格の時に発動。 Knowledge establishment, belief
+  verification, epistemic elevation. Use for: 知識, 確立, verify, knowledge, 検証済み. NOT
+  for: unverified beliefs (信念 → Doxa H4), wisdom (知恵 → Sophia K4).
 
-description: >
-  知識として確立できるか？・信念を検証したい・確信→知識昇格の時に発動。
-  Knowledge establishment, belief verification, epistemic elevation.
-  Use for: 知識, 確立, verify, knowledge, 検証済み.
-  NOT for: unverified beliefs (信念 → Doxa H4), wisdom (知恵 → Sophia K4).
-
+  '
 triggers:
-  - 知識の確立/検証
-  - 信念→知識の昇格
-  - エビデンスの統合
-  - /epi コマンド
-
-keywords: [episteme, knowledge, science, verified, 知識, 検証, 確立]
-
+- 知識の確立/検証
+- 信念→知識の昇格
+- エビデンスの統合
+- /epi コマンド
+keywords:
+- episteme
+- knowledge
+- science
+- verified
+- 知識
+- 検証
+- 確立
 related:
   upstream:
-    - "H2 Pistis (X-HA6: 確信→知識昇格)"
-    - "H4 Doxa (X-HA8: 信念→検証済み知識化)"
-    - "K3 Telos (X-KA6: 目的→必要知識の確定)"
-    - "K4 Sophia (X-KA8: 知恵→体系的知識昇格)"
+  - 'H2 Pistis (X-HA6: 確信→知識昇格)'
+  - 'H4 Doxa (X-HA8: 信念→検証済み知識化)'
+  - 'K3 Telos (X-KA6: 目的→必要知識の確定)'
+  - 'K4 Sophia (X-KA8: 知恵→体系的知識昇格)'
   downstream: []
-
-version: "3.0.0"
-workflow_ref: ".agent/workflows/epi.md"
+version: 3.0.0
+workflow_ref: .agent/workflows/epi.md
 risk_tier: L2
 reversible: false
 requires_approval: true
 risks:
-  - "偽陽性の知識確立 (未検証のまま知識と宣言)"
-fallbacks: ["manual execution"]
+- 偽陽性の知識確立 (未検証のまま知識と宣言)
+fallbacks:
+- manual execution
 ---
 
 # A4: Epistēmē (Ἐπιστήμη)

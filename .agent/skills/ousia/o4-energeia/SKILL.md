@@ -1,51 +1,45 @@
 ---
-# Theorem Metadata (v3.0)
-id: "O4"
-name: "Energeia"
-greek: "Ἐνέργεια"
-series: "Ousia"
+id: O4
+name: Energeia
+greek: Ἐνέργεια
+series: Ousia
 generation:
-  formula: "Flow (A) × Value (P)"
-  result: "実用行動 — 目的を達成するための行動"
+  formula: Flow (A) × Value (P)
+  result: 実用行動 — 目的を達成するための行動
+description: 'やって・実行して・作って・実装して時に発動。 Execute plans, implement changes, take concrete
+  action. Use for: 実行, やって, do it, 作って, implement. NOT for: planning (use O2), high
+  uncertainty (use O3).
 
-description: >
-  やって・実行して・作って・実装して時に発動。
-  Execute plans, implement changes, take concrete action.
-  Use for: 実行, やって, do it, 作って, implement.
-  NOT for: planning (use O2), high uncertainty (use O3).
-
+  '
 triggers:
-  - 計画承認後
-  - /ene コマンド
-  - 「やって」「実行して」「作って」
-
+- 計画承認後
+- /ene コマンド
+- 「やって」「実行して」「作って」
 keywords:
-  - energeia
-  - execute
-  - action
-  - implement
-  - do
-  - 実行
-  - 行動
-
+- energeia
+- execute
+- action
+- implement
+- do
+- 実行
+- 行動
 related:
-  upstream: ["O2 Boulēsis"]
+  upstream:
+  - O2 Boulēsis
   downstream:
-    - "S3 Stathmos"
-    - "S4 Praxis"
+  - S3 Stathmos
+  - S4 Praxis
   x_series:
-    - "X-OS7 → S3 Stathmos"
-    - "X-OS8 → S4 Praxis"
-
-lineage: "O4 Energeia + Anti-Skip Protocol + Artifact出力規則 → v3.0"
-
-version: "3.0.0"
-workflow_ref: ".agent/workflows/ene.md"
+  - X-OS7 → S3 Stathmos
+  - X-OS8 → S4 Praxis
+lineage: O4 Energeia + Anti-Skip Protocol + Artifact出力規則 → v3.0
+version: 3.0.0
+workflow_ref: .agent/workflows/ene.md
 risk_tier: L1
 reversible: true
 requires_approval: false
 risks:
-  - "認知フレームの過度な適用による思考の硬直化"
+- 認知フレームの過度な適用による思考の硬直化
 fallbacks: []
 ---
 

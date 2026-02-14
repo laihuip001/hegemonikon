@@ -1,85 +1,80 @@
 ---
 description: K3 Telos 自問ワークフロー。Why（目的）を問い、手段と目的の入れ替わりを防ぐ。
 hegemonikon: Kairos
-modules: [K3]
-skill_ref: ".agent/skills/kairos/k3-telos/SKILL.md"
+modules:
+- K3
+skill_ref: .agent/skills/kairos/k3-telos/SKILL.md
 triggers:
-  - "何のため"
-  - "目的"
-  - "telos"
-  - "why"
-version: "3.4"
+- 何のため
+- 目的
+- telos
+- why
+version: '3.4'
 lcm_state: beta
-lineage: "v3.3 + FBR変換 → v3.4"
-derivatives: [intr, extr, tran, objective]
+lineage: v3.3 + FBR変換 → v3.4
+derivatives:
+- intr
+- extr
+- tran
+- objective
 trigonon:
   series: K
   type: Mixed
   theorem: K3
-  coordinates: [Function, C]
-  bridge: [S, H]
-  anchor_via: [P, A]
+  coordinates:
+  - Function
+  - C
+  bridge:
+  - S
+  - H
+  anchor_via:
+  - P
+  - A
   morphisms:
-    ">>S": [/met, /mek, /sta, /pra]
-    ">>H": [/pro, /pis, /ore, /dox]
+    '>>S':
+    - /met
+    - /mek
+    - /sta
+    - /pra
+    '>>H':
+    - /pro
+    - /pis
+    - /ore
+    - /dox
 cognitive_algebra:
-  "+": "詳細目的分析。5 Whys、目的階層、トレードオフ"
-  "-": "即断目的。何のための1行回答"
-  "*": "目的のメタ分析。なぜこの目的を問うか"
+  +: 詳細目的分析。5 Whys、目的階層、トレードオフ
+  '-': 即断目的。何のための1行回答
+  '*': 目的のメタ分析。なぜこの目的を問うか
 category_theory:
-  core: "随伴 F⊣G の右随伴 G（忘却関手）"
-  adjunction: "Eukairia (F) ⊣ Telos (G)"
-  role: "G: Opportunity → Purpose（好機からタイミングの緊急性を忘却し、普遍的な目的だけ残す）"
-  G_definition: "「今これをやるべき」から「今」を落とし、「なぜこれをやるのか」だけ抽出"
+  core: 随伴 F⊣G の右随伴 G（忘却関手）
+  adjunction: Eukairia (F) ⊣ Telos (G)
+  role: 'G: Timing → Purpose（好機判定から進捗の文脈を忘却し、目的（前提）に戻る）'
+  G_definition: 「ここまで進んできた」という経緯を捨てて、「そもそもなんのため？」に立ち返る
+  same_formula: euk と tel は同じ判定（+, 正しさの評価）の Scale 違い
+  coordinates: K3[Macro,+] — Valence(+)を保存し Scale を Macro に設定
   G_two_layers:
-    目的: "「何のために」の方向性。well-defined"
-    タイミング感覚: "「なぜ今か」の直感的察知力。目的化すると消える"
-  drift: "Drift = タイミング感覚の喪失。目的はあるが「いつ」を見失う = 手段の目的化前兆"
-  tel_connection: "/tel = G の自問。「手段が目的化していないか？」"
-  insight: "目的なき者に好機は来ない。好機なき目的は絵に描いた餅 — Creator, 2026-02-11"
-  mathematical_basis:
-    L1: "前順序圏のガロア接続 — F(X) ≤ Y ⟺ X ≤ G(Y)"
-    L2: "[0,1]-豊穣圏 — Drift ∈ [0,1] は Hom 値"
-    L3: "弱2-圏 (将来) — 派生は 2-cell"
-  natural_transformation:
-    partner: "sop"
-    shared_axis: "Scale (Ma: 巨視)"
-    varied_axis: "Valence (+→-)"
-    meaning: "目的→知恵。「何のため→何を知るべきか」"
-  duality:
-    partner: "chr"
-    type: "tension"
-    meaning: "使命↔期限。「なぜ ↔ いつ」"
+    目的: 「何のためにやっているか」という前提・根拠。well-defined
+    進捗文脈: 「ここまで来た経緯」。目的に戻ると忘却される
+  drift: Drift = 手段の目的化の度合い。「なぜやっているか」を忘れている深刻さ
+  G_preserves: 不変量 = 価値評価の基準（正しさの尺度）。進捗を忘却しても、何が正しいかの基準は保存される
+  tel_design: 手段の目的化を防ぐ = G の発動条件 = ε 崩壊の検出
+  insight: 進捗度が忘れ去られて前提に戻る — Creator, 2026-02-11
 sel_enforcement:
-  "+":
-    description: "MUST analyze with 5 Whys, purpose hierarchy, and tradeoffs"
+  +:
+    description: MUST analyze with 5 Whys, purpose hierarchy, and tradeoffs
     minimum_requirements:
-      - "5 Whys 必須"
-      - "目的階層 必須"
-      - "トレードオフ 必須"
-  "-":
-    description: "MAY provide single line purpose only"
+    - 5 Whys 必須
+    - 目的階層 必須
+    - トレードオフ 必須
+  '-':
+    description: MAY provide single line purpose only
     minimum_requirements:
-      - "何のための1行"
-  "*":
-    description: "MUST meta-analyze: why ask this purpose?"
+    - 何のための1行
+  '*':
+    description: 'MUST meta-analyze: why ask this purpose?'
     minimum_requirements:
-      - "目的のメタ分析"
-ccl_signature: "/tel+?k3"
-category_theory:
-  core: "随伴 F⊣G の右随伴 G（忘却関手）"
-  adjunction: "Eukairia (F) ⊣ Telos (G)"
-  role: "G: Timing → Purpose（好機判定から進捗の文脈を忘却し、目的（前提）に戻る）"
-  G_definition: "「ここまで進んできた」という経緯を捨てて、「そもそもなんのため？」に立ち返る"
-  same_formula: "euk と tel は同じ判定（+, 正しさの評価）の Scale 違い"
-  coordinates: "K3[Macro,+] — Valence(+)を保存し Scale を Macro に設定"
-  G_two_layers:
-    目的: "「何のためにやっているか」という前提・根拠。well-defined"
-    進捗文脈: "「ここまで来た経緯」。目的に戻ると忘却される"
-  drift: "Drift = 手段の目的化の度合い。「なぜやっているか」を忘れている深刻さ"
-  G_preserves: "不変量 = 価値評価の基準（正しさの尺度）。進捗を忘却しても、何が正しいかの基準は保存される"
-  tel_design: "手段の目的化を防ぐ = G の発動条件 = ε 崩壊の検出"
-  insight: "進捗度が忘れ去られて前提に戻る — Creator, 2026-02-11"
+    - 目的のメタ分析
+ccl_signature: /tel+?k3
 ---
 
 # /tel: 目的整合ワークフロー (Telos)

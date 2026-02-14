@@ -1,14 +1,17 @@
 ---
 name: integration-audit
-description: |
-  知識・コードベース統合の品質診断エージェント。
+description: '知識・コードベース統合の品質診断エージェント。
+
   「馴染み」「吸収」「完全統合」の3段階で統合度を評価。
+
   **Trigger:** 「統合/マージ/吸収の品質を確認して」「馴染んでる？」
+
+  '
 risk_tier: L1
 reversible: true
 requires_approval: false
 risks:
-  - "ユーティリティの誤用による品質基準の逸脱"
+- ユーティリティの誤用による品質基準の逸脱
 fallbacks: []
 ---
 

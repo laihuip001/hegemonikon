@@ -1,42 +1,45 @@
 ---
-# Theorem Metadata (v3.0)
-id: "P4"
-name: "Tekhnē"
-greek: "Τέχνη"
-series: "Perigraphē"
+id: P4
+name: Tekhnē
+greek: Τέχνη
+series: Perigraphē
 generation:
-  formula: "Function × Precision"
-  result: "機能精密 — 技法の選択"
+  formula: Function × Precision
+  result: 機能精密 — 技法の選択
+description: 'どの技法で？・最適な技法を選びたい・技法の適切さを評価したい時に発動。 Technique selection, tool choice,
+  craft method evaluation. Use for: 技法, 技術, technique, tool, 方法. NOT for: method design
+  (方法設計 → Mekhanē S2).
 
-description: >
-  どの技法で？・最適な技法を選びたい・技法の適切さを評価したい時に発動。
-  Technique selection, tool choice, craft method evaluation.
-  Use for: 技法, 技術, technique, tool, 方法.
-  NOT for: method design (方法設計 → Mekhanē S2).
-
+  '
 triggers:
-  - 技法の選択
-  - ツールの適切さ評価
-  - 「何を使うか」の問い
-  - /tek コマンド
-
-keywords: [tekhne, technique, craft, art, tool, 技法, 技術]
-
+- 技法の選択
+- ツールの適切さ評価
+- 「何を使うか」の問い
+- /tek コマンド
+keywords:
+- tekhne
+- technique
+- craft
+- art
+- tool
+- 技法
+- 技術
 related:
   upstream:
-    - "S2 Mekhanē (X-SP6: 方法の粒度→技法の粒度)"
-    - "S4 Praxis (X-SP8: 実践の粒度→技法の粒度)"
+  - 'S2 Mekhanē (X-SP6: 方法の粒度→技法の粒度)'
+  - 'S4 Praxis (X-SP8: 実践の粒度→技法の粒度)'
   downstream:
-    - "K3 Telos (X-PK7: 技法のスケール→目的のスケール)"
-    - "K4 Sophia (X-PK8: 技法のスケール→知恵のスケール)"
-
-version: "3.0.0"
-workflow_ref: ".agent/workflows/tek.md"
+  - 'K3 Telos (X-PK7: 技法のスケール→目的のスケール)'
+  - 'K4 Sophia (X-PK8: 技法のスケール→知恵のスケール)'
+version: 3.0.0
+workflow_ref: .agent/workflows/tek.md
 risk_tier: L1
 reversible: true
 requires_approval: false
-risks: ["none identified"]
-fallbacks: ["manual execution"]
+risks:
+- none identified
+fallbacks:
+- manual execution
 ---
 
 # P4: Tekhnē (Τέχνη)

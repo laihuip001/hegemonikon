@@ -1,47 +1,48 @@
 ---
-# Theorem Metadata (v3.0)
-id: "K4"
-name: "Sophia"
-greek: "Σοφία"
-series: "Kairos"
+id: K4
+name: Sophia
+greek: Σοφία
+series: Kairos
 generation:
-  formula: "Function × Precision"
-  result: "機能精密 — 知恵の探求・調査"
+  formula: Function × Precision
+  result: 機能精密 — 知恵の探求・調査
+description: '何を調べるべき？・知恵は足りているか？・外部知識が必要な時に発動。 Wisdom seeking, research invocation,
+  knowledge sufficiency check. Use for: 調査, 知恵, 研究, research, wisdom, 十分か. NOT for:
+  verified knowledge (検証済み知識 → Epistēmē A4).
 
-description: >
-  何を調べるべき？・知恵は足りているか？・外部知識が必要な時に発動。
-  Wisdom seeking, research invocation, knowledge sufficiency check.
-  Use for: 調査, 知恵, 研究, research, wisdom, 十分か.
-  NOT for: verified knowledge (検証済み知識 → Epistēmē A4).
-
+  '
 triggers:
-  - 外部調査の必要性
-  - 知識の不足感
-  - Perplexity/論文検索の起点
-  - /sop コマンド
-
-keywords: [sophia, wisdom, research, investigation, 知恵, 調査]
-
+- 外部調査の必要性
+- 知識の不足感
+- Perplexity/論文検索の起点
+- /sop コマンド
+keywords:
+- sophia
+- wisdom
+- research
+- investigation
+- 知恵
+- 調査
 related:
   upstream:
-    - "S2 Mekhanē (X-SK6: 方法→知恵の充足度)"
-    - "S4 Praxis (X-SK8: 実践→知識の充足度)"
-    - "P3 Trokhia (X-PK6: サイクル→反復に必要な知恵)"
-    - "P4 Tekhnē (X-PK8: 技法→必要な知識)"
-    - "H2 Pistis (X-HK6: 確信→「何を知るべきか」を決定)"
-    - "H4 Doxa (X-HK8: 信念→知恵の源泉を選ぶ ⚠️)"
+  - 'S2 Mekhanē (X-SK6: 方法→知恵の充足度)'
+  - 'S4 Praxis (X-SK8: 実践→知識の充足度)'
+  - 'P3 Trokhia (X-PK6: サイクル→反復に必要な知恵)'
+  - 'P4 Tekhnē (X-PK8: 技法→必要な知識)'
+  - 'H2 Pistis (X-HK6: 確信→「何を知るべきか」を決定)'
+  - 'H4 Doxa (X-HK8: 信念→知恵の源泉を選ぶ ⚠️)'
   downstream:
-    - "A3 Gnōmē (X-KA7: 知恵→格言抽出)"
-    - "A4 Epistēmē (X-KA8: 知恵→体系的知識昇格)"
-
-version: "3.0.0"
-workflow_ref: ".agent/workflows/sop.md"
+  - 'A3 Gnōmē (X-KA7: 知恵→格言抽出)'
+  - 'A4 Epistēmē (X-KA8: 知恵→体系的知識昇格)'
+version: 3.0.0
+workflow_ref: .agent/workflows/sop.md
 risk_tier: L2
 reversible: true
 requires_approval: false
 risks:
-  - "確証バイアス: 信念が知恵の源泉を選り好み (X-HK8)"
-fallbacks: ["manual execution"]
+- '確証バイアス: 信念が知恵の源泉を選り好み (X-HK8)'
+fallbacks:
+- manual execution
 ---
 
 # K4: Sophia (Σοφία)

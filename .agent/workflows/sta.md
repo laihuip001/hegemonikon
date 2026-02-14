@@ -1,80 +1,89 @@
 ---
 description: S3 Stathmos（基準）を発動し、評価基準・ベンチマークを設定する。基準配置ワークフロー。
 hegemonikon: Schema
-modules: [S3]
-skill_ref: ".agent/skills/schema/s3-stathmos/SKILL.md"
+modules:
+- S3
+skill_ref: .agent/skills/schema/s3-stathmos/SKILL.md
 triggers:
-  - "基準は何"
-  - "ベンチマーク"
-  - "評価基準"
-  - "stathmos"
-  - "baseline"
-version: "2.3"
+- 基準は何
+- ベンチマーク
+- 評価基準
+- stathmos
+- baseline
+version: '2.3'
 lcm_state: beta
-lineage: "v2.2 + FBR変換 → v2.3"
+lineage: v2.2 + FBR変換 → v2.3
 trigonon:
   series: S
   type: Mixed
   theorem: S3
-  coordinates: [A, Scale]
-  bridge: [H, K]
-  anchor_via: [O, P]
+  coordinates:
+  - A
+  - Scale
+  bridge:
+  - H
+  - K
+  anchor_via:
+  - O
+  - P
   morphisms:
-    ">>H": [/pro, /pis, /ore, /dox]
-    ">>K": [/euk, /chr, /tel, /sop]
+    '>>H':
+    - /pro
+    - /pis
+    - /ore
+    - /dox
+    '>>K':
+    - /euk
+    - /chr
+    - /tel
+    - /sop
 cognitive_algebra:
-  "+": "詳細基準設定。Must/Should/Could + 根拠"
-  "-": "即断基準。Pass/Fail の1点のみ"
-  "*": "基準選択のメタ分析。なぜこの基準か"
+  +: 詳細基準設定。Must/Should/Could + 根拠
+  '-': 即断基準。Pass/Fail の1点のみ
+  '*': 基準選択のメタ分析。なぜこの基準か
 category_theory:
-  core: "随伴 F⊣G の右随伴 G（忘却関手）"
-  adjunction: "Metron (F) ⊣ Stathmos (G)"
-  role: "G: Measure → Standard（具体的尺度から粒度/スケールを忘却し、抽象的評価基準だけ残す）"
-  G_definition: "「何をどの細かさで測ったか」を捨て、「何が良いか/悪いか」の判断基準のみ保持"
-  G_two_layers:
-    判断基準: "Must/Should/Could の優先順位。well-defined"
-    測定コンテキスト: "なぜその粒度を選んだか、どの環境で有効か。基準化すると消える"
-  drift: "Drift = 測定コンテキストの喪失量。基準が環境非依存に見えて実は環境依存"
-  insight: "測れないものは改善できない。だが基準なき測定はただの数字遊び — Creator, 2026-02-11"
-  mathematical_basis:
-    L1: "前順序圏のガロア接続 — F(X) ≤ Y ⟺ X ≤ G(Y)"
-    L2: "[0,1]-豊穣圏 — Drift ∈ [0,1] は Hom 値"
-    L3: "弱2-圏 (将来) — 派生は 2-cell"
-  natural_transformation:
-    partner: "pra"
-    shared_axis: "Flow (A: 行為)"
-    varied_axis: "Scale (Mi→Ma)"
-    meaning: "状態確認→大局実践。「今どこか→大きく動く」"
-  duality:
-    partner: "mek"
-    type: "tension"
-    meaning: "現状↔設計。「現実から理想への往復」"
+  core: 随伴 F⊣G の右随伴 G（忘却関手）
+  adjunction: Metron (F) ⊣ Stathmos (G)
+  role: 'G: Scale → Criterion（尺度からスケールの具体性を剥いで、純粋な基準に戻る）'
+  G_definition: 「どう測るか」という手段を忘却し、「何を良しとするか」という判断基準だけを残す
+  coordinates: S3[A,Scale] — Flow(A:行為)を保存し Scale 軸で抽象化
+  unit: 'η: Criterion → G(F(Criterion)) — 基準を尺度にして基準に戻す = 基準の安定性検証'
+  counit: 'ε: F(G(Scale)) → Scale — 尺度を基準で見直して再設定 = 尺度の妥当性検証'
+  drift: Drift = Must/Should/Could が形骸化し、測定可能性だけが残っている状態
 sel_enforcement:
-  "+":
-    description: "MUST set criteria with Must/Should/Could + rationale"
+  +:
+    description: MUST set criteria with Must/Should/Could + rationale
     minimum_requirements:
-      - "Must/Should/Could 必須"
-      - "根拠 必須"
-  "-":
-    description: "MAY provide Pass/Fail only"
+    - Must/Should/Could 必須
+    - 根拠 必須
+  '-':
+    description: MAY provide Pass/Fail only
     minimum_requirements:
-      - "合否1点のみ"
-  "*":
-    description: "MUST meta-analyze: why this criterion?"
+    - 合否1点のみ
+  '*':
+    description: 'MUST meta-analyze: why this criterion?'
     minimum_requirements:
-      - "基準選択の根拠を問う"
-derivatives: [norm, empi, rela, pareto, optimize, safety, sensitivity, robust, done, test, delta, signal, failsafe, security, fairness, accountability, opportunity]
+    - 基準選択の根拠を問う
+derivatives:
+- norm
+- empi
+- rela
+- pareto
+- optimize
+- safety
+- sensitivity
+- robust
+- done
+- test
+- delta
+- signal
+- failsafe
+- security
+- fairness
+- accountability
+- opportunity
 anti_skip: enabled
-ccl_signature: "/sta+?s3"
-category_theory:
-  core: "随伴 F⊣G の右随伴 G（忘却関手）"
-  adjunction: "Metron (F) ⊣ Stathmos (G)"
-  role: "G: Scale → Criterion（尺度からスケールの具体性を剥いで、純粋な基準に戻る）"
-  G_definition: "「どう測るか」という手段を忘却し、「何を良しとするか」という判断基準だけを残す"
-  coordinates: "S3[A,Scale] — Flow(A:行為)を保存し Scale 軸で抽象化"
-  unit: "η: Criterion → G(F(Criterion)) — 基準を尺度にして基準に戻す = 基準の安定性検証"
-  counit: "ε: F(G(Scale)) → Scale — 尺度を基準で見直して再設定 = 尺度の妥当性検証"
-  drift: "Drift = Must/Should/Could が形骸化し、測定可能性だけが残っている状態"
+ccl_signature: /sta+?s3
 ---
 
 # /sta: 基準配置ワークフロー (Stathmos)

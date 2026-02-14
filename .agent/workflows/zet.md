@@ -1,89 +1,106 @@
 ---
 description: O3 Zētēsis（探求）を発動し、「何を問うべきか」を発見する。問いの種を見つける認知ツール。
 hegemonikon: Ousia
-modules: [O3]
-skill_ref: ".agent/skills/ousia/o3-zetesis/SKILL.md"
+modules:
+- O3
+skill_ref: .agent/skills/ousia/o3-zetesis/SKILL.md
 triggers:
-  - "何を問うべき"
-  - "問いを発見"
-  - "問いの種"
-  - "考えるべきこと"
-  - "深掘り候補"
-  - "探求"
-  - "zetesis"
-version: "7.0"
-lcm_state: stable       # draft | beta | stable | deprecated
-lineage: "v6.0 + モナド深層統合 → v7.0"
+- 何を問うべき
+- 問いを発見
+- 問いの種
+- 考えるべきこと
+- 深掘り候補
+- 探求
+- zetesis
+version: '7.0'
+lcm_state: stable
+lineage: v6.0 + モナド深層統合 → v7.0
 anti_skip: enabled
-ccl_signature: "/zet+"
+ccl_signature: /zet+
 category_theory:
-  core: "モナド T: Cog → Cog"
-  unit: "η: X → T(X) — 概念が問いを生む"
-  join: "μ: T(T(X)) → T(X) — 問いの問いを平坦化"
-  kleisli: "anom >=> hypo >=> eval — 派生の連鎖"
+  core: 'モナド T: Cog → Cog'
+  unit: 'η: X → T(X) — 概念が問いを生む'
+  join: 'μ: T(T(X)) → T(X) — 問いの問いを平坦化'
+  kleisli: anom >=> hypo >=> eval — 派生の連鎖
   laws:
-    left_unit: "μ∘ηT = id: 新しい問いを生んで平坦化 = そのまま"
-    right_unit: "μ∘Tη = id: 既存の問いに問いを被せて平坦化 = そのまま"
-    associativity: "μ∘μT = μ∘Tμ: 平坦化の順序は結果に影響しない"
+    left_unit: 'μ∘ηT = id: 新しい問いを生んで平坦化 = そのまま'
+    right_unit: 'μ∘Tη = id: 既存の問いに問いを被せて平坦化 = そのまま'
+    associativity: 'μ∘μT = μ∘Tμ: 平坦化の順序は結果に影響しない'
   noe_zet_adjunction:
-    adjunction: "Noēsis (F) ⊣ Zētēsis (G)"
-    G_role: "G: Insight → Question（認識から自信を忘却し、不確実性を拡散させる）"
-    G_definition: "既知への重み付け(precision)を捨てて、問いだけを残す操作"
+    adjunction: Noēsis (F) ⊣ Zētēsis (G)
+    G_role: 'G: Insight → Question（認識から自信を忘却し、不確実性を拡散させる）'
+    G_definition: 既知への重み付け(precision)を捨てて、問いだけを残す操作
     G_two_layers:
-      既知未知: "知っているが不確実なもの → 問いにできる。well-defined"
-      未知未知: "知らないことすら知らないもの → 問えない。unknown unknowns"
-    drift: "Drift = unknown unknowns の量。/pan (Panorama) は Drift 低減を試みる"
-    G_preserves: "不変量 = 問いの構造。確信を捨てても、何を知らないかの地図は保存される"
-    precision_axis: "L1.75 Precision (C↔U) 上の操作。/noe = C寄り、/zet = U寄り"
-    insight: "/noe は不確実性→確実性、/zet は確実性→不確実性の拡散 — Creator, 2026-02-10"
+      既知未知: 知っているが不確実なもの → 問いにできる。well-defined
+      未知未知: 知らないことすら知らないもの → 問えない。unknown unknowns
+    drift: Drift = unknown unknowns の量。/pan (Panorama) は Drift 低減を試みる
+    G_preserves: 不変量 = 問いの構造。確信を捨てても、何を知らないかの地図は保存される
+    precision_axis: L1.75 Precision (C↔U) 上の操作。/noe = C寄り、/zet = U寄り
+    insight: /noe は不確実性→確実性、/zet は確実性→不確実性の拡散 — Creator, 2026-02-10
   mathematical_basis:
-    L1: "前順序圏のガロア接続 — F(X) ≤ Y ⟺ X ≤ G(Y)"
-    L2: "[0,1]-豊穣圏 — Drift ∈ [0,1] は Hom 値"
-    L3: "弱2-圏 (将来) — 派生は 2-cell"
+    L1: 前順序圏のガロア接続 — F(X) ≤ Y ⟺ X ≤ G(Y)
+    L2: '[0,1]-豊穣圏 — Drift ∈ [0,1] は Hom 値'
+    L3: 弱2-圏 (将来) — 派生は 2-cell
   natural_transformation:
-    partner: "ene"
-    shared_axis: "Flow (A: 行為)"
-    varied_axis: "Value (E→P)"
-    meaning: "認識行為→実用行為。「探求→実行」"
+    partner: ene
+    shared_axis: 'Flow (A: 行為)'
+    varied_axis: Value (E→P)
+    meaning: 認識行為→実用行為。「探求→実行」
   duality:
-    partner: "bou"
-    type: "transition"
-    meaning: "探求→意志。「探す→望む」"
-derivatives: [anom, hypo, eval, abduction]
+    partner: bou
+    type: transition
+    meaning: 探求→意志。「探す→望む」
+derivatives:
+- anom
+- hypo
+- eval
+- abduction
 trigonon:
   series: O
   type: Pure
   theorem: O3
-  coordinates: [A, E]
-  bridge: [S, H]
+  coordinates:
+  - A
+  - E
+  bridge:
+  - S
+  - H
   anchor_via: []
   morphisms:
-    ">>S": [/met, /mek, /sta, /pra]
-    ">>H": [/pro, /pis, /ore, /dox]
+    '>>S':
+    - /met
+    - /mek
+    - /sta
+    - /pra
+    '>>H':
+    - /pro
+    - /pis
+    - /ore
+    - /dox
 cognitive_algebra:
-  "+": "深い問い。5層の問いを展開"
-  "-": "核心の問い。最も重要な1つだけ"
-  "*": "問いのメタ分析。なぜこの問いを問うのか"
-  "!": "全展開。全派生を並列展開"
+  +: 深い問い。5層の問いを展開
+  '-': 核心の問い。最も重要な1つだけ
+  '*': 問いのメタ分析。なぜこの問いを問うのか
+  '!': 全展開。全派生を並列展開
 sel_enforcement:
-  "+":
-    description: "MUST provide 5-layer questions, explore ALL dimensions"
+  +:
+    description: MUST provide 5-layer questions, explore ALL dimensions
     minimum_requirements:
-      - "問いの層: 5層以上"
-      - "方向性: 8+ カテゴリ"
-      - "交差分析: 必須"
-  "-":
-    description: "MAY provide single most important question only"
+    - '問いの層: 5層以上'
+    - '方向性: 8+ カテゴリ'
+    - '交差分析: 必須'
+  '-':
+    description: MAY provide single most important question only
     minimum_requirements:
-      - "問い: 1つのみ"
-  "!":
-    description: "MUST expand ALL derivatives (anom, hypo, eval, abduction)"
+    - '問い: 1つのみ'
+  '!':
+    description: MUST expand ALL derivatives (anom, hypo, eval, abduction)
     minimum_requirements:
-      - "全派生 (4種) を展開"
-      - "各派生の出力形式を遵守"
+    - 全派生 (4種) を展開
+    - 各派生の出力形式を遵守
 absorbed:
-  - "/poc (Spike/PoC) → --mode=poc"
-  - "/why (Five Whys) → --mode=five-whys"
+- /poc (Spike/PoC) → --mode=poc
+- /why (Five Whys) → --mode=five-whys
 ---
 
 # /zet: 探求ワークフロー (Zētēsis)

@@ -1,28 +1,36 @@
 ---
-id: "X-SP"
-name: "Schema → Perigraphē"
-category: "relation-layer"
-pair: "S → P"
-shared_coordinate: "C3 (Scale)"
+id: X-SP
+name: Schema → Perigraphē
+category: relation-layer
+pair: S → P
+shared_coordinate: C3 (Scale)
 relation_count: 8
-type: "Anchor"
-naturality: "構造"
-zoom_chain: "設計のズーム → 適用のズーム"
-description: "設計 (Schema) のズームレベルが条件空間 (Perigraphē) のズームレベルを規定する8つの射"
-
+type: Anchor
+naturality: 構造
+zoom_chain: 設計のズーム → 適用のズーム
+description: 設計 (Schema) のズームレベルが条件空間 (Perigraphē) のズームレベルを規定する8つの射
 activation_conditions:
-  - context: "設計の粒度が決まった後、適用範囲の問いが生じるとき"
-  - trigger: "「この粒度で設計した。どのスケールで適用するか」"
-  - confidence_threshold: 0.6
-  - priority: "high"
-
-triggers: ["設計→適用範囲", "/met >> /kho", "/mek >> /tro", "ズーム伝播"]
-keywords: [schema-perigraphe, design-to-scope, x-sp, zoom-propagation]
+- context: 設計の粒度が決まった後、適用範囲の問いが生じるとき
+- trigger: 「この粒度で設計した。どのスケールで適用するか」
+- confidence_threshold: 0.6
+- priority: high
+triggers:
+- 設計→適用範囲
+- /met >> /kho
+- /mek >> /tro
+- ズーム伝播
+keywords:
+- schema-perigraphe
+- design-to-scope
+- x-sp
+- zoom-propagation
 risk_tier: L0
-risks: ["none identified"]
+risks:
+- none identified
 reversible: true
 requires_approval: false
-fallbacks: ["manual execution"]
+fallbacks:
+- manual execution
 ---
 
 # X-SP: Schema → Perigraphē (様態→条件)

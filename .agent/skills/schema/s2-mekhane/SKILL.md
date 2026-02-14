@@ -1,46 +1,48 @@
 ---
-# Theorem Metadata (v3.0)
-id: "S2"
-name: "Mekhanē"
-greek: "Μηχανή"
-series: "Schema"
+id: S2
+name: Mekhanē
+greek: Μηχανή
+series: Schema
 generation:
-  formula: "Internality × Function"
-  result: "内在機能 — 方法の選択と配置"
+  formula: Internality × Function
+  result: 内在機能 — 方法の選択と配置
+description: 'どの方法で？・アプローチを選びたい・方法を配置したい時に発動。 Method selection, approach design, strategy
+  configuration. Use for: 方法, アプローチ, method, approach, how. NOT for: technique/tool
+  selection (技法 → Tekhnē P4).
 
-description: >
-  どの方法で？・アプローチを選びたい・方法を配置したい時に発動。
-  Method selection, approach design, strategy configuration.
-  Use for: 方法, アプローチ, method, approach, how.
-  NOT for: technique/tool selection (技法 → Tekhnē P4).
-
+  '
 triggers:
-  - 方法・アプローチの選択
-  - 戦略の設計
-  - 「どうやるか」の問い
-  - /mek コマンド
-
-keywords: [mekhane, method, machine, mechanism, 方法, アプローチ]
-
+- 方法・アプローチの選択
+- 戦略の設計
+- 「どうやるか」の問い
+- /mek コマンド
+keywords:
+- mekhane
+- method
+- machine
+- mechanism
+- 方法
+- アプローチ
 related:
   upstream:
-    - "O1 Noēsis (X-OS2: 本質理解→方法)"
-    - "O2 Boulēsis (X-OS4: 目的定義→達成手段)"
+  - 'O1 Noēsis (X-OS2: 本質理解→方法)'
+  - 'O2 Boulēsis (X-OS4: 目的定義→達成手段)'
   downstream:
-    - "P3 Trokhia (X-SP5: 方法→サイクル)"
-    - "P4 Tekhnē (X-SP6: 方法→技法)"
-    - "K3 Telos (X-SK5: 方法→目的整合)"
-    - "K4 Sophia (X-SK6: 方法→知恵充足)"
-    - "H1 Propatheia (X-SH3: 方法→直感)"
-    - "H2 Pistis (X-SH4: 方法→確信)"
-
-version: "3.0.0"
-workflow_ref: ".agent/workflows/mek.md"
+  - 'P3 Trokhia (X-SP5: 方法→サイクル)'
+  - 'P4 Tekhnē (X-SP6: 方法→技法)'
+  - 'K3 Telos (X-SK5: 方法→目的整合)'
+  - 'K4 Sophia (X-SK6: 方法→知恵充足)'
+  - 'H1 Propatheia (X-SH3: 方法→直感)'
+  - 'H2 Pistis (X-SH4: 方法→確信)'
+version: 3.0.0
+workflow_ref: .agent/workflows/mek.md
 risk_tier: L1
 reversible: true
 requires_approval: false
-risks: ["none identified"]
-fallbacks: ["manual execution"]
+risks:
+- none identified
+fallbacks:
+- manual execution
 ---
 
 # S2: Mekhanē (Μηχανή)

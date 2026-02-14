@@ -3,20 +3,20 @@ name: Prompt Library
 description: Library (112プロンプト) への動的ルーティングとコンテキスト注入
 activation: auto
 triggers:
-  - 思考モジュール
-  - プロンプト参照
-  - Library
-  - テンプレート
-  - Forge
-  - /lib
+- 思考モジュール
+- プロンプト参照
+- Library
+- テンプレート
+- Forge
+- /lib
 hegemonikon: S2 Mekhanē
 risk_tier: L1
 reversible: true
 requires_approval: false
 risks:
-  - "誤ったモジュール推薦による認知的誤誘導"
+- 誤ったモジュール推薦による認知的誤誘導
 fallbacks:
-  - "Creator に候補を提示し選択させる"
+- Creator に候補を提示し選択させる
 ---
 
 # Prompt Library Skill

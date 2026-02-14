@@ -1,26 +1,35 @@
 ---
-id: "X-HA"
-name: "Hormē → Akribeia"
-category: "relation-layer"
-pair: "H → A"
-shared_coordinate: "C5 (Valence)"
+id: X-HA
+name: Hormē → Akribeia
+category: relation-layer
+pair: H → A
+shared_coordinate: C5 (Valence)
 relation_count: 8
-type: "Anchor"
-description: "傾向 (Hormē) が精密判断 (Akribeia) を方向づける8つの射"
-
+type: Anchor
+description: 傾向 (Hormē) が精密判断 (Akribeia) を方向づける8つの射
 activation_conditions:
-  - context: "感情・確信・欲求が生じた後、それを精密に検証する必要があるとき"
-  - trigger: "「感じた。でもそれは正しいか」の遷移"
-  - confidence_threshold: 0.5
-  - priority: "high"
-
-triggers: ["傾向→精密", "/pro >> /dia", "/pis >> /epi", "/ore >> /pat", "動機→検証"]
-keywords: [horme-akribeia, drive-to-precision, x-ha, motivation-to-judgment]
+- context: 感情・確信・欲求が生じた後、それを精密に検証する必要があるとき
+- trigger: 「感じた。でもそれは正しいか」の遷移
+- confidence_threshold: 0.5
+- priority: high
+triggers:
+- 傾向→精密
+- /pro >> /dia
+- /pis >> /epi
+- /ore >> /pat
+- 動機→検証
+keywords:
+- horme-akribeia
+- drive-to-precision
+- x-ha
+- motivation-to-judgment
 risk_tier: L0
-risks: ["none identified"]
+risks:
+- none identified
 reversible: true
 requires_approval: false
-fallbacks: ["manual execution"]
+fallbacks:
+- manual execution
 ---
 
 # X-HA: Hormē → Akribeia (傾向→精密)

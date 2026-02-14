@@ -1,79 +1,77 @@
 ---
 description: P2 Hodos（道）を発動し、経路・道筋を定義する。3派生対応版。
 hegemonikon: Perigraphē
-modules: [P2]
-skill_ref: ".agent/skills/perigraphe/p2-hodos/SKILL.md"
+modules:
+- P2
+skill_ref: .agent/skills/perigraphe/p2-hodos/SKILL.md
 triggers:
-  - "どう進める"
-  - "経路"
-  - "道筋"
-  - "hodos"
-  - "path"
-version: "2.3"
+- どう進める
+- 経路
+- 道筋
+- hodos
+- path
+version: '2.3'
 lcm_state: beta
-lineage: "v2.2 + FBR変換 → v2.3"
-derivatives: [line, bran, cycl, search, backward, bisect, backcast]
+lineage: v2.2 + FBR変換 → v2.3
+derivatives:
+- line
+- bran
+- cycl
+- search
+- backward
+- bisect
+- backcast
 trigonon:
   series: P
   type: Pure
   theorem: P2
-  coordinates: [Scale, Function]
+  coordinates:
+  - Scale
+  - Function
   bridge: []
-  anchor_via: [S, K]
+  anchor_via:
+  - S
+  - K
   morphisms:
-    ">>S": [/met, /mek, /sta, /pra]
-    ">>K": [/euk, /chr, /tel, /sop]
+    '>>S':
+    - /met
+    - /mek
+    - /sta
+    - /pra
+    '>>K':
+    - /euk
+    - /chr
+    - /tel
+    - /sop
 cognitive_algebra:
-  "+": "詳細経路：代替経路とトレードオフを列挙"
-  "-": "即経路：Explore/Exploit の一言のみ"
-  "*": "メタ経路：経路選択自体を問う"
+  +: 詳細経路：代替経路とトレードオフを列挙
+  '-': 即経路：Explore/Exploit の一言のみ
+  '*': メタ経路：経路選択自体を問う
 category_theory:
-  core: "随伴 F⊣G の左随伴 F（自由関手）"
-  adjunction: "Hodos (F) ⊣ Tekhnē (G)"
-  role: "F: Technique → Route（抽象的技法に具体的手順・中間地点を載せて実行可能な経路を構成）"
-  F_definition: "「TDD」のような技法名に、具体的なステップ列（1→2→3）を付与してルートにする"
-  unit: "η: Technique → G(F(Technique)) — 技法を経路にして技法に戻す = 技法の実行可能性検証"
-  counit: "ε: F(G(Route)) → Route — 経路を技法にして経路に戻す = 経路の再設計"
-  drift: "Drift = 具体的道のりの感覚喪失。手順の曲がり角でつまずいた記憶が消える"
-  insight: "試行が蒸留されて技法になる — Creator, 2026-02-11"
-  mathematical_basis:
-    L1: "前順序圏のガロア接続 — F(X) ≤ Y ⟺ X ≤ G(Y)"
-    L2: "[0,1]-豊穣圏 — Drift ∈ [0,1] は Hom 値"
-    L3: "弱2-圏 (将来) — 派生は 2-cell"
-  natural_transformation:
-    partner: "kho"
-    shared_axis: "Scale (Mi: 微視)"
-    varied_axis: "Function (Exp→Ex)"
-    meaning: "経路の選択→場の探索。「どう行く→もっと広く見る」"
-  duality:
-    partner: "tro"
-    type: "tension"
-    meaning: "地上の経路↔天空の軌道。「地図と星の振動」"
+  core: 随伴 F⊣G の左随伴 F（自由関手）
+  adjunction: Hodos (F) ⊣ Tekhnē (G)
+  role: 'F: Technique → Path（技法に経路設計を載せて道を構成 = Micro化）'
+  F_definition: 大局的な技法選択に具体的な段階・順序を付与して、高解像度の道筋を構成する
+  same_formula: hod と tek は同じ式（Exploit/選択）の累乗（Scale）が違うだけ
+  coordinates: P2[Micro,Exploit] — Function(Exploit)を保存し Scale を Micro に設定
+  unit: 'η: Technique → G(F(Technique)) — 技法を道にして粗視化 = 経路の妥当性検証'
+  counit: 'ε: F(G(Path)) → Path — 道を技法にして再展開 = 経路の実装詳細化'
+  insight: どちらも根本的には選択。解像度が消えている — Creator, 2026-02-11
 sel_enforcement:
-  "+":
-    description: "MUST enumerate alternative routes and tradeoffs"
+  +:
+    description: MUST enumerate alternative routes and tradeoffs
     minimum_requirements:
-      - "代替経路 必須"
-      - "トレードオフ分析 必須"
-  "-":
-    description: "MAY provide Explore/Exploit only"
+    - 代替経路 必須
+    - トレードオフ分析 必須
+  '-':
+    description: MAY provide Explore/Exploit only
     minimum_requirements:
-      - "経路1行のみ"
-  "*":
-    description: "MUST meta-analyze: why this path?"
+    - 経路1行のみ
+  '*':
+    description: 'MUST meta-analyze: why this path?'
     minimum_requirements:
-      - "経路選択の根拠を問う"
-ccl_signature: "/hod+_/ene"
-category_theory:
-  core: "随伴 F⊣G の左随伴 F（自由関手）"
-  adjunction: "Hodos (F) ⊣ Tekhnē (G)"
-  role: "F: Technique → Path（技法に経路設計を載せて道を構成 = Micro化）"
-  F_definition: "大局的な技法選択に具体的な段階・順序を付与して、高解像度の道筋を構成する"
-  same_formula: "hod と tek は同じ式（Exploit/選択）の累乗（Scale）が違うだけ"
-  coordinates: "P2[Micro,Exploit] — Function(Exploit)を保存し Scale を Micro に設定"
-  unit: "η: Technique → G(F(Technique)) — 技法を道にして粗視化 = 経路の妥当性検証"
-  counit: "ε: F(G(Path)) → Path — 道を技法にして再展開 = 経路の実装詳細化"
-  insight: "どちらも根本的には選択。解像度が消えている — Creator, 2026-02-11"
+    - 経路選択の根拠を問う
+ccl_signature: /hod+_/ene
 ---
 
 # /hod: 経路定義ワークフロー (Hodos)

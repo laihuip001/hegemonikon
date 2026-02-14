@@ -1,85 +1,81 @@
 ---
 description: P3 Trokhia（軌道）を発動し、適用範囲・サイクルを定義する。3派生対応版。
 hegemonikon: Perigraphē
-modules: [P3]
-skill_ref: ".agent/skills/perigraphe/p3-trokhia/SKILL.md"
+modules:
+- P3
+skill_ref: .agent/skills/perigraphe/p3-trokhia/SKILL.md
 triggers:
-  - "どこまで適用する"
-  - "軌道"
-  - "サイクル"
-  - "trokhia"
-  - "orbit"
-version: "2.3"
+- どこまで適用する
+- 軌道
+- サイクル
+- trokhia
+- orbit
+version: '2.3'
 lcm_state: beta
-lineage: "v2.2 + FBR変換 → v2.3"
-derivatives: [fixe, adap, emer, state, scurve, learning]
+lineage: v2.2 + FBR変換 → v2.3
+derivatives:
+- fixe
+- adap
+- emer
+- state
+- scurve
+- learning
 trigonon:
   series: P
   type: Pure
   theorem: P3
-  coordinates: [Function, Scale]
+  coordinates:
+  - Function
+  - Scale
   bridge: []
-  anchor_via: [S, K]
+  anchor_via:
+  - S
+  - K
   morphisms:
-    ">>S": [/met, /mek, /sta, /pra]
-    ">>K": [/euk, /chr, /tel, /sop]
+    '>>S':
+    - /met
+    - /mek
+    - /sta
+    - /pra
+    '>>K':
+    - /euk
+    - /chr
+    - /tel
+    - /sop
 cognitive_algebra:
-  "+": "詳細軌道：周期・パターン・条件分岐を完全定義"
-  "-": "即軌道：一度/反復/継続 の一言のみ"
-  "*": "メタ軌道：軌道設計自体を問う"
+  +: 詳細軌道：周期・パターン・条件分岐を完全定義
+  '-': 即軌道：一度/反復/継続 の一言のみ
+  '*': メタ軌道：軌道設計自体を問う
 category_theory:
-  core: "随伴 F⊣G の右随伴 G（忘却関手）"
-  adjunction: "Khōra (F) ⊣ Trokhia (G)"
-  role: "G: Scope → Cycle（スコープから場の特殊性を忘却し、再利用可能な反復パターンだけ残す）"
-  G_definition: "「このプロジェクトで週次レビューをやった」から環境依存性を落とし、「週次レビューのサイクル」だけ抽出"
+  core: 随伴 F⊣G の右随伴 G（忘却関手）
+  adjunction: Khōra (F) ⊣ Trokhia (G)
+  role: 'G: Space → Orbit（場から解像度を忘却し、軌道（Macroサイクル）に圧縮）'
+  G_definition: 高解像度の空間構造を粗視化して、周回可能な1本の経路に落とす
+  same_formula: kho と tro は同じ式（Explore）の累乗（Scale）が違うだけ
+  coordinates: P3[Macro,Explore] — Function(Explore)を保存し Scale を Macro に設定
   G_two_layers:
-    反復パターン: "周期・頻度・条件分岐。well-defined"
-    場の文脈: "どの環境で、誰と、なぜその周期だったか。サイクル化すると消える"
-  drift: "Drift = 場の文脈の喪失量。パターンが環境を超えて適用されるリスク"
-  insight: "場が軌道を制約し、軌道が場を定義する。入れ物と動きは同時に決まる — Creator, 2026-02-11"
-  mathematical_basis:
-    L1: "前順序圏のガロア接続 — F(X) ≤ Y ⟺ X ≤ G(Y)"
-    L2: "[0,1]-豊穣圏 — Drift ∈ [0,1] は Hom 値"
-    L3: "弱2-圏 (将来) — 派生は 2-cell"
-  natural_transformation:
-    partner: "tek"
-    shared_axis: "Scale (Ma: 巨視)"
-    varied_axis: "Function (Ex→Exp)"
-    meaning: "大局探索→技法選択。「軌道を見た→何を使う」"
-  duality:
-    partner: "hod"
-    type: "tension"
-    meaning: "天空の軌道↔地上の経路。「星と地図の振動」"
+    構造: 周回できる大局パターン。well-defined
+    粒度: Macroでは見えないMicroの細部。忘却される
+  drift: Drift = Macroで見えないMicroの構造。サイクルで回しても見落とす細部
+  G_preserves: 不変量 = Explore パターン（探索の型）。解像度を忘却しても、探索の仕方は保存される
+  skewness_kurtosis: 歪度(3乗)と尖度(4乗)の比喩 — 同じ中心モーメント式の次元違い
+  insight: 元の式は同じ。次元を忘却している — Creator, 2026-02-11
 sel_enforcement:
-  "+":
-    description: "MUST define cycle, pattern, and conditional branches"
+  +:
+    description: MUST define cycle, pattern, and conditional branches
     minimum_requirements:
-      - "周期定義 必須"
-      - "パターン 必須"
-      - "条件分岐 必須"
-  "-":
-    description: "MAY provide one-off/repeat/continuous only"
+    - 周期定義 必須
+    - パターン 必須
+    - 条件分岐 必須
+  '-':
+    description: MAY provide one-off/repeat/continuous only
     minimum_requirements:
-      - "軌道1行のみ"
-  "*":
-    description: "MUST meta-analyze: why this orbit?"
+    - 軌道1行のみ
+  '*':
+    description: 'MUST meta-analyze: why this orbit?'
     minimum_requirements:
-      - "軌道設計の根拠を問う"
-ccl_signature: "/tro+"
-category_theory:
-  core: "随伴 F⊣G の右随伴 G（忘却関手）"
-  adjunction: "Khōra (F) ⊣ Trokhia (G)"
-  role: "G: Space → Orbit（場から解像度を忘却し、軌道（Macroサイクル）に圧縮）"
-  G_definition: "高解像度の空間構造を粗視化して、周回可能な1本の経路に落とす"
-  same_formula: "kho と tro は同じ式（Explore）の累乗（Scale）が違うだけ"
-  coordinates: "P3[Macro,Explore] — Function(Explore)を保存し Scale を Macro に設定"
-  G_two_layers:
-    構造: "周回できる大局パターン。well-defined"
-    粒度: "Macroでは見えないMicroの細部。忘却される"
-  drift: "Drift = Macroで見えないMicroの構造。サイクルで回しても見落とす細部"
-  G_preserves: "不変量 = Explore パターン（探索の型）。解像度を忘却しても、探索の仕方は保存される"
-  skewness_kurtosis: "歪度(3乗)と尖度(4乗)の比喩 — 同じ中心モーメント式の次元違い"
-  insight: "元の式は同じ。次元を忘却している — Creator, 2026-02-11"
+    - 軌道設計の根拠を問う
+ccl_signature: /tro+
 ---
 
 # /tro: 軌道定義ワークフロー (Trokhia)

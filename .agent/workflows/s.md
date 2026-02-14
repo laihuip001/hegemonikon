@@ -1,88 +1,97 @@
 ---
 description: S-series Peras。L1×L1.5 の極限演算で戦略設計の統合判断を生成。
 hegemonikon: Schema
-modules: [S1, S2, S3, S4]
+modules:
+- S1
+- S2
+- S3
+- S4
 skill_ref:
-  - ".agent/skills/schema/s1-metron/SKILL.md"
-  - ".agent/skills/schema/s2-mekhane/SKILL.md"
-  - ".agent/skills/schema/s3-stathmos/SKILL.md"
-  - ".agent/skills/schema/s4-praxis/SKILL.md"
+- .agent/skills/schema/s1-metron/SKILL.md
+- .agent/skills/schema/s2-mekhane/SKILL.md
+- .agent/skills/schema/s3-stathmos/SKILL.md
+- .agent/skills/schema/s4-praxis/SKILL.md
 triggers:
-  - "計画"
-  - "設計"
-  - "戦略"
-  - "plan"
-  - "schema"
-  - "リーンキャンバス"
-version: "6.4"
+- 計画
+- 設計
+- 戦略
+- plan
+- schema
+- リーンキャンバス
+version: '6.4'
 category_theory:
-  yoneda: "Hom(-, Tn) ≅ F(Tn) — 各定理はその射の集合で完全に決まる"
-  limit: "Cone の頂点 — 全ての射が一致する点"
-  converge_as_cone: "C0=PW決定, C1=STAGE 0-3の射列挙, C2=STAGE 4 Devil+PW加重融合, C3=STAGE 5 Kalon+KPT普遍性検証"
-  cone_builder: "mekhane/fep/cone_builder.py"
-  kalon: "mekhane/fep/universality.py — C3で使用"
-  adjunction: "F ⊣ G — 圏論を付与する (F) と 構造を発見する (G) の随伴対"
+  yoneda: Hom(-, Tn) ≅ F(Tn) — 各定理はその射の集合で完全に決まる
+  limit: Cone の頂点 — 全ての射が一致する点
+  converge_as_cone: C0=PW決定, C1=STAGE 0-3の射列挙, C2=STAGE 4 Devil+PW加重融合, C3=STAGE 5
+    Kalon+KPT普遍性検証
+  cone_builder: mekhane/fep/cone_builder.py
+  kalon: mekhane/fep/universality.py — C3で使用
+  adjunction: F ⊣ G — 圏論を付与する (F) と 構造を発見する (G) の随伴対
   enrichment:
-    concept: "Hom(Si,Sj) を張力 {低/中/高} で enrich — /s 固有の圏論概念"
-    mode: conceptual  # 形式的等価ではなく概念的対応
+    concept: Hom(Si,Sj) を張力 {低/中/高} で enrich — /s 固有の圏論概念
+    mode: conceptual
     structures:
-      - "6対の張力 = Hom の enrichment (Set → Met)"
-      - "Devil's Advocate = enriched Hom 上のテスト射"
-      - "PW 加重融合 = テスト射後の加重 colimit"
+    - 6対の張力 = Hom の enrichment (Set → Met)
+    - Devil's Advocate = enriched Hom 上のテスト射
+    - PW 加重融合 = テスト射後の加重 colimit
   mathematical_basis:
-    L1: "前順序圏のガロア接続 — F(X) ≤ Y ⟺ X ≤ G(Y)"
-    L2: "[0,1]-豊穣圏 — Drift ∈ [0,1] は Hom 値"
-    L3: "弱2-圏 (将来) — 派生は 2-cell"
+    L1: 前順序圏のガロア接続 — F(X) ≤ Y ⟺ X ≤ G(Y)
+    L2: '[0,1]-豊穣圏 — Drift ∈ [0,1] は Hom 値'
+    L3: 弱2-圏 (将来) — 派生は 2-cell
 lcm_state: stable
-layer: "Δ"
-lineage: "v5.8 + Limit演算復元 → v6.0 + C0 PW/加重融合 → v6.2 + v6.3 C3 Kalon化 → v6.4 固有層 Enrichment"
-derivatives: [met, mek, sta, pra]
+layer: Δ
+lineage: v5.8 + Limit演算復元 → v6.0 + C0 PW/加重融合 → v6.2 + v6.3 C3 Kalon化 → v6.4 固有層 Enrichment
+derivatives:
+- met
+- mek
+- sta
+- pra
 cognitive_algebra:
-  generation: "L1 × L1.5"
+  generation: L1 × L1.5
   coordinates:
-    axis_1: "Flow/Value"
-    axis_2: "Scale/Function"
-  definition: "/s = lim(S1·S2·S3·S4)"
+    axis_1: Flow/Value
+    axis_2: Scale/Function
+  definition: /s = lim(S1·S2·S3·S4)
   interpretation:
-    strict: "テンソル積 (Flow/Value⊗Scale/Function) の Limit 射影"
-    short: "4定理の内積 → 最適収束点"
+    strict: テンソル積 (Flow/Value⊗Scale/Function) の Limit 射影
+    short: 4定理の内積 → 最適収束点
   operators:
-    "+": "Limit強度↑ — 全4定理を詳細に収束"
-    "-": "Limit強度↓ — 縮約収束"
-    "*": "Limit対象自体を問う: なぜ戦略設計か"
+    +: Limit強度↑ — 全4定理を詳細に収束
+    '-': Limit強度↓ — 縮約収束
+    '*': 'Limit対象自体を問う: なぜ戦略設計か'
   modes:
-    stepback: "Step-Back Prompting: メタ俯瞰→原則抽出→具体設計 (/s^_/gno_/s)"
-    mass: "Multi-Agent Design Space Search: ローカル→トポロジー→グローバル3段階最適化"
+    stepback: 'Step-Back Prompting: メタ俯瞰→原則抽出→具体設計 (/s^_/gno_/s)'
+    mass: 'Multi-Agent Design Space Search: ローカル→トポロジー→グローバル3段階最適化'
 sel_enforcement:
-  "+":
-    description: "MUST execute ALL 4 theorems with deep convergence"
+  +:
+    description: MUST execute ALL 4 theorems with deep convergence
     minimum_requirements:
-      - "全5 STAGE 実行"
-      - "Scale 宣言 必須"
-      - "Y-1/D-1 時間軸評価 必須"
-      - "Devil's Advocate 必須"
-      - "SE振り返り 必須"
-      - "融合ステップ必須"
-  "-":
-    description: "MAY execute with condensed convergence"
+    - 全5 STAGE 実行
+    - Scale 宣言 必須
+    - Y-1/D-1 時間軸評価 必須
+    - Devil's Advocate 必須
+    - SE振り返り 必須
+    - 融合ステップ必須
+  '-':
+    description: MAY execute with condensed convergence
     minimum_requirements:
-      - "Core Goals + Actions のみ"
-  "*":
-    description: "MUST meta-analyze: why strategic design?"
+    - Core Goals + Actions のみ
+  '*':
+    description: 'MUST meta-analyze: why strategic design?'
     minimum_requirements:
-      - "戦略設計の意義を問う"
+    - 戦略設計の意義を問う
 absorbed:
-  - "Y-1 七世代先の視点 (Fast/Slow/Eternal)"
-  - "D-1 システム・ダイナミクス (T+0/T+1/T+2)"
-  - "S-Series派生概念体系化レポート v1.0 (2026-01-29)"
-  - "AI Zen 技法26: リーンキャンバス改 (事業計画テンプレート)"
+- Y-1 七世代先の視点 (Fast/Slow/Eternal)
+- D-1 システム・ダイナミクス (T+0/T+1/T+2)
+- S-Series派生概念体系化レポート v1.0 (2026-01-29)
+- 'AI Zen 技法26: リーンキャンバス改 (事業計画テンプレート)'
 anti_skip: enabled
-ccl_signature: "/s+_/dia"
+ccl_signature: /s+_/dia
 children:
-  - "/met"  # S1 Metron (スケール配置) → cont/disc/abst
-  - "/mek"  # S2 Mekhanē (方法配置) → comp/inve/adap
-  - "/sta"  # S3 Stathmos (基準配置) → norm/empi/rela
-  - "/pra"  # S4 Praxis (実践配置) → prax/pois/temp
+- /met
+- /mek
+- /sta
+- /pra
 ---
 
 # /s: 戦略設計 Peras (Schema)

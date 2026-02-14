@@ -1,75 +1,93 @@
 ---
 description: S4 Praxis（実践）を発動し、価値実現の方法を選択する。実践配置ワークフロー。
 hegemonikon: Schema
-modules: [S4]
-skill_ref: ".agent/skills/schema/s4-praxis/SKILL.md"
+modules:
+- S4
+skill_ref: .agent/skills/schema/s4-praxis/SKILL.md
 triggers:
-  - "どう実現する"
-  - "実践方法"
-  - "価値創造"
-  - "praxis"
-  - "practice"
-version: "2.3"
+- どう実現する
+- 実践方法
+- 価値創造
+- praxis
+- practice
+version: '2.3'
 lcm_state: beta
-lineage: "v2.2 + FBR変換 → v2.3"
+lineage: v2.2 + FBR変換 → v2.3
 trigonon:
   series: S
   type: Mixed
   theorem: S4
-  coordinates: [A, Function]
-  bridge: [H, K]
-  anchor_via: [O, P]
+  coordinates:
+  - A
+  - Function
+  bridge:
+  - H
+  - K
+  anchor_via:
+  - O
+  - P
   morphisms:
-    ">>H": [/pro, /pis, /ore, /dox]
-    ">>K": [/euk, /chr, /tel, /sop]
+    '>>H':
+    - /pro
+    - /pis
+    - /ore
+    - /dox
+    '>>K':
+    - /euk
+    - /chr
+    - /tel
+    - /sop
 cognitive_algebra:
-  "+": "詳細実践分析。全ステップ、リスク、代替案"
-  "-": "即断実践。次の1アクションのみ"
-  "*": "実践のメタ分析。なぜこの方法か"
+  +: 詳細実践分析。全ステップ、リスク、代替案
+  '-': 即断実践。次の1アクションのみ
+  '*': 実践のメタ分析。なぜこの方法か
 sel_enforcement:
-  "+":
-    description: "MUST analyze all steps, risks, and alternatives"
+  +:
+    description: MUST analyze all steps, risks, and alternatives
     minimum_requirements:
-      - "全ステップ 必須"
-      - "リスク 必須"
-      - "代替案 必須"
-  "-":
-    description: "MAY provide next 1 action only"
+    - 全ステップ 必須
+    - リスク 必須
+    - 代替案 必須
+  '-':
+    description: MAY provide next 1 action only
     minimum_requirements:
-      - "次の1アクションのみ"
-  "*":
-    description: "MUST meta-analyze: why this practice?"
+    - 次の1アクションのみ
+  '*':
+    description: 'MUST meta-analyze: why this practice?'
     minimum_requirements:
-      - "実践選択の根拠を問う"
-derivatives: [prax, pois, temp]
+    - 実践選択の根拠を問う
+derivatives:
+- prax
+- pois
+- temp
 anti_skip: enabled
-ccl_signature: "/pra+_/ene"
+ccl_signature: /pra+_/ene
 category_theory:
-  core: "随伴 F⊣G の右随伴 G（忘却関手）"
-  adjunction: "Mekhanē (F) ⊣ Praxis (G)"
-  role: "G: Method → Practice（方法論を多数のIF-THENチャンクに分解）"
-  G_definition: "1つの解（技術・方法論）の理論的構造を忘却し、条件反射的なIF-THENに分解する"
+  core: 随伴 F⊣G の右随伴 G（忘却関手）
+  adjunction: Mekhanē (F) ⊣ Praxis (G)
+  role: 'G: Method → Practice（方法論を多数のIF-THENチャンクに分解）'
+  G_definition: 1つの解（技術・方法論）の理論的構造を忘却し、条件反射的なIF-THENに分解する
   G_two_layers:
-    明示知: "IF-THEN に言語化できる部分。well-defined"
-    暗黙知: "言語化できない部分（名人芸、勘、手触り）。ポラニーの暗黙知"
-  drift: "Drift = 暗黙知の量。G が言語化できない残差"
-  G_preserves: "不変量 = 行為の文法 (IF-THEN パターン)。理論を忘却しても、実践の型は保存される"
-  explore_exploit: "Explore = F の自由度を広げる / Exploit = G の確実性を使う"
-  fep_connection: "座学⇄実践の循環。知覚⇄運動とアナロジカルだが、スケールは異なる"
-  insight: "IF-THENの集積 = 条件反射 = 無意識的技能 — Creator, 2026-02-10"
+    明示知: IF-THEN に言語化できる部分。well-defined
+    暗黙知: 言語化できない部分（名人芸、勘、手触り）。ポラニーの暗黙知
+  drift: Drift = 暗黙知の量。G が言語化できない残差
+  G_preserves: 不変量 = 行為の文法 (IF-THEN パターン)。理論を忘却しても、実践の型は保存される
+  explore_exploit: Explore = F の自由度を広げる / Exploit = G の確実性を使う
+  fep_connection: 座学⇄実践の循環。知覚⇄運動とアナロジカルだが、スケールは異なる
+  insight: IF-THENの集積 = 条件反射 = 無意識的技能 — Creator, 2026-02-10
   mathematical_basis:
-    L1: "前順序圏のガロア接続 — F(X) ≤ Y ⟺ X ≤ G(Y)"
-    L2: "[0,1]-豊穣圏 — Drift ∈ [0,1] は Hom 値"
-    L3: "弱2-圏 (将来) — 派生は 2-cell"
+    L1: 前順序圏のガロア接続 — F(X) ≤ Y ⟺ X ≤ G(Y)
+    L2: '[0,1]-豊穣圏 — Drift ∈ [0,1] は Hom 値'
+    L3: 弱2-圏 (将来) — 派生は 2-cell
   natural_transformation:
-    partner: "sta"
-    shared_axis: "Flow (A: 行為)"
-    varied_axis: "Scale (Ma→Mi)"
-    meaning: "大局実践→状態確認。「大きく動いた→今どこ？」"
+    partner: sta
+    shared_axis: 'Flow (A: 行為)'
+    varied_axis: Scale (Ma→Mi)
+    meaning: 大局実践→状態確認。「大きく動いた→今どこ？」
   duality:
-    partner: "met"
-    type: "transition"
-    meaning: "実践→基準。「やった→何が測れる？」"
+    partner: met
+    type: transition
+    meaning: 実践→基準。「やった→何が測れる？」
 ---
 
 # /pra: 実践配置ワークフロー (Praxis)

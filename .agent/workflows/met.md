@@ -1,84 +1,91 @@
 ---
 description: S1 Metron（尺度）を発動し、スケール・粒度を決定する。スケール配置ワークフロー。
 hegemonikon: Schema
-modules: [S1]
-skill_ref: ".agent/skills/schema/s1-metron/SKILL.md"
+modules:
+- S1
+skill_ref: .agent/skills/schema/s1-metron/SKILL.md
 triggers:
-  - "どのスケールで"
-  - "粒度"
-  - "詳細か全体か"
-  - "metron"
-  - "scale"
-  - "ボトルネック"
-  - "制約理論"
-version: "2.4"
+- どのスケールで
+- 粒度
+- 詳細か全体か
+- metron
+- scale
+- ボトルネック
+- 制約理論
+version: '2.4'
 lcm_state: beta
-lineage: "v2.3 + FBR変換 → v2.4"
-derivatives: [toc, fermi, cont, disc, abst, kiss, extreme, approximation, definition, dimensional, cognitive_load, check, ambiguity, units]
+lineage: v2.3 + FBR変換 → v2.4
+derivatives:
+- toc
+- fermi
+- cont
+- disc
+- abst
+- kiss
+- extreme
+- approximation
+- definition
+- dimensional
+- cognitive_load
+- check
+- ambiguity
+- units
 trigonon:
   series: S
   type: Mixed
   theorem: S1
-  coordinates: [I, Scale]
-  bridge: [H, K]
-  anchor_via: [O, P]
+  coordinates:
+  - I
+  - Scale
+  bridge:
+  - H
+  - K
+  anchor_via:
+  - O
+  - P
   morphisms:
-    ">>H": [/pro, /pis, /ore, /dox]
-    ">>K": [/euk, /chr, /tel, /sop]
+    '>>H':
+    - /pro
+    - /pis
+    - /ore
+    - /dox
+    '>>K':
+    - /euk
+    - /chr
+    - /tel
+    - /sop
 cognitive_algebra:
-  "+": "詳細スケール分析。全層を展開、トレードオフ記載"
-  "-": "即断スケール。Micro/Meso/Macro の1行判定"
-  "*": "スケール選択のメタ分析。なぜこの粒度か"
-  fermi: "フェルミ推定。オーダー概算、10倍精度"
+  +: 詳細スケール分析。全層を展開、トレードオフ記載
+  '-': 即断スケール。Micro/Meso/Macro の1行判定
+  '*': スケール選択のメタ分析。なぜこの粒度か
+  fermi: フェルミ推定。オーダー概算、10倍精度
 category_theory:
-  core: "随伴 F⊣G の左随伴 F（自由関手）"
-  adjunction: "Metron (F) ⊣ Stathmos (G)"
-  role: "F: Standard → Measure（抽象的評価基準に具体的スケール/粒度を載せて測定方法を構成）"
-  F_definition: "「良い/悪い」という漠然とした基準に、Micro/Meso/Macroの具体的尺度を付与して測定可能にする"
-  unit: "η: Standard → G(F(Standard)) — 基準を尺度にして基準に戻す = 測定可能性の検証"
-  counit: "ε: F(G(Measure)) → Measure — 尺度を基準にして再測定 = キャリブレーション"
-  drift: "Drift = 「なぜその粒度か」のコンテキスト喪失。尺度が独り歩きする"
-  insight: "測れないものは改善できない。だが基準なき測定はただの数字遊び — Creator, 2026-02-11"
-  mathematical_basis:
-    L1: "前順序圏のガロア接続 — F(X) ≤ Y ⟺ X ≤ G(Y)"
-    L2: "[0,1]-豊穣圏 — Drift ∈ [0,1] は Hom 値"
-    L3: "弱2-圏 (将来) — 派生は 2-cell"
-  natural_transformation:
-    partner: "mek"
-    shared_axis: "Flow (I: 推論)"
-    varied_axis: "Scale (Mi→Ma)"
-    meaning: "精密基準→大局設計。「基準から方法論へ」"
-  duality:
-    partner: "pra"
-    type: "transition"
-    meaning: "基準→実践。「測る→やる」"
+  core: 随伴 F⊣G の左随伴 F（自由関手）
+  adjunction: Metron (F) ⊣ Stathmos (G)
+  role: 'F: Criterion → Scale（基準に測定の具体性を載せて尺度を構成）'
+  F_definition: 「何を良しとするか」という基準に、Micro/Meso/Macro の粒度と測定方法を自由に構成する
+  coordinates: S1[I,Scale] — Flow(I:推論)を保存し Scale 軸で具体化
+  unit: 'η: Criterion → G(F(Criterion)) — 基準を尺度にして基準に戻す = 基準の安定性検証'
+  counit: 'ε: F(G(Scale)) → Scale — 尺度を基準で見直して再設定 = 尺度の妥当性検証'
+  drift: Drift = 尺度と基準の乖離。測定が目的化し、本来の基準を見失っている度合い
 sel_enforcement:
-  "+":
-    description: "MUST analyze all layers with tradeoffs"
+  +:
+    description: MUST analyze all layers with tradeoffs
     minimum_requirements:
-      - "全層展開 必須"
-      - "トレードオフ記載 必須"
-  "-":
-    description: "MAY provide Micro/Meso/Macro only"
+    - 全層展開 必須
+    - トレードオフ記載 必須
+  '-':
+    description: MAY provide Micro/Meso/Macro only
     minimum_requirements:
-      - "スケール1行のみ"
-  "*":
-    description: "MUST meta-analyze: why this granularity?"
+    - スケール1行のみ
+  '*':
+    description: 'MUST meta-analyze: why this granularity?'
     minimum_requirements:
-      - "粒度選択の根拠を問う"
+    - 粒度選択の根拠を問う
 anti_skip: enabled
 absorbed:
-  - "Forge ⛓️ ボトルネックを突く → --mode=toc"
-ccl_signature: "/met+"
-category_theory:
-  core: "随伴 F⊣G の左随伴 F（自由関手）"
-  adjunction: "Metron (F) ⊣ Stathmos (G)"
-  role: "F: Criterion → Scale（基準に測定の具体性を載せて尺度を構成）"
-  F_definition: "「何を良しとするか」という基準に、Micro/Meso/Macro の粒度と測定方法を自由に構成する"
-  coordinates: "S1[I,Scale] — Flow(I:推論)を保存し Scale 軸で具体化"
-  unit: "η: Criterion → G(F(Criterion)) — 基準を尺度にして基準に戻す = 基準の安定性検証"
-  counit: "ε: F(G(Scale)) → Scale — 尺度を基準で見直して再設定 = 尺度の妥当性検証"
-  drift: "Drift = 尺度と基準の乖離。測定が目的化し、本来の基準を見失っている度合い"
+- Forge ⛓️ ボトルネックを突く → --mode=toc
+ccl_signature: /met+
 ---
 
 # /met: スケール配置ワークフロー (Metron)

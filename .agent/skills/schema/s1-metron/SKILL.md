@@ -1,46 +1,49 @@
 ---
-# Theorem Metadata (v3.0)
-id: "S1"
-name: "Metron"
-greek: "Μέτρον"
-series: "Schema"
+id: S1
+name: Metron
+greek: Μέτρον
+series: Schema
 generation:
-  formula: "Internality × Scale"
-  result: "内在スケール — 測定基準・粒度の決定"
+  formula: Internality × Scale
+  result: 内在スケール — 測定基準・粒度の決定
+description: 'どのスケールで？・粒度を決めたい・測定基準を設定したい時に発動。 Scale determination, measurement criteria,
+  granularity setting. Use for: スケール, 粒度, 測定, scale, measure, granularity. NOT for:
+  method selection (方法選択 → Mekhanē S2).
 
-description: >
-  どのスケールで？・粒度を決めたい・測定基準を設定したい時に発動。
-  Scale determination, measurement criteria, granularity setting.
-  Use for: スケール, 粒度, 測定, scale, measure, granularity.
-  NOT for: method selection (方法選択 → Mekhanē S2).
-
+  '
 triggers:
-  - 粒度・スケールの決定
-  - 測定基準の設定
-  - 「どのレベルで見るか」
-  - /met コマンド
-
-keywords: [metron, measure, scale, metric, 測定, 粒度, スケール]
-
+- 粒度・スケールの決定
+- 測定基準の設定
+- 「どのレベルで見るか」
+- /met コマンド
+keywords:
+- metron
+- measure
+- scale
+- metric
+- 測定
+- 粒度
+- スケール
 related:
   upstream:
-    - "O1 Noēsis (X-OS1: 本質理解→スケール)"
-    - "O2 Boulēsis (X-OS3: 目的定義→目標の大きさ)"
+  - 'O1 Noēsis (X-OS1: 本質理解→スケール)'
+  - 'O2 Boulēsis (X-OS3: 目的定義→目標の大きさ)'
   downstream:
-    - "P1 Khōra (X-SP1: 測定→適用領域を限定)"
-    - "P2 Hodos (X-SP2: 測定→到達経路を制約)"
-    - "K1 Eukairia (X-SK1: 測定→今が好機か)"
-    - "K2 Chronos (X-SK2: 測定→時間スケール)"
-    - "H1 Propatheia (X-SH1: スケール→大きすぎ/小さすぎの直感)"
-    - "H2 Pistis (X-SH2: スケール→確信度)"
-
-version: "3.0.0"
-workflow_ref: ".agent/workflows/met.md"
+  - 'P1 Khōra (X-SP1: 測定→適用領域を限定)'
+  - 'P2 Hodos (X-SP2: 測定→到達経路を制約)'
+  - 'K1 Eukairia (X-SK1: 測定→今が好機か)'
+  - 'K2 Chronos (X-SK2: 測定→時間スケール)'
+  - 'H1 Propatheia (X-SH1: スケール→大きすぎ/小さすぎの直感)'
+  - 'H2 Pistis (X-SH2: スケール→確信度)'
+version: 3.0.0
+workflow_ref: .agent/workflows/met.md
 risk_tier: L1
 reversible: true
 requires_approval: false
-risks: ["none identified"]
-fallbacks: ["manual execution"]
+risks:
+- none identified
+fallbacks:
+- manual execution
 ---
 
 # S1: Metron (Μέτρον)

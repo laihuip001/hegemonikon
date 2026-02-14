@@ -4,25 +4,29 @@ name: Session Audit Skill
 version: v1.0
 archetype: Precision
 model_target: Claude Opus 4.5
-description: |
-  Use this skill when auditing outputs from other Claude sessions,
+description: 'Use this skill when auditing outputs from other Claude sessions,
+
   Gemini sessions, or Jules task results. Cross-Session Verification
+
   for detecting inconsistencies, drift, and integration quality.
+
   Triggers: /vet session, 他セッション監査, handoff 確認
+
+  '
 triggers:
   explicit:
-    - /vet session
+  - /vet session
   keywords:
-    - 他セッション
-    - セッション監査
-    - handoff
-    - drift
-    - 統合品質
+  - 他セッション
+  - セッション監査
+  - handoff
+  - drift
+  - 統合品質
 risk_tier: L1
 reversible: true
 requires_approval: false
 risks:
-  - "判断基準の誤適用による過信・過少評価"
+- 判断基準の誤適用による過信・過少評価
 fallbacks: []
 ---
 

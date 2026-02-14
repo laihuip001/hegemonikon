@@ -1,52 +1,45 @@
 ---
-# Theorem Metadata (v4.0)
-id: "O3"
-name: "Zētēsis"
-greek: "Ζήτησις"
-series: "Ousia"
+id: O3
+name: Zētēsis
+greek: Ζήτησις
+series: Ousia
 generation:
-  formula: "Flow (A) × Value (E)"
-  result: "探求 — 問いを立てる認知機能"
+  formula: Flow (A) × Value (E)
+  result: 探求 — 問いを立てる認知機能
+description: '何を問うべき？・問いを発見したい・深掘り候補を探す時に発動。 Question discovery, inquiry initiation,
+  philosophical seeking. Use for: 問いを立てる, 探求, 問いの発見, zet. NOT for: information gathering
+  (use K4 Sophia /sop).
 
-description: >
-  何を問うべき？・問いを発見したい・深掘り候補を探す時に発動。
-  Question discovery, inquiry initiation, philosophical seeking.
-  Use for: 問いを立てる, 探求, 問いの発見, zet.
-  NOT for: information gathering (use K4 Sophia /sop).
-
+  '
 triggers:
-  - "何を問うべき"
-  - "問いを発見"
-  - "問いの種"
-  - "探求"
-  - /zet コマンド
-
+- 何を問うべき
+- 問いを発見
+- 問いの種
+- 探求
+- /zet コマンド
 keywords:
-  - zetesis
-  - inquiry
-  - question
-  - discovery
-  - 探求
-  - 問い
-
+- zetesis
+- inquiry
+- question
+- discovery
+- 探求
+- 問い
 related:
   upstream: []
   downstream:
-    - "O1 Noēsis"
-    - "K4 Sophia"
+  - O1 Noēsis
+  - K4 Sophia
   x_series:
-    - "X-OK1 → K4 Sophia (情報収集)"
-    - "X-OO1 → O1 Noēsis (深い分析)"
-
-lineage: "O3 Zētēsis 統一リマッピング (2026-01-28) — 問いを立てる機能に純化"
-
-version: "4.0.0"
-workflow_ref: ".agent/workflows/zet.md"
+  - X-OK1 → K4 Sophia (情報収集)
+  - X-OO1 → O1 Noēsis (深い分析)
+lineage: O3 Zētēsis 統一リマッピング (2026-01-28) — 問いを立てる機能に純化
+version: 4.0.0
+workflow_ref: .agent/workflows/zet.md
 risk_tier: L1
 reversible: true
 requires_approval: false
 risks:
-  - "認知フレームの過度な適用による思考の硬直化"
+- 認知フレームの過度な適用による思考の硬直化
 fallbacks: []
 ---
 

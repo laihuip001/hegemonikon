@@ -1,5 +1,5 @@
 ---
-description: "\u565B\u3080 \u2014 /s-_/pro_F:[\xD73]{/eat+~(/noe*/dia)}_~(/h*/k)_@proof_/pis_/dox-"
+description: 噛む — /s-_/pro_F:[×3]{/eat+~(/noe*/dia)}_~(/h*/k)_@proof_/pis_/dox-
 lcm_state: beta
 version: '1.0'
 ---

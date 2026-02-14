@@ -1,5 +1,5 @@
 ---
-description: "\u78BA\u304B\u3081\u308B \u2014 /kho{git_diff}_C:{V:{/dia+}_/ene+}_/pra{test}_/pra{dendron_guard}_/pis_/dox"
+description: 確かめる — /kho{git_diff}_C:{V:{/dia+}_/ene+}_/pra{test}_/pra{dendron_guard}_/pis_/dox
 lcm_state: beta
 version: '1.0'
 ---

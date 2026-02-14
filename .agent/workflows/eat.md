@@ -1,63 +1,69 @@
 ---
 description: 外部コンテンツを Hegemonikón に消化するワークフロー。/mek で調理し、/fit で消化品質を検証する。
 hegemonikon: Schema, Akribeia
-modules: [S2, A2]
+modules:
+- S2
+- A2
 skill_ref:
-  - "hegemonikon/mekhane/ergasterion/tekhne/SKILL.md"
-  - ".agent/skills/akribeia/a2-krisis/SKILL.md"
-version: "3.0"
+- hegemonikon/mekhane/ergasterion/tekhne/SKILL.md
+- .agent/skills/akribeia/a2-krisis/SKILL.md
+version: '3.0'
 lcm_state: stable
-lineage: "v2.0 + 随伴昇格 (自然変換→F⊣G) → v3.0"
-derivatives: [cook, dige, natu, batch]
+lineage: v2.0 + 随伴昇格 (自然変換→F⊣G) → v3.0
+derivatives:
+- cook
+- dige
+- natu
+- batch
 cognitive_algebra:
-  "+": "詳細消化。全ステップ、マッピング根拠、反芻"
-  "-": "即消化。要点抽出のみ"
-  "*": "消化プロセスのメタ分析。なぜ取り込むか"
+  +: 詳細消化。全ステップ、マッピング根拠、反芻
+  '-': 即消化。要点抽出のみ
+  '*': 消化プロセスのメタ分析。なぜ取り込むか
 sel_enforcement:
-  "+":
-    description: "MUST execute all phases with mapping rationale"
+  +:
+    description: MUST execute all phases with mapping rationale
     minimum_requirements:
-      - "全7フェーズ実行 必須"
-      - "F と G の操作的定義 必須"
-      - "η と ε の構築 必須"
-      - "反芻 必須"
-  "-":
-    description: "MAY provide key points only"
+    - 全7フェーズ実行 必須
+    - F と G の操作的定義 必須
+    - η と ε の構築 必須
+    - 反芻 必須
+  '-':
+    description: MAY provide key points only
     minimum_requirements:
-      - "要点抽出のみ"
-  "*":
-    description: "MUST meta-analyze: why ingest this content?"
+    - 要点抽出のみ
+  '*':
+    description: 'MUST meta-analyze: why ingest this content?'
     minimum_requirements:
-      - "取り込む理由のメタ分析"
+    - 取り込む理由のメタ分析
 anti_skip: enabled
 related:
   x_series:
-    - "X-SA: S2 → A2 (調理→消化)"
-ccl_signature: "/eat+_/fit"
+  - 'X-SA: S2 → A2 (調理→消化)'
+ccl_signature: /eat+_/fit
 category_theory:
-  core: "随伴 F⊣G (Free-Forgetful Adjunction)"
-  adjunction: "Eat (F) ⊣ Forget (G)"
-  F: "取り込み関手 (左随伴 = 自由構成) — 最小チャンクに HGK 構造を載せて再構成"
-  G: "忘却関手 (右随伴 = 第一原理分解) — HGK 構造を剥いで最小チャンクに分解"
-  unit: "η: Id_Ext → G∘F (取り込んで分解して戻す = 情報保存率)"
-  counit: "ε: F∘G → Id_Int (分解して再構成して戻す = 構造の非冗長性)"
+  core: 随伴 F⊣G (Free-Forgetful Adjunction)
+  adjunction: Eat (F) ⊣ Forget (G)
+  F: 取り込み関手 (左随伴 = 自由構成) — 最小チャンクに HGK 構造を載せて再構成
+  G: 忘却関手 (右随伴 = 第一原理分解) — HGK 構造を剥いで最小チャンクに分解
+  unit: 'η: Id_Ext → G∘F (取り込んで分解して戻す = 情報保存率)'
+  counit: 'ε: F∘G → Id_Int (分解して再構成して戻す = 構造の非冗長性)'
   triangle_identities:
-    left: "ε_F ∘ F(η) = id_F"
-    right: "G(ε) ∘ η_G = id_G"
-  insight: "第零原則「自分を信じない」= 既知を忘却(G)して第一原理から再構成(F)すること。自然変換(v2.0)は η,ε として包含される上位互換。"
-  unification: "/boot⊣/bye (Mem↔Ses) と同じ圏論的パターンの別インスタンス"
+    left: ε_F ∘ F(η) = id_F
+    right: G(ε) ∘ η_G = id_G
+  insight: 第零原則「自分を信じない」= 既知を忘却(G)して第一原理から再構成(F)すること。自然変換(v2.0)は η,ε として包含される上位互換。
+  unification: /boot⊣/bye (Mem↔Ses) と同じ圏論的パターンの別インスタンス
   phases_as_F:
-    phase_0: "圏の特定 — Ext と Int の定義"
-    phase_1: "F の構築 — 取り込み関手（自由構成）"
-    phase_2: "G の構築 — 忘却関手（第一原理分解）"
-    phase_3: "η と ε の構築 — 随伴条件"
-    phase_4: "三角恒等式検証 (/fit) — 随伴の健全性"
-    phase_5: "統合実行 — パッチ適用"
-    phase_6: "検証 — 動作確認"
+    phase_0: 圏の特定 — Ext と Int の定義
+    phase_1: F の構築 — 取り込み関手（自由構成）
+    phase_2: G の構築 — 忘却関手（第一原理分解）
+    phase_3: η と ε の構築 — 随伴条件
+    phase_4: 三角恒等式検証 (/fit) — 随伴の健全性
+    phase_5: 統合実行 — パッチ適用
+    phase_6: 検証 — 動作確認
   mathematical_basis:
-    L1: "前順序圏のガロア接続 — F(X) ≤ Y ⟺ X ≤ G(Y)"
-    L2: "[0,1]-豊穣圏 — Drift ∈ [0,1] は Hom 値"
-    L3: "弱2-圏 (将来) — 派生は 2-cell"
+    L1: 前順序圏のガロア接続 — F(X) ≤ Y ⟺ X ≤ G(Y)
+    L2: '[0,1]-豊穣圏 — Drift ∈ [0,1] は Hom 値'
+    L3: 弱2-圏 (将来) — 派生は 2-cell
 ---
 
 # /eat: 外部コンテンツ消化ワークフロー

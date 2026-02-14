@@ -1,66 +1,58 @@
 ---
-# Theorem Metadata (v2.1)
-id: "H4"
-name: "Doxa"
-greek: "Δόξα"
-series: "Hormē"
+id: H4
+name: Doxa
+greek: Δόξα
+series: Hormē
 generation:
-  formula: "Value × Precision"
-  result: "価値確信 — 価値判断の確信度"
+  formula: Value × Precision
+  result: 価値確信 — 価値判断の確信度
+description: '記録して・覚えておいて・信念を残したい時に発動。 Belief documentation, long-term memory persistence.
+  Use for: 信念, 記録, 長期記憶, belief, memory, 覚えておいて. NOT for: temporary judgments (use
+  H1/H2).
 
-description: >
-  記録して・覚えておいて・信念を残したい時に発動。
-  Belief documentation, long-term memory persistence.
-  Use for: 信念, 記録, 長期記憶, belief, memory, 覚えておいて.
-  NOT for: temporary judgments (use H1/H2).
-
+  '
 triggers:
-  - 価値判断の確信度評価
-  - 信念の記録
-  - 長期記憶への格納
-
+- 価値判断の確信度評価
+- 信念の記録
+- 長期記憶への格納
 keywords:
-  - doxa
-  - belief
-  - opinion
-  - conviction
-  - memory
-  - 信念
-  - 記憶
-
+- doxa
+- belief
+- opinion
+- conviction
+- memory
+- 信念
+- 記憶
 related:
   upstream:
-    - "S4 Praxis"
+  - S4 Praxis
   downstream:
-    - "A4 Epistēmē"
+  - A4 Epistēmē
   x_series:
-    - "← X-SH4 ← S4 Praxis"
-    - "X-HA4 → A4 Epistēmē"
-
+  - ← X-SH4 ← S4 Praxis
+  - X-HA4 → A4 Epistēmē
 implementation:
-  micro: ".agent/workflows/hist.md"
-  macro: "mekhane/anamnesis/"
+  micro: .agent/workflows/hist.md
+  macro: mekhane/anamnesis/
   templates:
-    - "旧T8 Anamnēsis の記憶処理"
-
+  - 旧T8 Anamnēsis の記憶処理
 derivatives:
   sens:
-    name: "Sensory (感覚)"
-    description: "感覚・直感に基づく信念、経験的記録"
+    name: Sensory (感覚)
+    description: 感覚・直感に基づく信念、経験的記録
   conc:
-    name: "Conceptual (概念)"
-    description: "概念的・理論的な信念、構造的記録"
+    name: Conceptual (概念)
+    description: 概念的・理論的な信念、構造的記録
   form:
-    name: "Formal (形式)"
-    description: "形式・ルールとしての信念、明示的参照"
-
-version: "2.2.0"
-workflow_ref: ".agent/workflows/dox.md"
+    name: Formal (形式)
+    description: 形式・ルールとしての信念、明示的参照
+version: 2.2.0
+workflow_ref: .agent/workflows/dox.md
 risk_tier: L1
 reversible: true
 requires_approval: false
 risks:
-  - "動機評価の偏りによる行動指針の歪み"
+- 動機評価の偏りによる行動指針の歪み
 fallbacks: []
 ---
 

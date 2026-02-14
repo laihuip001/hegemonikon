@@ -1,34 +1,33 @@
 ---
-id: "K4"
-name: "Stratum→Tempo"
-category: "abstraction-reasoning"
-description: "処理レベルが時間スコープを決定する文脈定理"
-
+id: K4
+name: Stratum→Tempo
+category: abstraction-reasoning
+description: 処理レベルが時間スコープを決定する文脈定理
 triggers:
-  - depth-to-time mapping
-  - abstraction level decisions
-  - processing horizon planning
-
+- depth-to-time mapping
+- abstraction level decisions
+- processing horizon planning
 keywords:
-  - stratum
-  - tempo
-  - abstraction
-  - processing-depth
+- stratum
+- tempo
+- abstraction
+- processing-depth
+when_to_use: '処理の深さから適切な時間枠を導出する場合。
 
-when_to_use: |
-  処理の深さから適切な時間枠を導出する場合。
   例：アーキテクチャ設計（高次）には長期が必要。
 
-when_not_to_use: |
-  - 時間が既に決まっている場合
+  '
+when_not_to_use: '- 時間が既に決まっている場合
+
   - 処理レベルが固定されている場合
 
-version: "2.0"
+  '
+version: '2.0'
 risk_tier: L0
 reversible: true
 requires_approval: false
 risks:
-  - "アーカイブ済みスキルの誤参照による古い手法の適用"
+- アーカイブ済みスキルの誤参照による古い手法の適用
 fallbacks: []
 ---
 

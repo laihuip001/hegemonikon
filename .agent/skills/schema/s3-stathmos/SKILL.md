@@ -1,46 +1,49 @@
 ---
-# Theorem Metadata (v3.0)
-id: "S3"
-name: "Stathmos"
-greek: "Σταθμός"
-series: "Schema"
+id: S3
+name: Stathmos
+greek: Σταθμός
+series: Schema
 generation:
-  formula: "Internality × Precision"
-  result: "内在精密 — 評価基準の設定"
-
-description: >
-  何を基準に評価する？・成功条件を定義したい・ベンチマークを設定したい時に発動。
-  Evaluation criteria setting, benchmark definition, success criteria.
-  Use for: 基準, 評価, benchmark, criteria, standard.
+  formula: Internality × Precision
+  result: 内在精密 — 評価基準の設定
+description: '何を基準に評価する？・成功条件を定義したい・ベンチマークを設定したい時に発動。 Evaluation criteria setting,
+  benchmark definition, success criteria. Use for: 基準, 評価, benchmark, criteria, standard.
   NOT for: scale/granularity (スケール → Metron S1).
 
+  '
 triggers:
-  - 評価基準の設定
-  - 成功/失敗の判定条件定義
-  - ベンチマーク設計
-  - /sta コマンド
-
-keywords: [stathmos, standard, benchmark, criterion, 基準, 評価, ベンチマーク]
-
+- 評価基準の設定
+- 成功/失敗の判定条件定義
+- ベンチマーク設計
+- /sta コマンド
+keywords:
+- stathmos
+- standard
+- benchmark
+- criterion
+- 基準
+- 評価
+- ベンチマーク
 related:
   upstream:
-    - "O3 Zētēsis (X-OS5: 問いの発見→評価基準設定)"
-    - "O4 Energeia (X-OS7: 行為の実行→成果基準定義)"
+  - 'O3 Zētēsis (X-OS5: 問いの発見→評価基準設定)'
+  - 'O4 Energeia (X-OS7: 行為の実行→成果基準定義)'
   downstream:
-    - "P1 Khōra (X-SP3: 評価基準→評価対象の場)"
-    - "P2 Hodos (X-SP4: 評価基準→達成への道筋)"
-    - "K1 Eukairia (X-SK3: 評価基準→今が評価の好機か)"
-    - "K2 Chronos (X-SK4: 評価基準→評価に必要な時間枠)"
-    - "H3 Orexis (X-SH5: 基準→基準を満たしたい欲求)"
-    - "H4 Doxa (X-SH6: 基準→基準の妥当性への信念)"
-
-version: "3.0.0"
-workflow_ref: ".agent/workflows/sta.md"
+  - 'P1 Khōra (X-SP3: 評価基準→評価対象の場)'
+  - 'P2 Hodos (X-SP4: 評価基準→達成への道筋)'
+  - 'K1 Eukairia (X-SK3: 評価基準→今が評価の好機か)'
+  - 'K2 Chronos (X-SK4: 評価基準→評価に必要な時間枠)'
+  - 'H3 Orexis (X-SH5: 基準→基準を満たしたい欲求)'
+  - 'H4 Doxa (X-SH6: 基準→基準の妥当性への信念)'
+version: 3.0.0
+workflow_ref: .agent/workflows/sta.md
 risk_tier: L1
 reversible: true
 requires_approval: false
-risks: ["none identified"]
-fallbacks: ["manual execution"]
+risks:
+- none identified
+fallbacks:
+- manual execution
 ---
 
 # S3: Stathmos (Σταθμός)

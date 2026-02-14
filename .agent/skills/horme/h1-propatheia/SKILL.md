@@ -1,47 +1,49 @@
 ---
-# Theorem Metadata (v3.0)
-id: "H1"
-name: "Propatheia"
-greek: "Προπάθεια"
-series: "Hormē"
+id: H1
+name: Propatheia
+greek: Προπάθεια
+series: Hormē
 generation:
-  formula: "Flow × Valence"
-  result: "流動傾向 — 推論/行為がどちらに向かうか"
+  formula: Flow × Valence
+  result: 流動傾向 — 推論/行為がどちらに向かうか
+description: '直感的にどう感じる？・第一印象・接近/回避の傾向を知りたい時に発動。 Initial emotional tendencies, first
+  impressions, approach/avoidance impulses. Use for: 直感, 第一印象, 傾向, intuition. NOT
+  for: deliberate judgment (反省的判断 → Krisis A2).
 
-description: >
-  直感的にどう感じる？・第一印象・接近/回避の傾向を知りたい時に発動。
-  Initial emotional tendencies, first impressions, approach/avoidance impulses.
-  Use for: 直感, 第一印象, 傾向, intuition.
-  NOT for: deliberate judgment (反省的判断 → Krisis A2).
-
+  '
 triggers:
-  - 初期傾向の検出
-  - 直感的反応
-  - 接近/回避の判断
-  - /pro コマンド
-
-keywords: [propatheia, pre-emotion, tendency, intuition, 傾向, 直感, first-impression]
-
+- 初期傾向の検出
+- 直感的反応
+- 接近/回避の判断
+- /pro コマンド
+keywords:
+- propatheia
+- pre-emotion
+- tendency
+- intuition
+- 傾向
+- 直感
+- first-impression
 related:
   upstream:
-    - "O1 Noēsis (X-OH1: 深い認識→直感的反応)"
-    - "O2 Boulēsis (X-OH3: 目的意識→やりたい/やりたくない)"
-    - "S1 Metron (X-SH1: スケール設定→大きすぎ/小さすぎの直感)"
-    - "S2 Mekhanē (X-SH3: 方法選択→これでいけるの直感)"
+  - 'O1 Noēsis (X-OH1: 深い認識→直感的反応)'
+  - 'O2 Boulēsis (X-OH3: 目的意識→やりたい/やりたくない)'
+  - 'S1 Metron (X-SH1: スケール設定→大きすぎ/小さすぎの直感)'
+  - 'S2 Mekhanē (X-SH3: 方法選択→これでいけるの直感)'
   downstream:
-    - "A1 Pathos (X-HA1: 直感→感情の精緻化)"
-    - "A2 Krisis (X-HA2: 直感→批判的検証)"
-    - "K1 Eukairia (X-HK1: 直感→今がチャンスだの認識 ⚠️)"
-    - "K3 Telos (X-HK2: 直感→直感が目的を修正)"
-
-version: "3.0.0"
-workflow_ref: ".agent/workflows/pro.md"
+  - 'A1 Pathos (X-HA1: 直感→感情の精緻化)'
+  - 'A2 Krisis (X-HA2: 直感→批判的検証)'
+  - 'K1 Eukairia (X-HK1: 直感→今がチャンスだの認識 ⚠️)'
+  - 'K3 Telos (X-HK2: 直感→直感が目的を修正)'
+version: 3.0.0
+workflow_ref: .agent/workflows/pro.md
 risk_tier: L1
 reversible: true
 requires_approval: false
 risks:
-  - "直感の過信 (X-HK1 バイアス: 直感→好機認識の歪み)"
-fallbacks: ["manual execution"]
+- '直感の過信 (X-HK1 バイアス: 直感→好機認識の歪み)'
+fallbacks:
+- manual execution
 ---
 
 # H1: Propatheia (Προπάθεια)

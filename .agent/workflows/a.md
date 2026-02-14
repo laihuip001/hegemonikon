@@ -1,71 +1,87 @@
 ---
 description: A-series Peras。L1.75×L1.75 の極限演算で精度保証の統合判断を生成。
 hegemonikon: Akribeia
-modules: [A1, A2, A3, A4]
+modules:
+- A1
+- A2
+- A3
+- A4
 skill_ref:
-  - ".agent/skills/akribeia/a1-pathos/SKILL.md"
-  - ".agent/skills/akribeia/a2-krisis/SKILL.md"
-  - ".agent/skills/akribeia/a3-gnome/SKILL.md"
-  - ".agent/skills/akribeia/a4-episteme/SKILL.md"
-version: "5.6"
+- .agent/skills/akribeia/a1-pathos/SKILL.md
+- .agent/skills/akribeia/a2-krisis/SKILL.md
+- .agent/skills/akribeia/a3-gnome/SKILL.md
+- .agent/skills/akribeia/a4-episteme/SKILL.md
+version: '5.6'
 lcm_state: beta
-layer: "Δ"
+layer: Δ
 category_theory:
-  yoneda: "Hom(-, Tn) ≅ F(Tn) — 各定理はその射の集合で完全に決まる"
-  limit: "Cone の頂点 — 全ての精度射が一致する点"
-  converge_as_cone: "C0=PW決定, C1=精度射の列挙, C2=PW加重融合, C3=Kalon+普遍性検証"
-  cone_builder: "mekhane/fep/cone_builder.py"
-  kalon: "mekhane/fep/universality.py — C3で使用"
-  adjunction: "F ⊣ G — 圏論を付与する (F) と 構造を発見する (G) の随伴対"
+  yoneda: Hom(-, Tn) ≅ F(Tn) — 各定理はその射の集合で完全に決まる
+  limit: Cone の頂点 — 全ての精度射が一致する点
+  converge_as_cone: C0=PW決定, C1=精度射の列挙, C2=PW加重融合, C3=Kalon+普遍性検証
+  cone_builder: mekhane/fep/cone_builder.py
+  kalon: mekhane/fep/universality.py — C3で使用
+  adjunction: F ⊣ G — 圏論を付与する (F) と 構造を発見する (G) の随伴対
   enrichment:
-    concept: "Hom に確信度/精度 [0,1] を入れる — /a 固有 (PWが研究対象そのもの)"
+    concept: Hom に確信度/精度 [0,1] を入れる — /a 固有 (PWが研究対象そのもの)
     mode: conceptual
-    variant: "Fuzzy-enrichment (Hom → [0,1])"
+    variant: Fuzzy-enrichment (Hom → [0,1])
     structures:
-      - "A4 Epistēmē: tent/just/cert = 確信度のグレーディング"
-      - "A2 Krisis: PASS/FAIL = 二値判定 (ファジィの値域)"
-      - "PW が A-series の核心操作かつ研究対象 = 自己参照的 enrichment"
+    - 'A4 Epistēmē: tent/just/cert = 確信度のグレーディング'
+    - 'A2 Krisis: PASS/FAIL = 二値判定 (ファジィの値域)'
+    - PW が A-series の核心操作かつ研究対象 = 自己参照的 enrichment
   mathematical_basis:
-    L1: "前順序圏のガロア接続 — F(X) ≤ Y ⟺ X ≤ G(Y)"
-    L2: "[0,1]-豊穣圏 — Drift ∈ [0,1] は Hom 値"
-    L3: "弱2-圏 (将来) — 派生は 2-cell"
-lineage: "v4.2 + Limit演算復元 → v5.0 + C0 PW/加重融合 → v5.4 → v5.5 C3 Kalon化 → v5.6 固有層 Fuzzy-enrichment"
+    L1: 前順序圏のガロア接続 — F(X) ≤ Y ⟺ X ≤ G(Y)
+    L2: '[0,1]-豊穣圏 — Drift ∈ [0,1] は Hom 値'
+    L3: 弱2-圏 (将来) — 派生は 2-cell
+lineage: v4.2 + Limit演算復元 → v5.0 + C0 PW/加重融合 → v5.4 → v5.5 C3 Kalon化 → v5.6 固有層 Fuzzy-enrichment
 cognitive_algebra:
-  generation: "L1.75 × L1.75"
+  generation: L1.75 × L1.75
   coordinates:
-    axis_1: "Valence (+/-)"
-    axis_2: "Precision (C/U)"
-  definition: "/a = lim(A1·A2·A3·A4)"
+    axis_1: Valence (+/-)
+    axis_2: Precision (C/U)
+  definition: /a = lim(A1·A2·A3·A4)
   interpretation:
-    strict: "テンソル積 (Valence⊗Precision) の Limit 射影"
-    short: "4定理の内積 → 最適収束点"
+    strict: テンソル積 (Valence⊗Precision) の Limit 射影
+    short: 4定理の内積 → 最適収束点
   operators:
-    "+": "Limit強度↑ — 全4定理を詳細に収束"
-    "-": "Limit強度↓ — 縮約収束"
-    "*": "Limit対象自体を問う: なぜ精度を問うか"
+    +: Limit強度↑ — 全4定理を詳細に収束
+    '-': Limit強度↓ — 縮約収束
+    '*': 'Limit対象自体を問う: なぜ精度を問うか'
 sel_enforcement:
-  "+":
-    description: "MUST execute ALL 4 theorems with deep convergence"
+  +:
+    description: MUST execute ALL 4 theorems with deep convergence
     minimum_requirements:
-      - "全4定理実行"
-      - "各定理詳細モード"
-      - "融合ステップ必須"
-  "-":
-    description: "MAY execute with condensed convergence"
+    - 全4定理実行
+    - 各定理詳細モード
+    - 融合ステップ必須
+  '-':
+    description: MAY execute with condensed convergence
     minimum_requirements:
-      - "サマリーのみ"
-  "*":
-    description: "MUST meta-analyze: why question accuracy?"
+    - サマリーのみ
+  '*':
+    description: 'MUST meta-analyze: why question accuracy?'
     minimum_requirements:
-      - "精度層選択の理由を問う"
-derivatives: [prim, seco, regu, affi, nega, susp, conc, abst, univ, tent, just, cert]
-ccl_signature: "/a+_/dia"
+    - 精度層選択の理由を問う
+derivatives:
+- prim
+- seco
+- regu
+- affi
+- nega
+- susp
+- conc
+- abst
+- univ
+- tent
+- just
+- cert
+ccl_signature: /a+_/dia
 children:
-  - "/pat"   # A1 Pathos (メタ感情)
-  - "/dia"   # A2 Krisis (判定力)
-  - "/gno"   # A3 Gnōmē (格言)
-  - "/epi"   # A4 Epistēmē (知識)
-  - "/vet"   # A2+A4 派生
+- /pat
+- /dia
+- /gno
+- /epi
+- /vet
 anti_skip: enabled
 ---
 

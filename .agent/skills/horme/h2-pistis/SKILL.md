@@ -1,59 +1,52 @@
 ---
-# Theorem Metadata (v3.0)
-id: "H2"
-name: "Pistis"
-greek: "Πίστις"
-series: "Hormē"
+id: H2
+name: Pistis
+greek: Πίστις
+series: Hormē
 generation:
-  formula: "Flow × Precision"
-  result: "流動確信 — 推論/行為の確信度"
+  formula: Flow × Precision
+  result: 流動確信 — 推論/行為の確信度
+description: 'どのくらい確か？・確信度を評価したい・信頼できる？時に発動。 Confidence assessment, trust evaluation,
+  certainty in current approach. Use for: 確信, 信頼, certainty, どのくらい確か. NOT for: confidence
+  already clear (proceed directly).
 
-description: >
-  どのくらい確か？・確信度を評価したい・信頼できる？時に発動。
-  Confidence assessment, trust evaluation, certainty in current approach.
-  Use for: 確信, 信頼, certainty, どのくらい確か.
-  NOT for: confidence already clear (proceed directly).
-
+  '
 triggers:
-  - 確信度の評価
-  - 信頼性判断
-  - 推論の確度チェック
-  - /m コマンド (本気モード)
-  - 不確実性 > 0.5
-
+- 確信度の評価
+- 信頼性判断
+- 推論の確度チェック
+- /m コマンド (本気モード)
+- 不確実性 > 0.5
 keywords:
-  - pistis
-  - confidence
-  - trust
-  - belief
-  - certainty
-  - 確信
-  - 信頼
-
+- pistis
+- confidence
+- trust
+- belief
+- certainty
+- 確信
+- 信頼
 related:
   upstream:
-    - "O1 Noēsis (X-OH2: 深い認識→確信度)"
-    - "O2 Boulēsis (X-OH4: 目的意識→意志の確からしさ)"
-    - "S1 Metron (X-SH2: スケール設定→測定への確信)"
-    - "S2 Mekhanē (X-SH4: 方法選択→方法への確信)"
+  - 'O1 Noēsis (X-OH2: 深い認識→確信度)'
+  - 'O2 Boulēsis (X-OH4: 目的意識→意志の確からしさ)'
+  - 'S1 Metron (X-SH2: スケール設定→測定への確信)'
+  - 'S2 Mekhanē (X-SH4: 方法選択→方法への確信)'
   downstream:
-    - "A3 Gnōmē (X-HA5: 確信→原則抽出)"
-    - "A4 Epistēmē (X-HA6: 確信→知識昇格)"
-    - "K2 Chronos (X-HK5: 確信→時間感覚支配)"
-    - "K4 Sophia (X-HK6: 確信→知るべきことを決定)"
-
+  - 'A3 Gnōmē (X-HA5: 確信→原則抽出)'
+  - 'A4 Epistēmē (X-HA6: 確信→知識昇格)'
+  - 'K2 Chronos (X-HK5: 確信→時間感覚支配)'
+  - 'K4 Sophia (X-HK6: 確信→知るべきことを決定)'
 implementation:
-  micro: ".agent/workflows/pis.md"
-  macro: "(future)"
-
-version: "3.0.0"
-workflow_ref: ".agent/workflows/pis.md"
+  micro: .agent/workflows/pis.md
+  macro: (future)
+version: 3.0.0
+workflow_ref: .agent/workflows/pis.md
 risk_tier: L1
 reversible: true
 requires_approval: false
 risks:
-  - "過信による盲点 (X-HK5: 確信が時間感覚を歪める)"
-  - "確信と知識の混同 (Pistis ≠ Epistēmē)"
+- '過信による盲点 (X-HK5: 確信が時間感覚を歪める)'
+- 確信と知識の混同 (Pistis ≠ Epistēmē)
 fallbacks: []
 ---
 

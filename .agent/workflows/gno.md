@@ -1,91 +1,103 @@
 ---
 description: A3 Gnōmē（格言）を発動し、原則・教訓を抽出する。原則抽出ワークフロー。
 hegemonikon: Akribeia
-modules: [A3]
-skill_ref: ".agent/skills/akribeia/a3-gnome/SKILL.md"
+modules:
+- A3
+skill_ref: .agent/skills/akribeia/a3-gnome/SKILL.md
 triggers:
-  - "教訓は"
-  - "格言"
-  - "原則"
-  - "gnome"
-  - "maxim"
-  - "言葉遣い"
-  - "教えて vs 考えて"
-version: "1.4"
+- 教訓は
+- 格言
+- 原則
+- gnome
+- maxim
+- 言葉遣い
+- 教えて vs 考えて
+version: '1.4'
 lcm_state: beta
-lineage: "v1.3 + FBR変換 + Hub-and-Spoke → v1.4"
-derivatives: [disc, extr, appl, analogy, lit, rule, invariant, symmetry, metaphor, principle, story, check, personify, assumption]
+lineage: v1.3 + FBR変換 + Hub-and-Spoke → v1.4
+derivatives:
+- disc
+- extr
+- appl
+- analogy
+- lit
+- rule
+- invariant
+- symmetry
+- metaphor
+- principle
+- story
+- check
+- personify
+- assumption
 spoke_derivatives:
-  analogy-modes: [analogy_structure, analogy_surface, analogy_negative, analogy_cross, analogy_history, analogy_cs, analogy_physics, analogy_ecology]
+  analogy-modes:
+  - analogy_structure
+  - analogy_surface
+  - analogy_negative
+  - analogy_cross
+  - analogy_history
+  - analogy_cs
+  - analogy_physics
+  - analogy_ecology
 trigonon:
   series: A
   type: Pure
   theorem: A3
-  coordinates: [U, C]
+  coordinates:
+  - U
+  - C
   bridge: []
-  anchor_via: [H, K]
+  anchor_via:
+  - H
+  - K
   morphisms:
-    ">>H": [/pro, /pis, /ore, /dox]
-    ">>K": [/euk, /chr, /tel, /sop]
+    '>>H':
+    - /pro
+    - /pis
+    - /ore
+    - /dox
+    '>>K':
+    - /euk
+    - /chr
+    - /tel
+    - /sop
 cognitive_algebra:
-  "+": "詳細原則：適用条件・例外・根拠を完全記述"
-  "-": "即原則：1行格言のみ"
-  "*": "メタ原則：原則抽出プロセス自体を問う"
-  analogy: "アナロジー。既知→未知の写像、破綻点必須"
+  +: 詳細原則：適用条件・例外・根拠を完全記述
+  '-': 即原則：1行格言のみ
+  '*': メタ原則：原則抽出プロセス自体を問う
+  analogy: アナロジー。既知→未知の写像、破綻点必須
 category_theory:
-  core: "随伴 F⊣G の右随伴 G（忘却関手）"
-  adjunction: "Pathos (F) ⊣ Gnōmē (G)"
-  role: "G: Passion → Maxim（メタ感情から感情の激烈さを忘却し、再利用可能な教訓/格言だけ残す）"
-  G_definition: "「あの時死ぬほど悔しかった」から感情強度を落とし、「準備を怠るな」という原則だけ抽出"
-  G_two_layers:
-    格言: "教訓・原則・パターン。well-defined"
-    感情の鮮度: "痛みの生々しさ、喜びの高揚。格言化すると不可逆的に消える"
-  drift: "Drift = 感情の鮮度喪失量。「知っている」けど「感じない」状態"
-  insight: "痛みが教訓を生み、教訓は痛みを忘れた知恵。だから忘れた頃に繰り返す — Creator, 2026-02-11"
-  mathematical_basis:
-    L1: "前順序圏のガロア接続 — F(X) ≤ Y ⟺ X ≤ G(Y)"
-    L2: "[0,1]-豊穣圏 — Drift ∈ [0,1] は Hom 値"
-    L3: "弱2-圏 (将来) — 派生は 2-cell"
-  natural_transformation:
-    partner: "epi"
-    shared_axis: "Valence (-: 否定)"
-    varied_axis: "Precision (C→U)"
-    meaning: "確かな教訓→不確かな知識。「経験則→体系化の試み」"
-  duality:
-    partner: "dia"
-    type: "tension"
-    meaning: "教訓↔判断。「過去の知恵 ↔ 今の判断」"
+  core: 随伴 F⊣G の右随伴 G（忘却関手）
+  adjunction: Pathos (F) ⊣ Gnōmē (G)
+  role: 'G: Emotion → Principle（感情から精密さの文脈を剥いで、原則・教訓に圧縮する）'
+  G_definition: 「感じたこと」から情動の生々しさを忘却し、「学んだこと」という原則だけを残す
+  coordinates: A3[U,C] — Precision(U:不確実)を保存。原則は仮説として暫定的
+  unit: 'η: Principle → G(F(Principle)) — 原則を感情で評価し教訓に戻す = 原則の情動的妥当性'
+  counit: 'ε: F(G(Emotion)) → Emotion — 感情を教訓化して再び感じ直す = 感情の真正性検証'
+  drift: Drift = 教訓が生きた感情から切り離されている度合い。格言が空虚になる
+  insight: violations.md の教訓こそ G の出力。失敗の痛みを格言に昇華するプロセス
+  qualia: G はクオリア（体験の質）を忘却する側。主観→客観、一人称→三人称の変換
+  episodic_to_semantic: 格言 = エピソード記憶の意味記憶化（一般化/客体化）— dia⊣epi と同型だが感情レイヤー
+  drift_qualia: Drift = 格言にならないクオリア。言葉にできない「あの感覚」の喪失量
+  G_preserves: 不変量 = 経験の命題化可能部分。クオリアを忘却しても、言語化できた教訓は保存される
+  creator_insight: 主体感・主観・現象的意識が消える — Creator, 2026-02-11
 sel_enforcement:
-  "+":
-    description: "MUST describe with conditions, exceptions, and basis"
+  +:
+    description: MUST describe with conditions, exceptions, and basis
     minimum_requirements:
-      - "適用条件 必須"
-      - "例外 必須"
-      - "根拠 必須"
-  "-":
-    description: "MAY provide single line maxim only"
+    - 適用条件 必須
+    - 例外 必須
+    - 根拠 必須
+  '-':
+    description: MAY provide single line maxim only
     minimum_requirements:
-      - "1行格言のみ"
-  "*":
-    description: "MUST meta-analyze: why this principle?"
+    - 1行格言のみ
+  '*':
+    description: 'MUST meta-analyze: why this principle?'
     minimum_requirements:
-      - "原則抽出プロセスを問う"
-ccl_signature: "/gno+_/dox"
-category_theory:
-  core: "随伴 F⊣G の右随伴 G（忘却関手）"
-  adjunction: "Pathos (F) ⊣ Gnōmē (G)"
-  role: "G: Emotion → Principle（感情から精密さの文脈を剥いで、原則・教訓に圧縮する）"
-  G_definition: "「感じたこと」から情動の生々しさを忘却し、「学んだこと」という原則だけを残す"
-  coordinates: "A3[U,C] — Precision(U:不確実)を保存。原則は仮説として暫定的"
-  unit: "η: Principle → G(F(Principle)) — 原則を感情で評価し教訓に戻す = 原則の情動的妥当性"
-  counit: "ε: F(G(Emotion)) → Emotion — 感情を教訓化して再び感じ直す = 感情の真正性検証"
-  drift: "Drift = 教訓が生きた感情から切り離されている度合い。格言が空虚になる"
-  insight: "violations.md の教訓こそ G の出力。失敗の痛みを格言に昇華するプロセス"
-  qualia: "G はクオリア（体験の質）を忘却する側。主観→客観、一人称→三人称の変換"
-  episodic_to_semantic: "格言 = エピソード記憶の意味記憶化（一般化/客体化）— dia⊣epi と同型だが感情レイヤー"
-  drift_qualia: "Drift = 格言にならないクオリア。言葉にできない「あの感覚」の喪失量"
-  G_preserves: "不変量 = 経験の命題化可能部分。クオリアを忘却しても、言語化できた教訓は保存される"
-  creator_insight: "主体感・主観・現象的意識が消える — Creator, 2026-02-11"
+    - 原則抽出プロセスを問う
+ccl_signature: /gno+_/dox
 ---
 
 # /gno: 原則抽出ワークフロー (Gnōmē)

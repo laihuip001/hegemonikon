@@ -1,31 +1,33 @@
 ---
 description: Gemini の作業を Claude が監査する。Cross-Model Verification による品質保証。
 hegemonikon: Akribeia
-modules: [A2, A4]
-skill_ref: ".agent/skills/akribeia/a2-krisis/SKILL.md"
-pair: "/sop"
+modules:
+- A2
+- A4
+skill_ref: .agent/skills/akribeia/a2-krisis/SKILL.md
+pair: /sop
 tempo: Fast
-parent: "/dia"
-version: "3.1"
+parent: /dia
+version: '3.1'
 lcm_state: beta
-lineage: "v3.0 + 再実行提案フロー → v3.1"
+lineage: v3.0 + 再実行提案フロー → v3.1
 anti_skip: enabled
 sel_enforcement:
-  "+":
-    description: "MUST execute all 5 layers with detailed findings"
+  +:
+    description: MUST execute all 5 layers with detailed findings
     minimum_requirements:
-      - "L1-L5 全層チェック 必須"
-      - "発見事項の詳細記載 必須"
-      - "SEL 遵守率表示 必須"
-  "-":
-    description: "MAY provide summary only"
+    - L1-L5 全層チェック 必須
+    - 発見事項の詳細記載 必須
+    - SEL 遵守率表示 必須
+  '-':
+    description: MAY provide summary only
     minimum_requirements:
-      - "総合判定のみ"
-  "*":
-    description: "MUST meta-analyze: why this audit approach?"
+    - 総合判定のみ
+  '*':
+    description: 'MUST meta-analyze: why this audit approach?'
     minimum_requirements:
-      - "監査手法のメタ分析"
-ccl_signature: "/vet+"
+    - 監査手法のメタ分析
+ccl_signature: /vet+
 ---
 
 # /vet: 監査ワークフロー（Verification）v3.0

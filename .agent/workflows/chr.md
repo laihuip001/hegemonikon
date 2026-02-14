@@ -1,80 +1,76 @@
 ---
 description: K2 Chronos（時間）を発動し、時間制約と期限を評価する。時間配置ワークフロー。
 hegemonikon: Kairos
-modules: [K2]
-skill_ref: ".agent/skills/kairos/k2-chronos/SKILL.md"
+modules:
+- K2
+skill_ref: .agent/skills/kairos/k2-chronos/SKILL.md
 triggers:
-  - "いつまで"
-  - "期限"
-  - "時間"
-  - "deadline"
-  - "chronos"
-version: "1.4"
+- いつまで
+- 期限
+- 時間
+- deadline
+- chronos
+version: '1.4'
 lcm_state: beta
-lineage: "v1.3 + FBR変換 → v1.4"
-derivatives: [regu, dead, esti]
+lineage: v1.3 + FBR変換 → v1.4
+derivatives:
+- regu
+- dead
+- esti
 trigonon:
   series: K
   type: Mixed
   theorem: K2
-  coordinates: [Scale, U]
-  bridge: [S, H]
-  anchor_via: [P, A]
+  coordinates:
+  - Scale
+  - U
+  bridge:
+  - S
+  - H
+  anchor_via:
+  - P
+  - A
   morphisms:
-    ">>S": [/met, /mek, /sta, /pra]
-    ">>H": [/pro, /pis, /ore, /dox]
+    '>>S':
+    - /met
+    - /mek
+    - /sta
+    - /pra
+    '>>H':
+    - /pro
+    - /pis
+    - /ore
+    - /dox
 cognitive_algebra:
-  "+": "詳細時間分析。短期/中期/長期、依存関係"
-  "-": "即断期限。いつまでの1行回答"
-  "*": "時間感覚のメタ分析。なぜこの期限か"
+  +: 詳細時間分析。短期/中期/長期、依存関係
+  '-': 即断期限。いつまでの1行回答
+  '*': 時間感覚のメタ分析。なぜこの期限か
 category_theory:
-  core: "随伴 F⊣G の左随伴 F（自由関手）"
-  adjunction: "Chronos (F) ⊣ Sophia (G)"
-  role: "F: Wisdom → Timeline（蓄積された知恵に具体的な時間軸/期限を載せてスケジュールを構成）"
-  F_definition: "「何を知るべきか」に「いつまでに」を加えて、時間制約付きの行動計画にする"
-  unit: "η: Wisdom → G(F(Wisdom)) — 知恵を時間配置にして知恵に戻す = 時間制約が知恵を歪めないか検証"
-  counit: "ε: F(G(Timeline)) → Timeline — スケジュールを知恵にしてスケジュールに戻す = 期限の再設定"
-  drift: "Drift = 時間圧力の忘却。調査に没頭して期限を忘れる"
-  insight: "知恵は時間を忘れた経験の結晶。いつ学んだかは覚えていないが、学んだことは消えない — Creator, 2026-02-11"
-  mathematical_basis:
-    L1: "前順序圏のガロア接続 — F(X) ≤ Y ⟺ X ≤ G(Y)"
-    L2: "[0,1]-豊穣圏 — Drift ∈ [0,1] は Hom 値"
-    L3: "弱2-圏 (将来) — 派生は 2-cell"
-  natural_transformation:
-    partner: "euk"
-    shared_axis: "Scale (Mi: 微視)"
-    varied_axis: "Valence (-→+)"
-    meaning: "期限管理→好機判断。「いつまでに→今がチャンスかも」"
-  duality:
-    partner: "tel"
-    type: "tension"
-    meaning: "期限↔使命。「いつ ↔ なぜ」"
+  core: 随伴 F⊣G の左随伴 F（自由関手）
+  adjunction: Chronos (F) ⊣ Sophia (G)
+  role: 'F: Wisdom → Time（知見に時間制約を載せて時間判定を構成 = Micro化）'
+  F_definition: 大局的な知見に「いつまでに」「どれくらい」の時間文脈を付与する
+  same_formula: chr と sop は同じ Valence(-) の Scale 違い
+  coordinates: K2[Micro,-] — Valence(-)を保存し Scale を Micro に設定
+  k_series_pattern: 'K-series 全体: 問うべき対象のレイヤー（モーメント）が上下する'
+  unit: 'η: Wisdom → G(F(Wisdom)) — 知見を時間評価して調査に戻す = 知見の時間的妥当性検証'
+  insight: euk⊣tel と同じパターン。レイヤーが上下している — Creator, 2026-02-11
 sel_enforcement:
-  "+":
-    description: "MUST analyze short/medium/long term with dependencies"
+  +:
+    description: MUST analyze short/medium/long term with dependencies
     minimum_requirements:
-      - "時間軸分析 必須"
-      - "依存関係 必須"
-  "-":
-    description: "MAY provide single deadline only"
+    - 時間軸分析 必須
+    - 依存関係 必須
+  '-':
+    description: MAY provide single deadline only
     minimum_requirements:
-      - "期限の1行"
-  "*":
-    description: "MUST meta-analyze: why this deadline?"
+    - 期限の1行
+  '*':
+    description: 'MUST meta-analyze: why this deadline?'
     minimum_requirements:
-      - "時間感覚プロセスを問う"
+    - 時間感覚プロセスを問う
 anti_skip: enabled
-ccl_signature: "/chr+"
-category_theory:
-  core: "随伴 F⊣G の左随伴 F（自由関手）"
-  adjunction: "Chronos (F) ⊣ Sophia (G)"
-  role: "F: Wisdom → Time（知見に時間制約を載せて時間判定を構成 = Micro化）"
-  F_definition: "大局的な知見に「いつまでに」「どれくらい」の時間文脈を付与する"
-  same_formula: "chr と sop は同じ Valence(-) の Scale 違い"
-  coordinates: "K2[Micro,-] — Valence(-)を保存し Scale を Micro に設定"
-  k_series_pattern: "K-series 全体: 問うべき対象のレイヤー（モーメント）が上下する"
-  unit: "η: Wisdom → G(F(Wisdom)) — 知見を時間評価して調査に戻す = 知見の時間的妥当性検証"
-  insight: "euk⊣tel と同じパターン。レイヤーが上下している — Creator, 2026-02-11"
+ccl_signature: /chr+
 ---
 
 # /chr: 時間配置ワークフロー (Chronos)

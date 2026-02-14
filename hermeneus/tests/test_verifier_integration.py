@@ -13,6 +13,8 @@ import sys
 import time
 from pathlib import Path
 
+import pytest
+
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 from hermeneus.src.verifier import (
@@ -36,6 +38,7 @@ def check_ls_available() -> bool:
         return False
 
 
+@pytest.mark.asyncio
 async def test_single_agent_generate():
     """単一エージェントの LLM 生成テスト"""
     print("\n" + "=" * 60)
@@ -65,6 +68,7 @@ async def test_single_agent_generate():
     return turn
 
 
+@pytest.mark.asyncio
 async def test_two_agent_rally():
     """Proposer ↔ Critic のラリーテスト (3ターン)"""
     print("\n" + "=" * 60)
@@ -120,6 +124,7 @@ async def test_two_agent_rally():
     return rally_history
 
 
+@pytest.mark.asyncio
 async def test_full_debate():
     """フル debate エンジンテスト (ラリー + Arbiter)"""
     print("\n" + "=" * 60)
@@ -181,66 +186,17 @@ async def test_full_debate():
     return result
 
 
-async def main():
-    print("🔬 Hermēneus Convergent Debate 統合テスト")
-    print("=" * 60)
+if __name__ == "__main__":
+    # 手動実行用 (pytest 以外で実行する場合)
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
     
     # LS チェック
     if not check_ls_available():
-        print("\n❌ Antigravity LS が利用できません。統合テストをスキップします。")
-        print("   フォールバック: LLM なしでのプレースホルダー応答を検証します。")
-        
-        # Fallback: LLM なしでの動作確認
-        engine = DebateEngine()
-        result = await engine.debate(
-            claim="テスト主張",
-            context="",
-            max_rounds=1,
-            max_rally_turns=4,
-            min_rally_turns=3,
-        )
-        print(f"\n   フォールバック結果: accepted={result.accepted}, conf={result.confidence:.2f}")
-        print(f"   ラリーターン数: {len(result.rounds[0].rally) if result.rounds else 0}")
-        print("   ✅ フォールバックテスト passed")
-        return
-    
-    print("✅ Antigravity LS (synteleia-sandbox) に接続成功")
-    
-    results = {}
-    
-    # Test 1: 単一エージェント
-    try:
-        results["single"] = await test_single_agent_generate()
-    except Exception as e:
-        print(f"\n   ❌ Test 1 failed: {e}")
-        results["single"] = None
-    
-    # Test 2: ラリー
-    try:
-        results["rally"] = await test_two_agent_rally()
-    except Exception as e:
-        print(f"\n   ❌ Test 2 failed: {e}")
-        results["rally"] = None
-    
-    # Test 3: フル debate
-    try:
-        results["debate"] = await test_full_debate()
-    except Exception as e:
-        print(f"\n   ❌ Test 3 failed: {e}")
-        results["debate"] = None
-    
-    # サマリー
-    print("\n" + "=" * 60)
-    print("📊 統合テスト サマリー")
-    print("=" * 60)
-    passed = sum(1 for v in results.values() if v is not None)
-    total = len(results)
-    print(f"   合格: {passed}/{total}")
-    
-    for name, result in results.items():
-        status = "✅" if result is not None else "❌"
-        print(f"   {status} {name}")
+        print("LS not available")
+        sys.exit(0)
 
-
-if __name__ == "__main__":
-    asyncio.run(main())
+    loop.run_until_complete(test_single_agent_generate())
+    loop.run_until_complete(test_two_agent_rally())
+    loop.run_until_complete(test_full_debate())
+    loop.close()

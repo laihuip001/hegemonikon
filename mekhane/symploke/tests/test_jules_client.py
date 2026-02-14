@@ -16,6 +16,9 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent))
 
+# Skip if dependencies are missing
+pytest.importorskip("aiohttp")
+
 from mekhane.symploke.jules_client import (
     JulesClient,
     JulesSession,

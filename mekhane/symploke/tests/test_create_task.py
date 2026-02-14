@@ -16,7 +16,7 @@ sys.path.insert(0, "/home/makaron8426/oikos/hegemonikon")
 
 # PURPOSE: Create a simple test task
 @pytest.mark.asyncio
-async def create_test_task():
+async def test_create_task():
     """Create a simple test task."""
     # Ensure dependencies are available
     pytest.importorskip("aiohttp")
@@ -26,8 +26,7 @@ async def create_test_task():
 
     api_key = os.environ.get("JULES_API_KEY")
     if not api_key:
-        print("❌ JULES_API_KEY not set")
-        return False
+        pytest.skip("JULES_API_KEY not set")
 
     print("=" * 60)
     print("Jules API - Create Test Task")
@@ -66,18 +65,18 @@ async def create_test_task():
         elif final.error:
             print(f"❌ Error: {final.error}")
 
-        return final.state == SessionState.COMPLETED
+        assert final.state == SessionState.COMPLETED
 
     except Exception as e:
         print(f"\n❌ Exception: {e}")
         import traceback
 
         traceback.print_exc()
-        return False
+        raise
 
 
 if __name__ == "__main__":
-    result = asyncio.run(create_test_task())
+    result = asyncio.run(test_create_task())
     print(f"\n{'='*60}")
     print(f"Result: {'SUCCESS' if result else 'FAILED'}")
     sys.exit(0 if result else 1)

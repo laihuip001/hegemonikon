@@ -107,7 +107,7 @@ _FRONTMATTER_RE = re.compile(r"^---\s*\n(.*?)\n---", re.DOTALL)
 def parse_frontmatter(path: Path) -> Optional[dict]:
     """Markdown ファイルから YAML フロントマターをパースする"""
     if yaml is None:
-        print("WARNING: PyYAML not installed. Install with: pip install pyyaml", file=sys.stderr)
+        print(f"WARNING: PyYAML not installed. sys.path: {sys.path}", file=sys.stderr)
         return None
 
     try:

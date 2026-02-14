@@ -67,6 +67,7 @@ POLL_INTERVAL = 1.0  # seconds
 
 # --- Payload Builders (v8) ---
 
+# PURPOSE: [L2-auto] build_start_cascade
 def build_start_cascade() -> dict:
     """StartCascade ペイロードを構築する。
 
@@ -80,6 +81,7 @@ def build_start_cascade() -> dict:
     }
 
 
+# PURPOSE: [L2-auto] build_send_message
 def build_send_message(cascade_id: str, text: str, model: str) -> dict:
     """SendUserCascadeMessage ペイロードを構築する。
 
@@ -100,6 +102,7 @@ def build_send_message(cascade_id: str, text: str, model: str) -> dict:
     }
 
 
+# PURPOSE: [L2-auto] build_get_status
 def build_get_status() -> dict:
     """GetUserStatus ペイロードを構築する。"""
     return {
@@ -111,6 +114,7 @@ def build_get_status() -> dict:
     }
 
 
+# PURPOSE: [L2-auto] build_get_steps
 def build_get_steps(cascade_id: str, trajectory_id: str) -> dict:
     """GetCascadeTrajectorySteps ペイロードを構築する。"""
     return {

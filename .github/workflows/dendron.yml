@@ -40,6 +40,11 @@ jobs:
       - name: Install dependencies
         run: pip install pyyaml
 
+      - name: Debug Environment
+        run: |
+          pip list
+          python -c "import yaml; print(yaml)"
+
       # L1: PROOF Header Check (blocking)
       - name: "L1: PROOF Header Check"
         run: |

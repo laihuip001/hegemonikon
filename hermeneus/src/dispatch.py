@@ -132,6 +132,103 @@ def resolve_wf_paths(wf_ids: list[str]) -> dict[str, str]:
     return paths
 
 
+# PURPOSE: WF 定義ファイルから構造的要約を自動抽出 (L1 テンプレート自動充填)
+def resolve_wf_summaries(wf_paths: dict[str, str]) -> dict[str, dict]:
+    """WF 定義ファイルから purpose / phases / output_hint を抽出。
+
+    抽出元:
+      - YAML frontmatter の description: → purpose (fallback)
+      - blockquote `> **目的**:` → purpose (優先)
+      - `## 処理フロー` or `PHASE N` 見出し → phases
+      - `## 出力形式` → output_hint
+
+    Returns:
+        {"/noe": {"purpose": "...", "phases": [...], "output_hint": "..."}, ...}
+    """
+    import re
+    import yaml as _yaml
+
+    summaries: dict[str, dict] = {}
+
+    for wf_id, wf_path_str in wf_paths.items():
+        summary: dict = {"purpose": "", "phases": [], "output_hint": ""}
+
+        try:
+            content = Path(wf_path_str).read_text(encoding="utf-8")
+        except Exception:
+            summaries[wf_id] = summary
+            continue
+
+        # --- 1. YAML frontmatter から description を抽出 ---
+        fm_match = re.match(r"^---\n(.*?)\n---", content, re.DOTALL)
+        if fm_match:
+            try:
+                fm = _yaml.safe_load(fm_match.group(1))
+                if isinstance(fm, dict) and fm.get("description"):
+                    summary["purpose"] = fm["description"]
+            except Exception:
+                pass
+
+        # --- 2. blockquote `> **目的**:` で上書き (より具体的) ---
+        # frontmatter 直後 〜 最初の ## セクション見出しまでに限定
+        # (各 STEP/PHASE 内の局所的な `> **目的**:` を拾わない)
+        body = content[fm_match.end():] if fm_match else content
+        # 最初の "## " 見出しの前までを冒頭定義ブロックとする
+        intro_lines = []
+        for line in body.split("\n"):
+            if line.startswith("## "):
+                break
+            intro_lines.append(line)
+        intro_block = "\n".join(intro_lines)
+        purpose_match = re.search(
+            r">\s*\*\*目的\*\*\s*[:：]\s*(.+)", intro_block
+        )
+        if purpose_match:
+            summary["purpose"] = purpose_match.group(1).strip()
+
+        # --- 3. PHASE / STEP 行を抽出 ---
+        # パターン: "N. **PHASE N" or "N. **STEP N" (numbered list items)
+        phase_pattern = re.compile(
+            r"^\d+\.\s+\*\*(?:PHASE|STEP)\s+[\d.]+[\w]*\s*(?:—|:|-)\s*(.+?)\*\*",
+            re.MULTILINE,
+        )
+        phases = phase_pattern.findall(content)
+        if phases:
+            summary["phases"] = [p.strip().rstrip("*") for p in phases]
+
+        # fallback: `## PHASE N` 見出し
+        if not summary["phases"]:
+            heading_pattern = re.compile(
+                r"^##\s+PHASE\s+\d+\s*(?:—|:|-)\s*(.+)", re.MULTILINE
+            )
+            summary["phases"] = [
+                h.strip() for h in heading_pattern.findall(content)
+            ]
+
+        # --- 4. 出力形式セクションの冒頭を取得 ---
+        output_match = re.search(
+            r"##\s*出力形式\s*\n((?:.*\n){1,5})", content
+        )
+        if output_match:
+            hint = output_match.group(1).strip()
+            # コードフェンス (```) や空行を除外
+            hint_lines = [
+                l for l in hint.split("\n")
+                if l.strip()
+                and not l.strip().startswith("```")
+                and "---" not in l
+            ]
+            if hint_lines:
+                # テーブルヘッダーがあればそれだけ、なければ最初の行
+                table_lines = [l for l in hint_lines if l.strip().startswith("|")]
+                hint = table_lines[0] if table_lines else hint_lines[0]
+                summary["output_hint"] = hint.strip()[:120]
+
+        summaries[wf_id] = summary
+
+    return summaries
+
+
 # PURPOSE: WF 定義ファイルからサブモジュールのパスを抽出。
 def resolve_submodules(wf_paths: dict[str, str]) -> dict[str, list[str]]:
     """WF 定義ファイルからサブモジュールのパスを抽出。
@@ -202,6 +299,7 @@ def dispatch(ccl_expr: str) -> dict:
         "workflows": [],
         "wf_paths": {},
         "wf_submodules": {},
+        "wf_summaries": {},
         "plan_template": "",
         "macro_plan": None,
         "error": None,
@@ -219,10 +317,11 @@ def dispatch(ccl_expr: str) -> dict:
     # Step 1: 木構造表示
     result["tree"] = format_ast_tree(ast)
 
-    # Step 2: ワークフロー抽出 + パス解決
+    # Step 2: ワークフロー抽出 + パス解決 + 要約抽出
     result["workflows"] = extract_workflows(ast)
     result["wf_paths"] = resolve_wf_paths(result["workflows"])
     result["wf_submodules"] = resolve_submodules(result["wf_paths"])
+    result["wf_summaries"] = resolve_wf_summaries(result["wf_paths"])
 
     # Step 2.5: マクロ自動実行計画 (L1 環境制約)
     macro_section = ""
@@ -288,23 +387,80 @@ def dispatch(ccl_expr: str) -> dict:
     # マクロセクションがあれば plan_template の先頭に挿入
     macro_block = f"\n{macro_section}\n" if macro_section else ""
 
-    tmpl = f"""【CCL】{ccl_expr}
-【構造】
-{result['tree']}
-【関連WF】{wf_list}
-【WF定義】以下を view_file で開くこと:
-{view_cmds}{macro_block}
-【UML Pre-check】(WF 実行前に回答)
+    # Step 5: 実行計画の自動充填 (L1 テンプレート自動充填)
+    execution_plan_lines = []
+    wf_summaries = result["wf_summaries"]
+    for i, wf_id in enumerate(result["workflows"], 1):
+        summary = wf_summaries.get(wf_id, {})
+        purpose = summary.get("purpose", "")
+        phases = summary.get("phases", [])
+        output_hint = summary.get("output_hint", "")
+
+        line = f"  Step {i}: {wf_id}"
+        if purpose:
+            line += f"\n    目的: {purpose}"
+        if phases:
+            phase_str = " → ".join(phases[:5])  # 最大5フェーズ
+            line += f"\n    フェーズ: {phase_str}"
+        if output_hint:
+            line += f"\n    出力: {output_hint}"
+        execution_plan_lines.append(line)
+
+    if execution_plan_lines:
+        execution_plan = "\n".join(execution_plan_lines)
+    else:
+        execution_plan = "  (WF 要約を抽出できませんでした — view_file で確認してください)"
+
+    # Step 6: 深度レベル判定 (CCL 派生から推定)
+    # "+" → L3, 無印 → L2, "-" → L1
+    has_plus = "+" in ccl_expr
+    has_minus = "-" in ccl_expr and ">" not in ccl_expr  # >> は除外
+    if has_plus:
+        depth_level = 3
+    elif has_minus:
+        depth_level = 1
+    else:
+        depth_level = 2
+    result["depth_level"] = depth_level
+
+    # UML セクション: L2+ のみ
+    if depth_level >= 2:
+        uml_pre = """【UML Pre-check】(WF 実行前に回答)
   S1 [O1]: 入力を正しく理解したか？ → (回答)
-  S2 [A1]: 第一印象・直感はどうか？ → (回答)
-【実行計画】(AI が AST 構造に基づいて記入)
-【/dia 反論】(AI が最低1つの懸念を提示)
-【UML Post-check】(WF 実行後に回答)
+  S2 [A1]: 第一印象・直感はどうか？ → (回答)"""
+        uml_post = """【UML Post-check】(WF 実行後に回答)
   S3 [A2]: 批判的に再評価したか？ → (回答)
   S4 [O4]: 決定は妥当か？ 説明できるか？ → (回答)
-  S5 [A4]: 確信度は適切か？ 過信していないか？ (FP 32.5%) → (回答)
-【射提案 @complete】(WF 完了時に以下を出力すること)
-{morphism_section}→ これで進めてよいですか？"""
+  S5 [A4]: 確信度は適切か？ 過信していないか？ (FP 32.5%) → (回答)"""
+    else:
+        uml_pre = ""
+        uml_post = ""
+
+    # 射提案セクション: L2+ のみ、かつ改善版フォーマット
+    if depth_level >= 2 and morphism_section.strip():
+        morphism_block = f"""【射提案 @complete】(WF 完了時に以下を出力すること)
+{morphism_section}"""
+    else:
+        morphism_block = ""
+
+    # テンプレート構築 (空セクションを除外して組み立て)
+    sections = [
+        f"【CCL】{ccl_expr}",
+        f"【構造】\n{result['tree']}",
+        f"【関連WF】{wf_list}",
+        f"【WF定義】以下を view_file で開くこと:\n{view_cmds}{macro_block}",
+    ]
+    if uml_pre:
+        sections.append(uml_pre)
+    sections.append(f"【実行計画】(AST 順序に基づく自動生成)\n{execution_plan}")
+    sections.append("【/dia 反論】(AI が最低1つの懸念を提示)")
+    if uml_post:
+        sections.append(uml_post)
+    if morphism_block:
+        sections.append(morphism_block)
+    sections.append("→ これで進めてよいですか？")
+
+    tmpl = "\n".join(sections)
     result["plan_template"] = tmpl
 
     return result

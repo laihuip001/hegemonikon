@@ -318,7 +318,7 @@ class HGKOAuthProvider(OAuthAuthorizationServerProvider[AuthorizationCode, Refre
     async def register_client(self, client_info: OAuthClientInformationFull) -> None:
         self._clients[client_info.client_id] = client_info
 
-    # PURPOSE: hgk_gateway の authorize 処理を実行する
+# PURPOSE: [L2-auto] hgk_gateway の authorize 処理を実行する
     async def authorize(
         self, client: OAuthClientInformationFull, params: AuthorizationParams
     ) -> str:

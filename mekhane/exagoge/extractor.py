@@ -40,11 +40,13 @@ class BaseExporter(ABC):
         self.output_dir.mkdir(parents=True, exist_ok=True)
 
     @abstractmethod
+    # PURPOSE: [L2-auto] データソースからレコードを抽出する
     def extract(self, **kwargs: Any) -> list[dict[str, Any]]:
         """データソースからレコードを抽出する。"""
         ...
 
     @abstractmethod
+    # PURPOSE: [L2-auto] 抽出したレコードを出力形式に変換する
     def transform(self, records: list[dict[str, Any]], **kwargs: Any) -> Any:
         """抽出したレコードを出力形式に変換する。"""
         ...

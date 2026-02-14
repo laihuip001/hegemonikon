@@ -1,107 +1,58 @@
-// AT-SPI2 event listener — reactive desktop awareness
-// Subscribes to window focus, creation, and destruction events
+// AT-SPI2 event monitoring — reactive desktop awareness
+// Provides snapshot-based change detection (polling approach)
+// Full event streaming can be added once atspi-0.29 API is stabilized
 
-use atspi::events::object::{FocusEvent, StateChangedEvent};
-use atspi::events::EventInterfaces;
-use atspi::AccessibilityConnection;
-use futures::StreamExt;
+use super::tree;
 use serde::Serialize;
-use std::sync::Arc;
-use tokio::sync::broadcast;
 
-/// Desktop event types
+/// Desktop state change detected by polling
 #[derive(Debug, Clone, Serialize)]
 #[serde(tag = "type")]
-pub enum DesktopEvent {
-    /// A window gained focus
-    FocusChanged {
-        app_name: String,
-        bus_name: String,
-        path: String,
-    },
-    /// A window state changed (shown/hidden)
-    StateChanged {
-        app_name: String,
-        bus_name: String,
-        path: String,
-        state: String,
-        enabled: bool,
-    },
+pub enum DesktopChange {
+    /// New window appeared
+    WindowAppeared { app_name: String, bus_name: String },
+    /// Window disappeared
+    WindowDisappeared { app_name: String, bus_name: String },
+    /// No changes detected
+    NoChange,
 }
 
-/// Event listener handle — drop to stop listening
-pub struct EventListenerHandle {
-    pub receiver: broadcast::Receiver<DesktopEvent>,
-    _cancel: tokio::sync::oneshot::Sender<()>,
-}
+/// Compare current window list against a previous snapshot
+/// Returns a list of changes (new windows, disappeared windows)
+pub async fn detect_changes(
+    previous: &[tree::A11yWindow],
+) -> Result<Vec<DesktopChange>, String> {
+    let current = tree::list_accessible_windows().await?;
+    let mut changes = Vec::new();
 
-/// Start listening for AT-SPI desktop events
-/// Returns a handle with a broadcast receiver for events
-pub async fn start_event_listener() -> Result<EventListenerHandle, String> {
-    let a11y = AccessibilityConnection::new()
-        .await
-        .map_err(|e| format!("AT-SPI2 connection failed: {}", e))?;
-    let a11y = Arc::new(a11y);
-
-    // Subscribe to focus and state-changed events
-    a11y.register_event::<FocusEvent>()
-        .await
-        .map_err(|e| format!("Failed to register FocusEvent: {}", e))?;
-    a11y.register_event::<StateChangedEvent>()
-        .await
-        .map_err(|e| format!("Failed to register StateChangedEvent: {}", e))?;
-
-    let (tx, rx) = broadcast::channel::<DesktopEvent>(64);
-    let (cancel_tx, mut cancel_rx) = tokio::sync::oneshot::channel::<()>();
-
-    let a11y_clone = a11y.clone();
-    tokio::spawn(async move {
-        let mut stream = a11y_clone.event_stream();
-
-        loop {
-            tokio::select! {
-                _ = &mut cancel_rx => break,
-                event = stream.next() => {
-                    match event {
-                        Some(Ok(ev)) => {
-                            let desktop_event = match &ev {
-                                EventInterfaces::Object(
-                                    atspi::events::object::ObjectEvents::Focus(f)
-                                ) => {
-                                    Some(DesktopEvent::FocusChanged {
-                                        app_name: String::new(),
-                                        bus_name: f.inner.sender.to_string(),
-                                        path: f.inner.path.to_string(),
-                                    })
-                                }
-                                EventInterfaces::Object(
-                                    atspi::events::object::ObjectEvents::StateChanged(s)
-                                ) => {
-                                    Some(DesktopEvent::StateChanged {
-                                        app_name: String::new(),
-                                        bus_name: s.inner.sender.to_string(),
-                                        path: s.inner.path.to_string(),
-                                        state: s.state.to_string(),
-                                        enabled: s.enabled != 0,
-                                    })
-                                }
-                                _ => None,
-                            };
-
-                            if let Some(de) = desktop_event {
-                                let _ = tx.send(de);
-                            }
-                        }
-                        Some(Err(_)) => continue,
-                        None => break,
-                    }
-                }
-            }
+    // Find new windows
+    for w in &current {
+        if !previous.iter().any(|p| p.bus_name == w.bus_name) {
+            changes.push(DesktopChange::WindowAppeared {
+                app_name: w.app_name.clone(),
+                bus_name: w.bus_name.clone(),
+            });
         }
-    });
+    }
 
-    Ok(EventListenerHandle {
-        receiver: rx,
-        _cancel: cancel_tx,
-    })
+    // Find disappeared windows
+    for p in previous {
+        if !current.iter().any(|w| w.bus_name == p.bus_name) {
+            changes.push(DesktopChange::WindowDisappeared {
+                app_name: p.app_name.clone(),
+                bus_name: p.bus_name.clone(),
+            });
+        }
+    }
+
+    if changes.is_empty() {
+        changes.push(DesktopChange::NoChange);
+    }
+
+    Ok(changes)
+}
+
+/// Take a snapshot of current windows for future comparison
+pub async fn take_snapshot() -> Result<Vec<tree::A11yWindow>, String> {
+    tree::list_accessible_windows().await
 }

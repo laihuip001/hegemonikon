@@ -3,6 +3,7 @@ import { isPermissionGranted, requestPermission, sendNotification } from '@tauri
 import { renderGraph3D } from './views/graph3d';
 import { renderAgentManagerView } from './views/agent-manager';
 import { renderChatView } from './views/chat';
+import { renderDesktopDomView } from './views/desktop-dom';
 import type {
   HealthReportResponse,
   FEPStateResponse,
@@ -153,6 +154,7 @@ const routes: Record<string, ViewRenderer> = {
   'synteleia': renderSynteleiaView,
   'digestor': renderDigestorView,
   'chat': renderChatView,
+  'desktop': renderDesktopDomView,
 };
 
 let currentRoute = '';
@@ -407,6 +409,13 @@ async function renderDashboardContent(): Promise<void> {
     ${renderDigestCard(digestLatest)}
     ${renderHealthItems(health)}
     ${renderUsageCard()}
+    <footer class="dashboard-footer">
+      <span>Hegemonikón Desktop v0.3.0</span>
+      <span>·</span>
+      <span>FEP-based Cognitive Hypervisor</span>
+      <span>·</span>
+      <span>${new Date().toLocaleDateString('ja-JP')}</span>
+    </footer>
   `;
 
   // Phase 3: Apply animations

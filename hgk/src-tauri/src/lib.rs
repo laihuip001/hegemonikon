@@ -9,6 +9,20 @@ use std::process::{Child, Command};
 use std::sync::Mutex;
 use tauri::Manager;
 use std::time::{Duration, Instant};
+use serde::Serialize;
+
+/// Search result with position info
+#[derive(Debug, Serialize)]
+struct FoundElement {
+    name: String,
+    role: String,
+    path: String,
+    bus_name: String,
+    x: i32,
+    y: i32,
+    width: i32,
+    height: i32,
+}
 
 /// Python API サーバーの子プロセスを保持
 struct ApiProcess(Mutex<Option<Child>>);
@@ -151,6 +165,82 @@ async fn desktop_set_text(
     })
 }
 
+/// AT-SPI: Get element position/size on screen
+#[cfg(target_os = "linux")]
+#[tauri::command]
+async fn desktop_get_extents(
+    bus_name: String,
+    object_path: String,
+) -> Result<a11y::ElementExtents, String> {
+    a11y::get_element_extents(&bus_name, &object_path).await
+}
+
+/// AT-SPI: Focus an element
+#[cfg(target_os = "linux")]
+#[tauri::command]
+async fn desktop_focus(
+    bus_name: String,
+    object_path: String,
+) -> Result<bool, String> {
+    a11y::focus_element(&bus_name, &object_path).await
+}
+
+/// AT-SPI: Find elements by role/name in a subtree
+#[cfg(target_os = "linux")]
+#[tauri::command]
+async fn desktop_find_elements(
+    bus_name: String,
+    object_path: String,
+    role: Option<String>,
+    name: Option<String>,
+    max_depth: Option<u32>,
+) -> Result<Vec<FoundElement>, String> {
+    let tree = a11y::get_accessible_tree(&bus_name, &object_path, max_depth.unwrap_or(4)).await?;
+    let mut matches = Vec::new();
+    collect_matching_sync(&tree, role.as_deref(), name.as_deref(), &mut matches);
+
+    // Get extents for each match
+    let mut results = Vec::new();
+    for (n, r, p) in matches {
+        let (x, y, w, h) = match a11y::get_element_extents(&bus_name, &p).await {
+            Ok(ext) => (ext.x, ext.y, ext.width, ext.height),
+            Err(_) => (0, 0, 0, 0),
+        };
+        results.push(FoundElement {
+            name: n,
+            role: r,
+            path: p,
+            bus_name: bus_name.clone(),
+            x, y, width: w, height: h,
+        });
+        if results.len() >= 50 { break; }
+    }
+
+    Ok(results)
+}
+
+/// Sync tree traversal to collect matching elements
+#[cfg(target_os = "linux")]
+fn collect_matching_sync(
+    nodes: &[a11y::A11yNode],
+    role_filter: Option<&str>,
+    name_filter: Option<&str>,
+    matches: &mut Vec<(String, String, String)>,
+) {
+    for node in nodes {
+        let role_ok = role_filter.map_or(true, |r| {
+            node.role.to_lowercase().contains(&r.to_lowercase())
+        });
+        let name_ok = name_filter.map_or(true, |n| {
+            node.name.to_lowercase().contains(&n.to_lowercase())
+        });
+        if role_ok && name_ok && (!node.name.is_empty() || role_filter.is_some()) {
+            matches.push((node.name.clone(), node.role.clone(), node.path.clone()));
+        }
+        collect_matching_sync(&node.children, role_filter, name_filter, matches);
+    }
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     // GBM/DMA-BUF フォールバック: NVIDIA 環境や RDP セッションで
@@ -187,6 +277,12 @@ pub fn run() {
             desktop_list_actions,
             #[cfg(target_os = "linux")]
             desktop_set_text,
+            #[cfg(target_os = "linux")]
+            desktop_get_extents,
+            #[cfg(target_os = "linux")]
+            desktop_focus,
+            #[cfg(target_os = "linux")]
+            desktop_find_elements,
         ])
         .setup(move |app| {
             // dev モードならスキップ (既に手動でサーバーが起動している想定)

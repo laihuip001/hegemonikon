@@ -144,43 +144,46 @@ def _empty_response(error: str) -> QuotaResponse:
 def _discover_ls(ws_filter: str = "hegemonikon") -> tuple[str, list[int]]:
     """Language Server プロセスから CSRF トークンとポート一覧を取得する。
 
+    /proc/{pid}/cmdline で検出し CSRF を抽出（ps aux の行切り詰め回避）。
+    ss コマンドで PID ベースの全リスニングポートを取得（コマンドラインの
+    ポート番号はプロトコル種別が不明なため直接使わない）。
+
     Returns:
         (csrf_token, [port1, port2, ...])
 
     Raises:
-        RuntimeError: プロセスが見つからない or CSRF が取得できない場合
+        RuntimeError: プロセスが見つからない or CSRF/ポートが取得できない場合
     """
-    # ps aux で language_server_linux を検索
-    try:
-        ps_result = subprocess.run(
-            ["ps", "aux"],
-            capture_output=True, text=True, timeout=5,
-        )
-    except Exception as e:
-        raise RuntimeError(f"ps aux failed: {e}") from e
+    import os
 
-    proc_line = ""
-    for line in ps_result.stdout.splitlines():
-        if "language_server_linux" in line and ws_filter in line and "grep" not in line:
-            proc_line = line
-            break
+    # --- Phase 1: /proc でプロセスを検出し PID + CSRF を取得 ---
+    ls_pid: str | None = None
+    csrf: str | None = None
 
-    if not proc_line:
+    for pid_dir in os.listdir("/proc"):
+        if not pid_dir.isdigit():
+            continue
+        try:
+            with open(f"/proc/{pid_dir}/cmdline", "rb") as f:
+                cmdline = f.read().decode("utf-8", errors="replace").replace("\x00", " ")
+        except (PermissionError, FileNotFoundError, ProcessLookupError):
+            continue
+
+        if "language_server_linux" not in cmdline or ws_filter not in cmdline:
+            continue
+
+        csrf_match = re.search(r"csrf_token\s+(\S+)", cmdline)
+        if not csrf_match:
+            continue
+
+        ls_pid = pid_dir
+        csrf = csrf_match.group(1)
+        break
+
+    if not ls_pid or not csrf:
         raise RuntimeError(f"LS process not found (filter: {ws_filter})")
 
-    # PID 抽出
-    parts = proc_line.split()
-    if len(parts) < 2:
-        raise RuntimeError("Cannot parse PID from ps output")
-    pid = parts[1]
-
-    # CSRF トークン抽出
-    csrf_match = re.search(r"csrf_token\s+(\S+)", proc_line)
-    if not csrf_match:
-        raise RuntimeError("CSRF token not found in process args")
-    csrf = csrf_match.group(1)
-
-    # ss でリスニングポート取得
+    # --- Phase 2: ss で PID ベースの全リスニングポートを取得 ---
     try:
         ss_result = subprocess.run(
             ["ss", "-tlnp"],
@@ -191,14 +194,15 @@ def _discover_ls(ws_filter: str = "hegemonikon") -> tuple[str, list[int]]:
 
     ports: list[int] = []
     for line in ss_result.stdout.splitlines():
-        if f"pid={pid}" in line:
+        if f"pid={ls_pid}" in line:
             port_match = re.search(r"127\.0\.0\.1:(\d+)", line)
             if port_match:
                 ports.append(int(port_match.group(1)))
 
     if not ports:
-        raise RuntimeError(f"No listening ports found for PID {pid}")
+        raise RuntimeError(f"No listening ports for LS PID {ls_pid}")
 
+    logger.info("LS discovered: PID=%s CSRF=%s... ports=%s", ls_pid, csrf[:8], ports)
     return csrf, sorted(set(ports))
 
 

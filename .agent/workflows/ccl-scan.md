@@ -1,6 +1,9 @@
 ---
 description: 見る — /s*%/dia
+lcm_state: beta
+version: '1.0'
 ---
+
 
 # @scan — 見る
 

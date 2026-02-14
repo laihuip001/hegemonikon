@@ -13,6 +13,9 @@ import pytest
 # Add parent to path
 sys.path.insert(0, "/home/makaron8426/oikos/hegemonikon")
 
+# Skip if dependencies are missing
+pytest.importorskip("aiohttp")
+
 from mekhane.symploke.jules_client import JulesClient
 
 

@@ -1,5 +1,5 @@
 ---
-description: 量る — /bou*%/noe
+{description: 量る — /bou*%/noe, lcm_state: beta, version: '1.0'}
 ---
 
 # @weigh — 量る

@@ -1,3 +1,0 @@
-## 2025-05-24 - Command Palette Accessibility
-**Learning:** Custom UI components built with raw DOM manipulation require meticulous ARIA implementation. Specifically, combining `role="combobox"` on the input with `aria-controls` pointing to a `role="listbox"` container is crucial for screen readers to understand the relationship between the search input and the results. Managing `aria-activedescendant` manually is necessary when focus remains on the input.
-**Action:** When building or auditing custom search interfaces, always verify the Combobox pattern implementation against ARIA 1.2+ guidelines, ensuring `aria-expanded`, `aria-haspopup`, and `aria-activedescendant` are correctly managed.

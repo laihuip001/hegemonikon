@@ -197,6 +197,7 @@ def _traced(fn):
     """
     import functools
 
+    # PURPOSE: トレースラッパー関数
     @functools.wraps(fn)
     def wrapper(*args: Any, **kwargs: Any) -> Any:
         _start = time.time()
@@ -1026,7 +1027,7 @@ def hgk_paper_search(query: str, limit: int = 5) -> str:
         import signal
 
         # Anarkhia 対策: 30 秒タイムアウト
-        # PURPOSE: [L2-auto] 内部処理: timeout_handler
+# PURPOSE: 内部処理: timeout_handler
         def _timeout_handler(signum, frame):
             raise TimeoutError("API タイムアウト (30秒)")
 

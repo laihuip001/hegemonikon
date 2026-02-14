@@ -1,3 +1,4 @@
+# PROOF: [L2/S3] <- mekhane/synteleia/dokimasia/ Stathmos Agent
 # PURPOSE: Multi-LLM アンサンブル監査エージェント (Layer B: Nous)
 """
 MultiSemanticAgent — Multi-LLM Cognitive Ensemble

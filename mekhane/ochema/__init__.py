@@ -1,3 +1,4 @@
+# PROOF: [L2/P2] <- mekhane/ochema/ Hodos Package
 # PURPOSE: Ochēma パッケージ — Antigravity LS クライアント
 """Ochēma (ὄχημα) — Antigravity Language Server Client Package."""
 

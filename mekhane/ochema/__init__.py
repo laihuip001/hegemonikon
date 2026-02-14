@@ -1,4 +1,4 @@
-# PROOF: [P2/Hodos] Ochēma パッケージ — Antigravity LS クライアント
+# PROOF: [L2/Hodos] Ochēma パッケージ — Antigravity LS クライアント
 """Ochēma (ὄχημα) — Antigravity Language Server Client Package."""
 
 from mekhane.ochema.antigravity_client import AntigravityClient, LLMResponse

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# PROOF: [P3/Trokhia] LS API ポーリングでアクティブセッションをリアルタイムにモニターし MD 保存する
+# PROOF: [L2/Trokhia] LS API ポーリングでアクティブセッションをリアルタイムにモニターし MD 保存する
 """
 PROOF: [L2/インフラ] <- mekhane/anamnesis/
 

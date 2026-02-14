@@ -3,6 +3,6 @@
 # REASON: 外部 AI モデル (Antigravity, etc) との接続を一元管理し、
 #         Hegemonikón システム全体に統一的な推論能力を提供する。
 
-from mekhane.ochema.antigravity_client import AntigravityClient
+from mekhane.ochema.antigravity_client import AntigravityClient, LLMResponse
 
-__all__ = ["AntigravityClient"]
+__all__ = ["AntigravityClient", "LLMResponse"]

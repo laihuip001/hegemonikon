@@ -1,0 +1,12 @@
+❌ Dendron: 8 files missing PROOF
+  mekhane/ochema/proto.py
+  mekhane/ochema/__init__.py
+  mekhane/ochema/cli.py
+  mekhane/anamnesis/session_indexer.py
+  mekhane/anamnesis/session_monitor.py
+  mekhane/synteleia/dokimasia/ochema_backend.py
+  mekhane/synteleia/dokimasia/multi_semantic_agent.py
+  mekhane/ochema/scripts/cortex_capture.py
+   Purpose: 2532 ok, 0 weak, 18 missing
+   TypeHints: 3143/3560 (88%), 3 short
+   Reason: 41/2984 (1%) [Dir:39/110 File:2/324 Func:0/2550]

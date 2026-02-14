@@ -9,32 +9,30 @@ CCL: /dia --mode=ai-audit
 import ast
 import re
 from dataclasses import dataclass, field
-from enum import Enum
 from pathlib import Path
-from typing import List, Optional, Dict, Any
+from typing import List, Optional
+
+from mekhane.synteleia.base import AuditIssue, AuditSeverity
 
 
-# PURPOSE: Issue severity levels
-class Severity(Enum):
-    """Issue severity levels."""
-
-    CRITICAL = "critical"
-    HIGH = "high"
-    MEDIUM = "medium"
-    LOW = "low"
-
-
-# PURPOSE: Detected issue
-@dataclass
-class Issue:
-    """Detected issue."""
-
-    code: str  # e.g., "AI-001"
-    name: str  # e.g., "Naming Hallucination"
-    severity: Severity
-    line: int
-    message: str
-    suggestion: Optional[str] = None
+# PURPOSE: Issue factory for compatibility
+def Issue(
+    code: str,
+    name: str,
+    severity: AuditSeverity,
+    line: int,
+    message: str,
+    suggestion: Optional[str] = None,
+) -> AuditIssue:
+    """Factory to create AuditIssue from legacy Issue signature."""
+    return AuditIssue(
+        agent="AI-Auditor",
+        code=code,
+        severity=severity,
+        message=f"{name}: {message}",
+        location=f"Line {line}",
+        suggestion=suggestion,
+    )
 
 
 # PURPOSE: Result of auditing a file
@@ -43,17 +41,17 @@ class AuditResult:
     """Result of auditing a file."""
 
     file_path: Path
-    issues: List[Issue] = field(default_factory=list)
+    issues: List[AuditIssue] = field(default_factory=list)
 
     # PURPOSE: has_critical の処理
     @property
     def has_critical(self) -> bool:
-        return any(i.severity == Severity.CRITICAL for i in self.issues)
+        return any(i.severity == AuditSeverity.CRITICAL for i in self.issues)
 
     # PURPOSE: has_high の処理
     @property
     def has_high(self) -> bool:
-        return any(i.severity == Severity.HIGH for i in self.issues)
+        return any(i.severity == AuditSeverity.HIGH for i in self.issues)
 
 
 # PURPOSE: AI-generated code auditor with 22 evaluation axes
@@ -287,7 +285,7 @@ class AIAuditor:
                    If False (default), report only Critical and High issues.
         """
         self.strict = strict
-        self.issues: List[Issue] = []
+        self.issues: List[AuditIssue] = []
         self.source: str = ""
         self.tree: Optional[ast.AST] = None
         self.lines: List[str] = []
@@ -308,7 +306,7 @@ class AIAuditor:
                 Issue(
                     code="AI-000",
                     name="Syntax Error",
-                    severity=Severity.CRITICAL,
+                    severity=AuditSeverity.CRITICAL,
                     line=e.lineno or 1,
                     message=f"Syntax error: {e.msg}",
                 )
@@ -343,12 +341,18 @@ class AIAuditor:
         # Filter suppressed issues
         filtered_issues = []
         for issue in self.issues:
+            # Parse line number from location "Line X"
+            try:
+                line_num = int(issue.location.replace("Line ", ""))
+            except (ValueError, AttributeError):
+                line_num = 0
+
             # Skip suppression check if line number is invalid
-            if issue.line < 1 or issue.line > len(self.lines):
+            if line_num < 1 or line_num > len(self.lines):
                 filtered_issues.append(issue)
                 continue
 
-            line_content = self.lines[issue.line - 1]
+            line_content = self.lines[line_num - 1]
 
             # Check for inline suppression markers
             is_suppressed = False
@@ -391,7 +395,7 @@ class AIAuditor:
                             Issue(
                                 code="AI-001",
                                 name="Naming Hallucination",
-                                severity=Severity.HIGH,
+                                severity=AuditSeverity.HIGH,
                                 line=node.lineno,
                                 message=f"Unknown module '{alias.name}' - verify it exists",
                                 suggestion=f"pip install {module} or check spelling",
@@ -406,7 +410,7 @@ class AIAuditor:
                             Issue(
                                 code="AI-001",
                                 name="Naming Hallucination",
-                                severity=Severity.HIGH,
+                                severity=AuditSeverity.HIGH,
                                 line=node.lineno,
                                 message=f"Unknown module '{node.module}' - verify it exists",
                             )
@@ -426,7 +430,7 @@ class AIAuditor:
                             Issue(
                                 code="AI-002",
                                 name="API Misuse",
-                                severity=Severity.MEDIUM,
+                                severity=AuditSeverity.MEDIUM,
                                 line=node.lineno,
                                 message="json.loads() called on dict literal",
                                 suggestion="Remove json.loads(), already a dict",
@@ -440,7 +444,7 @@ class AIAuditor:
                             Issue(
                                 code="AI-002",
                                 name="API Misuse",
-                                severity=Severity.LOW,
+                                severity=AuditSeverity.LOW,
                                 line=node.lineno,
                                 message="list() called on list literal",
                             )
@@ -458,7 +462,7 @@ class AIAuditor:
                                 Issue(
                                     code="AI-002",
                                     name="API Misuse",
-                                    severity=Severity.LOW,
+                                    severity=AuditSeverity.LOW,
                                     line=node.lineno,
                                     message="Unnecessary split/join pattern",
                                     suggestion="Consider str.replace() instead",
@@ -490,7 +494,7 @@ class AIAuditor:
                                 Issue(
                                     code="AI-003",
                                     name="Type Confusion",
-                                    severity=Severity.HIGH,
+                                    severity=AuditSeverity.HIGH,
                                     line=node.lineno,
                                     message="String compared with number",
                                 )
@@ -502,7 +506,7 @@ class AIAuditor:
                                 Issue(
                                     code="AI-003",
                                     name="Type Confusion",
-                                    severity=Severity.HIGH,
+                                    severity=AuditSeverity.HIGH,
                                     line=node.lineno,
                                     message="Number compared with string",
                                 )
@@ -524,7 +528,7 @@ class AIAuditor:
                                     Issue(
                                         code="AI-003",
                                         name="Type Confusion",
-                                        severity=Severity.LOW,  # Common pattern, not critical
+                                        severity=AuditSeverity.LOW,  # Common pattern, not critical
                                         line=node.lineno,
                                         message="len() compared with boolean",
                                         suggestion="Use len() > 0 or len() == 0",
@@ -546,7 +550,7 @@ class AIAuditor:
                         Issue(
                             code="AI-004",
                             name="Logic Hallucination",
-                            severity=Severity.CRITICAL,
+                            severity=AuditSeverity.CRITICAL,
                             line=node.lineno,
                             message="Division by zero",
                         )
@@ -585,7 +589,7 @@ class AIAuditor:
                                 Issue(
                                     code="AI-004",
                                     name="Logic Hallucination",
-                                    severity=Severity.HIGH,
+                                    severity=AuditSeverity.HIGH,
                                     line=node.lineno,
                                     message="Infinite loop without break/return/exit",
                                 )
@@ -608,7 +612,7 @@ class AIAuditor:
                                     Issue(
                                         code="AI-004",
                                         name="Logic Hallucination",
-                                        severity=Severity.MEDIUM,
+                                        severity=AuditSeverity.MEDIUM,
                                         line=node.lineno,
                                         message=f"Empty range({start.value}, {end.value})",
                                     )
@@ -634,7 +638,7 @@ class AIAuditor:
                         Issue(
                             code="AI-005",
                             name="Incomplete Code",
-                            severity=Severity.MEDIUM,
+                            severity=AuditSeverity.MEDIUM,
                             line=node.lineno,
                             message=f"Empty {type(node).__name__} '{node.name}' with only 'pass'",
                             suggestion="Implement the function body or add NotImplementedError",
@@ -652,7 +656,7 @@ class AIAuditor:
                         Issue(
                             code="AI-005",
                             name="Incomplete Code",
-                            severity=Severity.MEDIUM,
+                            severity=AuditSeverity.MEDIUM,
                             line=node.lineno,
                             message=f"Stub {type(node).__name__} '{node.name}' with only '...'",
                         )
@@ -665,7 +669,7 @@ class AIAuditor:
                     Issue(
                         code="AI-005",
                         name="Incomplete Code",
-                        severity=Severity.LOW,
+                        severity=AuditSeverity.LOW,
                         line=i,
                         message="Found TODO/FIXME marker",
                     )
@@ -713,7 +717,7 @@ class AIAuditor:
                                         Issue(
                                             code="AI-006",
                                             name="Context Drift",
-                                            severity=Severity.LOW,
+                                            severity=AuditSeverity.LOW,
                                             line=child.lineno,
                                             message=f"Parameter '{target.id}' reused/reassigned",
                                             suggestion="Use a new variable for modified values",
@@ -759,7 +763,7 @@ class AIAuditor:
                     Issue(
                         code="AI-007",
                         name="Pattern Inconsistency",
-                        severity=Severity.LOW,
+                        severity=AuditSeverity.LOW,
                         line=1,
                         message="Mixed single and double quotes throughout file",
                         suggestion="Standardize on one quote style (Recommend Black)",
@@ -790,7 +794,7 @@ class AIAuditor:
                         Issue(
                             code="AI-007",
                             name="Pattern Inconsistency",
-                            severity=Severity.LOW,
+                            severity=AuditSeverity.LOW,
                             line=node.lineno,
                             message="Mixed naming conventions in same scope",
                             suggestion="Use consistent snake_case or camelCase",
@@ -822,7 +826,7 @@ class AIAuditor:
                         Issue(
                             code="AI-008",
                             name="Self-Contradiction",
-                            severity=Severity.HIGH,
+                            severity=AuditSeverity.HIGH,
                             line=node.lineno,
                             message=f"Contradictory logic: '{list(contradiction)[0]}' and 'not {list(contradiction)[0]}'",
                         )
@@ -836,7 +840,7 @@ class AIAuditor:
                             Issue(
                                 code="AI-008",
                                 name="Self-Contradiction",
-                                severity=Severity.MEDIUM,
+                                severity=AuditSeverity.MEDIUM,
                                 line=node.lineno,
                                 message="'if True:' is always executed - unnecessary condition",
                             )
@@ -846,7 +850,7 @@ class AIAuditor:
                             Issue(
                                 code="AI-008",
                                 name="Self-Contradiction",
-                                severity=Severity.HIGH,
+                                severity=AuditSeverity.HIGH,
                                 line=node.lineno,
                                 message="'if False:' is never executed - dead code",
                             )
@@ -865,7 +869,7 @@ class AIAuditor:
                         Issue(
                             code="AI-009",
                             name="Security Vulnerability",
-                            severity=Severity.CRITICAL,
+                            severity=AuditSeverity.CRITICAL,
                             line=node.lineno,
                             message="CWE-94: eval() allows code injection",
                             suggestion="Use ast.literal_eval() or explicit parsing",
@@ -878,7 +882,7 @@ class AIAuditor:
                         Issue(
                             code="AI-009",
                             name="Security Vulnerability",
-                            severity=Severity.CRITICAL,
+                            severity=AuditSeverity.CRITICAL,
                             line=node.lineno,
                             message="CWE-94: exec() allows code injection",
                         )
@@ -900,7 +904,7 @@ class AIAuditor:
                                 Issue(
                                     code="AI-009",
                                     name="Security Vulnerability",
-                                    severity=Severity.HIGH,
+                                    severity=AuditSeverity.HIGH,
                                     line=node.lineno,
                                     message="CWE-78: shell=True allows command injection",
                                     suggestion="Use shell=False with argument list",
@@ -964,7 +968,7 @@ class AIAuditor:
                             Issue(
                                 code="AI-009",
                                 name="Security Vulnerability",
-                                severity=Severity.CRITICAL,
+                                severity=AuditSeverity.CRITICAL,
                                 line=i,
                                 message=f"CWE-798: {desc} detected",
                                 suggestion="Use environment variables or secrets manager",
@@ -1017,7 +1021,7 @@ class AIAuditor:
                         Issue(
                             code="AI-010",
                             name="Input Validation Omission",
-                            severity=Severity.LOW,
+                            severity=AuditSeverity.LOW,
                             line=node.lineno,
                             message=f"Path parameter(s) may lack validation",
                             suggestion="Add existence/type check at function start",
@@ -1058,7 +1062,7 @@ class AIAuditor:
                                 Issue(
                                     code="AI-011",
                                     name="Boundary Condition",
-                                    severity=Severity.LOW,
+                                    severity=AuditSeverity.LOW,
                                     line=node.lineno,
                                     message="range(len(x)) pattern - consider enumerate()",
                                     suggestion="Use 'for i, item in enumerate(x):'",
@@ -1075,7 +1079,7 @@ class AIAuditor:
                                     Issue(
                                         code="AI-011",
                                         name="Boundary Condition",
-                                        severity=Severity.MEDIUM,
+                                        severity=AuditSeverity.MEDIUM,
                                         line=node.lineno,
                                         message="Comparison with len() may cause index error",
                                     )
@@ -1108,7 +1112,7 @@ class AIAuditor:
                         Issue(
                             code="AI-012",
                             name="Async Misuse",
-                            severity=Severity.MEDIUM,
+                            severity=AuditSeverity.MEDIUM,
                             line=node.lineno,
                             message=f"Async function '{node.name}' has no await",
                             suggestion="Remove async or add await for I/O operations",
@@ -1133,7 +1137,7 @@ class AIAuditor:
                                 Issue(
                                     code="AI-012",
                                     name="Async Misuse",
-                                    severity=Severity.CRITICAL,
+                                    severity=AuditSeverity.CRITICAL,
                                     line=child.lineno,
                                     message="await in non-async function",
                                 )
@@ -1153,7 +1157,7 @@ class AIAuditor:
                                         Issue(
                                             code="AI-012",
                                             name="Async Misuse",
-                                            severity=Severity.HIGH,
+                                            severity=AuditSeverity.HIGH,
                                             line=child.lineno,
                                             message="time.sleep() in async function blocks event loop",
                                             suggestion="Use asyncio.sleep() instead",
@@ -1181,7 +1185,7 @@ class AIAuditor:
                     Issue(
                         code="AI-013",
                         name="Concurrency Issue",
-                        severity=Severity.MEDIUM,
+                        severity=AuditSeverity.MEDIUM,
                         line=1,
                         message=f"Global variables {global_vars} with threading - potential race condition",
                         suggestion="Use threading.Lock() to protect shared state",
@@ -1197,7 +1201,7 @@ class AIAuditor:
                             Issue(
                                 code="AI-013",
                                 name="Concurrency Issue",
-                                severity=Severity.HIGH,
+                                severity=AuditSeverity.HIGH,
                                 line=node.lineno,
                                 message="Mutable default argument - shared between calls",
                                 suggestion="Use None as default and create new object in function",
@@ -1231,7 +1235,7 @@ class AIAuditor:
                         Issue(
                             code="AI-014",
                             name="Excessive Comment",
-                            severity=Severity.LOW,
+                            severity=AuditSeverity.LOW,
                             line=i,
                             message=desc,
                             suggestion="Remove redundant comment or add non-obvious context",
@@ -1258,7 +1262,7 @@ class AIAuditor:
                     Issue(
                         code="AI-015",
                         name="Copy-Paste Error",
-                        severity=Severity.MEDIUM,
+                        severity=AuditSeverity.MEDIUM,
                         line=i + 1,
                         message="Consecutive duplicate lines detected",
                         suggestion="Remove duplicate or extract to variable/function",
@@ -1274,7 +1278,7 @@ class AIAuditor:
                     Issue(
                         code="AI-015",
                         name="Copy-Paste Error",
-                        severity=Severity.HIGH,
+                        severity=AuditSeverity.HIGH,
                         line=i,
                         message=f"Variable '{match.group(1)}' assigned to itself",
                     )
@@ -1286,7 +1290,7 @@ class AIAuditor:
                     Issue(
                         code="AI-015",
                         name="Copy-Paste Error",
-                        severity=Severity.MEDIUM,
+                        severity=AuditSeverity.MEDIUM,
                         line=i,
                         message="Condition same as body - likely copy-paste error",
                     )
@@ -1306,7 +1310,7 @@ class AIAuditor:
                             Issue(
                                 code="AI-016",
                                 name="Dead Code",
-                                severity=Severity.MEDIUM,
+                                severity=AuditSeverity.MEDIUM,
                                 line=stmt.lineno,
                                 message="Unreachable code after return statement",
                             )
@@ -1420,7 +1424,7 @@ class AIAuditor:
                                 Issue(
                                     code="AI-017",
                                     name="Magic Number",
-                                    severity=Severity.LOW,
+                                    severity=AuditSeverity.LOW,
                                     line=node.lineno,
                                     message=f"Magic number {node.value} - consider named constant",
                                 )
@@ -1451,7 +1455,7 @@ class AIAuditor:
                         Issue(
                             code="AI-018",
                             name="Hardcoded Path",
-                            severity=Severity.LOW,  # Recommendation, not critical
+                            severity=AuditSeverity.LOW,  # Recommendation, not critical
                             line=i,
                             message="Hardcoded path detected",
                             suggestion="Use Path(__file__).parent or config",
@@ -1504,7 +1508,7 @@ class AIAuditor:
                         Issue(
                             code="AI-019",
                             name="Deprecated API",
-                            severity=Severity.LOW,
+                            severity=AuditSeverity.LOW,
                             line=i,
                             message=desc,
                         )
@@ -1524,7 +1528,7 @@ class AIAuditor:
                                 Issue(
                                     code="AI-019",
                                     name="Deprecated API",
-                                    severity=Severity.LOW,
+                                    severity=AuditSeverity.LOW,
                                     line=node.lineno,
                                     message=f"@{decorator.id} is deprecated",
                                     suggestion="Use @property/@staticmethod/@classmethod with @abstractmethod",
@@ -1544,7 +1548,7 @@ class AIAuditor:
                         Issue(
                             code="AI-020",
                             name="Exception Swallowing",
-                            severity=Severity.HIGH,
+                            severity=AuditSeverity.HIGH,
                             line=node.lineno,
                             message="Bare 'except:' catches all exceptions including KeyboardInterrupt",
                             suggestion="Use 'except Exception:' or specific exception types",
@@ -1566,7 +1570,7 @@ class AIAuditor:
                             Issue(
                                 code="AI-020",
                                 name="Exception Swallowing",
-                                severity=Severity.HIGH,
+                                severity=AuditSeverity.HIGH,
                                 line=node.lineno,
                                 message="Exception silently caught and ignored",
                                 suggestion="Log the exception or re-raise",
@@ -1597,7 +1601,7 @@ class AIAuditor:
                             Issue(
                                 code="AI-021",
                                 name="Resource Leak",
-                                severity=Severity.MEDIUM,
+                                severity=AuditSeverity.MEDIUM,
                                 line=node.lineno,
                                 message="open() without context manager may leak file handle",
                                 suggestion="Use 'with open(...) as f:' pattern",
@@ -1633,7 +1637,7 @@ class AIAuditor:
                     Issue(
                         code="AI-022",
                         name="Test Coverage Gap",
-                        severity=Severity.LOW,
+                        severity=AuditSeverity.LOW,
                         line=1,
                         message=f"File has {len(public_functions)} public functions but no visible tests",
                         suggestion="Add unit tests or doctests for public API",
@@ -1665,7 +1669,7 @@ class AIAuditor:
                             Issue(
                                 code="AI-022",
                                 name="Test Coverage Gap",
-                                severity=Severity.LOW,
+                                severity=AuditSeverity.LOW,
                                 line=node.lineno,
                                 message=f"Complex function '{node.name}' ({branches} branches) lacks docstring",
                                 suggestion="Add docstring explaining edge cases",
@@ -1712,15 +1716,17 @@ def format_report(results: List[AuditResult]) -> str:
     lines = ["# AI Audit Report\n"]
 
     total_critical = sum(
-        1 for r in results for i in r.issues if i.severity == Severity.CRITICAL
+        1 for r in results for i in r.issues if i.severity == AuditSeverity.CRITICAL
     )
     total_high = sum(
-        1 for r in results for i in r.issues if i.severity == Severity.HIGH
+        1 for r in results for i in r.issues if i.severity == AuditSeverity.HIGH
     )
     total_medium = sum(
-        1 for r in results for i in r.issues if i.severity == Severity.MEDIUM
+        1 for r in results for i in r.issues if i.severity == AuditSeverity.MEDIUM
     )
-    total_low = sum(1 for r in results for i in r.issues if i.severity == Severity.LOW)
+    total_low = sum(
+        1 for r in results for i in r.issues if i.severity == AuditSeverity.LOW
+    )
 
     lines.append(f"## Summary")
     lines.append(f"- Files with issues: {len(results)}")
@@ -1733,23 +1739,37 @@ def format_report(results: List[AuditResult]) -> str:
     for result in sorted(
         results,
         key=lambda r: (
-            -len([i for i in r.issues if i.severity == Severity.CRITICAL]),
+            -len([i for i in r.issues if i.severity == AuditSeverity.CRITICAL]),
             str(r.file_path),
         ),
     ):
         lines.append(f"## {result.file_path.name}")
         lines.append("")
 
-        for issue in sorted(result.issues, key=lambda i: (i.severity.value, i.line)):
+        # Helper for severity rank
+        def sev_rank(s: AuditSeverity) -> int:
+            return {
+                AuditSeverity.CRITICAL: 0,
+                AuditSeverity.HIGH: 1,
+                AuditSeverity.MEDIUM: 2,
+                AuditSeverity.LOW: 3,
+                AuditSeverity.INFO: 4,
+            }.get(s, 99)
+
+        for issue in sorted(
+            result.issues,
+            key=lambda i: (sev_rank(i.severity), i.location),
+        ):
             severity_icon = {
-                Severity.CRITICAL: "🔴",
-                Severity.HIGH: "🟠",
-                Severity.MEDIUM: "🟡",
-                Severity.LOW: "⚪",
+                AuditSeverity.CRITICAL: "🔴",
+                AuditSeverity.HIGH: "🟠",
+                AuditSeverity.MEDIUM: "🟡",
+                AuditSeverity.LOW: "⚪",
+                AuditSeverity.INFO: "🔵",
             }[issue.severity]
 
             lines.append(
-                f"- {severity_icon} **{issue.code}** L{issue.line}: {issue.message}"
+                f"- {severity_icon} **{issue.code}** {issue.location}: {issue.message}"
             )
             if issue.suggestion:
                 lines.append(f"  - 💡 {issue.suggestion}")

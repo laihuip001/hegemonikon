@@ -138,11 +138,15 @@ async fn main() {
         println!("  ⚠️  No elements to click");
     }
 
-    // Step 8: Type text into a text element (EditableText or xdotool fallback)
+    // Step 8: Type text into an element (EditableText or xdotool fallback)
+    // Try text-role elements first; if none, attempt on the previously clicked element
     println!("\n━━━ Step 8: Type text ━━━");
     let mut type_ok = false;
     let text_elements: Vec<_> = buttons.iter()
-        .filter(|(_n, r, _p)| r.to_lowercase().contains("text"))
+        .filter(|(_n, r, _p)| {
+            let rl = r.to_lowercase();
+            rl.contains("text") || rl.contains("entry") || rl.contains("search")
+        })
         .collect();
     if let Some((_name, _role, path)) = text_elements.first() {
         let demo_text = "HGK E2E test";
@@ -151,10 +155,21 @@ async fn main() {
                 println!("  ✅ Typed '{}' — success={}", demo_text, success);
                 type_ok = success;
             }
-            Err(e) => println!("  ⚠️  type_at_element: {} (element may not accept text)", e),
+            Err(e) => println!("  ⚠️  type_at_element: {}", e),
+        }
+    } else if let Some((_name, _role, path)) = buttons.first() {
+        // Fallback: try typing at the first interactive element (tests xdotool path)
+        let demo_text = "HGK";
+        println!("  ℹ️  No text elements — trying xdotool type on first interactive element");
+        match a11y::type_at_element(&copyq.bus_name, path, demo_text).await {
+            Ok(success) => {
+                println!("  ✅ xdotool type '{}' — success={}", demo_text, success);
+                type_ok = success;
+            }
+            Err(e) => println!("  ⚠️  type_at_element fallback: {}", e),
         }
     } else {
-        println!("  ⚠️  No text elements found — skipping type test");
+        println!("  ⚠️  No elements available for typing");
     }
 
     // Summary

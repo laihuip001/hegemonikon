@@ -184,15 +184,24 @@ def parse_llm_response(response: str, agent_name: str) -> List[AuditIssue]:
         data = json.loads(response)
         if isinstance(data, dict) and "issues" in data:
             for item in data["issues"]:
-                severity = _parse_severity(item.get("severity", "medium"))
+                # ParsedIssue (中間モデル) に変換して検証
+                parsed = ParsedIssue(
+                    code=item.get("code", "SEM-000"),
+                    severity=item.get("severity", "medium"),
+                    message=item.get("message", ""),
+                    location=item.get("location"),
+                    suggestion=item.get("suggestion"),
+                )
+
+                severity = _parse_severity(parsed.severity)
                 issues.append(
                     AuditIssue(
                         agent=agent_name,
-                        code=item.get("code", "SEM-000"),
+                        code=parsed.code,
                         severity=severity,
-                        message=item.get("message", ""),
-                        location=item.get("location"),
-                        suggestion=item.get("suggestion"),
+                        message=parsed.message,
+                        location=parsed.location,
+                        suggestion=parsed.suggestion,
                     )
                 )
             return issues

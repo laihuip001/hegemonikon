@@ -1,8 +1,8 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "hgk-desktop",
+  "productName": "hgk",
   "version": "0.1.0",
-  "identifier": "com.makaron8426.hgk-desktop",
+  "identifier": "com.makaron8426.hgk",
   "build": {
     "frontendDist": "../dist",
     "devUrl": "http://localhost:1420",

@@ -15,7 +15,7 @@
 | `mekhane/` | ✅ | **コアランタイム** — 全サブシステム (anamnesis, synteleia, symploke等) | 817 |
 | `hermeneus/` | ✅ | CCL パーサー / AST / マクロ実行エンジン | 49 |
 | `synergeia/` | ✅ | **VITAL** — coordinator.coordinate が API から直接 import | 39 |
-| `hgk-desktop/` | ✅ | Desktop アプリ (Tauri + Vite) | 51 |
+| `hgk/` | ✅ | Desktop アプリ (Tauri + Vite) | 51 |
 | `mneme/` | ✅ | 記憶システム (sessions, handoffs, patterns) | 580 |
 | `pythosis/` | ✅ | Python 設計哲学ドキュメント | 14 |
 | `scripts/` | ✅ | ユーティリティスクリプト (ingest, register等) | 57 |
@@ -39,7 +39,7 @@
 | `gcloud/` (48K files) | **削除** | ローカル重複。システム gcloud と競合 |
 | `peira/Raw+raw/` (1,100 files) | **削除** + Gnōsis 投入 | 347件を Gnōsis に永続化。残りは重複 |
 | `node_modules/` ×3 (630 MB) | **削除** | 再生成可能な依存関係 |
-| `hegemonikon-guide/` | **統合** | JSON 3件を `hgk-desktop/src/data/` に移動 |
+| `hegemonikon-guide/` | **統合** | JSON 3件を `hgk/src/data/` に移動 |
 
 ---
 

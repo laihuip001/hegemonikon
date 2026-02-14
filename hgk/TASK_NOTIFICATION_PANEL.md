@@ -2,7 +2,7 @@
 
 > **担当**: Jules (Gemini Code Assist)
 > **リポジトリ**: `laihuip001/hegemonikon`
-> **関連ファイル**: `hgk-desktop/src/`
+> **関連ファイル**: `hgk/src/`
 
 ## 目的
 

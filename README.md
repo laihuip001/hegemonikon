@@ -19,7 +19,7 @@ PYTHONPATH=. python -m mekhane.api.server
 # → http://127.0.0.1:9696/api/docs
 
 # 3. デスクトップアプリ (Tauri v2)
-cd hgk-desktop && npm install && npm run tauri dev
+cd hgk && npm install && npm run tauri dev
 ```
 
 ---
@@ -147,7 +147,7 @@ hegemonikon/
 │   ├── synedrion/       # MCP Gateway
 │   ├── synteleia/       # 6視点認知アンサンブル
 │   └── taxis/           # 分類・射の提案
-├── hgk-desktop/         # Tauri v2 デスクトップアプリ
+├── hgk/         # Tauri v2 デスクトップアプリ
 │   ├── src/             # TypeScript (main, graph3d, command_palette)
 │   └── src-tauri/       # Rust + Tauri 設定
 ├── scripts/             # CLI ユーティリティ

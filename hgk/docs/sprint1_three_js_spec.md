@@ -2,13 +2,13 @@
 
 > **dispatch**: Jules に投入するためのタスク仕様書
 > **repo**: `laihuip001/hegemonikon`
-> **作業ディレクトリ**: `hgk-desktop/src/`
+> **作業ディレクトリ**: `hgk/src/`
 
 ---
 
 ## 目標
 
-`hgk-desktop/src/views/graph3d.ts` を新規作成し、Hegemonikón の 24 定理 + 72 X-series エッジを
+`hgk/src/views/graph3d.ts` を新規作成し、Hegemonikón の 24 定理 + 72 X-series エッジを
 Three.js で 3D 力学シミュレーション付きインタラクティブグラフとして描画する。
 
 > **注**: API は 96 エッジ (72 X-series + 24 identity) を返すが、identity エッジは非表示にする。
@@ -16,7 +16,7 @@ Three.js で 3D 力学シミュレーション付きインタラクティブグ�
 ## 既存コード構造（参照必須）
 
 ```
-hgk-desktop/
+hgk/
 ├── src/
 │   ├── main.ts          # ルーター + 5 ビュー (492行)
 │   ├── styles.css        # デザインシステム (285行)
@@ -83,7 +83,7 @@ const SERIES_COLORS: Record<string, string> = {
 ### 1. パッケージ追加
 
 ```bash
-cd hgk-desktop && npm install three @types/three
+cd hgk && npm install three @types/three
 ```
 
 > `three-forcegraph` が npm 上に存在しない場合は、Three.js の `Object3D` + `d3-force-3d` で同等の力学シミュレーションを実装すること。
@@ -213,7 +213,7 @@ graphFull: () => apiFetch<GraphFullResponse>('/api/graph/full'),
 ## テスト
 
 ```bash
-cd hgk-desktop && npm run build  # TypeScript コンパイルが通ること
+cd hgk && npm run build  # TypeScript コンパイルが通ること
 ```
 
 ---

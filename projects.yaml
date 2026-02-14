@@ -58,14 +58,14 @@ projects:
     description: Hegemonikón 初期 Desktop App (Tauri+Vanilla)
     path: hgk-app/
     status: paused
-    phase: 初期プロトタイプ — hgk-desktop に移行？
+    phase: 初期プロトタイプ — hgk に移行？
     priority: low
     updated: '2026-02-11'
-    next_action: hgk-desktop との統合判断 (/noe+)
+    next_action: hgk との統合判断 (/noe+)
   hgk_desktop:
     name: HGK Desktop
     description: Hegemonikón Desktop App (Tauri+Vite+TS+Three.js)
-    path: hgk-desktop/
+    path: hgk/
     status: active
     phase: 白画面問題で中断
     priority: high

@@ -11,7 +11,7 @@
 graph TB
     subgraph "ユーザー接点"
         IDE["Antigravity IDE<br>(Claude)"]
-        DT["hgk-desktop<br>(Tauri + Three.js)"]
+        DT["hgk<br>(Tauri + Three.js)"]
     end
 
     subgraph "認知制御層"
@@ -66,7 +66,7 @@ graph TB
 | **ccl/** | CCL 言語仕様 | 演算子定義、マクロ参照、使用例 |
 | **hermeneus/** | CCL コンパイラ | パーサー → 展開 → LMQL 翻訳 → LLM 実行 → 検証。MCP サーバー提供 |
 | **mekhane/** | 実行基盤 | 26 サブモジュール。[詳細](mekhane/ARCHITECTURE.md) |
-| **hgk-desktop/** | デスクトップ UI | Tauri + Vite + Three.js。3D グラフ可視化 |
+| **hgk/** | デスクトップ UI | Tauri + Vite + Three.js。3D グラフ可視化 |
 | **synergeia/** | マルチエージェント | Jules (Gemini) API クライアント、並列タスク実行 |
 | **mneme/** | 長期記憶 | Handoff, セッション履歴, パターン記録 |
 | **gnosis_data/** | 論文 DB | LanceDB ベクトルストア。Gnōsis MCP で検索 |
@@ -109,7 +109,7 @@ CCL 式 → Parser → AST → Expander → LMQL → LLM 実行 → 検証
 
 → [mekhane 内部アーキテクチャ](mekhane/ARCHITECTURE.md)
 
-### 3. hgk-desktop/ (デスクトップ UI)
+### 3. hgk/ (デスクトップ UI)
 
 | ファイル | 役割 |
 |:---------|:-----|
@@ -155,7 +155,7 @@ mekhane/fep/ → FEP 認知計算
     ↓
 mekhane/anamnesis/ → 記憶検索 (LanceDB)
     ↓
-出力 → mneme/ (記録) + hgk-desktop/ (可視化)
+出力 → mneme/ (記録) + hgk/ (可視化)
 ```
 
 ---

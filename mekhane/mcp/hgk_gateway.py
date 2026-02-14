@@ -110,7 +110,7 @@ def _load_policy() -> dict:
         return {"version": "0.0", "defaults": {"max_input_size": 10000}, "tools": {}, "security": {}, "trace": {"enabled": False}}
 
 
-# PURPOSE: ポリシーからツール固有の制約値を取得する
+# PURPOSE: [L2-auto] ポリシーからツール固有の制約値を取得する
 def _get_policy(tool_name: str, key: str, default=None):
     """ポリシーからツール固有の値を取得。なければ defaults → default の順。"""
     tool_policy = POLICY.get("tools", {}).get(tool_name, {})

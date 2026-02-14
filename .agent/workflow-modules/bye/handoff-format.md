@@ -59,6 +59,11 @@ session_handoff:
     python: "{version}"
     test_command: "{pytest ...}"
     
+  # 品質レーティング (F6: 必須フィールド — cognitive_quality.py データ源)
+  quality_rating:
+    score: "{1-5}"  # ★の数。1=最低, 5=最高
+    criteria: "{根拠を1行で}"  # e.g. "機能完成 + レビュー + テスト通過"
+    
   # CEP-001: FEP 認知メトリクス
   fep_metrics:
     convergence: "{V[session] — 0.0=完全収束, 1.0=完全不確実}"
@@ -75,6 +80,7 @@ session_handoff:
 
 **セッション**: {YYYY-MM-DD HH:MM - HH:MM}
 **主題**: {primary_task}
+**品質**: ★★★☆☆ ({score}/5 — {criteria})
 
 ---
 

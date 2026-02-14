@@ -281,6 +281,38 @@ def check_kalon() -> HealthItem:
         return HealthItem("Kalon Quality", "unknown", str(e))
 
 
+# PURPOSE: 認知品質チェック (cognitive_quality.py 統合)
+def check_cognitive_quality() -> HealthItem:
+    """Handoff から認知品質指標を集計し、ダッシュボード品質を判定"""
+    try:
+        from mekhane.peira.cognitive_quality import scan_all
+        data = scan_all(days=30)
+        scores = data["quality_scores"]
+        avg = sum(scores) / len(scores) if scores else 0.0
+        violations = data["violations"]
+        total_v = sum(violations)
+        sessions = data["total"]
+        compliance = (1 - sum(1 for v in violations if v > 0) / sessions) * 100 if sessions else 0
+        direct_used = sum(1 for c in data["theorems_direct"].values() if c > 0)
+
+        detail = (
+            f"Q:{avg:.1f}/5 BC:{compliance:.0f}% T:{direct_used}/24"
+        )
+        status = "ok" if avg >= 3.5 and compliance >= 80 else "warn"
+        return HealthItem(
+            name="Cognitive Quality",
+            status=status,
+            detail=detail,
+            metric=avg / 5.0,
+        )
+    except Exception as e:
+        return HealthItem(
+            name="Cognitive Quality",
+            status="warn",
+            detail=f"scan error: {e}",
+        )
+
+
 # PURPOSE: 全ヘルスチェックを実行してレポートを生成
 def run_health_check() -> HealthReport:
     report = HealthReport(timestamp=datetime.now().isoformat())
@@ -301,6 +333,7 @@ def run_health_check() -> HealthReport:
     report.items.append(check_dendron())
     report.items.append(check_theorem_activity())
     report.items.append(check_kalon())
+    report.items.append(check_cognitive_quality())
 
     return report
 

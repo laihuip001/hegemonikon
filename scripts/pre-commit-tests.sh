@@ -15,6 +15,17 @@ echo "━━━━━━━━━━━━━━━━━━━━━━━━�
 echo "🔬 Hegemonikón Pre-commit Tests"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 
+# Phase 0: Secret Detection — OAuth credentials leak prevention
+echo ""
+echo "🔐 Secret scan (staged files)..."
+if git diff --cached --name-only | xargs grep -l "GOCSPX-\|681255809395-oo8ft2oprdrnp9e3aqf6av3hmdib135j" 2>/dev/null; then
+    echo "❌ OAuth credentials detected in staged files! Commit blocked."
+    echo "   Move secrets to ~/.config/cortex/oauth.json"
+    exit 1
+fi
+echo "✅ No secrets detected"
+echo ""
+
 # Phase 1: Dendron Guard — 変更ファイルの PROOF/PURPOSE チェック
 echo ""
 echo "🛡️  Dendron Guard (staged files)..."

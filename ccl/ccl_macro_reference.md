@@ -28,6 +28,7 @@
 | `@chew` | 噛む | `F:[×3]{/eat+~(/noe*/dia)}` | `/s-_/pro_F:[×3]{/eat+~(/noe*/dia)}_~(/h*/k)_@proof_/pis_/dox-` |
 | `@read` | 読む | `F:[×3]{/m.read~(/noe*/dia)}` | `/s-_/pro_F:[×3]{/m.read~(/noe*/dia)}_/ore_~(/h*/k)_/pis_/dox-` |
 | `@helm` | 舵 | `/bou+*%/zet+\|>/u++` | `/pro_/kho_/bou+*%/zet+\|>/u++_~(/h*/k)_/pis_/dox-` |
+| `@desktop` | 操る | `/kho{desktop}_/ene{action}` | `/pro_/kho{desktop}_/ene{desktop_action}_V:{/dia-}_/dox-` |
 
 ---
 
@@ -79,7 +80,7 @@
              │ @read @helm  │ @ready       │
              ├──────────────┼──────────────┤
  A (行為)    │ @vet @learn  │ @fix @build  │
-             │ @proof @syn  │              │
+             │ @proof @syn  │ @desktop     │
              └──────────────┴──────────────┘
 ```
 

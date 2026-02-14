@@ -84,3 +84,7 @@ Downloads/
 dashboard_current.png
 .playwright-mcp/
 腎生検_*.xml
+
+# OAuth credentials (local only)
+oauth.json
+.cortex_creds

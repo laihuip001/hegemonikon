@@ -135,11 +135,29 @@ async def search(
             from mekhane.symploke.handoff_search import search_handoffs
             matches = search_handoffs(q, top_k=k)
             for doc, score in matches:
+                # Handoff title: primary_task → ファイル名日時 → ID のフォールバックチェーン
+                title = doc.metadata.get("primary_task", "")
+                if not title or title == "Unknown":
+                    # ファイルパスから日時を抽出 (handoff_2026-02-09_2050.md → Handoff 2026-02-09 20:50)
+                    fp = doc.metadata.get("file_path", "")
+                    if fp:
+                        fname = Path(fp).stem  # handoff_2026-02-09_2050
+                        parts = fname.replace("handoff_", "").split("_")
+                        if len(parts) >= 2:
+                            date_part = parts[0]
+                            time_part = parts[1]
+                            if len(time_part) == 4:
+                                time_part = f"{time_part[:2]}:{time_part[2:]}"
+                            title = f"Handoff {date_part} {time_part}"
+                        else:
+                            title = fname
+                    else:
+                        title = doc.id
                 results.append(SearchResultItem(
                     id=doc.id,
                     source="handoff",
                     score=score,
-                    title=doc.metadata.get("primary_task", ""),
+                    title=title,
                     snippet=doc.content[:200],
                     metadata={
                         "timestamp": doc.metadata.get("timestamp", ""),

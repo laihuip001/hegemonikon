@@ -1,43 +1,151 @@
 # PROOF: [L2/Hodos] <- mekhane/ochema/scripts/cortex_capture.py
-# PURPOSE: Cortex Capture Script
-# REASON: Capture and log gRPC traffic between LS and Cortex for debugging.
 """
-Cortex Capture Script (mitmproxy).
+Cortex API MITM Capture Script for mitmproxy.
 
-Captures gRPC traffic between the local Language Server and the Cortex backend
-(daily-cloudcode-pa.googleapis.com). Logs request/response bodies to a file.
+LS → Cortex (daily-cloudcode-pa.googleapis.com) 間の gRPC 通信をキャプチャし、
+Project ID やリクエスト構造を解析する。
 
 Usage:
-    mitmdump -s cortex_capture.py --listen-port 8888 ...
+    /tmp/mitm-env/bin/mitmdump -s cortex_capture.py --listen-port 8888 \
+        --set upstream_cert=false --ssl-insecure
 """
 
 import json
-from mitmproxy import http
+import re
+from datetime import datetime
 
-# PURPOSE: [L2-auto] リクエストをインターセプトしてログ出力。
+from mitmproxy import http, ctx
+
+
+# Capture targets
+TARGET_HOSTS = [
+    "daily-cloudcode-pa.googleapis.com",
+    "cloudcode-pa.googleapis.com",
+    "antigravity-unleash.goog",
+    "googleapis.com",  # Catch all Google APIs
+]
+
+LOG_FILE = "/tmp/cortex_capture.log"
+
+
+# PURPOSE: [L2-auto] Write to both mitmproxy log and file.
+def log(msg: str) -> None:
+    """Write to both mitmproxy log and file."""
+    ts = datetime.now().strftime("%H:%M:%S.%f")[:-3]
+    line = f"[{ts}] {msg}"
+    ctx.log.info(line)
+    with open(LOG_FILE, "a") as f:
+        f.write(line + "\n")
+
+
+# PURPOSE: [L2-auto] Capture outgoing requests to Cortex.
 def request(flow: http.HTTPFlow) -> None:
-    """リクエストをインターセプトしてログ出力。"""
-    if "googleapis.com" in flow.request.pretty_host:
-        log("--> Request", flow.request.path, flow.request.content)
+    """Capture outgoing requests to Cortex."""
+    host = flow.request.pretty_host
+    if not any(t in host for t in TARGET_HOSTS):
+        return
 
-# PURPOSE: [L2-auto] レスポンスをインターセプトしてログ出力。
+    path = flow.request.path
+    method = flow.request.method
+    content_type = flow.request.headers.get("content-type", "unknown")
+
+    log(f">>> REQUEST {method} {host}{path}")
+    log(f"    Content-Type: {content_type}")
+
+    # Log all headers (mask auth tokens)
+    for k, v in flow.request.headers.items():
+        if "auth" in k.lower() or "token" in k.lower():
+            log(f"    Header {k}: {v[:30]}...({len(v)} chars)")
+        else:
+            log(f"    Header {k}: {v}")
+
+    # Try to decode body
+    body = flow.request.get_content()
+    if body:
+        log(f"    Body size: {len(body)} bytes")
+        # Try JSON decode
+        try:
+            parsed = json.loads(body)
+            log(f"    Body (JSON): {json.dumps(parsed, indent=2)[:500]}")
+            # Check for project-related fields
+            _find_project_fields(parsed, "request")
+        except (json.JSONDecodeError, UnicodeDecodeError):
+            # Try to extract readable strings from protobuf
+            strings = _extract_strings(body)
+            if strings:
+                log(f"    Body strings: {strings[:10]}")
+            # Check for project patterns in raw bytes
+            _find_project_in_bytes(body, "request")
+
+
+# PURPOSE: [L2-auto] Capture responses from Cortex.
 def response(flow: http.HTTPFlow) -> None:
-    """レスポンスをインターセプトしてログ出力。"""
-    if "googleapis.com" in flow.request.pretty_host:
-        log("<-- Response", flow.request.path, flow.response.content)
+    """Capture responses from Cortex."""
+    host = flow.request.pretty_host
+    if not any(t in host for t in TARGET_HOSTS):
+        return
 
-# PURPOSE: [L2-auto] ログファイルに出力。
-def log(prefix: str, path: str, data: bytes) -> None:
-    """ログファイルに出力。"""
-    try:
-        text = data.decode("utf-8", errors="replace")
-        # gRPC ヘッダー除去 (簡易的)
-        if len(text) > 5 and text[0] == "\x00":
-            text = text[5:]
+    path = flow.request.path
+    status = flow.response.status_code
+    content_type = flow.response.headers.get("content-type", "unknown")
 
-        with open("cortex_traffic.log", "a", encoding="utf-8") as f:
-            f.write(f"{prefix} {path}\n")
-            f.write(f"{text}\n")
-            f.write("-" * 40 + "\n")
-    except Exception as e:
-        print(f"Log error: {e}")
+    log(f"<<< RESPONSE {status} {host}{path}")
+    log(f"    Content-Type: {content_type}")
+
+    body = flow.response.get_content()
+    if body:
+        log(f"    Body size: {len(body)} bytes")
+        try:
+            parsed = json.loads(body)
+            log(f"    Body (JSON): {json.dumps(parsed, indent=2)[:500]}")
+            _find_project_fields(parsed, "response")
+        except (json.JSONDecodeError, UnicodeDecodeError):
+            strings = _extract_strings(body)
+            if strings:
+                log(f"    Body strings: {strings[:10]}")
+            _find_project_in_bytes(body, "response")
+
+
+# PURPOSE: [L2-auto] Recursively search for project-related fields in JSON.
+def _find_project_fields(obj, context: str, path: str = "") -> None:
+    """Recursively search for project-related fields in JSON."""
+    if isinstance(obj, dict):
+        for k, v in obj.items():
+            current = f"{path}.{k}" if path else k
+            if any(w in k.lower() for w in [
+                "project", "companion", "cloud", "quota"
+            ]):
+                log(f"    🎯 PROJECT FIELD ({context}): {current} = {v}")
+            _find_project_fields(v, context, current)
+    elif isinstance(obj, list):
+        for i, item in enumerate(obj):
+            _find_project_fields(item, context, f"{path}[{i}]")
+
+
+# PURPOSE: [L2-auto] Search for project ID patterns in raw bytes.
+def _find_project_in_bytes(data: bytes, context: str) -> None:
+    """Search for project ID patterns in raw bytes."""
+    patterns = [
+        rb"projects/([a-z][a-z0-9-]{5,29})",
+        rb"cloudaicompanion[_\x00]([a-z][a-z0-9-]{5,29})",
+    ]
+    for pattern in patterns:
+        for match in re.finditer(pattern, data):
+            log(f"    🎯 PROJECT PATTERN ({context}): {match.group().decode('ascii', errors='replace')}")
+
+
+# PURPOSE: [L2-auto] Extract readable ASCII strings from binary data.
+def _extract_strings(data: bytes, min_len: int = 6) -> list[str]:
+    """Extract readable ASCII strings from binary data."""
+    strings = []
+    current = []
+    for b in data:
+        if 32 <= b < 127:
+            current.append(chr(b))
+        else:
+            if len(current) >= min_len:
+                strings.append("".join(current))
+            current = []
+    if len(current) >= min_len:
+        strings.append("".join(current))
+    return strings

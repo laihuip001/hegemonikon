@@ -1,5 +1,6 @@
 ---
-description: "見渡す — /bou-_/pro_/kho_/chr_/euk_/tak-_~(/h*/k)_/pis"
+{description: "\u898B\u6E21\u3059 \u2014 /bou-_/pro_/kho_/chr_/euk_/tak-_~(/h*/k)_/pis",
+  lcm_state: beta, version: '1.0'}
 ---
 
 # /ccl-ready: 見渡しマクロ

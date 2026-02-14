@@ -1,5 +1,6 @@
 ---
-description: "掘る — /pro_/s+~(/p*/a)_/ana_/dia*/o+_/pis"
+{description: "\u6398\u308B \u2014 /pro_/s+~(/p*/a)_/ana_/dia*/o+_/pis", lcm_state: beta,
+  version: '1.0'}
 ---
 
 # /ccl-dig: 深掘りマクロ

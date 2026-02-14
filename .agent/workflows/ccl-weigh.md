@@ -1,5 +1,5 @@
 ---
-description: 量る — /bou*%/noe
+{description: "\u91CF\u308B \u2014 /bou*%/noe", lcm_state: beta, version: '1.0'}
 ---
 
 # @weigh — 量る

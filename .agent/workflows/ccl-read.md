@@ -1,5 +1,6 @@
 ---
-description: "読む — /s-_/pro_F:[×3]{/m.read~(/noe*/dia)}_/ore_~(/h*/k)_/pis_/dox-"
+{description: "\u8AAD\u3080 \u2014 /s-_/pro_F:[\xD73]{/m.read~(/noe*/dia)}_/ore_~(/h*/k)_/pis_/dox-",
+  lcm_state: beta, version: '1.0'}
 ---
 
 # /ccl-read: 反復熟読マクロ

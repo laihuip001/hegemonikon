@@ -1,5 +1,6 @@
 ---
-description: "問う — /pro_/s-_R:{F:[×2]{/u+*^/u^}}_~(/noe*/dia)_/pis_/dox-"
+{description: "\u554F\u3046 \u2014 /pro_/s-_R:{F:[\xD72]{/u+*^/u^}}_~(/noe*/dia)_/pis_/dox-",
+  lcm_state: beta, version: '1.0'}
 ---
 
 # /ccl-nous: 問いの深化マクロ (νοῦς)

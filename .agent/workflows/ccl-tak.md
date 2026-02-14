@@ -1,5 +1,6 @@
 ---
-description: "捌く — /s1_F:[×3]{/sta~/chr}_F:[×3]{/kho~/zet}_I:[∅]{/sop}_/euk_/bou"
+{description: "\u634C\u304F \u2014 /s1_F:[\xD73]{/sta~/chr}_F:[\xD73]{/kho~/zet}_I:[\u2205\
+    ]{/sop}_/euk_/bou", lcm_state: beta, version: '1.0'}
 ---
 
 # /ccl-tak: タスク整理マクロ

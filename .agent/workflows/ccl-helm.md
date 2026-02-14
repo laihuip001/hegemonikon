@@ -1,5 +1,6 @@
 ---
-description: "舵 — /pro_/kho_/bou+*%/zet+|>/u++_~(/h*/k)_/pis_/dox-"
+{description: "\u8235 \u2014 /pro_/kho_/bou+*%/zet+|>/u++_~(/h*/k)_/pis_/dox-", lcm_state: beta,
+  version: '1.0'}
 ---
 
 # @helm — 舵

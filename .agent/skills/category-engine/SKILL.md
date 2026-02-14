@@ -12,6 +12,11 @@ triggers:
   - 構造の保存・忘却を問う時
   - Trigonon / X-series を参照する時
   - 「なぜこの変換は正当か」を問う時
+
+risk_tier: L1
+risks:
+  - 複雑な理論の誤用による認知的過負荷
+  - 形式的証明ではない比喩的適用の限界
 ---
 
 # 🏛️ Category Theory Engine — 構造認識の言語

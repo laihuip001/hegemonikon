@@ -3,5 +3,6 @@
 """Ochēma (ὄχημα) — Antigravity Language Server Client Package."""
 
 from mekhane.ochema.antigravity_client import AntigravityClient, LLMResponse
+from mekhane.ochema.cortex_client import CortexClient
 
-__all__ = ["AntigravityClient", "LLMResponse"]
+__all__ = ["AntigravityClient", "CortexClient", "LLMResponse"]

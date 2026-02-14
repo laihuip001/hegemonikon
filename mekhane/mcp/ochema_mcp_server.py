@@ -94,8 +94,9 @@ server = Server(
 )
 log("Server initialized")
 
-# Lazy-loaded client instance
+# Lazy-loaded client instances
 _client = None
+_cortex_client = None
 
 
 # PURPOSE: get_client — AntigravityClient のシングルトン取得
@@ -112,6 +113,21 @@ def get_client():
             log(f"Client init error: {e}")
             raise
     return _client
+
+
+# PURPOSE: get_cortex_client — CortexClient のシングルトン取得 (Gemini API 直叩き)
+def get_cortex_client(model: str = "gemini-2.0-flash"):
+    """CortexClient をシングルトンで取得。LS 不要、Gemini 直叩き。"""
+    global _cortex_client
+    if _cortex_client is None:
+        try:
+            from mekhane.ochema.cortex_client import CortexClient
+            _cortex_client = CortexClient(model=model)
+            log(f"CortexClient initialized: model={model}")
+        except Exception as e:
+            log(f"CortexClient init error: {e}")
+            raise
+    return _cortex_client
 
 # PURPOSE: [L2-auto] List available tools.
 
@@ -153,6 +169,48 @@ async def list_tools():
                 },
                 "required": ["message"],
             },
+        ),
+        Tool(
+            name="ask_cortex",
+            description=(
+                "Send a prompt to Gemini via Cortex API (direct, no Language Server). "
+                "Faster and more reliable than LS-proxied calls. "
+                "Available models: gemini-2.0-flash (default), gemini-2.5-pro, "
+                "gemini-2.5-flash, gemini-3-pro-preview, gemini-3-flash-preview."
+            ),
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "message": {
+                        "type": "string",
+                        "description": "The prompt to send to Gemini",
+                    },
+                    "model": {
+                        "type": "string",
+                        "description": (
+                            "Gemini model name. Options: gemini-2.0-flash (default), "
+                            "gemini-2.5-pro, gemini-2.5-flash, "
+                            "gemini-3-pro-preview, gemini-3-flash-preview"
+                        ),
+                        "default": "gemini-2.0-flash",
+                    },
+                    "system_instruction": {
+                        "type": "string",
+                        "description": "Optional system instruction for the model",
+                    },
+                    "max_tokens": {
+                        "type": "number",
+                        "description": "Maximum output tokens (default: 8192)",
+                        "default": 8192,
+                    },
+                },
+                "required": ["message"],
+            },
+        ),
+        Tool(
+            name="cortex_quota",
+            description="Get Gemini API quota (remaining requests per model).",
+            inputSchema={"type": "object", "properties": {}},
         ),
         Tool(
             name="status",
@@ -234,6 +292,71 @@ async def call_tool(name: str, arguments: dict):
             return [TextContent(type="text", text=f"Error: LLM response timed out ({timeout}s)")]
         except Exception as e:
             log(f"Ask error: {e}")
+            return [TextContent(type="text", text=f"Error: {str(e)}")]
+
+    elif name == "ask_cortex":
+        message = arguments.get("message", "")
+        model = arguments.get("model", "gemini-2.0-flash")
+        system_instruction = arguments.get("system_instruction")
+        max_tokens = int(arguments.get("max_tokens", 8192))
+
+        if not message:
+            return [TextContent(type="text", text="Error: message is required")]
+
+        try:
+            client = get_cortex_client(model)
+            log(f"CortexClient asking {model}: {message[:50]}...")
+
+            response = client.ask(
+                message,
+                model=model,
+                system_instruction=system_instruction,
+                max_tokens=max_tokens,
+            )
+
+            output_lines = [
+                "# Cortex Response (Gemini Direct)\n",
+                f"**Model**: {response.model}",
+            ]
+
+            if response.token_usage:
+                usage = response.token_usage
+                output_lines.append(
+                    f"**Tokens**: {usage.get('prompt_tokens', 0)} → "
+                    f"{usage.get('completion_tokens', 0)} "
+                    f"(total: {usage.get('total_tokens', 0)})"
+                )
+
+            output_lines.extend(["", "## Response\n", response.text])
+
+            log(f"Cortex response: {len(response.text)} chars")
+            return [TextContent(type="text", text="\n".join(output_lines))]
+
+        except Exception as e:
+            log(f"Cortex ask error: {e}")
+            return [TextContent(type="text", text=f"Error: {str(e)}")]
+
+    elif name == "cortex_quota":
+        try:
+            client = get_cortex_client()
+            quota = client.retrieve_quota()
+
+            output_lines = ["# Gemini Quota\n"]
+            output_lines.append("| Model | Remaining | Reset |")
+            output_lines.append("|:------|----------:|:------|")
+            for bucket in quota.get("buckets", []):
+                model = bucket.get("modelId", "?")
+                remaining = bucket.get("remainingFraction", 0)
+                reset = bucket.get("resetTime", "?")[:16]
+                output_lines.append(
+                    f"| `{model}` | {remaining*100:.1f}% | {reset} |"
+                )
+
+            log(f"Quota returned: {len(quota.get('buckets', []))} buckets")
+            return [TextContent(type="text", text="\n".join(output_lines))]
+
+        except Exception as e:
+            log(f"Cortex quota error: {e}")
             return [TextContent(type="text", text=f"Error: {str(e)}")]
 
     elif name == "status":

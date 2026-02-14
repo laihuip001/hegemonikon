@@ -54,7 +54,7 @@ class CompletenessAgent(AuditAgent):
         (r"\bFIXME\b", "COMP-002", "FIXME マーカーが残っています"),
         (r"\bXXX\b", "COMP-003", "XXX マーカーが残っています"),
         (r"\bHACK\b", "COMP-004", "HACK マーカーが残っています"),
-        (r"\.\.\.(?!\s*\]|\s*\))", "COMP-005", "省略記号 ... が残っています"),
+        (r"\.\.\.(?!\s*\]|\s*\)|\s*\w)", "COMP-005", "省略記号 ... が残っています"),
         (r"(?<!@abstractmethod\n)\s+pass\s*$", "COMP-006", "空の pass 文があります"),
         (r'raise\s+NotImplementedError', "COMP-007", "NotImplementedError が残っています"),
         (r"\?\?\?", "COMP-008", "??? プレースホルダーが残っています"),
@@ -264,20 +264,32 @@ class CompletenessAgent(AuditAgent):
 
         # content はすでに stripped_content 経由で文字列/コメント除去済み
 
-        # 括弧のバランスチェック
+        # 括弧のバランスチェック (差分ベースの severity 段階化)
         brackets = [("(", ")"), ("[", "]"), ("{", "}")]
         for open_b, close_b in brackets:
             open_count = content.count(open_b)
             close_count = content.count(close_b)
-            if open_count != close_count:
-                issues.append(
-                    AuditIssue(
-                        agent=self.name,
-                        code="COMP-030",
-                        severity=AuditSeverity.HIGH,
-                        message=f"括弧のバランスが不正: '{open_b}' = {open_count}, '{close_b}' = {close_count}",
-                    )
+            diff = abs(open_count - close_count)
+            if diff == 0:
+                continue
+
+            # 差の大きさに応じて severity を段階化
+            if diff >= 4:
+                severity = AuditSeverity.HIGH
+            elif diff >= 2:
+                severity = AuditSeverity.MEDIUM
+            else:
+                # ±1 は strip 残留や言語固有構文の可能性が高い
+                severity = AuditSeverity.LOW
+
+            issues.append(
+                AuditIssue(
+                    agent=self.name,
+                    code="COMP-030",
+                    severity=severity,
+                    message=f"括弧のバランスが不正: '{open_b}' = {open_count}, '{close_b}' = {close_count} (差: {diff})",
                 )
+            )
 
         return issues
 

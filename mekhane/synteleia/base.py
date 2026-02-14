@@ -35,6 +35,31 @@ class AuditTargetType(Enum):
     GENERIC = "generic"  # 汎用
 
 
+# PURPOSE: ソースコードの言語
+class SourceLanguage(Enum):
+    """ソースコードの言語 (source 拡張子から自動推定)"""
+
+    PYTHON = "python"
+    TYPESCRIPT = "typescript"
+    JAVASCRIPT = "javascript"
+    RUST = "rust"
+    GO = "go"
+    UNKNOWN = "unknown"
+
+
+_EXTENSION_MAP = {
+    ".py": SourceLanguage.PYTHON,
+    ".pyi": SourceLanguage.PYTHON,
+    ".ts": SourceLanguage.TYPESCRIPT,
+    ".tsx": SourceLanguage.TYPESCRIPT,
+    ".js": SourceLanguage.JAVASCRIPT,
+    ".jsx": SourceLanguage.JAVASCRIPT,
+    ".mjs": SourceLanguage.JAVASCRIPT,
+    ".rs": SourceLanguage.RUST,
+    ".go": SourceLanguage.GO,
+}
+
+
 # PURPOSE: Audit target の実装
 @dataclass
 class AuditTarget:
@@ -62,6 +87,15 @@ class AuditTarget:
         else:
             self._stripped_cache = self.content
         return self._stripped_cache
+
+    @property
+    def language(self) -> "SourceLanguage":
+        """source 拡張子から言語を自動推定。"""
+        if self.source:
+            import os
+            ext = os.path.splitext(self.source)[1].lower()
+            return _EXTENSION_MAP.get(ext, SourceLanguage.UNKNOWN)
+        return SourceLanguage.UNKNOWN
 
 
 # PURPOSE: 監査で検出された問題

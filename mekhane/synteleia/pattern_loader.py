@@ -20,14 +20,26 @@ from typing import Any, Dict, List, Optional, Tuple
 
 # PURPOSE: 文字列リテラルとコメントを除去して L1 エージェントの誤検知を防ぐ
 def strip_strings_and_comments(content: str) -> str:
-    """文字列リテラルとコメントを空白に置換。パターンマッチの偽陽性を防ぐ。"""
-    # 三重クォート文字列
-    result = re.sub(r'"""[\s\S]*?"""', ' ', content)
+    """文字列リテラルとコメントを空白に置換。パターンマッチの偽陽性を防ぐ。
+
+    対応言語: Python, TypeScript/JavaScript, Rust, Go
+    """
+    # 1. ブロックコメント (/* ... */ — JS/TS/Rust/Go)
+    result = re.sub(r'/\*[\s\S]*?\*/', ' ', content)
+    # 2. 行コメント (// — JS/TS/Rust/Go)
+    result = re.sub(r'//.*$', ' ', result, flags=re.MULTILINE)
+    # 3. 三重クォート文字列 (Python)
+    result = re.sub(r'"""[\s\S]*?"""', ' ', result)
     result = re.sub(r"'''[\s\S]*?'''", ' ', result)
-    # 通常の文字列
+    # 4. テンプレートリテラル (JS/TS backtick strings)
+    result = re.sub(r'`[^`]*`', ' ', result)
+    # 5. JS/TS 正規表現リテラル (/pattern/flags)
+    #    代入・引数・return 等の後に来る / を正規表現と判定
+    result = re.sub(r'(?<=[=(,;:!&|?+\-~^])\s*/(?![/*])(?:[^/\\\n]|\\.)*/', ' ', result)
+    # 6. 通常の文字列
     result = re.sub(r'"[^"\n]*"', ' ', result)
     result = re.sub(r"'[^'\n]*'", ' ', result)
-    # 行コメント
+    # 7. 行コメント (# — Python/Shell)
     result = re.sub(r'#.*$', ' ', result, flags=re.MULTILINE)
     return result
 

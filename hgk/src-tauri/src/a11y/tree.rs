@@ -7,6 +7,8 @@ use atspi::AccessibilityConnection;
 use serde::Serialize;
 use zbus::Connection;
 
+use super::error::{A11yError, A11yResult};
+
 /// A desktop window discovered via AT-SPI2
 #[derive(Debug, Clone, Serialize)]
 pub struct A11yWindow {
@@ -38,28 +40,20 @@ pub struct A11yNode {
 }
 
 /// List all accessible windows on the desktop via AT-SPI2 Registry
-pub async fn list_accessible_windows() -> Result<Vec<A11yWindow>, String> {
-    let a11y_conn = AccessibilityConnection::new()
-        .await
-        .map_err(|e| format!("AT-SPI2 connection failed: {}", e))?;
+pub async fn list_accessible_windows() -> A11yResult<Vec<A11yWindow>> {
+    let a11y_conn = AccessibilityConnection::new().await?;
     let conn = a11y_conn.connection();
 
     // The AT-SPI2 Registry root object lists all accessible applications
     let registry = AccessibleProxy::builder(&conn)
-        .destination("org.a11y.atspi.Registry")
-        .map_err(|e| format!("Registry destination error: {}", e))?
-        .path("/org/a11y/atspi/accessible/root")
-        .map_err(|e| format!("Registry path error: {}", e))?
+        .destination("org.a11y.atspi.Registry")?
+        .path("/org/a11y/atspi/accessible/root")?
         .cache_properties(zbus::proxy::CacheProperties::No)
         .build()
-        .await
-        .map_err(|e| format!("Registry proxy build failed: {}", e))?;
+        .await?;
 
     // Get all children (= all accessible applications)
-    let children = registry
-        .get_children()
-        .await
-        .map_err(|e| format!("get_children failed: {}", e))?;
+    let children = registry.get_children().await?;
 
     let mut windows = Vec::new();
 
@@ -101,25 +95,26 @@ pub async fn list_accessible_windows() -> Result<Vec<A11yWindow>, String> {
 }
 
 /// Get the accessibility tree for a specific application
+/// Uses cache if available (TTL-based, see cache.rs)
 pub async fn get_accessible_tree(
     bus_name: &str,
     path: &str,
     max_depth: u32,
-) -> Result<Vec<A11yNode>, String> {
-    let a11y_conn = AccessibilityConnection::new()
-        .await
-        .map_err(|e| format!("AT-SPI2 connection failed: {}", e))?;
+) -> A11yResult<Vec<A11yNode>> {
+    // Check cache first
+    if let Some(cached) = super::cache::get(bus_name, path, max_depth) {
+        return Ok(cached);
+    }
+
+    let a11y_conn = AccessibilityConnection::new().await?;
     let conn = a11y_conn.connection();
 
     let proxy = AccessibleProxy::builder(&conn)
-        .destination(bus_name.to_string())
-        .map_err(|e| format!("destination error: {}", e))?
-        .path(path.to_string())
-        .map_err(|e| format!("path error: {}", e))?
+        .destination(bus_name.to_string())?
+        .path(path.to_string())?
         .cache_properties(zbus::proxy::CacheProperties::No)
         .build()
-        .await
-        .map_err(|e| format!("proxy build failed: {}", e))?;
+        .await?;
 
     let name = proxy.name().await.unwrap_or_default();
     let role = proxy
@@ -134,13 +129,18 @@ pub async fn get_accessible_tree(
         Vec::new()
     };
 
-    Ok(vec![A11yNode {
+    let result = vec![A11yNode {
         role,
         name,
         bus_name: bus_name.to_string(),
         path: path.to_string(),
         children,
-    }])
+    }];
+
+    // Store in cache
+    super::cache::put(bus_name, path, max_depth, result.clone());
+
+    Ok(result)
 }
 
 /// Recursively walk child nodes
@@ -150,15 +150,14 @@ fn walk_children<'a>(
     remaining_depth: u32,
 ) -> std::pin::Pin<Box<dyn std::future::Future<Output = Vec<A11yNode>> + Send + 'a>> {
     Box::pin(async move {
-        let child_refs = match parent.get_children().await {
+        let children_refs = match parent.get_children().await {
             Ok(c) => c,
             Err(_) => return Vec::new(),
         };
 
         let mut nodes = Vec::new();
 
-        // Cap at 50 children per node to prevent runaway
-        for child_ref in child_refs.into_iter().take(50) {
+        for child_ref in children_refs {
             let child_proxy = match child_ref.as_accessible_proxy(conn).await {
                 Ok(p) => p,
                 Err(_) => continue,
@@ -170,10 +169,11 @@ fn walk_children<'a>(
                 .await
                 .map(|r| r.name().to_string())
                 .unwrap_or_else(|_| "unknown".to_string());
+
             let bus_name = child_proxy.inner().destination().to_string();
             let path = child_proxy.inner().path().to_string();
 
-            let children = if remaining_depth > 0 {
+            let grandchildren = if remaining_depth > 0 {
                 walk_children(conn, &child_proxy, remaining_depth - 1).await
             } else {
                 Vec::new()
@@ -184,7 +184,7 @@ fn walk_children<'a>(
                 name,
                 bus_name,
                 path,
-                children,
+                children: grandchildren,
             });
         }
 
@@ -198,23 +198,18 @@ pub async fn perform_action(
     bus_name: &str,
     path: &str,
     action_index: i32,
-) -> Result<(bool, String), String> {
-    let a11y_conn = AccessibilityConnection::new()
-        .await
-        .map_err(|e| format!("AT-SPI2 connection failed: {}", e))?;
+) -> A11yResult<(bool, String)> {
+    let a11y_conn = AccessibilityConnection::new().await?;
     let conn = a11y_conn.connection();
 
     use atspi::proxy::action::ActionProxy;
 
     let action_proxy = ActionProxy::builder(&conn)
-        .destination(bus_name.to_string())
-        .map_err(|e| format!("destination error: {}", e))?
-        .path(path.to_string())
-        .map_err(|e| format!("path error: {}", e))?
+        .destination(bus_name.to_string())?
+        .path(path.to_string())?
         .cache_properties(zbus::proxy::CacheProperties::No)
         .build()
-        .await
-        .map_err(|e| format!("ActionProxy build failed: {}", e))?;
+        .await?;
 
     // Get the action name for reporting
     let action_name = action_proxy
@@ -222,10 +217,7 @@ pub async fn perform_action(
         .await
         .unwrap_or_else(|_| format!("action_{}", action_index));
 
-    let result = action_proxy
-        .do_action(action_index)
-        .await
-        .map_err(|e| format!("do_action failed: {}", e))?;
+    let result = action_proxy.do_action(action_index).await?;
 
     Ok((result, action_name))
 }
@@ -234,28 +226,20 @@ pub async fn perform_action(
 pub async fn list_actions(
     bus_name: &str,
     path: &str,
-) -> Result<Vec<String>, String> {
-    let a11y_conn = AccessibilityConnection::new()
-        .await
-        .map_err(|e| format!("AT-SPI2 connection failed: {}", e))?;
+) -> A11yResult<Vec<String>> {
+    let a11y_conn = AccessibilityConnection::new().await?;
     let conn = a11y_conn.connection();
 
     use atspi::proxy::action::ActionProxy;
 
     let action_proxy = ActionProxy::builder(&conn)
-        .destination(bus_name.to_string())
-        .map_err(|e| format!("destination error: {}", e))?
-        .path(path.to_string())
-        .map_err(|e| format!("path error: {}", e))?
+        .destination(bus_name.to_string())?
+        .path(path.to_string())?
         .cache_properties(zbus::proxy::CacheProperties::No)
         .build()
-        .await
-        .map_err(|e| format!("ActionProxy build failed: {}", e))?;
+        .await?;
 
-    let n = action_proxy
-        .nactions()
-        .await
-        .map_err(|e| format!("nactions failed: {}", e))?;
+    let n = action_proxy.nactions().await?;
 
     let mut names = Vec::new();
     for i in 0..n {
@@ -272,28 +256,21 @@ pub async fn set_text(
     bus_name: &str,
     path: &str,
     text: &str,
-) -> Result<bool, String> {
-    let a11y_conn = AccessibilityConnection::new()
-        .await
-        .map_err(|e| format!("AT-SPI2 connection failed: {}", e))?;
+) -> A11yResult<bool> {
+    let a11y_conn = AccessibilityConnection::new().await?;
     let conn = a11y_conn.connection();
 
     use atspi::proxy::editable_text::EditableTextProxy;
 
     let text_proxy = EditableTextProxy::builder(&conn)
-        .destination(bus_name.to_string())
-        .map_err(|e| format!("destination error: {}", e))?
-        .path(path.to_string())
-        .map_err(|e| format!("path error: {}", e))?
+        .destination(bus_name.to_string())?
+        .path(path.to_string())?
         .cache_properties(zbus::proxy::CacheProperties::No)
         .build()
-        .await
-        .map_err(|e| format!("EditableTextProxy build failed: {}", e))?;
+        .await?;
 
-    text_proxy
-        .set_text_contents(text)
-        .await
-        .map_err(|e| format!("set_text_contents failed: {}", e))
+    text_proxy.set_text_contents(text).await?;
+    Ok(true)
 }
 
 /// Element position and size on screen (from AT-SPI Component interface)
@@ -309,29 +286,21 @@ pub struct ElementExtents {
 pub async fn get_element_extents(
     bus_name: &str,
     path: &str,
-) -> Result<ElementExtents, String> {
-    let a11y_conn = AccessibilityConnection::new()
-        .await
-        .map_err(|e| format!("AT-SPI2 connection failed: {}", e))?;
+) -> A11yResult<ElementExtents> {
+    let a11y_conn = AccessibilityConnection::new().await?;
     let conn = a11y_conn.connection();
 
     use atspi::proxy::component::ComponentProxy;
     use atspi::CoordType;
 
     let comp_proxy = ComponentProxy::builder(&conn)
-        .destination(bus_name.to_string())
-        .map_err(|e| format!("destination error: {}", e))?
-        .path(path.to_string())
-        .map_err(|e| format!("path error: {}", e))?
+        .destination(bus_name.to_string())?
+        .path(path.to_string())?
         .cache_properties(zbus::proxy::CacheProperties::No)
         .build()
-        .await
-        .map_err(|e| format!("ComponentProxy build failed: {}", e))?;
+        .await?;
 
-    let (x, y, w, h) = comp_proxy
-        .get_extents(CoordType::Screen)
-        .await
-        .map_err(|e| format!("get_extents failed: {}", e))?;
+    let (x, y, w, h) = comp_proxy.get_extents(CoordType::Screen).await?;
 
     Ok(ElementExtents { x, y, width: w, height: h })
 }
@@ -340,28 +309,20 @@ pub async fn get_element_extents(
 pub async fn focus_element(
     bus_name: &str,
     path: &str,
-) -> Result<bool, String> {
-    let a11y_conn = AccessibilityConnection::new()
-        .await
-        .map_err(|e| format!("AT-SPI2 connection failed: {}", e))?;
+) -> A11yResult<bool> {
+    let a11y_conn = AccessibilityConnection::new().await?;
     let conn = a11y_conn.connection();
 
     use atspi::proxy::component::ComponentProxy;
 
     let comp_proxy = ComponentProxy::builder(&conn)
-        .destination(bus_name.to_string())
-        .map_err(|e| format!("destination error: {}", e))?
-        .path(path.to_string())
-        .map_err(|e| format!("path error: {}", e))?
+        .destination(bus_name.to_string())?
+        .path(path.to_string())?
         .cache_properties(zbus::proxy::CacheProperties::No)
         .build()
-        .await
-        .map_err(|e| format!("ComponentProxy build failed: {}", e))?;
+        .await?;
 
-    comp_proxy
-        .grab_focus()
-        .await
-        .map_err(|e| format!("grab_focus failed: {}", e))
+    Ok(comp_proxy.grab_focus().await?)
 }
 
 /// Click at the center of an AT-SPI element using xdotool
@@ -369,11 +330,11 @@ pub async fn focus_element(
 pub async fn click_at_element(
     bus_name: &str,
     path: &str,
-) -> Result<(bool, i32, i32), String> {
+) -> A11yResult<(bool, i32, i32)> {
     let ext = get_element_extents(bus_name, path).await?;
 
     if ext.width == 0 && ext.height == 0 {
-        return Err("Element has zero size (not visible)".to_string());
+        return Err(A11yError::ActionFailed("Element has zero size (not visible)".to_string()));
     }
 
     let center_x = ext.x + ext.width / 2;
@@ -387,7 +348,7 @@ pub async fn click_at_element(
                &center_x.to_string(), &center_y.to_string(),
                "click", "1"])
         .output()
-        .map_err(|e| format!("xdotool exec failed: {}", e))?;
+        .map_err(|e| A11yError::XdotoolFailed(e.to_string()))?;
 
     Ok((output.status.success(), center_x, center_y))
 }
@@ -398,7 +359,7 @@ pub async fn type_at_element(
     bus_name: &str,
     path: &str,
     text: &str,
-) -> Result<bool, String> {
+) -> A11yResult<bool> {
     // Try EditableText first (pure AT-SPI)
     if let Ok(success) = set_text(bus_name, path, text).await {
         if success {
@@ -412,7 +373,7 @@ pub async fn type_at_element(
     let output = std::process::Command::new("xdotool")
         .args(["type", "--clearmodifiers", text])
         .output()
-        .map_err(|e| format!("xdotool type failed: {}", e))?;
+        .map_err(|e| A11yError::XdotoolFailed(e.to_string()))?;
 
     Ok(output.status.success())
 }

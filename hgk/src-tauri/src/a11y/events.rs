@@ -3,6 +3,7 @@
 // Full event streaming can be added once atspi-0.29 API is stabilized
 
 use super::tree;
+use super::error::A11yResult;
 use serde::Serialize;
 
 /// Desktop state change detected by polling
@@ -21,7 +22,7 @@ pub enum DesktopChange {
 /// Returns a list of changes (new windows, disappeared windows)
 pub async fn detect_changes(
     previous: &[tree::A11yWindow],
-) -> Result<Vec<DesktopChange>, String> {
+) -> A11yResult<Vec<DesktopChange>> {
     let current = tree::list_accessible_windows().await?;
     let mut changes = Vec::new();
 
@@ -35,9 +36,10 @@ pub async fn detect_changes(
         }
     }
 
-    // Find disappeared windows
+    // Find disappeared windows — invalidate their cache
     for p in previous {
         if !current.iter().any(|w| w.bus_name == p.bus_name) {
+            super::cache::invalidate_bus(&p.bus_name);
             changes.push(DesktopChange::WindowDisappeared {
                 app_name: p.app_name.clone(),
                 bus_name: p.bus_name.clone(),
@@ -53,6 +55,6 @@ pub async fn detect_changes(
 }
 
 /// Take a snapshot of current windows for future comparison
-pub async fn take_snapshot() -> Result<Vec<tree::A11yWindow>, String> {
+pub async fn take_snapshot() -> A11yResult<Vec<tree::A11yWindow>> {
     tree::list_accessible_windows().await
 }

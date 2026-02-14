@@ -19,6 +19,7 @@ from ..base import (
     AuditSeverity,
     AuditTarget,
     AuditTargetType,
+    SourceLanguage,
 )
 from ..pattern_loader import (
     load_patterns, parse_pattern_list, parse_pair_list,
@@ -73,7 +74,7 @@ class LogicAgent(AuditAgent):
         stripped = target.stripped_content
 
         # 対立キーワードの共存検出
-        issues.extend(self._check_contradictions(stripped))
+        issues.extend(self._check_contradictions(stripped, target))
 
         # 論理パターンチェック
         issues.extend(self._check_logic_patterns(stripped))
@@ -93,13 +94,27 @@ class LogicAgent(AuditAgent):
         )
 
     # PURPOSE: [L2-auto] 対立キーワードの共存を検出
-    def _check_contradictions(self, content: str) -> List[AuditIssue]:
+    def _check_contradictions(self, content: str, target: AuditTarget) -> List[AuditIssue]:
         """対立キーワードの共存を検出"""
         issues = []
         # stripped_content はすでに文字列/コメント除去済み
         content_lower = content.lower()
 
+        # 言語に応じてセーフペアを決定
+        lang = target.language
+        _CODE_SAFE_PAIRS = {("true", "false"), ("enable", "disable")}
+        if lang in (SourceLanguage.RUST,):
+            # Rust: unsafe/safe も正当な共存
+            _CODE_SAFE_PAIRS.add(("all", "none"))  # Option::None vs Iterator::all
+        if lang in (SourceLanguage.TYPESCRIPT, SourceLanguage.JAVASCRIPT):
+            # JS/TS: required/optional は型定義で正当
+            _CODE_SAFE_PAIRS.add(("required", "optional"))
+
         for word1, word2 in self.CONTRADICTION_PAIRS:
+            pair_key = (word1.lower(), word2.lower())
+            if pair_key in _CODE_SAFE_PAIRS:
+                continue  # 言語固有のセーフペア
+
             if word1.lower() in content_lower and word2.lower() in content_lower:
                 # 同じ段落内での共存をチェック
                 paragraphs = content.split("\n\n")

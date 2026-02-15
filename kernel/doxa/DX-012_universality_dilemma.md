@@ -916,4 +916,43 @@ R^op ⊣ L^op が D^op, C^op 間の随伴
 
 ---
 
-*DX-012 v3.2.0 — §20 Op-category 仮説 (C_agent ≅ C_info^op) (2026-02-15)*
+## Smithe 論文消化: String Diagrams for Active Inference {#sec_21_eat_smithe}
+
+> arXiv:2308.00861 (Smithe, Tull, Kleiner 2023) を /eat で消化。
+
+### 核心: 定理46 (Free Energy の合成性)
+
+```
+F(M₁ ⊗ M₂, q₁ ⊗ q₂, o₁ ⊗ o₂) = F(M₁, q₁, o₁) + F(M₂, q₂, o₂)
+```
+
+> 全体の VFE = 各サブモデルの VFE の和。
+> エージェントは各サブモデルを**局所的に最小化**すれば全体が最小化される。
+
+### HGK Series 独立性への示唆
+
+| Smithe | HGK | 対応 |
+|:-------|:----|:-----|
+| サブモデル M₁, M₂ | 6 Series (O,S,H,P,K,A) | 各 Series = 認知のサブモデル |
+| テンソル積 ⊗ | X-series 関係 | Series 間の結合 |
+| 局所 VFE 最小化 | Series 独立ワークフロー | 各 Series が独立に最適化可能 |
+
+[推定: 60%] — X-series 関係は完全独立ではないため、テンソル積近似の限界あり。
+
+### Op-category η/ε 交換テスト (§20 検証)
+
+| Smithe ε | HGK η | 同一か？ |
+|:---------|:-------|:--------|
+| 推論→予測→元の観測と比較 (閉ループ) | 理解→探求 (開ループ) | [推定: 55%] |
+
+> 構造は対応するが、認知的解釈が異なる。
+> ε は「予測誤差チェック」(error correction)、η は「理解が新たな問いを生む」(generativity)。
+> → 完全な op-category 同型ではなく、**片方が閉じ、片方が開く**非対称性がある。
+
+### 消化ファイル
+
+→ [eat_smithe_string_diagrams_2026-02-15.md](file:///home/makaron8426/oikos/hegemonikon/mekhane/sophia/eat_smithe_string_diagrams_2026-02-15.md)
+
+---
+
+*DX-012 v3.3.0 — §21 Smithe消化: 定理46 (合成性) + η/ε テスト (2026-02-15)*

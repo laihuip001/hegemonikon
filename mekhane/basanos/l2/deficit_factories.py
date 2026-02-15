@@ -100,13 +100,41 @@ class EpsilonDeficitFactory:
     """
 
     # Map series to expected implementation directories
-    IMPL_DIRS = {
-        "O": ["workflows"],  # /noe, /bou, /zet, /ene
-        "S": ["mekhane/ergasterion", "mekhane/symploke"],
-        "H": ["workflows"],
-        "P": ["mekhane/fep"],
-        "K": ["mekhane/anamnesis", "mekhane/basanos"],
-        "A": ["mekhane/basanos", "mekhane/fep"],
+    IMPL_DIRS: dict[str, list[str]] = {
+        "O": [".agent/workflows", ".agent/skills"],
+        "S": [".agent/workflows", ".agent/skills", "mekhane/ergasterion", "mekhane/symploke"],
+        "H": [".agent/workflows", ".agent/skills"],
+        "P": ["mekhane/fep", ".agent/workflows"],
+        "K": ["mekhane/anamnesis", "mekhane/basanos", ".agent/workflows"],
+        "A": ["mekhane/basanos", "mekhane/fep", ".agent/workflows"],
+    }
+
+    # Map theorem IDs to known workflow file basenames
+    THEOREM_TO_WF: dict[str, list[str]] = {
+        "O1": ["noe"],
+        "O2": ["bou"],
+        "O3": ["zet"],
+        "O4": ["ene"],
+        "S1": ["sta"],
+        "S2": ["mek"],
+        "S3": ["met"],
+        "S4": ["pra"],
+        "H1": ["pro"],
+        "H2": ["pis"],
+        "H3": ["ore"],
+        "H4": ["dox"],
+        "P1": ["euk"],
+        "P2": ["chr"],
+        "P3": ["tel"],
+        "P4": ["ana"],
+        "K1": ["kho"],
+        "K2": ["tak"],
+        "K3": ["sop"],
+        "K4": ["epi"],
+        "A1": ["kri"],
+        "A2": ["dia"],
+        "A3": ["syn"],
+        "A4": ["epi"],
     }
 
     def __init__(self, g_struct: GStruct, project_root: Path | str) -> None:
@@ -116,42 +144,58 @@ class EpsilonDeficitFactory:
     def detect_impl_deficits(self) -> list[Deficit]:
         """Detect ε-impl: kernel definitions without implementations."""
         deficits = []
-        kernel_root = self.project_root / "kernel"
         concepts = self.g_struct.scan_all()
 
         for concept in concepts:
             if concept.status != "CANONICAL":
                 continue
 
-            # Check if implementation directories exist
-            impl_dirs = self.IMPL_DIRS.get(concept.series, [])
-            has_any_impl = False
+            # Check each theorem individually
+            unimplemented = []
+            for tid in concept.theorem_ids:
+                if self._has_implementation(tid, concept.series):
+                    continue
+                unimplemented.append(tid)
 
-            for impl_dir in impl_dirs:
-                impl_path = self.project_root / impl_dir
-                if impl_path.exists():
-                    # Look for references to this concept's theorem IDs
-                    for tid in concept.theorem_ids:
-                        if self._find_reference(impl_path, tid):
-                            has_any_impl = True
-                            break
-                if has_any_impl:
-                    break
-
-            if not has_any_impl and concept.theorem_ids:
+            if unimplemented:
                 deficits.append(
                     Deficit(
                         type=DeficitType.EPSILON_IMPL,
                         severity=0.6,
                         source=concept.path,
-                        target=", ".join(concept.theorem_ids),
-                        description=f"{concept.title} の定理 {concept.theorem_ids} に実装が見つからない",
-                        evidence=[f"kernel path: {concept.path}", f"series: {concept.series}"],
-                        suggested_action="実装ディレクトリに PROOF.md か対応コードが必要",
+                        target=", ".join(unimplemented),
+                        description=(
+                            f"{concept.title} の定理 {unimplemented} に"
+                            f"実装/WF が見つからない"
+                        ),
+                        evidence=[
+                            f"kernel path: {concept.path}",
+                            f"series: {concept.series}",
+                            f"実装済: {[t for t in concept.theorem_ids if t not in unimplemented]}",
+                        ],
+                        suggested_action=".agent/workflows/ か mekhane/ に実装が必要",
                     )
                 )
 
         return deficits
+
+    def _has_implementation(self, theorem_id: str, series: str) -> bool:
+        """Check if a theorem has any implementation (WF, skill, or code)."""
+        # 1. Check known WF mapping (fast, deterministic)
+        wf_names = self.THEOREM_TO_WF.get(theorem_id, [])
+        for wf_name in wf_names:
+            wf_path = self.project_root / ".agent" / "workflows" / f"{wf_name}.md"
+            if wf_path.exists():
+                return True
+
+        # 2. Check implementation directories via grep
+        impl_dirs = self.IMPL_DIRS.get(series, [])
+        for impl_dir in impl_dirs:
+            impl_path = self.project_root / impl_dir
+            if impl_path.exists() and self._find_reference(impl_path, theorem_id):
+                return True
+
+        return False
 
     def detect_justification_deficits(
         self, gnosis_keywords: set[str]

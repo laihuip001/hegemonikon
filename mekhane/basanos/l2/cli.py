@@ -40,6 +40,63 @@ class C:
     RESET = "\033[0m"
 
 
+def _fetch_gnosis_keywords() -> list[tuple[str, list[str]]]:
+    """Fetch paper keywords from Gnōsis knowledge base.
+
+    Returns list of (paper_title, keywords) tuples.
+    Returns empty list if Gnōsis is unavailable.
+    """
+    import subprocess as sp
+    import json
+
+    try:
+        # Query gnosis for recent papers' keywords
+        result = sp.run(
+            [
+                sys.executable,
+                "-c",
+                (
+                    "import json, sys; sys.path.insert(0, '.'); "
+                    "from mekhane.gnosis.kb import KnowledgeBase; "
+                    "kb = KnowledgeBase(); "
+                    "papers = kb.list_papers(limit=20); "
+                    "out = [(p.title, p.keywords) for p in papers if p.keywords]; "
+                    "print(json.dumps(out))"
+                ),
+            ],
+            capture_output=True,
+            text=True,
+            timeout=15,
+            cwd=str(detect_project_root()),
+        )
+        if result.returncode == 0 and result.stdout.strip():
+            return json.loads(result.stdout.strip())
+    except (sp.TimeoutExpired, OSError, json.JSONDecodeError, Exception):
+        pass
+
+    # Fallback: try gnosis MCP search for core topics
+    try:
+        result = sp.run(
+            [
+                sys.executable,
+                "-m", "mekhane.gnosis.cli",
+                "topics",
+            ],
+            capture_output=True,
+            text=True,
+            timeout=10,
+            cwd=str(detect_project_root()),
+        )
+        if result.returncode == 0 and result.stdout.strip():
+            # Parse topics output into keyword pairs
+            topics = [line.strip() for line in result.stdout.strip().split("\n") if line.strip()]
+            return [(t, t.split()) for t in topics[:10]]
+    except (sp.TimeoutExpired, OSError, Exception):
+        pass
+
+    return []
+
+
 def detect_project_root() -> Path:
     """Find project root by looking for kernel/ directory."""
     current = Path(__file__).resolve().parent
@@ -64,27 +121,31 @@ def scan_deficits(
     # η deficit
     if deficit_type in (None, "eta"):
         eta_factory = EtaDeficitFactory(g_struct, project_root)
-        # Use Gnōsis search for paper keywords (simplified: use static examples)
-        # In production, this would query mcp_gnosis_search
         print(f"{C.DIM}  scanning η deficits (external vs HGK)...{C.RESET}")
-        # We can't run gnosis in a script easily, so we detect what kernel
-        # concepts exist and flag gaps in the series coverage
-        concepts = g_struct.scan_all()
-        series_coverage = {c.series for c in concepts if c.series != "?"}
-        expected = {"O", "S", "H", "P", "K", "A"}
-        missing = expected - series_coverage
-        for s in missing:
-            deficits.append(
-                Deficit(
-                    type=DeficitType.ETA,
-                    severity=0.7,
-                    source="kernel/",
-                    target=f"{s}-series",
-                    description=f"{s}-series の kernel/ 定義が見つからない",
-                    evidence=[f"検出された series: {sorted(series_coverage)}"],
-                    suggested_action=f"kernel/{s.lower()}*.md を確認",
+
+        # Try Gnōsis integration for paper keywords
+        gnosis_keywords = _fetch_gnosis_keywords()
+        if gnosis_keywords:
+            for title, keywords in gnosis_keywords:
+                deficits.extend(eta_factory.detect(keywords, title))
+        else:
+            # Fallback: detect series coverage gaps
+            concepts = g_struct.scan_all()
+            series_coverage = {c.series for c in concepts if c.series != "?"}
+            expected = {"O", "S", "H", "P", "K", "A"}
+            missing = expected - series_coverage
+            for s in missing:
+                deficits.append(
+                    Deficit(
+                        type=DeficitType.ETA,
+                        severity=0.7,
+                        source="kernel/",
+                        target=f"{s}-series",
+                        description=f"{s}-series の kernel/ 定義が見つからない",
+                        evidence=[f"検出された series: {sorted(series_coverage)}"],
+                        suggested_action=f"kernel/{s.lower()}*.md を確認",
+                    )
                 )
-            )
 
     # ε deficit
     if deficit_type in (None, "epsilon"):

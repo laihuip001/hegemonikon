@@ -119,6 +119,7 @@ causal_inference:
 | `deliberative` | 三視点反復改善 | 「反復改善」 |
 | `explore` | 探索的テスト (UI) | 「触って壊して」「UIテスト」 |
 | `interventional` | 介入不変性テスト | 「条件を変えても」「介入しても」 |
+| `retrospective` | 反実仮想テスト | 「振り返り」「あのとき」「何が違えば」 |
 
 ---
 
@@ -245,6 +246,10 @@ default:
 *v7.1 — FBR 適用 (2026-02-07)*
 *v7.2 — 三角検証方法論 明文化 (2026-02-13)*
 *v7.3 — Cross-Model Cortex Auto 統合 (2026-02-14)*
+
+> **設計根拠 — 定量的裏付け** (Chen et al. 2026, UniT ablation):
+> Verification 能力の除去で reasoning タスクの精度が -1.9% 低下。
+> /dia (Krisis) の判定機能が反復改善システムに不可欠であることの定量的実証。
 
 ---
 

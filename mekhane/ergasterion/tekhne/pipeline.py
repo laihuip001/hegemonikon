@@ -48,6 +48,55 @@ SUPPORTED_EXTENSIONS = {
 }
 
 
+# === Thinking Config (HGK Depth → Model-specific params) ===
+
+# Gemini 3+ thinkingLevel mapping
+# Source: ai.google.dev/gemini-api/docs/thinking (2026-02-15)
+DEPTH_TO_GEMINI: dict[str, dict[str, str]] = {
+    "L0": {"thinkingLevel": "minimal", "verbosity": "concise"},
+    "L1": {"thinkingLevel": "low", "verbosity": "concise"},
+    "L2": {"thinkingLevel": "medium", "verbosity": "standard"},
+    "L3": {"thinkingLevel": "high", "verbosity": "detailed"},
+}
+
+# Claude 4.5+/4.6 effort mapping
+# Source: platform.claude.com Prompting Best Practices (2026-02-15)
+DEPTH_TO_CLAUDE: dict[str, dict[str, str]] = {
+    "L0": {"effort": "low", "thinking_type": "adaptive"},
+    "L1": {"effort": "low", "thinking_type": "adaptive"},
+    "L2": {"effort": "high", "thinking_type": "adaptive"},
+    "L3": {"effort": "max", "thinking_type": "adaptive"},
+}
+
+
+def resolve_thinking_config(
+    model: str,
+    hgk_depth: str = "L2",
+) -> dict[str, str]:
+    """Resolve HGK depth level to model-specific thinking parameters.
+
+    Args:
+        model: Model name (e.g. 'gemini-3-pro', 'claude-opus-4.6')
+        hgk_depth: HGK depth level ('L0', 'L1', 'L2', 'L3')
+
+    Returns:
+        Dict of thinking config params for the target model.
+    """
+    depth = hgk_depth.upper()
+    if depth not in ("L0", "L1", "L2", "L3"):
+        logger.warning("Unknown HGK depth '%s', defaulting to L2", hgk_depth)
+        depth = "L2"
+
+    model_lower = model.lower()
+    if "claude" in model_lower or "opus" in model_lower or "sonnet" in model_lower:
+        return DEPTH_TO_CLAUDE[depth]
+    elif "gemini" in model_lower:
+        return DEPTH_TO_GEMINI[depth]
+    else:
+        # Unknown model family — return Gemini defaults as fallback
+        logger.info("Unknown model family '%s', using Gemini config", model)
+        return DEPTH_TO_GEMINI[depth]
+
 # === Data Structures ===
 
 
@@ -65,11 +114,17 @@ class PipelineConfig:
     use_async: bool = True
     max_concurrency: int = 5
     use_cache: bool = True
+    hgk_depth: str = "L2"  # HGK depth level: L0/L1/L2/L3
 
     # Report
     top_n: int = 20
     output_dir: Optional[Path] = None
     report_format: str = "markdown"  # "markdown" or "json"
+
+    @property
+    def thinking_config(self) -> dict[str, str]:
+        """Resolve thinking parameters based on model and HGK depth."""
+        return resolve_thinking_config(self.model, self.hgk_depth)
 
 
 @dataclass

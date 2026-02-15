@@ -39,6 +39,7 @@ import subprocess
 import sys
 import time
 from datetime import datetime
+from typing import Optional
 from pathlib import Path
 
 # Project root
@@ -53,6 +54,20 @@ from specialist_v2 import (
     get_specialists_by_category,
 )
 from specialist_bridge import get_unified_specialists
+from basanos_bridge import BasanosBridge
+
+# Optional: AIAuditor for pre-filtering
+try:
+    from mekhane.basanos.ai_auditor import AIAuditor, Severity as AuditSeverity
+    HAS_AUDITOR = True
+except ImportError:
+    try:
+        import sys as _sys
+        _sys.path.insert(0, str(_PROJECT_ROOT / "mekhane" / "basanos"))
+        from ai_auditor import AIAuditor, Severity as AuditSeverity
+        HAS_AUDITOR = True
+    except ImportError:
+        HAS_AUDITOR = False
 
 # === Settings ===
 ACCOUNTS_FILE = _PROJECT_ROOT / "synergeia" / "jules_accounts.yaml"
@@ -63,6 +78,7 @@ LOG_DIR = _PROJECT_ROOT / "logs" / "specialist_daily"
 # Default settings
 DEFAULT_FILES_PER_SLOT = 16
 DEFAULT_SPECIALISTS_PER_FILE = 15
+DEFAULT_BASANOS_DOMAINS = 5  # basanos mode: domains per slot
 MAX_ERROR_RATE = 0.20  # 20% エラーで slot 自動停止
 
 
@@ -244,8 +260,13 @@ async def run_slot_batch(
     api_keys: list[str],
     max_concurrent: int = 6,
     dry_run: bool = False,
+    basanos_bridge: Optional["BasanosBridge"] = None,
+    basanos_domains: Optional[list[str]] = None,
 ) -> dict:
-    """1 アカウント分のバッチを実行。"""
+    """1 アカウント分のバッチを実行。
+
+    basanos_bridge が指定されている場合、Basanos パースペクティブを使用する。
+    """
     import run_specialists as rs_short
     from run_specialists import create_session, run_batch, suggest_categories
 
@@ -264,9 +285,16 @@ async def run_slot_batch(
 
     try:
         for file_idx, target_file in enumerate(files, 1):
-            # ランダムサンプリング
-            pool = list(ALL_SPECIALISTS)
-            specs = random.sample(pool, min(specialists_per_file, len(pool)))
+            # 専門家プール選択
+            if basanos_bridge is not None:
+                # Basanos mode: 構造化パースペクティブを使用
+                specs = basanos_bridge.get_perspectives_as_specialists(
+                    domains=basanos_domains,
+                )
+            else:
+                # Specialist mode: ランダムサンプリング
+                pool = list(ALL_SPECIALISTS)
+                specs = random.sample(pool, min(specialists_per_file, len(pool)))
 
             if dry_run:
                 print(f"  [{file_idx}/{len(files)}] {target_file} × {len(specs)} specialists (DRY-RUN)")
@@ -316,10 +344,14 @@ async def run_slot_batch(
 
 # PURPOSE: メイン
 async def main():
-    parser = argparse.ArgumentParser(description="Jules Daily Scheduler v1.1")
+    parser = argparse.ArgumentParser(description="Jules Daily Scheduler v2.0")
     parser.add_argument(
         "--slot", choices=["morning", "midday", "evening"], required=True,
         help="Time slot to execute",
+    )
+    parser.add_argument(
+        "--mode", choices=["specialist", "basanos"], default="specialist",
+        help="Review mode: specialist (random 1000人) or basanos (structured 480 perspectives)",
     )
     parser.add_argument(
         "--max-files", type=int, default=None,
@@ -330,8 +362,16 @@ async def main():
         help=f"Specialists per file (default: {DEFAULT_SPECIALISTS_PER_FILE})",
     )
     parser.add_argument(
+        "--domains", type=int, default=DEFAULT_BASANOS_DOMAINS,
+        help=f"Basanos mode: domains per slot (default: {DEFAULT_BASANOS_DOMAINS})",
+    )
+    parser.add_argument(
         "--max-concurrent", "-m", type=int, default=6,
         help="Max concurrent sessions (default: 6)",
+    )
+    parser.add_argument(
+        "--pre-audit", action="store_true",
+        help="Run AIAuditor pre-filter to prioritize files with critical issues",
     )
     parser.add_argument(
         "--dry-run", action="store_true",
@@ -345,7 +385,7 @@ async def main():
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M")
 
     print(f"\n{'='*60}")
-    print(f"Jules Daily Scheduler v1.1 (EAFP) — {args.slot} slot")
+    print(f"Jules Daily Scheduler v2.0 — {args.slot} slot [{args.mode}]")
     print(f"{'='*60}")
     print(f"Time:     {timestamp}")
 
@@ -354,6 +394,30 @@ async def main():
     if not all_keys:
         print("ERROR: No API keys found. Check JULES_API_KEY_xx env vars.")
         return
+
+    # --- Basanos mode: ドメイン選択 & specialists per file をオーバーライド ---
+    basanos_info = {}  # ログ用メタデータ
+    bridge: Optional[BasanosBridge] = None
+    sampled_domains: Optional[list[str]] = None
+
+    if args.mode == "basanos":
+        bridge = BasanosBridge()
+        sampled_domains = bridge.sample_domains(args.domains)
+        # Basanos では specs_per_file = 選択ドメイン数 × 24軸 (全パースペクティブ)
+        # ファイルあたりの specialist 数を axes 数に制限
+        specs_per_file = len(bridge.all_axes)  # 24
+        basanos_info = {
+            "domains": sampled_domains,
+            "axes": len(bridge.all_axes),
+            "perspectives_per_file": specs_per_file,
+        }
+        print(f"Mode:     basanos (structured orthogonal perspectives)")
+        print(f"Domains:  {sampled_domains} ({len(sampled_domains)} selected)")
+        print(f"Axes:     {len(bridge.all_axes)} (all theorems)")
+        if args.sample:
+            print(f"  ⚠️  --sample is ignored in basanos mode (using all {len(bridge.all_axes)} axes)")
+    else:
+        print(f"Mode:     specialist (random sampling from ~1000 pool)")
 
     total_tasks = total_files * specs_per_file
 
@@ -376,6 +440,49 @@ async def main():
         print(f"  [{i}] {f}")
     if len(all_selected_files) > 5:
         print(f"  ... and {len(all_selected_files) - 5} more")
+
+    # --- Pre-audit: AIAuditor でファイル優先度を再計算 ---
+    audit_info = {}  # ログ用
+    if args.pre_audit:
+        if not HAS_AUDITOR:
+            print("  ⚠️  --pre-audit requested but AIAuditor not available, skipping")
+        else:
+            print("\n🔍 Pre-audit: scanning files with AIAuditor...")
+            auditor = AIAuditor(strict=False)
+            file_scores: dict[str, int] = {}
+
+            for fpath in all_selected_files:
+                try:
+                    result = auditor.audit_file(Path(fpath))
+                    # Score: Critical=10, High=5, Medium=1, Low=0
+                    score = sum(
+                        10 if i.severity == AuditSeverity.CRITICAL
+                        else 5 if i.severity == AuditSeverity.HIGH
+                        else 1 if i.severity == AuditSeverity.MEDIUM
+                        else 0
+                        for i in result.issues
+                    )
+                    file_scores[fpath] = score
+                    if score > 0:
+                        crit = sum(1 for i in result.issues if i.severity == AuditSeverity.CRITICAL)
+                        high = sum(1 for i in result.issues if i.severity == AuditSeverity.HIGH)
+                        print(f"  {fpath}: score={score} (C:{crit} H:{high})")
+                except Exception as e:
+                    file_scores[fpath] = 0
+                    print(f"  {fpath}: audit failed ({e})")
+
+            # スコア降順で再ソート (問題の多いファイルが先)
+            all_selected_files.sort(key=lambda f: file_scores.get(f, 0), reverse=True)
+
+            total_issues = sum(file_scores.values())
+            files_with_issues = sum(1 for s in file_scores.values() if s > 0)
+            audit_info = {
+                "total_score": total_issues,
+                "files_with_issues": files_with_issues,
+                "file_scores": {f: s for f, s in file_scores.items() if s > 0},
+            }
+            print(f"  → {files_with_issues}/{len(all_selected_files)} files with issues, reordered by priority")
+
     print()
 
     # 使用量読込
@@ -398,6 +505,8 @@ async def main():
         api_keys=all_keys,
         max_concurrent=args.max_concurrent,
         dry_run=args.dry_run,
+        basanos_bridge=bridge if args.mode == "basanos" else None,
+        basanos_domains=sampled_domains if args.mode == "basanos" else None,
     )
 
     slot_result["total_tasks"] = result["total_tasks"]
@@ -433,12 +542,18 @@ async def main():
     if not args.dry_run:
         log_file = LOG_DIR / f"scheduler_{datetime.now().strftime('%Y%m%d_%H%M')}.json"
         log_file.parent.mkdir(parents=True, exist_ok=True)
-        log_file.write_text(json.dumps({
+        log_data = {
             "slot": args.slot,
+            "mode": args.mode,
             "timestamp": timestamp,
             "result": slot_result,
             "daily_usage": usage,
-        }, indent=2, ensure_ascii=False))
+        }
+        if basanos_info:
+            log_data["basanos"] = basanos_info
+        if audit_info:
+            log_data["pre_audit"] = audit_info
+        log_file.write_text(json.dumps(log_data, indent=2, ensure_ascii=False))
         print(f"  Log: {log_file}")
 
 

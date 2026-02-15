@@ -1082,6 +1082,20 @@ graph TD
 > **出典**: Kalon Deep Examination (2026-02-07), V1-V6 検証
 > **参考**: Smithe (2020) "Bayesian Updates Compose Optically", nLab Actegory
 
+#### C3 Forgetful Functor 対応 (2026-02-15)
+
+> **核心**: depth_level と forget_level は逆相関。深い思考ほど情報を保存する。
+
+| CCL 派生 | depth_level | forget_level | 保存される情報 |
+|:---------|:-----------|:-------------|:-------------|
+| `+` (深化) | L3 (Deep) | G₁ (Context) | 文脈 + 設計 + 実装 |
+| 無印 | L2 (Standard) | G₂ (Design) | 設計 + 実装 |
+| `-` (縮約) | L1 (Quick) | G₃ (Impl) | 実装のみ |
+| L0 (Bypass) | L0 | G₄ (All) | なし (全忘却) |
+
+> 数式: `forget_level = 4 - depth_level`
+> 実装: `dispatch.py` Step 6.1 / Rust: `pepsis/rust/src/level.rs`
+
 ### 13.4 ワークフロー圏論的構造
 
 > 13.3 の演算子が**組み合わさる**と、より高い圏論的構造が現れる。

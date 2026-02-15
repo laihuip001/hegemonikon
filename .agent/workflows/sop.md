@@ -1,7 +1,7 @@
 ---
-description: K4 Sophia（知恵）を発動し、Perplexityに調査を依頼する。深掘り版調査依頼書を生成。
+description: K4 Sophia（知恵）を発動し、Perplexity/Deep Researcher/Claude Researchに調査を依頼する。深掘り版調査依頼書を生成。
 hegemonikon: K4 Sophia
-version: "7.1"
+version: "7.3"
 skill_ref: ".agent/skills/kairos/k4-sophia/SKILL.md"
 lcm_state: stable
 triggers: ["調べて", "教えて", "Perplexityに聞いて", "パプ君に聞いて", "リサーチ"]
@@ -144,25 +144,47 @@ cd ~/oikos/hegemonikon && \
 
 ---
 
-## PHASE 1a: 経路選択（v7.1 新規）
+## PHASE 1a: 経路選択（v7.2 更新）
 
-> **起源**: 2026-02-12 GEM 試し打ち — Deep Researcher が /sop 品質に匹敵することを検証済み
+> **起源**: 2026-02-12 GEM 試し打ち + 2026-02-15 Claude Research 調査
 > **原則**: 最適な経路を選択し、認知コストを最小化する
 
 | 経路 | エンジン | 特徴 | 最適な場面 |
 |:-----|:---------|:-----|:----------|
 | **A: Perplexity** | Perplexity Pro | 実リアルタイム検索、URL 付き | 最新情報、ファクトチェック、速報 |
 | **B: Deep Researcher** | Gemini GEM (Deep Researcher v2.0) | 構造化テーブル出力、エビデンス階層付き | 学術調査、計算論的分析、体系的レビュー |
-| **C: 両方** | A + B | 相互補完 | 重要テーマ、網羅的調査 |
+| **C: Claude Research** | Claude.ai Research (Max/Pro) | コンテキスト統合型、Google Workspace 連携、MCP 対応 | 個人コンテキスト型調査、企業内ナレッジ横断、45分長時間処理 |
+| **D: 複合** | A/B/C の組合せ | 相互補完・二重検証 | 重要テーマ、網羅的調査 |
 
 ### 経路判定基準
 
+**Level 1: 問いの型で分岐** (2026-02-15 三重調査で実証)
+
 ```
-IF リアルタイム性が重要 → A (Perplexity)
-IF 構造化・学術性が重要 → B (Deep Researcher)
-IF 重要テーマ AND 時間余裕あり → C (両方)
+IF 「What/When/Who」型 (事実確認) → A (Perplexity = Answer Engine)
+IF 「Why/How/関係性」型 (推論・合成) → C (Claude = Research Analyst)
+IF 「All/Comprehensive」型 (網羅)  → B (Gemini = Strategic Advisor)
+IF 学術深度・数値精度が最優先     → B or ChatGPT (= Thorough Investigator)
+```
+
+**Level 2: 技術要件で微調整**
+
+```
+IF 個人コンテキスト統合 (Gmail/Calendar/Docs) → C (Claude Research)
+IF 社内ナレッジベース + MCP → C (Claude Research)
+IF 引用精度が最優先 (コンプライアンス, 報道) → A (Perplexity: 引用精度 90.24%)
+IF 高確度が必要 → D (複合: A→C で尖兵+参謀)
 DEFAULT → A (Perplexity) — 従来と同じ
 ```
+
+> **4社アーキタイプ** (DRACO ベンチマーク + 実地テスト):
+>
+> | ツール | アーキタイプ | HGK メタファー |
+> |:-------|:-------------|:-------------|
+> | Perplexity | Answer Engine (引用精度 90.24%) | 尖兵 |
+> | Claude | Research Analyst (合成・内部データ) | 参謀 |
+> | Gemini | Strategic Advisor (HLE 46.4% SOTA) | 重量級ユニット |
+> | ChatGPT | Thorough Investigator (25-36ページ) | 学者 |
 
 ### 経路 B の使用方法
 
@@ -172,6 +194,24 @@ DEFAULT → A (Perplexity) — 従来と同じ
 4. 結果をこのセッションに共有する or `/eat` で消化
 
 > **GEM レジストリ**: [gem_registry.yaml](file:///home/makaron8426/oikos/hegemonikon/.agent/resources/gem_registry.yaml)
+
+### 経路 C の使用方法
+
+> **起源**: 2026-02-15 三重調査 (A+B+C) で実証。
+> **調査結果**: [eat_claude_research_20260215.md](file:///home/makaron8426/oikos/mneme/.hegemonikon/workflows/eat_claude_research_20260215.md)
+
+1. Claude.ai を開き、「Search and tools」ボタンから **Research トグル ON**
+2. 3柱構造 (Context / Objective / Constraints) でプロンプトを構造化
+3. 処理時間: 通常 5-15分 / 最大 45分
+4. 二重検証: Claude Research → Perplexity で引用精度を裏取り
+
+**アーキテクチャ**: Opus (Lead) + Sonnet (Worker 3-10+ 並列) のオーケストレーター構造
+**コンテキスト**: 200K トークン (作業上限。超過時は自動要約で圧縮)
+**トークン消費**: **標準チャットの ~15倍** — メッセージ上限を急速に消費する。重要テーマに集中使用
+
+**強み**: Google Workspace 横断、MCP 50+コネクタ、長時間処理、100-700+ソース合成
+**弱み**: 引用精度は Perplexity に劣る、トークン消費大 → 二重検証 + 使用回数管理
+**注意**: 曖昧プロンプトだと clarify 質問が挟まりタイムロス (God Tip #17)
 
 ---
 

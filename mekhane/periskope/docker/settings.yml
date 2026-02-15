@@ -1,0 +1,80 @@
+# SearXNG settings for Periskopē
+# Optimized for API usage (JSON output, no UI overhead)
+
+use_default_settings: true
+
+general:
+  instance_name: "Periskopē Search"
+  debug: false
+
+search:
+  safe_search: 0
+  autocomplete: ""
+  default_lang: "ja-JP"
+  formats:
+    - html
+    - json
+
+server:
+  secret_key: "periskope-hgk-searxng-key"
+  limiter: false  # No rate limiting for local use
+  image_proxy: false
+
+ui:
+  static_use_hash: true
+
+engines:
+  # Primary web search
+  - name: google
+    engine: google
+    shortcut: g
+    disabled: false
+
+  - name: bing
+    engine: bing
+    shortcut: b
+    disabled: false
+
+  - name: duckduckgo
+    engine: duckduckgo
+    shortcut: ddg
+    disabled: false
+
+  - name: brave
+    engine: brave
+    shortcut: br
+    disabled: false
+
+  # Academic
+  - name: google scholar
+    engine: google_scholar
+    shortcut: gs
+    disabled: false
+
+  - name: semantic scholar
+    engine: semantic_scholar
+    shortcut: ss
+    disabled: false
+
+  - name: arxiv
+    engine: arxiv
+    shortcut: ax
+    disabled: false
+
+  # Wikipedia
+  - name: wikipedia
+    engine: wikipedia
+    shortcut: wp
+    disabled: false
+
+  # Code
+  - name: github
+    engine: github
+    shortcut: gh
+    disabled: false
+
+  # News
+  - name: google news
+    engine: google_news
+    shortcut: gn
+    disabled: false

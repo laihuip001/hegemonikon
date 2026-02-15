@@ -352,18 +352,21 @@ F (事実) を列挙した後、R では以下を追加で自問する:
 | **L2** | Standard | 設計、分析、通常WF | + BC-8, BC-9(Δ/Ω層), BC-15 | 無印 (`/noe`) |
 | **L3** | Deep | 本質問題、パラダイム転換 | 全 BC + 全フェーズ | `+` 派生 (`/noe+`) |
 
-### 深度 × Thinking 紐づけ (v3.2 追加)
+### 深度 × Thinking 紐づけ (v3.5 更新 — 両モデル統一マッピング)
 
 > **導出**: CoT 2.0 の知見 — 知識タスクでは過剰な内部思考が逆効果になりうる。
-> Gemini 3 の thinking level (LOW/MED/HIGH) と構造的に類似 (操作的類推)。
-> **起源**: 2026-02-13 @read 熟読 — Perplexity プロンプト技法レポートとの摩擦。
+> **起源**: 2026-02-13 @read 熟読 → 2026-02-15 /eat+ 一次ソース検証で両モデルのマッピングを確定。
 
-| Level | Thinking 深度 | 内部思考の使い方 | 例 |
-|:------|:-------------|:----------------|:---|
-| **L0** | **抑制** | 事実検索・単純応答。内部思考は最小限 | `ls`, 知識検索, 確認応答 |
-| **L1** | **軽量** | 実装判断。短い計画→即実行 | `/dev`, コード修正, `/bye` |
-| **L2** | **標準** | 設計・分析。構造化された思考 | `/noe`, `/dia`, `/s` |
-| **L3** | **全展開** | 本質追求。内部 CoT 全展開 + 多角的検証 | `/noe+`, `/o+`, `/ax` |
+| Level | Thinking 深度 | Gemini thinkingLevel | Claude effort | 例 |
+|:------|:-------------|:--------------------|:-------------|:---|
+| **L0** | **抑制** | `minimal` | `low` | `ls`, 知識検索, 確認応答 |
+| **L1** | **軽量** | `low` | `low` | `/dev`, コード修正, `/bye` |
+| **L2** | **標準** | `medium` | `high` | `/noe`, `/dia`, `/s` |
+| **L3** | **全展開** | `high` | `max` | `/noe+`, `/o+`, `/ax` |
+
+> ⚠️ Gemini 3 Pro は thinking 完全無効化不可。`minimal` = 思考しない可能性が高い設定。
+> ⚠️ Claude Opus 4.6 は `thinking: {type: "adaptive"}` + `output_config: {effort: ...}` で制御。
+> ⚠️ Gemini 2.5 系は thinkingLevel 非対応 (thinkingBudget を使用)。
 
 **自己検証**: 「今の深度 = L? に対して、thinking が過剰/不足していないか？」
 
@@ -529,3 +532,4 @@ BC-15 は「外部の人が行動できるか」。BC-17 は「概念が preshea
 *BC v3.2 — 深度×Thinking 紐づけ追加 (2026-02-13)*
 *BC v3.3 — INPUT TAINT 二元化: BC-6 OUTPUT/INPUT 区分 + BC-14 入力経路検証 (2026-02-14)*
 *BC v3.4 — 本音対話フィードバック: BC-8 射提案改善(ハブWF+理由+深度条件)、BC-9 L2+のみ発動、BC-12 実験的例外追加 (2026-02-14)*
+*BC v3.5 — 深度×Thinking 両モデル統一マッピング: Gemini thinkingLevel (minimal/low/medium/high) + Claude effort (low/low/high/max) 追加 (2026-02-15)*

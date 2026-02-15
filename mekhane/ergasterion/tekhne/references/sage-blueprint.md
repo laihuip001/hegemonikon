@@ -123,6 +123,10 @@ SAGE形式は以下を強制する:
 | `<user_input_zone>` | ユーザー入力の隔離（prompt injection 防御） | ✅ |
 | `<constraints>` | 制約ルール（**末尾に配置**） | ✅ |
 | `<input_source>` | コンテキストバインディング | ✅ |
+| `<action_policy>` | 行動ポリシータグ — Claude 4.5+ 向け (Law 7) | 条件付き |
+| `<safety_constraints>` | 安全ガードレール — Claude 4.5+ 向け (Law 7) | 条件付き |
+| `<thinking_config>` | 推論深度制御 — Gemini 3+ 向け (Law 8) | 条件付き |
+| `<workflow_design>` | タスク分解・コンテキスト割当 (Law 9) | 条件付き |
 
 ---
 
@@ -242,6 +246,181 @@ SAGE形式は以下を強制する:
     
     module_config に明示的な risk_level がある場合はそちらが優先。
   </activation>
+</law>
+```
+
+### Law 7: Action Policy Tags — Claude 4.5+/4.6 (2026-02-15 追加, v2 一次ソース修正)
+
+> **消化元**: Claude Prompting Best Practices (platform.claude.com 公式 Docs)
+> **一次ソース検証日**: 2026-02-15
+> **HGK 対応**: Safety Invariants (I-1〜I-6), BC-5 (Proposal First), E6
+
+```xml
+<law id="ACTION_POLICY_TAGS">
+  <definition>
+    Claude 4.5+/4.6 をターゲットとするモジュールでは、行動ポリシーを
+    XML タグで明示的に埋め込む。これにより、ツール利用の過不足
+    (over/under-trigger) を抑制し、安全かつ能動的な行動を促す。
+    
+    ⚠️ Claude Opus 4.5/4.6 はシステムプロンプトに以前のモデルより敏感。
+    過去の「CRITICAL: You MUST...」スタイルは overtrigger を引き起こす。
+    通常の言い回しを使うこと（Anthropic 公式推奨）。
+  </definition>
+  <implementation>
+    <!-- 行動ポリシー: instruction の直前に配置 -->
+    <action_policy>
+      <default_to_action>
+        デフォルトで、提案だけでなく変更を実装せよ。
+        ユーザーの意図が不明な場合は、最も有用なアクションを推測し、
+        推測ではなくツールで不足情報を発見して進めよ。
+      </default_to_action>
+      <investigate_before_answering>
+        質問に答える前に、関連するコード・ドキュメントを
+        実際に読んで確認せよ。記憶や推測で答えてはならない。
+      </investigate_before_answering>
+    </action_policy>
+    <!-- 安全ガードレール: constraints セクション内に配置 -->
+    <safety_constraints>
+      可逆性と潜在的影響を考慮せよ。ローカルで可逆な操作
+      （ファイル編集、テスト実行）は推奨するが、以下は確認を求めること：
+      - 破壊的操作: ファイル/ブランチ削除、rm -rf, DROP TABLE
+      - 不可逆操作: git push --force, git reset --hard
+      - 外部可視操作: コードのpush、PR/issueコメント
+    </safety_constraints>
+    <!-- サブエージェント制御（Claude Opus 4.6 向け） -->
+    <subagent_policy>
+      並列実行可能、独立したコンテキスト、独立ワークストリームの場合に
+      サブエージェントを使用せよ。単純なタスク、逐次操作、
+      単一ファイル編集、ステップ間でコンテキスト共有が必要な場合は直接作業せよ。
+    </subagent_policy>
+  </implementation>
+  <thinking_control>
+    <!-- Claude Opus 4.6: Adaptive Thinking + Effort -->
+    Claude Opus 4.6 では adaptive thinking を使用:
+      thinking: {type: "adaptive"}
+      output_config: {effort: "high"}
+    
+    HGK 深度レベル → Claude effort マッピング:
+      L0 (Bypass)   → effort: low
+      L1 (Quick)    → effort: low
+      L2 (Standard) → effort: high
+      L3 (Deep)     → effort: max
+    
+    注意: Claude Opus 4.5 は extended thinking 無効時に
+    "think" という語に敏感。"consider", "evaluate" に置換すること。
+  </thinking_control>
+  <activation>
+    model_target が Claude Opus 4.5 / Sonnet 4.5 / Opus 4.6 の場合に適用。
+    Gemini 系モデルでは <thinking_config> (Law 8) を使用。
+  </activation>
+  <hgk_mapping>
+    <default_to_action> = E6 ワークフロー実行優先
+    <investigate_before_answering> = BC-16 参照先行義務
+    <safety_constraints> = I-1〜I-6 安全不変条件
+    <subagent_policy> = BC-10 道具利用義務（過剰使用の抑制）
+    adaptive thinking + effort = BC-9 v3.5 深度×Thinking 両モデル統一マッピング
+  </hgk_mapping>
+  <forge_integration>
+    Forge テンプレート生成時の標準タグ:
+    - model_target が Claude Opus 4.6 → <subagent_policy> を自動挿入
+    - model_target が Claude 系 → <thinking_control> (effort) を自動挿入
+    - model_target が Gemini 3+ → <thinking_config> (thinkingLevel) を自動挿入
+    pipeline.py の resolve_thinking_config() でパラメータを自動解決。
+  </forge_integration>
+</law>
+```
+
+### Law 8: Thinking Level Control — Gemini 3+ (2026-02-15 追加, v2 一次ソース修正)
+
+> **消化元**: Gemini 3 Thinking Docs (ai.google.dev 公式)
+> **一次ソース検証日**: 2026-02-15
+> **HGK 対応**: 深度レベルシステム (L0-L3), BC-9 v3.2 深度×Thinking 紐づけ
+
+```xml
+<law id="THINKING_LEVEL_CONTROL">
+  <definition>
+    Gemini 3+ をターゲットとするモジュールでは、推論深度を
+    thinkingLevel パラメータで明示的に制御する。
+    HGK の深度レベル (L0-L3) とモデルの thinkingLevel を対応させ、
+    レイテンシと推論品質のトレードオフを最適化する。
+    
+    ⚠️ Gemini 3 Pro は thinking を完全無効化できない。
+    Gemini 3 Flash の minimal は「思考しない可能性が高い」設定。
+    デフォルト（未指定時）は "high"。
+    Gemini 2.5 系は thinkingLevel 非対応（thinkingBudget を使用）。
+  </definition>
+  <implementation>
+    <!-- module_config 内に配置 -->
+    <thinking_config>
+      <thinkingLevel>{minimal|low|medium|high}</thinkingLevel>
+      <verbosity>{concise|standard|detailed}</verbosity>
+    </thinking_config>
+  </implementation>
+  <hgk_depth_mapping>
+    <!-- HGK 深度レベル → Gemini thinkingLevel -->
+    L0 (Bypass)   → thinkingLevel: minimal, verbosity: concise
+    L1 (Quick)    → thinkingLevel: low,     verbosity: concise
+    L2 (Standard) → thinkingLevel: medium,  verbosity: standard
+    L3 (Deep)     → thinkingLevel: high,    verbosity: detailed
+  </hgk_depth_mapping>
+  <activation>
+    model_target が Gemini 3 Pro / Gemini 3 Flash の場合に適用。
+    Claude 系モデルでは Law 7 の thinking_control セクションで制御。
+  </activation>
+</law>
+```
+
+### Law 9: Context-First Workflow Design (2026-02-15 追加)
+
+> **消化元**: Context Engineering シフト (X/Anthropic 2026-02)
+> **HGK 対応**: 第零原則「意志より環境」、/plan WF
+
+```xml
+<law id="CONTEXT_FIRST_WORKFLOW_DESIGN">
+  <definition>
+    複雑なタスクを扱うモジュールでは、プロンプト本文の前に
+    「ワークフロー設計フェーズ」を明示的に配置する。
+    単一プロンプトの最適化より、タスク分解・コンテキスト注入・
+    出力ルーティングの設計が優先される。
+  </definition>
+  <implementation>
+    <!-- instruction 内の protocol の最初に配置 -->
+    <workflow_design>
+      <step_0_decompose>
+        **タスク分解:**
+        目標を 2-5 のサブタスクに分解。
+        各サブタスクに必要なコンテキストを特定。
+      </step_0_decompose>
+      <step_0_context_check>
+        **情報完全性チェック:**
+        各サブタスクに必要な情報がコンテキスト内に存在するか確認。
+        不足があれば実行せずに報告。
+      </step_0_context_check>
+      <step_0_outline>
+        **構造化アウトライン:**
+        回答の骨格を先に生成。詳細は次ステップで埋める。
+      </step_0_outline>
+    </workflow_design>
+    <!-- 以降、通常の protocol ステップが続く -->
+  </implementation>
+  <activation>
+    以下の条件で発動:
+    - タスクが 3+ サブタスクに分解可能
+    - 複数のコンテキストソースが必要
+    - 出力が複数の形式を含む
+    
+    Archetype → 発動マッピング:
+      Precision → 常に発動
+      Safety   → 常に発動
+      Autonomy → 条件付き（複雑度に応じて）
+      Creative → 条件付き（構造的タスクのみ）
+      Speed    → 省略可
+  </activation>
+  <hgk_basis>
+    第零原則「意志より環境」: 個別プロンプトの改善 (意志) より、
+    ワークフロー構造の設計 (環境) が認知性能を決定する。
+    Gemini 3 公式 Plan-then-Answer パターンと整合。
+  </hgk_basis>
 </law>
 ```
 

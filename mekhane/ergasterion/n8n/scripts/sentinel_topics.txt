@@ -1,0 +1,8 @@
+# Sentinel Topics — 自動走査する論文トピック
+# 1行1トピック。# で始まる行はコメント
+active inference
+free energy principle
+cognitive architecture
+meta-learning
+attention mechanism retrieval
+prompt engineering LLM

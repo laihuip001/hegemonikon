@@ -109,44 +109,66 @@ class EpsilonDeficitFactory:
         "A": ["mekhane/basanos", "mekhane/fep", ".agent/workflows"],
     }
 
-    # Map theorem IDs to known workflow file basenames
-    # Verified against kernel/ definitions and .agent/workflows/ frontmatter
-    THEOREM_TO_WF: dict[str, list[str]] = {
-        # O-series (Ousia)
-        "O1": ["noe"],   # Noēsis
-        "O2": ["bou"],   # Boulēsis
-        "O3": ["zet"],   # Zētēsis
-        "O4": ["ene"],   # Energeia
-        # S-series (Schema)
-        "S1": ["met"],   # Metron
-        "S2": ["mek"],   # Mekhanē
-        "S3": ["sta"],   # Stathmos
-        "S4": ["pra"],   # Praxis
-        # H-series (Hormē)
-        "H1": ["pro"],   # Propatheia
-        "H2": ["pis"],   # Pistis
-        "H3": ["ore"],   # Orexis
-        "H4": ["dox"],   # Doxa
-        # P-series (Perigraphē)
-        "P1": ["kho"],   # Khōra
-        "P2": ["hod"],   # Hodos
-        "P3": ["tro"],   # Trokhia
-        "P4": ["tek"],   # Tekhnē
-        # K-series (Kairos)
-        "K1": ["euk"],   # Eukairia
-        "K2": ["chr"],   # Chronos
-        "K3": ["tel"],   # Telos
-        "K4": ["sop"],   # Sophia
-        # A-series (Akribeia)
-        "A1": ["pat"],   # Pathos
-        "A2": ["dia"],   # Krisis
-        "A3": ["gno"],   # Gnōmē
-        "A4": ["epi"],   # Epistēmē
+    # Fallback static mapping (used only if auto-detection fails)
+    _FALLBACK_THEOREM_TO_WF: dict[str, list[str]] = {
+        "O1": ["noe"], "O2": ["bou"], "O3": ["zet"], "O4": ["ene"],
+        "S1": ["met"], "S2": ["mek"], "S3": ["sta"], "S4": ["pra"],
+        "H1": ["pro"], "H2": ["pis"], "H3": ["ore"], "H4": ["dox"],
+        "P1": ["kho"], "P2": ["hod"], "P3": ["tro"], "P4": ["tek"],
+        "K1": ["euk"], "K2": ["chr"], "K3": ["tel"], "K4": ["sop"],
+        "A1": ["pat"], "A2": ["dia"], "A3": ["gno"], "A4": ["epi"],
     }
 
     def __init__(self, g_struct: GStruct, project_root: Path | str) -> None:
         self.g_struct = g_struct
         self.project_root = Path(project_root)
+        self.THEOREM_TO_WF = self._build_theorem_to_wf()
+
+    def _build_theorem_to_wf(self) -> dict[str, list[str]]:
+        """Auto-generate THEOREM_TO_WF from .agent/workflows/ frontmatter.
+
+        Parses YAML frontmatter `modules: [X1, X2]` from each WF file
+        and builds the theorem→WF basename mapping dynamically.
+        Falls back to static dict if directory doesn't exist or parsing fails.
+        """
+        wf_dir = self.project_root / ".agent" / "workflows"
+        if not wf_dir.is_dir():
+            return dict(self._FALLBACK_THEOREM_TO_WF)
+
+        mapping: dict[str, list[str]] = {}
+        theorem_re = re.compile(r"^[OSHPKA][1-4]$")
+
+        for wf_path in sorted(wf_dir.glob("*.md")):
+            basename = wf_path.stem
+            # Skip CCL macros and non-theorem WFs
+            if basename.startswith("ccl-"):
+                continue
+
+            try:
+                text = wf_path.read_text(encoding="utf-8")
+                fm_match = re.match(r"^---\s*\n(.*?)\n---", text, re.DOTALL)
+                if not fm_match:
+                    continue
+
+                import yaml
+                fm = yaml.safe_load(fm_match.group(1)) or {}
+                modules = fm.get("modules", [])
+
+                if isinstance(modules, list):
+                    for mod in modules:
+                        mod_str = str(mod).strip()
+                        if theorem_re.match(mod_str):
+                            if mod_str not in mapping:
+                                mapping[mod_str] = []
+                            if basename not in mapping[mod_str]:
+                                mapping[mod_str].append(basename)
+            except Exception:
+                continue
+
+        # Merge with fallback for any missing theorems
+        result = dict(self._FALLBACK_THEOREM_TO_WF)
+        result.update(mapping)
+        return result
 
     def detect_impl_deficits(self) -> list[Deficit]:
         """Detect ε-impl: kernel definitions without implementations."""

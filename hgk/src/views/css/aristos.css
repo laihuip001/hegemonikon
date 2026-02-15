@@ -1,0 +1,123 @@
+/* Aristos L2 Evolution Dashboard */
+
+.ar-series-section {
+    margin-bottom: 2rem;
+}
+
+.ar-series-section h2 {
+    font-size: 1.2rem;
+    margin-bottom: 0.75rem;
+    padding-bottom: 0.25rem;
+    border-bottom: 1px solid rgba(139, 148, 158, 0.2);
+}
+
+.ar-theorem-card {
+    margin-bottom: 0.75rem;
+    padding: 1rem 1.25rem;
+    transition: transform 0.15s ease;
+}
+
+.ar-theorem-card:hover {
+    transform: translateX(4px);
+}
+
+.ar-theorem-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 0.75rem;
+}
+
+.ar-theorem-name {
+    font-weight: 700;
+    font-size: 1.1rem;
+    font-family: 'JetBrains Mono', monospace;
+}
+
+.ar-theorem-scalar {
+    font-size: 0.85rem;
+    color: #8b949e;
+    font-family: 'JetBrains Mono', monospace;
+}
+
+.ar-theorem-gen {
+    font-size: 0.75rem;
+    color: #8b949e;
+    background: rgba(139, 148, 158, 0.1);
+    padding: 0.15rem 0.5rem;
+    border-radius: 4px;
+    margin-left: auto;
+}
+
+/* Fitness bars */
+.ar-fitness-bars {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+
+.ar-fitness-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.ar-fitness-label {
+    font-size: 0.75rem;
+    color: #8b949e;
+    width: 70px;
+    text-align: right;
+}
+
+.ar-fitness-track {
+    flex: 1;
+    height: 6px;
+    background: rgba(139, 148, 158, 0.15);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.ar-fitness-fill {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 0.5s ease;
+}
+
+.ar-fitness-value {
+    font-size: 0.7rem;
+    color: #8b949e;
+    width: 45px;
+    font-family: 'JetBrains Mono', monospace;
+}
+
+/* Weights detail */
+.ar-weights-detail {
+    margin-top: 0.5rem;
+}
+
+.ar-weights-detail summary {
+    font-size: 0.8rem;
+    color: #8b949e;
+    cursor: pointer;
+    user-select: none;
+}
+
+.ar-weights-detail summary:hover {
+    color: #c9d1d9;
+}
+
+.ar-weights-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem 0.75rem;
+    margin-top: 0.35rem;
+    padding: 0.5rem;
+    background: rgba(0, 0, 0, 0.15);
+    border-radius: 4px;
+}
+
+.ar-weight-item {
+    font-size: 0.7rem;
+    color: #8b949e;
+    font-family: 'JetBrains Mono', monospace;
+}

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # PROOF: [L2/インフラ] <- mekhane/api/routes/
-# PURPOSE: Chat API — Gemini / Cortex / Claude (LS経由) の統合 LLM Chat プロキシ
+# PURPOSE: Chat API — OchemaService 経由の統合 LLM Chat プロキシ
 """
 Chat Router — LLM Chat の REST API エンドポイント
 
@@ -8,6 +8,8 @@ Chat Router — LLM Chat の REST API エンドポイント
   POST /chat/send    — メッセージ送信 (SSE ストリーミング)
   POST /chat/cortex  — Cortex generateChat (無課金 Gemini 2MB)
   GET  /chat/models  — 利用可能なモデル一覧 (LS 接続状態含む)
+
+消費者として OchemaService に委譲し、SSE フォーマット変換のみ担う。
 """
 
 from __future__ import annotations
@@ -16,12 +18,18 @@ import asyncio
 import json
 import logging
 import os
-from typing import Any, Optional
+from typing import Any
 
 import httpx
 from fastapi import APIRouter, HTTPException
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
+
+from mekhane.ochema.service import (
+    AVAILABLE_MODELS,
+    CLAUDE_MODEL_MAP,
+    OchemaService,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -64,26 +72,8 @@ class CortexChatRequest(BaseModel):
     include_thinking_summaries: bool = False
 
 
-AVAILABLE_MODELS: dict[str, str] = {
-    "gemini-3-pro-preview": "Gemini 3 Pro Preview",
-    "gemini-3-flash-preview": "Gemini 3 Flash Preview",
-    "gemini-2.5-pro": "Gemini 2.5 Pro",
-    "gemini-2.5-flash": "Gemini 2.5 Flash",
-    "gemini-2.0-flash": "Gemini 2.0 Flash",
-    "cortex-gemini": "Cortex Gemini (無課金 2MB)",
-    "claude-sonnet": "Claude Sonnet 4.5 (LS経由)",
-    "claude-opus": "Claude Opus 4.6 (LS経由)",
-}
-
-# Claude model alias mapping (chat model name → proto enum)
-CLAUDE_MODEL_MAP: dict[str, str] = {
-    "claude-sonnet": "MODEL_CLAUDE_4_5_SONNET_THINKING",
-    "claude-opus": "MODEL_PLACEHOLDER_M26",
-}
-
 GEMINI_API_BASE = "https://generativelanguage.googleapis.com/v1beta/models"
 CORTEX_CHAT_URL = "https://cloudcode-pa.googleapis.com/v1internal:generateChat"
-CORTEX_STREAM_URL = "https://cloudcode-pa.googleapis.com/v1internal:streamGenerateChat"
 
 
 def _get_api_key() -> str:
@@ -92,49 +82,6 @@ def _get_api_key() -> str:
     if not key:
         key = os.getenv("VITE_GOOGLE_API_KEY", "")
     return key
-
-
-def _get_cortex_token() -> Optional[str]:
-    """CortexClient の _get_token ロジックを再利用してアクセストークンを取得する。"""
-    try:
-        from mekhane.ochema.cortex_client import CortexClient
-        client = CortexClient()
-        return client._get_token()
-    except Exception as e:
-        logger.error("Cortex token acquisition failed: %s", e)
-        return None
-
-
-def _get_cortex_project(token: str) -> Optional[str]:
-    """CortexClient の _get_project ロジックを再利用してプロジェクト ID を取得する。"""
-    try:
-        from mekhane.ochema.cortex_client import CortexClient
-        client = CortexClient()
-        return client._get_project(token)
-    except Exception as e:
-        logger.error("Cortex project retrieval failed: %s", e)
-        return None
-
-
-# --- LS Client (Claude) ---
-
-_ls_client_cache: Optional["AntigravityClient"] = None
-
-
-def _get_ls_client() -> Optional["AntigravityClient"]:
-    """AntigravityClient を遅延初期化。LS 未起動時は None を返す。"""
-    global _ls_client_cache
-    try:
-        from mekhane.ochema.antigravity_client import AntigravityClient
-        if _ls_client_cache is None:
-            _ls_client_cache = AntigravityClient()
-        # Quick health check — verify LS is still alive
-        _ls_client_cache.get_status()
-        return _ls_client_cache
-    except Exception as e:
-        logger.debug("LS client unavailable: %s", e)
-        _ls_client_cache = None
-        return None
 
 
 # --- Endpoints ---
@@ -159,7 +106,6 @@ async def chat_send(req: ChatRequest):
         )
 
     if req.model not in AVAILABLE_MODELS:
-        # Claude models already handled above
         raise HTTPException(
             status_code=400,
             detail=f"Unknown model: {req.model}. Available: {list(AVAILABLE_MODELS.keys())}",
@@ -209,20 +155,14 @@ async def chat_send(req: ChatRequest):
 
 
 async def _claude_chat_from_gemini_format(req: ChatRequest):
-    """Gemini 形式の ChatRequest を AntigravityClient 経由で Claude に送信する。"""
-    client = _get_ls_client()
-    if not client:
+    """Gemini 形式の ChatRequest を OchemaService 経由で Claude に送信する。"""
+    svc = OchemaService.get()
+
+    if not svc.ls_available:
         raise HTTPException(
             status_code=503,
             detail="Language Server が起動していません。IDE を開いてから再試行してください。",
         )
-
-    # Gemini contents → 単一メッセージに結合
-    parts: list[str] = []
-    for content in req.contents:
-        text = content.parts[0].get("text", "") if content.parts else ""
-        prefix = "User: " if content.role == "user" else "Assistant: "
-        parts.append(f"{prefix}{text}")
 
     # 最後の user メッセージだけを送信 (会話履歴は LS 側で管理)
     user_message = ""
@@ -243,22 +183,15 @@ async def _claude_chat_from_gemini_format(req: ChatRequest):
             if sys_text:
                 user_message = f"[System] {sys_text}\n\n{user_message}"
 
-    proto_model = CLAUDE_MODEL_MAP.get(req.model, "MODEL_CLAUDE_4_5_SONNET_THINKING")
-
     logger.info(
-        "Claude Chat request: model=%s proto=%s msg_len=%d",
-        req.model, proto_model, len(user_message),
+        "Claude Chat request: model=%s msg_len=%d",
+        req.model, len(user_message),
     )
 
     async def stream_claude():
-        """AntigravityClient.ask() をスレッドで実行し、Gemini SSE 互換で返す。"""
+        """OchemaService.ask_async() で Gemini SSE 互換レスポンスを返す。"""
         try:
-            response = await asyncio.to_thread(
-                client.ask,
-                user_message,
-                model=proto_model,
-                timeout=120.0,
-            )
+            response = await svc.ask_async(user_message, model=req.model)
 
             if not response.text:
                 yield 'data: {"error": {"message": "Empty response from Claude", "code": 0}}\n\n'
@@ -293,14 +226,12 @@ async def _claude_chat_from_gemini_format(req: ChatRequest):
 
 async def _cortex_chat_from_gemini_format(req: ChatRequest):
     """Gemini 形式の ChatRequest を Cortex generateChat 形式に変換して実行する。"""
-    # Gemini contents → Cortex history + user_message に変換
     history: list[dict[str, Any]] = []
     user_message = ""
 
     for content in req.contents:
         text = content.parts[0].get("text", "") if content.parts else ""
         if content.role == "user":
-            # 最後の user メッセージは user_message に
             if user_message:
                 history.append({"author": 1, "content": user_message})
             user_message = text
@@ -319,19 +250,20 @@ async def _cortex_chat_from_gemini_format(req: ChatRequest):
 
 @router.post("/chat/cortex")
 async def cortex_chat(req: CortexChatRequest):
-    """Cortex generateChat — 無課金 Gemini 2MB コンテキスト。"""
-    token = _get_cortex_token()
-    if not token:
-        raise HTTPException(
-            status_code=500,
-            detail="Cortex OAuth トークンが取得できません。gemini-cli 認証を実行してください。",
-        )
+    """Cortex generateChat — 無課金 Gemini 2MB コンテキスト。
 
-    project = _get_cortex_project(token)
-    if not project:
+    OchemaService の CortexClient を使って認証を委譲。
+    """
+    svc = OchemaService.get()
+
+    try:
+        cortex = svc._get_cortex_client()
+        token = cortex._get_token()
+        project = cortex._get_project(token)
+    except Exception as e:
         raise HTTPException(
             status_code=500,
-            detail="Cortex プロジェクトIDが取得できません。",
+            detail=f"Cortex 認証エラー: {e}",
         )
 
     body: dict[str, Any] = {
@@ -377,8 +309,6 @@ async def cortex_chat(req: CortexChatRequest):
                     yield 'data: {"error": {"message": "Empty response from Cortex", "code": 0}}\n\n'
                     return
 
-                # Cortex の markdown レスポンスを Gemini SSE 互換形式で返す
-                # Frontend の readSSEStream は candidates[0].content.parts[0].text を期待
                 gemini_compat = {
                     "candidates": [{
                         "content": {
@@ -409,19 +339,6 @@ async def cortex_chat(req: CortexChatRequest):
 
 @router.get("/chat/models")
 async def chat_models() -> dict[str, Any]:
-    """利用可能なモデル一覧を返す。Cortex / LS の認証状態も含む。"""
-    cortex_available = False
-    try:
-        token = _get_cortex_token()
-        cortex_available = token is not None
-    except Exception:
-        pass
-
-    ls_available = _get_ls_client() is not None
-
-    return {
-        "models": AVAILABLE_MODELS,
-        "default": "gemini-3-pro-preview",
-        "cortex_available": cortex_available,
-        "ls_available": ls_available,
-    }
+    """利用可能なモデル一覧を返す。OchemaService に委譲。"""
+    svc = OchemaService.get()
+    return svc.models()

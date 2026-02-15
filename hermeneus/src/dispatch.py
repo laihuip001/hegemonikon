@@ -58,6 +58,11 @@ class DispatchResult(TypedDict, total=False):
     exhaustive_warnings: List[str]      # 網羅性チェック警告
     parallel_warnings: List[str]        # 並列安全性チェック警告
     route_context: RouteContext         # Aristos ルーティング文脈
+    # C3 Forgetful Functor 統合
+    forget_level: int                   # 0-4: Nothing/Context/Design/Impl/All
+    forget_mapping: Dict[str, int]      # WF ID → forget_level
+    forget_names: Dict[int, str]        # level → 名称 (表示用)
+    forget_deficits: List[Dict[str, Any]]  # F7: Basanos 忘却回復 deficits
 
 
 # PURPOSE: AST をインデント付きで木構造表示
@@ -601,7 +606,135 @@ def dispatch(ccl_expr: str) -> DispatchResult:
         depth_level = 2
     result["depth_level"] = depth_level
 
-    # Step 6.1: Adaptive Depth トリガー (BC-18 v3.5)
+    # Step 6.1: Forgetful Functor — 忘却レベル計算 (C3)
+    # 核心: depth_level と forget_level は逆相関。深い思考 = 多く保存。
+    # forget_level = 4 - depth_level (depth 0-3 → forget 4-1)
+    FORGET_NAMES = {0: "Nothing", 1: "Context", 2: "Design", 3: "Impl", 4: "All"}
+    forget_level = max(0, min(4, 4 - depth_level))  # clamp to [0, 4]
+    result["forget_level"] = forget_level
+    result["forget_names"] = FORGET_NAMES
+
+    # per-WF 忘却マッピング: AST の operators フィールドから個別忘却レベルを計算
+    forget_mapping: Dict[str, int] = {}
+
+    def _collect_wf_operators(node: Any) -> Dict[str, list]:
+        """AST を再帰走査し、WF ID → operators リストを収集。"""
+        from hermeneus.src.ccl_ast import (
+            Workflow as WfNode, Oscillation, Fusion, Sequence,
+            ColimitExpansion, ForLoop, IfCondition, Pipeline, Parallel,
+            OpType as _OpType
+        )
+        result_map: Dict[str, list] = {}
+        if isinstance(node, WfNode):
+            result_map[f"/{node.id}"] = node.operators
+        elif isinstance(node, Oscillation):
+            result_map.update(_collect_wf_operators(node.left))
+            result_map.update(_collect_wf_operators(node.right))
+        elif isinstance(node, Fusion):
+            result_map.update(_collect_wf_operators(node.left))
+            result_map.update(_collect_wf_operators(node.right))
+        elif isinstance(node, (Sequence, Pipeline, Parallel)):
+            for child in getattr(node, 'steps', getattr(node, 'branches', [])):
+                result_map.update(_collect_wf_operators(child))
+        elif isinstance(node, (ForLoop, IfCondition)):
+            result_map.update(_collect_wf_operators(getattr(node, 'body', None)))
+        elif isinstance(node, ColimitExpansion):
+            result_map.update(_collect_wf_operators(node.body))
+        return result_map
+
+    from hermeneus.src.ccl_ast import OpType
+    wf_ops = _collect_wf_operators(result.get("ast"))
+    for wf_id, ops in wf_ops.items():
+        # DEEPEN (+) → Context (1), CONDENSE (-) → Impl (3), 無印 → Design (2)
+        if OpType.DEEPEN in ops:
+            forget_mapping[wf_id] = 1   # Context: 文脈まで保存
+        elif OpType.CONDENSE in ops:
+            forget_mapping[wf_id] = 3   # Impl: 実装まで忘却
+        else:
+            forget_mapping[wf_id] = 2   # Design: 標準
+    result["forget_mapping"] = forget_mapping
+
+    # Step 6.1b: 忘却レベルの合成則 (F5)
+    # Sequence/Fusion = max (pessimistic: 最大忘却に引きずられる)
+    # Oscillation = min (optimistic: 反復で情報が回復する)
+    def _compose_forget_levels(node: Any, fmap: Dict[str, int]) -> int:
+        """AST 構造に基づく忘却レベルの合成。"""
+        from hermeneus.src.ccl_ast import (
+            Workflow as WfNode, Oscillation as Osc, Fusion as Fus,
+            Sequence as Seq, Pipeline as Pipe, Parallel as Par,
+            ForLoop as FLp, IfCondition as IfC, ColimitExpansion as Col
+        )
+        if isinstance(node, WfNode):
+            return fmap.get(f"/{node.id}", 2)
+        elif isinstance(node, Osc):
+            l = _compose_forget_levels(node.left, fmap)
+            r = _compose_forget_levels(node.right, fmap)
+            if getattr(node, 'divergent', False):
+                # ~! 発散振動: max — 情報が散乱する
+                return max(l, r)
+            else:
+                # ~ / ~* 収束振動: min — 反復は情報を回復する
+                return min(l, r)
+        elif isinstance(node, Fus):
+            # Fusion: max — 融合は保守的
+            l = _compose_forget_levels(node.left, fmap)
+            r = _compose_forget_levels(node.right, fmap)
+            return max(l, r)
+        elif isinstance(node, (Seq, Pipe)):
+            # Sequence/Pipeline: max — 順次は情報が減衰する
+            children = getattr(node, 'steps', [])
+            if not children:
+                return 2
+            return max(_compose_forget_levels(c, fmap) for c in children)
+        elif isinstance(node, Par):
+            # Parallel: min — 並列は最も保存する分岐が活きる
+            branches = getattr(node, 'branches', [])
+            if not branches:
+                return 2
+            return min(_compose_forget_levels(c, fmap) for c in branches)
+        elif isinstance(node, (FLp, IfC)):
+            body = getattr(node, 'body', None)
+            if body:
+                return _compose_forget_levels(body, fmap)
+            return 2
+        elif isinstance(node, Col):
+            return _compose_forget_levels(node.body, fmap)
+        return 2  # fallback: Design
+
+    ast_node = result.get("ast")
+    if ast_node and forget_mapping:
+        composed = _compose_forget_levels(ast_node, forget_mapping)
+        result["forget_level"] = composed  # 合成後の値で上書き
+
+    # Step 6.1c: Basanos 忘却回復 deficits (F7)
+    # forget_level >= 2 の WF に対し、忘却された情報を問う deficit を生成
+    # Basanos が実装されたときに consume する接続点
+    forget_deficits: list = []
+    PRESERVED_INFO = {
+        1: ["context", "design", "impl"],   # Context: 全保存
+        2: ["design", "impl"],              # Design: 設計+実装
+        3: ["impl"],                        # Impl: 実装のみ
+        4: [],                              # All: 全忘却
+    }
+    FORGOTTEN_INFO = {
+        1: [],                              # Context: なし
+        2: ["context"],                     # Design: 文脈を忘却
+        3: ["context", "design"],           # Impl: 文脈+設計を忘却
+        4: ["context", "design", "impl"],   # All: 全忘却
+    }
+    for wf_id, fl in forget_mapping.items():
+        if fl >= 2:  # Design 以上の忘却
+            forget_deficits.append({
+                "wf": wf_id,
+                "forget_level": fl,
+                "forget_name": FORGET_NAMES.get(fl, "Unknown"),
+                "forgotten": FORGOTTEN_INFO.get(fl, []),
+                "preserved": PRESERVED_INFO.get(fl, []),
+                "question_type": "recovery",
+            })
+    result["forget_deficits"] = forget_deficits
+
+    # Step 6.2: Adaptive Depth トリガー (BC-18 v3.5)
     result["adaptive_depth"] = {
         "current_level": depth_level,
         "triggers": [
@@ -708,6 +841,22 @@ def dispatch(ccl_expr: str) -> DispatchResult:
         sections.append(uml_post)
     if morphism_block:
         sections.append(morphism_block)
+    # Forgetful Functor セクション: L2+ で忘却レベルを表示
+    if depth_level >= 2 and forget_mapping:
+        forget_rows = []
+        for wf_id, fl in forget_mapping.items():
+            fl_name = FORGET_NAMES.get(fl, "?")
+            preserved = [FORGET_NAMES[i] for i in range(fl, 5) if i > 0]
+            preserved_str = " + ".join(preserved) if preserved else "—"
+            forget_rows.append(f"  | {wf_id} | G{fl} ({fl_name}) | {preserved_str} |")
+        forget_section = (
+            "【🔮 Forgetful Functor】(C3 — 忘却レベル)\n"
+            f"  全体忘却レベル: G{forget_level} ({FORGET_NAMES[forget_level]})\n"
+            "  | WF | ForgetLevel | 保存される情報 |\n"
+            "  |:---|:------------|:-------------|\n"
+            + "\n".join(forget_rows)
+        )
+        sections.append(forget_section)
     # Adaptive Depth: L1 以下のとき深度上昇トリガーを表示
     if depth_level <= 1:
         ad_section = """【📈 Adaptive Depth】(実行中に以下を検知したら深度を上げよ)

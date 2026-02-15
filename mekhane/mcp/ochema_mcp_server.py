@@ -94,40 +94,15 @@ server = Server(
 )
 log("Server initialized")
 
-# Lazy-loaded client instances
-_client = None
-_cortex_client = None
-
-
-# PURPOSE: get_client — AntigravityClient のシングルトン取得
-def get_client():
-    """AntigravityClient をシングルトンで取得。"""
-    global _client
-    if _client is None:
-        try:
-            with StdoutSuppressor():
-                from mekhane.ochema.antigravity_client import AntigravityClient
-            _client = AntigravityClient()
-            log(f"Client initialized: PID={_client.pid} Port={_client.port}")
-        except Exception as e:
-            log(f"Client init error: {e}")
-            raise
-    return _client
-
-
-# PURPOSE: get_cortex_client — CortexClient のシングルトン取得 (Gemini API 直叩き)
-def get_cortex_client(model: str = "gemini-2.0-flash"):
-    """CortexClient をシングルトンで取得。LS 不要、Gemini 直叩き。"""
-    global _cortex_client
-    if _cortex_client is None:
-        try:
-            from mekhane.ochema.cortex_client import CortexClient
-            _cortex_client = CortexClient(model=model)
-            log(f"CortexClient initialized: model={model}")
-        except Exception as e:
-            log(f"CortexClient init error: {e}")
-            raise
-    return _cortex_client
+# OchemaService — unified LLM service (singleton)
+# PURPOSE: get_service — OchemaService シングルトン取得
+def get_service():
+    """OchemaService をシングルトンで取得。"""
+    with StdoutSuppressor():
+        from mekhane.ochema.service import OchemaService
+    svc = OchemaService.get()
+    log(f"OchemaService: {svc}")
+    return svc
 
 # PURPOSE: [L2-auto] List available tools.
 
@@ -256,10 +231,10 @@ async def call_tool(name: str, arguments: dict):
             return [TextContent(type="text", text="Error: message is required")]
 
         try:
-            client = get_client()
+            svc = get_service()
             log(f"Sending to {model}: {message[:50]}...")
 
-            response = client.ask(message, model=model, timeout=timeout)
+            response = svc.ask(message, model=model, timeout=timeout)
 
             output_lines = [
                 "# Ochēma LLM Response\n",
@@ -304,10 +279,10 @@ async def call_tool(name: str, arguments: dict):
             return [TextContent(type="text", text="Error: message is required")]
 
         try:
-            client = get_cortex_client(model)
-            log(f"CortexClient asking {model}: {message[:50]}...")
+            svc = get_service()
+            log(f"Cortex asking {model}: {message[:50]}...")
 
-            response = client.ask(
+            response = svc.ask(
                 message,
                 model=model,
                 system_instruction=system_instruction,
@@ -338,8 +313,8 @@ async def call_tool(name: str, arguments: dict):
 
     elif name == "cortex_quota":
         try:
-            client = get_cortex_client()
-            quota = client.retrieve_quota()
+            svc = get_service()
+            quota = svc.quota().get("cortex", {})
 
             output_lines = ["# Gemini Quota\n"]
             output_lines.append("| Model | Remaining | Reset |")
@@ -361,17 +336,21 @@ async def call_tool(name: str, arguments: dict):
 
     elif name == "status":
         try:
-            client = get_client()
-            status = client.get_status()
+            svc = get_service()
+            svc_status = svc.status()
 
-            user_status = status.get("userStatus", {})
-            output_lines = [
-                "# Ochēma Status\n",
-                f"- **PID**: {client.pid}",
-                f"- **Port**: {client.port}",
-                f"- **Workspace**: {client.workspace}",
-                f"- **Name**: {user_status.get('name', 'N/A')}",
-            ]
+            output_lines = ["# Ochēma Status\n"]
+            ls_info = svc_status.get("ls", {})
+            if ls_info:
+                output_lines.extend([
+                    f"- **PID**: {ls_info.get('pid', 'N/A')}",
+                    f"- **Port**: {ls_info.get('port', 'N/A')}",
+                    f"- **Workspace**: {ls_info.get('workspace', 'N/A')}",
+                    f"- **Name**: {ls_info.get('name', 'N/A')}",
+                ])
+            else:
+                output_lines.append("- **LS**: unavailable")
+            output_lines.append(f"- **Cortex**: {'✓' if svc_status.get('cortex_available') else '✗'}")
 
             log("Status returned")
             return [TextContent(type="text", text="\n".join(output_lines))]
@@ -382,18 +361,21 @@ async def call_tool(name: str, arguments: dict):
 
     elif name == "models":
         try:
-            client = get_client()
-            models = client.list_models()
+            svc = get_service()
+            ls_models = svc.ls_models()
 
             output_lines = ["# Available Models\n"]
-            output_lines.append("| Model | Label | Remaining |")
-            output_lines.append("|:------|:------|----------:|")
-            for m in models:
-                output_lines.append(
-                    f"| `{m['name']}` | {m['label']} | {m['remaining']}% |"
-                )
+            if ls_models:
+                output_lines.append("| Model | Label | Remaining |")
+                output_lines.append("|:------|:------|----------:|")
+                for m in ls_models:
+                    output_lines.append(
+                        f"| `{m['name']}` | {m['label']} | {m['remaining']}% |"
+                    )
+            else:
+                output_lines.append("*LS unavailable — LS models not shown*")
 
-            log(f"Models listed: {len(models)}")
+            log(f"Models listed: {len(ls_models)}")
             return [TextContent(type="text", text="\n".join(output_lines))]
 
         except Exception as e:
@@ -402,11 +384,14 @@ async def call_tool(name: str, arguments: dict):
 
     elif name == "session_info":
         try:
-            client = get_client()
+            svc = get_service()
+            ls_client = svc._get_ls_client()
+            if not ls_client:
+                return [TextContent(type="text", text="Error: Language Server is not available")]
             conv_id = arguments.get("conversation_id")
 
             # Fetch all trajectories
-            all_data = client._rpc(
+            all_data = ls_client._rpc(
                 "exa.language_server_pb.LanguageServerService/GetAllCascadeTrajectories", {}
             )
             summaries = all_data.get("trajectorySummaries", {})

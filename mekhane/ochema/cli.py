@@ -51,33 +51,56 @@ def cmd_models(args: argparse.Namespace) -> None:
 # PURPOSE: [L2-auto] LLM にメッセージを送信し、応答を表示。
 def cmd_ask(args: argparse.Namespace) -> None:
     """LLM にメッセージを送信し、応答を表示。"""
-    client = AntigravityClient(workspace=args.workspace)
     message = " ".join(args.message)
     model = args.model
+    use_cortex = getattr(args, "cortex", False)
 
-    print(f"📤 Sending to {model}...")
-    print(f"   Message: {message[:80]}{'...' if len(message) > 80 else ''}")
-    print()
-
-    try:
-        response = client.ask(message, model=model, timeout=args.timeout)
-        if response.thinking:
-            print("💭 Thinking:")
-            print(f"   {response.thinking[:200]}...")
-            print()
-        print("💬 Response:")
-        print(response.text)
+    if use_cortex:
+        # OchemaService 経由で Cortex API を使用
+        from mekhane.ochema.service import OchemaService
+        svc = OchemaService.get()
+        cortex_model = model if model != DEFAULT_MODEL else "gemini-2.0-flash"
+        print(f"📤 Sending to Cortex ({cortex_model})...")
+        print(f"   Message: {message[:80]}{'...' if len(message) > 80 else ''}")
         print()
-        print(f"───────────────────────────────────────────")
-        print(f"  Model: {response.model}")
-        if response.token_usage:
-            print(f"  Tokens: {response.token_usage}")
-    except TimeoutError as e:
-        print(f"⏰ {e}", file=sys.stderr)
-        sys.exit(1)
-    except RuntimeError as e:
-        print(f"❌ {e}", file=sys.stderr)
-        sys.exit(1)
+        try:
+            response = svc.ask(message, model=cortex_model, timeout=args.timeout)
+            print("💬 Response:")
+            print(response.text)
+            print()
+            print(f"───────────────────────────────────────────")
+            print(f"  Model: {response.model}")
+            if response.token_usage:
+                usage = response.token_usage
+                print(f"  Tokens: {usage.get('prompt_tokens', 0)} → {usage.get('completion_tokens', 0)}")
+        except Exception as e:
+            print(f"❌ {e}", file=sys.stderr)
+            sys.exit(1)
+    else:
+        # LS 経由 (従来の動作)
+        client = AntigravityClient(workspace=args.workspace)
+        print(f"📤 Sending to {model}...")
+        print(f"   Message: {message[:80]}{'...' if len(message) > 80 else ''}")
+        print()
+        try:
+            response = client.ask(message, model=model, timeout=args.timeout)
+            if response.thinking:
+                print("💭 Thinking:")
+                print(f"   {response.thinking[:200]}...")
+                print()
+            print("💬 Response:")
+            print(response.text)
+            print()
+            print(f"───────────────────────────────────────────")
+            print(f"  Model: {response.model}")
+            if response.token_usage:
+                print(f"  Tokens: {response.token_usage}")
+        except TimeoutError as e:
+            print(f"⏰ {e}", file=sys.stderr)
+            sys.exit(1)
+        except RuntimeError as e:
+            print(f"❌ {e}", file=sys.stderr)
+            sys.exit(1)
 
 
 # PURPOSE: [L2-auto] 対話モード。
@@ -288,6 +311,10 @@ def main() -> None:
     # ask
     ask_parser = subparsers.add_parser("ask", help="Ask LLM a question")
     ask_parser.add_argument("message", nargs="+", help="Message to send")
+    ask_parser.add_argument(
+        "--cortex", "-c", action="store_true",
+        help="Use Cortex API directly (Gemini, no LS needed)",
+    )
 
     # chat
     subparsers.add_parser("chat", help="Interactive chat mode")

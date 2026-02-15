@@ -1,0 +1,111 @@
+[
+  {
+    "id": "20260215_112517_133943",
+    "ccl_expr": "/dia!",
+    "operators": [
+      "!"
+    ],
+    "generated_at": "2026-02-15T11:25:17.133962",
+    "answered": null,
+    "correct": null,
+    "had_failure": null,
+    "notes": ""
+  },
+  {
+    "id": "20260215_112517_144792",
+    "ccl_expr": "/dia!",
+    "operators": [
+      "!"
+    ],
+    "generated_at": "2026-02-15T11:25:17.144809",
+    "answered": null,
+    "correct": null,
+    "had_failure": null,
+    "notes": ""
+  },
+  {
+    "id": "20260215_112517_156559",
+    "ccl_expr": "/noe!*^/dia",
+    "operators": [
+      "!",
+      "*^"
+    ],
+    "generated_at": "2026-02-15T11:25:17.156574",
+    "answered": null,
+    "correct": null,
+    "had_failure": null,
+    "notes": ""
+  },
+  {
+    "id": "20260215_112517_166900",
+    "ccl_expr": "/noe\\dia",
+    "operators": [
+      "\\"
+    ],
+    "generated_at": "2026-02-15T11:25:17.166918",
+    "answered": null,
+    "correct": null,
+    "had_failure": null,
+    "notes": ""
+  },
+  {
+    "id": "20260215_112517_171193",
+    "ccl_expr": "/noe\\dia",
+    "operators": [
+      "\\"
+    ],
+    "generated_at": "2026-02-15T11:25:17.171209",
+    "answered": null,
+    "correct": null,
+    "had_failure": null,
+    "notes": ""
+  },
+  {
+    "id": "20260215_113745_123510",
+    "ccl_expr": "/pro_/s-_R:{F:[×2]{/u+*^/u^}}_~(/noe*/dia)_/pis_/dox-",
+    "operators": [
+      "*^"
+    ],
+    "generated_at": "2026-02-15T11:37:45.123531",
+    "answered": null,
+    "correct": null,
+    "had_failure": null,
+    "notes": ""
+  },
+  {
+    "id": "20260215_121749_207456",
+    "ccl_expr": "/pro_/s-_R:{F:[×2]{/u+*^/u^}}_~(/noe*/dia)_/pis_/dox-",
+    "operators": [
+      "*^"
+    ],
+    "generated_at": "2026-02-15T12:17:49.207479",
+    "answered": null,
+    "correct": null,
+    "had_failure": null,
+    "notes": ""
+  },
+  {
+    "id": "20260215_151139_170959",
+    "ccl_expr": "/noe+~!/dia-",
+    "operators": [
+      "!"
+    ],
+    "generated_at": "2026-02-15T15:11:39.170980",
+    "answered": null,
+    "correct": null,
+    "had_failure": null,
+    "notes": ""
+  },
+  {
+    "id": "20260215_151139_192543",
+    "ccl_expr": "/noe~!/dia",
+    "operators": [
+      "!"
+    ],
+    "generated_at": "2026-02-15T15:11:39.192554",
+    "answered": null,
+    "correct": null,
+    "had_failure": null,
+    "notes": ""
+  }
+]

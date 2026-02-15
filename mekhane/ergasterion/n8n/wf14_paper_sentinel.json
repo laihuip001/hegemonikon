@@ -1,0 +1,205 @@
+{
+    "name": "WF-14: Paper Sentinel (Midnight)",
+    "nodes": [
+        {
+            "parameters": {
+                "rule": {
+                    "interval": [
+                        {
+                            "field": "cronExpression",
+                            "expression": "0 */6 * * *"
+                        }
+                    ]
+                }
+            },
+            "id": "paper-cron",
+            "name": "6時間毎の巡回",
+            "type": "n8n-nodes-base.scheduleTrigger",
+            "typeVersion": 1.2,
+            "position": [
+                250,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "httpMethod": "POST",
+                "path": "paper-sentinel",
+                "responseMode": "lastNode",
+                "options": {}
+            },
+            "id": "paper-webhook",
+            "name": "手動トリガー",
+            "type": "n8n-nodes-base.webhook",
+            "typeVersion": 2,
+            "position": [
+                250,
+                500
+            ],
+            "webhookId": "paper-sentinel-wh"
+        },
+        {
+            "parameters": {
+                "command": "bash /home/makaron8426/oikos/hegemonikon/mekhane/ergasterion/n8n/scripts/paper_sentinel_scan.sh 2>&1"
+            },
+            "id": "scan-papers",
+            "name": "論文スキャン",
+            "type": "n8n-nodes-base.executeCommand",
+            "typeVersion": 1,
+            "position": [
+                450,
+                400
+            ]
+        },
+        {
+            "parameters": {
+                "jsCode": "const fs = require('fs');\n\nconst RAW = '/home/makaron8426/oikos/mneme/.hegemonikon/paper_sentinel_raw.json';\nconst OUT = '/home/makaron8426/oikos/mneme/.hegemonikon/paper_sentinel.json';\nconst now = new Date();\n\nlet raw = {};\ntry { raw = JSON.parse(fs.readFileSync(RAW, 'utf-8')); } catch(e) {\n  return [{ json: { error: e.message, hasPapers: false, shouldAlert: false } }];\n}\n\nconst papers = raw.papers || [];\nconst highScore = papers.filter(p => (p.score || 0) >= 0.7);\nconst hasPapers = papers.length > 0;\nconst shouldAlert = highScore.length > 0;\n\nconst result = {\n  timestamp: now.toISOString(),\n  topics: raw.topics || [],\n  totalPapers: papers.length,\n  highScorePapers: highScore.length,\n  hasPapers,\n  shouldAlert,\n  topPapers: papers.slice(0, 5).map(p => ({\n    title: p.title,\n    score: p.score,\n    topic: p.topic,\n    abstract: (p.abstract || '').substring(0, 200)\n  }))\n};\n\nfs.writeFileSync(OUT, JSON.stringify(result, null, 2), 'utf-8');\n\n// Build notification payload\nlet notifyPayload = '';\nif (shouldAlert) {\n  const paperList = highScore.slice(0, 3).map(p =>\n    '• *' + p.title + '* (score: ' + (p.score || 0).toFixed(2) + ', topic: ' + p.topic + ')'\n  ).join('\\n');\n  notifyPayload = JSON.stringify({\n    blocks: [\n      { type: 'header', text: { type: 'plain_text', text: '📚 Paper Sentinel: ' + highScore.length + ' high-score papers', emoji: true } },\n      { type: 'section', text: { type: 'mrkdwn', text: paperList } },\n      { type: 'context', elements: [{ type: 'mrkdwn', text: '_WF-14 | Topics: ' + (raw.topics || []).join(', ') + '_' }] }\n    ]\n  });\n}\n\nreturn [{ json: Object.assign(result, { notifyPayload }) }];"
+            },
+            "id": "parse-papers",
+            "name": "論文解析",
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                650,
+                400
+            ]
+        },
+        {
+            "parameters": {
+                "conditions": {
+                    "boolean": [
+                        {
+                            "value1": "={{$json.shouldAlert}}",
+                            "value2": true
+                        }
+                    ]
+                }
+            },
+            "id": "if-papers",
+            "name": "有望論文?",
+            "type": "n8n-nodes-base.if",
+            "typeVersion": 1,
+            "position": [
+                850,
+                400
+            ]
+        },
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "http://localhost:9823/ask",
+                "sendBody": true,
+                "specifyBody": "json",
+                "jsonBody": "={{ JSON.stringify({ prompt: 'Summarize these papers for HGK relevance assessment:\\n' + JSON.stringify($json.topPapers), model: 'gemini-2.0-flash', system_instruction: 'You are a research paper analyst. Evaluate each paper for relevance to cognitive architecture, active inference, and meta-learning. Output a brief markdown summary with relevance score (0-1) for each.', max_tokens: 2048 }) }}",
+                "options": {
+                    "timeout": 60000
+                }
+            },
+            "id": "cortex-summarize",
+            "name": "Cortex要約",
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.2,
+            "position": [
+                1050,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "jsCode": "const fs = require('fs');\nconst now = new Date();\nconst dateStr = now.toISOString().split('T')[0];\nconst dir = '/home/makaron8426/oikos/mneme/.hegemonikon/sentinel/';\n\ntry { fs.mkdirSync(dir, { recursive: true }); } catch(e) {}\n\nconst summary = $input.first().json;\nconst cortexResp = $('Cortex要約').first().json;\n\nconst report = `# Paper Sentinel Report — ${dateStr}\\n\\n` +\n  `> Topics: ${(summary.topics || []).join(', ')}\\n` +\n  `> Total: ${summary.totalPapers}, High-score: ${summary.highScorePapers}\\n\\n` +\n  `## Cortex Analysis\\n\\n${cortexResp.text || '(no response)'}\\n\\n` +\n  `## Top Papers\\n\\n` +\n  (summary.topPapers || []).map(p =>\n    `### ${p.title}\\n- Score: ${p.score}\\n- Topic: ${p.topic}\\n- ${p.abstract}\\n`\n  ).join('\\n');\n\nconst reportFile = dir + 'paper_sentinel_' + dateStr + '.md';\nfs.writeFileSync(reportFile, report, 'utf-8');\n\nreturn [{ json: { reportFile, status: 'saved' } }];"
+            },
+            "id": "save-report",
+            "name": "レポート保存",
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                1250,
+                300
+            ]
+        }
+    ],
+    "connections": {
+        "6時間毎の巡回": {
+            "main": [
+                [
+                    {
+                        "node": "論文スキャン",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "手動トリガー": {
+            "main": [
+                [
+                    {
+                        "node": "論文スキャン",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "論文スキャン": {
+            "main": [
+                [
+                    {
+                        "node": "論文解析",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "論文解析": {
+            "main": [
+                [
+                    {
+                        "node": "有望論文?",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "有望論文?": {
+            "main": [
+                [
+                    {
+                        "node": "Cortex要約",
+                        "type": "main",
+                        "index": 0
+                    }
+                ],
+                []
+            ]
+        },
+        "Cortex要約": {
+            "main": [
+                [
+                    {
+                        "node": "レポート保存",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        }
+    },
+    "settings": {
+        "executionOrder": "v1"
+    },
+    "tags": [
+        {
+            "name": "hegemonikon"
+        },
+        {
+            "name": "sentinel"
+        },
+        {
+            "name": "paper-sentinel"
+        }
+    ],
+    "active": true
+}

@@ -8,6 +8,7 @@ import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPa
 import { api } from '../api/client';
 import type { GraphNode, GraphEdge, GraphFullResponse, LinkGraphNode, LinkGraphFullResponse } from '../api/client';
 import { esc } from '../utils';
+import { openPaletteWithQuery } from '../command_palette';
 // @ts-ignore — d3-force-3d has no types
 import { forceSimulation, forceLink, forceManyBody, forceCenter } from 'd3-force-3d';
 
@@ -18,11 +19,49 @@ const SERIES_COLORS: Record<string, string> = {
     P: '#a855f7', K: '#f59e0b', A: '#f97316',
 };
 
+// Series gradient pairs for richer node visuals
+const SERIES_GRADIENTS: Record<string, [string, string]> = {
+    O: ['#0088cc', '#00eeff'],   // Deep blue → cyan
+    S: ['#059669', '#34d399'],   // Emerald → mint
+    H: ['#b91c1c', '#f87171'],   // Dark red → light red
+    P: ['#7c3aed', '#c084fc'],   // Violet → lavender
+    K: ['#d97706', '#fbbf24'],   // Amber → gold
+    A: ['#ea580c', '#fb923c'],   // Deep orange → light orange
+};
+
 const NATURALITY_COLORS: Record<string, string> = {
     experiential: '#00d4ff', reflective: '#ffd700', structural: '#8888aa',
 };
 
 const BG_COLOR = 0x050508;
+
+// ─── Glow Shell Shader ───────────────────────────────────────
+
+const glowVertexShader = `
+  varying vec3 vNormal;
+  varying vec3 vPosition;
+  void main() {
+    vNormal = normalize(normalMatrix * normal);
+    vPosition = (modelViewMatrix * vec4(position, 1.0)).xyz;
+    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+  }
+`;
+
+const glowFragmentShader = `
+  uniform vec3 uColor;
+  uniform vec3 uColor2;
+  uniform float uIntensity;
+  uniform float uTime;
+  varying vec3 vNormal;
+  varying vec3 vPosition;
+  void main() {
+    float rim = 1.0 - abs(dot(vNormal, normalize(-vPosition)));
+    rim = pow(rim, 2.5);
+    float pulse = 0.85 + 0.15 * sin(uTime * 1.5);
+    vec3 color = mix(uColor, uColor2, rim);
+    gl_FragColor = vec4(color * uIntensity * pulse, rim * 0.7);
+  }
+`;
 
 // ─── Source type colors (dimmed series colors) ───────────────
 
@@ -54,6 +93,28 @@ function createNodeGeometry(series: string, isPure: boolean): THREE.BufferGeomet
     }
 }
 
+// ─── Glow shell creation ─────────────────────────────────────
+
+function createGlowShell(series: string, isPure: boolean): THREE.Mesh {
+    const s = (isPure ? 1.0 : 0.72) * 1.6;
+    const geo = new THREE.SphereGeometry(2.5 * s, 24, 24);
+    const [c1, c2] = SERIES_GRADIENTS[series] || ['#ffffff', '#aaaaff'];
+    const mat = new THREE.ShaderMaterial({
+        uniforms: {
+            uColor: { value: new THREE.Color(c1) },
+            uColor2: { value: new THREE.Color(c2) },
+            uIntensity: { value: 0.6 },
+            uTime: { value: 0 },
+        },
+        vertexShader: glowVertexShader,
+        fragmentShader: glowFragmentShader,
+        transparent: true,
+        blending: THREE.AdditiveBlending,
+        side: THREE.BackSide,
+        depthWrite: false,
+    });
+    return new THREE.Mesh(geo, mat);
+}
 
 
 // ─── Types ───────────────────────────────────────────────────
@@ -146,14 +207,17 @@ export async function renderGraph3D(): Promise<void> {
     labelRenderer.domElement.style.pointerEvents = 'none';
     graphContainer.appendChild(labelRenderer.domElement);
 
-    // Controls
+    // Controls — optimized damping for smooth cinematic feel
     const controls = new OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
-    controls.dampingFactor = 0.06;
-    controls.rotateSpeed = 0.5;
-    controls.zoomSpeed = 0.8;
-    controls.minDistance = 20;
-    controls.maxDistance = 250;
+    controls.dampingFactor = 0.04;
+    controls.rotateSpeed = 0.4;
+    controls.zoomSpeed = 0.7;
+    controls.minDistance = 15;
+    controls.maxDistance = 280;
+    controls.enablePan = true;
+    controls.panSpeed = 0.4;
+    controls.autoRotateSpeed = 0.3;
 
     let autoOrbit = true;
     let lastInteraction = 0;
@@ -237,10 +301,14 @@ export async function renderGraph3D(): Promise<void> {
         wire.scale.setScalar(1.15);
         group.add(wire);
 
+        // Glow shell (custom shader)
+        const glow = createGlowShell(node.series, isPure);
+        group.add(glow);
+
         // Ring for Pure nodes
         if (isPure) {
-            const ringGeo = new THREE.TorusGeometry(3.8, 0.06, 8, 32);
-            const ringMat = new THREE.MeshBasicMaterial({ color, transparent: true, opacity: 0.3 });
+            const ringGeo = new THREE.TorusGeometry(3.8, 0.08, 12, 48);
+            const ringMat = new THREE.MeshBasicMaterial({ color, transparent: true, opacity: 0.4 });
             const ring = new THREE.Mesh(ringGeo, ringMat);
             ring.rotation.x = Math.PI / 2;
             group.add(ring);
@@ -276,6 +344,31 @@ export async function renderGraph3D(): Promise<void> {
         scene.add(line);
         edgeLines.push(line);
     });
+
+    // ─── Edge Pulse Particles ─────────────────────────────────
+
+    const PULSE_COUNT = Math.min(simLinks.length, 40);  // limit for perf
+    const pulseGeo = new THREE.BufferGeometry();
+    const pulsePositions = new Float32Array(PULSE_COUNT * 3);
+    const pulseSizes = new Float32Array(PULSE_COUNT);
+    const pulsePhases = new Float32Array(PULSE_COUNT);
+    for (let i = 0; i < PULSE_COUNT; i++) {
+        pulsePhases[i] = Math.random();  // each pulse starts at different phase
+        pulseSizes[i] = 1.5 + Math.random() * 1.5;
+    }
+    pulseGeo.setAttribute('position', new THREE.BufferAttribute(pulsePositions, 3));
+
+    const pulseMat = new THREE.PointsMaterial({
+        color: 0x6c8aff,
+        size: 1.8,
+        transparent: true,
+        opacity: 0.6,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false,
+        sizeAttenuation: true,
+    });
+    const pulsePoints = new THREE.Points(pulseGeo, pulseMat);
+    scene.add(pulsePoints);
 
     // ═══════════════════════════════════════════════════════════
     // ─── LinkGraph Satellite Layer ────────────────────────────
@@ -493,6 +586,18 @@ export async function renderGraph3D(): Promise<void> {
         <div class="edge-meaning">${e.meaning}</div></li>`;
         }).join('');
 
+        // Adjacent nodes (unique)
+        const adjacent = [...new Set(conn.map(e => e.source === nodeId ? e.target : e.source))];
+        const adjHtml = adjacent.length > 0
+            ? `<div class="info-adjacent">
+                ${adjacent.map(id => {
+                const n = nodeById.get(id);
+                const color = n ? SERIES_COLORS[n.series] || '#888' : '#888';
+                return `<span class="adj-node" style="border-color:${color}; color:${color}" data-node="${id}">${id}</span>`;
+            }).join('')}
+               </div>`
+            : '';
+
         // Count satellite knowledge nodes
         const satellites = kNodes3D.filter(kn => kn.projected_theorem === nodeId);
         const satInfo = satellites.length > 0
@@ -505,16 +610,38 @@ export async function renderGraph3D(): Promise<void> {
 
         infoPanel.innerHTML = `
       <h3 style="color:${SERIES_COLORS[node.series]}">${node.id} — ${node.name}</h3>
+      <div class="info-badges">
+        <span class="info-badge" style="background:${SERIES_COLORS[node.series]}22; color:${SERIES_COLORS[node.series]}; border:1px solid ${SERIES_COLORS[node.series]}44">${node.series}</span>
+        <span class="info-badge info-badge-type">${node.type}</span>
+      </div>
       <p class="info-greek">${node.greek}</p>
       <p class="info-meaning">${node.meaning}</p>
-      <p class="info-meta">${node.workflow} · ${node.type}</p>
+      <p class="info-meta info-wf-link" data-wf="${node.workflow}">${node.workflow} <span class="wf-arrow">→</span></p>
+      ${adjHtml}
       <h4>Connections <span class="conn-count">${conn.length}</span></h4>
       <ul>${list || '<li>None</li>'}</ul>
       ${satInfo}
       <button id="close-info" class="btn btn-sm">Close</button>`;
         infoPanel.classList.remove('hidden');
+        infoPanel.classList.add('slide-in');
+        setTimeout(() => infoPanel.classList.remove('slide-in'), 300);
+
         document.getElementById('close-info')?.addEventListener('click', () => {
             infoPanel.classList.add('hidden'); selectedNodeId = null;
+        });
+        // Adjacent node click → select that node
+        infoPanel.querySelectorAll('.adj-node').forEach(el => {
+            el.addEventListener('click', () => {
+                const nid = el.getAttribute('data-node');
+                if (nid) { selectedNodeId = nid; showNodeDetails(nid); }
+            });
+        });
+        // WF link click → open Command Palette with workflow name
+        infoPanel.querySelectorAll('.info-wf-link').forEach(el => {
+            el.addEventListener('click', () => {
+                const wfName = el.getAttribute('data-wf');
+                if (wfName) openPaletteWithQuery(wfName);
+            });
         });
     }
 
@@ -554,6 +681,8 @@ export async function renderGraph3D(): Promise<void> {
             initKnowledgeSatellites().catch(console.warn);
         }
 
+        const elapsed = now * 0.001;  // seconds for shader uniforms
+
         simNodes.forEach(node => {
             const group = nodeMeshes.get(node.id);
             if (!group) return;
@@ -561,18 +690,52 @@ export async function renderGraph3D(): Promise<void> {
 
             const core = group.children[0] as THREE.Mesh;
             const wire = group.children[1] as THREE.Mesh;
+            const glow = group.children[2] as THREE.Mesh;
+
+            // Update glow shader time uniform
+            if (glow && glow.material instanceof THREE.ShaderMaterial) {
+                const u = glow.material.uniforms;
+                if (u.uTime) u.uTime.value = elapsed;
+                // Boost glow on hover
+                if (u.uIntensity) u.uIntensity.value =
+                    group === hoveredGroup ? 1.2 : 0.6;
+            }
+
             if (group !== hoveredGroup) {
                 core.rotation.y += 0.004;
                 core.rotation.x += 0.002;
                 wire.rotation.y -= 0.003;
                 const coreMat = core.material as THREE.MeshPhongMaterial;
                 coreMat.emissiveIntensity = 0.5 + Math.sin(frame * 0.02 + (node.index || 0) * 0.6) * 0.1;
-                if (group.children.length > 2) {
-                    const ring = group.children[2] as THREE.Mesh;
+                // Ring (index 3 for Pure nodes; skip if it's a CSS2DObject label)
+                if (group.children.length > 3 && group.children[3] instanceof THREE.Mesh) {
+                    const ring = group.children[3] as THREE.Mesh;
                     ring.rotation.z += 0.006;
                 }
+            } else {
+                // Hovered: faster rotation + brighter
+                core.rotation.y += 0.008;
+                const coreMat = core.material as THREE.MeshPhongMaterial;
+                coreMat.emissiveIntensity = 0.9;
             }
         });
+
+        // ─── Edge pulse animation ─────────────────────────────
+        for (let i = 0; i < PULSE_COUNT; i++) {
+            const link = simLinks[i];
+            if (!link) continue;
+            const s = link.source as SimNode, t = link.target as SimNode;
+            // Advance phase (Float32Array — index always valid within PULSE_COUNT)
+            pulsePhases[i] = ((pulsePhases[i] ?? 0) + 0.004) % 1.0;
+            const p = pulsePhases[i] ?? 0;
+            // Interpolate position along edge
+            pulsePositions[i * 3] = s.x + (t.x - s.x) * p;
+            pulsePositions[i * 3 + 1] = s.y + (t.y - s.y) * p;
+            pulsePositions[i * 3 + 2] = s.z + (t.z - s.z) * p;
+        }
+        const posAttr = pulseGeo.attributes.position as THREE.BufferAttribute | undefined;
+        if (posAttr) posAttr.needsUpdate = true;
+        pulseMat.opacity = 0.4 + Math.sin(frame * 0.04) * 0.2;
 
         edgeLines.forEach((line, i) => {
             const link = simLinks[i];

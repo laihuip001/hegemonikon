@@ -38,7 +38,7 @@ npm run tauri dev
 | Timeline | `timeline.ts` | セッション履歴タイムライン |
 | Notifications | `notifications.ts` | 通知パネル |
 | Synteleia | `synteleia.ts` | 認知アンサンブル監査 |
-| Synedrion | `synedrion.ts` | 偉人評議会 UI |
+| Basanos | `basanos.ts` | 偉人評議会 UI |
 | PKS | `pks.ts` | Proactive Knowledge Surface |
 | Desktop DOM | `desktop-dom.ts` | AT-SPI アクセシビリティツリー |
 | Agent Manager | `agent-manager.ts` | エージェント管理 |

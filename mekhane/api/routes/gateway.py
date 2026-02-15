@@ -35,10 +35,10 @@ def _get_gateway():
     if _gateway is not None:
         return _gateway
 
-    from mekhane.synedrion.gateway.discovery import DiscoveryEngine
-    from mekhane.synedrion.gateway.policy_enforcer import PolicyEnforcer
-    from mekhane.synedrion.gateway.auth_proxy import AuthProxy
-    from mekhane.synedrion.gateway.virtual_server import VirtualServer
+    from mekhane.basanos.gateway.discovery import DiscoveryEngine
+    from mekhane.basanos.gateway.policy_enforcer import PolicyEnforcer
+    from mekhane.basanos.gateway.auth_proxy import AuthProxy
+    from mekhane.basanos.gateway.virtual_server import VirtualServer
 
     discovery = DiscoveryEngine()
     discovery.register_local_defaults()

@@ -243,6 +243,15 @@ class AttractorAdvisor:
             )
             lines.append(f"[PW boost: {pw_str}]")
 
+        # K-series concrete suggestion (v2: 定着率40%対策)
+        if "K" in rec.series:
+            k_suggestions = _suggest_k_theorems(user_input)
+            if k_suggestions:
+                k_str = ", ".join(
+                    f"K{k['id']} ({k['question']})" for k in k_suggestions[:3]
+                )
+                lines.append(f"[K-series: {k_str}]")
+
         # Gnōsis knowledge context
         if rec.knowledge_context:
             ki_names = ", ".join(k["ki_name"] for k in rec.knowledge_context)
@@ -474,6 +483,71 @@ def _suggest_pw_for_crossings(
         suggestion["K4"] = 0.3
 
     return suggestion
+
+
+# PURPOSE: K-series 具体提案 — キーワードベースのヒューリスティック
+_K_THEOREM_KEYWORDS: list[dict] = [
+    {"id": 1, "question": "今すぐ/後で × 深く/浅く",
+     "keywords": ["今すぐ", "後で", "深く", "浅く", "短期", "長期", "粒度", "応急", "本格",
+                  "quick fix", "deep dive", "short-term", "long-term"]},
+    {"id": 2, "question": "重要/緊急 × 順番/並行",
+     "keywords": ["重要", "緊急", "優先順位", "トリアージ", "整理", "並行", "順番",
+                  "priority", "triage", "ordering", "parallel", "sequential"]},
+    {"id": 3, "question": "緊急度 × 攻め/守り",
+     "keywords": ["急ぎ", "緊急", "リスク回避", "攻め", "守り", "今やる",
+                  "urgent", "risk", "aggressive", "defensive"]},
+    {"id": 4, "question": "複雑度 × タイミング",
+     "keywords": ["複雑", "難しそう", "表層", "深層", "計画が必要",
+                  "complex", "surface", "deep planning"]},
+    {"id": 5, "question": "個人深掘り × 集団浅広",
+     "keywords": ["一人で", "チームで", "深掘り", "広く浅く", "委譲",
+                  "solo", "delegate", "breadth", "depth"]},
+    {"id": 6, "question": "挑戦 × 安全",
+     "keywords": ["挑戦", "安全", "冒険", "堅実", "攻める", "守る",
+                  "challenge", "safe bet", "risk-reward"]},
+    {"id": 7, "question": "構造化 × 自由",
+     "keywords": ["構造化", "自由", "型", "フレームワーク", "即興", "テンプレ",
+                  "structured", "freeform", "framework", "improvise"]},
+    {"id": 8, "question": "速度 × 精度",
+     "keywords": ["速く", "正確", "精度", "速度", "雑で良い", "丁寧に",
+                  "fast", "accurate", "precision", "speed", "rough", "careful"]},
+    {"id": 9, "question": "保守 × 革新",
+     "keywords": ["保守", "革新", "今のまま", "変える", "リファクタ", "新規",
+                  "conservative", "innovative", "refactor", "greenfield"]},
+    {"id": 10, "question": "具体 × 抽象",
+     "keywords": ["具体", "抽象", "実装", "設計", "コード", "概念",
+                  "concrete", "abstract", "implement", "design", "concept"]},
+    {"id": 11, "question": "小さい成果 × 大きい賭け",
+     "keywords": ["小さい成果", "大きい成果", "コスパ", "投資対効果",
+                  "quick win", "big bet", "ROI"]},
+    {"id": 12, "question": "自分のため × みんなのため",
+     "keywords": ["自分のため", "みんなのため", "個人", "チーム",
+                  "self-interest", "collective"]},
+]
+
+
+def _suggest_k_theorems(user_input: str, max_results: int = 3) -> list[dict]:
+    """キーワードベースで最も関連する K 定理を提案する。
+
+    各 K 定理のキーワードリストとユーザー入力をマッチさせ、
+    マッチ数が多い順にソートして返す。
+
+    Returns:
+        [{"id": 1, "question": "...", "score": N}, ...]
+    """
+    input_lower = user_input.lower()
+    scored: list[dict] = []
+    for kt in _K_THEOREM_KEYWORDS:
+        score = sum(1 for kw in kt["keywords"] if kw.lower() in input_lower)
+        if score > 0:
+            scored.append({"id": kt["id"], "question": kt["question"], "score": score})
+    scored.sort(key=lambda x: x["score"], reverse=True)
+
+    # No keyword match → fall back to K1 (most common)
+    if not scored:
+        return [{"id": 1, "question": "今すぐ/後で × 深く/浅く", "score": 0}]
+
+    return scored[:max_results]
 
 
 # ---------------------------------------------------------------------------

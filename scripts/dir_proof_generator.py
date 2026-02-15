@@ -102,7 +102,7 @@ PARENT_DESCRIPTIONS = {
     "tekhne": "技法管理 — プロンプトエンジニアリング",
     "typos": "Prompt Language — DSL パーサー/実行系",
     "prompt_literacy": "プロンプトリテラシー — 教育・学習支援",
-    "synedrion": "評議会 — 多角的批評エンジン",
+    "basanos": "評議会 — 多角的批評エンジン",
     "digestor": "消化器 — 外部コンテンツ取込み",
 }
 

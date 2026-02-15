@@ -4,40 +4,69 @@ glob:
 description: K-series 文脈定理の発動条件
 ---
 
-# K-series（文脈定理）発動条件
+# K-series（文脈定理）発動条件 v2
 
-> **Hegemonikón K-series**: Kairos（適時）— 選択公理×選択公理 = 12文脈定理
+> **Hegemonikón K-series**: Kairos（適時）— 文脈判断の12定理
+> **v2 更新**: 定着率40%問題への環境支援強化 (2026-02-15)
 
 ## 運用方針
 
-**採用**: 「明示的修飾子」方式（暗黙的発動より予測可能性を優先）
+**採用**: 「キーワード自動検出 + 明示的修飾子」方式
+
+> v1 の「明示的修飾子のみ」方式は、Creator が K-series の存在を意識しないと発動しない。
+> 環境がキーワードを検出して自動提案する方式に切り替え、定着率を改善する。
 
 ## 発動パターン
 
 | パターン | 条件 | 例 |
 |----------|------|-----|
 | **明示的指定** | ユーザーが `/k{N}` で指定 | `/k3` = 緊急対応モード |
-| **自動修飾** | T-series発動時 `context_ambiguity > 0.5` | T6発動 → 「短期/長期？」→ K4判定 |
-| **衝突解決** | 複数T-seriesが競合 | T2 vs T4 → K1でTempo×Stratum評価 |
+| **キーワード自動検出** | 下記シグナルテーブルにマッチ | 「今すぐやるか後でやるか」→ K1 提案 |
+| **Attractor 連動** | Series 推薦で K が出た場合 | Attractor: K-series → K1-K3 を具体提案 |
+| **衝突解決** | 複数 Series が競合 | O vs S → K1 で深度判定 |
+
+## キーワード自動検出テーブル
+
+> **検出時の動作**: `[K-series 提案: K{N} {問い}]` を出力に付記する
+
+| K定理 | 検出キーワード (日本語) | 検出キーワード (英語) |
+|:------|:----------------------|:---------------------|
+| **K1** | 今すぐ/後で, 深く/浅く, 短期/長期, どの粒度, 応急/本格 | quick fix, deep dive, short-term, long-term |
+| **K3** | 急ぎ, 緊急, リスク回避, 攻め/守り, 今やるべき | urgent, risk, aggressive, defensive |
+| **K4** | 複雑, 難しそう, 表層/深層, 計画が必要 | complex, surface, deep planning |
+| **K5** | 一人で/チームで, 深掘り/広く浅く | solo, delegate, breadth vs depth |
+| **K6** | 挑戦/安全, 冒険/堅実, 攻める/守る | challenge, safe bet, risk-reward |
+| **K11** | 小さい成果/大きい成果, コスパ, 投資対効果 | quick win, big bet, ROI |
+| **K12** | 自分のため/みんなのため, 個人/チーム | self-interest, collective good |
 
 ## 自動発動ルール
 
 ```yaml
-trigger: T-series_invocation
-condition: context_ambiguity > 0.5
-action: evaluate_relevant_k_series
-max_k_series: 2  # 最大2つまで同時評価
+# v2: キーワード検出追加
+trigger:
+  - type: keyword_match
+    table: keyword_detection_table
+    action: propose_k_series
+    format: "[K-series 提案: K{N} — {問い}]"
+  - type: series_recommendation
+    condition: attractor recommends K-series
+    action: propose_top3_k_theorems
+  - type: series_conflict
+    condition: multiple_series_competing
+    action: evaluate_k1_tempo_stratum
 ```
 
-## 優先実装順序
+## 優先順位（頻度ベース）
 
-| 優先度 | K-series | 組合せ | 理由 |
-|--------|----------|--------|------|
-| **1** | K1 | Tempo × Stratum | 「今すぐ/後で」「深く/浅く」の判断が最頻出 |
-| **2** | K3 | Tempo × Valence | 「今すぐ + 接近/回避」緊急度判定 |
-| **3** | K4 | Stratum × Tempo | 「深さ + タイミング」複雑度判定 |
+| 順位 | K定理 | 問い | 頻度推定 |
+|:-----|:------|:-----|:---------|
+| **1** | K1 | 今すぐ/後で × 深く/浅く | 最頻出 — ほぼ毎セッション |
+| **2** | K3 | 緊急度 × 攻め/守り | バグ対応、deadline |
+| **3** | K4 | 複雑度 × タイミング | 設計判断時 |
+| **4** | K11 | 小さい勝ち × 大きい賭け | 優先順位決定時 |
+| **5** | K6 | 挑戦 × 安全 | 新技術採用時 |
 
-## K-series一覧（参照）
+## K-series 一覧
 
 | ID | 組合せ | 問い |
 |----|--------|------|
@@ -57,11 +86,10 @@ max_k_series: 2  # 最大2つまで同時評価
 ## 使用例
 
 ```markdown
-[Hegemonikon] K1 Tempo×Stratum
-  入力: T6 Praxis発動、文脈曖昧
-  判定: 短期実装（Tempo=F）+ 表層対応（Stratum=L）
-  結論: クイックフィックスを適用、後でリファクタリング
+入力: 「このバグ、応急処置で今出すか、根本修正してからか」
+[K-series 提案: K1 Tempo×Stratum — 今すぐ/後で × 深く/浅く]
+判定: 短期（応急）+ 深層（根本原因は追跡）→ 両方やる、ただし順序は 短期→長期
 ```
 
 ---
-*Source: Perplexity調査 (2026-01-25) + Claude.ai提案*
+*v2 (2026-02-15) — キーワード自動検出追加。定着率40%→環境支援強化*

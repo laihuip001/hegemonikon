@@ -1,7 +1,7 @@
 # PROOF: [L3/ユーティリティ] <- mekhane/scripts/ O4→運用スクリプトが必要→collect_results が担う
 #!/usr/bin/env python3
 """
-Synedrion v2.1 Result Collector
+Basanos v2.1 Result Collector
 
 Collect and summarize results from Jules sessions via API.
 No web UI needed - all done programmatically.
@@ -215,7 +215,7 @@ class JulesResultCollector:
 async def main():
     import argparse
 
-    parser = argparse.ArgumentParser(description="Synedrion v2.1 Result Collector")
+    parser = argparse.ArgumentParser(description="Basanos v2.1 Result Collector")
     parser.add_argument("--session", help="Check specific session ID")
     parser.add_argument("--list", type=int, help="List N recent sessions")
     parser.add_argument("--report", help="Generate report from session IDs file (JSON)")
@@ -265,7 +265,7 @@ async def main():
         else:
             stats = report["stats"]
             print(f"\n{'═' * 60}")
-            print(f"📊 Synedrion v2.1 Report")
+            print(f"📊 Basanos v2.1 Report")
             print(f"{'═' * 60}")
             print(f"Total Sessions: {stats['total_sessions']}")
             print(f"  ✅ Completed: {stats['completed']}")

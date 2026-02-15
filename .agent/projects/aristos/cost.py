@@ -152,9 +152,11 @@ class CostCalculator:
         self,
         time_estimates: Optional[Dict[str, float]] = None,
         operator_pt: Optional[Dict[str, int]] = None,
+        evolved_weights: Optional[Dict[str, float]] = None,
     ):
         self._time = time_estimates or DEFAULT_TIME_ESTIMATES
         self._pt = operator_pt or OPERATOR_PT
+        self._evolved_weights = evolved_weights
 
     def classify_tier(self, wf_name: str) -> Tier:
         """WF 名から階層を判定"""
@@ -214,6 +216,14 @@ class CostCalculator:
             bc_count=DEPTH_BC_COUNT[depth],
             tier_weight=TIER_WEIGHT[tier],
         )
+
+    def scalar_with_evolved(self, cost: "CostVector") -> float:
+        """進化済み重みで scalar コストを計算
+
+        evolved_weights が設定されていればそれを使用し、
+        なければデフォルト重みで計算。
+        """
+        return cost.scalar(self._evolved_weights)
 
     def calculate_pt(self, ccl_expr: str) -> float:
         """CCL 式の pt コストを計算"""

@@ -16,3 +16,5 @@ export { renderGraph3D } from './graph3d';
 export { renderAgentManagerView } from './agent-manager';
 export { renderChatView } from './chat';
 export { renderDesktopDomView } from './desktop-dom';
+export { renderAristosView } from './aristos';
+export { renderSettingsView } from './settings';

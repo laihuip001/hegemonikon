@@ -12,7 +12,7 @@ CCL 式の実行前に:
 """
 
 from pathlib import Path
-from typing import List, Dict, Set
+from typing import List, Dict, Optional, Set
 import re
 
 # 演算子と必須セクションのマッピング
@@ -28,19 +28,29 @@ OPERATOR_SECTIONS: Dict[str, str] = {
     "\\": "## 反転",
 }
 
-# 演算子の正式定義 (operators.md から)
-OPERATOR_DEFINITIONS: Dict[str, Dict[str, str]] = {
-    "+": {"名称": "深化", "作用": "3-5倍出力、明示的根拠"},
-    "-": {"名称": "縮約", "作用": "最小出力、要点のみ"},
-    "^": {"名称": "上昇", "作用": "次元↑ メタ層へ"},
-    "/": {"名称": "下降", "作用": "次元↓ 具体層へ"},
-    "?": {"名称": "照会", "作用": "制約・確信度の確認"},
-    "\\": {"名称": "反転", "作用": "視点を逆転（Antistrophē）"},
-    "*": {"名称": "融合", "作用": "複数を統合して1出力"},
-    "~": {"名称": "振動", "作用": "複数を往復して探索"},
-    "_": {"名称": "シーケンス", "作用": "Aの後にBを実行"},
-    "!": {"名称": "階乗", "作用": "全派生同時実行（⚠️ 高負荷）"},
+# PURPOSE: operator_loader から SSOT (operators.md) を動的ロード
+from mekhane.ccl.operator_loader import load_operators, to_definitions_dict, get_operators_hash
+
+# CCL 式の文字パースで検出するコア演算子シンボル
+# (operators.md は全演算子を定義するが、parse_operators は式中の文字マッチのみ)
+_CORE_SINGLE_SYMBOLS = {"+", "-", "^", "/", "?", "\\", "*", "~", "_", "!", "'"}
+_CORE_COMPOUND_SYMBOLS = {"*^", "~*", ">>"}
+
+# operators.md からロードし、互換辞書を構築
+_all_loaded = load_operators()
+_compound_loaded, _single_loaded, _ = to_definitions_dict(_all_loaded)
+_LOADED_HASH = get_operators_hash()  # G5: ロード時のハッシュを記録
+
+# コアセットでフィルタ (parse_operators 用)
+COMPOUND_OPERATORS: Dict[str, Dict[str, str]] = {
+    k: v for k, v in _compound_loaded.items() if k in _CORE_COMPOUND_SYMBOLS
 }
+OPERATOR_DEFINITIONS: Dict[str, Dict[str, str]] = {
+    k: v for k, v in _single_loaded.items() if k in _CORE_SINGLE_SYMBOLS
+}
+
+# 全演算子 (lookup 用 — コアセットのみ)
+ALL_OPERATORS: Dict[str, Dict[str, str]] = {**COMPOUND_OPERATORS, **OPERATOR_DEFINITIONS}
 
 
 # PURPOSE: CCL 仕様強制注入器
@@ -48,12 +58,23 @@ class SpecInjector:
     """CCL 仕様強制注入器"""
 
     # PURPOSE: SpecInjector の構成と依存関係の初期化
-    def __init__(self, operators_path: Path = None):
+    def __init__(self, operators_path: Optional[Path] = None):
         self.operators_path = (
             operators_path
             or Path(__file__).parent.parent.parent / "ccl" / "operators.md"
         )
-        self._operators_content: str = None
+        self._operators_content: Optional[str] = None
+
+        # G5: operators.md 変更検知 — モジュールロード時のハッシュと比較
+        from mekhane.ccl.operator_loader import get_operators_hash
+        current_hash = get_operators_hash(self.operators_path)
+        if current_hash and current_hash != _LOADED_HASH:
+            import warnings as _w
+            _w.warn(
+                f"operators.md が変更されました (hash: {_LOADED_HASH} → {current_hash})。"
+                " モジュールを再ロードしてください。",
+                stacklevel=2,
+            )
 
     # PURPOSE: spec_injector の operators content 処理を実行する
     @property
@@ -69,13 +90,23 @@ class SpecInjector:
                 self._operators_content = ""
         return self._operators_content
 
-    # PURPOSE: CCL 式から演算子を抽出
+    # PURPOSE: CCL 式から演算子を抽出 (複合演算子対応)
     def parse_operators(self, ccl_expr: str) -> Set[str]:
-        """CCL 式から演算子を抽出"""
+        """CCL 式から演算子を抽出 (2文字→1文字の貪欲マッチ)"""
         operators = set()
-        for char in ccl_expr:
-            if char in OPERATOR_DEFINITIONS:
-                operators.add(char)
+        i = 0
+        while i < len(ccl_expr):
+            # 2文字の複合演算子を先にチェック
+            if i + 1 < len(ccl_expr):
+                bigram = ccl_expr[i:i+2]
+                if bigram in COMPOUND_OPERATORS:
+                    operators.add(bigram)
+                    i += 2
+                    continue
+            # 1文字演算子
+            if ccl_expr[i] in OPERATOR_DEFINITIONS:
+                operators.add(ccl_expr[i])
+            i += 1
         return operators
 
     # PURPOSE: 演算子仕様ブロックを生成
@@ -107,11 +138,8 @@ class SpecInjector:
 
         for i, op in enumerate(sorted(operators), 1):
             if op in OPERATOR_DEFINITIONS:
-                defn = OPERATOR_DEFINITIONS[op]
-                lines.append(f"**Q{i}**: 演算子 `{op}` の名称と作用は？")
-                lines.append(
-                    f"**A{i}**: [ここに回答: 名称={defn['名称']}, 作用={defn['作用']}]\n"
-                )
+                lines.append(f"**Q{i}**: 演算子 `{op}` の名称と作用は？ (回答してから実行せよ)")
+                lines.append("")
 
         return "\n".join(lines)
 
@@ -176,7 +204,25 @@ def get_warnings_for_expr(ccl_expr: str) -> List[str]:
             "⚠️ `*^` は「融合 + メタ分析」です。両方のセクションが必要です。"
         )
 
+    if "\\" in ccl_expr:
+        warnings.append(
+            "⚠️ 演算子 `\\` は「反転 (Antistrophē)」です。エスケープ文字ではありません。"
+        )
+
     return warnings
+
+
+# PURPOSE: spec_injector が警告した演算子のセットを返す (dispatch の重複排除用)
+def get_warned_operators(ccl_expr: str) -> set:
+    """警告対象となった演算子のセットを返す"""
+    warned = set()
+    if "!" in ccl_expr:
+        warned.add("!")
+    if "*^" in ccl_expr:
+        warned.add("*^")
+    if "\\" in ccl_expr:
+        warned.add("\\")
+    return warned
 
 
 # テスト用

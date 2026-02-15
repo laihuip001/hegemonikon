@@ -91,7 +91,7 @@ class SwarmScheduler:
             for task in tasks:
                 try:
                     # Generate prompt from perspective
-                    from mekhane.synedrion import PerspectiveMatrix
+                    from mekhane.basanos import PerspectiveMatrix
 
                     matrix = PerspectiveMatrix.load()
                     perspective = matrix.get(task["domain"], task["axis"])

@@ -28,7 +28,7 @@ projects:
   name: Synergeia (συνέργεια)
   path: synergeia/
   tier: product
-  summary: マルチエージェント協調 — Jules Pool, SynedrionReviewer
+  summary: マルチエージェント協調 — Jules Pool, BasanosReviewer
   status: active
   phase: operational
   etymology: 共同作業・協力
@@ -221,17 +221,6 @@ projects:
   entry_point:
     python: from mekhane.pks.pks_engine import PKSEngine
   usage_trigger: 能動的知識プッシュが必要な時。PKS エンジン経由。
-- id: gnosis
-  name: Gnōsis (γνῶσις)
-  path: mekhane/gnosis/
-  tier: engine
-  summary: 知識基盤 (legacy パス) — Anamnesis に統合済み
-  status: archived
-  phase: maintenance
-  etymology: 知識・認識
-  proof: true
-  entry_point: null
-  usage_trigger: 使うな。Anamnesis (mekhane/anamnesis/) を使え。
 - id: mcp
   name: MCP Server
   path: mekhane/mcp/
@@ -258,29 +247,19 @@ projects:
     docker: docker compose -f mekhane/ergasterion/n8n/docker-compose.yml up -d
     webhook: http://localhost:5678/webhook/{path}
   usage_trigger: n8n WF の操作・デプロイ・テスト時。Health 監視、セッション管理、自動通知。
-- id: hgk-api
-  name: Hegemonikón API
-  path: mekhane/api/
-  tier: product
-  summary: FastAPI backend — UDS (/tmp/hgk.sock) for Tauri, TCP (:9696) for n8n/dev
-  status: active
-  phase: operational
-  entry_point:
-    cli_uds: python -m mekhane.api.server --uds /tmp/hgk.sock
-    cli_tcp: python -m mekhane.api.server --port 9696
-  usage_trigger: デスクトップアプリのバックエンド起動時。
 - id: hgk-app
   name: Hegemonikón Desktop App
   path: hgk/
   tier: product
-  summary: 認知ハイパーバイザー GUI — Tauri v2 + Vite + TypeScript + Three.js (17 views, Rust a11y backend)
+  summary: 認知ハイパーバイザー GUI — Tauri v2 + Vite + TypeScript + Three.js (17 views, Rust a11y) + FastAPI backend
   status: active
   phase: implementation
-  etymology: null
   proof: true
+  note: API (mekhane/api/) を内包。UDS (/tmp/hgk.sock) for Tauri, TCP (:9696) for n8n/dev
   entry_point:
     dev: cd hgk && npm run tauri dev
-    api: python -m mekhane.api.server --uds /tmp/hgk.sock
+    api_uds: python -m mekhane.api.server --uds /tmp/hgk.sock
+    api_tcp: python -m mekhane.api.server --port 9696
   usage_trigger: デスクトップアプリの開発・ビルド時。API バックエンドも必要。
 - id: agora
   name: Agora
@@ -301,3 +280,65 @@ projects:
   phase: "operational"
   entry_point: null
   usage_trigger: null
+- id: ochema
+  name: Ochēma (ὄχημα)
+  path: mekhane/ochema/
+  tier: engine
+  summary: LLM ルーター — Antigravity LS 非公式 Python クライアント + Cortex API
+  status: active
+  phase: operational
+  etymology: 乗り物 — 魂を運ぶ器
+  proof: true
+  entry_point:
+    cli: PYTHONPATH=. .venv/bin/python mekhane/ochema/cli.py ask "query"
+    python: from mekhane.ochema.cortex_client import CortexClient
+    mcp: ochema_ask, ochema_ask_cortex
+  usage_trigger: LLM 呼び出し時。LS 経由 or Cortex 直接。
+- id: taxis
+  name: Taxis (τάξις)
+  path: mekhane/taxis/
+  tier: module
+  summary: タスク分類・射提案 — X-series Morphism Proposer
+  status: active
+  phase: implementation
+  etymology: 秩序・配置 — 分類の本質
+  proof: true
+  entry_point:
+    python: from mekhane.taxis.morphism_proposer import MorphismProposer
+  usage_trigger: タスク分類、射提案、WF ルーティング時。
+- id: basanos
+  name: Basanos (συνέδριον)
+  path: mekhane/basanos/
+  tier: module
+  summary: 偉人評議会 — 複数ペルソナによる多角的レビュー
+  status: active
+  phase: operational
+  etymology: 評議会・議場 — 古代ギリシャの合議体
+  proof: true
+  entry_point:
+    python: from mekhane.basanos.ai_auditor import SweepEngine
+    api: POST /api/synteleia/audit
+  usage_trigger: /dia+ 時の偉人評議会レビュー。Synteleia と連携。
+- id: fep-engine
+  name: FEP Engine
+  path: mekhane/fep/
+  tier: engine
+  summary: FEP 数学エンジン — アトラクター評価・随伴構成・精度加重
+  status: active
+  phase: implementation
+  etymology: null
+  proof: true
+  entry_point:
+    python: from mekhane.fep.attractor_advisor import AttractorAdvisor
+  usage_trigger: FEP ベースの評価・判断時。アトラクター分析、リスクタグ生成。
+- id: ccl-runtime
+  name: CCL Runtime
+  path: mekhane/ccl/
+  tier: engine
+  summary: CCL パーサー・ジェネレーター・実行エンジン — 24定理の記号的操作
+  status: active
+  phase: implementation
+  proof: true
+  entry_point:
+    python: from mekhane.ccl.executor import CCLExecutor
+  usage_trigger: CCL 式の解析・生成・実行時。ccl/ (仕様) の実装ランタイム。

@@ -9,7 +9,7 @@ Async client for Google Jules API with:
 - Exponential backoff for rate limiting
 - Unified HTTP layer with retry support
 
-Refactored based on 58 Jules Synedrion reviews.
+Refactored based on 58 Jules Basanos reviews.
 
 Usage:
     client = JulesClient(api_key="YOUR_KEY")
@@ -646,8 +646,8 @@ class JulesClient:
 
         return results
 
-    # PURPOSE: [DEPRECATED] Execute Synedrion v2.1 multi-perspective review
-    async def synedrion_review(
+    # PURPOSE: [DEPRECATED] Execute Basanos v2.1 multi-perspective review
+    async def basanos_review(
         self,
         source: str,
         branch: str = "main",
@@ -656,10 +656,10 @@ class JulesClient:
         progress_callback: Optional[callable] = None,
     ) -> list["JulesResult"]:
         """
-        [DEPRECATED] Execute Synedrion v2.1 multi-perspective review.
+        [DEPRECATED] Execute Basanos v2.1 multi-perspective review.
         
         .. deprecated::
-            Use `SynedrionReviewer` from `mekhane.symploke.synedrion_reviewer` instead.
+            Use `BasanosReviewer` from `mekhane.symploke.basanos_reviewer` instead.
             This method violates SRP by mixing API transport with business logic.
             See TH-003, TH-009, ES-009, AI-011 reviews. with 480 orthogonal perspectives.
 
@@ -678,12 +678,12 @@ class JulesClient:
 
         Example:
             # Full 480-perspective review (8 batches)
-            results = await client.synedrion_review(
+            results = await client.basanos_review(
                 source="sources/github/owner/repo"
             )
 
             # Filtered review (Security domain, O-series axes = 4 perspectives)
-            results = await client.synedrion_review(
+            results = await client.basanos_review(
                 source="sources/github/owner/repo",
                 domains=["Security"],
                 axes=["O1", "O2", "O3", "O4"]
@@ -691,10 +691,10 @@ class JulesClient:
         """
         # Import perspective matrix
         try:
-            from mekhane.synedrion import PerspectiveMatrix
+            from mekhane.basanos import PerspectiveMatrix
         except ImportError:
             raise ImportError(
-                "Synedrion module not found. Ensure mekhane.ergasterion.synedrion is installed."
+                "Basanos module not found. Ensure mekhane.ergasterion.basanos is installed."
             )
 
         # Load perspective matrix
@@ -737,7 +737,7 @@ class JulesClient:
         total_batches = (len(tasks) + batch_size - 1) // batch_size
 
         logger.info(
-            f"Starting Synedrion v2.1 review: "
+            f"Starting Basanos v2.1 review: "
             f"{len(tasks)} perspectives, {total_batches} batches"
         )
 
@@ -767,7 +767,7 @@ class JulesClient:
         )
 
         logger.info(
-            f"Synedrion review complete: "
+            f"Basanos review complete: "
             f"{succeeded} succeeded, {failed} failed, {silent} silent (no issues)"
         )
 

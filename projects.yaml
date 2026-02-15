@@ -26,10 +26,10 @@ projects:
     priority: medium
     updated: '2026-02-11'
     next_action: LLM 統合設計の実装着手
-  synedrion:
-    name: Synedrion
+  basanos:
+    name: Basanos
     description: AI監査・偉人評議会
-    path: mekhane/synedrion/
+    path: mekhane/basanos/
     status: active
     phase: MVP実装中
     priority: medium

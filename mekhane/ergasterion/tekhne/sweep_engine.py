@@ -326,7 +326,7 @@ class SweepEngine:
     def _get_matrix(self):
         """Lazy-load PerspectiveMatrix."""
         if self._matrix is None:
-            from mekhane.synedrion.prompt_generator import PerspectiveMatrix
+            from mekhane.basanos.prompt_generator import PerspectiveMatrix
             self._matrix = PerspectiveMatrix.load()
         return self._matrix
 

@@ -22,6 +22,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from mekhane.fep.derivative_selector import (
     select_derivative,
+    correct_selection,
     DerivativeRecommendation,
     DERIVATIVE_DESCRIPTIONS,
     get_derivative_description,
@@ -317,6 +318,56 @@ def format_derivative_selection(result: WorkflowResult) -> str:
             output += f"  → {rec.workflow} ({rec.x_id}: {rec.reason})\n"
 
     return output
+
+
+# PURPOSE: Apply a /u correction and record explicit feedback
+def apply_correction(
+    theorem: str,
+    problem_context: str,
+    original_result: WorkflowResult,
+    corrected_to: str,
+) -> str:
+    """
+    Creator が /u で派生選択を修正した際に呼ぶ。
+
+    correct_selection() を自動実行し、明示フィードバックを蓄積する。
+    蓄積されたフィードバックは evolve_cli.py --all で GA 進化に使用される。
+
+    Args:
+        theorem: 定理コード (e.g., "O1")
+        problem_context: 元の問題文
+        original_result: run_workflow() の結果
+        corrected_to: Creator が指定した正解の派生コード
+
+    Returns:
+        修正結果のサマリー文字列
+
+    Example:
+        >>> result = run_workflow("O1", "本質を知りたい")
+        >>> msg = apply_correction("O1", "本質を知りたい", result, "phro")
+        >>> print(msg)
+        '✅ O1: nous → phro に修正記録'
+    """
+    # DerivativeRecommendation を再構築
+    recommendation = DerivativeRecommendation(
+        theorem=theorem,
+        derivative=original_result.derivative,
+        confidence=original_result.confidence,
+        rationale=original_result.rationale,
+        alternatives=original_result.alternatives,
+    )
+
+    # correct_selection() で明示フィードバックを記録
+    correct_selection(
+        theorem=theorem,
+        problem=problem_context,
+        original=recommendation,
+        corrected_to=corrected_to,
+    )
+
+    return (
+        f"✅ {theorem}: {original_result.derivative} → {corrected_to} に修正記録"
+    )
 
 
 # PURPOSE: Get workflow path for a theorem

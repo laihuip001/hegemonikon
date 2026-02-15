@@ -34,7 +34,7 @@
 | **gpu_guard** | `mekhane/symploke/gpu_guard.py` | GPU 競合防止 (RTX 2070 SUPER) |
 | **EnergeiaCoreResolver** | `mekhane/poiema/flow/energeia_core.py` | Metron レベル→モデル選択 |
 | **EpocheShield** | `mekhane/poiema/flow/epoche_shield.py` | PII マスキング |
-| **synedrion_reviewer** | `mekhane/symploke/synedrion_reviewer.py` | 偉人評議会レビュー |
+| **basanos_reviewer** | `mekhane/symploke/basanos_reviewer.py` | 偉人評議会レビュー |
 | **jules_results_loader** | `mekhane/symploke/jules_results_loader.py` | Jules 結果取り込み |
 | **insight_miner** | `mekhane/symploke/insight_miner.py` | セッション成果抽出 |
 

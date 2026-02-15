@@ -1268,6 +1268,17 @@ pre:hover .code-copy-btn {
   background: rgba(88, 166, 255, 0.08);
 }
 
+.cp-item-icon {
+  font-size: 1rem;
+  margin-right: 0.3rem;
+}
+
+.cp-route-item .cp-item-header {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
 #cp-quick-exec {
   background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
   border: none;

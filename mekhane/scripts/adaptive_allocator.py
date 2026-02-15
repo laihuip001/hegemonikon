@@ -23,7 +23,7 @@ from typing import Optional
 
 # Load perspectives configuration
 PERSPECTIVES_FILE = (
-    Path(__file__).parent / "mekhane/ergasterion/synedrion/perspectives.yaml"
+    Path(__file__).parent / "mekhane/ergasterion/basanos/perspectives.yaml"
 )
 
 

@@ -71,7 +71,7 @@ graph TD
         E7["E7 Via Negativa"]
         E8["E8 バージョン管理"]
         E9["E9 Prompt Library"]
-        E10["E10 Synedrion"]
+        E10["E10 Basanos"]
     end
 
     %% A層内の連鎖
@@ -237,7 +237,7 @@ graph TD
 | E7 | Via Negativa 逆算設計 | [draft_E7](draft_E7_via_negativa.md) | ✅ |
 | E8 | バージョン管理と不変性 | [draft_E8](draft_E8_version_control.md) | ✅ |
 | E9 | プロンプトライブラリ112本 | [draft_E9](draft_E9_prompt_library.md) | ✅ |
-| E10 | AI 偉人評議会 | [draft_E10](draft_E10_synedrion.md) | ✅ |
+| E10 | AI 偉人評議会 | [draft_E10](draft_E10_basanos.md) | ✅ |
 
 ---
 

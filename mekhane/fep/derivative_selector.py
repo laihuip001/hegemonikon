@@ -59,7 +59,79 @@ SELECTION_LOG_PATH = Path(
     "/home/makaron8426/oikos/mneme/.hegemonikon/derivative_selections.yaml"
 )
 
+# -----------------------------------------------------------------------------
+# L2 Evolution Engine Integration (v3.3 新規)
+# -----------------------------------------------------------------------------
+EVOLVED_WEIGHTS_PATH = Path(
+    "/home/makaron8426/oikos/mneme/.hegemonikon/evolved_weights.json"
+)
+EVOLVED_WEIGHTS_ENABLED = True  # Set to False to disable GA weight boosting
+
 logger = logging.getLogger(__name__)
+
+# Lazy-loaded evolved weights cache
+_evolved_weights_cache: Optional[Dict[str, float]] = None
+_evolved_weights_loaded = False
+
+
+def _load_evolved_weights() -> Optional[Dict[str, float]]:
+    """GA 進化済み重みをロード (lazy, 一度だけ)
+
+    weights.json format: {"weights": {"deriv_code": boost_factor, ...}, ...}
+    """
+    global _evolved_weights_cache, _evolved_weights_loaded
+
+    if _evolved_weights_loaded:
+        return _evolved_weights_cache
+
+    _evolved_weights_loaded = True
+
+    if not EVOLVED_WEIGHTS_ENABLED or not EVOLVED_WEIGHTS_PATH.exists():
+        return None
+
+    try:
+        with open(EVOLVED_WEIGHTS_PATH, "r", encoding="utf-8") as f:
+            data = json.load(f)
+        _evolved_weights_cache = data.get("weights", {})
+        logger.info(f"Loaded evolved weights: {len(_evolved_weights_cache)} entries")
+        return _evolved_weights_cache
+    except (json.JSONDecodeError, KeyError) as e:
+        logger.warning(f"Failed to load evolved weights: {e}")
+        return None
+
+
+def _apply_evolved_boost(result: "DerivativeRecommendation") -> "DerivativeRecommendation":
+    """GA 進化済み重みで推薦結果をブースト
+
+    weights に該当する derivative のブースト係数があれば confidence を調整。
+    ブースト係数 > 1.0 → confidence 上昇、< 1.0 → confidence 低下。
+    """
+    weights = _load_evolved_weights()
+    if not weights:
+        return result
+
+    # theorem:derivative 形式のキーを検索 (e.g., "O1:nous")
+    key = f"{result.theorem}:{result.derivative}"
+    boost = weights.get(key)
+
+    if boost is not None and boost != 1.0:
+        original_conf = result.confidence
+        # ブースト適用 (0.0-0.99 にクランプ)
+        result.confidence = max(0.0, min(0.99, result.confidence * boost))
+        logger.debug(
+            f"Evolved boost: {key} {original_conf:.2f} * {boost:.2f} = {result.confidence:.2f}"
+        )
+
+    return result
+
+
+# PURPOSE: CLI からキャッシュを強制リロードし、新しい進化済み重みを反映する
+def reload_evolved_weights() -> None:
+    """進化済み重みキャッシュを強制リロード (CLI から呼ぶ用)"""
+    global _evolved_weights_cache, _evolved_weights_loaded
+    _evolved_weights_loaded = False
+    _evolved_weights_cache = None
+    _load_evolved_weights()
 
 try:
     from google import genai
@@ -1296,21 +1368,23 @@ def _hybrid_select(
     return keyword_result
 
 
-# PURPOSE: 派生選択をログに記録 (v3.2 学習基盤)
+# PURPOSE: 派生選択をログに記録 (v3.2 学習基盤, v3.3 L2 Evolution 対応)
 def _log_selection(
     theorem: str,
     problem: str,
     result: "DerivativeRecommendation",
     method: str = "keyword",
+    corrected_to: Optional[str] = None,
 ) -> None:
     """
-    派生選択をログに記録 (v3.2 学習基盤)
+    派生選択をログに記録 (v3.2 学習基盤, v3.3 L2 Evolution 対応)
 
     Args:
         theorem: 定理コード (O1, S2, etc.)
         problem: 問題文 (最大100文字)
         result: 選択結果
         method: 選択方法 ("keyword" or "llm")
+        corrected_to: Creator による修正先の派生コード (None = 暗黙承認)
     """
     if not SELECTION_LOG_ENABLED:
         return
@@ -1328,6 +1402,10 @@ def _log_selection(
             "confidence": round(result.confidence, 2),
             "method": method,
         }
+
+        # L2 Evolution Engine 用: 修正情報があれば付加
+        if corrected_to is not None:
+            entry["corrected_to"] = corrected_to
 
         # 既存ログを読み込み
         existing = []
@@ -1350,6 +1428,38 @@ def _log_selection(
             )
     except Exception as e:
         logger.warning(f"Failed to log derivative selection: {e}")
+
+
+# PURPOSE: Creator による修正をログに記録 (v3.3 L2 Evolution 対応)
+def correct_selection(
+    theorem: str,
+    problem: str,
+    original: "DerivativeRecommendation",
+    corrected_to: str,
+) -> None:
+    """
+    Creator が /u で派生選択を修正した際に呼ぶ。
+
+    暗黙フィードバック (修正なし) は _log_selection() で自動記録。
+    明示フィードバック (修正あり) はこの関数で記録。
+
+    Args:
+        theorem: 定理コード
+        problem: 問題文
+        original: 元の選択結果
+        corrected_to: Creator が指定した正解の派生コード
+
+    Example:
+        >>> correct_selection("O1", "本質を知りたい", orig_result, "phro")
+        # → ログに corrected_to="phro" が記録される
+    """
+    _log_selection(
+        theorem=theorem,
+        problem=problem,
+        result=original,
+        method="corrected",
+        corrected_to=corrected_to,
+    )
 
 
 # =============================================================================
@@ -1458,11 +1568,15 @@ def select_derivative(
     if use_llm_fallback and keyword_result is not None:
         result = _hybrid_select(theorem, problem_context, keyword_result)
         method = "llm" if "LLM" in result.rationale else "keyword"
+        # v3.3: Apply evolved weights boost
+        result = _apply_evolved_boost(result)
         _log_selection(theorem, problem_context, result, method)
         return result
 
     # v3.2: Log keyword selection
     if keyword_result is not None:
+        # v3.3: Apply evolved weights boost
+        keyword_result = _apply_evolved_boost(keyword_result)
         _log_selection(theorem, problem_context, keyword_result, "keyword")
 
     return keyword_result

@@ -144,7 +144,7 @@ hegemonikon/
 │   ├── peira/           # ヘルスチェック
 │   ├── pks/             # PKS (知識プッシュ)
 │   ├── symploke/        # Boot 統合 (15軸)
-│   ├── synedrion/       # MCP Gateway
+│   ├── basanos/       # MCP Gateway
 │   ├── synteleia/       # 6視点認知アンサンブル
 │   └── taxis/           # 分類・射の提案
 ├── hgk/         # Tauri v2 デスクトップアプリ

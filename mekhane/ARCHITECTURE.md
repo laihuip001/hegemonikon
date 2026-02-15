@@ -46,7 +46,7 @@ graph TD
         MCP["mcp<br>MCPサーバー<br>←0"]
         POI["poiema<br>出力生成<br>←0"]
         TAX["taxis<br>分類・優先度<br>←0"]
-        SYN["synedrion<br>評議会<br>←1"]
+        SYN["basanos<br>評議会<br>←1"]
     end
 
     SYM --> ANA
@@ -89,7 +89,7 @@ graph TD
 | 7 | **dendron** | 2 | 存在証明チェッカー | 品質保証層 |
 | 8 | **api** | 1 | REST API facade | 外部接点 |
 | 8 | **peira** | 1 | ヘルスチェック | 監視層 |
-| 8 | **synedrion** | 1 | 多角的レビュー | 評価層 |
+| 8 | **basanos** | 1 | 多角的レビュー | 評価層 |
 
 ---
 
@@ -110,7 +110,7 @@ graph TD
 │    pks/     — 能動的知識推薦                           │
 │    ccl/     — CCL パーサー/ジェネレーター              │
 │    taxis/   — 分類・優先度・スケジューリング           │
-│    synedrion/ — 多角的レビュー                        │
+│    basanos/ — 多角的レビュー                        │
 ├─────────────────────────────────────────────────────┤
 │  Layer 3: 基盤サービス                                │
 │    anamnesis/ — 記憶・ベクトル検索 (LanceDB)          │
@@ -153,7 +153,7 @@ graph TD
 
 | 領域 | 言語 | 例 |
 |:-----|:-----|:---|
-| 認知的概念 (Layer 2) | ギリシャ語 | fep, ccl, taxis, synedrion |
+| 認知的概念 (Layer 2) | ギリシャ語 | fep, ccl, taxis, basanos |
 | 基盤サービス (Layer 3) | ギリシャ語 | anamnesis, dendron, peira, poiema |
 | ツール (Layer 4) | 英語 | ergasterion (例外: ギリシャ語), scripts, deploy |
 | 外部接点 (Layer 0) | 英語 | api, mcp |

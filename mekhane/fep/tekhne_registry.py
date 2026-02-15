@@ -273,7 +273,7 @@ STANDARD_TECHNIQUES: Dict[str, Technique] = {
     ),
     "syn": Technique(
         id="syn",
-        name="Synedrion",
+        name="Basanos",
         description="偉人評議会・多角評価",
         category=ActionCategory.EVALUATIVE,
         quadrant=TechniqueQuadrant.EXPERIMENTAL,
@@ -281,7 +281,7 @@ STANDARD_TECHNIQUES: Dict[str, Technique] = {
         risk_level=0.3,
         time_cost=6,
         success_rate=0.7,
-        keywords=["評議", "多角", "synedrion"],
+        keywords=["評議", "多角", "basanos"],
     ),
     "epo": Technique(
         id="epo",

@@ -217,7 +217,7 @@ class WorkflowGraphBuilder:
                             source=node.name,
                             target=dep,
                             relation="contains",
-                            weight=cost.scalar() if cost else 1.0,
+                            weight=self._calc.scalar_with_evolved(cost) if cost else 1.0,
                         ))
 
         # Phase 4: 共通パターンからの暗黙的依存

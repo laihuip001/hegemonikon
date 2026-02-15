@@ -12,7 +12,11 @@ import { renderFep } from './views/fep';
 import { renderGnosis } from './views/gnosis';
 import { renderQuality } from './views/quality';
 import { renderPostcheck } from './views/postcheck';
-import { renderGraph3D } from './views/graph3d';
+// Three.js graph — lazy loaded to split the 700KB+ chunk
+const renderGraph3D = async () => {
+    const { renderGraph3D: render } = await import('./views/graph3d');
+    await render();
+};
 import { renderNotifications } from './views/notifications';
 import { renderPKS } from './views/pks';
 import { renderSophiaView } from './views/sophia';
@@ -22,6 +26,8 @@ import { renderSynedrionView } from './views/synedrion';
 import { renderDigestorView } from './views/digestor';
 import { renderDesktopDomView } from './views/desktop-dom';
 import { renderChatView } from './views/chat';
+import { renderAristosView } from './views/aristos';
+import { renderSettingsView } from './views/settings';
 
 // ─── Types ───────────────────────────────────────────────────
 
@@ -54,6 +60,8 @@ export const ROUTES: RouteConfig[] = [
     { key: 'digestor', label: 'Digestor', icon: '🧬', renderer: renderDigestorView },
     { key: 'desktop', label: 'Desktop', icon: '🖥️', renderer: renderDesktopDomView },
     { key: 'chat', label: 'Chat', icon: '💬', renderer: renderChatView },
+    { key: 'aristos', label: 'Aristos', icon: '🧬', renderer: renderAristosView },
+    { key: 'settings', label: 'Settings', icon: '⚙️', renderer: renderSettingsView },
 ];
 
 // ─── Derived Maps ────────────────────────────────────────────

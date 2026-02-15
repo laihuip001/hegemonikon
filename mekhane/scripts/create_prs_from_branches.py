@@ -264,7 +264,7 @@ def create_pr(
     title = f"[Jules Review] {branch.review_type}: {branch.description}"
 
     # PR 本文を生成
-    body = f"""## 🤖 Jules Synedrion Review
+    body = f"""## 🤖 Jules Basanos Review
 
 **Review Type**: `{branch.review_type}`
 **Description**: {branch.description}

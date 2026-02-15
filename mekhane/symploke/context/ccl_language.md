@@ -1,16 +1,41 @@
 # CCL (Cognitive Control Language)
 
-> The custom DSL for cognitive workflow orchestration
+> Domain-specific language for orchestrating cognitive workflows.
+> Jules reviewers: CCL syntax in comments/filenames is INTENTIONAL, not typos.
 
-> Auto-generated: 2026-02-14 17:52
+## Syntax Quick Reference
 
-## Notes
+| Operator | Meaning | Example |
+|:---------|:--------|:--------|
+| `/` | Workflow invocation | `/noe` = invoke Noēsis |
+| `+` | Deep variant (L3) | `/noe+` = deep Noēsis |
+| `-` | Quick variant (L1) | `/noe-` = quick Noēsis |
+| `~` | Oscillation | `~(/noe*/dia)` = alternate |
+| `>>` | Sequence | `/noe >> /dia` = then |
+| `*` | Parallel | `/noe*/dia` = concurrent |
+| `{}` | Group | `{/noe + /dia}` |
+| `F:[×N]` | Loop N times | `F:[×3]{...}` |
+| `V:{}` | Verify block | `V:{/dia+}` |
+| `C:{}` | Core block | `C:{/ene+}` |
 
-No knowledge items found for this theme. Context is based on static definitions.
+## Workflow Naming Convention
 
-## Relevance to Specialist Review
+| Layer | Length | Language | Example | Role |
+|:------|:-------|:---------|:--------|:-----|
+| Ω (Omega) | 1-2 | English | `/o`, `/s`, `/ax` | Series orchestrator |
+| Δ (Delta) | 3 | Greek | `/noe`, `/dia`, `/zet` | Domain expert (theorem) |
+| τ (Tau) | 3-4 | English | `/bye`, `/dev`, `/plan` | Task execution |
 
-When reviewing code related to ccl (cognitive control language), consider:
-- Does the implementation align with the project's the custom dsl for cognitive workflow orchestration?
-- Are there design principle violations (Reduced Complexity, Form Follows Function)?
-- Is the naming consistent with established patterns?
+## Common CCL Macros
+
+- `/ccl-dig` — Deep analysis
+- `/ccl-build` — Build/implement
+- `/ccl-fix` — Fix/repair
+- `/ccl-vet` — Verification
+- `/ccl-proof` — Formal proof
+
+## For Code Review
+
+CCL expressions in code comments (e.g., `# /noe+ analysis`) indicate which
+cognitive workflow produced or validates that section. Do NOT flag these as
+formatting issues — they are intentional workflow markers.

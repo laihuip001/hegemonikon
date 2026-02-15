@@ -103,7 +103,7 @@ CCL 式 → Parser → AST → Expander → LMQL → LLM 実行 → 検証
 |:---|:-----------|:-----|
 | L0 外部接点 | api, mcp | FastAPI REST, MCP servers |
 | L1 統合 | symploke | /boot シーケンス、統合 |
-| L2 認知 | fep, ccl, taxis, synedrion | FEP 計算、分類、評議会 |
+| L2 認知 | fep, ccl, taxis, basanos | FEP 計算、分類、評議会 |
 | L3 基盤 | anamnesis, dendron, peira, poiema | 記憶、存在証明、監視、出力 |
 | L4 ツール | ergasterion, scripts | 開発ワークショップ |
 

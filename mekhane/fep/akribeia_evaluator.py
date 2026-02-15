@@ -14,7 +14,7 @@ A-series Akribeia Evaluator — 精度評価モジュール
 
 Hegemonikón A-series (Akribeia) 定理: A1 Pathos, A3 Gnōmē, A4 Epistēmē
 FEP層での感情・原則・知識の評価を担当。
-(A2 Krisis は ergasterion/synedrion として判定層で分離済み)
+(A2 Krisis は ergasterion/basanos として判定層で分離済み)
 
 Architecture:
 - A1 Pathos = メタ感情評価 (emot/cogn/soma)

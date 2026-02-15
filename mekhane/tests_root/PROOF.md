@@ -21,7 +21,7 @@ REASON: tests_root の機能が必要だった
 | `test_fep_bridge.py` | Tests for FEP Bridge - Workflow Integration Layer. |
 | `test_fep_config.py` | Tests for FEP config module. |
 | `test_llm_evaluator.py` | Tests for LLM Evaluator - Hierarchical Hybrid Evaluation. |
-| `test_synedrion.py` | Synedrion テストスイート |
+| `test_basanos.py` | Basanos テストスイート |
 | `test_vault.py` | Test writing a new file. |
 
 ---

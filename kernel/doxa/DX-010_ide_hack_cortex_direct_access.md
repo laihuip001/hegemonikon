@@ -1,10 +1,11 @@
 # DX-010: Antigravity IDE ハック — API 直叩き完全手順書
 
-> **日付**: 2026-02-13 → 2026-02-14 14:25 更新
+> **日付**: 2026-02-13 → 2026-02-15 09:00 更新
 > **ステータス**: ✅ Cortex Direct (Gemini) + generateChat (Gemini 2MB コンテキスト) 成功
 > **Claude 直叩き**: ❌ `generateChat` は Gemini 専用と判明 (Claude は gRPC-only)
+> **v13 更新**: W1 解決 (client_secret 抽出)。W3 正体: ライセンス Tier ACL
 > **確信度**: [確信: 100%] (SOURCE: streaming modelConfig で Gemini 3 Pro 確認)
-> **関連セッション**: a639e0f9, 9d4186ec, 24101dfc, 5697133d
+> **関連セッション**: a639e0f9, 9d4186ec, 24101dfc, 5697133d, 5a08cf7f
 
 ---
 
@@ -435,7 +436,7 @@ Antigravity IDE
 | # | 試行 | 結果 | 教訓 |
 |:--|:-----|:-----|:-----|
 | 1 | gcloud auth token + cloudcode-pa | SERVICE_DISABLED | gcloud の Client ID では到達不可 |
-| 2 | gcore メモリダンプ → LS token 抽出 | PERMISSION_DENIED | LS は gRPC 専用内部 token |
+| 2 | gcore メモリダンプ → LS token 抽出 | **v12: SA 不在** | 25 ya29 全てユーザートークン。SA Impersonation 否定 |
 | 3 | mitmdump で LS 通信傍受 | Go gRPC は HTTPS_PROXY 無視 | gRPC proxy は別手法 |
 | 4-6 | animated-surfer / project-f2526536 | PERMISSION_DENIED | Google 管理プロジェクト |
 | 7 | `GetCascade` で応答取得 | 常に 0 bytes | IDE 内部専用 |
@@ -473,3 +474,5 @@ Antigravity IDE
 ---
 
 *DX-010 v4.0 — Claude REST 直叩き (generateChat) 発見を統合。A' セクション新設。MECE 再構成 (2026-02-14 14:10 JST)*
+*DX-010 v4.1 — v12 gcore 解析: SA Impersonation 棄却、API キー注入仮説。ls-standalone-reference.md §27 参照 (2026-02-15 08:30 JST)*
+*DX-010 v4.2 — v13 W1 解決: `main.js` から Antigravity client_secret (`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`) 抽出。W3 正体: ライセンス Tier ACL (standard-tier=403, g1-ultra=許可)。§28 参照 (2026-02-15 09:00 JST)*

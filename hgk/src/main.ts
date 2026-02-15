@@ -147,12 +147,33 @@ function navigate(route: string): void {
 
     const renderer = ROUTE_MAP[route];
     if (renderer) {
-      renderer().then(() => {
+      const timeout = new Promise<never>((_, reject) =>
+        setTimeout(() => reject(new Error('応答がタイムアウトしました (10秒)')), 10000)
+      );
+      Promise.race([renderer(), timeout]).then(() => {
         app.classList.remove('view-enter');
         void app.offsetWidth;
         app.classList.add('view-enter');
       }).catch((err: Error) => {
-        app.innerHTML = `<div class="card status-error">Error: ${esc(err.message)}</div>`;
+        const routeLabel = ROUTES.find(r => r.key === route)?.label ?? route;
+        app.innerHTML = `
+          <div class="error-boundary">
+            <div class="error-boundary-icon">⚠️</div>
+            <h2>${esc(routeLabel)} を読み込めませんでした</h2>
+            <p class="error-boundary-detail">${esc(err.message)}</p>
+            <div class="error-boundary-actions">
+              <button class="btn error-retry-btn" id="error-retry">再試行</button>
+              <button class="btn btn-ghost" id="error-dashboard">Dashboard へ戻る</button>
+            </div>
+          </div>`;
+        document.getElementById('error-retry')?.addEventListener('click', () => {
+          setCurrentRoute('');  // force re-navigate
+          navigate(route);
+        });
+        document.getElementById('error-dashboard')?.addEventListener('click', () => {
+          setCurrentRoute('');
+          navigate('dashboard');
+        });
       });
     }
   }, 120);

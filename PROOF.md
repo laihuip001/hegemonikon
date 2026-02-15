@@ -17,7 +17,7 @@
 | `synergeia/` | ✅ | **VITAL** — coordinator.coordinate が API から直接 import | 39 |
 | `hgk/` | ✅ | Desktop アプリ (Tauri + Vite) | 51 |
 | `mneme/` | ✅ | 記憶システム (sessions, handoffs, patterns) | 580 |
-| `pepsis/` | ✅ | 設計哲学消化フレームワーク (Python 完食, Rust 消化中) | 14 |
+| `pepsis/` | ✅ | 設計哲学消化フレームワーク (Python Phase 5 完食, **Rust Phase 1-3 完了**: 7設計文書, 新構文 `!` のみ) | 21 |
 | `scripts/` | ✅ | ユーティリティスクリプト (ingest, register等) | 57 |
 | `tests/` | ✅ | テストスイート | — |
 | `experiments/` | ✅ | 実験的コード (sandbox) | 6 |

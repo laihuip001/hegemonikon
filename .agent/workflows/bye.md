@@ -1,9 +1,9 @@
 ---
 description: セッション終了時に引き継ぎドキュメントを生成し、経験を法則化する。次回セッションの/bootで読み込まれる。
 hegemonikon: H4 Doxa
-version: "7.4"
+version: "7.5"
 lcm_state: stable
-lineage: "v7.0 + Step 3.5 IDE ネイティブ Export → v7.1 → v7.3 gRPC Auto-Export → v7.4 Step 3.7.5 共進化記録"
+lineage: "v7.0 + Step 3.5 IDE ネイティブ Export → v7.1 → v7.3 gRPC Auto-Export → v7.4 Step 3.7.5 共進化記録 → v7.5 /dox パイプ接続 + Content memory 実証 (UniT)"
 category_theory:
   core: "随伴の右関手 R: Ses → Mem"
   adjunction: "L (Boot) ⊣ R (Bye)"

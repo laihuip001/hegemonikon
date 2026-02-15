@@ -13,11 +13,15 @@ Usage:
 
 import copy
 import heapq
+import json
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Dict, List, Optional, Set, Tuple
 
 from .cost import CostCalculator, CostVector
+
+# Default evolved weights path
+COST_WEIGHTS_PATH = Path.home() / "oikos/mneme/.hegemonikon/cost_weights.json"
 from .graph_builder import WFGraph, WFNode, WFEdge, WorkflowGraphBuilder
 
 
@@ -63,6 +67,7 @@ class RouteSuggestion:
     shortest: Optional[Route] = None   # ステップ数最少
     fastest: Optional[Route] = None    # 時間最少
     deepest: Optional[Route] = None    # 認知深度最大
+    nash_allocation: Optional[Dict[str, float]] = None  # L4 Nash 配分
     context: str = ""                  # 分析コメント
 
     def format(self) -> str:
@@ -88,6 +93,15 @@ class RouteSuggestion:
                 lines.append(f"├─ {emoji} [{label}] {arrow} ({', '.join(meta)})")
             else:
                 lines.append(f"├─ {emoji} [{label}] 到達不能")
+
+        # L4 Nash 配分
+        if self.nash_allocation:
+            alloc_str = ", ".join(
+                f"{wf}={w:.0%}" for wf, w in sorted(
+                    self.nash_allocation.items(), key=lambda x: -x[1]
+                )
+            )
+            lines.append(f"├─ ⚖️ [Nash] {alloc_str}")
 
         if self.context:
             lines.append(f"└─ ⚠️ {self.context}")
@@ -127,11 +141,28 @@ class WorkflowRouter:
         self,
         graph: Optional[WFGraph] = None,
         base_dir: Optional[Path] = None,
+        evolved_weights: Optional[Dict[str, float]] = None,
     ):
         self._graph = graph
         self._base_dir = base_dir or Path(".")
-        self._calc = CostCalculator()
-        self._builder = WorkflowGraphBuilder()
+
+        # evolved weights: 明示指定 > ファイル > デフォルト
+        if evolved_weights is None:
+            evolved_weights = self._load_evolved_weights()
+        self._calc = CostCalculator(evolved_weights=evolved_weights)
+        self._builder = WorkflowGraphBuilder(cost_calculator=self._calc)
+
+    @staticmethod
+    def _load_evolved_weights() -> Optional[Dict[str, float]]:
+        """cost_weights.json から進化済み重みを読込"""
+        if not COST_WEIGHTS_PATH.exists():
+            return None
+        try:
+            with open(COST_WEIGHTS_PATH, "r") as f:
+                data = json.load(f)
+            return data.get("weights")
+        except Exception:
+            return None
 
     @property
     def graph(self) -> WFGraph:
@@ -387,14 +418,14 @@ class WorkflowRouter:
         source: str,
         goal: str,
     ) -> RouteSuggestion:
-        """3つのヒューリスティクスをたたき台として提示
+        """3つのヒューリスティクス + L4 Nash 配分をたたき台として提示
 
         Args:
             source: 現在の WF (起点)
             goal: 目標 WF
 
         Returns:
-            RouteSuggestion: 最短/最速/最深の3候補
+            RouteSuggestion: 最短/最速/最深の3候補 + Nash 配分
         """
         g = self.graph
         suggestion = RouteSuggestion(goal=goal, source=source)
@@ -434,6 +465,18 @@ class WorkflowRouter:
         deepest.heuristic = "deepest"
         suggestion.deepest = deepest
 
+        # L4 Nash 配分
+        try:
+            from .game_theory import L4Coordinator
+            coord = L4Coordinator(calc=self._calc)
+            # 最短経路の WF 群で Nash 配分を計算
+            wfs = shortest.path if shortest and shortest.reachable else []
+            if len(wfs) >= 2:
+                alloc = coord.optimize_allocation(wfs, method="nash")
+                suggestion.nash_allocation = alloc.wf_weights
+        except Exception:
+            pass  # game_theory が利用不可でも suggest_routes は動作する
+
         # コンテキスト: 3つが同じなら注記
         if shortest.path == fastest.path == deepest.path:
             suggestion.context = "全ヒューリスティクスが同一経路 — 選択の余地なし"
@@ -441,6 +484,54 @@ class WorkflowRouter:
             suggestion.context = f"最速ルートは認知深度が浅い (L{int(fastest.max_depth)})。深い分析が必要なら最深ルート推奨"
 
         return suggestion
+
+    def compare_routes(
+        self,
+        source: str,
+        goal: str,
+        base_dir: Optional[Path] = None,
+    ) -> Dict[str, Route]:
+        """evolved weights vs デフォルト重みで経路を比較
+
+        Args:
+            source: 開始 WF
+            goal: 目標 WF
+            base_dir: WF ディレクトリのベース
+
+        Returns:
+            {"evolved": Route, "default": Route, "diff_pct": float}
+        """
+        base = base_dir or self._base_dir
+
+        # evolved weights での経路 (現在のルーター)
+        evolved_route = self.find_shortest_path(source, goal)
+
+        # デフォルト重みでの経路
+        default_router = WorkflowRouter(
+            base_dir=base,
+            evolved_weights={
+                "pt": 1.0, "depth": 2.0, "time_min": 0.5,
+                "bc_count": 0.3, "tier_weight": 1.0,
+            },
+        )
+        default_router.build(base)
+        default_route = default_router.find_shortest_path(source, goal)
+
+        # 差分計算
+        diff_pct = 0.0
+        if default_route.reachable and evolved_route.reachable:
+            if default_route.total_cost > 0:
+                diff_pct = round(
+                    (evolved_route.total_cost - default_route.total_cost)
+                    / default_route.total_cost * 100,
+                    2,
+                )
+
+        return {
+            "evolved": evolved_route,
+            "default": default_route,
+            "diff_pct": diff_pct,
+        }
 
     def summary(self) -> str:
         """ルーターのサマリー"""

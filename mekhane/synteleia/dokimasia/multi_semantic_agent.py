@@ -14,8 +14,8 @@ Architecture:
       → Majority Voting (confidence-weighted)
       → Unified AgentResult
 
-Synedrion との差異:
-    Synedrion = 偉人 persona (哲学的・戦略的判断)
+Basanos との差異:
+    Basanos = 偉人 persona (哲学的・戦略的判断)
     Multi-LLM Synteleia = 機能的 persona (コード/ドキュメント品質)
 """
 

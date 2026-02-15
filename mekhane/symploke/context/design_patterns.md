@@ -1,16 +1,46 @@
 # Design Patterns & Architecture
 
-> Architectural patterns used across the codebase
+> Architectural patterns used across the Hegemonikón codebase.
+> Jules reviewers: deviations from these patterns may be intentional or bugs.
 
-> Auto-generated: 2026-02-14 17:52
+## Module Hierarchy
 
-## Notes
+```
+kernel/          — Theory (axioms, theorems, definitions)
+  └→ hermeneus/  — CCL parser & workflow engine
+       └→ mekhane/ — Implementation layer
+            ├── symploke/   — Jules reviews & boot integration
+            ├── ochema/     — LLM routing (LS + Cortex)
+            ├── dendron/    — Code quality & existence proofs
+            ├── peira/      — Health monitoring
+            ├── ergasterion/ — Paper analysis pipeline
+            ├── fep/        — FEP calculations
+            ├── synteleia/  — Safety & verification
+            └── mcp/        — MCP servers
+```
 
-No knowledge items found for this theme. Context is based on static definitions.
+## Mandatory Code Conventions
 
-## Relevance to Specialist Review
+| Pattern | Rule | Violation Signal |
+|:--------|:-----|:-----------------|
+| `# PROOF:` header | Every module file starts with existence proof | Missing = not integrated |
+| `# PURPOSE:` comments | Every function/class has purpose annotation | Missing = undocumented intent |
+| Type annotations | All new functions require type hints | Missing = incomplete |
+| snake_case | Functions and variables | PascalCase ≠ function |
+| PascalCase | Classes only | snake_case ≠ class |
+| SCREAMING_SNAKE | Constants only | lowercase ≠ constant |
 
-When reviewing code related to design patterns & architecture, consider:
-- Does the implementation align with the project's architectural patterns used across the codebase?
-- Are there design principle violations (Reduced Complexity, Form Follows Function)?
-- Is the naming consistent with established patterns?
+## Design Principles (Ranked)
+
+1. **Reduced Complexity** — 10x → 1/10 compression
+2. **Intuitive Logic** — Structure needs no explanation
+3. **Obsessive Detail** — Edge cases always matter
+4. **Form Follows Function** — No decorative code
+5. **Consistency Over Cleverness** — Follow established patterns
+
+## Anti-Patterns to Flag
+
+- Reimplementing existing functionality (check `registry.yaml` first)
+- Breaking the kernel → hermeneus → mekhane dependency flow
+- Mixing Greek/English naming without following the naming convention
+- Large functions (>20 lines) without decomposition

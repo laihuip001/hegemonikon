@@ -48,6 +48,8 @@ const MODELS: Record<string, string> = {
     'gemini-2.5-pro': 'Gemini 2.5 Pro',
     'gemini-2.5-flash': 'Gemini 2.5 Flash',
     'gemini-2.0-flash': 'Gemini 2.0 Flash',
+    'claude-sonnet': '🟣 Claude Sonnet 4.5 (LS経由)',
+    'claude-opus': '🟣 Claude Opus 4.6 (LS経由)',
 };
 
 const API_BACKEND = 'http://127.0.0.1:9696/api';
@@ -284,7 +286,7 @@ function renderMessages(): void {
       <div class="chat-empty">
         <div class="chat-empty-icon">💬</div>
         <div class="chat-empty-title">Hegemonikón Chat</div>
-        <div class="chat-empty-subtitle">Gemini と対話を始めましょう</div>
+        <div class="chat-empty-subtitle">AI と対話を始めましょう</div>
         <div class="chat-empty-hints">
           <span class="chat-hint">HGK の現在の方向性は？</span>
           <span class="chat-hint">FEP を簡単に説明して</span>
@@ -505,9 +507,17 @@ export async function renderChatView(): Promise<void> {
     const savedSysPrompt = localStorage.getItem('hgk-chat-sysprompt');
     if (savedSysPrompt !== null) systemInstruction = savedSysPrompt;
 
-    const modelOptions = Object.entries(MODELS)
-        .map(([id, name]) => `<option value="${id}" ${id === currentModel ? 'selected' : ''}>${esc(name)}</option>`)
-        .join('');
+    const geminiModels = Object.entries(MODELS).filter(([id]) => !id.startsWith('claude-'));
+    const claudeModels = Object.entries(MODELS).filter(([id]) => id.startsWith('claude-'));
+
+    const modelOptions = `
+      <optgroup label="Gemini">
+        ${geminiModels.map(([id, name]) => `<option value="${id}" ${id === currentModel ? 'selected' : ''}>${esc(name)}</option>`).join('')}
+      </optgroup>
+      <optgroup label="Claude (LS経由)">
+        ${claudeModels.map(([id, name]) => `<option value="${id}" ${id === currentModel ? 'selected' : ''}>${esc(name)}</option>`).join('')}
+      </optgroup>
+    `;
 
     app.innerHTML = `
     <div class="chat-container">

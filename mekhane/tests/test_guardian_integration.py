@@ -544,7 +544,7 @@ class TestAIFixerSelfAssignment:
     # PURPOSE: Verify detects true self assignment behaves correctly
     def test_detects_true_self_assignment(self):
         """ai_fixer should flag `x = x` as a self-assignment."""
-        from mekhane.synedrion.ai_fixer import AIFixer
+        from mekhane.basanos.ai_fixer import AIFixer
 
         fixer = AIFixer(dry_run=True)
         code = [
@@ -561,7 +561,7 @@ class TestAIFixerSelfAssignment:
     # PURPOSE: Verify ignores keyword argument pass behaves correctly
     def test_ignores_keyword_argument_pass(self):
         """ai_fixer must NOT flag `func(param=param)` as self-assignment."""
-        from mekhane.synedrion.ai_fixer import AIFixer
+        from mekhane.basanos.ai_fixer import AIFixer
 
         fixer = AIFixer(dry_run=True)
         # This code contains keyword argument passes, NOT self-assignments
@@ -584,7 +584,7 @@ class TestAIFixerSelfAssignment:
     # PURPOSE: Verify mixed code only flags assignment behaves correctly
     def test_mixed_code_only_flags_assignment(self):
         """In code with both patterns, only true self-assignments are flagged."""
-        from mekhane.synedrion.ai_fixer import AIFixer
+        from mekhane.basanos.ai_fixer import AIFixer
 
         fixer = AIFixer(dry_run=True)
         code = [

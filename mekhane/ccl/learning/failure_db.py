@@ -82,6 +82,11 @@ class FailureDB:
                             "severity": "warning",
                             "added": "2026-01-31",
                         },
+                        "\\": {
+                            "message": "`\\` は「反転 (Antistrophē) = 視点を逆転」です。エスケープ文字ではありません。",
+                            "severity": "warning",
+                            "added": "2026-02-15",
+                        },
                     },
                     "success_patterns": [],
                 }

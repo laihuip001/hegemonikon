@@ -21,12 +21,21 @@ import { ROUTES } from './route-config';
 let paletteEl: HTMLElement | null = null;
 let isOpen = false;
 let navigateFn: ((route: string) => void) | null = null;
+const recentViews: string[] = JSON.parse(localStorage.getItem('hgk-recent-views') || '[]');
 
 /** Register navigate callback from main.ts */
 export function setNavigateCallback(fn: (route: string) => void): void {
   navigateFn = fn;
 }
 let wfCache: WFSummary[] = [];
+
+function trackRecentView(key: string): void {
+  const idx = recentViews.indexOf(key);
+  if (idx !== -1) recentViews.splice(idx, 1);
+  recentViews.unshift(key);
+  if (recentViews.length > 5) recentViews.length = 5;
+  localStorage.setItem('hgk-recent-views', JSON.stringify(recentViews));
+}
 
 // --- HTML ---
 
@@ -254,6 +263,26 @@ interface QuickAction {
   action: (arg: string) => void;
 }
 
+function renderRouteItems(filter: string): string {
+  const q = filter.toLowerCase();
+  const routes = q
+    ? ROUTES.filter(r => r.key.includes(q) || r.label.toLowerCase().includes(q))
+    : (recentViews.length > 0
+      ? recentViews.map(k => ROUTES.find(r => r.key === k)).filter(Boolean) as typeof ROUTES
+      : ROUTES.slice(0, 6));
+  if (routes.length === 0) return '';
+  const sectionLabel = !q && recentViews.length > 0 ? '最近のビュー' : 'ビュー';
+  return `<div class="cp-section-label">${sectionLabel}</div>` +
+    routes.map((r, i) => `
+      <div class="cp-item cp-route-item ${i === 0 ? 'cp-item-active' : ''}" data-idx="${i}" data-route="${esc(r.key)}">
+        <div class="cp-item-header">
+          <span class="cp-item-icon">${r.icon}</span>
+          <span class="cp-item-name">${esc(r.label)}</span>
+        </div>
+      </div>
+    `).join('');
+}
+
 function getQuickActions(): QuickAction[] {
   return [
     {
@@ -437,10 +466,25 @@ async function handleInput(input: HTMLInputElement, resultsEl: HTMLElement): Pro
   // Workflow filter
   const filtered = filterWorkflows(val);
   activeIdx = 0;
-  resultsEl.innerHTML = renderWFItems(filtered);
+  // Show route navigation + workflow list
+  const routeSection = renderRouteItems(val);
+  resultsEl.innerHTML = routeSection +
+    (filtered.length > 0 ? `<div class="cp-section-label">ワークフロー</div>` : '') +
+    renderWFItems(filtered);
 
-  // Click handlers
-  resultsEl.querySelectorAll('.cp-item').forEach(item => {
+  // Click handlers — routes
+  resultsEl.querySelectorAll('.cp-route-item').forEach(item => {
+    item.addEventListener('click', () => {
+      const route = (item as HTMLElement).dataset.route ?? '';
+      if (navigateFn && route) {
+        trackRecentView(route);
+        navigateFn(route);
+        closePalette();
+      }
+    });
+  });
+  // Click handlers — workflows
+  resultsEl.querySelectorAll('.cp-item:not(.cp-route-item):not(.cp-quick-action)').forEach(item => {
     item.addEventListener('click', () => {
       const name = (item as HTMLElement).dataset.name ?? '';
       selectWorkflow(name, resultsEl);
@@ -547,6 +591,23 @@ export function initCommandPalette(): void {
     if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
       e.preventDefault();
       togglePalette();
+    }
+  });
+}
+
+/**
+ * Open the command palette with a pre-filled query.
+ * Used by Graph → WF link integration.
+ */
+export function openPaletteWithQuery(query: string): void {
+  openPalette();
+  // Defer to ensure DOM is ready
+  requestAnimationFrame(() => {
+    const input = document.getElementById('cp-input') as HTMLInputElement | null;
+    const resultsEl = document.getElementById('cp-results');
+    if (input && resultsEl) {
+      input.value = query;
+      void handleInput(input, resultsEl);
     }
   });
 }

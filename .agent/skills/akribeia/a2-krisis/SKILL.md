@@ -32,7 +32,7 @@ keywords:
   - validation
   - critique
   - panorama
-  - synedrion
+  - basanos
   - epoche
   - lexis
   - 検証
@@ -117,7 +117,7 @@ fallbacks: []
 
 ```
 /dia (抽象コマンド)
-  ├── /syn (Synedrion: 偉人評議会)
+  ├── /syn (Basanos: 偉人評議会)
   │     ├── /syn inv (反転モード)
   │     ├── /syn 10m (10th Man)
   │     └── /syn grv (墓場歩き)
@@ -143,7 +143,7 @@ fallbacks: []
 Layer 1: Domain Shift (領域シフト)
   → 技術偏重なら心理・歴史の視点を注入
   
-Layer 2: Synedrion (偉人評議会)
+Layer 2: Basanos (偉人評議会)
   → 6名の専門家による多角的批評
   
 Layer 3: User Perspective (ユーザー視点)
@@ -184,7 +184,7 @@ Layer 6: Graveyard Walk (墓場歩き)
 **Current Focus**: [現在偏っている領域]
 **Missing Dimensions**: [欠けている軸]
 
-## 🏛️ Synedrion Review
+## 🏛️ Basanos Review
 [6評議員の意見]
 
 ## 👥 User Perspective Panel
@@ -208,7 +208,7 @@ $next = {次のアクション}
 
 ---
 
-## Synedrion: 偉人評議会 (/syn)
+## Basanos: 偉人評議会 (/syn)
 
 ### The Six Critics (6評議員)
 
@@ -558,7 +558,7 @@ step_4_evaluate:
 | ワークフロー | 使用機能 |
 |:-------------|:---------|
 | `/dia` | 自動選択、Buzzword Guillotine |
-| `/syn` | Synedrion 6評議員 |
+| `/syn` | Basanos 6評議員 |
 | `/syn inv` | Inversion Mode |
 | `/syn 10m` | 10th Man Rule |
 | `/syn grv` | Graveyard Walk |
@@ -665,7 +665,7 @@ step_4_evaluate:
 | lex | `/dia.lex` | 表現教養 |
 | epo | `/dia.epo` | 判断停止 |
 | panorama | `/dia.panorama` | 全層スキャン |
-| synedrion | `/dia.synedrion` | 偉人評議会 |
+| basanos | `/dia.basanos` | 偉人評議会 |
 | cold_mirror | `/dia.cold_mirror` | 冷静監査 |
 | cross_model | `/dia.cross_model` | モデル間検証 |
 | counterfactual | `/dia.counterfactual` | 反実仮想 |

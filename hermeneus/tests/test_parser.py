@@ -448,6 +448,78 @@ class TestTaggedBlocks:
         assert ast.tag == "M"
 
 
+class TestConvergentOscillationBehavior:
+    """B1: ~* (収束振動 / terminal coalgebra) の操作的テスト
+
+    F6 operators.md で定義: ~* = terminal coalgebra (最大不動点への収束)
+    Colimit (合流点) との区別を検証する。
+    """
+
+    # PURPOSE: ~* の max_iterations フィールドに既定値がある
+    def test_convergent_has_max_iterations(self):
+        """~* ノードは max_iterations=5 をデフォルトで持つ"""
+        ast = parse_ccl("/dia+~*/noe")
+        assert isinstance(ast, Oscillation)
+        assert ast.convergent is True
+        assert ast.max_iterations == 5  # terminal coalgebra: 有限で打ち切り
+
+    # PURPOSE: 通常振動 ~ には max_iterations があるが convergent=False
+    def test_plain_oscillation_not_convergent(self):
+        """~ は ~* ではない: convergent=False"""
+        ast = parse_ccl("/dia+~/noe")
+        assert isinstance(ast, Oscillation)
+        assert ast.convergent is False
+        assert ast.max_iterations == 5  # 存在するが収束判定には使わない
+
+    # PURPOSE: format_ast_tree が ~* を正しく表示する
+    def test_ast_tree_shows_convergent_mode(self):
+        """AST tree 表示で (~*) と表記される"""
+        from hermeneus.src.dispatch import format_ast_tree
+        ast = parse_ccl("/dia+~*/noe")
+        tree = format_ast_tree(ast)
+        assert "(~*)" in tree
+        assert "Oscillation" in tree
+
+    # PURPOSE: ネストされた ~* が全て convergent=True
+    def test_nested_convergent_all_true(self):
+        """(/dia+~*/noe)~*/pan+ — 全ネスト層が convergent"""
+        ast = parse_ccl("(/dia+~*/noe)~*/pan+")
+        assert isinstance(ast, Oscillation)
+        assert ast.convergent is True
+        assert isinstance(ast.left, Oscillation)
+        assert ast.left.convergent is True
+        # right は単純な Workflow
+        assert isinstance(ast.right, Workflow)
+        assert ast.right.id == "pan"
+
+    # PURPOSE: ~* と ~ の混合ネスト
+    def test_mixed_convergent_and_plain(self):
+        """(/dia+~/noe)~*/pan+ — 内側は通常振動、外側が収束"""
+        ast = parse_ccl("(/dia+~/noe)~*/pan+")
+        assert isinstance(ast, Oscillation)
+        assert ast.convergent is True  # 外側
+        assert isinstance(ast.left, Oscillation)
+        assert ast.left.convergent is False  # 内側は通常
+
+    # PURPOSE: dispatch 出力に adaptive_depth が含まれる
+    def test_dispatch_includes_adaptive_depth(self):
+        """dispatch() の結果に adaptive_depth キーがある"""
+        from hermeneus.src.dispatch import dispatch
+        result = dispatch("/noe-~*/dia")
+        assert result["success"] is True
+        assert "adaptive_depth" in result
+        assert result["adaptive_depth"]["current_level"] == 1  # "-" → L1
+        assert len(result["adaptive_depth"]["triggers"]) == 3
+
+    # PURPOSE: dispatch 出力の depth_level が ~* によって変わらない
+    def test_convergent_does_not_affect_depth(self):
+        """~* はプロセス演算子であり、深度レベルには影響しない"""
+        from hermeneus.src.dispatch import dispatch
+        result_plain = dispatch("/noe~/dia")
+        result_conv = dispatch("/noe~*/dia")
+        assert result_plain["depth_level"] == result_conv["depth_level"]
+
+
 # =============================================================================
 # Run
 # =============================================================================

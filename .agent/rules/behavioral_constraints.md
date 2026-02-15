@@ -248,7 +248,8 @@ AMP ループ: Stage 3 で過信検出 → Stage 1 に戻る（最大2回）
 >
 > **操作的類似体 (Chen et al. 2026, UniT)**: Budget forcing (自然終了を抑制して追加反省ラウンドを強制) は
 > BC-9 の meta-cognitive check の環境的強制と構造的類似。第零原則「意志より環境」の参考データ。
-> ⚠️ 操作的類推であり、厳密な同型性は未証明。**反証条件**: Budget forcing が Meta-cognitive check と異なる認知効果を生む場合。
+> 同論文の verification loop (中間結果を検証→修正する反復) も AMP ループ (Stage 3→1 回帰) と構造的一致。
+> ⚠️ 操作的類推であり、厳密な同型性は未証明。**反証条件**: Budget forcing / verification loop が Meta-cognitive check と異なる認知効果を生む場合。
 
 ### BC-10: 道具利用義務（Tool-First）
 
@@ -508,6 +509,18 @@ BC-15 は「外部の人が行動できるか」。BC-17 は「概念が preshea
 **自己検証**: 「今の N chat messages はいくつか？ 言えないならチェックしていない。それは BC-18 違反である。」
 
 **tool-mastery.md §5.5 との関係**: §5.5 が閾値と行動を定義し、BC-18 がその遵守を強制する。§5.5 = ルール、BC-18 = ルールの執行。
+
+**Adaptive Depth (v3.5 追加 — UniT 消化由来)**:
+
+> 実行中に深度不足を検出した場合、自律的に深度を上昇 (L+1) させる。
+
+| 検出条件 | アクション |
+|:---------|:---------|
+| BC-14 FaR で確信度 <50% が 2 回連続 | L+1 を提案 |
+| AMP ループ Stage 3→1 が 2 回発動 | L+1 を強制 |
+| Creator が「もっと深く」と指示 | 即座に L+1 |
+
+> 導出: UniT short-to-long generalization の操作的翻訳。深度の固定は予測誤差の蓄積を招く。
 
 ---
 

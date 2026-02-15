@@ -1,17 +1,18 @@
 #!/usr/bin/env python3
 # PROOF: [L2/インフラ] <- mekhane/api/routes/
-# PURPOSE: Chat API — Gemini API SSE プロキシ + Cortex generateChat (2MB コンテキスト)
+# PURPOSE: Chat API — Gemini / Cortex / Claude (LS経由) の統合 LLM Chat プロキシ
 """
 Chat Router — LLM Chat の REST API エンドポイント
 
 エンドポイント:
   POST /chat/send    — メッセージ送信 (SSE ストリーミング)
   POST /chat/cortex  — Cortex generateChat (無課金 Gemini 2MB)
-  GET  /chat/models  — 利用可能なモデル一覧
+  GET  /chat/models  — 利用可能なモデル一覧 (LS 接続状態含む)
 """
 
 from __future__ import annotations
 
+import asyncio
 import json
 import logging
 import os
@@ -70,6 +71,14 @@ AVAILABLE_MODELS: dict[str, str] = {
     "gemini-2.5-flash": "Gemini 2.5 Flash",
     "gemini-2.0-flash": "Gemini 2.0 Flash",
     "cortex-gemini": "Cortex Gemini (無課金 2MB)",
+    "claude-sonnet": "Claude Sonnet 4.5 (LS経由)",
+    "claude-opus": "Claude Opus 4.6 (LS経由)",
+}
+
+# Claude model alias mapping (chat model name → proto enum)
+CLAUDE_MODEL_MAP: dict[str, str] = {
+    "claude-sonnet": "MODEL_CLAUDE_4_5_SONNET_THINKING",
+    "claude-opus": "MODEL_PLACEHOLDER_M26",
 }
 
 GEMINI_API_BASE = "https://generativelanguage.googleapis.com/v1beta/models"
@@ -107,12 +116,37 @@ def _get_cortex_project(token: str) -> Optional[str]:
         return None
 
 
+# --- LS Client (Claude) ---
+
+_ls_client_cache: Optional["AntigravityClient"] = None
+
+
+def _get_ls_client() -> Optional["AntigravityClient"]:
+    """AntigravityClient を遅延初期化。LS 未起動時は None を返す。"""
+    global _ls_client_cache
+    try:
+        from mekhane.ochema.antigravity_client import AntigravityClient
+        if _ls_client_cache is None:
+            _ls_client_cache = AntigravityClient()
+        # Quick health check — verify LS is still alive
+        _ls_client_cache.get_status()
+        return _ls_client_cache
+    except Exception as e:
+        logger.debug("LS client unavailable: %s", e)
+        _ls_client_cache = None
+        return None
+
+
 # --- Endpoints ---
 
 
 @router.post("/chat/send")
 async def chat_send(req: ChatRequest):
     """Gemini API にプロキシし、SSE をそのままフロントに流す。"""
+    # Claude モデルの場合は LS 経由ルートにリダイレクト
+    if req.model in CLAUDE_MODEL_MAP:
+        return await _claude_chat_from_gemini_format(req)
+
     # Cortex モデルの場合は Cortex ルートにリダイレクト
     if req.model == "cortex-gemini":
         return await _cortex_chat_from_gemini_format(req)
@@ -125,6 +159,7 @@ async def chat_send(req: ChatRequest):
         )
 
     if req.model not in AVAILABLE_MODELS:
+        # Claude models already handled above
         raise HTTPException(
             status_code=400,
             detail=f"Unknown model: {req.model}. Available: {list(AVAILABLE_MODELS.keys())}",
@@ -164,6 +199,89 @@ async def chat_send(req: ChatRequest):
 
     return StreamingResponse(
         stream_proxy(),
+        media_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "Connection": "keep-alive",
+            "X-Accel-Buffering": "no",
+        },
+    )
+
+
+async def _claude_chat_from_gemini_format(req: ChatRequest):
+    """Gemini 形式の ChatRequest を AntigravityClient 経由で Claude に送信する。"""
+    client = _get_ls_client()
+    if not client:
+        raise HTTPException(
+            status_code=503,
+            detail="Language Server が起動していません。IDE を開いてから再試行してください。",
+        )
+
+    # Gemini contents → 単一メッセージに結合
+    parts: list[str] = []
+    for content in req.contents:
+        text = content.parts[0].get("text", "") if content.parts else ""
+        prefix = "User: " if content.role == "user" else "Assistant: "
+        parts.append(f"{prefix}{text}")
+
+    # 最後の user メッセージだけを送信 (会話履歴は LS 側で管理)
+    user_message = ""
+    for content in reversed(req.contents):
+        if content.role == "user":
+            text = content.parts[0].get("text", "") if content.parts else ""
+            user_message = text
+            break
+
+    if not user_message:
+        raise HTTPException(status_code=400, detail="No user message found")
+
+    # システムプロンプトがあれば先頭に付与
+    if req.system_instruction:
+        sys_parts = req.system_instruction.get("parts", [])
+        if sys_parts:
+            sys_text = sys_parts[0].get("text", "")
+            if sys_text:
+                user_message = f"[System] {sys_text}\n\n{user_message}"
+
+    proto_model = CLAUDE_MODEL_MAP.get(req.model, "MODEL_CLAUDE_4_5_SONNET_THINKING")
+
+    logger.info(
+        "Claude Chat request: model=%s proto=%s msg_len=%d",
+        req.model, proto_model, len(user_message),
+    )
+
+    async def stream_claude():
+        """AntigravityClient.ask() をスレッドで実行し、Gemini SSE 互換で返す。"""
+        try:
+            response = await asyncio.to_thread(
+                client.ask,
+                user_message,
+                model=proto_model,
+                timeout=120.0,
+            )
+
+            if not response.text:
+                yield 'data: {"error": {"message": "Empty response from Claude", "code": 0}}\n\n'
+                return
+
+            # Gemini SSE 互換形式で返す
+            gemini_compat = {
+                "candidates": [{
+                    "content": {
+                        "parts": [{"text": response.text}],
+                        "role": "model",
+                    },
+                    "finishReason": "STOP",
+                }]
+            }
+            yield f"data: {json.dumps(gemini_compat)}\n\n"
+
+        except Exception as e:
+            logger.error("Claude chat error: %s", e)
+            yield f'data: {{"error": {{"message": "Claude error: {str(e)}", "code": 500}}}}\n\n'
+
+    return StreamingResponse(
+        stream_claude(),
         media_type="text/event-stream",
         headers={
             "Cache-Control": "no-cache",
@@ -291,7 +409,7 @@ async def cortex_chat(req: CortexChatRequest):
 
 @router.get("/chat/models")
 async def chat_models() -> dict[str, Any]:
-    """利用可能なモデル一覧を返す。Cortex の認証状態も含む。"""
+    """利用可能なモデル一覧を返す。Cortex / LS の認証状態も含む。"""
     cortex_available = False
     try:
         token = _get_cortex_token()
@@ -299,8 +417,11 @@ async def chat_models() -> dict[str, Any]:
     except Exception:
         pass
 
+    ls_available = _get_ls_client() is not None
+
     return {
         "models": AVAILABLE_MODELS,
         "default": "gemini-3-pro-preview",
         "cortex_available": cortex_available,
+        "ls_available": ls_available,
     }

@@ -232,3 +232,83 @@ main:has(#graph-container) {
   overflow: hidden;
 }
 
+/* ─── Sprint 5: Info Panel Enhancements ─────────────────────── */
+
+.info-badges {
+  display: flex;
+  gap: 0.4rem;
+  margin: 0.35rem 0 0.5rem;
+}
+
+.info-badge {
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 0.15rem 0.5rem;
+  border-radius: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.info-badge-type {
+  background: rgba(139, 148, 158, 0.12);
+  color: #8b949e;
+  border: 1px solid rgba(139, 148, 158, 0.2);
+}
+
+.info-adjacent {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin: 0.5rem 0;
+}
+
+.adj-node {
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 0.2rem 0.5rem;
+  border: 1px solid;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: transparent;
+}
+
+.adj-node:hover {
+  background: rgba(88, 166, 255, 0.1);
+  transform: translateY(-1px);
+}
+
+.info-wf-link {
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.info-wf-link:hover {
+  color: #58a6ff !important;
+}
+
+.wf-arrow {
+  font-size: 0.7rem;
+  opacity: 0.4;
+  transition: opacity 0.2s ease;
+}
+
+.info-wf-link:hover .wf-arrow {
+  opacity: 1;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(20px);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.graph-info-panel.slide-in {
+  animation: slideIn 0.25s ease-out;
+}

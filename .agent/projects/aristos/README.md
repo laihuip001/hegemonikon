@@ -40,8 +40,9 @@ Hermēneus = 実行
 | Phase | 内容 | Status |
 |:------|:-----|:-------|
 | **L1** | グラフ理論 (ルーティング) | ✅ |
-| **L2** | 遺伝的アルゴリズム (派生選択器) | 🔲 |
-| **L3** | アルゴリズム解析 (pt最適化) | 🔲 |
+| **L2** | 遺伝的アルゴリズム (進化基盤) | ✅ |
+| **L2.5** | フィードバックループ接続 | ✅ |
+| **L3** | アルゴリズム解析 (pt最適化) | ✅ |
 | **L4** | ゲーム理論 (Synergeia統合) | 🔲 |
 
 ---
@@ -50,12 +51,34 @@ Hermēneus = 実行
 
 | ファイル | 行数 | 役割 |
 |:---------|:-----|:-----|
-| `__init__.py` | 24 | パッケージ公開 API |
-| `cost.py` | ~220 | 多次元コスト計算 (pt, depth, time, BC, tier) |
+| `cost.py` | ~255 | 多次元コスト計算 (pt, depth, time, BC, tier) + evolved weights |
 | `graph_builder.py` | ~260 | WF 依存関係グラフの自動構築 |
-| `router.py` | ~280 | Dijkstra 最短経路、全経路探索、マクロ分析 |
-| `test_router.py` | ~280 | 39 テスト (全合格) |
+| `router.py` | ~440 | Dijkstra 最短経路、全経路探索、マクロ分析、ヒューリスティクス提案 |
+| `test_router.py` | ~450 | 50 テスト (全合格) |
+
+## L2 ファイル構成
+
+| ファイル | 行数 | 役割 |
+|:---------|:-----|:-----|
+| `evolve.py` | ~570 | Evolution Engine (Chromosome[T], FitnessVector, GA, Feedback) |
+| `evolve_cli.py` | ~400 | CLI: 派生重み進化、フィードバック変換、ステータス表示 |
+| `test_evolve.py` | ~310 | 35 テスト (全合格) |
+| `tests/test_feedback_loop.py` | ~370 | フィードバックループ統合テスト 13 件 |
+
+**設計思想**: Chromosome[T] を汎用に設計し、L3/L4 で対象を拡張可能。
+スケール別変異率 (Micro > Meso > Macro) = FEP の精度加重と同型。
+
+## L3 ファイル構成
+
+| ファイル | 行数 | 役割 |
+|:---------|:-----|:-----|
+| `route_feedback.py` | ~170 | ルーティングフィードバック収集・YAML 永続化 |
+| `pt_optimizer.py` | ~210 | CostVector.scalar() の重みを GA で動的最適化 |
+| `tests/test_pt_optimizer.py` | ~260 | PT 最適化テスト 15 件 |
+
+**設計思想**: L1 の CostCalculator と L2 の GA を接続。
+ルーティング品質のフィードバックからコスト関数の重みを学習する。
 
 ---
 
-*Created: 2026-02-04 | L1 Implemented: 2026-02-14*
+*Created: 2026-02-04 | L1: 2026-02-14 | L2: 2026-02-14 | L2.5: 2026-02-15 | L3: 2026-02-15*

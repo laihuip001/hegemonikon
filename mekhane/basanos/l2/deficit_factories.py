@@ -1,0 +1,304 @@
+# PURPOSE: 3種の deficit (η, ε, Δε/Δt) を検出するファクトリ群
+# REASON: F⊣G 随伴構造の「破れ」を自動検出し、問いに変換するため
+"""Deficit factories for Basanos L2.
+
+Three factories detect structural discrepancies:
+- EtaDeficitFactory: External knowledge not absorbed (η deficit)
+- EpsilonDeficitFactory: HGK claims lacking impl/justification (ε deficit)
+- DeltaDeficitFactory: Change-introduced discrepancies (Δε/Δt)
+"""
+
+from __future__ import annotations
+
+import re
+import subprocess
+from dataclasses import dataclass
+from pathlib import Path
+from typing import Optional
+
+from mekhane.basanos.l2.g_struct import GStruct
+from mekhane.basanos.l2.models import Deficit, DeficitType, ExternalForm, HGKConcept
+
+
+# ---------------------------------------------------------------------------
+# η deficit: What external knowledge has NOT been absorbed?
+# ---------------------------------------------------------------------------
+
+
+class EtaDeficitFactory:
+    """Detect η deficit: external knowledge not absorbed into HGK.
+
+    Compares Gnōsis papers against kernel/ concepts.
+    If a paper's core concepts have no corresponding kernel/ definition,
+    that's an η deficit — knowledge lost during /eat.
+    """
+
+    def __init__(self, g_struct: GStruct, project_root: Path | str) -> None:
+        self.g_struct = g_struct
+        self.project_root = Path(project_root)
+        self._hgk_keywords: Optional[set[str]] = None
+
+    def detect(self, paper_keywords: list[str], paper_title: str) -> list[Deficit]:
+        """Detect η deficits by comparing paper keywords against HGK.
+
+        Args:
+            paper_keywords: Keywords from an external paper (via Gnōsis)
+            paper_title: Title of the source paper
+
+        Returns:
+            List of Deficit objects for unabsorbed concepts
+        """
+        hgk_kw = self._get_hgk_keywords()
+        deficits = []
+
+        for kw in paper_keywords:
+            kw_lower = kw.lower()
+            # Check if any HGK keyword overlaps
+            if not any(kw_lower in hk or hk in kw_lower for hk in hgk_kw):
+                deficits.append(
+                    Deficit(
+                        type=DeficitType.ETA,
+                        severity=0.5,  # Default; could be weighted by paper citation count
+                        source=paper_title,
+                        target=kw,
+                        description=f"概念「{kw}」が HGK に未取り込み",
+                        evidence=[f"論文: {paper_title}", f"キーワード: {kw}"],
+                        suggested_action=f"/eat で「{kw}」を消化検討",
+                    )
+                )
+
+        return deficits
+
+    def _get_hgk_keywords(self) -> set[str]:
+        """Cache and return all HGK keywords from kernel/."""
+        if self._hgk_keywords is not None:
+            return self._hgk_keywords
+
+        keywords = set()
+        kernel_root = self.project_root / "kernel"
+        for md in kernel_root.glob("*.md"):
+            ext_form = self.g_struct.extract_external_form(md)
+            if ext_form:
+                keywords.update(kw.lower() for kw in ext_form.keywords)
+                keywords.update(tid.lower() for tid in ext_form.theorem_ids)
+
+        self._hgk_keywords = keywords
+        return keywords
+
+
+# ---------------------------------------------------------------------------
+# ε deficit: What HGK claims lack implementation or justification?
+# ---------------------------------------------------------------------------
+
+
+class EpsilonDeficitFactory:
+    """Detect ε deficit: HGK claims lacking implementation or justification.
+
+    Two sub-types:
+    - ε-impl: kernel/ definition exists but no PROOF.md / mekhane/ implementation
+    - ε-just: kernel/ claim exists but no supporting paper in Gnōsis
+    """
+
+    # Map series to expected implementation directories
+    IMPL_DIRS = {
+        "O": ["workflows"],  # /noe, /bou, /zet, /ene
+        "S": ["mekhane/ergasterion", "mekhane/symploke"],
+        "H": ["workflows"],
+        "P": ["mekhane/fep"],
+        "K": ["mekhane/anamnesis", "mekhane/basanos"],
+        "A": ["mekhane/basanos", "mekhane/fep"],
+    }
+
+    def __init__(self, g_struct: GStruct, project_root: Path | str) -> None:
+        self.g_struct = g_struct
+        self.project_root = Path(project_root)
+
+    def detect_impl_deficits(self) -> list[Deficit]:
+        """Detect ε-impl: kernel definitions without implementations."""
+        deficits = []
+        kernel_root = self.project_root / "kernel"
+        concepts = self.g_struct.scan_all()
+
+        for concept in concepts:
+            if concept.status != "CANONICAL":
+                continue
+
+            # Check if implementation directories exist
+            impl_dirs = self.IMPL_DIRS.get(concept.series, [])
+            has_any_impl = False
+
+            for impl_dir in impl_dirs:
+                impl_path = self.project_root / impl_dir
+                if impl_path.exists():
+                    # Look for references to this concept's theorem IDs
+                    for tid in concept.theorem_ids:
+                        if self._find_reference(impl_path, tid):
+                            has_any_impl = True
+                            break
+                if has_any_impl:
+                    break
+
+            if not has_any_impl and concept.theorem_ids:
+                deficits.append(
+                    Deficit(
+                        type=DeficitType.EPSILON_IMPL,
+                        severity=0.6,
+                        source=concept.path,
+                        target=", ".join(concept.theorem_ids),
+                        description=f"{concept.title} の定理 {concept.theorem_ids} に実装が見つからない",
+                        evidence=[f"kernel path: {concept.path}", f"series: {concept.series}"],
+                        suggested_action="実装ディレクトリに PROOF.md か対応コードが必要",
+                    )
+                )
+
+        return deficits
+
+    def detect_justification_deficits(
+        self, gnosis_keywords: set[str]
+    ) -> list[Deficit]:
+        """Detect ε-justification: HGK claims without external support.
+
+        Args:
+            gnosis_keywords: Set of keywords from Gnōsis paper database
+
+        Returns:
+            List of justification deficits (flagged, not resolved)
+        """
+        deficits = []
+        kernel_root = self.project_root / "kernel"
+
+        for md in sorted(kernel_root.glob("*.md")):
+            ext_form = self.g_struct.extract_external_form(md)
+            if not ext_form:
+                continue
+
+            for claim in ext_form.claims:
+                # Check if any gnosis keyword relates to this claim
+                claim_words = set(claim.lower().split())
+                overlap = claim_words & gnosis_keywords
+                if not overlap:
+                    deficits.append(
+                        Deficit(
+                            type=DeficitType.EPSILON_JUST,
+                            severity=0.4,  # Flag only; resolution via /sop
+                            source=ext_form.source_path,
+                            target=claim,
+                            description=f"主張「{claim[:50]}...」に Gnōsis の根拠なし",
+                            evidence=[f"source: {ext_form.source_path}"],
+                            suggested_action="/sop で学術的根拠を調査",
+                        )
+                    )
+
+        return deficits
+
+    def _find_reference(self, directory: Path, theorem_id: str) -> bool:
+        """Check if a theorem ID is referenced in any file under directory."""
+        try:
+            result = subprocess.run(
+                ["grep", "-rl", theorem_id, str(directory)],
+                capture_output=True,
+                text=True,
+                timeout=5,
+            )
+            return bool(result.stdout.strip())
+        except (subprocess.TimeoutExpired, OSError):
+            return False
+
+
+# ---------------------------------------------------------------------------
+# Δε/Δt: What changes introduced new discrepancies?
+# ---------------------------------------------------------------------------
+
+
+class DeltaDeficitFactory:
+    """Detect Δε/Δt: changes that introduce structural discrepancies.
+
+    Uses git diff to find recent changes to kernel/ or mekhane/ files,
+    then checks if those changes break consistency.
+    """
+
+    def __init__(self, project_root: Path | str) -> None:
+        self.project_root = Path(project_root)
+
+    def detect(self, since: str = "HEAD~5") -> list[Deficit]:
+        """Detect change-induced deficits from recent git history.
+
+        Args:
+            since: Git revision range (default: last 5 commits)
+
+        Returns:
+            List of Δε/Δt deficits
+        """
+        deficits = []
+
+        # Get changed kernel/ files
+        kernel_changes = self._get_changed_files(since, "kernel/")
+        mekhane_changes = self._get_changed_files(since, "mekhane/")
+
+        # If kernel changed but mekhane didn't (or vice versa), flag it
+        for kf in kernel_changes:
+            series = self._detect_series_from_path(kf)
+            if series:
+                related_mekhane = [
+                    mf for mf in mekhane_changes if self._is_related(series, mf)
+                ]
+                if not related_mekhane:
+                    deficits.append(
+                        Deficit(
+                            type=DeficitType.DELTA,
+                            severity=0.5,
+                            source=kf,
+                            target="mekhane/",
+                            description=f"kernel/{kf} が変更されたが、対応する mekhane/ の更新がない",
+                            evidence=[f"変更ファイル: kernel/{kf}", f"series: {series}"],
+                            suggested_action="kernel の変更に合わせて実装を更新するか確認",
+                        )
+                    )
+
+        return deficits
+
+    def _get_changed_files(self, since: str, prefix: str) -> list[str]:
+        """Get list of files changed since given revision under prefix."""
+        try:
+            result = subprocess.run(
+                [
+                    "git",
+                    "diff",
+                    "--name-only",
+                    since,
+                    "--",
+                    prefix,
+                ],
+                capture_output=True,
+                text=True,
+                cwd=str(self.project_root),
+                timeout=10,
+            )
+            return [
+                line.strip()
+                for line in result.stdout.strip().split("\n")
+                if line.strip()
+            ]
+        except (subprocess.TimeoutExpired, OSError):
+            return []
+
+    def _detect_series_from_path(self, path: str) -> Optional[str]:
+        """Detect series from file path."""
+        basename = Path(path).stem.lower()
+        mapping = {
+            "ousia": "O",
+            "schema": "S",
+            "horme": "H",
+            "perigraphe": "P",
+            "kairos": "K",
+            "akribeia": "A",
+        }
+        for name, series in mapping.items():
+            if name in basename:
+                return series
+        return None
+
+    def _is_related(self, series: str, mekhane_path: str) -> bool:
+        """Check if a mekhane path is related to a series."""
+        related_dirs = EpsilonDeficitFactory.IMPL_DIRS.get(series, [])
+        return any(mekhane_path.startswith(d) for d in related_dirs)

@@ -6,6 +6,7 @@ import type {
   SentinelLatest, SentinelPaper,
   EpistemicHealthResponse,
   BasanosL2ScanResponse,
+  BasanosL2HistoryResponse, BasanosL2TrendResponse,
 } from '../api/client';
 import { getCurrentRoute, esc, applyCountUpAnimations, applyStaggeredFadeIn, startPolling, relativeTime } from '../utils';
 import { renderUsageCard } from '../telemetry';
@@ -18,7 +19,7 @@ export async function renderDashboard(): Promise<void> {
 }
 
 async function renderDashboardContent(): Promise<void> {
-  const [health, healthCheck, fep, gnosisStats, criticals, kalonHist, quota, digestLatest, gatewayStats, sentinel, epistemicHealth, basanosL2] = await Promise.all([
+  const [health, healthCheck, fep, gnosisStats, criticals, kalonHist, quota, digestLatest, gatewayStats, sentinel, epistemicHealth, basanosL2, basanosL2History, basanosL2Trend] = await Promise.all([
     api.status().catch((): null => null),
     api.health().catch((): null => null),
     api.fepState().catch((): null => null),
@@ -31,6 +32,8 @@ async function renderDashboardContent(): Promise<void> {
     api.sentinelLatest().catch((): null => null),
     api.epistemicHealth().catch((): null => null),
     api.basanosL2Scan().catch((): null => null),
+    api.basanosL2History(10).catch((): null => null),
+    api.basanosL2Trend(10).catch((): null => null),
   ]);
 
   const app = document.getElementById('view-content')!;
@@ -104,6 +107,7 @@ async function renderDashboardContent(): Promise<void> {
     ${renderSentinelCard(sentinel)}
     ${renderEpistemicCard(epistemicHealth)}
     ${renderBasanosL2Card(basanosL2)}
+    ${renderBasanosL2HistoryCard(basanosL2History, basanosL2Trend)}
     ${renderQuotaCard(quota)}
     ${renderDigestCard(digestLatest)}
     ${renderGatewayCard(gatewayStats)}
@@ -545,6 +549,82 @@ function renderBasanosL2Card(data: BasanosL2ScanResponse | null): string {
       </div>
       ${barsHtml}
       ${deficitsHtml ? `<div style="margin-top:0.5rem;">${deficitsHtml}</div>` : ''}
+    </div>
+  `;
+}
+
+function renderBasanosL2HistoryCard(
+  history: BasanosL2HistoryResponse | null,
+  trend: BasanosL2TrendResponse | null,
+): string {
+  if (!history && !trend) return '';
+
+  const directionIcon: Record<string, string> = {
+    improving: '📉',
+    worsening: '📈',
+    stable: '➡️',
+  };
+  const directionLabel: Record<string, string> = {
+    improving: '改善傾向',
+    worsening: '悪化傾向',
+    stable: '安定',
+  };
+  const directionColor: Record<string, string> = {
+    improving: 'var(--clr-green, #4caf50)',
+    worsening: 'var(--clr-red, #f44336)',
+    stable: 'var(--clr-yellow, #ffc107)',
+  };
+
+  const dir = trend?.direction ?? 'unknown';
+  const trendHtml = trend ? `
+    <div style="display:flex; align-items:center; gap:0.75rem; margin-bottom:0.75rem;">
+      <span style="font-size:1.5rem;">${directionIcon[dir] ?? '❓'}</span>
+      <div>
+        <div style="font-weight:700; color:${directionColor[dir] ?? ''}">${directionLabel[dir] ?? dir}</div>
+        <div style="font-size:0.8rem; opacity:0.7;">
+          現在 ${trend.current}件 · 前回 ${trend.previous}件 · Δ${trend.delta >= 0 ? '+' : ''}${trend.delta}
+        </div>
+      </div>
+      <div style="font-family:monospace; font-size:1.2rem; letter-spacing:2px; margin-left:auto;">
+        ${esc(trend.sparkline)}
+      </div>
+    </div>
+  ` : '';
+
+  const records = history?.records ?? [];
+  const historyRows = records.slice(0, 8).map(r => {
+    const ts = r.timestamp?.slice(0, 16).replace('T', ' ') ?? '?';
+    const total = r.total ?? 0;
+    const color = total === 0 ? 'var(--clr-green, #4caf50)'
+      : total <= 5 ? 'var(--clr-yellow, #ffc107)'
+        : 'var(--clr-red, #f44336)';
+    const types = Object.entries(r.by_type ?? {}).map(([k, v]) => `${k}:${v}`).join(' ') || '—';
+    return `<tr>
+      <td style="opacity:0.6; font-size:0.8rem;">${esc(ts)}</td>
+      <td style="font-weight:700; color:${color}; text-align:right;">${total}</td>
+      <td style="font-size:0.8rem; opacity:0.7;">${esc(types)}</td>
+    </tr>`;
+  }).join('');
+
+  return `
+    <div class="card card-fade" style="grid-column: span 1;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.75rem;">
+        <span class="metric-label">📊 Deficit 履歴</span>
+        <span style="font-size:0.8rem; opacity:0.6;">直近 ${records.length} 件</span>
+      </div>
+      ${trendHtml}
+      ${records.length > 0 ? `
+        <table style="width:100%; border-collapse:collapse; font-size:0.85rem;">
+          <thead>
+            <tr style="opacity:0.5; font-size:0.75rem;">
+              <th style="text-align:left;">日時</th>
+              <th style="text-align:right;">件数</th>
+              <th>内訳</th>
+            </tr>
+          </thead>
+          <tbody>${historyRows}</tbody>
+        </table>
+      ` : '<div style="opacity:0.5; text-align:center; padding:1rem;">履歴なし</div>'}
     </div>
   `;
 }

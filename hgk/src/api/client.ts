@@ -248,6 +248,26 @@ export interface BasanosL2ScanResponse {
     error: string;
 }
 
+// --- Basanos L2 History/Trend Types ---
+export interface BasanosL2HistoryRecord {
+    timestamp: string;
+    scan_type: string;
+    total: number;
+    by_type: Record<string, number>;
+}
+export interface BasanosL2HistoryResponse {
+    records: BasanosL2HistoryRecord[];
+    count: number;
+}
+export interface BasanosL2TrendResponse {
+    direction: string;
+    current: number;
+    previous: number;
+    delta: number;
+    sparkline: string;
+    window: number;
+}
+
 // --- Quota Types ---
 export interface QuotaModel {
     label: string;
@@ -436,6 +456,10 @@ export const api = {
     // Basanos L2
     basanosL2Scan: () =>
         apiFetch<BasanosL2ScanResponse>('/api/basanos/l2/scan'),
+    basanosL2History: (limit = 10) =>
+        apiFetch<BasanosL2HistoryResponse>(`/api/basanos/l2/history?limit=${limit}`),
+    basanosL2Trend: (window = 10) =>
+        apiFetch<BasanosL2TrendResponse>(`/api/basanos/l2/trend?window=${window}`),
 
     // Quota
     quota: () => apiFetch<QuotaResponse>('/api/quota'),

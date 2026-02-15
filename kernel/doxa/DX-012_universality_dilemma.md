@@ -720,4 +720,68 @@ flowchart LR
 
 ---
 
-*DX-012 v2.7.0 — §17 @nous (CT+FEP dual axiom 提案) 追加 (2026-02-15)*
+## FEP × CT 統合研究 (/sop 調査) {#sec_18_fep_ct}
+
+> §17 @nous の「CT+FEP dual axiom」提案を、Deep Researcher 調査で修正。
+
+### §17 の修正
+
+| §17 提案 | 修正後 |
+|:---------|:-------|
+| CT + FEP = 二重基盤 (dual axiom) | **CT は FEP を書くための自然な言語** |
+
+> Creator の洞察: 「FEP と CT は独立ではなくリンクしているのでは」
+> → Smithe (2021-2024) の Bayesian Lenses 系列で**確認**。
+
+### Smithe 系列の核心
+
+| 年 | CT 構造 | FEP 接続 |
+|:---|:--------|:---------|
+| 2021 | **Bayesian Lens** (Grothendieck 構成) | 知覚-行動ループ = lens composition |
+| 2022 | **Polynomial functors**, Opindexed monoidal | predictive coding = adjoint pair |
+| 2023 | **String diagrams** (cd-categories) | VFE/EFE の diagrammatic derivation |
+| 2024 | **Polynomial interfaces**, dependent types | meta-agents, formal verification |
+
+### 核心: CT は FEP を「書く」ための言語
+
+> 微分方程式が物理法則と「別の公理」ではないように、
+> CT は FEP と「別の公理」ではない。
+>
+> - FEP = **法則** (認知システムが VFE を最小化する)
+> - CT = **言語** (その法則を合成的に記述する形式体系)
+>
+> Smithe: Bayesian updates compose **optically** (lens composition)
+> → FEP の双方向性 (prediction + update) が CT から**自然に**出現
+
+### HGK への示唆
+
+| 対応仮説 | 確信度 |
+|:---------|:-------|
+| HGK 12 随伴対 ↔ Bayesian Lens | [仮説: 25%] — 未比較 |
+| HGK 2×2 マトリクス ↔ polynomial functor の 2-cell | [仮説: 20%] — 未検証 |
+| CCL >> / ~ / + ↔ string diagram composition | [推定: 50%] — 構造的類似性あり |
+
+### Mangalam 警告 (残存)
+
+> CT formalization は FEP の **数学的構造** を clarify するが、
+> **反証可能性** を根本的には解決しない。
+> 「Categorical precision ≠ scientific validity」(Mangalam 2025)
+
+### axiom_hierarchy.md 改訂方針
+
+> 現行: 「**唯一の公理: FEP**」
+> 改訂案: 「**公理: FEP** (CT = その自然な表現言語)」
+>
+> 変更点: FEP を降格しない。CT を昇格しない。
+> FEP は法則として維持し、CT はその法則を記述する形式体系として**明示**する。
+> [推定: 70%] (SOURCE: Deep Researcher 10 論文分析)
+
+### 次のステップ
+
+1. **形式的マッピング**: HGK 随伴対 ↔ Bayesian Lens の isomorphism check
+2. **Smithe 論文の消化**: arXiv:2308.00861 (String Diagrams for FEP) を `/eat` で消化
+3. **axiom_hierarchy.md 改訂**: 上記 mapping 完了後に実施
+
+---
+
+*DX-012 v3.0.0 — §18 FEP×CT 統合 (Smithe Bayesian Lenses) (2026-02-15)*

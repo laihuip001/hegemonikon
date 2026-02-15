@@ -842,5 +842,78 @@ Bayesian:     Generative (探求的)  ⊣  Recognition (認識的)
 > → axiom_hierarchy.md の D-type 定義見直しの可能性。
 
 ---
+---
 
-*DX-012 v3.1.0 — §19 形式的比較: NOT isomorphic, 随伴逆転問題 (2026-02-15)*
+## Op-category 仮説: 随伴逆転の解釈 {#sec_20_op_category}
+
+> §19 の「致命的不一致 #1 (随伴逆転)」を深掘り。
+
+### 仮説
+
+> **C_agent ≅ C_information^op**
+>
+> HGK (エージェント中心) と Smithe (情報処理中心) は**同じ構造を反対側から見ている**。
+> [推定: 70%] (SOURCE: Gemini 2.5 Pro 形式分析 — 「mathematically impeccable」と判定)
+
+### 二つの視点
+
+| | 情報処理視点 (Smithe) | エージェント視点 (HGK) |
+|:--|:---------------------|:---------------------|
+| **left adjoint** = | Generative (自由に予測を生成) | Noēsis (自由に理解を形成) |
+| **right adjoint** = | Recognition (データで制約) | Zētēsis (現実で制約) |
+| **射の方向** = | 洗練 (refinement: 情報追加) | 抽象化 (abstraction: 情報圧縮) |
+| **"free" の意味** = | 予測を自由に生成 | 理解を自由に形成 |
+
+> エージェントにとっての「自由な理解」は、情報論的には「データに制約された推論」。
+> 情報論的な「自由な生成」は、エージェントにとっては「現実への問いかけ (制約)」。
+> → **射の方向が逆転する** = op-category
+
+### 数学的根拠
+
+```
+L ⊣ R  が C, D 間の随伴なら、
+R^op ⊣ L^op が D^op, C^op 間の随伴
+
+→ 左右が入れ替わる。これは数学的に自明。
+```
+
+### 反証条件 (Killing Blow)
+
+> **η_HGK = ε_Smithe が成立しなければこの仮説は棄却される。**
+
+| HGK | Smithe | 対応すべき |
+|:----|:-------|:---------|
+| **η_HGK**: Id → Zētēsis∘Noēsis (理解→探求の循環) | **ε_Smithe**: Gen∘Rec → Id (再構成→現実チェック) | **同じ変換のはず** |
+| **ε_HGK**: Noēsis∘Zētēsis → Id (探求→理解の簡約) | **η_Smithe**: Id → Rec∘Gen (現実→モデル化) | **同じ変換のはず** |
+
+> 「探求して理解する」(εHGK) と「現実をモデル化する」(ηSmithe) は**同じ認知プロセス**か？
+> 「理解して探求する」(ηHGK) と「モデルで現実を再構成する」(εSmithe) は**同じ認知プロセス**か？
+> → YES なら op-category 仮説は成立。NO なら棄却。
+
+### 先例 (数学的双対性)
+
+| 例 | 構造 |
+|:---|:-----|
+| **Stone Duality** | Boolean代数 ↔ Stone空間。Free construction と Constraining construction が逆転 |
+| **Gelfand Duality** | C*-代数 ↔ コンパクトHausdorff空間 |
+| **Pontryagin Duality** | 位相群 ↔ 双対群。Fourier変換の方向が視点で逆転 |
+| **Lagrangian ↔ Hamiltonian** | 同じ力学を配位空間 (q) と位相空間 (q,p) で記述。Legendre変換で接続 |
+
+### HGK への示唆
+
+> もし op-category 仮説が正しいなら:
+>
+> 1. HGK の D-type 随伴は**設計ミスではない** — エージェント視点からの正当な形式化
+> 2. Smithe の Bayesian Lens は**情報処理視点からの正当な形式化**
+> 3. 両者を**統合する上位構造** (Legendre 変換的なもの) が存在するはず
+> 4. axiom_hierarchy.md の現行定義は修正不要 — ただし op-category 関係を**明記**すべき
+
+### 検証ロードマップ
+
+1. **C_agent の射の定義**: HGK の前順序 ≤ が「抽象化」方向であることを形式化
+2. **C_information の射の定義**: Smithe の Markov kernel が「洗練」方向であることを確認
+3. **η/ε 交換テスト**: 上記反証条件を具体的に検証
+
+---
+
+*DX-012 v3.2.0 — §20 Op-category 仮説 (C_agent ≅ C_info^op) (2026-02-15)*

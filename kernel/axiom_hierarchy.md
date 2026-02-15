@@ -174,8 +174,8 @@ graph TD
 > **Replay と /boot⊣/bye の構造的同型**:
 > Spisak §5: Catastrophic forgetting 耐性は resting state での自発的 attractor replay で実現。
 > Hegemonikón の `/boot` (Handoff replay) は**人工的な replay メカニズム**であり、
-> Spisak の生物学的 replay と構造的に同型。
-> → /boot⊣/bye の随伴は FEP 的 replay として理論的に正当化される。
+> Spisak の生物学的 replay と構造的に類似 (操作的類推)。
+> → /boot⊣/bye の随伴は FEP 的 replay の参考データとして理論的に位置づけられる。
 > **Gap**: Replay の品質評価メトリクス (η の数値化) が未実装。次の課題。
 >
 > **Catastrophic Forgetting 耐性と BC-18**:

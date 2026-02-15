@@ -102,7 +102,7 @@ Sánchez-Cañizares (2021, Entropy) の分析:
 
 > "FEP does not claim at this stage to be a GUT; to date, it provides theoretical neuroscience and life disciplines with a **new paradigm** that can, in principle, encompass otherwise partial frameworks and shallower explanatory logics, **much as evolution became the universally shared framework for biology**."
 
-つまり **FEP は進化論と構造的に同型** — 個々の生物学的事実を「予測」するのではなく、諸理論を**統合するパラダイム**として機能する。この位置づけは Creator の「メタ原理 (バイザー)」解釈と完全に整合する。
+つまり **FEP は進化論と構造的に類似した位置づけにある** — 個々の生物学的事実を「予測」するのではなく、諸理論を**統合するパラダイム**として機能する。この位置づけは Creator の「メタ原理 (バイザー)」解釈と整合する。
 
 > [!NOTE]
 > Creator の FEP 解釈は HGK 独自の逸脱ではなく、学術的にも支持される立場。

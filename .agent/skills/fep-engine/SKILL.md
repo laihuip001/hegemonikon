@@ -289,7 +289,7 @@ print(llm_fmt)
 | Aguilera 2021 [arXiv:2105.11203](https://arxiv.org/abs/2105.11203) | FEP の物理的特殊性 | スコープ限定の必要性 |
 | Shafiei 2025 [Nature Comms](https://www.nature.com/articles/s41467-025-67348-6) | DR-FREE | 分布ロバスト FEP。環境ミスマッチ耐性 |
 | Ramstead 2024 [MIT](https://oecs.mit.edu/pub/my8vpqih) | FEP の概念整理 | 「枠組み」であり「反証性は具体モデルレベル」 |
-| **Chen et al. 2026 (UniT)** | **Sequential CoT > Parallel sampling** | **Active Inference の反復的 VFE 最小化が独立サンプリングより 2.5x 効率的** |
+| **Chen et al. 2026 (UniT)** | **Sequential CoT > Parallel sampling** | **Active Inference の反復的 VFE 最小化が独立サンプリングより 2.5x 効率的 (参考データ。⚠️ 操作的類推。反証条件: 他のアーキテクチャで並列が逐次を上回る場合)** |
 
 ### 批判と応答
 

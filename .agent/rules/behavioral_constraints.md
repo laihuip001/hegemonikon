@@ -354,7 +354,7 @@ F (事実) を列挙した後、R では以下を追加で自問する:
 ### 深度 × Thinking 紐づけ (v3.2 追加)
 
 > **導出**: CoT 2.0 の知見 — 知識タスクでは過剰な内部思考が逆効果になりうる。
-> Gemini 3 の thinking level (LOW/MED/HIGH) と構造的に同型。
+> Gemini 3 の thinking level (LOW/MED/HIGH) と構造的に類似 (操作的類推)。
 > **起源**: 2026-02-13 @read 熟読 — Perplexity プロンプト技法レポートとの摩擦。
 
 | Level | Thinking 深度 | 内部思考の使い方 | 例 |

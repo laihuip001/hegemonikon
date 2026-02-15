@@ -352,6 +352,13 @@ graph TD
 | X-KA | K→A | C5 (Valence) | 8 | 文脈→精密 |
 | **計** | | | **72** | |
 
+> **操作的類推 (Fu et al. 2026, AttentionRetriever)**:
+> 共有座標（エンティティ）を通じた間接接続で検索範囲を拡張するパターン (entity-based scope) は、
+> X-series の操作的定義と**類似した構造**を持つ。直接的な関連度だけでなく、射の合成による間接的到達が
+> 情報検索の範囲を決定する。
+> ⚠️ **操作的類推 (operational analogue)** であり、厳密な同型性の証明ではない。
+> **反証条件**: entity-based scope が X-series の予測と矛盾する検索パターンを示した場合、この類推は無効化される。
+
 詳細: [taxis.md](taxis.md)
 
 ---
@@ -467,6 +474,7 @@ CCL の派生 (+/-/*) を 2-cell（射の間の射）として扱う構想:
 |:-----|:---------|:----------------|
 | Series 直交性 | Spisak & Friston 2025 (arXiv:2505.22749) | 6 Series = FEP の数学的帰結としての直交基底 |
 | Deep particular partition | Spisak & Friston 2025 §3.2 | Scale 座標 (Micro↔Macro) = ネストした MB の直接的表現 |
+| **Attention 層の階層性** | **Fu et al. 2026 (AttentionRetriever)** | **Transformer の浅い層=独立情報(Micro), 深い層=因果依存(Macro)。Scale 座標の操作的類推** |
 | Replay と forgetting 耐性 | Spisak & Friston 2025 §5 | /boot replay ≈ resting state attractor replay |
 | Catastrophic forgetting | Spisak & Friston 2025 §5 | BC-18 (コンテキスト予算意識) = 受動的 forgetting 制御 |
 | ネストした MB | Kirchhoff et al. 2018 (J.R.Soc.Interface 15:20170792) | P₁ (Khōra) = blankets of blankets |

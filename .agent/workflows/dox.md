@@ -12,6 +12,8 @@ triggers:
 version: "2.4"
 lcm_state: beta
 lineage: "v2.3 + FBR変換 → v2.4"
+evidence:
+  content_memory_importance: "Content memory 除去で 42.5% 低下 (UniT ablation, Chen et al. 2026)。信念記録の重要性を示す参考データ。⚠️ 特定モデルの結果であり汎化は限定的"
 derivatives: [sens, conc, form, delta, structured]
 trigonon:
   series: H

@@ -111,6 +111,12 @@ G(π) = - Epistemic Value - Pragmatic Value
 > 高精度の情報源（view_file で確認 = SOURCE）からの出力は高確信度。
 > 低精度の情報源（search_web 要約 = TAINT）のみの出力は低確信度。
 > → **BC-6 の TAINT/SOURCE 追跡は、精度チャネルの健全性タグとして FEP 的に正当化される**
+>
+> **操作的類推 (Fu et al. 2026, AttentionRetriever)**:
+> π_i = V[ε_i]⁻¹ は情報源 i への**暗黙の検索クエリ**として解釈できる。
+> Attention score が高い = π が高い = その情報源に「問いかけ」ている。
+> ⚠️ 操作的類推であり、attention mechanism と FEP 精度加重の数学的同型性は未証明。
+> **反証条件**: attention score の分布が精度加重 π の理論的分布と系統的に乖離する場合。
 
 **過信と過少信の FEP 解釈**:
 
@@ -283,6 +289,7 @@ print(llm_fmt)
 | Aguilera 2021 [arXiv:2105.11203](https://arxiv.org/abs/2105.11203) | FEP の物理的特殊性 | スコープ限定の必要性 |
 | Shafiei 2025 [Nature Comms](https://www.nature.com/articles/s41467-025-67348-6) | DR-FREE | 分布ロバスト FEP。環境ミスマッチ耐性 |
 | Ramstead 2024 [MIT](https://oecs.mit.edu/pub/my8vpqih) | FEP の概念整理 | 「枠組み」であり「反証性は具体モデルレベル」 |
+| **Chen et al. 2026 (UniT)** | **Sequential CoT > Parallel sampling** | **Active Inference の反復的 VFE 最小化が独立サンプリングより 2.5x 効率的** |
 
 ### 批判と応答
 

@@ -245,6 +245,10 @@ cd ~/oikos/hegemonikon && python mekhane/anamnesis/cli.py search "query"
 AMP ループ: Stage 3 で過信検出 → Stage 1 に戻る（最大2回）
 
 > **起源の問題 (2026-02-14)**: L3 以外では「S1: はい」「S2: 問題なし」と形式的に埋めるだけでノイズ化。深度条件で環境が制御する。
+>
+> **操作的類似体 (Chen et al. 2026, UniT)**: Budget forcing (自然終了を抑制して追加反省ラウンドを強制) は
+> BC-9 の meta-cognitive check の環境的強制と構造的類似。第零原則「意志より環境」の参考データ。
+> ⚠️ 操作的類推であり、厳密な同型性は未証明。**反証条件**: Budget forcing が Meta-cognitive check と異なる認知効果を生む場合。
 
 ### BC-10: 道具利用義務（Tool-First）
 

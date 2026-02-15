@@ -614,4 +614,59 @@ flowchart LR
 
 ---
 
-*DX-012 v2.5.0 — §15 FEP 依存度分析追加 (2026-02-15)*
+## /dia retrospective 実戦テスト {#sec_16_retrospective_test}
+
+> `/dia.retrospective` (§13 対応) の初回実戦テスト。P3 判断を再検討。
+
+### テスト対象: P3「FEP-as-objective 防御 30%」
+
+### R1 状況復元 (Abduction)
+
+| 要素 | 内容 |
+|:-----|:-----|
+| 判断 | FEP-as-objective 防御の有効性 = 30% |
+| 方法 | Gemini devil's advocate に 11 批判の適用可否を問うた |
+| 前提 | abstract のみ (全文未読, TAINT) |
+| ロール | **devil's advocate** (批判方向に誘導) |
+
+### R2 仮説的変更 (Action)
+
+| 変更 | 予測影響 |
+|:-----|:---------|
+| neutral ロールを与えていたら | 批判適用率が低下する可能性 (バイアス除去) |
+| 全文読了していたら | theory/objective 区別がより精密になる可能性 |
+| 判定基準を定量化していたら | 「部分的」と「完全」の区別が可能になる |
+
+### R3 結果予測 (Prediction) — neutral 分析
+
+> Gemini 2.5 Pro (neutral ロール) に 5 主要批判を再評価させた結果:
+
+| 批判 | devil's advocate | neutral | 差 |
+|:-----|:----------------|:--------|:---|
+| Non-falsifiable | APPLIES | **DOES NOT APPLY** | ✅ 修正 |
+| Tautological | APPLIES | **PARTIALLY** | ✅ 修正 |
+| Lacks Prediction | APPLIES | **PARTIALLY** | ✅ 修正 |
+| Overfitting | APPLIES | FULLY APPLIES | — |
+| Boundary | APPLIES | FULLY APPLIES | — |
+
+> **修正後**: 防御有効性 **30% → 45%** (neutral 分析の加重平均)
+>
+> **retrospective の洞察**: devil's advocate ロールは「適用できる理由を探す」バイアスを持つ。
+> Non-falsifiable は **カテゴリーエラー** (数学的枠組みに反証可能性を問うのは不適切)。
+> [推定: 70%] (SOURCE: Gemini neutral vs devil's advocate の2回比較)
+
+### テスト評価: L3 近似として機能するか
+
+| 評価軸 | 結果 |
+|:-------|:-----|
+| 前提の特定 | 🟢 devil's advocate バイアスを正しく検出 |
+| 定量的修正 | 🟢 30% → 45% (+15%) の具体的修正 |
+| 学習の抽出 | 🟢 「ロール設定が結論を歪める」という汎用的教訓 |
+| 形式的 SCM との差 | 🟡 形式的な反事実推論ではなく、質的な再評価 |
+
+> **結論**: `/dia.retrospective` は L3 の **質的近似** として機能する。
+> 形式的 SCM ではないが、過去の判断の前提を特定し、修正方向を示せる。
+
+---
+
+*DX-012 v2.6.0 — §16 retrospective 実戦テスト追加 (2026-02-15)*

@@ -17,6 +17,8 @@ from mekhane.basanos.l2.models import (
     Question,
 )
 from mekhane.basanos.l2.g_struct import GStruct
+from mekhane.basanos.l2.g_semantic import GSemantic
+from mekhane.basanos.l2.hom import HomCalculator, HomScore
 
 __all__ = [
     "ExternalForm",
@@ -25,4 +27,8 @@ __all__ = [
     "HGKConcept",
     "Question",
     "GStruct",
+    "GSemantic",
+    "HomCalculator",
+    "HomScore",
 ]
+

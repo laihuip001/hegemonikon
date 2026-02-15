@@ -62,8 +62,9 @@ class Citation:
     source_url: str
     source_title: str = ""
     taint_level: TaintLevel = TaintLevel.UNCHECKED
-    similarity: float = 0.0
+    similarity: float | None = None
     verified_at: str | None = None
+    verification_note: str = ""
 
     @property
     def is_trustworthy(self) -> bool:

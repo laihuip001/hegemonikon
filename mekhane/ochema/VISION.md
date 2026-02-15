@@ -34,11 +34,33 @@ Ochēma は1つのプロジェクトとして、界面を段階的に広げて�
 
 | Phase | 形態 | 状態 | 到達範囲 |
 |:------|:-----|:-----|:---------|
-| 0 | `antigravity_client.py` | ✅ 完成 | Python から LLM |
+| 0 | `antigravity_client.py` | ✅ 完成 | Python から LLM (LS 経由) |
 | 1 | `cli.py` | ✅ 完成 | ターミナルから LLM |
 | 2 | `ochema_mcp_server.py` | ✅ 完成 | IDE (Antigravity) から LLM |
+| 2.5 | `service.py` (OchemaService) | ✅ 完成 | **統一サービス層** — 全消費者のファサード |
 | 3 | `hgk_gateway.py` | ✅ 完成 | モバイル/claude.ai から HGK + LLM |
 | 4 | **OIKOS App** | 🔮 構想 | 専用 UI から HGK 全機能 |
+
+### Phase 2.5: OchemaService — 統一サービス層
+
+Phase 0-3 の各消費者が個別にクライアントを管理していた重複を解消:
+
+```
+┌─[消費者]──────────────────────────────────────┐
+│  chat.py │ MCP server │ CLI │ Gateway         │
+└──────┬───────┬──────────┬──────┬──────────────┘
+       │       │          │      │
+       ▼       ▼          ▼      ▼
+┌─[OchemaService]───────────────────────────────┐
+│  • Singleton pattern                          │
+│  • Model routing (Claude ↔ Gemini)            │
+│  • Client lifecycle management                │
+│  • ask / ask_async / stream                   │
+├───────────────────┬───────────────────────────┤
+│ AntigravityClient │ CortexClient              │
+│ (LS → Claude)     │ (Cortex API → Gemini)     │
+└───────────────────┴───────────────────────────┘
+```
 
 ### Phase 3 → 4 の転換点
 
@@ -115,6 +137,8 @@ OIKOS App ならば:
 - [antigravity_client.py](file:///home/makaron8426/oikos/hegemonikon/mekhane/ochema/antigravity_client.py) — Phase 0
 - [cli.py](file:///home/makaron8426/oikos/hegemonikon/mekhane/ochema/cli.py) — Phase 1
 - [ochema_mcp_server.py](file:///home/makaron8426/oikos/hegemonikon/mekhane/mcp/ochema_mcp_server.py) — Phase 2
+- [service.py](file:///home/makaron8426/oikos/hegemonikon/mekhane/ochema/service.py) — Phase 2.5 (OchemaService)
+- [cortex_client.py](file:///home/makaron8426/oikos/hegemonikon/mekhane/ochema/cortex_client.py) — Cortex API direct
 - [hgk_gateway.py](file:///home/makaron8426/oikos/hegemonikon/mekhane/mcp/hgk_gateway.py) — Phase 3
 
 ---

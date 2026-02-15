@@ -88,3 +88,6 @@ dashboard_current.png
 # OAuth credentials (local only)
 oauth.json
 .cortex_creds
+
+# LS reverse-engineering notes (contains OAuth token patterns)
+mekhane/ochema/docs/ls-standalone-reference.md

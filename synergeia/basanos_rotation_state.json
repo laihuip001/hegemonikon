@@ -1,26 +1,9 @@
 {
   "last_domains": [
     "Maintainability",
-    "DataFlow",
-    "Scalability",
-    "Documentation",
-    "EdgeCase",
-    "Architecture",
-    "CodeStyle",
-    "Security",
-    "Reliability",
-    "Observability",
-    "Dependency",
-    "Compatibility",
-    "Resource",
-    "Error",
     "Usability",
-    "API",
-    "Configuration",
-    "Testing",
-    "Performance",
-    "Concurrency"
+    "Resource"
   ],
-  "cycle": 16,
+  "cycle": 18,
   "last_date": "2026-02-15"
 }

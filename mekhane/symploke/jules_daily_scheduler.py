@@ -404,8 +404,7 @@ async def main():
         bridge = BasanosBridge()
         sampled_domains = bridge.sample_domains(args.domains)
         # Basanos では specs_per_file = 選択ドメイン数 × 24軸 (全パースペクティブ)
-        # ファイルあたりの specialist 数を axes 数に制限
-        specs_per_file = len(bridge.all_axes)  # 24
+        specs_per_file = len(sampled_domains) * len(bridge.all_axes)
         basanos_info = {
             "domains": sampled_domains,
             "axes": len(bridge.all_axes),
@@ -414,6 +413,7 @@ async def main():
         print(f"Mode:     basanos (structured orthogonal perspectives)")
         print(f"Domains:  {sampled_domains} ({len(sampled_domains)} selected)")
         print(f"Axes:     {len(bridge.all_axes)} (all theorems)")
+        print(f"Specs:    {len(sampled_domains)} domains × {len(bridge.all_axes)} axes = {specs_per_file}/file")
         if args.sample:
             print(f"  ⚠️  --sample is ignored in basanos mode (using all {len(bridge.all_axes)} axes)")
     else:

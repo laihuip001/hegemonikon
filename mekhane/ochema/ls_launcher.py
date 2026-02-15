@@ -202,6 +202,8 @@ def main():
     parser = argparse.ArgumentParser(description="LS Standalone Launcher")
     parser.add_argument("--port", type=int, default=29501, help="Server port")
     parser.add_argument("--token", type=str, help="OAuth access token")
+    parser.add_argument("--from-ide", action="store_true",
+                        help="Read token from IDE's state.vscdb")
     parser.add_argument("--auto-token", action="store_true",
                         help="Auto-extract token from running LS")
     parser.add_argument("--workspace", type=str, default="standalone_test")
@@ -214,7 +216,17 @@ def main():
     
     # Get token
     token = args.token
-    if not token and args.auto_token:
+    if not token and args.from_ide:
+        from mekhane.ochema.fake_extension_server import read_token_from_ide
+        print("[Launcher] Reading OAuth token from IDE state.vscdb...")
+        token_info = read_token_from_ide()
+        if token_info:
+            token = token_info.access_token
+            print(f"[Launcher] Found token: {token[:20]}... (expiry: {token_info.expiry_seconds})")
+        else:
+            print("[Launcher] ERROR: No token found in state.vscdb")
+            sys.exit(1)
+    elif not token and args.auto_token:
         print("[Launcher] Extracting OAuth token from running LS...")
         token = get_current_oauth_token()
         if token:
@@ -224,7 +236,7 @@ def main():
             sys.exit(1)
     
     if not token:
-        print("[Launcher] ERROR: --token or --auto-token required")
+        print("[Launcher] ERROR: --token, --from-ide, or --auto-token required")
         sys.exit(1)
     
     # Launch

@@ -36,6 +36,16 @@ if [ $DENDRON_EXIT -ne 0 ]; then
 fi
 echo ""
 
+# Phase 1.5: Basanos Δε/Δt — kernel/mekhane 変更の構造的整合性チェック
+KERNEL_CHANGED=$(git diff --cached --name-only | grep -c "^kernel/" || true)
+MEKHANE_CHANGED=$(git diff --cached --name-only | grep -c "^mekhane/" || true)
+if [ "$KERNEL_CHANGED" -gt 0 ] || [ "$MEKHANE_CHANGED" -gt 0 ]; then
+    echo ""
+    echo "🔍 Basanos Δε/Δt scan (kernel/mekhane changes detected)..."
+    PYTHONPATH=. .venv/bin/python -m mekhane.basanos.l2.cli scan --type delta 2>&1 || true
+    echo ""
+fi
+
 # Phase 2: Test Suite
 PYTHONPATH=. .venv/bin/python -m pytest \
     mekhane/tests/ \

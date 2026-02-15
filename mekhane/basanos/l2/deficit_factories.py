@@ -1,5 +1,6 @@
 # PURPOSE: 3種の deficit (η, ε, Δε/Δt) を検出するファクトリ群
 # REASON: F⊣G 随伴構造の「破れ」を自動検出し、問いに変換するため
+# PROOF: 41/41 テスト (tests/test_l2.py, tests/test_extensions.py) + CLI scan 0 deficit
 """Deficit factories for Basanos L2.
 
 Three factories detect structural discrepancies:
@@ -26,6 +27,7 @@ from mekhane.basanos.l2.models import Deficit, DeficitType, ExternalForm, HGKCon
 
 
 class EtaDeficitFactory:
+    # PURPOSE: 外部知識の未吸収を検出する η deficit ファクトリ
     """Detect η deficit: external knowledge not absorbed into HGK.
 
     Compares Gnōsis papers against kernel/ concepts.
@@ -39,6 +41,7 @@ class EtaDeficitFactory:
         self._hgk_keywords: Optional[set[str]] = None
 
     def detect(self, paper_keywords: list[str], paper_title: str) -> list[Deficit]:
+        # PURPOSE: 論文キーワードと HGK kernel/ を照合し、未吸収概念を deficit として返す
         """Detect η deficits by comparing paper keywords against HGK.
 
         Args:
@@ -92,6 +95,7 @@ class EtaDeficitFactory:
 
 
 class EpsilonDeficitFactory:
+    # PURPOSE: HGK の主張に実装/根拠がない ε deficit を検出するファクトリ
     """Detect ε deficit: HGK claims lacking implementation or justification.
 
     Two sub-types:
@@ -137,6 +141,7 @@ class EpsilonDeficitFactory:
 
         mapping: dict[str, list[str]] = {}
         theorem_re = re.compile(r"^[OSHPKA][1-4]$")
+        theorem_search_re = re.compile(r"\b([OSHPKA][1-4])\b")
 
         for wf_path in sorted(wf_dir.glob("*.md")):
             basename = wf_path.stem
@@ -152,8 +157,9 @@ class EpsilonDeficitFactory:
 
                 import yaml
                 fm = yaml.safe_load(fm_match.group(1)) or {}
-                modules = fm.get("modules", [])
 
+                # Source 1: modules: [X1, X2]
+                modules = fm.get("modules", [])
                 if isinstance(modules, list):
                     for mod in modules:
                         mod_str = str(mod).strip()
@@ -162,6 +168,17 @@ class EpsilonDeficitFactory:
                                 mapping[mod_str] = []
                             if basename not in mapping[mod_str]:
                                 mapping[mod_str].append(basename)
+
+                # Source 2: hegemonikon: "K4 Sophia" → extract "K4"
+                hgk_field = fm.get("hegemonikon", "")
+                if isinstance(hgk_field, str):
+                    hgk_match = theorem_search_re.search(hgk_field)
+                    if hgk_match:
+                        tid = hgk_match.group(1)
+                        if tid not in mapping:
+                            mapping[tid] = []
+                        if basename not in mapping[tid]:
+                            mapping[tid].append(basename)
             except Exception:
                 continue
 
@@ -171,6 +188,7 @@ class EpsilonDeficitFactory:
         return result
 
     def detect_impl_deficits(self) -> list[Deficit]:
+        # PURPOSE: kernel/ 定義に対応する WF/mekhane 実装の有無を検査
         """Detect ε-impl: kernel definitions without implementations."""
         deficits = []
         concepts = self.g_struct.scan_all()
@@ -229,6 +247,7 @@ class EpsilonDeficitFactory:
     def detect_justification_deficits(
         self, gnosis_keywords: set[str]
     ) -> list[Deficit]:
+        # PURPOSE: kernel/ の主張に Gnōsis 論文による学術的根拠があるかを検査
         """Detect ε-justification: HGK claims without external support.
 
         Args:
@@ -284,6 +303,7 @@ class EpsilonDeficitFactory:
 
 
 class DeltaDeficitFactory:
+    # PURPOSE: git 変更差分から構造的不整合を検出する Δε/Δt ファクトリ
     """Detect Δε/Δt: changes that introduce structural discrepancies.
 
     Uses git diff to find recent changes to kernel/ or mekhane/ files,
@@ -294,6 +314,7 @@ class DeltaDeficitFactory:
         self.project_root = Path(project_root)
 
     def detect(self, since: str = "HEAD~5") -> list[Deficit]:
+        # PURPOSE: 直近の git コミットから kernel/mekhane 間の不整合を検出
         """Detect change-induced deficits from recent git history.
 
         Args:

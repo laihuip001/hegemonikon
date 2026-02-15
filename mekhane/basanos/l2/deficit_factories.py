@@ -110,31 +110,38 @@ class EpsilonDeficitFactory:
     }
 
     # Map theorem IDs to known workflow file basenames
+    # Verified against kernel/ definitions and .agent/workflows/ frontmatter
     THEOREM_TO_WF: dict[str, list[str]] = {
-        "O1": ["noe"],
-        "O2": ["bou"],
-        "O3": ["zet"],
-        "O4": ["ene"],
-        "S1": ["sta"],
-        "S2": ["mek"],
-        "S3": ["met"],
-        "S4": ["pra"],
-        "H1": ["pro"],
-        "H2": ["pis"],
-        "H3": ["ore"],
-        "H4": ["dox"],
-        "P1": ["euk"],
-        "P2": ["chr"],
-        "P3": ["tel"],
-        "P4": ["ana"],
-        "K1": ["kho"],
-        "K2": ["tak"],
-        "K3": ["sop"],
-        "K4": ["epi"],
-        "A1": ["kri"],
-        "A2": ["dia"],
-        "A3": ["syn"],
-        "A4": ["epi"],
+        # O-series (Ousia)
+        "O1": ["noe"],   # Noēsis
+        "O2": ["bou"],   # Boulēsis
+        "O3": ["zet"],   # Zētēsis
+        "O4": ["ene"],   # Energeia
+        # S-series (Schema)
+        "S1": ["met"],   # Metron
+        "S2": ["mek"],   # Mekhanē
+        "S3": ["sta"],   # Stathmos
+        "S4": ["pra"],   # Praxis
+        # H-series (Hormē)
+        "H1": ["pro"],   # Propatheia
+        "H2": ["pis"],   # Pistis
+        "H3": ["ore"],   # Orexis
+        "H4": ["dox"],   # Doxa
+        # P-series (Perigraphē)
+        "P1": ["kho"],   # Khōra
+        "P2": ["hod"],   # Hodos
+        "P3": ["tro"],   # Trokhia
+        "P4": ["tek"],   # Tekhnē
+        # K-series (Kairos)
+        "K1": ["euk"],   # Eukairia
+        "K2": ["chr"],   # Chronos
+        "K3": ["tel"],   # Telos
+        "K4": ["sop"],   # Sophia
+        # A-series (Akribeia)
+        "A1": ["pat"],   # Pathos
+        "A2": ["dia"],   # Krisis
+        "A3": ["gno"],   # Gnōmē
+        "A4": ["epi"],   # Epistēmē
     }
 
     def __init__(self, g_struct: GStruct, project_root: Path | str) -> None:

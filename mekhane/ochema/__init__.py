@@ -4,5 +4,6 @@
 
 from mekhane.ochema.antigravity_client import AntigravityClient, LLMResponse
 from mekhane.ochema.cortex_client import CortexClient
+from mekhane.ochema.service import OchemaService
 
-__all__ = ["AntigravityClient", "CortexClient", "LLMResponse"]
+__all__ = ["AntigravityClient", "CortexClient", "LLMResponse", "OchemaService"]

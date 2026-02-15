@@ -24,65 +24,27 @@ Usage:
 """
 
 import sys
-import importlib.util
+import subprocess
 from pathlib import Path
 
 # Paths
 SCRIPTS_DIR = Path(__file__).parent
-PEIRA_SCRIPTS = SCRIPTS_DIR.parent / "peira" / "scripts"
-ANAMNESIS_DIR = SCRIPTS_DIR
-
-# Import indexers directly
-try:
-    # Try importing as part of the mekhane package
-    from mekhane.anamnesis import lancedb_indexer, module_indexer
-except ImportError:
-    # Fallback for script execution
-    sys.path.append(str(ANAMNESIS_DIR))
-    import lancedb_indexer
-    import module_indexer
-
-# Dynamically import chat-history-kb (due to hyphens in filename)
-def import_chat_history_kb():
-    try:
-        spec = importlib.util.spec_from_file_location(
-            "chat_history_kb", PEIRA_SCRIPTS / "chat-history-kb.py"
-        )
-        if spec and spec.loader:
-            module = importlib.util.module_from_spec(spec)
-            spec.loader.exec_module(module)
-            return module
-    except Exception as e:
-        # Silently fail if file not found (will be handled in search_vector)
-        return None
-
-chat_history_kb = import_chat_history_kb()
+PEIRA_SCRIPTS = Path(r"M:\Hegemonikon\mekhane\peira\scripts")
+ANAMNESIS_DIR = Path(r"M:\Hegemonikon\mekhane\anamnesis")
 
 
 # PURPOSE: ベクトル検索（chat-history-kb.py）
 def search_vector(query: str, limit: int = 3) -> str:
     """ベクトル検索（chat-history-kb.py）"""
-    if not chat_history_kb:
-        return "[ERROR] Vector search unavailable (module not loaded)"
-
     try:
-        results = chat_history_kb.search_chat_history(query, n_results=limit)
-
-        output = []
-        output.append(f'\n[SEARCH] Query: "{query}"\n')
-        output.append("-" * 60)
-
-        if results:
-            for i, r in enumerate(results):
-                output.append(f"\n[{i+1}] Session: {r['session_id'][:8]}...")
-                output.append(f"    Type: {r['artifact_type']}")
-                output.append(f"    Summary: {r['summary'][:100]}...")
-                output.append(f"    Updated: {r['updated_at']}")
-        else:
-            output.append("\nNo results found.")
-
-        output.append("\n" + "-" * 60)
-        return "\n".join(output)
+        result = subprocess.run(
+            ["python", str(PEIRA_SCRIPTS / "chat-history-kb.py"), "search", query],
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            timeout=60,
+        )
+        return result.stdout
     except Exception as e:
         return f"[ERROR] Vector search failed: {e}"
 
@@ -91,20 +53,14 @@ def search_vector(query: str, limit: int = 3) -> str:
 def search_fts(query: str, limit: int = 3) -> str:
     """FTS 検索（lancedb_indexer.py）"""
     try:
-        results = lancedb_indexer.search_sessions(query, limit=limit)
-
-        output = []
-        if results:
-            output.append(f"\n=== Found {len(results)} results ===\n")
-            for i, r in enumerate(results, 1):
-                output.append(f"[{i}] {r['title']}")
-                output.append(f"    File: {r['filename']}")
-                output.append(f"    Preview: {r['content_preview'][:100]}...")
-                output.append("")
-        else:
-            output.append("[!] No results found")
-
-        return "\n".join(output)
+        result = subprocess.run(
+            ["python", str(ANAMNESIS_DIR / "lancedb_indexer.py"), "search", query],
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            timeout=30,
+        )
+        return result.stdout
     except Exception as e:
         return f"[ERROR] FTS search failed: {e}"
 
@@ -113,21 +69,14 @@ def search_fts(query: str, limit: int = 3) -> str:
 def search_modules(query: str, limit: int = 3) -> str:
     """モジュール検索（module_indexer.py）"""
     try:
-        results = module_indexer.search_modules(query, limit=limit)
-
-        output = []
-        if results:
-            output.append(f"\n=== Found {len(results)} results ===\n")
-            for i, r in enumerate(results, 1):
-                output.append(f"[{i}] {r['title']}")
-                output.append(f"    Category: {r['category']}")
-                output.append(f"    File: {r['filename']}")
-                output.append(f"    Preview: {r['content_preview'][:100]}...")
-                output.append("")
-        else:
-            output.append("[!] No results found")
-
-        return "\n".join(output)
+        result = subprocess.run(
+            ["python", str(ANAMNESIS_DIR / "module_indexer.py"), "search", query],
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            timeout=30,
+        )
+        return result.stdout
     except Exception as e:
         return f"[ERROR] Module search failed: {e}"
 

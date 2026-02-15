@@ -187,6 +187,50 @@ export interface DigestReportListResponse {
     total: number;
 }
 
+// --- Sentinel Types ---
+export interface SentinelPaper {
+    title: string;
+    score: number;
+    topic: string;
+    abstract: string;
+}
+export interface SentinelLatest {
+    timestamp: string;
+    topics: string[];
+    totalPapers: number;
+    highScorePapers: number;
+    hasPapers: boolean;
+    shouldAlert: boolean;
+    topPapers: SentinelPaper[];
+    status?: string;
+    message?: string;
+}
+
+// --- Epistemic Types ---
+export interface EpistemicPatch {
+    id: string;
+    claim: string;
+    status: string;
+    file: string;
+    line: number;
+    source: string;
+    falsification: string;
+    updated: string;
+}
+export interface EpistemicStatusResponse {
+    total: number;
+    summary: Record<string, number>;
+    patches: EpistemicPatch[];
+    status?: string;
+}
+export interface EpistemicHealthResponse {
+    score: number;
+    total_patches: number;
+    falsification_coverage: number;
+    grade: string;
+    details?: string;
+}
+
 // --- Quota Types ---
 export interface QuotaModel {
     label: string;
@@ -361,6 +405,16 @@ export const api = {
         apiFetch<DigestReportListResponse>(`/api/digestor/reports?limit=${limit}`),
     digestorLatest: () =>
         apiFetch<DigestReport | null>('/api/digestor/latest'),
+
+    // Sentinel
+    sentinelLatest: () =>
+        apiFetch<SentinelLatest>('/api/sentinel/latest'),
+
+    // Epistemic
+    epistemicStatus: () =>
+        apiFetch<EpistemicStatusResponse>('/api/epistemic/status'),
+    epistemicHealth: () =>
+        apiFetch<EpistemicHealthResponse>('/api/epistemic/health'),
 
     // Quota
     quota: () => apiFetch<QuotaResponse>('/api/quota'),

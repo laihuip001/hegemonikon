@@ -214,6 +214,30 @@ def _register_routers(app: FastAPI) -> None:
     except Exception as exc:
         logger.warning("Quota router skipped: %s", exc)
 
+    # Aristos — L2 Evolution Dashboard (ファイルシステム IO のみ)
+    try:
+        from mekhane.api.routes.aristos import router as aristos_router
+        app.include_router(aristos_router, prefix=API_PREFIX)
+        logger.info("Aristos router registered")
+    except Exception as exc:
+        logger.warning("Aristos router skipped: %s", exc)
+
+    # Sentinel — Paper Sentinel レポート (ファイルシステム IO のみ)
+    try:
+        from mekhane.api.routes.sentinel import router as sentinel_router
+        app.include_router(sentinel_router, prefix=API_PREFIX)
+        logger.info("Sentinel router registered")
+    except Exception as exc:
+        logger.warning("Sentinel router skipped: %s", exc)
+
+    # Epistemic — 認識論的地位レジストリ (YAML ファイル IO のみ)
+    try:
+        from mekhane.api.routes.epistemic import router as epistemic_router
+        app.include_router(epistemic_router, prefix=API_PREFIX)
+        logger.info("Epistemic router registered")
+    except Exception as exc:
+        logger.warning("Epistemic router skipped: %s", exc)
+
 
 # PURPOSE: アプリケーションインスタンス（uvicorn 用）
 app = create_app()

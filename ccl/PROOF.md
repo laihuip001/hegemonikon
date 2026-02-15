@@ -27,3 +27,15 @@ ccl/
 
 - **ccl/**: 仕様・ドキュメント (言語設計)
 - **mekhane/ccl/**: 実装・パーサー (言語処理)
+
+<!-- EPISTEMIC_STATUS_START -->
+
+## 認識論的地位 (Epistemic Status)
+
+> 自動生成: `epistemic_status.yaml` から注入
+
+| ID | 主張 | 地位 | 反証条件 |
+|:---|:-----|:-----|:---------|
+| P8 | Subgoal decomposition が認知的に有用 | 🔵 reference | LLM 以外の認知システムで分解構造が不要な場合 |
+
+<!-- EPISTEMIC_STATUS_END -->

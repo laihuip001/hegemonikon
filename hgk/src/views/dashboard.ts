@@ -3,6 +3,8 @@ import { api } from '../api/client';
 import type {
   HealthReportResponse, Notification, DigestCandidate, DigestReport,
   QuotaResponse, QuotaModel, PKSGatewayStatsResponse,
+  SentinelLatest, SentinelPaper,
+  EpistemicHealthResponse,
 } from '../api/client';
 import { getCurrentRoute, esc, applyCountUpAnimations, applyStaggeredFadeIn, startPolling, relativeTime } from '../utils';
 import { renderUsageCard } from '../telemetry';
@@ -15,7 +17,7 @@ export async function renderDashboard(): Promise<void> {
 }
 
 async function renderDashboardContent(): Promise<void> {
-  const [health, healthCheck, fep, gnosisStats, criticals, kalonHist, quota, digestLatest, gatewayStats] = await Promise.all([
+  const [health, healthCheck, fep, gnosisStats, criticals, kalonHist, quota, digestLatest, gatewayStats, sentinel, epistemicHealth] = await Promise.all([
     api.status().catch((): null => null),
     api.health().catch((): null => null),
     api.fepState().catch((): null => null),
@@ -25,6 +27,8 @@ async function renderDashboardContent(): Promise<void> {
     api.quota().catch((): null => null),
     api.digestorLatest().catch((): null => null),
     api.pksGatewayStats().catch((): null => null),
+    api.sentinelLatest().catch((): null => null),
+    api.epistemicHealth().catch((): null => null),
   ]);
 
   const app = document.getElementById('view-content')!;
@@ -95,6 +99,8 @@ async function renderDashboardContent(): Promise<void> {
         <div class="kalon-card-hint">Ctrl+K → kalon [概念] で判定</div>
       </div>
     </div>
+    ${renderSentinelCard(sentinel)}
+    ${renderEpistemicCard(epistemicHealth)}
     ${renderQuotaCard(quota)}
     ${renderDigestCard(digestLatest)}
     ${renderGatewayCard(gatewayStats)}
@@ -352,3 +358,117 @@ function renderGatewayCard(stats: PKSGatewayStatsResponse | null): string {
     </div>
   `;
 }
+
+function renderSentinelCard(data: SentinelLatest | null): string {
+  if (!data || data.status === 'no_data') {
+    return `
+      <div class="card" style="margin-top:1rem;">
+        <div class="metric-label">🔭 Paper Sentinel</div>
+        <div style="color:var(--text-secondary); font-size:0.85rem; padding:0.5rem 0;">
+          Sentinel 未実行 — 6時間毎に自動スキャン
+        </div>
+      </div>
+    `;
+  }
+
+  const timeStr = data.timestamp
+    ? (() => {
+      try {
+        const d = new Date(data.timestamp);
+        return `${d.getMonth() + 1}/${d.getDate()} ${d.getHours()}:${String(d.getMinutes()).padStart(2, '0')}`;
+      } catch { return data.timestamp; }
+    })()
+    : '';
+
+  const topicsStr = (data.topics || []).join(', ');
+  const papers = (data.topPapers || []).slice(0, 5);
+
+  const papersHtml = papers.map((p: SentinelPaper) => {
+    const scoreWidth = Math.round((p.score || 0) * 100);
+    const scoreColor = (p.score || 0) >= 0.7 ? 'var(--success-color, #22c55e)'
+      : (p.score || 0) >= 0.4 ? 'var(--warning-color, #eab308)'
+        : 'var(--text-secondary)';
+    return `
+      <div class="digest-candidate">
+        <div class="digest-candidate-header">
+          <span class="digest-candidate-title">${esc(p.title)}</span>
+          <span class="digest-candidate-score" style="color:${scoreColor}">${(p.score || 0).toFixed(2)}</span>
+        </div>
+        <div class="quota-bar" style="margin:0.2rem 0;">
+          <div class="quota-bar-fill" style="width:${scoreWidth}%; background:${scoreColor}"></div>
+        </div>
+        <div class="digest-candidate-meta">
+          <span class="digest-source">${esc(p.topic)}</span>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  return `
+    <div class="card" style="margin-top:1rem;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
+        <span class="metric-label">🔭 Paper Sentinel</span>
+        <span style="color:var(--text-secondary); font-size:0.8rem;">
+          ${data.totalPapers}件発見
+          <span class="digest-timestamp">${esc(timeStr)}</span>
+        </span>
+      </div>
+      <div style="color:var(--text-secondary); font-size:0.75rem; margin-bottom:0.5rem;">
+        📡 ${esc(topicsStr)}
+      </div>
+      ${papersHtml}
+    </div>
+  `;
+}
+
+function renderEpistemicCard(data: EpistemicHealthResponse | null): string {
+  if (!data || data.details === 'Registry not found') {
+    return `
+      <div class="card" style="margin-top:1rem;">
+        <div class="metric-label">🧬 Epistemic Health</div>
+        <div style="color:var(--text-secondary); font-size:0.85rem; padding:0.5rem 0;">
+          epistemic_status.yaml 未検出
+        </div>
+      </div>
+    `;
+  }
+
+  const gradeColor: Record<string, string> = {
+    A: 'var(--success-color, #22c55e)',
+    B: 'var(--info-color, #3b82f6)',
+    C: 'var(--warning-color, #eab308)',
+    D: 'var(--error-color, #ef4444)',
+  };
+  const color = gradeColor[data.grade] ?? 'var(--text-secondary)';
+  const scorePct = Math.round(data.score);
+  const falsifPct = Math.round(data.falsification_coverage);
+
+  return `
+    <div class="card" style="margin-top:1rem;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.75rem;">
+        <span class="metric-label">🧬 Epistemic Health</span>
+        <span style="font-size:1.5rem; font-weight:700; color:${color};">${esc(data.grade)}</span>
+      </div>
+      <div style="display:flex; gap:1.5rem; margin-bottom:0.5rem;">
+        <div style="flex:1;">
+          <div style="font-size:0.8rem; color:var(--text-secondary); margin-bottom:0.15rem;">健全性スコア</div>
+          <div class="quota-bar">
+            <div class="quota-bar-fill" style="width:${scorePct}%; background:${color}"></div>
+          </div>
+          <div style="font-size:0.75rem; color:var(--text-secondary); margin-top:0.1rem;">${data.score}/100</div>
+        </div>
+        <div style="flex:1;">
+          <div style="font-size:0.8rem; color:var(--text-secondary); margin-bottom:0.15rem;">反証カバレッジ</div>
+          <div class="quota-bar">
+            <div class="quota-bar-fill" style="width:${falsifPct}%; background:var(--accent-color, #a855f7)"></div>
+          </div>
+          <div style="font-size:0.75rem; color:var(--text-secondary); margin-top:0.1rem;">${data.falsification_coverage}%</div>
+        </div>
+      </div>
+      <div style="color:var(--text-secondary); font-size:0.8rem;">
+        📊 ${data.total_patches} パッチ登録済み
+      </div>
+    </div>
+  `;
+}
+

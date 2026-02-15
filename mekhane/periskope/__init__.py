@@ -1,4 +1,3 @@
-# PROOF: [L2/Infra] Periskope package init
 """
 Periskopē — HGK Deep Research Engine
 

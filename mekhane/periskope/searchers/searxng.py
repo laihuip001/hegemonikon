@@ -1,4 +1,3 @@
-# PROOF: [L2/Infra] SearXNG searcher implementation
 """
 SearXNG search client for Periskopē.
 

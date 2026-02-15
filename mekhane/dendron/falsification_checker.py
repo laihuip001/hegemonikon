@@ -1,4 +1,3 @@
-# PROOF: [L2/Infra] Falsification checker implementation
 """
 S7: Falsification Condition Checker
 
@@ -57,7 +56,7 @@ def check_completeness(registry: dict) -> list[str]:
     return issues
 
 
-# PURPOSE: Verify that claims exist in referenced files
+# PURPOSE: Verify that claims exist in referenced files at specified lines
 def check_file_references(registry: dict) -> list[str]:
     """Verify that claims exist in referenced files at specified lines"""
     issues = []

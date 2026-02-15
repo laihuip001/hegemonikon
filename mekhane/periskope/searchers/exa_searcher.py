@@ -1,4 +1,3 @@
-# PROOF: [L2/Infra] Exa searcher implementation
 """
 Exa search client for Periskopē.
 

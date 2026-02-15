@@ -1,3 +1,4 @@
+# PROOF: [L2/Infra] Searchers package init
 """
 Periskopē searchers — pluggable search source adapters.
 

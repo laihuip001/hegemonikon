@@ -1,3 +1,4 @@
+# PROOF: [L2/Infra] Falsification checker implementation
 """
 S7: Falsification Condition Checker
 

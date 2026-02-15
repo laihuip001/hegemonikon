@@ -1,3 +1,4 @@
+# PROOF: [L2/Infra] Internal searcher implementation
 """
 Internal knowledge searcher for Periskopē.
 

@@ -11,6 +11,7 @@ from enum import Enum
 from typing import Any
 
 
+# PURPOSE: Search source identifiers
 class SearchSource(str, Enum):
     """Search source identifiers."""
     SEARXNG = "searxng"
@@ -21,6 +22,7 @@ class SearchSource(str, Enum):
     PLAYWRIGHT = "playwright"
 
 
+# PURPOSE: BC-6 TAINT classification
 class TaintLevel(str, Enum):
     """BC-6 TAINT classification for citations."""
     SOURCE = "SOURCE"       # Directly verified (similarity > 0.8)
@@ -29,6 +31,7 @@ class TaintLevel(str, Enum):
     UNCHECKED = "UNCHECKED"   # Not yet verified
 
 
+# PURPOSE: Available synthesis models
 class SynthModel(str, Enum):
     """Available synthesis models."""
     GEMINI_FLASH = "gemini-2.0-flash"
@@ -37,6 +40,7 @@ class SynthModel(str, Enum):
     CLAUDE_CORTEX = "claude-cortex"  # If available via Cortex
 
 
+# PURPOSE: A single search result from any source
 @dataclass
 class SearchResult:
     """A single search result from any source."""

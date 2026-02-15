@@ -29,6 +29,7 @@
 | `@read` | 読む | `F:[×3]{/m.read~(/noe*/dia)}` | `/s-_/pro_F:[×3]{/m.read~(/noe*/dia)}_/ore_~(/h*/k)_/pis_/dox-` |
 | `@helm` | 舵 | `/bou+*%/zet+\|>/u++` | `/pro_/kho_/bou+*%/zet+\|>/u++_~(/h*/k)_/pis_/dox-` |
 | `@desktop` | 操る | `/kho{desktop}_/ene{action}` | `/pro_/kho{desktop}_/ene{desktop_action}_V:{/dia-}_/dox-` |
+| `@rpr` | 回す(RPR) | `C:{/ene >> /dia{retrospective}}` | `C:{/ene >> /dia{retrospective}}_/dox+` |
 
 ---
 
@@ -55,6 +56,10 @@
 |:-----|:-----|:-----------|
 | `F:[×N]{X}` | N回反復 | `for _ in range(N)` |
 | `F:[a,b]{X}` | 各要素に適用 | `for x in [a,b]` |
+
+> **認知的必要性の実証 (Chen et al. 2026, UniT ablation)**:
+> Subgoal decomposition 能力の除去で構成タスクの精度が -3.8% 低下。
+> `F:[×N]{X}` の反復分解構造は認知的に不可欠。
 | `I:[cond]{X}` | 条件分岐 | `if cond:` |
 | `E:{X}` | その他 | `else:` |
 | `L:[x]{X}` | Lambda | `lambda x: X` |
@@ -80,7 +85,7 @@
              │ @read @helm  │ @ready       │
              ├──────────────┼──────────────┤
  A (行為)    │ @vet @learn  │ @fix @build  │
-             │ @proof @syn  │ @desktop     │
+             │ @proof @syn  │ @desktop @rpr│
              └──────────────┴──────────────┘
 ```
 
@@ -90,7 +95,7 @@
 |:---------|:-------|
 | Prior → Likelihood → Posterior | @dig, @plan, @fix, @kyc, @learn, @nous, @syn, @helm, @ready |
 | 反復深化 (F:[×N]) | @chew, @read, @tak |
-| 収束ループ (C:/R:) | @kyc, @fix |
+| 収束ループ (C:/R:) | @kyc, @fix, @rpr |
 | 検証ゲート (V:) | @vet, @proof, @build |
 
 ### 軸3: 双対構造
@@ -118,4 +123,4 @@
 
 ---
 
-*v4.1 — /dia++ レビューで 21→15 に間引き (2026-02-14)*
+*v4.2 — @rpr (React→Plan→Reflect) 追加 (2026-02-15)*

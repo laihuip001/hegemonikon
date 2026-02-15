@@ -35,21 +35,41 @@
 | **Macro (`macro_rules!`)** | CCL @macro | ★★★☆☆ | 衛生的マクロ = 名前空間汚染防止。HGK のマクロは衛生性が未実装 |
 | **`async/await`** | `\|\|` / `\|>` (並行/パイプ) | ★★☆☆☆ | 非同期実行モデル。HGK の並行演算子は設計段階 |
 
-## 4. 消化済（T2/T3 再発見）
+## 4. 消化済（T2/T3）
 
-| Rust | HGK 対応 | 消化結果 |
-|:-----|:---------|:--------|
-| **Affine Type System** | BC-5 LBYL + I-4 Undo | T2: 不可逆操作の分類として既に存在。→ [affine_types.md](../designs/affine_types.md) |
-| **FnOnce** | `>>` (構造的変換) | T2: コンテキストを消費する操作として >> に内在 |
-| **Send / Sync** | Independent / Shareable | T2: → [parallel_model.md](../designs/parallel_model.md) |
-| **RAII / Drop** | `{}` スコープ意味明確化 | T3: → [raii_error_propagation.md](../designs/raii_error_propagation.md) |
-| **`?` 演算子** | `I:/E:` 明示的失敗処理 | T3: 失敗=ε>ε_max (FEP 直系) |
-| **Pin\<T\>** | SACRED_TRUTH + I-4 Guard | T2: → [pin_immutability.md](../designs/pin_immutability.md) |
+### Phase 1-4 (個別消化)
+
+| Rust | HGK 対応 | T |
+|:-----|:---------|:-:|
+| **Affine Type System** | BC-5 LBYL + I-4 Undo | T2 |
+| **FnOnce** | `>>` (構造的変換) | T2 |
+| **Send / Sync** | Independent / Shareable | T2 |
+| **RAII / Drop** | `{}` スコープ意味明確化 | T3 |
+| **`?` 演算子** | `I:/E:` 明示的失敗処理 | T3 |
+| **Pin\<T\>** | SACRED_TRUTH + I-4 Guard | T2 |
+
+### Phase 5 (網羅的一括消化)
+
+| Rust | HGK 対応 | T |
+|:-----|:---------|:-:|
+| **Option\<T\>** | BC-6 確信度 + /dia epochē | T2 |
+| **ジェネリクス** | CCL はデフォルトでジェネリック | T2 |
+| **イテレータ** | F:[] + _ + I:[] | T2 |
+| **スマートポインタ** | Flow + * + || + - | T2 |
+| **Interior Mutability** | BC ランタイムチェック | T2 |
+| **チャネル (mpsc)** | || + _ (All join) | T2 |
+| **Mutex/RwLock** | Independent/Shareable | T2 |
+| **モジュール/可視性** | WF 層 (Ω/Δ/τ) + ディレクトリ | T2 |
+| **From/Into** | >> (構造的変換) | T2 |
+| **Cow** | - → + 遷移 | T2 |
+| **Newtype** | WF 派生 (+/-/*) | T2 |
+
+→ 詳細: [remaining_concepts.md](../designs/remaining_concepts.md)
 
 ## 5. 未対応
 
-**なし** — 全概念が消化済み。
+**なし** — Rust Book 全章走査済み。全 28 概念が消化完了。
 
 ---
 
-*Mapping v1.2 — 完全消化 (2026-02-15)*
+*Mapping v2.0 — 完全消化 (2026-02-15)*

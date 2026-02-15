@@ -35,14 +35,21 @@
 | **Macro (`macro_rules!`)** | CCL @macro | ★★★☆☆ | 衛生的マクロ = 名前空間汚染防止。HGK のマクロは衛生性が未実装 |
 | **`async/await`** | `\|\|` / `\|>` (並行/パイプ) | ★★☆☆☆ | 非同期実行モデル。HGK の並行演算子は設計段階 |
 
-## 4. 未対応（T3/T4 候補）
+## 4. 消化済（T2 再発見）
+
+| Rust | HGK 対応 | 消化結果 |
+|:-----|:---------|:--------|
+| **Affine Type System** | BC-5 LBYL + I-4 Undo | T2: 不可逆操作の分類として既に存在。→ [affine_types.md](../designs/affine_types.md) |
+| **FnOnce** | `>>` (構造的変換) | T2: コンテキストを消費する操作として >> に内在 |
+| **Send / Sync** | Independent / Shareable | T2: → [parallel_model.md](../designs/parallel_model.md) |
+
+## 5. 未対応（T3/T4 候補）
 
 | Rust | HGK での可能性 | 消化パターン |
 |:-----|:--------------|:------------|
-| **Affine Type System** | 認知リソースの線形使用（一度使ったら消費される思考） | T4 (概念輸入) |
 | **RAII** | WF のスコープ管理。`@scoped` の強化版 | T3 (機能消化) |
 | **Pinning (`Pin<T>`)** | 認知的固定（移動禁止の思考。公理の不変性保証） | T4 (概念輸入) |
 
 ---
 
-*Mapping v1.0 — Pepsis Rust Phase 1 (2026-02-14)*
+*Mapping v1.1 — Phase 1 T1 + Phase 2/3 T2 反映 (2026-02-15)*

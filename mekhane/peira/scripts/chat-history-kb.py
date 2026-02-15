@@ -343,16 +343,16 @@ def build_index(incremental: bool = False, report_mode: bool = False):
 # PURPOSE: Semantic search.
 
 
-def search(query: str, n_results: int = 5):
+def search_chat_history(query: str, n_results: int = 5) -> list:
     """Semantic search."""
     if not check_dependencies():
-        return
+        return []
 
     import lancedb
 
     if not LANCE_DIR.exists():
         print("Error: Index not found. Run 'python chat-history-kb.py index' first.")
-        return
+        return []
 
     embedder = Embedder()
     query_vector = embedder.embed(query)
@@ -360,18 +360,7 @@ def search(query: str, n_results: int = 5):
     db = lancedb.connect(str(LANCE_DIR))
     table = db.open_table("chat_history")
 
-    results = table.search(query_vector).limit(n_results).to_list()
-
-    print(f'\n[SEARCH] Query: "{query}"\n')
-    print("-" * 60)
-
-    for i, r in enumerate(results):
-        print(f"\n[{i+1}] Session: {r['session_id'][:8]}...")
-        print(f"    Type: {r['artifact_type']}")
-        print(f"    Summary: {r['summary'][:100]}...")
-        print(f"    Updated: {r['updated_at']}")
-
-    print("\n" + "-" * 60)
+    return table.search(query_vector).limit(n_results).to_list()
 # PURPOSE: Show statistics.
 
 
@@ -485,7 +474,19 @@ def main():
         if len(sys.argv) < 3:
             print('Usage: python chat-history-kb.py search "query"')
             return
-        search(" ".join(sys.argv[2:]))
+        query = " ".join(sys.argv[2:])
+        results = search_chat_history(query)
+
+        print(f'\n[SEARCH] Query: "{query}"\n')
+        print("-" * 60)
+
+        for i, r in enumerate(results):
+            print(f"\n[{i+1}] Session: {r['session_id'][:8]}...")
+            print(f"    Type: {r['artifact_type']}")
+            print(f"    Summary: {r['summary'][:100]}...")
+            print(f"    Updated: {r['updated_at']}")
+
+        print("\n" + "-" * 60)
     elif command == "stats":
         show_stats()
     else:

@@ -1,9 +1,10 @@
-# CCL 並行実行モデル v1.0
+# CCL 並行実行モデル v1.1
 
 > **CCL**: `/gno+{ccl.parallel_model >> rust.concurrency}`
 > **消化タイプ**: T3 (機能消化) — 既存 `||` の成熟 + Send/Sync 消化
 > **Date**: 2026-02-15
 > **前提**: [ccl/operators.md](../../ccl/operators.md) v7.4 §1.6
+> **v1.1**: /dia+ (5指摘) + /ccl-nous (4修正) 反映
 
 ---
 
@@ -52,6 +53,38 @@ A || B が安全 ⟺ 以下のいずれか:
 ```
 ❌ A と B が同じコンテキストを変更する (= データ競合)
 ❌ A の出力が B の入力に依存する (= シーケンスにすべき)
+```
+
+### 安全性の強制: Hermēneus によるコンパイル時チェック
+
+> **/dia+ + /ccl-nous 発見 (v1.1)**:
+> CCL に型チェッカーはない、と当初考えた。**誤り**。
+>
+> - **Hermēneus** = CCL のコンパイラ (パーサー → AST → 実行計画)
+> - **Claude** = CCL のランタイム (実行計画を実行)
+>
+> 並行安全チェックは **Hermēneus の dispatch()** に組み込む。
+> エージェントの意志に依存しない = **第零原則** (意志より環境)。
+
+**dispatch() での検証ロジック**:
+
+```
+dispatch("A || B"):
+  1. A と B のパラメータを解析
+  2. コンテキスト名が一致するパラメータを検出
+  3. 一致するパラメータに `+` が両方に付いている → エラー
+  4. 一致するパラメータに `+` と `-` → 警告 (Rust: &mut + & は禁止)
+  5. 一致なし or 両方 `-` → OK
+```
+
+**コンテキスト一致の定義** (/dia+ Q3 修正): **パラメータ名が同じ = 同じコンテキスト**。
+
+```ccl
+# 同じコンテキスト (パラメータ名 "ctx" が一致)
+/noe+{ctx: X} || /dia+{ctx: Y}  → ❌ 同名パラメータに両方 +
+
+# 異なるコンテキスト (パラメータ名が異なる)
+/noe+{topic: A} || /dia+{subject: B}  → ✅ 名前不一致 = 独立
 ```
 
 ---
@@ -119,10 +152,9 @@ A || B が安全 ⟺ 以下のいずれか:
 |:---------|:-----|:-----|
 | **All** (全完了) | `(A || B) _ C` | A と B の両方が完了してから C |
 | **Merge** (融合) | `(A || B) * C` | 結果を融合して C に渡す |
-| **Race** (最速) | `(A || B) >> C` | **先に完了した方**の結果で C に進む |
 
-**Race は新概念**。Rust の `select!` に相当。
-認知的意味: 「二つの思考のうち、先に結論が出た方を採用する」。
+> **v1.1 変更**: Race (`>>`) を削除。`>>` の既存意味 (構造的変換) と衝突するため。
+> Race が必要になった場合は専用構文を設計する。
 
 ---
 
@@ -132,25 +164,17 @@ A || B が安全 ⟺ 以下のいずれか:
 
 `raii_error_propagation.md` で定義: 失敗 = ε > ε_max
 
-```ccl
-# A が失敗、B が成功
-I:[(A || B) = partial]{
-  # B の結果のみで続行
-}
-E:{
-  # 両方成功
-}
-```
-
 ### 失敗戦略
 
 | 戦略 | 構文 | 意味 |
 |:-----|:-----|:-----|
-| **AllOrNothing** | `(A || B) _ C` | 片方失敗 → 全体失敗 |
-| **BestEffort** | `(A || B)- _ C` | 失敗を無視。成功した結果のみ |
-| **Fallback** | `(A || B) >> C` | Race — 先に成功した方のみ |
+| **BestEffort** | `(A || B) _ C` | 成功した結果のみで続行 |
+| **AllOrNothing** | `(A || B)! _ C` | 片方失敗 → 全体失敗 |
 
-**デフォルト: AllOrNothing**。明示的に `-` を付けると BestEffort。
+> **v1.1 変更**: デフォルトを **BestEffort** に変更。
+> 理由: AI エージェントは頻繁に「一部失敗」する。
+> AllOrNothing だと Jules の 1 タスク失敗で全体が停止する。
+> AllOrNothing が必要な場合は `!` で明示。
 
 ---
 
@@ -169,20 +193,12 @@ E:{
 @thread[claude_code]{/noe+{deep}} || @thread[jules]{/ene+{code}}
 ```
 
-### スレッドの Send/Sync 特性
+### スレッドの Independent 特性
 
-| スレッド | Send | Sync | 得意領域 |
-|:---------|:----:|:----:|:---------|
-| Antigravity (私) | ✅ | — | 認知・判断 |
-| Claude Code | ✅ | — | 長時間自律 |
-| Jules | ✅ | — | コード生成 |
-| Gemini CLI | ✅ | — | CLI 処理 |
-| Perplexity | ✅ | — | 調査 |
+全スレッド (Antigravity, Claude Code, Jules, Gemini, Perplexity) は **Independent**。
+各スレッドは独自のコンテキストを持ち、メッセージパッシングで通信。
 
-**全スレッドが Send** (独立実行可能)。
-**Sync は不要**: 各スレッドは独自のコンテキストを持ち、共有コンテキストはない。
-
-→ これは Rust の `spawn` モデルに近い: スレッド間はメッセージパッシングで通信。
+→ Rust の `spawn` + `channel` モデルに近い。
 
 ---
 
@@ -192,31 +208,13 @@ E:{
 
 ```
 A || B:
-  前提条件: A と B が Independent または Shareable
-  実行: A と B を同時に実行
-  Join: All (デフォルト) / Merge (`*`) / Race (`>>`)
-  失敗: AllOrNothing (デフォルト) / BestEffort (`-`)
+  安全条件: A と B が Independent または Shareable
+  強制: Hermēneus dispatch() がコンパイル時チェック (第零原則)
+  実行: A と B を同時に実行 (Claude がランタイム)
+  Join: All (デフォルト) / Merge (`*`)
+  失敗: BestEffort (デフォルト) / AllOrNothing (`!`)
   スレッド: @thread で指定 (省略時は同一エージェント)
 ```
-
-### operators.md に追加すべき内容
-
-| 追加項目 | 場所 |
-|:---------|:-----|
-| 安全条件 (Independent / Shareable) | §1.6 に追加 |
-| Join セマンティクス (All / Merge / Race) | §1.6 に追加 |
-| エラー戦略 (AllOrNothing / BestEffort) | §1.6 に追加 |
-
-### 新構文
-
-| 構文 | 意味 | 新規 |
-|:-----|:-----|:----:|
-| `(A || B) _ C` | All join → C | いいえ (既存構文の組合せ) |
-| `(A || B) * C` | Merge join → C | いいえ |
-| `(A || B) >> C` | Race → C | **意味拡張** |
-| `(A || B)- _ C` | BestEffort | **意味拡張** |
-
-**新構文ゼロ**。既存演算子の組合せで全て表現可能。
 
 ---
 
@@ -226,12 +224,25 @@ A || B:
 |:-----|:----|:-----:|
 | Send | Independent — WF が独立コンテキストを持つ | ✅ |
 | Sync | Shareable — コンテキストが読取専用 (`-`) で共有可能 | ✅ |
-| `!Send` | `+` で同じコンテキストを変更する WF | ✅ |
-| `!Sync` | `+` コンテキストは `||` で共有不可 | ✅ |
+| rustc | Hermēneus dispatch() — コンパイル時の安全チェック | ✅ |
+| runtime | Claude — 実行計画を実行 | ✅ |
 
 **Kalon テスト**: 「独立」「読取共有」は Rust を知らなくても理解できる。
-Send/Sync の名前は使わない。✅
+Send/Sync の名前は使わない。Hermēneus/Claude の役割分担は HGK 固有。✅
 
 ---
 
-*Pepsis Rust Phase 3 | CCL Parallel Model v1.0 (2026-02-15)*
+## /dia+ レビュー結果 (2026-02-15)
+
+| 指摘 | 対応 | ステータス |
+|:-----|:-----|:--------:|
+| Q1: 型チェッカー不在 | Hermēneus = コンパイラ。dispatch() で強制 | ✅ 修正済 |
+| Q2: Race `>>` 意味衝突 | Race 削除 | ✅ 修正済 |
+| Q3: コンテキスト曖昧 | パラメータ名一致 = 同コンテキストと定義 | ✅ 修正済 |
+| Q4: 実需確認 | @thread 並行は実在する需要 | ✅ 確認済 |
+| Q5: デフォルト戦略 | BestEffort に変更 | ✅ 修正済 |
+
+---
+
+*Pepsis Rust Phase 3 | CCL Parallel Model v1.1 (2026-02-15)*
+*v1.1: /dia+ (5指摘) + /ccl-nous (再帰的問い) 反映*

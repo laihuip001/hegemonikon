@@ -251,6 +251,18 @@ async def handle_run_digestor(arguments: dict):
         for i, c in enumerate(result.candidates, 1):
             output += f"  {i}. {c.paper.title[:50]}... (score: {c.score:.2f})\n"
 
+    # F4: Falsification matching — check digested papers against epistemic_status.yaml
+    try:
+        from mekhane.dendron.falsification_matcher import check_falsification, format_alerts
+
+        for c in (result.candidates or []):
+            paper_text = f"{c.paper.title} {getattr(c.paper, 'abstract', '')}"
+            alerts = check_falsification(paper_text, c.paper.title, threshold=0.4)
+            if alerts:
+                output += f"\n{format_alerts(alerts, c.paper.title)}\n"
+    except Exception as e:
+        log(f"Falsification check skipped: {e}")
+
 # PURPOSE: トピック一覧取得
     return [TextContent(type="text", text=output)]
 

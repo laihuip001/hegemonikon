@@ -1,0 +1,17 @@
+{
+  "raw_counts": {
+    "arxiv": 157,
+    "session": 1821,
+    "github": 1190,
+    "manual": 627
+  },
+  "precision_weights": {
+    "arxiv": 0.5,
+    "session": 1.5,
+    "github": 1.12,
+    "manual": 0.78,
+    "unknown": 1.0
+  },
+  "calibration_date": "2026-02-15",
+  "handoff_count": 203
+}

@@ -35,21 +35,21 @@
 | **Macro (`macro_rules!`)** | CCL @macro | ★★★☆☆ | 衛生的マクロ = 名前空間汚染防止。HGK のマクロは衛生性が未実装 |
 | **`async/await`** | `\|\|` / `\|>` (並行/パイプ) | ★★☆☆☆ | 非同期実行モデル。HGK の並行演算子は設計段階 |
 
-## 4. 消化済（T2 再発見）
+## 4. 消化済（T2/T3 再発見）
 
 | Rust | HGK 対応 | 消化結果 |
 |:-----|:---------|:--------|
 | **Affine Type System** | BC-5 LBYL + I-4 Undo | T2: 不可逆操作の分類として既に存在。→ [affine_types.md](../designs/affine_types.md) |
 | **FnOnce** | `>>` (構造的変換) | T2: コンテキストを消費する操作として >> に内在 |
 | **Send / Sync** | Independent / Shareable | T2: → [parallel_model.md](../designs/parallel_model.md) |
+| **RAII / Drop** | `{}` スコープ意味明確化 | T3: → [raii_error_propagation.md](../designs/raii_error_propagation.md) |
+| **`?` 演算子** | `I:/E:` 明示的失敗処理 | T3: 失敗=ε>ε_max (FEP 直系) |
+| **Pin\<T\>** | SACRED_TRUTH + I-4 Guard | T2: → [pin_immutability.md](../designs/pin_immutability.md) |
 
-## 5. 未対応（T3/T4 候補）
+## 5. 未対応
 
-| Rust | HGK での可能性 | 消化パターン |
-|:-----|:--------------|:------------|
-| **RAII** | WF のスコープ管理。`@scoped` の強化版 | T3 (機能消化) |
-| **Pinning (`Pin<T>`)** | 認知的固定（移動禁止の思考。公理の不変性保証） | T4 (概念輸入) |
+**なし** — 全概念が消化済み。
 
 ---
 
-*Mapping v1.1 — Phase 1 T1 + Phase 2/3 T2 反映 (2026-02-15)*
+*Mapping v1.2 — 完全消化 (2026-02-15)*

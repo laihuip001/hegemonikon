@@ -231,6 +231,23 @@ export interface EpistemicHealthResponse {
     details?: string;
 }
 
+// --- Basanos L2 Types ---
+export interface BasanosL2DeficitItem {
+    type: string;
+    severity: number;
+    source: string;
+    target: string;
+    description: string;
+    suggested_action: string;
+}
+export interface BasanosL2ScanResponse {
+    total: number;
+    by_type: Record<string, number>;
+    top_deficits: BasanosL2DeficitItem[];
+    status: string;
+    error: string;
+}
+
 // --- Quota Types ---
 export interface QuotaModel {
     label: string;
@@ -415,6 +432,10 @@ export const api = {
         apiFetch<EpistemicStatusResponse>('/api/epistemic/status'),
     epistemicHealth: () =>
         apiFetch<EpistemicHealthResponse>('/api/epistemic/health'),
+
+    // Basanos L2
+    basanosL2Scan: () =>
+        apiFetch<BasanosL2ScanResponse>('/api/basanos/l2/scan'),
 
     // Quota
     quota: () => apiFetch<QuotaResponse>('/api/quota'),

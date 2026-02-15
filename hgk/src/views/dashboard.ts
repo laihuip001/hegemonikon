@@ -5,6 +5,7 @@ import type {
   QuotaResponse, QuotaModel, PKSGatewayStatsResponse,
   SentinelLatest, SentinelPaper,
   EpistemicHealthResponse,
+  BasanosL2ScanResponse,
 } from '../api/client';
 import { getCurrentRoute, esc, applyCountUpAnimations, applyStaggeredFadeIn, startPolling, relativeTime } from '../utils';
 import { renderUsageCard } from '../telemetry';
@@ -17,7 +18,7 @@ export async function renderDashboard(): Promise<void> {
 }
 
 async function renderDashboardContent(): Promise<void> {
-  const [health, healthCheck, fep, gnosisStats, criticals, kalonHist, quota, digestLatest, gatewayStats, sentinel, epistemicHealth] = await Promise.all([
+  const [health, healthCheck, fep, gnosisStats, criticals, kalonHist, quota, digestLatest, gatewayStats, sentinel, epistemicHealth, basanosL2] = await Promise.all([
     api.status().catch((): null => null),
     api.health().catch((): null => null),
     api.fepState().catch((): null => null),
@@ -29,6 +30,7 @@ async function renderDashboardContent(): Promise<void> {
     api.pksGatewayStats().catch((): null => null),
     api.sentinelLatest().catch((): null => null),
     api.epistemicHealth().catch((): null => null),
+    api.basanosL2Scan().catch((): null => null),
   ]);
 
   const app = document.getElementById('view-content')!;
@@ -101,6 +103,7 @@ async function renderDashboardContent(): Promise<void> {
     </div>
     ${renderSentinelCard(sentinel)}
     ${renderEpistemicCard(epistemicHealth)}
+    ${renderBasanosL2Card(basanosL2)}
     ${renderQuotaCard(quota)}
     ${renderDigestCard(digestLatest)}
     ${renderGatewayCard(gatewayStats)}
@@ -472,3 +475,76 @@ function renderEpistemicCard(data: EpistemicHealthResponse | null): string {
   `;
 }
 
+
+function renderBasanosL2Card(data: BasanosL2ScanResponse | null): string {
+  if (!data || data.error) {
+    return `
+      <div class="card" style="margin-top:1rem;">
+        <div class="metric-label">🔍 Basanos L2</div>
+        <div style="color:var(--text-secondary); font-size:0.85rem; padding:0.5rem 0;">
+          ${data?.error ? esc(data.error) : 'L2 構造スキャン未実行'}
+        </div>
+      </div>
+    `;
+  }
+
+  const statusIcon: Record<string, string> = { ok: '✅', warn: '⚠️', error: '🔴' };
+  const statusColor: Record<string, string> = {
+    ok: 'var(--success-color, #22c55e)',
+    warn: 'var(--warning-color, #eab308)',
+    error: 'var(--error-color, #ef4444)',
+  };
+  const typeLabels: Record<string, string> = {
+    eta: 'η 未吸収',
+    'epsilon-impl': 'ε 未実装',
+    'epsilon-just': 'ε 根拠なし',
+    delta: 'Δε/Δt 変更不整合',
+  };
+  const typeColors: Record<string, string> = {
+    eta: 'var(--info-color, #3b82f6)',
+    'epsilon-impl': 'var(--warning-color, #eab308)',
+    'epsilon-just': 'var(--accent-color, #a855f7)',
+    delta: 'var(--quota-orange, #f97316)',
+  };
+
+  const maxCount = Math.max(...Object.values(data.by_type), 1);
+  const barsHtml = Object.entries(data.by_type).map(([key, count]) => {
+    const pct = Math.round((count / maxCount) * 100);
+    const color = typeColors[key] ?? 'var(--text-secondary)';
+    const label = typeLabels[key] ?? key;
+    return `
+      <div style="margin-bottom:0.4rem;">
+        <div style="display:flex; justify-content:space-between; font-size:0.8rem; margin-bottom:0.1rem;">
+          <span>${esc(label)}</span>
+          <span style="color:${color}; font-weight:600;">${count}</span>
+        </div>
+        <div class="quota-bar">
+          <div class="quota-bar-fill" style="width:${pct}%; background:${color}"></div>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  const deficitsHtml = data.top_deficits.slice(0, 3).map(d => `
+    <div style="padding:0.3rem 0; border-bottom:1px solid var(--border-color); font-size:0.8rem;">
+      <div style="display:flex; justify-content:space-between;">
+        <span style="color:var(--text-primary);">${esc(d.target)}</span>
+        <span style="color:${d.severity >= 0.7 ? 'var(--error-color)' : 'var(--text-secondary)'}; font-size:0.75rem;">${d.severity.toFixed(1)}</span>
+      </div>
+      <div style="color:var(--text-secondary); font-size:0.75rem;">${esc(d.description).slice(0, 80)}</div>
+    </div>
+  `).join('');
+
+  return `
+    <div class="card" style="margin-top:1rem;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.75rem;">
+        <span class="metric-label">🔍 Basanos L2</span>
+        <span style="font-size:1.1rem; font-weight:700; color:${statusColor[data.status] ?? ''}">
+          ${statusIcon[data.status] ?? ''} ${data.total}件
+        </span>
+      </div>
+      ${barsHtml}
+      ${deficitsHtml ? `<div style="margin-top:0.5rem;">${deficitsHtml}</div>` : ''}
+    </div>
+  `;
+}

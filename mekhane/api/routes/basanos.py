@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # PROOF: [L2/インフラ] <- mekhane/api/routes/
-# PURPOSE: Basanos (SweepEngine) — 多視点プロンプトスキャン REST API
+# PURPOSE: Basanos — 多視点スキャン (SweepEngine) + L2 構造的差分スキャン REST API
 """
 Basanos Routes — SweepEngine + ResponseCache REST API
 
@@ -208,3 +208,66 @@ async def cache_clear():
     except Exception as exc:
         logger.error("Cache clear failed: %s", exc)
         raise HTTPException(status_code=500, detail=f"Cache clear failed: {exc}")
+
+
+# --- L2 Structural Deficit Scan ---
+
+
+class L2DeficitItem(BaseModel):
+    """L2 で検出された deficit の1件。"""
+    type: str  # eta, epsilon-impl, epsilon-just, delta
+    severity: float
+    source: str
+    target: str
+    description: str
+    suggested_action: str = ""
+
+
+class L2ScanResponse(BaseModel):
+    """L2 構造的差分スキャン結果。"""
+    total: int = 0
+    by_type: dict[str, int] = Field(default_factory=dict)
+    top_deficits: list[L2DeficitItem] = Field(default_factory=list)
+    status: str = "ok"  # ok, warn, error
+    error: str = ""
+
+
+@router.get("/l2/scan", response_model=L2ScanResponse)
+async def l2_scan():
+    """L2 構造的差分スキャンを実行しサマリーを返す。"""
+    try:
+        from mekhane.basanos.l2.cli import scan_deficits, detect_project_root
+
+        project_root = detect_project_root()
+        deficits = scan_deficits(project_root)
+
+        by_type: dict[str, int] = {}
+        for d in deficits:
+            key = d.type.value if hasattr(d.type, "value") else str(d.type)
+            by_type[key] = by_type.get(key, 0) + 1
+
+        top = deficits[:10]
+        items = [
+            L2DeficitItem(
+                type=d.type.value if hasattr(d.type, "value") else str(d.type),
+                severity=d.severity,
+                source=d.source,
+                target=d.target,
+                description=d.description,
+                suggested_action=d.suggested_action,
+            )
+            for d in top
+        ]
+
+        status = "ok" if len(deficits) == 0 else "warn" if len(deficits) <= 5 else "error"
+
+        return L2ScanResponse(
+            total=len(deficits),
+            by_type=by_type,
+            top_deficits=items,
+            status=status,
+        )
+    except Exception as exc:
+        logger.error("L2 scan failed: %s", exc)
+        return L2ScanResponse(status="error", error=str(exc))
+

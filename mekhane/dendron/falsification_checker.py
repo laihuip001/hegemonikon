@@ -73,8 +73,19 @@ def check_file_references(registry: dict) -> list[str]:
             else:
                 # Check if the line contains anything related to the claim
                 context = "\n".join(lines[max(0, line_num-3):line_num+3])
-                source = patch.get("source", "").split("(")[0].strip()
-                if source and source.lower() not in context.lower():
+                source = patch.get("source", "")
+                # Try multiple matching strategies for source name
+                source_parts = [
+                    source.split("(")[0].strip(),  # Before parentheses
+                    source.split("&")[0].strip(),   # Before ampersand
+                    source.split(",")[0].strip(),   # Before comma
+                ]
+                found = any(
+                    part and part.lower() in context.lower()
+                    for part in source_parts
+                    if len(part) > 3  # Skip very short fragments
+                )
+                if not found:
                     issues.append(
                         f"ℹ️ {patch_id}: source '{source}' not found near line {line_num} "
                         f"(may have shifted)"

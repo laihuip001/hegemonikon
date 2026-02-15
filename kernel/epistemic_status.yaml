@@ -95,16 +95,16 @@ patches:
     file: .agent/rules/behavioral_constraints.md
     line: 357
     claim: "深度レベルが Gemini thinking level と構造的に類似"
-    source: "CoT 2.0 + Gemini 3 design"
+    source: "Gemini 3"
     status: analogue
     falsification: "thinking level の調整が HGK 深度システムと異なる効果を示す場合"
     updated: "2026-02-15"
 
   fep_evolution:
     file: kernel/fep_epistemic_status.md
-    line: 105
+    line: 101
     claim: "FEP は進化論と構造的に類似した位置づけ"
-    source: "Sánchez-Cañizares 2021 (Entropy)"
+    source: "Sánchez-Cañizares"
     status: analogue
     falsification: "FEP が進化論と異なる認識論的特性を持つことが示された場合"
     updated: "2026-02-15"

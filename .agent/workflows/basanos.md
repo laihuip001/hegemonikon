@@ -7,6 +7,8 @@ derivatives:
   "+": "全 deficit タイプスキャン + 問い生成 + 重要度ソート"
   "-": "epsilon のみクイックチェック"
   "~": "前回結果との差分比較"
+lcm_state: beta
+version: "1.0"
 ---
 
 # /basanos — 構造的差分スキャン

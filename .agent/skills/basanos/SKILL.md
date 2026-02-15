@@ -14,6 +14,9 @@ triggers:
 risk_tier: "L1"
 risks:
   - "評議会の意見が合意バイアスに陥る"
+reversible: true
+requires_approval: false
+fallbacks: ["手動レビューリストを提示"]
 ---
 
 # Basanos Council

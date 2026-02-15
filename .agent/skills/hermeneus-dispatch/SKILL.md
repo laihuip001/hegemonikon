@@ -19,6 +19,9 @@ risk_tier: "L2"
 risks:
   - "CCL パースエラーによるワークフロー誤実行"
   - "LLM API 呼出コスト"
+reversible: true
+requires_approval: false
+fallbacks: ["CCL 式を手動で解析"]
 ---
 
 # Hermēneus CCL Dispatch v3.0

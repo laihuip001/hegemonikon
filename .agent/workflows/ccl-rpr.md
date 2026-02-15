@@ -1,5 +1,7 @@
 ---
 description: 回す (RPR) — React→Plan→Reflect ループ。実行と反省の収束的循環。
+lcm_state: beta
+version: "1.0"
 ---
 
 # @rpr — 回す (React → Plan → Reflect)

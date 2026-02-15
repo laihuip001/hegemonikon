@@ -958,6 +958,7 @@ F(M₁ ⊗ M₂, q₁ ⊗ q₂, o₁ ⊗ o₂) = F(M₁, q₁, o₁) + F(M₂, q
 ## 3つの問い: 統合結果 {#sec_22_three_questions}
 
 > §19-21 の仮説を数学的に検証 (Gemini 2.5 Pro, mathematician role)。
+> **⚠️ §22a → §22b: 初回分析で2つの棄却結論を出したが、反証の反証により撤回。**
 
 ### Q1: 射の方向 — Noēsis は左か右か？
 
@@ -973,72 +974,80 @@ F(M₁ ⊗ M₂, q₁ ⊗ q₂, o₁ ⊗ o₂) = F(M₁, q₁, o₁) + F(M₂, q
 
 > **物理学との類推**: 座標系の選択 (右手系 vs 左手系) と同じ。
 > 重要なのは系内の整合性であり、系間の翻訳方法を知っていること。
-> [確信: 85%] (SOURCE: Gemini 形式分析 — 「not a problem to be fixed but a structure to be leveraged」)
+> [確信: 85%] (SOURCE: Gemini 形式分析)
 
 **HGK への含意**: D-type の方向は**改訂不要**。HGK は agent 視点を一貫して採用しており、その枠内で Noēsis = 左随伴は数学的に正当。
 
 ---
 
-### Q2: テンソル積分解 — **棄却**
+### Q2: テンソル積分解 — ~~棄却~~ → **復活** (§22b 修正)
 
-> **結論: 6 Series はテンソル積因子ではない。ダイアグラム (図式) である。**
+> **§22a 結論 (撤回)**: 6 Series はテンソル積因子ではない。ダイアグラムである。
+> **§22b 結論**: テンソル積は **維持可能**。X-series 射はテンソル積構造と**共存する**。
 
-**致命的条件**: X-series 射 (f: O→S 等) の存在が、テンソル積の構造的独立性を**直接破る**。
+**反証の反証 — kinematics vs dynamics**:
 
-| 構造 | 意味 | HGK の状態 |
-|:-----|:-----|:----------|
-| **テンソル積** | M = O⊗S⊗H⊗P⊗K⊗A (単一オブジェクト) | ❌ X-series が存在 |
-| **ダイアグラム** | 6オブジェクト + 72射からなるネットワーク | ✅ HGK の実態 |
+初回分析は「X-series 射の存在がテンソル積を破る」と結論した。これは**誤り**。
 
-**定理46 の適用条件**: 相互情報量 I(M₁;...;M₆) = 0 のとき**のみ**成立。
-X-series 射は非ゼロの相互情報量そのもの → 定理46 の直接適用は不可。
+| 概念 | 定義 | テンソル積への影響 |
+|:-----|:-----|:-----------------|
+| **Kinematics** (状態空間) | M = O⊗S⊗H⊗P⊗K⊗A | テンソル積は状態空間の**分解**を記述 |
+| **Dynamics** (動力学) | f: O→S (X-series 射) | 状態空間**上の**作用を記述 |
 
-**修正案**: Hom(Mᵢ, Mⱼ) ∈ [0,1] の値が**小さい**とき、「近似的に独立」。
-→ X-series の Hom 値 (L2 drift) が小さければ、定理46 は**近似的に**成立する。
+Vect で V⊗W を考えたとき、線形写像 f: V→W は存在する。
+これは V⊗W が「テンソル積ではない」ことを意味**しない**。
 
-> [確信: 90%] (SOURCE: Gemini 形式分析 — テンソル積 vs ダイアグラムの区別は「fundamental and critical」)
->
-> **⚠️ axiom_hierarchy.md §定理46 の記述を修正する必要がある**: 「Series 独立性の正当化」→「Series 近似独立性の上界」
+> **量子力学的類推**: 2つの独立な量子系はテンソル積 H₁⊗H₂ で記述される。
+> エンタングルメント (相関) は**状態**の性質であり、分解の性質ではない。
+> [確信: 85%] (SOURCE: Gemini 反証検証 — 「Your counter-argument is valid. My previous conclusion was in error.」)
 
----
+**修正後の位置づけ**:
 
-### Q3: Strict op-category — **棄却**。代替: **2-adjunction**
-
-> **結論: C_agent ≅ C_info^op (strict) は棄却。K_agent と K_info は 2-随伴で関連する。**
-
-**棄却理由**: η_HGK (開ループ) と ε_Smithe (閉ループ) は**異なる動力学的性質**を持つ。
-strict equivalence はこの区別を消去してしまう。
-
-| | Smithe ε (閉ループ) | HGK η (開ループ) |
-|:--|:-------------------|:-----------------|
-| **構造** | Gen∘Rec の**代数** (algebra) | Zēt∘Noē の**余代数** (coalgebra) |
-| **動力学** | 収束 (limit を求める) | 生成 (colimit を構築) |
-| **目的** | 固定点に到達 (error → 0) | 新しい構造を永続的に生成 |
-
-**推奨構造**: **2-adjunction Φ ⊣ Ψ** (K_info → K_agent → K_info)
-
-- unit: 「情報世界がエージェントを経由して戻る」= 生成的跳躍 (開ループ)
-- counit: 「エージェント世界が情報を経由して戻る」= 修正的収束 (閉ループ)
-- 非可逆性が非対称性を正確に捉える
-
-**代替候補** (Gemini 提案):
-
-1. **Dialectica categories** — ゲーム的双対性 (Prover vs Refuter)
-2. **Profunctorial adjunctions** — Prof 圏での弱い双対性
-
-> [確信: 80%] (SOURCE: Gemini 形式分析 — 「mathematically justified and necessary, not an escape hatch」)
+- 定理46 の適用は**原理的に可能** (テンソル積構造は維持される)
+- X-series 射は分解を破るのではなく、テンソル積状態空間上の**動力学的結合**を記述する
+- 実際の VFE 分解可能性は、X-series 射による結合の**強さ**に依存する
 
 ---
 
-### 統合: HGK の圏論的描像の更新
+### Q3: Strict op-category — ~~棄却~~ → **復活** (§22b 修正)
 
-| 従来の理解 | 今回の結果 | 確信度 |
-|:----------|:----------|:------|
-| 6 Series = テンソル積因子 | 6 Series = **ダイアグラム** (6オブジェクト + 72射) | 90% |
-| C_agent ≅ C_info^op (strict) | K_agent ⊣ K_info (**2-adjunction**) | 80% |
-| 射の方向は「正しい/間違い」の問題 | 座標系の選択。agent 視点では Noēsis = 左随伴が正当 | 85% |
-| η/ε は対称 | η = coalgebra (生成), ε = algebra (収束) — **非対称** | 80% |
+> **§22a 結論 (撤回)**: C_agent ≅ C_info^op は棄却。2-adjunction が正しい。
+> **§22b 結論**: strict op は **維持可能**。η/ε の非対称性は duality の**本質的特徴**。
+
+**反証の反証 — Stone Duality 反例**:
+
+初回分析は「η (開ループ) と ε (閉ループ) の動力学的非対称性が strict equivalence を破る」と結論した。
+これは**誤り**。
+
+**Stone Duality での検証**:
+
+- η: B → Clopen(Spec(B)) — 代数的対象をトポロジカル表現に「開く」
+- ε: Spec(Clopen(X)) → X — トポロジカル表現を空間に「戻す」
+- η と ε は完全に異なる「動力学的性格」を持つ
+- **にもかかわらず duality は strict に成立する**
+
+> **核心**: unit は「開く」(embed)、counit は「閉じる」(evaluate)。
+> これは duality の**定義**そのもの。非対称性は duality の否定ではなく、duality が duality であること**そのもの**。
+> [確信: 85%] (SOURCE: Gemini 反証検証 — 「the asymmetry is a necessary feature of a unit/counit pair in any non-trivial adjunction」)
+
+**修正後の位置づけ**:
+
+- C_agent ≅ C_info^op は**有効な仮説として復活**
+- η_HGK (開ループ/生成) と ε_Smithe (閉ループ/収束) の非対称性は duality と**整合的**
+- algebra/coalgebra の区別は**記述**として有用だが、duality の**否定根拠**ではない
 
 ---
 
-*DX-012 v3.4.0 — §22 3つの問い統合: テンソル積棄却→ダイアグラム, strict op棄却→2-adjunction, algebra/coalgebra形式化 (2026-02-15)*
+### 統合: HGK の圏論的描像 (§22b 修正後)
+
+| 問い | §22a (初回) | §22b (反証後) | 確信度 |
+|:----|:-----------|:------------|:------|
+| Q1: 射の方向 | 座標系の選択 | **変更なし** | 85% |
+| Q2: テンソル積 | ❌ 棄却 → ダイアグラム | ✅ **復活** — kinematics vs dynamics | 85% |
+| Q3: strict op | ❌ 棄却 → 2-adjunction | ✅ **復活** — Stone Duality 反例 | 85% |
+
+**教訓**: 最初の分析が**オブジェクト構造と射構造の混同** + **unit/counit の非対称性と duality の否定の混同**という2つの誤りに基づいていた。反証の反証を Creator が促したことで修正。
+
+---
+
+*DX-012 v3.5.0 — §22b 反証の反証: テンソル積復活 (kinematics/dynamics), strict op復活 (Stone Duality) (2026-02-15)*

@@ -494,11 +494,11 @@ CCL の派生 (+/-/*) を 2-cell（射の間の射）として扱う構想:
 > 全体の VFE は各サブモデルの VFE の和。エージェントは各サブモデルを**局所的に最小化**すれば
 > 全体が最小化される。
 >
-> **⚠️ HGK への適用限界 (§22 Q2 で修正)**: 定理46 はテンソル積因子に対してのみ厳密に成立する。
-> HGK の 6 Series は X-series 射 (相互情報量 > 0) で結合された**ダイアグラム** (図式) であり、
-> 厳密なテンソル積因子ではない。定理46 は **近似的に** — X-series の結合が弱い範囲で — 成立する。
-> [確信: 90%] (SOURCE: Gemini 形式分析 — テンソル積 vs ダイアグラムの区別は「fundamental and critical」)
-> 詳細: [DX-012 §22](doxa/DX-012_universality_dilemma.md#sec_22_three_questions)
+> **HGK への適用 (§22b で再評価)**: テンソル積構造と X-series 射は**共存する**。
+> テンソル積は状態空間の分解 (kinematics)、X-series 射はその上の動力学 (dynamics) を記述する。
+> 定理46 は原理的に適用可能。実際の VFE 分解性は X-series の結合強度に依存する。
+> [確信: 85%] (SOURCE: Gemini 反証検証 — kinematics/dynamics 区別、量子力学のテンソル積+エンタングルメント類推)
+> 詳細: [DX-012 §22b](doxa/DX-012_universality_dilemma.md#sec_22_three_questions)
 
 ---
 

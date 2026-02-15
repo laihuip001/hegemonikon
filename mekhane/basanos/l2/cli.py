@@ -153,6 +153,17 @@ def scan_deficits(
         eps_factory = EpsilonDeficitFactory(g_struct, project_root)
         deficits.extend(eps_factory.detect_impl_deficits())
 
+        # ε-just: check kernel claims against Gnōsis papers
+        gnosis_kw_pairs = _fetch_gnosis_keywords()
+        if gnosis_kw_pairs:
+            all_keywords: set[str] = set()
+            for _title, keywords in gnosis_kw_pairs:
+                all_keywords.update(kw.lower() for kw in keywords)
+            if all_keywords:
+                deficits.extend(
+                    eps_factory.detect_justification_deficits(all_keywords)
+                )
+
     # Δε/Δt deficit
     if deficit_type in (None, "delta"):
         print(f"{C.DIM}  scanning Δε/Δt deficits (git changes)...{C.RESET}")

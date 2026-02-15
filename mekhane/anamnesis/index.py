@@ -410,7 +410,13 @@ class GnosisIndex:
         return len(data)
 
     # PURPOSE: セマンティック検索
-    def search(self, query: str, k: int = 10, source_filter: str | None = None) -> list[dict]:
+    def search(
+        self,
+        query: str,
+        k: int = 10,
+        source_filter: str | None = None,
+        precision_weights: dict[str, float] | None = None,
+    ) -> list[dict]:
         """
         セマンティック検索
 
@@ -418,9 +424,11 @@ class GnosisIndex:
             query: 検索クエリ
             k: 取得件数
             source_filter: ソースフィルタ (例: "arxiv", "session", "handoff")
+            precision_weights: ソース別の精度加重 π (例: {"arxiv": 1.5, "session": 0.8})
+                高い π = そのソースからの結果をより重視する
 
         Returns:
-            検索結果のリスト
+            検索結果のリスト (precision_weights 指定時は weighted_score 付き)
         """
         if not self._table_exists():
             print("[GnosisIndex] No papers indexed yet")
@@ -443,7 +451,9 @@ class GnosisIndex:
             )
             return []
 
-        search_query = table.search(query_vector).limit(k)
+        # Fetch more results when using precision weights to allow re-ranking
+        fetch_k = k * 3 if precision_weights else k
+        search_query = table.search(query_vector).limit(fetch_k)
 
         if source_filter:
             search_query = search_query.where(
@@ -451,6 +461,18 @@ class GnosisIndex:
             )
 
         results = search_query.to_list()
+
+        # F4: Precision-weighted re-ranking
+        if precision_weights and results:
+            for r in results:
+                source = r.get("source", "unknown")
+                pi = precision_weights.get(source, 1.0)
+                distance = r.get("_distance", 1.0)
+                # similarity = 1 / (1 + distance), then scale by π
+                similarity = 1.0 / (1.0 + distance)
+                r["weighted_score"] = similarity * pi
+            results.sort(key=lambda r: r["weighted_score"], reverse=True)
+            results = results[:k]
 
         return results
 

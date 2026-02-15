@@ -1,0 +1,110 @@
+# Epistemic Status Registry
+# HGK 内の各パッチ / 主張の認識論的地位を一元管理する
+#
+# status:
+#   empirical    — 実験的に検証済み (テスト通過, 再現可能)
+#   reference    — 参考データ (特定条件下の結果, 汎化は限定的)  
+#   analogue     — 操作的類推 (構造的類似性, 同型性は未証明)
+#   hypothesis   — 仮説 (未検証, 反証条件定義済み)
+#
+# falsification: 反証条件 (この条件が成立すれば主張は無効化される)
+
+patches:
+  P1:
+    file: kernel/axiom_hierarchy.md
+    line: 475
+    claim: "Attention 層の階層性が Scale 座標の操作的類推"
+    source: "Fu et al. 2026 (AttentionRetriever)"
+    status: analogue
+    falsification: "浅い層=独立, 深い層=因果依存の関係が他のアーキテクチャで成立しない場合"
+    updated: "2026-02-15"
+
+  P2:
+    file: .agent/skills/fep-engine/SKILL.md
+    line: 115
+    claim: "π_i = V[ε_i]⁻¹ は暗黙の検索クエリとして解釈できる"
+    source: "Fu et al. 2026 (AttentionRetriever)"
+    status: analogue
+    falsification: "attention score の分布が精度加重 π の理論的分布と系統的に乖離する場合"
+    updated: "2026-02-15"
+
+  P3:
+    file: kernel/axiom_hierarchy.md
+    line: 355
+    claim: "entity-based scope が X-series の操作的類推"
+    source: "Fu et al. 2026 (AttentionRetriever)"
+    status: analogue
+    falsification: "entity-based scope が X-series の予測と矛盾する検索パターンを示す場合"
+    updated: "2026-02-15"
+
+  P4:
+    file: .agent/workflows/dia.md
+    line: 250
+    claim: "Verification 除去で reasoning 精度が -1.9% 低下"
+    source: "Chen et al. 2026 (UniT ablation)"
+    status: reference
+    falsification: "他のモデル/タスクで Verification 除去が精度に影響しない場合"
+    updated: "2026-02-15"
+
+  P5:
+    file: .agent/workflows/dox.md
+    line: 16
+    claim: "Content memory 除去で 42.5% 低下"
+    source: "Chen et al. 2026 (UniT ablation)"
+    status: reference
+    falsification: "他のモデルで Content memory 除去が同等の影響を示さない場合"
+    updated: "2026-02-15"
+
+  P6:
+    file: .agent/skills/fep-engine/SKILL.md
+    line: 292
+    claim: "Sequential CoT > Parallel sampling (2.5x)"
+    source: "Chen et al. 2026 (UniT)"
+    status: reference
+    falsification: "他のアーキテクチャで並列が逐次を上回る場合"
+    updated: "2026-02-15"
+
+  P7:
+    file: .agent/rules/behavioral_constraints.md
+    line: 249
+    claim: "Budget forcing が BC-9 meta-cognitive check と構造的に類似"
+    source: "Chen et al. 2026 (UniT)"
+    status: analogue
+    falsification: "Budget forcing が Meta-cognitive check と異なる認知効果を生む場合"
+    updated: "2026-02-15"
+
+  P8:
+    file: ccl/ccl_macro_reference.md
+    line: 65
+    claim: "Subgoal decomposition が認知的に有用"
+    source: "Chen et al. 2026 (UniT ablation)"
+    status: reference
+    falsification: "LLM 以外の認知システムで分解構造が不要な場合"
+    updated: "2026-02-15"
+
+  Spisak_replay:
+    file: kernel/axiom_hierarchy.md
+    line: 177
+    claim: "/boot⊣/bye replay が生物学的 replay と構造的に類似"
+    source: "Spisak & Friston 2025"
+    status: analogue
+    falsification: "replay 品質 η の数値化で生物学的 replay との乖離が大きい場合"
+    updated: "2026-02-15"
+
+  thinking_depth:
+    file: .agent/rules/behavioral_constraints.md
+    line: 357
+    claim: "深度レベルが Gemini thinking level と構造的に類似"
+    source: "CoT 2.0 + Gemini 3 design"
+    status: analogue
+    falsification: "thinking level の調整が HGK 深度システムと異なる効果を示す場合"
+    updated: "2026-02-15"
+
+  fep_evolution:
+    file: kernel/fep_epistemic_status.md
+    line: 105
+    claim: "FEP は進化論と構造的に類似した位置づけ"
+    source: "Sánchez-Cañizares 2021 (Entropy)"
+    status: analogue
+    falsification: "FEP が進化論と異なる認識論的特性を持つことが示された場合"
+    updated: "2026-02-15"

@@ -952,3 +952,29 @@ ul li {
   animation: shimmer 1.8s ease-in-out infinite;
   margin-top: 1rem;
 }
+/* ─── Sprint 6: Loading Spinner & Accessibility ──────────────── */
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.spinner {
+  width: 24px;
+  height: 24px;
+  border: 3px solid rgba(88, 166, 255, 0.2);
+  border-top-color: var(--primary-color);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.loading-state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 1rem;
+  color: var(--text-secondary);
+  font-style: italic;
+  gap: 0.75rem;
+}

@@ -29,6 +29,7 @@ export async function renderSearch(): Promise<void> {
         const color = SOURCE_COLORS[key] ?? '#8b949e';
         return `<button class="search-source-chip ${active ? 'active' : ''}"
       data-source="${esc(key)}"
+      aria-pressed="${active ? 'true' : 'false'}"
       style="--chip-color: ${color}">
       ${label}
     </button>`;
@@ -40,6 +41,7 @@ export async function renderSearch(): Promise<void> {
       <div style="display:flex; gap:0.5rem; margin-bottom:0.75rem;">
         <input type="text" id="symploke-search-input" class="input"
           placeholder="すべての知識ソースを横断検索..."
+          aria-label="検索キーワード"
           style="flex:1; font-size:1.05rem;" />
         <button id="symploke-search-btn" class="btn">検索</button>
       </div>
@@ -47,7 +49,7 @@ export async function renderSearch(): Promise<void> {
         ${sourceChips}
       </div>
     </div>
-    <div id="symploke-search-results"></div>
+    <div id="symploke-search-results" aria-live="polite"></div>
   `;
 
     const searchInput = document.getElementById('symploke-search-input') as HTMLInputElement;
@@ -59,9 +61,11 @@ export async function renderSearch(): Promise<void> {
             if (searchActiveSources.has(source)) {
                 searchActiveSources.delete(source);
                 chip.classList.remove('active');
+                chip.setAttribute('aria-pressed', 'false');
             } else {
                 searchActiveSources.add(source);
                 chip.classList.add('active');
+                chip.setAttribute('aria-pressed', 'true');
             }
         });
     });
@@ -70,7 +74,11 @@ export async function renderSearch(): Promise<void> {
         const query = searchInput.value.trim();
         if (!query) return;
         const resultsDiv = document.getElementById('symploke-search-results')!;
-        resultsDiv.innerHTML = '<div class="loading">検索中...</div>';
+        resultsDiv.innerHTML = `
+          <div class="loading-state" role="status" aria-live="polite">
+            <div class="spinner" aria-hidden="true"></div>
+            <span>検索中...</span>
+          </div>`;
 
         const sources = Array.from(searchActiveSources).join(',');
         try {

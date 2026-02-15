@@ -2,7 +2,7 @@
 # PROOF: [L3/ユーティリティ] <- mekhane/symploke/ O4→日次バッチ消化→scheduler が担う
 # PURPOSE: Jules 720 tasks/day スケジューラー — 6垢分散 + 自動ローテーション
 """
-Jules Daily Scheduler v1.1
+Jules Daily Scheduler v2.1
 
 有効キープール方式。起動時に全 API キーを検証し、
 有効なキーだけを使ってバッチを実行する。
@@ -18,6 +18,9 @@ Usage:
     # Dry-run (何も実行しない、配分だけ表示)
     PYTHONPATH=. python mekhane/symploke/jules_daily_scheduler.py --slot morning --dry-run
 
+    # Basanos mode (構造化レビュー + pre-audit)
+    PYTHONPATH=. python mekhane/symploke/jules_daily_scheduler.py --slot morning --mode basanos --pre-audit
+
     # Small test (2 files × 3 specialists = 6 tasks)
     PYTHONPATH=. python mekhane/symploke/jules_daily_scheduler.py --slot morning --max-files 2 --sample 3
 
@@ -25,9 +28,10 @@ Usage:
     PYTHONPATH=. python mekhane/symploke/jules_daily_scheduler.py --slot morning
 
 Cron:
-    0 6  * * * cd ~/oikos/hegemonikon && PYTHONPATH=. .venv/bin/python mekhane/symploke/jules_daily_scheduler.py --slot morning  >> logs/specialist_daily/cron.log 2>&1
-    0 12 * * * cd ~/oikos/hegemonikon && PYTHONPATH=. .venv/bin/python mekhane/symploke/jules_daily_scheduler.py --slot midday   >> logs/specialist_daily/cron.log 2>&1
-    0 18 * * * cd ~/oikos/hegemonikon && PYTHONPATH=. .venv/bin/python mekhane/symploke/jules_daily_scheduler.py --slot evening  >> logs/specialist_daily/cron.log 2>&1
+    # 推奨: scripts/jules_basanos_cron.sh を使用 (曜日別自動切替)
+    0 6  * * * ~/oikos/hegemonikon/scripts/jules_basanos_cron.sh morning
+    0 12 * * * ~/oikos/hegemonikon/scripts/jules_basanos_cron.sh midday
+    0 18 * * * ~/oikos/hegemonikon/scripts/jules_basanos_cron.sh evening
 """
 
 import argparse
@@ -262,6 +266,7 @@ async def run_slot_batch(
     dry_run: bool = False,
     basanos_bridge: Optional["BasanosBridge"] = None,
     basanos_domains: Optional[list[str]] = None,
+    hybrid_ratio: float = 0.0,
 ) -> dict:
     """1 アカウント分のバッチを実行。
 
@@ -286,7 +291,25 @@ async def run_slot_batch(
     try:
         for file_idx, target_file in enumerate(files, 1):
             # 専門家プール選択
-            if basanos_bridge is not None:
+            if basanos_bridge is not None and hybrid_ratio > 0 and hybrid_ratio < 1.0:
+                # Hybrid mode: basanos + specialist を比率で混合
+                basanos_specs = basanos_bridge.get_perspectives_as_specialists(
+                    domains=basanos_domains,
+                )
+                basanos_count = max(1, int(specialists_per_file * hybrid_ratio))
+                specialist_count = specialists_per_file - basanos_count
+                # basanos specs から basanos_count 個をサンプリング
+                sampled_basanos = random.sample(
+                    basanos_specs, min(basanos_count, len(basanos_specs)),
+                )
+                # specialist pool から残りをサンプリング
+                pool = list(ALL_SPECIALISTS)
+                sampled_specialist = random.sample(
+                    pool, min(specialist_count, len(pool)),
+                )
+                specs = sampled_basanos + sampled_specialist
+                random.shuffle(specs)  # 混合順序をランダム化
+            elif basanos_bridge is not None:
                 # Basanos mode: 構造化パースペクティブを使用
                 specs = basanos_bridge.get_perspectives_as_specialists(
                     domains=basanos_domains,
@@ -350,8 +373,8 @@ async def main():
         help="Time slot to execute",
     )
     parser.add_argument(
-        "--mode", choices=["specialist", "basanos"], default="specialist",
-        help="Review mode: specialist (random 1000人) or basanos (structured 480 perspectives)",
+        "--mode", choices=["specialist", "basanos", "hybrid"], default="specialist",
+        help="Review mode: specialist (random), basanos (structured), hybrid (mixed)",
     )
     parser.add_argument(
         "--max-files", type=int, default=None,
@@ -368,6 +391,10 @@ async def main():
     parser.add_argument(
         "--max-concurrent", "-m", type=int, default=6,
         help="Max concurrent sessions (default: 6)",
+    )
+    parser.add_argument(
+        "--basanos-ratio", type=float, default=0.6,
+        help="Hybrid mode: ratio of basanos specs (default: 0.6 = 60%% basanos)",
     )
     parser.add_argument(
         "--pre-audit", action="store_true",
@@ -400,9 +427,11 @@ async def main():
     bridge: Optional[BasanosBridge] = None
     sampled_domains: Optional[list[str]] = None
 
-    if args.mode == "basanos":
+    if args.mode in ("basanos", "hybrid"):
         bridge = BasanosBridge()
         sampled_domains = bridge.sample_domains(args.domains)
+
+    if args.mode == "basanos":
         # Basanos では specs_per_file = 選択ドメイン数 × 24軸 (全パースペクティブ)
         specs_per_file = len(sampled_domains) * len(bridge.all_axes)
         basanos_info = {
@@ -416,6 +445,21 @@ async def main():
         print(f"Specs:    {len(sampled_domains)} domains × {len(bridge.all_axes)} axes = {specs_per_file}/file")
         if args.sample:
             print(f"  ⚠️  --sample is ignored in basanos mode (using all {len(bridge.all_axes)} axes)")
+    elif args.mode == "hybrid":
+        # Hybrid: basanos specs + specialist specs を比率で混合
+        ratio = args.basanos_ratio
+        basanos_count = max(1, int(specs_per_file * ratio))
+        specialist_count = specs_per_file - basanos_count
+        basanos_info = {
+            "domains": sampled_domains,
+            "axes": len(bridge.all_axes),
+            "basanos_count": basanos_count,
+            "specialist_count": specialist_count,
+            "ratio": ratio,
+        }
+        print(f"Mode:     hybrid ({ratio:.0%} basanos + {1-ratio:.0%} specialist)")
+        print(f"Domains:  {sampled_domains} ({len(sampled_domains)} selected)")
+        print(f"Specs:    {basanos_count} basanos + {specialist_count} specialist = {specs_per_file}/file")
     else:
         print(f"Mode:     specialist (random sampling from ~1000 pool)")
 
@@ -453,7 +497,9 @@ async def main():
 
             for fpath in all_selected_files:
                 try:
-                    result = auditor.audit_file(Path(fpath))
+                    # select_daily_files は相対パスを返す → _PROJECT_ROOT で絶対化
+                    abs_path = _PROJECT_ROOT / fpath
+                    result = auditor.audit_file(abs_path)
                     # Score: Critical=10, High=5, Medium=1, Low=0
                     score = sum(
                         10 if i.severity == AuditSeverity.CRITICAL
@@ -505,8 +551,9 @@ async def main():
         api_keys=all_keys,
         max_concurrent=args.max_concurrent,
         dry_run=args.dry_run,
-        basanos_bridge=bridge if args.mode == "basanos" else None,
-        basanos_domains=sampled_domains if args.mode == "basanos" else None,
+        basanos_bridge=bridge if args.mode in ("basanos", "hybrid") else None,
+        basanos_domains=sampled_domains if args.mode in ("basanos", "hybrid") else None,
+        hybrid_ratio=args.basanos_ratio if args.mode == "hybrid" else 0.0,
     )
 
     slot_result["total_tasks"] = result["total_tasks"]

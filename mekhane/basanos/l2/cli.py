@@ -25,6 +25,8 @@ from mekhane.basanos.l2.deficit_factories import (
     EpsilonDeficitFactory,
     DeltaDeficitFactory,
 )
+from mekhane.basanos.l2.history import record_scan, load_history, get_trend
+from mekhane.basanos.l2.resolver import Resolver, print_resolutions
 
 
 # ANSI colors
@@ -259,6 +261,34 @@ def main(argv: Optional[list[str]] = None) -> int:
         help="特定の deficit タイプのみ",
     )
 
+    # history command
+    hist_parser = subparsers.add_parser("history", help="deficit 履歴を表示")
+    hist_parser.add_argument(
+        "--limit",
+        type=int,
+        default=10,
+        help="表示するレコード数 (default: 10)",
+    )
+    hist_parser.add_argument(
+        "--trend",
+        action="store_true",
+        help="トレンドサマリーを表示",
+    )
+
+    # resolve command (F4: L3)
+    res_parser = subparsers.add_parser("resolve", help="deficit の解決策を自動提案")
+    res_parser.add_argument(
+        "--limit",
+        type=int,
+        default=5,
+        help="提案する解決策の最大数 (default: 5)",
+    )
+    res_parser.add_argument(
+        "--type",
+        choices=["eta", "epsilon", "delta"],
+        help="特定の deficit タイプのみ",
+    )
+
     args = parser.parse_args(argv)
 
     if not args.command:
@@ -275,6 +305,9 @@ def main(argv: Optional[list[str]] = None) -> int:
             since=getattr(args, "since", "HEAD~5"),
         )
         print_deficits(deficits)
+        # F8: auto-record to history
+        hpath = record_scan(deficits, scan_type=args.type or "full")
+        print(f"{C.DIM}📝 履歴記録: {hpath}{C.RESET}")
 
     elif args.command == "questions":
         deficits = scan_deficits(
@@ -282,6 +315,39 @@ def main(argv: Optional[list[str]] = None) -> int:
             deficit_type=getattr(args, "type", None),
         )
         print_questions(deficits, limit=getattr(args, "limit", 10))
+
+    elif args.command == "history":
+        if getattr(args, "trend", False):
+            trend = get_trend()
+            icon = {"improving": "📉", "worsening": "📈", "stable": "➡️"}.get(trend["direction"], "❓")
+            print(f"\n{C.BOLD}━━━ Basanos L2: トレンド ━━━{C.RESET}")
+            print(f"  {icon} {trend['direction']}  (現在: {trend['current']}, 前回: {trend['previous']}, Δ: {trend['delta']:+d})")
+            print(f"  sparkline: {trend.get('sparkline', '')}  (直近 {trend.get('window', 0)} 回)")
+        else:
+            records = load_history(limit=getattr(args, "limit", 10))
+            if not records:
+                print(f"\n{C.DIM}履歴なし{C.RESET}")
+            else:
+                print(f"\n{C.BOLD}━━━ Basanos L2: 履歴 (直近 {len(records)} 件) ━━━{C.RESET}\n")
+                for r in records:
+                    ts = r.get("timestamp", "?")[:19].replace("T", " ")
+                    total = r.get("total", 0)
+                    by_type = r.get("by_type", {})
+                    type_str = " ".join(f"{k}:{v}" for k, v in by_type.items())
+                    color = C.GREEN if total == 0 else C.YELLOW if total <= 5 else C.RED
+                    print(f"  {C.DIM}{ts}{C.RESET}  {color}{total:3d}{C.RESET} 件  [{type_str}]")
+
+    elif args.command == "resolve":
+        deficits = scan_deficits(
+            project_root,
+            deficit_type=getattr(args, "type", None),
+        )
+        resolver = Resolver(project_root)
+        resolutions = resolver.resolve_batch(
+            deficits,
+            max_resolutions=getattr(args, "limit", 5),
+        )
+        print_resolutions(resolutions)
 
     return 0
 

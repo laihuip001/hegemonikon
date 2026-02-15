@@ -271,3 +271,109 @@ async def l2_scan():
         logger.error("L2 scan failed: %s", exc)
         return L2ScanResponse(status="error", error=str(exc))
 
+
+class L2HistoryRecord(BaseModel):
+    """履歴レコード1件。"""
+    timestamp: str
+    scan_type: str = "full"
+    total: int = 0
+    by_type: dict[str, int] = Field(default_factory=dict)
+
+
+class L2HistoryResponse(BaseModel):
+    """履歴一覧レスポンス。"""
+    records: list[L2HistoryRecord] = Field(default_factory=list)
+    count: int = 0
+
+
+class L2TrendResponse(BaseModel):
+    """トレンド分析レスポンス。"""
+    direction: str = "unknown"  # improving, worsening, stable
+    current: int = 0
+    previous: int = 0
+    delta: int = 0
+    sparkline: str = ""
+    window: int = 0
+
+
+@router.get("/l2/history", response_model=L2HistoryResponse)
+async def l2_history(limit: int = 20):
+    """L2 deficit スキャン履歴を取得。"""
+    try:
+        from mekhane.basanos.l2.history import load_history
+
+        records = load_history(limit=limit)
+        items = [
+            L2HistoryRecord(
+                timestamp=r.get("timestamp", ""),
+                scan_type=r.get("scan_type", "full"),
+                total=r.get("total", 0),
+                by_type=r.get("by_type", {}),
+            )
+            for r in records
+        ]
+        return L2HistoryResponse(records=items, count=len(items))
+    except Exception as exc:
+        logger.error("L2 history failed: %s", exc)
+        return L2HistoryResponse()
+
+
+@router.get("/l2/trend", response_model=L2TrendResponse)
+async def l2_trend(window: int = 10):
+    """L2 deficit トレンドを取得。"""
+    try:
+        from mekhane.basanos.l2.history import get_trend
+
+        trend = get_trend(window=window)
+        return L2TrendResponse(**trend)
+    except Exception as exc:
+        logger.error("L2 trend failed: %s", exc)
+        return L2TrendResponse()
+
+
+class L2ResolutionItem(BaseModel):
+    """解決提案1件。"""
+    question: str
+    deficit_type: str
+    strategy: str
+    confidence: float
+    actions: list[str] = Field(default_factory=list)
+    references: list[str] = Field(default_factory=list)
+    status: str = "proposed"
+
+
+class L2ResolveResponse(BaseModel):
+    """L3 自動解決レスポンス。"""
+    resolutions: list[L2ResolutionItem] = Field(default_factory=list)
+    total: int = 0
+    error: str = ""
+
+
+@router.get("/l2/resolve", response_model=L2ResolveResponse)
+async def l2_resolve(limit: int = 5):
+    """L3 自動解決ループ: deficit→問い→解決策を返す。"""
+    try:
+        from mekhane.basanos.l2.cli import scan_deficits, detect_project_root
+        from mekhane.basanos.l2.resolver import Resolver
+
+        project_root = detect_project_root()
+        deficits = scan_deficits(project_root)
+        resolver = Resolver(project_root)
+        resolutions = resolver.resolve_batch(deficits, max_resolutions=limit)
+
+        items = [
+            L2ResolutionItem(
+                question=r.question.text,
+                deficit_type=r.question.deficit.type.value,
+                strategy=r.strategy,
+                confidence=r.confidence,
+                actions=r.actions,
+                references=[str(ref) for ref in r.references],
+                status=r.status,
+            )
+            for r in resolutions
+        ]
+        return L2ResolveResponse(resolutions=items, total=len(items))
+    except Exception as exc:
+        logger.error("L2 resolve failed: %s", exc)
+        return L2ResolveResponse(error=str(exc))

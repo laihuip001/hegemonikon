@@ -84,7 +84,7 @@
 
 | Phase | 内容 | 推定工数 | 依存 |
 |:------|:-----|:---------|:-----|
-| **P1** | Intent-WAL フォーマット定義 | 2h | - |
+| **P1** | Intent-WAL フォーマット定義 | 2h | ✅ `intent_wal_schema.md` |
 | **P2** | `/rom` 自動トリガー (BC-18 連動) | 3h | P1 |
 | **P3** | Jules Pipeline への WAL 統合 | 4h | P1, P2 |
 | **P4** | `/boot` の WAL 読み込み対応 | 2h | P1 |

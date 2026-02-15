@@ -342,12 +342,12 @@ projects:
   entry_point:
     python: from mekhane.ccl.executor import CCLExecutor
   usage_trigger: CCL 式の解析・生成・実行時。ccl/ (仕様) の実装ランタイム。
-
-  - id: periskope
-    name: "Periskopē"
-    path: "mekhane/periskope"
-    summary: "HGK Deep Research Engine — multi-source parallel search + multi-model synthesis + TAINT verification"
-    status: "active"
-    phase: "design"
-    entry_point: null
-    usage_trigger: null
+- id: periskope
+  name: "Periskopē"
+  path: "mekhane/periskope"
+  tier: engine
+  summary: "HGK Deep Research Engine — multi-source parallel search + multi-model synthesis + TAINT verification"
+  status: "active"
+  phase: "design"
+  entry_point: null
+  usage_trigger: null

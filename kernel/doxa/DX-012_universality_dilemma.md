@@ -313,6 +313,11 @@ quadrantChart
 
 ## Levins のトレードオフとの接続 {#sec_11_levins}
 
+> [!WARNING]
+> §11-§13 の分析は §10 の RDT 再形式化仮説に条件依存する。
+> §14 Test 2 で RDT 仮説は FRAGILE (経験的未検証) と判定されている。
+> 以下の議論は「RDT 仮説が成立するならば」の条件下で読むこと。
+
 > Levins R (1966), "The Strategy of Model Building in Population Biology", American Scientist 54(4):421-431
 
 ### Levins GRP トレードオフ
@@ -549,4 +554,4 @@ flowchart LR
 
 ---
 
-*DX-012 v2.3.0 — §14 Test 2 結果追加 (2026-02-15)*
+*DX-012 v2.4.0 — P5 Gemini 全文レビュー (9/10), contingency 注記追加 (2026-02-15)*

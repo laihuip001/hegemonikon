@@ -270,7 +270,7 @@ function renderMessage(msg: ChatMessage, index: number): string {
         <span class="chat-msg-role">${isUser ? '👤 You' : '🤖 AI'}</span>
         ${modelTag}
         <span class="chat-msg-time">${formatTime(msg.timestamp)}</span>
-        <button class="chat-msg-delete" title="削除" data-idx="${index}">✕</button>
+        <button class="chat-msg-delete" title="削除" aria-label="メッセージを削除" data-idx="${index}">✕</button>
       </div>
       <div class="chat-msg-body">${rendered}</div>
     </div>
@@ -335,6 +335,7 @@ function addCopyButtons(container: HTMLElement): void {
         btn.className = 'code-copy-btn';
         btn.textContent = '📋';
         btn.title = 'コピー';
+        btn.setAttribute('aria-label', 'コードをコピー');
         btn.addEventListener('click', () => {
             const code = pre.querySelector('code')?.textContent ?? pre.textContent ?? '';
             void navigator.clipboard.writeText(code).then(() => {
@@ -376,7 +377,13 @@ function setLoading(loading: boolean): void {
     const input = document.getElementById('chat-input') as HTMLTextAreaElement | null;
     if (btn) {
         btn.disabled = loading;
-        btn.textContent = loading ? '⏳' : '送信';
+        if (loading) {
+            btn.innerHTML = '<span class="spinner"></span>';
+            btn.setAttribute('aria-label', '送信中');
+        } else {
+            btn.textContent = '送信';
+            btn.removeAttribute('aria-label');
+        }
     }
     if (input) {
         input.disabled = loading;
@@ -534,8 +541,8 @@ export async function renderChatView(): Promise<void> {
           <select id="chat-model-select" class="input chat-model-select">
             ${modelOptions}
           </select>
-          <button id="chat-settings-btn" class="btn btn-sm btn-outline" title="API キー設定">⚙️</button>
-          <button id="chat-clear-btn" class="btn btn-sm btn-outline" title="履歴クリア">🗑️</button>
+          <button id="chat-settings-btn" class="btn btn-sm btn-outline" title="API キー設定" aria-label="API キー設定">⚙️</button>
+          <button id="chat-clear-btn" class="btn btn-sm btn-outline" title="履歴クリア" aria-label="履歴クリア">🗑️</button>
         </div>
       </div>
 

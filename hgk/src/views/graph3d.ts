@@ -78,26 +78,43 @@ const LOD_FAR = 120;       // > 120: theorem only
 const LOD_MEDIUM = 60;     // 60-120: theorem + bridge nodes
 const LOD_CLOSE = 30;      // < 30: all knowledge nodes + labels
 
+// ─── Geometry Caching ────────────────────────────────────────
+
+const geometryCache = new Map<string, THREE.BufferGeometry>();
+
+function getCachedGeometry(key: string, factory: () => THREE.BufferGeometry): THREE.BufferGeometry {
+    let geo = geometryCache.get(key);
+    if (!geo) {
+        geo = factory();
+        geometryCache.set(key, geo);
+    }
+    return geo;
+}
+
 // ─── Series-specific Geometry ────────────────────────────────
 
 function createNodeGeometry(series: string, isPure: boolean): THREE.BufferGeometry {
-    const s = isPure ? 1.0 : 0.72;
-    switch (series) {
-        case 'O': return new THREE.OctahedronGeometry(2.5 * s, 0);
-        case 'S': return new THREE.BoxGeometry(3.2 * s, 3.2 * s, 3.2 * s);
-        case 'H': return new THREE.TetrahedronGeometry(3 * s, 0);
-        case 'P': return new THREE.DodecahedronGeometry(2.5 * s, 0);
-        case 'K': return new THREE.IcosahedronGeometry(2.5 * s, 0);
-        case 'A': return new THREE.OctahedronGeometry(2.5 * s, 1);
-        default: return new THREE.SphereGeometry(2.5 * s, 16, 16);
-    }
+    const key = `node-${series}-${isPure}`;
+    return getCachedGeometry(key, () => {
+        const s = isPure ? 1.0 : 0.72;
+        switch (series) {
+            case 'O': return new THREE.OctahedronGeometry(2.5 * s, 0);
+            case 'S': return new THREE.BoxGeometry(3.2 * s, 3.2 * s, 3.2 * s);
+            case 'H': return new THREE.TetrahedronGeometry(3 * s, 0);
+            case 'P': return new THREE.DodecahedronGeometry(2.5 * s, 0);
+            case 'K': return new THREE.IcosahedronGeometry(2.5 * s, 0);
+            case 'A': return new THREE.OctahedronGeometry(2.5 * s, 1);
+            default: return new THREE.SphereGeometry(2.5 * s, 16, 16);
+        }
+    });
 }
 
 // ─── Glow shell creation ─────────────────────────────────────
 
 function createGlowShell(series: string, isPure: boolean): THREE.Mesh {
     const s = (isPure ? 1.0 : 0.72) * 1.6;
-    const geo = new THREE.SphereGeometry(2.5 * s, 24, 24);
+    const key = `glow-${isPure}`;
+    const geo = getCachedGeometry(key, () => new THREE.SphereGeometry(2.5 * s, 24, 24));
     const [c1, c2] = SERIES_GRADIENTS[series] || ['#ffffff', '#aaaaff'];
     const mat = new THREE.ShaderMaterial({
         uniforms: {
@@ -682,11 +699,16 @@ export async function renderGraph3D(): Promise<void> {
         }
 
         const elapsed = now * 0.001;  // seconds for shader uniforms
+        const isStable = simulation.alpha() <= 0.001;
 
         simNodes.forEach(node => {
             const group = nodeMeshes.get(node.id);
             if (!group) return;
-            group.position.set(node.x, node.y, node.z);
+
+            // ⚡ Bolt Optimization: Only update position if simulation is active
+            if (!isStable) {
+                group.position.set(node.x, node.y, node.z);
+            }
 
             const core = group.children[0] as THREE.Mesh;
             const wire = group.children[1] as THREE.Mesh;
@@ -740,11 +762,16 @@ export async function renderGraph3D(): Promise<void> {
         edgeLines.forEach((line, i) => {
             const link = simLinks[i];
             if (!link) return;
-            const s = link.source as SimNode, t = link.target as SimNode;
-            const pos = line.geometry.attributes.position as THREE.BufferAttribute;
-            pos.setXYZ(0, s.x, s.y, s.z);
-            pos.setXYZ(1, t.x, t.y, t.z);
-            pos.needsUpdate = true;
+
+            // ⚡ Bolt Optimization: Only update edge geometry if simulation is active
+            if (!isStable) {
+                const s = link.source as SimNode, t = link.target as SimNode;
+                const pos = line.geometry.attributes.position as THREE.BufferAttribute;
+                pos.setXYZ(0, s.x, s.y, s.z);
+                pos.setXYZ(1, t.x, t.y, t.z);
+                pos.needsUpdate = true;
+            }
+
             const mat = line.material as THREE.LineBasicMaterial;
             const e = line.userData.edge as GraphEdge;
             mat.opacity = selectedNodeId
@@ -817,6 +844,8 @@ export async function renderGraph3D(): Promise<void> {
                 if (Array.isArray(m)) m.forEach(x => x.dispose()); else (m as THREE.Material).dispose();
             }
         });
+        // Clear cached geometries so they don't leak or point to disposed buffers
+        geometryCache.clear();
         pGeo.dispose(); pMat.dispose(); composer.dispose(); renderer.dispose(); controls.dispose();
     };
 }

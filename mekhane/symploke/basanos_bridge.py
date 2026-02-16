@@ -118,16 +118,19 @@ class BasanosBridge:
         self._all_domains = self._matrix.domains
         self._all_axes = self._matrix.axes
 
+    # PURPOSE: Get total perspectives
     @property
     def total_perspectives(self) -> int:
         """Total number of available perspectives."""
         return self._matrix.total_perspectives
 
+    # PURPOSE: Get all domains
     @property
     def all_domains(self) -> list[str]:
         """All available domain IDs."""
         return list(self._all_domains)
 
+    # PURPOSE: Get all axes
     @property
     def all_axes(self) -> list[str]:
         """All available axis IDs."""

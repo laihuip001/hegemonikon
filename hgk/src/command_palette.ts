@@ -41,15 +41,15 @@ function trackRecentView(key: string): void {
 
 function createPaletteHTML(): string {
   return `
-    <div class="cp-overlay" id="cp-overlay">
+    <div class="cp-overlay" id="cp-overlay" role="dialog" aria-modal="true" aria-label="Command Palette">
       <div class="cp-dialog">
         <div class="cp-input-wrapper">
-          <span class="cp-icon">⌘</span>
-          <input type="text" id="cp-input" class="cp-input" placeholder="Type a workflow name or CCL expression..." autocomplete="off" />
-          <kbd class="cp-kbd">ESC</kbd>
+          <span class="cp-icon" aria-hidden="true">⌘</span>
+          <input type="text" id="cp-input" class="cp-input" placeholder="Type a workflow name or CCL expression..." autocomplete="off" role="combobox" aria-autocomplete="list" aria-expanded="true" aria-controls="cp-results" aria-label="Command input" />
+          <kbd class="cp-kbd" aria-hidden="true">ESC</kbd>
         </div>
-        <div class="cp-results" id="cp-results"></div>
-        <div class="cp-footer">
+        <div class="cp-results" id="cp-results" role="listbox" aria-label="Search results"></div>
+        <div class="cp-footer" aria-hidden="true">
           <span>↑↓ Navigate</span>
           <span>↵ Execute</span>
           <span>ESC Close</span>
@@ -63,10 +63,10 @@ function createPaletteHTML(): string {
 
 function renderWFItems(items: WFSummary[]): string {
   if (items.length === 0) {
-    return '<div class="cp-empty">No matching workflows</div>';
+    return '<div class="cp-empty" role="status">No matching workflows</div>';
   }
   return items.map((wf, i) => `
-    <div class="cp-item ${i === 0 ? 'cp-item-active' : ''}" data-idx="${i}" data-name="${esc(wf.name)}" data-ccl="${esc(wf.ccl)}">
+    <div class="cp-item" data-idx="${i}" data-name="${esc(wf.name)}" data-ccl="${esc(wf.ccl)}" role="option">
       <div class="cp-item-header">
         <span class="cp-item-name">/${esc(wf.name)}</span>
         ${wf.ccl ? `<span class="cp-item-ccl">${esc(wf.ccl)}</span>` : ''}
@@ -274,7 +274,7 @@ function renderRouteItems(filter: string): string {
   const sectionLabel = !q && recentViews.length > 0 ? '最近のビュー' : 'ビュー';
   return `<div class="cp-section-label">${sectionLabel}</div>` +
     routes.map((r, i) => `
-      <div class="cp-item cp-route-item ${i === 0 ? 'cp-item-active' : ''}" data-idx="${i}" data-route="${esc(r.key)}">
+      <div class="cp-item cp-route-item" data-idx="${i}" data-route="${esc(r.key)}" role="option">
         <div class="cp-item-header">
           <span class="cp-item-icon">${r.icon}</span>
           <span class="cp-item-name">${esc(r.label)}</span>
@@ -343,7 +343,7 @@ function renderQuickActions(filter: string): string {
   if (actions.length === 0) return '';
   return `<div class="cp-section-label">Quick Actions</div>` +
     actions.map((a, i) => `
-      <div class="cp-item cp-quick-action ${i === 0 ? 'cp-item-active' : ''}" data-idx="${i}" data-action="${esc(a.label)}">
+      <div class="cp-item cp-quick-action" data-idx="${i}" data-action="${esc(a.label)}" role="option">
         <div class="cp-item-header">
           <span class="cp-item-name">${a.icon} >${esc(a.label)}</span>
         </div>
@@ -381,10 +381,26 @@ let activeIdx = 0;
 function updateActive(resultsEl: HTMLElement, delta: number): void {
   const items = resultsEl.querySelectorAll('.cp-item');
   if (items.length === 0) return;
-  items[activeIdx]?.classList.remove('cp-item-active');
+
+  const prev = items[activeIdx] as HTMLElement;
+  if (prev) {
+    prev.classList.remove('cp-item-active');
+    prev.removeAttribute('aria-selected');
+    prev.removeAttribute('id');
+  }
+
   activeIdx = Math.max(0, Math.min(items.length - 1, activeIdx + delta));
-  items[activeIdx]?.classList.add('cp-item-active');
-  (items[activeIdx] as HTMLElement)?.scrollIntoView({ block: 'nearest' });
+
+  const next = items[activeIdx] as HTMLElement;
+  if (next) {
+    next.classList.add('cp-item-active');
+    next.setAttribute('aria-selected', 'true');
+    next.id = 'cp-active-item';
+    next.scrollIntoView({ block: 'nearest' });
+
+    const input = document.getElementById('cp-input');
+    if (input) input.setAttribute('aria-activedescendant', 'cp-active-item');
+  }
 }
 
 async function handleInput(input: HTMLInputElement, resultsEl: HTMLElement): Promise<void> {
@@ -414,6 +430,7 @@ async function handleInput(input: HTMLInputElement, resultsEl: HTMLElement): Pro
     // Show filtered quick actions
     resultsEl.innerHTML = renderQuickActions(cmd);
     activeIdx = 0;
+    updateActive(resultsEl, 0);
     // Click handlers for quick action items
     resultsEl.querySelectorAll('.cp-quick-action').forEach(item => {
       item.addEventListener('click', () => {
@@ -471,6 +488,8 @@ async function handleInput(input: HTMLInputElement, resultsEl: HTMLElement): Pro
   resultsEl.innerHTML = routeSection +
     (filtered.length > 0 ? `<div class="cp-section-label">ワークフロー</div>` : '') +
     renderWFItems(filtered);
+
+  updateActive(resultsEl, 0);
 
   // Click handlers — routes
   resultsEl.querySelectorAll('.cp-route-item').forEach(item => {

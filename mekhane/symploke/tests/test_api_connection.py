@@ -9,15 +9,24 @@ import asyncio
 import os
 import sys
 import pytest
+from unittest.mock import MagicMock
 
 # Add parent to path
 sys.path.insert(0, "/home/makaron8426/oikos/hegemonikon")
+
+# Mock aiohttp if not available to allow JulesClient import
+try:
+    import aiohttp
+except ImportError:
+    sys.modules["aiohttp"] = MagicMock()
+    aiohttp = None
 
 from mekhane.symploke.jules_client import JulesClient
 
 
 # PURPOSE: Test API connection by listing sources
 @pytest.mark.asyncio
+@pytest.mark.skipif(aiohttp is None, reason="aiohttp not installed")
 @pytest.mark.skipif(not os.environ.get("JULES_API_KEY"), reason="JULES_API_KEY not set")
 async def test_connection():
     """Test API connection by listing sources."""
@@ -30,8 +39,6 @@ async def test_connection():
     print("-" * 50)
 
     try:
-        import aiohttp
-
         headers = {"X-Goog-Api-Key": api_key, "Content-Type": "application/json"}
 
         async with aiohttp.ClientSession() as session:

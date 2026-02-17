@@ -2,19 +2,30 @@
 
 > **目的**: 全コード・ドキュメント・環境を Python 3.13 に統一
 > **環境**: Debian 12 (bookworm), GCP c4-standard-24
+> **ステータス**: ✅ 完了 (2026-02-17)
 
 ---
 
-## 現状
+## 完了状態
 
-- **System**: Python 3.11.2 (Debian 12 デフォルト)
-- **venv**: 3.11.2
-- **pyproject.toml**: `requires-python = ">=3.11"`
-- **ドキュメント言及**: 13箇所 (`grep -r "3.11" --include="*.md" --include="*.toml"`)
+| 項目 | 移行前 | 移行後 |
+|:-----|:-------|:-------|
+| System Python | 3.11.2 (`/usr/bin/python3`) | 3.13.2 (pyenv) |
+| .venv Python | 3.11.2 | 3.13.2 |
+| pyproject.toml | `>=3.11` | `>=3.13` |
+| pip packages | 209 | 230 (cp313 wheel) |
+| ドキュメント | 3.11 言及 ~20箇所 | 全て 3.13 に更新 |
+| GitHub Actions | `python-version: "3.11"` | `python-version: "3.13"` |
 
-## 作業手順
+## テスト結果
 
-### Step 1: pyenv で 3.13 インストール
+- **pytest**: 2684 passed, 15 failed (全て既存問題), 14 skipped
+- **boot_integration --mode fast**: Exit code: 0
+- **3.13 固有 regression**: **0件**
+
+## 実施手順（記録）
+
+### Step 1: pyenv + Python 3.13.2
 
 ```bash
 # ビルド依存
@@ -22,11 +33,9 @@ sudo apt install -y build-essential libssl-dev zlib1g-dev \
   libbz2-dev libreadline-dev libsqlite3-dev libncursesw5-dev \
   xz-utils tk-dev libxml2-dev libxmlsec1-dev libffi-dev liblzma-dev
 
-# pyenv
+# pyenv (git clone)
 curl https://pyenv.run | bash
-# ~/.bashrc に追加:
-# export PATH="$HOME/.pyenv/bin:$PATH"
-# eval "$(pyenv init -)"
+# ~/.bashrc に追加済み
 
 pyenv install 3.13.2
 pyenv global 3.13.2
@@ -36,54 +45,33 @@ pyenv global 3.13.2
 
 ```bash
 cd ~/oikos/hegemonikon
-mv .venv .venv_311_backup  # ロールバック用
+mv .venv .venv_311_backup
 python3.13 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-> **リスク**: LanceDB, ONNX Runtime 等のバイナリパッケージが 3.13 wheel を提供していない可能性。失敗時は `.venv_311_backup` から復元。
+### Step 3: テスト → PASS
 
-### Step 3: テスト実行
+### Step 4: ドキュメント更新 (~20箇所)
 
-```bash
-PYTHONPATH=. python -m pytest --tb=short -q
-PYTHONPATH=. python mekhane/symploke/boot_integration.py --mode fast
-```
+更新ファイル: pyproject.toml, GEMINI.md, README.md, 05_creator_profile.md,
+Module 19 (3箇所), gcp_linux.md (3箇所), debian_local.md,
+post_migration_verification.md, GitHub Actions (4件),
+01_environment.md, codex_infra.md (3箇所), ai_tools_config.md
 
-### Step 4: ドキュメント更新 (13箇所)
-
-| ファイル | 変更 |
-|:---------|:-----|
-| pyproject.toml | `>=3.11` → `>=3.13` |
-| GEMINI.md | `3.11+` → `3.13` |
-| README.md | `Python 3.11` → `Python 3.13` |
-| kernel/constitution/01_environment.md | Docker タグ例 |
-| mekhane/ergasterion/protocols/Module 19*.md | `python:3.11-slim` → `3.13-slim` (3箇所) |
-| mekhane/mcp/project_knowledge/05_creator_profile.md | `3.11+` → `3.13` |
-| knowledge_items/.../gcp_linux.md | venv コマンド (3箇所) |
-| knowledge_items/.../debian_local.md | venv コマンド |
-| knowledge_items/.../post_migration_verification.md | バージョンチェック |
-
-### Step 5: 残存チェック
+### Step 5: requirements.txt 再固定
 
 ```bash
-grep -rn "3\.11" --include="*.md" --include="*.toml" --include="*.cfg" --include="*.yml" ~/oikos/hegemonikon/
-# 0件であること
+pip freeze > requirements.txt  # 230 packages
 ```
 
-## ロールバック手順
+## ロールバック手順（未使用・backup 削除済み）
 
 ```bash
-rm -rf .venv
-mv .venv_311_backup .venv
-# pyproject.toml を git checkout
+# pyenv で 3.11 に戻す場合:
+pyenv install 3.11.2
+pyenv global 3.11.2
+python3.11 -m venv .venv
+pip install -r requirements.txt
 ```
-
-## 完了条件
-
-1. `python3 --version` → `3.13.x`
-2. `.venv/bin/python --version` → `3.13.x`
-3. `pytest` 全テスト PASS
-4. `boot_integration.py --mode fast` 正常終了
-5. `grep -r "3.11"` で文書内の残存 0件

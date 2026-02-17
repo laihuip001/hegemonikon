@@ -1,7 +1,7 @@
 ---
 doc_id: "MEKHANE_ARCH"
 version: "1.0.0"
-updated: "2026-02-10"
+updated: "2026-02-17"
 depends_on:
   - doc_id: "ARCHITECTURE"
     min_version: "1.0.0"
@@ -9,7 +9,7 @@ depends_on:
 
 # mekhane/ Architecture — 圏としての実装層
 
-> **最終更新**: 2026-02-10
+> **最終更新**: 2026-02-17
 > **導出**: O1 Noēsis + /m 熟読 + Dendron 100% 検証に基づく
 
 ---
@@ -120,13 +120,17 @@ graph TD
 │    ccl/     — CCL パーサー/ジェネレーター              │
 │    taxis/   — 分類・優先度・スケジューリング           │
 │    basanos/ — 多角的レビュー                        │
+│    ochema/  — LLM ルーター (Cortex API)               │
 ├─────────────────────────────────────────────────────┤
 │  Layer 3: 基盤サービス                                │
 │    anamnesis/ — 記憶・ベクトル検索 (LanceDB)          │
+│    sophia/    — 知識アイテム管理・検索                 │
 │    dendron/   — 存在証明チェッカー                     │
 │    peira/     — ヘルスチェック・監視                   │
 │    poiema/    — 構造化出力生成                         │
 │    synteleia/ — 統合テスト・品質ゲート                 │
+│    exagoge/   — エクスポート (Handoff/Doxa/KI)        │
+│    periskope/ — Deep Research Engine                  │
 ├─────────────────────────────────────────────────────┤
 │  Layer 4: ツール                                      │
 │    ergasterion/ — 開発ワークショップ                   │
@@ -175,7 +179,7 @@ graph TD
 
 | 指標 | 値 |
 |:-----|:---|
-| サブディレクトリ数 | 26 |
+| サブディレクトリ数 | 23 (+ _archived, tests) |
 | Python ファイル数 | ~400 |
 | `__init__.py` あり | 15/26 (パッケージ化されたもの) |
 | Dendron PROOF カバレッジ | **100.0%** |

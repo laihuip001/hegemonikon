@@ -17,14 +17,25 @@ from __future__ import annotations
 import argparse
 import sys
 from dataclasses import dataclass, field
-from datetime import datetime, timedelta
+from datetime import datetime
+from enum import Enum
 from pathlib import Path
 from typing import Dict, List, Optional
 
 import yaml
+from packaging.version import Version, InvalidVersion
 
 
 # ── Data Models ──────────────────────────────────────
+
+
+# PURPOSE: 判定ステータスを列挙し、文字列リテラルの代わりに型安全な比較を可能にする
+class StalenessStatus(Enum):
+    """依存辺の検査ステータス."""
+    OK = "OK"
+    STALE = "STALE"
+    WARNING = "WARNING"
+    CIRCULAR = "CIRCULAR"
 
 
 # PURPOSE: ドキュメント間の依存関係1件を表現し、STALE 判定の入力にする
@@ -52,23 +63,23 @@ class StalenessResult:
     """1つの依存辺の検査結果."""
     doc_id: str
     upstream_id: str
-    status: str  # "OK", "STALE", "WARNING", "CIRCULAR"
+    status: StalenessStatus
     detail: str
 
 
-# ── Semver Compare ───────────────────────────────────
+# ── Version Compare ──────────────────────────────────
 
 
-# PURPOSE: バージョン文字列の大小比較を数値タプルで行い、STALE 判定の基盤にする
-def _parse_version(v: str) -> tuple[int, ...]:
-    """Parse "1.2.3" → (1, 2, 3). Non-numeric parts default to 0."""
-    parts: list[int] = []
-    for p in v.split("."):
-        try:
-            parts.append(int(p))
-        except ValueError:
-            parts.append(0)
-    return tuple(parts)
+# PURPOSE: packaging.version を使った安全なバージョン比較。pre-release にも対応する
+def _parse_version(v: str) -> Version:
+    """Parse version string via packaging.version.Version.
+
+    Invalid version strings are normalized to Version("0.0.0").
+    """
+    try:
+        return Version(v)
+    except InvalidVersion:
+        return Version("0.0.0")
 
 
 # ── Checker ──────────────────────────────────────────
@@ -92,17 +103,31 @@ class DocStalenessChecker:
     def __init__(self) -> None:
         self._docs: Dict[str, DocInfo] = {}
         self._results: List[StalenessResult] = []
+        self._warnings: List[str] = []
+
+    @property
+    def warnings(self) -> List[str]:
+        """scan 時の警告 (doc_id 重複等)."""
+        return list(self._warnings)
 
     # PURPOSE: プロジェクト内の全 .md ファイルから frontmatter を収集し、依存グラフ構築の材料にする
     def scan(self, root: Path) -> List[DocInfo]:
         """全 .md ファイルの YAML frontmatter をパースして DocInfo 一覧を構築."""
         self._docs.clear()
+        self._warnings.clear()
         for md_path in sorted(root.rglob("*.md")):
             # 除外ディレクトリ判定
             if any(part in self.EXCLUDE_DIRS for part in md_path.parts):
                 continue
             doc_info = self._parse_frontmatter(md_path)
             if doc_info:
+                # doc_id 重複検出
+                if doc_info.doc_id in self._docs:
+                    existing = self._docs[doc_info.doc_id]
+                    self._warnings.append(
+                        f"doc_id 重複: '{doc_info.doc_id}' "
+                        f"({existing.path} と {doc_info.path})"
+                    )
                 self._docs[doc_info.doc_id] = doc_info
         return list(self._docs.values())
 
@@ -171,7 +196,7 @@ class DocStalenessChecker:
                     self._results.append(StalenessResult(
                         doc_id=doc.doc_id,
                         upstream_id=dep.doc_id,
-                        status="CIRCULAR",
+                        status=StalenessStatus.CIRCULAR,
                         detail=f"循環依存: {doc.doc_id} ↔ {dep.doc_id}",
                     ))
                     continue
@@ -181,12 +206,12 @@ class DocStalenessChecker:
                     self._results.append(StalenessResult(
                         doc_id=doc.doc_id,
                         upstream_id=dep.doc_id,
-                        status="STALE",
+                        status=StalenessStatus.STALE,
                         detail=f"上流 {dep.doc_id} が見つからない",
                     ))
                     continue
 
-                # Version 比較
+                # Version 比較 (packaging.version)
                 upstream_ver = _parse_version(upstream.version)
                 min_ver = _parse_version(dep.min_version)
 
@@ -194,7 +219,7 @@ class DocStalenessChecker:
                     self._results.append(StalenessResult(
                         doc_id=doc.doc_id,
                         upstream_id=dep.doc_id,
-                        status="STALE",
+                        status=StalenessStatus.STALE,
                         detail=(
                             f"上流 {dep.doc_id} v{upstream.version} > "
                             f"下流 min_version {dep.min_version}"
@@ -214,7 +239,7 @@ class DocStalenessChecker:
                             self._results.append(StalenessResult(
                                 doc_id=doc.doc_id,
                                 upstream_id=dep.doc_id,
-                                status="WARNING",
+                                status=StalenessStatus.WARNING,
                                 detail=f"日付差 {diff}日 (>{self.STALE_DAYS_THRESHOLD}日)",
                             ))
                             continue
@@ -224,7 +249,7 @@ class DocStalenessChecker:
                 self._results.append(StalenessResult(
                     doc_id=doc.doc_id,
                     upstream_id=dep.doc_id,
-                    status="OK",
+                    status=StalenessStatus.OK,
                     detail="最新",
                 ))
 
@@ -248,7 +273,8 @@ class DocStalenessChecker:
         if not self._results:
             return 100.0
         ok_count = sum(
-            1 for r in self._results if r.status in ("OK", "WARNING")
+            1 for r in self._results
+            if r.status in (StalenessStatus.OK, StalenessStatus.WARNING)
         )
         return (ok_count / len(self._results)) * 100.0
 
@@ -258,10 +284,10 @@ class DocStalenessChecker:
         if not self._results:
             return "📄 Doc Staleness: チェック対象なし"
 
-        stale = [r for r in self._results if r.status == "STALE"]
-        warnings = [r for r in self._results if r.status == "WARNING"]
-        circular = [r for r in self._results if r.status == "CIRCULAR"]
-        ok = [r for r in self._results if r.status == "OK"]
+        stale = [r for r in self._results if r.status == StalenessStatus.STALE]
+        warnings = [r for r in self._results if r.status == StalenessStatus.WARNING]
+        circular = [r for r in self._results if r.status == StalenessStatus.CIRCULAR]
+        ok = [r for r in self._results if r.status == StalenessStatus.OK]
 
         lines: list[str] = []
         pct = self.doc_health_pct()
@@ -278,6 +304,10 @@ class DocStalenessChecker:
             lines.append(f"  ⚠️ {r.doc_id} ← {r.upstream_id}: {r.detail}")
         for r in circular:
             lines.append(f"  🔄 {r.doc_id} ← {r.upstream_id}: {r.detail}")
+
+        # doc_id 重複警告
+        for w in self._warnings:
+            lines.append(f"  ⚠️ {w}")
 
         return "\n".join(lines)
 
@@ -307,7 +337,7 @@ def main() -> None:
     results = checker.check()
     print(checker.format_report())
 
-    stale_count = sum(1 for r in results if r.status == "STALE")
+    stale_count = sum(1 for r in results if r.status == StalenessStatus.STALE)
     sys.exit(1 if stale_count > 0 else 0)
 
 

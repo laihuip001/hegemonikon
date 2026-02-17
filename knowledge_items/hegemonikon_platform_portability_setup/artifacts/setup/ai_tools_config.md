@@ -106,7 +106,7 @@ sudo apt-get install -y nodejs
 
 ## 6.1 Python Prerequisites (Debian)
 
-Internal framework tools and some CLI managers (like `jules_api.py`) require Python 3.11+ and specific libraries.
+Internal framework tools and some CLI managers (like `jules_api.py`) require Python 3.13+ and specific libraries.
 
 - **Recommended Commands**:
 

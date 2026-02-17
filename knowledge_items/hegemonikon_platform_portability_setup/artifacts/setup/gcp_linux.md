@@ -8,7 +8,7 @@ Standard packages required for core operations and MCP support:
 
 ```bash
 # Core
-sudo apt update && sudo apt install -y python3.11 python3.11-venv git curl
+sudo apt update && sudo apt install -y python3.13 python3.13-venv git curl
 
 # Git Identity
 git config --global user.email "your-email@example.com"
@@ -31,11 +31,11 @@ sudo apt install -y nodejs
 
 ### Python Virtual Environment
 
-Hegemonikón relies on a Python 3.11 environment.
+Hegemonikón relies on a Python 3.13 environment.
 
 ```bash
 cd ~/oikos/hegemonikon
-python3.11 -m venv .venv
+python3.13 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
 pip install mcp  # Ensure SDK is present

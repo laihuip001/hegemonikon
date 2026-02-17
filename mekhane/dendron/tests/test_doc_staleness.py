@@ -14,6 +14,7 @@ from mekhane.dendron.doc_staleness import (
     DocDependency,
     DocInfo,
     StalenessResult,
+    StalenessStatus,
     _parse_version,
 )
 
@@ -32,9 +33,18 @@ def create_md(tmp_path):
         depends_on: list[dict] | None = None,
         updated: str = "2026-02-17",
         subdir: str = "",
+        raw_content: str | None = None,
     ) -> Path:
         """Verify create behavior."""
         import yaml
+
+        if raw_content is not None:
+            # 生のコンテンツを直接書き込み (壊れた YAML テスト用)
+            target_dir = tmp_path / subdir if subdir else tmp_path
+            target_dir.mkdir(parents=True, exist_ok=True)
+            p = target_dir / name
+            p.write_text(raw_content, encoding="utf-8")
+            return p
 
         meta: dict = {
             "doc_id": doc_id,
@@ -59,12 +69,13 @@ def create_md(tmp_path):
 
 # PURPOSE: バージョン文字列パースの単体テスト
 class TestVersionParse:
-    """Semver パースの基本テスト."""
+    """packaging.version ベースのパーステスト."""
 
-    # PURPOSE: 基本的なバージョン比較
+    # PURPOSE: 基本的なバージョンパース
     def test_basic(self) -> None:
-        assert _parse_version("1.0.0") == (1, 0, 0)
-        assert _parse_version("7.0.0") == (7, 0, 0)
+        from packaging.version import Version
+        assert _parse_version("1.0.0") == Version("1.0.0")
+        assert _parse_version("7.0.0") == Version("7.0.0")
 
     # PURPOSE: バージョン大小比較
     def test_comparison(self) -> None:
@@ -72,6 +83,16 @@ class TestVersionParse:
         assert _parse_version("1.1.0") > _parse_version("1.0.0")
         assert _parse_version("1.0.1") > _parse_version("1.0.0")
         assert not (_parse_version("1.0.0") > _parse_version("1.0.0"))
+
+    # PURPOSE: pre-release バージョン対応
+    def test_prerelease(self) -> None:
+        assert _parse_version("2.0.0") > _parse_version("2.0.0a1")
+        assert _parse_version("2.0.0b1") > _parse_version("2.0.0a1")
+
+    # PURPOSE: 不正バージョンのフォールバック
+    def test_invalid_version(self) -> None:
+        from packaging.version import Version
+        assert _parse_version("not-a-version") == Version("0.0.0")
 
 
 # ─── Scan Tests ═════════════════════════════════
@@ -110,6 +131,25 @@ class TestScan:
         assert len(docs) == 1
         assert docs[0].doc_id == "NORMAL"
 
+    # PURPOSE: 壊れた YAML frontmatter はスキップされる
+    def test_broken_yaml_skipped(self, create_md, tmp_path) -> None:
+        create_md("broken.md", "", "", raw_content="---\n: invalid: yaml: {{{\n---\n\nBody\n")
+        create_md("good.md", "GOOD", "1.0.0")
+        checker = DocStalenessChecker()
+        docs = checker.scan(tmp_path)
+        assert len(docs) == 1
+        assert docs[0].doc_id == "GOOD"
+
+    # PURPOSE: doc_id 重複を検出して warnings に記録する
+    def test_duplicate_doc_id_warning(self, create_md, tmp_path) -> None:
+        create_md("first.md", "SAME_ID", "1.0.0", subdir="a")
+        create_md("second.md", "SAME_ID", "2.0.0", subdir="b")
+        checker = DocStalenessChecker()
+        checker.scan(tmp_path)
+        assert len(checker.warnings) == 1
+        assert "doc_id 重複" in checker.warnings[0]
+        assert "SAME_ID" in checker.warnings[0]
+
 
 # ─── Check Tests ════════════════════════════════
 
@@ -129,7 +169,7 @@ class TestCheck:
         checker.scan(tmp_path)
         results = checker.check()
 
-        stale = [r for r in results if r.status == "STALE"]
+        stale = [r for r in results if r.status == StalenessStatus.STALE]
         assert len(stale) == 1
         assert stale[0].doc_id == "DOWNSTREAM"
         assert stale[0].upstream_id == "UPSTREAM"
@@ -145,7 +185,7 @@ class TestCheck:
         checker.scan(tmp_path)
         results = checker.check()
 
-        ok = [r for r in results if r.status == "OK"]
+        ok = [r for r in results if r.status == StalenessStatus.OK]
         assert len(ok) == 1
 
     # PURPOSE: 上流 updated が31日前 → WARNING
@@ -161,7 +201,7 @@ class TestCheck:
         checker.scan(tmp_path)
         results = checker.check()
 
-        warnings = [r for r in results if r.status == "WARNING"]
+        warnings = [r for r in results if r.status == StalenessStatus.WARNING]
         assert len(warnings) == 1
         assert "日付差" in warnings[0].detail
 
@@ -178,7 +218,7 @@ class TestCheck:
         checker.scan(tmp_path)
         results = checker.check()
 
-        circular = [r for r in results if r.status == "CIRCULAR"]
+        circular = [r for r in results if r.status == StalenessStatus.CIRCULAR]
         assert len(circular) == 2  # both edges flagged
 
     # PURPOSE: 存在しない doc_id を参照 → STALE
@@ -191,7 +231,7 @@ class TestCheck:
         checker.scan(tmp_path)
         results = checker.check()
 
-        stale = [r for r in results if r.status == "STALE"]
+        stale = [r for r in results if r.status == StalenessStatus.STALE]
         assert len(stale) == 1
         assert "見つからない" in stale[0].detail
 
@@ -229,3 +269,24 @@ class TestDocHealth:
         checker.scan(tmp_path)
         checker.check()
         assert checker.doc_health_pct() == 100.0
+
+
+# ─── Format Report Tests ═══════════════════════
+
+
+# PURPOSE: format_report() のテスト
+class TestFormatReport:
+    """format_report() のテスト."""
+
+    # PURPOSE: doc_id 重複がレポートに含まれる
+    def test_duplicate_warning_in_report(self, create_md, tmp_path) -> None:
+        create_md("first.md", "DUP", "1.0.0", subdir="a")
+        create_md("second.md", "DUP", "1.0.0", subdir="b")
+        create_md("dep.md", "DEP", "1.0.0", depends_on=[
+            {"doc_id": "DUP", "min_version": "1.0.0"},
+        ])
+        checker = DocStalenessChecker()
+        checker.scan(tmp_path)
+        checker.check()
+        report = checker.format_report()
+        assert "doc_id 重複" in report

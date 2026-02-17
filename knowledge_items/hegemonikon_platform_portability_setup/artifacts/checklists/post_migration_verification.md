@@ -22,7 +22,7 @@ Check `.env` files and session exports:
 
 Verify availability and versions:
 
-- [x] **Python**: `python3 --version` (should be 3.11+).
+- [x] **Python**: `python3 --version` (should be 3.13+).
 - [x] **Python Packages**: `pip list | grep PyYAML` (Required for Jules Pool manager).
 - [x] **Node.js**: `node --version` (should be 20.x+).
 - [x] **Claude CLI**: `claude --version` (Login status: `claude login`).

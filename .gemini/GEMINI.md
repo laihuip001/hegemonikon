@@ -90,7 +90,7 @@ Hegemonikón は FEP (Free Energy Principle) に基づく認知ハイパーバ�
 ## Environment
 
 - **OS**: Debian 13 (GCP c4-standard-24)
-- **Python**: 3.11+ (.venv)
+- **Python**: 3.13 (.venv)
 - **Node.js**: 20.x
 - **DB**: LanceDB (ベクトル検索)
 - **正本**: `kernel/axiom_hierarchy.md` (v7.0, 2026-02-15)

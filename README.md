@@ -186,7 +186,7 @@ hegemonikon/
 
 | 層 | 技術 |
 |:---|:-----|
-| **Backend** | Python 3.11, FastAPI, LanceDB, ONNX Runtime |
+| **Backend** | Python 3.13, FastAPI, LanceDB, ONNX Runtime |
 | **Desktop** | Tauri v2, TypeScript, Three.js (3D Graph) |
 | **AI/ML** | BGE-M3 (埋め込み), Google Gemini |
 | **Tools** | MCP (10+ サーバー), CCL パーサー |

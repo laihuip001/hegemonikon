@@ -1,3 +1,5 @@
+# PROOF: [S2/Mekhanē] <- mekhane/periskope/
+# PURPOSE: Periskopē data models
 """
 Periskopē data models.
 

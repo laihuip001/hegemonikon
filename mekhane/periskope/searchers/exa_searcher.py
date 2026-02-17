@@ -1,3 +1,4 @@
+# PROOF: [L2/Infra] <- mekhane/periskope/searchers/ Exa
 """
 Exa search client for Periskopē.
 

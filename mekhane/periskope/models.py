@@ -1,4 +1,15 @@
+# PROOF: [L2/インフラ] <- mekhane/periskope/
 """
+PROOF: [L2/インフラ] このファイルは存在しなければならない
+
+S5 → 検索機能の実装が必要
+   → 共通データ構造 (検索結果、合成結果、引用) が必要
+   → models.py が担う
+
+Q.E.D.
+
+---
+
 Periskopē data models.
 
 Shared data structures for the search → synthesis → citation pipeline.

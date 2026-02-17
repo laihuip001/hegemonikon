@@ -1,4 +1,15 @@
+# PROOF: [L2/インフラ] <- mekhane/periskope/
 """
+PROOF: [L2/インフラ] このファイルは存在しなければならない
+
+S5 → 検索機能の実装が必要
+   → SearXNG メタ検索エンジンとの接続が必要
+   → searxng.py が担う
+
+Q.E.D.
+
+---
+
 SearXNG search client for Periskopē.
 
 Connects to a self-hosted SearXNG instance to aggregate results

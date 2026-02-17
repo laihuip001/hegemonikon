@@ -1,4 +1,4 @@
-# PROOF: [L2/Mekhanē] <- mekhane/periskope/PROOF.md S2->Periskopē->package
+# PROOF: [L2/Mekhanē] <- mekhane/periskope/PROOF.md
 # PURPOSE: Periskopē package initialization.
 
 """

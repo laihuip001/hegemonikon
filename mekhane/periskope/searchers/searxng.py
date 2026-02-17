@@ -1,4 +1,4 @@
-# PROOF: [L2/Mekhanē] <- mekhane/periskope/PROOF.md S2->Periskopē->searchers->searxng
+# PROOF: [L2/Mekhanē] <- mekhane/periskope/PROOF.md
 # PURPOSE: SearXNG search client implementation.
 
 """

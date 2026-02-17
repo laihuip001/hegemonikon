@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhanē] <- mekhane/periskope/tests/ A0->S5(DeepResearch)->Tests
 """
 Tests for SearXNG searcher.
 """

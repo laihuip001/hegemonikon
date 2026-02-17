@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhanē] <- mekhane/periskope/ A0->S5(DeepResearch)->Models
 """
 Periskopē data models.
 

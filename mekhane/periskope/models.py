@@ -1,3 +1,6 @@
+# PROOF: [S1/PeriskopeModels] <- mekhane/periskope/PROOF.md S1 target
+# PURPOSE: Periskopē data models.
+
 """
 Periskopē data models.
 

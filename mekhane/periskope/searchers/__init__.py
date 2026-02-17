@@ -1,3 +1,6 @@
+# PROOF: [S1/Searchers] <- mekhane/periskope/PROOF.md S1 target
+# PURPOSE: Searcher package initialization.
+
 """
 Periskopē searchers — pluggable search source adapters.
 

@@ -1,3 +1,5 @@
+# PROOF: [L2/Mekhanē] <- mekhane/periskope/tests/ A0→Search→Searchers→Internal Tests
+# PURPOSE: 内部サーチャー (Gnōsis, Sophia, Kairos) のユニットテスト
 """
 Tests for internal searchers (Gnōsis, Sophia, Kairos).
 """

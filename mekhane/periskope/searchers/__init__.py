@@ -1,2 +1,2 @@
-# PROOF: [L2/Mekhanē] <- mekhane/periskope/PROOF.md
+# PROOF: [L2/Mekhane] <- mekhane/periskope/PROOF.md
 # PURPOSE: Searcher implementations.

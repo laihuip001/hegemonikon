@@ -27,6 +27,7 @@ if _version_not_supported:
     )
 
 
+# PURPOSE: [S2/Mekhanē] ExtensionServerServiceStub
 class ExtensionServerServiceStub(object):
     """Minimal service definition - only what LS needs
     """
@@ -59,10 +60,12 @@ class ExtensionServerServiceStub(object):
                 _registered_method=True)
 
 
+# PURPOSE: [S2/Mekhanē] ExtensionServerServiceServicer
 class ExtensionServerServiceServicer(object):
     """Minimal service definition - only what LS needs
     """
 
+    # PURPOSE: [S2/Mekhanē] SubscribeToUnifiedStateSyncTopic
     def SubscribeToUnifiedStateSyncTopic(self, request, context):
         """Critical: LS calls this to subscribe to state updates (OAuth token)
         """
@@ -70,6 +73,7 @@ class ExtensionServerServiceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    # PURPOSE: [S2/Mekhanē] PushUnifiedStateSyncUpdate
     def PushUnifiedStateSyncUpdate(self, request, context):
         """LS calls this to push state updates
         """
@@ -77,6 +81,7 @@ class ExtensionServerServiceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    # PURPOSE: [S2/Mekhanē] LanguageServerStarted
     def LanguageServerStarted(self, request, context):
         """LS calls this on startup
         """
@@ -84,6 +89,7 @@ class ExtensionServerServiceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    # PURPOSE: [S2/Mekhanē] RecordError
     def RecordError(self, request, context):
         """LS calls this to report errors
         """
@@ -92,6 +98,7 @@ class ExtensionServerServiceServicer(object):
         raise NotImplementedError('Method not implemented!')
 
 
+# PURPOSE: [S2/Mekhanē] add_ExtensionServerServiceServicer_to_server
 def add_ExtensionServerServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
             'SubscribeToUnifiedStateSyncTopic': grpc.unary_stream_rpc_method_handler(
@@ -122,10 +129,12 @@ def add_ExtensionServerServiceServicer_to_server(servicer, server):
 
 
  # This class is part of an EXPERIMENTAL API.
+# PURPOSE: [S2/Mekhanē] ExtensionServerService
 class ExtensionServerService(object):
     """Minimal service definition - only what LS needs
     """
 
+    # PURPOSE: [S2/Mekhanē] SubscribeToUnifiedStateSyncTopic
     @staticmethod
     def SubscribeToUnifiedStateSyncTopic(request,
             target,
@@ -153,6 +162,7 @@ class ExtensionServerService(object):
             metadata,
             _registered_method=True)
 
+    # PURPOSE: [S2/Mekhanē] PushUnifiedStateSyncUpdate
     @staticmethod
     def PushUnifiedStateSyncUpdate(request,
             target,
@@ -180,6 +190,7 @@ class ExtensionServerService(object):
             metadata,
             _registered_method=True)
 
+    # PURPOSE: [S2/Mekhanē] LanguageServerStarted
     @staticmethod
     def LanguageServerStarted(request,
             target,
@@ -207,6 +218,7 @@ class ExtensionServerService(object):
             metadata,
             _registered_method=True)
 
+    # PURPOSE: [S2/Mekhanē] RecordError
     @staticmethod
     def RecordError(request,
             target,

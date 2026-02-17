@@ -21,6 +21,7 @@ from mekhane.periskope.models import SearchResult, SearchSource
 logger = logging.getLogger(__name__)
 
 
+# PURPOSE: [S2/Mekhanē] ExaSearcher
 class ExaSearcher:
     """Client for Exa semantic search via MCP.
 
@@ -35,6 +36,7 @@ class ExaSearcher:
     def __init__(self) -> None:
         pass
 
+    # PURPOSE: [S2/Mekhanē] search
     async def search(
         self,
         query: str,
@@ -76,6 +78,7 @@ class ExaSearcher:
             logger.error("Exa search failed: %s", e)
             return []
 
+    # PURPOSE: [S2/Mekhanē] _search_via_api
     async def _search_via_api(
         self,
         query: str,
@@ -141,6 +144,7 @@ class ExaSearcher:
         logger.info("Exa: %d results for %r", len(results), query)
         return results
 
+    # PURPOSE: [S2/Mekhanē] search_academic
     async def search_academic(
         self,
         query: str,
@@ -155,6 +159,7 @@ class ExaSearcher:
         )
 
 
+# PURPOSE: [S2/Mekhanē] _truncate
 def _truncate(text: str, max_len: int) -> str:
     if len(text) <= max_len:
         return text

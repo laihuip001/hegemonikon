@@ -1,3 +1,4 @@
+# PROOF: [L2/Infra] <- mekhane/periskope/ Package
 """
 Periskopē — HGK Deep Research Engine
 

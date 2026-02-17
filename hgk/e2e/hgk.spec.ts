@@ -67,6 +67,8 @@ test.describe('Navigation', () => {
 test.describe('Graph 3D', () => {
     test('lazy loads graph3d chunk', async ({ page }) => {
         await page.goto('/');
+        // Mock API after page load
+        await setupApiMock(page);
         // Click Graph button
         const graphBtn = page.locator('button:has-text("Graph")');
         await graphBtn.click();
@@ -78,6 +80,8 @@ test.describe('Graph 3D', () => {
 
     test('graph container exists after navigation', async ({ page }) => {
         await page.goto('/');
+        // Mock API after page load
+        await setupApiMock(page);
         await page.locator('button:has-text("Graph")').click();
 
         // graph-container should be present

@@ -1,3 +1,4 @@
+# PROOF: [S2/Mekhanē] <- mekhane/ A0->Implementation
 """
 Falsification Matcher — 消化論文の主張と epistemic_status.yaml の反証条件を照合
 

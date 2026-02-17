@@ -44,7 +44,7 @@ jobs:
                   # Install core test dependencies (CPU-only)
                   # 1. Install standard deps + torch deps (filelock, typing-extensions, sympy, jinja2, fsspec)
                   pip install pytest pytest-asyncio pytest-timeout pyyaml pydantic lancedb numpy scipy \
-                              networkx pandas tabulate requests httpx schedule \
+                              networkx pandas tabulate requests httpx schedule fastapi aiohttp python-dotenv \
                               filelock typing-extensions sympy jinja2 fsspec
                   # 2. Install torch (CPU) from specific index
                   pip install torch --index-url https://download.pytorch.org/whl/cpu

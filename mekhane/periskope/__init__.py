@@ -1,3 +1,5 @@
+# PROOF: [L2/Mekhanē] <- mekhane/periskope/ A0(FEP) -> S5(DeepResearch) -> PackageInit
+# PURPOSE: Periskopē パッケージ初期化
 """
 Periskopē — HGK Deep Research Engine
 

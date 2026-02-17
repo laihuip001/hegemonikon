@@ -1,3 +1,5 @@
+# PROOF: [L2/インフラ] <- mekhane/periskope/
+# PURPOSE: Periskopē data models
 """
 Periskopē data models.
 

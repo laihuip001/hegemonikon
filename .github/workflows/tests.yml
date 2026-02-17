@@ -43,7 +43,7 @@ jobs:
                   python -m pip install --upgrade pip
                   # Step 1: Install base dependencies + torch requirements (from PyPI)
                   pip install pytest pytest-asyncio pytest-timeout pyyaml pydantic lancedb numpy scipy \
-                              networkx pandas tabulate requests httpx schedule fastapi \
+                              networkx pandas tabulate requests httpx schedule fastapi aiohttp \
                               jinja2 sympy filelock typing-extensions fsspec
                   # Step 2: Install torch (CPU-only)
                   pip install torch --index-url https://download.pytorch.org/whl/cpu

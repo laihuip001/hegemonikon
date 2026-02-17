@@ -1,4 +1,4 @@
-# PROOF: [L2/インフラ] <- mekhane/periskope/
+# PROOF: [S2/Mekhanē] <- mekhane/periskope/
 # PURPOSE: Periskopē package initialization
 """
 Periskopē — HGK Deep Research Engine

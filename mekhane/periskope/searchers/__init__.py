@@ -1,4 +1,4 @@
-# PROOF: [L2/インフラ] <- mekhane/periskope/searchers/
+# PROOF: [S2/Mekhanē] <- mekhane/periskope/searchers/
 # PURPOSE: Searchers package initialization
 """
 Periskopē searchers — pluggable search source adapters.

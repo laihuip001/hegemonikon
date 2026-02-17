@@ -1,0 +1,22 @@
+{
+    "title": "Google GenAI SDK Migration (v1.60.0)",
+    "summary": "Documentation for the migration from the legacy google.generativeai SDK to the modern google.genai SDK across the Hegemonikón environment. It details the implementation changes in Hermeneus and Synergeia, focusing on the genai.Client pattern and GenerateContentConfig structure to address the November 2025 EOL of the legacy library.",
+    "references": [
+        {
+            "type": "file",
+            "value": "hermeneus/src/runtime.py"
+        },
+        {
+            "type": "file",
+            "value": "synergeia/gemini_api.py"
+        },
+        {
+            "type": "conversation_id",
+            "value": "66808cd3-ad44-4534-9185-09ed06711122"
+        },
+        {
+            "type": "conversation_id",
+            "value": "fe7dc7ad-4871-41e8-bba9-a0b3a25eaeea"
+        }
+    ]
+}

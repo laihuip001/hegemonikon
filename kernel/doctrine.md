@@ -1,13 +1,17 @@
 ---
 doc_id: "KERNEL_DOCTRINE"
-version: "3.1.0"
+version: "3.2.0"
 tier: "KERNEL"
 architecture: "4-layer"
 flags:
   immutable: true
   persona: "ENFORCED"
-updated: "2026-01-27"
+updated: "2026-02-17"
+depends_on:
+  - doc_id: "AXIOM_HIERARCHY"
+    min_version: "7.0.0"
 ---
+
 
 > **Kernel Doc Index**: [SACRED_TRUTH](SACRED_TRUTH.md) | [axiom_hierarchy](axiom_hierarchy.md) | [doctrine](doctrine.md) ← 📍
 

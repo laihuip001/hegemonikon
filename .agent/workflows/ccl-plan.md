@@ -1,23 +1,47 @@
 ---
-description: "段取る — /bou+_/chr_/s+~(/p*/k)_V:{/dia}_/pis_/dox-"
+description: "段取る — /bou+_/chr_/hod_/s+~(/p*/k)_V:{/dia}_/pis_/dox-"
+lcm_state: beta
+version: "2.0"
 ---
 
 # /ccl-plan: 計画策定マクロ
 
-> **CCL**: `@plan = /bou+_/chr_/s+~(/p*/k)_V:{/dia}_/pis_/dox-`
+> **CCL**: `@plan = /bou+_/chr_/hod_/s+~(/p*/k)_V:{/dia}_/pis_/dox-`
 > **用途**: 何かを始める前に計画を練りたいとき
 > **認知骨格**: Prior → Likelihood → Posterior
+> **v2.0**: 各ステップの定理マッピングを明示化 (24定理活用深化 Phase 2)
 
-## 展開
+## 展開 — 定理マッピング付き
 
-| 相 | ステップ | 意味 |
-|:---|:---------|:-----|
-| Prior | `/bou+` | 意志を詳細化: 何を達成したいか |
-| Prior | `/chr` | 資源確認: 手持ちで使えるものは何か |
-| Likelihood | `/s+~(/p*/k)` | 戦略を環境×文脈と振動させて練る |
-| Likelihood | `V:{/dia}` | 判定で検証ゲート: 計画は妥当か |
-| Posterior | `/pis` | 計画の確信度を測定 |
-| Posterior | `/dox-` | 計画を軽量記録 |
+| 相 | ステップ | 定理 | 意味 |
+|:---|:---------|:-----|:-----|
+| Prior | `/bou+` | **O2 Boulēsis** | 意志を詳細化: 何を達成したいか |
+| Prior | `/chr` | **K2 Chronos** | 時間資源確認: いつまでに、どれくらいかかるか |
+| Prior | `/hod` | **P2 Hodos** | 経路設計: どの道を行くか、代替経路はあるか |
+| Likelihood | `/s+` | **S1-S4 全体** | 戦略を全面展開: 測定(S1)→方法(S2)→品質基準(S3)→実践(S4) |
+| Likelihood | `~(/p*/k)` | **P1-P4 × K1-K4** | 環境と文脈を振動させて練る |
+| Likelihood | `V:{/dia}` | **A2 Krisis** | 判定で検証ゲート: 計画は妥当か |
+| Posterior | `/pis` | **H2 Pistis** | 計画の確信度を測定 |
+| Posterior | `/dox-` | **H4 Doxa** | 計画を軽量記録 |
+
+### `/s+~(/p*/k)` の意味 — S/P/K 定理の協奏
+
+> このステップで 12 定理 (S4 + P4 + K4) が同時に関与する。
+
+| Series | 問い |
+|:-------|:-----|
+| **S1 Metron** | この計画の成功をどう測定するか？ |
+| **S2 Mekhanē** | どの方法/ツールを使うか？ |
+| **S3 Stathmos** | 品質基準は何か？ |
+| **S4 Praxis** | 実践への変換で何が失われるか？ |
+| **P1 Khōra** | 作業空間のスコープは明確か？ |
+| **P2 Hodos** | 経路に代替案はあるか？ |
+| **P3 Trokhia** | 既知のパターン/アンチパターンはあるか？ |
+| **P4 Tekhnē** | 技術選定は適切か？ |
+| **K1 Eukairia** | 今が好機か？ |
+| **K2 Chronos** | 時間配分は妥当か？ |
+| **K3 Telos** | 最終目的と整合しているか？ |
+| **K4 Sophia** | 過去の経験から何を学べるか？ |
 
 ## 使用例
 

@@ -5,37 +5,22 @@
 
 ---
 
-## ⚡ クイックスタート
-
-```bash
-# 1. クローン & セットアップ
-git clone https://github.com/laihuip001/hegemonikon.git
-cd hegemonikon
-python -m venv .venv && source .venv/bin/activate
-pip install -r requirements.txt
-
-# 2. API サーバー起動
-PYTHONPATH=. python -m mekhane.api.server
-# → http://127.0.0.1:9696/api/docs
-
-# 3. デスクトップアプリ (Tauri v2)
-cd hgk && npm install && npm run tauri dev
-```
-
 ---
 
-## 🏛️ 96要素体系
+## 🏛️ 体系概要
 
 > **「真理は美しく、美しさは真理に近づく道標である」**
 
 | 項目 | 数 | 生成規則 |
 |:-----|---:|:---------|
-| **公理** | 7 | 1+2+2+2 (階層的導出) |
-| **定理** | 24 | 6系列 × 4定理 |
-| **関係** | 72 | 9接続 × 8関係 (X-series) |
-| **総計** | **96** | 2⁵×3 — 高度合成数の因子 |
+| **公理** | 1 | FEP (予測誤差最小化) |
+| **座標 (定理¹)** | 6 | 1+2+3 (構成距離) |
+| **認知機能 (定理²)** | 24 | 6系列 × 4定理 |
+| **関係 (Series内)** | 36 | 12D + 12H + 12X |
+| **関係 (Series間)** | 72 | 9接続 × 8関係 (X-series) |
+| **総計** | **103+** | 1+6+24+36+72 |
 
-### 公理階層 (7軸)
+### 公理階層 (1公理 → 6座標)
 
 ```mermaid
 graph TD
@@ -80,7 +65,7 @@ graph LR
 | B | L3 | **K** Kairos | L1.5×L1.75 | Eukairia, Chronos, Telos, Sophia |
 | B | L4 | **A** Akribeia | L1.75×L1.75 | Pathos, Krisis, Gnōmē, Epistēmē |
 
-### X-series: 関係層 (72 = 9接続 × 8関係)
+### X-series: Series間関係 (72 = 9接続 × 8関係)
 
 | X | 接続 | 共有座標 | 数 |
 |:--|:-----|:---------|:---|
@@ -144,7 +129,7 @@ hegemonikon/
 │   ├── peira/           # ヘルスチェック
 │   ├── pks/             # PKS (知識プッシュ)
 │   ├── symploke/        # Boot 統合 (15軸)
-│   ├── basanos/       # MCP Gateway
+│   ├── basanos/       # 偉人評議会 (多角的レビュー)
 │   ├── synteleia/       # 6視点認知アンサンブル
 │   └── taxis/           # 分類・射の提案
 ├── hgk/         # Tauri v2 デスクトップアプリ
@@ -208,4 +193,4 @@ hegemonikon/
 
 ---
 
-*Hegemonikón v3.3 — 96要素認知ハイパーバイザーフレームワーク*
+*Hegemonikón v3.7 — 103+要素認知ハイパーバイザーフレームワーク (2026-02-17)*

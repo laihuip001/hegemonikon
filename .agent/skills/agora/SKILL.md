@@ -4,6 +4,14 @@ description: HGK 収益化プロジェクト — ディープインパクト戦�
 triggers:
   - "agora"
   - "agora"
+
+risk_tier: "L2"
+risks:
+  - "収益化戦略の未検証実行による外部影響"
+  - "自動生成テンプレート — import パスの検証が必要"
+reversible: true
+requires_approval: true
+fallbacks: ["戦略実行前に Creator 承認を取得"]
 ---
 
 # Agora

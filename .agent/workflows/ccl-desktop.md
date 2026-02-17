@@ -1,5 +1,7 @@
 ---
 description: デスクトップ操作マクロ。AT-SPI (構造化) → Bytebot VLM (視覚) の自動ルーティング
+lcm_state: draft
+version: "0.1"
 ---
 
 # @desktop: デスクトップ操作マクロ

@@ -174,6 +174,40 @@ git -C ~/oikos status --short
 
 ---
 
+## Step 2.3: Intent-WAL 照合 — 意図 vs 実績
+
+> **圏論**: WAL(t₀) と S(t_now) の差分 = ker(R) に含まれうる意図の逸脱。
+> 明示的に照合し、Handoff に記録することで、R(S) の精度を上げる。
+
+### 手順
+
+1. **WAL ロード**: 現セッションの WAL ファイルを読む
+
+```python
+from mekhane.symploke.intent_wal import IntentWALManager
+wal_mgr = IntentWALManager()
+current_wal = wal_mgr.load_latest()
+```
+
+1. **照合テーブル作成**: WAL の `session_goal` / `progress` を task.md と対比
+
+| WAL 項目 | 計画 | 実績 | 差異 |
+|:---------|:-----|:-----|:-----|
+| session_goal | {WAL の目標} | {実際に達成したこと} | {差分の説明} |
+| progress[n] | {計画ステップ} | {ステータス} | done/blocked/skipped |
+
+1. **乖離分析**: 計画と実績の乖離を要約（1-2行）
+2. **Handoff 注入**: `to_handoff_section()` の出力を Handoff に含める
+
+```python
+handoff_section = wal_mgr.to_handoff_section()
+# → Handoff の `## 📋 Intent-WAL 照合` セクションに統合
+```
+
+> **スキップ条件**: WAL ファイルが存在しない場合はスキップ。
+
+---
+
 ## Step 2.5π: R^π(S) の計算 — Value Pitch
 
 > [!IMPORTANT]

@@ -1,0 +1,30 @@
+{
+    "title": "Hegemonikón Knowledge Infrastructure (AIDB/GNOSIS)",
+    "summary": "Documentation of Hegemonikón's data acquisition and indexing assets (AIDB, Gnōsis, Note.com). Covers article collection, robust collection protocols, and mandatory vector search enforcement. Includes operational hygiene practices for workflow suppression and global rule (GEMINI.md) maintenance.",
+    "references": [
+        {
+            "type": "file",
+            "value": "/home/makaron8426/oikos/hegemonikon/mekhane/peira/scripts/aidb-kb.py"
+        },
+        {
+            "type": "file",
+            "value": "/home/makaron8426/oikos/hegemonikon/.agent/workflows/eat.md"
+        },
+        {
+            "type": "conversation_id",
+            "value": "bot-f7bf082b-0c48-4859-9df7-04e3a0339d98"
+        },
+        {
+            "type": "conversation_id",
+            "value": "bot-6c7545e7-c74d-4b61-b59c-be80da22856d"
+        },
+        {
+            "type": "conversation_id",
+            "value": "fe7dc7ad-4871-41e8-bba9-a0b3a25eaeea"
+        },
+        {
+            "type": "conversation_id",
+            "value": "794"
+        }
+    ]
+}

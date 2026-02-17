@@ -1,0 +1,18 @@
+{
+    "title": "Project Dendron: Existence Purpose Tensor (EPT)",
+    "summary": "Documentation for Project Dendron, the existence error minimization engine of Hegemonikón. It implements a 32-cell Existence Purpose Tensor (EPT) to verify code 'Purpose' (teleological intent) vs 'Reason' (past context) across 4 depth layers (L0-L3) and 4 meta-layers (Surface-Verification), mapped to NF1-BCNF. Includes the '2M-Matrix' analysis, implementation details for L0-L2 existence proofs, and the 'Teleological Purpose Standards' established in v2.6, which enables automated qualitative verification for the core Dendron module.",
+    "references": [
+        {
+            "type": "file",
+            "value": "/home/makaron8426/oikos/hegemonikon/mekhane/dendron/VISION.md"
+        },
+        {
+            "type": "conversation_id",
+            "value": "796b9acc-d965-4ab8-ac5a-eb26d470ff73"
+        },
+        {
+            "type": "conversation_id",
+            "value": "bot-beb3b73a-8c9b-4943-a2ec-abc862a70fbf"
+        }
+    ]
+}

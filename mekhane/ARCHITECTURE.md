@@ -1,3 +1,12 @@
+---
+doc_id: "MEKHANE_ARCH"
+version: "1.0.0"
+updated: "2026-02-10"
+depends_on:
+  - doc_id: "ARCHITECTURE"
+    min_version: "1.0.0"
+---
+
 # mekhane/ Architecture — 圏としての実装層
 
 > **最終更新**: 2026-02-10

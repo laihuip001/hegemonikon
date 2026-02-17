@@ -1,0 +1,26 @@
+{
+    "title": "Hegemonikón Behavioral Steering Research",
+    "summary": "Research and implementation artifacts for using Activation Steering (Steering Vectors) to enforce Cognitive Algebra (CCL) compliance and behavioral alignment in LLMs. Focuses on local execution using consumer-grade GPUs (RTX 2070 SUPER), hardware-specific optimization (VRAM management, 4-bit quantization), and model selection strategies (1.5B vs 7B fallback). Includes specific API implementation details for 'llm-steer' and 'transformers'. This project aims to develop robust, locally executable methods for fine-grained control over LLM behavior, ensuring ethical and aligned outputs while optimizing for resource-constrained environments.",
+    "references": [
+        {
+            "type": "conversation_id",
+            "value": "bot-febe3775-6893-470a-8bf8-091a18cbf5e2"
+        },
+        {
+            "type": "conversation_id",
+            "value": "bot-c4c1ec1e-0c4b-45b1-8a99-547069343e56"
+        },
+        {
+            "type": "conversation_id",
+            "value": "bot-f7bf082b-0c48-4859-9df7-04e3a0339d98"
+        },
+        {
+            "type": "file",
+            "value": "/home/makaron8426/oikos/hegemonikon/docs/gpu_required_tasks.md"
+        },
+        {
+            "type": "file",
+            "value": "/home/makaron8426/oikos/hegemonikon/experiments/activation_steering_mvp.ipynb"
+        }
+    ]
+}

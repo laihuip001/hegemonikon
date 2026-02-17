@@ -319,6 +319,41 @@ intent_wal:
 | **参照タイミング** | セッション中に「次何やるんだっけ」と迷った時に WAL を参照 |
 | **照合** | /bye 時に WAL と実際の行動を照合し、乖離を Handoff に記録 |
 
+### 2.5.1 WAL 自動読込 (v5.9 追加)
+
+> 前セッションの WAL が存在する場合、`IntentWALManager.load_latest()` で自動読込し、
+> 未完了タスクや blockers をセッション復元に使う。
+
+**Python 連携コード**:
+
+```python
+from mekhane.symploke.intent_wal import IntentWALManager
+
+mgr = IntentWALManager()
+prev_wal = mgr.load_latest()
+if prev_wal:
+    print(f"📋 前WAL: {prev_wal.session_goal}")
+    print(f"   Health: {prev_wal.context_health_level}")
+    done = sum(1 for e in prev_wal.progress if e.status == 'done')
+    total = len(prev_wal.progress)
+    print(f"   Progress: {done}/{total} steps")
+    if prev_wal.blockers:
+        print(f"   ⚠️ Blockers: {', '.join(prev_wal.blockers)}")
+    # Boot Report に WAL セクションを挿入
+    boot_section = mgr.to_boot_section()
+else:
+    print("📋 前WAL なし — 新規セッション")
+```
+
+**読込後の判断**:
+
+| 前WAL の状態 | 行動 |
+|:------------|:-----|
+| 存在しない | 新規 `create()` で WAL 生成 |
+| progress 全て done | 新規 `create()` で WAL 生成 |
+| progress に in_progress/blocked がある | 前セッションの続きとして復元を提案 |
+| context_health が 🟠/🔴 | 「前セッションはコンテキスト枯渇で終了」と報告 |
+
 ---
 
 ## Phase 2.7: Context Budget & Monitor — 精度加重の配分と観測

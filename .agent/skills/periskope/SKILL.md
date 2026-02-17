@@ -4,6 +4,14 @@ description: HGK Deep Research Engine — multi-source parallel search + multi-m
 triggers:
   - "periskope"
   - "periskopē"
+
+risk_tier: "L2"
+risks:
+  - "外部検索 API (SearXNG, Exa) への過剰リクエスト"
+  - "自動生成テンプレート — import パスの検証が必要"
+reversible: true
+requires_approval: false
+fallbacks: ["search_web / read_url_content で個別検索"]
 ---
 
 # Periskopē

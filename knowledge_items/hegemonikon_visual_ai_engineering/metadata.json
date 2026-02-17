@@ -1,0 +1,14 @@
+{
+    "title": "Hegemonikón Visual AI Engineering",
+    "summary": "This Knowledge Item captures the specialized techniques for generating high-fidelity visual outputs, particularly software screenshots and infographics, using AI models like Gemini (Imagen). It establishes structural prompting patterns (TITLE BAR -> MENU -> TOOLBAR -> CONTENT), precision factors (specificity, structural clarity, style), and mitigation strategies for text rendering limitations and 'mockup hallucinations'.",
+    "references": [
+        {
+            "type": "conversation_id",
+            "value": "33a3a33f-5f5b-4156-8538-1e35a69617c1"
+        },
+        {
+            "type": "conversation_id",
+            "value": "788bb3d5-2d01-4d3a-a870-9d190636cb92"
+        }
+    ]
+}

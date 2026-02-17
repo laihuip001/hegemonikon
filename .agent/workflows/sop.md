@@ -1,7 +1,7 @@
 ---
-description: K4 Sophia（知恵）を発動し、Perplexity/Deep Researcher/Claude Researchに調査を依頼する。深掘り版調査依頼書を生成。
+description: K4 Sophia（知恵）を発動。Periskopē (デフォルト) で内部自動実行、または Perplexity/Deep Researcher/Claude Research に調査依頼。
 hegemonikon: K4 Sophia
-version: "7.3"
+version: "8.0"
 skill_ref: ".agent/skills/kairos/k4-sophia/SKILL.md"
 lcm_state: stable
 triggers: ["調べて", "教えて", "Perplexityに聞いて", "パプ君に聞いて", "リサーチ"]
@@ -52,11 +52,11 @@ category_theory:
 # /sop: 情報収集ワークフロー (Sophia)
 
 > **Hegemonikón**: K4 Sophia（知恵）
-> **目的**: 外部ソースから情報を収集する — Perplexity 調査依頼を生成
+> **目的**: 情報を収集する — Periskopē (内部自動) または外部ツールへの調査依頼
 > **役割**: observe 行動 — 環境からの知識取得
 >
+> **デフォルト**: 経路 E (Periskopē) で内部自動実行。外部ツールは必要時のみ。
 > **制約**: PHASE 0 (目的確認) を完了するまで PHASE 1 に進んではならない。
-> 外部検索の前に、必ず PHASE 0.5 で内部KB検索を実施すること。
 
 ---
 
@@ -96,7 +96,8 @@ view_file /home/makaron8426/oikos/hegemonikon/.agent/skills/kairos/k4-sophia/SKI
 
 | トリガー | 説明 |
 |:---------|:-----|
-| `/sop [質問]` | 深掘り版調査依頼書（デフォルト） |
+| `/sop [質問]` | **Periskopē 自動実行**（デフォルト） |
+| `/sop ext [質問]` | 外部調査依頼書を生成 (従来動作) |
 | `/sop simple [質問]` | 簡易版（従来形式） |
 | `/sop context [質問]` | 文脈共有ブロック付き |
 | `/sop assist [意図]` | Claude が質問案を提案 |
@@ -144,37 +145,44 @@ cd ~/oikos/hegemonikon && \
 
 ---
 
-## PHASE 1a: 経路選択（v7.2 更新）
+## PHASE 1a: 経路選択（v8.0 更新 — Periskopē デフォルト）
 
-> **起源**: 2026-02-12 GEM 試し打ち + 2026-02-15 Claude Research 調査
-> **原則**: 最適な経路を選択し、認知コストを最小化する
+> **起源**: 2026-02-15 Periskopē 完成 + GEM 試し打ち + Claude Research 調査
+> **原則**: まず内部で自動実行。外部は必要な場合のみ。
 
 | 経路 | エンジン | 特徴 | 最適な場面 |
 |:-----|:---------|:-----|:----------|
+| **E: Periskopē** ★ | 内部 (SearXNG+Exa+Gnōsis+Sophia+Kairos) | **自動実行 + 多モデル合成 + 引用検証** | **デフォルト。全調査の第一選択** |
 | **A: Perplexity** | Perplexity Pro | 実リアルタイム検索、URL 付き | 最新情報、ファクトチェック、速報 |
 | **B: Deep Researcher** | Gemini GEM (Deep Researcher v2.0) | 構造化テーブル出力、エビデンス階層付き | 学術調査、計算論的分析、体系的レビュー |
 | **C: Claude Research** | Claude.ai Research (Max/Pro) | コンテキスト統合型、Google Workspace 連携、MCP 対応 | 個人コンテキスト型調査、企業内ナレッジ横断、45分長時間処理 |
-| **D: 複合** | A/B/C の組合せ | 相互補完・二重検証 | 重要テーマ、網羅的調査 |
+| **D: 複合** | A/B/C/E の組合せ | 相互補完・二重検証 | 重要テーマ、網羅的調査 |
 
-### 経路判定基準
+### 経路 E (Periskopē) — デフォルト
 
-**Level 1: 問いの型で分岐** (2026-02-15 三重調査で実証)
+```bash
+# 自動実行 (CLI)
+cd ~/oikos/hegemonikon && PYTHONPATH=. .venv/bin/python -m mekhane.periskope.cli "query"
+
+# ソース指定
+PYTHONPATH=. .venv/bin/python -m mekhane.periskope.cli "query" --sources gnosis sophia searxng
+```
+
+**Periskopē パイプライン**:
+
+1. Phase 1: 5ソース並列検索 (SearXNG, Exa, Gnōsis, Sophia, Kairos)
+2. Phase 2: 多モデル合成 (Gemini + Claude LS)
+3. Phase 3: 引用検証 (BC-6 TAINT 自動分類)
+4. Phase 4: Markdown レポート生成
+
+### 外部経路への昇格条件
 
 ```
-IF 「What/When/Who」型 (事実確認) → A (Perplexity = Answer Engine)
-IF 「Why/How/関係性」型 (推論・合成) → C (Claude = Research Analyst)
-IF 「All/Comprehensive」型 (網羅)  → B (Gemini = Strategic Advisor)
-IF 学術深度・数値精度が最優先     → B or ChatGPT (= Thorough Investigator)
-```
-
-**Level 2: 技術要件で微調整**
-
-```
-IF 個人コンテキスト統合 (Gmail/Calendar/Docs) → C (Claude Research)
-IF 社内ナレッジベース + MCP → C (Claude Research)
-IF 引用精度が最優先 (コンプライアンス, 報道) → A (Perplexity: 引用精度 90.24%)
-IF 高確度が必要 → D (複合: A→C で尖兵+参謀)
-DEFAULT → A (Perplexity) — 従来と同じ
+DEFAULT → E (Periskopē) — 全調査はまずここ
+IF Periskopē 結果が不十分 or リアルタイム性が必要 → A (Perplexity)
+IF 「Why/How/関係性」型 (推論・合成) + 個人文脈必要 → C (Claude Research)
+IF 「All/Comprehensive」型 (網羅) + 学術深度     → B (Gemini Deep)
+IF 高確度が必要 → D (複合: E→A で内部+外部裏取り)
 ```
 
 > **4社アーキタイプ** (DRACO ベンチマーク + 実地テスト):

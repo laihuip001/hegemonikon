@@ -1,10 +1,12 @@
 ---
 description: 回す (RPR) — React→Plan→Reflect ループ。実行と反省の収束的循環。
+lcm_state: beta
+version: "1.0"
 ---
 
 # @rpr — 回す (React → Plan → Reflect)
 
-> **CCL**: `C:{/ene >> /dia{retrospective}}_/dox+`
+> **CCL**: `C:{/tro_/ene >> /dia{retrospective}}_/dox+`
 > **俗名**: 回す
 > **由来**: DX-012 §13 Pearl 因果階梯分析で発見された HGK 核心構造
 > **層対応**: τ (React) → Δ (Plan) → L3近似 (Reflect)
@@ -26,6 +28,7 @@ description: 回す (RPR) — React→Plan→Reflect ループ。実行と反省
 
 ```
 C:{                       # 収束ループ: 品質が安定するまで繰り返す
+  /tro                    # 軌道定義: このラウンドのスコープ (P3 Trokhia)
   /ene                    # React: τ層の実行 (Energeia)
   >>                      # シーケンス
   /dia{retrospective}     # Plan + Reflect: retrospective モードで振り返り判定

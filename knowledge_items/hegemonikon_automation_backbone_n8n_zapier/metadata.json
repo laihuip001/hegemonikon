@@ -1,0 +1,18 @@
+{
+    "title": "Hegemonikón Automation Backbone (n8n & Zapier)",
+    "summary": "Documentation for Hegemonikón's automation infrastructure, using n8n and Zapier to create a 'life center' (人生の中枢) backbone. Covers the strategic decision to adopt high-capability automation despite complexity, transitioning from cron/shell to a Dockerized n8n environment on Debian. Includes designs for Perplexity daily digestion, morning boot notifications, and the 'Desire List' for autonomous AI evolution.",
+    "references": [
+        {
+            "type": "conversation_id",
+            "value": "f7bf082b-0c48-4859-9df7-04e3a0339d98"
+        },
+        {
+            "type": "file",
+            "value": "hegemonikon/docs/digestion/perplexity_n8n_automation_design.md"
+        },
+        {
+            "type": "file",
+            "value": "hegemonikon/mekhane/ergasterion/n8n/boot_morning_flow.json"
+        }
+    ]
+}

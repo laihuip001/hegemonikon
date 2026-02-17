@@ -1,3 +1,14 @@
+# PROOF: [L2/Mekhanē] <- mekhane/periskope/
+"""
+PROOF: [L2/Mekhanē] This file must exist.
+
+P3 → Need for external research capabilities.
+   → Package initialization for Periskopē module.
+   → __init__.py defines the public API.
+
+Q.E.D.
+"""
+
 """
 Periskopē — HGK Deep Research Engine
 

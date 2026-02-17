@@ -1,8 +1,12 @@
+# PROOF: [L2/Mekhanē] <- mekhane/periskope/searchers/
 """
-Periskopē searchers — pluggable search source adapters.
+PROOF: [L2/Mekhanē] This file must exist.
 
-Each searcher implements the same async interface:
-    async def search(query: str, max_results: int) -> list[SearchResult]
+P3 → Need for external research capabilities.
+   → Package initialization for searchers module.
+   → __init__.py exports the searcher classes.
+
+Q.E.D.
 """
 
 from .searxng import SearXNGSearcher

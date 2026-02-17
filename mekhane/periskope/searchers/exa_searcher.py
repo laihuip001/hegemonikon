@@ -1,3 +1,14 @@
+# PROOF: [L2/Mekhanē] <- mekhane/periskope/searchers/
+"""
+PROOF: [L2/Mekhanē] This file must exist.
+
+P3 → Need for external research capabilities.
+   → Interface to Exa semantic search engine.
+   → exa_searcher.py implements this interface.
+
+Q.E.D.
+"""
+
 """
 Exa search client for Periskopē.
 

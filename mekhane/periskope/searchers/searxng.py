@@ -1,3 +1,14 @@
+# PROOF: [L2/Mekhanē] <- mekhane/periskope/searchers/
+"""
+PROOF: [L2/Mekhanē] This file must exist.
+
+P3 → Need for external research capabilities.
+   → Interface to SearXNG meta-search engine.
+   → searxng.py implements this interface.
+
+Q.E.D.
+"""
+
 """
 SearXNG search client for Periskopē.
 

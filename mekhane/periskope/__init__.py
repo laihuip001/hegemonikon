@@ -1,3 +1,4 @@
+# PROOF: [S2/Mekhanē] <- mekhane/ A0->Implementation
 """
 Periskopē — HGK Deep Research Engine
 

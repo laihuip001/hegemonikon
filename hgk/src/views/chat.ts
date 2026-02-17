@@ -270,7 +270,7 @@ function renderMessage(msg: ChatMessage, index: number): string {
         <span class="chat-msg-role">${isUser ? '👤 You' : '🤖 AI'}</span>
         ${modelTag}
         <span class="chat-msg-time">${formatTime(msg.timestamp)}</span>
-        <button class="chat-msg-delete" title="削除" data-idx="${index}">✕</button>
+        <button class="chat-msg-delete" title="削除" aria-label="このメッセージを削除" data-idx="${index}">✕</button>
       </div>
       <div class="chat-msg-body">${rendered}</div>
     </div>
@@ -335,6 +335,7 @@ function addCopyButtons(container: HTMLElement): void {
         btn.className = 'code-copy-btn';
         btn.textContent = '📋';
         btn.title = 'コピー';
+        btn.setAttribute('aria-label', 'コードをクリップボードにコピー');
         btn.addEventListener('click', () => {
             const code = pre.querySelector('code')?.textContent ?? pre.textContent ?? '';
             void navigator.clipboard.writeText(code).then(() => {
@@ -531,11 +532,11 @@ export async function renderChatView(): Promise<void> {
           </span>
         </div>
         <div class="chat-header-right">
-          <select id="chat-model-select" class="input chat-model-select">
+          <select id="chat-model-select" class="input chat-model-select" aria-label="AIモデル選択">
             ${modelOptions}
           </select>
-          <button id="chat-settings-btn" class="btn btn-sm btn-outline" title="API キー設定">⚙️</button>
-          <button id="chat-clear-btn" class="btn btn-sm btn-outline" title="履歴クリア">🗑️</button>
+          <button id="chat-settings-btn" class="btn btn-sm btn-outline" title="API キー設定" aria-label="API キー設定">⚙️</button>
+          <button id="chat-clear-btn" class="btn btn-sm btn-outline" title="履歴クリア" aria-label="履歴クリア">🗑️</button>
         </div>
       </div>
 
@@ -551,6 +552,7 @@ export async function renderChatView(): Promise<void> {
       <div class="chat-input-area">
         <textarea id="chat-input" class="input chat-textarea" 
           placeholder="メッセージを入力... (Enter で送信、Shift+Enter で改行)"
+          aria-label="メッセージ入力"
           rows="1"></textarea>
         <button id="chat-send-btn" class="btn chat-send-btn">送信</button>
       </div>

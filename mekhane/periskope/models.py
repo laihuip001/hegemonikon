@@ -1,3 +1,5 @@
+# PROOF: [L2/Mekhanē] <- mekhane/periskope/ A0(FEP) -> S5(DeepResearch) -> DataModels
+# PURPOSE: Periskopē データモデル定義
 """
 Periskopē data models.
 

@@ -1,3 +1,5 @@
+# PROOF: [L2/Mekhanē] <- mekhane/periskope/ A0(FEP) -> S5(DeepResearch) -> SearXNGClient
+# PURPOSE: SearXNG 検索クライアント
 """
 SearXNG search client for Periskopē.
 

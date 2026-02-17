@@ -1,4 +1,5 @@
 # PROOF: [S2/Mekhanē] <- mekhane/ A0->Implementation
+# PURPOSE: [S2/Mekhanē] Implementation of falsification_checker.py
 """
 S7: Falsification Condition Checker
 

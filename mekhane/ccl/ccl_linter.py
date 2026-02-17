@@ -1,4 +1,5 @@
 # PROOF: [S2/Mekhanē] <- mekhane/ A0->Implementation
+# PURPOSE: [S2/Mekhanē] Implementation of ccl_linter.py
 """CCL Linter — CCL 式の静的検証。
 
 operators.md (SSOT) に基づいて CCL 式を検証し、

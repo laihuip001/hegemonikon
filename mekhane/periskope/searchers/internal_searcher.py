@@ -1,4 +1,5 @@
 # PROOF: [S2/Mekhanē] <- mekhane/ A0->Implementation
+# PURPOSE: [S2/Mekhanē] Implementation of internal_searcher.py
 """
 Internal knowledge searcher for Periskopē.
 

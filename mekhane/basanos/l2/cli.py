@@ -1,4 +1,5 @@
 # PROOF: [S2/Mekhanē] <- mekhane/ A0->Implementation
+# PURPOSE: [S2/Mekhanē] Implementation of cli.py
 #!/usr/bin/env python3
 # PURPOSE: Basanos L2 問い生成 CLI — deficit 検出→問い生成→優先度表示
 # REASON: 全 deficit factory を統合実行し、HGK の構造的ズレを対話的に発見する

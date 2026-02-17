@@ -3,6 +3,7 @@
 from typing import List, Dict, Any, Optional
 from pathlib import Path
 
+# PURPOSE: 構造的欠陥の反証チェッカー
 class FalsificationChecker:
     """構造的欠陥の反証チェッカー"""
     pass

@@ -3,6 +3,7 @@
 from typing import List, Dict, Any, Optional
 import re
 
+# PURPOSE: 反証パターンのマッチャー
 class FalsificationMatcher:
     """反証パターンのマッチャー"""
     pass

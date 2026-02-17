@@ -1,4 +1,15 @@
+# PROOF: [L2/インフラ] <- mekhane/periskope/
 """
+PROOF: [L2/インフラ] このファイルは存在しなければならない
+
+S5 → 検索機能の実装が必要
+   → Exa 検索エンジンとの接続が必要
+   → exa_searcher.py が担う
+
+Q.E.D.
+
+---
+
 Exa search client for Periskopē.
 
 Wraps the Exa MCP tool for semantic/neural web search.

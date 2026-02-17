@@ -1,4 +1,15 @@
+# PROOF: [L2/インフラ] <- mekhane/periskope/
 """
+PROOF: [L2/インフラ] このファイルは存在しなければならない
+
+S5 → 検索機能の実装が必要
+   → 内部知識 (Gnōsis, Sophia, Kairos) の検索が必要
+   → internal_searcher.py が担う
+
+Q.E.D.
+
+---
+
 Internal knowledge searcher for Periskopē.
 
 Searches HGK's internal knowledge bases:

@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhanē] <- mekhane/periskope/searchers/ A0->S5(DeepResearch)->Searcher
 """
 Exa search client for Periskopē.
 

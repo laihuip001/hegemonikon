@@ -13,34 +13,114 @@ Q.E.D.
 
 Session Indexer — セッション履歴ベクトル検索
 
-agq-sessions.sh --dump で取得した JSON を Paper モデルに変換し、
-GnosisIndex に source="session" として投入する。
+Language Server API から取得したセッション履歴、または agq-sessions.sh --dump で取得した
+JSON を Paper モデルに変換し、GnosisIndex に source="session" として投入する。
 
 Usage:
-    python mekhane/anamnesis/session_indexer.py <json_path>
-    python mekhane/anamnesis/session_indexer.py --from-api
+    python -m mekhane.anamnesis.session_indexer <json_path>
+    python -m mekhane.anamnesis.session_indexer --from-api
 """
 
 import json
+import logging
+import os
 import re
 import sys
-import subprocess
-import tempfile
 from datetime import datetime
 from pathlib import Path
-from typing import Optional
+from typing import Any, Dict, List, Optional, TypedDict
 
-# Ensure hegemonikon root is in path
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+    datefmt="%Y-%m-%d %H:%M:%S",
+)
+logger = logging.getLogger("session_indexer")
+
+# Constants
 _HEGEMONIKON_ROOT = Path(__file__).parent.parent.parent
-if str(_HEGEMONIKON_ROOT) not in sys.path:
-    sys.path.insert(0, str(_HEGEMONIKON_ROOT))
 
+# Default paths via environment variables
+MNEME_HOME = Path(os.environ.get("MNEME_HOME", Path.home() / "oikos" / "mneme"))
+_HANDOFF_DIR = MNEME_HOME / ".hegemonikon" / "sessions"
+_ROM_DIR = MNEME_HOME / ".hegemonikon" / "rom"
+_EXPORT_DIR = MNEME_HOME / ".hegemonikon" / "sessions"
+_BRAIN_DIR = Path(
+    os.environ.get("BRAIN_DIR", Path.home() / ".gemini" / "antigravity" / "brain")
+)
+
+
+# --- Type Definitions ---
+
+class SessionInfo(TypedDict):
+    conversation_id: str
+    title: str
+    step_count: int
+    status: str
+    created: str
+    modified: str
+    workspaces: List[str]
+
+
+class HandoffRecord(TypedDict):
+    title: str
+    date: str
+    session_id: str
+    sections: List[str]
+    text: str
+    filename: str
+
+
+class StepInfo(TypedDict):
+    conversation_id: str
+    step_number: str
+    content: str
+    size: int
+
+
+class ExportRecord(TypedDict):
+    title: str
+    conv_id: str
+    exported_at: str
+    user_count: int
+    assistant_count: int
+    content: str
+    filename: str
+
+
+class ConversationInfo(TypedDict):
+    cascade_id: str
+    title: str
+    step_count: int
+    total_turns: int
+    user_text: str
+    assistant_text: str
+    full_text: str
+    created: str
+    modified: str
+
+
+class RomRecord(TypedDict):
+    title: str
+    date: str
+    derivative: str
+    topics: List[str]
+    exec_summary: str
+    reliability: str
+    semantic_tags: List[str]
+    sections: List[str]
+    text: str
+    filename: str
+
+
+# --- Functions ---
 
 # PURPOSE: LS API の trajectorySummaries JSON からセッション情報を構造化 dict に抽出する
-def parse_sessions_from_json(data: dict) -> list[dict]:
+def parse_sessions_from_json(data: Dict[str, Any]) -> List[SessionInfo]:
     """PURPOSE: LS API の trajectorySummaries JSON からセッション情報を構造化 dict に抽出する"""
     summaries = data.get("trajectorySummaries", {})
-    sessions = []
+    sessions: List[SessionInfo] = []
 
     for conv_id, info in summaries.items():
         if not isinstance(info, dict):
@@ -58,7 +138,7 @@ def parse_sessions_from_json(data: dict) -> list[dict]:
                 if path:
                     workspaces.append(Path(path).name)
 
-        sessions.append({
+        session: SessionInfo = {
             "conversation_id": conv_id,
             "title": title,
             "step_count": info.get("stepCount", 0),
@@ -66,24 +146,15 @@ def parse_sessions_from_json(data: dict) -> list[dict]:
             "created": info.get("createdTime", ""),
             "modified": info.get("lastModifiedTime", ""),
             "workspaces": workspaces,
-        })
+        }
+        sessions.append(session)
 
     return sessions
 
 
 # PURPOSE: セッション情報を LanceDB レコード (既存スキーマ準拠) に変換する
-def sessions_to_records(sessions: list[dict]) -> list[dict]:
-    """PURPOSE: セッション情報を LanceDB レコード (既存スキーマ準拠) に変換する
-
-    既存テーブルスキーマ:
-      primary_key, title, source, abstract, content,
-      authors, doi, arxiv_id, url, citations, vector
-
-    P3 フィールド拡充 (v2):
-      content  → 構造化メタデータ (timestamps, status, duration)
-      authors  → ワークスペース名 (プロジェクト文脈)
-      url      → セッション conversation_id (逆引き用)
-    """
+def sessions_to_records(sessions: List[SessionInfo]) -> List[Dict[str, Any]]:
+    """PURPOSE: セッション情報を LanceDB レコード (既存スキーマ準拠) に変換する"""
     records = []
 
     for s in sessions:
@@ -108,9 +179,9 @@ def sessions_to_records(sessions: list[dict]) -> list[dict]:
                 minutes = remainder // 60
                 duration_str = f"{hours}h{minutes:02d}m"
             except (ValueError, TypeError):
-                pass
+                logger.warning(f"Failed to parse timestamps for session {conv_id}")
 
-        # Build abstract: rich context for embedding quality
+        # Build abstract
         abstract_parts = [
             f"Session: {title}",
             f"Steps: {step_count}",
@@ -123,7 +194,7 @@ def sessions_to_records(sessions: list[dict]) -> list[dict]:
 
         abstract = ". ".join(abstract_parts)
 
-        # P3: content — 構造化メタデータ (検索対象 + 情報保持)
+        # Content
         content_parts = []
         if created:
             content_parts.append(f"Created: {created}")
@@ -137,10 +208,7 @@ def sessions_to_records(sessions: list[dict]) -> list[dict]:
             content_parts.append(f"Workspaces: {', '.join(workspaces)}")
         content = " | ".join(content_parts)
 
-        # P3: authors — ワークスペース名 (プロジェクト文脈として活用)
         authors = ", ".join(workspaces) if workspaces else ""
-
-        # P3: url — conversation_id (逆引き・リンク用)
         url = f"session://{conv_id}"
 
         record = {
@@ -154,7 +222,6 @@ def sessions_to_records(sessions: list[dict]) -> list[dict]:
             "arxiv_id": "",
             "url": url,
             "citations": step_count,
-            # vector will be added by indexer
         }
         records.append(record)
 
@@ -162,10 +229,8 @@ def sessions_to_records(sessions: list[dict]) -> list[dict]:
 
 
 # ==============================================================
-# Handoff Indexer — handoff_*.md を source="handoff" でインデックス
+# Handoff Indexer
 # ==============================================================
-
-_HANDOFF_DIR = Path.home() / "oikos" / "mneme" / ".hegemonikon" / "sessions"
 
 # Regex patterns for Handoff parsing
 _RE_TITLE = re.compile(r"^#\s+(?:🔄\s*)?(?:Handoff:\s*)?(.+)$", re.MULTILINE)
@@ -179,31 +244,25 @@ _RE_SECTION = re.compile(r"^##\s+(.+)$", re.MULTILINE)
 
 
 # PURPOSE: Handoff マークダウンファイルをパースし構造化 dict に変換する
-def parse_handoff_md(path: Path) -> dict:
+def parse_handoff_md(path: Path) -> HandoffRecord:
     """PURPOSE: Handoff マークダウンファイルをパースし構造化 dict に変換する"""
     text = path.read_text(encoding="utf-8", errors="replace")
 
-    # Title: first H1 line
     title_match = _RE_TITLE.search(text)
     title = title_match.group(1).strip() if title_match else path.stem
 
-    # Date from metadata blockquote
     date_match = _RE_DATE.search(text)
     date_str = date_match.group(1).strip() if date_match else ""
 
-    # Fallback: extract date from filename  handoff_YYYY-MM-DD_HHMM.md
     if not date_str:
         fname_match = re.search(r"(\d{4}-\d{2}-\d{2})_(\d{2})(\d{2})", path.stem)
         if fname_match:
             date_str = f"{fname_match.group(1)} {fname_match.group(2)}:{fname_match.group(3)}"
 
-    # Session ID (if present at bottom)
     session_match = _RE_SESSION_ID.search(text)
     session_id = session_match.group(1) if session_match else ""
 
-    # Section headers for content summary
     sections = _RE_SECTION.findall(text)
-    # Clean emoji prefixes
     sections = [re.sub(r"^[^\w]+", "", s).strip() for s in sections]
 
     return {
@@ -217,11 +276,10 @@ def parse_handoff_md(path: Path) -> dict:
 
 
 # PURPOSE: パース済み Handoff dict を LanceDB 互換レコードに変換する
-def handoffs_to_records(handoffs: list[dict]) -> list[dict]:
+def handoffs_to_records(handoffs: List[HandoffRecord]) -> List[Dict[str, Any]]:
     """PURPOSE: パース済み Handoff dict を LanceDB 互換レコードに変換する"""
     records = []
     for h in handoffs:
-        # Build abstract from title + date + section list
         abstract_parts = [h["title"]]
         if h["date"]:
             abstract_parts.append(f"({h['date']})")
@@ -229,13 +287,8 @@ def handoffs_to_records(handoffs: list[dict]) -> list[dict]:
             abstract_parts.append("— " + ", ".join(h["sections"][:6]))
         abstract = " ".join(abstract_parts)
 
-        # Content: full text truncated to ~4000 chars for embedding
         content = h["text"][:4000]
-
-        # Primary key from filename for dedup
         primary_key = f"handoff:{h['filename']}"
-
-        # URL: link to session if available
         url = f"session://{h['session_id']}" if h["session_id"] else ""
 
         record = {
@@ -261,92 +314,97 @@ def index_handoffs(handoff_dir: Optional[str] = None) -> int:
     directory = Path(handoff_dir) if handoff_dir else _HANDOFF_DIR
 
     if not directory.exists():
-        print(f"[Error] Handoff directory not found: {directory}")
+        logger.error(f"Handoff directory not found: {directory}")
         return 1
 
     md_files = sorted(directory.glob("handoff_*.md"))
     if not md_files:
-        print("[Error] No handoff_*.md files found")
+        logger.info("No handoff_*.md files found")
         return 1
 
-    print(f"[HandoffIndexer] Found {len(md_files)} handoff files")
+    logger.info(f"Found {len(md_files)} handoff files")
 
-    # Parse all
     handoffs = [parse_handoff_md(f) for f in md_files]
     records = handoffs_to_records(handoffs)
 
-    # Embed and add to LanceDB
-    from mekhane.anamnesis.index import GnosisIndex, Embedder
+    from mekhane.anamnesis.index import Embedder, GnosisIndex
 
     index = GnosisIndex()
     embedder = Embedder()
 
-    # Dedupe against existing records
+    # Dedupe
     if index._table_exists():
-        table = index.db.open_table(index.TABLE_NAME)
         try:
+            table = index.db.open_table(index.TABLE_NAME)
             existing = table.to_pandas()
-            existing_keys = set(existing["primary_key"].tolist())
-            before = len(records)
-            records = [r for r in records if r["primary_key"] not in existing_keys]
-            skipped = before - len(records)
-            if skipped:
-                print(f"[HandoffIndexer] Skipped {skipped} duplicates")
+            if not existing.empty:
+                existing_keys = set(existing["primary_key"].tolist())
+                before = len(records)
+                records = [r for r in records if r["primary_key"] not in existing_keys]
+                skipped = before - len(records)
+                if skipped:
+                    logger.info(f"Skipped {skipped} duplicates")
         except Exception:
-            pass  # Intentional: table may be empty or have incompatible schema
+            logger.warning("Failed to check duplicates (table might be empty or schema mismatch)", exc_info=True)
 
     if not records:
-        print("[HandoffIndexer] No new handoffs to add (all duplicates)")
+        logger.info("No new handoffs to add (all duplicates)")
         return 0
 
-    # Generate embeddings (title + abstract for embedding text)
     texts = [f"{r['title']} {r['abstract']}" for r in records]
     vectors = embedder.embed_batch(texts)
 
-    # Attach vectors
     data_with_vectors = []
     for rec, vec in zip(records, vectors):
         rec["vector"] = vec
         data_with_vectors.append(rec)
 
-    # Add to LanceDB
     if index._table_exists():
-        table = index.db.open_table(index.TABLE_NAME)
-        # Schema filtering (P4 pattern)
-        schema_fields = {f.name for f in table.schema}
-        filtered_data = [
-            {k: v for k, v in record.items() if k in schema_fields}
-            for record in data_with_vectors
-        ]
-        table.add(filtered_data)
+        try:
+            table = index.db.open_table(index.TABLE_NAME)
+            schema_fields = {f.name for f in table.schema}
+            filtered_data = [
+                {k: v for k, v in record.items() if k in schema_fields}
+                for record in data_with_vectors
+            ]
+            table.add(filtered_data)
+        except Exception:
+            logger.error("Failed to add records to existing table", exc_info=True)
+            return 1
     else:
-        index.db.create_table(index.TABLE_NAME, data=data_with_vectors)
+        try:
+            index.db.create_table(index.TABLE_NAME, data=data_with_vectors)
+        except Exception:
+            logger.error("Failed to create table", exc_info=True)
+            return 1
 
-    print(f"[HandoffIndexer] ✅ Indexed {len(data_with_vectors)} handoffs")
+    logger.info(f"✅ Indexed {len(data_with_vectors)} handoffs")
     return 0
 
 
 # PURPOSE: AntigravityClient 経由で LS API から全セッション会話データを取得する
-def fetch_all_conversations(max_sessions: int = 100) -> list[dict]:
+def fetch_all_conversations(max_sessions: int = 100) -> List[ConversationInfo]:
     """PURPOSE: AntigravityClient 経由で LS API から全セッション会話データを取得する"""
     from mekhane.ochema.antigravity_client import AntigravityClient
 
     client = AntigravityClient()
 
-    # 全セッション一覧を取得 (session_info は内部で RPC_GET_TRAJECTORIES を使う)
-    all_data = client._rpc(
-        "exa.language_server_pb.LanguageServerService/GetAllCascadeTrajectories", {}
-    )
-    summaries = all_data.get("trajectorySummaries", {})
+    try:
+        all_data = client._rpc(
+            "exa.language_server_pb.LanguageServerService/GetAllCascadeTrajectories", {}
+        )
+    except Exception:
+        logger.error("Failed to fetch cascade trajectories from Language Server", exc_info=True)
+        return []
 
-    conversations = []
+    summaries = all_data.get("trajectorySummaries", {})
+    conversations: List[ConversationInfo] = []
     processed = 0
 
     for cid, meta in summaries.items():
         if processed >= max_sessions:
             break
 
-        summary_text = meta.get("summary", "").strip()
         step_count = meta.get("stepCount", 0)
         trajectory_id = meta.get("trajectoryId", "")
 
@@ -356,13 +414,13 @@ def fetch_all_conversations(max_sessions: int = 100) -> list[dict]:
         try:
             conv_data = client.session_read(cid, full=True)
             if "error" in conv_data:
+                logger.warning(f"Error reading session {cid[:8]}: {conv_data['error']}")
                 continue
 
             conversation = conv_data.get("conversation", [])
             if not conversation:
                 continue
 
-            # user + assistant のテキストを結合
             user_texts = []
             assistant_texts = []
             for turn in conversation:
@@ -375,7 +433,7 @@ def fetch_all_conversations(max_sessions: int = 100) -> list[dict]:
 
             conversations.append({
                 "cascade_id": cid,
-                "title": summary_text or f"Session {cid[:8]}",
+                "title": meta.get("summary", "").strip() or f"Session {cid[:8]}",
                 "step_count": step_count,
                 "total_turns": conv_data.get("total_turns", 0),
                 "user_text": "\n\n".join(user_texts),
@@ -387,18 +445,18 @@ def fetch_all_conversations(max_sessions: int = 100) -> list[dict]:
             processed += 1
 
             if processed % 10 == 0:
-                print(f"  Fetched {processed} conversations...")
+                logger.info(f"Fetched {processed} conversations...")
 
-        except Exception as e:
-            print(f"  [Warn] Failed to read {cid[:8]}: {e}")
+        except Exception:
+            logger.error(f"Failed to read {cid[:8]}", exc_info=True)
             continue
 
-    print(f"[ConvIndexer] Fetched {len(conversations)} conversations")
+    logger.info(f"Fetched {len(conversations)} conversations")
     return conversations
 
 
 # PURPOSE: 会話データを LanceDB セマンティック検索用レコードに変換する
-def conversations_to_records(conversations: list[dict]) -> list[dict]:
+def conversations_to_records(conversations: List[ConversationInfo]) -> List[Dict[str, Any]]:
     """PURPOSE: 会話データを LanceDB セマンティック検索用レコードに変換する"""
     records = []
 
@@ -407,19 +465,14 @@ def conversations_to_records(conversations: list[dict]) -> list[dict]:
         title = conv["title"]
         full_text = conv.get("full_text", "")
 
-        # abstract: タイトル + ターン数 + 最初のユーザー入力の先頭200文字
         user_preview = conv.get("user_text", "")[:200]
         abstract = f"{title} ({conv.get('total_turns', 0)} turns) — {user_preview}"
-
-        # content: 検索用テキスト (先頭 4000 文字)
         content = full_text[:4000] if full_text else abstract
 
-        # 日付のパース
         created = conv.get("created", "")
         year = ""
         if created:
             try:
-                # ISO format or timestamp
                 if "T" in created:
                     dt = datetime.fromisoformat(created.replace("Z", "+00:00"))
                     year = str(dt.year)
@@ -435,7 +488,7 @@ def conversations_to_records(conversations: list[dict]) -> list[dict]:
             "authors": "IDE Session",
             "year": year,
             "url": f"conversation://{cascade_id}",
-            "citations": conv.get("step_count", 0),  # step count as proxy
+            "citations": conv.get("step_count", 0),
         })
 
     return records
@@ -446,35 +499,34 @@ def index_conversations(max_sessions: int = 100) -> int:
     """PURPOSE: 全セッション会話を取得し LanceDB にセマンティックインデックスする"""
     conversations = fetch_all_conversations(max_sessions)
     if not conversations:
-        print("[ConvIndexer] No conversations to index")
+        logger.info("No conversations to index")
         return 1
 
     records = conversations_to_records(conversations)
 
-    from mekhane.anamnesis.index import GnosisIndex, Embedder
+    from mekhane.anamnesis.index import Embedder, GnosisIndex
 
     index = GnosisIndex()
     embedder = Embedder()
 
-    # Dedupe against existing records
     if index._table_exists():
-        table = index.db.open_table(index.TABLE_NAME)
         try:
+            table = index.db.open_table(index.TABLE_NAME)
             existing = table.to_pandas()
-            existing_keys = set(existing["primary_key"].tolist())
-            before = len(records)
-            records = [r for r in records if r["primary_key"] not in existing_keys]
-            skipped = before - len(records)
-            if skipped:
-                print(f"[ConvIndexer] Skipped {skipped} duplicates")
+            if not existing.empty:
+                existing_keys = set(existing["primary_key"].tolist())
+                before = len(records)
+                records = [r for r in records if r["primary_key"] not in existing_keys]
+                skipped = before - len(records)
+                if skipped:
+                    logger.info(f"Skipped {skipped} duplicates")
         except Exception:
-            pass  # Intentional: table may be empty or have incompatible schema
+            logger.warning("Failed to check duplicates", exc_info=True)
 
     if not records:
-        print("[ConvIndexer] No new conversations to add (all duplicates)")
+        logger.info("No new conversations to add (all duplicates)")
         return 0
 
-    # Generate embeddings in batches
     BATCH_SIZE = 16
     data_with_vectors = []
 
@@ -487,40 +539,43 @@ def index_conversations(max_sessions: int = 100) -> int:
             record["vector"] = vector
             data_with_vectors.append(record)
 
-        print(f"  Embedded {min(i + BATCH_SIZE, len(records))}/{len(records)}...")
+        logger.info(f"Embedded {min(i + BATCH_SIZE, len(records))}/{len(records)}...")
 
-    # Add to LanceDB
     if index._table_exists():
-        table = index.db.open_table(index.TABLE_NAME)
-        schema_fields = {f.name for f in table.schema}
-        filtered_data = [
-            {k: v for k, v in record.items() if k in schema_fields}
-            for record in data_with_vectors
-        ]
-        table.add(filtered_data)
+        try:
+            table = index.db.open_table(index.TABLE_NAME)
+            schema_fields = {f.name for f in table.schema}
+            filtered_data = [
+                {k: v for k, v in record.items() if k in schema_fields}
+                for record in data_with_vectors
+            ]
+            table.add(filtered_data)
+        except Exception:
+            logger.error("Failed to add records", exc_info=True)
+            return 1
     else:
-        index.db.create_table(index.TABLE_NAME, data=data_with_vectors)
+        try:
+            index.db.create_table(index.TABLE_NAME, data=data_with_vectors)
+        except Exception:
+            logger.error("Failed to create table", exc_info=True)
+            return 1
 
-    print(f"[ConvIndexer] ✅ Indexed {len(data_with_vectors)} conversations")
+    logger.info(f"✅ Indexed {len(data_with_vectors)} conversations")
     return 0
 
 
 # ==============================================================
-# Steps Indexer — .system_generated/steps/*/output.txt をインデックス
+# Steps Indexer
 # ==============================================================
 
-_BRAIN_DIR = Path.home() / ".gemini" / "antigravity" / "brain"
-
-
 # PURPOSE: .system_generated/steps/ 配下の output.txt をパースしレコード化する
-def parse_step_outputs(brain_dir: Optional[str] = None, max_per_session: int = 20) -> list[dict]:
+def parse_step_outputs(brain_dir: Optional[str] = None, max_per_session: int = 20) -> List[StepInfo]:
     """PURPOSE: .system_generated/steps/ 配下の output.txt をパースしレコード化する"""
     directory = Path(brain_dir) if brain_dir else _BRAIN_DIR
     if not directory.exists():
         return []
 
-    steps = []
-    # Each conversation has its own brain dir
+    steps: List[StepInfo] = []
     for conv_dir in directory.iterdir():
         if not conv_dir.is_dir():
             continue
@@ -529,7 +584,6 @@ def parse_step_outputs(brain_dir: Optional[str] = None, max_per_session: int = 2
         if not steps_dir.exists():
             continue
 
-        # Find output.txt files, sorted by step number descending (newer first)
         output_files = sorted(
             steps_dir.glob("*/output.txt"),
             key=lambda p: int(p.parent.name) if p.parent.name.isdigit() else 0,
@@ -557,7 +611,7 @@ def parse_step_outputs(brain_dir: Optional[str] = None, max_per_session: int = 2
 
 
 # PURPOSE: ステップ出力データを LanceDB 互換レコードに変換する
-def steps_to_records(steps: list[dict]) -> list[dict]:
+def steps_to_records(steps: List[StepInfo]) -> List[Dict[str, Any]]:
     """PURPOSE: ステップ出力データを LanceDB 互換レコードに変換する"""
     records = []
     for s in steps:
@@ -565,7 +619,6 @@ def steps_to_records(steps: list[dict]) -> list[dict]:
         step_num = s["step_number"]
         content = s["content"]
 
-        # First line as title (often contains tool name or command)
         first_line = content.split("\n", 1)[0][:120].strip()
         title = f"[Step {step_num}] {first_line}" if first_line else f"Step {step_num}"
 
@@ -592,37 +645,35 @@ def index_steps(brain_dir: Optional[str] = None, max_per_session: int = 20) -> i
     """PURPOSE: .system_generated/steps/ の出力ファイルを LanceDB にインデックスする"""
     steps = parse_step_outputs(brain_dir, max_per_session)
     if not steps:
-        print("[StepsIndexer] No step outputs found")
+        logger.info("No step outputs found")
         return 1
 
-    print(f"[StepsIndexer] Found {len(steps)} step outputs")
-
+    logger.info(f"Found {len(steps)} step outputs")
     records = steps_to_records(steps)
 
-    from mekhane.anamnesis.index import GnosisIndex, Embedder
+    from mekhane.anamnesis.index import Embedder, GnosisIndex
 
     index = GnosisIndex()
     embedder = Embedder()
 
-    # Dedupe
     if index._table_exists():
-        table = index.db.open_table(index.TABLE_NAME)
         try:
+            table = index.db.open_table(index.TABLE_NAME)
             existing = table.to_pandas()
-            existing_keys = set(existing["primary_key"].tolist())
-            before = len(records)
-            records = [r for r in records if r["primary_key"] not in existing_keys]
-            skipped = before - len(records)
-            if skipped:
-                print(f"[StepsIndexer] Skipped {skipped} duplicates")
+            if not existing.empty:
+                existing_keys = set(existing["primary_key"].tolist())
+                before = len(records)
+                records = [r for r in records if r["primary_key"] not in existing_keys]
+                skipped = before - len(records)
+                if skipped:
+                    logger.info(f"Skipped {skipped} duplicates")
         except Exception:
-            pass
+            logger.warning("Failed to check duplicates", exc_info=True)
 
     if not records:
-        print("[StepsIndexer] No new steps to add (all duplicates)")
+        logger.info("No new steps to add (all duplicates)")
         return 0
 
-    # Embed in batches
     BATCH_SIZE = 16
     data_with_vectors = []
 
@@ -635,68 +686,67 @@ def index_steps(brain_dir: Optional[str] = None, max_per_session: int = 20) -> i
             record["vector"] = vector
             data_with_vectors.append(record)
 
-        print(f"  Embedded {min(i + BATCH_SIZE, len(records))}/{len(records)}...")
+        logger.info(f"Embedded {min(i + BATCH_SIZE, len(records))}/{len(records)}...")
 
-    # Add to LanceDB
     if index._table_exists():
-        table = index.db.open_table(index.TABLE_NAME)
-        schema_fields = {f.name for f in table.schema}
-        filtered_data = [
-            {k: v for k, v in record.items() if k in schema_fields}
-            for record in data_with_vectors
-        ]
-        table.add(filtered_data)
+        try:
+            table = index.db.open_table(index.TABLE_NAME)
+            schema_fields = {f.name for f in table.schema}
+            filtered_data = [
+                {k: v for k, v in record.items() if k in schema_fields}
+                for record in data_with_vectors
+            ]
+            table.add(filtered_data)
+        except Exception:
+            logger.error("Failed to add records", exc_info=True)
+            return 1
     else:
-        index.db.create_table(index.TABLE_NAME, data=data_with_vectors)
+        try:
+            index.db.create_table(index.TABLE_NAME, data=data_with_vectors)
+        except Exception:
+            logger.error("Failed to create table", exc_info=True)
+            return 1
 
-    print(f"[StepsIndexer] ✅ Indexed {len(data_with_vectors)} steps")
+    logger.info(f"✅ Indexed {len(data_with_vectors)} steps")
     return 0
 
 
 # ==============================================================
-# Export MD Indexer — export_chats.py 出力の MD をインデックス
+# Export MD Indexer
 # ==============================================================
 
-_EXPORT_DIR = Path.home() / "oikos" / "mneme" / ".hegemonikon" / "sessions"
 _RE_EXPORT_ID = re.compile(r"\*\*ID\*\*:\s*`([^`]+)`")
 _RE_EXPORT_DATE = re.compile(r"\*\*エクスポート日時\*\*:\s*(.+)")
-_RE_ROLE = re.compile(r"^##\s+(👤 User|🤖 Claude)", re.MULTILINE)
 
 
 # PURPOSE: export_chats.py 出力の MD ファイルを構造化 dict にパースする
-def parse_export_md(path: Path) -> dict:
+def parse_export_md(path: Path) -> ExportRecord:
     """PURPOSE: export_chats.py 出力の MD ファイルを構造化 dict にパースする"""
     text = path.read_text(encoding="utf-8", errors="replace")
     lines = text.split("\n")
 
-    # Title: first H1
     title = path.stem
     for line in lines[:5]:
         if line.startswith("# "):
             title = line[2:].strip()
             break
 
-    # ID
     id_match = _RE_EXPORT_ID.search(text)
     conv_id = id_match.group(1) if id_match else ""
 
-    # Export date
     date_match = _RE_EXPORT_DATE.search(text)
     exported_at = date_match.group(1).strip() if date_match else ""
 
-    # Extract body (after first ---)
     body_start = 0
     for i, line in enumerate(lines):
         if line.strip() == "---":
             body_start = i + 1
             break
 
-    # Count messages by role markers
     user_count = len(re.findall(r"^## 👤 User", text, re.MULTILINE))
     assistant_count = len(re.findall(r"^## 🤖 Claude", text, re.MULTILINE))
 
     body = "\n".join(lines[body_start:])
-    # Clean noise
     body = re.sub(r"Thought for \d+s\s*", "", body)
     body = re.sub(r"Thought for <\d+s\s*", "", body)
     body = re.sub(r"\n{3,}", "\n\n", body).strip()
@@ -713,7 +763,7 @@ def parse_export_md(path: Path) -> dict:
 
 
 # PURPOSE: パース済みエクスポート dict を LanceDB 互換レコードに変換する
-def exports_to_records(exports: list[dict]) -> list[dict]:
+def exports_to_records(exports: List[ExportRecord]) -> List[Dict[str, Any]]:
     """PURPOSE: パース済みエクスポート dict を LanceDB 互換レコードに変換する"""
     records = []
     for e in exports:
@@ -741,43 +791,42 @@ def index_exports(export_dir: Optional[str] = None) -> int:
     """PURPOSE: export_chats.py 出力 MD を LanceDB にセマンティックインデックスする"""
     directory = Path(export_dir) if export_dir else _EXPORT_DIR
     if not directory.exists():
-        print(f"[ExportIndexer] Directory not found: {directory}")
+        logger.error(f"Directory not found: {directory}")
         return 1
 
-    # export_chats.py output: YYYY-MM-DD_conv_N_Title.md
     md_files = sorted(directory.glob("*_conv_*.md"))
     if not md_files:
-        print("[ExportIndexer] No export MD files found")
+        logger.info("No export MD files found")
         return 1
 
-    print(f"[ExportIndexer] Found {len(md_files)} export files")
+    logger.info(f"Found {len(md_files)} export files")
 
     exports = [parse_export_md(f) for f in md_files]
     records = exports_to_records(exports)
 
-    from mekhane.anamnesis.index import GnosisIndex, Embedder
+    from mekhane.anamnesis.index import Embedder, GnosisIndex
+
     index = GnosisIndex()
     embedder = Embedder()
 
-    # Dedupe
     if index._table_exists():
-        table = index.db.open_table(index.TABLE_NAME)
         try:
+            table = index.db.open_table(index.TABLE_NAME)
             existing = table.to_pandas()
-            existing_keys = set(existing["primary_key"].tolist())
-            before = len(records)
-            records = [r for r in records if r["primary_key"] not in existing_keys]
-            skipped = before - len(records)
-            if skipped:
-                print(f"[ExportIndexer] Skipped {skipped} duplicates")
+            if not existing.empty:
+                existing_keys = set(existing["primary_key"].tolist())
+                before = len(records)
+                records = [r for r in records if r["primary_key"] not in existing_keys]
+                skipped = before - len(records)
+                if skipped:
+                    logger.info(f"Skipped {skipped} duplicates")
         except Exception:
-            pass
+            logger.warning("Failed to check duplicates", exc_info=True)
 
     if not records:
-        print("[ExportIndexer] No new exports to add (all duplicates)")
+        logger.info("No new exports to add (all duplicates)")
         return 0
 
-    # Embed
     BATCH_SIZE = 16
     data_with_vectors = []
     for i in range(0, len(records), BATCH_SIZE):
@@ -787,31 +836,35 @@ def index_exports(export_dir: Optional[str] = None) -> int:
         for record, vector in zip(batch, vectors):
             record["vector"] = vector
             data_with_vectors.append(record)
-        print(f"  Embedded {min(i + BATCH_SIZE, len(records))}/{len(records)}...")
+        logger.info(f"Embedded {min(i + BATCH_SIZE, len(records))}/{len(records)}...")
 
-    # Add to LanceDB
     if index._table_exists():
-        table = index.db.open_table(index.TABLE_NAME)
-        schema_fields = {f.name for f in table.schema}
-        filtered_data = [
-            {k: v for k, v in record.items() if k in schema_fields}
-            for record in data_with_vectors
-        ]
-        table.add(filtered_data)
+        try:
+            table = index.db.open_table(index.TABLE_NAME)
+            schema_fields = {f.name for f in table.schema}
+            filtered_data = [
+                {k: v for k, v in record.items() if k in schema_fields}
+                for record in data_with_vectors
+            ]
+            table.add(filtered_data)
+        except Exception:
+            logger.error("Failed to add records", exc_info=True)
+            return 1
     else:
-        index.db.create_table(index.TABLE_NAME, data=data_with_vectors)
+        try:
+            index.db.create_table(index.TABLE_NAME, data=data_with_vectors)
+        except Exception:
+            logger.error("Failed to create table", exc_info=True)
+            return 1
 
-    print(f"[ExportIndexer] ✅ Indexed {len(data_with_vectors)} exports")
+    logger.info(f"✅ Indexed {len(data_with_vectors)} exports")
     return 0
 
 
 # ==============================================================
-# ROM Indexer — /rom WF で蒸留されたコンテキストをインデックス
+# ROM Indexer
 # ==============================================================
 
-_ROM_DIR = Path.home() / "oikos" / "mneme" / ".hegemonikon" / "rom"
-
-# Regex patterns for ROM parsing
 _RE_ROM_TITLE = re.compile(r"^#\s+(.+)$", re.MULTILINE)
 _RE_ROM_FRONTMATTER = re.compile(r"^---\s*\n(.*?)\n---", re.DOTALL)
 _RE_ROM_SEMANTIC_TAG = re.compile(
@@ -820,15 +873,13 @@ _RE_ROM_SEMANTIC_TAG = re.compile(
 
 
 # PURPOSE: ROM マークダウンファイルをパースし構造化 dict に変換する
-def parse_rom_md(path: Path) -> dict:
+def parse_rom_md(path: Path) -> RomRecord:
     """PURPOSE: ROM マークダウンファイルをパースし構造化 dict に変換する"""
     text = path.read_text(encoding="utf-8", errors="replace")
 
-    # Title: first H1 line
     title_match = _RE_ROM_TITLE.search(text)
     title = title_match.group(1).strip() if title_match else path.stem
 
-    # Try to extract YAML frontmatter
     topics = []
     exec_summary = ""
     reliability = ""
@@ -844,9 +895,8 @@ def parse_rom_md(path: Path) -> dict:
                 reliability = fm.get("reliability", "")
                 source_date = fm.get("source_date", "")
         except Exception:
-            pass  # Intentional: frontmatter may be malformed
+            pass
 
-    # Date from filename: rom_YYYY-MM-DD_HHMM_slug.md
     date_str = ""
     fname_match = re.search(r"(\d{4}-\d{2}-\d{2})_(\d{2})(\d{2})", path.stem)
     if fname_match:
@@ -854,17 +904,13 @@ def parse_rom_md(path: Path) -> dict:
     elif source_date and source_date != "Unknown":
         date_str = source_date
 
-    # Derivative level from filename
     derivative = "standard"
     if "_snapshot_" in path.stem or path.stem.endswith("_snapshot"):
         derivative = "rom-"
     elif "_rag_" in path.stem or path.stem.endswith("_rag"):
         derivative = "rom+"
 
-    # Semantic tags count
     semantic_tags = _RE_ROM_SEMANTIC_TAG.findall(text)
-
-    # Section headers for content summary
     sections = _RE_SECTION.findall(text)
     sections = [re.sub(r"^[^\w]+", "", s).strip() for s in sections]
 
@@ -883,11 +929,10 @@ def parse_rom_md(path: Path) -> dict:
 
 
 # PURPOSE: パース済み ROM dict を LanceDB 互換レコードに変換する
-def roms_to_records(roms: list[dict]) -> list[dict]:
+def roms_to_records(roms: List[RomRecord]) -> List[Dict[str, Any]]:
     """PURPOSE: パース済み ROM dict を LanceDB 互換レコードに変換する"""
     records = []
     for r in roms:
-        # Build abstract from title + date + topics + exec_summary
         abstract_parts = [f"[ROM/{r['derivative']}] {r['title']}"]
         if r["date"]:
             abstract_parts.append(f"({r['date']})")
@@ -899,13 +944,8 @@ def roms_to_records(roms: list[dict]) -> list[dict]:
             abstract_parts.append(f"Topics: {', '.join(r['topics'][:5])}")
         abstract = " ".join(abstract_parts)
 
-        # Content: full text truncated for embedding
         content = r["text"][:4000]
-
-        # Primary key from filename for dedup
         primary_key = f"rom:{r['filename']}"
-
-        # URL: file path for retrieval
         url = str(_ROM_DIR / r["filename"])
 
         record = {
@@ -931,69 +971,71 @@ def index_roms(rom_dir: Optional[str] = None) -> int:
     directory = Path(rom_dir) if rom_dir else _ROM_DIR
 
     if not directory.exists():
-        print(f"[ROMIndexer] ROM directory not found: {directory}")
-        print("[ROMIndexer] Run /rom to generate ROM files first")
+        logger.error(f"ROM directory not found: {directory}")
+        logger.info("Run /rom to generate ROM files first")
         return 1
 
     md_files = sorted(directory.glob("rom_*.md"))
     if not md_files:
-        print("[ROMIndexer] No rom_*.md files found")
+        logger.info("No rom_*.md files found")
         return 1
 
-    print(f"[ROMIndexer] Found {len(md_files)} ROM files")
+    logger.info(f"Found {len(md_files)} ROM files")
 
-    # Parse all
     roms = [parse_rom_md(f) for f in md_files]
     records = roms_to_records(roms)
 
-    # Embed and add to LanceDB
-    from mekhane.anamnesis.index import GnosisIndex, Embedder
+    from mekhane.anamnesis.index import Embedder, GnosisIndex
 
     index = GnosisIndex()
     embedder = Embedder()
 
-    # Dedupe against existing records
     if index._table_exists():
-        table = index.db.open_table(index.TABLE_NAME)
         try:
+            table = index.db.open_table(index.TABLE_NAME)
             existing = table.to_pandas()
-            existing_keys = set(existing["primary_key"].tolist())
-            before = len(records)
-            records = [r for r in records if r["primary_key"] not in existing_keys]
-            skipped = before - len(records)
-            if skipped:
-                print(f"[ROMIndexer] Skipped {skipped} duplicates")
+            if not existing.empty:
+                existing_keys = set(existing["primary_key"].tolist())
+                before = len(records)
+                records = [r for r in records if r["primary_key"] not in existing_keys]
+                skipped = before - len(records)
+                if skipped:
+                    logger.info(f"Skipped {skipped} duplicates")
         except Exception:
-            pass  # Intentional: table may be empty or have incompatible schema
+            logger.warning("Failed to check duplicates", exc_info=True)
 
     if not records:
-        print("[ROMIndexer] No new ROMs to add (all duplicates)")
+        logger.info("No new ROMs to add (all duplicates)")
         return 0
 
-    # Generate embeddings (title + abstract for embedding text)
     texts = [f"{r['title']} {r['abstract']}" for r in records]
     vectors = embedder.embed_batch(texts)
 
-    # Attach vectors
     data_with_vectors = []
     for rec, vec in zip(records, vectors):
         rec["vector"] = vec
         data_with_vectors.append(rec)
 
-    # Add to LanceDB
     if index._table_exists():
-        table = index.db.open_table(index.TABLE_NAME)
-        # Schema filtering (P4 pattern)
-        schema_fields = {f.name for f in table.schema}
-        filtered_data = [
-            {k: v for k, v in record.items() if k in schema_fields}
-            for record in data_with_vectors
-        ]
-        table.add(filtered_data)
+        try:
+            table = index.db.open_table(index.TABLE_NAME)
+            schema_fields = {f.name for f in table.schema}
+            filtered_data = [
+                {k: v for k, v in record.items() if k in schema_fields}
+                for record in data_with_vectors
+            ]
+            table.add(filtered_data)
+        except Exception:
+            logger.error("Failed to add records", exc_info=True)
+            return 1
     else:
-        index.db.create_table(index.TABLE_NAME, data=data_with_vectors)
+        try:
+            index.db.create_table(index.TABLE_NAME, data=data_with_vectors)
+        except Exception:
+            logger.error("Failed to create table", exc_info=True)
+            return 1
 
-    print(f"[ROMIndexer] ✅ Indexed {len(data_with_vectors)} ROMs")
+    logger.info(f"✅ Indexed {len(data_with_vectors)} ROMs")
     return 0
 
 
@@ -1002,7 +1044,7 @@ def index_from_json(json_path: str) -> int:
     """PURPOSE: trajectorySummaries JSON からセッション情報を LanceDB にインデックスする"""
     path = Path(json_path)
     if not path.exists():
-        print(f"[Error] File not found: {json_path}")
+        logger.error(f"File not found: {json_path}")
         return 1
 
     with open(path) as f:
@@ -1010,38 +1052,35 @@ def index_from_json(json_path: str) -> int:
 
     sessions = parse_sessions_from_json(data)
     if not sessions:
-        print("[Error] No sessions found in JSON")
+        logger.error("No sessions found in JSON")
         return 1
 
-    print(f"[SessionIndexer] Parsed {len(sessions)} sessions")
-
+    logger.info(f"Parsed {len(sessions)} sessions")
     records = sessions_to_records(sessions)
 
-    # Embed and add to LanceDB
-    from mekhane.anamnesis.index import GnosisIndex, Embedder
+    from mekhane.anamnesis.index import Embedder, GnosisIndex
 
     index = GnosisIndex()
     embedder = Embedder()
 
-    # Dedupe: check existing primary_keys
     if index._table_exists():
-        table = index.db.open_table(index.TABLE_NAME)
         try:
+            table = index.db.open_table(index.TABLE_NAME)
             existing = table.to_pandas()
-            existing_keys = set(existing["primary_key"].tolist())
-            before = len(records)
-            records = [r for r in records if r["primary_key"] not in existing_keys]
-            skipped = before - len(records)
-            if skipped:
-                print(f"[SessionIndexer] Skipped {skipped} duplicates")
+            if not existing.empty:
+                existing_keys = set(existing["primary_key"].tolist())
+                before = len(records)
+                records = [r for r in records if r["primary_key"] not in existing_keys]
+                skipped = before - len(records)
+                if skipped:
+                    logger.info(f"Skipped {skipped} duplicates")
         except Exception:
-            pass  # Intentional: table may be empty or have incompatible schema
+            logger.warning("Failed to check duplicates", exc_info=True)
 
     if not records:
-        print("[SessionIndexer] No new sessions to add (all duplicates)")
+        logger.info("No new sessions to add (all duplicates)")
         return 0
 
-    # Generate embeddings
     BATCH_SIZE = 32
     data_with_vectors = []
 
@@ -1054,45 +1093,105 @@ def index_from_json(json_path: str) -> int:
             record["vector"] = vector
             data_with_vectors.append(record)
 
-        print(f"  Processed {min(i + BATCH_SIZE, len(records))}/{len(records)}...")
+        logger.info(f"Processed {min(i + BATCH_SIZE, len(records))}/{len(records)}...")
 
-    # Add to LanceDB
     if index._table_exists():
-        table = index.db.open_table(index.TABLE_NAME)
-        table.add(data_with_vectors)
+        try:
+            table = index.db.open_table(index.TABLE_NAME)
+            table.add(data_with_vectors)
+        except Exception:
+            logger.error("Failed to add records", exc_info=True)
+            return 1
     else:
-        index.db.create_table(index.TABLE_NAME, data=data_with_vectors)
+        try:
+            index.db.create_table(index.TABLE_NAME, data=data_with_vectors)
+        except Exception:
+            logger.error("Failed to create table", exc_info=True)
+            return 1
 
-    print(f"[SessionIndexer] ✅ Indexed {len(data_with_vectors)} sessions")
+    logger.info(f"✅ Indexed {len(data_with_vectors)} sessions")
     return 0
 
 
 # PURPOSE: LS API から直接セッション情報を取得し LanceDB にインデックスする
 def index_from_api() -> int:
     """PURPOSE: LS API から直接セッション情報を取得し LanceDB にインデックスする"""
-    script = _HEGEMONIKON_ROOT / "scripts" / "agq-sessions.sh"
-    if not script.exists():
-        print(f"[Error] Script not found: {script}")
+    from mekhane.ochema.antigravity_client import AntigravityClient
+
+    try:
+        client = AntigravityClient()
+        data = client._rpc(
+            "exa.language_server_pb.LanguageServerService/GetAllCascadeTrajectories", {}
+        )
+    except Exception:
+        logger.error("Failed to fetch trajectories from API", exc_info=True)
         return 1
 
-    with tempfile.TemporaryDirectory(prefix="agq_sessions_") as tmpdir:
-        dump_dir = Path(tmpdir)
-        result = subprocess.run(
-            ["bash", str(script), "--dump", str(dump_dir)],
-            capture_output=True,
-            text=True,
-        )
+    # In-memory processing without writing to file
+    sessions = parse_sessions_from_json(data)
+    if not sessions:
+        logger.info("No sessions found from API")
+        return 0
 
-        if result.returncode != 0:
-            print(f"[Error] agq-sessions.sh failed: {result.stderr}")
+    logger.info(f"Fetched {len(sessions)} sessions from API")
+    records = sessions_to_records(sessions)
+
+    # Re-use logic: index_from_json's logic is duplicated here, better refactor?
+    # For now, let's keep it inline to avoid further complexity, similar to index_from_json
+    # but strictly speaking, we could extract `index_records(records)` function.
+    # To minimize changes, I will duplicate the indexing logic block or call a helper if I made one.
+    # Since I didn't plan a helper extraction, I will duplicate the block but with logger fixes.
+
+    from mekhane.anamnesis.index import Embedder, GnosisIndex
+
+    index = GnosisIndex()
+    embedder = Embedder()
+
+    if index._table_exists():
+        try:
+            table = index.db.open_table(index.TABLE_NAME)
+            existing = table.to_pandas()
+            if not existing.empty:
+                existing_keys = set(existing["primary_key"].tolist())
+                before = len(records)
+                records = [r for r in records if r["primary_key"] not in existing_keys]
+                skipped = before - len(records)
+                if skipped:
+                    logger.info(f"Skipped {skipped} duplicates")
+        except Exception:
+            logger.warning("Failed to check duplicates", exc_info=True)
+
+    if not records:
+        logger.info("No new sessions to add (all duplicates)")
+        return 0
+
+    BATCH_SIZE = 32
+    data_with_vectors = []
+    for i in range(0, len(records), BATCH_SIZE):
+        batch = records[i : i + BATCH_SIZE]
+        texts = [f"{r['title']} {r['abstract']}" for r in batch]
+        vectors = embedder.embed_batch(texts)
+        for record, vector in zip(batch, vectors):
+            record["vector"] = vector
+            data_with_vectors.append(record)
+        logger.info(f"Processed {min(i + BATCH_SIZE, len(records))}/{len(records)}...")
+
+    if index._table_exists():
+        try:
+            table = index.db.open_table(index.TABLE_NAME)
+            table.add(data_with_vectors)
+        except Exception:
+            logger.error("Failed to add records", exc_info=True)
+            return 1
+    else:
+        try:
+            index.db.create_table(index.TABLE_NAME, data=data_with_vectors)
+        except Exception:
+            logger.error("Failed to create table", exc_info=True)
             return 1
 
-        json_path = dump_dir / "trajectories_raw.json"
-        if not json_path.exists():
-            print("[Error] trajectories_raw.json not generated")
-            return 1
-
-        return index_from_json(str(json_path))
+    logger.info(f"✅ Indexed {len(data_with_vectors)} sessions from API")
+    return 0
 
 
 # PURPOSE: [L2-auto] 関数: main
@@ -1120,7 +1219,7 @@ def main() -> int:  # PURPOSE: CLI エントリポイント — サブコマン�
     parser.add_argument(
         "--handoff-dir",
         default=None,
-        help="Custom handoff directory (default: ~/oikos/mneme/.hegemonikon/sessions)",
+        help="Custom handoff directory",
     )
     parser.add_argument(
         "--conversations",
@@ -1152,7 +1251,7 @@ def main() -> int:  # PURPOSE: CLI エントリポイント — サブコマン�
     parser.add_argument(
         "--export-dir",
         default=None,
-        help="Custom export directory (default: ~/oikos/mneme/.hegemonikon/sessions)",
+        help="Custom export directory",
     )
     parser.add_argument(
         "--roms",
@@ -1162,7 +1261,7 @@ def main() -> int:  # PURPOSE: CLI エントリポイント — サブコマン�
     parser.add_argument(
         "--rom-dir",
         default=None,
-        help="Custom ROM directory (default: ~/oikos/mneme/.hegemonikon/rom)",
+        help="Custom ROM directory",
     )
 
     args = parser.parse_args()
@@ -1182,9 +1281,11 @@ def main() -> int:  # PURPOSE: CLI エントリポイント — サブコマン�
     elif args.json_path:
         return index_from_json(args.json_path)
     else:
-        print("Usage: session_indexer.py <json_path> | --from-api | --handoffs | --roms | --steps | --exports")
+        parser.print_help()
         return 1
 
 
 if __name__ == "__main__":
+    if str(_HEGEMONIKON_ROOT) not in sys.path:
+        sys.path.insert(0, str(_HEGEMONIKON_ROOT))
     sys.exit(main())

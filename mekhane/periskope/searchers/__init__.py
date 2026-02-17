@@ -1,18 +1,14 @@
+# PROOF: [L2/Periskopē] <- mekhane/periskope/searchers/ Package
 """
-Periskopē searchers — pluggable search source adapters.
-
-Each searcher implements the same async interface:
-    async def search(query: str, max_results: int) -> list[SearchResult]
+Searcher implementations for different sources.
 """
 
 from .searxng import SearXNGSearcher
-from .exa_searcher import ExaSearcher
-from .internal_searcher import GnosisSearcher, SophiaSearcher, KairosSearcher
+# from .exa_searcher import ExaSearcher
+# from .internal_searcher import InternalSearcher
 
 __all__ = [
     "SearXNGSearcher",
-    "ExaSearcher",
-    "GnosisSearcher",
-    "SophiaSearcher",
-    "KairosSearcher",
+    # "ExaSearcher",
+    # "InternalSearcher",
 ]

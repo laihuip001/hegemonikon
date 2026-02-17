@@ -1,3 +1,6 @@
+# PROOF: [L2/Mekhanē] <- mekhane/periskope/PROOF.md S2->Periskopē->searchers->exa
+# PURPOSE: Exa search client implementation.
+
 """
 Exa search client for Periskopē.
 

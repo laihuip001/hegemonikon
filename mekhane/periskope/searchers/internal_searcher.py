@@ -1,3 +1,6 @@
+# PROOF: [L2/Mekhanē] <- mekhane/periskope/PROOF.md S2->Periskopē->searchers->internal
+# PURPOSE: Internal knowledge searcher implementation.
+
 """
 Internal knowledge searcher for Periskopē.
 

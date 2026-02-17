@@ -1,3 +1,6 @@
+# PROOF: [L2/Mekhanē] <- mekhane/periskope/PROOF.md S2->Periskopē->models.py
+# PURPOSE: Periskopē data models.
+
 """
 Periskopē data models.
 

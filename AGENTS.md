@@ -118,7 +118,6 @@ hegemonikon/
 │   ├── ochema/      # LLM ルーティング
 │   └── ergasterion/ # 論文消化、プロンプト最適化
 ├── synergeia/       # Jules (Gemini) マルチエージェント連携
-├── mneme/           # 外部記憶 (Handoff, KI)
 ├── scripts/         # ユーティリティ
 └── docs/            # ドキュメント
 ```

@@ -48,6 +48,21 @@ ccl_signature: "/vet+"
 view_file /home/makaron8426/oikos/hegemonikon/.agent/skills/akribeia/a2-krisis/SKILL.md
 ```
 
+## STEP 0.5: Doc Health Check (環境健全性)
+
+> **目的**: 監査の前提となるドキュメント依存関係が健全か確認する。
+> STALE なドキュメントに基づく監査は無効になるリスクがある。
+
+// turbo
+
+```bash
+cd ~/oikos/hegemonikon && PYTHONPATH=. .venv/bin/python -m mekhane.dendron.doc_staleness --check
+```
+
+> **判定**:
+> - exit code 0: 健全 ✅
+> - exit code 1: STALE あり ⚠️ (警告を表示しつつ続行、または重要な場合は停止)
+
 ---
 
 ## 発動条件

@@ -1,237 +1,34 @@
-version: 1.2.0
+# Active Projects Registry — Actionable tools, engines, and products.
+# Theoretical/informational items are in knowledge.yaml.
+# Tiers: product (user-facing), shared (internal reusable modules)
+version: 2.0.0
 projects:
-- id: hegemonikon
-  name: Hegemonikón (ἡγεμονικόν)
-  path: /
-  tier: core
-  summary: FEP に基づく認知ハイパーバイザーフレームワーク
-  status: active
-  phase: operational
-  etymology: 指導的理性 — ストア哲学の統治原理
-  entry_point: null
-  usage_trigger: null
-- id: hermeneus
-  name: Hermēneus (ἑρμηνεύς)
-  path: hermeneus/
-  tier: core
-  summary: CCL 実行保証コンパイラ — LMQL/LangGraph による >96% 実行保証
-  status: active
-  phase: implementation
-  etymology: 翻訳者・解釈者 — ヘルメスの使者
-  proof: true
-  entry_point:
-    cli: python -m hermeneus.src compile '{CCL式}'
-    python: from hermeneus.src import compile_ccl
-    mcp: hermeneus_execute, hermeneus_compile
-  usage_trigger: CCL 式の解析・コンパイル・実行時。手動で CCL を分析するな。
-- id: synergeia
-  name: Synergeia (συνέργεια)
-  path: synergeia/
+# ─── Products ─────────────────────────────────────────────
+- id: hgk-app
+  name: Hegemonikón Desktop App
+  path: hgk/
   tier: product
-  summary: マルチエージェント協調 — Jules Pool, BasanosReviewer
-  status: active
-  phase: operational
-  etymology: 共同作業・協力
-  proof: true
-  entry_point:
-    cli: python synergeia/bridge.py
-    python: from synergeia.bridge import dispatch
-  usage_trigger: 複数エージェント連携時。Jules への委任、並列実行、結果統合。
-- id: mekhane
-  name: Mekhane (μηχανή)
-  path: mekhane/
-  tier: core
-  summary: 機器全体 — 全操作モジュールの親
-  status: active
-  phase: operational
-  etymology: 機械・装置 — デウス・エクス・マキナの語源
-  proof: true
-  entry_point: null
-  usage_trigger: null
-- id: dendron
-  name: Dendron (δένδρον)
-  path: mekhane/dendron/
-  tier: module
-  summary: 存在目的テンソル (EPT) — 存在誤差最小化エンジン
+  summary: 認知ハイパーバイザー GUI — Tauri v2 + Vite + TypeScript + Three.js (17 views, Rust a11y) + FastAPI backend
   status: active
   phase: implementation
-  etymology: 樹木 — コードの存在が根を張り枝を伸ばす
   proof: true
-  note: core_architecture.md に構造柱として明記
+  note: API (mekhane/api/) を内包。UDS (/tmp/hgk.sock) for Tauri, TCP (:9696) for n8n/dev
   entry_point:
-    cli: python mekhane/dendron/checker.py {target_dir}
-    python: from mekhane.dendron.checker import DendronChecker
-  usage_trigger: コード品質・存在証明の検証時。PROOF.md の有無、EPT スコア確認。
-- id: symploke
-  name: Symploke (συμπλοκή)
-  path: mekhane/symploke/
-  tier: engine
-  summary: 編組・統合 — Boot統合, スペシャリスト, Jules Client
-  status: active
-  phase: operational
-  etymology: 編み合わせ・結合 — プラトンの概念
-  proof: true
-  entry_point:
-    cli: python mekhane/symploke/boot_integration.py --mode {mode}
-    python: from mekhane.symploke.boot_integration import get_boot_context
-  usage_trigger: /boot 実行時に自動。スペシャリスト Tier 実行時。
-- id: anamnesis
-  name: Anamnesis (ἀνάμνησις)
-  path: mekhane/anamnesis/
-  tier: engine
-  summary: 想起 — Gnōsis CLI, LanceDB ベクトル検索
-  status: active
-  phase: operational
-  etymology: 想起・回想 — プラトンのアナムネーシス
-  proof: true
-  entry_point:
-    cli: python mekhane/anamnesis/cli.py search '{query}'
-    python: from mekhane.anamnesis.cli import cmd_search
-  usage_trigger: 知識検索時。grep/キーワード検索ではなく、必ずベクトル検索を使え。
-- id: synteleia
-  name: Synteleia (συντέλεια)
-  path: mekhane/synteleia/
-  tier: module
-  summary: 6視点認知アンサンブル — 9 agent (8 L1 + 1 L2) による多角監査
-  status: active
-  phase: operational
-  etymology: 完成・終末 — 全てを見届ける監視者
-  proof: true
-  entry_point:
-    cli: PYTHONPATH=. .venv/bin/python -c "from mekhane.synteleia import SynteleiaOrchestrator; print(SynteleiaOrchestrator().agents)"
-    python: from mekhane.synteleia import SynteleiaOrchestrator, AuditTarget, AuditTargetType
-    api: POST /api/synteleia/audit, POST /api/synteleia/audit-quick, GET /api/synteleia/agents
-  usage_trigger: /dia+ 自動発動。コード/計画/CCL出力の多角監査。REST API 経由で n8n 連携可能。
-- id: ergasterion
-  name: Ergasterion (ἐργαστήριον)
-  path: mekhane/ergasterion/
-  tier: module
-  summary: 工房 — 実験と鍛造の場
-  status: active
-  phase: implementation
-  etymology: 工房・作業場
-  proof: true
-  entry_point:
-    python: from mekhane.ergasterion.tekhne.pipeline import TekhnePipeline
-  usage_trigger: 新しい WF/Skill の鍛造時。実験的実装はここで。
-- id: peira
-  name: Peira (πείρα)
-  path: mekhane/peira/
-  tier: module
-  summary: 試行 — テスト, note-collector, 検証スクリプト
-  status: active
-  phase: operational
-  etymology: 経験・試み — 知識は経験から
-  proof: true
-  entry_point:
-    cli: python mekhane/peira/hgk_health.py
-  usage_trigger: ヘルスチェック時。システム全体の健全性確認。
-- id: poiema
-  name: Poiema (ποίημα)
-  path: mekhane/poiema/
-  tier: module
-  summary: 生成・創造 — 出力生成エンジン
-  status: active
-  phase: implementation
-  etymology: 作品・創造物 — ポイエーシス（制作）の産物
-  proof: true
-  entry_point:
-    python: from mekhane.poiema import generate
-  usage_trigger: 構造化出力の生成時。Boot レポート、Handoff 等の定型出力。
-- id: exagoge
-  name: Exagōgē (ἐξαγωγή)
-  path: mekhane/exagoge/
-  tier: module
-  summary: 抽出 — Handoff/Doxa/KI/Ideas のエクスポート機構
-  status: active
-  phase: implementation
-  etymology: 引き出し・輸出
-  proof: true
-  entry_point:
-    cli: PYTHONPATH=. .venv/bin/python -m mekhane.exagoge.cli --type all --format json
-    python: from mekhane.exagoge import HandoffExporter, DoxaExporter, KIExporter, IdeasExporter
-  usage_trigger: HGK データの外部エクスポート時。Agora 連携、バックアップ、分析。
-- id: ccl
-  name: CCL (Cognitive Control Language)
-  path: ccl/
-  tier: engine
-  summary: 認知代数言語 — 演算子, マクロ, WF 分類
-  status: active
-  phase: operational
-  proof: true
-  entry_point:
-    reference: ccl/operators.md
-    macros: ccl/macros/
-  usage_trigger: CCL 構文の仕様確認時。演算子の意味・pt 計算の正本。
-- id: kernel
-  name: Kernel
-  path: kernel/
-  tier: core
-  summary: 公理・定理・憲法 — 96要素体系の根幹
-  status: active
-  phase: operational
-  proof: true
-  entry_point:
-    reference: kernel/SACRED_TRUTH.md
-  usage_trigger: 公理・定理の参照時。96要素体系の正本。
-- id: pepsis
-  name: Pepsis (Πέψις)
-  path: pepsis/
-  tier: concept
-  summary: 外部設計哲学を消化し HGK に統合する汎用フレームワーク (Python 完食, Rust 消化中)
-  status: active
-  phase: operational
-  etymology: Πέψις = 消化。旧 Pythōsis を汎用化。
-  proof: true
-  entry_point: null
-  usage_trigger: null
-- id: kalon
-  name: Kalon (τὸ καλόν)
-  path: .agent/projects/kalon/
-  tier: concept
-  summary: 美の体系 — FEP/圏論/CCL演算子の数学的基盤
-  status: active
-  phase: theory
-  etymology: 美 — 美しいもの
-  note: core_architecture.md に構造柱として明記。CCL と同等の深淵。
-  entry_point:
-    reference: ccl/operators.md §13 圏論的意味論マップ
-  usage_trigger: 圏論的解釈が必要な時。演算子の数学的基盤、随伴・モナド・極限。
-- id: aristos
-  name: Aristos (ἄριστος)
-  path: .agent/projects/aristos/
-  tier: concept
-  summary: 最適化数学 — L1 グラフ理論 (WF ルーティング) 実装済み
-  status: active
-  phase: implementation
-  etymology: 最善・最良 — アリストクラシーの語源
-  note: core_architecture.md に構造柱として明記
-  proof: true
-  entry_point:
-    test: PYTHONPATH=. .venv/bin/python -m pytest .agent/projects/aristos/test_router.py -v
-  usage_trigger: 最適化問題、WFルーティング、グラフ理論的分析が必要な時。
-- id: autophonos
-  name: Autophōnos (αὐτόφωνος)
-  path: .agent/projects/autophonos/
-  tier: concept
-  summary: 自律提案 — データが主体的に価値を Push する機構
+    dev: cd hgk && npm run tauri dev
+    api_uds: python -m mekhane.api.server --uds /tmp/hgk.sock
+    api_tcp: python -m mekhane.api.server --port 9696
+  usage_trigger: デスクトップアプリの開発・ビルド時。API バックエンドも必要。
+
+- id: agora
+  name: Agora
+  path: /home/makaron8426/oikos/agora
+  tier: product
+  summary: HGK 収益化プロジェクト — ディープインパクト戦略
   status: active
   phase: design
-  etymology: 自ら語る — データの擬人化
-  entry_point:
-    python: from mekhane.pks.pks_engine import PKSEngine
-  usage_trigger: 能動的知識プッシュが必要な時。PKS エンジン経由。
-- id: mcp
-  name: MCP Server
-  path: mekhane/mcp/
-  tier: engine
-  summary: Gnōsis MCP サーバー — Model Context Protocol
-  status: active
-  phase: operational
-  proof: true
-  entry_point:
-    cli: python mekhane/mcp/gnosis_mcp_server.py
-  usage_trigger: MCP 経由で Gnōsis にアクセスする時。
+  entry_point: null
+  usage_trigger: null
+
 - id: sympatheia
   name: Sympatheia (συμπάθεια)
   path: mekhane/ergasterion/n8n/
@@ -247,43 +44,203 @@ projects:
     docker: docker compose -f mekhane/ergasterion/n8n/docker-compose.yml up -d
     webhook: http://localhost:5678/webhook/{path}
   usage_trigger: n8n WF の操作・デプロイ・テスト時。Health 監視、セッション管理、自動通知。
-- id: hgk-app
-  name: Hegemonikón Desktop App
-  path: hgk/
+
+- id: synergeia
+  name: Synergeia (συνέργεια)
+  path: synergeia/
   tier: product
-  summary: 認知ハイパーバイザー GUI — Tauri v2 + Vite + TypeScript + Three.js (17 views, Rust a11y) + FastAPI backend
+  summary: マルチエージェント協調 — Jules Pool, BasanosReviewer
+  status: active
+  phase: operational
+  etymology: 共同作業・協力
+  proof: true
+  entry_point:
+    cli: python synergeia/bridge.py
+    python: from synergeia.bridge import dispatch
+  usage_trigger: 複数エージェント連携時。Jules への委任、並列実行、結果統合。
+
+# ─── Shared Modules ───────────────────────────────────────
+- id: hermeneus
+  name: Hermēneus (ἑρμηνεύς)
+  path: hermeneus/
+  tier: shared
+  summary: CCL 実行保証コンパイラ — LMQL/LangGraph による >96% 実行保証
+  status: active
+  phase: implementation
+  etymology: 翻訳者・解釈者 — ヘルメスの使者
+  proof: true
+  entry_point:
+    cli: python -m hermeneus.src compile '{CCL式}'
+    python: from hermeneus.src import compile_ccl
+    mcp: hermeneus_execute, hermeneus_compile
+  usage_trigger: CCL 式の解析・コンパイル・実行時。手動で CCL を分析するな。
+
+- id: symploke
+  name: Symploke (συμπλοκή)
+  path: mekhane/symploke/
+  tier: shared
+  summary: 編組・統合 — Boot統合, スペシャリスト, Jules Client
+  status: active
+  phase: operational
+  etymology: 編み合わせ・結合 — プラトンの概念
+  proof: true
+  entry_point:
+    cli: python mekhane/symploke/boot_integration.py --mode {mode}
+    python: from mekhane.symploke.boot_integration import get_boot_context
+  usage_trigger: /boot 実行時に自動。スペシャリスト Tier 実行時。
+
+- id: anamnesis
+  name: Anamnesis (ἀνάμνησις)
+  path: mekhane/anamnesis/
+  tier: shared
+  summary: 想起 — Gnōsis CLI, LanceDB ベクトル検索
+  status: active
+  phase: operational
+  etymology: 想起・回想 — プラトンのアナムネーシス
+  proof: true
+  entry_point:
+    cli: python mekhane/anamnesis/cli.py search '{query}'
+    python: from mekhane.anamnesis.cli import cmd_search
+  usage_trigger: 知識検索時。grep/キーワード検索ではなく、必ずベクトル検索を使え。
+
+- id: synteleia
+  name: Synteleia (συντέλεια)
+  path: mekhane/synteleia/
+  tier: shared
+  summary: 6視点認知アンサンブル — 9 agent (8 L1 + 1 L2) による多角監査
+  status: active
+  phase: operational
+  etymology: 完成・終末 — 全てを見届ける監視者
+  proof: true
+  entry_point:
+    cli: PYTHONPATH=. .venv/bin/python -c "from mekhane.synteleia import SynteleiaOrchestrator; print(SynteleiaOrchestrator().agents)"
+    python: from mekhane.synteleia import SynteleiaOrchestrator, AuditTarget, AuditTargetType
+    api: POST /api/synteleia/audit, POST /api/synteleia/audit-quick, GET /api/synteleia/agents
+  usage_trigger: /dia+ 自動発動。コード/計画/CCL出力の多角監査。REST API 経由で n8n 連携可能。
+
+- id: dendron
+  name: Dendron (δένδρον)
+  path: mekhane/dendron/
+  tier: shared
+  summary: 存在目的テンソル (EPT) — 存在誤差最小化エンジン
+  status: active
+  phase: implementation
+  etymology: 樹木 — コードの存在が根を張り枝を伸ばす
+  proof: true
+  note: core_architecture.md に構造柱として明記
+  entry_point:
+    cli: python mekhane/dendron/checker.py {target_dir}
+    python: from mekhane.dendron.checker import DendronChecker
+  usage_trigger: コード品質・存在証明の検証時。PROOF.md の有無、EPT スコア確認。
+
+- id: fep-engine
+  name: FEP Engine
+  path: mekhane/fep/
+  tier: shared
+  summary: FEP 数学エンジン — アトラクター評価・随伴構成・精度加重
   status: active
   phase: implementation
   proof: true
-  note: API (mekhane/api/) を内包。UDS (/tmp/hgk.sock) for Tauri, TCP (:9696) for n8n/dev
   entry_point:
-    dev: cd hgk && npm run tauri dev
-    api_uds: python -m mekhane.api.server --uds /tmp/hgk.sock
-    api_tcp: python -m mekhane.api.server --port 9696
-  usage_trigger: デスクトップアプリの開発・ビルド時。API バックエンドも必要。
-- id: agora
-  name: Agora
-  path: /home/makaron8426/oikos/agora
-  tier: product
-  summary: HGK 収益化プロジェクト — ディープインパクト戦略
-  status: active
-  phase: design
-  entry_point: null
-  usage_trigger: null
+    python: from mekhane.fep.attractor_advisor import AttractorAdvisor
+  usage_trigger: FEP ベースの評価・判断時。アトラクター分析、リスクタグ生成。
 
-- id: jules-daily-pipeline
-  name: "Jules Daily Pipeline"
-  path: "mekhane/symploke/"
-  tier: module
-  summary: "720 tasks/day 6垢分散スケジューラー。Specialist Reviews を日次自動実行"
-  status: "active"
-  phase: "operational"
-  entry_point: null
-  usage_trigger: null
+- id: ccl-runtime
+  name: CCL Runtime
+  path: mekhane/ccl/
+  tier: shared
+  summary: CCL パーサー・ジェネレーター・実行エンジン — 24定理の記号的操作
+  status: active
+  phase: implementation
+  proof: true
+  entry_point:
+    python: from mekhane.ccl.executor import CCLExecutor
+  usage_trigger: CCL 式の解析・生成・実行時。ccl/ (仕様) の実装ランタイム。
+
+- id: basanos
+  name: Basanos (συνέδριον)
+  path: mekhane/basanos/
+  tier: shared
+  summary: 偉人評議会 — 複数ペルソナによる多角的レビュー
+  status: active
+  phase: operational
+  etymology: 評議会・議場 — 古代ギリシャの合議体
+  proof: true
+  entry_point:
+    python: from mekhane.basanos.ai_auditor import SweepEngine
+    api: POST /api/synteleia/audit
+  usage_trigger: /dia+ 時の偉人評議会レビュー。Synteleia と連携。
+
+- id: taxis
+  name: Taxis (τάξις)
+  path: mekhane/taxis/
+  tier: shared
+  summary: タスク分類・射提案 — X-series Morphism Proposer
+  status: active
+  phase: implementation
+  etymology: 秩序・配置 — 分類の本質
+  proof: true
+  entry_point:
+    python: from mekhane.taxis.morphism_proposer import MorphismProposer
+  usage_trigger: タスク分類、射提案、WF ルーティング時。
+
+- id: poiema
+  name: Poiema (ποίημα)
+  path: mekhane/poiema/
+  tier: shared
+  summary: 生成・創造 — 出力生成エンジン
+  status: active
+  phase: implementation
+  etymology: 作品・創造物 — ポイエーシス（制作）の産物
+  proof: true
+  entry_point:
+    python: from mekhane.poiema import generate
+  usage_trigger: 構造化出力の生成時。Boot レポート、Handoff 等の定型出力。
+
+- id: exagoge
+  name: Exagōgē (ἐξαγωγή)
+  path: mekhane/exagoge/
+  tier: shared
+  summary: 抽出 — Handoff/Doxa/KI/Ideas のエクスポート機構
+  status: active
+  phase: implementation
+  etymology: 引き出し・輸出
+  proof: true
+  entry_point:
+    cli: PYTHONPATH=. .venv/bin/python -m mekhane.exagoge.cli --type all --format json
+    python: from mekhane.exagoge import HandoffExporter, DoxaExporter, KIExporter, IdeasExporter
+  usage_trigger: HGK データの外部エクスポート時。Agora 連携、バックアップ、分析。
+
+- id: ergasterion
+  name: Ergasterion (ἐργαστήριον)
+  path: mekhane/ergasterion/
+  tier: shared
+  summary: 工房 — 実験と鍛造の場
+  status: active
+  phase: implementation
+  etymology: 工房・作業場
+  proof: true
+  entry_point:
+    python: from mekhane.ergasterion.tekhne.pipeline import TekhnePipeline
+  usage_trigger: 新しい WF/Skill の鍛造時。実験的実装はここで。
+
+- id: peira
+  name: Peira (πείρα)
+  path: mekhane/peira/
+  tier: shared
+  summary: 試行 — テスト, note-collector, 検証スクリプト
+  status: active
+  phase: operational
+  etymology: 経験・試み — 知識は経験から
+  proof: true
+  entry_point:
+    cli: python mekhane/peira/hgk_health.py
+  usage_trigger: ヘルスチェック時。システム全体の健全性確認。
+
 - id: ochema
   name: Ochēma (ὄχημα)
   path: mekhane/ochema/
-  tier: engine
+  tier: shared
   summary: LLM ルーター — Antigravity LS 非公式 Python クライアント + Cortex API
   status: active
   phase: operational
@@ -294,60 +251,47 @@ projects:
     python: from mekhane.ochema.cortex_client import CortexClient
     mcp: ochema_ask, ochema_ask_cortex
   usage_trigger: LLM 呼び出し時。LS 経由 or Cortex 直接。
-- id: taxis
-  name: Taxis (τάξις)
-  path: mekhane/taxis/
-  tier: module
-  summary: タスク分類・射提案 — X-series Morphism Proposer
-  status: active
-  phase: implementation
-  etymology: 秩序・配置 — 分類の本質
-  proof: true
-  entry_point:
-    python: from mekhane.taxis.morphism_proposer import MorphismProposer
-  usage_trigger: タスク分類、射提案、WF ルーティング時。
-- id: basanos
-  name: Basanos (συνέδριον)
-  path: mekhane/basanos/
-  tier: module
-  summary: 偉人評議会 — 複数ペルソナによる多角的レビュー
+
+- id: mcp
+  name: MCP Server
+  path: mekhane/mcp/
+  tier: shared
+  summary: Gnōsis MCP サーバー — Model Context Protocol
   status: active
   phase: operational
-  etymology: 評議会・議場 — 古代ギリシャの合議体
   proof: true
   entry_point:
-    python: from mekhane.basanos.ai_auditor import SweepEngine
-    api: POST /api/synteleia/audit
-  usage_trigger: /dia+ 時の偉人評議会レビュー。Synteleia と連携。
-- id: fep-engine
-  name: FEP Engine
-  path: mekhane/fep/
-  tier: engine
-  summary: FEP 数学エンジン — アトラクター評価・随伴構成・精度加重
+    cli: python mekhane/mcp/gnosis_mcp_server.py
+  usage_trigger: MCP 経由で Gnōsis にアクセスする時。
+
+- id: pks
+  name: PKS (Proactive Knowledge System)
+  path: mekhane/pks/
+  tier: shared
+  summary: 能動的知識プッシュ — データが主体的に価値を Push する機構 (旧 Autophōnos 統合)
   status: active
-  phase: implementation
-  etymology: null
+  phase: design
   proof: true
   entry_point:
-    python: from mekhane.fep.attractor_advisor import AttractorAdvisor
-  usage_trigger: FEP ベースの評価・判断時。アトラクター分析、リスクタグ生成。
-- id: ccl-runtime
-  name: CCL Runtime
-  path: mekhane/ccl/
-  tier: engine
-  summary: CCL パーサー・ジェネレーター・実行エンジン — 24定理の記号的操作
-  status: active
-  phase: implementation
-  proof: true
-  entry_point:
-    python: from mekhane.ccl.executor import CCLExecutor
-  usage_trigger: CCL 式の解析・生成・実行時。ccl/ (仕様) の実装ランタイム。
+    python: from mekhane.pks.pks_engine import PKSEngine
+  usage_trigger: 能動的知識プッシュが必要な時。PKS エンジン経由。
+
 - id: periskope
-  name: "Periskopē"
-  path: "mekhane/periskope"
-  tier: engine
-  summary: "HGK Deep Research Engine — multi-source parallel search + multi-model synthesis + TAINT verification"
-  status: "active"
-  phase: "design"
+  name: Periskopē
+  path: mekhane/periskope
+  tier: shared
+  summary: HGK Deep Research Engine — multi-source parallel search + multi-model synthesis + TAINT verification
+  status: active
+  phase: design
+  entry_point: null
+  usage_trigger: null
+
+- id: jules-daily-pipeline
+  name: Jules Daily Pipeline
+  path: mekhane/symploke/
+  tier: shared
+  summary: 720 tasks/day 6垢分散スケジューラー。Specialist Reviews を日次自動実行
+  status: active
+  phase: operational
   entry_point: null
   usage_trigger: null

@@ -311,6 +311,52 @@ class DocStalenessChecker:
 
         return "\n".join(lines)
 
+    # PURPOSE: 依存関係を Mermaid グラフ形式で出力する (F6)
+    def generate_mermaid(self) -> str:
+        """Mermaid 形式の依存グラフを生成."""
+        if not self._docs:
+            return "graph TD\n    Target[チェック対象なし]"
+
+        lines = ["graph TD"]
+        # ノード定義とエッジ
+        # バージョン情報を含める: DocID<br/>(v1.0.0)
+        for doc in self._docs.values():
+            safe_id = doc.doc_id.replace("-", "_")  # Mermaid ID safety
+            lines.append(f'    {safe_id}["{doc.doc_id}<br/>(v{doc.version})"]')
+            for dep in doc.depends_on:
+                dep_safe_id = dep.doc_id.replace("-", "_")
+                # リンクにもラベル (min_version) をつけると情報過多かも？ 一旦なしで。
+                lines.append(f"    {safe_id} --> {dep_safe_id}")
+
+        # スタイリング (STALE=Red, WARNING=Gold, CIRCULAR=Purple)
+        # 判定結果に基づいてノードを色分けする
+        stale_ids = {
+            r.doc_id.replace("-", "_") for r in self._results
+            if r.status == StalenessStatus.STALE
+        }
+        warning_ids = {
+            r.doc_id.replace("-", "_") for r in self._results
+            if r.status == StalenessStatus.WARNING
+        }
+        circular_ids = {
+            r.doc_id.replace("-", "_") for r in self._results
+            if r.status == StalenessStatus.CIRCULAR
+        }
+
+        # 赤 (STALE)
+        for nid in stale_ids:
+            lines.append(f"    style {nid} stroke:red,stroke-width:3px")
+
+        # 黄 (WARNING) - STALE 優先
+        for nid in warning_ids - stale_ids:
+            lines.append(f"    style {nid} stroke:gold,stroke-width:3px")
+
+        # 紫 (CIRCULAR)
+        for nid in circular_ids:
+            lines.append(f"    style {nid} stroke:purple,stroke-width:3px,stroke-dasharray: 5 5")
+
+        return "\n".join(lines)
+
 
 # ── CLI ──────────────────────────────────────────────
 
@@ -325,9 +371,12 @@ def main() -> None:
         "--root", type=str, default=None,
         help="Project root (default: auto-detect)",
     )
+    parser.add_argument(
+        "--graph", action="store_true", help="Output Mermaid graph",
+    )
     args = parser.parse_args()
 
-    if not args.check:
+    if not args.check and not args.graph:
         parser.print_help()
         return
 
@@ -335,6 +384,11 @@ def main() -> None:
     checker = DocStalenessChecker()
     checker.scan(root)
     results = checker.check()
+
+    if args.graph:
+        print(checker.generate_mermaid())
+        return
+
     print(checker.format_report())
 
     stale_count = sum(1 for r in results if r.status == StalenessStatus.STALE)

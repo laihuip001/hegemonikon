@@ -11,10 +11,10 @@ extends:
   - L0.FEP
   - L1.Flow
   - L1.Value
-  generation: L1 × L1
+  generation: "L1 × L1"
 depends_on:
-- doc_id: AXIOM_HIERARCHY
-  min_version: 7.0.0
+  - doc_id: "AXIOM_HIERARCHY"
+    min_version: "7.0.0"
 ---
 
 > **Kernel Doc Index**: [axiom_hierarchy](axiom_hierarchy.md) | [ousia](ousia.md) ← 📍 | [schema](schema.md)

@@ -5,6 +5,11 @@ triggers:
   - "periskope"
   - "periskopē"
 
+version: "1.0.0"
+depends_on:
+- doc_id: AXIOM_HIERARCHY
+  min_version: 7.0.0
+
 risk_tier: "L2"
 risks:
   - "外部検索 API (SearXNG, Exa) への過剰リクエスト"

@@ -290,3 +290,57 @@ class TestFormatReport:
         checker.check()
         report = checker.format_report()
         assert "doc_id 重複" in report
+
+
+# ─── Threshold Tests ═══════════════════════════
+
+
+# PURPOSE: 日付閾値 (30日) の境界条件テスト (F3 対応)
+class TestStalenessThreshold:
+    """STALE_DAYS_THRESHOLD (30日) の境界テスト."""
+
+    # PURPOSE: ちょうど30日差なら WARNING は出ない (境界値: OK)
+    def test_threshold_exactly_30_days_no_warning(self, create_md, tmp_path) -> None:
+        create_md("upstream.md", "UPSTREAM", "1.0.0", updated="2026-01-01")
+        create_md("downstream.md", "DOWNSTREAM", "1.0.0",
+                  updated="2026-01-31",  # 差: 30日
+                  depends_on=[{"doc_id": "UPSTREAM", "min_version": "1.0.0"}])
+
+        checker = DocStalenessChecker()
+        checker.scan(tmp_path)
+        results = checker.check()
+
+        # OK であるべき (WARNING ではない)
+        ok = [r for r in results if r.status == StalenessStatus.OK]
+        assert len(ok) == 1
+        assert ok[0].doc_id == "DOWNSTREAM"
+
+    # PURPOSE: 31日差なら WARNING が出る (境界値: OUT)
+    def test_threshold_31_days_warning(self, create_md, tmp_path) -> None:
+        create_md("upstream.md", "UPSTREAM", "1.0.0", updated="2026-01-01")
+        create_md("downstream.md", "DOWNSTREAM", "1.0.0",
+                  updated="2026-02-01",  # 差: 31日
+                  depends_on=[{"doc_id": "UPSTREAM", "min_version": "1.0.0"}])
+
+        checker = DocStalenessChecker()
+        checker.scan(tmp_path)
+        results = checker.check()
+
+        # WARNING であるべき
+        warnings = [r for r in results if r.status == StalenessStatus.WARNING]
+        assert len(warnings) == 1
+        assert "日付差 31日" in warnings[0].detail
+
+    # PURPOSE: 19日差 (naming_conventions の現状) はセーフ
+    def test_threshold_19_days_safe(self, create_md, tmp_path) -> None:
+        create_md("upstream.md", "UPSTREAM", "7.0.0", updated="2026-02-15")
+        create_md("downstream.md", "DOWNSTREAM", "1.1.0",
+                  updated="2026-01-27",  # 差: 19日 (逆転していても絶対値比較)
+                  depends_on=[{"doc_id": "UPSTREAM", "min_version": "7.0.0"}])
+
+        checker = DocStalenessChecker()
+        checker.scan(tmp_path)
+        results = checker.check()
+
+        ok = [r for r in results if r.status == StalenessStatus.OK]
+        assert len(ok) == 1

@@ -20,6 +20,9 @@ triggers:
   - "series"
 
 version: "2.0.0"
+depends_on:
+- doc_id: AXIOM_HIERARCHY
+  min_version: 7.0.0
 lineage: |
   v1.1 (手順のみ) → /sop deep 15論点50論文調査 (2026-02-10) → /noe+ 3命題抽出 → v2.0
 

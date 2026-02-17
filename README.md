@@ -130,7 +130,7 @@ hegemonikon/
 │   ├── pks/             # PKS (知識プッシュ)
 │   ├── symploke/        # Boot 統合 (15軸)
 │   ├── basanos/       # 偉人評議会 (多角的レビュー)
-│   ├── synteleia/       # 6視点認知アンサンブル
+│   ├── synteleia/       # 8エージェント品質監査 (WBC + /dia 連携)
 │   └── taxis/           # 分類・射の提案
 ├── hgk/         # Tauri v2 デスクトップアプリ
 │   ├── src/             # TypeScript (main, graph3d, command_palette)

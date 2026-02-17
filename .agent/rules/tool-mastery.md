@@ -67,6 +67,7 @@ LLM は確率的生成モデルである。ツールのパラメータを「知�
 | **CRLF改行破壊** | Windows改行が `replace` の TargetContent 不一致を起こす | `file <path>` で確認 → `dos2unix` |
 | **冒頭行不一致** | BOM や不可視文字が1行目に潜む | `view_file` L1 で正確に確認、コピペで TargetContent 作成 |
 | **browser new_page 拒否** | Playwright が新規タブ作成に失敗 | サブエージェントが自律的に既存ページを置換する（確認済み） |
+| **ゴーストターミナル** | node-pty の EOF 検出不備。コマンドは完了しているが IDE 上で "Running…" のまま残る。SIGINT 送信後も "still running" になる | ターミナルの × ボタンで閉じてよい。実際には完了済み。`Developer: Reload Window` で全ゴーストを一掃可能 |
 
 ---
 

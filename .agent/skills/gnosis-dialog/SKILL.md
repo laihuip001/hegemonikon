@@ -7,6 +7,10 @@ triggers:
   - "Gnōsis"
   - "研究"
 hegemonikon: T5 Peira + T8 Anamnēsis
+version: "1.0.0"
+depends_on:
+- doc_id: AXIOM_HIERARCHY
+  min_version: 7.0.0
 # Safety Contract (v1.0 — /eat 消化洞察 2026-02-07)
 risk_tier: L1
 reversible: true

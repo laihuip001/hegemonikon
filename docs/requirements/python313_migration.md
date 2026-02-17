@@ -75,3 +75,34 @@ pyenv global 3.11.2
 python3.11 -m venv .venv
 pip install -r requirements.txt
 ```
+
+## 移行後の必須ステップ（教訓）
+
+> **起源**: 2026-02-17 GCP 環境で `git commit` がハング。Python 3.13 venv の
+> pre-commit キャッシュが古い Python 3.11 を参照していたことが原因。
+
+### pre-commit キャッシュ再構築（移行後に必ず実行）
+
+```bash
+cd ~/oikos/hegemonikon
+
+# 1. 古いキャッシュを完全削除
+rm -rf ~/.cache/pre-commit
+
+# 2. pre-commit を新しい venv に再インストール
+.venv/bin/pip install --force-reinstall pre-commit
+
+# 3. フック環境をクリーンアップ＋再インストール
+.venv/bin/pre-commit clean
+.venv/bin/pre-commit install
+
+# 4. 動作確認
+.venv/bin/pre-commit run --all-files
+```
+
+### 防御的 `.bashrc` 設定
+
+```bash
+# 対話プロンプト待ちによるハングを防止
+export GIT_TERMINAL_PROMPT=0
+```

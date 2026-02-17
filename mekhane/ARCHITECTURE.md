@@ -112,7 +112,6 @@ graph TD
 ├─────────────────────────────────────────────────────┤
 │  Layer 1: オーケストレーション                         │
 │    symploke/ — 統合・/boot シーケンス                  │
-│    orchestration/ — WF 管理 (thin)                    │
 ├─────────────────────────────────────────────────────┤
 │  Layer 2: 認知能力                                    │
 │    fep/     — 自由エネルギー原理 (pymdp)              │
@@ -128,7 +127,7 @@ graph TD
 │    dendron/   — 存在証明チェッカー                     │
 │    peira/     — ヘルスチェック・監視                   │
 │    poiema/    — 構造化出力生成                         │
-│    synteleia/ — 統合テスト・品質ゲート                 │
+│    synteleia/ — 8エージェント品質監査 (WBC + /dia 連携) │
 │    exagoge/   — エクスポート (Handoff/Doxa/KI)        │
 │    periskope/ — Deep Research Engine                  │
 ├─────────────────────────────────────────────────────┤
@@ -179,9 +178,9 @@ graph TD
 
 | 指標 | 値 |
 |:-----|:---|
-| サブディレクトリ数 | 23 (+ _archived, tests) |
-| Python ファイル数 | ~400 |
-| `__init__.py` あり | 15/26 (パッケージ化されたもの) |
+| サブディレクトリ数 | 25 (+ _archived, tests, tests_root) |
+| Python ファイル数 | ~710 |
+| `__init__.py` あり | 54 |
 | Dendron PROOF カバレッジ | **100.0%** |
 | 射 (import 関係) の数 | 10+ 個のクロスモジュール依存 |
 | Terminal Object | anamnesis (被依存 9) |

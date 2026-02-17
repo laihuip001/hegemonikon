@@ -8,6 +8,10 @@ description: Hegemonikón 公理体系 v3.5 — 103要素認知フレームワ�
 > **「管理などどうでもいい、美しさと正しさを損ねてはならない」**
 
 ---
+depends_on:
+- doc_id: AXIOM_HIERARCHY
+  min_version: 7.0.0
+---
 
 ## 0. 体系概要
 

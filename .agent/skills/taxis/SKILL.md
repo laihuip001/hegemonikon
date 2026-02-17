@@ -11,6 +11,11 @@ triggers:
   - "整理"
   - "morphism"
 
+version: "1.2.0"
+depends_on:
+- doc_id: AXIOM_HIERARCHY
+  min_version: 7.0.0
+
 risk_tier: "L1"
 risks:
   - "分類ミスによる優先順位の歪み"

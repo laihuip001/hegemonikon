@@ -13,6 +13,11 @@ triggers:
   - "監査"
   - "audit"
 
+version: "2.0.0"
+depends_on:
+- doc_id: AXIOM_HIERARCHY
+  min_version: 7.0.0
+
 risk_tier: "L1"
 risks:
   - "WBC 偽陽性によるアラート疲れ"

@@ -1,3 +1,6 @@
+# PROOF: [L2/Mekhane] <- mekhane/periskope/PROOF.md
+# PURPOSE: Periskopē package initialization.
+
 """
 Periskopē — HGK Deep Research Engine
 

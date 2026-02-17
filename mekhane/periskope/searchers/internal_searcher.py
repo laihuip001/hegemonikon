@@ -1,3 +1,6 @@
+# PROOF: [L2/Mekhane] <- mekhane/periskope/PROOF.md
+# PURPOSE: Internal knowledge searcher implementation.
+
 """
 Internal knowledge searcher for Periskopē.
 

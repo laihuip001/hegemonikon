@@ -1,3 +1,5 @@
+# PROOF: [L2/Mekhanē] <- mekhane/periskope/ A0→Search→Search Results→Data Models
+# PURPOSE: Periskopē 検索・統合パイプラインのデータモデル定義
 """
 Periskopē data models.
 

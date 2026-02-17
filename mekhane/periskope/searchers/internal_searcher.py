@@ -1,3 +1,5 @@
+# PROOF: [L2/Mekhanē] <- mekhane/periskope/searchers/ A0→Search→Searchers→Internal
+# PURPOSE: 内部知識ベース (Gnōsis, Sophia, Kairos) 用サーチャークラス群
 """
 Internal knowledge searcher for Periskopē.
 

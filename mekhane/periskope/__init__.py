@@ -1,3 +1,5 @@
+# PROOF: [L2/Mekhanē] <- mekhane/periskope/ A0→Search→Search Results→Deep Research Engine
+# PURPOSE: Periskopē パッケージ定義 (Deep Research Engine)
 """
 Periskopē — HGK Deep Research Engine
 

@@ -1,3 +1,5 @@
+# PROOF: [L2/Mekhanē] <- mekhane/periskope/tests/ A0→Search→Searchers→SearXNG Test
+# PURPOSE: SearXNGSearcher のユニットテスト
 """
 Tests for SearXNG searcher.
 """

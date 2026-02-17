@@ -1,3 +1,5 @@
+# PROOF: [L2/Mekhanē] <- mekhane/periskope/searchers/ A0→Search→Searchers→Adapter Interface
+# PURPOSE: Periskopē 検索アダプタ (SearXNG, Exa, Internal) のエクスポート
 """
 Periskopē searchers — pluggable search source adapters.
 

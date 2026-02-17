@@ -1,3 +1,5 @@
+# PROOF: [L2/Mekhanē] <- mekhane/periskope/searchers/ A0→Search→Searchers→SearXNG
+# PURPOSE: SearXNG (Meta-Search) クライアント実装
 """
 SearXNG search client for Periskopē.
 

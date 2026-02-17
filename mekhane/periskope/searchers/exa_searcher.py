@@ -1,3 +1,5 @@
+# PROOF: [L2/Mekhanē] <- mekhane/periskope/searchers/ A0→Search→Searchers→Exa
+# PURPOSE: Exa (Neural Search) クライアント実装
 """
 Exa search client for Periskopē.
 

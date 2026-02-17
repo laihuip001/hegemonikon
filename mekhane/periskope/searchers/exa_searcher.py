@@ -1,3 +1,6 @@
+# PROOF: [S2/Exa] <- mekhane/periskope/PROOF.md S2 target
+# PURPOSE: Exa search client for semantic search.
+
 """
 Exa search client for Periskopē.
 

@@ -1,3 +1,6 @@
+# PROOF: [S1/Periskope] <- mekhane/periskope/PROOF.md S1 target
+# PURPOSE: Periskopē - HGK Deep Research Engine.
+
 """
 Periskopē — HGK Deep Research Engine
 

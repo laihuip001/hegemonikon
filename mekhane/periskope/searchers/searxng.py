@@ -1,3 +1,6 @@
+# PROOF: [S1/SearXNG] <- mekhane/periskope/PROOF.md S1 target
+# PURPOSE: SearXNG search client for Periskopē.
+
 """
 SearXNG search client for Periskopē.
 

@@ -1,3 +1,6 @@
+# PROOF: [S2/Internal] <- mekhane/periskope/PROOF.md S2 target
+# PURPOSE: Internal knowledge searcher (Gnōsis, Sophia, Kairos).
+
 """
 Internal knowledge searcher for Periskopē.
 

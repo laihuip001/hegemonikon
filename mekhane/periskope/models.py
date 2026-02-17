@@ -1,14 +1,3 @@
-# PROOF: [L2/Mekhanē] <- mekhane/periskope/
-"""
-PROOF: [L2/Mekhanē] This file must exist.
-
-P3 → Need for external research capabilities.
-   → Data models for Periskopē search and synthesis.
-   → models.py defines these structures.
-
-Q.E.D.
-"""
-
 """
 Periskopē data models.
 

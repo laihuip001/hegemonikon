@@ -1,14 +1,3 @@
-# PROOF: [L2/Mekhanē] <- mekhane/periskope/searchers/
-"""
-PROOF: [L2/Mekhanē] This file must exist.
-
-P3 → Need for external research capabilities.
-   → Internal searchers (Gnosis, Sophia, Kairos) implementation.
-   → internal_searcher.py implements these searchers.
-
-Q.E.D.
-"""
-
 """
 Internal knowledge searcher for Periskopē.
 

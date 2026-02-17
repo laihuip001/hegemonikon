@@ -2,7 +2,8 @@
 doc_id: "AXIOM_HIERARCHY_V3"
 version: "3.0.0-experimental"
 tier: "KERNEL"
-status: "EXPERIMENTAL"
+status: "SUPERSEDED"
+superseded_by: "AXIOM_HIERARCHY"
 created: "2026-02-07"
 based_on: "axiom_hierarchy v2.1 (v5.0.0)"
 context: |
@@ -19,6 +20,8 @@ related_proofs: |
   - 二項対立の必然性: .agent/projects/kalon/docs/binary_opposition_necessity.md (解決済み)
   - 定理ペア選択: v2.1 時点で確定済み。v3.0 は名称変更のみで構造は同一。
 ---
+
+> ⚠️ このドキュメントは正本 [axiom_hierarchy.md](axiom_hierarchy.md) (v7.0.0) に吸収済み。参照のみ。
 
 # 📐 公理階層構造 v3.0 (1公理 + 6座標)
 

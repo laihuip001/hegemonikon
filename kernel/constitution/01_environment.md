@@ -80,7 +80,7 @@ enforcement_level: L1
 
 - Assume host has only Docker and Git
 - Generate `Dockerfile` + `docker-compose.yml` instead of install steps
-- Use specific version tags (`python:3.11-slim`), never `latest`
+- Use specific version tags (`python:3.13-slim`), never `latest`
 
 **Deliverables:**
 

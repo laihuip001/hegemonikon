@@ -773,6 +773,34 @@ def load_ideas(mode: str, context: Optional[str] = None, **kw) -> dict:
 
 
 # ─────────────────────────────────────────────────────────────────────
+# 軸 Q: Doc Health (ドキュメント腐敗検知)
+# ─────────────────────────────────────────────────────────────────────
+
+# PURPOSE: ドキュメント依存グラフの staleness 検査結果を boot に表示する
+def load_doc_health(mode: str, context: Optional[str] = None, **kw) -> dict:
+    """Doc Health 軸: ドキュメント腐敗 (staleness) 検知."""
+    result: dict = {"stale": 0, "total": 0, "pct": 100.0, "formatted": ""}
+    print(" [17/17] 📄 Checking Doc Staleness...", file=sys.stderr, end="", flush=True)
+    try:
+        from mekhane.dendron.doc_staleness import DocStalenessChecker
+        checker = DocStalenessChecker()
+        checker.scan(Path(__file__).parent.parent.parent)
+        check_results = checker.check()
+        stale = sum(1 for r in check_results if r.status == "STALE")
+        pct = checker.doc_health_pct()
+        result = {
+            "stale": stale,
+            "total": len(check_results),
+            "pct": pct,
+            "formatted": checker.format_report(),
+        }
+        print(f" Done ({pct:.0f}% healthy).", file=sys.stderr)
+    except Exception as e:
+        print(f" Failed ({e}).", file=sys.stderr)
+    return result
+
+
+# ─────────────────────────────────────────────────────────────────────
 # Axis Registry — 統合フォーマット用の順序定義
 # ─────────────────────────────────────────────────────────────────────
 
@@ -784,14 +812,15 @@ AXIS_REGISTRY: list[tuple[str, Any, int]] = [
     ("pks",             load_pks,             4),
     ("safety",          load_safety,          5),
     ("ept",             load_ept,             6),
-    ("digestor",        load_digestor,        7),
-    ("attractor",       load_attractor,       8),
-    ("projects",        load_projects,        9),
-    ("skills",          load_skills,          10),
-    ("doxa",            load_doxa,            11),
-    ("feedback",        load_feedback,        12),
-    ("proactive_push",  load_proactive_push,  13),
-    ("violations",      load_violations,      14),
-    ("gnosis_advice",   load_gnosis_advice,   15),
-    ("ideas",           load_ideas,            16),
+    ("doc_health",      load_doc_health,      7),   # EPT の直後
+    ("digestor",        load_digestor,        8),
+    ("attractor",       load_attractor,       9),
+    ("projects",        load_projects,        10),
+    ("skills",          load_skills,          11),
+    ("doxa",            load_doxa,            12),
+    ("feedback",        load_feedback,        13),
+    ("proactive_push",  load_proactive_push,  14),
+    ("violations",      load_violations,      15),
+    ("gnosis_advice",   load_gnosis_advice,   16),
+    ("ideas",           load_ideas,           17),
 ]

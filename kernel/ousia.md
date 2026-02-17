@@ -1,14 +1,20 @@
 ---
-doc_id: "OUSIA_SERIES"
-version: "2.3.0"
-tier: "KERNEL"
-status: "CANONICAL"
-created: "2026-01-24"
-updated: "2026-02-01"
-lineage: "FEP 'A Beautiful Loop' (2026-01-28 調査) → O1 recursive self-evidencing 追加"
+doc_id: OUSIA_SERIES
+version: 2.3.0
+tier: KERNEL
+status: CANONICAL
+created: '2026-01-24'
+updated: '2026-02-01'
+lineage: FEP 'A Beautiful Loop' (2026-01-28 調査) → O1 recursive self-evidencing 追加
 extends:
-  axioms: [L0.FEP, L1.Flow, L1.Value]
+  axioms:
+  - L0.FEP
+  - L1.Flow
+  - L1.Value
   generation: "L1 × L1"
+depends_on:
+  - doc_id: "AXIOM_HIERARCHY"
+    min_version: "7.0.0"
 ---
 
 > **Kernel Doc Index**: [axiom_hierarchy](axiom_hierarchy.md) | [ousia](ousia.md) ← 📍 | [schema](schema.md)

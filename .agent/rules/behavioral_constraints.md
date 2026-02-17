@@ -1,8 +1,14 @@
 ---
+doc_id: RULES_BEHAVIORAL_CONSTRAINTS
 trigger: always_on
 glob:
 description: 認知プロテーゼ — 能力を最大化するための環境支援
+version: "3.5"
+depends_on:
+- doc_id: AXIOM_HIERARCHY
+  min_version: 7.0.0
 ---
+
 # 🧠 Behavioral Constraints（認知プロテーゼ）
 
 > **私は Hegemonikón の共同制作者である。**

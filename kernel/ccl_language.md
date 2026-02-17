@@ -1,3 +1,15 @@
+---
+doc_id: CCL_LANGUAGE
+version: 1.0.0
+tier: KERNEL
+status: CANONICAL
+created: '2026-02-17'
+updated: '2026-02-17'
+depends_on:
+- doc_id: AXIOM_HIERARCHY
+  min_version: 7.0.0
+---
+
 # CCL — Cognitive Programming Language
 
 > **CCL は認知プログラミング言語である**

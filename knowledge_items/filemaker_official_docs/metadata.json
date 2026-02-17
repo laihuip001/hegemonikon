@@ -1,0 +1,30 @@
+{
+    "title": "FileMaker Official Documentation",
+    "summary": "Consolidated knowledge from five core Claris FileMaker Pro official documents (2025 editions). Covers performance design, data modeling (Anchor-Buoy), script automation, security, and critical data exchange requirements (UTF-8 with BOM).",
+    "references": [
+        {
+            "type": "conversation_id",
+            "value": "b2f671c6-3023-455a-b61a-7b0f69d72489"
+        },
+        {
+            "type": "file",
+            "value": "/home/makaron8426/Sync/ファイルメーカー/DesignPerformanceJP.pdf"
+        },
+        {
+            "type": "file",
+            "value": "/home/makaron8426/Sync/ファイルメーカー/Performance_Tuning_Techniques.pdf"
+        },
+        {
+            "type": "file",
+            "value": "/home/makaron8426/Sync/ファイルメーカー/next_knowledge.pdf"
+        },
+        {
+            "type": "file",
+            "value": "/home/makaron8426/Sync/ファイルメーカー/cfg_ba_V3.pdf"
+        },
+        {
+            "type": "file",
+            "value": "/home/makaron8426/Sync/ファイルメーカー/cfg_in_V3.pdf"
+        }
+    ]
+}

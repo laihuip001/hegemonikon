@@ -1,6 +1,15 @@
+---
+doc_id: "MEKHANE_ARCH"
+version: "1.0.0"
+updated: "2026-02-17"
+depends_on:
+  - doc_id: "ARCHITECTURE"
+    min_version: "1.0.0"
+---
+
 # mekhane/ Architecture — 圏としての実装層
 
-> **最終更新**: 2026-02-10
+> **最終更新**: 2026-02-17
 > **導出**: O1 Noēsis + /m 熟読 + Dendron 100% 検証に基づく
 
 ---
@@ -103,7 +112,6 @@ graph TD
 ├─────────────────────────────────────────────────────┤
 │  Layer 1: オーケストレーション                         │
 │    symploke/ — 統合・/boot シーケンス                  │
-│    orchestration/ — WF 管理 (thin)                    │
 ├─────────────────────────────────────────────────────┤
 │  Layer 2: 認知能力                                    │
 │    fep/     — 自由エネルギー原理 (pymdp)              │
@@ -111,13 +119,17 @@ graph TD
 │    ccl/     — CCL パーサー/ジェネレーター              │
 │    taxis/   — 分類・優先度・スケジューリング           │
 │    basanos/ — 多角的レビュー                        │
+│    ochema/  — LLM ルーター (Cortex API)               │
 ├─────────────────────────────────────────────────────┤
 │  Layer 3: 基盤サービス                                │
 │    anamnesis/ — 記憶・ベクトル検索 (LanceDB)          │
+│    sophia/    — 知識アイテム管理・検索                 │
 │    dendron/   — 存在証明チェッカー                     │
 │    peira/     — ヘルスチェック・監視                   │
 │    poiema/    — 構造化出力生成                         │
-│    synteleia/ — 統合テスト・品質ゲート                 │
+│    synteleia/ — 8エージェント品質監査 (WBC + /dia 連携) │
+│    exagoge/   — エクスポート (Handoff/Doxa/KI)        │
+│    periskope/ — Deep Research Engine                  │
 ├─────────────────────────────────────────────────────┤
 │  Layer 4: ツール                                      │
 │    ergasterion/ — 開発ワークショップ                   │
@@ -166,9 +178,9 @@ graph TD
 
 | 指標 | 値 |
 |:-----|:---|
-| サブディレクトリ数 | 26 |
-| Python ファイル数 | ~400 |
-| `__init__.py` あり | 15/26 (パッケージ化されたもの) |
+| サブディレクトリ数 | 25 (+ _archived, tests, tests_root) |
+| Python ファイル数 | ~710 |
+| `__init__.py` あり | 54 |
 | Dendron PROOF カバレッジ | **100.0%** |
 | 射 (import 関係) の数 | 10+ 個のクロスモジュール依存 |
 | Terminal Object | anamnesis (被依存 9) |

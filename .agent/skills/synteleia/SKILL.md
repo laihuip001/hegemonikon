@@ -13,10 +13,18 @@ triggers:
   - "監査"
   - "audit"
 
+version: "2.0.0"
+depends_on:
+- doc_id: AXIOM_HIERARCHY
+  min_version: 7.0.0
+
 risk_tier: "L1"
 risks:
   - "WBC 偽陽性によるアラート疲れ"
   - "偽陰性による脅威の見逃し"
+reversible: true
+requires_approval: false
+fallbacks: ["手動安全チェックリストを使用"]
 ---
 
 # Synteleia WBC (白血球)

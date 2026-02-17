@@ -1,0 +1,10 @@
+{
+    "title": "Project Aristos: Optimization Mathematics",
+    "summary": "Project Aristos is the optimization engine of Hegemonikón, integrating advanced mathematical fields like Graph Theory and Genetic Algorithms to maximize the efficiency of CCL workflows. It serves as the link between the high-level definitions of 'Beauty' (Arche) and the low-level execution runtime (Hermēneus).",
+    "references": [
+        {
+            "type": "conversation_id",
+            "value": "81e3d6d7-15cc-4b68-a785-caa923392814"
+        }
+    ]
+}

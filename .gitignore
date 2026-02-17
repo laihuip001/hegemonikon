@@ -91,3 +91,17 @@ oauth.json
 
 # LS reverse-engineering notes (contains OAuth token patterns)
 mekhane/ochema/docs/ls-standalone-reference.md
+
+# Windows
+desktop.ini
+Thumbs.db
+
+# IDE backup
+*.bak
+.claude.json.backup.*
+
+# FEP learning data (runtime generated)
+data/fep/*.npy
+
+# Context generator state
+.context_generator_state.json

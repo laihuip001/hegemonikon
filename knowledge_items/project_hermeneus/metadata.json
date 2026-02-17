@@ -1,0 +1,30 @@
+{
+    "title": "Project Hermēneus: CCL Execution Runtime",
+    "summary": "Documentation for Project Hermēneus, the execution engine of the Hegemonikón system. It covers the translation of Cognitive Algebra (CCL) into deterministic LMQL/LangGraph workflows and the core principle of 'Context Density over API Cost'.",
+    "references": [
+        {
+            "type": "file",
+            "value": "/home/makaron8426/oikos/hegemonikon/hermeneus/src/runtime.py"
+        },
+        {
+            "type": "conversation_id",
+            "value": "e7319a38-f13b-4e88-a338-6b91ddb4a02a"
+        },
+        {
+            "type": "conversation_id",
+            "value": "411d05b2-84eb-4849-8a23-763ff5d94dbe"
+        },
+        {
+            "type": "file",
+            "value": "/home/makaron8426/.gemini/antigravity/knowledge/synergeia_distributed_execution"
+        },
+        {
+            "type": "conversation_id",
+            "value": "bot-3c246c77-4fa9-4aaa-93ad-6bd90556fa6d"
+        },
+        {
+            "type": "conversation_id",
+            "value": "66808cd3-ad44-4534-9185-09ed06711122"
+        }
+    ]
+}

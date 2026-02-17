@@ -1,0 +1,34 @@
+{
+    "title": "Hegemonikón Platform Portability and Setup",
+    "summary": "Documentation for the setup and migration of the Hegemonikón environment across platforms (GCP, Debian, Windows). Details the 'Zero Design' architecture, 'Mnēme' portability, and the 'Oikos Mesh' (Syncthing over Tailscale). Establishes the 'Local-Remote Hybrid Strategy' (Local-Modern / RDP-Stable) using GNOME locally and Xfce remotely. Includes RDP Xfce optimization, clipboard troubleshooting, and Syncthing-based image transfer workarounds. As of 2026-02-07, it includes verified recovery rituals for 'Zombie Sync' (Windows profile leakage) and compatible CLI commands for Syncthing v1.29+.",
+    "references": [
+        {
+            "type": "conversation_id",
+            "value": "788bb3d5-2d01-4d3a-a870-9d190636cb92"
+        },
+        {
+            "type": "conversation_id",
+            "value": "fafb1f1b-8826-4beb-9ed9-e617a0f8ac19"
+        },
+        {
+            "type": "conversation_id",
+            "value": "f7bf082b-0c48-4859-9df7-04e3a0339d98"
+        },
+        {
+            "type": "conversation_id",
+            "value": "bot-beb3b73a-8c9b-4943-a2ec-abc862a70fbf"
+        },
+        {
+            "type": "conversation_id",
+            "value": "bot-6c7545e7-c74d-4b61-b59c-be80da22856d"
+        },
+        {
+            "type": "conversation_id",
+            "value": "bot-febe3775-6893-470a-8bf8-091a18cbf5e2"
+        },
+        {
+            "type": "conversation_id",
+            "value": "80955345-059b-416a-a955-566b6a66b3f9"
+        }
+    ]
+}

@@ -52,23 +52,6 @@ const MOCK_QUOTA = {
     error: null,
 };
 
-const MOCK_GRAPH_FULL = {
-    nodes: [
-        { id: 'T1', series: 'O', name: 'Theorem 1', greek: 'Alpha', meaning: 'Beginning', workflow: 'noe', type: 'Pure', color: '#00d4ff', position: { x: 0, y: 0, z: 0 } },
-        { id: 'T2', series: 'S', name: 'Theorem 2', greek: 'Beta', meaning: 'Flow', workflow: 'dia', type: 'Applied', color: '#10b981', position: { x: 10, y: 10, z: 10 } }
-    ],
-    edges: [
-        { id: 'E1', pair: 'T1-T2', source: 'T1', target: 'T2', shared_coordinate: 'X', naturality: 'experiential', meaning: 'Connection', type: 'standard' }
-    ],
-    meta: {
-        total_nodes: 2,
-        total_edges: 1,
-        series: { 'O': { name: 'Origin', color: '#00d4ff', theorems: 1 }, 'S': { name: 'Stream', color: '#10b981', theorems: 1 } },
-        trigonon: { vertices: ['T1', 'T2'], description: 'Simple test' },
-        naturality: { experiential: 'Blue' }
-    }
-};
-
 // --- Route Mock Setup ---
 
 export async function setupApiMock(page: Page): Promise<void> {
@@ -93,8 +76,6 @@ export async function setupApiMock(page: Page): Promise<void> {
             '/api/digestor/status': { status: 'idle', last_run: null },
             '/api/aristos/status': { status: 'idle' },
             '/api/sentinel/latest': { status: 'no_report' },
-            '/api/graph/full': MOCK_GRAPH_FULL,
-            '/api/link-graph/full': { nodes: [], edges: [], meta: { total_nodes: 0, total_edges: 0, source_type_counts: {}, projection_counts: {}, projection_map: {} } },
         };
 
         // Exact match

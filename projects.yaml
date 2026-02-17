@@ -6,16 +6,16 @@ projects:
     status: active
     phase: 'Phase 1: 表層 L2/L3'
     priority: high
-    updated: '2026-02-11'
-    next_action: L2 関数 docstring PROOF 実装
+    updated: '2026-02-17'
+    next_action: L2 関数 docstring PROOF 実装 (GCP 環境で継続)
   hermeneus:
     name: Hermēneus
     description: CCL→LMQL コンパイラ + MCP サーバ
     path: hermeneus/
     status: active
-    phase: MCP 全ツール稼働
+    phase: MCP 全ツール稼働 (GCP 移行済・340 tests passed)
     priority: high
-    updated: '2026-02-11'
+    updated: '2026-02-17'
     next_action: Phase 3 LangGraph 深化
   synteleia:
     name: Synteleia
@@ -66,10 +66,10 @@ projects:
     name: HGK Desktop
     description: Hegemonikón Desktop App (Tauri+Vite+TS+Three.js)
     path: hgk/
-    status: active
-    phase: 白画面問題で中断
-    priority: high
-    updated: '2026-02-11'
+    status: paused
+    phase: 白画面問題で中断 (GCP GPU なし — 一時保留)
+    priority: medium
+    updated: '2026-02-17'
     next_action: 白画面の原因診断・修正
   ccl_docs:
     name: CCL Docs
@@ -112,9 +112,9 @@ projects:
     description: 自由エネルギー原理に基づく認知エンジン
     path: mekhane/fep/
     status: active
-    phase: コア実装完了・Rule 整備中
+    phase: コア実装完了 (GCP 移行済・1267 tests passed・GPU レス互換確認済)
     priority: high
-    updated: '2026-02-11'
+    updated: '2026-02-17'
     next_action: null
   anamnesis:
     name: Anamnēsis

@@ -9,7 +9,7 @@ repos:
     hooks:
       - id: dendron-check
         name: Dendron PROOF Check
-        entry: python3 -m mekhane.dendron check mekhane/ --ci
+        entry: .venv/bin/python3 -m mekhane.dendron check mekhane/ --ci
         language: system
         types: [python]
         pass_filenames: false
@@ -17,8 +17,16 @@ repos:
 
       - id: epistemic-check
         name: Epistemic Status Check
-        entry: python3 mekhane/dendron/falsification_checker.py
+        entry: .venv/bin/python3 mekhane/dendron/falsification_checker.py
         language: system
+        pass_filenames: false
+        always_run: true
+
+      - id: doc-staleness
+        name: Doc Staleness Check
+        entry: .venv/bin/python3 -m mekhane.dendron.doc_staleness --check
+        language: system
+        types: [markdown]
         pass_filenames: false
         always_run: true
 

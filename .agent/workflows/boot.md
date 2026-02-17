@@ -2,6 +2,9 @@
 description: セッション開始時の統合ブートシーケンス。二人で起動する。
 hegemonikon: O1 Noēsis + H4 Doxa
 version: "5.8"
+depends_on:
+- doc_id: AXIOM_HIERARCHY
+  min_version: 7.0.0
 lcm_state: stable
 lineage: "v4.1 + 随伴深層統合 → v5.0 → v5.2 Quota → v5.3 Session → v5.5 VSearch → v5.7 ROM → v5.8 Modularize"
 category_theory:
@@ -318,6 +321,41 @@ intent_wal:
 | **省略可否** | /boot- では省略可。/boot, /boot+ では必須 |
 | **参照タイミング** | セッション中に「次何やるんだっけ」と迷った時に WAL を参照 |
 | **照合** | /bye 時に WAL と実際の行動を照合し、乖離を Handoff に記録 |
+
+### 2.5.1 WAL 自動読込 (v5.9 追加)
+
+> 前セッションの WAL が存在する場合、`IntentWALManager.load_latest()` で自動読込し、
+> 未完了タスクや blockers をセッション復元に使う。
+
+**Python 連携コード**:
+
+```python
+from mekhane.symploke.intent_wal import IntentWALManager
+
+mgr = IntentWALManager()
+prev_wal = mgr.load_latest()
+if prev_wal:
+    print(f"📋 前WAL: {prev_wal.session_goal}")
+    print(f"   Health: {prev_wal.context_health_level}")
+    done = sum(1 for e in prev_wal.progress if e.status == 'done')
+    total = len(prev_wal.progress)
+    print(f"   Progress: {done}/{total} steps")
+    if prev_wal.blockers:
+        print(f"   ⚠️ Blockers: {', '.join(prev_wal.blockers)}")
+    # Boot Report に WAL セクションを挿入
+    boot_section = mgr.to_boot_section()
+else:
+    print("📋 前WAL なし — 新規セッション")
+```
+
+**読込後の判断**:
+
+| 前WAL の状態 | 行動 |
+|:------------|:-----|
+| 存在しない | 新規 `create()` で WAL 生成 |
+| progress 全て done | 新規 `create()` で WAL 生成 |
+| progress に in_progress/blocked がある | 前セッションの続きとして復元を提案 |
+| context_health が 🟠/🔴 | 「前セッションはコンテキスト枯渇で終了」と報告 |
 
 ---
 

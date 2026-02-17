@@ -1,3 +1,5 @@
+# PROOF: [S2/Mekhanē] <- mekhane/ A0->Implementation
+# PURPOSE: [S2/Mekhanē] Implementation of internal_searcher.py
 """
 Internal knowledge searcher for Periskopē.
 
@@ -27,6 +29,7 @@ if str(_PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(_PROJECT_ROOT))
 
 
+# PURPOSE: [S2/Mekhanē] GnosisSearcher
 class GnosisSearcher:
     """Search Gnōsis academic paper index (LanceDB).
 
@@ -37,6 +40,7 @@ class GnosisSearcher:
     def __init__(self) -> None:
         self._index = None
 
+    # PURPOSE: [S2/Mekhanē] _get_index
     def _get_index(self):
         """Lazy-load GnosisIndex."""
         if self._index is None:
@@ -48,6 +52,7 @@ class GnosisSearcher:
                 raise
         return self._index
 
+    # PURPOSE: [S2/Mekhanē] search
     async def search(
         self,
         query: str,
@@ -95,6 +100,7 @@ class GnosisSearcher:
         return results
 
 
+# PURPOSE: [S2/Mekhanē] SophiaSearcher
 class SophiaSearcher:
     """Search Sophia Knowledge Items (KI) and Steps.
 
@@ -108,6 +114,7 @@ class SophiaSearcher:
     def __init__(self, ki_dir: Path | None = None) -> None:
         self.ki_dir = ki_dir or self.KI_DIR
 
+    # PURPOSE: [S2/Mekhanē] search
     async def search(
         self,
         query: str,
@@ -148,6 +155,7 @@ class SophiaSearcher:
         logger.info("Sophia: %d results for %r", len(results), query)
         return results
 
+    # PURPOSE: [S2/Mekhanē] _collect_searchable_docs
     def _collect_searchable_docs(self) -> list[tuple[str, str, Path | None, str]]:
         """Collect KI files for search."""
         docs: list[tuple[str, str, Path | None, str]] = []
@@ -162,6 +170,7 @@ class SophiaSearcher:
 
         return docs
 
+    # PURPOSE: [S2/Mekhanē] _tfidf_rank
     def _tfidf_rank(
         self,
         query: str,
@@ -198,6 +207,7 @@ class SophiaSearcher:
         return scored[:k]
 
 
+# PURPOSE: [S2/Mekhanē] KairosSearcher
 class KairosSearcher:
     """Search Kairos session handoffs and ROM files.
 
@@ -215,6 +225,7 @@ class KairosSearcher:
         self.handoff_dir = handoff_dir or self.HANDOFF_DIR
         self.rom_dir = rom_dir or self.ROM_DIR
 
+    # PURPOSE: [S2/Mekhanē] search
     async def search(
         self,
         query: str,
@@ -251,6 +262,7 @@ class KairosSearcher:
         logger.info("Kairos: %d results for %r", len(results), query)
         return results
 
+    # PURPOSE: [S2/Mekhanē] _collect_docs
     def _collect_docs(self) -> list[tuple[str, str, Path | None, str]]:
         docs = []
 
@@ -274,6 +286,7 @@ class KairosSearcher:
 
         return docs
 
+    # PURPOSE: [S2/Mekhanē] _simple_rank
     def _simple_rank(
         self,
         query: str,
@@ -305,6 +318,7 @@ class KairosSearcher:
         return scored[:k]
 
 
+# PURPOSE: [S2/Mekhanē] _truncate
 def _truncate(text: str, max_len: int) -> str:
     if len(text) <= max_len:
         return text

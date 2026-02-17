@@ -1,3 +1,5 @@
+# PROOF: [S2/Mekhanē] <- mekhane/ A0->Implementation
+# PURPOSE: [S2/Mekhanē] Implementation of ccl_linter.py
 """CCL Linter — CCL 式の静的検証。
 
 operators.md (SSOT) に基づいて CCL 式を検証し、
@@ -18,6 +20,7 @@ from mekhane.ccl.operator_loader import load_operators, OperatorDef
 from mekhane.ccl.spec_injector import ALL_OPERATORS, COMPOUND_OPERATORS, OPERATOR_DEFINITIONS
 
 
+# PURPOSE: [S2/Mekhanē] LintWarning
 @dataclass
 class LintWarning:
     """Lint 警告。"""
@@ -40,6 +43,7 @@ _KNOWN_NON_OPERATORS = set("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ
 _STRUCTURAL_CHARS = set("(){}[]@:,.=|")
 
 
+# PURPOSE: [S2/Mekhanē] lint
 def lint(ccl_expr: str) -> List[LintWarning]:
     """CCL 式を静的検証し、警告リストを返す。"""
     warnings: List[LintWarning] = []

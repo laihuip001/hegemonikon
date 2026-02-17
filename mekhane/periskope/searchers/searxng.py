@@ -1,3 +1,5 @@
+# PROOF: [S2/Mekhanē] <- mekhane/ A0->Implementation
+# PURPOSE: [S2/Mekhanē] Implementation of searxng.py
 """
 SearXNG search client for Periskopē.
 
@@ -24,6 +26,7 @@ CATEGORY_NEWS = "news"
 CATEGORY_IT = "it"
 
 
+# PURPOSE: [S2/Mekhanē] SearXNGSearcher
 class SearXNGSearcher:
     """Client for SearXNG meta-search engine.
 
@@ -42,16 +45,19 @@ class SearXNGSearcher:
         self.default_lang = default_lang
         self._client: httpx.AsyncClient | None = None
 
+    # PURPOSE: [S2/Mekhanē] _get_client
     async def _get_client(self) -> httpx.AsyncClient:
         if self._client is None or self._client.is_closed:
             self._client = httpx.AsyncClient(timeout=self.timeout)
         return self._client
 
+    # PURPOSE: [S2/Mekhanē] close
     async def close(self) -> None:
         if self._client and not self._client.is_closed:
             await self._client.aclose()
             self._client = None
 
+    # PURPOSE: [S2/Mekhanē] search
     async def search(
         self,
         query: str,
@@ -131,6 +137,7 @@ class SearXNGSearcher:
 
         return results
 
+    # PURPOSE: [S2/Mekhanē] search_academic
     async def search_academic(
         self,
         query: str,
@@ -144,6 +151,7 @@ class SearXNGSearcher:
             engines=["google scholar", "semantic scholar", "arxiv"],
         )
 
+    # PURPOSE: [S2/Mekhanē] search_news
     async def search_news(
         self,
         query: str,
@@ -158,6 +166,7 @@ class SearXNGSearcher:
             time_range=time_range,
         )
 
+    # PURPOSE: [S2/Mekhanē] health_check
     async def health_check(self) -> bool:
         """Check if SearXNG is reachable."""
         try:
@@ -168,6 +177,7 @@ class SearXNGSearcher:
             return False
 
 
+# PURPOSE: [S2/Mekhanē] _calculate_relevance
 def _calculate_relevance(index: int, total: int) -> float:
     """Calculate relevance score based on position (0-indexed)."""
     if total == 0:
@@ -175,6 +185,7 @@ def _calculate_relevance(index: int, total: int) -> float:
     return max(0.0, 1.0 - (index / max(total, 1)))
 
 
+# PURPOSE: [S2/Mekhanē] _truncate
 def _truncate(text: str, max_len: int) -> str:
     """Truncate text to max_len characters."""
     if len(text) <= max_len:

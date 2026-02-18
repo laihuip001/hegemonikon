@@ -1,3 +1,5 @@
+# PROOF: [S2/Mekhanē] <- mekhane/ A0->Implementation
+# PURPOSE: [Auto-generated] Implementation of module functionality
 #!/usr/bin/env python3
 """Intent-WAL (Write-Ahead Log) Manager.
 

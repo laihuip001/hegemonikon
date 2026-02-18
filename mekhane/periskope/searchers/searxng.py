@@ -1,3 +1,5 @@
+# PROOF: [S2/Mekhanē] <- mekhane/ A0->Implementation
+# PURPOSE: SearXNG client for multi-engine search
 """
 SearXNG search client for Periskopē.
 

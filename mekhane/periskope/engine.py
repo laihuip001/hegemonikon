@@ -1,3 +1,5 @@
+# PROOF: [S2/Mekhanē] <- mekhane/ A0->Implementation
+# PURPOSE: Periskopē deep research orchestrator
 """
 Periskopē Deep Research Engine — Orchestrator.
 

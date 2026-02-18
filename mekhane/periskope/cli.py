@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# PROOF: [S2/Mekhanē] <- mekhane/ A0->Implementation
+# PURPOSE: Periskopē CLI entry point
 """
 Periskopē CLI — Deep Research from the command line.
 

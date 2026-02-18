@@ -1,3 +1,4 @@
+# PROOF: [S2/Mekhanē] <- mekhane/ A0->Implementation
 """CCL Linter — CCL 式の静的検証。
 
 operators.md (SSOT) に基づいて CCL 式を検証し、

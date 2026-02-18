@@ -1,3 +1,5 @@
+# PROOF: [S2/Mekhanē] <- mekhane/ A0->Implementation
+# PURPOSE: Expand search queries via bilingual translation
 """
 Query expander for Periskopē.
 

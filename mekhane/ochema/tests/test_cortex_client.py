@@ -9,6 +9,7 @@ Run:
 """
 
 import pytest
+from unittest.mock import patch
 
 from mekhane.ochema.antigravity_client import LLMResponse
 from mekhane.ochema.cortex_client import (
@@ -67,7 +68,16 @@ class TestGenerate:
 
     def test_token_usage(self, client):
         """Response includes token usage metadata."""
-        resp = client.ask("Say 'hello'")
+        mock_response = {
+            "candidates": [{"content": {"parts": [{"text": "hello"}]}}],
+            "usageMetadata": {
+                "promptTokenCount": 10,
+                "candidatesTokenCount": 5,
+                "totalTokenCount": 15,
+            },
+        }
+        with patch.object(client, "_call_api", return_value=mock_response):
+            resp = client.ask("Say 'hello'")
         assert isinstance(resp.token_usage, dict)
         assert resp.token_usage.get("total_tokens", 0) > 0
 

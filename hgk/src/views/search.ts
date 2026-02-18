@@ -29,6 +29,7 @@ export async function renderSearch(): Promise<void> {
         const color = SOURCE_COLORS[key] ?? '#8b949e';
         return `<button class="search-source-chip ${active ? 'active' : ''}"
       data-source="${esc(key)}"
+      aria-pressed="${active}"
       style="--chip-color: ${color}">
       ${label}
     </button>`;
@@ -40,6 +41,7 @@ export async function renderSearch(): Promise<void> {
       <div style="display:flex; gap:0.5rem; margin-bottom:0.75rem;">
         <input type="text" id="symploke-search-input" class="input"
           placeholder="すべての知識ソースを横断検索..."
+          aria-label="検索キーワード"
           style="flex:1; font-size:1.05rem;" />
         <button id="symploke-search-btn" class="btn">検索</button>
       </div>
@@ -47,7 +49,7 @@ export async function renderSearch(): Promise<void> {
         ${sourceChips}
       </div>
     </div>
-    <div id="symploke-search-results"></div>
+    <div id="symploke-search-results" aria-live="polite" aria-atomic="true"></div>
   `;
 
     const searchInput = document.getElementById('symploke-search-input') as HTMLInputElement;
@@ -59,9 +61,11 @@ export async function renderSearch(): Promise<void> {
             if (searchActiveSources.has(source)) {
                 searchActiveSources.delete(source);
                 chip.classList.remove('active');
+                chip.setAttribute('aria-pressed', 'false');
             } else {
                 searchActiveSources.add(source);
                 chip.classList.add('active');
+                chip.setAttribute('aria-pressed', 'true');
             }
         });
     });
@@ -70,11 +74,13 @@ export async function renderSearch(): Promise<void> {
         const query = searchInput.value.trim();
         if (!query) return;
         const resultsDiv = document.getElementById('symploke-search-results')!;
+        resultsDiv.setAttribute('aria-busy', 'true');
         resultsDiv.innerHTML = '<div class="loading">検索中...</div>';
 
         const sources = Array.from(searchActiveSources).join(',');
         try {
             const res: SymplokeSearchResponse = await api.symplokeSearch(query, 20, sources);
+            resultsDiv.setAttribute('aria-busy', 'false');
 
             if (res.results.length === 0) {
                 resultsDiv.innerHTML = `
@@ -116,6 +122,7 @@ export async function renderSearch(): Promise<void> {
 
             applyStaggeredFadeIn(resultsDiv);
         } catch (e) {
+            resultsDiv.setAttribute('aria-busy', 'false');
             resultsDiv.innerHTML = `<div class="card status-error">検索失敗: ${esc((e as Error).message)}</div>`;
         }
     };

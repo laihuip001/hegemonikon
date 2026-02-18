@@ -1,3 +1,5 @@
+# PROOF: [S2/Mekhanē] <- mekhane/ A0->Implementation
+# PURPOSE: Playwright-based page renderer for dynamic content
 """
 Playwright-based searcher for Periskopē.
 

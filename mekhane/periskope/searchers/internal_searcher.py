@@ -1,3 +1,5 @@
+# PROOF: [S2/Mekhanē] <- mekhane/ A0->Implementation
+# PURPOSE: Internal knowledge searchers (Gnōsis, Sophia, Kairos)
 """
 Internal knowledge searcher for Periskopē.
 
@@ -102,8 +104,8 @@ class SophiaSearcher:
     """
 
     # Default KI directory
-    KI_DIR = Path("/home/makaron8426/.gemini/antigravity/knowledge")
-    STEPS_ROOT = Path("/home/makaron8426/.gemini/antigravity/brain")
+    KI_DIR = Path.home() / ".gemini" / "antigravity" / "knowledge"
+    STEPS_ROOT = Path.home() / ".gemini" / "antigravity" / "brain"
 
     def __init__(self, ki_dir: Path | None = None) -> None:
         self.ki_dir = ki_dir or self.KI_DIR
@@ -204,8 +206,8 @@ class KairosSearcher:
     Provides access to session history and accumulated knowledge.
     """
 
-    HANDOFF_DIR = Path("/home/makaron8426/oikos/mneme/.hegemonikon/sessions")
-    ROM_DIR = Path("/home/makaron8426/oikos/mneme/.hegemonikon/rom")
+    HANDOFF_DIR = Path.home() / "oikos" / "mneme" / ".hegemonikon" / "sessions"
+    ROM_DIR = Path.home() / "oikos" / "mneme" / ".hegemonikon" / "rom"
 
     def __init__(
         self,

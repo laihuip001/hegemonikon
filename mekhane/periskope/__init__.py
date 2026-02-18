@@ -1,3 +1,5 @@
+# PROOF: [S2/Mekhanē] <- mekhane/ A0->Implementation
+# PURPOSE: Periskopē module initialization and exports
 """
 Periskopē — HGK Deep Research Engine
 

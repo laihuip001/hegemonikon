@@ -1,3 +1,5 @@
+# PROOF: [S2/Mekhanē] <- mekhane/ A0->Implementation
+# PURPOSE: Synthesize search results using multiple LLMs
 """
 Multi-model synthesizer for Periskopē.
 

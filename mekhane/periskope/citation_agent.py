@@ -1,3 +1,5 @@
+# PROOF: [S2/Mekhanē] <- mekhane/ A0->Implementation
+# PURPOSE: Verify citations and assign TAINT levels
 """
 Citation verification agent for Periskopē.
 

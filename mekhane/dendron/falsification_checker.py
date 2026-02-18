@@ -1,3 +1,5 @@
+# PROOF: [S7/Falsification] <- mekhane/dendron/
+# PURPOSE: Check completeness of epistemic status registry and verify file references
 """
 S7: Falsification Condition Checker
 

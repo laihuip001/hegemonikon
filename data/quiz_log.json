@@ -229,5 +229,102 @@
     "correct": null,
     "had_failure": null,
     "notes": ""
+  },
+  {
+    "id": "20260218_032659_554899",
+    "ccl_expr": "\\noe+",
+    "operators": [
+      "\\"
+    ],
+    "generated_at": "2026-02-18T03:26:59.554923",
+    "answered": null,
+    "correct": null,
+    "had_failure": null,
+    "notes": ""
+  },
+  {
+    "id": "20260218_033835_014679",
+    "ccl_expr": "(/noe+)*%(/noe+^)_(\\noe+)*%(\\noe+^)",
+    "operators": [
+      "\\"
+    ],
+    "generated_at": "2026-02-18T03:38:35.014703",
+    "answered": null,
+    "correct": null,
+    "had_failure": null,
+    "notes": ""
+  },
+  {
+    "id": "20260218_035340_052497",
+    "ccl_expr": "C:{/noe+~*/noe+^}_\\noe!",
+    "operators": [
+      "!",
+      "\\"
+    ],
+    "generated_at": "2026-02-18T03:53:40.052524",
+    "answered": null,
+    "correct": null,
+    "had_failure": null,
+    "notes": ""
+  },
+  {
+    "id": "20260218_035340_497118",
+    "ccl_expr": "(/noe+)*%(/noe-)_(\\noe+)*%(\\noe-)",
+    "operators": [
+      "\\"
+    ],
+    "generated_at": "2026-02-18T03:53:40.497143",
+    "answered": null,
+    "correct": null,
+    "had_failure": null,
+    "notes": ""
+  },
+  {
+    "id": "20260218_035931_147977",
+    "ccl_expr": "/pro_/s-_R:{F:[×2]{/u+*^/u^}}_~(/noe*/dia)_/pis_/dox-",
+    "operators": [
+      "*^"
+    ],
+    "generated_at": "2026-02-18T03:59:31.148004",
+    "answered": null,
+    "correct": null,
+    "had_failure": null,
+    "notes": ""
+  },
+  {
+    "id": "20260218_040420_764046",
+    "ccl_expr": "C:{(/noe+)*%(/noe+^)_(\\noe+)*%(\\noe+^)}",
+    "operators": [
+      "\\"
+    ],
+    "generated_at": "2026-02-18T04:04:20.764071",
+    "answered": null,
+    "correct": null,
+    "had_failure": null,
+    "notes": ""
+  },
+  {
+    "id": "20260218_040420_776588",
+    "ccl_expr": "C:{/noe+*%/noe-_\\noe+^*%\\noe√}",
+    "operators": [
+      "\\"
+    ],
+    "generated_at": "2026-02-18T04:04:20.776608",
+    "answered": null,
+    "correct": null,
+    "had_failure": null,
+    "notes": ""
+  },
+  {
+    "id": "20260218_041433_648729",
+    "ccl_expr": "F:[×2]{(/noe+)*%(/noe+^)_(\\noe+)*%(\\noe+^)}",
+    "operators": [
+      "\\"
+    ],
+    "generated_at": "2026-02-18T04:14:33.648754",
+    "answered": null,
+    "correct": null,
+    "had_failure": null,
+    "notes": ""
   }
 ]

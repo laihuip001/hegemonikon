@@ -31,6 +31,7 @@
 | `@helm` | 舵 | `/bou+*%/zet+\|>/u++` | `/pro_/kho_/bou+*%/zet+\|>/u++_~(/h*/k)_/pis_/dox-` |
 | `@desktop` | 操る | `/kho{desktop}_/ene{action}` | `/pro_/kho{desktop}_/ene{desktop_action}_V:{/dia-}_/dox-` |
 | `@rpr` | 回す(RPR) | `C:{/ene >> /dia{retrospective}}` | `C:{/ene >> /dia{retrospective}}_/dox+` |
+| `@fathom` | 見通す | `(/noe+)*%(/noe+^)_(\ noe+)*%(\noe+^)` | `F:[×2]{(/noe+)*%(/noe+^)_(\noe+)*%(\noe+^)}` |
 
 ---
 
@@ -90,6 +91,7 @@
              ┌──────────────┬──────────────┐
  I (推論)    │ @dig @nous   │ @plan @tak   │
              │ @read @helm  │ @ready       │
+             │ @fathom      │              │
              ├──────────────┼──────────────┤
  A (行為)    │ @vet @learn  │ @fix @build  │
              │ @proof @syn  │ @desktop @rpr│
@@ -104,6 +106,7 @@
 | 反復深化 (F:[×N]) | @chew, @read, @tak |
 | 収束ループ (C:/R:) | @kyc, @fix, @rpr |
 | 検証ゲート (V:) | @vet, @proof, @build |
+| **Limit → Colimit (位相対称)** | **@fathom** |
 
 ### 軸3: 双対構造
 
@@ -130,4 +133,28 @@
 
 ---
 
-*v4.2 — @rpr (React→Plan→Reflect) 追加 (2026-02-15)*
+## 純正拡張マクロ (WF Extension Pattern)
+
+> **設計原則**: 単一 WF の認知構造を `*%` + Limit/Colimit で拡張する。
+> 骨格: `(wf+)*%(wf+X)_(\wf+)*%(\wf+X)` — `X` は WF 固有。
+
+### 派生体系
+
+| 派生 | ラッパー | 意味 |
+|:-----|:---------|:-----|
+| `-` | 平文 | 1回実行 |
+| 無印 | `F:[×2]{}` | 2回反復 |
+| `+` | `C:{}` | 収束ループ (不動点) |
+
+### 実装状況
+
+| WF | マクロ | X (右辺演算子) | 状態 |
+|:---|:-------|:---------------|:-----|
+| `/noe` | `@fathom` | `^` (メタ化) | ✅ パイロット実装 |
+| `/dia` | — | `^` or `!` | 計画中 |
+| `/bou` | — | `-` (縮約) | 計画中 |
+| `/zet` | — | `^` (メタ化) | 計画中 |
+
+---
+
+*v4.3 — @fathom (見通す) 追加。純正拡張マクロ体系新設 (2026-02-18)*

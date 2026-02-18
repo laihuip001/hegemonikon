@@ -19,25 +19,28 @@ from __future__ import annotations
 
 import json
 import re
-import ssl
 import subprocess
 import os
 import time
-import urllib.request
 import uuid
 from dataclasses import dataclass, field
 from typing import Optional
 
+import requests
+import urllib3
 
 # --- Data Classes ---
 
-from mekhane.ochema.types import LLMResponse  # noqa: E402 — shared type to avoid circular deps
+from mekhane.ochema.types import (
+    LLMResponse,
+)  # noqa: E402 — shared type to avoid circular deps
 
 
 # PURPOSE: [L2-auto] Language Server の接続情報。
 @dataclass
 class LSInfo:
     """Language Server の接続情報。"""
+
     pid: int = 0
     csrf: str = ""
     port: int = 0
@@ -49,7 +52,7 @@ class LSInfo:
 
 DEFAULT_MODEL = "MODEL_CLAUDE_4_5_SONNET_THINKING"
 DEFAULT_TIMEOUT = 120.0
-POLL_INTERVAL = 1.0
+POLL_INTERVAL = 0.2  # Reduced from 1.0s for faster response
 
 try:
     from mekhane.ochema.proto import (  # noqa: E402
@@ -70,6 +73,7 @@ try:
         build_get_steps,
         extract_planner_response,
     )
+
     _HAS_PROTO = True
 except ImportError:
     _HAS_PROTO = False
@@ -81,6 +85,7 @@ BRAIN_DIR = os.path.expanduser("~/.gemini/antigravity/brain")
 
 
 # --- Client ---
+
 
 # PURPOSE: [L2-auto] Antigravity Language Server の非公式クライアント。
 class AntigravityClient:
@@ -100,8 +105,23 @@ class AntigravityClient:
             workspace: ワークスペース名 (ps aux のフィルタに使用)
         """
         self.workspace = workspace
-        self._ssl_ctx = self._make_ssl_context()
+
+        # Optimize connection with persistent session
+        self.session = requests.Session()
+        self.session.verify = False
+        urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+
         self.ls = self._detect_ls()
+
+        # Configure session headers after successful detection
+        self.session.headers.update(
+            {
+                "Content-Type": "application/json",
+                "X-Codeium-Csrf-Token": self.ls.csrf,
+                "Connect-Protocol-Version": "1",
+                "User-Agent": USER_AGENT,
+            }
+        )
 
     # PURPOSE: [L2-auto] 関数: pid
     @property
@@ -178,13 +198,16 @@ class AntigravityClient:
     # PURPOSE: [L2-auto] LS のユーザーステータスを取得する。接続確認にも使用。
     def get_status(self) -> dict:
         """LS のユーザーステータスを取得する。接続確認にも使用。"""
-        return self._rpc(RPC_GET_STATUS, {
-            "metadata": {
-                "ideName": "antigravity",
-                "extensionName": "antigravity",
-                "locale": "en",
-            }
-        })
+        return self._rpc(
+            RPC_GET_STATUS,
+            {
+                "metadata": {
+                    "ideName": "antigravity",
+                    "extensionName": "antigravity",
+                    "locale": "en",
+                }
+            },
+        )
 
     # PURPOSE: [L2-auto] 利用可能なモデル一覧を取得する。
     def list_models(self) -> list[dict]:
@@ -219,16 +242,16 @@ class AntigravityClient:
         models = []
         for c in config.get("clientModelConfigs", []):
             quota = c.get("quotaInfo", {})
-            models.append({
-                "label": c.get("label", ""),
-                "model": c.get("modelOrAlias", {}).get("model", ""),
-                "remaining_pct": round(
-                    quota.get("remainingFraction", 0) * 100
-                ),
-                "reset_time": quota.get("resetTime", ""),
-                "images": c.get("supportsImages", False),
-                "recommended": c.get("isRecommended", False),
-            })
+            models.append(
+                {
+                    "label": c.get("label", ""),
+                    "model": c.get("modelOrAlias", {}).get("model", ""),
+                    "remaining_pct": round(quota.get("remainingFraction", 0) * 100),
+                    "reset_time": quota.get("resetTime", ""),
+                    "images": c.get("supportsImages", False),
+                    "recommended": c.get("isRecommended", False),
+                }
+            )
 
         # Experiment flags (context/memory 関連のみ)
         exp_data = self._rpc(RPC_EXPERIMENT_STATUS, {})
@@ -291,10 +314,13 @@ class AntigravityClient:
             for s in sessions:
                 if s["cascade_id"] == cascade_id:
                     # ステップ詳細も取得
-                    steps_data = self._rpc(RPC_GET_STEPS, {
-                        "cascadeId": cascade_id,
-                        "trajectoryId": s["trajectory_id"],
-                    })
+                    steps_data = self._rpc(
+                        RPC_GET_STEPS,
+                        {
+                            "cascadeId": cascade_id,
+                            "trajectoryId": s["trajectory_id"],
+                        },
+                    )
                     step_types: dict[str, int] = {}
                     for step in steps_data.get("steps", []):
                         st = step.get("type", "UNKNOWN")
@@ -338,10 +364,13 @@ class AntigravityClient:
             return {"error": f"No trajectory for cascade {cascade_id}"}
 
         # 全ステップを取得
-        steps_data = self._rpc(RPC_GET_STEPS, {
-            "cascadeId": cascade_id,
-            "trajectoryId": trajectory_id,
-        })
+        steps_data = self._rpc(
+            RPC_GET_STEPS,
+            {
+                "cascadeId": cascade_id,
+                "trajectoryId": trajectory_id,
+            },
+        )
         steps = steps_data.get("steps", [])
 
         # ステップを会話ターンにパース
@@ -360,11 +389,13 @@ class AntigravityClient:
                     if "text" in item:
                         text += item["text"]
                 if text:
-                    conversation.append({
-                        "role": "user",
-                        "content": text[:max_content],
-                        "truncated": len(text) > max_content,
-                    })
+                    conversation.append(
+                        {
+                            "role": "user",
+                            "content": text[:max_content],
+                            "truncated": len(text) > max_content,
+                        }
+                    )
 
             elif step_type == "CORTEX_STEP_TYPE_PLANNER_RESPONSE":
                 # Claude 応答
@@ -372,38 +403,46 @@ class AntigravityClient:
                 text = pr.get("response", "")
                 model = pr.get("generatorModel", "")
                 if text:
-                    conversation.append({
-                        "role": "assistant",
-                        "content": text[:max_content],
-                        "model": model,
-                        "truncated": len(text) > max_content,
-                    })
+                    conversation.append(
+                        {
+                            "role": "assistant",
+                            "content": text[:max_content],
+                            "model": model,
+                            "truncated": len(text) > max_content,
+                        }
+                    )
 
             elif step_type == "CORTEX_STEP_TYPE_MCP_TOOL":
                 # ツール呼出し (サマリのみ)
                 tool_info = step.get("mcpToolCall", step.get("toolCall", {}))
                 tool_name = tool_info.get("toolName", tool_info.get("name", "unknown"))
                 tool_status = "done" if status == "CORTEX_STEP_STATUS_DONE" else status
-                conversation.append({
-                    "role": "tool",
-                    "tool": tool_name,
-                    "status": tool_status,
-                })
+                conversation.append(
+                    {
+                        "role": "tool",
+                        "tool": tool_name,
+                        "status": tool_status,
+                    }
+                )
 
             elif step_type == "CORTEX_STEP_TYPE_TOOL_CALL":
                 # 内部ツール呼出し
                 tool_call = step.get("toolCall", {})
                 tool_name = tool_call.get("name", "unknown")
-                conversation.append({
-                    "role": "tool",
-                    "tool": tool_name,
-                    "status": "done" if status == "CORTEX_STEP_STATUS_DONE" else status,
-                })
+                conversation.append(
+                    {
+                        "role": "tool",
+                        "tool": tool_name,
+                        "status": (
+                            "done" if status == "CORTEX_STEP_STATUS_DONE" else status
+                        ),
+                    }
+                )
 
         # 最新 N ターン
         if not full and len(conversation) > max_turns * 3:
             # user+assistant+tool で約3エントリ/ターン
-            conversation = conversation[-(max_turns * 3):]
+            conversation = conversation[-(max_turns * 3) :]
 
         return {
             "cascade_id": cascade_id,
@@ -441,11 +480,13 @@ class AntigravityClient:
                     # 先頭200文字だけ読む
                     with open(output_file, "r", errors="replace") as f:
                         preview = f.read(200)
-                    episodes.append({
-                        "step": int(step_dir) if step_dir.isdigit() else step_dir,
-                        "size_bytes": size,
-                        "preview": preview,
-                    })
+                    episodes.append(
+                        {
+                            "step": int(step_dir) if step_dir.isdigit() else step_dir,
+                            "size_bytes": size,
+                            "preview": preview,
+                        }
+                    )
             return {
                 "brain_id": brain_id,
                 "total_episodes": len(episodes),
@@ -457,10 +498,13 @@ class AntigravityClient:
         for entry in os.listdir(BRAIN_DIR):
             sys_gen = os.path.join(BRAIN_DIR, entry, ".system_generated", "steps")
             if os.path.isdir(sys_gen):
-                count = len([
-                    d for d in os.listdir(sys_gen)
-                    if os.path.isfile(os.path.join(sys_gen, d, "output.txt"))
-                ])
+                count = len(
+                    [
+                        d
+                        for d in os.listdir(sys_gen)
+                        if os.path.isfile(os.path.join(sys_gen, d, "output.txt"))
+                    ]
+                )
                 if count > 0:
                     # brain のアーティファクト名を取得
                     task_file = os.path.join(BRAIN_DIR, entry, "task.md")
@@ -471,11 +515,13 @@ class AntigravityClient:
                                 if line.startswith("# "):
                                     title = line[2:].strip()
                                     break
-                    brains.append({
-                        "brain_id": entry,
-                        "episode_count": count,
-                        "title": title,
-                    })
+                    brains.append(
+                        {
+                            "brain_id": entry,
+                            "episode_count": count,
+                            "title": title,
+                        }
+                    )
         brains.sort(key=lambda x: x["episode_count"], reverse=True)
         return {
             "total_brains": len(brains),
@@ -554,8 +600,7 @@ class AntigravityClient:
         try:
             quota = self.quota_status()
             low_quota_models = [
-                m["label"] for m in quota.get("models", [])
-                if m["remaining_pct"] < 20
+                m["label"] for m in quota.get("models", []) if m["remaining_pct"] < 20
             ]
         except Exception:
             low_quota_models = []
@@ -599,34 +644,42 @@ class AntigravityClient:
 
         # --- 段階別圧縮戦略 ---
         if step_count > 20:
-            strategies.append({
-                "type": "savepoint",
-                "priority": "medium",
-                "description": "中間セーブを生成し、現在の作業状態を永続化",
-                "path": "~/oikos/mneme/.hegemonikon/sessions/savepoint_*.md",
-            })
+            strategies.append(
+                {
+                    "type": "savepoint",
+                    "priority": "medium",
+                    "description": "中間セーブを生成し、現在の作業状態を永続化",
+                    "path": "~/oikos/mneme/.hegemonikon/sessions/savepoint_*.md",
+                }
+            )
 
         if step_count > 30:
-            strategies.append({
-                "type": "topic_pruning",
-                "priority": "high",
-                "description": "完了済みトピックの要約化。詳細をドロップし要約のみ保持",
-                "estimated_savings": "30-50% of completed topic tokens",
-            })
+            strategies.append(
+                {
+                    "type": "topic_pruning",
+                    "priority": "high",
+                    "description": "完了済みトピックの要約化。詳細をドロップし要約のみ保持",
+                    "estimated_savings": "30-50% of completed topic tokens",
+                }
+            )
 
         if step_count > 40:
-            strategies.append({
-                "type": "tool_output_summary",
-                "priority": "critical",
-                "description": "過去のツール出力を要約に置換。view_file 結果等の大量テキストを圧縮",
-                "estimated_savings": "up to 90% of tool output tokens",
-            })
-            strategies.append({
-                "type": "session_split",
-                "priority": "critical",
-                "description": "/bye → Handoff → 新セッション。コンテキストを完全リセット",
-                "estimated_savings": "100% (fresh context)",
-            })
+            strategies.append(
+                {
+                    "type": "tool_output_summary",
+                    "priority": "critical",
+                    "description": "過去のツール出力を要約に置換。view_file 結果等の大量テキストを圧縮",
+                    "estimated_savings": "up to 90% of tool output tokens",
+                }
+            )
+            strategies.append(
+                {
+                    "type": "session_split",
+                    "priority": "critical",
+                    "description": "/bye → Handoff → 新セッション。コンテキストを完全リセット",
+                    "estimated_savings": "100% (fresh context)",
+                }
+            )
 
         # --- Chroma Research 知見の運用化 ---
         academic_insights = [
@@ -667,17 +720,35 @@ class AntigravityClient:
     _MODEL_ROUTES = {
         # Claude Thinking — deep analysis, security, architecture
         "MODEL_CLAUDE_4_5_SONNET_THINKING": [
-            "security", "audit", "architecture", "design", "review",
-            "analyze", "explain", "why", "philosophy", "proof",
+            "security",
+            "audit",
+            "architecture",
+            "design",
+            "review",
+            "analyze",
+            "explain",
+            "why",
+            "philosophy",
+            "proof",
         ],
         # Gemini Flash — speed, simple tasks
         "MODEL_PLACEHOLDER_M18": [
-            "translate", "format", "list", "simple", "quick",
-            "calculate", "convert", "summarize",
+            "translate",
+            "format",
+            "list",
+            "simple",
+            "quick",
+            "calculate",
+            "convert",
+            "summarize",
         ],
         # Gemini Pro — general purpose, multimodal
         "MODEL_PLACEHOLDER_M8": [
-            "image", "video", "multimodal", "diagram", "chart",
+            "image",
+            "video",
+            "multimodal",
+            "diagram",
+            "chart",
         ],
     }
 
@@ -731,8 +802,7 @@ class AntigravityClient:
         try:
             quota = self.quota_status()
             model_quota = {
-                m["model"]: m["remaining_pct"]
-                for m in quota.get("models", [])
+                m["model"]: m["remaining_pct"] for m in quota.get("models", [])
             }
 
             current = best_model
@@ -772,9 +842,7 @@ class AntigravityClient:
             dict with exported (list of paths), skipped (int)
         """
         if output_dir is None:
-            output_dir = os.path.expanduser(
-                "~/oikos/mneme/.ochema/sessions"
-            )
+            output_dir = os.path.expanduser("~/oikos/mneme/.ochema/sessions")
         os.makedirs(output_dir, exist_ok=True)
 
         sessions = self.session_info()
@@ -810,20 +878,20 @@ class AntigravityClient:
             # Markdown 生成
             lines = [
                 f"# Session {cid[:12]}",
-                f"",
+                "",
                 f"- **Cascade ID**: `{cid}`",
                 f"- **Modified**: {modified}",
                 f"- **Steps**: {conv.get('total_steps', 0)}",
                 f"- **Summary**: {conv.get('summary', '(none)')}",
-                f"",
-                f"---",
-                f"",
+                "",
+                "---",
+                "",
             ]
 
             for turn in conv.get("conversation", []):
                 role = turn.get("role", "")
                 if role == "user":
-                    lines.append(f"## 👤 User\n")
+                    lines.append("## 👤 User\n")
                     lines.append(turn.get("content", ""))
                     lines.append("")
                 elif role == "assistant":
@@ -914,22 +982,25 @@ class AntigravityClient:
         # Step 3: 全ポート試行 → GetUserStatus 成功で確定
         for port in info.all_ports:
             try:
-                result = self._raw_rpc(port, info.csrf, RPC_GET_STATUS, {
-                    "metadata": {
-                        "ideName": "antigravity",
-                        "extensionName": "antigravity",
-                        "locale": "en",
-                    }
-                })
+                result = self._raw_rpc(
+                    port,
+                    info.csrf,
+                    RPC_GET_STATUS,
+                    {
+                        "metadata": {
+                            "ideName": "antigravity",
+                            "extensionName": "antigravity",
+                            "locale": "en",
+                        }
+                    },
+                )
                 if "userStatus" in result:
                     info.port = port
                     return info
             except Exception:
                 continue
 
-        raise RuntimeError(
-            f"All ports failed ({info.all_ports}) for GetUserStatus"
-        )
+        raise RuntimeError(f"All ports failed ({info.all_ports}) for GetUserStatus")
 
     # --- Internal: 4-Step Flow ---
 
@@ -985,19 +1056,20 @@ class AntigravityClient:
                     summaries = trajs.get("trajectorySummaries", {})
                     cascade_summary = summaries.get(cascade_id, {})
                     if cascade_summary:
-                        trajectory_id = cascade_summary.get(
-                            "trajectoryId", ""
-                        )
+                        trajectory_id = cascade_summary.get("trajectoryId", "")
                 except Exception:
                     pass
 
             # Step 4: trajectory のステップを取得
             if trajectory_id:
                 try:
-                    steps_result = self._rpc(RPC_GET_STEPS, {
-                        "cascadeId": cascade_id,
-                        "trajectoryId": trajectory_id,
-                    })
+                    steps_result = self._rpc(
+                        RPC_GET_STEPS,
+                        {
+                            "cascadeId": cascade_id,
+                            "trajectoryId": trajectory_id,
+                        },
+                    )
                     all_steps = steps_result.get("steps", [])
                     turn_state = steps_result.get("turnState", "")
 
@@ -1024,8 +1096,7 @@ class AntigravityClient:
             time.sleep(POLL_INTERVAL)
 
         raise TimeoutError(
-            f"LLM response timed out after {timeout}s "
-            f"(cascade_id={cascade_id})"
+            f"LLM response timed out after {timeout}s " f"(cascade_id={cascade_id})"
         )
 
     # PURPOSE: [L2-auto] ステップから LLM 応答をパースする。
@@ -1070,47 +1141,36 @@ class AntigravityClient:
         return self._raw_rpc(self.ls.port, self.ls.csrf, endpoint, payload)
 
     # PURPOSE: [L2-auto] 低レベル RPC 呼び出し。
-    def _raw_rpc(
-        self, port: int, csrf: str, endpoint: str, payload: dict
-    ) -> dict:
+    def _raw_rpc(self, port: int, csrf: str, endpoint: str, payload: dict) -> dict:
         """低レベル RPC 呼び出し。"""
         url = f"https://127.0.0.1:{port}/{endpoint}"
-        data = json.dumps(payload).encode("utf-8")
 
-        req = urllib.request.Request(
-            url,
-            data=data,
-            method="POST",
-            headers={
+        # If we are using the detected port, use the session with pre-configured headers
+        if hasattr(self, "ls") and self.ls.port == port:
+            resp = self.session.post(url, json=payload, timeout=10)
+        else:
+            # During detection or if params differ, use session but explicit headers
+            headers = {
                 "Content-Type": "application/json",
                 "X-Codeium-Csrf-Token": csrf,
                 "Connect-Protocol-Version": "1",
                 "User-Agent": USER_AGENT,
-            },
-        )
+            }
+            resp = self.session.post(url, json=payload, headers=headers, timeout=10)
 
-        with urllib.request.urlopen(req, context=self._ssl_ctx, timeout=10) as resp:
-            body = resp.read().decode("utf-8")
-            if not body:
-                return {}
-            return json.loads(body)
-
-    # --- Internal: Utilities ---
-
-    # PURPOSE: [L2-auto] 自己署名証明書を許可する SSL コンテキスト。
-    @staticmethod
-    def _make_ssl_context() -> ssl.SSLContext:
-        """自己署名証明書を許可する SSL コンテキスト。"""
-        ctx = ssl.create_default_context()
-        ctx.check_hostname = False
-        ctx.verify_mode = ssl.CERT_NONE
-        return ctx
+        if not resp.text:
+            return {}
+        try:
+            return resp.json()
+        except ValueError:
+            return {}
 
     # PURPOSE: [L2-auto] 現在のユーザー名を取得。
     @staticmethod
     def _get_user() -> str:
         """現在のユーザー名を取得。"""
         import os
+
         return os.environ.get("USER", "makaron8426")
 
 
@@ -1165,9 +1225,7 @@ class CascadeConversation:
         self._turn_count += 1
 
         # Send
-        self._client._send_message(
-            self.cascade_id, message, use_model
-        )
+        self._client._send_message(self.cascade_id, message, use_model)
 
         # Poll with offset
         response = self._client._poll_response(
@@ -1195,4 +1253,3 @@ class CascadeConversation:
         # 将来の拡張のためにインターフェースを提供
         self.cascade_id = ""
         self._step_offset = 0
-

@@ -13,12 +13,12 @@
 
 ```dockerfile
 # Multi-stage build
-FROM python:3.13-slim AS builder
+FROM python:3.11-slim AS builder
 WORKDIR /app
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-FROM python:3.13-alpine AS runtime
+FROM python:3.11-alpine AS runtime
 # Non-root user
 RUN adduser -D appuser
 USER appuser
@@ -30,7 +30,7 @@ HEALTHCHECK --interval=30s CMD curl -f http://localhost:8080/health
 
 | ❌ | ✅ |
 |:--|:--|
-| `FROM python:latest` | `FROM python:3.13-alpine` (pinned) |
+| `FROM python:latest` | `FROM python:3.11-alpine` (pinned) |
 | `USER root` | `USER appuser` |
 | HEALTHCHECK なし | `HEALTHCHECK --interval=30s ...` |
 | `RUN apt-get install && ...` 単一RUN | Multi-stage で分離 |

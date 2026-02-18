@@ -2,9 +2,6 @@
 description: セッション開始時の統合ブートシーケンス。二人で起動する。
 hegemonikon: O1 Noēsis + H4 Doxa
 version: "5.8"
-depends_on:
-- doc_id: AXIOM_HIERARCHY
-  min_version: 7.0.0
 lcm_state: stable
 lineage: "v4.1 + 随伴深層統合 → v5.0 → v5.2 Quota → v5.3 Session → v5.5 VSearch → v5.7 ROM → v5.8 Modularize"
 category_theory:

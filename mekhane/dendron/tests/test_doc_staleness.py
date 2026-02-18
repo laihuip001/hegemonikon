@@ -344,3 +344,60 @@ class TestStalenessThreshold:
 
         ok = [r for r in results if r.status == StalenessStatus.OK]
         assert len(ok) == 1
+
+
+# ─── Mermaid Tests ═════════════════════════════
+
+
+# PURPOSE: Mermaid グラフ生成のテスト (F12)
+class TestMermaidGraph:
+    """generate_mermaid() のテスト."""
+
+    # PURPOSE: 空の場合はプレースホルダーを表示
+    def test_empty_graph(self, tmp_path) -> None:
+        checker = DocStalenessChecker()
+        checker.scan(tmp_path)
+        output = checker.generate_mermaid()
+        assert "graph TD" in output
+        assert "チェック対象なし" in output
+
+    # PURPOSE: 正常な依存関係がエッジとして出力される
+    def test_basic_dependency_graph(self, create_md, tmp_path) -> None:
+        create_md("upstream.md", "UP", "1.0.0")
+        create_md("downstream.md", "DOWN", "1.0.0", depends_on=[
+            {"doc_id": "UP", "min_version": "1.0.0"}
+        ])
+        checker = DocStalenessChecker()
+        checker.scan(tmp_path)
+        output = checker.generate_mermaid()
+        
+        # DOWN depends on UP -> Arrow from DOWN to UP
+        assert "DOWN --> UP" in output
+        assert 'DOWN["DOWN<br/>(v1.0.0)"]' in output
+
+    # PURPOSE: STALE なノードは赤くスタイリングされる
+    def test_stale_styling(self, create_md, tmp_path) -> None:
+        create_md("up.md", "UP", "2.0.0")
+        create_md("down.md", "DOWN", "1.0.0", depends_on=[
+            {"doc_id": "UP", "min_version": "1.0.0"} # STALE
+        ])
+        checker = DocStalenessChecker()
+        checker.scan(tmp_path)
+        checker.check() # 要実行
+        output = checker.generate_mermaid()
+        
+        # DOWN が STALE なので赤色
+        assert "style DOWN stroke:red" in output
+
+    # PURPOSE: WARNING なノードは金色にスタイリングされる
+    def test_warning_styling(self, create_md, tmp_path) -> None:
+        create_md("up.md", "UP", "1.0.0", updated="2026-01-01")
+        create_md("down.md", "DOWN", "1.0.0", updated="2026-02-17", depends_on=[
+            {"doc_id": "UP", "min_version": "1.0.0"}
+        ])
+        checker = DocStalenessChecker()
+        checker.scan(tmp_path)
+        checker.check()
+        output = checker.generate_mermaid()
+        
+        assert "style DOWN stroke:gold" in output

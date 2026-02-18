@@ -5,28 +5,5 @@
         ".github/workflows/dendron.yml",
         ".github/workflows/jules-scheduled-tasks.yml",
         ".github/workflows/quality-review.yml"
-    ],
-    "files.watcherExclude": {
-        "**/.venv/**": true,
-        "**/.git/objects/**": true,
-        "**/.git/subtree-cache/**": true,
-        "**/node_modules/**": true,
-        "**/__pycache__/**": true,
-        "**/gnosis_data/**": true,
-        "**/.pytest_cache/**": true,
-        "**/fm_output/**": true,
-        "**/.pyre/**": true
-    },
-    "search.exclude": {
-        "**/.venv/**": true,
-        "**/node_modules/**": true,
-        "**/__pycache__/**": true,
-        "**/gnosis_data/**": true,
-        "**/.pytest_cache/**": true,
-        "**/fm_output/**": true
-    },
-    "files.exclude": {
-        "**/__pycache__": true,
-        "**/.pytest_cache": true
-    }
+    ]
 }

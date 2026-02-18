@@ -1,0 +1,232 @@
+---
+description: セッション開始時の統合ブートシーケンス。二人で起動する。
+hegemonikon: O1 Noēsis + H4 Doxa
+version: "4.0"
+derivatives:
+  "+": 詳細起動（全ステップ展開、Handoff 10件、KI 5件）
+  "-": 高速起動（最小情報のみ、1分で開始）
+---
+
+# /boot ワークフロー
+
+> **Hegemonikón**: O1 Noēsis (認識) + H4 Doxa (記憶読込)
+> **設計思想**: /boot は AI と Creator の「二人で起動する」儀式。
+> Creator は忘れっぽい。AI は毎回忘却から始まる。だから情報はプッシュで良い。
+
+// turbo-all
+
+---
+
+## Phase 0: Identity Stack 読込
+
+> 「私」の連続性を確保する最初のステップ
+
+```bash
+cd ~/oikos/hegemonikon && \
+PYTHONPATH=. .venv/bin/python mekhane/symploke/boot_integration.py --mode ${BOOT_MODE:-standard}
+```
+
+| BOOT_MODE | Handoff | KI | 用途 |
+|-----------|---------|-----|------|
+| `fast` | 0 | 0 | /boot- |
+| `standard` | 3 | 3 | /boot |
+| `detailed` | 10 | 5 | /boot+ |
+
+**出力**:
+
+```
+🧠 私について: セッション数, 信頼度, 最終対話, 最近の気づき
+📋 最新 Handoff: ID, 主題
+📚 関連知識: KI サマリ
+```
+
+---
+
+## Phase 1: 正本読込 (Anti-Stale)
+
+```bash
+view_file ~/oikos/hegemonikon/.agent/workflows/boot.md
+```
+
+> キャッシュから実行されている可能性があるため、正本を読み直す
+
+---
+
+## Phase 2: セッション状態確認
+
+### 2.1 週次レビュー判定
+
+```bash
+ls -1t ~/oikos/mneme/.hegemonikon/sessions/weekly_review_*.md | head -1
+ls -1 ~/oikos/mneme/.hegemonikon/sessions/handoff_*.md | wc -l
+```
+
+**トリガー**: 7日以上経過 OR Handoff 15件以上
+
+### 2.2 前回 Handoff 読込
+
+対象: `~/oikos/mneme/.hegemonikon/sessions/handoff_*.md` の最新
+
+### 2.3 目的リマインド (Boulēsis)
+
+最新の `/bou` 出力から現在の目的を取得し表示
+
+### 2.4 Drift 診断
+
+目的と現在の軸の乖離度を評価 (0-100%)
+
+**警告出力** (乖離 > 30%):
+
+```
+⚠️ Drift警告: XX%
+  目的: {元の目的}
+  現在の焦点: {最近のタスクの傾向}
+```
+
+---
+
+## Phase 3: 知識読込
+
+### 3.1 H4 長期記憶
+
+| ファイル | 用途 |
+|:---------|:-----|
+| `patterns.yaml` | O1 Noēsis へ提供 |
+| `values.json` | O2 Boulēsis へ提供 |
+| `trust_history.json` | O4 Energeia へ提供 |
+
+### 3.2 Sophia 知識サマリー
+
+```bash
+cd ~/oikos/hegemonikon && \
+PYTHONPATH=. .venv/bin/python -c "
+from mekhane.symploke.sophia_ingest import load_sophia_index, search_loaded_index
+from pathlib import Path
+pkl = Path('~/oikos/mneme/.hegemonikon/indices/sophia.pkl').expanduser()
+if pkl.exists():
+    adapter = load_sophia_index(str(pkl))
+    results = search_loaded_index(adapter, 'implementation design pattern', top_k=5)
+    for r in results:
+        print(f'  • {r.metadata.get(\"ki_name\", \"N/A\")}: {r.metadata.get(\"artifact\", \"N/A\")}')
+"
+```
+
+### 3.3 KI ランダム想起
+
+毎セッション異なるKIを2-3件表示し、知識の「忘却」を防ぐ
+
+---
+
+## Phase 4: システム更新
+
+### 4.1 プロファイル確認
+
+`GEMINI.md` が有効であることを確認
+
+### 4.2 コアモジュール有効化
+
+- **O1 Noēsis**: 認識推論・深い理解
+- **O2 Boulēsis**: 意志推論・目標設定
+
+### 4.3 tools.yaml 読込
+
+```bash
+cat ~/oikos/hegemonikon/.agent/tools.yaml
+```
+
+### 4.4 Gnōsis 鮮度チェック
+
+```bash
+.venv/bin/python mekhane/anamnesis/cli.py check-freshness
+```
+
+Stale の場合: 自動収集実行
+
+### 4.5 白血球 — 未消化サジェスト
+
+```bash
+cd ~/oikos/hegemonikon && \
+PYTHONPATH=. .venv/bin/python -c "
+from mekhane.ergasterion.digestor.pipeline import DigestorPipeline
+p = DigestorPipeline()
+result = p.run(max_papers=15, max_candidates=3, dry_run=True)
+print(f'🦠 白血球 — 論文: {len(result.candidates)} 消化候補')
+" 2>&1 | grep -v Warning
+```
+
+---
+
+## Phase 5: 外部入力
+
+### 5.1 Dispatch Log
+
+```bash
+cat ~/oikos/mneme/.hegemonikon/logs/dispatch_log.yaml | grep -c "^-" || echo 0
+```
+
+**出力**: `📊 Dispatch Log: [N]/50 (XX%)`
+
+### 5.2 Perplexity Inbox
+
+対象: `~/oikos/hegemonikon/docs/research/perplexity/`
+
+新規ファイルがあれば表示
+
+### 5.3 Jules レビュー結果
+
+```bash
+cd ~/oikos/hegemonikon && git fetch origin && git branch -a | grep jules-review | tail -5
+```
+
+---
+
+## Phase 6: 完了
+
+### 6.1 ブート完了報告
+
+```
+🚀 HEGEMONIKON BOOT COMPLETE v4.0
+
+┌─ Phase サマリー ─────────────────────────────────┐
+│ 0. Identity     ✅ 連続性スコア: X.XX           │
+│ 1. 正本読込     ✅ boot.md v4.0                 │
+│ 2. セッション   ✅ Handoff / Drift XX%          │
+│ 3. 知識読込     ✅ Sophia N件 / KI M件          │
+│ 4. システム     ✅ tools / Gnōsis               │
+│ 5. 外部入力     📥 Perplexity / Jules           │
+│ 6. 完了         🚀 Ready                        │
+└──────────────────────────────────────────────────┘
+```
+
+### 6.2 開発中プロジェクト
+
+```bash
+python3 -c "
+import yaml
+from pathlib import Path
+pf = Path('~/oikos/hegemonikon/projects.yaml').expanduser()
+if pf.exists():
+    projects = yaml.safe_load(pf.read_text())['projects']
+    active = [(k,v) for k,v in projects.items() if v['status'] != 'stable']
+    if active:
+        print('🚧 開発中プロジェクト:')
+        for k, p in active:
+            print(f'  • {p[\"name\"]} [{p[\"phase\"]}]')
+"
+```
+
+### 6.3 タスク提案
+
+Handoff から抽出したタスク提案を表示
+
+---
+
+## 参照
+
+- **週次レビュー形式**: `.agent/workflows/templates/weekly_review.md`
+- **Identity Stack 詳細**: `kernel/continuing_me.md`
+- **FEP A行列**: `mekhane/fep/README.md`
+
+---
+
+*v4.0 — 洗練版 (2026-02-06)*

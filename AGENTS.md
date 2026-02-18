@@ -110,14 +110,15 @@ hegemonikon/
 ├── kernel/          # 理論的基盤 (公理、定理の定義)
 ├── hermeneus/       # CCL パーサー・ランタイム
 ├── mekhane/         # 実装層
-│   ├── symploke/    # Boot統合・セッション管理
+│   ├── symploke/    # Jules specialist review エンジン
 │   ├── dendron/     # 存在証明 (PROOF.md) チェッカー
 │   ├── peira/       # ヘルスチェック・統計
 │   ├── pks/         # 統合検索 (PKS)
 │   ├── ccl/         # CCL マクロ展開
 │   ├── ochema/      # LLM ルーティング
 │   └── ergasterion/ # 論文消化、プロンプト最適化
-├── synergeia/       # Jules (Gemini) マルチエージェント連携
+├── synergeia/       # デスクトップアプリ (Tauri)
+├── mneme/           # 外部記憶 (Handoff, KI)
 ├── scripts/         # ユーティリティ
 └── docs/            # ドキュメント
 ```

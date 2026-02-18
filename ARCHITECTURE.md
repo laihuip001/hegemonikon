@@ -1,15 +1,6 @@
----
-doc_id: "ARCHITECTURE"
-version: "1.0.0"
-updated: "2026-02-10"
-depends_on:
-  - doc_id: "AXIOM_HIERARCHY"
-    min_version: "7.0.0"
----
-
 # Hegemonikón Architecture
 
-> **最終更新**: 2026-02-17
+> **最終更新**: 2026-02-10
 > **目的**: PJ 全体の技術構造を一目で理解する
 
 ---
@@ -26,7 +17,7 @@ graph TB
     subgraph "認知制御層"
         HRM["hermeneus/<br>CCL コンパイラ"]
         CCL["ccl/<br>言語仕様"]
-        KRN["kernel/<br>公理体系 (103+要素)"]
+        KRN["kernel/<br>公理体系 (96要素)"]
     end
 
     subgraph "実行基盤 (mekhane/)"
@@ -39,7 +30,7 @@ graph TB
 
     subgraph "マルチエージェント"
         SYN["synergeia/<br>Jules 連携"]
-        MCP["MCP Servers<br>(8)"]
+        MCP["MCP Servers<br>(5+)"]
     end
 
     subgraph "記憶"
@@ -71,7 +62,7 @@ graph TB
 
 | パス | 用途 | 詳細 |
 |:-----|:-----|:-----|
-| **kernel/** | 公理体系定義 | SACRED_TRUTH, axiom_hierarchy.md, 各series.md。103+要素の正本 |
+| **kernel/** | 公理体系定義 | SACRED_TRUTH, ousia.md, schema.md, horme.md 等。96要素の正本 |
 | **ccl/** | CCL 言語仕様 | 演算子定義、マクロ参照、使用例 |
 | **hermeneus/** | CCL コンパイラ | パーサー → 展開 → LMQL 翻訳 → LLM 実行 → 検証。MCP サーバー提供 |
 | **mekhane/** | 実行基盤 | 26 サブモジュール。[詳細](mekhane/ARCHITECTURE.md) |
@@ -80,7 +71,7 @@ graph TB
 | **mneme/** | 長期記憶 | Handoff, セッション履歴, パターン記録 |
 | **gnosis_data/** | 論文 DB | LanceDB ベクトルストア。Gnōsis MCP で検索 |
 | **docs/** | ドキュメント | 設計文書、研究ノート、レポート |
-| **.agent/** | AI エージェント設定 | Rules (23), Workflows (58), Skills (15), Templates |
+| **.agent/** | AI エージェント設定 | Rules, Workflows (47), Skills (55), Templates |
 | **scripts/** | ユーティリティ | PJ 登録、MCP ラッパー、ヘルスチェック |
 
 ---
@@ -122,7 +113,7 @@ CCL 式 → Parser → AST → Expander → LMQL → LLM 実行 → 検証
 
 | ファイル | 役割 |
 |:---------|:-----|
-| `src/views/graph3d.ts` | Three.js 3D グラフ可視化 (103+要素 + LinkGraph) |
+| `src/views/graph3d.ts` | Three.js 3D グラフ可視化 (96要素 + LinkGraph 544ノード) |
 | `src/api/client.ts` | バックエンド API クライアント |
 | `src-tauri/` | Tauri ネイティブシェル設定 |
 
@@ -195,4 +186,4 @@ mekhane/anamnesis/ → 記憶検索 (LanceDB)
 
 ---
 
-*Hegemonikón Architecture — 認知の地図 (2026-02-17)*
+*Hegemonikón Architecture — 認知の地図 (2026-02-10)*

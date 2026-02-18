@@ -391,8 +391,43 @@ class WorkflowExecutor:
         """CCL からワークフロー名を抽出"""
         # /noe+ → noe, /bou+ >> /ene+ → bou
         import re
-        match = re.search(r"/(\w+)[+\-]?", ccl)
+        match = re.search(r"/([a-zA-Z]+)[+\-]?", ccl)
         return match.group(1) if match else ""
+    
+    # PURPOSE: CCL から全ワークフロー ID を抽出
+    def _extract_all_workflow_ids(self, ccl: str) -> list:
+        """CCL 内の全ワークフロー ID を抽出
+        
+        例: /bou+_/chr_/hod → ['bou', 'chr', 'hod']
+        """
+        import re
+        return re.findall(r"/([a-zA-Z]+)[+\-]?", ccl)
+    
+    # PURPOSE: 定理使用を記録
+    def _record_theorem_usage(self, pipeline: ExecutionPipeline) -> None:
+        """成功した WF 実行から定理使用を自動記録する。"""
+        if not pipeline.success:
+            return
+        
+        try:
+            from mekhane.fep.theorem_recommender import record_usage, THEOREM_KEYWORDS
+            
+            # command → theorem_id の逆引きテーブル
+            cmd_to_theorem = {
+                t["command"].lstrip("/"): t["id"]
+                for t in THEOREM_KEYWORDS
+            }
+            
+            wf_ids = self._extract_all_workflow_ids(pipeline.ccl)
+            context = pipeline.context[:80] if pipeline.context else ""
+            
+            for wf_id in wf_ids:
+                theorem_id = cmd_to_theorem.get(wf_id)
+                if theorem_id:
+                    record_usage(theorem_id, context)
+        except Exception:
+            # 定理記録の失敗はパイプライン実行を妨げない
+            pass
     
     # PURPOSE: パイプラインを完了
     def _finalize(
@@ -403,6 +438,10 @@ class WorkflowExecutor:
         """パイプラインを完了"""
         pipeline.total_duration_ms = (time.time() - start_time) * 1000
         pipeline.completed_at = datetime.now()
+        
+        # 定理使用を自動記録
+        self._record_theorem_usage(pipeline)
+        
         return pipeline
 
 

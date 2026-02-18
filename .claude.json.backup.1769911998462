@@ -1,6 +1,4 @@
 {
-  "installMethod": "native",
-  "autoUpdates": false,
   "cachedGrowthBookFeatures": {
     "tengu_1p_event_batch_config": {
       "scheduledDelayMillis": 5000,
@@ -81,6 +79,5 @@
     }
   },
   "cachedChromeExtensionInstalled": false,
-  "changelogLastFetched": 1769911990357,
-  "autoUpdatesProtectedForNative": true
+  "changelogLastFetched": 1769911990357
 }

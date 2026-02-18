@@ -26,7 +26,7 @@ import json
 import argparse
 from datetime import datetime
 from pathlib import Path
-from typing import Optional
+from typing import Optional, Any, cast
 
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
@@ -84,7 +84,7 @@ def extract_dispatch_info(context: str, gpu_ok: bool = True) -> dict:
     """
     dispatch_info = {"primary": "", "alternatives": [], "dispatch_formatted": ""}
     try:
-        from mekhane.fep.attractor_dispatcher import AttractorDispatcher
+        from mekhane.fep.attractor_dispatcher import AttractorDispatcher  # type: ignore
         dispatcher = AttractorDispatcher(force_cpu=not gpu_ok)
         plan = dispatcher.dispatch(context)
         if plan:
@@ -120,7 +120,7 @@ def _load_projects(project_root: Path) -> dict:
     knowledge_path = base_path / "knowledge.yaml"
 
     try:
-        import yaml
+        import yaml  # type: ignore
 
         # --- Load actionable registry ---
         projects: list = []
@@ -229,8 +229,8 @@ def _load_skills(project_root: Path) -> dict:
         return result
 
     try:
-        skills = []
-        skill_paths = []
+        skills: list[dict[str, Any]] = []
+        skill_paths: list[str] = []
         for skill_dir in sorted(skills_dir.iterdir()):
             skill_md = skill_dir / "SKILL.md"
             if not skill_dir.is_dir() or not skill_md.exists():
@@ -243,7 +243,7 @@ def _load_skills(project_root: Path) -> dict:
             if content.startswith("---"):
                 parts = content.split("---", 2)
                 if len(parts) >= 3:
-                    import yaml
+                    import yaml  # type: ignore
                     try:
                         meta = yaml.safe_load(parts[1])
                         name = meta.get("name", skill_dir.name)
@@ -308,7 +308,7 @@ def get_boot_context(mode: str = "standard", context: Optional[str] = None) -> d
     Returns:
         dict: 各軸の結果 + "formatted" キーにフォーマット済み出力
     """
-    from mekhane.symploke.boot_axes import (
+    from mekhane.symploke.boot_axes import (  # type: ignore
         gpu_preflight as _gpu_pf,
         load_handoffs, load_sophia, load_persona, load_pks,
         load_safety, load_ept, load_digestor, load_attractor,
@@ -323,14 +323,21 @@ def get_boot_context(mode: str = "standard", context: Optional[str] = None) -> d
     # Project Root のドキュメント健全性をチェックし、腐敗があれば警告
     doc_health_msg = ""
     try:
-        from mekhane.dendron.doc_staleness import DocStalenessChecker, StalenessStatus
+        from mekhane.dendron.doc_staleness import DocStalenessChecker, StalenessStatus  # type: ignore
         project_root = Path(__file__).parent.parent.parent
         checker = DocStalenessChecker()
         checker.scan(project_root)
         results = checker.check()
         stale_count = sum(1 for r in results if r.status == StalenessStatus.STALE)
         if stale_count > 0:
-            doc_health_msg = f"⚠️  **Doc Health Warning**: {stale_count} documents are STALE. Run `doc-staleness` to fix."
+            mermaid_graph = checker.generate_mermaid()
+            doc_health_msg = (
+                f"⚠️  **Doc Health Warning**: {stale_count} documents are STALE.\n"
+                f"<details><summary>Dependency Context (Mermaid)</summary>\n\n"
+                f"```mermaid\n{mermaid_graph}\n```\n"
+                f"</details>\n"
+                f"Run `doc-staleness --check` to fix."
+            )
     except Exception:
         pass
 
@@ -355,15 +362,15 @@ def get_boot_context(mode: str = "standard", context: Optional[str] = None) -> d
                 capture_output=True, text=True, cwd=str(project_root), timeout=5,
             )
             if git_log.returncode == 0 and git_log.stdout.strip():
-                commits = git_log.stdout.strip().split("\n")
+                commits: list[str] = git_log.stdout.strip().split("\n")
                 diff_stat = git_diff_stat.stdout.strip() if git_diff_stat.returncode == 0 else ""
                 git_lines = ["🔀 **Git Context Fallback** (Handoff 不在 — git log から復元)"]
                 git_lines.append("  直近のコミット:")
-                for c in commits[:10]:
+                for c in commits[:10]:  # type: ignore
                     git_lines.append(f"    {c}")
                 if diff_stat:
                     git_lines.append("  直近5コミットの変更ファイル:")
-                    for line in diff_stat.split("\n")[:10]:
+                    for line in diff_stat.split("\n")[:10]:  # type: ignore
                         git_lines.append(f"    {line}")
                 git_context_result = {
                     "commits": commits,
@@ -413,7 +420,7 @@ def get_boot_context(mode: str = "standard", context: Optional[str] = None) -> d
         lines.append("")
 
     if handoffs_result.get("latest"):
-        from mekhane.symploke.handoff_search import format_boot_output
+        from mekhane.symploke.handoff_search import format_boot_output  # type: ignore
         lines.append(format_boot_output(handoffs_result, verbose=(mode == "detailed")))
         lines.append("")
     elif git_context_result.get("fallback_used"):
@@ -421,7 +428,7 @@ def get_boot_context(mode: str = "standard", context: Optional[str] = None) -> d
         lines.append("")
 
     if ki_result.get("ki_items"):
-        from mekhane.symploke.sophia_ingest import format_ki_output
+        from mekhane.symploke.sophia_ingest import format_ki_output  # type: ignore
         lines.append(format_ki_output(ki_result))
 
     for axis_result in [pks_result, safety_result, ept_result, digestor_result,
@@ -435,12 +442,12 @@ def get_boot_context(mode: str = "standard", context: Optional[str] = None) -> d
 
     # incoming/ チェック — Digestor 消化候補の通知
     incoming_dir = Path.home() / "oikos" / "mneme" / ".hegemonikon" / "incoming"
-    incoming_files = sorted(incoming_dir.glob("eat_*.md")) if incoming_dir.exists() else []
+    incoming_files: list[Path] = sorted(incoming_dir.glob("eat_*.md")) if incoming_dir.exists() else []
     incoming_result = {"count": len(incoming_files), "files": [f.name for f in incoming_files]}
     if incoming_files:
         lines.append("")
         lines.append(f"📥 Digestor: {len(incoming_files)} 件の消化候補待ち")
-        for f in incoming_files[:5]:
+        for f in incoming_files[:5]:  # type: ignore
             lines.append(f"   → {f.name}")
         if len(incoming_files) > 5:
             lines.append(f"   ... +{len(incoming_files) - 5} 件")
@@ -583,7 +590,8 @@ def generate_boot_template(result: dict) -> Path:
     lines.append("")
 
     reqs = MODE_REQUIREMENTS.get("detailed", {})
-    for section in reqs.get("required_sections", []):
+    required_sections = cast(list[str], reqs.get("required_sections", []))
+    for section in required_sections:
         lines.append(f"- [ ] {section}")
     lines.append("")
 
@@ -596,13 +604,13 @@ def generate_boot_template(result: dict) -> Path:
     related = handoffs.get("related", [])
     latest = handoffs.get("latest")
 
-    all_handoffs = []
+    all_handoffs: list[Any] = []
     if latest:
         all_handoffs.append(latest)
     if related:
         all_handoffs.extend(related)
 
-    for i, h in enumerate(all_handoffs[:10], 1):
+    for i, h in enumerate(all_handoffs[:10], 1):  # type: ignore
         title = "Unknown"
         if hasattr(h, "metadata"):
             title = h.metadata.get("primary_task", h.metadata.get("title", "Unknown"))
@@ -740,7 +748,8 @@ def postcheck_boot_report(report_path: str, mode: str = "detailed") -> dict:
 
     # Check 2: REQUIRED セクション数
     required_count = content.count("<!-- REQUIRED")
-    expected = len(reqs.get("required_sections", []))
+    required_sections = cast(list[str], reqs.get("required_sections", []))
+    expected = len(required_sections)
     checks.append({
         "name": "required_sections",
         "passed": required_count >= expected,
@@ -748,7 +757,7 @@ def postcheck_boot_report(report_path: str, mode: str = "detailed") -> dict:
     })
 
     # Check 3: 総文字数
-    min_chars = reqs.get("min_chars", 0)
+    min_chars = cast(int, reqs.get("min_chars", 0))
     char_count = len(content)
     checks.append({
         "name": "content_length",
@@ -759,7 +768,7 @@ def postcheck_boot_report(report_path: str, mode: str = "detailed") -> dict:
 
     # Check 4: Handoff 引用数 (### Handoff N: の数)
     handoff_refs = len(re.findall(r"^### Handoff \d+:", content, re.MULTILINE))
-    expected_h = reqs.get("handoff_count", 0)
+    expected_h = cast(int, reqs.get("handoff_count", 0))
     checks.append({
         "name": "handoff_references",
         "passed": handoff_refs >= expected_h,

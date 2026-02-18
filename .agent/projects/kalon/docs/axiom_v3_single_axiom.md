@@ -1,11 +1,8 @@
 ---
-doc_id: "KALON_AXIOM_V3_REF"
+doc_id: "AXIOM_HIERARCHY_V3"
 version: "3.0.0-experimental"
 tier: "KERNEL"
 status: "EXPERIMENTAL"
-depends_on:
-  - doc_id: "AXIOM_HIERARCHY_V3"
-    min_version: "3.0.0"
 created: "2026-02-07"
 based_on: "axiom_hierarchy v2.1 (v5.0.0)"
 context: |

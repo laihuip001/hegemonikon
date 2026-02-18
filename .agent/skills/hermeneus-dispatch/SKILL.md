@@ -14,9 +14,6 @@ triggers:
   - "ワークフロー式"
   - "演算子"
 version: "3.0"
-depends_on:
-- doc_id: AXIOM_HIERARCHY
-  min_version: 7.0.0
 
 risk_tier: "L2"
 risks:

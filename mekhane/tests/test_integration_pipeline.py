@@ -324,7 +324,7 @@ class TestRegistryConsistency:
         with open(registry_path) as f:
             data = yaml.safe_load(f)
 
-        valid_tiers = {"core", "engine", "module", "concept", "product"}
+        valid_tiers = {"core", "engine", "module", "concept", "product", "shared"}
         for project in data["projects"]:
             tier = project.get("tier")
             assert tier is not None, f"Project {project['id']} missing tier"
@@ -371,7 +371,6 @@ class TestRegistryConsistency:
             tier = project.get("tier", "unknown")
             tiers[tier] = tiers.get(tier, 0) + 1
 
-        # At minimum, we should have these tiers populated
-        assert tiers.get("core", 0) >= 3
-        assert tiers.get("engine", 0) >= 3
-        assert tiers.get("module", 0) >= 3
+        # Registry v2.0: product (user-facing) + shared (internal reusable)
+        assert tiers.get("product", 0) >= 2
+        assert tiers.get("shared", 0) >= 5

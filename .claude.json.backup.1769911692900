@@ -1,6 +1,4 @@
 {
-  "installMethod": "native",
-  "autoUpdates": false,
   "cachedGrowthBookFeatures": {
     "tengu_1p_event_batch_config": {
       "scheduledDelayMillis": 5000,
@@ -35,8 +33,7 @@
     "tengu_c4w_usage_limit_notifications_enabled": true,
     "tengu_coral_fern": false,
     "tengu_cache_plum_violet": true,
-    "tengu_streaming_tool_execution2": true,
-    "tengu_cork_m4q": false
+    "tengu_streaming_tool_execution2": true
   },
   "userID": "19c87de3d9a87a5a744b4f983403009d9ae0558490b39f824fba692e4be26f99",
   "firstStartTime": "2026-02-01T01:04:18.916Z",
@@ -81,6 +78,5 @@
     }
   },
   "cachedChromeExtensionInstalled": false,
-  "changelogLastFetched": 1769911990357,
-  "autoUpdatesProtectedForNative": true
+  "changelogLastFetched": 1769910897664
 }

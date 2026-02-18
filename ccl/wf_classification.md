@@ -1,7 +1,7 @@
 # WF 分類マトリックス (Python Analogy)
 
-> **Date**: 2026-02-17 | **CCL**: `/s+`
-> **Total**: 58 ワークフロー (24 Core + 6 Hub + 11 Utility + 17 CCL Macro)
+> **Date**: 2026-01-31 | **CCL**: `/s+`
+> **Total**: 40 ワークフロー
 
 ---
 
@@ -13,7 +13,7 @@
 
 | WF | 定理 | Python 対応 | 説明 |
 |:---|:-----|:------------|:-----|
-| `/noe` | O1 Noēsis | `type()`, `isinstance()` | 本質認識 (メタ認知を含む) |
+| `/noe` | O1 Noēsis | `type()`, `isinstance()` | 本質認識 |
 | `/bou` | O2 Boulēsis | `input()` (意図取得) | 意志・目的 |
 | `/zet` | O3 Zētēsis | `dir()`, `help()` | 探求・問い |
 | `/ene` | O4 Energeia | `exec()`, `eval()` | 実行・行為 |
@@ -52,7 +52,7 @@
 | `/euk` | K1 Eukairia | `time.time()` | 好機・タイミング |
 | `/chr` | K2 Chronos | `datetime` | 時間 |
 | `/tel` | K3 Telos | `@property` (目的属性) | 目的 |
-| `/sop` | K4 Sophia | `requests`, `API` | 知恵・外部調査依頼 |
+| `/sop` | K4 Sophia | `requests`, `API` | 知恵・外部参照 |
 
 ### A-series (Akribeia: 精密)
 
@@ -80,49 +80,74 @@
 
 ---
 
-## 3. Utility WF (11) — `stdlib` 拡張
+## 3. ライフサイクル WF (2) — `__init__`, `__del__`, `atexit`
 
-ライフサイクル・対話・統合・品質に関わる非定理系 WF。
+セッションの開始・終了を管理。
 
-| WF | Python 対応 | 分類 | 説明 |
-|:---|:------------|:-----|:-----|
-| `/boot` | `__init__` + `atexit` | ライフサイクル | セッション開始 |
-| `/bye` | `__del__` + `pickle.dump()` | ライフサイクル | セッション終了・永続化 |
-| `/rom` | `shelve.sync()` | ライフサイクル | RAM→ROM 中間セーブ |
-| `/u` | `__call__` + `input()` | インタラクション | AI の主観・対話 |
-| `/m` | `signal.SIGUSR1` | インタラクション | 本気モード発動 |
-| `/ax` | `unittest.TestSuite` | オーケストレーション | 全層統合 (大循環) |
-| `/x` | `import` 解決 | オーケストレーション | X-series 関係ナビゲーション |
-| `/eat` | `with open()` + `json.load()` | 複合 | 外部消化 |
-| `/vet` | `subprocess.check_call()` | 品質 | Cross-Model Verification |
-| `/basanos` | `multiprocessing.Pool` | 品質 | 偉人評議会 (多角的レビュー) |
-| `/dendron` | `ast.parse()` + `inspect` | 品質 | 存在証明チェック |
+| WF | Python 対応 | 説明 |
+|:---|:------------|:-----|
+| `/boot` | `__init__` + `atexit.register()` | セッション開始 |
+| `/bye` | `__del__` + `pickle.dump()` | セッション終了・永続化 |
 
 ---
 
-## 4. CCL Macro WF (17) — `Makefile` ターゲット
+## 4. インタラクション WF (1) — `__call__`, `input()`
 
-CCL 式を定義済みパイプラインとして再利用するマクロ。
+ユーザーとの対話インタフェース。
 
-| WF | 日本語名 | CCL 式 | 用途 |
-|:---|:---------|:-------|:-----|
-| `@build` | 組む | `/bou-_/s+_/ene+_V:{/dia-}_I:[✓]{/dox-}` | 段階的構築 |
-| `@chew` | 噛む | `/s-_/pro_F:[×3]{/eat+~(...)}_...` | 深い消化 |
-| `@desktop` | 操作 | AT-SPI → Bytebot VLM | デスクトップ操作 |
-| `@dig` | 掘る | `/pro_/s+~(/p*/a)_/ana_/dia*/o+_...` | 深掘り調査 |
-| `@fix` | 直す | `/kho_/tel_C:{/dia+_/ene+}_...` | バグ修正 |
-| `@helm` | 舵 | `/pro_/kho_/bou+*%/zet+\|>/u++_...` | 方向決定 |
-| `@kyc` | 回す | `/pro_C:{/sop_/noe_/ene_/dia-}_...` | KYC サイクル |
-| `@learn` | 刻む | `/pro_/dox+_F:[×2]{/u+~(...)}_...` | 学習定着 |
-| `@nous` | 問う | `/pro_/s-_R:{F:[×2]{/u+*^/u^}}_...` | 深い問い |
-| `@plan` | 段取る | `/bou+_/chr_/s+~(/p*/k)_V:{/dia}_...` | 計画策定 |
-| `@proof` | 裁く | `V:{/noe~/dia}_I:[✓]{/ene{...}}_...` | 品質裁定 |
-| `@read` | 読む | `/s-_/pro_F:[×3]{/m.read~(...)}_...` | 熟読 |
-| `@ready` | 見渡す | `/bou-_/pro_/kho_/chr_/euk_...` | 準備確認 |
-| `@rpr` | RPR | React→Plan→Reflect | 反復収束 |
-| `@syn` | 監る | `/kho_/s-_/pro_/dia+{synteleia}_...` | Synteleia 監査 |
-| `@tak` | 捌く | `/s1_F:[×3]{/sta~/chr}_...` | タスク整理 |
-| `@vet` | 確かめる | `/kho{git_diff}_C:{V:{/dia+}_...}` | 変更検証 |
+| WF | Python 対応 | 説明 |
+|:---|:------------|:-----|
+| `/u` | `__call__` + `input()` | AI の主観・対話 |
+
+---
+
+## 5. オーケストレーション WF (3) — `__main__`, `argparse`
+
+タスクの整理・統合・全体制御。
+
+| WF | Python 対応 | 説明 |
+|:---|:------------|:-----|
+| `/tak` | `__main__` + `argparse` | タスク整理・エントリ |
+| `/ax` | `unittest.TestSuite` | 全層統合 (大循環) |
+| `/x` | `import` 解決 | X-series 関係ナビゲーション |
+
+---
+
+## 6. メタ WF (2) — `type()`, `metaclass`
+
+システム全体のメタ認知・内省。
+
+| WF | Python 対応 | 説明 |
+|:---|:------------|:-----|
+| `/pan` | `inspect`, `sys._getframe()` | パノラマ (メタ認知レーダー) |
+| `/syn` | `multiprocessing.Pool` | 偉人評議会 (並列評価) |
+
+---
+
+## 7. 複合 WF (4) — `functools.wraps`, 高階関数
+
+複数定理を組み合わせた複合操作。
+
+| WF | Python 対応 | 説明 |
+|:---|:------------|:-----|
+| `/eat` | `with open()` + `json.load()` | 外部消化 |
+| `/dev` | `importlib.reload()` | 開発プロトコル参照 |
+| `/why` | `traceback` | Five Whys 根本原因 |
+| `/lex` | `re`, `nltk` | 表現リテラシー |
+
+---
+
+## 8. 派生ショートカット WF (2)
+
+特定派生への直接アクセス。
+
+| WF | 派生元 | 説明 |
+|:---|:-------|:-----|
+| `/poc` | O3 Zētēsis `poc` | Spike/PoC 探索 |
+| `/pre` | O2 Boulēsis `pre` | Premortem |
+| `/flag` | O4 Energeia `flag` | Feature Flags |
+| `/fit` | 消化検証 | Digestion Audit |
+| `/vet` | A2 Krisis | Cross-Model Verification |
 
 ---
 
@@ -132,10 +157,14 @@ CCL 式を定義済みパイプラインとして再利用するマクロ。
 |:---------|---:|:------------|
 | Core WF (定理) | 24 | `builtins` |
 | Hub WF | 6 | `abc.ABC` |
-| Utility WF | 11 | `stdlib` |
-| CCL Macro WF | 17 | `Makefile` |
-| **合計** | **58** | |
+| ライフサイクル | 2 | `__init__`, `__del__` |
+| インタラクション | 1 | `__call__` |
+| オーケストレーション | 3 | `__main__` |
+| メタ | 2 | `metaclass` |
+| 複合 | 4 | `functools` |
+| 派生ショートカット | 5+ | (varies) |
+| **合計** | **40+** | |
 
 ---
 
-*Updated 2026-02-17 | WF Classification Matrix v2*
+*Generated by `/s+` | WF Classification Matrix*

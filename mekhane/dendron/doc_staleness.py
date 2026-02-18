@@ -374,9 +374,13 @@ def main() -> None:
     parser.add_argument(
         "--graph", action="store_true", help="Output Mermaid graph",
     )
+    parser.add_argument(
+        "--reverse-deps", type=str, metavar="DOC_ID",
+        help="Find documents that depend on DOC_ID",
+    )
     args = parser.parse_args()
 
-    if not args.check and not args.graph:
+    if not args.check and not args.graph and not args.reverse_deps:
         parser.print_help()
         return
 
@@ -384,6 +388,22 @@ def main() -> None:
     checker = DocStalenessChecker()
     checker.scan(root)
     results = checker.check()
+
+    if args.reverse_deps:
+        target = args.reverse_deps
+        print(f"🔎 Reverse dependencies for '{target}':")
+        found = []
+        for doc in checker._docs.values():
+            for dep in doc.depends_on:
+                if dep.doc_id == target:
+                    found.append(doc)
+                    break
+        if found:
+            for doc in found:
+                print(f"  - {doc.doc_id} (v{doc.version}) in {doc.path.relative_to(root)}")
+        else:
+            print("  (None found)")
+        return
 
     if args.graph:
         print(checker.generate_mermaid())

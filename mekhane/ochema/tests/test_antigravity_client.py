@@ -1,4 +1,4 @@
-# PROOF: [L2/インフラ] <- mekhane/ochema/tests/ テスト
+# PROOF: [S2/Mekhanē] <- mekhane/ochema/tests/ A0->UnitTests
 # PURPOSE: AntigravityClient ユニットテスト
 """
 AntigravityClient unit tests.

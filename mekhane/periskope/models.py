@@ -31,8 +31,8 @@ class TaintLevel(str, Enum):
 
 class SynthModel(str, Enum):
     """Available synthesis models."""
-    GEMINI_FLASH = "gemini-2.0-flash"
-    GEMINI_PRO = "gemini-2.5-pro"
+    GEMINI_FLASH = "gemini-3-flash-preview"
+    GEMINI_PRO = "gemini-3-pro-preview"
     CLAUDE_LS = "claude-ls"       # Via Language Server
     CLAUDE_CORTEX = "claude-cortex"  # If available via Cortex
 

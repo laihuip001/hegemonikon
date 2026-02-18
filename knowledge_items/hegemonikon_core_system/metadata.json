@@ -1,0 +1,22 @@
+{
+    "title": "Hegemonikón Core System — Architecture & Operations",
+    "summary": "Comprehensive documentation of the Hegemonikón framework's core principles and operations. Defines 'Beauty' (Arche) as 'Deductive Momentum' and explores the isomorphism between Active Inference (FEP) and deductive necessity. Documents the v7.0 workflow modularization (Hub-and-Spoke) and the 'Promptware Engineering' standard (RCFOR+, primacy/recency optimization). Establishes the 'Functional Beauty' principle—achieving ~40% token efficiency by eliminating decorative ASCII in favor of semantic structures—formalized in the v7.1 /mek redesign.",
+    "references": [
+        {
+            "type": "conversation_id",
+            "value": "bot-f7bf082b-0c48-4859-9df7-04e3a0339d98"
+        },
+        {
+            "type": "conversation_id",
+            "value": "80955345-059b-416a-a955-566b6a66b3f9"
+        },
+        {
+            "type": "conversation_id",
+            "value": "749"
+        },
+        {
+            "type": "conversation_id",
+            "value": "794"
+        }
+    ]
+}

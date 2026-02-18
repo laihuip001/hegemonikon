@@ -1,0 +1,62 @@
+{
+    "title": "Hegemonikón Multi-Agent Orchestration",
+    "summary": "Consolidated architectural and operational documentation for Hegemonikón's multi-agent systems. Features scalable reliability patterns including Variance-Adaptive Sampling, ReConcile Round-Table convergence, and the Tiered Specialist Intelligence model. Implements the SRP-compliant SynedrionReviewer to separate review strategies from the Jules transport layer. Documents the mass digestion (338+ branches) and Diorthōsis of critical AI/TH/ES risks (AI-022, TH-013, ES-018). Includes tiered agent memory architectures and the Jules Pool high-throughput infrastructure.",
+    "references": [
+        {
+            "type": "conversation_id",
+            "value": "12978a9f-a298-4e66-9a0a-4bd32bee5340"
+        },
+        {
+            "type": "file",
+            "value": "mekhane/symploke/specialist_v2.py"
+        },
+        {
+            "type": "file",
+            "value": "mekhane/symploke/run_specialists.py"
+        },
+        {
+            "type": "file",
+            "value": "mekhane/symploke/specialists_tier1.py"
+        },
+        {
+            "type": "file",
+            "value": "mekhane/symploke/jules_client.py"
+        },
+        {
+            "type": "file",
+            "value": "mekhane/symploke/jules_results_loader.py"
+        },
+        {
+            "type": "conversation_id",
+            "value": "81e3d6d7-15cc-4b68-a785-caa923392814"
+        },
+        {
+            "type": "conversation_id",
+            "value": "bot-f7bf082b-0c48-4859-9df7-04e3a0339d98"
+        },
+        {
+            "type": "conversation_id",
+            "value": "fe7dc7ad-4871-41e8-bba9-a0b3a25eaeea"
+        },
+        {
+            "type": "conversation_id",
+            "value": "6c7545e7-c74d-4b61-b59c-be80da22856d"
+        },
+        {
+            "type": "conversation_id",
+            "value": "9838f92a-07d9-4065-8984-c371d6ebc74b"
+        },
+        {
+            "type": "conversation_id",
+            "value": "bot-2d04385a-5b1e-4afe-a48d-64eedf52b843"
+        },
+        {
+            "type": "conversation_id",
+            "value": "6c7545e7-c74d-4b61-b59c-be80da22856d"
+        },
+        {
+            "type": "file",
+            "value": "mekhane/symploke/synedrion_reviewer.py"
+        }
+    ]
+}

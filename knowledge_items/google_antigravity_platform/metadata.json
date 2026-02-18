@@ -1,0 +1,46 @@
+{
+    "title": "Google Antigravity Platform Intelligence",
+    "summary": "Comprehensive documentation and architectural teardown of Google Antigravity (v1.16.5). Includes full official documentation coverage: Home, Getting Started, Agent Capabilities (Models, Modes, Skills, Task Groups), Rules & Workflows, Security (Strict/Sandbox Mode), Artifacts & Knowledge, Editor/Manager Interfaces, and Browser Interaction. Specifically documents the 'Skills' deep dive, the 12,000 character limit for Rule files, and the behavioral protocol that concrete platform-base understanding is a prerequisite for project-wide prediction error minimization.",
+    "references": [
+        {
+            "type": "url",
+            "value": "https://antigravity.google/docs"
+        },
+        {
+            "type": "url",
+            "value": "https://antigravity.google/changelog"
+        },
+        {
+            "type": "conversation_id",
+            "value": "c43921fa-dbae-4ead-b952-cf534584a742"
+        },
+        {
+            "type": "conversation_id",
+            "value": "fafb1f1b-8826-4beb-9ed9-e617a0f8ac19"
+        },
+        {
+            "type": "conversation_id",
+            "value": "249d3753-1577-449d-accf-193496bc439d"
+        },
+        {
+            "type": "conversation_id",
+            "value": "33a3a33f-5f5b-4156-8538-1e35a69617c1"
+        },
+        {
+            "type": "conversation_id",
+            "value": "788bb3d5-2d01-4d3a-a870-9d190636cb92"
+        },
+        {
+            "type": "conversation_id",
+            "value": "725"
+        },
+        {
+            "type": "conversation_id",
+            "value": "749"
+        },
+        {
+            "type": "conversation_id",
+            "value": "794"
+        }
+    ]
+}

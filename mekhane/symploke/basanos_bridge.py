@@ -222,6 +222,57 @@ class BasanosBridge:
             f"Review the following file: `{target_file}`\n"
         )
 
+    # PURPOSE: F8 Dynamic Perspective 統合
+    def get_dynamic_perspectives(
+        self,
+        file_path: str,
+        audit_issues: Optional[list[str]] = None,
+        max_perspectives: int = 24,
+    ) -> list[Specialist]:
+        """ファイル特性に基づいて動的に Perspective を生成し Specialist 形式で返す。
+
+        DynamicPerspectiveGenerator を内部で使い、ファイルの AST/pattern/issue に
+        基づいた adaptive な Specialist セットを返す。
+
+        Args:
+            file_path: 対象ファイルパス
+            audit_issues: AIAuditor が検出した issue コード (AI-xxx)
+            max_perspectives: 最大 perspective 数
+
+        Returns:
+            Specialist リスト (run_slot_batch 互換)
+        """
+        try:
+            from dynamic_perspective_generator import DynamicPerspectiveGenerator
+        except ImportError:
+            import sys as _sys
+            _dpg_path = str(Path(__file__).parent)
+            if _dpg_path not in _sys.path:
+                _sys.path.insert(0, _dpg_path)
+            from dynamic_perspective_generator import DynamicPerspectiveGenerator
+
+        gen = DynamicPerspectiveGenerator(max_perspectives=max_perspectives)
+        dynamic_perps = gen.generate_for_file(file_path, audit_issues=audit_issues)
+
+        # DynamicPerspective → Specialist v2 変換
+        specialists = []
+        for dp in dynamic_perps:
+            specialists.append(Specialist(
+                id=dp.id,
+                name=f"Dynamic: {dp.domain} — {dp.focus}",
+                category=dp.domain.lower().replace("-", "_"),
+                archetype=Archetype.PRECISION,
+                domain=dp.domain,
+                principle=dp.focus,
+                perceives=[dp.focus],
+                blind_to=[],
+                measure=f"Evaluate {dp.focus} in this file",
+                verdict=VerdictFormat.REVIEW,
+                severity_map={},
+            ))
+
+        return specialists
+
     # --- Internal rotation state ---
 
     def _load_rotation(self) -> dict:

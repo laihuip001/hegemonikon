@@ -1470,7 +1470,8 @@ def correct_selection(
 # PURPOSE: Select the optimal derivative for the given theorem and problem context.
 def select_derivative(
     theorem: Literal[
-        "O1", "O2", "O3", "O4", "S1", "S2", "S3", "S4", "H1", "H2", "H3", "H4"
+        "O1", "O2", "O3", "O4", "S1", "S2", "S3", "S4", "H1", "H2", "H3", "H4",
+        "P1", "P2", "P3", "P4", "K1", "K2", "K3", "K4", "A1", "A2", "A3", "A4",
     ],
     problem_context: str,
     use_fep: bool = False,

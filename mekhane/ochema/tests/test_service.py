@@ -80,14 +80,21 @@ class TestModelRouting:
         assert self.svc._is_claude_model("gemini-2.5-pro") is False
         assert self.svc._is_claude_model("gemini-3-pro-preview") is False
 
-    def test_resolve_claude_friendly_name(self):
-        """Friendly names resolve to proto enums."""
-        assert self.svc._resolve_claude_model("claude-sonnet") == "MODEL_CLAUDE_4_5_SONNET_THINKING"
-        assert self.svc._resolve_claude_model("claude-opus") == "MODEL_PLACEHOLDER_M26"
+    def test_resolve_model_config_id(self):
+        """Friendly names resolve to model_config_id."""
+        assert self.svc._resolve_model_config_id("claude-sonnet") == "claude-sonnet-4-5"
+        assert self.svc._resolve_model_config_id("claude-opus") == "claude-opus-4-6"
+        assert self.svc._resolve_model_config_id("claude-sonnet-4-5") == "claude-sonnet-4-5"
 
-    def test_resolve_unknown_passes_through(self):
+    def test_resolve_model_config_id_unknown_passes_through(self):
         """Unknown models pass through unchanged."""
-        assert self.svc._resolve_claude_model("custom-model") == "custom-model"
+        assert self.svc._resolve_model_config_id("custom-model") == "custom-model"
+
+    def test_resolve_ls_proto_model(self):
+        """Friendly names resolve to LS proto enums for fallback."""
+        assert self.svc._resolve_ls_proto_model("claude-sonnet") == "MODEL_CLAUDE_4_5_SONNET_THINKING"
+        assert self.svc._resolve_ls_proto_model("claude-opus") == "MODEL_PLACEHOLDER_M26"
+        assert self.svc._resolve_ls_proto_model("claude-sonnet-4-5") == "MODEL_CLAUDE_4_5_SONNET_THINKING"
 
 
 # --- Models Registry ---
@@ -118,7 +125,7 @@ class TestModelsRegistry:
         result = self.svc.models()
         models = result["models"]
         assert "gemini-2.0-flash" in models
-        assert "cortex-gemini" in models
+        assert "cortex-chat" in models
         assert "claude-sonnet" in models
 
     def test_default_model(self):
@@ -164,7 +171,7 @@ class TestConstants:
         expected = {
             "gemini-3-pro-preview", "gemini-3-flash-preview",
             "gemini-2.5-pro", "gemini-2.5-flash", "gemini-2.0-flash",
-            "cortex-gemini", "claude-sonnet", "claude-opus",
+            "cortex-chat", "claude-sonnet", "claude-sonnet-4-5", "claude-opus",
         }
         assert set(AVAILABLE_MODELS.keys()) == expected
 

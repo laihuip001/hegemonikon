@@ -1,0 +1,14 @@
+{
+    "title": "Claude Model Intelligence & Evolution",
+    "summary": "Detailed tracking of Anthropic's Claude models, specifically focusing on the 4.x series and its implications for agentic workflows. Covers key features like the 1M token context window, Adaptive Thinking, and Context Compaction. Documents the Shift to \"Agent Teams\" in coding tasks and the performance benchmarks (Terminal-Bench, GDPval-AA) that establish Claude's position in the frontier model landscape. This KI serves as a reference for optimizing Hegemonikón's context management and multi-agent orchestration strategies.",
+    "references": [
+        {
+            "type": "conversation_id",
+            "value": "80955345-059b-416a-a955-566b6a66b3f9"
+        },
+        {
+            "type": "url",
+            "value": "https://www.anthropic.com/news/claude-opus-4-6"
+        }
+    ]
+}

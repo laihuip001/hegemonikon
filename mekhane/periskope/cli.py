@@ -57,6 +57,27 @@ def create_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="Verbose logging",
     )
+    parser.add_argument(
+        "--digest",
+        action="store_true",
+        help="Auto-digest: write results to /eat incoming",
+    )
+    parser.add_argument(
+        "--digest-depth",
+        choices=["quick", "standard", "deep"],
+        default="quick",
+        help="Digest template depth (default: quick)",
+    )
+    parser.add_argument(
+        "--no-expand",
+        action="store_true",
+        help="Disable bilingual query expansion (W3)",
+    )
+    parser.add_argument(
+        "--multipass",
+        action="store_true",
+        help="Enable multi-pass search for deeper coverage (W6)",
+    )
     return parser
 
 
@@ -73,6 +94,10 @@ async def main(args: argparse.Namespace) -> int:
     report = await engine.research(
         query=args.query,
         sources=args.sources,
+        auto_digest=args.digest,
+        digest_depth=args.digest_depth,
+        expand_query=not args.no_expand,
+        multipass=args.multipass,
     )
 
     md = report.markdown()

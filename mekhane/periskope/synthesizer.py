@@ -62,7 +62,7 @@ class MultiModelSynthesizer:
     def __init__(
         self,
         synth_models: list[SynthModel] | None = None,
-        cortex_model: str = "gemini-2.0-flash",
+        cortex_model: str = "gemini-3-flash-preview",
         max_tokens: int = 4096,
     ) -> None:
         self.synth_models = synth_models or [SynthModel.GEMINI_FLASH]
@@ -132,7 +132,7 @@ class MultiModelSynthesizer:
         """Synthesize via Cortex (Gemini) API."""
         cortex = self._get_cortex()
 
-        gemini_model = model.value  # e.g., "gemini-2.0-flash"
+        gemini_model = model.value  # e.g., "gemini-3-flash-preview"
 
         start = time.monotonic()
         response = await cortex.ask_async(
@@ -170,12 +170,47 @@ class MultiModelSynthesizer:
     ) -> SynthesisResult:
         """Synthesize via Language Server (Claude).
 
-        Currently a placeholder — extensible for parallel LS support.
+        Uses AntigravityClient to connect to the running LS.
+        Falls back to error if LS is not running.
         """
-        # Future: Use ls_launcher.py or antigravity_client.py
-        # For now, fall back to Cortex with a note
-        logger.warning("Claude LS synthesis not yet implemented, using Gemini fallback")
-        return await self._synth_gemini(prompt, SynthModel.GEMINI_FLASH, system_instruction)
+        try:
+            from mekhane.ochema.antigravity_client import AntigravityClient, LLMResponse
+
+            # AntigravityClient.ask() is synchronous — wrap in thread
+            def _call_ls() -> LLMResponse:
+                client = AntigravityClient()
+                return client.ask(
+                    message=prompt,
+                    model="MODEL_CLAUDE_4_5_SONNET_THINKING",
+                    timeout=120.0,
+                )
+
+            start = time.monotonic()
+            response = await asyncio.to_thread(_call_ls)
+            elapsed = time.monotonic() - start
+
+            citations = self._extract_citations(response.text)
+            confidence = self._extract_confidence(response.text)
+
+            logger.info(
+                "Claude LS synthesis: %d chars in %.1fs, confidence=%d%%",
+                len(response.text), elapsed, int(confidence * 100),
+            )
+
+            return SynthesisResult(
+                model=SynthModel.CLAUDE_LS,
+                content=response.text,
+                citations=citations,
+                confidence=confidence,
+                thinking=response.thinking or "",
+                token_count=response.token_usage.get("total_tokens", 0)
+                if isinstance(response.token_usage, dict)
+                else 0,
+            )
+
+        except Exception as e:
+            logger.warning("Claude LS synthesis failed (LS may not be running): %s", e)
+            raise RuntimeError(f"Claude LS unavailable: {e}") from e
 
     def detect_divergence(
         self,

@@ -1,0 +1,21 @@
+{
+  "ccl": "/noe-",
+  "status": "error",
+  "results": [
+    {
+      "thread": "ochema",
+      "ccl": "/noe-",
+      "status": "error",
+      "error": "Language Server not found (workspace: hegemonikon)"
+    }
+  ],
+  "plan": {
+    "type": "single",
+    "elements": [
+      "/noe-"
+    ],
+    "fallback": true
+  },
+  "timestamp": "2026-02-18T02:07:51.105724",
+  "error": null
+}

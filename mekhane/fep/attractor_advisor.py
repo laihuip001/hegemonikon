@@ -257,6 +257,16 @@ class AttractorAdvisor:
             ki_names = ", ".join(k["ki_name"] for k in rec.knowledge_context)
             lines.append(f"[Knowledge: {ki_names}]")
 
+        # S/P-series 活性化定理ブースト (F6: 活性化状態反映)
+        # 新たに CCL マクロに統合された定理を積極的に推薦
+        _SP_BOOST: dict[str, str] = {
+            "S": "S1(Metron/スケール判断) → ccl-build,ccl-dig",
+            "P": "P2(Hodos/経路設計),P3(Trokhia/軌道定義),P4(Tekhnē/技法選択)",
+        }
+        for s in rec.series:
+            if s in _SP_BOOST:
+                lines.append(f"[ActivationBoost: {_SP_BOOST[s]}]")
+
         return "\n".join(lines)
 
     # PURPOSE: Problem D — 複合入力を分解して各セグメントごとに推薦する

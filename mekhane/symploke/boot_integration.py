@@ -327,10 +327,45 @@ def get_boot_context(mode: str = "standard", context: Optional[str] = None) -> d
     proactive_push_result = load_proactive_push(mode, context)
     ideas_result = load_ideas(mode, context)
 
+    # ── WAL 軸 (O) — Intent-WAL 前セッション復元 ──
+    wal_result = {"has_wal": False, "formatted": ""}
+    if mode != "fast":
+        try:
+            from mekhane.symploke.intent_wal import IntentWALManager
+            wal_mgr = IntentWALManager()
+            prev_wal = wal_mgr.load_latest()
+            if prev_wal:
+                done = sum(1 for e in prev_wal.progress if e.status == "done")
+                total = len(prev_wal.progress)
+                wal_lines = ["📋 **Intent-WAL** (前セッション)"]
+                wal_lines.append(f"   Goal: {prev_wal.session_goal}")
+                wal_lines.append(f"   Health: {prev_wal.context_health_level}")
+                wal_lines.append(f"   Progress: {done}/{total} steps")
+                if prev_wal.blockers:
+                    wal_lines.append(f"   ⚠️ Blockers: {', '.join(prev_wal.blockers)}")
+                # Incomplete tasks
+                incomplete = [e for e in prev_wal.progress if e.status in ("in_progress", "blocked")]
+                if incomplete:
+                    wal_lines.append("   未完了:")
+                    for e in incomplete[:5]:
+                        wal_lines.append(f"     - [{e.status}] {e.action}")
+                wal_result = {
+                    "has_wal": True,
+                    "session_goal": prev_wal.session_goal,
+                    "health": prev_wal.context_health_level,
+                    "progress_done": done,
+                    "progress_total": total,
+                    "blockers": prev_wal.blockers,
+                    "formatted": "\n".join(wal_lines),
+                    "boot_section": wal_mgr.to_boot_section(),
+                }
+        except Exception:
+            pass  # WAL failure should not block boot
+
     # ── 統合フォーマット ──
     lines: list[str] = []
 
-    # 表示順: Persona → Handoff → KI → PKS → Safety → EPT
+    # 表示順: Persona → Handoff → WAL → KI → PKS → Safety → EPT
     #       → Digestor → Attractor → Projects → Skills → Doxa → Feedback
     if persona_result.get("formatted"):
         lines.append(persona_result["formatted"])
@@ -339,6 +374,10 @@ def get_boot_context(mode: str = "standard", context: Optional[str] = None) -> d
     if handoffs_result.get("latest"):
         from mekhane.symploke.handoff_search import format_boot_output
         lines.append(format_boot_output(handoffs_result, verbose=(mode == "detailed")))
+        lines.append("")
+
+    if wal_result.get("formatted"):
+        lines.append(wal_result["formatted"])
         lines.append("")
 
     if ki_result.get("ki_items"):
@@ -402,6 +441,7 @@ def get_boot_context(mode: str = "standard", context: Optional[str] = None) -> d
         "feedback": feedback_result,
         "proactive_push": proactive_push_result,
         "ideas": ideas_result,
+        "wal": wal_result,
         "incoming": incoming_result,
         "formatted": "\n".join(lines),
     }
@@ -414,6 +454,24 @@ def print_boot_summary(mode: str = "standard", context: Optional[str] = None):
     """Print formatted boot summary."""
     result = get_boot_context(mode=mode, context=context)
     print(result["formatted"])
+
+    # Today's Theorem — underused theorem suggestion
+    try:
+        from mekhane.fep.theorem_recommender import todays_theorem, usage_summary
+        suggestions = todays_theorem(n=2)
+        if suggestions:
+            print()
+            print("💡 **今日の定理提案** (underused theorems)")
+            for t in suggestions:
+                usage = t["usage_count"]
+                print(f"   {t['id']} {t['name']} ({t['command']}) — 使用{usage}回")
+                print(f"      {t['prompt']}")
+            # Usage summary line
+            summary = usage_summary()
+            unused_pct = round(summary["unused_count"] / 24 * 100)
+            print(f"   📊 未使用: {summary['unused_count']}/24 ({unused_pct}%)")
+    except Exception:
+        pass  # Theorem recommender failure should not block boot
 
     # Summary line
     print()

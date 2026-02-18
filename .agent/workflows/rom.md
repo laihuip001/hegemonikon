@@ -314,6 +314,49 @@ related_roms: ["{関連ROM_ID}"]
 | 🟡→🟠 | `/rom` を**推奨** — Savepoint 代わりに構造化保存 |
 | 🟠→🔴 | `/rom` + `/bye` を**強制** — 焼ける物は全て焼いて撤退 |
 
+### Intent-WAL 自動更新 (v1.1 追加)
+
+> Context Rot 遷移時、Intent-WAL Manager を使って WAL ファイルをリアルタイム更新する。
+> WAL は `/boot` 時に `load_latest()` で自動読込され、セッション復元に使われる。
+
+**Python 連携コード**:
+
+```python
+from mekhane.symploke.intent_wal import IntentWALManager
+
+mgr = IntentWALManager()
+mgr.load_latest()  # 現セッションの WAL を読込
+
+# 🟢→🟡 遷移時: 提案 + WAL 更新
+mgr.update_context_health(
+    level="yellow",
+    recommendation="/rom を提案: 重要な判断を ROM に焼く",
+)
+
+# 🟡→🟠 遷移時: 推奨 + Savepoint 記録
+mgr.update_context_health(
+    level="orange",
+    savepoint="~/oikos/mneme/.hegemonikon/sessions/savepoint_YYYYMMDD_HHMM.md",
+    recommendation="/rom を推奨: 構造化保存。新規タスク受付を停止",
+)
+
+# ROM 焼付け完了時: progress に記録
+mgr.update_progress(
+    step=N,
+    action="ROM burned: rom_YYYY-MM-DD_topic.md",
+    status="done",
+)
+```
+
+**発動タイミング**:
+
+| タイミング | 操作 |
+|:---------|:-----|
+| セッション開始 | `create()` で WAL 生成 |
+| BC-18 遷移検知 | `update_context_health()` で WAL 更新 |
+| `/rom` 実行完了 | `update_progress()` で ROM 焼付けを記録 |
+| `/bye` 時 | `to_handoff_section()` で Handoff に WAL 要約を埋込 |
+
 ---
 
 ## Artifact 自動保存

@@ -1,0 +1,30 @@
+# Periskopē Search Configuration
+# Customize category weights, defaults, and behavior.
+
+# SearXNG category weights (must sum to ~1.0)
+searxng:
+  weights:
+    general: 0.4
+    science: 0.2
+    it: 0.2
+    news: 0.2
+
+# Exa category weights (must sum to ~1.0)
+exa:
+  weights:
+    general: 0.5
+    paper: 0.3
+    github: 0.2
+
+# Default behavior
+defaults:
+  max_results_per_source: 10
+  expand_query: true      # W3: bilingual expansion
+  multipass: false         # W6: 2-pass refinement
+  verify_citations: true
+
+# SearXNG instance
+searxng_url: "http://localhost:8888"
+
+# Query expansion model (W3)
+expansion_model: "gemini-2.0-flash"

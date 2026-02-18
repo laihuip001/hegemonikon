@@ -16,6 +16,7 @@ WARNING: ToS グレーゾーン。実験用途限定。公開禁止。
 
 import sys
 import os
+import uuid
 
 # ============ CRITICAL: Platform-specific asyncio setup ============
 if sys.platform == "win32":
@@ -104,6 +105,10 @@ def get_service():
     log(f"OchemaService: {svc}")
     return svc
 
+# ============ Stateful Chat Conversations ============
+_MAX_CONVERSATIONS = 10
+_conversations: dict[str, object] = {}  # {conv_id: ChatConversation}
+
 # PURPOSE: [L2-auto] List available tools.
 
 @server.list_tools()
@@ -140,6 +145,11 @@ async def list_tools():
                         "type": "number",
                         "description": "Max wait seconds for LLM response (default: 120)",
                         "default": 120,
+                    },
+                    "account": {
+                        "type": "string",
+                        "description": "TokenVault account name (default: 'default')",
+                        "default": "default",
                     },
                 },
                 "required": ["message"],
@@ -178,14 +188,137 @@ async def list_tools():
                         "description": "Maximum output tokens (default: 8192)",
                         "default": 8192,
                     },
+                    "account": {
+                        "type": "string",
+                        "description": "TokenVault account name (default: 'default')",
+                        "default": "default",
+                    },
                 },
                 "required": ["message"],
             },
         ),
         Tool(
+            name="ask_chat",
+            description=(
+                "Chat with Gemini via generateChat API (direct, no Language Server). "
+                "Supports multi-turn conversation with history. "
+                "2MB context window, 100+ turns. Uses Gemini 3 Pro Preview."
+            ),
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "message": {
+                        "type": "string",
+                        "description": "The message to send",
+                    },
+                    "history": {
+                        "type": "array",
+                        "description": (
+                            "Conversation history. Array of objects with "
+                            "'author' (1=user, 2=model) and 'content' (string)"
+                        ),
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "author": {"type": "number"},
+                                "content": {"type": "string"},
+                            },
+                        },
+                    },
+                    "tier_id": {
+                        "type": "string",
+                        "description": "Model routing tier (empty=default, g1-ultra-tier=premium)",
+                        "default": "",
+                    },
+                    "account": {
+                        "type": "string",
+                        "description": "TokenVault account name (default: 'default')",
+                        "default": "default",
+                    },
+                },
+                "required": ["message"],
+            },
+        ),
+        Tool(
+            name="start_chat",
+            description=(
+                "Start a stateful multi-turn chat conversation. "
+                "Returns a conversation_id to use with send_chat. "
+                "Supports Claude and Gemini models. Max 10 concurrent conversations."
+            ),
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "model": {
+                        "type": "string",
+                        "description": (
+                            "Model config ID (e.g. 'claude-sonnet-4-5'). "
+                            "Empty = server default"
+                        ),
+                        "default": "",
+                    },
+                    "tier_id": {
+                        "type": "string",
+                        "description": "Model routing tier (empty=default)",
+                        "default": "",
+                    },
+                    "account": {
+                        "type": "string",
+                        "description": "TokenVault account name (default: 'default')",
+                        "default": "default",
+                    },
+                },
+            },
+        ),
+        Tool(
+            name="send_chat",
+            description=(
+                "Send a message to an existing chat conversation. "
+                "Requires conversation_id from start_chat. "
+                "History is managed server-side automatically."
+            ),
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "conversation_id": {
+                        "type": "string",
+                        "description": "Conversation ID from start_chat",
+                    },
+                    "message": {
+                        "type": "string",
+                        "description": "The message to send",
+                    },
+                },
+                "required": ["conversation_id", "message"],
+            },
+        ),
+        Tool(
+            name="close_chat",
+            description="Close a chat conversation and free resources.",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "conversation_id": {
+                        "type": "string",
+                        "description": "Conversation ID to close",
+                    },
+                },
+                "required": ["conversation_id"],
+            },
+        ),
+        Tool(
             name="cortex_quota",
             description="Get Gemini API quota (remaining requests per model).",
-            inputSchema={"type": "object", "properties": {}},
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "account": {
+                        "type": "string",
+                        "description": "TokenVault account name (default: 'default')",
+                        "default": "default",
+                    },
+                },
+            },
         ),
         Tool(
             name="status",
@@ -274,19 +407,23 @@ async def call_tool(name: str, arguments: dict):
         model = arguments.get("model", "gemini-2.0-flash")
         system_instruction = arguments.get("system_instruction")
         max_tokens = int(arguments.get("max_tokens", 8192))
+        timeout = float(arguments.get("timeout", 120))
+        account = arguments.get("account", "default")
 
         if not message:
             return [TextContent(type="text", text="Error: message is required")]
 
         try:
             svc = get_service()
-            log(f"Cortex asking {model}: {message[:50]}...")
+            log(f"Asking {model} (account={account}): {message[:50]}...")
 
             response = svc.ask(
                 message,
                 model=model,
                 system_instruction=system_instruction,
                 max_tokens=max_tokens,
+                timeout=timeout,
+                account=account,
             )
 
             output_lines = [
@@ -311,10 +448,133 @@ async def call_tool(name: str, arguments: dict):
             log(f"Cortex ask error: {e}")
             return [TextContent(type="text", text=f"Error: {str(e)}")]
 
-    elif name == "cortex_quota":
+    elif name == "ask_chat":
+        message = arguments.get("message", "")
+        model = arguments.get("model", "")
+        history = arguments.get("history", [])
+        tier_id = arguments.get("tier_id", "")
+        account = arguments.get("account", "default")
+
+        if not message:
+            return [TextContent(type="text", text="Error: message is required")]
+
         try:
             svc = get_service()
-            quota = svc.quota().get("cortex", {})
+            log(f"Chat: {message[:50]}... (model={model or 'default'}, account={account})")
+
+            response = svc.chat(
+                message=message,
+                model=model,
+                history=history,
+                tier_id=tier_id,
+                account=account,
+            )
+
+            output_lines = [
+                "# Chat Response (generateChat)\n",
+                f"**Model**: {response.model}",
+                "",
+                "## Response\n",
+                response.text,
+            ]
+
+            log(f"Chat response: {len(response.text)} chars")
+            return [TextContent(type="text", text="\n".join(output_lines))]
+
+        except Exception as e:
+            log(f"Chat error: {e}")
+            return [TextContent(type="text", text=f"Error: {str(e)}")]
+
+    elif name == "start_chat":
+        model = arguments.get("model", "")
+        tier_id = arguments.get("tier_id", "")
+        account = arguments.get("account", "default")
+        try:
+            if len(_conversations) >= _MAX_CONVERSATIONS:
+                oldest_id = next(iter(_conversations))
+                _conversations[oldest_id].close()
+                del _conversations[oldest_id]
+                log(f"Evicted conversation {oldest_id}")
+
+            svc = get_service()
+            conv = svc.start_chat(model=model, tier_id=tier_id, account=account)
+            conv_id = str(uuid.uuid4())[:8]
+            _conversations[conv_id] = conv
+            log(f"Started conversation {conv_id} (model={model or 'default'}, total: {len(_conversations)})")
+            return [TextContent(
+                type="text",
+                text=(
+                    f"# Chat Started\n\n"
+                    f"**Conversation ID**: `{conv_id}`\n"
+                    f"Use `send_chat` with this ID to send messages.\n"
+                    f"Use `close_chat` to end the conversation."
+                ),
+            )]
+        except Exception as e:
+            log(f"Start chat error: {e}")
+            return [TextContent(type="text", text=f"Error: {str(e)}")]
+
+    elif name == "send_chat":
+        conv_id = arguments.get("conversation_id", "")
+        message = arguments.get("message", "")
+
+        if not conv_id or not message:
+            return [TextContent(type="text", text="Error: conversation_id and message are required")]
+
+        conv = _conversations.get(conv_id)
+        if conv is None:
+            return [TextContent(
+                type="text",
+                text=f"Error: conversation '{conv_id}' not found. Use start_chat first.",
+            )]
+
+        try:
+            log(f"Send to {conv_id}: {message[:50]}... (turn {conv.turn_count + 1})")
+            response = conv.send(message)
+
+            output_lines = [
+                "# Chat Response\n",
+                f"**Conversation**: `{conv_id}` (turn {conv.turn_count})",
+                f"**Model**: {response.model}",
+                "",
+                "## Response\n",
+                response.text,
+            ]
+
+            log(f"Chat {conv_id} turn {conv.turn_count}: {len(response.text)} chars")
+            return [TextContent(type="text", text="\n".join(output_lines))]
+
+        except Exception as e:
+            log(f"Send chat error ({conv_id}): {e}")
+            return [TextContent(type="text", text=f"Error: {str(e)}")]
+
+    elif name == "close_chat":
+        conv_id = arguments.get("conversation_id", "")
+
+        if not conv_id:
+            return [TextContent(type="text", text="Error: conversation_id is required")]
+
+        conv = _conversations.pop(conv_id, None)
+        if conv is None:
+            return [TextContent(
+                type="text",
+                text=f"Error: conversation '{conv_id}' not found.",
+            )]
+
+        turns = conv.turn_count
+        conv.close()
+        log(f"Closed conversation {conv_id} ({turns} turns)")
+        return [TextContent(
+            type="text",
+            text=f"Chat `{conv_id}` closed ({turns} turns completed).",
+        )]
+
+    elif name == "cortex_quota":
+        try:
+            account = arguments.get("account", "default")
+            svc = get_service()
+            quota_data = svc.quota(account=account)
+            quota = quota_data.get("cortex", {})
 
             output_lines = ["# Gemini Quota\n"]
             output_lines.append("| Model | Remaining | Reset |")
@@ -326,6 +586,38 @@ async def call_tool(name: str, arguments: dict):
                 output_lines.append(
                     f"| `{model}` | {remaining*100:.1f}% | {reset} |"
                 )
+
+            # Chat session info (F8)
+            if _conversations:
+                output_lines.append("")
+                output_lines.append("## Active Chat Sessions")
+                output_lines.append(f"**{len(_conversations)}/{_MAX_CONVERSATIONS}** sessions active")
+                total_turns = 0
+                for cid, conv in _conversations.items():
+                    try:
+                        turns = conv.turn_count  # type: ignore[union-attr]
+                        total_turns += turns
+                        output_lines.append(f"- `{cid[:8]}…`: {turns} turns")
+                    except AttributeError:
+                        output_lines.append(f"- `{cid[:8]}…`: (unknown)")
+                output_lines.append(f"\n**Total turns**: {total_turns}")
+
+            # Token health (F5)
+            token_health = quota_data.get("token_health")
+            if token_health and token_health.get("accounts"):
+                output_lines.append("")
+                output_lines.append("## Token Health")
+                for acct_name, info in token_health["accounts"].items():
+                    if info.get("cached"):
+                        ttl = info.get("ttl_seconds", 0)
+                        healthy = "✅" if info.get("healthy") else "⚠️"
+                        output_lines.append(
+                            f"- `{acct_name}`: {healthy} TTL={ttl}s"
+                        )
+                    else:
+                        output_lines.append(
+                            f"- `{acct_name}`: 🔘 not cached"
+                        )
 
             log(f"Quota returned: {len(quota.get('buckets', []))} buckets")
             return [TextContent(type="text", text="\n".join(output_lines))]

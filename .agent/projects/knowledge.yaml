@@ -1,0 +1,78 @@
+# Knowledge Base — Informational / Theoretical items
+# These are NOT actionable tools. They are reference material, concepts, and theories.
+# Separated from registry.yaml to distinguish "what you can use" from "what you should know".
+version: 1.0.0
+knowledge:
+- id: kernel
+  name: Kernel
+  path: kernel/
+  category: theory
+  summary: 公理・定理・憲法 — 体系の根幹 (1公理 + 6座標 + 24定理 + 108関係)
+  status: active
+  phase: operational
+  entry_point:
+    reference: kernel/SACRED_TRUTH.md
+  usage_trigger: 公理・定理の参照時。体系の正本。
+
+- id: ccl
+  name: CCL (Cognitive Control Language)
+  path: ccl/
+  category: language
+  summary: 認知代数言語仕様 — 演算子, マクロ, WF 分類
+  status: active
+  phase: operational
+  entry_point:
+    reference: ccl/operators.md
+    macros: ccl/macros/
+  usage_trigger: CCL 構文の仕様確認時。演算子の意味・pt 計算の正本。
+
+- id: pepsis
+  name: Pepsis (Πέψις)
+  path: pepsis/
+  category: framework
+  summary: 外部設計哲学を消化し HGK に統合する汎用フレームワーク
+  status: active
+  phase: operational
+  etymology: Πέψις = 消化
+
+- id: kalon
+  name: Kalon (τὸ καλόν)
+  path: .agent/projects/kalon/
+  category: theory
+  summary: 美の体系 — FEP/圏論/CCL演算子の数学的基盤
+  status: active
+  phase: theory
+  etymology: 美 — 美しいもの
+  entry_point:
+    reference: ccl/operators.md §13 圏論的意味論マップ
+  usage_trigger: 圏論的解釈が必要な時。演算子の数学的基盤、随伴・モナド・極限。
+
+- id: aristos
+  name: Aristos (ἄριστος)
+  path: .agent/projects/aristos/
+  category: theory
+  summary: 最適化数学 — L1 グラフ理論 (WF ルーティング) 実装済み
+  status: active
+  phase: implementation
+  etymology: 最善・最良 — アリストクラシーの語源
+  entry_point:
+    test: PYTHONPATH=. .venv/bin/python -m pytest .agent/projects/aristos/test_router.py -v
+  usage_trigger: 最適化問題、WFルーティング、グラフ理論的分析が必要な時。
+
+- id: code-protocols
+  name: Code Protocols
+  path: .agent/skills/code-protocols/
+  category: protocol
+  summary: 開発プロトコル（旧資産 Module 01-25）
+  status: active
+  phase: operational
+  usage_trigger: コーディング規約・プロトコルの参照時。
+
+- id: category-theory-engine
+  name: Category Theory Engine
+  path: .agent/skills/category-engine/
+  category: theory
+  summary: 圏論に基づく構造認識エンジン — 前順序圏 + ガロア接続 + 豊穣圏
+  status: active
+  phase: operational
+  usage_trigger: 圏論的分析が必要な時。12随伴対・Trigonon・CCL の圏論的意味。

@@ -123,6 +123,79 @@ class FeedbackStore:
         """外部保存用。"""
         self._save()
 
+    def get_exclusion_report(self, threshold: float = 0.1) -> dict:
+        """淘汰レポートを返す (F14)。"""
+        excluded = self.get_low_quality_perspectives(threshold)
+        total = len(self._data)
+        return {
+            "excluded_count": len(excluded),
+            "excluded_ids": excluded,
+            "threshold": threshold,
+            "total_perspectives": total,
+            "exclusion_rate": round(len(excluded) / total, 3) if total else 0.0,
+        }
+
+    def get_stale_perspectives(self, inactive_days: int = 30) -> list[str]:
+        """指定日数以上使用されていない Perspective ID リストを返す (F24)。
+
+        Args:
+            inactive_days: 非活性とみなす日数 (デフォルト30日)
+
+        Returns:
+            stale perspective_id のリスト
+        """
+        from datetime import datetime, timedelta
+        cutoff = datetime.now() - timedelta(days=inactive_days)
+        cutoff_str = cutoff.strftime("%Y-%m-%d")
+
+        stale = []
+        for pid, fb in self._data.items():
+            if not fb.last_used:
+                stale.append(pid)
+            elif fb.last_used < cutoff_str:
+                stale.append(pid)
+        return stale
+
+    def archive_perspective(self, perspective_id: str) -> bool:
+        """Perspective をアーカイブ状態にする (F24)。
+
+        削除ではなくアーカイブ。archived/ ディレクトリに移動し、
+        メインデータからは除外する。
+
+        Returns:
+            True if archived, False if not found
+        """
+        import json
+
+        if perspective_id not in self._data:
+            return False
+
+        fb = self._data[perspective_id]
+
+        # アーカイブファイルに追記
+        archive_dir = self._state_file.parent / "archived_perspectives"
+        archive_dir.mkdir(parents=True, exist_ok=True)
+        archive_file = archive_dir / "archive.jsonl"
+
+        archive_record = {
+            "perspective_id": perspective_id,
+            "domain": fb.domain,
+            "axis": fb.axis,
+            "total_reviews": fb.total_reviews,
+            "useful_count": fb.useful_count,
+            "usefulness_rate": fb.usefulness_rate,
+            "last_used": fb.last_used,
+            "archived_at": __import__("datetime").datetime.now().isoformat(),
+        }
+
+        with open(archive_file, "a") as f:
+            f.write(json.dumps(archive_record, ensure_ascii=False) + "\n")
+
+        # メインデータから除外
+        del self._data[perspective_id]
+        self._save()
+        return True
+
 
 # PURPOSE: スケジューラーログから basanos 使用実績を収集
 def collect_from_logs(days: int = 7) -> dict:

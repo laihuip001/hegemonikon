@@ -152,6 +152,69 @@ class ExaSearcher:
             search_type="neural",
         )
 
+    async def search_multi_category(
+        self,
+        query: str,
+        max_results: int = 10,
+        weights: dict[str, float] | None = None,
+    ) -> list[SearchResult]:
+        """W2: Search across 3 categories in parallel.
+
+        Runs general, research paper, and github searches concurrently,
+        then merges and deduplicates results.
+
+        Args:
+            query: Search query.
+            max_results: Total max results across all categories.
+            weights: Category weights for result allocation.
+                Keys: "general", "paper", "github". Values sum to 1.0.
+                Default: {"general": 0.5, "paper": 0.3, "github": 0.2}
+
+        Returns:
+            Merged and deduplicated results.
+        """
+        w = weights or {"general": 0.5, "paper": 0.3, "github": 0.2}
+        n_general = max(2, int(max_results * w.get("general", 0.5)))
+        n_paper = max(2, int(max_results * w.get("paper", 0.3)))
+        n_github = max(2, int(max_results * w.get("github", 0.2)))
+
+        tasks = [
+            self.search(query, max_results=n_general, category="general"),
+            self.search(query, max_results=n_paper, category="research paper", search_type="neural"),
+            self.search(query, max_results=n_github, category="github"),
+        ]
+
+        all_results: list[SearchResult] = []
+        category_results = await asyncio.gather(*tasks, return_exceptions=True)
+
+        category_names = ["general", "paper", "github"]
+        for cat_name, result in zip(category_names, category_results):
+            if isinstance(result, list):
+                all_results.extend(result)
+                logger.info("  Exa [%s]: %d results", cat_name, len(result))
+            elif isinstance(result, Exception):
+                logger.warning("  Exa [%s]: FAILED — %s", cat_name, result)
+
+        # Deduplicate by URL
+        seen: set[str] = set()
+        deduped: list[SearchResult] = []
+        for r in all_results:
+            key = (r.url or "").lower().rstrip("/")
+            if key and key in seen:
+                continue
+            if key:
+                seen.add(key)
+            deduped.append(r)
+
+        deduped.sort(key=lambda r: r.relevance, reverse=True)
+        result_list = deduped[:max_results]
+
+        logger.info(
+            "Exa multi-category: %d results (from %d raw)",
+            len(result_list), len(all_results),
+        )
+        return result_list
+
 
 def _truncate(text: str, max_len: int) -> str:
     if len(text) <= max_len:

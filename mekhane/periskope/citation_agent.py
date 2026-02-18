@@ -9,6 +9,7 @@ automatically based on verification results.
 from __future__ import annotations
 
 import asyncio
+import hashlib
 import logging
 import re
 from difflib import SequenceMatcher
@@ -29,28 +30,38 @@ class CitationAgent:
         4. Assign TaintLevel based on similarity score
 
     BC-6 TAINT Mapping:
-        ≥0.8 similarity → SOURCE (verified)
-        ≥0.5 similarity → TAINT (partially supported)
-        <0.5 similarity → FABRICATED (unsupported)
+        ≥0.65 similarity → SOURCE (verified)
+        ≥0.40 similarity → TAINT (partially supported)
+        <0.40 similarity → FABRICATED (unsupported)
     """
 
-    # Similarity thresholds for TAINT classification
-    THRESHOLD_SOURCE = 0.6    # ≥ this → SOURCE
-    THRESHOLD_TAINT = 0.3     # ≥ this → TAINT
+    # Default similarity thresholds for TAINT classification
+    THRESHOLD_SOURCE = 0.65   # ≥ this → SOURCE
+    THRESHOLD_TAINT = 0.40    # ≥ this → TAINT
     # < THRESHOLD_TAINT → FABRICATED
 
     def __init__(
         self,
         timeout: float = 15.0,
         max_content_length: int = 10000,
+        threshold_source: float | None = None,
+        threshold_taint: float | None = None,
     ) -> None:
         self.timeout = timeout
         self.max_content_length = max_content_length
+        self._embedder = None
+        if threshold_source is not None:
+            self.THRESHOLD_SOURCE = threshold_source
+        if threshold_taint is not None:
+            self.THRESHOLD_TAINT = threshold_taint
+        # F8: embedding cache (SHA256[:16] → vector)
+        self._embed_cache: dict[str, list[float]] = {}
 
     async def verify_citations(
         self,
         citations: list[Citation],
         source_contents: dict[str, str] | None = None,
+        verify_depth: int = 1,
     ) -> list[Citation]:
         """Verify a list of citations.
 
@@ -58,6 +69,7 @@ class CitationAgent:
             citations: Citations to verify.
             source_contents: Pre-fetched content keyed by URL (optional).
                 If provided, skips URL fetching for matching URLs.
+            verify_depth: 1 = direct verification, 2 = 2-hop chain verification (F13).
 
         Returns:
             Updated citations with taint_level, similarity, and verification_note.
@@ -94,6 +106,11 @@ class CitationAgent:
             levels.count(TaintLevel.FABRICATED),
             levels.count(TaintLevel.UNCHECKED),
         )
+
+        # F13: 2-hop chain verification
+        if verify_depth >= 2:
+            verified = await self._verify_chain(verified, source_contents)
+
         return verified
 
     async def _verify_one(
@@ -142,12 +159,13 @@ class CitationAgent:
         return citation
 
     def _compute_similarity(self, claim: str, content: str) -> float:
-        """Compute fuzzy similarity between claim and source content.
+        """Compute similarity between claim and source content.
 
-        Uses multiple strategies:
+        Uses multiple strategies (best score wins):
         1. Direct substring check (highest confidence)
         2. Sentence-level SequenceMatcher
         3. Keyword overlap ratio
+        4. Semantic embedding similarity (BGE-M3 cosine)
 
         Returns:
             Similarity score between 0.0 and 1.0.
@@ -178,8 +196,126 @@ class CitationAgent:
         else:
             keyword_score = 0.0
 
-        # Weighted combination
-        return 0.6 * best_sentence_score + 0.4 * keyword_score
+        # Lexical score (original weighted combination)
+        lexical_score = 0.6 * best_sentence_score + 0.4 * keyword_score
+
+        # Strategy 4: Semantic embedding similarity (BGE-M3)
+        semantic_score = self._compute_semantic_similarity(claim, content_truncated)
+
+        if semantic_score is not None:
+            # Take best of lexical and semantic — LLM paraphrasing
+            # is caught by semantic even when lexical fails
+            return max(lexical_score, semantic_score)
+
+        return lexical_score
+
+    def _compute_semantic_similarity(
+        self, claim: str, content: str,
+    ) -> float | None:
+        """Compute cosine similarity via BGE-M3 embeddings.
+
+        Splits content into chunks, embeds claim + chunks,
+        and returns max cosine similarity.
+        Uses hash-based cache to avoid re-embedding identical text.
+
+        Returns None if embedder is unavailable.
+        """
+        try:
+            from mekhane.anamnesis.index import Embedder
+
+            embedder = self._get_embedder()
+
+            claim_vec = self._cached_embed(embedder, claim)
+
+            # Split content into sentences for granular matching
+            sentences = re.split(r'[.!?\n]+', content)
+            chunks = [s.strip() for s in sentences if len(s.strip()) >= 20]
+
+            if not chunks:
+                return None
+
+            # Embed chunks with cache
+            chunk_vecs = [self._cached_embed(embedder, c) for c in chunks]
+
+            # Cosine similarity = dot product (embeddings are L2-normalized)
+            best = 0.0
+            for vec in chunk_vecs:
+                dot = sum(a * b for a, b in zip(claim_vec, vec))
+                best = max(best, dot)
+
+            # Normalize to [0, 1] range (cosine can be negative)
+            return max(0.0, min(1.0, best))
+
+        except Exception as e:
+            logger.debug("Semantic similarity unavailable: %s", e)
+            return None
+
+    def _cached_embed(self, embedder, text: str) -> list[float]:
+        """Embed text with hash-based caching."""
+        key = hashlib.sha256(text.encode()).hexdigest()[:16]
+        if key not in self._embed_cache:
+            self._embed_cache[key] = embedder.embed(text)
+        return self._embed_cache[key]
+
+    async def _verify_chain(
+        self,
+        citations: list[Citation],
+        source_contents: dict[str, str],
+    ) -> list[Citation]:
+        """F13: 2-hop chain verification.
+
+        For TAINT citations, look for referenced URLs in the source content,
+        fetch those 2nd-level sources, and re-verify the claim.
+        If a 2nd-level source confirms the claim, upgrade to SOURCE.
+        """
+        _URL_PATTERN = re.compile(r'https?://[^\s\)\]>"]+')
+
+        upgraded = 0
+        for citation in citations:
+            if citation.taint_level != TaintLevel.TAINT:
+                continue
+
+            content = source_contents.get(citation.source_url, "")
+            if not content:
+                continue
+
+            # Extract URLs from source content
+            ref_urls = _URL_PATTERN.findall(content)
+            if not ref_urls:
+                continue
+
+            # Try up to 3 referenced URLs
+            for ref_url in ref_urls[:3]:
+                ref_content = source_contents.get(ref_url)
+                if ref_content is None:
+                    ref_content = await self._fetch_url(ref_url)
+                    if ref_content:
+                        source_contents[ref_url] = ref_content
+
+                if not ref_content:
+                    continue
+
+                sim = self._compute_similarity(citation.claim, ref_content)
+                if sim >= self.THRESHOLD_SOURCE:
+                    citation.taint_level = TaintLevel.SOURCE
+                    citation.similarity = max(citation.similarity or 0, sim)
+                    citation.verification_note = (
+                        f"2-hop verified via {ref_url[:60]} (sim={sim:.2f})"
+                    )
+                    upgraded += 1
+                    break
+
+        if upgraded:
+            logger.info("F13: 2-hop chain upgraded %d citations to SOURCE", upgraded)
+
+        return citations
+
+    def _get_embedder(self):
+        """Lazy-load embedder singleton."""
+        if not hasattr(self, '_embedder') or self._embedder is None:
+            from mekhane.anamnesis.index import Embedder
+            self._embedder = Embedder()
+        return self._embedder
 
     async def _fetch_url(self, url: str) -> str:
         """Fetch URL content as text."""

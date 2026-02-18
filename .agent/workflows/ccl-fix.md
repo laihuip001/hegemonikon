@@ -1,12 +1,12 @@
 ---
-description: "直す — /kho_/tel_C:{/dia+_/ene+}_I:[✓]{/pis_/dox-}"
+description: "直す — /kho_/tel_/tek_C:{/dia+_/ene+}_I:[✓]{/pis_/dox-}"
 lcm_state: beta
 version: "1.0"
 ---
 
 # /ccl-fix: 修正サイクルマクロ
 
-> **CCL**: `@fix = /kho_/tel_C:{/dia+_/ene+}_I:[✓]{/pis_/dox-}`
+> **CCL**: `@fix = /kho_/tel_/tek_C:{/dia+_/ene+}_I:[✓]{/pis_/dox-}`
 > **用途**: 問題を見つけて直すサイクルを収束まで回す
 > **認知骨格**: Prior → Likelihood → Posterior
 
@@ -16,6 +16,7 @@ version: "1.0"
 |:---|:---------|:-----|
 | Prior | `/kho` | 場の把握: 何が壊れているかの全体像 |
 | Prior | `/tel` | 目標設定: どこに戻したいか |
+| Prior | `/tek` | 技法選択: どの手法で直すか (P4 Tekhnē) |
 | Likelihood | `C:{/dia+_/ene+}` | 診断→修正の収束ループ |
 | Posterior | `I:[✓]{/pis_/dox-}` | 収束したら確信度を測定し記録 |
 

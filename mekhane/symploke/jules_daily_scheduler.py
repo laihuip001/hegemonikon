@@ -267,6 +267,9 @@ async def run_slot_batch(
     basanos_bridge: Optional["BasanosBridge"] = None,
     basanos_domains: Optional[list[str]] = None,
     hybrid_ratio: float = 0.0,
+    audit_issue_codes: Optional[list[str]] = None,
+    use_dynamic: bool = False,
+    exclude_low_quality: bool = True,
 ) -> dict:
     """1 アカウント分のバッチを実行。
 
@@ -311,13 +314,58 @@ async def run_slot_batch(
                 random.shuffle(specs)  # 混合順序をランダム化
             elif basanos_bridge is not None:
                 # Basanos mode: 構造化パースペクティブを使用
-                specs = basanos_bridge.get_perspectives_as_specialists(
-                    domains=basanos_domains,
-                )
+                if use_dynamic:
+                    # F10: ファイル特性に基づく動的 perspective
+                    specs = basanos_bridge.get_dynamic_perspectives(
+                        file_path=target_file,
+                        audit_issues=audit_issue_codes,
+                        max_perspectives=specialists_per_file,
+                    )
+                    if not specs:
+                        # フォールバック: 静的 perspective
+                        specs = basanos_bridge.get_perspectives_as_specialists(
+                            domains=basanos_domains,
+                        )
+                else:
+                    specs = basanos_bridge.get_perspectives_as_specialists(
+                        domains=basanos_domains,
+                    )
             else:
-                # Specialist mode: ランダムサンプリング
-                pool = list(ALL_SPECIALISTS)
-                specs = random.sample(pool, min(specialists_per_file, len(pool)))
+                # Specialist mode: audit issue があれば adaptive、なければランダム
+                if audit_issue_codes:
+                    from audit_specialist_matcher import AuditSpecialistMatcher
+                    from specialist_v2 import get_specialists_by_category
+                    matcher = AuditSpecialistMatcher()
+                    categories = matcher.select_for_issues(
+                        audit_issue_codes, total_budget=specialists_per_file,
+                    )
+                    specs = []
+                    for cat in categories:
+                        cat_pool = get_specialists_by_category(cat)
+                        if cat_pool:
+                            specs.append(random.choice(cat_pool))
+                    # budget を満たさなければランダムで補充
+                    if len(specs) < specialists_per_file:
+                        pool = [s for s in ALL_SPECIALISTS if s not in specs]
+                        remaining = specialists_per_file - len(specs)
+                        specs.extend(random.sample(pool, min(remaining, len(pool))))
+                else:
+                    pool = list(ALL_SPECIALISTS)
+                    specs = random.sample(pool, min(specialists_per_file, len(pool)))
+
+            # F14: 低品質 Perspective を実行時除外
+            if exclude_low_quality and specs:
+                try:
+                    from basanos_feedback import FeedbackStore as _FBStore
+                    _excluded_ids = set(_FBStore().get_low_quality_perspectives(threshold=0.1))
+                    if _excluded_ids:
+                        before = len(specs)
+                        specs = [s for s in specs if getattr(s, 'id', '') not in _excluded_ids]
+                        culled = before - len(specs)
+                        if culled > 0:
+                            print(f"    🗑️  F14: {culled} low-quality perspectives excluded")
+                except Exception:
+                    pass  # FeedbackStore 不在時はスキップ
 
             if dry_run:
                 print(f"  [{file_idx}/{len(files)}] {target_file} × {len(specs)} specialists (DRY-RUN)")
@@ -336,11 +384,25 @@ async def run_slot_batch(
             total_started += started
             total_failed += failed
 
+            # F9: session_id + perspective_id をログ保存 (jules_result_parser 連携)
+            sessions_info = []
+            for i, r in enumerate(results):
+                info = {}
+                if "session_id" in r:
+                    info["session_id"] = r["session_id"]
+                if "error" in r:
+                    info["error"] = str(r["error"])[:100]
+                if i < len(specs):
+                    info["specialist"] = specs[i].name
+                    info["perspective_id"] = getattr(specs[i], "id", "")
+                sessions_info.append(info)
+
             all_results.append({
                 "file": target_file,
                 "specialists": len(specs),
                 "started": started,
                 "failed": failed,
+                "sessions": sessions_info,
             })
 
             # 安全弁: エラー率チェック
@@ -399,6 +461,10 @@ async def main():
     parser.add_argument(
         "--pre-audit", action="store_true",
         help="Run AIAuditor pre-filter to prioritize files with critical issues",
+    )
+    parser.add_argument(
+        "--dynamic", action="store_true",
+        help="F10: Use dynamic perspectives based on file characteristics (basanos/hybrid mode)",
     )
     parser.add_argument(
         "--dry-run", action="store_true",
@@ -522,12 +588,25 @@ async def main():
 
             total_issues = sum(file_scores.values())
             files_with_issues = sum(1 for s in file_scores.values() if s > 0)
+            # F7: issue コードを収集 (audit_specialist_matcher 連携用)
+            all_issue_codes: list[str] = []
+            for fpath in all_selected_files:
+                try:
+                    abs_path = _PROJECT_ROOT / fpath
+                    re_result = auditor.audit_file(abs_path)
+                    all_issue_codes.extend(i.code for i in re_result.issues)
+                except Exception:
+                    pass
+
             audit_info = {
                 "total_score": total_issues,
                 "files_with_issues": files_with_issues,
                 "file_scores": {f: s for f, s in file_scores.items() if s > 0},
+                "issue_codes": list(set(all_issue_codes)),
             }
             print(f"  → {files_with_issues}/{len(all_selected_files)} files with issues, reordered by priority")
+            if all_issue_codes:
+                print(f"  → {len(set(all_issue_codes))} unique issue codes collected for adaptive matching")
 
     print()
 
@@ -545,6 +624,9 @@ async def main():
 
     print(f"--- Batch ({len(all_keys)} keys, {len(all_selected_files)} files) ---")
 
+    # F7: pre-audit の issue codes を specialist 選択に渡す
+    collected_issue_codes = audit_info.get("issue_codes", []) if audit_info else None
+
     result = await run_slot_batch(
         files=all_selected_files,
         specialists_per_file=specs_per_file,
@@ -554,6 +636,8 @@ async def main():
         basanos_bridge=bridge if args.mode in ("basanos", "hybrid") else None,
         basanos_domains=sampled_domains if args.mode in ("basanos", "hybrid") else None,
         hybrid_ratio=args.basanos_ratio if args.mode == "hybrid" else 0.0,
+        audit_issue_codes=collected_issue_codes,
+        use_dynamic=args.dynamic,
     )
 
     slot_result["total_tasks"] = result["total_tasks"]
@@ -593,6 +677,13 @@ async def main():
             "slot": args.slot,
             "mode": args.mode,
             "timestamp": timestamp,
+            # F11 Dashboard API 用トップレベルキー
+            "total_tasks": slot_result.get("total_tasks", 0),
+            "total_started": slot_result.get("total_started", 0),
+            "total_failed": slot_result.get("total_failed", 0),
+            "files_reviewed": len(all_selected_files),
+            "dynamic": getattr(args, "dynamic", False),
+            # 後方互換: 詳細データ
             "result": slot_result,
             "daily_usage": usage,
         }
@@ -602,6 +693,17 @@ async def main():
             log_data["pre_audit"] = audit_info
         log_file.write_text(json.dumps(log_data, indent=2, ensure_ascii=False))
         print(f"  Log: {log_file}")
+
+        # F21: 自動フィードバック収集 (collect_and_update)
+        try:
+            from jules_result_parser import collect_and_update
+            feedback_result = collect_and_update(days=1)
+            if feedback_result:
+                updated = feedback_result.get("updated", 0)
+                if updated > 0:
+                    print(f"  📊 Feedback: {updated} perspectives updated")
+        except Exception as fb_exc:
+            print(f"  ⚠️  Feedback collection failed: {fb_exc}")
 
 
 if __name__ == "__main__":

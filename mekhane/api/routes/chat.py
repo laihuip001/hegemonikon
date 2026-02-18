@@ -68,12 +68,14 @@ class CortexChatRequest(BaseModel):
     """Cortex generateChat request."""
     user_message: str
     history: list[CortexChatMessage] = []
+    model_config_id: str = ""  # empty = server default (Gemini), e.g. "claude-sonnet-4-5"
     tier_id: str = ""  # empty = Gemini default
     include_thinking_summaries: bool = False
 
 
 GEMINI_API_BASE = "https://generativelanguage.googleapis.com/v1beta/models"
 CORTEX_CHAT_URL = "https://cloudcode-pa.googleapis.com/v1internal:generateChat"
+CORTEX_STREAM_URL = "https://cloudcode-pa.googleapis.com/v1internal:streamGenerateChat"
 
 
 def _get_api_key() -> str:
@@ -90,12 +92,14 @@ def _get_api_key() -> str:
 @router.post("/chat/send")
 async def chat_send(req: ChatRequest):
     """Gemini API にプロキシし、SSE をそのままフロントに流す。"""
-    # Claude モデルの場合は LS 経由ルートにリダイレクト
+    # Claude モデルの場合も Cortex generateChat 経由に統合
     if req.model in CLAUDE_MODEL_MAP:
-        return await _claude_chat_from_gemini_format(req)
+        return await _cortex_chat_from_gemini_format(
+            req, model_config_id=CLAUDE_MODEL_MAP[req.model],
+        )
 
     # Cortex モデルの場合は Cortex ルートにリダイレクト
-    if req.model == "cortex-gemini":
+    if req.model == "cortex-chat":
         return await _cortex_chat_from_gemini_format(req)
 
     key = _get_api_key()
@@ -224,7 +228,10 @@ async def _claude_chat_from_gemini_format(req: ChatRequest):
     )
 
 
-async def _cortex_chat_from_gemini_format(req: ChatRequest):
+async def _cortex_chat_from_gemini_format(
+    req: ChatRequest,
+    model_config_id: str = "",
+):
     """Gemini 形式の ChatRequest を Cortex generateChat 形式に変換して実行する。"""
     history: list[dict[str, Any]] = []
     user_message = ""
@@ -244,6 +251,7 @@ async def _cortex_chat_from_gemini_format(req: ChatRequest):
     cortex_req = CortexChatRequest(
         user_message=user_message,
         history=[CortexChatMessage(**h) for h in history],
+        model_config_id=model_config_id,
     )
     return await cortex_chat(cortex_req)
 
@@ -277,18 +285,24 @@ async def cortex_chat(req: CortexChatRequest):
         body["tier_id"] = req.tier_id
     if req.include_thinking_summaries:
         body["include_thinking_summaries"] = True
+    if req.model_config_id:
+        body["model_config_id"] = req.model_config_id
 
     logger.info(
-        "Cortex Chat request: history=%d, msg_len=%d",
-        len(req.history), len(req.user_message),
+        "Cortex Chat request: model=%s history=%d, msg_len=%d",
+        req.model_config_id or "default", len(req.history), len(req.user_message),
     )
 
     async def stream_cortex():
-        """Cortex generateChat を呼び、Gemini SSE 互換形式に変換して yield する。"""
+        """Cortex streamGenerateChat → Gemini SSE 互換形式に変換して yield。
+
+        streamGenerateChat は JSON 配列 [{markdown: "..."}, ...] を返す。
+        各要素を SSE チャンクとしてフロントエンドに送出する。
+        """
         async with httpx.AsyncClient(timeout=120.0) as client:
             try:
                 response = await client.post(
-                    CORTEX_CHAT_URL,
+                    CORTEX_STREAM_URL,
                     json=body,
                     headers={
                         "Authorization": f"Bearer {token}",
@@ -302,23 +316,37 @@ async def cortex_chat(req: CortexChatRequest):
                     yield f"data: {{\"error\": {{\"message\": \"Cortex API Error {response.status_code}\", \"code\": {response.status_code}}}}}\n\n"
                     return
 
-                data = response.json()
-                markdown_text = data.get("markdown", "")
+                raw = response.text
 
-                if not markdown_text:
-                    yield 'data: {"error": {"message": "Empty response from Cortex", "code": 0}}\n\n'
+                # streamGenerateChat returns JSON array or single object
+                try:
+                    data = json.loads(raw)
+                except json.JSONDecodeError:
+                    yield 'data: {"error": {"message": "Invalid JSON from Cortex", "code": 0}}\n\n'
                     return
 
-                gemini_compat = {
-                    "candidates": [{
-                        "content": {
-                            "parts": [{"text": markdown_text}],
-                            "role": "model",
-                        },
-                        "finishReason": "STOP",
-                    }]
-                }
-                yield f"data: {json.dumps(gemini_compat)}\n\n"
+                # Normalize to list
+                items = data if isinstance(data, list) else [data]
+                has_content = False
+
+                for item in items:
+                    markdown_text = item.get("markdown", "")
+                    if not markdown_text:
+                        continue
+                    has_content = True
+                    gemini_compat = {
+                        "candidates": [{
+                            "content": {
+                                "parts": [{"text": markdown_text}],
+                                "role": "model",
+                            },
+                            "finishReason": "STOP",
+                        }]
+                    }
+                    yield f"data: {json.dumps(gemini_compat)}\n\n"
+
+                if not has_content:
+                    yield 'data: {"error": {"message": "Empty response from Cortex", "code": 0}}\n\n'
 
             except httpx.TimeoutException:
                 yield 'data: {"error": {"message": "Cortex API timeout", "code": 408}}\n\n'

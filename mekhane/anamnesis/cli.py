@@ -501,6 +501,22 @@ def main():
     )
     p_rom.set_defaults(func=cmd_rom_index)
 
+    # wal-index (Intent-WAL VSearch)
+    # PURPOSE: [L2-auto] WAL ファイルをインデックス
+    def cmd_wal_index(args):
+        """Intent-WAL ファイルをインデックス"""
+        from mekhane.anamnesis.session_indexer import index_wals
+        return index_wals(args.wal_dir)
+
+    p_wal = subparsers.add_parser(
+        "wal-index", help="Index intent_wal_*.yaml files into LanceDB"
+    )
+    p_wal.add_argument(
+        "--wal-dir", default=None,
+        help="Custom WAL directory (default: ~/oikos/mneme/.hegemonikon/wal)"
+    )
+    p_wal.set_defaults(func=cmd_wal_index)
+
     # conversation-index (Full Conversation Content VSearch)
     # PURPOSE: [L2-auto] 全セッション会話をインデックス
     def cmd_conversation_index(args):

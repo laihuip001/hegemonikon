@@ -7,6 +7,10 @@ import type {
   EpistemicHealthResponse,
   BasanosL2ScanResponse,
   BasanosL2HistoryResponse, BasanosL2TrendResponse,
+  SchedulerStatusResponse, SchedulerRun, SchedulerTrendResponse,
+  SchedulerEvolutionResponse, SchedulerRotationResponse, RotationDay,
+  TheoremUsageResponse,
+  WALStatusResponse,
 } from '../api/client';
 import { getCurrentRoute, esc, applyCountUpAnimations, applyStaggeredFadeIn, startPolling, relativeTime } from '../utils';
 import { renderUsageCard } from '../telemetry';
@@ -19,7 +23,7 @@ export async function renderDashboard(): Promise<void> {
 }
 
 async function renderDashboardContent(): Promise<void> {
-  const [health, healthCheck, fep, gnosisStats, criticals, kalonHist, quota, digestLatest, gatewayStats, sentinel, epistemicHealth, basanosL2, basanosL2History, basanosL2Trend] = await Promise.all([
+  const [health, healthCheck, fep, gnosisStats, criticals, kalonHist, quota, digestLatest, gatewayStats, sentinel, epistemicHealth, basanosL2, basanosL2History, basanosL2Trend, schedulerStatus, schedulerTrend, schedulerEvolution, schedulerRotation, theoremUsage, walStatus] = await Promise.all([
     api.status().catch((): null => null),
     api.health().catch((): null => null),
     api.fepState().catch((): null => null),
@@ -34,6 +38,12 @@ async function renderDashboardContent(): Promise<void> {
     api.basanosL2Scan().catch((): null => null),
     api.basanosL2History(10).catch((): null => null),
     api.basanosL2Trend(10).catch((): null => null),
+    api.schedulerStatus().catch((): null => null),
+    api.schedulerTrend(14).catch((): null => null),
+    api.schedulerEvolution().catch((): null => null),
+    api.schedulerRotation().catch((): null => null),
+    api.theoremUsage().catch((): null => null),
+    api.walStatus().catch((): null => null),
   ]);
 
   const app = document.getElementById('view-content')!;
@@ -111,6 +121,9 @@ async function renderDashboardContent(): Promise<void> {
     ${renderQuotaCard(quota)}
     ${renderDigestCard(digestLatest)}
     ${renderGatewayCard(gatewayStats)}
+    ${renderSchedulerCard(schedulerStatus, schedulerTrend, schedulerEvolution, schedulerRotation)}
+    ${renderTheoremCard(theoremUsage)}
+    ${renderWALCard(walStatus)}
     ${renderHealthItems(health)}
     ${renderUsageCard()}
     <footer class="dashboard-footer">
@@ -625,6 +638,280 @@ function renderBasanosL2HistoryCard(
           <tbody>${historyRows}</tbody>
         </table>
       ` : '<div style="opacity:0.5; text-align:center; padding:1rem;">履歴なし</div>'}
+    </div>
+  `;
+}
+
+// ─── Scheduler Card ──────────────────────────────────────────
+
+function renderSparkline(points: number[], width = 200, height = 40): string {
+  if (points.length < 2) return '';
+  const max = Math.max(...points, 100);
+  const min = Math.min(...points, 0);
+  const range = max - min || 1;
+  const step = width / (points.length - 1);
+  const coords = points.map((v, i) => {
+    const x = i * step;
+    const y = height - ((v - min) / range) * height;
+    return `${x.toFixed(1)},${y.toFixed(1)}`;
+  });
+  const path = `M ${coords.join(' L ')}`;
+  // 90% threshold line
+  const thresholdY = (height - ((90 - min) / range) * height).toFixed(1);
+  return `
+    <svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" style="overflow:visible;">
+      <line x1="0" y1="${thresholdY}" x2="${width}" y2="${thresholdY}" stroke="var(--success-color, #22c55e)" stroke-width="0.5" stroke-dasharray="3 2" opacity="0.5"/>
+      <path d="${path}" fill="none" stroke="var(--accent-color, #38bdf8)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      <circle cx="${coords[coords.length - 1]!.split(',')[0]}" cy="${coords[coords.length - 1]!.split(',')[1]}" r="2.5" fill="var(--accent-color, #38bdf8)"/>
+    </svg>
+  `;
+}
+
+function renderSchedulerCard(
+  data: SchedulerStatusResponse | null,
+  trend: SchedulerTrendResponse | null = null,
+  evolution: SchedulerEvolutionResponse | null = null,
+  rotation: SchedulerRotationResponse | null = null,
+): string {
+  if (!data || data.status === 'no_data') return '';
+
+  const summary = data.summary;
+  if (!summary) return '';
+
+  const statusIcon: Record<string, string> = { ok: '🟢', warn: '🟡', error: '🔴' };
+  const statusColor: Record<string, string> = {
+    ok: 'var(--success-color, #22c55e)',
+    warn: 'var(--warning-color, #eab308)',
+    error: 'var(--error-color, #ef4444)',
+  };
+  const icon = statusIcon[summary.status] ?? '⚪';
+  const color = statusColor[summary.status] ?? 'var(--text-secondary)';
+
+  const ratePct = Math.round(summary.success_rate);
+
+  const modesHtml = Object.entries(summary.modes).map(([mode, count]) =>
+    `<span style="background:var(--bg-secondary); padding:0.15rem 0.5rem; border-radius:0.25rem; font-size:0.75rem;">${esc(mode)} ×${count}</span>`
+  ).join(' ');
+
+  const runsHtml = data.runs.slice(0, 3).map((r: SchedulerRun) => {
+    const runStatus = r.total_failed === 0 ? '🟢' : r.total_failed <= 2 ? '🟡' : '🔴';
+    const ts = r.timestamp ? relativeTime(r.timestamp) : r.filename;
+    return `
+      <div style="display:flex; justify-content:space-between; align-items:center; padding:0.3rem 0; border-bottom:1px solid var(--border-color);">
+        <div style="display:flex; gap:0.5rem; align-items:center;">
+          <span>${runStatus}</span>
+          <span style="font-size:0.8rem;">${esc(r.slot || 'N/A')}</span>
+          <span style="font-size:0.7rem; opacity:0.6;">${esc(ts)}</span>
+        </div>
+        <div style="font-size:0.75rem; color:var(--text-secondary);">
+          ${r.files_reviewed}件 / ${esc(r.mode)}${r.dynamic ? ' ⚡' : ''}
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  // Sparkline from trend data
+  let sparklineHtml = '';
+  if (trend?.trend && trend.trend.length >= 2) {
+    const rates = trend.trend.map((t: { success_rate: number }) => t.success_rate);
+    sparklineHtml = `
+      <div style="margin-top:0.5rem; padding-top:0.5rem; border-top:1px solid var(--border-color);">
+        <div style="font-size:0.7rem; color:var(--text-secondary); margin-bottom:0.25rem;">📈 14日間 成功率推移</div>
+        ${renderSparkline(rates, 280, 36)}
+      </div>
+    `;
+  }
+
+  // F19: Evolution proposals section
+  let evolutionHtml = '';
+  if (evolution && evolution.proposals && evolution.proposals.length > 0) {
+    const items = evolution.proposals.slice(0, 3).map(p =>
+      `<div style="display:flex; justify-content:space-between; padding:0.2rem 0; font-size:0.75rem;">
+        <span>🧬 ${esc(p.domain)} / ${esc(p.axis)}</span>
+        <span style="opacity:0.6;">${Math.round(p.usefulness_rate * 100)}%</span>
+      </div>`
+    ).join('');
+    evolutionHtml = `
+      <div style="margin-top:0.5rem; padding-top:0.5rem; border-top:1px solid var(--border-color);">
+        <div style="font-size:0.7rem; color:var(--text-secondary); margin-bottom:0.25rem;">🔬 進化提案 (${evolution.total_proposals}件)</div>
+        ${items}
+      </div>
+    `;
+  }
+
+  // F19: Rotation comparison section
+  let rotationHtml = '';
+  if (rotation?.rotation) {
+    const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+    const dayLabels: Record<string, string> = { Mon: '月', Tue: '火', Wed: '水', Thu: '木', Fri: '金', Sat: '土', Sun: '日' };
+    const cells = days.map(d => {
+      const r = rotation.rotation[d] as RotationDay | undefined;
+      if (!r) return '';
+      const isAdapted = r.static !== r.adaptive;
+      const badge = isAdapted ? '⚡' : '';
+      return `<span style="font-size:0.7rem; padding:0.1rem 0.3rem; border-radius:0.2rem; background:${isAdapted ? 'var(--accent-bg, rgba(99,102,241,0.15))' : 'var(--bg-secondary)'}">${dayLabels[d]}:${esc(r.adaptive)}${badge}</span>`;
+    }).join(' ');
+    rotationHtml = `
+      <div style="margin-top:0.5rem; padding-top:0.5rem; border-top:1px solid var(--border-color);">
+        <div style="font-size:0.7rem; color:var(--text-secondary); margin-bottom:0.25rem;">📅 今週のローテーション ${rotation.total_data_points > 0 ? '(適応)' : '(静的)'}</div>
+        <div style="display:flex; flex-wrap:wrap; gap:0.25rem;">${cells}</div>
+      </div>
+    `;
+  }
+
+  return `
+    <div class="card card-fade" style="margin-top:1rem;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.75rem;">
+        <span class="metric-label">🗓️ Jules Scheduler</span>
+        <span style="font-size:1.2rem; font-weight:700; color:${color}">${icon} ${ratePct}%</span>
+      </div>
+      <div style="margin-bottom:0.5rem;">
+        <div style="font-size:0.8rem; color:var(--text-secondary); margin-bottom:0.15rem;">成功率</div>
+        <div class="quota-bar">
+          <div class="quota-bar-fill" style="width:${ratePct}%; background:${color}"></div>
+        </div>
+      </div>
+      <div style="display:flex; gap:1rem; margin-bottom:0.5rem; font-size:0.8rem; color:var(--text-secondary);">
+        <span>📁 ${summary.total_files_reviewed} ファイル</span>
+        <span>🚀 ${summary.total_started} タスク</span>
+        <span>❌ ${summary.total_failed} 失敗</span>
+      </div>
+      <div style="margin-bottom:0.5rem;">${modesHtml}</div>
+      ${runsHtml}
+      ${sparklineHtml}
+      ${evolutionHtml}
+      ${rotationHtml}
+    </div>
+  `;
+}
+
+
+function renderTheoremCard(data: TheoremUsageResponse | null): string {
+  if (!data) {
+    return `
+      <div class="card" style="margin-top:1rem;">
+        <div class="metric-label">📐 Theorem Activity</div>
+        <div style="color:var(--text-secondary); font-size:0.85rem; padding:0.5rem 0;">
+          定理使用データなし
+        </div>
+      </div>
+    `;
+  }
+
+  const ratePct = Math.round(data.usage_rate);
+  const rateColor = ratePct >= 60 ? 'var(--success-color, #22c55e)'
+    : ratePct >= 30 ? 'var(--warning-color, #eab308)'
+      : 'var(--error-color, #ef4444)';
+
+  // Series bars — 6 Series を横棒で
+  const seriesOrder = ['O', 'S', 'H', 'P', 'K', 'A'];
+  const maxUsage = Math.max(1, ...Object.values(data.series).map(s => s.total_usage));
+  const seriesBarsHtml = seriesOrder.map(key => {
+    const s = data.series[key];
+    if (!s) return '';
+    const barW = Math.round((s.total_usage / maxUsage) * 100);
+    const usedCount = s.theorems.filter(t => t.usage_count > 0).length;
+    return `
+      <div style="display:flex; align-items:center; gap:0.5rem; margin-bottom:0.25rem;">
+        <span style="width:3rem; font-size:0.75rem; color:var(--text-secondary); text-align:right;">${esc(key)}-${esc(s.name.slice(0, 3))}</span>
+        <div style="flex:1; height:0.5rem; background:var(--bg-tertiary, #333); border-radius:0.25rem; overflow:hidden;">
+          <div style="width:${barW}%; height:100%; background:${s.color}; border-radius:0.25rem; transition: width 0.5s ease;"></div>
+        </div>
+        <span style="width:3rem; font-size:0.7rem; color:var(--text-secondary);">${usedCount}/4</span>
+      </div>
+    `;
+  }).join('');
+
+  // Most used top 3
+  const topHtml = data.most_used.slice(0, 3).filter(m => m.count > 0).map(m =>
+    `<span style="display:inline-block; padding:0.1rem 0.4rem; background:var(--bg-tertiary, #333); border-radius:0.25rem; font-size:0.7rem; margin-right:0.25rem;">${esc(m.theorem_id)} ×${m.count}</span>`
+  ).join('');
+
+  return `
+    <div class="card" style="margin-top:1rem;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.75rem;">
+        <span class="metric-label">📐 Theorem Activity</span>
+        <span style="font-size:1.25rem; font-weight:700; color:${rateColor};">${ratePct}%</span>
+      </div>
+      <div style="display:flex; gap:1.5rem; margin-bottom:0.75rem;">
+        <div style="flex:1;">
+          <div style="font-size:0.8rem; color:var(--text-secondary); margin-bottom:0.15rem;">使用率 (${24 - data.unused_count}/24)</div>
+          <div class="quota-bar">
+            <div class="quota-bar-fill" style="width:${ratePct}%; background:${rateColor}"></div>
+          </div>
+        </div>
+        <div style="text-align:center;">
+          <div style="font-size:0.8rem; color:var(--text-secondary);">使用回数</div>
+          <div style="font-size:1.1rem; font-weight:600;">${data.total_usage}</div>
+        </div>
+      </div>
+      <div style="margin-bottom:0.5rem;">
+        ${seriesBarsHtml}
+      </div>
+      ${topHtml ? `<div style="margin-top:0.25rem;">${topHtml}</div>` : ''}
+    </div>
+  `;
+}
+
+function renderWALCard(data: WALStatusResponse | null): string {
+  if (!data || data.total_wals === 0) return '';
+
+  const activeColor = data.active_wals > 0 ? 'var(--accent-primary, #6366f1)' : 'var(--text-secondary)';
+  const activeIcon = data.active_wals > 0 ? '🟢' : '⚪';
+
+  let latestHtml = '';
+  if (data.latest) {
+    const progressItems = data.latest.progress.slice(-3).map(p =>
+      `<div style="font-size:0.7rem; padding:0.15rem 0; color:var(--text-secondary);">• ${esc(p)}</div>`
+    ).join('');
+    latestHtml = `
+      <div style="margin-top:0.5rem; padding-top:0.5rem; border-top:1px solid var(--border-color);">
+        <div style="font-size:0.75rem; font-weight:500; margin-bottom:0.25rem;">${esc(data.latest.goal)}</div>
+        <div style="display:flex; gap:0.5rem; font-size:0.7rem; color:var(--text-secondary); margin-bottom:0.25rem;">
+          <span>${esc(data.latest.status)}</span>
+          <span>•</span>
+          <span>${relativeTime(data.latest.created)}</span>
+        </div>
+        ${progressItems}
+      </div>
+    `;
+  }
+
+  let recentHtml = '';
+  const otherRecent = data.recent.filter(r => r.filename !== data.latest?.filename).slice(0, 2);
+  if (otherRecent.length > 0) {
+    const items = otherRecent.map(r =>
+      `<div style="display:flex; justify-content:space-between; padding:0.15rem 0; font-size:0.7rem;">
+        <span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:70%;">${esc(r.goal)}</span>
+        <span style="color:var(--text-secondary);">${esc(r.status)}</span>
+      </div>`
+    ).join('');
+    recentHtml = `
+      <div style="margin-top:0.5rem; padding-top:0.5rem; border-top:1px solid var(--border-color);">
+        <div style="font-size:0.7rem; color:var(--text-secondary); margin-bottom:0.25rem;">Recent</div>
+        ${items}
+      </div>
+    `;
+  }
+
+  return `
+    <div class="card card-fade" style="margin-top:1rem;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.75rem;">
+        <div style="font-weight:600;">📋 Intent-WAL</div>
+        <div style="font-size:0.75rem; color:var(--text-secondary);">${data.total_wals} total</div>
+      </div>
+      <div style="display:flex; gap:1.5rem; margin-bottom:0.5rem;">
+        <div style="text-align:center;">
+          <div style="font-size:0.8rem; color:var(--text-secondary);">アクティブ</div>
+          <div style="font-size:1.3rem; font-weight:700; color:${activeColor};">${activeIcon} ${data.active_wals}</div>
+        </div>
+        <div style="text-align:center;">
+          <div style="font-size:0.8rem; color:var(--text-secondary);">累計</div>
+          <div style="font-size:1.1rem; font-weight:600;">${data.total_wals}</div>
+        </div>
+      </div>
+      ${latestHtml}
+      ${recentHtml}
     </div>
   `;
 }

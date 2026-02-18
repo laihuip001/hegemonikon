@@ -1,13 +1,10 @@
 ---
-doc_id: KERNEL_PRACTICE_GUIDE
-version: 2.1.0
-tier: KERNEL
-status: REFERENCE
-created: '2026-01-23'
-updated: '2026-01-27'
-depends_on:
-- doc_id: AXIOM_HIERARCHY
-  min_version: 7.0.0
+doc_id: "KERNEL_PRACTICE_GUIDE"
+version: "2.1.0"
+tier: "KERNEL"
+status: "REFERENCE"
+created: "2026-01-23"
+updated: "2026-01-27"
 ---
 
 > **Kernel Doc Index**: [SACRED_TRUTH](SACRED_TRUTH.md) | [axiom_hierarchy](axiom_hierarchy.md) | [PRACTICE_GUIDE](KERNEL_PRACTICE_GUIDE.md) ← 📍

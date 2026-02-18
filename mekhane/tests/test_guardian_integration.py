@@ -228,7 +228,7 @@ class TestTyposToolChainRegression:
         """ContextItem must preserve tool_chain field."""
         import sys
         sys.path.insert(0, str(Path(__file__).parent.parent / "ergasterion" / "typos"))
-        pl = pytest.importorskip("typos_lang", reason="typos_lang not installed")
+        import typos_lang as pl
 
         # Create a ContextItem with tool_chain
         item = pl.ContextItem(
@@ -243,7 +243,7 @@ class TestTyposToolChainRegression:
         """Parser should extract MCP context references."""
         import sys
         sys.path.insert(0, str(Path(__file__).parent.parent / "ergasterion" / "typos"))
-        pl = pytest.importorskip("typos_lang", reason="typos_lang not installed")
+        import typos_lang as pl
 
         # Test that ContextItem preserves tool_chain when explicitly set
         item = pl.ContextItem(

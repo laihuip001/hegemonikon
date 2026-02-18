@@ -30,7 +30,7 @@ def __getattr__(name: str):
         from mekhane.ochema.antigravity_client import AntigravityClient
         return AntigravityClient
     if name == "LLMResponse":
-        from mekhane.ochema.antigravity_client import LLMResponse
+        from mekhane.ochema.types import LLMResponse
         return LLMResponse
     raise AttributeError(f"module 'mekhane.ochema' has no attribute {name!r}")
 

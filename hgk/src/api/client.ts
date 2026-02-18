@@ -248,6 +248,174 @@ export interface BasanosL2ScanResponse {
     error: string;
 }
 
+// --- Basanos L2 History/Trend Types ---
+export interface BasanosL2HistoryRecord {
+    timestamp: string;
+    scan_type: string;
+    total: number;
+    by_type: Record<string, number>;
+}
+export interface BasanosL2HistoryResponse {
+    records: BasanosL2HistoryRecord[];
+    count: number;
+}
+export interface BasanosL2TrendResponse {
+    direction: string;
+    current: number;
+    previous: number;
+    delta: number;
+    sparkline: string;
+    window: number;
+}
+
+// --- Scheduler Types ---
+export interface SchedulerRun {
+    filename: string;
+    timestamp: string;
+    slot: string;
+    mode: string;
+    total_tasks: number;
+    total_started: number;
+    total_failed: number;
+    files_reviewed: number;
+    dynamic: boolean;
+}
+export interface SchedulerSummary {
+    total_runs: number;
+    total_files_reviewed: number;
+    total_started: number;
+    total_failed: number;
+    success_rate: number;
+    modes: Record<string, number>;
+    status: string;
+}
+export interface SchedulerStatusResponse {
+    status: string;
+    runs: SchedulerRun[];
+    summary: SchedulerSummary | null;
+    message?: string;
+}
+
+// --- Scheduler Trend Types ---
+export interface SchedulerTrendPoint {
+    date: string;
+    success_rate: number;
+    runs: number;
+    started: number;
+    failed: number;
+}
+export interface SchedulerTrendResponse {
+    trend: SchedulerTrendPoint[];
+    days: number;
+}
+
+// --- Scheduler Analysis Types ---
+export interface PerspectiveRank {
+    perspective_id: string;
+    domain: string;
+    axis: string;
+    total_reviews: number;
+    useful_count: number;
+    usefulness_rate: number;
+    last_used: string;
+}
+export interface DomainAggregate {
+    domain: string;
+    perspectives: number;
+    total_reviews: number;
+    useful_count: number;
+    usefulness_rate: number;
+}
+export interface AxisAggregate {
+    axis: string;
+    perspectives: number;
+    total_reviews: number;
+    useful_count: number;
+    usefulness_rate: number;
+}
+export interface SchedulerAnalysisResponse {
+    ranking: PerspectiveRank[];
+    by_domain: DomainAggregate[];
+    by_axis: AxisAggregate[];
+    low_quality_ids?: string[];
+    total_perspectives?: number;
+    error?: string;
+}
+export interface EvolutionProposal {
+    domain: string;
+    axis: string;
+    reason: string;
+    usefulness_rate: number;
+}
+export interface SchedulerEvolutionResponse {
+    proposals: EvolutionProposal[];
+    applied: number;
+    dry_run: boolean;
+    total_proposals: number;
+    error?: string;
+}
+export interface RotationDay {
+    static: string;
+    adaptive: string;
+}
+export interface SchedulerRotationResponse {
+    mode_scores: Record<string, number>;
+    total_data_points: number;
+    window_days: number;
+    rotation: Record<string, RotationDay>;
+    error?: string;
+}
+
+// --- Theorem Usage Types ---
+export interface TheoremInfo {
+    id: string;
+    name: string;
+    command: string;
+    question: string;
+    usage_count: number;
+}
+export interface TheoremSeriesInfo {
+    name: string;
+    color: string;
+    total_usage: number;
+    theorems: TheoremInfo[];
+}
+export interface TheoremUsageResponse {
+    total_usage: number;
+    total_theorems: number;
+    unused_count: number;
+    usage_rate: number;
+    series: Record<string, TheoremSeriesInfo>;
+    most_used: Array<{ theorem_id: string; count: number }>;
+}
+export interface TheoremTodayResponse {
+    suggestions: Array<{
+        id: string;
+        name: string;
+        series: string;
+        command: string;
+        question: string;
+        usage_count: number;
+        prompt: string;
+    }>;
+}
+
+// --- WAL Types ---
+export interface WALEntry {
+    filename: string;
+    session_id: string;
+    goal: string;
+    status: string;
+    progress: string[];
+    created: string;
+}
+export interface WALStatusResponse {
+    total_wals: number;
+    active_wals: number;
+    latest: WALEntry | null;
+    recent: WALEntry[];
+}
+
 // --- Quota Types ---
 export interface QuotaModel {
     label: string;
@@ -436,6 +604,29 @@ export const api = {
     // Basanos L2
     basanosL2Scan: () =>
         apiFetch<BasanosL2ScanResponse>('/api/basanos/l2/scan'),
+    basanosL2History: (limit = 10) =>
+        apiFetch<BasanosL2HistoryResponse>(`/api/basanos/l2/history?limit=${limit}`),
+    basanosL2Trend: (window = 10) =>
+        apiFetch<BasanosL2TrendResponse>(`/api/basanos/l2/trend?window=${window}`),
+
+    // Scheduler
+    schedulerStatus: (limit = 5) =>
+        apiFetch<SchedulerStatusResponse>(`/api/scheduler/status?limit=${limit}`),
+    schedulerTrend: (days = 14) =>
+        apiFetch<SchedulerTrendResponse>(`/api/scheduler/trend?days=${days}`),
+    schedulerAnalysis: () =>
+        apiFetch<SchedulerAnalysisResponse>('/api/scheduler/analysis'),
+    schedulerEvolution: () =>
+        apiFetch<SchedulerEvolutionResponse>('/api/scheduler/evolution'),
+    schedulerRotation: () =>
+        apiFetch<SchedulerRotationResponse>('/api/scheduler/rotation'),
+
+    // Theorem Usage
+    theoremUsage: () => apiFetch<TheoremUsageResponse>('/api/theorem/usage'),
+    theoremToday: () => apiFetch<TheoremTodayResponse>('/api/theorem/today'),
+
+    // WAL
+    walStatus: () => apiFetch<WALStatusResponse>('/api/wal/status'),
 
     // Quota
     quota: () => apiFetch<QuotaResponse>('/api/quota'),

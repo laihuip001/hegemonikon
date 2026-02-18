@@ -13,33 +13,28 @@ from pathlib import Path
 
 
 # PURPOSE: [L2-auto] Hermeneus 統合テスト
-# NOTE: synergeia.coordinator は _archive_v01/ にアーカイブ済み。
-# coordinator が復帰するまでスキップ。
-coordinator = pytest.importorskip(
-    "synergeia.coordinator",
-    reason="synergeia.coordinator archived to _archive_v01/",
-)
-
-
 class TestHermeneusIntegration:
     """Hermeneus 統合テスト"""
     
     # PURPOSE: [L2-auto] Hermeneus がインポート可能
     def test_hermeneus_available(self):
         """Hermeneus がインポート可能"""
-        assert coordinator.HERMENEUS_AVAILABLE is True
+        from synergeia.coordinator import HERMENEUS_AVAILABLE
+        assert HERMENEUS_AVAILABLE is True
     
     # PURPOSE: [L2-auto] 標準マクロがロードされている
     def test_standard_macros_loaded(self):
         """標準マクロがロードされている"""
-        assert len(coordinator.STANDARD_MACROS) >= 5
-        assert "think" in coordinator.STANDARD_MACROS
-        assert "scoped" in coordinator.STANDARD_MACROS
+        from synergeia.coordinator import STANDARD_MACROS
+        assert len(STANDARD_MACROS) >= 5
+        assert "think" in STANDARD_MACROS
+        assert "scoped" in STANDARD_MACROS
     
     # PURPOSE: [L2-auto] CCL を LMQL にコンパイル
     def test_execute_hermeneus_compile(self):
         """CCL を LMQL にコンパイル"""
-        result = coordinator.execute_hermeneus("/noe+", "test", compile_only=True)
+        from synergeia.coordinator import execute_hermeneus
+        result = execute_hermeneus("/noe+", "test", compile_only=True)
         assert result["status"] == "compiled"
         assert "lmql" in result
         assert "macros_available" in result
@@ -47,7 +42,8 @@ class TestHermeneusIntegration:
     # PURPOSE: [L2-auto] 収束ループをコンパイル
     def test_execute_hermeneus_with_convergence(self):
         """収束ループをコンパイル"""
-        result = coordinator.execute_hermeneus("/noe+ >> V[] < 0.3", "test")
+        from synergeia.coordinator import execute_hermeneus
+        result = execute_hermeneus("/noe+ >> V[] < 0.3", "test")
         assert result["status"] == "success"
         assert result["ast_type"] == "ConvergenceLoop"
 
@@ -59,23 +55,27 @@ class TestFEPSelectorIntegration:
     # PURPOSE: [L2-auto] FEP Selector がインポート可能
     def test_fep_selector_available(self):
         """FEP Selector がインポート可能"""
-        assert coordinator.FEP_SELECTOR_AVAILABLE is True
+        from synergeia.coordinator import FEP_SELECTOR_AVAILABLE
+        assert FEP_SELECTOR_AVAILABLE is True
     
     # PURPOSE: [L2-auto] FEP ベースのスレッド選択
     def test_select_thread_with_fep(self):
         """FEP ベースのスレッド選択"""
+        from synergeia.coordinator import select_thread
+        
         # 高複雑度 → antigravity
-        thread = coordinator.select_thread("/noe+ >> V[] < 0.3")
+        thread = select_thread("/noe+ >> V[] < 0.3")
         assert thread == "antigravity"
         
         # 中複雑度 → claude
-        thread = coordinator.select_thread("/s+ _ /ene")
+        thread = select_thread("/s+ _ /ene")
         assert thread == "claude"
     
     # PURPOSE: [L2-auto] FEP 無効時はルールベースにフォールバック
     def test_select_thread_fallback(self):
         """FEP 無効時はルールベースにフォールバック"""
-        thread = coordinator.select_thread("/unknown+", use_fep=False)
+        from synergeia.coordinator import select_thread
+        thread = select_thread("/unknown+", use_fep=False)
         assert thread == "antigravity"
 
 
@@ -121,14 +121,16 @@ class TestEndToEnd:
     # PURPOSE: [L2-auto] CCL → FEP選択 → Hermeneus コンパイル
     def test_full_pipeline(self):
         """CCL → FEP選択 → Hermeneus コンパイル"""
+        from synergeia.coordinator import select_thread, execute_hermeneus
+        
         ccl = "/noe+ >> V[] < 0.3"
         
         # FEP でスレッド選択
-        thread = coordinator.select_thread(ccl)
+        thread = select_thread(ccl)
         assert thread in ["antigravity", "hermeneus"]
         
         # Hermeneus でコンパイル
-        result = coordinator.execute_hermeneus(ccl, "E2E test")
+        result = execute_hermeneus(ccl, "E2E test")
         assert result["status"] == "success"
         assert "lmql" in result
         assert "convergence_loop" in result["lmql"]

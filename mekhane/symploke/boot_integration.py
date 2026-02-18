@@ -26,7 +26,7 @@ import json
 import argparse
 from datetime import datetime
 from pathlib import Path
-from typing import Optional, Any, cast
+from typing import Optional
 
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
@@ -84,7 +84,7 @@ def extract_dispatch_info(context: str, gpu_ok: bool = True) -> dict:
     """
     dispatch_info = {"primary": "", "alternatives": [], "dispatch_formatted": ""}
     try:
-        from mekhane.fep.attractor_dispatcher import AttractorDispatcher  # type: ignore
+        from mekhane.fep.attractor_dispatcher import AttractorDispatcher
         dispatcher = AttractorDispatcher(force_cpu=not gpu_ok)
         plan = dispatcher.dispatch(context)
         if plan:
@@ -99,110 +99,90 @@ def extract_dispatch_info(context: str, gpu_ok: bool = True) -> dict:
 
 
 def _load_projects(project_root: Path) -> dict:
-    """Load project registries from .agent/projects/.
-
-    Loads both registry.yaml (actionable tools/products) and
-    knowledge.yaml (theoretical/informational items).
+    """Load project registry from .agent/projects/registry.yaml.
 
     Returns:
         dict: {
-            "projects": [...],    # Actionable projects
-            "knowledge": [...],   # Knowledge items
+            "projects": [...],   # 全プロジェクト
             "active": int,
             "dormant": int,
             "total": int,
-            "formatted": str      # フォーマット済み出力
+            "formatted": str     # フォーマット済み出力
         }
     """
-    result = {"projects": [], "knowledge": [], "active": 0, "dormant": 0, "total": 0, "formatted": ""}
-    base_path = project_root / ".agent" / "projects"
-    registry_path = base_path / "registry.yaml"
-    knowledge_path = base_path / "knowledge.yaml"
+    result = {"projects": [], "active": 0, "dormant": 0, "total": 0, "formatted": ""}
+    registry_path = project_root / ".agent" / "projects" / "registry.yaml"
+    if not registry_path.exists():
+        return result
 
     try:
-        import yaml  # type: ignore
-
-        # --- Load actionable registry ---
-        projects: list = []
-        if registry_path.exists():
-            data = yaml.safe_load(registry_path.read_text(encoding="utf-8"))
-            projects = data.get("projects", []) if data else []
-
-        # --- Load knowledge base ---
-        knowledge: list = []
-        if knowledge_path.exists():
-            kdata = yaml.safe_load(knowledge_path.read_text(encoding="utf-8"))
-            knowledge = kdata.get("knowledge", []) if kdata else []
-
-        if not projects and not knowledge:
+        import yaml
+        data = yaml.safe_load(registry_path.read_text(encoding="utf-8"))
+        projects = data.get("projects", [])
+        if not projects:
             return result
 
         active = [p for p in projects if p.get("status") == "active"]
         dormant = [p for p in projects if p.get("status") == "dormant"]
+        archived = [p for p in projects if p.get("status") == "archived"]
 
-        # --- Group by tier ---
-        products = [p for p in projects if p.get("tier") == "product"]
-        shared = [p for p in projects if p.get("tier") == "shared"]
+        lines = ["📦 **Projects** (registry.yaml)"]
+        # Group by category based on path patterns
+        categories = {
+            "コアランタイム": [],
+            "Mekhane モジュール": [],
+            "理論・言語基盤": [],
+            "研究・概念": [],
+            "補助": [],
+        }
+        for p in projects:
+            path = p.get("path", "")
+            status = p.get("status", "")
+            if status == "archived":
+                categories["補助"].append(p)
+            elif path.startswith("mekhane/"):
+                categories["Mekhane モジュール"].append(p)
+            elif path.startswith(".") or p.get("id") in ("kalon", "aristos", "autophonos"):
+                categories["研究・概念"].append(p)
+            elif p.get("id") in ("ccl", "kernel", "pepsis"):
+                categories["理論・言語基盤"].append(p)
+            elif p.get("id") in ("hgk",):
+                categories["補助"].append(p)
+            else:
+                categories["コアランタイム"].append(p)
 
-        status_icons = {"active": "🟢", "dormant": "💤", "archived": "🗄️", "planned": "📋", "design": "📐"}
-        lines = ["📦 **Projects** (registry v2)"]
+        status_icons = {"active": "🟢", "dormant": "💤", "archived": "🗄️", "planned": "📋"}
+        for cat_name, cat_projects in categories.items():
+            if not cat_projects:
+                continue
+            lines.append(f"  [{cat_name}]")
+            for p in cat_projects:
+                icon = status_icons.get(p.get("status", ""), "❓")
+                name = p.get("name", p.get("id", "?"))
+                phase = p.get("phase", "")
+                summary = p.get("summary", "")
+                if len(summary) > 50:
+                    summary = summary[:50] + "..."
+                line = f"    {icon} {name} [{phase}] — {summary}"
+                # entry_point: CLI があれば表示
+                ep = p.get("entry_point")
+                if ep and isinstance(ep, dict):
+                    cli = ep.get("cli", "")
+                    if cli:
+                        line += f"\n       📎 `{cli}`"
+                lines.append(line)
+                # usage_trigger: 利用条件を表示
+                trigger = p.get("usage_trigger", "")
+                if trigger and p.get("status") == "active":
+                    lines.append(f"       ⚡ {trigger}")
 
-        def _format_project(p: dict) -> list:
-            """Format a single project entry."""
-            out: list = []
-            icon = status_icons.get(p.get("status", ""), "❓")
-            name = p.get("name", p.get("id", "?"))
-            phase = p.get("phase", "")
-            summary = p.get("summary", "")
-            if len(summary) > 60:
-                summary = summary[:60] + "..."
-            line = f"    {icon} {name} [{phase}] — {summary}"
-            ep = p.get("entry_point")
-            if ep and isinstance(ep, dict):
-                cli = ep.get("cli", "")
-                if cli:
-                    line += f"\n       📎 `{cli}`"
-            out.append(line)
-            trigger = p.get("usage_trigger", "")
-            if trigger and p.get("status") == "active":
-                out.append(f"       ⚡ {trigger}")
-            return out
-
-        # Products
-        if products:
-            lines.append("  [🎯 Product]")
-            for p in products:
-                lines.extend(_format_project(p))
-
-        # Shared modules
-        if shared:
-            lines.append("  [🔧 Shared]")
-            for p in shared:
-                lines.extend(_format_project(p))
-
-        # Knowledge
-        if knowledge:
-            lines.append("  [📚 Knowledge] (knowledge.yaml)")
-            for k in knowledge:
-                name = k.get("name", k.get("id", "?"))
-                cat = k.get("category", "")
-                summary = k.get("summary", "")
-                if len(summary) > 60:
-                    summary = summary[:60] + "..."
-                lines.append(f"    📖 {name} [{cat}] — {summary}")
-
-        # Statistics
-        lines.append(
-            f"  統計: Product {len(products)} / Shared {len(shared)} / Knowledge {len(knowledge)}"
-            f" (Active {len(active)} / Dormant {len(dormant)})"
-        )
+        lines.append(f"  統計: {len(projects)}件 / Active {len(active)} / Dormant {len(dormant)} / Archived {len(archived)}")
 
         result = {
             "projects": projects,
-            "knowledge": knowledge,
             "active": len(active),
             "dormant": len(dormant),
-            "total": len(projects) + len(knowledge),
+            "total": len(projects),
             "formatted": "\n".join(lines),
         }
     except Exception:
@@ -229,8 +209,8 @@ def _load_skills(project_root: Path) -> dict:
         return result
 
     try:
-        skills: list[dict[str, Any]] = []
-        skill_paths: list[str] = []
+        skills = []
+        skill_paths = []
         for skill_dir in sorted(skills_dir.iterdir()):
             skill_md = skill_dir / "SKILL.md"
             if not skill_dir.is_dir() or not skill_md.exists():
@@ -243,7 +223,7 @@ def _load_skills(project_root: Path) -> dict:
             if content.startswith("---"):
                 parts = content.split("---", 2)
                 if len(parts) >= 3:
-                    import yaml  # type: ignore
+                    import yaml
                     try:
                         meta = yaml.safe_load(parts[1])
                         name = meta.get("name", skill_dir.name)
@@ -308,7 +288,7 @@ def get_boot_context(mode: str = "standard", context: Optional[str] = None) -> d
     Returns:
         dict: 各軸の結果 + "formatted" キーにフォーマット済み出力
     """
-    from mekhane.symploke.boot_axes import (  # type: ignore
+    from mekhane.symploke.boot_axes import (
         gpu_preflight as _gpu_pf,
         load_handoffs, load_sophia, load_persona, load_pks,
         load_safety, load_ept, load_digestor, load_attractor,
@@ -319,67 +299,8 @@ def get_boot_context(mode: str = "standard", context: Optional[str] = None) -> d
     # GPU プリフライトチェック
     gpu_ok, gpu_reason = _gpu_pf()
 
-    # ── Doc Staleness Check (F5) ──
-    # Project Root のドキュメント健全性をチェックし、腐敗があれば警告
-    doc_health_msg = ""
-    try:
-        from mekhane.dendron.doc_staleness import DocStalenessChecker, StalenessStatus  # type: ignore
-        project_root = Path(__file__).parent.parent.parent
-        checker = DocStalenessChecker()
-        checker.scan(project_root)
-        results = checker.check()
-        stale_count = sum(1 for r in results if r.status == StalenessStatus.STALE)
-        if stale_count > 0:
-            mermaid_graph = checker.generate_mermaid()
-            doc_health_msg = (
-                f"⚠️  **Doc Health Warning**: {stale_count} documents are STALE.\n"
-                f"<details><summary>Dependency Context (Mermaid)</summary>\n\n"
-                f"```mermaid\n{mermaid_graph}\n```\n"
-                f"</details>\n"
-                f"Run `doc-staleness --check` to fix."
-            )
-    except Exception:
-        pass
-
     # ── 軸ロード (A-L) ──
     handoffs_result = load_handoffs(mode, context)
-
-    # ── Git Log Fallback ──
-    # PURPOSE: Handoff がない場合（GCP 移行直後など）に git log から作業コンテキストを復元する
-    # git は記憶喪失しない — 最も信頼できるフォールバック (SOURCE, not TAINT)
-    git_context_result: dict = {"commits": [], "formatted": "", "fallback_used": False}
-    if not handoffs_result.get("latest") and mode != "fast":
-        try:
-            import subprocess
-            project_root = Path(__file__).parent.parent.parent
-            # git log --oneline -20 + diff --stat for recent context
-            git_log = subprocess.run(
-                ["git", "log", "--oneline", "--no-decorate", "-20"],
-                capture_output=True, text=True, cwd=str(project_root), timeout=5,
-            )
-            git_diff_stat = subprocess.run(
-                ["git", "diff", "--stat", "HEAD~5", "HEAD"],
-                capture_output=True, text=True, cwd=str(project_root), timeout=5,
-            )
-            if git_log.returncode == 0 and git_log.stdout.strip():
-                commits: list[str] = git_log.stdout.strip().split("\n")
-                diff_stat = git_diff_stat.stdout.strip() if git_diff_stat.returncode == 0 else ""
-                git_lines = ["🔀 **Git Context Fallback** (Handoff 不在 — git log から復元)"]
-                git_lines.append("  直近のコミット:")
-                for c in commits[:10]:  # type: ignore
-                    git_lines.append(f"    {c}")
-                if diff_stat:
-                    git_lines.append("  直近5コミットの変更ファイル:")
-                    for line in diff_stat.split("\n")[:10]:  # type: ignore
-                        git_lines.append(f"    {line}")
-                git_context_result = {
-                    "commits": commits,
-                    "diff_stat": diff_stat,
-                    "formatted": "\n".join(git_lines),
-                    "fallback_used": True,
-                }
-        except Exception:
-            pass  # Git failure should not block boot
 
     # KI コンテキスト: Handoff 主題からフォールバック
     ki_context = context
@@ -406,29 +327,61 @@ def get_boot_context(mode: str = "standard", context: Optional[str] = None) -> d
     proactive_push_result = load_proactive_push(mode, context)
     ideas_result = load_ideas(mode, context)
 
+    # ── WAL 軸 (O) — Intent-WAL 前セッション復元 ──
+    wal_result = {"has_wal": False, "formatted": ""}
+    if mode != "fast":
+        try:
+            from mekhane.symploke.intent_wal import IntentWALManager
+            wal_mgr = IntentWALManager()
+            prev_wal = wal_mgr.load_latest()
+            if prev_wal:
+                done = sum(1 for e in prev_wal.progress if e.status == "done")
+                total = len(prev_wal.progress)
+                wal_lines = ["📋 **Intent-WAL** (前セッション)"]
+                wal_lines.append(f"   Goal: {prev_wal.session_goal}")
+                wal_lines.append(f"   Health: {prev_wal.context_health_level}")
+                wal_lines.append(f"   Progress: {done}/{total} steps")
+                if prev_wal.blockers:
+                    wal_lines.append(f"   ⚠️ Blockers: {', '.join(prev_wal.blockers)}")
+                # Incomplete tasks
+                incomplete = [e for e in prev_wal.progress if e.status in ("in_progress", "blocked")]
+                if incomplete:
+                    wal_lines.append("   未完了:")
+                    for e in incomplete[:5]:
+                        wal_lines.append(f"     - [{e.status}] {e.action}")
+                wal_result = {
+                    "has_wal": True,
+                    "session_goal": prev_wal.session_goal,
+                    "health": prev_wal.context_health_level,
+                    "progress_done": done,
+                    "progress_total": total,
+                    "blockers": prev_wal.blockers,
+                    "formatted": "\n".join(wal_lines),
+                    "boot_section": wal_mgr.to_boot_section(),
+                }
+        except Exception:
+            pass  # WAL failure should not block boot
+
     # ── 統合フォーマット ──
     lines: list[str] = []
 
-    # 表示順: Doc Health → Persona → Handoff → KI → PKS → Safety → EPT
+    # 表示順: Persona → Handoff → WAL → KI → PKS → Safety → EPT
     #       → Digestor → Attractor → Projects → Skills → Doxa → Feedback
-    if doc_health_msg:
-        lines.append(doc_health_msg)
-        lines.append("")
-
     if persona_result.get("formatted"):
         lines.append(persona_result["formatted"])
         lines.append("")
 
     if handoffs_result.get("latest"):
-        from mekhane.symploke.handoff_search import format_boot_output  # type: ignore
+        from mekhane.symploke.handoff_search import format_boot_output
         lines.append(format_boot_output(handoffs_result, verbose=(mode == "detailed")))
         lines.append("")
-    elif git_context_result.get("fallback_used"):
-        lines.append(git_context_result["formatted"])
+
+    if wal_result.get("formatted"):
+        lines.append(wal_result["formatted"])
         lines.append("")
 
     if ki_result.get("ki_items"):
-        from mekhane.symploke.sophia_ingest import format_ki_output  # type: ignore
+        from mekhane.symploke.sophia_ingest import format_ki_output
         lines.append(format_ki_output(ki_result))
 
     for axis_result in [pks_result, safety_result, ept_result, digestor_result,
@@ -442,12 +395,12 @@ def get_boot_context(mode: str = "standard", context: Optional[str] = None) -> d
 
     # incoming/ チェック — Digestor 消化候補の通知
     incoming_dir = Path.home() / "oikos" / "mneme" / ".hegemonikon" / "incoming"
-    incoming_files: list[Path] = sorted(incoming_dir.glob("eat_*.md")) if incoming_dir.exists() else []
+    incoming_files = sorted(incoming_dir.glob("eat_*.md")) if incoming_dir.exists() else []
     incoming_result = {"count": len(incoming_files), "files": [f.name for f in incoming_files]}
     if incoming_files:
         lines.append("")
         lines.append(f"📥 Digestor: {len(incoming_files)} 件の消化候補待ち")
-        for f in incoming_files[:5]:  # type: ignore
+        for f in incoming_files[:5]:
             lines.append(f"   → {f.name}")
         if len(incoming_files) > 5:
             lines.append(f"   ... +{len(incoming_files) - 5} 件")
@@ -475,7 +428,6 @@ def get_boot_context(mode: str = "standard", context: Optional[str] = None) -> d
 
     return {
         "handoffs": handoffs_result,
-        "git_context": git_context_result,
         "ki": ki_result,
         "persona": persona_result,
         "pks": pks_result,
@@ -489,6 +441,7 @@ def get_boot_context(mode: str = "standard", context: Optional[str] = None) -> d
         "feedback": feedback_result,
         "proactive_push": proactive_push_result,
         "ideas": ideas_result,
+        "wal": wal_result,
         "incoming": incoming_result,
         "formatted": "\n".join(lines),
     }
@@ -501,6 +454,24 @@ def print_boot_summary(mode: str = "standard", context: Optional[str] = None):
     """Print formatted boot summary."""
     result = get_boot_context(mode=mode, context=context)
     print(result["formatted"])
+
+    # Today's Theorem — underused theorem suggestion
+    try:
+        from mekhane.fep.theorem_recommender import todays_theorem, usage_summary
+        suggestions = todays_theorem(n=2)
+        if suggestions:
+            print()
+            print("💡 **今日の定理提案** (underused theorems)")
+            for t in suggestions:
+                usage = t["usage_count"]
+                print(f"   {t['id']} {t['name']} ({t['command']}) — 使用{usage}回")
+                print(f"      {t['prompt']}")
+            # Usage summary line
+            summary = usage_summary()
+            unused_pct = round(summary["unused_count"] / 24 * 100)
+            print(f"   📊 未使用: {summary['unused_count']}/24 ({unused_pct}%)")
+    except Exception:
+        pass  # Theorem recommender failure should not block boot
 
     # Summary line
     print()
@@ -590,8 +561,7 @@ def generate_boot_template(result: dict) -> Path:
     lines.append("")
 
     reqs = MODE_REQUIREMENTS.get("detailed", {})
-    required_sections = cast(list[str], reqs.get("required_sections", []))
-    for section in required_sections:
+    for section in reqs.get("required_sections", []):
         lines.append(f"- [ ] {section}")
     lines.append("")
 
@@ -604,13 +574,13 @@ def generate_boot_template(result: dict) -> Path:
     related = handoffs.get("related", [])
     latest = handoffs.get("latest")
 
-    all_handoffs: list[Any] = []
+    all_handoffs = []
     if latest:
         all_handoffs.append(latest)
     if related:
         all_handoffs.extend(related)
 
-    for i, h in enumerate(all_handoffs[:10], 1):  # type: ignore
+    for i, h in enumerate(all_handoffs[:10], 1):
         title = "Unknown"
         if hasattr(h, "metadata"):
             title = h.metadata.get("primary_task", h.metadata.get("title", "Unknown"))
@@ -748,8 +718,7 @@ def postcheck_boot_report(report_path: str, mode: str = "detailed") -> dict:
 
     # Check 2: REQUIRED セクション数
     required_count = content.count("<!-- REQUIRED")
-    required_sections = cast(list[str], reqs.get("required_sections", []))
-    expected = len(required_sections)
+    expected = len(reqs.get("required_sections", []))
     checks.append({
         "name": "required_sections",
         "passed": required_count >= expected,
@@ -757,7 +726,7 @@ def postcheck_boot_report(report_path: str, mode: str = "detailed") -> dict:
     })
 
     # Check 3: 総文字数
-    min_chars = cast(int, reqs.get("min_chars", 0))
+    min_chars = reqs.get("min_chars", 0)
     char_count = len(content)
     checks.append({
         "name": "content_length",
@@ -768,7 +737,7 @@ def postcheck_boot_report(report_path: str, mode: str = "detailed") -> dict:
 
     # Check 4: Handoff 引用数 (### Handoff N: の数)
     handoff_refs = len(re.findall(r"^### Handoff \d+:", content, re.MULTILINE))
-    expected_h = cast(int, reqs.get("handoff_count", 0))
+    expected_h = reqs.get("handoff_count", 0)
     checks.append({
         "name": "handoff_references",
         "passed": handoff_refs >= expected_h,

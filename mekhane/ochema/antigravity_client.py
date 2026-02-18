@@ -31,17 +31,7 @@ from typing import Optional
 
 # --- Data Classes ---
 
-# PURPOSE: 応答テキスト・思考過程・Quota 消費を統一的に返し、呼び出し側の分岐を不要にする
-@dataclass
-class LLMResponse:
-    """LLM からの応答を保持する。"""
-    text: str = ""
-    thinking: str = ""
-    model: str = ""
-    token_usage: dict = field(default_factory=dict)
-    cascade_id: str = ""
-    trajectory_id: str = ""
-    raw_steps: list = field(default_factory=list)
+from mekhane.ochema.types import LLMResponse  # noqa: E402 — shared type to avoid circular deps
 
 
 # PURPOSE: [L2-auto] Language Server の接続情報。
@@ -55,29 +45,34 @@ class LSInfo:
     all_ports: list = field(default_factory=list)
 
 
-# --- Constants (from proto.py) ---
+# --- Constants (originally from proto.py, inlined to avoid hard dependency) ---
 
-from mekhane.ochema.proto import (  # noqa: E402
-    DEFAULT_MODEL,
-    DEFAULT_TIMEOUT,
-    POLL_INTERVAL,
-    RPC_START_CASCADE,
-    RPC_SEND_MESSAGE,
-    RPC_GET_TRAJECTORIES,
-    RPC_GET_STEPS,
-    RPC_GET_STATUS,
-    RPC_MODEL_CONFIG,
-    RPC_EXPERIMENT_STATUS,
-    RPC_USER_MEMORIES,
-    STEP_TYPE_PLANNER,
-    STEP_STATUS_DONE,
-    TURN_STATES_DONE,
-    build_start_cascade,
-    build_send_message,
-    build_get_status,
-    build_get_steps,
-    extract_planner_response,
-)
+DEFAULT_MODEL = "MODEL_CLAUDE_4_5_SONNET_THINKING"
+DEFAULT_TIMEOUT = 120.0
+POLL_INTERVAL = 1.0
+
+try:
+    from mekhane.ochema.proto import (  # noqa: E402
+        RPC_START_CASCADE,
+        RPC_SEND_MESSAGE,
+        RPC_GET_TRAJECTORIES,
+        RPC_GET_STEPS,
+        RPC_GET_STATUS,
+        RPC_MODEL_CONFIG,
+        RPC_EXPERIMENT_STATUS,
+        RPC_USER_MEMORIES,
+        STEP_TYPE_PLANNER,
+        STEP_STATUS_DONE,
+        TURN_STATES_DONE,
+        build_start_cascade,
+        build_send_message,
+        build_get_status,
+        build_get_steps,
+        extract_planner_response,
+    )
+    _HAS_PROTO = True
+except ImportError:
+    _HAS_PROTO = False
 
 USER_AGENT = "ochema/0.1"
 
@@ -156,6 +151,29 @@ class AntigravityClient:
 
         # Step 3-4: Poll for response
         return self._poll_response(cascade_id, timeout)
+
+    # PURPOSE: マルチターン会話を開始する。
+    def start_conversation(
+        self,
+        model: str = DEFAULT_MODEL,
+    ) -> "CascadeConversation":
+        """マルチターン会話を開始する。
+
+        同一 cascade_id 内で複数メッセージのやり取りを行う。
+        各ターンの応答はステップオフセットで区別される。
+
+        Args:
+            model: デフォルトモデル名
+
+        Returns:
+            CascadeConversation instance
+        """
+        cascade_id = self._start_cascade()
+        return CascadeConversation(
+            client=self,
+            cascade_id=cascade_id,
+            default_model=model,
+        )
 
     # PURPOSE: [L2-auto] LS のユーザーステータスを取得する。接続確認にも使用。
     def get_status(self) -> dict:
@@ -936,16 +954,27 @@ class AntigravityClient:
 
     # PURPOSE: [L2-auto] Step 3-4: ポーリングで LLM 応答を取得。
     def _poll_response(
-        self, cascade_id: str, timeout: float
+        self,
+        cascade_id: str,
+        timeout: float,
+        step_offset: int = 0,
+        trajectory_id_hint: str = "",
     ) -> LLMResponse:
         """Step 3-4: ポーリングで LLM 応答を取得。
 
         walkthrough.md の構造:
         - GetAllCascadeTrajectories: trajectorySummaries[cascadeId].trajectoryId
         - GetCascadeTrajectorySteps: cascadeId + trajectoryId が必須
+
+        Args:
+            cascade_id: Cascade ID
+            timeout: 最大待機秒数
+            step_offset: このオフセット以降のステップのみを対象にする
+                         (マルチターン時に前ターンのステップをスキップ)
+            trajectory_id_hint: 既知の trajectory_id (マルチターン時にスキップ)
         """
         start_time = time.time()
-        trajectory_id = ""
+        trajectory_id = trajectory_id_hint
 
         while time.time() - start_time < timeout:
             # Step 3: trajectory_id を取得
@@ -969,20 +998,26 @@ class AntigravityClient:
                         "cascadeId": cascade_id,
                         "trajectoryId": trajectory_id,
                     })
-                    steps = steps_result.get("steps", [])
+                    all_steps = steps_result.get("steps", [])
                     turn_state = steps_result.get("turnState", "")
 
-                    # PLANNER_RESPONSE ステップが存在し、状態が完了を示す
+                    # step_offset 以降のステップのみを対象
+                    new_steps = all_steps[step_offset:]
+
+                    # 新しい PLANNER_RESPONSE が完了しているか
                     has_response = any(
                         s.get("type") == STEP_TYPE_PLANNER
                         and s.get("status") == STEP_STATUS_DONE
-                        for s in steps
+                        for s in new_steps
                     )
                     is_done = turn_state in TURN_STATES_DONE
                     if has_response and is_done:
-                        return self._parse_steps(
-                            steps, cascade_id, trajectory_id
+                        response = self._parse_steps(
+                            new_steps, cascade_id, trajectory_id
                         )
+                        # total_steps を記録 (次のオフセットに使う)
+                        response.step_count = len(all_steps)
+                        return response
                 except Exception:
                     pass
 
@@ -1077,3 +1112,87 @@ class AntigravityClient:
         """現在のユーザー名を取得。"""
         import os
         return os.environ.get("USER", "makaron8426")
+
+
+# --- Multi-Turn Conversation ---
+
+
+class CascadeConversation:
+    """マルチターン会話を管理する。
+
+    同一 cascade_id 内で複数メッセージをやり取りし、
+    ステップオフセットで各ターンの応答を区別する。
+
+    Usage:
+        client = AntigravityClient()
+        conv = client.start_conversation()
+        r1 = conv.send("Remember: X = 42")
+        r2 = conv.send("What is X?")
+        print(r2.text)  # → "X is 42"
+        conv.close()
+    """
+
+    def __init__(
+        self,
+        client: AntigravityClient,
+        cascade_id: str,
+        default_model: str = DEFAULT_MODEL,
+    ):
+        self._client = client
+        self.cascade_id = cascade_id
+        self.trajectory_id = ""
+        self._default_model = default_model
+        self._step_offset = 0
+        self._turn_count = 0
+
+    def send(
+        self,
+        message: str,
+        model: str = "",
+        timeout: float = DEFAULT_TIMEOUT,
+    ) -> LLMResponse:
+        """メッセージを送信し、応答を取得する。
+
+        Args:
+            message: 送信テキスト
+            model: モデル名 (省略時はデフォルト)
+            timeout: 最大待機秒数
+
+        Returns:
+            LLMResponse with text, thinking, model info
+        """
+        use_model = model or self._default_model
+        self._turn_count += 1
+
+        # Send
+        self._client._send_message(
+            self.cascade_id, message, use_model
+        )
+
+        # Poll with offset
+        response = self._client._poll_response(
+            cascade_id=self.cascade_id,
+            timeout=timeout,
+            step_offset=self._step_offset,
+            trajectory_id_hint=self.trajectory_id,
+        )
+
+        # Update state for next turn
+        self.trajectory_id = response.trajectory_id
+        self._step_offset = response.step_count
+        response.cascade_id = self.cascade_id
+
+        return response
+
+    @property
+    def turn_count(self) -> int:
+        """現在のターン数。"""
+        return self._turn_count
+
+    def close(self) -> None:
+        """会話を閉じる (リソース解放)。"""
+        # LS API に明示的な close はないが、
+        # 将来の拡張のためにインターフェースを提供
+        self.cascade_id = ""
+        self._step_offset = 0
+

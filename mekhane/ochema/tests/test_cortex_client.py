@@ -20,13 +20,8 @@ from mekhane.ochema.cortex_client import (
 
 @pytest.fixture
 def client():
-    """Create a CortexClient instance (skip if OAuth not configured)."""
-    try:
-        c = CortexClient()
-        c._get_token()  # verify auth works
-        return c
-    except (CortexAuthError, Exception) as e:
-        pytest.skip(f"OAuth not configured: {e}")
+    """Create a CortexClient instance."""
+    return CortexClient()
 
 
 class TestTokenRefresh:
@@ -138,9 +133,6 @@ class TestConvenience:
 
     def test_cortex_ask(self):
         """cortex_ask returns string."""
-        try:
-            result = cortex_ask("What is 1+1? Reply with just the number.")
-        except CortexAuthError as e:
-            pytest.skip(f"OAuth not configured: {e}")
+        result = cortex_ask("What is 1+1? Reply with just the number.")
         assert isinstance(result, str)
         assert "2" in result

@@ -115,7 +115,7 @@ class TestContextHealth(unittest.TestCase):
             "total": 1,
             "sessions": [{
                 "cascade_id": "test-2",
-                "step_count": 35,
+                "step_count": 42,
                 "status": "RUNNING",
                 "summary": "big session",
             }],

@@ -238,6 +238,39 @@ def _register_routers(app: FastAPI) -> None:
     except Exception as exc:
         logger.warning("Epistemic router skipped: %s", exc)
 
+    # Scheduler — Jules Daily Scheduler ログ (ファイルシステム IO のみ)
+    try:
+        from mekhane.api.routes.scheduler import router as scheduler_router
+        app.include_router(scheduler_router, prefix=API_PREFIX)
+        logger.info("Scheduler router registered")
+    except Exception as exc:
+        logger.warning("Scheduler router skipped: %s", exc)
+
+    # Periskopē — 研究エンジン API (非同期研究リクエスト・履歴参照)
+    try:
+        from mekhane.api.routes.periskope import router as periskope_router
+        app.include_router(periskope_router, prefix=API_PREFIX)
+        logger.info("Periskopē router registered")
+    except Exception as exc:
+        logger.warning("Periskopē router skipped: %s", exc)
+
+    # Theorem — 定理使用頻度トラッキング (ファイルシステム IO のみ)
+    try:
+        from mekhane.api.routes.theorem import router as theorem_router
+        app.include_router(theorem_router, prefix=API_PREFIX)
+        logger.info("Theorem router registered")
+    except Exception as exc:
+        logger.warning("Theorem router skipped: %s", exc)
+
+    # WAL — Intent-WAL ダッシュボードカード (ファイルシステム IO のみ)
+    try:
+        from mekhane.api.routes.wal import router as wal_router
+        app.include_router(wal_router, prefix=API_PREFIX)
+        logger.info("WAL router registered")
+    except Exception as exc:
+        logger.warning("WAL router skipped: %s", exc)
+
+
 
 # PURPOSE: アプリケーションインスタンス（uvicorn 用）
 app = create_app()

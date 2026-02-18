@@ -38,7 +38,7 @@
 ## 環境
 
 - **OS**: Debian 13 (Linux)
-- **Python**: 3.13
+- **Python**: 3.11+
 - **Node.js**: 20.x
 - **エディタ**: Antigravity IDE (Google)
 - **ブラウザ**: Vivaldi

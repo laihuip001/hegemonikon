@@ -27,7 +27,7 @@
 
     <deliverables>
         <file name="Dockerfile">
-            Must use specific version tags (e.g., `python:3.13-slim-bookworm`), NEVER `latest`.
+            Must use specific version tags (e.g., `python:3.11-slim-bookworm`), NEVER `latest`.
             Must include multi-stage builds for production optimization if applicable.
         </file>
         <file name="docker-compose.yml">
@@ -55,7 +55,7 @@
         
         **Dockerfile:**
         ```dockerfile
-        FROM python:3.13-slim
+        FROM python:3.11-slim
         WORKDIR /app
         COPY requirements.txt .
         RUN pip install --no-cache-dir -r requirements.txt
@@ -79,7 +79,7 @@
 1.  **ホスト汚染の防止:**
     *   AIの言う通りに `pip install` などを繰り返すと、貴殿のPCはすぐに「依存関係の競合」で動かなくなります。このモジュールは、**貴殿のPCを清潔に保つための防護服**です。
 2.  **再現性の保証 (Version Pinning):**
-    *   `FROM python:latest` は禁止です。今日動いたコードが、明日Pythonのバージョンが上がって動かなくなるのを防ぐため、`python:3.13-slim` のように厳密に指定させます。
+    *   `FROM python:latest` は禁止です。今日動いたコードが、明日Pythonのバージョンが上がって動かなくなるのを防ぐため、`python:3.11-slim` のように厳密に指定させます。
 3.  **オンボーディングの瞬殺:**
     *   将来、チームメンバーが増えた時（あるいは貴殿がPCを買い替えた時）、環境構築手順書を読む必要はありません。`docker-compose up` だけで、**1分で開発を開始**できます。
 

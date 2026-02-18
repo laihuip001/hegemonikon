@@ -2,7 +2,7 @@
 # PROOF: [L3/ユーティリティ] <- mekhane/symploke/ O4→日次バッチ消化→scheduler が担う
 # PURPOSE: Jules 720 tasks/day スケジューラー — 6垢分散 + 自動ローテーション
 """
-Jules Daily Scheduler v1.1
+Jules Daily Scheduler v2.1
 
 有効キープール方式。起動時に全 API キーを検証し、
 有効なキーだけを使ってバッチを実行する。
@@ -18,6 +18,9 @@ Usage:
     # Dry-run (何も実行しない、配分だけ表示)
     PYTHONPATH=. python mekhane/symploke/jules_daily_scheduler.py --slot morning --dry-run
 
+    # Basanos mode (構造化レビュー + pre-audit)
+    PYTHONPATH=. python mekhane/symploke/jules_daily_scheduler.py --slot morning --mode basanos --pre-audit
+
     # Small test (2 files × 3 specialists = 6 tasks)
     PYTHONPATH=. python mekhane/symploke/jules_daily_scheduler.py --slot morning --max-files 2 --sample 3
 
@@ -25,9 +28,10 @@ Usage:
     PYTHONPATH=. python mekhane/symploke/jules_daily_scheduler.py --slot morning
 
 Cron:
-    0 6  * * * cd ~/oikos/hegemonikon && PYTHONPATH=. .venv/bin/python mekhane/symploke/jules_daily_scheduler.py --slot morning  >> logs/specialist_daily/cron.log 2>&1
-    0 12 * * * cd ~/oikos/hegemonikon && PYTHONPATH=. .venv/bin/python mekhane/symploke/jules_daily_scheduler.py --slot midday   >> logs/specialist_daily/cron.log 2>&1
-    0 18 * * * cd ~/oikos/hegemonikon && PYTHONPATH=. .venv/bin/python mekhane/symploke/jules_daily_scheduler.py --slot evening  >> logs/specialist_daily/cron.log 2>&1
+    # 推奨: scripts/jules_basanos_cron.sh を使用 (曜日別自動切替)
+    0 6  * * * ~/oikos/hegemonikon/scripts/jules_basanos_cron.sh morning
+    0 12 * * * ~/oikos/hegemonikon/scripts/jules_basanos_cron.sh midday
+    0 18 * * * ~/oikos/hegemonikon/scripts/jules_basanos_cron.sh evening
 """
 
 import argparse
@@ -262,6 +266,10 @@ async def run_slot_batch(
     dry_run: bool = False,
     basanos_bridge: Optional["BasanosBridge"] = None,
     basanos_domains: Optional[list[str]] = None,
+    hybrid_ratio: float = 0.0,
+    audit_issue_codes: Optional[list[str]] = None,
+    use_dynamic: bool = False,
+    exclude_low_quality: bool = True,
 ) -> dict:
     """1 アカウント分のバッチを実行。
 
@@ -286,15 +294,78 @@ async def run_slot_batch(
     try:
         for file_idx, target_file in enumerate(files, 1):
             # 専門家プール選択
-            if basanos_bridge is not None:
-                # Basanos mode: 構造化パースペクティブを使用
-                specs = basanos_bridge.get_perspectives_as_specialists(
+            if basanos_bridge is not None and hybrid_ratio > 0 and hybrid_ratio < 1.0:
+                # Hybrid mode: basanos + specialist を比率で混合
+                basanos_specs = basanos_bridge.get_perspectives_as_specialists(
                     domains=basanos_domains,
                 )
-            else:
-                # Specialist mode: ランダムサンプリング
+                basanos_count = max(1, int(specialists_per_file * hybrid_ratio))
+                specialist_count = specialists_per_file - basanos_count
+                # basanos specs から basanos_count 個をサンプリング
+                sampled_basanos = random.sample(
+                    basanos_specs, min(basanos_count, len(basanos_specs)),
+                )
+                # specialist pool から残りをサンプリング
                 pool = list(ALL_SPECIALISTS)
-                specs = random.sample(pool, min(specialists_per_file, len(pool)))
+                sampled_specialist = random.sample(
+                    pool, min(specialist_count, len(pool)),
+                )
+                specs = sampled_basanos + sampled_specialist
+                random.shuffle(specs)  # 混合順序をランダム化
+            elif basanos_bridge is not None:
+                # Basanos mode: 構造化パースペクティブを使用
+                if use_dynamic:
+                    # F10: ファイル特性に基づく動的 perspective
+                    specs = basanos_bridge.get_dynamic_perspectives(
+                        file_path=target_file,
+                        audit_issues=audit_issue_codes,
+                        max_perspectives=specialists_per_file,
+                    )
+                    if not specs:
+                        # フォールバック: 静的 perspective
+                        specs = basanos_bridge.get_perspectives_as_specialists(
+                            domains=basanos_domains,
+                        )
+                else:
+                    specs = basanos_bridge.get_perspectives_as_specialists(
+                        domains=basanos_domains,
+                    )
+            else:
+                # Specialist mode: audit issue があれば adaptive、なければランダム
+                if audit_issue_codes:
+                    from audit_specialist_matcher import AuditSpecialistMatcher
+                    from specialist_v2 import get_specialists_by_category
+                    matcher = AuditSpecialistMatcher()
+                    categories = matcher.select_for_issues(
+                        audit_issue_codes, total_budget=specialists_per_file,
+                    )
+                    specs = []
+                    for cat in categories:
+                        cat_pool = get_specialists_by_category(cat)
+                        if cat_pool:
+                            specs.append(random.choice(cat_pool))
+                    # budget を満たさなければランダムで補充
+                    if len(specs) < specialists_per_file:
+                        pool = [s for s in ALL_SPECIALISTS if s not in specs]
+                        remaining = specialists_per_file - len(specs)
+                        specs.extend(random.sample(pool, min(remaining, len(pool))))
+                else:
+                    pool = list(ALL_SPECIALISTS)
+                    specs = random.sample(pool, min(specialists_per_file, len(pool)))
+
+            # F14: 低品質 Perspective を実行時除外
+            if exclude_low_quality and specs:
+                try:
+                    from basanos_feedback import FeedbackStore as _FBStore
+                    _excluded_ids = set(_FBStore().get_low_quality_perspectives(threshold=0.1))
+                    if _excluded_ids:
+                        before = len(specs)
+                        specs = [s for s in specs if getattr(s, 'id', '') not in _excluded_ids]
+                        culled = before - len(specs)
+                        if culled > 0:
+                            print(f"    🗑️  F14: {culled} low-quality perspectives excluded")
+                except Exception:
+                    pass  # FeedbackStore 不在時はスキップ
 
             if dry_run:
                 print(f"  [{file_idx}/{len(files)}] {target_file} × {len(specs)} specialists (DRY-RUN)")
@@ -313,11 +384,25 @@ async def run_slot_batch(
             total_started += started
             total_failed += failed
 
+            # F9: session_id + perspective_id をログ保存 (jules_result_parser 連携)
+            sessions_info = []
+            for i, r in enumerate(results):
+                info = {}
+                if "session_id" in r:
+                    info["session_id"] = r["session_id"]
+                if "error" in r:
+                    info["error"] = str(r["error"])[:100]
+                if i < len(specs):
+                    info["specialist"] = specs[i].name
+                    info["perspective_id"] = getattr(specs[i], "id", "")
+                sessions_info.append(info)
+
             all_results.append({
                 "file": target_file,
                 "specialists": len(specs),
                 "started": started,
                 "failed": failed,
+                "sessions": sessions_info,
             })
 
             # 安全弁: エラー率チェック
@@ -350,8 +435,8 @@ async def main():
         help="Time slot to execute",
     )
     parser.add_argument(
-        "--mode", choices=["specialist", "basanos"], default="specialist",
-        help="Review mode: specialist (random 1000人) or basanos (structured 480 perspectives)",
+        "--mode", choices=["specialist", "basanos", "hybrid"], default="specialist",
+        help="Review mode: specialist (random), basanos (structured), hybrid (mixed)",
     )
     parser.add_argument(
         "--max-files", type=int, default=None,
@@ -370,8 +455,16 @@ async def main():
         help="Max concurrent sessions (default: 6)",
     )
     parser.add_argument(
+        "--basanos-ratio", type=float, default=0.6,
+        help="Hybrid mode: ratio of basanos specs (default: 0.6 = 60%% basanos)",
+    )
+    parser.add_argument(
         "--pre-audit", action="store_true",
         help="Run AIAuditor pre-filter to prioritize files with critical issues",
+    )
+    parser.add_argument(
+        "--dynamic", action="store_true",
+        help="F10: Use dynamic perspectives based on file characteristics (basanos/hybrid mode)",
     )
     parser.add_argument(
         "--dry-run", action="store_true",
@@ -400,9 +493,11 @@ async def main():
     bridge: Optional[BasanosBridge] = None
     sampled_domains: Optional[list[str]] = None
 
-    if args.mode == "basanos":
+    if args.mode in ("basanos", "hybrid"):
         bridge = BasanosBridge()
         sampled_domains = bridge.sample_domains(args.domains)
+
+    if args.mode == "basanos":
         # Basanos では specs_per_file = 選択ドメイン数 × 24軸 (全パースペクティブ)
         specs_per_file = len(sampled_domains) * len(bridge.all_axes)
         basanos_info = {
@@ -416,6 +511,21 @@ async def main():
         print(f"Specs:    {len(sampled_domains)} domains × {len(bridge.all_axes)} axes = {specs_per_file}/file")
         if args.sample:
             print(f"  ⚠️  --sample is ignored in basanos mode (using all {len(bridge.all_axes)} axes)")
+    elif args.mode == "hybrid":
+        # Hybrid: basanos specs + specialist specs を比率で混合
+        ratio = args.basanos_ratio
+        basanos_count = max(1, int(specs_per_file * ratio))
+        specialist_count = specs_per_file - basanos_count
+        basanos_info = {
+            "domains": sampled_domains,
+            "axes": len(bridge.all_axes),
+            "basanos_count": basanos_count,
+            "specialist_count": specialist_count,
+            "ratio": ratio,
+        }
+        print(f"Mode:     hybrid ({ratio:.0%} basanos + {1-ratio:.0%} specialist)")
+        print(f"Domains:  {sampled_domains} ({len(sampled_domains)} selected)")
+        print(f"Specs:    {basanos_count} basanos + {specialist_count} specialist = {specs_per_file}/file")
     else:
         print(f"Mode:     specialist (random sampling from ~1000 pool)")
 
@@ -453,7 +563,9 @@ async def main():
 
             for fpath in all_selected_files:
                 try:
-                    result = auditor.audit_file(Path(fpath))
+                    # select_daily_files は相対パスを返す → _PROJECT_ROOT で絶対化
+                    abs_path = _PROJECT_ROOT / fpath
+                    result = auditor.audit_file(abs_path)
                     # Score: Critical=10, High=5, Medium=1, Low=0
                     score = sum(
                         10 if i.severity == AuditSeverity.CRITICAL
@@ -476,12 +588,25 @@ async def main():
 
             total_issues = sum(file_scores.values())
             files_with_issues = sum(1 for s in file_scores.values() if s > 0)
+            # F7: issue コードを収集 (audit_specialist_matcher 連携用)
+            all_issue_codes: list[str] = []
+            for fpath in all_selected_files:
+                try:
+                    abs_path = _PROJECT_ROOT / fpath
+                    re_result = auditor.audit_file(abs_path)
+                    all_issue_codes.extend(i.code for i in re_result.issues)
+                except Exception:
+                    pass
+
             audit_info = {
                 "total_score": total_issues,
                 "files_with_issues": files_with_issues,
                 "file_scores": {f: s for f, s in file_scores.items() if s > 0},
+                "issue_codes": list(set(all_issue_codes)),
             }
             print(f"  → {files_with_issues}/{len(all_selected_files)} files with issues, reordered by priority")
+            if all_issue_codes:
+                print(f"  → {len(set(all_issue_codes))} unique issue codes collected for adaptive matching")
 
     print()
 
@@ -499,14 +624,20 @@ async def main():
 
     print(f"--- Batch ({len(all_keys)} keys, {len(all_selected_files)} files) ---")
 
+    # F7: pre-audit の issue codes を specialist 選択に渡す
+    collected_issue_codes = audit_info.get("issue_codes", []) if audit_info else None
+
     result = await run_slot_batch(
         files=all_selected_files,
         specialists_per_file=specs_per_file,
         api_keys=all_keys,
         max_concurrent=args.max_concurrent,
         dry_run=args.dry_run,
-        basanos_bridge=bridge if args.mode == "basanos" else None,
-        basanos_domains=sampled_domains if args.mode == "basanos" else None,
+        basanos_bridge=bridge if args.mode in ("basanos", "hybrid") else None,
+        basanos_domains=sampled_domains if args.mode in ("basanos", "hybrid") else None,
+        hybrid_ratio=args.basanos_ratio if args.mode == "hybrid" else 0.0,
+        audit_issue_codes=collected_issue_codes,
+        use_dynamic=args.dynamic,
     )
 
     slot_result["total_tasks"] = result["total_tasks"]
@@ -546,6 +677,13 @@ async def main():
             "slot": args.slot,
             "mode": args.mode,
             "timestamp": timestamp,
+            # F11 Dashboard API 用トップレベルキー
+            "total_tasks": slot_result.get("total_tasks", 0),
+            "total_started": slot_result.get("total_started", 0),
+            "total_failed": slot_result.get("total_failed", 0),
+            "files_reviewed": len(all_selected_files),
+            "dynamic": getattr(args, "dynamic", False),
+            # 後方互換: 詳細データ
             "result": slot_result,
             "daily_usage": usage,
         }
@@ -555,6 +693,17 @@ async def main():
             log_data["pre_audit"] = audit_info
         log_file.write_text(json.dumps(log_data, indent=2, ensure_ascii=False))
         print(f"  Log: {log_file}")
+
+        # F21: 自動フィードバック収集 (collect_and_update)
+        try:
+            from jules_result_parser import collect_and_update
+            feedback_result = collect_and_update(days=1)
+            if feedback_result:
+                updated = feedback_result.get("updated", 0)
+                if updated > 0:
+                    print(f"  📊 Feedback: {updated} perspectives updated")
+        except Exception as fb_exc:
+            print(f"  ⚠️  Feedback collection failed: {fb_exc}")
 
 
 if __name__ == "__main__":

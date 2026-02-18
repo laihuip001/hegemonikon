@@ -13,7 +13,6 @@ __version__ = "3.0.0"
 
 __all__ = [
     "DendronChecker",
-    "DocStalenessChecker",
     "ProofStatus",
     "ProofLevel",
     "MetaLayer",
@@ -28,13 +27,3 @@ __all__ = [
     "DendronReporter",
     "ReportFormat",
 ]
-
-
-# PURPOSE: DocStalenessChecker を遅延 import し、python -m 実行時の RuntimeWarning を回避する
-def __getattr__(name: str):  # type: ignore[no-untyped-def]
-    if name == "DocStalenessChecker":
-        from .doc_staleness import DocStalenessChecker
-        return DocStalenessChecker
-    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
-
-

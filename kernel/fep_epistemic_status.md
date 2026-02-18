@@ -1,18 +1,12 @@
 ---
-doc_id: FEP_EPISTEMIC_STATUS
-version: 1.1.0
-tier: KERNEL
-status: CANONICAL
-created: '2026-02-14'
-updated: '2026-02-14'
-origin: /ccl-nous × 2 + /sop (Deep Researcher) + Creator dialogue
-related:
-- axiom_hierarchy.md
-- DX-012_universality_dilemma.md
-- DX-013_limit_test_principle.md
-depends_on:
-- doc_id: AXIOM_HIERARCHY
-  min_version: 7.0.0
+doc_id: "FEP_EPISTEMIC_STATUS"
+version: "1.1.0"
+tier: "KERNEL"
+status: "CANONICAL"
+created: "2026-02-14"
+updated: "2026-02-14"
+origin: "/ccl-nous × 2 + /sop (Deep Researcher) + Creator dialogue"
+related: ["axiom_hierarchy.md", "DX-012_universality_dilemma.md", "DX-013_limit_test_principle.md"]
 ---
 
 > **Kernel Doc Index**: [SACRED_TRUTH](SACRED_TRUTH.md) | [axiom_hierarchy](axiom_hierarchy.md) | [fep_epistemic_status](fep_epistemic_status.md) ← 📍

@@ -1,13 +1,10 @@
 ---
-doc_id: TRIGONON
-version: 1.0.0
-tier: KERNEL
-parent: axiom_hierarchy
-created: '2026-02-07'
-summary: 6定理群の三角形構造 — Pure/Mixed 分類と関係の階層
-depends_on:
-- doc_id: AXIOM_HIERARCHY
-  min_version: 7.0.0
+doc_id: "TRIGONON"
+version: "1.0.0"
+tier: "KERNEL"
+parent: "axiom_hierarchy"
+created: "2026-02-07"
+summary: "6定理群の三角形構造 — Pure/Mixed 分類と関係の階層"
 ---
 
 # Trígōnon (τρίγωνον) — 三角形構造

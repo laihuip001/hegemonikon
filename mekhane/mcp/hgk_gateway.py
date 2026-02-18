@@ -1366,10 +1366,10 @@ def hgk_sessions() -> str:
     hgk_session_read や hgk_ask (cascade_id 指定) と組み合わせて使用する。
     """
     try:
-        from mekhane.ochema.antigravity_client import AntigravityClient
+        from mekhane.ochema.service import OchemaService
 
-        client = AntigravityClient()
-        data = client.session_info()
+        svc = OchemaService.get()
+        data = svc.session_info()
 
         sessions = data.get("sessions", [])
         if not sessions:
@@ -1416,7 +1416,7 @@ def hgk_session_read(
     try:
         from mekhane.ochema.antigravity_client import AntigravityClient
 
-        client = AntigravityClient()
+        client = AntigravityClient()  # session_read is LS-specific
         data = client.session_read(
             cascade_id.strip(),
             max_turns=max(1, min(50, max_turns)),
@@ -1505,18 +1505,20 @@ def hgk_ask(
         return "⚠️ レートリミット超過 (5 回/分)。少し待ってから再試行してください。"
 
     try:
-        from mekhane.ochema.antigravity_client import AntigravityClient
-
-        client = AntigravityClient()
-
         if cascade_id and cascade_id.strip():
-            # 既存セッションにメッセージ追加
+            # 既存セッションにメッセージ追加 — LS 固有 API が必要
+            from mekhane.ochema.antigravity_client import AntigravityClient
+
+            client = AntigravityClient()
             cid = cascade_id.strip()
             client._send_message(cid, message, model)
             response = client._poll_response(cid, float(timeout))
         else:
-            # 新規セッション
-            response = client.ask(message, model=model, timeout=float(timeout))
+            # 新規セッション — OchemaService 経由 (Cortex/LS 自動ルーティング)
+            from mekhane.ochema.service import OchemaService
+
+            svc = OchemaService.get()
+            response = svc.ask(message, model=model, timeout=float(timeout))
 
         result = f"## 🤖 LLM 応答\n\n**モデル**: `{response.model}`\n\n---\n\n{response.text}"
 
@@ -1543,10 +1545,10 @@ def hgk_models() -> str:
     Antigravity LS が提供するモデルとクォータ残量を確認できる。
     """
     try:
-        from mekhane.ochema.antigravity_client import AntigravityClient
+        from mekhane.ochema.service import OchemaService
 
-        client = AntigravityClient()
-        models = client.list_models()
+        svc = OchemaService.get()
+        models = svc.ls_models()
 
         if not models:
             return "📭 モデル情報を取得できませんでした"
@@ -1578,20 +1580,21 @@ def hgk_ls_status() -> str:
     LS が稼働しているか、PID, ポート, ワークスペースを表示する。
     """
     try:
-        from mekhane.ochema.antigravity_client import AntigravityClient
+        from mekhane.ochema.service import OchemaService
 
-        client = AntigravityClient()
-        status = client.get_status()
+        svc = OchemaService.get()
+        st = svc.status()
 
+        if not st.get("ls_available"):
+            return "## 🔌 Language Server ステータス\n\n**状態**: ❌ 未検出"
+
+        ls_info = st.get("ls", {})
         return f"""## 🔌 Language Server ステータス
 
 **状態**: ✅ 接続済み
-**PID**: {client.pid}
-**Port**: {client.port}
-
----
-
-{status}"""
+**PID**: {ls_info.get('pid', 'N/A')}
+**Port**: {ls_info.get('port', 'N/A')}
+**Workspace**: {ls_info.get('workspace', 'N/A')}"""
     except RuntimeError as e:
         return f"## 🔌 Language Server ステータス\n\n**状態**: ❌ 未検出\n**エラー**: {e}"
     except Exception as e:

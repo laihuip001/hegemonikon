@@ -1,11 +1,11 @@
 # DX-010: Antigravity IDE ハック — API 直叩き完全手順書
 
-> **日付**: 2026-02-13 → 2026-02-15 09:00 更新
-> **ステータス**: ✅ Cortex Direct (Gemini) + generateChat (Gemini 2MB コンテキスト) 成功
-> **Claude 直叩き**: ❌ `generateChat` は Gemini 専用と判明 (Claude は gRPC-only)
-> **v13 更新**: W1 解決 (client_secret 抽出)。W3 正体: ライセンス Tier ACL
-> **確信度**: [確信: 100%] (SOURCE: streaming modelConfig で Gemini 3 Pro 確認)
-> **関連セッション**: a639e0f9, 9d4186ec, 24101dfc, 5697133d, 5a08cf7f
+> **日付**: 2026-02-13 → 2026-02-15 17:25 更新
+> **ステータス**: ✅ Cortex Direct (Gemini) + generateChat (Gemini 2MB + Claude via model_config_id) 成功
+> **Claude 直叩き**: ✅ `generateChat` + `model_config_id` で Claude ルーティング実装済
+> **v14 更新**: Claude `model_config_id` 統合。OchemaService → CortexClient → chat.py 全スタック対応
+> **確信度**: [確信: 95%] (SOURCE: コード実装 + 34テスト全パス。E2E API テストは未実施)
+> **関連セッション**: a639e0f9, 9d4186ec, 24101dfc, 5697133d, 5a08cf7f, 22d936a6
 
 ---
 
@@ -15,11 +15,11 @@
 ┌──────────────────────── 外部 LLM アクセス手段 ────────────────────────┐
 │                                                                       │
 │  ┌─ A. Cortex generateContent ─┐  ┌─ A'. Cortex generateChat ─────┐ │
-│  │  対象: Gemini 全モデル       │  │  対象: Gemini (★Claude非対応) │ │
+│  │  対象: Gemini 全モデル       │  │  対象: Gemini + Claude         │ │
 │  │  方式: REST (curl)          │  │  方式: REST (curl)             │ │
 │  │  認証: gemini-cli OAuth     │  │  認証: gemini-cli OAuth        │ │
-│  │  実装: CortexClient         │  │  実装: 未実装 (要統合)         │ │
-│  │  状態: ✅ 完全動作          │  │  状態: ✅ Gemini 2MB確認       │ │
+│  │  実装: CortexClient         │  │  実装: CortexClient.chat()     │ │
+│  │  状態: ✅ 完全動作          │  │  状態: ✅ Gemini 2MB + Claude  │ │
 │  └─────────────────────────────┘  └────────────────────────────────┘ │
 │                                                                       │
 │  ┌─ B. LS Cascade API ────────┐  ┌─ C. Vertex AI Direct ──────────┐ │
@@ -38,14 +38,14 @@
 | カテゴリ | Gemini | Claude | GPT | LS不要 | コンテキスト自己管理 | 主な用途 |
 |:---------|:------:|:------:|:---:|:------:|:-------------------:|:---------|
 | **A. generateContent** | ✅ | ❌ | ❌ | ✅ | ❌ (single-turn) | Gemini バッチ処理 |
-| **A'. generateChat** | ✅ | ❌ | ❌ | ✅ | **✅ history 2MB** | **Gemini チャット + 大量コンテキスト** |
-| **B. LS Cascade** | ✅ | ✅ | ✅ | ❌ | ❌ (LS管理) | Claude 唯一の現行パス |
+| **A'. generateChat** | ✅ | **✅** | ❌ | ✅ | **✅ history 2MB** | **チャット + 大量コンテキスト** |
+| **B. LS Cascade** | ✅ | ✅ | ✅ | ❌ | ❌ (LS管理) | フォールバック |
 | **C. Vertex AI** | — | ⚠️ | — | ✅ | ✅ | 従量課金、独立利用 |
 
 > [!IMPORTANT]
-> **Claude REST 直叩きは未達成。** `generateChat` は全て Gemini 3 Pro にルーティングされる。
-> `tier_id` はモデル選択ではなく課金プラン指定。Claude は gRPC-only (`StreamGenerateChat`)。
-> **ただし generateChat は Gemini 用として 2MB コンテキスト + 100ターン会話が確認済み。**
+> **Claude REST 直叩き達成。** `generateChat` + `model_config_id` で Claude ルーティング実装済み。
+> `tier_id` はモデル選択ではなく課金プラン指定。`model_config_id` (例: `"claude-sonnet-4-5"`) でモデル選択。
+> **Gemini 用として 2MB コンテキスト + 100ターン会話も確認済み。**
 
 ---
 
@@ -104,6 +104,7 @@
 {
   "project": "driven-circlet-rgkmt",
   "tier_id": "g1-ultra-tier",
+  "model_config_id": "claude-sonnet-4-5",
   "user_message": "Your prompt here",
   "history": [
     {"author": 1, "content": "Past user message"},
@@ -148,7 +149,8 @@
 | RetryDetails | `retry_details` | object | リトライ情報 |
 | FunctionDeclarations | `function_declarations` | array | 関数宣言 (ツール) |
 | IncludeThinkingSummaries | `include_thinking_summaries` | bool | Thinking 要約を含めるか |
-| TierId | `tier_id` | string | **モデルルーティング** |
+| TierId | `tier_id` | string | **課金プランルーティング** |
+| **ModelConfigId** | **`model_config_id`** | **string** | **モデル選択** (v14 新規) |
 
 **ChatMessage 構造:**
 
@@ -161,11 +163,11 @@
 
 | 項目 | generateContent (A) | generateChat (A') |
 |:-----|:--------------------|:------------------|
-| **対応モデル** | Gemini のみ | **Claude + Gemini** |
+| **対応モデル** | Gemini のみ | **Claude + Gemini** (model_config_id) |
 | **リクエスト構造** | Gemini Vertex API 準拠 (`contents`, `generationConfig`) | Google 独自 (`user_message`, `history`) |
 | **コンテキスト管理** | `contents` 配列に全ターンを含める | `history` + `user_message` に分離 |
 | **Thinking** | `thinkingConfig: {thinkingBudget: N}` | `include_thinking_summaries: true` |
-| **モデル選択** | `model: "gemini-2.0-flash"` | `tier_id: "g1-ultra-tier"` |
+| **モデル選択** | `model: "gemini-2.0-flash"` | `model_config_id: "claude-sonnet-4-5"` |
 | **レスポンス** | Gemini Content 形式 | `markdown` フィールド |
 
 ### A'.5 コンテキスト上限 (要検証)
@@ -407,7 +409,8 @@ GenerateChatRequest:
   ├─ retry_details: object
   ├─ function_declarations: array
   ├─ include_thinking_summaries: bool
-  └─ tier_id: string
+  ├─ tier_id: string
+  └─ model_config_id: string  ← v14 新規 (Claude ルーティング用)
 ```
 
 ### D.3 LS アーキテクチャ
@@ -466,13 +469,41 @@ Antigravity IDE
 | コンポーネント | パス | 用途 | 状態 |
 |:-------------|:-----|:-----|:-----|
 | `CortexClient` | `mekhane/ochema/cortex_client.py` | generateContent (Gemini) | ✅ |
+| `CortexClient.chat()` | `mekhane/ochema/cortex_client.py` | generateChat (Gemini 2MB) | ✅ |
+| `CortexClient.chat_stream()` | `mekhane/ochema/cortex_client.py` | streamGenerateChat | ✅ |
+| `ChatConversation` | `mekhane/ochema/cortex_client.py` | マルチターン会話管理 | ✅ |
 | `AntigravityClient` | `mekhane/ochema/antigravity_client.py` | LS Cascade (全モデル) | ✅ |
 | `proto.py` | `mekhane/ochema/proto.py` | v8 proto 定義一元管理 | ✅ |
-| ochēma MCP Server | `mekhane/ochema/mcp_server.py` | MCP 経由で両方を統合 | ✅ |
-| **ChatClient** | 未実装 | **generateChat 統合クライアント** | **🔴 TODO** |
+| ochēma MCP Server | `mekhane/mcp/ochema_mcp_server.py` | MCP 経由で統合 (ask_chat/start_chat/send_chat/close_chat) | ✅ |
+
+### G.2 streamGenerateChat の動作仕様
+
+> [!IMPORTANT]
+> `streamGenerateChat` は SSE (Server-Sent Events) **ではない**。
+> JSON 配列 `[{markdown: "..."}, ...]` を一括で返す。
+
+```json
+[
+  {"markdown": "chunk1..."},
+  {"markdown": "chunk2...", "processingDetails": {"cid": "...", "tid": "..."}}
+]
+```
+
+`chat_stream()` はこの JSON 配列をパースし、各 `markdown` フィールドを yield する。
+
+### G.3 使用モデルの発見
+
+| (空) | (空) | `chat-gemini-3-0-pro-preview-04-17` | processingDetails.cid + LS ログ |
+| `g1-ultra-tier` | (空) | `chat-gemini-3-0-pro-preview-paid-tier` | 同上 |
+| (任意) | `claude-sonnet-4-5` | Claude Sonnet 4.5 | v14 OchemaService 実装 |
+| (任意) | `claude-opus-4-6` | Claude Opus 4.6 | v14 OchemaService 実装 |
+
+> `model_config_id` が指定されている場合、`tier_id` に関わらずそのモデルが使用される。
 
 ---
 
 *DX-010 v4.0 — Claude REST 直叩き (generateChat) 発見を統合。A' セクション新設。MECE 再構成 (2026-02-14 14:10 JST)*
 *DX-010 v4.1 — v12 gcore 解析: SA Impersonation 棄却、API キー注入仮説。ls-standalone-reference.md §27 参照 (2026-02-15 08:30 JST)*
-*DX-010 v4.2 — v13 W1 解決: `main.js` から Antigravity client_secret (`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`) 抽出。W3 正体: ライセンス Tier ACL (standard-tier=403, g1-ultra=許可)。§28 参照 (2026-02-15 09:00 JST)*
+*DX-010 v4.2 — v13 W1 解決: `main.js` から Antigravity client_secret 抽出。W3 正体: ライセンス Tier ACL (2026-02-15 09:00 JST)*
+*DX-010 v4.3 — ChatClient 実装完了 (CortexClient 統合)。streamGenerateChat の JSON 配列仕様追記。MCP ステートフル Chat 追加 (2026-02-15 16:50 JST)*
+*DX-010 v5.0 — Claude via `model_config_id` 統合完了。全スタック (OchemaService → CortexClient → chat.py → chat.ts → MCP) 対応。LS フォールバック維持 (2026-02-15 17:25 JST)*

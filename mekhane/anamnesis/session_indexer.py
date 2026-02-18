@@ -27,6 +27,8 @@ import sys
 import subprocess
 import tempfile
 from datetime import datetime
+
+import yaml
 from pathlib import Path
 from typing import Optional
 
@@ -997,6 +999,181 @@ def index_roms(rom_dir: Optional[str] = None) -> int:
     return 0
 
 
+# ==============================================================
+# WAL Indexer — Intent-WAL YAML を source="wal" でインデックス
+# ==============================================================
+
+_WAL_DIR = Path.home() / "oikos" / "mneme" / ".hegemonikon" / "wal"
+
+
+# PURPOSE: Intent-WAL YAML ファイルをパースし構造化 dict に変換する
+def parse_wal_yaml(path: Path) -> dict:
+    """PURPOSE: Intent-WAL YAML ファイルをパースし構造化 dict に変換する"""
+    try:
+        text = path.read_text(encoding="utf-8", errors="replace")
+        data = yaml.safe_load(text)
+        if not isinstance(data, dict):
+            return {}
+    except Exception as e:
+        print(f"  [Warn] Failed to parse {path.name}: {e}")
+        return {}
+
+    meta = data.get("meta", {})
+    intent = data.get("intent", {})
+    progress = data.get("progress", [])
+    recovery = data.get("recovery", {})
+    context_health = data.get("context_health", {})
+
+    session_id = meta.get("session_id", "")
+    session_goal = intent.get("session_goal", "")
+    acceptance = intent.get("acceptance_criteria", [])
+    context = intent.get("context", "")
+
+    # Progress summary
+    progress_steps = []
+    if isinstance(progress, list):
+        for p in progress:
+            if isinstance(p, dict):
+                action = p.get("action", "")
+                status = p.get("status", "")
+                progress_steps.append(f"[{status}] {action}")
+
+    return {
+        "session_id": session_id,
+        "session_goal": session_goal,
+        "acceptance_criteria": acceptance,
+        "context": context,
+        "progress": progress_steps,
+        "progress_count": len(progress_steps),
+        "agent": meta.get("agent", ""),
+        "created_at": meta.get("created_at", ""),
+        "n_chat_messages": meta.get("n_chat_messages", 0),
+        "blockers": recovery.get("blockers", []),
+        "health_level": context_health.get("level", "green"),
+        "text": text,
+        "filename": path.name,
+    }
+
+
+# PURPOSE: パース済み WAL dict を LanceDB 互換レコードに変換する
+def wals_to_records(wals: list[dict]) -> list[dict]:
+    """PURPOSE: パース済み WAL dict を LanceDB 互換レコードに変換する"""
+    records = []
+    for w in wals:
+        if not w:
+            continue
+
+        # Build abstract from goal + progress + health
+        abstract_parts = [f"[WAL] {w['session_goal'][:200]}"]
+        if w["created_at"]:
+            abstract_parts.append(f"({w['created_at'][:10]})")
+        if w["progress"]:
+            abstract_parts.append(f"— {w['progress_count']} steps")
+            # Last 3 progress entries
+            recent = w["progress"][-3:]
+            abstract_parts.append("; ".join(recent))
+        if w["blockers"]:
+            abstract_parts.append(f"Blockers: {', '.join(w['blockers'][:3])}")
+
+        abstract = " ".join(abstract_parts)
+
+        # Content: full YAML text
+        content = w["text"][:4000]
+
+        # Title
+        title = f"[WAL] {w['session_goal'][:100]}" if w["session_goal"] else f"[WAL] {w['filename']}"
+
+        records.append({
+            "primary_key": f"wal:{w['filename']}",
+            "title": title,
+            "source": "wal",
+            "abstract": abstract[:500],
+            "content": content,
+            "authors": w.get("agent", "Claude"),
+            "doi": "",
+            "arxiv_id": "",
+            "url": str(_WAL_DIR / w["filename"]),
+            "citations": w["progress_count"],
+        })
+
+    return records
+
+
+# PURPOSE: Intent-WAL ファイル群を LanceDB にセマンティックインデックスする
+def index_wals(wal_dir: Optional[str] = None) -> int:
+    """PURPOSE: Intent-WAL ファイル群を LanceDB にセマンティックインデックスする"""
+    directory = Path(wal_dir) if wal_dir else _WAL_DIR
+
+    if not directory.exists():
+        print(f"[WALIndexer] WAL directory not found: {directory}")
+        print("[WALIndexer] Run /boot with WAL integration to generate WAL files first")
+        return 1
+
+    yaml_files = sorted(directory.glob("intent_*.yaml"))
+    if not yaml_files:
+        print("[WALIndexer] No intent_*.yaml files found")
+        return 1
+
+    print(f"[WALIndexer] Found {len(yaml_files)} WAL files")
+
+    # Parse all
+    wals = [parse_wal_yaml(f) for f in yaml_files]
+    records = wals_to_records(wals)
+
+    if not records:
+        print("[WALIndexer] No valid WAL records to index")
+        return 1
+
+    # Embed and add to LanceDB
+    from mekhane.anamnesis.index import GnosisIndex, Embedder
+
+    index = GnosisIndex()
+    embedder = Embedder()
+
+    # Dedupe against existing records
+    if index._table_exists():
+        table = index.db.open_table(index.TABLE_NAME)
+        try:
+            existing = table.to_pandas()
+            existing_keys = set(existing["primary_key"].tolist())
+            before = len(records)
+            records = [r for r in records if r["primary_key"] not in existing_keys]
+            skipped = before - len(records)
+            if skipped:
+                print(f"[WALIndexer] Skipped {skipped} duplicates")
+        except Exception:
+            pass  # Intentional: table may be empty or have incompatible schema
+
+    if not records:
+        print("[WALIndexer] No new WALs to add (all duplicates)")
+        return 0
+
+    # Generate embeddings (title + abstract for embedding text)
+    texts = [f"{r['title']} {r['abstract']}" for r in records]
+    vectors = embedder.embed_batch(texts)
+
+    # Attach vectors
+    data_with_vectors = []
+    for rec, vec in zip(records, vectors):
+        rec["vector"] = vec
+        data_with_vectors.append(rec)
+
+    # Add to LanceDB
+    if index._table_exists():
+        table = index.db.open_table(index.TABLE_NAME)
+        schema_fields = {f.name for f in table.schema}
+        filtered_data = [
+            {k: v for k, v in record.items() if k in schema_fields}
+            for record in data_with_vectors
+        ]
+        table.add(filtered_data)
+    else:
+        index.db.create_table(index.TABLE_NAME, data=data_with_vectors)
+
+    print(f"[WALIndexer] ✅ Indexed {len(data_with_vectors)} WALs")
+    return 0
+
+
 # PURPOSE: trajectorySummaries JSON からセッション情報を LanceDB にインデックスする
 def index_from_json(json_path: str) -> int:
     """PURPOSE: trajectorySummaries JSON からセッション情報を LanceDB にインデックスする"""
@@ -1164,10 +1341,22 @@ def main() -> int:  # PURPOSE: CLI エントリポイント — サブコマン�
         default=None,
         help="Custom ROM directory (default: ~/oikos/mneme/.hegemonikon/rom)",
     )
+    parser.add_argument(
+        "--wals",
+        action="store_true",
+        help="Index intent_*.yaml WAL files into LanceDB",
+    )
+    parser.add_argument(
+        "--wal-dir",
+        default=None,
+        help="Custom WAL directory (default: ~/oikos/mneme/.hegemonikon/wal)",
+    )
 
     args = parser.parse_args()
 
-    if args.exports:
+    if args.wals:
+        return index_wals(args.wal_dir)
+    elif args.exports:
         return index_exports(args.export_dir)
     elif args.roms:
         return index_roms(args.rom_dir)

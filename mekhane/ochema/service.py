@@ -39,20 +39,26 @@ AVAILABLE_MODELS: dict[str, str] = {
     "gemini-2.5-pro": "Gemini 2.5 Pro",
     "gemini-2.5-flash": "Gemini 2.5 Flash",
     "gemini-2.0-flash": "Gemini 2.0 Flash",
-    # Cortex generateChat (無課金枠)
-    "cortex-gemini": "Cortex Gemini (無課金 2MB)",
-    # Claude (LS 経由)
-    "claude-sonnet": "Claude Sonnet 4.5 (LS経由)",
-    "claude-opus": "Claude Opus 4.6 (LS経由)",
+    # Cortex generateChat (LS不要、全モデル直接アクセス)
+    "cortex-chat": "Cortex Chat (LS不要 全モデル直接)",
+    # Claude (Cortex chat() 直接 / LS フォールバック)
+    "claude-sonnet": "Claude Sonnet 4.5",
+    "claude-sonnet-4-5": "Claude Sonnet 4.5",
+    "claude-opus": "Claude Opus 4.6",
 }
 
-# PURPOSE: Claude モデルのフレンドリー名 → proto enum マッピング
+# PURPOSE: Claude モデルのフレンドリー名 → model_config_id マッピング
+# generateChat API の model_config_id として使用
 CLAUDE_MODEL_MAP: dict[str, str] = {
-    "claude-sonnet": "MODEL_CLAUDE_4_5_SONNET_THINKING",
-    "claude-opus": "MODEL_PLACEHOLDER_M26",
+    "claude-sonnet": "claude-sonnet-4-5",
+    "claude-sonnet-4-5": "claude-sonnet-4-5",
+    "claude-opus": "claude-opus-4-6",
+    # LS proto enum → model_config_id (互換性維持)
+    "MODEL_CLAUDE_4_5_SONNET_THINKING": "claude-sonnet-4-5",
+    "MODEL_PLACEHOLDER_M26": "claude-opus-4-6",
 }
 
-# PURPOSE: LS proto 形式のモデル名セット (ルーティング判定用)
+# PURPOSE: LS proto 形式のモデル名セット (LS フォールバック用)
 _LS_PROTO_MODELS = {
     "MODEL_CLAUDE_4_5_SONNET_THINKING",
     "MODEL_PLACEHOLDER_M26",
@@ -77,9 +83,8 @@ class OchemaService:
     def __init__(self) -> None:
         """Initialize service (use get() for singleton access)."""
         self._ls_client: Any = None
-        self._cortex_client: Any = None
+        self._cortex_clients: dict[str, Any] = {}  # account -> CortexClient
         self._ls_init_attempted = False
-        self._cortex_init_attempted = False
 
     @classmethod
     def get(cls) -> "OchemaService":
@@ -123,25 +128,36 @@ class OchemaService:
             self._ls_init_attempted = True
             return None
 
-    def _get_cortex_client(self) -> Any:
-        """Get CortexClient (lazy, cached). Raises on auth failure."""
-        if self._cortex_client is not None:
-            return self._cortex_client
+    def _get_cortex_client(self, account: str = "default") -> Any:
+        """Get CortexClient for account (lazy, cached per account)."""
+        if account in self._cortex_clients:
+            return self._cortex_clients[account]
 
         from mekhane.ochema.cortex_client import CortexClient
-        self._cortex_client = CortexClient(model=DEFAULT_MODEL)
-        logger.info("CortexClient initialized")
-        return self._cortex_client
+        client = CortexClient(model=DEFAULT_MODEL, account=account)
+        self._cortex_clients[account] = client
+        logger.info("CortexClient initialized (account=%s)", account)
+        return client
 
     # --- Routing ---
 
     def _is_claude_model(self, model: str) -> bool:
-        """Check if model should route to LS (Claude/GPT)."""
+        """Check if model is a Claude/GPT model."""
         return model in CLAUDE_MODEL_MAP or model in _LS_PROTO_MODELS
 
-    def _resolve_claude_model(self, model: str) -> str:
-        """Resolve friendly name to proto enum."""
+    def _resolve_model_config_id(self, model: str) -> str:
+        """Resolve friendly name to model_config_id for generateChat."""
         return CLAUDE_MODEL_MAP.get(model, model)
+
+    def _resolve_ls_proto_model(self, model: str) -> str:
+        """Resolve friendly name to LS proto enum (fallback)."""
+        # Reverse map: model_config_id → proto enum
+        _REVERSE_MAP = {
+            "claude-sonnet-4-5": "MODEL_CLAUDE_4_5_SONNET_THINKING",
+            "claude-opus-4-6": "MODEL_PLACEHOLDER_M26",
+        }
+        config_id = CLAUDE_MODEL_MAP.get(model, model)
+        return _REVERSE_MAP.get(config_id, model)
 
     # --- Core API ---
 
@@ -155,12 +171,13 @@ class OchemaService:
         max_tokens: Optional[int] = None,
         thinking_budget: Optional[int] = None,
         timeout: float = 120.0,
+        account: str = "default",
     ) -> "LLMResponse":
         """Send a prompt and get a response.
 
         Routes to the appropriate client based on model name:
-        - claude-*, MODEL_* → AntigravityClient (LS)
-        - gemini-*, cortex-* → CortexClient (Cortex API)
+        - claude-*, MODEL_* → Cortex chat() 直接 (LS フォールバック)
+        - gemini-*, cortex-* → CortexClient generateContent
 
         Args:
             message: The prompt text
@@ -174,10 +191,20 @@ class OchemaService:
         Returns:
             LLMResponse with text, thinking, model, token_usage
         """
-        from mekhane.ochema.antigravity_client import LLMResponse
-
         if self._is_claude_model(model):
-            return self._ask_ls(message, model, timeout=timeout)
+            # Primary: Cortex chat() 直接 (LS不要)
+            try:
+                config_id = self._resolve_model_config_id(model)
+                return self._ask_cortex_chat(
+                    message, model=config_id, timeout=timeout,
+                    account=account,
+                )
+            except Exception as e:
+                logger.warning(
+                    "Cortex chat() failed for %s, trying LS: %s", model, e,
+                )
+                # Fallback: LS 経由
+                return self._ask_ls(message, model, timeout=timeout)
         else:
             return self._ask_cortex(
                 message, model,
@@ -186,6 +213,7 @@ class OchemaService:
                 max_tokens=max_tokens,
                 thinking_budget=thinking_budget,
                 timeout=timeout,
+                account=account,
             )
 
     async def ask_async(
@@ -276,15 +304,8 @@ class OchemaService:
 
         return result
 
-    def quota(self) -> dict[str, Any]:
-        """Return unified quota info from LS and Cortex.
-
-        Returns:
-            {
-                "ls": {...} or None,
-                "cortex": {...} or None,
-            }
-        """
+    def quota(self, account: str = "default") -> dict[str, Any]:
+        """Return unified quota info from LS and Cortex."""
         result: dict[str, Any] = {"ls": None, "cortex": None}
 
         # LS quota
@@ -297,7 +318,7 @@ class OchemaService:
 
         # Cortex quota
         try:
-            cortex = self._get_cortex_client()
+            cortex = self._get_cortex_client(account)
             result["cortex"] = cortex.retrieve_quota()
         except Exception as e:
             logger.debug("Cortex quota error: %s", e)
@@ -355,8 +376,8 @@ class OchemaService:
         model: str,
         timeout: float = 120.0,
     ) -> "LLMResponse":
-        """Send via AntigravityClient (LS)."""
-        from mekhane.ochema.antigravity_client import LLMResponse
+        """Send via AntigravityClient (LS). Fallback for Claude models."""
+        from mekhane.ochema.types import LLMResponse
 
         ls = self._get_ls_client()
         if not ls:
@@ -365,7 +386,7 @@ class OchemaService:
                 "IDE を開いてから再試行してください。"
             )
 
-        proto_model = self._resolve_claude_model(model)
+        proto_model = self._resolve_ls_proto_model(model)
         logger.info("LS ask: model=%s proto=%s", model, proto_model)
         return ls.ask(message, model=proto_model, timeout=timeout)
 
@@ -379,10 +400,11 @@ class OchemaService:
         max_tokens: Optional[int] = None,
         thinking_budget: Optional[int] = None,
         timeout: float = 120.0,
+        account: str = "default",
     ) -> "LLMResponse":
         """Send via CortexClient (Cortex API direct)."""
-        client = self._get_cortex_client()
-        logger.info("Cortex ask: model=%s", model)
+        client = self._get_cortex_client(account)
+        logger.info("Cortex ask: model=%s account=%s", model, account)
         return client.ask(
             message,
             model=model,
@@ -393,9 +415,66 @@ class OchemaService:
             timeout=timeout,
         )
 
+    # --- Chat API (generateChat) ---
+
+    def chat(
+        self,
+        message: str,
+        model: str = "",
+        history: list[dict] | None = None,
+        tier_id: str = "",
+        include_thinking: bool = True,
+        timeout: float = 120.0,
+        account: str = "default",
+    ) -> "LLMResponse":
+        """generateChat API でチャット応答を取得。"""
+        client = self._get_cortex_client(account)
+        resolved_model = self._resolve_model_config_id(model) if model else model
+        logger.info("Cortex chat: model=%s account=%s", resolved_model or "default", account)
+        return client.chat(
+            message=message,
+            model=resolved_model,
+            history=history,
+            tier_id=tier_id,
+            include_thinking=include_thinking,
+            timeout=timeout,
+        )
+
+    def _ask_cortex_chat(
+        self,
+        message: str,
+        model: str = "",
+        timeout: float = 120.0,
+        account: str = "default",
+    ) -> "LLMResponse":
+        """Send via CortexClient.chat() (generateChat API direct)."""
+        client = self._get_cortex_client(account)
+        logger.info("Cortex chat direct: model=%s account=%s", model or "default", account)
+        return client.chat(
+            message=message,
+            model=model,
+            timeout=timeout,
+        )
+
+    def start_chat(
+        self,
+        model: str = "",
+        tier_id: str = "",
+        include_thinking: bool = True,
+        account: str = "default",
+    ) -> Any:
+        """マルチターン generateChat 会話を開始する。"""
+        client = self._get_cortex_client(account)
+        resolved_model = self._resolve_model_config_id(model) if model else model
+        return client.start_chat(
+            model=resolved_model,
+            tier_id=tier_id,
+            include_thinking=include_thinking,
+        )
+
     def __repr__(self) -> str:
         return (
             f"OchemaService("
             f"ls={'✓' if self._ls_client else '✗'}, "
-            f"cortex={'✓' if self._cortex_client else '✗'})"
+            f"cortex={'✓' if self._cortex_clients else '✗'})"
         )

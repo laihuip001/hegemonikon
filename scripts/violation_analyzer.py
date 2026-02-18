@@ -40,9 +40,6 @@ PATTERN_NAMES = {
     "env_gap": "環境強制なし",
     "accuracy_vs_utility": "正確 ≠ 有用",
     "false_impossibility": "できない ≠ やっていない",
-    "selective_omission": "選択的省略",
-    "stale_handoff": "古い引き継ぎ",
-    "preflight_waste": "事前検証の浪費",
 }
 
 

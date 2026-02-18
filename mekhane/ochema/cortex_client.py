@@ -27,6 +27,7 @@ Usage:
 import json
 import logging
 import os
+import sqlite3
 import time
 import urllib.error
 import urllib.parse
@@ -34,7 +35,7 @@ import urllib.request
 from pathlib import Path
 from typing import Any, Generator, Optional
 
-from mekhane.ochema.antigravity_client import LLMResponse
+from mekhane.ochema.types import LLMResponse
 
 logger = logging.getLogger(__name__)
 
@@ -45,6 +46,7 @@ logger = logging.getLogger(__name__)
 # Source of values: gemini-cli oauth2.ts L70-86
 _OAUTH_CONFIG = Path.home() / ".config" / "cortex" / "oauth.json"
 _CREDS_FILE = Path.home() / ".gemini" / "oauth_creds.json"
+_LS_STATE_DB = Path.home() / ".config" / "Antigravity" / "User" / "globalStorage" / "state.vscdb"
 
 
 def _load_oauth_config() -> tuple[str, str]:
@@ -122,6 +124,7 @@ class CortexClient:
         model: str = DEFAULT_MODEL,
         temperature: float = DEFAULT_TEMPERATURE,
         max_tokens: int = DEFAULT_MAX_TOKENS,
+        account: str = "default",
     ):
         """Initialize with default generation parameters.
 
@@ -130,16 +133,27 @@ class CortexClient:
                    gemini-3-pro-preview, etc.)
             temperature: Default temperature (0.0-2.0)
             max_tokens: Default max output tokens
+            account: TokenVault account name for multi-account support
         """
         self.model = model
         self.temperature = temperature
         self.max_tokens = max_tokens
+        self._account = account
         self._token: Optional[str] = None
         self._project: Optional[str] = None
+        self._vault: Optional["TokenVault"] = None
 
         # Unset proxy env vars (mitmproxy remnant avoidance)
         for var in ("HTTPS_PROXY", "HTTP_PROXY", "https_proxy", "http_proxy"):
             os.environ.pop(var, None)
+
+    @property
+    def vault(self) -> "TokenVault":
+        """Get or create TokenVault instance."""
+        if self._vault is None:
+            from mekhane.ochema.token_vault import TokenVault
+            self._vault = TokenVault()
+        return self._vault
 
     # --- Public API ---
 
@@ -448,8 +462,17 @@ class CortexClient:
     # --- Private Methods ---
 
     # PURPOSE: refresh_token から access_token を取得し、55分 TTL でキャッシュする
+    #   TokenVault → gemini-cli OAuth → LS OAuth のフォールバック順
     def _get_token(self) -> str:
-        """Get access token (cached for 55 min, shared with cortex.sh)."""
+        """Get access token (cached for 55 min, shared with cortex.sh).
+
+        Token priority:
+            1. Instance cache (in-memory)
+            2. File cache (/tmp/.cortex_token_cache)
+            3. TokenVault (multi-account, internal caching)
+            4. gemini-cli OAuth refresh (oauth_creds.json)
+            5. LS OAuth capture (state.vscdb)
+        """
         # Check instance cache
         if self._token:
             if _TOKEN_CACHE.exists():
@@ -457,19 +480,47 @@ class CortexClient:
                 if age < _TOKEN_TTL:
                     return self._token
 
-        # Check file cache
-        if _TOKEN_CACHE.exists():
+        # Check file cache (for non-vault accounts / backward compat)
+        if self._account == "default" and _TOKEN_CACHE.exists():
             age = time.time() - _TOKEN_CACHE.stat().st_mtime
             if age < _TOKEN_TTL:
                 self._token = _TOKEN_CACHE.read_text().strip()
                 return self._token
 
-        # Refresh
-        if not _CREDS_FILE.exists():
-            raise CortexAuthError(
-                "OAuth 認証が必要です。先に: npx @google/gemini-cli --prompt 'hello'"
-            )
+        # Try TokenVault (multi-account support)
+        try:
+            token = self.vault.get_token(self._account)
+            self._token = token
+            # Cache for default account (backward compat with cortex.sh)
+            if self._account == "default":
+                _TOKEN_CACHE.write_text(token)
+                _TOKEN_CACHE.chmod(0o600)
+            return token
+        except Exception as vault_err:
+            logger.debug("TokenVault failed for '%s': %s", self._account, vault_err)
 
+        # Fallback: gemini-cli OAuth refresh (direct, no vault)
+        if _CREDS_FILE.exists():
+            try:
+                return self._refresh_gemini_cli_token()
+            except CortexAuthError:
+                logger.warning("gemini-cli OAuth refresh failed, trying LS OAuth")
+
+        # Fallback: LS OAuth (state.vscdb)
+        ls_token = self._get_ls_token()
+        if ls_token:
+            self._token = ls_token
+            return self._token
+
+        raise CortexAuthError(
+            "認証ソースがありません。以下のいずれかが必要:\n"
+            "  1. gemini-cli: npx @google/gemini-cli --prompt 'hello'\n"
+            "  2. Antigravity IDE が起動中 (LS OAuth)\n"
+            "  3. TokenVault にアカウントを追加"
+        )
+
+    def _refresh_gemini_cli_token(self) -> str:
+        """Refresh token via gemini-cli OAuth credentials."""
         try:
             creds = json.loads(_CREDS_FILE.read_text())
             refresh_token = creds["refresh_token"]
@@ -498,6 +549,45 @@ class CortexClient:
         _TOKEN_CACHE.write_text(self._token)
         _TOKEN_CACHE.chmod(0o600)
         return self._token
+
+    def _get_ls_token(self) -> Optional[str]:
+        """Capture OAuth token from Antigravity LS state database.
+
+        The LS stores its Google OAuth access token (ya29.*) in state.vscdb
+        under the key 'antigravityAuthStatus'. The LS refreshes this token
+        automatically while running.
+
+        Returns:
+            Access token string, or None if unavailable.
+        """
+        if not _LS_STATE_DB.exists():
+            logger.debug("LS state DB not found: %s", _LS_STATE_DB)
+            return None
+
+        try:
+            db = sqlite3.connect(str(_LS_STATE_DB))
+            row = db.execute(
+                "SELECT value FROM ItemTable WHERE key = ?",
+                ("antigravityAuthStatus",),
+            ).fetchone()
+            db.close()
+
+            if not row:
+                logger.debug("antigravityAuthStatus key not found in state DB")
+                return None
+
+            data = json.loads(row[0])
+            token = data.get("apiKey", "")
+            if token and token.startswith("ya29."):
+                logger.info("LS OAuth token captured (email: %s)", data.get("email", "?"))
+                return token
+
+            logger.debug("LS token format unexpected: %s...", str(token)[:10])
+            return None
+
+        except (sqlite3.Error, json.JSONDecodeError, KeyError) as e:
+            logger.warning("LS OAuth 取得失敗: %s", e)
+            return None
 
     # PURPOSE: loadCodeAssist で動的にプロジェクト ID を取得・キャッシュし、
     #   generateContent の必須パラメータを自動解決する
@@ -695,8 +785,300 @@ class CortexClient:
             token_usage=token_usage,
         )
 
+    # --- generateChat API (DX-010 §A') ---
+
+    # PURPOSE: generateChat API で Claude/Gemini チャット応答を取得する。
+    #   LS 不要、model_config_id で全モデルにアクセス可能。
+    def chat(
+        self,
+        message: str,
+        model: str = "",
+        history: list[dict[str, Any]] | None = None,
+        tier_id: str = "",
+        include_thinking: bool = True,
+        timeout: float = 120.0,
+    ) -> LLMResponse:
+        """generateChat API でチャット応答を取得。
+
+        LS を迂回し、cloudcode-pa の generateChat エンドポイントを直接呼び出す。
+        model で Claude/Gemini 全モデルを指定可能。
+
+        Args:
+            message: 現在のユーザーメッセージ
+            model: モデル ID (e.g. "gemini-2.5-pro", "claude-sonnet-4-5")
+                   空文字列の場合はサーバーデフォルト (Gemini 3 Pro Preview)
+            history: 過去の会話履歴 [{"author": 1, "content": "..."}, ...]
+                     author: 1=USER, 2=MODEL
+            tier_id: モデルルーティング (""=default, "g1-ultra-tier"=Premium)
+            include_thinking: Thinking summaries を含めるか
+            timeout: リクエストタイムアウト (秒)
+
+        Returns:
+            LLMResponse with text and metadata
+        """
+        token = self._get_token()
+        project = self._get_project(token)
+
+        payload: dict[str, Any] = {
+            "project": project,
+            "user_message": message,
+            "history": history or [],
+            "metadata": {"ideType": "IDE_UNSPECIFIED"},
+            "include_thinking_summaries": include_thinking,
+        }
+        if model:
+            payload["model_config_id"] = model
+        if tier_id:
+            payload["tier_id"] = tier_id
+
+        result = self._call_api(
+            f"{_BASE_URL}:generateChat",
+            payload,
+            timeout=timeout,
+            token_override=token,
+        )
+
+        return self._parse_chat_response(result, request_model=model)
+
+    # PURPOSE: generateChat のストリーミング版。チャンクを逐次 yield。
+    def chat_stream(
+        self,
+        message: str,
+        model: str = "",
+        history: list[dict[str, Any]] | None = None,
+        tier_id: str = "",
+        include_thinking: bool = True,
+        timeout: float = 120.0,
+    ) -> Generator[str, None, None]:
+        """streamGenerateChat API でストリーミングチャット。
+
+        Note: streamGenerateChat は SSE ではなく JSON 配列を返す。
+        各要素の "markdown" フィールドをチャンクとして yield する。
+
+        Args:
+            (same as chat())
+
+        Yields:
+            str: テキストチャンク (markdown フィールドから抽出)
+        """
+        token = self._get_token()
+        project = self._get_project(token)
+
+        payload: dict[str, Any] = {
+            "project": project,
+            "user_message": message,
+            "history": history or [],
+            "metadata": {"ideType": "IDE_UNSPECIFIED"},
+            "include_thinking_summaries": include_thinking,
+        }
+        if model:
+            payload["model_config_id"] = model
+        if tier_id:
+            payload["tier_id"] = tier_id
+
+        data = json.dumps(payload, ensure_ascii=False).encode("utf-8")
+
+        req = urllib.request.Request(
+            f"{_BASE_URL}:streamGenerateChat",
+            data=data,
+            headers={
+                "Authorization": f"Bearer {token}",
+                "Content-Type": "application/json",
+            },
+            method="POST",
+        )
+
+        try:
+            with urllib.request.urlopen(req, timeout=timeout) as resp:
+                raw = resp.read().decode("utf-8")
+                try:
+                    items = json.loads(raw)
+                except json.JSONDecodeError:
+                    # Fallback: SSE 形式の場合
+                    for line in raw.split("\n"):
+                        line = line.strip()
+                        if line.startswith("data: "):
+                            try:
+                                d = json.loads(line[6:])
+                                md = d.get("markdown", "")
+                                if md:
+                                    yield md
+                            except json.JSONDecodeError:
+                                continue
+                    return
+
+                # JSON 配列形式: [{markdown: "...", processingDetails: ...}, ...]
+                if isinstance(items, list):
+                    for item in items:
+                        md = item.get("markdown", "")
+                        if md:
+                            yield md
+                elif isinstance(items, dict):
+                    md = items.get("markdown", "")
+                    if md:
+                        yield md
+        except urllib.error.HTTPError as e:
+            raise CortexAPIError(
+                f"Chat stream failed: {e.code} {e.reason}",
+                status_code=e.code,
+                response_body=e.read().decode("utf-8", errors="replace"),
+            )
+
+    # PURPOSE: マルチターン generateChat 会話を開始する。
+    def start_chat(
+        self,
+        model: str = "",
+        tier_id: str = "",
+        include_thinking: bool = True,
+    ) -> "ChatConversation":
+        """マルチターン generateChat 会話を開始する。
+
+        Args:
+            model: モデル ID (e.g. "claude-sonnet-4-5")
+            tier_id: モデルルーティング
+            include_thinking: Thinking summaries を含めるか
+
+        Returns:
+            ChatConversation instance (history 自動管理)
+        """
+        return ChatConversation(
+            client=self,
+            model=model,
+            tier_id=tier_id,
+            include_thinking=include_thinking,
+        )
+
+    # PURPOSE: generateChat レスポンスを LLMResponse に変換。
+    # Reverse map: model_config_id → human-friendly display name
+    _MODEL_DISPLAY_NAMES: dict[str, str] = {
+        "claude-sonnet-4-5": "Claude Sonnet 4.5",
+        "claude-opus-4-6": "Claude Opus 4.6",
+        "gemini-2.5-pro": "Gemini 2.5 Pro",
+        "gemini-2.5-flash": "Gemini 2.5 Flash",
+        "gemini-2.0-flash": "Gemini 2.0 Flash",
+        "gemini-3-pro-preview": "Gemini 3 Pro Preview",
+        "gemini-3-flash-preview": "Gemini 3 Flash Preview",
+    }
+
+    def _parse_chat_response(
+        self,
+        response: dict,
+        request_model: str = "",
+    ) -> LLMResponse:
+        """Parse generateChat response into LLMResponse.
+
+        Args:
+            response: Raw API response dict
+            request_model: The model_config_id used in the request (for fallback)
+        """
+        text = response.get("markdown", "")
+        details = response.get("processingDetails", {})
+        # modelConfig can be in response root or inside processingDetails
+        model_config = (
+            response.get("modelConfig")
+            or details.get("modelConfig")
+            or {}
+        )
+
+        # Priority: displayName > config id > request_model > fallback
+        model_name = (
+            model_config.get("displayName")
+            or model_config.get("id")
+            or self._MODEL_DISPLAY_NAMES.get(request_model, "")
+            or request_model
+            or f"cortex-chat (cid={details.get('cid', '')})"
+        )
+
+        return LLMResponse(
+            text=text,
+            model=model_name,
+            cascade_id=details.get("cid", ""),
+            trajectory_id=details.get("tid", ""),
+        )
+
     def __repr__(self) -> str:
         return f"CortexClient(model={self.model!r}, project={self._project!r})"
+
+
+# --- ChatConversation ---
+
+
+# PURPOSE: generateChat のマルチターン会話を管理する。
+#   history を自動追跡し、CascadeConversation と対称的な API を提供する。
+class ChatConversation:
+    """マルチターン generateChat 会話 (history 自動管理)。
+
+    同一 history 内で複数メッセージをやり取りし、
+    2MB コンテキスト + 100 ターンまでの大規模会話が可能。
+
+    Usage:
+        client = CortexClient()
+        conv = client.start_chat()
+        r1 = conv.send("Remember: X = 42")
+        r2 = conv.send("What is X?")
+        print(r2.text)  # → "X is 42"
+        conv.close()
+    """
+
+    def __init__(
+        self,
+        client: CortexClient,
+        model: str = "",
+        tier_id: str = "",
+        include_thinking: bool = True,
+    ):
+        self._client = client
+        self._model = model
+        self._tier_id = tier_id
+        self._include_thinking = include_thinking
+        self._history: list[dict[str, Any]] = []
+        self._turn_count = 0
+
+    def send(
+        self,
+        message: str,
+        timeout: float = 120.0,
+    ) -> LLMResponse:
+        """メッセージを送信し、応答を取得する。
+
+        Args:
+            message: 送信テキスト
+            timeout: 最大待機秒数
+
+        Returns:
+            LLMResponse with text and metadata
+        """
+        self._turn_count += 1
+
+        response = self._client.chat(
+            message=message,
+            model=self._model,
+            history=self._history,
+            tier_id=self._tier_id,
+            include_thinking=self._include_thinking,
+            timeout=timeout,
+        )
+
+        # Update history for next turn
+        self._history.append({"author": 1, "content": message})
+        self._history.append({"author": 2, "content": response.text})
+
+        return response
+
+    @property
+    def turn_count(self) -> int:
+        """現在のターン数。"""
+        return self._turn_count
+
+    @property
+    def history(self) -> list[dict[str, Any]]:
+        """現在の会話履歴 (read-only copy)。"""
+        return list(self._history)
+
+    def close(self) -> None:
+        """会話を閉じる (リソース解放)。"""
+        self._history.clear()
+        self._turn_count = 0
 
 
 # --- Convenience Functions ---

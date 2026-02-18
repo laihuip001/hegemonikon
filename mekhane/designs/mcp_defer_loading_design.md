@@ -1,6 +1,6 @@
 # MCP Tool Search (defer_loading) 設計文書
 
-> **Status**: Draft (2026-02-15)
+> **Status**: PoC 調査完了 (2026-02-15)
 > **Priority**: Mid-term (F6)
 > **導出**: /eat+ T3-5 (MCP Tool Search)
 
@@ -8,42 +8,63 @@
 
 | 指標 | 値 |
 |:-----|:---|
-| MCP サーバー数 | 12+ |
+| MCP サーバー数 | 12+ (gnosis, sophia, jules, typos, digestor, sympatheia, hermeneus, mneme, ochema, filesystem, exa, memory, playwright, sequential-thinking) |
 | ツール定義 (推定) | ~134k トークン |
 | 全コンテキスト比率 | ~25-35% |
 | 影響 | 実質的な作業コンテキストの圧迫 |
 
 現在、全 MCP サーバーのツール定義がセッション開始時にコンテキストに一括ロードされている。 使用しないツールの定義がコンテキスト予算を消費し、BC-18 (コンテキスト予算意識) の N chat messages 閾値に早期到達するリスクがある。
 
-## 解決策: defer_loading + Tool Search
+## PoC 調査結果 (2026-02-15)
 
-### パターン概要
+### MCP 仕様確認
 
-```
-[起動時]
-  MCP サーバー登録 → ツール定義をロードしない (defer_loading: true)
-
-[ツール使用時]
-  LLM が「このタスクに必要なツールは？」と判断
-  → Tool Search API でツール定義を動的取得
-  → 必要なツールのみコンテキストに注入
-```
-
-### 前提条件
-
-| 条件 | 状態 |
+| 項目 | 結果 |
 |:-----|:-----|
-| MCP SDK の `defer_loading` サポート | ⚠️ Spec 未確認 |
-| Antigravity IDE での MCP 設定変更 | ⚠️ 設定可能か未検証 |
-| Tool Search API の存在 | [仮説] MCP 仕様に含まれる可能性 |
+| `defer_loading` の存在 | ✅ MCP Beta 機能として確認 |
+| トークン削減効果 | 最大 85% (文献報告) |
+| IDE サポート | ⚠️ Antigravity IDE での設定可能性は未検証 |
+| GitHub Issue | Tool 構造体への `DeferLoading` boolean プロパティ追加が議論中 |
 
-### 実装ロードマップ
+### 現在の MCP 設定構造
 
-| Phase | 内容 | 推定工数 |
-|:------|:-----|:---------|
-| **PoC** | 1サーバーで defer_loading テスト | 2h |
-| **計測** | 全サーバー on/off でトークン消費比較 | 1h |
-| **統合** | 効果が確認されたら全サーバーに適用 | 3h |
+| ファイル | 内容 | サーバー数 |
+|:---------|:-----|:---------:|
+| `.gemini/antigravity/mcp_config.json` | IDE 主要設定 (gnosis, sophia, jules, 他) | 12+ |
+| `.config/Antigravity/User/mcp.json` | IDE ユーザー設定 (GitKraken) | 1 |
+| `.vscode/mcp.json` | ワークスペース設定 (gnosis, hermeneus) | 2 |
+
+現在の設定に `defer_loading` フィールドは一切使用されていない。
+
+### defer_loading パターン
+
+```jsonc
+// 仮説: IDE が対応していれば以下で有効化
+{
+  "mcpServers": {
+    "gnosis": {
+      "command": "...",
+      "args": ["..."],
+      "defer_loading": true    // ← 追加
+    }
+  }
+}
+```
+
+### PoC 方針
+
+| Phase | 内容 | ブロッカー |
+|:------|:-----|:----------|
+| **P0** | IDE が `defer_loading` を解釈するか確認 | IDE ソースコード or ドキュメント参照が必要 |
+| **P1** | 1サーバー (typos) で `defer_loading: true` テスト | P0 の結果次第 |
+| **P2** | 効果測定: ツール定義トークン before/after | P1 成功後 |
+
+### 結論
+
+> [!IMPORTANT]
+> `defer_loading` は MCP 仕様として存在するが、**Antigravity IDE が解釈するかは未確認**。
+> IDE のソースコードまたはドキュメントで `defer_loading` の処理を確認する必要がある。
+> 現時点では **PoC ブロック状態** — IDE 側の対応調査が先行課題。
 
 ## リスク
 
@@ -55,10 +76,10 @@
 
 ## 次のアクション
 
-1. MCP 公式仕様で `defer_loading` の存在を確認 (`search_web`)
-2. Antigravity IDE の MCP 設定フォーマットを調査
-3. 1サーバー (gnosis) で PoC を実施
+1. ~~MCP 公式仕様で `defer_loading` の存在を確認~~ ✅ 確認済み (Beta)
+2. **Antigravity IDE のソースで `defer_loading` の処理を調査** (ブロッカー)
+3. P0 クリア後: 1サーバー (typos) で PoC を実施
 
 ---
 
-*Design v0.1 — /eat+ F6*
+*Design v0.2 — PoC 調査完了 (2026-02-15)*

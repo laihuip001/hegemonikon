@@ -12,7 +12,7 @@
 patches:
   P1:
     file: kernel/axiom_hierarchy.md
-    line: 511
+    line: 475
     claim: "Attention 層の階層性が Scale 座標の操作的類推"
     source: "Fu et al. 2026 (AttentionRetriever)"
     status: analogue
@@ -21,7 +21,7 @@ patches:
 
   P2:
     file: .agent/skills/fep-engine/SKILL.md
-    line: 121
+    line: 115
     claim: "π_i = V[ε_i]⁻¹ は暗黙の検索クエリとして解釈できる"
     source: "Fu et al. 2026 (AttentionRetriever)"
     status: analogue
@@ -57,7 +57,7 @@ patches:
 
   P6:
     file: .agent/skills/fep-engine/SKILL.md
-    line: 298
+    line: 292
     claim: "Sequential CoT > Parallel sampling (2.5x)"
     source: "Chen et al. 2026 (UniT)"
     status: reference
@@ -66,7 +66,7 @@ patches:
 
   P7:
     file: .agent/rules/behavioral_constraints.md
-    line: 255
+    line: 249
     claim: "Budget forcing が BC-9 meta-cognitive check と構造的に類似"
     source: "Chen et al. 2026 (UniT)"
     status: analogue
@@ -93,7 +93,7 @@ patches:
 
   thinking_depth:
     file: .agent/rules/behavioral_constraints.md
-    line: 373
+    line: 357
     claim: "深度レベルが Gemini thinking level と構造的に類似"
     source: "Gemini 3"
     status: analogue
@@ -102,7 +102,7 @@ patches:
 
   fep_evolution:
     file: kernel/fep_epistemic_status.md
-    line: 107
+    line: 101
     claim: "FEP は進化論と構造的に類似した位置づけ"
     source: "Sánchez-Cañizares"
     status: analogue

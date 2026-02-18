@@ -152,6 +152,60 @@ class ExaSearcher:
             search_type="neural",
         )
 
+    async def search_multi_category(
+        self,
+        query: str,
+        max_results: int = 10,
+    ) -> list[SearchResult]:
+        """W2: Search across 3 categories in parallel.
+
+        Runs general, research paper, and github searches concurrently,
+        then merges and deduplicates results.
+
+        Args:
+            query: Search query.
+            max_results: Total max results across all categories.
+
+        Returns:
+            Merged and deduplicated results.
+        """
+        per_cat = max(3, max_results // 3)
+
+        tasks = [
+            self.search(query, max_results=per_cat, category="general"),
+            self.search(query, max_results=per_cat, category="research paper", search_type="neural"),
+            self.search(query, max_results=per_cat, category="github"),
+        ]
+
+        all_results: list[SearchResult] = []
+        category_results = await asyncio.gather(*tasks, return_exceptions=True)
+
+        for result in category_results:
+            if isinstance(result, list):
+                all_results.extend(result)
+            elif isinstance(result, Exception):
+                logger.warning("Exa category search failed: %s", result)
+
+        # Deduplicate by URL
+        seen: set[str] = set()
+        deduped: list[SearchResult] = []
+        for r in all_results:
+            key = (r.url or "").lower().rstrip("/")
+            if key and key in seen:
+                continue
+            if key:
+                seen.add(key)
+            deduped.append(r)
+
+        deduped.sort(key=lambda r: r.relevance, reverse=True)
+        result_list = deduped[:max_results]
+
+        logger.info(
+            "Exa multi-category: %d results (from %d raw)",
+            len(result_list), len(all_results),
+        )
+        return result_list
+
 
 def _truncate(text: str, max_len: int) -> str:
     if len(text) <= max_len:

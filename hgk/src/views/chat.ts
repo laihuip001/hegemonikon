@@ -42,14 +42,15 @@ let apiKey = '';
 let systemInstruction = 'あなたは Hegemonikón の認知支援AIです。日本語で応答してください。簡潔かつ正確に。';
 
 const MODELS: Record<string, string> = {
-    'cortex-gemini': '🆓 Cortex Gemini (無課金 2MB)',
+    'cortex-chat': '💬 Cortex Chat (LS不要 2MB)',
     'gemini-3-pro-preview': 'Gemini 3 Pro Preview',
     'gemini-3-flash-preview': 'Gemini 3 Flash Preview',
     'gemini-2.5-pro': 'Gemini 2.5 Pro',
     'gemini-2.5-flash': 'Gemini 2.5 Flash',
     'gemini-2.0-flash': 'Gemini 2.0 Flash',
-    'claude-sonnet': '🟣 Claude Sonnet 4.5 (LS経由)',
-    'claude-opus': '🟣 Claude Opus 4.6 (LS経由)',
+    'claude-sonnet': '🟣 Claude Sonnet 4.5',
+    'claude-sonnet-4-5': '🟣 Claude Sonnet 4.5 (direct)',
+    'claude-opus': '🟣 Claude Opus 4.6',
 };
 
 const API_BACKEND = 'http://127.0.0.1:9696/api';

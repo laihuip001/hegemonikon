@@ -1,3 +1,4 @@
+# PROOF: [S2/Mekhanē] <- mekhane/ A0->Implementation
 #!/usr/bin/env python3
 """LS Standalone Launcher — IDE なしで Language Server を直接起動する。
 

@@ -2,6 +2,9 @@
 name: Gnōsis Dialog
 description: 論文知識基盤への対話インターフェース
 activation: auto
+summary: |
+  論文知識基盤への対話インターフェース。ベクトル検索による
+  学術論文の検索・参照・引用。Gnōsis インデックスを活用。
 triggers:
   - "論文"
   - "Gnōsis"

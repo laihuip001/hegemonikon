@@ -1,6 +1,9 @@
 ---
 name: Basanos Council
 description: 偉人評議会 (Basanos) による多角的レビュー・監査
+summary: |
+  偉人評議会による多角的レビュー。歴史的思想家のペルソナで
+  敵対的監査を実施し、盲点を検出する。
 triggers:
   - "評議会"
   - "レビュー"

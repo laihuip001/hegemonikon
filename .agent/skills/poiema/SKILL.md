@@ -1,6 +1,9 @@
 ---
 name: Poiema Generator
 description: 構造化出力の生成 (Boot レポート, Handoff, 定型ドキュメント)
+summary: |
+  構造化出力の生成。Boot レポート、Handoff、定型ドキュメントの
+  テンプレートベース生成。一貫したフォーマットを保証。
 triggers:
   - "生成"
   - "レポート"

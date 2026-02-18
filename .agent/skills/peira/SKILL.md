@@ -1,6 +1,9 @@
 ---
 name: Peira Health Check
 description: システム全体のヘルスチェック・健全性確認
+summary: |
+  システム全体のヘルスチェック。全コンポーネントの健全性確認、
+  依存関係の検証、パフォーマンス指標の収集。
 triggers:
   - "ヘルス"
   - "健全"

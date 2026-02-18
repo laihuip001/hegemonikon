@@ -15,6 +15,9 @@ description: |
     - "エージェント駆動開発の相談"
     - "GEMINI.md の書き方"
 
+summary: |
+  IDE 利用ガイド。ツール群の仕様、Skills/Rules/Workflows の設計パターン、
+  モデル固有の最適化、エージェント駆動開発のベストプラクティス。
 triggers:
   - "Antigravity"
   - "IDE"

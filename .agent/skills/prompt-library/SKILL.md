@@ -2,6 +2,9 @@
 name: Prompt Library
 description: Library (112プロンプト) への動的ルーティングとコンテキスト注入
 activation: auto
+summary: |
+  112 プロンプトへの動的ルーティング。コンテキスト注入と
+  テンプレート選択の自動化。Forge 連携。
 triggers:
   - 思考モジュール
   - プロンプト参照

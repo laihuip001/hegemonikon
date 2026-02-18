@@ -1,6 +1,9 @@
 ---
 name: Dendron EPT Checker
 description: コード品質・存在証明 (PROOF.md) の検証を実行する
+summary: |
+  コード品質ゲート。PROOF.md (存在証明) の検証、Metrika (認知複雑度)、
+  Chreos (技術的負債)、Palimpsest (書き換え頻度) による品質スコアリング。
 triggers:
   - "品質"
   - "PROOF"

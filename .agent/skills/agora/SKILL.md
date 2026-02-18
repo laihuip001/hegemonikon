@@ -1,6 +1,9 @@
 ---
 name: Agora
 description: HGK 収益化プロジェクト — ディープインパクト戦略
+summary: |
+  収益化戦略設計。ディープインパクト分析、市場機会の特定、
+  実行計画の策定。HGK の外部展開を支援する。
 triggers:
   - "agora"
   - "agora"

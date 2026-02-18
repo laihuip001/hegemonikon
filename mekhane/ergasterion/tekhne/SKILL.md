@@ -168,7 +168,9 @@ case_mapping:
 
 ## M2: RECURSIVE_CORE (3-Layer Deep Compute)
 
-### Layer Architecture
+> **v6.8 Canvas-CoT Enhanced** — arXiv 2602.10494 に基づく非単調推論統合
+
+### Layer Architecture (Canvas-CoT Enhanced)
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
@@ -176,13 +178,19 @@ case_mapping:
 │   • 変数・制約の網羅的列挙                                       │
 │   • Hidden Agenda 検出                                          │
 │   • フィルタなし、ノイズ生成許容                                 │
+│   • 各仮説を ID 付きノードとして登録 (Canvas-CoT)               │
 ├─────────────────────────────────────────────────────────────────┤
 │ Layer 2: CONFLICT (対立)                                        │
 │   • Internal Council による多視点批評                           │
 │   • Adversarial Simulation (Red Team)                          │
-│   • 仮説の破壊テスト                                            │
+│   • 仮説ノードの CRUD 操作ループ (Canvas-CoT):                  │
+│     ┌ Modify : 部分修正 (矛盾の局所解消)                        │
+│     ├ Delete : 破棄 (反証された仮説の除去)                      │
+│     ├ Insert : 新証拠/仮説の追加                                │
+│     └ Replace: ノード全体の置換 (前提転換)                      │
 ├─────────────────────────────────────────────────────────────────┤
 │ Layer 3: CONVERGENCE (収束)                                     │
+│   • 生存ノードの最終読取 (Canvas-CoT DOM 終端)                  │
 │   • Ockham's Razor 蒸留                                        │
 │   • Fluff 除去（形容詞、副詞、メタコメント）                    │
 │   • Artifact 形成                                               │
@@ -191,6 +199,52 @@ case_mapping:
 🚫 準備強制ゲート:
    Layer 2 完了まで Layer 3 進行をブロック。
    「早く実装したい」は許されない。準備8割。
+```
+
+### Thought Node Management (Canvas-CoT)
+
+> **Origin**: Canvas-of-Thought (arXiv 2602.10494, 2026-02)
+> **原則**: 推論トレースは append-only ログではなく、ID アドレス可能なツリーとして管理する。
+> 局所的エラーの修正に全コンテキスト再生成を要しない。
+
+```yaml
+thought_node_management:
+  node_structure:
+    format: "<hypothesis id='H{n}' status='{active|modified|deleted}'>"
+    attributes:
+      id: "一意識別子 (H1, H2, ...)"
+      status: "active (生存) | modified (修正済) | deleted (破棄)"
+      source: "expansion | council | critique | external"
+      confidence: "0-100"
+      parent: "親ノード ID (ツリー構造の場合)"
+
+  crud_operations:
+    insert:
+      action: "新仮説/証拠の追加"
+      constraint: "既存ノードへの参照を明記"
+    modify:
+      action: "部分修正。修正履歴を保持"
+      format: "H{n}: {old} → {new} (reason: ...)"
+    replace:
+      action: "ノード全体の置換"
+      trigger: "前提転換、パラダイムシフト検出時"
+    delete:
+      action: "破棄。理由を記録"
+      format: "H{n}: DELETED (refuted_by: H{m}, reason: ...)"
+
+  conflict_protocol: |
+    Layer 2 の各 Council Voice が以下を出力:
+    1. 検証対象ノード ID の指定
+    2. 操作種別 (CRUD) の選択
+    3. 操作理由の記述
+    4. 修正後ノードの提案 (modify/replace の場合)
+
+  convergence_protocol: |
+    Layer 3 進入時:
+    1. status=active のノードのみ収集
+    2. confidence 降順でソート
+    3. 相互参照の整合性チェック
+    4. 生存ノードから最終 Artifact を合成
 ```
 
 ### Internal Council (Layer 2)
@@ -207,31 +261,36 @@ voices:
     role: Pure Compiler
     focus: 構文、アーキテクチャ、確率計算
     question: "これは論理的に正しいか？"
+    canvas_action: "対象ノード ID + CRUD 操作を出力"
   
   EMOTION:
     role: Limbic System
     focus: ドーパミン状態、動機、恐怖
     question: "これは Creator を傷つけるか？助けるか？"
+    canvas_action: "対象ノード ID + CRUD 操作を出力"
   
   HISTORY:
     role: Phantom Timeline Archive
     focus: 過去の失敗・成功パターン
     question: "以前これを試した時、何が起きたか？"
+    canvas_action: "対象ノード ID + CRUD 操作を出力"
 
 synthesis_protocol:
   1. LOGIC と EMOTION の対立を特定
   2. HISTORY で解決の糸口を探す
-  3. 三者の合意点を抽出し、最終回答を合成
+  3. 三者の CRUD 提案を統合し、ノードツリーを更新
+  4. 更新後のツリーから最終回答を合成
 ```
 
 ### Deep Think Cycle
 
 ```
-1. DECONSTRUCT: 要求を原子単位に分解
+1. DECONSTRUCT: 要求を原子単位に分解 → 各原子を H{n} として登録
 2. SIMULATE: メンタルシミュレーション実行
-3. COUNCIL: Internal Council の議論
-4. RED_TEAM: Devil's Advocate として自己攻撃
-5. REFINE: 批評から最終計画を合成
+3. COUNCIL: Internal Council の議論 → CRUD 操作を収集
+4. NODE_SURGERY: 矛盾検出 → 当該ノードのみ修正 (非単調推論)
+5. RED_TEAM: Devil's Advocate として自己攻撃
+6. REFINE: 生存ノードから最終計画を合成
 ```
 
 ---
@@ -689,22 +748,30 @@ advantages:
   - 客観性の強化
 ```
 
-### Integration with RECURSIVE_CORE
+### Integration with RECURSIVE_CORE (Canvas-CoT Enhanced)
 
 ```yaml
-integration_point: "Layer 3: CONVERGENCE"
+integration_point: "Layer 2: CONFLICT + Layer 3: CONVERGENCE"
 
 enhanced_flow:
-  1. Layer 1 (EXPANSION): 拡散的生成
-  2. Layer 2 (CONFLICT): Internal Council 批評
+  1. Layer 1 (EXPANSION): 拡散的生成 → ID 付きノードとして登録
+  2. Layer 2 (CONFLICT): 
+     - Internal Council 批評
+     - Self-Critique → 対象ノード ID を指定して CRUD 操作
+     - 全コンテキスト再生成ではなく、局所修正で収束
   3. Layer 3 (CONVERGENCE): 
-     - Self-Critique ループを自動発動
-     - 2回の反復で収束
+     - 生存ノード (status=active) のみ収集
+     - Ockham's Razor 蒸留
      - 最終成果物を形成
 
 auto_trigger:
   condition: "確信度 < 90%"
-  action: "Self-Critique 1回追加"
+  action: "Self-Critique → 対象ノードの Modify/Delete を1回追加"
+
+canvas_cot_benefit: |
+  従来: 批評 → 全体再生成 (O(n))
+  改善: 批評 → 対象ノード修正 (O(1))
+  効果: hallucination snowballing の構造的防止
 ```
 
 ---

@@ -1,6 +1,9 @@
 ---
 name: Taxis Classifier
 description: タスク/入力の自動分類・優先順位付け
+summary: |
+  タスク/入力の自動分類。優先順位付け、射 (morphism) の提案、
+  ワークフロー推薦。FEP attractor による最適ルーティング。
 triggers:
   - "分類"
   - "優先"

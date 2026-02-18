@@ -1,6 +1,9 @@
 ---
 name: Hermēneus CCL Dispatch
 description: CCL 式を検出したら Hermēneus パーサーで構造解析し、AST に基づいて実行する
+summary: |
+  CCL 式の構造解析と AST ベース実行。Hermēneus パーサーで
+  CCL 演算子を解析し、ワークフロー定義を読込み、順次実行する。
 triggers:
   - "/"
   - "~"

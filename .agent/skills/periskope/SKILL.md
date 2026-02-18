@@ -1,6 +1,9 @@
 ---
 name: Periskopē
 description: HGK Deep Research Engine — multi-source parallel search + multi-model synthesis + TAINT verification
+summary: |
+  Deep Research エンジン。多ソース並列検索 (SearXNG, Exa) +
+  多モデル合成 (Gemini, Claude) + TAINT 検証による調査自動化。
 triggers:
   - "periskope"
   - "periskopē"

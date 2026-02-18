@@ -2,6 +2,9 @@
 name: Code Protocols
 description: 開発プロトコル（旧資産Module 01-25）への自動参照
 activation: auto
+summary: |
+  開発プロトコル参照。旧資産 Module 01-25 への自動ルーティング。
+  コーディング規約、レビュー手順、デプロイ手順を提供。
 triggers:
   - /do
   - /plan (implementation phase)

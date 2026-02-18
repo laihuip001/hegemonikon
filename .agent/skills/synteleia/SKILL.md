@@ -1,6 +1,9 @@
 ---
 name: Synteleia WBC
 description: 安全性チェック・白血球 (WBC) による不正操作検知
+summary: |
+  安全性チェック (白血球/WBC)。ファイル変更の不正操作検知、
+  脅威スコアリング、エスカレーション判定。
 triggers:
   - "安全"
   - "安全性"

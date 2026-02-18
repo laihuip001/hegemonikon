@@ -5,6 +5,9 @@ description: |
   「全てを説明する理論」ではなく「行動選択の objective」として FEP を使う。
   VFE/EFE の数学的分解、精度加重の操作的定義、HGK 体系との対応を含む。
 
+summary: |
+  FEP 認知設計原理。VFE/EFE の数学的分解、精度加重の操作的定義、
+  行動選択の objective としての FEP。HGK 体系との対応表を含む。
 triggers:
   - "FEP"
   - "自由エネルギー"

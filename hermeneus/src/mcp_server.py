@@ -71,6 +71,11 @@ if MCP_AVAILABLE:
                             "type": "boolean",
                             "description": "監査記録を残すか",
                             "default": True
+                        },
+                        "model": {
+                            "type": "string",
+                            "description": "使用するモデル (auto, gemini-2.5-flash, claude-sonnet-4, vertex/claude-sonnet-4.5 等)",
+                            "default": "auto"
                         }
                     },
                     "required": ["ccl"]
@@ -194,18 +199,20 @@ if MCP_AVAILABLE:
 # PURPOSE: hermeneus_execute の処理
 async def _handle_execute(args: Dict[str, Any]) -> Sequence[TextContent]:
     """hermeneus_execute の処理"""
-    from .executor import run_workflow
+    from .executor import WorkflowExecutor
     
     ccl = args["ccl"]
     context = args.get("context", "")
     verify = args.get("verify", True)
     audit = args.get("audit", True)
+    model = args.get("model", "auto")
     
-    result = await run_workflow(
+    executor = WorkflowExecutor(model=model)
+    result = await executor.execute(
         ccl=ccl,
         context=context,
         verify=verify,
-        audit=audit
+        audit=audit,
     )
     
     # 結果をフォーマット
@@ -217,10 +224,17 @@ async def _handle_execute(args: Dict[str, Any]) -> Sequence[TextContent]:
 **CCL**: `{ccl}`
 **ステータス**: {status}
 **{verify_status}**
+**モデル**: `{model}`
 """
     
     if result.audit_id:
         text += f"**監査ID**: `{result.audit_id}`\n"
+    
+    # エラー詳細を出力に含める
+    if not result.success and result.execute_result:
+        error_msg = getattr(result.execute_result, 'error', None)
+        if error_msg:
+            text += f"\n**エラー**: {error_msg}\n"
     
     text += f"\n---\n\n{result.output}"
     

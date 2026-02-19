@@ -1,22 +1,9 @@
 #!/usr/bin/env python3
 # PROOF: [L2/インフラ] <- mekhane/mcp/ A0→Týpos MCP統合が必要→typos_mcp_serverが担う
 """
-Týpos MCP Server v2.0 — Hegemonikón Skill Generator
+Týpos MCP Server v2.1 — Hegemonikón Skill Generator
 
-Model Context Protocol server for Týpos code generation,
-parsing, validation, compilation, and convergence/divergence policy.
-
-Tools:
-  - generate: Natural language → .prompt code (domain-aware)
-  - parse: .prompt file → JSON AST
-  - validate: .prompt file syntax check
-  - compile: .prompt file → system prompt (markdown/xml/plain)
-  - expand: .prompt file → natural language prompt
-  - policy_check: Convergence/divergence task classification
-
-CRITICAL: This file follows MCP stdio protocol rules:
-- stdout: JSON-RPC messages ONLY
-- stderr: All logging and debug output
+Tools: generate, parse, validate, compile, expand, policy_check
 """
 
 import sys
@@ -25,62 +12,17 @@ import re
 from pathlib import Path
 from typing import Optional
 
-# ============ CRITICAL: Platform-specific asyncio setup ============
-if sys.platform == "win32":
-    import asyncio
-    asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
+from mekhane.mcp.mcp_base import MCPBase, StdoutSuppressor
+from mcp.types import TextContent, Tool
 
-# ============ CRITICAL: Redirect ALL stdout to stderr ============
-import io
-
-_original_stdout = sys.stdout
-_stderr_wrapper = sys.stderr
-
-
-# PURPOSE: typos_mcp_server の log 処理を実行する
-def log(msg):
-    print(f"[typos] {msg}", file=sys.stderr, flush=True)
-
-
-log("Starting Týpos MCP Server v2.0...")
-log(f"Python: {sys.executable}")
-log(f"Platform: {sys.platform}")
-
-# ============ Import path setup ============
-sys.path.insert(0, str(Path(__file__).parent.parent))
-log(f"Added to path: {Path(__file__).parent.parent}")
-
-
-# ============ Suppress stdout during imports ============
-# PURPOSE: の統一的インターフェースを実現する
-class StdoutSuppressor:
-    def __init__(self):
-        self._null = io.StringIO()
-        self._old_stdout = None
-
-    # PURPOSE: [L2-auto] 内部処理: enter__
-    def __enter__(self):
-        self._old_stdout = sys.stdout
-        sys.stdout = self._null
-        return self
-
-    # PURPOSE: [L2-auto] 内部処理: exit__
-    def __exit__(self, *args):
-        sys.stdout = self._old_stdout
-        captured = self._null.getvalue()
-        if captured.strip():
-            log(f"Suppressed stdout during import: {captured[:100]}...")
-
-
-# Import MCP SDK
-try:
-    from mcp.server import Server
-    from mcp.server.stdio import stdio_server
-    from mcp.types import Tool, TextContent
-    log("MCP imports successful")
-except Exception as e:
-    log(f"MCP import error: {e}")
-    sys.exit(1)
+_base = MCPBase(
+    "typos",
+    "2.1.0",
+    "Týpos — Hegemonikón Skill Generator. "
+    "Generate, parse, validate, compile .prompt files.",
+)
+server = _base.server
+log = _base.log
 
 # Import typos parser
 try:
@@ -685,13 +627,7 @@ def generate_typos(requirements: str, domain: str, output_format: str) -> str:
     return "\n".join(lines)
 
 
-# ============ Initialize MCP Server ============
-server = Server(
-    name="typos",
-    version="2.0.0",
-    instructions="Týpos v2.3: generate, parse, validate, compile, expand, and policy_check for structured prompt definitions",
-)
-log("Server v2.0 initialized")
+# ============ MCP Tool Registration ============
 
 
 # PURPOSE: typos_mcp_server の list tools 処理を実行する
@@ -1107,31 +1043,6 @@ async def _handle_policy_check(arguments: dict):
     return [TextContent(type="text", text="\n".join(lines))]
 
 
-# PURPOSE: typos_mcp_server の main 処理を実行する
-async def main():
-    """Run the MCP server."""
-    log("Starting stdio server...")
-    try:
-        async with stdio_server() as streams:
-            log("stdio_server connected")
-            await server.run(
-                streams[0],
-                streams[1],
-                server.create_initialization_options(),
-            )
-    except Exception as e:
-        log(f"Server error: {e}")
-        raise
-
 
 if __name__ == "__main__":
-    import asyncio
-
-    log("Running main...")
-    try:
-        asyncio.run(main())
-    except KeyboardInterrupt:
-        log("Server stopped by user")
-    except Exception as e:
-        log(f"Fatal error: {e}")
-        sys.exit(1)
+    _base.run()

@@ -207,6 +207,62 @@ async def list_tools():
             ),
             inputSchema={"type": "object", "properties": {}},
         ),
+        # === BC Violation Logger ===
+        Tool(
+            name="sympatheia_log_violation",
+            description=(
+                "BC違反/フィードバック記録: Creator の叱責・承認・AI 自己検出を JSONL に即時記録。"
+                "記録後にセッション統計サマリーを返す。"
+            ),
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "feedback_type": {
+                        "type": "string",
+                        "enum": ["reprimand", "acknowledgment", "self_detected"],
+                        "description": "種別: reprimand(叱責), acknowledgment(承認), self_detected(自己検出)",
+                    },
+                    "bc_ids": {
+                        "type": "array", "items": {"type": "string"},
+                        "description": "違反した BC ID (例: ['BC-1', 'BC-3'])",
+                        "default": [],
+                    },
+                    "pattern": {
+                        "type": "string",
+                        "description": "パターンID (skip_bias, selective_omission 等)",
+                        "default": "",
+                    },
+                    "severity": {
+                        "type": "string",
+                        "enum": ["low", "medium", "high", "critical"],
+                        "default": "medium",
+                    },
+                    "description": {"type": "string", "description": "何が起きたか"},
+                    "context": {"type": "string", "description": "そのとき何をしていたか", "default": ""},
+                    "creator_words": {"type": "string", "description": "Creator の原文 (叱責/承認の言葉)", "default": ""},
+                    "corrective": {"type": "string", "description": "取った是正行動", "default": ""},
+                },
+                "required": ["feedback_type", "description"],
+            },
+        ),
+        Tool(
+            name="sympatheia_violation_dashboard",
+            description=(
+                "BC違反ダッシュボード: パターン別・BC別・深刻度別の統計 + 週次トレンド + Creator の言葉。"
+                "叱責率と自己検出率を可視化する。"
+            ),
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "period": {
+                        "type": "string",
+                        "enum": ["today", "week", "month", "all"],
+                        "default": "all",
+                        "description": "集計期間",
+                    },
+                },
+            },
+        ),
     ]
 
 
@@ -411,6 +467,12 @@ async def call_tool(name: str, arguments: dict):
         elif name == "sympatheia_peira_health":
             return await _handle_peira_health()
 
+        elif name == "sympatheia_log_violation":
+            return await _handle_log_violation(arguments)
+
+        elif name == "sympatheia_violation_dashboard":
+            return await _handle_violation_dashboard(arguments)
+
         else:
             return [TextContent(type="text", text=f"Unknown tool: {name}")]
 
@@ -485,5 +547,78 @@ async def _handle_peira_health() -> list[TextContent]:
         return [TextContent(type="text", text=f"Error: {str(e)}")]
 
 
+# ============ BC Violation Logger handlers ============
+
+async def _handle_log_violation(arguments: dict) -> list[TextContent]:
+    """BC違反/フィードバックを記録。"""
+    try:
+        from scripts.bc_violation_logger import (
+            FeedbackEntry, log_entry, read_all_entries,
+            format_session_summary, compute_stats,
+        )
+        from datetime import datetime
+
+        entry = FeedbackEntry(
+            timestamp=datetime.now().isoformat(),
+            feedback_type=arguments.get("feedback_type", "self_detected"),
+            bc_ids=arguments.get("bc_ids", []),
+            pattern=arguments.get("pattern", ""),
+            severity=arguments.get("severity", "medium"),
+            description=arguments.get("description", ""),
+            context=arguments.get("context", ""),
+            creator_words=arguments.get("creator_words", ""),
+            corrective=arguments.get("corrective", ""),
+        )
+
+        path = log_entry(entry)
+
+        # セッション統計
+        all_entries = read_all_entries()
+        stats = compute_stats(all_entries)
+        summary = format_session_summary(all_entries)
+
+        TYPE_ICONS = {"reprimand": "⚡", "acknowledgment": "✨", "self_detected": "🔍"}
+        icon = TYPE_ICONS.get(entry.feedback_type, "")
+
+        lines = [
+            f"# {icon} フィードバック記録完了\n",
+            f"- **種別**: {entry.feedback_type}",
+            f"- **BC**: {', '.join(entry.bc_ids) or 'N/A'}",
+            f"- **パターン**: {entry.pattern or 'N/A'}",
+            f"- **深刻度**: {entry.severity}",
+            f"- **説明**: {entry.description}",
+        ]
+        if entry.creator_words:
+            lines.append(f"- **Creator の言葉**: \"{entry.creator_words}\"")
+        lines.append(f"\n{summary}")
+        lines.append(f"\n📁 ログ: `{path}`")
+
+        return [TextContent(type="text", text="\n".join(lines))]
+    except Exception as e:
+        log(f"Log violation error: {e}")
+        return [TextContent(type="text", text=f"Error: {str(e)}")]
+
+
+async def _handle_violation_dashboard(arguments: dict) -> list[TextContent]:
+    """BC違反ダッシュボードを表示。"""
+    try:
+        from scripts.bc_violation_logger import (
+            read_all_entries, format_dashboard,
+        )
+
+        period = arguments.get("period", "all")
+        entries = read_all_entries()
+
+        if not entries:
+            return [TextContent(type="text", text="✅ フィードバック記録なし — まだログがありません")]
+
+        dashboard = format_dashboard(entries, period=period)
+        return [TextContent(type="text", text=dashboard)]
+    except Exception as e:
+        log(f"Violation dashboard error: {e}")
+        return [TextContent(type="text", text=f"Error: {str(e)}")]
+
+
 if __name__ == "__main__":
     _base.run()
+

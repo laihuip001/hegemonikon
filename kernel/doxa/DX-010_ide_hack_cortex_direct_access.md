@@ -1,11 +1,11 @@
 # DX-010: Antigravity IDE ハック — API 直叩き完全手順書
 
-> **日付**: 2026-02-13 → 2026-02-15 17:25 更新
+> **日付**: 2026-02-13 → 2026-02-19 05:30 更新
 > **ステータス**: ✅ Cortex Direct (Gemini) + generateChat (Gemini 2MB + Claude via model_config_id) 成功
 > **Claude 直叩き**: ✅ `generateChat` + `model_config_id` で Claude ルーティング実装済
-> **v14 更新**: Claude `model_config_id` 統合。OchemaService → CortexClient → chat.py 全スタック対応
-> **確信度**: [確信: 95%] (SOURCE: コード実装 + 34テスト全パス。E2E API テストは未実施)
-> **関連セッション**: a639e0f9, 9d4186ec, 24101dfc, 5697133d, 5a08cf7f, 22d936a6
+> **v6.0 更新**: LS パラメータ制約調査。全モデルリスト・Protobuf 構造体・未公開モデル名を追加
+> **確信度**: [確信: 95%] (SOURCE: コード実装 + 34テスト全パス + vscdb protobuf デコード + strings 解析)
+> **関連セッション**: a639e0f9, 9d4186ec, 24101dfc, 5697133d, 5a08cf7f, 22d936a6, 61377cd0
 
 ---
 
@@ -432,6 +432,75 @@ Antigravity IDE
        └─ CloudCode/LoadCodeAssist ← 認証・設定
 ```
 
+### D.4 LS パラメータ制約 (v6.0 新規 — 2026-02-19)
+
+**調査方法**: strings -t x による Go バイナリシンボル抽出 + vscdb protobuf デコード + IDE JS grep
+
+#### ThinkingBudget / MaxOutputTokens の制御構造
+
+| 調査対象 | `thinkingBudget` | `maxOutputTokens` | 結論 |
+|:---------|:----------------|:------------------|:-----|
+| `extension.js` (3.9MB) | ❌ なし | ❌ なし | JS 側に設定なし |
+| `main.js` | ❌ なし | ❌ なし | JS 側に設定なし |
+| `settings.json` | ❌ なし | ❌ なし | ユーザー設定なし |
+| LS Go バイナリ (strings) | ✅ 存在 | ✅ 存在 | **LS 内部で管理** |
+
+**結論**: **LS Go バイナリが全パラメータの唯一の制御点**。ユーザーが変更する方法はない。
+
+#### Protobuf 構造体一覧 (Go シンボルから抽出)
+
+| 構造体 | パッケージ | 関連フィールド |
+|:-------|:----------|:-------------|
+| `ModelInfo` | `codeium_common_pb` | GetThinkingBudget, GetMinThinkingBudget, GetMaxOutputTokens |
+| `ChatNodeConfig` | `codeium_common_pb` | GetMaxOutputTokens |
+| `CascadePlannerConfig` | `cortex_pb` | GetMaxOutputTokens |
+| `CheckpointConfig` | `cortex_pb` | GetMaxOutputTokens |
+| `GenerationConfig_ThinkingConfig` | `cloud.aiplatform` | GetThinkingBudget |
+| `ModelDetails` | `v1internal_prediction_service` | GetThinkingBudget, GetMinThinkingBudget, GetMaxOutputTokens |
+
+#### Claude パラメータの抽象化
+
+`extended_thinking`, `budget_tokens`, `reasoning_effort` は LS バイナリの strings に **存在しない**。
+→ Claude 固有パラメータは LS 内部で Gemini と共通の抽象化レイヤー (`ModelInfo.ThinkingBudget`) にマッピングされている。
+
+#### Cortex API vs IDE — パラメータ制御力の比較
+
+| パラメータ | IDE (LS経由) | Cortex API (直接) |
+|:---------|:------------|:-----------------|
+| **ThinkingLevel** | モデル選択で間接制御 (High/Low) | 任意の値を直接指定可能 |
+| **ThinkingBudget** | **LS 内部で決定 (不透明・変更不可)** | 任意の値を指定可能 (0-32768+) |
+| **MaxOutputTokens** | **LS 内部で決定 (不透明・変更不可)** | 任意の値を指定可能 |
+| **Temperature** | **LS 内部で決定** | 任意の値を指定可能 |
+| **モデル選択** | 8モデル固定 | 全 Gemini モデル (実験的モデル含む) |
+| **Claude ThinkingBudget** | **LS が抽象化して管理 (不透明)** | Ochema で budget_tokens を直接指定可能 |
+
+### D.5 全モデルリスト (v6.0 新規)
+
+**取得元**: Ochema MCP `models` + IDE スクリーンショット (2026-02-19)
+
+| # | モデル名 | LS 内部 ID | Thinking | バリアント意味 |
+|:--|:---------|:-----------|:---------|:-------------|
+| 1 | Gemini 3 Pro (High) | `MODEL_PLACEHOLDER_M8` | — | ThinkingLevel=High |
+| 2 | Gemini 3 Pro (Low) | `MODEL_PLACEHOLDER_M7` | — | ThinkingLevel=Low |
+| 3 | Gemini 3 Flash | `MODEL_PLACEHOLDER_M18` | — | |
+| 4 | Claude Sonnet 4.5 | `MODEL_CLAUDE_4_5_SONNET` | No | extended_thinking=false |
+| 5 | Claude Sonnet 4.5 (Thinking) | `MODEL_CLAUDE_4_5_SONNET_THINKING` | Yes | |
+| 6 | Claude Sonnet 4.6 (Thinking) | `MODEL_PLACEHOLDER_M35` | Yes | |
+| 7 | **Claude Opus 4.6 (Thinking)** | **`MODEL_PLACEHOLDER_M26`** | Yes | 最高性能 |
+| 8 | GPT-OSS 120B (Medium) | `MODEL_OPENAI_GPT_OSS_120B_MEDIUM` | — | Medium quality |
+
+> vscdb の `allowed_command_model_configs` からは2モデルのみ取得 (WAL 未適用で古いデータ)。
+> LS の gRPC API (Ochema MCP 経由) では全8モデルが取得可能。
+
+### D.6 未公開モデル名 (LS バイナリ strings から発見)
+
+| モデル定数名 | 状態 |
+|:------------|:-----|
+| `MODEL_CLAUDE_4_5_HAIKU_THINKING` | UI 非表示 |
+| `MODEL_GOOGLE_GEMINI_HORIZONDAWN` | コードネーム |
+| `MODEL_GOOGLE_GEMINI_COSMICFORGE` | コードネーム |
+| `MODEL_GOOGLE_GEMINI_INFINITYJET` | コードネーム |
+
 ---
 
 ## E. 失敗した経路 (学習記録)
@@ -507,3 +576,4 @@ Antigravity IDE
 *DX-010 v4.2 — v13 W1 解決: `main.js` から Antigravity client_secret 抽出。W3 正体: ライセンス Tier ACL (2026-02-15 09:00 JST)*
 *DX-010 v4.3 — ChatClient 実装完了 (CortexClient 統合)。streamGenerateChat の JSON 配列仕様追記。MCP ステートフル Chat 追加 (2026-02-15 16:50 JST)*
 *DX-010 v5.0 — Claude via `model_config_id` 統合完了。全スタック (OchemaService → CortexClient → chat.py → chat.ts → MCP) 対応。LS フォールバック維持 (2026-02-15 17:25 JST)*
+*DX-010 v6.0 — LS パラメータ制約調査。全モデルリスト (8モデル)・Protobuf 構造体・未公開モデル名 (HORIZONDAWN/COSMICFORGE/INFINITYJET/HAIKU_THINKING)・パラメータ制御力比較を D.4-D.6 に追加 (2026-02-19 05:30 JST)*

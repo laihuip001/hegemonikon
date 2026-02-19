@@ -40,6 +40,12 @@ PATTERN_NAMES = {
     "env_gap": "環境強制なし",
     "accuracy_vs_utility": "正確 ≠ 有用",
     "false_impossibility": "できない ≠ やっていない",
+    "selective_omission": "勝手な省略",
+    "stale_handoff": "古い情報を信じる",
+    "preflight_waste": "確認が本番を消費",
+    "shortcut": "短絡・手抜き",
+    "overconfidence": "過信",
+    "sycophancy": "迎合",
 }
 
 

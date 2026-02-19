@@ -34,6 +34,9 @@ from mekhane.periskope.models import (
 )
 from mekhane.periskope.searchers.searxng import SearXNGSearcher
 from mekhane.periskope.searchers.exa_searcher import ExaSearcher
+from mekhane.periskope.searchers.brave_searcher import BraveSearcher
+from mekhane.periskope.searchers.tavily_searcher import TavilySearcher
+from mekhane.periskope.searchers.semantic_scholar_searcher import SemanticScholarSearcher
 from mekhane.periskope.searchers.internal_searcher import (
     GnosisSearcher,
     SophiaSearcher,
@@ -145,6 +148,9 @@ class PeriskopeEngine:
         # Searchers
         self.searxng = SearXNGSearcher(base_url=searxng_url)
         self.exa = ExaSearcher()
+        self.brave = BraveSearcher()
+        self.tavily = TavilySearcher()
+        self.semantic_scholar = SemanticScholarSearcher()
         self.gnosis = GnosisSearcher()
         self.sophia = SophiaSearcher()
         self.kairos = KairosSearcher()
@@ -198,7 +204,8 @@ class PeriskopeEngine:
         Args:
             query: Research query.
             sources: List of source names to use. If None, uses all.
-                Valid: "searxng", "exa", "gnosis", "sophia", "kairos"
+                Valid: "searxng", "exa", "brave", "tavily", "semantic_scholar",
+                    "gnosis", "sophia", "kairos"
             auto_digest: If True, write results to Digestor incoming/ as eat_*.md.
             digest_depth: Digest template depth — "quick" (/eat-), "standard" (/eat), "deep" (/eat+).
             expand_query: If True, expand query via bilingual translation (W3).
@@ -210,7 +217,10 @@ class PeriskopeEngine:
             ResearchReport with all phases completed.
         """
         start = time.monotonic()
-        enabled = set(sources or ["searxng", "exa", "gnosis", "sophia", "kairos"])
+        enabled = set(sources or [
+            "searxng", "brave", "tavily", "semantic_scholar",
+            "exa", "gnosis", "sophia", "kairos",
+        ])
 
         # Phase 0.5: Query expansion (W3)
         queries = [query]
@@ -371,6 +381,14 @@ class PeriskopeEngine:
             exa_weights = self._config.get("exa", {}).get("weights")
             tasks["exa"] = self.exa.search_multi_category(
                 query, max_results=self.max_results, weights=exa_weights,
+            )
+        if "brave" in enabled and self.brave.available:
+            tasks["brave"] = self.brave.search(query, max_results=self.max_results)
+        if "tavily" in enabled and self.tavily.available:
+            tasks["tavily"] = self.tavily.search(query, max_results=self.max_results)
+        if "semantic_scholar" in enabled:
+            tasks["semantic_scholar"] = self.semantic_scholar.search(
+                query, max_results=self.max_results,
             )
         if "gnosis" in enabled:
             tasks["gnosis"] = self.gnosis.search(query, max_results=self.max_results)

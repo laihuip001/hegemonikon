@@ -8,6 +8,19 @@ searxng:
     science: 0.2
     it: 0.2
     news: 0.2
+  # Engine quality filter: engines with consistently low relevance
+  # are deprioritized. Set min_score to filter results by SearXNG score.
+  min_score: 0.0
+  # Preferred engines (results from these get a relevance boost)
+  preferred_engines:
+    - google
+    - brave
+    - duckduckgo
+    - wikipedia
+    - google scholar
+    - arxiv
+  # Blocked engines (results from these are discarded)
+  blocked_engines: []
 
 # Exa category weights — 7 categories (must sum to ~1.0)
 # Set weight to 0 to disable a category
@@ -21,6 +34,23 @@ exa:
     pdf: 0.05
     personal_site: 0.05
   min_hit_rate: 0.1  # T3: categories below this hit rate auto-disabled
+
+# Brave Search — 2,000 free queries/month
+# Requires BRAVE_API_KEY environment variable
+brave:
+  enabled: true
+
+# Tavily Search — 1,000 free credits/month
+# Requires TAVILY_API_KEY environment variable
+tavily:
+  enabled: true
+  search_depth: "basic"  # "basic" (1 credit) or "advanced" (2 credits)
+
+# Semantic Scholar — free, unlimited (1 RPS with key)
+# Optional: S2_API_KEY environment variable for higher limits
+semantic_scholar:
+  enabled: true
+  year_range: ""  # e.g., "2023-2026" to filter by year
 
 # Synthesis — depth-level model routing
 synthesis:

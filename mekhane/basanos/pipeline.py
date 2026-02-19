@@ -389,6 +389,10 @@ class DailyReviewPipeline:
         if not dry_run:
             self._persist_report(result)
 
+        # ── Trend: 蓄積データからの学習 (G7/G8) ──
+        if not dry_run:
+            self._apply_trends()
+
         return result
 
     def _discover_changed_files(self) -> List[Path]:
@@ -480,6 +484,23 @@ class DailyReviewPipeline:
         except Exception as e:
             logger.warning(f"Jules trigger failed: {e}")
             return None
+
+    def _apply_trends(self) -> None:
+        """G7/G8: 蓄積データからの学習を適用。"""
+        try:
+            from mekhane.basanos.trend_analyzer import TrendAnalyzer
+
+            analyzer = TrendAnalyzer(days=14)
+            changes = analyzer.apply_to_rotation(self.rotation_state)
+
+            if changes.get("weight_adjustments"):
+                self.rotation_state.save(self.rotation_state_path)
+                logger.info(f"Trend learning: {len(changes['weight_adjustments'])} adjustments")
+            else:
+                logger.debug("Trend learning: no adjustments needed")
+
+        except Exception as e:
+            logger.warning(f"Trend analysis failed (non-fatal): {e}")
 
     def _update_feedback(self, result: PipelineResult, domains: List[str]) -> None:
         """フィードバックループ: 重みを更新して保存。"""

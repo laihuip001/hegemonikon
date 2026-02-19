@@ -1,0 +1,13 @@
+# Docker build context — Gateway 用に最小限のファイルのみ含める
+.git
+.venv
+__pycache__
+*.pyc
+*.pyo
+.mypy_cache
+.pytest_cache
+.ruff_cache
+experiments/
+docs/
+*.egg-info
+node_modules

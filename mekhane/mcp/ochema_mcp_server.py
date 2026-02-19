@@ -3,13 +3,8 @@
 """
 Ochēma MCP Server — Antigravity Language Server Bridge
 
-Antigravity IDE の Language Server を介して LLM テキスト生成を行う
-MCP サーバ。4-Step API フロー (StartCascade → SendMessage →
-GetTrajectories → GetSteps) をMCP tool として公開する。
-
-CRITICAL: This file follows MCP stdio protocol rules:
-- stdout: JSON-RPC messages ONLY
-- stderr: All logging and debug output
+Send prompts to LLM (Claude/Gemini) via local Language Server.
+Also provides status, model listing, Jules code tasks, and chat.
 
 WARNING: ToS グレーゾーン。実験用途限定。公開禁止。
 """
@@ -18,82 +13,19 @@ import sys
 import os
 import uuid
 
-# ============ CRITICAL: Platform-specific asyncio setup ============
-if sys.platform == "win32":
-    import asyncio
-    asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
-
-# ============ CRITICAL: Redirect ALL stdout to stderr ============
-import io
-
-_original_stdout = sys.stdout
-_stderr_wrapper = sys.stderr
-
-
-# Debug logging to stderr
-# PURPOSE: log — MCP サービスの処理
-def log(msg):
-    print(f"[ochema-mcp] {msg}", file=sys.stderr, flush=True)
-
-
-log("Starting Ochēma MCP Server...")
-log(f"Python: {sys.executable}")
-
-# ============ Import path setup ============
+from mekhane.mcp.mcp_base import MCPBase, StdoutSuppressor
+from mcp.types import TextContent, Tool
 from pathlib import Path
 
-# mekhane/mcp/ → mekhane/ → hegemonikon/ (project root)
-_mekhane_dir = Path(__file__).parent.parent
-_project_root = _mekhane_dir.parent
-for _p in [str(_project_root), str(_mekhane_dir)]:
-    if _p not in sys.path:
-        sys.path.insert(0, _p)
-log(f"Added to path: {_project_root}")
-
-
-# ============ Suppress stdout during imports ============
-# PURPOSE: クラス: StdoutSuppressor
-class StdoutSuppressor:
-    def __init__(self):
-        self._null = io.StringIO()
-        self._old_stdout = None
-
-    # PURPOSE: [L2-auto] 内部処理: enter__
-    def __enter__(self):
-        self._old_stdout = sys.stdout
-        sys.stdout = self._null
-        return self
-
-    # PURPOSE: [L2-auto] 内部処理: exit__
-    def __exit__(self, *args):
-        sys.stdout = self._old_stdout
-        captured = self._null.getvalue()
-        if captured.strip():
-            log(f"Suppressed stdout: {captured[:100]}...")
-
-
-# Import MCP SDK
-try:
-    from mcp.server import Server
-    from mcp.server.stdio import stdio_server
-    from mcp.types import Tool, TextContent
-
-    log("MCP imports successful")
-except Exception as e:
-    log(f"MCP import error: {e}")
-    sys.exit(1)
-
-# Initialize MCP server
-server = Server(
-    name="ochema",
-    version="0.1.0",
-    instructions=(
-        "Ochēma — Antigravity Language Server bridge. "
-        "Send prompts to LLM (Claude/Gemini) via local Language Server. "
-        "Also provides status and model listing."
-    ),
+_base = MCPBase(
+    "ochema",
+    "0.2.0",
+    "Ochēma — Antigravity Language Server bridge. "
+    "Send prompts to LLM (Claude/Gemini) via local Language Server. "
+    "Also provides status, model listing, Jules tasks, and chat.",
 )
-log("Server initialized")
+server = _base.server
+log = _base.log
 
 # OchemaService — unified LLM service (singleton)
 # PURPOSE: get_service — OchemaService シングルトン取得
@@ -1086,31 +1018,6 @@ async def _handle_jules(name: str, arguments: dict) -> list[TextContent]:
     return [TextContent(type="text", text=f"Unknown Jules tool: {name}")]
 
 
-# PURPOSE: ochema_mcp_server の main 処理を実行する
-async def main():
-    """Run the MCP server."""
-    log("Starting stdio server...")
-    try:
-        async with stdio_server() as streams:
-            log("stdio_server connected")
-            await server.run(
-                streams[0],
-                streams[1],
-                server.create_initialization_options(),
-            )
-    except Exception as e:
-        log(f"Server error: {e}")
-        raise
-
 
 if __name__ == "__main__":
-    import asyncio
-
-    log("Running main...")
-    try:
-        asyncio.run(main())
-    except KeyboardInterrupt:
-        log("Server stopped by user")
-    except Exception as e:
-        log(f"Fatal error: {e}")
-        sys.exit(1)
+    _base.run()

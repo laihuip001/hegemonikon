@@ -287,8 +287,8 @@ class LMQLExecutor:
         try:
             if self._lmql_available:
                 result = await self._execute_with_lmql(lmql_code, context, variables)
-                # LMQL exec() が失敗した場合は Fallback へ
-                if result.status == ExecutionStatus.ERROR and "exec" in str(result.error).lower():
+                # LMQL 実行失敗 → Fallback (直接 LLM API) へ
+                if result.status == ExecutionStatus.ERROR:
                     return await self._execute_fallback(lmql_code, context, variables)
                 return result
             else:

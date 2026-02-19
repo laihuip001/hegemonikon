@@ -393,6 +393,10 @@ class DailyReviewPipeline:
         if not dry_run:
             self._apply_trends()
 
+        # ── Git: churn 予兆検知 ──
+        if not dry_run:
+            self._git_risk_check(result)
+
         return result
 
     def _discover_changed_files(self) -> List[Path]:
@@ -501,6 +505,41 @@ class DailyReviewPipeline:
 
         except Exception as e:
             logger.warning(f"Trend analysis failed (non-fatal): {e}")
+
+    def _git_risk_check(self, result: PipelineResult) -> None:
+        """Git churn + TrendAnalyzer の交差で予兆検知。"""
+        try:
+            from mekhane.basanos.git_metrics import GitMetrics
+
+            gm = GitMetrics(repo_root=self.project_root, days=14)
+            risky = gm.risky_files(top_n=5)
+
+            if risky:
+                # TrendAnalyzer の hot files と交差させる
+                try:
+                    from mekhane.basanos.trend_analyzer import TrendAnalyzer
+                    ta = TrendAnalyzer(days=14)
+                    hot_paths = [fp.path for fp in ta.hot_files(top_n=10)]
+                    overlaps = gm.hotspot_overlaps(hot_paths)
+                except Exception:
+                    overlaps = []
+
+                git_summary = gm.summary()
+                result.l0_issues.append({
+                    "file": "",
+                    "name": "Git Risk Alert",
+                    "code": "GIT-001",
+                    "severity": "info",
+                    "location": "",
+                    "description": git_summary,
+                    "risky_files": [{"path": fc.path, "risk": round(fc.risk_score, 1)} for fc in risky[:3]],
+                    "hotspot_overlaps": overlaps,
+                })
+                if overlaps:
+                    logger.warning(f"⚠️ Hotspot overlap: {overlaps}")
+
+        except Exception as e:
+            logger.debug(f"Git risk check skipped: {e}")
 
     def _update_feedback(self, result: PipelineResult, domains: List[str]) -> None:
         """フィードバックループ: 重みを更新して保存。"""

@@ -190,4 +190,8 @@ class TestRealViolations:
         entries = parse_violations()
         for e in entries:
             pattern = e.get("pattern")
-            assert pattern in PATTERN_NAMES, f"Unknown pattern: {pattern}"
+            if isinstance(pattern, list):
+                for p in pattern:
+                    assert p in PATTERN_NAMES, f"Unknown pattern: {p}"
+            else:
+                assert pattern in PATTERN_NAMES, f"Unknown pattern: {pattern}"

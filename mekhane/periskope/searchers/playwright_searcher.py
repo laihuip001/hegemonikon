@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/
 """
 Playwright-based searcher for Periskopē.
 

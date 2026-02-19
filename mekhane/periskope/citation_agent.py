@@ -355,6 +355,12 @@ class CitationAgent:
         """Extract verifiable claims from synthesis text.
 
         Parses [Source N] references and maps them to search result URLs.
+        Improved claim extraction:
+        - Splits at sentence boundaries
+        - Only extracts sentences containing [Source N] citations
+        - Removes modifiers/connectives for cleaner claims
+        - Splits long claims (>200 chars) at clause boundaries
+        - Filters out claims <20 chars
 
         Args:
             synthesis_text: The synthesized text with [Source N] references.
@@ -367,30 +373,80 @@ class CitationAgent:
 
         # Build source index
         source_urls: dict[int, str] = {}
+        source_titles: dict[int, str] = {}
         if search_results:
             for i, r in enumerate(search_results, 1):
                 if hasattr(r, "url") and r.url:
                     source_urls[i] = r.url
+                if hasattr(r, "title") and r.title:
+                    source_titles[i] = r.title
 
         # Find sentences with [Source N] citations
-        sentences = re.split(r'(?<=[.!?])\s+', synthesis_text)
+        sentences = re.split(r'(?<=[.!?。！？])\s+', synthesis_text)
         for sentence in sentences:
             refs = re.findall(r'\[Source\s+(\d+)\]', sentence)
             if not refs:
                 continue
 
-            # Clean the sentence (remove [Source N] markers)
+            # Clean the sentence (remove [Source N] markers and leading connectives)
             clean = re.sub(r'\s*\[Source\s+\d+\]\s*', ' ', sentence).strip()
+            # Remove leading connectives/modifiers
+            clean = re.sub(
+                r'^(However|Moreover|Furthermore|Additionally|In contrast|'
+                r'Similarly|Specifically|In particular|For example|'
+                r'According to|Based on|As noted|In summary|'
+                r'しかし|また|さらに|特に|具体的には|例えば|'
+                r'一方で|それに加えて|結果として)[,、]\s*',
+                '', clean, flags=re.IGNORECASE,
+            )
+            clean = clean.strip()
+
             if len(clean) < 20:
                 continue
 
-            for ref_num in refs:
-                idx = int(ref_num)
-                url = source_urls.get(idx, "")
-                citations.append(Citation(
-                    claim=clean,
-                    source_url=url,
-                    taint_level=TaintLevel.UNCHECKED,
-                ))
+            # Split long claims at clause boundaries
+            claims = self._split_long_claim(clean)
+
+            for claim_text in claims:
+                if len(claim_text) < 20:
+                    continue
+                for ref_num in refs:
+                    idx = int(ref_num)
+                    url = source_urls.get(idx, "")
+                    title = source_titles.get(idx, "")
+                    citations.append(Citation(
+                        claim=claim_text,
+                        source_url=url,
+                        source_title=title,
+                        taint_level=TaintLevel.UNCHECKED,
+                    ))
 
         return citations
+
+    @staticmethod
+    def _split_long_claim(text: str, max_len: int = 200) -> list[str]:
+        """Split long claims at clause boundaries.
+
+        Keeps claims under max_len by splitting at semicolons, commas,
+        or conjunctions. Returns original if already short enough.
+        """
+        if len(text) <= max_len:
+            return [text]
+
+        # Try splitting at semicolons first
+        parts = re.split(r';\s*', text)
+        if len(parts) > 1:
+            return [p.strip() for p in parts if len(p.strip()) >= 20]
+
+        # Try splitting at clause-level conjunctions
+        parts = re.split(
+            r'(?:,\s*(?:and|but|while|whereas|which|that)\s+|'
+            r'、(?:そして|しかし|ただし|一方))',
+            text,
+        )
+        if len(parts) > 1:
+            return [p.strip() for p in parts if len(p.strip()) >= 20]
+
+        # Can't split meaningfully — return as-is
+        return [text]
+

@@ -23,12 +23,12 @@
         },
         {
             "parameters": {
-                "command": "cd /home/makaron8426/oikos/hegemonikon && PYTHONPATH=. /home/makaron8426/oikos/hegemonikon/.venv/bin/python -m synergeia.bridge --daily-review 2>&1"
+                "jsCode": "const { exec } = require('child_process');\n\nreturn new Promise((resolve, reject) => {\n  exec(\n    'cd /home/makaron8426/oikos/hegemonikon && PYTHONPATH=. /home/makaron8426/oikos/hegemonikon/.venv/bin/python -m synergeia.bridge --daily-review 2>&1',\n    { timeout: 300000 },\n    (error, stdout, stderr) => {\n      resolve([{ json: { stdout, stderr, exitCode: error ? error.code : 0 } }]);\n    }\n  );\n});"
             },
-            "id": "exec-daily-review",
+            "id": "code-daily-review",
             "name": "Run Pipeline",
-            "type": "n8n-nodes-base.executeCommand",
-            "typeVersion": 1,
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
             "position": [
                 500,
                 300
@@ -116,13 +116,5 @@
     },
     "settings": {
         "executionOrder": "v1"
-    },
-    "tags": [
-        {
-            "name": "daily"
-        },
-        {
-            "name": "basanos"
-        }
-    ]
+    }
 }

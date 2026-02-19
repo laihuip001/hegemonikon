@@ -31,7 +31,7 @@ from mekhane.periskope.models import (
 
 logger = logging.getLogger(__name__)
 
-# Synthesis prompt template
+# Synthesis prompt template — structured output
 _SYNTH_PROMPT = """You are a research synthesizer. Given the following search results
 for the query "{query}", produce a comprehensive synthesis.
 
@@ -44,11 +44,22 @@ Requirements:
 Search Results:
 {results_text}
 
-Provide your synthesis in a structured format with sections:
+Output your synthesis in EXACTLY this format:
+
 ## Key Findings
+- [finding 1] [Source N]
+- [finding 2] [Source N]
+(list all key findings, each citing sources)
+
 ## Source Analysis
-## Contradictions (if any)
+- [Source N]: [brief assessment of source quality/relevance]
+
+## Contradictions
+- [contradiction description] (between [Source X] and [Source Y])
+(write "None identified" if no contradictions)
+
 ## Confidence: X%
+(single integer 0-100)
 """
 
 # Depth-level → model selection mapping

@@ -1,0 +1,26 @@
+[Unit]
+Description=HGK MCP Gateway — Hegemonikón Remote Access
+After=network-online.target tailscaled.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=makaron8426
+Group=makaron8426
+WorkingDirectory=/home/makaron8426/oikos/hegemonikon
+EnvironmentFile=/home/makaron8426/oikos/hegemonikon/.env
+ExecStart=/home/makaron8426/oikos/hegemonikon/.venv/bin/python -m mekhane.mcp.hgk_gateway
+Restart=on-failure
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=hgk-gateway
+
+# Security hardening
+NoNewPrivileges=true
+ProtectSystem=strict
+ReadWritePaths=/home/makaron8426/oikos
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

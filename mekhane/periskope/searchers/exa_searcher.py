@@ -28,10 +28,15 @@ class ExaSearcher:
 
     Note: Uses the Exa MCP server, which must be configured
     in the IDE's MCP settings.
+
+    T3: Adaptive pruning — tracks hit rates per category and
+    automatically disables underperforming categories.
     """
 
-    def __init__(self) -> None:
-        pass
+    def __init__(self, min_hit_rate: float = 0.1) -> None:
+        # T3: Category hit-rate tracking {category: (hits, attempts)}
+        self._hit_stats: dict[str, tuple[int, int]] = {}
+        self._min_hit_rate = min_hit_rate
 
     async def search(
         self,
@@ -164,6 +169,9 @@ class ExaSearcher:
         and personal site searches concurrently, then merges and
         deduplicates results.
 
+        T3: Adaptive pruning — categories with hit rate below
+        min_hit_rate are automatically skipped.
+
         Args:
             query: Search query.
             max_results: Total max results across all categories.
@@ -208,6 +216,18 @@ class ExaSearcher:
             weight = w.get(key, 0)
             if weight <= 0:
                 continue
+
+            # T3: Adaptive pruning — skip categories with low hit rate
+            hits, attempts = self._hit_stats.get(key, (0, 0))
+            if attempts >= 3:  # Need at least 3 attempts to judge
+                hit_rate = hits / attempts
+                if hit_rate < self._min_hit_rate:
+                    logger.info(
+                        "  Exa [%s]: PRUNED (hit_rate=%.2f < %.2f, %d/%d)",
+                        key, hit_rate, self._min_hit_rate, hits, attempts,
+                    )
+                    continue
+
             n = max(2, int(max_results * weight))
             # Use neural for academic, auto for others
             stype = "neural" if key == "paper" else "auto"
@@ -222,8 +242,14 @@ class ExaSearcher:
         for cat_name, result in zip(category_names, category_results):
             if isinstance(result, list):
                 all_results.extend(result)
+                # T3: Update hit stats
+                hits, attempts = self._hit_stats.get(cat_name, (0, 0))
+                self._hit_stats[cat_name] = (hits + len(result), attempts + 1)
                 logger.info("  Exa [%s]: %d results", cat_name, len(result))
             elif isinstance(result, Exception):
+                # T3: Count failures as attempts with 0 hits
+                hits, attempts = self._hit_stats.get(cat_name, (0, 0))
+                self._hit_stats[cat_name] = (hits, attempts + 1)
                 logger.warning("  Exa [%s]: FAILED — %s", cat_name, result)
 
         # Deduplicate by URL
@@ -245,6 +271,18 @@ class ExaSearcher:
             len(result_list), len(all_results), len(category_names),
         )
         return result_list
+
+    def get_hit_rates(self) -> dict[str, float]:
+        """T3: Return current hit rates per category.
+
+        Returns:
+            Dict of {category: hit_rate}. Empty categories not included.
+        """
+        rates = {}
+        for cat, (hits, attempts) in self._hit_stats.items():
+            if attempts > 0:
+                rates[cat] = hits / attempts
+        return rates
 
 
 def _truncate(text: str, max_len: int) -> str:

@@ -32,20 +32,48 @@ class GnosisSearcher:
 
     Wraps mekhane.anamnesis.index.GnosisIndex for direct access
     to the paper database without MCP overhead.
+
+    T2: Embedder hang protection — if GnosisIndex initialization
+    takes >10s (embedder loading), falls back to TF-IDF search
+    on the raw markdown files.
     """
+
+    # Timeout for GnosisIndex initialization (embedder loading)
+    _INIT_TIMEOUT = 10.0
 
     def __init__(self) -> None:
         self._index = None
+        self._fallback_mode = False  # True if embedder hang detected
+        self._papers_dir = Path("/home/makaron8426/oikos/hegemonikon/mekhane/anamnesis/papers")
 
     def _get_index(self):
-        """Lazy-load GnosisIndex."""
+        """Lazy-load GnosisIndex with timeout protection."""
+        if self._fallback_mode:
+            return None
         if self._index is None:
-            try:
+            import asyncio
+            import concurrent.futures
+
+            def _load():
                 from mekhane.anamnesis.index import GnosisIndex
-                self._index = GnosisIndex()
+                return GnosisIndex()
+
+            try:
+                with concurrent.futures.ThreadPoolExecutor(max_workers=1) as pool:
+                    future = pool.submit(_load)
+                    self._index = future.result(timeout=self._INIT_TIMEOUT)
+            except concurrent.futures.TimeoutError:
+                logger.warning(
+                    "GnosisIndex initialization timed out (>%.0fs) — "
+                    "embedder hang detected, falling back to TF-IDF",
+                    self._INIT_TIMEOUT,
+                )
+                self._fallback_mode = True
+                return None
             except Exception as e:
                 logger.error("Failed to initialize GnosisIndex: %s", e)
-                raise
+                self._fallback_mode = True
+                return None
         return self._index
 
     async def search(
@@ -56,6 +84,9 @@ class GnosisSearcher:
     ) -> list[SearchResult]:
         """Search Gnōsis paper index.
 
+        Uses LanceDB embedding search if available, falls back to
+        TF-IDF on raw paper files if embedder hangs.
+
         Args:
             query: Search query.
             max_results: Maximum results to return.
@@ -64,12 +95,18 @@ class GnosisSearcher:
         Returns:
             List of SearchResult from Gnōsis.
         """
-        try:
-            index = self._get_index()
-            raw_results = index.search(query, k=max_results, source_filter=source_filter)
-        except Exception as e:
-            logger.error("Gnōsis search failed: %s", e)
-            return []
+        index = self._get_index()
+
+        if index is not None:
+            # Normal path: embedding search via LanceDB
+            try:
+                raw_results = index.search(query, k=max_results, source_filter=source_filter)
+            except Exception as e:
+                logger.error("Gnōsis search failed: %s", e)
+                return []
+        else:
+            # Fallback: TF-IDF on raw paper markdown files
+            raw_results = self._tfidf_fallback(query, max_results)
 
         results = []
         for i, r in enumerate(raw_results):
@@ -87,12 +124,68 @@ class GnosisSearcher:
                     "paper_source": r.get("source", ""),
                     "doi": r.get("doi"),
                     "arxiv_id": r.get("arxiv_id"),
+                    "search_mode": "tfidf" if self._fallback_mode else "embedding",
                 },
             )
             results.append(result)
 
-        logger.info("Gnōsis: %d results for %r", len(results), query)
+        mode = "TF-IDF fallback" if self._fallback_mode else "embedding"
+        logger.info("Gnōsis (%s): %d results for %r", mode, len(results), query)
         return results
+
+    def _tfidf_fallback(
+        self,
+        query: str,
+        max_results: int,
+    ) -> list[dict]:
+        """TF-IDF search on raw paper markdown/JSON files."""
+        import re
+        from collections import Counter
+
+        query_terms = set(re.findall(r'\w+', query.lower()))
+        if not query_terms:
+            return []
+
+        scored = []
+        # Search processed papers directory
+        papers_dir = self._papers_dir
+        if not papers_dir.exists():
+            return []
+
+        for f in papers_dir.glob("*.md"):
+            try:
+                content = f.read_text(encoding="utf-8")
+                words = re.findall(r'\w+', content.lower())
+                counts = Counter(words)
+                total = len(words) or 1
+
+                score = sum(counts.get(t, 0) / total for t in query_terms)
+                # Boost title (filename) matches
+                fname = f.stem.lower()
+                score += sum(0.5 for t in query_terms if t in fname)
+
+                if score > 0:
+                    # Extract title from first heading
+                    title_match = re.search(r'^#\s+(.+)$', content, re.MULTILINE)
+                    title = title_match.group(1) if title_match else f.stem
+
+                    # Extract abstract (first paragraph after title)
+                    abstract_match = re.search(
+                        r'^#.+?\n\n(.+?)(?:\n\n|\Z)', content, re.DOTALL,
+                    )
+                    abstract = abstract_match.group(1)[:500] if abstract_match else ""
+
+                    scored.append((score, {
+                        "title": title,
+                        "abstract": abstract,
+                        "url": None,
+                        "_distance": score,
+                    }))
+            except Exception:
+                continue
+
+        scored.sort(key=lambda x: x[0], reverse=True)
+        return [item for _, item in scored[:max_results]]
 
 
 class SophiaSearcher:

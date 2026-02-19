@@ -123,6 +123,7 @@ class WorkflowExecutor:
         self.verify_by_default = verify_by_default
         self.audit_by_default = audit_by_default
         self.min_confidence = min_confidence
+        self._tape = None
     
     # PURPOSE: レジストリを取得 (遅延初期化)
     @property
@@ -170,6 +171,7 @@ class WorkflowExecutor:
         try:
             # Phase 1: Compile
             pipeline.compile_result = await self._phase_compile(ccl, model)
+            self._tape_phase(pipeline, pipeline.compile_result)
             if not pipeline.compile_result.success:
                 pipeline.success = False
                 return self._finalize(pipeline, start_time)
@@ -183,6 +185,7 @@ class WorkflowExecutor:
             pipeline.execute_result = await self._phase_execute(
                 ccl, context, model
             )
+            self._tape_phase(pipeline, pipeline.execute_result)
             if not pipeline.execute_result.success:
                 pipeline.success = False
                 return self._finalize(pipeline, start_time)
@@ -194,6 +197,7 @@ class WorkflowExecutor:
                 pipeline.verify_result = await self._phase_verify(
                     ccl, pipeline.output, context
                 )
+                self._tape_phase(pipeline, pipeline.verify_result)
                 pipeline.verified = pipeline.verify_result.success
                 if pipeline.verify_result.output:
                     pipeline.confidence = getattr(
@@ -207,6 +211,7 @@ class WorkflowExecutor:
                 pipeline.audit_result = await self._phase_audit(
                     ccl, pipeline.output, pipeline.verify_result
                 )
+                self._tape_phase(pipeline, pipeline.audit_result)
                 if pipeline.audit_result.output:
                     pipeline.audit_id = pipeline.audit_result.output
             
@@ -447,26 +452,50 @@ class WorkflowExecutor:
         
         return pipeline
     
-    # PURPOSE: WF 実行トレースを JSONL tape に記録
-    def _record_tape(self, pipeline: ExecutionPipeline) -> None:
-        """TapeWriter で実行トレースを記録。
-        
-        _finalize() から自動呼び出し。失敗してもパイプラインをブロックしない。
-        """
+    # PURPOSE: Tape インスタンスを遅延取得
+    def _get_tape(self):
+        """TapeWriter を遅延初期化して共有する。"""
+        if self._tape is None:
+            try:
+                from mekhane.tape import TapeWriter
+                self._tape = TapeWriter()
+            except Exception:
+                pass
+        return self._tape
+    
+    # PURPOSE: フェーズ完了時の tape 記録
+    def _tape_phase(self, pipeline: ExecutionPipeline, result: PhaseResult) -> None:
+        """各フェーズ完了時に tape へ記録。失敗してもパイプラインをブロックしない。"""
         try:
-            from mekhane.tape import TapeWriter
-            tape = TapeWriter()
-            tape.log(
-                wf=pipeline.ccl,
-                step="COMPLETE" if pipeline.success else "FAILED",
-                workflow_name=pipeline.workflow_name,
-                confidence=pipeline.confidence,
-                duration_ms=round(pipeline.total_duration_ms, 1),
-                verified=pipeline.verified,
-                model=pipeline.model,
-            )
+            tape = self._get_tape()
+            if tape:
+                tape.log(
+                    wf=pipeline.ccl,
+                    step=result.phase.value.upper(),
+                    success=result.success,
+                    duration_ms=round(result.duration_ms, 1),
+                    error=result.error,
+                )
         except Exception:
-            pass  # Tape failure should never block execution
+            pass
+    
+    # PURPOSE: WF 実行トレースの最終サマリーを tape に記録
+    def _record_tape(self, pipeline: ExecutionPipeline) -> None:
+        """パイプライン完了時の最終サマリーを記録。"""
+        try:
+            tape = self._get_tape()
+            if tape:
+                tape.log(
+                    wf=pipeline.ccl,
+                    step="COMPLETE" if pipeline.success else "FAILED",
+                    workflow_name=pipeline.workflow_name,
+                    confidence=pipeline.confidence,
+                    duration_ms=round(pipeline.total_duration_ms, 1),
+                    verified=pipeline.verified,
+                    model=pipeline.model,
+                )
+        except Exception:
+            pass
 
 
 # =============================================================================

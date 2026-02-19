@@ -1,0 +1,30 @@
+# HGK Gateway — Docker Compose
+# Usage: docker compose -f docker-compose.gateway.yml up -d
+
+services:
+  hgk-gateway:
+    build:
+      context: .
+      dockerfile: Dockerfile.gateway
+    container_name: hgk-gateway
+    restart: unless-stopped
+    ports:
+      - "8765:8765"
+    env_file:
+      - .env
+    environment:
+      - HGK_GATEWAY_HOST=0.0.0.0
+      - HGK_GATEWAY_PORT=8765
+      # Tailscale はコンテナ内にないため URL を明示指定
+      # .env に HGK_GATEWAY_URL=https://your-host.ts.net を設定
+      - HGK_GATEWAY_URL=${HGK_GATEWAY_URL:-}
+      - HGK_MNEME=/mneme
+    volumes:
+      # Mneme (Handoff, Doxa, Ideas, Sessions) — 読み書き
+      - ../mneme/.hegemonikon:/mneme
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "http://localhost:8765/.well-known/oauth-authorization-server"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s

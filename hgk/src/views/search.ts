@@ -29,7 +29,6 @@ export async function renderSearch(): Promise<void> {
         const color = SOURCE_COLORS[key] ?? '#8b949e';
         return `<button class="search-source-chip ${active ? 'active' : ''}"
       data-source="${esc(key)}"
-      aria-pressed="${active}"
       style="--chip-color: ${color}">
       ${label}
     </button>`;
@@ -40,7 +39,6 @@ export async function renderSearch(): Promise<void> {
     <div class="card">
       <div style="display:flex; gap:0.5rem; margin-bottom:0.75rem;">
         <input type="text" id="symploke-search-input" class="input"
-          aria-label="検索キーワード"
           placeholder="すべての知識ソースを横断検索..."
           style="flex:1; font-size:1.05rem;" />
         <button id="symploke-search-btn" class="btn">検索</button>
@@ -49,7 +47,7 @@ export async function renderSearch(): Promise<void> {
         ${sourceChips}
       </div>
     </div>
-    <div id="symploke-search-results" aria-live="polite"></div>
+    <div id="symploke-search-results"></div>
   `;
 
     const searchInput = document.getElementById('symploke-search-input') as HTMLInputElement;
@@ -61,11 +59,9 @@ export async function renderSearch(): Promise<void> {
             if (searchActiveSources.has(source)) {
                 searchActiveSources.delete(source);
                 chip.classList.remove('active');
-                chip.setAttribute('aria-pressed', 'false');
             } else {
                 searchActiveSources.add(source);
                 chip.classList.add('active');
-                chip.setAttribute('aria-pressed', 'true');
             }
         });
     });

@@ -107,7 +107,7 @@ class Canvas:
     def replace(self, node_id: str, new_content: str, reason: str = "") -> bool:
         """ノード全体を置換 (パラダイムシフト)。"""
         node = self._nodes.get(node_id)
-        if not node:
+        if not node or node.status == "deleted":
             return False
 
         old = node.content

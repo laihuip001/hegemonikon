@@ -192,10 +192,27 @@ class WorkflowExecutor:
             
             pipeline.output = pipeline.execute_result.output
             
+            # Phase 2.5: Canvas-CoT ノード登録
+            canvas = self._create_canvas(ccl)
+            if canvas and pipeline.output:
+                canvas.insert(
+                    pipeline.output[:500],
+                    source="execution",
+                    confidence=50,  # 初期確信度
+                )
+            
             # Phase 3: Verify (オプション)
             if verify:
+                # dynamic_voices: 確信度に基づく Voice 選択
+                voices_prompt = self._build_voices_prompt(
+                    pipeline.output, pipeline.confidence
+                )
+                verify_context = context
+                if voices_prompt:
+                    verify_context = f"{context}\n\n{voices_prompt}" if context else voices_prompt
+                
                 pipeline.verify_result = await self._phase_verify(
-                    ccl, pipeline.output, context
+                    ccl, pipeline.output, verify_context
                 )
                 self._tape_phase(pipeline, pipeline.verify_result)
                 pipeline.verified = pipeline.verify_result.success
@@ -205,6 +222,14 @@ class WorkflowExecutor:
                         "confidence", 
                         0.0
                     )
+                
+                # Canvas: 検証結果に基づくノード更新
+                if canvas and canvas.active_nodes():
+                    node = canvas.active_nodes()[0]
+                    if pipeline.verified:
+                        canvas.modify(node.id, node.content, reason=f"verified (conf={pipeline.confidence:.0%})")
+                    else:
+                        canvas.modify(node.id, node.content, reason="verification failed")
             
             # Phase 4: Audit (オプション)
             if audit:
@@ -398,6 +423,42 @@ class WorkflowExecutor:
         import re
         match = re.search(r"/([a-zA-Z]+)[+\-]?", ccl)
         return match.group(1) if match else ""
+    
+    # PURPOSE: Canvas-CoT インスタンスを生成
+    def _create_canvas(self, ccl: str):
+        """Canvas-CoT インスタンスを生成。失敗時は None。"""
+        try:
+            from hermeneus.src.canvas import Canvas
+            tape = self._get_tape()
+            return Canvas(tape=tape, wf=ccl)
+        except Exception:
+            return None
+    
+    # PURPOSE: dynamic_voices プロンプトを構築
+    def _build_voices_prompt(self, output: str, confidence: float) -> str:
+        """確信度に基づいて Voice セットを選択し、検証プロンプトを構築。
+        
+        Args:
+            output: 実行結果の出力
+            confidence: 現在の確信度 (0.0-1.0)
+            
+        Returns:
+            Voice プロンプト文字列 (Voice 追加なしなら空文字)
+        """
+        try:
+            from hermeneus.src.voices import select_voices, format_voices_prompt
+            
+            # confidence は 0.0-1.0 → 0-100 に変換
+            conf_pct = confidence * 100 if confidence <= 1.0 else confidence
+            voices = select_voices(conf_pct)
+            
+            # Base voices のみ (3) なら追加プロンプト不要
+            if len(voices) <= 3:
+                return ""
+            
+            return format_voices_prompt(voices, hypothesis=output[:200])
+        except Exception:
+            return ""
     
     # PURPOSE: CCL から全ワークフロー ID を抽出
     def _extract_all_workflow_ids(self, ccl: str) -> list:

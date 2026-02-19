@@ -10,7 +10,6 @@ Usage:
 """
 import argparse
 import json
-import sys
 from collections import defaultdict
 from datetime import datetime, timedelta, timezone
 from pathlib import Path

@@ -149,15 +149,28 @@ class TestStreamValidation:
         from mekhane.ochema.service import OchemaService
         OchemaService.reset()
 
-    def test_stream_rejects_claude_models(self):
-        """stream() raises ValueError for Claude models."""
-        with pytest.raises(ValueError, match="Streaming not supported"):
-            list(self.svc.stream("hello", model="claude-sonnet"))
+    @patch("mekhane.ochema.service.OchemaService._get_cortex_client")
+    def test_stream_claude_routes_to_chat_stream(self, mock_get_cortex):
+        """stream() routes Claude models to chat_stream()."""
+        mock_client = MagicMock()
+        mock_client.chat_stream.return_value = iter(["Hello", " world"])
+        mock_get_cortex.return_value = mock_client
+        chunks = list(self.svc.stream("hello", model="claude-sonnet"))
+        assert chunks == ["Hello", " world"]
+        mock_client.chat_stream.assert_called_once_with(
+            "hello", model="claude-sonnet-4-5", timeout=120.0,
+            thinking_budget=None,
+        )
 
-    def test_stream_rejects_proto_models(self):
-        """stream() raises ValueError for proto enum models."""
-        with pytest.raises(ValueError, match="Streaming not supported"):
-            list(self.svc.stream("hello", model="MODEL_CLAUDE_4_5_SONNET_THINKING"))
+    @patch("mekhane.ochema.service.OchemaService._get_cortex_client")
+    def test_stream_proto_model_routes_to_chat_stream(self, mock_get_cortex):
+        """stream() routes proto enum Claude models to chat_stream()."""
+        mock_client = MagicMock()
+        mock_client.chat_stream.return_value = iter(["Response"])
+        mock_get_cortex.return_value = mock_client
+        chunks = list(self.svc.stream("hello", model="MODEL_CLAUDE_4_5_SONNET_THINKING"))
+        assert chunks == ["Response"]
+        mock_client.chat_stream.assert_called_once()
 
 
 # --- Constants ---

@@ -326,5 +326,92 @@
     "correct": null,
     "had_failure": null,
     "notes": ""
+  },
+  {
+    "id": "20260218_051608_895180",
+    "ccl_expr": "(/dia+)*%(/dia*)_(\\dia+)*%(\\dia*)",
+    "operators": [
+      "\\"
+    ],
+    "generated_at": "2026-02-18T05:16:08.895206",
+    "answered": null,
+    "correct": null,
+    "had_failure": null,
+    "notes": ""
+  },
+  {
+    "id": "20260218_051608_908062",
+    "ccl_expr": "(/dia+)*%(/dia+!)_(\\dia+)*%(\\dia+!)",
+    "operators": [
+      "!",
+      "\\"
+    ],
+    "generated_at": "2026-02-18T05:16:08.908091",
+    "answered": null,
+    "correct": null,
+    "had_failure": null,
+    "notes": ""
+  },
+  {
+    "id": "20260218_053545_046958",
+    "ccl_expr": "F:[×3]{(/dia+)*%(/dia+!)_(\\dia+)*%(\\dia+!)}",
+    "operators": [
+      "!",
+      "\\"
+    ],
+    "generated_at": "2026-02-18T05:35:45.046989",
+    "answered": null,
+    "correct": null,
+    "had_failure": null,
+    "notes": ""
+  },
+  {
+    "id": "20260218_053655_676657",
+    "ccl_expr": "F:[×3]{(/dia+)*%(/dia+!)_(\\dia+)*%(\\dia+!)}",
+    "operators": [
+      "!",
+      "\\"
+    ],
+    "generated_at": "2026-02-18T05:36:55.676681",
+    "answered": null,
+    "correct": null,
+    "had_failure": null,
+    "notes": ""
+  },
+  {
+    "id": "20260218_055841_876998",
+    "ccl_expr": "(/noe+)*%(/noe+^)_(\\noe+)*%(\\noe+^)",
+    "operators": [
+      "\\"
+    ],
+    "generated_at": "2026-02-18T05:58:41.877022",
+    "answered": null,
+    "correct": null,
+    "had_failure": null,
+    "notes": ""
+  },
+  {
+    "id": "20260218_064839_668930",
+    "ccl_expr": "/pro_/s-_R:{F:[×2]{/u+*^/u^}}_~(/noe*/dia)_/pis_/dox-",
+    "operators": [
+      "*^"
+    ],
+    "generated_at": "2026-02-18T06:48:39.668958",
+    "answered": null,
+    "correct": null,
+    "had_failure": null,
+    "notes": ""
+  },
+  {
+    "id": "20260218_120012_925508",
+    "ccl_expr": "F:[×3]{(/noe+)*%(/noe+^)_(\\noe+)*%(\\noe+^)}",
+    "operators": [
+      "\\"
+    ],
+    "generated_at": "2026-02-18T12:00:12.925534",
+    "answered": null,
+    "correct": null,
+    "had_failure": null,
+    "notes": ""
   }
 ]

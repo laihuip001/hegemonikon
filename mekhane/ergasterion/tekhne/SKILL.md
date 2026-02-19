@@ -275,11 +275,32 @@ voices:
     question: "以前これを試した時、何が起きたか？"
     canvas_action: "対象ノード ID + CRUD 操作を出力"
 
+# MoT (Mixture-of-Thought) 動的 Voice 制御
+dynamic_voices:
+  base_voices: [LOGIC, EMOTION, HISTORY]     # 常駐 (3)
+  optional_voices:
+    DOMAIN_EXPERT:
+      trigger: "技術的判断 + 確信度 < 70%"
+      focus: "ドメイン固有知識、先行事例、ベストプラクティス"
+      question: "この分野の専門知識に照らして妥当か？"
+    DEVILS_ADVOCATE:
+      trigger: "全 base_voices が同意 (groupthink 検出)"
+      focus: "意図的な反論生成、見落としの発掘"
+      question: "この結論が間違っているとしたら、なぜか？"
+  max_voices: 5                               # コンテキスト制約
+  selection_rule: |
+    確信度に反比例して Voice を追加:
+    - 確信度 80%+: base_voices のみ (3)
+    - 確信度 50-79%: + DOMAIN_EXPERT (4)
+    - 確信度 < 50%: + DOMAIN_EXPERT + DEVILS_ADVOCATE (5)
+    - 全 Voice 同意: DEVILS_ADVOCATE 強制追加
+
 synthesis_protocol:
   1. LOGIC と EMOTION の対立を特定
   2. HISTORY で解決の糸口を探す
-  3. 三者の CRUD 提案を統合し、ノードツリーを更新
-  4. 更新後のツリーから最終回答を合成
+  3. dynamic_voices: 確信度に応じて追加 Voice を招集
+  4. 全 Voice の CRUD 提案を統合し、ノードツリーを更新
+  5. 更新後のツリーから最終回答を合成
 ```
 
 ### Deep Think Cycle

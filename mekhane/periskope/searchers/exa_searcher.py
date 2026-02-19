@@ -158,36 +158,67 @@ class ExaSearcher:
         max_results: int = 10,
         weights: dict[str, float] | None = None,
     ) -> list[SearchResult]:
-        """W2: Search across 3 categories in parallel.
+        """W2: Search across multiple Exa categories in parallel.
 
-        Runs general, research paper, and github searches concurrently,
-        then merges and deduplicates results.
+        Runs general, research paper, github, news, tweet, pdf,
+        and personal site searches concurrently, then merges and
+        deduplicates results.
 
         Args:
             query: Search query.
             max_results: Total max results across all categories.
             weights: Category weights for result allocation.
-                Keys: "general", "paper", "github". Values sum to 1.0.
-                Default: {"general": 0.5, "paper": 0.3, "github": 0.2}
+                Keys: "general", "paper", "github", "news", "tweet",
+                      "pdf", "personal_site".
+                Default: general=0.3, paper=0.25, github=0.15,
+                         news=0.15, tweet=0.05, pdf=0.05, personal_site=0.05
 
         Returns:
             Merged and deduplicated results.
         """
-        w = weights or {"general": 0.5, "paper": 0.3, "github": 0.2}
-        n_general = max(2, int(max_results * w.get("general", 0.5)))
-        n_paper = max(2, int(max_results * w.get("paper", 0.3)))
-        n_github = max(2, int(max_results * w.get("github", 0.2)))
+        # Default weights for 7 categories
+        default_weights = {
+            "general": 0.30,
+            "paper": 0.25,
+            "github": 0.15,
+            "news": 0.15,
+            "tweet": 0.05,
+            "pdf": 0.05,
+            "personal_site": 0.05,
+        }
+        w = default_weights.copy()
+        if weights:
+            w.update(weights)
 
-        tasks = [
-            self.search(query, max_results=n_general, category="general"),
-            self.search(query, max_results=n_paper, category="research paper", search_type="neural"),
-            self.search(query, max_results=n_github, category="github"),
-        ]
+        # Exa category name mapping (config key -> API value)
+        category_map = {
+            "general": "general",
+            "paper": "research paper",
+            "github": "github",
+            "news": "news",
+            "tweet": "tweet",
+            "pdf": "pdf",
+            "personal_site": "personal site",
+        }
+
+        # Build tasks for categories with weight > 0
+        tasks = []
+        category_names = []
+        for key, exa_cat in category_map.items():
+            weight = w.get(key, 0)
+            if weight <= 0:
+                continue
+            n = max(2, int(max_results * weight))
+            # Use neural for academic, auto for others
+            stype = "neural" if key == "paper" else "auto"
+            tasks.append(
+                self.search(query, max_results=n, category=exa_cat, search_type=stype)
+            )
+            category_names.append(key)
 
         all_results: list[SearchResult] = []
         category_results = await asyncio.gather(*tasks, return_exceptions=True)
 
-        category_names = ["general", "paper", "github"]
         for cat_name, result in zip(category_names, category_results):
             if isinstance(result, list):
                 all_results.extend(result)
@@ -210,8 +241,8 @@ class ExaSearcher:
         result_list = deduped[:max_results]
 
         logger.info(
-            "Exa multi-category: %d results (from %d raw)",
-            len(result_list), len(all_results),
+            "Exa multi-category: %d results (from %d raw, %d categories)",
+            len(result_list), len(all_results), len(category_names),
         )
         return result_list
 

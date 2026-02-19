@@ -1,4 +1,128 @@
 {
+  "domains": {
+    "Maintainability": {
+      "weight": 1.9000000000000001,
+      "last_issues": 1,
+      "total_issues": 9,
+      "last_reviewed": "2026-02-18"
+    },
+    "DataFlow": {
+      "weight": 1.9000000000000001,
+      "last_issues": 1,
+      "total_issues": 9,
+      "last_reviewed": "2026-02-18"
+    },
+    "Scalability": {
+      "weight": 1.9000000000000001,
+      "last_issues": 1,
+      "total_issues": 9,
+      "last_reviewed": "2026-02-18"
+    },
+    "Documentation": {
+      "weight": 1.0,
+      "last_issues": 0,
+      "total_issues": 0,
+      "last_reviewed": null
+    },
+    "EdgeCase": {
+      "weight": 1.0,
+      "last_issues": 0,
+      "total_issues": 0,
+      "last_reviewed": null
+    },
+    "Architecture": {
+      "weight": 1.0,
+      "last_issues": 0,
+      "total_issues": 0,
+      "last_reviewed": null
+    },
+    "CodeStyle": {
+      "weight": 1.0,
+      "last_issues": 0,
+      "total_issues": 0,
+      "last_reviewed": null
+    },
+    "Security": {
+      "weight": 1.0,
+      "last_issues": 0,
+      "total_issues": 0,
+      "last_reviewed": null
+    },
+    "Reliability": {
+      "weight": 1.0,
+      "last_issues": 0,
+      "total_issues": 0,
+      "last_reviewed": null
+    },
+    "Observability": {
+      "weight": 1.0,
+      "last_issues": 0,
+      "total_issues": 0,
+      "last_reviewed": null
+    },
+    "Dependency": {
+      "weight": 1.0,
+      "last_issues": 0,
+      "total_issues": 0,
+      "last_reviewed": null
+    },
+    "Compatibility": {
+      "weight": 1.0,
+      "last_issues": 0,
+      "total_issues": 0,
+      "last_reviewed": null
+    },
+    "Resource": {
+      "weight": 1.0,
+      "last_issues": 0,
+      "total_issues": 0,
+      "last_reviewed": null
+    },
+    "Error": {
+      "weight": 1.0,
+      "last_issues": 0,
+      "total_issues": 0,
+      "last_reviewed": null
+    },
+    "Usability": {
+      "weight": 1.0,
+      "last_issues": 0,
+      "total_issues": 0,
+      "last_reviewed": null
+    },
+    "API": {
+      "weight": 1.0,
+      "last_issues": 0,
+      "total_issues": 0,
+      "last_reviewed": null
+    },
+    "Configuration": {
+      "weight": 1.0,
+      "last_issues": 0,
+      "total_issues": 0,
+      "last_reviewed": null
+    },
+    "Testing": {
+      "weight": 1.0,
+      "last_issues": 0,
+      "total_issues": 0,
+      "last_reviewed": null
+    },
+    "Performance": {
+      "weight": 1.0,
+      "last_issues": 0,
+      "total_issues": 0,
+      "last_reviewed": null
+    },
+    "Concurrency": {
+      "weight": 1.0,
+      "last_issues": 0,
+      "total_issues": 0,
+      "last_reviewed": null
+    }
+  },
+  "cycle": 55,
+  "last_date": "2026-02-18",
   "last_domains": [
     "Maintainability",
     "DataFlow",
@@ -20,7 +144,5 @@
     "Testing",
     "Performance",
     "Concurrency"
-  ],
-  "cycle": 53,
-  "last_date": "2026-02-18"
+  ]
 }

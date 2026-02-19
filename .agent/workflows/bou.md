@@ -132,12 +132,12 @@ category_theory:
 | Phase | 名称 | 内容 |
 |:------|:-----|:-----|
 | **STEP 0** | SKILL.md 読込 | `view_file /home/makaron8426/oikos/hegemonikon/.agent/skills/ousia/o2-boulesis/SKILL.md` (**必須・省略不可**) |
-| **PHASE 0** | 私の望み提示 | Claude が3-5個の望みを提示(たたき台) |
+| **PHASE 0** | 私の望み提示 + **P(o\|C) 具体化** | Claude が3-5個の望みを提示(たたき台) + 「望みが実現した朝、何が観測可能に違うか？」で EFE の preferred outcome を鮮明化。[出典](../workflow-modules/sfbt-tools.md) |
 | **PHASE 1-2** | 対話+深掘り | 5 Whys + 多面的問い(達成後の変化/困ること/誰のため) |
 | **PHASE 3** | 衝動vs熟慮 | 衝動スコア(0-100)付与。低=熟慮された意志 |
 | **PHASE 4** | 実現可能性 | リソース/制約/実現可能性スコア → 2×2マトリクス分類 |
 | **PHASE 4.5** | 6W3H具体化 | 「即実行」判定のもののみ → 9つの問いで具体化 |
-| **PHASE 5** | 優先順位+行動 | 最終優先順位 → 具体的次アクション → /ene へ |
+| **PHASE 5** | 優先順位+行動 + **VFE 外在化** | 最終優先順位 → 具体的次アクション + 「0-10で目的にどれだけ近い？ +1には？」= D_KL の言語化 → /ene へ。[出典](../workflow-modules/sfbt-tools.md) |
 | **PHASE 6** | FEP Feedback | (Optional) 認知的フィードバック |
 
 ---

@@ -76,6 +76,7 @@ sel_enforcement:
 | ファイル | 内容 |
 |----------|------|
 | [modes.md](../workflow-modules/noe/modes.md) | 派生モード (nous/phro/meta/separate/align/metalearning) |
+| [sfbt-tools.md](../workflow-modules/sfbt-tools.md) | 予測誤差操作の理論的根拠 (MQ=EFE, SQ=VFE) — 出典・FEP 導出 |
 
 ---
 
@@ -130,20 +131,20 @@ sel_enforcement:
    > **目的**: 27,000件の Gnōsis から関連知見を引き出し、Phase 1 の前提に組み込む
    > **省略禁止**: このステップを飛ばした /noe は「自分の記憶だけで考える」に等しい
 
-3. **PHASE 0 — Prolegomena** (前限定): 図式 D の定義域 J を選ぶ — **必須**
+3. **PHASE 0 — Prolegomena** (前限定): 図式 D の定義域 J を選ぶ + **Limit Apex 先行定義** — **必須**
 4. **PHASE 1 — Excavation** (対象の列挙): 圏の対象（前提）を炙り出す — **必須**
 5. **PHASE 2 — Genesis** (Cone の射を生成): 各仮説 = apex → 対象への射 — **必須**
 6. **PHASE 3 — Kalon** (普遍性検証): Limit の頂点を発見する — **L3 のみ**
 7. **PHASE 4 — Synthesis** (射の合成と検証): 経路を辿り整合性を確認 — **L3 のみ**
-8. **PHASE 5 — Dokimasia** (忠実性テスト): 関手 F が射を保存するか — **必須**
+8. **PHASE 5 — Dokimasia** (忠実性テスト + **Kalon 距離測定**): 関手の忠実性 + 理想との距離 — **必須**
 9. **PHASE 6 — Theoria** (Yoneda 適用): Hom(-, 結論) で結論の完全性を検証 — **L3 のみ**
 10. 最終出力: 構造化知見 → ファイル保存
 
-> **深度レベル別の実行範囲** (DX-008 v6.3):
+> **深度レベル別の実行範囲** (DX-008 v6.4):
 >
-> - **L2 (Standard `/noe`)**: STEP 0 → 0.5 → Phase 0, 1, 2, 5 → 出力保存
+> - **L2 (Standard `/noe`)**: STEP 0 → 0.5 → Phase 0 (含 Apex 定義), 1, 2, 5 (含 距離測定) → 出力保存
 > - **L3 (Deep `/noe+`)**: STEP 0 → 0.5 → Phase 0〜6 全実行 → 出力保存
-> - **L1 (Quick `/noe-`)**: 結論 + 理由1つ、5行以内（従来通り）
+> - **L1 (Quick `/noe-`)**: 結論 + 理由1つ、5行以内（Apex 定義省略可）
 
 ---
 

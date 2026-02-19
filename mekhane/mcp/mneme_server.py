@@ -97,7 +97,7 @@ except Exception as e:
 server = Server(
     name="mneme",
     version="1.0.0",
-    instructions="Mneme: Hegemonikón integrated knowledge search across 4 sources",
+    instructions="Mneme: Hegemonikón unified knowledge server (Gnōsis papers + Sophia KI + Kairos handoffs + Chronos chat)",
 )
 log("Server initialized")
 
@@ -233,6 +233,47 @@ async def list_tools() -> list[Tool]:
             description="List available knowledge sources",
             inputSchema={"type": "object", "properties": {}, "required": []},
         ),
+        # === From gnosis ===
+        Tool(
+            name="search_papers",
+            description="Search the Gnōsis knowledge base for academic papers. Returns relevant papers with titles, authors, abstracts, and citations.",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "query": {"type": "string", "description": "Search query (e.g., 'transformer attention mechanism')"},
+                    "limit": {"type": "integer", "description": "Maximum number of results (default: 5)", "default": 5},
+                },
+                "required": ["query"],
+            },
+        ),
+        Tool(
+            name="recommend_model",
+            description="Recommend the best AI model (Claude/Gemini) for a given task based on T2 Krisis priority rules (P1-P5). Returns model recommendation with detected keywords and reasoning.",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "task_description": {"type": "string", "description": "Description of the task to analyze (e.g., 'UI design for dashboard', 'security audit of API')"},
+                },
+                "required": ["task_description"],
+            },
+        ),
+        # === From sophia ===
+        Tool(
+            name="backlinks",
+            description="Get backlinks for a Knowledge Item. Shows which KIs reference the given one via [[wikilink]] syntax.",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "ki_name": {"type": "string", "description": "Name of the Knowledge Item to get backlinks for"},
+                },
+                "required": ["ki_name"],
+            },
+        ),
+        Tool(
+            name="graph_stats",
+            description="Get knowledge graph statistics (nodes, edges, most linked items)",
+            inputSchema={"type": "object", "properties": {}},
+        ),
     ]
 # PURPOSE: tool calls の安全な処理を保証する
 
@@ -250,6 +291,14 @@ async def call_tool(name: str, arguments: dict) -> list[TextContent]:
             return await _handle_stats(arguments)
         elif name == "sources":
             return await _handle_sources(arguments)
+        elif name == "search_papers":
+            return await _handle_search_papers(arguments)
+        elif name == "recommend_model":
+            return await _handle_recommend_model(arguments)
+        elif name == "backlinks":
+            return await _handle_backlinks(arguments)
+        elif name == "graph_stats":
+            return await _handle_graph_stats(arguments)
         else:
             return [TextContent(type="text", text=f"Unknown tool: {name}")]
     except Exception as e:
@@ -329,6 +378,144 @@ async def _handle_sources(arguments: dict) -> list[TextContent]:
         lines.append(f"- **{source}**: {desc}")
 
     return [TextContent(type="text", text="\n".join(lines))]
+
+
+# ============ Gnosis tools (from gnosis_mcp_server.py) ============
+
+# PURPOSE: [L2-auto] Handle search_papers tool.
+async def _handle_search_papers(arguments: dict) -> list[TextContent]:
+    """Search Gnosis papers via GnosisIndex (LanceDB)."""
+    query = arguments.get("query", "")
+    limit = arguments.get("limit", 5)
+    if not query:
+        return [TextContent(type="text", text="Error: query is required")]
+    try:
+        with StdoutSuppressor():
+            from mekhane.anamnesis.index import GnosisIndex
+            index = GnosisIndex()
+            results = index.search(query, k=limit)
+        if not results:
+            return [TextContent(type="text", text=f"No results found for: {query}")]
+        lines = [f'# Gnōsis Search Results: "{query}"\n', f"Found {len(results)} results:\n"]
+        for i, r in enumerate(results, 1):
+            lines.append(f"## [{i}] {r.get('title', 'Untitled')}")
+            lines.append(f"- **Source**: {r.get('source', 'Unknown')}")
+            lines.append(f"- **Citations**: {r.get('citations', 'N/A')}")
+            authors = r.get('authors', 'Unknown')
+            if isinstance(authors, str):
+                authors = authors[:100]
+            lines.append(f"- **Authors**: {authors}")
+            abstract = r.get('abstract', '')
+            if isinstance(abstract, str):
+                abstract = abstract[:300]
+            lines.append(f"- **Abstract**: {abstract}...")
+            if r.get("url"):
+                lines.append(f"- **URL**: {r.get('url')}")
+            lines.append("")
+        log(f"search_papers completed: {len(results)} results")
+        return [TextContent(type="text", text="\n".join(lines))]
+    except Exception as e:
+        log(f"search_papers error: {e}")
+        return [TextContent(type="text", text=f"Error searching papers: {str(e)}")]
+
+
+# PURPOSE: [L2-auto] Handle recommend_model tool.
+async def _handle_recommend_model(arguments: dict) -> list[TextContent]:
+    """Recommend AI model based on Krisis priority rules."""
+    task_desc = arguments.get("task_description", "").lower()
+    if not task_desc:
+        return [TextContent(type="text", text="Error: task_description is required")]
+    log(f"Recommending model for: {task_desc[:50]}...")
+    priority_rules = [
+        ("P1", ["セキュリティ", "security", "監査", "audit", "コンプライアンス", "compliance", "品質保証", "quality"], "Claude"),
+        ("P2", ["画像", "image", "ui", "ux", "図", "diagram", "可視化", "visualization", "デザイン", "design"], "Gemini"),
+        ("P3", ["探索", "explore", "ブレスト", "brainstorm", "プロトタイプ", "prototype", "mvp", "試作"], "Gemini"),
+        ("P4", ["高速", "fast", "バッチ", "batch", "初期調査", "triage", "トリアージ"], "Gemini Flash"),
+    ]
+    detected_keywords = []
+    matched_priority = None
+    recommended_model = "Claude"  # Default P5
+    for priority, keywords, model in priority_rules:
+        for kw in keywords:
+            if kw in task_desc:
+                detected_keywords.append(kw)
+                if matched_priority is None:
+                    matched_priority = priority
+                    recommended_model = model
+    if matched_priority is None:
+        matched_priority = "P5"
+    lines = [
+        "# [Hegemonikon] T2 Krisis (Model Selection)\n",
+        f"- **Task**: {arguments.get('task_description', '')}",
+        f"- **Detected Keywords**: {', '.join(detected_keywords) if detected_keywords else '(none)'}",
+        f"- **Priority**: {matched_priority}",
+        f"- **Recommended Model**: {recommended_model}",
+    ]
+    return [TextContent(type="text", text="\n".join(lines))]
+
+
+# ============ Sophia tools (from sophia_mcp_server.py) ============
+
+_KI_DIR = Path("/home/makaron8426/.gemini/antigravity/knowledge")
+
+
+# PURPOSE: [L2-auto] Handle backlinks tool.
+async def _handle_backlinks(arguments: dict) -> list[TextContent]:
+    """Get backlinks for a Knowledge Item."""
+    ki_name = arguments.get("ki_name", "")
+    if not ki_name:
+        return [TextContent(type="text", text="Error: ki_name is required")]
+    try:
+        with StdoutSuppressor():
+            from mekhane.symploke.sophia_backlinker import SophiaBacklinker
+        log(f"Getting backlinks for: {ki_name}")
+        backlinker = SophiaBacklinker()
+        backlinker.build_graph()
+        backlinks = backlinker.get_backlinks(ki_name)
+        outlinks = backlinker.get_outlinks(ki_name)
+        lines = [f"# Backlinks: {ki_name}\n"]
+        if backlinks:
+            lines.append(f"## ← Backlinks ({len(backlinks)})")
+            for link in sorted(backlinks):
+                lines.append(f"- {link}")
+        else:
+            lines.append("No backlinks found.")
+        lines.append("")
+        if outlinks:
+            lines.append(f"## → Outlinks ({len(outlinks)})")
+            for link in sorted(outlinks):
+                lines.append(f"- {link}")
+        return [TextContent(type="text", text="\n".join(lines))]
+    except Exception as e:
+        log(f"Backlinks error: {e}")
+        return [TextContent(type="text", text=f"Error: {str(e)}")]
+
+
+# PURPOSE: [L2-auto] Handle graph_stats tool.
+async def _handle_graph_stats(arguments: dict) -> list[TextContent]:
+    """Get knowledge graph statistics."""
+    try:
+        with StdoutSuppressor():
+            from mekhane.symploke.sophia_backlinker import SophiaBacklinker
+        log("Getting graph stats...")
+        backlinker = SophiaBacklinker()
+        backlinker.build_graph()
+        stats = backlinker.get_stats()
+        lines = ["# Knowledge Graph Statistics\n"]
+        lines.append(f"- **Nodes**: {stats['nodes']}")
+        lines.append(f"- **Edges**: {stats['edges']}")
+        lines.append(f"- **Isolated**: {stats['isolated']}")
+        if stats["most_linked"]:
+            lines.append("\n## Most Linked")
+            for name, count in stats["most_linked"]:
+                if count > 0:
+                    lines.append(f"- **{name}**: {count} backlinks")
+        return [TextContent(type="text", text="\n".join(lines))]
+    except Exception as e:
+        log(f"Graph stats error: {e}")
+        return [TextContent(type="text", text=f"Error: {str(e)}")]
+
+
 # PURPOSE: Run the MCP server.
 
 

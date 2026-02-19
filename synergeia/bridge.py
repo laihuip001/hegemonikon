@@ -243,17 +243,32 @@ def _exec_hermeneus(ccl: str, context: str) -> Dict[str, Any]:
         return {"thread": "hermeneus", "ccl": ccl, "status": "error", "error": str(e)}
 
 
-# PURPOSE: [L2-auto] Jules → タスク作成 (非同期)
+# PURPOSE: [L2-auto] Jules → タスク作成 (ochema MCP 経由)
 def _exec_jules(ccl: str, context: str) -> Dict[str, Any]:
-    # PURPOSE: Jules MCP でコーディングタスクを作成する (非同期)
-    """Jules → タスク作成 (非同期)"""
-    return {
-        "thread": "jules",
-        "ccl": ccl,
-        "status": "deferred",
-        "answer": f"Jules タスク '{ccl}' — jules MCP create_task を使用してください",
-        "note": "Jules は非同期実行。jules_create_task MCP ツールで直接投入推奨",
-    }
+    # PURPOSE: Jules MCP でコーディングタスクを作成する (ochema 経由)
+    """Jules → タスク作成 (ochema MCP 経由)"""
+    try:
+        from mekhane.ochema.mcp_client import create_jules_task
+        prompt = f"{context}\nCCL: {ccl}" if context else ccl
+        session_id = create_jules_task(prompt=prompt)
+        return {
+            "thread": "jules",
+            "ccl": ccl,
+            "status": "submitted",
+            "session_id": session_id,
+            "answer": f"Jules タスク投入完了: session={session_id}",
+        }
+    except ImportError:
+        # ochema MCP client が未インストールの場合はフォールバック
+        return {
+            "thread": "jules",
+            "ccl": ccl,
+            "status": "deferred",
+            "answer": f"Jules タスク '{ccl}' — jules MCP create_task を使用してください",
+            "note": "ochema MCP client 未検出。MCP ツールで直接投入推奨",
+        }
+    except Exception as e:
+        return {"thread": "jules", "ccl": ccl, "status": "error", "error": str(e)}
 
 
 # PURPOSE: [L2-auto] /sop → 調査依頼書生成
@@ -364,6 +379,52 @@ def _save_result(result: SynergeiaResult) -> Optional[Path]:
         return None
 
 
+# PURPOSE: DailyReviewPipeline を bridge 経由で実行
+def run_daily_review(
+    files=None,
+    domains=None,
+    dry_run: bool = False,
+    project_root=None,
+) -> tuple:
+    """
+    DailyReviewPipeline を bridge 経由で実行。
+
+    VISION.md Layer A→B→C の具体化:
+      L0 (Basanos) → L1 (Synteleia) → L2 (Jules) → FB
+
+    Args:
+        files: 対象ファイルリスト (None = git diff)
+        domains: レビュードメイン (None = 重み付き自動選択)
+        dry_run: True = L2 発動せず結果のみ
+        project_root: プロジェクトルート
+
+    Returns:
+        (summary_text, PipelineResult)
+    """
+    from mekhane.basanos.pipeline import DailyReviewPipeline
+
+    pipeline = DailyReviewPipeline(
+        project_root=project_root or Path(__file__).parent.parent,
+        enable_l2=not dry_run,
+    )
+    result = pipeline.run(files=files, domains=domains, dry_run=dry_run)
+    summary = pipeline.summary(result)
+
+    if not dry_run:
+        _save_result(SynergeiaResult(
+            ccl="/daily-review",
+            status="success" if not result.l2_triggered else "l2_triggered",
+            results=[{
+                "files_scanned": result.files_scanned,
+                "l0_issues": len(result.l0_issues),
+                "l2_triggered": result.l2_triggered,
+                "domains": result.domains_reviewed,
+            }],
+        ))
+
+    return summary, result
+
+
 # PURPOSE: [L2-auto] n8n Synergeia webhook の疎通確認
 def health_check() -> Dict[str, Any]:
     # PURPOSE: n8n Synergeia webhook の疎通を確認して稼働状態を返す
@@ -405,6 +466,8 @@ def main():
     parser.add_argument("--no-save", action="store_true", help="Don't save result")
     parser.add_argument("--compile-only", action="store_true", help="Compile only")
     parser.add_argument("--health", action="store_true", help="Health check")
+    parser.add_argument("--daily-review", action="store_true", help="Run DailyReviewPipeline")
+    parser.add_argument("--dry-run", action="store_true", help="Dry run (no L2)")
     parser.add_argument("--json", action="store_true", help="JSON output")
 
     args = parser.parse_args()
@@ -416,8 +479,13 @@ def main():
         print(json.dumps(result, indent=2))
         return
 
+    if args.daily_review:
+        summary, pipeline_result = run_daily_review(dry_run=args.dry_run)
+        print(summary)
+        return
+
     if not args.ccl:
-        parser.error("CCL expression is required (unless --health is used)")
+        parser.error("CCL expression is required (unless --health or --daily-review)")
 
     if args.compile_only:
         result = dispatch_compile_only(args.ccl)

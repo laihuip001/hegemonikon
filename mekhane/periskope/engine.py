@@ -307,7 +307,7 @@ class PeriskopeEngine:
                     if sr.url and sr.content:
                         source_contents[sr.url] = sr.content
                 verified = await self.citation_agent.verify_citations(
-                    extracted, source_contents,
+                    extracted, source_contents, verify_depth=2,
                 )
                 citations.extend(verified)
 
@@ -511,12 +511,16 @@ class PeriskopeEngine:
         """F12: Classify query type for adaptive source selection.
 
         Returns:
-            "academic", "implementation", or "concept".
+            "academic", "implementation", "news", or "concept".
         """
         q = query.lower()
         academic_kw = ["paper", "arxiv", "研究", "論文", "experiment", "study", "journal"]
         impl_kw = ["実装", "code", "how to", "作り方", "tutorial", "library", "方法"]
+        news_kw = ["latest", "最新", "news", "ニュース", "announce", "release", "update"]
 
+        # news > academic > implementation (news keywords override academic)
+        if any(kw in q for kw in news_kw):
+            return "news"
         if any(kw in q for kw in academic_kw):
             return "academic"
         if any(kw in q for kw in impl_kw):
@@ -532,8 +536,39 @@ class PeriskopeEngine:
             return ["gnosis", "exa", "searxng"]
         elif qtype == "implementation":
             return ["searxng", "exa", "sophia"]
+        elif qtype == "news":
+            return ["searxng", "exa"]
         else:
             return ["searxng", "exa", "gnosis", "sophia", "kairos"]
+
+    @classmethod
+    def exa_weights_for_query(cls, query: str) -> dict[str, float]:
+        """F12: Suggest Exa category weights based on query classification.
+
+        Returns weights dict suitable for ExaSearcher.search_multi_category().
+        """
+        qtype = cls._classify_query(query)
+
+        if qtype == "academic":
+            return {
+                "general": 0.15, "paper": 0.50, "github": 0.05,
+                "news": 0.05, "tweet": 0.05, "pdf": 0.15, "personal_site": 0.05,
+            }
+        elif qtype == "implementation":
+            return {
+                "general": 0.20, "paper": 0.10, "github": 0.40,
+                "news": 0.05, "tweet": 0.05, "pdf": 0.10, "personal_site": 0.10,
+            }
+        elif qtype == "news":
+            return {
+                "general": 0.20, "paper": 0.05, "github": 0.05,
+                "news": 0.40, "tweet": 0.20, "pdf": 0.05, "personal_site": 0.05,
+            }
+        else:  # concept
+            return {
+                "general": 0.30, "paper": 0.25, "github": 0.15,
+                "news": 0.15, "tweet": 0.05, "pdf": 0.05, "personal_site": 0.05,
+            }
 
     def _phase_digest(self, report: ResearchReport, depth: str = "quick") -> Path | None:
         """Phase 4: Write research results to Digestor incoming.

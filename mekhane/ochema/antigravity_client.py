@@ -93,7 +93,7 @@ class AntigravityClient:
     """
 
     # PURPOSE: [L2-auto] LS を自動検出して接続する。
-    def __init__(self, workspace: str = "hegemonikon"):
+    def __init__(self, workspace: str = "oikos"):
         """LS を自動検出して接続する。
 
         Args:

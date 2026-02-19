@@ -65,7 +65,9 @@ class MultiModelSynthesizer:
         cortex_model: str = "gemini-3-flash-preview",
         max_tokens: int = 4096,
     ) -> None:
-        self.synth_models = synth_models or [SynthModel.GEMINI_FLASH]
+        # Default: dual-model synthesis (Gemini + Claude)
+        # Claude LS degrades gracefully if unavailable
+        self.synth_models = synth_models or [SynthModel.GEMINI_FLASH, SynthModel.CLAUDE_LS]
         self.cortex_model = cortex_model
         self.max_tokens = max_tokens
         self._cortex = None

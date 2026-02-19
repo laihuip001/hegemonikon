@@ -178,6 +178,11 @@ view_file /home/makaron8426/oikos/hegemonikon/.agent/skills/ousia/o3-zetesis/SKI
 
 ## 処理フロー
 
+### PHASE 0.5: T の到達型定義 — 「正しい問いが見つかったら、何が変わるか？」
+
+> **モナド的意味**: T(X) の理想型を先に定義する。η の射先を事前宣言し、Phase 3 の問い候補評価基準とする。
+> **FEP**: EFE の P(o|C) を確定する操作 = 逆算。[FEP 導出](../workflow-modules/sfbt-tools.md)
+
 ### PHASE 1: η (Unit) — 概念 X から問い T(X) を生成
 
 > **モナド操作**: η: X → T(X)
@@ -227,6 +232,11 @@ T を適用する3つの源泉:
 | B | ... | ... | ... | ... |
 
 **私のおすすめ**: [候補ID] — [理由]
+
+### PHASE 3.5: Kleisli 射の評価 — 「0-10で問いの質はどこにあるか？ +1には？」
+
+> **モナド的意味**: Kleisli 射 f: X → T(Y) の精度測定。Phase 3 の問い候補を Phase 0.5 の「T の到達型」と照合し評価する。
+> **FEP**: VFE = D_KL[Q(s)||P(s|o)] の外在化。+1 = 次の bind の改善方向。[FEP 導出](../workflow-modules/sfbt-tools.md)
 
 ### PHASE 4: Kleisli Bind — Creator との対話
 

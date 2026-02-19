@@ -53,6 +53,23 @@ description: 全ワークフローに暗黙的に適用される認知的公理
   - 成功条件
 ```
 
+### A5: 建設的認知原則 (Constructive Cognition Principle)
+
+> **できない理由ではなく、できる理由を探せ。**
+> 変えられるものを変え、変えられないものを受容し、区別に注意資源を配分する。
+
+```yaml
+3原理:
+  C-1: 可能性の探索 — 「できるとしたら、どうやって？」を先に問う
+  C-2: 制約の受容 — 構造的限界を認め、そこにエネルギーを浪費しない
+  C-3: 区別の精度 — 制御可能と制御不能を正確に分類する
+導出:
+  - FEP Function 公理 (Explore ↔ Exploit)
+  - ニーバーの祈り (Serenity Prayer)
+  - ストア派 Dichotomy of Control
+参照: kernel/constructive_cognition.md
+```
+
 ---
 
 ## 適用タイミング
@@ -65,6 +82,8 @@ description: 全ワークフローに暗黙的に適用される認知的公理
 [A1] 接地原則 — 6W3H で具体化
   ↓
 WF 本体処理
+  ↓
+[A5] 建設的認知 — 「できない」と言う前に「どうすればできるか」
   ↓
 [A3] 不足検出 — Gap を明示
   ↓
@@ -89,3 +108,4 @@ def workflow_handler(input):
 ---
 
 *v1.0 — Cognitive Axioms (2026-01-30)*
+*v1.1 — A5 建設的認知原則 追加。臨床心理学統合 Phase 1 (2026-02-18)*

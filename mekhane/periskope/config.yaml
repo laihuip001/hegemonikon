@@ -9,12 +9,17 @@ searxng:
     it: 0.2
     news: 0.2
 
-# Exa category weights (must sum to ~1.0)
+# Exa category weights — 7 categories (must sum to ~1.0)
+# Set weight to 0 to disable a category
 exa:
   weights:
-    general: 0.5
-    paper: 0.3
-    github: 0.2
+    general: 0.30
+    paper: 0.25
+    github: 0.15
+    news: 0.15
+    tweet: 0.05
+    pdf: 0.05
+    personal_site: 0.05
 
 # Default behavior
 defaults:

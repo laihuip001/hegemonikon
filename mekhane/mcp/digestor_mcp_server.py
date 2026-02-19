@@ -86,8 +86,8 @@ except Exception as e:
 # Initialize MCP server
 server = Server(
     name="digestor",
-    version="1.0.0",
-    instructions="Digestor: Automated knowledge ingestion pipeline (Gnosis → /eat)",
+    version="2.0.0",
+    instructions="Digestor: Knowledge ingestion pipeline (Gnosis → /eat) + Semantic Scholar API (paper search/details/citations)",
 )
 log("Server initialized")
 # PURPOSE: List available tools.
@@ -165,6 +165,42 @@ async def list_tools():
                 },
             },
         ),
+        # === Semantic Scholar API (自作クライアント統合) ===
+        Tool(
+            name="paper_search",
+            description="Search academic papers via Semantic Scholar API. Returns titles, authors, abstracts, citation counts.",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "query": {"type": "string", "description": "Search query (e.g., 'free energy principle')"},
+                    "limit": {"type": "integer", "default": 10, "description": "Max results (1-100)"},
+                },
+                "required": ["query"],
+            },
+        ),
+        Tool(
+            name="paper_details",
+            description="Get detailed info for a specific paper by Semantic Scholar ID, DOI, or arXiv ID.",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "paper_id": {"type": "string", "description": "S2 Paper ID, DOI (e.g., '10.1038/s41586-021-03819-2'), or arXiv ID (e.g., 'arXiv:2106.01345')"},
+                },
+                "required": ["paper_id"],
+            },
+        ),
+        Tool(
+            name="paper_citations",
+            description="Get papers that cite a given paper.",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "paper_id": {"type": "string", "description": "S2 Paper ID, DOI, or arXiv ID"},
+                    "limit": {"type": "integer", "default": 10, "description": "Max citations to return"},
+                },
+                "required": ["paper_id"],
+            },
+        ),
     ]
 # PURPOSE: tool calls の安全な処理を保証する
 
@@ -186,6 +222,8 @@ async def call_tool(name: str, arguments: dict):
             return await handle_check_incoming(arguments)
         elif name == "mark_processed":
             return await handle_mark_processed(arguments)
+        elif name in ("paper_search", "paper_details", "paper_citations"):
+            return await handle_semantic_scholar(name, arguments)
         else:
             return [TextContent(type="text", text=f"Unknown tool: {name}")]
     except Exception as e:
@@ -360,6 +398,87 @@ async def handle_mark_processed(arguments: dict):
         output += f"  ❌ {e['file']}: {e['error']}\n"
 
     return [TextContent(type="text", text=output)]
+
+
+# === Semantic Scholar handlers ===
+
+async def handle_semantic_scholar(name: str, arguments: dict):
+    """Handle Semantic Scholar API tools."""
+    try:
+        with StdoutSuppressor():
+            from mekhane.pks.semantic_scholar import SemanticScholarClient
+            import os
+            api_key = os.environ.get("SEMANTIC_SCHOLAR_API_KEY")
+            client = SemanticScholarClient(api_key=api_key)
+    except Exception as e:
+        return [TextContent(type="text", text=f"Error initializing S2 client: {e}")]
+
+    if name == "paper_search":
+        query = arguments.get("query", "")
+        limit = arguments.get("limit", 10)
+        if not query:
+            return [TextContent(type="text", text="Error: query is required")]
+        try:
+            papers = client.search(query, limit=min(limit, 100))
+            if not papers:
+                return [TextContent(type="text", text=f"No results for: {query}")]
+            lines = [f'# Semantic Scholar: "{query}"\n', f"Found {len(papers)} results:\n"]
+            for i, p in enumerate(papers, 1):
+                lines.append(f"## [{i}] {p.title}")
+                lines.append(f"- **Year**: {p.year or 'N/A'}")
+                lines.append(f"- **Citations**: {p.citation_count}")
+                lines.append(f"- **Authors**: {', '.join(p.authors[:5])}")
+                if p.abstract:
+                    lines.append(f"- **Abstract**: {p.abstract[:300]}...")
+                if p.url:
+                    lines.append(f"- **URL**: {p.url}")
+                if p.doi:
+                    lines.append(f"- **DOI**: {p.doi}")
+                lines.append("")
+            return [TextContent(type="text", text="\n".join(lines))]
+        except Exception as e:
+            return [TextContent(type="text", text=f"Error: {e}")]
+
+    elif name == "paper_details":
+        paper_id = arguments.get("paper_id", "")
+        if not paper_id:
+            return [TextContent(type="text", text="Error: paper_id is required")]
+        try:
+            paper = client.get_paper(paper_id)
+            if not paper:
+                return [TextContent(type="text", text=f"Paper not found: {paper_id}")]
+            lines = [
+                f"# {paper.title}\n",
+                f"- **Year**: {paper.year or 'N/A'}",
+                f"- **Citations**: {paper.citation_count}",
+                f"- **Authors**: {', '.join(paper.authors)}",
+                f"- **DOI**: {paper.doi or 'N/A'}",
+                f"- **arXiv**: {paper.arxiv_id or 'N/A'}",
+                f"- **URL**: {paper.url or 'N/A'}",
+            ]
+            if paper.abstract:
+                lines.append(f"\n## Abstract\n\n{paper.abstract}")
+            return [TextContent(type="text", text="\n".join(lines))]
+        except Exception as e:
+            return [TextContent(type="text", text=f"Error: {e}")]
+
+    elif name == "paper_citations":
+        paper_id = arguments.get("paper_id", "")
+        limit = arguments.get("limit", 10)
+        if not paper_id:
+            return [TextContent(type="text", text="Error: paper_id is required")]
+        try:
+            citations = client.get_citations(paper_id, limit=limit)
+            if not citations:
+                return [TextContent(type="text", text=f"No citations found for: {paper_id}")]
+            lines = [f"# Citations for {paper_id}\n", f"Found {len(citations)} citing papers:\n"]
+            for i, p in enumerate(citations, 1):
+                lines.append(f"{i}. **{p.title}** ({p.year or '?'}) — {p.citation_count} citations")
+            return [TextContent(type="text", text="\n".join(lines))]
+        except Exception as e:
+            return [TextContent(type="text", text=f"Error: {e}")]
+
+    return [TextContent(type="text", text=f"Unknown S2 tool: {name}")]
 
 
 # PURPOSE: digestor_mcp_server の main 処理を実行する

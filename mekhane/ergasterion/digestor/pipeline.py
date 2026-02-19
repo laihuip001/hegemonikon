@@ -183,6 +183,103 @@ class DigestorPipeline:
 
         return papers
 
+    # PURPOSE: Exa semantic search から論文を取得
+    def _fetch_from_exa(
+        self, topics: Optional[list[str]] = None, max_papers: int = 20
+    ) -> list:
+        """
+        Exa AI semantic search から論文を取得
+
+        Phase C: Exa API ニューラル検索 (research paper カテゴリ)
+        EXA_API_KEY がない場合は graceful にスキップ。
+        """
+        import os
+        api_key = os.environ.get("EXA_API_KEY")
+        if not api_key:
+            print("[Digestor]   → Phase C skipped: EXA_API_KEY not set")
+            return []
+
+        papers = []
+        exa_count = 0
+
+        # トピック定義からクエリを取得
+        topics_list = self.selector.get_topics()
+        if topics:
+            queries = [
+                (t.get("id", ""), t.get("query", ""))
+                for t in topics_list if t.get("id") in topics
+            ]
+        else:
+            queries = [
+                (t.get("id", ""), t.get("query", ""))
+                for t in topics_list
+            ]
+
+        try:
+            from mekhane.periskope.searchers.exa_searcher import ExaSearcher
+            import asyncio
+
+            searcher = ExaSearcher()
+            per_topic = max(max_papers // max(len(queries), 1), 3)
+
+            # MCP server (asyncio) 内でも動くヘルパー
+            def _run_async(coro):
+                try:
+                    loop = asyncio.get_running_loop()
+                except RuntimeError:
+                    loop = None
+                if loop and loop.is_running():
+                    # 既存ループ内 → 新スレッドで実行
+                    import concurrent.futures
+                    with concurrent.futures.ThreadPoolExecutor(max_workers=1) as pool:
+                        return pool.submit(asyncio.run, coro).result(timeout=30)
+                else:
+                    return asyncio.run(coro)
+
+            for topic_id, query in queries:
+                if not query:
+                    continue
+                try:
+                    results = _run_async(
+                        searcher.search_academic(query, max_results=per_topic)
+                    )
+                    for r in results:
+                        paper = self._exa_to_paper(r, topic_id)
+                        if paper is not None:
+                            papers.append(paper)
+                            exa_count += 1
+                except Exception as e:
+                    print(f"[Digestor]   → Exa search for '{topic_id}' failed: {e}")
+
+            print(f"[Digestor]   → Phase C (Exa): {exa_count} papers")
+        except ImportError:
+            print("[Digestor]   → Phase C skipped: ExaSearcher not available")
+        except Exception as e:
+            print(f"[Digestor]   → Phase C error: {e}")
+
+        return papers
+
+    # PURPOSE: Exa SearchResult を Paper オブジェクトに変換
+    def _exa_to_paper(self, result, topic_id: str):
+        """Exa SearchResult を Paper オブジェクトに変換"""
+        try:
+            from mekhane.anamnesis.models.paper import Paper
+        except ImportError:
+            from .selector import Paper
+
+        title = getattr(result, "title", "").strip()
+        if not title:
+            return None
+
+        return Paper(
+            id=f"exa_{title[:40]}",
+            source="exa",
+            source_id=getattr(result, "url", "") or f"exa_{title[:40]}",
+            title=title,
+            abstract=getattr(result, "content", "")[:500] or getattr(result, "snippet", ""),
+            url=getattr(result, "url", ""),
+        )
+
     # PURPOSE: retrieve_only の source 辞書を Paper オブジェクトに変換
     def _source_to_paper(self, src: dict, topic_id: str):
         """retrieve_only の source 辞書を Paper オブジェクトに変換"""
@@ -430,6 +527,12 @@ class DigestorPipeline:
         papers = self._fetch_from_gnosis(topics, max_papers)
         print(f"[Digestor]   → {len(papers)} papers fetched")
 
+        # 1.3 C: Exa semantic search
+        print("[Digestor] Phase 1.3: Fetching from Exa...")
+        exa_papers = self._fetch_from_exa(topics, max_papers=max(max_papers // 3, 5))
+        papers.extend(exa_papers)
+        print(f"[Digestor]   → {len(papers)} total papers (incl. Exa)")
+
         # 1.5 B: 既存インデックスとの重複排除
         print("[Digestor] Phase 1.5: Deduplicating against existing indices...")
         papers = self._deduplicate_against_indices(papers)
@@ -445,7 +548,7 @@ class DigestorPipeline:
         # 3. レポート生成
         result = DigestResult(
             timestamp=datetime.now().isoformat(),
-            source="gnosis",
+            source="gnosis+exa" if exa_papers else "gnosis",
             total_papers=len(papers),
             candidates_selected=len(candidates),
             candidates=candidates,

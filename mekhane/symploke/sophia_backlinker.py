@@ -25,7 +25,7 @@ except ImportError:
     sys.exit(1)
 
 
-KNOWLEDGE_DIR = Path("/home/makaron8426/oikos/.gemini/antigravity/knowledge")
+KNOWLEDGE_DIR = Path.home() / ".gemini" / "antigravity" / "knowledge"
 
 
 # PURPOSE: NetworkX ベースのバックリンク検出システム

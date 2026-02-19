@@ -403,6 +403,22 @@ bash ~/oikos/hegemonikon/scripts/agq-check.sh --delta 2>/dev/null
 | 比喩の自己評価 | R の表現力 | 自発的比喩の数と質 |
 | 同意/反論比率 | R の偏り | 同意N / 反論N / 確認N |
 
+#### 例外分析 (SFBT Exception Finding — v7.6 追加)
+
+> **導出**: SFBT (de Shazer & Berg) の「例外探し」を HGK に統合。
+> **目的**: 失敗パターンだけでなく**成功パターン**も体系的に抽出し、再現性を高める。
+> **原則**: 問題が「起きなかった」とき = 例外。例外の条件を再現 = 改善。
+
+| # | 問い | 記録対象 |
+|:--|:-----|:---------|
+| 1 | **今日うまくいったことは何か？** (3つ) | 具体的な成功場面 |
+| 2 | **なぜ成功したか？** | 成功パターンの抽出 (例: 「view_file を先に読んだから」) |
+| 3 | **過去の失敗と何が違ったか？** | 失敗パターンとの差分 |
+| 4 | **この成功パターンを再現するには？** | 操作的な行動指針 |
+
+> **patterns.yaml への追記**: 成功パターンを `patterns.yaml` に `type: success` として記録する。
+> 失敗パターン (`type: violation`) と対称的に蓄積し、/boot で参照する。
+
 ---
 
 ## Step 3.7.5: Creator 側変化の記録 — 共進化の対側
@@ -465,6 +481,11 @@ bash ~/oikos/hegemonikon/scripts/agq-check.sh --delta 2>/dev/null
 | 3 | タスク提案が具体的か | R(S) → L の射の計算可能性 | 「続きをやる」等の曖昧なタスク |
 | 4 | Step 3.5 (ker(R)) が実行されたか | ker(R) の保存 | チャット履歴エクスポート未実行 |
 | 5 | Stranger Test 通過 | R(S) の自己完結性 (BC-15) | 下記5項目のいずれかが NG |
+| 6 | **Handoff 構造差分** (Agent-Diff) | R(S_n) と R(S_{n-1}) の構造比較 | 前回存在したセクションが今回欠落 |
+
+> **#6 Agent-Diff**: 前回 Handoff (`ls -1t handoff_*.md | head -2 | tail -1`) のセクション見出し (##) を
+> 今回 Handoff と比較する。前回にあったセクション（例: `## 🧠 信念 (Doxa)`, `## 📊 Session Metrics`）が
+> 今回欠落していたら FAIL。意図的な省略は `(省略理由: ...)` を明記することで PASS。
 
 ### Stranger Test チェックリスト (v7.2 追加)
 
@@ -534,3 +555,4 @@ graph LR
 *v7.1 — Step 3.5 を export_chats.py から IDE ネイティブ Export に変更。保存先: chat_export_YYYY-MM-DD.md (2026-02-09)*
 *v7.2 — Step 3.6.5 Session Metrics 追加。BOOT→BYE のデルタ計測 (PC/FC/Claude Opus) + WF 使用ログを Handoff に統合 (2026-02-12)*
 *v7.3 — Step 3.5 を gRPC 自動エクスポート (agq-sessions.sh --export-current) に変更。IDE ネイティブ Export はフォールバックに格下げ (2026-02-13)*
+*v7.6 — Step 3.7 に SFBT 例外分析 (Exception Finding) 追加。失敗パターンと対称的に成功パターンを体系的に抽出。臨床心理学統合 Phase 1 (2026-02-18)*

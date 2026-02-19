@@ -20,6 +20,7 @@ Usage:
 
 from __future__ import annotations
 
+import json
 import logging
 from typing import Any, Generator, Optional
 
@@ -64,7 +65,6 @@ _LS_PROTO_MODELS = {
     "MODEL_PLACEHOLDER_M26",
     "MODEL_GEMINI_2_5_PRO",
     "MODEL_GEMINI_2_5_FLASH",
-    "MODEL_GPT_4_1",
 }
 
 
@@ -198,6 +198,7 @@ class OchemaService:
                 return self._ask_cortex_chat(
                     message, model=config_id, timeout=timeout,
                     account=account,
+                    thinking_budget=thinking_budget,
                 )
             except Exception as e:
                 logger.warning(
@@ -249,9 +250,11 @@ class OchemaService:
         client = self._get_cortex_client(account)
 
         if self._is_claude_model(model):
-            raise ValueError(
-                f"Streaming not supported for Claude models (got '{model}'). "
-                "Use ask() instead."
+            # Claude → Cortex chat_stream (streamGenerateChat)
+            config_id = self._resolve_model_config_id(model)
+            yield from client.chat_stream(
+                message, model=config_id, timeout=timeout,
+                thinking_budget=thinking_budget,
             )
         else:
             # Gemini → Cortex streaming (supports system_instruction etc.)
@@ -491,6 +494,7 @@ class OchemaService:
         model: str = "",
         timeout: float = 120.0,
         account: str = "default",
+        thinking_budget: Optional[int] = 32768,
     ) -> "LLMResponse":
         """Send via CortexClient.chat() (generateChat API direct)."""
         client = self._get_cortex_client(account)
@@ -499,6 +503,7 @@ class OchemaService:
             message=message,
             model=model,
             timeout=timeout,
+            thinking_budget=thinking_budget,
         )
 
     def start_chat(
@@ -515,6 +520,203 @@ class OchemaService:
             model=resolved_model,
             tier_id=tier_id,
             include_thinking=include_thinking,
+        )
+
+    # --- Tool Use API (F0 + F3) ---
+
+    # Known Claude model prefixes for routing
+    _CLAUDE_MODELS = {"claude", "model_claude", "model_placeholder"}
+
+    def _is_claude_model(self, model: str) -> bool:
+        """Check if model name refers to a Claude model (LS route)."""
+        lower = model.lower().replace("-", "_")
+        return any(lower.startswith(prefix) for prefix in self._CLAUDE_MODELS)
+
+    def ask_with_tools(
+        self,
+        message: str,
+        model: str = DEFAULT_MODEL,
+        *,
+        system_instruction: Optional[str] = None,
+        tools: Optional[list[dict]] = None,
+        max_iterations: int = 10,
+        temperature: Optional[float] = None,
+        max_tokens: Optional[int] = None,
+        thinking_budget: Optional[int] = None,
+        timeout: float = 120.0,
+        account: str = "default",
+    ) -> "LLMResponse":
+        """Send a prompt with tool use support.
+
+        Routes automatically based on model:
+        - Gemini models → CortexClient (native Function Calling)
+        - Claude models → AntigravityClient (text-based Tool Use)
+
+        AI がローカルファイルを読み書き・コマンド実行できるエージェントループ。
+
+        Args:
+            message: The prompt text
+            model: Model name (gemini-* or claude-*/MODEL_CLAUDE_*)
+            system_instruction: Optional system prompt (or template name)
+            tools: Custom tool definitions (default: file/cmd tools)
+            max_iterations: Max tool call rounds
+            temperature: Generation temperature
+            max_tokens: Max output tokens
+            thinking_budget: Thinking token budget (Gemini only)
+            timeout: Per-API-call timeout
+            account: TokenVault account
+
+        Returns:
+            LLMResponse with final text (after tool calls resolved)
+        """
+        # Resolve system instruction template names
+        from mekhane.ochema.tools import get_system_template
+        if system_instruction and system_instruction in (
+            "default", "hgk_citizen", "code_review", "researcher"
+        ):
+            system_instruction = get_system_template(system_instruction)
+
+        if self._is_claude_model(model):
+            return self._ask_with_tools_claude(
+                message=message,
+                model=model,
+                system_instruction=system_instruction,
+                max_iterations=max_iterations,
+                timeout=timeout,
+                account=account,
+            )
+        else:
+            return self._ask_with_tools_gemini(
+                message=message,
+                model=model,
+                system_instruction=system_instruction,
+                tools=tools,
+                max_iterations=max_iterations,
+                temperature=temperature,
+                max_tokens=max_tokens,
+                thinking_budget=thinking_budget,
+                timeout=timeout,
+                account=account,
+            )
+
+    def _ask_with_tools_gemini(
+        self,
+        message: str,
+        model: str,
+        *,
+        system_instruction: Optional[str] = None,
+        tools: Optional[list[dict]] = None,
+        max_iterations: int = 10,
+        temperature: Optional[float] = None,
+        max_tokens: Optional[int] = None,
+        thinking_budget: Optional[int] = None,
+        timeout: float = 120.0,
+        account: str = "default",
+    ) -> "LLMResponse":
+        """Gemini route: native Function Calling."""
+        client = self._get_cortex_client(account)
+        logger.info("Tool use (Gemini): model=%s account=%s", model, account)
+        return client.ask_with_tools(
+            message=message,
+            model=model,
+            system_instruction=system_instruction,
+            tools=tools,
+            max_iterations=max_iterations,
+            temperature=temperature,
+            max_tokens=max_tokens,
+            thinking_budget=thinking_budget,
+            timeout=timeout,
+        )
+
+    def _ask_with_tools_claude(
+        self,
+        message: str,
+        model: str,
+        *,
+        system_instruction: Optional[str] = None,
+        max_iterations: int = 10,
+        timeout: float = 120.0,
+        account: str = "default",
+    ) -> "LLMResponse":
+        """Claude Tool Use: LS primary → Cortex chat fallback.
+
+        Tries:
+        1. LS ask() — tested and working (system prompt with tool definitions)
+        2. Cortex generateChat — if LS unavailable
+
+        System prompt teaches Claude the tool_call format,
+        then parses responses for tool invocations.
+        """
+        from mekhane.ochema.tools import (
+            execute_tool,
+            get_claude_system_prompt,
+            has_tool_calls,
+            parse_tool_calls_from_text,
+        )
+
+        logger.info("Tool use (Claude): model=%s", model)
+
+        # Build system prompt with tool descriptions
+        tool_system = get_claude_system_prompt(system_instruction or "")
+
+        # First turn: include system prompt + user message
+        first_message = f"[System Instructions]\n{tool_system}\n\n[User Request]\n{message}"
+        current_message = first_message
+
+        from mekhane.ochema.types import LLMResponse
+
+        def _call_claude(msg: str) -> LLMResponse:
+            """Try LS first, then Cortex chat."""
+            # Try LS (primary — confirmed working)
+            try:
+                ls_client = self._get_ls_client()
+                return ls_client.ask(message=msg, model=model, timeout=timeout)
+            except Exception as e_ls:
+                logger.info("LS unavailable (%s), trying Cortex chat", e_ls)
+
+            # Try Cortex chat (fallback)
+            try:
+                config_id = CLAUDE_MODEL_MAP.get(model, "claude-sonnet-4-5")
+                client = self._get_cortex_client(account)
+                return client.chat(message=msg, model=config_id, timeout=timeout)
+            except Exception as e_cx:
+                raise RuntimeError(f"Claude unavailable: LS={e_ls}, Cortex={e_cx}") from e_cx
+
+        for iteration in range(max_iterations):
+            logger.info("Claude tool loop: iteration %d/%d", iteration + 1, max_iterations)
+
+            response = _call_claude(current_message)
+
+            # Check if Claude wants to use tools
+            if not has_tool_calls(response.text):
+                logger.info("Claude tool loop complete: %d iterations", iteration + 1)
+                return response
+
+            # Parse and execute tool calls
+            tool_calls = parse_tool_calls_from_text(response.text)
+
+            tool_results = []
+            for tc in tool_calls:
+                name = tc["name"]
+                args = tc["args"]
+                logger.info("Claude tool call [%d]: %s(%s)", iteration + 1, name, args)
+                result = execute_tool(name, args)
+                tool_results.append(f"### Tool: {name}\nArgs: {args}\nResult:\n```json\n{json.dumps(result, ensure_ascii=False, indent=2)}\n```")
+
+            # Build follow-up message with tool results
+            results_text = "\n\n".join(tool_results)
+            current_message = (
+                f"Here are the results of your tool calls:\n\n{results_text}\n\n"
+                f"Based on these results, continue your analysis. "
+                f"If you need more information, make additional tool calls. "
+                f"Otherwise, provide your final answer."
+            )
+
+        # Max iterations reached
+        logger.warning("Claude tool loop: max iterations (%d) reached", max_iterations)
+        return LLMResponse(
+            text="[Tool Use] Maximum iterations reached. Last tool calls may be incomplete.",
+            model=model,
         )
 
     def __repr__(self) -> str:

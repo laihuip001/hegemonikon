@@ -675,6 +675,7 @@ class CortexClient:
         temperature: float = 0.7,
         max_tokens: int = 8192,
         thinking_budget: Optional[int] = None,
+        tools: Optional[list[dict]] = None,
     ) -> dict:
         """Build the generateContent request payload."""
         request_inner: dict[str, Any] = {
@@ -695,6 +696,9 @@ class CortexClient:
             request_inner["generationConfig"]["thinkingConfig"] = {
                 "thinkingBudget": thinking_budget
             }
+
+        if tools:
+            request_inner["tools"] = [{"functionDeclarations": tools}]
 
         return {
             "model": model,
@@ -794,12 +798,13 @@ class CortexClient:
     def _parse_response(self, response: dict) -> LLMResponse:
         """Parse Cortex API response into LLMResponse.
 
-        Handles both thinking and non-thinking response formats.
+        Handles text, thinking, and function call response formats.
         """
         r = response.get("response", response)
 
         text_parts: list[str] = []
         thinking_parts: list[str] = []
+        function_calls: list[dict[str, Any]] = []
         model_version = r.get("modelVersion", "")
 
         for candidate in r.get("candidates", []):
@@ -810,6 +815,8 @@ class CortexClient:
                         thinking_parts.append(part["text"])
                     else:
                         text_parts.append(part["text"])
+                elif "functionCall" in part:
+                    function_calls.append(part["functionCall"])
 
         usage = r.get("usageMetadata", {})
         token_usage = {}
@@ -820,12 +827,20 @@ class CortexClient:
                 "total_tokens": usage.get("totalTokenCount", 0),
             }
 
-        return LLMResponse(
+        result = LLMResponse(
             text="\n".join(text_parts),
             thinking="\n".join(thinking_parts),
             model=model_version,
             token_usage=token_usage,
         )
+        # Attach function calls as extra attribute for agent loop
+        result.function_calls = function_calls  # type: ignore[attr-defined]
+        # Preserve raw model parts for thought_signature (Gemini 3 requirement)
+        raw_parts: list[dict[str, Any]] = []
+        for candidate in r.get("candidates", []):
+            raw_parts.extend(candidate.get("content", {}).get("parts", []))
+        result.raw_model_parts = raw_parts  # type: ignore[attr-defined]
+        return result
 
     # --- generateChat API (DX-010 §A') ---
 
@@ -838,6 +853,7 @@ class CortexClient:
         history: list[dict[str, Any]] | None = None,
         tier_id: str = "",
         include_thinking: bool = True,
+        thinking_budget: int | None = None,
         timeout: float = 120.0,
     ) -> LLMResponse:
         """generateChat API でチャット応答を取得。
@@ -853,6 +869,7 @@ class CortexClient:
                      author: 1=USER, 2=MODEL
             tier_id: モデルルーティング (""=default, "g1-ultra-tier"=Premium)
             include_thinking: Thinking summaries を含めるか
+            thinking_budget: Thinking token budget (default: 32768 = max depth)
             timeout: リクエストタイムアウト (秒)
 
         Returns:
@@ -872,6 +889,8 @@ class CortexClient:
             payload["model_config_id"] = model
         if tier_id:
             payload["tier_id"] = tier_id
+        if thinking_budget is not None:
+            payload["thinking_budget"] = thinking_budget
 
         result = self._call_api(
             f"{_BASE_URL}:generateChat",
@@ -890,6 +909,7 @@ class CortexClient:
         history: list[dict[str, Any]] | None = None,
         tier_id: str = "",
         include_thinking: bool = True,
+        thinking_budget: int = 32768,
         timeout: float = 120.0,
     ) -> Generator[str, None, None]:
         """streamGenerateChat API でストリーミングチャット。
@@ -917,6 +937,8 @@ class CortexClient:
             payload["model_config_id"] = model
         if tier_id:
             payload["tier_id"] = tier_id
+        if thinking_budget is not None:
+            payload["thinking_budget"] = thinking_budget
 
         data = json.dumps(payload, ensure_ascii=False).encode("utf-8")
 
@@ -1040,6 +1062,138 @@ class CortexClient:
 
     def __repr__(self) -> str:
         return f"CortexClient(model={self.model!r}, project={self._project!r})"
+
+    # --- Tool Use Agent Loop (F0) ---
+
+    # PURPOSE: Function Calling でローカルファイルを操作するエージェントループ。
+    #   AI の認知自由の基盤。
+    def ask_with_tools(
+        self,
+        message: str,
+        model: Optional[str] = None,
+        system_instruction: Optional[str] = None,
+        tools: Optional[list[dict]] = None,
+        max_iterations: int = 10,
+        temperature: Optional[float] = None,
+        max_tokens: Optional[int] = None,
+        thinking_budget: Optional[int] = None,
+        timeout: float = 120.0,
+    ) -> LLMResponse:
+        """Send a prompt with tool use (Function Calling) support.
+
+        Implements an agent loop:
+        1. Send prompt + tool definitions to LLM
+        2. If LLM returns functionCall → execute locally
+        3. Send results back to LLM
+        4. Repeat until LLM returns text (or max_iterations)
+
+        Args:
+            message: The prompt text
+            model: Model override
+            system_instruction: Optional system prompt
+            tools: Tool definitions (default: TOOL_DEFINITIONS from tools.py)
+            max_iterations: Max tool call rounds (default: 10)
+            temperature: Temperature override
+            max_tokens: Max output tokens
+            timeout: Per-API-call timeout
+
+        Returns:
+            LLMResponse with final text (after all tool calls resolved)
+        """
+        from .tools import TOOL_DEFINITIONS as DEFAULT_TOOLS, execute_tool
+
+        model = model or self.model
+        temperature = temperature if temperature is not None else self.temperature
+        max_tokens = max_tokens or self.max_tokens
+        tool_defs = tools or DEFAULT_TOOLS
+
+        contents: list[dict[str, Any]] = [
+            {"role": "user", "parts": [{"text": message}]}
+        ]
+
+        total_usage: dict[str, int] = {
+            "prompt_tokens": 0,
+            "completion_tokens": 0,
+            "total_tokens": 0,
+        }
+
+        for iteration in range(max_iterations):
+            request_body = self._build_request(
+                contents=contents,
+                model=model,
+                system_instruction=system_instruction,
+                temperature=temperature,
+                max_tokens=max_tokens,
+                thinking_budget=thinking_budget,
+                tools=tool_defs,
+            )
+
+            response = self._call_api(
+                f"{_BASE_URL}:generateContent",
+                request_body,
+                timeout=timeout,
+            )
+
+            result = self._parse_response(response)
+
+            # Accumulate token usage
+            for key in total_usage:
+                total_usage[key] += result.token_usage.get(key, 0)
+
+            # Check for function calls
+            fn_calls = getattr(result, "function_calls", [])
+            if not fn_calls:
+                # No tool calls → final response
+                result.token_usage = total_usage
+                logger.info(
+                    "Tool use completed: %d iterations, %d total tokens",
+                    iteration + 1,
+                    total_usage.get("total_tokens", 0),
+                )
+                return result
+
+            # Execute tool calls and build response
+            # Gemini 3 thought_signature: preserve raw model parts as-is
+            # to maintain thinking context across multi-turn function calling.
+            # See: https://ai.google.dev/gemini-api/docs/thought-signatures
+            raw_parts = getattr(result, "raw_model_parts", [])
+            user_parts: list[dict[str, Any]] = []
+
+            for fc in fn_calls:
+                name = fc.get("name", "")
+                args = fc.get("args", {})
+
+                logger.info("Tool call [%d/%d]: %s(%s)", iteration + 1, max_iterations, name, args)
+
+                # Execute the tool locally
+                tool_result = execute_tool(name, args)
+
+                # Build function response part (our result)
+                user_parts.append({
+                    "functionResponse": {
+                        "name": name,
+                        "response": tool_result,
+                    }
+                })
+
+            # Add model's original response (with thought_signatures intact)
+            if raw_parts:
+                contents.append({"role": "model", "parts": raw_parts})
+            else:
+                # Fallback for non-thinking models
+                model_parts = [{"functionCall": fc} for fc in fn_calls]
+                contents.append({"role": "model", "parts": model_parts})
+            # Add our function responses
+            contents.append({"role": "user", "parts": user_parts})
+
+        # Max iterations reached
+        logger.warning("ask_with_tools: max iterations (%d) reached", max_iterations)
+        result = LLMResponse(
+            text="[Tool Use] Maximum iterations reached. Last tool calls may be incomplete.",
+            model=model,
+            token_usage=total_usage,
+        )
+        return result
 
 
 # --- ChatConversation ---

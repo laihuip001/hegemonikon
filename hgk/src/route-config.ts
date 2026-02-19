@@ -5,29 +5,83 @@
  * ルート追加・変更はここだけで完結する。
  */
 
-import { renderDashboard } from './views/dashboard';
-import { renderAgentManagerView } from './views/agent-manager';
-import { renderSearch } from './views/search';
-import { renderFep } from './views/fep';
-import { renderGnosis } from './views/gnosis';
-import { renderQuality } from './views/quality';
-import { renderPostcheck } from './views/postcheck';
+const renderDashboard = async () => {
+    const { renderDashboard: render } = await import('./views/dashboard');
+    await render();
+};
+const renderAgentManagerView = async () => {
+    const { renderAgentManagerView: render } = await import('./views/agent-manager');
+    await render();
+};
+const renderSearch = async () => {
+    const { renderSearch: render } = await import('./views/search');
+    await render();
+};
+const renderFep = async () => {
+    const { renderFep: render } = await import('./views/fep');
+    await render();
+};
+const renderGnosis = async () => {
+    const { renderGnosis: render } = await import('./views/gnosis');
+    await render();
+};
+const renderQuality = async () => {
+    const { renderQuality: render } = await import('./views/quality');
+    await render();
+};
+const renderPostcheck = async () => {
+    const { renderPostcheck: render } = await import('./views/postcheck');
+    await render();
+};
 // Three.js graph — lazy loaded to split the 700KB+ chunk
 const renderGraph3D = async () => {
     const { renderGraph3D: render } = await import('./views/graph3d');
     await render();
 };
-import { renderNotifications } from './views/notifications';
-import { renderPKS } from './views/pks';
-import { renderSophiaView } from './views/sophia';
-import { renderTimelineView } from './views/timeline';
-import { renderSynteleiaView } from './views/synteleia';
-import { renderSynedrionView } from './views/synedrion';
-import { renderDigestorView } from './views/digestor';
-import { renderDesktopDomView } from './views/desktop-dom';
-import { renderChatView } from './views/chat';
-import { renderAristosView } from './views/aristos';
-import { renderSettingsView } from './views/settings';
+const renderNotifications = async () => {
+    const { renderNotifications: render } = await import('./views/notifications');
+    await render();
+};
+const renderPKS = async () => {
+    const { renderPKS: render } = await import('./views/pks');
+    await render();
+};
+const renderSophiaView = async () => {
+    const { renderSophiaView: render } = await import('./views/sophia');
+    await render();
+};
+const renderTimelineView = async () => {
+    const { renderTimelineView: render } = await import('./views/timeline');
+    await render();
+};
+const renderSynteleiaView = async () => {
+    const { renderSynteleiaView: render } = await import('./views/synteleia');
+    await render();
+};
+const renderSynedrionView = async () => {
+    const { renderSynedrionView: render } = await import('./views/synedrion');
+    await render();
+};
+const renderDigestorView = async () => {
+    const { renderDigestorView: render } = await import('./views/digestor');
+    await render();
+};
+const renderDesktopDomView = async () => {
+    const { renderDesktopDomView: render } = await import('./views/desktop-dom');
+    await render();
+};
+const renderChatView = async () => {
+    const { renderChatView: render } = await import('./views/chat');
+    await render();
+};
+const renderAristosView = async () => {
+    const { renderAristosView: render } = await import('./views/aristos');
+    await render();
+};
+const renderSettingsView = async () => {
+    const { renderSettingsView: render } = await import('./views/settings');
+    await render();
+};
 
 // ─── Types ───────────────────────────────────────────────────
 

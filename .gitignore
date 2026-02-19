@@ -91,3 +91,6 @@ oauth.json
 
 # LS reverse-engineering notes (contains OAuth token patterns)
 mekhane/ochema/docs/ls-standalone-reference.md
+
+# WF execution traces (auto-generated JSONL)
+.agent/tape/*.jsonl

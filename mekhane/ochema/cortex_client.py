@@ -1060,6 +1060,217 @@ class CortexClient:
             trajectory_id=details.get("tid", ""),
         )
 
+    # --- generateChat API (DX-010 §A') ---
+
+    # PURPOSE: generateChat API で Claude/Gemini チャット応答を取得する。
+    #   LS 不要、model_config_id で全モデルにアクセス可能。
+    def chat(
+        self,
+        message: str,
+        model: str = "",
+        history: list[dict[str, Any]] | None = None,
+        tier_id: str = "",
+        include_thinking: bool = True,
+        timeout: float = 120.0,
+    ) -> LLMResponse:
+        """generateChat API でチャット応答を取得。
+
+        LS を迂回し、cloudcode-pa の generateChat エンドポイントを直接呼び出す。
+        model で Claude/Gemini 全モデルを指定可能。
+
+        Args:
+            message: 現在のユーザーメッセージ
+            model: モデル ID (e.g. "gemini-2.5-pro", "claude-sonnet-4-5")
+                   空文字列の場合はサーバーデフォルト (Gemini 3 Pro Preview)
+            history: 過去の会話履歴 [{"author": 1, "content": "..."}, ...]
+                     author: 1=USER, 2=MODEL
+            tier_id: モデルルーティング (""=default, "g1-ultra-tier"=Premium)
+            include_thinking: Thinking summaries を含めるか
+            timeout: リクエストタイムアウト (秒)
+
+        Returns:
+            LLMResponse with text and metadata
+        """
+        token = self._get_token()
+        project = self._get_project(token)
+
+        payload: dict[str, Any] = {
+            "project": project,
+            "user_message": message,
+            "history": history or [],
+            "metadata": {"ideType": "IDE_UNSPECIFIED"},
+            "include_thinking_summaries": include_thinking,
+        }
+        if model:
+            payload["model_config_id"] = model
+        if tier_id:
+            payload["tier_id"] = tier_id
+
+        result = self._call_api(
+            f"{_BASE_URL}:generateChat",
+            payload,
+            timeout=timeout,
+            token_override=token,
+        )
+
+        return self._parse_chat_response(result, request_model=model)
+
+    # PURPOSE: generateChat のストリーミング版。チャンクを逐次 yield。
+    def chat_stream(
+        self,
+        message: str,
+        model: str = "",
+        history: list[dict[str, Any]] | None = None,
+        tier_id: str = "",
+        include_thinking: bool = True,
+        timeout: float = 120.0,
+    ) -> Generator[str, None, None]:
+        """streamGenerateChat API でストリーミングチャット。
+
+        Note: streamGenerateChat は SSE ではなく JSON 配列を返す。
+        各要素の "markdown" フィールドをチャンクとして yield する。
+
+        Args:
+            (same as chat())
+
+        Yields:
+            str: テキストチャンク (markdown フィールドから抽出)
+        """
+        token = self._get_token()
+        project = self._get_project(token)
+
+        payload: dict[str, Any] = {
+            "project": project,
+            "user_message": message,
+            "history": history or [],
+            "metadata": {"ideType": "IDE_UNSPECIFIED"},
+            "include_thinking_summaries": include_thinking,
+        }
+        if model:
+            payload["model_config_id"] = model
+        if tier_id:
+            payload["tier_id"] = tier_id
+
+        data = json.dumps(payload, ensure_ascii=False).encode("utf-8")
+
+        req = urllib.request.Request(
+            f"{_BASE_URL}:streamGenerateChat",
+            data=data,
+            headers={
+                "Authorization": f"Bearer {token}",
+                "Content-Type": "application/json",
+            },
+            method="POST",
+        )
+
+        try:
+            with urllib.request.urlopen(req, timeout=timeout) as resp:
+                raw = resp.read().decode("utf-8")
+                try:
+                    items = json.loads(raw)
+                except json.JSONDecodeError:
+                    # Fallback: SSE 形式の場合
+                    for line in raw.split("\n"):
+                        line = line.strip()
+                        if line.startswith("data: "):
+                            try:
+                                d = json.loads(line[6:])
+                                md = d.get("markdown", "")
+                                if md:
+                                    yield md
+                            except json.JSONDecodeError:
+                                continue
+                    return
+
+                # JSON 配列形式: [{markdown: "...", processingDetails: ...}, ...]
+                if isinstance(items, list):
+                    for item in items:
+                        md = item.get("markdown", "")
+                        if md:
+                            yield md
+                elif isinstance(items, dict):
+                    md = items.get("markdown", "")
+                    if md:
+                        yield md
+        except urllib.error.HTTPError as e:
+            raise CortexAPIError(
+                f"Chat stream failed: {e.code} {e.reason}",
+                status_code=e.code,
+                response_body=e.read().decode("utf-8", errors="replace"),
+            )
+
+    # PURPOSE: マルチターン generateChat 会話を開始する。
+    def start_chat(
+        self,
+        model: str = "",
+        tier_id: str = "",
+        include_thinking: bool = True,
+    ) -> "ChatConversation":
+        """マルチターン generateChat 会話を開始する。
+
+        Args:
+            model: モデル ID (e.g. "claude-sonnet-4-5")
+            tier_id: モデルルーティング
+            include_thinking: Thinking summaries を含めるか
+
+        Returns:
+            ChatConversation instance (history 自動管理)
+        """
+        return ChatConversation(
+            client=self,
+            model=model,
+            tier_id=tier_id,
+            include_thinking=include_thinking,
+        )
+
+    # PURPOSE: generateChat レスポンスを LLMResponse に変換。
+    # Reverse map: model_config_id → human-friendly display name
+    _MODEL_DISPLAY_NAMES: dict[str, str] = {
+        "claude-sonnet-4-5": "Claude Sonnet 4.5",
+        "claude-opus-4-6": "Claude Opus 4.6",
+        "gemini-2.5-pro": "Gemini 2.5 Pro",
+        "gemini-2.5-flash": "Gemini 2.5 Flash",
+        "gemini-2.0-flash": "Gemini 2.0 Flash",
+        "gemini-3-pro-preview": "Gemini 3 Pro Preview",
+        "gemini-3-flash-preview": "Gemini 3 Flash Preview",
+    }
+
+    def _parse_chat_response(
+        self,
+        response: dict,
+        request_model: str = "",
+    ) -> LLMResponse:
+        """Parse generateChat response into LLMResponse.
+
+        Args:
+            response: Raw API response dict
+            request_model: The model_config_id used in the request (for fallback)
+        """
+        text = response.get("markdown", "")
+        details = response.get("processingDetails", {})
+        # modelConfig can be in response root or inside processingDetails
+        model_config = (
+            response.get("modelConfig")
+            or details.get("modelConfig")
+            or {}
+        )
+
+        # Priority: displayName > config id > request_model > fallback
+        model_name = (
+            model_config.get("displayName")
+            or model_config.get("id")
+            or self._MODEL_DISPLAY_NAMES.get(request_model, "")
+            or request_model
+            or f"cortex-chat (cid={details.get('cid', '')})"
+        )
+
+        return LLMResponse(
+            text=text,
+            model=model_name,
+            cascade_id=details.get("cid", ""),
+            trajectory_id=details.get("tid", ""),
+        )
+
     def __repr__(self) -> str:
         return f"CortexClient(model={self.model!r}, project={self._project!r})"
 
@@ -1194,6 +1405,87 @@ class CortexClient:
             token_usage=total_usage,
         )
         return result
+
+
+# --- ChatConversation ---
+
+
+# PURPOSE: generateChat のマルチターン会話を管理する。
+#   history を自動追跡し、CascadeConversation と対称的な API を提供する。
+class ChatConversation:
+    """マルチターン generateChat 会話 (history 自動管理)。
+
+    同一 history 内で複数メッセージをやり取りし、
+    2MB コンテキスト + 100 ターンまでの大規模会話が可能。
+
+    Usage:
+        client = CortexClient()
+        conv = client.start_chat()
+        r1 = conv.send("Remember: X = 42")
+        r2 = conv.send("What is X?")
+        print(r2.text)  # → "X is 42"
+        conv.close()
+    """
+
+    def __init__(
+        self,
+        client: CortexClient,
+        model: str = "",
+        tier_id: str = "",
+        include_thinking: bool = True,
+    ):
+        self._client = client
+        self._model = model
+        self._tier_id = tier_id
+        self._include_thinking = include_thinking
+        self._history: list[dict[str, Any]] = []
+        self._turn_count = 0
+
+    def send(
+        self,
+        message: str,
+        timeout: float = 120.0,
+    ) -> LLMResponse:
+        """メッセージを送信し、応答を取得する。
+
+        Args:
+            message: 送信テキスト
+            timeout: 最大待機秒数
+
+        Returns:
+            LLMResponse with text and metadata
+        """
+        self._turn_count += 1
+
+        response = self._client.chat(
+            message=message,
+            model=self._model,
+            history=self._history,
+            tier_id=self._tier_id,
+            include_thinking=self._include_thinking,
+            timeout=timeout,
+        )
+
+        # Update history for next turn
+        self._history.append({"author": 1, "content": message})
+        self._history.append({"author": 2, "content": response.text})
+
+        return response
+
+    @property
+    def turn_count(self) -> int:
+        """現在のターン数。"""
+        return self._turn_count
+
+    @property
+    def history(self) -> list[dict[str, Any]]:
+        """現在の会話履歴 (read-only copy)。"""
+        return list(self._history)
+
+    def close(self) -> None:
+        """会話を閉じる (リソース解放)。"""
+        self._history.clear()
+        self._turn_count = 0
 
 
 # --- ChatConversation ---

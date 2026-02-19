@@ -442,7 +442,31 @@ class WorkflowExecutor:
         # 定理使用を自動記録
         self._record_theorem_usage(pipeline)
         
+        # WF 実行トレースを tape に記録
+        self._record_tape(pipeline)
+        
         return pipeline
+    
+    # PURPOSE: WF 実行トレースを JSONL tape に記録
+    def _record_tape(self, pipeline: ExecutionPipeline) -> None:
+        """TapeWriter で実行トレースを記録。
+        
+        _finalize() から自動呼び出し。失敗してもパイプラインをブロックしない。
+        """
+        try:
+            from mekhane.tape import TapeWriter
+            tape = TapeWriter()
+            tape.log(
+                wf=pipeline.ccl,
+                step="COMPLETE" if pipeline.success else "FAILED",
+                workflow_name=pipeline.workflow_name,
+                confidence=pipeline.confidence,
+                duration_ms=round(pipeline.total_duration_ms, 1),
+                verified=pipeline.verified,
+                model=pipeline.model,
+            )
+        except Exception:
+            pass  # Tape failure should never block execution
 
 
 # =============================================================================

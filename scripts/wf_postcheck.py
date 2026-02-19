@@ -240,6 +240,11 @@ def postcheck(
         nat_checks = check_naturality()
         checks.extend(nat_checks)
 
+    # Agent-Diff: Handoff structure diff (bye only)
+    if wf_name == "bye":
+        diff_checks = check_agent_diff(content)
+        checks.extend(diff_checks)
+
     # UML metacognitive post-check (Phase 2: all WFs)
     uml_checks = check_uml(wf_name, content)
     checks.extend(uml_checks)
@@ -259,6 +264,64 @@ def postcheck(
         "checks": checks,
         "formatted": "\n".join(lines),
     }
+
+
+# ============================================================
+# Extended Checks: Agent-Diff (Handoff Structure Diff)
+# ============================================================
+
+HANDOFF_DIR = Path.home() / "oikos" / "mneme" / ".hegemonikon" / "sessions"
+
+
+def check_agent_diff(content: str) -> list[dict]:
+    """Compare current Handoff sections with previous Handoff.
+
+    Detects section headings (##) in the previous Handoff that are
+    missing from the current one. Missing sections are reported as
+    FAIL unless the content contains an explicit '(省略理由:' note.
+    """
+    checks = []
+
+    # Find the two most recent Handoff files
+    handoffs = sorted(HANDOFF_DIR.glob("handoff_*.md"), reverse=True)
+    if len(handoffs) < 2:
+        checks.append({
+            "name": "agent_diff",
+            "passed": True,
+            "detail": "✅ Agent-Diff: 比較対象の前回 Handoff なし (スキップ)",
+        })
+        return checks
+
+    prev_path = handoffs[1]  # Second most recent
+    try:
+        prev_content = prev_path.read_text(encoding="utf-8")
+    except Exception:
+        return checks
+
+    # Extract ## headings
+    prev_sections = set(re.findall(r"^## (.+)$", prev_content, re.MULTILINE))
+    curr_sections = set(re.findall(r"^## (.+)$", content, re.MULTILINE))
+
+    missing = prev_sections - curr_sections
+    if not missing:
+        checks.append({
+            "name": "agent_diff",
+            "passed": True,
+            "detail": f"✅ Agent-Diff: 前回 ({prev_path.name}) と構造一致",
+        })
+    else:
+        for section in sorted(missing):
+            # Check for explicit skip reason
+            has_reason = "省略理由" in content and section.split()[0] in content
+            checks.append({
+                "name": f"agent_diff_{section[:30]}",
+                "passed": has_reason,
+                "detail": f"{'✅' if has_reason else '❌'} Agent-Diff: "
+                          f"前回にあった '## {section}' が欠落"
+                          + (" (省略理由あり)" if has_reason else ""),
+            })
+
+    return checks
 
 
 # ============================================================

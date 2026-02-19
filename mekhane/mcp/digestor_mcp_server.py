@@ -1,75 +1,26 @@
 # PROOF: [L2/インフラ] <- mekhane/mcp/ A0→MCP経由のアクセスが必要→digestor_mcp_server が担う
 #!/usr/bin/env python3
 """
-Digestor MCP Server - Hegemonikón Knowledge Digestion Pipeline
+Digestor MCP Server v2.1 - Hegemonikón Knowledge Digestion Pipeline
 
-Model Context Protocol server for automated knowledge ingestion.
-Exposes digestor tools via stdio transport.
-
-CRITICAL: This file follows MCP stdio protocol rules:
-- NO print() to stdout (use stderr for debugging)
-- All communication via MCP protocol only
+Tools: list_candidates, run_digestor, get_topics, check_incoming,
+       mark_processed, paper_search, paper_details, paper_citations
 """
 
 import sys
-import io
-
-_original_stdout = sys.stdout
-_stderr_wrapper = sys.stderr
-
-
-# Debug logging to stderr (won't interfere with MCP stdio)
-# PURPOSE: log — MCPサービスの処理
-def log(msg):
-    print(f"[Digestor MCP] {msg}", file=_stderr_wrapper)
-
-
-log("Starting Digestor MCP Server...")
-
-# ============ Import path setup ============
 from pathlib import Path
+from mekhane.mcp.mcp_base import MCPBase, StdoutSuppressor
 
-# mekhane/mcp/ → mekhane/ → hegemonikon/ (project root)
-_mekhane_dir = Path(__file__).parent.parent
-_project_root = _mekhane_dir.parent
-
-# Both paths needed: project root for `from mekhane.xxx` imports,
-# mekhane dir for any relative imports within mekhane
-for _p in [str(_project_root), str(_mekhane_dir)]:
-    if _p not in sys.path:
-        sys.path.insert(0, _p)
-log(f"Added to path: {_project_root} + {_mekhane_dir}")
-
-
-# ============ Suppress stdout during imports ============
-# PURPOSE: クラス: StdoutSuppressor
-class StdoutSuppressor:
-    # PURPOSE: StdoutSuppressor の構成と依存関係の初期化
-    def __init__(self):
-        self._null = io.StringIO()
-        self._old_stdout = None
-
-    # PURPOSE: enter__ — MCPサービスの内部処理
-    def __enter__(self):
-        self._old_stdout = sys.stdout
-        sys.stdout = self._null
-        return self
-
-    # PURPOSE: exit__ — MCPサービスの内部処理
-    def __exit__(self, *args):
-        sys.stdout = self._old_stdout
-
-
-# Import MCP SDK
-try:
-    from mcp.server import Server
-    from mcp.server.stdio import stdio_server
-    from mcp.types import Tool, TextContent
-
-    log("MCP imports successful")
-except Exception as e:
-    log(f"MCP import error: {e}")
-    sys.exit(1)
+# Initialize via shared infrastructure
+_base = MCPBase(
+    name="digestor",
+    version="2.1.0",
+    instructions="Digestor: Knowledge ingestion pipeline (Gnosis → /eat) + Semantic Scholar API (paper search/details/citations)",
+)
+server = _base.server
+log = _base.log
+TextContent = _base.TextContent
+Tool = _base.Tool
 
 # Import Digestor modules
 try:
@@ -82,14 +33,6 @@ except Exception as e:
     log("Will run with stub mode")
     DigestorSelector = None
     DigestorPipeline = None
-
-# Initialize MCP server
-server = Server(
-    name="digestor",
-    version="2.0.0",
-    instructions="Digestor: Knowledge ingestion pipeline (Gnosis → /eat) + Semantic Scholar API (paper search/details/citations)",
-)
-log("Server initialized")
 # PURPOSE: List available tools.
 
 
@@ -481,25 +424,5 @@ async def handle_semantic_scholar(name: str, arguments: dict):
     return [TextContent(type="text", text=f"Unknown S2 tool: {name}")]
 
 
-# PURPOSE: digestor_mcp_server の main 処理を実行する
-async def main():
-    """Run the MCP server."""
-    log("Starting stdio server...")
-    sys.stdout = _original_stdout
-
-    async with stdio_server() as streams:
-        log("Stdio streams acquired")
-        await server.run(streams[0], streams[1], server.create_initialization_options())
-
-
 if __name__ == "__main__":
-    import asyncio
-
-    log("Running main...")
-    try:
-        asyncio.run(main())
-    except KeyboardInterrupt:
-        log("Server stopped by user")
-    except Exception as e:
-        log(f"Fatal error: {e}")
-        sys.exit(1)
+    _base.run()

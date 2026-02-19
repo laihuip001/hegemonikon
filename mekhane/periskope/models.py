@@ -33,8 +33,11 @@ class SynthModel(str, Enum):
     """Available synthesis models."""
     GEMINI_FLASH = "gemini-3-flash-preview"
     GEMINI_PRO = "gemini-3-pro-preview"
-    CLAUDE_LS = "claude-ls"       # Via Language Server
-    CLAUDE_CORTEX = "claude-cortex"  # If available via Cortex
+    CLAUDE_SONNET = "claude-sonnet-4-5"    # L2 standard
+    CLAUDE_OPUS = "claude-opus-4-6"        # L3 deep
+    # Deprecated — use CLAUDE_SONNET/CLAUDE_OPUS instead
+    CLAUDE_LS = "claude-ls"
+    CLAUDE_CORTEX = "claude-cortex"
 
 
 @dataclass

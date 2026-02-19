@@ -440,7 +440,7 @@ async def list_tools():
                             "0=minimal, 1024=light, 8192=standard, 32768=deep (default). "
                             "None=model default."
                         ),
-                        "default": None,
+                        "default": 32768,
                     },
                     "max_iterations": {
                         "type": "integer",
@@ -922,7 +922,7 @@ async def call_tool(name: str, arguments: dict):
         message = arguments.get("message", "")
         model = arguments.get("model", "gemini-3-pro-preview")
         system_instruction = arguments.get("system_instruction")
-        thinking_budget = arguments.get("thinking_budget")
+        thinking_budget = arguments.get("thinking_budget", 32768)
         max_iterations = int(arguments.get("max_iterations", 10))
         max_tokens = int(arguments.get("max_tokens", 8192))
         timeout = float(arguments.get("timeout", 120))

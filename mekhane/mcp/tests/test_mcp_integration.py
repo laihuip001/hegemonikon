@@ -382,3 +382,103 @@ class TestDigestorS2:
         result = await handle_semantic_scholar("paper_citations", {"paper_id": ""})
         assert "Error" in result[0].text
 
+
+# ============ sympatheia: basanos_scan ============
+
+class TestSympatheiBasanosScan:
+    """basanos_scan ツールのテスト"""
+
+    @pytest.mark.asyncio
+    async def test_basanos_import_ok(self):
+        """AIAuditor が正しくインポートできる"""
+        from mekhane.basanos.ai_auditor import AIAuditor
+        auditor = AIAuditor(strict=False)
+        assert auditor is not None
+
+    @pytest.mark.asyncio
+    async def test_basanos_scan_missing_path(self):
+        """path 未指定でエラー"""
+        from mekhane.mcp.sympatheia_mcp_server import _handle_basanos_scan
+        result = await _handle_basanos_scan({})
+        assert "Error" in result[0].text
+
+    @pytest.mark.asyncio
+    async def test_basanos_scan_nonexistent_path(self):
+        """存在しないパスでエラー"""
+        from mekhane.mcp.sympatheia_mcp_server import _handle_basanos_scan
+        result = await _handle_basanos_scan({"path": "/nonexistent/file.py"})
+        assert "not found" in result[0].text
+
+    @pytest.mark.asyncio
+    async def test_basanos_scan_file(self, tmp_path):
+        """正常ケース: 単一ファイルスキャン"""
+        test_file = tmp_path / "test_sample.py"
+        test_file.write_text("x = 1\n")
+
+        from mekhane.mcp.sympatheia_mcp_server import _handle_basanos_scan
+        result = await _handle_basanos_scan({"path": str(test_file)})
+        # Either no issues or issues found — both are valid
+        assert len(result) == 1
+        assert isinstance(result[0].text, str)
+
+
+# ============ sympatheia: peira_health ============
+
+class TestSympatheiaPeiraHealth:
+    """peira_health ツールのテスト"""
+
+    @pytest.mark.asyncio
+    async def test_peira_import_ok(self):
+        """run_health_check / format_terminal が正しくインポートできる"""
+        from mekhane.peira.hgk_health import run_health_check, format_terminal
+        assert callable(run_health_check)
+        assert callable(format_terminal)
+
+    @pytest.mark.asyncio
+    async def test_peira_health_returns_text(self):
+        """peira_health がテキスト結果を返す"""
+        from mekhane.mcp.sympatheia_mcp_server import _handle_peira_health
+        result = await _handle_peira_health()
+        assert len(result) == 1
+        assert isinstance(result[0].text, str)
+        # Should contain some health-related output
+        assert len(result[0].text) > 0
+
+
+# ============ mneme: dendron_check ============
+
+class TestMnemeDendronCheck:
+    """dendron_check ツールのテスト"""
+
+    @pytest.mark.asyncio
+    async def test_dendron_import_ok(self):
+        """DendronChecker が正しくインポートできる"""
+        from mekhane.dendron.checker import DendronChecker
+        checker = DendronChecker()
+        assert checker is not None
+
+    @pytest.mark.asyncio
+    async def test_dendron_check_missing_path(self):
+        """path 未指定でエラー"""
+        from mekhane.mcp.mneme_server import _handle_dendron_check
+        result = await _handle_dendron_check({})
+        assert "Error" in result[0].text or "path" in result[0].text.lower()
+
+    @pytest.mark.asyncio
+    async def test_dendron_check_nonexistent_path(self):
+        """存在しないパスでエラー"""
+        from mekhane.mcp.mneme_server import _handle_dendron_check
+        result = await _handle_dendron_check({"path": "/nonexistent/file.py"})
+        assert "not found" in result[0].text or "Error" in result[0].text
+
+    @pytest.mark.asyncio
+    async def test_dendron_check_file(self, tmp_path):
+        """正常ケース: PROOF ヘッダー付きファイル"""
+        test_file = tmp_path / "test_proof.py"
+        test_file.write_text("# PROOF: [L1/test] <- test\n# PURPOSE: test\nx = 1\n")
+
+        from mekhane.mcp.mneme_server import _handle_dendron_check
+        result = await _handle_dendron_check({"path": str(test_file)})
+        assert len(result) == 1
+        assert isinstance(result[0].text, str)
+

@@ -413,5 +413,18 @@
     "correct": null,
     "had_failure": null,
     "notes": ""
+  },
+  {
+    "id": "20260219_014122_612128",
+    "ccl_expr": "F:[×3]{(/dia+)*%(/dia+!)_(\\dia+)*%(\\dia+!)}",
+    "operators": [
+      "!",
+      "\\"
+    ],
+    "generated_at": "2026-02-19T01:41:22.612154",
+    "answered": null,
+    "correct": null,
+    "had_failure": null,
+    "notes": ""
   }
 ]

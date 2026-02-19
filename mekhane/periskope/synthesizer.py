@@ -2,10 +2,15 @@
 Multi-model synthesizer for Periskopē.
 
 Synthesizes search results using multiple LLMs in parallel:
-- Gemini (via Cortex API direct)
-- Claude (via Language Server, extensible to parallel LS)
+- Gemini (via CortexClient.chat() — generateChat API)
+- Claude (via CortexClient.chat() — generateChat API, LS 不要)
 
 Detects divergence between models to identify uncertain claims.
+
+Depth-level model routing:
+  L1: Gemini Pro only
+  L2: Gemini Pro + Claude Sonnet
+  L3: Gemini Pro + Claude Opus
 """
 
 from __future__ import annotations
@@ -46,29 +51,39 @@ Provide your synthesis in a structured format with sections:
 ## Confidence: X%
 """
 
+# Depth-level → model selection mapping
+_DEPTH_MODELS: dict[int, list[SynthModel]] = {
+    1: [SynthModel.GEMINI_PRO],
+    2: [SynthModel.GEMINI_PRO, SynthModel.CLAUDE_SONNET],
+    3: [SynthModel.GEMINI_PRO, SynthModel.CLAUDE_OPUS],
+}
+
+
+def models_for_depth(depth: int) -> list[SynthModel]:
+    """Return synthesis models for the given depth level (1-3)."""
+    return _DEPTH_MODELS.get(depth, _DEPTH_MODELS[2])
+
 
 class MultiModelSynthesizer:
     """Synthesize search results using multiple LLMs.
 
-    Uses CortexClient (Gemini) as primary synthesizer.
-    LS-based Claude synthesis is supported via the extensible
-    synth_models configuration.
+    Uses CortexClient.chat() (generateChat API) for both Gemini and Claude.
+    No Language Server dependency — all models accessed directly via Cortex.
 
-    Architecture:
-        synth_models = [GEMINI_FLASH]  # Start with 1 model
-        # Extensible to: [GEMINI_FLASH, CLAUDE_LS] for parallel
+    Depth-level routing:
+        L1: Gemini Pro only (fast, single-model)
+        L2: Gemini Pro + Claude Sonnet (standard dual-model)
+        L3: Gemini Pro + Claude Opus (deep dual-model)
     """
 
     def __init__(
         self,
         synth_models: list[SynthModel] | None = None,
-        cortex_model: str = "gemini-3-flash-preview",
+        gemini_model: str = "gemini-3-pro-preview",
         max_tokens: int = 4096,
     ) -> None:
-        # Default: dual-model synthesis (Gemini + Claude)
-        # Claude LS degrades gracefully if unavailable
-        self.synth_models = synth_models or [SynthModel.GEMINI_FLASH, SynthModel.CLAUDE_LS]
-        self.cortex_model = cortex_model
+        self.synth_models = synth_models or models_for_depth(2)
+        self.gemini_model = gemini_model
         self.max_tokens = max_tokens
         self._cortex = None
 
@@ -77,7 +92,7 @@ class MultiModelSynthesizer:
         if self._cortex is None:
             from mekhane.ochema.cortex_client import CortexClient
             self._cortex = CortexClient(
-                model=self.cortex_model,
+                model=self.gemini_model,
                 max_tokens=self.max_tokens,
             )
         return self._cortex
@@ -108,9 +123,15 @@ class MultiModelSynthesizer:
         tasks = []
         for model in self.synth_models:
             if model in (SynthModel.GEMINI_FLASH, SynthModel.GEMINI_PRO):
-                tasks.append(self._synth_gemini(prompt, model, system_instruction))
+                tasks.append(self._synth_via_cortex(prompt, model, system_instruction))
+            elif model in (SynthModel.CLAUDE_SONNET, SynthModel.CLAUDE_OPUS):
+                tasks.append(self._synth_via_cortex(prompt, model, system_instruction))
             elif model == SynthModel.CLAUDE_LS:
-                tasks.append(self._synth_claude_ls(prompt, system_instruction))
+                # Deprecated: redirect to CLAUDE_SONNET via cortex
+                logger.warning("CLAUDE_LS is deprecated, using CLAUDE_SONNET via Cortex")
+                tasks.append(self._synth_via_cortex(
+                    prompt, SynthModel.CLAUDE_SONNET, system_instruction,
+                ))
             else:
                 logger.warning("Unsupported synth model: %s", model)
 
@@ -125,23 +146,35 @@ class MultiModelSynthesizer:
 
         return synth_results
 
-    async def _synth_gemini(
+    async def _synth_via_cortex(
         self,
         prompt: str,
         model: SynthModel,
         system_instruction: str | None,
     ) -> SynthesisResult:
-        """Synthesize via Cortex (Gemini) API."""
+        """Synthesize via CortexClient.chat() (generateChat API).
+
+        Works for both Gemini and Claude models — unified pathway.
+        """
         cortex = self._get_cortex()
 
-        gemini_model = model.value  # e.g., "gemini-3-flash-preview"
+        # model.value is the model_config_id (e.g. "gemini-3-pro-preview", "claude-sonnet-4-5")
+        model_id = model.value
+
+        # Prepend system instruction to the prompt if provided
+        # (generateChat doesn't have a separate system_instruction field)
+        full_prompt = prompt
+        if system_instruction:
+            full_prompt = f"System: {system_instruction}\n\n{prompt}"
 
         start = time.monotonic()
-        response = await cortex.ask_async(
-            message=prompt,
-            model=gemini_model,
-            system_instruction=system_instruction or "You are a thorough research analyst.",
-            max_tokens=self.max_tokens,
+
+        # CortexClient.chat() is sync — run in thread pool
+        response = await asyncio.to_thread(
+            cortex.chat,
+            message=full_prompt,
+            model=model_id,
+            timeout=120.0,
         )
         elapsed = time.monotonic() - start
 
@@ -152,8 +185,8 @@ class MultiModelSynthesizer:
         confidence = self._extract_confidence(response.text)
 
         logger.info(
-            "Gemini synthesis (%s): %d chars in %.1fs, confidence=%d%%",
-            gemini_model, len(response.text), elapsed, int(confidence * 100),
+            "Synthesis (%s): %d chars in %.1fs, confidence=%d%%",
+            model_id, len(response.text), elapsed, int(confidence * 100),
         )
 
         return SynthesisResult(
@@ -161,58 +194,11 @@ class MultiModelSynthesizer:
             content=response.text,
             citations=citations,
             confidence=confidence,
-            thinking=response.thinking or "",
-            token_count=response.usage.get("total", 0) if hasattr(response, "usage") else 0,
+            thinking=getattr(response, "thinking", "") or "",
+            token_count=response.token_usage.get("total_tokens", 0)
+            if isinstance(response.token_usage, dict)
+            else 0,
         )
-
-    async def _synth_claude_ls(
-        self,
-        prompt: str,
-        system_instruction: str | None,
-    ) -> SynthesisResult:
-        """Synthesize via Language Server (Claude).
-
-        Uses AntigravityClient to connect to the running LS.
-        Falls back to error if LS is not running.
-        """
-        try:
-            from mekhane.ochema.antigravity_client import AntigravityClient, LLMResponse
-
-            # AntigravityClient.ask() is synchronous — wrap in thread
-            def _call_ls() -> LLMResponse:
-                client = AntigravityClient()
-                return client.ask(
-                    message=prompt,
-                    model="MODEL_CLAUDE_4_5_SONNET_THINKING",
-                    timeout=120.0,
-                )
-
-            start = time.monotonic()
-            response = await asyncio.to_thread(_call_ls)
-            elapsed = time.monotonic() - start
-
-            citations = self._extract_citations(response.text)
-            confidence = self._extract_confidence(response.text)
-
-            logger.info(
-                "Claude LS synthesis: %d chars in %.1fs, confidence=%d%%",
-                len(response.text), elapsed, int(confidence * 100),
-            )
-
-            return SynthesisResult(
-                model=SynthModel.CLAUDE_LS,
-                content=response.text,
-                citations=citations,
-                confidence=confidence,
-                thinking=response.thinking or "",
-                token_count=response.token_usage.get("total_tokens", 0)
-                if isinstance(response.token_usage, dict)
-                else 0,
-            )
-
-        except Exception as e:
-            logger.warning("Claude LS synthesis failed (LS may not be running): %s", e)
-            raise RuntimeError(f"Claude LS unavailable: {e}") from e
 
     def detect_divergence(
         self,

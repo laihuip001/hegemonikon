@@ -11,6 +11,7 @@ VISION.md Layer A (Immunitas) → Layer B (Nous) → Layer C (Pronoia) の
 
 import json
 import logging
+import os
 from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
@@ -375,11 +376,18 @@ class DailyReviewPipeline:
             result.l2_triggered = True
             result.l2_session_id = self._trigger_jules_review(result)
 
+        # ── Auto-expand: 新ドメイン自動検出 ──
+        self._auto_expand_domains(result)
+
         # ── FB: Feedback loop — update weights ──
         self._update_feedback(result, domains)
 
         # ── Notify: Sympatheia 通知 ──
         self._notify_result(result)
+
+        # ── Persist: レポート永続化 ──
+        if not dry_run:
+            self._persist_report(result)
 
         return result
 
@@ -402,14 +410,72 @@ class DailyReviewPipeline:
             logger.warning(f"git diff failed: {e}")
         return []
 
+    def _auto_expand_domains(self, result: PipelineResult) -> None:
+        """L0 結果から未登録ドメインを自動追加。"""
+        # AI-XXX code → name mapping for domain categorization
+        CATEGORY_MAP = {
+            "Naming": "Naming",
+            "API": "API",
+            "Type": "Types",
+            "Logic": "Logic",
+            "Incomplete": "Completeness",
+            "Context": "Context",
+            "Pattern": "Patterns",
+            "Contradiction": "Logic",
+            "Security": "Security",
+            "Input": "Validation",
+            "Boundary": "Boundary",
+            "Async": "Async",
+            "Concurrency": "Concurrency",
+            "Comment": "Documentation",
+            "Copy": "DRY",
+            "Dead": "DeadCode",
+            "Magic": "Magic",
+            "Hardcoded": "Config",
+        }
+        for issue in result.l0_issues:
+            name = issue.get("name", "")
+            # Extract first word as category key
+            key = name.split()[0] if name else ""
+            domain = CATEGORY_MAP.get(key, "")
+            if domain and domain not in self.rotation_state.domains:
+                self.rotation_state.domains[domain] = DomainWeight(name=domain, weight=0.8)
+                logger.info(f"Auto-expanded domain: {domain} (from {name})")
+
     def _trigger_jules_review(self, result: PipelineResult) -> Optional[str]:
         """Jules API 経由で深掘りレビューを発動。"""
         try:
-            # Jules integration via ochema MCP
-            # This will be called from the n8n workflow
+            import asyncio
+            from mekhane.symploke.jules_client import JulesClient
+
+            # API key from environment
+            api_key = None
+            for i in range(1, 10):
+                key = os.environ.get(f"JULES_API_KEY_{i:02d}")
+                if key:
+                    api_key = key
+                    break
+
+            if not api_key:
+                logger.warning("L2: No JULES_API_KEY_XX found, skipping")
+                return None
+
+            repo = os.environ.get("JULES_REPO", "laihuip001/oikos")
             prompt = result.to_jules_prompt()
-            logger.info(f"L2 triggered: {len(result.l0_issues)} issues, prompt={len(prompt)} chars")
-            # Return None for now — actual Jules call is via bridge.py / MCP
+            logger.info(f"L2 triggered: {len(result.l0_issues)} issues → Jules ({repo})")
+
+            async def _create():
+                client = JulesClient(api_key)
+                source = f"sources/github/{repo}"
+                session = await client.create_session(prompt, source, "main")
+                return session.id
+
+            session_id = asyncio.run(_create())
+            logger.info(f"L2 session created: {session_id}")
+            return session_id
+
+        except ImportError:
+            logger.warning("L2: JulesClient not available")
             return None
         except Exception as e:
             logger.warning(f"Jules trigger failed: {e}")
@@ -452,6 +518,48 @@ class DailyReviewPipeline:
             )
         except Exception as e:
             logger.warning(f"Sympatheia notification failed: {e}")
+
+    def _persist_report(self, result: PipelineResult) -> Optional[Path]:
+        """daily_reviews/YYYY-MM-DD.json に結果を保存。"""
+        try:
+            report_dir = Path.home() / "oikos/mneme/.hegemonikon/daily_reviews"
+            report_dir.mkdir(parents=True, exist_ok=True)
+            today = datetime.now().strftime("%Y-%m-%d")
+            report_file = report_dir / f"{today}.json"
+
+            report = {
+                "timestamp": datetime.now().isoformat(),
+                "files_scanned": result.files_scanned,
+                "l0_issues": result.l0_issues,
+                "l1_results": result.l1_results,
+                "l2_triggered": result.l2_triggered,
+                "l2_session_id": result.l2_session_id,
+                "domains_reviewed": result.domains_reviewed,
+                "needs_l2": result.needs_l2,
+                "summary": self.summary(result),
+            }
+
+            # Append mode: same day runs get merged
+            if report_file.exists():
+                existing = json.loads(report_file.read_text("utf-8"))
+                if isinstance(existing, list):
+                    existing.append(report)
+                else:
+                    existing = [existing, report]
+                report_file.write_text(
+                    json.dumps(existing, ensure_ascii=False, indent=2), "utf-8"
+                )
+            else:
+                report_file.write_text(
+                    json.dumps(report, ensure_ascii=False, indent=2), "utf-8"
+                )
+
+            logger.info(f"Report saved: {report_file}")
+            return report_file
+        except Exception as e:
+            logger.warning(f"Report persist failed: {e}")
+            return None
+
 
     def summary(self, result: PipelineResult) -> str:
         """パイプライン結果のサマリーを生成。"""

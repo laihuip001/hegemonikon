@@ -1,78 +1,26 @@
 # PROOF: [L2/インフラ] <- mekhane/mcp/ A0→MCP経由のアクセスが必要→mneme_server が担う
 #!/usr/bin/env python3
 """
-Mneme MCP Server - Hegemonikón Symplokē Integration
+Mneme MCP Server v1.1 - Hegemonikón Symplokē Integration
 
-Model Context Protocol server for integrated knowledge search across
-Gnōsis, Chronos, Sophia, and Kairos indices.
-
-CRITICAL: This file follows MCP stdio protocol rules:
-- All debug/log output goes to STDERR
-- STDOUT is reserved for MCP protocol JSON-RPC
+Unified knowledge search: Gnōsis papers + Sophia KI + Kairos handoffs + Chronos chat
 """
 
 import sys
-import io
-
-# Prevent any accidental stdout pollution
-_original_stdout = sys.stdout
-_stderr_wrapper = sys.stderr
-
-
-# PURPOSE: Debug logging to stderr.
-def log(msg):
-    """Debug logging to stderr."""
-    print(f"[mneme] {msg}", file=sys.stderr)
-
-
-log("Starting Mneme MCP Server...")
-log(f"Python: {sys.executable}")
-log(f"Platform: {sys.platform}")
-
-# ============ Import path setup ============
 from pathlib import Path
+from mekhane.mcp.mcp_base import MCPBase, StdoutSuppressor
 
-# mekhane/mcp/ → mekhane/ → hegemonikon/ (project root)
-_mekhane_dir = Path(__file__).parent.parent
-_project_root = _mekhane_dir.parent
-for _p in [str(_project_root), str(_mekhane_dir)]:
-    if _p not in sys.path:
-        sys.path.insert(0, _p)
-log(f"Added to path: {_project_root} + {_mekhane_dir}")
+_base = MCPBase(
+    name="mneme",
+    version="1.1.0",
+    instructions="Mneme: Hegemonikón unified knowledge server (Gnōsis papers + Sophia KI + Kairos handoffs + Chronos chat)",
+)
+server = _base.server
+log = _base.log
+TextContent = _base.TextContent
+Tool = _base.Tool
 
-
-# ============ Suppress stdout during imports ============
-# PURPOSE: クラス: StdoutSuppressor
-class StdoutSuppressor:
-    # PURPOSE: StdoutSuppressor の構成と依存関係の初期化
-    def __init__(self):
-        self._null = io.StringIO()
-        self._old_stdout = None
-
-    # PURPOSE: enter__ — MCPサービスの内部処理
-    def __enter__(self):
-        self._old_stdout = sys.stdout
-        sys.stdout = self._null
-        return self
-
-    # PURPOSE: exit__ — MCPサービスの内部処理
-    def __exit__(self, *args):
-        sys.stdout = self._old_stdout
-
-
-# ============ Import MCP SDK ============
-try:
-    from mcp.server import Server
-    from mcp.server.stdio import stdio_server
-    from mcp.types import Tool, TextContent
-
-    log("MCP imports successful")
-except Exception as e:
-    log(f"MCP import error: {e}")
-    sys.exit(1)
-
-
-# ============ Import Symplokē components ============
+# Import Symplokē components
 try:
     with StdoutSuppressor():
         from mekhane.symploke.search.engine import SearchEngine
@@ -88,18 +36,8 @@ try:
     log("Symplokē imports successful (EmbeddingAdapter + LanceBridge mode)")
 except Exception as e:
     log(f"Symplokē import error: {e}")
-    # Continue without Symplokē - stub mode
     SearchEngine = None
     GnosisLanceBridge = None
-
-
-# ============ Initialize MCP server ============
-server = Server(
-    name="mneme",
-    version="1.0.0",
-    instructions="Mneme: Hegemonikón unified knowledge server (Gnōsis papers + Sophia KI + Kairos handoffs + Chronos chat)",
-)
-log("Server initialized")
 
 
 # ============ Initialize SearchEngine ============
@@ -274,6 +212,20 @@ async def list_tools() -> list[Tool]:
             description="Get knowledge graph statistics (nodes, edges, most linked items)",
             inputSchema={"type": "object", "properties": {}},
         ),
+        # === From dendron ===
+        Tool(
+            name="dendron_check",
+            description="Run Dendron PROOF verification on a file or directory. Checks existence proofs (PROOF headers, PURPOSE comments). Returns issues found.",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "path": {"type": "string", "description": "Absolute path to file or directory to check"},
+                    "check_functions": {"type": "boolean", "description": "Check function/class PURPOSE comments (L2)", "default": True},
+                    "recursive": {"type": "boolean", "description": "Recurse into subdirectories", "default": False},
+                },
+                "required": ["path"],
+            },
+        ),
     ]
 # PURPOSE: tool calls の安全な処理を保証する
 
@@ -299,6 +251,8 @@ async def call_tool(name: str, arguments: dict) -> list[TextContent]:
             return await _handle_backlinks(arguments)
         elif name == "graph_stats":
             return await _handle_graph_stats(arguments)
+        elif name == "dendron_check":
+            return await _handle_dendron_check(arguments)
         else:
             return [TextContent(type="text", text=f"Unknown tool: {name}")]
     except Exception as e:
@@ -516,33 +470,70 @@ async def _handle_graph_stats(arguments: dict) -> list[TextContent]:
         return [TextContent(type="text", text=f"Error: {str(e)}")]
 
 
-# PURPOSE: Run the MCP server.
+# ============ Dendron tools ============
 
+async def _handle_dendron_check(arguments: dict) -> list[TextContent]:
+    """Run Dendron PROOF verification on a file or directory."""
+    target = arguments.get("path", "")
+    if not target:
+        return [TextContent(type="text", text="Error: path is required")]
 
-# ============ Main ============
-# PURPOSE: [L2-auto] Run the MCP server.
-async def main():
-    """Run the MCP server."""
-    log("Starting stdio server...")
+    check_functions = arguments.get("check_functions", True)
+    recursive = arguments.get("recursive", False)
 
-    # Initialize engine
-    get_engine()
+    try:
+        with StdoutSuppressor():
+            from mekhane.dendron.checker import DendronChecker
 
-    async with stdio_server() as (read, write):
-        log("Stdio streams ready")
-        await server.run(read, write, server.create_initialization_options())
+        target_path = Path(target)
+        if not target_path.exists():
+            return [TextContent(type="text", text=f"Error: path not found: {target}")]
 
-    log("Server shutdown")
+        checker = DendronChecker(
+            check_functions=check_functions,
+            root=_base.project_root,
+        )
+
+        issues = []
+        if target_path.is_file():
+            result = checker.check_file_proof(target_path)
+            if result.status.value not in ("ok", "exempt"):
+                issues.append(f"- **{result.status.value}**: {target_path.name} — {result.reason or 'no reason'}")
+            if check_functions:
+                func_results = checker.check_functions_in_file(target_path)
+                for fr in func_results:
+                    if fr.status.value != "ok":
+                        issues.append(f"- **{fr.status.value}**: `{fr.name}` in {target_path.name} — {fr.reason or ''}")
+        elif target_path.is_dir():
+            # Check directory PROOF.md
+            dir_result = checker.check_dir_proof(target_path)
+            if dir_result.status.value not in ("ok", "exempt"):
+                issues.append(f"- **{dir_result.status.value}**: {target_path.name}/ — {dir_result.reason or ''}")
+
+            # Check files in directory
+            pattern = "**/*.py" if recursive else "*.py"
+            for py_file in sorted(target_path.glob(pattern)):
+                if py_file.name.startswith("__"):
+                    continue
+                result = checker.check_file_proof(py_file)
+                if result.status.value not in ("ok", "exempt"):
+                    rel = py_file.relative_to(target_path)
+                    issues.append(f"- **{result.status.value}**: {rel} — {result.reason or ''}")
+
+        if not issues:
+            return [TextContent(type="text", text=f"✅ Dendron: all checks passed for `{target_path.name}`")]
+
+        lines = [f"# 🌿 Dendron Check: {target_path.name}\n"]
+        lines.append(f"**Issues found**: {len(issues)}\n")
+        lines.extend(issues)
+        return [TextContent(type="text", text="\n".join(lines))]
+
+    except Exception as e:
+        log(f"Dendron check error: {e}")
+        return [TextContent(type="text", text=f"Error: {str(e)}")]
 
 
 if __name__ == "__main__":
-    import asyncio
-
-    log("Running main...")
-    try:
-        asyncio.run(main())
-    except KeyboardInterrupt:
-        log("Server stopped by user")
-    except Exception as e:
-        log(f"Fatal error: {e}")
-        sys.exit(1)
+    # Initialize engine before server starts
+    get_engine()
+    _base.run()

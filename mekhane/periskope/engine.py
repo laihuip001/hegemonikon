@@ -149,9 +149,13 @@ class PeriskopeEngine:
         self.sophia = SophiaSearcher()
         self.kairos = KairosSearcher()
 
-        # Synthesizer
+        # Synthesizer — depth-level model routing from config
+        gemini_model = self._config.get("synthesis", {}).get(
+            "gemini_model", "gemini-3-pro-preview",
+        )
         self.synthesizer = MultiModelSynthesizer(
-            synth_models=synth_models or [SynthModel.GEMINI_FLASH],
+            synth_models=synth_models,  # None = use depth routing
+            gemini_model=gemini_model,
         )
 
         # Citation Agent
@@ -187,6 +191,7 @@ class PeriskopeEngine:
         digest_depth: str = "quick",
         expand_query: bool = True,
         multipass: bool = False,
+        depth: int = 2,
     ) -> ResearchReport:
         """Execute the full research pipeline.
 
@@ -198,6 +203,8 @@ class PeriskopeEngine:
             digest_depth: Digest template depth — "quick" (/eat-), "standard" (/eat), "deep" (/eat+).
             expand_query: If True, expand query via bilingual translation (W3).
             multipass: If True, perform 2-pass search for deeper coverage (W6).
+            depth: HGK depth level (1=L1 Quick, 2=L2 Standard, 3=L3 Deep).
+                Controls model selection for synthesis.
 
         Returns:
             ResearchReport with all phases completed.
@@ -246,8 +253,15 @@ class PeriskopeEngine:
                 source_counts=source_counts,
             )
 
-        # Phase 2: Multi-model synthesis
-        logger.info("Phase 2: Multi-model synthesis (%d results)", len(search_results))
+        # Phase 2: Multi-model synthesis (depth-level routing)
+        from mekhane.periskope.synthesizer import models_for_depth
+        if not self.synthesizer.synth_models:
+            self.synthesizer.synth_models = models_for_depth(depth)
+        logger.info(
+            "Phase 2: Multi-model synthesis (%d results, depth=L%d, models=%s)",
+            len(search_results), depth,
+            [m.value for m in self.synthesizer.synth_models],
+        )
         synthesis = await self.synthesizer.synthesize(query, search_results)
         divergence = self.synthesizer.detect_divergence(synthesis)
 

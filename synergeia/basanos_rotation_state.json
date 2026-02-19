@@ -1,22 +1,22 @@
 {
   "domains": {
     "Maintainability": {
-      "weight": 1.9000000000000001,
-      "last_issues": 1,
-      "total_issues": 9,
-      "last_reviewed": "2026-02-18"
+      "weight": 2.5,
+      "last_issues": 6,
+      "total_issues": 15,
+      "last_reviewed": "2026-02-19"
     },
     "DataFlow": {
-      "weight": 1.9000000000000001,
-      "last_issues": 1,
-      "total_issues": 9,
-      "last_reviewed": "2026-02-18"
+      "weight": 2.5,
+      "last_issues": 6,
+      "total_issues": 15,
+      "last_reviewed": "2026-02-19"
     },
     "Scalability": {
-      "weight": 1.9000000000000001,
-      "last_issues": 1,
-      "total_issues": 9,
-      "last_reviewed": "2026-02-18"
+      "weight": 2.5,
+      "last_issues": 6,
+      "total_issues": 15,
+      "last_reviewed": "2026-02-19"
     },
     "Documentation": {
       "weight": 1.0,
@@ -121,8 +121,8 @@
       "last_reviewed": null
     }
   },
-  "cycle": 55,
-  "last_date": "2026-02-18",
+  "cycle": 56,
+  "last_date": "2026-02-19",
   "last_domains": [
     "Maintainability",
     "DataFlow",

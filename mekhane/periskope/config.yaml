@@ -20,6 +20,19 @@ exa:
     tweet: 0.05
     pdf: 0.05
     personal_site: 0.05
+  min_hit_rate: 0.1  # T3: categories below this hit rate auto-disabled
+
+# Synthesis — depth-level model routing
+synthesis:
+  gemini_model: "gemini-3-pro-preview"  # HIGH tier, always used
+  claude_models:
+    standard: "claude-sonnet-4-5"   # L2 Standard
+    deep: "claude-opus-4-6"         # L3 Deep research
+  depth_routing:
+    # L1: Gemini Pro only (single model, fast)
+    # L2: Gemini Pro + Claude Sonnet (dual model)
+    # L3: Gemini Pro + Claude Opus (dual model, deep)
+  fallback_to_single: true  # If Claude fails, continue with Gemini only
 
 # Default behavior
 defaults:
@@ -27,6 +40,7 @@ defaults:
   expand_query: true      # W3: bilingual expansion
   multipass: false         # W6: 2-pass refinement
   verify_citations: true
+  depth: 2                 # Default depth level (L2 Standard)
 
 # SearXNG instance
 searxng_url: "http://localhost:8888"

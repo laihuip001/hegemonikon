@@ -72,13 +72,46 @@ ALLOWED_REDIRECT_DOMAINS: set[str] = {
     "chatgpt.com",
 }
 
-# Allowed hosts for DNS rebinding protection
-_default_hosts = (
-    "localhost,localhost:8765,"
-    "127.0.0.1,127.0.0.1:8765,"
-    "hegemonikon.tail3b6058.ts.net"
+# Tailscale hostname auto-detection
+def _detect_tailscale_hostname() -> str | None:
+    """Tailscale の DNS 名を自動検出。失敗時は None。"""
+    import subprocess
+    try:
+        result = subprocess.run(
+            ["tailscale", "status", "--self", "--json"],
+            capture_output=True, text=True, timeout=5,
+        )
+        if result.returncode == 0:
+            import json as _json
+            data = _json.loads(result.stdout)
+            dns_name = data.get("Self", {}).get("DNSName", "").rstrip(".")
+            if dns_name:
+                return dns_name
+    except Exception:
+        pass
+    return None
+
+# Gateway URL: env → Tailscale auto-detect → fallback
+_ts_hostname = _detect_tailscale_hostname()
+_GATEWAY_URL = os.getenv(
+    "HGK_GATEWAY_URL",
+    f"https://{_ts_hostname}" if _ts_hostname else f"http://localhost:{GATEWAY_PORT}",
 )
-ALLOWED_HOSTS = os.getenv("HGK_GATEWAY_ALLOWED_HOSTS", _default_hosts).split(",")
+if _ts_hostname:
+    print(f"🌐 Tailscale detected: {_ts_hostname}", file=sys.stderr)
+else:
+    print(f"⚠️ Tailscale not detected, using: {_GATEWAY_URL}", file=sys.stderr)
+
+# Allowed hosts for DNS rebinding protection (auto-derived from URL)
+from urllib.parse import urlparse as _urlparse
+_parsed_url = _urlparse(_GATEWAY_URL)
+_url_host = _parsed_url.hostname or "localhost"
+_static_hosts = ["localhost", f"localhost:{GATEWAY_PORT}", "127.0.0.1", f"127.0.0.1:{GATEWAY_PORT}"]
+_dynamic_hosts = [_url_host] if _url_host not in _static_hosts else []
+ALLOWED_HOSTS = os.getenv(
+    "HGK_GATEWAY_ALLOWED_HOSTS",
+    ",".join(_static_hosts + _dynamic_hosts),
+).split(",")
 
 
 
@@ -435,7 +468,7 @@ class HGKOAuthProvider(OAuthAuthorizationServerProvider[AuthorizationCode, Refre
 
 from mcp.server.auth.settings import AuthSettings, ClientRegistrationOptions
 
-_GATEWAY_URL = "https://hegemonikon.tail3b6058.ts.net"
+# _GATEWAY_URL is already defined above (auto-detected)
 
 _oauth_provider = HGKOAuthProvider(GATEWAY_TOKEN) if GATEWAY_TOKEN else None
 _auth_settings = AuthSettings(

@@ -1,93 +1,41 @@
 #!/usr/bin/env python3
 # PROOF: [L2/Sympatheia] <- mekhane/mcp/
-# PURPOSE: Sympatheia MCP Server — 自律神経系への直接アクセス
 """
-Sympatheia MCP Server
+Sympatheia MCP Server v1.1 — Hegemonikón Autonomic Nervous System
 
-Claude が直接 Sympatheia 自律神経系を呼び出すための MCP サーバー。
-mekhane/api/routes/sympatheia.py のロジックを MCP ツールとして公開。
-
-Tools:
-  - sympatheia_wbc: 脅威分析（白血球）
-  - sympatheia_attractor: 定理推薦（反射弓）
-  - sympatheia_digest: 記憶圧縮（週次集約）
-  - sympatheia_feedback: 恒常性制御（閾値調整）
-  - sympatheia_notifications: 通知 CRUD
-  - sympatheia_status: 全 state ファイルのサマリ
-
-Resources:
-  - sympatheia://heartbeat — heartbeat.json
-  - sympatheia://wbc — wbc_state.json
-  - sympatheia://config — sympatheia_config.json
-  - sympatheia://notifications — notifications.jsonl (最新 20 件)
-  - sympatheia://digest — weekly_digest.json
-
-CRITICAL: stdout は JSON-RPC 専用。ログは stderr に出力。
+Tools: wbc, attractor, digest, feedback, notifications, status
+Resources: heartbeat, wbc, config, notifications, digest, attractor
 """
 
 import sys
 import os
-import io
-
-if sys.platform == "win32":
-    import asyncio
-    asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
-
-_original_stdout = sys.stdout
-
-
-# PURPOSE: sympatheia_mcp_server の log 処理を実行する
-def log(msg):
-    print(f"[sympatheia-mcp] {msg}", file=sys.stderr, flush=True)
-
-
-log("Starting Sympatheia MCP Server...")
-
-# ============ Import path setup ============
 from pathlib import Path
+from mekhane.mcp.mcp_base import MCPBase, StdoutSuppressor
 
-_PROJECT_ROOT = Path(__file__).resolve().parents[2]  # hegemonikon/
-sys.path.insert(0, str(_PROJECT_ROOT))
-log(f"Project root: {_PROJECT_ROOT}")
+_base = MCPBase(
+    name="sympatheia",
+    version="1.1.0",
+    instructions=(
+        "Sympatheia 自律神経系。脅威分析(WBC)、定理推薦(Attractor)、"
+        "記憶圧縮(Digest)、恒常性(Feedback)、ルーティング(Route)を提供。"
+    ),
+)
+server = _base.server
+log = _base.log
+TextContent = _base.TextContent
+Tool = _base.Tool
 
-
-# PURPOSE: の統一的インターフェースを実現する
-class StdoutSuppressor:
-    def __init__(self):
-        self._null = io.StringIO()
-        self._old = None
-
-    # PURPOSE: [L2-auto] 内部処理: enter__
-    def __enter__(self):
-        self._old = sys.stdout
-        sys.stdout = self._null
-        return self
-
-    # PURPOSE: [L2-auto] 内部処理: exit__
-    def __exit__(self, *args):
-        sys.stdout = self._old
-
-
-# ============ MCP SDK ============
-try:
-    from mcp.server import Server
-    from mcp.server.stdio import stdio_server
-    from mcp.types import Tool, TextContent, Resource
-    log("MCP imports OK")
-except Exception as e:
-    log(f"MCP import error: {e}")
-    sys.exit(1)
+# Also need Resource for this server
+from mcp.types import Resource
 
 import json as _json
 
-
-# ============ Sympatheia imports (lazy) ============
+# Lazy Sympatheia import
 _sympatheia = None
-# PURPOSE: [L2-auto] sympatheia.py のヘルパー関数群を安全にインポート。
 
 
 def _get_sympatheia():
-    """sympatheia.py のヘルパー関数群を安全にインポート。"""
+    """‪sympatheia.py のヘルパー関数群を安全にインポート。"""
     global _sympatheia
     if _sympatheia is None:
         try:
@@ -98,18 +46,6 @@ def _get_sympatheia():
         except Exception as e:
             log(f"Sympatheia import error: {e}")
     return _sympatheia
-
-
-# ============ MCP Server ============
-server = Server(
-    name="sympatheia",
-    version="1.0.0",
-    instructions=(
-        "Sympatheia 自律神経系。脅威分析(WBC)、定理推薦(Attractor)、"
-        "記憶圧縮(Digest)、恒常性(Feedback)、ルーティング(Route)を提供。"
-    ),
-)
-log("Server initialized")
 
 
 # ============ Resources ============
@@ -244,6 +180,30 @@ async def list_tools():
                 "Sympatheia 全体ステータス: 全 state ファイルのサマリを一発で確認。"
                 "Heartbeat beats, WBC alert count, Git dirty status, Config thresholds, 未読通知数を返す。"
                 "セッション開始時 (/boot Phase 4.9) に呼ぶことを推奨。"
+            ),
+            inputSchema={"type": "object", "properties": {}},
+        ),
+        # === Basanos/Peira integration ===
+        Tool(
+            name="sympatheia_basanos_scan",
+            description=(
+                "Basanos L0 スキャン: AST ベース静的解析で Python ファイルの品質問題を検出する。"
+                "DailyReviewPipeline の L0 フェーズを手動実行。"
+            ),
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "path": {"type": "string", "description": "スキャン対象パス (ファイルまたはディレクトリ)"},
+                    "max_issues": {"type": "integer", "description": "最大 issue 数", "default": 20},
+                },
+                "required": ["path"],
+            },
+        ),
+        Tool(
+            name="sympatheia_peira_health",
+            description=(
+                "Peira ヘルスチェック: 全サービスの死活と品質を一覧表示。"
+                "Systemd, Docker, Handoff, Dendron, 定理活性度, Digest 鮮度を検証。"
             ),
             inputSchema={"type": "object", "properties": {}},
         ),
@@ -445,6 +405,12 @@ async def call_tool(name: str, arguments: dict):
 
             return [TextContent(type="text", text="\n".join(lines))]
 
+        elif name == "sympatheia_basanos_scan":
+            return await _handle_basanos_scan(arguments)
+
+        elif name == "sympatheia_peira_health":
+            return await _handle_peira_health()
+
         else:
             return [TextContent(type="text", text=f"Unknown tool: {name}")]
 
@@ -455,31 +421,69 @@ async def call_tool(name: str, arguments: dict):
         return [TextContent(type="text", text=f"Error: {e}")]
 
 
-# PURPOSE: sympatheia_mcp_server の main 処理を実行する
-async def main():
-    """MCP サーバー起動。"""
-    log("Starting stdio server...")
+
+
+# ============ Basanos/Peira handlers ============
+
+async def _handle_basanos_scan(arguments: dict) -> list[TextContent]:
+    """Basanos L0 scan via AIAuditor."""
+    target = arguments.get("path", "")
+    max_issues = arguments.get("max_issues", 20)
+    if not target:
+        return [TextContent(type="text", text="Error: path is required")]
+
     try:
-        async with stdio_server() as streams:
-            log("stdio connected")
-            await server.run(
-                streams[0],
-                streams[1],
-                server.create_initialization_options(),
-            )
+        with StdoutSuppressor():
+            from mekhane.basanos.ai_auditor import AIAuditor
+
+        target_path = Path(target)
+        if not target_path.exists():
+            return [TextContent(type="text", text=f"Error: path not found: {target}")]
+
+        auditor = AIAuditor(strict=False)
+        all_issues = []
+
+        if target_path.is_file():
+            result = auditor.audit_file(target_path)
+            all_issues.extend(result.issues)
+        else:
+            # Scan all .py files in directory
+            for py_file in sorted(target_path.glob("**/*.py")):
+                if py_file.name.startswith("__"):
+                    continue
+                try:
+                    result = auditor.audit_file(py_file)
+                    all_issues.extend(result.issues)
+                except Exception:
+                    pass  # Skip unparseable files
+
+        if not all_issues:
+            return [TextContent(type="text", text=f"✅ Basanos: no issues in `{target_path.name}`")]
+
+        lines = [f"# 🔍 Basanos Scan: {target_path.name}\n"]
+        lines.append(f"**Issues**: {len(all_issues)} (showing max {max_issues})\n")
+        for issue in all_issues[:max_issues]:
+            lines.append(f"- **{issue.severity.value}** [{issue.code}] L{issue.line}: {issue.message}")
+
+        return [TextContent(type="text", text="\n".join(lines))]
     except Exception as e:
-        log(f"Server error: {e}")
-        raise
+        log(f"Basanos scan error: {e}")
+        return [TextContent(type="text", text=f"Error: {str(e)}")]
+
+
+async def _handle_peira_health() -> list[TextContent]:
+    """Peira health check."""
+    try:
+        with StdoutSuppressor():
+            from mekhane.peira.hgk_health import run_health_check, format_terminal
+
+        report = run_health_check()
+        text = format_terminal(report)
+        return [TextContent(type="text", text=text)]
+    except Exception as e:
+        log(f"Peira health error: {e}")
+        return [TextContent(type="text", text=f"Error: {str(e)}")]
 
 
 if __name__ == "__main__":
-    import asyncio
-
-    log("Running main...")
-    try:
-        asyncio.run(main())
-    except KeyboardInterrupt:
-        log("Stopped by user")
-    except Exception as e:
-        log(f"Fatal error: {e}")
-        sys.exit(1)
+    _base.run()

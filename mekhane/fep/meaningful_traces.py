@@ -26,7 +26,8 @@ from typing import Optional, List
 import json
 
 # Default persistence path
-TRACES_PATH = Path("/home/makaron8426/oikos/mneme/.hegemonikon/meaningful_traces.json")
+# Use Path.home() to work across environments (CI, local, etc.)
+TRACES_PATH = Path.home() / "oikos" / "mneme" / ".hegemonikon" / "meaningful_traces.json"
 
 
 # PURPOSE: の統一的インターフェースを実現する
@@ -125,7 +126,13 @@ def save_traces(path: Optional[Path] = None) -> Path:
         Path where traces were saved
     """
     target_path = path or TRACES_PATH
-    ensure_traces_dir()
+
+    # If using the default path, ensure directory exists
+    # If path is provided (e.g. in tests), caller is responsible or we check parent
+    if path is None:
+        ensure_traces_dir()
+    elif not path.parent.exists():
+        path.parent.mkdir(parents=True, exist_ok=True)
 
     # Load existing traces
     existing = load_traces(target_path)
@@ -158,10 +165,13 @@ def load_traces(path: Optional[Path] = None) -> List[MeaningfulTrace]:
     if not target_path.exists():
         return []
 
-    with open(target_path, "r", encoding="utf-8") as f:
-        data = json.load(f)
+    try:
+        with open(target_path, "r", encoding="utf-8") as f:
+            data = json.load(f)
+        return [MeaningfulTrace.from_dict(t) for t in data]
+    except (json.JSONDecodeError, FileNotFoundError):
+        return []
 
-    return [MeaningfulTrace.from_dict(t) for t in data]
 # PURPOSE: Get the most recent meaningful traces.
 
 

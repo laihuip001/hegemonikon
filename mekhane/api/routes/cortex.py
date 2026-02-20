@@ -1,3 +1,4 @@
+# PROOF: [L2/Infrastructure] <- mekhane/api/ S2->API
 from typing import Any, AsyncGenerator
 
 import asyncio

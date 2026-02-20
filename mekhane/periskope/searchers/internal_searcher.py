@@ -1,3 +1,4 @@
+# PROOF: [S2/Mekhanē] <- mekhane/periskope/ A0→Research Engine
 """
 Internal knowledge searcher for Periskopē.
 

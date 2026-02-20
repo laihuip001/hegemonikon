@@ -1,110 +1,82 @@
-#!/usr/bin/env python3
-# PROOF: [L2/インフラ] <- mekhane/dendron/
+# PROOF: [L2/インフラ] <- mekhane/dendron/ A0→Quality
 """
-Doc Staleness Checker — ドキュメント腐敗自動検知
+S2 Doc Staleness Checker (v1.0)
 
-YAML frontmatter の depends_on 宣言に基づき、
-上流ドキュメントの version > 下流の min_version であれば STALE 判定。
-updated 日付差が閾値以上なら WARNING。
+Purpose:
+  - 依存グラフ (upstream → downstream) を構築
+  - 上流の更新日時 > 下流の更新日時 を検出 (STALE)
+  - 循環依存を検出 (CIRCULAR)
+  - 人間可読レポート & Mermaid グラフ生成
 
 Usage:
-    python -m mekhane.dendron.doc_staleness --check
-    python -m mekhane.dendron.doc_staleness --check --root /path/to/project
+  python -m mekhane.dendron.doc_staleness check .
+  python -m mekhane.dendron.doc_staleness mermaid . > graph.mmd
 """
 
-from __future__ import annotations
-
-import argparse
+import os
 import sys
-from dataclasses import dataclass, field
-from datetime import datetime
-from enum import Enum
-from pathlib import Path
-from typing import Dict, List, Optional
-
 import yaml
-from packaging.version import Version, InvalidVersion
+import re
+from datetime import datetime
+from pathlib import Path
+from typing import Dict, List, Optional, Set, Tuple
+from dataclasses import dataclass, field
+from enum import Enum
 
 
-# ── Data Models ──────────────────────────────────────
-
-
-# PURPOSE: 判定ステータスを列挙し、文字列リテラルの代わりに型安全な比較を可能にする
+# PURPOSE: ドキュメントの鮮度状態を定義する列挙型
 class StalenessStatus(Enum):
-    """依存辺の検査ステータス."""
+    """ドキュメントの鮮度状態."""
     OK = "OK"
     STALE = "STALE"
     WARNING = "WARNING"
     CIRCULAR = "CIRCULAR"
 
 
-# PURPOSE: ドキュメント間の依存関係1件を表現し、STALE 判定の入力にする
-@dataclass
-class DocDependency:
-    """依存先 doc_id と期待する最低バージョン."""
-    doc_id: str
-    min_version: str
-
-
-# PURPOSE: 1つのドキュメントの frontmatter 情報を構造化し、依存グラフの頂点にする
+# PURPOSE: ドキュメントのメタ情報 (ID, パス, 更新日時, 上流依存) を統合管理する
 @dataclass
 class DocInfo:
-    """ドキュメントの frontmatter メタデータ."""
+    """ドキュメント情報."""
     doc_id: str
-    version: str
     path: Path
-    updated: Optional[str] = None
-    depends_on: List[DocDependency] = field(default_factory=list)
+    mtime: float
+    upstreams: List[str] = field(default_factory=list)
+    title: str = ""
 
 
-# PURPOSE: STALE/OK/WARNING/CIRCULAR の判定結果を個別に返し、レポート生成に渡す
+# PURPOSE: 鮮度チェックの結果 (状態, 詳細) を統合管理する
 @dataclass
 class StalenessResult:
-    """1つの依存辺の検査結果."""
+    """鮮度チェック結果."""
     doc_id: str
-    upstream_id: str
     status: StalenessStatus
-    detail: str
+    upstream_id: Optional[str] = None
+    detail: str = ""
 
 
-# ── Version Compare ──────────────────────────────────
-
-
-# PURPOSE: packaging.version を使った安全なバージョン比較。pre-release にも対応する
-def _parse_version(v: str) -> Version:
-    """Parse version string via packaging.version.Version.
-
-    Invalid version strings are normalized to Version("0.0.0").
-    """
-    try:
-        return Version(v)
-    except InvalidVersion:
-        return Version("0.0.0")
-
-
-# ── Checker ──────────────────────────────────────────
-
-
-# PURPOSE: ドキュメント依存グラフを構築・検査し、腐敗を自動検知する (FEP 的環境制約)
+# PURPOSE: ドキュメント依存グラフを構築し、更新日時と構造的健全性を検証するチェッカー
 class DocStalenessChecker:
-    """ドキュメント腐敗 (staleness) 検知器.
+    """依存グラフに基づきドキュメントの鮮度を検証する."""
 
-    1. scan(root) — .md ファイルの frontmatter をパース
-    2. check()   — 依存グラフから STALE/WARNING を判定
-    3. doc_health_pct() — 健全率を計算
-    """
+    # 無視するディレクトリ
+    EXCLUDE_DIRS = {".git", ".venv", "node_modules", "__pycache__"}
 
-    STALE_DAYS_THRESHOLD = 30
-    EXCLUDE_DIRS = frozenset({
-        "knowledge_items", ".venv", "__pycache__", ".git",
-        "node_modules", ".pytest_cache",
-    })
+    # 上流参照パターンの定義 (拡張可能)
+    # 例: "upstream: [doc_id]"
+    UPSTREAM_PATTERN = re.compile(r"upstream:\s*\[(.*?)\]")
+
+    # 例: "A0 -> B0" (PROOFヘッダ等)
+    PROOF_PATTERN = re.compile(r"([A-Z][0-9])\s*->\s*([A-Z][0-9])")
+
+    # Frontmatter の doc_id
+    ID_PATTERN = re.compile(r"^id:\s*(.+)$", re.MULTILINE)
 
     def __init__(self) -> None:
         self._docs: Dict[str, DocInfo] = {}
         self._results: List[StalenessResult] = []
         self._warnings: List[str] = []
 
+    # PURPOSE: scan 時の警告 (doc_id 重複等).
     @property
     def warnings(self) -> List[str]:
         """scan 時の警告 (doc_id 重複等)."""
@@ -131,154 +103,128 @@ class DocStalenessChecker:
                 self._docs[doc_info.doc_id] = doc_info
         return list(self._docs.values())
 
-    # PURPOSE: YAML frontmatter から doc_id/version/depends_on を抽出し DocInfo を生成する
     def _parse_frontmatter(self, path: Path) -> Optional[DocInfo]:
-        """YAML frontmatter をパースして DocInfo を返す. frontmatter なしは None."""
+        """ファイルの先頭 YAML ブロック (または独自記法) を解析."""
         try:
             content = path.read_text(encoding="utf-8")
-        except (OSError, UnicodeDecodeError):
+        except Exception:
             return None
 
-        if not content.startswith("---"):
-            return None
-
-        parts = content.split("---", 2)
-        if len(parts) < 3:
+        # YAML frontmatter (--- ... ---)
+        fm_match = re.match(r"^---\s*\n(.*?)\n---", content, re.DOTALL)
+        if not fm_match:
+            # PROOF header fallback (簡易)
+            # # PROOF: [L1/Theory] <- kernel/ A0->B0
+            # A0->B0 のような関係があれば A0 を upstream とみなす... は複雑なので
+            # ここでは明示的な frontmatter のみを対象とする (S2仕様)
             return None
 
         try:
-            meta = yaml.safe_load(parts[1])
+            data = yaml.safe_load(fm_match.group(1))
         except yaml.YAMLError:
             return None
 
-        if not isinstance(meta, dict):
+        doc_id = data.get("id")
+        if not doc_id:
             return None
 
-        doc_id = meta.get("doc_id")
-        version = meta.get("version")
-        if not doc_id or not version:
-            return None
-
-        depends_on: list[DocDependency] = []
-        raw_deps = meta.get("depends_on", [])
-        if isinstance(raw_deps, list):
-            for dep in raw_deps:
-                if isinstance(dep, dict) and "doc_id" in dep:
-                    depends_on.append(DocDependency(
-                        doc_id=dep["doc_id"],
-                        min_version=str(dep.get("min_version", "0.0.0")),
-                    ))
+        # upstreams: 文字列 or リスト
+        ups = data.get("upstream", [])
+        if isinstance(ups, str):
+            # "A0, B0" -> ["A0", "B0"]
+            ups = [u.strip() for u in ups.split(",")]
 
         return DocInfo(
             doc_id=str(doc_id),
-            version=str(version),
             path=path,
-            updated=str(meta.get("updated", "")),
-            depends_on=depends_on,
+            mtime=path.stat().st_mtime,
+            upstreams=[str(u) for u in ups if u],
+            title=data.get("title", "")
         )
 
-    # PURPOSE: 依存グラフを走査し、全辺の STALE/WARNING/CIRCULAR を判定する
+    # PURPOSE: 構築された依存グラフをトラバースし、Stale (更新遅れ) や循環依存を検出する
     def check(self) -> List[StalenessResult]:
-        """依存グラフを検査して StalenessResult 一覧を返す."""
+        """依存グラフの健全性をチェック."""
         self._results.clear()
 
-        # 循環検出用
-        edges: dict[str, set[str]] = {}
+        # 1. 依存先解決チェック
         for doc in self._docs.values():
-            edges[doc.doc_id] = {d.doc_id for d in doc.depends_on}
-
-        circular_pairs = self._detect_circular(edges)
-
-        for doc in self._docs.values():
-            for dep in doc.depends_on:
-                # 循環チェック
-                if (doc.doc_id, dep.doc_id) in circular_pairs:
+            for up_id in doc.upstreams:
+                if up_id not in self._docs:
                     self._results.append(StalenessResult(
                         doc_id=doc.doc_id,
-                        upstream_id=dep.doc_id,
-                        status=StalenessStatus.CIRCULAR,
-                        detail=f"循環依存: {doc.doc_id} ↔ {dep.doc_id}",
+                        status=StalenessStatus.WARNING,
+                        upstream_id=up_id,
+                        detail=f"依存先 ID '{up_id}' が見つかりません"
                     ))
                     continue
 
-                upstream = self._docs.get(dep.doc_id)
-                if not upstream:
+                upstream = self._docs[up_id]
+
+                # 2. Staleness チェック
+                # upstream が downstream より新しい場合 = STALE
+                # (1秒程度の誤差は許容してもよいが、ここでは厳密比較)
+                if upstream.mtime > doc.mtime:
+                    diff_sec = upstream.mtime - doc.mtime
                     self._results.append(StalenessResult(
                         doc_id=doc.doc_id,
-                        upstream_id=dep.doc_id,
                         status=StalenessStatus.STALE,
-                        detail=f"上流 {dep.doc_id} が見つからない",
+                        upstream_id=up_id,
+                        detail=f"上流が {diff_sec:.0f}秒 新しい ({upstream.path.name})"
                     ))
-                    continue
-
-                # Version 比較 (packaging.version)
-                upstream_ver = _parse_version(upstream.version)
-                min_ver = _parse_version(dep.min_version)
-
-                if upstream_ver > min_ver:
+                else:
+                    # OK (明示的に記録する場合)
                     self._results.append(StalenessResult(
                         doc_id=doc.doc_id,
-                        upstream_id=dep.doc_id,
-                        status=StalenessStatus.STALE,
-                        detail=(
-                            f"上流 {dep.doc_id} v{upstream.version} > "
-                            f"下流 min_version {dep.min_version}"
-                        ),
+                        status=StalenessStatus.OK,
+                        upstream_id=up_id
                     ))
-                    continue
 
-                # 日付差チェック
-                up_str = upstream.updated or ""
-                dn_str = doc.updated or ""
-                if up_str and dn_str:
-                    try:
-                        up_date = datetime.strptime(up_str, "%Y-%m-%d")
-                        dn_date = datetime.strptime(dn_str, "%Y-%m-%d")
-                        diff = abs((up_date - dn_date).days)
-                        if diff > self.STALE_DAYS_THRESHOLD:
-                            self._results.append(StalenessResult(
-                                doc_id=doc.doc_id,
-                                upstream_id=dep.doc_id,
-                                status=StalenessStatus.WARNING,
-                                detail=f"日付差 {diff}日 (>{self.STALE_DAYS_THRESHOLD}日)",
-                            ))
-                            continue
-                    except ValueError:
-                        pass  # 日付パース失敗は無視
+        # 3. 循環参照チェック (DFS)
+        visited: Set[str] = set()
+        recursion_stack: Set[str] = set()
 
-                self._results.append(StalenessResult(
-                    doc_id=doc.doc_id,
-                    upstream_id=dep.doc_id,
-                    status=StalenessStatus.OK,
-                    detail="最新",
-                ))
+        # PURPOSE: DFS 再帰関数 (内部関数)
+        def dfs(curr_id: str):
+            visited.add(curr_id)
+            recursion_stack.add(curr_id)
+
+            curr_doc = self._docs.get(curr_id)
+            if curr_doc:
+                for up_id in curr_doc.upstreams:
+                    if up_id not in self._docs:
+                        continue
+                    if up_id in recursion_stack:
+                        self._results.append(StalenessResult(
+                            doc_id=curr_id,
+                            status=StalenessStatus.CIRCULAR,
+                            upstream_id=up_id,
+                            detail=f"循環依存検出: {curr_id} -> ... -> {up_id}"
+                        ))
+                    elif up_id not in visited:
+                        dfs(up_id)
+
+            recursion_stack.remove(curr_id)
+
+        for doc_id in self._docs:
+            if doc_id not in visited:
+                dfs(doc_id)
 
         return self._results
 
-    # PURPOSE: 有向グラフの循環辺を検出し、CIRCULAR ステータスの判定材料にする
-    @staticmethod
-    def _detect_circular(edges: dict[str, set[str]]) -> set[tuple[str, str]]:
-        """循環する辺ペアの集合を返す."""
-        circular: set[tuple[str, str]] = set()
-        for src, dsts in edges.items():
-            for dst in dsts:
-                if dst in edges and src in edges.get(dst, set()):
-                    circular.add((src, dst))
-                    circular.add((dst, src))
-        return circular
-
-    # PURPOSE: STALE でない依存辺の割合を計算し、EPT スコア統合の入力にする
+    # PURPOSE: ドキュメント全体の健全性スコア (OK率) を計算する
     def doc_health_pct(self) -> float:
-        """Doc Health %: STALE でない割合."""
+        """健全性スコア (OK率)."""
         if not self._results:
             return 100.0
-        ok_count = sum(
-            1 for r in self._results
-            if r.status in (StalenessStatus.OK, StalenessStatus.WARNING)
-        )
-        return (ok_count / len(self._results)) * 100.0
 
-    # PURPOSE: CLI 実行時に人間が読めるレポートを標準出力に表示する
+        # OK 以外のレコード数をカウント (同じドキュメントの複数エラー含む)
+        negatives = sum(1 for r in self._results if r.status != StalenessStatus.OK)
+        total_checks = len(self._results)
+
+        return 100.0 * (1.0 - (negatives / total_checks))
+
+    # PURPOSE: チェック結果をレポートとして整形し、CIや人間が読める形式で出力する
     def format_report(self) -> str:
         """人間可読なレポートをフォーマット."""
         if not self._results:
@@ -312,108 +258,40 @@ class DocStalenessChecker:
         return "\n".join(lines)
 
     # PURPOSE: 依存関係を Mermaid グラフ形式で出力する (F6)
-    def generate_mermaid(self) -> str:
-        """Mermaid 形式の依存グラフを生成."""
-        if not self._docs:
-            return "graph TD\n    Target[チェック対象なし]"
-
+    def to_mermaid(self) -> str:
+        """Mermaid 形式のグラフ定義を出力."""
         lines = ["graph TD"]
-        # ノード定義とエッジ
-        # バージョン情報を含める: DocID<br/>(v1.0.0)
+
+        # ノード定義 (Stale 状態等で色分けしたい場合はクラス定義を追加)
         for doc in self._docs.values():
-            safe_id = doc.doc_id.replace("-", "_")  # Mermaid ID safety
-            lines.append(f'    {safe_id}["{doc.doc_id}<br/>(v{doc.version})"]')
-            for dep in doc.depends_on:
-                dep_safe_id = dep.doc_id.replace("-", "_")
-                # リンクにもラベル (min_version) をつけると情報過多かも？ 一旦なしで。
-                lines.append(f"    {safe_id} --> {dep_safe_id}")
+            safe_id = doc.doc_id.replace("-", "_").replace(".", "_")
+            lines.append(f"    {safe_id}[\"{doc.doc_id}<br>{doc.title}\"]")
 
-        # スタイリング (STALE=Red, WARNING=Gold, CIRCULAR=Purple)
-        # 判定結果に基づいてノードを色分けする
-        stale_ids = {
-            r.doc_id.replace("-", "_") for r in self._results
-            if r.status == StalenessStatus.STALE
-        }
-        warning_ids = {
-            r.doc_id.replace("-", "_") for r in self._results
-            if r.status == StalenessStatus.WARNING
-        }
-        circular_ids = {
-            r.doc_id.replace("-", "_") for r in self._results
-            if r.status == StalenessStatus.CIRCULAR
-        }
-
-        # 赤 (STALE)
-        for nid in stale_ids:
-            lines.append(f"    style {nid} stroke:red,stroke-width:3px")
-
-        # 黄 (WARNING) - STALE 優先
-        for nid in warning_ids - stale_ids:
-            lines.append(f"    style {nid} stroke:gold,stroke-width:3px")
-
-        # 紫 (CIRCULAR)
-        for nid in circular_ids:
-            lines.append(f"    style {nid} stroke:purple,stroke-width:3px,stroke-dasharray: 5 5")
+            for up_id in doc.upstreams:
+                if up_id in self._docs:
+                    safe_up = up_id.replace("-", "_").replace(".", "_")
+                    # up -> down (更新フロー)
+                    # 実際は upstream が古ければ下流が腐る
+                    lines.append(f"    {safe_up} --> {safe_id}")
 
         return "\n".join(lines)
 
 
-# ── CLI ──────────────────────────────────────────────
-
-
-# PURPOSE: CLI エントリポイント — --check で staleness 検査を実行する
-def main() -> None:
-    parser = argparse.ArgumentParser(description="Doc Staleness Checker")
-    parser.add_argument(
-        "--check", action="store_true", help="Run staleness check",
-    )
-    parser.add_argument(
-        "--root", type=str, default=None,
-        help="Project root (default: auto-detect)",
-    )
-    parser.add_argument(
-        "--graph", action="store_true", help="Output Mermaid graph",
-    )
-    parser.add_argument(
-        "--reverse-deps", type=str, metavar="DOC_ID",
-        help="Find documents that depend on DOC_ID",
-    )
+if __name__ == "__main__":
+    # 簡易 CLI
+    import argparse
+    parser = argparse.ArgumentParser()
+    parser.add_argument("command", choices=["check", "mermaid"])
+    parser.add_argument("path", default=".")
     args = parser.parse_args()
 
-    if not args.check and not args.graph and not args.reverse_deps:
-        parser.print_help()
-        return
-
-    root = Path(args.root) if args.root else Path(__file__).parent.parent.parent
     checker = DocStalenessChecker()
-    checker.scan(root)
-    results = checker.check()
+    checker.scan(Path(args.path))
 
-    if args.reverse_deps:
-        target = args.reverse_deps
-        print(f"🔎 Reverse dependencies for '{target}':")
-        found = []
-        for doc in checker._docs.values():
-            for dep in doc.depends_on:
-                if dep.doc_id == target:
-                    found.append(doc)
-                    break
-        if found:
-            for doc in found:
-                print(f"  - {doc.doc_id} (v{doc.version}) in {doc.path.relative_to(root)}")
-        else:
-            print("  (None found)")
-        return
-
-    if args.graph:
-        print(checker.generate_mermaid())
-        return
-
-    print(checker.format_report())
-
-    stale_count = sum(1 for r in results if r.status == StalenessStatus.STALE)
-    sys.exit(1 if stale_count > 0 else 0)
-
-
-if __name__ == "__main__":
-    main()
+    if args.command == "check":
+        checker.check()
+        print(checker.format_report())
+        if any(r.status != StalenessStatus.OK for r in checker._results):
+            sys.exit(1)
+    elif args.command == "mermaid":
+        print(checker.to_mermaid())

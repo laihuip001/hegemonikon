@@ -1,3 +1,4 @@
+# PROOF: [S2/Mekhanē] <- mekhane/periskope/ A0→Research Engine
 """
 Periskopē searchers — pluggable search source adapters.
 

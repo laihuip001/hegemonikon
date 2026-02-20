@@ -1,5 +1,9 @@
+# PROOF: [L2/インフラ] <- mekhane/dendron/ A0→Quality
 """
-Falsification Matcher — 消化論文の主張と epistemic_status.yaml の反証条件を照合
+S7 Falsification Matcher
+
+Matches paper content against the epistemic status registry
+to detect potential falsifications.
 
 PURPOSE: /eat 消化時に呼び出し、新論文の主張が既存パッチの反証条件に
 該当する可能性がないか自動チェックする。
@@ -11,7 +15,6 @@ Usage:
 
 import sys
 from pathlib import Path
-
 import yaml
 
 # Project root
@@ -19,6 +22,7 @@ PROJECT_ROOT = Path(__file__).parent.parent.parent
 REGISTRY_PATH = PROJECT_ROOT / "kernel" / "epistemic_status.yaml"
 
 
+# PURPOSE: Load the epistemic status registry
 def load_registry() -> dict:
     """Load the epistemic status registry"""
     if not REGISTRY_PATH.exists():
@@ -27,16 +31,17 @@ def load_registry() -> dict:
         return yaml.safe_load(f) or {"patches": {}}
 
 
+# PURPOSE: Check for potential falsifications in paper text
 def check_falsification(
     paper_text: str,
     paper_title: str = "",
     threshold: float = 0.5,
 ) -> list[dict]:
     """
-    消化テキストと反証条件を照合し、警告を生成。
+    論文テキストが反証条件にマッチするかチェックする。
 
     Args:
-        paper_text: 消化対象のテキスト (全文 or 要約)
+        paper_text: 論文の本文または要約
         paper_title: 論文タイトル (ログ用)
         threshold: キーワードマッチの閾値 (0-1)
 
@@ -49,45 +54,34 @@ def check_falsification(
 
     paper_lower = paper_text.lower()
 
-    for patch_id, patch in patches.items():
-        falsification = patch.get("falsification", "")
-        if not falsification:
+    for patch_id, data in patches.items():
+        # Check if patch is active
+        if data.get("status") not in ("active", "provisional"):
             continue
 
-        # Keyword extraction from falsification condition
-        # Split into meaningful keywords (3+ chars)
-        keywords = [
-            w.strip(".,;:()\"'")
-            for w in falsification.lower().split()
-            if len(w.strip(".,;:()\"'")) >= 3
-        ]
-        # Remove common stopwords
-        stopwords = {
-            "the", "and", "for", "that", "this", "with", "from", "not",
-            "are", "was", "were", "been", "being", "have", "has", "had",
-            "does", "did", "will", "would", "could", "should", "may",
-            "might", "shall", "can", "its", "his", "her", "our",
-            "その", "この", "あの", "する", "ある", "いる",
-            "ない", "ない場合", "場合", "場合は",
-        }
-        keywords = [k for k in keywords if k not in stopwords]
+        falsification = data.get("falsification", {})
+        condition = falsification.get("condition", "")
+        keywords = falsification.get("keywords", [])
 
-        if not keywords:
+        if not condition:
             continue
 
-        # Count keyword matches
-        matched = [k for k in keywords if k in paper_lower]
-        score = len(matched) / len(keywords) if keywords else 0
+        # Check keywords
+        matched = [k for k in keywords if k.lower() in paper_lower]
 
+        # Simple scoring based on keyword matches
+        score = 0.0
+        if keywords:
+            score = len(matched) / len(keywords)
+
+        # If score exceeds threshold, add alert
         if score >= threshold:
             alerts.append({
                 "patch_id": patch_id,
-                "claim": patch.get("claim", ""),
-                "status": patch.get("status", ""),
-                "falsification": falsification,
+                "claim": data.get("claim", ""),
+                "falsification": condition,
                 "matched_keywords": matched,
-                "score": score,
-                "source": patch.get("source", ""),
+                "score": score
             })
 
     # Sort by score (highest first)
@@ -95,36 +89,33 @@ def check_falsification(
     return alerts
 
 
+# PURPOSE: Format alerts into readable text
 def format_alerts(alerts: list[dict], paper_title: str = "") -> str:
     """警告をフォーマットされたテキストに変換"""
     if not alerts:
         return ""
 
     lines = [
-        "⚠️ **Falsification Alert** — 以下のパッチの反証条件に関連する可能性:",
-        "",
+        f"⚠️ Falsification Alert: '{paper_title}'",
+        "The following claims might be challenged:",
     ]
 
-    for a in alerts:
-        lines.extend([
-            f"- **{a['patch_id']}** ({a['status']}): {a['claim']}",
-            f"  反証条件: {a['falsification']}",
-            f"  マッチ: {', '.join(a['matched_keywords'])} (score: {a['score']:.0%})",
-            "",
-        ])
-
-    lines.append(
-        "> 上記は自動検出です。実際に反証が成立するかは人間の判断が必要です。"
-    )
+    for alert in alerts:
+        lines.append(f"\n[{alert['patch_id']}] Score: {alert['score']:.2f}")
+        lines.append(f"  Claim: {alert['claim']}")
+        lines.append(f"  Condition: {alert['falsification']}")
+        lines.append(f"  Matched: {', '.join(alert['matched_keywords'])}")
 
     return "\n".join(lines)
 
 
 if __name__ == "__main__":
-    # Demo: run with sample text
+    # Test run
     sample = """
-    This paper demonstrates that attention mechanisms in shallow layers
-    can capture causal dependencies, contradicting the assumption that
+    We demonstrate that attention is not all you need.
+    Recurrent models with efficient state space layers outperform Transformers.
+    Chain-of-Thought is harmful for simple reasoning tasks.
+    Shallow layers in LLMs do not process syntax;
     only deep layers handle causal reasoning. Our architecture shows
     that parallel sampling outperforms sequential Chain-of-Thought
     in knowledge-intensive tasks.

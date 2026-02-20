@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhanē] <- mekhane/ P1→Auto-fix
 """
 MCP Base Module — Hegemonikón MCP Server Common Infrastructure
 

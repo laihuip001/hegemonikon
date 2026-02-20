@@ -1,3 +1,4 @@
+# PROOF: [L2/Periskope] <- mekhane/periskope/ O3→Zētēsis→Brave Search Integration
 """
 Brave Search API client for Periskopē.
 

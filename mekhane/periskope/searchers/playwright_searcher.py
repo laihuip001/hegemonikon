@@ -1,3 +1,4 @@
+# PROOF: [L2/Periskope] <- mekhane/periskope/ O3→Zētēsis→Browser Automation
 """
 Playwright-based searcher for Periskopē.
 

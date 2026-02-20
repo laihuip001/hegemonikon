@@ -1,3 +1,4 @@
+# PROOF: [L2/Periskope] <- mekhane/periskope/ O3→Zētēsis→Multi-Model Synthesis
 """
 Multi-model synthesizer for Periskopē.
 

@@ -1,3 +1,4 @@
+# PROOF: [L2/Infra] <- mekhane/ A0→Infrastructure→Core Module
 import os
 import logging
 from google import genai

@@ -1,3 +1,4 @@
+# PROOF: [L2/Periskope] <- mekhane/periskope/ O3→Zētēsis→Internal Search Integration
 """
 Internal knowledge searcher for Periskopē.
 

@@ -1,3 +1,4 @@
+# PROOF: [L2/Periskope] <- mekhane/periskope/ O3→Zētēsis→Citation Verification
 """
 Citation verification agent for Periskopē.
 

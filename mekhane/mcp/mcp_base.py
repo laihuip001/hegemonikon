@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Infra] <- mekhane/mcp/ P1→Khora→Model Context Protocol
 """
 MCP Base Module — Hegemonikón MCP Server Common Infrastructure
 

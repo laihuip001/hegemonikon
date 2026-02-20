@@ -1,3 +1,4 @@
+# PROOF: [L2/Infra] <- mekhane/mcp/ P1→Khora→Model Context Protocol
 """
 MCP Guard — ゾンビプロセス防止の自己防衛モジュール
 

@@ -1,3 +1,4 @@
+# PROOF: [L2/Impl] <- mekhane/periskope/ A0->Impl->Synthesizer
 """
 Multi-model synthesizer for Periskopē.
 

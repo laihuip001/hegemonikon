@@ -1,3 +1,4 @@
+# PROOF: [L2/Impl] <- mekhane/periskope/ A0->Impl->CitationAgent
 """
 Citation verification agent for Periskopē.
 

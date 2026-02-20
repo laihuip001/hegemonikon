@@ -1,3 +1,5 @@
+# PROOF: [L2/Mekhanē] <- mekhane/periskope/searchers/
+# PURPOSE: Implementation of __init__.py
 """
 Periskopē searchers — pluggable search source adapters.
 

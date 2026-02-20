@@ -1,3 +1,5 @@
+# PROOF: [L2/Anamnēsis] <- mekhane/anamnesis/
+# PURPOSE: Implementation of vertex_embedder.py
 import os
 import logging
 from google import genai

@@ -1,3 +1,5 @@
+# PROOF: [L2/インフラ] <- mekhane/dendron/
+# PURPOSE: Implementation of falsification_checker.py
 """
 S7: Falsification Condition Checker
 

@@ -1,3 +1,5 @@
+# PROOF: [L2/インフラ] <- mekhane/symploke/
+# PURPOSE: Implementation of intent_wal.py
 #!/usr/bin/env python3
 """Intent-WAL (Write-Ahead Log) Manager.
 

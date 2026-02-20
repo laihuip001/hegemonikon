@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/periskope/ Init
 """
 Periskopē — HGK Deep Research Engine
 

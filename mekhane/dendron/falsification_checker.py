@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/dendron/ Falsification Checker
 """
 S7: Falsification Condition Checker
 
@@ -109,6 +110,7 @@ def summary_stats(registry: dict) -> dict:
     }
 
 
+# PURPOSE: メイン処理を実行する
 def main():
     registry = load_registry()
     

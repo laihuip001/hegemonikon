@@ -146,7 +146,6 @@ class MypyProver(ProverInterface):
         **kwargs
     ) -> ProofResult:
         """Python コードの型チェック"""
-        import time
         start = time.time()
         
         if not self._mypy_available:
@@ -287,7 +286,6 @@ class SchemaProver(ProverInterface):
         **kwargs
     ) -> ProofResult:
         """JSON をスキーマで検証"""
-        import time
         start = time.time()
         
         if not schema:
@@ -345,7 +343,6 @@ class SchemaProver(ProverInterface):
         start: float
     ) -> ProofResult:
         """フォールバック検証"""
-        import time
         required = schema.get("required", [])
         missing = [f for f in required if f not in data]
         
@@ -420,7 +417,6 @@ class Lean4Prover(ProverInterface):
         **kwargs
     ) -> ProofResult:
         """形式証明"""
-        import time
         start = time.time()
         
         if not self._lean_available:

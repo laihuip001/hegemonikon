@@ -1,3 +1,4 @@
+# PROOF: [L2/Infra] <- mekhane/ A0->Auto->Fix
 """
 Periskopē searchers — pluggable search source adapters.
 

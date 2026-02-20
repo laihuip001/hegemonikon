@@ -1,3 +1,4 @@
+# PROOF: [L2/Infra] <- mekhane/ A0->Auto->Fix
 """
 Periskopē Deep Research Engine — Orchestrator.
 

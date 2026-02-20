@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/ A0→実装が必要→citation_agent.py
 """
 Citation verification agent for Periskopē.
 

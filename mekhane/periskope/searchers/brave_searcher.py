@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/ A0→実装が必要→brave_searcher.py
 """
 Brave Search API client for Periskopē.
 

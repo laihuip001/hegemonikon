@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/ A0→実装が必要→synthesizer.py
 """
 Multi-model synthesizer for Periskopē.
 

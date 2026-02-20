@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/ A0→実装が必要→falsification_matcher.py
 """
 Falsification Matcher — 消化論文の主張と epistemic_status.yaml の反証条件を照合
 

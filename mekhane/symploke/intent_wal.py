@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/ A0→実装が必要→intent_wal.py
 #!/usr/bin/env python3
 """Intent-WAL (Write-Ahead Log) Manager.
 

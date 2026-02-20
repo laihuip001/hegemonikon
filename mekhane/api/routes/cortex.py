@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/ A0→実装が必要→cortex.py
 from typing import Any, AsyncGenerator
 
 import asyncio

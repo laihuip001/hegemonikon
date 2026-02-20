@@ -1,3 +1,4 @@
+# PROOF: [L3/Sophia] <- mekhane/periskope/searchers/ K4→Search→Internal
 """
 Internal knowledge searcher for Periskopē.
 

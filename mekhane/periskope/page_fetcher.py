@@ -1,3 +1,4 @@
+# PROOF: [L3/Sophia] <- mekhane/periskope/ K4→Search→Fetch
 """
 Page Fetcher — 選択的全文クロール for Periskopē.
 

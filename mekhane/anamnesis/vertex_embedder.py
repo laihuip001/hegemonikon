@@ -1,3 +1,4 @@
+# PROOF: [L3/Anamnesis] <- mekhane/anamnesis/ K3→Memory→Embed
 import os
 import logging
 from google import genai

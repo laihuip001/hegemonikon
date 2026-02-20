@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhanē] <- mekhane/periskope/ A0→取得が必要→PageFetcherが担う
 """
 Page Fetcher — 選択的全文クロール for Periskopē.
 

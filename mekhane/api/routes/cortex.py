@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhanē] <- mekhane/api/routes/ A0→API提供が必要→Cortexルーターが担う
 from typing import Any, AsyncGenerator
 
 import asyncio

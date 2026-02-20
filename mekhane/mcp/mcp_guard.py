@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhanē] <- mekhane/mcp/ A0→安全性が必要→MCPガードが担う
 """
 MCP Guard — ゾンビプロセス防止の自己防衛モジュール
 

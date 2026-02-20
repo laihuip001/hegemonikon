@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhanē] <- mekhane/symploke/ A0→意図管理が必要→IntentWALが担う
 #!/usr/bin/env python3
 """Intent-WAL (Write-Ahead Log) Manager.
 

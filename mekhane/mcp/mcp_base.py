@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhanē] <- mekhane/mcp/ A0→インフラ統合が必要→MCPBaseが担う
 #!/usr/bin/env python3
 """
 MCP Base Module — Hegemonikón MCP Server Common Infrastructure

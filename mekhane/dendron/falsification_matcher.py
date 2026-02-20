@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhanē] <- mekhane/dendron/ A0→安全性が必要→FalsificationMatcherが担う
 """
 Falsification Matcher — 消化論文の主張と epistemic_status.yaml の反証条件を照合
 

@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhanē] <- mekhane/periskope/ A0→検証が必要→CitationAgentが担う
 """
 Citation verification agent for Periskopē.
 

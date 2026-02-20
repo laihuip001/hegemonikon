@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhanē] <- mekhane/periskope/ A0→統合が必要→MultiModelSynthesizerが担う
 """
 Multi-model synthesizer for Periskopē.
 

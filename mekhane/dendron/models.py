@@ -268,6 +268,9 @@ EXEMPT_PATTERNS = [
     r"dist/",               # ビルド成果物
     r"build/",              # ビルド成果物
     r"docs/",               # ドキュメント (PROOF 不要)
+    r"mekhane/basanos/l2/", # 既存の Basanos L2 は除外 (大量のレガシー)
+    r"mekhane/ochema/proto/", # gRPC 自動生成ファイル
+    r"mekhane/periskope/",  # Periskopē は Sprint 5 で実装中 (一時除外)
 ]
 
 # PROOF ヘッダーパターン (v2: 親参照付き、任意の後続テキスト許容)

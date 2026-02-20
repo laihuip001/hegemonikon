@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhanē] <- mekhane/periskope/ A0→実装が必要→PeriskopeModuleが担う
 """
 Periskopē — HGK Deep Research Engine
 

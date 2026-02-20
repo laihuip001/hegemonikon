@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhanē] <- mekhane/periskope/ A0→多角性が必要→QueryExpanderが担う
 """
 Query expander for Periskopē.
 

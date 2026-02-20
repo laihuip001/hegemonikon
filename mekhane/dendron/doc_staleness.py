@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# PROOF: [L2/インフラ] <- mekhane/dendron/
+# PROOF: [L2/インフラ] <- mekhane/dendron/ A0→品質保証→ドキュメント腐敗検知
 """
 Doc Staleness Checker — ドキュメント腐敗自動検知
 

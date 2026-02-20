@@ -1,3 +1,4 @@
+# PROOF: [L2/FEP] <- mekhane/periskope/
 """
 Brave Search API client for Periskopē.
 

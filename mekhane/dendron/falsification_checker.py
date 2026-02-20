@@ -22,6 +22,7 @@ from dataclasses import dataclass
 from .falsification_matcher import FalsificationMatcher, PatternType
 
 
+# PURPOSE: 反証可能性チェック結果
 @dataclass
 class FalsificationResult:
     """反証可能性チェック結果"""
@@ -34,6 +35,7 @@ class FalsificationResult:
     confidence: float
 
 
+# PURPOSE: 反証可能性チェッカー
 class FalsificationChecker:
     """反証可能性チェッカー"""
     
@@ -87,6 +89,7 @@ class FalsificationChecker:
         self.results.append(result)
 
 
+# PURPOSE: CLI エントリポイント
 def main():
     """CLI エントリポイント"""
     if len(sys.argv) < 2:

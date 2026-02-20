@@ -11,6 +11,7 @@ from dataclasses import dataclass
 from typing import Optional, Any
 
 
+# PURPOSE: パターンタイプ
 class PatternType(Enum):
     """パターンタイプ"""
     FALSIFIABLE = "falsifiable"       # 反証可能 (正常)
@@ -19,6 +20,7 @@ class PatternType(Enum):
     UNKNOWN = "unknown"               # 不明
 
 
+# PURPOSE: マッチング結果
 @dataclass
 class MatchResult:
     """マッチング結果"""
@@ -28,9 +30,11 @@ class MatchResult:
     confidence: float
 
 
+# PURPOSE: 反証可能性パターンマッチャー
 class FalsificationMatcher:
     """反証可能性パターンマッチャー"""
 
+    # PURPOSE: ASTノードを解析し、結果を返す
     def match(self, node: ast.AST) -> MatchResult:
         """ASTノードを解析し、結果を返す"""
 

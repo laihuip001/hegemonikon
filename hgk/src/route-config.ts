@@ -6,30 +6,6 @@
  */
 
 import { renderDashboard } from './views/dashboard';
-import { renderOrchestratorView } from './views/orchestrator';
-import { renderAgentManagerView } from './views/agent-manager';
-import { renderSearch } from './views/search';
-import { renderFep } from './views/fep';
-import { renderGnosis } from './views/gnosis';
-import { renderQuality } from './views/quality';
-import { renderPostcheck } from './views/postcheck';
-// Three.js graph — lazy loaded to split the 700KB+ chunk
-const renderGraph3D = async () => {
-    const { renderGraph3D: render } = await import('./views/graph3d');
-    await render();
-};
-import { renderNotifications } from './views/notifications';
-import { renderPKS } from './views/pks';
-import { renderSophiaView } from './views/sophia';
-import { renderTimelineView } from './views/timeline';
-import { renderSynteleiaView } from './views/synteleia';
-import { renderSynedrionView } from './views/synedrion';
-import { renderDigestorView } from './views/digestor';
-import { renderDesktopDomView } from './views/desktop-dom';
-import { renderChatView } from './views/chat';
-import { renderAristosView } from './views/aristos';
-import { renderDevToolsView } from './views/devtools';
-import { renderSettingsView } from './views/settings';
 
 // ─── Types ───────────────────────────────────────────────────
 
@@ -42,30 +18,47 @@ export interface RouteConfig {
     renderer: ViewRenderer;
 }
 
+// ─── Lazy Loading Helper ─────────────────────────────────────
+
+/**
+ * Creates a lazy-loaded renderer.
+ * Splits code into separate chunks loaded only when the route is visited.
+ */
+function lazy(importer: () => Promise<any>, exportName: string): ViewRenderer {
+    return async () => {
+        const mod = await importer();
+        const renderer = mod[exportName] as ViewRenderer;
+        if (!renderer) {
+            throw new Error(`Module does not export '${exportName}'`);
+        }
+        await renderer();
+    };
+}
+
 // ─── Route Definitions ───────────────────────────────────────
 
 export const ROUTES: RouteConfig[] = [
     { key: 'dashboard', label: 'Dashboard', icon: '📊', renderer: renderDashboard },
-    { key: 'orchestrator', label: 'Orchestrator', icon: '🎯', renderer: renderOrchestratorView },
-    { key: 'agents', label: 'Agents', icon: '🤖', renderer: renderAgentManagerView },
-    { key: 'search', label: 'Search', icon: '🔍', renderer: renderSearch },
-    { key: 'fep', label: 'FEP Agent', icon: '🧠', renderer: renderFep },
-    { key: 'gnosis', label: 'Gnōsis', icon: '📖', renderer: renderGnosis },
-    { key: 'quality', label: 'Quality', icon: '✅', renderer: renderQuality },
-    { key: 'postcheck', label: 'Postcheck', icon: '🔄', renderer: renderPostcheck },
-    { key: 'graph', label: 'Graph', icon: '🔮', renderer: renderGraph3D },
-    { key: 'notifications', label: 'Notifications', icon: '🔔', renderer: renderNotifications },
-    { key: 'pks', label: 'PKS', icon: '📡', renderer: renderPKS },
-    { key: 'sophia', label: 'Sophia KI', icon: '📚', renderer: renderSophiaView },
-    { key: 'timeline', label: 'Timeline', icon: '📅', renderer: renderTimelineView },
-    { key: 'synteleia', label: 'Synteleia', icon: '🛡️', renderer: renderSynteleiaView },
-    { key: 'synedrion', label: 'Synedrion', icon: '🔭', renderer: renderSynedrionView },
-    { key: 'digestor', label: 'Digestor', icon: '🧬', renderer: renderDigestorView },
-    { key: 'desktop', label: 'Desktop', icon: '🖥️', renderer: renderDesktopDomView },
-    { key: 'chat', label: 'Chat', icon: '💬', renderer: renderChatView },
-    { key: 'devtools', label: 'DevTools', icon: '🛠️', renderer: renderDevToolsView },
-    { key: 'aristos', label: 'Aristos', icon: '🧬', renderer: renderAristosView },
-    { key: 'settings', label: 'Settings', icon: '⚙️', renderer: renderSettingsView },
+    { key: 'orchestrator', label: 'Orchestrator', icon: '🎯', renderer: lazy(() => import('./views/orchestrator'), 'renderOrchestratorView') },
+    { key: 'agents', label: 'Agents', icon: '🤖', renderer: lazy(() => import('./views/agent-manager'), 'renderAgentManagerView') },
+    { key: 'search', label: 'Search', icon: '🔍', renderer: lazy(() => import('./views/search'), 'renderSearch') },
+    { key: 'fep', label: 'FEP Agent', icon: '🧠', renderer: lazy(() => import('./views/fep'), 'renderFep') },
+    { key: 'gnosis', label: 'Gnōsis', icon: '📖', renderer: lazy(() => import('./views/gnosis'), 'renderGnosis') },
+    { key: 'quality', label: 'Quality', icon: '✅', renderer: lazy(() => import('./views/quality'), 'renderQuality') },
+    { key: 'postcheck', label: 'Postcheck', icon: '🔄', renderer: lazy(() => import('./views/postcheck'), 'renderPostcheck') },
+    { key: 'graph', label: 'Graph', icon: '🔮', renderer: lazy(() => import('./views/graph3d'), 'renderGraph3D') },
+    { key: 'notifications', label: 'Notifications', icon: '🔔', renderer: lazy(() => import('./views/notifications'), 'renderNotifications') },
+    { key: 'pks', label: 'PKS', icon: '📡', renderer: lazy(() => import('./views/pks'), 'renderPKS') },
+    { key: 'sophia', label: 'Sophia KI', icon: '📚', renderer: lazy(() => import('./views/sophia'), 'renderSophiaView') },
+    { key: 'timeline', label: 'Timeline', icon: '📅', renderer: lazy(() => import('./views/timeline'), 'renderTimelineView') },
+    { key: 'synteleia', label: 'Synteleia', icon: '🛡️', renderer: lazy(() => import('./views/synteleia'), 'renderSynteleiaView') },
+    { key: 'synedrion', label: 'Synedrion', icon: '🔭', renderer: lazy(() => import('./views/synedrion'), 'renderSynedrionView') },
+    { key: 'digestor', label: 'Digestor', icon: '🧬', renderer: lazy(() => import('./views/digestor'), 'renderDigestorView') },
+    { key: 'desktop', label: 'Desktop', icon: '🖥️', renderer: lazy(() => import('./views/desktop-dom'), 'renderDesktopDomView') },
+    { key: 'chat', label: 'Chat', icon: '💬', renderer: lazy(() => import('./views/chat'), 'renderChatView') },
+    { key: 'devtools', label: 'DevTools', icon: '🛠️', renderer: lazy(() => import('./views/devtools'), 'renderDevToolsView') },
+    { key: 'aristos', label: 'Aristos', icon: '🧬', renderer: lazy(() => import('./views/aristos'), 'renderAristosView') },
+    { key: 'settings', label: 'Settings', icon: '⚙️', renderer: lazy(() => import('./views/settings'), 'renderSettingsView') },
 ];
 
 // ─── Derived Maps ────────────────────────────────────────────

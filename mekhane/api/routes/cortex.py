@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/ A0→Proof→Missing→Added
 from typing import Any, AsyncGenerator
 
 import asyncio

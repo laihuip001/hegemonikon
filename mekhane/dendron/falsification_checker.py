@@ -1,3 +1,4 @@
+# PROOF: [L2/Impl] <- mekhane/dendron/ A0→実装が必要→falsification_checker.py が担う
 """
 S7: Falsification Condition Checker
 

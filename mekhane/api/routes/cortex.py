@@ -1,3 +1,4 @@
+# PROOF: [L2/Impl] <- mekhane/api/routes/ A0→実装が必要→cortex.py が担う
 from typing import Any, AsyncGenerator
 
 import asyncio

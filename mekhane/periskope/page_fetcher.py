@@ -1,3 +1,4 @@
+# PROOF: [L2/Impl] <- mekhane/periskope/ A0→実装が必要→page_fetcher.py が担う
 """
 Page Fetcher — 選択的全文クロール for Periskopē.
 

@@ -1,3 +1,4 @@
+# PROOF: [L2/Impl] <- mekhane/mcp/ A0→実装が必要→mcp_guard.py が担う
 """
 MCP Guard — ゾンビプロセス防止の自己防衛モジュール
 

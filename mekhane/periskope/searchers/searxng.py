@@ -1,3 +1,4 @@
+# PROOF: [L2/Impl] <- mekhane/periskope/searchers/ A0→実装が必要→searxng.py が担う
 """
 SearXNG search client for Periskopē.
 

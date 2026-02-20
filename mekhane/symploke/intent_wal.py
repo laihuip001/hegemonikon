@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/symploke/ O4→意図継続→IntentWALが担う
 #!/usr/bin/env python3
 """Intent-WAL (Write-Ahead Log) Manager.
 

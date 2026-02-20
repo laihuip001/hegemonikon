@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/ Existence verified
 """
 Semantic Scholar API client for Periskopē.
 

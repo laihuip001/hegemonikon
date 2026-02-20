@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/ A0→実装が必要→ls_launcher.py
 #!/usr/bin/env python3
 """LS Standalone Launcher — IDE なしで Language Server を直接起動する。
 

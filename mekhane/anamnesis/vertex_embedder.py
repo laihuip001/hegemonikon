@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/ A0→実装が必要→vertex_embedder.py
 import os
 import logging
 from google import genai

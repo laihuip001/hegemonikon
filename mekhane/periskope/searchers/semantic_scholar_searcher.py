@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/ A0→実装が必要→semantic_scholar_searcher.py
 """
 Semantic Scholar API client for Periskopē.
 

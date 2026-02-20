@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/ A0→実装が必要→query_expander.py
 """
 Query expander for Periskopē.
 

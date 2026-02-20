@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/ A0→実装が必要→__init__.py
 """
 Periskopē searchers — pluggable search source adapters.
 

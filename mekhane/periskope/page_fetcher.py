@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/ A0→実装が必要→page_fetcher.py
 """
 Page Fetcher — 選択的全文クロール for Periskopē.
 

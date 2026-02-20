@@ -1,4 +1,5 @@
 # PROOF: [S2/Mekhanē] <- mekhane/periskope/ S2→Engine→Expander
+# PURPOSE: Query Expander — 検索クエリの多角的展開
 """
 Query expander for Periskopē.
 

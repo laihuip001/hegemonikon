@@ -1,4 +1,5 @@
 # PROOF: [S2/Mekhanē] <- mekhane/periskope/ S2→Engine→Models
+# PURPOSE: Periskope Models — 検索・消化データモデル
 """
 Periskopē data models.
 

@@ -1,4 +1,5 @@
 # PROOF: [S2/Mekhanē] <- mekhane/periskope/ S2→Engine→Synthesizer
+# PURPOSE: Periskope Synthesizer — 検索結果の統合と洞察生成
 """
 Multi-model synthesizer for Periskopē.
 

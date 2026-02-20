@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # PROOF: [L3/統合] <- mekhane/mcp/ S2→Protocol→Base
+# PURPOSE: MCP Base — プロトコル実装の基底クラス
 """
 MCP Base Module — Hegemonikón MCP Server Common Infrastructure
 

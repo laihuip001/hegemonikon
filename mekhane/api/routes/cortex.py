@@ -1,4 +1,5 @@
 # PROOF: [L2/インフラ] <- mekhane/api/routes/ S2→API→Cortex
+# PURPOSE: Cortex Route — LLM 推論エンドポイント
 from typing import Any, AsyncGenerator
 
 import asyncio

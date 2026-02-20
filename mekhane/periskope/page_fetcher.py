@@ -1,4 +1,5 @@
 # PROOF: [S2/Mekhanē] <- mekhane/periskope/ S2→Engine→Fetcher
+# PURPOSE: Page Fetcher — ウェブページの取得とクリーニング
 """
 Page Fetcher — 選択的全文クロール for Periskopē.
 

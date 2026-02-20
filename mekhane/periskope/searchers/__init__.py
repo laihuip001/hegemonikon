@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/ A0→実装基盤
 """
 Periskopē searchers — pluggable search source adapters.
 

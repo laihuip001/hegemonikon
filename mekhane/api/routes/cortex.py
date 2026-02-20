@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/ A0→実装基盤
 from typing import Any, AsyncGenerator
 
 import asyncio

@@ -1,4 +1,5 @@
 # PROOF: [L2/インフラ] <- mekhane/mcp/
+# PURPOSE: Implementation of mcp_guard.py
 """
 MCP Guard — ゾンビプロセス防止の自己防衛モジュール
 

@@ -1,4 +1,5 @@
 # PROOF: [L2/インフラ] <- mekhane/dendron/
+# PURPOSE: Implementation of falsification_matcher.py
 """
 Falsification Matcher — 消化論文の主張と epistemic_status.yaml の反証条件を照合
 

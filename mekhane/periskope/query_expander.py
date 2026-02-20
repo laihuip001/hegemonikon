@@ -1,4 +1,5 @@
 # PROOF: [S2/Mekhanē] <- mekhane/periskope/
+# PURPOSE: Implementation of query_expander.py
 """
 Query expander for Periskopē.
 

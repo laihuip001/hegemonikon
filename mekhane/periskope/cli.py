@@ -1,4 +1,5 @@
 # PROOF: [S2/Mekhanē] <- mekhane/periskope/
+# PURPOSE: Implementation of cli.py
 #!/usr/bin/env python3
 """
 Periskopē CLI — Deep Research from the command line.

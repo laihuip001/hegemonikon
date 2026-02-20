@@ -1,4 +1,5 @@
 # PROOF: [S2/Mekhanē] <- mekhane/periskope/searchers/
+# PURPOSE: Implementation of brave_searcher.py
 """
 Brave Search API client for Periskopē.
 

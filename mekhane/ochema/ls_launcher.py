@@ -1,4 +1,5 @@
 # PROOF: [S2/Mekhanē] <- mekhane/ochema/
+# PURPOSE: Implementation of ls_launcher.py
 #!/usr/bin/env python3
 """LS Standalone Launcher — IDE なしで Language Server を直接起動する。
 

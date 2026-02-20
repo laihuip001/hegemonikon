@@ -1,4 +1,5 @@
 # PROOF: [S2/Mekhanē] <- mekhane/periskope/searchers/
+# PURPOSE: Implementation of tavily_searcher.py
 """
 Tavily Search API client for Periskopē.
 

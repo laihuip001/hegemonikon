@@ -1,3 +1,4 @@
+# PROOF: [S2/Mekhanē] <- mekhane/periskope/ S2→Engine→Citation
 """
 Citation verification agent for Periskopē.
 

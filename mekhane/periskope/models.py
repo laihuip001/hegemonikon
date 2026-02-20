@@ -1,3 +1,4 @@
+# PROOF: [S2/Mekhanē] <- mekhane/periskope/ S2→Engine→Models
 """
 Periskopē data models.
 

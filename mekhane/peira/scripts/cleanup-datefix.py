@@ -1,5 +1,5 @@
-# PROOF: [L3/ユーティリティ] <- mekhane/peira/scripts/ O4→実験スクリプトが必要
 #!/usr/bin/env python3
+# PROOF: [L3/ユーティリティ] <- mekhane/peira/scripts/ O4→実験スクリプトが必要
 """
 cleanup-datefix.py
 Fix files in 0000/00 by re-fetching metadata and moving to correct YYYY/MM folder.

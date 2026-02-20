@@ -1,3 +1,4 @@
+# PROOF: [A4/知識] <- mekhane/dendron/ A4→Verification→Matcher
 """
 Falsification Matcher — 消化論文の主張と epistemic_status.yaml の反証条件を照合
 

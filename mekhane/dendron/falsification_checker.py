@@ -1,3 +1,4 @@
+# PROOF: [A4/知識] <- mekhane/dendron/ A4→Verification→Checker
 """
 S7: Falsification Condition Checker
 

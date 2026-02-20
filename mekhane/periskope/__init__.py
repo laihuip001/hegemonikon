@@ -1,3 +1,4 @@
+# PROOF: [S2/Mekhanē] <- mekhane/periskope/ S2→Engine→Init
 """
 Periskopē — HGK Deep Research Engine
 

@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/periskope/ A0->Discovery->Periskope searches external knowledge
 """
 Semantic Scholar API client for Periskopē.
 

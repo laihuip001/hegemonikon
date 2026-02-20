@@ -1,3 +1,4 @@
+# PROOF: [L2/Infra] <- mekhane/ A0→Infrastructure→Core Module
 from typing import Any, AsyncGenerator
 
 import asyncio

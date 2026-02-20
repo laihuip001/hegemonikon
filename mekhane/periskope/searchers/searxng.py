@@ -1,3 +1,4 @@
+# PROOF: [L2/Periskope] <- mekhane/periskope/searchers/ K4→SearXNG→SearXNG API search
 """
 SearXNG search client for Periskopē.
 

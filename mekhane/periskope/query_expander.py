@@ -1,3 +1,4 @@
+# PROOF: [L2/Periskope] <- mekhane/periskope/ K4→Expander→Search query expansion
 """
 Query expander for Periskopē.
 

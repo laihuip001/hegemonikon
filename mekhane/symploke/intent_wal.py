@@ -1,3 +1,4 @@
+# PROOF: [L2/Review] <- mekhane/symploke/ A3→WAL→Intent Write-Ahead Log
 #!/usr/bin/env python3
 """Intent-WAL (Write-Ahead Log) Manager.
 

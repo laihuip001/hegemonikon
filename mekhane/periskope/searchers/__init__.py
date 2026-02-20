@@ -1,3 +1,4 @@
+# PROOF: [L2/Periskope] <- mekhane/periskope/searchers/ K4→Init→Searcher registry
 """
 Periskopē searchers — pluggable search source adapters.
 

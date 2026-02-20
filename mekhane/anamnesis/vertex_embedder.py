@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/anamnesis/vertex_embedder.py Automated PROOF header addition
 import os
 import logging
 from google import genai

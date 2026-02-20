@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/pks/narrator_formats.py Automated PROOF header addition
 # noqa: AI-ALL
 # PROOF: [L2/インフラ] <- mekhane/pks/
 """

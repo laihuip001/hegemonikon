@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/scripts/check_proof.py Automated PROOF header addition
 #!/usr/bin/env python3
 # PROOF: [L3/ユーティリティ] <- mekhane/scripts/ 後方互換ラッパー（非推奨）
 # lineage: 旧 check_proof.py → dendron/checker.py へ昇華 (2026-02-01)

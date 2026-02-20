@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/symploke/value_pitch_proposer.py Automated PROOF header addition
 #!/usr/bin/env python3
 # PROOF: [L2/インフラ] <- mekhane/symploke/
 # PURPOSE: Value Pitch の Benefit Angle 自動提案 + 骨格ドラフト生成

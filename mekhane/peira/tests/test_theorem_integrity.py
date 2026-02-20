@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/peira/tests/test_theorem_integrity.py Automated PROOF header addition
 #!/usr/bin/env python3
 # PROOF: [L2/検証] <- DX-008: THEOREM_WORKFLOWS バグ再発防止
 """

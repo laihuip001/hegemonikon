@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/api/tests/test_synteleia_api.py Automated PROOF header addition
 #!/usr/bin/env python3
 # PROOF: [L2/テスト] <- mekhane/api/tests/
 # PURPOSE: Synteleia REST API エンドポイントのテスト

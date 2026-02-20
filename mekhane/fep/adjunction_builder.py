@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/fep/adjunction_builder.py Automated PROOF header addition
 #!/usr/bin/env python3
 # PROOF: [L2/インフラ] <- mekhane/fep/ A0→Adjunction型の消費者が必要→adjunction_builderが担う
 """

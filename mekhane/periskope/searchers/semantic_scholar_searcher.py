@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/periskope/searchers/semantic_scholar_searcher.py Automated PROOF header addition
 """
 Semantic Scholar API client for Periskopē.
 

@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/basanos/tests/test_git_metrics.py Automated PROOF header addition
 """Tests for GitMetrics — git 履歴からのリスク予兆検出。"""
 
 import subprocess

@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/pks/tests/test_gateway_stats.py Automated PROOF header addition
 #!/usr/bin/env python3
 """F6c: Gateway Stats API endpoint tests."""
 

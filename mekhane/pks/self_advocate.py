@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/pks/self_advocate.py Automated PROOF header addition
 #!/usr/bin/env python3
 # PROOF: [L2/インフラ] <- mekhane/pks/
 """

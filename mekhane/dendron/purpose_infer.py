@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/dendron/purpose_infer.py Automated PROOF header addition
 #!/usr/bin/env python3
 # PROOF: [L2/インフラ] <- mekhane/dendron/ A0→PURPOSE自動付与が必要→purpose_inferが担う
 """

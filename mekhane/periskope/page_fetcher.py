@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/periskope/page_fetcher.py Automated PROOF header addition
 """
 Page Fetcher — 選択的全文クロール for Periskopē.
 

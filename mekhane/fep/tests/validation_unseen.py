@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/fep/tests/validation_unseen.py Automated PROOF header addition
 #!/usr/bin/env python3
 """Unseen input validation — exemplar/benchmark と重複しない入力で精度を検証.
 

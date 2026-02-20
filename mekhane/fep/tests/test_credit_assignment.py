@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/fep/tests/test_credit_assignment.py Automated PROOF header addition
 """Tests for Credit Assignment — Teacher Signal for FEP Agent."""
 
 import json

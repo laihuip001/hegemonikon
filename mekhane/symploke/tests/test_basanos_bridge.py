@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/symploke/tests/test_basanos_bridge.py Automated PROOF header addition
 #!/usr/bin/env python3
 # PROOF: [L2/テスト] <- mekhane/symploke/tests/ A2→basanos_bridge→test_basanos_bridge が担う
 # PURPOSE: Basanos Bridge のユニットテスト

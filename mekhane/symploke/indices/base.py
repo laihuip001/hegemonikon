@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/symploke/indices/base.py Automated PROOF header addition
 # noqa: AI-ALL
 # PROOF: [L2/インフラ] <- mekhane/symploke/indices/ A0→索引管理が必要→base が担う
 """

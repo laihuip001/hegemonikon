@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/periskope/query_expander.py Automated PROOF header addition
 """
 Query expander for Periskopē.
 

@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/periskope/synthesizer.py Automated PROOF header addition
 """
 Multi-model synthesizer for Periskopē.
 

@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/scripts/create_prs_from_branches.py Automated PROOF header addition
 #!/usr/bin/env python3
 # PROOF: [L2/インフラ] <- mekhane/scripts/ O4→ブランチからPRを作成する必要→create_prs_from_branches が担う
 """

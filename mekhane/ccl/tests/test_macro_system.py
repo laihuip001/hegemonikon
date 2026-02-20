@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/ccl/tests/test_macro_system.py Automated PROOF header addition
 #!/usr/bin/env python3
 # PROOF: [L2/テスト] <- mekhane/ccl/tests/
 # PURPOSE: CCL Macro Registry & Expander の包括テスト

@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/pks/attractor_context.py Automated PROOF header addition
 #!/usr/bin/env python3
 # PROOF: [L2/インフラ] <- mekhane/pks/ A0→Attractor+PKS接続が必要→attractor_context が担う
 """

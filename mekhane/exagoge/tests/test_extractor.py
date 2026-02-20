@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/exagoge/tests/test_extractor.py Automated PROOF header addition
 #!/usr/bin/env python3
 # PROOF: [L1/テスト] <- mekhane/exagoge/tests/
 # PURPOSE: Exagoge extractor モジュールのユニットテスト

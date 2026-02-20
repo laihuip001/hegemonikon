@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/ochema/claude_cli.py Automated PROOF header addition
 #!/usr/bin/env python3
 # PROOF: [L2/ツール] <- mekhane/ochema/ V15 headless LS Claude wrapper
 # PURPOSE: IDE GUI なしで LS 経由 Claude を叩く CLI

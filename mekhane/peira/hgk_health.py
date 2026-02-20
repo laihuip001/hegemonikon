@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/peira/hgk_health.py Automated PROOF header addition
 #!/usr/bin/env python3
 # PROOF: [L2/インフラ] <- mekhane/peira/ A0→システム可観測性が必要→hgk_healthが担う
 """

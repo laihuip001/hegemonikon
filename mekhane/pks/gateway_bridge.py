@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/pks/gateway_bridge.py Automated PROOF header addition
 #!/usr/bin/env python3
 # PROOF: [L2/コア] <- mekhane/pks/
 # PURPOSE: Gateway Bridge — Ideas/Doxa/Handoff を PKS の KnowledgeNugget に変換

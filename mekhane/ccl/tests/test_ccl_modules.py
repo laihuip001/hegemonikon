@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/ccl/tests/test_ccl_modules.py Automated PROOF header addition
 #!/usr/bin/env python3
 # PROOF: [L2/テスト] <- mekhane/ccl/tests/
 # PURPOSE: CCL Pattern Cache, Workflow Signature, Output Schema, Tracer の包括テスト

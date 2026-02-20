@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/pks/semantic_scholar.py Automated PROOF header addition
 #!/usr/bin/env python3
 # PROOF: [L2/インフラ] <- mekhane/pks/ A0→Gnōsis 知識基盤の拡充に学術 API が必要
 # PURPOSE: Semantic Scholar API クライアント（論文メタデータの構造化取得）

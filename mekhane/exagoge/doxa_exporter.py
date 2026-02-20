@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/exagoge/doxa_exporter.py Automated PROOF header addition
 #!/usr/bin/env python3
 # PROOF: [L2/コア] <- mekhane/exagoge/
 # PURPOSE: Doxa (信念) データのエクスポート機能

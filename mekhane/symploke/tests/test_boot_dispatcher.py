@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/symploke/tests/test_boot_dispatcher.py Automated PROOF header addition
 """
 Tests for Dispatcher integration in boot_integration.py
 

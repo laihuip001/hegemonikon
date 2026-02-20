@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/mcp/typos_mcp_server.py Automated PROOF header addition
 #!/usr/bin/env python3
 # PROOF: [L2/インフラ] <- mekhane/mcp/ A0→Týpos MCP統合が必要→typos_mcp_serverが担う
 """

@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/periskope/searchers/brave_searcher.py A0→継続する私が必要→CI Compliance
 """
 Brave Search API client for Periskopē.
 

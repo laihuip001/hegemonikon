@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/periskope/searchers/searxng.py A0→継続する私が必要→CI Compliance
 """
 SearXNG search client for Periskopē.
 

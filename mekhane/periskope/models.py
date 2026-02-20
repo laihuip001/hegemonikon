@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/periskope/models.py A0→継続する私が必要→CI Compliance
 """
 Periskopē data models.
 

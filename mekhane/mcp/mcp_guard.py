@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/mcp/mcp_guard.py A0→継続する私が必要→CI Compliance
 """
 MCP Guard — ゾンビプロセス防止の自己防衛モジュール
 

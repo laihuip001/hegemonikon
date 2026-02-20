@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/dendron/falsification_checker.py A0→継続する私が必要→CI Compliance
 """
 S7: Falsification Condition Checker
 

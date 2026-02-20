@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/periskope/searchers/playwright_searcher.py A0→継続する私が必要→CI Compliance
 """
 Playwright-based searcher for Periskopē.
 

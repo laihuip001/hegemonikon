@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/periskope/query_expander.py A0→継続する私が必要→CI Compliance
 """
 Query expander for Periskopē.
 

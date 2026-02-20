@@ -1,3 +1,4 @@
+# PROOF: [A3/Epimeleia] <- mekhane/dendron/ A0→Quality
 """
 S7: Falsification Condition Checker
 

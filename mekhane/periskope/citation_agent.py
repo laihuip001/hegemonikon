@@ -1,3 +1,4 @@
+# PROOF: [L2/K2-Sophia] <- mekhane/periskope/ K2→Generate citations
 """
 Citation verification agent for Periskopē.
 
@@ -454,4 +455,3 @@ class CitationAgent:
 
         # Can't split meaningfully — return as-is
         return [text]
-

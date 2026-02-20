@@ -1,3 +1,4 @@
+# PROOF: [L2/K2-Sophia] <- mekhane/periskope/searchers/ K2→Searchers package
 """
 Periskopē searchers — pluggable search source adapters.
 

@@ -1,3 +1,4 @@
+# PROOF: [L2/A2-Krisis] <- mekhane/dendron/ A2→Match falsification patterns
 """
 Falsification Matcher — 消化論文の主張と epistemic_status.yaml の反証条件を照合
 

@@ -1,3 +1,4 @@
+# PROOF: [L2/K2-Sophia] <- mekhane/periskope/searchers/ K2→SearXNG searcher
 """
 SearXNG search client for Periskopē.
 
@@ -305,4 +306,3 @@ def _truncate(text: str, max_len: int) -> str:
     if len(text) <= max_len:
         return text
     return text[:max_len - 3] + "..."
-

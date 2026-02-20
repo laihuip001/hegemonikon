@@ -1,3 +1,4 @@
+# PROOF: [L2/K2-Sophia] <- mekhane/periskope/ K2→Search engine core
 """
 Periskopē Deep Research Engine — Orchestrator.
 
@@ -1187,4 +1188,3 @@ depth: {depth}
 - [ ] 消化プロセスの振り返り
 - [ ] 信念更新 (/dox)
 - [ ] 知識永続化 (/epi)"""
-

@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/dendron/ A0→継続する私が必要→falsification_checker が担う
 """
 S7: Falsification Condition Checker
 

@@ -1,3 +1,4 @@
+# PROOF: [S2/Mekhanē] <- mekhane/periskope/ S2→方法配置→init が担う
 """
 Periskopē — HGK Deep Research Engine
 

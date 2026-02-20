@@ -1,3 +1,4 @@
+# PROOF: [S2/Mekhanē] <- mekhane/periskope/ S2→方法配置→deep_research が担う
 """
 Page Fetcher — 選択的全文クロール for Periskopē.
 

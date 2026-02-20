@@ -1,3 +1,4 @@
+# PROOF: [S2/Mekhanē] <- mekhane/periskope/ S2→方法配置→models が担う
 """
 Periskopē data models.
 

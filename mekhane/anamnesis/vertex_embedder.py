@@ -1,3 +1,4 @@
+# PROOF: [S2/Mekhanē] <- mekhane/anamnesis/ S2→方法配置→vertex_embedder が担う
 import os
 import logging
 from google import genai

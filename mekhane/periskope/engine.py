@@ -1,3 +1,4 @@
+# PROOF: [S2/Mekhanē] <- mekhane/periskope/ S2→方法配置→engine が担う
 """
 Periskopē Deep Research Engine — Orchestrator.
 

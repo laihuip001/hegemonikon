@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/periskope/ K2→Orchestration→Engine
 """
 Periskopē Deep Research Engine — Orchestrator.
 

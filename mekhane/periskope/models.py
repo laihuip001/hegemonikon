@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/periskope/ S2→Structure→Models
 """
 Periskopē data models.
 

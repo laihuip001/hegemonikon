@@ -1,3 +1,4 @@
+# PROOF: [L2/Search] <- mekhane/periskope/ A2→Krisis→Knowledge Search
 """
 Page Fetcher — 選択的全文クロール for Periskopē.
 

@@ -1,3 +1,4 @@
+# PROOF: [L2/Search] <- mekhane/periskope/ A2→Krisis→Knowledge Search
 """
 Periskopē — HGK Deep Research Engine
 

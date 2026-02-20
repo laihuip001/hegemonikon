@@ -1,3 +1,4 @@
+# PROOF: [L2/Interface] <- mekhane/api/ P2→Telos→API Endpoint
 """
 DevTools API routes — ファイル操作・ターミナル・Ochema (AI) をフロントエンド DevTools ビューに提供。
 

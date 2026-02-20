@@ -1,3 +1,4 @@
+# PROOF: [L2/Interface] <- mekhane/api/ P2→Telos→API Endpoint
 from typing import Any, AsyncGenerator
 
 import asyncio

@@ -1,3 +1,4 @@
+# PROOF: [L2/Dendron] <- kernel/epistemic_status.yaml Axiom→Falsification Check
 """
 S7: Falsification Condition Checker
 

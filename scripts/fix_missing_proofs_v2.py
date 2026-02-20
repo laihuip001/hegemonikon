@@ -1,4 +1,3 @@
-
 import os
 from pathlib import Path
 
@@ -27,6 +26,7 @@ FILES = [
     "mekhane/ochema/proto/__init__.py",
     "mekhane/ochema/proto/extension_server_pb2.py",
     "mekhane/periskope/searchers/__init__.py",
+    "mekhane/periskope/searchers/internal_searcher.py",
     "mekhane/periskope/searchers/tavily_searcher.py",
     "mekhane/periskope/searchers/semantic_scholar_searcher.py",
     "mekhane/periskope/searchers/playwright_searcher.py",
@@ -62,7 +62,7 @@ def add_proof_header(filepath):
     elif "mekhane/periskope" in filepath:
         header = f"# PROOF: [S2/Mekhanē] <- mekhane/periskope/"
     elif "mekhane/ochema" in filepath:
-        header = f"# PROOF: [L2/Infrastucture] <- mekhane/ochema/"
+        header = f"# PROOF: [L2/Infrastructure] <- mekhane/ochema/"
     elif "mekhane/mcp" in filepath:
         header = f"# PROOF: [L2/Infrastructure] <- mekhane/mcp/"
     elif "mekhane/ccl" in filepath:

@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/dendron/ A0→S2→Mekhanē実装
 """
 S7: Falsification Condition Checker
 

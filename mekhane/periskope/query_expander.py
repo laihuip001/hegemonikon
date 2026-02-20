@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/periskope/ A0→S2→Mekhanē実装
 """
 Query expander for Periskopē.
 

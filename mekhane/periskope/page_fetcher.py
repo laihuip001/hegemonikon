@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/periskope/ A0→S2→Mekhanē実装
 """
 Page Fetcher — 選択的全文クロール for Periskopē.
 

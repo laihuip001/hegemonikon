@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/インフラ] <- mekhane/periskope/ S2→研究ツールが必要→Periskopē CLIが担う
 """
 Periskopē CLI — Deep Research from the command line.
 

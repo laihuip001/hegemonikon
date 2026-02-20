@@ -1,3 +1,4 @@
+# PROOF: [L2/Periskope] <- kernel/axiom.md Axiom→DeepSearch
 """
 Tavily Search API client for Periskopē.
 

@@ -1,3 +1,4 @@
+# PROOF: [L2/Periskope] <- kernel/axiom.md Axiom→DeepSearch
 """
 Playwright-based searcher for Periskopē.
 

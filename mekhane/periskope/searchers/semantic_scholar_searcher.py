@@ -1,3 +1,4 @@
+# PROOF: [L2/Periskope] <- kernel/axiom.md Axiom→DeepSearch
 """
 Semantic Scholar API client for Periskopē.
 

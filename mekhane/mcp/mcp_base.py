@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/インフラ] <- mekhane/mcp/ A0→インフラ統合→MCPサーバー共通基盤が必要
 """
 MCP Base Module — Hegemonikón MCP Server Common Infrastructure
 

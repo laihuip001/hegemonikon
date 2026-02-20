@@ -1,150 +1,130 @@
+#!/usr/bin/env python3
+# PROOF: [L2/品質] <- mekhane/dendron/ A2→反証可能性→FalsificationChecker
 """
-S7: Falsification Condition Checker
+Falsification Checker - 反証可能性チェッカー
 
-PURPOSE: epistemic_status.yaml に登録された反証条件を自動チェックし、
-無効化されるべき主張がないか警告する。
+BC-14 (FaR - Falsification and Refutation) を実装し、
+アサーションが「反証可能性」を持っているか、
+または「自明なトートロジー」に陥っていないかをチェックする。
 
-現時点では YAML の整合性チェック + 反証条件の完全性検証を実行。
-将来的に: 新論文の消化時に反証条件とのマッチングを自動化する。
+Design:
+  - Falsifiable (反証可能): 失敗する可能性のある条件 (例: status == 200)
+  - Tautology (トートロジー): 常に真になる条件 (例: True is True)
+  - Unfalsifiable (反証不可能): 定義上常に真 (例: x = 1; assert x == 1)
 """
 
+import ast
 import sys
 from pathlib import Path
+from typing import List, Dict, Any, Optional, Tuple
+from dataclasses import dataclass
 
-import yaml
-
-
-# Project root (hegemonikon/)
-PROJECT_ROOT = Path(__file__).parent.parent.parent
-REGISTRY_PATH = PROJECT_ROOT / "kernel" / "epistemic_status.yaml"
+from .falsification_matcher import FalsificationMatcher, PatternType
 
 
-def load_registry() -> dict:
-    """Load the epistemic status registry"""
-    if not REGISTRY_PATH.exists():
-        print(f"❌ Registry not found: {REGISTRY_PATH}")
-        sys.exit(1)
+# PURPOSE: 反証可能性チェック結果
+@dataclass
+class FalsificationResult:
+    """反証可能性チェック結果"""
+    file_path: str
+    line: int
+    code: str
+    is_falsifiable: bool
+    pattern_type: PatternType
+    reason: str
+    confidence: float
+
+
+# PURPOSE: 反証可能性チェッカー
+class FalsificationChecker:
+    """反証可能性チェッカー"""
     
-    with open(REGISTRY_PATH, encoding="utf-8") as f:
-        return yaml.safe_load(f)
-
-
-def check_completeness(registry: dict) -> list[str]:
-    """Check that all patches have required fields"""
-    issues = []
-    patches = registry.get("patches", {})
+    def __init__(self):
+        self.matcher = FalsificationMatcher()
+        self.results: List[FalsificationResult] = []
     
-    required_fields = ["file", "claim", "source", "status", "falsification"]
-    valid_statuses = {"empirical", "reference", "analogue", "hypothesis"}
-    
-    for patch_id, patch in patches.items():
-        for field in required_fields:
-            if field not in patch or not patch[field]:
-                issues.append(f"❌ {patch_id}: missing '{field}'")
-        
-        status = patch.get("status", "")
-        if status not in valid_statuses:
-            issues.append(f"⚠️ {patch_id}: invalid status '{status}' (valid: {valid_statuses})")
-        
-        # Check that the referenced file exists
-        file_path = PROJECT_ROOT / patch.get("file", "")
-        if patch.get("file") and not file_path.exists():
-            issues.append(f"⚠️ {patch_id}: file not found '{patch['file']}'")
-    
-    return issues
+    # PURPOSE: ファイルをチェックする
+    def check_file(self, file_path: str) -> List[FalsificationResult]:
+        """ファイルをチェックする"""
+        path = Path(file_path)
+        if not path.exists():
+            return []
 
-
-def check_file_references(registry: dict) -> list[str]:
-    """Verify that claims exist in referenced files at specified lines"""
-    issues = []
-    patches = registry.get("patches", {})
-    
-    for patch_id, patch in patches.items():
-        file_path = PROJECT_ROOT / patch.get("file", "")
-        line_num = patch.get("line")
-        
-        if not file_path.exists() or not line_num:
-            continue
-        
         try:
-            lines = file_path.read_text(encoding="utf-8").splitlines()
-            if line_num > len(lines):
-                issues.append(f"⚠️ {patch_id}: line {line_num} exceeds file length ({len(lines)})")
-            else:
-                # Check if the line contains anything related to the claim
-                context = "\n".join(lines[max(0, line_num-3):line_num+3])
-                source = patch.get("source", "")
-                # Try multiple matching strategies for source name
-                source_parts = [
-                    source.split("(")[0].strip(),  # Before parentheses
-                    source.split("&")[0].strip(),   # Before ampersand
-                    source.split(",")[0].strip(),   # Before comma
-                ]
-                found = any(
-                    part and part.lower() in context.lower()
-                    for part in source_parts
-                    if len(part) > 3  # Skip very short fragments
-                )
-                if not found:
-                    issues.append(
-                        f"ℹ️ {patch_id}: source '{source}' not found near line {line_num} "
-                        f"(may have shifted)"
-                    )
-        except Exception as e:
-            issues.append(f"❌ {patch_id}: error reading file: {e}")
-    
-    return issues
+            content = path.read_text(encoding="utf-8")
+            tree = ast.parse(content, filename=file_path)
+            self._visit(tree, file_path, content.splitlines())
+            return self.results
+        except Exception:
+            # パースエラー等は無視
+            return []
+
+    # PURPOSE: ASTを走査する
+    def _visit(self, node: ast.AST, file_path: str, lines: List[str]):
+        """ASTを走査する"""
+        for child in ast.walk(node):
+            if isinstance(child, ast.Assert):
+                self._check_assert(child, file_path, lines)
+
+    # PURPOSE: assert文をチェックする
+    def _check_assert(self, node: ast.Assert, file_path: str, lines: List[str]):
+        """assert文をチェックする"""
+        # ソースコード取得
+        start_line = node.lineno - 1
+        end_line = node.end_lineno if hasattr(node, "end_lineno") and node.end_lineno else node.lineno
+        code = "\n".join(lines[start_line:end_line]).strip()
+        
+        # マッチング
+        match = self.matcher.match(node.test)
+        
+        result = FalsificationResult(
+            file_path=file_path,
+            line=node.lineno,
+            code=code,
+            is_falsifiable=match.is_falsifiable,
+            pattern_type=match.pattern_type,
+            reason=match.reason,
+            confidence=match.confidence
+        )
+        self.results.append(result)
 
 
-def summary_stats(registry: dict) -> dict:
-    """Generate summary statistics"""
-    patches = registry.get("patches", {})
-    status_counts = {}
-    for patch in patches.values():
-        s = patch.get("status", "unknown")
-        status_counts[s] = status_counts.get(s, 0) + 1
-    return {
-        "total_patches": len(patches),
-        "status_distribution": status_counts,
-    }
-
-
+# PURPOSE: CLI エントリポイント
 def main():
-    registry = load_registry()
+    """CLI エントリポイント"""
+    if len(sys.argv) < 2:
+        print("Usage: python -m mekhane.dendron.falsification_checker <file_or_dir>")
+        sys.exit(1)
+
+    target = Path(sys.argv[1])
+    checker = FalsificationChecker()
     
-    print("=" * 60)
-    print("S7: Falsification Condition Check")
-    print("=" * 60)
+    files = []
+    if target.is_file():
+        files.append(str(target))
+    elif target.is_dir():
+        files.extend(str(p) for p in target.glob("**/*.py"))
+
+    for f in files:
+        checker.check_file(f)
+
+    # 結果表示
+    falsifiable = [r for r in checker.results if r.is_falsifiable]
+    tautology = [r for r in checker.results if r.pattern_type == PatternType.TAUTOLOGY]
+    unfalsifiable = [r for r in checker.results if not r.is_falsifiable and r.pattern_type != PatternType.TAUTOLOGY]
     
-    # Stats
-    stats = summary_stats(registry)
-    print(f"\nTotal patches: {stats['total_patches']}")
-    print(f"Status distribution: {stats['status_distribution']}")
+    print(f"Checked {len(files)} files, found {len(checker.results)} assertions.")
+    print(f"  ✅ Falsifiable: {len(falsifiable)}")
+    print(f"  ❌ Tautology:   {len(tautology)}")
+    print(f"  ⚠️ Unfalsifiable: {len(unfalsifiable)}")
     
-    # Completeness check
-    print("\n--- Completeness Check ---")
-    comp_issues = check_completeness(registry)
-    if comp_issues:
-        for issue in comp_issues:
-            print(f"  {issue}")
-    else:
-        print("  ✅ All patches have required fields")
-    
-    # File reference check
-    print("\n--- File Reference Check ---")
-    ref_issues = check_file_references(registry)
-    if ref_issues:
-        for issue in ref_issues:
-            print(f"  {issue}")
-    else:
-        print("  ✅ All file references valid")
-    
-    # Overall
-    total_issues = len(comp_issues) + len(ref_issues)
-    print(f"\n{'✅' if total_issues == 0 else '⚠️'} Total issues: {total_issues}")
-    
-    return total_issues
+    if tautology:
+        print("\nTautologies found:")
+        for r in tautology:
+            print(f"  {r.file_path}:{r.line} - {r.code} ({r.reason})")
+
+    sys.exit(1 if tautology else 0)
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    main()

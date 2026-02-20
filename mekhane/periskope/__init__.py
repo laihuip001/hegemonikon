@@ -1,3 +1,4 @@
+# PROOF: [L2/Periskope] <- mekhane/periskope/ K4→Init→Module initialization
 """
 Periskopē — HGK Deep Research Engine
 

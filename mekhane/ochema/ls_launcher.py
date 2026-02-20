@@ -1,3 +1,4 @@
+# PROOF: [L2/Ochema] <- mekhane/ochema/ O1→Launcher→Language Server process management
 #!/usr/bin/env python3
 """LS Standalone Launcher — IDE なしで Language Server を直接起動する。
 

@@ -1,3 +1,4 @@
+# PROOF: [L2/Base] <- mekhane/ S2→Tape→Sequential execution context
 """
 Tape Writer — WF 実行トレースを JSONL として記録する。
 

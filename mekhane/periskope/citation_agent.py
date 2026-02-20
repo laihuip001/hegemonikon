@@ -1,3 +1,4 @@
+# PROOF: [L2/Periskope] <- mekhane/periskope/ K4→Citation→Citation verification agent
 """
 Citation verification agent for Periskopē.
 

@@ -1,3 +1,4 @@
+# PROOF: [L2/Impl] <- mekhane/ A0->Impl->Module
 """Tests for JulesFeedback — L2結果→L0精度フィードバック。"""
 
 import json

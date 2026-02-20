@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Impl] <- mekhane/ A0->Impl->Module
 # PURPOSE: PKS v2 E2E シナリオテスト
 """
 PKS v2 End-to-End シナリオテスト

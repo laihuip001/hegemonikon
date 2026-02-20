@@ -1,3 +1,4 @@
+# PROOF: [L2/Impl] <- mekhane/ A0->Impl->Module
 """Tests for thinking config resolution (HGK depth -> model params)."""
 
 import pytest

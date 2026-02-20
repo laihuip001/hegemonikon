@@ -1,3 +1,4 @@
+# PROOF: [L2/Impl] <- mekhane/ A0->Impl->Module
 """
 Guardian Integration Tests — /bou ② テスト守護者
 

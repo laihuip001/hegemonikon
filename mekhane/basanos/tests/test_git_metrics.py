@@ -1,3 +1,4 @@
+# PROOF: [L2/Impl] <- mekhane/ A0->Impl->Module
 """Tests for GitMetrics — git 履歴からのリスク予兆検出。"""
 
 import subprocess

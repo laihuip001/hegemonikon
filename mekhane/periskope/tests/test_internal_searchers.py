@@ -1,3 +1,4 @@
+# PROOF: [L2/Impl] <- mekhane/ A0->Impl->Module
 """
 Tests for internal searchers (Gnōsis, Sophia, Kairos).
 """

@@ -110,6 +110,7 @@ def summary_stats(registry: dict) -> dict:
     }
 
 
+# PURPOSE: メイン処理を実行する
 def main():
     registry = load_registry()
     

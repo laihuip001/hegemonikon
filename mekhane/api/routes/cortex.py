@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/ A0→Fixing CI failure
 from typing import Any, AsyncGenerator
 
 import asyncio

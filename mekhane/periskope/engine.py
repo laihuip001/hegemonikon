@@ -1,3 +1,4 @@
+# PROOF: [L2/Impl] <- periskope/ A0->Auto-fix->CI Repair
 """
 Periskopē Deep Research Engine — Orchestrator.
 

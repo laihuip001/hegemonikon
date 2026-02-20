@@ -1,3 +1,4 @@
+# PROOF: [L2/Impl] <- routes/ A0->Auto-fix->CI Repair
 """
 DevTools API routes — ファイル操作・ターミナル・Ochema (AI) をフロントエンド DevTools ビューに提供。
 

@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- mekhane/ A0→観測可能→実行トレースを記録する→TapeWriter
 """
 Tape Writer — WF 実行トレースを JSONL として記録する。
 
@@ -15,18 +17,22 @@ import os
 from datetime import datetime, timezone
 from pathlib import Path
 
+# PURPOSE: Tape storage directory
 TAPE_DIR = Path(__file__).resolve().parents[2] / ".agent" / "tape"
 
 
+# PURPOSE: Tape Writer Class
 class TapeWriter:
     """Append-only JSONL tape for WF execution traces."""
 
+    # PURPOSE: Initialize TapeWriter
     def __init__(self, tape_dir: Path | None = None):
         self.tape_dir = tape_dir or TAPE_DIR
         self.tape_dir.mkdir(parents=True, exist_ok=True)
         now = datetime.now(timezone.utc)
         self.filepath = self.tape_dir / f"tape_{now.strftime('%Y-%m-%d_%H%M')}.jsonl"
 
+    # PURPOSE: Log an entry
     def log(self, wf: str, step: str, **kwargs) -> dict:
         """Append a trace entry to the tape file.
 
@@ -48,6 +54,7 @@ class TapeWriter:
             f.write(json.dumps(entry, ensure_ascii=False) + "\n")
         return entry
 
+    # PURPOSE: Read all entries
     def read(self) -> list[dict]:
         """Read all entries from the current tape file."""
         if not self.filepath.exists():
@@ -60,6 +67,7 @@ class TapeWriter:
                     entries.append(json.loads(line))
         return entries
 
+    # PURPOSE: Summarize tape
     def summary(self) -> dict:
         """Return a summary of the current tape."""
         entries = self.read()

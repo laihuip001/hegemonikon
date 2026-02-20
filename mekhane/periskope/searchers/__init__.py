@@ -1,3 +1,4 @@
+# PROOF: [L2/Impl] <- searchers/ A0->Auto-fix->CI Repair
 """
 Periskopē searchers — pluggable search source adapters.
 

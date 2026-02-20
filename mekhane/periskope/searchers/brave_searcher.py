@@ -1,3 +1,4 @@
+# PROOF: [L2/Impl] <- searchers/ A0->Auto-fix->CI Repair
 """
 Brave Search API client for Periskopē.
 

@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Impl] <- periskope/ A0->Auto-fix->CI Repair
 """
 Periskopē CLI — Deep Research from the command line.
 

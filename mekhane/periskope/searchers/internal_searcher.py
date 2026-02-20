@@ -1,3 +1,4 @@
+# PROOF: [L2/Impl] <- searchers/ A0->Auto-fix->CI Repair
 """
 Internal knowledge searcher for Periskopē.
 

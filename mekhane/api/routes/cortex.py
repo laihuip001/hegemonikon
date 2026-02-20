@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/ Missing proof filled by CI fix
 from typing import Any, AsyncGenerator
 
 import asyncio

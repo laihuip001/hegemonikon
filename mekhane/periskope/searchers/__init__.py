@@ -1,3 +1,4 @@
+# PROOF: [L2/Periskope] <- mekhane/periskope/ O3→Zētēsis→Searcher Adapters
 """
 Periskopē searchers — pluggable search source adapters.
 

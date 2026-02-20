@@ -1,3 +1,4 @@
+# PROOF: [L2/Periskope] <- mekhane/periskope/ O3→Zētēsis→SearXNG Integration
 """
 SearXNG search client for Periskopē.
 

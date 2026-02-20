@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/ A0→実装基盤
 """
 Playwright-based searcher for Periskopē.
 

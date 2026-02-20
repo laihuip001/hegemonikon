@@ -1,3 +1,4 @@
+# PROOF: [P4/Periskope] <- mekhane/periskope/searchers/ A0->Init
 """
 Periskopē searchers — pluggable search source adapters.
 

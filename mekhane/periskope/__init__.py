@@ -1,3 +1,4 @@
+# PROOF: [P4/Periskope] <- mekhane/periskope/ A0->Init
 """
 Periskopē — HGK Deep Research Engine
 

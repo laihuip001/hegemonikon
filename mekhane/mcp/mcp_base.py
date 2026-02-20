@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- (Auto-fix) CI check compliance
 """
 MCP Base Module — Hegemonikón MCP Server Common Infrastructure
 

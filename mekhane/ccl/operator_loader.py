@@ -1,3 +1,4 @@
+# PROOF: [L2/Impl] <- mekhane/ccl/ A0->Impl->OperatorLoader
 """operators.md の SSOT パーサー。
 
 operators.md の Markdown テーブルから演算子定義を抽出し、

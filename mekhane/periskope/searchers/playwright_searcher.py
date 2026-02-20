@@ -1,3 +1,4 @@
+# PROOF: [S2/Mekhanē] <- mekhane/periskope/searchers/ S2→方法配置→searcher が担う
 """
 Playwright-based searcher for Periskopē.
 

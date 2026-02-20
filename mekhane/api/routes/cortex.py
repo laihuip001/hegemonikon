@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/api/ A0→継続する私が必要→routes が担う
 from typing import Any, AsyncGenerator
 
 import asyncio

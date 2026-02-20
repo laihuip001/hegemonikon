@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/インフラ] <- mekhane/periskope/ A0→S2→Mekhanē実装
 """
 Periskopē CLI — Deep Research from the command line.
 

@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/api/routes/ A0→S2→Mekhanē実装
 from typing import Any, AsyncGenerator
 
 import asyncio

@@ -1,3 +1,4 @@
+# PROOF: [L2/Infrastructure] <- mekhane/periskope/ S4→Citation Agent
 """
 Citation verification agent for Periskopē.
 

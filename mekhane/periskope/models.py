@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/periskope/ S2→データ構造が必要→Periskopē Modelsが担う
 """
 Periskopē data models.
 

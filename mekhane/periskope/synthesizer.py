@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/periskope/ S2→統合分析が必要→Synthesizerが担う
 """
 Multi-model synthesizer for Periskopē.
 

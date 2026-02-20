@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/periskope/ S2→内部検索が必要→InternalSearcherが担う
 """
 Internal knowledge searcher for Periskopē.
 

@@ -1,3 +1,4 @@
+# PROOF: [S2/Mekhanē] <- mekhane/periskope/
 """
 SearXNG search client for Periskopē.
 

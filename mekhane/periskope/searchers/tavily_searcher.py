@@ -1,4 +1,4 @@
-# PROOF: [K2/Sophia] <- mekhane/periskope/searchers/ K2→Tavily searcher
+# PROOF: [L2/K2-Sophia] <- mekhane/periskope/searchers/ K2→Tavily searcher
 """
 Tavily Search API client for Periskopē.
 

@@ -1,4 +1,4 @@
-# PROOF: [A2/Krisis] <- mekhane/dendron/ A2→Check for falsification
+# PROOF: [L2/A2-Krisis] <- mekhane/dendron/ A2→Check for falsification
 """
 S7: Falsification Condition Checker
 

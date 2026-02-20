@@ -1,4 +1,4 @@
-# PROOF: [K3/Anamnēsis] <- mekhane/anamnesis/ K3→Embed vertices for memory
+# PROOF: [L2/K3-Anamnēsis] <- mekhane/anamnesis/ K3→Embed vertices for memory
 import os
 import logging
 from google import genai

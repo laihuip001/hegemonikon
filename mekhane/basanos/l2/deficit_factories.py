@@ -1,4 +1,4 @@
-# PROOF: [A2/Krisis] <- mekhane/basanos/l2/ A2→Generate deficits
+# PROOF: [L2/A2-Krisis] <- mekhane/basanos/l2/ A2→Generate deficits
 # PURPOSE: 3種の deficit (η, ε, Δε/Δt) を検出するファクトリ群
 # REASON: F⊣G 随伴構造の「破れ」を自動検出し、問いに変換するため
 """Deficit factories for Basanos L2.

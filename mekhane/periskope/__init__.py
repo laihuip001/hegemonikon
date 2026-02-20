@@ -1,4 +1,4 @@
-# PROOF: [K2/Sophia] <- mekhane/periskope/ K2→Periskopē package
+# PROOF: [L2/K2-Sophia] <- mekhane/periskope/ K2→Periskopē package
 """
 Periskopē — HGK Deep Research Engine
 

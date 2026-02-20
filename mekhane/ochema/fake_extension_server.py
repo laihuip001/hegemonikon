@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+# PROOF: [L2/Mekhanē] <- mekhane/ochema/ A0→OAuth同期が必要→FakeExtensionServerが担う
 """Fake Extension Server — ConnectRPC over HTTP.
 
 LS は ConnectRPC (extension_server_go_proto_connect) で Extension Server に接続する。

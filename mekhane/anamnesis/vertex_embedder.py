@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhanē] <- mekhane/anamnesis/ A0→意味検索が必要→VertexEmbedderが担う
 import os
 import logging
 from google import genai

@@ -1,3 +1,4 @@
+# PROOF: [L2/Infrastructure] <- mekhane/mcp/ S2→AutoFix
 #!/usr/bin/env python3
 """
 MCP Base Module — Hegemonikón MCP Server Common Infrastructure

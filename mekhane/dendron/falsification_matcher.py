@@ -1,3 +1,4 @@
+# PROOF: [L2/System] <- mekhane/dendron/ A0->Structure->Dendron verifies structural integrity
 """
 Falsification Matcher — 消化論文の主張と epistemic_status.yaml の反証条件を照合
 

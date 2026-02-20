@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/periskope/ A0->Discovery->Periskope searches external knowledge
 """
 Page Fetcher — 選択的全文クロール for Periskopē.
 

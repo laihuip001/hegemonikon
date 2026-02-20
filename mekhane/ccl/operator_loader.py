@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhanē] <- mekhane/ccl/ A0→一貫性が必要→OperatorLoaderが担う
 """operators.md の SSOT パーサー。
 
 operators.md の Markdown テーブルから演算子定義を抽出し、

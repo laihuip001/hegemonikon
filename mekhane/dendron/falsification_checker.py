@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhanē] <- mekhane/dendron/ A0→健全性が必要→FalsificationCheckerが担う
 """
 S7: Falsification Condition Checker
 

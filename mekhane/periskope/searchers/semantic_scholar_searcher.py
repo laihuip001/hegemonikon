@@ -1,4 +1,3 @@
-# PROOF: [L3/Periskope] <- mekhane/periskope/searchers/semantic_scholar_searcher.py Search Integration
 """
 Semantic Scholar API client for Periskopē.
 

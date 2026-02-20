@@ -1,4 +1,3 @@
-# PROOF: [L3/Periskope] <- mekhane/periskope/cli.py Search Integration
 #!/usr/bin/env python3
 """
 Periskopē CLI — Deep Research from the command line.

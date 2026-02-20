@@ -1,4 +1,3 @@
-# PROOF: [L3/Periskope] <- mekhane/periskope/synthesizer.py Search Integration
 """
 Multi-model synthesizer for Periskopē.
 

@@ -1,4 +1,3 @@
-# PROOF: [L3/Periskope] <- mekhane/periskope/models.py Search Integration
 """
 Periskopē data models.
 

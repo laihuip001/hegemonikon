@@ -1,4 +1,3 @@
-# PROOF: [L3/Periskope] <- mekhane/periskope/searchers/brave_searcher.py Search Integration
 """
 Brave Search API client for Periskopē.
 

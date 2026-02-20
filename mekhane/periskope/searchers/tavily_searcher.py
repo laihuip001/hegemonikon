@@ -1,4 +1,3 @@
-# PROOF: [L3/Periskope] <- mekhane/periskope/searchers/tavily_searcher.py Search Integration
 """
 Tavily Search API client for Periskopē.
 

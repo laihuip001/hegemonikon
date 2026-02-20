@@ -1,4 +1,3 @@
-# PROOF: [L3/Periskope] <- mekhane/periskope/searchers/playwright_searcher.py Search Integration
 """
 Playwright-based searcher for Periskopē.
 

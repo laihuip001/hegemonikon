@@ -1,4 +1,3 @@
-# PROOF: [L3/Periskope] <- mekhane/periskope/citation_agent.py Search Integration
 """
 Citation verification agent for Periskopē.
 

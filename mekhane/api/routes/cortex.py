@@ -1,4 +1,3 @@
-# PROOF: [L3/API] <- mekhane/api/routes/cortex.py Service Interface
 from typing import Any, AsyncGenerator
 
 import asyncio

@@ -1,4 +1,3 @@
-# PROOF: [L3/Periskope] <- mekhane/periskope/searchers/__init__.py Search Integration
 """
 Periskopē searchers — pluggable search source adapters.
 

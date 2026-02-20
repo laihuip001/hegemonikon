@@ -1,4 +1,3 @@
-# PROOF: [L3/Periskope] <- mekhane/periskope/engine.py Search Integration
 """
 Periskopē Deep Research Engine — Orchestrator.
 

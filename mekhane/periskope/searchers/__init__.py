@@ -1,3 +1,4 @@
+# PROOF: [L2/Impl] <- mekhane/ Automated fix for CI
 """
 Periskopē searchers — pluggable search source adapters.
 

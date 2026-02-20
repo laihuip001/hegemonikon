@@ -1,3 +1,5 @@
+# PROOF: [S2/Mekhanē] <- mekhane/periskope/searchers/
+# PURPOSE: Internal Searcher — 内部知識ベース検索
 """
 Internal knowledge searcher for Periskopē.
 

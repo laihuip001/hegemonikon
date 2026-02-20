@@ -1,5 +1,5 @@
-# PROOF: [L1/定理] <- mekhane/ CCL→実行基盤が必要
 #!/usr/bin/env python3
+# PROOF: [L1/定理] <- mekhane/ CCL→実行基盤が必要
 """
 CCL Tracer (v1.0)
 Cognitive Control Language Debugging Tool

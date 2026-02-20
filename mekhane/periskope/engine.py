@@ -1,3 +1,5 @@
+# PROOF: [S2/Mekhanē] <- mekhane/periskope/ S2→Engine→Core
+# PURPOSE: Periskope Engine — 検索・消化・合成のコアロジック
 """
 Periskopē Deep Research Engine — Orchestrator.
 

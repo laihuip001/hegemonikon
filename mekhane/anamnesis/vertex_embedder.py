@@ -1,3 +1,5 @@
+# PROOF: [K3/想起] <- mekhane/anamnesis/ K3→Memory→Embedder
+# PURPOSE: Vertex Embedder — 記憶断片のベクトル化
 import os
 import logging
 from google import genai

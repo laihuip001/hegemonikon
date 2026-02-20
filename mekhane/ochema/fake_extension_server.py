@@ -1,3 +1,5 @@
+# PROOF: [L2/インフラ] <- mekhane/ochema/ S2→Routing→FakeServer
+# PURPOSE: Fake Extension Server — テスト用拡張サーバーモック
 """Fake Extension Server — ConnectRPC over HTTP.
 
 LS は ConnectRPC (extension_server_go_proto_connect) で Extension Server に接続する。

@@ -1,5 +1,5 @@
-# PROOF: [L3/テスト] <- mekhane/symploke/tests/ 対象モジュールが存在→検証が必要→test_api_connection が担う
 #!/usr/bin/env python3
+# PROOF: [L3/テスト] <- mekhane/symploke/tests/ 対象モジュールが存在→検証が必要→test_api_connection が担う
 """
 Quick API connection test for Jules API.
 Tests if the API key is valid and can connect to Jules.

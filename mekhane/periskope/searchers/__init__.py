@@ -1,3 +1,5 @@
+# PROOF: [S2/Mekhanē] <- mekhane/periskope/searchers/
+# PURPOSE: Searchers Init — 検索プロバイダモジュール
 """
 Periskopē searchers — pluggable search source adapters.
 

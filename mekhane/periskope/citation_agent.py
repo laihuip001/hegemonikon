@@ -1,3 +1,5 @@
+# PROOF: [S2/Mekhanē] <- mekhane/periskope/ S2→Engine→Citation
+# PURPOSE: Citation Agent — 引用の正確性検証と整形
 """
 Citation verification agent for Periskopē.
 

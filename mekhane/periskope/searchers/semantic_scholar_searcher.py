@@ -1,3 +1,5 @@
+# PROOF: [S2/Mekhanē] <- mekhane/periskope/searchers/
+# PURPOSE: Semantic Scholar Searcher — 論文検索アダプタ
 """
 Semantic Scholar API client for Periskopē.
 

@@ -1,3 +1,5 @@
+# PROOF: [L3/統合] <- mekhane/mcp/ S2→Protocol→Guard
+# PURPOSE: MCP Guard — プロトコル違反を検出し遮断する
 """
 MCP Guard — ゾンビプロセス防止の自己防衛モジュール
 

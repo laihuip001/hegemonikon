@@ -1,3 +1,5 @@
+# PROOF: [L2/インフラ] <- mekhane/tape.py
+# PURPOSE: Tape — 認知プロセスの記録媒体
 """
 Tape Writer — WF 実行トレースを JSONL として記録する。
 

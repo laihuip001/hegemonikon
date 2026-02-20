@@ -1,3 +1,5 @@
+# PROOF: [S2/Mekhanē] <- mekhane/periskope/searchers/
+# PURPOSE: Tavily Searcher — Tavily API検索アダプタ
 """
 Tavily Search API client for Periskopē.
 

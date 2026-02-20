@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# PROOF: [S2/Mekhanē] <- mekhane/periskope/ S2→Engine→CLI
+# PURPOSE: Periskope CLI — コマンドラインからの調査実行
 """
 Periskopē CLI — Deep Research from the command line.
 

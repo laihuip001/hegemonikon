@@ -1,3 +1,5 @@
+# PROOF: [A4/知識] <- mekhane/dendron/ A4→Verification→Checker
+# PURPOSE: Falsification Checker — 反証可能性の検証
 """
 S7: Falsification Condition Checker
 

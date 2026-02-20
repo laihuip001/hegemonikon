@@ -1,3 +1,5 @@
+# PROOF: [S2/Mekhanē] <- mekhane/periskope/searchers/
+# PURPOSE: SearXNG Searcher — メタ検索エンジンアダプタ
 """
 SearXNG search client for Periskopē.
 

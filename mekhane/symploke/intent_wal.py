@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# PROOF: [L2/インフラ] <- mekhane/symploke/ A0→Agent→IntentWAL
+# PURPOSE: Intent WAL — 意図の先行書き込みログ
 """Intent-WAL (Write-Ahead Log) Manager.
 
 Manages session intent WAL files for crash recovery and context continuity.

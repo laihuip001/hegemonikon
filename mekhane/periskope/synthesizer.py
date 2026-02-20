@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/periskope/ A0→継続する私が必要→synthesizerが担う
 """
 Multi-model synthesizer for Periskopē.
 

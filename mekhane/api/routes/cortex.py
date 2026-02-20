@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/api/routes/ A0→継続する私が必要→cortex_routeが担う
 from typing import Any, AsyncGenerator
 
 import asyncio

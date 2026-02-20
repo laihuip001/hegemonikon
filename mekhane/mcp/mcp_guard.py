@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/mcp/ A0→継続する私が必要→mcp_guardが担う
 """
 MCP Guard — ゾンビプロセス防止の自己防衛モジュール
 

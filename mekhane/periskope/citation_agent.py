@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/periskope/ A0→継続する私が必要→citation_agentが担う
 """
 Citation verification agent for Periskopē.
 

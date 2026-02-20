@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/periskope/ A0→継続する私が必要→cliが担う
 #!/usr/bin/env python3
 """
 Periskopē CLI — Deep Research from the command line.

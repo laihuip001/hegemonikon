@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/periskope/searchers/ A0→継続する私が必要→internal_searcherが担う
 """
 Internal knowledge searcher for Periskopē.
 

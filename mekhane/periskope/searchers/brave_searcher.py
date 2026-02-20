@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/periskope/searchers/ A0→継続する私が必要→brave_searcherが担う
 """
 Brave Search API client for Periskopē.
 

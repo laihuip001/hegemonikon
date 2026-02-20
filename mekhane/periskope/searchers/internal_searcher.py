@@ -1,3 +1,4 @@
+# PROOF: [L2/Impl] <- mekhane/ A0->Impl->Module
 """
 Internal knowledge searcher for Periskopē.
 

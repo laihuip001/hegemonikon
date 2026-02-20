@@ -1,3 +1,4 @@
+# PROOF: [L2/Periskopē] <- mekhane/periskope/ A0->Auto-fix for CI
 """
 Semantic Scholar API client for Periskopē.
 

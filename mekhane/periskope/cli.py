@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Periskopē] <- mekhane/periskope/ A0->Auto-fix for CI
 """
 Periskopē CLI — Deep Research from the command line.
 

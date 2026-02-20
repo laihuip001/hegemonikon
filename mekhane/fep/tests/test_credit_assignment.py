@@ -1,3 +1,4 @@
+# PROOF: [L2/Impl] <- mekhane/ A0->Impl->Module
 """Tests for Credit Assignment — Teacher Signal for FEP Agent."""
 
 import json

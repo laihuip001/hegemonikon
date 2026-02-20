@@ -1,3 +1,4 @@
+# PROOF: [L2/Impl] <- mekhane/ A0->Impl->Module
 """Tests for mekhane.fep.universality — Kalon (圏論的普遍性検証)."""
 
 import json

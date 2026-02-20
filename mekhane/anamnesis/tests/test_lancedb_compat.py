@@ -1,3 +1,4 @@
+# PROOF: [L2/Impl] <- mekhane/ A0->Impl->Module
 """Tests for mekhane.anamnesis.lancedb_compat."""
 
 import unittest

@@ -1,3 +1,4 @@
+# PROOF: [L2/Impl] <- mekhane/ A0->Impl->Module
 """
 GatewayBridge テスト — E2E + 単体テスト
 

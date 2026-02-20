@@ -1,3 +1,4 @@
+# PROOF: [L2/Impl] <- mekhane/ A0->Impl->Module
 """Tests for W3 QueryExpander and P3 weight distribution."""
 
 from __future__ import annotations

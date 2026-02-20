@@ -1,3 +1,4 @@
+# PROOF: [L2/Impl] <- mekhane/ A0->Impl->Module
 """Tests for pw_adapter.py — L1↔L2 PW bridge."""
 
 import pytest

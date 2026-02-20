@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Impl] <- mekhane/ A0->Impl->Module
 """
 Generate → Score Pipeline CI Tests
 

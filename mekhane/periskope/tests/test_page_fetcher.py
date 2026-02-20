@@ -1,3 +1,4 @@
+# PROOF: [L2/Impl] <- mekhane/ A0->Impl->Module
 """
 Tests for PageFetcher (W7: selective full-page crawling).
 """

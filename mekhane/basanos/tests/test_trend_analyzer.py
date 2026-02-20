@@ -1,3 +1,4 @@
+# PROOF: [L2/Impl] <- mekhane/ A0->Impl->Module
 """Tests for TrendAnalyzer — 合成データで全機能をテスト。"""
 
 import json

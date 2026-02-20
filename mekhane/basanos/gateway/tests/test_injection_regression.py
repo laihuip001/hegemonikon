@@ -1,3 +1,4 @@
+# PROOF: [L2/Impl] <- mekhane/ A0->Impl->Module
 """
 Injection Regression Test Suite — 6攻撃ベクタによるセキュリティ検証
 

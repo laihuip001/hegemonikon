@@ -1,3 +1,4 @@
+# PROOF: [L2/Impl] <- mekhane/ A0->Impl->Module
 """UML Phase 2 — SEL 統合テスト"""
 
 import pytest

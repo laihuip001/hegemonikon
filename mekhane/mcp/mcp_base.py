@@ -1,3 +1,4 @@
+# PROOF: [L2/Auto] <- mekhane/dendron/ Auto-generated proof for CI compliance
 #!/usr/bin/env python3
 """
 MCP Base Module — Hegemonikón MCP Server Common Infrastructure

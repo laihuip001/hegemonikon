@@ -1,3 +1,4 @@
+# PROOF: [L2/Auto] <- mekhane/dendron/ Auto-generated proof for CI compliance
 """
 DevTools API routes — ファイル操作・ターミナル・Ochema (AI) をフロントエンド DevTools ビューに提供。
 

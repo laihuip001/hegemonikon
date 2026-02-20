@@ -1,3 +1,4 @@
+# PROOF: [L2/Auto] <- mekhane/dendron/ Auto-generated proof for CI compliance
 """
 Periskopē — HGK Deep Research Engine
 

@@ -8,8 +8,10 @@ import './styles.css';
 // ─── Bootstrap ───────────────────────────────────────────────
 
 document.addEventListener('DOMContentLoaded', () => {
-  buildSidebar();
+  buildIconRail();
+  buildTabNav();
   setupNavigation();
+  setupSlidePanel();
   navigate(DEFAULT_ROUTE);
   // Start global badge polling
   void updateNotifBadge();
@@ -23,14 +25,242 @@ document.addEventListener('DOMContentLoaded', () => {
   initThemeToggle();
 });
 
-// ─── Dynamic Sidebar ─────────────────────────────────────────
+// ─── U1: Icon Rail (左端アイコンバー) ────────────────────────
 
-function buildSidebar(): void {
-  const nav = document.querySelector('nav');
+// MECE 再設計 — HGK 認知フロー型 (η→K→Δ→ε→Ω)
+// 軸: 対話(入力) → 知識(記憶) → 判断(処理) → 実行(出力) → 状態(管理)
+const ICON_GROUPS = [
+  {
+    id: 'dialogue',
+    icon: 'η',          // eta: 自然変換の単位 = 入力・対話の始点
+    label: '対話',
+    routes: ['orchestrator', 'chat', 'agents'],
+    desc: 'AI との対話・指揮・エージェント操作 (入力層)',
+  },
+  {
+    id: 'knowledge',
+    icon: 'K',           // K-series (Kairos): 知識・文脈
+    label: '知識',
+    routes: ['search', 'gnosis', 'sophia', 'digestor', 'fep'],
+    desc: '知識検索・論文・KI・消化・FEP理論 (記憶層)',
+  },
+  {
+    id: 'judgement',
+    icon: 'Δ',           // Delta-layer: 判断・批評
+    label: '判断',
+    routes: ['quality', 'postcheck', 'synteleia', 'synedrion', 'aristos'],
+    desc: '品質検証・監査・判定 (処理層)',
+  },
+  {
+    id: 'output',
+    icon: 'ε',           // epsilon: 余単位 = 射出・具現化
+    label: '可視化',
+    routes: ['dashboard', 'graph', 'timeline'],
+    desc: 'ダッシュボード・グラフ・タイムライン (出力層)',
+  },
+  {
+    id: 'system',
+    icon: 'Ω',           // Omega-layer: 全体統御
+    label: '運用',
+    routes: ['notifications', 'pks', 'devtools', 'desktop', 'settings'],
+    desc: '通知・インフラ・DevTools・設定 (管理層)',
+  },
+];
+
+let activeGroup = 'dialogue';
+let expandedGroup: string | null = 'dialogue'; // Obsidian style
+let isTabNavOpen = true; // Tab nav toggle
+
+function buildIconRail(): void {
+  const rail = document.getElementById('icon-rail');
+  if (!rail) return;
+
+  let html = '';
+  for (const g of ICON_GROUPS) {
+    const isActive = g.id === activeGroup;
+    const isExpanded = g.id === expandedGroup;
+
+    // Group icon button
+    html += `<button class="rail-btn ${isActive ? 'active' : ''}" data-group="${g.id}" title="${g.label}: ${g.desc}">
+      <span class="rail-icon">${g.icon}</span>
+    </button>`;
+
+    // Obsidian-style: expanded sub-items below icon
+    if (isExpanded) {
+      html += `<div class="rail-sub-items">`;
+      for (const rKey of g.routes) {
+        const route = ROUTES.find(r => r.key === rKey);
+        if (!route) continue;
+        const isCurrent = rKey === getCurrentRoute();
+        html += `<button class="rail-sub-btn ${isCurrent ? 'active' : ''}" data-route="${route.key}" title="${route.label}">
+          <span class="rail-sub-icon">${route.icon}</span>
+        </button>`;
+      }
+      html += `</div>`;
+    }
+  }
+
+  // Tab nav toggle at bottom
+  html += `<div class="rail-spacer"></div>`;
+  html += `<button class="rail-btn rail-toggle" title="${isTabNavOpen ? 'タブを閉じる' : 'タブを開く'}">
+    <span class="rail-icon">${isTabNavOpen ? '◀' : '▶'}</span>
+  </button>`;
+
+  rail.innerHTML = html;
+}
+
+// ─── U2: Vertical Tab Nav (縦タブ) ──────────────────────────
+
+function buildTabNav(): void {
+  const nav = document.getElementById('tab-nav');
   if (!nav) return;
-  nav.innerHTML = ROUTES.map(r =>
-    `<button data-route="${r.key}">${r.icon} ${r.label}</button>`
-  ).join('');
+
+  // Toggle visibility
+  nav.classList.toggle('collapsed', !isTabNavOpen);
+  // Update grid
+  const app = document.getElementById('app');
+  if (app) {
+    app.style.gridTemplateColumns = isTabNavOpen ? '48px 180px 1fr' : '48px 1fr';
+  }
+
+  if (!isTabNavOpen) {
+    nav.innerHTML = '';
+    return;
+  }
+
+  const group = ICON_GROUPS.find(g => g.id === activeGroup);
+  if (!group) return;
+
+  const tabs = group.routes.map(rKey => {
+    const route = ROUTES.find(r => r.key === rKey);
+    if (!route) return '';
+    const isCurrent = rKey === getCurrentRoute();
+    return `<button class="tab-btn ${isCurrent ? 'active' : ''}" data-route="${route.key}">
+      <span class="tab-icon">${route.icon}</span>
+      <span class="tab-label">${route.label}</span>
+    </button>`;
+  }).join('');
+
+  nav.innerHTML = `
+    <h2 class="nav-brand">⬡ Hegemonikón</h2>
+    <div class="tab-group-label">${group.icon} ${group.label}</div>
+    ${tabs}
+  `;
+}
+
+// ─── U3: Assistant Panel ────────────────────────────────────
+
+function setupSlidePanel(): void {
+  const trigger = document.getElementById('slide-trigger');
+  const panel = document.getElementById('slide-panel');
+  const closeBtn = document.getElementById('slide-panel-close');
+  const clearBtn = document.getElementById('assistant-clear');
+  const sendBtn = document.getElementById('assistant-send');
+  const inputEl = document.getElementById('assistant-input') as HTMLTextAreaElement | null;
+  const messagesEl = document.getElementById('assistant-messages');
+  const navToggle = document.getElementById('tab-nav-toggle');
+
+  /* ── Open/Close helpers ── */
+  const openPanel = () => {
+    panel?.classList.add('open');
+    trigger?.classList.add('hidden');
+  };
+  const closePanel = () => {
+    panel?.classList.remove('open');
+    trigger?.classList.remove('hidden');
+  };
+
+  /* ── Trigger (right edge) ── */
+  if (trigger) {
+    trigger.addEventListener('mouseenter', () => trigger.classList.add('hover'));
+    trigger.addEventListener('mouseleave', () => trigger.classList.remove('hover'));
+    trigger.addEventListener('click', openPanel);
+  }
+  closeBtn?.addEventListener('click', closePanel);
+
+  /* ── nav ◧ button opens assistant panel ── */
+  navToggle?.addEventListener('click', openPanel);
+
+  /* ── Clear ── */
+  clearBtn?.addEventListener('click', () => {
+    if (!messagesEl) return;
+    messagesEl.innerHTML = `
+      <div class="assistant-welcome">
+        <div class="assistant-welcome-icon">⬡</div>
+        <p class="assistant-welcome-text">Hegemonikón にようこそ。<br>何でも聞いてください。</p>
+      </div>`;
+  });
+
+  /* ── Message rendering ── */
+  const appendMessage = (role: 'user' | 'assistant', text: string) => {
+    if (!messagesEl) return;
+    // Remove welcome screen on first message
+    messagesEl.querySelector('.assistant-welcome')?.remove();
+
+    const div = document.createElement('div');
+    div.className = `assistant-message assistant-message--${role}`;
+    div.innerHTML = `
+      <div class="assistant-message-bubble">${text.replace(/\n/g, '<br>')}</div>
+      <div class="assistant-message-meta">${role === 'user' ? 'You' : '⬡'} · ${new Date().toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' })}</div>
+    `;
+    messagesEl.appendChild(div);
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+  };
+
+  const setThinking = (show: boolean) => {
+    const existing = messagesEl?.querySelector('.assistant-thinking');
+    if (show && !existing) {
+      const div = document.createElement('div');
+      div.className = 'assistant-message assistant-message--assistant assistant-thinking';
+      div.innerHTML = `<div class="assistant-message-bubble"><span class="thinking-dots"><span></span><span></span><span></span></span></div>`;
+      messagesEl?.appendChild(div);
+      messagesEl && (messagesEl.scrollTop = messagesEl.scrollHeight);
+    } else if (!show) {
+      existing?.remove();
+    }
+  };
+
+  /* ── Send ── */
+  const sendMessage = async () => {
+    if (!inputEl) return;
+    const text = inputEl.value.trim();
+    if (!text) return;
+
+    appendMessage('user', text);
+    inputEl.value = '';
+    inputEl.style.height = 'auto';
+    setThinking(true);
+
+    try {
+      // Use existing ochema API
+      const res = await fetch('http://127.0.0.1:9696/api/ochema/ask', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: text, model: 'MODEL_GEMINI_2_5_FLASH' }),
+      });
+      const data = await res.json() as { text?: string; error?: string };
+      setThinking(false);
+      appendMessage('assistant', data.text ?? data.error ?? '(応答なし)');
+    } catch (e) {
+      setThinking(false);
+      appendMessage('assistant', `⚠️ バックエンドに接続できませんでした (port 9696)`);
+    }
+  };
+
+  sendBtn?.addEventListener('click', () => { void sendMessage(); });
+
+  /* ── Textarea auto-resize + Enter to send ── */
+  inputEl?.addEventListener('keydown', (e: KeyboardEvent) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      void sendMessage();
+    }
+  });
+  inputEl?.addEventListener('input', () => {
+    if (!inputEl) return;
+    inputEl.style.height = 'auto';
+    inputEl.style.height = `${Math.min(inputEl.scrollHeight, 120)}px`;
+  });
 }
 
 // ─── Theme Toggle ────────────────────────────────────────────
@@ -95,7 +325,58 @@ function initKeyboardNav(): void {
 }
 
 function setupNavigation(): void {
-  document.querySelectorAll('nav button').forEach(btn => {
+  // Icon Rail: group switching + Obsidian-style expand
+  document.getElementById('icon-rail')?.addEventListener('click', (e) => {
+    const railBtn = (e.target as HTMLElement).closest('.rail-btn');
+    const subBtn = (e.target as HTMLElement).closest('.rail-sub-btn');
+
+    // Sub-item click → navigate directly
+    if (subBtn) {
+      const route = subBtn.getAttribute('data-route');
+      if (route) navigate(route);
+      return;
+    }
+
+    if (!railBtn) return;
+
+    // Toggle button
+    if (railBtn.classList.contains('rail-toggle')) {
+      isTabNavOpen = !isTabNavOpen;
+      buildIconRail();
+      buildTabNav();
+      setupTabClickHandlers();
+      return;
+    }
+
+    const group = railBtn.getAttribute('data-group');
+    if (!group) return;
+
+    if (group === expandedGroup) {
+      // Click same group → toggle collapse
+      expandedGroup = null;
+    } else {
+      expandedGroup = group;
+    }
+    activeGroup = group;
+    buildIconRail();
+    buildTabNav();
+    setupTabClickHandlers();
+
+    // Navigate to first route in group if changing group
+    const groupDef = ICON_GROUPS.find(g => g.id === group);
+    if (groupDef && groupDef.routes.length > 0) {
+      const currentRoute = getCurrentRoute();
+      if (!groupDef.routes.includes(currentRoute)) {
+        navigate(groupDef.routes[0]);
+      }
+    }
+  });
+
+  setupTabClickHandlers();
+}
+
+function setupTabClickHandlers(): void {
+  document.querySelectorAll('.tab-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       const route = btn.getAttribute('data-route');
       if (route) navigate(route);
@@ -109,7 +390,7 @@ async function updateNotifBadge(): Promise<void> {
   try {
     const criticals = await api.notifications(100, 'CRITICAL');
     const count = criticals.length;
-    const notifBtn = document.querySelector('nav button[data-route="notifications"]');
+    const notifBtn = document.querySelector('.tab-btn[data-route="notifications"]');
     if (!notifBtn) return;
     const existing = notifBtn.querySelector('.nav-badge');
     if (existing) existing.remove();
@@ -130,9 +411,18 @@ function navigate(route: string): void {
   clearPolling();
   recordView(route);
 
-  document.querySelectorAll('nav button').forEach(btn => {
+  document.querySelectorAll('.tab-btn').forEach(btn => {
     btn.classList.toggle('active', btn.getAttribute('data-route') === route);
   });
+
+  // Also highlight the correct icon rail group
+  const group = ICON_GROUPS.find(g => g.routes.includes(route));
+  if (group && group.id !== activeGroup) {
+    activeGroup = group.id;
+    buildIconRail();
+    buildTabNav();
+    setupTabClickHandlers();
+  }
 
   const app = document.getElementById('view-content');
   if (!app) return;

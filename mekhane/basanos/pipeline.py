@@ -375,6 +375,9 @@ class DailyReviewPipeline:
         if result.needs_l2 and self.enable_l2 and not dry_run:
             result.l2_triggered = True
             result.l2_session_id = self._trigger_jules_review(result)
+            # Register session for feedback tracking
+            if result.l2_session_id:
+                self._register_jules_session(result)
 
         # ── Auto-expand: 新ドメイン自動検出 ──
         self._auto_expand_domains(result)
@@ -396,6 +399,10 @@ class DailyReviewPipeline:
         # ── Git: churn 予兆検知 ──
         if not dry_run:
             self._git_risk_check(result)
+
+        # ── Jules Feedback: L2結果→L0精度調整 ──
+        if not dry_run:
+            self._collect_jules_feedback()
 
         return result
 
@@ -505,6 +512,36 @@ class DailyReviewPipeline:
 
         except Exception as e:
             logger.warning(f"Trend analysis failed (non-fatal): {e}")
+
+    def _register_jules_session(self, result: PipelineResult) -> None:
+        """Jules セッションを feedback 追跡に登録。"""
+        try:
+            from mekhane.basanos.jules_feedback import JulesFeedback
+
+            fb = JulesFeedback()
+            critical_issues = [
+                i for i in result.l0_issues
+                if i.get("severity") in ("critical", "high")
+            ]
+            fb.register_session(result.l2_session_id, critical_issues)
+        except Exception as e:
+            logger.debug(f"Jules session registration skipped: {e}")
+
+    def _collect_jules_feedback(self) -> None:
+        """前回の Jules セッション結果を回収し L0 精度を調整。"""
+        try:
+            from mekhane.basanos.jules_feedback import JulesFeedback
+
+            fb = JulesFeedback()
+            completed = fb.collect_completed()
+
+            if completed:
+                changes = fb.apply_to_rotation(self.rotation_state)
+                if changes.get("adjustments_applied"):
+                    self.rotation_state.save(self.rotation_state_path)
+                    logger.info(f"Jules feedback: {len(changes['adjustments_applied'])} adjustments")
+        except Exception as e:
+            logger.debug(f"Jules feedback collection skipped: {e}")
 
     def _git_risk_check(self, result: PipelineResult) -> None:
         """Git churn + TrendAnalyzer の交差で予兆検知。"""

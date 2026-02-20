@@ -534,6 +534,8 @@ async def _handle_dendron_check(arguments: dict) -> list[TextContent]:
 
 
 if __name__ == "__main__":
+    from mekhane.mcp.mcp_guard import guard
+    guard("mneme")
     # Initialize engine before server starts
     get_engine()
     _base.run()

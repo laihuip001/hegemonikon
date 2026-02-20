@@ -1,6 +1,7 @@
 import type { paths, components } from '../api-types';
 
-const API_BASE = 'http://127.0.0.1:9696';
+// API ベース URL: Vite の環境変数 VITE_API_BASE があれば優先、なければローカルプロキシ (9698)
+const API_BASE = import.meta.env.VITE_API_BASE || 'http://127.0.0.1:9698';
 
 // Tauri 環境判定: __TAURI_INTERNALS__ 存在時のみ Tauri fetch を使用
 let resolvedFetch: typeof globalThis.fetch | null = null;
@@ -416,6 +417,53 @@ export interface WALStatusResponse {
     recent: WALEntry[];
 }
 
+// --- Orchestrator (AI 指揮台) Types ---
+export interface FileEntry {
+    name: string;
+    path: string;
+    is_dir: boolean;
+    size?: number;
+    children?: number;
+}
+export interface FilesListResponse {
+    entries: FileEntry[];
+    path: string;
+}
+export interface FilesReadResponse {
+    content: string;
+    path: string;
+    size: number;
+}
+export interface GitFileStatus {
+    path: string;
+    status: string;
+    code: string;
+}
+export interface GitStatusResponse {
+    files: GitFileStatus[];
+    total: number;
+    repo: string;
+}
+export interface GitDiffResponse {
+    diff: string;
+    path: string;
+    staged: boolean;
+    repo: string;
+}
+export interface OrchestratorChatResponse {
+    text: string;
+    model: string;
+    thinking: string;
+}
+export interface TerminalResponse {
+    output: string;
+    stdout?: string;
+    stderr?: string;
+    returncode: number;
+    command: string;
+    cwd: string;
+}
+
 // --- Quota Types ---
 export interface QuotaModel {
     label: string;
@@ -516,6 +564,27 @@ export const api = {
     linkGraphStats: () => apiFetch<LinkGraphStatsResponse>('/api/link-graph/stats'),
     linkGraphNeighbors: (nodeId: string, hops = 2) =>
         apiFetch<LinkGraphNeighborsResponse>(`/api/link-graph/neighbors/${encodeURIComponent(nodeId)}?hops=${hops}`),
+
+    // Cortex (AI Core)
+    cortexAskStream: async (bodyPayload: any, resolvedFetch?: typeof fetch) => {
+        let response: Response;
+        if (resolvedFetch) {
+            // Tauri 経由でのリクエスト (TLSエラースキップ等)
+            response = await resolvedFetch(`${API_BASE}/api/cortex/ask/stream`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(bodyPayload),
+            });
+        } else {
+            // 通常の fetch (ブラウザ)
+            response = await fetch(`${API_BASE}/api/cortex/ask/stream`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(bodyPayload),
+            });
+        }
+        return response; // Assuming the caller will handle the stream
+    },
 
     // CCL + Workflows
     cclParse: (ccl: string) =>
@@ -630,6 +699,44 @@ export const api = {
 
     // Quota
     quota: () => apiFetch<QuotaResponse>('/api/quota'),
+
+    // --- Orchestrator (AI 指揮台) ---
+
+    // DevTools: File Operations
+    filesList: (path = '/home/makaron8426/oikos/hegemonikon') =>
+        apiFetch<FilesListResponse>(`/api/files/list?path=${encodeURIComponent(path)}`),
+    filesRead: (path: string) =>
+        apiFetch<FilesReadResponse>(`/api/files/read?path=${encodeURIComponent(path)}`),
+
+    // DevTools: Git Operations
+    gitStatus: (repo = '/home/makaron8426/oikos/hegemonikon') =>
+        apiFetch<GitStatusResponse>(`/api/git/status?repo=${encodeURIComponent(repo)}`),
+    gitDiff: (repo = '/home/makaron8426/oikos/hegemonikon', path = '', staged = false) =>
+        apiFetch<GitDiffResponse>(
+            `/api/git/diff?repo=${encodeURIComponent(repo)}&path=${encodeURIComponent(path)}&staged=${staged}`
+        ),
+
+    // DevTools: Ochema AI
+    orchestratorChat: (message: string, model = 'gemini-2.0-flash', systemInstruction = '') =>
+        apiFetch<OrchestratorChatResponse>('/api/ochema/ask_with_tools', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                message,
+                model,
+                system_instruction: systemInstruction,
+                max_iterations: 10,
+                max_tokens: 8192,
+            }),
+        }),
+
+    // DevTools: Terminal
+    terminalExecute: (command: string, cwd = '/home/makaron8426/oikos/hegemonikon') =>
+        apiFetch<TerminalResponse>('/api/terminal/execute', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ command, cwd }),
+        }),
 };
 
 // --- Notification Types ---
@@ -931,6 +1038,24 @@ export async function kiList(): Promise<KIListResponse> {
 
 export async function kiGet(id: string): Promise<KIDetail> {
     return apiFetch<KIDetail>(`/api/sophia/ki/${encodeURIComponent(id)}`);
+}
+
+export async function cortexAsk(message: string, model: string = "gemini-2.5-flash"): Promise<{ text: string, model: string }> {
+    try {
+        const response = await fetch(`${API_BASE}/api/cortex/ask`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ message, model }),
+        });
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.detail || `API error: ${response.statusText}`);
+        }
+        return await response.json();
+    } catch (error) {
+        console.error("Error in cortexAsk:", error);
+        throw error;
+    }
 }
 
 export async function kiCreate(req: KICreateRequest): Promise<KIDetail> {

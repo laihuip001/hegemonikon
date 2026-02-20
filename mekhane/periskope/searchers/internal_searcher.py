@@ -261,7 +261,7 @@ class SophiaSearcher:
         docs: list[tuple[str, str, Path | None, str]],
         k: int = 10,
     ) -> list[tuple[str, str, Path | None, str, float]]:
-        """Simple TF-IDF ranking."""
+        """Simple TF-IDF ranking with normalization."""
         import re
         from collections import Counter
 
@@ -288,6 +288,17 @@ class SophiaSearcher:
                 scored.append((name, content, path, doc_type, score))
 
         scored.sort(key=lambda x: x[4], reverse=True)
+
+        # Normalize scores to 0-1 range and filter low-relevance noise
+        if scored:
+            max_score = scored[0][4]
+            if max_score > 0:
+                scored = [
+                    (n, c, p, d, s / max_score)
+                    for n, c, p, d, s in scored
+                    if s / max_score >= 0.1  # Filter < 10% of best match
+                ]
+
         return scored[:k]
 
 
@@ -373,7 +384,7 @@ class KairosSearcher:
         docs: list[tuple[str, str, Path | None, str]],
         k: int = 10,
     ) -> list[tuple[str, str, Path | None, str, float]]:
-        """Simple keyword-based ranking."""
+        """Simple keyword-based ranking with normalization."""
         import re
         from collections import Counter
 
@@ -395,6 +406,17 @@ class KairosSearcher:
                 scored.append((name, content, path, doc_type, score))
 
         scored.sort(key=lambda x: x[4], reverse=True)
+
+        # Normalize scores to 0-1 range and filter low-relevance noise
+        if scored:
+            max_score = scored[0][4]
+            if max_score > 0:
+                scored = [
+                    (n, c, p, d, s / max_score)
+                    for n, c, p, d, s in scored
+                    if s / max_score >= 0.1  # Filter < 10% of best match
+                ]
+
         return scored[:k]
 
 

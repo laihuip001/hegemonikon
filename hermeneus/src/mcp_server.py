@@ -447,4 +447,6 @@ def run_server():
 
 
 if __name__ == "__main__":
+    from mekhane.mcp.mcp_guard import guard
+    guard("hermeneus")
     run_server()

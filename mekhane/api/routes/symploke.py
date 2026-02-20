@@ -252,16 +252,30 @@ async def get_persona():
     return PersonaResponse(persona=persona_data, creator=creator_data)
 
 
-# PURPOSE: boot context を取得する
+# PURPOSE: boot context を取得する (非同期 + タイムアウト)
 @router.get("/boot-context", response_model=BootContextResponse)
 async def get_boot_context(
     mode: str = Query("standard", description="fast | standard | detailed"),
     context: Optional[str] = Query(None, description="セッションコンテキスト"),
+    timeout: int = Query(90, ge=10, le=300, description="タイムアウト秒数"),
 ):
-    """Boot コンテキスト (全軸データ) を取得。"""
+    """Boot コンテキスト (全軸データ) を取得。
+
+    Embedder は API Server startup で事前ロード済み (warm cache)。
+    get_boot_context() は asyncio.to_thread で非同期実行し、
+    API Server のイベントループをブロックしない。
+    """
+    import asyncio
+
     try:
-        from mekhane.symploke.boot_integration import get_boot_context as _get_ctx
-        result = _get_ctx(mode=mode, context=context)
+        def _run():
+            from mekhane.symploke.boot_integration import get_boot_context as _get_ctx
+            return _get_ctx(mode=mode, context=context)
+
+        result = await asyncio.wait_for(
+            asyncio.to_thread(_run),
+            timeout=timeout,
+        )
 
         # numpy.float32 等の非JSON型を sanitize
         sanitized = json.loads(json.dumps(result, default=str))
@@ -270,6 +284,11 @@ async def get_boot_context(
             mode=mode,
             axes=sanitized,
             summary=f"Boot context loaded ({mode} mode)",
+        )
+    except asyncio.TimeoutError:
+        logger.warning("Boot context timed out after %ds", timeout)
+        return BootContextResponse(
+            mode=mode, axes={}, summary=f"Timeout after {timeout}s"
         )
     except Exception as exc:
         logger.warning("Boot context load failed: %s", exc)

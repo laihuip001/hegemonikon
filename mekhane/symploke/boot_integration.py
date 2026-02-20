@@ -393,6 +393,24 @@ def get_boot_context(mode: str = "standard", context: Optional[str] = None) -> d
             lines.append("")
             lines.append(fmt)
 
+    # ── BC違反傾向 (Phase 4.9) ──
+    bc_violation_result = {"formatted": ""}
+    if mode != "fast":
+        try:
+            from scripts.bc_violation_logger import (
+                read_all_entries as _read_bc,
+                format_boot_summary as _format_bc_boot,
+            )
+            bc_entries = _read_bc()
+            if bc_entries:
+                bc_summary = _format_bc_boot(bc_entries)
+                bc_violation_result = {"formatted": bc_summary, "count": len(bc_entries)}
+                lines.append("")
+                lines.append(bc_summary)
+        except Exception as e:
+            import logging
+            logging.debug("BC violation loading skipped: %s", e)
+
     # incoming/ チェック — Digestor 消化候補の通知
     incoming_dir = Path.home() / "oikos" / "mneme" / ".hegemonikon" / "incoming"
     incoming_files = sorted(incoming_dir.glob("eat_*.md")) if incoming_dir.exists() else []
@@ -443,6 +461,7 @@ def get_boot_context(mode: str = "standard", context: Optional[str] = None) -> d
         "ideas": ideas_result,
         "wal": wal_result,
         "incoming": incoming_result,
+        "bc_violations": bc_violation_result,
         "formatted": "\n".join(lines),
     }
 

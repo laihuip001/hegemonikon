@@ -29,10 +29,39 @@ _PROJECT_ROOT = Path(__file__).resolve().parents[2]  # hegemonikon/
 if str(_PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(_PROJECT_ROOT))
 
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from mekhane.api import API_PREFIX, API_TITLE, DEFAULT_PORT, __version__
+
+
+# PURPOSE: Embedder を起動時に事前ロード (warm cache for /boot-context)
+@asynccontextmanager
+async def _lifespan(app: FastAPI):
+    """Startup: Embedder 事前ロード → Shutdown: cleanup."""
+    import asyncio
+    try:
+        def _preload():
+            # Vertex AI Embedding に切り替え (ローカル Embedder を廃止)
+            from mekhane.anamnesis.vertex_embedder import VertexEmbedder
+            embedder = VertexEmbedder()
+            logger.info(
+                "VertexEmbedder preloaded: %s (dim=%d, gpu=%s)",
+                embedder.model_name, embedder._dimension, embedder._use_gpu,
+            )
+            return embedder
+
+        embedder = await asyncio.to_thread(_preload)
+        # 後方互換のため app.state.embedder に格納
+        app.state.embedder = embedder
+        logger.info("🧠 VertexEmbedder warm cache ready")
+    except Exception as exc:
+        logger.warning("VertexEmbedder preload failed (non-fatal): %s", exc)
+        app.state.embedder = None
+    yield
+    # Shutdown — nothing to cleanup for now
 
 # PURPOSE: デフォルト UDS パス
 DEFAULT_UDS_PATH = "/tmp/hgk.sock"
@@ -51,6 +80,7 @@ def create_app() -> FastAPI:
         docs_url=f"{API_PREFIX}/docs",
         redoc_url=f"{API_PREFIX}/redoc",
         openapi_url=f"{API_PREFIX}/openapi.json",
+        lifespan=_lifespan,
     )
 
     # CORS — TCP モード時のみ意味がある（UDS では不要だが害もない）
@@ -109,6 +139,16 @@ def _register_routers(app: FastAPI) -> None:
         logger.info("Sympatheia router registered")
     except Exception as exc:
         logger.warning("Sympatheia router skipped: %s", exc)
+
+    # Cortex — Lite proxy for Gemini
+    try:
+        from mekhane.api.routes.cortex import router as cortex_router
+        # Cortex router は API_PREFIX に既に /cortex が含まれている前提なので、prefix をどうするか確認
+        # cortex.py で prefix="/api/cortex" としているので、ここでは prefix="" または削除
+        app.include_router(cortex_router)
+        logger.info("Cortex router registered")
+    except Exception as exc:
+        logger.warning("Cortex router skipped: %s", exc)
 
     # PKS — 埋め込みモデルに依存するため遅延ロード
     try:
@@ -269,6 +309,14 @@ def _register_routers(app: FastAPI) -> None:
         logger.info("WAL router registered")
     except Exception as exc:
         logger.warning("WAL router skipped: %s", exc)
+
+    # DevTools — ファイル操作・ターミナル・Ochema AI (CortexClient に依存)
+    try:
+        from mekhane.api.routes.devtools import router as devtools_router
+        app.include_router(devtools_router, prefix=API_PREFIX)
+        logger.info("DevTools router registered")
+    except Exception as exc:
+        logger.warning("DevTools router skipped: %s", exc)
 
 
 

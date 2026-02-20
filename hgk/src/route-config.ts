@@ -6,6 +6,7 @@
  */
 
 import { renderDashboard } from './views/dashboard';
+import { renderOrchestratorView } from './views/orchestrator';
 import { renderAgentManagerView } from './views/agent-manager';
 import { renderSearch } from './views/search';
 import { renderFep } from './views/fep';
@@ -27,6 +28,7 @@ import { renderDigestorView } from './views/digestor';
 import { renderDesktopDomView } from './views/desktop-dom';
 import { renderChatView } from './views/chat';
 import { renderAristosView } from './views/aristos';
+import { renderDevToolsView } from './views/devtools';
 import { renderSettingsView } from './views/settings';
 
 // ─── Types ───────────────────────────────────────────────────
@@ -44,6 +46,7 @@ export interface RouteConfig {
 
 export const ROUTES: RouteConfig[] = [
     { key: 'dashboard', label: 'Dashboard', icon: '📊', renderer: renderDashboard },
+    { key: 'orchestrator', label: 'Orchestrator', icon: '🎯', renderer: renderOrchestratorView },
     { key: 'agents', label: 'Agents', icon: '🤖', renderer: renderAgentManagerView },
     { key: 'search', label: 'Search', icon: '🔍', renderer: renderSearch },
     { key: 'fep', label: 'FEP Agent', icon: '🧠', renderer: renderFep },
@@ -60,6 +63,7 @@ export const ROUTES: RouteConfig[] = [
     { key: 'digestor', label: 'Digestor', icon: '🧬', renderer: renderDigestorView },
     { key: 'desktop', label: 'Desktop', icon: '🖥️', renderer: renderDesktopDomView },
     { key: 'chat', label: 'Chat', icon: '💬', renderer: renderChatView },
+    { key: 'devtools', label: 'DevTools', icon: '🛠️', renderer: renderDevToolsView },
     { key: 'aristos', label: 'Aristos', icon: '🧬', renderer: renderAristosView },
     { key: 'settings', label: 'Settings', icon: '⚙️', renderer: renderSettingsView },
 ];

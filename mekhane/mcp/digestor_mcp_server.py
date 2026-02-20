@@ -425,4 +425,6 @@ async def handle_semantic_scholar(name: str, arguments: dict):
 
 
 if __name__ == "__main__":
+    from mekhane.mcp.mcp_guard import guard
+    guard("digestor")
     _base.run()

@@ -28,7 +28,7 @@ def create_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--sources",
         nargs="+",
-        choices=["searxng", "exa", "gnosis", "sophia", "kairos"],
+        choices=["searxng", "brave", "tavily", "semantic_scholar", "gnosis", "sophia", "kairos"],
         default=None,
         help="Search sources to use (default: all)",
     )

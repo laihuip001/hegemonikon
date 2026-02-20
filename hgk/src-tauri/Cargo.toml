@@ -5,6 +5,7 @@ description = "Hegemonikón Desktop — FEP-based Cognitive Hypervisor"
 authors = ["makaron8426"]
 edition = "2021"
 license = "MIT"
+default-run = "hgk-desktop"
 
 [profile.release]
 opt-level = 3
@@ -40,6 +41,10 @@ zbus = "5"
 tokio = { version = "1", features = ["rt", "macros"] }
 reqwest = { version = "0.12", features = ["json"] }
 thiserror = "2"
+
+[[bin]]
+name = "hgk-desktop"
+path = "src/main.rs"
 
 [[bin]]
 name = "a11y_test"

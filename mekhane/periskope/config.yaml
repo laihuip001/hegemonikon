@@ -22,18 +22,6 @@ searxng:
   # Blocked engines (results from these are discarded)
   blocked_engines: []
 
-# Exa category weights — 7 categories (must sum to ~1.0)
-# Set weight to 0 to disable a category
-exa:
-  weights:
-    general: 0.30
-    paper: 0.25
-    github: 0.15
-    news: 0.15
-    tweet: 0.05
-    pdf: 0.05
-    personal_site: 0.05
-  min_hit_rate: 0.1  # T3: categories below this hit rate auto-disabled
 
 # Brave Search — 2,000 free queries/month
 # Requires BRAVE_API_KEY environment variable
@@ -77,3 +65,16 @@ searxng_url: "http://localhost:8888"
 
 # Query expansion model (W3)
 expansion_model: "gemini-2.0-flash"
+
+# W7: Selective full-page crawling (Summary→Full-text pattern)
+crawling:
+  timeout: 10.0            # Per-page fetch timeout (seconds)
+  max_content_length: 15000 # Max chars to keep per page
+  min_content_length: 500   # Skip pages shorter than this
+  playwright_fallback: true  # Use Playwright for JS-rendered pages
+
+# W6: Iterative gap analysis refinement
+refinement:
+  max_iterations: 2         # L3: up to 2 refinement rounds
+  queries_per_iteration: 3  # Max queries per round
+

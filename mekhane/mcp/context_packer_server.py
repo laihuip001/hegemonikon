@@ -185,4 +185,6 @@ def capture_error_context(
 
 
 if __name__ == "__main__":
+    from mekhane.mcp.mcp_guard import guard
+    guard("context_packer")
     mcp.run()

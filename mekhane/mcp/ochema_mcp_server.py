@@ -1020,4 +1020,6 @@ async def _handle_jules(name: str, arguments: dict) -> list[TextContent]:
 
 
 if __name__ == "__main__":
+    from mekhane.mcp.mcp_guard import guard
+    guard("ochema")
     _base.run()

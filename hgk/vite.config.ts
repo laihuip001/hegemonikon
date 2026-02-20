@@ -20,6 +20,12 @@ export default defineConfig(async () => ({
                 port: 1421,
             }
             : undefined,
+        proxy: {
+            '/api': {
+                target: 'http://127.0.0.1:9698',
+                changeOrigin: true,
+            },
+        },
         watch: {
             // Avoid inotify watchers entirely — Firefox ESR consumes 90K+ FDs,
             // leaving none for chokidar. Polling is slower but stable.

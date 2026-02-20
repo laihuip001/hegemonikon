@@ -1,0 +1,433 @@
+/* ─── DevTools — IDE Core ─────────────────────────────────── */
+
+.dt-container {
+    display: flex;
+    height: calc(100vh - 4rem);
+    background: var(--bg-color);
+    overflow: hidden;
+}
+
+/* Sidebar (File/Terminal/AI) */
+.dt-sidebar {
+    width: 360px;
+    flex-shrink: 0;
+    border-right: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    background: var(--bg-elevated);
+}
+
+/* Tabs */
+.dt-tabs {
+    display: flex;
+    border-bottom: 1px solid var(--border-color);
+    background: var(--bg-color);
+}
+
+.dt-tab {
+    flex: 1;
+    padding: 0.6rem 0.5rem;
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid transparent;
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-family: inherit;
+}
+
+.dt-tab:hover {
+    color: var(--text-color);
+    background: var(--hover-bg);
+}
+
+.dt-tab-active {
+    color: var(--primary-color);
+    border-bottom-color: var(--primary-color);
+}
+
+/* Panels */
+.dt-panel {
+    flex: 1;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+/* Breadcrumb */
+.dt-breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 0.15rem;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.78rem;
+    border-bottom: 1px solid var(--border-color);
+    background: var(--bg-color);
+    overflow-x: auto;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.dt-breadcrumb-item {
+    color: var(--primary-color);
+    cursor: pointer;
+    padding: 0.1rem 0.25rem;
+    border-radius: 4px;
+    transition: background 0.1s;
+}
+
+.dt-breadcrumb-item:hover {
+    background: var(--hover-bg);
+}
+
+.dt-breadcrumb-sep {
+    color: var(--text-secondary);
+}
+
+/* File List */
+.dt-file-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0.25rem;
+}
+
+.dt-file-entry {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.4rem 0.75rem;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.1s;
+    font-size: 0.85rem;
+}
+
+.dt-file-entry:hover {
+    background: var(--hover-bg);
+}
+
+.dt-file-active {
+    background: var(--primary-glow);
+    border-left: 3px solid var(--primary-color);
+}
+
+.dt-file-icon {
+    font-size: 0.9rem;
+    width: 1.2rem;
+    text-align: center;
+    flex-shrink: 0;
+}
+
+.dt-file-name {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-family: 'Menlo', 'Monaco', 'Courier New', monospace;
+    font-size: 0.82rem;
+}
+
+.dt-file-meta {
+    font-size: 0.7rem;
+    color: var(--text-secondary);
+    flex-shrink: 0;
+}
+
+.dt-dir .dt-file-name {
+    font-weight: 500;
+    color: var(--primary-color);
+}
+
+.dt-empty {
+    padding: 2rem;
+    text-align: center;
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+}
+
+.dt-loading {
+    padding: 1.5rem;
+    text-align: center;
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+}
+
+/* Main: Code Viewer */
+.dt-main {
+    flex: 1;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.dt-code-viewer {
+    flex: 1;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.dt-viewer-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: var(--text-secondary);
+}
+
+.dt-viewer-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.5rem 1rem;
+    border-bottom: 1px solid var(--border-color);
+    background: var(--bg-elevated);
+    flex-shrink: 0;
+}
+
+.dt-viewer-filename {
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.dt-viewer-path {
+    font-size: 0.72rem;
+    color: var(--text-secondary);
+    font-family: monospace;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    flex: 1;
+}
+
+.dt-viewer-info {
+    font-size: 0.72rem;
+    color: var(--text-secondary);
+    flex-shrink: 0;
+}
+
+.dt-code-container {
+    flex: 1;
+    overflow: auto;
+    display: flex;
+    background: var(--bg-color);
+}
+
+.dt-line-numbers {
+    padding: 0.75rem 0.5rem;
+    text-align: right;
+    font-family: 'Menlo', 'Monaco', 'Courier New', monospace;
+    font-size: 0.78rem;
+    line-height: 1.5;
+    color: var(--text-secondary);
+    user-select: none;
+    border-right: 1px solid var(--border-color);
+    flex-shrink: 0;
+    background: var(--bg-elevated);
+    margin: 0;
+}
+
+.dt-line-numbers span {
+    display: block;
+    min-width: 2.5em;
+}
+
+.dt-code {
+    flex: 1;
+    padding: 0.75rem 1rem;
+    font-family: 'Menlo', 'Monaco', 'Courier New', monospace;
+    font-size: 0.78rem;
+    line-height: 1.5;
+    margin: 0;
+    white-space: pre;
+    overflow-x: auto;
+    tab-size: 4;
+}
+
+.dt-copy-btn {
+    margin-left: auto;
+}
+
+/* Terminal */
+.dt-term-output {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0.75rem;
+    font-family: 'Menlo', 'Monaco', 'Courier New', monospace;
+    font-size: 0.8rem;
+    line-height: 1.5;
+    background: #0d1117;
+}
+
+.dt-term-welcome {
+    color: var(--text-secondary);
+    padding: 1rem;
+    text-align: center;
+}
+
+.dt-term-line {
+    white-space: pre-wrap;
+    word-break: break-all;
+}
+
+.dt-term-input .dt-term-prompt {
+    color: var(--success-color);
+    font-weight: 600;
+}
+
+.dt-term-input {
+    color: var(--text-color);
+}
+
+.dt-term-output .dt-term-output {
+    color: #c9d1d9;
+}
+
+.dt-term-error {
+    color: var(--error-color);
+}
+
+.dt-term-input-area {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    border-top: 1px solid var(--border-color);
+    background: #0d1117;
+    flex-shrink: 0;
+}
+
+.dt-term-prompt-icon {
+    color: var(--success-color);
+    font-weight: 700;
+    font-family: monospace;
+}
+
+.dt-term-input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: var(--text-color);
+    font-family: 'Menlo', 'Monaco', 'Courier New', monospace;
+    font-size: 0.82rem;
+    outline: none;
+}
+
+/* AI Panel */
+.dt-ai-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0.75rem;
+}
+
+.dt-ai-welcome {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    text-align: center;
+    gap: 0.25rem;
+}
+
+.dt-ai-hints {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    margin-top: 0.75rem;
+}
+
+.dt-ai-hint {
+    font-size: 0.78rem;
+    color: var(--primary-color);
+    background: var(--primary-glow);
+    padding: 0.35rem 0.75rem;
+    border-radius: 16px;
+    cursor: pointer;
+    transition: all 0.15s;
+    border: 1px solid rgba(88, 166, 255, 0.15);
+}
+
+.dt-ai-hint:hover {
+    background: rgba(88, 166, 255, 0.15);
+    transform: translateY(-1px);
+}
+
+.dt-ai-msg {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+}
+
+.dt-ai-msg-role {
+    flex-shrink: 0;
+    font-size: 1rem;
+    margin-top: 0.1rem;
+}
+
+.dt-ai-msg-body {
+    flex: 1;
+    font-size: 0.85rem;
+    line-height: 1.5;
+    overflow-wrap: break-word;
+}
+
+.dt-ai-msg-user .dt-ai-msg-body {
+    background: var(--primary-glow);
+    padding: 0.5rem 0.75rem;
+    border-radius: 12px 12px 12px 4px;
+}
+
+.dt-ai-msg-ai .dt-ai-msg-body {
+    padding: 0.25rem 0;
+}
+
+.dt-ai-msg-ai .dt-ai-msg-body pre {
+    background: var(--bg-color);
+    padding: 0.5rem;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 0.78rem;
+}
+
+.dt-ai-msg-ai .dt-ai-msg-body code {
+    background: var(--bg-color);
+    padding: 0.1rem 0.3rem;
+    border-radius: 3px;
+    font-size: 0.82rem;
+}
+
+.dt-ai-input-area {
+    display: flex;
+    gap: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    border-top: 1px solid var(--border-color);
+    background: var(--bg-elevated);
+    flex-shrink: 0;
+}
+
+.dt-ai-input {
+    flex: 1;
+    background: var(--bg-color);
+    border: 1px solid var(--border-color);
+    color: var(--text-color);
+    font-family: inherit;
+    font-size: 0.85rem;
+    padding: 0.5rem 0.75rem;
+    border-radius: 8px;
+    outline: none;
+    resize: none;
+    min-height: 36px;
+    max-height: 150px;
+}
+
+.dt-ai-input:focus {
+    border-color: var(--primary-color);
+}
+
+.dt-ai-send-btn {
+    flex-shrink: 0;
+    align-self: flex-end;
+}

@@ -38,7 +38,7 @@ class SemanticScholarSearcher:
     """
 
     def __init__(self, timeout: float = 10.0) -> None:
-        self._api_key = os.getenv("S2_API_KEY", "")
+        self._api_key = os.getenv("S2_API_KEY") or os.getenv("SEMANTIC_SCHOLAR_API_KEY", "")
         self._timeout = timeout
 
     @property

@@ -15,6 +15,7 @@ Gnōsis Index - LanceDB統合 + 重複排除
 
 import os
 import sys
+import threading
 from pathlib import Path
 from typing import Optional
 from mekhane.anamnesis.lancedb_compat import get_table_names
@@ -70,16 +71,18 @@ class Embedder:
     """
 
     _instances: dict[tuple, "Embedder"] = {}
+    _lock = threading.Lock()
 
-    # PURPOSE: [L2-auto] 内部処理: new__
+    # PURPOSE: [L2-auto] 内部処理: new__ (thread-safe singleton)
     def __new__(cls, force_cpu: bool = False, model_name: str = "BAAI/bge-m3"):
         key = (model_name, force_cpu)
-        if key in cls._instances:
-            return cls._instances[key]
-        instance = super().__new__(cls)
-        instance._initialized = False
-        cls._instances[key] = instance
-        return instance
+        with cls._lock:
+            if key in cls._instances:
+                return cls._instances[key]
+            instance = super().__new__(cls)
+            instance._initialized = False
+            cls._instances[key] = instance
+            return instance
 
     # PURPOSE: Embedder の構成と依存関係の初期化
     # Known model dimensions
@@ -102,9 +105,10 @@ class Embedder:
 
     # PURPOSE: [L2-auto] 初期化: init__
     def __init__(self, force_cpu: bool = False, model_name: str = "BAAI/bge-m3"):
-        if self._initialized:
-            return
-        self._initialized = True
+        with self._lock:
+            if self._initialized:
+                return
+            self._initialized = True
 
         import numpy as np
         self.np = np
@@ -305,11 +309,15 @@ class GnosisIndex:
         return self.TABLE_NAME in get_table_names(self.db)
 
     # PURPOSE: 既存primary_keyとtitleをキャッシュ
-    def _get_embedder(self) -> Embedder:
-        if self.embedder is None:
-            self.embedder = Embedder()
-        return self.embedder
+    def _get_embedder(self):
+        # Vertex AI Embedding に切り替え (ローカル Embedder を廃止)
+        from mekhane.api.server import app
 
+        if hasattr(app.state, "embedder") and app.state.embedder is not None:
+            return app.state.embedder
+
+        from mekhane.anamnesis.vertex_embedder import VertexEmbedder
+        return VertexEmbedder()
     # PURPOSE: 既存primary_keyとtitleをキャッシュ
     def _load_primary_keys(self):
         """既存primary_keyとtitleをキャッシュ"""

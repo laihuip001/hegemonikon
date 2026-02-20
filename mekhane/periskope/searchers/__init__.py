@@ -6,12 +6,16 @@ Each searcher implements the same async interface:
 """
 
 from .searxng import SearXNGSearcher
-from .exa_searcher import ExaSearcher
+from .brave_searcher import BraveSearcher
+from .tavily_searcher import TavilySearcher
+from .semantic_scholar_searcher import SemanticScholarSearcher
 from .internal_searcher import GnosisSearcher, SophiaSearcher, KairosSearcher
 
 __all__ = [
     "SearXNGSearcher",
-    "ExaSearcher",
+    "BraveSearcher",
+    "TavilySearcher",
+    "SemanticScholarSearcher",
     "GnosisSearcher",
     "SophiaSearcher",
     "KairosSearcher",

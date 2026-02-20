@@ -14,7 +14,6 @@ from typing import Any
 class SearchSource(str, Enum):
     """Search source identifiers."""
     SEARXNG = "searxng"
-    EXA = "exa"
     BRAVE = "brave"
     TAVILY = "tavily"
     SEMANTIC_SCHOLAR = "semantic_scholar"
@@ -105,7 +104,9 @@ class PeriskopeConfig:
     search_sources: list[SearchSource] = field(
         default_factory=lambda: [
             SearchSource.SEARXNG,
-            SearchSource.EXA,
+            SearchSource.BRAVE,
+            SearchSource.TAVILY,
+            SearchSource.SEMANTIC_SCHOLAR,
             SearchSource.GNOSIS,
             SearchSource.SOPHIA,
         ]

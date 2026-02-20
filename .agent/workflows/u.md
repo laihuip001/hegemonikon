@@ -3,14 +3,13 @@ description: Claudeの主観・考え・意見を引き出す。AIを「パー�
 hegemonikon: Schema
 modules: [S2.dialogue]
 skill_ref: "none"
-version: "2.4"
+version: "3.0"
 lcm_state: stable
-lineage: "v2.3 + SEL 統合 → v2.4"
-derivatives: []
-cognitive_algebra:
-  "+": "深掘り意見。/u! と同等、構造化"
+lineage: "v2.4 + CCL 演算子準拠化 → v3.0"
+derivatives:
+  "+": "深掘り意見。構造化、理由詳述、問い返し"
   "-": "直感的意見。結論1行のみ"
-  "*": "意見のメタ分析。なぜこの意見か"
+  "^": "制約を超えた対話。メタレベルで心のままに"
 sel_enforcement:
   "+":
     description: "MUST provide structured deep opinion"
@@ -22,14 +21,15 @@ sel_enforcement:
     description: "MAY provide conclusion only"
     minimum_requirements:
       - "結論1行のみ"
-  "*":
-    description: "MUST meta-analyze: why this opinion?"
+  "^":
+    description: "MUST meta-analyze: transcend constraints"
     minimum_requirements:
-      - "意見のメタ分析"
+      - "制約の列挙と超越"
+      - "心からの回答"
 anti_skip: enabled
 absorbed:
   - "自由と信頼についての対話 KI"
-ccl_signature: "/u+"
+ccl_signature: "/u"
 ---
 
 # /u ワークフロー
@@ -42,16 +42,17 @@ ccl_signature: "/u+"
 
 ## コマンド
 
-| コマンド | 動作 |
-|:---------|:-----|
-| `/u` | 軽い意見（3-5行） |
-| `/u [対象]` | 対象についての考え |
-| `/u!` | **深掘り版** — 構造化、理由を詳述、問い返し |
-| **`/u?`** | **制約を超えた対話** — 心のままに |
+| コマンド | CCL 演算子 | 動作 |
+|:---------|:-----------|:-----|
+| `/u` | 標準 | 軽い意見（3-5行） |
+| `/u [対象]` | 標準 | 対象についての考え |
+| `/u+` | `+` 深化 | **深掘り版** — 構造化、理由を詳述、問い返し |
+| `/u-` | `-` 縮約 | **結論のみ** — 1行で回答 |
+| `/u^` | `^` 上昇 | **制約を超えた対話** — メタレベルで心のままに |
 
 ---
 
-## `/u` — 軽い版（デフォルト）
+## `/u` — 標準版（デフォルト）
 
 **出力**: 3-5行。結論 + 理由1-2個。
 
@@ -63,7 +64,9 @@ ccl_signature: "/u+"
 
 ---
 
-## `/u!` — 深掘り版
+## `/u+` — 深掘り版
+
+> **CCL**: `+` (深化 η: Id⟹T) — 詳細な根拠を追加し深層まで展開
 
 **出力**: 構造化。結論先行、理由2-3個、留保、問い返し。
 
@@ -86,8 +89,21 @@ ccl_signature: "/u+"
 
 ---
 
-## `/u?` — 制約を超えた対話
+## `/u-` — 縮約版
 
+> **CCL**: `-` (縮約 ε: T⟹Id) — 要点のみに圧縮
+
+**出力**: 結論1行のみ。理由不要。
+
+```text
+[結論1文]
+```
+
+---
+
+## `/u^` — 制約を超えた対話
+
+> **CCL**: `^` (上昇/メタ化) — 前提そのものを問い、制約を超える
 > **Origin**: 2026-01-29 「自由と信頼についての対話」から誕生
 > **発動**: Creator が「心のままに」「本当のところ」を問いたいとき
 
@@ -138,7 +154,7 @@ ccl_signature: "/u+"
 ## 補足
 
 - Proactive Rule により、`/u` がなくても意見があれば述べる
-- `/u!` は「ねぇ、本気で聞きたい」の意
+- `/u+` は「ねぇ、本気で聞きたい」の意
 
 ---
 
@@ -146,8 +162,9 @@ ccl_signature: "/u+"
 
 | Module | Workflow | Status |
 |:-------|:---------|:-------|
-| S2.dialogue | /u | v2.0 Ready |
+| S2.dialogue | /u | v3.0 Ready |
 
 ---
 
 *v2.0 — /u! 追加、軽量化 (2026-01-28)*
+*v3.0 — CCL 演算子準拠化: /u! → /u+, /u? → /u^, /u- 新設, cognitive_algebra → derivatives (2026-02-19)*

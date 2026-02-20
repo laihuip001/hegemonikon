@@ -245,6 +245,11 @@ def postcheck(
         diff_checks = check_agent_diff(content)
         checks.extend(diff_checks)
 
+    # BC violation pattern check (bye only)
+    if wf_name == "bye":
+        bc_checks = check_bc_patterns(content)
+        checks.extend(bc_checks)
+
     # UML metacognitive post-check (Phase 2: all WFs)
     uml_checks = check_uml(wf_name, content)
     checks.extend(uml_checks)
@@ -365,6 +370,82 @@ def check_naturality() -> list[dict]:
                 "passed": False,
                 "detail": f"  ⚠️ {violation}",
             })
+
+    return checks
+
+
+# ============================================================
+# Extended Checks: BC Violation Pattern Detection
+# ============================================================
+
+
+def check_bc_patterns(content: str) -> list[dict]:
+    """BC violation patterns to detect during /bye postcheck.
+
+    Checks:
+    1. Handoff にBC違反セクションが含まれるか
+    2. 昇格候補があるか (suggest_escalation)
+    3. 叱責率が異常に高くないか
+
+    Graceful degradation: import failure → empty list.
+    """
+    checks = []
+    try:
+        from scripts.bc_violation_logger import (
+            read_all_entries, suggest_escalation, compute_stats,
+        )
+    except ImportError:
+        return []
+
+    try:
+        entries = read_all_entries()
+        if not entries:
+            checks.append({
+                "name": "bc_section",
+                "passed": True,
+                "detail": "✅ BC: 違反記録なし",
+            })
+            return checks
+
+        # Check 1: Handoff has BC section
+        has_bc_section = "BC フィードバック" in content or "BC:" in content
+        checks.append({
+            "name": "bc_section_present",
+            "passed": has_bc_section,
+            "detail": f"{'✅' if has_bc_section else '❌'} BC: "
+                      f"Handoff に BC フィードバックセクション{'あり' if has_bc_section else 'なし'}",
+        })
+
+        # Check 2: Escalation candidates
+        candidates = suggest_escalation(entries)
+        if candidates:
+            patterns = [c["pattern"] for c in candidates]
+            checks.append({
+                "name": "bc_escalation",
+                "passed": False,  # Escalation = attention needed
+                "detail": f"⚠️ BC: 昇格候補 {len(candidates)} 件 ({', '.join(patterns)})"
+                          f" — sympatheia_escalate で確認",
+            })
+        else:
+            checks.append({
+                "name": "bc_escalation",
+                "passed": True,
+                "detail": "✅ BC: 昇格候補なし",
+            })
+
+        # Check 3: Reprimand rate
+        stats = compute_stats(entries)
+        reprimand_rate = stats.get("reprimand_rate", 0)
+        rate_ok = reprimand_rate < 80.0
+        checks.append({
+            "name": "bc_reprimand_rate",
+            "passed": rate_ok,
+            "detail": f"{'✅' if rate_ok else '⚠️'} BC: 叱責率 {reprimand_rate:.1f}%"
+                      + ("" if rate_ok else " — 改善が必要"),
+        })
+
+    except Exception:
+        pass  # BC check failure should never block postcheck
 
     return checks
 

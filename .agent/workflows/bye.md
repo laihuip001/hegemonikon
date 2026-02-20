@@ -168,9 +168,20 @@ git -C ~/oikos status --short
 - 未完了タスク（[ ]マーク） — **S の未確定射**
 - 決定事項 — **S の不可逆射（合意された変更）**
 - **セッション中の /dox 記録** — **S の信念射（/dox- エントリ）**
+- **BC違反ログ** — **S のフィードバック射（叱責・承認・自己検出）**
 
 > **信念収集**: セッション中に `/dox-` で記録された信念エントリを、成果物ファイルから収集する。
 > 該当がなければスキップ。収集した信念は Handoff の `## 🧠 信念 (Doxa)` セクションに統合する。
+
+> **BC違反収集**: `bc_violation_logger.py` の `format_bye_section()` を呼び出し、
+> Handoff の `## ⚡ BC フィードバック` セクションに統合する。
+
+```bash
+cd ~/oikos/hegemonikon && PYTHONPATH=. .venv/bin/python -c "
+from scripts.bc_violation_logger import read_all_entries, format_bye_section
+print(format_bye_section(read_all_entries()))
+"
+```
 
 ---
 
@@ -402,6 +413,7 @@ bash ~/oikos/hegemonikon/scripts/agq-check.sh --delta 2>/dev/null
 | 能力境界の更新 | R の定義域を修正 | 得意/苦手の発見 |
 | 比喩の自己評価 | R の表現力 | 自発的比喩の数と質 |
 | 同意/反論比率 | R の偏り | 同意N / 反論N / 確認N |
+| **BC違反傾向** | R の歪みパターン | **violations.jsonl との照合 — 叱責率・自己検出率・頻出パターン** |
 
 #### 例外分析 (SFBT Exception Finding — v7.6 追加)
 
@@ -436,6 +448,7 @@ bash ~/oikos/hegemonikon/scripts/agq-check.sh --delta 2>/dev/null
 | 方向修正 | Creator が途中で判断を変えた場面は？ | 旧方針 → 新方針 + 理由 |
 | 新しい問い | Creator から新たに提起された問いは？ | 問いの内容と背景 |
 | フィードバック品質 | Creator のフィードバックは行動可能だったか？ | 具体 / 曖昧 / なし |
+| **叱責/承認の統計** | Creator のフィードバック傾向は？ | **violations.jsonl の叱責率・承認数** |
 
 ---
 

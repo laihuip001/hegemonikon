@@ -47,7 +47,7 @@ class ChatContent(BaseModel):
 
 class ChatRequest(BaseModel):
     """Chat send request."""
-    model: str = "gemini-3-pro-preview"
+    model: str = "gemini-3.1-pro-preview"
     contents: list[ChatContent]
     system_instruction: dict[str, Any] | None = None
     generation_config: dict[str, Any] = Field(

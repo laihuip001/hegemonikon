@@ -157,9 +157,11 @@ result = select_derivative("S2", "新しいワークフローを作りたい")
 
 | トリガー | 説明 |
 |:---------|:-----|
-| `/mek` | Hegemonikon Mode (デフォルト) — 定理体系に馴染む生成 |
-| `/mek vulg` | 俗モード — 例外的に体系外の生成が必要な場合のみ |
-| `/mek [要件]` | 指定要件でスキル生成 |
+| `/mek [要件]` | **Prompt Mode (デフォルト)** — 収束/拡散判定後に自動ルーティング |
+| `/mek skill [要件]` | Skill Mode — HGK SKILL.md 生成 |
+| `/mek wf [要件]` | Workflow Mode — HGK workflow.md 生成 |
+| `/mek hege [要件]` | Hegemonikon Mode — 定理体系に馴染む Skill/WF 生成 |
+| `/mek typos [要件]` | Týpos Mode — .prompt ソースのみ生成 (compile なし) |
 | `/mek diagnose [file]` | 既存プロンプトを診断 (`prompt_quality_scorer.py -v`) |
 | `/mek improve [file]` | 既存プロンプトを改善 (`self_refine_pipeline.py --mode full`) |
 | `/mek ccl "意図"` | CCL生成モード — 自然言語から CCL v2.0 式を生成 |
@@ -203,19 +205,18 @@ SKILL.md を必ず読み込んでから処理を開始する:
 
 ## Modes
 
-| モード | トリガー | 出力 |
-|:-------|:---------|:-----|
-| Hegemonikon | `/tek hege` | 定理体系に馴染むスキル/ワークフロー |
-| Generate (Skill) | `/tek [要件]` | SKILL.md |
-| Generate (Workflow) | Interactive → Workflow | workflow.md |
-| Diagnose | `/tek diagnose` | スコア表 + 改善案 |
-| Improve | `/tek improve` | 差分のみ提示 |
-| SAGE | `/tek sage` | XML/MD ハイブリッド |
-| Týpos | `/mek typos "要件"` | .prompt ファイル (MCP `generate` 呼出) |
-| Reverse | `/mek reverse` | 出力→プロンプト逆生成 |
-| Constitutional | `/mek constitution` | 原則優先度付き生成 |
-| YAML | `/mek yaml` | YAML+MD ハイブリッド |
-| Multi-expert | `/mek multi` | 並列専門家対話 |
+| モード | トリガー | 出力 | ルーティング |
+|:-------|:---------|:-----|:------------|
+| **Prompt (デフォルト)** | `/mek [要件]` | `.prompt` → `compile` → テキスト | 収束/拡散で自動判定 |
+| Skill | `/mek skill [要件]` | SKILL.md | 明示指定のみ |
+| Workflow | `/mek wf [要件]` | workflow.md | 明示指定のみ |
+| Hegemonikon | `/mek hege [要件]` | 定理体系 Skill/WF | 明示指定のみ |
+| Týpos | `/mek typos [要件]` | .prompt ソースのみ | 明示指定のみ |
+| Diagnose | `/mek diagnose [file]` | スコア表 + 改善案 | — |
+| Improve | `/mek improve [file]` | 差分のみ提示 | — |
+| SAGE | `/mek sage [要件]` | XML/MD ハイブリッド | 明示指定のみ |
+| Reverse | `/mek reverse` | 出力→プロンプト逆生成 | — |
+| CCL | `/mek ccl "意図"` | CCL v2.0 式 | — |
 
 ---
 
@@ -229,9 +230,22 @@ SKILL.md を必ず読み込んでから処理を開始する:
    view_file /home/makaron8426/oikos/hegemonikon/.agent/skills/schema/s2-mekhane/SKILL.md
    ```
 
-2. **STEP 1**: モード判定 (1分)
-   - 明示的指定がない場合 → Generate
-   - diagnose/improve → 対象ファイル読み込み
+2. **STEP 1**: モード判定 + 出力ルーティング (1分)
+   - **1.1 明示的指定の検出**:
+     - `skill` → SKILL.md 生成
+     - `wf` / `workflow` → workflow.md 生成
+     - `hege` / `hegemonikon` → Hegemonikon Mode (M7)
+     - `typos` → .prompt ソース生成 (compile なし)
+     - `diagnose` → 診断モード (対象ファイル読み込み)
+     - `improve` → 改善モード (対象ファイル読み込み)
+     - `sage` → SAGE Mode
+     - `ccl` → CCL 生成モード
+   - **1.2 明示的指定がない場合 → Prompt Mode (デフォルト)**:
+     - MCP `policy_check` または `classify_task()` で収束/拡散を判定
+     - **convergent** → .prompt 生成 → compile → コピペ可能なテキスト出力
+     - **divergent** → 自然言語プロンプトとして直接生成
+     - **ambiguous** → Creator に確認
+   - ルーティング結果を WM `$output_mode` に記録
 3. **STEP 1.5**: Information Absorption Layer (3分)
    - Q1: Creator が「当たり前」と思っている知識は何か？
    - Q2: 対象ドメインの暗黙の前提は何か？
@@ -290,7 +304,19 @@ SKILL.md を必ず読み込んでから処理を開始する:
 9. **STEP 7**: SE反復原則 — 初版確認
    - `/dia-` クイックレビュー推奨
    - `/dia+` 詳細レビュー
-10. **最終出力**: 成果物 → ファイル保存
+10. **最終出力**: ルーティング結果に基づく出力
+    - **Prompt Mode (convergent)**:
+      a. Týpos MCP `generate` で .prompt ソース生成
+      b. Týpos MCP `compile` でテキスト化
+      c. **コピペ可能なテキスト** を Creator に提示
+      d. .prompt ソースファイルも保存 (編集・再コンパイル用)
+    - **Prompt Mode (divergent)**:
+      a. 自然言語プロンプトを直接生成・提示
+    - **Skill / WF / Hegemonikon Mode**:
+      a. 従来通り SKILL.md / workflow.md を生成
+    - **Týpos Mode**:
+      a. .prompt ソースのみ生成 (compile は行わない)
+    - 全モード共通: ファイル保存先を Creator に報告
 
 ---
 
@@ -336,3 +362,4 @@ cd ~/oikos/hegemonikon && PYTHONPATH=. .venv/bin/python scripts/wf_postcheck.py 
 
 *v7.1 — Functional Beauty Redesign (2026-02-07)*
 *v7.2 — Quality Scorer + Self-Refine 統合 (2026-02-11)*
+*v7.3 — Output Routing: デフォルトを Prompt Mode に変更、classify_task → compile フロー統合 (2026-02-19)*

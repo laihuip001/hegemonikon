@@ -382,7 +382,12 @@ class CitationAgent:
                     source_titles[i] = r.title
 
         # Find sentences with [Source N] citations
-        sentences = re.split(r'(?<=[.!?。！？])\s+', synthesis_text)
+        # Fix 3: Remove meta-sections that are not verifiable claims
+        clean_text = re.sub(
+            r'## (?:Source Analysis|Contradictions|Confidence).*?(?=## |\Z)',
+            '', synthesis_text, flags=re.DOTALL,
+        )
+        sentences = re.split(r'(?<=[.!?。！？])\s+', clean_text)
         for sentence in sentences:
             refs = re.findall(r'\[Source\s+(\d+)\]', sentence)
             if not refs:

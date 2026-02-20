@@ -227,7 +227,7 @@ class GitMetrics:
         """分析結果の要約テキスト。"""
         churns = self.file_churn()
         if not churns:
-            return "📊 Git Metrics: No commits in the past {self.days} days."
+            return f"📊 Git Metrics: No commits in the past {self.days} days."
 
         risky = self.risky_files(top_n=3)
         velocity = self.commit_velocity()

@@ -356,6 +356,282 @@ def format_session_summary(entries: list[FeedbackEntry], session_id: str = "") -
     return f"📊 セッション: {' | '.join(parts)} | 自己検出率: {stats['self_detection_rate']}%"
 
 
+def format_bye_section(entries: list[FeedbackEntry]) -> str:
+    """
+    /bye Handoff に含める BC違反セクション。
+
+    Step 2 (セッション情報収集) と Step 3.7 (Self-Profile) で使う。
+    """
+    stats = compute_stats(entries)
+    if stats["total"] == 0:
+        return "## ⚡ BC フィードバック\n\n✅ このセッションでのフィードバック記録なし\n"
+
+    lines = [
+        "## ⚡ BC フィードバック",
+        "",
+        "| 指標 | 値 |",
+        "|:-----|:---|",
+        f"| 総件数 | {stats['total']} |",
+        f"| 叱責率 | {stats['reprimand_rate']}% |",
+        f"| 自己検出率 | {stats['self_detection_rate']}% |",
+    ]
+
+    # 種別内訳
+    rep = stats["by_type"].get("reprimand", 0)
+    ack = stats["by_type"].get("acknowledgment", 0)
+    sd = stats["by_type"].get("self_detected", 0)
+    lines.append(f"| 内訳 | ⚡叱責 {rep} / ✨承認 {ack} / 🔍自己検出 {sd} |")
+
+    # パターン
+    if stats["by_pattern"]:
+        top_patterns = ", ".join(
+            f"{PATTERN_NAMES.get(p, p)}({c})"
+            for p, c in list(stats["by_pattern"].items())[:3]
+        )
+        lines.append(f"| 頻出パターン | {top_patterns} |")
+
+    # 最多 BC
+    if stats["by_bc"]:
+        top_bcs = ", ".join(
+            f"{bc}({c})" for bc, c in list(stats["by_bc"].items())[:3]
+        )
+        lines.append(f"| 最多 BC | {top_bcs} |")
+
+    lines.append("")
+
+    # Creator の言葉
+    if stats["creator_words_samples"]:
+        lines.append("### Creator の言葉")
+        lines.append("")
+        for s in stats["creator_words_samples"]:
+            icon = TYPE_ICONS.get(s["type"], "")
+            lines.append(f"- {icon} [{s['date']}] \"{s['words']}\"")
+        lines.append("")
+
+    return "\n".join(lines)
+
+
+def format_boot_summary(entries: list[FeedbackEntry]) -> str:
+    """
+    /boot 時に突きつける前セッションまでの傾向サマリー。
+
+    コンパクトに叱責率・自己検出率・直近トレンドを返す。
+    """
+    if not entries:
+        return "⚡ BC: 記録なし"
+
+    stats = compute_stats(entries)
+    trend = compute_trend(entries, weeks=2)
+
+    # 直近週のデータ
+    latest = trend[-1] if trend else {}
+    latest_rep = latest.get("reprimands", 0)
+    latest_total = latest.get("total", 0)
+
+    parts = [
+        f"⚡ BC: 累計{stats['total']}件",
+        f"叱責率{stats['reprimand_rate']}%",
+        f"自己検出率{stats['self_detection_rate']}%",
+        f"直近週: {latest_rep}叱責/{latest_total}件",
+    ]
+
+    # 最多パターン警告
+    if stats["by_pattern"]:
+        top_pattern = list(stats["by_pattern"].keys())[0]
+        top_name = PATTERN_NAMES.get(top_pattern, top_pattern)
+        parts.append(f"⚠️{top_name}")
+
+    return " | ".join(parts)
+
+
+# ============================================================
+# Escalation — violations.md への昇格提案
+# ============================================================
+
+VIOLATIONS_MD = (
+    Path.home()
+    / "oikos"
+    / "hegemonikon"
+    / ".agent"
+    / "rules"
+    / "behavioral_constraints"
+    / "violations.md"
+)
+
+
+def _next_violation_id(violations_path: Optional[Path] = None) -> str:
+    """violations.md の既存最大 V-NNN ID を検出し、次の ID を返す。
+
+    YAML ブロック内の `id: V-NNN` 行のみを対象にする。
+    本文中の言及 (例: 'V-006 の再発') は無視する。
+    """
+    path = violations_path or VIOLATIONS_MD
+    if not path.exists():
+        return "V-001"
+    import re
+
+    content = path.read_text(encoding="utf-8")
+    # YAML ブロック内の id: V-NNN のみを対象
+    ids = re.findall(r'^id:\s*V-(\d{3})', content, re.MULTILINE)
+    if not ids:
+        return "V-001"
+    max_id = max(int(i) for i in ids)
+    return f"V-{max_id + 1:03d}"
+
+
+def _existing_patterns_in_violations(violations_path: Optional[Path] = None) -> set[str]:
+    """violations.md に既に記録されているパターン名を返す。"""
+    path = violations_path or VIOLATIONS_MD
+    if not path.exists():
+        return set()
+    import re
+
+    content = path.read_text(encoding="utf-8")
+    return set(re.findall(r'^pattern:\s*(\S+)', content, re.MULTILINE))
+
+
+def suggest_escalation(
+    entries: list[FeedbackEntry],
+    *,
+    min_severity: str = "high",
+    min_occurrences: int = 2,
+) -> list[dict]:
+    """
+    violations.md への昇格候補を検出する。
+
+    昇格条件 (OR):
+      1. severity が min_severity 以上
+      2. 同じ pattern が min_occurrences 回以上出現
+
+    Returns:
+        list[dict]: 昇格候補のリスト。各要素は:
+          - pattern: str
+          - severity: str (最高深刻度)
+          - count: int
+          - reason: str ("severity" or "recurrence" or "both")
+          - entries: list[FeedbackEntry] (該当エントリ)
+          - template: str (violations.md 用 YAML テンプレート)
+    """
+    if not entries:
+        return []
+
+    # パターンごとに集計
+    pattern_groups: dict[str, list[FeedbackEntry]] = {}
+    for e in entries:
+        if e.pattern:
+            pattern_groups.setdefault(e.pattern, []).append(e)
+
+    # 二重提案防止: violations.md に既に記録されているパターンを除外
+    existing_patterns = _existing_patterns_in_violations()
+    for p in existing_patterns:
+        pattern_groups.pop(p, None)
+
+    sev_threshold = SEVERITY_ORDER.get(min_severity, 2)
+    next_id = _next_violation_id()
+    candidates = []
+
+    for pattern, group in pattern_groups.items():
+        max_sev = max(SEVERITY_ORDER.get(e.severity, 0) for e in group)
+        max_sev_name = next(k for k, v in SEVERITY_ORDER.items() if v == max_sev)
+        count = len(group)
+
+        is_severe = max_sev >= sev_threshold
+        is_recurrent = count >= min_occurrences
+        if not (is_severe or is_recurrent):
+            continue
+
+        reason = "both" if (is_severe and is_recurrent) else (
+            "severity" if is_severe else "recurrence"
+        )
+
+        # YAML テンプレート生成
+        template = _format_escalation_entry(
+            vid=next_id,
+            pattern=pattern,
+            severity=max_sev_name,
+            recurrent=is_recurrent,
+            group=group,
+        )
+
+        candidates.append({
+            "pattern": pattern,
+            "severity": max_sev_name,
+            "count": count,
+            "reason": reason,
+            "entries": group,
+            "template": template,
+        })
+
+        # 次の ID をインクリメント
+        num = int(next_id.split("-")[1])
+        next_id = f"V-{num + 1:03d}"
+
+    # 深刻度降順 → 件数降順
+    candidates.sort(
+        key=lambda c: (-SEVERITY_ORDER.get(c["severity"], 0), -c["count"])
+    )
+    return candidates
+
+
+def _format_escalation_entry(
+    vid: str,
+    pattern: str,
+    severity: str,
+    recurrent: bool,
+    group: list[FeedbackEntry],
+) -> str:
+    """violations.md 用の YAML テンプレートを生成。"""
+    from datetime import date
+
+    # BC の集約
+    all_bcs: set[str] = set()
+    for e in group:
+        all_bcs.update(e.bc_ids)
+    bc_list = sorted(all_bcs) if all_bcs else ["BC-?"]
+
+    # サマリー: 代表的な description を使用
+    descriptions = [e.description for e in group if e.description]
+    summary = descriptions[0] if descriptions else "JSONL から昇格"
+    if len(descriptions) > 1:
+        summary += f" (他 {len(descriptions) - 1} 件)"
+
+    # Creator の言葉
+    creator_words = [e.creator_words for e in group if e.creator_words]
+    creator_section = ""
+    if creator_words:
+        creator_section = "\n  Creator の言葉:\n" + "\n".join(
+            f"    - \"{w}\"" for w in creator_words[:3]
+        )
+
+    # 是正行動
+    correctives = [e.corrective for e in group if e.corrective]
+    corrective_section = correctives[0] if correctives else "<!-- FILL: 是正行動 -->"
+
+    pattern_name = PATTERN_NAMES.get(pattern, pattern)
+
+    return f"""### {vid}: {pattern_name}（JSONL 昇格）
+
+```yaml
+id: {vid}
+date: "{date.today().isoformat()}"
+bc: [{', '.join(bc_list)}]
+pattern: {pattern}
+severity: {severity}
+recurrence: {str(recurrent).lower()}
+summary: |
+  {summary}
+  JSONL 記録 {len(group)} 件から昇格。{creator_section}
+root_cause: |
+  <!-- FILL: 根本原因を記述 -->
+corrective: |
+  {corrective_section}
+lesson: |
+  <!-- FILL: 教訓を記述 -->
+```
+
+---"""
+
+
 # ============================================================
 # CLI
 # ============================================================
@@ -398,6 +674,14 @@ def main():
                             help="期間")
     dash_parser.add_argument("--json", action="store_true", help="JSON出力")
 
+    # escalate コマンド
+    esc_parser = sub.add_parser("escalate", help="violations.md への昇格候補を表示")
+    esc_parser.add_argument("--min-severity", type=str, default="high",
+                           choices=sorted(SEVERITY_ORDER.keys()),
+                           help="最低深刻度 (default: high)")
+    esc_parser.add_argument("--min-occurrences", type=int, default=2,
+                           help="最低出現回数 (default: 2)")
+
     args = parser.parse_args()
 
     if args.command == "log":
@@ -436,6 +720,25 @@ def main():
             print(json.dumps(stats, ensure_ascii=False, indent=2))
         else:
             print(format_dashboard(entries, period=args.period))
+
+    elif args.command == "escalate":
+        entries = read_all_entries()
+        candidates = suggest_escalation(
+            entries,
+            min_severity=args.min_severity,
+            min_occurrences=args.min_occurrences,
+        )
+        if not candidates:
+            print("✅ 昇格候補なし — 現在の記録に重大/反復パターンは検出されませんでした")
+        else:
+            print(f"⬆️ 昇格候補: {len(candidates)} 件")
+            print(f"   次の ID: {_next_violation_id()}")
+            print("━" * 50)
+            for c in candidates:
+                name = PATTERN_NAMES.get(c["pattern"], c["pattern"])
+                icon = SEVERITY_ICONS.get(c["severity"], "⚪")
+                print(f"\n{icon} {name} — {c['count']}件 ({c['reason']})")
+                print(c["template"])
 
     else:
         parser.print_help()

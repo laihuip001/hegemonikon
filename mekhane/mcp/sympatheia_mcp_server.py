@@ -263,6 +263,29 @@ async def list_tools():
                 },
             },
         ),
+        Tool(
+            name="sympatheia_escalate",
+            description=(
+                "BC違反の昇格候補検出: 深刻度や再発回数に基づき violations.md への昇格候補を提案。"
+                "自動書込みはしない (LBYL)。テンプレートを表示するのみ。"
+            ),
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "min_severity": {
+                        "type": "string",
+                        "enum": ["low", "medium", "high", "critical"],
+                        "default": "high",
+                        "description": "最低深刻度",
+                    },
+                    "min_occurrences": {
+                        "type": "integer",
+                        "default": 2,
+                        "description": "最低出現回数",
+                    },
+                },
+            },
+        ),
     ]
 
 
@@ -473,6 +496,9 @@ async def call_tool(name: str, arguments: dict):
         elif name == "sympatheia_violation_dashboard":
             return await _handle_violation_dashboard(arguments)
 
+        elif name == "sympatheia_escalate":
+            return await _handle_escalate(arguments)
+
         else:
             return [TextContent(type="text", text=f"Unknown tool: {name}")]
 
@@ -619,6 +645,40 @@ async def _handle_violation_dashboard(arguments: dict) -> list[TextContent]:
         return [TextContent(type="text", text=f"Error: {str(e)}")]
 
 
+async def _handle_escalate(arguments: dict) -> list[TextContent]:
+    """violations.md への昇格候補を表示。"""
+    try:
+        from scripts.bc_violation_logger import (
+            read_all_entries, suggest_escalation,
+        )
+
+        min_severity = arguments.get("min_severity", "high")
+        min_occurrences = arguments.get("min_occurrences", 2)
+        entries = read_all_entries()
+
+        if not entries:
+            return [TextContent(type="text", text="✅ フィードバック記録なし")]
+
+        candidates = suggest_escalation(
+            entries, min_severity=min_severity, min_occurrences=min_occurrences,
+        )
+
+        if not candidates:
+            return [TextContent(type="text", text="✅ 昇格候補なし — 条件に合致するパターンがありません")]
+
+        lines = [f"# 📋 昇格候補: {len(candidates)} 件\n"]
+        for c in candidates:
+            lines.append(f"## {c['pattern']} ({c['reason']}, {c['count']}件)\n")
+            lines.append(f"```yaml\n{c['template']}```\n")
+
+        return [TextContent(type="text", text="\n".join(lines))]
+    except Exception as e:
+        log(f"Escalate error: {e}")
+        return [TextContent(type="text", text=f"Error: {str(e)}")]
+
+
 if __name__ == "__main__":
+    from mekhane.mcp.mcp_guard import guard
+    guard("sympatheia")
     _base.run()
 

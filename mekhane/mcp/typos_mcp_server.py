@@ -1045,4 +1045,6 @@ async def _handle_policy_check(arguments: dict):
 
 
 if __name__ == "__main__":
+    from mekhane.mcp.mcp_guard import guard
+    guard("typos")
     _base.run()

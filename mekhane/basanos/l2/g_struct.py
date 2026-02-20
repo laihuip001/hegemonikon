@@ -18,6 +18,7 @@ import yaml
 from mekhane.basanos.l2.models import ExternalForm, HGKConcept
 
 
+# PURPOSE: GStruct
 class GStruct:
     """Structural parser for kernel/ markdown files.
 
@@ -41,9 +42,11 @@ class GStruct:
     # Claim patterns: blockquotes starting with **
     CLAIM_RE = re.compile(r"^>\s*\*\*[「「](.+?)[」」]\*\*", re.MULTILINE)
 
+    # PURPOSE: __init__
     def __init__(self, kernel_root: Path | str) -> None:
         self.kernel_root = Path(kernel_root)
 
+    # PURPOSE: parse_file
     def parse_file(self, path: Path | str) -> Optional[HGKConcept]:
         """Parse a single kernel/ markdown file into HGKConcept."""
         path = Path(path)
@@ -81,6 +84,7 @@ class GStruct:
             extends=extends,
         )
 
+    # PURPOSE: extract_external_form
     def extract_external_form(self, path: Path | str) -> Optional[ExternalForm]:
         """Extract ExternalForm (G_struct output) from a kernel/ file.
 
@@ -121,6 +125,7 @@ class GStruct:
             theorem_ids=theorem_ids,
         )
 
+    # PURPOSE: scan_all
     def scan_all(self) -> list[HGKConcept]:
         """Scan all kernel/ markdown files and return HGKConcepts."""
         concepts = []
@@ -132,6 +137,7 @@ class GStruct:
 
     # --- Private helpers ---
 
+    # PURPOSE: _extract_frontmatter
     def _extract_frontmatter(self, text: str) -> dict:
         """Extract YAML frontmatter from markdown."""
         match = re.match(r"^---\s*\n(.*?)\n---", text, re.DOTALL)
@@ -142,15 +148,18 @@ class GStruct:
         except yaml.YAMLError:
             return {}
 
+    # PURPOSE: _strip_frontmatter
     def _strip_frontmatter(self, text: str) -> str:
         """Remove YAML frontmatter from markdown."""
         return re.sub(r"^---\s*\n.*?\n---\s*\n?", "", text, count=1, flags=re.DOTALL)
 
+    # PURPOSE: _extract_title
     def _extract_title(self, body: str) -> Optional[str]:
         """Extract first H1 heading."""
         match = re.search(r"^#\s+(.+)$", body, re.MULTILINE)
         return match.group(1).strip() if match else None
 
+    # PURPOSE: _detect_series
     def _detect_series(self, doc_id: str, path: str) -> Optional[str]:
         """Detect which series (O/S/H/P/K/A) a document belongs to."""
         combined = f"{doc_id} {path}"
@@ -159,6 +168,7 @@ class GStruct:
                 return series
         return None
 
+    # PURPOSE: _extract_keywords
     def _extract_keywords(self, body: str, frontmatter: dict) -> list[str]:
         """Extract keywords from headings and bold terms."""
         keywords = []
@@ -174,6 +184,7 @@ class GStruct:
             keywords.append(match.group(1).strip())
         return list(set(keywords))
 
+    # PURPOSE: _extract_mechanisms
     def _extract_mechanisms(self, body: str) -> list[str]:
         """Extract mechanism descriptions (implementation details)."""
         mechanisms = []

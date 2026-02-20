@@ -31,6 +31,7 @@ PID_DIR = Path.home() / ".cache" / "hgk" / "mcp"
 _KILL_WAIT = 2.0
 
 
+# PURPOSE: guard
 def guard(server_name: str) -> None:
     """MCP サーバー起動ガード。
 
@@ -53,16 +54,19 @@ def guard(server_name: str) -> None:
         pass
 
 
+# PURPOSE: _ensure_dir
 def _ensure_dir() -> None:
     """PID ディレクトリを作成。"""
     PID_DIR.mkdir(parents=True, exist_ok=True)
 
 
+# PURPOSE: _pid_file
 def _pid_file(server_name: str) -> Path:
     """PID ファイルのパスを返す。"""
     return PID_DIR / f"{server_name}.pid"
 
 
+# PURPOSE: _kill_old_process
 def _kill_old_process(server_name: str) -> None:
     """古い同名プロセスを安全に kill する。
 
@@ -120,6 +124,7 @@ def _kill_old_process(server_name: str) -> None:
     pid_path.unlink(missing_ok=True)
 
 
+# PURPOSE: _is_mcp_process
 def _is_mcp_process(pid: int, server_name: str) -> bool:
     """PID が実際に MCP サーバーのプロセスかどうかを検証。
 
@@ -150,6 +155,7 @@ def _is_mcp_process(pid: int, server_name: str) -> bool:
         return False
 
 
+# PURPOSE: _process_alive
 def _process_alive(pid: int) -> bool:
     """プロセスが生存しているか確認。"""
     try:
@@ -159,13 +165,16 @@ def _process_alive(pid: int) -> bool:
         return False
 
 
+# PURPOSE: _write_pid
 def _write_pid(server_name: str) -> None:
     """自分の PID をファイルに書き込む。"""
     _pid_file(server_name).write_text(str(os.getpid()))
 
 
+# PURPOSE: _register_cleanup
 def _register_cleanup(server_name: str) -> None:
     """終了時に PID ファイルを削除する atexit ハンドラを登録。"""
+    # PURPOSE: _cleanup
     def _cleanup():
         try:
             pid_path = _pid_file(server_name)
@@ -180,6 +189,7 @@ def _register_cleanup(server_name: str) -> None:
     atexit.register(_cleanup)
 
 
+# PURPOSE: status
 def status() -> dict:
     """全 MCP サーバーの PID 状況を返す。診断用。"""
     result = {}

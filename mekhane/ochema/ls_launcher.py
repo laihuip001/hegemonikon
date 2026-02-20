@@ -34,6 +34,7 @@ LS_BINARY = (
 CLOUD_CODE_ENDPOINT = "https://daily-cloudcode-pa.googleapis.com"
 
 
+# PURPOSE: encode_protobuf_string
 def encode_protobuf_string(field_number: int, value: str) -> bytes:
     """Encode a protobuf string field (wire type 2)."""
     if not value:
@@ -43,6 +44,7 @@ def encode_protobuf_string(field_number: int, value: str) -> bytes:
     return _encode_varint(tag) + _encode_varint(len(data)) + data
 
 
+# PURPOSE: encode_protobuf_bool
 def encode_protobuf_bool(field_number: int, value: bool) -> bytes:
     """Encode a protobuf bool field (wire type 0)."""
     if not value:
@@ -51,6 +53,7 @@ def encode_protobuf_bool(field_number: int, value: bool) -> bytes:
     return _encode_varint(tag) + _encode_varint(1 if value else 0)
 
 
+# PURPOSE: _encode_varint
 def _encode_varint(value: int) -> bytes:
     """Encode an integer as a protobuf varint."""
     result = []
@@ -61,6 +64,7 @@ def _encode_varint(value: int) -> bytes:
     return bytes(result)
 
 
+# PURPOSE: build_management_metadata
 def build_management_metadata(
     auth_token: str,
     auth_uid: str = "",
@@ -76,6 +80,7 @@ def build_management_metadata(
     return msg
 
 
+# PURPOSE: get_current_oauth_token
 def get_current_oauth_token() -> str | None:
     """現在起動中の LS プロセスのメモリから OAuth token を取得する。
     
@@ -135,6 +140,7 @@ def get_current_oauth_token() -> str | None:
     return None
 
 
+# PURPOSE: launch_ls
 def launch_ls(
     port: int,
     auth_token: str,
@@ -199,6 +205,7 @@ def launch_ls(
     return proc
 
 
+# PURPOSE: main
 def main():
     parser = argparse.ArgumentParser(description="LS Standalone Launcher")
     parser.add_argument("--port", type=int, default=29501, help="Server port")

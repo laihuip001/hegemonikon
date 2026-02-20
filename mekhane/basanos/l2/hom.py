@@ -18,6 +18,7 @@ from pathlib import Path
 from typing import Optional
 
 
+# PURPOSE: HomScore
 @dataclass
 class HomScore:
     """Result of Hom computation between two concepts."""
@@ -28,6 +29,7 @@ class HomScore:
     embedding_score: Optional[float] = None  # Pass 2: cosine similarity [0, 1]
     llm_score: Optional[float] = None  # Pass 3: LLM judgment [0, 1]
 
+    # PURPOSE: combined_score
     @property
     def combined_score(self) -> float:
         """Weighted combination of available scores."""
@@ -40,12 +42,14 @@ class HomScore:
         total_weight = sum(w for _, w in scores)
         return sum(s * w for s, w in scores) / total_weight if total_weight > 0 else 0.0
 
+    # PURPOSE: is_related
     @property
     def is_related(self) -> bool:
         """Whether the concepts are considered related (threshold: 0.3)."""
         return self.combined_score >= 0.3
 
 
+# PURPOSE: HomCalculator
 class HomCalculator:
     """Calculate Hom (relatedness) between external and HGK concepts.
 
@@ -55,6 +59,7 @@ class HomCalculator:
     3. LLM judgment (edge cases only)
     """
 
+    # PURPOSE: __init__
     def __init__(
         self,
         project_root: Path | str,
@@ -65,6 +70,7 @@ class HomCalculator:
         self.use_mneme = use_mneme
         self.use_llm = use_llm
 
+    # PURPOSE: compute
     def compute(
         self,
         source_keywords: list[str],
@@ -105,6 +111,7 @@ class HomCalculator:
 
         return score
 
+    # PURPOSE: batch_compute
     def batch_compute(
         self,
         source_keywords: list[str],
@@ -123,6 +130,7 @@ class HomCalculator:
 
     # --- Pass implementations ---
 
+    # PURPOSE: _jaccard
     def _jaccard(self, a: list[str], b: list[str]) -> float:
         """Pass 1: Jaccard coefficient between keyword sets."""
         set_a = {kw.lower().strip() for kw in a if kw.strip()}
@@ -142,6 +150,7 @@ class HomCalculator:
         union = set_a | set_b
         return len(intersection) / len(union) if union else 0.0
 
+    # PURPOSE: _mneme_similarity
     def _mneme_similarity(self, query: str, target_keywords: list[str]) -> Optional[float]:
         """Pass 2: Use Mnēmē vector search to estimate semantic similarity."""
         try:
@@ -180,6 +189,7 @@ class HomCalculator:
             pass
         return None
 
+    # PURPOSE: _llm_judge
     def _llm_judge(self, source: list[str], target: list[str]) -> Optional[float]:
         """Pass 3: LLM judgment for edge cases."""
         # Only triggered for ambiguous cases (score between 0.2 and 0.5)

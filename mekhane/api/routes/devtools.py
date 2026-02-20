@@ -32,6 +32,7 @@ ALLOWED_BASES = [
 ]
 
 
+# PURPOSE: _is_safe_path
 def _is_safe_path(path: str) -> bool:
     """Check if the path is under allowed base directories."""
     resolved = Path(path).resolve()
@@ -40,6 +41,7 @@ def _is_safe_path(path: str) -> bool:
 
 # ─── File Operations ──────────────────────────────────────────
 
+# PURPOSE: list_directory
 @router.get("/files/list")
 async def list_directory(
     path: str = Query(default="/home/makaron8426/oikos/hegemonikon"),
@@ -80,6 +82,7 @@ async def list_directory(
     return {"entries": entries, "path": path}
 
 
+# PURPOSE: read_file
 @router.get("/files/read")
 async def read_file(
     path: str = Query(...),
@@ -107,6 +110,7 @@ async def read_file(
 
 # ─── Terminal ─────────────────────────────────────────────────
 
+# PURPOSE: TerminalRequest
 class TerminalRequest(BaseModel):
     command: str
     cwd: str = "/home/makaron8426/oikos/hegemonikon"
@@ -119,6 +123,7 @@ BLOCKED_COMMANDS = {
 }
 
 
+# PURPOSE: execute_command
 @router.post("/terminal/execute")
 async def execute_command(req: TerminalRequest) -> dict[str, Any]:
     """Execute a shell command and return output."""
@@ -162,6 +167,7 @@ async def execute_command(req: TerminalRequest) -> dict[str, Any]:
 
 # ─── Git Operations ──────────────────────────────────────────
 
+# PURPOSE: git_status
 @router.get("/git/status")
 async def git_status(
     repo: str = Query(default="/home/makaron8426/oikos/hegemonikon"),
@@ -199,6 +205,7 @@ async def git_status(
         raise HTTPException(500, f"Git status error: {exc}")
 
 
+# PURPOSE: git_diff
 @router.get("/git/diff")
 async def git_diff(
     repo: str = Query(default="/home/makaron8426/oikos/hegemonikon"),
@@ -237,6 +244,7 @@ async def git_diff(
 
 # ─── Ochema (AI with Tools) ──────────────────────────────────
 
+# PURPOSE: OchemaRequest
 class OchemaRequest(BaseModel):
     message: str
     model: str = "gemini-2.0-flash"
@@ -246,6 +254,7 @@ class OchemaRequest(BaseModel):
     thinking_budget: int | None = None
 
 
+# PURPOSE: ask_with_tools
 @router.post("/ochema/ask_with_tools")
 async def ask_with_tools(req: OchemaRequest) -> dict[str, Any]:
     """Proxy to Cortex API ask_with_tools."""

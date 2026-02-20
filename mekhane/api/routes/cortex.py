@@ -16,6 +16,7 @@ router = APIRouter(prefix="/api/cortex", tags=["Cortex"])
 # Singleton client
 _client: CortexClient | None = None
 
+# PURPOSE: _get_client
 def _get_client() -> CortexClient:
     global _client
     if _client is None:
@@ -23,12 +24,14 @@ def _get_client() -> CortexClient:
     return _client
 
 
+# PURPOSE: health
 @router.get("/health")
 async def health():
     """Health check for Cortex Proxy."""
     return {"status": "ok", "service": "hgk-desktop-api-cortex"}
 
 
+# PURPOSE: ask
 @router.post("/ask")
 async def ask(request: Request):
     """Simple ask endpoint — non-streaming."""
@@ -50,6 +53,7 @@ async def ask(request: Request):
         return JSONResponse({"error": str(e)}, status_code=500)
 
 
+# PURPOSE: ask_stream
 @router.post("/ask/stream")
 async def ask_stream(request: Request):
     """SSE streaming endpoint — full parameter control."""
@@ -64,6 +68,7 @@ async def ask_stream(request: Request):
     if not message:
         return JSONResponse({"error": "message is required"}, status_code=400)
 
+    # PURPOSE: event_generator
     async def event_generator() -> AsyncGenerator[str, Any]:
         try:
             client = _get_client()

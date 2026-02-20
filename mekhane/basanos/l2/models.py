@@ -10,6 +10,7 @@ from enum import Enum
 from typing import Optional
 
 
+# PURPOSE: DeficitType
 class DeficitType(Enum):
     """Type of structural deficit detected."""
 
@@ -19,6 +20,7 @@ class DeficitType(Enum):
     DELTA = "Δε/Δt"  # Change-introduced discrepancy
 
 
+# PURPOSE: ExternalForm
 @dataclass(frozen=True)
 class ExternalForm:
     """G(hgk): HGK concept projected into external-comparable form.
@@ -36,6 +38,7 @@ class ExternalForm:
     theorem_ids: list[str] = field(default_factory=list)  # e.g. ["O1", "O2"]
 
 
+# PURPOSE: HGKConcept
 @dataclass(frozen=True)
 class HGKConcept:
     """Internal HGK concept extracted from kernel/."""
@@ -51,6 +54,7 @@ class HGKConcept:
     has_implementation: bool = False  # mekhane/ counterpart exists
 
 
+# PURPOSE: Deficit
 @dataclass
 class Deficit:
     """Structural discrepancy detected by Basanos L2.
@@ -66,6 +70,7 @@ class Deficit:
     evidence: list[str] = field(default_factory=list)  # supporting facts
     suggested_action: Optional[str] = None
 
+    # PURPOSE: to_question
     def to_question(self) -> Question:
         """Convert deficit to a natural question."""
         templates = {
@@ -84,6 +89,7 @@ class Deficit:
         )
 
 
+# PURPOSE: Question
 @dataclass
 class Question:
     """Question generated from a structural deficit."""

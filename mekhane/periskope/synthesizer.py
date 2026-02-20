@@ -71,11 +71,13 @@ _DEPTH_MODELS: dict[int, list[SynthModel]] = {
 }
 
 
+# PURPOSE: models_for_depth
 def models_for_depth(depth: int) -> list[SynthModel]:
     """Return synthesis models for the given depth level (1-3)."""
     return _DEPTH_MODELS.get(depth, _DEPTH_MODELS[2])
 
 
+# PURPOSE: MultiModelSynthesizer
 class MultiModelSynthesizer:
     """Synthesize search results using multiple LLMs.
 
@@ -88,6 +90,7 @@ class MultiModelSynthesizer:
         L3: Gemini Pro + Claude Opus (deep dual-model)
     """
 
+    # PURPOSE: __init__
     def __init__(
         self,
         synth_models: list[SynthModel] | None = None,
@@ -99,6 +102,7 @@ class MultiModelSynthesizer:
         self.max_tokens = max_tokens
         self._cortex = None
 
+    # PURPOSE: _get_cortex
     def _get_cortex(self):
         """Lazy-load CortexClient."""
         if self._cortex is None:
@@ -109,6 +113,7 @@ class MultiModelSynthesizer:
             )
         return self._cortex
 
+    # PURPOSE: synthesize
     async def synthesize(
         self,
         query: str,
@@ -158,6 +163,7 @@ class MultiModelSynthesizer:
 
         return synth_results
 
+    # PURPOSE: _synth_via_cortex
     async def _synth_via_cortex(
         self,
         prompt: str,
@@ -212,6 +218,7 @@ class MultiModelSynthesizer:
             else 0,
         )
 
+    # PURPOSE: detect_divergence
     def detect_divergence(
         self,
         results: list[SynthesisResult],
@@ -256,6 +263,7 @@ class MultiModelSynthesizer:
             ],
         )
 
+    # PURPOSE: _format_results
     def _format_results(self, results: list[SearchResult]) -> str:
         """Format search results for the synthesis prompt."""
         lines = []
@@ -269,6 +277,7 @@ class MultiModelSynthesizer:
             )
         return "\n\n".join(lines)
 
+    # PURPOSE: _extract_citations
     def _extract_citations(self, text: str) -> list[Citation]:
         """Extract [Source N] citations from synthesis text."""
         import re
@@ -287,6 +296,7 @@ class MultiModelSynthesizer:
                 ))
         return citations
 
+    # PURPOSE: _extract_confidence
     def _extract_confidence(self, text: str) -> float:
         """Extract confidence percentage from synthesis text."""
         import re

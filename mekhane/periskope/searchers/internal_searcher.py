@@ -28,6 +28,7 @@ if str(_PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(_PROJECT_ROOT))
 
 
+# PURPOSE: GnosisSearcher
 class GnosisSearcher:
     """Search Gnōsis academic paper index (LanceDB).
 
@@ -42,11 +43,13 @@ class GnosisSearcher:
     # Timeout for GnosisIndex initialization (embedder loading)
     _INIT_TIMEOUT = 10.0
 
+    # PURPOSE: __init__
     def __init__(self) -> None:
         self._index = None
         self._fallback_mode = False  # True if embedder hang detected
         self._papers_dir = Path("/home/makaron8426/oikos/hegemonikon/mekhane/anamnesis/papers")
 
+    # PURPOSE: _get_index
     def _get_index(self):
         """Lazy-load GnosisIndex with timeout protection."""
         if self._fallback_mode:
@@ -55,6 +58,7 @@ class GnosisSearcher:
             import asyncio
             import concurrent.futures
 
+            # PURPOSE: _load
             def _load():
                 from mekhane.anamnesis.index import GnosisIndex
                 return GnosisIndex()
@@ -77,6 +81,7 @@ class GnosisSearcher:
                 return None
         return self._index
 
+    # PURPOSE: search
     async def search(
         self,
         query: str,
@@ -134,6 +139,7 @@ class GnosisSearcher:
         logger.info("Gnōsis (%s): %d results for %r", mode, len(results), query)
         return results
 
+    # PURPOSE: _tfidf_fallback
     def _tfidf_fallback(
         self,
         query: str,
@@ -189,6 +195,7 @@ class GnosisSearcher:
         return [item for _, item in scored[:max_results]]
 
 
+# PURPOSE: SophiaSearcher
 class SophiaSearcher:
     """Search Sophia Knowledge Items (KI) and Steps.
 
@@ -199,9 +206,11 @@ class SophiaSearcher:
     KI_DIR = Path("/home/makaron8426/.gemini/antigravity/knowledge")
     STEPS_ROOT = Path("/home/makaron8426/.gemini/antigravity/brain")
 
+    # PURPOSE: __init__
     def __init__(self, ki_dir: Path | None = None) -> None:
         self.ki_dir = ki_dir or self.KI_DIR
 
+    # PURPOSE: search
     async def search(
         self,
         query: str,
@@ -242,6 +251,7 @@ class SophiaSearcher:
         logger.info("Sophia: %d results for %r", len(results), query)
         return results
 
+    # PURPOSE: _collect_searchable_docs
     def _collect_searchable_docs(self) -> list[tuple[str, str, Path | None, str]]:
         """Collect KI files for search."""
         docs: list[tuple[str, str, Path | None, str]] = []
@@ -256,6 +266,7 @@ class SophiaSearcher:
 
         return docs
 
+    # PURPOSE: _tfidf_rank
     def _tfidf_rank(
         self,
         query: str,
@@ -303,6 +314,7 @@ class SophiaSearcher:
         return scored[:k]
 
 
+# PURPOSE: KairosSearcher
 class KairosSearcher:
     """Search Kairos session handoffs and ROM files.
 
@@ -312,6 +324,7 @@ class KairosSearcher:
     HANDOFF_DIR = Path("/home/makaron8426/oikos/mneme/.hegemonikon/sessions")
     ROM_DIR = Path("/home/makaron8426/oikos/mneme/.hegemonikon/rom")
 
+    # PURPOSE: __init__
     def __init__(
         self,
         handoff_dir: Path | None = None,
@@ -320,6 +333,7 @@ class KairosSearcher:
         self.handoff_dir = handoff_dir or self.HANDOFF_DIR
         self.rom_dir = rom_dir or self.ROM_DIR
 
+    # PURPOSE: search
     async def search(
         self,
         query: str,
@@ -356,6 +370,7 @@ class KairosSearcher:
         logger.info("Kairos: %d results for %r", len(results), query)
         return results
 
+    # PURPOSE: _collect_docs
     def _collect_docs(self) -> list[tuple[str, str, Path | None, str]]:
         docs = []
 
@@ -379,6 +394,7 @@ class KairosSearcher:
 
         return docs
 
+    # PURPOSE: _simple_rank
     def _simple_rank(
         self,
         query: str,
@@ -421,6 +437,7 @@ class KairosSearcher:
         return scored[:k]
 
 
+# PURPOSE: _truncate
 def _truncate(text: str, max_len: int) -> str:
     if len(text) <= max_len:
         return text

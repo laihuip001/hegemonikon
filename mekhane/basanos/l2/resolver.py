@@ -22,6 +22,7 @@ from mekhane.basanos.l2.models import Deficit, Question
 logger = logging.getLogger(__name__)
 
 
+# PURPOSE: Resolution
 @dataclass
 class Resolution:
     """Proposed resolution for a deficit."""
@@ -33,6 +34,7 @@ class Resolution:
     references: list[str] = field(default_factory=list)  # relevant files/docs
     status: str = "proposed"  # proposed, accepted, rejected, applied
 
+    # PURPOSE: to_dict
     def to_dict(self) -> dict[str, Any]:
         """Serialize to JSON-safe dict."""
         return {
@@ -46,6 +48,7 @@ class Resolution:
         }
 
 
+# PURPOSE: Resolver
 class Resolver:
     """L3 auto-resolution engine.
 
@@ -54,10 +57,12 @@ class Resolver:
     2. LLM-assisted analysis (via Cortex/Ochema, if available)
     """
 
+    # PURPOSE: __init__
     def __init__(self, project_root: Path):
         self.project_root = project_root
         self._heuristics = self._build_heuristics()
 
+    # PURPOSE: _build_heuristics
     def _build_heuristics(self) -> dict[str, Any]:
         """Build rule-based resolution heuristics per deficit type."""
         return {
@@ -113,6 +118,7 @@ class Resolver:
             },
         }
 
+    # PURPOSE: resolve_heuristic
     def resolve_heuristic(self, deficit: Deficit) -> Resolution:
         """Generate resolution using rule-based heuristics (no LLM)."""
         question = deficit.to_question()
@@ -137,6 +143,7 @@ class Resolver:
             status="proposed",
         )
 
+    # PURPOSE: _find_references
     def _find_references(self, deficit: Deficit) -> list[str]:
         """Find relevant files for a deficit."""
         refs: list[str] = []
@@ -154,6 +161,7 @@ class Resolver:
 
         return refs[:5]  # Limit references
 
+    # PURPOSE: resolve_batch
     def resolve_batch(
         self,
         deficits: list[Deficit],
@@ -183,6 +191,7 @@ class Resolver:
         resolutions.sort(key=lambda r: r.confidence, reverse=True)
         return resolutions
 
+    # PURPOSE: resolve_with_llm
     async def resolve_with_llm(
         self,
         deficit: Deficit,
@@ -237,6 +246,7 @@ class Resolver:
             logger.info("LLM resolution unavailable (%s), falling back to heuristic", exc)
             return self.resolve_heuristic(deficit)
 
+    # PURPOSE: _extract_actions
     def _extract_actions(self, text: str) -> list[str]:
         """Extract action items from LLM response text."""
         actions: list[str] = []
@@ -248,6 +258,7 @@ class Resolver:
         return actions[:5]
 
 
+# PURPOSE: print_resolutions
 def print_resolutions(resolutions: list[Resolution]) -> None:
     """Display resolutions in formatted output."""
     if not resolutions:

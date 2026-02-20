@@ -26,6 +26,7 @@ logger = logging.getLogger(__name__)
 _BRAVE_API_URL = "https://api.search.brave.com/res/v1/web/search"
 
 
+# PURPOSE: BraveSearcher
 class BraveSearcher:
     """Client for Brave Search API.
 
@@ -37,16 +38,19 @@ class BraveSearcher:
     Requires BRAVE_API_KEY environment variable.
     """
 
+    # PURPOSE: __init__
     def __init__(self, timeout: float = 10.0) -> None:
         self._api_key = os.getenv("BRAVE_API_KEY", "")
         self._timeout = timeout
         self._client: httpx.AsyncClient | None = None
 
+    # PURPOSE: available
     @property
     def available(self) -> bool:
         """Check if API key is configured."""
         return bool(self._api_key)
 
+    # PURPOSE: _get_client
     async def _get_client(self) -> httpx.AsyncClient:
         if self._client is None or self._client.is_closed:
             self._client = httpx.AsyncClient(
@@ -59,6 +63,7 @@ class BraveSearcher:
             )
         return self._client
 
+    # PURPOSE: search
     async def search(
         self,
         query: str,
@@ -146,12 +151,14 @@ class BraveSearcher:
         logger.info("Brave: %d results for %r", len(results), query)
         return results
 
+    # PURPOSE: close
     async def close(self) -> None:
         """Close the HTTP client."""
         if self._client and not self._client.is_closed:
             await self._client.aclose()
 
 
+# PURPOSE: _truncate
 def _truncate(text: str, max_len: int) -> str:
     if len(text) <= max_len:
         return text

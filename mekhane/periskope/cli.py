@@ -17,6 +17,7 @@ import logging
 import sys
 
 
+# PURPOSE: create_parser
 def create_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="periskope",
@@ -82,6 +83,7 @@ def create_parser() -> argparse.ArgumentParser:
     return parser
 
 
+# PURPOSE: main
 async def main(args: argparse.Namespace) -> int:
     """Run Periskopē research."""
     from mekhane.periskope.engine import PeriskopeEngine
@@ -123,6 +125,7 @@ async def main(args: argparse.Namespace) -> int:
     return 0
 
 
+# PURPOSE: run
 def run() -> None:
     parser = create_parser()
     args = parser.parse_args()

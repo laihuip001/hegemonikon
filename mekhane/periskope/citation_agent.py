@@ -21,6 +21,7 @@ from mekhane.periskope.models import Citation, TaintLevel
 logger = logging.getLogger(__name__)
 
 
+# PURPOSE: CitationAgent
 class CitationAgent:
     """Verify citations by matching claims against source content.
 
@@ -41,6 +42,7 @@ class CitationAgent:
     THRESHOLD_TAINT = 0.40    # ≥ this → TAINT
     # < THRESHOLD_TAINT → FABRICATED
 
+    # PURPOSE: __init__
     def __init__(
         self,
         timeout: float = 15.0,
@@ -58,6 +60,7 @@ class CitationAgent:
         # F8: embedding cache (SHA256[:16] → vector)
         self._embed_cache: dict[str, list[float]] = {}
 
+    # PURPOSE: verify_citations
     async def verify_citations(
         self,
         citations: list[Citation],
@@ -114,6 +117,7 @@ class CitationAgent:
 
         return verified
 
+    # PURPOSE: _verify_one
     async def _verify_one(
         self,
         citation: Citation,
@@ -159,6 +163,7 @@ class CitationAgent:
 
         return citation
 
+    # PURPOSE: _compute_similarity
     def _compute_similarity(self, claim: str, content: str) -> float:
         """Compute similarity between claim and source content.
 
@@ -210,6 +215,7 @@ class CitationAgent:
 
         return lexical_score
 
+    # PURPOSE: _compute_semantic_similarity
     def _compute_semantic_similarity(
         self, claim: str, content: str,
     ) -> float | None:
@@ -251,6 +257,7 @@ class CitationAgent:
             logger.debug("Semantic similarity unavailable: %s", e)
             return None
 
+    # PURPOSE: _cached_embed
     def _cached_embed(self, embedder, text: str) -> list[float]:
         """Embed text with hash-based caching."""
         key = hashlib.sha256(text.encode()).hexdigest()[:16]
@@ -258,6 +265,7 @@ class CitationAgent:
             self._embed_cache[key] = embedder.embed(text)
         return self._embed_cache[key]
 
+    # PURPOSE: _verify_chain
     async def _verify_chain(
         self,
         citations: list[Citation],
@@ -311,6 +319,7 @@ class CitationAgent:
 
         return citations
 
+    # PURPOSE: _get_embedder
     def _get_embedder(self):
         """Lazy-load embedder singleton."""
         if not hasattr(self, '_embedder') or self._embedder is None:
@@ -318,6 +327,7 @@ class CitationAgent:
             self._embedder = Embedder()
         return self._embedder
 
+    # PURPOSE: _fetch_url
     async def _fetch_url(self, url: str) -> str:
         """Fetch URL content as text."""
         if not url or url.startswith("file://"):
@@ -348,6 +358,7 @@ class CitationAgent:
             logger.debug("Failed to fetch %s: %s", url, e)
             return ""
 
+    # PURPOSE: extract_claims_from_synthesis
     def extract_claims_from_synthesis(
         self,
         synthesis_text: str,
@@ -429,6 +440,7 @@ class CitationAgent:
 
         return citations
 
+    # PURPOSE: _split_long_claim
     @staticmethod
     def _split_long_claim(text: str, max_len: int = 200) -> list[str]:
         """Split long claims at clause boundaries.

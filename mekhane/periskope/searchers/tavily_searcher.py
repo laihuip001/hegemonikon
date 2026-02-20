@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/periskope/searchers/ Automated fix
 """
 Tavily Search API client for Periskopē.
 

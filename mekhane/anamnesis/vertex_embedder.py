@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/anamnesis/ Automated fix
 import os
 import logging
 from google import genai

@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/periskope/searchers/ Automated fix
 """
 SearXNG search client for Periskopē.
 

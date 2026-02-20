@@ -1,3 +1,4 @@
+# PROOF: [L2/Infrastructure] <- mekhane/periskope/ S2→CLI Integration
 #!/usr/bin/env python3
 """
 Periskopē CLI — Deep Research from the command line.

@@ -1,3 +1,4 @@
+# PROOF: [L2/Infrastructure] <- mekhane/periskope/searchers/ S2→AutoFix
 """
 Internal knowledge searcher for Periskopē.
 

@@ -1,3 +1,4 @@
+# PROOF: [L2/Infrastructure] <- mekhane/periskope/ S2→AutoFix
 """
 Page Fetcher — 選択的全文クロール for Periskopē.
 

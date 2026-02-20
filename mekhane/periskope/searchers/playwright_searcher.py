@@ -1,3 +1,4 @@
+# PROOF: [K2/Sophia] <- mekhane/periskope/searchers/ K2→Playwright searcher
 """
 Playwright-based searcher for Periskopē.
 

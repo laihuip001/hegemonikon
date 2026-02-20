@@ -1,3 +1,4 @@
+# PROOF: [K2/Sophia] <- mekhane/periskope/ K2→Synthesize search results
 """
 Multi-model synthesizer for Periskopē.
 

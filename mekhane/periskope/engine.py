@@ -1,3 +1,4 @@
+# PROOF: [K2/Sophia] <- mekhane/periskope/ K2→Search engine core
 """
 Periskopē Deep Research Engine — Orchestrator.
 

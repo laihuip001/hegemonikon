@@ -1,3 +1,4 @@
+# PROOF: [K2/Sophia] <- mekhane/periskope/ K2→Fetch web pages
 """
 Page Fetcher — 選択的全文クロール for Periskopē.
 

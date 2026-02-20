@@ -1,3 +1,4 @@
+# PROOF: [K2/Sophia] <- mekhane/periskope/ K2→Generate citations
 """
 Citation verification agent for Periskopē.
 

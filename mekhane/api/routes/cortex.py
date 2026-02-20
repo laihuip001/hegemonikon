@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/
 from typing import Any, AsyncGenerator
 
 import asyncio

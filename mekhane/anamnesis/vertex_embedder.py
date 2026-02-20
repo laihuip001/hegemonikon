@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/ A0→基盤実装
 import os
 import logging
 from google import genai

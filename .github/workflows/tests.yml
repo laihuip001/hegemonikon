@@ -43,7 +43,8 @@ jobs:
                   python -m pip install --upgrade pip
                   # 1. Install base dependencies (PyPI)
                   pip install pytest pytest-asyncio pytest-timeout pyyaml pydantic lancedb numpy scipy \
-                              networkx pandas tabulate requests httpx schedule
+                              networkx pandas tabulate requests httpx schedule \
+                              fastapi aiohttp jinja2 sympy
                   # 2. Install PyTorch (CPU) explicitly
                   pip install torch --index-url https://download.pytorch.org/whl/cpu
                   # 3. Install sentence-transformers (PyPI)

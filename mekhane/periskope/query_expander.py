@@ -1,3 +1,4 @@
+# PROOF: [L3/Periskope] <- mekhane/periskope/query_expander.py Search Integration
 """
 Query expander for Periskopē.
 

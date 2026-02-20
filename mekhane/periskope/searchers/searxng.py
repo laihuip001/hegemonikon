@@ -1,3 +1,4 @@
+# PROOF: [L3/Periskope] <- mekhane/periskope/searchers/searxng.py Search Integration
 """
 SearXNG search client for Periskopē.
 

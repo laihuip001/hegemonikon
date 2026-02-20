@@ -1,3 +1,4 @@
+# PROOF: [L3/Periskope] <- mekhane/periskope/searchers/internal_searcher.py Search Integration
 """
 Internal knowledge searcher for Periskopē.
 

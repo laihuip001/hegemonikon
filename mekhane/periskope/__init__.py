@@ -1,3 +1,4 @@
+# PROOF: [L3/Periskope] <- mekhane/periskope/__init__.py Search Integration
 """
 Periskopē — HGK Deep Research Engine
 

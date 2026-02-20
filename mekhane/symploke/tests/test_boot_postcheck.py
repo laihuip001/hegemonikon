@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/symploke/tests/test_boot_postcheck.py Automated proof
 #!/usr/bin/env python3
 """Tests for boot_integration template generation and postcheck."""
 

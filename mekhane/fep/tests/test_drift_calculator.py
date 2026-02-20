@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/fep/tests/test_drift_calculator.py Automated proof
 #!/usr/bin/env python3
 """Tests for drift_calculator.py — [0,1]-Enriched Category Hom Value
 

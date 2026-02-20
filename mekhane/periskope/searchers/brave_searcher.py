@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/periskope/searchers/brave_searcher.py Automated proof
 """
 Brave Search API client for Periskopē.
 

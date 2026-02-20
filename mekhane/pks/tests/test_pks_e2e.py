@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/pks/tests/test_pks_e2e.py Automated proof
 #!/usr/bin/env python3
 # PURPOSE: PKS v2 E2E シナリオテスト
 """

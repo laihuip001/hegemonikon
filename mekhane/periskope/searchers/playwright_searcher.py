@@ -1,4 +1,5 @@
 # PROOF: [S2/Mekhanē] <- mekhane/periskope/searchers/
+# PURPOSE: Playwright Searcher — ブラウザ操作による検索
 """
 Playwright-based searcher for Periskopē.
 

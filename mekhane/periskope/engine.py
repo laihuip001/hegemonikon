@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/periskope/ O3→Zētēsis→Core Engine
 """
 Periskopē Deep Research Engine — Orchestrator.
 

@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/ Existence confirmed by Dendron CI
 """
 MCP Guard — ゾンビプロセス防止の自己防衛モジュール
 

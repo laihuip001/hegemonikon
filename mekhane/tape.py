@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/ Existence confirmed by Dendron CI
 """
 Tape Writer — WF 実行トレースを JSONL として記録する。
 

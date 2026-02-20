@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/ Existence confirmed by Dendron CI
 """
 Brave Search API client for Periskopē.
 

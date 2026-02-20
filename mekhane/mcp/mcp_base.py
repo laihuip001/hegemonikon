@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- mekhane/ Existence confirmed by Dendron CI
 """
 MCP Base Module — Hegemonikón MCP Server Common Infrastructure
 

@@ -1,3 +1,4 @@
+# PROOF: [S2/Mekhanē] <- mekhane/periskope/ Deep Research Engine
 #!/usr/bin/env python3
 """
 Periskopē CLI — Deep Research from the command line.

@@ -1,3 +1,4 @@
+# PROOF: [S2/Mekhanē] <- mekhane/periskope/ Deep Research Engine
 """
 Brave Search API client for Periskopē.
 

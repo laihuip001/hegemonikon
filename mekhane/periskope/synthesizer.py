@@ -1,3 +1,4 @@
+# PROOF: [S2/Mekhanē] <- mekhane/periskope/ Deep Research Engine
 """
 Multi-model synthesizer for Periskopē.
 

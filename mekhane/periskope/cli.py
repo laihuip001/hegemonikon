@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- mekhane/periskope/ A0→探求する私が必要→periskopeが担う
+# PURPOSE: Periskopē CLI — Deep Research from the command line.
 """
 Periskopē CLI — Deep Research from the command line.
 

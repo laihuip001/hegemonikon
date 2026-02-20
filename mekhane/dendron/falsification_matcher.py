@@ -1,3 +1,4 @@
+# PROOF: [L2/Dendron] <- mekhane/dendron/ A0→品質保証が必要→dendronが担う
 """
 Falsification Matcher — 消化論文の主張と epistemic_status.yaml の反証条件を照合
 

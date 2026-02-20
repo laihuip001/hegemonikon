@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/ A0→記録する私が必要→tapeが担う
 """
 Tape Writer — WF 実行トレースを JSONL として記録する。
 

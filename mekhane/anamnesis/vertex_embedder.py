@@ -1,3 +1,4 @@
+# PROOF: [L2/Anamnesis] <- mekhane/anamnesis/ A0→記憶検索が必要→anamnesisが担う
 import os
 import logging
 from google import genai

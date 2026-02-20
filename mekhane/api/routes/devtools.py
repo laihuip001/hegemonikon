@@ -1,3 +1,4 @@
+# PROOF: [L2/API] <- mekhane/api/routes/ A0→APIエンドポイントが必要→routesが担う
 """
 DevTools API routes — ファイル操作・ターミナル・Ochema (AI) をフロントエンド DevTools ビューに提供。
 

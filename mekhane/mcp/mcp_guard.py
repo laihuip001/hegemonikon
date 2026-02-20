@@ -1,3 +1,4 @@
+# PROOF: [L2/MCP] <- mekhane/mcp/ A0→外部ツール統合が必要→mcpが担う
 """
 MCP Guard — ゾンビプロセス防止の自己防衛モジュール
 

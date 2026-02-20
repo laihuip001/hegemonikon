@@ -1,3 +1,4 @@
+# PROOF: [L1/CCL] <- mekhane/ccl/ A0→認知制御言語が必要→cclが担う
 """operators.md の SSOT パーサー。
 
 operators.md の Markdown テーブルから演算子定義を抽出し、

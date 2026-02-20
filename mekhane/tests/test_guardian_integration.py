@@ -101,7 +101,10 @@ class TestMeaningfulTraceContextRegression:
                 intensity=2,
                 context="must persist to disk",
             )
-            save_traces(path)
+
+            # Mock TRACES_PATH.parent.mkdir to avoid PermissionError in CI
+            with patch("pathlib.Path.mkdir"):
+                save_traces(path)
 
             # Load and verify
             loaded = load_traces(path)

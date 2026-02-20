@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/periskope/ S2→引用検証が必要→CitationAgentが担う
 """
 Citation verification agent for Periskopē.
 

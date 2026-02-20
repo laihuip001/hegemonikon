@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/anamnesis/ K3→ベクトル検索が必要→VertexEmbedderが担う
 import os
 import logging
 from google import genai

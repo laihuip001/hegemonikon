@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/periskope/ O3→探求が必要→periskope が担う
 """
 Internal knowledge searcher for Periskopē.
 

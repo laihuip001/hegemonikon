@@ -41,14 +41,10 @@ jobs:
             - name: Install dependencies
               run: |
                   python -m pip install --upgrade pip
-                  # 1. Install standard PyPI dependencies (including those for tests)
+                  # Install core test dependencies (CPU-only)
                   pip install pytest pytest-asyncio pytest-timeout pyyaml pydantic lancedb numpy scipy \
-                              networkx pandas tabulate requests httpx schedule filelock \
-                              fastapi aiohttp python-dotenv
-                  # 2. Install PyTorch CPU
-                  pip install torch --index-url https://download.pytorch.org/whl/cpu
-                  # 3. Install sentence-transformers (after torch)
-                  pip install sentence-transformers
+                              networkx pandas tabulate requests httpx schedule \
+                              sentence-transformers torch --index-url https://download.pytorch.org/whl/cpu
                   # Install project in development mode if setup exists
                   pip install -e ".[test]" 2>/dev/null || true
 

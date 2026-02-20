@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/api/ P1→空間が必要→api が担う
 """
 DevTools API routes — ファイル操作・ターミナル・Ochema (AI) をフロントエンド DevTools ビューに提供。
 

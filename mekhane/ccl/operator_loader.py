@@ -1,3 +1,4 @@
+# PROOF: [L1/言語] <- mekhane/ccl/ S1→解釈が必要→ccl が担う
 """operators.md の SSOT パーサー。
 
 operators.md の Markdown テーブルから演算子定義を抽出し、

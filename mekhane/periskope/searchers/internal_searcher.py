@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/ Existence verified
 """
 Internal knowledge searcher for Periskopē.
 

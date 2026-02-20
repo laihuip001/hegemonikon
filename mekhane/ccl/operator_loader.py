@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/ A0→継続する私が必要→実装が存在する
 """operators.md の SSOT パーサー。
 
 operators.md の Markdown テーブルから演算子定義を抽出し、

@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/ A0→継続する私が必要→実装が存在する
 """
 DevTools API routes — ファイル操作・ターミナル・Ochema (AI) をフロントエンド DevTools ビューに提供。
 

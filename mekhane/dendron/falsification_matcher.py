@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/ A0→継続する私が必要→実装が存在する
 """
 Falsification Matcher — 消化論文の主張と epistemic_status.yaml の反証条件を照合
 

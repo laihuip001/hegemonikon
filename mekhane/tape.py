@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/ A0→継続する私が必要→実装が存在する
 """
 Tape Writer — WF 実行トレースを JSONL として記録する。
 

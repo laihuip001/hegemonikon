@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/ A0→継続する私が必要→実装が存在する
 """
 Page Fetcher — 選択的全文クロール for Periskopē.
 

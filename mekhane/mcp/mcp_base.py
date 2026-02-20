@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/インフラ] <- mekhane/ A0→継続する私が必要→実装が存在する
 """
 MCP Base Module — Hegemonikón MCP Server Common Infrastructure
 

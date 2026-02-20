@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/periskope/__init__.py Automated PROOF header addition
 """
 Periskopē — HGK Deep Research Engine
 

@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/synteleia/tests/test_l2_live.py Automated PROOF header addition
 #!/usr/bin/env python3
 # PROOF: [L2/テスト] <- mekhane/synteleia/tests/
 # PURPOSE: L2 SemanticAgent 実弾テスト (OpenAI Backend)

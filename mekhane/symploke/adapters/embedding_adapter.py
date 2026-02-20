@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/symploke/adapters/embedding_adapter.py Automated PROOF header addition
 """
 # PROOF: [L2/インフラ] <- mekhane/symploke/adapters/ A0→ベクトルDBアダプタが必要→embedding_adapter が担う
 EmbeddingAdapter - sentence-transformers を使用した実ベクトル検索アダプタ

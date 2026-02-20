@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/periskope/engine.py Automated PROOF header addition
 """
 Periskopē Deep Research Engine — Orchestrator.
 

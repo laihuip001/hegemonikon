@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/fep/tests/test_uml_sel_bridge.py Automated PROOF header addition
 """UML Phase 2 — SEL 統合テスト"""
 
 import pytest

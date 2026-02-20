@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/periskope/searchers/internal_searcher.py Automated PROOF header addition
 """
 Internal knowledge searcher for Periskopē.
 

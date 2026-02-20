@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/basanos/gateway/tests/test_gateway.py Automated PROOF header addition
 """
 MCP Gateway — 統合テスト
 

@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/dendron/falsification_checker.py Automated PROOF header addition
 """
 S7: Falsification Condition Checker
 

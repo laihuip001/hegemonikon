@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/fep/tests/test_attractor_advisor.py Automated PROOF header addition
 """Tests for attractor_advisor helper functions."""
 
 import unittest

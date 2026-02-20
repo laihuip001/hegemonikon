@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/peira/cognitive_quality.py Automated PROOF header addition
 #!/usr/bin/env python3
 # PROOF: [L2/検証] <- A0→認知品質の定量測定が必要→n=1でもデータで語る
 """

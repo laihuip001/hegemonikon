@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/symploke/tests/test_intent_wal.py Automated PROOF header addition
 #!/usr/bin/env python3
 """Tests for Intent-WAL Manager."""
 

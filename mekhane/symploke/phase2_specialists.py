@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/symploke/phase2_specialists.py Automated PROOF header addition
 #!/usr/bin/env python3
 # PROOF: [L3/ユーティリティ] <- mekhane/symploke/ O4→実行スクリプトが必要→phase2_specialists が担う
 """

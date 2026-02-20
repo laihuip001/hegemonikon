@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/ergasterion/tekhne/tests/test_cortex_refine.py Automated PROOF header addition
 #!/usr/bin/env python3
 """
 Tests for Sweep Engine and Deep Engine — Cortex Refine Integration

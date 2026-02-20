@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/tests/test_guardian_integration.py Automated PROOF header addition
 """
 Guardian Integration Tests — /bou ② テスト守護者
 

@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/dendron/cli.py Automated PROOF header addition
 # noqa: AI-ALL
 # PROOF: [L2/インフラ] <- mekhane/dendron/  # noqa: AI-022
 """

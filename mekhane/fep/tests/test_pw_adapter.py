@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/fep/tests/test_pw_adapter.py Automated PROOF header addition
 """Tests for pw_adapter.py — L1↔L2 PW bridge."""
 
 import pytest

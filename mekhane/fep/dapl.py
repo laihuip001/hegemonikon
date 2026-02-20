@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/fep/dapl.py Automated PROOF header addition
 #!/usr/bin/env python3
 # PROOF: [L2/インフラ] <- mekhane/fep/ A0→dirty adapterの設計を体系化する必要→dapl が担う
 """

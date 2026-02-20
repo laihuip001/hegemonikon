@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/exagoge/cli.py Automated PROOF header addition
 #!/usr/bin/env python3
 # PROOF: [L2/コア] <- mekhane/exagoge/
 # PURPOSE: Exagoge CLI — ワンコマンドで HGK データをエクスポート

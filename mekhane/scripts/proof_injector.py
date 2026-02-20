@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/scripts/proof_injector.py Automated PROOF header addition
 #!/usr/bin/env python3
 # PROOF: [L3/ツール] <- mekhane/scripts/
 """

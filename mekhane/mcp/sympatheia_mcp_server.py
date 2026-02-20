@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/mcp/sympatheia_mcp_server.py Automated PROOF header addition
 #!/usr/bin/env python3
 # PROOF: [L2/Sympatheia] <- mekhane/mcp/
 """

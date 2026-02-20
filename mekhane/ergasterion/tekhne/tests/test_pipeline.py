@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/ergasterion/tekhne/tests/test_pipeline.py Automated PROOF header addition
 #!/usr/bin/env python3
 # PROOF: [L3/テスト] <- mekhane/ergasterion/tekhne/ TekhnePipeline 統合テスト
 """

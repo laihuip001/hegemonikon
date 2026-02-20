@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/basanos/tests/test_auto_noqa.py Automated PROOF header addition
 #!/usr/bin/env python3
 # PROOF: [L2/テスト] <- mekhane/basanos/tests/
 # PURPOSE: Basanos auto_noqa の包括テスト

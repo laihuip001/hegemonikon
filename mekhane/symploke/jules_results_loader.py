@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/symploke/jules_results_loader.py Automated PROOF header addition
 #!/usr/bin/env python3
 # PROOF: [L2/インフラ] <- mekhane/symploke/ O4→結果統合が必要→jules_results_loader が担う
 """

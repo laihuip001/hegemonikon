@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/ergasterion/digestor/tests/test_digestor_improvements.py Automated PROOF header addition
 #!/usr/bin/env python3
 # PROOF: [L2/テスト] <- mekhane/ergasterion/digestor/tests/
 # PURPOSE: Digestor Pipeline 改善 A-F の包括テスト

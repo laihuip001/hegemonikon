@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/anamnesis/tests/test_proactive_push.py Automated PROOF header addition
 """Proactive Push + Link Graph のテスト."""
 
 import json

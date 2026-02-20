@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/pks/tests/test_gateway_bridge.py Automated PROOF header addition
 """
 GatewayBridge テスト — E2E + 単体テスト
 

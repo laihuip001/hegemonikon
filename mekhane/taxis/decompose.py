@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/taxis/decompose.py Automated PROOF header addition
 #!/usr/bin/env python3
 # PROOF: [L2/インフラ] <- mekhane/taxis/ A0→G関手(第一原理分解)が必要→decomposeが担う
 """

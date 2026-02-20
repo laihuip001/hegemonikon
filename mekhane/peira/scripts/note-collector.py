@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/peira/scripts/note-collector.py Automated PROOF header addition
 #!/usr/bin/env python3
 # PROOF: [L2/インフラ] <- mekhane/peira/ A0→note.com記事収集が必要→note-collectorが担う
 """

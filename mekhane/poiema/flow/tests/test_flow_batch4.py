@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/poiema/flow/tests/test_flow_batch4.py Automated PROOF header addition
 #!/usr/bin/env python3
 # PROOF: [L2/テスト] <- mekhane/poiema/flow/tests/
 # PURPOSE: Poiema flow モジュール (EpocheScanner, EpocheShield, MetronResolver, DoxaCache) テスト

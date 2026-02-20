@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/api/routes/sophia.py Automated PROOF header addition
 #!/usr/bin/env python3
 # PROOF: [L2/インフラ] <- mekhane/api/routes/
 # PURPOSE: Sophia KI (Knowledge Items) CRUD API

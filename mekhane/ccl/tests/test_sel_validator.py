@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/ccl/tests/test_sel_validator.py Automated PROOF header addition
 #!/usr/bin/env python3
 # PROOF: [L2/テスト] <- mekhane/ccl/tests/
 # PURPOSE: CCL SEL Validator の包括テスト — WF出力がSEL要件を満たすか検証

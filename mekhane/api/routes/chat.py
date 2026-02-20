@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/api/routes/chat.py Automated PROOF header addition
 #!/usr/bin/env python3
 # PROOF: [L2/インフラ] <- mekhane/api/routes/
 # PURPOSE: Chat API — OchemaService 経由の統合 LLM Chat プロキシ

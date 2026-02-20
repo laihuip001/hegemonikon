@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/peira/tests/test_hgk_health.py Automated PROOF header addition
 #!/usr/bin/env python3
 # PROOF: [L2/テスト] <- mekhane/peira/ A0→テストが必要→test_hgk_healthが担う
 """

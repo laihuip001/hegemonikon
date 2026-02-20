@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/basanos/gateway/tests/test_injection_regression.py Automated PROOF header addition
 """
 Injection Regression Test Suite — 6攻撃ベクタによるセキュリティ検証
 

@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/synteleia/tests/test_semantic_agent.py Automated PROOF header addition
 """
 Tests for SemanticAgent (L2)
 """

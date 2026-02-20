@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/periskope/searchers/playwright_searcher.py Automated PROOF header addition
 """
 Playwright-based searcher for Periskopē.
 

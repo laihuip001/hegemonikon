@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/exagoge/ideas_exporter.py Automated PROOF header addition
 #!/usr/bin/env python3
 # PROOF: [L2/コア] <- mekhane/exagoge/
 # PURPOSE: Gateway Ideas データのエクスポート機能

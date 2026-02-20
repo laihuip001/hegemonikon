@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/periskope/ Automated fix
 """
 Multi-model synthesizer for Periskopē.
 

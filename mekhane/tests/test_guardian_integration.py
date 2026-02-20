@@ -25,6 +25,7 @@ class TestMeaningfulTraceContextRegression:
     """Verify that context= is actually passed to MeaningfulTrace."""
 
     # PURPOSE: Verify mark meaningful with context behaves correctly
+    @patch("mekhane.fep.meaningful_traces.TRACES_PATH", Path(tempfile.gettempdir()) / "traces.json")
     def test_mark_meaningful_with_context(self):
         """context must be stored in the trace, not silently dropped."""
         from mekhane.fep.meaningful_traces import (
@@ -32,6 +33,9 @@ class TestMeaningfulTraceContextRegression:
             clear_session_traces,
             get_session_traces,
         )
+
+        # Ensure directory exists for patched path
+        Path(tempfile.gettempdir()).mkdir(parents=True, exist_ok=True)
 
         clear_session_traces()
         trace = mark_meaningful(
@@ -53,9 +57,13 @@ class TestMeaningfulTraceContextRegression:
         clear_session_traces()
 
     # PURPOSE: Verify mark meaningful context none by default behaves correctly
+    @patch("mekhane.fep.meaningful_traces.TRACES_PATH", Path(tempfile.gettempdir()) / "traces.json")
     def test_mark_meaningful_context_none_by_default(self):
         """context should default to None, not crash."""
         from mekhane.fep.meaningful_traces import mark_meaningful, clear_session_traces
+
+        # Ensure directory exists for patched path
+        Path(tempfile.gettempdir()).mkdir(parents=True, exist_ok=True)
 
         clear_session_traces()
         trace = mark_meaningful(reason="no context", intensity=1)
@@ -84,33 +92,37 @@ class TestMeaningfulTraceContextRegression:
     # PURPOSE: Verify save load preserves context behaves correctly
     def test_save_load_preserves_context(self):
         """context must survive save -> load cycle."""
-        from mekhane.fep.meaningful_traces import (
-            mark_meaningful,
-            save_traces,
-            load_traces,
-            clear_session_traces,
-        )
-
+        # Use a temporary file for TRACES_PATH to avoid PermissionError
         with tempfile.TemporaryDirectory() as tmpdir:
-            path = Path(tmpdir) / "traces.json"
+            temp_traces_path = Path(tmpdir) / "traces.json"
 
-            # Write a trace with context
-            clear_session_traces()
-            mark_meaningful(
-                reason="persist context",
-                intensity=2,
-                context="must persist to disk",
-            )
-            save_traces(path)
+            with patch("mekhane.fep.meaningful_traces.TRACES_PATH", temp_traces_path):
+                from mekhane.fep.meaningful_traces import (
+                    mark_meaningful,
+                    save_traces,
+                    load_traces,
+                    clear_session_traces,
+                )
 
-            # Load and verify
-            loaded = load_traces(path)
-            assert len(loaded) >= 1
-            found = [t for t in loaded if t.reason == "persist context"]
-            assert len(found) == 1
-            assert found[0].context == "must persist to disk"
+                path = temp_traces_path
 
-            clear_session_traces()
+                # Write a trace with context
+                clear_session_traces()
+                mark_meaningful(
+                    reason="persist context",
+                    intensity=2,
+                    context="must persist to disk",
+                )
+                save_traces(path)
+
+                # Load and verify
+                loaded = load_traces(path)
+                assert len(loaded) >= 1
+                found = [t for t in loaded if t.reason == "persist context"]
+                assert len(found) == 1
+                assert found[0].context == "must persist to disk"
+
+                clear_session_traces()
 
 
 # ============ 2. FailureDB — resolution regression ============

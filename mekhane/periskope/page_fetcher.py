@@ -1,3 +1,4 @@
+# PROOF: [L3/Periskope] <- mekhane/periskope/page_fetcher.py Search Integration
 """
 Page Fetcher — 選択的全文クロール for Periskopē.
 

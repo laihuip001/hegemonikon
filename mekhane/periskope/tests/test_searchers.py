@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/periskope/tests/test_searchers.py Automated proof
 """
 Tests for SearXNG searcher.
 """

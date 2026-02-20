@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/ochema/tests/test_f0_manual.py Automated proof
 #!/usr/bin/env python3
 """F0 Tool Use — 手動検証スクリプト.
 

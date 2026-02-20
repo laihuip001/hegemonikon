@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/periskope/tests/test_engine.py Automated proof
 """
 Tests for Periskopē Engine (orchestrator).
 """

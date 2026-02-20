@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/ergasterion/tekhne/tests/test_prompt_quality.py Automated proof
 #!/usr/bin/env python3
 """
 Prompt Quality Testing Suite

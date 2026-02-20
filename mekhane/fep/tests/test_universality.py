@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/fep/tests/test_universality.py Automated proof
 """Tests for mekhane.fep.universality — Kalon (圏論的普遍性検証)."""
 
 import json

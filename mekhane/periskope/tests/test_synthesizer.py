@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/periskope/tests/test_synthesizer.py Automated proof
 """
 Tests for multi-model synthesizer.
 """

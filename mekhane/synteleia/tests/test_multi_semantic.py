@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/synteleia/tests/test_multi_semantic.py Automated proof
 # PURPOSE: MultiSemanticAgent のテスト (Layer B: Nous)
 """
 Tests for Multi-LLM Ensemble Audit Agent.

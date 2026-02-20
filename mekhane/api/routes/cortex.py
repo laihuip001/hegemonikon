@@ -1,3 +1,4 @@
+# PROOF: [L2/Infrastructure] <- mekhane/api/ A0->Cortex
 from typing import Any, AsyncGenerator
 
 import asyncio

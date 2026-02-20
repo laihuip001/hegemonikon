@@ -1,4 +1,4 @@
-# PROOF: [S2/Mekhanē] <- mekhane/ochema/
+# PROOF: [L2/Mekhanē] <- mekhane/ochema/
 # PURPOSE: Implementation of fake_extension_server.py
 """Fake Extension Server — ConnectRPC over HTTP.
 

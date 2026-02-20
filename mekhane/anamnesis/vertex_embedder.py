@@ -1,4 +1,4 @@
-# PROOF: [K3/Anamnēsis] <- mekhane/anamnesis/
+# PROOF: [L2/Anamnēsis] <- mekhane/anamnesis/
 # PURPOSE: Implementation of vertex_embedder.py
 import os
 import logging

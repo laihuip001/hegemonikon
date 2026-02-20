@@ -1,4 +1,4 @@
-# PROOF: [S2/Mekhanē] <- mekhane/api/routes/
+# PROOF: [L2/Mekhanē] <- mekhane/api/routes/
 # PURPOSE: Implementation of cortex.py
 from typing import Any, AsyncGenerator
 

@@ -1,4 +1,4 @@
-# PROOF: [S2/Mekhanē] <- mekhane/periskope/
+# PROOF: [L2/Mekhanē] <- mekhane/periskope/
 # PURPOSE: Implementation of cli.py
 #!/usr/bin/env python3
 """

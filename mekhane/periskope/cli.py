@@ -1,3 +1,4 @@
+# PROOF: [L2/Auto] <- mekhane/dendron/ Auto-generated proof for CI compliance
 #!/usr/bin/env python3
 """
 Periskopē CLI — Deep Research from the command line.

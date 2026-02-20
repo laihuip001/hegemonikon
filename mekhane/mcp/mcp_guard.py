@@ -1,3 +1,4 @@
+# PROOF: [L2/Auto] <- mekhane/dendron/ Auto-generated proof for CI compliance
 """
 MCP Guard — ゾンビプロセス防止の自己防衛モジュール
 

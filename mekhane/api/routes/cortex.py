@@ -1,3 +1,4 @@
+# PROOF: [L2/Impl] <- mekhane/ A0->Impl->Module
 from typing import Any, AsyncGenerator
 
 import asyncio

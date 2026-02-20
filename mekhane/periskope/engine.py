@@ -1,3 +1,5 @@
+# PROOF: [L2/Mekhane] <- mekhane/periskope/ A0→探求する私が必要→periskopeが担う
+# PURPOSE: Periskopē Deep Research Engine — Orchestrator.
 """
 Periskopē Deep Research Engine — Orchestrator.
 

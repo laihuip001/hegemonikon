@@ -1,3 +1,4 @@
+# PROOF: [L1/Hermēneus] <- mekhane/ccl/ S1→言語→CCL
 """CCL Linter — CCL 式の静的検証。
 
 operators.md (SSOT) に基づいて CCL 式を検証し、

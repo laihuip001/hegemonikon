@@ -1,3 +1,4 @@
+# PROOF: [S2/Mekhanē] <- mekhane/periskope/ S2→探求→DeepSearch
 """
 Page Fetcher — 選択的全文クロール for Periskopē.
 

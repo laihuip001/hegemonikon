@@ -1,3 +1,4 @@
+# PROOF: [L2/Impl] <- mekhane/ Missing proof retrofitting via CI fix
 #!/usr/bin/env python3
 """
 Periskopē CLI — Deep Research from the command line.

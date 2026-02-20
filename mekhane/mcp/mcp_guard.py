@@ -1,3 +1,4 @@
+# PROOF: [L2/Impl] <- mekhane/ Missing proof retrofitting via CI fix
 """
 MCP Guard — ゾンビプロセス防止の自己防衛モジュール
 

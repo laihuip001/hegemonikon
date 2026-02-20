@@ -1,3 +1,4 @@
+# PROOF: [L2/Impl] <- mekhane/ Missing proof retrofitting via CI fix
 """
 Playwright-based searcher for Periskopē.
 

@@ -1,3 +1,4 @@
+# PROOF: [L2/Impl] <- mekhane/ Missing proof retrofitting via CI fix
 from typing import Any, AsyncGenerator
 
 import asyncio

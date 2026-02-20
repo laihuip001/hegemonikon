@@ -1,3 +1,4 @@
+# PROOF: [S2/Mekhanē] <- mekhane/periskope/searchers/ S2→探求→DeepSearch
 """
 Tavily Search API client for Periskopē.
 

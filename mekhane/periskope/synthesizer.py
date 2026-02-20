@@ -1,3 +1,4 @@
+# PROOF: [S2/Mekhanē] <- mekhane/periskope/ S2→探求→DeepSearch
 """
 Multi-model synthesizer for Periskopē.
 
